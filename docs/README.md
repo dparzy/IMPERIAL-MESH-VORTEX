@@ -12,6 +12,7 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [AUDYT_ADOPCJI.md](AUDYT_ADOPCJI.md) | Audyt adopcji 17 modułów Kingdom Pixel → Imperium (mapowanie, prawa, ostrzeżenia) |
 | [ARCHITEKTURA_IMPERIUM.md](ARCHITEKTURA_IMPERIUM.md) | Pełna mapa Imperium — dzielnice, moduły, przepływ sygnału, cykl Fazy 0 |
 | [ARSENAL_IMPERIUM.md](ARSENAL_IMPERIUM.md) | Zweryfikowany katalog ~320 narzędzi z pliku IMV (✅ realne / ⚠️ niepewne / ❌ halucynacje) |
+| [ARSENAL_AMERYKI.md](ARSENAL_AMERYKI.md) | 690 linków z 50+ krajów (Americas, Europa, Afryka, Australia, Oceania) — oceny 1-10, priorytety 1-5 |
 | _(wkrótce)_ | System Numeracji — klucz kodowy i intuicja botów |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

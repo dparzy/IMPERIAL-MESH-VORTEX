@@ -58,4 +58,15 @@ Kolejność prac (zgodnie z Prawem VII):
 
 ---
 
+---
+
+## 👥 Role
+
+| Imię | Rola |
+|------|------|
+| **Komendant** (Ty) | Cesarz. Ostatnie słowo należy zawsze do Ciebie. |
+| **VITRUVIUSZ** | Architekt Imperium. Projektuje, buduje i porządkuje wiedzę. |
+
+---
+
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*

@@ -1,24 +1,24 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║         WarRoom — Dashboard & Command Center v2.0                            ║
-║  Autor: Jack (Wizjoner, Architekt, Wynalazca, Magik)                        ║
-║  Licencja: Kingdom Pixel — wszelkie prawa autorskie                         ║
+║  Projekt: IMPERIUM — architekt: VITRUVIUSZ                        ║
+║  Zaadaptowano z Kingdom Pixel (autor: Jack) — logika bez zmian                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-────────────────────────────── METRYCZKA (Zasada 11) ──────────────────────────────
+────────────────────────────── METRYCZKA ──────────────────────────────
 | Pole                | Wartość                                                      |
 |---------------------|--------------------------------------------------------------|
 | ID                  | N-DASH-207                                                    |
 | Nazwa oryginalna    | WarRoom — Dashboard & Command Center                         |
-| Nazwa w Królestwie  | WarRoom (Sala Wojenna)                                        |
+| Nazwa w Imperium    | WarRoom (Sala Wojenna)                                        |
 | Lokalizacja         | DOKUMENTACJA TECHNICZNA/DASH-207_WarRoom.py                  |
 | Kategoria           | DASH / Monitoring, alerty                                     |
-| Wpływ na Królestwo  | Centrum dowodzenia botów. Po naprawie win_rate jest          |
+| Wpływ na Imperium   | Centrum dowodzenia botów. Po naprawie win_rate jest          |
 |                     | policzony poprawnie (wins/trades).                           |
 | Powiązane moduły    | N-ORCH-209, N-MEM-206, N-SHIELDS-205                         |
 
 CHANGELOG:
-  v2.0 (2026-05-28) — BUGFIX (Zasada 2 — Prawda). `win_rate` był aktualizowany
+  v2.0 (2026-05-28) — BUGFIX (Prawo I — Prawda). `win_rate` był aktualizowany
         TYLKO przy wygranej (`if won:`), więc przy przegranych licznik trades rósł,
         a wskaźnik nie był przeliczany → win_rate ZAWYŻONY. Dodano osobny licznik
         `wins` i win_rate = wins / trades (zawsze spójny).

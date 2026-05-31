@@ -1,24 +1,24 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║        OmniSight — Bayesian Fusion On-Chain + OrderBook v2.0                ║
-║  Autor: Jack (Wizjoner, Architekt, Wynalazca, Magik)                        ║
-║  Licencja: Kingdom Pixel — wszelkie prawa autorskie                         ║
+║  Projekt: IMPERIUM — architekt: VITRUVIUSZ                        ║
+║  Zaadaptowano z Kingdom Pixel (autor: Jack) — logika bez zmian                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-────────────────────────────── METRYCZKA (Zasada 11) ──────────────────────────────
+────────────────────────────── METRYCZKA ──────────────────────────────
 | Pole                | Wartość                                                      |
 |---------------------|--------------------------------------------------------------|
 | ID                  | N-EYES-028                                                    |
 | Nazwa oryginalna    | OmniSight — Bayesian Fusion On-Chain + OrderBook             |
-| Nazwa w Królestwie  | OmniSight (Wszechoko)                                         |
+| Nazwa w Imperium    | OmniSight (Wszechoko)                                         |
 | Lokalizacja         | DOKUMENTACJA TECHNICZNA/EYES-028_OmniSight.py                |
 | Kategoria           | EYES / Percepcja, detekcja manipulacji                       |
-| Wpływ na Królestwo  | Warstwa percepcji rynku; po naprawie poprawnie wykrywa       |
+| Wpływ na Imperium   | Warstwa percepcji rynku; po naprawie poprawnie wykrywa       |
 |                     | manipulację (znormalizowany posterior Bayesa).               |
 | Powiązane moduły    | N-BRAIN-026, N-SHIELDS-205, N-CORE-005                       |
 
 CHANGELOG:
-  v2.0 (2026-05-28) — BUGFIX (Zasada 2 — Prawda). Stary kod liczył
+  v2.0 (2026-05-28) — BUGFIX (Prawo I — Prawda). Stary kod liczył
         `posterior = P(E|M)·P(M)` BEZ normalizacji przez dowód. Z priorem 0.05
         posterior był zawsze ≤ ~0.045 → próg 0.5 nieosiągalny → manipulacja
         PRAKTYCZNIE NIGDY niewykrywana. Wprowadzono pełny wzór Bayesa z

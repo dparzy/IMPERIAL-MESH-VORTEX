@@ -1,20 +1,20 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║     MetaCortex — Samodoskonalący się Agent z Meta-Learningiem v3.0          ║
-║  Autor: Jack (Wizjoner, Architekt, Wynalazca, Magik)                        ║
-║  Licencja: Kingdom Pixel — wszelkie prawa autorskie                         ║
+║  Projekt: IMPERIUM — architekt: VITRUVIUSZ                        ║
+║  Zaadaptowano z Kingdom Pixel (autor: Jack) — logika bez zmian                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-────────────────────────────── METRYCZKA (Zasada 11) ──────────────────────────────
+────────────────────────────── METRYCZKA ──────────────────────────────
 | Pole                | Wartość                                                      |
 |---------------------|--------------------------------------------------------------|
 | ID                  | N-BRAIN-026                                                   |
 | Nazwa oryginalna    | MetaCortex — Samodoskonalący się Agent z Meta-Learningiem    |
-| Nazwa w Królestwie  | MetaCortex (Meta-Kora)                                        |
+| Nazwa w Imperium    | MetaCortex (Meta-Kora)                                        |
 | Lokalizacja         | DOKUMENTACJA TECHNICZNA/BRAIN-026_MetaCortex.py              |
 | Kategoria           | BRAIN / Meta-learning, decyzja wieloagentowa                 |
-| Wpływ na Królestwo  | Centralny mózg debaty agentów (Aktor-Sędzia-MetaSędzia).     |
-|                     | Trend liczony teraz z TA-Lib (Zasada 75).                    |
+| Wpływ na Imperium   | Centralny mózg debaty agentów (Aktor-Sędzia-MetaSędzia).     |
+|                     | Trend liczony teraz z TA-Lib (Prawo I).                    |
 | Powiązane moduły    | N-TOOLS-208 (ToolForge), N-ORCH-209 (TitanMind),             |
 |                     | N-MEM-206 (Mnemosyne)                                        |
 
@@ -41,12 +41,12 @@ from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional
 from enum import Enum
 
-# ── Zasada 75: matematyka trendu z deterministycznego rdzenia TA-Lib. ──
+# ── Prawo I: matematyka trendu z deterministycznego rdzenia TA-Lib. ──
 try:
     import talib
 except ImportError as e:
     raise RuntimeError(
-        "N-BRAIN-026 wymaga TA-Lib (Zasada 75). Instalacja: `pip install TA-Lib`. "
+        "N-BRAIN-026 wymaga TA-Lib (Prawo I). Instalacja: `pip install TA-Lib`. "
         "Brak ręcznego fallbacku — gwarancja kanonicznych wartości EMA."
     ) from e
 
@@ -177,7 +177,7 @@ class StrategyEvolution:
 
 
 def main():
-    logger.info("=== MetaCortex v3.0 Demo (Zasada 75 — TA-Lib) ===")
+    logger.info("=== MetaCortex v3.0 Demo (Prawo I — TA-Lib) ===")
     random.seed(7)
     prices = [50000 + i * 100 + random.uniform(-500, 500) for i in range(60)]
     headlines = ["Bitcoin surges past resistance!", "Analysts predict new rally", "Fear of regulation looms"]
@@ -196,7 +196,7 @@ def main():
     meta.evaluate(records)
     evo.evolve()
 
-    print("\n✅ MetaCortex v3.0 — demo zakończone (Zasada 75 spełniona, bug MetaJudge naprawiony).")
+    print("\n✅ MetaCortex v3.0 — demo zakończone (Prawo I spełniona, bug MetaJudge naprawiony).")
 
 
 if __name__ == "__main__":

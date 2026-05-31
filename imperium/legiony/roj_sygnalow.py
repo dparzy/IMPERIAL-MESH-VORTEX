@@ -1,13 +1,13 @@
 """
 ╔══════════════════════════════════════════════════════════════════╗
 ║  N-NEURON-001 — RÓJ SYGNAŁÓW (Signal Swarm)                        ║
-║  Królestwo Pixel | Projektant: Jack                               ║
+║  IMPERIUM — adaptacja z Kingdom Pixel (Jack)                               ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║  CO TO: wiele "neuronów-sygnałów" głosuje ważoną wagą; wejście    ║
 ║  tylko przy KONSENSUSIE. Realizacja wizji Komendanta "rój neuronów"║
 ║  + filtr reżimu (technika trend-following funduszy 2026).         ║
 ║                                                                    ║
-║  NEURONY (close-only, liczone przez Bramę — Zasada 75):           ║
+║  NEURONY (close-only, liczone przez Bramę — Prawo I):           ║
 ║   N1 Trend     — cena > EMA(fast)                                 ║
 ║   N2 Momentum  — RSI w zdrowym pasmie (low..high)                 ║
 ║   N3 Reżim     — cena > EMA(long) ORAZ EMA(long) ROŚNIE           ║

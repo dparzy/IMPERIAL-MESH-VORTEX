@@ -1,25 +1,25 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║       Lustro Prawdy (The Truth Mirror) — Walidacja Kontradyktoryjna v1.1     ║
-║  Autor (Kingdom Pixel): Jack (Wizjoner, Architekt, Wynalazca, Magik)        ║
-║  Geneza: persona Shinsō (深層) — dorobek zintegrowany do Królestwa           ║
-║  Licencja: Kingdom Pixel — wszelkie prawa autorskie                         ║
+║  Projekt: IMPERIUM — architekt: VITRUVIUSZ        ║
+║  Geneza: persona Shinsō (深層) — dorobek zintegrowany do Imperium           ║
+║  Zaadaptowano z Kingdom Pixel (autor: Jack) — logika bez zmian                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-────────────────────────────── METRYCZKA (Zasada 11) ──────────────────────────────
+────────────────────────────── METRYCZKA ──────────────────────────────
 | Pole                | Wartość                                                      |
 |---------------------|--------------------------------------------------------------|
 | ID                  | N-BRAIN-073  (numer do potwierdzenia wg ZBADANE)             |
 | Nazwa oryginalna    | Lustro Prawdy (The Truth Mirror) — autor: Shinsō            |
-| Nazwa w Królestwie  | Lustro Prawdy                                                 |
+| Nazwa w Imperium    | Lustro Prawdy                                                 |
 | Lokalizacja         | DOKUMENTACJA TECHNICZNA/BRAIN-073_LustroPrawdy.py           |
 | Kategoria           | BRAIN / Walidacja kontradyktoryjna sygnałów                  |
-| Wpływ na Królestwo  | Warstwa obrony: każdy sygnał jest "atakowany" przez          |
-|                     | adwersarza przed egzekucją. Rozszerza Guardrails i Zasadę 75.|
+| Wpływ na Imperium   | Warstwa obrony: każdy sygnał jest "atakowany" przez          |
+|                     | adwersarza przed egzekucją. Rozszerza Guardrails i Prawo I.|
 | Powiązane moduły    | N-EYES-028 (OmniSight), N-SHIELDS-205 (AegisShield),         |
 |                     | N-BRAIN-026 (MetaCortex)                                     |
 
-────────────────────────────── STATUS REALNOŚCI (Zasada 2) ─────────────────────────
+────────────────────────────── STATUS REALNOŚCI (Prawo I) ─────────────────────────
 UCZCIWIE: to NIE jest trenowana sieć GAN, mimo nazwy. To lekki HEURYSTYCZNY
 scorer kontradyktoryjny: liniowy dyskryminator + adwersarz (dot-product + sigmoid)
 oraz czarna lista oparta na podobieństwie kosinusowym. Wagi są losowe na starcie,

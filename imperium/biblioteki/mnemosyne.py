@@ -1,24 +1,24 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║      Mnemosyne — Memory & Trade Learning Record System v2.0                 ║
-║  Autor: Jack (Wizjoner, Architekt, Wynalazca, Magik)                        ║
-║  Licencja: Kingdom Pixel — wszelkie prawa autorskie                         ║
+║  Projekt: IMPERIUM — architekt: VITRUVIUSZ                        ║
+║  Zaadaptowano z Kingdom Pixel (autor: Jack) — logika bez zmian                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-────────────────────────────── METRYCZKA (Zasada 11) ──────────────────────────────
+────────────────────────────── METRYCZKA ──────────────────────────────
 | Pole                | Wartość                                                      |
 |---------------------|--------------------------------------------------------------|
 | ID                  | N-MEM-206                                                     |
 | Nazwa oryginalna    | Mnemosyne — Memory & Trade Learning Record System           |
-| Nazwa w Królestwie  | Mnemosyne (Pamięć Królestwa)                                  |
+| Nazwa w Imperium    | Mnemosyne (Pamięć Imperium)                                  |
 | Lokalizacja         | DOKUMENTACJA TECHNICZNA/MEM-206_Mnemosyne.py                 |
 | Kategoria           | MEM / Pamięć trwała, uczenie z transakcji                    |
-| Wpływ na Królestwo  | Trwała pamięć transakcji + Księga Wad. Po naprawie każdy     |
+| Wpływ na Imperium   | Trwała pamięć transakcji + Księga Wad. Po naprawie każdy     |
 |                     | rekord ma prawdziwy, własny znacznik czasu.                  |
 | Powiązane moduły    | N-BRAIN-026, N-BACK-210, N-DASH-207                         |
 
 CHANGELOG:
-  v2.0 (2026-05-28) — BUGFIX (Zasada 2 — Prawda). `timestamp: float = time.time()`
+  v2.0 (2026-05-28) — BUGFIX (Prawo I — Prawda). `timestamp: float = time.time()`
         było ewaluowane RAZ przy definicji klasy → wszystkie rekordy dostawały ten
         sam (startowy) znacznik czasu. Zmieniono na `field(default_factory=time.time)`,
         więc czas jest pobierany w momencie tworzenia każdego rekordu.

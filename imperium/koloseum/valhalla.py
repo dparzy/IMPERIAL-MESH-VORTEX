@@ -1,19 +1,19 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║       Valhalla — Backtesting & Simulation Arena v2.0                         ║
-║  Autor: Jack (Wizjoner, Architekt, Wynalazca, Magik)                        ║
-║  Licencja: Kingdom Pixel — wszelkie prawa autorskie                         ║
+║  Projekt: IMPERIUM — architekt: VITRUVIUSZ                        ║
+║  Zaadaptowano z Kingdom Pixel (autor: Jack) — logika bez zmian                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-────────────────────────────── METRYCZKA (Zasada 11) ──────────────────────────────
+────────────────────────────── METRYCZKA ──────────────────────────────
 | Pole                | Wartość                                                      |
 |---------------------|--------------------------------------------------------------|
 | ID                  | N-BACK-210                                                    |
 | Nazwa oryginalna    | Valhalla — Backtesting & Simulation Arena                    |
-| Nazwa w Królestwie  | Valhalla (Arena Próby)                                        |
+| Nazwa w Imperium    | Valhalla (Arena Próby)                                        |
 | Lokalizacja         | DOKUMENTACJA TECHNICZNA/BACK-210_Valhalla.py                 |
 | Kategoria           | BACK / Backtest, Monte Carlo, walk-forward                   |
-| Wpływ na Królestwo  | Arena testowa strategii. Sygnały RSI z TA-Lib (Zasada 75);   |
+| Wpływ na Imperium   | Arena testowa strategii. Sygnały RSI z TA-Lib (Prawo I);   |
 |                     | metryki portfela = deterministyczny NumPy (brak ich w TA-Lib)|
 | Powiązane moduły    | N-TOOLS-208, N-BRAIN-026, N-ORCH-209                         |
 
@@ -40,12 +40,12 @@ import logging
 from typing import List, Dict
 from dataclasses import dataclass
 
-# ── Zasada 75: wskaźniki z deterministycznego rdzenia TA-Lib. ──
+# ── Prawo I: wskaźniki z deterministycznego rdzenia TA-Lib. ──
 try:
     import talib
 except ImportError as e:
     raise RuntimeError(
-        "N-BACK-210 wymaga TA-Lib (Zasada 75) do generacji sygnałów. "
+        "N-BACK-210 wymaga TA-Lib (Prawo I) do generacji sygnałów. "
         "Instalacja: `pip install TA-Lib`."
     ) from e
 
@@ -161,7 +161,7 @@ def generate_rsi_signals(prices: List[float], period: int = 14, low: float = 35,
 
 
 def main():
-    logger.info("=== Valhalla v2.0 Demo (Zasada 75 — sygnały TA-Lib) ===")
+    logger.info("=== Valhalla v2.0 Demo (Prawo I — sygnały TA-Lib) ===")
     np.random.seed(42)
     prices = [50000.0]
     for _ in range(500):

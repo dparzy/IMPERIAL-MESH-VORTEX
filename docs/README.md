@@ -8,8 +8,8 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 
 | Plik | Temat |
 |------|-------|
+| [WZORZEC_DNSS.md](WZORZEC_DNSS.md) | Wzorzec DNSS — czego uczymy się od roju 79 agentów (Calculator Pattern, TA-Lib, Python/Rust/Zig) |
 | _(wkrótce)_ | Architektura — pełna mapa Imperium |
-| _(wkrótce)_ | Wzorzec DNSS — czego uczymy się od roju 79 agentów |
 | _(wkrótce)_ | System Numeracji — klucz kodowy i intuicja botów |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

@@ -12,9 +12,9 @@
 ## 🏛️ SCHEMAT KORELACJI (jak współpracują)
 
 ```
-👑 CESARZ (Mózg AI)        SHARP + AgenticAITA + CogAlpha
+👑 CESARZ (Mózg AI)        SHARP + AgenticAITA + CogAlpha + **OpenAlice**
             │
-🏛️ SENAT (Decyzje)         LangGraph + CrewAI + TradingAgents + Reflexion + DSPy
+🏛️ SENAT (Decyzje)         LangGraph + CrewAI + TradingAgents + Reflexion + DSPy + **Hermes Agent**
             │
 ⚔️ LEGIONY (Boty)          Freqtrade + Hummingbot + ArchetypeTrader + FinRL + BBGO
             │
@@ -109,6 +109,8 @@ prometheus-trading/exporter · Cosmic Portal (stockcake) · Mr. Million (okx.vot
 | 13 | DreamerV3 | ✅ | github.com/danijar/dreamerv3 |
 | 14 | Tree-of-Thoughts | ✅ | github.com/ysymyth/tree-of-thought-llm |
 | 15 | AI Scientist (Sakana) | ✅ | github.com/SakanaAI/AI-Scientist |
+| 15b | **OpenAlice** – AI Trading Agent (4.6k★) | ✅ | github.com/TraderAlice/OpenAlice |
+| 15c | **Hermes Agent** (Nous Research) – Multi-Agent | ✅ | github.com/NousResearch/hermes-agent |
 
 ### ⚔️ LEGIONY
 | Lp | Narzędzie | Status | URL |

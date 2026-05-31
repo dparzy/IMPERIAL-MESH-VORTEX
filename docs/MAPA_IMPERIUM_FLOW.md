@@ -119,25 +119,48 @@
 
 ---
 
-## 🚫 ZASADA ZERO DUPLIKATÓW
+## 🚫 ZASADA SYMBIOZA — nie duplikacja
 
-| Zadanie | KTO to robi | Kto NIE robi |
-|---------|-------------|--------------|
-| Pobieranie danych | Akwedukty (kwatermistrz) | Nikt inny |
-| Liczenie matematyki | Fundament (brama) | Nikt inny |
-| Generowanie sygnałów | Legiony (zwiadowcy) | Nikt inny |
-| Zarządzanie ryzykiem | Pretorianie (aegis) | Nikt inny |
-| Debata/konsensus | Senat (meta_kora) | Nikt inny |
-| Decyzja końcowa | Cesarz (titan_mind) | Nikt inny |
-| Egzekucja zlecenia | Drogi (nexus, war_lancer) | Nikt inny |
-| Pamięć/logi | Biblioteki (kronikarz, mnemosyne) | Nikt inny |
-| Wizualizacja | Świątynie (kartograf, sala_wojenna) | Nikt inny |
-| Backtest/walidacja | Koloseum (valhalla) | Nikt inny |
+**Zasada:** Moduł może być wielozadaniowy i skomplikowany. Ale żaden moduł nie może robić
+dokładnie tego samego co inny. Moduły mają się **uzupełniać**, nie kopiować.
 
-**Redundancja TAK ale tylko tam gdzie ma sens:**
-- Kilku zwiadowców w Legionach → OK (różne strategie, uzupełniają się)
-- Kilku agentów w Senacie → OK (frakcja BYKÓW vs NIEDŹWIEDZI)
-- Dwa strażniki w Pretorianach → OK (aegis=ryzyko, lustro=walidacja)
+### ✅ Dobra redundancja (symbioza)
+
+Przykład — śledzenie wielorybów (jeden moduł to za mało):
+```
+oczy/wszechoko.py
+    ├── Zwiad A: top 100 walletów on-chain (ruchy BTC/ETH)
+    ├── Zwiad B: CEX inflow/outflow (wpłaty na giełdy = możliwa sprzedaż)
+    ├── Zwiad C: celebryci i influencerzy (Twitter/X on-chain powiązania)
+    └── Zwiad D: funding rate + open interest (sentiment futures)
+```
+Każdy patrzy gdzie indziej. Razem dają PEŁNY OBRAZ. Nikt nie powiela.
+
+Przykład — Senat (debata):
+```
+senat/meta_kora.py
+    ├── Agent BYKÓW: aktywnie szuka argumentów ZA LONG
+    └── Agent NIEDŹWIEDZI: aktywnie szuka argumentów ZA SHORT
+```
+Czytają te same dane — ale każdy filtruje pod swój kąt. Wynik: Cesarz widzi oba światy.
+
+### ❌ Zła redundancja (duplikacja do usunięcia)
+
+```
+❌ 5 modułów sprawdza to samo konto na Twitterze
+❌ 3 moduły liczą RSI z tych samych danych
+❌ 2 moduły wysyłają ten sam alert do logów
+❌ Zwiadowca 1 i Zwiadowca 2 używają identycznej strategii EMA
+```
+
+### 🔑 Klucz do decyzji: "Co unikalnego wnosi ten moduł?"
+
+Przed dodaniem nowego modułu/narzędzia pytamy:
+1. Co ten moduł widzi/robi czego inne NIE robią?
+2. Jaką lukę wypełnia w systemie?
+3. Czy jego wynik trafia do kogoś kto go realnie używa?
+
+Jeśli odpowiedź brzmi "robi to samo co X, tylko trochę inaczej" → NIE dodajemy.
 
 ---
 

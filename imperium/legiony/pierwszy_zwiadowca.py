@@ -64,21 +64,22 @@ def _load_module(filename: str, required: bool = True):
             raise FileNotFoundError(f"Brak wymaganego pliku '{filename}' w folderze.")
         logger.warning(f"[Bot] Brak opcjonalnego modułu '{filename}' — pomijam tę funkcję.")
         return None
-    spec = importlib.util.spec_from_file_location(filename[:-3].replace("-", "_"), path)
+    mod_name = os.path.basename(filename)[:-3].replace("-", "_")
+    spec = importlib.util.spec_from_file_location(mod_name, path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
 
-# Wymagane / opcjonalne moduły Królestwa
-_gw = _load_module("CORE-006_CalculatorGateway.py", required=True)
+# Wymagane / opcjonalne moduły Imperium (ścieżki względem dzielnic)
+_gw = _load_module("../fundament/brama_kalkulatora.py", required=True)
 CalculatorGateway = _gw.CalculatorGateway
-_sh = _load_module("SHIELDS-205_AegisShield.py", required=False)
+_sh = _load_module("../pretorianie/aegis_tarcza.py", required=False)
 AegisShield = _sh.AegisShield if _sh else None
-_dl = _load_module("DATA-001_DataLoader.py", required=False)
+_dl = _load_module("../akwedukty/kwatermistrz_danych.py", required=False)
 DataLoader = _dl.DataLoader if _dl else None
-_vz = _load_module("VIZ-001_Kartograf.py", required=False)
+_vz = _load_module("../swiatynie/kartograf.py", required=False)
 plot_run = _vz.plot_run if _vz else None
-_lg = _load_module("LOG-001_Kronikarz.py", required=False)
+_lg = _load_module("../biblioteki/kronikarz.py", required=False)
 Kronikarz = _lg.Kronikarz if _lg else None
 RunReport = _lg.RunReport if _lg else None
 

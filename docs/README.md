@@ -10,7 +10,7 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 |------|-------|
 | [WZORZEC_DNSS.md](WZORZEC_DNSS.md) | Wzorzec DNSS — czego uczymy się od roju 79 agentów (Calculator Pattern, TA-Lib, Python/Rust/Zig) |
 | [AUDYT_ADOPCJI.md](AUDYT_ADOPCJI.md) | Audyt adopcji 17 modułów Kingdom Pixel → Imperium (mapowanie, prawa, ostrzeżenia) |
-| _(wkrótce)_ | Architektura — pełna mapa Imperium |
+| [ARCHITEKTURA_IMPERIUM.md](ARCHITEKTURA_IMPERIUM.md) | Pełna mapa Imperium — dzielnice, moduły, przepływ sygnału, cykl Fazy 0 |
 | _(wkrótce)_ | System Numeracji — klucz kodowy i intuicja botów |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

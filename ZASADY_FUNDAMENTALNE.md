@@ -88,4 +88,75 @@ Rozmowy znikają. **Pliki zostają.**
 
 ---
 
+## ⚖️ PRAWO IX — WERYFIKACJA W GŁĘBI
+
+Sygnał nie idzie prosto do mózgu. **Przechodzi przez filtry**, jak w wojsku.
+
+1. **Szeregowi (boty)** generują surowe sygnały — często sprzeczne.
+2. **Oficerowie (guardrails)** odrzucają halucynacje — sygnał musi mieć format i poziom pewności.
+3. **Senat** debatuje — Analityk, Ryzyko, Scheduler ścierają argumenty.
+4. **Cesarz** decyduje — widząc cały zapis debaty.
+
+Boty, które widzą "wszystko", często nie widzą nic. Filtr zabija szum.
+
+---
+
+## ⚖️ PRAWO X — RÓJ, NIE KOLEKCJA
+
+Imperium to **żywa sfora**, nie 100 botów krzyczących osobno.
+
+- Boty komunikują się — "sygnały dymne" lecą do całej floty.
+- Uczą się od siebie nawzajem (Federated Learning) — bez zdradzania sekretów.
+- Żaden bot nie widzi całości, ale **razem widzą cały obraz** i otaczają zwierzynę.
+
+100 pojedynczych botów to chaos, który rynek pożre na śniadanie. Rój — poluje.
+
+---
+
+## ⚖️ PRAWO XI — ŁOWCA NIE PANIKUJE
+
+Agent nie goni ślepo za zyskiem. On **rozumie, co się dzieje** (Active Inference).
+
+- Cel to minimalizacja "zaskoczenia", nie maksymalizacja chciwości.
+- Agent nieustannie aktualizuje swój model świata.
+- Kto rozumie — nie panikuje. **Spokój to przewaga.**
+
+---
+
+## ⚖️ PRAWO XII — SIEDEM WARSTW POSTRZEGANIA
+
+Imperium widzi rynek na **wielu warstwach jednocześnie** — to oczy Cesarstwa.
+
+1. Cena i wolumen
+2. Mikrostruktura (arkusz zleceń, delta)
+3. On-chain (wieloryby, rezerwy, TVL)
+4. Sentyment (social, newsy)
+5. Makro (ETF, stopy, regulacje)
+6. Korelacje między aktywami
+7. Predykcja (modele świata)
+
+Wszystkie warstwy łączą się w jeden **super-wektor chwili**. Widzimy przyczyny, nie tylko skutki.
+
+---
+
+## ⚖️ PRAWO XIII — KAŻDA DECYZJA JEST AUDYTOWALNA
+
+Nigdy "kupuj, bo tak". Zawsze **wiadomo dlaczego**.
+
+- Cesarz widzi pełny zapis debaty — które argumenty zwyciężyły i czemu.
+- Każdą decyzję da się prześledzić wstecz.
+- Brak audytu = brak zaufania.
+
+---
+
+## ⚖️ PRAWO XIV — KALIBRACJA, NIE SZTYWNOŚĆ
+
+System się **stroi**, nie zastyga.
+
+- Zbyt zachowawczy? Obniżamy próg pewności.
+- Zbyt agresywny? Podnosimy go.
+- Każdy parametr jest pokrętłem, nie betonem.
+
+---
+
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*

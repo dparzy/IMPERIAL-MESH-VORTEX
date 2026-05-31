@@ -1,19 +1,19 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║       Ładowarka Danych (Data Loader) — realne OHLCV + biblioteka v1.1        ║
-║  Autor: Jack (Główny Projektant Królestwa Pixel)                            ║
-║  Oryginał Kingdom Pixel — wszelkie prawa autorskie                          ║
+║  Projekt: IMPERIUM — architekt: VITRUVIUSZ                            ║
+║  Zaadaptowano z Kingdom Pixel (autor: Jack) — logika bez zmian                          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-────────────────────────────── METRYCZKA (Zasada 11) ──────────────────────────────
+────────────────────────────── METRYCZKA ──────────────────────────────
 | Pole                | Wartość                                                      |
 |---------------------|--------------------------------------------------------------|
 | ID                  | N-DATA-001                                                   |
 | Nazwa oryginalna    | Data Loader (oryginał Kingdom Pixel)                        |
-| Nazwa w Królestwie  | Ładowarka (Kwatermistrz Danych)                             |
+| Nazwa w Imperium    | Ładowarka (Kwatermistrz Danych)                             |
 | Lokalizacja         | DOKUMENTACJA TECHNICZNA/DATA-001_DataLoader.py              |
 | Kategoria           | DATA / Pozyskiwanie danych rynkowych (OHLCV)                |
-| Wpływ na Królestwo  | Realne darmowe dane (CCXT) + import własnych CSV +           |
+| Wpływ na Imperium   | Realne darmowe dane (CCXT) + import własnych CSV +           |
 |                     | biblioteka wielu monet + kontrola jakości.                  |
 | Powiązane moduły    | N-STRAT-001, N-BACK-210, N-CORE-006, N-VIZ-001              |
 

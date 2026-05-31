@@ -1,19 +1,19 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║       Kartograf (The Cartographer) — Wykresy Biegów v1.0                     ║
-║  Autor: Jack (Główny Projektant Królestwa Pixel)                            ║
-║  Oryginał Kingdom Pixel — wszelkie prawa autorskie                          ║
+║  Projekt: IMPERIUM — architekt: VITRUVIUSZ                            ║
+║  Zaadaptowano z Kingdom Pixel (autor: Jack) — logika bez zmian                          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-────────────────────────────── METRYCZKA (Zasada 11) ──────────────────────────────
+────────────────────────────── METRYCZKA ──────────────────────────────
 | Pole                | Wartość                                                      |
 |---------------------|--------------------------------------------------------------|
 | ID                  | N-VIZ-001  (nowa kategoria VIZ — do potwierdzenia w ZBADANE) |
 | Nazwa oryginalna    | Cartographer (oryginał Kingdom Pixel)                       |
-| Nazwa w Królestwie  | Kartograf                                                    |
+| Nazwa w Imperium    | Kartograf                                                    |
 | Lokalizacja         | DOKUMENTACJA TECHNICZNA/VIZ-001_Kartograf.py                |
 | Kategoria           | VIZ / Wizualizacja wyników (PNG)                            |
-| Wpływ na Królestwo  | OCZY KOMENDANTA: rysuje cenę + EMA + wejścia/wyjścia +       |
+| Wpływ na Imperium   | OCZY KOMENDANTA: rysuje cenę + EMA + wejścia/wyjścia +       |
 |                     | krzywą kapitału. Plik PNG do otwarcia jednym kliknięciem.   |
 | Powiązane moduły    | N-STRAT-001 (bot), N-LOG-001 (Kronikarz), N-DATA-001        |
 

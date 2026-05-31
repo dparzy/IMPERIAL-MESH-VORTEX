@@ -1,21 +1,21 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║       Kronikarz (The Chronicler) — Logi i Dziennik Postępu v1.0             ║
-║  Autor: Jack (Główny Projektant Królestwa Pixel)                            ║
-║  Oryginał Kingdom Pixel — wszelkie prawa autorskie                          ║
+║  Projekt: IMPERIUM — architekt: VITRUVIUSZ                            ║
+║  Zaadaptowano z Kingdom Pixel (autor: Jack) — logika bez zmian                          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-────────────────────────────── METRYCZKA (Zasada 11) ──────────────────────────────
+────────────────────────────── METRYCZKA ──────────────────────────────
 | Pole                | Wartość                                                      |
 |---------------------|--------------------------------------------------------------|
 | ID                  | N-LOG-001  (nowa kategoria LOG — do potwierdzenia w ZBADANE) |
 | Nazwa oryginalna    | Chronicler (oryginał Kingdom Pixel)                         |
-| Nazwa w Królestwie  | Kronikarz                                                    |
+| Nazwa w Imperium    | Kronikarz                                                    |
 | Lokalizacja         | DOKUMENTACJA TECHNICZNA/LOG-001_Kronikarz.py                |
 | Kategoria           | LOG / Raportowanie i dziennik postępu                       |
-| Wpływ na Królestwo  | MOST DIAGNOZY: po każdym biegu pisze raport (JSON+MD), który |
+| Wpływ na Imperium   | MOST DIAGNOZY: po każdym biegu pisze raport (JSON+MD), który |
 |                     | Komendant wgrywa, a Jack czyta i kalibruje. Dziennik pokazuje|
-|                     | postęp wersja-po-wersji. (Data Lineage — Zasada 23.)        |
+|                     | postęp wersja-po-wersji. (Data Lineage — Prawo XIII.)        |
 | Powiązane moduły    | N-STRAT-001 (paper-bot), N-MEM-206 (Mnemosyne), N-BACK-210  |
 
 ────────────────────────── PO CO TO (dla Komendanta) ───────────────────────────────

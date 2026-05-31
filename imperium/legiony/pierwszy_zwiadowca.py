@@ -1,29 +1,29 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║   PaperBot RSI+EMA — Pierwszy Zwiadowca (pełny cykl) v1.1                    ║
-║  Autor: Jack (Główny Projektant Królestwa Pixel)                            ║
-║  Oryginał Kingdom Pixel — wszelkie prawa autorskie                          ║
+║  Projekt: IMPERIUM — architekt: VITRUVIUSZ                            ║
+║  Zaadaptowano z Kingdom Pixel (autor: Jack) — logika bez zmian                          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-────────────────────────────── METRYCZKA (Zasada 11) ──────────────────────────────
+────────────────────────────── METRYCZKA ──────────────────────────────
 | Pole                | Wartość                                                      |
 |---------------------|--------------------------------------------------------------|
 | ID                  | N-STRAT-001                                                  |
 | Nazwa oryginalna    | PaperBot RSI+EMA (oryginał Kingdom Pixel)                   |
-| Nazwa w Królestwie  | Pierwszy Zwiadowca                                           |
+| Nazwa w Imperium    | Pierwszy Zwiadowca                                           |
 | Lokalizacja         | DOKUMENTACJA TECHNICZNA/STRAT-001_PaperBot_RSI_EMA.py        |
 | Kategoria           | STRAT / Strategia demonstracyjna (paper trading)            |
-| Wpływ na Królestwo  | PEŁNY CYKL Fazy 0 w jednym uruchomieniu: dane → decyzja →    |
+| Wpływ na Imperium   | PEŁNY CYKL Fazy 0 w jednym uruchomieniu: dane → decyzja →    |
 |                     | ryzyko → wykres → raport. Spina 5 modułów.                  |
 | Powiązane moduły    | N-DATA-001, N-CORE-006, N-SHIELDS-205, N-VIZ-001, N-LOG-001 |
 
-────────────────────────── UCZCIWIE, NOWICJUSZU (Zasada 2) ─────────────────────────
+────────────────────────── UCZCIWIE (Prawo I) ─────────────────────────
 Bot NA NIBY (paper). Zero prawdziwych pieniędzy. Strategia prosta i edukacyjna —
 wyniki NIE przewidują realnych zysków. Cel: zobaczyć i zrozumieć pełny cykl.
 
 CYKL (jedno uruchomienie robi wszystko):
   1. Ładowarka (N-DATA-001) — dane z biblioteki / MEXC / syntetyczne
-  2. Brama (N-CORE-006)     — liczy RSI i EMA (Zasada 75)
+  2. Brama (N-CORE-006)     — liczy RSI i EMA (Prawo I)
   3. Strategia             — trend-following (cena>EMA + RSI 50–70; wyjście EMA/RSI/stop/take)
   4. AegisShield (N-SHIELDS-205) — ryzyko, circuit breaker
   5. Kartograf (N-VIZ-001) — wykres PNG
@@ -126,10 +126,10 @@ class PaperBot:
         self.data_source = data_source
         self.ema_series = [None] * len(prices)
         warmup = self.ema_period + 2
-        # Wskaźniki liczone RAZ na całej serii przez Bramę (Zasada 75) — szybko, bez lookahead.
+        # Wskaźniki liczone RAZ na całej serii przez Bramę (Prawo I) — szybko, bez lookahead.
         rsi_arr = self.gateway.compute_series("RSI", close=prices, period=14)
         ema_arr = self.gateway.compute_series("EMA", close=prices, period=self.ema_period)
-        # neuron reżimu (długa EMA) — liczony tylko gdy gramy rojem; też przez Bramę (Zasada 75)
+        # neuron reżimu (długa EMA) — liczony tylko gdy gramy rojem; też przez Bramę (Prawo I)
         ema_long_arr = (self.gateway.compute_series("EMA", close=prices, period=self.roj.regime_period)
                         if self.roj is not None else None)
         for i in range(warmup, len(prices)):

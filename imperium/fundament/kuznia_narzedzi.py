@@ -1,20 +1,20 @@
 """
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║       ToolForge — IndicatorFactory v5 + API Toolkit v2.0                     ║
-║  Autor: Jack (Wizjoner, Architekt, Wynalazca, Magik)                        ║
-║  Licencja: Kingdom Pixel — wszelkie prawa autorskie                         ║
+║  Projekt: IMPERIUM — architekt: VITRUVIUSZ                        ║
+║  Zaadaptowano z Kingdom Pixel (autor: Jack) — logika bez zmian                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-────────────────────────────── METRYCZKA (Zasada 11) ──────────────────────────────
+────────────────────────────── METRYCZKA ──────────────────────────────
 | Pole                | Wartość                                                      |
 |---------------------|--------------------------------------------------------------|
 | ID                  | N-TOOLS-208                                                   |
 | Nazwa oryginalna    | ToolForge — IndicatorFactory + API Toolkit                   |
-| Nazwa w Królestwie  | ToolForge (Kuźnia Narzędzi)                                   |
+| Nazwa w Imperium    | ToolForge (Kuźnia Narzędzi)                                   |
 | Lokalizacja         | DOKUMENTACJA TECHNICZNA/TOOLS-208_ToolForge.py               |
 | Kategoria           | TOOLS / Wskaźniki i sygnały                                   |
-| Wpływ na Królestwo  | Jedyne źródło kanonicznych, deterministycznych wskaźników     |
-|                     | (TA-Lib) dla całego Królestwa. Fundament wykonawczy Zasady 75.|
+| Wpływ na Imperium   | Jedyne źródło kanonicznych, deterministycznych wskaźników     |
+|                     | (TA-Lib) dla całego Imperium. Fundament wykonawczy Prawa I.|
 | Powiązane moduły    | N-BRAIN-026, N-CORE-XX (Calculator Gateway), N-BACK-210,      |
 |                     | N-EYES-028                                                    |
 
@@ -23,7 +23,7 @@ CHANGELOG:
         SMA/EMA) przeniesiona z ręcznego NumPy na TA-Lib (deterministyczny rdzeń C).
         Stary RSI używał zwykłej średniej kroczącej zamiast wygładzania Wildera →
         dawał wartości NIEKANONICZNE. Teraz wynik = referencyjny TA-Lib.
-  v1.0 — wersja wyjściowa (ręczne NumPy, niezgodna z Zasadą 75).
+  v1.0 — wersja wyjściowa (ręczne NumPy, niezgodna z Prawem I).
 
 Mechanizm:
 1. INDICATOR FACTORY — RSI, MACD, BBANDS, ATR, Supertrend (wszystko z TA-Lib).
@@ -36,12 +36,12 @@ import numpy as np
 import logging
 from typing import List, Dict
 
-# ── Zasada 75: deterministyczny rdzeń obliczeń. Bez TA-Lib moduł NIE działa celowo. ──
+# ── Prawo I: deterministyczny rdzeń obliczeń. Bez TA-Lib moduł NIE działa celowo. ──
 try:
     import talib
 except ImportError as e:
     raise RuntimeError(
-        "N-TOOLS-208 wymaga TA-Lib (Zasada 75 — deterministyczny rdzeń C). "
+        "N-TOOLS-208 wymaga TA-Lib (Prawo I — deterministyczny rdzeń C). "
         "Instalacja: `pip install TA-Lib`. "
         "Świadomie BRAK fallbacku do ręcznej matematyki — to gwarantuje wartości kanoniczne."
     ) from e
@@ -109,7 +109,7 @@ class IndicatorFactory:
 
 
 class SignalGenerator:
-    """Sygnały zbudowane wyłącznie na kanonicznych wartościach TA-Lib (Zasada 75)."""
+    """Sygnały zbudowane wyłącznie na kanonicznych wartościach TA-Lib (Prawo I)."""
 
     def __init__(self, prices: List[float], highs: List[float], lows: List[float]):
         self.prices = prices
@@ -139,7 +139,7 @@ class SignalGenerator:
 
 
 def main():
-    logger.info("=== ToolForge v2.0 Demo (Zasada 75 — TA-Lib) ===")
+    logger.info("=== ToolForge v2.0 Demo (Prawo I — TA-Lib) ===")
     np.random.seed(42)
     prices = [50000 + i * 50 + np.random.uniform(-200, 200) for i in range(300)]
     highs = [p + np.random.uniform(0, 100) for p in prices]
@@ -155,7 +155,7 @@ def main():
     logger.info(f"BB Upper/Middle/Lower: {bb['UPPER'][-1]:.1f} / {bb['MIDDLE'][-1]:.1f} / {bb['LOWER'][-1]:.1f}")
     logger.info(f"Golden Cross: {sig.golden_cross()} | RSI Oversold: {sig.rsi_oversold()} | MACD Bullish: {sig.macd_bullish_cross()}")
 
-    print("\n✅ ToolForge v2.0 — demo zakończone (Zasada 75 spełniona).")
+    print("\n✅ ToolForge v2.0 — demo zakończone (Prawo I spełniona).")
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@
 | # | Wizja | Priorytet | Status | Dokument docelowy |
 |---|-------|-----------|--------|------------------|
 | W-001 | Podłączyć Valhalla pod neurony z KATALOG_NEURONOW (nie tylko RSI) | 🔴 Wysoki | 💭 Idea | `imperium/koloseum/` |
-| W-002 | Zbudować silnik Igrzysk w kodzie (scorer.py) | 🔴 Wysoki | 💭 Idea | `imperium/biblioteki/igrzyska.py` |
+| W-002 | Zbudować silnik Igrzysk w kodzie (scorer.py) | 🔴 Wysoki | ✅ ZROBIONE → `igrzyska.py` (11 testów ✅) | `imperium/biblioteki/igrzyska.py` |
 | W-003 | Podłączyć Doradców do Cesarza (oracle.py, iustitia.py, pythia.py) | 🟠 Średni | 💭 Idea | `imperium/cesarz/doradcy/` |
 | W-004 | Dashboard Kapitolu — tabela liderów neuronów na żywo | 🟡 Niski | 💭 Idea | `imperium/swiatynie/` |
 | W-005 | Walk-Forward z adaptacyjnymi parametrami (re-optymalizacja co 7 dni) | 🟠 Średni | 💭 Idea | `imperium/koloseum/valhalla.py` |
@@ -47,7 +47,7 @@
 | W-025 | Fleet Risk Manager — ryzyko portfelowe + realokacja kapitału do zwycięzców (sprzęg z Igrzyskami) | 🟠 Średni | 💭 Idea | `imperium/pretorianie/` + Igrzyska |
 | W-026 | Strategy Vector DB (LanceDB) — strategie jako embeddingi, semantyczny dedup + dopasowanie reżimu | 🟡 Niski | 💭 Idea (REALNE) | `imperium/biblioteki/` (mnemosyne?) |
 | W-027 | Data Drift Detector — wykrywa shift rozkładu danych → trigger rekalibracji neuronów | 🟡 Niski | 💭 Idea | `imperium/koloseum/` |
-| W-028 | Reguła 30% max straty (AOA) — hard circuit-breaker w Kalkulatorze (przerwij przy 30% DD) | 🔴 Wysoki | 💭 Idea | `imperium/pretorianie/kalkulator_lewara.py` |
+| W-028 | Reguła 30% max straty (AOA) — hard circuit-breaker w Kalkulatorze (przerwij przy 30% DD) | 🔴 Wysoki | ✅ ZROBIONE → `BezpiecznikKapitalu` (12 testów ✅) | `imperium/pretorianie/kalkulator_lewara.py` |
 
 ---
 
@@ -109,9 +109,9 @@
 | Metryka | Wartość |
 |---------|---------|
 | Łącznie wizji | 28 |
-| W trakcie analizy | 21 |
+| W trakcie analizy | 19 |
 | Przeniesione do katalogów (Higuchi, CME, Azja Range) | 3 |
-| Zaimplementowane | 0 |
+| Zaimplementowane (W-002 Igrzyska, W-028 Bezpiecznik) | 2 |
 | Odrzucone (niezgodne z zasadami) | 0 |
 
 ---

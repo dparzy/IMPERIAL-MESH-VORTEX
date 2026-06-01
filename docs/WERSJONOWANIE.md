@@ -75,6 +75,26 @@ class NeuronWaddahAttar(MikroNeuron):
 
 ## 📜 HISTORIA WERSJI
 
+### [v0.4.0] — 2026-06-01 — *"Certamen Vivum"*
+*(Żywa Rywalizacja)*
+
+#### Dodano
+- `🏛️ IMV-ORI` `igrzyska.py` — silnik rywalizacji neuronów (W-002): scoring wg wzoru WYNIK_NEURONU, rangi Tiro→Aquilifer, Złoty Hełm, Lista Infamii, mnożniki wag dla Legatusa, integracja z Pamięcią Absolutną
+- `🏛️ IMV-ORI` `BezpiecznikKapitalu` w `kalkulator_lewara.py` (W-028) — circuit-breaker AOA: 30% obsunięcia od szczytu → blokada wszystkich pozycji do ręcznego resetu
+- `tests/` — pierwszy zestaw testów (28 testów, 0 zależności zewnętrznych): test_kalkulator (12), test_igrzyska (11), test_pamiec (5) + `run_tests.py`
+- Skan VI psychologia (PSY-01..06) + odtworzone wskaźniki (WA-01, MC-01, NN-01)
+- Skan VII Azja (+13 neuronów, +5 strategii) → `SKAN_AZJA.md`
+- `AUDYT_SYSTEMU.md`, `WERSJONOWANIE.md`, `WIZJONER.md`
+
+#### Naprawiono
+- `KATALOG_NEURONOW.md` — usunięto zduplikowane przestarzałe tabele podsumowania (315→306 leftover)
+
+#### Zmieniono
+- Neurony 287 → **328**, strategie ~85 → **~108**, wizje → **28** (2 zaimplementowane)
+- **Luka #1 z audytu zamknięta:** projekt ma teraz testy (było ZERO)
+
+---
+
 ### [v0.3.0] — 2026-06-01 — *"Memoria et Certamen"*
 *(Pamięć i Rywalizacja)*
 

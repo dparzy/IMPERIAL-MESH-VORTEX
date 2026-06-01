@@ -2,7 +2,7 @@
 ⚔️ IMV-INS | Neurony Momentum — Legion X Equestris (Scalp)
 Interpretują wartości z Bramy bez samodzielnego liczenia.
 
-Neurony: RSI, StochRSI, MACD, BBands, ADX, EMA Cross, Williams %R
+Neurony: RSI, StochRSI, MACD, BBands, ADX, EMA Cross, Williams %R, ATR Deviation
 """
 
 from imperium.legiony.mikro_neuron import MikroNeuron, SygnalNeuronu
@@ -187,3 +187,76 @@ class NeuronWilliamsR(MikroNeuron):
             pewnosc = 0.80 if wr >= -10 else 0.65
             return self._bazowy_sygnal(wr, "SHORT", pewnosc, [f"W%R={wr:.1f} wykupiony"])
         return self._bazowy_sygnal(wr, "NEUTRAL", 0.20, [f"W%R={wr:.1f} strefa neutralna"])
+
+
+class NeuronATRDeviation(MikroNeuron):
+    """
+    🔱 IMV-ADO v1.0 | ATR Deviation (Arsi Smart Buy Sell — odtworzony + naprawiony)
+    Oryginał: Arsi Scalper Pro (Arsalan Riaz, MQL5, closed-source, $50).
+    Adopcja: z-score odchylenia ceny od wygładzonej średniej, znormalizowany ATR.
+
+    Nasze ulepszenia względem oryginału:
+      1. NAPRAWIONY BŁĄD LOGIKI: oryginalny kod kupował gdy cena WYSOKO nad
+         średnią (to momentum, nie mean-reversion). My obsługujemy OBA tryby
+         poprawnie i wybieramy wg reżimu (filozofia Kameleon/Parrondo).
+      2. Tryb adaptacyjny: RANGING → mean-reversion, TREND → momentum.
+      3. MinDisplacement: ignoruje odchylenia < 1.0 ATR (filtr szumu).
+      4. Filtr ADX: momentum tylko gdy ADX > próg (realny trend).
+
+    Brama dostarcza:
+      ATR_DEVIATION = (close - smooth_mean) / atr   (z-score na ATR)
+      ADX_14 (opcjonalnie), REZIM (opcjonalnie: "TREND_*"/"RANGING")
+    Progi: NearFactor (domyślnie 1.0 = MinDisplacement), FarFactor (2.0).
+    """
+    KLUCZ = "X-25"
+    LEGION = "SCALP"
+    WSKAZNIK = "ATR_DEVIATION"
+    KATEGORIA = "M"
+    WAGA = 6
+
+    MIN_DISPLACEMENT = 1.0   # NearFactor — poniżej = szum, ignoruj
+    FAR_FACTOR = 2.0         # ekstremalne odchylenie = wyższa pewność
+    ADX_TREND_PROG = 25.0    # momentum tylko gdy realny trend
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        dev = wskazniki.get("ATR_DEVIATION")
+        if dev is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak ATR_DEVIATION"])
+
+        # MinDisplacement — odfiltruj szum
+        if abs(dev) < self.MIN_DISPLACEMENT:
+            return self._bazowy_sygnal(dev, "NEUTRAL", 0.10,
+                [f"Odchylenie={dev:+.2f} ATR < MinDisplacement {self.MIN_DISPLACEMENT} — szum"])
+
+        # Wybór trybu wg reżimu (Kameleon)
+        rezim = str(wskazniki.get("REZIM", "")).upper()
+        adx = wskazniki.get("ADX_14")
+        if rezim.startswith("TREND"):
+            tryb_trend = True
+        elif rezim == "RANGING":
+            tryb_trend = False
+        elif adx is not None:
+            tryb_trend = adx > self.ADX_TREND_PROG
+        else:
+            tryb_trend = False  # bezpieczny default: mean-reversion (oryginalna intencja)
+
+        # Siła sygnału — skaluj z wielkością odchylenia
+        ekstremalne = abs(dev) >= self.FAR_FACTOR
+        pewnosc = 0.80 if ekstremalne else 0.60
+
+        if tryb_trend:
+            # MOMENTUM: cena daleko nad średnią → kontynuacja w górę
+            if dev > 0:
+                return self._bazowy_sygnal(dev, "LONG", pewnosc,
+                    [f"TREND momentum: cena {dev:+.2f} ATR nad średnią — kontynuacja wzrostu",
+                     f"ADX={adx:.1f}" if adx is not None else f"reżim={rezim}"])
+            return self._bazowy_sygnal(dev, "SHORT", pewnosc,
+                [f"TREND momentum: cena {dev:+.2f} ATR pod średnią — kontynuacja spadku",
+                 f"ADX={adx:.1f}" if adx is not None else f"reżim={rezim}"])
+        else:
+            # MEAN-REVERSION (poprawna logika): cena daleko nad średnią → SHORT (powrót)
+            if dev > 0:
+                return self._bazowy_sygnal(dev, "SHORT", pewnosc,
+                    [f"MEAN-REV: cena {dev:+.2f} ATR nad średnią — oczekuj powrotu w dół"])
+            return self._bazowy_sygnal(dev, "LONG", pewnosc,
+                [f"MEAN-REV: cena {dev:+.2f} ATR pod średnią — oczekuj powrotu w górę"])

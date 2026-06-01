@@ -29,5 +29,6 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [IGRZYSKA_IMPERIUM.md](IGRZYSKA_IMPERIUM.md) | System Rywalizacji — rankingi 303 neuronów / 4 legionów / senatorów. Złoty Hełm, Złota Zbroja, Purpura Senatu |
 | [PAMIEC_ABSOLUTNA.md](PAMIEC_ABSOLUTNA.md) | System Logowania — ImperiumLog (40+ pól), MAE/MFE, walk-forward, replay sesji, Prawo Memoriae |
 | [DORADCY_CARA.md](DORADCY_CARA.md) | Rada Doradców Cesarskich — Oracle/Fulmen/Iustitia/Hermes/Pythia, second opinion w spornych decyzjach |
+| [WIZJONER.md](WIZJONER.md) | 💡 **Brudnopis** — surowe idee, analiza wpływu, symulacje "co jeśli", przypomnienia o niezrealizowanych wizjach |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

@@ -33,7 +33,7 @@
 | W-011 | Azja Range Breakout — strategia (break Asia High/Low w sesji London) | 🔴 Wysoki | 💭 Idea | `KATALOG_STRATEGII.md` |
 | W-012 | Cross-exchange arbitraż (MEXC vs Binance vs OKX price diff + funding diff) | 🟠 Średni | 💭 Idea | `KATALOG_STRATEGII.md` + `imperium/akwedukty/` |
 | W-013 | Rozbudowa Igrzysk — system "kija" (kary progresywne, ceremonia hańby, lista infamii) | 🟠 Średni | 💭 Idea | `IGRZYSKA_IMPERIUM.md` |
-| W-014 | Plik 3100 linków Azja — przeskanować i wyciągnąć perełki (małe repozytoria, doktoraty, fora) | 🟠 Średni | ⏳ Czeka na plik | `KATALOG_NEURONOW.md` + `KATALOG_STRATEGII.md` |
+| W-014 | Plik 3100 linków Azja — przeskanować i wyciągnąć perełki (małe repozytoria, doktoraty, fora) | 🟠 Średni | 🔄 W TRAKCIE (4 agenci skanują) | `KATALOG_NEURONOW.md` + `KATALOG_STRATEGII.md` |
 | W-015 | Obserwatorzy/Zwiadowcy (oczy) — zmapować istniejące i brakujące: newsy, sentiment, on-chain, CME, sesje | 🔴 Wysoki | 💭 Idea | `imperium/oczy/` + nowy doc `OBSERWATORZY.md` |
 | W-016 | Ekspansja na inne giełdy (Binance, OKX, Bybit) — "podbój prowincji", multi-exchange arbitraż | 🟡 Niski (Faza 2+) | 💭 Idea | `docs/ROADMAP_IMPERIUM.md` |
 

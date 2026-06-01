@@ -223,6 +223,28 @@ Imperium rośnie przez zdekorelowaną różnorodność, nie przez jeden idealny 
 
 **Na początku KAŻDEJ sesji i przed KAŻDYM nowym zadaniem** — OBOWIĄZKOWO:
 
+### 🔒 KROK 0 — WERYFIKACJA SPÓJNOŚCI REPOZYTORIUM (ZAWSZE PIERWSZE)
+
+Zanim cokolwiek zaczniesz — sprawdź, że repo jest spójne i czyste:
+
+```
+git status                          # brak niezacommitowanych zmian?
+python tests/run_tests.py           # testy zielone?
+grep -c "✅" docs/MANIFEST_KODU.md  # liczba ✅ zgadza się z README?
+```
+
+Sprawdź, że te trzy liczby są **identyczne** (policz z kodu, nie z pamięci):
+1. Liczba klas `Neuron*(MikroNeuron)` zarejestrowanych w `rejestr.py`
+2. Liczba `✅ aktywny` w `docs/MANIFEST_KODU.md`
+3. Liczba podana w `README.md`
+
+Jeśli cokolwiek się **nie zgadza** → STOP. Najpierw napraw spójność (Prawo XVIII),
+dopiero potem zacznij nowe zadanie. Praca na niespójnym repo = budowanie na błędnym fundamencie.
+
+**Niespójność repo = czerwony alarm. Każda sesja zaczyna się od czystego stanu.**
+
+---
+
 1. 📖 **PRZECZYTAJ stan Imperium** — repozytorium (GitHub/lokalnie): `README.md`,
    `CLAUDE.md`, `docs/` (katalogi, indeksy), realny kod w `imperium/`. Nie zgaduj
    z pamięci ani z poprzedniej sesji — sprawdź FAKTY w plikach.
@@ -234,13 +256,14 @@ Imperium rośnie przez zdekorelowaną różnorodność, nie przez jeden idealny 
 4. ✅ **ZOSTAW ŚLAD** — każda zmiana = commit z prawdą; dokumentacja zsynchronizowana
    z kodem przed zakończeniem zadania.
 
-**Zakaz pracy „w ciemno".** Rozpoczęcie zadania bez rozpoznania zawartości Imperium
-albo pozostawienie nieaktualnego README/katalogu = złamanie Prawa XVII.
+**Zakaz pracy „w ciemno".** Rozpoczęcie zadania bez weryfikacji spójności repo i bez
+rozpoznania zawartości Imperium = złamanie Prawa XVII.
 
 Checklist startu sesji:
-- [ ] Przeczytałem README, CLAUDE.md, indeksy w docs/?
+- [ ] `git status` czysty? Testy zielone? Liczby spójne (rejestr = MANIFEST = README)?
+- [ ] Przeczytałem README, CLAUDE.md, MANIFEST_KODU.md, indeksy w docs/?
 - [ ] Sprawdziłem realny kod vs to, co mówią dokumenty?
-- [ ] Znam aktualne liczby (neurony, zwiadowcy, prawa, testy)?
+- [ ] Znam aktualne liczby (neurony, zwiadowcy, prawa, testy) — policzone, nie z pamięci?
 - [ ] Po zmianie zaktualizowałem dokumentację, żeby mówiła prawdę?
 
 ---

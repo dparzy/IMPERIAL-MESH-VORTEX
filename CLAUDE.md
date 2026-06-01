@@ -14,15 +14,34 @@ decyzje kierunkowe/nieodwracalne (kasowanie, kapitał, zmiana strategii, koszt).
 
 ## 🗺️ PRAWO XVII — ROZPOZNANIE TERENU (ROZKAZ STAŁY, ROBISZ TO PIERWSZE)
 
-**Na początku KAŻDEJ sesji i przed KAŻDYM nowym zadaniem** — najpierw przeczytaj
+### 🔒 KROK 0 — WERYFIKACJA SPÓJNOŚCI (ABSOLUTNIE PIERWSZE, przed czymkolwiek)
+
+```bash
+git status                    # musi być: "nothing to commit, working tree clean"
+python tests/run_tests.py     # musi być: X/X zielone
+```
+
+Sprawdź, że ta sama liczba neuronów pojawia się w **trzech miejscach jednocześnie**:
+- `rejestr.py` → `wszystkie_neurony()` — ile klas zarejestrowanych?
+- `docs/MANIFEST_KODU.md` → ile wpisów `✅ aktywny`?
+- `README.md` → jaka liczba podana?
+
+Jeśli którakolwiek się różni → STOP, napraw spójność zanim zaczniesz nowe zadanie.
+
+**Niespójność repo = złamanie Prawa XVII. Każda sesja zaczyna się od czystego stanu.**
+
+---
+
+**Na początku KAŻDEJ sesji i przed KAŻDYM nowym zadaniem** — przeczytaj
 stan Imperium, NIE zgaduj z pamięci:
 - [ ] `README.md`, `CLAUDE.md`, `ZASADY_FUNDAMENTALNE.md`
+- [ ] `docs/MANIFEST_KODU.md` — ile neuronów ✅ w kodzie (jedyne źródło prawdy)
 - [ ] `docs/` — indeksy i katalogi (KATALOG_NEURONOW, KATALOG_STRATEGII, INDEKS_IMPERIUM)
 - [ ] realny kod w `imperium/` vs to, co mówią dokumenty (katalog ≠ kod)
-- [ ] aktualne liczby: neurony, zwiadowcy, prawa, testy
+- [ ] aktualne liczby: neurony, zwiadowcy, prawa, testy — **policzone, nie z pamięci**
 
 Po KAŻDEJ zmianie systemu **zaktualizuj dokumentację w tym samym ruchu**
-(README, indeksy, katalogi, liczby, status). Nieaktualny dokument = kłamstwo.
+(README, MANIFEST, indeksy, katalogi, liczby, status). Nieaktualny dokument = kłamstwo.
 
 ## 🚨 PRAWO XV — CZERWONY ALARM UTRATY POTENCJAŁU (ROZKAZ STAŁY)
 

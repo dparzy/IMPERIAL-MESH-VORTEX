@@ -48,7 +48,7 @@ from imperium.legiony.neurony.onchain import (
 from imperium.legiony.zwiadowcy import (
     ZwiadowcaHiguchiFD, ZwiadowcaHAScalper, ZwiadowcaHurst,
     ZwiadowcaKalmanATR, ZwiadowcaSMC, aktywuj_neurony_smc,
-    ZwiadowcaKatana,
+    ZwiadowcaKatana, ZwiadowcaTLP,
 )
 
 logger = logging.getLogger("Rejestr")
@@ -82,6 +82,7 @@ def wszyscy_zwiadowcy() -> list:
         ZwiadowcaHurst(),      # EXP-03 persystencja
         ZwiadowcaKalmanATR(),  # EXP-04 zmienność
         ZwiadowcaKatana(),     # EXP-06 Katana Scalper Pro (IMV-ADO)
+        ZwiadowcaTLP(),        # EXP-07 A-TLP Scalper breakout (IMV-ADO)
     ]
 
 

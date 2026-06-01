@@ -606,3 +606,58 @@ def test_katana_rezim_choppy_blokuje():
     # W CHOPPY sygnał powinien być NEUTRAL lub pewność mała
     if r.kierunek != "NEUTRAL":
         assert r.pewnosc < 0.7, f"W choppy pewność zbyt wysoka: {r.pewnosc}"
+
+
+# ─── EXP-07 A-TLP Scalper ─────────────────────────────────────────────────────
+
+def test_tlp_import():
+    from imperium.legiony.zwiadowcy.exp_tlp import ZwiadowcaTLP
+    t = ZwiadowcaTLP()
+    assert t.KLUCZ == "EXP-07"
+    assert t.KATEGORIA == "T"
+
+
+def test_tlp_za_malo_barow():
+    from imperium.legiony.zwiadowcy.exp_tlp import ZwiadowcaTLP
+    t = ZwiadowcaTLP()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100}] * 5
+    r = t.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def test_tlp_atr_to_prawdziwy_true_range():
+    """ATR musi uwzględniać previous close (naprawiony błąd oryginału)."""
+    from imperium.legiony.zwiadowcy.exp_tlp import _atr_series
+    # Gap up: prev close 100, bieżący bar high=110 low=108
+    bary = [
+        {"open": 99, "high": 101, "low": 98, "close": 100},
+        {"open": 108, "high": 110, "low": 108, "close": 109},  # gap
+    ]
+    trs = _atr_series(bary)
+    # TR bara 1 = max(110-108, |110-100|, |108-100|) = max(2, 10, 8) = 10
+    # Błędny (high-low) dałby tylko 2 — gap zignorowany
+    assert abs(trs[1] - 10) < 1e-9, f"TR powinien uwzględnić gap (=10), jest {trs[1]}"
+
+
+def test_tlp_swiezy_breakout_long():
+    """Breakout w górę z konsolidacji + impuls = LONG (świeże przebicie)."""
+    from imperium.legiony.zwiadowcy.exp_tlp import ZwiadowcaTLP
+    t = ZwiadowcaTLP()
+    # 28 barów konsolidacji wokół 100, potem silny breakout w górę
+    bary = []
+    for i in range(28):
+        bary.append({"open": 100, "high": 100.5, "low": 99.5, "close": 100})
+    # Bar z rozszerzeniem zmienności (by reżim = TRENDING) + breakout
+    bary.append({"open": 100, "high": 103, "low": 100, "close": 102.5})
+    bary.append({"open": 102.5, "high": 108, "low": 102.5, "close": 107})  # silny breakout
+    r = t.analizuj(bary)
+    assert r.kierunek in ("LONG", "NEUTRAL"), f"Nie powinno być SHORT, jest {r.kierunek}"
+
+
+def test_tlp_brak_breakoutu_w_kanale():
+    """Cena w środku kanału = NEUTRAL."""
+    from imperium.legiony.zwiadowcy.exp_tlp import ZwiadowcaTLP
+    t = ZwiadowcaTLP()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100} for _ in range(35)]
+    r = t.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"

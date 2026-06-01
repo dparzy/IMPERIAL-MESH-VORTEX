@@ -17,7 +17,7 @@
 ║  Dokumenty:          25 plików .md                                   ║
 ║  Neurony:            328 zmapowanych                                 ║
 ║  Strategie:          ~108+ zmapowanych                               ║
-║  Testy automatyczne: 28 ✅ (luka #1 zamknięta)                      ║
+║  Testy automatyczne: 52 ✅ (luki #1, #2, #3 zamknięte)              ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║  ✅ Działające (bez TA-Lib):    8 modułów                            ║
 ║  ⚠️  Blokowane przez TA-Lib:    9 modułów                            ║
@@ -80,11 +80,11 @@
 
 | # | Czego brakuje | Gdzie | Priorytet |
 |---|---------------|-------|-----------|
-| 1 | ✅ ZROBIONE — **Testy automatyczne** `tests/` (28 testów, 0 zależności) | `tests/` | ~~🔴~~ |
+| 1 | ✅ ZROBIONE — **Testy automatyczne** `tests/` (52 testów, 0 zależności) | `tests/` | ~~🔴~~ |
 | 2 | ✅ ZROBIONE — **Scorer Igrzysk** `igrzyska.py` (11 testów) | `biblioteki/igrzyska.py` | ~~🔴~~ |
-| 3 | **Moduł Neuronów produkcyjnych** — mamy spec 306 neuronów, ale w kodzie tylko 2 przykłady | `legiony/neurony/` | 🔴 Wysoki |
-| 4 | **Doradcy Cara** — SHARP/Oracle/Iustitia/Pythia w kodzie | `cesarz/doradcy/` | 🟠 Średni |
-| 5 | **Konektor CME Gap** — pobieranie danych CME futures | `oczy/cme_feed.py` | 🟠 Średni |
+| 3 | ✅ ZROBIONE — **Doradcy Cara** Oracle/Fulmen/Iustitia/Hermes/Pythia+Rada (24 testów) | `cesarz/doradcy/` | ~~🟠~~ |
+| 4 | **Moduł Neuronów produkcyjnych** — mamy spec 328 neuronów, ale w kodzie tylko 2 przykłady | `legiony/neurony/` | 🔴 Wysoki |
+| 5 | **Konektor CME Gap** — ⚠️ CME 24/7 od 29.05.2026 — strategia zanika historycznie | `oczy/cme_feed.py` | 🟡 Niski |
 | 6 | **Multi-exchange konektor** — Binance, OKX jako "prowincje" | `akwedukty/multi_exchange.py` | 🟠 Faza 2 |
 | 7 | **Scheduler** — cykliczne uruchamianie systemu co N minut | `drogi/scheduler.py` | 🟠 Faza 1 |
 | 8 | **Paper Trading Engine** — pełny symulator bez real money | `koloseum/paper_trading.py` | 🔴 Wysoki |

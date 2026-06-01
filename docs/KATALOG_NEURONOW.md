@@ -227,6 +227,8 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | X-22 | BigTrades | BigTrades Quant Analyzer | Detekcja absorpcji ważonej wolumenem + aktywność inst. | W7 |
 | X-23 | AetherVol | AetherEdge Volume Surge Detector | Klasyfikuje skoki wolumenu REALNY/SZUM + BUY/SELL | W6 |
 | X-24 | WicklessC | xGhozt Wickless Candles | Świece bez knotów → wyczerpanie i słabe ruchy cenowe | W5 |
+| X-25 | ATRDeviation 🔱 | Arsi Smart Buy Sell (odtworzony+naprawiony) | Z-score odchylenia ceny od średniej znorm. ATR. DWA tryby: RANGING→mean-rev, TREND→momentum (Kameleon). MinDisplacement 1.0 ATR, filtr ADX. ZAIMPLEMENTOWANY w kodzie | W6 |
+| X-26 | HAScalper 🔱 | MSX Hybrid Heiken Scalper (odtworzony+naprawiony) | Kolor+kształt świec HA (bez repainting) + momentum. Filtr Volatility_Index (ATR/MidMA20) blokuje konsolidację. DWA tryby: aggressive/conservative. Naprawiona tautologia oryginału. ZAIMPLEMENTOWANY | W7 |
 
 ---
 

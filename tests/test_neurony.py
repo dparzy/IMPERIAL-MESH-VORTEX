@@ -3,7 +3,7 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from imperium.legiony.neurony.momentum import NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross, NeuronWilliamsR
+from imperium.legiony.neurony.momentum import NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross, NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper
 from imperium.legiony.neurony.trend import NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend
 from imperium.legiony.neurony.wolumen import NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly
 from imperium.legiony.neurony.psychologia import NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv
@@ -77,6 +77,104 @@ def test_williams_r():
     assert n.interpretuj({"WILLIAMS_R": -85.0}).kierunek == "LONG"
     assert n.interpretuj({"WILLIAMS_R": -15.0}).kierunek == "SHORT"
     assert n.interpretuj({"WILLIAMS_R": -50.0}).kierunek == "NEUTRAL"
+
+
+def test_atr_deviation_szum_ignorowany():
+    n = NeuronATRDeviation()
+    s = n.interpretuj({"ATR_DEVIATION": 0.5})  # < MinDisplacement 1.0
+    assert s.kierunek == "NEUTRAL"
+
+
+def test_atr_deviation_mean_reversion_short():
+    n = NeuronATRDeviation()
+    # RANGING + cena daleko NAD średnią → mean-reversion → SHORT (powrót w dół)
+    s = n.interpretuj({"ATR_DEVIATION": 2.5, "REZIM": "RANGING"})
+    assert s.kierunek == "SHORT"
+    assert s.pewnosc == 0.80  # ekstremalne (>= FAR_FACTOR)
+
+
+def test_atr_deviation_mean_reversion_long():
+    n = NeuronATRDeviation()
+    # RANGING + cena pod średnią → LONG (powrót w górę)
+    s = n.interpretuj({"ATR_DEVIATION": -1.5, "REZIM": "RANGING"})
+    assert s.kierunek == "LONG"
+
+
+def test_atr_deviation_momentum_trend():
+    n = NeuronATRDeviation()
+    # TREND + cena nad średnią → momentum → LONG (kontynuacja)
+    s = n.interpretuj({"ATR_DEVIATION": 2.0, "REZIM": "TREND_STRONG"})
+    assert s.kierunek == "LONG"
+
+
+def test_atr_deviation_adx_decyduje_tryb():
+    n = NeuronATRDeviation()
+    # Bez reżimu, ADX wysoki → tryb trend → momentum LONG
+    s = n.interpretuj({"ATR_DEVIATION": 1.5, "ADX_14": 30.0})
+    assert s.kierunek == "LONG"
+    # ADX niski → mean-reversion → SHORT
+    s2 = n.interpretuj({"ATR_DEVIATION": 1.5, "ADX_14": 15.0})
+    assert s2.kierunek == "SHORT"
+
+
+def test_atr_deviation_brak_danych():
+    n = NeuronATRDeviation()
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+
+
+# ─── HA SCALPER (X-26) ────────────────────────────────────────────────────────
+
+def test_ha_scalper_bull_z_momentum():
+    n = NeuronHAScalper()
+    s = n.interpretuj({"HA_BULL": True, "HA_BEAR": False, "HA_MOMENTUM": 0.05,
+                        "HA_VOLATILITY_INDEX": 0.015, "REZIM": "TREND_STRONG"})
+    assert s.kierunek == "LONG"
+    assert s.pewnosc >= 0.70
+
+
+def test_ha_scalper_bear_z_momentum():
+    n = NeuronHAScalper()
+    s = n.interpretuj({"HA_BULL": False, "HA_BEAR": True, "HA_MOMENTUM": -0.05,
+                        "HA_VOLATILITY_INDEX": 0.015, "REZIM": "TREND_STRONG"})
+    assert s.kierunek == "SHORT"
+    assert s.pewnosc >= 0.70
+
+
+def test_ha_scalper_slaby_sygnal_sprzeczny_momentum():
+    n = NeuronHAScalper()
+    # Świeca bycza ale momentum spada — obniżona pewność
+    s = n.interpretuj({"HA_BULL": True, "HA_BEAR": False, "HA_MOMENTUM": -0.02,
+                        "HA_VOLATILITY_INDEX": 0.015, "REZIM": "TREND_STRONG"})
+    assert s.kierunek == "LONG"
+    assert s.pewnosc < 0.65  # obniżona
+
+
+def test_ha_scalper_konsolidacja_blokuje():
+    n = NeuronHAScalper()
+    # RANGING + niski Volatility_Index → NEUTRAL (ochrona przed konsolidacją)
+    s = n.interpretuj({"HA_BULL": True, "HA_BEAR": False, "HA_MOMENTUM": 0.05,
+                        "HA_VOLATILITY_INDEX": 0.003, "REZIM": "RANGING"})
+    assert s.kierunek == "NEUTRAL"
+
+
+def test_ha_scalper_trend_niski_vol_dozwolony():
+    n = NeuronHAScalper()
+    # W trendzie niższy próg volatility (0.003 vs 0.008)
+    s = n.interpretuj({"HA_BULL": True, "HA_BEAR": False, "HA_MOMENTUM": 0.04,
+                        "HA_VOLATILITY_INDEX": 0.005, "REZIM": "TREND_STRONG"})
+    assert s.kierunek == "LONG"  # dozwolony w trendzie
+
+
+def test_ha_scalper_doji_neutral():
+    n = NeuronHAScalper()
+    s = n.interpretuj({"HA_BULL": False, "HA_BEAR": False, "HA_MOMENTUM": 0.0,
+                        "HA_VOLATILITY_INDEX": 0.015})
+    assert s.kierunek == "NEUTRAL"
+
+
+def test_ha_scalper_brak_danych():
+    n = NeuronHAScalper()
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
 
 
 # ─── TREND ────────────────────────────────────────────────────────────────────
@@ -273,7 +371,7 @@ def test_vsa_stop_volume():
 def test_neurony_brak_danych_nie_crashuje():
     """Każdy neuron musi obsłużyć pusty dict."""
     neurony = [
-        NeuronRSI(), NeuronMACD(), NeuronBBands(), NeuronEMACross(),
+        NeuronRSI(), NeuronMACD(), NeuronBBands(), NeuronEMACross(), NeuronWilliamsR(), NeuronATRDeviation(), NeuronHAScalper(),
         NeuronADX(), NeuronIchimoku(), NeuronEMA50_200(), NeuronSupertrend(),
         NeuronOBV(), NeuronVWAP(), NeuronCVD(), NeuronVolumeAnomaly(),
         NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(),

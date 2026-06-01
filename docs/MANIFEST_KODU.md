@@ -68,39 +68,39 @@
 |-------|-------|--------|------|
 | V-OBV | NeuronOBV | ✅ aktywny | On-Balance Volume |
 | V-VWAP | NeuronVWAP | ✅ aktywny | VWAP bounce |
-| V-CVD | NeuronCVD | ✅ aktywny | Cumulative Volume Delta |
+| V-CVD | NeuronCVD | 🔇 wyciszony (brak CVD z Bramy) | Cumulative Volume Delta |
 | V-VANOM | NeuronVolumeAnomaly | ✅ aktywny | Volume anomaly detection |
 
 ### Plik: `neurony/struktura.py`
 
 | KLUCZ | Klasa | Status | Opis |
 |-------|-------|--------|------|
-| S-OB | NeuronOrderBlock | ✅ aktywny | Order Block SMC |
-| S-FVG | NeuronFVG | ✅ aktywny | Fair Value Gap |
-| S-BOS | NeuronBOS | ✅ aktywny | Break of Structure |
+| S-OB | NeuronOrderBlock | 🔇 wyciszony (brak danych SMC z Bramy) | Order Block SMC |
+| S-FVG | NeuronFVG | 🔇 wyciszony (brak danych SMC z Bramy) | Fair Value Gap |
+| S-BOS | NeuronBOS | 🔇 wyciszony (brak danych SMC z Bramy) | Break of Structure |
 | S-VSA | NeuronVSA | ✅ aktywny | Volume Spread Analysis |
 
 ### Plik: `neurony/psychologia.py`
 
 | KLUCZ | Klasa | Status | Opis |
 |-------|-------|--------|------|
-| P-FG | NeuronFearGreed | ✅ aktywny (wyciszony — API) | Fear & Greed index |
-| P-FUND | NeuronFundingExtreme | ✅ aktywny | Funding rate ekstrema |
-| P-PANIK | NeuronPanikaDetal | ✅ aktywny | Panika detalu |
-| P-OIDIV | NeuronOIDiv | ✅ aktywny | OI divergence |
+| P-FG | NeuronFearGreed | 🔇 wyciszony (API Fear&Greed) | Fear & Greed index |
+| P-FUND | NeuronFundingExtreme | 🔇 wyciszony (API funding) | Funding rate ekstrema |
+| P-PANIK | NeuronPanikaDetal | 🔇 wyciszony (API/feed) | Panika detalu |
+| P-OIDIV | NeuronOIDiv | 🔇 wyciszony (API OI) | OI divergence |
 
 ### Plik: `neurony/onchain.py`
 
 | KLUCZ | Klasa | Status | Opis |
 |-------|-------|--------|------|
-| O-MVRV | NeuronMVRV | ✅ aktywny (wyciszony — API) | MVRV Z-score |
-| O-SOPR | NeuronSOPR | ✅ aktywny (wyciszony — API) | SOPR sentiment |
-| O-PUELL | NeuronPuellMultiple | ✅ aktywny (wyciszony — API) | Puell Multiple |
-| O-NETFLOW | NeuronExchangeNetflow | ✅ aktywny (wyciszony — API) | Exchange netflow |
+| O-MVRV | NeuronMVRV | 🔇 wyciszony (API on-chain) | MVRV Z-score |
+| O-SOPR | NeuronSOPR | 🔇 wyciszony (API on-chain) | SOPR sentiment |
+| O-PUELL | NeuronPuellMultiple | 🔇 wyciszony (API on-chain) | Puell Multiple |
+| O-NETFLOW | NeuronExchangeNetflow | 🔇 wyciszony (API on-chain) | Exchange netflow |
 
 ---
 
-## 📋 NEURONY DO WDROŻENIA (272 — tylko katalog)
+## 📋 NEURONY DO WDROŻENIA (271 — tylko katalog)
 
 > Źródło: `docs/KATALOG_NEURONOW.md`. Status: `🔴 tylko katalog` — brak kodu.
 > Implementacja: etapami, z pomiarem dekorelacji po każdej fazie (Prawo XVI).

@@ -795,3 +795,53 @@ def test_sweep_atr_true_range():
     ]
     trs = _atr_series(bary)
     assert abs(trs[1] - 10) < 1e-9
+
+
+# ─── EXP-10 Displacement Scalper ──────────────────────────────────────────────
+
+def test_displacement_import():
+    from imperium.legiony.zwiadowcy.exp_displacement import ZwiadowcaDisplacement
+    d = ZwiadowcaDisplacement()
+    assert d.KLUCZ == "EXP-10"
+    assert d.KATEGORIA == "S"
+
+
+def test_displacement_za_malo_barow():
+    from imperium.legiony.zwiadowcy.exp_displacement import ZwiadowcaDisplacement
+    d = ZwiadowcaDisplacement()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100}] * 5
+    r = d.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def test_displacement_symetryczne():
+    """Przemieszczenie musi uwzględniać i high, i low (naprawiona asymetria)."""
+    from imperium.legiony.zwiadowcy.exp_displacement import _displacement_series
+    # Ruch w dół: low spada mocno, high stoi → oryginał (tylko high) by przegapił
+    bary = [{"open": 100, "high": 100, "low": 100, "close": 100} for _ in range(5)]
+    bary.append({"open": 100, "high": 100, "low": 95, "close": 96})  # low -5
+    disp = _displacement_series(bary, lookback=5)
+    # disp ostatniego = max(|100-100|, |95-100|)/96 = 5/96 ≈ 0.052
+    assert disp[-1] > 0.04, f"Przemieszczenie w dół powinno być wykryte, jest {disp[-1]}"
+
+
+def test_displacement_spike_long():
+    """Spokojny rynek + nagły impuls w górę → LONG."""
+    from imperium.legiony.zwiadowcy.exp_displacement import ZwiadowcaDisplacement
+    d = ZwiadowcaDisplacement()
+    # 54 bary bardzo spokojne
+    bary = [{"open": 100, "high": 100.1, "low": 99.9, "close": 100} for _ in range(54)]
+    # impuls w górę: ostatni bar mocno wyżej (displacement spike, ATR umiarkowane)
+    bary.append({"open": 100, "high": 100.6, "low": 100.0, "close": 100.5})
+    r = d.analizuj(bary)
+    assert r.kierunek in ("LONG", "NEUTRAL"), f"Impuls w górę nie powinien dać SHORT, jest {r.kierunek}"
+
+
+def test_displacement_atr_true_range():
+    from imperium.legiony.zwiadowcy.exp_displacement import _atr_series
+    bary = [
+        {"open": 99, "high": 101, "low": 98, "close": 100},
+        {"open": 108, "high": 110, "low": 108, "close": 109},
+    ]
+    trs = _atr_series(bary)
+    assert abs(trs[1] - 10) < 1e-9

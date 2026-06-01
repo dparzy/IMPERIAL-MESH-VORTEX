@@ -50,7 +50,7 @@ from imperium.legiony.zwiadowcy import (
     ZwiadowcaKalmanATR, ZwiadowcaSMC, aktywuj_neurony_smc,
     ZwiadowcaKatana, ZwiadowcaTLP, ZwiadowcaNightTurbo,
     ZwiadowcaLiquiditySweep, ZwiadowcaDisplacement,
-    ZwiadowcaDynamic,
+    ZwiadowcaDynamic, ZwiadowcaAtmabhan,
 )
 
 logger = logging.getLogger("Rejestr")
@@ -89,6 +89,7 @@ def wszyscy_zwiadowcy() -> list:
         ZwiadowcaLiquiditySweep(), # EXP-09 Liquidity Sweep stop-hunt (IMV-ADO)
         ZwiadowcaDisplacement(), # EXP-10 Displacement impuls strukturalny (IMV-ADO)
         ZwiadowcaDynamic(),    # EXP-11 Dynamic cross + slippage guard (IMV-ADO)
+        ZwiadowcaAtmabhan(),   # EXP-12 L2 mikrostruktura (IMV-ADO, WYCISZONY do feedu L2)
     ]
 
 
@@ -133,11 +134,21 @@ def raport_potencjalu() -> dict:
     neurony = wszystkie_neurony()
     aktywne = [n for n in neurony if n.DOSTEPNY]
     wyciszone = [n for n in neurony if not n.DOSTEPNY]
+
+    zwiadowcy = wszyscy_zwiadowcy()
+    zw_aktywni = [z for z in zwiadowcy if getattr(z, "DOSTEPNY", True)]
+    zw_wyciszeni = [z for z in zwiadowcy if not getattr(z, "DOSTEPNY", True)]
+
+    powody = {n.KLUCZ: n.POWOD_NIEDOSTEPNOSCI for n in wyciszone}
+    powody.update({z.KLUCZ: z.POWOD_NIEDOSTEPNOSCI for z in zw_wyciszeni})
+
     return {
         "neurony_lacznie": len(neurony),
         "neurony_aktywne": len(aktywne),
         "neurony_wyciszone": len(wyciszone),
-        "zwiadowcy_exp": len(wszyscy_zwiadowcy()),
+        "zwiadowcy_exp": len(zwiadowcy),
+        "zwiadowcy_aktywni": len(zw_aktywni),
+        "zwiadowcy_wyciszeni": len(zw_wyciszeni),
         "wykorzystanie_pct": round(len(aktywne) / len(neurony) * 100, 1),
-        "wyciszone_powody": {n.KLUCZ: n.POWOD_NIEDOSTEPNOSCI for n in wyciszone},
+        "wyciszone_powody": powody,
     }

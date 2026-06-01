@@ -382,3 +382,39 @@ def test_neurony_brak_danych_nie_crashuje():
         s = n.interpretuj({})
         assert s is not None
         assert s.kierunek in ("LONG", "SHORT", "NEUTRAL"), f"{n.KLUCZ} zwrócił nieznany kierunek"
+
+
+# ─── Prawo XV: X-26 HAScalper nie może być martwym głosem ─────────────────────
+
+def test_budowniczy_produkuje_ha_dla_x26():
+    """
+    REGRESJA Prawa XV: X-26 NeuronHAScalper czyta HA_BULL/HA_BEAR/HA_MOMENTUM/
+    HA_VOLATILITY_INDEX. Budowniczy MUSI je produkować — inaczej X-26 jest martwy.
+    """
+    from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
+    from imperium.legiony.neurony.momentum import NeuronHAScalper
+
+    bud = BudowniczyWskaznikow.__new__(BudowniczyWskaznikow)
+    n = NeuronHAScalper()
+
+    def bary_kier(up=True, m=40):
+        out = []; p = 100.0
+        for i in range(m):
+            p += (0.8 if up else -0.8)
+            out.append({"open": p - 0.4, "high": p + 0.5, "low": p - 0.6, "close": p})
+        return out
+
+    # Bycza seria → HA klucze obecne + X-26 daje LONG
+    w_up = {}
+    bud._dodaj_ha(bary_kier(True), w_up)
+    assert w_up.get("HA_BULL") is True
+    assert w_up.get("HA_BEAR") is False
+    assert "HA_MOMENTUM" in w_up
+    assert "HA_VOLATILITY_INDEX" in w_up
+    assert n.interpretuj(w_up).kierunek == "LONG"
+
+    # Niedźwiedzia seria → X-26 daje SHORT
+    w_dn = {}
+    bud._dodaj_ha(bary_kier(False), w_dn)
+    assert w_dn.get("HA_BEAR") is True
+    assert n.interpretuj(w_dn).kierunek == "SHORT"

@@ -76,7 +76,11 @@ class ZwiadowcaTLP(ZwiadowcaElitarny):
 
     CHANNEL_PERIOD: int = 20
     ATR_PERIOD: int = 14
-    ATR_MULT: float = 1.5
+    # Bufor PONAD maksimum kanału Donchina = filtr szumu, NIE bariera.
+    # Oryginał A-TLP miał 1.5 — to znaczyło "przebij szczyt 20 barów o 1.5 ATR",
+    # co spełniało się ~0.4% czasu (martwy głos = utrata potencjału, Prawo XV).
+    # 0.15 ATR odfiltrowuje szum, ale pozwala realnym wybiciom przejść.
+    ATR_MULT: float = 0.15
     VOL_RATIO_MIN: float = 0.9   # poniżej = CHOPPY → blokuj breakout
     WYMAGA_BAROW: int = 30
 

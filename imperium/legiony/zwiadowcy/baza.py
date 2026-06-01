@@ -103,6 +103,13 @@ class ZwiadowcaElitarny(ABC):
     # Stałe klasy — nie nadpisywać
     LEGION: str = "EXPLORATORES"
 
+    # Dostępność (Prawo XV — jawność potencjału). Gdy zwiadowca wymaga danych
+    # których pipeline jeszcze nie dostarcza (np. feed L2 orderbook), oznacz go
+    # DOSTEPNY=False z czytelnym powodem — Legatus go pominie zamiast karmić
+    # martwym NEUTRAL. To NIE jest utrata potencjału, lecz świadome wyciszenie.
+    DOSTEPNY: bool = True
+    POWOD_NIEDOSTEPNOSCI: str = ""
+
     def __init__(self) -> None:
         if self.KLUCZ == "EXP-00":
             raise NotImplementedError(f"{type(self).__name__} musi ustawić KLUCZ (EXP-XX).")

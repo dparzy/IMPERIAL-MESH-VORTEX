@@ -5,7 +5,19 @@
 ## 📜 Konstytucja
 
 Pełne prawa: [`ZASADY_FUNDAMENTALNE.md`](./ZASADY_FUNDAMENTALNE.md).
-Każda decyzja musi być zgodna z 15 Prawami Imperium.
+Każda decyzja musi być zgodna z 17 Prawami Imperium.
+
+## 🗺️ PRAWO XVII — ROZPOZNANIE TERENU (ROZKAZ STAŁY, ROBISZ TO PIERWSZE)
+
+**Na początku KAŻDEJ sesji i przed KAŻDYM nowym zadaniem** — najpierw przeczytaj
+stan Imperium, NIE zgaduj z pamięci:
+- [ ] `README.md`, `CLAUDE.md`, `ZASADY_FUNDAMENTALNE.md`
+- [ ] `docs/` — indeksy i katalogi (KATALOG_NEURONOW, KATALOG_STRATEGII, INDEKS_IMPERIUM)
+- [ ] realny kod w `imperium/` vs to, co mówią dokumenty (katalog ≠ kod)
+- [ ] aktualne liczby: neurony, zwiadowcy, prawa, testy
+
+Po KAŻDEJ zmianie systemu **zaktualizuj dokumentację w tym samym ruchu**
+(README, indeksy, katalogi, liczby, status). Nieaktualny dokument = kłamstwo.
 
 ## 🚨 PRAWO XV — CZERWONY ALARM UTRATY POTENCJAŁU (ROZKAZ STAŁY)
 
@@ -27,6 +39,16 @@ Checklist utraty potencjału (sprawdzaj zawsze):
 - [ ] Czy dane wieloskładnikowe są redukowane do jednej liczby, gdy niosą więcej?
 
 Cel: potencjał Imperium wykorzystany w 100%, nie w 11%.
+
+## 📊 PRAWO XVI — REDUNDANCJA MIERZONA, NIE ZGADYWANA
+
+Nie odrzucaj modułu za podobieństwo — odrzucaj za **skorelowany sygnał bez nowej
+informacji**. Decyzja o redundancji opiera się na pomiarze, nie na opinii:
+
+- `imperium/legiony/diagnostyka_korelacji.raport_dekorelacji(bary, zwiadowcy)`
+- `|korelacja| > 0.80` → kandydat do scalenia / wagi w dół
+- `|korelacja| < 0.20` → filar siły (zachować)
+- stały sygnał (zerowa wariancja) → martwy głos = czerwony alarm Prawa XV
 
 ## 🔐 Bezpieczeństwo (NIENARUSZALNE)
 

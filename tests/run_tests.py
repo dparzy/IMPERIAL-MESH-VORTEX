@@ -20,6 +20,7 @@ MODULY_TESTOWE = [
     "test_kalkulator", "test_igrzyska", "test_pamiec",
     "test_doradcy", "test_paper_trading", "test_scheduler",
     "test_neurony", "test_exploratores", "test_integracja",
+    "test_dekorelacja",
 ]
 
 

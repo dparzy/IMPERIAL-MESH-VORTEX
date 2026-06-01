@@ -39,6 +39,7 @@ class SygnalNeuronu:
     pewnosc_finalna: float = 0.0         # po uwzględnieniu przeciwnika
     powody: List[str] = field(default_factory=list)
     waga: int = 5                        # waga ważności 1-10 (dynamiczna)
+    kategoria: str = "?"                 # M/T/V/F/O/L/S/A — dla wag reżimowych (Prawo XV)
     timestamp: float = field(default_factory=time.time)
     hash_danych: str = ""                # SHA-256 z Bramy (dowód nienaruszalności)
 
@@ -89,6 +90,7 @@ class MikroNeuron(ABC):
             pewnosc=pewnosc,
             powody=powody,
             waga=self.WAGA,
+            kategoria=self.KATEGORIA,
             hash_danych=hash_danych,
         )
         s.policz_finalna()

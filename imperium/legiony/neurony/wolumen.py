@@ -107,6 +107,11 @@ class NeuronCVD(MikroNeuron):
     WSKAZNIK = "CVD"
     KATEGORIA = "V"
     WAGA = 8
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = (
+        "CVD wymaga danych o stronie agresora (buy/sell volume z tick/trade feed). "
+        "OHLCV tego nie zawiera. Aktywuje się przy podpięciu trade feed z MEXC."
+    )
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         cvd = wskazniki.get("CVD")

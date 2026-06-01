@@ -5,7 +5,7 @@
 ## 📜 Konstytucja
 
 Pełne prawa: [`ZASADY_FUNDAMENTALNE.md`](./ZASADY_FUNDAMENTALNE.md).
-Każda decyzja musi być zgodna z 18 Prawami Imperium.
+Każda decyzja musi być zgodna z **19 Prawami Imperium**.
 
 **Prawo XVIII (decyzyjność):** gdy widzisz niespójność/błąd — rozstrzygasz SAM
 (najlepsza opcja zgodna z zasadami), nie pytasz o błahostki. Źródło prawdy:
@@ -54,6 +54,18 @@ informacji**. Decyzja o redundancji opiera się na pomiarze, nie na opinii:
 - `|korelacja| > 0.80` → kandydat do scalenia / wagi w dół
 - `|korelacja| < 0.20` → filar siły (zachować)
 - stały sygnał (zerowa wariancja) → martwy głos = czerwony alarm Prawa XV
+
+## 🔱 PRAWO XIX — KOD JEST PRAWEM (ROZKAZ STAŁY)
+
+**Nic nie „istnieje" w Imperium bez kodu + testów na branchu `claude/sleepy-fermi-dsdE4`.**
+
+Checklist Prawa XIX (sprawdzaj na początku sesji):
+- [ ] Przeczytaj `docs/MANIFEST_KODU.md` — ile modułów naprawdę istnieje w kodzie?
+- [ ] `grep "🔴" docs/MANIFEST_KODU.md` — które są tylko w katalogu?
+- [ ] Po każdym nowym wdrożeniu → zaktualizuj MANIFEST_KODU.md w tym samym commicie.
+- [ ] Nigdy nie mów "mamy X neuronów" bez sprawdzenia MANIFEST — tylko `✅` liczy się.
+
+**Złamanie Prawa XIX:** twierdzenie, że moduł istnieje, gdy nie ma kodu na branchu.
 
 ## 🔐 Bezpieczeństwo (NIENARUSZALNE)
 

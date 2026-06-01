@@ -270,7 +270,45 @@ Lepsza dobra decyzja udokumentowana i odwracalna niż czekanie na rozkaz w błah
 
 ---
 
+---
+
+## ⚖️ PRAWO XIX — KOD JEST PRAWEM, KATALOG JEST PLANEM 🔱
+
+> **Rozkaz Cezara.** Odkrycie zapisane tylko w katalogu to marzenie, nie fakt.
+> Każdy neuron, każda strategia, każdy moduł istnieje w Imperium WTEDY I TYLKO WTEDY,
+> gdy istnieje jako działający kod z testami na gałęzi `claude/sleepy-fermi-dsdE4`.
+
+### Zasada prymatu kodu
+
+- **Katalog = plan.** Wpis w `KATALOG_NEURONOW.md` to zamówienie robocze, nie gotowy produkt.
+- **Kod + test = fakt.** Tylko plik `.py` z klasą + przechodzący test = neuron ISTNIEJE.
+- **Brak kodu = brak modułu.** Nawet najlepiej opisany algorytm bez implementacji
+  nie jest częścią Imperium — jest częścią listy życzeń.
+
+### Ścisła kontrola GitHub
+
+Każda sesja:
+1. **SPRAWDŹ** stan brancha `claude/sleepy-fermi-dsdE4` — co jest naprawdę w kodzie.
+2. **PORÓWNAJ** z `docs/MANIFEST_KODU.md` — plik kontrolny: każdy ze 299 neuronów
+   z katalogu ma status `✅ kod+testy` / `🔴 tylko katalog`.
+3. **AKTUALIZUJ** MANIFEST po każdym nowym wdrożeniu — w tym samym commicie co kod.
+4. **NIGDY** nie twierdzij, że coś "jest w systemie", jeśli nie ma kodu na branchu.
+
+### Reguły operacyjne
+
+- Nowy neuron → najpierw implementacja + testy → potem aktualizacja katalogu i MANIFEST.
+- Każda faza rozbudowy roju zaczyna się od: `cat docs/MANIFEST_KODU.md | grep "🔴"` —
+  które neurony czekają na implementację.
+- Po każdej fazie: `python tests/run_tests.py` musi być zielony zanim cokolwiek trafi
+  do `main` lub na gałąź deweloperską.
+- `MANIFEST_KODU.md` to **jedyne oficjalne źródło prawdy** o tym, ile kodu naprawdę mamy.
+
+**Gwiazdka na dokumencie bez kodu = złamanie Prawa XIX.**
+
+---
+
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*
 > 🚨 *"Niewykorzystana siła to siła oddana wrogowi. Imperium nie marnuje niczego."*
 > 🗺️ *"Wódz, który nie zna własnego obozu, przegrywa bitwę przed jej początkiem."*
 > ⚙️ *"Architekt, który o każdą cegłę pyta Cezara, nie jest architektem."*
+> 🔱 *"Katalog mówi: chcemy. Kod mówi: mamy. Nie mylimy tych dwóch słów nigdy."*

@@ -69,19 +69,62 @@ class Legatus:
 
     def __init__(self, neurony: List[MikroNeuron],
                  min_neuronow: int = 5,
-                 min_przewaga: float = 0.55):
+                 min_przewaga: float = 0.55,
+                 zwiadowcy: Optional[list] = None):
+        """
+        neurony:   lista MikroNeuronów (czytają z dict Bramy).
+        zwiadowcy: lista ZwiadowcaElitarny (EXP-XX) — liczą sami z serii barów.
+                   Jeśli podani, fokus() odpala ich gdy dostanie `bary`.
+                   ZwiadowcaSMC dodatkowo wstrzykuje strefy → budzi SMC-01/02/03.
+        """
         self.roj = Roj(neurony)
         self.min_neuronow = min_neuronow
         self.min_przewaga = min_przewaga
+        self.zwiadowcy = zwiadowcy or []
 
     # ── Tryb FOKUS ─────────────────────────────────────────────────────────────
 
     def fokus(self, symbol: str, wskazniki: dict,
-              rezim: str = "NORMAL") -> RaportLegatusa:
-        """Koncentruje wszystkie neurony na jednym symbolu."""
+              rezim: str = "NORMAL",
+              bary: Optional[list] = None) -> RaportLegatusa:
+        """
+        Koncentruje wszystkie neurony na jednym symbolu.
+
+        bary: opcjonalna seria OHLCV (List[dict]). Jeśli podana i są zwiadowcy:
+              1. ZwiadowcaSMC wstrzykuje strefy do `wskazniki` (budzi neurony SMC)
+              2. Każdy zwiadowca EXP liczy własny sygnał z barów
+              3. Sygnały EXP dołączają do agregacji obok neuronów
+        """
+        sygnaly_exp = []
+        if bary and self.zwiadowcy:
+            sygnaly_exp = self._odpal_zwiadowcow(wskazniki, bary)
+
         sygnaly = self.roj.zbierz_sygnaly(wskazniki)
+        sygnaly = sygnaly + sygnaly_exp
         sygnaly = self._dostosuj_wagi(sygnaly, rezim)
         return self._agreguj(symbol, "FOKUS", rezim, sygnaly)
+
+    def _odpal_zwiadowcow(self, wskazniki: dict, bary: list) -> List[SygnalNeuronu]:
+        """
+        Odpala zwiadowców EXP na serii barów (Prawo XV — potencjał wykorzystany).
+        Najpierw ZwiadowcaSMC wstrzykuje strefy (most do SMC), potem reszta liczy sygnały.
+        """
+        sygnaly = []
+        # Krok 1: zwiadowcy z metodą wstrzyknij() (np. SMC) najpierw wzbogacają dict
+        for z in self.zwiadowcy:
+            if hasattr(z, "wstrzyknij"):
+                try:
+                    z.wstrzyknij(wskazniki, bary)
+                except Exception as e:
+                    logger.error(f"[Legatus] Zwiadowca {z.KLUCZ} wstrzyknij() padł: {e}")
+        # Krok 2: każdy zwiadowca liczy własny raport
+        for z in self.zwiadowcy:
+            try:
+                raport = z.analizuj(bary)
+                sygnaly.append(raport.sygnal)
+            except Exception as e:
+                logger.error(f"[Legatus] Zwiadowca {z.KLUCZ} analizuj() padł: {e}")
+        return sygnaly
 
     # ── Tryb SKANER ────────────────────────────────────────────────────────────
 
@@ -166,7 +209,7 @@ class Legatus:
 
     def _dostosuj_wagi(self, sygnaly: List[SygnalNeuronu],
                        rezim: str) -> List[SygnalNeuronu]:
-        """Modyfikuje wagi neuronów zgodnie z bieżącym reżimem."""
+        """Modyfikuje wagi neuronów zgodnie z bieżącym reżimem (Prawo XV — wagi ożywione)."""
         mapa = WAGI_REZIMU.get(rezim, {})
         if not mapa:
             return sygnaly
@@ -174,7 +217,7 @@ class Legatus:
         default = mapa.get("_default", 1.0)
         wynik = []
         for s in sygnaly:
-            k = getattr(s, "_kategoria", None)  # neurony mogą mieć kategorię w przyszłości
+            k = s.kategoria if s.kategoria != "?" else None
             mnoznik = mapa.get(k, default) if k else default
             if mnoznik != 1.0:
                 import copy

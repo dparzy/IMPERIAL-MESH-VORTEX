@@ -143,7 +143,7 @@ class ZwiadowcaElitarny(ABC):
             wskaznik=self.WSKAZNIK, wartosc=None,
             kierunek="NEUTRAL", pewnosc=0.0,
             powody=[f"[{self.KLUCZ}] Brak danych: {powod}"],
-            waga=self.WAGA,
+            waga=self.WAGA, kategoria=self.KATEGORIA,
         )
         sygnal.policz_finalna()
         return RaportZwiadowcy(
@@ -167,7 +167,7 @@ class ZwiadowcaElitarny(ABC):
             neuron_id=self.KLUCZ, legion=self.LEGION,
             wskaznik=self.WSKAZNIK, wartosc=diagnostics.get("main_value"),
             kierunek=kierunek, pewnosc=pewnosc,
-            powody=powody, waga=self.WAGA,
+            powody=powody, waga=self.WAGA, kategoria=self.KATEGORIA,
         )
         sygnal.policz_finalna()
         return RaportZwiadowcy(

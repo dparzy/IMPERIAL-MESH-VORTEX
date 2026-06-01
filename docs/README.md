@@ -23,6 +23,8 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [KATALOG_NEURONOW.md](KATALOG_NEURONOW.md) | Katalog 261 mikro-neuronów roju — 4 legiony + 12 dywizji specjalnych (AI/ML, Straż, Breadth, Order Book, Arbitraż, Reżim, Sentyment, Wieloryby, Entropia, Struktura, Perły) |
 | [MATRYCA_KORELACJI.md](MATRYCA_KORELACJI.md) | Kostka Rubika sygnałów — korelacje, konflikty, reżimy rynku, wagi dynamiczne, wpływ BTC |
 | [REGULAMINY_I_MANIPULACJE.md](REGULAMINY_I_MANIPULACJE.md) | Zgodność z regulaminami giełd + 7 manipulacji do wykrywania (obrona, nie atak) |
-| _(wkrótce)_ | System Numeracji — klucz kodowy i intuicja botów |
+| [GENERAL_LEGATUS.md](GENERAL_LEGATUS.md) | Generał Legatus — koordynator Legionów i Senatu, Tryb SKANER vs FOKUS, agregacja sygnałów |
+| [KALKULATOR_LEWARA.md](KALKULATOR_LEWARA.md) | Matematyka przeżycia — likwidacja, stop-loss, dynamiczna dźwignia, zarządzanie kapitałem |
+| [KATALOG_STRATEGII.md](KATALOG_STRATEGII.md) | Katalog strategii — przepisy z neuronów, traderzy świata, auto-dopasowanie do rynku |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

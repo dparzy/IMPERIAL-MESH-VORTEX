@@ -48,6 +48,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)-7s | 
 logger = logging.getLogger("BramaKalkulatora")
 
 SOURCE_TAG = "TA-Lib (C-core, deterministic)"
+SOURCE_TAG_PY = "pure-Python (deterministic)"
 
 
 def _arr(x) -> np.ndarray:
@@ -59,6 +60,109 @@ def _last_valid(a: np.ndarray):
     a = np.asarray(a, dtype=np.float64)
     valid = a[~np.isnan(a)]
     return float(valid[-1]) if valid.size else None
+
+
+def _second_last_valid(a: np.ndarray):
+    """Przedostatnia nie-NaN wartość — wartość z poprzedniego baru (dla crossoverów)."""
+    a = np.asarray(a, dtype=np.float64)
+    valid = a[~np.isnan(a)]
+    return float(valid[-2]) if valid.size >= 2 else None
+
+
+# ── Pure-Python: wskaźniki których TA-Lib nie posiada ────────────────────────
+
+def _py_vwap(high, low, close, volume) -> float:
+    """VWAP = Σ(TypicalPrice × Volume) / Σ(Volume). Okres = cała podana seria."""
+    tp = [(h + l + c) / 3 for h, l, c in zip(high, low, close)]
+    vol = list(volume)
+    total = sum(vol)
+    return sum(t * v for t, v in zip(tp, vol)) / total if total else 0.0
+
+
+def _py_vwap_std(high, low, close, volume) -> float:
+    """Odchylenie standardowe VWAP (wolumenowo ważone)."""
+    tp = [(h + l + c) / 3 for h, l, c in zip(high, low, close)]
+    vol = list(volume)
+    total = sum(vol)
+    if not total:
+        return 0.0
+    vwap = sum(t * v for t, v in zip(tp, vol)) / total
+    var = sum(v * (t - vwap) ** 2 for t, v in zip(tp, vol)) / total
+    return var ** 0.5
+
+
+def _py_supertrend(high, low, close, period: int = 10, multiplier: float = 3.0):
+    """
+    Supertrend — pure Python, bez TA-Lib.
+    Zwraca (st_value, direction, st_value_prev, direction_prev).
+    direction: 1=bullish, -1=bearish.
+    """
+    n = len(close)
+    if n < period + 2:
+        return None, None, None, None
+
+    # ATR Wilder (EMA-style)
+    trs = [max(high[i] - low[i], abs(high[i] - close[i - 1]), abs(low[i] - close[i - 1]))
+           for i in range(1, n)]
+    atr = [sum(trs[:period]) / period]
+    for tr in trs[period:]:
+        atr.append((atr[-1] * (period - 1) + tr) / period)
+
+    offset = period  # atr[0] odpowiada bar-indeksowi = period
+    basic_upper = [(high[offset + i] + low[offset + i]) / 2 + multiplier * atr[i]
+                   for i in range(len(atr))]
+    basic_lower = [(high[offset + i] + low[offset + i]) / 2 - multiplier * atr[i]
+                   for i in range(len(atr))]
+
+    final_upper = [basic_upper[0]]
+    final_lower = [basic_lower[0]]
+    for i in range(1, len(atr)):
+        prev_c = close[offset + i - 1]
+        fu = basic_upper[i] if basic_upper[i] < final_upper[-1] or prev_c > final_upper[-1] else final_upper[-1]
+        fl = basic_lower[i] if basic_lower[i] > final_lower[-1] or prev_c < final_lower[-1] else final_lower[-1]
+        final_upper.append(fu)
+        final_lower.append(fl)
+
+    direction = []
+    for i in range(len(atr)):
+        c = close[offset + i]
+        if not direction:
+            direction.append(1 if c > final_lower[i] else -1)
+        else:
+            prev_dir = direction[-1]
+            if prev_dir == 1:
+                direction.append(1 if c > final_upper[i] else -1)
+            else:
+                direction.append(-1 if c < final_lower[i] else 1)
+
+    st_vals = [final_lower[i] if direction[i] == 1 else final_upper[i] for i in range(len(direction))]
+    return (
+        st_vals[-1], direction[-1],
+        st_vals[-2] if len(st_vals) >= 2 else None,
+        direction[-2] if len(direction) >= 2 else None,
+    )
+
+
+def _py_ichimoku(high, low):
+    """
+    Ichimoku Cloud — ostatnie wartości z podanej serii.
+    Wymaga min. 52 barów (Senkou B potrzebuje 52 obserwacji).
+    """
+    def _hl2(h, l, period):
+        if len(h) < period:
+            return None
+        return (max(h[-period:]) + min(l[-period:])) / 2
+
+    tenkan = _hl2(high, low, 9)
+    kijun = _hl2(high, low, 26)
+    senkou_b = _hl2(high, low, 52)
+    senkou_a = (tenkan + kijun) / 2 if tenkan is not None and kijun is not None else None
+    return {
+        "ICHIMOKU_TENKAN": tenkan,
+        "ICHIMOKU_KIJUN": kijun,
+        "ICHIMOKU_SENKOU_A": senkou_a,
+        "ICHIMOKU_SENKOU_B": senkou_b,
+    }
 
 
 @dataclass
@@ -94,24 +198,108 @@ class CalculatorGateway:
 
     def __init__(self):
         self._registry: Dict[str, Callable[..., Any]] = {
-            "RSI":    lambda close, period=14: _last_valid(talib.RSI(_arr(close), timeperiod=period)),
-            "EMA":    lambda close, period=20: _last_valid(talib.EMA(_arr(close), timeperiod=period)),
-            "SMA":    lambda close, period=20: _last_valid(talib.SMA(_arr(close), timeperiod=period)),
-            "ATR":    lambda high, low, close, period=14: _last_valid(talib.ATR(_arr(high), _arr(low), _arr(close), timeperiod=period)),
-            "MACD":   self._macd,
-            "BBANDS": self._bbands,
+            # ── TA-Lib: podstawowe ─────────────────────────────────────────────
+            "RSI":      lambda close, period=14: _last_valid(talib.RSI(_arr(close), timeperiod=period)),
+            "EMA":      lambda close, period=20: _last_valid(talib.EMA(_arr(close), timeperiod=period)),
+            "SMA":      lambda close, period=20: _last_valid(talib.SMA(_arr(close), timeperiod=period)),
+            "ATR":      lambda high, low, close, period=14: _last_valid(talib.ATR(_arr(high), _arr(low), _arr(close), timeperiod=period)),
+            "MACD":     self._macd,
+            "BBANDS":   self._bbands,
+
+            # ── TA-Lib: EMA na konkretnych okresach (dla neuronów crossover) ──
+            "EMA_9":    lambda close: _last_valid(talib.EMA(_arr(close), timeperiod=9)),
+            "EMA_21":   lambda close: _last_valid(talib.EMA(_arr(close), timeperiod=21)),
+            "EMA_50":   lambda close: _last_valid(talib.EMA(_arr(close), timeperiod=50)),
+            "EMA_200":  lambda close: _last_valid(talib.EMA(_arr(close), timeperiod=200)),
+
+            # ── TA-Lib: PREV — wartość z poprzedniego baru (dla crossoverów) ──
+            "RSI_PREV":     lambda close, period=14: _second_last_valid(talib.RSI(_arr(close), timeperiod=period)),
+            "EMA_9_PREV":   lambda close: _second_last_valid(talib.EMA(_arr(close), timeperiod=9)),
+            "EMA_21_PREV":  lambda close: _second_last_valid(talib.EMA(_arr(close), timeperiod=21)),
+            "EMA_50_PREV":  lambda close: _second_last_valid(talib.EMA(_arr(close), timeperiod=50)),
+            "EMA_200_PREV": lambda close: _second_last_valid(talib.EMA(_arr(close), timeperiod=200)),
+            "MACD_HIST_PREV": self._macd_hist_prev,
+
+            # ── TA-Lib: ADX + kierunkowe ───────────────────────────────────────
+            "ADX_14":   lambda high, low, close, period=14: _last_valid(talib.ADX(_arr(high), _arr(low), _arr(close), timeperiod=period)),
+            "DI_PLUS":  lambda high, low, close, period=14: _last_valid(talib.PLUS_DI(_arr(high), _arr(low), _arr(close), timeperiod=period)),
+            "DI_MINUS": lambda high, low, close, period=14: _last_valid(talib.MINUS_DI(_arr(high), _arr(low), _arr(close), timeperiod=period)),
+
+            # ── TA-Lib: oscylatory momentum ────────────────────────────────────
+            "WILLIAMS_R": lambda high, low, close, period=14: _last_valid(talib.WILLR(_arr(high), _arr(low), _arr(close), timeperiod=period)),
+
+            # ── TA-Lib: wolumen ────────────────────────────────────────────────
+            "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),
+            "OBV_EMA_20":   lambda close, volume: _last_valid(talib.EMA(talib.OBV(_arr(close), _arr(volume)), timeperiod=20)),
+            "VOLUME_MA20":  lambda volume: _last_valid(talib.SMA(_arr(volume), timeperiod=20)),
+            "VOLUME_PREV":  lambda volume: _second_last_valid(talib.SMA(_arr(volume), timeperiod=1)),
+
+            # ── TA-Lib: ATR Deviation = (close[-1] - EMA_20) / ATR ────────────
+            "ATR_DEVIATION": self._atr_deviation,
+
+            # ── Pure-Python: VWAP (TA-Lib nie ma) ─────────────────────────────
+            "VWAP":     lambda high, low, close, volume: _py_vwap(high, low, close, volume),
+            "VWAP_STD": lambda high, low, close, volume: _py_vwap_std(high, low, close, volume),
+
+            # ── Pure-Python: Supertrend (TA-Lib nie ma) ───────────────────────
+            "SUPERTREND":          self._supertrend_value,
+            "SUPERTREND_DIR":      self._supertrend_dir,
+            "SUPERTREND_DIR_PREV": self._supertrend_dir_prev,
+
+            # ── Pure-Python: Ichimoku (TA-Lib nie ma) ─────────────────────────
+            "ICHIMOKU": self._ichimoku,
         }
         self.audit_log: List[CalcResult] = []
+
+    # ── Metody pomocnicze dla złożonych wskaźników ────────────────────────────
 
     @staticmethod
     def _macd(close, fast=12, slow=26, signal=9) -> Dict[str, float]:
         macd, sig, hist = talib.MACD(_arr(close), fastperiod=fast, slowperiod=slow, signalperiod=signal)
-        return {"MACD": _last_valid(macd), "SIGNAL": _last_valid(sig), "HISTOGRAM": _last_valid(hist)}
+        return {"MACD": _last_valid(macd), "SIGNAL": _last_valid(sig), "HISTOGRAM": _last_valid(hist),
+                "MACD_PREV": _second_last_valid(macd), "SIGNAL_PREV": _second_last_valid(sig),
+                "HISTOGRAM_PREV": _second_last_valid(hist)}
+
+    @staticmethod
+    def _macd_hist_prev(close, fast=12, slow=26, signal=9):
+        _, _, hist = talib.MACD(_arr(close), fastperiod=fast, slowperiod=slow, signalperiod=signal)
+        return _second_last_valid(hist)
 
     @staticmethod
     def _bbands(close, period=20, std=2.0) -> Dict[str, float]:
         up, mid, low = talib.BBANDS(_arr(close), timeperiod=period, nbdevup=std, nbdevdn=std, matype=0)
         return {"UPPER": _last_valid(up), "MIDDLE": _last_valid(mid), "LOWER": _last_valid(low)}
+
+    @staticmethod
+    def _atr_deviation(high, low, close, ema_period=20, atr_period=14):
+        """(close[-1] - EMA_20) / ATR — znormalizowane odchylenie od średniej."""
+        ema_arr = talib.EMA(_arr(close), timeperiod=ema_period)
+        atr_arr = talib.ATR(_arr(high), _arr(low), _arr(close), timeperiod=atr_period)
+        ema = _last_valid(ema_arr)
+        atr = _last_valid(atr_arr)
+        c = float(close[-1]) if hasattr(close, '__len__') else float(close)
+        if ema is None or atr is None or atr == 0:
+            return None
+        return round((c - ema) / atr, 4)
+
+    @staticmethod
+    def _supertrend_value(high, low, close, period=10, multiplier=3.0):
+        st, _, _, _ = _py_supertrend(list(high), list(low), list(close), period, multiplier)
+        return st
+
+    @staticmethod
+    def _supertrend_dir(high, low, close, period=10, multiplier=3.0):
+        _, d, _, _ = _py_supertrend(list(high), list(low), list(close), period, multiplier)
+        return d
+
+    @staticmethod
+    def _supertrend_dir_prev(high, low, close, period=10, multiplier=3.0):
+        _, _, _, dp = _py_supertrend(list(high), list(low), list(close), period, multiplier)
+        return dp
+
+    @staticmethod
+    def _ichimoku(high, low) -> Dict[str, Any]:
+        return _py_ichimoku(list(high), list(low))
 
     def available(self) -> List[str]:
         return sorted(self._registry.keys())

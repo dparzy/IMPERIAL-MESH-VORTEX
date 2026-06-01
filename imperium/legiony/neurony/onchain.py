@@ -2,9 +2,15 @@
 ⚔️ IMV-INS | Neurony On-Chain — Dywizja Wieszczowie
 MVRV-Z, SOPR, Puell Multiple, NVT, Exchange Netflow.
 Dane fundamentalne on-chain — cykle makro.
+
+UWAGA: OC-01..OC-04 wymagają zewnętrznego API on-chain (Glassnode/CryptoQuant).
+Brama Kalkulatora NIE dostarcza tych danych — neurony są wyciszone (DOSTEPNY=False)
+do czasu podpięcia adapterów API. Logika interpretacji jest gotowa i poprawna.
 """
 
 from imperium.legiony.mikro_neuron import MikroNeuron, SygnalNeuronu
+
+_POWOD = "Wymaga on-chain API (Glassnode/CryptoQuant). Podepnij adapter w pobierz_wskazniki()."
 
 
 class NeuronMVRV(MikroNeuron):
@@ -17,6 +23,8 @@ class NeuronMVRV(MikroNeuron):
     WSKAZNIK = "MVRV_Z"
     KATEGORIA = "F"
     WAGA = 9
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = _POWOD
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         mvrv_z = wskazniki.get("MVRV_Z_SCORE")
@@ -50,6 +58,8 @@ class NeuronSOPR(MikroNeuron):
     WSKAZNIK = "SOPR"
     KATEGORIA = "F"
     WAGA = 8
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = _POWOD
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         sopr = wskazniki.get("SOPR")
@@ -86,6 +96,8 @@ class NeuronPuellMultiple(MikroNeuron):
     WSKAZNIK = "PUELL_MULTIPLE"
     KATEGORIA = "F"
     WAGA = 7
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = _POWOD
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         puell = wskazniki.get("PUELL_MULTIPLE")
@@ -118,6 +130,8 @@ class NeuronExchangeNetflow(MikroNeuron):
     WSKAZNIK = "EXCHANGE_NETFLOW"
     KATEGORIA = "F"
     WAGA = 8
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = _POWOD
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         netflow = wskazniki.get("EXCHANGE_NETFLOW_BTC")  # BTC: + = napływ, - = odpływ

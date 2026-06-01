@@ -61,6 +61,11 @@ class MikroNeuron(ABC):
     KATEGORIA: str = "?"   # M/T/V/F/O/L/S/A
     WAGA: int = 5
 
+    # Dostępność — ustaw False gdy neuron wymaga zewnętrznego API niedostępnego przez Bramę.
+    # Rój automatycznie pomija niedostępne neurony zamiast produkować wieczne NEUTRAL.
+    DOSTEPNY: bool = True
+    POWOD_NIEDOSTEPNOSCI: str = ""
+
     def __init__(self):
         if self.KLUCZ == "???-00":
             raise NotImplementedError(f"{type(self).__name__} musi ustawić KLUCZ.")
@@ -144,15 +149,31 @@ class Roj:
 
     def __init__(self, neurony: List[MikroNeuron]):
         self.neurony = neurony
+        # Loguj niedostępne neurony przy starcie (raz, nie co sygnał)
+        for n in neurony:
+            if not n.DOSTEPNY:
+                logger.warning(
+                    f"[Rój] Neuron {n.KLUCZ} ({n.WSKAZNIK}) NIEDOSTĘPNY — pomijany. "
+                    f"Powód: {n.POWOD_NIEDOSTEPNOSCI or 'brak danych z Bramy'}"
+                )
 
     def zbierz_sygnaly(self, wskazniki: dict) -> List[SygnalNeuronu]:
         sygnaly = []
         for n in self.neurony:
+            if not n.DOSTEPNY:
+                continue  # pomiń zombie — nie produkuj fałszywych NEUTRAL
             try:
                 sygnaly.append(n.interpretuj(wskazniki))
             except Exception as e:
                 logger.error(f"[Rój] Neuron {n.KLUCZ} padł: {e}")
         return sygnaly
+
+    def lista_niedostepnych(self) -> List[str]:
+        """Które neurony są wyciszone i dlaczego."""
+        return [
+            f"{n.KLUCZ} ({n.WSKAZNIK}): {n.POWOD_NIEDOSTEPNOSCI}"
+            for n in self.neurony if not n.DOSTEPNY
+        ]
 
 
 # ─── Demo ─────────────────────────────────────────────────────────────────────

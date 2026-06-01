@@ -270,8 +270,6 @@ Lepsza dobra decyzja udokumentowana i odwracalna niż czekanie na rozkaz w błah
 
 ---
 
----
-
 ## ⚖️ PRAWO XIX — KOD JEST PRAWEM, KATALOG JEST PLANEM 🔱
 
 > **Rozkaz Cezara.** Odkrycie zapisane tylko w katalogu to marzenie, nie fakt.

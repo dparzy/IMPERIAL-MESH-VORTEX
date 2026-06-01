@@ -25,6 +25,6 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [REGULAMINY_I_MANIPULACJE.md](REGULAMINY_I_MANIPULACJE.md) | Zgodność z regulaminami giełd + 7 manipulacji do wykrywania (obrona, nie atak) |
 | [GENERAL_LEGATUS.md](GENERAL_LEGATUS.md) | Generał Legatus — koordynator Legionów i Senatu, Tryb SKANER vs FOKUS, agregacja sygnałów |
 | [KALKULATOR_LEWARA.md](KALKULATOR_LEWARA.md) | Matematyka przeżycia — likwidacja, stop-loss, dynamiczna dźwignia, zarządzanie kapitałem |
-| [KATALOG_STRATEGII.md](KATALOG_STRATEGII.md) | Katalog strategii — przepisy z neuronów, traderzy świata, auto-dopasowanie do rynku |
+| [KATALOG_STRATEGII.md](KATALOG_STRATEGII.md) | Katalog ~57 strategii — Księga Azjatycka (STR-001→170), traderzy świata (AOA/BNF/Wyckoff/Soros), reguły ryzyka, auto-dopasowanie |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

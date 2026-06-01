@@ -33,9 +33,21 @@
 | W-011 | Azja Range Breakout — strategia (break Asia High/Low w sesji London) | 🔴 Wysoki | 💭 Idea | `KATALOG_STRATEGII.md` |
 | W-012 | Cross-exchange arbitraż (MEXC vs Binance vs OKX price diff + funding diff) | 🟠 Średni | 💭 Idea | `KATALOG_STRATEGII.md` + `imperium/akwedukty/` |
 | W-013 | Rozbudowa Igrzysk — system "kija" (kary progresywne, ceremonia hańby, lista infamii) | 🟠 Średni | 💭 Idea | `IGRZYSKA_IMPERIUM.md` |
-| W-014 | Plik 3100 linków Azja — przeskanować i wyciągnąć perełki (małe repozytoria, doktoraty, fora) | 🟠 Średni | 🔄 W TRAKCIE (4 agenci skanują) | `KATALOG_NEURONOW.md` + `KATALOG_STRATEGII.md` |
+| W-014 | Plik 3100 linków Azja — przeskanować i wyciągnąć perełki | 🟠 Średni | ✅ ZROBIONE → SKAN_AZJA.md (+13 neuronów, +5 strat) | `SKAN_AZJA.md` |
 | W-015 | Obserwatorzy/Zwiadowcy (oczy) — zmapować istniejące i brakujące: newsy, sentiment, on-chain, CME, sesje | 🔴 Wysoki | 💭 Idea | `imperium/oczy/` + nowy doc `OBSERWATORZY.md` |
 | W-016 | Ekspansja na inne giełdy (Binance, OKX, Bybit) — "podbój prowincji", multi-exchange arbitraż | 🟡 Niski (Faza 2+) | 💭 Idea | `docs/ROADMAP_IMPERIUM.md` |
+| W-017 | **Outlines** — structured generation (JSON/Pydantic na DeepSeek = zero halucynacji formatu) | 🔴 Wysoki | 💭 Idea (REALNE: dottxt-ai/outlines) | `imperium/cesarz/` |
+| W-018 | **Reflexion** — verbal self-reflection (post-mortem strat → kontekst następnej decyzji) | 🔴 Wysoki | 💭 Idea (REALNE: noahshinn/reflexion) | `imperium/cesarz/` + Pamięć Absolutna |
+| W-019 | TradingAgents — Senat jako debata ról (Analyst→Researcher→Trader→RiskManager) | 🟠 Średni | 💭 Idea (REALNE) | `imperium/senat/` |
+| W-020 | CVaR position sizing — Kalkulator Lewara v2 (Conditional VaR zamiast stop-loss) | 🟠 Średni | 💭 Idea | `imperium/pretorianie/kalkulator_lewara.py` |
+| W-021 | Causal inference filter (CausalNex/DoWhy) — odróżnia przyczyny od korelacji pozornych | 🟠 Średni | 💭 Idea (REALNE) | `imperium/senat/` lub `cesarz/doradcy/` |
+| W-022 | Strategy Guardian AI — proces "anioł stróż" monitoruje otwarte pozycje na żywo | 🟠 Średni | 💭 Idea | `imperium/pretorianie/` |
+| W-023 | NautilusTrader — event-driven core (wzorzec egzekucji Faza 2) | 🟡 Niski (Faza 2) | 💭 Idea (REALNE) | `imperium/drogi/` |
+| W-024 | GEPA/CogAlpha — DeepSeek auto-generuje neurony jako kod → backtest → zachowaj zwycięzców | 🟡 Niski | 💭 Idea | `imperium/legiony/` + Koloseum |
+| W-025 | Fleet Risk Manager — ryzyko portfelowe + realokacja kapitału do zwycięzców (sprzęg z Igrzyskami) | 🟠 Średni | 💭 Idea | `imperium/pretorianie/` + Igrzyska |
+| W-026 | Strategy Vector DB (LanceDB) — strategie jako embeddingi, semantyczny dedup + dopasowanie reżimu | 🟡 Niski | 💭 Idea (REALNE) | `imperium/biblioteki/` (mnemosyne?) |
+| W-027 | Data Drift Detector — wykrywa shift rozkładu danych → trigger rekalibracji neuronów | 🟡 Niski | 💭 Idea | `imperium/koloseum/` |
+| W-028 | Reguła 30% max straty (AOA) — hard circuit-breaker w Kalkulatorze (przerwij przy 30% DD) | 🔴 Wysoki | 💭 Idea | `imperium/pretorianie/kalkulator_lewara.py` |
 
 ---
 
@@ -96,13 +108,37 @@
 
 | Metryka | Wartość |
 |---------|---------|
-| Łącznie wizji | 16 |
-| W trakcie analizy | 5 |
-| Przeniesione do dokumentów | 0 |
+| Łącznie wizji | 28 |
+| W trakcie analizy | 21 |
+| Przeniesione do katalogów (Higuchi, CME, Azja Range) | 3 |
 | Zaimplementowane | 0 |
 | Odrzucone (niezgodne z zasadami) | 0 |
 
 ---
+
+## 🚨 PRZYPOMNIENIE DLA KOMENDANTA (2026-06-01)
+
+> **Zasada przypomnienia uruchomiona!** Mamy **9 wizji z priorytetem 🔴** (próg to 3).
+
+Komendancie — nazbierało się sporo. Najpilniejsze do wdrożenia (wszystkie 🔴), pogrupowane:
+
+**Grupa A — Niezawodność Cesarza (zrób NAJPIERW, REALNE biblioteki):**
+- W-017 **Outlines** — wymusza poprawny JSON na DeepSeek (koniec z halucynacjami formatu)
+- W-018 **Reflexion** — system uczy się z własnych strat
+- W-009 **SHARP** — warstwa audytu nad DeepSeek
+
+**Grupa B — Fundament działania (wymaga komputera/TA-Lib):**
+- W-001 Valhalla + neurony (backtest na prawdziwych sygnałach)
+- W-002 Scorer Igrzysk (rankingi neuronów żyją)
+
+**Grupa C — Bezpieczeństwo kapitału (proste, wysokie ROI):**
+- W-028 **Reguła 30% max straty** — hard circuit-breaker (szybkie do zrobienia)
+
+**Grupa D — Oczy systemu:**
+- W-015 Mapa Obserwatorów/Zwiadowców
+- W-010/W-011 CME Gap + Azja Range (✅ już w katalogu jako neurony, kod czeka)
+
+➡️ **Moja rekomendacja kolejności:** W-028 (najszybsze, chroni kapitał) → W-017 (niezawodność) → po TA-Lib: W-001 + W-002.
 
 > **Zasada przypomnienia:** Gdy mamy ≥ 5 wizji o podobnym temacie albo ≥ 3 wizje z priorytetem 🔴 — przypominam Komendantowi i razem decydujemy co wdrożyć jako następne.
 

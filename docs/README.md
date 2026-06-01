@@ -32,5 +32,6 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [WIZJONER.md](WIZJONER.md) | 💡 **Brudnopis** — surowe idee, analiza wpływu, symulacje "co jeśli", przypomnienia o niezrealizowanych wizjach |
 | [AUDYT_SYSTEMU.md](AUDYT_SYSTEMU.md) | 🔍 **Audyt systemu** — co działa, co blokowane (TA-Lib), co brakuje, mapa przepływu, priorytety wdrożenia |
 | [WERSJONOWANIE.md](WERSJONOWANIE.md) | 🏺 **Wersjonowanie + Pieczęć Imperium** — IMV-ORI/ADO/INS/POR/EXP, CHANGELOG, post-mortem relegowanych |
+| [SKAN_AZJA.md](SKAN_AZJA.md) | 🌏 **Skan 3100 linków Azji** — perełki: +13 neuronów, +5 strategii, 12 idei architektury (Parrondo, Hurst, Outlines, Reflexion) |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

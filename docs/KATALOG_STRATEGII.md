@@ -1268,6 +1268,100 @@ Momentum_Score = Slope_90D × R² × Annualization_Factor
 
 ---
 
+## 🌅 SKAN V — CME Gaps, Azja Range, Strefy Czasowe, Arbitraż (2026-06-01)
+
+### XII-RV-005 | "LUKA W MURZE" | CME Gap Fill Strategy
+**Źródło:** CME Bitcoin/Ethereum Futures — gap fill (historyczne 77% fill rate)
+**Interwał:** 1H–4H | **Warunki:** poniedziałek po weekendzie, gap > 0.5%
+
+**Mechanika CME Gap:**
+- Futures CME zamykają się w piątek o 17:00 CT, otwierają w niedzielę o 17:00 CT
+- Przez ~53h rynek spot działa bez CME → powstaje różnica cen
+- Gap = Cena niedzielnego otwarcia CME − Piątkowego zamknięcia CME
+- 77% historycznych luk zostaje "wypełnionych" (cena wraca do poziomu luki)
+
+**Reguły wejścia:**
+- `SES-03` CMEGap > +0.5% (gap w górę) → cena powinna spaść do fills → **SHORT** do poziomu luki
+- `SES-03` CMEGap < -0.5% (gap w dół) → cena powinna wzrosnąć → **LONG** do poziomu luki
+- Wejście: NIE od razu po otwarciu, poczekaj na ruch w kierunku przeciwnym do luki (potwierdzenie)
+- Wyjście: cena dotknęła poziomu luki (target) lub stop = 1.5× wielkości luki
+
+**⚠️ WAŻNE (maj 2026):** CME uruchomiło handel 24/7 od 29.05.2026 → CME gaps PRZESTAJĄ powstawać. Strategia historyczna — 3 ostatnie luki niezapełnione. Stosuj ostrożnie, monitoruj czy nowe luki nadal się tworzą.
+
+**Neurony WEJŚCIE:** `SES-03` CMEGap  
+**Neurony FILTR:** `XII-05` Fibonacci (poziom luki jako fib target), `VPIN-01` VPIN < 0.6  
+**Dźwignia:** 3×–8× | **R:R:** 1:2 | **Status:** SZKIC ⚠️ Monitoruj zmianę CME 24/7
+
+---
+
+### X-BK-003 | "PRZEBUDZENIE AZJI" | Asian Range Breakout
+**Źródło:** Session-based trading — Asia Range (ICT + SMC adaptacja)
+**Interwał:** M15–1H | **Warunki:** Londyn/NY session, po zamknięciu sesji azjatyckiej
+
+**Mechanika:**
+- Sesja azjatycka (00:00–08:00 UTC) = faza konsolidacji, wąski zakres
+- Londyn otwiera o 07:00 UTC → instytucje "testują" granice azjatyckiego zakresu
+- Przebicie Asia High → LONG (breakout z momentum Londynu)
+- Przebicie Asia Low → SHORT (sweep of lows + reversal lub trend continuation)
+
+**Reguły wejścia:**
+- Wyznacz `SES-02` AzjaRange (High i Low sesji 00:00–08:00 UTC) na wykresie 15M
+- Wejście: OCO powyżej Asia High (+0.1%) i poniżej Asia Low (-0.1%)
+- Wyjście: 1.5× szerokości azjatyckiego zakresu od punktu wejścia
+- Anuluj zlecenia o 10:00 UTC jeśli żadne nie zostało aktywowane
+- **POMIŃ gdy Asia Range > 2% BTC** (za szeroki = słaby R:R)
+
+**Neurony WEJŚCIE:** `SES-02` AzjaRange breakout  
+**Neurony FILTR:** `SES-01` KillZone (London active), `X-11` RVOL (wolumen potwierdza breakout)  
+**Neurony WYJŚCIE:** 1.5× Asia Range od wejścia lub `X-06` ATR-Stop  
+**Dźwignia:** 5×–15× | **R:R:** 1:2 | **Status:** SZKIC
+
+---
+
+### IMV-AR-006 | "PODATEK OD PROWINCJI" | Funding Rate Cross-Exchange Arbitrage
+**Źródło:** Funding rate arbitrage (delta-neutral, 10-30% APY)
+**Interwał:** 8H (cykl funding: 00:00, 08:00, 16:00 UTC) | **Warunki:** duże rozbieżności funding
+
+**Mechanika delta-neutral:**
+- Jeśli Binance Funding > MEXC Funding o > 0.05% per 8h:
+  - SHORT perp na Binance (zbierasz funding)
+  - LONG perp na MEXC (płacisz mniej)
+  - Pozycje się równoważą → zero ryzyko kierunkowe
+- Zysk = różnica funding rate × 3 rozliczenia/dzień
+
+**Kalkulacja profitability:**
+```
+Spread 8h = Funding_Binance - Funding_MEXC
+Minimalny opłacalny spread = 0.03% (po prowizjach 2×0.05% = 0.1% round-trip)
+Roczna stopa (APY) = Spread_8h × 3 × 365 × 100
+Przykład: 0.05% spread × 3 × 365 = 54.75% APY (bez dźwigni)
+```
+
+**Neurony WEJŚCIE:** `BASIS-01` Basis + `VI-07` FundingRate (rozbieżność między giełdami)  
+**Neurony FILTR:** `SPREAD-01` BidAsk (sprawdź czy spread wykonania nie zjada profitu)  
+**Dźwignia:** 1×–3× (delta-neutral) | **R:R:** nie dotyczy (yield strategy) | **Status:** FAZA 2 (wymaga multi-exchange)
+
+---
+
+### X-SC-005 | "SESJA AZJI" | Asia Session Scalp (Vol Spike 01:00 UTC)
+**Źródło:** Session microstructure — Tokyo institutional desks, 01:00 EST spike
+**Interwał:** M1–M5 | **Warunki:** 00:30–02:00 UTC (Tokyo/HK institutional open)
+
+**Obserwacja:** BTC widzi 2-5% swings podczas NY/Asia overlap (08:00-11:00 GMT = 09:00-12:00 CET).
+Spike wolumenu o 01:00 EST (07:00 CET) → wejście instytucji Londynu.
+
+**Reguły:**
+- `SES-01` KillZone aktywna (London Kill Zone 07:00–09:00 UTC)
+- `X-11` RVOL > 1.5× (ponadnormatywny wolumen)
+- Kierunek z `X-03` CVD (kto dominuje w tym oknie)
+- Wejście z `X-04` VWAP jako filtrem trendu dnia
+
+**Neurony WEJŚCIE:** `X-11` RVOL spike + `SES-01` KillZone  
+**Neurony FILTR:** `X-03` CVD kierunek + `X-04` VWAP  
+**Dźwignia:** 5×–20× | **R:R:** 1:1.5 | **Status:** SZKIC
+
+---
+
 ## 📊 AKTUALIZACJA PODSUMOWANIA KATALOGU (v2.3)
 
 | Grupa | Strategii | Status |
@@ -1278,11 +1372,12 @@ Momentum_Score = Slope_90D × R² × Annualization_Factor
 | Mistrzowie Świata (L-R) | 9 | SZKIC |
 | Klasyka/Arbitraż/ICT/Boty/Fale (T-Z) | 15 | SZKIC/FAZA 3 |
 | VSA/VP/VPIN/GEX/Opcje/Makro/DeFi (Skan IV) | 11 | SZKIC |
+| CME Gap / Azja Range / Funding Arb / Sesje (Skan V) | 4 | SZKIC |
 | Reguły Ryzyka (Pretorianie) | 5+ | DO WDROŻENIA |
-| **RAZEM zmapowanych** | **~97+** | rośnie |
+| **RAZEM zmapowanych** | **~103+** | rośnie |
 
-**Nowe neurony Skan IV (+16):** VSA-01..04, VP-01..02, VPIN-01, SPREAD-01, GEX-01, SKEW-01, PCR-01, DXY-01, HM-01, TVL-01, RS-01, XCS-01  
-**Nowe dywizje:** 📉 Opcji (GEX/Skew/PCR) + 🌱 DeFi (TVL) → patrz KATALOG_NEURONOW.md
+**Nowe neurony Skan V (+2):** SES-02 AzjaRange, SES-03 CMEGap → patrz KATALOG_NEURONOW.md (306 łącznie)  
+**⚠️ Uwaga CME:** Od 29.05.2026 CME handel 24/7 — strategia CME Gap historyczna, monitoruj.
 
 ---
 

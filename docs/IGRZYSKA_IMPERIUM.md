@@ -183,6 +183,101 @@ Roznicowanie:
 
 ---
 
+## ⚡ KIJ I MARCHEWKA — System Pełny
+
+> *"Praemia et poenae duces exercitus sunt."* — Nagrody i kary są wodzami armii.
+
+Samo nagradzanie nie wystarczy. Kara musi boleć — inaczej system się nie kalibruje.
+
+---
+
+### 🥕 MARCHEWKA (nagrody — już zdefiniowane powyżej):
+- Złoty Hełm, Srebrna Włócznia, Tarcza Spartana (neurony)
+- Złota Zbroja, Orzeł Legionowy (legiony)
+- Purpura Senatu (senatorzy)
+- Automatyczne zwiększenie wag i alokacji kapitału
+
+---
+
+### 🪄 KIJ — System Kar Progresywnych
+
+#### Poziomy Hańby (Neuron)
+
+| Poziom | Trigger | Kara | Nazwa |
+|--------|---------|------|-------|
+| ⚠️ **Ostrzeżenie** | WYNIK < 0.45 przez 7 dni | Waga ×0.5, żółta flaga w logu | *Ignominia* |
+| 🔴 **Infamia** | WYNIK < 0.40 przez 14 dni | Waga ×0.2, wpis na Listę Infamii | *Infamia Publica* |
+| ⚫ **Hibernacja** | Brak poprawy 7 dni po Infamii | Nie głosuje, obserwuje cicho | *Exilium Temporale* |
+| 💀 **Relegacja** | Brak poprawy 7 dni po Hibernacji | Usunięty do `archiwum_neuronow/` | *Damnatio Memoriae* |
+
+#### Ceremonia Hańby *(Cerimonia Ignominiae)*
+
+Gdy neuron trafia na Listę Infamii, system generuje **Raport Hańby**:
+```
+╔══════════════════════════════════════════════════════════╗
+║         ⚫ LISTA INFAMII — RAPORT HAŃBY                  ║
+║  Neuron: [KLUCZ] [NAZWA]                                 ║
+║  WYNIK: [X.XX] | Próg: 0.40 | Dni poniżej: [N]          ║
+║  Najczęstszy błąd: [np. "flip-flop w RANGING reżimie"]   ║
+║  Waga obniżona: [stara] → [nowa]                         ║
+║  Status: INFAMIA | Szansa na rehabilitację: [dni]        ║
+╚══════════════════════════════════════════════════════════╝
+```
+
+#### Zasada Pokuty *(Lex Paenitentiae)*
+
+Neuron relegowany może wrócić przez:
+1. **7 dni obserwacji** — śledzi rynek, nie głosuje, uczy się
+2. **7 dni warunkowych** — głosuje z wagą ×0.3, wynik monitorowany co 24h
+3. **Przywrócenie** — jeśli WYNIK ≥ 0.55 przez 7 dni → pełny powrót ze statusem *"Restitutus"*
+4. **Podwójna czujność** — przez następny miesiąc próg relegacji podniesiony do 0.45 (surowszy nadzór)
+
+---
+
+### ⚡ KIJ DLA LEGIONÓW
+
+| Sytuacja | Kara |
+|----------|------|
+| WYNIK_LEGIONU < 0.40 przez 14 dni | Legio Damnata — zawieszony, zero nowych pozycji |
+| MaxDD > 20% w miesiącu | Natychmiastowe zamrożenie do wyjaśnienia przez Legatusa |
+| 3× z rzędu ujemny tydzień | Przegląd strategii — mandatory Koloseum re-test |
+| WinRate < 35% przez miesiąc | Redukcja alokacji do 25% normalnej |
+
+**Rytuał Pokuty Legionu** *(Supplicatio)*:
+Po relegacji Legion musi "wygrać 3 tygodnie z rzędu" z WinRate > 50% zanim wróci do pełnej alokacji. Każdy tydzień poniżej normy resetuje licznik.
+
+---
+
+### ⚡ KIJ DLA SENATORÓW
+
+| Sytuacja | Kara |
+|----------|------|
+| WYNIK_SENATORA < 0.40 | Waga głosu ×0.3 ("Senator Milczący") |
+| 5× z rzędu błędne głosowanie | Czasowe zawieszenie z głosowania (48h) |
+| Kalibracja < 0.30 (mówi 90% pewności ale zawsze się myli) | Waga stała ×0.1 przez tydzień |
+
+---
+
+### 📋 LISTA INFAMII — Format Wpisu
+
+Plik `imperium/biblioteki/igrzyska/LISTA_INFAMII.jsonl`:
+```json
+{
+  "timestamp": "2026-06-01T10:00:00Z",
+  "typ": "NEURON",
+  "klucz": "X-07",
+  "nazwa": "Williams %R",
+  "wynik_14d": 0.38,
+  "powod": "flip-flop w RANGING — 23 zmiany kierunku w 7 dni",
+  "kara": "INFAMIA",
+  "waga_przed": 5,
+  "waga_po": 1,
+  "rehabilitacja_mozliwa_od": "2026-06-08"
+}
+```
+
+---
+
 ## 🏆 PANTEON — Hall of Fame
 
 ### `PANTEON_NEURONOW.md` — Złote Hełmy historyczne

@@ -30,5 +30,7 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [PAMIEC_ABSOLUTNA.md](PAMIEC_ABSOLUTNA.md) | System Logowania — ImperiumLog (40+ pól), MAE/MFE, walk-forward, replay sesji, Prawo Memoriae |
 | [DORADCY_CARA.md](DORADCY_CARA.md) | Rada Doradców Cesarskich — Oracle/Fulmen/Iustitia/Hermes/Pythia, second opinion w spornych decyzjach |
 | [WIZJONER.md](WIZJONER.md) | 💡 **Brudnopis** — surowe idee, analiza wpływu, symulacje "co jeśli", przypomnienia o niezrealizowanych wizjach |
+| [AUDYT_SYSTEMU.md](AUDYT_SYSTEMU.md) | 🔍 **Audyt systemu** — co działa, co blokowane (TA-Lib), co brakuje, mapa przepływu, priorytety wdrożenia |
+| [WERSJONOWANIE.md](WERSJONOWANIE.md) | 🏺 **Wersjonowanie + Pieczęć Imperium** — IMV-ORI/ADO/INS/POR/EXP, CHANGELOG, post-mortem relegowanych |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

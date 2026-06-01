@@ -650,6 +650,8 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | Klucz | Neuron | Wskaźnik | Zadanie | Waga |
 |-------|--------|----------|---------|------|
 | SES-01 | Neuron KillZone | Session/Killzone Timer (Azja/Londyn/NY) | Aktywność instytucji max w kill zones (NY 8-11 EST) | W6 |
+| SES-02 | Neuron AzjaRange | Asia Range High/Low (00:00–08:00 UTC) | Wyznacza zakres sesji azjatyckiej — breakout w Londynie = silny sygnał | W8 |
+| SES-03 | Neuron CMEGap | CME Gap Detector (BTC/ETH futures) | Sunday open vs Friday close > 0.5% → 77% fill rate → kontrariański sygnał w kierunku luki | W8 |
 
 ### 😱 Rozszerzenie Dywizji Wyroczni (sentyment)
 
@@ -732,7 +734,64 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 
 ---
 
-## 📊 TABELA PODSUMOWUJĄCA (zaktualizowana)
+## 🧠 SKAN VI — Psychologia Rynku + Odtwarzalne Wskaźniki Zamknięte (2026-06-01)
+
+> Źródło: behavioral finance research + reverse-engineering znanych zamkniętych wskaźników.
+> Pieczęć: ⚔️ IMV-INS (zainspirowane) lub 🔱 IMV-ADO (ulepszone).
+
+### 😱 Rozszerzenie Dywizji Wyroczni (psychologia / behawioryzm)
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| PSY-01 | Neuron FOMO | FOMO Score = funding >0.1% + vol >2× avg + social spike >300%/7d | 5-składnikowy ensemble (87% accuracy histor.) → LONG crowded → SHORT kontrariański | W8 |
+| PSY-02 | Neuron Kapitulacja | Capitulation Detector: vol >2× avg + wide candle + close w dolnej 1/4 + recovery next bar | Panikowe dno → kontrariański LONG | W9 |
+| PSY-03 | Neuron LossAversion | Liquidation Cascade: >$50M likwidacji w 1h + overshooting 1-3% | Po kaskadzie → scalp kontrariański (revert) | W8 |
+| PSY-04 | Neuron Stado | Herding Signal: >70% retail LONG (Coinglass/CryptoQuant) | Tłum po jednej stronie → SHORT kontrariański (+50% siły w rynku niedźwiedzia) | W7 |
+| PSY-05 | Neuron Anchor | Round Number Anchor: cena ±0.3% od okrągłej liczby ($100k/$50k/$10k) | Strefa oporu/wsparcia — nie wchodzić w środku, czekać na potwierdzenie | W6 |
+| PSY-06 | Neuron Sezon | Seasonal Pattern: Grudzień hist. 6/8 lat pozytywny, Styczeń mieszany | Słaby sygnał — tylko jako filtr makro, nie samodzielny | W3 |
+
+### 🔱 Nowa Dywizja: Odtwarzalne Wskaźniki (IMV-ADO/INS)
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| WA-01 | Neuron WaddahAttar | Waddah Attar Explosion: Trend=(MACD_curr-MACD_prev)×sens; Explosion=BB_upper-BB_lower | Trend > Explosion = silny kierunek (kup/sprzedaj); Dead Zone = brak sygnału | W8 |
+| MC-01 | Neuron MarketCipher | Market Cipher B core: WaveTrend (WT1/WT2) + MFI + RSI + StochRSI + VWAP momentum | Zielona kropka gdy wszystkie 5 zbieżne w oversold = silny LONG | W8 |
+| NN-01 | Neuron NNFX | NNFX Baseline: MA(200) + 2 potwierdzenia (RSI + MACD) + Vol (ATR) + Exit (PSAR) | Kupuj gdy Baseline + oba potwierdzenia + vol ALIGNED; wychodzi na Exit | W7 |
+
+---
+
+## 📊 TABELA PODSUMOWUJĄCA (zaktualizowana v3.0)
+
+| Grupa / Dywizja | Liczba |
+|-----------------|--------|
+| Legio X Equestris (Scalp) | **26** |
+| Legio XII Fulminata (Swing) | **33** |
+| Legio III Augusta (Invest/On-Chain) | **41** |
+| Legio VI Ferrata (Leverage) | 19 |
+| Wspólne (multi-legion) | 16 |
+| 🤖 Dywizja AI/ML | 23 |
+| 🛡️ Dywizja Straży (anty-manipulacja) | 30 |
+| 📊 Dywizja Breadth (szerokość) | 7 |
+| 📖 Dywizja Order Book | **14** |
+| 🔀 Dywizja Arbitrażu (Faza 3) | **12** |
+| 🔄 Dywizja Wieszczów (reżim/makro) | **20** |
+| 😱 Dywizja Wyroczni (sentyment + psych) | 11 + 6 = **17** |
+| 🐋 Dywizja Wielorybów (on-chain) | 5 |
+| 🌀 Dywizja Entropii (matematyka + fraktal) | **8** |
+| 🧱 Dywizja Struktury (SMC/ICT/VSA) | **22** |
+| ⏰ Dywizja Czasu/Sesji | **3** |
+| 💎 Dywizja Perł (wyspecjalizowane) | 10 |
+| 📉 Dywizja Opcji | **3** |
+| 🌱 Dywizja DeFi | **1** |
+| 🔱 Dywizja Odtworzonych (IMV-ADO/INS) | **3** |
+| **RAZEM** | **315** |
+
+> **315 neuronów** (+9 Skan VI: psychologia FOMO/Kapitulacja/Stado + WaddahAttar/MarketCipherB/NNFX).
+> Nowa dywizja: 🔱 Odtworzone (nasze wersje zamkniętych wskaźników).
+
+---
+
+*VITRUVIUSZ — "Trzysta piętnaście par oczu jednego organizmu. Imperium nie ma ślepego pola."*
 
 | Grupa / Dywizja | Liczba |
 |-----------------|--------|
@@ -751,13 +810,13 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | 🐋 Dywizja Wielorybów (on-chain) | 5 |
 | 🌀 Dywizja Entropii (matematyka) | 7 + 1 = **8** |
 | 🧱 Dywizja Struktury (SMC/ICT/VSA) | 16 + 6 = **22** |
-| ⏰ Dywizja Czasu/Sesji | 1 |
+| ⏰ Dywizja Czasu/Sesji | 1 + 2 = **3** |
 | 💎 Dywizja Perł (wyspecjalizowane) | 10 |
 | 📉 Dywizja Opcji (NOWA) | **3** |
 | 🌱 Dywizja DeFi (NOWA) | **1** |
-| **RAZEM** | **304** |
+| **RAZEM** | **306** |
 
-> **304 neurony** (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, HowardMarks, TVL, L1/L2 RS, Cross-Sectional Momentum).
+> **306 neuronów** (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, HowardMarks, TVL, L1/L2 RS, Cross-Sectional Momentum).
 > Dwie nowe dywizje: 📉 Opcji + 🌱 DeFi.
 
 ---

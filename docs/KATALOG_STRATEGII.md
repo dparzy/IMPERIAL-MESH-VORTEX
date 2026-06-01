@@ -911,18 +911,200 @@ Momentum_Score = Slope_90D × R² × Annualization_Factor
 
 ---
 
-## 📊 AKTUALIZACJA PODSUMOWANIA KATALOGU
+---
+
+# 🌐 SKAN III — Klasyka, Arbitraż, ICT, Boty (v2.2)
+
+> Źródło: WebSearch czerwiec 2026. Pokrywamy: chart patterns, basis trade, ICT, sentyment, boty, fale, stat-arb.
+
+---
+
+## 📐 T. Peter Brandt — Classical Charting (Edwards & Magee)
+
+### IMV-BK-002 | "STARY KARTOGRAF" | Classical Chart Pattern Breakout
+**Twórca:** Peter Brandt (40+ lat, szkoła Edwards & Magee, "no indicator soup")
+**Interwał:** 1D, 1W | **Warunki:** czysta formacja klasyczna + wybicie z wolumenem
+
+**Formacje (price-only, bez wskaźników):**
+- Head & Shoulders (wyczerpanie popytu — break neckline = kapitulacja byków)
+- Triangle (symetryczny/wstępujący — kompresja zmienności)
+- Rectangle, Double Top/Bottom, Flag/Pennant (measured moves)
+
+**Neurony WEJŚCIE:**
+- `PAT-01` *(nowy)* Chart Pattern Detector — H&S, triangle, double top/bottom
+- `XII-08` OBV → wolumen MUSI potwierdzić wybicie (institutional conviction)
+- `XII-03` Bollinger → kompresja przed wybiciem (triangle = squeeze)
+
+**Zasada Brandta:** wejście na decydującym zamknięciu poza granicą LUB breakout + retest (throwback).
+**Ryzyko:** max 1-2% kapitału, stop na invalidacji formacji. Win rate ~50% — zarabia na measured moves.
+
+**Dźwignia:** 2×–5× | **R:R:** measured move (często 1:3+) | **Status:** SZKIC
+**Nowy Neuron:** `PAT-01` Chart Pattern Detector (SMC/Struktura, waga 7)
+
+---
+
+## 💰 U. Basis Trade / Cash-and-Carry (Delta-Neutral) — FAZA 3
+
+### IMV-AR-003 | "ŻNIWIARZ FUNDINGU" | Cash-and-Carry Funding Harvest
+**Źródło:** WebSearch — delta-neutral cash & carry (10-30% APY 2026, instytucje: Goldman/Citadel)
+**Interwał:** ciągły | **Warunki:** dodatni funding rate na perpetualach
+
+**Mechanika (rynkowo-neutralna):**
+- LONG spot BTC + SHORT perpetual BTC (ta sama wielkość) → ruch ceny się znosi
+- Zysk = zbierany funding rate (early 2026 BTC ~0.51%/8h = >70% annualized w szczytach)
+
+**Neurony:**
+- `VI-01` FundingRate → musi być dodatni i wysoki
+- `ARB-02` Funding Spread → różnica fundingu między giełdami
+- `VI-02` Open Interest → płynność do wejścia/wyjścia
+
+**RYZYKO (Pretorianie monitorują):** funding może flipnąć ujemny w 1 interwale → pozycja z dochodu staje się kosztem. Wyjście gdy funding < 0.01%/8h przez 24h.
+
+**Dźwignia:** 1× (delta-neutral) | **APY:** 10-30% | **Status:** FAZA 3 (multi-exchange)
+
+---
+
+## 🎯 V. ICT — Inner Circle Trader (Michael Huddleston)
+
+### IMV-HY-006 | "SMART MONEY ICT" | Liquidity Grab + FVG + Order Block
+**Twórca:** Michael J. Huddleston (ICT) — odczyt zachowań instytucji
+**Interwał:** M15–1H (kill zones) | **Warunki:** sweep płynności → FVG → wejście
+
+**Koncepty ICT (mapowanie na neurony):**
+| Koncept ICT | Neuron Imperium |
+|-------------|-----------------|
+| Liquidity Grab/Sweep | `STR-01` Stop Hunt Detector (Straż) |
+| Fair Value Gap (FVG) | `ICT-FVG` *(nowy)* — 3-świecowa luka imbalance |
+| Order Block | `XII-06` SMC (Order Blocks) |
+| BOS/CHoCH/MSS | `XII-06` SMC (Market Structure) |
+| Kill Zone (sesje) | `SES-01` *(nowy)* Session/Killzone timer |
+| Displacement | `ICT-DISP` *(nowy)* — agresywny ruch impulsowy |
+
+**Sekwencja wejścia (ICT 2026 model):**
+1. Cena wbija w pool płynności (sweep stopów) → `STR-01`
+2. Displacement — agresywny ruch tworzy FVG → `ICT-FVG`
+3. Powrót do FVG/Order Block = Optimal Trade Entry → wejście
+4. Kill zone NY 8-11 EST = max aktywność instytucji → `SES-01`
+
+**Dźwignia:** 3×–10× | **R:R:** 1:3+ | **Status:** SZKIC — priorytet (synergiczne z naszą Strażą)
+**Nowe Neurony:** `ICT-FVG` (Fair Value Gap), `ICT-DISP` (Displacement), `SES-01` (Killzone timer)
+
+---
+
+## 😱 W. Sentyment — Fear & Greed + Crowd Positioning
+
+### IMV-RV-003 | "KONTRA TŁUMU" | Fear & Greed Contrarian
+**Źródło:** WebSearch — Crypto Fear & Greed Index (volatility 25% + momentum 25% + social + dominacja + trends)
+**Interwał:** 1D | **Warunki:** ekstremum sentymentu
+
+**Zasada kontrariańska (Warren Buffett crypto):**
+- F&G < 20 (Extreme Fear) → strefa kupna (krew na ulicach)
+- F&G > 80 (Extreme Greed) → strefa sprzedaży (euforia)
+
+**Neurony:**
+- `SENT-FG` *(nowy)* Fear & Greed Index — agregat sentymentu
+- `VI-04` Long/Short Ratio → crowded longs = ryzyko spadku, crowded shorts = ryzyko wybicia
+- `VI-01` FundingRate → emocje rynku futures
+- `SENT-SOC` *(nowy)* Social Volume → hype mediów społecznościowych
+
+**Dźwignia:** 2×–5× | **R:R:** 1:2 | **Status:** SZKIC
+**Nowe Neurony:** `SENT-FG` (Fear&Greed), `SENT-SOC` (Social Volume)
+
+---
+
+## 🤖 X. Boty — Grid / DCA / Mean Reversion
+
+### IMV-RG-004 | "SIATKA KAMELEONA" | Grid Trading Bot
+**Źródło:** WebSearch — grid bot (sideways/choppy markets)
+**Interwał:** dowolny | **Warunki:** rynek RANGING (boczny, brak trendu)
+
+**Mechanika:** staggered buy/sell orders w zdefiniowanym kanale. Zarabia na oscylacji.
+**Neurony FILTR (Generał aktywuje TYLKO w reżimie RANGING):**
+- ADX < 20 → brak trendu (warunek konieczny dla grid)
+- `XII-03` Bollinger → granice kanału = granice siatki
+- `ENT-01` Shannon Entropy → wysoka entropia = chop = grid działa
+
+**Parametry:** upper/lower bound, liczba poziomów (gęstość siatki), kapitał/poziom.
+**⚠️ Pretorianie:** grid + trend = katastrofa. Wyłączyć gdy ADX > 25 (reżim TREND).
+**Dźwignia:** 1×–3× | **Status:** SZKIC
+
+### IMV-MC-004 | "MRÓWKA DCA" | DCA + Safety Orders
+**Źródło:** WebSearch — DCA bot z safety orders
+**Mechanika:** kupno stałych kwot w interwałach; safety orders przy spadkach (uśrednianie).
+**Neurony:** `III-01` MVRV (strefa akumulacji), `SENT-FG` (kupuj strach)
+**⚠️ Pretorianie:** to NIE martyngał — safety orders mają twardy limit (Martingale Blocker IMV-RISK-002).
+**Status:** SZKIC
+
+### IMV-RG-005 | "POWRÓT DO ŚREDNIEJ" | RSI Mean Reversion
+**Źródło:** WebSearch — mean reversion (RSI<30 buy, return to neutral sell)
+**Neurony:** `X-02` StochRSI, `WR-14` Williams%R, `X-04` VWAP (powrót do fair value)
+**Warunki:** reżim RANGING | **Status:** SZKIC
+
+---
+
+## 🌊 Y. Fale i Geometria — Elliott / Wolfe / Harmonic
+
+### IMV-RV-004 | "FALA ELLIOTTA" | Elliott Wave + Fibonacci
+**Twórca:** Ralph Nelson Elliott (1938, "The Wave Principle")
+**Interwał:** 4H–1W | **Warunki:** wyraźna struktura 5-3 fal
+
+**Reguły żelazne Elliotta:**
+- Fala 2 nigdy nie cofa >100% fali 1
+- Fala 3 nigdy nie jest najkrótsza z impulsowych (1,3,5)
+- Fala 4 nie wchodzi w terytorium fali 1
+
+**Neurony:**
+- `EW-01` *(nowy)* Elliott Wave Counter (auto-liczenie fal)
+- `XII-05` Fibonacci → cele zniesień/rozszerzeń
+- `X-02` StochRSI → potwierdzenie końca fali 5 (dywergencja)
+
+**Najlepszy setup:** harmonic pattern na końcu fali 3 lub 5 → łapie cały ruch A-B-C.
+**Status:** SZKIC | **Nowy Neuron:** `EW-01` Elliott Wave Counter (Struktura, waga 6)
+
+### IMV-RV-005 | "FALA WOLFE'A" | Wolfe Wave Reversal
+**Źródło:** WebSearch — Wolfe Wave (5-falowy wzorzec równowagi)
+**Reguły:** fale 3-4 w kanale fal 1-2; Wave 1-2 = Wave 3-4 (symetria); Wave 4 między 1 a 2.
+**Neurony:** `WW-01` *(nowy)* Wolfe Wave Detector, `XII-05` Fibonacci
+**Status:** SZKIC | **Nowy Neuron:** `WW-01` (Struktura, waga 6)
+
+---
+
+## 📊 Z. Statistical Arbitrage — Pairs Trading (BTC/ETH)
+
+### IMV-AR-004 | "BLIŹNIĘTA" | Cointegration Pairs Trading
+**Źródło:** WebSearch — BTC/ETH pairs (16.34% APY, Sharpe 2.45, win 64.74%, beta 0.09-0.18)
+**Interwał:** 1H–4H | **Warunki:** dwie skointegrowane kryptowaluty (BTC/ETH)
+
+**Mechanika (rynkowo-neutralna):**
+- Śledź spread/ratio BTC vs ETH (test ADF/Johansen na kointegrację)
+- Z-Score spreadu > +2 → SHORT BTC, LONG ETH (oczekuj powrotu do średniej)
+- Z-Score < -2 → odwrotnie
+- Zamknij gdy Z-Score → 0
+
+**Neurony:**
+- `PAIR-01` *(nowy)* Pair Z-Score — spread dwóch aktywów w sigma
+- `PAIR-02` *(nowy)* Cointegration Test — ADF/Johansen stationarity
+- `CORR-01` Correlation (Breadth) → potwierdzenie korelacji par
+
+**Zaleta:** market-neutral (beta ~0.1), zarabia niezależnie od kierunku BTC.
+**Dźwignia:** 2×–5× (na obu nogach) | **APY hist.:** 16% Sharpe 2.45 | **Status:** FAZA 3
+**Nowe Neurony:** `PAIR-01` (Z-Score par), `PAIR-02` (Cointegration test)
+
+---
+
+## 📊 AKTUALIZACJA PODSUMOWANIA KATALOGU (v2.2)
 
 | Grupa | Strategii | Status |
 |-------|-----------|--------|
 | Rdzeń Legionów (X/XII/III/VI) | 8 | SZKIC |
-| Multi-legion (IMV-HY) | 5 | SZKIC |
+| Multi-legion (IMV-HY) | 6 | SZKIC |
 | Księga Azjatycka (A-K) | ~35 | SZKIC/FAZA 3 |
 | Mistrzowie Świata (L-R) | 9 | SZKIC |
+| Klasyka/Arbitraż/ICT/Boty/Fale (T-Z) | 15 | SZKIC/FAZA 3 |
 | Reguły Ryzyka (Pretorianie) | 5+ | DO WDROŻENIA |
-| **RAZEM zmapowanych** | **~62+** | rośnie |
+| **RAZEM zmapowanych** | **~85+** | rośnie |
 
-**Nowe neurony z tego skanu:** 13 (do dodania do KATALOG_NEURONOW.md)
+**Nowe neurony z tego skanu (Skan III):** 13 → patrz KATALOG_NEURONOW.md
 
 ---
 

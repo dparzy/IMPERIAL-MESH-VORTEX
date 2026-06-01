@@ -29,6 +29,13 @@
 | W-007 | AEL (Agent Evolving Learning) — samoewolucja strategii, Sharpe 2.13 | 🟠 Średni | 💭 Idea | `imperium/cesarz/` lub `imperium/senat/` |
 | W-008 | Sharpe Terminal (sharpe.ai) — integracja danych narracyjnej rotacji sektorów | 🟡 Niski | 💭 Idea | `imperium/oczy/` |
 | W-009 | SHARP (Self-Evolving Rubric Policy, arxiv 2605.06822) — podłączyć jako warstwę audytu/weryfikacji nad DeepSeek w Cesarzu | 🔴 Wysoki | 💭 Idea | `imperium/cesarz/sharp_auditor.py` |
+| W-010 | CME Gap — neuron + strategia (gap fill BTC futures, ~90% fill rate) | 🔴 Wysoki | 💭 Idea | `KATALOG_NEURONOW.md` + `KATALOG_STRATEGII.md` |
+| W-011 | Azja Range Breakout — strategia (break Asia High/Low w sesji London) | 🔴 Wysoki | 💭 Idea | `KATALOG_STRATEGII.md` |
+| W-012 | Cross-exchange arbitraż (MEXC vs Binance vs OKX price diff + funding diff) | 🟠 Średni | 💭 Idea | `KATALOG_STRATEGII.md` + `imperium/akwedukty/` |
+| W-013 | Rozbudowa Igrzysk — system "kija" (kary progresywne, ceremonia hańby, lista infamii) | 🟠 Średni | 💭 Idea | `IGRZYSKA_IMPERIUM.md` |
+| W-014 | Plik 3100 linków Azja — przeskanować i wyciągnąć perełki (małe repozytoria, doktoraty, fora) | 🟠 Średni | ⏳ Czeka na plik | `KATALOG_NEURONOW.md` + `KATALOG_STRATEGII.md` |
+| W-015 | Obserwatorzy/Zwiadowcy (oczy) — zmapować istniejące i brakujące: newsy, sentiment, on-chain, CME, sesje | 🔴 Wysoki | 💭 Idea | `imperium/oczy/` + nowy doc `OBSERWATORZY.md` |
+| W-016 | Ekspansja na inne giełdy (Binance, OKX, Bybit) — "podbój prowincji", multi-exchange arbitraż | 🟡 Niski (Faza 2+) | 💭 Idea | `docs/ROADMAP_IMPERIUM.md` |
 
 ---
 
@@ -89,7 +96,7 @@
 
 | Metryka | Wartość |
 |---------|---------|
-| Łącznie wizji | 9 |
+| Łącznie wizji | 16 |
 | W trakcie analizy | 5 |
 | Przeniesione do dokumentów | 0 |
 | Zaimplementowane | 0 |

@@ -650,6 +650,8 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | Klucz | Neuron | Wskaźnik | Zadanie | Waga |
 |-------|--------|----------|---------|------|
 | SES-01 | Neuron KillZone | Session/Killzone Timer (Azja/Londyn/NY) | Aktywność instytucji max w kill zones (NY 8-11 EST) | W6 |
+| SES-02 | Neuron AzjaRange | Asia Range High/Low (00:00–08:00 UTC) | Wyznacza zakres sesji azjatyckiej — breakout w Londynie = silny sygnał | W8 |
+| SES-03 | Neuron CMEGap | CME Gap Detector (BTC/ETH futures) | Sunday open vs Friday close > 0.5% → 77% fill rate → kontrariański sygnał w kierunku luki | W8 |
 
 ### 😱 Rozszerzenie Dywizji Wyroczni (sentyment)
 
@@ -751,13 +753,13 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | 🐋 Dywizja Wielorybów (on-chain) | 5 |
 | 🌀 Dywizja Entropii (matematyka) | 7 + 1 = **8** |
 | 🧱 Dywizja Struktury (SMC/ICT/VSA) | 16 + 6 = **22** |
-| ⏰ Dywizja Czasu/Sesji | 1 |
+| ⏰ Dywizja Czasu/Sesji | 1 + 2 = **3** |
 | 💎 Dywizja Perł (wyspecjalizowane) | 10 |
 | 📉 Dywizja Opcji (NOWA) | **3** |
 | 🌱 Dywizja DeFi (NOWA) | **1** |
-| **RAZEM** | **304** |
+| **RAZEM** | **306** |
 
-> **304 neurony** (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, HowardMarks, TVL, L1/L2 RS, Cross-Sectional Momentum).
+> **306 neuronów** (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, HowardMarks, TVL, L1/L2 RS, Cross-Sectional Momentum).
 > Dwie nowe dywizje: 📉 Opcji + 🌱 DeFi.
 
 ---

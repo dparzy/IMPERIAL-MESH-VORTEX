@@ -693,4 +693,237 @@ Strategie nadal poszukiwane (kolejne skany internetu):
 
 ---
 
+# 🌍 MISTRZOWIE ŚWIATA — Strategie z WebSearch (v2.1)
+
+> Źródło: Wyszukiwanie internetowe, czerwiec 2026.
+> Zasada: wyciągamy działającą logikę → mapujemy na neurony Imperium.
+
+---
+
+## 📈 L. Larry Williams — COT + Williams %R + Sezonowość
+
+### IMV-TR-004 | "INSIDERZY COT" | Williams COT Seasonal System
+**Twórca:** Larry Williams (trader od 1970s, World Cup Champion)
+**Interwał:** 1D | **Warunki:** sezonowe okno + ekstremum COT + %R sygnał
+
+**Logika COT (Commitment of Traders):**
+- Spekulanci rekordowo LONG + Commercials rekordowo SHORT → kontrariański SHORT
+- Commercials (producenci/hedgers) wiedzą więcej niż spekulanci → śledź Commercials
+
+**Neurony WEJŚCIE (wszystkie 3 warunki muszą być spełnione):**
+- `MAK-COT` *(nowy neuron — Makro/Geo)* COT Extreme — commercials vs speculators spread
+- `XII-07-WR` Williams %R(14) < -80 (wyprzedanie) → LONG lub > -20 (wykupienie) → SHORT
+- `III-06` Halving Cycle / sezonowość → w historycznie silnym oknie sezonowym
+
+**Neurony FILTR:**
+- `III-08` M2 Global Liquidity → makro wspiera kierunek
+
+**Zasada Bailout Exit:** wyjście przy pierwszym zyskownym otwarciu kolejnego dnia.
+
+**Dźwignia:** 1×–3× | **R:R:** 1:3 | **Status:** SZKIC
+**Nowy Neuron:** `MAK-COT` (Makro/Geo, waga 8) → *do dodania do KATALOG_NEURONOW.md*
+
+---
+
+## 📊 M. Stan Weinstein — Stage Analysis (4 Fazy)
+
+### III-MC-002 | "CZTERY PORY ROKU" | Weinstein Stage Analysis
+**Twórca:** Stan Weinstein ("Secrets for Profiting in Bull and Bear Markets", 1988)
+**Interwał:** 1W (tygodniowy — "oath" 30W SMA) | **Warunki:** cykl 4 faz
+
+**Cztery fazy:**
+| Faza | Opis | 30W SMA | Akcja |
+|------|------|---------|-------|
+| 1 — Basing | Konsolidacja po spadkach | Spłaszcza się | Czekaj, akumuluj dyskretnie |
+| 2 — Advancing | Wybicie powyżej SMA, wzrost | Rosnące | KUPUJ — tu jest zysk |
+| 3 — Distribution | Plateau, spłaszczenie SMA | Zwalnia | Redukuj, szukaj wyjścia |
+| 4 — Declining | Poniżej malejącego SMA | Malejące | NIGDY nie trzymaj (Weinstein: "złóż przysięgę") |
+
+**Neurony WEJŚCIE (przejście Fazy 1→2):**
+- `XII-01-W` EMA(200) tygodniowy → cena powyżej rosnącej SMA30W
+- `XII-08` OBV rosnący → wolumen potwierdza wybicie z bazy
+- `III-07` AltSeason Index → sektor rotacji
+
+**Neurony WYJŚCIE (sygnał Fazy 3):**
+- `XII-01` EMA cross w dół lub SMA30W spłaszcza → wychodzić
+- `XII-07` RSI-Div niedźwiedzia → ostrzeżenie
+
+**Dźwignia:** 1× SPOT | **R:R:** 1:5+ | **Status:** SZKIC
+
+---
+
+## 🦅 N. Paul Tudor Jones — 200D MA + Turning Points + 5:1 R:R
+
+### IMV-TR-005 | "WIKING NA SKRAJU" | PTJ Macro Turning Points
+**Twórca:** Paul Tudor Jones (Tudor Investment, 1987 Crash Prophet, +30 lat bez straty)
+**Interwał:** 1D–1W | **Warunki:** cena na kluczowym turning point + 200D MA
+
+**Trzy żelazne zasady PTJ:**
+1. **200D MA jako north star** — nie wchodzić w cokolwiek poniżej 200D. Wyjście gdy cena przebija poniżej 200D (bez dyskusji).
+2. **5:1 R:R minimum** — ryzykujesz 1%, celujesz w 5%. Możesz mylić się 4 razy z 5 i wciąż zarabiać.
+3. **Odwrócenia > momentum** — "najlepsze pieniądze są na turning pointach, nie w środku trendu"
+
+**Neurony WEJŚCIE:**
+- `XII-01` EMA(200D) → cena powraca powyżej po korekcie (retest 200D = turning point)
+- `XII-07` RSI-Div + ekstrema → identyfikacja turning point
+- `III-08` M2 + makro → macro alignment
+
+**Neurony FILTR:**
+- `VI-01` FundingRate → emocje rynku (PTJ kontrariański przy ekstremach sentymentu)
+- ADX < 20 (rynek zastygnięty) → czekaj na wyraźny sygnał
+
+**Zarządzanie pozycją (PTJ):** wchodzi małą pozycją na turning point, dokłada (pyramiding) dopiero gdy rynek potwierdza kierunek.
+
+**Dźwignia:** 1×–5× | **R:R:** 1:5 minimum | **Status:** SZKIC — priorytetowa
+
+---
+
+## 🔁 O. Michael Covel / Richard Dennis — Trend Following System
+
+### IMV-TR-006 | "ŻELAZNA FALA" | Covel Systematic Trend Following
+**Twórca:** Michael Covel (Trend Following), syntetyzuje Dennis/Eckhardt/Seykota/Marcus
+**Interwał:** 1D | **Warunki:** wyraźny trend z niskim szumem
+
+**Reguły systemu (syntetyczne):**
+1. Wejście: cena przebija N-dniowy kanał Donchiana lub EMA cross (breakout)
+2. Rozmiar pozycji: fixed fractional — max 2% ryzyka / ATR sizing
+3. Stop: zawsze trailing stop oparty na ATR (nigdy stały poziom)
+4. Wyjście: odwrócenie kanału (krótsza długość niż wejście)
+5. Nie przewiduj — tylko śledź. Trend jest twoim przyjacielem.
+
+**Neurony:**
+- `XII-01` EMA(50/200) cross → kierunek trendu
+- `XII-04` Supertrend + ADX > 25 → siła i potwierdzenie
+- `X-06` ATR → trailing stop i sizing
+
+**Różnica od Turtles (IMV-TR-001):** Covel dopuszcza krótszy interwał sygnału wejścia, Turtles sztywno 20D/55D.
+
+**Dźwignia:** 1×–3× | **R:R:** 1:3+ | **Status:** SZKIC
+
+---
+
+## 📐 P. Andreas Clenow — Volatility-Adjusted Momentum
+
+### IMV-TR-007 | "LOGARYTM CLENOWA" | Volatility-Adjusted Momentum Ranking
+**Twórca:** Andreas Clenow ("Stocks on the Move", 2015)
+**Interwał:** 1D (rebalancing tygodniowy) | **Warunki:** rynek powyżej 200D SMA
+
+**Unikalna formuła momentum:**
+```
+Momentum_Score = Slope_90D × R² × Annualization_Factor
+(regresja logarytmiczna 90D × determinacja = volatility-adjusted momentum)
+```
+
+**Filtr wykluczający (jeśli JEDEN spełniony → skip):**
+- cena poniżej 100D MA
+- gap > 15% w ostatnich 90 dniach
+- rynek (BTC/SPY) poniżej 200D MA → STOP all entries (regime filter)
+
+**Neurony SKANER (tryb SKANER Generała idealne zastosowanie):**
+- `XII-01` EMA(200) → regime filter (rynek nad SMA)
+- `XII-MOM` *(nowy neuron)* Momentum Score 90D → ranking aktywów
+- `XII-04` Supertrend → kierunek
+
+**Implementacja w SKANERZE:** zamiast skanować po pewności neuronów, rankinuj po Momentum Score i wybieraj top 3. Clenow to dokładnie "tryb SKANER" naszego Legatusa.
+
+**Dźwignia:** 1× SPOT | **Rebalans:** tygodniowy | **Status:** SZKIC — priorytet (algorytmiczny, testowalny)
+**Nowy Neuron:** `XII-MOM` Momentum Slope×R² (Swing, waga 7) → *do katalogu*
+
+---
+
+## 🕯️ Q. Nial Fuller — Price Action (Pin Bar + Inside Bar)
+
+### IMV-RV-002 | "IGŁA FULLER" | Pin Bar Reversal at Key Level
+**Twórca:** Nial Fuller (learntotradethemarket.com, "60-65% win rate na daily")
+**Interwał:** 4H, 1D | **Warunki:** pin bar przy kluczowym S/R poziomie
+
+**Kryteria pin bara (MUSZĄ być spełnione):**
+- Ogon (wick) ≥ 2/3 całej świecy (≥ 66% zakresu)
+- Ciało świecy w górnej 1/3 (bycza) lub dolnej 1/3 (niedźwiedzia)
+- Pojawia się na kluczowym poziomie S/R, VWAP, Fibo lub EMA
+
+**Neurony WEJŚCIE:**
+- `PA-PINBAR` *(nowy neuron)* Pin Bar Detector — sprawdza geometrię świecy
+- `XII-05` Fibonacci S/R → czy pin bar na kluczowym poziomie
+- `X-04` VWAP → zgodność z fair value
+
+**Combo Setup — Inside Bar po Pin Barze:**
+- Pin bar → Inside Bar (matka-córka) = kompresja przed wybuchem
+- Wejście na wybiciu z Inside Bar w kierunku Pin Bara
+
+**Dźwignia:** 2×–5× | **R:R:** 1:2 (daily) | **Status:** SZKIC
+
+### IMV-SC-004 | "MATKA I CÓRKA" | Inside Bar Continuation
+**Neurony:** `PA-INSIDE` *(nowy neuron)* Inside Bar Detector, `XII-04` Supertrend (kierunek trendu = kierunek wybiecia)
+**Warunki:** wyraźny trend + inside bar = kompresja przed kontynuacją
+**Status:** SZKIC
+
+**Nowe Neurony:** `PA-PINBAR` i `PA-INSIDE` (kategoria: S=SMC/Price Action, waga 6) → *do KATALOG_NEURONOW*
+
+---
+
+## 🎯 R. Stanley Druckenmiller — Koncentracja + Makro
+
+### IMV-MC-003 | "BARIBAL" | Druckenmiller Concentrated Macro Bet
+**Twórca:** Stanley Druckenmiller (Quantum Fund z Sorosem, 30 lat bez straty rocznej)
+**Interwał:** 1W–1M | **Warunki:** wyjątkowa okazja makro + wysoka konwikcja
+
+**Zasady Druckenmillera (REGUŁY PRETORIANÓW dla dużych pozycji):**
+1. **Koncentracja** — gdy masz konwikcję, ładujesz duże. "35 pozycji = kłopot. 1 duża = uwaga."
+2. **Nie hedguj wątpliwości** — jeśli potrzebujesz hedge, pozycja jest za duża lub zła → zamknij.
+3. **Soros-lekcja** — "nie ważne czy masz rację, ważne ILE zarabiasz gdy masz rację"
+4. **1-2 wielkie okazje rocznie** — czekaj na nie. Cała reszta to szum.
+5. **Nie dywersyfikuj dla zasady** — dywersyfikacja ≠ automatycznie bezpieczeństwo
+
+**Implementacja w Imperium:**
+- Gdy `pewnosc_agregatu` > 0.92 + `RaportLegatusa.weto == False` + reżim TREND_STRONG → DRUCKENMILLER MODE: dźwignia ×1.5 powyżej tabeli, rozmiar pozycji do 5% kapitału (zamiast 2%)
+- To jest wyjątek od zasady 2% — **TYLKO przy >92% pewności Generała**
+
+**Dźwignia:** do 20× (wyjątkowo) | **R:R:** 1:5+ | **Status:** SZKIC
+
+---
+
+## 📊 S. Nowe Neurony z Przeglądu Rynku 2026
+
+> Zidentyfikowane luki w KATALOG_NEURONOW.md na podstawie przeglądu wskaźników 2026.
+
+### Nowe neurony do dodania do katalogu:
+
+| Klucz | Neuron | Wskaźnik | Dywizja | Waga | Skąd |
+|-------|--------|----------|---------|------|------|
+| `MP-01` | Neuron TPO POC | TPO Market Profile — Point of Control | Order Book | 8 | 2026 review |
+| `MP-02` | Neuron VRVP | Visible Range Volume Profile — VAH/VAL/POC | Order Book | 8 | 2026 review |
+| `MP-03` | Neuron Super POC | TPO POC = Volume POC → magnes ceny | Order Book | 9 | 2026 review |
+| `CVD-D` | Neuron CVD-Div | CVD Divergence (cena rośnie, CVD spada = ostrzeżenie) | Legio X | 9 | 2026 review |
+| `NVT-S` | Neuron NVT Signal | NVT z wstęgami odchylenia std (overbought/oversold) | Legio III | 8 | on-chain 2026 |
+| `RHODL` | Neuron RHODL Ratio | Realized HODL waves — long-term holder spending | Legio III | 9 | on-chain 2026 |
+| `MAK-COT` | Neuron COT Extreme | Commercial vs Speculator spread ekstremum | Makro/Geo | 8 | Larry Williams |
+| `XII-MOM` | Neuron MomScore | Slope×R² regresji 90D (Clenow momentum rank) | Legio XII | 7 | Clenow |
+| `PA-PINBAR` | Neuron PinBar | Pin Bar geometryczny detektor (ogon ≥ 66%) | SMC/ICT | 6 | Nial Fuller |
+| `PA-INSIDE` | Neuron InsideBar | Inside Bar detektor (matka-córka kompresja) | SMC/ICT | 6 | Nial Fuller |
+| `PA-FAKEY` | Neuron Fakey | Fałszywe wybicie z inside bara + reversal | SMC/ICT | 7 | Nial Fuller |
+| `WR-14` | Neuron Williams%R | Williams %R(14) ekstrema < -80 / > -20 | Legio X | 6 | Larry Williams |
+| `MVRV-Z` | Neuron MVRV-Z | MVRV Z-Score (> 7 = top cyklu, < -0.5 = dołek) | Legio III | 9 | on-chain 2026 |
+
+> **MVRV-Z** to ulepszona wersja MVRV-Ratio (III-01) z uwzględnieniem odchylenia standardowego — dokładniejsza na topach.
+> **Super POC (MP-03)** = TPO POC pokrywa się z Volume POC — jeden z najsilniejszych magnesów ceny.
+> **CVD-Div (CVD-D)** to rozszerzenie X-03 o wykrywanie dywergencji (kluczowe sygnały).
+
+---
+
+## 📊 AKTUALIZACJA PODSUMOWANIA KATALOGU
+
+| Grupa | Strategii | Status |
+|-------|-----------|--------|
+| Rdzeń Legionów (X/XII/III/VI) | 8 | SZKIC |
+| Multi-legion (IMV-HY) | 5 | SZKIC |
+| Księga Azjatycka (A-K) | ~35 | SZKIC/FAZA 3 |
+| Mistrzowie Świata (L-R) | 9 | SZKIC |
+| Reguły Ryzyka (Pretorianie) | 5+ | DO WDROŻENIA |
+| **RAZEM zmapowanych** | **~62+** | rośnie |
+
+**Nowe neurony z tego skanu:** 13 (do dodania do KATALOG_NEURONOW.md)
+
+---
+
 *"Strategia bez neuronu to plan bez żołnierzy. Neuron bez strategii to żołnierz bez rozkazu."* — VITRUVIUSZ

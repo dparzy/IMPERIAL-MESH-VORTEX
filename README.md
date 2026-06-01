@@ -35,7 +35,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
 | **Testy** | `python tests/run_tests.py` → **237/237** |
 
-**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **~261 neuronów** docelowo — to mapa drogowa, nie kod. Różnica = backlog do zbudowania (partiami, z pomiarem dekorelacji).
+**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 27) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
 ---
 
@@ -43,8 +43,8 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Folder / Plik | Zawartość |
 |---------------|-----------|
-| **[ZASADY_FUNDAMENTALNE.md](ZASADY_FUNDAMENTALNE.md)** | Konstytucja — **17 praw**, których zawsze przestrzegamy |
-| **[CLAUDE.md](CLAUDE.md)** | Instrukcje stałe (czytane co sesję): Prawo XV/XVI, bezpieczeństwo, git |
+| **[ZASADY_FUNDAMENTALNE.md](ZASADY_FUNDAMENTALNE.md)** | Konstytucja — **18 praw**, których zawsze przestrzegamy |
+| **[CLAUDE.md](CLAUDE.md)** | Instrukcje stałe (czytane co sesję): Prawa XV–XVIII, bezpieczeństwo, git |
 | **imperium/** | Żywy kod systemu (patrz mapa niżej) |
 | **docs/** | Dokumentacja + katalogi projektowe (neurony, strategie, arsenał) |
 | **tests/** | Testy bez zależności: `python tests/run_tests.py` |

@@ -2,7 +2,7 @@
 
 > **Po co:** Pełny, uczciwy zapis adopcji 17 modułów kodu z projektu Kingdom Pixel
 > do Imperium. Zgodnie z Prawem I (Zero halucynacji) — mówimy też o tym, co jest słabe.
-> **Zasada porządkowa:** adoptujemy KOD, **nie adoptujemy ZASAD** (Imperium ma własne 14 praw).
+> **Zasada porządkowa:** adoptujemy KOD, **nie adoptujemy ZASAD** (Imperium ma własne 18 praw).
 > **Stan kodu:** wszystkie 17 modułów kompiluje się czysto (`py_compile`, 0 błędów).
 
 ---
@@ -72,7 +72,7 @@ Z wewnętrznego audytu Kingdom Pixel (autor: Jack, 31.05.2026) — przenoszę uc
 - 17 modułów skopiowanych do struktury Imperium (10 folderów wg metafory).
 - Wszystkie kompilują się czysto.
 - Kingdom Pixel **nietknięty** jako backup (Prawo VIII — nic nie ginie).
-- Zasady Kingdom Pixel **świadomie pominięte** (Imperium ma własne 14 praw).
+- Zasady Kingdom Pixel **świadomie pominięte** (Imperium ma własne 18 praw).
 
 **Do zrobienia (kolejka, Prawo VII):**
 1. Przepisać nagłówki modułów na prawa Imperium (po jednym).

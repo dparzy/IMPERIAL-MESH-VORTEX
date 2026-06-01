@@ -11,13 +11,13 @@
 
 ```
 ╔══════════════════════════════════════════════════════════════════════╗
-║               🏛️  AUDYT IMPERIUM v0.4.0 — 2026-06-01                ║
+║               🏛️  AUDYT IMPERIUM v0.9.x — 2026-06-01 (zakt.)                ║
 ╠══════════════════════════════════════════════════════════════════════╣
-║  Moduły kodu:        24 pliki .py                                    ║
+║  Moduły kodu:        58 plików .py                                  ║
 ║  Dokumenty:          25 plików .md                                   ║
-║  Neurony:            328 zmapowanych                                 ║
+║  Neurony:            27 w kodzie / 299 katalog                      ║
 ║  Strategie:          ~108+ zmapowanych                               ║
-║  Testy automatyczne: 78 ✅ (luki #1–#5 zamknięte)                   ║
+║  Testy automatyczne: 237 ✅ (wszystkie zielone)                     ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║  ✅ Działające (bez TA-Lib):    8 modułów                            ║
 ║  ⚠️  Blokowane przez TA-Lib:    9 modułów                            ║
@@ -83,7 +83,7 @@
 | 1 | ✅ ZROBIONE — **Testy automatyczne** `tests/` (52 testów, 0 zależności) | `tests/` | ~~🔴~~ |
 | 2 | ✅ ZROBIONE — **Scorer Igrzysk** `igrzyska.py` (11 testów) | `biblioteki/igrzyska.py` | ~~🔴~~ |
 | 3 | ✅ ZROBIONE — **Doradcy Cara** Oracle/Fulmen/Iustitia/Hermes/Pythia+Rada (24 testów) | `cesarz/doradcy/` | ~~🟠~~ |
-| 4 | **Moduł Neuronów produkcyjnych** — mamy spec 328 neuronów, ale w kodzie tylko 2 przykłady | `legiony/neurony/` | 🔴 Wysoki |
+| 4 | ✅ ZROBIONE — **27 neuronów + 12 zwiadowców** w kodzie (z 299 katalogu); 237 testów | `legiony/neurony/` | ~~🔴~~ |
 | 5 | **Konektor CME Gap** — ⚠️ CME 24/7 od 29.05.2026 — strategia zanika historycznie | `oczy/cme_feed.py` | 🟡 Niski |
 | 6 | **Multi-exchange konektor** — Binance, OKX jako "prowincje" | `akwedukty/multi_exchange.py` | 🟠 Faza 2 |
 | 7 | ✅ ZROBIONE — **Scheduler** LIVE/BACKTEST/ONCE, bezpiecznik AOA, graceful shutdown | `drogi/scheduler.py` | ~~🟠~~ |
@@ -126,7 +126,7 @@
 | Dokument | Status | Aktualność |
 |----------|--------|-----------|
 | INDEKS_IMPERIUM.md | ✅ | v0.3.0 — aktualne |
-| KATALOG_NEURONOW.md | ✅ | 306 neuronów — aktualne |
+| KATALOG_NEURONOW.md | ✅ | 299 katalog / 27 w kodzie |
 | KATALOG_STRATEGII.md | ✅ | ~103 strategie — aktualne |
 | IGRZYSKA_IMPERIUM.md | ✅ | Kij + Marchewka — aktualne |
 | PAMIEC_ABSOLUTNA.md | ✅ | ImperiumLog — aktualne |
@@ -134,7 +134,7 @@
 | WIZJONER.md | ✅ | 16 wizji — aktualne |
 | ARCHITEKTURA_IMPERIUM.md | ⚠️ | Nie uwzględnia nowych modułów |
 | MAPA_IMPERIUM_FLOW.md | ⚠️ | Nie uwzględnia Legatusa/Kalkulator |
-| LEGIONY_ARCHITEKTURA.md | ⚠️ | Nieaktualna — 306 neuronów tu nie widać |
+| LEGIONY_ARCHITEKTURA.md | ⚠️ | Nieaktualna — 299 katalog tu nie widać |
 | MATRYCA_KORELACJI.md | ⚠️ | Nie zaktualizowana po Skan I-V |
 | ROADMAP_IMPERIUM.md | ⚠️ | Stara — nie uwzględnia Fazy 0 obecnego stanu |
 

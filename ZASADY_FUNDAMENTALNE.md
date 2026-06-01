@@ -189,5 +189,33 @@ Potencjał Imperium ma być wykorzystany w 100%, nie w 11%.
 
 ---
 
+## ⚖️ PRAWO XVI — REDUNDANCJA MIERZONA, NIE ZGADYWANA 📊
+
+> **Doprecyzowanie Prawa XV.** Dogmat „już mamy coś podobnego" to też utrata potencjału.
+
+Nowy moduł (neuron, zwiadowca) **NIE jest odrzucany za podobieństwo** do istniejącego.
+Redundancja szkodzi **wyłącznie wtedy, gdy sygnały są SKORELOWANE** — czyli popełniają
+te same błędy w tych samych momentach i zawyżają jedną opinię w agregacie Legatusa.
+
+Dwa „podobne" moduły liczone **inaczej** (inny okres, inne potwierdzenie, inny reżim,
+inne dane) **DEKORELUJĄ błędy** = wartość, nie szum. To fundament siły roju (ensemble).
+
+**Zasada przyjęcia modułu** — wystarczy JEDNO z poniższych:
+1. **Inne dane** (np. L2 orderbook vs OHLCV).
+2. **Inna logika** na tych samych danych (np. cross + bramka egzekucji vs goły cross).
+3. **Inny reżim** (np. pro-breakout vs anty-breakout — komplementarne).
+4. **Niska korelacja sygnału** w czasie z istniejącymi (mierzona empirycznie).
+
+**Zakaz oceniania „na oko".** Decyzję o redundancji podejmuje się na podstawie
+`diagnostyka_korelacji.raport_dekorelacji()`:
+- para z `|korelacja| > 0.80` → kandydat do scalenia lub wagi w dół,
+- para z `|korelacja| < 0.20` → filar siły (niezależna informacja),
+- moduł o stałym sygnale (zerowa wariancja) → **martwy głos = czerwony alarm Prawa XV**.
+
+**Odrzucenie użytecznego modułu z dogmatu o redundancji = złamanie Prawa XVI.**
+Imperium rośnie przez zdekorelowaną różnorodność, nie przez jeden idealny głos.
+
+---
+
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*
 > 🚨 *"Niewykorzystana siła to siła oddana wrogowi. Imperium nie marnuje niczego."*

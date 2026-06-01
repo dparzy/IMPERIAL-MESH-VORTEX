@@ -355,3 +355,30 @@ class NeuronHAScalper(MikroNeuron):
 
         return self._bazowy_sygnal(None, "NEUTRAL", 0.10,
             ["HA Doji/niejednoznaczna świeca — brak sygnału"])
+
+
+class NeuronStochRSI(MikroNeuron):
+    """
+    X-02 | Stochastic RSI — ekstrema wykupienia/wyprzedania (szybsze niż RSI).
+    Linia %K (0–100): <20 = wyprzedanie → LONG, >80 = wykupienie → SHORT.
+    Dane z Bramy: klucz STOCHRSI (talib.STOCHRSI fastk).
+    """
+    KLUCZ = "X-02"
+    LEGION = "SCALP"
+    WSKAZNIK = "STOCHRSI"
+    KATEGORIA = "M"
+    WAGA = 6
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        v = wskazniki.get("STOCHRSI")
+        if v is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych StochRSI."])
+        if v < 20:
+            pewnosc = 0.85 if v < 10 else 0.75
+            return self._bazowy_sygnal(v, "LONG", pewnosc,
+                [f"StochRSI={v:.1f} < 20 → strefa wyprzedania, możliwe odbicie"])
+        if v > 80:
+            pewnosc = 0.85 if v > 90 else 0.75
+            return self._bazowy_sygnal(v, "SHORT", pewnosc,
+                [f"StochRSI={v:.1f} > 80 → strefa wykupienia, możliwa korekta"])
+        return self._bazowy_sygnal(v, "NEUTRAL", 0.30, [f"StochRSI={v:.1f} w strefie neutralnej"])

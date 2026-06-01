@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-01 · **Testy:** 237/237 zielone · **Faza:** rdzeń decyzyjny działa, rozbudowa roju w toku.
+> **Stan na:** 2026-06-01 · **Testy:** 240/240 zielone · **Faza:** rdzeń decyzyjny działa, rozbudowa roju w toku.
 
 ---
 
@@ -26,16 +26,16 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **27 zaimplementowanych** (15 aktywnych na OHLCV + 12 wyciszonych: czekają na API/feed) |
+| **Mikro-neurony** | **28 zaimplementowanych** (16 aktywnych na OHLCV + 12 wyciszonych: czekają na API/feed) |
 | **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
 | **Generał Legatus** | agregacja głosów + wagi reżimowe + odpalanie zwiadowców |
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
-| **Testy** | `python tests/run_tests.py` → **237/237** |
+| **Testy** | `python tests/run_tests.py` → **240/240** |
 
-**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 27) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
+**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 28) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
 ---
 
@@ -81,7 +81,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ## 🧪 Uruchomienie testów
 
 ```bash
-python tests/run_tests.py     # 237/237, bez zależności zewnętrznych
+python tests/run_tests.py     # 240/240, bez zależności zewnętrznych
 ```
 
 ---

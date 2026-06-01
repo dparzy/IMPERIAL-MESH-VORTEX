@@ -5,9 +5,17 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 
 **Stan na:** 2026-06-01 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 27 neuronów + 12 zwiadowców = **39 modułów w kodzie**
+**Zaimplementowane:** 28 neuronów (zarejestrowanych w roju) + 12 zwiadowców = **40 modułów w kodzie**
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
-**Do wdrożenia:** 272 neurony
+**Do wdrożenia:** 271 neuronów
+
+> **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
+> w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
+> `test_rejestr_wszystkie_neurony` (== 28). NIE liczymy klas-sierot poza rojem.
+> **Audyt 2026-06-01:** wykryto 2 neurony-sieroty w `mikro_neuron.py` (X-02 StochRSI,
+> VI-01 FundingRate) — kod istniał, ale poza rojem (utrata potencjału, Prawo XV).
+> Naprawa: X-02 promowany do `momentum.py` + Brama/Budowniczy (STOCHRSI) → aktywny;
+> VI-01 wycofany jako redundantny z `NeuronFundingExtreme` (Prawo XVI).
 
 ---
 
@@ -30,13 +38,14 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (27/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (28/299)
 
 ### Plik: `neurony/momentum.py`
 
 | KLUCZ | Klasa | Status | Opis |
 |-------|-------|--------|------|
 | M-RSI | NeuronRSI | ✅ aktywny | RSI(14) z dywergencją |
+| X-02 | NeuronStochRSI | ✅ aktywny | Stochastic RSI %K (Brama: STOCHRSI) |
 | M-MACD | NeuronMACD | ✅ aktywny | MACD crossover |
 | M-BB | NeuronBBands | ✅ aktywny | Bollinger Bands squeeze/bounce |
 | M-EMA | NeuronEMACross | ✅ aktywny | EMA 9/21 cross |
@@ -101,7 +110,7 @@
 | KLUCZ | Nazwa | Opis | Status |
 |-------|-------|------|--------|
 | X-01 | EMA Cross | EMA(9/21) kierunek | 🔴 katalog |
-| X-02 | StochRSI | Stochastic RSI ekstrema | 🔴 katalog |
+| X-02 | StochRSI | Stochastic RSI ekstrema | ✅ kod (momentum.py, aktywny) |
 | X-03 | CVD | Cumulative Volume Delta | 🔴 katalog (osobna wersja M5) |
 | X-04 | VWAP Bounce | VWAP magnes dnia | 🔴 katalog |
 | X-05 | OrderFlow | Bid/Ask Imbalance | 🔴 katalog |
@@ -136,11 +145,11 @@
 
 | Legion | Skatalogowane | Wdrożone | Do wdrożenia |
 |--------|--------------|---------|--------------|
-| X Equestris (M5/M15) | 26 | 2 (X-25, X-26) | 24 |
+| X Equestris (M5/M15) | 26 | 3 (X-02, X-25, X-26) | 23 |
 | III Augusta (H1) | ~45 | 11 (T-ADX..P-OIDIV..V-*..S-*) | ~34 |
 | XII Fulminata (D1) | ~40 | 4 (O-MVRV..O-NETFLOW) | ~36 |
 | Pozostałe legiony | ~188 | 10 (RSI,MACD,BB,EMACross,WR + WolumenAnomaly) | ~178 |
-| **RAZEM** | **299** | **27** | **272** |
+| **RAZEM** | **299** | **28** | **271** |
 
 ---
 
@@ -165,7 +174,8 @@
 | 2026-05-xx | Adopcja IMV-ADO | +2 neurony (X-25, X-26) | 23 | ATRDeviation + HAScalper |
 | 2026-05-xx | Exploratores EXP-01..05 | +5 zwiadowców | 23+5 | Higuchi, HA, Hurst, Kalman, SMC |
 | 2026-06-01 | Exploratores EXP-06..12 | +7 zwiadowców | 27+12=39 | Katana, TLP, Night, Sweep, Displacement, Dynamic, Atmabhan(wyciszony) |
-| **Do wdrożenia** | Faza 1 (X Equestris) | +24 neurony | — | Priorytet: X-01..X-24 (dekorelacja po każdej partii) |
+| 2026-06-01 | Audyt liczby + X-02 | +1 neuron (StochRSI) | 28+12=40 | Ożywienie sieroty X-02; wycofanie redundantnego VI-01 |
+| **Do wdrożenia** | Faza 1 (X Equestris) | +23 neurony | — | Priorytet: X-01,X-03..X-24 (dekorelacja po każdej partii) |
 
 ---
 

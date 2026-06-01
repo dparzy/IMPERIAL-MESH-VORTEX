@@ -97,51 +97,12 @@ class MikroNeuron(ABC):
         return s
 
 
-# ─── Przykładowa implementacja: Neuron X-02 (StochRSI) ───────────────────────
-
-class NeuronStochRSI(MikroNeuron):
-    """X-02 | Legio X | Stochastic RSI — ekstrema wykupienia/wyprzedania."""
-    KLUCZ = "X-02"
-    LEGION = "SCALP"
-    WSKAZNIK = "StochRSI"
-    KATEGORIA = "M"
-    WAGA = 6
-
-    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
-        v = wskazniki.get("StochRSI")
-        if v is None:
-            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych StochRSI."])
-        if v < 20:
-            return self._bazowy_sygnal(v, "LONG", 0.75,
-                [f"StochRSI={v:.1f} < 20 → strefa wyprzedania, możliwe odbicie"])
-        if v > 80:
-            return self._bazowy_sygnal(v, "SHORT", 0.75,
-                [f"StochRSI={v:.1f} > 80 → strefa wykupienia, możliwa korekta"])
-        return self._bazowy_sygnal(v, "NEUTRAL", 0.3, [f"StochRSI={v:.1f} w strefie neutralnej"])
-
-
-# ─── Przykładowa implementacja: Neuron VI-01 (Funding Rate) ──────────────────
-
-class NeuronFundingRate(MikroNeuron):
-    """VI-01 | Legio VI | Funding Rate — przeważenie long/short na futures."""
-    KLUCZ = "VI-01"
-    LEGION = "LEVERAGE"
-    WSKAZNIK = "FundingRate"
-    KATEGORIA = "L"
-    WAGA = 9
-
-    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
-        v = wskazniki.get("FundingRate")
-        if v is None:
-            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych Funding Rate."])
-        # >0.03% = za dużo longów (ryzyko long squeeze → kontra SHORT)
-        if v > 0.0003:
-            return self._bazowy_sygnal(v, "SHORT", 0.7,
-                [f"Funding={v*100:.4f}% > 0.03% → za dużo longów, ryzyko long squeeze"])
-        if v < -0.0003:
-            return self._bazowy_sygnal(v, "LONG", 0.7,
-                [f"Funding={v*100:.4f}% < -0.03% → za dużo shortów, ryzyko short squeeze"])
-        return self._bazowy_sygnal(v, "NEUTRAL", 0.3, [f"Funding={v*100:.4f}% zrównoważony"])
+# UWAGA (Prawo XIX): klasy neuronów NIE mieszkają już w tym pliku bazowym.
+# Każdy neuron żyje w swoim module (neurony/*.py) i jest rejestrowany w rejestr.py.
+#   • X-02 StochRSI  → przeniesiony do neurony/momentum.py (aktywny, dane STOCHRSI z Bramy)
+#   • VI-01 Funding  → wycofany jako redundantny z NeuronFundingExtreme (Prawo XVI);
+#                      kanoniczny neuron funding to NeuronFundingExtreme w neurony/psychologia.py
+# Dzięki temu nie ma "neuronów-sierot" z kodem, ale poza rojem (Prawo XV/XIX).
 
 
 # ─── Rój — agregator neuronów jednego legionu ────────────────────────────────

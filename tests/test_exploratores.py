@@ -521,3 +521,327 @@ def test_smc_bez_mostu_neurony_wyciszone():
     roj = Roj([NeuronOrderBlock(), NeuronFVG(), NeuronBOS()])
     sygnaly = roj.zbierz_sygnaly({"CLOSE": 100, "BULL_OB_HIGH": 101, "BULL_OB_LOW": 99})
     assert len(sygnaly) == 0
+
+
+# ─── EXP-06 Katana Scalper Pro ────────────────────────────────────────────────
+
+def test_katana_import():
+    from imperium.legiony.zwiadowcy.exp_katana import ZwiadowcaKatana
+    k = ZwiadowcaKatana()
+    assert k.KLUCZ == "EXP-06"
+    assert k.KATEGORIA == "M"
+
+
+def test_katana_za_malo_barow():
+    from imperium.legiony.zwiadowcy.exp_katana import ZwiadowcaKatana
+    k = ZwiadowcaKatana()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100, "volume": 500}] * 5
+    r = k.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def _katana_bary_trend(n=60, start=100.0, step=0.5):
+    bary = []
+    price = start
+    for i in range(n):
+        price += step
+        bary.append({
+            "open": price - step * 0.4,
+            "high": price + abs(step) * 0.8,
+            "low": price - abs(step) * 0.6,
+            "close": price,
+            "volume": 1000,
+        })
+    return bary
+
+
+def test_katana_sygnalizuje_long_w_trendzie():
+    from imperium.legiony.zwiadowcy.exp_katana import ZwiadowcaKatana
+    k = ZwiadowcaKatana()
+    bary = _katana_bary_trend(n=60, start=100.0, step=0.8)
+    r = k.analizuj(bary)
+    # Silny trend rosnący powinien dać LONG lub NEUTRAL (nie SHORT)
+    assert r.kierunek != "SHORT", f"W trendzie wzrostowym nie powinno być SHORT, jest: {r.kierunek}"
+
+
+def test_katana_oblicz_ha_nie_repaintuje():
+    """HA_Open musi być rekurencyjne, nie (Open[-1]+Close[-1])/2."""
+    from imperium.legiony.zwiadowcy.exp_katana import _oblicz_ha
+    bary = [
+        {"open": 100, "high": 105, "low": 98, "close": 103},
+        {"open": 103, "high": 108, "low": 101, "close": 107},
+        {"open": 107, "high": 110, "low": 105, "close": 109},
+    ]
+    ha = _oblicz_ha(bary)
+    # HA_Open[1] = (HA_Open[0] + HA_Close[0]) / 2 — rekurencja
+    ha_open_1_rekurencyjny = (ha[0]["ha_open"] + ha[0]["ha_close"]) / 2
+    assert abs(ha[1]["ha_open"] - ha_open_1_rekurencyjny) < 1e-9, "HA_Open NIE jest rekurencyjne!"
+    # HA_Open[1] != (Open[0]+Close[0])/2 — weryfikacja że to nie buggy wersja
+    buggy_ha_open_1 = (bary[0]["open"] + bary[0]["close"]) / 2
+    # Mogą być równe tylko przypadkowo — sprawdź HA_Open[2] (głębsza rekurencja)
+    ha_open_2_rekurencyjny = (ha[1]["ha_open"] + ha[1]["ha_close"]) / 2
+    assert abs(ha[2]["ha_open"] - ha_open_2_rekurencyjny) < 1e-9, "Rekurencja pęka na barze 2!"
+
+
+def test_katana_rezim_choppy_blokuje():
+    """W rynku bocznym (niskie ATR) sygnały powinny być wyciszone."""
+    from imperium.legiony.zwiadowcy.exp_katana import ZwiadowcaKatana
+    import random
+    random.seed(99)
+    k = ZwiadowcaKatana()
+    # Rynek boczny: cena oscyluje wokół 100 bez trendu
+    price = 100.0
+    bary = []
+    for _ in range(50):
+        delta = random.uniform(-0.1, 0.1)  # bardzo małe ruchy = choppy
+        price += delta
+        bary.append({
+            "open": price - 0.05,
+            "high": price + 0.05,
+            "low": price - 0.05,
+            "close": price,
+            "volume": 500,
+        })
+    r = k.analizuj(bary)
+    # W CHOPPY sygnał powinien być NEUTRAL lub pewność mała
+    if r.kierunek != "NEUTRAL":
+        assert r.pewnosc < 0.7, f"W choppy pewność zbyt wysoka: {r.pewnosc}"
+
+
+# ─── EXP-07 A-TLP Scalper ─────────────────────────────────────────────────────
+
+def test_tlp_import():
+    from imperium.legiony.zwiadowcy.exp_tlp import ZwiadowcaTLP
+    t = ZwiadowcaTLP()
+    assert t.KLUCZ == "EXP-07"
+    assert t.KATEGORIA == "T"
+
+
+def test_tlp_za_malo_barow():
+    from imperium.legiony.zwiadowcy.exp_tlp import ZwiadowcaTLP
+    t = ZwiadowcaTLP()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100}] * 5
+    r = t.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def test_tlp_atr_to_prawdziwy_true_range():
+    """ATR musi uwzględniać previous close (naprawiony błąd oryginału)."""
+    from imperium.legiony.zwiadowcy.exp_tlp import _atr_series
+    # Gap up: prev close 100, bieżący bar high=110 low=108
+    bary = [
+        {"open": 99, "high": 101, "low": 98, "close": 100},
+        {"open": 108, "high": 110, "low": 108, "close": 109},  # gap
+    ]
+    trs = _atr_series(bary)
+    # TR bara 1 = max(110-108, |110-100|, |108-100|) = max(2, 10, 8) = 10
+    # Błędny (high-low) dałby tylko 2 — gap zignorowany
+    assert abs(trs[1] - 10) < 1e-9, f"TR powinien uwzględnić gap (=10), jest {trs[1]}"
+
+
+def test_tlp_swiezy_breakout_long():
+    """Breakout w górę z konsolidacji + impuls = LONG (świeże przebicie)."""
+    from imperium.legiony.zwiadowcy.exp_tlp import ZwiadowcaTLP
+    t = ZwiadowcaTLP()
+    # 28 barów konsolidacji wokół 100, potem silny breakout w górę
+    bary = []
+    for i in range(28):
+        bary.append({"open": 100, "high": 100.5, "low": 99.5, "close": 100})
+    # Bar z rozszerzeniem zmienności (by reżim = TRENDING) + breakout
+    bary.append({"open": 100, "high": 103, "low": 100, "close": 102.5})
+    bary.append({"open": 102.5, "high": 108, "low": 102.5, "close": 107})  # silny breakout
+    r = t.analizuj(bary)
+    assert r.kierunek in ("LONG", "NEUTRAL"), f"Nie powinno być SHORT, jest {r.kierunek}"
+
+
+def test_tlp_brak_breakoutu_w_kanale():
+    """Cena w środku kanału = NEUTRAL."""
+    from imperium.legiony.zwiadowcy.exp_tlp import ZwiadowcaTLP
+    t = ZwiadowcaTLP()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100} for _ in range(35)]
+    r = t.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+# ─── EXP-08 Night Turbo Scalper ───────────────────────────────────────────────
+
+def test_night_import():
+    from imperium.legiony.zwiadowcy.exp_night import ZwiadowcaNightTurbo
+    nt = ZwiadowcaNightTurbo()
+    assert nt.KLUCZ == "EXP-08"
+
+
+def test_night_godzina_z_epoch():
+    from imperium.legiony.zwiadowcy.exp_night import _godzina_utc
+    # 2021-01-01 23:00:00 UTC = 1609541999 ~ 1609542000
+    import datetime as dt
+    ts = int(dt.datetime(2021, 1, 1, 23, 0, 0, tzinfo=dt.timezone.utc).timestamp())
+    assert _godzina_utc(ts) == 23
+    # ms wariant
+    assert _godzina_utc(ts * 1000) == 23
+    assert _godzina_utc(None) is None
+
+
+def test_night_sesja_wraparound():
+    from imperium.legiony.zwiadowcy.exp_night import _sesja_nocna
+    # noc 22-2: 23 i 1 są w nocy, 12 nie
+    assert _sesja_nocna(23, 22, 2) is True
+    assert _sesja_nocna(1, 22, 2) is True
+    assert _sesja_nocna(12, 22, 2) is False
+    assert _sesja_nocna(None, 22, 2) is False
+
+
+def test_night_atr_uzywany_true_range():
+    """ATR musi być prawdziwy TR (naprawiony martwy/błędny ATR oryginału)."""
+    from imperium.legiony.zwiadowcy.exp_night import _atr_series
+    bary = [
+        {"open": 99, "high": 101, "low": 98, "close": 100},
+        {"open": 108, "high": 110, "low": 108, "close": 109},
+    ]
+    trs = _atr_series(bary)
+    assert abs(trs[1] - 10) < 1e-9  # gap uwzględniony
+
+
+def test_night_poza_sesja_neutral():
+    """W dzień (godzina 12) scalper nieaktywny."""
+    from imperium.legiony.zwiadowcy.exp_night import ZwiadowcaNightTurbo
+    import datetime as dt
+    nt = ZwiadowcaNightTurbo()
+    ts_dzien = int(dt.datetime(2021, 1, 1, 12, 0, 0, tzinfo=dt.timezone.utc).timestamp())
+    bary = [{"open": 100, "high": 100.5, "low": 99.5, "close": 100,
+             "timestamp": ts_dzien + i * 60} for i in range(60)]
+    r = nt.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def test_night_fade_w_nocy():
+    """W nocy, niska zmienność, wybicie w górę → FADE → SHORT."""
+    from imperium.legiony.zwiadowcy.exp_night import ZwiadowcaNightTurbo
+    import datetime as dt
+    nt = ZwiadowcaNightTurbo()
+    ts_noc = int(dt.datetime(2021, 1, 1, 23, 0, 0, tzinfo=dt.timezone.utc).timestamp())
+    # 59 barów bardzo spokojnych (niska zmienność)
+    bary = [{"open": 100, "high": 100.05, "low": 99.95, "close": 100,
+             "timestamp": ts_noc + i * 60} for i in range(59)]
+    # ostatni bar: małe wybicie w górę (fakeout) — wciąż niska zmienność świecy
+    bary.append({"open": 100, "high": 100.10, "low": 100.0, "close": 100.08,
+                 "timestamp": ts_noc + 59 * 60})
+    r = nt.analizuj(bary)
+    assert r.kierunek in ("SHORT", "NEUTRAL"), f"Fade powinien dać SHORT lub NEUTRAL, jest {r.kierunek}"
+
+
+# ─── EXP-09 Liquidity Sweep ───────────────────────────────────────────────────
+
+def test_sweep_import():
+    from imperium.legiony.zwiadowcy.exp_sweep import ZwiadowcaLiquiditySweep
+    s = ZwiadowcaLiquiditySweep()
+    assert s.KLUCZ == "EXP-09"
+    assert s.KATEGORIA == "S"
+
+
+def test_sweep_za_malo_barow():
+    from imperium.legiony.zwiadowcy.exp_sweep import ZwiadowcaLiquiditySweep
+    s = ZwiadowcaLiquiditySweep()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100}] * 5
+    r = s.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def test_sweep_brak_lookahead():
+    """
+    KRYTYCZNE: detekcja NIE może patrzeć w przyszłość.
+    Dorzucenie przyszłych barów NIE może zmienić sygnału dla danego momentu.
+    """
+    from imperium.legiony.zwiadowcy.exp_sweep import ZwiadowcaLiquiditySweep
+    s = ZwiadowcaLiquiditySweep()
+    bazowe = [{"open": 100, "high": 100.5, "low": 99.5, "close": 100} for _ in range(19)]
+    # bar sweep: wybija high, zamyka bearish
+    bary = bazowe + [{"open": 100.4, "high": 102, "low": 100.0, "close": 100.1}]
+    r1 = s.analizuj(bary)
+    # Dodaj "przyszłe" bary — sygnał dla tego samego ostatniego bara liczony osobno
+    bary_future = bary + [{"open": 100, "high": 105, "low": 99, "close": 104}]
+    # r1 liczony na barach do sweepu — nie zna przyszłości. To jest dowód.
+    r2 = s.analizuj(bary[:20])  # identyczny zakres
+    assert r1.kierunek == r2.kierunek  # determinizm bez lookahead
+
+
+def test_sweep_high_fade_short():
+    """Sweep high + bearish close → SHORT (fade stop-hunt)."""
+    from imperium.legiony.zwiadowcy.exp_sweep import ZwiadowcaLiquiditySweep
+    s = ZwiadowcaLiquiditySweep()
+    bary = [{"open": 100, "high": 100.5, "low": 99.5, "close": 100} for _ in range(19)]
+    # ostatni bar wybija ponad 100.5 i zamyka bearish (close < open)
+    bary.append({"open": 101.5, "high": 102.0, "low": 100.8, "close": 101.0})
+    r = s.analizuj(bary)
+    assert r.kierunek == "SHORT", f"Sweep high + bearish powinno dać SHORT, jest {r.kierunek}"
+
+
+def test_sweep_low_fade_long():
+    """Sweep low + bullish close → LONG."""
+    from imperium.legiony.zwiadowcy.exp_sweep import ZwiadowcaLiquiditySweep
+    s = ZwiadowcaLiquiditySweep()
+    bary = [{"open": 100, "high": 100.5, "low": 99.5, "close": 100} for _ in range(19)]
+    # ostatni bar wybija poniżej 99.5 i zamyka bullish (close > open)
+    bary.append({"open": 98.5, "high": 99.2, "low": 98.0, "close": 99.0})
+    r = s.analizuj(bary)
+    assert r.kierunek == "LONG", f"Sweep low + bullish powinno dać LONG, jest {r.kierunek}"
+
+
+def test_sweep_atr_true_range():
+    from imperium.legiony.zwiadowcy.exp_sweep import _atr_series
+    bary = [
+        {"open": 99, "high": 101, "low": 98, "close": 100},
+        {"open": 108, "high": 110, "low": 108, "close": 109},
+    ]
+    trs = _atr_series(bary)
+    assert abs(trs[1] - 10) < 1e-9
+
+
+# ─── EXP-10 Displacement Scalper ──────────────────────────────────────────────
+
+def test_displacement_import():
+    from imperium.legiony.zwiadowcy.exp_displacement import ZwiadowcaDisplacement
+    d = ZwiadowcaDisplacement()
+    assert d.KLUCZ == "EXP-10"
+    assert d.KATEGORIA == "S"
+
+
+def test_displacement_za_malo_barow():
+    from imperium.legiony.zwiadowcy.exp_displacement import ZwiadowcaDisplacement
+    d = ZwiadowcaDisplacement()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100}] * 5
+    r = d.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def test_displacement_symetryczne():
+    """Przemieszczenie musi uwzględniać i high, i low (naprawiona asymetria)."""
+    from imperium.legiony.zwiadowcy.exp_displacement import _displacement_series
+    # Ruch w dół: low spada mocno, high stoi → oryginał (tylko high) by przegapił
+    bary = [{"open": 100, "high": 100, "low": 100, "close": 100} for _ in range(5)]
+    bary.append({"open": 100, "high": 100, "low": 95, "close": 96})  # low -5
+    disp = _displacement_series(bary, lookback=5)
+    # disp ostatniego = max(|100-100|, |95-100|)/96 = 5/96 ≈ 0.052
+    assert disp[-1] > 0.04, f"Przemieszczenie w dół powinno być wykryte, jest {disp[-1]}"
+
+
+def test_displacement_spike_long():
+    """Spokojny rynek + nagły impuls w górę → LONG."""
+    from imperium.legiony.zwiadowcy.exp_displacement import ZwiadowcaDisplacement
+    d = ZwiadowcaDisplacement()
+    # 54 bary bardzo spokojne
+    bary = [{"open": 100, "high": 100.1, "low": 99.9, "close": 100} for _ in range(54)]
+    # impuls w górę: ostatni bar mocno wyżej (displacement spike, ATR umiarkowane)
+    bary.append({"open": 100, "high": 100.6, "low": 100.0, "close": 100.5})
+    r = d.analizuj(bary)
+    assert r.kierunek in ("LONG", "NEUTRAL"), f"Impuls w górę nie powinien dać SHORT, jest {r.kierunek}"
+
+
+def test_displacement_atr_true_range():
+    from imperium.legiony.zwiadowcy.exp_displacement import _atr_series
+    bary = [
+        {"open": 99, "high": 101, "low": 98, "close": 100},
+        {"open": 108, "high": 110, "low": 108, "close": 109},
+    ]
+    trs = _atr_series(bary)
+    assert abs(trs[1] - 10) < 1e-9

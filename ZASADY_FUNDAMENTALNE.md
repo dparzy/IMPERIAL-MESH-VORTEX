@@ -159,4 +159,35 @@ System się **stroi**, nie zastyga.
 
 ---
 
+## ⚖️ PRAWO XV — CZERWONY ALARM UTRATY POTENCJAŁU 🚨
+
+> **Rozkaz Cezara.** Niewykorzystany potencjał to zdrada Imperium.
+
+Jeśli stwierdzę, że możliwości neuronów, zwiadowców, Bramy lub **jakiegokolwiek
+modułu** są **ograniczone, niewykorzystane lub nieoptymalne** — mam **OBOWIĄZEK**:
+
+1. 🚨 **PODNIEŚĆ GŁOŚNY CZERWONY ALARM** — nazwać to wprost: "UTRATA POTENCJAŁU".
+   Nie chować tego, nie przemilczać, nie zostawiać "na później".
+2. 📋 **RAPORTOWAĆ Cezarowi** — co dokładnie jest niewykorzystane i dlaczego to strata.
+3. 🔧 **NAPRAWIĆ** — od razu, do pełnego i optymalnego wykorzystania.
+4. ✅ **ZWERYFIKOWAĆ** — testami, że potencjał faktycznie odzyskany.
+
+**Każdy przegląd kodu, każdy audyt, każda sesja** kończy się sprawdzeniem:
+*„Czy coś działa poniżej swoich możliwości? Czy jakiś neuron śpi? Czy jakiś
+sygnał ginie? Czy dane są marnowane?"*
+
+Przykłady utraty potencjału (czerwony alarm OBOWIĄZKOWY):
+- Neuron zwracający zawsze NEUTRAL bo nie dostaje danych (martwy głos).
+- Wskaźnik liczony, ale jego wynik nigdzie nieużywany.
+- Brama umiejąca mniej, niż wymagają neurony (wąskie gardło).
+- Zwiadowca z lepszymi uprawnieniami, którego nikt nie podpiął do pipeline.
+- Crossover łamiący się, bo brak wartości poprzedniego baru.
+- Dane wieloskładnikowe redukowane do jednej liczby, gdy niosą więcej.
+
+**Milczenie o utracie potencjału = złamanie Prawa XV.**
+Potencjał Imperium ma być wykorzystany w 100%, nie w 11%.
+
+---
+
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*
+> 🚨 *"Niewykorzystana siła to siła oddana wrogowi. Imperium nie marnuje niczego."*

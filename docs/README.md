@@ -26,5 +26,9 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [GENERAL_LEGATUS.md](GENERAL_LEGATUS.md) | Generał Legatus — koordynator Legionów i Senatu, Tryb SKANER vs FOKUS, agregacja sygnałów |
 | [KALKULATOR_LEWARA.md](KALKULATOR_LEWARA.md) | Matematyka przeżycia — likwidacja, stop-loss, dynamiczna dźwignia, zarządzanie kapitałem |
 | [KATALOG_STRATEGII.md](KATALOG_STRATEGII.md) | Katalog **~97+** strategii — Księga Azjatycka, Mistrzowie Świata, VSA/GEX/DeFi/Makro/Opcje/Sektory |
+| [IGRZYSKA_IMPERIUM.md](IGRZYSKA_IMPERIUM.md) | System Rywalizacji — rankingi 303 neuronów / 4 legionów / senatorów. Złoty Hełm, Złota Zbroja, Purpura Senatu |
+| [PAMIEC_ABSOLUTNA.md](PAMIEC_ABSOLUTNA.md) | System Logowania — ImperiumLog (40+ pól), MAE/MFE, walk-forward, replay sesji, Prawo Memoriae |
+| [DORADCY_CARA.md](DORADCY_CARA.md) | Rada Doradców Cesarskich — Oracle/Fulmen/Iustitia/Hermes/Pythia, second opinion w spornych decyzjach |
+| [WIZJONER.md](WIZJONER.md) | 💡 **Brudnopis** — surowe idee, analiza wpływu, symulacje "co jeśli", przypomnienia o niezrealizowanych wizjach |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

@@ -46,6 +46,16 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 10 | `AUDYT_ADOPCJI.md` | 17 modułów migrowanych z Kingdom Pixel — audyt adopcji | ✅ Aktywny |
 | 11 | `SYMBIOZA_MODULOW.md` | Interakcje modułów i mapowanie narzędzi | 🔗 Link |
 | 12 | `ROADMAP_IMPERIUM.md` | Roadmapa rozwoju i wersjonowanie | 🔗 Link |
+| 13 | `KATALOG_NEURONOW.md` | **303 mikro-neurony** — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
+| 14 | `KATALOG_STRATEGII.md` | **~97+ strategii** — Księga Azjatycka + Mistrzowie Świata + VSA/GEX/DeFi | ✅ Aktywny |
+| 15 | `GENERAL_LEGATUS.md` | Generał Legatus — SKANER/FOKUS, agregacja 303 neuronów, reżimy | ✅ Aktywny |
+| 16 | `KALKULATOR_LEWARA.md` | Matematyka przeżycia — likwidacja, stop-loss, Kelly, dynamiczna dźwignia | ✅ Aktywny |
+| 17 | `IGRZYSKA_IMPERIUM.md` | **System Rywalizacji** — rankingi neuronów/legionów/senatorów, Złoty Hełm | ✅ Aktywny |
+| 18 | `PAMIEC_ABSOLUTNA.md` | **System Logowania** — ImperiumLog, MAE/MFE, walk-forward, replay sesji | ✅ Aktywny |
+| 19 | `DORADCY_CARA.md` | **Rada Doradców** — Oracle/Fulmen/Iustitia/Hermes/Pythia, second opinion | ✅ Aktywny |
+| 20 | `ARSENAL_WSKAZNIKOW.md` | Wskaźniki bazowe + mapowanie na legiony | ✅ Aktywny |
+| 21 | `MATRYCA_KORELACJI.md` | Kostka Rubika sygnałów — korelacje, konflikty, reżimy, wagi dynamiczne | 🔗 Link |
+| 22 | `REGULAMINY_I_MANIPULACJE.md` | Zgodność z regulaminami + 7 manipulacji do wykrywania | ✅ Aktywny |
 
 ---
 
@@ -62,7 +72,7 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 | `imperium/senat/` | Senat — debata Popularów vs Optymantów nad sygnałem | Senate Debate | 🟡 Szkielet |
 | `imperium/cesarz/` | Cesarz — DeepSeek LLM podejmuje ostateczną decyzję | Emperor (LLM) | 🟡 Szkielet |
 | `imperium/drogi/` | Drogi — wykonanie zlecenia na MEXC (Via Romana) | Order Execution | 🟡 Szkielet |
-| `imperium/biblioteki/` | Biblioteki — logi, pamięć, historia transakcji | Logs & Memory | ✅ Gotowy |
+| `imperium/biblioteki/` | Biblioteki — kronikarz.py + **pamiec_absolutna.py** (ImperiumLog, MAE/MFE, JSONL) | Logs & Memory | ✅ Gotowy |
 | `imperium/swiatynie/` | Świątynie — wykresy, dashboard, wizualizacje | Charts & Dashboard | 🟡 Szkielet |
 | `imperium/koloseum/` | Koloseum — arena backtestów, testowanie strategii | Backtesting Arena | 🟡 Szkielet |
 | `imperium/oczy/` | Oczy — newsy, sentyment, dane on-chain | News & Sentiment | 🔴 Planowany |
@@ -136,10 +146,12 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 |---|---------|-------|-----------|
 | 1 | ⚡ Ustaw `DEEPSEEK_API_KEY` w zmiennych środowiskowych | Cesarz | 🔴 Krytyczny |
 | 2 | 🧪 Uruchom `python imperium/cesarz/deepseek_glos.py` — test połączenia | Cesarz | 🔴 Krytyczny |
-| 3 | 🔄 Uruchom pełny cykl Fazy 0 na realnych danych (paper trading) | Cały system | 🟠 Wysoki |
-| 4 | 🖥️ Zainstaluj TA-Lib na Windows 10 (Fujitsu 8GB RAM) | Fundament | 🟠 Wysoki |
-| 5 | 🧬 Rozbuduj mikro-neurony do 79+ agentów | Legiony | 🟡 Średni |
-| 6 | 🏟️ Zbuduj Koloseum — arena backtestów z historycznych danych | Koloseum | 🟡 Średni |
+| 3 | 🖥️ Zainstaluj TA-Lib na Windows 10 (Fujitsu 8GB RAM) | Fundament | 🔴 Krytyczny |
+| 4 | 🔄 Uruchom pełny cykl Fazy 0 na realnych danych (paper trading) | Cały system | 🟠 Wysoki |
+| 5 | 🏟️ Zbuduj silnik Koloseum (backtest + WFO + MAE/MFE) | Koloseum | 🟠 Wysoki |
+| 6 | 🎮 Zaimplementuj moduł Igrzysk w kodzie (scorer neuronów) | Biblioteki | 🟡 Średni |
+| 7 | 🔮 Zaimplementuj Doradców Cara (Oracle/Fulmen/Iustitia w kodzie) | Cesarz | 🟡 Średni |
+| 8 | 🧬 Ciągle: szukaj nowych neuronów i strategii (Skan V, VI...) | Legiony | 🟡 Ciągły |
 
 ---
 
@@ -169,6 +181,8 @@ python imperium/pretorianie/veto_check.py
 | Wersja | Data | Zmiana |
 |--------|------|--------|
 | v0.1.0 | 2026-06-01 | Inicjalizacja INDEKS_IMPERIUM — Master Index stworzony |
+| v0.2.0 | 2026-06-01 | +legatus.py, +kalkulator_lewara.py, +KATALOG_STRATEGII, +KATALOG_NEURONOW (287) |
+| v0.3.0 | 2026-06-01 | Skan IV (+16 neuronów → 303), IGRZYSKA_IMPERIUM, PAMIEC_ABSOLUTNA, DORADCY_CARA, pamiec_absolutna.py |
 
 ---
 

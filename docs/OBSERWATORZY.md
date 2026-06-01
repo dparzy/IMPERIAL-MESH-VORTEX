@@ -155,7 +155,7 @@
       ↓
 [HERMES — Data Auditor] ← hash, kompletność, VPIN, event check
       ↓
-[LEGIONY NEURONÓW]     ← 328 neuronów daje sygnały
+[LEGIONY NEURONÓW]     ← neurony dają sygnały (299 katalog / 27 kod)
       ↓
 [LEGATUS]              ← agregacja ważona reżimem
       ↓

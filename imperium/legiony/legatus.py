@@ -240,14 +240,14 @@ if __name__ == "__main__":
     import sys, os
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
-    from imperium.legiony.mikro_neuron import NeuronStochRSI, NeuronFundingRate
+    from imperium.legiony.neurony.momentum import NeuronStochRSI, NeuronRSI
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(message)s')
 
-    neurony = [NeuronStochRSI(), NeuronFundingRate()]
+    neurony = [NeuronStochRSI(), NeuronRSI()]
     legatus = Legatus(neurony, min_neuronow=1, min_przewaga=0.4)
 
-    wskazniki = {"StochRSI": 15.0, "FundingRate": 0.0002}
+    wskazniki = {"STOCHRSI": 15.0, "RSI_14": 25.0}
     raport = legatus.fokus("BTCUSDT", wskazniki, rezim="TREND_STRONG")
 
     print(f"\n=== Raport Legatusa: {raport.symbol} ===")

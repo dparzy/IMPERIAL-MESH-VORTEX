@@ -227,6 +227,8 @@ class CalculatorGateway:
 
             # ── TA-Lib: oscylatory momentum ────────────────────────────────────
             "WILLIAMS_R": lambda high, low, close, period=14: _last_valid(talib.WILLR(_arr(high), _arr(low), _arr(close), timeperiod=period)),
+            # StochRSI: bierzemy linię %K (fastk) 0–100. talib.STOCHRSI → (fastk, fastd).
+            "STOCHRSI":   lambda close, period=14: _last_valid(talib.STOCHRSI(_arr(close), timeperiod=period, fastk_period=5, fastd_period=3, fastd_matype=0)[0]),
 
             # ── TA-Lib: wolumen ────────────────────────────────────────────────
             "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),

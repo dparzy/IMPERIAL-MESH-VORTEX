@@ -1456,7 +1456,7 @@ Spike wolumenu o 01:00 EST (07:00 CET) → wejście instytucji Londynu.
 
 **Nowe ze Skanu VII (Azja):** IMV-HY-007 Parrondo, IMV-HY-008 GameTheory, VI-LV-005 Kaskada, XII-RV-006 AMD, IMV-MC-005 Kimchi → pełny skan w `docs/SKAN_AZJA.md`
 
-**Nowe neurony Skan V (+2):** SES-02 AzjaRange, SES-03 CMEGap → patrz KATALOG_NEURONOW.md (306 łącznie)  
+**Nowe neurony Skan V (+2):** SES-02 AzjaRange, SES-03 CMEGap → patrz KATALOG_NEURONOW.md (299 w katalogu)  
 **⚠️ Uwaga CME:** Od 29.05.2026 CME handel 24/7 — strategia CME Gap historyczna, monitoruj.
 
 ---

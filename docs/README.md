@@ -20,13 +20,13 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [LEGIONY_ARCHITEKTURA.md](LEGIONY_ARCHITEKTURA.md) | Cztery Legiony (Equestris/Fulminata/Augusta/Ferrata) — mikro-neurony, schemat sygnału, Pretorianie |
 | [SYMBIOZA_MODULOW.md](SYMBIOZA_MODULOW.md) | Symbioza i korelacja — mapa narzędzi (oryginalne nazwy → Imperium), przepływ danych, zasada Alchemika |
 | [ROADMAP_IMPERIUM.md](ROADMAP_IMPERIUM.md) | Mapa rozwoju — Fazy 0-4, wersjonowanie, zasady Areny, zgodność z regulaminami giełd |
-| [KATALOG_NEURONOW.md](KATALOG_NEURONOW.md) | Katalog **303** mikro-neuronów — 4 legiony + 14 dywizji (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, Howard Marks, TVL, L1/L2 RS, Cross-Sectional Momentum) |
+| [KATALOG_NEURONOW.md](KATALOG_NEURONOW.md) | Katalog **299** mikro-neuronów (27 w kodzie) — 4 legiony + 14 dywizji (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, Howard Marks, TVL, L1/L2 RS, Cross-Sectional Momentum) |
 | [MATRYCA_KORELACJI.md](MATRYCA_KORELACJI.md) | Kostka Rubika sygnałów — korelacje, konflikty, reżimy rynku, wagi dynamiczne, wpływ BTC |
 | [REGULAMINY_I_MANIPULACJE.md](REGULAMINY_I_MANIPULACJE.md) | Zgodność z regulaminami giełd + 7 manipulacji do wykrywania (obrona, nie atak) |
 | [GENERAL_LEGATUS.md](GENERAL_LEGATUS.md) | Generał Legatus — koordynator Legionów i Senatu, Tryb SKANER vs FOKUS, agregacja sygnałów |
 | [KALKULATOR_LEWARA.md](KALKULATOR_LEWARA.md) | Matematyka przeżycia — likwidacja, stop-loss, dynamiczna dźwignia, zarządzanie kapitałem |
 | [KATALOG_STRATEGII.md](KATALOG_STRATEGII.md) | Katalog **~97+** strategii — Księga Azjatycka, Mistrzowie Świata, VSA/GEX/DeFi/Makro/Opcje/Sektory |
-| [IGRZYSKA_IMPERIUM.md](IGRZYSKA_IMPERIUM.md) | System Rywalizacji — rankingi 303 neuronów / 4 legionów / senatorów. Złoty Hełm, Złota Zbroja, Purpura Senatu |
+| [IGRZYSKA_IMPERIUM.md](IGRZYSKA_IMPERIUM.md) | System Rywalizacji — rankingi neuronów / 4 legionów / senatorów. Złoty Hełm, Złota Zbroja, Purpura Senatu |
 | [PAMIEC_ABSOLUTNA.md](PAMIEC_ABSOLUTNA.md) | System Logowania — ImperiumLog (40+ pól), MAE/MFE, walk-forward, replay sesji, Prawo Memoriae |
 | [DORADCY_CARA.md](DORADCY_CARA.md) | Rada Doradców Cesarskich — Oracle/Fulmen/Iustitia/Hermes/Pythia, second opinion w spornych decyzjach |
 | [WIZJONER.md](WIZJONER.md) | 💡 **Brudnopis** — surowe idee, analiza wpływu, symulacje "co jeśli", przypomnienia o niezrealizowanych wizjach |

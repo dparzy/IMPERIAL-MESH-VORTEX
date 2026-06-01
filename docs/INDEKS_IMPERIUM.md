@@ -46,9 +46,9 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 10 | `AUDYT_ADOPCJI.md` | 17 modułów migrowanych z Kingdom Pixel — audyt adopcji | ✅ Aktywny |
 | 11 | `SYMBIOZA_MODULOW.md` | Interakcje modułów i mapowanie narzędzi | 🔗 Link |
 | 12 | `ROADMAP_IMPERIUM.md` | Roadmapa rozwoju i wersjonowanie | 🔗 Link |
-| 13 | `KATALOG_NEURONOW.md` | **303 mikro-neurony** — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
+| 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (27 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
 | 14 | `KATALOG_STRATEGII.md` | **~97+ strategii** — Księga Azjatycka + Mistrzowie Świata + VSA/GEX/DeFi | ✅ Aktywny |
-| 15 | `GENERAL_LEGATUS.md` | Generał Legatus — SKANER/FOKUS, agregacja 303 neuronów, reżimy | ✅ Aktywny |
+| 15 | `GENERAL_LEGATUS.md` | Generał Legatus — SKANER/FOKUS, agregacja neuronów, reżimy | ✅ Aktywny |
 | 16 | `KALKULATOR_LEWARA.md` | Matematyka przeżycia — likwidacja, stop-loss, Kelly, dynamiczna dźwignia | ✅ Aktywny |
 | 17 | `IGRZYSKA_IMPERIUM.md` | **System Rywalizacji** — rankingi neuronów/legionów/senatorów, Złoty Hełm | ✅ Aktywny |
 | 18 | `PAMIEC_ABSOLUTNA.md` | **System Logowania** — ImperiumLog, MAE/MFE, walk-forward, replay sesji | ✅ Aktywny |

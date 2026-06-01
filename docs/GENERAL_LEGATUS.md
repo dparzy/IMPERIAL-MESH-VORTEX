@@ -28,7 +28,7 @@
 
 **Kiedy:** Brak aktywnej pozycji, szukamy punktu wejścia
 **Co robi:**
-- Aktywuje WSZYSTKIE 261 neuronów
+- Aktywuje WSZYSTKIE skatalogowane neurony (299 w katalogu, 27 w kodzie)
 - Skanuje całą watchlistę (BTC, ETH, SOL, BNB, top alts)
 - Dla każdego aktywa liczy `wynik_skaner` = suma ważona sygnałów
 - Wybiera 3 najlepszych kandydatów → przekazuje do Senatu
@@ -165,7 +165,7 @@ Generał dostosowuje wagi neuronów do bieżącego reżimu:
 
 ## 💡 ZASADY GENERAŁA
 
-1. **Generał filtruje szum** — Senat nie widzi 261 surowych sygnałów. Widzi zagregowany raport.
+1. **Generał filtruje szum** — Senat nie widzi setek surowych sygnałów. Widzi zagregowany raport.
 2. **Generał nie ma opinii** — agreguje matematycznie, nie "uważa".
 3. **Generał zna reżim** — dostosowuje wagi do warunków rynkowych.
 4. **Generał respektuje Weto** — jeśli Pretorianie mówią STOP, Generał nie przekazuje sygnału dalej.

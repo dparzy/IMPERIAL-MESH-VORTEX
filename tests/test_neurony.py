@@ -3,7 +3,7 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from imperium.legiony.neurony.momentum import NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross, NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper
+from imperium.legiony.neurony.momentum import NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross, NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI
 from imperium.legiony.neurony.trend import NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend
 from imperium.legiony.neurony.wolumen import NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly
 from imperium.legiony.neurony.psychologia import NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv
@@ -77,6 +77,27 @@ def test_williams_r():
     assert n.interpretuj({"WILLIAMS_R": -85.0}).kierunek == "LONG"
     assert n.interpretuj({"WILLIAMS_R": -15.0}).kierunek == "SHORT"
     assert n.interpretuj({"WILLIAMS_R": -50.0}).kierunek == "NEUTRAL"
+
+
+def test_stochrsi_wyprzedany_long():
+    n = NeuronStochRSI()
+    s = n.interpretuj({"STOCHRSI": 15.0})
+    assert s.kierunek == "LONG"
+    s2 = n.interpretuj({"STOCHRSI": 5.0})
+    assert s2.kierunek == "LONG" and s2.pewnosc == 0.85
+
+
+def test_stochrsi_wykupiony_short():
+    n = NeuronStochRSI()
+    assert n.interpretuj({"STOCHRSI": 85.0}).kierunek == "SHORT"
+    assert n.interpretuj({"STOCHRSI": 95.0}).pewnosc == 0.85
+
+
+def test_stochrsi_neutral_i_brak_danych():
+    n = NeuronStochRSI()
+    assert n.interpretuj({"STOCHRSI": 50.0}).kierunek == "NEUTRAL"
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+    assert n.interpretuj({}).pewnosc == 0.0
 
 
 def test_atr_deviation_szum_ignorowany():
@@ -371,7 +392,7 @@ def test_vsa_stop_volume():
 def test_neurony_brak_danych_nie_crashuje():
     """Każdy neuron musi obsłużyć pusty dict."""
     neurony = [
-        NeuronRSI(), NeuronMACD(), NeuronBBands(), NeuronEMACross(), NeuronWilliamsR(), NeuronATRDeviation(), NeuronHAScalper(),
+        NeuronRSI(), NeuronMACD(), NeuronBBands(), NeuronEMACross(), NeuronWilliamsR(), NeuronATRDeviation(), NeuronHAScalper(), NeuronStochRSI(),
         NeuronADX(), NeuronIchimoku(), NeuronEMA50_200(), NeuronSupertrend(),
         NeuronOBV(), NeuronVWAP(), NeuronCVD(), NeuronVolumeAnomaly(),
         NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(),

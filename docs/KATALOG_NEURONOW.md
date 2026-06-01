@@ -1,4 +1,4 @@
-# 🧬 KATALOG MIKRO-NEURONÓW — Rój Imperium (328)
+# 🧬 KATALOG MIKRO-NEURONÓW — Rój Imperium (299)
 
 > **Źródło:** `docs/ARSENAL_WSKAZNIKOW.md` (157 wskaźników) + wizja roju agentów
 > **Wzorzec:** DNSS (79-agentowy rój) — my idziemy dalej, mamy 79+ i rośniemy
@@ -575,9 +575,9 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | 🌀 Dywizja Entropii (matematyka) | 7 |
 | 🧱 Dywizja Struktury (SMC/ICT) | 8 |
 | 💎 Dywizja Perł (wyspecjalizowane) | 10 |
-| **RAZEM** | **261** |
+| **RAZEM (szacunek skanu I-IV)** | **261** |
 
-> **261 neuronów skatalogowanych** — 3,3× więcej niż DNSS (79).
+> **299 neuronów skatalogowanych** (zweryfikowane policzeniem unikalnych kluczy; wcześniejsze szacunki 261/328 były nieuzgodnione). 27 zaimplementowanych w kodzie.
 > Cała baza wskaźników przeskanowana (sekcje 1.0–3.0). Zero luk.
 > Każdy neuron przed bojem przechodzi przez Koloseum (Prawo VI).
 
@@ -846,9 +846,9 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | 📉 Dywizja Opcji (+ APAC Vol) | 3 + 1 = **4** |
 | 🌱 Dywizja DeFi | **1** |
 | 🔱 Dywizja Odtworzonych (IMV-ADO/INS) | **3** |
-| **RAZEM** | **328** |
+| **RAZEM (szacunek po Skan VII; kanon zweryfikowany = 299)** | **328** |
 
-> **328 neuronów** (+13 Skan VII Azja: Hurst, AdaptZScore, LiquidityGrab, Absorption, AdaptSuperTrend, KalmanATR, KimchiPremium, VenueDivergence, Hashrate, Iceberg, APACVol, JpRetail, AsiaCalendar).
+> **299 neuronów skatalogowanych** (kanon — policzone). Skan VII Azja dorzucił m.in.: Hurst, AdaptZScore, LiquidityGrab, Absorption, AdaptSuperTrend, KalmanATR, KimchiPremium, VenueDivergence, Hashrate, Iceberg, APACVol, JpRetail, AsiaCalendar).
 > Pełne pieczęcie i odrzucone duplikaty: `docs/SKAN_AZJA.md`.
 
 ---

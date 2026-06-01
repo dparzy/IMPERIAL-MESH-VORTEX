@@ -51,6 +51,7 @@ _PLAN_SKALARNE = {
     "DI_PLUS":       ("DI_PLUS", ("high", "low", "close"), {"period": 14}),
     "DI_MINUS":      ("DI_MINUS", ("high", "low", "close"), {"period": 14}),
     "WILLIAMS_R":    ("WILLIAMS_R", ("high", "low", "close"), {"period": 14}),
+    "STOCHRSI":      ("STOCHRSI", ("close",), {"period": 14}),
     "OBV":           ("OBV", ("close", "volume"), {}),
     "OBV_EMA_20":    ("OBV_EMA_20", ("close", "volume"), {}),
     "VOLUME_MA20":   ("VOLUME_MA20", ("volume",), {}),

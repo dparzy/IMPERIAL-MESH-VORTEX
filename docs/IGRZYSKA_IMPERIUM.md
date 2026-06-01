@@ -19,7 +19,7 @@
 
 | Arena | Uczestnicy | Metryki | Częstotliwość |
 |-------|-----------|---------|---------------|
-| 🧬 **Arena Neuronów** | Mikro-neurony (303+) | Accuracy, Precision, F1, Contribution | Co 24h rolling |
+| 🧬 **Arena Neuronów** | Mikro-neurony (299 w katalogu, 27 w kodzie) | Accuracy, Precision, F1, Contribution | Co 24h rolling |
 | ⚔️ **Arena Legionów** | 4 Legiony + dywizje | Sharpe, WinRate, MaxDD, Calmar | Co tydzień |
 | 🏛️ **Arena Senatu** | Senatorzy (głosy LONG/SHORT) | Głosowania vs wynik, kalibracja | Po każdym trade |
 

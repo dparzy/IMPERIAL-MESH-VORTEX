@@ -24,6 +24,7 @@ from .exp_night import ZwiadowcaNightTurbo
 from .exp_sweep import ZwiadowcaLiquiditySweep
 from .exp_displacement import ZwiadowcaDisplacement
 from .exp_dynamic import ZwiadowcaDynamic
+from .exp_atmabhan import ZwiadowcaAtmabhan
 
 __all__ = [
     "ZwiadowcaElitarny", "RaportZwiadowcy", "TypDanych",
@@ -33,5 +34,5 @@ __all__ = [
     "ZwiadowcaSMC", "aktywuj_neurony_smc",
     "ZwiadowcaKatana", "ZwiadowcaTLP", "ZwiadowcaNightTurbo",
     "ZwiadowcaLiquiditySweep", "ZwiadowcaDisplacement",
-    "ZwiadowcaDynamic",
+    "ZwiadowcaDynamic", "ZwiadowcaAtmabhan",
 ]

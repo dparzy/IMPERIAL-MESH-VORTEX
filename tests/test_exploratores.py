@@ -909,3 +909,84 @@ def test_dynamic_atr_true_range():
     ]
     trs = _atr_series(bary)
     assert abs(trs[1] - 10) < 1e-9
+
+
+# ─── EXP-12 Atmabhan L2 Microstructure ────────────────────────────────────────
+
+def test_atmabhan_import():
+    from imperium.legiony.zwiadowcy.exp_atmabhan import ZwiadowcaAtmabhan
+    a = ZwiadowcaAtmabhan()
+    assert a.KLUCZ == "EXP-12"
+
+
+def test_atmabhan_wyciszony():
+    """EXP-12 musi być wyciszony — brak feedu L2 (Prawo XV: nie martwy głos)."""
+    from imperium.legiony.zwiadowcy.exp_atmabhan import ZwiadowcaAtmabhan
+    a = ZwiadowcaAtmabhan()
+    assert a.DOSTEPNY is False
+    assert "L2" in a.POWOD_NIEDOSTEPNOSCI or "orderbook" in a.POWOD_NIEDOSTEPNOSCI
+
+
+def test_atmabhan_ohlcv_brak_danych():
+    """Z OHLCV nie da się policzyć mikrostruktury → brak danych, nie crash."""
+    from imperium.legiony.zwiadowcy.exp_atmabhan import ZwiadowcaAtmabhan
+    a = ZwiadowcaAtmabhan()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100} for _ in range(30)]
+    r = a.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def test_atmabhan_imbalance():
+    from imperium.legiony.zwiadowcy.exp_atmabhan import _imbalance
+    # Same bidy, brak asków → imbalance +1 (presja kupna)
+    bids = [[100, 10], [99, 10]]
+    asks = [[101, 0], [102, 0]]
+    assert abs(_imbalance(bids, asks, 2) - 1.0) < 1e-9
+    # Symetria
+    bids2 = [[100, 5]]
+    asks2 = [[101, 5]]
+    assert abs(_imbalance(bids2, asks2, 1)) < 1e-9
+
+
+def test_atmabhan_delta_acceleration():
+    from imperium.legiony.zwiadowcy.exp_atmabhan import _delta_acceleration
+    # imbalance rośnie przyspieszając: 0, 0.1, 0.3 → accel = 0.3 - 0.2 + 0 = 0.1
+    assert abs(_delta_acceleration([0.0, 0.1, 0.3]) - 0.1) < 1e-9
+    assert _delta_acceleration([0.1]) == 0.0  # za mało danych
+
+
+def test_atmabhan_orderbook_silna_presja_kupna():
+    """Snapshot z silną przewagą bidów + wysoka konwikcja → LONG."""
+    from imperium.legiony.zwiadowcy.exp_atmabhan import ZwiadowcaAtmabhan
+    a = ZwiadowcaAtmabhan()
+    # Buduj historię imbalance rosnącego, by accel był dodatni
+    for vol in (12, 15, 20):
+        snap = {
+            "bids": [[100, vol]] * 10,
+            "asks": [[101, 1]] * 10,
+            "timestamp": 0,
+        }
+        r = a.analizuj_orderbook(snap)
+    # Ostatni: ogromna przewaga bidów → LONG z wysoką konwikcją
+    assert r.kierunek == "LONG", f"Silna presja kupna powinna dać LONG, jest {r.kierunek}"
+
+
+def test_atmabhan_orderbook_pusty():
+    from imperium.legiony.zwiadowcy.exp_atmabhan import ZwiadowcaAtmabhan
+    a = ZwiadowcaAtmabhan()
+    r = a.analizuj_orderbook({"bids": [], "asks": [], "timestamp": 0})
+    assert r.kierunek == "NEUTRAL"
+
+
+def test_atmabhan_pominiety_w_legatusie():
+    """Legatus musi pomijać wyciszonego EXP-12 (nie wpychać NEUTRAL)."""
+    from imperium.legiony.legatus import Legatus
+    from imperium.legiony.zwiadowcy import ZwiadowcaAtmabhan, ZwiadowcaHurst
+    leg = Legatus(neurony=[], min_neuronow=1, min_przewaga=0.1,
+                  zwiadowcy=[ZwiadowcaAtmabhan(), ZwiadowcaHurst()])
+    bary = [{"open": 100 + i, "high": 101 + i, "low": 99 + i, "close": 100 + i,
+             "volume": 1000, "timestamp": i} for i in range(60)]
+    raport = leg.fokus("BTCUSDT", {}, rezim="NORMAL", bary=bary)
+    klucze = {s.neuron_id for s in raport.sygnaly}
+    assert "EXP-12" not in klucze  # wyciszony pominięty
+    assert "EXP-03" in klucze       # aktywny obecny

@@ -110,15 +110,19 @@ class Legatus:
         Najpierw ZwiadowcaSMC wstrzykuje strefy (most do SMC), potem reszta liczy sygnały.
         """
         sygnaly = []
+        # Zwiadowcy wyciszeni (DOSTEPNY=False) są pomijani — wymagają danych,
+        # których pipeline jeszcze nie ma (np. feed L2). Prawo XV: świadome
+        # wyciszenie, nie martwy głos.
+        aktywni = [z for z in self.zwiadowcy if getattr(z, "DOSTEPNY", True)]
         # Krok 1: zwiadowcy z metodą wstrzyknij() (np. SMC) najpierw wzbogacają dict
-        for z in self.zwiadowcy:
+        for z in aktywni:
             if hasattr(z, "wstrzyknij"):
                 try:
                     z.wstrzyknij(wskazniki, bary)
                 except Exception as e:
                     logger.error(f"[Legatus] Zwiadowca {z.KLUCZ} wstrzyknij() padł: {e}")
         # Krok 2: każdy zwiadowca liczy własny raport
-        for z in self.zwiadowcy:
+        for z in aktywni:
             try:
                 raport = z.analizuj(bary)
                 sygnaly.append(raport.sygnal)

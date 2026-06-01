@@ -18,6 +18,7 @@ from .exp_ha_scalper import ZwiadowcaHAScalper
 from .exp_hurst import ZwiadowcaHurst
 from .exp_kalman import ZwiadowcaKalmanATR
 from .exp_smc import ZwiadowcaSMC, aktywuj_neurony_smc
+from .exp_katana import ZwiadowcaKatana
 
 __all__ = [
     "ZwiadowcaElitarny", "RaportZwiadowcy", "TypDanych",
@@ -25,4 +26,5 @@ __all__ = [
     "ZwiadowcaHiguchiFD", "ZwiadowcaHAScalper",
     "ZwiadowcaHurst", "ZwiadowcaKalmanATR",
     "ZwiadowcaSMC", "aktywuj_neurony_smc",
+    "ZwiadowcaKatana",
 ]

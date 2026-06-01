@@ -56,15 +56,15 @@ def test_rejestr_wszystkie_neurony():
 
 def test_rejestr_wszyscy_zwiadowcy():
     zw = wszyscy_zwiadowcy()
-    assert len(zw) == 5
+    assert len(zw) == 6
     klucze = {z.KLUCZ for z in zw}
-    assert klucze == {"EXP-01", "EXP-02", "EXP-03", "EXP-04", "EXP-05"}
+    assert klucze == {"EXP-01", "EXP-02", "EXP-03", "EXP-04", "EXP-05", "EXP-06"}
 
 
 def test_raport_potencjalu():
     rap = raport_potencjalu()
     assert rap["neurony_lacznie"] == 27
-    assert rap["zwiadowcy_exp"] == 5
+    assert rap["zwiadowcy_exp"] == 6
     # Część neuronów wyciszona (on-chain/futures/SMC bez mostu/CVD)
     assert rap["neurony_wyciszone"] > 0
     assert 0 < rap["wykorzystanie_pct"] <= 100

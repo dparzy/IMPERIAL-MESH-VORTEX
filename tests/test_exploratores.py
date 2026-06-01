@@ -521,3 +521,88 @@ def test_smc_bez_mostu_neurony_wyciszone():
     roj = Roj([NeuronOrderBlock(), NeuronFVG(), NeuronBOS()])
     sygnaly = roj.zbierz_sygnaly({"CLOSE": 100, "BULL_OB_HIGH": 101, "BULL_OB_LOW": 99})
     assert len(sygnaly) == 0
+
+
+# ─── EXP-06 Katana Scalper Pro ────────────────────────────────────────────────
+
+def test_katana_import():
+    from imperium.legiony.zwiadowcy.exp_katana import ZwiadowcaKatana
+    k = ZwiadowcaKatana()
+    assert k.KLUCZ == "EXP-06"
+    assert k.KATEGORIA == "M"
+
+
+def test_katana_za_malo_barow():
+    from imperium.legiony.zwiadowcy.exp_katana import ZwiadowcaKatana
+    k = ZwiadowcaKatana()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100, "volume": 500}] * 5
+    r = k.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def _katana_bary_trend(n=60, start=100.0, step=0.5):
+    bary = []
+    price = start
+    for i in range(n):
+        price += step
+        bary.append({
+            "open": price - step * 0.4,
+            "high": price + abs(step) * 0.8,
+            "low": price - abs(step) * 0.6,
+            "close": price,
+            "volume": 1000,
+        })
+    return bary
+
+
+def test_katana_sygnalizuje_long_w_trendzie():
+    from imperium.legiony.zwiadowcy.exp_katana import ZwiadowcaKatana
+    k = ZwiadowcaKatana()
+    bary = _katana_bary_trend(n=60, start=100.0, step=0.8)
+    r = k.analizuj(bary)
+    # Silny trend rosnący powinien dać LONG lub NEUTRAL (nie SHORT)
+    assert r.kierunek != "SHORT", f"W trendzie wzrostowym nie powinno być SHORT, jest: {r.kierunek}"
+
+
+def test_katana_oblicz_ha_nie_repaintuje():
+    """HA_Open musi być rekurencyjne, nie (Open[-1]+Close[-1])/2."""
+    from imperium.legiony.zwiadowcy.exp_katana import _oblicz_ha
+    bary = [
+        {"open": 100, "high": 105, "low": 98, "close": 103},
+        {"open": 103, "high": 108, "low": 101, "close": 107},
+        {"open": 107, "high": 110, "low": 105, "close": 109},
+    ]
+    ha = _oblicz_ha(bary)
+    # HA_Open[1] = (HA_Open[0] + HA_Close[0]) / 2 — rekurencja
+    ha_open_1_rekurencyjny = (ha[0]["ha_open"] + ha[0]["ha_close"]) / 2
+    assert abs(ha[1]["ha_open"] - ha_open_1_rekurencyjny) < 1e-9, "HA_Open NIE jest rekurencyjne!"
+    # HA_Open[1] != (Open[0]+Close[0])/2 — weryfikacja że to nie buggy wersja
+    buggy_ha_open_1 = (bary[0]["open"] + bary[0]["close"]) / 2
+    # Mogą być równe tylko przypadkowo — sprawdź HA_Open[2] (głębsza rekurencja)
+    ha_open_2_rekurencyjny = (ha[1]["ha_open"] + ha[1]["ha_close"]) / 2
+    assert abs(ha[2]["ha_open"] - ha_open_2_rekurencyjny) < 1e-9, "Rekurencja pęka na barze 2!"
+
+
+def test_katana_rezim_choppy_blokuje():
+    """W rynku bocznym (niskie ATR) sygnały powinny być wyciszone."""
+    from imperium.legiony.zwiadowcy.exp_katana import ZwiadowcaKatana
+    import random
+    random.seed(99)
+    k = ZwiadowcaKatana()
+    # Rynek boczny: cena oscyluje wokół 100 bez trendu
+    price = 100.0
+    bary = []
+    for _ in range(50):
+        delta = random.uniform(-0.1, 0.1)  # bardzo małe ruchy = choppy
+        price += delta
+        bary.append({
+            "open": price - 0.05,
+            "high": price + 0.05,
+            "low": price - 0.05,
+            "close": price,
+            "volume": 500,
+        })
+    r = k.analizuj(bary)
+    # W CHOPPY sygnał powinien być NEUTRAL lub pewność mała
+    if r.kierunek != "NEUTRAL":
+        assert r.pewnosc < 0.7, f"W choppy pewność zbyt wysoka: {r.pewnosc}"

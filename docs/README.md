@@ -20,6 +20,9 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [LEGIONY_ARCHITEKTURA.md](LEGIONY_ARCHITEKTURA.md) | Cztery Legiony (Equestris/Fulminata/Augusta/Ferrata) — mikro-neurony, schemat sygnału, Pretorianie |
 | [SYMBIOZA_MODULOW.md](SYMBIOZA_MODULOW.md) | Symbioza i korelacja — mapa narzędzi (oryginalne nazwy → Imperium), przepływ danych, zasada Alchemika |
 | [ROADMAP_IMPERIUM.md](ROADMAP_IMPERIUM.md) | Mapa rozwoju — Fazy 0-4, wersjonowanie, zasady Areny, zgodność z regulaminami giełd |
+| [KATALOG_NEURONOW.md](KATALOG_NEURONOW.md) | Katalog 81 mikro-neuronów roju — klucze, wagi, zadania, 4 legiony + neurony anty-manipulacyjne |
+| [MATRYCA_KORELACJI.md](MATRYCA_KORELACJI.md) | Kostka Rubika sygnałów — korelacje, konflikty, reżimy rynku, wagi dynamiczne, wpływ BTC |
+| [REGULAMINY_I_MANIPULACJE.md](REGULAMINY_I_MANIPULACJE.md) | Zgodność z regulaminami giełd + 7 manipulacji do wykrywania (obrona, nie atak) |
 | _(wkrótce)_ | System Numeracji — klucz kodowy i intuicja botów |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

@@ -20,11 +20,11 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [LEGIONY_ARCHITEKTURA.md](LEGIONY_ARCHITEKTURA.md) | Cztery Legiony (Equestris/Fulminata/Augusta/Ferrata) — mikro-neurony, schemat sygnału, Pretorianie |
 | [SYMBIOZA_MODULOW.md](SYMBIOZA_MODULOW.md) | Symbioza i korelacja — mapa narzędzi (oryginalne nazwy → Imperium), przepływ danych, zasada Alchemika |
 | [ROADMAP_IMPERIUM.md](ROADMAP_IMPERIUM.md) | Mapa rozwoju — Fazy 0-4, wersjonowanie, zasady Areny, zgodność z regulaminami giełd |
-| [KATALOG_NEURONOW.md](KATALOG_NEURONOW.md) | Katalog 287 mikro-neuronów roju — 4 legiony + 12 dywizji + 13 nowych (Market Profile, CVD-Div, MVRV-Z, RHODL, COT, Clenow MomScore, Price Action) |
+| [KATALOG_NEURONOW.md](KATALOG_NEURONOW.md) | Katalog **303** mikro-neuronów — 4 legiony + 14 dywizji (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, Howard Marks, TVL, L1/L2 RS, Cross-Sectional Momentum) |
 | [MATRYCA_KORELACJI.md](MATRYCA_KORELACJI.md) | Kostka Rubika sygnałów — korelacje, konflikty, reżimy rynku, wagi dynamiczne, wpływ BTC |
 | [REGULAMINY_I_MANIPULACJE.md](REGULAMINY_I_MANIPULACJE.md) | Zgodność z regulaminami giełd + 7 manipulacji do wykrywania (obrona, nie atak) |
 | [GENERAL_LEGATUS.md](GENERAL_LEGATUS.md) | Generał Legatus — koordynator Legionów i Senatu, Tryb SKANER vs FOKUS, agregacja sygnałów |
 | [KALKULATOR_LEWARA.md](KALKULATOR_LEWARA.md) | Matematyka przeżycia — likwidacja, stop-loss, dynamiczna dźwignia, zarządzanie kapitałem |
-| [KATALOG_STRATEGII.md](KATALOG_STRATEGII.md) | Katalog ~57 strategii — Księga Azjatycka (STR-001→170), traderzy świata (AOA/BNF/Wyckoff/Soros), reguły ryzyka, auto-dopasowanie |
+| [KATALOG_STRATEGII.md](KATALOG_STRATEGII.md) | Katalog **~97+** strategii — Księga Azjatycka, Mistrzowie Świata, VSA/GEX/DeFi/Makro/Opcje/Sektory |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

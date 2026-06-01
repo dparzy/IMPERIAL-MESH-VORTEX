@@ -1092,7 +1092,183 @@ Momentum_Score = Slope_90D × R² × Annualization_Factor
 
 ---
 
-## 📊 AKTUALIZACJA PODSUMOWANIA KATALOGU (v2.2)
+## 📊 SKAN IV — VSA, Intermarket, Opcje, DeFi (2026-06-01)
+
+### XII-RV-003 | "WYCZERPANIE WILKA" | VSA Stopping Volume Reversal
+**Źródło:** Tom Williams — Volume Spread Analysis
+**Interwał:** 15M–4H | **Warunki:** koniec trendu, kulminacyjny vol
+
+**Reguły:**
+- Szukaj świecy z WOLUMENEM > 3× średniej 20-dniowej + SZEROKIM spreadem (wlicza Upthrust/SpreadUp)
+- Następna świeca zamyka poniżej środka kulminacyjnej (potwierdzenie odwrotu)
+- `VSA-04` StoppingVol = sygnał
+
+**Neurony WEJŚCIE:** `VSA-04` StoppingVol  
+**Neurony FILTR:** `VSA-01` NoSupply (lub `VSA-02` NoDemand w zależności od kierunku), `X-06` ATR-Stop  
+**Neurony WYJŚCIE:** `X-02` StochRSI powrót do neutralnego  
+**Dźwignia:** 3×–8× | **R:R:** 1:3 | **Status:** SZKIC
+
+---
+
+### XII-RV-004 | "FAŁSZYWY SZTURM" | VSA Upthrust Rejection
+**Źródło:** Tom Williams — VSA Upthrust (False Breakout)
+**Interwał:** 1H–4H | **Warunki:** obszary oporu, dystrybucja
+
+**Reguły:**
+- Cena wybija ponad kluczowy opór na wysokim vol → zamyka w dolnej 1/3 świecy
+- `VSA-03` Upthrust = SHORT sygnał
+- Potwierdź: Spread < 3% od strefy
+
+**Neurony WEJŚCIE:** `VSA-03` Upthrust, `VP-02` ValueArea (VAH odrzucenie)  
+**Neurony FILTR:** `VSA-02` NoDemand (brak popytu przed wybiciem)  
+**Neurony WYJŚCIE:** `VP-01` VPOC (magnes cenowy)  
+**Dźwignia:** 5×–10× | **R:R:** 1:2 | **Status:** SZKIC
+
+---
+
+### X-SC-004 | "PUSTA KSIĘGA" | Volume Profile VPOC Scalp
+**Źródło:** Market Profile / Volume Profile (Peter Steidlmayer)
+**Interwał:** M5–M15 | **Warunki:** konsolidacja wokół VPOC
+
+**Reguły:**
+- Cena wraca do strefy VPOC dziennego (±0.3%)
+- `VP-01` VPOC jako magnes = wejście contra-trendem przy odchyleniu
+- Wyjście przy powrocie do VPOC lub VAH/VAL
+
+**Neurony WEJŚCIE:** `VP-01` VPOC, `X-04` VWAP (konwergencja)  
+**Neurony FILTR:** `VPIN-01` VPIN < 0.5 (brak toksycznego flow)  
+**Neurony WYJŚCIE:** `VP-02` ValueArea granice  
+**Dźwignia:** 2×–5× | **R:R:** 1:2 | **Status:** SZKIC
+
+---
+
+### VI-LV-003 | "DETEKTOR TOKSYN" | VPIN Flash Risk Management
+**Źródło:** Easley/López de Prado — Volume-Synchronized PIN
+**Interwał:** M1–M5 | **Warunki:** wysokie VPIN = exit sygnał
+
+**Reguły:**
+- VPIN > 0.75 → natychmiastowe zmniejszenie pozycji lub exit (ryzyko flash-crash)
+- VPIN < 0.30 → bezpieczne środowisko, powiększ pozycje
+- SPREAD-01 BidAsk > +2σ → dodatkowe potwierdzenie wyjścia
+
+**Neurony WEJŚCIE:** `VPIN-01` VPIN + `SPREAD-01` BidAsk (razem dają sygnał RYZYKO)  
+**Funkcja:** Pretoriańska tarcza, nie samodzielna strategia  
+**Dźwignia:** redukuje na żądanie | **Status:** PRETORIANIN (zawsze aktywny)
+
+---
+
+### VI-LV-004 | "ZAPORA GAMMA" | GEX Dealer Flip Strategy
+**Źródło:** SpotGamma / Mott Capital — Gamma Exposure
+**Interwał:** 1H–1D | **Warunki:** rynki z płynnymi opcjami (BTC/ETH)
+
+**Reguły:**
+- GEX ujemny (dealerzy short gamma) → amplifikacja ruchów → tendencja trend
+- GEX > 0 (dealerzy long gamma) → tłumienie vol → strategia mean-reversion
+- GEX Flip Level = kluczowy pivot
+- SKEW-01 > +2σ → drogie puty → kontrariański LONG
+
+**Neurony WEJŚCIE:** `GEX-01` GammaFlip  
+**Neurony FILTR:** `SKEW-01` VolSkew, `PCR-01` PutCall (kontrariańskie ekstrema)  
+**Neurony WYJŚCIE:** powrót GEX do strefy neutralnej  
+**Dźwignia:** 5×–20× | **R:R:** 1:2.5 | **Status:** SZKIC (wymaga danych opcji)
+
+---
+
+### IMV-MC-003 | "CYKL MARKSA" | Howard Marks Dumb Money Cycle
+**Źródło:** Howard Marks — "Mastering the Market Cycle" (2018)
+**Interwał:** 1W–1M | **Warunki:** ekstrema cyklu rynkowego
+
+**Reguły:**
+- `HM-01` MarksCykl Score > +2σ → euforia, zbliżamy się do szczytu → redukuj ekspozycję, HEDGE
+- `HM-01` Score < -2σ → panika / kapitulacja → AKUMULUJ (silne LONG)
+- Potwierdzenie: `SENT-FG` FearGreed skrajny + `PCR-01` PutCall skrajny
+
+**Neurony WEJŚCIE:** `HM-01` MarksCykl (ekstrema cyklu)  
+**Neurony FILTR:** `SENT-FG` FearGreed + `PCR-01` PutCall  
+**Legio:** III Augusta (Invest) / makro  
+**Dźwignia:** 0× (akumulacja) lub hedge | **R:R:** 1:4+ (swing tygodniowy) | **Status:** SZKIC
+
+---
+
+### IMV-MC-004 | "SŁABY DOLAR" | DXY Macro Correlation Signal
+**Źródło:** Intermarket Analysis (John Murphy)
+**Interwał:** 1D–1W | **Warunki:** reżim korelacji BTC/DXY
+
+**Reguły:**
+- `DXY-01` DXYCorr: r < -0.6 + DXY spada 2%+/tydzień → LONG BTC (tradycyjny reżim)
+- r > +0.4 + DXY rośnie + BTC rośnie = instytucjonalny napływ → też LONG
+- r przeskakuje 0 w 20d oknie = zmiana reżimu → REDUCE SIZE, ostrożność
+
+**Neurony WEJŚCIE:** `DXY-01` DXYCorr  
+**Neurony FILTR:** `III-MACRO` (Wieloryby/Reżim) + `HM-01` MarksCykl  
+**Dźwignia:** 2×–5× (macro overlay) | **R:R:** 1:3 | **Status:** SZKIC
+
+---
+
+### III-TR-003 | "ZIELONE RZEKI" | TVL Velocity DeFi Protocol Long
+**Źródło:** DefiLlama — TVL Velocity + Protocol Revenue
+**Interwał:** 1D–1W | **Warunki:** DeFi sezon, rosnący TVL
+
+**Reguły:**
+- `TVL-01` TVLVelocity > +10%/tydzień przez 2+ tygodnie → LONG token protokołu
+- Revenue Week-over-Week > +30% przez 2+ tygodnie → dodatkowe potwierdzenie
+- TVLVelocity flips ujemny → EXIT/NEUTRAL
+
+**Neurony WEJŚCIE:** `TVL-01` TVLVelocity  
+**Neurony FILTR:** `SENT-SOC` SocialVolume (hype nie wyprzedza TVL), `III-01` MVRV  
+**Neurony WYJŚCIE:** TVLVelocity < 0 lub MVRV > 3.5  
+**Dźwignia:** 1×–3× (spot/low lev) | **R:R:** 1:3 | **Status:** SZKIC
+
+---
+
+### IMV-AR-005 | "ROTACJA LEGIONÓW" | L1/L2 Relative Strength Rotation
+**Źródło:** Sector rotation theory (Sharpe Terminal / CoinGecko 2026)
+**Interwał:** 4H–1D | **Warunki:** rynek byka, narracja aktywna
+
+**Reguły:**
+- `RS-01` L1L2RS = SMA20(L1 index) / SMA20(L2 index) > poprzednie 20d max → LONG L1, SHORT L2
+- RS ratio odwrócone → LONG L2, SHORT L1
+- RS > +2σ od 50d MA → fade (reversion to mean)
+
+**Neurony WEJŚCIE:** `RS-01` L1L2RS  
+**Neurony FILTR:** `CORR-01` Correlation (sprawdź korelację pary), `SENT-SOC` SocialVolume (narracja)  
+**Dźwignia:** 2×–5× (na obu nogach) | **R:R:** 1:2 | **Status:** SZKIC
+
+---
+
+### XII-TR-006 | "IMPET KRZYŻOWY" | Cross-Sectional Momentum 6m
+**Źródło:** Jegadeesh-Titman (1993) — dostosowany do krypto (6m zamiast 12m)
+**Interwał:** 1D–1W (rebalancing miesięczny) | **Warunki:** rynek byka
+
+**Reguły:**
+- Rankuj kryptowaluty po zwrotach 6-miesięcznych (wykluczając ostatni miesiąc)
+- TOP 30% = LONG koszyk; BOTTOM 30% = SHORT koszyk (lub neutral)
+- Rebalansuj co miesiąc
+- `XCS-01` CrossMom Score crash (>-15% miesięcznie) → EXIT wszystkich pozycji momentum
+
+**Neurony WEJŚCIE:** `XCS-01` CrossMom (ranking)  
+**Neurony FILTR:** `HM-01` MarksCykl (tylko w bull/early bear), `SENT-FG` FearGreed > 30  
+**Dźwignia:** 1×–3× | **R:R:** 1:2.5 | **Status:** SZKIC
+
+---
+
+### X-RV-003 | "CICHY RYNEK" | Bid-Ask Spread Collapse Entry
+**Źródło:** Market Microstructure — płynność jako wejście
+**Interwał:** M1–M5 | **Warunki:** wysoka płynność (spot Binance/MEXC)
+
+**Reguły:**
+- `SPREAD-01` BidAsk < -2σ (spread bardzo wąski) = idealne warunki do scalpu
+- Połącz z kierunkiem z `X-03` CVD + `X-04` VWAP
+- Wyjście gdy SPREAD-01 rośnie do neutralnego (płynność spada)
+
+**Neurony WEJŚCIE:** `SPREAD-01` BidAsk (collapse = wejście ok), kierunek z `X-03` CVD  
+**Neurony FILTR:** `VPIN-01` VPIN < 0.5 (brak toxic flow)  
+**Neurony WYJŚCIE:** SPREAD-01 wzrósł > 0 (płynność pogarsza się)  
+**Dźwignia:** 5×–20× | **R:R:** 1:1.5 (scalp, częste) | **Status:** SZKIC
+
+---
+
+## 📊 AKTUALIZACJA PODSUMOWANIA KATALOGU (v2.3)
 
 | Grupa | Strategii | Status |
 |-------|-----------|--------|
@@ -1101,10 +1277,12 @@ Momentum_Score = Slope_90D × R² × Annualization_Factor
 | Księga Azjatycka (A-K) | ~35 | SZKIC/FAZA 3 |
 | Mistrzowie Świata (L-R) | 9 | SZKIC |
 | Klasyka/Arbitraż/ICT/Boty/Fale (T-Z) | 15 | SZKIC/FAZA 3 |
+| VSA/VP/VPIN/GEX/Opcje/Makro/DeFi (Skan IV) | 11 | SZKIC |
 | Reguły Ryzyka (Pretorianie) | 5+ | DO WDROŻENIA |
-| **RAZEM zmapowanych** | **~85+** | rośnie |
+| **RAZEM zmapowanych** | **~97+** | rośnie |
 
-**Nowe neurony z tego skanu (Skan III):** 13 → patrz KATALOG_NEURONOW.md
+**Nowe neurony Skan IV (+16):** VSA-01..04, VP-01..02, VPIN-01, SPREAD-01, GEX-01, SKEW-01, PCR-01, DXY-01, HM-01, TVL-01, RS-01, XCS-01  
+**Nowe dywizje:** 📉 Opcji (GEX/Skew/PCR) + 🌱 DeFi (TVL) → patrz KATALOG_NEURONOW.md
 
 ---
 

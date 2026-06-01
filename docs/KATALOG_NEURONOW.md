@@ -674,31 +674,86 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 
 ---
 
+## 🔭 SKAN IV — VSA, Intermarket, Opcje, DeFi, Sektory (2026-06-01)
+
+> Nowe neurony z prac badawczych: VSA, Volume Profile, VPIN, GEX, Skew, Pairs/Momentum cross-sectional, DeFi TVL, Howard Marks cykl, DXY, L1/L2 RS, Bid-Ask Spread. Łącznie +16 neuronów.
+
+### 📈 Rozszerzenie Dywizji Struktury (VSA)
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| VSA-01 | Neuron NoSupply | VSA No Supply (wąski spread + niski vol + zamknięcie w górnej połowie na spadku) | Sprzedający wyczerpani → sygnał LONG | W8 |
+| VSA-02 | Neuron NoDemand | VSA No Demand (rosnąca cena + spadający vol) | Słaby ruch wzrostowy → sygnał SHORT | W7 |
+| VSA-03 | Neuron Upthrust | VSA Upthrust (wybicie nad opór + zamknięcie w dolnej 1/3 + wysoki vol) | Fałszywy breakout, pułapka na kupujących → SHORT | W8 |
+| VSA-04 | Neuron StoppingVol | VSA Stopping Volume (kulminacyjny vol + świeca odwrotu) | Kapitulacja, wyczerpanie trendu → kontrariańskie wejście | W9 |
+| VP-01 | Neuron VPOC | Volume Point of Control (cena z największym vol w sesji) | VPOC jako magnes / pivot → filtr wejść | W7 |
+| VP-02 | Neuron ValueArea | Value Area High/Low (70% vol) | VAH = opór dynamiczny, VAL = wsparcie dynamiczne | W7 |
+
+### 🔬 Rozszerzenie Dywizji Order Book (mikrostruktura)
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| VPIN-01 | Neuron VPIN | Volume-Synchronized Probability of Informed Trading | VPIN > 0.75 = ryzyko flash-crash / gwałtownego ruchu | W9 |
+| SPREAD-01 | Neuron BidAskSpread | Bid-Ask Spread jako % ceny mid, znormalizowany | Spread > +2σ = unikaj scalpu; spread < -2σ = dobra płynność | W6 |
+
+### 📉 Rozszerzenie Dywizji Opcji (nowa gałąź)
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| GEX-01 | Neuron GammaFlip | GEX Gamma Exposure — poziom zmiany znaku dealerów (Positive → Negative) | Poniżej GEX flip = tryb amplifikacji, powyżej = tłumienie vol | W9 |
+| SKEW-01 | Neuron VolSkew | 25-Delta Risk Reversal (IV Put 25Δ / IV Call 25Δ, znorm. z-score 30d) | Skew > +2σ = drogie puty → sprzedaj strach; < -2σ = drogie calle → sprzedaj euforie | W8 |
+| PCR-01 | Neuron PutCall | Put/Call Ratio (vol + OI), znorm. z-score 20d | PCR < 0.5 = komplacencja → SHORT sygnał kontrariański; PCR > 1.5 = panika → LONG | W7 |
+
+### 🌐 Rozszerzenie Dywizji Wieszczów (makro/intermarket)
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| DXY-01 | Neuron DXYCorr | Korelacja krocząca 30d BTC vs DXY (Pearson r) | r < -0.6 + DXY rośnie = presja na BTC; r flip = zmiana reżimu | W7 |
+| HM-01 | Neuron MarksCykl | Howard Marks Dumb Money Score (kompozyt: PCR + retail flows + media sentym.) | Score > +2σ = szczyt euforii → SHORT; < -2σ = dno paniki → LONG | W8 |
+
+### 🌱 Rozszerzenie Dywizji DeFi (On-chain, nowa gałąź)
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| TVL-01 | Neuron TVLVelocity | TVL Velocity = (TVL_t - TVL_t-30) / TVL_t-30 | > +10%/tydzień = napływ kapitału → LONG token; flips ujemny = NEUTRAL/SHORT | W7 |
+
+### 🔄 Rozszerzenie Dywizji Arbitrażu (sektor/narracja)
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| RS-01 | Neuron L1L2RS | Relative Strength: L1 vs L2 (ratio SMA20) | L1 > L2 trend = rotacja do L1; L2 > L1 = rotacja L2 | W6 |
+| XCS-01 | Neuron CrossMom | Cross-sectional Momentum 12-1m (ranking 6m returns krypto) | TOP 30% koszyków = LONG; BOTTOM 30% = SHORT; crash = exit | W7 |
+
+---
+
 ## 📊 TABELA PODSUMOWUJĄCA (zaktualizowana)
 
 | Grupa / Dywizja | Liczba |
 |-----------------|--------|
-| Legio X Equestris (Scalp) | 24 + 2 = **26** |
-| Legio XII Fulminata (Swing) | 32 + 1 = **33** |
-| Legio III Augusta (Invest/On-Chain) | 38 + 3 = **41** |
+| Legio X Equestris (Scalp) | **26** |
+| Legio XII Fulminata (Swing) | **33** |
+| Legio III Augusta (Invest/On-Chain) | **41** |
 | Legio VI Ferrata (Leverage) | 19 |
 | Wspólne (multi-legion) | 16 |
 | 🤖 Dywizja AI/ML | 23 |
 | 🛡️ Dywizja Straży (anty-manipulacja) | 30 |
 | 📊 Dywizja Breadth (szerokość) | 7 |
-| 📖 Dywizja Order Book | 8 + 3 + 1 = **12** |
-| 🔀 Dywizja Arbitrażu (Faza 3) | 8 + 2 = **10** |
-| 🔄 Dywizja Wieszczów (reżim/makro) | 17 + 1 = **18** |
-| 😱 Dywizja Wyroczni (sentyment) | 9 + 2 = **11** |
+| 📖 Dywizja Order Book | 12 + 2 = **14** |
+| 🔀 Dywizja Arbitrażu (Faza 3) | 10 + 2 = **12** |
+| 🔄 Dywizja Wieszczów (reżim/makro) | 18 + 2 = **20** |
+| 😱 Dywizja Wyroczni (sentyment) | **11** |
 | 🐋 Dywizja Wielorybów (on-chain) | 5 |
 | 🌀 Dywizja Entropii (matematyka) | 7 |
-| 🧱 Dywizja Struktury (SMC/ICT/Price Action) | 8 + 3 + 5 = **16** |
-| ⏰ Dywizja Czasu/Sesji (NOWA) | 1 |
+| 🧱 Dywizja Struktury (SMC/ICT/VSA) | 16 + 6 = **22** |
+| ⏰ Dywizja Czasu/Sesji | 1 |
 | 💎 Dywizja Perł (wyspecjalizowane) | 10 |
-| **RAZEM** | **287** |
+| 📉 Dywizja Opcji (NOWA) | **3** |
+| 🌱 Dywizja DeFi (NOWA) | **1** |
+| **RAZEM** | **303** |
 
-> **287 neuronów** (+13 Skan III: Brandt, ICT, Elliott/Wolfe, sentyment, pairs trading, basis).
+> **303 neurony** (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, HowardMarks, TVL, L1/L2 RS, Cross-Sectional Momentum).
+> Dwie nowe dywizje: 📉 Opcji + 🌱 DeFi.
 
 ---
 
-*VITRUVIUSZ — "Dwieście osiemdziesiąt siedem par oczu jednego organizmu. Imperium nie ma ślepego pola."*
+*VITRUVIUSZ — "Trzysta trzy pary oczu jednego organizmu. Imperium nie ma ślepego pola."*

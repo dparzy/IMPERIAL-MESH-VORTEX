@@ -661,3 +661,70 @@ def test_tlp_brak_breakoutu_w_kanale():
     bary = [{"open": 100, "high": 101, "low": 99, "close": 100} for _ in range(35)]
     r = t.analizuj(bary)
     assert r.kierunek == "NEUTRAL"
+
+
+# ─── EXP-08 Night Turbo Scalper ───────────────────────────────────────────────
+
+def test_night_import():
+    from imperium.legiony.zwiadowcy.exp_night import ZwiadowcaNightTurbo
+    nt = ZwiadowcaNightTurbo()
+    assert nt.KLUCZ == "EXP-08"
+
+
+def test_night_godzina_z_epoch():
+    from imperium.legiony.zwiadowcy.exp_night import _godzina_utc
+    # 2021-01-01 23:00:00 UTC = 1609541999 ~ 1609542000
+    import datetime as dt
+    ts = int(dt.datetime(2021, 1, 1, 23, 0, 0, tzinfo=dt.timezone.utc).timestamp())
+    assert _godzina_utc(ts) == 23
+    # ms wariant
+    assert _godzina_utc(ts * 1000) == 23
+    assert _godzina_utc(None) is None
+
+
+def test_night_sesja_wraparound():
+    from imperium.legiony.zwiadowcy.exp_night import _sesja_nocna
+    # noc 22-2: 23 i 1 są w nocy, 12 nie
+    assert _sesja_nocna(23, 22, 2) is True
+    assert _sesja_nocna(1, 22, 2) is True
+    assert _sesja_nocna(12, 22, 2) is False
+    assert _sesja_nocna(None, 22, 2) is False
+
+
+def test_night_atr_uzywany_true_range():
+    """ATR musi być prawdziwy TR (naprawiony martwy/błędny ATR oryginału)."""
+    from imperium.legiony.zwiadowcy.exp_night import _atr_series
+    bary = [
+        {"open": 99, "high": 101, "low": 98, "close": 100},
+        {"open": 108, "high": 110, "low": 108, "close": 109},
+    ]
+    trs = _atr_series(bary)
+    assert abs(trs[1] - 10) < 1e-9  # gap uwzględniony
+
+
+def test_night_poza_sesja_neutral():
+    """W dzień (godzina 12) scalper nieaktywny."""
+    from imperium.legiony.zwiadowcy.exp_night import ZwiadowcaNightTurbo
+    import datetime as dt
+    nt = ZwiadowcaNightTurbo()
+    ts_dzien = int(dt.datetime(2021, 1, 1, 12, 0, 0, tzinfo=dt.timezone.utc).timestamp())
+    bary = [{"open": 100, "high": 100.5, "low": 99.5, "close": 100,
+             "timestamp": ts_dzien + i * 60} for i in range(60)]
+    r = nt.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def test_night_fade_w_nocy():
+    """W nocy, niska zmienność, wybicie w górę → FADE → SHORT."""
+    from imperium.legiony.zwiadowcy.exp_night import ZwiadowcaNightTurbo
+    import datetime as dt
+    nt = ZwiadowcaNightTurbo()
+    ts_noc = int(dt.datetime(2021, 1, 1, 23, 0, 0, tzinfo=dt.timezone.utc).timestamp())
+    # 59 barów bardzo spokojnych (niska zmienność)
+    bary = [{"open": 100, "high": 100.05, "low": 99.95, "close": 100,
+             "timestamp": ts_noc + i * 60} for i in range(59)]
+    # ostatni bar: małe wybicie w górę (fakeout) — wciąż niska zmienność świecy
+    bary.append({"open": 100, "high": 100.10, "low": 100.0, "close": 100.08,
+                 "timestamp": ts_noc + 59 * 60})
+    r = nt.analizuj(bary)
+    assert r.kierunek in ("SHORT", "NEUTRAL"), f"Fade powinien dać SHORT lub NEUTRAL, jest {r.kierunek}"

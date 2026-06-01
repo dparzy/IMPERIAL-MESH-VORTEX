@@ -9,6 +9,7 @@
 > Przykład: `X-02 | M | W7` = Legio X, neuron 2, Momentum, waga ważności 7
 >
 > **Kategorie:** M=Momentum, T=Trend, V=Zmienność, F=Flow/Wolumen, O=On-chain, L=Leverage, S=Struktura(SMC), A=Anty-manipulacja
+> **Nowe:** K=Makro/Intermarket, E=Entropia/AI, R=Reżim/Sentyment, G=Geo/Regionalne
 
 ---
 
@@ -16,14 +17,15 @@
 
 | Legion | Nazwa | Styl | Neurony | Cel docelowy |
 |--------|-------|------|---------|--------------|
-| X | Equestris (Konny) | Scalp M1-M15 | 18 | 20+ |
-| XII | Fulminata (Błyskawica) | Swing 4H-1D | 22 | 25+ |
-| III | Augusta (Augustowski) | Invest 1D-1W | 20 | 20+ |
-| VI | Ferrata (Żelazny) | Leverage | 14 | 15+ |
-| ⚖️ | Neurony Wspólne (Anty-manipulacja) | wszystkie | 7 | 10+ |
-| **RAZEM** | | | **81** | **90+** |
+| X | Equestris (Konny) | Scalp M1-M15 | 24 | 30+ |
+| XII | Fulminata (Błyskawica) | Swing 4H-1D | 32 | 35+ |
+| III | Augusta (Augustowski) | Invest 1D-1W | 38 | 40+ |
+| VI | Ferrata (Żelazny) | Leverage | 19 | 20+ |
+| ⚖️ | Neurony Wspólne (Anty-manip + Makro) | wszystkie | 16 | 20+ |
+| **RAZEM** | | | **129** | **145+** |
 
-> **81 neuronów już skatalogowanych** — przebijamy DNSS (79). Lista żywa, rośnie.
+> **129 neuronów skatalogowanych** — 1.6× więcej niż DNSS (79). Lista żywa, rośnie.
+> Ostatnia aktualizacja: 2026-06-01 (v1.2 + v1.3 + v1.6 bazy wskaźników zintegrowane)
 
 ---
 
@@ -209,4 +211,133 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 
 ---
 
-*VITRUVIUSZ — "Osiemdziesiąt jeden par oczu jednego organizmu. Żadne ślepe pole."*
+---
+
+## ⚡ LEGIO X EQUESTRIS — Rozszerzenie (Scalp, v1.2+)
+
+*Nowe neurony z bazy v1.2 i v1.3 — zaawansowany order flow i AI scalp*
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| X-19 | BubbleFlow | Bubble Flow Tron System | Wykrywa absorpcję wolumenu + silne pchnięcie kierunkowe na M15 | W7 |
+| X-20 | AIOrderFlow | AI Probabilistic OrderFlow Scalper | 3-czynnikowy scoring: OI imbalance + struktura + RSI bias | W7 |
+| X-21 | FlowMatrix | Flow Matrix Pro (CartelConsole) | Instytucjonalne nierównowagi order flow na danych tickowych | W8 |
+| X-22 | BigTrades | BigTrades Quant Analyzer | Detekcja absorpcji ważonej wolumenem + aktywność inst. | W7 |
+| X-23 | AetherVol | AetherEdge Volume Surge Detector | Klasyfikuje skoki wolumenu REALNY/SZUM + BUY/SELL | W6 |
+| X-24 | WicklessC | xGhozt Wickless Candles | Świece bez knotów → wyczerpanie i słabe ruchy cenowe | W5 |
+
+---
+
+## ⚖️ LEGIO XII FULMINATA — Rozszerzenie (Swing, v1.2+)
+
+*Nowe neurony: SMC instytucjonalne, ICT, wielointerwałowe hybrydowe*
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| XII-23 | SMC-Full | SMC Institutional Order Flow | BOS/CHoCH + OB + FVG + Liq Sweeps + Premium/Discount zones | W8 |
+| XII-24 | RaidReverse | Raid & Reverse Liquidity Engine | Sweepy płynności + potwierdzenie Market Structure Shift | W8 |
+| XII-25 | ICT-Turtle | ICT Turtle Soup | Fałszywe wybicia poprzednich szczytów/dołków | W7 |
+| XII-26 | SMT-Div | P1asebo SMT+ Divergence | Dywergencja BTC vs IBIT/MSTR/NQ → strefy odwrócenia | W7 |
+| XII-27 | Trinity | Trinity Codes Harmonic Flow | EMA 111/333/666/798 + MFI z progami pump/dump + box 444 | W7 |
+| XII-28 | ContIdx | Continuation Index (Ehlers) | Filtry Laguerre — wczesna identyfikacja trendu, zakres -1..+1 | W7 |
+| XII-29 | ZenithSMC | Zenith Market Structure (ICT) | Wielomodelowy BOS/CHoCH/OB/FVG wizualizacja | W6 |
+| XII-30 | MTFBias | MTF Market Structure Bias | Multi-timeframe alignment — filtr handlu przeciw trendowi | W7 |
+| XII-31 | VolProfExt | Volume Profile HVN/LVN Extension | HVN/LVN rzutowane w przyszłość jako S/R | W6 |
+| XII-32 | AuroraComp | Aurora Compass (NVI-weighted VP) | Profile wolumenu ważone NVI — ślady instytucjonalne | W6 |
+
+---
+
+## 🏰 LEGIO III AUGUSTA — Rozszerzenie (Invest, v1.2+)
+
+*Nowe neurony: on-chain zaawansowane, makro, sezonowość, AI/on-chain kompozyty*
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| III-21 | GUSI | GUSI Pro (Adaptive Cycle Risk) | Kompozyt on-chain 0-100: >97 szczyt, <2.5 akumulacja | W9 |
+| III-22 | M2Corr | Global M2 Liquidity (offset 105d) | Makropłynność vs BTC z przesunięciem 105 dni | W8 |
+| III-23 | Wyckoff | ADCI Wyckoff Cycle Index | Faza cyklu: 0-3=akumulacja, 30-70=trend, 70-100=dystrybucja | W8 |
+| III-24 | Season | BTC Monthly Returns Heatmap | Historyczna sezonowość miesięczna → warunki rynkowe | W7 |
+| III-25 | PiOscil | AV BTC Pi Cycle Oscillator | Oscylator Pi Cycle + ATH/halving markers | W8 |
+| III-26 | WhaleWatch | Unusual Whales Crypto Premium | Whale activity + derivatives sentiment tracking | W7 |
+| III-27 | OTCDesk | Bitcoin Total OTC Desk Balance | Odpływy OTC → często poprzedzają ralle | W7 |
+| III-28 | DXYInv | DXY Inverse Correlation | USD spada → krypto rośnie (risk-on/off) | W7 |
+| III-29 | ISM-DOM | BTC Dominance vs ISM PMI | Słabość ekonomiczna → BTC dominacja rośnie | W6 |
+| III-30 | MVRV-Z | MVRV Z-Score (DEMA smoothed) | Znormalizowany MVRV jako sygnał trendowy | W8 |
+| III-31 | NUPL-Z | SD Median NUPL-Z | NUPL w postaci trend-following, potwierdzenie on-chain | W8 |
+| III-32 | NVT-Sig | NVT Signal (Glassnode) | Kapitalizacja vs wolumen transferów → over/undervaluation | W7 |
+| III-33 | SmartFlow | Smart Money Flow (Exchange + TVL) | Kompozyt: exchange flows + TVL → smart money tracking | W7 |
+| III-34 | FG-Quant | Advanced Fear & Greed (Quant v6) | Smart money vs retail dystrybucja, skala 0-100 | W6 |
+| III-35 | Breadth40 | Crypto Market Breadth Engine (40 coins) | Ile z top 40 krypto w trendzie wzrostowym | W7 |
+| III-36 | BreadthRisk | Crypto Breadth Risk Planner | Czy koszyk szeroko uczestniczy vs wewnętrznie słabnie | W7 |
+| III-37 | FlowTrin | FlowTrinity Capital Rotation | Rotacja BTC/Stable/Alt — dominance oscillators + histogram | W8 |
+| III-38 | OTCReversal | OTC Desk Flow Reversal Strategy | OTC odpływy + niski MVRV → smart money absorbuje | W7 |
+
+---
+
+## 🔥 LEGIO VI FERRATA — Rozszerzenie (Leverage, v1.3+)
+
+*Nowe neurony: instytucjonalne strategie opcyjne, delta-neutral, GEX*
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| VI-15 | DeltaNeutral | Delta-Neutral Funding Arbitrage | Long spot + short perpetual → zysk z funding (8-20% APY) | W6 |
+| VI-16 | GEX-Dealer | Gamma Exposure Dealer Hedging | GEX+ → dealerzy tłumią zmienność; GEX- → accelerują | W8 |
+| VI-17 | OI-Fund-Comp | OI + Funding Composite (v2) | Ryzyko squeeze z dynamicznym progiem | W8 |
+| VI-18 | BigTrades-F | BigTrades na Futures | Duże transakcje futures → aktywność inst. na dźwigni | W7 |
+| VI-19 | FlowMatLev | Flow Matrix Pro (Futures) | Nierównowagi order flow specyficznie dla futures | W7 |
+
+---
+
+## ⚖️ NEURONY WSPÓLNE — Rozszerzenie (Makro + AI + Geo)
+
+> Nowe kategorie: K=Makro/Intermarket, E=Entropia/AI, R=Reżim/Sentyment, G=Geo/Regionalne
+
+| Klucz | Kat | Neuron | Zadanie | Waga |
+|-------|-----|--------|---------|------|
+| A-08 | K | CECP Entropy | Complexity-Entropy plane — reżim chaotyczny vs efektywny | W6 |
+| A-09 | K | Intermarket DICT | Korelacje w czasie rzeczywistym: akcje/obligacje/commodities/krypto | W7 |
+| A-10 | A | Inst. Order Flow Det. | Wykrywa dystrybucję vs absorpcję instytucjonalną | W7 |
+| A-11 | E | AetherEdge KNN | KNN na 6-dim fingerprint rynku → prawdopodobieństwo kierunkowe | W7 |
+| A-12 | E | Kronos K-Line LLM | Open-source model bazowy K-line (AAAI 2026) — predykcja szeregów | W6 |
+| A-13 | R | CFGI Sentiment | Indeks sentymentu co 15min (wolumen+zmienność+dominacja+wieloryby) | W6 |
+| A-14 | R | MTPI OTHERS.D | Siła trendu całego segmentu alt (spoza top 10) — 8 sygnałów | W6 |
+| A-15 | G | Kimchi Premium | Premia koreańska BTC/ETH → rotacja kapitału azjatyckiego | W5 |
+| A-16 | G | BTC Regional Premiums | Premia giełdowa: Korea/Japonia/Chiny/USD → geograficzny sentyment | W5 |
+
+---
+
+## 🤖 NEURONY AI/ML — Nowa dywizja (Faza 2+)
+
+> Te neurony wymagają modeli ML — wdrożenie w Fazie 2, teraz skatalogowane.
+> Źródło: baza wskaźników v1.6, badania arXiv/Springer 2025-2026.
+
+| Klucz | Neuron | Model/Metoda | Zadanie | Waga |
+|-------|--------|--------------|---------|------|
+| ML-01 | CNN-LSTM | Hybrid CNN-LSTM (Springer 2026) | Prognoza kierunku ceny, ~45% ROI na M1, wdrożony przez CCXT | W7 |
+| ML-02 | TFT | Temporal Fusion Transformer | Multi-asset (BTC+ETH+BNB+DeFi) z on-chain + RSI/MACD/SOPR | W7 |
+| ML-03 | NNParam | Neural Net Parametric Labeling | 400+ kryptowalut, 6 lat historii BTC/ETH, generalizacja wzorców | W6 |
+| ML-04 | AetherTri | AetherEdge Triaxial Consensus | Trend+Momentum+Volatility + Q-learning self-tuning na 4H/1D | W7 |
+| ML-05 | SpecialK | Special K Enhanced (Pring) | Composite multi-cycle oscylator z kompresją k=0.5 dla krypto | W6 |
+| ML-06 | FEVA | Fractal Entropy Volatility | Multifraktal + teoria informacji → ukryte wzorce zmienności | W5 |
+| ML-07 | NonCausal | Crypto Non-Causality Suite | "Future-smoothed" struktury rynku → nieuniknione atraktory | W5 |
+
+---
+
+## 📊 AKTUALIZACJA PODSUMOWANIA (po rozszerzeniu)
+
+| Legion | v1.0 | Po rozszerzeniu | Wzrost |
+|--------|------|-----------------|--------|
+| X (Scalp) | 18 | 24 | +6 |
+| XII (Swing) | 22 | 32 | +10 |
+| III (Invest) | 20 | 38 | +18 |
+| VI (Leverage) | 14 | 19 | +5 |
+| Wspólne/Anty-manip | 7 | 16 | +9 |
+| AI/ML (nowa dywizja) | 0 | 7 | +7 |
+| **RAZEM** | **81** | **136** | **+55** |
+
+> **136 neuronów** skatalogowanych łącznie (nie licząc duplikatów z bazy v1.3).
+> Każdy neuron przed wdrożeniem przechodzi przez Koloseum (Prawo VI).
+
+---
+
+*VITRUVIUSZ — "Sto trzydzieści sześć par oczu jednego organizmu. Żadne ślepe pole."*

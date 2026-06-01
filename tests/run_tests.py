@@ -16,7 +16,11 @@ import sys, os, importlib, traceback
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-MODULY_TESTOWE = ["test_kalkulator", "test_igrzyska", "test_pamiec", "test_doradcy"]
+MODULY_TESTOWE = [
+    "test_kalkulator", "test_igrzyska", "test_pamiec",
+    "test_doradcy", "test_paper_trading", "test_scheduler",
+    "test_neurony",
+]
 
 
 def uruchom():

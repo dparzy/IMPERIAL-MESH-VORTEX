@@ -17,7 +17,7 @@
 ║  Dokumenty:          25 plików .md                                   ║
 ║  Neurony:            328 zmapowanych                                 ║
 ║  Strategie:          ~108+ zmapowanych                               ║
-║  Testy automatyczne: 52 ✅ (luki #1, #2, #3 zamknięte)              ║
+║  Testy automatyczne: 78 ✅ (luki #1–#5 zamknięte)                   ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║  ✅ Działające (bez TA-Lib):    8 modułów                            ║
 ║  ⚠️  Blokowane przez TA-Lib:    9 modułów                            ║
@@ -86,8 +86,8 @@
 | 4 | **Moduł Neuronów produkcyjnych** — mamy spec 328 neuronów, ale w kodzie tylko 2 przykłady | `legiony/neurony/` | 🔴 Wysoki |
 | 5 | **Konektor CME Gap** — ⚠️ CME 24/7 od 29.05.2026 — strategia zanika historycznie | `oczy/cme_feed.py` | 🟡 Niski |
 | 6 | **Multi-exchange konektor** — Binance, OKX jako "prowincje" | `akwedukty/multi_exchange.py` | 🟠 Faza 2 |
-| 7 | **Scheduler** — cykliczne uruchamianie systemu co N minut | `drogi/scheduler.py` | 🟠 Faza 1 |
-| 8 | **Paper Trading Engine** — pełny symulator bez real money | `koloseum/paper_trading.py` | 🔴 Wysoki |
+| 7 | ✅ ZROBIONE — **Scheduler** LIVE/BACKTEST/ONCE, bezpiecznik AOA, graceful shutdown | `drogi/scheduler.py` | ~~🟠~~ |
+| 8 | ✅ ZROBIONE — **Paper Trading Engine** TP/SL/LIQ/TIMEOUT, MAE/MFE, prowizje, statystyki | `koloseum/paper_trading.py` | ~~🔴~~ |
 
 ---
 

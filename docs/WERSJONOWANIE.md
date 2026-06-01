@@ -75,6 +75,48 @@ class NeuronWaddahAttar(MikroNeuron):
 
 ## 📜 HISTORIA WERSJI
 
+### [v0.8.0] — 2026-06-01 — *"Legio Surgit"*
+*(Legion Powstaje)*
+
+#### Dodano
+- `⚔️ IMV-INS` `legiony/neurony/momentum.py` — RSI(ekstremalny), MACD(crossover+hist), BBands(squeeze+touch), EMA Cross(świeże krzyżowanie), Williams %R
+- `⚔️ IMV-INS` `legiony/neurony/trend.py` — ADX+DI(siła), Ichimoku(chmura+tenkan/kijun), EMA50/200(Golden/Death Cross), Supertrend(zmiana kierunku)
+- `⚔️ IMV-INS` `legiony/neurony/wolumen.py` — OBV+dywergencja, VWAP+σ, CVD+dywergencja, Volume Anomaly(3× MA)
+- `🏛️ IMV-ORI` `legiony/neurony/psychologia.py` — Fear&Greed(contrarian), Funding Extreme(crowded), Long/Short Ratio(tłum), OI Divergence
+- `⚔️ IMV-INS` `legiony/neurony/onchain.py` — MVRV-Z(kapituacja/bańka), SOPR, Puell Multiple, Exchange Netflow
+- `⚔️ IMV-INS` `legiony/neurony/struktura.py` — Order Block, FVG(Fair Value Gap), BOS/MSS(Change of Character), VSA Stop Volume
+- `tests/test_neurony.py` — 36 testów (w tym universal test: brak danych nie crashuje)
+
+#### Zmieniono
+- Testy: 78 → **114** (+36 neurony)
+- Luka audytu #4 zamknięta: mamy prod neurony (było tylko 2 przykłady)
+
+---
+
+### [v0.7.0] — 2026-06-01 — *"Vigilantia Perpetua"*
+*(Wieczna Czujność)*
+
+#### Dodano
+- `🏛️ IMV-ORI` `drogi/scheduler.py` — pętla operacyjna: LIVE(co Ns, Ctrl+C graceful)/BACKTEST(lista barów)/ONCE(debug); bezpiecznik AOA, max_bledow_z_rzędu→pauza, mock callbacki
+- `tests/test_scheduler.py` — 10 testów
+
+#### Zmieniono
+- Testy: 68 → **78**
+
+---
+
+### [v0.6.0] — 2026-06-01 — *"Spectaculum Sine Sanguine"*
+*(Widowisko Bez Krwi)*
+
+#### Dodano
+- `🏛️ IMV-ORI` `koloseum/paper_trading.py` — pełny symulator: wejście(margin/duplikat/max_otwartych), LIQ>SL>TP>TIMEOUT, slippage+prowizja, MAE/MFE, StatystykiSesji(win_rate/PF/maxDD)
+- `tests/test_paper_trading.py` — 16 testów
+
+#### Zmieniono
+- Testy: 52 → **68**
+
+---
+
 ### [v0.5.0] — 2026-06-01 — *"Consilium Principis"*
 *(Rada Cesarza)*
 

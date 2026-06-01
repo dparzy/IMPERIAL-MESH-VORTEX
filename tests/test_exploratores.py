@@ -1,4 +1,4 @@
-"""Testy Dywizji Exploratores — baza, igrzyska, HFD, HA Scalper Full."""
+"""Testy Dywizji Exploratores — baza, igrzyska, HFD, HA Scalper Full, Hurst, Kalman."""
 
 import sys, os, math
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -9,6 +9,8 @@ from imperium.legiony.zwiadowcy.igrzyska_exploratores import (
 )
 from imperium.legiony.zwiadowcy.exp_higuchi import ZwiadowcaHiguchiFD, _higuchi_fd
 from imperium.legiony.zwiadowcy.exp_ha_scalper import ZwiadowcaHAScalper, _oblicz_ha
+from imperium.legiony.zwiadowcy.exp_hurst import ZwiadowcaHurst, _hurst_rs
+from imperium.legiony.zwiadowcy.exp_kalman import ZwiadowcaKalmanATR, _kalman_filter_1d, _kalman_atr
 
 
 # ─── Pomocnicze ───────────────────────────────────────────────────────────────
@@ -265,3 +267,148 @@ def test_ha_scalper_tryb_conservative_nizszy_prog():
     # Conservative bazuje od 0.55, aggressive od 0.65 — aggressive wyższy bazowy
     if r_agg.sygnal.kierunek != "NEUTRAL" and r_con.sygnal.kierunek != "NEUTRAL":
         assert r_agg.pewnosc >= r_con.pewnosc
+
+
+# ─── Hurst Exponent (EXP-03) ──────────────────────────────────────────────────
+
+def test_hurst_rs_trend_wysoki():
+    """Seria liniowa (idealny trend) → H bliskie 1.0 (silna persystencja)."""
+    seria = [float(i) for i in range(100)]
+    h = _hurst_rs(seria)
+    assert h > 0.55, f"Hurst serii trendującej powinien być > 0.55, got {h}"
+
+
+def test_hurst_rs_za_malo_danych():
+    """Za mało danych → fallback 0.5 (random walk)."""
+    h = _hurst_rs([1.0, 2.0, 3.0], min_n=8)
+    assert h == 0.5
+
+
+def test_hurst_rs_przedzial():
+    """H zawsze w (0, 1)."""
+    import random
+    random.seed(7)
+    seria = [random.gauss(0, 1) for _ in range(100)]
+    h = _hurst_rs(seria)
+    assert 0.0 < h < 1.0, f"H poza przedziałem (0,1): {h}"
+
+
+def test_zwiadowca_hurst_trend_daje_sygnal():
+    z = ZwiadowcaHurst()
+    bary = _bary_trend(n=60, krok=0.5)
+    raport = z.analizuj(bary)
+    assert raport.sygnal.neuron_id == "EXP-03"
+    assert raport.sygnal.kierunek in ("LONG", "SHORT", "NEUTRAL")
+    assert "hurst" in raport.diagnostics
+
+
+def test_zwiadowca_hurst_za_malo_barow():
+    z = ZwiadowcaHurst()
+    raport = z.analizuj([_bar() for _ in range(10)])
+    assert raport.sygnal.kierunek == "NEUTRAL"
+    assert raport.pewnosc_metody == 0.0
+
+
+def test_zwiadowca_hurst_legion():
+    z = ZwiadowcaHurst()
+    bary = _bary_trend(n=60)
+    raport = z.analizuj(bary)
+    assert raport.sygnal.legion == "EXPLORATORES"
+
+
+def test_hurst_i_higuchi_korelacja():
+    """Trend: Higuchi FD < 1.35 i Hurst H > 0.55 — oba zgadzają się."""
+    z_fd = ZwiadowcaHiguchiFD()
+    z_h = ZwiadowcaHurst()
+    bary = _bary_trend(n=60, krok=1.0)
+    r_fd = z_fd.analizuj(bary)
+    r_h = z_h.analizuj(bary)
+    # Oba w tym samym kierunku lub co najmniej jedno nie jest NEUTRAL
+    assert not (r_fd.sygnal.kierunek == "NEUTRAL" and r_h.sygnal.kierunek == "NEUTRAL"), \
+        "Oba EXP-01 i EXP-03 NEUTRAL na serii trendującej — błąd"
+
+
+# ─── Kalman Filter ATR (EXP-04) ───────────────────────────────────────────────
+
+def test_kalman_filter_wygladza():
+    """Filtr Kalmana wygładza serię — każda wartość między min a max obserwacji."""
+    obs = [1.0, 10.0, 1.0, 10.0, 1.0, 10.0]
+    filtered = _kalman_filter_1d(obs, q=0.01, r=1.0)
+    assert len(filtered) == len(obs)
+    # Wygładzona < max(obs) i > min(obs) dla środkowych wartości
+    assert all(0.5 <= v <= 11.0 for v in filtered)
+
+
+def test_kalman_filter_stala_seria():
+    """Stała obserwacja → filtr szybko się stabilizuje na tej wartości."""
+    obs = [5.0] * 50
+    filtered = _kalman_filter_1d(obs, q=0.01, r=0.5)
+    assert abs(filtered[-1] - 5.0) < 0.1
+
+
+def test_kalman_atr_zwraca_liczbe():
+    bary = _bary_trend(n=40)
+    katr, series = _kalman_atr(bary)
+    assert katr > 0
+    assert len(series) == len(bary) - 1  # TR = n-1 wartości
+
+
+def test_zwiadowca_kalman_sygnal():
+    z = ZwiadowcaKalmanATR()
+    bary = _bary_trend(n=40, krok=1.0)
+    raport = z.analizuj(bary)
+    assert raport.sygnal.neuron_id == "EXP-04"
+    assert raport.sygnal.kierunek in ("LONG", "SHORT", "NEUTRAL")
+    assert "kalman_atr" in raport.diagnostics
+    assert "momentum" in raport.diagnostics
+    assert "volatility_spike" in raport.diagnostics
+
+
+def test_zwiadowca_kalman_za_malo_barow():
+    z = ZwiadowcaKalmanATR()
+    raport = z.analizuj([_bar() for _ in range(5)])
+    assert raport.sygnal.kierunek == "NEUTRAL"
+    assert raport.pewnosc_metody == 0.0
+
+
+def test_zwiadowca_kalman_spike_alert():
+    """Seria z nagłym skokiem zmienności → volatility_spike=True w diagnostics."""
+    z = ZwiadowcaKalmanATR()
+    # Spokojne bary + 1 bar z ogromnym zasięgiem na końcu
+    bary = _bary_trend(n=35, krok=0.1)
+    # Dodaj 1 bar z 10× większym zasięgiem
+    bary.append({"open": 100, "high": 200, "low": 50, "close": 120, "volume": 5000, "timestamp": 0})
+    raport = z.analizuj(bary)
+    # Spike powinien być wykryty
+    assert raport.diagnostics.get("spike_ratio", 0) > 1.0
+
+
+# ─── Rój filtruje niedostępne neurony ─────────────────────────────────────────
+
+def test_roj_pomija_niedostepne():
+    """Rój nie produkuje sygnałów z neuronów DOSTEPNY=False."""
+    from imperium.legiony.mikro_neuron import Roj
+    from imperium.legiony.neurony.onchain import NeuronMVRV
+    from imperium.legiony.neurony.psychologia import NeuronFearGreed
+
+    roj = Roj([NeuronMVRV(), NeuronFearGreed()])
+    sygnaly = roj.zbierz_sygnaly({"MVRV_Z_SCORE": -1.0, "FEAR_GREED_INDEX": 5})
+    # Oba niedostępne → 0 sygnałów
+    assert len(sygnaly) == 0
+
+
+def test_roj_lista_niedostepnych():
+    from imperium.legiony.mikro_neuron import Roj
+    from imperium.legiony.neurony.onchain import NeuronMVRV, NeuronSOPR
+
+    roj = Roj([NeuronMVRV(), NeuronSOPR()])
+    lista = roj.lista_niedostepnych()
+    assert len(lista) == 2
+    assert any("OC-01" in x for x in lista)
+
+
+def test_neuron_dostepny_domyslnie_true():
+    """Zwykły neuron (RSI) ma DOSTEPNY=True domyślnie."""
+    from imperium.legiony.neurony.momentum import NeuronRSI
+    n = NeuronRSI()
+    assert n.DOSTEPNY is True

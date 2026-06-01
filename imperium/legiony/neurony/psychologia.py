@@ -2,9 +2,20 @@
 🏛️ IMV-ORI | Neurony Psychologii — Dywizja Wyrocznia (PSY)
 Fear & Greed, Funding Rate Extreme, Capitulation, Panika Detaliczna.
 Behawioralne wzorce rynku — wyjście z tłumu.
+
+DOSTĘPNOŚĆ:
+  PSY-01 FUNDING_RATE     — wymaga API futures (MEXC/Binance). Aktywuje się gdy
+                            MEXC_API_KEY jest skonfigurowany i adapter podpięty.
+  PSY-02 LONG_SHORT_RATIO — j.w.
+  PSY-03 FEAR_GREED_INDEX — wymaga zewnętrznego API (alternative.me lub podobne).
+  PSY-04 OPEN_INTEREST    — wymaga API futures.
+  Wszystkie wyciszone (DOSTEPNY=False) dopóki adapter nie zostanie podpięty.
 """
 
 from imperium.legiony.mikro_neuron import MikroNeuron, SygnalNeuronu
+
+_POWOD_FUTURES = "Wymaga API futures (MEXC). Ustaw MEXC_API_KEY i podepnij adapter."
+_POWOD_SENTIMENT = "Wymaga zewnętrznego API sentymentu (alternative.me / CoinGlass)."
 
 
 class NeuronFearGreed(MikroNeuron):
@@ -18,6 +29,8 @@ class NeuronFearGreed(MikroNeuron):
     WSKAZNIK = "FEAR_GREED"
     KATEGORIA = "S"
     WAGA = 7
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = _POWOD_SENTIMENT
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         fg = wskazniki.get("FEAR_GREED_INDEX")
@@ -51,6 +64,8 @@ class NeuronFundingExtreme(MikroNeuron):
     WSKAZNIK = "FUNDING_EXTREME"
     KATEGORIA = "S"
     WAGA = 8
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = _POWOD_FUTURES
 
     FUNDING_HIGH = 0.001    # 0.1% per 8H — dużo longerów
     FUNDING_LOW = -0.0005   # -0.05% per 8H — dużo shorterów
@@ -86,6 +101,8 @@ class NeuronPanikaDetal(MikroNeuron):
     WSKAZNIK = "LS_RATIO"
     KATEGORIA = "S"
     WAGA = 7
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = _POWOD_FUTURES
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         ls_ratio = wskazniki.get("LONG_SHORT_RATIO")  # long/(long+short), 0.0-1.0
@@ -123,6 +140,8 @@ class NeuronOIDiv(MikroNeuron):
     WSKAZNIK = "OI_DIVERGENCE"
     KATEGORIA = "S"
     WAGA = 7
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = _POWOD_FUTURES
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         oi = wskazniki.get("OPEN_INTEREST")

@@ -28,6 +28,7 @@
 | W-006 | Neuron Higuchi Fractal Dimension — detekcja reżimu D≈1 (trend) vs D≈2 (chaos) | 🔴 Wysoki | 💭 Idea | `KATALOG_NEURONOW.md` + `imperium/legiony/` |
 | W-007 | AEL (Agent Evolving Learning) — samoewolucja strategii, Sharpe 2.13 | 🟠 Średni | 💭 Idea | `imperium/cesarz/` lub `imperium/senat/` |
 | W-008 | Sharpe Terminal (sharpe.ai) — integracja danych narracyjnej rotacji sektorów | 🟡 Niski | 💭 Idea | `imperium/oczy/` |
+| W-009 | SHARP (Self-Evolving Rubric Policy, arxiv 2605.06822) — podłączyć jako warstwę audytu/weryfikacji nad DeepSeek w Cesarzu | 🔴 Wysoki | 💭 Idea | `imperium/cesarz/sharp_auditor.py` |
 
 ---
 
@@ -88,7 +89,7 @@
 
 | Metryka | Wartość |
 |---------|---------|
-| Łącznie wizji | 8 |
+| Łącznie wizji | 9 |
 | W trakcie analizy | 5 |
 | Przeniesione do dokumentów | 0 |
 | Zaimplementowane | 0 |

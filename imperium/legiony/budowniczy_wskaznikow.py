@@ -111,6 +111,7 @@ class BudowniczyWskaznikow:
         self._dodaj_macd(serie, w)
         self._dodaj_bbands(serie, w)
         self._dodaj_ichimoku(serie, w)
+        self._dodaj_ha(bary, w)
 
         return w
 
@@ -138,3 +139,43 @@ class BudowniczyWskaznikow:
             w.update(d)  # ICHIMOKU_TENKAN/KIJUN/SENKOU_A/SENKOU_B
         except Exception as e:
             logger.debug(f"[Budowniczy] ICHIMOKU pominięty: {e}")
+
+    def _dodaj_ha(self, bary, w):
+        """
+        Heiken Ashi dla X-26 NeuronHAScalper (Prawo XV — był martwym głosem bo
+        Budowniczy nie produkował HA_*). HA liczone rekurencyjnie z surowych OHLC
+        (bez repainting — identycznie jak EXP-02). Wystawia ostatni bar:
+          HA_BULL, HA_BEAR, HA_MOMENTUM (znorm. ATR), HA_VOLATILITY_INDEX (ATR/MidMA20).
+        """
+        try:
+            if len(bary) < 2:
+                return
+            # HA rekurencyjne
+            ha = []
+            for i, b in enumerate(bary):
+                o, h, l, c = (float(b.get("open", 0)), float(b.get("high", 0)),
+                              float(b.get("low", 0)), float(b.get("close", 0)))
+                ha_close = (o + h + l + c) / 4
+                ha_open = (o + c) / 2 if i == 0 else (ha[i - 1]["o"] + ha[i - 1]["c"]) / 2
+                ha_high = max(h, ha_open, ha_close)
+                ha_low = min(l, ha_open, ha_close)
+                ha.append({"o": ha_open, "c": ha_close, "mid": (ha_high + ha_low) / 2})
+
+            # ATR (True Range z surowych barów, okres 14)
+            trs = []
+            for i in range(1, len(bary)):
+                h = float(bary[i].get("high", 0)); l = float(bary[i].get("low", 0))
+                pc = float(bary[i - 1].get("close", 0))
+                trs.append(max(h - l, abs(h - pc), abs(l - pc)))
+            atr = sum(trs[-14:]) / len(trs[-14:]) if trs else 0.0
+
+            ostatni = ha[-1]
+            w["HA_BULL"] = ostatni["c"] >= ostatni["o"]
+            w["HA_BEAR"] = ostatni["c"] < ostatni["o"]
+            if atr > 0:
+                w["HA_MOMENTUM"] = (ostatni["mid"] - ha[-2]["mid"]) / atr
+                mids = [x["mid"] for x in ha[-20:]]
+                mid_ma = sum(mids) / len(mids)
+                w["HA_VOLATILITY_INDEX"] = atr / mid_ma if mid_ma > 0 else 0.0
+        except Exception as e:
+            logger.debug(f"[Budowniczy] HA pominięty: {e}")

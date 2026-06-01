@@ -43,7 +43,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Folder / Plik | Zawartość |
 |---------------|-----------|
-| **[ZASADY_FUNDAMENTALNE.md](ZASADY_FUNDAMENTALNE.md)** | Konstytucja — **16 praw**, których zawsze przestrzegamy |
+| **[ZASADY_FUNDAMENTALNE.md](ZASADY_FUNDAMENTALNE.md)** | Konstytucja — **17 praw**, których zawsze przestrzegamy |
 | **[CLAUDE.md](CLAUDE.md)** | Instrukcje stałe (czytane co sesję): Prawo XV/XVI, bezpieczeństwo, git |
 | **imperium/** | Żywy kod systemu (patrz mapa niżej) |
 | **docs/** | Dokumentacja + katalogi projektowe (neurony, strategie, arsenał) |

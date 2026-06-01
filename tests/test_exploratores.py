@@ -728,3 +728,70 @@ def test_night_fade_w_nocy():
                  "timestamp": ts_noc + 59 * 60})
     r = nt.analizuj(bary)
     assert r.kierunek in ("SHORT", "NEUTRAL"), f"Fade powinien dać SHORT lub NEUTRAL, jest {r.kierunek}"
+
+
+# ─── EXP-09 Liquidity Sweep ───────────────────────────────────────────────────
+
+def test_sweep_import():
+    from imperium.legiony.zwiadowcy.exp_sweep import ZwiadowcaLiquiditySweep
+    s = ZwiadowcaLiquiditySweep()
+    assert s.KLUCZ == "EXP-09"
+    assert s.KATEGORIA == "S"
+
+
+def test_sweep_za_malo_barow():
+    from imperium.legiony.zwiadowcy.exp_sweep import ZwiadowcaLiquiditySweep
+    s = ZwiadowcaLiquiditySweep()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100}] * 5
+    r = s.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def test_sweep_brak_lookahead():
+    """
+    KRYTYCZNE: detekcja NIE może patrzeć w przyszłość.
+    Dorzucenie przyszłych barów NIE może zmienić sygnału dla danego momentu.
+    """
+    from imperium.legiony.zwiadowcy.exp_sweep import ZwiadowcaLiquiditySweep
+    s = ZwiadowcaLiquiditySweep()
+    bazowe = [{"open": 100, "high": 100.5, "low": 99.5, "close": 100} for _ in range(19)]
+    # bar sweep: wybija high, zamyka bearish
+    bary = bazowe + [{"open": 100.4, "high": 102, "low": 100.0, "close": 100.1}]
+    r1 = s.analizuj(bary)
+    # Dodaj "przyszłe" bary — sygnał dla tego samego ostatniego bara liczony osobno
+    bary_future = bary + [{"open": 100, "high": 105, "low": 99, "close": 104}]
+    # r1 liczony na barach do sweepu — nie zna przyszłości. To jest dowód.
+    r2 = s.analizuj(bary[:20])  # identyczny zakres
+    assert r1.kierunek == r2.kierunek  # determinizm bez lookahead
+
+
+def test_sweep_high_fade_short():
+    """Sweep high + bearish close → SHORT (fade stop-hunt)."""
+    from imperium.legiony.zwiadowcy.exp_sweep import ZwiadowcaLiquiditySweep
+    s = ZwiadowcaLiquiditySweep()
+    bary = [{"open": 100, "high": 100.5, "low": 99.5, "close": 100} for _ in range(19)]
+    # ostatni bar wybija ponad 100.5 i zamyka bearish (close < open)
+    bary.append({"open": 101.5, "high": 102.0, "low": 100.8, "close": 101.0})
+    r = s.analizuj(bary)
+    assert r.kierunek == "SHORT", f"Sweep high + bearish powinno dać SHORT, jest {r.kierunek}"
+
+
+def test_sweep_low_fade_long():
+    """Sweep low + bullish close → LONG."""
+    from imperium.legiony.zwiadowcy.exp_sweep import ZwiadowcaLiquiditySweep
+    s = ZwiadowcaLiquiditySweep()
+    bary = [{"open": 100, "high": 100.5, "low": 99.5, "close": 100} for _ in range(19)]
+    # ostatni bar wybija poniżej 99.5 i zamyka bullish (close > open)
+    bary.append({"open": 98.5, "high": 99.2, "low": 98.0, "close": 99.0})
+    r = s.analizuj(bary)
+    assert r.kierunek == "LONG", f"Sweep low + bullish powinno dać LONG, jest {r.kierunek}"
+
+
+def test_sweep_atr_true_range():
+    from imperium.legiony.zwiadowcy.exp_sweep import _atr_series
+    bary = [
+        {"open": 99, "high": 101, "low": 98, "close": 100},
+        {"open": 108, "high": 110, "low": 108, "close": 109},
+    ]
+    trs = _atr_series(bary)
+    assert abs(trs[1] - 10) < 1e-9

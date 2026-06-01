@@ -21,6 +21,7 @@ from .exp_smc import ZwiadowcaSMC, aktywuj_neurony_smc
 from .exp_katana import ZwiadowcaKatana
 from .exp_tlp import ZwiadowcaTLP
 from .exp_night import ZwiadowcaNightTurbo
+from .exp_sweep import ZwiadowcaLiquiditySweep
 
 __all__ = [
     "ZwiadowcaElitarny", "RaportZwiadowcy", "TypDanych",
@@ -29,4 +30,5 @@ __all__ = [
     "ZwiadowcaHurst", "ZwiadowcaKalmanATR",
     "ZwiadowcaSMC", "aktywuj_neurony_smc",
     "ZwiadowcaKatana", "ZwiadowcaTLP", "ZwiadowcaNightTurbo",
+    "ZwiadowcaLiquiditySweep",
 ]

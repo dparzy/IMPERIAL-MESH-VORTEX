@@ -49,6 +49,7 @@ from imperium.legiony.zwiadowcy import (
     ZwiadowcaHiguchiFD, ZwiadowcaHAScalper, ZwiadowcaHurst,
     ZwiadowcaKalmanATR, ZwiadowcaSMC, aktywuj_neurony_smc,
     ZwiadowcaKatana, ZwiadowcaTLP, ZwiadowcaNightTurbo,
+    ZwiadowcaLiquiditySweep,
 )
 
 logger = logging.getLogger("Rejestr")
@@ -84,6 +85,7 @@ def wszyscy_zwiadowcy() -> list:
         ZwiadowcaKatana(),     # EXP-06 Katana Scalper Pro (IMV-ADO)
         ZwiadowcaTLP(),        # EXP-07 A-TLP Scalper breakout (IMV-ADO)
         ZwiadowcaNightTurbo(), # EXP-08 Night Turbo fade-scalper (IMV-ADO)
+        ZwiadowcaLiquiditySweep(), # EXP-09 Liquidity Sweep stop-hunt (IMV-ADO)
     ]
 
 

@@ -1362,6 +1362,83 @@ Spike wolumenu o 01:00 EST (07:00 CET) → wejście instytucji Londynu.
 
 ---
 
+## 🌏 SKAN VII — Perełki z Azji (3100 linków, 2026-06-01)
+
+### IMV-HY-007 | "PARADOKS PARRONDA" | Parrondo Switching Ensemble
+**Źródło:** Azja BMD-08/STR-125 — Paradoks Parronda (teoria gier)
+**Interwał:** M1–1D | **Warunki:** dowolne (system przełączający)
+
+**Mechanika (kontrintuicyjna):**
+- Dwie strategie, każda OSOBNO przegrywająca: A = mean-reversion, B = momentum
+- Reguła przełączania (np. zależna od `HX-01` Hurst lub kapitału) tworzy ensemble który BIJE buy&hold
+- To matematyczna formalizacja filozofii Kameleona (zmiana stylu wg reżimu)
+
+**Neurony WEJŚCIE:** `HX-01` Hurst (przełącznik: H>0.5 → momentum, H<0.5 → mean-rev)  
+**Neurony FILTR:** `ENT-08` Higuchi (potwierdza reżim)  
+**Dźwignia:** 2×–5× | **R:R:** zmienne | **Status:** SZKIC 🏛️ IMV-ORI (nasza formalizacja)
+
+---
+
+### IMV-HY-008 | "GRA Z KOWALEM" | Game Theory vs Market Maker
+**Źródło:** Azja HYB-008 — iterowana gra (tit-for-tat Axelroda)
+**Interwał:** M5–1H | **Warunki:** rynki z aktywnym MM (manipulacja)
+
+**Mechanika:**
+- Modeluje market makera jako przeciwnika w iterowanej grze
+- Wykrywa wzorzec MM (stop-hunt → reversal) i gra tit-for-tat: kopiuj ostatni ruch przeciwnika
+- Współpracuje z `LG-01` LiquidityGrab (wykrycie zagrania MM)
+
+**Neurony WEJŚCIE:** `LG-01` LiquidityGrab + `IB-01` Iceberg  
+**Neurony FILTR:** `VPIN-01` VPIN (toksyczny flow = MM aktywny)  
+**Dźwignia:** 3×–10× | **R:R:** 1:2 | **Status:** SZKIC
+
+---
+
+### VI-LV-005 | "KASKADA" | Liquidation Cascade Hunt
+**Źródło:** Azja LEG-016 (trader Dan) — kaskady likwidacji
+**Interwał:** M1–M15 | **Warunki:** wysokie OI + ekstremalne funding
+
+**Mechanika:**
+- Buduje się Open Interest + funding ekstremalny → przeludnienie jednej strony
+- Kaskada likwidacji (>$50M w 1h) → overshooting 1-3%
+- Wejście kontrariańskie PO zakończeniu kaskady (revert)
+
+**Neurony WEJŚCIE:** `PSY-03` LossAversion (kaskada) + `VI-07` FundingRate  
+**Neurony FILTR:** `VPIN-01` VPIN, `AD-01` Absorption (kto łapie spadek)  
+**Dźwignia:** 5×–15× | **R:R:** 1:2.5 | **Status:** SZKIC
+
+---
+
+### XII-RV-006 | "CYKL AMD" | Accumulation-Manipulation-Distribution
+**Źródło:** Azja SES-001..004 — model AMD (SMC/ICT azjatycki)
+**Interwał:** 15M–4H | **Warunki:** sesje (Azja akumulacja → Londyn manipulacja)
+
+**Mechanika:**
+- **Akumulacja:** instytucje cicho zbierają w wąskim zakresie (sesja azjatycka)
+- **Manipulacja:** stop-hunt poza zakresem (fałszywy ruch, `LG-01`)
+- **Dystrybucja:** prawdziwy ruch w przeciwnym kierunku (Londyn/NY)
+
+**Neurony WEJŚCIE:** `SES-02` AzjaRange + `LG-01` LiquidityGrab (faza manipulacji)  
+**Neurony FILTR:** `SES-01` KillZone, `AD-01` Absorption  
+**Dźwignia:** 5×–10× | **R:R:** 1:3 | **Status:** SZKIC
+
+---
+
+### IMV-MC-005 | "PREMIA STRACHU" | Kimchi Premium Stress Gauge
+**Źródło:** Azja IND-002 — Kimchi/P2P Premium jako miernik stresu
+**Interwał:** 1H–1D | **Warunki:** rozjazd cen Korea/global
+
+**Mechanika:**
+- `KP-01` Kimchi Premium normalnie ~1-3%, w panice skacze do ekstremów
+- Premia rośnie gwałtownie = lokalny FOMO/panika koreańska → często szczyt lokalny
+- Premia ujemna (discount) = strach → potencjalne dno
+
+**Neurony WEJŚCIE:** `KP-01` KimchiPremium  
+**Neurony FILTR:** `SENT-FG` FearGreed, `CV-01` VenueDivergence  
+**Dźwignia:** 2×–5× | **R:R:** 1:2 | **Status:** SZKIC
+
+---
+
 ## 📊 AKTUALIZACJA PODSUMOWANIA KATALOGU (v2.3)
 
 | Grupa | Strategii | Status |
@@ -1373,8 +1450,11 @@ Spike wolumenu o 01:00 EST (07:00 CET) → wejście instytucji Londynu.
 | Klasyka/Arbitraż/ICT/Boty/Fale (T-Z) | 15 | SZKIC/FAZA 3 |
 | VSA/VP/VPIN/GEX/Opcje/Makro/DeFi (Skan IV) | 11 | SZKIC |
 | CME Gap / Azja Range / Funding Arb / Sesje (Skan V) | 4 | SZKIC |
+| Parrondo/GameTheory/Kaskada/AMD/Kimchi (Skan VII Azja) | 5 | SZKIC |
 | Reguły Ryzyka (Pretorianie) | 5+ | DO WDROŻENIA |
-| **RAZEM zmapowanych** | **~103+** | rośnie |
+| **RAZEM zmapowanych** | **~108+** | rośnie |
+
+**Nowe ze Skanu VII (Azja):** IMV-HY-007 Parrondo, IMV-HY-008 GameTheory, VI-LV-005 Kaskada, XII-RV-006 AMD, IMV-MC-005 Kimchi → pełny skan w `docs/SKAN_AZJA.md`
 
 **Nowe neurony Skan V (+2):** SES-02 AzjaRange, SES-03 CMEGap → patrz KATALOG_NEURONOW.md (306 łącznie)  
 **⚠️ Uwaga CME:** Od 29.05.2026 CME handel 24/7 — strategia CME Gap historyczna, monitoruj.

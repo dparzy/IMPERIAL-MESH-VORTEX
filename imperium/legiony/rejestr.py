@@ -50,6 +50,7 @@ from imperium.legiony.zwiadowcy import (
     ZwiadowcaKalmanATR, ZwiadowcaSMC, aktywuj_neurony_smc,
     ZwiadowcaKatana, ZwiadowcaTLP, ZwiadowcaNightTurbo,
     ZwiadowcaLiquiditySweep, ZwiadowcaDisplacement,
+    ZwiadowcaDynamic,
 )
 
 logger = logging.getLogger("Rejestr")
@@ -87,6 +88,7 @@ def wszyscy_zwiadowcy() -> list:
         ZwiadowcaNightTurbo(), # EXP-08 Night Turbo fade-scalper (IMV-ADO)
         ZwiadowcaLiquiditySweep(), # EXP-09 Liquidity Sweep stop-hunt (IMV-ADO)
         ZwiadowcaDisplacement(), # EXP-10 Displacement impuls strukturalny (IMV-ADO)
+        ZwiadowcaDynamic(),    # EXP-11 Dynamic cross + slippage guard (IMV-ADO)
     ]
 
 

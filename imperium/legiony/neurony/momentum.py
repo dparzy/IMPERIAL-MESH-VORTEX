@@ -260,3 +260,98 @@ class NeuronATRDeviation(MikroNeuron):
                     [f"MEAN-REV: cena {dev:+.2f} ATR nad średnią — oczekuj powrotu w dół"])
             return self._bazowy_sygnal(dev, "LONG", pewnosc,
                 [f"MEAN-REV: cena {dev:+.2f} ATR pod średnią — oczekuj powrotu w górę"])
+
+
+class NeuronHAScalper(MikroNeuron):
+    """
+    🔱 IMV-ADO v1.0 | HA Scalper (MSX Hybrid Heiken Scalper — odtworzony + naprawiony)
+    Oryginał: MSX Hybrid Heiken Scalper (MQL5, closed-source, $50-$100).
+
+    Technika: kolor i kształt świec Heiken Ashi (HA) jako sygnał kierunku,
+    potwierdzony momentum. Kluczowa zaleta oryginału: HA bez repainting
+    (obliczane ze zwykłych OHLC — zamknięta świeca się nie zmienia).
+
+    Nasze poprawki:
+      1. Prawo I: neuron NIE liczy HA/ATR sam — pyta Bramę o gotowe wartości.
+      2. Usunięta redundantna tautologia: Mid_Price < HA_Close jest zawsze
+         prawdą gdy HA_Close > HA_Open — zastąpiona filtrem Volatility_Index.
+      3. Filtr reżimu: w RANGING → wymaga wyższego Volatility_Index (≥ 0.008).
+         Agresywny scalper bez filtra w konsolidacji = strata pewna.
+      4. Tryby aggressive/conservative jako parametr pewności wejścia.
+
+    Brama dostarcza (z danych HA obliczonych na surowych OHLC, bez wygładzania):
+      HA_BULL: bool (HA_Close > HA_Open — świeca bycza)
+      HA_BEAR: bool (HA_Close < HA_Open — świeca niedźwiedzia)
+      HA_MOMENTUM: float (Mid_Price[t] - Mid_Price[t-1], znorm. ATR)
+      HA_VOLATILITY_INDEX: float (ATR / MidPrice_MA20 — normalizacja bezwymiarowa)
+      REZIM (opcjonalnie): str
+    """
+    KLUCZ = "X-26"
+    LEGION = "SCALP"
+    WSKAZNIK = "HA_SCALPER"
+    KATEGORIA = "M"
+    WAGA = 7
+
+    # Tryby (aggressive = niższy próg = więcej sygnałów)
+    VOLATILITY_MIN_RANGING = 0.008  # filtr dla RANGING — wymagaj realnej zmienności
+    VOLATILITY_MIN_TREND = 0.003    # w trendzie wystarczy mniejsza
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        ha_bull = wskazniki.get("HA_BULL")
+        ha_bear = wskazniki.get("HA_BEAR")
+        ha_momentum = wskazniki.get("HA_MOMENTUM")   # znormalizowane przez ATR, >0 = byk
+        vol_idx = wskazniki.get("HA_VOLATILITY_INDEX")
+        tryb = str(wskazniki.get("TRYB", "aggressive")).lower()
+        rezim = str(wskazniki.get("REZIM", "")).upper()
+
+        if ha_bull is None or ha_bear is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych HA"])
+
+        # Filtr Volatility_Index wg reżimu (naprawiona tautologia oryginału)
+        jest_ranging = rezim == "RANGING" or (not rezim.startswith("TREND"))
+        vol_min = self.VOLATILITY_MIN_RANGING if jest_ranging else self.VOLATILITY_MIN_TREND
+
+        if vol_idx is not None and vol_idx < vol_min:
+            return self._bazowy_sygnal(vol_idx, "NEUTRAL", 0.0,
+                [f"HA: Volatility_Index={vol_idx:.4f} < {vol_min:.3f} — konsolidacja, brak sygnału"])
+
+        # Bazowa pewność wg trybu (aggressive = wyższy próg akceptacji)
+        pewnosc_bazowa = 0.65 if tryb == "aggressive" else 0.55
+
+        # Potwierdzenie momentum (naprawiony warunek — nie tautologia)
+        mom_potwierdza_bull = ha_momentum is not None and ha_momentum > 0
+        mom_potwierdza_bear = ha_momentum is not None and ha_momentum < 0
+
+        if ha_bull and not ha_bear:
+            if mom_potwierdza_bull:
+                pewnosc = pewnosc_bazowa + 0.15
+                powody = [f"HA BULL: świeca bycza + momentum↑ ({ha_momentum:+.3f} ATR)"]
+            elif ha_momentum is None:
+                pewnosc = pewnosc_bazowa
+                powody = ["HA BULL: świeca bycza (brak momentum)"]
+            else:
+                # Świeca bycza ale momentum spada — słaby sygnał
+                pewnosc = pewnosc_bazowa - 0.15
+                powody = [f"HA BULL słaby: świeca bycza ale momentum↓ ({ha_momentum:+.3f} ATR)"]
+
+            if vol_idx is not None:
+                powody.append(f"VolIdx={vol_idx:.4f}")
+            return self._bazowy_sygnal(vol_idx, "LONG", max(0.0, pewnosc), powody)
+
+        if ha_bear and not ha_bull:
+            if mom_potwierdza_bear:
+                pewnosc = pewnosc_bazowa + 0.15
+                powody = [f"HA BEAR: świeca niedźwiedzia + momentum↓ ({ha_momentum:+.3f} ATR)"]
+            elif ha_momentum is None:
+                pewnosc = pewnosc_bazowa
+                powody = ["HA BEAR: świeca niedźwiedzia (brak momentum)"]
+            else:
+                pewnosc = pewnosc_bazowa - 0.15
+                powody = [f"HA BEAR słaby: świeca niedźwiedzia ale momentum↑ ({ha_momentum:+.3f} ATR)"]
+
+            if vol_idx is not None:
+                powody.append(f"VolIdx={vol_idx:.4f}")
+            return self._bazowy_sygnal(vol_idx, "SHORT", max(0.0, pewnosc), powody)
+
+        return self._bazowy_sygnal(None, "NEUTRAL", 0.10,
+            ["HA Doji/niejednoznaczna świeca — brak sygnału"])

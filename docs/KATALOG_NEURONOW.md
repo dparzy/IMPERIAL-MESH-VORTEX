@@ -577,7 +577,7 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | 💎 Dywizja Perł (wyspecjalizowane) | 10 |
 | **RAZEM (szacunek skanu I-IV)** | **261** |
 
-> **299 neuronów skatalogowanych** (zweryfikowane policzeniem unikalnych kluczy; wcześniejsze szacunki 261/328 były nieuzgodnione). 27 zaimplementowanych w kodzie.
+> **299 neuronów skatalogowanych** (zweryfikowane policzeniem unikalnych kluczy; wcześniejsze szacunki 261/328 były nieuzgodnione). 28 zaimplementowanych w kodzie.
 > Cała baza wskaźników przeskanowana (sekcje 1.0–3.0). Zero luk.
 > Każdy neuron przed bojem przechodzi przez Koloseum (Prawo VI).
 

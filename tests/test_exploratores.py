@@ -845,3 +845,67 @@ def test_displacement_atr_true_range():
     ]
     trs = _atr_series(bary)
     assert abs(trs[1] - 10) < 1e-9
+
+
+# ─── EXP-11 Dynamic Scalper ───────────────────────────────────────────────────
+
+def test_dynamic_import():
+    from imperium.legiony.zwiadowcy.exp_dynamic import ZwiadowcaDynamic
+    d = ZwiadowcaDynamic()
+    assert d.KLUCZ == "EXP-11"
+
+
+def test_dynamic_za_malo_barow():
+    from imperium.legiony.zwiadowcy.exp_dynamic import ZwiadowcaDynamic
+    d = ZwiadowcaDynamic()
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100}] * 5
+    r = d.analizuj(bary)
+    assert r.kierunek == "NEUTRAL"
+
+
+def test_dynamic_percentyl():
+    from imperium.legiony.zwiadowcy.exp_dynamic import _percentyl
+    assert abs(_percentyl([1, 2, 3, 4], 0.0) - 1) < 1e-9
+    assert abs(_percentyl([1, 2, 3, 4], 1.0) - 4) < 1e-9
+    assert abs(_percentyl([1, 2, 3, 4], 0.5) - 2.5) < 1e-9
+
+
+def test_dynamic_slippage_guard_blokuje():
+    """Szeroki spread (drogi fill) musi wyciszyć sygnał — perełka oryginału."""
+    from imperium.legiony.zwiadowcy.exp_dynamic import ZwiadowcaDynamic
+    d = ZwiadowcaDynamic()
+    # 54 bary wąskie, trend rosnący (cross up powstałby)
+    bary = []
+    for i in range(54):
+        c = 100 + i * 0.1
+        bary.append({"open": c, "high": c + 0.05, "low": c - 0.05, "close": c})
+    # ostatni bar: ekstremalnie szeroki spread (zły fill)
+    c = 100 + 54 * 0.1
+    bary.append({"open": c, "high": c + 5, "low": c - 5, "close": c})
+    r = d.analizuj(bary)
+    assert r.kierunek == "NEUTRAL", f"Szeroki spread powinien wyciszyć, jest {r.kierunek}"
+    assert any("SLIPPAGE" in p for p in r.sygnal.powody)
+
+
+def test_dynamic_cross_to_zdarzenie():
+    """Cross musi być zdarzeniem — utrzymany stan fast>slow NIE generuje sygnału."""
+    from imperium.legiony.zwiadowcy.exp_dynamic import ZwiadowcaDynamic
+    d = ZwiadowcaDynamic()
+    # Stały trend rosnący od dawna: fast>slow przez cały czas (stan, nie cross)
+    bary = []
+    for i in range(60):
+        c = 100 + i * 0.5
+        bary.append({"open": c, "high": c + 0.1, "low": c - 0.1, "close": c})
+    r = d.analizuj(bary)
+    # fast>slow utrzymane → brak świeżego crossa → NEUTRAL
+    assert r.kierunek == "NEUTRAL", f"Utrzymany stan nie powinien dać sygnału, jest {r.kierunek}"
+
+
+def test_dynamic_atr_true_range():
+    from imperium.legiony.zwiadowcy.exp_dynamic import _atr_series
+    bary = [
+        {"open": 99, "high": 101, "low": 98, "close": 100},
+        {"open": 108, "high": 110, "low": 108, "close": 109},
+    ]
+    trs = _atr_series(bary)
+    assert abs(trs[1] - 10) < 1e-9

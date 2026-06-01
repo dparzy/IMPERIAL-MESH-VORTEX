@@ -11,6 +11,10 @@ from imperium.legiony.zwiadowcy.exp_higuchi import ZwiadowcaHiguchiFD, _higuchi_
 from imperium.legiony.zwiadowcy.exp_ha_scalper import ZwiadowcaHAScalper, _oblicz_ha
 from imperium.legiony.zwiadowcy.exp_hurst import ZwiadowcaHurst, _hurst_rs
 from imperium.legiony.zwiadowcy.exp_kalman import ZwiadowcaKalmanATR, _kalman_filter_1d, _kalman_atr
+from imperium.legiony.zwiadowcy.exp_smc import (
+    ZwiadowcaSMC, aktywuj_neurony_smc,
+    _swing_pivots, _wykryj_fvg, _wykryj_order_blocks, _wykryj_bos_mss,
+)
 
 
 # ─── Pomocnicze ───────────────────────────────────────────────────────────────
@@ -412,3 +416,108 @@ def test_neuron_dostepny_domyslnie_true():
     from imperium.legiony.neurony.momentum import NeuronRSI
     n = NeuronRSI()
     assert n.DOSTEPNY is True
+
+
+# ─── EXP-05 ZwiadowcaSMC ──────────────────────────────────────────────────────
+
+def _bar_oc(o, h, l, c, vol=1000.0):
+    return {"open": o, "high": h, "low": l, "close": c, "volume": vol, "timestamp": 0}
+
+
+def test_swing_pivots_wykrywa_szczyt():
+    # Bar 2 (high=110) jest swing high — wyższy niż sąsiedzi
+    bary = [_bar_oc(100, 102, 99, 101), _bar_oc(101, 105, 100, 104),
+            _bar_oc(104, 110, 103, 108), _bar_oc(108, 106, 104, 105),
+            _bar_oc(105, 103, 101, 102)]
+    sh, sl = _swing_pivots(bary, lewo=2, prawo=2)
+    assert 2 in sh
+
+
+def test_fvg_bullish_luka():
+    """Bullish FVG: low[i] > high[i-2]."""
+    # bar0 high=100, bar2 low=105 → luka [100,105]
+    bary = [_bar_oc(95, 100, 94, 99), _bar_oc(99, 104, 98, 103), _bar_oc(103, 108, 105, 107)]
+    fvg = _wykryj_fvg(bary)
+    assert fvg["BULL_FVG_LOW"] == 100
+    assert fvg["BULL_FVG_HIGH"] == 105
+
+
+def test_order_block_bullish_wykryty():
+    """Czerwona świeca przed silnym impulsem zielonym = Bullish OB."""
+    bary = ([_bar_oc(100, 101, 99, 100) for _ in range(3)]
+            + [_bar_oc(100, 100.5, 98, 98.5)]      # czerwona (OB)
+            + [_bar_oc(98.5, 112, 98, 111)]         # silny impuls zielony
+            + [_bar_oc(111, 113, 110, 112) for _ in range(2)])
+    ob = _wykryj_order_blocks(bary, impuls_prog=1.2)
+    assert ob["BULL_OB_HIGH"] is not None
+
+
+def test_zwiadowca_smc_sygnal():
+    z = ZwiadowcaSMC()
+    bary = _bary_trend(n=30, krok=0.5)
+    raport = z.analizuj(bary)
+    assert raport.sygnal.neuron_id == "EXP-05"
+    assert raport.sygnal.kierunek in ("LONG", "SHORT", "NEUTRAL")
+
+
+def test_zwiadowca_smc_za_malo_barow():
+    z = ZwiadowcaSMC()
+    raport = z.analizuj([_bar() for _ in range(5)])
+    assert raport.sygnal.kierunek == "NEUTRAL"
+
+
+def test_smc_wstrzyknij_dodaje_klucze():
+    """wstrzyknij() dodaje strefy SMC do dict wskazniki."""
+    z = ZwiadowcaSMC()
+    bary = _bary_trend(n=30, krok=0.5)
+    wskazniki = {"RSI_14": 55.0}
+    wynik = z.wstrzyknij(wskazniki, bary)
+    # Po wstrzyknięciu dict ma klucze SMC
+    assert "CLOSE" in wynik
+    assert "BOS_BULLISH" in wynik
+    assert "MSS_BULLISH" in wynik
+    # Oryginalne dane zachowane
+    assert wynik["RSI_14"] == 55.0
+
+
+def test_smc_most_budzi_neurony():
+    """
+    PEŁNY MOST: EXP-05 wstrzykuje strefy → SMC neurony (aktywowane) interpretują.
+    To jest sedno — martwe neurony budzą się przez zwiadowcę.
+    """
+    from imperium.legiony.neurony.struktura import NeuronOrderBlock, NeuronFVG, NeuronBOS
+    from imperium.legiony.mikro_neuron import Roj
+
+    # 1. Aktywuj neurony SMC (symuluje pipeline z EXP-05)
+    aktywowane = aktywuj_neurony_smc()
+    assert set(aktywowane) == {"SMC-01", "SMC-02", "SMC-03"}
+
+    try:
+        # 2. Zwiadowca wstrzykuje strefy
+        z = ZwiadowcaSMC()
+        bary = _bary_trend(n=30, krok=0.5)
+        wskazniki = {}
+        z.wstrzyknij(wskazniki, bary)
+
+        # 3. Rój odpala neurony SMC — teraz dostępne, produkują sygnały
+        roj = Roj([NeuronOrderBlock(), NeuronFVG(), NeuronBOS()])
+        sygnaly = roj.zbierz_sygnaly(wskazniki)
+        # Wcześniej byłoby 0 (wyciszone), teraz 3 sygnały
+        assert len(sygnaly) == 3
+        assert all(s.kierunek in ("LONG", "SHORT", "NEUTRAL") for s in sygnaly)
+    finally:
+        # Posprzątaj — przywróć stan wyciszony (izolacja testów)
+        for klasa in (NeuronOrderBlock, NeuronFVG, NeuronBOS):
+            klasa.DOSTEPNY = False
+
+
+def test_smc_bez_mostu_neurony_wyciszone():
+    """Bez aktywacji EXP-05 neurony SMC są wyciszone (zero fałszywych sygnałów)."""
+    from imperium.legiony.neurony.struktura import NeuronOrderBlock, NeuronFVG, NeuronBOS
+    from imperium.legiony.mikro_neuron import Roj
+    # Upewnij się że są wyciszone (domyślny stan)
+    for klasa in (NeuronOrderBlock, NeuronFVG, NeuronBOS):
+        klasa.DOSTEPNY = False
+    roj = Roj([NeuronOrderBlock(), NeuronFVG(), NeuronBOS()])
+    sygnaly = roj.zbierz_sygnaly({"CLOSE": 100, "BULL_OB_HIGH": 101, "BULL_OB_LOW": 99})
+    assert len(sygnaly) == 0

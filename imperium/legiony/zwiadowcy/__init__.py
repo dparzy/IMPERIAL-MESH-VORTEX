@@ -17,10 +17,12 @@ from .exp_higuchi import ZwiadowcaHiguchiFD
 from .exp_ha_scalper import ZwiadowcaHAScalper
 from .exp_hurst import ZwiadowcaHurst
 from .exp_kalman import ZwiadowcaKalmanATR
+from .exp_smc import ZwiadowcaSMC, aktywuj_neurony_smc
 
 __all__ = [
     "ZwiadowcaElitarny", "RaportZwiadowcy", "TypDanych",
     "IgrzyskaExploratores", "RangaExploratores",
     "ZwiadowcaHiguchiFD", "ZwiadowcaHAScalper",
     "ZwiadowcaHurst", "ZwiadowcaKalmanATR",
+    "ZwiadowcaSMC", "aktywuj_neurony_smc",
 ]

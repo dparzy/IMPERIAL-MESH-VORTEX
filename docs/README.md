@@ -16,6 +16,7 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [ARSENAL_WSKAZNIKOW.md](ARSENAL_WSKAZNIKOW.md) | 157 wskaźników/strategii → mikro-neurony, mapowanie na legiony (scalp/swing/invest/leverage) |
 | [PLAN_DEEPSEEK.md](PLAN_DEEPSEEK.md) | Jak podłączyć DeepSeek API jako mózg Cesarza i Senatu (Populares vs Optimates) |
 | [ARSENAL_AMERYKI.md](ARSENAL_AMERYKI.md) | 690 linków z 50+ krajów (Americas, Europa, Afryka, Australia, Oceania) — oceny 1-10, priorytety 1-5 |
+| [LEGIONY_ARCHITEKTURA.md](LEGIONY_ARCHITEKTURA.md) | Cztery Legiony (Equestris/Fulminata/Augusta/Ferrata) — mikro-neurony, schemat sygnału, Pretorianie |
 | _(wkrótce)_ | System Numeracji — klucz kodowy i intuicja botów |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.

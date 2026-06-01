@@ -20,6 +20,58 @@ OPLATA_UTRZYMANIA = 0.005  # 0.5% — typowe dla Binance/MEXC
 MAX_DZWIGNIA = 20
 MAX_RYZYKO = 0.02           # 2% kapitału max per trade
 MIN_RR = 2.0                # minimum Risk:Reward 1:2
+MAX_DRAWDOWN_STOP = 0.30    # AOA: "nigdy nie kochaj pozycji" — 30% obsunięcia = STOP
+
+
+@dataclass
+class BezpiecznikKapitalu:
+    """
+    Bezpiecznik AOA (reguła W-028) — twardy circuit-breaker portfela.
+
+    Śledzi szczyt kapitału. Gdy bieżący kapitał spadnie o MAX_DRAWDOWN_STOP
+    od szczytu → bezpiecznik się przepala (tripped) i blokuje WSZYSTKIE
+    nowe pozycje aż do ręcznego resetu przez Komendanta.
+
+    Użycie:
+        bezp = BezpiecznikKapitalu(kapital_startowy=5000)
+        bezp.aktualizuj(4200)        # po serii strat
+        if bezp.przepalony: ...      # blokada wejść
+    """
+    kapital_startowy: float
+    kapital_szczyt: float = 0.0
+    kapital_biezacy: float = 0.0
+    przepalony: bool = False
+
+    def __post_init__(self):
+        if self.kapital_szczyt <= 0:
+            self.kapital_szczyt = self.kapital_startowy
+        if self.kapital_biezacy <= 0:
+            self.kapital_biezacy = self.kapital_startowy
+
+    def aktualizuj(self, kapital_biezacy: float) -> None:
+        """Po każdym zamknięciu pozycji — zaktualizuj stan kapitału."""
+        self.kapital_biezacy = kapital_biezacy
+        if kapital_biezacy > self.kapital_szczyt:
+            self.kapital_szczyt = kapital_biezacy
+        if self.drawdown >= MAX_DRAWDOWN_STOP:
+            self.przepalony = True
+            logger.warning(
+                f"🛑 BEZPIECZNIK AOA PRZEPALONY! Drawdown {self.drawdown:.1%} "
+                f"≥ {MAX_DRAWDOWN_STOP:.0%}. Wszystkie pozycje zablokowane."
+            )
+
+    @property
+    def drawdown(self) -> float:
+        """Obsunięcie od szczytu (0.0–1.0)."""
+        if self.kapital_szczyt <= 0:
+            return 0.0
+        return max(0.0, (self.kapital_szczyt - self.kapital_biezacy) / self.kapital_szczyt)
+
+    def reset(self) -> None:
+        """Ręczny reset przez Komendanta po przeglądzie (Lex Paenitentiae)."""
+        self.przepalony = False
+        self.kapital_szczyt = self.kapital_biezacy
+        logger.info("✅ Bezpiecznik AOA zresetowany ręcznie. Nowy szczyt = bieżący kapitał.")
 
 
 @dataclass
@@ -52,7 +104,8 @@ class KalkulatorLewara:
     def policz(self, symbol: str, kierunek: str, cena_wejscia: float,
                dzwignia: int, kapital_usdt: float,
                pewnosc: float = 0.7, rezim: str = "NORMAL",
-               pretorianie_ok: bool = True) -> PlanPozycji:
+               pretorianie_ok: bool = True,
+               bezpiecznik: "BezpiecznikKapitalu | None" = None) -> PlanPozycji:
 
         kierunek = kierunek.upper()
         assert kierunek in ("LONG", "SHORT"), "kierunek musi być LONG lub SHORT"
@@ -88,7 +141,8 @@ class KalkulatorLewara:
         # 7. Checklist
         ok, powod = self._checklist(
             kierunek, dzwignia, pewnosc, rezim,
-            pretorianie_ok, bufor_pct, rozmiar_usdt, kapital_usdt
+            pretorianie_ok, bufor_pct, rozmiar_usdt, kapital_usdt,
+            bezpiecznik
         )
 
         return PlanPozycji(
@@ -126,7 +180,12 @@ class KalkulatorLewara:
 
     def _checklist(self, kierunek: str, dzwignia: int, pewnosc: float,
                    rezim: str, pretorianie_ok: bool,
-                   bufor_pct: float, rozmiar: float, kapital: float):
+                   bufor_pct: float, rozmiar: float, kapital: float,
+                   bezpiecznik: "BezpiecznikKapitalu | None" = None):
+        if bezpiecznik is not None and bezpiecznik.przepalony:
+            return False, (f"🛑 BEZPIECZNIK AOA przepalony — drawdown "
+                           f"{bezpiecznik.drawdown:.1%} ≥ {MAX_DRAWDOWN_STOP:.0%}. "
+                           f"Wymaga ręcznego resetu Komendanta.")
         if not pretorianie_ok:
             return False, "Pretorianie nałożyli VETO (warunki zewnętrzne)"
         if rezim == "PANIC":
@@ -203,3 +262,21 @@ if __name__ == "__main__":
         rezim="VOLATILE"
     )
     kalk.drukuj_plan(plan2)
+
+    # Demo bezpiecznika AOA (W-028): kapitał spada z 5000 do 3400 (-32%)
+    print("\n=== Bezpiecznik AOA (reguła 30%) ===")
+    bezp = BezpiecznikKapitalu(kapital_startowy=5_000)
+    bezp.aktualizuj(4_500)   # -10% — ok
+    print(f"Po -10%: drawdown={bezp.drawdown:.1%}, przepalony={bezp.przepalony}")
+    bezp.aktualizuj(3_400)   # -32% od szczytu — STOP
+    print(f"Po -32%: drawdown={bezp.drawdown:.1%}, przepalony={bezp.przepalony}")
+
+    plan3 = kalk.policz(
+        symbol="BTCUSDT", kierunek="LONG",
+        cena_wejscia=100_000, dzwignia=10,
+        kapital_usdt=3_400, pewnosc=0.85,
+        rezim="TREND_STRONG", bezpiecznik=bezp
+    )
+    kalk.drukuj_plan(plan3)
+    assert not plan3.checklist_ok, "Bezpiecznik powinien zablokować!"
+    print("✅ Bezpiecznik AOA poprawnie zablokował wejście po 32% obsunięciu")

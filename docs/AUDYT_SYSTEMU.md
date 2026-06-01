@@ -11,13 +11,13 @@
 
 ```
 ╔══════════════════════════════════════════════════════════════════════╗
-║               🏛️  AUDYT IMPERIUM v0.3.0 — 2026-06-01                ║
+║               🏛️  AUDYT IMPERIUM v0.4.0 — 2026-06-01                ║
 ╠══════════════════════════════════════════════════════════════════════╣
-║  Moduły kodu:        23 pliki .py                                    ║
-║  Dokumenty:          22 pliki .md                                    ║
-║  Neurony:            306 zmapowanych                                 ║
-║  Strategie:          ~103+ zmapowanych                               ║
-║  Testy automatyczne: 0 (LUKA KRYTYCZNA)                              ║
+║  Moduły kodu:        24 pliki .py                                    ║
+║  Dokumenty:          25 plików .md                                   ║
+║  Neurony:            328 zmapowanych                                 ║
+║  Strategie:          ~108+ zmapowanych                               ║
+║  Testy automatyczne: 28 ✅ (luka #1 zamknięta)                      ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║  ✅ Działające (bez TA-Lib):    8 modułów                            ║
 ║  ⚠️  Blokowane przez TA-Lib:    9 modułów                            ║
@@ -80,8 +80,8 @@
 
 | # | Czego brakuje | Gdzie | Priorytet |
 |---|---------------|-------|-----------|
-| 1 | **Testy automatyczne** (`tests/`) — ZERO testów w projekcie | `tests/` | 🔴 Krytyczny |
-| 2 | **Scorer Igrzysk** — kod który liczy rankingi neuronów | `biblioteki/igrzyska.py` | 🔴 Wysoki |
+| 1 | ✅ ZROBIONE — **Testy automatyczne** `tests/` (28 testów, 0 zależności) | `tests/` | ~~🔴~~ |
+| 2 | ✅ ZROBIONE — **Scorer Igrzysk** `igrzyska.py` (11 testów) | `biblioteki/igrzyska.py` | ~~🔴~~ |
 | 3 | **Moduł Neuronów produkcyjnych** — mamy spec 306 neuronów, ale w kodzie tylko 2 przykłady | `legiony/neurony/` | 🔴 Wysoki |
 | 4 | **Doradcy Cara** — SHARP/Oracle/Iustitia/Pythia w kodzie | `cesarz/doradcy/` | 🟠 Średni |
 | 5 | **Konektor CME Gap** — pobieranie danych CME futures | `oczy/cme_feed.py` | 🟠 Średni |

@@ -5,7 +5,19 @@
 ## 📜 Konstytucja
 
 Pełne prawa: [`ZASADY_FUNDAMENTALNE.md`](./ZASADY_FUNDAMENTALNE.md).
-Każda decyzja musi być zgodna z 16 Prawami Imperium.
+Każda decyzja musi być zgodna z 17 Prawami Imperium.
+
+## 🗺️ PRAWO XVII — ROZPOZNANIE TERENU (ROZKAZ STAŁY, ROBISZ TO PIERWSZE)
+
+**Na początku KAŻDEJ sesji i przed KAŻDYM nowym zadaniem** — najpierw przeczytaj
+stan Imperium, NIE zgaduj z pamięci:
+- [ ] `README.md`, `CLAUDE.md`, `ZASADY_FUNDAMENTALNE.md`
+- [ ] `docs/` — indeksy i katalogi (KATALOG_NEURONOW, KATALOG_STRATEGII, INDEKS_IMPERIUM)
+- [ ] realny kod w `imperium/` vs to, co mówią dokumenty (katalog ≠ kod)
+- [ ] aktualne liczby: neurony, zwiadowcy, prawa, testy
+
+Po KAŻDEJ zmianie systemu **zaktualizuj dokumentację w tym samym ruchu**
+(README, indeksy, katalogi, liczby, status). Nieaktualny dokument = kłamstwo.
 
 ## 🚨 PRAWO XV — CZERWONY ALARM UTRATY POTENCJAŁU (ROZKAZ STAŁY)
 

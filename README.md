@@ -1,22 +1,41 @@
 # 🏛️ IMPERIAL MESH VORTEX
 
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
-> Lokalny, samouczący się rój agentów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
+> Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
+
+> **Stan na:** 2026-06-01 · **Testy:** 237/237 zielone · **Faza:** rdzeń decyzyjny działa, rozbudowa roju w toku.
 
 ---
 
 ## 🎯 Czym jest ten projekt
 
 System tradingowy zbudowany na metaforze **Cesarstwa Rzymskiego** — od Cesarza (mózg AI) po Akwedukty (dane).
-Inspirowany realnym projektem **DNSS** (rój 79 agentów AI zbudowany na starym komputerze), ale celuje wyżej:
-pełna lokalność, pełna autonomia, zero halucynacji.
+Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej: pełna lokalność, pełna autonomia, zero halucynacji.
 
 **Główne założenia:**
-- 🧠 Rój autonomicznych agentów, którzy debatują i decydują kolektywnie
-- 💾 Działa lokalnie na własnym sprzęcie — zero przymusowej chmury
-- 🔄 Tworzy strategie sam, w locie — nie realizuje sztywnych schematów
-- 🎙️ Sterowanie i raportowanie głosowe — system jako mentor i zwiadowca
-- ✅ Zero halucynacji — matematykę liczy kod, AI tylko interpretuje
+- 🧠 Rój mikro-neuronów, które głosują, a Generał Legatus agreguje sygnał
+- 💾 Działa lokalnie — matematykę liczy kod (Brama), AI tylko interpretuje
+- 🔄 Strategie dobierane do reżimu rynku (wagi reżimowe)
+- ✅ Zero halucynacji + jawność potencjału (Prawo XV)
+
+---
+
+## 📊 Co JEST zbudowane (kod + testy) — stan faktyczny
+
+> Rozróżnienie obowiązkowe (Prawo I): **„katalog" = projekt na papierze, „kod" = działa i ma testy.**
+
+| Komponent | Stan w kodzie |
+|-----------|---------------|
+| **Mikro-neurony** | **27 zaimplementowanych** (15 aktywnych na OHLCV + 12 wyciszonych: czekają na API/feed) |
+| **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
+| **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
+| **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
+| **Generał Legatus** | agregacja głosów + wagi reżimowe + odpalanie zwiadowców |
+| **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
+| **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
+| **Testy** | `python tests/run_tests.py` → **237/237** |
+
+**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **~261 neuronów** docelowo — to mapa drogowa, nie kod. Różnica = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
 ---
 
@@ -24,39 +43,46 @@ pełna lokalność, pełna autonomia, zero halucynacji.
 
 | Folder / Plik | Zawartość |
 |---------------|-----------|
-| **[ZASADY_FUNDAMENTALNE.md](ZASADY_FUNDAMENTALNE.md)** | Konstytucja projektu — 8 praw, których zawsze przestrzegamy |
-| **docs/** | Uporządkowana dokumentacja (architektura, koncepcje, raporty) |
-| **archiwum/** | Surowa, oryginalna wizja — zbiór wszystkich rozmów i pomysłów |
+| **[ZASADY_FUNDAMENTALNE.md](ZASADY_FUNDAMENTALNE.md)** | Konstytucja — **16 praw**, których zawsze przestrzegamy |
+| **[CLAUDE.md](CLAUDE.md)** | Instrukcje stałe (czytane co sesję): Prawo XV/XVI, bezpieczeństwo, git |
+| **imperium/** | Żywy kod systemu (patrz mapa niżej) |
+| **docs/** | Dokumentacja + katalogi projektowe (neurony, strategie, arsenał) |
+| **tests/** | Testy bez zależności: `python tests/run_tests.py` |
+| **archiwum/** | Surowa, oryginalna wizja |
+| **kingdom-pixel/** | Archiwum poprzedniego projektu (NIE wchodzi do żywego systemu bez decyzji) |
 
 ---
 
-## 🗺️ Mapa Imperium (architektura)
+## 🗺️ Mapa Imperium (realne foldery w `imperium/`)
 
 ```
-👑 CESARZ        — Główny mózg AI (decyzje, ewolucja)
-🏛️ SENAT         — Systemy decyzyjne multi-agent (debata, konsensus)
-⚔️ LEGIONY        — Boty strategiczne (wykonanie)
-🛡️ PRETORIANIE    — Bezpieczeństwo i guardrails
-🏗️ AKWEDUKTY      — Pipeline danych (CCXT, Polars, ClickHouse, Redis)
-🛤️ DROGI          — API i egzekucja (Binance, OKX, NautilusTrader)
-🎨 ŚWIĄTYNIE      — Dashboard i wizualizacja
-📚 BIBLIOTEKI     — Wiedza i strategie (vector DB)
+👑 cesarz/       — mózg decyzyjny i doradcy        (9 modułów)
+🏛️ senat/        — debata / konsensus              (2)
+⚔️ legiony/      — neurony + zwiadowcy + Legatus    (29)
+🏟️ koloseum/     — Igrzyska, rangowanie             (2)
+🛡️ pretorianie/  — bezpieczeństwo, kalkulator lewara (3)
+🏗️ akwedukty/    — pipeline danych                 (1)
+🛤️ drogi/        — API i egzekucja                 (3)
+🎨 swiatynie/    — dashboard / wizualizacja         (2)
+📚 biblioteki/   — wiedza, pamięć                   (4)
+👁️ oczy/         — obserwatorzy / źródła            (1)
+🧮 fundament/    — Brama Kalkulatora                (2)
 ```
 
 ---
 
 ## 🚦 Status
 
-🟡 **Faza: Fundament** — budujemy zasady i porządkujemy wizję.
-
-Kolejność prac (zgodnie z Prawem VII):
-1. ✅ Zasady fundamentalne
-2. 🔄 Uporządkowanie wizji
-3. ⬜ Dane i egzekucja
-4. ⬜ Inteligencja (agenci)
-5. ⬜ Wizualizacja
+🟢 **Rdzeń decyzyjny działa** — rój neuronów głosuje, Legatus agreguje, testy zielone.
+🔄 **W toku:** rozbudowa roju z katalogu (zdekorelowana, partiami — Prawo XVI), adaptery API/feed (obudzenie wyciszonych neuronów i EXP-12).
 
 ---
+
+## 🧪 Uruchomienie testów
+
+```bash
+python tests/run_tests.py     # 237/237, bez zależności zewnętrznych
+```
 
 ---
 
@@ -64,9 +90,10 @@ Kolejność prac (zgodnie z Prawem VII):
 
 | Imię | Rola |
 |------|------|
-| **Komendant** (Ty) | Cesarz. Ostatnie słowo należy zawsze do Ciebie. |
-| **VITRUVIUSZ** | Architekt Imperium. Projektuje, buduje i porządkuje wiedzę. |
+| **Komendant / Cezar** (Ty) | Ostatnie słowo należy zawsze do Ciebie. |
+| **Architekt Imperium** | Projektuje, buduje, porządkuje — i mówi prawdę o stanie (Prawo I, XV). |
 
 ---
 
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*
+> 📊 *"Mniej, ale prawdziwie. Katalog to plan, kod to fakt."*

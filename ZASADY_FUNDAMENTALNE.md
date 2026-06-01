@@ -217,5 +217,34 @@ Imperium rośnie przez zdekorelowaną różnorodność, nie przez jeden idealny 
 
 ---
 
+## ⚖️ PRAWO XVII — ROZPOZNANIE TERENU I PORZĄDEK 🗺️
+
+> **Rozkaz Cezara.** Zanim ruszysz — POZNAJ to, co już masz. Nieaktualna dokumentacja to kłamstwo, które samo się rozrasta.
+
+**Na początku KAŻDEJ sesji i przed KAŻDYM nowym zadaniem** — OBOWIĄZKOWO:
+
+1. 📖 **PRZECZYTAJ stan Imperium** — repozytorium (GitHub/lokalnie): `README.md`,
+   `CLAUDE.md`, `docs/` (katalogi, indeksy), realny kod w `imperium/`. Nie zgaduj
+   z pamięci ani z poprzedniej sesji — sprawdź FAKTY w plikach.
+2. 🧭 **Zrozum różnicę katalog vs kod** — co jest zaprojektowane (docs), a co
+   faktycznie zaimplementowane i przetestowane. Raportuj liczby uczciwie (Prawo I).
+3. 🧹 **DBAJ O PORZĄDEK** — gdy zmieniasz system, AKTUALIZUJ dokumentację w tym
+   samym ruchu: `README.md`, indeksy, katalogi, liczby modułów/praw, status fazy.
+   Dokument, który kłamie o stanie, jest gorszy niż jego brak.
+4. ✅ **ZOSTAW ŚLAD** — każda zmiana = commit z prawdą; dokumentacja zsynchronizowana
+   z kodem przed zakończeniem zadania.
+
+**Zakaz pracy „w ciemno".** Rozpoczęcie zadania bez rozpoznania zawartości Imperium
+albo pozostawienie nieaktualnego README/katalogu = złamanie Prawa XVII.
+
+Checklist startu sesji:
+- [ ] Przeczytałem README, CLAUDE.md, indeksy w docs/?
+- [ ] Sprawdziłem realny kod vs to, co mówią dokumenty?
+- [ ] Znam aktualne liczby (neurony, zwiadowcy, prawa, testy)?
+- [ ] Po zmianie zaktualizowałem dokumentację, żeby mówiła prawdę?
+
+---
+
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*
 > 🚨 *"Niewykorzystana siła to siła oddana wrogowi. Imperium nie marnuje niczego."*
+> 🗺️ *"Wódz, który nie zna własnego obozu, przegrywa bitwę przed jej początkiem."*

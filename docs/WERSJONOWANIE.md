@@ -75,6 +75,26 @@ class NeuronWaddahAttar(MikroNeuron):
 
 ## 📜 HISTORIA WERSJI
 
+### [v0.5.0] — 2026-06-01 — *"Consilium Principis"*
+*(Rada Cesarza)*
+
+#### Dodano
+- `🏛️ IMV-ORI` `cesarz/doradcy/oracle.py` — ORACLE (Sharpe Auditor): Q_score = 0.3×Sharpe + 0.25×Sortino + 0.25×Calmar + 0.2×Omega; GODNE/WĄTPLIWE/NIEGODNE
+- `🏛️ IMV-ORI` `cesarz/doradcy/fulmen.py` — FULMEN (Regime Validator): weryfikacja ADX+Vortex+Choppiness+Kaufman ER, wykrywa KONFLIKT reżimów ×1.2/×0.7
+- `🏛️ IMV-ORI` `cesarz/doradcy/iustitia.py` — IUSTITIA (Risk Auditor): portfolio heat >6% veto, korelacja >0.75 veto, seria 5 strat = cooling, Half Kelly
+- `🏛️ IMV-ORI` `cesarz/doradcy/hermes.py` — HERMES (Info Auditor): kompletność danych, świeżość 2×interwał, hash SHA-256, VPIN >0.75, event blocker 30min
+- `🏛️ IMV-ORI` `cesarz/doradcy/pythia.py` — PYTHIA (Probabilistic): fingerprint matching OdciskPalca (reżim+interwał+kierunek+binning), p_zysk z historii
+- `🏛️ IMV-ORI` `cesarz/doradcy/rada.py` — RadaDoradcow: orchestrator 5/5=×1.0, 4/5=×0.8, 3/5=×0.6, <3=blokada; IUSTITIA/HERMES = veto bezwarunkowe
+- `🏛️ IMV-ORI` `docs/OBSERWATORZY.md` — pełna mapa 44 źródeł informacji (5 warstw: OCZY/USZY/WIESZCZOWIE/SZPIEDZY/HEROLD), priorytety kluczy API
+- `tests/test_doradcy.py` — 24 testy wszystkich doradców + Rady
+
+#### Zmieniono
+- Testy: 28 → **52** (+ 24 testy doradców)
+- Luka audytu #3 zamknięta: Doradcy Cara w kodzie (było tylko spec w DORADCY_CARA.md)
+- `AUDYT_SYSTEMU.md` — zaktualizowany dashboard (52 testów, luka #3 zamknięta)
+
+---
+
 ### [v0.4.0] — 2026-06-01 — *"Certamen Vivum"*
 *(Żywa Rywalizacja)*
 

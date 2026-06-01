@@ -5,17 +5,18 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 
 **Stan na:** 2026-06-01 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 28 neuronów (zarejestrowanych w roju) + 12 zwiadowców = **40 modułów w kodzie**
+**Zaimplementowane:** 32 neurony (zarejestrowane w roju) + 12 zwiadowców = **44 moduły w kodzie**
+**Aktywne / wyciszone:** 20 aktywnych (czyste OHLCV) + 12 wyciszonych (API/feed)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
-**Do wdrożenia:** 271 neuronów
+**Do wdrożenia:** 267 neuronów
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 28). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 32). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-01:** wykryto 2 neurony-sieroty w `mikro_neuron.py` (X-02 StochRSI,
-> VI-01 FundingRate) — kod istniał, ale poza rojem (utrata potencjału, Prawo XV).
-> Naprawa: X-02 promowany do `momentum.py` + Brama/Budowniczy (STOCHRSI) → aktywny;
-> VI-01 wycofany jako redundantny z `NeuronFundingExtreme` (Prawo XVI).
+> VI-01 FundingRate). Naprawa: X-02 promowany do roju; VI-01 wycofany (redundancja).
+> **Faza 1 (2026-06-01):** ożywiono 4 neurony z katalogu na czystym OHLCV (aktywne):
+> X-08 Awesome, X-11 RVOL, X-17 TRIX, X-18 Donchian — zdekorelowane (Prawo XVI).
 
 ---
 
@@ -38,7 +39,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (28/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (32/299)
 
 ### Plik: `neurony/momentum.py`
 
@@ -46,6 +47,8 @@
 |-------|-------|--------|------|
 | M-RSI | NeuronRSI | ✅ aktywny | RSI(14) z dywergencją |
 | X-02 | NeuronStochRSI | ✅ aktywny | Stochastic RSI %K (Brama: STOCHRSI) |
+| X-08 | NeuronAwesome | ✅ aktywny | Awesome Oscillator (median price) |
+| X-17 | NeuronTRIX | ✅ aktywny | TRIX potrójnie wygładzone momentum |
 | M-MACD | NeuronMACD | ✅ aktywny | MACD crossover |
 | M-BB | NeuronBBands | ✅ aktywny | Bollinger Bands squeeze/bounce |
 | M-EMA | NeuronEMACross | ✅ aktywny | EMA 9/21 cross |
@@ -61,6 +64,7 @@
 | T-ICHI | NeuronIchimoku | ✅ aktywny | Ichimoku cloud |
 | T-EMA50 | NeuronEMA50_200 | ✅ aktywny | EMA 50/200 cross |
 | T-SUPER | NeuronSupertrend | ✅ aktywny | Supertrend ATR |
+| X-18 | NeuronDonchian | ✅ aktywny | Donchian Channel wybicia |
 
 ### Plik: `neurony/wolumen.py`
 
@@ -68,6 +72,7 @@
 |-------|-------|--------|------|
 | V-OBV | NeuronOBV | ✅ aktywny | On-Balance Volume |
 | V-VWAP | NeuronVWAP | ✅ aktywny | VWAP bounce |
+| X-11 | NeuronRVOL | ✅ aktywny | Relative Volume (wsparcie ruchu) |
 | V-CVD | NeuronCVD | 🔇 wyciszony (brak CVD z Bramy) | Cumulative Volume Delta |
 | V-VANOM | NeuronVolumeAnomaly | ✅ aktywny | Volume anomaly detection |
 
@@ -116,17 +121,17 @@
 | X-05 | OrderFlow | Bid/Ask Imbalance | 🔴 katalog |
 | X-06 | ATR-Stop | ATR×1.5 dynamiczny stop | 🔴 katalog |
 | X-07 | Williams %R | Szybkie ekstrema | 🔴 katalog |
-| X-08 | Awesome Osc | Momentum 5 vs 34 SMA | 🔴 katalog |
+| X-08 | Awesome Osc | Momentum 5 vs 34 SMA | ✅ kod (momentum.py, aktywny) |
 | X-09 | Accelerator | Przyspieszenie momentum | 🔴 katalog |
 | X-10 | HMA | Hull Moving Average | 🔴 katalog |
-| X-11 | RVOL | Relative Volume | 🔴 katalog |
+| X-11 | RVOL | Relative Volume | ✅ kod (wolumen.py, aktywny) |
 | X-12 | BB Squeeze | Bollinger Squeeze M5 | 🔴 katalog |
 | X-13 | Taker CVD | Spot Taker CVD | 🔴 katalog |
 | X-14 | CVD Absorb | CVD Absorption | 🔴 katalog |
 | X-15 | Net Volume | Net Volume / BoP | 🔴 katalog |
 | X-16 | Volume Profile | POC/VAH/VAL M15 | 🔴 katalog |
-| X-17 | TRIX | TRIX szybki | 🔴 katalog |
-| X-18 | Donchian | Donchian Channel M15 | 🔴 katalog |
+| X-17 | TRIX | TRIX szybki | ✅ kod (momentum.py, aktywny) |
+| X-18 | Donchian | Donchian Channel M15 | ✅ kod (trend.py, aktywny) |
 | X-19 | BubbleFlow 🔱 | Bubble Flow Tron System | 🔴 katalog |
 | X-20 | AIOrderFlow 🔱 | AI Probabilistic OrderFlow | 🔴 katalog |
 | X-21 | FlowMatrix 🔱 | Flow Matrix Pro | 🔴 katalog |
@@ -145,11 +150,11 @@
 
 | Legion | Skatalogowane | Wdrożone | Do wdrożenia |
 |--------|--------------|---------|--------------|
-| X Equestris (M5/M15) | 26 | 3 (X-02, X-25, X-26) | 23 |
+| X Equestris (M5/M15) | 26 | 7 (X-02,X-08,X-11,X-17,X-18,X-25,X-26) | 19 |
 | III Augusta (H1) | ~45 | 11 (T-ADX..P-OIDIV..V-*..S-*) | ~34 |
 | XII Fulminata (D1) | ~40 | 4 (O-MVRV..O-NETFLOW) | ~36 |
 | Pozostałe legiony | ~188 | 10 (RSI,MACD,BB,EMACross,WR + WolumenAnomaly) | ~178 |
-| **RAZEM** | **299** | **28** | **271** |
+| **RAZEM** | **299** | **32** | **267** |
 
 ---
 
@@ -175,7 +180,8 @@
 | 2026-05-xx | Exploratores EXP-01..05 | +5 zwiadowców | 23+5 | Higuchi, HA, Hurst, Kalman, SMC |
 | 2026-06-01 | Exploratores EXP-06..12 | +7 zwiadowców | 27+12=39 | Katana, TLP, Night, Sweep, Displacement, Dynamic, Atmabhan(wyciszony) |
 | 2026-06-01 | Audyt liczby + X-02 | +1 neuron (StochRSI) | 28+12=40 | Ożywienie sieroty X-02; wycofanie redundantnego VI-01 |
-| **Do wdrożenia** | Faza 1 (X Equestris) | +23 neurony | — | Priorytet: X-01,X-03..X-24 (dekorelacja po każdej partii) |
+| 2026-06-01 | Faza 1 — ożywienie OHLCV | +4 neurony | 32+12=44 | X-08 Awesome, X-11 RVOL, X-17 TRIX, X-18 Donchian (aktywne) |
+| **Do wdrożenia** | Faza 2 (X Equestris c.d.) | +19 neuronów | — | X-01,X-03..X-07,X-09,X-10,X-12..X-16,X-19..X-24 |
 
 ---
 

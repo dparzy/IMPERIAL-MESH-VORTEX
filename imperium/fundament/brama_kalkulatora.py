@@ -91,6 +91,41 @@ def _py_vwap_std(high, low, close, volume) -> float:
     return var ** 0.5
 
 
+def _py_awesome(high, low, fast: int = 5, slow: int = 34):
+    """Awesome Oscillator = SMA(median,5) − SMA(median,34). median=(H+L)/2.
+    Zwraca (AO_last, AO_prev). Bez TA-Lib — czysta matematyka."""
+    med = [(h + l) / 2 for h, l in zip(high, low)]
+    if len(med) < slow + 1:
+        return None, None
+    def sma(seq, p, idx):
+        return sum(seq[idx - p + 1: idx + 1]) / p
+    n = len(med)
+    ao_last = sma(med, fast, n - 1) - sma(med, slow, n - 1)
+    ao_prev = sma(med, fast, n - 2) - sma(med, slow, n - 2)
+    return ao_last, ao_prev
+
+
+def _py_donchian(high, low, period: int = 20):
+    """Donchian Channel: górny=max(high,period), dolny=min(low,period), środek.
+    Zwraca dict UPPER/LOWER/MID (z barów do −2, bez bieżącego — brak lookahead na wybicie)."""
+    if len(high) < period + 1:
+        return {"DONCHIAN_UPPER": None, "DONCHIAN_LOWER": None, "DONCHIAN_MID": None}
+    # kanał liczony z okna POPRZEDNIEGO baru → bieżący close może go przebić (wybicie)
+    okno_h = list(high)[-period - 1:-1]
+    okno_l = list(low)[-period - 1:-1]
+    up = max(okno_h); lo = min(okno_l)
+    return {"DONCHIAN_UPPER": up, "DONCHIAN_LOWER": lo, "DONCHIAN_MID": (up + lo) / 2}
+
+
+def _py_rvol(volume, period: int = 20):
+    """Relative Volume = bieżący wolumen / średnia z 'period' poprzednich barów."""
+    vol = list(volume)
+    if len(vol) < period + 1:
+        return None
+    srednia = sum(vol[-period - 1:-1]) / period
+    return vol[-1] / srednia if srednia > 0 else None
+
+
 def _py_supertrend(high, low, close, period: int = 10, multiplier: float = 3.0):
     """
     Supertrend — pure Python, bez TA-Lib.
@@ -229,6 +264,19 @@ class CalculatorGateway:
             "WILLIAMS_R": lambda high, low, close, period=14: _last_valid(talib.WILLR(_arr(high), _arr(low), _arr(close), timeperiod=period)),
             # StochRSI: bierzemy linię %K (fastk) 0–100. talib.STOCHRSI → (fastk, fastd).
             "STOCHRSI":   lambda close, period=14: _last_valid(talib.STOCHRSI(_arr(close), timeperiod=period, fastk_period=5, fastd_period=3, fastd_matype=0)[0]),
+            # TRIX: potrójnie wygładzone ROC (momentum z filtracją szumu)
+            "TRIX":       lambda close, period=15: _last_valid(talib.TRIX(_arr(close), timeperiod=period)),
+            "TRIX_PREV":  lambda close, period=15: _second_last_valid(talib.TRIX(_arr(close), timeperiod=period)),
+
+            # ── Pure-Python: Awesome Oscillator (TA-Lib nie ma) ───────────────
+            "AO":      lambda high, low: _py_awesome(high, low)[0],
+            "AO_PREV": lambda high, low: _py_awesome(high, low)[1],
+
+            # ── Pure-Python: Donchian Channel (TA-Lib nie ma) ─────────────────
+            "DONCHIAN": lambda high, low, period=20: _py_donchian(high, low, period),
+
+            # ── Pure-Python: Relative Volume (TA-Lib nie ma) ──────────────────
+            "RVOL":    lambda volume, period=20: _py_rvol(volume, period),
 
             # ── TA-Lib: wolumen ────────────────────────────────────────────────
             "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),

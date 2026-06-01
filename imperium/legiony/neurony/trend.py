@@ -182,3 +182,28 @@ class NeuronSupertrend(MikroNeuron):
         pewnosc = 0.90 if zmiana else 0.70
         return self._bazowy_sygnal(supertrend, "SHORT", pewnosc,
             [f"Supertrend BEAR {'(ZMIANA KIERUNKU)' if zmiana else ''} | linia={supertrend:.2f}"])
+
+
+class NeuronDonchian(MikroNeuron):
+    """
+    X-18 | Donchian Channel — wybicia krótkoterminowe. Kanał z 20 poprzednich barów.
+    Close > górny kanał = wybicie LONG, close < dolny = wybicie SHORT.
+    Dane z Bramy: CLOSE, DONCHIAN_UPPER, DONCHIAN_LOWER.
+    """
+    KLUCZ = "X-18"
+    LEGION = "TREND"
+    WSKAZNIK = "DONCHIAN"
+    KATEGORIA = "T"
+    WAGA = 5
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        close = wskazniki.get("CLOSE")
+        up = wskazniki.get("DONCHIAN_UPPER")
+        lo = wskazniki.get("DONCHIAN_LOWER")
+        if close is None or up is None or lo is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych Donchian."])
+        if close > up:
+            return self._bazowy_sygnal(close, "LONG", 0.75, [f"Wybicie górą: close={close:.2f} > kanał={up:.2f}"])
+        if close < lo:
+            return self._bazowy_sygnal(close, "SHORT", 0.75, [f"Wybicie dołem: close={close:.2f} < kanał={lo:.2f}"])
+        return self._bazowy_sygnal(close, "NEUTRAL", 0.20, [f"Cena w kanale [{lo:.2f}, {up:.2f}]"])

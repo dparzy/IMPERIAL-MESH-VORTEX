@@ -52,6 +52,11 @@ _PLAN_SKALARNE = {
     "DI_MINUS":      ("DI_MINUS", ("high", "low", "close"), {"period": 14}),
     "WILLIAMS_R":    ("WILLIAMS_R", ("high", "low", "close"), {"period": 14}),
     "STOCHRSI":      ("STOCHRSI", ("close",), {"period": 14}),
+    "TRIX":          ("TRIX", ("close",), {"period": 15}),
+    "TRIX_PREV":     ("TRIX_PREV", ("close",), {"period": 15}),
+    "AO":            ("AO", ("high", "low"), {}),
+    "AO_PREV":       ("AO_PREV", ("high", "low"), {}),
+    "RVOL":          ("RVOL", ("volume",), {"period": 20}),
     "OBV":           ("OBV", ("close", "volume"), {}),
     "OBV_EMA_20":    ("OBV_EMA_20", ("close", "volume"), {}),
     "VOLUME_MA20":   ("VOLUME_MA20", ("volume",), {}),
@@ -112,6 +117,7 @@ class BudowniczyWskaznikow:
         self._dodaj_macd(serie, w)
         self._dodaj_bbands(serie, w)
         self._dodaj_ichimoku(serie, w)
+        self._dodaj_donchian(serie, w)
         self._dodaj_ha(bary, w)
 
         return w
@@ -140,6 +146,13 @@ class BudowniczyWskaznikow:
             w.update(d)  # ICHIMOKU_TENKAN/KIJUN/SENKOU_A/SENKOU_B
         except Exception as e:
             logger.debug(f"[Budowniczy] ICHIMOKU pominięty: {e}")
+
+    def _dodaj_donchian(self, serie, w):
+        try:
+            d = self.brama.compute("DONCHIAN", high=serie["high"], low=serie["low"]).value
+            w.update(d)  # DONCHIAN_UPPER/LOWER/MID
+        except Exception as e:
+            logger.debug(f"[Budowniczy] DONCHIAN pominięty: {e}")
 
     def _dodaj_ha(self, bary, w):
         """

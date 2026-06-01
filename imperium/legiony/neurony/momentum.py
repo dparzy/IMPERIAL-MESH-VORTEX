@@ -382,3 +382,61 @@ class NeuronStochRSI(MikroNeuron):
             return self._bazowy_sygnal(v, "SHORT", pewnosc,
                 [f"StochRSI={v:.1f} > 80 → strefa wykupienia, możliwa korekta"])
         return self._bazowy_sygnal(v, "NEUTRAL", 0.30, [f"StochRSI={v:.1f} w strefie neutralnej"])
+
+
+class NeuronTRIX(MikroNeuron):
+    """
+    X-17 | TRIX — potrójnie wygładzony ROC. Filtruje szum, łapie zmianę momentum.
+    Przejście przez zero w górę = LONG, w dół = SHORT (świeże przejście = mocniej).
+    Dane z Bramy: TRIX, TRIX_PREV.
+    """
+    KLUCZ = "X-17"
+    LEGION = "SCALP"
+    WSKAZNIK = "TRIX"
+    KATEGORIA = "M"
+    WAGA = 4
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        trix = wskazniki.get("TRIX")
+        prev = wskazniki.get("TRIX_PREV")
+        if trix is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych TRIX."])
+        if prev is not None and trix > 0 and prev <= 0:
+            return self._bazowy_sygnal(trix, "LONG", 0.80, [f"TRIX przeciął zero w górę ({trix:+.4f})"])
+        if prev is not None and trix < 0 and prev >= 0:
+            return self._bazowy_sygnal(trix, "SHORT", 0.80, [f"TRIX przeciął zero w dół ({trix:+.4f})"])
+        if trix > 0:
+            return self._bazowy_sygnal(trix, "LONG", 0.45, [f"TRIX>0 momentum dodatnie ({trix:+.4f})"])
+        if trix < 0:
+            return self._bazowy_sygnal(trix, "SHORT", 0.45, [f"TRIX<0 momentum ujemne ({trix:+.4f})"])
+        return self._bazowy_sygnal(trix, "NEUTRAL", 0.20, ["TRIX≈0 brak momentum"])
+
+
+class NeuronAwesome(MikroNeuron):
+    """
+    X-08 | Awesome Oscillator = SMA(median,5) − SMA(median,34).
+    AO>0 i rosnący = LONG, AO<0 i opadający = SHORT. Median price = mniej szumu close.
+    Dane z Bramy: AO, AO_PREV.
+    """
+    KLUCZ = "X-08"
+    LEGION = "SCALP"
+    WSKAZNIK = "AO"
+    KATEGORIA = "M"
+    WAGA = 5
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        ao = wskazniki.get("AO")
+        prev = wskazniki.get("AO_PREV")
+        if ao is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych AO."])
+        if prev is not None and ao > 0 and prev <= 0:
+            return self._bazowy_sygnal(ao, "LONG", 0.80, [f"AO przeciął zero w górę ({ao:+.4f})"])
+        if prev is not None and ao < 0 and prev >= 0:
+            return self._bazowy_sygnal(ao, "SHORT", 0.80, [f"AO przeciął zero w dół ({ao:+.4f})"])
+        rosnacy = prev is not None and ao > prev
+        opadajacy = prev is not None and ao < prev
+        if ao > 0 and rosnacy:
+            return self._bazowy_sygnal(ao, "LONG", 0.60, [f"AO>0 i rośnie ({ao:+.4f})"])
+        if ao < 0 and opadajacy:
+            return self._bazowy_sygnal(ao, "SHORT", 0.60, [f"AO<0 i opada ({ao:+.4f})"])
+        return self._bazowy_sygnal(ao, "NEUTRAL", 0.25, [f"AO={ao:+.4f} bez wyraźnego momentum"])

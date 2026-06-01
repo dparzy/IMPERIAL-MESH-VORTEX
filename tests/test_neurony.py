@@ -3,9 +3,9 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from imperium.legiony.neurony.momentum import NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross, NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI
-from imperium.legiony.neurony.trend import NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend
-from imperium.legiony.neurony.wolumen import NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly
+from imperium.legiony.neurony.momentum import NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross, NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI, NeuronTRIX, NeuronAwesome
+from imperium.legiony.neurony.trend import NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian
+from imperium.legiony.neurony.wolumen import NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL
 from imperium.legiony.neurony.psychologia import NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv
 from imperium.legiony.neurony.onchain import NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow
 from imperium.legiony.neurony.struktura import NeuronOrderBlock, NeuronFVG, NeuronBOS, NeuronVSA
@@ -98,6 +98,50 @@ def test_stochrsi_neutral_i_brak_danych():
     assert n.interpretuj({"STOCHRSI": 50.0}).kierunek == "NEUTRAL"
     assert n.interpretuj({}).kierunek == "NEUTRAL"
     assert n.interpretuj({}).pewnosc == 0.0
+
+
+def test_trix_przeciecie_zera():
+    n = NeuronTRIX()
+    s = n.interpretuj({"TRIX": 0.002, "TRIX_PREV": -0.001})
+    assert s.kierunek == "LONG" and s.pewnosc == 0.80
+    s2 = n.interpretuj({"TRIX": -0.002, "TRIX_PREV": 0.001})
+    assert s2.kierunek == "SHORT" and s2.pewnosc == 0.80
+    # bez przecięcia, tylko znak
+    assert n.interpretuj({"TRIX": 0.003, "TRIX_PREV": 0.002}).kierunek == "LONG"
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_awesome_oscillator():
+    n = NeuronAwesome()
+    # przecięcie zera w górę
+    assert n.interpretuj({"AO": 0.5, "AO_PREV": -0.2}).kierunek == "LONG"
+    assert n.interpretuj({"AO": -0.5, "AO_PREV": 0.2}).kierunek == "SHORT"
+    # nad zerem i rośnie
+    assert n.interpretuj({"AO": 1.0, "AO_PREV": 0.5}).kierunek == "LONG"
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_donchian_wybicie():
+    n = NeuronDonchian()
+    s = n.interpretuj({"CLOSE": 105.0, "DONCHIAN_UPPER": 104.0, "DONCHIAN_LOWER": 96.0})
+    assert s.kierunek == "LONG" and s.pewnosc == 0.75
+    s2 = n.interpretuj({"CLOSE": 95.0, "DONCHIAN_UPPER": 104.0, "DONCHIAN_LOWER": 96.0})
+    assert s2.kierunek == "SHORT"
+    # w kanale
+    assert n.interpretuj({"CLOSE": 100.0, "DONCHIAN_UPPER": 104.0, "DONCHIAN_LOWER": 96.0}).kierunek == "NEUTRAL"
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_rvol_wsparcie_wolumenu():
+    n = NeuronRVOL()
+    # wysoki RVOL + ruch w górę
+    s = n.interpretuj({"RVOL": 2.0, "CLOSE": 101.0, "CLOSE_PREV": 100.0})
+    assert s.kierunek == "LONG"
+    s2 = n.interpretuj({"RVOL": 3.0, "CLOSE": 99.0, "CLOSE_PREV": 100.0})
+    assert s2.kierunek == "SHORT" and s2.pewnosc == 0.75
+    # niski RVOL → neutralny
+    assert n.interpretuj({"RVOL": 0.5, "CLOSE": 101.0, "CLOSE_PREV": 100.0}).kierunek == "NEUTRAL"
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
 
 
 def test_atr_deviation_szum_ignorowany():
@@ -392,9 +436,9 @@ def test_vsa_stop_volume():
 def test_neurony_brak_danych_nie_crashuje():
     """Każdy neuron musi obsłużyć pusty dict."""
     neurony = [
-        NeuronRSI(), NeuronMACD(), NeuronBBands(), NeuronEMACross(), NeuronWilliamsR(), NeuronATRDeviation(), NeuronHAScalper(), NeuronStochRSI(),
-        NeuronADX(), NeuronIchimoku(), NeuronEMA50_200(), NeuronSupertrend(),
-        NeuronOBV(), NeuronVWAP(), NeuronCVD(), NeuronVolumeAnomaly(),
+        NeuronRSI(), NeuronMACD(), NeuronBBands(), NeuronEMACross(), NeuronWilliamsR(), NeuronATRDeviation(), NeuronHAScalper(), NeuronStochRSI(), NeuronTRIX(), NeuronAwesome(),
+        NeuronADX(), NeuronIchimoku(), NeuronEMA50_200(), NeuronSupertrend(), NeuronDonchian(),
+        NeuronOBV(), NeuronVWAP(), NeuronCVD(), NeuronVolumeAnomaly(), NeuronRVOL(),
         NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(),
         NeuronMVRV(), NeuronSOPR(), NeuronPuellMultiple(), NeuronExchangeNetflow(),
         NeuronOrderBlock(), NeuronFVG(), NeuronBOS(), NeuronVSA(),

@@ -184,3 +184,32 @@ class NeuronVolumeAnomaly(MikroNeuron):
         if cena_rosnie is False:
             return self._bazowy_sygnal(ratio, "SHORT", pewnosc, [opis + " — potwierdza spadek"])
         return self._bazowy_sygnal(ratio, "NEUTRAL", pewnosc * 0.5, [opis + " — brak kierunku ceny"])
+
+
+class NeuronRVOL(MikroNeuron):
+    """
+    X-11 | Relative Volume — czy ruch ma wsparcie wolumenu. RVOL = vol / średnia(20).
+    Wysoki RVOL + ruch w górę = LONG (wsparcie), + w dół = SHORT. Niski = brak siły.
+    Dane z Bramy: RVOL, CLOSE, CLOSE_PREV.
+    """
+    KLUCZ = "X-11"
+    LEGION = "VOLUME"
+    WSKAZNIK = "RVOL"
+    KATEGORIA = "V"
+    WAGA = 7
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        rvol = wskazniki.get("RVOL")
+        close = wskazniki.get("CLOSE")
+        prev = wskazniki.get("CLOSE_PREV")
+        if rvol is None or close is None or prev is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych RVOL."])
+        if rvol >= 1.5:
+            pewnosc = 0.75 if rvol >= 2.5 else 0.60
+            if close > prev:
+                return self._bazowy_sygnal(rvol, "LONG", pewnosc, [f"RVOL={rvol:.2f}× + ruch↑ → wsparcie wolumenu"])
+            if close < prev:
+                return self._bazowy_sygnal(rvol, "SHORT", pewnosc, [f"RVOL={rvol:.2f}× + ruch↓ → presja podaży"])
+        if rvol < 0.7:
+            return self._bazowy_sygnal(rvol, "NEUTRAL", 0.15, [f"RVOL={rvol:.2f}× niski → brak zainteresowania"])
+        return self._bazowy_sygnal(rvol, "NEUTRAL", 0.25, [f"RVOL={rvol:.2f}× przeciętny"])

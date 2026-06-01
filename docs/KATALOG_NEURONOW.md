@@ -717,6 +717,12 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 |-------|--------|----------|---------|------|
 | TVL-01 | Neuron TVLVelocity | TVL Velocity = (TVL_t - TVL_t-30) / TVL_t-30 | > +10%/tydzień = napływ kapitału → LONG token; flips ujemny = NEUTRAL/SHORT | W7 |
 
+### 🌀 Rozszerzenie Dywizji Entropii (fraktal)
+
+| Klucz | Neuron | Wskaźnik | Zadanie | Waga |
+|-------|--------|----------|---------|------|
+| ENT-08 | Neuron Higuchi | Higuchi Fractal Dimension (HFD, D = 1.0–2.0) | D ≈ 1.0 = rynek trendujący (TREND), D ≈ 2.0 = rynek chaotyczny/ranging. Szybsza detekcja reżimu niż ADX/Choppiness. Wyniki HFT QUARTET: Sharpe > 2.5, WR 70-80%. | W9 |
+
 ### 🔄 Rozszerzenie Dywizji Arbitrażu (sektor/narracja)
 
 | Klucz | Neuron | Wskaźnik | Zadanie | Waga |
@@ -743,15 +749,15 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | 🔄 Dywizja Wieszczów (reżim/makro) | 18 + 2 = **20** |
 | 😱 Dywizja Wyroczni (sentyment) | **11** |
 | 🐋 Dywizja Wielorybów (on-chain) | 5 |
-| 🌀 Dywizja Entropii (matematyka) | 7 |
+| 🌀 Dywizja Entropii (matematyka) | 7 + 1 = **8** |
 | 🧱 Dywizja Struktury (SMC/ICT/VSA) | 16 + 6 = **22** |
 | ⏰ Dywizja Czasu/Sesji | 1 |
 | 💎 Dywizja Perł (wyspecjalizowane) | 10 |
 | 📉 Dywizja Opcji (NOWA) | **3** |
 | 🌱 Dywizja DeFi (NOWA) | **1** |
-| **RAZEM** | **303** |
+| **RAZEM** | **304** |
 
-> **303 neurony** (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, HowardMarks, TVL, L1/L2 RS, Cross-Sectional Momentum).
+> **304 neurony** (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, HowardMarks, TVL, L1/L2 RS, Cross-Sectional Momentum).
 > Dwie nowe dywizje: 📉 Opcji + 🌱 DeFi.
 
 ---

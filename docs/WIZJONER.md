@@ -25,6 +25,9 @@
 | W-003 | Podłączyć Doradców do Cesarza (oracle.py, iustitia.py, pythia.py) | 🟠 Średni | 💭 Idea | `imperium/cesarz/doradcy/` |
 | W-004 | Dashboard Kapitolu — tabela liderów neuronów na żywo | 🟡 Niski | 💭 Idea | `imperium/swiatynie/` |
 | W-005 | Walk-Forward z adaptacyjnymi parametrami (re-optymalizacja co 7 dni) | 🟠 Średni | 💭 Idea | `imperium/koloseum/valhalla.py` |
+| W-006 | Neuron Higuchi Fractal Dimension — detekcja reżimu D≈1 (trend) vs D≈2 (chaos) | 🔴 Wysoki | 💭 Idea | `KATALOG_NEURONOW.md` + `imperium/legiony/` |
+| W-007 | AEL (Agent Evolving Learning) — samoewolucja strategii, Sharpe 2.13 | 🟠 Średni | 💭 Idea | `imperium/cesarz/` lub `imperium/senat/` |
+| W-008 | Sharpe Terminal (sharpe.ai) — integracja danych narracyjnej rotacji sektorów | 🟡 Niski | 💭 Idea | `imperium/oczy/` |
 
 ---
 
@@ -85,7 +88,7 @@
 
 | Metryka | Wartość |
 |---------|---------|
-| Łącznie wizji | 5 |
+| Łącznie wizji | 8 |
 | W trakcie analizy | 5 |
 | Przeniesione do dokumentów | 0 |
 | Zaimplementowane | 0 |

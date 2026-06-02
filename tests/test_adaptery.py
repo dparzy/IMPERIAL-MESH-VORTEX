@@ -16,6 +16,15 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from imperium.akwedukty.adaptery import (
     AdapterDanych, AdapterTestowyOnChain, AdapterTestowyFutures, AdapterTestowyCVD,
+    AdapterFearGreed,
+)
+
+# Próbka prawdziwej odpowiedzi alternative.me (format zweryfikowany z dokumentacji API)
+_FNG_JSON = (
+    '{"name":"Fear and Greed Index",'
+    '"data":[{"value":"%s","value_classification":"%s",'
+    '"timestamp":"1718000000","time_until_update":"3600"}],'
+    '"metadata":{"error":null}}'
 )
 
 
@@ -170,6 +179,67 @@ def test_cvd_dystrybucja_short():
     w = {}
     ad.wzbogac(w, "BTCUSDT")
     assert NeuronCVD().interpretuj(w).kierunek == "SHORT"
+
+
+# ── AdapterFearGreed (PSY-03) — pierwszy prawdziwy adapter API ────────────────
+
+def test_feargreed_parsuje_realny_json():
+    """Parsuje prawdziwy format alternative.me → FEAR_GREED_INDEX jako float."""
+    ad = AdapterFearGreed(fetcher=lambda: _FNG_JSON % ("40", "Fear"))
+    dane = ad.pobierz("BTCUSDT")
+    assert dane["FEAR_GREED_INDEX"] == 40.0
+
+
+def test_feargreed_pusta_data_zwraca_none():
+    """Pusta sekcja 'data' → None (graceful, neuron śpi dalej, nie martwy głos)."""
+    ad = AdapterFearGreed(fetcher=lambda: '{"name":"x","data":[],"metadata":{}}')
+    assert ad.pobierz("X")["FEAR_GREED_INDEX"] is None
+
+
+def test_feargreed_uszkodzony_json_nie_psuje_dict():
+    """Uszkodzony JSON → wzbogac() łapie błąd, dict bez zmian (Prawo XV)."""
+    def zly_fetcher():
+        return "to nie jest json {{{"
+    ad = AdapterFearGreed(fetcher=zly_fetcher)
+    w = {"CLOSE": 100.0}
+    ad.wzbogac(w, "X")                 # nie rzuca — baza łapie wyjątek
+    assert w == {"CLOSE": 100.0}       # dict nietknięty
+    assert "FEAR_GREED_INDEX" not in w
+
+
+def test_feargreed_aktywuj_tylko_psy03():
+    """AdapterFearGreed budzi DOKŁADNIE PSY-03 (granularne), nie całą domenę PSY."""
+    from imperium.legiony.neurony.psychologia import (
+        NeuronFearGreed, NeuronFundingExtreme,
+    )
+    ad = AdapterFearGreed(fetcher=lambda: _FNG_JSON % ("40", "Fear"))
+    assert NeuronFearGreed.DOSTEPNY is False
+    try:
+        assert ad.aktywuj() == ["PSY-03"]
+        assert NeuronFearGreed.DOSTEPNY is True
+        assert NeuronFundingExtreme.DOSTEPNY is False   # PSY-01 zostaje uśpiony
+    finally:
+        ad.usypiaj()
+        assert NeuronFearGreed.DOSTEPNY is False
+
+
+def test_feargreed_strach_long():
+    """Ekstremalny strach (12) → wzbogac + PSY-03 → kontrariański LONG."""
+    from imperium.legiony.neurony.psychologia import NeuronFearGreed
+    ad = AdapterFearGreed(fetcher=lambda: _FNG_JSON % ("12", "Extreme Fear"))
+    w = {}
+    ad.wzbogac(w, "BTCUSDT")
+    assert w["FEAR_GREED_INDEX"] == 12.0
+    assert NeuronFearGreed().interpretuj(w).kierunek == "LONG"
+
+
+def test_feargreed_chciwosc_short():
+    """Ekstremalna chciwość (88) → kontrariański SHORT."""
+    from imperium.legiony.neurony.psychologia import NeuronFearGreed
+    ad = AdapterFearGreed(fetcher=lambda: _FNG_JSON % ("88", "Extreme Greed"))
+    w = {}
+    ad.wzbogac(w, "BTCUSDT")
+    assert NeuronFearGreed().interpretuj(w).kierunek == "SHORT"
 
 
 # ── Gwarancja czystego stanu globalnego ───────────────────────────────────────

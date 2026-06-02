@@ -11,10 +11,12 @@ from imperium.akwedukty.adaptery.testowy import (
     AdapterTestowyFutures,
     AdapterTestowyCVD,
 )
+from imperium.akwedukty.adaptery.feargreed import AdapterFearGreed
 
 __all__ = [
     "AdapterDanych",
     "AdapterTestowyOnChain",
     "AdapterTestowyFutures",
     "AdapterTestowyCVD",
+    "AdapterFearGreed",
 ]

@@ -204,6 +204,7 @@
 | Rejestr Strategii (Klucznik) | `legiony/strategie/rejestr_strategii.py` | ✅ aktywny |
 | Framework Adapterów (most API→rój) | `akwedukty/adaptery/baza.py` | ✅ aktywny |
 | Adaptery testowe (OnChain/Futures/CVD mock) | `akwedukty/adaptery/testowy.py` | ✅ aktywny (mock) |
+| AdapterFearGreed (PSY-03, alternative.me) | `akwedukty/adaptery/feargreed.py` | ✅ aktywny (realne API) |
 
 ---
 
@@ -249,7 +250,15 @@ WYŁĄCZNIE z `os.getenv` — Prawo bezpieczeństwa). Interfejs stały → reszt
 
 **Prawo XV:** `aktywuj()` budzi neuron tylko razem z adapterem dostarczającym
 jego dane. Bez adaptera neuron śpi (świadomie). `usypiaj()` przywraca stan —
-testy nie fałszują statycznego audytu. Testy: `tests/test_adaptery.py` (13).
+testy nie fałszują statycznego audytu. Testy: `tests/test_adaptery.py` (19).
+
+**Pierwszy prawdziwy adapter:** `AdapterFearGreed` (PSY-03) — darmowe API
+alternative.me (bez klucza). `pobierz()` używa wstrzykiwanego fetchera: produkcja
+= HTTP urllib (stdlib), testy = mock z próbką JSON (pełny test OFFLINE). Gdy
+`FEAR_GREED_INDEX` płynie, PSY-03 ożywa i głosuje kontrariańsko (strach→LONG,
+chciwość→SHORT). Wybudzanie granularne: budzi TYLKO PSY-03, nie całą domenę PSY.
+**Uwaga środowisko:** wywołanie na żywo wymaga, by polityka sieci zezwoliła na
+`api.alternative.me` (w obecnym sandboksie zwraca 403 — kod gotowy, czeka na dostęp).
 
 ---
 
@@ -269,6 +278,7 @@ testy nie fałszują statycznego audytu. Testy: `tests/test_adaptery.py` (13).
 | 2026-06-02 | Faza 4 — A-01, A-02 (Straż) | +2 neurony | 39+12=51 | Stop Hunt, Wick Rejection; litera A ożywiona (Prawo XV); +1 strategia IMV-DEF-001 (14 łącznie) |
 | 2026-06-02 | Faza 5 — A-03, A-05, XII-06 | +3 neurony | 42+12=54 | WashVol, BartPattern (Straż); OBZone (XII) — Order Block OHLCV |
 | 2026-06-02 | Faza 6 — Framework Adapterów | +2 moduły | most API→rój | Baza + 3 adaptery testowe (OnChain/Futures/CVD); auto-wybudzanie 9 neuronów API; 13 testów |
+| 2026-06-02 | Faza 7 — AdapterFearGreed | +1 moduł | PSY-03 realne API | Pierwszy prawdziwy adapter (alternative.me, bez klucza); wstrzykiwany fetcher; +6 testów offline |
 | 2026-06-02 | Dywizja Strategii + Klucznik | +2 moduły | 46+2 | Strategie jako KOD, silnik dopasowania, audyt Warstwa 4 |
 | **Do wdrożenia** | Faza 3 (X Equestris c.d.) | +X neuronów | — | X-12..X-16, X-19..X-24 + strategie wymagające nowych neuronów |
 

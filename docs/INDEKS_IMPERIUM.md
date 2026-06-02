@@ -38,12 +38,13 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 2 | `ARCHITEKTURA_IMPERIUM.md` | Pełna mapa architektury systemu — warstwy, moduły, przepływ | ✅ Aktywny |
 | 3 | `MAPA_IMPERIUM_FLOW.md` | Przepływ sygnału krok po kroku — od danych do zlecenia | ✅ Aktywny |
 | 4 | `LEGIONY_ARCHITEKTURA.md` | 4 Legiony + mikro-neurony + schemat sygnałów | ✅ Aktywny |
-| 5 | `ARSENAL_WSKAZNIKOW.md` | 157 wskaźników przypisanych do Legionów | ✅ Aktywny |
-| 6 | `ARSENAL_IMPERIUM.md` | Katalog ~320 narzędzi (realne / niepewne / halucynacje) | ✅ Aktywny |
-| 7 | `ARSENAL_AMERYKI.md` | 690 linków z 50+ krajów — globalna mapa zasobów | ✅ Aktywny |
-| 8 | `PLAN_DEEPSEEK.md` | Plan integracji DeepSeek API — klucz, testy, prompt | ✅ Aktywny |
-| 9 | `WZORZEC_DNSS.md` | Wzorzec DNSS (rój 79 agentów, Calculator Pattern) | ✅ Aktywny |
-| 10 | `AUDYT_ADOPCJI.md` | 17 modułów migrowanych z Kingdom Pixel — audyt adopcji | ✅ Aktywny |
+| 5 | `LOG_ZMIAN.md` | **Żywa pamięć projektu** — obowiązkowy log zmian (ROZKAZ STAŁY) | ✅ Aktywny |
+| 6 | `PLAN_DEEPSEEK.md` | Plan integracji DeepSeek API — klucz, testy, prompt | ✅ Aktywny |
+| 7 | `archiwum/WZORZEC_DNSS.md` | Wzorzec DNSS (rój 79 agentów, Calculator Pattern) — 📦 Archiwum | 📦 Archiwum |
+| 8 | `archiwum/AUDYT_ADOPCJI.md` | 17 modułów migrowanych z Kingdom Pixel — historyczny audyt | 📦 Archiwum |
+| 9 | `archiwum/ARSENAL_WSKAZNIKOW.md` | 157 wskaźników (stary paradygmat) — superseded przez KATALOG_NEURONOW | 📦 Archiwum |
+| 10 | `archiwum/ARSENAL_IMPERIUM.md` | Katalog ~320 narzędzi — superseded przez KATALOG_NEURONOW | 📦 Archiwum |
+| 11 | `archiwum/ARSENAL_AMERYKI.md` | 690 linków z 50+ krajów — informacyjny | 📦 Archiwum |
 | 11 | `SYMBIOZA_MODULOW.md` | Interakcje modułów i mapowanie narzędzi | 🔗 Link |
 | 12 | `ROADMAP_IMPERIUM.md` | Roadmapa rozwoju i wersjonowanie | 🔗 Link |
 | 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (27 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
@@ -53,8 +54,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 17 | `IGRZYSKA_IMPERIUM.md` | **System Rywalizacji** — rankingi neuronów/legionów/senatorów, Złoty Hełm | ✅ Aktywny |
 | 18 | `PAMIEC_ABSOLUTNA.md` | **System Logowania** — ImperiumLog, MAE/MFE, walk-forward, replay sesji | ✅ Aktywny |
 | 19 | `DORADCY_CARA.md` | **Rada Doradców** — Oracle/Fulmen/Iustitia/Hermes/Pythia, second opinion | ✅ Aktywny |
-| 20 | `ARSENAL_WSKAZNIKOW.md` | Wskaźniki bazowe + mapowanie na legiony | ✅ Aktywny |
-| 21 | `MATRYCA_KORELACJI.md` | Kostka Rubika sygnałów — korelacje, konflikty, reżimy, wagi dynamiczne | 🔗 Link |
+| 20 | `MATRYCA_KORELACJI.md` | Kostka Rubika sygnałów — korelacje, konflikty, reżimy, wagi dynamiczne | 🔗 Link |
 | 22 | `REGULAMINY_I_MANIPULACJE.md` | Zgodność z regulaminami + 7 manipulacji do wykrywania | ✅ Aktywny |
 
 ---

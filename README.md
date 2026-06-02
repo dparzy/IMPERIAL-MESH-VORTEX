@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-02 · **Testy:** 307/307 zielone · **Faza:** rdzeń decyzyjny działa, rozbudowa roju w toku.
+> **Stan na:** 2026-06-02 · **Testy:** 326/326 zielone · **Faza:** rdzeń decyzyjny działa, rozbudowa roju w toku.
 
 ---
 

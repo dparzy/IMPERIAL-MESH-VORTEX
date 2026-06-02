@@ -203,6 +203,7 @@
 | PaperTradingEngine | `koloseum/paper_trading.py` | ✅ aktywny |
 | Dyrygent (orkiestrator cyklu end-to-end) | `koloseum/dyrygent.py` | ✅ aktywny |
 | Backtest (przejazd po historii) | `koloseum/backtest.py` | ✅ aktywny |
+| Detektor Lookahead-bias (Freqtrade LA-01) | `koloseum/lookahead.py` | ✅ aktywny |
 | CzytnikCSV (CryptoDataDownload → bary) | `akwedukty/czytnik_csv.py` | ✅ aktywny |
 | Dywizja Strategii (model + silnik) | `legiony/strategie/baza.py` | ✅ aktywny |
 | Rejestr Strategii (Klucznik) | `legiony/strategie/rejestr_strategii.py` | ✅ aktywny |

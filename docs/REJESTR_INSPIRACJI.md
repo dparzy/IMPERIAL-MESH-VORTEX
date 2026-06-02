@@ -25,9 +25,13 @@
 | 3 | ML-26 | CogAlpha — Alpha Factory | arxiv.org/abs/2511.18850 | ✅ zweryfikowany | Auto-generowanie neuronów |
 | 4 | ML-27 | NEXUS — Self-Evolving Market AI | github.com/The-R4V3N/Nexus | ✅ zweryfikowany | Wzorzec autonomii (Faza 4) |
 | 5 | A-12 | Kronos — Foundation Model for K-line | github.com/shiyu-coder/Kronos | ✅ zweryfikowany | Neuron predykcyjny świec |
+| 6 | LA-01 | Freqtrade lookahead-analysis | freqtrade.io/en/stable/lookahead-analysis | ✅ **WDROŻONY** | Detektor lookahead-bias w backteście |
+| 7 | ML-28 | MRC — Market Regime Council (Shapley) | arxiv.org/abs/2605.24490 | ✅ zweryfikowany | Dynamiczne wagi agentów (plan) |
+| 8 | ML-29 | TradingAgents — Multi-Agent LLM | arxiv.org/abs/2412.20138 | ✅ zweryfikowany | Wzorzec Senatu/ról (referencja) |
 
 > **Uwaga:** ML-24..27 to NOWE klucze rezerwowe (dodane 2026-06-02). A-12 Kronos był już w katalogu
 > (`KATALOG_NEURONOW.md` linia 314) — tu dostaje pełny opis i link.
+> LA-01, ML-28, ML-29 dodane 2026-06-02 po deep-research weryfikacji bazy DeepSeek (sesja "tryb agregat/strategia").
 
 ---
 
@@ -191,5 +195,79 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 
 ---
 
+## 7️⃣ LA-01 | Detektor Lookahead-Bias (Freqtrade) — ✅ WDROŻONY
+
+- **Klucz:** `LA-01`
+- **Pełna nazwa (oryginalna):** Freqtrade `lookahead-analysis` (Look-Ahead Bias Analysis)
+- **Nazwa po polsku:** Detektor zaglądania w przyszłość (analiza błędu wyprzedzania)
+- **Źródło (link):** https://www.freqtrade.io/en/stable/lookahead-analysis/
+- **Typ źródła:** dokumentacja open-source (framework Freqtrade, Python)
+- **Status weryfikacji:** ✅ zweryfikowany 2026-06-02 (deep-research) — narzędzie realne, opisane, używane produkcyjnie
+- **Co robi (dla nowicjusza):** lookahead-bias to gdy backtest „oszukuje" — podejmuje decyzję na
+  barze przeszłym, ale korzysta z danych z przyszłości (których w realu jeszcze by nie było). Wtedy
+  wyniki backtestu są fałszywie dobre. Freqtrade wykrywa to, uruchamiając backtest na pełnych danych
+  i na danych obciętych, a potem porównując, czy sygnały na wspólnym zakresie są identyczne.
+- **Jak działa w Imperium:** `imperium/koloseum/lookahead.py` — liczy ślad głosów roju na pełnym i
+  obciętym zbiorze barów; każda rozbieżność = czerwony alarm (Prawo I: rój nie może znać przyszłości).
+- **Status implementacji:** ✅ **W KODZIE** — `wykryj_lookahead()` + 3 testy (`tests/test_lookahead.py`)
+- **Faza wdrożenia:** Faza 0 (backtest) — gotowe
+- **Powód:** OpenAlice (badany jako alternatywa) NIE ma rygoru backtestu; Freqtrade tak. Przenieśliśmy
+  jego metodę weryfikacji do naszego silnika zamiast zmieniać framework.
+- **Dowód:** `python -m imperium.koloseum.lookahead dane/dzienne/Binance_BTCUSDT_d.csv 1D 600` → ✅ CZYSTO
+- **Powiązania:** `backtest.py` (niezmiennik okna), Prawo I, Prawo XXI
+
+---
+
+## 8️⃣ ML-28 | Market Regime Council — dynamiczne wagi Shapley (plan)
+
+- **Klucz:** `ML-28`
+- **Pełna nazwa (oryginalna):** MRC — Market Regime Council for Dynamic Credit Assignment in Multi-Agent LLM Decision Systems
+- **Nazwa po polsku:** Rada Reżimu Rynkowego (dynamiczne przypisanie zasług metodą Shapleya)
+- **Źródło (link):** https://arxiv.org/abs/2605.24490
+- **Typ źródła:** praca naukowa (arXiv, preprint maj 2026)
+- **Status weryfikacji:** ✅ zweryfikowany 2026-06-02 (deep-research) — papier istnieje, wyniki: Sharpe 1.51,
+  CR 440.1% na 1037 dniach / 13 aktywach krypto. UWAGA: preprint nierecenzowany, brak replikacji stron trzecich.
+- **Co robi (dla nowicjusza):** zamiast dawać każdemu neuronowi równy głos (nasz „agregat"), oblicza
+  ile NAPRAWDĘ wnosi każdy agent do wspólnego sukcesu (wartości Shapleya z teorii gier) i tak ważą głosy.
+  Mnożniki zależne od reżimu zmieniają autorytet agenta zależnie od fazy rynku.
+- **Jak pasuje do Imperium:** to naukowy następca naszego prostego głosowania w Legatusie — wagi nie stałe
+  (WAGI_REZIMU), tylko uczone z historii trafności. Rozwiązuje problem `pewnosc_agregatu ≈ 1.0` (zawsze max lewar).
+- **Status implementacji:** 🔴 tylko plan (kandydat na Fazę 2 — następca WAGI_REZIMU)
+- **Faza wdrożenia:** Faza 2
+- **Powód:** jedyna naukowo udokumentowana metoda dynamicznego ważenia agentów znaleziona w badaniu.
+- **Ryzyko / ograniczenia:** dokładny Shapley = koszt wykładniczy (N agentów → 2^N koalicji); preprint niereplikowany.
+- **Powiązania:** Legatus `_agreguj`, WAGI_REZIMU, Prawo XVI (redundancja mierzona)
+
+---
+
+## 9️⃣ ML-29 | TradingAgents — wieloagentowy framework LLM (referencja)
+
+- **Klucz:** `ML-29`
+- **Pełna nazwa (oryginalna):** TradingAgents — Multi-Agents LLM Financial Trading Framework (Tauric Research)
+- **Nazwa po polsku:** Agenci Handlowi — wieloagentowy framework LLM do handlu
+- **Źródło (link):** https://arxiv.org/abs/2412.20138 | https://github.com/TauricResearch/TradingAgents
+- **Typ źródła:** praca naukowa (arXiv) + repozytorium open-source (~80 000 ⭐, autor: Yijia Xiao i in.)
+- **Status weryfikacji:** ✅ zweryfikowany 2026-06-02 (deep-research) — DeepSeek podał 71 400 ⭐ (zaniżone,
+  realnie ~80k). 7 ról: Fundamentalny, Sentymentu, Newsów, Techniczny, Badacz, Trader, Risk Manager. Debata byk vs niedźwiedź.
+- **Co robi (dla nowicjusza):** symuluje cały fundusz hedgingowy — agenci LLM o różnych rolach debatują
+  (byk kontra niedźwiedź) zanim podejmą decyzję. Testowany głównie na AKCJACH, nie krypto.
+- **Jak pasuje do Imperium:** wzorzec referencyjny dla Senatu/Doradców Cezara (debata ról przed decyzją).
+- **Status implementacji:** 🔴 referencja architektoniczna (nie kopiujemy — mamy własny Senat)
+- **Faza wdrożenia:** Faza 2+ (inspiracja)
+- **Powód:** najpopularniejszy zweryfikowany framework multi-agent; potwierdza nasz kierunek (role + debata).
+- **Ryzyko / ograniczenia:** LLM-heavy (koszt API); wyniki krypto niepotwierdzone w papierze.
+- **Powiązania:** Senat, DORADCY_CARA.md, ML-25 AgenticAITA
+
+> **🚩 Odrzucone w badaniu 2026-06-02 (Prawo I — nie wszystko z DeepSeeka jest prawdą):**
+> - **StratEvo** (rzekomo Sharpe 6.06) — realnie 17 ⭐, liczby pomylone akcje/krypto, brak replikacji. ❌ nie wdrażamy.
+> - **VORTEX** (LabLab Milan) — niezweryfikowalny, brak projektu o tej nazwie w źródłach. ❌
+> - **OpenAlice** (rzekomo do backtestu) — to agent LLM w Node.js, NIE silnik backtestu. ❌ niekompatybilny.
+> - **AetherEdge** — realny wskaźnik TradingView, ale opis „RL agenci" przesadzony. ⚠️ tylko jako idea konsensusu.
+
+---
+
 *VITRUVIUSZ — "Pięć obietnic z przyszłości. Zapisane z linkiem i uczciwym 'jeszcze nie sprawdziłem' —
 to jest pamięć, nie marzenie."*
+
+*LA-01 dopisany przez deep-research 2026-06-02: pierwsza inspiracja, która z miejsca trafiła do KODU,
+nie do planu. Freqtrade nauczył nas, jak sprawdzić, czy nasz backtest nie kłamie — i sprawdza.*

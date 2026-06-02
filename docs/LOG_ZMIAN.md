@@ -6,6 +6,43 @@
 
 ---
 
+## 2026-06-02 | MAJOR | Detektor lookahead-bias (Freqtrade LA-01) + weryfikacja bazy DeepSeek
+
+### Kontekst (sesja "tryb agregat/strategia")
+Cezar wgrał `Zbior_wskaznikow_i_strategi_03.06.2026.md` (transkrypcja rozmów z DeepSeekiem).
+Zadanie: porównać z naszym kodem + zweryfikować twierdzenia w internecie (deep-research).
+
+### Ustalenia deep-research (Prawo I — zero halucynacji)
+- ✅ TradingAgents (~80k ⭐), MRC arXiv 2605.24490 (Shapley, Sharpe 1.51) — REALNE.
+- ❌ StratEvo (Sharpe 6.06) — 17 ⭐, liczby pomylone; VORTEX — niezweryfikowalny;
+  OpenAlice — agent LLM Node.js, NIE silnik backtestu (DeepSeek mylił przeznaczenie).
+- ✅ Akademicko potwierdzone: 1H ma niskie SNR (gorsze od 1D); korelowane wskaźniki bez przewagi.
+- 🏆 Najlepsza zdatna do wdrożenia perełka: **Freqtrade lookahead-analysis** — detektor oszustwa backtestu.
+
+### Zmiany kodu
+- `imperium/koloseum/lookahead.py` — NOWY. `wykryj_lookahead()`: liczy ślad głosów roju na
+  pełnym i obciętym zbiorze barów; rozbieżność = rój zagląda w przyszłość (Prawo I złamane).
+  CLI: `python -m imperium.koloseum.lookahead <plik.csv> <interwal> [max_barow]`.
+- `tests/test_lookahead.py` — NOWE: brak lookahead na czystym pipeline, determinizm śladu,
+  kontrola pozytywna (sztuczny przeciek MUSI być wykryty). +3 testy → 326/326.
+- `tests/run_tests.py` — rejestracja `test_lookahead`.
+
+### Dowód
+`python -m imperium.koloseum.lookahead dane/dzienne/Binance_BTCUSDT_d.csv 1D 600` → ✅ CZYSTO.
+Nasz backtest na prawdziwych danych BTC nie oszukuje.
+
+### Dokumentacja (ZPO + symbioza)
+- `docs/REJESTR_INSPIRACJI.md` — LA-01 (wdrożony), ML-28 MRC/Shapley (plan), ML-29 TradingAgents (ref),
+  + sekcja odrzuconych (StratEvo/VORTEX/OpenAlice/AetherEdge z powodami).
+- `MANIFEST_KODU.md`, `INDEKS_IMPERIUM.md` — dopisany moduł lookahead.
+- `README.md` — testy 307→326 (liczba policzona, nie z pamięci — Prawo XXI).
+
+### Powód
+Pierwsza inspiracja zewnętrzna, która trafiła PROSTO do kodu, nie do planu. OpenAlice odrzucony
+jako backtest (Node.js, brak rygoru); zamiast zmieniać framework — przenieśliśmy metodę Freqtrade.
+
+---
+
 ## 2026-06-02 | MAJOR | Warstwa strategii wpięta w decyzję — 3 tryby + pomiar (Opcja 3)
 
 ### Problem (Prawo XV — utrata potencjału)

@@ -48,11 +48,13 @@ class KandydatAktywa:
 
 # ─── Wagi reżimowe dla kategorii neuronów ─────────────────────────────────────
 
+# Wagi reżimowe wg KATEGORII neuronu (legenda: M=Momentum T=Trend V=Zmienność
+# F=Flow/Wolumen O=On-chain L=Leverage R=Sentyment S=Struktura A=Anty-manipulacja).
 WAGI_REZIMU = {
     "TREND_STRONG": {"T": 1.5, "M": 1.2, "O": 0.7, "L": 0.8},
-    "RANGING":      {"M": 1.5, "V": 1.3, "T": 0.5},
+    "RANGING":      {"M": 1.5, "V": 1.3, "F": 1.2, "T": 0.5},
     "VOLATILE":     {"A": 2.0, "L": 0.3, "_default": 0.7},
-    "PANIC":        {"A": 3.0, "_default": 0.1},
+    "PANIC":        {"A": 3.0, "R": 1.5, "_default": 0.1},
     "NORMAL":       {},
     "ON-CHAIN_BULLISH": {"O": 2.0, "L": 0.8},
 }
@@ -60,7 +62,7 @@ WAGI_REZIMU = {
 
 class Legatus:
     """
-    Generał Legatus — agreguje sygnały 261 neuronów i przekazuje raport Senatowi.
+    Generał Legatus — agreguje sygnały wszystkich aktywnych neuronów i przekazuje raport Senatowi.
 
     Użycie:
         legatus = Legatus(neurony=[...], min_neuronow=5, min_przewaga=0.55)

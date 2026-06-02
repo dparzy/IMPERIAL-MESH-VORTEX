@@ -59,13 +59,22 @@ class MikroNeuron(ABC):
     KLUCZ: str = "???-00"
     LEGION: str = "WSPOLNY"
     WSKAZNIK: str = "abstract"
-    KATEGORIA: str = "?"   # M/T/V/F/O/L/S/A
+    # Legenda KATEGORIA (jedno źródło prawdy, zgodne z docs/KATALOG_NEURONOW.md):
+    #   M=Momentum  T=Trend  V=Zmienność  F=Flow/Wolumen  O=On-chain
+    #   L=Leverage  R=Reżim/Sentyment  S=Struktura(SMC)  A=Anty-manipulacja
+    #   K=Makro/Intermarket  E=Entropia/AI  G=Geo/Regionalne
+    KATEGORIA: str = "?"
     WAGA: int = 5
 
     # Dostępność — ustaw False gdy neuron wymaga zewnętrznego API niedostępnego przez Bramę.
     # Rój automatycznie pomija niedostępne neurony zamiast produkować wieczne NEUTRAL.
     DOSTEPNY: bool = True
     POWOD_NIEDOSTEPNOSCI: str = ""
+
+    # Status elitarny (Prawo XX) — ustaw True gdy neuron spełnia kryteria elity.
+    # Status OTWARTY i AKTUALIZOWALNY: nadawany/odbierany pomiarem, nie opinią.
+    ELITARNY: bool = False
+    POWOD_ELITARNOSCI: str = ""   # które kryteria E1–E7 spełnia (do audytu)
 
     def __init__(self):
         if self.KLUCZ == "???-00":

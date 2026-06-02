@@ -145,3 +145,37 @@ def test_zbuduj_legatusa_pelny():
         from imperium.legiony.neurony.struktura import NeuronFVG, NeuronBOS
         NeuronFVG.DOSTEPNY = False
         NeuronBOS.DOSTEPNY = False
+
+
+def test_prawo_xx_status_elitarny():
+    """Prawo XX: status elitarny mierzony, nie opinią."""
+    from imperium.legiony.rejestr import raport_elity, wszystkie_neurony, wszyscy_zwiadowcy
+
+    raport = raport_elity()
+
+    assert "neurony_elite" in raport
+    assert "zwiadowcy_elite" in raport
+    assert "lacznie_elite" in raport
+
+    # X-25 i X-26 są elitarne
+    klucze_elite = [e["klucz"] for e in raport["neurony_elite"]]
+    assert "X-25" in klucze_elite
+    assert "X-26" in klucze_elite
+
+    # Każdy elitarny moduł musi mieć niepusty powód
+    for e in raport["neurony_elite"] + raport["zwiadowcy_elite"]:
+        assert e["powod"], f"{e['klucz']} jest elitarny, ale brak POWOD_ELITARNOSCI"
+
+    # Wszyscy zwiadowcy Exploratores są elitarni (E1 — definicja klasy)
+    zwiadowcy = wszyscy_zwiadowcy()
+    for z in zwiadowcy:
+        assert getattr(z, "ELITARNY", False), f"Zwiadowca {z.KLUCZ} powinien być ELITARNY"
+
+    # Zwykłe neurony NIE są domyślnie elitarne — elita musi być zarobiona
+    neurony = wszystkie_neurony()
+    nie_elitarne = [n for n in neurony if not getattr(n, "ELITARNY", False)]
+    assert len(nie_elitarne) > 0, "Część neuronów powinna NIE być elitarna"
+
+    # Łączna liczba elitarnych > 0
+    assert raport["lacznie_elite"] > 0
+

@@ -147,7 +147,7 @@ class NeuronVSA(MikroNeuron):
     KLUCZ = "VSA-01"
     LEGION = "SWING"
     WSKAZNIK = "VSA"
-    KATEGORIA = "V"
+    KATEGORIA = "F"
     WAGA = 8
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:

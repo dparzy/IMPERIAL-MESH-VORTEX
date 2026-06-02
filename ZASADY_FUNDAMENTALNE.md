@@ -328,6 +328,58 @@ Każda sesja:
 
 ---
 
+## ⚖️ PRAWO XX — STATUS ELITARNY: MIERZONY, OTWARTY, ŻYWY 🎖️
+
+> **Rozkaz Cezara.** Elita to nie kasta z urodzenia — to zasłużona, mierzalna rola,
+> którą można zdobyć i stracić. Imperium nigdy nie blokuje unikatu (Prawo IV postępu).
+
+### Czym jest status elitarny
+
+Neuron lub zwiadowca dostaje **status elitarny** (`ELITARNY=True` w kodzie), gdy wnosi
+**unikatową, niezastępowalną wartość** dla roju — nie powiela istniejącego głosu, lecz
+widzi coś, czego nikt inny nie widzi. Status jest **polem w kodzie** (Prawo XIX), nie opinią.
+
+### Kryteria nadania (mierzalne)
+
+Status elitarny przyznaje się, gdy moduł spełnia **≥1 kryterium KRYTYCZNE** LUB **≥2 WSPIERAJĄCE**:
+
+**KRYTYCZNE (jedno wystarcza):**
+- **E1 — Własna matematyka:** liczy to, czego Brama nie umie (Higuchi, Kalman, ML,
+  multi-bar patterns). Każdy `ZwiadowcaElitarny` (Exploratores) spełnia E1 z definicji.
+- **E2 — Filar dekorelacji:** zmierzona `|korelacja| < 0.20` z resztą roju (Prawo XVI)
+  ORAZ moduł aktywny. Wnosi niezależną informację.
+- **E3 — Unikalny mechanizm:** funkcja, której nie ma żaden inny moduł (np. spread/
+  slippage guard EXP-11, blokada konsolidacji przez Volatility Index).
+
+**WSPIERAJĄCE (potrzeba ≥2):**
+- **E4 — Multi-reżim / multi-faktor:** inna decyzja w różnych reżimach (kameleon
+  RANGING↔TREND), nie pojedynczy próg.
+- **E5 — Pieczęć IMV-ADO 🔱:** zaadaptowany i ulepszony moduł zewnętrzny z naprawionymi
+  bugami oryginału (fake ATR, lookahead, martwy kod).
+- **E6 — Zmierzona przewaga:** udokumentowany edge w Igrzyskach/backteście (Prawo VI).
+- **E7 — Potrójne potwierdzenie:** wbudowana walidacja przeciw szumowi (multi-confirm).
+
+### Klauzula postępu (OTWARTOŚĆ — Prawo IV)
+
+- **Nic nie blokuje unikatu.** Moduł INNY i unikatowy NIGDY nie jest odrzucany za
+  „podobieństwo" — tylko **zmierzona redundancja** (Prawo XVI, `|kor|>0.80`) go zatrzymuje.
+- **Status żyje.** Nadawany i odbierany **pomiarem**, nie raz na zawsze. Moduł, który
+  stracił dekorelację lub przewagę → traci status. Moduł, który ją zdobył → zyskuje.
+  To żywy ranking (Prawo VI rywalizacja), nie zamknięta lista.
+- **Nowe kryterium mile widziane.** Gdy pojawi się moduł elitarny z innego powodu niż
+  E1–E7 — **dopisujemy nowe kryterium**, nie odrzucamy modułu. Lista jest otwarta.
+
+### Reguły operacyjne
+
+- Status w kodzie: `ELITARNY: bool` + `POWOD_ELITARNOSCI: str` (które E spełnia).
+- Audyt elity: `rejestr.raport_elity()` — lista elitarnych + powód, weryfikowalna testem.
+- Po każdej rundzie Igrzysk / pomiarze dekorelacji → aktualizuj statusy elitarne.
+
+**Zablokowanie unikatowego modułu „bo podobny" = złamanie Prawa XX (i Prawa IV).**
+**Twierdzenie o elitarności bez spełnionego kryterium w kodzie = złamanie Prawa XX (i XIX).**
+
+---
+
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*
 > 🚨 *"Niewykorzystana siła to siła oddana wrogowi. Imperium nie marnuje niczego."*
 > 🗺️ *"Wódz, który nie zna własnego obozu, przegrywa bitwę przed jej początkiem."*

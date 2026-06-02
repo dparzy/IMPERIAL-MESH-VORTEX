@@ -21,7 +21,7 @@ class NeuronMVRV(MikroNeuron):
     KLUCZ = "OC-01"
     LEGION = "WSPOLNY"
     WSKAZNIK = "MVRV_Z"
-    KATEGORIA = "F"
+    KATEGORIA = "O"
     WAGA = 9
     DOSTEPNY = False
     POWOD_NIEDOSTEPNOSCI = _POWOD
@@ -56,7 +56,7 @@ class NeuronSOPR(MikroNeuron):
     KLUCZ = "OC-02"
     LEGION = "WSPOLNY"
     WSKAZNIK = "SOPR"
-    KATEGORIA = "F"
+    KATEGORIA = "O"
     WAGA = 8
     DOSTEPNY = False
     POWOD_NIEDOSTEPNOSCI = _POWOD
@@ -94,7 +94,7 @@ class NeuronPuellMultiple(MikroNeuron):
     KLUCZ = "OC-03"
     LEGION = "WSPOLNY"
     WSKAZNIK = "PUELL_MULTIPLE"
-    KATEGORIA = "F"
+    KATEGORIA = "O"
     WAGA = 7
     DOSTEPNY = False
     POWOD_NIEDOSTEPNOSCI = _POWOD
@@ -128,7 +128,7 @@ class NeuronExchangeNetflow(MikroNeuron):
     KLUCZ = "OC-04"
     LEGION = "WSPOLNY"
     WSKAZNIK = "EXCHANGE_NETFLOW"
-    KATEGORIA = "F"
+    KATEGORIA = "O"
     WAGA = 8
     DOSTEPNY = False
     POWOD_NIEDOSTEPNOSCI = _POWOD

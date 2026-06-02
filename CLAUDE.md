@@ -5,7 +5,7 @@
 ## 📜 Konstytucja
 
 Pełne prawa: [`ZASADY_FUNDAMENTALNE.md`](./ZASADY_FUNDAMENTALNE.md).
-Każda decyzja musi być zgodna z **20 Prawami Imperium**.
+Każda decyzja musi być zgodna z **21 Prawami Imperium**.
 
 **Prawo XVIII (decyzyjność):** gdy widzisz niespójność/błąd — rozstrzygasz SAM
 (najlepsza opcja zgodna z zasadami), nie pytasz o błahostki. Źródło prawdy:
@@ -14,21 +14,55 @@ decyzje kierunkowe/nieodwracalne (kasowanie, kapitał, zmiana strategii, koszt).
 
 ## 🗺️ PRAWO XVII — ROZPOZNANIE TERENU (ROZKAZ STAŁY, ROBISZ TO PIERWSZE)
 
-### 🔒 KROK 0 — WERYFIKACJA SPÓJNOŚCI (ABSOLUTNIE PIERWSZE, przed czymkolwiek)
+### 🔒 KROK 0 — PEŁNA WERYFIKACJA SPÓJNOŚCI (ABSOLUTNIE PIERWSZE, przed czymkolwiek)
+
+**Prawo XXI nakazuje chirurgiczną precyzję — zero tolerancji na rozbieżności.**
 
 ```bash
+# 1. Stan git
 git status                    # musi być: "nothing to commit, working tree clean"
 python tests/run_tests.py     # musi być: X/X zielone
+
+# 2. Żywy rój — liczby z kodu (nie z pamięci!)
+python -c "
+from imperium.legiony.rejestr import wszystkie_neurony, wszyscy_zwiadowcy, raport_potencjalu, raport_elity
+n=wszystkie_neurony(); z=wszyscy_zwiadowcy(); p=raport_potencjalu(); e=raport_elity()
+print(f'Neurony: {len(n)} | aktywne: {p[\"neurony_aktywne\"]} | wyciszone: {p[\"neurony_wyciszone\"]}')
+print(f'Zwiadowcy: {len(z)} | aktywni: {p[\"zwiadowcy_aktywni\"]} | wyciszeni: {p[\"zwiadowcy_wyciszeni\"]}')
+print(f'Elitarne: {e[\"lacznie_elite\"]} | Kategorie: {sorted({x.KATEGORIA for x in n})}')
+bad=[x for x in n if x.KATEGORIA not in \"MTVFOLRSAKEGm\"]; print(f'Bad KAT: {[(x.KLUCZ,x.KATEGORIA) for x in bad]}')
+"
+
+# 3. WAGI_REZIMU — martwe litery (planowane A/L/V są OK — pre-zarejestrowane)
+python -c "
+from imperium.legiony.legatus import WAGI_REZIMU, WAGI_REZIMU_PLANOWANE
+from imperium.legiony.rejestr import wszystkie_neurony, wszyscy_zwiadowcy
+cats={n.KATEGORIA for n in wszystkie_neurony()} | {getattr(z,'KATEGORIA','?') for z in wszyscy_zwiadowcy()}
+dead=[(r,k) for r,m in WAGI_REZIMU.items() for k in m if k!='_default' and k not in cats and k not in WAGI_REZIMU_PLANOWANE]
+print('Nieoczekiwane martwe KAT:', dead or 'BRAK ✅')
+"
+
+# 4. Klucze MANIFEST vs KOD (Prawo XXI — klucze muszą się zgadzać)
+python -c "
+import re
+from imperium.legiony.rejestr import wszystkie_neurony
+with open('docs/MANIFEST_KODU.md') as f: txt=f.read()
+section=txt.split('## ⚡')[1].split('## 📋')[0] if '## ⚡' in txt else ''
+mkeys=set(re.findall(r'^\|\s*([A-Z][\w-]+)',section,re.M)) - {'KLUCZ'}
+ckeys={n.KLUCZ for n in wszystkie_neurony()}
+print('Tylko w MANIFEST:', sorted(mkeys-ckeys) or '✅')
+print('Tylko w kodzie:  ', sorted(ckeys-mkeys) or '✅')
+"
 ```
 
 Sprawdź, że ta sama liczba neuronów pojawia się w **trzech miejscach jednocześnie**:
 - `rejestr.py` → `wszystkie_neurony()` — ile klas zarejestrowanych?
-- `docs/MANIFEST_KODU.md` → ile wpisów `✅ aktywny`?
-- `README.md` → jaka liczba podana?
+- `docs/MANIFEST_KODU.md` → nagłówek "Zaimplementowane"
+- `README.md` → liczba podana wprost
 
 Jeśli którakolwiek się różni → STOP, napraw spójność zanim zaczniesz nowe zadanie.
 
-**Niespójność repo = złamanie Prawa XVII. Każda sesja zaczyna się od czystego stanu.**
+**Niespójność = złamanie Prawa XVII + XXI. Każda sesja zaczyna się od czystego stanu.**
 
 ---
 
@@ -85,6 +119,30 @@ Checklist Prawa XIX (sprawdzaj na początku sesji):
 - [ ] Nigdy nie mów "mamy X neuronów" bez sprawdzenia MANIFEST — tylko `✅` liczy się.
 
 **Złamanie Prawa XIX:** twierdzenie, że moduł istnieje, gdy nie ma kodu na branchu.
+
+## 🔬 PRAWO XXI — PROTOKÓŁ SPÓJNOŚCI: CHIRURGICZNA PRECYZJA (ROZKAZ STAŁY)
+
+**Po KAŻDEJ zmianie kodu i przed KAŻDYM commitem** — uruchom pełny KROK 0 powyżej i sprawdź:
+
+- [ ] **Warstwa 1 (kod):** KLUCZ, WSKAZNIK, KATEGORIA, WAGA, DOSTEPNY, ELITARNY — wszystkie poprawne
+- [ ] **Warstwa 2A (WAGI_REZIMU):** każda litera KAT w mapie istnieje w `{n.KATEGORIA for n in wszystkie_neurony()}` — zero martwych liter
+- [ ] **Warstwa 2B (Budowniczy):** każdy WSKAZNIK aktywnego neuronu jest produkowany przez Budowniczego (`wskazniki["KLUCZ"]` w kodzie)
+- [ ] **Warstwa 3 (MANIFEST):** KLUCZ w tabeli = n.KLUCZ w kodzie — żadnych aliasów, żadnych starych nazw
+- [ ] **Warstwa 3 (README):** liczba neuronów, testy, prawa = liczby z kodu (policzone, nie z pamięci)
+- [ ] **Data "Stan na:"** w MANIFEST i README = data bieżącego commitu
+
+**9 Nienaruszalnych Reguł (pełne: ZASADY_FUNDAMENTALNE.md § PRAWO XXI):**
+1. Klucze MANIFEST = KLUCZ w kodzie — żadnych aliasów
+2. KATEGORIA ∈ M/T/V/F/O/L/R/S/A/K/E/G — brak "?" u aktywnych
+3. WAGI_REZIMU — tylko litery KAT faktycznie używane w kodzie
+4. WSKAZNIK aktywnego neuronu = klucz produkowany przez Budowniczego
+5. DOSTEPNY=False → neuron nie produkuje głosu (lista_niedostepnych())
+6. ELITARNY=True → niepusty POWOD_ELITARNOSCI (raport_elity())
+7. Testy zielone przed każdym push
+8. Liczby w README/MANIFEST policzone, nie zaokrąglone
+9. Data "Stan na:" = data commitu
+
+**Złamanie Prawa XXI:** commit z rozbieżnością między kodem a dokumentacją.
 
 ## 🎖️ PRAWO XX — STATUS ELITARNY (MIERZONY, NIE OPINIĄ)
 

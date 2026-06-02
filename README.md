@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-01 · **Testy:** 244/244 zielone · **Faza:** rdzeń decyzyjny działa, rozbudowa roju w toku.
+> **Stan na:** 2026-06-02 · **Testy:** 245/245 zielone · **Faza:** rdzeń decyzyjny działa, rozbudowa roju w toku.
 
 ---
 
@@ -33,7 +33,8 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Generał Legatus** | agregacja głosów + wagi reżimowe + odpalanie zwiadowców |
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
-| **Testy** | `python tests/run_tests.py` → **244/244** |
+| **Status elitarny** | **14 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26 + 12 zwiadowców |
+| **Testy** | `python tests/run_tests.py` → **245/245** |
 
 **Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 32) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
@@ -43,7 +44,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Folder / Plik | Zawartość |
 |---------------|-----------|
-| **[ZASADY_FUNDAMENTALNE.md](ZASADY_FUNDAMENTALNE.md)** | Konstytucja — **19 praw**, których zawsze przestrzegamy |
+| **[ZASADY_FUNDAMENTALNE.md](ZASADY_FUNDAMENTALNE.md)** | Konstytucja — **21 praw**, których zawsze przestrzegamy |
 | **[CLAUDE.md](CLAUDE.md)** | Instrukcje stałe (czytane co sesję): Prawa XV–XVIII, bezpieczeństwo, git |
 | **imperium/** | Żywy kod systemu (patrz mapa niżej) |
 | **docs/** | Dokumentacja + katalogi projektowe (neurony, strategie, arsenał) |
@@ -81,7 +82,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ## 🧪 Uruchomienie testów
 
 ```bash
-python tests/run_tests.py     # 244/244, bez zależności zewnętrznych
+python tests/run_tests.py     # 245/245, bez zależności zewnętrznych
 ```
 
 ---

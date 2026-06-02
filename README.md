@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-02 · **Testy:** 247/247 zielone · **Faza:** rdzeń decyzyjny działa, rozbudowa roju w toku.
+> **Stan na:** 2026-06-02 · **Testy:** 301/301 zielone · **Faza:** rdzeń decyzyjny działa, rozbudowa roju w toku.
 
 ---
 
@@ -34,7 +34,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
 | **Status elitarny** | **14 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26 + 12 zwiadowców |
-| **Testy** | `python tests/run_tests.py` → **290/290** |
+| **Testy** | `python tests/run_tests.py` → **301/301** |
 
 **Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 42) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
@@ -62,7 +62,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ⚔️ legiony/      — neurony + zwiadowcy + Legatus    (29)
 🏟️ koloseum/     — Igrzyska, rangowanie             (2)
 🛡️ pretorianie/  — bezpieczeństwo, kalkulator lewara (3)
-🏗️ akwedukty/    — pipeline danych                 (1)
+🏗️ akwedukty/    — pipeline danych + adaptery API   (2)
 🛤️ drogi/        — API i egzekucja                 (3)
 🎨 swiatynie/    — dashboard / wizualizacja         (2)
 📚 biblioteki/   — wiedza, pamięć                   (4)
@@ -82,7 +82,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ## 🧪 Uruchomienie testów
 
 ```bash
-python tests/run_tests.py     # 247/247, bez zależności zewnętrznych
+python tests/run_tests.py     # 301/301, bez zależności zewnętrznych
 ```
 
 ---

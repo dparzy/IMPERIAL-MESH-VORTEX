@@ -202,6 +202,8 @@
 | KalkulatorLewara | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | Dywizja Strategii (model + silnik) | `legiony/strategie/baza.py` | ✅ aktywny |
 | Rejestr Strategii (Klucznik) | `legiony/strategie/rejestr_strategii.py` | ✅ aktywny |
+| Framework Adapterów (most API→rój) | `akwedukty/adaptery/baza.py` | ✅ aktywny |
+| Adaptery testowe (OnChain/Futures/CVD mock) | `akwedukty/adaptery/testowy.py` | ✅ aktywny (mock) |
 
 ---
 
@@ -221,9 +223,33 @@
 pilnuje, że KAŻDY klucz w strategii istnieje w kodzie i jest aktywny — żadnych
 neuronów-widm. Test: `test_klucznik_strategie_uzywaja_istniejacych_neuronow`.
 
-**Stan:** 7 strategii (klucze: 13 — wszystkie aktywne). Status każdej: SZKIC
+**Stan:** 15 strategii (klucze: 20 — wszystkie aktywne). Status każdej: SZKIC
 (czeka na kalibrację w Koloseum). Strategie z katalogu wymagające nieistniejących
 neuronów (OrderFlow, CVD, SMC, on-chain) wejdą gdy te neurony ożyją.
+
+---
+
+## 🔌 FRAMEWORK ADAPTERÓW — most API → rój (model "test teraz → auto-wybudzenie")
+
+> **Wizja (Cezar):** "teraz wersja testowa, a później łatwe auto-wybudzenie".
+> Adaptery realizują ten model dla 9 neuronów wymagających zewnętrznego API.
+> Wzór skopiowany z mostu SMC (`wstrzyknij()` + `aktywuj_neurony_smc()`).
+
+| Element | Plik | Rola |
+|---------|------|------|
+| `AdapterDanych` (baza) | `akwedukty/adaptery/baza.py` | `wzbogac()` dolewa dane do dict, `aktywuj()`/`usypiaj()` budzi/usypia neurony domeny |
+| `AdapterTestowyOnChain` | `akwedukty/adaptery/testowy.py` | mock OC-01..04 (scenariusze: kapitulacja/euforia/neutralny) |
+| `AdapterTestowyFutures` | `akwedukty/adaptery/testowy.py` | mock PSY-01..04 (panika/chciwość/neutralny) |
+| `AdapterTestowyCVD` | `akwedukty/adaptery/testowy.py` | mock V-03 (akumulacja/dystrybucja/neutralny) |
+
+**Przepływ (identyczny jak SMC):** `adapter.wzbogac(wskazniki, symbol)` → dict ma
+klucze API → `adapter.aktywuj()` budzi neurony → rój głosuje. **Test→produkcja:**
+podmieniamy tylko `pobierz()` na wersję uderzającą w MEXC/Glassnode (klucze API
+WYŁĄCZNIE z `os.getenv` — Prawo bezpieczeństwa). Interfejs stały → reszta bez zmian.
+
+**Prawo XV:** `aktywuj()` budzi neuron tylko razem z adapterem dostarczającym
+jego dane. Bez adaptera neuron śpi (świadomie). `usypiaj()` przywraca stan —
+testy nie fałszują statycznego audytu. Testy: `tests/test_adaptery.py` (13).
 
 ---
 
@@ -242,6 +268,7 @@ neuronów (OrderFlow, CVD, SMC, on-chain) wejdą gdy te neurony ożyją.
 | 2026-06-02 | Faza 3 — XII-05, XII-07, X-12 | +3 neurony | 37+12=49 | Fibonacci, RSI Dywergencja, BB Squeeze; +6 strategii (13 łącznie) |
 | 2026-06-02 | Faza 4 — A-01, A-02 (Straż) | +2 neurony | 39+12=51 | Stop Hunt, Wick Rejection; litera A ożywiona (Prawo XV); +1 strategia IMV-DEF-001 (14 łącznie) |
 | 2026-06-02 | Faza 5 — A-03, A-05, XII-06 | +3 neurony | 42+12=54 | WashVol, BartPattern (Straż); OBZone (XII) — Order Block OHLCV |
+| 2026-06-02 | Faza 6 — Framework Adapterów | +2 moduły | most API→rój | Baza + 3 adaptery testowe (OnChain/Futures/CVD); auto-wybudzanie 9 neuronów API; 13 testów |
 | 2026-06-02 | Dywizja Strategii + Klucznik | +2 moduły | 46+2 | Strategie jako KOD, silnik dopasowania, audyt Warstwa 4 |
 | **Do wdrożenia** | Faza 3 (X Equestris c.d.) | +X neuronów | — | X-12..X-16, X-19..X-24 + strategie wymagające nowych neuronów |
 

@@ -21,7 +21,6 @@ Zasada: ten skrypt NIE liczy z pamięci. Wszystkie liczby pochodzą z żywego ko
 import os
 import re
 import sys
-import subprocess
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)

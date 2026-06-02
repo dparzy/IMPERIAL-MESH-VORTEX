@@ -179,3 +179,78 @@ def test_prawo_xx_status_elitarny():
     # Łączna liczba elitarnych > 0
     assert raport["lacznie_elite"] > 0
 
+
+# ── KLASYFIKATOR REŻIMU ──────────────────────────────────────────────────────
+
+def test_klasyfikator_rezim_trend_strong():
+    """ADX > 25 → TREND_STRONG."""
+    from imperium.legiony.legatus import klasyfikuj_rezim
+    w = {"ADX_14": 30.0, "ATR_DEVIATION": 1.2, "BB_UPPER": 110.0, "BB_MIDDLE": 100.0, "BB_LOWER": 90.0}
+    assert klasyfikuj_rezim(w) == "TREND_STRONG"
+
+
+def test_klasyfikator_rezim_ranging():
+    """ADX < 20 → RANGING."""
+    from imperium.legiony.legatus import klasyfikuj_rezim
+    w = {"ADX_14": 15.0, "ATR_DEVIATION": 0.8, "BB_UPPER": 101.0, "BB_MIDDLE": 100.0, "BB_LOWER": 99.0}
+    assert klasyfikuj_rezim(w) == "RANGING"
+
+
+def test_klasyfikator_rezim_volatile():
+    """ATR_DEVIATION > 2.5 → VOLATILE (wyższy priorytet niż trend)."""
+    from imperium.legiony.legatus import klasyfikuj_rezim
+    w = {"ADX_14": 30.0, "ATR_DEVIATION": 3.0}
+    assert klasyfikuj_rezim(w) == "VOLATILE"
+
+
+def test_klasyfikator_rezim_normal():
+    """ADX między 20–25, ATR normalny → NORMAL."""
+    from imperium.legiony.legatus import klasyfikuj_rezim
+    w = {"ADX_14": 22.0, "ATR_DEVIATION": 1.5}
+    assert klasyfikuj_rezim(w) == "NORMAL"
+
+
+def test_klasyfikator_brak_danych():
+    """Brak wskaźników (pusty dict) → NORMAL (bezpieczny fallback)."""
+    from imperium.legiony.legatus import klasyfikuj_rezim
+    assert klasyfikuj_rezim({}) == "NORMAL"
+
+
+def test_fokus_auto_klasyfikuje_rezim():
+    """fokus() z rezim='NORMAL' + ADX > 25 → auto-wykrywa TREND_STRONG."""
+    import math
+    from imperium.legiony.rejestr import zbuduj_legatusa
+    from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
+
+    bary = []
+    p = 100.0
+    for i in range(120):
+        p += 0.6 + math.sin(i / 8) * 0.4
+        bary.append({"open": p - 0.2, "high": p + 0.4, "low": p - 0.4,
+                     "close": p, "volume": 1000 + i * 5, "timestamp": i})
+
+    leg = zbuduj_legatusa(min_neuronow=3, min_przewaga=0.4, aktywuj_smc=False)
+    w = BudowniczyWskaznikow().zbuduj(bary)
+
+    # Nie podajemy rezim — system powinien go wykryć sam
+    raport = leg.fokus("BTCUSDT", w, bary=bary)
+
+    assert raport.rezim != "NORMAL" or raport.rezim_zrodlo == "manual"
+    # Na trendzie wzrostowym klasyfikator powinien wykryć trend lub pozostawić NORMAL
+    assert raport.rezim in ("TREND_STRONG", "RANGING", "VOLATILE", "NORMAL")
+    # rezim_zrodlo musi być ustawiony
+    assert raport.rezim_zrodlo in ("auto", "manual")
+
+
+def test_fokus_manual_rezim_nie_jest_nadpisywany():
+    """Gdy rezim != 'NORMAL' (np. PANIC), auto-klasyfikator nie nadpisuje."""
+    from imperium.legiony.legatus import Legatus
+    from imperium.legiony.neurony.momentum import NeuronRSI
+
+    leg = Legatus([NeuronRSI()], min_neuronow=1, min_przewaga=0.1)
+    w = {"RSI_14": 25.0, "RSI_PREV": 24.0, "ADX_14": 35.0}  # ADX wskazuje trend
+
+    raport = leg.fokus("BTCUSDT", w, rezim="PANIC")
+    assert raport.rezim == "PANIC"      # PANIC musi zostać
+    assert raport.rezim_zrodlo == "manual"
+

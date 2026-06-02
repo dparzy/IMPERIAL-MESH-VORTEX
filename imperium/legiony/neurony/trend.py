@@ -207,3 +207,38 @@ class NeuronDonchian(MikroNeuron):
         if close < lo:
             return self._bazowy_sygnal(close, "SHORT", 0.75, [f"Wybicie dołem: close={close:.2f} < kanał={lo:.2f}"])
         return self._bazowy_sygnal(close, "NEUTRAL", 0.20, [f"Cena w kanale [{lo:.2f}, {up:.2f}]"])
+
+
+class NeuronHMA(MikroNeuron):
+    """
+    X-10 | Hull Moving Average — szybki trend o minimalnym opóźnieniu.
+    Nachylenie HMA (HMA vs HMA_PREV) daje kierunek bez lagu klasycznych EMA.
+    Potwierdzenie ceną (CLOSE po właściwej stronie HMA) wzmacnia sygnał.
+    Dane z Bramy: HMA, HMA_PREV, CLOSE.
+    """
+    KLUCZ = "X-10"
+    LEGION = "SCALP"
+    WSKAZNIK = "HMA"
+    KATEGORIA = "T"
+    WAGA = 6
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        hma = wskazniki.get("HMA")
+        prev = wskazniki.get("HMA_PREV")
+        close = wskazniki.get("CLOSE")
+        if hma is None or prev is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych HMA."])
+        rosnie = hma > prev
+        opada = hma < prev
+        # potwierdzenie ceną: close po tej samej stronie co nachylenie
+        potw_long = close is not None and close >= hma
+        potw_short = close is not None and close <= hma
+        if rosnie and potw_long:
+            return self._bazowy_sygnal(hma, "LONG", 0.70, [f"HMA rośnie ({hma:.2f}>{prev:.2f}) i cena nad HMA"])
+        if opada and potw_short:
+            return self._bazowy_sygnal(hma, "SHORT", 0.70, [f"HMA opada ({hma:.2f}<{prev:.2f}) i cena pod HMA"])
+        if rosnie:
+            return self._bazowy_sygnal(hma, "LONG", 0.45, [f"HMA rośnie ({hma:.2f}>{prev:.2f}), cena bez potw."])
+        if opada:
+            return self._bazowy_sygnal(hma, "SHORT", 0.45, [f"HMA opada ({hma:.2f}<{prev:.2f}), cena bez potw."])
+        return self._bazowy_sygnal(hma, "NEUTRAL", 0.15, [f"HMA płaska ({hma:.2f})"])

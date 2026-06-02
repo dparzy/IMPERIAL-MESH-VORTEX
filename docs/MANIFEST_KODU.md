@@ -6,15 +6,15 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-02 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 32 neurony (zarejestrowane w roju) + 12 zwiadowców = **44 moduły w kodzie**
-**Aktywne / wyciszone:** 20 aktywnych (czyste OHLCV) + 12 wyciszonych (API/feed)
+**Zaimplementowane:** 34 neurony (zarejestrowane w roju) + 12 zwiadowców = **46 modułów w kodzie**
+**Aktywne / wyciszone:** 22 aktywnych (czyste OHLCV) + 12 wyciszonych (API/feed)
 **Elitarne (Prawo XX):** 14 (2 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
-**Do wdrożenia:** 267 neuronów
+**Do wdrożenia:** 265 neuronów
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 32). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 34). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -41,7 +41,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (32/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (34/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -58,6 +58,7 @@
 | X-05 | NeuronEMACross | T | 6 | ✅ aktywny | EMA_CROSS | — |
 | X-06 | NeuronWilliamsR | M | 4 | ✅ aktywny | WILLIAMS_R | — |
 | X-08 | NeuronAwesome | M | 5 | ✅ aktywny | AO | — |
+| X-09 | NeuronAccelerator | M | 4 | ✅ aktywny | AC | — |
 | X-17 | NeuronTRIX | M | 4 | ✅ aktywny | TRIX | — |
 | X-25 🔱 | NeuronATRDeviation | M | 6 | ✅ aktywny | ATR_DEVIATION | E4+E5 |
 | X-26 🔱 | NeuronHAScalper | M | 7 | ✅ aktywny | HA_SCALPER | E4+E5+E7 |
@@ -71,6 +72,7 @@
 | XII-03 | NeuronEMA50_200 | T | 9 | ✅ aktywny | EMA_50_200 | — |
 | XII-04 | NeuronSupertrend | T | 7 | ✅ aktywny | SUPERTREND | — |
 | X-18 | NeuronDonchian | T | 5 | ✅ aktywny | DONCHIAN | — |
+| X-10 | NeuronHMA | T | 6 | ✅ aktywny | HMA | — |
 
 ### Plik: `neurony/wolumen.py`
 
@@ -111,7 +113,7 @@
 
 ---
 
-## 📋 NEURONY DO WDROŻENIA (267 — tylko katalog)
+## 📋 NEURONY DO WDROŻENIA (265 — tylko katalog)
 
 > Źródło: `docs/KATALOG_NEURONOW.md`. Status: `🔴 tylko katalog` — brak kodu.
 > Implementacja: etapami, z pomiarem dekorelacji po każdej fazie (Prawo XVI).
@@ -133,8 +135,8 @@
 | X-05 | OrderFlow | Bid/Ask Imbalance | 🔴 katalog |
 | X-06 | ATR-Stop | ATR×1.5 dynamiczny stop | 🔴 katalog |
 | X-07 | Williams %R | Szybkie ekstrema | 🔴 katalog (X-06 WilliamsR = odpowiednik) |
-| X-09 | Accelerator | Przyspieszenie momentum | 🔴 katalog |
-| X-10 | HMA | Hull Moving Average | 🔴 katalog |
+| X-09 | Accelerator | Przyspieszenie momentum (2. pochodna AO) | ✅ kod (momentum.py, aktywny) |
+| X-10 | HMA | Hull Moving Average | ✅ kod (trend.py, aktywny) |
 | X-12 | BB Squeeze | Bollinger Squeeze M5 | 🔴 katalog |
 | X-13 | Taker CVD | Spot Taker CVD | 🔴 katalog |
 | X-14 | CVD Absorb | CVD Absorption | 🔴 katalog |
@@ -159,7 +161,7 @@
 | III Augusta (H1) | ~45 | 9 (XII-01..04, V-01..04, VSA-01) + wyciszone: V-03,SMC-01..03,PSY-01..04 | ~36 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
-| **RAZEM** | **299** | **32** | **267** |
+| **RAZEM** | **299** | **34** | **265** |
 
 ---
 
@@ -173,6 +175,29 @@
 | Igrzyska / Koloseum | `koloseum/` | ✅ aktywny |
 | BramaKalkulatora | `fundament/brama_kalkulatora.py` | ✅ aktywny |
 | KalkulatorLewara | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
+| Dywizja Strategii (model + silnik) | `legiony/strategie/baza.py` | ✅ aktywny |
+| Rejestr Strategii (Klucznik) | `legiony/strategie/rejestr_strategii.py` | ✅ aktywny |
+
+---
+
+## 🗺️ DYWIZJA STRATEGII — Klucznik + silnik dopasowania (Prawo XIX/XXI)
+
+> **Wizja:** neurony wysyłają sygnały → silnik automatycznie dobiera NAJBLIŻSZĄ
+> strategię z bazy do bieżącej sytuacji rynku. Potem kalibracja w testach/live.
+
+| Element | Plik | Rola |
+|---------|------|------|
+| `Strategia` (model) | `strategie/baza.py` | przepis: które neurony, w jakiej roli (wejście/filtr/wyjście) |
+| `dobierz_najlepsze()` | `strategie/baza.py` | silnik: sygnały → top-3 pasujące strategie + kierunek |
+| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 7 strategii zmapowanych na ŻYWE klucze kodu |
+
+**Klucznik (strażnik spójności):** audyt Warstwa 4 (`narzedzia/audyt_spojnosci.py`)
+pilnuje, że KAŻDY klucz w strategii istnieje w kodzie i jest aktywny — żadnych
+neuronów-widm. Test: `test_klucznik_strategie_uzywaja_istniejacych_neuronow`.
+
+**Stan:** 7 strategii (klucze: 13 — wszystkie aktywne). Status każdej: SZKIC
+(czeka na kalibrację w Koloseum). Strategie z katalogu wymagające nieistniejących
+neuronów (OrderFlow, CVD, SMC, on-chain) wejdą gdy te neurony ożyją.
 
 ---
 
@@ -187,7 +212,9 @@
 | 2026-06-01 | Audyt liczby + X-02 | +1 neuron (StochRSI) | 28+12=40 | Ożywienie sieroty X-02; wycofanie redundantnego VI-01 |
 | 2026-06-01 | Faza 1 — ożywienie OHLCV | +4 neurony | 32+12=44 | X-08 Awesome, X-11 RVOL, X-17 TRIX, X-18 Donchian (aktywne) |
 | 2026-06-02 | Prawo XX + kategoria fix | 0 nowych | 32+12=44 | Status elitarny; KAT M→F→R→O; WAGI_REZIMU; MANIFEST klucze naprawione |
-| **Do wdrożenia** | Faza 2 (X Equestris c.d.) | +19 neuronów | — | X-09,X-10,X-12..X-16,X-19..X-24 + nowe schemy |
+| 2026-06-02 | Faza 2 — X-09, X-10 | +2 neurony | 34+12=46 | Accelerator + HMA; dekorelacja AC↔AO=+0.23 (Prawo XVI) |
+| 2026-06-02 | Dywizja Strategii + Klucznik | +2 moduły | 46+2 | Strategie jako KOD, silnik dopasowania, audyt Warstwa 4 |
+| **Do wdrożenia** | Faza 3 (X Equestris c.d.) | +X neuronów | — | X-12..X-16, X-19..X-24 + strategie wymagające nowych neuronów |
 
 ---
 

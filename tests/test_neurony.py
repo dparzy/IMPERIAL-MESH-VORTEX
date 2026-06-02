@@ -3,8 +3,8 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from imperium.legiony.neurony.momentum import NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross, NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI, NeuronTRIX, NeuronAwesome
-from imperium.legiony.neurony.trend import NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian
+from imperium.legiony.neurony.momentum import NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross, NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI, NeuronTRIX, NeuronAwesome, NeuronAccelerator
+from imperium.legiony.neurony.trend import NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian, NeuronHMA
 from imperium.legiony.neurony.wolumen import NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL
 from imperium.legiony.neurony.psychologia import NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv
 from imperium.legiony.neurony.onchain import NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow
@@ -118,6 +118,31 @@ def test_awesome_oscillator():
     assert n.interpretuj({"AO": -0.5, "AO_PREV": 0.2}).kierunek == "SHORT"
     # nad zerem i rośnie
     assert n.interpretuj({"AO": 1.0, "AO_PREV": 0.5}).kierunek == "LONG"
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_accelerator_przyspieszenie():
+    n = NeuronAccelerator()
+    # przecięcie zera w górę = LONG
+    assert n.interpretuj({"AC": 0.3, "AC_PREV": -0.1}).kierunek == "LONG"
+    assert n.interpretuj({"AC": -0.3, "AC_PREV": 0.1}).kierunek == "SHORT"
+    # nad zerem i rośnie
+    assert n.interpretuj({"AC": 0.5, "AC_PREV": 0.2}).kierunek == "LONG"
+    # pod zerem i opada
+    assert n.interpretuj({"AC": -0.5, "AC_PREV": -0.2}).kierunek == "SHORT"
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_hma_nachylenie():
+    n = NeuronHMA()
+    # HMA rośnie + cena nad HMA = LONG mocny
+    s = n.interpretuj({"HMA": 101.0, "HMA_PREV": 100.0, "CLOSE": 102.0})
+    assert s.kierunek == "LONG" and s.pewnosc == 0.70
+    # HMA opada + cena pod HMA = SHORT mocny
+    s2 = n.interpretuj({"HMA": 99.0, "HMA_PREV": 100.0, "CLOSE": 98.0})
+    assert s2.kierunek == "SHORT" and s2.pewnosc == 0.70
+    # HMA rośnie bez potwierdzenia ceną = LONG słabszy
+    assert n.interpretuj({"HMA": 101.0, "HMA_PREV": 100.0, "CLOSE": 99.0}).kierunek == "LONG"
     assert n.interpretuj({}).kierunek == "NEUTRAL"
 
 

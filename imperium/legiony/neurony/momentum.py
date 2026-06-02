@@ -444,3 +444,34 @@ class NeuronAwesome(MikroNeuron):
         if ao < 0 and opadajacy:
             return self._bazowy_sygnal(ao, "SHORT", 0.60, [f"AO<0 i opada ({ao:+.4f})"])
         return self._bazowy_sygnal(ao, "NEUTRAL", 0.25, [f"AO={ao:+.4f} bez wyraźnego momentum"])
+
+
+class NeuronAccelerator(MikroNeuron):
+    """
+    X-09 | Accelerator Oscillator (Bill Williams) = AO − SMA(AO, 5).
+    Mierzy PRZYSPIESZENIE momentum (2. pochodna ceny) — wyprzedza AO.
+    Zmiana znaku AC = wczesny sygnał zmiany momentum, ZANIM zareaguje AO.
+    Dane z Bramy: AC, AC_PREV.
+    """
+    KLUCZ = "X-09"
+    LEGION = "SCALP"
+    WSKAZNIK = "AC"
+    KATEGORIA = "M"
+    WAGA = 4
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        ac = wskazniki.get("AC")
+        prev = wskazniki.get("AC_PREV")
+        if ac is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych AC."])
+        if prev is not None and ac > 0 and prev <= 0:
+            return self._bazowy_sygnal(ac, "LONG", 0.75, [f"AC przyspiesza w górę — przeciął zero ({ac:+.4f})"])
+        if prev is not None and ac < 0 and prev >= 0:
+            return self._bazowy_sygnal(ac, "SHORT", 0.75, [f"AC przyspiesza w dół — przeciął zero ({ac:+.4f})"])
+        rosnacy = prev is not None and ac > prev
+        opadajacy = prev is not None and ac < prev
+        if ac > 0 and rosnacy:
+            return self._bazowy_sygnal(ac, "LONG", 0.55, [f"AC>0 i rośnie — momentum przyspiesza ({ac:+.4f})"])
+        if ac < 0 and opadajacy:
+            return self._bazowy_sygnal(ac, "SHORT", 0.55, [f"AC<0 i opada — momentum przyspiesza w dół ({ac:+.4f})"])
+        return self._bazowy_sygnal(ac, "NEUTRAL", 0.20, [f"AC={ac:+.4f} bez wyraźnego przyspieszenia"])

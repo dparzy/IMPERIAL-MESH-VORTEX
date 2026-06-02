@@ -4,6 +4,7 @@ Silnik audytu (narzedzia/audyt_spojnosci.py) MUSI być zielony w każdej sesji.
 """
 
 import os
+import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +27,7 @@ def test_audyt_wykrywa_rozbieznosc():
     def fake(p):
         t = orig(p)
         if p == "README.md":
-            return t.replace("32 zaimplementowane", "999 zaimplementowane")
+            return re.sub(r"\d+ zaimplementowane", "999 zaimplementowane", t)
         return t
 
     a._czytaj = fake

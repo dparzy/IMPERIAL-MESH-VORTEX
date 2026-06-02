@@ -31,7 +31,7 @@ from imperium.legiony.neurony.momentum import (
 )
 from imperium.legiony.neurony.trend import (
     NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian,
-    NeuronHMA, NeuronFibonacci, NeuronRSIDiv,
+    NeuronHMA, NeuronFibonacci, NeuronRSIDiv, NeuronOBZone,
 )
 from imperium.legiony.neurony.wolumen import (
     NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL,
@@ -46,7 +46,7 @@ from imperium.legiony.neurony.onchain import (
     NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow,
 )
 from imperium.legiony.neurony.straz import (
-    NeuronStopHunt, NeuronWickRejection,
+    NeuronStopHunt, NeuronWickRejection, NeuronWashVol, NeuronBartPattern,
 )
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronTRIX(), NeuronAwesome(), NeuronAccelerator(), NeuronBBSqueeze(),
         # Trend (XII)
         NeuronADX(), NeuronIchimoku(), NeuronEMA50_200(), NeuronSupertrend(), NeuronDonchian(),
-        NeuronHMA(), NeuronFibonacci(), NeuronRSIDiv(),
+        NeuronHMA(), NeuronFibonacci(), NeuronRSIDiv(), NeuronOBZone(),
         # Wolumen (V)
         NeuronOBV(), NeuronVWAP(), NeuronCVD(), NeuronVolumeAnomaly(), NeuronRVOL(),
         # Struktura (SMC/VSA)
@@ -80,7 +80,7 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         # On-chain (OC)
         NeuronMVRV(), NeuronSOPR(), NeuronPuellMultiple(), NeuronExchangeNetflow(),
         # Straż / Anty-manipulacja (A)
-        NeuronStopHunt(), NeuronWickRejection(),
+        NeuronStopHunt(), NeuronWickRejection(), NeuronWashVol(), NeuronBartPattern(),
     ]
 
 

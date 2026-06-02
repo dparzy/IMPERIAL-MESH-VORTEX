@@ -385,3 +385,76 @@ class NeuronHMA(MikroNeuron):
         if opada:
             return self._bazowy_sygnal(hma, "SHORT", 0.45, [f"HMA opada ({hma:.2f}<{prev:.2f}), cena bez potw."])
         return self._bazowy_sygnal(hma, "NEUTRAL", 0.15, [f"HMA płaska ({hma:.2f})"])
+
+
+class NeuronOBZone(MikroNeuron):
+    """
+    XII-06 | Order Block — strefa gdzie "big money" zostawił ślad.
+
+    Dla nowicjusza: Przed wielką ruchą w górę (impulse) zazwyczaj jest ostatnia
+    świeca SPADKOWA — tam market maker zbierał zlecenia (kupował cicho podczas
+    spadku, zanim popchnął cenę w górę). Ta niedźwiedzia świeca to "bullish order
+    block". Gdy cena do niej wraca → wielki gracz kupuje ponownie → LONG.
+    Odwrotnie dla bearish order block.
+
+    Wersja OHLCV (uproszczona, bez zewnętrznego feedu SMC):
+      Bullish OB: poprzedni bar był wyraźnie bearish (CLOSE_PREV < OPEN_PREV o min.
+                  _PROG_CIALA kanału Donchian), a CURRENT CLOSE jest powyżej OPEN_PREV
+                  (cena wróciła do OB i poszła dalej w górę) → LONG
+      Bearish OB: poprzedni bar był wyraźnie bullish (CLOSE_PREV > OPEN_PREV), ale
+                  CURRENT CLOSE jest poniżej OPEN_PREV → SHORT
+
+    Ograniczenie: to jest uproszczenie — prawdziwy SMC-OB wymaga kontekstu impulsu
+    z wielu barów. Ta wersja identyfikuje sam "punkt wejścia", nie cały kontekst SMC.
+    """
+    KLUCZ = "XII-06"
+    LEGION = "SWING"
+    WSKAZNIK = "CLOSE_PREV"
+    KATEGORIA = "T"
+    WAGA = 6
+
+    _PROG_CIALA = 0.20  # ciało PREV musi stanowić min. tę frakcję zakresu Donchian
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        c = wskazniki.get("CLOSE")
+        o_prev = wskazniki.get("OPEN_PREV")
+        c_prev = wskazniki.get("CLOSE_PREV")
+        donch_hi = wskazniki.get("DONCHIAN_UPPER")
+        donch_lo = wskazniki.get("DONCHIAN_LOWER")
+
+        if None in (c, o_prev, c_prev):
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych OrderBlock."])
+
+        if donch_hi is not None and donch_lo is not None:
+            zakres_ref = donch_hi - donch_lo
+        else:
+            zakres_ref = abs(c_prev - o_prev) * 2 + 1e-9
+
+        if zakres_ref < 1e-9:
+            return self._bazowy_sygnal(c, "NEUTRAL", 0.0, ["Zakres zerowy."])
+
+        cialo_prev = abs(c_prev - o_prev)
+        frakcja = cialo_prev / zakres_ref
+
+        if frakcja < self._PROG_CIALA:
+            return self._bazowy_sygnal(c, "NEUTRAL", 0.10,
+                [f"Poprzedni bar zbyt mały ({frakcja:.0%} kanału) — brak wyraźnego OB"])
+
+        # Bullish OB: bearish bar PREV + CURRENT wrócił POWYŻEJ wejścia w PREV
+        if c_prev < o_prev and c > o_prev:
+            gleb = (c - o_prev) / zakres_ref
+            sila = min(0.80, 0.55 + gleb * 1.5)
+            return self._bazowy_sygnal(c, "LONG", sila,
+                [f"🟢 BULLISH OB: PREV bearish {frakcja:.0%} kanału, "
+                 f"CLOSE={c:.2f} powyżej OPEN_PREV={o_prev:.2f} — strefa OB aktywna"])
+
+        # Bearish OB: bullish bar PREV + CURRENT wrócił PONIŻEJ wejścia w PREV
+        if c_prev > o_prev and c < o_prev:
+            gleb = (o_prev - c) / zakres_ref
+            sila = min(0.80, 0.55 + gleb * 1.5)
+            return self._bazowy_sygnal(c, "SHORT", sila,
+                [f"🔴 BEARISH OB: PREV bullish {frakcja:.0%} kanału, "
+                 f"CLOSE={c:.2f} poniżej OPEN_PREV={o_prev:.2f} — strefa OB aktywna"])
+
+        return self._bazowy_sygnal(c, "NEUTRAL", 0.10,
+            [f"Brak sygnału OB: PREV {frakcja:.0%} kanału, cena nie przełamała strefy"])

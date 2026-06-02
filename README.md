@@ -26,7 +26,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **39 zaimplementowane** (27 aktywnych na OHLCV + 12 wyciszonych: czekają na API/feed) |
+| **Mikro-neurony** | **42 zaimplementowane** (30 aktywnych na OHLCV + 12 wyciszonych: czekają na API/feed) |
 | **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
@@ -34,9 +34,9 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
 | **Status elitarny** | **14 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26 + 12 zwiadowców |
-| **Testy** | `python tests/run_tests.py` → **247/247** |
+| **Testy** | `python tests/run_tests.py` → **290/290** |
 
-**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 34) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
+**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 42) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
 ---
 

@@ -1,5 +1,5 @@
 """
-🏛️ DYRYGENT — orkiestrator pełnego cyklu decyzyjnego Imperium (Faza 0).
+🏛️ DYRYGENT — orkiestrator pełnego cyklu decyzyjnego Imperium (Faza 1).
 
 Spina rozproszone klocki w jeden łańcuch end-to-end:
 
@@ -9,10 +9,16 @@ Spina rozproszone klocki w jeden łańcuch end-to-end:
     [Budowniczy + Brama Kalkulatora]  → wskazniki (Prawo I: tylko Brama liczy)
         │
         ▼
+    klasyfikuj_rezim()                → rezim (auto lub podany z zewnątrz)
+        │
+        ▼
+    [NAMIESTNIK]                      → UstawieniaRezimu: {tryb, lewar_factor, prog, czy_grac}
+        │                               (Regime-Aware Gating — arXiv:2508.02686, 2603.19136)
+        ▼
     [Legatus.fokus]                   → RaportLegatusa (kierunek, pewność, reżim, weto)
         │
         ▼
-    [KalkulatorLewara.policz]         → PlanPozycji (SL/TP/dźwignia/rozmiar, checklist)
+    [KalkulatorLewara.policz]         → PlanPozycji (SL/TP/dźwignia×lewar_factor, checklist)
         │
         ▼
     [SygnalWejscia → PaperTradingEngine] → wirtualna pozycja + log do Pamięci Absolutnej
@@ -42,6 +48,7 @@ from typing import Callable, List, Optional, Dict, Any
 from imperium.koloseum.paper_trading import (
     PaperTradingEngine, SygnalWejscia, BarData,
 )
+from imperium.koloseum.namiestnik import Namiestnik, get_namiestnik
 from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara, PlanPozycji
 
 logger = logging.getLogger("Dyrygent")
@@ -74,6 +81,7 @@ class Dyrygent:
         wskazniki_provider: Optional[Callable[[List[Dict[str, Any]]], Dict[str, Any]]] = None,
         min_pewnosc: float = 0.55,
         tryb: str = "agregat",
+        namiestnik: Optional[Namiestnik] = None,
     ) -> None:
         self.legatus = legatus
         self.kalkulator = kalkulator
@@ -81,12 +89,14 @@ class Dyrygent:
         self.budowniczy = budowniczy
         self.wskazniki_provider = wskazniki_provider
         self.min_pewnosc = min_pewnosc
-        # Tryb roli warstwy strategii (Klucznik) w decyzji:
-        #   "agregat"   — kierunek z gołego głosowania neuronów (strategie ignorowane)
-        #   "filtr"     — wejście tylko gdy top-strategia zgadza się z neuronami (Opcja 1)
-        #   "strategia" — kierunek z top-1 dopasowanej strategii; neurony dają pewność (Opcja 2)
+        # Tryb domyślny (gdy Namiestnik wyłączony lub niezainicjowany):
+        #   "agregat"   — kierunek z gołego głosowania neuronów
+        #   "filtr"     — wejście tylko gdy top-strategia zgadza się z neuronami
+        #   "strategia" — kierunek z top-1 dopasowanej strategii
         assert tryb in ("agregat", "filtr", "strategia"), f"nieznany tryb: {tryb}"
         self.tryb = tryb
+        # Namiestnik: Regime-Aware Gating (Faza 1). None = tryb statyczny jak wcześniej.
+        self.namiestnik: Optional[Namiestnik] = namiestnik
 
     # ── Fabryka pełnego składu (produkcyjna — wymaga TA-Lib) ─────────────────
     @classmethod
@@ -103,7 +113,8 @@ class Dyrygent:
         engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
                                     sesja_id=sesja_id, log_dir=log_dir)
         return cls(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
-                   budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb)
+                   budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
+                   namiestnik=get_namiestnik())
 
     # ── Jeden cykl decyzyjny ─────────────────────────────────────────────────
     def cykl(self, symbol: str, bary: List[Dict[str, Any]],
@@ -118,7 +129,21 @@ class Dyrygent:
             return DecyzjaCyklu(symbol, "BUDOWNICZY", False,
                                 powod="brak wskaźników (puste bary lub błąd Bramy)")
 
-        # 2. Legatus — agregacja roju
+        # 2. Namiestnik — Regime-Aware Gating (Faza 1)
+        # Wyznacza: tryb, prog_pewnosci, lewar_factor, czy_grac dla tego reżimu.
+        tryb_aktywny = self.tryb
+        prog_aktywny = self.min_pewnosc
+        lewar_factor = 1.0
+        if self.namiestnik is not None:
+            ustaw = self.namiestnik.decyduj(rezim)
+            if not ustaw.czy_grac:
+                return DecyzjaCyklu(symbol, "NAMIESTNIK_CISZA", False,
+                                    rezim=rezim, powod=f"Namiestnik: {ustaw.opis}")
+            tryb_aktywny = ustaw.tryb
+            prog_aktywny = ustaw.prog_pewnosci
+            lewar_factor = ustaw.lewar_factor
+
+        # 3. Legatus — agregacja roju
         raport = self.legatus.fokus(symbol, wskazniki, rezim=rezim, bary=bary)
 
         if raport.weto:
@@ -133,19 +158,19 @@ class Dyrygent:
                                 rezim=raport.rezim, powod="rój neutralny — brak przewagi",
                                 raport=raport)
 
-        if raport.pewnosc_agregatu < self.min_pewnosc:
+        if raport.pewnosc_agregatu < prog_aktywny:
             return DecyzjaCyklu(symbol, "LEGATUS_SLABY", False,
                                 kierunek=raport.kierunek, pewnosc=raport.pewnosc_agregatu,
                                 rezim=raport.rezim,
-                                powod=f"pewność {raport.pewnosc_agregatu:.2f} < próg {self.min_pewnosc}",
+                                powod=f"pewność {raport.pewnosc_agregatu:.2f} < próg {prog_aktywny:.2f} (Namiestnik)",
                                 raport=raport)
 
-        # 2b. Warstwa strategii (Klucznik) — rola zależna od trybu (Opcja 3)
+        # 3b. Warstwa strategii (Klucznik) — tryb określony przez Namiestnika
         kierunek = raport.kierunek
         pewnosc = raport.pewnosc_agregatu
         top_strat = raport.strategie_dopasowane[0] if raport.strategie_dopasowane else None
 
-        if self.tryb == "filtr":
+        if tryb_aktywny == "filtr":
             # Wejście tylko gdy top-strategia zgadza się z głosowaniem neuronów (Opcja 1)
             if top_strat is None:
                 return DecyzjaCyklu(symbol, "STRATEGIA_BRAK", False, kierunek=kierunek,
@@ -157,7 +182,7 @@ class Dyrygent:
                                     powod=f"tryb filtr: neurony {kierunek} ≠ strategia "
                                           f"{top_strat.strategia.id} {top_strat.kierunek}",
                                     raport=raport)
-        elif self.tryb == "strategia":
+        elif tryb_aktywny == "strategia":
             # Kierunek z top-1 strategii; neurony tylko potwierdzają pewność (Opcja 2)
             if top_strat is None:
                 return DecyzjaCyklu(symbol, "STRATEGIA_BRAK", False, kierunek=kierunek,
@@ -175,11 +200,19 @@ class Dyrygent:
                                 pewnosc=pewnosc, rezim=raport.rezim,
                                 powod="brak ceny CLOSE w danych", raport=raport)
 
+        # 4a. Dźwignia: auto z pewności/reżimu, a potem Namiestnik skaluje lewar_factor
+        dzwignia_base = self.kalkulator.auto_dzwignia(pewnosc, raport.rezim)
+        if self.namiestnik is not None:
+            dzwignia_final = self.namiestnik.skaluj_dzwignie(dzwignia_base, raport.rezim)
+        else:
+            dzwignia_final = int(round(dzwignia_base * lewar_factor))
+            dzwignia_final = max(1, min(dzwignia_final, 20))
+
         plan = self.kalkulator.policz(
             symbol=symbol,
             kierunek=kierunek,
             cena_wejscia=cena_wejscia,
-            dzwignia=0,  # 0 = auto z pewności i reżimu
+            dzwignia=dzwignia_final,
             kapital_usdt=self.engine.kapital,
             pewnosc=pewnosc,
             rezim=raport.rezim,

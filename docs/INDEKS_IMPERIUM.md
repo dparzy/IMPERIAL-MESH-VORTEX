@@ -47,7 +47,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 11 | `archiwum/ARSENAL_AMERYKI.md` | 690 linków z 50+ krajów — pełny katalog regionalny (na wyraźne polecenie) | 📦 Archiwum |
 | 11 | `SYMBIOZA_MODULOW.md` | Interakcje modułów i mapowanie narzędzi | 🔗 Link |
 | 12 | `ROADMAP_IMPERIUM.md` | Roadmapa rozwoju i wersjonowanie | 🔗 Link |
-| 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (27 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
+| 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (42 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
 | 14 | `KATALOG_STRATEGII.md` | **~97+ strategii** — Księga Azjatycka + Mistrzowie Świata + VSA/GEX/DeFi | ✅ Aktywny |
 | 15 | `GENERAL_LEGATUS.md` | Generał Legatus — SKANER/FOKUS, agregacja neuronów, reżimy | ✅ Aktywny |
 | 16 | `KALKULATOR_LEWARA.md` | Matematyka przeżycia — likwidacja, stop-loss, Kelly, dynamiczna dźwignia | ✅ Aktywny |
@@ -55,10 +55,16 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 18 | `PAMIEC_ABSOLUTNA.md` | **System Logowania** — ImperiumLog, MAE/MFE, walk-forward, replay sesji | ✅ Aktywny |
 | 19 | `DORADCY_CARA.md` | **Rada Doradców** — Oracle/Fulmen/Iustitia/Hermes/Pythia, second opinion | ✅ Aktywny |
 | 20 | `MATRYCA_KORELACJI.md` | Kostka Rubika sygnałów — korelacje, konflikty, reżimy, wagi dynamiczne | 🔗 Link |
+| 21 | `MANIFEST_KODU.md` | **Jedyne oficjalne źródło prawdy** o kodzie — tabela kluczy, statusy ✅/🔴 (Prawo XIX) | ✅ Aktywny |
 | 22 | `REGULAMINY_I_MANIPULACJE.md` | Zgodność z regulaminami + 7 manipulacji do wykrywania | ✅ Aktywny |
 | 23 | `WZORZEC_OPISU.md` | **Zasada Pełnego Opisu (ZPO)** — szablon kompletnego opisu modułu/inspiracji (pełna nazwa, link, status weryfikacji) | ✅ Aktywny |
 | 24 | `REJESTR_INSPIRACJI.md` | **Rejestr inspiracji AI/ML** — jedno źródło prawdy o zewnętrznych projektach (SHARP, AgenticAITA, CogAlpha, NEXUS, Kronos) z linkami i statusem ✅ | ✅ Aktywny |
-| 25 | `WZORZEC_OPISU.md` | Zasada Pełnego Opisu (ZPO) — szablon każdego wpisu (pełna nazwa, link, weryfikacja) | ✅ Aktywny |
+| 26 | `AUDYT_SYSTEMU.md` | Audyt stanu faktycznego Imperium — nosce te ipsum | ✅ Aktywny |
+| 27 | `MAPA_KLUCZY.md` | Mapa kluczy — katalog ↔ kod, rozwiązuje nieporozumienia między planami a implementacją | ✅ Aktywny |
+| 28 | `OBSERWATORZY.md` | Obserwatorzy Imperium — mapa źródeł informacji (on-chain, newsy, sentiment) | ✅ Aktywny |
+| 29 | `SKAN_AZJA.md` | Skan Azja — perełki z 3100 linków azjatyckich | ✅ Aktywny |
+| 30 | `WERSJONOWANIE.md` | Wersjonowanie i pieczęć Imperium — historia tagów i polityka wersji | ✅ Aktywny |
+| 31 | `WIZJONER.md` | Wizjoner — brudnopis Imperium: rozmowy → wizje → zadania → kod | ✅ Aktywny |
 
 ---
 

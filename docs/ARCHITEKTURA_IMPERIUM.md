@@ -70,7 +70,7 @@
 6. **kronikarz** → raport + dziennik
 
 > Reszta modułów (senat, cesarz, oczy, drogi...) to **sprawdzony kod-baza**,
-> jeszcze nie wpięty w cykl. Status uczciwie w [AUDYT_ADOPCJI.md](AUDYT_ADOPCJI.md).
+> jeszcze nie wpięty w cykl. Status uczciwie w [archiwum/AUDYT_ADOPCJI.md](../archiwum/AUDYT_ADOPCJI.md).
 
 ---
 

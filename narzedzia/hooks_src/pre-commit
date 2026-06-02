@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# 🔐 PRE-COMMIT HOOK — Prawo XXI (ROZKAZ STAŁY)
+#
+# Blokuje commit gdy:
+#   1. Testy nie są zielone
+#   2. Audyt spójności wykrywa rozbieżność
+#
+# Zainstalowany przez: narzedzia/install_hooks.py
+# Zasada: commit bez zielonego audytu = złamanie Prawa XXI
+
+set -e
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+echo "🔐 PRE-COMMIT: sprawdzam spójność Imperium (Prawo XXI)..."
+
+# 1. Testy
+echo "  ▶ Testy..."
+if ! python tests/run_tests.py 2>&1; then
+    echo ""
+    echo "  ❌ TESTY NIE PRZESZŁY — commit zablokowany."
+    echo "     Napraw testy, potem spróbuj ponownie."
+    exit 1
+fi
+echo "  ✅ Testy zielone"
+
+# 2. Audyt spójności
+echo "  ▶ Audyt spójności (Prawo XXI)..."
+if ! python narzedzia/audyt_spojnosci.py --cichy 2>&1; then
+    echo ""
+    echo "  ❌ AUDYT SPÓJNOŚCI WYKRYŁ ROZBIEŻNOŚCI — commit zablokowany."
+    echo "     Uruchom: python narzedzia/audyt_spojnosci.py  (pełny raport)"
+    echo "     Napraw rozbieżności, potem spróbuj ponownie."
+    exit 1
+fi
+echo "  ✅ Audyt spójności OK"
+
+echo "🔐 PRE-COMMIT: ✅ Imperium gotowe — commit dopuszczony."
+exit 0

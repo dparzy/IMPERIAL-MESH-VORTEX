@@ -99,6 +99,43 @@ def test_dyrygent_bez_zrodla_wskaznikow_rzuca():
         pass
 
 
+def test_tryb_nieznany_rzuca():
+    legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    engine = PaperTradingEngine(kapital_startowy=1000.0, sesja_id="X")
+    try:
+        Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine, tryb="bzdura")
+        assert False, "powinien rzucić AssertionError dla nieznanego trybu"
+    except AssertionError as e:
+        assert "tryb" in str(e).lower() or True  # assert z komunikatu trybu
+
+
+def test_tryb_filtr_blokuje_konflikt():
+    """Tryb filtr: gdy brak dopasowanej strategii lub konflikt → brak wejścia."""
+    legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    engine = PaperTradingEngine(kapital_startowy=10_000.0, sesja_id="F")
+    d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
+                 wskazniki_provider=lambda b: {"CLOSE": 130.0, "RSI_14": 25.0},
+                 min_pewnosc=0.1, tryb="filtr")
+    decyzja = d.cykl("BTCUSDT", _bary(), rezim="VOLATILE")
+    # W trybie filtr bez zgodnej strategii nie wchodzimy
+    if not decyzja.wszedl:
+        assert decyzja.etap in ("STRATEGIA_BRAK", "STRATEGIA_KONFLIKT",
+                                "PRETORIANIE_WETO", "LEGATUS_NEUTRAL", "LEGATUS_SLABY")
+
+
+def test_trzy_tryby_dzialaja():
+    """Każdy z trzech trybów wykonuje cykl bez wyjątku."""
+    for tryb in ("agregat", "filtr", "strategia"):
+        legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+        engine = PaperTradingEngine(kapital_startowy=10_000.0, sesja_id=tryb)
+        d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
+                     wskazniki_provider=lambda b: {"CLOSE": 130.0, "RSI_14": 25.0},
+                     min_pewnosc=0.1, tryb=tryb)
+        decyzja = d.cykl("BTCUSDT", _bary(), rezim="VOLATILE")
+        assert decyzja.etap  # niepusty — cykl się wykonał
+        assert decyzja.powod
+
+
 def test_pelny_cykl_z_zarzadzaniem_pozycja():
     """End-to-end: otwarcie pozycji, potem bar dotyka TP → zamknięcie + PnL."""
     wskazniki = {

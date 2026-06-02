@@ -73,6 +73,7 @@ class Dyrygent:
         budowniczy=None,
         wskazniki_provider: Optional[Callable[[List[Dict[str, Any]]], Dict[str, Any]]] = None,
         min_pewnosc: float = 0.55,
+        tryb: str = "agregat",
     ) -> None:
         self.legatus = legatus
         self.kalkulator = kalkulator
@@ -80,12 +81,18 @@ class Dyrygent:
         self.budowniczy = budowniczy
         self.wskazniki_provider = wskazniki_provider
         self.min_pewnosc = min_pewnosc
+        # Tryb roli warstwy strategii (Klucznik) w decyzji:
+        #   "agregat"   — kierunek z gołego głosowania neuronów (strategie ignorowane)
+        #   "filtr"     — wejście tylko gdy top-strategia zgadza się z neuronami (Opcja 1)
+        #   "strategia" — kierunek z top-1 dopasowanej strategii; neurony dają pewność (Opcja 2)
+        assert tryb in ("agregat", "filtr", "strategia"), f"nieznany tryb: {tryb}"
+        self.tryb = tryb
 
     # ── Fabryka pełnego składu (produkcyjna — wymaga TA-Lib) ─────────────────
     @classmethod
     def zbuduj(cls, kapital_startowy: float = 10_000.0, sesja_id: str = "",
                min_neuronow: int = 5, min_przewaga: float = 0.55,
-               min_pewnosc: float = 0.55, log_dir=None) -> "Dyrygent":
+               min_pewnosc: float = 0.55, log_dir=None, tryb: str = "agregat") -> "Dyrygent":
         """Składa Dyrygenta z pełnym rojem, Budowniczym (TA-Lib) i silnikiem paper."""
         from imperium.legiony.rejestr import zbuduj_legatusa
         from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
@@ -96,7 +103,7 @@ class Dyrygent:
         engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
                                     sesja_id=sesja_id, log_dir=log_dir)
         return cls(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
-                   budowniczy=budowniczy, min_pewnosc=min_pewnosc)
+                   budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb)
 
     # ── Jeden cykl decyzyjny ─────────────────────────────────────────────────
     def cykl(self, symbol: str, bary: List[Dict[str, Any]],
@@ -133,35 +140,66 @@ class Dyrygent:
                                 powod=f"pewność {raport.pewnosc_agregatu:.2f} < próg {self.min_pewnosc}",
                                 raport=raport)
 
+        # 2b. Warstwa strategii (Klucznik) — rola zależna od trybu (Opcja 3)
+        kierunek = raport.kierunek
+        pewnosc = raport.pewnosc_agregatu
+        top_strat = raport.strategie_dopasowane[0] if raport.strategie_dopasowane else None
+
+        if self.tryb == "filtr":
+            # Wejście tylko gdy top-strategia zgadza się z głosowaniem neuronów (Opcja 1)
+            if top_strat is None:
+                return DecyzjaCyklu(symbol, "STRATEGIA_BRAK", False, kierunek=kierunek,
+                                    pewnosc=pewnosc, rezim=raport.rezim,
+                                    powod="tryb filtr: brak dopasowanej strategii", raport=raport)
+            if top_strat.kierunek != kierunek:
+                return DecyzjaCyklu(symbol, "STRATEGIA_KONFLIKT", False, kierunek=kierunek,
+                                    pewnosc=pewnosc, rezim=raport.rezim,
+                                    powod=f"tryb filtr: neurony {kierunek} ≠ strategia "
+                                          f"{top_strat.strategia.id} {top_strat.kierunek}",
+                                    raport=raport)
+        elif self.tryb == "strategia":
+            # Kierunek z top-1 strategii; neurony tylko potwierdzają pewność (Opcja 2)
+            if top_strat is None:
+                return DecyzjaCyklu(symbol, "STRATEGIA_BRAK", False, kierunek=kierunek,
+                                    pewnosc=pewnosc, rezim=raport.rezim,
+                                    powod="tryb strategia: brak dopasowanej strategii", raport=raport)
+            kierunek = top_strat.kierunek
+            # pewność = średnia dopasowania strategii i pewności neuronów (gdy zgodne — wzmocnienie)
+            zgoda = 1.0 if top_strat.kierunek == raport.kierunek else 0.6
+            pewnosc = round(min(1.0, (top_strat.wynik + raport.pewnosc_agregatu) / 2 * zgoda), 4)
+
         # 3. Pretorianie — matematyka przeżycia (SL/TP/dźwignia/rozmiar)
         cena_wejscia = wskazniki.get("CLOSE") or (bary[-1].get("close") if bary else 0.0)
         if not cena_wejscia:
-            return DecyzjaCyklu(symbol, "BRAK_CENY", False, kierunek=raport.kierunek,
-                                pewnosc=raport.pewnosc_agregatu, rezim=raport.rezim,
+            return DecyzjaCyklu(symbol, "BRAK_CENY", False, kierunek=kierunek,
+                                pewnosc=pewnosc, rezim=raport.rezim,
                                 powod="brak ceny CLOSE w danych", raport=raport)
 
         plan = self.kalkulator.policz(
             symbol=symbol,
-            kierunek=raport.kierunek,
+            kierunek=kierunek,
             cena_wejscia=cena_wejscia,
             dzwignia=0,  # 0 = auto z pewności i reżimu
             kapital_usdt=self.engine.kapital,
-            pewnosc=raport.pewnosc_agregatu,
+            pewnosc=pewnosc,
             rezim=raport.rezim,
         )
 
         if not plan.checklist_ok:
-            return DecyzjaCyklu(symbol, "PRETORIANIE_WETO", False, kierunek=raport.kierunek,
-                                pewnosc=raport.pewnosc_agregatu, rezim=raport.rezim,
+            return DecyzjaCyklu(symbol, "PRETORIANIE_WETO", False, kierunek=kierunek,
+                                pewnosc=pewnosc, rezim=raport.rezim,
                                 powod=f"weto Pretorianów: {plan.powod_veto}",
                                 raport=raport, plan=plan)
 
         # 4. Sygnał wejścia → silnik paper trading
+        powody = f"{raport.zgodnych_neuronow}/{raport.aktywnych_neuronow} neuronów zgodnych"
+        if top_strat is not None:
+            powody += f" | strategia {top_strat.strategia.id} {top_strat.kierunek} ({top_strat.wynik:.0%})"
         sygnal = SygnalWejscia(
             symbol=symbol,
             interwal=bary[-1].get("interwal", "") if bary else "",
-            kierunek=raport.kierunek,
-            pewnosc=raport.pewnosc_agregatu,
+            kierunek=kierunek,
+            pewnosc=pewnosc,
             cena_wejscia=plan.cena_wejscia,
             stop_loss=plan.stop_loss,
             take_profit=plan.take_profit,
@@ -169,18 +207,18 @@ class Dyrygent:
             rozmiar_usdt=plan.rozmiar_usdt,
             rezim=raport.rezim,
             sesja_id=self.engine.sesja_id,
-            powody=f"{raport.zgodnych_neuronow}/{raport.aktywnych_neuronow} neuronów zgodnych",
+            powody=powody,
         )
 
         pozycja = self.engine.wejdz(sygnal, timestamp=timestamp)
         if pozycja is None:
-            return DecyzjaCyklu(symbol, "ENGINE_ODRZUCIL", False, kierunek=raport.kierunek,
-                                pewnosc=raport.pewnosc_agregatu, rezim=raport.rezim,
+            return DecyzjaCyklu(symbol, "ENGINE_ODRZUCIL", False, kierunek=kierunek,
+                                pewnosc=pewnosc, rezim=raport.rezim,
                                 powod="silnik odrzucił (limit pozycji / brak kapitału / duplikat)",
                                 raport=raport, plan=plan, sygnal=sygnal)
 
-        return DecyzjaCyklu(symbol, "WEJSCIE", True, kierunek=raport.kierunek,
-                            pewnosc=raport.pewnosc_agregatu, rezim=raport.rezim,
+        return DecyzjaCyklu(symbol, "WEJSCIE", True, kierunek=kierunek,
+                            pewnosc=pewnosc, rezim=raport.rezim,
                             powod=f"pozycja otwarta: {pozycja.pozycja_id}",
                             raport=raport, plan=plan, sygnal=sygnal)
 

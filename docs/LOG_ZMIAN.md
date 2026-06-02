@@ -6,6 +6,40 @@
 
 ---
 
+## 2026-06-02 | MAJOR | Warstwa strategii wpięta w decyzję — 3 tryby + pomiar (Opcja 3)
+
+### Problem (Prawo XV — utrata potencjału)
+Klucznik dobierał strategie po kluczach, ale Dyrygent ICH NIE UŻYWAŁ — decyzja szła
+z gołego głosowania neuronów. Wykryto nawet sprzeczność (bar 400: neurony LONG,
+wszystkie 3 top-strategie SHORT) zignorowaną przez system.
+
+### Zmiany kodu
+- `imperium/koloseum/dyrygent.py` — parametr `tryb`:
+  - `agregat`   — kierunek z głosowania neuronów (strategie ignorowane, stan dotychczasowy)
+  - `filtr`     — wejście tylko gdy top-strategia zgadza się z neuronami (Opcja 1)
+  - `strategia` — kierunek z top-1 strategii, neurony dają pewność (Opcja 2)
+- `imperium/koloseum/backtest.py` — `porownaj_tryby()` + CLI `--porownaj`; `bary` reużywalne
+- `tests/test_dyrygent.py` — +3 testy trybów (323/323 zielone)
+
+### POMIAR (Prawo XVI — decyzja na liczbach, nie opinii)
+| Rynek | tryb | PnL | Trades | WinRate | PF | MaxDD |
+|-------|------|-----|--------|---------|----|----|
+| BTC 1D | agregat | +32.7% | 124 | 45.2% | 1.23 | 23.8% |
+| BTC 1D | filtr | +26.5% | 135 | 45.9% | 1.16 | 22.2% |
+| BTC 1D | strategia | +11.1% | 108 | 41.7% | 1.08 | 24.1% |
+| ETH 1D | agregat | +23.8% | 160 | 43.8% | 1.09 | 26.4% |
+| ETH 1D | **filtr** | **+43.0%** | 160 | 48.1% | 1.16 | **16.3%** |
+| ETH 1D | strategia | +14.6% | 147 | 40.8% | 1.06 | 26.2% |
+
+### Wnioski (zmierzone)
+1. **`strategia` (nadrzędna) — najgorsza na obu rynkach.** Potwierdza: warstwa strategii
+   jest słabo skalibrowana, nie nadaje się jeszcze na ster. ODRZUCONA jako domyślna.
+2. **`filtr` ma najniższy MaxDD na obu rynkach** (22.2%/16.3% vs 23.8%/26.4%) i wygrywa
+   ryzykiem-do-zysku (ETH +43% przy DD 16%). Na BTC goły agregat ma wyższy surowy zwrot.
+3. Decyzja o domyślnym trybie — w gestii Cezara (return vs ryzyko). Tryby zostają w kodzie.
+
+---
+
 ## 2026-06-02 | MAJOR | Backtest na PRAWDZIWYCH danych + czytnik CSV
 
 ### Zmiany kodu

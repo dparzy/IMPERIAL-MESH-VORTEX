@@ -46,17 +46,22 @@ def backtest(
     kapital_startowy: float = 10_000.0,
     max_barow: Optional[int] = None,
     min_pewnosc: float = 0.55,
+    tryb: str = "agregat",
+    bary: Optional[List[Dict[str, Any]]] = None,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
 
     okno:      ile barów wstecz widzi rój przy każdej decyzji (potrzebne dla EMA_200)
     max_barow: ogranicz liczbę przetworzonych barów (None = całość)
+    tryb:      rola warstwy strategii ("agregat" / "filtr" / "strategia")
+    bary:      opcjonalnie gotowe bary (oszczędza ponownego czytania CSV przy porównaniu trybów)
     """
     from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
     from imperium.legiony.rejestr import zbuduj_legatusa
 
-    bary = wczytaj_csv(sciezka, interwal=interwal, limit=max_barow)
+    if bary is None:
+        bary = wczytaj_csv(sciezka, interwal=interwal, limit=max_barow)
     if len(bary) <= okno:
         raise ValueError(f"Za mało barów ({len(bary)}) dla okna {okno}")
 
@@ -64,9 +69,10 @@ def backtest(
     legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
     budowniczy = BudowniczyWskaznikow()
     engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
-                                sesja_id=f"BT-{symbol}-{interwal}")
+                                sesja_id=f"BT-{symbol}-{interwal}-{tryb}")
     dyrygent = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(),
-                        engine=engine, budowniczy=budowniczy, min_pewnosc=min_pewnosc)
+                        engine=engine, budowniczy=budowniczy,
+                        min_pewnosc=min_pewnosc, tryb=tryb)
 
     wejscia = 0
     weta = 0
@@ -94,20 +100,57 @@ def backtest(
     return engine
 
 
+def porownaj_tryby(sciezka: str, interwal: str, max_barow: Optional[int] = None,
+                   tryby=("agregat", "filtr", "strategia")) -> Dict[str, Any]:
+    """
+    Przejeżdża ten sam zestaw barów w każdym trybie i zwraca tabelę porównawczą.
+    Prawo XVI: decyzja o roli strategii podjęta na pomiarze, nie na opinii.
+    """
+    bary = wczytaj_csv(sciezka, interwal=interwal, limit=max_barow)
+    symbol = bary[0]["symbol"]
+    wyniki = {}
+    for tryb in tryby:
+        eng = backtest(sciezka, interwal, max_barow=max_barow, tryb=tryb, bary=bary)
+        st = eng.podsumowanie()
+        st.oblicz(eng.historia_zamkniec)
+        wyniki[tryb] = st
+
+    # Tabela
+    print(f"\n{'═'*78}")
+    print(f"  📊 PORÓWNANIE TRYBÓW — {symbol} {interwal} ({len(bary)} barów)")
+    print(f"{'═'*78}")
+    print(f"  {'Tryb':<12}{'PnL %':>10}{'Trades':>9}{'WinRate':>10}{'PF':>8}{'MaxDD':>9}")
+    print(f"  {'-'*70}")
+    for tryb, st in wyniki.items():
+        pnl_pct = (st.kapital_koncowy / st.kapital_startowy - 1) * 100
+        print(f"  {tryb:<12}{pnl_pct:>+9.2f}%{st.total_trades:>9}"
+              f"{st.win_rate:>9.1%}{st.profit_factor:>8.2f}{st.max_drawdown_pct:>8.1%}")
+    print(f"{'═'*78}\n")
+    return wyniki
+
+
 def main():
     logging.basicConfig(level=logging.WARNING,
                         format="%(asctime)s | %(levelname)s | %(message)s")
     logging.getLogger("Rój").setLevel(logging.ERROR)
 
     if len(sys.argv) < 3:
-        print("Użycie: python -m imperium.koloseum.backtest <plik.csv> <interwal> [max_barow]")
+        print("Użycie: python -m imperium.koloseum.backtest <plik.csv> <interwal> [max_barow] [--porownaj|tryb]")
         sys.exit(1)
 
     sciezka = sys.argv[1]
     interwal = sys.argv[2]
-    max_barow = int(sys.argv[3]) if len(sys.argv) > 3 else None
+    max_barow = int(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[3].isdigit() else None
 
-    engine = backtest(sciezka, interwal, max_barow=max_barow)
+    if "--porownaj" in sys.argv:
+        porownaj_tryby(sciezka, interwal, max_barow=max_barow)
+        return
+
+    tryb = "agregat"
+    for t in ("agregat", "filtr", "strategia"):
+        if t in sys.argv:
+            tryb = t
+    engine = backtest(sciezka, interwal, max_barow=max_barow, tryb=tryb)
     engine.drukuj_raport()
 
 

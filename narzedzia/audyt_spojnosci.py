@@ -6,10 +6,15 @@ Uruchamiany automatycznie przez hooki Claude Code (SessionStart + Stop) oraz rę
     python narzedzia/audyt_spojnosci.py            # raport + exit code
     python narzedzia/audyt_spojnosci.py --cichy     # tylko gdy są błędy
 
-Sprawdza 4 warstwy spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
+Sprawdza 7 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 1 — żywy rój:        liczby, kategorie, elity, klucze
   Warstwa 2 — infrastruktura:  WAGI_REZIMU vs KAT w kodzie
   Warstwa 3 — dokumentacja:    MANIFEST klucze vs kod, liczby README/MANIFEST/CLAUDE
+  Warstwa 4 — strategie:       Klucznik — klucze w strategiach vs kod
+  Warstwa 5 — INDEKS:          liczby w INDEKS_IMPERIUM vs żywy kod
+  Warstwa 6 — daty:            "Stan na:" w MANIFEST i README = bieżący dzień lub niedawno
+  Warstwa 7 — sieroty:         pliki docs/ w INDEKS, linki cross-docs istnieją na dysku
+  Warstwa 8 — LOG_ZMIAN:       jeśli kod zmieniony, LOG_ZMIAN ma wpis z bieżącą datą
 
 Exit code:
   0 = pełna spójność (Imperium gotowe)
@@ -21,6 +26,7 @@ Zasada: ten skrypt NIE liczy z pamięci. Wszystkie liczby pochodzą z żywego ko
 import os
 import re
 import sys
+from datetime import date, datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -28,14 +34,23 @@ sys.path.insert(0, ROOT)
 # Litery KATEGORII dozwolone w kodzie (legenda — jedyne źródło prawdy)
 LEGENDA_KAT = set("MTVFOLRSAKEGm")
 
+# Pliki docs/ które celowo NIE są w INDEKS (archiwum, pliki techniczne)
+INDEKS_WHITELIST = {
+    "README.md",  # w docs/ ale to root README
+}
+
 
 def _czytaj(sciezka: str) -> str:
     with open(os.path.join(ROOT, sciezka), encoding="utf-8") as f:
         return f.read()
 
 
-def audyt() -> list:
-    """Zwraca listę błędów (pusta = spójność)."""
+def _istnieje(sciezka: str) -> bool:
+    return os.path.exists(os.path.join(ROOT, sciezka))
+
+
+def audyt() -> tuple:
+    """Zwraca (bledy: list, info: list)."""
     bledy = []
     info = []
 
@@ -82,7 +97,7 @@ def audyt() -> list:
 
     except Exception as e:
         bledy.append(f"[W1] Nie udało się załadować żywego roju: {e}")
-        return bledy + ["(audyt przerwany — napraw import)"]
+        return bledy + ["(audyt przerwany — napraw import)"], info
 
     # ── WARSTWA 2A: WAGI_REZIMU vs KAT ─────────────────────────────────────
     try:
@@ -142,9 +157,6 @@ def audyt() -> list:
         bledy.append(f"[W3] Błąd sprawdzania liczb w dokumentach: {e}")
 
     # ── WARSTWA 4: KLUCZNIK — strategie ↔ kod (Prawo XIX/XXI) ───────────────
-    # Każdy klucz neuronu użyty w rejestrze strategii MUSI istnieć w kodzie
-    # i być aktywny. Strategia wskazująca neuron-widmo = złamanie spójności
-    # (silnik dopasowania dobrałby martwy/nieistniejący głos).
     try:
         from imperium.legiony.strategie.rejestr_strategii import (
             klucze_uzyte_w_strategiach, wszystkie_strategie,
@@ -166,13 +178,145 @@ def audyt() -> list:
     except Exception as e:
         bledy.append(f"[W4] Błąd sprawdzania Klucznika strategii: {e}")
 
+    # ── WARSTWA 5: INDEKS_IMPERIUM — liczby ─────────────────────────────────
+    # Sprawdzamy sekcję MAPA KODU w INDEKS (tam są liczby z kodu, nie z katalogu)
+    try:
+        indeks = _czytaj("docs/INDEKS_IMPERIUM.md")
+
+        # Szukamy w sekcji MAPA KODU: "mikro-neurony (42)"
+        mapa_kodu = ""
+        if "## 🏛️ MAPA KODU" in indeks:
+            mapa_kodu = indeks.split("## 🏛️ MAPA KODU")[1].split("##")[0]
+
+        in_match = re.search(r"mikro-neurony\s*\((\d+)\)", mapa_kodu)
+        if in_match:
+            in_n = int(in_match.group(1))
+            if in_n != n_neuronow:
+                bledy.append(f"[W5] INDEKS (MAPA KODU) mikro-neurony={in_n} ≠ kod={n_neuronow}")
+
+        # Liczba zwiadowców w INDEKS (MAPA KODU)
+        iz_match = re.search(r"zwiadowców?\s*\((\d+)\)", mapa_kodu)
+        if not iz_match:
+            iz_match = re.search(r"zwiadowcy\s*\((\d+)\)", mapa_kodu)
+        if iz_match:
+            iz_n = int(iz_match.group(1))
+            if iz_n != n_zwiadowcow:
+                bledy.append(f"[W5] INDEKS (MAPA KODU) zwiadowcy={iz_n} ≠ kod={n_zwiadowcow}")
+
+    except Exception as e:
+        bledy.append(f"[W5] Błąd sprawdzania INDEKS_IMPERIUM: {e}")
+
+    # ── WARSTWA 6: DATY "Stan na:" ──────────────────────────────────────────
+    try:
+        today = date.today()
+        # Tolerancja: "Stan na:" może być z poprzedniego dnia (np. commit był wieczorem)
+        TOLERANCJA_DNI = 2
+
+        for doc_path, label in [("docs/MANIFEST_KODU.md", "MANIFEST"), ("README.md", "README")]:
+            doc = _czytaj(doc_path)
+            m = re.search(r"Stan na:\s*(\d{4}-\d{2}-\d{2})", doc)
+            if m:
+                doc_date = date.fromisoformat(m.group(1))
+                delta = (today - doc_date).days
+                if delta > TOLERANCJA_DNI:
+                    bledy.append(
+                        f"[W6] {label} 'Stan na:' = {m.group(1)} — "
+                        f"przestarzałe o {delta} dni (dziś {today}). Zaktualizuj po każdej sesji."
+                    )
+    except Exception as e:
+        bledy.append(f"[W6] Błąd sprawdzania dat 'Stan na:': {e}")
+
+    # ── WARSTWA 7: SIEROTY — pliki docs/ bez wpisu w INDEKS ─────────────────
+    try:
+        indeks_txt = _czytaj("docs/INDEKS_IMPERIUM.md")
+        docs_dir = os.path.join(ROOT, "docs")
+        docs_files = {f for f in os.listdir(docs_dir)
+                      if f.endswith(".md") and f not in INDEKS_WHITELIST}
+
+        sieroty = []
+        for fname in sorted(docs_files):
+            # Plik w docs/archiwum/ — pomijamy (archiwum ma swoje zasady)
+            if fname.startswith("archiwum"):
+                continue
+            # Sprawdź czy nazwa pliku pojawia się w INDEKS
+            if fname not in indeks_txt:
+                sieroty.append(fname)
+
+        if sieroty:
+            bledy.append(f"[W7] Pliki docs/ bez wpisu w INDEKS_IMPERIUM: {sieroty}")
+
+        # Linki cross-docs: [text](ścieżka.md) — sprawdź czy plik istnieje
+        dead_links = []
+        link_pattern = re.compile(r"\[([^\]]+)\]\(([^)#]+\.md[^)]*)\)")
+        for fname in sorted(docs_files):
+            fpath = os.path.join(docs_dir, fname)
+            if not os.path.isfile(fpath):
+                continue
+            try:
+                content = open(fpath, encoding="utf-8").read()
+            except Exception:
+                continue
+            for text, href in link_pattern.findall(content):
+                # Usuń kotwice (#...)
+                href_clean = href.split("#")[0].strip()
+                if not href_clean:
+                    continue
+                # Ścieżki względne od docs/
+                if href_clean.startswith("../"):
+                    target = os.path.join(ROOT, href_clean[3:])
+                elif href_clean.startswith("/"):
+                    target = os.path.join(ROOT, href_clean.lstrip("/"))
+                elif "/" not in href_clean:
+                    target = os.path.join(docs_dir, href_clean)
+                else:
+                    target = os.path.join(docs_dir, href_clean)
+                if not os.path.exists(target):
+                    dead_links.append(f"{fname} → {href_clean}")
+
+        if dead_links:
+            bledy.append(f"[W7] Martwe linki w docs/ ({len(dead_links)}): {dead_links[:10]}"
+                         + (" ..." if len(dead_links) > 10 else ""))
+
+    except Exception as e:
+        bledy.append(f"[W7] Błąd sprawdzania sierot/linków: {e}")
+
+    # ── WARSTWA 8: LOG_ZMIAN — świeżość ─────────────────────────────────────
+    try:
+        import glob
+        import time
+
+        log = _czytaj("docs/LOG_ZMIAN.md")
+
+        # Ostatnia data w logu (format: ## YYYY-MM-DD)
+        log_dates = re.findall(r"^## (\d{4}-\d{2}-\d{2})", log, re.M)
+        if log_dates:
+            last_log_date = date.fromisoformat(sorted(log_dates)[-1])
+
+            # Znajdź najnowszy plik .py w imperium/ (mtime)
+            py_files = glob.glob(os.path.join(ROOT, "imperium", "**", "*.py"), recursive=True)
+            if py_files:
+                newest_py = max(py_files, key=os.path.getmtime)
+                newest_mtime = date.fromtimestamp(os.path.getmtime(newest_py))
+
+                if newest_mtime > last_log_date:
+                    rel = os.path.relpath(newest_py, ROOT)
+                    bledy.append(
+                        f"[W8] Kod zmieniony ({rel}, {newest_mtime}) "
+                        f"po ostatnim wpisie w LOG_ZMIAN ({last_log_date}). "
+                        f"Dodaj wpis do docs/LOG_ZMIAN.md."
+                    )
+        else:
+            bledy.append("[W8] docs/LOG_ZMIAN.md nie zawiera żadnej daty (format: ## YYYY-MM-DD)")
+
+    except Exception as e:
+        bledy.append(f"[W8] Błąd sprawdzania świeżości LOG_ZMIAN: {e}")
+
     return bledy, info
 
 
 def main():
     cichy = "--cichy" in sys.argv
-    wynik = audyt()
-    bledy, info = wynik if isinstance(wynik, tuple) else (wynik, [])
+    bledy, info = audyt()
 
     if bledy:
         print("🚨 AUDYT SPÓJNOŚCI — WYKRYTO ROZBIEŻNOŚCI (złamanie Prawa XXI):", file=sys.stderr)

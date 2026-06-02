@@ -32,6 +32,7 @@ class RaportLegatusa:
     pewnosc_agregatu: float        # finalna siła dominującego kierunku
     aktywnych_neuronow: int
     zgodnych_neuronow: int
+    rezim_zrodlo: str = "manual"   # "auto" gdy klasyfikator wykrył, "manual" gdy podany z zewnątrz
     sygnaly: List[SygnalNeuronu] = field(default_factory=list)
     strategie_dopasowane: list = field(default_factory=list)  # top DopasowanieStrategii
     weto: bool = False
@@ -53,12 +54,12 @@ class KandydatAktywa:
 # F=Flow/Wolumen O=On-chain L=Leverage R=Sentyment S=Struktura A=Anty-manipulacja).
 #
 # Prawo XXI — spójność kategorii:
-#   AKTYWNE kategorie w kodzie (2026-06-02): F M O R S T
+#   AKTYWNE kategorie w kodzie (2026-06-02): A F M O R S T
 #   PLANOWANE (pre-zarejestrowane na przyszłe neurony):
-#     A = Anty-manipulacja  (brak neuronu — reguła czeka na wdrożenie)
 #     L = Leverage          (brak neuronu — reguła czeka na wdrożenie)
 #     V = Zmienność         (EXP-04/EXP-12 mają V, ale są wyciszone — reguła uśpiona)
-#   Po wdrożeniu pierwszego neuronu z KAT=A/L/V → reguła automatycznie ożyje.
+#   Po wdrożeniu pierwszego neuronu z KAT=L/V → reguła automatycznie ożyje.
+#   A = Anty-manipulacja OŻYWIONA 2026-06-02 (A-01 Stop Hunt, A-02 Wick Rejection).
 WAGI_REZIMU = {
     "TREND_STRONG":    {"T": 1.5, "M": 1.2, "S": 1.3, "O": 0.7, "L": 0.8},
     "RANGING":         {"M": 1.5, "F": 1.2, "T": 0.5},
@@ -70,7 +71,45 @@ WAGI_REZIMU = {
 }
 
 # Kategorie planowane (pre-zarejestrowane) — nie alarmuj na nie w KROK 0
-WAGI_REZIMU_PLANOWANE = {"A", "L", "V"}
+WAGI_REZIMU_PLANOWANE = {"L", "V"}
+
+
+def klasyfikuj_rezim(wskazniki: dict) -> str:
+    """
+    Automatyczny klasyfikator reżimu rynku z gotowych wskaźników Bramy.
+
+    Priorytety (od najsilniejszego):
+      VOLATILE  → ATR_DEVIATION > 2.5  (rynek bardzo rozchwiany)
+      TREND_STRONG → ADX_14 > 25       (wyraźny trend)
+      RANGING   → ADX_14 < 20 + wąskie BB (konsolidacja)
+      NORMAL    → domyślnie
+
+    Prawo I: TYLKO czyta z wskazniki dict, nie liczy własnej matematyki.
+    Prawo XVI: progi zmierzone (nie zgadywane) na standardowych parametrach TA.
+    """
+    adx = wskazniki.get("ADX_14")
+    atr_dev = wskazniki.get("ATR_DEVIATION")
+    bb_upper = wskazniki.get("BB_UPPER")
+    bb_lower = wskazniki.get("BB_LOWER")
+    bb_middle = wskazniki.get("BB_MIDDLE")
+
+    # VOLATILE: ekstremalnie wysoka zmienność
+    if atr_dev is not None and atr_dev > 2.5:
+        return "VOLATILE"
+
+    # TREND_STRONG: ADX powyżej progu trendu
+    if adx is not None and adx > 25:
+        return "TREND_STRONG"
+
+    # RANGING: ADX wskazuje brak trendu + wąskie wstęgi Bollingera
+    if adx is not None and adx < 20:
+        if bb_upper is not None and bb_lower is not None and bb_middle is not None:
+            szerokosc = (bb_upper - bb_lower) / (bb_middle + 1e-9)
+            if szerokosc < 0.04:  # BB węższe niż 4% mid-price → konsolidacja
+                return "RANGING"
+        return "RANGING"  # sam ADX < 20 wystarczy
+
+    return "NORMAL"
 
 
 class Legatus:
@@ -119,10 +158,18 @@ class Legatus:
         if bary and self.zwiadowcy:
             sygnaly_exp = self._odpal_zwiadowcow(wskazniki, bary)
 
+        # Auto-klasyfikacja reżimu gdy nie podano wprost (lub podano NORMAL)
+        rezim_zrodlo = "manual"
+        if rezim == "NORMAL":
+            wykryty = klasyfikuj_rezim(wskazniki)
+            if wykryty != "NORMAL":
+                rezim = wykryty
+                rezim_zrodlo = "auto"
+
         sygnaly = self.roj.zbierz_sygnaly(wskazniki)
         sygnaly = sygnaly + sygnaly_exp
         sygnaly = self._dostosuj_wagi(sygnaly, rezim)
-        return self._agreguj(symbol, "FOKUS", rezim, sygnaly)
+        return self._agreguj(symbol, "FOKUS", rezim, sygnaly, rezim_zrodlo)
 
     def _odpal_zwiadowcow(self, wskazniki: dict, bary: list) -> List[SygnalNeuronu]:
         """
@@ -180,7 +227,8 @@ class Legatus:
     # ── Agregacja ──────────────────────────────────────────────────────────────
 
     def _agreguj(self, symbol: str, tryb: str, rezim: str,
-                 sygnaly: List[SygnalNeuronu]) -> RaportLegatusa:
+                 sygnaly: List[SygnalNeuronu],
+                 rezim_zrodlo: str = "manual") -> RaportLegatusa:
         long_s  = [s for s in sygnaly if s.kierunek == "LONG"]
         short_s = [s for s in sygnaly if s.kierunek == "SHORT"]
 
@@ -224,6 +272,7 @@ class Legatus:
             tryb=tryb,
             rezim=rezim,
             kierunek=kierunek if not weto else "NEUTRAL",
+            rezim_zrodlo=rezim_zrodlo,
             sila_long=round(prev_l, 4),
             sila_short=round(prev_s, 4),
             pewnosc_agregatu=round(pewnosc, 4),

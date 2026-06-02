@@ -10,6 +10,12 @@
 >
 > **Kategorie:** M=Momentum, T=Trend, V=Zmienność, F=Flow/Wolumen, O=On-chain, L=Leverage, S=Struktura(SMC), A=Anty-manipulacja
 > **Nowe:** K=Makro/Intermarket, E=Entropia/AI, R=Reżim/Sentyment, G=Geo/Regionalne
+>
+> ⚠️ **UWAGA — klucze w kodzie vs. katalog:**
+> Klucze w tabelach poniżej oznaczone `✅` = zgodne z kodem (implementacja gotowa).
+> Klucze bez oznaczenia = plan (brak kodu). Klucze `🔴` = planowane, numer zarezerwowany.
+> **Pełna mapa rozbieżności:** `docs/MAPA_KLUCZY.md` — używaj jej gdy piszesz strategie.
+> **Źródło prawdy kluczy:** `from imperium.legiony.rejestr import wszystkie_neurony`
 
 ---
 
@@ -37,13 +43,13 @@
 
 | Klucz | Neuron | Wskaźnik | Zadanie | Waga |
 |-------|--------|----------|---------|------|
-| X-01 | EMA Cross | EMA(9/21) | Kierunek mikro-trendu M5 | W7 |
-| X-02 | StochRSI | Stochastic RSI | Ekstrema wykupienia/wyprzedania | W6 |
-| X-03 | CVD | Cumulative Volume Delta | Kto kontroluje (kupujący/sprzedający) | W8 |
-| X-04 | VWAP | VWAP Bounce | Magnes cenowy dnia | W7 |
-| X-05 | OrderFlow | Bid/Ask Imbalance | Mikrostruktura — presja natychmiastowa | W8 |
-| X-06 | ATR-Stop | ATR×1.5 | Dynamiczny stop-loss | W9 |
-| X-07 | Williams %R | Williams %R | Szybkie ekstrema | W5 |
+| X-01 ✅ | RSI | RSI 14 | Wykupienie/wyprzedanie (klasyk) | W7 |
+| X-02 ✅ | StochRSI | Stochastic RSI | Ekstrema wykupienia/wyprzedania | W6 |
+| X-03 ✅ | MACD | MACD histogram | Zmiany momentum (konwergencja/dywergencja) | W7 |
+| X-04 ✅ | BBands | Bollinger Bands | Zakres cenowy — ściskanie i wybicia | W7 |
+| X-05 ✅ | EMA Cross | EMA(9/21) cross | Kierunek mikro-trendu M5 | W7 |
+| X-06 ✅ | Williams %R | Williams %R | Szybkie ekstrema — wyprzedzający RSI | W5 |
+| X-07 🔴 | ATR-Stop | ATR×1.5 dynamiczny SL | Dynamiczny stop-loss | W9 |
 | X-08 | Awesome Osc | Awesome Oscillator | Momentum 5 vs 34 SMA | W5 |
 | X-09 | Accelerator | Accelerator Oscillator | Przyspieszenie momentum | W4 |
 | X-10 | HMA | Hull Moving Average | Szybki trend, mało opóźnienia | W6 |
@@ -66,10 +72,10 @@
 
 | Klucz | Neuron | Wskaźnik | Zadanie | Waga |
 |-------|--------|----------|---------|------|
-| XII-01 | EMA Major | EMA(50/200) golden/death | Główny kierunek trendu | W9 |
-| XII-02 | MACD | MACD histogram | Zmiany momentum | W8 |
-| XII-03 | Bollinger | BB breakout 1D | Kompresja → wybicie | W7 |
-| XII-04 | Supertrend | Supertrend+ADX | Kierunek + siła trendu | W8 |
+| XII-01 ✅ | ADX | ADX 14 | Siła trendu — filtr (>25 = trend) | W9 |
+| XII-02 ✅ | Ichimoku | Ichimoku Cloud | Trend+S/R+momentum (5 linii) | W8 |
+| XII-03 ✅ | EMA Major | EMA(50/200) golden/death cross | Główny kierunek trendu | W9 |
+| XII-04 ✅ | Supertrend | Supertrend+ADX | Kierunek + siła trendu | W8 |
 | XII-05 | Fibo | Fibonacci retracement | Poziomy S/R | W7 |
 | XII-06 | SMC-OB | Order Blocks | Strefy smart money | W7 |
 | XII-07 | RSI-Div | RSI + dywergencje | Ukryte odwrócenia | W7 |
@@ -161,9 +167,10 @@
 
 | Klucz | Neuron | Zadanie | Waga |
 |-------|--------|---------|------|
-| A-01 | StopHunt | Wykrywa polowanie na stop-lossy (knot + szybki powrót) | W8 |
-| A-02 | FakeWall | Wykrywa fałszywe ściany w księdze zleceń (pojawia się/znika) | W7 |
+| A-01 ✅ | StopHunt | Wykrywa polowanie na stop-lossy (knot + szybki powrót) | W8 |
+| A-02 ✅ | WickRejection | Odrzucenie poziomu długim knotem (pin bar) — kod OHLCV. *Katalogowy FakeWall (księga L2) → przeniesiony, czeka na feed.* | W7 |
 | A-03 | WashVol | Wykrywa fałszywy wolumen (wolumen ≠ ruch ceny) | W7 |
+| A-08 🔴 | FakeWall | Fałszywe ściany w księdze zleceń (wymaga feedu L2) | W7 |
 | A-04 | Spoofing | Wykrywa migoczące zlecenia (order book flickering) | W6 |
 | A-05 | BartPattern | Wykrywa manipulację na niskiej płynności (noc/weekend) | W6 |
 | A-06 | LiqCascade | Wykrywa inżynierię kaskady likwidacji (push do klastrów) | W8 |

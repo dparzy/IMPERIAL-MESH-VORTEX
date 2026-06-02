@@ -99,12 +99,16 @@ class BudowniczyWskaznikow:
 
         # Surowe wartości bieżącego i poprzedniego baru (dla neuronów struktury/OI)
         ostatni = bary[-1]
+        w["OPEN"] = float(ostatni.get("open", 0))
         w["CLOSE"] = float(ostatni.get("close", 0))
         w["HIGH"] = float(ostatni.get("high", 0))
         w["LOW"] = float(ostatni.get("low", 0))
         w["VOLUME"] = float(ostatni.get("volume", 0))
         if len(bary) >= 2:
+            w["OPEN_PREV"] = float(bary[-2].get("open", 0))
             w["CLOSE_PREV"] = float(bary[-2].get("close", 0))
+            w["HIGH_PREV"] = float(bary[-2].get("high", 0))
+            w["LOW_PREV"] = float(bary[-2].get("low", 0))
             w["VOLUME_PREV"] = float(bary[-2].get("volume", 0))
 
         # Skalarne obliczenia Bramy

@@ -6,15 +6,15 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-02 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 34 neurony (zarejestrowane w roju) + 12 zwiadowców = **46 modułów w kodzie**
-**Aktywne / wyciszone:** 22 aktywnych (czyste OHLCV) + 12 wyciszonych (API/feed)
+**Zaimplementowane:** 42 neurony (zarejestrowane w roju) + 12 zwiadowców = **54 modułów w kodzie**
+**Aktywne / wyciszone:** 30 aktywnych (czyste OHLCV) + 12 wyciszonych (API/feed)
 **Elitarne (Prawo XX):** 14 (2 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
-**Do wdrożenia:** 265 neuronów
+**Do wdrożenia:** 257 neuronów
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 34). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 42). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -41,7 +41,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (34/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (42/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -60,6 +60,7 @@
 | X-08 | NeuronAwesome | M | 5 | ✅ aktywny | AO | — |
 | X-09 | NeuronAccelerator | M | 4 | ✅ aktywny | AC | — |
 | X-17 | NeuronTRIX | M | 4 | ✅ aktywny | TRIX | — |
+| X-12 | NeuronBBSqueeze | M | 6 | ✅ aktywny | BB_UPPER | — |
 | X-25 🔱 | NeuronATRDeviation | M | 6 | ✅ aktywny | ATR_DEVIATION | E4+E5 |
 | X-26 🔱 | NeuronHAScalper | M | 7 | ✅ aktywny | HA_SCALPER | E4+E5+E7 |
 
@@ -71,6 +72,9 @@
 | XII-02 | NeuronIchimoku | T | 8 | ✅ aktywny | ICHIMOKU | — |
 | XII-03 | NeuronEMA50_200 | T | 9 | ✅ aktywny | EMA_50_200 | — |
 | XII-04 | NeuronSupertrend | T | 7 | ✅ aktywny | SUPERTREND | — |
+| XII-05 | NeuronFibonacci | T | 6 | ✅ aktywny | DONCHIAN | — |
+| XII-06 | NeuronOBZone | T | 6 | ✅ aktywny | CLOSE_PREV | — |
+| XII-07 | NeuronRSIDiv | T | 7 | ✅ aktywny | RSI_14 | — |
 | X-18 | NeuronDonchian | T | 5 | ✅ aktywny | DONCHIAN | — |
 | X-10 | NeuronHMA | T | 6 | ✅ aktywny | HMA | — |
 
@@ -111,9 +115,22 @@
 | OC-03 | NeuronPuellMultiple | O | 7 | 🔇 wyciszony (API on-chain) | PUELL_MULTIPLE | — |
 | OC-04 | NeuronExchangeNetflow | O | 8 | 🔇 wyciszony (API on-chain) | EXCHANGE_NETFLOW | — |
 
+### Plik: `neurony/straz.py` (Dywizja Anty-Manipulacji — KAT A)
+
+| KLUCZ | Klasa | KAT | WAGA | Status | WSKAZNIK (Brama) | 🎖️ |
+|-------|-------|-----|------|--------|-----------------|-----|
+| A-01 | NeuronStopHunt | A | 8 | ✅ aktywny | DONCHIAN | — |
+| A-02 | NeuronWickRejection | A | 7 | ✅ aktywny | OPEN | — |
+| A-03 | NeuronWashVol | A | 6 | ✅ aktywny | VOLUME | — |
+| A-05 | NeuronBartPattern | A | 6 | ✅ aktywny | CLOSE_PREV | — |
+
+> **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
+> PANIC ×3.0) były pre-zarejestrowane — teraz mają realne neurony. Prawo XV.
+> Dekorelacja (Prawo XVI): A-01↔A-02 r=+0.24, A↔RSI |r|<0.15 — filary nowej informacji.
+
 ---
 
-## 📋 NEURONY DO WDROŻENIA (265 — tylko katalog)
+## 📋 NEURONY DO WDROŻENIA (260 — tylko katalog)
 
 > Źródło: `docs/KATALOG_NEURONOW.md`. Status: `🔴 tylko katalog` — brak kodu.
 > Implementacja: etapami, z pomiarem dekorelacji po każdej fazie (Prawo XVI).
@@ -161,7 +178,7 @@
 | III Augusta (H1) | ~45 | 9 (XII-01..04, V-01..04, VSA-01) + wyciszone: V-03,SMC-01..03,PSY-01..04 | ~36 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
-| **RAZEM** | **299** | **34** | **265** |
+| **RAZEM** | **299** | **42** | **257** |
 
 ---
 
@@ -214,6 +231,9 @@ neuronów (OrderFlow, CVD, SMC, on-chain) wejdą gdy te neurony ożyją.
 | 2026-06-01 | Faza 1 — ożywienie OHLCV | +4 neurony | 32+12=44 | X-08 Awesome, X-11 RVOL, X-17 TRIX, X-18 Donchian (aktywne) |
 | 2026-06-02 | Prawo XX + kategoria fix | 0 nowych | 32+12=44 | Status elitarny; KAT M→F→R→O; WAGI_REZIMU; MANIFEST klucze naprawione |
 | 2026-06-02 | Faza 2 — X-09, X-10 | +2 neurony | 34+12=46 | Accelerator + HMA; dekorelacja AC↔AO=+0.23 (Prawo XVI) |
+| 2026-06-02 | Faza 3 — XII-05, XII-07, X-12 | +3 neurony | 37+12=49 | Fibonacci, RSI Dywergencja, BB Squeeze; +6 strategii (13 łącznie) |
+| 2026-06-02 | Faza 4 — A-01, A-02 (Straż) | +2 neurony | 39+12=51 | Stop Hunt, Wick Rejection; litera A ożywiona (Prawo XV); +1 strategia IMV-DEF-001 (14 łącznie) |
+| 2026-06-02 | Faza 5 — A-03, A-05, XII-06 | +3 neurony | 42+12=54 | WashVol, BartPattern (Straż); OBZone (XII) — Order Block OHLCV |
 | 2026-06-02 | Dywizja Strategii + Klucznik | +2 moduły | 46+2 | Strategie jako KOD, silnik dopasowania, audyt Warstwa 4 |
 | **Do wdrożenia** | Faza 3 (X Equestris c.d.) | +X neuronów | — | X-12..X-16, X-19..X-24 + strategie wymagające nowych neuronów |
 

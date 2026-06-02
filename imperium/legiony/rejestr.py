@@ -27,11 +27,11 @@ from imperium.legiony.legatus import Legatus
 from imperium.legiony.neurony.momentum import (
     NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross,
     NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI,
-    NeuronTRIX, NeuronAwesome, NeuronAccelerator,
+    NeuronTRIX, NeuronAwesome, NeuronAccelerator, NeuronBBSqueeze,
 )
 from imperium.legiony.neurony.trend import (
     NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian,
-    NeuronHMA,
+    NeuronHMA, NeuronFibonacci, NeuronRSIDiv, NeuronOBZone,
 )
 from imperium.legiony.neurony.wolumen import (
     NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL,
@@ -44,6 +44,9 @@ from imperium.legiony.neurony.psychologia import (
 )
 from imperium.legiony.neurony.onchain import (
     NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow,
+)
+from imperium.legiony.neurony.straz import (
+    NeuronStopHunt, NeuronWickRejection, NeuronWashVol, NeuronBartPattern,
 )
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
@@ -64,10 +67,10 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         # Momentum (X)
         NeuronRSI(), NeuronMACD(), NeuronBBands(), NeuronEMACross(),
         NeuronWilliamsR(), NeuronATRDeviation(), NeuronHAScalper(), NeuronStochRSI(),
-        NeuronTRIX(), NeuronAwesome(), NeuronAccelerator(),
+        NeuronTRIX(), NeuronAwesome(), NeuronAccelerator(), NeuronBBSqueeze(),
         # Trend (XII)
         NeuronADX(), NeuronIchimoku(), NeuronEMA50_200(), NeuronSupertrend(), NeuronDonchian(),
-        NeuronHMA(),
+        NeuronHMA(), NeuronFibonacci(), NeuronRSIDiv(), NeuronOBZone(),
         # Wolumen (V)
         NeuronOBV(), NeuronVWAP(), NeuronCVD(), NeuronVolumeAnomaly(), NeuronRVOL(),
         # Struktura (SMC/VSA)
@@ -76,6 +79,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(), NeuronOIDiv(),
         # On-chain (OC)
         NeuronMVRV(), NeuronSOPR(), NeuronPuellMultiple(), NeuronExchangeNetflow(),
+        # Straż / Anty-manipulacja (A)
+        NeuronStopHunt(), NeuronWickRejection(), NeuronWashVol(), NeuronBartPattern(),
     ]
 
 

@@ -475,3 +475,55 @@ class NeuronAccelerator(MikroNeuron):
         if ac < 0 and opadajacy:
             return self._bazowy_sygnal(ac, "SHORT", 0.55, [f"AC<0 i opada — momentum przyspiesza w dół ({ac:+.4f})"])
         return self._bazowy_sygnal(ac, "NEUTRAL", 0.20, [f"AC={ac:+.4f} bez wyraźnego przyspieszenia"])
+
+
+class NeuronBBSqueeze(MikroNeuron):
+    """
+    X-12 | Bollinger Squeeze — detektor kompresji zmienności.
+
+    Dla nowicjusza: wyobraź sobie sprężynę. Gdy rynek się "ściska" (Bollinger Bands
+    zwężają się), energia się kumuluje. Gdy sprężyna pęka → gwałtowny ruch.
+    Ten neuron wykrywa moment "ściśnięcia" i kierunek potencjalnego wybicia.
+
+    Logika:
+      BB_width = (BB_UPPER - BB_LOWER) / BB_MIDDLE (normalizacja do ceny)
+      Squeeze = BB_width < 0.04 (wstęgi poniżej 4% ceny środkowej)
+      Kierunek wybicia: CLOSE vs BB_MIDDLE (cena w górnej/dolnej połówce)
+      Potwierdzenie: ATR_DEVIATION musi być niskie (<1.0) — spokojny rynek, nie po wybuchu
+    """
+    KLUCZ = "X-12"
+    LEGION = "SCALP"
+    WSKAZNIK = "BB_UPPER"
+    KATEGORIA = "M"
+    WAGA = 6
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        bb_upper = wskazniki.get("BB_UPPER")
+        bb_lower = wskazniki.get("BB_LOWER")
+        bb_mid = wskazniki.get("BB_MIDDLE")
+        close = wskazniki.get("CLOSE")
+        atr_dev = wskazniki.get("ATR_DEVIATION", 1.0)
+
+        if None in (bb_upper, bb_lower, bb_mid, close):
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych BB."])
+
+        bb_width = (bb_upper - bb_lower) / (bb_mid + 1e-9)
+
+        # Brak ściśnięcia = neutralny
+        if bb_width >= 0.04:
+            return self._bazowy_sygnal(bb_width, "NEUTRAL", 0.15,
+                [f"BB szeroki ({bb_width:.3f}) — brak ściśnięcia"])
+
+        # Ściśnięcie potwierdzone
+        powody = [f"BB SQUEEZE: szerokość={bb_width:.3f} (<4%) | ATR_dev={atr_dev:.2f}"]
+
+        # Kierunek wybicia — cena w górnej/dolnej połowie wstęgi
+        polowa = (bb_upper + bb_lower) / 2
+        if close > polowa:
+            pewnosc = 0.60 + (0.15 if atr_dev < 1.0 else 0.0)
+            powody.append(f"Cena ({close:.2f}) w górnej połowie → bias LONG")
+            return self._bazowy_sygnal(bb_width, "LONG", pewnosc, powody)
+        else:
+            pewnosc = 0.60 + (0.15 if atr_dev < 1.0 else 0.0)
+            powody.append(f"Cena ({close:.2f}) w dolnej połowie → bias SHORT")
+            return self._bazowy_sygnal(bb_width, "SHORT", pewnosc, powody)

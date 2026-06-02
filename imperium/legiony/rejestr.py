@@ -154,3 +154,21 @@ def raport_potencjalu() -> dict:
         "wykorzystanie_pct": round(len(aktywne) / len(neurony) * 100, 1),
         "wyciszone_powody": powody,
     }
+
+
+def raport_elity() -> dict:
+    """
+    Prawo XX — diagnostyka statusu elitarnego.
+    Zwraca neurony i zwiadowców ze statusem ELITARNY=True + powody.
+    """
+    neurony = wszystkie_neurony()
+    zwiadowcy = wszyscy_zwiadowcy()
+
+    elite_n = [n for n in neurony if getattr(n, "ELITARNY", False)]
+    elite_z = [z for z in zwiadowcy if getattr(z, "ELITARNY", True)]
+
+    return {
+        "neurony_elite": [{"klucz": n.KLUCZ, "powod": n.POWOD_ELITARNOSCI} for n in elite_n],
+        "zwiadowcy_elite": [{"klucz": z.KLUCZ, "powod": z.POWOD_ELITARNOSCI} for z in elite_z],
+        "lacznie_elite": len(elite_n) + len(elite_z),
+    }

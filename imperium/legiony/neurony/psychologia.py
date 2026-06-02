@@ -27,7 +27,7 @@ class NeuronFearGreed(MikroNeuron):
     KLUCZ = "PSY-03"
     LEGION = "WSPOLNY"
     WSKAZNIK = "FEAR_GREED"
-    KATEGORIA = "S"
+    KATEGORIA = "R"
     WAGA = 7
     DOSTEPNY = False
     POWOD_NIEDOSTEPNOSCI = _POWOD_SENTIMENT
@@ -62,7 +62,7 @@ class NeuronFundingExtreme(MikroNeuron):
     KLUCZ = "PSY-01"
     LEGION = "WSPOLNY"
     WSKAZNIK = "FUNDING_EXTREME"
-    KATEGORIA = "S"
+    KATEGORIA = "R"
     WAGA = 8
     DOSTEPNY = False
     POWOD_NIEDOSTEPNOSCI = _POWOD_FUTURES
@@ -99,7 +99,7 @@ class NeuronPanikaDetal(MikroNeuron):
     KLUCZ = "PSY-02"
     LEGION = "WSPOLNY"
     WSKAZNIK = "LS_RATIO"
-    KATEGORIA = "S"
+    KATEGORIA = "R"
     WAGA = 7
     DOSTEPNY = False
     POWOD_NIEDOSTEPNOSCI = _POWOD_FUTURES
@@ -138,7 +138,7 @@ class NeuronOIDiv(MikroNeuron):
     KLUCZ = "PSY-04"
     LEGION = "WSPOLNY"
     WSKAZNIK = "OI_DIVERGENCE"
-    KATEGORIA = "S"
+    KATEGORIA = "R"
     WAGA = 7
     DOSTEPNY = False
     POWOD_NIEDOSTEPNOSCI = _POWOD_FUTURES

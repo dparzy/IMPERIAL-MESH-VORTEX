@@ -5,7 +5,7 @@
 ## 📜 Konstytucja
 
 Pełne prawa: [`ZASADY_FUNDAMENTALNE.md`](./ZASADY_FUNDAMENTALNE.md).
-Każda decyzja musi być zgodna z **19 Prawami Imperium**.
+Każda decyzja musi być zgodna z **20 Prawami Imperium**.
 
 **Prawo XVIII (decyzyjność):** gdy widzisz niespójność/błąd — rozstrzygasz SAM
 (najlepsza opcja zgodna z zasadami), nie pytasz o błahostki. Źródło prawdy:
@@ -85,6 +85,18 @@ Checklist Prawa XIX (sprawdzaj na początku sesji):
 - [ ] Nigdy nie mów "mamy X neuronów" bez sprawdzenia MANIFEST — tylko `✅` liczy się.
 
 **Złamanie Prawa XIX:** twierdzenie, że moduł istnieje, gdy nie ma kodu na branchu.
+
+## 🎖️ PRAWO XX — STATUS ELITARNY (MIERZONY, NIE OPINIĄ)
+
+`rejestr.raport_elity()` — lista elit z kryterium E1-E7. Test `test_prawo_xx_status_elitarny` weryfikuje każdą sesję.
+
+Checklist Prawa XX (sprawdzaj po każdej sesji z nowymi modułami):
+- [ ] `raport_elity()["lacznie_elite"]` > 0 (minimum jeden elitarny moduł istnieje)
+- [ ] Każdy ZwiadowcaElitarny ma ELITARNY=True (definicja Exploratores — kryterium E1)
+- [ ] Neurony spełniające E1–E7 mają ELITARNY=True + niepusty POWOD_ELITARNOSCI
+- [ ] Kryteria E1–E7 opisane w ZASADY_FUNDAMENTALNE.md § PRAWO XX
+
+**Złamanie Prawa XX:** przyznanie statusu bez kryterium, lub posiadanie E1-E7 bez oznaczenia.
 
 ## 🔐 Bezpieczeństwo (NIENARUSZALNE)
 

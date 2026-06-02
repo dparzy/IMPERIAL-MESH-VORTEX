@@ -110,6 +110,11 @@ class ZwiadowcaElitarny(ABC):
     DOSTEPNY: bool = True
     POWOD_NIEDOSTEPNOSCI: str = ""
 
+    # Status elitarny (Prawo XX). Każdy Exploratores spełnia kryterium E1 (własna
+    # matematyka, której Brama nie liczy) → jest elitarny z definicji klasy.
+    ELITARNY: bool = True
+    POWOD_ELITARNOSCI: str = "E1 (własna matematyka poza Bramą — Exploratores)"
+
     def __init__(self) -> None:
         if self.KLUCZ == "EXP-00":
             raise NotImplementedError(f"{type(self).__name__} musi ustawić KLUCZ (EXP-XX).")

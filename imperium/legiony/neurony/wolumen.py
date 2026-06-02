@@ -15,7 +15,7 @@ class NeuronOBV(MikroNeuron):
     KLUCZ = "V-01"
     LEGION = "SWING"
     WSKAZNIK = "OBV"
-    KATEGORIA = "V"
+    KATEGORIA = "F"
     WAGA = 7
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
@@ -59,7 +59,7 @@ class NeuronVWAP(MikroNeuron):
     KLUCZ = "V-02"
     LEGION = "SWING"
     WSKAZNIK = "VWAP"
-    KATEGORIA = "V"
+    KATEGORIA = "F"
     WAGA = 8
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
@@ -105,7 +105,7 @@ class NeuronCVD(MikroNeuron):
     KLUCZ = "V-03"
     LEGION = "SCALP"
     WSKAZNIK = "CVD"
-    KATEGORIA = "V"
+    KATEGORIA = "F"
     WAGA = 8
     DOSTEPNY = False
     POWOD_NIEDOSTEPNOSCI = (
@@ -149,7 +149,7 @@ class NeuronVolumeAnomaly(MikroNeuron):
     KLUCZ = "V-04"
     LEGION = "SCALP"
     WSKAZNIK = "VOLUME_ANOMALY"
-    KATEGORIA = "V"
+    KATEGORIA = "F"
     WAGA = 6
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
@@ -195,7 +195,7 @@ class NeuronRVOL(MikroNeuron):
     KLUCZ = "X-11"
     LEGION = "VOLUME"
     WSKAZNIK = "RVOL"
-    KATEGORIA = "V"
+    KATEGORIA = "F"
     WAGA = 7
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:

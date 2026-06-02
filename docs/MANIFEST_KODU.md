@@ -4,7 +4,7 @@
 > **Zasada:** `✅` = kod + testy na branchu `claude/sleepy-fermi-dsdE4`. `🔴` = tylko katalog.
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 
-**Stan na:** 2026-06-01 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Stan na:** 2026-06-02 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 32 neurony (zarejestrowane w roju) + 12 zwiadowców = **44 moduły w kodzie**
 **Aktywne / wyciszone:** 20 aktywnych (czyste OHLCV) + 12 wyciszonych (API/feed)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
@@ -20,22 +20,24 @@
 
 ---
 
-## 🔬 ZWIADOWCY EXPLORATORES (12/12 w kodzie)
+## 🔬 ZWIADOWCY EXPLORATORES (12/12 w kodzie) — wszyscy 🎖️ elitarni (E1)
+
+> **Prawo XX:** każdy Exploratores = ELITARNY=True z definicji klasy (kryterium E1 — własna matematyka poza Bramą).
 
 | KLUCZ | Klasa | Plik | Status | Opis |
 |-------|-------|------|--------|------|
-| EXP-01 | ZwiadowcaHiguchi | `zwiadowcy/exp_higuchi.py` | ✅ aktywny | Fraktalny wymiar Higuchi |
-| EXP-02 | ZwiadowcaHAScalper | `zwiadowcy/exp_ha_scalper.py` | ✅ aktywny | Heiken Ashi pattern |
-| EXP-03 | ZwiadowcaHurst | `zwiadowcy/exp_hurst.py` | ✅ aktywny | Wykładnik Hursta |
-| EXP-04 | ZwiadowcaKalman | `zwiadowcy/exp_kalman.py` | ✅ aktywny | Filtr Kalmana |
-| EXP-05 | ZwiadowcaSMC | `zwiadowcy/exp_smc.py` | ✅ aktywny | Smart Money Concepts |
-| EXP-06 | ZwiadowcaKatana | `zwiadowcy/exp_katana.py` | ✅ aktywny | Katana Scalper (IMV-ADO 🔱) |
-| EXP-07 | ZwiadowcaTLP | `zwiadowcy/exp_tlp.py` | ✅ aktywny | A-TLP breakout (IMV-ADO 🔱) |
-| EXP-08 | ZwiadowcaNightTurbo | `zwiadowcy/exp_night.py` | ✅ aktywny | Night Turbo (IMV-ADO 🔱) |
-| EXP-09 | ZwiadowcaLiquiditySweep | `zwiadowcy/exp_sweep.py` | ✅ aktywny | Liquidity Sweep SMC (IMV-ADO 🔱) |
-| EXP-10 | ZwiadowcaDisplacement | `zwiadowcy/exp_displacement.py` | ✅ aktywny | Structural Displacement (IMV-ADO 🔱) |
-| EXP-11 | ZwiadowcaDynamic | `zwiadowcy/exp_dynamic.py` | ✅ aktywny | Dynamic Pro + spread guard (IMV-ADO 🔱) |
-| EXP-12 | ZwiadowcaAtmabhan | `zwiadowcy/exp_atmabhan.py` | 🔇 wyciszony (L2 feed) | AP-Mode microstructure (IMV-ADO 🔱) |
+| EXP-01 🎖️ | ZwiadowcaHiguchi | `zwiadowcy/exp_higuchi.py` | ✅ aktywny | Fraktalny wymiar Higuchi (E1) |
+| EXP-02 🎖️ | ZwiadowcaHAScalper | `zwiadowcy/exp_ha_scalper.py` | ✅ aktywny | Heiken Ashi pattern (E1) |
+| EXP-03 🎖️ | ZwiadowcaHurst | `zwiadowcy/exp_hurst.py` | ✅ aktywny | Wykładnik Hursta (E1) |
+| EXP-04 🎖️ | ZwiadowcaKalman | `zwiadowcy/exp_kalman.py` | ✅ aktywny | Filtr Kalmana (E1) |
+| EXP-05 🎖️ | ZwiadowcaSMC | `zwiadowcy/exp_smc.py` | ✅ aktywny | Smart Money Concepts (E1) |
+| EXP-06 🎖️ | ZwiadowcaKatana | `zwiadowcy/exp_katana.py` | ✅ aktywny | Katana Scalper (IMV-ADO 🔱, E1+E5) |
+| EXP-07 🎖️ | ZwiadowcaTLP | `zwiadowcy/exp_tlp.py` | ✅ aktywny | A-TLP breakout (IMV-ADO 🔱, E1+E5) |
+| EXP-08 🎖️ | ZwiadowcaNightTurbo | `zwiadowcy/exp_night.py` | ✅ aktywny | Night Turbo (IMV-ADO 🔱, E1+E5) |
+| EXP-09 🎖️ | ZwiadowcaLiquiditySweep | `zwiadowcy/exp_sweep.py` | ✅ aktywny | Liquidity Sweep SMC (IMV-ADO 🔱, E1+E5) |
+| EXP-10 🎖️ | ZwiadowcaDisplacement | `zwiadowcy/exp_displacement.py` | ✅ aktywny | Structural Displacement (IMV-ADO 🔱, E1+E5) |
+| EXP-11 🎖️ | ZwiadowcaDynamic | `zwiadowcy/exp_dynamic.py` | ✅ aktywny | Dynamic Pro + spread guard (IMV-ADO 🔱, E1+E5) |
+| EXP-12 🎖️ | ZwiadowcaAtmabhan | `zwiadowcy/exp_atmabhan.py` | 🔇 wyciszony (L2 feed) | AP-Mode microstructure (IMV-ADO 🔱, E1+E5) |
 
 ---
 
@@ -53,8 +55,8 @@
 | M-BB | NeuronBBands | ✅ aktywny | Bollinger Bands squeeze/bounce |
 | M-EMA | NeuronEMACross | ✅ aktywny | EMA 9/21 cross |
 | M-WR | NeuronWilliamsR | ✅ aktywny | Williams %R ekstrema |
-| X-25 🔱 | NeuronATRDeviation | ✅ aktywny | ATR Z-score kameleon (IMV-ADO) |
-| X-26 🔱 | NeuronHAScalper | ✅ aktywny | HA Scalper bez repainting (IMV-ADO) |
+| X-25 🔱🎖️ | NeuronATRDeviation | ✅ aktywny | ATR Z-score kameleon (IMV-ADO, E4+E5) |
+| X-26 🔱🎖️ | NeuronHAScalper | ✅ aktywny | HA Scalper bez repainting (IMV-ADO, E4+E5+E7) |
 
 ### Plik: `neurony/trend.py`
 

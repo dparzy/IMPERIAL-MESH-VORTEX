@@ -213,6 +213,8 @@ class NeuronATRDeviation(MikroNeuron):
     WSKAZNIK = "ATR_DEVIATION"
     KATEGORIA = "M"
     WAGA = 6
+    ELITARNY = True
+    POWOD_ELITARNOSCI = "E4 (kameleon RANGING↔TREND) + E5 (IMV-ADO 🔱, naprawiony oryginał)"
 
     MIN_DISPLACEMENT = 1.0   # NearFactor — poniżej = szum, ignoruj
     FAR_FACTOR = 2.0         # ekstremalne odchylenie = wyższa pewność
@@ -291,6 +293,8 @@ class NeuronHAScalper(MikroNeuron):
     WSKAZNIK = "HA_SCALPER"
     KATEGORIA = "M"
     WAGA = 7
+    ELITARNY = True
+    POWOD_ELITARNOSCI = "E4 (multi-reżim) + E5 (IMV-ADO 🔱) + E7 (filtr Volatility Index + potrójne potwierdzenie)"
 
     # Tryby (aggressive = niższy próg = więcej sygnałów)
     VOLATILITY_MIN_RANGING = 0.008  # filtr dla RANGING — wymagaj realnej zmienności

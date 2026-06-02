@@ -203,6 +203,35 @@ wyjaśnienie "dla nowicjusza", status kod-vs-plan, faza, powód. Szablon: `docs/
 
 **Złamanie ZPO:** skrót bez rozwinięcia, projekt bez linku, lub udawana weryfikacja.
 
+## 🔗 ZASADA PEŁNEJ SYMBIOZY (ROZKAZ STAŁY — Cezar zatwierdził 2026-06-02)
+
+**Żadna zmiana nie jest izolowana.** Po KAŻDEJ zmianie (neuron, strategia, klucz, kategoria,
+dokument) — sprawdzasz wpływ na CAŁY system, zanim uznasz zadanie za skończone. Nie "robisz kropkę
+i nie patrzysz, czy wpłynęła na coś innego".
+
+Łańcuch symbiozy do sprawdzenia przy każdej zmianie:
+- [ ] **Nowy/zmieniony neuron** → czy strategia go używa? (`rejestr_strategii.py` — klucze wejścia/filtr/wyjścia)
+- [ ] **Zmiana klucza/kategorii** → czy WAGI_REZIMU, MANIFEST, KATALOG, README się zgadzają? (Prawo XXI)
+- [ ] **Nowy moduł** → czy INDEKS_IMPERIUM go wymienia? czy LOG_ZMIAN ma wpis?
+- [ ] **Zmiana liczb** (neurony/zwiadowcy/testy) → czy WSZYSTKIE dokumenty mają tę samą liczbę?
+- [ ] **Po zmianie** → `audyt_spojnosci.py` exit 0 + testy zielone (twardy dowód symbiozy)
+
+**Złamanie:** commit zostawiający rozjazd między modułem a resztą systemu (osierocony klucz,
+nieaktualna liczba, neuron bez strategii, dokument niezsynchronizowany).
+
+## 📦 ZASADA ARCHIWIZACJI (ROZKAZ STAŁY — Cezar zatwierdził 2026-06-02)
+
+**Przed przeniesieniem JAKIEGOKOLWIEK pliku do `archiwum/` — przeczytaj go w CAŁOŚCI.**
+"Wygląda staro/nieaktualnie" to NIE jest powód. Wygląd ≠ zawartość.
+
+- [ ] Przeczytany cały plik (nie nagłówek, nie pierwsze 50 linii)
+- [ ] Potwierdzone, że treść jest faktycznie przestarzała / zastąpiona (z nazwą następcy)
+- [ ] Sprawdzone, czy inne dokumenty/kod go nie cytują (grep nazwy pliku)
+- [ ] `archiwum/` otwierasz tylko na wyraźne polecenie Cezara — to magazyn, nie warsztat
+
+**Złamanie:** archiwizacja pliku bez przeczytania (nawet przez nieuwagę — Prawo XVIII:
+złamanie przez nieuwagę = takie samo złamanie jak celowe).
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`

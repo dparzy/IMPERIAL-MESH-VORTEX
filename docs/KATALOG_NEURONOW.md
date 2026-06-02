@@ -390,14 +390,14 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 ### 🔭 Inspiracje zewnętrzne — pełne opisy w `docs/REJESTR_INSPIRACJI.md`
 
 > Projekty badawcze AI/ML z pełnymi nazwami, linkami i statusem weryfikacji (Zasada Pełnego Opisu).
-> ⚠️ Linki niezweryfikowane — patrz REJESTR_INSPIRACJI.md (Prawo I: nie udajemy weryfikacji).
+> ✅ Zweryfikowane w ARSENAL_IMPERIUM.md (maj 2026, 3 zwiadowców) — patrz REJESTR_INSPIRACJI.md.
 
 | Klucz | Pełna nazwa | Źródło | Rola |
 |-------|-------------|--------|------|
-| ML-24 | SHARP — Self-Evolving Rubric Policy | arxiv.org/abs/2605.06822 | Warstwa audytu nad Cesarzem (W-009) |
-| ML-25 | AgenticAITA — Multi-Agent Reasoning | arxiv.org/abs/2605.12532 | Wzorzec Senatu (debata 4 ról) |
-| ML-26 | CogAlpha — Cognitive Alpha Factory | arxiv.org/abs/2511.18850 | Auto-generowanie neuronów (W-024) |
-| ML-27 | NEXUS — Self-Evolving Market AI | github.com/The-R4V3N/Nexus | Wzorzec autonomii Faza 4 |
+| ML-24 | SHARP — Self-Evolving Rubric Policy | arxiv.org/abs/2605.06822 | Warstwa audytu nad Cesarzem (W-009) ✅ ARSENAL_IMPERIUM.md |
+| ML-25 | AgenticAITA — Multi-Agent Reasoning | arxiv.org/abs/2605.12532 | Wzorzec Senatu (debata 4 ról) ✅ ARSENAL_IMPERIUM.md |
+| ML-26 | CogAlpha — Cognitive Alpha Factory | arxiv.org/abs/2511.18850 | Auto-generowanie neuronów (W-024) ✅ ARSENAL_IMPERIUM.md |
+| ML-27 | NEXUS — Self-Evolving Market AI | github.com/The-R4V3N/Nexus | Wzorzec autonomii Faza 4 ✅ ARSENAL_IMPERIUM.md |
 
 ---
 

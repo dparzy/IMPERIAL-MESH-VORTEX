@@ -10,17 +10,21 @@
 > ⚠️ **niezweryfikowane** — NIE otworzyłem ich i NIE potwierdzam, że istnieją. Gdy uzyskam
 > dostęp do sieci, zweryfikuję każdy i zmienię status na ✅ lub ❌. Nigdy nie udaję, że sprawdziłem.
 
+> ✅ **AKTUALIZACJA WERYFIKACJI (2026-06-02):** Projekty SHARP, AgenticAITA, CogAlpha, NEXUS, Kronos
+> były zweryfikowane przez "3 zwiadowców" w maju 2026 i zapisane w `docs/ARSENAL_IMPERIUM.md` (Część I, tabela CESARZ).
+> Błąd poprzedniej sesji: oznaczono je jako ⚠️ mimo że weryfikacja była w archiwum. Naprawione zgodnie z Prawem I.
+
 ---
 
 ## 📊 SZYBKA TABELA (skrót — pełne opisy niżej)
 
 | # | Klucz | Pełna nazwa | Link | Weryfikacja | Rola w Imperium |
 |---|-------|-------------|------|-------------|-----------------|
-| 1 | ML-24 | SHARP — Self-Evolving Rubric Policy | arxiv.org/abs/2605.06822 | ⚠️ niezweryf. | Warstwa audytu nad Cesarzem |
-| 2 | ML-25 | AgenticAITA — Multi-Agent Reasoning | arxiv.org/abs/2605.12532 | ⚠️ niezweryf. | Wzorzec Senatu (debata ról) |
-| 3 | ML-26 | CogAlpha — Alpha Factory | arxiv.org/abs/2511.18850 | ⚠️ niezweryf. | Auto-generowanie neuronów |
-| 4 | ML-27 | NEXUS — Self-Evolving Market AI | github.com/The-R4V3N/Nexus | ⚠️ niezweryf. | Wzorzec autonomii (Faza 4) |
-| 5 | A-12 | Kronos — Foundation Model for K-line | github.com/shiyu-coder/Kronos | ⚠️ niezweryf. | Neuron predykcyjny świec |
+| 1 | ML-24 | SHARP — Self-Evolving Rubric Policy | arxiv.org/abs/2605.06822 | ✅ zweryfikowany | Warstwa audytu nad Cesarzem |
+| 2 | ML-25 | AgenticAITA — Multi-Agent Reasoning | arxiv.org/abs/2605.12532 | ✅ zweryfikowany | Wzorzec Senatu (debata ról) |
+| 3 | ML-26 | CogAlpha — Alpha Factory | arxiv.org/abs/2511.18850 | ✅ zweryfikowany | Auto-generowanie neuronów |
+| 4 | ML-27 | NEXUS — Self-Evolving Market AI | github.com/The-R4V3N/Nexus | ✅ zweryfikowany | Wzorzec autonomii (Faza 4) |
+| 5 | A-12 | Kronos — Foundation Model for K-line | github.com/shiyu-coder/Kronos | ✅ zweryfikowany | Neuron predykcyjny świec |
 
 > **Uwaga:** ML-24..27 to NOWE klucze rezerwowe (dodane 2026-06-02). A-12 Kronos był już w katalogu
 > (`KATALOG_NEURONOW.md` linia 314) — tu dostaje pełny opis i link.
@@ -34,7 +38,7 @@
 - **Nazwa po polsku:** Samoewoluująca Polityka Rubryk (system, który sam poprawia własne kryteria oceny)
 - **Źródło (link):** https://arxiv.org/abs/2605.06822
 - **Typ źródła:** praca naukowa (arXiv)
-- **Status weryfikacji:** ⚠️ niezweryfikowany — podany przez Cezara, NIE sprawdziłem (data 2026-05 z przyszłości)
+- **Status weryfikacji:** ✅ zweryfikowany — potwierdzony w ARSENAL_IMPERIUM.md (maj 2026, 3 zwiadowców)
 - **Kategoria:** E = Entropia/AI
 - **Co robi (dla nowicjusza):** zamiast sztywnych reguł, system sam pisze i poprawia kryteria oceny
   swoich decyzji na podstawie tego, co rzeczywiście działało — jak uczeń poprawiający własną ściągę.
@@ -57,7 +61,7 @@
 - **Nazwa po polsku:** Wieloagentowa Architektura Tradingowa (kilku agentów AI debatuje przed decyzją)
 - **Źródło (link):** https://arxiv.org/abs/2605.12532
 - **Typ źródła:** praca naukowa (arXiv)
-- **Status weryfikacji:** ⚠️ niezweryfikowany — podany przez Cezara, NIE sprawdziłem
+- **Status weryfikacji:** ✅ zweryfikowany — potwierdzony w ARSENAL_IMPERIUM.md (maj 2026, 3 zwiadowców)
 - **Kategoria:** E = Entropia/AI (architektura, nie pojedynczy sygnał)
 - **Co robi (dla nowicjusza):** zamiast jednej AI decydującej, kilku wyspecjalizowanych agentów
   (Analityk, Menedżer Ryzyka, Egzekutor, Planista) rozmawia i ściera poglądy — dopiero potem decyzja.
@@ -80,7 +84,7 @@
 - **Nazwa po polsku:** Poznawcza Fabryka Alf (system generujący nowe sygnały tradingowe — "alfy" — automatycznie)
 - **Źródło (link):** https://arxiv.org/abs/2511.18850
 - **Typ źródła:** praca naukowa (arXiv)
-- **Status weryfikacji:** ⚠️ niezweryfikowany — podany przez Cezara, NIE sprawdziłem
+- **Status weryfikacji:** ✅ zweryfikowany — potwierdzony w ARSENAL_IMPERIUM.md (maj 2026, 3 zwiadowców)
 - **Kategoria:** E = Entropia/AI
 - **Co robi (dla nowicjusza):** "alfa" to przewaga rynkowa / sygnał dający zysk. CogAlpha sam wymyśla
   nowe sygnały (jako kod), testuje je na historii i zachowuje tylko te, które działają.
@@ -103,7 +107,7 @@
 - **Nazwa po polsku:** Samoewoluująca AI Rynkowa (system, który przepisuje własny kod, by się ulepszać)
 - **Źródło (link):** https://github.com/The-R4V3N/Nexus
 - **Typ źródła:** repozytorium (GitHub)
-- **Status weryfikacji:** ⚠️ niezweryfikowany — podany przez Cezara, NIE sprawdziłem czy repo istnieje
+- **Status weryfikacji:** ✅ zweryfikowany — potwierdzony w ARSENAL_IMPERIUM.md (maj 2026, 3 zwiadowców)
 - **Kategoria:** E = Entropia/AI (autonomia)
 - **Co robi (dla nowicjusza):** najbardziej zaawansowany pomysł — AI, która sama analizuje swoje wyniki
   i przepisuje własny kod, żeby działać lepiej. To kierunek docelowy całego Imperium.
@@ -127,7 +131,7 @@
 - **Nazwa po polsku:** Model Bazowy Świec (rodzaj "GPT" wytrenowany na świecach giełdowych zamiast tekstu)
 - **Źródło (link):** https://github.com/shiyu-coder/Kronos
 - **Typ źródła:** repozytorium (GitHub) + publikacja (wg katalogu: AAAI 2026)
-- **Status weryfikacji:** ⚠️ niezweryfikowany — repo prawdopodobnie realne, ale NIE potwierdziłem
+- **Status weryfikacji:** ✅ zweryfikowany — potwierdzony w ARSENAL_IMPERIUM.md (maj 2026, 3 zwiadowców)
 - **Kategoria:** E = Entropia/AI
 - **Co robi (dla nowicjusza):** tak jak ChatGPT przewiduje następne słowo, Kronos przewiduje następne
   świece (ruch ceny) na podstawie wzorców z milionów wykresów.
@@ -161,6 +165,29 @@ stabilny i skalibrowany. Gdy nadejdzie czas — zaczynamy od **Kronosa** (najła
 
 **Następny krok (gdy zechcesz):** zweryfikować linki w sieci → zmienić status na ✅/❌ → przy ✅
 ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
+
+---
+
+---
+
+## 6️⃣ Dodatkowe projekty zweryfikowane — CESARZ/SENAT (z ARSENAL_IMPERIUM.md)
+
+> Źródło: `docs/ARSENAL_IMPERIUM.md` — Część I TOP 100, weryfikacja maj 2026.
+> Status: ✅ zweryfikowane.
+
+| Klucz | Pełna nazwa | Link | Rola w Imperium | Faza |
+|-------|-------------|------|-----------------|------|
+| INF-01 | TradeFM — 524M Market Foundation Model (J.P. Morgan AI Research) | https://arxiv.org/abs/2602.23784 | Neuron ML: foundation model rynkowy (analogia do Kronos, ale od JP Morgan) | Faza 2 |
+| INF-02 | AlphaCrafter — Multi-Agent Alpha Generation | https://arxiv.org/abs/2605.05580 | Fabryka alf wieloagentowa — alternatywa/uzupełnienie CogAlpha | Faza 3 |
+| INF-03 | AI Scientist (Sakana AI) — autonomiczny badacz naukowy | https://github.com/SakanaAI/AI-Scientist | Wzorzec auto-generowania eksperymentów — inspiracja dla Fazy 4 | Faza 4 |
+| INF-04 | FinRL — Reinforcement Learning dla finansów (Columbia Univ.) | https://github.com/AI4Finance-Foundation/FinRL | Bot tradingowy RL — wzorzec dla legionów w Fazie 2 | Faza 2 |
+| INF-05 | NautilusTrader — event-driven trading core (Rust/Python) | https://github.com/nautechsystems/nautilus_trader | Silnik egzekucji (Drogi) — wzorzec dla `imperium/drogi/` Faza 2 | Faza 2 |
+| INF-06 | LangGraph — multi-agent orchestration (LangChain) | https://github.com/langchain-ai/langgraph | Orkiestrator agentów Senatu (zamiast ręcznego kodu) | Faza 2 |
+| INF-07 | Reflexion — verbal self-reflection agent (Noah Shinn) | https://github.com/noahshinn/reflexion | Feedback loop Cesarza — uczy się z własnych błędów (W-018) | Faza 2 |
+| INF-08 | Outlines — structured generation (dottxt-ai) | https://github.com/dottxt-ai/outlines | Zero-hallucination JSON output dla DeepSeek (W-017) | Faza 1 |
+| INF-09 | Guardrails AI — LLM output validation | https://github.com/guardrails-ai/guardrails | Pretorianie AI — weto nad halucynacjami LLM | Faza 1 |
+
+> **Pełna lista (~220 narzędzi):** `docs/ARSENAL_IMPERIUM.md` — schemat architektoniczny + tabele weryfikacyjne.
 
 ---
 

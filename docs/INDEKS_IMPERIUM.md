@@ -20,7 +20,7 @@
 | **Motto**        | Roma non est facta die una       |
 | **Wersja**       | v0.1.0                           |
 | **Faza**         | 🟡 Faza 0 — Paper Trading        |
-| **Data**         | 2026-06-01                       |
+| **Data**         | 2026-06-02                       |
 | **Giełda główna**| MEXC (konto zweryfikowane)       |
 | **Rdzeń AI**     | DeepSeek LLM via API             |
 
@@ -40,11 +40,11 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 4 | `LEGIONY_ARCHITEKTURA.md` | 4 Legiony + mikro-neurony + schemat sygnałów | ✅ Aktywny |
 | 5 | `LOG_ZMIAN.md` | **Żywa pamięć projektu** — obowiązkowy log zmian (ROZKAZ STAŁY) | ✅ Aktywny |
 | 6 | `PLAN_DEEPSEEK.md` | Plan integracji DeepSeek API — klucz, testy, prompt | ✅ Aktywny |
-| 7 | `archiwum/WZORZEC_DNSS.md` | Wzorzec DNSS (rój 79 agentów, Calculator Pattern) — 📦 Archiwum | 📦 Archiwum |
+| 7 | `WZORZEC_DNSS.md` | Wzorzec DNSS — rój 79 agentów, sprzęt, architektura (punkt odniesienia dla Imperium) | ✅ Aktywny |
 | 8 | `archiwum/AUDYT_ADOPCJI.md` | 17 modułów migrowanych z Kingdom Pixel — historyczny audyt | 📦 Archiwum |
 | 9 | `archiwum/ARSENAL_WSKAZNIKOW.md` | 157 wskaźników (stary paradygmat) — superseded przez KATALOG_NEURONOW | 📦 Archiwum |
-| 10 | `archiwum/ARSENAL_IMPERIUM.md` | Katalog ~320 narzędzi — superseded przez KATALOG_NEURONOW | 📦 Archiwum |
-| 11 | `archiwum/ARSENAL_AMERYKI.md` | 690 linków z 50+ krajów — informacyjny | 📦 Archiwum |
+| 10 | `ARSENAL_IMPERIUM.md` | Zweryfikowany katalog ~220 narzędzi infrastruktury (frameworki/API/bazy) — schemat architektury | ✅ Aktywny |
+| 11 | `archiwum/ARSENAL_AMERYKI.md` | 690 linków z 50+ krajów — pełny katalog regionalny (na wyraźne polecenie) | 📦 Archiwum |
 | 11 | `SYMBIOZA_MODULOW.md` | Interakcje modułów i mapowanie narzędzi | 🔗 Link |
 | 12 | `ROADMAP_IMPERIUM.md` | Roadmapa rozwoju i wersjonowanie | 🔗 Link |
 | 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (27 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
@@ -57,7 +57,8 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 20 | `MATRYCA_KORELACJI.md` | Kostka Rubika sygnałów — korelacje, konflikty, reżimy, wagi dynamiczne | 🔗 Link |
 | 22 | `REGULAMINY_I_MANIPULACJE.md` | Zgodność z regulaminami + 7 manipulacji do wykrywania | ✅ Aktywny |
 | 23 | `WZORZEC_OPISU.md` | **Zasada Pełnego Opisu (ZPO)** — szablon kompletnego opisu modułu/inspiracji (pełna nazwa, link, status weryfikacji) | ✅ Aktywny |
-| 24 | `REJESTR_INSPIRACJI.md` | **Rejestr inspiracji AI/ML** — jedno źródło prawdy o zewnętrznych projektach (SHARP, AgenticAITA, CogAlpha, NEXUS, Kronos) z linkami i statusem ⚠️ | ✅ Aktywny |
+| 24 | `REJESTR_INSPIRACJI.md` | **Rejestr inspiracji AI/ML** — jedno źródło prawdy o zewnętrznych projektach (SHARP, AgenticAITA, CogAlpha, NEXUS, Kronos) z linkami i statusem ✅ | ✅ Aktywny |
+| 25 | `WZORZEC_OPISU.md` | Zasada Pełnego Opisu (ZPO) — szablon każdego wpisu (pełna nazwa, link, weryfikacja) | ✅ Aktywny |
 
 ---
 
@@ -69,7 +70,7 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 |---------|-----------------|-------|--------|
 | `imperium/akwedukty/` | Rurociąg danych — pobieranie świec z MEXC przez CCXT | Akwedukty (Data Pipeline) | ✅ Gotowy |
 | `imperium/fundament/` | Brama Kalkulatora — TA-Lib oblicza wskaźniki, SHA-256 podpisuje | Calculator Gate | ✅ Gotowy |
-| `imperium/legiony/` | Legiony Zwiadowcze — generatory sygnałów (4 legiony + mikro-neurony) | Scout Legions | 🟡 Szkielet |
+| `imperium/legiony/` | Legiony — mikro-neurony (42), Legatus, zwiadowcy (12), strategie (15) | Scout Legions | ✅ Rdzeń aktywny |
 | `imperium/pretorianie/` | Pretorianie — weto ryzyka, ochrona kapitału | Risk Praetorians | ✅ Gotowy |
 | `imperium/senat/` | Senat — debata Popularów vs Optymantów nad sygnałem | Senate Debate | 🟡 Szkielet |
 | `imperium/cesarz/` | Cesarz — DeepSeek LLM podejmuje ostateczną decyzję | Emperor (LLM) | 🟡 Szkielet |
@@ -185,6 +186,7 @@ python imperium/pretorianie/veto_check.py
 | v0.1.0 | 2026-06-01 | Inicjalizacja INDEKS_IMPERIUM — Master Index stworzony |
 | v0.2.0 | 2026-06-01 | +legatus.py, +kalkulator_lewara.py, +KATALOG_STRATEGII, +KATALOG_NEURONOW (287) |
 | v0.3.0 | 2026-06-01 | Skan IV (+16 neuronów → 303), IGRZYSKA_IMPERIUM, PAMIEC_ABSOLUTNA, DORADCY_CARA, pamiec_absolutna.py |
+| v0.4.0 | 2026-06-02 | +Adaptery API, +5 neuronów (A-03/A-05/XII-06 + F-01..04), Prawo XX elitarny, WAGI_REZIMU, LOG_ZMIAN, ZPO, REJESTR_INSPIRACJI |
 
 ---
 

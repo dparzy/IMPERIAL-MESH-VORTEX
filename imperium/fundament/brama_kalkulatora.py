@@ -105,6 +105,57 @@ def _py_awesome(high, low, fast: int = 5, slow: int = 34):
     return ao_last, ao_prev
 
 
+def _py_hma(close, period: int = 16):
+    """Hull Moving Average — szybka MA o minimalnym opóźnieniu.
+    HMA = WMA(2·WMA(N/2) − WMA(N), sqrt(N)). Zwraca (HMA_last, HMA_prev).
+    Bez TA-Lib — czysta matematyka. None gdy za mało danych."""
+    c = list(close)
+    half = max(1, period // 2)
+    root = max(1, int(period ** 0.5))
+    potrzeba = period + root  # by policzyć 2 ostatnie punkty HMA
+    if len(c) < potrzeba:
+        return None, None
+
+    def wma(seq, p, idx):
+        # ważona średnia: wagi 1..p, najnowszy bar waży najwięcej
+        okno = seq[idx - p + 1: idx + 1]
+        wagi = range(1, p + 1)
+        return sum(s * w for s, w in zip(okno, wagi)) / (p * (p + 1) / 2)
+
+    # surowa seria raw = 2·WMA(N/2) − WMA(N) dla każdego baru, potem WMA(sqrt) z raw
+    n = len(c)
+    raw = []
+    for idx in range(period - 1, n):
+        raw.append(2 * wma(c, half, idx) - wma(c, period, idx))
+    if len(raw) < root + 1:
+        return None, None
+    m = len(raw)
+    hma_last = wma(raw, root, m - 1)
+    hma_prev = wma(raw, root, m - 2)
+    return hma_last, hma_prev
+
+
+def _py_accelerator(high, low, fast: int = 5, slow: int = 34, sma_ac: int = 5):
+    """Accelerator Oscillator (Bill Williams) = AO − SMA(AO, 5).
+    Mierzy PRZYSPIESZENIE momentum (2. pochodna ceny) — wyprzedza AO.
+    Zwraca (AC_last, AC_prev). Bez TA-Lib — czysta matematyka."""
+    med = [(h + l) / 2 for h, l in zip(high, low)]
+    potrzeba = slow + sma_ac + 1
+    if len(med) < potrzeba:
+        return None, None
+
+    def sma(seq, p, idx):
+        return sum(seq[idx - p + 1: idx + 1]) / p
+
+    n = len(med)
+    # seria AO dla ostatnich (sma_ac+1) barów, by policzyć SMA(AO) i jego poprzednik
+    ao_seria = [sma(med, fast, i) - sma(med, slow, i) for i in range(n - sma_ac - 1, n)]
+    # AC[-1] = AO[-1] − SMA(AO, sma_ac) liczone do ostatniego baru
+    ac_last = ao_seria[-1] - sum(ao_seria[-sma_ac:]) / sma_ac
+    ac_prev = ao_seria[-2] - sum(ao_seria[-sma_ac - 1:-1]) / sma_ac
+    return ac_last, ac_prev
+
+
 def _py_donchian(high, low, period: int = 20):
     """Donchian Channel: górny=max(high,period), dolny=min(low,period), środek.
     Zwraca dict UPPER/LOWER/MID (z barów do −2, bez bieżącego — brak lookahead na wybicie)."""
@@ -271,6 +322,14 @@ class CalculatorGateway:
             # ── Pure-Python: Awesome Oscillator (TA-Lib nie ma) ───────────────
             "AO":      lambda high, low: _py_awesome(high, low)[0],
             "AO_PREV": lambda high, low: _py_awesome(high, low)[1],
+
+            # ── Pure-Python: Hull Moving Average (TA-Lib nie ma) ──────────────
+            "HMA":      lambda close, period=16: _py_hma(close, period)[0],
+            "HMA_PREV": lambda close, period=16: _py_hma(close, period)[1],
+
+            # ── Pure-Python: Accelerator Oscillator (TA-Lib nie ma) ───────────
+            "AC":      lambda high, low: _py_accelerator(high, low)[0],
+            "AC_PREV": lambda high, low: _py_accelerator(high, low)[1],
 
             # ── Pure-Python: Donchian Channel (TA-Lib nie ma) ─────────────────
             "DONCHIAN": lambda high, low, period=20: _py_donchian(high, low, period),

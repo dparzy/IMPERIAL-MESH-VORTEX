@@ -190,6 +190,19 @@ Jeśli którakolwiek czerwona → NIE commitujesz, naprawiasz, dopiero potem com
   - DeepSeek: `api_key=os.getenv("DEEPSEEK_API_KEY")` (`setx DEEPSEEK_API_KEY "..."`)
   - MEXC: `os.getenv("MEXC_API_KEY")`, `os.getenv("MEXC_SECRET")`
 
+## 📐 ZASADA PEŁNEGO OPISU (ZPO) — ROZKAZ STAŁY (Cezar zatwierdził 2026-06-02)
+
+Cezar jest nowicjuszem. Każdy moduł/neuron/strategia/inspiracja opisywany jest KOMPLETNIE:
+pełna nazwa (rozwinięcie KAŻDEGO skrótu), link źródła, status weryfikacji (✅/⚠️/❌),
+wyjaśnienie "dla nowicjusza", status kod-vs-plan, faza, powód. Szablon: `docs/WZORZEC_OPISU.md`.
+
+- **Nigdy skrótu bez rozwinięcia** (SHARP → Self-Evolving Rubric Policy).
+- **Nigdy projektu bez pełnego linku** (`https://arxiv.org/abs/...`, nie "arxiv 2605...").
+- **Nigdy fałszywej weryfikacji** (Prawo I): nie sprawdziłem → piszę ⚠️ niezweryfikowany.
+- Wszystkie zewnętrzne inspiracje AI/ML: `docs/REJESTR_INSPIRACJI.md` (jedno źródło prawdy).
+
+**Złamanie ZPO:** skrót bez rozwinięcia, projekt bez linku, lub udawana weryfikacja.
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`

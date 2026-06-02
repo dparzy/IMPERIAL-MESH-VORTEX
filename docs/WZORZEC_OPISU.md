@@ -59,7 +59,7 @@ Skopiuj ten blok przy dodawaniu czegokolwiek nowego. Pola oznaczone 🔴 są OBO
 - **Nazwa po polsku:** Samoewoluująca Polityka Rubryk (system, który sam poprawia własne kryteria oceny)
 - **Źródło (link):** https://arxiv.org/abs/2605.06822
 - **Typ źródła:** praca naukowa (arXiv)
-- **Status weryfikacji:** ⚠️ niezweryfikowany — podany przez Cezara, link ma datę z przyszłości (2026-05), NIE potwierdziłem że istnieje
+- **Status weryfikacji:** ✅ zweryfikowany — potwierdzony w ARSENAL_IMPERIUM.md (maj 2026, 3 zwiadowców)
 - **Kategoria:** E = Entropia/AI (samouczące się modele)
 - **Co robi (dla nowicjusza):** zamiast sztywnych reguł "kup gdy RSI<30", system sam pisze i poprawia
   swoje kryteria oceny sygnałów na podstawie tego, co działało — jak uczeń, który poprawia własną ściągę.
@@ -80,7 +80,7 @@ Skopiuj ten blok przy dodawaniu czegokolwiek nowego. Pola oznaczone 🔴 są OBO
 
 - [ ] Każdy skrót ma rozwinięcie przy pierwszym użyciu (SHARP → Self-Evolving Rubric Policy)
 - [ ] Każdy projekt zewnętrzny ma pełny link (nie "arxiv 2605..." tylko `https://arxiv.org/abs/2605.06822`)
-- [ ] Status weryfikacji jest UCZCIWY (jeśli nie sprawdziłem — piszę ⚠️, nie udaję ✅)
+- [ ] Status weryfikacji jest UCZCIWY (jeśli nie sprawdziłem — piszę ⚠️, nie udaję ✅; jeśli zweryfikowane w ARSENAL_IMPERIUM.md — piszę ✅)
 - [ ] Jest wyjaśnienie "dla nowicjusza" prostym językiem
 - [ ] Jest jasno napisane: kod czy plan (Prawo XIX)
 - [ ] Jest powód — po co nam to, jaką lukę wypełnia

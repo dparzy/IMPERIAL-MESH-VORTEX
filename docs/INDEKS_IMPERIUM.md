@@ -20,7 +20,7 @@
 | **Motto**        | Roma non est facta die una       |
 | **Wersja**       | v0.1.0                           |
 | **Faza**         | 🟡 Faza 0 — Paper Trading        |
-| **Data**         | 2026-06-01                       |
+| **Data**         | 2026-06-02                       |
 | **Giełda główna**| MEXC (konto zweryfikowane)       |
 | **Rdzeń AI**     | DeepSeek LLM via API             |
 

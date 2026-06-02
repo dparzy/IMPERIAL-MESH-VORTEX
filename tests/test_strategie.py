@@ -133,6 +133,45 @@ def test_legatus_zwraca_dobrane_strategie():
     assert all(d.kierunek == "LONG" for d in raport.strategie_dopasowane)
 
 
+def test_legatus_short_symetryczny():
+    """Trend SPADKOWY → agregat SHORT i strategie dobrane SHORT (symetria LONG/SHORT)."""
+    import math
+    from imperium.legiony.rejestr import zbuduj_legatusa
+    from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
+
+    bary = []
+    p = 200.0
+    for i in range(120):
+        p -= 0.6 + math.sin(i / 8) * 0.4
+        bary.append({"open": p + 0.2, "high": p + 0.4, "low": p - 0.4,
+                     "close": p, "volume": 1000 + i * 5, "timestamp": i})
+
+    leg = zbuduj_legatusa(min_neuronow=3, min_przewaga=0.4, aktywuj_smc=False)
+    w = BudowniczyWskaznikow().zbuduj(bary)
+    raport = leg.fokus("BTCUSDT", w, rezim="TREND_STRONG", bary=bary)
+
+    assert raport.kierunek == "SHORT"
+    assert len(raport.strategie_dopasowane) >= 1
+    assert all(d.kierunek == "SHORT" for d in raport.strategie_dopasowane)
+
+
+def test_dopasowanie_short_na_poziomie_silnika():
+    """Silnik dobiera SHORT gdy wejścia strategii głosują SHORT."""
+    strat = Strategia(
+        id="TEST-S", nazwa="Test Short", legion="X", styl="TR", warunki="test",
+        neurony_wejscie=["XII-03", "XII-04"], neurony_filtr=["V-01"],
+    )
+    sygnaly = {
+        "XII-03": _syg("XII-03", "SHORT", 0.9),
+        "XII-04": _syg("XII-04", "SHORT", 0.8),
+        "V-01": _syg("V-01", "SHORT", 0.7),
+    }
+    d = dopasuj_strategie(strat, sygnaly)
+    assert d.kierunek == "SHORT"
+    assert d.zgodnych_wejsc == 2
+    assert d.wynik > 0.5
+
+
 def test_legatus_bez_strategii_pusta_lista():
     """Legatus bez bazy strategii zwraca pustą listę (brak kosztu, brak błędu)."""
     from imperium.legiony.legatus import Legatus

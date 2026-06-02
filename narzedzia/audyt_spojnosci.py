@@ -141,6 +141,31 @@ def audyt() -> list:
     except Exception as e:
         bledy.append(f"[W3] Błąd sprawdzania liczb w dokumentach: {e}")
 
+    # ── WARSTWA 4: KLUCZNIK — strategie ↔ kod (Prawo XIX/XXI) ───────────────
+    # Każdy klucz neuronu użyty w rejestrze strategii MUSI istnieć w kodzie
+    # i być aktywny. Strategia wskazująca neuron-widmo = złamanie spójności
+    # (silnik dopasowania dobrałby martwy/nieistniejący głos).
+    try:
+        from imperium.legiony.strategie.rejestr_strategii import (
+            klucze_uzyte_w_strategiach, wszystkie_strategie,
+        )
+        klucze_strat = klucze_uzyte_w_strategiach()
+        klucze_kod = {n.KLUCZ for n in neurony}
+        aktywne_kod = {n.KLUCZ for n in neurony if n.DOSTEPNY}
+
+        widma = klucze_strat - klucze_kod
+        if widma:
+            bledy.append(f"[W4] Strategie wskazują klucze-widma (brak w kodzie): {sorted(widma)}")
+        wyciszone = klucze_strat - aktywne_kod - widma
+        if wyciszone:
+            bledy.append(f"[W4] Strategie wskazują WYCISZONE neurony (martwy głos): {sorted(wyciszone)}")
+
+        info.append(f"Strategie: {len(wszystkie_strategie())} (klucze: {len(klucze_strat)}, Klucznik spójny)")
+    except ImportError:
+        pass  # moduł strategii opcjonalny — brak = brak warstwy 4
+    except Exception as e:
+        bledy.append(f"[W4] Błąd sprawdzania Klucznika strategii: {e}")
+
     return bledy, info
 
 

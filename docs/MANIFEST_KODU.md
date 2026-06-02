@@ -175,6 +175,29 @@
 | Igrzyska / Koloseum | `koloseum/` | ✅ aktywny |
 | BramaKalkulatora | `fundament/brama_kalkulatora.py` | ✅ aktywny |
 | KalkulatorLewara | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
+| Dywizja Strategii (model + silnik) | `legiony/strategie/baza.py` | ✅ aktywny |
+| Rejestr Strategii (Klucznik) | `legiony/strategie/rejestr_strategii.py` | ✅ aktywny |
+
+---
+
+## 🗺️ DYWIZJA STRATEGII — Klucznik + silnik dopasowania (Prawo XIX/XXI)
+
+> **Wizja:** neurony wysyłają sygnały → silnik automatycznie dobiera NAJBLIŻSZĄ
+> strategię z bazy do bieżącej sytuacji rynku. Potem kalibracja w testach/live.
+
+| Element | Plik | Rola |
+|---------|------|------|
+| `Strategia` (model) | `strategie/baza.py` | przepis: które neurony, w jakiej roli (wejście/filtr/wyjście) |
+| `dobierz_najlepsze()` | `strategie/baza.py` | silnik: sygnały → top-3 pasujące strategie + kierunek |
+| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 7 strategii zmapowanych na ŻYWE klucze kodu |
+
+**Klucznik (strażnik spójności):** audyt Warstwa 4 (`narzedzia/audyt_spojnosci.py`)
+pilnuje, że KAŻDY klucz w strategii istnieje w kodzie i jest aktywny — żadnych
+neuronów-widm. Test: `test_klucznik_strategie_uzywaja_istniejacych_neuronow`.
+
+**Stan:** 7 strategii (klucze: 13 — wszystkie aktywne). Status każdej: SZKIC
+(czeka na kalibrację w Koloseum). Strategie z katalogu wymagające nieistniejących
+neuronów (OrderFlow, CVD, SMC, on-chain) wejdą gdy te neurony ożyją.
 
 ---
 
@@ -189,7 +212,9 @@
 | 2026-06-01 | Audyt liczby + X-02 | +1 neuron (StochRSI) | 28+12=40 | Ożywienie sieroty X-02; wycofanie redundantnego VI-01 |
 | 2026-06-01 | Faza 1 — ożywienie OHLCV | +4 neurony | 32+12=44 | X-08 Awesome, X-11 RVOL, X-17 TRIX, X-18 Donchian (aktywne) |
 | 2026-06-02 | Prawo XX + kategoria fix | 0 nowych | 32+12=44 | Status elitarny; KAT M→F→R→O; WAGI_REZIMU; MANIFEST klucze naprawione |
-| **Do wdrożenia** | Faza 2 (X Equestris c.d.) | +19 neuronów | — | X-09,X-10,X-12..X-16,X-19..X-24 + nowe schemy |
+| 2026-06-02 | Faza 2 — X-09, X-10 | +2 neurony | 34+12=46 | Accelerator + HMA; dekorelacja AC↔AO=+0.23 (Prawo XVI) |
+| 2026-06-02 | Dywizja Strategii + Klucznik | +2 moduły | 46+2 | Strategie jako KOD, silnik dopasowania, audyt Warstwa 4 |
+| **Do wdrożenia** | Faza 3 (X Equestris c.d.) | +X neuronów | — | X-12..X-16, X-19..X-24 + strategie wymagające nowych neuronów |
 
 ---
 

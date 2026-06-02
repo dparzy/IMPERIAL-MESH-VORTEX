@@ -200,6 +200,24 @@ Jeśli którakolwiek czerwona → NIE commitujesz, naprawiasz, dopiero potem com
 - Rozwój na branchu: `claude/sleepy-fermi-dsdE4`
 - Push: `git push -u origin <branch>`. PR tylko na wyraźną prośbę.
 
+## 🔍 ZASADA SPÓJNOŚCI PRZY PR (ROZKAZ STAŁY — Cezar zatwierdził 2026-06-02)
+
+**Cezar merguje do main RĘCZNIE.** Ty nie pushujesz do main. Ale **przy każdym
+tworzeniu PR — automatycznie sprawdzasz pełną spójność** gałęzi (żeby Cezar
+wklejał do main czysty, zweryfikowany stan):
+
+1. **Bramka kodu:** `python tests/run_tests.py` (X/X zielone) + `python narzedzia/audyt_spojnosci.py` (exit 0)
+2. **Spójność gałąź↔main:**
+   ```bash
+   git fetch origin main <branch>
+   git diff origin/main origin/<branch> --stat     # co PR faktycznie zmienia
+   git log --oneline origin/main..origin/<branch>   # commity które wejdą
+   ```
+3. **Raport w opisie PR:** wynik testów, audytu, lista plików/commitów.
+4. Jeśli bramka czerwona → NIE twórz PR, napraw najpierw.
+
+To weryfikacja, nie auto-merge — ostatnie słowo (merge do main) należy do Cezara.
+
 ## 👁️ ZASADA OBSERWACJI PR (ROZKAZ STAŁY — Cezar zatwierdził 2026-06-02)
 
 **Po każdym utworzeniu Pull Requesta — od razu go obserwuj** (`subscribe_pr_activity`),

@@ -190,6 +190,7 @@
 | `Strategia` (model) | `strategie/baza.py` | przepis: które neurony, w jakiej roli (wejście/filtr/wyjście) |
 | `dobierz_najlepsze()` | `strategie/baza.py` | silnik: sygnały → top-3 pasujące strategie + kierunek |
 | `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 7 strategii zmapowanych na ŻYWE klucze kodu |
+| **Wpięcie w Legatusa** | `legiony/legatus.py` | `RaportLegatusa.strategie_dopasowane` — Generał zwraca dobrane strategie w każdym raporcie |
 
 **Klucznik (strażnik spójności):** audyt Warstwa 4 (`narzedzia/audyt_spojnosci.py`)
 pilnuje, że KAŻDY klucz w strategii istnieje w kodzie i jest aktywny — żadnych

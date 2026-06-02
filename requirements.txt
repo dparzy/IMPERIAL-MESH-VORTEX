@@ -1,0 +1,22 @@
+# 🏛️ IMPERIAL MESH VORTEX — zależności żywego systemu
+#
+# WAŻNE: testy (python tests/run_tests.py) działają BEZ tych zależności
+# (graceful fallback — Prawo I). Te pakiety włączają PEŁNĄ moc Imperium:
+# prawdziwą matematykę Bramy (TA-Lib), zwiadowców (numpy), dashboard, AI doradcę.
+#
+# Instalacja: pip install -r requirements.txt
+# W sesjach Claude Code na webie robi to automatycznie hook .claude/hooks/session-start.sh
+
+# ── Rdzeń matematyczny (Brama Kalkulatora + zwiadowcy Exploratores) ──
+numpy>=1.24
+TA-Lib>=0.6.0          # Brama Kalkulatora — Prawo I (zero halucynacji, prawdziwe wskaźniki)
+
+# ── Dane i rynek ──
+pandas>=2.0
+ccxt>=4.0              # adaptery giełd (drogi/ — MEXC itd.)
+
+# ── Doradca AI (DeepSeek przez klienta zgodnego z OpenAI) ──
+openai>=1.0            # klucz: os.getenv("DEEPSEEK_API_KEY") — NIGDY w kodzie
+
+# ── Wizualizacja (świątynie/ — dashboard) ──
+matplotlib>=3.7

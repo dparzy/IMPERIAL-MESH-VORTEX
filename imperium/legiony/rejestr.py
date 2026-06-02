@@ -45,6 +45,9 @@ from imperium.legiony.neurony.psychologia import (
 from imperium.legiony.neurony.onchain import (
     NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow,
 )
+from imperium.legiony.neurony.straz import (
+    NeuronStopHunt, NeuronWickRejection,
+)
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
 from imperium.legiony.zwiadowcy import (
@@ -76,6 +79,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(), NeuronOIDiv(),
         # On-chain (OC)
         NeuronMVRV(), NeuronSOPR(), NeuronPuellMultiple(), NeuronExchangeNetflow(),
+        # Straż / Anty-manipulacja (A)
+        NeuronStopHunt(), NeuronWickRejection(),
     ]
 
 

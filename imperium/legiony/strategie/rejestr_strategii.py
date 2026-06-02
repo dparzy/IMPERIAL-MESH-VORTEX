@@ -153,6 +153,17 @@ def wszystkie_strategie() -> list:
             interwaly=["1H", "4H"], rezim_preferowany="RANGING",
             dzwignia="1×–3×", rr="1:2", status="SZKIC",
         ),
+        # ── Dywizja Straży: kontra na manipulację (aktywowane 2026-06-02) ─────
+        Strategia(
+            id="IMV-DEF-001", nazwa="TARCZA PRETORIANÓW", legion="IMV", styl="RV",
+            warunki="Kontra na stop hunt / wick rejection — gramy PRZECIW pułapce MM (VOLATILE)",
+            zrodlo="IMV (syntetyczna) — anty-manipulacja",
+            neurony_wejscie=["A-01", "A-02"],   # Stop Hunt + Wick Rejection (kontrariański)
+            neurony_filtr=["X-02", "V-02"],     # StochRSI ekstremum + VWAP poziom
+            neurony_wyjscie=["A-01", "X-25"],   # sweep zanika / ATR-dev normalizuje
+            interwaly=["M15", "1H"], rezim_preferowany="VOLATILE",
+            dzwignia="2×–5×", rr="1:2", status="SZKIC",
+        ),
     ]
 
 

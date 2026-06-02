@@ -167,9 +167,10 @@
 
 | Klucz | Neuron | Zadanie | Waga |
 |-------|--------|---------|------|
-| A-01 | StopHunt | Wykrywa polowanie na stop-lossy (knot + szybki powrót) | W8 |
-| A-02 | FakeWall | Wykrywa fałszywe ściany w księdze zleceń (pojawia się/znika) | W7 |
+| A-01 ✅ | StopHunt | Wykrywa polowanie na stop-lossy (knot + szybki powrót) | W8 |
+| A-02 ✅ | WickRejection | Odrzucenie poziomu długim knotem (pin bar) — kod OHLCV. *Katalogowy FakeWall (księga L2) → przeniesiony, czeka na feed.* | W7 |
 | A-03 | WashVol | Wykrywa fałszywy wolumen (wolumen ≠ ruch ceny) | W7 |
+| A-08 🔴 | FakeWall | Fałszywe ściany w księdze zleceń (wymaga feedu L2) | W7 |
 | A-04 | Spoofing | Wykrywa migoczące zlecenia (order book flickering) | W6 |
 | A-05 | BartPattern | Wykrywa manipulację na niskiej płynności (noc/weekend) | W6 |
 | A-06 | LiqCascade | Wykrywa inżynierię kaskady likwidacji (push do klastrów) | W8 |

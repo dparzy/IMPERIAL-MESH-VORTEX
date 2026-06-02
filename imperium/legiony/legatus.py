@@ -54,12 +54,12 @@ class KandydatAktywa:
 # F=Flow/Wolumen O=On-chain L=Leverage R=Sentyment S=Struktura A=Anty-manipulacja).
 #
 # Prawo XXI — spójność kategorii:
-#   AKTYWNE kategorie w kodzie (2026-06-02): F M O R S T
+#   AKTYWNE kategorie w kodzie (2026-06-02): A F M O R S T
 #   PLANOWANE (pre-zarejestrowane na przyszłe neurony):
-#     A = Anty-manipulacja  (brak neuronu — reguła czeka na wdrożenie)
 #     L = Leverage          (brak neuronu — reguła czeka na wdrożenie)
 #     V = Zmienność         (EXP-04/EXP-12 mają V, ale są wyciszone — reguła uśpiona)
-#   Po wdrożeniu pierwszego neuronu z KAT=A/L/V → reguła automatycznie ożyje.
+#   Po wdrożeniu pierwszego neuronu z KAT=L/V → reguła automatycznie ożyje.
+#   A = Anty-manipulacja OŻYWIONA 2026-06-02 (A-01 Stop Hunt, A-02 Wick Rejection).
 WAGI_REZIMU = {
     "TREND_STRONG":    {"T": 1.5, "M": 1.2, "S": 1.3, "O": 0.7, "L": 0.8},
     "RANGING":         {"M": 1.5, "F": 1.2, "T": 0.5},
@@ -71,7 +71,7 @@ WAGI_REZIMU = {
 }
 
 # Kategorie planowane (pre-zarejestrowane) — nie alarmuj na nie w KROK 0
-WAGI_REZIMU_PLANOWANE = {"A", "L", "V"}
+WAGI_REZIMU_PLANOWANE = {"L", "V"}
 
 
 def klasyfikuj_rezim(wskazniki: dict) -> str:

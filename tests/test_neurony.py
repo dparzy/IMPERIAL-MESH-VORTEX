@@ -3,8 +3,9 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from imperium.legiony.neurony.momentum import NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross, NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI, NeuronTRIX, NeuronAwesome, NeuronAccelerator
-from imperium.legiony.neurony.trend import NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian, NeuronHMA
+from imperium.legiony.neurony.momentum import NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross, NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI, NeuronTRIX, NeuronAwesome, NeuronAccelerator, NeuronBBSqueeze
+from imperium.legiony.neurony.trend import NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian, NeuronHMA, NeuronFibonacci, NeuronRSIDiv
+from imperium.legiony.neurony.straz import NeuronStopHunt, NeuronWickRejection
 from imperium.legiony.neurony.wolumen import NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL
 from imperium.legiony.neurony.psychologia import NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv
 from imperium.legiony.neurony.onchain import NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow
@@ -508,3 +509,102 @@ def test_budowniczy_produkuje_ha_dla_x26():
     bud._dodaj_ha(bary_kier(False), w_dn)
     assert w_dn.get("HA_BEAR") is True
     assert n.interpretuj(w_dn).kierunek == "SHORT"
+
+
+# ─── STRAŻ / ANTY-MANIPULACJA (KAT A) ─────────────────────────────────────────
+
+def test_a01_stop_hunt_bull():
+    """A-01: knot przebił dół kanału, close wrócił nad → LONG (kontra na sweep)."""
+    n = NeuronStopHunt()
+    w = {"HIGH": 105, "LOW": 88, "CLOSE": 99, "DONCHIAN_UPPER": 110, "DONCHIAN_LOWER": 90}
+    s = n.interpretuj(w)
+    assert s.kierunek == "LONG"
+    assert s.pewnosc > 0.5
+
+
+def test_a01_stop_hunt_bear():
+    """A-01: knot przebił szczyt, close wrócił pod → SHORT."""
+    n = NeuronStopHunt()
+    w = {"HIGH": 112, "LOW": 95, "CLOSE": 101, "DONCHIAN_UPPER": 110, "DONCHIAN_LOWER": 90}
+    s = n.interpretuj(w)
+    assert s.kierunek == "SHORT"
+
+
+def test_a01_stop_hunt_neutral():
+    """A-01: cena w kanale, brak sweepu → NEUTRAL."""
+    n = NeuronStopHunt()
+    w = {"HIGH": 105, "LOW": 95, "CLOSE": 100, "DONCHIAN_UPPER": 110, "DONCHIAN_LOWER": 90}
+    assert n.interpretuj(w).kierunek == "NEUTRAL"
+
+
+def test_a02_wick_rejection_long():
+    """A-02: długi dolny knot + małe ciało → odrzucenie dołu → LONG."""
+    n = NeuronWickRejection()
+    w = {"OPEN": 100, "CLOSE": 101, "HIGH": 102, "LOW": 92}
+    s = n.interpretuj(w)
+    assert s.kierunek == "LONG"
+
+
+def test_a02_wick_rejection_short():
+    """A-02: długi górny knot + małe ciało → odrzucenie góry → SHORT."""
+    n = NeuronWickRejection()
+    w = {"OPEN": 100, "CLOSE": 99, "HIGH": 108, "LOW": 98}
+    s = n.interpretuj(w)
+    assert s.kierunek == "SHORT"
+
+
+def test_a02_wick_brak_danych():
+    """A-02: brak OPEN → NEUTRAL (bezpieczny fallback)."""
+    n = NeuronWickRejection()
+    assert n.interpretuj({"HIGH": 100, "LOW": 90, "CLOSE": 95}).kierunek == "NEUTRAL"
+
+
+def test_a_kategoria_aktywna():
+    """Litera A musi być żywa w roju i NIE w PLANOWANE (Prawo XV/XXI)."""
+    from imperium.legiony.rejestr import wszystkie_neurony
+    from imperium.legiony.legatus import WAGI_REZIMU_PLANOWANE
+    kat_a = [n for n in wszystkie_neurony() if n.KATEGORIA == "A"]
+    assert len(kat_a) >= 2, "Powinny być min. 2 neurony anty-manipulacji"
+    assert all(n.DOSTEPNY for n in kat_a), "Neurony A muszą być aktywne (żywy głos)"
+    assert "A" not in WAGI_REZIMU_PLANOWANE, "A już ożywiona — nie może być w PLANOWANE"
+
+
+# ─── NOWE NEURONY FAZY 2-3 ────────────────────────────────────────────────────
+
+def test_xii05_fibonacci():
+    """XII-05: cena powyżej 61.8% kanału → LONG (silny trend)."""
+    n = NeuronFibonacci()
+    w = {"CLOSE": 108, "DONCHIAN_UPPER": 110, "DONCHIAN_LOWER": 90, "CLOSE_PREV": 107}
+    s = n.interpretuj(w)
+    assert s.kierunek == "LONG"
+
+
+def test_xii07_rsi_div_bear():
+    """XII-07: cena rośnie ale RSI spada → niedźwiedzia dywergencja → SHORT."""
+    n = NeuronRSIDiv()
+    w = {"RSI_14": 60, "RSI_PREV": 70, "CLOSE": 105, "CLOSE_PREV": 100}
+    s = n.interpretuj(w)
+    assert s.kierunek == "SHORT"
+
+
+def test_xii07_rsi_div_bull():
+    """XII-07: cena spada ale RSI rośnie → bycza dywergencja → LONG."""
+    n = NeuronRSIDiv()
+    w = {"RSI_14": 40, "RSI_PREV": 30, "CLOSE": 95, "CLOSE_PREV": 100}
+    s = n.interpretuj(w)
+    assert s.kierunek == "LONG"
+
+
+def test_x12_bb_squeeze():
+    """X-12: wąskie wstęgi BB + cena w górnej połowie → LONG bias."""
+    n = NeuronBBSqueeze()
+    w = {"BB_UPPER": 101, "BB_LOWER": 99.5, "BB_MIDDLE": 100.2, "CLOSE": 100.8, "ATR_DEVIATION": 0.8}
+    s = n.interpretuj(w)
+    assert s.kierunek == "LONG"
+
+
+def test_x12_bb_brak_squeeze():
+    """X-12: szerokie wstęgi → NEUTRAL (brak ściśnięcia)."""
+    n = NeuronBBSqueeze()
+    w = {"BB_UPPER": 110, "BB_LOWER": 90, "BB_MIDDLE": 100, "CLOSE": 105, "ATR_DEVIATION": 1.5}
+    assert n.interpretuj(w).kierunek == "NEUTRAL"

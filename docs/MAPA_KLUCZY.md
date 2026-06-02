@@ -24,6 +24,7 @@
 | **X-10** | NeuronHMA | Hull MA — szybki trend | X-10 ✅ | Zgodny |
 | **X-11** | NeuronRVOL | Relative Volume — wolumen | X-11 ✅ | Zgodny |
 | **X-17** | NeuronTRIX | TRIX — momentum wygładzone | X-17 ✅ | Zgodny |
+| **X-12** | NeuronBBSqueeze | Bollinger Squeeze — detektor kompresji | X-12 ✅ | Zgodny |
 | **X-18** | NeuronDonchian | Donchian Channel — wybicia | X-18 ✅ | Zgodny |
 | **X-25** 🔱 | NeuronATRDeviation | ATR Z-score Kameleon (LONG/SHORT) | X-25 ✅ | Elitarny |
 | **X-26** 🔱 | NeuronHAScalper | Heiken Ashi + zmienność | X-26 ✅ | Elitarny |
@@ -43,6 +44,8 @@ X-19..X-24 (planowane EXP), X-27..X-30 (rezerwa)
 | **XII-02** | NeuronIchimoku | Ichimoku Cloud — trend+S/R | XII-02 w kat. = MACD ❌ | **ROZBIEŻNOŚĆ** — kat. zaktualizowany |
 | **XII-03** | NeuronEMA50_200 | EMA(50/200) Golden/Death Cross | XII-03 w kat. = Bollinger ❌ | **ROZBIEŻNOŚĆ** — kat. zaktualizowany |
 | **XII-04** | NeuronSupertrend | Supertrend — kierunek trendu | XII-04 ✅ | Zgodny |
+| **XII-05** | NeuronFibonacci | Fibonacci retracement — złota strefa | XII-05 ✅ | Zgodny |
+| **XII-07** | NeuronRSIDiv | RSI dywergencja — odwrócenia | XII-07 ✅ | Zgodny |
 
 **Planowane XII (brak kodu):**
 XII-05 Fibonacci, XII-06 SMC-OB, XII-07 RSI-Div, XII-08 OBV,
@@ -99,6 +102,19 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 | **OC-04** | NeuronExchangeNetflow | Exchange Netflow | III-04 Netflow | ❌ WYCISZONY |
 
 *Wyciszone = wymagają API (Glassnode, CryptoQuant). Katalog używa kluczy III-xx — kod używa OC-xx.*
+
+---
+
+## 🛡️ STRAŻ / ANTY-MANIPULACJA (A-XX) — KATEGORIA A
+
+| Klucz w kodzie | Klasa w kodzie | Co robi | W katalogu | Dostępny |
+|---|---|---|---|---|
+| **A-01** | NeuronStopHunt | Stop hunt / liquidity sweep (knot + powrót) | A-01 StopHunt ✅ | ✅ aktywny |
+| **A-02** | NeuronWickRejection | Odrzucenie poziomu długim knotem (pin bar) | A-02 (kat. FakeWall→A-08) | ✅ aktywny |
+
+> **Litera A ożywiona 2026-06-02.** W WAGI_REZIMU: VOLATILE ×2.0, PANIC ×3.0.
+> Dekorelacja (Prawo XVI): A-01↔A-02 r=+0.24, A↔RSI |r|<0.15 — filary nowej informacji.
+> Katalogowy A-02 FakeWall (wymaga księgi zleceń L2) przeniesiony na A-08 — czeka na feed.
 
 ---
 

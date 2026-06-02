@@ -8,3 +8,7 @@ imperium/**/wykres_biegu.png
 imperium/**/raport_biegu_*.md
 imperium/**/DZIENNIK_WYNIKOW.md
 imperium/**/dane/*.csv
+
+# Dane historyczne CSV — minutowe są DUŻE (50-90 MB), trzymane lokalnie / zewnętrznie
+dane/minutowe/*.csv
+# Dzienne (~320 KB) i godzinowe (~8 MB) — małe, śledzone w repo (NIE ignorowane)

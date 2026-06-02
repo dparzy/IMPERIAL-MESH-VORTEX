@@ -200,6 +200,10 @@
 | Igrzyska / Koloseum | `koloseum/` | ✅ aktywny |
 | BramaKalkulatora | `fundament/brama_kalkulatora.py` | ✅ aktywny |
 | KalkulatorLewara | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
+| PaperTradingEngine | `koloseum/paper_trading.py` | ✅ aktywny |
+| Dyrygent (orkiestrator cyklu end-to-end) | `koloseum/dyrygent.py` | ✅ aktywny |
+| Backtest (przejazd po historii) | `koloseum/backtest.py` | ✅ aktywny |
+| CzytnikCSV (CryptoDataDownload → bary) | `akwedukty/czytnik_csv.py` | ✅ aktywny |
 | Dywizja Strategii (model + silnik) | `legiony/strategie/baza.py` | ✅ aktywny |
 | Rejestr Strategii (Klucznik) | `legiony/strategie/rejestr_strategii.py` | ✅ aktywny |
 | Framework Adapterów (most API→rój) | `akwedukty/adaptery/baza.py` | ✅ aktywny |

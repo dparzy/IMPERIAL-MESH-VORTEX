@@ -6,6 +6,102 @@
 
 ---
 
+## 2026-06-02 | MAJOR | Warstwa strategii wpięta w decyzję — 3 tryby + pomiar (Opcja 3)
+
+### Problem (Prawo XV — utrata potencjału)
+Klucznik dobierał strategie po kluczach, ale Dyrygent ICH NIE UŻYWAŁ — decyzja szła
+z gołego głosowania neuronów. Wykryto nawet sprzeczność (bar 400: neurony LONG,
+wszystkie 3 top-strategie SHORT) zignorowaną przez system.
+
+### Zmiany kodu
+- `imperium/koloseum/dyrygent.py` — parametr `tryb`:
+  - `agregat`   — kierunek z głosowania neuronów (strategie ignorowane, stan dotychczasowy)
+  - `filtr`     — wejście tylko gdy top-strategia zgadza się z neuronami (Opcja 1)
+  - `strategia` — kierunek z top-1 strategii, neurony dają pewność (Opcja 2)
+- `imperium/koloseum/backtest.py` — `porownaj_tryby()` + CLI `--porownaj`; `bary` reużywalne
+- `tests/test_dyrygent.py` — +3 testy trybów (323/323 zielone)
+
+### POMIAR (Prawo XVI — decyzja na liczbach, nie opinii)
+| Rynek | tryb | PnL | Trades | WinRate | PF | MaxDD |
+|-------|------|-----|--------|---------|----|----|
+| BTC 1D | agregat | +32.7% | 124 | 45.2% | 1.23 | 23.8% |
+| BTC 1D | filtr | +26.5% | 135 | 45.9% | 1.16 | 22.2% |
+| BTC 1D | strategia | +11.1% | 108 | 41.7% | 1.08 | 24.1% |
+| ETH 1D | agregat | +23.8% | 160 | 43.8% | 1.09 | 26.4% |
+| ETH 1D | **filtr** | **+43.0%** | 160 | 48.1% | 1.16 | **16.3%** |
+| ETH 1D | strategia | +14.6% | 147 | 40.8% | 1.06 | 26.2% |
+
+### Wnioski (zmierzone)
+1. **`strategia` (nadrzędna) — najgorsza na obu rynkach.** Potwierdza: warstwa strategii
+   jest słabo skalibrowana, nie nadaje się jeszcze na ster. ODRZUCONA jako domyślna.
+2. **`filtr` ma najniższy MaxDD na obu rynkach** (22.2%/16.3% vs 23.8%/26.4%) i wygrywa
+   ryzykiem-do-zysku (ETH +43% przy DD 16%). Na BTC goły agregat ma wyższy surowy zwrot.
+3. Decyzja o domyślnym trybie — w gestii Cezara (return vs ryzyko). Tryby zostają w kodzie.
+
+---
+
+## 2026-06-02 | MAJOR | Backtest na PRAWDZIWYCH danych + czytnik CSV
+
+### Zmiany kodu
+- `imperium/akwedukty/czytnik_csv.py` — czytnik formatu CryptoDataDownload (Binance export):
+  pomija linię URL, odwraca malejący plik na chronologiczny, wykrywa wolumen bazowy
+  (Volume BTC/ETH) vs quote (Volume USDT). Zwraca bary zgodne z Budowniczym/Dyrygentem.
+- `imperium/koloseum/backtest.py` — przejazd Dyrygenta po historii z przesuwnym oknem.
+  NIE zagląda w przyszłość: wskaźniki liczone tylko z barów do bieżącej świecy włącznie.
+- `tests/test_czytnik_csv.py` — 7 testów (próbka inline, bez dużych plików)
+- `dane/dzienne/` + `dane/godzinowe/` — realne dane Binance BTC+ETH (Cezar wrzucił)
+
+### PIERWSZE UCZCIWE WYNIKI (bez danych syntetycznych — Prawo I)
+Dane realne Binance, dźwignia auto, SL/TP z Kalkulatora Lewara, prowizje+poślizg liczone:
+| Rynek | Okres | PnL | Trades | Win Rate | Profit Factor | Max DD |
+|-------|-------|-----|--------|----------|---------------|--------|
+| BTC 1D | 2017-2026 (3192) | **+32.7%** | 124 | 45.2% | 1.23 | 23.9% |
+| ETH 1D | 2017-2026 (3192) | **+23.8%** | 160 | 43.8% | 1.09 | 26.4% |
+| BTC 1H | ost. 5000 (~7 mies.) | **-4.3%** | 101 | 44.6% | 0.85 | 13.9% |
+
+### Uczciwa ocena (Prawo XV — nie ukrywam słabości)
+Infrastruktura działa end-to-end na realnym rynku. ALE strategia jest SŁABA:
+PF ledwo > 1 na dziennym, STRATNA na godzinowym (PF 0.85). To NIE jest gotowy system
+zarabiający — to działający szkielet do kalibracji. Buy-and-hold BTC dałby +1600%,
+my +32%. Następny etap: kalibracja wag/progów, obudzenie śpiących neuronów, lepszy dobór reżimu.
+
+### Powód
+Poprzedni "+393 USDT" był na danych SYNTETYCZNYCH (idealna linia) — nic nie znaczył.
+Teraz mamy prawdziwą informację zwrotną z rynku, na której można poprawiać Imperium.
+
+---
+
+## 2026-06-02 | MAJOR | Dyrygent — orkiestrator pełnego cyklu decyzyjnego (Faza 0 end-to-end)
+
+### Zmiany kodu
+- `imperium/koloseum/dyrygent.py` — NOWY orkiestrator spinający rozproszone klocki w jeden łańcuch:
+  bary OHLCV → Budowniczy/Brama (wskaźniki) → Legatus.fokus (kierunek/pewność/reżim) →
+  KalkulatorLewara.policz (SL/TP/dźwignia/rozmiar) → SygnalWejscia → PaperTradingEngine
+- `DecyzjaCyklu` — przejrzysty ślad każdego etapu (gdzie cykl się zakończył i dlaczego — Prawo I jawność)
+- Budowniczy wstrzykiwany (Prawo I); `wskazniki_provider` pozwala testować bez TA-Lib
+- `tests/test_dyrygent.py` — 6 testów: pusty/neutralny/silny cykl, pełny ślad, brak źródła, end-to-end z TP_HIT
+
+### Dowód działania
+Pełny cykl zweryfikowany ręcznie: rój dał LONG → Kalkulator dźwignia 10, SL/TP →
+pozycja otwarta 4210 USDT → bar dotknął TP → zamknięcie +393 USDT (+3.93%).
+Bramka ryzyka działa: przy dźwigni 20 Pretorianie wetują pozycję >50% kapitału.
+
+### Powód
+Wszystkie klocki (Budowniczy, Legatus, Kalkulator, PaperTradingEngine) istniały i były
+testowane OSOBNO, ale nic nie spinało ich w cykl. To była UTRATA POTENCJAŁU (Prawo XV):
+gotowe moduły niepodpięte do pipeline. Dyrygent domyka Fazę 0 — rój realnie podejmuje decyzje.
+
+### Symbioza
+- MANIFEST_KODU: +PaperTradingEngine, +Dyrygent
+- INDEKS_IMPERIUM (MAPA KODU): koloseum/ 🟡 Szkielet → ✅ Cykl Faza 0 aktywny
+- Testy: 307 → 313 (+6)
+
+### Otwarty wątek (do kalibracji w Fazie 1)
+`pewnosc_agregatu` Legatusa bywa ~1.0 nawet przy słabym składzie zgodnych neuronów —
+warto skalibrować (więcej neuronów = wyższa pewność, nie sama zgodność kierunku).
+
+---
+
 ## 2026-06-02 | NARZĘDZIA | Zestaw strażników spójności — audyt rozszerzony + status.py + pre-commit hook
 
 ### Nowe narzędzia

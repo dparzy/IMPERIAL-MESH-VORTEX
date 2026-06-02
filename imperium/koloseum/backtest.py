@@ -1,0 +1,158 @@
+"""
+🏟️ BACKTEST — przejazd Dyrygenta po prawdziwej historii rynku.
+
+Łączy czytnik CSV + Budowniczy + Dyrygent + PaperTradingEngine w jeden bieg:
+
+    1. Wczytaj historyczne bary (czytnik_csv)
+    2. Przesuwaj okno (np. 250 barów) świeca po świecy
+    3. W każdym kroku:
+       a) zbuduj wskaźniki z okna (Brama/TA-Lib)
+       b) Dyrygent.cykl → ewentualne wejście
+       c) engine.przetworz_bar(bieżąca świeca) → aktualizacja/zamknięcie pozycji
+    4. Na koniec: zamknij otwarte po ostatniej cenie, drukuj raport
+
+Zasada: backtest NIE zagląda w przyszłość — wskaźniki liczone TYLKO z barów
+do bieżącej świecy włącznie (okno kończy się na 'teraz'). Prawo I + uczciwość.
+
+Użycie (CLI):
+    python -m imperium.koloseum.backtest dane/dzienne/Binance_BTCUSDT_d.csv 1D
+    python -m imperium.koloseum.backtest dane/godzinowe/Binance_BTCUSDT_1h.csv 1H 500
+"""
+
+import logging
+import sys
+from typing import List, Dict, Any, Optional
+
+from imperium.akwedukty.czytnik_csv import wczytaj_csv
+from imperium.koloseum.dyrygent import Dyrygent
+from imperium.koloseum.paper_trading import PaperTradingEngine, BarData
+from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara
+
+logger = logging.getLogger("Backtest")
+
+
+def _bar_data(b: Dict[str, Any]) -> BarData:
+    return BarData(
+        timestamp=b["timestamp"], open=b["open"], high=b["high"],
+        low=b["low"], close=b["close"], volume=b["volume"],
+        symbol=b["symbol"], interwal=b.get("interwal", ""),
+    )
+
+
+def backtest(
+    sciezka: str,
+    interwal: str,
+    okno: int = 250,
+    kapital_startowy: float = 10_000.0,
+    max_barow: Optional[int] = None,
+    min_pewnosc: float = 0.55,
+    tryb: str = "agregat",
+    bary: Optional[List[Dict[str, Any]]] = None,
+) -> PaperTradingEngine:
+    """
+    Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
+
+    okno:      ile barów wstecz widzi rój przy każdej decyzji (potrzebne dla EMA_200)
+    max_barow: ogranicz liczbę przetworzonych barów (None = całość)
+    tryb:      rola warstwy strategii ("agregat" / "filtr" / "strategia")
+    bary:      opcjonalnie gotowe bary (oszczędza ponownego czytania CSV przy porównaniu trybów)
+    """
+    from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
+    from imperium.legiony.rejestr import zbuduj_legatusa
+
+    if bary is None:
+        bary = wczytaj_csv(sciezka, interwal=interwal, limit=max_barow)
+    if len(bary) <= okno:
+        raise ValueError(f"Za mało barów ({len(bary)}) dla okna {okno}")
+
+    symbol = bary[0]["symbol"]
+    legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
+    budowniczy = BudowniczyWskaznikow()
+    engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
+                                sesja_id=f"BT-{symbol}-{interwal}-{tryb}")
+    dyrygent = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(),
+                        engine=engine, budowniczy=budowniczy,
+                        min_pewnosc=min_pewnosc, tryb=tryb)
+
+    wejscia = 0
+    weta = 0
+    for i in range(okno, len(bary)):
+        biezacy = bary[i]
+        okno_barow = bary[i - okno: i + 1]   # do bieżącej świecy włącznie (bez przyszłości)
+
+        # 1. Aktualizuj otwarte pozycje bieżącą świecą
+        engine.przetworz_bar(_bar_data(biezacy))
+
+        # 2. Decyzja na podstawie okna
+        decyzja = dyrygent.cykl(symbol, okno_barow,
+                                rezim="NORMAL", timestamp=biezacy["timestamp"])
+        if decyzja.wszedl:
+            wejscia += 1
+        elif decyzja.etap in ("PRETORIANIE_WETO", "LEGATUS_WETO"):
+            weta += 1
+
+    # 3. Zamknij pozostałe otwarte po ostatniej cenie
+    ostatnia_cena = {symbol: bary[-1]["close"]}
+    engine.zamknij_wszystkie(ostatnia_cena, powod="MANUAL")
+
+    logger.info(f"[Backtest] {symbol} {interwal}: {len(bary)} barów, "
+                f"{wejscia} wejść, {weta} wet Pretorianów")
+    return engine
+
+
+def porownaj_tryby(sciezka: str, interwal: str, max_barow: Optional[int] = None,
+                   tryby=("agregat", "filtr", "strategia")) -> Dict[str, Any]:
+    """
+    Przejeżdża ten sam zestaw barów w każdym trybie i zwraca tabelę porównawczą.
+    Prawo XVI: decyzja o roli strategii podjęta na pomiarze, nie na opinii.
+    """
+    bary = wczytaj_csv(sciezka, interwal=interwal, limit=max_barow)
+    symbol = bary[0]["symbol"]
+    wyniki = {}
+    for tryb in tryby:
+        eng = backtest(sciezka, interwal, max_barow=max_barow, tryb=tryb, bary=bary)
+        st = eng.podsumowanie()
+        st.oblicz(eng.historia_zamkniec)
+        wyniki[tryb] = st
+
+    # Tabela
+    print(f"\n{'═'*78}")
+    print(f"  📊 PORÓWNANIE TRYBÓW — {symbol} {interwal} ({len(bary)} barów)")
+    print(f"{'═'*78}")
+    print(f"  {'Tryb':<12}{'PnL %':>10}{'Trades':>9}{'WinRate':>10}{'PF':>8}{'MaxDD':>9}")
+    print(f"  {'-'*70}")
+    for tryb, st in wyniki.items():
+        pnl_pct = (st.kapital_koncowy / st.kapital_startowy - 1) * 100
+        print(f"  {tryb:<12}{pnl_pct:>+9.2f}%{st.total_trades:>9}"
+              f"{st.win_rate:>9.1%}{st.profit_factor:>8.2f}{st.max_drawdown_pct:>8.1%}")
+    print(f"{'═'*78}\n")
+    return wyniki
+
+
+def main():
+    logging.basicConfig(level=logging.WARNING,
+                        format="%(asctime)s | %(levelname)s | %(message)s")
+    logging.getLogger("Rój").setLevel(logging.ERROR)
+
+    if len(sys.argv) < 3:
+        print("Użycie: python -m imperium.koloseum.backtest <plik.csv> <interwal> [max_barow] [--porownaj|tryb]")
+        sys.exit(1)
+
+    sciezka = sys.argv[1]
+    interwal = sys.argv[2]
+    max_barow = int(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[3].isdigit() else None
+
+    if "--porownaj" in sys.argv:
+        porownaj_tryby(sciezka, interwal, max_barow=max_barow)
+        return
+
+    tryb = "agregat"
+    for t in ("agregat", "filtr", "strategia"):
+        if t in sys.argv:
+            tryb = t
+    engine = backtest(sciezka, interwal, max_barow=max_barow, tryb=tryb)
+    engine.drukuj_raport()
+
+
+if __name__ == "__main__":
+    main()

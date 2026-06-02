@@ -21,6 +21,7 @@ MODULY_TESTOWE = [
     "test_doradcy", "test_paper_trading", "test_scheduler",
     "test_neurony", "test_exploratores", "test_integracja",
     "test_dekorelacja", "test_strategie", "test_adaptery", "test_spojnosc",
+    "test_dyrygent", "test_czytnik_csv",
 ]
 
 

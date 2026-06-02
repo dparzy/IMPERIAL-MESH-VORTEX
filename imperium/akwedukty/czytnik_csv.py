@@ -1,0 +1,134 @@
+"""
+📜 CZYTNIK CSV — wczytuje historyczne dane rynkowe do barów Imperium.
+
+Format docelowy: CryptoDataDownload (Binance export), np.:
+
+    https://www.CryptoDataDownload.com          ← linia 1 (URL, pomijana)
+    Unix,Date,Symbol,Open,High,Low,Close,Volume BTC,Volume USDT,tradecount
+    1779840000000,2026-05-27,BTCUSDT,75930.01,...,16877.77,1270680262.9,3367068
+    ...                                          ← dane MALEJĄCO (najnowsze na górze)
+
+Zasady:
+  • Prawo I — czytnik NIE liczy wskaźników, tylko parsuje surowe OHLCV.
+  • Dane wyjściowe SĄ chronologiczne (rosnąco wg czasu) — backtest idzie od
+    przeszłości do teraźniejszości, więc odwracamy malejący plik CDD.
+  • Wolumen bazowy: kolumna "Volume <ASSET>" (np. Volume BTC), NIE "Volume USDT".
+  • Zwraca List[dict] zgodny z BudowniczyWskaznikow i Dyrygentem.
+
+Użycie:
+    from imperium.akwedukty.czytnik_csv import wczytaj_csv
+    bary = wczytaj_csv("dane/godzinowe/Binance_BTCUSDT_1h.csv", interwal="1H")
+    # bary[0] = najstarszy, bary[-1] = najnowszy
+"""
+
+import csv
+import logging
+import os
+from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger("CzytnikCSV")
+
+# Nagłówki CryptoDataDownload (wielkość liter ignorowana przy dopasowaniu)
+_KOL_UNIX = "unix"
+_KOL_DATE = "date"
+_KOL_SYMBOL = "symbol"
+_KOL_OPEN = "open"
+_KOL_HIGH = "high"
+_KOL_LOW = "low"
+_KOL_CLOSE = "close"
+_KOL_VOL_QUOTE = "volume usdt"   # wolumen w USDT — NIE używamy jako 'volume'
+_KOL_TRADES = "tradecount"
+
+
+def _znajdz_naglowek(plik) -> tuple:
+    """
+    Pomija ewentualną linię URL i zwraca (lista_kolumn_lower, reader_ustawiony_na_dane).
+    CryptoDataDownload zaczyna od linii z 'http' — wtedy nagłówek jest w 2. linii.
+    """
+    pierwszy = plik.readline()
+    if pierwszy.strip().lower().startswith("http"):
+        linia_naglowka = plik.readline()
+    else:
+        linia_naglowka = pierwszy
+    kolumny = [k.strip().lower() for k in linia_naglowka.rstrip("\n").split(",")]
+    return kolumny
+
+
+def _indeks_wolumenu_bazowego(kolumny: List[str]) -> Optional[int]:
+    """
+    Wolumen bazowy = kolumna 'Volume <ASSET>' (np. 'volume btc'), różna od 'volume usdt'.
+    Zwraca indeks lub None.
+    """
+    for i, k in enumerate(kolumny):
+        if k.startswith("volume") and k != _KOL_VOL_QUOTE:
+            return i
+    return None
+
+
+def wczytaj_csv(sciezka: str, interwal: str = "",
+                limit: Optional[int] = None,
+                chronologicznie: bool = True) -> List[Dict[str, Any]]:
+    """
+    Wczytuje plik CSV CryptoDataDownload → lista barów OHLCV.
+
+    sciezka:        ścieżka do pliku .csv
+    interwal:       etykieta interwału dopisywana do każdego baru ("1H", "1D"...)
+    limit:          jeśli podany, zwraca tylko ostatnie N barów (po sortowaniu chronologicznym)
+    chronologicznie: True = bary[0] najstarszy, bary[-1] najnowszy (domyślnie)
+
+    Zwraca: List[dict] z kluczami:
+        timestamp (int, ms), open, high, low, close, volume (bazowy),
+        volume_quote (USDT), symbol, interwal, tradecount
+    """
+    if not os.path.exists(sciezka):
+        raise FileNotFoundError(f"Brak pliku danych: {sciezka}")
+
+    with open(sciezka, encoding="utf-8") as f:
+        kolumny = _znajdz_naglowek(f)
+
+        # Mapa nazwa_kolumny → indeks
+        idx = {k: i for i, k in enumerate(kolumny)}
+        wymagane = [_KOL_UNIX, _KOL_OPEN, _KOL_HIGH, _KOL_LOW, _KOL_CLOSE]
+        brakujace = [k for k in wymagane if k not in idx]
+        if brakujace:
+            raise ValueError(f"CSV {sciezka} — brak wymaganych kolumn: {brakujace} "
+                             f"(znalezione: {kolumny})")
+
+        i_vol = _indeks_wolumenu_bazowego(kolumny)
+        i_vol_quote = idx.get(_KOL_VOL_QUOTE)
+        i_sym = idx.get(_KOL_SYMBOL)
+        i_trades = idx.get(_KOL_TRADES)
+
+        bary: List[Dict[str, Any]] = []
+        reader = csv.reader(f)
+        for wiersz in reader:
+            if not wiersz or len(wiersz) <= idx[_KOL_CLOSE]:
+                continue
+            try:
+                bar = {
+                    "timestamp": int(float(wiersz[idx[_KOL_UNIX]])),
+                    "open":  float(wiersz[idx[_KOL_OPEN]]),
+                    "high":  float(wiersz[idx[_KOL_HIGH]]),
+                    "low":   float(wiersz[idx[_KOL_LOW]]),
+                    "close": float(wiersz[idx[_KOL_CLOSE]]),
+                    "volume": float(wiersz[i_vol]) if i_vol is not None else 0.0,
+                    "volume_quote": float(wiersz[i_vol_quote]) if i_vol_quote is not None else 0.0,
+                    "symbol": wiersz[i_sym] if i_sym is not None else "",
+                    "interwal": interwal,
+                    "tradecount": int(float(wiersz[i_trades])) if i_trades is not None and wiersz[i_trades] else 0,
+                }
+            except (ValueError, IndexError) as e:
+                logger.debug(f"[CzytnikCSV] pominięto wiersz: {e}")
+                continue
+            bary.append(bar)
+
+    # CryptoDataDownload jest malejąco → sortuj rosnąco po czasie
+    if chronologicznie:
+        bary.sort(key=lambda b: b["timestamp"])
+
+    if limit is not None and limit > 0:
+        bary = bary[-limit:] if chronologicznie else bary[:limit]
+
+    logger.info(f"[CzytnikCSV] {sciezka}: wczytano {len(bary)} barów "
+                f"({interwal or 'brak interwału'})")
+    return bary

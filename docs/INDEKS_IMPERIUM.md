@@ -83,7 +83,7 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 | `imperium/drogi/` | Drogi — wykonanie zlecenia na MEXC (Via Romana) | Order Execution | 🟡 Szkielet |
 | `imperium/biblioteki/` | Biblioteki — kronikarz.py + **pamiec_absolutna.py** (ImperiumLog, MAE/MFE, JSONL) | Logs & Memory | ✅ Gotowy |
 | `imperium/swiatynie/` | Świątynie — wykresy, dashboard, wizualizacje | Charts & Dashboard | 🟡 Szkielet |
-| `imperium/koloseum/` | Koloseum — arena backtestów, testowanie strategii | Backtesting Arena | 🟡 Szkielet |
+| `imperium/koloseum/` | Koloseum — PaperTradingEngine + **Dyrygent** (orkiestrator cyklu end-to-end: bary→Legatus→Kalkulator→pozycja) | Backtesting Arena | ✅ Cykl Faza 0 aktywny |
 | `imperium/oczy/` | Oczy — newsy, sentyment, dane on-chain | News & Sentiment | 🔴 Planowany |
 
 **Legenda:** ✅ Gotowy — działa produkcyjnie | 🟡 Szkielet — struktura istnieje, wypełnianie w toku | 🔴 Planowany — jeszcze nie rozpoczęty

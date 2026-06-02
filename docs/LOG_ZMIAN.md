@@ -6,6 +6,37 @@
 
 ---
 
+## 2026-06-02 | MAJOR | Backtest na PRAWDZIWYCH danych + czytnik CSV
+
+### Zmiany kodu
+- `imperium/akwedukty/czytnik_csv.py` — czytnik formatu CryptoDataDownload (Binance export):
+  pomija linię URL, odwraca malejący plik na chronologiczny, wykrywa wolumen bazowy
+  (Volume BTC/ETH) vs quote (Volume USDT). Zwraca bary zgodne z Budowniczym/Dyrygentem.
+- `imperium/koloseum/backtest.py` — przejazd Dyrygenta po historii z przesuwnym oknem.
+  NIE zagląda w przyszłość: wskaźniki liczone tylko z barów do bieżącej świecy włącznie.
+- `tests/test_czytnik_csv.py` — 7 testów (próbka inline, bez dużych plików)
+- `dane/dzienne/` + `dane/godzinowe/` — realne dane Binance BTC+ETH (Cezar wrzucił)
+
+### PIERWSZE UCZCIWE WYNIKI (bez danych syntetycznych — Prawo I)
+Dane realne Binance, dźwignia auto, SL/TP z Kalkulatora Lewara, prowizje+poślizg liczone:
+| Rynek | Okres | PnL | Trades | Win Rate | Profit Factor | Max DD |
+|-------|-------|-----|--------|----------|---------------|--------|
+| BTC 1D | 2017-2026 (3192) | **+32.7%** | 124 | 45.2% | 1.23 | 23.9% |
+| ETH 1D | 2017-2026 (3192) | **+23.8%** | 160 | 43.8% | 1.09 | 26.4% |
+| BTC 1H | ost. 5000 (~7 mies.) | **-4.3%** | 101 | 44.6% | 0.85 | 13.9% |
+
+### Uczciwa ocena (Prawo XV — nie ukrywam słabości)
+Infrastruktura działa end-to-end na realnym rynku. ALE strategia jest SŁABA:
+PF ledwo > 1 na dziennym, STRATNA na godzinowym (PF 0.85). To NIE jest gotowy system
+zarabiający — to działający szkielet do kalibracji. Buy-and-hold BTC dałby +1600%,
+my +32%. Następny etap: kalibracja wag/progów, obudzenie śpiących neuronów, lepszy dobór reżimu.
+
+### Powód
+Poprzedni "+393 USDT" był na danych SYNTETYCZNYCH (idealna linia) — nic nie znaczył.
+Teraz mamy prawdziwą informację zwrotną z rynku, na której można poprawiać Imperium.
+
+---
+
 ## 2026-06-02 | MAJOR | Dyrygent — orkiestrator pełnego cyklu decyzyjnego (Faza 0 end-to-end)
 
 ### Zmiany kodu

@@ -91,6 +91,17 @@ def wszystkie_strategie() -> list:
             interwaly=["1D"], rezim_preferowany="TREND_STRONG",
             dzwignia="1×–3×", rr="1:3", status="SZKIC",
         ),
+        # ── Legio XII Fulminata (Swing) — odwrócenie ────────────────────────
+        Strategia(
+            id="XII-RV-001", nazwa="BUMERANG SENATU", legion="XII", styl="RV",
+            warunki="Dywergencja RSI + Fibonacci złota strefa → odwrócenie trendu (4H/1D)",
+            zrodlo="Lawrence McMillan + klasyczna analiza techniczna",
+            neurony_wejscie=["XII-07", "XII-05"],  # RSI dywergencja + Fibonacci strefa
+            neurony_filtr=["XII-01", "V-01"],      # ADX (trend słabnie) + OBV potwierdzenie
+            neurony_wyjscie=["XII-07", "XII-04"],  # Dywergencja zanika / Supertrend zmiana
+            interwaly=["4H", "1D"], rezim_preferowany="RANGING",
+            dzwignia="1×–3×", rr="1:2.5", status="SZKIC",
+        ),
         # ── Faza 2: nowe strategie (aktywowane 2026-06-02) ───────────────────
         Strategia(
             id="X-SC-003", nazwa="BROOKS M2B", legion="X", styl="SC",

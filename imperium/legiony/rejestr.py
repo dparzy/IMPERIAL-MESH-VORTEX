@@ -27,11 +27,11 @@ from imperium.legiony.legatus import Legatus
 from imperium.legiony.neurony.momentum import (
     NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross,
     NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI,
-    NeuronTRIX, NeuronAwesome, NeuronAccelerator,
+    NeuronTRIX, NeuronAwesome, NeuronAccelerator, NeuronBBSqueeze,
 )
 from imperium.legiony.neurony.trend import (
     NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian,
-    NeuronHMA,
+    NeuronHMA, NeuronFibonacci, NeuronRSIDiv,
 )
 from imperium.legiony.neurony.wolumen import (
     NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL,
@@ -64,10 +64,10 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         # Momentum (X)
         NeuronRSI(), NeuronMACD(), NeuronBBands(), NeuronEMACross(),
         NeuronWilliamsR(), NeuronATRDeviation(), NeuronHAScalper(), NeuronStochRSI(),
-        NeuronTRIX(), NeuronAwesome(), NeuronAccelerator(),
+        NeuronTRIX(), NeuronAwesome(), NeuronAccelerator(), NeuronBBSqueeze(),
         # Trend (XII)
         NeuronADX(), NeuronIchimoku(), NeuronEMA50_200(), NeuronSupertrend(), NeuronDonchian(),
-        NeuronHMA(),
+        NeuronHMA(), NeuronFibonacci(), NeuronRSIDiv(),
         # Wolumen (V)
         NeuronOBV(), NeuronVWAP(), NeuronCVD(), NeuronVolumeAnomaly(), NeuronRVOL(),
         # Struktura (SMC/VSA)

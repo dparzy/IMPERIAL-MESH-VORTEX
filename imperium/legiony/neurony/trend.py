@@ -1,6 +1,11 @@
 """
 ⚔️ IMV-INS | Neurony Trendu — Legion XII Fulminata (Swing)
-ADX, Ichimoku, Supertrend, EMA 50/200, Parabolic SAR
+ADX, Ichimoku, Supertrend, EMA 50/200, Fibonacci, RSI Divergence, HMA, Donchian
+"""
+
+"""
+⚔️ IMV-INS | Neurony Trendu — Legion XII Fulminata (Swing)
+ADX, Ichimoku, Supertrend, EMA 50/200, Fibonacci, RSI Divergence, HMA, Donchian
 """
 
 from imperium.legiony.mikro_neuron import MikroNeuron, SygnalNeuronu
@@ -207,6 +212,144 @@ class NeuronDonchian(MikroNeuron):
         if close < lo:
             return self._bazowy_sygnal(close, "SHORT", 0.75, [f"Wybicie dołem: close={close:.2f} < kanał={lo:.2f}"])
         return self._bazowy_sygnal(close, "NEUTRAL", 0.20, [f"Cena w kanale [{lo:.2f}, {up:.2f}]"])
+
+
+class NeuronFibonacci(MikroNeuron):
+    """
+    XII-05 | Fibonacci Retracement — poziomy wsparcia/oporu.
+
+    Dla nowicjusza: Leonardo Fibonacci odkrył sekwencję liczbową (1,1,2,3,5,8...)
+    gdzie każda liczba = suma dwóch poprzednich. Rynek "magicznie" zatrzymuje się
+    na poziomach 38.2%, 50%, 61.8% poprzedniego ruchu. Dlaczego? Bo wielu traderów
+    jednocześnie patrzy na te poziomy i reaguje — to staje się self-fulfilling prophecy.
+
+    Logika:
+      Zakres ceny: DONCHIAN_UPPER (szczyt) / DONCHIAN_LOWER (dołek)
+      Złota strefa: 38.2%–61.8% od dołka (gdzie cena często "odbija")
+      Gdy close jest w złotej strefie: bias zgodny z obecnym momentum (CLOSE vs CLOSE_PREV)
+      Gdy close dokładnie na 50% (±1%): neutralny (walka bykow i niedźwiedzi)
+    """
+    KLUCZ = "XII-05"
+    LEGION = "SWING"
+    WSKAZNIK = "DONCHIAN"
+    KATEGORIA = "T"
+    WAGA = 6
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        close = wskazniki.get("CLOSE")
+        donch_hi = wskazniki.get("DONCHIAN_UPPER")
+        donch_lo = wskazniki.get("DONCHIAN_LOWER")
+        close_prev = wskazniki.get("CLOSE_PREV")
+
+        if None in (close, donch_hi, donch_lo):
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych Fibonacci."])
+
+        zakres = donch_hi - donch_lo
+        if zakres < 1e-9:
+            return self._bazowy_sygnal(close, "NEUTRAL", 0.0, ["Zakres Donchian zbyt mały."])
+
+        # Pozycja ceny w zakresie (0.0 = dołek, 1.0 = szczyt)
+        pozycja = (close - donch_lo) / zakres
+
+        # Złota strefa: 38.2%–61.8%
+        fib_382 = donch_lo + 0.382 * zakres
+        fib_618 = donch_lo + 0.618 * zakres
+        fib_500 = donch_lo + 0.500 * zakres
+
+        powody = [f"Pozycja w kanale: {pozycja:.1%} | Złota strefa: [{fib_382:.2f}, {fib_618:.2f}]"]
+
+        # Momentum cenowy (kierunek ostatniego ruchu)
+        momentum_long = close_prev is not None and close > close_prev
+        momentum_short = close_prev is not None and close < close_prev
+
+        if 0.382 <= pozycja <= 0.618:
+            # W złotej strefie — bias zgodny z momentum
+            if abs(pozycja - 0.5) < 0.05:
+                # Dokładnie na 50% — brak wyraźnego sygnału
+                powody.append(f"Cena na 50% Fibonacci ({fib_500:.2f}) — walka sił")
+                return self._bazowy_sygnal(close, "NEUTRAL", 0.20, powody)
+            if momentum_long:
+                pewnosc = 0.60 + (0.10 if pozycja < 0.5 else 0.0)
+                powody.append(f"W złotej strefie + momentum w górę → wsparcie Fibo")
+                return self._bazowy_sygnal(close, "LONG", pewnosc, powody)
+            if momentum_short:
+                pewnosc = 0.60 + (0.10 if pozycja > 0.5 else 0.0)
+                powody.append(f"W złotej strefie + momentum w dół → opór Fibo")
+                return self._bazowy_sygnal(close, "SHORT", pewnosc, powody)
+
+        elif pozycja > 0.618:
+            # Powyżej złotej strefy — trend silny, oczekuj kontynuacji
+            powody.append(f"Cena powyżej 61.8% ({fib_618:.2f}) — silny trend wzrostowy")
+            return self._bazowy_sygnal(close, "LONG", 0.55, powody)
+        else:
+            # Poniżej 38.2% — trend silny w dół
+            powody.append(f"Cena poniżej 38.2% ({fib_382:.2f}) — silny trend spadkowy")
+            return self._bazowy_sygnal(close, "SHORT", 0.55, powody)
+
+        return self._bazowy_sygnal(close, "NEUTRAL", 0.15, powody)
+
+
+class NeuronRSIDiv(MikroNeuron):
+    """
+    XII-07 | RSI Divergence — dywergencja RSI vs cena.
+
+    Dla nowicjusza: Wyobraź sobie samochód jadący pod górę. Motor (RSI) zaczyna
+    się dławić zanim auto jeszcze zatrzyma. Cena rośnie, ale "silnik" (momentum)
+    już słabnie. To właśnie dywergencja — jeden z najlepszych sygnałów odwrócenia.
+
+    Bycza dywergencja: cena robi NIŻSZY dołek, ale RSI robi WYŻSZY dołek → LONG
+    Niedźwiedzia dyw.: cena robi WYŻSZY szczyt, ale RSI robi NIŻSZY szczyt → SHORT
+
+    Uwaga: z dwóch świec (CLOSE + CLOSE_PREV, RSI + RSI_PREV) wykrywamy kierunek
+    rozbieżności. Dla pełnej dywergencji (2+ szczytów) potrzeba więcej historii —
+    tu dajemy wczesny sygnał ostrzegawczy.
+    """
+    KLUCZ = "XII-07"
+    LEGION = "SWING"
+    WSKAZNIK = "RSI_14"
+    KATEGORIA = "T"
+    WAGA = 7
+
+    _MIN_RSI_DELTA = 2.0   # Minimum zmiana RSI (żeby ignorować szum)
+    _MIN_CENA_DELTA = 0.001  # Minimum zmiana ceny (0.1%)
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        rsi = wskazniki.get("RSI_14")
+        rsi_prev = wskazniki.get("RSI_PREV")
+        close = wskazniki.get("CLOSE")
+        close_prev = wskazniki.get("CLOSE_PREV")
+
+        if None in (rsi, rsi_prev, close, close_prev):
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak danych RSI Div."])
+
+        delta_rsi = rsi - rsi_prev
+        delta_cena_pct = (close - close_prev) / (close_prev + 1e-9)
+
+        # Brak istotnej zmiany — ignoruj
+        if abs(delta_rsi) < self._MIN_RSI_DELTA or abs(delta_cena_pct) < self._MIN_CENA_DELTA:
+            return self._bazowy_sygnal(rsi, "NEUTRAL", 0.10,
+                [f"Delta RSI={delta_rsi:.1f}, cena={delta_cena_pct:.2%} — za małe do dywergencji"])
+
+        cena_rosnie = delta_cena_pct > 0
+        rsi_rosnie = delta_rsi > 0
+
+        powody = [f"RSI: {rsi_prev:.1f}→{rsi:.1f} ({delta_rsi:+.1f}) | Cena: {delta_cena_pct:+.2%}"]
+
+        if cena_rosnie and not rsi_rosnie:
+            # Cena w górę, RSI w dół → NIEDŹWIEDZIA dywergencja → SHORT
+            sila = min(0.85, 0.55 + abs(delta_rsi) / 20)
+            powody.append("🔴 Niedźwiedzia dywergencja: cena↑ ale RSI↓ — momentum słabnie")
+            return self._bazowy_sygnal(rsi, "SHORT", sila, powody)
+
+        if not cena_rosnie and rsi_rosnie:
+            # Cena w dół, RSI w górę → BYCZA dywergencja → LONG
+            sila = min(0.85, 0.55 + abs(delta_rsi) / 20)
+            powody.append("🟢 Bycza dywergencja: cena↓ ale RSI↑ — sprzedający słabną")
+            return self._bazowy_sygnal(rsi, "LONG", sila, powody)
+
+        # Brak dywergencji — sygnały zgodne
+        return self._bazowy_sygnal(rsi, "NEUTRAL", 0.10,
+            [f"Brak dywergencji: cena i RSI idą w tym samym kierunku"])
 
 
 class NeuronHMA(MikroNeuron):

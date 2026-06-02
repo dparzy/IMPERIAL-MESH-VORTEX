@@ -108,6 +108,8 @@ def zbuduj_legatusa(min_neuronow: int = 5, min_przewaga: float = 0.55,
     """
     neurony = wszystkie_neurony()
     zwiadowcy = wszyscy_zwiadowcy()
+    from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
+    strategie = wszystkie_strategie()
 
     if aktywuj_smc:
         obudzone = aktywuj_neurony_smc()
@@ -118,6 +120,7 @@ def zbuduj_legatusa(min_neuronow: int = 5, min_przewaga: float = 0.55,
         min_neuronow=min_neuronow,
         min_przewaga=min_przewaga,
         zwiadowcy=zwiadowcy,
+        strategie=strategie,
     )
 
     # Raport startowy — co śpi, co czuwa (Prawo XV — jawność potencjału)
@@ -125,7 +128,8 @@ def zbuduj_legatusa(min_neuronow: int = 5, min_przewaga: float = 0.55,
     aktywne = len(neurony) - len(niedostepne)
     logger.info(
         f"[Rejestr] Legatus gotowy: {aktywne}/{len(neurony)} neuronów aktywnych, "
-        f"{len(zwiadowcy)} zwiadowców EXP. Wyciszone (wymagają API/feed): {len(niedostepne)}"
+        f"{len(zwiadowcy)} zwiadowców EXP, {len(strategie)} strategii w bazie. "
+        f"Wyciszone (wymagają API/feed): {len(niedostepne)}"
     )
     return legatus
 

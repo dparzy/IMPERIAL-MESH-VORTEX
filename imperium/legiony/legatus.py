@@ -33,6 +33,7 @@ class RaportLegatusa:
     aktywnych_neuronow: int
     zgodnych_neuronow: int
     sygnaly: List[SygnalNeuronu] = field(default_factory=list)
+    strategie_dopasowane: list = field(default_factory=list)  # top DopasowanieStrategii
     weto: bool = False
     powod_weta: str = ""
     timestamp: float = field(default_factory=time.time)
@@ -84,17 +85,22 @@ class Legatus:
     def __init__(self, neurony: List[MikroNeuron],
                  min_neuronow: int = 5,
                  min_przewaga: float = 0.55,
-                 zwiadowcy: Optional[list] = None):
+                 zwiadowcy: Optional[list] = None,
+                 strategie: Optional[list] = None):
         """
         neurony:   lista MikroNeuronów (czytają z dict Bramy).
         zwiadowcy: lista ZwiadowcaElitarny (EXP-XX) — liczą sami z serii barów.
                    Jeśli podani, fokus() odpala ich gdy dostanie `bary`.
                    ZwiadowcaSMC dodatkowo wstrzykuje strefy → budzi SMC-01/02/03.
+        strategie: lista Strategia — baza przepisów. Jeśli podana, raport zawiera
+                   automatycznie dobrane TOP strategie do bieżących sygnałów (wizja
+                   Cezara: sygnały → najbliższa strategia). Brak → pusta lista.
         """
         self.roj = Roj(neurony)
         self.min_neuronow = min_neuronow
         self.min_przewaga = min_przewaga
         self.zwiadowcy = zwiadowcy or []
+        self.strategie = strategie or []
 
     # ── Tryb FOKUS ─────────────────────────────────────────────────────────────
 
@@ -210,6 +216,9 @@ class Legatus:
             weto = True
             powod = "Reżim PANIC — system w trybie obronnym"
 
+        # Wizja Cezara: z bieżących sygnałów dobierz najbliższą strategię z bazy
+        strategie_dopasowane = self._dobierz_strategie(sygnaly, rezim)
+
         return RaportLegatusa(
             symbol=symbol,
             tryb=tryb,
@@ -221,9 +230,25 @@ class Legatus:
             aktywnych_neuronow=len(sygnaly),
             zgodnych_neuronow=zgodnych,
             sygnaly=sygnaly,
+            strategie_dopasowane=strategie_dopasowane,
             weto=weto,
             powod_weta=powod,
         )
+
+    def _dobierz_strategie(self, sygnaly: List[SygnalNeuronu], rezim: str) -> list:
+        """
+        Most do Dywizji Strategii: mapuje sygnały po kluczu neuronu i pyta silnik
+        o TOP pasujące strategie. Brak bazy strategii → pusta lista (bez kosztu).
+        """
+        if not self.strategie:
+            return []
+        try:
+            from imperium.legiony.strategie.baza import dobierz_najlepsze
+            mapa = {s.neuron_id: s for s in sygnaly}
+            return dobierz_najlepsze(self.strategie, mapa, rezim=rezim, top=3)
+        except Exception as e:
+            logger.error(f"[Legatus] Dobieranie strategii padło: {e}")
+            return []
 
     def _dostosuj_wagi(self, sygnaly: List[SygnalNeuronu],
                        rezim: str) -> List[SygnalNeuronu]:

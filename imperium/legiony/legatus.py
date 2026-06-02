@@ -50,14 +50,26 @@ class KandydatAktywa:
 
 # Wagi reżimowe wg KATEGORII neuronu (legenda: M=Momentum T=Trend V=Zmienność
 # F=Flow/Wolumen O=On-chain L=Leverage R=Sentyment S=Struktura A=Anty-manipulacja).
+#
+# Prawo XXI — spójność kategorii:
+#   AKTYWNE kategorie w kodzie (2026-06-02): F M O R S T
+#   PLANOWANE (pre-zarejestrowane na przyszłe neurony):
+#     A = Anty-manipulacja  (brak neuronu — reguła czeka na wdrożenie)
+#     L = Leverage          (brak neuronu — reguła czeka na wdrożenie)
+#     V = Zmienność         (EXP-04/EXP-12 mają V, ale są wyciszone — reguła uśpiona)
+#   Po wdrożeniu pierwszego neuronu z KAT=A/L/V → reguła automatycznie ożyje.
 WAGI_REZIMU = {
-    "TREND_STRONG": {"T": 1.5, "M": 1.2, "O": 0.7, "L": 0.8},
-    "RANGING":      {"M": 1.5, "V": 1.3, "F": 1.2, "T": 0.5},
-    "VOLATILE":     {"A": 2.0, "L": 0.3, "_default": 0.7},
-    "PANIC":        {"A": 3.0, "R": 1.5, "_default": 0.1},
-    "NORMAL":       {},
-    "ON-CHAIN_BULLISH": {"O": 2.0, "L": 0.8},
+    "TREND_STRONG":    {"T": 1.5, "M": 1.2, "S": 1.3, "O": 0.7, "L": 0.8},
+    "RANGING":         {"M": 1.5, "F": 1.2, "T": 0.5},
+    "VOLATILE":        {"A": 2.0, "V": 1.5, "L": 0.3, "_default": 0.7},
+    "PANIC":           {"A": 3.0, "R": 1.5, "_default": 0.1},
+    "NORMAL":          {},
+    "ON-CHAIN_BULLISH":{"O": 2.0, "L": 0.8},
+    "SMC_ACTIVE":      {"S": 2.0, "F": 1.2, "T": 1.1},
 }
+
+# Kategorie planowane (pre-zarejestrowane) — nie alarmuj na nie w KROK 0
+WAGI_REZIMU_PLANOWANE = {"A", "L", "V"}
 
 
 class Legatus:

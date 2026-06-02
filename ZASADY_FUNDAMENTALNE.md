@@ -380,6 +380,127 @@ Status elitarny przyznaje się, gdy moduł spełnia **≥1 kryterium KRYTYCZNE**
 
 ---
 
+## ⚖️ PRAWO XXI — PROTOKÓŁ SPÓJNOŚCI: CHIRURGICZNA PRECYZJA 🔬
+
+> **"Żadna rozbieżność nie jest za mała. Żaden dokument nie jest za stary. Żaden klucz nie jest zbędny."**
+
+Prawo XXI nakazuje pełną inwentaryzację spójności **przed każdą zmianą kodu** i **po każdej zmianie**. Spójność to nie opcja — to warunek konieczny działania Imperium. Jeden niezsynchronizowany klucz może skierować cały rój na złą drogę.
+
+### Zakres obowiązku spójności
+
+Każda zmiana kodu musi być **zsynchronizowana we wszystkich tych miejscach jednocześnie**:
+
+```
+WARSTWA 1 — KOD (źródło prawdy nadrzędne)
+  imperium/legiony/neurony/*.py     → KLUCZ, WSKAZNIK, KATEGORIA, WAGA, DOSTEPNY, ELITARNY
+  imperium/legiony/zwiadowcy/*.py   → KLUCZ, WSKAZNIK, WYMAGA_BAROW, DOSTEPNY, ELITARNY
+  imperium/legiony/mikro_neuron.py  → pola bazowe MikroNeuronu
+  imperium/legiony/zwiadowcy/baza.py → pola bazowe ZwiadowcyElitarnego
+  imperium/legiony/rejestr.py       → wszystkie_neurony(), wszyscy_zwiadowcy(), raport_*()
+
+WARSTWA 2 — INFRASTRUKTURA (kod zależny od kodu)
+  imperium/legiony/legatus.py       → WAGI_REZIMU (tylko litery KAT które istnieją w kodzie)
+  imperium/legiony/budowniczy_wskaznikow.py → wskazniki[KEY] dla każdego aktywnego WSKAZNIK
+  imperium/fundament/brama_kalkulatora.py   → funkcje liczące każdy WSKAZNIK z Budowniczego
+
+WARSTWA 3 — DOKUMENTACJA (odzwierciedla Warstwę 1)
+  docs/MANIFEST_KODU.md  → KLUCZ = n.KLUCZ w kodzie (nie alias!), KATEGORIA, Status, WSKAZNIK
+  docs/KATALOG_NEURONOW.md → plan → stan wdrożenia
+  README.md              → liczba neuronów, testy, prawa — POLICZONE nie z pamięci
+  CLAUDE.md              → liczba praw, operacyjne nakazy
+  ZASADY_FUNDAMENTALNE.md → definicje i prawa (tutaj)
+```
+
+### Chirurgiczna Checklista Spójności (uruchamiaj po każdej zmianie)
+
+```bash
+# ── WARSTWA 1: ŻYWY ROJ ──────────────────────────────────────────────────
+python -c "
+from imperium.legiony.rejestr import wszystkie_neurony, wszyscy_zwiadowcy, raport_potencjalu, raport_elity
+n = wszystkie_neurony(); z = wszyscy_zwiadowcy()
+p = raport_potencjalu(); e = raport_elity()
+print(f'Neurony: {len(n)} | aktywne: {p[\"neurony_aktywne\"]} | wyciszone: {p[\"neurony_wyciszone\"]}')
+print(f'Zwiadowcy: {len(z)} | aktywni: {p[\"zwiadowcy_aktywni\"]} | wyciszeni: {p[\"zwiadowcy_wyciszeni\"]}')
+print(f'Elitarne (Prawo XX): {e[\"lacznie_elite\"]}')
+print('KATEGORIE:', sorted({x.KATEGORIA for x in n}))
+bad_kat = [x for x in n if x.KATEGORIA not in 'MTVFOLRSAKEGm']
+print('Nieprawidłowa KAT:', [(x.KLUCZ, x.KATEGORIA) for x in bad_kat])
+"
+
+# ── WARSTWA 2A: WAGI_REZIMU vs KAT w kodzie ─────────────────────────────
+python -c "
+from imperium.legiony.legatus import WAGI_REZIMU
+from imperium.legiony.rejestr import wszystkie_neurony
+cats = {n.KATEGORIA for n in wszystkie_neurony()}
+for rezim, mapa in WAGI_REZIMU.items():
+    dead = [k for k in mapa if k != '_default' and k not in cats]
+    if dead: print(f'UWAGA {rezim}: martwe litery KAT {dead} (żaden neuron nie ma tej kategorii)')
+print('WAGI_REZIMU: OK') if all(
+    not [k for k in m if k != '_default' and k not in cats]
+    for m in WAGI_REZIMU.values()
+) else None
+"
+
+# ── WARSTWA 2B: BUDOWNICZY vs WSKAZNIK aktywnych neuronów ────────────────
+# (wymaga talib — sprawdź czy każdy aktywny WSKAZNIK jest produkowany przez Budowniczego)
+# grep -n "wskazniki\[" imperium/legiony/budowniczy_wskaznikow.py | grep -oP '(?<=")[A-Z_0-9]+'
+
+# ── WARSTWA 3: MANIFEST vs KOD (klucze) ──────────────────────────────────
+python -c "
+import re
+from imperium.legiony.rejestr import wszystkie_neurony, wszyscy_zwiadowcy
+with open('docs/MANIFEST_KODU.md') as f: txt = f.read()
+# Klucze w tabelach 'zaimplementowanych' (sekcja NEURONY ZAIMPLEMENTOWANE)
+section = txt.split('## ⚡')[1].split('## 📋')[0] if '## ⚡' in txt else ''
+manifest_impl = set(re.findall(r'^\|\s*([A-Z][\w-]+)\s*[🔱🎖️]*\s*\|', section, re.M))
+code_keys = {n.KLUCZ for n in wszystkie_neurony()}
+only_m = manifest_impl - code_keys
+only_c = code_keys - manifest_impl
+if only_m: print('W MANIFEST, brak w kodzie:', sorted(only_m))
+if only_c: print('W kodzie, brak w MANIFEST:', sorted(only_c))
+if not only_m and not only_c: print('MANIFEST klucze: ✅ zgodne')
+"
+
+# ── WARSTWA 3: LICZBY w doc vs kod ───────────────────────────────────────
+python -c "
+import re, subprocess
+n = int(subprocess.check_output(['python','-c',
+    'from imperium.legiony.rejestr import wszystkie_neurony; print(len(wszystkie_neurony()))']).strip())
+tests = int(subprocess.check_output(['python','-c',
+    'import subprocess; r=subprocess.run([\"python\",\"tests/run_tests.py\"],capture_output=True,text=True); '
+    'import re; m=re.search(r\"(\d+)/(\d+)\",r.stdout+r.stderr); print(m.group(1) if m else 0)'],
+    capture_output=True, text=True).stdout.strip() or 0)
+with open('README.md') as f: readme = f.read()
+readme_neurons = re.findall(r'(\d+) zaimplementowane', readme)
+readme_tests   = re.findall(r'(\d+)/(\d+)', readme)
+print(f'Neurony kod={n}  README={readme_neurons}')
+print(f'Testy README={readme_tests}')
+"
+```
+
+### 9 Nienaruszalnych Reguł Spójności
+
+1. **Klucze MANIFEST = KLUCZ w kodzie** — żadnych aliasów, żadnych starych nazw, żadnych skrótów
+2. **KATEGORIA w kodzie ∈ legenda** — tylko M/T/V/F/O/L/R/S/A/K/E/G — brak "?" u aktywnych
+3. **WAGI_REZIMU używa tylko liter KAT istniejących w kodzie** — martwa litera = martwa reguła = alarm
+4. **WSKAZNIK każdego aktywnego neuronu istnieje w Budowniczym** — weryfikuj grep lub testem `test_dead_voices`
+5. **DOSTEPNY=False nie produkuje głosu** — weryfikuj lista_niedostepnych() przy starcie Roju
+6. **ELITARNY=True tylko z niepustym POWOD_ELITARNOSCI** — weryfikuj raport_elity()
+7. **Testy muszą być zielone** — każda zmiana logiki = nowe testy, push tylko gdy zielone
+8. **Liczby w README/MANIFEST policzone** — nie z pamięci, nie zaokrąglone, nie "mniej więcej"
+9. **Stan na: data = data commitu** — po każdym commicie zaktualizuj datę we wszystkich nagłówkach
+
+### Sygnatura naruszenia Prawa XXI
+
+Złamanie Prawa XXI = jakakolwiek z poniższych sytuacji:
+- KLUCZ w MANIFEST ≠ KLUCZ w kodzie
+- Litera KAT w WAGI_REZIMU, której żaden neuron nie ma (martwa reguła)
+- WSKAZNIK aktywnego neuronu nieprodukowany przez Budowniczego (martwy głos)
+- Liczba neuronów/testów/praw różna w dowolnych dwóch dokumentach
+- Commit z nieaktualnym MANIFEST/README
+
+---
+
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*
 > 🚨 *"Niewykorzystana siła to siła oddana wrogowi. Imperium nie marnuje niczego."*
 > 🗺️ *"Wódz, który nie zna własnego obozu, przegrywa bitwę przed jej początkiem."*

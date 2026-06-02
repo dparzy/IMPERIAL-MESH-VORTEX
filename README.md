@@ -26,7 +26,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **42 zaimplementowane** (30 aktywnych na OHLCV + 12 wyciszonych: czekają na API/feed) |
+| **Mikro-neurony** | **42 zaimplementowane** (30 aktywnych OHLCV + 3 budzone wewnętrznie SMC + 9 czeka na API/feed) |
 | **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |

@@ -56,6 +56,8 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 19 | `DORADCY_CARA.md` | **Rada Doradców** — Oracle/Fulmen/Iustitia/Hermes/Pythia, second opinion | ✅ Aktywny |
 | 20 | `MATRYCA_KORELACJI.md` | Kostka Rubika sygnałów — korelacje, konflikty, reżimy, wagi dynamiczne | 🔗 Link |
 | 22 | `REGULAMINY_I_MANIPULACJE.md` | Zgodność z regulaminami + 7 manipulacji do wykrywania | ✅ Aktywny |
+| 23 | `WZORZEC_OPISU.md` | **Zasada Pełnego Opisu (ZPO)** — szablon kompletnego opisu modułu/inspiracji (pełna nazwa, link, status weryfikacji) | ✅ Aktywny |
+| 24 | `REJESTR_INSPIRACJI.md` | **Rejestr inspiracji AI/ML** — jedno źródło prawdy o zewnętrznych projektach (SHARP, AgenticAITA, CogAlpha, NEXUS, Kronos) z linkami i statusem ⚠️ | ✅ Aktywny |
 
 ---
 

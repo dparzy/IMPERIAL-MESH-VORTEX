@@ -311,7 +311,7 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | A-09 | K | Intermarket DICT | Korelacje w czasie rzeczywistym: akcje/obligacje/commodities/krypto | W7 |
 | A-10 | A | Inst. Order Flow Det. | Wykrywa dystrybucję vs absorpcję instytucjonalną | W7 |
 | A-11 | E | AetherEdge KNN | KNN na 6-dim fingerprint rynku → prawdopodobieństwo kierunkowe | W7 |
-| A-12 | E | Kronos K-Line LLM | Open-source model bazowy K-line (AAAI 2026) — predykcja szeregów | W6 |
+| A-12 | E | Kronos K-Line LLM | Open-source model bazowy K-line (AAAI 2026) — predykcja szeregów · pełny opis: REJESTR_INSPIRACJI.md | W6 |
 | A-13 | R | CFGI Sentiment | Indeks sentymentu co 15min (wolumen+zmienność+dominacja+wieloryby) | W6 |
 | A-14 | R | MTPI OTHERS.D | Siła trendu całego segmentu alt (spoza top 10) — 8 sygnałów | W6 |
 | A-15 | G | Kimchi Premium | Premia koreańska BTC/ETH → rotacja kapitału azjatyckiego | W5 |
@@ -386,6 +386,18 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | ML-21 | ChaosForecast | ARIMA + teoria chaosu + ATR | Buy/Sell/Hold heurystyczny | W5 |
 | ML-22 | TradeFM | Generatywny model fundamentowy | Trade-flow i mikrostruktura rynku | W6 |
 | ML-23 | AutoQuant | Autonomiczna pętla LLM | Iteracyjna ewolucja strategii FreqTrade | W5 |
+
+### 🔭 Inspiracje zewnętrzne — pełne opisy w `docs/REJESTR_INSPIRACJI.md`
+
+> Projekty badawcze AI/ML z pełnymi nazwami, linkami i statusem weryfikacji (Zasada Pełnego Opisu).
+> ⚠️ Linki niezweryfikowane — patrz REJESTR_INSPIRACJI.md (Prawo I: nie udajemy weryfikacji).
+
+| Klucz | Pełna nazwa | Źródło | Rola |
+|-------|-------------|--------|------|
+| ML-24 | SHARP — Self-Evolving Rubric Policy | arxiv.org/abs/2605.06822 | Warstwa audytu nad Cesarzem (W-009) |
+| ML-25 | AgenticAITA — Multi-Agent Reasoning | arxiv.org/abs/2605.12532 | Wzorzec Senatu (debata 4 ról) |
+| ML-26 | CogAlpha — Cognitive Alpha Factory | arxiv.org/abs/2511.18850 | Auto-generowanie neuronów (W-024) |
+| ML-27 | NEXUS — Self-Evolving Market AI | github.com/The-R4V3N/Nexus | Wzorzec autonomii Faza 4 |
 
 ---
 

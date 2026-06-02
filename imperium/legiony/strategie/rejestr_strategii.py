@@ -164,6 +164,16 @@ def wszystkie_strategie() -> list:
             interwaly=["M15", "1H"], rezim_preferowany="VOLATILE",
             dzwignia="2×–5×", rr="1:2", status="SZKIC",
         ),
+        Strategia(
+            id="IMV-DEF-002", nazwa="MUR KONTRWYWIADU", legion="IMV", styl="RV",
+            warunki="Pranie wolumenu + wzorzec Barta — kontra na fałszywą aktywność MM (VOLATILE/niska płynność)",
+            zrodlo="IMV (syntetyczna) — anty-manipulacja vol+płynność",
+            neurony_wejscie=["A-03", "A-05"],   # Wash Volume + Bart Pattern (kontrariański)
+            neurony_filtr=["X-11", "V-02"],     # RVOL (anomalia wolumenu) + VWAP poziom
+            neurony_wyjscie=["A-05", "X-25"],   # Bart wraca do normy / ATR-dev normalizuje
+            interwaly=["M15", "1H"], rezim_preferowany="VOLATILE",
+            dzwignia="2×–4×", rr="1:2", status="SZKIC",
+        ),
     ]
 
 

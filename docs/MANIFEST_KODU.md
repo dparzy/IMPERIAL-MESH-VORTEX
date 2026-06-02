@@ -7,7 +7,9 @@
 
 **Stan na:** 2026-06-02 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 42 neurony (zarejestrowane w roju) + 12 zwiadowców = **54 modułów w kodzie**
-**Aktywne / wyciszone:** 30 aktywnych (czyste OHLCV) + 12 wyciszonych (API/feed)
+**Aktywne / wyciszone:** 30 aktywnych (czyste OHLCV) + 12 wyciszonych, z czego:
+  • **3 budzone WEWNĘTRZNIE** (SMC-01/02/03) — liczą z barów przez most EXP-05, ożywają w żywym Legatusie (`zbuduj_legatusa`), **bez żadnego API**
+  • **9 wymaga ZEWNĘTRZNEGO API/feedu** (V-03 CVD, PSY-01..04, OC-01..04) — wybudzą się przez adapter API (mechanizm gotowy)
 **Elitarne (Prawo XX):** 14 (2 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
 **Do wdrożenia:** 257 neuronów
@@ -92,9 +94,15 @@
 
 | KLUCZ | Klasa | KAT | WAGA | Status | WSKAZNIK (Brama) | 🎖️ |
 |-------|-------|-----|------|--------|-----------------|-----|
-| SMC-01 | NeuronOrderBlock | S | 8 | 🔇 wyciszony (brak danych SMC z Bramy) | ORDER_BLOCK | — |
-| SMC-02 | NeuronFVG | S | 7 | 🔇 wyciszony (brak danych SMC z Bramy) | FVG | — |
-| SMC-03 | NeuronBOS | S | 9 | 🔇 wyciszony (brak danych SMC z Bramy) | BOS_MSS | — |
+| SMC-01 | NeuronOrderBlock | S | 8 | 🌙 budzony wewnętrznie (most EXP-05) | ORDER_BLOCK | — |
+| SMC-02 | NeuronFVG | S | 7 | 🌙 budzony wewnętrznie (most EXP-05) | FVG | — |
+| SMC-03 | NeuronBOS | S | 9 | 🌙 budzony wewnętrznie (most EXP-05) | BOS_MSS | — |
+
+> **🌙 = budzony wewnętrznie (NIE wymaga API).** SMC-01/02/03 są `DOSTEPNY=False` w stanie
+> statycznym, ale `zbuduj_legatusa()` wywołuje `aktywuj_neurony_smc()` → `DOSTEPNY=True`,
+> a EXP-05 `wstrzyknij()` dostarcza strefy OB/FVG/BOS z **samych barów OHLCV**.
+> W żywym pipeline te 3 neurony GŁOSUJĄ w pełni. Audyt statyczny liczy je jako wyciszone
+> tylko dlatego, że bada klasy przed zbudowaniem Legatusa — to NIE jest brak danych z API.
 | VSA-01 | NeuronVSA | F | 8 | ✅ aktywny | VSA | — |
 
 ### Plik: `neurony/psychologia.py`
@@ -206,7 +214,7 @@
 |---------|------|------|
 | `Strategia` (model) | `strategie/baza.py` | przepis: które neurony, w jakiej roli (wejście/filtr/wyjście) |
 | `dobierz_najlepsze()` | `strategie/baza.py` | silnik: sygnały → top-3 pasujące strategie + kierunek |
-| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 7 strategii zmapowanych na ŻYWE klucze kodu |
+| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 15 strategii zmapowanych na ŻYWE klucze kodu |
 | **Wpięcie w Legatusa** | `legiony/legatus.py` | `RaportLegatusa.strategie_dopasowane` — Generał zwraca dobrane strategie w każdym raporcie |
 
 **Klucznik (strażnik spójności):** audyt Warstwa 4 (`narzedzia/audyt_spojnosci.py`)

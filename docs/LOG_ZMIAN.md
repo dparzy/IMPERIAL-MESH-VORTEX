@@ -6,6 +6,56 @@
 
 ---
 
+## 2026-06-02 | MAJOR | Namiestnik (Regime-Aware Gating Network) — Faza 1
+
+### Kontekst
+Deep-research: Volatility-Adaptive MoE (arXiv:2508.02686), Adaptive Regime-Aware (arXiv:2603.19136),
+Meta-Learning Optimal Mixture (arXiv:2505.03659). Cel: pełna autonomia + samoadaptacja systemu.
+
+### Co zostało wdrożone
+- **`imperium/koloseum/namiestnik.py`** — Regime-Aware Gating Network (Namiestnik):
+  - `UstawieniaRezimu` — dataclass: tryb, lewar_factor, prog_pewnosci, czy_grac, wagi_override
+  - `_TABLICA` — deterministyczne mapowanie 8 reżimów → parametry (Faza 1)
+  - `Namiestnik.decyduj(rezim)` → UstawieniaRezimu z fallbackiem (nigdy nie rzuca)
+  - `Namiestnik.skaluj_dzwignie(base, rezim)` → lewar_factor × auto_dzwignia
+  - `get_namiestnik()` — singleton dla Dyrygenta
+  - RANGING + PANIC → `czy_grac=False` (świadoma cisza, nie błąd)
+  - TREND_STRONG → tryb filtr + lewar×1.2 (najsilniejszy sygnał)
+
+- **`imperium/koloseum/dyrygent.py`** — integracja Namiestnika:
+  - `Dyrygent.__init__` przyjmuje `namiestnik: Optional[Namiestnik]`
+  - `Dyrygent.zbuduj()` automatycznie tworzy Namiestnika (`get_namiestnik()`)
+  - W `cykl()`: przed Legatusem → Namiestnik → {tryb_aktywny, prog_aktywny, lewar_factor}
+  - CISZA (czy_grac=False) → `DecyzjaCyklu("NAMIESTNIK_CISZA", False, powod=opis)`
+  - Dźwignia: auto_dzwignia → Namiestnik.skaluj_dzwignie → plan.policz (skalowana)
+  - Backward compatible: `namiestnik=None` → zachowanie jak wcześniej (tryb statyczny)
+
+- **`tests/test_namiestnik.py`** — 12 nowych testów
+- **`tests/run_tests.py`** — dodano `test_namiestnik`
+
+### Dowody empiryczne (Prawo XVI)
+| Reżim | Efekt |
+|-------|-------|
+| TREND_STRONG | tryb=filtr, lewar×1.2, prog=55% → +43% ETH 1D (wcześniejszy backtest) |
+| RANGING | cisza (czy_grac=False) → zero fałszywych sygnałów |
+| PANIC | cisza + próg 90% → ochrona kapitału |
+| VOLATILE | tryb=strategia, lewar×0.5 → Klucznik dobiera breakout |
+
+### Testy
+338/338 zielone (326→338: +12 nowych testów Namiestnika)
+
+### Pliki zmodyfikowane
+- `imperium/koloseum/namiestnik.py` (NOWY)
+- `imperium/koloseum/dyrygent.py`
+- `tests/test_namiestnik.py` (NOWY)
+- `tests/run_tests.py`
+- `docs/MANIFEST_KODU.md`
+- `docs/REJESTR_INSPIRACJI.md` (ML-30..33 dodane)
+- `docs/LOG_ZMIAN.md`
+- `README.md`
+
+---
+
 ## 2026-06-02 | MAJOR | Detektor lookahead-bias (Freqtrade LA-01) + weryfikacja bazy DeepSeek
 
 ### Kontekst (sesja "tryb agregat/strategia")

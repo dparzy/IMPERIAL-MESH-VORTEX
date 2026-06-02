@@ -28,6 +28,10 @@
 | 6 | LA-01 | Freqtrade lookahead-analysis | freqtrade.io/en/stable/lookahead-analysis | ✅ **WDROŻONY** | Detektor lookahead-bias w backteście |
 | 7 | ML-28 | MRC — Market Regime Council (Shapley) | arxiv.org/abs/2605.24490 | ✅ zweryfikowany | Dynamiczne wagi agentów (plan) |
 | 8 | ML-29 | TradingAgents — Multi-Agent LLM | arxiv.org/abs/2412.20138 | ✅ zweryfikowany | Wzorzec Senatu/ról (referencja) |
+| 9 | ML-30 | Volatility-Adaptive MoE (Adaptive Market Intelligence) | arxiv.org/abs/2508.02686 | ✅ zweryfikowany | **WDROŻONY** jako Namiestnik TABLICA |
+| 10 | ML-31 | Adaptive Regime-Aware Stock Prediction (Transformer+RL) | arxiv.org/abs/2603.19136 | ✅ zweryfikowany | Wzorzec dla Namiestnik Faza 2 |
+| 11 | ML-32 | Meta-Learning Optimal Mixture of Strategies | arxiv.org/abs/2505.03659 | ✅ zweryfikowany | Wzorzec MAML dla Namiestnik Faza 3 |
+| 12 | ML-33 | NautilusTrader — Rust+Python event-driven | github.com/nautechsystems/nautilus_trader | ✅ zweryfikowany | Wzorzec architektury (referencja) |
 
 > **Uwaga:** ML-24..27 to NOWE klucze rezerwowe (dodane 2026-06-02). A-12 Kronos był już w katalogu
 > (`KATALOG_NEURONOW.md` linia 314) — tu dostaje pełny opis i link.

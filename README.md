@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-03 · **Testy:** 388/388 zielone · **Faza:** Namiestnik Regime + Timeframe-Aware (styl SCALP/SWING/INVEST, futures/spot, lewar_cap).
+> **Stan na:** 2026-06-03 · **Testy:** 390/390 zielone · **Faza:** Namiestnik Regime + Timeframe-Aware (styl SCALP/SWING/INVEST, futures/spot, lewar_cap).
 
 ---
 
@@ -34,7 +34,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
 | **Status elitarny** | **14 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26 + 12 zwiadowców |
-| **Testy** | `python tests/run_tests.py` → **388/388** ✅ |
+| **Testy** | `python tests/run_tests.py` → **390/390** ✅ |
 
 **Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 46) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
@@ -82,7 +82,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ## 🧪 Uruchomienie testów
 
 ```bash
-python tests/run_tests.py     # 388/388, bez zależności zewnętrznych
+python tests/run_tests.py     # 390/390, bez zależności zewnętrznych
 ```
 
 ---

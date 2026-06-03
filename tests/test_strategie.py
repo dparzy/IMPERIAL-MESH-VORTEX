@@ -115,6 +115,25 @@ def test_dopasowanie_pomija_wyciszone_nie_karze():
     assert d.wynik > 0.0
 
 
+def test_dopasowanie_wyciszone_filtry_nie_karza():
+    """Strategia z filtrami, ale WSZYSTKIE filtry wyciszone → brak kary (Prawo XV).
+    Wynik musi być równy strategii bez filtrów przy tych samych wejściach."""
+    we = ["XII-03", "XII-04"]
+    sygnaly = {"XII-03": _syg("XII-03", "LONG", 0.9), "XII-04": _syg("XII-04", "LONG", 0.9)}
+
+    # A: filtry zdefiniowane, ale nieobecne w sygnałach (wyciszone)
+    strat_filtr = Strategia(id="T-F", nazwa="Z filtrem", legion="X", styl="TR",
+                            warunki="t", neurony_wejscie=we, neurony_filtr=["V-01", "V-02"])
+    # B: brak filtrów w ogóle
+    strat_bez = Strategia(id="T-B", nazwa="Bez filtra", legion="X", styl="TR",
+                          warunki="t", neurony_wejscie=we, neurony_filtr=[])
+
+    d_filtr = dopasuj_strategie(strat_filtr, sygnaly)
+    d_bez = dopasuj_strategie(strat_bez, sygnaly)
+    assert d_filtr.wynik == d_bez.wynik, \
+        f"Wyciszone filtry karzą: {d_filtr.wynik} ≠ {d_bez.wynik}"
+
+
 def test_dopasowanie_konflikt_kierunku():
     """Gdy wejścia idą w przeciwne strony — wygrywa silniejszy kierunek."""
     strat = Strategia(

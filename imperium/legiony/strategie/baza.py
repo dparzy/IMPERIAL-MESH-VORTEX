@@ -123,11 +123,15 @@ def dopasuj_strategie(strategia: Strategia, sygnaly: Dict[str, object],
     # 2) Potwierdzenie FILTRÓW (muszą iść w tym samym kierunku)
     kier_f, _, _, fn_l, fn_s, n_akt_f = _kierunek_i_sila(strategia.neurony_filtr, sygnaly)
     potwierdzen = (fn_l if kier == "LONG" else fn_s)
-    if strategia.neurony_filtr:
-        filtr_frakcja = potwierdzen / max(1, n_akt_f) if n_akt_f else 0.5
+    if strategia.neurony_filtr and n_akt_f:
+        filtr_frakcja = potwierdzen / n_akt_f
         powody.append(f"Filtr: {potwierdzen}/{n_akt_f} potwierdza {kier}")
     else:
-        filtr_frakcja = 1.0  # brak filtrów = brak warunku
+        # Brak filtrów LUB wszystkie wyciszone → brak warunku.
+        # Prawo XV: nieobecny sygnał NIE karze strategii (filtr_frakcja=1.0).
+        filtr_frakcja = 1.0
+        if strategia.neurony_filtr:
+            powody.append("Filtr: wszystkie wyciszone — neutralnie (bez kary)")
 
     # 3) Bonus reżimu — strategia w swoim żywiole
     bonus_rezim = 1.0

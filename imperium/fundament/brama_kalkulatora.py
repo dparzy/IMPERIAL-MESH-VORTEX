@@ -149,7 +149,9 @@ def _py_accelerator(high, low, fast: int = 5, slow: int = 34, sma_ac: int = 5):
     Mierzy PRZYSPIESZENIE momentum (2. pochodna ceny) — wyprzedza AO.
     Zwraca (AC_last, AC_prev). Bez TA-Lib — czysta matematyka."""
     med = [(h + l) / 2 for h, l in zip(high, low)]
-    potrzeba = slow + sma_ac + 1
+    # Najgłębszy SMA(slow) przy najwcześniejszym indeksie AO (n−sma_ac−1) wymaga
+    # n ≥ slow + sma_ac. Bez nadmiarowego +1 (off-by-one opóźniał wynik o 1 bar).
+    potrzeba = slow + sma_ac
     if len(med) < potrzeba:
         return None, None
 

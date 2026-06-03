@@ -617,6 +617,17 @@ def test_brama_audyt_zrodlo_pure_python():
     assert r_rsi.source == SOURCE_TAG, "RSI musi pozostać TA-Lib"
 
 
+def test_brama_accelerator_warmup_dokladny():
+    """AC: potrzebuje DOKŁADNIE slow+sma_ac świec (off-by-one naprawiony)."""
+    from imperium.fundament.brama_kalkulatora import _py_accelerator
+    import random
+    random.seed(1)
+    h = [100 + random.gauss(0, 2) for _ in range(39)]  # slow=34 + sma_ac=5 = 39
+    l = [v - 1 for v in h]
+    assert _py_accelerator(h, l)[0] is not None, "39 świec wystarcza (slow+sma_ac)"
+    assert _py_accelerator(h[:38], l[:38])[0] is None, "38 < 39 → None"
+
+
 def test_v14_choppiness_trend():
     """V-14: CHOP < 38.2 → silny trend → LONG."""
     s = NeuronChoppiness().interpretuj({"CHOPPINESS_14": 30.0})

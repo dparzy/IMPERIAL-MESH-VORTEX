@@ -173,8 +173,13 @@ def audyt() -> tuple:
             bledy.append(f"[W4] Strategie wskazują WYCISZONE neurony (martwy głos): {sorted(wyciszone)}")
 
         info.append(f"Strategie: {len(wszystkie_strategie())} (klucze: {len(klucze_strat)}, Klucznik spójny)")
-    except ImportError:
-        pass  # moduł strategii opcjonalny — brak = brak warstwy 4
+    except ModuleNotFoundError as e:
+        # Tylko BRAK modułu strategii jest dopuszczalny (warstwa 4 opcjonalna).
+        # Inny brakujący moduł (np. zależność strategii padła) = realna awaria.
+        if e.name and e.name.startswith("imperium.legiony.strategie"):
+            pass
+        else:
+            bledy.append(f"[W4] Błąd importu w warstwie strategii: {e}")
     except Exception as e:
         bledy.append(f"[W4] Błąd sprawdzania Klucznika strategii: {e}")
 

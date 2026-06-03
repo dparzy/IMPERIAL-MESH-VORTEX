@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-06-03 | FIX | Poprawki recenzji PR (cubic) #3 — filtr/AC/audyt W4/MANIFEST
+
+### Kontekst
+Trzecia tura recenzji PR — 4 uwagi. Wszystkie zweryfikowane jako trafne i naprawione.
+
+### Naprawione (kod + testy regresyjne)
+- **baza.py (filtr nie karze):** strategia z filtrami, ale wszystkie wyciszone
+  (`n_akt_f==0`) dostawała `filtr_frakcja=0.5` → kara mimo komentarza „nie karzemy
+  za wyciszone". Poprawiono na `1.0` (jak brak filtrów). Prawo XV.
+- **brama (AC off-by-one):** `_py_accelerator` wymagał `slow+sma_ac+1` świec, choć
+  najgłębszy SMA potrzebuje `slow+sma_ac`. Usunięto `+1` → wynik o bar wcześniej.
+- **audyt W4 (maskowanie importu):** `except ImportError: pass` ukrywał KAŻDY błąd
+  importu. Zawężono do `ModuleNotFoundError` modułu strategii; inne → błąd audytu.
+- **MANIFEST (per-legion):** X Equestris pokazywał 7 zaimpl./19 do wdrożenia mimo
+  dodania X-09/X-10. Poprawiono na 9/17 (spójne z RAZEM 46/253).
+
+### Testy regresyjne
+- `test_brama_accelerator_warmup_dokladny` — AC przy dokładnie slow+sma_ac.
+- `test_dopasowanie_wyciszone_filtry_nie_karza` — wynik = strategia bez filtrów.
+
+### Stan
+- Testy: 387/387 (+2). Audyt: pełna harmonia.
+
+---
+
 ## 2026-06-03 | FIX | Poprawki recenzji PR (cubic) #2 — hook staged-only + audyt W6 'Stan na:'
 
 ### Kontekst

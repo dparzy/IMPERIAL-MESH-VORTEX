@@ -322,6 +322,37 @@ def audyt() -> tuple:
     except Exception as e:
         bledy.append(f"[W8] Błąd sprawdzania świeżości LOG_ZMIAN: {e}")
 
+    # ── WARSTWA 9: KATALOG_STRATEGII — klucze zaimplementowanych = kod ───────
+    # Prawo XIX/XXI: opis strategii w katalogu NIE może cytować kluczy neuronów,
+    # których dana strategia nie używa w kodzie (martwe/stare klucze mylą czytelnika).
+    try:
+        from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
+        kat = _czytaj("docs/KATALOG_STRATEGII.md")
+        code_keys = {s.id: (set(s.neurony_wejscie) | set(s.neurony_filtr)
+                            | set(s.neurony_wyjscie)) for s in wszystkie_strategie()}
+        impl_ids = set(code_keys)
+        # Podziel katalog na bloki "### ID ..." i sprawdź klucze w bloku.
+        bloki = re.split(r"\n### ", kat)
+        key_pat = re.compile(r"\b((?:X|XII|VI|V|A|PSY|III|OC|SMC)-\d{2,3})\b")
+        rozjazdy = []
+        for blk in bloki:
+            m = re.match(r"([A-Z0-9-]+)", blk)
+            if not m or m.group(1) not in impl_ids:
+                continue
+            sid = m.group(1)
+            cytowane = set(key_pat.findall(blk)) - {sid}
+            obce = cytowane - code_keys[sid]
+            if obce:
+                rozjazdy.append(f"{sid}: obce klucze {sorted(obce)}")
+        if rozjazdy:
+            bledy.append("[W9] KATALOG_STRATEGII cytuje klucze spoza kodu "
+                         f"(zaimplementowane strategie): {rozjazdy}")
+    except ModuleNotFoundError as e:
+        if not (e.name and e.name.startswith("imperium.legiony.strategie")):
+            bledy.append(f"[W9] Błąd importu strategii: {e}")
+    except Exception as e:
+        bledy.append(f"[W9] Błąd sprawdzania kluczy KATALOG_STRATEGII: {e}")
+
     return bledy, info
 
 

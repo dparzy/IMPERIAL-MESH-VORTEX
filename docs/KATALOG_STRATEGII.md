@@ -64,18 +64,17 @@ Każda strategia zawiera:
 **Interwał:** M5
 **Warunki:** ADX > 25, wyraźny trend jednokierunkowy
 
-**Neurony WEJŚCIE (wszystkie muszą być zgodne):**
-- `X-01` EMA(9/21) cross → kierunek trendu
-- `X-02` StochRSI < 20 (LONG) lub > 80 (SHORT) → momentum ekstremum
-- `X-05` OrderFlow — Bid/Ask Imbalance → potwierdzenie presji
+**Neurony WEJŚCIE (klucze = kod):**
+- `X-05` EMA(9/21) cross → kierunek trendu
+- `X-02` StochRSI < 20 (LONG) / > 80 (SHORT) → momentum ekstremum
 
-**Neurony FILTR (minimum 2/3 potwierdzenia):**
-- `X-03` CVD → kto kontroluje rynek
-- `X-04` VWAP → cena powyżej/poniżej VWAP
+**Neurony FILTR:**
+- `V-02` VWAP → cena powyżej/poniżej VWAP
+- `XII-01` ADX → siła trendu (>25 potwierdza scalp)
 
 **Neurony WYJŚCIE:**
-- `X-06` ATR×1.5 → dynamiczny stop-loss
-- StochRSI > 70 (dla LONG) → sygnał wyjścia
+- `X-02` StochRSI w przeciwnym ekstremum → sygnał wyjścia
+- `X-25` ATR-Deviation 🔱 → z-score ceny / dynamiczny stop
 
 **Dźwignia:** 5×–10×
 **R:R:** minimum 1:2
@@ -88,17 +87,16 @@ Każda strategia zawiera:
 **Interwał:** M5, M15
 **Warunki:** Zakres dzienny, ruch od VWAP
 
-**Neurony WEJŚCIE:**
-- `X-04` VWAP Bounce — cena odbija od VWAP
+**Neurony WEJŚCIE (klucze = kod):**
+- `V-02` VWAP Bounce — cena odbija od VWAP
 - `X-02` StochRSI w ekstremum w momencie odbicia
-- `X-05` OrderFlow — presja zgodna z odbiciem
 
 **Neurony FILTR:**
-- `X-01` EMA(9/21) — trend powinien wspierać odbicie
+- `X-05` EMA(9/21) — trend powinien wspierać odbicie
 
 **Neurony WYJŚCIE:**
-- Powrót do VWAP z przeciwnej strony
-- `X-06` ATR stop
+- `V-02` Powrót do VWAP z przeciwnej strony
+- `X-25` ATR-Deviation 🔱 → z-score / stop
 
 **Dźwignia:** 3×–7×
 **R:R:** 1:1.5 minimum
@@ -109,21 +107,24 @@ Każda strategia zawiera:
 ## ⚖️ STRATEGIE LEGIO XII FULMINATA (Swing, 4H–1D)
 
 ### XII-TR-001 | "ZŁOTY ORZEŁ" | Golden Cross Swing
-**Twórca:** Klasyczna strategia giełdowa (Golden Cross)
+**Twórca:** Klasyka analizy technicznej (Golden Cross — domena publiczna, brak
+pojedynczego autora; popularyzowane na indeksach giełdowych od dekad).
 **Interwał:** 4H, 1D
-**Warunki:** EMA(50) przebija EMA(200) od dołu (Golden Cross)
+**Warunki:** EMA(50) przebija EMA(200) od dołu (Golden Cross).
+> ⚠️ **Wariant EMA, nie oryginalny SMA:** kanoniczny Golden Cross liczy się na
+> **SMA** 50/200. Nasz neuron `XII-03` używa **EMA** (szybszy, bardziej reaktywny
+> wariant) — świadomy wybór, nie błąd. To odstępstwo od literalnego oryginału.
 
-**Neurony WEJŚCIE:**
-- `XII-01` EMA(50/200) Golden Cross → główny sygnał
-- `XII-04` Supertrend LONG → potwierdzenie
-- `XII-08` OBV rośnie → wolumen potwierdza
+**Neurony WEJŚCIE (klucze = kod):**
+- `XII-03` EMA(50/200) Golden Cross → główny sygnał
+- `XII-04` Supertrend LONG → potwierdzenie kierunku
 
 **Neurony FILTR:**
-- `XII-02` MACD histogram > 0 → momentum rośnie
-- `XII-07` RSI bez dywergencji niedźwiedzich
+- `XII-01` ADX → siła trendu (filtruje słabe przecięcia)
+- `V-01` OBV → wolumen potwierdza akumulację
 
 **Neurony WYJŚCIE:**
-- `XII-01` Death Cross lub EMA(50) ponownie poniżej EMA(200)
+- `XII-03` Death Cross — EMA(50) ponownie poniżej EMA(200)
 - `XII-04` Supertrend zmienia kierunek
 
 **Dźwignia:** 1×–3× (swing — ostrożnie)
@@ -137,18 +138,17 @@ Każda strategia zawiera:
 **Interwał:** 4H
 **Warunki:** Wyraźna dywergencja RSI przy ekstremach
 
-**Neurony WEJŚCIE:**
-- `XII-07` RSI + ukryta dywergencja → główny sygnał odwrócenia
-- `XII-05` Fibonacci S/R — cena na kluczowym poziomie
-- `XII-06` SMC — CHoCH (Change of Character) potwierdza
+**Neurony WEJŚCIE (klucze = kod):**
+- `XII-07` RSI-Divergence → główny sygnał odwrócenia
+- `XII-05` Fibonacci/Donchian S/R — cena na kluczowym poziomie
 
 **Neurony FILTR:**
-- `XII-03` Bollinger — kompresja zakończona (squeeze release)
-- `XII-08` OBV — wolumen potwierdzający odwrócenie
+- `XII-01` ADX → siła/wygasanie trendu (kontekst odwrócenia)
+- `V-01` OBV — wolumen potwierdzający odwrócenie
 
 **Neurony WYJŚCIE:**
-- RSI powraca do strefy neutralnej (40–60)
-- `XII-05` Kolejny poziom Fibonacci jako cel
+- `XII-07` RSI powraca do strefy neutralnej (40–60)
+- `XII-04` Supertrend zmienia kierunek
 
 **Dźwignia:** 2×–5×
 **R:R:** 1:2.5
@@ -161,18 +161,17 @@ Każda strategia zawiera:
 **Interwał:** 4H, 1D
 **Warunki:** BB squeeze (ściskanie), następnie gwałtowne wybicie
 
-**Neurony WEJŚCIE:**
-- `XII-03` Bollinger Squeeze → kompresja zmienności
-- `XII-04` Supertrend + ADX rosnący → kierunek wybicia
-- `XII-08` OBV wybicie → wolumen potwierdza
+**Neurony WEJŚCIE (klucze = kod):**
+- `X-04` Wstęgi Bollingera → kompresja/wybicie zmienności
+- `X-18` Donchian → wybicie max/min zakresu
 
 **Neurony FILTR:**
-- `XII-01` EMA(50/200) → ogólny trend (wchodzimy w kierunku trendu)
-- `XII-02` MACD — zgodny z kierunkiem wybicia
+- `XII-04` Supertrend → kierunek wybicia (kanał ATR)
+- `V-01` OBV → wolumen potwierdza wybicie
 
 **Neurony WYJŚCIE:**
-- BB rozszerza się do normalnego zakresu
-- Momentum MACD słabnie
+- `X-04` BB rozszerza się do normalnego zakresu
+- `X-03` MACD — momentum słabnie
 
 **Dźwignia:** 3×–8×
 **R:R:** 1:2
@@ -287,18 +286,23 @@ Każda strategia zawiera:
 **Interwał:** 4H, 1D
 **Warunki:** Wyraźna chmura Ichimoku, cena powyżej/poniżej
 
-**Neurony kluczowe:**
-- `XII-TR-ICH` *(planowany)* Ichimoku Cloud pozycja
-- `XII-01` EMA trend → zgodność z chmurą
-- `XII-08` OBV → wolumenowe potwierdzenie
-- `X-02` StochRSI → timing wejścia
+**Neurony WEJŚCIE (klucze = kod):**
+- `XII-02` Ichimoku → pozycja względem chmury (Kumo)
+- `X-05` EMA(9/21) cross → timing/kierunek wejścia
+
+**Neurony FILTR:**
+- `V-01` OBV → wolumenowe potwierdzenie
+- `X-02` StochRSI → timing ekstremum
+
+**Neurony WYJŚCIE:**
+- `XII-02` Ichimoku → cena wraca do chmury
+- `XII-04` Supertrend zmienia kierunek
 
 **Sygnały Ichimoku:**
 - TK Cross (Tenkan-Kijun) + powyżej chmury → LONG
-- Chikou powyżej historycznej ceny → potwierdzenie
 - Kumo (chmura) cienka → słabszy sygnał
 
-**Status:** SZKIC — wymaga nowego neuronu Ichimoku
+**Status:** SZKIC (neuron `XII-02` Ichimoku ✅ w kodzie)
 
 ---
 
@@ -307,11 +311,17 @@ Każda strategia zawiera:
 **Interwał:** 1D
 **Warunki:** Wybicie 20-dniowego/55-dniowego kanału Donchiana
 
-**Neurony kluczowe:**
-- `XII-BK-DON` *(planowany)* Donchian Channel Breakout
-- `XII-08` OBV → wolumen wybicia
-- `III-08` M2 Liquidity → makro kontekst
-- `X-06` ATR → wielkość pozycji (N = ATR)
+**Neurony WEJŚCIE (klucze = kod):**
+- `X-18` Donchian → wybicie 20/55-dniowego kanału
+
+**Neurony FILTR:**
+- `V-01` OBV → wolumen wybicia
+- `XII-01` ADX → siła trendu
+- `X-25` ATR-Deviation 🔱 → z-score / wielkość pozycji (N = ATR)
+
+**Neurony WYJŚCIE:**
+- `X-18` Donchian → wybicie 10-dniowego kanału w przeciwną stronę
+- `XII-04` Supertrend zmienia kierunek
 
 **Zasady Turtles:**
 - Wejście: wybicie 20-dniowego high/low
@@ -355,11 +365,11 @@ Każda strategia zawiera:
 ### IMV-SC-002 | "WSCHÓD SŁOŃCA" | Asian Session Liquidity Reversion
 **Źródło:** STR-001, STR-006 (Session Liquidity Reversion, Asian Sunrise)
 **Interwał:** M15–1H | **Warunki:** fałszywe wybicie z zakresu sesji azjatyckiej
-**Neurony WEJŚCIE:**
-- `STR-01` Stop Hunt Detector (Straż) → wykrywa fałszywe wybicie poza zakres sesji
-- `X-04` VWAP → powrót do fair value
-- `X-05` OrderFlow → wejście płynności
-**Neurony FILTR:** `X-03` CVD (kto przejmuje kontrolę po wybiciu)
+**Neurony WEJŚCIE (klucze = kod):**
+- `V-02` VWAP → powrót do fair value po fałszywym wybiciu
+- `X-05` EMA(9/21) cross → kierunek wejścia płynności
+**Neurony FILTR:** `X-11` RVOL (wolumen względny), `X-04` Wstęgi Bollingera (zmienność)
+**Neurony WYJŚCIE:** `X-25` ATR-Deviation 🔱 (z-score), `V-02` powrót do VWAP
 **Dźwignia:** 3×–7× | **R:R:** 1:2 | **Status:** SZKIC
 
 ### IMV-HY-004 | "CYKL AMD" | Accumulation-Manipulation-Distribution
@@ -433,20 +443,20 @@ Każda strategia zawiera:
 ### IMV-TR-002 | "PUDEŁKO DARVASA" | Darvas Box Theory
 **Źródło:** STR-024 (Nicolas Darvas Box Theory)
 **Interwał:** 1D | **Warunki:** cena buduje "pudełka" konsolidacji, wybicie w górę
-**Neurony:** `XII-03` Bollinger (zakres pudełka), `XII-08` OBV (wolumen wybicia), `X-06` ATR (wysokość pudełka)
+**Neurony (klucze = kod):** WEJŚCIE `X-18` Donchian (zakres/wybicie pudełka) + `X-04` Wstęgi Bollingera (wysokość pudełka); FILTR `V-01` OBV (wolumen wybicia) + `X-11` RVOL; WYJŚCIE `X-18` Donchian + `X-25` ATR-Deviation 🔱
 **Zasada:** kupuj wybicie szczytu pudełka, stop pod dołem pudełka. **Status:** SZKIC
 
 ### IMV-RG-001 | "STREET SMARTS" | Connors-Raschke Reversals
 **Źródło:** WebSearch — Linda Raschke & Larry Connors "Street Smarts" (20+ setupów)
 **Interwał:** M15–4H | **Warunki:** range, wyczerpanie momentum
-**Neurony:** `X-02` StochRSI (ekstrema), `XII-07` RSI-Div (dywergencje), `X-04` VWAP (powrót do średniej)
+**Neurony (klucze = kod):** WEJŚCIE `X-02` StochRSI (ekstrema) + `V-02` VWAP (powrót do średniej); FILTR `XII-01` ADX (siła trendu) + `X-25` ATR-Deviation 🔱; WYJŚCIE `X-02` StochRSI + `V-02` VWAP
 **Kluczowe setupy:** "Holy Grail" (ADX>30 + pullback do EMA20), "Turtle Soup" (false breakout 20-dni)
 **Status:** SZKIC — priorytet (sprawdzone setupy)
 
 ### IMV-TR-003 | "MISTRZ MINERVINI" | SEPA Momentum
 **Źródło:** WebSearch — Mark Minervini "Think & Trade Like a Champion" (SEPA)
 **Interwał:** 1D | **Warunki:** Trend Template (cena > MA50 > MA150 > MA200, wszystkie rosnące)
-**Neurony:** `XII-01` EMA(50/200) układ, `XII-04` Supertrend, `XII-08` OBV (potwierdzenie wolumenem VCP — Volatility Contraction Pattern)
+**Neurony (klucze = kod):** WEJŚCIE `XII-03` EMA(50/200) układ + `XII-04` Supertrend; FILTR `V-01` OBV (potwierdzenie wolumenem VCP) + `X-11` RVOL; WYJŚCIE `XII-03` EMA(50/200) + `XII-01` ADX
 **Status:** SZKIC
 
 ### X-SC-003 | "BROOKS M2B" (Dwulistny Pullback) | Al Brooks M2B/M2S
@@ -458,7 +468,7 @@ Każda strategia zawiera:
 
 ### IMV-RG-002 | "RYTM LIVERMORE'A" | Pivotal Points
 **Źródło:** WebSearch — Jesse Livermore (pivotal points, pyramiding)
-**Interwał:** 1D | **Neurony:** `XII-05` Fibo (kluczowe poziomy), `XII-03` Bollinger (breakout), `PYR` Pyramiding Manager (STR-133)
+**Interwał:** 1D | **Neurony (klucze = kod):** WEJŚCIE `X-18` Donchian (pivotal breakout) + `X-01` RSI (wykupienie/wyprzedanie); FILTR `V-02` VWAP + `X-25` ATR-Deviation 🔱; WYJŚCIE `X-18` Donchian + `X-03` MACD
 **Status:** SZKIC
 
 ---

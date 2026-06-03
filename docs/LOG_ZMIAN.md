@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-06-03 | MAJOR | Synchronizacja KATALOG_STRATEGII z kodem + warstwa audytu W9 (Prawo XIX/XXI)
+
+### Kontekst
+Pytanie Cezara o ZŁOTY ORZEŁ ujawniło, że opisy strategii w `KATALOG_STRATEGII.md`
+cytowały STARE klucze neuronów (numeracja projektowa), niezgodne z kodem — np. ZŁOTY
+ORZEŁ miał „XII-01 EMA Golden Cross" (a XII-01 to ADX), „XII-08 OBV" (nie istnieje).
+Audyt tego nie łapał (sprawdzał tylko klucze neuronów, nie listy w katalogu).
+
+### Diagnoza
+Z 17 zaimplementowanych strategii: 5 spójnych, **12 z rozjazdem** (obce klucze w opisie).
+Kod był zawsze poprawny (wszystkie strategie wskazują istniejące, aktywne neurony) —
+problem był wyłącznie w dokumentacji.
+
+### Naprawione
+- **12 bloków strategii** w `KATALOG_STRATEGII.md` — klucze WEJŚCIE/FILTR/WYJŚCIE
+  zsynchronizowane z kodem (X-SC-001/002, XII-TR-001, XII-RV-001, XII-BK-001,
+  IMV-HY-003, IMV-TR-001/002/003, IMV-SC-002, IMV-RG-001/002).
+- **ZŁOTY ORZEŁ** — dodano notatkę „wariant EMA, nie oryginalny SMA" + pochodzenie
+  (Golden Cross = klasyka, domena publiczna, brak pojedynczego autora).
+- **Warstwa audytu W9** (`audyt_spojnosci.py`) — parsuje bloki zaimplementowanych
+  strategii i wykrywa klucze spoza kodu. Rozjazd katalog↔kod już nigdy nie przejdzie.
+
+### Testy regresyjne
+- `test_audyt_w9_wykrywa_obcy_klucz_strategii`, `test_audyt_w9_zielony_na_realnym_katalogu`.
+
+### Stan
+- 17/17 strategii spójnych (kod=katalog). Testy: 390/390 (+2). Audyt: pełna harmonia.
+
+---
+
 ## 2026-06-03 | FIX | Poprawki recenzji PR (cubic) #5 — L2 float, HA doji/ATR0, dekorelacja None
 
 ### Kontekst

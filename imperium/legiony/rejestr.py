@@ -48,6 +48,7 @@ from imperium.legiony.neurony.onchain import (
 from imperium.legiony.neurony.straz import (
     NeuronStopHunt, NeuronWickRejection, NeuronWashVol, NeuronBartPattern,
 )
+from imperium.legiony.neurony.dzwignia import NeuronATRLev, NeuronRealizedVol
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
 from imperium.legiony.zwiadowcy import (
@@ -81,6 +82,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronMVRV(), NeuronSOPR(), NeuronPuellMultiple(), NeuronExchangeNetflow(),
         # Straż / Anty-manipulacja (A)
         NeuronStopHunt(), NeuronWickRejection(), NeuronWashVol(), NeuronBartPattern(),
+        # Dźwignia (L) + Zmienność (V) — OHLCV, bez API
+        NeuronATRLev(), NeuronRealizedVol(),
     ]
 
 

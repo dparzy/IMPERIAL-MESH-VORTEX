@@ -510,7 +510,7 @@ class NeuronBBSqueeze(MikroNeuron):
         bb_width = (bb_upper - bb_lower) / (bb_mid + 1e-9)
 
         # Brak ściśnięcia = neutralny
-        if bb_width >= 0.04:
+        if bb_width >= 0.025:
             return self._bazowy_sygnal(bb_width, "NEUTRAL", 0.15,
                 [f"BB szeroki ({bb_width:.3f}) — brak ściśnięcia"])
 

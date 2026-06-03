@@ -31,7 +31,7 @@ import hashlib
 import logging
 from datetime import datetime, timezone
 from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Any, Callable
+from typing import Dict, List, Any, Callable, Optional
 
 import numpy as np
 
@@ -175,6 +175,26 @@ def _py_rvol(volume, period: int = 20):
         return None
     srednia = sum(vol[-period - 1:-1]) / period
     return vol[-1] / srednia if srednia > 0 else None
+
+
+def _py_hist_vol(close, period: int = 20) -> Optional[float]:
+    """
+    Historical (Realized) Volatility = annualized std of log returns.
+    Wzór: std(log(c[i]/c[i-1])) * sqrt(252) (annualizacja dziennych danych).
+    Dla interwałów krótszych niż 1D wartość i tak porównywalna (relative ranking).
+    """
+    import math
+    c = list(close)
+    if len(c) < period + 1:
+        return None
+    window = c[-(period + 1):]
+    log_ret = [math.log(window[i] / window[i - 1]) for i in range(1, len(window)) if window[i - 1] > 0]
+    if len(log_ret) < 2:
+        return None
+    n = len(log_ret)
+    mean = sum(log_ret) / n
+    variance = sum((r - mean) ** 2 for r in log_ret) / (n - 1)
+    return math.sqrt(variance) * math.sqrt(252)
 
 
 def _py_supertrend(high, low, close, period: int = 10, multiplier: float = 3.0):
@@ -335,7 +355,10 @@ class CalculatorGateway:
             "DONCHIAN": lambda high, low, period=20: _py_donchian(high, low, period),
 
             # ── Pure-Python: Relative Volume (TA-Lib nie ma) ──────────────────
-            "RVOL":    lambda volume, period=20: _py_rvol(volume, period),
+            "RVOL":      lambda volume, period=20: _py_rvol(volume, period),
+
+            # ── Pure-Python: Historical/Realized Volatility (TA-Lib nie ma) ──
+            "HIST_VOL":  lambda close, period=20: _py_hist_vol(close, period),
 
             # ── TA-Lib: wolumen ────────────────────────────────────────────────
             "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),

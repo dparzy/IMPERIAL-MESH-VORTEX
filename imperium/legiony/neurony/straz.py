@@ -225,7 +225,7 @@ class NeuronBartPattern(MikroNeuron):
     KATEGORIA = "A"
     WAGA = 6
 
-    _PROG_CIALA = 0.30  # ciało PREV musi stanowić min. tę frakcję zakresu Donchian
+    _PROG_CIALA = 0.10  # ciało PREV musi stanowić min. tę frakcję zakresu Donchian
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         c = wskazniki.get("CLOSE")

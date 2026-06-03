@@ -6,6 +6,35 @@
 
 ---
 
+## 2026-06-03 | FEATURE | HedgeMWU — online żywe wagi Legatusa + zamknięcie pętli uczenia (wizja W-049)
+
+### Kontekst
+Czerwony alarm Prawa XV: `Igrzyska.nowe_wagi()` liczyło mnożniki wag neuronów,
+ale **Legatus nigdy ich nie konsumował** — policzony potencjał leżał odłogiem.
+Brakowało też online'owego (strumieniowego) uczenia wag z gwarancją regretu.
+
+### Wdrożone
+- **`imperium/biblioteki/hedge_mwu.py`** — `HedgeMWU`: algorytm Hedge / Multiplicative
+  Weights Update (Freund & Schapire, 1997), regret O(√(T·ln N)). Po każdym wyniku
+  waga eksperta ×exp(-η·strata); `mnozniki()` skalowane wokół 1.0 (stan neutralny
+  = brak zniekształcenia, Prawo XV). Min. waga chroni przed śmiercią eksperta.
+- **`Igrzyska.obserwatorzy`** — lista obserwatorów strumienia wyników; MWU uczy
+  się z DOKŁADNIE tego samego strumienia co Igrzyska (DRY, bez duplikacji parowania
+  logów). `HedgeMWU.z_logow(logi)` korzysta z tego mechanizmu.
+- **Legatus** — nowy parametr `mnozniki_neuronow` + `ustaw_mnozniki_neuronow()`;
+  `_dostosuj_wagi` mnoży wagę reżimową × mnożnik uczenia per-neuron. Konsumuje
+  ZARÓWNO `Igrzyska.nowe_wagi()` (batch) jak i `HedgeMWU.mnozniki()` (online).
+  Domyślnie pusty → kompatybilność wsteczna (zero zmian zachowania).
+- **Testy:** +12 (MWU: neutralność, adaptacja, normalizacja, min_waga, obserwator
+  Igrzysk; Legatus: brak/iniekcja/setter). 398 → 410/410 zielone.
+
+### Pliki
+`imperium/biblioteki/hedge_mwu.py`, `imperium/biblioteki/igrzyska.py`,
+`imperium/legiony/legatus.py`, `tests/test_hedge_mwu.py`, `tests/run_tests.py`,
+`docs/WIZJONER.md`, `docs/INDEKS_IMPERIUM.md`, `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-06-03 | FEATURE | Yang-Zhang Volatility — upgrade estymatora kat. V (wizja W-055)
 
 ### Kontekst

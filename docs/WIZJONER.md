@@ -68,7 +68,7 @@
 | W-046 | Zwiadowca Japoński — J-Quants API (TSE) przez MCP jako źródło danych fundamentalnych | 🟡 Niski | 💭 Idea (zwiad azjat.) | `imperium/oczy/` + `akwedukty/` |
 | W-047 | Zasady — audyt przestarzałych praw (które blokują zamiast pomagać) | 🟠 Średni | 💭 Idea Cezara | `ZASADY_FUNDAMENTALNE.md` przegląd |
 | W-048 | Oficina Imperialis — Cesarska Kuźnia (metafora laboratorium ARCH-MAX + nowe neurony) | 🟡 Niski | 💭 Idea Cezara | `docs/` + `imperium/legiony/` |
-| W-049 | Hedge/MWU — żywe wagi Legatusa (online, gwarancja żalu, neuron co kłamie cichnie) | 🔴 Wysoki | 💭 Idea (zwiad AI) | `imperium/legiony/legatus.py` |
+| W-049 | Hedge/MWU — żywe wagi Legatusa (online, gwarancja żalu, neuron co kłamie cichnie) | 🔴 Wysoki | ✅ WDROŻONE 2026-06-03 | `biblioteki/hedge_mwu.py` + Legatus inject |
 | W-050 | Conformal Prediction (ACI/MAPIE) — skalibrowana niepewność każdego głosu | 🔴 Wysoki | 💭 Idea (zwiad AI) | `imperium/legiony/` + Senat |
 | W-051 | BOCPD — bayesowski detektor zmiany reżimu w czasie rzeczywistym | 🔴 Wysoki | 💭 Idea (zwiad AI) | `imperium/legiony/zwiadowcy/` |
 | W-052 | Thompson Sampling bandit — wybór która koalicja neuronów/strategia gra teraz | 🟠 Średni | 💭 Idea (zwiad AI) | nad rojem (`legatus`) |

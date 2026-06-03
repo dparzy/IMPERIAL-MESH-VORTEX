@@ -125,7 +125,8 @@ class Legatus:
                  min_neuronow: int = 5,
                  min_przewaga: float = 0.55,
                  zwiadowcy: Optional[list] = None,
-                 strategie: Optional[list] = None):
+                 strategie: Optional[list] = None,
+                 mnozniki_neuronow: Optional[dict] = None):
         """
         neurony:   lista MikroNeuronów (czytają z dict Bramy).
         zwiadowcy: lista ZwiadowcaElitarny (EXP-XX) — liczą sami z serii barów.
@@ -134,12 +135,25 @@ class Legatus:
         strategie: lista Strategia — baza przepisów. Jeśli podana, raport zawiera
                    automatycznie dobrane TOP strategie do bieżących sygnałów (wizja
                    Cezara: sygnały → najbliższa strategia). Brak → pusta lista.
+        mnozniki_neuronow: opcjonalny dict {klucz_neuronu: mnoznik} z uczenia wag —
+                   źródło: Igrzyska.nowe_wagi() (batch) lub HedgeMWU.mnozniki()
+                   (online, wizja W-049). Mnożone NA WIERZCH wag reżimowych.
+                   Brak/1.0 → zero zmian (Prawo XV: domyślnie neutralne).
         """
         self.roj = Roj(neurony)
         self.min_neuronow = min_neuronow
         self.min_przewaga = min_przewaga
         self.zwiadowcy = zwiadowcy or []
         self.strategie = strategie or []
+        self.mnozniki_neuronow = mnozniki_neuronow or {}
+
+    def ustaw_mnozniki_neuronow(self, mnozniki: dict):
+        """
+        Aktualizuje mnożniki wag per-neuron (z Igrzysk lub HedgeMWU). Wywoływane
+        okresowo (Igrzyska co ~30 dni) lub na bieżąco (MWU online). Prawo XV:
+        zamyka pętlę uczenia — policzone wagi faktycznie wpływają na decyzję.
+        """
+        self.mnozniki_neuronow = mnozniki or {}
 
     # ── Tryb FOKUS ─────────────────────────────────────────────────────────────
 
@@ -310,16 +324,23 @@ class Legatus:
 
     def _dostosuj_wagi(self, sygnaly: List[SygnalNeuronu],
                        rezim: str) -> List[SygnalNeuronu]:
-        """Modyfikuje wagi neuronów zgodnie z bieżącym reżimem (Prawo XV — wagi ożywione)."""
+        """
+        Modyfikuje wagi neuronów: mnożnik REŻIMOWY (wg kategorii, WAGI_REZIMU) ×
+        mnożnik UCZENIA per-neuron (Igrzyska/HedgeMWU, wizja W-049). Prawo XV —
+        wagi ożywione zarówno regułą reżimu, jak i wynikami historycznymi.
+        """
         mapa = WAGI_REZIMU.get(rezim, {})
-        if not mapa:
+        default = mapa.get("_default", 1.0)
+        mn_neuron = self.mnozniki_neuronow
+        if not mapa and not mn_neuron:
             return sygnaly
 
-        default = mapa.get("_default", 1.0)
         wynik = []
         for s in sygnaly:
             k = s.kategoria if s.kategoria != "?" else None
-            mnoznik = mapa.get(k, default) if k else default
+            mnoznik_rezim = (mapa.get(k, default) if k else default) if mapa else 1.0
+            mnoznik_uczenie = mn_neuron.get(s.neuron_id, 1.0)
+            mnoznik = mnoznik_rezim * mnoznik_uczenie
             if mnoznik != 1.0:
                 import copy
                 s2 = copy.copy(s)

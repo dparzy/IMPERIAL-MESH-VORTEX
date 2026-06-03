@@ -24,12 +24,14 @@ Użycie:
 import csv
 import logging
 import os
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger("CzytnikCSV")
 
 # Nagłówki CryptoDataDownload (wielkość liter ignorowana przy dopasowaniu)
 _KOL_UNIX = "unix"
+_KOL_TIMESTAMP = "timestamp"   # prosty format Imperium (ISO-data lub epoch)
 _KOL_DATE = "date"
 _KOL_SYMBOL = "symbol"
 _KOL_OPEN = "open"
@@ -52,6 +54,30 @@ def _znajdz_naglowek(plik) -> tuple:
         linia_naglowka = pierwszy
     kolumny = [k.strip().lower() for k in linia_naglowka.rstrip("\n").split(",")]
     return kolumny
+
+
+def _parse_ts(surowy: str) -> int:
+    """
+    Parsuje znacznik czasu na epoch w milisekundach.
+
+    Obsługuje:
+      • epoch (sekundy lub milisekundy) jako liczba — format CryptoDataDownload,
+      • ISO-datę ('2026-05-15 17:10:21.514319+00:00') — prosty format Imperium.
+
+    Heurystyka epoch: wartość > 1e12 traktujemy jako ms, mniejszą jako sekundy.
+    """
+    surowy = surowy.strip()
+    try:
+        liczba = float(surowy)
+        return int(liczba) if liczba > 1e12 else int(liczba * 1000)
+    except ValueError:
+        pass
+    # ISO-data → epoch ms (UTC). 'Z' normalizujemy do +00:00.
+    iso = surowy.replace("Z", "+00:00")
+    dt = datetime.fromisoformat(iso)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return int(dt.timestamp() * 1000)
 
 
 def _indeks_wolumenu_bazowego(kolumny: List[str]) -> Optional[int]:
@@ -88,8 +114,12 @@ def wczytaj_csv(sciezka: str, interwal: str = "",
 
         # Mapa nazwa_kolumny → indeks
         idx = {k: i for i, k in enumerate(kolumny)}
-        wymagane = [_KOL_UNIX, _KOL_OPEN, _KOL_HIGH, _KOL_LOW, _KOL_CLOSE]
+        # Kolumna czasu: 'unix' (CryptoDataDownload) LUB 'timestamp' (prosty format).
+        i_czas = idx.get(_KOL_UNIX, idx.get(_KOL_TIMESTAMP))
+        wymagane = [_KOL_OPEN, _KOL_HIGH, _KOL_LOW, _KOL_CLOSE]
         brakujace = [k for k in wymagane if k not in idx]
+        if i_czas is None:
+            brakujace.insert(0, f"{_KOL_UNIX}|{_KOL_TIMESTAMP}")
         if brakujace:
             raise ValueError(f"CSV {sciezka} — brak wymaganych kolumn: {brakujace} "
                              f"(znalezione: {kolumny})")
@@ -98,22 +128,24 @@ def wczytaj_csv(sciezka: str, interwal: str = "",
         i_vol_quote = idx.get(_KOL_VOL_QUOTE)
         i_sym = idx.get(_KOL_SYMBOL)
         i_trades = idx.get(_KOL_TRADES)
+        # Brak kolumny 'symbol' (prosty format) → wywnioskuj z nazwy pliku ('BTC_1h' → 'BTC').
+        symbol_z_pliku = os.path.splitext(os.path.basename(sciezka))[0].split("_")[0].upper()
 
         bary: List[Dict[str, Any]] = []
         reader = csv.reader(f)
         for wiersz in reader:
-            if not wiersz or len(wiersz) <= idx[_KOL_CLOSE]:
+            if not wiersz or len(wiersz) <= max(i_czas, idx[_KOL_CLOSE]):
                 continue
             try:
                 bar = {
-                    "timestamp": int(float(wiersz[idx[_KOL_UNIX]])),
+                    "timestamp": _parse_ts(wiersz[i_czas]),
                     "open":  float(wiersz[idx[_KOL_OPEN]]),
                     "high":  float(wiersz[idx[_KOL_HIGH]]),
                     "low":   float(wiersz[idx[_KOL_LOW]]),
                     "close": float(wiersz[idx[_KOL_CLOSE]]),
                     "volume": float(wiersz[i_vol]) if i_vol is not None else 0.0,
                     "volume_quote": float(wiersz[i_vol_quote]) if i_vol_quote is not None else 0.0,
-                    "symbol": wiersz[i_sym] if i_sym is not None else "",
+                    "symbol": wiersz[i_sym] if i_sym is not None else symbol_z_pliku,
                     "interwal": interwal,
                     "tradecount": int(float(wiersz[i_trades])) if i_trades is not None and wiersz[i_trades] else 0,
                 }

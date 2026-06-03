@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-03 | FIX+TESTY | Backtest ożywiony — czytnik prostego formatu + testy Dyrygenta (Prawo XIX)
+
+### Kontekst
+`koloseum/backtest.py` (przejazd Dyrygenta po historii) istniał, ale: (1) NIE miał
+własnych testów — martwa litera wg Prawa XIX (test_scheduler testuje inny backtest);
+(2) czytnik CSV wymagał formatu CryptoDataDownload (kolumna `unix`), więc dołączone
+dane `dane/*.csv` (prosty format `timestamp,open,...`) NIE dawały się uruchomić.
+
+### Co zostało wdrożone (kod)
+- **Czytnik elastyczny** (`akwedukty/czytnik_csv.py`) — akceptuje `unix` (CDD) LUB
+  `timestamp` (prosty format Imperium). `_parse_ts()` parsuje epoch (s/ms) oraz
+  ISO-datę. Brak kolumny `symbol` → wywnioskowany z nazwy pliku (`BTC_1h` → `BTC`).
+- **Testy backtestu** (`tests/test_backtest.py`, 5) — silnik z historią, walidacja
+  za małej liczby barów, AUTO-reżim (Namiestnik), porównanie 3 trybów oraz
+  **bezpośredni dowód braku lookahead** (szpieg na `Dyrygent.cykl` sprawdza, że
+  każde okno kończy się na bieżącej świecy, brak barów z przyszłości).
+- **Testy prostego formatu** (`tests/test_czytnik_csv.py`, +3) — ISO-timestamp,
+  symbol z nazwy pliku, `_parse_ts` (epoch s/ms/ISO).
+
+### Weryfikacja
+Backtest odpala się out-of-the-box na `dane/BTC_1h.csv` i `dane/ETH_1d.csv`
+(`--porownaj` oraz `auto_rezim=True`). Brak zaglądania w przyszłość udowodniony testem.
+
+### Stan
+- Testy: 370/370 (+8). Audyt: pełna harmonia. Neurony/strategie bez zmian.
+
+---
+
 ## 2026-06-03 | MAJOR | Faza C — V-03 CVD obudzony (adapter trade-feed publiczny, Prawo XV)
 
 ### Kontekst

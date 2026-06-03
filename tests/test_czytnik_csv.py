@@ -91,6 +91,50 @@ def test_brak_pliku_rzuca():
         pass
 
 
+# Prosty format Imperium: nagłówek 'timestamp' + ISO-data (rosnąco, jak dane/*.csv)
+PROBKA_PROSTA = """timestamp,open,high,low,close,volume
+2026-05-19 21:10:21.521895+00:00,3000.0,3022.7,2997.6,3010.0,83.5
+2026-05-19 22:10:21.521895+00:00,3010.0,3025.0,3005.0,3018.0,67.6
+2026-05-19 23:10:21.521895+00:00,3018.0,3040.0,3015.0,3035.0,71.2
+"""
+
+
+def test_prosty_format_timestamp_iso():
+    """Prosty format 'timestamp,open,...' z ISO-datą — backtest na dołączonych danych."""
+    p = _zapisz_probke(PROBKA_PROSTA)
+    try:
+        bary = wczytaj_csv(p, interwal="1H")
+        assert len(bary) == 3
+        assert bary[0]["open"] == 3000.0
+        assert bary[-1]["close"] == 3035.0
+        # ISO-data sparsowana na epoch ms (dodatnia, monotoniczna)
+        assert bary[0]["timestamp"] > 0
+        assert bary[0]["timestamp"] < bary[-1]["timestamp"]
+    finally:
+        os.unlink(p)
+
+
+def test_prosty_format_symbol_z_nazwy_pliku():
+    """Brak kolumny 'symbol' → wywnioskowany z nazwy pliku (BTC_1h → BTC)."""
+    f = tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False,
+                                    prefix="BTC_1h_", encoding="utf-8")
+    f.write(PROBKA_PROSTA)
+    f.close()
+    try:
+        bary = wczytaj_csv(f.name, interwal="1H")
+        assert bary[0]["symbol"] == "BTC"
+    finally:
+        os.unlink(f.name)
+
+
+def test_parse_ts_epoch_i_iso():
+    """_parse_ts: epoch sekund, epoch ms i ISO-data dają epoch ms."""
+    from imperium.akwedukty.czytnik_csv import _parse_ts
+    assert _parse_ts("1502928000") == 1502928000000        # sekundy → ms
+    assert _parse_ts("1502928000000") == 1502928000000     # już ms
+    assert _parse_ts("2017-08-17T00:00:00+00:00") == 1502928000000  # ISO UTC
+
+
 def test_eth_naglowek_volume_eth():
     """Kolumna wolumenu zmienia nazwę (Volume ETH) — wykrycie po pozycji, nie nazwie stałej."""
     tekst = PROBKA.replace("Volume BTC", "Volume ETH").replace("BTCUSDT", "ETHUSDT")

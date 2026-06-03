@@ -127,3 +127,32 @@ def test_raport_wykrywa_martwy_glos():
     # Oba mają stały sygnał → oba w moduly_stale
     assert "EXP-TEST-N" in rap["moduly_stale"]
     assert "EXP-TEST-L" in rap["moduly_stale"]
+    # Para stałych trafia do martwych (zerowa wariancja), NIE do niedostatecznych danych
+    assert ("EXP-TEST-N", "EXP-TEST-L") in rap["pary_nieokreslone"] \
+        or ("EXP-TEST-L", "EXP-TEST-N") in rap["pary_nieokreslone"]
+
+
+def test_raport_niedostateczne_dane_nie_alarmuje_martwych():
+    """None z za małej liczby próbek (1 krok) NIE może trafić do martwych (false alarm)."""
+    from imperium.legiony.zwiadowcy.baza import ZwiadowcaElitarny
+
+    class Zmienny(ZwiadowcaElitarny):
+        KLUCZ = "EXP-VAR-A"
+        WSKAZNIK = "test"; KATEGORIA = "M"; WYMAGA_BAROW = 1
+        def analizuj(self, bary):
+            # sygnał zależny od ostatniego baru → seria ma wariancję, gdy kroków ≥2
+            kier = "LONG" if bary[-1]["close"] > bary[0]["close"] else "SHORT"
+            return self._buduj_raport(kier, 0.6, ["zmienny"],
+                                      {"main_value": bary[-1]["close"]}, len(bary))
+
+    class ZmiennyB(Zmienny):
+        KLUCZ = "EXP-VAR-B"
+
+    bary = _bary_trend(n=61)
+    # okno=60, krok=5 → tylko 1 krok (za mało na korelację → None, ale NIE martwy)
+    rap = raport_dekorelacji(bary, [Zmienny(), ZmiennyB()], okno=60, krok=5)
+    if rap["liczba_krokow"] < 2:
+        assert not rap["moduly_stale"], "Zmienne moduły nie są stałe"
+        # Para z None przy 1 kroku → niedostateczne dane, NIE martwe
+        assert not rap["pary_nieokreslone"], "1 krok nie może dać fałszywego martwego głosu"
+        assert rap["pary_niedostateczne_dane"], "None z braku danych → osobny kubełek"

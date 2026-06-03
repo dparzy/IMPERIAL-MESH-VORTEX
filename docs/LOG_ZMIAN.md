@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-06-03 | FIX | Poprawki recenzji PR (cubic) #5 — L2 float, HA doji/ATR0, dekorelacja None
+
+### Kontekst
+Tura recenzji PR #22 — 4 uwagi (2×P1, 2×P2). Wszystkie trafne i naprawione.
+
+### Naprawione (kod + testy regresyjne)
+- **P1 L2 qty (exp_atmabhan):** Binance depth zwraca ilości jako STRINGI → `sum(b[1])`
+  mógł paść/sklejać. Rzutowanie `float(b[1])` przed sumą.
+- **P1 HA doji (budowniczy):** `HA_BULL = c >= o` oznaczał doji (c==o) jako byka.
+  Zmieniono na strict `>` → doji neutralny.
+- **P2 HA ATR==0 (budowniczy):** płaski rynek gubił pola HA_MOMENTUM/HA_VOLATILITY_INDEX.
+  Dodano jawne zera w gałęzi else → martwy rynek FILTROWANY, nie handlowany (Prawo XV).
+- **P2 dekorelacja None (diagnostyka):** `None` traktowany bezwarunkowo jako martwa para,
+  choć oznacza też za mało danych (n<2). Rozdzielono: martwy = któraś seria stała
+  (≥2 próbki, zerowa wariancja); reszta None → `pary_niedostateczne_dane`. Naprawiono też
+  detekcję `stale` (1 próbka trywialnie wyglądała na stałą → false alarm).
+
+### Testy regresyjne
+- `test_raport_niedostateczne_dane_nie_alarmuje_martwych` — 1 krok ≠ martwy głos.
+- Rozszerzono `test_raport_wykrywa_martwy_glos` o sprawdzenie `pary_nieokreslone`.
+
+### Stan
+- Testy: 388/388 (+1). Audyt: pełna harmonia.
+
+---
+
 ## 2026-06-03 | FIX | Poprawka recenzji PR (cubic) #4 — KROK 0 grep mylący (ZASADY)
 
 ### Kontekst

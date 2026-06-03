@@ -5,7 +5,52 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from imperium.pretorianie.kalkulator_lewara import (
     KalkulatorLewara, BezpiecznikKapitalu, MAX_DRAWDOWN_STOP,
+    VOL_TARGET_DEFAULT, SKALA_VOL_MIN, SKALA_VOL_MAX,
 )
+
+
+# ── Volatility Targeting (W-059) ─────────────────────────────────────────────
+
+def test_vol_targeting_brak_danych_skala_1():
+    """Brak vol_realized → skala 1.0 (kompatybilność wsteczna, Prawo XV)."""
+    assert KalkulatorLewara.skala_vol_targeting(None) == 1.0
+    assert KalkulatorLewara.skala_vol_targeting(0.0) == 1.0
+
+
+def test_vol_targeting_wysoka_vol_tnie_pozycje():
+    """Realized vol > target → skala < 1.0 (mniejsza pozycja w burzy)."""
+    skala = KalkulatorLewara.skala_vol_targeting(1.20, vol_target=0.60)
+    assert skala == 0.5, f"0.60/1.20 = 0.5, jest {skala}"
+
+
+def test_vol_targeting_niska_vol_powieksza():
+    """Realized vol < target → skala > 1.0 (większa pozycja w spokoju, w granicach)."""
+    skala = KalkulatorLewara.skala_vol_targeting(0.40, vol_target=0.60)
+    assert 1.0 < skala <= SKALA_VOL_MAX
+
+
+def test_vol_targeting_przyciecie_min_max():
+    """Skala przycięta do [MIN, MAX] — ekstremalna vol nie zeruje, cisza nie rozdmuchuje."""
+    assert KalkulatorLewara.skala_vol_targeting(10.0, vol_target=0.60) == SKALA_VOL_MIN
+    assert KalkulatorLewara.skala_vol_targeting(0.01, vol_target=0.60) == SKALA_VOL_MAX
+
+
+def test_vol_targeting_wplywa_na_rozmiar_planu():
+    """policz() z vol_realized faktycznie zmniejsza rozmiar vs bez (ten sam setup)."""
+    kalk = KalkulatorLewara()
+    bazowy = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 5_000, pewnosc=0.78)
+    burza = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 5_000, pewnosc=0.78,
+                        vol_realized=1.20, vol_target=0.60)
+    assert burza.skala_vol == 0.5
+    assert burza.rozmiar_usdt < bazowy.rozmiar_usdt
+    assert abs(burza.rozmiar_usdt - bazowy.rozmiar_usdt * 0.5) < 0.5
+
+
+def test_vol_targeting_domyslnie_neutralne_w_planie():
+    """Bez vol_realized plan ma skala_vol == 1.0 (nic się nie zmienia)."""
+    kalk = KalkulatorLewara()
+    plan = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 5_000, pewnosc=0.78)
+    assert plan.skala_vol == 1.0
 
 
 def test_likwidacja_long_ponizej_wejscia():

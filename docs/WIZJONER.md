@@ -78,7 +78,7 @@
 | W-056 | Amihud illiquidity + Corwin-Schultz spread — mikrostruktura z samego OHLC | 🟠 Średni | 💭 Idea (zwiad sygn.) | kat. L/mikrostruktura |
 | W-057 | RQA (determinism/laminarity) — early-warning krachu z teorii systemów dynam. | 🟡 Niski | 💭 Idea (zwiad sygn.) | kat. R, okna 200 barów |
 | W-058 | MF-DFA szerokość widma — multifraktalny early-warning krytycznego reżimu | 🟡 Niski | 💭 Idea (zwiad sygn.) | kat. D (fraktal) |
-| W-059 | Volatility Targeting — RDZEŃ kalkulatora lewara (pozycja = vol_target/vol_real) | 🔴 Wysoki | 💭 Idea (zwiad risk) | `pretorianie/kalkulator_lewara.py` |
+| W-059 | Volatility Targeting — RDZEŃ kalkulatora lewara (pozycja = vol_target/vol_real) | 🔴 Wysoki | ✅ WDROŻONE 2026-06-03 | `kalkulator_lewara.skala_vol_targeting` (vol_realized=YANG_ZHANG_20) |
 | W-060 | OFI (Order Flow Imbalance, Cont) — przyczynowy driver ceny krótkoterm. | 🟠 Średni | 💭 Idea (zwiad risk) | kat. T, L2 feed |
 | W-061 | Wash trading detection (Benford + power-law) — veto fałszywego wolumenu MEXC | 🔴 Wysoki | 💭 Idea (zwiad risk) | kat. O, filtr przed głosem |
 | W-062 | Equity-curve circuit breaker — rój handluje własną krzywą kapitału (HALT/REDUCE) | 🔴 Wysoki | 💭 Idea (zwiad risk) | `pretorianie/` globalny |

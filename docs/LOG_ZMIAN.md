@@ -6,6 +6,30 @@
 
 ---
 
+## 2026-06-03 | FEATURE | Volatility Targeting — skalowanie rozmiaru pozycji do celu zmienności (wizja W-059)
+
+### Kontekst
+Kalkulator Lewara liczył rozmiar wyłącznie risk-based (2% kapitału / stop_pct).
+Brakowało standardu instytucjonalnego: rozmiar ∝ vol_target / vol_realized —
+mniejsza pozycja w burzy, większa w spokoju (w bezpiecznych granicach).
+
+### Wdrożone
+- **`KalkulatorLewara.skala_vol_targeting(vol_realized, vol_target)`** — mnożnik
+  = vol_target/vol_realized przycięty do [0.25, 1.50]. None/≤0 → 1.0 (bez
+  halucynacji, Prawo XV).
+- **`policz(..., vol_realized=None, vol_target=0.60)`** — rozmiar przeskalowany
+  mnożnikiem; nowe pole `PlanPozycji.skala_vol`. Domyślnie 1.0 → kompatybilność
+  wsteczna. Symbioza z W-055: `vol_realized` = `YANG_ZHANG_20` (ta sama skala
+  annualizowana co cel).
+- **Testy:** +6 (brak danych, tnie/powiększa, przycięcie MIN/MAX, wpływ na plan).
+  410 → 416/416 zielone.
+
+### Pliki
+`imperium/pretorianie/kalkulator_lewara.py`, `tests/test_kalkulator.py`,
+`docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`, `README.md`.
+
+---
+
 ## 2026-06-03 | FEATURE | HedgeMWU — online żywe wagi Legatusa + zamknięcie pętli uczenia (wizja W-049)
 
 ### Kontekst

@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-03 · **Testy:** 398/398 zielone · **Faza:** Namiestnik Regime + Timeframe-Aware (styl SCALP/SWING/INVEST, futures/spot, lewar_cap).
+> **Stan na:** 2026-06-03 · **Testy:** 416/416 zielone · **Faza:** Namiestnik Regime + Timeframe-Aware (styl SCALP/SWING/INVEST, futures/spot, lewar_cap).
 
 ---
 

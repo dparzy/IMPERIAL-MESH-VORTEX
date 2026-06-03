@@ -6,6 +6,67 @@
 
 ---
 
+## 2026-06-03 | FEATURE | Hurst-DFA meta-brama reżimu — nowa kategoria H (wizja W-053)
+
+### Kontekst
+Brakowało osobnej osi informacji „pamięć długiego zasięgu" jako meta-bramy
+reżimu (czy rynek W OGÓLE ma przewagę: trend / mean-reversion / błądzenie losowe).
+EXP-03 liczył Hursta metodą R/S (obciążoną na trendach) — potrzebny był odporny
+estymator DFA we własnej kategorii.
+
+### Decyzja Prawa XVI (redundancja mierzona, nie zgadywana)
+DFA detrenduje każde okno wielomianem → odporny na niestacjonarność; R/S nie.
+Na trendującym krypto oba dają RÓŻNE H → realna dekorelacja (jak istniejący duet
+Higuchi FD + Hurst R/S). H-01 zaprojektowany jako META-BRAMA (H≈0.5 → NEUTRAL
+„nie handluj"), nie trzeci głos kierunkowy. Korelacja H-01↔EXP-03 do zmierzenia
+`diagnostyka_korelacji` po zebraniu danych paper-tradingu.
+
+### Wdrożone
+- **Brama:** pure-Python `HURST_DFA` (`_py_hurst_dfa`, close, period=100) — DFA
+  Peng i in. 1994; H∈(0,1), None gdy <period (Prawo I). Stempel pure-Python (XIII).
+- **Budowniczy:** klucz `HURST_DFA_100`.
+- **Neuron H-01** `neurony/fraktal.py` (NeuronHurstDFA, kat. H): H>0.55 persystencja
+  (podążaj), H<0.45 antypersystencja (kontra), H≈0.5 NEUTRAL (meta-brama).
+- **Nowa kategoria H** ożywiona: legenda `mikro_neuron.py`, audyt `LEGENDA_KAT`,
+  `WAGI_REZIMU` (H ×1.3 TREND_STRONG, ×1.2 RANGING, ×1.1 NORMAL), rejestr.
+- **Liczby:** 46→47 neuronów (40 aktywnych), 58→59 modułów. Backlog 253→252.
+- **Testy:** +9 (Brama DFA zakres/warmup/determinizm/źródło, H-01 4 reżimy + kat.).
+  416 → 425/425 zielone.
+
+### Pliki
+`imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/fraktal.py`, `imperium/legiony/mikro_neuron.py`,
+`imperium/legiony/legatus.py`, `imperium/legiony/rejestr.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_neurony.py`, `tests/test_integracja.py`,
+`docs/MANIFEST_KODU.md`, `docs/WIZJONER.md`, `docs/INDEKS_IMPERIUM.md`,
+`docs/LOG_ZMIAN.md`, `README.md`.
+
+---
+
+## 2026-06-03 | FEATURE | Volatility Targeting — skalowanie rozmiaru pozycji do celu zmienności (wizja W-059)
+
+### Kontekst
+Kalkulator Lewara liczył rozmiar wyłącznie risk-based (2% kapitału / stop_pct).
+Brakowało standardu instytucjonalnego: rozmiar ∝ vol_target / vol_realized —
+mniejsza pozycja w burzy, większa w spokoju (w bezpiecznych granicach).
+
+### Wdrożone
+- **`KalkulatorLewara.skala_vol_targeting(vol_realized, vol_target)`** — mnożnik
+  = vol_target/vol_realized przycięty do [0.25, 1.50]. None/≤0 → 1.0 (bez
+  halucynacji, Prawo XV).
+- **`policz(..., vol_realized=None, vol_target=0.60)`** — rozmiar przeskalowany
+  mnożnikiem; nowe pole `PlanPozycji.skala_vol`. Domyślnie 1.0 → kompatybilność
+  wsteczna. Symbioza z W-055: `vol_realized` = `YANG_ZHANG_20` (ta sama skala
+  annualizowana co cel).
+- **Testy:** +6 (brak danych, tnie/powiększa, przycięcie MIN/MAX, wpływ na plan).
+  410 → 416/416 zielone.
+
+### Pliki
+`imperium/pretorianie/kalkulator_lewara.py`, `tests/test_kalkulator.py`,
+`docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`, `README.md`.
+
+---
+
 ## 2026-06-03 | FEATURE | HedgeMWU — online żywe wagi Legatusa + zamknięcie pętli uczenia (wizja W-049)
 
 ### Kontekst

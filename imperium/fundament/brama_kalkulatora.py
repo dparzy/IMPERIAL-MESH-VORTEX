@@ -54,7 +54,7 @@ SOURCE_TAG_PY = "pure-Python (deterministic)"
 # compute() stempluje je SOURCE_TAG_PY — audyt nie może kłamać o źródle (Prawo XIII).
 _PURE_PYTHON_INDICATORS = {
     "AO", "AO_PREV", "AC", "AC_PREV", "HMA", "HMA_PREV",
-    "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "CHOPPINESS", "ULCER",
+    "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "CHOPPINESS", "ULCER",
     "VWAP", "VWAP_STD",
     "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
 }
@@ -267,6 +267,94 @@ def _py_yang_zhang(open_, high, low, close, period: int = 20) -> Optional[float]
     if var_yz < 0:
         var_yz = 0.0
     return math.sqrt(var_yz) * math.sqrt(252)
+
+
+def _py_hurst_dfa(close, period: int = 100) -> Optional[float]:
+    """
+    Wykładnik Hursta metodą DFA (Detrended Fluctuation Analysis, Peng i in. 1994).
+    Źródło: https://doi.org/10.1103/PhysRevE.49.1685
+
+    Dla nowicjusza: wykładnik Hursta (H) mówi, czy rynek ma "pamięć":
+      H > 0.5 → persystencja (trend ma kontynuację — podążaj za trendem)
+      H < 0.5 → antypersystencja (mean-reversion — graj przeciw ruchowi)
+      H ≈ 0.5 → błądzenie losowe (brak przewagi — NIE handluj, meta-brama STOP)
+
+    Różnica od R/S (EXP-03 ZwiadowcaHurst): DFA DETRENDUJE każde okno wielomianem
+    przed pomiarem fluktuacji, więc jest odporny na niestacjonarność (trendy).
+    R/S na silnie trendującym krypto daje obciążone H; DFA — nie. Dlatego oba
+    estymatory dekorelują na trendzie (Prawo XVI — różna informacja, krzyżowe
+    potwierdzenie, analogicznie do duetu Higuchi FD + Hurst R/S).
+
+    Algorytm:
+      1. x = log-zwroty close
+      2. profil Y(i) = skumulowana suma (x - średnia)
+      3. dla okien n: podziel profil na pudełka, w każdym dopasuj prostą (trend
+         lokalny) i policz RMS reszt; F(n) = średnia RMS po pudełkach
+      4. F(n) ~ n^H → H = nachylenie regresji log F(n) vs log n
+    Zwraca H ∈ (0,1). Fallback None gdy za mało danych (Prawo I — bez halucynacji).
+    """
+    import math
+    c = list(close)
+    if len(c) < period:
+        return None
+    seria = c[-period:]
+    # log-zwroty
+    x = [math.log(seria[i] / seria[i - 1]) for i in range(1, len(seria)) if seria[i - 1] > 0]
+    n_x = len(x)
+    if n_x < 16:
+        return None
+    srednia = sum(x) / n_x
+    # profil (skumulowana suma odchyleń)
+    Y = []
+    acc = 0.0
+    for v in x:
+        acc += v - srednia
+        Y.append(acc)
+
+    # rozmiary okien: geometrycznie od 4 do n_x//4
+    okna = []
+    n = 4
+    while n <= n_x // 4:
+        okna.append(n)
+        n = max(n + 1, int(n * 1.4))
+    if len(okna) < 2:
+        return None
+
+    log_n, log_F = [], []
+    for n in okna:
+        liczba_pudelek = n_x // n
+        if liczba_pudelek < 1:
+            continue
+        rms_sum = 0.0
+        for b in range(liczba_pudelek):
+            seg = Y[b * n:(b + 1) * n]
+            # dopasowanie prostej (MNK) — lokalny trend
+            idx = list(range(n))
+            sx = sum(idx); sy = sum(seg)
+            sxx = sum(i * i for i in idx); sxy = sum(idx[i] * seg[i] for i in range(n))
+            denom = n * sxx - sx * sx
+            if denom == 0:
+                continue
+            a = (n * sxy - sx * sy) / denom        # nachylenie
+            b0 = (sy - a * sx) / n                  # wyraz wolny
+            reszty2 = sum((seg[i] - (a * i + b0)) ** 2 for i in range(n))
+            rms_sum += math.sqrt(reszty2 / n)
+        if liczba_pudelek > 0:
+            F = rms_sum / liczba_pudelek
+            if F > 0:
+                log_n.append(math.log(n))
+                log_F.append(math.log(F))
+
+    if len(log_n) < 2:
+        return None
+    m = len(log_n)
+    sx = sum(log_n); sy = sum(log_F)
+    sxx = sum(v * v for v in log_n); sxy = sum(log_n[i] * log_F[i] for i in range(m))
+    denom = m * sxx - sx * sx
+    if denom == 0:
+        return None
+    slope = (m * sxy - sx * sy) / denom
+    return round(max(0.01, min(0.99, slope)), 4)
 
 
 def _py_choppiness(high, low, close, period: int = 14) -> Optional[float]:
@@ -484,6 +572,9 @@ class CalculatorGateway:
             # ── Pure-Python: Yang-Zhang OHLC Volatility (TA-Lib nie ma) ───────
             # ~14× efektywniejszy estymator annualizowanej vol niż HIST_VOL (close-only).
             "YANG_ZHANG": lambda open, high, low, close, period=20: _py_yang_zhang(open, high, low, close, period),
+
+            # ── Pure-Python: Hurst-DFA — pamięć długiego zasięgu / meta-brama (kat. H, W-053) ──
+            "HURST_DFA": lambda close, period=100: _py_hurst_dfa(close, period),
 
             # ── Pure-Python: Choppiness Index — trend vs konsolidacja (kat. V) ──
             "CHOPPINESS": lambda high, low, close, period=14: _py_choppiness(high, low, close, period),

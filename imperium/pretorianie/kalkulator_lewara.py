@@ -22,6 +22,15 @@ MAX_RYZYKO = 0.02           # 2% kapitału max per trade
 MIN_RR = 2.0                # minimum Risk:Reward 1:2
 MAX_DRAWDOWN_STOP = 0.30    # AOA: "nigdy nie kochaj pozycji" — 30% obsunięcia = STOP
 
+# ── Volatility Targeting (wizja W-059) ───────────────────────────────────────
+# Standard instytucjonalny: rozmiar pozycji ∝ vol_target / vol_realized.
+# Gdy rynek bardziej zmienny niż cel → przytnij pozycję; spokojniejszy → powiększ
+# (w bezpiecznych granicach). vol_realized podaje się jako annualizowana vol —
+# idealnie YANG_ZHANG_20 z Bramy (W-055), ta sama skala co cel poniżej.
+VOL_TARGET_DEFAULT = 0.60   # 60% annualizowanej zmienności — typowy cel portfela krypto
+SKALA_VOL_MIN = 0.25        # nie schodź poniżej 1/4 bazowego rozmiaru
+SKALA_VOL_MAX = 1.50        # nie powiększaj ponad 1.5× (ostrożność > chciwość)
+
 
 @dataclass
 class BezpiecznikKapitalu:
@@ -83,12 +92,13 @@ class PlanPozycji:
     cena_likwidacji: float
     stop_loss: float
     take_profit: float
-    rozmiar_usdt: float        # wielkość pozycji w USDT
+    rozmiar_usdt: float        # wielkość pozycji w USDT (po skalowaniu vol-targeting)
     ryzyko_usdt: float         # max strata w USDT
     rr_ratio: float
     bufor_likwidacji_pct: float  # ile % między SL a likwidacją (bezpieczeństwo)
     checklist_ok: bool
     powod_veto: str            # "" jeśli checklist OK
+    skala_vol: float = 1.0     # mnożnik volatility-targeting (W-059); 1.0 = brak skalowania
 
 
 class KalkulatorLewara:
@@ -105,7 +115,9 @@ class KalkulatorLewara:
                dzwignia: int, kapital_usdt: float,
                pewnosc: float = 0.7, rezim: str = "NORMAL",
                pretorianie_ok: bool = True,
-               bezpiecznik: "BezpiecznikKapitalu | None" = None) -> PlanPozycji:
+               bezpiecznik: "BezpiecznikKapitalu | None" = None,
+               vol_realized: "float | None" = None,
+               vol_target: float = VOL_TARGET_DEFAULT) -> PlanPozycji:
 
         kierunek = kierunek.upper()
         assert kierunek in ("LONG", "SHORT"), "kierunek musi być LONG lub SHORT"
@@ -128,6 +140,12 @@ class KalkulatorLewara:
         stop_pct = abs(cena_wejscia - stop_loss) / cena_wejscia
         ryzyko_usdt = kapital_usdt * MAX_RYZYKO
         rozmiar_usdt = ryzyko_usdt / stop_pct if stop_pct > 0 else 0
+
+        # 5b. Volatility Targeting (W-059): przeskaluj rozmiar do celu zmienności.
+        # Wysoka realized vol → mniejsza pozycja; spokojny rynek → większa (w granicach).
+        # Brak vol_realized → skala 1.0 (kompatybilność wsteczna, zero zmian).
+        skala_vol = self.skala_vol_targeting(vol_realized, vol_target)
+        rozmiar_usdt *= skala_vol
 
         # 6. Take-profit (min R:R 1:2)
         ruch_sl = abs(cena_wejscia - stop_loss)
@@ -159,7 +177,25 @@ class KalkulatorLewara:
             bufor_likwidacji_pct=bufor_pct,
             checklist_ok=ok,
             powod_veto=powod,
+            skala_vol=round(skala_vol, 4),
         )
+
+    # ── Volatility Targeting (W-059) ────────────────────────────────────────────
+
+    @staticmethod
+    def skala_vol_targeting(vol_realized: "float | None",
+                            vol_target: float = VOL_TARGET_DEFAULT) -> float:
+        """
+        Mnożnik rozmiaru = vol_target / vol_realized, przycięty do [MIN, MAX].
+
+        vol_realized: annualizowana realized vol (np. YANG_ZHANG_20). None/≤0 →
+                      brak danych → skala 1.0 (neutralnie, Prawo XV: bez halucynacji).
+        Zwraca skalę w [SKALA_VOL_MIN, SKALA_VOL_MAX].
+        """
+        if vol_realized is None or vol_realized <= 0 or vol_target <= 0:
+            return 1.0
+        skala = vol_target / vol_realized
+        return max(SKALA_VOL_MIN, min(SKALA_VOL_MAX, skala))
 
     # ── Wzory ──────────────────────────────────────────────────────────────────
 
@@ -230,7 +266,7 @@ class KalkulatorLewara:
 ║  Likwidacja:     {plan.cena_likwidacji:>12.2f} USDT
 ║  Bufor do lik:   {plan.bufor_likwidacji_pct:>11.1f}%
 ║──────────────────────────────────────────────────────
-║  Rozmiar:        {plan.rozmiar_usdt:>12.2f} USDT
+║  Rozmiar:        {plan.rozmiar_usdt:>12.2f} USDT (vol×{plan.skala_vol:.2f})
 ║  Max ryzyko:     {plan.ryzyko_usdt:>12.2f} USDT
 ║  R:R ratio:      1:{plan.rr_ratio:.1f}
 ╠══════════════════════════════════════════════════════╣

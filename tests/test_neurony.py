@@ -682,6 +682,83 @@ def test_v13_brak_obu_zrodel_neutral():
     assert NeuronRealizedVol().interpretuj({}).kierunek == "NEUTRAL"
 
 
+def test_brama_hurst_dfa_zakres():
+    """Brama (W-053): Hurst-DFA zwraca H ∈ (0,1) na realnej serii."""
+    from imperium.fundament.brama_kalkulatora import _py_hurst_dfa
+    import random
+    random.seed(5)
+    c = [100.0]
+    for _ in range(150):
+        c.append(c[-1] * (1 + random.gauss(0, 0.01)))
+    h = _py_hurst_dfa(c, period=120)
+    assert h is not None and 0.0 < h < 1.0
+
+
+def test_brama_hurst_dfa_za_malo_danych():
+    """Brama (W-053): < period świec → None (bez halucynacji, Prawo I)."""
+    from imperium.fundament.brama_kalkulatora import _py_hurst_dfa
+    assert _py_hurst_dfa([100, 101, 102], period=100) is None
+
+
+def test_brama_hurst_dfa_deterministyczny():
+    """Brama (W-053): ta sama seria → ta sama wartość (determinizm, Prawo I)."""
+    from imperium.fundament.brama_kalkulatora import _py_hurst_dfa
+    import random
+    random.seed(9)
+    c = [100.0]
+    for _ in range(140):
+        c.append(c[-1] * (1 + random.gauss(0, 0.012)))
+    assert _py_hurst_dfa(c, 120) == _py_hurst_dfa(c, 120)
+
+
+def test_brama_audyt_zrodlo_hurst_dfa_pure_python():
+    """Prawo XIII: HURST_DFA stemplowany jako pure-Python."""
+    from imperium.fundament.brama_kalkulatora import CalculatorGateway, SOURCE_TAG_PY
+    import random
+    random.seed(2)
+    c = [100.0]
+    for _ in range(140):
+        c.append(c[-1] * (1 + random.gauss(0, 0.01)))
+    r = CalculatorGateway().compute("HURST_DFA", close=c, period=120)
+    assert r.source == SOURCE_TAG_PY
+
+
+def test_h01_persystencja_podaza_za_ruchem():
+    """H-01 (W-053): H>0.55 + ruch↑ → LONG (potwierdza trend)."""
+    from imperium.legiony.neurony.fraktal import NeuronHurstDFA
+    s = NeuronHurstDFA().interpretuj({"HURST_DFA_100": 0.70, "CLOSE": 105, "CLOSE_PREV": 100})
+    assert s.kierunek == "LONG"
+    assert s.pewnosc >= 0.55
+
+
+def test_h01_antypersystencja_kontra():
+    """H-01 (W-053): H<0.45 + ruch↑ → SHORT (mean-reversion, kontra)."""
+    from imperium.legiony.neurony.fraktal import NeuronHurstDFA
+    s = NeuronHurstDFA().interpretuj({"HURST_DFA_100": 0.30, "CLOSE": 105, "CLOSE_PREV": 100})
+    assert s.kierunek == "SHORT"
+
+
+def test_h01_random_walk_meta_brama_neutral():
+    """H-01 (W-053): H≈0.5 → NEUTRAL (meta-brama: brak przewagi — kluczowa rola)."""
+    from imperium.legiony.neurony.fraktal import NeuronHurstDFA
+    s = NeuronHurstDFA().interpretuj({"HURST_DFA_100": 0.50, "CLOSE": 105, "CLOSE_PREV": 100})
+    assert s.kierunek == "NEUTRAL"
+    assert any("META-BRAMA" in p for p in s.powody)
+
+
+def test_h01_brak_danych_neutral():
+    """H-01 (W-053): brak HURST_DFA_100 → NEUTRAL (abstynencja, Prawo I)."""
+    from imperium.legiony.neurony.fraktal import NeuronHurstDFA
+    assert NeuronHurstDFA().interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_h01_kategoria_H_zywa():
+    """Kategoria H żywa w roju i poprawnie w legendzie (Prawo XV/XXI)."""
+    from imperium.legiony.rejestr import wszystkie_neurony
+    kat_h = [n for n in wszystkie_neurony() if n.KATEGORIA == "H"]
+    assert len(kat_h) >= 1 and all(n.DOSTEPNY for n in kat_h)
+
+
 def test_brama_audyt_zrodlo_pure_python():
     """Prawo XIII: pure-Python wskaźniki stemplowane jako pure-Python, nie TA-Lib."""
     from imperium.fundament.brama_kalkulatora import (

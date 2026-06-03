@@ -47,7 +47,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 11 | `archiwum/ARSENAL_AMERYKI.md` | 690 linków z 50+ krajów — pełny katalog regionalny (na wyraźne polecenie) | 📦 Archiwum |
 | 11 | `SYMBIOZA_MODULOW.md` | Interakcje modułów i mapowanie narzędzi | 🔗 Link |
 | 12 | `ROADMAP_IMPERIUM.md` | Roadmapa rozwoju i wersjonowanie | 🔗 Link |
-| 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (46 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
+| 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (47 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
 | 14 | `KATALOG_STRATEGII.md` | **~108+ strategii zmapowanych** (17 w kodzie) — Księga Azjatycka + Mistrzowie Świata + VSA/GEX/DeFi | ✅ Aktywny |
 | 15 | `GENERAL_LEGATUS.md` | Generał Legatus — SKANER/FOKUS, agregacja neuronów, reżimy | ✅ Aktywny |
 | 16 | `KALKULATOR_LEWARA.md` | Matematyka przeżycia — likwidacja, stop-loss, Kelly, dynamiczna dźwignia | ✅ Aktywny |
@@ -77,7 +77,7 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 |---------|-----------------|-------|--------|
 | `imperium/akwedukty/` | Rurociąg danych — pobieranie świec z MEXC przez CCXT | Akwedukty (Data Pipeline) | ✅ Gotowy |
 | `imperium/fundament/` | Brama Kalkulatora — TA-Lib oblicza wskaźniki, SHA-256 podpisuje | Calculator Gate | ✅ Gotowy |
-| `imperium/legiony/` | Legiony — mikro-neurony (46), Legatus, zwiadowcy (12), strategie (17) | Scout Legions | ✅ Rdzeń aktywny |
+| `imperium/legiony/` | Legiony — mikro-neurony (47), Legatus, zwiadowcy (12), strategie (17) | Scout Legions | ✅ Rdzeń aktywny |
 | `imperium/pretorianie/` | Pretorianie — weto ryzyka, ochrona kapitału | Risk Praetorians | ✅ Gotowy |
 | `imperium/senat/` | Senat — debata Popularów vs Optymantów nad sygnałem | Senate Debate | 🟡 Szkielet |
 | `imperium/cesarz/` | Cesarz — DeepSeek LLM podejmuje ostateczną decyzję | Emperor (LLM) | 🟡 Szkielet |
@@ -166,10 +166,10 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 | **C** ✅ | AdapterCVD (Binance aggTrades public) → V-03 CVD obudzony | ✅ ZREALIZOWANA 2026-06-03 | +1 neuron (V-03 kat. F) |
 | **D** 🔵 | OC-01..04 on-chain (MVRV, SOPR, Puell, Netflow) — wymaga klucza Glassnode/CryptoQuant | ⏳ OCZEKUJE — decyzja Cezara | +4 neurony (kat. O) |
 | **LIVE** 🟠 | Paper trading na żywych danych MEXC — `MEXC_API_KEY` + `MEXC_SECRET` | ⏳ Gotowe do uruchomienia | rdzeń kompletny |
-| **E** 🔵 | Dalsze neurony z katalogu (299−46=253 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
+| **E** 🔵 | Dalsze neurony z katalogu (299−47=252 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
 **Stan kategorii (2026-06-03):** aktywne M/T/F/A/L/V/R/F · wyciszone S(SMC feed)/O(on-chain API)
-**Neurony: 46** (39 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 390/390**
+**Neurony: 47** (40 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 425/425**
 
 ### Zadania bieżące (infrastruktura)
 | # | Zadanie | Moduł | Priorytet |

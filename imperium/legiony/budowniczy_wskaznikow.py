@@ -68,6 +68,7 @@ _PLAN_SKALARNE = {
     "ATR_DEVIATION": ("ATR_DEVIATION", ("high", "low", "close"), {}),
     "HIST_VOL_20":   ("HIST_VOL", ("close",), {"period": 20}),
     "YANG_ZHANG_20": ("YANG_ZHANG", ("open", "high", "low", "close"), {"period": 20}),
+    "HURST_DFA_100": ("HURST_DFA", ("close",), {"period": 100}),
     "CHOPPINESS_14": ("CHOPPINESS", ("high", "low", "close"), {"period": 14}),
     "ULCER_14":      ("ULCER", ("close",), {"period": 14}),
     "VWAP":          ("VWAP", ("high", "low", "close", "volume"), {}),

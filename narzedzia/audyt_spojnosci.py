@@ -32,7 +32,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
 # Litery KATEGORII dozwolone w kodzie (legenda — jedyne źródło prawdy)
-LEGENDA_KAT = set("MTVFOLRSAKEGm")
+LEGENDA_KAT = set("MTVFOLRSAKEGHm")
 
 # Pliki docs/ które celowo NIE są w INDEKS (archiwum, pliki techniczne)
 INDEKS_WHITELIST = {

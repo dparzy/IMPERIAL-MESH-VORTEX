@@ -51,6 +51,9 @@ from imperium.legiony.neurony.straz import (
 from imperium.legiony.neurony.dzwignia import (
     NeuronATRLev, NeuronRealizedVol, NeuronChoppiness, NeuronUlcer,
 )
+from imperium.legiony.neurony.fraktal import (
+    NeuronHurstDFA,
+)
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
 from imperium.legiony.zwiadowcy import (
@@ -86,6 +89,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronStopHunt(), NeuronWickRejection(), NeuronWashVol(), NeuronBartPattern(),
         # Dźwignia (L) + Zmienność (V) — OHLCV, bez API
         NeuronATRLev(), NeuronRealizedVol(), NeuronChoppiness(), NeuronUlcer(),
+        # Fraktal (H) — Hurst-DFA meta-brama reżimu, OHLCV bez API
+        NeuronHurstDFA(),
     ]
 
 

@@ -128,8 +128,10 @@ def wczytaj_csv(sciezka: str, interwal: str = "",
         i_vol_quote = idx.get(_KOL_VOL_QUOTE)
         i_sym = idx.get(_KOL_SYMBOL)
         i_trades = idx.get(_KOL_TRADES)
-        # Brak kolumny 'symbol' (prosty format) → wywnioskuj z nazwy pliku ('BTC_1h' → 'BTC').
-        symbol_z_pliku = os.path.splitext(os.path.basename(sciezka))[0].split("_")[0].upper()
+        # Brak kolumny 'symbol' (prosty format) → wywnioskuj z nazwy pliku.
+        # Symbol to segment PRZED interwałem: 'BTC_1h'→'BTC', 'Binance_BTCUSDT_1h'→'BTCUSDT'.
+        _czesci = os.path.splitext(os.path.basename(sciezka))[0].split("_")
+        symbol_z_pliku = (_czesci[-2] if len(_czesci) >= 2 else _czesci[0]).upper()
 
         bary: List[Dict[str, Any]] = []
         reader = csv.reader(f)

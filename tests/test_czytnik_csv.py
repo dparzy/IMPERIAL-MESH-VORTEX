@@ -115,16 +115,18 @@ def test_prosty_format_timestamp_iso():
 
 
 def test_prosty_format_symbol_z_nazwy_pliku():
-    """Brak kolumny 'symbol' → wywnioskowany z nazwy pliku (BTC_1h → BTC)."""
-    f = tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False,
-                                    prefix="BTC_1h_", encoding="utf-8")
-    f.write(PROBKA_PROSTA)
-    f.close()
-    try:
-        bary = wczytaj_csv(f.name, interwal="1H")
-        assert bary[0]["symbol"] == "BTC"
-    finally:
-        os.unlink(f.name)
+    """Brak kolumny 'symbol' → symbol z segmentu PRZED interwałem w nazwie pliku."""
+    import tempfile as _tf
+    katalog = _tf.mkdtemp()
+    # Dwa formaty nazw: 'BTC_1h.csv' → BTC, 'Binance_BTCUSDT_1h.csv' → BTCUSDT
+    for nazwa, oczekiwany in [("BTC_1h.csv", "BTC"), ("Binance_BTCUSDT_1h.csv", "BTCUSDT")]:
+        sciezka = os.path.join(katalog, nazwa)
+        with open(sciezka, "w", encoding="utf-8") as fh:
+            fh.write(PROBKA_PROSTA)
+        bary = wczytaj_csv(sciezka, interwal="1H")
+        assert bary[0]["symbol"] == oczekiwany, f"{nazwa} → {bary[0]['symbol']} ≠ {oczekiwany}"
+        os.unlink(sciezka)
+    os.rmdir(katalog)
 
 
 def test_parse_ts_epoch_i_iso():

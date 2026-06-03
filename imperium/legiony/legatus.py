@@ -166,10 +166,13 @@ class Legatus:
                 rezim = wykryty
                 rezim_zrodlo = "auto"
 
+        # Interwał z danych — Timeframe-Aware dobór strategii (Prawo XV)
+        interwal = bary[-1].get("interwal", "") if bary else ""
+
         sygnaly = self.roj.zbierz_sygnaly(wskazniki)
         sygnaly = sygnaly + sygnaly_exp
         sygnaly = self._dostosuj_wagi(sygnaly, rezim)
-        return self._agreguj(symbol, "FOKUS", rezim, sygnaly, rezim_zrodlo)
+        return self._agreguj(symbol, "FOKUS", rezim, sygnaly, rezim_zrodlo, interwal)
 
     def _odpal_zwiadowcow(self, wskazniki: dict, bary: list) -> List[SygnalNeuronu]:
         """
@@ -228,7 +231,8 @@ class Legatus:
 
     def _agreguj(self, symbol: str, tryb: str, rezim: str,
                  sygnaly: List[SygnalNeuronu],
-                 rezim_zrodlo: str = "manual") -> RaportLegatusa:
+                 rezim_zrodlo: str = "manual",
+                 interwal: str = "") -> RaportLegatusa:
         long_s  = [s for s in sygnaly if s.kierunek == "LONG"]
         short_s = [s for s in sygnaly if s.kierunek == "SHORT"]
 
@@ -265,7 +269,8 @@ class Legatus:
             powod = "Reżim PANIC — system w trybie obronnym"
 
         # Wizja Cezara: z bieżących sygnałów dobierz najbliższą strategię z bazy
-        strategie_dopasowane = self._dobierz_strategie(sygnaly, rezim)
+        # (Timeframe-Aware: filtr po interwale — scalp M5 ≠ swing 1D)
+        strategie_dopasowane = self._dobierz_strategie(sygnaly, rezim, interwal)
 
         return RaportLegatusa(
             symbol=symbol,
@@ -284,17 +289,21 @@ class Legatus:
             powod_weta=powod,
         )
 
-    def _dobierz_strategie(self, sygnaly: List[SygnalNeuronu], rezim: str) -> list:
+    def _dobierz_strategie(self, sygnaly: List[SygnalNeuronu], rezim: str,
+                           interwal: str = "") -> list:
         """
         Most do Dywizji Strategii: mapuje sygnały po kluczu neuronu i pyta silnik
         o TOP pasujące strategie. Brak bazy strategii → pusta lista (bez kosztu).
+
+        interwal: Timeframe-Aware filtr — przepuszcza tylko strategie na ten TF.
         """
         if not self.strategie:
             return []
         try:
             from imperium.legiony.strategie.baza import dobierz_najlepsze
             mapa = {s.neuron_id: s for s in sygnaly}
-            return dobierz_najlepsze(self.strategie, mapa, rezim=rezim, top=3)
+            return dobierz_najlepsze(self.strategie, mapa, rezim=rezim, top=3,
+                                     interwal=interwal)
         except Exception as e:
             logger.error(f"[Legatus] Dobieranie strategii padło: {e}")
             return []

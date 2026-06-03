@@ -135,19 +135,24 @@ class Dyrygent:
             from imperium.legiony.legatus import klasyfikuj_rezim
             rezim = klasyfikuj_rezim(wskazniki)
 
-        # 2. Namiestnik — Regime-Aware Gating (Faza 1)
-        # Wyznacza: tryb, prog_pewnosci, lewar_factor, czy_grac dla tego reżimu.
+        # Interwał z danych — sterownik warstwy stylu (SCALP/SWING/INVEST).
+        interwal = bary[-1].get("interwal", "") if bary else ""
+
+        # 2. Namiestnik — Regime-Aware + Timeframe-Aware Gating (Faza 1)
+        # Wyznacza: tryb, prog_pewnosci, lewar_factor, lewar_cap, rynek, czy_grac
+        # dla pary (reżim × styl interwałowy).
         tryb_aktywny = self.tryb
         prog_aktywny = self.min_pewnosc
         lewar_factor = 1.0
+        decyzja_nam = None
         if self.namiestnik is not None:
-            ustaw = self.namiestnik.decyduj(rezim)
-            if not ustaw.czy_grac:
+            decyzja_nam = self.namiestnik.decyduj(rezim, interwal)
+            if not decyzja_nam.czy_grac:
                 return DecyzjaCyklu(symbol, "NAMIESTNIK_CISZA", False,
-                                    rezim=rezim, powod=f"Namiestnik: {ustaw.opis}")
-            tryb_aktywny = ustaw.tryb
-            prog_aktywny = ustaw.prog_pewnosci
-            lewar_factor = ustaw.lewar_factor
+                                    rezim=rezim, powod=f"Namiestnik: {decyzja_nam.opis}")
+            tryb_aktywny = decyzja_nam.tryb
+            prog_aktywny = decyzja_nam.prog_pewnosci
+            lewar_factor = decyzja_nam.lewar_factor
 
         # 3. Legatus — agregacja roju
         raport = self.legatus.fokus(symbol, wskazniki, rezim=rezim, bary=bary)
@@ -206,10 +211,11 @@ class Dyrygent:
                                 pewnosc=pewnosc, rezim=raport.rezim,
                                 powod="brak ceny CLOSE w danych", raport=raport)
 
-        # 4a. Dźwignia: auto z pewności/reżimu, a potem Namiestnik skaluje lewar_factor
+        # 4a. Dźwignia: auto z pewności/reżimu, Namiestnik skaluje lewar_factor
+        #     i przycina sufitem stylu interwałowego (lewar_cap: scalp≤10, swing≤5, invest≤2).
         dzwignia_base = self.kalkulator.auto_dzwignia(pewnosc, raport.rezim)
         if self.namiestnik is not None:
-            dzwignia_final = self.namiestnik.skaluj_dzwignie(dzwignia_base, raport.rezim)
+            dzwignia_final = self.namiestnik.skaluj_dzwignie(dzwignia_base, raport.rezim, interwal)
         else:
             dzwignia_final = int(round(dzwignia_base * lewar_factor))
             dzwignia_final = max(1, min(dzwignia_final, 20))

@@ -17,7 +17,7 @@ i ocenia, jak dobrze pasują do jej przepisu.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 # Role neuronu w strategii (przepis tradera)
@@ -145,14 +145,32 @@ def dopasuj_strategie(strategia: Strategia, sygnaly: Dict[str, object],
     )
 
 
+def _interwal_pasuje(strategia: Strategia, interwal: Optional[str]) -> bool:
+    """
+    Czy strategia jest przeznaczona na ten interwał? (Prawo XV — ożywia martwe
+    metadane: pole interwaly było ignorowane przez selekcję).
+    Pusta lista interwaly = strategia uniwersalna (pasuje zawsze).
+    Brak interwału na wejściu = nie filtrujemy.
+    """
+    if not interwal or not strategia.interwaly:
+        return True
+    cel = interwal.upper().strip()
+    return any(cel == i.upper().strip() for i in strategia.interwaly)
+
+
 def dobierz_najlepsze(strategie: List[Strategia], sygnaly: Dict[str, object],
                       rezim: str = "NORMAL", top: int = 3,
-                      min_wynik: float = 0.3) -> List[DopasowanieStrategii]:
+                      min_wynik: float = 0.3,
+                      interwal: Optional[str] = None) -> List[DopasowanieStrategii]:
     """
     Serce wizji: z całej bazy strategii wybiera TOP najlepiej pasujące
     do bieżących sygnałów neuronów. Pomija dopasowania poniżej min_wynik.
+
+    interwal: gdy podany, odfiltrowuje strategie nieprzeznaczone na ten timeframe
+              (Timeframe-Aware: scalp M5 nie konkuruje ze swingiem 1D). Prawo XV.
     """
-    wyniki = [dopasuj_strategie(s, sygnaly, rezim) for s in strategie]
+    kandydaci = [s for s in strategie if _interwal_pasuje(s, interwal)]
+    wyniki = [dopasuj_strategie(s, sygnaly, rezim) for s in kandydaci]
     wyniki = [d for d in wyniki if d.wynik >= min_wynik and d.kierunek != "NEUTRAL"]
     wyniki.sort(key=lambda d: d.wynik, reverse=True)
     return wyniki[:top]

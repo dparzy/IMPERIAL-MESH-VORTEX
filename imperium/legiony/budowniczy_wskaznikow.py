@@ -196,12 +196,18 @@ class BudowniczyWskaznikow:
             atr = sum(trs[-14:]) / len(trs[-14:]) if trs else 0.0
 
             ostatni = ha[-1]
-            w["HA_BULL"] = ostatni["c"] >= ostatni["o"]
+            # Doji (c==o) NIE jest bykiem — strict '>' zostawia go neutralnym.
+            w["HA_BULL"] = ostatni["c"] > ostatni["o"]
             w["HA_BEAR"] = ostatni["c"] < ostatni["o"]
             if atr > 0:
                 w["HA_MOMENTUM"] = (ostatni["mid"] - ha[-2]["mid"]) / atr
                 mids = [x["mid"] for x in ha[-20:]]
                 mid_ma = sum(mids) / len(mids)
                 w["HA_VOLATILITY_INDEX"] = atr / mid_ma if mid_ma > 0 else 0.0
+            else:
+                # Płaski rynek (ATR=0) — jawne zera, by neuron FILTROWAŁ, nie handlował
+                # na brakujących polach (Prawo XV: martwy rynek = brak sygnału, nie chaos).
+                w["HA_MOMENTUM"] = 0.0
+                w["HA_VOLATILITY_INDEX"] = 0.0
         except Exception as e:
             logger.debug(f"[Budowniczy] HA pominięty: {e}")

@@ -15,6 +15,29 @@ cd "$ROOT"
 
 echo "🔐 PRE-COMMIT: sprawdzam spójność Imperium (Prawo XXI)..."
 
+# 0. Sprawdzamy DOKŁADNIE to, co wchodzi do commitu (staged), nie working tree.
+#    Schowaj zmiany nie-staged (keep-index zachowuje wersję staged na dysku),
+#    a trap gwarantuje przywrócenie nawet gdy testy/audyt padną lub przerwiemy.
+STASHED=0
+przywroc_working_tree() {
+    if [ "$STASHED" = "1" ]; then
+        git stash pop --quiet 2>/dev/null || git stash pop 2>/dev/null || true
+        STASHED=0
+    fi
+}
+trap przywroc_working_tree EXIT INT TERM
+
+if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
+    if git stash push --keep-index --include-untracked --quiet \
+            --message "pre-commit: izolacja staged" 2>/dev/null; then
+        # Schowaliśmy tylko jeśli faktycznie były zmiany nie-staged do schowania.
+        if git stash list | grep -q "pre-commit: izolacja staged"; then
+            STASHED=1
+            echo "  ▶ Izolacja staged (schowano zmiany nie-staged na czas sprawdzeń)"
+        fi
+    fi
+fi
+
 # 1. Testy
 echo "  ▶ Testy..."
 if ! python tests/run_tests.py 2>&1; then

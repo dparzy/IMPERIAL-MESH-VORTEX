@@ -592,6 +592,42 @@ def test_brama_choppiness_za_malo_danych():
     assert _py_choppiness([1, 2], [0, 1], [1, 2], period=14) is None
 
 
+def test_brama_ulcer_dokladnie_period():
+    """Brama: Ulcer potrzebuje DOKŁADNIE `period` świec (nie period+1) — warmup."""
+    from imperium.fundament.brama_kalkulatora import _py_ulcer
+    seria = [100 - i for i in range(14)]   # dokładnie 14 świec, period=14
+    assert _py_ulcer(seria, period=14) is not None
+    assert _py_ulcer(seria[:13], period=14) is None  # 13 < 14 → None
+
+
+def test_brama_audyt_zrodlo_pure_python():
+    """Prawo XIII: pure-Python wskaźniki stemplowane jako pure-Python, nie TA-Lib."""
+    from imperium.fundament.brama_kalkulatora import (
+        CalculatorGateway, SOURCE_TAG_PY, SOURCE_TAG)
+    import math
+    brama = CalculatorGateway()
+    h = [100 + math.sin(i/3)*5 for i in range(30)]
+    l = [v - 3 for v in h]; c = [(a+b)/2 for a, b in zip(h, l)]
+    r_chop = brama.compute("CHOPPINESS", high=h, low=l, close=c)
+    r_ulcer = brama.compute("ULCER", close=c)
+    assert r_chop.source == SOURCE_TAG_PY, "CHOPPINESS musi być pure-Python w audycie"
+    assert r_ulcer.source == SOURCE_TAG_PY, "ULCER musi być pure-Python w audycie"
+    # Kontrola: RSI nadal TA-Lib
+    r_rsi = brama.compute("RSI", close=c, period=14)
+    assert r_rsi.source == SOURCE_TAG, "RSI musi pozostać TA-Lib"
+
+
+def test_brama_accelerator_warmup_dokladny():
+    """AC: potrzebuje DOKŁADNIE slow+sma_ac świec (off-by-one naprawiony)."""
+    from imperium.fundament.brama_kalkulatora import _py_accelerator
+    import random
+    random.seed(1)
+    h = [100 + random.gauss(0, 2) for _ in range(39)]  # slow=34 + sma_ac=5 = 39
+    l = [v - 1 for v in h]
+    assert _py_accelerator(h, l)[0] is not None, "39 świec wystarcza (slow+sma_ac)"
+    assert _py_accelerator(h[:38], l[:38])[0] is None, "38 < 39 → None"
+
+
 def test_v14_choppiness_trend():
     """V-14: CHOP < 38.2 → silny trend → LONG."""
     s = NeuronChoppiness().interpretuj({"CHOPPINESS_14": 30.0})

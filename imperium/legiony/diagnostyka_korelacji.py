@@ -132,19 +132,29 @@ def raport_dekorelacji(
 
     redundantne = []
     dywersyfikujace = []
-    martwe = []  # stały sygnał (korelacja nieokreślona) — sam w sobie utrata potencjału
+    martwe = []          # None Z POWODU stałego sygnału (zerowa wariancja) = martwy głos
+    niedostateczne = []  # None z powodu za małej liczby próbek (NIE martwy moduł)
+
+    # Moduły zawsze NEUTRAL w całym oknie (zerowa wariancja) = martwy głos.
+    # Wymaga ≥2 próbek — przy 1 próbce seria trywialnie ma len(set)==1, co NIE
+    # dowodzi martwoty, tylko braku danych (Prawo I: nie udawaj wiedzy z 1 punktu).
+    stale = {k for k, v in serie.items() if len(v) >= 2 and len(set(v)) == 1}
 
     for (a, b), kor in macierz.items():
         if kor is None:
-            martwe.append((a, b))
+            # None oznacza: (1) stały sygnał (martwy) LUB (2) za mało próbek.
+            # Tylko (1) to realna utrata potencjału — (2) to po prostu krótka seria.
+            if a in stale or b in stale:
+                martwe.append((a, b))
+            else:
+                niedostateczne.append((a, b))
             continue
         if abs(kor) > prog_redundancji:
             redundantne.append((a, b, round(kor, 3)))
         elif abs(kor) < prog_dywersyfikacji:
             dywersyfikujace.append((a, b, round(kor, 3)))
 
-    # Moduły zawsze NEUTRAL w całym oknie (zerowa wariancja) = martwy głos
-    stale = [k for k, v in serie.items() if v and len(set(v)) == 1]
+    stale = sorted(stale)
 
     redundantne.sort(key=lambda t: -abs(t[2]))
     dywersyfikujace.sort(key=lambda t: abs(t[2]))
@@ -155,6 +165,7 @@ def raport_dekorelacji(
         "pary_redundantne": redundantne,
         "pary_dywersyfikujace": dywersyfikujace,
         "pary_nieokreslone": martwe,
+        "pary_niedostateczne_dane": niedostateczne,
         "moduly_stale": stale,
         "prog_redundancji": prog_redundancji,
         "prog_dywersyfikacji": prog_dywersyfikacji,

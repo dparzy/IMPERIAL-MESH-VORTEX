@@ -53,8 +53,9 @@ def _imbalance(bids: List, asks: List, poziomy: int) -> float:
     L2 imbalance dla N poziomów: (bid_vol - ask_vol) / (bid_vol + ask_vol).
     Zakres [-1, 1]. >0 = presja kupna, <0 = presja sprzedaży.
     """
-    bid_vol = sum(b[1] for b in bids[:poziomy]) if bids else 0.0
-    ask_vol = sum(a[1] for a in asks[:poziomy]) if asks else 0.0
+    # Binance depth zwraca [cena, ilość] jako STRINGI → rzutuj na float przed sumą.
+    bid_vol = sum(float(b[1]) for b in bids[:poziomy]) if bids else 0.0
+    ask_vol = sum(float(a[1]) for a in asks[:poziomy]) if asks else 0.0
     razem = bid_vol + ask_vol
     if razem <= 0:
         return 0.0

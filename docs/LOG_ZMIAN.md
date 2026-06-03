@@ -6,6 +6,121 @@
 
 ---
 
+## 2026-06-03 | FIX | Poprawki recenzji PR (cubic) #5 — L2 float, HA doji/ATR0, dekorelacja None
+
+### Kontekst
+Tura recenzji PR #22 — 4 uwagi (2×P1, 2×P2). Wszystkie trafne i naprawione.
+
+### Naprawione (kod + testy regresyjne)
+- **P1 L2 qty (exp_atmabhan):** Binance depth zwraca ilości jako STRINGI → `sum(b[1])`
+  mógł paść/sklejać. Rzutowanie `float(b[1])` przed sumą.
+- **P1 HA doji (budowniczy):** `HA_BULL = c >= o` oznaczał doji (c==o) jako byka.
+  Zmieniono na strict `>` → doji neutralny.
+- **P2 HA ATR==0 (budowniczy):** płaski rynek gubił pola HA_MOMENTUM/HA_VOLATILITY_INDEX.
+  Dodano jawne zera w gałęzi else → martwy rynek FILTROWANY, nie handlowany (Prawo XV).
+- **P2 dekorelacja None (diagnostyka):** `None` traktowany bezwarunkowo jako martwa para,
+  choć oznacza też za mało danych (n<2). Rozdzielono: martwy = któraś seria stała
+  (≥2 próbki, zerowa wariancja); reszta None → `pary_niedostateczne_dane`. Naprawiono też
+  detekcję `stale` (1 próbka trywialnie wyglądała na stałą → false alarm).
+
+### Testy regresyjne
+- `test_raport_niedostateczne_dane_nie_alarmuje_martwych` — 1 krok ≠ martwy głos.
+- Rozszerzono `test_raport_wykrywa_martwy_glos` o sprawdzenie `pary_nieokreslone`.
+
+### Stan
+- Testy: 388/388 (+1). Audyt: pełna harmonia.
+
+---
+
+## 2026-06-03 | FIX | Poprawka recenzji PR (cubic) #4 — KROK 0 grep mylący (ZASADY)
+
+### Kontekst
+Recenzja PR #24 zwróciła uwagę: w KROK 0 komenda `grep -c "✅"` liczyła WSZYSTKIE
+✅ (nagłówek + statusy), a krok 2 opisywał `✅ aktywny` — sprzeczne liczby.
+
+### Diagnoza (głębsza niż uwaga)
+`grep -c "✅ aktywny"` daje 69 (łapie też zwiadowców EXP i inne tabele), a aktywnych
+neuronów jest 39. Grep po dokumentach NIE jest w stanie wyizolować neuronów — to złe
+źródło prawdy (łamie Prawo XIX: źródłem jest kod, nie dokument).
+
+### Naprawione
+- KROK 0 w `ZASADY_FUNDAMENTALNE.md`: zastąpiono kruchy grep autorytatywną komendą
+  (`audyt_spojnosci.py` + one-liner z `rejestr.py`). Dodano ostrzeżenie, by NIE liczyć
+  neuronów grepem. Źródło prawdy = kod weryfikowany audytem.
+
+### Stan
+- Testy: 387/387. Audyt: pełna harmonia. (Zmiana wyłącznie dokumentacyjna — ZASADY.)
+
+---
+
+## 2026-06-03 | FIX | Poprawki recenzji PR (cubic) #3 — filtr/AC/audyt W4/MANIFEST
+
+### Kontekst
+Trzecia tura recenzji PR — 4 uwagi. Wszystkie zweryfikowane jako trafne i naprawione.
+
+### Naprawione (kod + testy regresyjne)
+- **baza.py (filtr nie karze):** strategia z filtrami, ale wszystkie wyciszone
+  (`n_akt_f==0`) dostawała `filtr_frakcja=0.5` → kara mimo komentarza „nie karzemy
+  za wyciszone". Poprawiono na `1.0` (jak brak filtrów). Prawo XV.
+- **brama (AC off-by-one):** `_py_accelerator` wymagał `slow+sma_ac+1` świec, choć
+  najgłębszy SMA potrzebuje `slow+sma_ac`. Usunięto `+1` → wynik o bar wcześniej.
+- **audyt W4 (maskowanie importu):** `except ImportError: pass` ukrywał KAŻDY błąd
+  importu. Zawężono do `ModuleNotFoundError` modułu strategii; inne → błąd audytu.
+- **MANIFEST (per-legion):** X Equestris pokazywał 7 zaimpl./19 do wdrożenia mimo
+  dodania X-09/X-10. Poprawiono na 9/17 (spójne z RAZEM 46/253).
+
+### Testy regresyjne
+- `test_brama_accelerator_warmup_dokladny` — AC przy dokładnie slow+sma_ac.
+- `test_dopasowanie_wyciszone_filtry_nie_karza` — wynik = strategia bez filtrów.
+
+### Stan
+- Testy: 387/387 (+2). Audyt: pełna harmonia.
+
+---
+
+## 2026-06-03 | FIX | Poprawki recenzji PR (cubic) #2 — hook staged-only + audyt W6 'Stan na:'
+
+### Kontekst
+Druga tura recenzji PR zgłosiła 2 uwagi. Obie trafne i naprawione.
+
+### Naprawione (kod + testy regresyjne)
+- **Pre-commit hook (staged-only):** hook uruchamiał testy/audyt na working tree,
+  nie na zawartości staged → zepsuty staged mógł przejść, jeśli working tree był
+  poprawny (i odwrotnie). Dodano izolację: `git stash push --keep-index --include-untracked`
+  na czas sprawdzeń + `trap` gwarantujący przywrócenie working tree (EXIT/INT/TERM).
+- **Audyt W6 (brak 'Stan na:'):** brak pola daty był cicho pomijany (`if m:` bez `else`).
+  Dodano `else` → brak daty = błąd. Przy okazji wykryto, że regex nie matchował
+  markdown `**Stan na:** data` — poprawiono na `Stan na:\s*\**\s*(data)`.
+
+### Testy regresyjne
+- `test_audyt_wykrywa_brak_stan_na` — brak pola = błąd W6.
+- `test_audyt_akceptuje_stan_na_w_markdown` — markdown nie daje fałszywego alarmu.
+
+### Stan
+- Testy: 385/385 (+2). Audyt: pełna harmonia. Hook zsynchronizowany (install_hooks.py).
+
+---
+
+## 2026-06-03 | FIX | Poprawki recenzji PR (cubic) — audyt źródła, warmup Ulcer, fallback symbolu
+
+### Kontekst
+Recenzja automatyczna PR zgłosiła 3 uwagi. Wszystkie zweryfikowane jako trafne i naprawione.
+
+### Naprawione (kod + testy regresyjne)
+- **Prawo XIII (audyt źródła):** `CalcResult.source` domyślnie stemplował WSZYSTKIE
+  wskaźniki jako TA-Lib, w tym pure-Python (AO/AC/HMA/RVOL/HIST_VOL/VWAP/Supertrend/
+  Ichimoku/Donchian/CHOPPINESS/ULCER). Dodano `_PURE_PYTHON_INDICATORS` + wybór źródła
+  w `compute()` → audyt nie kłamie o pochodzeniu obliczenia.
+- **Ulcer warmup:** `_py_ulcer` wymagał `period+1` świec, choć używa `c[-period:]`
+  (dokładnie `period`). Poprawiono próg na `< period`.
+- **Fallback symbolu:** `czytnik_csv` brał `split("_")[0]` → dla `Binance_BTCUSDT_1h.csv`
+  zwracał `BINANCE`. Poprawiono na segment PRZED interwałem (`[-2]`) → `BTCUSDT`.
+
+### Stan
+- Testy: 383/383 (+2 regresyjne: warmup Ulcer, stempel źródła). Audyt: pełna harmonia.
+
+---
+
 ## 2026-06-03 | MAJOR | Rozbudowa roju — kat. L+V wzmocnione (Ulcer + Choppiness, Prawo XVI)
 
 ### Kontekst

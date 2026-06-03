@@ -50,6 +50,15 @@ logger = logging.getLogger("BramaKalkulatora")
 SOURCE_TAG = "TA-Lib (C-core, deterministic)"
 SOURCE_TAG_PY = "pure-Python (deterministic)"
 
+# Wskaźniki liczone czystą matematyką Pythona (TA-Lib ich nie ma).
+# compute() stempluje je SOURCE_TAG_PY — audyt nie może kłamać o źródle (Prawo XIII).
+_PURE_PYTHON_INDICATORS = {
+    "AO", "AO_PREV", "AC", "AC_PREV", "HMA", "HMA_PREV",
+    "DONCHIAN", "RVOL", "HIST_VOL", "CHOPPINESS", "ULCER",
+    "VWAP", "VWAP_STD",
+    "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
+}
+
 
 def _arr(x) -> np.ndarray:
     return np.asarray(x, dtype=np.float64)
@@ -140,7 +149,9 @@ def _py_accelerator(high, low, fast: int = 5, slow: int = 34, sma_ac: int = 5):
     Mierzy PRZYSPIESZENIE momentum (2. pochodna ceny) — wyprzedza AO.
     Zwraca (AC_last, AC_prev). Bez TA-Lib — czysta matematyka."""
     med = [(h + l) / 2 for h, l in zip(high, low)]
-    potrzeba = slow + sma_ac + 1
+    # Najgłębszy SMA(slow) przy najwcześniejszym indeksie AO (n−sma_ac−1) wymaga
+    # n ≥ slow + sma_ac. Bez nadmiarowego +1 (off-by-one opóźniał wynik o 1 bar).
+    potrzeba = slow + sma_ac
     if len(med) < potrzeba:
         return None, None
 
@@ -233,7 +244,7 @@ def _py_ulcer(close, period: int = 14) -> Optional[float]:
     """
     import math
     c = list(close)
-    if len(c) < period + 1:
+    if len(c) < period:          # UI potrzebuje dokładnie `period` świec (okno = c[-period:])
         return None
     okno = c[-period:]
     szczyt = okno[0]
@@ -521,7 +532,8 @@ class CalculatorGateway:
         series = kwargs.get("close")
         if series is not None:
             params["input_len"] = int(len(series))
-        result = CalcResult(indicator=name, params=params, value=value)
+        zrodlo = SOURCE_TAG_PY if name in _PURE_PYTHON_INDICATORS else SOURCE_TAG
+        result = CalcResult(indicator=name, params=params, value=value, source=zrodlo)
         self.audit_log.append(result)
         logger.info(f"[Brama] {name} {params} = {value} | hash={result.sha256}")
         return result

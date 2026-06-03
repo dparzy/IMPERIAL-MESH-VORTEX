@@ -107,11 +107,9 @@ class NeuronCVD(MikroNeuron):
     WSKAZNIK = "CVD"
     KATEGORIA = "F"
     WAGA = 8
-    DOSTEPNY = False
-    POWOD_NIEDOSTEPNOSCI = (
-        "CVD wymaga danych o stronie agresora (buy/sell volume z tick/trade feed). "
-        "OHLCV tego nie zawiera. Aktywuje się przy podpięciu trade feed z MEXC."
-    )
+    DOSTEPNY = True   # AdapterCVD (Binance aggTrades publiczne, bez klucza) — Faza C
+    # Prawo XV: w backteście CSV (bez trade-feedu) abstynuje (NEUTRAL); live/paper
+    # AdapterCVD liczy CVD z publicznego aggTrades → V-03 głosuje.
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         cvd = wskazniki.get("CVD")

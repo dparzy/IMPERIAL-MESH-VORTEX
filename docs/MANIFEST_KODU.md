@@ -7,11 +7,12 @@
 
 **Stan na:** 2026-06-03 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 44 neurony (zarejestrowane w roju) + 12 zwiadowców = **56 modułów w kodzie**
-**Aktywne / wyciszone:** 36 aktywnych + 8 wyciszonych, z czego:
+**Aktywne / wyciszone:** 37 aktywnych + 7 wyciszonych, z czego:
   • **32 czyste OHLCV** (M/T/F/A/L/V) — liczą z barów bez żadnego API
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
+  • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 budzone WEWNĘTRZNIE** (SMC-01/02/03) — liczą z barów przez most EXP-05, ożywają w żywym Legatusie (`zbuduj_legatusa`), **bez żadnego API**
-  • **5 wymaga ZEWNĘTRZNEGO API/feedu** (V-03 CVD, OC-01..04) — wybudzą się przez adapter API (mechanizm gotowy)
+  • **4 wymaga ZEWNĘTRZNEGO API on-chain** (OC-01..04) — Glassnode/CryptoQuant (Faza D)
 **Elitarne (Prawo XX):** 14 (2 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
 **Do wdrożenia:** 255 neuronów
@@ -88,7 +89,7 @@
 |-------|-------|-----|------|--------|-----------------|-----|
 | V-01 | NeuronOBV | F | 7 | ✅ aktywny | OBV | — |
 | V-02 | NeuronVWAP | F | 8 | ✅ aktywny | VWAP | — |
-| V-03 | NeuronCVD | F | 8 | 🔇 wyciszony (brak CVD z Bramy) | CVD | — |
+| V-03 | NeuronCVD | F | 8 | ✅ aktywny (AdapterCVD) | CVD | — |
 | V-04 | NeuronVolumeAnomaly | F | 6 | ✅ aktywny | VOLUME_ANOMALY | — |
 | X-11 | NeuronRVOL | F | 7 | ✅ aktywny | RVOL | — |
 
@@ -159,7 +160,7 @@
 | X-25 | ATRDeviation 🔱 | ATR Z-score kameleon (IMV-ADO) | ✅ kod (momentum.py, aktywny) |
 | X-26 | HAScalper 🔱 | HA Scalper bez repainting (IMV-ADO) | ✅ kod (momentum.py, aktywny) |
 | X-01 | EMA Cross | EMA(9/21) kierunek | 🔴 katalog (X-05 EMACross to odpowiednik) |
-| X-03 | CVD | Cumulative Volume Delta | 🔴 katalog (V-03 CVD wyciszony) |
+| X-03 | CVD | Cumulative Volume Delta | ✅ V-03 aktywny (AdapterCVD, Faza C) |
 | X-04 | VWAP Bounce | VWAP magnes dnia | 🔴 katalog (V-02 VWAP = odpowiednik) |
 | X-05 | OrderFlow | Bid/Ask Imbalance | 🔴 katalog |
 | X-06 | ATR-Stop | ATR×1.5 dynamiczny stop | 🔴 katalog |
@@ -216,6 +217,7 @@
 | Adaptery testowe (OnChain/Futures/CVD mock) | `akwedukty/adaptery/testowy.py` | ✅ aktywny (mock) |
 | AdapterFearGreed (PSY-03, alternative.me) | `akwedukty/adaptery/feargreed.py` | ✅ aktywny (realne API) |
 | AdapterFutures (PSY-01/02/04, Binance fapi publiczne) | `akwedukty/adaptery/futures.py` | ✅ aktywny (realne API, bez klucza) |
+| AdapterCVD (V-03, Binance aggTrades publiczne) | `akwedukty/adaptery/cvd.py` | ✅ aktywny (realne API, bez klucza) |
 
 ---
 
@@ -293,7 +295,8 @@ chciwość→SHORT). Wybudzanie granularne: budzi TYLKO PSY-03, nie całą domen
 | 2026-06-02 | Dywizja Strategii + Klucznik | +2 moduły | 46+2 | Strategie jako KOD, silnik dopasowania, audyt Warstwa 4 |
 | 2026-06-03 | Faza A — kat. L+V + 3 martwe naprawione | +2 neurony | 44+12=56 | VI-13 ATR-Lev (L), V-13 RealizedVol (V); naprawa XII-07/X-12/A-05 |
 | 2026-06-03 | **Faza B — kat. R obudzona** | +1 adapter | aktywne 32→36 | AdapterFutures (Binance fapi publiczne) budzi PSY-01/02/04; PSY-03 (FearGreed) wpięty; adaptery w pipeline Dyrygenta; +2 strategie VI-LV (17 łącznie); +9 testów |
-| **Do wdrożenia** | Faza C/D — feed/on-chain | +X neuronów | — | V-03 CVD, OC-01..04, SMC live feed |
+| 2026-06-03 | **Faza C — V-03 CVD obudzony** | +1 adapter | aktywne 36→37 | AdapterCVD (Binance aggTrades publiczne, bez klucza) liczy CVD=buy−sell; pamięć CVD_PREV; wpięty w pipeline Dyrygenta; +6 testów offline |
+| **Do wdrożenia** | Faza D — on-chain | +0 (4 obudzić) | — | OC-01..04 (Glassnode/CryptoQuant API) |
 
 ---
 

@@ -13,6 +13,7 @@ from imperium.akwedukty.adaptery.testowy import (
 )
 from imperium.akwedukty.adaptery.feargreed import AdapterFearGreed
 from imperium.akwedukty.adaptery.futures import AdapterFutures
+from imperium.akwedukty.adaptery.cvd import AdapterCVD
 
 __all__ = [
     "AdapterDanych",
@@ -21,4 +22,5 @@ __all__ = [
     "AdapterTestowyCVD",
     "AdapterFearGreed",
     "AdapterFutures",
+    "AdapterCVD",
 ]

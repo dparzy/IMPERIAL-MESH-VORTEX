@@ -208,17 +208,12 @@ def test_futures_real_padniety_fetcher_bezpieczny():
 
 # ── CVD (V-03) ────────────────────────────────────────────────────────────────
 
-def test_cvd_aktywuj_i_usypiaj():
-    """aktywuj()/usypiaj() dla V-03 CVD — stan czysty po teście."""
+def test_cvd_aktywny_faza_c():
+    """Faza C: V-03 CVD aktywny domyślnie (realny AdapterCVD, Binance aggTrades)."""
     from imperium.legiony.neurony.wolumen import NeuronCVD
+    assert NeuronCVD.DOSTEPNY is True
     ad = AdapterTestowyCVD("akumulacja")
-    assert NeuronCVD.DOSTEPNY is False
-    try:
-        assert ad.aktywuj() == ["V-03"]
-        assert NeuronCVD.DOSTEPNY is True
-    finally:
-        ad.usypiaj()
-        assert NeuronCVD.DOSTEPNY is False
+    assert ad.neurony_obslugiwane() == ["V-03"]
 
 
 def test_cvd_akumulacja_long():
@@ -237,6 +232,56 @@ def test_cvd_dystrybucja_short():
     w = {}
     ad.wzbogac(w, "BTCUSDT")
     assert NeuronCVD().interpretuj(w).kierunek == "SHORT"
+
+
+# ── AdapterCVD REALNY (Binance aggTrades, fetcher wstrzyknięty — offline) ─────
+
+def _aggtrades_json(buy_qty: float, sell_qty: float) -> str:
+    """Buduje próbkę aggTrades: jeden trade buy (m=false) i jeden sell (m=true)."""
+    return ('[{"q":"%s","m":false},{"q":"%s","m":true}]' % (buy_qty, sell_qty))
+
+
+def test_cvd_real_dolewa_cvd():
+    """AdapterCVD liczy CVD = buy − sell z aggTrades i dolewa CVD/CVD_PREV."""
+    from imperium.akwedukty.adaptery import AdapterCVD
+    ad = AdapterCVD(fetcher=lambda url: _aggtrades_json(100.0, 40.0))
+    w = {"CLOSE": 40000.0}
+    ad.wzbogac(w, "BTCUSDT")
+    assert abs(w["CVD"] - 60.0) < 1e-9        # 100 buy − 40 sell
+    assert w["CVD_PREV"] == w["CVD"]          # pierwszy odczyt = brak dywergencji
+
+
+def test_cvd_real_dodatni_long():
+    """CVD dodatni (przewaga kupujących agresorów) → V-03 LONG."""
+    from imperium.akwedukty.adaptery import AdapterCVD
+    from imperium.legiony.neurony.wolumen import NeuronCVD
+    ad = AdapterCVD(fetcher=lambda url: _aggtrades_json(200.0, 50.0))
+    w = {}
+    ad.wzbogac(w, "BTCUSDT")
+    assert NeuronCVD().interpretuj(w).kierunek == "LONG"
+
+
+def test_cvd_real_pamiec_prev():
+    """CVD_PREV pamięta poprzedni odczyt (dla dywergencji V-03)."""
+    from imperium.akwedukty.adaptery import AdapterCVD
+    ad = AdapterCVD(fetcher=lambda url: _aggtrades_json(100.0, 40.0))
+    w1 = {}; ad.wzbogac(w1, "BTCUSDT")
+    ad._fetcher = lambda url: _aggtrades_json(30.0, 90.0)  # CVD = -60
+    w2 = {}; ad.wzbogac(w2, "BTCUSDT")
+    assert abs(w2["CVD"] - (-60.0)) < 1e-9
+    assert abs(w2["CVD_PREV"] - 60.0) < 1e-9   # poprzedni odczyt
+
+
+def test_cvd_real_padniety_fetcher_bezpieczny():
+    """Fetcher rzucający wyjątek → dict bez zmian (Prawo XV: V-03 abstynuje)."""
+    from imperium.akwedukty.adaptery import AdapterCVD
+    def zly(url):
+        raise RuntimeError("brak feedu")
+    ad = AdapterCVD(fetcher=zly)
+    w = {"CLOSE": 100.0}
+    ad.wzbogac(w, "BTCUSDT")
+    assert w.get("CVD") is None
+    assert "CLOSE" in w
 
 
 # ── AdapterFearGreed (PSY-03) — pierwszy prawdziwy adapter API ────────────────
@@ -306,10 +351,9 @@ def test_stan_globalny_przywrocony():
         NeuronFundingExtreme, NeuronPanikaDetal, NeuronFearGreed, NeuronOIDiv,
     )
     from imperium.legiony.neurony.wolumen import NeuronCVD
-    wyciszone = [NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow,
-                 NeuronCVD]
+    wyciszone = [NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow]
     for klasa in wyciszone:
         assert klasa.DOSTEPNY is False, f"{klasa.KLUCZ} pozostał obudzony — zafałszuje audyt!"
-    aktywne_psy = [NeuronFundingExtreme, NeuronPanikaDetal, NeuronFearGreed, NeuronOIDiv]
-    for klasa in aktywne_psy:
-        assert klasa.DOSTEPNY is True, f"{klasa.KLUCZ} powinien być aktywny (Faza B)"
+    aktywne = [NeuronFundingExtreme, NeuronPanikaDetal, NeuronFearGreed, NeuronOIDiv, NeuronCVD]
+    for klasa in aktywne:
+        assert klasa.DOSTEPNY is True, f"{klasa.KLUCZ} powinien być aktywny (Faza B/C)"

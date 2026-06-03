@@ -18,9 +18,9 @@
 |------------------|----------------------------------|
 | **Projekt**      | IMPERIUM — AI Crypto Trading     |
 | **Motto**        | Roma non est facta die una       |
-| **Wersja**       | v0.1.0                           |
-| **Faza**         | 🟡 Faza 0 — Paper Trading        |
-| **Data**         | 2026-06-02                       |
+| **Wersja**       | v0.5.0                           |
+| **Faza**         | 🟡 Faza 1 — Namiestnik (Regime + Timeframe-Aware Gating) |
+| **Data**         | 2026-06-03                       |
 | **Giełda główna**| MEXC (konto zweryfikowane)       |
 | **Rdzeń AI**     | DeepSeek LLM via API             |
 
@@ -65,6 +65,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 29 | `SKAN_AZJA.md` | Skan Azja — perełki z 3100 linków azjatyckich | ✅ Aktywny |
 | 30 | `WERSJONOWANIE.md` | Wersjonowanie i pieczęć Imperium — historia tagów i polityka wersji | ✅ Aktywny |
 | 31 | `WIZJONER.md` | Wizjoner — brudnopis Imperium: rozmowy → wizje → zadania → kod | ✅ Aktywny |
+| 32 | `NAMIESTNIK.md` | **Namiestnik** — Regime + Timeframe-Aware Gating Network (reżim×styl → tryb/lewar/rynek/próg), tabela dowodowa, fazy | ✅ Aktywny |
 
 ---
 
@@ -83,7 +84,7 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 | `imperium/drogi/` | Drogi — wykonanie zlecenia na MEXC (Via Romana) | Order Execution | 🟡 Szkielet |
 | `imperium/biblioteki/` | Biblioteki — kronikarz.py + **pamiec_absolutna.py** (ImperiumLog, MAE/MFE, JSONL) | Logs & Memory | ✅ Gotowy |
 | `imperium/swiatynie/` | Świątynie — wykresy, dashboard, wizualizacje | Charts & Dashboard | 🟡 Szkielet |
-| `imperium/koloseum/` | Koloseum — PaperTradingEngine + **Dyrygent** (orkiestrator cyklu end-to-end: bary→Legatus→Kalkulator→pozycja) + **Backtest** + **Detektor Lookahead-bias** (LA-01, Freqtrade) | Backtesting Arena | ✅ Cykl Faza 0 aktywny |
+| `imperium/koloseum/` | Koloseum — PaperTradingEngine + **Dyrygent** (orkiestrator: bary→**Namiestnik**→Legatus→Kalkulator→pozycja) + **Namiestnik** (Regime + Timeframe-Aware Gating Network) + **Backtest** + **Detektor Lookahead-bias** (LA-01, Freqtrade) | Backtesting Arena | ✅ Cykl Faza 1 aktywny |
 | `imperium/oczy/` | Oczy — newsy, sentyment, dane on-chain | News & Sentiment | 🔴 Planowany |
 
 **Legenda:** ✅ Gotowy — działa produkcyjnie | 🟡 Szkielet — struktura istnieje, wypełnianie w toku | 🔴 Planowany — jeszcze nie rozpoczęty
@@ -136,12 +137,16 @@ Nienaruszalne zasady. Złamanie któregokolwiek Prawa = błąd architektoniczny.
 
 Cztery Legiony Zwiadowcze — każdy widzi rynek inaczej.
 
-| # | Nazwa Łacińska | Styl Analizy | Timeframe | Specjalizacja |
-|---|----------------|--------------|-----------|---------------|
-| I | **Legio Prima — Fulminata** | Momentum & Trend | 1m–15m | Szybkie ruchy, breakouty, wolumen |
-| II | **Legio Secunda — Augusta** | Mean Reversion | 1h–4h | RSI, oversold/overbought, powrót do średniej |
-| III | **Legio Tertia — Gallica** | Structure & Patterns | 4h–1D | Formacje świecowe, S/R, fale Elliotta |
-| IV | **Legio Quarta — Scythica** | Macro & Sentiment | 1D–1W | Trendy makro, on-chain, cykl rynkowy |
+| # | Nazwa Łacińska | Styl (Namiestnik) | Timeframe | Lewar (cap) | Rynek | Specjalizacja |
+|---|----------------|-------------------|-----------|-------------|-------|---------------|
+| X | **Legio X — Equestris** | SCALP | M1–M15 | ≤10× | FUTURES | Szybkie ruchy, breakouty, wolumen |
+| XII | **Legio XII — Fulminata** | SWING | 30M–4H | ≤5× | FUTURES/SPOT | Trend swing, RSI, struktura |
+| XII/IMV | **Swing-Position** | SWING/INVEST | 4H–1D | ≤2–5× | OBA | Formacje, S/R, MTF bias |
+| III | **Legio III — Augusta** | INVEST | 1D–1W | ≤2× | SPOT | Trendy makro, on-chain, cykl |
+
+> **Timeframe-Aware (Namiestnik, 2026-06-03):** interwał → styl (SCALP/SWING/INVEST)
+> automatycznie wyznacza sufit dźwigni, rynek (futures/spot) i korektę progu pewności.
+> Strategie filtrowane po interwale (`dobierz_najlepsze(interwal=...)`).
 
 > Szczegóły mikro-neuronów i schematu sygnałów → `LEGIONY_ARCHITEKTURA.md`
 
@@ -151,16 +156,26 @@ Cztery Legiony Zwiadowcze — każdy widzi rynek inaczej.
 
 Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 
+### 🗺️ FAZY ROZWOJU (uzupełnianie luk kategorii — patrz `NAMIESTNIK.md`)
+
+| Faza | Zakres | Kategorie/Neurony | API? | Priorytet |
+|------|--------|-------------------|------|-----------|
+| **A'** | Naprawa martwych głosów (XII-07, X-12, A-05 = 100% NEUTRAL) | naprawa istniejących | ❌ nie | 🔴 Krytyczny |
+| **A** | Ożywienie pustych kategorii: **L** (VI-13 ATR-Lev) + **V** (Realized Vol) z OHLCV | +2 kat., +7-9 neuronów | ❌ nie | 🔴 Krytyczny |
+| **B** | Adapter Futures → Legion VI (Funding, OI, Liq, L/S) → pełna kat. **L** | +~14 neuronów | ✅ futures | 🟠 Wysoki |
+| **C** | Adaptery feed → obudzenie 12 gotowych wyciszonych (SMC/PSY/OC) → kat. S/R/O | +12 (kod gotowy) | ✅ L2/sentyment/on-chain | 🟠 Wysoki |
+| **D** | Legion III Augusta (Invest 1D-1W: MVRV, NUPL, SOPR…) | +38 neuronów | ✅ on-chain | 🔵 Średni |
+| **E** | Księga Azjatycka strategii (STR-001..170) + futures/spot strategie VI-LV | +~165 strategii | częściowo | 🔵 Niski |
+
+**Stan kategorii (2026-06-03):** aktywne M/T/F/A · wyciszone S/R/O/V · **L = PUSTA (0 neuronów)** 🚨
+
+### Zadania bieżące (infrastruktura)
 | # | Zadanie | Moduł | Priorytet |
 |---|---------|-------|-----------|
 | 1 | ⚡ Ustaw `DEEPSEEK_API_KEY` w zmiennych środowiskowych | Cesarz | 🔴 Krytyczny |
-| 2 | 🧪 Uruchom `python imperium/cesarz/deepseek_glos.py` — test połączenia | Cesarz | 🔴 Krytyczny |
-| 3 | 🖥️ Zainstaluj TA-Lib na Windows 10 (Fujitsu 8GB RAM) | Fundament | 🔴 Krytyczny |
-| 4 | 🔄 Uruchom pełny cykl Fazy 0 na realnych danych (paper trading) | Cały system | 🟠 Wysoki |
-| 5 | 🏟️ Zbuduj silnik Koloseum (backtest + WFO + MAE/MFE) | Koloseum | 🟠 Wysoki |
-| 6 | 🎮 Zaimplementuj moduł Igrzysk w kodzie (scorer neuronów) | Biblioteki | 🟡 Średni |
-| 7 | 🔮 Zaimplementuj Doradców Cara (Oracle/Fulmen/Iustitia w kodzie) | Cesarz | 🟡 Średni |
-| 8 | 🧬 Ciągle: szukaj nowych neuronów i strategii (Skan V, VI...) | Legiony | 🟡 Ciągły |
+| 2 | 🖥️ Zainstaluj TA-Lib (środowisko produkcyjne) | Fundament | 🔴 Krytyczny |
+| 3 | 🧬 Faza A': napraw 3 martwe neurony + Faza A: ożyw kategorie L i V | Legiony | 🔴 Krytyczny |
+| 4 | 🔌 Faza B/C: adaptery Futures + feed (obudzenie wyciszonych) | Akwedukty | 🟠 Wysoki |
 
 ---
 
@@ -193,6 +208,7 @@ python imperium/pretorianie/veto_check.py
 | v0.2.0 | 2026-06-01 | +legatus.py, +kalkulator_lewara.py, +KATALOG_STRATEGII, +KATALOG_NEURONOW (287) |
 | v0.3.0 | 2026-06-01 | Skan IV (+16 neuronów → 303), IGRZYSKA_IMPERIUM, PAMIEC_ABSOLUTNA, DORADCY_CARA, pamiec_absolutna.py |
 | v0.4.0 | 2026-06-02 | +Adaptery API, +5 neuronów (A-03/A-05/XII-06 + F-01..04), Prawo XX elitarny, WAGI_REZIMU, LOG_ZMIAN, ZPO, REJESTR_INSPIRACJI |
+| v0.5.0 | 2026-06-03 | +Namiestnik (Regime-Aware Gating), +Detektor Lookahead, +Timeframe-Aware (styl SCALP/SWING/INVEST, lewar_cap, futures/spot, filtr strategii po interwale), tabela dowodowa, 346 testów |
 
 ---
 

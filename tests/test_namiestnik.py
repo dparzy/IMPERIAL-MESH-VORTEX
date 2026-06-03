@@ -15,6 +15,87 @@ def test_namiestnik_import():
     assert s is not None
 
 
+# ─── Warstwa STYLU INTERWAŁOWEGO (Timeframe-Aware) ───────────────────────────
+
+def test_styl_interwalu_mapowanie():
+    from imperium.koloseum.namiestnik import styl_interwalu
+    assert styl_interwalu("M5") == "SCALP"
+    assert styl_interwalu("M15") == "SCALP"
+    assert styl_interwalu("1H") == "SWING"
+    assert styl_interwalu("4H") == "SWING"
+    assert styl_interwalu("1D") == "INVEST"
+    assert styl_interwalu("1W") == "INVEST"
+    assert styl_interwalu("") == "SWING"      # domyślny
+    assert styl_interwalu(None) == "SWING"
+
+
+def test_profil_stylu_lewar_cap():
+    from imperium.koloseum.namiestnik import profil_stylu
+    # scalp dopuszcza wyższą dźwignię niż invest
+    assert profil_stylu("M5").lewar_cap == 10
+    assert profil_stylu("1H").lewar_cap == 5
+    assert profil_stylu("1D").lewar_cap == 2
+    # invest = spot, scalp = futures
+    assert profil_stylu("1D").rynek == "SPOT"
+    assert profil_stylu("M5").rynek == "FUTURES"
+
+
+def test_decyduj_z_interwalem_zwraca_styl():
+    from imperium.koloseum.namiestnik import Namiestnik
+    n = Namiestnik()
+    d = n.decyduj("TREND_STRONG", "M5")
+    assert d.styl == "SCALP"
+    assert d.lewar_cap == 10
+    d2 = n.decyduj("TREND_STRONG", "1D")
+    assert d2.styl == "INVEST"
+    assert d2.lewar_cap == 2
+
+
+def test_skaluj_dzwignie_przycina_sufitem_stylu():
+    from imperium.koloseum.namiestnik import Namiestnik
+    n = Namiestnik()
+    # TREND_STRONG lewar_factor=1.2; baza=10 → 12, ale INVEST cap=2
+    d_invest = n.skaluj_dzwignie(10, "TREND_STRONG", "1D")
+    assert d_invest <= 2, f"INVEST powinien przyciąć do 2, dostał {d_invest}"
+    # SCALP cap=10 → 12 przycięte do 10
+    d_scalp = n.skaluj_dzwignie(10, "TREND_STRONG", "M5")
+    assert d_scalp <= 10
+    assert d_scalp > d_invest
+
+
+def test_volatile_wymusza_spot_nawet_na_scalpie():
+    from imperium.koloseum.namiestnik import Namiestnik
+    n = Namiestnik()
+    d = n.decyduj("VOLATILE", "M5")  # scalp normalnie FUTURES
+    assert d.rynek == "SPOT", "VOLATILE powinien wymusić SPOT (obrona)"
+
+
+def test_invest_prog_wyzszy_niz_scalp():
+    from imperium.koloseum.namiestnik import Namiestnik
+    n = Namiestnik()
+    # ten sam reżim, invest selektywniejszy (mnoznik_progu 1.1 vs scalp 0.95)
+    d_scalp = n.decyduj("NORMAL", "M5")
+    d_invest = n.decyduj("NORMAL", "1D")
+    assert d_invest.prog_pewnosci > d_scalp.prog_pewnosci
+
+
+def test_strategia_filtr_interwalu():
+    """dobierz_najlepsze odfiltrowuje strategie spoza interwału (Prawo XV)."""
+    from imperium.legiony.strategie.baza import _interwal_pasuje, Strategia
+    s_scalp = Strategia(id="T-SC", nazwa="x", legion="X", styl="SC",
+                        warunki="", interwaly=["M5", "M15"])
+    s_swing = Strategia(id="T-SW", nazwa="y", legion="XII", styl="TR",
+                        warunki="", interwaly=["4H", "1D"])
+    s_uniw = Strategia(id="T-UN", nazwa="z", legion="IMV", styl="HY",
+                       warunki="", interwaly=[])
+    assert _interwal_pasuje(s_scalp, "M5")
+    assert not _interwal_pasuje(s_scalp, "1D")
+    assert _interwal_pasuje(s_swing, "1D")
+    assert _interwal_pasuje(s_uniw, "M5")   # pusta lista = uniwersalna
+    assert _interwal_pasuje(s_uniw, "1D")
+    assert _interwal_pasuje(s_scalp, "")    # brak interwału = nie filtruj
+
+
 def test_znane_rezimy_zwracaja_ustawienia():
     from imperium.koloseum.namiestnik import Namiestnik
     n = Namiestnik()

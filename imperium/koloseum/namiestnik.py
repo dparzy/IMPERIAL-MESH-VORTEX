@@ -148,44 +148,158 @@ _FALLBACK = UstawieniaRezimu(
 )
 
 
+# ─── Warstwa STYLU INTERWAŁOWEGO (Timeframe-Aware Gating) ─────────────────────
+#
+# Deep-research (2026-06-03): auto-selekcja timeframe+strategia wg reżimu to
+# OTWARTY PROBLEM — Freqtrade/Jesse/Nautilus/OctoBot wymagają ręcznej konfiguracji
+# per styl. Standardy praktyków:
+#   SCALP (M1-M15):  RSI 4-7, lewar 5-10×, FUTURES, szybkie wejścia
+#   SWING (30M-4H):  RSI ~20, lewar 2-5×, FUTURES/SPOT
+#   INVEST (1D-1W):  RSI 14, lewar spot/1-2×, SPOT, selektywne
+#
+# Prawo XV: ożywia martwe metadane strategii (interwaly/styl/dzwignia ignorowane
+# przez dobierz_najlepsze). Namiestnik teraz rozróżnia styl wg interwału.
+
+
+@dataclass
+class ProfilStylu:
+    """
+    Profil handlowy zależny od interwału (timeframe → styl).
+
+    styl:         SCALP / SWING / INVEST
+    lewar_cap:    twardy sufit dźwigni dla tego stylu (deep-research: scalp≤10, swing≤5, invest≤2)
+    rynek:        preferowany rynek: 'FUTURES' / 'SPOT' / 'OBA'
+    mnoznik_progu:korekta progu pewności (scalp szybciej, invest selektywniej)
+    opis:         czytelny powód
+    """
+    styl: str
+    lewar_cap: int
+    rynek: str
+    mnoznik_progu: float
+    opis: str
+
+
+# Mapa interwał → profil stylu (Prawo XVI: progi/lewary z deep-research praktyków)
+_PROFILE_STYLU: Dict[str, ProfilStylu] = {
+    "SCALP": ProfilStylu("SCALP", lewar_cap=10, rynek="FUTURES", mnoznik_progu=0.95,
+                         opis="Scalp M1-M15: szybkie wejścia, futures, wysoka dźwignia"),
+    "SWING": ProfilStylu("SWING", lewar_cap=5, rynek="OBA", mnoznik_progu=1.0,
+                         opis="Swing 30M-4H: zbalansowane, futures lub spot"),
+    "INVEST": ProfilStylu("INVEST", lewar_cap=2, rynek="SPOT", mnoznik_progu=1.1,
+                          opis="Invest 1D-1W: spot, niska dźwignia, selektywne"),
+}
+
+# Mapa interwału (z danych/strategii) → styl. Normalizacja wielkości liter.
+_INTERWAL_NA_STYL: Dict[str, str] = {
+    "M1": "SCALP", "1M": "SCALP", "M3": "SCALP", "3M": "SCALP",
+    "M5": "SCALP", "5M": "SCALP", "M15": "SCALP", "15M": "SCALP",
+    "M30": "SWING", "30M": "SWING", "1H": "SWING", "H1": "SWING",
+    "2H": "SWING", "4H": "SWING", "H4": "SWING",
+    "1D": "INVEST", "D1": "INVEST", "D": "INVEST", "3D": "INVEST",
+    "1W": "INVEST", "W1": "INVEST", "W": "INVEST", "1M_MIES": "INVEST",
+}
+
+_PROFIL_FALLBACK = ProfilStylu("SWING", lewar_cap=5, rynek="OBA", mnoznik_progu=1.0,
+                               opis="Nieznany interwał — domyślny profil SWING")
+
+
+def styl_interwalu(interwal: Optional[str]) -> str:
+    """Mapuje interwał (np. '1H','M5','1D') na styl SCALP/SWING/INVEST."""
+    if not interwal:
+        return "SWING"
+    return _INTERWAL_NA_STYL.get(interwal.upper().strip(), "SWING")
+
+
+def profil_stylu(interwal: Optional[str]) -> ProfilStylu:
+    """Zwraca ProfilStylu dla interwału. Nigdy nie rzuca."""
+    return _PROFILE_STYLU.get(styl_interwalu(interwal), _PROFIL_FALLBACK)
+
+
+@dataclass
+class DecyzjaNamiestnika:
+    """
+    Pełna decyzja Namiestnika: reżim × styl interwałowy.
+    Łączy UstawieniaRezimu (co robić w tym reżimie) z ProfilStylu (jak na tym TF).
+    """
+    rezim: str
+    styl: str
+    tryb: str
+    prog_pewnosci: float        # już skorygowany mnoznikiem stylu
+    lewar_factor: float
+    lewar_cap: int              # twardy sufit dźwigni stylu
+    rynek: str                  # FUTURES / SPOT / OBA
+    czy_grac: bool
+    wagi_override: Optional[Dict[str, float]]
+    opis: str
+
+
 class Namiestnik:
     """
-    Gating Network: reżim → kompletny zestaw parametrów dla jednego cyklu.
+    Gating Network: (reżim, interwał) → kompletny zestaw parametrów dla jednego cyklu.
+
+    Dwie warstwy:
+      1. Reżim  (UstawieniaRezimu)  — CO robić w danym stanie rynku
+      2. Styl   (ProfilStylu)       — JAK na danym interwale (lewar_cap, rynek, próg)
 
     Użycie w Dyrygencie:
-        namiestnik = Namiestnik()
-        ustaw = namiestnik.decyduj(raport.rezim)
-        if not ustaw.czy_grac:
-            return DecyzjaCyklu(symbol, "NAMIESTNIK_CISZA", False, powod=ustaw.opis)
-        # ... dalej z ustaw.tryb, ustaw.prog_pewnosci, ustaw.lewar_factor
+        ustaw = namiestnik.decyduj(rezim, interwal)
+        if not ustaw.czy_grac: ... cisza
+        # ustaw.tryb, ustaw.prog_pewnosci, ustaw.lewar_factor, ustaw.lewar_cap, ustaw.rynek
     """
 
     def __init__(self, tablica: Optional[Dict[str, UstawieniaRezimu]] = None) -> None:
         self._tablica = tablica if tablica is not None else _TABLICA
 
-    def decyduj(self, rezim: str) -> UstawieniaRezimu:
-        """Zwraca UstawieniaRezimu dla podanego reżimu. Nigdy nie rzuca wyjątku."""
-        ustaw = self._tablica.get(rezim)
-        if ustaw is None:
+    def decyduj(self, rezim: str, interwal: Optional[str] = None) -> DecyzjaNamiestnika:
+        """
+        Łączy reżim ze stylem interwałowym. Gdy interwal=None → czysty profil reżimu
+        (SWING domyślnie). Nigdy nie rzuca wyjątku.
+        """
+        baza = self._tablica.get(rezim)
+        if baza is None:
             logger.warning(f"[Namiestnik] Nieznany reżim '{rezim}' → fallback ostrożny")
-            return _FALLBACK
-        return ustaw
+            baza = _FALLBACK
+        prof = profil_stylu(interwal)
 
-    def skaluj_dzwignie(self, dzwignia_base: int, rezim: str) -> int:
+        # INVEST na spot nie używa dźwigni futures — łączymy reguły.
+        # Futures/spot: reżimy obronne (VOLATILE/PANIC) wymuszają SPOT niezależnie od stylu.
+        rynek = prof.rynek
+        if rezim in ("PANIC", "VOLATILE") and rynek == "FUTURES":
+            rynek = "SPOT"  # obrona: bez dźwigni w chaosie nawet na scalpie
+
+        return DecyzjaNamiestnika(
+            rezim=rezim,
+            styl=prof.styl,
+            tryb=baza.tryb,
+            prog_pewnosci=round(min(1.0, baza.prog_pewnosci * prof.mnoznik_progu), 4),
+            lewar_factor=baza.lewar_factor,
+            lewar_cap=prof.lewar_cap,
+            rynek=rynek,
+            czy_grac=baza.czy_grac,
+            wagi_override=baza.wagi_override,
+            opis=f"{baza.opis} | {prof.opis}",
+        )
+
+    def skaluj_dzwignie(self, dzwignia_base: int, rezim: str,
+                        interwal: Optional[str] = None) -> int:
         """
-        Aplikuje lewar_factor do obliczonej przez KalkulatorLewara dźwigni.
-        Wynik: int w przedziale [1, 20].
+        Aplikuje lewar_factor (reżim) do dźwigni, potem przycina sufitem stylu (lewar_cap).
+        Wynik: int w przedziale [1, lewar_cap].
         """
-        ustaw = self.decyduj(rezim)
-        scaled = int(round(dzwignia_base * ustaw.lewar_factor))
-        return max(1, min(scaled, 20))
+        d = self.decyduj(rezim, interwal)
+        scaled = int(round(dzwignia_base * d.lewar_factor))
+        return max(1, min(scaled, d.lewar_cap))
 
     def tablica_rezimu(self) -> Dict[str, UstawieniaRezimu]:
-        """Pełna tablica do inspekcji / diagnostyki."""
+        """Pełna tablica reżimów do inspekcji / diagnostyki."""
         return dict(self._tablica)
 
+    def profile_stylu(self) -> Dict[str, ProfilStylu]:
+        """Pełna mapa profili stylu do inspekcji."""
+        return dict(_PROFILE_STYLU)
+
     def raport(self) -> str:
-        """Czytelny raport tablicy dla logów / dashboardu."""
+        """Czytelny raport tablicy reżimów + profili stylu dla logów / dashboardu."""
         linie = ["🏛️ NAMIESTNIK — Tablica reżimów (Faza 1):"]
         for rezim, u in self._tablica.items():
             gra = "✅ GRAJ" if u.czy_grac else "🛑 CISZA"
@@ -193,7 +307,14 @@ class Namiestnik:
                 f"  {rezim:<20} │ {gra} │ tryb={u.tryb:<10} │ "
                 f"lewar×{u.lewar_factor:.1f} │ próg={u.prog_pewnosci:.0%}"
             )
+        linie.append("🕒 Profile stylu interwałowego (Timeframe-Aware):")
+        for styl, p in _PROFILE_STYLU.items():
+            linie.append(
+                f"  {styl:<8} │ lewar≤{p.lewar_cap:>2}× │ rynek={p.rynek:<8} │ "
+                f"próg×{p.mnoznik_progu:.2f}"
+            )
         return "\n".join(linie)
+
 
 
 # ─── Singleton dla użycia w Dyrygencie ───────────────────────────────────────

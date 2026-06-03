@@ -6,6 +6,54 @@
 
 ---
 
+## 2026-06-03 | MAJOR | Timeframe-Aware Gating — styl SCALP/SWING/INVEST + futures/spot (Prawo XV)
+
+### Kontekst
+Cezar: system musi rozróżniać interwał czasowy (scalp/swing/invest), wybierać neurony,
+strategie, dźwignię i rynek (futures/spot) automatycznie wg oceny rynku + interwału.
+Deep-research: auto-selekcja timeframe+strategia to OTWARTY PROBLEM (Freqtrade/Jesse/
+Nautilus/OctoBot wymagają ręcznej konfiguracji). Namiestnik robi to automatycznie.
+
+### Wykryta UTRATA POTENCJAŁU (Prawo XV)
+- Strategie miały pola `interwaly`, `styl`, `dzwignia` — **ignorowane** przez
+  `dobierz_najlepsze()`. Martwe metadane. Naprawione.
+- Namiestnik znał tylko reżim, nie interwał. Dodano warstwę stylu.
+
+### Co zostało wdrożone (kod)
+- **`namiestnik.py`** — warstwa 2 (Timeframe-Aware):
+  - `ProfilStylu` + `_PROFILE_STYLU`: SCALP(≤10×,FUTURES), SWING(≤5×,OBA), INVEST(≤2×,SPOT)
+  - `_INTERWAL_NA_STYL`: mapa M1-M15→SCALP, 30M-4H→SWING, 1D-1W→INVEST
+  - `styl_interwalu()`, `profil_stylu()` — funkcje pomocnicze
+  - `DecyzjaNamiestnika` — łączy reżim × styl (tryb, prog, lewar_factor, lewar_cap, rynek)
+  - `decyduj(rezim, interwal)` — dwuwarstwowa decyzja, VOLATILE/PANIC wymusza SPOT
+  - `skaluj_dzwignie(base, rezim, interwal)` — przycina sufitem stylu (lewar_cap)
+- **`baza.py`** — `dobierz_najlepsze(interwal=...)` + `_interwal_pasuje()`: filtr strategii po TF
+- **`legatus.py`** — `fokus`/`_agreguj`/`_dobierz_strategie` przekazują interwał z barów
+- **`dyrygent.py`** — wyciąga interwał z barów, przekazuje do Namiestnika i skalowania
+- **`docs/NAMIESTNIK.md`** — pełna dokumentacja modułu (ZPO)
+- **`tests/test_namiestnik.py`** — +7 testów warstwy stylu
+
+### Tabela dowodowa (Prawo XVI — z Timeframe-Aware)
+| Zestaw | BASELINE | NAMIESTNIK | Δ PnL | WinRate | PF | MaxDD |
+|--------|----------|------------|-------|---------|-----|-------|
+| BTC 1D | +32.71% | +27.32% | -5.39pp | 45→**55%** | 1.23→**1.57** | 23.8→**5.3%** |
+| ETH 1D | +23.80% | +14.84% | -8.96pp | 44→48% | 1.09→1.19 | 26.4→**11.9%** |
+| BTC 1H | -4.34% | -6.83% | -2.48pp | 45→43% | 0.85→0.74 | 13.9→**10.0%** |
+| ETH 1H | -9.14% | **-4.65%** | **+4.50pp** | 48→43% | 0.77→0.86 | 11.2→**10.0%** |
+
+> Namiestnik redukuje **drawdown na każdym zestawie**. Na 1D (INVEST cap 2×) selektywnie:
+> mniej pozycji, wyższy WinRate/PF, drawdown 4.5× niżej na BTC. 1H mieszane (ETH +4.5pp).
+> Filozofia: profil ryzyka > surowy zysk.
+
+### Testy
+346/346 zielone (+7). Audyt spójności: pełna harmonia.
+
+### Następne fazy (uzupełnianie luk — patrz INDEKS_IMPERIUM.md)
+A' napraw martwe neurony → A ożyw kat. L (VI-13 ATR-Lev) i V (Realized Vol) →
+B adapter Futures (Legion VI) → C obudzenie 12 wyciszonych → D Legion III → E Księga Azjatycka.
+
+---
+
 ## 2026-06-03 | MAJOR | Namiestnik podłączony do backtestu + tabela dowodowa (Prawo XV+XVI)
 
 ### Kontekst (głęboki audyt Prawo XV)

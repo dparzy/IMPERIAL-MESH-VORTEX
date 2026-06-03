@@ -32,6 +32,15 @@
 | 10 | ML-31 | Adaptive Regime-Aware Stock Prediction (Transformer+RL) | arxiv.org/abs/2603.19136 | ✅ zweryfikowany | Wzorzec dla Namiestnik Faza 2 |
 | 11 | ML-32 | Meta-Learning Optimal Mixture of Strategies | arxiv.org/abs/2505.03659 | ✅ zweryfikowany | Wzorzec MAML dla Namiestnik Faza 3 |
 | 12 | ML-33 | NautilusTrader — Rust+Python event-driven | github.com/nautechsystems/nautilus_trader | ✅ zweryfikowany | Wzorzec architektury (referencja) |
+| 13 | ML-34 | Multi-Timeframe Confluence (QuantPedia/TrendRider) | quantpedia.com/.../multi-timeframe-trend-strategy | ✅ zweryfikowany | **WDROŻONY** styl SCALP/SWING/INVEST w Namiestniku |
+| 14 | ML-35 | Systematic Trend-Following (arXiv 2602.11708) | arxiv.org/abs/2602.11708 | ✅ zweryfikowany | Wzorzec MTF bias-filter (Faza MTF) |
+
+> **Odkrycie deep-research (2026-06-03):** auto-selekcja **timeframe + strategia wg reżimu**
+> to **OTWARTY PROBLEM** — Freqtrade (informative pairs), Jesse, NautilusTrader, OctoBot
+> wymagają RĘCZNEJ konfiguracji per styl. Brak frameworka z auto-przełączaniem reżim×TF
+> (stan: czerwiec 2026). Namiestnik (warstwa stylu) robi to automatycznie = przewaga.
+> Standardy praktyków wbudowane: SCALP M1-15/lewar 5-10×/futures, SWING 4H-1D/2-5×,
+> INVEST 1W/spot-1-2×; Kelly frakcyjny 10-25%; ATR-sizing; VOLATILE→SPOT (obrona).
 
 > **Uwaga:** ML-24..27 to NOWE klucze rezerwowe (dodane 2026-06-02). A-12 Kronos był już w katalogu
 > (`KATALOG_NEURONOW.md` linia 314) — tu dostaje pełny opis i link.

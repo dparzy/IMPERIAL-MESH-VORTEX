@@ -392,11 +392,11 @@ def test_zwiadowca_kalman_spike_alert():
 def test_roj_pomija_niedostepne():
     """Rój nie produkuje sygnałów z neuronów DOSTEPNY=False."""
     from imperium.legiony.mikro_neuron import Roj
-    from imperium.legiony.neurony.onchain import NeuronMVRV
-    from imperium.legiony.neurony.psychologia import NeuronFearGreed
+    from imperium.legiony.neurony.onchain import NeuronMVRV, NeuronSOPR
 
-    roj = Roj([NeuronMVRV(), NeuronFearGreed()])
-    sygnaly = roj.zbierz_sygnaly({"MVRV_Z_SCORE": -1.0, "FEAR_GREED_INDEX": 5})
+    # OC wciąż wyciszone (czekają na on-chain API); PSY obudzone w Fazie B
+    roj = Roj([NeuronMVRV(), NeuronSOPR()])
+    sygnaly = roj.zbierz_sygnaly({"MVRV_Z_SCORE": -1.0, "SOPR": 0.9})
     # Oba niedostępne → 0 sygnałów
     assert len(sygnaly) == 0
 

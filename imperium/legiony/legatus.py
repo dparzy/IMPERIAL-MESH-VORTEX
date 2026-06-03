@@ -61,12 +61,12 @@ class KandydatAktywa:
 #   Po wdrożeniu pierwszego neuronu z KAT=L/V → reguła automatycznie ożyje.
 #   A = Anty-manipulacja OŻYWIONA 2026-06-02 (A-01 Stop Hunt, A-02 Wick Rejection).
 WAGI_REZIMU = {
-    "TREND_STRONG":    {"T": 1.5, "M": 1.2, "S": 1.3, "O": 0.7, "L": 0.8},
-    "RANGING":         {"M": 1.5, "F": 1.2, "T": 0.5},
-    "VOLATILE":        {"A": 2.0, "V": 1.5, "L": 0.3, "_default": 0.7},
+    "TREND_STRONG":    {"T": 1.5, "M": 1.2, "S": 1.3, "O": 0.7, "L": 0.8, "R": 0.8},
+    "RANGING":         {"M": 1.5, "F": 1.2, "T": 0.5, "R": 1.2},
+    "VOLATILE":        {"A": 2.0, "V": 1.5, "R": 1.3, "L": 0.3, "_default": 0.7},
     "PANIC":           {"A": 3.0, "R": 1.5, "_default": 0.1},
-    "NORMAL":          {},
-    "ON-CHAIN_BULLISH":{"O": 2.0, "L": 0.8},
+    "NORMAL":          {"R": 1.1},
+    "ON-CHAIN_BULLISH":{"O": 2.0, "L": 0.8, "R": 1.1},
     "SMC_ACTIVE":      {"S": 2.0, "F": 1.2, "T": 1.1},
 }
 

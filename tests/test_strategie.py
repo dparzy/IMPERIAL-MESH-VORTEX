@@ -54,6 +54,28 @@ def test_rejestr_strategii_niepusty():
         assert s.neurony_wejscie, f"{s.id} bez neuronów wejścia"
 
 
+def test_strategie_vi_lv_futures_obecne():
+    """Faza B: strategie Legio VI Ferrata (Futures/Leverage) w rejestrze, używają kat. R."""
+    strategie = {s.id: s for s in wszystkie_strategie()}
+    assert "VI-LV-001" in strategie, "Brak VI-LV-001 (Funding Contrarian)"
+    assert "VI-LV-002" in strategie, "Brak VI-LV-002 (Liquidation Cascade)"
+    # VI-LV-001 opiera się na obudzonej kategorii R (PSY)
+    assert "PSY-01" in strategie["VI-LV-001"].wszystkie_klucze()
+    assert "PSY-04" in strategie["VI-LV-002"].wszystkie_klucze()
+
+
+def test_strategie_vi_lv_dobierane_w_volatile():
+    """VI-LV-001 dopasowuje się gdy funding/LS ekstremalne (VOLATILE, 1H)."""
+    sygnaly = {s.neuron_id: s for s in [
+        _syg("PSY-01", "SHORT", 0.85), _syg("PSY-02", "SHORT", 0.80),
+        _syg("VI-13", "SHORT", 0.6), _syg("V-13", "SHORT", 0.6),
+    ]}
+    top = dobierz_najlepsze(wszystkie_strategie(), sygnaly,
+                            rezim="VOLATILE", top=5, interwal="1H")
+    assert any(d.strategia.id == "VI-LV-001" for d in top), \
+        "VI-LV-001 powinna pasować przy ekstremalnym fundingu w VOLATILE/1H"
+
+
 # ── SILNIK DOPASOWANIA ───────────────────────────────────────────────────────
 
 def test_dopasowanie_trend_wzrostowy():

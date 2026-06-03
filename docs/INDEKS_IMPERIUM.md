@@ -156,26 +156,27 @@ Cztery Legiony Zwiadowcze — każdy widzi rynek inaczej.
 
 Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 
-### 🗺️ FAZY ROZWOJU (uzupełnianie luk kategorii — patrz `NAMIESTNIK.md`)
+### 🗺️ FAZY ROZWOJU — STAN REALIZACJI
 
-| Faza | Zakres | Kategorie/Neurony | API? | Priorytet |
-|------|--------|-------------------|------|-----------|
-| **A'** | Naprawa martwych głosów (XII-07, X-12, A-05 = 100% NEUTRAL) | naprawa istniejących | ❌ nie | 🔴 Krytyczny |
-| **A** | Ożywienie pustych kategorii: **L** (VI-13 ATR-Lev) + **V** (Realized Vol) z OHLCV | +2 kat., +7-9 neuronów | ❌ nie | 🔴 Krytyczny |
-| **B** | Adapter Futures → Legion VI (Funding, OI, Liq, L/S) → pełna kat. **L** | +~14 neuronów | ✅ futures | 🟠 Wysoki |
-| **C** | Adaptery feed → obudzenie 12 gotowych wyciszonych (SMC/PSY/OC) → kat. S/R/O | +12 (kod gotowy) | ✅ L2/sentyment/on-chain | 🟠 Wysoki |
-| **D** | Legion III Augusta (Invest 1D-1W: MVRV, NUPL, SOPR…) | +38 neuronów | ✅ on-chain | 🔵 Średni |
-| **E** | Księga Azjatycka strategii (STR-001..170) + futures/spot strategie VI-LV | +~165 strategii | częściowo | 🔵 Niski |
+| Faza | Zakres | Status | Neurony |
+|------|--------|--------|---------|
+| **A'** ✅ | Naprawa martwych głosów (XII-07, X-12, A-05) | ✅ ZREALIZOWANA 2026-06-02 | naprawione progi |
+| **A** ✅ | Kat. **L** (VI-13 ATR-Lev, L-14 Ulcer) + **V** (V-13 RealizedVol, V-14 Choppiness) | ✅ ZREALIZOWANA 2026-06-03 | +4 neurony, kat. L=2, V=2 |
+| **B** ✅ | AdapterFutures (Binance fapi public) → PSY-01/02/04 obudzone, kat. **R** żywa | ✅ ZREALIZOWANA 2026-06-03 | +4 neurony (PSY), 2 strategie VI-LV |
+| **C** ✅ | AdapterCVD (Binance aggTrades public) → V-03 CVD obudzony | ✅ ZREALIZOWANA 2026-06-03 | +1 neuron (V-03 kat. F) |
+| **D** 🔵 | OC-01..04 on-chain (MVRV, SOPR, Puell, Netflow) — wymaga klucza Glassnode/CryptoQuant | ⏳ OCZEKUJE — decyzja Cezara | +4 neurony (kat. O) |
+| **LIVE** 🟠 | Paper trading na żywych danych MEXC — `MEXC_API_KEY` + `MEXC_SECRET` | ⏳ Gotowe do uruchomienia | rdzeń kompletny |
+| **E** 🔵 | Dalsze neurony z katalogu (299−46=253 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
-**Stan kategorii (2026-06-03):** aktywne M/T/F/A · wyciszone S/R/O/V · **L = PUSTA (0 neuronów)** 🚨
+**Stan kategorii (2026-06-03):** aktywne M/T/F/A/L/V/R/F · wyciszone S(SMC feed)/O(on-chain API)
+**Neurony: 46** (39 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 381/381**
 
 ### Zadania bieżące (infrastruktura)
 | # | Zadanie | Moduł | Priorytet |
 |---|---------|-------|-----------|
-| 1 | ⚡ Ustaw `DEEPSEEK_API_KEY` w zmiennych środowiskowych | Cesarz | 🔴 Krytyczny |
-| 2 | 🖥️ Zainstaluj TA-Lib (środowisko produkcyjne) | Fundament | 🔴 Krytyczny |
-| 3 | 🧬 Faza A': napraw 3 martwe neurony + Faza A: ożyw kategorie L i V | Legiony | 🔴 Krytyczny |
-| 4 | 🔌 Faza B/C: adaptery Futures + feed (obudzenie wyciszonych) | Akwedukty | 🟠 Wysoki |
+| 1 | ⚡ Ustaw `DEEPSEEK_API_KEY` w zmiennych środowiskowych | Cesarz | 🔴 Krytyczny (LLM offline) |
+| 2 | 🔌 Faza D: klucz Glassnode/CryptoQuant → kat. O ożywiona | Legiony/OC | 🔵 Średni |
+| 3 | 🏛️ Paper Trading LIVE: `MEXC_API_KEY` + feed → pierwszy żywy cykl Dyrygenta | Drogi/Akwedukty | 🟠 Wysoki |
 
 ---
 

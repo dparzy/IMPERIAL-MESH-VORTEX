@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-06-03 | FEATURE | Yang-Zhang Volatility — upgrade estymatora kat. V (wizja W-055)
+
+### Kontekst
+Neuron V-13 (NeuronRealizedVol) liczył zmienność wyłącznie z cen zamknięcia
+(`HIST_VOL_20` = std log-returns × √252). To ignorowało luki overnight i cały
+zakres świecy (high/low) — utrata informacji OHLC (Prawo XV).
+
+### Wdrożone
+- **Brama:** nowe obliczenie pure-Python `YANG_ZHANG` (`_py_yang_zhang`,
+  open/high/low/close, period=20) — annualizowana vol w tej samej skali co
+  HIST_VOL, ~14× efektywniejsza statystycznie (Yang & Zhang, 2000). Stemplowane
+  jako pure-Python (Prawo XIII).
+- **Budowniczy:** produkuje klucz `YANG_ZHANG_20`.
+- **V-13:** WSKAZNIK → `YANG_ZHANG_20` (podstawa) z fallbackiem `HIST_VOL_20`
+  (bez martwego głosu — Prawo XV). Progi reżimu bez zmian (ta sama skala).
+- **Testy:** +7 (Brama zakres/warmup/skala/źródło, V-13 podstawa/fallback/neutral).
+  391 → 398/398 zielone.
+
+### Pliki
+`imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/dzwignia.py`, `tests/test_neurony.py`,
+`docs/MANIFEST_KODU.md`, `docs/WIZJONER.md`, `README.md`.
+
+---
+
 ## 2026-06-03 | MAJOR | Synchronizacja KATALOG_STRATEGII z kodem + warstwa audytu W9 (Prawo XIX/XXI)
 
 ### Kontekst

@@ -165,6 +165,11 @@ class Igrzyska:
         wagi = ig.nowe_wagi()           # {klucz: mnoznik} do Legatusa
     """
     statystyki: Dict[str, StatystykaNeuronu] = field(default_factory=dict)
+    # Obserwatorzy strumienia wyników (np. HedgeMWU — wizja W-049). Każdy musi mieć
+    # metodę zarejestruj_wynik(klucz, kierunek, zyskowny_kierunek, contribution, timeliness).
+    # Dzięki temu MWU uczy się z DOKŁADNIE tego samego strumienia, bez duplikacji
+    # logiki parowania logów (DRY, Prawo XVI).
+    obserwatorzy: list = field(default_factory=list)
 
     def _stat(self, klucz: str) -> StatystykaNeuronu:
         if klucz not in self.statystyki:
@@ -177,6 +182,12 @@ class Igrzyska:
                           timeliness: Optional[float] = None):
         self._stat(klucz).zarejestruj(kierunek, zyskowny_kierunek,
                                        contribution, timeliness)
+        for obs in self.obserwatorzy:
+            try:
+                obs.zarejestruj_wynik(klucz, kierunek, zyskowny_kierunek,
+                                      contribution, timeliness)
+            except Exception as e:
+                logger.error(f"[Igrzyska] Obserwator {obs} padł: {e}")
 
     def przetworz_logi(self, logi: list):
         """

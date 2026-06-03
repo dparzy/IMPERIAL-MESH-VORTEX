@@ -136,7 +136,7 @@
 | A-05 | NeuronBartPattern | A | 6 | ✅ aktywny | CLOSE_PREV | — |
 | VI-13 | NeuronATRLev | L | 8 | ✅ aktywny | ATR_14 | — |
 | L-14 | NeuronUlcer | L | 7 | ✅ aktywny | ULCER_14 | — |
-| V-13 | NeuronRealizedVol | V | 7 | ✅ aktywny | HIST_VOL_20 | — |
+| V-13 | NeuronRealizedVol | V | 7 | ✅ aktywny | YANG_ZHANG_20 | fallback HIST_VOL_20 |
 | V-14 | NeuronChoppiness | V | 7 | ✅ aktywny | CHOPPINESS_14 | — |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
@@ -147,6 +147,13 @@
 > V-14 Choppiness Index (trend vs konsolidacja). Pomiar dekorelacji (Prawo XVI):
 > V-13↔V-14 |r|=0.05–0.27 (dywersyfikacja), VI-13↔L-14 — VI-13 stały na danych
 > testowych, L-14 dostarcza pełną wariancję kat. L (komplementarność). Czyste OHLCV.
+
+> **V-13 upgrade Yang-Zhang** (2026-06-03, wizja W-055): NeuronRealizedVol czyta
+> teraz `YANG_ZHANG_20` (annualizowana vol z pełnego OHLC, ~14× efektywniejszy
+> estymator niż close-only) z fallbackiem na `HIST_VOL_20`. Ta sama skala
+> (annualized × √252) → progi reżimu bez zmian. Prawo XV: pełne wykorzystanie
+> informacji OHLC zamiast samego close. Źródło: Yang & Zhang (2000),
+> "Drift-Independent Volatility Estimation Using High, Low, Open, and Close Prices".
 
 ---
 

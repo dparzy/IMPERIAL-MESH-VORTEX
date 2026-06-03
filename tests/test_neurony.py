@@ -600,6 +600,88 @@ def test_brama_ulcer_dokladnie_period():
     assert _py_ulcer(seria[:13], period=14) is None  # 13 < 14 → None
 
 
+def test_brama_yang_zhang_zakres():
+    """Brama (W-055): Yang-Zhang zwraca annualizowaną vol > 0 na realnej serii OHLC."""
+    from imperium.fundament.brama_kalkulatora import _py_yang_zhang
+    import math, random
+    random.seed(7)
+    o, h, l, c = [], [], [], []
+    cena = 100.0
+    for _ in range(40):
+        op = cena
+        cl = op * (1 + random.gauss(0, 0.02))
+        hi = max(op, cl) * (1 + abs(random.gauss(0, 0.01)))
+        lo = min(op, cl) * (1 - abs(random.gauss(0, 0.01)))
+        o.append(op); h.append(hi); l.append(lo); c.append(cl)
+        cena = cl
+    yz = _py_yang_zhang(o, h, l, c, period=20)
+    assert yz is not None and yz > 0, "Yang-Zhang musi dać dodatnią annualizowaną vol"
+
+
+def test_brama_yang_zhang_za_malo_danych():
+    """Brama (W-055): < period+1 świec → None (bez halucynacji, Prawo I)."""
+    from imperium.fundament.brama_kalkulatora import _py_yang_zhang
+    o = h = l = c = [100, 101, 102]
+    assert _py_yang_zhang(o, h, l, c, period=20) is None
+
+
+def test_brama_yang_zhang_skala_jak_hist_vol():
+    """Brama (W-055): YZ i HIST_VOL są w tej samej skali (annualized) — rząd wielkości zgodny."""
+    from imperium.fundament.brama_kalkulatora import _py_yang_zhang, _py_hist_vol
+    import random
+    random.seed(11)
+    o, h, l, c = [], [], [], []
+    cena = 100.0
+    for _ in range(60):
+        op = cena
+        cl = op * (1 + random.gauss(0, 0.03))
+        hi = max(op, cl) * (1 + abs(random.gauss(0, 0.015)))
+        lo = min(op, cl) * (1 - abs(random.gauss(0, 0.015)))
+        o.append(op); h.append(hi); l.append(lo); c.append(cl)
+        cena = cl
+    yz = _py_yang_zhang(o, h, l, c, period=20)
+    hv = _py_hist_vol(c, period=20)
+    # Ta sama skala: obie annualizowane, stosunek w rozsądnym przedziale (nie rząd wielkości).
+    assert 0.2 < yz / hv < 5.0, f"YZ ({yz:.3f}) i HV ({hv:.3f}) muszą być tej samej skali"
+
+
+def test_brama_audyt_zrodlo_yang_zhang_pure_python():
+    """Prawo XIII: YANG_ZHANG stemplowany jako pure-Python (nie TA-Lib)."""
+    from imperium.fundament.brama_kalkulatora import CalculatorGateway, SOURCE_TAG_PY
+    import random
+    random.seed(3)
+    o, h, l, c = [], [], [], []
+    cena = 100.0
+    for _ in range(40):
+        op = cena; cl = op * (1 + random.gauss(0, 0.02))
+        o.append(op); h.append(max(op, cl) * 1.01); l.append(min(op, cl) * 0.99); c.append(cl)
+        cena = cl
+    r = CalculatorGateway().compute("YANG_ZHANG", open=o, high=h, low=l, close=c, period=20)
+    assert r.source == SOURCE_TAG_PY, "YANG_ZHANG musi być pure-Python w audycie"
+
+
+def test_v13_uzywa_yang_zhang_jako_podstawy():
+    """V-13 (W-055): czyta YANG_ZHANG_20 jako podstawę, opis sygnalizuje źródło YZ."""
+    from imperium.legiony.neurony.dzwignia import NeuronRealizedVol
+    s = NeuronRealizedVol().interpretuj({"YANG_ZHANG_20": 0.20, "HIST_VOL_20": 0.99})
+    assert s.kierunek == "LONG", "YZ=20% < 30% → niska vol → LONG (ignoruje HV fallback)"
+    assert any("YZ=" in p for p in s.powody), "opis musi sygnalizować estymator Yang-Zhang"
+
+
+def test_v13_fallback_hist_vol():
+    """V-13 (W-055): brak YANG_ZHANG_20 → fallback HIST_VOL_20 (bez martwego głosu, Prawo XV)."""
+    from imperium.legiony.neurony.dzwignia import NeuronRealizedVol
+    s = NeuronRealizedVol().interpretuj({"HIST_VOL_20": 0.95})
+    assert s.kierunek == "SHORT", "HV=95% → ekstremalna → SHORT"
+    assert any("HV=" in p for p in s.powody), "fallback musi sygnalizować źródło HV"
+
+
+def test_v13_brak_obu_zrodel_neutral():
+    """V-13 (W-055): brak YZ i HV → NEUTRAL (abstynencja, Prawo I)."""
+    from imperium.legiony.neurony.dzwignia import NeuronRealizedVol
+    assert NeuronRealizedVol().interpretuj({}).kierunek == "NEUTRAL"
+
+
 def test_brama_audyt_zrodlo_pure_python():
     """Prawo XIII: pure-Python wskaźniki stemplowane jako pure-Python, nie TA-Lib."""
     from imperium.fundament.brama_kalkulatora import (

@@ -75,8 +75,16 @@ class NeuronRealizedVol(MikroNeuron):
     się przez ostatnie 20 dni. Annualizowana: 30% = typowy spokojny BTC,
     60%+ = wysoka zmienność, 100%+ = chaos/mania.
 
-    Logika:
-      HIST_VOL_20 (annualized std log returns × √252):
+    Estymator (Prawo XV — pełne wykorzystanie OHLC, wizja W-055):
+      PODSTAWA: YANG_ZHANG_20 — annualizowana vol z pełnego OHLC (open/high/low/
+        close). ~14× efektywniejszy statystycznie niż close-only, odporny na luki
+        overnight i drift (Yang & Zhang, 2000).
+      FALLBACK: HIST_VOL_20 — gdy brak pełnego OHLC (np. seria tylko-close),
+        neuron nie milknie, tylko schodzi na estymator close-only.
+    Obie liczby są w TEJ SAMEJ skali (annualizowana vol × √252), więc progi
+    reżimu pozostają ważne niezależnie od użytego estymatora.
+
+    Logika progów (annualized realized vol):
       < 0.30  → niska zmienność → LONG (wchodzimy, środowisko sprzyjające)
       0.30–0.60 → normalna → NEUTRAL
       0.60–0.90 → wysoka → SHORT (ostrożnie, reżim VOLATILE)
@@ -87,7 +95,7 @@ class NeuronRealizedVol(MikroNeuron):
     """
     KLUCZ = "V-13"
     LEGION = "WSPOLNY"
-    WSKAZNIK = "HIST_VOL_20"
+    WSKAZNIK = "YANG_ZHANG_20"
     KATEGORIA = "V"
     WAGA = 7
     ELITARNY = False
@@ -98,25 +106,29 @@ class NeuronRealizedVol(MikroNeuron):
     _PROG_WYSOKA = 0.90
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
-        hv = wskazniki.get("HIST_VOL_20")
+        hv = wskazniki.get("YANG_ZHANG_20")
+        zrodlo = "YZ"
+        if hv is None:
+            hv = wskazniki.get("HIST_VOL_20")   # fallback close-only (Prawo XV: bez martwego głosu)
+            zrodlo = "HV"
 
         if hv is None:
-            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak HIST_VOL_20"])
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak YANG_ZHANG_20/HIST_VOL_20"])
 
         if hv < self._PROG_NISKA:
             return self._bazowy_sygnal(hv, "LONG", 0.65,
-                [f"HV={hv:.1%} — niska zmienność, sprzyjające środowisko"])
+                [f"{zrodlo}={hv:.1%} — niska zmienność, sprzyjające środowisko"])
 
         if hv < self._PROG_NORMALNA:
             return self._bazowy_sygnal(hv, "NEUTRAL", 0.40,
-                [f"HV={hv:.1%} — normalna zmienność BTC"])
+                [f"{zrodlo}={hv:.1%} — normalna zmienność BTC"])
 
         if hv < self._PROG_WYSOKA:
             return self._bazowy_sygnal(hv, "SHORT", 0.60,
-                [f"HV={hv:.1%} — wysoka zmienność, ostrożnie"])
+                [f"{zrodlo}={hv:.1%} — wysoka zmienność, ostrożnie"])
 
         return self._bazowy_sygnal(hv, "SHORT", 0.78,
-            [f"HV={hv:.1%} — ekstremalna zmienność, obrona kapitału"])
+            [f"{zrodlo}={hv:.1%} — ekstremalna zmienność, obrona kapitału"])
 
 
 class NeuronChoppiness(MikroNeuron):

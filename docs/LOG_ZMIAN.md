@@ -6,6 +6,60 @@
 
 ---
 
+## 2026-06-03 | FEATURE | HedgeMWU — online żywe wagi Legatusa + zamknięcie pętli uczenia (wizja W-049)
+
+### Kontekst
+Czerwony alarm Prawa XV: `Igrzyska.nowe_wagi()` liczyło mnożniki wag neuronów,
+ale **Legatus nigdy ich nie konsumował** — policzony potencjał leżał odłogiem.
+Brakowało też online'owego (strumieniowego) uczenia wag z gwarancją regretu.
+
+### Wdrożone
+- **`imperium/biblioteki/hedge_mwu.py`** — `HedgeMWU`: algorytm Hedge / Multiplicative
+  Weights Update (Freund & Schapire, 1997), regret O(√(T·ln N)). Po każdym wyniku
+  waga eksperta ×exp(-η·strata); `mnozniki()` skalowane wokół 1.0 (stan neutralny
+  = brak zniekształcenia, Prawo XV). Min. waga chroni przed śmiercią eksperta.
+- **`Igrzyska.obserwatorzy`** — lista obserwatorów strumienia wyników; MWU uczy
+  się z DOKŁADNIE tego samego strumienia co Igrzyska (DRY, bez duplikacji parowania
+  logów). `HedgeMWU.z_logow(logi)` korzysta z tego mechanizmu.
+- **Legatus** — nowy parametr `mnozniki_neuronow` + `ustaw_mnozniki_neuronow()`;
+  `_dostosuj_wagi` mnoży wagę reżimową × mnożnik uczenia per-neuron. Konsumuje
+  ZARÓWNO `Igrzyska.nowe_wagi()` (batch) jak i `HedgeMWU.mnozniki()` (online).
+  Domyślnie pusty → kompatybilność wsteczna (zero zmian zachowania).
+- **Testy:** +12 (MWU: neutralność, adaptacja, normalizacja, min_waga, obserwator
+  Igrzysk; Legatus: brak/iniekcja/setter). 398 → 410/410 zielone.
+
+### Pliki
+`imperium/biblioteki/hedge_mwu.py`, `imperium/biblioteki/igrzyska.py`,
+`imperium/legiony/legatus.py`, `tests/test_hedge_mwu.py`, `tests/run_tests.py`,
+`docs/WIZJONER.md`, `docs/INDEKS_IMPERIUM.md`, `docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-06-03 | FEATURE | Yang-Zhang Volatility — upgrade estymatora kat. V (wizja W-055)
+
+### Kontekst
+Neuron V-13 (NeuronRealizedVol) liczył zmienność wyłącznie z cen zamknięcia
+(`HIST_VOL_20` = std log-returns × √252). To ignorowało luki overnight i cały
+zakres świecy (high/low) — utrata informacji OHLC (Prawo XV).
+
+### Wdrożone
+- **Brama:** nowe obliczenie pure-Python `YANG_ZHANG` (`_py_yang_zhang`,
+  open/high/low/close, period=20) — annualizowana vol w tej samej skali co
+  HIST_VOL, ~14× efektywniejsza statystycznie (Yang & Zhang, 2000). Stemplowane
+  jako pure-Python (Prawo XIII).
+- **Budowniczy:** produkuje klucz `YANG_ZHANG_20`.
+- **V-13:** WSKAZNIK → `YANG_ZHANG_20` (podstawa) z fallbackiem `HIST_VOL_20`
+  (bez martwego głosu — Prawo XV). Progi reżimu bez zmian (ta sama skala).
+- **Testy:** +7 (Brama zakres/warmup/skala/źródło, V-13 podstawa/fallback/neutral).
+  391 → 398/398 zielone.
+
+### Pliki
+`imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/dzwignia.py`, `tests/test_neurony.py`,
+`docs/MANIFEST_KODU.md`, `docs/WIZJONER.md`, `README.md`.
+
+---
+
 ## 2026-06-03 | MAJOR | Synchronizacja KATALOG_STRATEGII z kodem + warstwa audytu W9 (Prawo XIX/XXI)
 
 ### Kontekst

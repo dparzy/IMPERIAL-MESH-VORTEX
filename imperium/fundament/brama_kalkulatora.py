@@ -54,7 +54,7 @@ SOURCE_TAG_PY = "pure-Python (deterministic)"
 # compute() stempluje je SOURCE_TAG_PY — audyt nie może kłamać o źródle (Prawo XIII).
 _PURE_PYTHON_INDICATORS = {
     "AO", "AO_PREV", "AC", "AC_PREV", "HMA", "HMA_PREV",
-    "DONCHIAN", "RVOL", "HIST_VOL", "CHOPPINESS", "ULCER",
+    "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "CHOPPINESS", "ULCER",
     "VWAP", "VWAP_STD",
     "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
 }
@@ -206,6 +206,67 @@ def _py_hist_vol(close, period: int = 20) -> Optional[float]:
     mean = sum(log_ret) / n
     variance = sum((r - mean) ** 2 for r in log_ret) / (n - 1)
     return math.sqrt(variance) * math.sqrt(252)
+
+
+def _py_yang_zhang(open_, high, low, close, period: int = 20) -> Optional[float]:
+    """
+    Yang-Zhang Realized Volatility — annualizowana zmienność z pełnego OHLC.
+
+    Dla nowicjusza: zwykła zmienność (HIST_VOL) liczy tylko ceny zamknięcia
+    (close), więc IGNORUJE skoki overnight (luka między zamknięciem a otwarciem)
+    oraz cały zakres świecy (high/low). Yang-Zhang (2000) używa WSZYSTKICH czterech
+    cen i jest do ~14× bardziej efektywny statystycznie — ta sama "prawdziwa" vol,
+    ale policzona z dużo mniejszym szumem, odporny na drift i luki.
+
+    Wzór (Yang & Zhang, 2000, "Drift-Independent Volatility Estimation"):
+      σ²_YZ = σ²_overnight + k·σ²_open-close + σ²_RS
+        overnight:   o_i = ln(O_i / C_{i-1})  → wariancja próbkowa
+        open-close:  u_i = ln(C_i / O_i)       → wariancja próbkowa
+        Rogers-Satchell: σ²_RS = mean[ ln(H/C)·ln(H/O) + ln(L/C)·ln(L/O) ]
+        k = 0.34 / (1.34 + (n+1)/(n-1))
+      σ_YZ = sqrt(σ²_YZ) × sqrt(252)   (annualizacja, ta sama skala co HIST_VOL)
+
+    Skala wyniku jest IDENTYCZNA z HIST_VOL (annualizowana), więc progi reżimu
+    neuronu V-13 pozostają ważne — to czystsza wersja tej samej liczby (Prawo XV:
+    pełne wykorzystanie informacji OHLC zamiast samego close).
+    """
+    import math
+    o, h, l, c = list(open_), list(high), list(low), list(close)
+    n_bars = min(len(o), len(h), len(l), len(c))
+    if n_bars < period + 1:
+        return None
+    # Okno: ostatnie `period` świec; overnight potrzebuje C_{i-1}, więc bierzemy period+1 close.
+    o = o[-period:]
+    h = h[-period:]
+    l = l[-period:]
+    c_prev = c[-(period + 1):-1]   # C_{i-1} dla każdej z `period` świec
+    c = c[-period:]
+    n = period
+
+    overnight = []   # ln(O_i / C_{i-1})
+    openclose = []   # ln(C_i / O_i)
+    rs = []          # Rogers-Satchell term
+    for i in range(n):
+        if min(o[i], h[i], l[i], c[i], c_prev[i]) <= 0:
+            return None
+        overnight.append(math.log(o[i] / c_prev[i]))
+        openclose.append(math.log(c[i] / o[i]))
+        rs.append(math.log(h[i] / c[i]) * math.log(h[i] / o[i])
+                  + math.log(l[i] / c[i]) * math.log(l[i] / o[i]))
+
+    if n < 2:
+        return None
+    mean_on = sum(overnight) / n
+    var_on = sum((x - mean_on) ** 2 for x in overnight) / (n - 1)
+    mean_oc = sum(openclose) / n
+    var_oc = sum((x - mean_oc) ** 2 for x in openclose) / (n - 1)
+    var_rs = sum(rs) / n
+
+    k = 0.34 / (1.34 + (n + 1) / (n - 1))
+    var_yz = var_on + k * var_oc + (1 - k) * var_rs
+    if var_yz < 0:
+        var_yz = 0.0
+    return math.sqrt(var_yz) * math.sqrt(252)
 
 
 def _py_choppiness(high, low, close, period: int = 14) -> Optional[float]:
@@ -419,6 +480,10 @@ class CalculatorGateway:
 
             # ── Pure-Python: Historical/Realized Volatility (TA-Lib nie ma) ──
             "HIST_VOL":  lambda close, period=20: _py_hist_vol(close, period),
+
+            # ── Pure-Python: Yang-Zhang OHLC Volatility (TA-Lib nie ma) ───────
+            # ~14× efektywniejszy estymator annualizowanej vol niż HIST_VOL (close-only).
+            "YANG_ZHANG": lambda open, high, low, close, period=20: _py_yang_zhang(open, high, low, close, period),
 
             # ── Pure-Python: Choppiness Index — trend vs konsolidacja (kat. V) ──
             "CHOPPINESS": lambda high, low, close, period=14: _py_choppiness(high, low, close, period),

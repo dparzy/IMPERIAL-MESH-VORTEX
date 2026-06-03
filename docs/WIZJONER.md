@@ -68,13 +68,13 @@
 | W-046 | Zwiadowca Japoński — J-Quants API (TSE) przez MCP jako źródło danych fundamentalnych | 🟡 Niski | 💭 Idea (zwiad azjat.) | `imperium/oczy/` + `akwedukty/` |
 | W-047 | Zasady — audyt przestarzałych praw (które blokują zamiast pomagać) | 🟠 Średni | 💭 Idea Cezara | `ZASADY_FUNDAMENTALNE.md` przegląd |
 | W-048 | Oficina Imperialis — Cesarska Kuźnia (metafora laboratorium ARCH-MAX + nowe neurony) | 🟡 Niski | 💭 Idea Cezara | `docs/` + `imperium/legiony/` |
-| W-049 | Hedge/MWU — żywe wagi Legatusa (online, gwarancja żalu, neuron co kłamie cichnie) | 🔴 Wysoki | 💭 Idea (zwiad AI) | `imperium/legiony/legatus.py` |
+| W-049 | Hedge/MWU — żywe wagi Legatusa (online, gwarancja żalu, neuron co kłamie cichnie) | 🔴 Wysoki | ✅ WDROŻONE 2026-06-03 | `biblioteki/hedge_mwu.py` + Legatus inject |
 | W-050 | Conformal Prediction (ACI/MAPIE) — skalibrowana niepewność każdego głosu | 🔴 Wysoki | 💭 Idea (zwiad AI) | `imperium/legiony/` + Senat |
 | W-051 | BOCPD — bayesowski detektor zmiany reżimu w czasie rzeczywistym | 🔴 Wysoki | 💭 Idea (zwiad AI) | `imperium/legiony/zwiadowcy/` |
 | W-052 | Thompson Sampling bandit — wybór która koalicja neuronów/strategia gra teraz | 🟠 Średni | 💭 Idea (zwiad AI) | nad rojem (`legatus`) |
 | W-053 | Hurst-DFA — meta-gate reżimu (trend H>0.5 vs mean-reversion H<0.5) | 🔴 Wysoki | 💭 Idea (zwiad sygn.) | nowa kat. H, `legatus` |
 | W-054 | Permutation Entropy — neuron chaosu (forbidden patterns, ortogonalny do RSI) | 🔴 Wysoki | 💭 Idea (zwiad sygn.) | nowa kat. N (entropia) |
-| W-055 | Yang-Zhang volatility — upgrade kat. V (7-14× efektywniejszy niż std(close)) | 🔴 Wysoki | 💭 Idea (zwiad sygn.) | `fundament/brama` + kat. V |
+| W-055 | Yang-Zhang volatility — upgrade kat. V (7-14× efektywniejszy niż std(close)) | 🔴 Wysoki | ✅ WDROŻONE 2026-06-03 | `fundament/brama` (`YANG_ZHANG`) + V-13 |
 | W-056 | Amihud illiquidity + Corwin-Schultz spread — mikrostruktura z samego OHLC | 🟠 Średni | 💭 Idea (zwiad sygn.) | kat. L/mikrostruktura |
 | W-057 | RQA (determinism/laminarity) — early-warning krachu z teorii systemów dynam. | 🟡 Niski | 💭 Idea (zwiad sygn.) | kat. R, okna 200 barów |
 | W-058 | MF-DFA szerokość widma — multifraktalny early-warning krytycznego reżimu | 🟡 Niski | 💭 Idea (zwiad sygn.) | kat. D (fraktal) |

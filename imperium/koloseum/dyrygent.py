@@ -129,6 +129,12 @@ class Dyrygent:
             return DecyzjaCyklu(symbol, "BUDOWNICZY", False,
                                 powod="brak wskaźników (puste bary lub błąd Bramy)")
 
+        # 1b. Auto-klasyfikacja reżimu (Prawo XV — ożywia system reżimowy).
+        # rezim="AUTO" → klasyfikator z gotowych wskaźników (nie zgadywanie, dane Bramy).
+        if rezim == "AUTO":
+            from imperium.legiony.legatus import klasyfikuj_rezim
+            rezim = klasyfikuj_rezim(wskazniki)
+
         # 2. Namiestnik — Regime-Aware Gating (Faza 1)
         # Wyznacza: tryb, prog_pewnosci, lewar_factor, czy_grac dla tego reżimu.
         tryb_aktywny = self.tryb

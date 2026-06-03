@@ -48,6 +48,11 @@
 | W-026 | Strategy Vector DB (LanceDB) — strategie jako embeddingi, semantyczny dedup + dopasowanie reżimu | 🟡 Niski | 💭 Idea (REALNE) | `imperium/biblioteki/` (mnemosyne?) |
 | W-027 | Data Drift Detector — wykrywa shift rozkładu danych → trigger rekalibracji neuronów | 🟡 Niski | 💭 Idea | `imperium/koloseum/` |
 | W-028 | Reguła 30% max straty (AOA) — hard circuit-breaker w Kalkulatorze (przerwij przy 30% DD) | 🔴 Wysoki | ✅ ZROBIONE → `BezpiecznikKapitalu` (12 testów ✅) | `imperium/pretorianie/kalkulator_lewara.py` |
+| W-029 | Adaptacyjna kalibracja wag neuronów po wyborze strategii (boost kategorii wspierających) | 🔴 Wysoki | 💭 Idea | `imperium/legiony/legatus.py` + `WAGI_REZIMU` |
+| W-030 | Pełny raport zwiadowczy przed wejściem (multi-TF, BTC dominacja, volume flow) | 🔴 Wysoki | 💭 Idea | `imperium/legiony/zwiadowcy/` + `cesarz/` |
+| W-031 | Roman Naming — szlacheckie nazwy walut na dashboardzie (BTC=Capitolium, ETH=Patricii…) | 🟡 Niski | 💭 Idea | `imperium/swiatynie/` dashboard |
+| W-032 | Lupanar Neuronów — koszary treningowe, hybrydy, modernizacja (trening przed polem bitwy) | 🟠 Średni | 💭 Idea | `imperium/koloseum/` |
+| W-033 | Agentki szpiegowskie — wykrywanie manipulacji giełdowych (pump&dump, spoofing, hunting) | 🔴 Wysoki | 💭 Idea | nowa kategoria neuronów / `imperium/oczy/` |
 
 ---
 
@@ -108,7 +113,7 @@
 
 | Metryka | Wartość |
 |---------|---------|
-| Łącznie wizji | 28 |
+| Łącznie wizji | 33 |
 | W trakcie analizy | 19 |
 | Przeniesione do katalogów (Higuchi, CME, Azja Range) | 3 |
 | Zaimplementowane (W-002 Igrzyska, W-028 Bezpiecznik) | 2 |
@@ -179,4 +184,157 @@ pełnym imieniem i tytułem, nieodłącznym. Nie zniknie.
   tylko egzekutor (Grupa A: W-009/W-017/W-018).
 
 *Status: rozmowa otwarta — następne iskry dopisujemy poniżej.*
+
+---
+
+### 📅 2026-06-03 — Wielka Wizja Cezara Pixela (głosem, ~1000 słów)
+
+> *Cezar mówił głosem, ARCH-MAX zebrał i skatalogował. Nic nie zginęło.*
+
+---
+
+#### 🎯 I. ADAPTACYJNA KALIBRACJA NEURONÓW PO WYBORZE STRATEGII
+
+**Rdzeń pomysłu:** Po wyborze strategii przez Legatusa — nie wyciszamy reszty neuronów brudno, ale **płynnie przeskalowujemy wagi** na korzyść kategorii neuronów wspierających wybraną strategię. Dynamiczne "wirowanie kostką Rubika".
+
+**Fazy działania (jak to Cezar widzi):**
+1. **Rekonesans** — wszystkie aktywne neurony + zwiadowcy skanują rynek (pełny zakres)
+2. **Diagnoza** — określenie reżimu: trend/konsolidacja, bessa/hossa, interwał, dominacja BTC
+3. **Selekcja** — Legatus wybiera strategię na podstawie głosów
+4. **Wzmocnienie** — neurony wspierające wybraną strategię dostają `+waga_boost`; pozostałe — nie wyciszone, ale z niższą wagą (flanki, nie cmentarz)
+5. **Flanki obronne** — wydzielona grupa neuronów "supportowych" obserwuje otwartą pozycję ciągłe: inne TF, wolumen, news — i sygnalizuje wyjście / zmianę lewara
+6. **Płynna kalibracja lewara** — w trakcie trwania pozycji dynamicznie dostosowujemy dźwignię: cena idzie naszym torem → doważamy; coś się zmienia → redukujemy
+
+**Analogia Cezara:** "Brygada konna dostaje lepsze konie — jest szybsza, celniejsza, skalibrowana. Ale reszta legionów dalej stoi na flankach."
+
+**Powiązania z istniejącymi elementami:**
+- `WAGI_REZIMU` w `legatus.py` — już mamy bazę do rozbudowy
+- `Namiestnik` (Regime-Aware Gating) — już wykrywa reżim
+- `kalkulator_lewara.py` + `BezpiecznikKapitalu` — fundament pod dynamiczny lewar
+
+**Status:** 💭 Wizja → do głębszego przemyślenia architektury. Dodaję jako **W-029**.
+
+---
+
+#### 👁️ II. PEŁNY REKONESANS RYNKU PRZED WEJŚCIEM
+
+**Rdzeń pomysłu:** Zanim wybierzemy strategię — wysyłamy "przed-zwiadowców" którzy mapują:
+- Wszystkie interwały czasowe (scalp/swing/invest)
+- Dominacja BTC i korelacje altcoinów z nim
+- Czy jesteśmy w bessie / hossie / akumulacji
+- Volume flow: pieniądze się chowają mimo stabilnej ceny? → manipulacja
+- Inne giełdy: spread cenowy MEXC vs Binance vs OKX
+- On-chain (gdy będą klucze API): przepływy wielorybów
+
+**Analogia Cezara:** "Najpierw wysyłamy zwiadowców którzy mapują teren. Dopiero potem decydujemy którym legionem atakujemy."
+
+**Powiązania:** EXP-* (zwiadowcy) + nowe OC-* (on-chain, gdy API) + planowane oczy newsów
+
+**Status:** 💭 Wizja → częściowo już mamy (Namiestnik + EXP-*), ale brak pełnego "raport zwiadowczy" przed decyzją. Dodaję jako **W-030**.
+
+---
+
+#### 🏛️ III. NAZEWNICTWO WALUT — ROMAN NAMING
+
+**Rdzeń pomysłu:** Każda waluta dostaje **szlachecką nazwę z epoki rzymskiej** obok oficjalnego tickera. Charakter nazwy odzwierciedla charakter waluty:
+
+| Waluta | Charakter | Propozycja nazwy |
+|--------|-----------|-----------------|
+| **BTC** | Król, twierdza, niezdobyta | *Capitolium / Arx Maxima* — Twierdza Kapitolińska |
+| **ETH** | Szlachcic, platforma, ekosystem | *Patricii Aeterni* — Wieczni Patrycjusze |
+| **SOL** | Szybki barbarzyńca | *Velocitas Barbari* — Prędkość Barbarzyńcy |
+| **DOGE** | Meme, nieprzewidywalny błazen | *Mimus Augusti* — Błazen Cesarza |
+| Meme coiny | Niebezpieczne ziemie | *Terrae Incognitae* — Ziemie Nieznane |
+| Nowe projekty | Kolonie do podboju | *Coloniae Novae* — Nowe Kolonie |
+
+**Manipulacje giełdowe** (cwaniaczki, łajdaki) → *Mercatores Perversi* — Przewrotni Kupcy
+
+**Status:** 💭 Wizja → dodaję jako **W-031**. Świetne do dashboardu Kapitolu (W-004).
+
+---
+
+#### ⚔️ IV. LUPANAR NEURONÓW — TRENING I DOSKONALENIE
+
+**Rdzeń pomysłu:** Specjalne miejsce (Lupanar — dosłownie "wilcze gniazdo", ale Cezar ma na myśli treningowe "legionowe koszary") gdzie neurony:
+- Trenują na papierowych danych zanim wyjdą "na pole bitwy"
+- Mogą być hybrydyzowane / combo (np. neuron A + B = nowy hybryd)
+- Najlepsze dostają oznaczenie modernizacji: "Brygada Konna v2"
+- Słabe wracają na trening lub są relegowane
+
+**Powiązania:** Igrzyska (W-002 zrobione) + Valhalla backtest (W-001) + Walk-Forward (W-005)
+
+**Status:** 💭 Wizja → dodaję jako **W-032**.
+
+---
+
+#### 🕵️ V. AGENTKI SZPIEGOWSKIE — WYKRYWANIE MANIPULACJI
+
+**Rdzeń pomysłu:** Wydzielona klasa neuronów/zwiadowców których zadaniem jest **wykrywanie manipulacji**:
+- Pump & dump (fałszywy wzrost, potem crash)
+- Ukryty odpływ kapitału (volume flow ≠ ruch ceny)
+- Spoofing orderbook (duże zlecenia które znikają)
+- Giełdowe "polowanie na likwidacje" (price spike do likwidacji leveraged pozycji)
+
+**Analogia Cezara:** "Agentki które wyciągają informacje i szpiegują. Dają cynk co się naprawdę dzieje."
+
+**Powiązania:** EXP-* (Exploratores) + planowane OC-* on-chain + nowa kategoria neuronów "M" (manipulacja)?
+
+**Status:** 💭 Wizja → dodaję jako **W-033**.
+
+---
+
+#### 💻 VI. PLAN TECHNICZNY — PRZEJŚCIE NA LOKALNY LAPTOP
+
+**Cezar Pixel planuje:**
+- Nowy laptop: min. 32 GB RAM, ekran 17–18", budżet ~5000–5500 PLN (raty)
+- Cel: Claude Code zainstalowany **lokalnie**, nie przez przeglądarkę
+- Dodatkowe narzędzia: Hermes Agent + inne (lepsza pamięć, szybkość)
+- Giełda bazowa: **MEXC** → na niej się uczymy, potem ekspansja
+
+**Co to zmienia dla Imperium:**
+- TA-Lib lokalnie (odblokowanie neuronów V/L które teraz są pure-Python fallback)
+- Większa prędkość sesji, brak limitów kontekstu webowego
+- Możliwość lokalnego DeepSeek (mniejsze modele, prywatność)
+
+**Status:** 📋 Plan techniczny, nie wizja — zapamiętane do realizacji gdy laptop gotowy.
+
+---
+
+#### 📊 VII. PAPER TRADING — ROZSZERZENIE DANYCH
+
+**Cezar Pixel chce:**
+- Ściągnąć historyczne dane na więcej walut (nie tylko BTC/ETH)
+- Pokryć wszystkie interwały: scalp (1m/5m/15m), swing (4h/1d), invest (1w)
+- Testować zarówno **lewar** jak i **spot**
+- Obserwować kilka walut jednocześnie, nie tylko jedną
+- BTC dominacja jako wskaźnik pomocniczy (gdy pojawi się on-chain API)
+
+**Status:** 💭 Wizja → rozszerza W-001 (Valhalla + neurony). Dodaję jako notatkę do W-001.
+
+---
+
+#### 🎖️ VIII. IGRZYSKA — REGULARNY HARMONOGRAM
+
+**Cezar Pixel potwierdza wizję Igrzysk:**
+- Regularne (co kwartał? co miesiąc?) "Sezony Igrzysk"
+- Tytuły dla zwycięskich neuronów/strategii: *Złoty Hełm*, *Złota Zbroja*, *Złoty Miecz*
+- Relegacja słabych do treningu (Lupanar — W-032)
+- Legatus otrzymuje automatycznie zaktualizowane wagi po Igrzyskach
+
+**Status:** ✅ Fundamenty zbudowane (W-002 Igrzyska gotowe) → harmonogram i tytuły to kolejny krok.
+
+---
+
+**Podsumowanie tej sesji głosowej — nowe wizje do tabeli:**
+
+| # | Wizja | Priorytet |
+|---|-------|-----------|
+| W-029 | Adaptacyjna kalibracja wag neuronów po wyborze strategii | 🔴 Wysoki |
+| W-030 | Pełny raport zwiadowczy przed wejściem (multi-TF, BTC dom, flow) | 🔴 Wysoki |
+| W-031 | Roman Naming — szlacheckie nazwy walut na dashboardzie | 🟡 Niski |
+| W-032 | Lupanar Neuronów — koszary treningowe, hybrydy, modernizacja | 🟠 Średni |
+| W-033 | Agentki szpiegowskie — wykrywanie manipulacji giełdowych | 🔴 Wysoki |
+
+*Cezar Pixel idzie spać, wraca za 2 dni (marynarz na służbie). ARCH-MAX czeka.*
+*Rodzina czeka — synowie i żona. Najpierw oni.* 👑⚓
 

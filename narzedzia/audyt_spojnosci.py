@@ -214,7 +214,8 @@ def audyt() -> tuple:
 
         for doc_path, label in [("docs/MANIFEST_KODU.md", "MANIFEST"), ("README.md", "README")]:
             doc = _czytaj(doc_path)
-            m = re.search(r"Stan na:\s*(\d{4}-\d{2}-\d{2})", doc)
+            # Tolerancja markdown: '**Stan na:** 2026-06-03' (gwiazdki/spacje przed datą)
+            m = re.search(r"Stan na:\s*\**\s*(\d{4}-\d{2}-\d{2})", doc)
             if m:
                 doc_date = date.fromisoformat(m.group(1))
                 delta = (today - doc_date).days
@@ -223,6 +224,11 @@ def audyt() -> tuple:
                         f"[W6] {label} 'Stan na:' = {m.group(1)} — "
                         f"przestarzałe o {delta} dni (dziś {today}). Zaktualizuj po każdej sesji."
                     )
+            else:
+                bledy.append(
+                    f"[W6] {label} nie zawiera pola 'Stan na:' (format: YYYY-MM-DD). "
+                    f"Wymagane przez Prawo XXI (data = data commitu)."
+                )
     except Exception as e:
         bledy.append(f"[W6] Błąd sprawdzania dat 'Stan na:': {e}")
 

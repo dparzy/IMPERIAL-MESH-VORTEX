@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-06-03 | FIX | Poprawki recenzji PR (cubic) #2 — hook staged-only + audyt W6 'Stan na:'
+
+### Kontekst
+Druga tura recenzji PR zgłosiła 2 uwagi. Obie trafne i naprawione.
+
+### Naprawione (kod + testy regresyjne)
+- **Pre-commit hook (staged-only):** hook uruchamiał testy/audyt na working tree,
+  nie na zawartości staged → zepsuty staged mógł przejść, jeśli working tree był
+  poprawny (i odwrotnie). Dodano izolację: `git stash push --keep-index --include-untracked`
+  na czas sprawdzeń + `trap` gwarantujący przywrócenie working tree (EXIT/INT/TERM).
+- **Audyt W6 (brak 'Stan na:'):** brak pola daty był cicho pomijany (`if m:` bez `else`).
+  Dodano `else` → brak daty = błąd. Przy okazji wykryto, że regex nie matchował
+  markdown `**Stan na:** data` — poprawiono na `Stan na:\s*\**\s*(data)`.
+
+### Testy regresyjne
+- `test_audyt_wykrywa_brak_stan_na` — brak pola = błąd W6.
+- `test_audyt_akceptuje_stan_na_w_markdown` — markdown nie daje fałszywego alarmu.
+
+### Stan
+- Testy: 385/385 (+2). Audyt: pełna harmonia. Hook zsynchronizowany (install_hooks.py).
+
+---
+
 ## 2026-06-03 | FIX | Poprawki recenzji PR (cubic) — audyt źródła, warmup Ulcer, fallback symbolu
 
 ### Kontekst

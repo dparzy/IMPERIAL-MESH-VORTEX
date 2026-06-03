@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-03 | FIX | Poprawka recenzji PR (cubic) #4 — KROK 0 grep mylący (ZASADY)
+
+### Kontekst
+Recenzja PR #24 zwróciła uwagę: w KROK 0 komenda `grep -c "✅"` liczyła WSZYSTKIE
+✅ (nagłówek + statusy), a krok 2 opisywał `✅ aktywny` — sprzeczne liczby.
+
+### Diagnoza (głębsza niż uwaga)
+`grep -c "✅ aktywny"` daje 69 (łapie też zwiadowców EXP i inne tabele), a aktywnych
+neuronów jest 39. Grep po dokumentach NIE jest w stanie wyizolować neuronów — to złe
+źródło prawdy (łamie Prawo XIX: źródłem jest kod, nie dokument).
+
+### Naprawione
+- KROK 0 w `ZASADY_FUNDAMENTALNE.md`: zastąpiono kruchy grep autorytatywną komendą
+  (`audyt_spojnosci.py` + one-liner z `rejestr.py`). Dodano ostrzeżenie, by NIE liczyć
+  neuronów grepem. Źródło prawdy = kod weryfikowany audytem.
+
+### Stan
+- Testy: 387/387. Audyt: pełna harmonia. (Zmiana wyłącznie dokumentacyjna — ZASADY.)
+
+---
+
 ## 2026-06-03 | FIX | Poprawki recenzji PR (cubic) #3 — filtr/AC/audyt W4/MANIFEST
 
 ### Kontekst

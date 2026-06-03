@@ -230,13 +230,18 @@ Zanim cokolwiek zaczniesz — sprawdź, że repo jest spójne i czyste:
 ```
 git status                          # brak niezacommitowanych zmian?
 python tests/run_tests.py           # testy zielone?
-grep -c "✅" docs/MANIFEST_KODU.md  # liczba ✅ zgadza się z README?
+python narzedzia/audyt_spojnosci.py # liczby kod↔README↔MANIFEST↔INDEKS spójne? (exit 0)
+# liczba neuronów wprost z kodu (źródło prawdy — NIE grep po dokumentach):
+python -c "from imperium.legiony.rejestr import wszystkie_neurony as w; n=w(); print('neurony:',len(n),'| aktywne:',len([x for x in n if x.DOSTEPNY]))"
 ```
 
-Sprawdź, że te trzy liczby są **identyczne** (policz z kodu, nie z pamięci):
-1. Liczba klas `Neuron*(MikroNeuron)` zarejestrowanych w `rejestr.py`
-2. Liczba `✅ aktywny` w `docs/MANIFEST_KODU.md`
+Sprawdź, że liczba neuronów jest **identyczna** w trzech miejscach (policz z kodu, nie z pamięci):
+1. Liczba klas `Neuron*(MikroNeuron)` zarejestrowanych w `rejestr.py` (komenda wyżej)
+2. Liczba „Zaimplementowane" w nagłówku `docs/MANIFEST_KODU.md`
 3. Liczba podana w `README.md`
+
+> ⚠️ NIE używaj `grep -c "✅"` — liczy też zwiadowców (EXP) i inne tabele. Źródłem
+> prawdy o liczbie neuronów jest `rejestr.py` (kod), weryfikowany przez `audyt_spojnosci.py`.
 
 Jeśli cokolwiek się **nie zgadza** → STOP. Najpierw napraw spójność (Prawo XVIII),
 dopiero potem zacznij nowe zadanie. Praca na niespójnym repo = budowanie na błędnym fundamencie.

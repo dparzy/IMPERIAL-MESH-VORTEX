@@ -48,6 +48,26 @@
 | W-026 | Strategy Vector DB (LanceDB) — strategie jako embeddingi, semantyczny dedup + dopasowanie reżimu | 🟡 Niski | 💭 Idea (REALNE) | `imperium/biblioteki/` (mnemosyne?) |
 | W-027 | Data Drift Detector — wykrywa shift rozkładu danych → trigger rekalibracji neuronów | 🟡 Niski | 💭 Idea | `imperium/koloseum/` |
 | W-028 | Reguła 30% max straty (AOA) — hard circuit-breaker w Kalkulatorze (przerwij przy 30% DD) | 🔴 Wysoki | ✅ ZROBIONE → `BezpiecznikKapitalu` (12 testów ✅) | `imperium/pretorianie/kalkulator_lewara.py` |
+| W-029 | Adaptacyjna kalibracja wag neuronów po wyborze strategii (boost kategorii wspierających) | 🔴 Wysoki | 💭 Idea | `imperium/legiony/legatus.py` + `WAGI_REZIMU` |
+| W-030 | Pełny raport zwiadowczy przed wejściem (multi-TF, BTC dominacja, volume flow) | 🔴 Wysoki | 💭 Idea | `imperium/legiony/zwiadowcy/` + `cesarz/` |
+| W-031 | Roman Naming — szlacheckie nazwy walut na dashboardzie (BTC=Capitolium, ETH=Patricii…) | 🟡 Niski | 💭 Idea | `imperium/swiatynie/` dashboard |
+| W-032 | Lupanar Neuronów — koszary treningowe, hybrydy, modernizacja (trening przed polem bitwy) | 🟠 Średni | 💭 Idea | `imperium/koloseum/` |
+| W-033 | Agentki szpiegowskie — wykrywanie manipulacji giełdowych (pump&dump, spoofing, hunting) | 🔴 Wysoki | 💭 Idea | nowa kategoria neuronów / `imperium/oczy/` |
+| W-034 | Arbiter Fiduciae — meta-labeling (drugi mózg: ile postawić, López de Prado) | 🔴 Wysoki | 💭 Idea (zwiad) | `imperium/senat/` + `kalkulator_lewara.py` |
+| W-035 | Arena Trzech Bram — potrójna bariera (sprawiedliwy scoring Igrzysk) | 🔴 Wysoki | 💭 Idea (zwiad) | `imperium/koloseum/` + Igrzyska |
+| W-036 | NeuronToxicFlow — VPIN, radar polowania na likwidacje | 🔴 Wysoki | 💭 Idea (zwiad) | `imperium/legiony/` + `fundament/brama` |
+| W-037 | Senat Byka i Niedźwiedzia — strukturalna debata (lokalna, LLM tylko Cenzor) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/senat/` |
+| W-038 | Wyrocznia Stanów — HMM, miękki wykrywacz reżimu (płynne wagi) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/legiony/` Namiestnik |
+| W-039 | Kroniki Bitew — pamięć epizodyczna reżimów (spina VPIN+HMM+bariera) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/biblioteki/` Mnemosyne |
+| W-040 | Skarbiec Imperialny — danina/budżet kapitału jako twarda reguła | 🔴 Wysoki | 💭 Idea | `imperium/pretorianie/` + Bezpiecznik |
+| W-041 | NeuronSentiment (Fear-Greed) — strach i chciwość jako neuron kat. S (AUC 0.93) | 🔴 Wysoki | 💭 Idea (zwiad azjat.) | `imperium/legiony/neurony/` kat. S |
+| W-042 | NeuronPumpDetect — wykrywanie akumulacji przed pump (mikro-struktura, kat. Z) | 🔴 Wysoki | 💭 Idea (zwiad azjat.) | `imperium/legiony/neurony/` kat. Z |
+| W-043 | Senat Bayesowski — ważona kombinacja głosów przez KL/JS divergence (wzorzec PolySwarm) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/legiony/legatus.py` |
+| W-044 | Staking Neuronów — neurony które "miały rację" dostają wyższe wagi przyszłościowo | 🟠 Średni | 💭 Idea (wzorzec Numerai) | `imperium/koloseum/` Igrzyska |
+| W-045 | KunQuant-styl kompilacja wskaźników — 170× szybciej niż Python dla Alpha101/158 | 🟡 Niski (Faza 2) | 💭 Idea (zwiad chiński) | `imperium/fundament/brama_kalkulatora.py` |
+| W-046 | Zwiadowca Japoński — J-Quants API (TSE) przez MCP jako źródło danych fundamentalnych | 🟡 Niski | 💭 Idea (zwiad azjat.) | `imperium/oczy/` + `akwedukty/` |
+| W-047 | Zasady — audyt przestarzałych praw (które blokują zamiast pomagać) | 🟠 Średni | 💭 Idea Cezara | `ZASADY_FUNDAMENTALNE.md` przegląd |
+| W-048 | Oficina Imperialis — Cesarska Kuźnia (metafora laboratorium ARCH-MAX + nowe neurony) | 🟡 Niski | 💭 Idea Cezara | `docs/` + `imperium/legiony/` |
 
 ---
 
@@ -101,6 +121,11 @@
 - "Sezon Igrzysk" — raz na kwartał wielki reset rankingów
 - Nazwa dla naszego prywatnego indeksu top-10 krypto (jak "Dow Jones Imperium"?)
 - Cesarz mówi do siebie — monolog wewnętrzny przed każdą decyzją (log narracyjny)
+- **Psychohistoria Imperium** — jak Fundacja Asimova: matematyczne przewidywanie zachowań tłumu (łączy neurony sentymentu + reżimu + Fear-Greed)
+- **Oficina Imperialis** — Cesarska Kuźnia, laboratorium ARCH-MAX gdzie rodzą się nowe neurony
+- **Bibliotheca Maxima** — siedziba ARCH-MAX: `imperium/biblioteki/` + `docs/ARCH_MAX_KRONIKI.md`
+- **Dow Jones Imperium** — nasz własny indeks top-10 krypto (ważony przez głosy neuronów)
+- Rust/C++ warstwa dla Budowniczego w Fazie 2 (KunQuant-styl, 170× speedup) — gdy potrzeba HFT
 
 ---
 
@@ -108,7 +133,7 @@
 
 | Metryka | Wartość |
 |---------|---------|
-| Łącznie wizji | 28 |
+| Łącznie wizji | 48 |
 | W trakcie analizy | 19 |
 | Przeniesione do katalogów (Higuchi, CME, Azja Range) | 3 |
 | Zaimplementowane (W-002 Igrzyska, W-028 Bezpiecznik) | 2 |
@@ -179,4 +204,453 @@ pełnym imieniem i tytułem, nieodłącznym. Nie zniknie.
   tylko egzekutor (Grupa A: W-009/W-017/W-018).
 
 *Status: rozmowa otwarta — następne iskry dopisujemy poniżej.*
+
+---
+
+### 📅 2026-06-03 — Wielka Wizja Cezara Pixela (głosem, ~1000 słów)
+
+> *Cezar mówił głosem, ARCH-MAX zebrał i skatalogował. Nic nie zginęło.*
+
+---
+
+#### 🎯 I. ADAPTACYJNA KALIBRACJA NEURONÓW PO WYBORZE STRATEGII
+
+**Rdzeń pomysłu:** Po wyborze strategii przez Legatusa — nie wyciszamy reszty neuronów brudno, ale **płynnie przeskalowujemy wagi** na korzyść kategorii neuronów wspierających wybraną strategię. Dynamiczne "wirowanie kostką Rubika".
+
+**Fazy działania (jak to Cezar widzi):**
+1. **Rekonesans** — wszystkie aktywne neurony + zwiadowcy skanują rynek (pełny zakres)
+2. **Diagnoza** — określenie reżimu: trend/konsolidacja, bessa/hossa, interwał, dominacja BTC
+3. **Selekcja** — Legatus wybiera strategię na podstawie głosów
+4. **Wzmocnienie** — neurony wspierające wybraną strategię dostają `+waga_boost`; pozostałe — nie wyciszone, ale z niższą wagą (flanki, nie cmentarz)
+5. **Flanki obronne** — wydzielona grupa neuronów "supportowych" obserwuje otwartą pozycję ciągłe: inne TF, wolumen, news — i sygnalizuje wyjście / zmianę lewara
+6. **Płynna kalibracja lewara** — w trakcie trwania pozycji dynamicznie dostosowujemy dźwignię: cena idzie naszym torem → doważamy; coś się zmienia → redukujemy
+
+**Analogia Cezara:** "Brygada konna dostaje lepsze konie — jest szybsza, celniejsza, skalibrowana. Ale reszta legionów dalej stoi na flankach."
+
+**Powiązania z istniejącymi elementami:**
+- `WAGI_REZIMU` w `legatus.py` — już mamy bazę do rozbudowy
+- `Namiestnik` (Regime-Aware Gating) — już wykrywa reżim
+- `kalkulator_lewara.py` + `BezpiecznikKapitalu` — fundament pod dynamiczny lewar
+
+**Status:** 💭 Wizja → do głębszego przemyślenia architektury. Dodaję jako **W-029**.
+
+---
+
+#### 👁️ II. PEŁNY REKONESANS RYNKU PRZED WEJŚCIEM
+
+**Rdzeń pomysłu:** Zanim wybierzemy strategię — wysyłamy "przed-zwiadowców" którzy mapują:
+- Wszystkie interwały czasowe (scalp/swing/invest)
+- Dominacja BTC i korelacje altcoinów z nim
+- Czy jesteśmy w bessie / hossie / akumulacji
+- Volume flow: pieniądze się chowają mimo stabilnej ceny? → manipulacja
+- Inne giełdy: spread cenowy MEXC vs Binance vs OKX
+- On-chain (gdy będą klucze API): przepływy wielorybów
+
+**Analogia Cezara:** "Najpierw wysyłamy zwiadowców którzy mapują teren. Dopiero potem decydujemy którym legionem atakujemy."
+
+**Powiązania:** EXP-* (zwiadowcy) + nowe OC-* (on-chain, gdy API) + planowane oczy newsów
+
+**Status:** 💭 Wizja → częściowo już mamy (Namiestnik + EXP-*), ale brak pełnego "raport zwiadowczy" przed decyzją. Dodaję jako **W-030**.
+
+---
+
+#### 🏛️ III. NAZEWNICTWO WALUT — ROMAN NAMING
+
+**Rdzeń pomysłu:** Każda waluta dostaje **szlachecką nazwę z epoki rzymskiej** obok oficjalnego tickera. Charakter nazwy odzwierciedla charakter waluty:
+
+| Waluta | Charakter | Propozycja nazwy |
+|--------|-----------|-----------------|
+| **BTC** | Król, twierdza, niezdobyta | *Capitolium / Arx Maxima* — Twierdza Kapitolińska |
+| **ETH** | Szlachcic, platforma, ekosystem | *Patricii Aeterni* — Wieczni Patrycjusze |
+| **SOL** | Szybki barbarzyńca | *Velocitas Barbari* — Prędkość Barbarzyńcy |
+| **DOGE** | Meme, nieprzewidywalny błazen | *Mimus Augusti* — Błazen Cesarza |
+| Meme coiny | Niebezpieczne ziemie | *Terrae Incognitae* — Ziemie Nieznane |
+| Nowe projekty | Kolonie do podboju | *Coloniae Novae* — Nowe Kolonie |
+
+**Manipulacje giełdowe** (cwaniaczki, łajdaki) → *Mercatores Perversi* — Przewrotni Kupcy
+
+**Status:** 💭 Wizja → dodaję jako **W-031**. Świetne do dashboardu Kapitolu (W-004).
+
+---
+
+#### ⚔️ IV. LUPANAR NEURONÓW — TRENING I DOSKONALENIE
+
+**Rdzeń pomysłu:** Specjalne miejsce (Lupanar — dosłownie "wilcze gniazdo", ale Cezar ma na myśli treningowe "legionowe koszary") gdzie neurony:
+- Trenują na papierowych danych zanim wyjdą "na pole bitwy"
+- Mogą być hybrydyzowane / combo (np. neuron A + B = nowy hybryd)
+- Najlepsze dostają oznaczenie modernizacji: "Brygada Konna v2"
+- Słabe wracają na trening lub są relegowane
+
+**Powiązania:** Igrzyska (W-002 zrobione) + Valhalla backtest (W-001) + Walk-Forward (W-005)
+
+**Status:** 💭 Wizja → dodaję jako **W-032**.
+
+---
+
+#### 🕵️ V. AGENTKI SZPIEGOWSKIE — WYKRYWANIE MANIPULACJI
+
+**Rdzeń pomysłu:** Wydzielona klasa neuronów/zwiadowców których zadaniem jest **wykrywanie manipulacji**:
+- Pump & dump (fałszywy wzrost, potem crash)
+- Ukryty odpływ kapitału (volume flow ≠ ruch ceny)
+- Spoofing orderbook (duże zlecenia które znikają)
+- Giełdowe "polowanie na likwidacje" (price spike do likwidacji leveraged pozycji)
+
+**Analogia Cezara:** "Agentki które wyciągają informacje i szpiegują. Dają cynk co się naprawdę dzieje."
+
+**Powiązania:** EXP-* (Exploratores) + planowane OC-* on-chain + nowa kategoria neuronów "M" (manipulacja)?
+
+**Status:** 💭 Wizja → dodaję jako **W-033**.
+
+---
+
+#### 💻 VI. PLAN TECHNICZNY — PRZEJŚCIE NA LOKALNY LAPTOP
+
+**Cezar Pixel planuje:**
+- Nowy laptop: min. 32 GB RAM, ekran 17–18", budżet ~5000–5500 PLN (raty)
+- Cel: Claude Code zainstalowany **lokalnie**, nie przez przeglądarkę
+- Dodatkowe narzędzia: Hermes Agent + inne (lepsza pamięć, szybkość)
+- Giełda bazowa: **MEXC** → na niej się uczymy, potem ekspansja
+
+**Co to zmienia dla Imperium:**
+- TA-Lib lokalnie (odblokowanie neuronów V/L które teraz są pure-Python fallback)
+- Większa prędkość sesji, brak limitów kontekstu webowego
+- Możliwość lokalnego DeepSeek (mniejsze modele, prywatność)
+
+**Status:** 📋 Plan techniczny, nie wizja — zapamiętane do realizacji gdy laptop gotowy.
+
+---
+
+#### 📊 VII. PAPER TRADING — ROZSZERZENIE DANYCH
+
+**Cezar Pixel chce:**
+- Ściągnąć historyczne dane na więcej walut (nie tylko BTC/ETH)
+- Pokryć wszystkie interwały: scalp (1m/5m/15m), swing (4h/1d), invest (1w)
+- Testować zarówno **lewar** jak i **spot**
+- Obserwować kilka walut jednocześnie, nie tylko jedną
+- BTC dominacja jako wskaźnik pomocniczy (gdy pojawi się on-chain API)
+
+**Status:** 💭 Wizja → rozszerza W-001 (Valhalla + neurony). Dodaję jako notatkę do W-001.
+
+---
+
+#### 🎖️ VIII. IGRZYSKA — REGULARNY HARMONOGRAM
+
+**Cezar Pixel potwierdza wizję Igrzysk:**
+- Regularne (co kwartał? co miesiąc?) "Sezony Igrzysk"
+- Tytuły dla zwycięskich neuronów/strategii: *Złoty Hełm*, *Złota Zbroja*, *Złoty Miecz*
+- Relegacja słabych do treningu (Lupanar — W-032)
+- Legatus otrzymuje automatycznie zaktualizowane wagi po Igrzyskach
+
+**Status:** ✅ Fundamenty zbudowane (W-002 Igrzyska gotowe) → harmonogram i tytuły to kolejny krok.
+
+---
+
+**Podsumowanie tej sesji głosowej — nowe wizje do tabeli:**
+
+| # | Wizja | Priorytet |
+|---|-------|-----------|
+| W-029 | Adaptacyjna kalibracja wag neuronów po wyborze strategii | 🔴 Wysoki |
+| W-030 | Pełny raport zwiadowczy przed wejściem (multi-TF, BTC dom, flow) | 🔴 Wysoki |
+| W-031 | Roman Naming — szlacheckie nazwy walut na dashboardzie | 🟡 Niski |
+| W-032 | Lupanar Neuronów — koszary treningowe, hybrydy, modernizacja | 🟠 Średni |
+| W-033 | Agentki szpiegowskie — wykrywanie manipulacji giełdowych | 🔴 Wysoki |
+
+*Cezar Pixel idzie spać, wraca za 2 dni (marynarz na służbie). ARCH-MAX czeka.*
+*Rodzina czeka — synowie i żona. Najpierw oni.* 👑⚓
+
+---
+
+### 📅 2026-06-03 — RAPORT ZE ZWIADU: Propozycje ARCH-MAX (podpatrzone u konkurencji, wykute lepiej)
+
+> *Cezar rozkazał: "Wyślij szpiegów do obcych imperiów, ukradnij najlepsze pomysły,*
+> *zrób z nich coś lepszego — tylko dla nas." ARCH-MAX wrócił z 8 zdobyczami.*
+> *Każda ma źródło (co podpatrzyłem) + nasz oryginalny ulepszony wariant.*
+
+---
+
+#### 🔱 W-034 | META-LABELING — DRUGI MÓZG, KTÓRY MÓWI "ILE POSTAWIĆ" 🔴
+
+**Co podpatrzyłem:** Marcos López de Prado (*Advances in Financial Machine Learning*, 2018) — technika **meta-labelingu**. Pierwszy model mówi KIERUNEK (long/short). Drugi model nie zgaduje kierunku — ocenia: *"jak pewny jest ten sygnał? czy postawić, a jeśli tak — ile?"*. To rozdziela DWIE różne decyzje, które większość systemów myli.
+
+**Nasz lepszy wariant (oryginalny):**
+- Legatus zostaje "pierwszym mózgiem" — agreguje głosy neuronów → KIERUNEK
+- Nowy moduł **`Arbiter Fiduciae`** (Strażnik Zaufania) = drugi mózg. Bierze: zgodność neuronów, dekorelację (Prawo XVI), reżim Namiestnika, toksyczność flow → zwraca `pewnosc ∈ [0,1]`
+- `pewnosc` wpięta wprost w `kalkulator_lewara.py` → rozmiar pozycji i lewar
+- **Przewaga nasza:** my mamy już zmierzą dekorelację (Prawo XVI) jako wejście — konkurencja zgaduje pewność z gołego ML, my liczymy ją z mierzonej niezależności głosów
+
+**Powiązanie:** wzmacnia W-029 (kalibracja) + W-020 (CVaR sizing). Łączy się z Pythią (doradca).
+
+---
+
+#### 🎯 W-035 | POTRÓJNA BARIERA — ETYKIETOWANIE WYNIKÓW DLA IGRZYSK 🔴
+
+**Co podpatrzyłem:** *Triple Barrier Method* (López de Prado) — zamiast pytać "czy cena wzrosła?", stawiamy 3 bariery: **take-profit** (góra), **stop-loss** (dół), **czas** (pion). Wynik = która bariera padła pierwsza. To uczciwa ocena: sygnał był dobry tylko jeśli TP padł przed SL i przed wygaśnięciem.
+
+**Nasz lepszy wariant (oryginalny):**
+- To jest **brakujące serce Igrzysk** (W-002). Teraz scorer ocenia neurony "na oko" — z potrójną barierą każdy głos neuronu dostaje twardą, obiektywną ocenę: trafił TP / dostał SL / wygasł
+- **`Arena Trzech Bram`** — każdy sygnał z backtestu przechodzi przez 3 bramy; neuron zbiera punkty tylko za realnie zamknięte z zyskiem
+- **Przewaga nasza:** wpinamy to w istniejący `koloseum/backtest.py` + Igrzyska → rankingi neuronów stają się sprawiedliwe i niemanipulowalne
+
+**Powiązanie:** fundament pod W-001/W-002 (żywe Igrzyska) + W-032 (Lupanar — kogo relegować).
+
+---
+
+#### ☠️ W-036 | VPIN — WYKRYWACZ TOKSYCZNEGO FLOW (radar polowania na likwidacje) 🔴
+
+**Co podpatrzyłem:** **VPIN** (Volume-Synchronized Probability of Informed Trading, Easley & López de Prado). Mierzy "toksyczność" przepływu: czy handlują poinformowani (wieloryby, market-makerzy) przeciw tłumowi. Badania 2026: **VPIN > 0.8 + niski OBI = nadchodzi kaskada likwidacji**. To dokładnie Twoje "łajdaki, które chcą nam zabrać pieniądze".
+
+**Nasz lepszy wariant (oryginalny):**
+- Nowy zwiadowca **EXP / neuron kat. nowa „Z" (Zagrożenie)**: `NeuronToxicFlow`
+- Liczy VPIN z koszyków wolumenu (pure-Python, bez API — działa już teraz na danych OHLCV jako proxy, pełny na L2 gdy feed)
+- Wynik: VPIN < 0.3 spokój → 0.3-0.7 czujność → >0.7 **czerwony alarm: schodź z lewara / nie wchodź**
+- To jest realizacja Twojej wizji W-033 (agentki szpiegowskie) w konkretnym, zmierzonym wskaźniku
+- **Przewaga nasza:** wpięte w "flanki obronne" z W-029 — nie tylko wykrywa, ale automatycznie redukuje lewar przez Kalkulator
+
+**Powiązanie:** W-033 (manipulacje) + W-029 (flanki) + Hermes (doradca już liczy VPIN-podobne!).
+
+---
+
+#### 🐂🐻 W-037 | SENAT BYKA I NIEDŹWIEDZIA — STRUKTURALNA DEBATA 🟠
+
+**Co podpatrzyłem:** BlackRock/Columbia (kwiecień 2026) + TradingAgents v0.2.0 — najlepsze systemy to **trój-warstwowa debata**: agent-Byk (szuka argumentów za long), agent-Niedźwiedź (za short), Risk-Supervisor (rozstrzyga). Externalizacja konfliktu = mniej halucynacji niż jeden model.
+
+**Nasz lepszy wariant (oryginalny):**
+- Mamy już `senat/` (debata/konsensus) — ożywiamy go jako **dwóch Senatorów**:
+  - *Senator Optymata* (Byk) — zbiera wyłącznie głosy neuronów BUY i buduje najmocniejszą tezę long
+  - *Senator Popular* (Niedźwiedź) — to samo dla short
+  - *Cenzor* (Risk-Supervisor = nasz Iustitia) — rozstrzyga + weto ryzyka
+- **Przewaga nasza:** konkurencja używa drogiego LLM dla każdego agenta. My robimy to **lokalnie i za darmo** z neuronów — LLM (Cesarz/DeepSeek) wchodzi TYLKO jako Cenzor na końcu. Tani, szybki, bez halucynacji.
+
+**Powiązanie:** ożywia istniejący `senat/` + W-019 (TradingAgents) + Cesarz.
+
+---
+
+#### 🗺️ W-038 | HMM — UKRYTY MARKOV, PRAWDZIWY WYKRYWACZ REŻIMU 🟠
+
+**Co podpatrzyłem:** Badania 2024-2026 — **Hidden Markov Model** wykrywa ukryte stany rynku (byk/niedźwiedź/bok) lepiej niż progi na wskaźnikach, bo modeluje PRZEJŚCIA między stanami i ich prawdopodobieństwa. Najlepsze: ensemble-HMM (kilka modeli głosuje na reżim).
+
+**Nasz lepszy wariant (oryginalny):**
+- Namiestnik wykrywa reżim teraz progami (ADX, itp.). HMM to upgrade: **`Wyrocznia Stanów`** liczy prawdopodobieństwo {trend↑, trend↓, konsolidacja, chaos} pure-Python (Baum-Welch lekki)
+- Zwraca nie "jesteś w trendzie", ale "72% trend ↑, 18% bok, 10% przejście" → płynne wagi zamiast skokowych (dokładnie Twoja "płynna kalibracja, perpetuum mobile")
+- **Przewaga nasza:** wynik HMM karmi WAGI_REZIMU z W-029 jako mnożnik miękki, nie twarda bramka
+
+**Powiązanie:** upgrade Namiestnika + serce W-029 (płynne wagi) + W-006 (Higuchi — komplementarny detektor chaosu).
+
+---
+
+#### 🧠 W-039 | PAMIĘĆ EPIZODYCZNA — "PAMIĘTAM TEGO WIELORYBA Z 2025" 🟠
+
+**Co podpatrzyłem:** FinCon / "Better Memory frameworks" 2026 — przewaga agentów nad gołym LLM to **pamięć regimów**: system pamięta jak konkretny setup zachował się wcześniej i stosuje tę lekcję teraz. Goły LLM jest "bezstanowy" — zapomina.
+
+**Nasz lepszy wariant (oryginalny):**
+- Mamy `biblioteki/` (Pamięć Absolutna / Mnemosyne). Rozbudowa: **`Kroniki Bitew`** — każda zamknięta pozycja zapisana jako "odcisk reżimu" (HMM-stan + VPIN + zgodność neuronów + wynik z potrójnej bariery)
+- Przed nowym wejściem: *"szukam w Kronikach podobnych odcisków — jak się skończyły?"* → modyfikator pewności dla Arbitra (W-034)
+- **Przewaga nasza:** to spina W-035 (potrójna bariera) + W-036 (VPIN) + W-038 (HMM) w JEDNĄ uczącą się pętlę. To jest Twoje "neuron z pola bitwy wie najlepiej co ulepszyć".
+
+**Powiązanie:** W-018 (Reflexion) + W-026 (Vector DB) + Igrzyska.
+
+---
+
+#### 👑 W-040 | DANINA CEZARA — BUDŻET IMPERIUM JAKO TWARDA REGUŁA 🔴
+
+**Co podpatrzyłem:** To Twój własny pomysł z tej rozmowy (danina, utrzymanie legionów) — w świecie quant to **risk budgeting / Kelly fractional**. Ale Twoja metafora jest lepsza jako reguła operacyjna.
+
+**Nasz lepszy wariant (oryginalny):**
+- **`Skarbiec Imperialny`** — moduł który traktuje kapitał jak budżet państwa: część na "wojnę" (lewar, agresywne), część w "spichlerzu" (spot, bezpieczne), rezerwa "na czarną godzinę" (cash, nietykalna)
+- Po każdej wygranej bitwie: danina do Skarbca rośnie; po serii porażek: automatyczne przejście w tryb oszczędności (mniejsze pozycje), zanim Bezpiecznik 30% w ogóle się zbliży
+- **Przewaga nasza:** spina W-028 (Bezpiecznik 30%) + W-025 (Fleet Risk) w narrację Imperium, którą Ty rozumiesz i kontrolujesz jako Cezar
+
+**Powiązanie:** W-028 + W-025 + W-020 (CVaR) + Kalkulator Lewara.
+
+---
+
+**Podsumowanie raportu zwiadu — 7 nowych wizji (W-040 to Twój pomysł sformalizowany):**
+
+| # | Wizja | Źródło podpatrzone | Nasza przewaga | Prio |
+|---|-------|--------------------|----------------|------|
+| W-034 | Arbiter Fiduciae — meta-labeling (drugi mózg: ile postawić) | López de Prado | dekorelacja jako wejście pewności | 🔴 |
+| W-035 | Arena Trzech Bram — potrójna bariera w Igrzyskach | López de Prado | sprawiedliwy scoring neuronów | 🔴 |
+| W-036 | NeuronToxicFlow — VPIN, radar polowania na likwidacje | Easley/LdP 2026 | auto-redukcja lewara na flankach | 🔴 |
+| W-037 | Senat Byka i Niedźwiedzia — strukturalna debata | BlackRock/TradingAgents | lokalnie z neuronów, LLM tylko Cenzor | 🟠 |
+| W-038 | Wyrocznia Stanów — HMM, miękki wykrywacz reżimu | Badania 2024-26 | miękkie wagi zamiast bramek | 🟠 |
+| W-039 | Kroniki Bitew — pamięć epizodyczna reżimów | FinCon 2026 | spina VPIN+HMM+bariera w 1 pętlę | 🟠 |
+| W-040 | Skarbiec Imperialny — danina/budżet jako reguła | Twój pomysł + Kelly | narracja Imperium nad ryzykiem | 🔴 |
+
+**🎖️ Rekomendacja kolejności ARCH-MAX** (najwięcej mocy za najmniej pracy, wszystko pure-Python, zero API):
+1. **W-035** (Arena Trzech Bram) — natychmiast naprawia Igrzyska, fundament pod wszystko inne
+2. **W-036** (VPIN) — Twój radar na łajdaków, działa już dziś na OHLCV
+3. **W-034** (Arbiter Fiduciae) — drugi mózg, wpina pewność w lewar
+4. **W-038** (HMM) → **W-029** (płynne wagi) → **W-039** (pamięć) — uczący się rdzeń
+
+> Wszystkie 7 da się zbudować **lokalnie, pure-Python, bez ani jednego klucza API** — czyli możemy zacząć choćby jutro, zgodnie z Twoją zasadą "najpierw fundament papierowy, potem oczy zewnętrzne".
+
+*— Raport złożony. Ave, Cezar Pixel. Czekam na rozkaz: którą zdobycz wykuwamy pierwszą?* 🏛️⚔️
+
+---
+
+### 📅 2026-06-03/04 — NOCNY ZWIAD GLOBALNY: Azja, Australia, Rosja, Cały Świat
+
+> *Cezar rozkazał: "Wejdź w azjatyckie karczmy, australijskie tartany, rosyjskie repozytoria.*
+> *Sprawdź czy ktoś buduje coś podobnego do Imperium."*
+> *ARCH-MAX wyruszył o 16:43 gdy Cezar Pixel kładł się spać.*
+
+---
+
+#### 🌍 WNIOSKI STRATEGICZNE (najpierw — dla wracającego z morza)
+
+**1. Architektura Imperium jest POTWIERDZONA przez naukę 2025-2026.**
+Niezależnie od siebie: PolySwarm (MIT, 2026), TradingAgents (Tauric Research), FinRL Ensemble (2025), Numerai ($550M AUM) — wszyscy mówią to samo: **rój niezależnych neuronów głosujących > jeden model**. Jesteś na właściwej ścieżce, Cezar.
+
+**2. Numerai to jedyny istniejący rój z prawdziwymi pieniędzmi.**
+1200+ modeli ML głosuje co tydzień. Wynik 2024: **25.45% netto, Sharpe 2.75, tylko 1 ujemny miesiąc**. Imperium celuje w to samo — ale lokalnie, autonomicznie, pod Twoją kontrolą.
+
+**3. Chiński ekosystem quant jest nieznany na Zachodzie — to nasza przewaga.**
+KunQuant (170× szybszy od Pandas), Hikyuu (166ms dla całej giełdy), VnPy.alpha — klasy produkcyjnej, open-source, zupełnie poza radarem zachodnich developerów.
+
+**4. Manipulacja jest mierzalna i wykrywalna.** Chińskie badania: >99% accuracy. Krypto badania 2025: akumulacja koncentruje się w **ostatniej godzinie przed pump** — to konkretny sygnał dla neuronu anty-manipulacyjnego.
+
+**5. Psychologia rynku = niedowykorzystana kategoria neuronów.** Fear-Greed state prediction: AUC 0.93 (prawie idealne). Strach wzmacnia volatility o 40% w kryzysach → neuron sentymentu to nie "miękka" funkcja, to twarda matematyka.
+
+---
+
+#### 🏛️ PODOBNE SYSTEMY DO IMPERIUM — czy ktoś nas wyprzedził?
+
+**PolySwarm** (arXiv 2604.03888, kwiecień 2026) — NAJBLIŻSZY ODPOWIEDNIK
+- 50 różnych LLM-person głosuje niezależnie na ten sam rynek, agregacja bayesowska
+- Wyniki: bije single-model na Brier score i log-loss vs human superforecasters
+- **Różnica od Imperium:** oni używają LLM dla każdego "neuronu" (drogie!), my używamy czystego kodu Python. Nasz system jest: tańszy, szybszy, lokalny, bez halucynacji.
+- Link: https://arxiv.org/abs/2604.03888
+
+**TradingAgents** (arXiv 2412.20138, GitHub: TauricResearch/TradingAgents)
+- Multi-agent LLM: analitycy fundamentalni + techniczni + sentymentalni + Bull/Bear + Risk Manager
+- v0.2.0 (luty 2026): GPT-5.x, Gemini 3.x, Claude 4.x, Grok 4.x
+- **Różnica od Imperium:** oni symulują firmę tradingową z LLM. My mamy rój mikro-neuronów pure-code. Różne filozofie — nasze uzupełnienie: dodać warstwę LLM (Cesarz/DeepSeek) TYLKO dla finalnej decyzji Cenzora.
+- GitHub: https://github.com/TauricResearch/TradingAgents
+
+**FinRL Ensemble** (arXiv 2501.10709, styczeń 2025)
+- RL agents głosują majority vote → Sharpe 0.28, max DD -0.73%, win/loss 1.62
+- **Twarda liczba:** ensemble > każdy indywidualny agent zawsze
+- Link: https://arxiv.org/abs/2501.10709
+
+**Numerai** (realnie działający, $550M AUM)
+- 1200+ staked modeli ML od 30,000+ data scientists, co tydzień głosują → Meta Model
+- Ważenie przez "stake" (skórę w grze): model który się myli traci staked NMR
+- Wynik 2024: **25.45% zwrot netto, Sharpe 2.75**
+- **Nasz pomysł W-044 (Staking Neuronów):** wzorować na Numerai — neurony które "miały rację" w Igrzyskach dostają wyższe wagi automatycznie
+- Link: https://numer.ai/
+
+**Wniosek:** Nikt nie zbudował dokładnie tego co Imperium — **lokalnego, pure-Python, bez LLM per neuron, z pełną dokumentacją w stylu Prawa Cesarskiego**. Jesteśmy unikalni.
+
+---
+
+#### 🗾 AZJA — PEREŁKI
+
+**JAPONIA — J-Quants API (oficjalne API Tokijskiej Giełdy)**
+- Darmowe historyczne dane TSE, EDINET financials, TDNet disclosures
+- `edinetdb` MCP server: 3800+ spółek japońskich, normalizuje JP-GAAP/IFRS/US-GAAP
+- Kaggle competition 2022 — 20,000 uczestników, modele zwycięzców open-source
+- **Fit do Imperium:** kategoria "F" (fundamental) neuronów może dostać japońskie dane → zwiadowca japoński
+- Link: https://github.com/J-Quants/JPXTokyoStockExchangePrediction
+
+**CHINY — KunQuant (PEREŁKA TECHNICZNA)**
+- Kompiluje wyrażenia Alpha101/Alpha158 do C++ z SIMD (AVX2/AVX512)
+- **170× szybszy od Pandas** dla tych samych obliczeń
+- Alpha101 na i7-7700HQ: 0.083s vs 6.138s Pandas. GPU (RTX5080): 0.22s dla 1024 akcji
+- **Fit do Imperium:** jeśli wyjdziemy poza Python, KunQuant to silnik obliczeń dla Budowniczego Wskaźników
+- GitHub: https://github.com/Menooker/KunQuant
+
+**CHINY — Hikyuu Quant Framework (architektura komponentów)**
+- 19.13 milionów K-lines całej A-share: **6 sekund pierwsze wczytanie, 166ms po cache**
+- Każdy moduł wymienny niezależnie: market environment / signal / stop-loss / fund management
+- **Fit do Imperium:** ich architektura separacji jest wzorcem tego co robimy — każdy neuron izolowany, każda warstwa wymienna
+- GitHub: https://github.com/fasiondog/hikyuu
+
+**CHINY — VnPy v4.3** — profesjonalny framework 10 lat rozwoju, Python, latencja 30-100μs
+- v4.0 wprowadził `vnpy.alpha` — moduł ML/AI dla strategii wieloczynnikowych
+- GitHub/PyPI: https://pypi.org/project/vnpy/
+
+**CHINY — Wykrywanie manipulacji na danych CSRC (chińska KNF)**
+- KNN + Decision Tree: **>99% skuteczność** wykrywania manipulowanych akcji
+- Sygnał: Order Flow Imbalance + koncentracja wolumenu = manipulacja
+- Link: https://www.sciencedirect.com/science/article/abs/pii/S1057521921002143
+
+**KRYPTO — Mikrostruktura przed pump (arXiv 2504.15790, 2025)**
+- Akumulacja koncentruje się w **ostatniej godzinie przed pump**
+- To konkretny pattern dla neuronu W-042 (NeuronPumpDetect)
+- Link: https://arxiv.org/html/2504.15790v1
+
+**KOREA — QuantyLab + PRISM-INSIGHT**
+- 13 wyspecjalizowanych agentów AI, Upbit API (koreańska kryptogiełda), KIS API (Korea Investment Securities)
+- GitHub: https://github.com/quantylab
+
+**SINGAPUR — Asia Quant Academy**
+- Link: https://www.asiaquantacademy.com/
+
+---
+
+#### 🦘 AUSTRALIA — ODKRYCIE
+
+**Rynek:** $372M revenue 2024, CAGR 12.2% do 2030. **Scena jest wybitnie korporacyjna i zamknięta** — prawie zero open-source repozytoriów. To GAP. Imperium mogłoby targetować ASX jako drugą giełdę bazową (po MEXC) z unikalną przewagą open-source.
+
+**Sydney Quant Traders** — studencki klub Uni of Sydney, Discord, mock trading
+**ASIC regulacje 2024:** obowiązkowe "kill switches" + real-time monitoring dla wszystkich algo strategii — to wymóg który Bezpiecznik 30% już spełnia!
+
+---
+
+#### 🐻 ROSJA — MATEMATYCZNA TRADYCJA
+
+**Smart-Lab.ru** — największa społeczność traderów rosyjskich, fora na MOEX (Moskiewska Giełda)
+- Rosyjska szkoła matematyczna (Kołmogorow, Markow) → silne podejścia stochastyczne rzadkie na Zachodzie
+- **QUIK Python API** — popularny terminal tradingowy z Pythonem, repozytoria na GitHub (tag: `quik-trading`)
+- Link: https://smart-lab.ru/
+
+**Unikalne instrumenty MOEX:** OFZ (obligacje rządowe), NG futures na gaz ziemny, rubel/USD FX — egzotyczne ale interesujące do dywersyfikacji portfela Imperium w przyszłości.
+
+---
+
+#### 🧠 PSYCHOLOGIA RYNKU — TWARDY MATH, NIE "MIĘKKA ANALIZA"
+
+**Fear-Greed jako neuron sentymentu — AUC 0.93** (Springer 2025)
+- SVR + lagged features → 93% accuracy w predykcji stanów fear-greed
+- Link: https://link.springer.com/article/10.1007/s40745-025-00666-0
+
+**Extremity Premium** (arXiv 2602.07018) — skrajny strach/chciwość = wyższe spready → adverse selection
+- Strach wzmacnia volatility o **40%** podczas kryzysów kryptowalutowych
+- Link: https://arxiv.org/abs/2602.07018
+
+**Wisdom of Silicon Crowds** (PMC 2025) — LLM ensemble rywalizuje z ludzkimi superforecasters:
+- Warunek: (1) diversity neuronów, (2) niezależność głosowania, (3) mechanizm agregacji
+- **Imperium spełnia wszystkie 3!** — to jest naukowe uzasadnienie całej architektury
+- Link: https://pmc.ncbi.nlm.nih.gov/articles/PMC11800985/
+
+---
+
+#### 💡 INNE WIZJE CEZARA Z TEJ SESJI (zapisane)
+
+**Język kodu:** Python jest naszą bazą, ale Cezar zapytał o Rust i inne. Odpowiedź: neurony pozostają w Pythonie (prostota, ekosystem), ale potencjalnie KunQuant-styl C++ dla Budowniczego w Fazie 2 gdy potrzebujemy HFT-latency.
+
+**Fundacja** (serial Asimova) — Cezar wspomniał tę serię jako inspirację. Psychohistoria = matematyczne przewidywanie zachowania tłumów → to dokładnie co robimy z neuronami sentymentu + reżimu. Dodaję do szybkich idei.
+
+**Kuźnia Neuronów** — Cezar zapytał jak nazwiemy miejsce gdzie ARCH-MAX tworzy nowe neurony. Propozycja: **Oficina Imperialis** (Cesarska Kuźnia) — folder `imperium/legiony/oficina/` lub jako metafora laboratorium w dokumentacji. Dodaję do szybkich idei.
+
+**Siedziba ARCH-MAX w Imperium** — Cezar zapytał. Propozycja: **Bibliotheca Maxima** — wielka biblioteka Imperium, gdzie Architekt prowadzi swoje badania, kroniki i plany. Naturalnie w `imperium/biblioteki/` + plik `docs/ARCH_MAX_KRONIKI.md` jako dziennik spostrzeżeń.
+
+---
+
+**TOP 10 ZDOBYCZY NOCNEGO ZWIADU — do wdrożenia w kolejności:**
+
+| # | Zdobycz | Źródło | Priorytet |
+|---|---------|--------|-----------|
+| 1 | **NeuronSentiment** — Fear-Greed, AUC 0.93 (W-041) | Springer 2025 | 🔴 |
+| 2 | **NeuronPumpDetect** — akumulacja ostatnia godzina (W-042) | arXiv 2504.15790 | 🔴 |
+| 3 | **Staking Neuronów** — wagi rosną gdy neuron "ma rację" (W-044) | Numerai | 🟠 |
+| 4 | **Senat Bayesowski** — KL/JS divergence zamiast prostego średniowania (W-043) | PolySwarm | 🟠 |
+| 5 | **Audyt Zasad** — które prawa blokują zamiast pomagać (W-047) | Cezar Pixel | 🟠 |
+| 6 | J-Quants zwiadowca (W-046) | JPX/Tokio | 🟡 |
+| 7 | KunQuant kompilacja (W-045) | Chiny | 🟡 (Faza 2) |
+| 8 | Senat Byka i Niedźwiedzia (W-037) | TradingAgents | 🟠 |
+| 9 | HMM Wyrocznia Stanów (W-038) | Nauka 2024-26 | 🟠 |
+| 10 | Oficina Imperialis — kuźnia neuronów (nowa W-048) | Cezar Pixel | 🟡 |
+
+*Zwiad zakończony o świcie. ARCH-MAX złożył raport. Czeka na rozkaz Cezara Pixela.* ⚔️🏛️
 

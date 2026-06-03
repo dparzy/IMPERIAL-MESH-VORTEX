@@ -68,6 +68,36 @@
 | W-046 | Zwiadowca Japoński — J-Quants API (TSE) przez MCP jako źródło danych fundamentalnych | 🟡 Niski | 💭 Idea (zwiad azjat.) | `imperium/oczy/` + `akwedukty/` |
 | W-047 | Zasady — audyt przestarzałych praw (które blokują zamiast pomagać) | 🟠 Średni | 💭 Idea Cezara | `ZASADY_FUNDAMENTALNE.md` przegląd |
 | W-048 | Oficina Imperialis — Cesarska Kuźnia (metafora laboratorium ARCH-MAX + nowe neurony) | 🟡 Niski | 💭 Idea Cezara | `docs/` + `imperium/legiony/` |
+| W-049 | Hedge/MWU — żywe wagi Legatusa (online, gwarancja żalu, neuron co kłamie cichnie) | 🔴 Wysoki | 💭 Idea (zwiad AI) | `imperium/legiony/legatus.py` |
+| W-050 | Conformal Prediction (ACI/MAPIE) — skalibrowana niepewność każdego głosu | 🔴 Wysoki | 💭 Idea (zwiad AI) | `imperium/legiony/` + Senat |
+| W-051 | BOCPD — bayesowski detektor zmiany reżimu w czasie rzeczywistym | 🔴 Wysoki | 💭 Idea (zwiad AI) | `imperium/legiony/zwiadowcy/` |
+| W-052 | Thompson Sampling bandit — wybór która koalicja neuronów/strategia gra teraz | 🟠 Średni | 💭 Idea (zwiad AI) | nad rojem (`legatus`) |
+| W-053 | Hurst-DFA — meta-gate reżimu (trend H>0.5 vs mean-reversion H<0.5) | 🔴 Wysoki | 💭 Idea (zwiad sygn.) | nowa kat. H, `legatus` |
+| W-054 | Permutation Entropy — neuron chaosu (forbidden patterns, ortogonalny do RSI) | 🔴 Wysoki | 💭 Idea (zwiad sygn.) | nowa kat. N (entropia) |
+| W-055 | Yang-Zhang volatility — upgrade kat. V (7-14× efektywniejszy niż std(close)) | 🔴 Wysoki | 💭 Idea (zwiad sygn.) | `fundament/brama` + kat. V |
+| W-056 | Amihud illiquidity + Corwin-Schultz spread — mikrostruktura z samego OHLC | 🟠 Średni | 💭 Idea (zwiad sygn.) | kat. L/mikrostruktura |
+| W-057 | RQA (determinism/laminarity) — early-warning krachu z teorii systemów dynam. | 🟡 Niski | 💭 Idea (zwiad sygn.) | kat. R, okna 200 barów |
+| W-058 | MF-DFA szerokość widma — multifraktalny early-warning krytycznego reżimu | 🟡 Niski | 💭 Idea (zwiad sygn.) | kat. D (fraktal) |
+| W-059 | Volatility Targeting — RDZEŃ kalkulatora lewara (pozycja = vol_target/vol_real) | 🔴 Wysoki | 💭 Idea (zwiad risk) | `pretorianie/kalkulator_lewara.py` |
+| W-060 | OFI (Order Flow Imbalance, Cont) — przyczynowy driver ceny krótkoterm. | 🟠 Średni | 💭 Idea (zwiad risk) | kat. T, L2 feed |
+| W-061 | Wash trading detection (Benford + power-law) — veto fałszywego wolumenu MEXC | 🔴 Wysoki | 💭 Idea (zwiad risk) | kat. O, filtr przed głosem |
+| W-062 | Equity-curve circuit breaker — rój handluje własną krzywą kapitału (HALT/REDUCE) | 🔴 Wysoki | 💭 Idea (zwiad risk) | `pretorianie/` globalny |
+| W-063 | Drawdown-fractional sizing (Maier-Paape) — frakcja maleje z bieżącym DD | 🟠 Średni | 💭 Idea (zwiad risk) | `pretorianie/kalkulator_lewara.py` |
+| W-064 | Ulcer fitness + Calmar allocation — strojenie wag rojem na "ból" krzywej | 🟠 Średni | 💭 Idea (zwiad risk) | `koloseum/` Igrzyska |
+| W-065 | Funding sentiment + cash-and-carry basis — kontrarian + delta-neutral spot+perp | 🟠 Średni | 💭 Idea (zwiad risk) | kat. F + moduł arbitrażu |
+| W-066 | Liquidation magnet — strefy kaskad z OI+funding+L/S ratio | 🟠 Średni | 💭 Idea (zwiad risk) | kat. L |
+| W-067 | DVOL/VRP — zwiadowca Deribit (variance risk premium, term structure, skew) | 🔴 Wysoki | 💭 Idea (zwiad dane) | `oczy/` Deribit (free API) |
+| W-068 | Coinbase + Kimchi premium — instytucje (US) vs euforia retail (Korea) | 🟠 Średni | 💭 Idea (zwiad dane) | `oczy/` (free self-compute) |
+| W-069 | SSR (Stablecoin Supply Ratio) — "suchy proch" / latentna siła kupna | 🟠 Średni | 💭 Idea (zwiad dane) | `oczy/` (CoinGecko free) |
+| W-070 | Google Trends + Wikipedia attention — jedyny spójny czynnik akademicki | 🟠 Średni | 💭 Idea (zwiad dane) | `oczy/` (pytrends free) |
+| W-071 | Transfer Entropy — kierunkowy przepływ informacji (BTC prowadzi alty) | 🟡 Niski | 💭 Idea (zwiad sygn.) | kat. sieć (cross-asset) |
+| W-072 | Hawkes branching ratio — endogeniczność/refleksywność (η→1 = ryzyko kaskady) | 🟡 Niski | 💭 Idea (zwiad sygn.) | kat. T/mikrostruktura |
+| W-073 | Wavelet multiresolution — rozkład cykli (handluj pasmem o najwyższym H) | 🟡 Niski | 💭 Idea (zwiad sygn.) | kat. S/cykle |
+| W-074 | LLMoE routing — Cesarz/DeepSeek jako router MoE (wg reżimu wybiera ekspertów) | 🟠 Średni | 💭 Idea (zwiad AI) | `cesarz/` (DeepSeek) |
+| W-075 | River + ADWIN — backbone online-learningu + drugi detektor dryfu | 🟠 Średni | 💭 Idea (zwiad AI) | cały rój (infrastruktura) |
+| W-076 | gplearn factor forge — genetyczne odkrywanie formuł alpha (Oficina) | 🟡 Niski | 💭 Idea (zwiad AI) | `koloseum/` kuźnia |
+| W-077 | Protokół anty-overfitting — odrzucanie przeuczonych jako test hipotezy (Prawo I) | 🟠 Średni | 💭 Idea (zwiad AI) | bramka audytu/commit |
+| W-078 | Numerai orthogonality — waga = ortogonalność + niski churn (Prawo XVI w produkcji) | 🔴 Wysoki | 💭 Idea (zwiad dane) | `legatus` + `diagnostyka_korelacji` |
 
 ---
 
@@ -133,8 +163,8 @@
 
 | Metryka | Wartość |
 |---------|---------|
-| Łącznie wizji | 48 |
-| W trakcie analizy | 19 |
+| Łącznie wizji | 78 |
+| W trakcie analizy | 49 |
 | Przeniesione do katalogów (Higuchi, CME, Azja Range) | 3 |
 | Zaimplementowane (W-002 Igrzyska, W-028 Bezpiecznik) | 2 |
 | Odrzucone (niezgodne z zasadami) | 0 |
@@ -901,4 +931,233 @@ Nie "albo-albo" — **trójfazowa hybryda:**
 - [Zigma — Zig trading framework (GitHub)](https://github.com/Thomvanoorschot/zigma)
 - [Rust for Low-Latency Trading (Quantt)](https://www.quantt.co.uk/resources/rust-for-low-latency-trading)
 - [Why OpenAlgo built in Python, not Rust (MarketCalls)](https://www.marketcalls.in/openalgo/why-we-built-openalgo-in-python-not-go-rust-or-as-an-exe.html)
+
+---
+
+### 📅 2026-06-04 — WIELKI ZWIAD W CZTERY STRONY ŚWIATA (W-049..W-078)
+
+> *Cezar rozkazał: "Wyślij zwiadowców niech głęboko poszukają wszędzie — w lokalnych*
+> *językach, na rynkach, skryptach, badaniach, forach studenckich, konkursach.*
+> *Rewolucyjne niszowe potwierdzone wzory i patenty. Uzupełnij nasze luki."*
+> *ARCH-MAX wysłał 4 szpiegów równolegle. Wrócili z 49 perełkami — oto najlepsze.*
+
+**Zasada filtra (Prawo I + XVI):** wybrałem tylko (a) potwierdzone w recenzowanych badaniach/konkursach, (b) policzalne pure-Python (lub przez darmowe API), (c) niosące NOWĄ informację (nie duplikat istniejących). Część potwierdza wizje które JUŻ mamy — to dowód że jesteśmy na właściwej drodze.
+
+---
+
+#### 🧬 ZWIAD I — NISZOWE KATEGORIE SYGNAŁÓW (entropia, fraktale, mikrostruktura)
+
+**W-053 | Hurst Exponent przez DFA — META-GATE REŻIMU** 🔴 *(najwyższy priorytet)*
+- **Co mierzy:** Pamięć długoterminową. H>0.5 = trend trwa (pro-trend), H<0.5 = mean-reversion (kontrarian), H≈0.5 = błądzenie losowe (NIE handluj).
+- **Dlaczego rewolucyjne:** to nie sygnał kierunku, to PRZEŁĄCZNIK — mówi czy w ogóle warto handlować trendowo czy kontrariańsko. Idealny jako meta-neuron ważący cały rój.
+- **Pure-Python:** ✅ ~30 linii (DFA: całkowanie, okna, log-log fit). Nowa kategoria **H (Memory/Persistence)**.
+- Źródło: [MF-DFA market efficiency, MDPI](https://www.mdpi.com/2071-1050/12/2/535)
+
+**W-054 | Permutation Entropy — NEURON CHAOSU** 🔴
+- **Co mierzy:** Złożoność przez wzorce porządkowe. Wysoka PE = chaos, niska + "forbidden patterns" = rynek przewidywalny/nieefektywny.
+- **Dlaczego rewolucyjne:** patrzy na STRUKTURĘ porządku, nie kierunek — całkowicie ortogonalne do RSI/MACD. Badania: 34% czulsze niż GARCH na volatility clustering.
+- **Pure-Python:** ✅ ~15 linii. Nowa kategoria **N (Entropy/Information)**.
+- Źródło: [Flow of Information in Trading, PMC](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7597144/)
+
+**W-055 | Yang-Zhang Volatility — UPGRADE KAT. V** 🔴
+- **Co mierzy:** Zmienność z OHLC łącząca Rogers-Satchell + skok nocny + skok otwarcia. 5-dniowy YZ ≈ precyzja 70-dniowego close-to-close (14× efektywność).
+- **🚨 UTRATA POTENCJAŁU (Prawo XV):** liczymy zmienność jako std(close) — marnujemy High/Low/Open! YZ wyciska 7-14× więcej sygnału z TYCH SAMYCH barów.
+- **Pure-Python:** ✅ ~20 linii. Natychmiastowy upgrade istniejącej kategorii V.
+- Źródło: [Most Efficient Volatility Estimators, arXiv:0908.1677](https://arxiv.org/pdf/0908.1677)
+
+**W-056 | Amihud Illiquidity + Corwin-Schultz Spread — MIKROSTRUKTURA Z OHLC** 🟠
+- **Amihud:** |return|/wolumen = wpływ cenowy (proxy Kyle's Lambda — Hasbrouck potwierdził korelację). Wysoki = cienki rynek / informed trading.
+- **Corwin-Schultz:** efektywny bid-ask spread z samych High/Low dwóch dni — stres płynnościowy bez order booka.
+- **Pure-Python:** ✅ oba trywialne (~15 linii każdy). Wzbogaca kategorię L.
+- Źródło: [Amihud 2002](https://www.cis.upenn.edu/~mkearns/finread/amihud.pdf), [Corwin-Schultz JF 2012](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1106193)
+
+**W-057 | RQA (Recurrence Quantification Analysis) — EARLY-WARNING KRACHU** 🟡
+- **Co mierzy:** Z rekonstrukcji przestrzeni stanów — ile dynamika jest deterministyczna (DET) i laminarna (LAM). Spadek DET/LAM POPRZEDZA krachy (analogia przejścia fazowego). Potwierdzone na bańce tech, kryzysie azjatyckim, subprime.
+- **Pure-Python:** ✅ cięższe ~60-80 linii, macierz N×N — używać na oknach 200 barów. Kategoria R.
+- Źródło: [RQA of Financial Crashes, arXiv:1107.5420](https://arxiv.org/pdf/1107.5420)
+
+**W-058 | MF-DFA szerokość widma — MULTIFRAKTALNY EARLY-WARNING** 🟡
+- **Co mierzy:** Szerokość widma osobliwości Δα. Maleje gdy rynek zbliża się do stanu krytycznego — sygnał przedkrachowy.
+- **Pure-Python:** ✅ ~50 linii (rozszerzenie DFA o rzędy q + Legendre). Kategoria D.
+- Źródło: [Multifractal Early Warning, Wiley 2022](https://onlinelibrary.wiley.com/doi/10.1155/2022/8177307)
+
+**W-071 | Transfer Entropy — KIERUNKOWY PRZEPŁYW INFORMACJI** 🟡
+- **Co mierzy:** Czy BTC prowadzi ETH (model-free, nieliniowa przyczynowość której nie widzi korelacja). Sygnał wyprzedzający z innego aktywa.
+- **Pure-Python:** ✅ ~40 linii, wymaga ≥2 zsynchronizowanych szeregów. Kategoria sieć.
+- Źródło: [Transfer Entropy financial networks, arXiv:2507.09554](https://arxiv.org/pdf/2507.09554)
+
+**W-072 | Hawkes Branching Ratio — REFLEKSYWNOŚĆ RYNKU** 🟡
+- **Co mierzy:** η = jaka część aktywności jest samo-wzbudzana (rynek reaguje na siebie) vs egzogeniczna (newsy). η→1 = rynek krytyczny, podatny na kaskady. BTC ma kernel power-law.
+- **Pure-Python:** ⚠️ częściowo, najcięższe z listy (~80 linii + optymalizacja). Kategoria T.
+- Źródło: [Bitcoin Self-Exciting Process](https://jheusser.github.io/2013/09/08/hawkes.html)
+
+**W-073 | Wavelet Multiresolution — ROZKŁAD CYKLI** 🟡
+- **Co mierzy:** Rozkłada szereg na pasma czasowo-częstotliwościowe (lepiej niż Fourier dla niestacjonarności). Handluj pasmem o najwyższym Hurst.
+- **Pure-Python:** ✅ ~50 linii dla Haar/Daubechies. Kategoria S/cykle.
+- Źródło: [Wavelets return forecasts, Macrosynergy](https://macrosynergy.com/research/improving-return-forecasts-with-wavelets/)
+
+> ✅ **Potwierdzenie istniejącej wizji:** W-006 (Higuchi Fractal Dimension) — zwiad potwierdził, lekki filtr jakości trendu (D<1.4 trend, D>1.6 chop). Pure-Python ~25 linii.
+
+---
+
+#### 🔱 ZWIAD II — RYZYKO, POSITION SIZING, MANIPULACJE
+
+**W-059 | Volatility Targeting — RDZEŃ KALKULATORA LEWARA** 🔴 *(najmocniejszy dowód empiryczny)*
+- **Co robi:** `pozycja = vol_target / vol_realized`. Niska zmienność → wyższy lewar, wysoka → cięcie. Standard instytucjonalny (CTA/risk-parity), prawie nieobecny w retailu krypto.
+- **Dlaczego rewolucyjne:** udokumentowana poprawa Sharpe + obcięcie lewych ogonów dla aktywów z "leverage effect" (krypto ma silny). To powinno być SERCE naszego kalkulatora lewara.
+- **Pure-Python:** ✅ EWMA realized vol (RiskMetrics λ=0.94).
+- ⚠️ Uwaga: zwiększa turnover → pilnuj fee+funding na MEXC.
+- Źródło: [Man Group vol targeting](https://www.man.com/insights/the-impact-of-volatility-targeting)
+
+**W-061 | Wash Trading Detection (Benford + power-law) — VETO FAŁSZYWEGO WOLUMENU** 🔴
+- **Co robi:** 3 testy statystyczne: prawo Benforda na pierwszej cyfrze wolumenów + clustering zaokrągleń + wykładnik power-law. Na nieregulowanych giełdach ~70% wolumenu to wash trading.
+- **Dlaczego KRYTYCZNE dla nas:** MEXC jest nieregulowana → realne ryzyko fałszywego wolumenu. Nikt w retailu tego nie liczy.
+- **Pure-Python:** ✅ Benford (chi²) + histogram + MLE power-law. Kategoria O, filtr PRZED głosowaniem.
+- Źródło: [Crypto Wash Trading, NBER w30783](https://www.nber.org/papers/w30783)
+
+**W-062 | Equity-Curve Circuit Breaker — RÓJ HANDLUJE WŁASNĄ KRZYWĄ** 🔴
+- **Co robi:** Traktuje WŁASNĄ equity jak instrument: MA na krzywej kapitału. Equity pod MA / DD>próg → REDUCE lub HALT. Powrót nad MA → wznów.
+- **Dlaczego rewolucyjne:** meta-poziom anty-tail. Stany: NORMAL → REDUCED (frakcja ×0.5) → HALT. To realizuje Prawo XV w kodzie ponad Bezpiecznikiem 30%.
+- **Pure-Python:** ✅ globalny breaker nad całym rojem.
+- Źródło: ⚠️ technika praktyczna (system-trading), nie pojedynczy peer-review.
+
+**W-063 | Drawdown-Fractional Sizing (Maier-Paape) — FRAKCJA MALEJE Z DD** 🟠
+- **Co robi:** Rozszczepia optimal f Vince'a na "chance" i "risk", optymalizuje frakcję z ograniczeniem na BIEŻĄCY drawdown. Mniejsza frakcja niż Kelly, radykalnie mniejszy DD.
+- **Pure-Python:** ✅ golden-section search. Opublikowane w Journal of Risk (peer-review).
+- Źródło: [Maier-Paape, arXiv:1612.02985](https://arxiv.org/abs/1612.02985)
+
+**W-064 | Ulcer Index Fitness + Calmar Allocation** 🟠
+- **Co robi:** Ulcer Index = sqrt(mean(DD²)) karze GŁĘBOKOŚĆ i CZAS drawdownu (max DD widzi tylko punkt). Jako funkcja celu do strojenia wag roju zamiast Sharpe. Calmar (CAGR/maxDD) jako alokacja kapitału per-strategia.
+- **Pure-Python:** ✅ trywialne.
+- ✅ Uwaga: mamy już neuron L-14 Ulcer (na CENIE). To jest Ulcer na KRZYWEJ KAPITAŁU — inne zastosowanie (fitness, nie sygnał).
+- Źródło: [Ulcer Index](https://journalplus.co/metrics/ulcer-index/)
+
+**W-060 | OFI (Order Flow Imbalance, Cont) — PRZYCZYNOWY DRIVER CENY** 🟠
+- **Co robi:** Imbalance bid/ask (limit+market+cancel). LINIOWA zależność zmiany ceny od OFI — wyjaśnia "square-root law" lepiej niż wolumen.
+- **Pure-Python:** ✅ z L2 WebSocket MEXC. Kategoria T. Delta-divergence (cena↑, OFI↓) = neuron reversji.
+- Źródło: [Cont-Kukanov-Stoikov, arXiv:1011.6402](https://arxiv.org/abs/1011.6402)
+
+**W-065 | Funding Sentiment + Cash-and-Carry Basis** 🟠
+- **Co robi:** (a) ekstremalny funding = przegrzane longi (kontrarian); (b) long spot + short perp zbiera funding bez ekspozycji (delta-neutral, ~19% rocznie raportowane 2025).
+- **Pure-Python:** ✅ REST MEXC funding + spot/perp. Kategoria F + moduł arbitrażu spot+lewar.
+- Źródło: [Funding rates explained](https://www.altrady.com/blog/crypto-trading-strategies/crypto-funding-rates-explained)
+
+**W-066 | Liquidation Magnet — STREFY KASKAD** 🟠
+- **Co robi:** OI rekordowy + funding ekstremalny + skrzywiony L/S ratio → strefy skupionych likwidacji. Rynek "grawituje" ku nim (wymuszony flow).
+- **Pure-Python:** ✅ OI+funding+L/S z API. Kategoria L. Przy przeładowanej stronie → wymuszone cięcie lewara.
+- Źródło: ⚠️ technika rynkowa (Gate/TradeLink), nie akademicka.
+
+> ✅ **Potwierdzenie istniejących wizji:** W-036 (VPIN) i W-020 (CVaR) — oba zwiad potwierdził jako top-tier, peer-reviewed (Easley/LdP, Rockafellar-Uryasev). VPIN: BVC bucketing pure-Python. CVaR: wzór pure-Python, pełny LP przez scipy.
+
+---
+
+#### 🤖 ZWIAD III — ARCHITEKTURY AI/ML
+
+**W-049 | Hedge / Multiplicative Weights — ŻYWE WAGI LEGATUSA** 🔴 *(brakujący mózg Legatusa)*
+- **Co robi:** Każdy neuron = ekspert. Po każdym barze: `waga *= exp(-η·strata)`, normalizacja. Gwarancja żalu O(√(T·log N)) — bez treningu offline. Neuron który zaczął kłamać w nowym reżimie SAM cichnie.
+- **Dlaczego rewolucyjne:** zamienia STAŁE WAGI_REZIMU w żywe wagi adaptowane bieżącym PnL. Wariant EARCP karze dodatkowo neurony skorelowane (synergia z Prawem XVI!).
+- **Pure-Python:** ✅ ~20 linii, zero zależności.
+- Źródło: [Numin weighted-majority intraday, arXiv:2412.03167](https://arxiv.org/abs/2412.03167)
+
+**W-050 | Conformal Prediction (ACI/MAPIE) — SKALIBROWANA NIEPEWNOŚĆ** 🔴
+- **Co robi:** Zamiast "cena wzrośnie" daje przedział z gwarancją pokrycia (90% pewności że zwrot ∈ [−0.4%, +1.1%]). ACI dostraja szerokość online pod dryf.
+- **Dlaczego rewolucyjne:** daje Legatusowi i Senatowi TWARDĄ niepewność — wąski przedział = mocny głos, szeroki = wstrzymaj się. Realny filtr fałszywych alarmów.
+- **Pure-Python:** ✅ MAPIE (`pip install mapie`) lub sam ACI ~30 linii.
+- Źródło: [MAPIE](https://github.com/scikit-learn-contrib/MAPIE), [ACI arXiv:2202.07282](https://arxiv.org/abs/2202.07282)
+
+**W-051 | BOCPD — DETEKTOR ZMIANY REŻIMU W CZASIE RZECZYWISTYM** 🔴
+- **Co robi:** Utrzymuje rozkład nad "run length" (ile barów trwa reżim). Nowy bar nie pasuje → masa skacze do 0 = wykryta zmiana reżimu BEZ patrzenia w przyszłość.
+- **Dlaczego rewolucyjne:** naturalny przełącznik dla MoE (W-074) i resetu wag Hedge (W-049) po krachu.
+- **Pure-Python:** ✅ ~100 linii (Adams & MacKay) lub `ruptures`. Nowy zwiadowca-detektor.
+- Źródło: [Online Order Flow + BOCPD, arXiv:2307.02375](https://arxiv.org/pdf/2307.02375)
+
+**W-052 | Thompson Sampling Bandit — WYBÓR KTÓRA STRATEGIA GRA** 🟠
+- **Co robi:** Każda strategia = ramię. Próbkuje z rozkładu skuteczności i gra najlepsze — automatyczny balans eksploracja/eksploatacja. Wariant sliding-window dla niestacjonarności.
+- **Dlaczego rewolucyjne:** zamiast uruchamiać wszystkie strategie zawsze (drogie, szumne) — alokuje uwagę do tego co teraz działa.
+- **Pure-Python:** ✅ ~15 linii (Beta/Normal posterior). Warstwa NAD rojem.
+- Źródło: [Adaptive Portfolio Thompson Sampling, arXiv:1911.05309](https://arxiv.org/abs/1911.05309)
+
+**W-074 | LLMoE Routing — CESARZ JAKO ROUTER MoE** 🟠
+- **Co robi:** Bramka kieruje decyzję do specjalisty-eksperta wg reżimu. LLM (DeepSeek) jako router wybiera którą koalicję neuronów aktywować wg "wiedzy o świecie".
+- **Pure-Python:** ✅ softmax-gating + DeepSeek którego planujemy. Spina się z BOCPD jako routerem.
+- Źródło: [LLMoE, arXiv:2501.09636](https://arxiv.org/abs/2501.09636), [MoGU uncertainty gating, arXiv:2510.07459](https://arxiv.org/pdf/2510.07459)
+
+**W-075 | River + ADWIN — BACKBONE ONLINE-LEARNINGU** 🟠
+- **Co robi:** Production-grade biblioteka uczenia inkrementalnego (bar-po-barze) + ADWIN wykrywa dryf koncepcji i resetuje model.
+- **Pure-Python:** ✅ czysty Python, lekki. ADWIN jako drugi (statystyczny) detektor reżimu obok BOCPD.
+- Źródło: [River](https://github.com/online-ml/river)
+
+**W-076 | gplearn Factor Forge — GENETYCZNE ODKRYWANIE ALPHA** 🟡
+- **Co robi:** Programowanie genetyczne odkrywa wzory-cechy (np. `corr(volume,close,10)/std(returns,5)`) optymalizując Information Coefficient. Fabryka neuronów-kandydatów.
+- **Pure-Python:** ✅ gplearn (sklearn-compatible). AlphaGen (cięższy, PyTorch, offline) jako rozszerzenie. To zaludnia Oficina Imperialis (W-048).
+- Źródło: [gplearn](https://github.com/trevorstephens/gplearn), [AlphaGen](https://github.com/RL-MLDM/alphagen)
+
+**W-077 | Protokół Anty-Overfitting — ODRZUCANIE PRZEUCZONYCH** 🟠
+- **Co robi:** Frame'uje overfitting backtestu jako test hipotezy — estymuje prawdopodobieństwo przeuczenia i ODRZUCA zanim trafi na rynek.
+- **Dlaczego pasuje:** zgodne z Prawem I (zero fałszywej weryfikacji). Wpinasz do bramki commit/audyt — uzupełnia Prawo XXI.
+- **Pure-Python:** ✅ lekki (test na PnL).
+- Źródło: [DRL Backtest Overfitting, arXiv:2209.05559](https://arxiv.org/pdf/2209.05559)
+
+> ✅ **Potwierdzenie istniejących wizji:** W-018 (Reflexion), W-021 (Causal inference), W-024 (auto-generacja neuronów). Zwiad potwierdził PCMCI/tigramite (lepsze niż Granger pairwise) dla W-021, oraz wzorce Reflexion+Self-Consistency+TrustTrade selective-consensus dla Senatu (W-018/W-037).
+
+---
+
+#### 🌍 ZWIAD IV — EGZOTYCZNE DANE I EDGE
+
+**W-067 | DVOL/VRP — ZWIADOWCA DERIBIT (Variance Risk Premium)** 🔴 *(forward-looking, free API)*
+- **Co robi:** Implied variance (DVOL²) minus realized. BTC VRP ≈ 0.14 (~7× S&P) — opcje systematycznie przeszacowane. Plus term structure (backwardation = strach) + skew (put/call).
+- **Dlaczego rewolucyjne:** WYPRZEDZAJĄCY sygnał reżimu zmienności + tradeable risk premium. 3 sygnały z jednego DARMOWEGO źródła.
+- **API:** ✅ Deribit public `get_volatility_index_data` (bez klucza). Realized z naszych świec.
+- Źródło: [Bitcoin risk premia, arXiv:2410.15195](https://arxiv.org/abs/2410.15195)
+
+**W-078 | Numerai Orthogonality — META-REGUŁA WAG (Prawo XVI w produkcji)** 🔴
+- **Co robi:** Numerai płaci TYLKO za sygnały które przeżyją neutralizację względem istniejących czynników + mają niski churn/turnover. Lekcja: ortogonalny alpha + niski obrót > surowa moc predykcyjna.
+- **Dlaczego KLUCZOWE:** to dosłownie nasze Prawo XVI w produkcji. Ważymy neurony przez ortogonalność (mamy `diagnostyka_korelacji`!) i karzemy wysokorotacyjne.
+- **Pure-Python:** ✅ meta-reguła dla legatus/WAGI, nie neuron.
+- Źródło: [Numerai scoring](https://docs.numer.ai/numerai-signals/scoring)
+
+**W-068 | Coinbase + Kimchi Premium — INSTYTUCJE vs EUFORIA RETAIL** 🟠
+- **Coinbase Premium:** spread Coinbase(USD) vs global = popyt instytucjonalny US. Trwały dodatni = uptrend.
+- **Kimchi Premium:** premia Korea (Upbit) = euforia retail. Ekstremalna = kontrarian top.
+- **API:** ✅ darmowe self-compute (publiczne tickery). Kategoria sentyment.
+- Źródło: [Coinbase Premium](https://www.coinglass.com/pro/i/coinbase-bitcoin-premium-index)
+
+**W-069 | SSR (Stablecoin Supply Ratio) — SUCHY PROCH** 🟠
+- **Co robi:** BTC mcap ÷ stablecoin mcap. Niski SSR = dużo "suchego prochu" → latentna siła kupna. Spadający SSR + emisja stablecoinów = risk-on.
+- **API:** ✅ CoinGecko free (BTC mcap + USDT/USDC/DAI supply). Glassnode SSR jest płatny — liczymy sami.
+- Źródło: [BGeometrics SSR](https://bgeometrics.com/bitcoin-ssr-stablecoin-supply-ratio/)
+
+**W-070 | Google Trends + Wikipedia Attention — JEDYNY SPÓJNY CZYNNIK AKADEMICKI** 🟠
+- **Co robi:** Search Volume Index dla "Bitcoin". Wiele badań (Kristoufek, Urquhart 2018, Da et al.): SVI to NAJBARDZIEJ konsekwentny utrzymujący się czynnik cenowy. Najsilniejszy w retail-driven altach.
+- **API:** ✅ darmowe — pytrends + Wikipedia Pageviews REST (oficjalne). Spike = FOMO (kontrarian na ekstremach), wzrost z dna = wczesna akumulacja.
+- Źródło: [QuantPedia Google Trends](https://quantpedia.com/can-google-trends-sentiment-be-useful-as-a-predictor-for-cryptocurrency-returns/)
+
+> 🚨 **ALARM CZASOWY (Prawo XV):** Klasyczny **CME weekend gap edge UMARŁ 29.05.2026** — CME uruchomił 24/7 BTC futures, weekendowe luki przestały powstawać. NIE wpinaj jako żywy sygnał. Przerób W-010 na sezonowość dnia tygodnia / efekt poniedziałku.
+> ⚠️ **On-chain wolne sygnały:** MVRV/SOPR/NUPL/netflow to MARKERY CYKLU (nie timing), zawiodły w 2021 gdy makro dominowało. Niska waga, długi horyzont. Darmowe surowe: Bitquery GraphQL; czyste: Glassnode (płatne).
+
+---
+
+#### 🎯 SYNTEZA — NOWE KATEGORIE NEURONÓW (uzupełniają obecne 9)
+
+| Litera | Kategoria | Startery (pure-Python) |
+|--------|-----------|------------------------|
+| **H** | Memory/Persistence | Hurst-DFA (W-053) — meta-gate reżimu |
+| **N** | Entropy/Information | Permutation Entropy (W-054), Sample Entropy |
+| **D** | Fractal/Dynamical | Higuchi (W-006), RQA (W-057), MF-DFA (W-058) |
+| (do V) | Volatility upgrade | Yang-Zhang (W-055) |
+| (do L) | Mikrostruktura | Amihud + Corwin-Schultz (W-056), OFI (W-060) |
+| (do T) | Order-flow/toxicity | VPIN (W-036), OFI (W-060), Hawkes (W-072) |
+
+**🎖️ TOP 5 "OD JUTRA" (pure-Python, zero API, potwierdzone, najwyższy ROI):**
+1. **W-049 Hedge** — żywe wagi Legatusa (brakujący mózg agregatora)
+2. **W-059 Volatility Targeting** — rdzeń kalkulatora lewara (najmocniejszy dowód)
+3. **W-053 Hurst-DFA** — meta-gate reżimu ważący cały rój
+4. **W-050 Conformal** — skalibrowana pewność każdego głosu
+5. **W-061 Wash Trading** — krytyczny filtr fałszywego wolumenu MEXC
+
+**🚨 Prawo XVI przed wdrożeniem:** Hurst, Higuchi, RQA-DET wszystkie mierzą "trendowość vs losowość" — zmierz `raport_dekorelacji` PRZED dodaniem wszystkich. |r|>0.80 → scal/zważ w dół. To samo Permutation vs Sample Entropy.
+
+**Granica weryfikacji (Prawo I / ZPO):** wszystkie tezy z recenzowanych źródeł (JF, Quantitative Finance, Physica A, MDPI, arXiv, NBER). ⚠️ NIE uruchomiłem implementacji ani nie zmierzyłem realnych korelacji na NASZYCH danych — "pure-Python policzalne" oparte na znanej złożoności algorytmów. Dokładne wzory (YZ, kernel Hawkes, BVC) wymagają sprawdzenia w cytowanych paperach przed kodowaniem. Wszystkie inspiracje → do `docs/REJESTR_INSPIRACJI.md`.
+
+*Cztery zwiady złożone. 30 nowych wizji (W-049..W-078). ARCH-MAX czeka na rozkaz.* ⚔️🏛️
 

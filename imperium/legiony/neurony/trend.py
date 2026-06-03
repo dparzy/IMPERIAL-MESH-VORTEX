@@ -310,8 +310,8 @@ class NeuronRSIDiv(MikroNeuron):
     KATEGORIA = "T"
     WAGA = 7
 
-    _MIN_RSI_DELTA = 2.0   # Minimum zmiana RSI (żeby ignorować szum)
-    _MIN_CENA_DELTA = 0.001  # Minimum zmiana ceny (0.1%)
+    _MIN_RSI_DELTA = 0.3   # Minimum zmiana RSI (0.3 punktu — reaguje na dziennych barach)
+    _MIN_CENA_DELTA = 0.0005  # Minimum zmiana ceny (0.05%)
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         rsi = wskazniki.get("RSI_14")

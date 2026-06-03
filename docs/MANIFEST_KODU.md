@@ -5,14 +5,14 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-02 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 42 neurony (zarejestrowane w roju) + 12 zwiadowców = **54 modułów w kodzie**
-**Aktywne / wyciszone:** 30 aktywnych (czyste OHLCV) + 12 wyciszonych, z czego:
+**Stan na:** 2026-06-03 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Zaimplementowane:** 44 neurony (zarejestrowane w roju) + 12 zwiadowców = **56 modułów w kodzie**
+**Aktywne / wyciszone:** 32 aktywnych (czyste OHLCV) + 12 wyciszonych, z czego:
   • **3 budzone WEWNĘTRZNIE** (SMC-01/02/03) — liczą z barów przez most EXP-05, ożywają w żywym Legatusie (`zbuduj_legatusa`), **bez żadnego API**
   • **9 wymaga ZEWNĘTRZNEGO API/feedu** (V-03 CVD, PSY-01..04, OC-01..04) — wybudzą się przez adapter API (mechanizm gotowy)
 **Elitarne (Prawo XX):** 14 (2 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
-**Do wdrożenia:** 257 neuronów
+**Do wdrożenia:** 255 neuronów
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
@@ -131,6 +131,8 @@
 | A-02 | NeuronWickRejection | A | 7 | ✅ aktywny | OPEN | — |
 | A-03 | NeuronWashVol | A | 6 | ✅ aktywny | VOLUME | — |
 | A-05 | NeuronBartPattern | A | 6 | ✅ aktywny | CLOSE_PREV | — |
+| VI-13 | NeuronATRLev | L | 8 | ✅ aktywny | ATR_14 | — |
+| V-13 | NeuronRealizedVol | V | 7 | ✅ aktywny | HIST_VOL_20 | — |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
 > PANIC ×3.0) były pre-zarejestrowane — teraz mają realne neurony. Prawo XV.
@@ -186,7 +188,7 @@
 | III Augusta (H1) | ~45 | 9 (XII-01..04, V-01..04, VSA-01) + wyciszone: V-03,SMC-01..03,PSY-01..04 | ~36 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
-| **RAZEM** | **299** | **42** | **257** |
+| **RAZEM** | **299** | **44** | **255** |
 
 ---
 

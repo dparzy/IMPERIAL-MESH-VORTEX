@@ -51,7 +51,7 @@ def test_wagi_rezimowe_dzialaja():
 
 def test_rejestr_wszystkie_neurony():
     neurony = wszystkie_neurony()
-    assert len(neurony) == 42, f"Powinno być 42 neurony, jest {len(neurony)}"
+    assert len(neurony) == 44, f"Powinno być 44 neurony, jest {len(neurony)}"
 
 
 def test_rejestr_wszyscy_zwiadowcy():
@@ -65,7 +65,7 @@ def test_rejestr_wszyscy_zwiadowcy():
 
 def test_raport_potencjalu():
     rap = raport_potencjalu()
-    assert rap["neurony_lacznie"] == 42
+    assert rap["neurony_lacznie"] == 44
     assert rap["zwiadowcy_exp"] == 12
     # EXP-12 (L2) wyciszony do czasu feedu orderbook
     assert rap["zwiadowcy_wyciszeni"] >= 1
@@ -253,4 +253,59 @@ def test_fokus_manual_rezim_nie_jest_nadpisywany():
     raport = leg.fokus("BTCUSDT", w, rezim="PANIC")
     assert raport.rezim == "PANIC"      # PANIC musi zostać
     assert raport.rezim_zrodlo == "manual"
+
+
+# ─── Nowe neurony L i V ───────────────────────────────────────────────────────
+
+def test_neuron_atr_lev_spokojny():
+    """VI-13: niski ATR rel → LONG (bezpieczna dźwignia)."""
+    from imperium.legiony.neurony.dzwignia import NeuronATRLev
+    n = NeuronATRLev()
+    sygnal = n.interpretuj({"ATR_14": 100.0, "CLOSE": 40000.0})  # ATR_rel=0.25%
+    assert sygnal.kierunek == "LONG"
+
+
+def test_neuron_atr_lev_turbulencja():
+    """VI-13: wysoki ATR rel → SHORT (redukuj dźwignię)."""
+    from imperium.legiony.neurony.dzwignia import NeuronATRLev
+    n = NeuronATRLev()
+    sygnal = n.interpretuj({"ATR_14": 3000.0, "CLOSE": 40000.0})  # ATR_rel=7.5%
+    assert sygnal.kierunek == "SHORT"
+
+
+def test_neuron_atr_lev_brak_danych():
+    """VI-13: brak ATR_14 → NEUTRAL."""
+    from imperium.legiony.neurony.dzwignia import NeuronATRLev
+    n = NeuronATRLev()
+    sygnal = n.interpretuj({})
+    assert sygnal.kierunek == "NEUTRAL"
+
+
+def test_neuron_realized_vol_niska():
+    """V-13: niska zmienność historyczna → LONG."""
+    from imperium.legiony.neurony.dzwignia import NeuronRealizedVol
+    n = NeuronRealizedVol()
+    sygnal = n.interpretuj({"HIST_VOL_20": 0.20})  # 20% annualized
+    assert sygnal.kierunek == "LONG"
+
+
+def test_neuron_realized_vol_ekstremalna():
+    """V-13: ekstremalna zmienność → SHORT."""
+    from imperium.legiony.neurony.dzwignia import NeuronRealizedVol
+    n = NeuronRealizedVol()
+    sygnal = n.interpretuj({"HIST_VOL_20": 1.20})  # 120% annualized
+    assert sygnal.kierunek == "SHORT"
+
+
+def test_kategorie_l_v_aktywne():
+    """Kategorie L i V mają aktywne neurony w roju."""
+    from imperium.legiony.rejestr import wszystkie_neurony
+    n = wszystkie_neurony()
+    katy = {x.KATEGORIA for x in n if x.DOSTEPNY}
+    assert "L" in katy, "Kategoria L musi mieć aktywne neurony"
+    assert "V" in katy, "Kategoria V musi mieć aktywne neurony"
+    vi13 = next((x for x in n if x.KLUCZ == "VI-13"), None)
+    v13 = next((x for x in n if x.KLUCZ == "V-13"), None)
+    assert vi13 is not None and vi13.DOSTEPNY
+    assert v13 is not None and v13.DOSTEPNY
 

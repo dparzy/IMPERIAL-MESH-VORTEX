@@ -71,7 +71,7 @@ WAGI_REZIMU = {
 }
 
 # Kategorie planowane (pre-zarejestrowane) — nie alarmuj na nie w KROK 0
-WAGI_REZIMU_PLANOWANE = {"L", "V"}
+WAGI_REZIMU_PLANOWANE: set = set()  # L i V zaimplementowane (VI-13, V-13)
 
 
 def klasyfikuj_rezim(wskazniki: dict) -> str:

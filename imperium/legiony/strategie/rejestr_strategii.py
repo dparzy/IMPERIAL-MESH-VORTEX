@@ -155,7 +155,7 @@ def wszystkie_strategie() -> list:
         ),
         # ── Dywizja Straży: kontra na manipulację (aktywowane 2026-06-02) ─────
         Strategia(
-            id="IMV-DEF-001", nazwa="TARCZA PRETORIANÓW", legion="IMV", styl="RV",
+            id="IMV-DEF-001", nazwa="TARCZA PRETORIANÓW (Wash Trading Detection)", legion="IMV", styl="RV",
             warunki="Kontra na stop hunt / wick rejection — gramy PRZECIW pułapce MM (VOLATILE)",
             zrodlo="IMV (syntetyczna) — anty-manipulacja",
             neurony_wejscie=["A-01", "A-02"],   # Stop Hunt + Wick Rejection (kontrariański)
@@ -165,7 +165,7 @@ def wszystkie_strategie() -> list:
             dzwignia="2×–5×", rr="1:2", status="SZKIC",
         ),
         Strategia(
-            id="IMV-DEF-002", nazwa="MUR KONTRWYWIADU", legion="IMV", styl="RV",
+            id="IMV-DEF-002", nazwa="MUR KONTRWYWIADU (Iceberg Order Detector)", legion="IMV", styl="RV",
             warunki="Pranie wolumenu + wzorzec Barta — kontra na fałszywą aktywność MM (VOLATILE/niska płynność)",
             zrodlo="IMV (syntetyczna) — anty-manipulacja vol+płynność",
             neurony_wejscie=["A-03", "A-05"],   # Wash Volume + Bart Pattern (kontrariański)

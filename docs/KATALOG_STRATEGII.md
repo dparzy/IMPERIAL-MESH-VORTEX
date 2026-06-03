@@ -495,15 +495,17 @@ Każda strategia zawiera:
 
 > Mapują się na istniejącą dywizję Straż w `KATALOG_NEURONOW.md`.
 
-### IMV-DEF-001 | "TARCZA WASH" | Wash Trading Detection
+### IMV-DEF-001 | "TARCZA PRETORIANÓW (Wash Trading Detection)" | Wash Trading Detection
 **Źródło:** STR-071, STR-072, STR-073 (NTU/Lund/Columbia — wash trading)
-**Neurony:** `STR-WASH` (anomalne częstotliwości transakcji), `OB-01` Order Book (fałszywe ściany), analiza sieciowa
-**Funkcja:** filtr — jeśli wolumen jest sztuczny, neurony wolumenowe tracą wagę. **Status:** SZKIC
+**Interwał:** M15/1H | **Reżim:** VOLATILE | **Lewar:** 2×–5×
+**Neurony WEJŚCIE:** `A-01` Stop Hunt + `A-02` Wick Rejection (kontrariański) | **FILTR:** `X-02` StochRSI + `V-02` VWAP | **WYJŚCIE:** `A-01` + `X-25`
+**Funkcja:** kontra na stop hunt / wick rejection — gramy PRZECIW pułapce MM. **Status:** ✅ W KODZIE (`rejestr_strategii.py`, klucz `IMV-DEF-001`)
 
-### IMV-DEF-002 | "GÓRA LODOWA" | Iceberg Order Detector
+### IMV-DEF-002 | "MUR KONTRWYWIADU (Iceberg Order Detector)" | Iceberg Order Detector
 **Źródło:** STR-120 (META_quant 4D Iceberg Detector)
-**Neurony:** `OB-02` Iceberg (ukryte zlecenia), `X-05` OrderFlow
-**Funkcja:** wykrywa duże ukryte zlecenia instytucji → sygnał kierunku smart money. **Status:** SZKIC
+**Interwał:** M15/1H | **Reżim:** VOLATILE | **Lewar:** 2×–4×
+**Neurony WEJŚCIE:** `A-03` Wash Volume + `A-05` Bart Pattern (kontrariański) | **FILTR:** `X-11` RVOL + `V-02` VWAP | **WYJŚCIE:** `A-05` + `X-25`
+**Funkcja:** pranie wolumenu + wzorzec Barta — kontra na fałszywą aktywność MM. **Status:** ✅ W KODZIE (`rejestr_strategii.py`, klucz `IMV-DEF-002`)
 
 ### IMV-DEF-003 | "OBROŁA ORACLE" | Oracle Manipulation Defense
 **Źródło:** STR-100, STR-101 (Oracle front-run, Hot Wallet drain)

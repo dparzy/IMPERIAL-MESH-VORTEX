@@ -16,8 +16,21 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from imperium.akwedukty.adaptery import (
     AdapterDanych, AdapterTestowyOnChain, AdapterTestowyFutures, AdapterTestowyCVD,
-    AdapterFearGreed,
+    AdapterFearGreed, AdapterFutures,
 )
+
+
+def _fetcher_futures(funding="0.00010000", long_acc="0.50", oi="1500000.0"):
+    """Buduje wstrzykiwany fetcher(url)->JSON dla AdapterFutures (offline)."""
+    def fetch(url: str) -> str:
+        if "premiumIndex" in url:
+            return '{"symbol":"BTCUSDT","lastFundingRate":"%s","markPrice":"40000"}' % funding
+        if "globalLongShortAccountRatio" in url:
+            return '[{"symbol":"BTCUSDT","longAccount":"%s","shortAccount":"0.50","longShortRatio":"1.0"}]' % long_acc
+        if "openInterest" in url:
+            return '{"symbol":"BTCUSDT","openInterest":"%s","time":1718000000}' % oi
+        return "{}"
+    return fetch
 
 # Próbka prawdziwej odpowiedzi alternative.me (format zweryfikowany z dokumentacji API)
 _FNG_JSON = (
@@ -108,18 +121,18 @@ def test_onchain_euforia_short():
 
 # ── Futures / sentyment (PSY-01..04) ──────────────────────────────────────────
 
-def test_futures_aktywuj_i_usypiaj():
-    """aktywuj()/usypiaj() dla domeny PSY — stan czysty po teście."""
-    from imperium.legiony.neurony.psychologia import NeuronFearGreed
+def test_futures_psy_aktywne_faza_b():
+    """Faza B: PSY-01/02/04 aktywne domyślnie (realny AdapterFutures publiczny)."""
+    from imperium.legiony.neurony.psychologia import (
+        NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv,
+    )
+    # PSY obudzone w Fazie B — kategoria R głosuje (nie martwy głos)
+    assert NeuronFundingExtreme.DOSTEPNY is True
+    assert NeuronPanikaDetal.DOSTEPNY is True
+    assert NeuronOIDiv.DOSTEPNY is True
+    # Mock futures wciąż dostarcza dane przez wzbogac()
     ad = AdapterTestowyFutures("panika")
-    assert NeuronFearGreed.DOSTEPNY is False
-    try:
-        obudzone = ad.aktywuj()
-        assert set(obudzone) == {"PSY-01", "PSY-02", "PSY-03", "PSY-04"}
-        assert NeuronFearGreed.DOSTEPNY is True
-    finally:
-        ad.usypiaj()
-        assert NeuronFearGreed.DOSTEPNY is False
+    assert set(ad.neurony_obslugiwane()) >= {"PSY-01", "PSY-02", "PSY-04"}
 
 
 def test_futures_panika_long():
@@ -146,6 +159,51 @@ def test_futures_chciwosc_short():
     for klasa in (NeuronFundingExtreme, NeuronPanikaDetal, NeuronFearGreed):
         s = klasa().interpretuj(w)
         assert s.kierunek == "SHORT", f"{klasa.KLUCZ} powinien SHORT w chciwości, jest {s.kierunek}"
+
+
+# ── AdapterFutures REALNY (Binance public, fetcher wstrzyknięty — offline) ────
+
+def test_futures_real_dolewa_klucze():
+    """AdapterFutures.wzbogac dolewa FUNDING_RATE/LONG_SHORT_RATIO/OPEN_INTEREST."""
+    ad = AdapterFutures(fetcher=_fetcher_futures(funding="0.00250000", long_acc="0.82", oi="1600000"))
+    w = {"CLOSE": 40000.0}
+    ad.wzbogac(w, "BTCUSDT")
+    assert abs(w["FUNDING_RATE"] - 0.0025) < 1e-9
+    assert abs(w["LONG_SHORT_RATIO"] - 0.82) < 1e-9
+    assert w["OPEN_INTEREST"] == 1600000.0
+
+
+def test_futures_real_funding_extreme_short():
+    """Wysoki funding (crowded long) → PSY-01 kontrariański SHORT."""
+    from imperium.legiony.neurony.psychologia import NeuronFundingExtreme
+    ad = AdapterFutures(fetcher=_fetcher_futures(funding="0.00250000"))
+    w = {}
+    ad.wzbogac(w, "BTCUSDT")
+    assert NeuronFundingExtreme().interpretuj(w).kierunek == "SHORT"
+
+
+def test_futures_real_oi_prev_pamiec():
+    """OPEN_INTEREST_PREV: pierwszy odczyt = OI (brak dywergencji), drugi pamięta poprzedni."""
+    ad = AdapterFutures(fetcher=_fetcher_futures(oi="1500000"))
+    w1 = {}
+    ad.wzbogac(w1, "BTCUSDT")
+    assert w1["OPEN_INTEREST"] == w1["OPEN_INTEREST_PREV"]  # pierwszy = brak dywergencji
+    ad._fetcher = _fetcher_futures(oi="1600000")
+    w2 = {}
+    ad.wzbogac(w2, "BTCUSDT")
+    assert w2["OPEN_INTEREST"] == 1600000.0
+    assert w2["OPEN_INTEREST_PREV"] == 1500000.0  # pamięta poprzedni odczyt
+
+
+def test_futures_real_padniety_fetcher_bezpieczny():
+    """Fetcher rzucający wyjątek → dict bez zmian (Prawo XV: neuron abstynuje)."""
+    def zly(url):
+        raise RuntimeError("brak sieci")
+    ad = AdapterFutures(fetcher=zly)
+    w = {"CLOSE": 100.0}
+    ad.wzbogac(w, "BTCUSDT")
+    assert w.get("FUNDING_RATE") is None
+    assert "CLOSE" in w  # nietknięte
 
 
 # ── CVD (V-03) ────────────────────────────────────────────────────────────────
@@ -207,20 +265,15 @@ def test_feargreed_uszkodzony_json_nie_psuje_dict():
     assert "FEAR_GREED_INDEX" not in w
 
 
-def test_feargreed_aktywuj_tylko_psy03():
-    """AdapterFearGreed budzi DOKŁADNIE PSY-03 (granularne), nie całą domenę PSY."""
-    from imperium.legiony.neurony.psychologia import (
-        NeuronFearGreed, NeuronFundingExtreme,
-    )
+def test_feargreed_psy03_aktywny():
+    """Faza B: PSY-03 aktywny domyślnie (AdapterFearGreed alternative.me, bez klucza)."""
+    from imperium.legiony.neurony.psychologia import NeuronFearGreed
+    assert NeuronFearGreed.DOSTEPNY is True
     ad = AdapterFearGreed(fetcher=lambda: _FNG_JSON % ("40", "Fear"))
-    assert NeuronFearGreed.DOSTEPNY is False
-    try:
-        assert ad.aktywuj() == ["PSY-03"]
-        assert NeuronFearGreed.DOSTEPNY is True
-        assert NeuronFundingExtreme.DOSTEPNY is False   # PSY-01 zostaje uśpiony
-    finally:
-        ad.usypiaj()
-        assert NeuronFearGreed.DOSTEPNY is False
+    assert ad.neurony_obslugiwane() == ["PSY-03"]
+    # aktywuj() idempotentne — stan pozostaje aktywny
+    assert ad.aktywuj() == ["PSY-03"]
+    assert NeuronFearGreed.DOSTEPNY is True
 
 
 def test_feargreed_strach_long():
@@ -245,7 +298,7 @@ def test_feargreed_chciwosc_short():
 # ── Gwarancja czystego stanu globalnego ───────────────────────────────────────
 
 def test_stan_globalny_przywrocony():
-    """Po wszystkich testach 9 neuronów API musi być z powrotem wyciszonych."""
+    """Po testach: OC (4) + CVD (1) wyciszone; PSY (4) aktywne (Faza B)."""
     from imperium.legiony.neurony.onchain import (
         NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow,
     )
@@ -253,8 +306,10 @@ def test_stan_globalny_przywrocony():
         NeuronFundingExtreme, NeuronPanikaDetal, NeuronFearGreed, NeuronOIDiv,
     )
     from imperium.legiony.neurony.wolumen import NeuronCVD
-    api_neurony = [NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow,
-                   NeuronFundingExtreme, NeuronPanikaDetal, NeuronFearGreed, NeuronOIDiv,
-                   NeuronCVD]
-    for klasa in api_neurony:
+    wyciszone = [NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow,
+                 NeuronCVD]
+    for klasa in wyciszone:
         assert klasa.DOSTEPNY is False, f"{klasa.KLUCZ} pozostał obudzony — zafałszuje audyt!"
+    aktywne_psy = [NeuronFundingExtreme, NeuronPanikaDetal, NeuronFearGreed, NeuronOIDiv]
+    for klasa in aktywne_psy:
+        assert klasa.DOSTEPNY is True, f"{klasa.KLUCZ} powinien być aktywny (Faza B)"

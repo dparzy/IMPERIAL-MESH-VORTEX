@@ -6,6 +6,46 @@
 
 ---
 
+## 2026-06-03 | MAJOR | Faza B — kategoria R obudzona (adaptery futures publiczne, Prawo XV)
+
+### Kontekst
+Kategoria R (Sentyment) miała 0 aktywnych neuronów — 4 neurony PSY (Funding,
+Long/Short, Fear&Greed, OI Divergence) leżały wyciszone. Reguły WAGI_REZIMU dla R
+istniały tylko w PANIC (= weto, brak transakcji) → potencjał kategorii R w 0%.
+
+### Wykryta UTRATA POTENCJAŁU (Prawo XV)
+- 4 neurony PSY wyciszone mimo gotowego frameworku adapterów.
+- AdapterFearGreed (PSY-03, realne darmowe API) istniał, ale nie był wpięty w pipeline.
+- WAGI_REZIMU: R aktywne tylko w PANIC (weto) → R nigdy nie wpływało na transakcję.
+
+### Co zostało wdrożone (kod)
+- **AdapterFutures** (`akwedukty/adaptery/futures.py`) — publiczne endpointy Binance fapi
+  (funding, open interest, long/short) BEZ klucza API; wstrzykiwany fetcher (test offline);
+  pamięć OI_PREV dla dywergencji PSY-04.
+- **PSY-01/02/03/04 obudzone** (DOSTEPNY=True) — kategoria R: 0→4 aktywne.
+- **Adaptery wpięte w pipeline Dyrygenta** — `_wskazniki()` dolewa dane po Budowniczym;
+  `Dyrygent.zbuduj(adaptery_live=True)` domyślnie wpina AdapterFutures + AdapterFearGreed.
+- **WAGI_REZIMU** — R dodane do VOLATILE(×1.3), RANGING(×1.2), NORMAL(×1.1),
+  TREND_STRONG(×0.8), ON-CHAIN_BULLISH(×1.1) — R realnie wpływa na transakcje.
+- **+2 strategie VI-LV** (Legio VI Ferrata): VI-LV-001 Funding Contrarian (PSY-01/02+VI-13/V-13),
+  VI-LV-002 Liquidation Cascade (A-01/PSY-04+VI-13/V-13). 17 strategii łącznie.
+
+### Prawo I / XV — uczciwość
+W czystym backteście z CSV (bez kolumny funding/OI) neurony PSY ABSTYNUJĄ (NEUTRAL,
+rój wyklucza je z głosu kierunkowego — nie martwy ciężar). W trybie live/paper adapter
+dolewa realne dane → PSY głosują.
+
+### Stan po Fazie B
+- Neurony: 44 (aktywne 36, wyciszone 8) — kat. R żywa.
+- Kategorie aktywne: A, F, L, M, O*, R, S*, T, V (O/S budzone runtime/feed).
+- Strategie: 17. Testy: 358/358. Audyt: pełna harmonia.
+
+### Następne fazy
+- Faza C: V-03 CVD (trade feed), SMC live feed.
+- Faza D: OC-01..04 on-chain (Glassnode/CryptoQuant API).
+
+---
+
 ## 2026-06-03 | MAJOR | Timeframe-Aware Gating — styl SCALP/SWING/INVEST + futures/spot (Prawo XV)
 
 ### Kontekst

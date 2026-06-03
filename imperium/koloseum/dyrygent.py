@@ -82,6 +82,7 @@ class Dyrygent:
         min_pewnosc: float = 0.55,
         tryb: str = "agregat",
         namiestnik: Optional[Namiestnik] = None,
+        adaptery: Optional[List[Any]] = None,
     ) -> None:
         self.legatus = legatus
         self.kalkulator = kalkulator
@@ -89,6 +90,10 @@ class Dyrygent:
         self.budowniczy = budowniczy
         self.wskazniki_provider = wskazniki_provider
         self.min_pewnosc = min_pewnosc
+        # Adaptery danych (Faza B) — dolewają do wskaźników dane spoza OHLCV
+        # (funding, OI, long/short, sentyment) po Budowniczym. Pusta lista = tryb
+        # czysty OHLCV (np. backtest z CSV — neurony R abstynują, Prawo XV).
+        self.adaptery: List[Any] = adaptery or []
         # Tryb domyślny (gdy Namiestnik wyłączony lub niezainicjowany):
         #   "agregat"   — kierunek z gołego głosowania neuronów
         #   "filtr"     — wejście tylko gdy top-strategia zgadza się z neuronami
@@ -102,8 +107,14 @@ class Dyrygent:
     @classmethod
     def zbuduj(cls, kapital_startowy: float = 10_000.0, sesja_id: str = "",
                min_neuronow: int = 5, min_przewaga: float = 0.55,
-               min_pewnosc: float = 0.55, log_dir=None, tryb: str = "agregat") -> "Dyrygent":
-        """Składa Dyrygenta z pełnym rojem, Budowniczym (TA-Lib) i silnikiem paper."""
+               min_pewnosc: float = 0.55, log_dir=None, tryb: str = "agregat",
+               adaptery_live: bool = True) -> "Dyrygent":
+        """Składa Dyrygenta z pełnym rojem, Budowniczym (TA-Lib) i silnikiem paper.
+
+        adaptery_live: gdy True (domyślnie), wpina publiczne adaptery futures+sentyment
+            (Binance fapi + alternative.me, bez klucza) → kategoria R głosuje realnymi
+            danymi. Ustaw False dla czystego backtestu OHLCV z CSV (neurony R abstynują).
+        """
         from imperium.legiony.rejestr import zbuduj_legatusa
         from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
 
@@ -112,9 +123,13 @@ class Dyrygent:
         budowniczy = BudowniczyWskaznikow()
         engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
                                     sesja_id=sesja_id, log_dir=log_dir)
+        adaptery = []
+        if adaptery_live:
+            from imperium.akwedukty.adaptery import AdapterFutures, AdapterFearGreed
+            adaptery = [AdapterFutures(), AdapterFearGreed()]
         return cls(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
                    budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
-                   namiestnik=get_namiestnik())
+                   namiestnik=get_namiestnik(), adaptery=adaptery)
 
     # ── Jeden cykl decyzyjny ─────────────────────────────────────────────────
     def cykl(self, symbol: str, bary: List[Dict[str, Any]],
@@ -124,7 +139,7 @@ class Dyrygent:
         Zwraca DecyzjaCyklu z przejrzystym śladem każdego etapu.
         """
         # 1. Wskaźniki (Prawo I — Brama/Budowniczy liczą, nie Dyrygent)
-        wskazniki = self._wskazniki(bary)
+        wskazniki = self._wskazniki(bary, symbol)
         if not wskazniki:
             return DecyzjaCyklu(symbol, "BUDOWNICZY", False,
                                 powod="brak wskaźników (puste bary lub błąd Bramy)")
@@ -268,10 +283,24 @@ class Dyrygent:
                             raport=raport, plan=plan, sygnal=sygnal)
 
     # ── Wewnętrzne ───────────────────────────────────────────────────────────
-    def _wskazniki(self, bary: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Liczy wskaźniki przez wstrzyknięty provider lub Budowniczego (Prawo I)."""
+    def _wskazniki(self, bary: List[Dict[str, Any]], symbol: str = "") -> Dict[str, Any]:
+        """Liczy wskaźniki przez wstrzyknięty provider lub Budowniczego (Prawo I).
+
+        Po policzeniu wskaźników OHLCV dolewa dane z adapterów (Faza B): funding,
+        OI, long/short, sentyment — most do neuronów kategorii R (PSY-01/02/03/04).
+        Adapter, który padnie/nie ma danych, jest pomijany (wzbogac() bezpieczny).
+        """
         if self.wskazniki_provider is not None:
-            return self.wskazniki_provider(bary)
-        if self.budowniczy is not None:
-            return self.budowniczy.zbuduj(bary)
-        raise RuntimeError("Dyrygent bez Budowniczego i bez wskazniki_provider — nie ma skąd wziąć wskaźników (Prawo I)")
+            wskazniki = self.wskazniki_provider(bary)
+        elif self.budowniczy is not None:
+            wskazniki = self.budowniczy.zbuduj(bary)
+        else:
+            raise RuntimeError("Dyrygent bez Budowniczego i bez wskazniki_provider — nie ma skąd wziąć wskaźników (Prawo I)")
+
+        # Faza B — adaptery dolewają dane spoza OHLCV (most do kategorii R/O)
+        for adapter in self.adaptery:
+            try:
+                adapter.wzbogac(wskazniki, symbol)
+            except Exception as e:
+                logger.warning(f"[Dyrygent] adapter {getattr(adapter, 'NAZWA', '?')} pominięty: {e}")
+        return wskazniki

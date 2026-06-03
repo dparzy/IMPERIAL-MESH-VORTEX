@@ -174,6 +174,27 @@ def wszystkie_strategie() -> list:
             interwaly=["M15", "1H"], rezim_preferowany="VOLATILE",
             dzwignia="2×–4×", rr="1:2", status="SZKIC",
         ),
+        # ── Legio VI Ferrata: Futures/Leverage (Faza B — kat. R obudzona) ────
+        Strategia(
+            id="VI-LV-001", nazwa="ŻELAZNY KLIN (Funding Rate Contrarian)", legion="VI", styl="LV",
+            warunki="Ekstremalny funding = tłum po jednej stronie — gramy contrarian na squeeze (futures)",
+            zrodlo="VI Ferrata — funding/sentyment futures (Binance fapi publiczne)",
+            neurony_wejscie=["PSY-01", "PSY-02"],  # Funding extreme + Long/Short ekstremum
+            neurony_filtr=["VI-13", "V-13"],       # ATR-Lev (bezpieczna dźwignia) + Realized Vol
+            neurony_wyjscie=["PSY-01", "X-25"],    # funding normalizuje / ATR-dev wraca do normy
+            interwaly=["1H", "4H"], rezim_preferowany="VOLATILE",
+            dzwignia="2×–5×", rr="1:2", status="SZKIC",
+        ),
+        Strategia(
+            id="VI-LV-002", nazwa="KASKADA STALOWA (Liquidation Cascade Hunt)", legion="VI", styl="LV",
+            warunki="Stop hunt + dywergencja OI = kaskada likwidacji — łapiemy odbicie po zmiataniu (futures)",
+            zrodlo="VI Ferrata — liquidation hunt (OI + struktura)",
+            neurony_wejscie=["A-01", "PSY-04"],    # Stop Hunt + OI Divergence (kaskada)
+            neurony_filtr=["VI-13", "V-13"],       # ATR-Lev + Realized Vol (kontrola ryzyka)
+            neurony_wyjscie=["A-01", "VI-13"],     # sweep zanika / ATR-Lev sygnalizuje spokój
+            interwaly=["M15", "1H"], rezim_preferowany="VOLATILE",
+            dzwignia="2×–4×", rr="1:3", status="SZKIC",
+        ),
     ]
 
 

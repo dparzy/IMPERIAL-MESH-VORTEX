@@ -3,13 +3,15 @@
 Fear & Greed, Funding Rate Extreme, Capitulation, Panika Detaliczna.
 Behawioralne wzorce rynku — wyjście z tłumu.
 
-DOSTĘPNOŚĆ:
-  PSY-01 FUNDING_RATE     — wymaga API futures (MEXC/Binance). Aktywuje się gdy
-                            MEXC_API_KEY jest skonfigurowany i adapter podpięty.
-  PSY-02 LONG_SHORT_RATIO — j.w.
-  PSY-03 FEAR_GREED_INDEX — wymaga zewnętrznego API (alternative.me lub podobne).
-  PSY-04 OPEN_INTEREST    — wymaga API futures.
-  Wszystkie wyciszone (DOSTEPNY=False) dopóki adapter nie zostanie podpięty.
+DOSTĘPNOŚĆ (Faza B — obudzone przez adaptery publiczne, bez klucza API):
+  PSY-01 FUNDING_RATE     — AdapterFutures (Binance fapi publiczne, bez klucza).
+  PSY-02 LONG_SHORT_RATIO — AdapterFutures (Binance futures/data publiczne).
+  PSY-03 FEAR_GREED_INDEX — AdapterFearGreed (alternative.me, darmowe bez klucza).
+  PSY-04 OPEN_INTEREST    — AdapterFutures (Binance fapi openInterest publiczne).
+  Wszystkie AKTYWNE (DOSTEPNY=True) — adaptery wpięte w pipeline (Dyrygent).
+  Prawo XV: w czystym backteście z CSV (bez kolumny funding/OI) neuron ABSTYNUJE
+  (zwraca NEUTRAL, rój wyklucza go z głosu kierunkowego — nie martwy ciężar).
+  W trybie live/paper adapter dolewa realne dane → neuron głosuje.
 """
 
 from imperium.legiony.mikro_neuron import MikroNeuron, SygnalNeuronu
@@ -29,8 +31,7 @@ class NeuronFearGreed(MikroNeuron):
     WSKAZNIK = "FEAR_GREED"
     KATEGORIA = "R"
     WAGA = 7
-    DOSTEPNY = False
-    POWOD_NIEDOSTEPNOSCI = _POWOD_SENTIMENT
+    DOSTEPNY = True   # AdapterFearGreed (alternative.me, bez klucza)
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         fg = wskazniki.get("FEAR_GREED_INDEX")
@@ -64,8 +65,7 @@ class NeuronFundingExtreme(MikroNeuron):
     WSKAZNIK = "FUNDING_EXTREME"
     KATEGORIA = "R"
     WAGA = 8
-    DOSTEPNY = False
-    POWOD_NIEDOSTEPNOSCI = _POWOD_FUTURES
+    DOSTEPNY = True   # AdapterFutures (Binance fapi, bez klucza)
 
     FUNDING_HIGH = 0.001    # 0.1% per 8H — dużo longerów
     FUNDING_LOW = -0.0005   # -0.05% per 8H — dużo shorterów
@@ -101,8 +101,7 @@ class NeuronPanikaDetal(MikroNeuron):
     WSKAZNIK = "LS_RATIO"
     KATEGORIA = "R"
     WAGA = 7
-    DOSTEPNY = False
-    POWOD_NIEDOSTEPNOSCI = _POWOD_FUTURES
+    DOSTEPNY = True   # AdapterFutures (Binance fapi, bez klucza)
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         ls_ratio = wskazniki.get("LONG_SHORT_RATIO")  # long/(long+short), 0.0-1.0
@@ -140,8 +139,7 @@ class NeuronOIDiv(MikroNeuron):
     WSKAZNIK = "OI_DIVERGENCE"
     KATEGORIA = "R"
     WAGA = 7
-    DOSTEPNY = False
-    POWOD_NIEDOSTEPNOSCI = _POWOD_FUTURES
+    DOSTEPNY = True   # AdapterFutures (Binance fapi, bez klucza)
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         oi = wskazniki.get("OPEN_INTEREST")

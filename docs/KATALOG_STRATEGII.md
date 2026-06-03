@@ -210,53 +210,25 @@ Każda strategia zawiera:
 
 ## 🔥 STRATEGIE LEGIO VI FERRATA (Leverage/Futures)
 
-### VI-LV-001 | "ŻELAZNY KLIN" | Funding Rate Contrarian
-**Twórca:** IMV (syntetyczna) — kontrariańska strategia lewara
-**Interwał:** 15M–1H
-**Warunki:** Ekstremalne funding rate + sygnał odwrócenia
-
-**Neurony WEJŚCIE:**
-- `VI-01` FundingRate > 0.05% → za dużo longów (wchodzimy SHORT)
-- `VI-04` Long/Short Ratio ekstremalne → sentyment przekupiony
-- `VI-03` LiqHeatmap — duże skupisko liquidacji powyżej ceny
-
-**Neurony FILTR:**
-- `VI-02` Open Interest rośnie → pozycje narastają (gotowe do squeeze)
-- `VI-05` Leverage Z-Score > 2σ → rynek ekstremalnie lewarowany
-
-**Neurony WYJŚCIE:**
-- FundingRate normalizuje się < 0.02%
-- `VI-03` Heatmap — poziom likwidacji osiągnięty
-
-**Dźwignia:** 5×–15× (zależnie od pewności)
-**R:R:** 1:2
-**Pretorianie:** OBOWIĄZKOWE WETO jeśli funding > 0.08%
-**Status:** SZKIC
+### VI-LV-001 | "ŻELAZNY KLIN (Funding Rate Contrarian)" | Funding Rate Contrarian
+**Twórca:** IMV (syntetyczna) — kontrariańska strategia lewara na funding/sentyment futures
+**Interwał:** 1H–4H | **Reżim:** VOLATILE | **Lewar:** 2×–5×
+**Źródło danych:** AdapterFutures (Binance fapi publiczne, bez klucza)
+**Neurony WEJŚCIE:** `PSY-01` Funding Extreme + `PSY-02` Long/Short Ratio (kontrariańsko — tłum po jednej stronie → squeeze)
+**Neurony FILTR:** `VI-13` ATR-Lev (bezpieczna dźwignia) + `V-13` Realized Vol (kontrola zmienności)
+**Neurony WYJŚCIE:** `PSY-01` funding normalizuje + `X-25` ATR-dev wraca do normy
+**R:R:** 1:2 · **Status:** ✅ W KODZIE (`rejestr_strategii.py`, klucz `VI-LV-001`)
 
 ---
 
-### VI-LV-002 | "KASKADA STALOWA" | Liquidation Cascade Hunt
-**Twórca:** IMV (na podstawie obserwacji rynku futures)
-**Interwał:** 15M
-**Warunki:** Duże skupiska likwidacji widoczne na heatmapie
-
-**Neurony WEJŚCIE:**
-- `VI-03` LiqHeatmap — wyraźna kaskada likwidacji tuż powyżej/poniżej
-- `VI-02` Open Interest wysoki → dużo pozycji do likwidacji
-- `X-05` OrderFlow — presja w kierunku kaskady
-
-**Neurony FILTR:**
-- `VI-01` FundingRate neutralny (nie wchodzimy przy ekstremalnym fundingu)
-- `XII-04` Supertrend → kierunek ogólny
-
-**Neurony WYJŚCIE:**
-- Po osiągnięciu poziomu kaskady
-- `X-06` ATR stop
-
-**Dźwignia:** 10×–20× (krótka pozycja, szybkie wyjście)
-**R:R:** 1:1.5 (szybka transakcja)
-**⚠️ RYZYKO NAJWYŻSZE**
-**Status:** SZKIC
+### VI-LV-002 | "KASKADA STALOWA (Liquidation Cascade Hunt)" | Liquidation Cascade Hunt
+**Twórca:** IMV (na podstawie obserwacji rynku futures) — łapanie odbicia po kaskadzie likwidacji
+**Interwał:** M15–1H | **Reżim:** VOLATILE | **Lewar:** 2×–4×
+**Źródło danych:** AdapterFutures (OI) + struktura OHLCV
+**Neurony WEJŚCIE:** `A-01` Stop Hunt (zmiatanie płynności) + `PSY-04` OI Divergence (kaskada pozycji)
+**Neurony FILTR:** `VI-13` ATR-Lev + `V-13` Realized Vol (kontrola ryzyka w chaosie)
+**Neurony WYJŚCIE:** `A-01` sweep zanika + `VI-13` ATR-Lev sygnalizuje spokój
+**R:R:** 1:3 · **Status:** ✅ W KODZIE (`rejestr_strategii.py`, klucz `VI-LV-002`)
 
 ---
 

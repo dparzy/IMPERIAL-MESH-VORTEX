@@ -7,9 +7,11 @@
 
 **Stan na:** 2026-06-03 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 44 neurony (zarejestrowane w roju) + 12 zwiadowców = **56 modułów w kodzie**
-**Aktywne / wyciszone:** 32 aktywnych (czyste OHLCV) + 12 wyciszonych, z czego:
+**Aktywne / wyciszone:** 36 aktywnych + 8 wyciszonych, z czego:
+  • **32 czyste OHLCV** (M/T/F/A/L/V) — liczą z barów bez żadnego API
+  • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **3 budzone WEWNĘTRZNIE** (SMC-01/02/03) — liczą z barów przez most EXP-05, ożywają w żywym Legatusie (`zbuduj_legatusa`), **bez żadnego API**
-  • **9 wymaga ZEWNĘTRZNEGO API/feedu** (V-03 CVD, PSY-01..04, OC-01..04) — wybudzą się przez adapter API (mechanizm gotowy)
+  • **5 wymaga ZEWNĘTRZNEGO API/feedu** (V-03 CVD, OC-01..04) — wybudzą się przez adapter API (mechanizm gotowy)
 **Elitarne (Prawo XX):** 14 (2 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
 **Do wdrożenia:** 255 neuronów
@@ -109,10 +111,10 @@
 
 | KLUCZ | Klasa | KAT | WAGA | Status | WSKAZNIK (Brama) | 🎖️ |
 |-------|-------|-----|------|--------|-----------------|-----|
-| PSY-01 | NeuronFundingExtreme | R | 8 | 🔇 wyciszony (API funding) | FUNDING_EXTREME | — |
-| PSY-02 | NeuronPanikaDetal | R | 7 | 🔇 wyciszony (API/feed) | LS_RATIO | — |
-| PSY-03 | NeuronFearGreed | R | 7 | 🔇 wyciszony (API Fear&Greed) | FEAR_GREED | — |
-| PSY-04 | NeuronOIDiv | R | 7 | 🔇 wyciszony (API OI) | OI_DIVERGENCE | — |
+| PSY-01 | NeuronFundingExtreme | R | 8 | ✅ aktywny (AdapterFutures) | FUNDING_EXTREME | — |
+| PSY-02 | NeuronPanikaDetal | R | 7 | ✅ aktywny (AdapterFutures) | LS_RATIO | — |
+| PSY-03 | NeuronFearGreed | R | 7 | ✅ aktywny (AdapterFearGreed) | FEAR_GREED | — |
+| PSY-04 | NeuronOIDiv | R | 7 | ✅ aktywny (AdapterFutures) | OI_DIVERGENCE | — |
 
 ### Plik: `neurony/onchain.py`
 
@@ -185,7 +187,7 @@
 | Legion | Skatalogowane | Wdrożone | Do wdrożenia |
 |--------|--------------|---------|--------------|
 | X Equestris (M5/M15) | 26 | 7 (X-02,X-08,X-11,X-17,X-18,X-25,X-26) | 19 |
-| III Augusta (H1) | ~45 | 9 (XII-01..04, V-01..04, VSA-01) + wyciszone: V-03,SMC-01..03,PSY-01..04 | ~36 |
+| III Augusta (H1) | ~45 | 9 (XII-01..04, V-01..04, VSA-01) + PSY-01..04 ✅ (Faza B) + wyciszone: V-03,SMC-01..03 | ~36 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
 | **RAZEM** | **299** | **44** | **255** |
@@ -213,6 +215,7 @@
 | Framework Adapterów (most API→rój) | `akwedukty/adaptery/baza.py` | ✅ aktywny |
 | Adaptery testowe (OnChain/Futures/CVD mock) | `akwedukty/adaptery/testowy.py` | ✅ aktywny (mock) |
 | AdapterFearGreed (PSY-03, alternative.me) | `akwedukty/adaptery/feargreed.py` | ✅ aktywny (realne API) |
+| AdapterFutures (PSY-01/02/04, Binance fapi publiczne) | `akwedukty/adaptery/futures.py` | ✅ aktywny (realne API, bez klucza) |
 
 ---
 
@@ -288,7 +291,9 @@ chciwość→SHORT). Wybudzanie granularne: budzi TYLKO PSY-03, nie całą domen
 | 2026-06-02 | Faza 6 — Framework Adapterów | +2 moduły | most API→rój | Baza + 3 adaptery testowe (OnChain/Futures/CVD); auto-wybudzanie 9 neuronów API; 13 testów |
 | 2026-06-02 | Faza 7 — AdapterFearGreed | +1 moduł | PSY-03 realne API | Pierwszy prawdziwy adapter (alternative.me, bez klucza); wstrzykiwany fetcher; +6 testów offline |
 | 2026-06-02 | Dywizja Strategii + Klucznik | +2 moduły | 46+2 | Strategie jako KOD, silnik dopasowania, audyt Warstwa 4 |
-| **Do wdrożenia** | Faza 3 (X Equestris c.d.) | +X neuronów | — | X-12..X-16, X-19..X-24 + strategie wymagające nowych neuronów |
+| 2026-06-03 | Faza A — kat. L+V + 3 martwe naprawione | +2 neurony | 44+12=56 | VI-13 ATR-Lev (L), V-13 RealizedVol (V); naprawa XII-07/X-12/A-05 |
+| 2026-06-03 | **Faza B — kat. R obudzona** | +1 adapter | aktywne 32→36 | AdapterFutures (Binance fapi publiczne) budzi PSY-01/02/04; PSY-03 (FearGreed) wpięty; adaptery w pipeline Dyrygenta; +2 strategie VI-LV (17 łącznie); +9 testów |
+| **Do wdrożenia** | Faza C/D — feed/on-chain | +X neuronów | — | V-03 CVD, OC-01..04, SMC live feed |
 
 ---
 

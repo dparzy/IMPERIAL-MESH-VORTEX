@@ -6,6 +6,62 @@
 
 ---
 
+## 2026-06-03 | MAJOR | Rozbudowa roju — kat. L+V wzmocnione (Ulcer + Choppiness, Prawo XVI)
+
+### Kontekst
+Kategorie L (dźwignia) i V (zmienność) miały po 1 neuronie — najcieńsze w roju,
+ledwo wpływały na wagi reżimowe. Mierzona rozbudowa zdekorelowanymi sygnałami.
+
+### Co zostało wdrożone (kod)
+- **L-14 NeuronUlcer** (kat. L) — Ulcer Index: ryzyko SPADKOWE (głębokość/czas
+  obsunięć), karze tylko ruch w dół. Dekoreluje z VI-13 (ATR symetryczny).
+- **V-14 NeuronChoppiness** (kat. V) — Choppiness Index: trend vs konsolidacja
+  (efektywność ruchu). Dekoreluje z V-13 (HV = magnituda wahań).
+- **Brama** (`fundament/brama_kalkulatora.py`) — pure-Python `_py_ulcer`,
+  `_py_choppiness` + wpisy rejestru ULCER, CHOPPINESS (Prawo I — jedyne wejście).
+- **Budowniczy** — ULCER_14, CHOPPINESS_14 w `_PLAN_SKALARNE`.
+- **Rejestr** — oba neurony w `wszystkie_neurony()`. Czyste OHLCV, bez API.
+
+### Pomiar dekorelacji (Prawo XVI — nie opinia)
+Seria sygnałów (LONG=+1/NEUTRAL=0/SHORT=−1) po oknie kroczącym, korelacja Pearsona
+na dołączonych danych (ETH_1d, BTC_1h):
+- **V-13 ↔ V-14:** |r| = 0.05–0.27 → dywersyfikacja (filar siły, oba zostają).
+- **VI-13 ↔ L-14:** VI-13 stały (SHORT) na danych syntetycznych → L-14 dostarcza
+  PEŁNĄ wariancję kat. L (LONG/NEUTRAL/SHORT, UI 0.24–12.0) → komplementarność.
+
+### Stan
+- Neurony: 46 (aktywne 39, wyciszone 7). Testy: 381/381. Audyt: pełna harmonia.
+
+---
+
+## 2026-06-03 | FIX+TESTY | Backtest ożywiony — czytnik prostego formatu + testy Dyrygenta (Prawo XIX)
+
+### Kontekst
+`koloseum/backtest.py` (przejazd Dyrygenta po historii) istniał, ale: (1) NIE miał
+własnych testów — martwa litera wg Prawa XIX (test_scheduler testuje inny backtest);
+(2) czytnik CSV wymagał formatu CryptoDataDownload (kolumna `unix`), więc dołączone
+dane `dane/*.csv` (prosty format `timestamp,open,...`) NIE dawały się uruchomić.
+
+### Co zostało wdrożone (kod)
+- **Czytnik elastyczny** (`akwedukty/czytnik_csv.py`) — akceptuje `unix` (CDD) LUB
+  `timestamp` (prosty format Imperium). `_parse_ts()` parsuje epoch (s/ms) oraz
+  ISO-datę. Brak kolumny `symbol` → wywnioskowany z nazwy pliku (`BTC_1h` → `BTC`).
+- **Testy backtestu** (`tests/test_backtest.py`, 5) — silnik z historią, walidacja
+  za małej liczby barów, AUTO-reżim (Namiestnik), porównanie 3 trybów oraz
+  **bezpośredni dowód braku lookahead** (szpieg na `Dyrygent.cykl` sprawdza, że
+  każde okno kończy się na bieżącej świecy, brak barów z przyszłości).
+- **Testy prostego formatu** (`tests/test_czytnik_csv.py`, +3) — ISO-timestamp,
+  symbol z nazwy pliku, `_parse_ts` (epoch s/ms/ISO).
+
+### Weryfikacja
+Backtest odpala się out-of-the-box na `dane/BTC_1h.csv` i `dane/ETH_1d.csv`
+(`--porownaj` oraz `auto_rezim=True`). Brak zaglądania w przyszłość udowodniony testem.
+
+### Stan
+- Testy: 370/370 (+8). Audyt: pełna harmonia. Neurony/strategie bez zmian.
+
+---
+
 ## 2026-06-03 | MAJOR | Faza C — V-03 CVD obudzony (adapter trade-feed publiczny, Prawo XV)
 
 ### Kontekst

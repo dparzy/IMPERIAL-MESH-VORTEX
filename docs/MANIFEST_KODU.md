@@ -6,20 +6,20 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-03 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 44 neurony (zarejestrowane w roju) + 12 zwiadowców = **56 modułów w kodzie**
-**Aktywne / wyciszone:** 37 aktywnych + 7 wyciszonych, z czego:
-  • **32 czyste OHLCV** (M/T/F/A/L/V) — liczą z barów bez żadnego API
+**Zaimplementowane:** 46 neuronów (zarejestrowane w roju) + 12 zwiadowców = **58 modułów w kodzie**
+**Aktywne / wyciszone:** 39 aktywnych + 7 wyciszonych, z czego:
+  • **34 czyste OHLCV** (M/T/F/A/L/V) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 budzone WEWNĘTRZNIE** (SMC-01/02/03) — liczą z barów przez most EXP-05, ożywają w żywym Legatusie (`zbuduj_legatusa`), **bez żadnego API**
   • **4 wymaga ZEWNĘTRZNEGO API on-chain** (OC-01..04) — Glassnode/CryptoQuant (Faza D)
 **Elitarne (Prawo XX):** 14 (2 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
-**Do wdrożenia:** 255 neuronów
+**Do wdrożenia:** 253 neurony
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 42). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 46). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -135,11 +135,18 @@
 | A-03 | NeuronWashVol | A | 6 | ✅ aktywny | VOLUME | — |
 | A-05 | NeuronBartPattern | A | 6 | ✅ aktywny | CLOSE_PREV | — |
 | VI-13 | NeuronATRLev | L | 8 | ✅ aktywny | ATR_14 | — |
+| L-14 | NeuronUlcer | L | 7 | ✅ aktywny | ULCER_14 | — |
 | V-13 | NeuronRealizedVol | V | 7 | ✅ aktywny | HIST_VOL_20 | — |
+| V-14 | NeuronChoppiness | V | 7 | ✅ aktywny | CHOPPINESS_14 | — |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
 > PANIC ×3.0) były pre-zarejestrowane — teraz mają realne neurony. Prawo XV.
 > Dekorelacja (Prawo XVI): A-01↔A-02 r=+0.24, A↔RSI |r|<0.15 — filary nowej informacji.
+
+> **Kat. L i V wzmocnione** (2026-06-03): L-14 Ulcer Index (ryzyko spadkowe) +
+> V-14 Choppiness Index (trend vs konsolidacja). Pomiar dekorelacji (Prawo XVI):
+> V-13↔V-14 |r|=0.05–0.27 (dywersyfikacja), VI-13↔L-14 — VI-13 stały na danych
+> testowych, L-14 dostarcza pełną wariancję kat. L (komplementarność). Czyste OHLCV.
 
 ---
 
@@ -191,7 +198,7 @@
 | III Augusta (H1) | ~45 | 9 (XII-01..04, V-01..04, VSA-01) + PSY-01..04 ✅ (Faza B) + wyciszone: V-03,SMC-01..03 | ~36 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
-| **RAZEM** | **299** | **44** | **255** |
+| **RAZEM** | **299** | **46** | **253** |
 
 ---
 

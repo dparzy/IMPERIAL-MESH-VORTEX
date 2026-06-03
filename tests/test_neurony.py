@@ -10,6 +10,7 @@ from imperium.legiony.neurony.wolumen import NeuronOBV, NeuronVWAP, NeuronCVD, N
 from imperium.legiony.neurony.psychologia import NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv
 from imperium.legiony.neurony.onchain import NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow
 from imperium.legiony.neurony.struktura import NeuronOrderBlock, NeuronFVG, NeuronBOS, NeuronVSA
+from imperium.legiony.neurony.dzwignia import NeuronChoppiness, NeuronUlcer
 
 
 # ─── MOMENTUM ─────────────────────────────────────────────────────────────────
@@ -557,6 +558,85 @@ def test_a02_wick_brak_danych():
     """A-02: brak OPEN → NEUTRAL (bezpieczny fallback)."""
     n = NeuronWickRejection()
     assert n.interpretuj({"HIGH": 100, "LOW": 90, "CLOSE": 95}).kierunek == "NEUTRAL"
+
+
+def test_brama_ulcer_bez_obsuniec():
+    """Brama: rosnąca seria (zero drawdownu) → Ulcer Index = 0."""
+    from imperium.fundament.brama_kalkulatora import _py_ulcer
+    rosnaca = [100 + i for i in range(30)]
+    assert _py_ulcer(rosnaca, period=14) == 0.0
+
+
+def test_brama_ulcer_z_obsunieciem():
+    """Brama: seria z obsunięciem → Ulcer Index > 0."""
+    from imperium.fundament.brama_kalkulatora import _py_ulcer
+    seria = [100] * 10 + [90, 85, 80, 75, 70, 80, 90]  # wyraźny drawdown
+    ui = _py_ulcer(seria, period=14)
+    assert ui is not None and ui > 0
+
+
+def test_brama_choppiness_zakres():
+    """Brama: Choppiness Index mieści się w 0–100 i istnieje na realnej serii."""
+    from imperium.fundament.brama_kalkulatora import _py_choppiness
+    import math
+    h = [100 + math.sin(i / 3) * 5 for i in range(30)]
+    l = [v - 3 for v in h]
+    c = [(hi + lo) / 2 for hi, lo in zip(h, l)]
+    chop = _py_choppiness(h, l, c, period=14)
+    assert chop is not None and 0 <= chop <= 100
+
+
+def test_brama_choppiness_za_malo_danych():
+    """Brama: za mało barów → None (bezpieczny fallback, brak halucynacji)."""
+    from imperium.fundament.brama_kalkulatora import _py_choppiness
+    assert _py_choppiness([1, 2], [0, 1], [1, 2], period=14) is None
+
+
+def test_v14_choppiness_trend():
+    """V-14: CHOP < 38.2 → silny trend → LONG."""
+    s = NeuronChoppiness().interpretuj({"CHOPPINESS_14": 30.0})
+    assert s.kierunek == "LONG"
+    assert s.pewnosc >= 0.55
+
+
+def test_v14_choppiness_konsolidacja():
+    """V-14: CHOP > 61.8 → piła/konsolidacja → SHORT."""
+    s = NeuronChoppiness().interpretuj({"CHOPPINESS_14": 70.0})
+    assert s.kierunek == "SHORT"
+
+
+def test_v14_choppiness_brak_danych():
+    """V-14: brak CHOPPINESS_14 → NEUTRAL (abstynencja)."""
+    assert NeuronChoppiness().interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_l14_ulcer_plytki():
+    """L-14: UI < 1% → płytkie obsunięcia → LONG (bezpieczna dźwignia)."""
+    s = NeuronUlcer().interpretuj({"ULCER_14": 0.5})
+    assert s.kierunek == "LONG"
+
+
+def test_l14_ulcer_ekstremalny():
+    """L-14: UI > 8% → ekstremalne ryzyko spadkowe → SHORT silny."""
+    s = NeuronUlcer().interpretuj({"ULCER_14": 12.0})
+    assert s.kierunek == "SHORT"
+    assert s.pewnosc >= 0.75
+
+
+def test_l14_ulcer_brak_danych():
+    """L-14: brak ULCER_14 → NEUTRAL (abstynencja)."""
+    assert NeuronUlcer().interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_lv_kategorie_aktywne():
+    """Kategorie L i V mają po min. 2 aktywne neurony (Prawo XV — nie martwa litera)."""
+    from imperium.legiony.rejestr import wszystkie_neurony
+    from imperium.legiony.legatus import WAGI_REZIMU_PLANOWANE
+    neu = wszystkie_neurony()
+    for kat in ("L", "V"):
+        zywe = [n for n in neu if n.KATEGORIA == kat and n.DOSTEPNY]
+        assert len(zywe) >= 2, f"Kategoria {kat} powinna mieć min. 2 aktywne neurony"
+        assert kat not in WAGI_REZIMU_PLANOWANE, f"{kat} ożywiona — nie w PLANOWANE"
 
 
 def test_a_kategoria_aktywna():

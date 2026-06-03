@@ -197,6 +197,55 @@ def _py_hist_vol(close, period: int = 20) -> Optional[float]:
     return math.sqrt(variance) * math.sqrt(252)
 
 
+def _py_choppiness(high, low, close, period: int = 14) -> Optional[float]:
+    """
+    Choppiness Index (CHOP) — mierzy, czy rynek TRENDUJE czy się KONSOLIDUJE.
+    Wzór: 100 * log10(Σ TR(n) / (maxHigh(n) − minLow(n))) / log10(n).
+    Zakres 0–100: >61.8 = konsolidacja (chop), <38.2 = silny trend.
+    Dekoreluje z realized volatility (magnituda) — CHOP mierzy EFEKTYWNOŚĆ ruchu.
+    """
+    import math
+    h, l, c = list(high), list(low), list(close)
+    if len(c) < period + 1:
+        return None
+    # True Range dla ostatnich `period` barów
+    tr = []
+    for i in range(len(c) - period, len(c)):
+        if i == 0:
+            tr.append(h[i] - l[i])
+        else:
+            tr.append(max(h[i] - l[i], abs(h[i] - c[i - 1]), abs(l[i] - c[i - 1])))
+    suma_tr = sum(tr)
+    max_h = max(h[-period:])
+    min_l = min(l[-period:])
+    rozpietosc = max_h - min_l
+    if rozpietosc <= 0 or suma_tr <= 0:
+        return None
+    return round(100 * math.log10(suma_tr / rozpietosc) / math.log10(period), 2)
+
+
+def _py_ulcer(close, period: int = 14) -> Optional[float]:
+    """
+    Ulcer Index (UI) — miara ryzyka SPADKOWEGO (głębokość i czas obsunięć).
+    Wzór: sqrt(mean(drawdown_pct²)), gdzie drawdown liczony od kroczącego maksimum.
+    Dekoreluje z ATR (symetryczny zakres) — UI karze tylko ruch W DÓŁ.
+    Wyższy UI = większy ból posiadania → mniejsza bezpieczna dźwignia (kat. L).
+    """
+    import math
+    c = list(close)
+    if len(c) < period + 1:
+        return None
+    okno = c[-period:]
+    szczyt = okno[0]
+    kwadraty = []
+    for cena in okno:
+        if cena > szczyt:
+            szczyt = cena
+        dd = (cena - szczyt) / szczyt * 100 if szczyt > 0 else 0.0
+        kwadraty.append(dd * dd)
+    return round(math.sqrt(sum(kwadraty) / len(kwadraty)), 4)
+
+
 def _py_supertrend(high, low, close, period: int = 10, multiplier: float = 3.0):
     """
     Supertrend — pure Python, bez TA-Lib.
@@ -359,6 +408,12 @@ class CalculatorGateway:
 
             # ── Pure-Python: Historical/Realized Volatility (TA-Lib nie ma) ──
             "HIST_VOL":  lambda close, period=20: _py_hist_vol(close, period),
+
+            # ── Pure-Python: Choppiness Index — trend vs konsolidacja (kat. V) ──
+            "CHOPPINESS": lambda high, low, close, period=14: _py_choppiness(high, low, close, period),
+
+            # ── Pure-Python: Ulcer Index — ryzyko spadkowe (kat. L) ───────────
+            "ULCER":     lambda close, period=14: _py_ulcer(close, period),
 
             # ── TA-Lib: wolumen ────────────────────────────────────────────────
             "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),

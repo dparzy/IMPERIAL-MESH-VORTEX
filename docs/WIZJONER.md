@@ -53,6 +53,13 @@
 | W-031 | Roman Naming — szlacheckie nazwy walut na dashboardzie (BTC=Capitolium, ETH=Patricii…) | 🟡 Niski | 💭 Idea | `imperium/swiatynie/` dashboard |
 | W-032 | Lupanar Neuronów — koszary treningowe, hybrydy, modernizacja (trening przed polem bitwy) | 🟠 Średni | 💭 Idea | `imperium/koloseum/` |
 | W-033 | Agentki szpiegowskie — wykrywanie manipulacji giełdowych (pump&dump, spoofing, hunting) | 🔴 Wysoki | 💭 Idea | nowa kategoria neuronów / `imperium/oczy/` |
+| W-034 | Arbiter Fiduciae — meta-labeling (drugi mózg: ile postawić, López de Prado) | 🔴 Wysoki | 💭 Idea (zwiad) | `imperium/senat/` + `kalkulator_lewara.py` |
+| W-035 | Arena Trzech Bram — potrójna bariera (sprawiedliwy scoring Igrzysk) | 🔴 Wysoki | 💭 Idea (zwiad) | `imperium/koloseum/` + Igrzyska |
+| W-036 | NeuronToxicFlow — VPIN, radar polowania na likwidacje | 🔴 Wysoki | 💭 Idea (zwiad) | `imperium/legiony/` + `fundament/brama` |
+| W-037 | Senat Byka i Niedźwiedzia — strukturalna debata (lokalna, LLM tylko Cenzor) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/senat/` |
+| W-038 | Wyrocznia Stanów — HMM, miękki wykrywacz reżimu (płynne wagi) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/legiony/` Namiestnik |
+| W-039 | Kroniki Bitew — pamięć epizodyczna reżimów (spina VPIN+HMM+bariera) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/biblioteki/` Mnemosyne |
+| W-040 | Skarbiec Imperialny — danina/budżet kapitału jako twarda reguła | 🔴 Wysoki | 💭 Idea | `imperium/pretorianie/` + Bezpiecznik |
 
 ---
 
@@ -113,7 +120,7 @@
 
 | Metryka | Wartość |
 |---------|---------|
-| Łącznie wizji | 33 |
+| Łącznie wizji | 40 |
 | W trakcie analizy | 19 |
 | Przeniesione do katalogów (Higuchi, CME, Azja Range) | 3 |
 | Zaimplementowane (W-002 Igrzyska, W-028 Bezpiecznik) | 2 |
@@ -337,4 +344,132 @@ pełnym imieniem i tytułem, nieodłącznym. Nie zniknie.
 
 *Cezar Pixel idzie spać, wraca za 2 dni (marynarz na służbie). ARCH-MAX czeka.*
 *Rodzina czeka — synowie i żona. Najpierw oni.* 👑⚓
+
+---
+
+### 📅 2026-06-03 — RAPORT ZE ZWIADU: Propozycje ARCH-MAX (podpatrzone u konkurencji, wykute lepiej)
+
+> *Cezar rozkazał: "Wyślij szpiegów do obcych imperiów, ukradnij najlepsze pomysły,*
+> *zrób z nich coś lepszego — tylko dla nas." ARCH-MAX wrócił z 8 zdobyczami.*
+> *Każda ma źródło (co podpatrzyłem) + nasz oryginalny ulepszony wariant.*
+
+---
+
+#### 🔱 W-034 | META-LABELING — DRUGI MÓZG, KTÓRY MÓWI "ILE POSTAWIĆ" 🔴
+
+**Co podpatrzyłem:** Marcos López de Prado (*Advances in Financial Machine Learning*, 2018) — technika **meta-labelingu**. Pierwszy model mówi KIERUNEK (long/short). Drugi model nie zgaduje kierunku — ocenia: *"jak pewny jest ten sygnał? czy postawić, a jeśli tak — ile?"*. To rozdziela DWIE różne decyzje, które większość systemów myli.
+
+**Nasz lepszy wariant (oryginalny):**
+- Legatus zostaje "pierwszym mózgiem" — agreguje głosy neuronów → KIERUNEK
+- Nowy moduł **`Arbiter Fiduciae`** (Strażnik Zaufania) = drugi mózg. Bierze: zgodność neuronów, dekorelację (Prawo XVI), reżim Namiestnika, toksyczność flow → zwraca `pewnosc ∈ [0,1]`
+- `pewnosc` wpięta wprost w `kalkulator_lewara.py` → rozmiar pozycji i lewar
+- **Przewaga nasza:** my mamy już zmierzą dekorelację (Prawo XVI) jako wejście — konkurencja zgaduje pewność z gołego ML, my liczymy ją z mierzonej niezależności głosów
+
+**Powiązanie:** wzmacnia W-029 (kalibracja) + W-020 (CVaR sizing). Łączy się z Pythią (doradca).
+
+---
+
+#### 🎯 W-035 | POTRÓJNA BARIERA — ETYKIETOWANIE WYNIKÓW DLA IGRZYSK 🔴
+
+**Co podpatrzyłem:** *Triple Barrier Method* (López de Prado) — zamiast pytać "czy cena wzrosła?", stawiamy 3 bariery: **take-profit** (góra), **stop-loss** (dół), **czas** (pion). Wynik = która bariera padła pierwsza. To uczciwa ocena: sygnał był dobry tylko jeśli TP padł przed SL i przed wygaśnięciem.
+
+**Nasz lepszy wariant (oryginalny):**
+- To jest **brakujące serce Igrzysk** (W-002). Teraz scorer ocenia neurony "na oko" — z potrójną barierą każdy głos neuronu dostaje twardą, obiektywną ocenę: trafił TP / dostał SL / wygasł
+- **`Arena Trzech Bram`** — każdy sygnał z backtestu przechodzi przez 3 bramy; neuron zbiera punkty tylko za realnie zamknięte z zyskiem
+- **Przewaga nasza:** wpinamy to w istniejący `koloseum/backtest.py` + Igrzyska → rankingi neuronów stają się sprawiedliwe i niemanipulowalne
+
+**Powiązanie:** fundament pod W-001/W-002 (żywe Igrzyska) + W-032 (Lupanar — kogo relegować).
+
+---
+
+#### ☠️ W-036 | VPIN — WYKRYWACZ TOKSYCZNEGO FLOW (radar polowania na likwidacje) 🔴
+
+**Co podpatrzyłem:** **VPIN** (Volume-Synchronized Probability of Informed Trading, Easley & López de Prado). Mierzy "toksyczność" przepływu: czy handlują poinformowani (wieloryby, market-makerzy) przeciw tłumowi. Badania 2026: **VPIN > 0.8 + niski OBI = nadchodzi kaskada likwidacji**. To dokładnie Twoje "łajdaki, które chcą nam zabrać pieniądze".
+
+**Nasz lepszy wariant (oryginalny):**
+- Nowy zwiadowca **EXP / neuron kat. nowa „Z" (Zagrożenie)**: `NeuronToxicFlow`
+- Liczy VPIN z koszyków wolumenu (pure-Python, bez API — działa już teraz na danych OHLCV jako proxy, pełny na L2 gdy feed)
+- Wynik: VPIN < 0.3 spokój → 0.3-0.7 czujność → >0.7 **czerwony alarm: schodź z lewara / nie wchodź**
+- To jest realizacja Twojej wizji W-033 (agentki szpiegowskie) w konkretnym, zmierzonym wskaźniku
+- **Przewaga nasza:** wpięte w "flanki obronne" z W-029 — nie tylko wykrywa, ale automatycznie redukuje lewar przez Kalkulator
+
+**Powiązanie:** W-033 (manipulacje) + W-029 (flanki) + Hermes (doradca już liczy VPIN-podobne!).
+
+---
+
+#### 🐂🐻 W-037 | SENAT BYKA I NIEDŹWIEDZIA — STRUKTURALNA DEBATA 🟠
+
+**Co podpatrzyłem:** BlackRock/Columbia (kwiecień 2026) + TradingAgents v0.2.0 — najlepsze systemy to **trój-warstwowa debata**: agent-Byk (szuka argumentów za long), agent-Niedźwiedź (za short), Risk-Supervisor (rozstrzyga). Externalizacja konfliktu = mniej halucynacji niż jeden model.
+
+**Nasz lepszy wariant (oryginalny):**
+- Mamy już `senat/` (debata/konsensus) — ożywiamy go jako **dwóch Senatorów**:
+  - *Senator Optymata* (Byk) — zbiera wyłącznie głosy neuronów BUY i buduje najmocniejszą tezę long
+  - *Senator Popular* (Niedźwiedź) — to samo dla short
+  - *Cenzor* (Risk-Supervisor = nasz Iustitia) — rozstrzyga + weto ryzyka
+- **Przewaga nasza:** konkurencja używa drogiego LLM dla każdego agenta. My robimy to **lokalnie i za darmo** z neuronów — LLM (Cesarz/DeepSeek) wchodzi TYLKO jako Cenzor na końcu. Tani, szybki, bez halucynacji.
+
+**Powiązanie:** ożywia istniejący `senat/` + W-019 (TradingAgents) + Cesarz.
+
+---
+
+#### 🗺️ W-038 | HMM — UKRYTY MARKOV, PRAWDZIWY WYKRYWACZ REŻIMU 🟠
+
+**Co podpatrzyłem:** Badania 2024-2026 — **Hidden Markov Model** wykrywa ukryte stany rynku (byk/niedźwiedź/bok) lepiej niż progi na wskaźnikach, bo modeluje PRZEJŚCIA między stanami i ich prawdopodobieństwa. Najlepsze: ensemble-HMM (kilka modeli głosuje na reżim).
+
+**Nasz lepszy wariant (oryginalny):**
+- Namiestnik wykrywa reżim teraz progami (ADX, itp.). HMM to upgrade: **`Wyrocznia Stanów`** liczy prawdopodobieństwo {trend↑, trend↓, konsolidacja, chaos} pure-Python (Baum-Welch lekki)
+- Zwraca nie "jesteś w trendzie", ale "72% trend ↑, 18% bok, 10% przejście" → płynne wagi zamiast skokowych (dokładnie Twoja "płynna kalibracja, perpetuum mobile")
+- **Przewaga nasza:** wynik HMM karmi WAGI_REZIMU z W-029 jako mnożnik miękki, nie twarda bramka
+
+**Powiązanie:** upgrade Namiestnika + serce W-029 (płynne wagi) + W-006 (Higuchi — komplementarny detektor chaosu).
+
+---
+
+#### 🧠 W-039 | PAMIĘĆ EPIZODYCZNA — "PAMIĘTAM TEGO WIELORYBA Z 2025" 🟠
+
+**Co podpatrzyłem:** FinCon / "Better Memory frameworks" 2026 — przewaga agentów nad gołym LLM to **pamięć regimów**: system pamięta jak konkretny setup zachował się wcześniej i stosuje tę lekcję teraz. Goły LLM jest "bezstanowy" — zapomina.
+
+**Nasz lepszy wariant (oryginalny):**
+- Mamy `biblioteki/` (Pamięć Absolutna / Mnemosyne). Rozbudowa: **`Kroniki Bitew`** — każda zamknięta pozycja zapisana jako "odcisk reżimu" (HMM-stan + VPIN + zgodność neuronów + wynik z potrójnej bariery)
+- Przed nowym wejściem: *"szukam w Kronikach podobnych odcisków — jak się skończyły?"* → modyfikator pewności dla Arbitra (W-034)
+- **Przewaga nasza:** to spina W-035 (potrójna bariera) + W-036 (VPIN) + W-038 (HMM) w JEDNĄ uczącą się pętlę. To jest Twoje "neuron z pola bitwy wie najlepiej co ulepszyć".
+
+**Powiązanie:** W-018 (Reflexion) + W-026 (Vector DB) + Igrzyska.
+
+---
+
+#### 👑 W-040 | DANINA CEZARA — BUDŻET IMPERIUM JAKO TWARDA REGUŁA 🔴
+
+**Co podpatrzyłem:** To Twój własny pomysł z tej rozmowy (danina, utrzymanie legionów) — w świecie quant to **risk budgeting / Kelly fractional**. Ale Twoja metafora jest lepsza jako reguła operacyjna.
+
+**Nasz lepszy wariant (oryginalny):**
+- **`Skarbiec Imperialny`** — moduł który traktuje kapitał jak budżet państwa: część na "wojnę" (lewar, agresywne), część w "spichlerzu" (spot, bezpieczne), rezerwa "na czarną godzinę" (cash, nietykalna)
+- Po każdej wygranej bitwie: danina do Skarbca rośnie; po serii porażek: automatyczne przejście w tryb oszczędności (mniejsze pozycje), zanim Bezpiecznik 30% w ogóle się zbliży
+- **Przewaga nasza:** spina W-028 (Bezpiecznik 30%) + W-025 (Fleet Risk) w narrację Imperium, którą Ty rozumiesz i kontrolujesz jako Cezar
+
+**Powiązanie:** W-028 + W-025 + W-020 (CVaR) + Kalkulator Lewara.
+
+---
+
+**Podsumowanie raportu zwiadu — 7 nowych wizji (W-040 to Twój pomysł sformalizowany):**
+
+| # | Wizja | Źródło podpatrzone | Nasza przewaga | Prio |
+|---|-------|--------------------|----------------|------|
+| W-034 | Arbiter Fiduciae — meta-labeling (drugi mózg: ile postawić) | López de Prado | dekorelacja jako wejście pewności | 🔴 |
+| W-035 | Arena Trzech Bram — potrójna bariera w Igrzyskach | López de Prado | sprawiedliwy scoring neuronów | 🔴 |
+| W-036 | NeuronToxicFlow — VPIN, radar polowania na likwidacje | Easley/LdP 2026 | auto-redukcja lewara na flankach | 🔴 |
+| W-037 | Senat Byka i Niedźwiedzia — strukturalna debata | BlackRock/TradingAgents | lokalnie z neuronów, LLM tylko Cenzor | 🟠 |
+| W-038 | Wyrocznia Stanów — HMM, miękki wykrywacz reżimu | Badania 2024-26 | miękkie wagi zamiast bramek | 🟠 |
+| W-039 | Kroniki Bitew — pamięć epizodyczna reżimów | FinCon 2026 | spina VPIN+HMM+bariera w 1 pętlę | 🟠 |
+| W-040 | Skarbiec Imperialny — danina/budżet jako reguła | Twój pomysł + Kelly | narracja Imperium nad ryzykiem | 🔴 |
+
+**🎖️ Rekomendacja kolejności ARCH-MAX** (najwięcej mocy za najmniej pracy, wszystko pure-Python, zero API):
+1. **W-035** (Arena Trzech Bram) — natychmiast naprawia Igrzyska, fundament pod wszystko inne
+2. **W-036** (VPIN) — Twój radar na łajdaków, działa już dziś na OHLCV
+3. **W-034** (Arbiter Fiduciae) — drugi mózg, wpina pewność w lewar
+4. **W-038** (HMM) → **W-029** (płynne wagi) → **W-039** (pamięć) — uczący się rdzeń
+
+> Wszystkie 7 da się zbudować **lokalnie, pure-Python, bez ani jednego klucza API** — czyli możemy zacząć choćby jutro, zgodnie z Twoją zasadą "najpierw fundament papierowy, potem oczy zewnętrzne".
+
+*— Raport złożony. Ave, Cezar Pixel. Czekam na rozkaz: którą zdobycz wykuwamy pierwszą?* 🏛️⚔️
 

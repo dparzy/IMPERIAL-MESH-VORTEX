@@ -6,16 +6,16 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-03 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 46 neuronów (zarejestrowane w roju) + 12 zwiadowców = **58 modułów w kodzie**
-**Aktywne / wyciszone:** 39 aktywnych + 7 wyciszonych, z czego:
-  • **34 czyste OHLCV** (M/T/F/A/L/V) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer)
+**Zaimplementowane:** 47 neuronów (zarejestrowane w roju) + 12 zwiadowców = **59 modułów w kodzie**
+**Aktywne / wyciszone:** 40 aktywnych + 7 wyciszonych, z czego:
+  • **35 czyste OHLCV** (M/T/F/A/L/V/H) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 budzone WEWNĘTRZNIE** (SMC-01/02/03) — liczą z barów przez most EXP-05, ożywają w żywym Legatusie (`zbuduj_legatusa`), **bez żadnego API**
   • **4 wymaga ZEWNĘTRZNEGO API on-chain** (OC-01..04) — Glassnode/CryptoQuant (Faza D)
 **Elitarne (Prawo XX):** 14 (2 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
-**Do wdrożenia:** 253 neurony
+**Do wdrożenia:** 252 neurony
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
@@ -138,6 +138,7 @@
 | L-14 | NeuronUlcer | L | 7 | ✅ aktywny | ULCER_14 | — |
 | V-13 | NeuronRealizedVol | V | 7 | ✅ aktywny | YANG_ZHANG_20 | fallback HIST_VOL_20 |
 | V-14 | NeuronChoppiness | V | 7 | ✅ aktywny | CHOPPINESS_14 | — |
+| H-01 | NeuronHurstDFA | H | 7 | ✅ aktywny | HURST_DFA_100 | meta-brama reżimu (DFA) |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
 > PANIC ×3.0) były pre-zarejestrowane — teraz mają realne neurony. Prawo XV.
@@ -147,6 +148,16 @@
 > V-14 Choppiness Index (trend vs konsolidacja). Pomiar dekorelacji (Prawo XVI):
 > V-13↔V-14 |r|=0.05–0.27 (dywersyfikacja), VI-13↔L-14 — VI-13 stały na danych
 > testowych, L-14 dostarcza pełną wariancję kat. L (komplementarność). Czyste OHLCV.
+
+> **Kat. H ożywiona — Hurst-DFA meta-brama** (2026-06-03, wizja W-053): H-01
+> NeuronHurstDFA mierzy pamięć długiego zasięgu metodą DFA (Detrended Fluctuation
+> Analysis, Peng i in. 1994) z Bramy (`HURST_DFA_100`). Nowa kategoria H = odrębna
+> oś informacji (persystencja vs Trend/Zmienność). Rola meta-bramy: H≈0.5 → NEUTRAL
+> („nie handluj, brak przewagi"). KOMPLEMENTARNY (Prawo XVI) do EXP-03 Hurst R/S:
+> DFA detrenduje okna → odporny na niestacjonarność, inny estymator tej samej
+> wielkości (jak duet Higuchi FD + Hurst R/S). Korelacja H-01↔EXP-03 do zmierzenia
+> `diagnostyka_korelacji` po zebraniu danych paper-tradingu. WAGI_REZIMU: H ×1.3
+> TREND_STRONG, ×1.2 RANGING, ×1.1 NORMAL.
 
 > **V-13 upgrade Yang-Zhang** (2026-06-03, wizja W-055): NeuronRealizedVol czyta
 > teraz `YANG_ZHANG_20` (annualizowana vol z pełnego OHLC, ~14× efektywniejszy

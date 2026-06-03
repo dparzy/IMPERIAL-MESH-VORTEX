@@ -63,6 +63,7 @@ class MikroNeuron(ABC):
     #   M=Momentum  T=Trend  V=Zmienność  F=Flow/Wolumen  O=On-chain
     #   L=Leverage  R=Reżim/Sentyment  S=Struktura(SMC)  A=Anty-manipulacja
     #   K=Makro/Intermarket  E=Entropia/AI  G=Geo/Regionalne
+    #   H=Hurst/Pamięć długiego zasięgu (meta-brama reżimu)
     KATEGORIA: str = "?"
     WAGA: int = 5
 

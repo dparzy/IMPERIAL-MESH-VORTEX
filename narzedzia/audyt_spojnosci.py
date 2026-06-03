@@ -272,6 +272,11 @@ def audyt() -> tuple:
                 href_clean = href.split("#")[0].strip()
                 if not href_clean:
                     continue
+                # Pomiń zewnętrzne URL-e (http/https/mailto) — W7 sprawdza tylko
+                # lokalne linki cross-doc. Uwaga: domeny jak "www.mdpi.com"
+                # zawierają ".md" i wpadały w regex jako fałszywy martwy link.
+                if re.match(r"^(https?:|mailto:|ftp:)", href_clean, re.I):
+                    continue
                 # Ścieżki względne od docs/
                 if href_clean.startswith("../"):
                     target = os.path.join(ROOT, href_clean[3:])

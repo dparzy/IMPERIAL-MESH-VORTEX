@@ -94,3 +94,13 @@ def test_audyt_w9_zielony_na_realnym_katalogu():
     bledy, _ = a.audyt()
     w9 = [b for b in bledy if "W9" in b]
     assert not w9, f"Rozjazd katalog↔kod w strategiach: {w9}"
+
+
+def test_audyt_w7_ignoruje_zewnetrzne_url():
+    """W7: zewnętrzne URL-e (np. www.mdpi.com zawierający '.md' w domenie) NIE są martwymi linkami."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, _ = a.audyt()
+    # WIZJONER.md zawiera realne linki http(s) z '.md' w domenie (mdpi.com itd.)
+    w7_url = [b for b in bledy if "W7" in b and "Martwe linki" in b
+              and ("http" in b or "mdpi" in b)]
+    assert not w7_url, f"W7 fałszywie oznaczył zewnętrzne URL-e jako martwe linki: {w7_url}"

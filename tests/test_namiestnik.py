@@ -131,6 +131,44 @@ def test_dyrygent_integracja_namiestnik():
     assert "NAMIESTNIK_CISZA" in decyzja.etap or "CISZA" in decyzja.powod
 
 
+def test_dyrygent_auto_rezim_klasyfikuje():
+    """rezim='AUTO' → Dyrygent woła klasyfikuj_rezim() (naprawa martwego kodu, Prawo XV)."""
+    from imperium.koloseum.namiestnik import Namiestnik
+    from imperium.koloseum.dyrygent import Dyrygent
+    from unittest.mock import MagicMock
+
+    # ADX>25 → klasyfikuj_rezim zwraca TREND_STRONG
+    wskazniki = {"ADX_14": 30.0, "ATR_DEVIATION": 1.0, "CLOSE": 100.0,
+                 "EMA_50": 90.0, "EMA_200": 80.0}
+
+    legatus_mock = MagicMock()
+    raport_mock = MagicMock()
+    raport_mock.weto = False
+    raport_mock.kierunek = "NEUTRAL"  # zatrzyma cykl po Legatusie, ale reżim już ustalony
+    raport_mock.pewnosc_agregatu = 0.4
+    raport_mock.rezim = "TREND_STRONG"
+    raport_mock.powod_weta = ""
+    raport_mock.strategie_dopasowane = []
+    legatus_mock.fokus.return_value = raport_mock
+
+    engine_mock = MagicMock()
+    engine_mock.kapital = 10000.0
+
+    d = Dyrygent(
+        legatus=legatus_mock,
+        kalkulator=MagicMock(),
+        engine=engine_mock,
+        wskazniki_provider=lambda _: wskazniki,
+        namiestnik=Namiestnik(),
+    )
+
+    d.cykl("BTCUSDT", [{"close": 100.0}], rezim="AUTO")
+    # Legatus dostał skonkretyzowany reżim, nie "AUTO"
+    _, kwargs = legatus_mock.fokus.call_args
+    assert kwargs.get("rezim") != "AUTO", "rezim AUTO nie został rozwiązany!"
+    assert kwargs.get("rezim") in ("TREND_STRONG", "RANGING", "VOLATILE", "NORMAL")
+
+
 def test_dyrygent_trend_strong_gra():
     """Dyrygent z Namiestnikiem: TREND_STRONG → tryb filtr aktywny."""
     from imperium.koloseum.namiestnik import Namiestnik

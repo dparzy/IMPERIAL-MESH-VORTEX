@@ -25,6 +25,7 @@ from typing import List, Dict, Any, Optional
 
 from imperium.akwedukty.czytnik_csv import wczytaj_csv
 from imperium.koloseum.dyrygent import Dyrygent
+from imperium.koloseum.namiestnik import get_namiestnik
 from imperium.koloseum.paper_trading import PaperTradingEngine, BarData
 from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara
 
@@ -48,14 +49,17 @@ def backtest(
     min_pewnosc: float = 0.55,
     tryb: str = "agregat",
     bary: Optional[List[Dict[str, Any]]] = None,
+    auto_rezim: bool = False,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
 
-    okno:      ile barów wstecz widzi rój przy każdej decyzji (potrzebne dla EMA_200)
-    max_barow: ogranicz liczbę przetworzonych barów (None = całość)
-    tryb:      rola warstwy strategii ("agregat" / "filtr" / "strategia")
-    bary:      opcjonalnie gotowe bary (oszczędza ponownego czytania CSV przy porównaniu trybów)
+    okno:       ile barów wstecz widzi rój przy każdej decyzji (potrzebne dla EMA_200)
+    max_barow:  ogranicz liczbę przetworzonych barów (None = całość)
+    tryb:       rola warstwy strategii ("agregat" / "filtr" / "strategia")
+    bary:       opcjonalnie gotowe bary (oszczędza ponownego czytania CSV przy porównaniu trybów)
+    auto_rezim: True → klasyfikuj_rezim() na każdym barze + Namiestnik steruje
+                trybem/dźwignią/progiem (Faza 1 ożywiona). False → stary "NORMAL".
     """
     from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
     from imperium.legiony.rejestr import zbuduj_legatusa
@@ -68,11 +72,15 @@ def backtest(
     symbol = bary[0]["symbol"]
     legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
     budowniczy = BudowniczyWskaznikow()
+    suffix = "-AUTO" if auto_rezim else ""
     engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
-                                sesja_id=f"BT-{symbol}-{interwal}-{tryb}")
+                                sesja_id=f"BT-{symbol}-{interwal}-{tryb}{suffix}")
+    # auto_rezim → wstrzyknij Namiestnika (Regime-Aware Gating); inaczej tryb statyczny.
+    namiestnik = get_namiestnik() if auto_rezim else None
     dyrygent = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(),
                         engine=engine, budowniczy=budowniczy,
-                        min_pewnosc=min_pewnosc, tryb=tryb)
+                        min_pewnosc=min_pewnosc, tryb=tryb, namiestnik=namiestnik)
+    rezim_arg = "AUTO" if auto_rezim else "NORMAL"
 
     wejscia = 0
     weta = 0
@@ -85,7 +93,7 @@ def backtest(
 
         # 2. Decyzja na podstawie okna
         decyzja = dyrygent.cykl(symbol, okno_barow,
-                                rezim="NORMAL", timestamp=biezacy["timestamp"])
+                                rezim=rezim_arg, timestamp=biezacy["timestamp"])
         if decyzja.wszedl:
             wejscia += 1
         elif decyzja.etap in ("PRETORIANIE_WETO", "LEGATUS_WETO"):

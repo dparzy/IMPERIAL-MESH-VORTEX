@@ -6,6 +6,48 @@
 
 ---
 
+## 2026-06-03 | MAJOR | Namiestnik podłączony do backtestu + tabela dowodowa (Prawo XV+XVI)
+
+### Kontekst (głęboki audyt Prawo XV)
+Audyt wykrył 🚨 UTRATĘ POTENCJAŁU: Namiestnik (i cały system reżimowy) był MARTWY
+w backteście — `backtest.py` hardkodował `rezim="NORMAL"` i nie wstrzykiwał Namiestnika.
+Stare `WAGI_REZIMU` też nigdy nie działały w backteście. Naprawione.
+
+### Co zostało wdrożone (#1 — podłączenie)
+- **`dyrygent.py`**: `cykl(rezim="AUTO")` → woła `klasyfikuj_rezim(wskazniki)` (Prawo I:
+  dane z Bramy, nie zgadywanie). Reżim rozwiązany PRZED Namiestnikiem i Legatusem.
+- **`backtest.py`**: parametr `auto_rezim: bool`. True → wstrzykuje `get_namiestnik()`
+  + `rezim="AUTO"`. False → zachowanie wsteczne (NORMAL, bez Namiestnika).
+- **`narzedzia/pomiar_namiestnik.py`**: skrypt tabeli dowodowej BASELINE vs NAMIESTNIK.
+- **`tests/test_namiestnik.py`**: +1 test (`test_dyrygent_auto_rezim_klasyfikuje`)
+  blokujący powrót martwego kodu.
+
+### Tabela dowodowa #2 (Prawo XVI — mierzone, nie opinia)
+| Zestaw | BASELINE PnL | NAMIESTNIK PnL | Δ PnL | Δ MaxDD |
+|--------|-------------|----------------|-------|---------|
+| BTC 1D | +32.71% | +19.43% | -13.28pp | 23.8→23.1% |
+| ETH 1D | +23.80% | +17.16% | -6.64pp | 26.4→**16.8%** |
+| BTC 1H | -4.34% | -3.73% | +0.62pp | 13.9→**7.4%** |
+| ETH 1H | -9.14% | **+4.56%** | **+13.70pp** | 11.2→11.8% |
+
+### Uczciwy werdykt (Prawo I — bez upiększania)
+Wynik **MIESZANY**, nie jednoznaczne zwycięstwo:
+- **1H (choppy/intraday): Namiestnik wygrywa** — ETH 1H strata→zysk (+13.7pp, PF 0.77→1.11),
+  BTC 1H drawdown o połowę (13.9→7.4%), wyższy WinRate.
+- **1D (silny bull): Namiestnik traci zysk** — bo `RANGING→czy_grac=False` i niższa dźwignia
+  wycinają część hossy. DD jednak niższy (ETH 1D 26→17%).
+- **Wniosek:** architektura DZIAŁA i jest mierzalna; tablica jest przestrojona zbyt
+  defensywnie na rynkach trendujących. Namiestnik = redukcja ryzyka kosztem zysku w bullu.
+
+### Następny krok (Faza 1.1 — przestrojenie tablicy na dowodach)
+RANGING na 1D nie powinno być pełną ciszą (gubi hossę). Kandydaci: RANGING→czy_grac=True
+z niższą dźwignią; rozdzielenie progów per-interwał. Do zmierzenia w kolejnej iteracji.
+
+### Testy
+339/339 zielone (+1). Audyt spójności: pełna harmonia.
+
+---
+
 ## 2026-06-02 | MAJOR | Namiestnik (Regime-Aware Gating Network) — Faza 1
 
 ### Kontekst

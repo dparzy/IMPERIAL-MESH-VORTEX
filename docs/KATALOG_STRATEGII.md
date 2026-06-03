@@ -477,11 +477,12 @@ Każda strategia zawiera:
 **Neurony:** `XII-01` EMA(50/200) układ, `XII-04` Supertrend, `XII-08` OBV (potwierdzenie wolumenem VCP — Volatility Contraction Pattern)
 **Status:** SZKIC
 
-### IMV-SC-003 | "DWULISTNY PULLBACK" | Al Brooks M2B/M2S
+### X-SC-003 | "BROOKS M2B" (Dwulistny Pullback) | Al Brooks M2B/M2S
 **Źródło:** WebSearch — Al Brooks (Two-legged Pullback to MA, 5-min charts)
-**Interwał:** M5 | **Warunki:** trend + dwunożny pullback do EMA20
+**Interwał:** M5/M15 | **Warunki:** trend + dwunożny pullback do EMA20
 **Neurony:** `X-01` EMA(9/21) (kierunek+pullback), `X-05` OrderFlow (siła odbicia), `X-02` StochRSI (timing)
-**Zasada Brooksa:** institutional piggybacking — wchodzimy po pullbacku w kierunku trendu. **Status:** SZKIC
+**Zasada Brooksa:** institutional piggybacking — wchodzimy po pullbacku w kierunku trendu. **Status:** ✅ W KODZIE (`rejestr_strategii.py`, klucz `X-SC-003`)
+> *Uwaga (Prawo XXI): historycznie szkicowane jako IMV-SC-003 — kanoniczny klucz to `X-SC-003` (Legio X Scalp), zgodny z kodem.*
 
 ### IMV-RG-002 | "RYTM LIVERMORE'A" | Pivotal Points
 **Źródło:** WebSearch — Jesse Livermore (pivotal points, pyramiding)

@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-03 | MAJOR | Faza C — V-03 CVD obudzony (adapter trade-feed publiczny, Prawo XV)
+
+### Kontekst
+V-03 CVD (Cumulative Volume Delta, kat. F) wyciszony — OHLCV nie zawiera strony
+agresora (kto market-kupował vs sprzedawał). Potrzebny trade-feed.
+
+### Co zostało wdrożone (kod)
+- **AdapterCVD** (`akwedukty/adaptery/cvd.py`) — publiczny feed Binance aggTrades
+  (`fapi/v1/aggTrades`) BEZ klucza API. CVD = Σ(buy) − Σ(sell) z okna transakcji
+  (pole `m`=isBuyerMaker: false→buy, true→sell). Wstrzykiwany fetcher (test offline);
+  pamięć CVD_PREV per symbol (dla dywergencji V-03).
+- **V-03 obudzony** (DOSTEPNY=True) — kat. F: 5→6 aktywnych.
+- **Adapter wpięty w pipeline Dyrygenta** — `Dyrygent.zbuduj(adaptery_live=True)`
+  domyślnie wpina AdapterFutures + AdapterFearGreed + AdapterCVD.
+
+### Prawo I/XV — uczciwość
+W backteście CSV (bez trade-feedu) V-03 ABSTYNUJE (NEUTRAL). Live/paper: AdapterCVD
+liczy CVD z publicznego aggTrades → V-03 głosuje (znak CVD + dywergencja vs cena).
+
+### Stan po Fazie C
+- Neurony: 44 (aktywne 37, wyciszone 7 = OC-01..04 + SMC-01..03).
+- Testy: 362/362. Audyt: pełna harmonia.
+
+### Następna faza
+- Faza D: OC-01..04 on-chain (Glassnode/CryptoQuant API — wymaga klucza, os.getenv).
+
+---
+
 ## 2026-06-03 | MAJOR | Faza B — kategoria R obudzona (adaptery futures publiczne, Prawo XV)
 
 ### Kontekst

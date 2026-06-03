@@ -125,8 +125,8 @@ class Dyrygent:
                                     sesja_id=sesja_id, log_dir=log_dir)
         adaptery = []
         if adaptery_live:
-            from imperium.akwedukty.adaptery import AdapterFutures, AdapterFearGreed
-            adaptery = [AdapterFutures(), AdapterFearGreed()]
+            from imperium.akwedukty.adaptery import AdapterFutures, AdapterFearGreed, AdapterCVD
+            adaptery = [AdapterFutures(), AdapterFearGreed(), AdapterCVD()]
         return cls(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
                    budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
                    namiestnik=get_namiestnik(), adaptery=adaptery)

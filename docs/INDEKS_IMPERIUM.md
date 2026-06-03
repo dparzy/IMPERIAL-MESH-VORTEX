@@ -77,7 +77,7 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 |---------|-----------------|-------|--------|
 | `imperium/akwedukty/` | Rurociąg danych — pobieranie świec z MEXC przez CCXT | Akwedukty (Data Pipeline) | ✅ Gotowy |
 | `imperium/fundament/` | Brama Kalkulatora — TA-Lib oblicza wskaźniki, SHA-256 podpisuje | Calculator Gate | ✅ Gotowy |
-| `imperium/legiony/` | Legiony — mikro-neurony (44), Legatus, zwiadowcy (12), strategie (17) | Scout Legions | ✅ Rdzeń aktywny |
+| `imperium/legiony/` | Legiony — mikro-neurony (46), Legatus, zwiadowcy (12), strategie (17) | Scout Legions | ✅ Rdzeń aktywny |
 | `imperium/pretorianie/` | Pretorianie — weto ryzyka, ochrona kapitału | Risk Praetorians | ✅ Gotowy |
 | `imperium/senat/` | Senat — debata Popularów vs Optymantów nad sygnałem | Senate Debate | 🟡 Szkielet |
 | `imperium/cesarz/` | Cesarz — DeepSeek LLM podejmuje ostateczną decyzję | Emperor (LLM) | 🟡 Szkielet |

@@ -117,3 +117,108 @@ class NeuronRealizedVol(MikroNeuron):
 
         return self._bazowy_sygnal(hv, "SHORT", 0.78,
             [f"HV={hv:.1%} — ekstremalna zmienność, obrona kapitału"])
+
+
+class NeuronChoppiness(MikroNeuron):
+    """
+    V-14 | Choppiness Index — trend kontra konsolidacja (kategoria V).
+
+    Dla nowicjusza: Choppiness Index (CHOP) mówi, czy rynek IDZIE w jedną stronę
+    (trend), czy "miele w miejscu" (konsolidacja/piła). Skala 0–100:
+      > 61.8 → konsolidacja (piła) → SHORT bias (nie goń wybić, fałszywe ruchy)
+      38.2–61.8 → strefa przejściowa → NEUTRAL
+      < 38.2 → silny trend → LONG bias (ruch jest efektywny, podążaj)
+
+    Dlaczego osobny neuron od V-13 (Realized Volatility): HV mierzy MAGNITUDĘ
+    wahań (jak mocno), CHOP mierzy EFEKTYWNOŚĆ ruchu (czy dokądś zmierza).
+    Rynek może mieć wysoką HV i niski CHOP (silny zmienny trend) — to różna
+    informacja, więc dekoreluje (Prawo XVI).
+
+    Źródło: E.W. Dreiss, Choppiness Index (commodity trading, lata 90.) —
+    branżowy wskaźnik reżimu trend/range.
+    """
+    KLUCZ = "V-14"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "CHOPPINESS_14"
+    KATEGORIA = "V"
+    WAGA = 7
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    _PROG_TREND = 38.2      # < 38.2 → silny trend
+    _PROG_KONSOLIDACJA = 61.8  # > 61.8 → konsolidacja (piła)
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        chop = wskazniki.get("CHOPPINESS_14")
+
+        if chop is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak CHOPPINESS_14"])
+
+        if chop < self._PROG_TREND:
+            return self._bazowy_sygnal(chop, "LONG", 0.62,
+                [f"CHOP={chop:.1f} — silny trend, ruch efektywny (podążaj)"])
+
+        if chop <= self._PROG_KONSOLIDACJA:
+            return self._bazowy_sygnal(chop, "NEUTRAL", 0.40,
+                [f"CHOP={chop:.1f} — strefa przejściowa"])
+
+        return self._bazowy_sygnal(chop, "SHORT", 0.60,
+            [f"CHOP={chop:.1f} — konsolidacja/piła, unikaj fałszywych wybić"])
+
+
+class NeuronUlcer(MikroNeuron):
+    """
+    L-14 | Ulcer Index — ryzyko spadkowe modulujące dźwignię (kategoria L).
+
+    Dla nowicjusza: Ulcer Index (UI) mierzy "ból posiadania" — jak głębokie i
+    jak długie były obsunięcia (drawdowny) w ostatnim oknie. W odróżnieniu od
+    ATR (który liczy zwykły zakres, symetrycznie góra/dół), UI karze TYLKO ruch
+    w dół. Im wyższy UI, tym mocniejsze osuwanie się ceny → mniejsza bezpieczna
+    dźwignia.
+
+    Logika:
+      < 1%   → płytkie obsunięcia → LONG (bezpieczna dźwignia)
+      1–4%   → umiarkowane → NEUTRAL
+      > 4%   → bolesne obsunięcia → SHORT (redukuj dźwignię/ryzyko)
+      > 8%   → ekstremalne → SHORT silny
+
+    Dlaczego osobny neuron od VI-13 (ATR-Leverage): ATR jest symetryczny i mierzy
+    POZIOM zmienności; UI mierzy ASYMETRIĘ spadkową (downside) — różna informacja,
+    dekoreluje (Prawo XVI).
+
+    Źródło: Peter Martin, "The Investor's Guide to Fidelity Funds" (1989) —
+    Ulcer Index jako miara ryzyka downside.
+    """
+    KLUCZ = "L-14"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "ULCER_14"
+    KATEGORIA = "L"
+    WAGA = 7
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    _PROG_PLYTKI = 1.0     # UI < 1% → płytkie obsunięcia
+    _PROG_UMIARKOWANY = 4.0  # UI < 4% → umiarkowane
+    _PROG_EKSTREMALNY = 8.0  # UI > 8% → ekstremalne
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        ui = wskazniki.get("ULCER_14")
+
+        if ui is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak ULCER_14"])
+
+        if ui < self._PROG_PLYTKI:
+            return self._bazowy_sygnal(ui, "LONG", 0.62,
+                [f"UI={ui:.2f}% — płytkie obsunięcia, bezpieczna dźwignia"])
+
+        if ui <= self._PROG_UMIARKOWANY:
+            return self._bazowy_sygnal(ui, "NEUTRAL", 0.40,
+                [f"UI={ui:.2f}% — umiarkowane ryzyko spadkowe"])
+
+        if ui <= self._PROG_EKSTREMALNY:
+            sila = 0.60 + (ui - self._PROG_UMIARKOWANY) / (self._PROG_EKSTREMALNY - self._PROG_UMIARKOWANY) * 0.15
+            return self._bazowy_sygnal(ui, "SHORT", sila,
+                [f"UI={ui:.2f}% — bolesne obsunięcia, redukuj dźwignię"])
+
+        return self._bazowy_sygnal(ui, "SHORT", 0.80,
+            [f"UI={ui:.2f}% — ekstremalne ryzyko spadkowe, obrona kapitału"])

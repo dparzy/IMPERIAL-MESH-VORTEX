@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-03 | MAJOR | Rozbudowa roju — kat. L+V wzmocnione (Ulcer + Choppiness, Prawo XVI)
+
+### Kontekst
+Kategorie L (dźwignia) i V (zmienność) miały po 1 neuronie — najcieńsze w roju,
+ledwo wpływały na wagi reżimowe. Mierzona rozbudowa zdekorelowanymi sygnałami.
+
+### Co zostało wdrożone (kod)
+- **L-14 NeuronUlcer** (kat. L) — Ulcer Index: ryzyko SPADKOWE (głębokość/czas
+  obsunięć), karze tylko ruch w dół. Dekoreluje z VI-13 (ATR symetryczny).
+- **V-14 NeuronChoppiness** (kat. V) — Choppiness Index: trend vs konsolidacja
+  (efektywność ruchu). Dekoreluje z V-13 (HV = magnituda wahań).
+- **Brama** (`fundament/brama_kalkulatora.py`) — pure-Python `_py_ulcer`,
+  `_py_choppiness` + wpisy rejestru ULCER, CHOPPINESS (Prawo I — jedyne wejście).
+- **Budowniczy** — ULCER_14, CHOPPINESS_14 w `_PLAN_SKALARNE`.
+- **Rejestr** — oba neurony w `wszystkie_neurony()`. Czyste OHLCV, bez API.
+
+### Pomiar dekorelacji (Prawo XVI — nie opinia)
+Seria sygnałów (LONG=+1/NEUTRAL=0/SHORT=−1) po oknie kroczącym, korelacja Pearsona
+na dołączonych danych (ETH_1d, BTC_1h):
+- **V-13 ↔ V-14:** |r| = 0.05–0.27 → dywersyfikacja (filar siły, oba zostają).
+- **VI-13 ↔ L-14:** VI-13 stały (SHORT) na danych syntetycznych → L-14 dostarcza
+  PEŁNĄ wariancję kat. L (LONG/NEUTRAL/SHORT, UI 0.24–12.0) → komplementarność.
+
+### Stan
+- Neurony: 46 (aktywne 39, wyciszone 7). Testy: 381/381. Audyt: pełna harmonia.
+
+---
+
 ## 2026-06-03 | FIX+TESTY | Backtest ożywiony — czytnik prostego formatu + testy Dyrygenta (Prawo XIX)
 
 ### Kontekst

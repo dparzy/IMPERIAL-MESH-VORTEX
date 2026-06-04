@@ -829,6 +829,14 @@ def test_n01_brak_danych_neutral():
     assert NeuronPermutationEntropy().interpretuj({}).kierunek == "NEUTRAL"
 
 
+def test_n01_plaska_cena_nie_short():
+    """N-01: płaska cena (CLOSE == CLOSE_PREV) → brak kierunku → NEUTRAL, nie SHORT."""
+    from imperium.legiony.neurony.entropia import NeuronPermutationEntropy
+    s = NeuronPermutationEntropy().interpretuj(
+        {"PERM_ENTROPY_100": 0.40, "CLOSE": 100, "CLOSE_PREV": 100})
+    assert s.kierunek == "NEUTRAL", "Płaska cena nie może dać kierunkowego SHORT"
+
+
 def test_n01_kategoria_N_zywa():
     """Kategoria N żywa w roju i poprawnie w legendzie (Prawo XV/XXI)."""
     from imperium.legiony.rejestr import wszystkie_neurony

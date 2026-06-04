@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-06-04 | FIX | Review PR #57 — płaska cena N-01, brakujące wiersze KATALOG, spójność testów README
+
+**Opis:** Trzy poprawki ze zewnętrznej recenzji:
+1. **N-01 entropia.py:** płaska cena (`CLOSE == CLOSE_PREV`) była błędnie klasyfikowana jako SHORT. Teraz `kierunek_ruchu = None` przy braku ruchu → NEUTRAL (nie wymuszamy kierunku bez ruchu). +1 test `test_n01_plaska_cena_nie_short`.
+2. **KATALOG_NEURONOW.md:** legenda zapowiadała kategorie N i Z, ale tabela nie miała wierszy. Dodano N-01 (PermutationEntropy), Z-01 (ToxicFlow), Z-02 (PumpDetect).
+3. **README.md / INDEKS:** zsynchronizowano liczbę testów (495/495) we wszystkich miejscach.
+**Powód:** Prawo XXI — chirurgiczna spójność; usunięcie kierunkowego sygnału bez ruchu.
+**Pliki:** `imperium/legiony/neurony/entropia.py`, `tests/test_neurony.py`, `docs/KATALOG_NEURONOW.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`
+**Testy:** 495/495 ✅. Audyt: exit 0 ✅.
+
+---
+
 ## 2026-06-04 | FEATURE | NeuronPumpDetect Z-02 — detekcja akumulacji przed pumpem (wizja W-042)
 
 **Opis:** Nowy neuron Z-02 NeuronPumpDetect wykrywa cichą akumulację smart money przed pumpem. Pure-OHLCV, 3 warunki: wolumen ×1.5–4× MA20, wąski zakres świecy (< 0.75× ATR), OBV rośnie (> OBV_EMA_20 × 1.005). Gdy wszystkie 3 naraz → LONG, pewność 0.55–0.85 skalowana stopniem spełnienia. Ortogonalny wobec Z-01 (obrona vs ofensywa).

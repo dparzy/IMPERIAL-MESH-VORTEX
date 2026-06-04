@@ -752,6 +752,25 @@ def test_h01_brak_danych_neutral():
     assert NeuronHurstDFA().interpretuj({}).kierunek == "NEUTRAL"
 
 
+def test_h01_plaska_cena_nie_short():
+    """H-01: płaska cena (CLOSE == CLOSE_PREV) → brak kierunku → NEUTRAL, nie SHORT."""
+    from imperium.legiony.neurony.fraktal import NeuronHurstDFA
+    s = NeuronHurstDFA().interpretuj(
+        {"HURST_DFA_100": 0.70, "CLOSE": 100, "CLOSE_PREV": 100})
+    assert s.kierunek == "NEUTRAL", "Płaska cena nie może dać kierunkowego SHORT"
+
+
+def test_hurst_dfa_nieujemna_cena_fallback():
+    """Brama: HURST_DFA z niedodatnią ceną → None (bez math domain error, Prawo I)."""
+    from imperium.fundament.brama_kalkulatora import CalculatorGateway
+    g = CalculatorGateway()
+    # świeca o cenie 0 w środku serii nie może wysadzić log()
+    c = [100.0 + i * 0.1 for i in range(120)]
+    c[60] = 0.0
+    r = g.compute("HURST_DFA", close=c, period=120)  # nie rzuca math domain error
+    assert r.value is None or isinstance(r.value, float)
+
+
 def test_h01_kategoria_H_zywa():
     """Kategoria H żywa w roju i poprawnie w legendzie (Prawo XV/XXI)."""
     from imperium.legiony.rejestr import wszystkie_neurony

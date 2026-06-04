@@ -5,7 +5,9 @@ Przed każdą pozycją lewarowaną MUSI policzyć:
   - dokładną cenę likwidacji
   - stop-loss (min 50% drogi do likwidacji)
   - take-profit (min R:R 1:2)
-  - rozmiar pozycji (max 2% kapitału)
+  - rozmiar pozycji (baza 2% kapitału; vol-targeting W-059 może świadomie
+    podnieść do 1.5× w spokoju + przewadze, więc realne ryzyko bywa > 2% —
+    ryzyko_usdt raportuje faktyczną wartość po skalowaniu, nie bazę)
   - dźwignię dynamiczną (z pewności agregatu)
 
 Zasada Żelazna: jeśli cokolwiek nie przejdzie checklist → WETO.
@@ -336,6 +338,13 @@ class KalkulatorLewara:
         # Brak skalowania_dd → frakcja 1.0 (kompatybilność wsteczna, zero zmian).
         frakcja_dd = skalowanie_dd.frakcja() if skalowanie_dd is not None else 1.0
         rozmiar_usdt *= frakcja_dd
+
+        # 5e. Uczciwy raport ryzyka (Prawo I): ryzyko_usdt liczymy z FINALNEGO
+        # rozmiaru po wszystkich skalowaniach. Vol-targeting może świadomie podnieść
+        # rozmiar > bazowego 2% (W-059, spokojny rynek + wyraźna przewaga = większy
+        # zakład), więc realne ryzyko bywa > MAX_RYZYKO — i raport musi to pokazać,
+        # nie udawać twardego capu 2%.
+        ryzyko_usdt = rozmiar_usdt * stop_pct
 
         # 6. Take-profit (min R:R 1:2)
         ruch_sl = abs(cena_wejscia - stop_loss)

@@ -298,8 +298,12 @@ def _py_hurst_dfa(close, period: int = 100) -> Optional[float]:
     if len(c) < period:
         return None
     seria = c[-period:]
-    # log-zwroty
-    x = [math.log(seria[i] / seria[i - 1]) for i in range(1, len(seria)) if seria[i - 1] > 0]
+    # log-zwroty — obie świece muszą być dodatnie (log domain), inaczej brak danych
+    x = []
+    for i in range(1, len(seria)):
+        if seria[i - 1] <= 0 or seria[i] <= 0:
+            return None
+        x.append(math.log(seria[i] / seria[i - 1]))
     n_x = len(x)
     if n_x < 16:
         return None

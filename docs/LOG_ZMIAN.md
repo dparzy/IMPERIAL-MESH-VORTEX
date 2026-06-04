@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-06-04 | FIX | Review PR #55 — uczciwy raport ryzyka vol, log domain HURST, płaska cena H-01, spójność liczb
+
+**Opis:** Poprawki ze zewnętrznej recenzji:
+1. **kalkulator_lewara.py (P1):** vol-targeting (W-059) mógł podnieść rozmiar do 1.5×, a `ryzyko_usdt` raportowało bazowe 2% — teraz liczone z FINALNEGO rozmiaru (Prawo I). Decyzja Cezara: upsizing w spokoju + wyraźnej przewadze jest celowy, więc zostaje; raport pokazuje realne ryzyko, docstring zaktualizowany.
+2. **brama_kalkulatora.py (P2):** HURST_DFA mógł rzucić math domain error przy niedodatniej cenie bieżącej — teraz walidujemy obie świece przed `log()`, fallback None.
+3. **fraktal.py (P2):** płaska cena (CLOSE==CLOSE_PREV) klasyfikowana jako SHORT → teraz NEUTRAL (jak N-01).
+4. **MANIFEST/README (P2):** wiersz RAZEM i backlog zsynchronizowane do 51 neuronów (248 do wdrożenia).
+**Powód:** Prawo I (uczciwy raport ryzyka), Prawo XIX/XXI (spójność liczb).
+**Pliki:** `imperium/pretorianie/kalkulator_lewara.py`, `imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/neurony/fraktal.py`, `tests/test_neurony.py`, `docs/MANIFEST_KODU.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`
+**Testy:** 497/497 ✅. Audyt: exit 0 ✅.
+
+---
+
 ## 2026-06-04 | FIX | Review PR #57 — płaska cena N-01, brakujące wiersze KATALOG, spójność testów README
 
 **Opis:** Trzy poprawki ze zewnętrznej recenzji:

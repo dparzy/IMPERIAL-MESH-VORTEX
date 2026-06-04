@@ -6,15 +6,18 @@ Uruchamiany automatycznie przez hooki Claude Code (SessionStart + Stop) oraz rę
     python narzedzia/audyt_spojnosci.py            # raport + exit code
     python narzedzia/audyt_spojnosci.py --cichy     # tylko gdy są błędy
 
-Sprawdza 7 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
-  Warstwa 1 — żywy rój:        liczby, kategorie, elity, klucze
-  Warstwa 2 — infrastruktura:  WAGI_REZIMU vs KAT w kodzie
-  Warstwa 3 — dokumentacja:    MANIFEST klucze vs kod, liczby README/MANIFEST/CLAUDE
-  Warstwa 4 — strategie:       Klucznik — klucze w strategiach vs kod
-  Warstwa 5 — INDEKS:          liczby w INDEKS_IMPERIUM vs żywy kod
-  Warstwa 6 — daty:            "Stan na:" w MANIFEST i README = bieżący dzień lub niedawno
-  Warstwa 7 — sieroty:         pliki docs/ w INDEKS, linki cross-docs istnieją na dysku
-  Warstwa 8 — LOG_ZMIAN:       jeśli kod zmieniony, LOG_ZMIAN ma wpis z bieżącą datą
+Sprawdza 11 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
+  Warstwa 1  — żywy rój:        liczby, kategorie, elity, klucze
+  Warstwa 2  — infrastruktura:  WAGI_REZIMU vs KAT w kodzie
+  Warstwa 3  — dokumentacja:    MANIFEST klucze vs kod, liczby README/MANIFEST/CLAUDE
+  Warstwa 4  — strategie:       Klucznik — klucze w strategiach vs kod
+  Warstwa 5  — INDEKS:          liczby w INDEKS_IMPERIUM vs żywy kod
+  Warstwa 6  — daty:            "Stan na:" w MANIFEST i README = bieżący dzień lub niedawno
+  Warstwa 7  — sieroty:         pliki docs/ w INDEKS, linki cross-docs istnieją na dysku
+  Warstwa 8  — LOG_ZMIAN:       jeśli kod zmieniony, LOG_ZMIAN ma wpis z bieżącą datą
+  Warstwa 9  — KATALOG_STRATEGII: cytowane klucze neuronów = klucze zaimplementowane
+  Warstwa 10 — słowa kluczowe:  kluczowe dokumenty modułowe zawierają wymagane terminy
+  Warstwa 11 — biblioteki/:     moduły w imperium/biblioteki/ wymienione w INDEKS_IMPERIUM
 
 Exit code:
   0 = pełna spójność (Imperium gotowe)
@@ -358,7 +361,66 @@ def audyt() -> tuple:
     except Exception as e:
         bledy.append(f"[W9] Błąd sprawdzania kluczy KATALOG_STRATEGII: {e}")
 
+    # ── WARSTWA 10: SŁOWA KLUCZOWE W DOKUMENTACH MODUŁOWYCH ─────────────────
+    bledy += _warstwa_10_doc_keywords()
+
+    # ── WARSTWA 11: BIBLIOTEKI/ MODUŁY W INDEKS ───────────────────────────────
+    bledy += _warstwa_11_biblioteki_indeks()
+
     return bledy, info
+
+
+def _warstwa_10_doc_keywords():
+    """W10 — słowa kluczowe w dokumentach modułowych (spójność z kodem)."""
+    bledy = []
+
+    # Each entry: (file_path, required_keyword, error_message)
+    checks = [
+        ("docs/KALKULATOR_LEWARA.md", "vol_targeting",
+         "KALKULATOR_LEWARA.md brak 'vol_targeting' — dodaj sekcję Volatility Targeting (W-059)"),
+        ("docs/KALKULATOR_LEWARA.md", "skala_vol",
+         "KALKULATOR_LEWARA.md brak 'skala_vol' — PlanPozycji.skala_vol nie opisane"),
+        ("docs/IGRZYSKA_IMPERIUM.md", "HedgeMWU",
+         "IGRZYSKA_IMPERIUM.md brak 'HedgeMWU' — dodaj sekcję online learning (W-049)"),
+        ("docs/IGRZYSKA_IMPERIUM.md", "obserwatorzy",
+         "IGRZYSKA_IMPERIUM.md brak 'obserwatorzy' — observer pattern Igrzyska nie opisany"),
+        ("docs/GENERAL_LEGATUS.md", "mnozniki_neuronow",
+         "GENERAL_LEGATUS.md brak 'mnozniki_neuronow' — HedgeMWU→Legatus integracja nie opisana"),
+        ("docs/GENERAL_LEGATUS.md", "HedgeMWU",
+         "GENERAL_LEGATUS.md brak 'HedgeMWU' — online learning nie opisane"),
+        ("docs/LEGIONY_ARCHITEKTURA.md", "Hurst",
+         "LEGIONY_ARCHITEKTURA.md brak 'Hurst' — kategoria H nie opisana w legendzie"),
+        ("docs/ARCHITEKTURA_IMPERIUM.md", "21",
+         "ARCHITEKTURA_IMPERIUM.md brak '21' praw — aktualizuj z 19→21"),
+    ]
+
+    for fpath, keyword, msg in checks:
+        try:
+            with open(os.path.join(ROOT, fpath), encoding="utf-8") as f:
+                content = f.read()
+            if keyword.lower() not in content.lower():
+                bledy.append(f"[W10] {msg}")
+        except FileNotFoundError:
+            bledy.append(f"[W10] Brak pliku: {fpath}")
+
+    return bledy
+
+
+def _warstwa_11_biblioteki_indeks():
+    """W11 — moduły w imperium/biblioteki/ muszą być wymienione w INDEKS_IMPERIUM."""
+    bledy = []
+    try:
+        bib_dir = os.path.join(ROOT, "imperium/biblioteki")
+        modules = [f[:-3] for f in os.listdir(bib_dir)
+                   if f.endswith(".py") and not f.startswith("_")]
+        with open(os.path.join(ROOT, "docs/INDEKS_IMPERIUM.md"), encoding="utf-8") as f:
+            indeks = f.read()
+        for mod in sorted(modules):
+            if mod not in indeks:
+                bledy.append(f"[W11] Moduł biblioteki '{mod}' nie wymieniony w INDEKS_IMPERIUM.md")
+    except Exception as e:
+        bledy.append(f"[W11] Błąd sprawdzania biblioteki: {e}")
+    return bledy
 
 
 def main():

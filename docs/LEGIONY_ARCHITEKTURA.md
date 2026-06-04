@@ -153,6 +153,24 @@ class SygnalNeuronu:
 }
 ```
 
+### Legenda kategorii neuronów (pole `KATEGORIA` w kodzie)
+
+| Litera | Kategoria | Przykłady |
+|--------|-----------|-----------|
+| M | Momentum | RSI, StochRSI, MACD |
+| T | Trend | EMA cross, ADX, Supertrend |
+| V | Zmienność | ATR, Bollinger Bands, Choppiness |
+| F | Flow/Wolumen | CVD, OBV, Open Interest |
+| O | On-chain | MVRV, SOPR, Exchange Netflow |
+| L | Lewarowanie | FundingRate, ATR-Lev, Ulcer |
+| R | Rynki pochodne | Futures OI, Max Pain, LS-Ratio |
+| S | Smart Money | BOS, CHoCH, Order Blocks |
+| A | Anty-manipulacja | Wykrywanie fałszywych wybić |
+| K | Korelacja | Korelacje między aktywami |
+| E | Eksploracja | EXP-* eksperymenty (Higuchi, Hurst R/S) |
+| G | Giełdowe | Wolumeny, płynność |
+| H | Hurst/Pamięć długiego zasięgu | H-01 DFA — meta-brama reżimu: H>0.55 persystencja, H<0.45 antypersystencja, H≈0.5 NEUTRAL |
+
 > **Zasada Prawa I:** `wartosc` ZAWSZE pochodzi z Bramy Kalkulatora (TA-Lib).
 > Neuron NIGDY nie liczy wskaźnika samodzielnie. Pyta Bramę → interpretuje wynik.
 

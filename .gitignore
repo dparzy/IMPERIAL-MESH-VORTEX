@@ -6,6 +6,7 @@ __pycache__/
 # Wyniki biegow Imperium (generowane)
 imperium/**/wykres_biegu.png
 imperium/**/raport_biegu_*.md
+imperium/**/raport_biegu_*.json
 imperium/**/DZIENNIK_WYNIKOW.md
 imperium/**/dane/*.csv
 

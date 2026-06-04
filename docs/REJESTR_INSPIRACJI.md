@@ -203,6 +203,9 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 | INF-07 | Reflexion — verbal self-reflection agent (Noah Shinn) | https://github.com/noahshinn/reflexion | Feedback loop Cesarza — uczy się z własnych błędów (W-018) | Faza 2 |
 | INF-08 | Outlines — structured generation (dottxt-ai) | https://github.com/dottxt-ai/outlines | Zero-hallucination JSON output dla DeepSeek (W-017) | Faza 1 |
 | INF-09 | Guardrails AI — LLM output validation | https://github.com/guardrails-ai/guardrails | Pretorianie AI — weto nad halucynacjami LLM | Faza 1 |
+| INF-10 | Path Signature Transform — Rough Path Signature (Chen's Iterated Integrals, Lyons 1998) | https://arxiv.org/pdf/1307.7244 | Neuron geometrii ścieżki: Lévy Area Close↔Volume = kolejność przyczynowa (W-079, kat. D) | Faza 1 |
+| INF-11 | Hawkes Branching Ratio — samowzmacniający proces punktowy (Hardiman & Bouchaud, Phys. Rev. E 2014) | https://arxiv.org/abs/1403.5227 | Neuron endogeniczności: n̂→1 = rynek krytyczny (kaskada PANIC), sensor reżimu (W-080, kat. R/F) | Faza 1 |
+| INF-12 | MFDFA — Multifractal Detrended Fluctuation Analysis (Rydin Gorjão et al., SoftwareX 2021) | https://arxiv.org/pdf/2104.10470 | Neuron wielofraktalny: szerokość spektrum Δα = heterogeniczność fluktuacji, early-warning (W-081, kat. F/D) | Faza 1 |
 
 > **Pełna lista (~220 narzędzi):** `docs/ARSENAL_IMPERIUM.md` — schemat architektoniczny + tabele weryfikacyjne.
 

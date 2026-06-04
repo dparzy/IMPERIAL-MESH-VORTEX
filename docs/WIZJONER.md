@@ -1162,3 +1162,79 @@ Nie "albo-albo" — **trójfazowa hybryda:**
 
 *Cztery zwiady złożone. 30 nowych wizji (W-049..W-078). ARCH-MAX czeka na rozkaz.* ⚔️🏛️
 
+---
+
+### 📅 2026-06-04 — ZWIAD PEREŁEK: GEOMETRIA, ENDOGENICZNOŚĆ, WIELOFRAKTAL (W-079..W-081)
+
+> *Cezar rozkazał: "Wyszukaj głęboko perełkę zgodną z systemem — rzadkie znalezisko,
+> które podniesie wartość Imperium."* Głęboki zwiad: arXiv 2024–2025, GitHub 500+⭐,
+> literatura quant. Weryfikacja adwersarialna (3-głos per teza). Trzy perełki ortogonalne
+> wobec obecnych 51 neuronów. Wszystkie inspiracje → `docs/REJESTR_INSPIRACJI.md`.
+
+**W-079 | Path Signature Transform — GEOMETRIA ŚCIEŻKI (Lévy Area)** 🔴 *(REKOMENDACJA #1)*
+
+- **Pełna nazwa:** Rough Path Signature Transform (Transformacja Sygnatury Ścieżki Chena —
+  Chen's Iterated Integrals, z teorii ścieżek szorstkich Lyonsa 1998).
+- **Co mierzy (dla nowicjusza):** traktuje OHLCV jako ścieżkę w przestrzeni wielowymiarowej
+  i opisuje jej KSZTAŁT, nie poziom. Kluczowy sygnał: **Lévy Area między Close a Volume** —
+  mierzy, czy wolumen wyprzedza cenę (akumulacja/dystrybucja) czy cena wyprzedza wolumen
+  (trend). To proxy KOLEJNOŚCI PRZYCZYNOWEJ w czasie rzeczywistym.
+- **Dlaczego ORTOGONALNY (Prawo XVI):** 0% pokrycia z istniejącymi. RSI/MACD mierzą poziom
+  i prędkość, ATR/BB zasięg, OBV/CVD kierunek przepływu. Sygnatura mierzy GEOMETRIĘ ścieżki
+  i kauzalność cena↔wolumen — zupełnie nowa oś.
+- **Okno:** 10–20 barów → działa natychmiast na 1m/5m. **Zależności:** `iisignature` (NumPy). **~70 LOC.**
+- **Kategoria:** nowa **D** (Dynamika ścieżkowa) lub **V**.
+- **Źródła:** [arXiv:1307.7244](https://arxiv.org/pdf/1307.7244) (fundament), [arXiv:2410.23297](https://arxiv.org/pdf/2410.23297)
+  (clustering krypto 2024), [arXiv:2503.02680](https://arxiv.org/html/2503.02680v1) (VWAP krypto 2025),
+  [arXiv:2505.05332](https://arxiv.org/pdf/2505.05332) (pairs trading futures 1m 2025),
+  [GitHub: bottler/iisignature](https://github.com/bottler/iisignature).
+- ⚠️ Niezweryfikowane na NASZYCH danych: stabilność `levy_area` z 10-barowego okna 1m — wymaga pomiaru.
+
+**W-080 | Hawkes Branching Ratio — ENDOGENICZNOŚĆ RYNKU (samowzmocnienie)** 🔴 *(REKOMENDACJA #2)*
+
+- **Pełna nazwa:** Hawkes Self-Exciting Point Process Branching Ratio (Wskaźnik Rozgałęzienia
+  Samowzmacniającego się Procesu Punktowego Hawkesa).
+- **Co mierzy (dla nowicjusza):** parametr **n̂** — ile ruchów cenowych jest „sprowokowanych"
+  przez poprzednie (stado, FOMO, kaskady stop-loss). n̂≈0 = rynek spokojny (zdarzenia zewnętrzne),
+  n̂→1 = rynek KRYTYCZNY (80–99% ruchów samogeneruje się). BTC historycznie ≈0.8 normalnie,
+  →0.95–0.99 przed krachami.
+- **Dlaczego ORTOGONALNY:** CVD/OBV mierzą kierunek, VPIN toksyczność. Branching ratio mierzy
+  ENDOGENICZNOŚĆ — ile rynku napędza sam siebie. Sensor reżimu PANIC/VOLATILE inny niż ADX czy Hurst.
+- **Okno:** 100–200 barów. **Zależności:** tylko `numpy`. **~90 LOC.** **Kategoria:** **R** lub **F**.
+- **Metoda:** estimator momentowy Hardimana-Bouchaud: `n̂ = 1 − √(E[N]/Var[N])` na proxy zdarzeń
+  z barów (|return| > próg).
+- **Źródła:** [arXiv:1403.5227](https://arxiv.org/abs/1403.5227) (Hardiman & Bouchaud, Physical Review E 2014),
+  [Mark et al. 2022 (European J. of Finance)](https://www.tandfonline.com/doi/full/10.1080/1351847X.2020.1791925),
+  [arXiv:1302.1405](https://ar5iv.labs.arxiv.org/html/1302.1405) (Filimonov & Sornette).
+- ⚠️ Niezweryfikowane: proxy z barów OHLCV (zamiast tick data) — jakościowy sensor, nie absolutna metryka.
+
+**W-081 | MFDFA Δα — WIELOFRAKTALNA HETEROGENICZNOŚĆ** 🟠 *(REKOMENDACJA #3)*
+
+- **Pełna nazwa:** Multifractal Detrended Fluctuation Analysis (Wielofraktalna Analiza Fluktuacji
+  z Usuwaniem Trendu).
+- **Co mierzy (dla nowicjusza):** Hurst-DFA (już mamy) daje JEDEN wykładnik. MFDFA daje całe
+  **spektrum osobliwości** f(α). Szerokość **Δα = α_max − α_min** mówi, jak bardzo rynek różni
+  się we wschodzeniu vs opadaniu, w małych vs dużych ruchach. Δα maleje → rynek traci złożoność
+  (poprzedza kryzysy). Δα rośnie asymetrycznie w lewo → dominują duże fluktuacje (VOLATILE/PANIC).
+- **Dlaczego ORTOGONALNY (uwaga, Prawo XVI):** rozszerza oś Hurst-DFA — zmierz `raport_dekorelacji`
+  PRZED dodaniem; |r|>0.80 z H-01 → scal/zważ w dół. Mierzy ROZKŁAD wykładników, nie jeden.
+- **Okno:** 200–512 barów (sensor długoterminowy, nie skalpowanie). **Zależności:** `MFDFA` (NumPy). **~80 LOC.**
+- **Kategoria:** **F** lub nowa **D**.
+- **Źródła:** [arXiv:2104.10470](https://arxiv.org/pdf/2104.10470) (biblioteka, SoftwareX),
+  [arXiv:2411.05951](https://arxiv.org/pdf/2411.05951) (krypto Uniswap 5-min 2024),
+  [arXiv:2510.13785](https://arxiv.org/pdf/2510.13785) (źródła wielofraktalności 2025),
+  [GitHub: LRydin/MFDFA](https://github.com/LRydin/MFDFA).
+- ⚠️ Niezweryfikowane: Δα jako early-warning na 5-min barach (potwierdzone na daily/hourly).
+
+**🏆 Rekomendacja ARCH-MAX — kolejność wdrożenia:**
+1. **W-079 Path Signature** (najbardziej ortogonalna, 0% overlap, najniższy próg danych — działa na 1m/5m)
+2. **W-080 Hawkes Branching Ratio** (sensor reżimu PANIC, zero zależności)
+3. **W-081 MFDFA Δα** (długoterminowy reżim — najpierw dekorelacja z Hurst-DFA)
+
+**Granica weryfikacji (Prawo I / ZPO):** wszystkie tezy z recenzowanych/preprint źródeł (arXiv,
+Physical Review E, European J. of Finance). ⚠️ NIE uruchomiłem implementacji ani nie zmierzyłem
+korelacji na NASZYCH danych — złożoność LOC oparta na znanych algorytmach. Dokładne wzory wymagają
+sprawdzenia w cytowanych paperach przed kodowaniem.
+
+*Zwiad perełek złożony. 3 ortogonalne znaleziska (W-079..W-081). ARCH-MAX czeka na rozkaz Cezara.* ⚔️🏛️
+

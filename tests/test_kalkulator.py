@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from imperium.pretorianie.kalkulator_lewara import (
     KalkulatorLewara, BezpiecznikKapitalu, MAX_DRAWDOWN_STOP,
     VOL_TARGET_DEFAULT, SKALA_VOL_MIN, SKALA_VOL_MAX,
+    BezpiecznikKrzywejKapitalu,
 )
 
 
@@ -140,3 +141,82 @@ def test_bezpiecznik_aktualizuje_szczyt():
     bezp.aktualizuj(5_500)  # spadek od szczytu 7000 = -21%
     assert not bezp.przepalony, "21% od szczytu jeszcze nie przepala"
     assert abs(bezp.drawdown - 0.214) < 0.01
+
+
+# ── Equity-Curve Circuit Breaker (W-062) ──
+
+def test_breaker_krzywej_normal_pelna_frakcja():
+    br = BezpiecznikKrzywejKapitalu()
+    br.aktualizuj(10_000)  # świeży szczyt, zero DD
+    assert br.stan == "NORMAL"
+    assert br.frakcja_pozycji() == 1.0
+    assert not br.halt
+
+
+def test_breaker_krzywej_reduced_polowa():
+    # Krzywa rosnąca → szczyt, potem łagodny spadek poniżej MA ale DD < 20%.
+    br = BezpiecznikKrzywejKapitalu(okno_ma=5)
+    for k in (10_000, 10_200, 10_400, 10_600, 10_800):
+        br.aktualizuj(k)        # napełnij okno MA, szczyt 10_800
+    br.aktualizuj(10_100)       # poniżej MA (~10_420), DD ~6.5% < 10% i < 20%
+    assert br.ma_kapitalu is not None
+    assert br.stan == "REDUCED", "kapitał < MA powinien dać REDUCED"
+    assert br.frakcja_pozycji() == 0.5
+    assert not br.halt
+
+
+def test_breaker_krzywej_halt_blokuje():
+    br = BezpiecznikKrzywejKapitalu()
+    br.aktualizuj(10_000)
+    br.aktualizuj(7_900)        # -21% od szczytu ≥ 20%
+    assert br.stan == "HALT"
+    assert br.halt
+    assert br.frakcja_pozycji() == 0.0
+
+
+def test_breaker_krzywej_powrot_do_normal():
+    br = BezpiecznikKrzywejKapitalu(okno_ma=3)
+    br.aktualizuj(10_000)
+    br.aktualizuj(9_300)        # -7% < 10%, ale brak pełnego okna MA → NORMAL
+    br.aktualizuj(9_000)        # okno=3 pełne, MA≈9433, kapitał<MA → REDUCED
+    assert br.stan == "REDUCED"
+    br.aktualizuj(11_000)       # nowy szczyt, kapitał > MA, DD=0 → NORMAL
+    assert br.stan == "NORMAL"
+    assert br.frakcja_pozycji() == 1.0
+
+
+def test_breaker_krzywej_histereza_halt():
+    br = BezpiecznikKrzywejKapitalu()
+    br.aktualizuj(10_000)
+    br.aktualizuj(7_900)        # -21% → HALT
+    assert br.stan == "HALT"
+    br.aktualizuj(8_700)        # -13% (≥10% reduced, <20% halt) → histereza trzyma HALT
+    assert br.stan == "HALT", "histereza: nie wychodź z HALT póki DD ≥ prog_dd_reduced"
+    br.aktualizuj(9_100)        # -9% < 10% → dopiero teraz wyjście z HALT
+    assert br.stan != "HALT"
+
+
+def test_breaker_krzywej_w_checklist_blokuje():
+    kalk = KalkulatorLewara()
+    br = BezpiecznikKrzywejKapitalu()
+    br.aktualizuj(10_000)
+    br.aktualizuj(7_900)        # HALT
+    plan = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 7_900, pewnosc=0.9,
+                       rezim="TREND_STRONG", breaker_krzywej=br)
+    assert not plan.checklist_ok, "HALT breakera musi blokować wejście"
+    assert "BREAKER KRZYWEJ" in plan.powod_veto
+
+
+def test_breaker_krzywej_reduced_zmniejsza_rozmiar():
+    kalk = KalkulatorLewara()
+    plan_normal = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 10_000,
+                              pewnosc=0.9, rezim="TREND_STRONG")
+    br = BezpiecznikKrzywejKapitalu(okno_ma=5)
+    for k in (10_000, 10_200, 10_400, 10_600, 10_800):
+        br.aktualizuj(k)
+    br.aktualizuj(10_100)       # REDUCED
+    assert br.stan == "REDUCED"
+    plan_reduced = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 10_000,
+                               pewnosc=0.9, rezim="TREND_STRONG", breaker_krzywej=br)
+    assert plan_reduced.frakcja_breaker == 0.5
+    assert abs(plan_reduced.rozmiar_usdt - plan_normal.rozmiar_usdt * 0.5) < 1.0

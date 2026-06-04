@@ -15,6 +15,7 @@ dane/minutowe/*.csv
 dane/*5m*.csv
 dane/*15m*.csv
 dane/*1m*.csv
+dane/*4h*.csv
 # Konwertowane pliki robocze (generowane przez backtest runner)
 dane/*_imp.csv
 # Dzienne (~320 KB) i godzinowe (~8 MB) — małe, śledzone w repo (NIE ignorowane)

@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-06-04 | KOD | W-062 Equity-Curve Circuit Breaker — meta-poziom anti-tail nad AOA
+
+### Kontekst
+Pierwsza wizja Etapu A. Backtest LINK 5m pokazał PF < 1.0 (overtrading) — rój dalej grał
+pełnym rozmiarem mimo obsuwającej się krzywej kapitału. Potrzebna miększa, wcześniej
+reagująca warstwa ryzyka NAD twardym BezpiecznikKapitalu (AOA 30%, W-028). Realizacja
+Prawa XV (ochrona potencjału) w kodzie.
+
+### Wdrożone
+- **`BezpiecznikKrzywejKapitalu`** (`pretorianie/kalkulator_lewara.py`) — dataclass traktujący
+  własną krzywą kapitału roju jak instrument. MA na krzywej + drawdown od szczytu → trzy stany:
+  - NORMAL (kapitał ≥ MA, DD < 10%) → rozmiar ×1.0
+  - REDUCED (DD ≥ 10% lub kapitał < MA) → rozmiar ×0.5
+  - HALT (DD ≥ 20%) → blokada wszystkich nowych wejść (weto w checklist)
+  - Histereza: z HALT wychodzimy dopiero gdy DD < prog_dd_reduced (brak migotania na granicy)
+  - Metody: `aktualizuj()`, `frakcja_pozycji()`, props `drawdown`/`ma_kapitalu`/`halt`, `reset()`
+- **`KalkulatorLewara.policz(breaker_krzywej=...)`** — REDUCED mnoży rozmiar, HALT → weto.
+- **`PlanPozycji.frakcja_breaker`** — widoczny mnożnik breakera (1.0/0.5/0.0).
+- **`Dyrygent(breaker_krzywej=True)`** — instancja breakera, `.aktualizuj(engine.kapital)`
+  w cyklu przed sizingiem, przekazanie do `policz()`. Opt-out: `breaker_krzywej=False`.
+- **7 nowych testów** w `tests/test_kalkulator.py`. Suite: 434 → 441 ✅.
+
+### Plasowanie w stosie ryzyka
+Warstwa MIĘKSZA, reagująca WCZEŚNIEJ niż AOA: przycina (10%) → wstrzymuje (20%) → AOA twardy STOP (30%).
+
+### Pliki
+`imperium/pretorianie/kalkulator_lewara.py`, `imperium/koloseum/dyrygent.py`,
+`tests/test_kalkulator.py`, `docs/MANIFEST_KODU.md`, `docs/KALKULATOR_LEWARA.md`,
+`docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`
+
+---
+
 ## 2026-06-04 | DOC | Prawo XXI doc-gap audit — pełna symbioza KALKULATOR/IGRZYSKA/LEGATUS/ARCHITEKTURA
 
 ### Kontekst

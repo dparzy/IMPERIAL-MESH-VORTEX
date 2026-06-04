@@ -1,6 +1,6 @@
 # 🏛️ ARCHITEKTURA IMPERIUM — pełna mapa
 
-> **Po co:** Jedno miejsce, które spina **19 praw** z **realnym kodem** (17 modułów).
+> **Po co:** Jedno miejsce, które spina **21 prawami** z **realnym kodem** (17 modułów).
 > Pokazuje, jak Cesarstwo jest zbudowane i którędy płynie sygnał.
 
 ---
@@ -22,6 +22,8 @@
                                    sala_wojenna          dashboard             [V]
 📚 BIBLIOTEKI      biblioteki/    mnemosyne             pamięć transakcji      [VIII, XIII]
                                    kronikarz             logi, dziennik         [XIII]
+                                   igrzyska              ranking batch + observer pattern [XV]
+                                   hedge_mwu             MWU online learning (W-049)     [XV, XVI]
 🧮 FUNDAMENT       fundament/     brama_kalkulatora     jedyne wejście do mat. [I, IX, XIII]
                                    kuznia_narzedzi       kanoniczne wskaźniki   [I]
 🏟️ KOLOSEUM        koloseum/      valhalla              backtest, Monte Carlo  [VI, VII]

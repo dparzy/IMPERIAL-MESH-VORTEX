@@ -196,6 +196,48 @@ Generał dostosowuje wagi neuronów do bieżącego reżimu:
 
 ---
 
+## 🤖 Integracja HedgeMWU — Online Learning (W-049)
+
+Legatus obsługuje per-neuronowe mnożniki uczenia online dostarczane przez `HedgeMWU`
+(Multiplicative Weights Update, Freund & Schapire 1997).
+
+### Parametr mnozniki_neuronow
+
+```python
+legatus = Legatus(mnozniki_neuronow={"X-01": 1.42, "X-07": 0.63, ...})
+# lub po konstrukcji:
+legatus.ustaw_mnozniki_neuronow(mwu.mnozniki())
+```
+
+- `mnozniki_neuronow: Optional[dict]` — słownik `{KLUCZ_neuronu → float}`.
+- Neutralny stan (brak danych): wszystkie mnożniki = 1.0 (brak zniekształcenia).
+- Trafni eksperci: > 1.0 | Mylący się: < 1.0.
+
+### Jak _dostosuj_wagi() używa mnożników
+
+```python
+# Wewnątrz _dostosuj_wagi():
+waga_finalna = waga_rezimu × mnoznik_mwu
+# Efekt: neurony trafne w historii mają wyższy głos NIEZALEŻNIE od reżimu.
+```
+
+Formuła: `waga_rezimu` (z WAGI_REZIMU) × `mnoznik_mwu` (z HedgeMWU.mnozniki()).
+Działają ADDYTYWNIE — reżim i historia uczenia wzmacniają się nawzajem.
+
+### Przepływ danych MWU → Legatus
+
+```
+Igrzyska.zarejestruj_wynik()
+  └─ obserwatorzy (DRY) → HedgeMWU.zarejestruj_wynik()
+       └─ HedgeMWU.mnozniki()
+            └─ legatus.ustaw_mnozniki_neuronow(mnozniki)
+                 └─ _dostosuj_wagi() → waga_finalna = reżim × MWU
+```
+
+Szczegóły algorytmu MWU → `docs/IGRZYSKA_IMPERIUM.md` § HedgeMWU.
+
+---
+
 ## 📁 Plik kodu: `imperium/legiony/legatus.py`
 
 > Szkielet kodu — patrz plik implementacji.

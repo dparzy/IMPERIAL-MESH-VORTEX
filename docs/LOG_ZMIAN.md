@@ -6,6 +6,37 @@
 
 ---
 
+## 2026-06-04 | DOC | Prawo XXI doc-gap audit — pełna symbioza KALKULATOR/IGRZYSKA/LEGATUS/ARCHITEKTURA
+
+### Kontekst
+Zmiany kodu z poprzednich sesji (W-059 vol-targeting, HedgeMWU W-049, H-01 Hurst, legatus.py
+mnożniki, igrzyska.py obserwatorzy, 19→21 praw) nie były jeszcze odzwierciedlone w pełni
+w dokumentach modułowych. Audyt wykazał luki (doc-gap). Prawo XXI + ZASADA PEŁNEJ SYMBIOZY.
+
+### Naprawione
+- **KALKULATOR_LEWARA.md** — sekcja Volatility Targeting (W-059) była już obecna ✅
+- **IGRZYSKA_IMPERIUM.md** — sekcja HedgeMWU (W-049) była już obecna ✅
+- **GENERAL_LEGATUS.md** — dodano: legendę kategorii neuronów (A–H), wagi H w WAGI_REZIMU
+  (TREND_STRONG ×1.3, RANGING ×1.2, NORMAL ×1.1), nową sekcję integracji HedgeMWU
+  (mnozniki_neuronow, ustaw_mnozniki_neuronow, _dostosuj_wagi = reżim × MWU)
+- **LEGIONY_ARCHITEKTURA.md** — dodano legendę kategorii neuronów (M/T/V/F/O/L/R/S/A/K/E/G/H)
+  z opisem kategorii H = Hurst/Pamięć długiego zasięgu (meta-brama reżimu)
+- **ARCHITEKTURA_IMPERIUM.md** — poprawiono "19 praw" → "21 prawami"; dodano igrzyska.py
+  i hedge_mwu.py do opisu dzielnicy biblioteki/
+- **INDEKS_IMPERIUM.md** — dodano mnemosyne.py do wiersza biblioteki/ (W11 fix)
+- **audyt_spojnosci.py** — dodano Warstwa 10 (słowa kluczowe w dokumentach modułowych)
+  i Warstwa 11 (moduły biblioteki/ wymienione w INDEKS). Docstring zaktualizowany 7→11 warstw.
+
+### Wynik
+- Testy: 425/425 zielone
+- Audyt: exit 0 — pełna harmonia (W1–W11)
+
+### Pliki
+`docs/GENERAL_LEGATUS.md`, `docs/LEGIONY_ARCHITEKTURA.md`, `docs/ARCHITEKTURA_IMPERIUM.md`,
+`docs/INDEKS_IMPERIUM.md`, `narzedzia/audyt_spojnosci.py`, `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-06-03 | FEATURE | Hurst-DFA meta-brama reżimu — nowa kategoria H (wizja W-053)
 
 ### Kontekst

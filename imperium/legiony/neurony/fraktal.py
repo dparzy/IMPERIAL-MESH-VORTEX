@@ -49,13 +49,16 @@ class NeuronHurstDFA(MikroNeuron):
 
         close = wskazniki.get("CLOSE")
         close_prev = wskazniki.get("CLOSE_PREV")
-        ruch_long = (close is not None and close_prev is not None and close > close_prev)
-        kierunek_ruchu = "LONG" if ruch_long else "SHORT"
+        # Płaska cena (close == close_prev) NIE jest kierunkowa — None = brak ruchu.
+        if close is None or close_prev is None or close == close_prev:
+            kierunek_ruchu = None
+        else:
+            kierunek_ruchu = "LONG" if close > close_prev else "SHORT"
 
         if h > self._H_TREND:
             # Persystencja → potwierdza podążanie za bieżącym ruchem
             pewnosc = min(0.90, 0.60 + (h - self._H_TREND) * 1.5)
-            if close is None or close_prev is None:
+            if kierunek_ruchu is None:
                 return self._bazowy_sygnal(h, "NEUTRAL", 0.30,
                     [f"H={h:.3f} > {self._H_TREND} — persystencja, ale brak kierunku ceny"])
             return self._bazowy_sygnal(h, kierunek_ruchu, round(pewnosc, 4),
@@ -64,7 +67,7 @@ class NeuronHurstDFA(MikroNeuron):
         if h < self._H_MEANREV:
             # Antypersystencja → kontrariańsko, przeciw bieżącemu ruchowi
             pewnosc = min(0.85, 0.58 + (self._H_MEANREV - h) * 1.5)
-            if close is None or close_prev is None:
+            if kierunek_ruchu is None:
                 return self._bazowy_sygnal(h, "NEUTRAL", 0.30,
                     [f"H={h:.3f} < {self._H_MEANREV} — mean-reversion, ale brak kierunku ceny"])
             kontra = "SHORT" if kierunek_ruchu == "LONG" else "LONG"

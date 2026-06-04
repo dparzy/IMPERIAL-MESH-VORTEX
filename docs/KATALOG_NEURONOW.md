@@ -316,6 +316,9 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 | A-14 | R | MTPI OTHERS.D | Siła trendu całego segmentu alt (spoza top 10) — 8 sygnałów | W6 |
 | A-15 | G | Kimchi Premium | Premia koreańska BTC/ETH → rotacja kapitału azjatyckiego | W5 |
 | A-16 | G | BTC Regional Premiums | Premia giełdowa: Korea/Japonia/Chiny/USD → geograficzny sentyment | W5 |
+| N-01 ✅ | N | NeuronPermutationEntropy | Permutation Entropy (W-054) — meta-brama chaosu: PE>0.85 STOP, PE<0.65 potwierdź ruch (OHLCV, bez API) | W7 |
+| Z-01 ✅ | Z | NeuronToxicFlow | VPIN toksyczny przepływ (W-036) — meta-brama obronna: tłumi rój przy ryzyku kaskady likwidacji | W8 |
+| Z-02 ✅ | Z | NeuronPumpDetect | Detekcja akumulacji przed pumpem (W-042) — vol×1.5–4 + wąski zakres + OBV↑ → LONG (OHLCV, bez API) | W7 |
 
 ---
 

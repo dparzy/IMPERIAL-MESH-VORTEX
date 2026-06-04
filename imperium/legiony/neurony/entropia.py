@@ -57,8 +57,12 @@ class NeuronPermutationEntropy(MikroNeuron):
 
         close = wskazniki.get("CLOSE")
         close_prev = wskazniki.get("CLOSE_PREV")
-        ruch_long = (close is not None and close_prev is not None and close > close_prev)
-        kierunek_ruchu = "LONG" if ruch_long else "SHORT"
+        # Kierunek bieżącego mikro-ruchu; płaska cena (close == close_prev) NIE jest
+        # kierunkowa — None oznacza brak ruchu (nie wymuszaj SHORT).
+        if close is None or close_prev is None or close == close_prev:
+            kierunek_ruchu = None
+        else:
+            kierunek_ruchu = "LONG" if close > close_prev else "SHORT"
 
         if pe > self._PE_CHAOS:
             # Chaos → meta-brama: brak przewagi (to NAJWAŻNIEJSZY sygnał gate'a)
@@ -69,7 +73,7 @@ class NeuronPermutationEntropy(MikroNeuron):
         if pe < self._PE_STRUKTURA:
             # Przewidywalność → struktura obecna → potwierdza bieżący mikro-ruch
             pewnosc = min(0.80, 0.55 + (self._PE_STRUKTURA - pe) * 1.2)
-            if close is None or close_prev is None:
+            if kierunek_ruchu is None:
                 return self._bazowy_sygnal(pe, "NEUTRAL", 0.30,
                     [f"PE={pe:.3f} < {self._PE_STRUKTURA} — struktura, ale brak kierunku ceny"])
             return self._bazowy_sygnal(pe, kierunek_ruchu, round(pewnosc, 4),

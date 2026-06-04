@@ -15,7 +15,7 @@
   • **4 wymaga ZEWNĘTRZNEGO API on-chain** (OC-01..04) — Glassnode/CryptoQuant (Faza D)
 **Elitarne (Prawo XX):** 14 (2 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
-**Do wdrożenia:** 252 neurony
+**Do wdrożenia:** 248 neuronów
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
@@ -245,7 +245,7 @@
 | III Augusta (H1) | ~45 | 9 (XII-01..04, V-01..04, VSA-01) + PSY-01..04 ✅ (Faza B) + wyciszone: V-03,SMC-01..03 | ~36 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
-| **RAZEM** | **299** | **46** | **253** |
+| **RAZEM** | **299** | **51** | **248** |
 
 ---
 

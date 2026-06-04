@@ -686,10 +686,11 @@ KunQuant (170× szybszy od Pandas), Hikyuu (166ms dla całej giełdy), VnPy.alph
 
 ---
 
-### 📅 2026-06-04 — PEŁNY RAPORT WPŁYWU 48 WIZJI NA IMPERIUM
+### 📅 2026-06-04 — PEŁNY RAPORT WPŁYWU PIERWSZYCH 48 WIZJI (W-001..W-048) NA IMPERIUM
 
 > *Cezar rozkazał: "Zdaj raport jak każda wizja wpływa na Imperium i podnieś jakość."*
-> *ARCH-MAX zbadał wszystkie 48, pogrupował w warstwy, wyliczył wzrost jakości.*
+> *ARCH-MAX zbadał pierwsze 48 wizji (W-001..W-048), pogrupował w warstwy, wyliczył wzrost jakości.*
+> *Uwaga: kolejne 30 wizji (W-049..W-078) dodano w późniejszych zwiadach — patrz sekcje poniżej.*
 
 **Ocena bazowa Imperium dziś: 6.5/10** — solidny fundament, ale system jest "głuchy, ślepy i nie uczy się".
 
@@ -868,7 +869,7 @@ Diagram przepływu z tamtej wizji:
 **Trzy powody operacyjne, jeden architektoniczny:**
 
 **Powód 1: Bloker instalacyjny TA-Lib na Windows (historyczny)**
-W maju 2026 gdy budowaliśmy Imperium, TA-Lib na Windows wymagała ręcznej kompilacji lub nieoficjalnych wheeli. To blokowało każdą nową sesję developerską — nie można było uruchomić czegokolwiek bez walki z C kompilatorem. Rozwiązanie: pure-Python fallback który działa ZAWSZE. Nota: od v0.6.8 (październik 2025) TA-Lib ma pre-built wheels dla Windows ARM64 — ten bloker zniknął. Możemy wrócić do TA-Lib jako opcjonalny backend.
+W maju 2026 gdy budowaliśmy Imperium, TA-Lib na Windows wymagała ręcznej kompilacji lub nieoficjalnych wheeli. To blokowało każdą nową sesję developerską — nie można było uruchomić czegokolwiek bez walki z C kompilatorem. Rozwiązanie: pure-Python fallback który działa ZAWSZE. Nota: od v0.6.5 (październik 2025) TA-Lib ma pre-built wheels dla Windows ARM64 — ten bloker zniknął. Możemy wrócić do TA-Lib jako opcjonalny backend.
 
 **Powód 2: Prawo I — "Brama jest jedynym wejściem do matematyki"**
 Architektura wielojęzykowa (Python+Rust+Zig) tworzy TRZY różne wejścia do matematyki wskaźników. To łamie Prawo I. Pure-Python Brama = jedno miejsce, jeden język, jeden wynik. Każdy może debugować, każdy może czytać. Audit trail jest prosty.

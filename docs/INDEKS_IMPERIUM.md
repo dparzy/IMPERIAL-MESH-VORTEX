@@ -18,9 +18,9 @@
 |------------------|----------------------------------|
 | **Projekt**      | IMPERIUM — AI Crypto Trading     |
 | **Motto**        | Roma non est facta die una       |
-| **Wersja**       | v0.5.0                           |
+| **Wersja**       | v0.6.0                           |
 | **Faza**         | 🟡 Faza 1 — Namiestnik (Regime + Timeframe-Aware Gating) |
-| **Data**         | 2026-06-03                       |
+| **Data**         | 2026-06-04                       |
 | **Giełda główna**| MEXC (konto zweryfikowane)       |
 | **Rdzeń AI**     | DeepSeek LLM via API             |
 

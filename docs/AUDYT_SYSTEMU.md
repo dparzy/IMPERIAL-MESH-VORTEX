@@ -83,7 +83,7 @@
 | 1 | ✅ ZROBIONE — **Testy automatyczne** `tests/` (52 testów, 0 zależności) | `tests/` | ~~🔴~~ |
 | 2 | ✅ ZROBIONE — **Scorer Igrzysk** `igrzyska.py` (11 testów) | `biblioteki/igrzyska.py` | ~~🔴~~ |
 | 3 | ✅ ZROBIONE — **Doradcy Cara** Oracle/Fulmen/Iustitia/Hermes/Pythia+Rada (24 testów) | `cesarz/doradcy/` | ~~🟠~~ |
-| 4 | ✅ ZROBIONE — **28 neuronów + 12 zwiadowców** w kodzie (z 299 katalogu); 240 testów | `legiony/neurony/` | ~~🔴~~ |
+| 4 | ✅ ZROBIONE — **51 neuronów + 12 zwiadowców** w kodzie (z 299 katalogu); 497 testów | `legiony/neurony/` | ~~🔴~~ |
 | 5 | **Konektor CME Gap** — ⚠️ CME 24/7 od 29.05.2026 — strategia zanika historycznie | `oczy/cme_feed.py` | 🟡 Niski |
 | 6 | **Multi-exchange konektor** — Binance, OKX jako "prowincje" | `akwedukty/multi_exchange.py` | 🟠 Faza 2 |
 | 7 | ✅ ZROBIONE — **Scheduler** LIVE/BACKTEST/ONCE, bezpiecznik AOA, graceful shutdown | `drogi/scheduler.py` | ~~🟠~~ |

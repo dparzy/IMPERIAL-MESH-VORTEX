@@ -51,7 +51,7 @@ def test_wagi_rezimowe_dzialaja():
 
 def test_rejestr_wszystkie_neurony():
     neurony = wszystkie_neurony()
-    assert len(neurony) == 51, f"Powinno być 50 neuronów, jest {len(neurony)}"
+    assert len(neurony) == 51, f"Powinno być 51 neuronów, jest {len(neurony)}"
 
 
 def test_rejestr_wszyscy_zwiadowcy():

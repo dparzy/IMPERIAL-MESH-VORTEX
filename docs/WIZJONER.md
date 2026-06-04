@@ -54,7 +54,7 @@
 | W-032 | Lupanar Neuronów — koszary treningowe, hybrydy, modernizacja (trening przed polem bitwy) | 🟠 Średni | 💭 Idea | `imperium/koloseum/` |
 | W-033 | Agentki szpiegowskie — wykrywanie manipulacji giełdowych (pump&dump, spoofing, hunting) | 🔴 Wysoki | 💭 Idea | nowa kategoria neuronów / `imperium/oczy/` |
 | W-034 | Arbiter Fiduciae — meta-labeling (drugi mózg: ile postawić, López de Prado) | 🔴 Wysoki | 💭 Idea (zwiad) | `imperium/senat/` + `kalkulator_lewara.py` |
-| W-035 | Arena Trzech Bram — potrójna bariera (sprawiedliwy scoring Igrzysk) | 🔴 Wysoki | 💭 Idea (zwiad) | `imperium/koloseum/` + Igrzyska |
+| W-035 | Arena Trzech Bram — potrójna bariera (sprawiedliwy scoring Igrzysk) | 🔴 Wysoki | ✅ WDROŻONE 2026-06-04 → `biblioteki/arena_trzech_bram.py` + `backtest.backtest_arena()` (17 testów ✅) | `imperium/biblioteki/` + Igrzyska |
 | W-036 | NeuronToxicFlow — VPIN, radar polowania na likwidacje | 🔴 Wysoki | ✅ WDROŻONE 2026-06-04 | Z-01 `neurony/zagrozenie.py` (nowa kat. Z), Brama VPIN |
 | W-037 | Senat Byka i Niedźwiedzia — strukturalna debata (lokalna, LLM tylko Cenzor) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/senat/` |
 | W-038 | Wyrocznia Stanów — HMM, miękki wykrywacz reżimu (płynne wagi) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/legiony/` Namiestnik |

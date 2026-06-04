@@ -82,7 +82,7 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 | `imperium/senat/` | Senat — debata Popularów vs Optymantów nad sygnałem | Senate Debate | 🟡 Szkielet |
 | `imperium/cesarz/` | Cesarz — DeepSeek LLM podejmuje ostateczną decyzję | Emperor (LLM) | 🟡 Szkielet |
 | `imperium/drogi/` | Drogi — wykonanie zlecenia na MEXC (Via Romana) | Order Execution | 🟡 Szkielet |
-| `imperium/biblioteki/` | Biblioteki — **kronikarz.py** (logi) + **mnemosyne.py** (pamięć transakcji) + **pamiec_absolutna.py** (ImperiumLog, MAE/MFE, JSONL) + **igrzyska.py** (ranking batch) + **hedge_mwu.py** (online MWU, W-049) | Logs & Memory & Learning | ✅ Gotowy |
+| `imperium/biblioteki/` | Biblioteki — **kronikarz.py** (logi) + **mnemosyne.py** (pamięć transakcji) + **pamiec_absolutna.py** (ImperiumLog, MAE/MFE, JSONL) + **igrzyska.py** (ranking batch) + **hedge_mwu.py** (online MWU, W-049) + **arena_trzech_bram.py** (potrójna bariera, W-035) | Logs & Memory & Learning | ✅ Gotowy |
 | `imperium/swiatynie/` | Świątynie — wykresy, dashboard, wizualizacje | Charts & Dashboard | 🟡 Szkielet |
 | `imperium/koloseum/` | Koloseum — PaperTradingEngine + **Dyrygent** (orkiestrator: bary→**Namiestnik**→Legatus→Kalkulator→pozycja) + **Namiestnik** (Regime + Timeframe-Aware Gating Network) + **Backtest** + **Detektor Lookahead-bias** (LA-01, Freqtrade) | Backtesting Arena | ✅ Cykl Faza 1 aktywny |
 | `imperium/oczy/` | Oczy — newsy, sentyment, dane on-chain | News & Sentiment | 🔴 Planowany |
@@ -169,7 +169,7 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 | **E** 🔵 | Dalsze neurony z katalogu (299−50=249 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
 **Stan kategorii (2026-06-04):** aktywne M/T/F/A/L/V/R/H/N/Z/O · wyciszone S(SMC feed)/O-API(on-chain API)
-**Neurony: 50** (43 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 462/462**
+**Neurony: 50** (43 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 477/477**
 
 ### Zadania bieżące (infrastruktura)
 | # | Zadanie | Moduł | Priorytet |

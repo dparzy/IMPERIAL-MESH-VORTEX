@@ -21,7 +21,7 @@ Użycie (CLI):
 
 import logging
 import sys
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 
 from imperium.akwedukty.czytnik_csv import wczytaj_csv
 from imperium.koloseum.dyrygent import Dyrygent
@@ -106,6 +106,85 @@ def backtest(
     logger.info(f"[Backtest] {symbol} {interwal}: {len(bary)} barów, "
                 f"{wejscia} wejść, {weta} wet Pretorianów")
     return engine
+
+
+def backtest_arena(
+    sciezka: str,
+    interwal: str,
+    okno: int = 250,
+    kapital_startowy: float = 10_000.0,
+    max_barow: Optional[int] = None,
+    min_pewnosc: float = 0.55,
+    tryb: str = "agregat",
+    tp_pct: float = 0.02,
+    sl_pct: float = 0.01,
+    max_bary_bariery: int = 20,
+    bary: Optional[List[Dict[str, Any]]] = None,
+) -> Tuple[PaperTradingEngine, "RaportAreny"]:
+    """
+    Backtest z Areną Trzech Bram (W-035): każdy sygnał dostaje obiektywną etykietę
+    potrójnej bariery (TP/SL/CZAS), co pozwala Igrzyskom uczciwie ocenić neurony.
+
+    Parametry Arena:
+      tp_pct            frakcja take-profit od ceny wejścia (domyślnie 2%)
+      sl_pct            frakcja stop-loss od ceny wejścia (domyślnie 1%)
+      max_bary_bariery  bariera czasowa (domyślnie 20 barów)
+
+    Zwraca (engine, raport_areny). RaportAreny zawiera:
+      - win_rate_tp, sygnaly_tp/sl/czas
+      - kontryb_neuronow: {klucz: contribution} dla Igrzysk
+
+    Uzasadnienie "look-ahead" dla bariery: w backteście bary przyszłe są znane.
+    Bariera służy TYLKO do etykietowania historycznego — nie wchodzi do logiki handlu.
+    Deklarujemy to wprost (Prawo I — Zero Halucynacji).
+    """
+    from imperium.biblioteki.arena_trzech_bram import oznacz_bariera, RaportAreny
+    from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
+    from imperium.legiony.rejestr import zbuduj_legatusa
+
+    if bary is None:
+        bary = wczytaj_csv(sciezka, interwal=interwal, limit=max_barow)
+    if len(bary) <= okno:
+        raise ValueError(f"Za mało barów ({len(bary)}) dla okna {okno}")
+
+    symbol = bary[0]["symbol"]
+    legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
+    budowniczy = BudowniczyWskaznikow()
+    engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
+                                sesja_id=f"BT-ARENA-{symbol}-{interwal}-{tryb}")
+    dyrygent = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(),
+                        engine=engine, budowniczy=budowniczy,
+                        min_pewnosc=min_pewnosc, tryb=tryb)
+    raport = RaportAreny()
+
+    for i in range(okno, len(bary)):
+        biezacy = bary[i]
+        okno_barow = bary[i - okno: i + 1]
+
+        engine.przetworz_bar(_bar_data(biezacy))
+
+        decyzja = dyrygent.cykl(symbol, okno_barow,
+                                rezim="NORMAL", timestamp=biezacy["timestamp"])
+
+        if decyzja.wszedl and decyzja.kierunek in ("LONG", "SHORT"):
+            cena_wejscia = biezacy["close"]
+            bary_przyszle = bary[i + 1: i + 1 + max_bary_bariery]
+            wynik = oznacz_bariera(
+                kierunek=decyzja.kierunek,
+                cena_wejscia=cena_wejscia,
+                bary_przyszle=bary_przyszle,
+                tp_pct=tp_pct,
+                sl_pct=sl_pct,
+                max_bary=max_bary_bariery,
+            )
+            sygnaly_json = None
+            if hasattr(decyzja, "sygnaly_json"):
+                sygnaly_json = decyzja.sygnaly_json
+            raport.zarejestruj(wynik, sygnaly_json)
+
+    ostatnia_cena = {symbol: bary[-1]["close"]}
+    engine.zamknij_wszystkie(ostatnia_cena, powod="MANUAL")
+    return engine, raport
 
 
 def porownaj_tryby(sciezka: str, interwal: str, max_barow: Optional[int] = None,

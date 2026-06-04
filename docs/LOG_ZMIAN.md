@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-06-04 | FEATURE | Arena Trzech Bram — potrójna bariera (wizja W-035)
+
+### Kontekst
+Igrzyska oceniały neurony binarnie (pnl > 0 = wygrana). Potrójna bariera (López de Prado 2018)
+daje obiektywną etykietę każdemu sygnałowi: TP (contribution +1) / SL (-1) / CZAS (0).
+Premia za szybkość (timeliness): TP w 3. barze > TP w 20. barze. To sprawiedliwy, niemanipulowalny
+scoring, fundament pod żywe Igrzyska i rankingi neuronów.
+
+### Zmiany
+- `imperium/biblioteki/arena_trzech_bram.py` — `oznacz_bariera()`, `WynikBariery`, `RaportAreny`
+- `imperium/koloseum/backtest.py` — `backtest_arena()` — backtest z etykietowaniem potrójną barierą
+- `tests/test_arena_trzech_bram.py` — 17 testów
+- `tests/run_tests.py` — dodano `test_arena_trzech_bram` do listy modułów
+- `docs/WIZJONER.md`, `docs/INDEKS_IMPERIUM.md`, `docs/LOG_ZMIAN.md` — sync
+
+### Wynik
+477/477 testów ✅ | Audyt W1–W11 exit 0 ✅ | Etykietowanie look-ahead w backteście jawnie udokumentowane (Prawo I)
+
+---
+
 ## 2026-06-04 | FEATURE | Wash Trading Detection OC-05 — Benford + zaokrąglenia (wizja W-061)
 
 ### Kontekst

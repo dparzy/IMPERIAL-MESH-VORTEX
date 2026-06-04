@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-06-04 | AUDYT+ZWIAD | 7 niespójności liczb naprawionych + 3 perełki do WIZJONERA (W-079..W-081)
+
+**Opis:** Głęboki audyt całego Imperium (kod vs dokumenty wg INDEKSU) wykrył 7 stałych
+rozbieżności liczb — wszystkie naprawione (MANIFEST 43/299→51, ==46→51; test_integracja
+komunikat 50→51; KATALOG 42→51 i 28→51; AUDYT_SYSTEMU 28/240→51/497; INDEKS data+wersja).
+Równolegle zwiad perełek (arXiv 2024–2025, weryfikacja 3-głos) → 3 ortogonalne znaleziska
+dopisane do WIZJONER i REJESTR_INSPIRACJI (INF-10/11/12):
+- **W-079 Path Signature** (Lévy Area Close↔Volume — geometria/kauzalność, kat. D) — REKOMENDACJA #1
+- **W-080 Hawkes Branching Ratio** (endogeniczność n̂, sensor PANIC, kat. R/F)
+- **W-081 MFDFA Δα** (wielofraktalna heterogeniczność, kat. F/D)
+**Powód:** Prawo XVII (rozpoznanie terenu), Prawo XIX/XXI (spójność), Prawo XV (podnoszenie potencjału).
+**Pliki:** `docs/MANIFEST_KODU.md`, `tests/test_integracja.py`, `docs/KATALOG_NEURONOW.md`, `docs/AUDYT_SYSTEMU.md`, `docs/INDEKS_IMPERIUM.md`, `docs/WIZJONER.md`, `docs/REJESTR_INSPIRACJI.md`
+**Testy:** 497/497 ✅. Audyt: exit 0 ✅.
+
+---
+
 ## 2026-06-04 | FIX | Review PR #55 — uczciwy raport ryzyka vol, log domain HURST, płaska cena H-01, spójność liczb
 
 **Opis:** Poprawki ze zewnętrznej recenzji:

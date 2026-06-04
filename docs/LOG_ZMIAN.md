@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-06-04 | FIX | Naprawa martwego breakera krzywej (W-062) — equity zamiast wolnego kapitału
+
+### Kontekst
+Backtest A/B LINK 5m wykazał, że breaker krzywej (W-062) był **martwy w praktyce**:
+ON i OFF dawały identyczny PnL co do grosza, mimo że breaker spędzał 63% czasu w
+stanie REDUCED. Diagnoza (Prawo XV — utrata potencjału): `aktualizuj()` dostawał
+`engine.kapital` (wolny kapitał), który spada przy otwarciu pozycji (margin
+zablokowany), a wraca przy zamknięciu. W momencie KAŻDEGO wejścia breaker był więc
+NORMAL → frakcja zawsze 1.0 → zero wpływu na sizing.
+
+### Zmiana
+- `PaperTradingEngine.kapital_calkowity` (nowa property) = wolny + Σ zablokowany
+  margin otwartych pozycji = startowy + zrealizowany PnL. Nie spada przy otwarciu.
+- `Dyrygent` karmi breaker `kapital_calkowity` zamiast `kapital`.
+
+### Wynik (LINK 5m, kwiecień 2026, breaker ON vs OFF)
+- agregat:   -2.99% → -0.78%  (PF 0.82 → 0.90)
+- strategia: -0.50% → +0.89%  (PF 0.94 → 1.12, rentowny)
+- filtr:     -0.66% → -4.59%  (breaker zmienił timing — niejednolity efekt)
+
+### Pliki
+`imperium/koloseum/paper_trading.py` (kapital_calkowity), `imperium/koloseum/dyrygent.py`,
+`tests/test_paper_trading.py` (+2 testy). Testy 443/443, audyt exit 0.
+
+---
+
 ## 2026-06-04 | KOD | W-062 Equity-Curve Circuit Breaker — meta-poziom anti-tail nad AOA
 
 ### Kontekst

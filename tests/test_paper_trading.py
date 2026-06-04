@@ -187,3 +187,31 @@ def test_zamknij_wszystkie():
     wyniki = e.zamknij_wszystkie({"BTCUSDT": 105.0, "ETHUSDT": 98.0})
     assert len(wyniki) == 2
     assert len(e.otwarte) == 0
+
+
+def test_kapital_calkowity_stabilny_przy_otwarciu():
+    """
+    Prawo XV: kapital_calkowity (wolny + zablokowany margin) NIE spada przy
+    otwarciu pozycji — margin przenosi się z wolnego do zablokowanego, suma stała.
+    To naprawia martwy breaker krzywej (W-062), który wcześniej dostawał sam
+    wolny kapitał i mylił utylizację depozytu z drawdownem.
+    """
+    e = _engine(kapital=10_000.0)
+    przed = e.kapital_calkowity
+    assert abs(przed - 10_000.0) < 1e-6
+    e.wejdz(_sygnal("BTCUSDT", "LONG", 100, 95, 110, 5, 1000.0))
+    # Wolny kapitał spada (margin + prowizja zablokowane), ale całkowity prawie stały
+    assert e.kapital < przed                      # wolny spadł
+    # Całkowity spada tylko o prowizję wejścia (margin wrócił jako zablokowany)
+    assert abs(e.kapital_calkowity - przed) < przed * 0.01
+
+
+def test_kapital_calkowity_odzwierciedla_strate():
+    """kapital_calkowity po zamknięciu stratnej pozycji = startowy − strata − prowizje."""
+    e = _engine(kapital=10_000.0)
+    e.wejdz(_sygnal("BTCUSDT", "LONG", 100, 95, 110, 5, 1000.0))
+    e.przetworz_bar(_bar("BTCUSDT", o=100, h=101, l=93, c=96))  # SL trafiony → strata
+    assert len(e.otwarte) == 0
+    # Po zamknięciu całkowity = wolny (brak otwartych) i poniżej startowego
+    assert e.kapital_calkowity == e.kapital
+    assert e.kapital_calkowity < 10_000.0

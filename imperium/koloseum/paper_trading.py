@@ -190,6 +190,19 @@ class PaperTradingEngine:
 
         self._pamiec = PamiecAbsolutna(katalog=log_dir) if log_dir else None
 
+    @property
+    def kapital_calkowity(self) -> float:
+        """
+        Prawdziwe equity roju = kapitał wolny + suma zablokowanych depozytów
+        otwartych pozycji. W przeciwieństwie do `self.kapital` (tylko wolny),
+        NIE spada sztucznie przy otwarciu pozycji (margin przenosi się z wolnego
+        do zablokowanego, suma stała). Równe kapital_startowy + zrealizowany PnL.
+
+        To jest właściwa krzywa kapitału dla Equity-Curve Circuit Breakera (W-062):
+        breaker ma reagować na realne zyski/straty, nie na utylizację depozytu.
+        """
+        return self.kapital + sum(p.kapital_zablokowany for p in self.otwarte.values())
+
     # ── Wejście ────────────────────────────────────────────────────────────────
 
     def wejdz(self, sygnal: SygnalWejscia, timestamp: Optional[int] = None) -> Optional[OtwartaPozycja]:

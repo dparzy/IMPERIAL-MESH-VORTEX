@@ -82,7 +82,7 @@
 | W-060 | OFI (Order Flow Imbalance, Cont) — przyczynowy driver ceny krótkoterm. | 🟠 Średni | 💭 Idea (zwiad risk) | kat. T, L2 feed |
 | W-061 | Wash trading detection (Benford + power-law) — veto fałszywego wolumenu MEXC | 🔴 Wysoki | ✅ WDROŻONE 2026-06-04 → `neurony/onchain.NeuronWashTrading` OC-05 + `brama_kalkulatora._py_wash_trading` (10 testów ✅) | kat. O, meta-gate obronna |
 | W-062 | Equity-curve circuit breaker — rój handluje własną krzywą kapitału (HALT/REDUCE) | 🔴 Wysoki | ✅ WDROŻONE 2026-06-04 → `pretorianie/kalkulator_lewara.BezpiecznikKrzywejKapitalu` (7 testów ✅) | `pretorianie/` globalny |
-| W-063 | Drawdown-fractional sizing (Maier-Paape) — frakcja maleje z bieżącym DD | 🟠 Średni | 💭 Idea (zwiad risk) | `pretorianie/kalkulator_lewara.py` |
+| W-063 | Drawdown-fractional sizing (Maier-Paape) — frakcja maleje z bieżącym DD | 🟠 Średni | ✅ WDROŻONE 2026-06-04 → `pretorianie/kalkulator_lewara.SkalowanieFrakcjaDD` (8 testów ✅) | `pretorianie/kalkulator_lewara.py` |
 | W-064 | Ulcer fitness + Calmar allocation — strojenie wag rojem na "ból" krzywej | 🟠 Średni | 💭 Idea (zwiad risk) | `koloseum/` Igrzyska |
 | W-065 | Funding sentiment + cash-and-carry basis — kontrarian + delta-neutral spot+perp | 🟠 Średni | 💭 Idea (zwiad risk) | kat. F + moduł arbitrażu |
 | W-066 | Liquidation magnet — strefy kaskad z OI+funding+L/S ratio | 🟠 Średni | 💭 Idea (zwiad risk) | kat. L |

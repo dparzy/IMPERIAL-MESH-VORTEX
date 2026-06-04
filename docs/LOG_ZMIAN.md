@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-04 | FEATURE | Drawdown-Fractional Sizing (wizja W-063, Maier-Paape)
+
+### Kontekst
+BezpiecznikKrzywejKapitalu (W-062) ma 3 stany skokowe (NORMAL/REDUCED/HALT). W-063 dodaje
+płynną redukcję: frakcja = max(min_f, 1 − DD/prog_max) maleje liniowo z bieżącym drawdownem.
+Komplementarny do W-062: razem = twardy wyłącznik + płynna regulacja przed nim.
+Źródło: Maier-Paape & Zhu (2018), Risks 6(2), doi:10.3390/risks6020053.
+
+### Zmiany
+- `imperium/pretorianie/kalkulator_lewara.py` — `SkalowanieFrakcjaDD` + integracja w `policz()`
+- `tests/test_kalkulator.py` — 8 nowych testów W-063
+- `docs/WIZJONER.md`, `docs/INDEKS_IMPERIUM.md` — sync
+
+### Wynik
+485/485 testów ✅ | Audyt W1–W11 exit 0 ✅
+
+---
+
 ## 2026-06-04 | FEATURE | Arena Trzech Bram — potrójna bariera (wizja W-035)
 
 ### Kontekst

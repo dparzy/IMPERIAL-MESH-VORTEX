@@ -320,3 +320,44 @@ def skala_vol_targeting(vol_realized: float | None,
 ### Źródło danych
 
 `vol_realized` dostarcza Brama Kalkulatora jako `YANG_ZHANG_20` (W-055) — ta sama skala annualizowana co `VOL_TARGET_DEFAULT`. Można podać dowolną inną annualizowaną vol (np. 30-dniową realized vol z własnego obliczenia).
+
+---
+
+## 🔻 Equity-Curve Circuit Breaker (W-062)
+
+**Klasa:** `BezpiecznikKrzywejKapitalu` w `imperium/pretorianie/kalkulator_lewara.py`
+
+DLA NOWICJUSZA: ten bezpiecznik traktuje **własną krzywą kapitału roju** jak instrument. Liczy średnią kroczącą (MA = Moving Average) na punktach kapitału i pilnuje obsunięcia (drawdown) od szczytu. Realizacja Prawa XV (ochrona potencjału) w kodzie.
+
+### Trzy stany
+
+| Stan | Warunek | Mnożnik rozmiaru | Wejścia |
+|------|---------|------------------|---------|
+| **NORMAL** | kapitał ≥ MA **i** DD < `prog_dd_reduced` | ×1.0 | dozwolone |
+| **REDUCED** | DD ≥ `prog_dd_reduced` **lub** kapitał < MA (przy pełnym oknie) | ×`frakcja_reduced` (0.5) | dozwolone, połowa rozmiaru |
+| **HALT** | DD ≥ `prog_dd_halt` | ×0.0 | **zablokowane** (weto w checklist) |
+
+### Progi (domyślne)
+
+- `okno_ma = 20` — okno MA na krzywej kapitału
+- `prog_dd_reduced = 0.10` — 10% DD → REDUCED
+- `prog_dd_halt = 0.20` — 20% DD → HALT
+- `frakcja_reduced = 0.5` — połowa rozmiaru w REDUCED
+
+### Histereza
+
+Z HALT wychodzimy dopiero gdy DD spadnie **poniżej** `prog_dd_reduced` (nie na samej granicy progu HALT) — żeby nie migotać NORMAL↔HALT na granicy.
+
+### Gdzie się plasuje w stosie ryzyka
+
+Ten bezpiecznik siedzi **PONAD** twardym `BezpiecznikKapitalu` (reguła AOA W-028, twardy STOP przy 30% obsunięciu). Jest warstwą **miększą**, reagującą **wcześniej**: najpierw przycina rozmiar (REDUCED przy 10%), potem wstrzymuje wejścia (HALT przy 20%), zanim AOA przepali się twardo przy 30%.
+
+### Integracja
+
+- `KalkulatorLewara.policz(..., breaker_krzywej=...)` — REDUCED mnoży `rozmiar_usdt` przez `frakcja_pozycji()`; HALT → weto w `_checklist()` (`powod_veto` zawiera "BREAKER KRZYWEJ: HALT").
+- `PlanPozycji.frakcja_breaker` — widoczny mnożnik (1.0=NORMAL, 0.5=REDUCED, 0.0=HALT).
+- `Dyrygent(breaker_krzywej=True)` — instancjonuje breaker, woła `.aktualizuj(engine.kapital)` w każdym cyklu przed sizingiem i przekazuje do `policz()`. `breaker_krzywej=False` wyłącza (opt-out).
+
+### Źródło
+
+⚠️ To ugruntowana praktyka system-tradingu (traktowanie equity curve jak instrumentu + MA filter), **nie** pojedyncza recenzowana publikacja peer-review.

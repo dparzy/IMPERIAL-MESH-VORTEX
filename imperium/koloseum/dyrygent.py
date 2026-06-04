@@ -49,7 +49,9 @@ from imperium.koloseum.paper_trading import (
     PaperTradingEngine, SygnalWejscia, BarData,
 )
 from imperium.koloseum.namiestnik import Namiestnik, get_namiestnik
-from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara, PlanPozycji
+from imperium.pretorianie.kalkulator_lewara import (
+    KalkulatorLewara, PlanPozycji, BezpiecznikKrzywejKapitalu,
+)
 
 logger = logging.getLogger("Dyrygent")
 
@@ -83,6 +85,7 @@ class Dyrygent:
         tryb: str = "agregat",
         namiestnik: Optional[Namiestnik] = None,
         adaptery: Optional[List[Any]] = None,
+        breaker_krzywej: bool = True,
     ) -> None:
         self.legatus = legatus
         self.kalkulator = kalkulator
@@ -102,6 +105,12 @@ class Dyrygent:
         self.tryb = tryb
         # Namiestnik: Regime-Aware Gating (Faza 1). None = tryb statyczny jak wcześniej.
         self.namiestnik: Optional[Namiestnik] = namiestnik
+        # Equity-Curve Circuit Breaker (W-062): meta-poziom anti-tail nad AOA (30%).
+        # Śledzi własną krzywą kapitału; REDUCED → ×0.5 rozmiaru, HALT → blokada wejść.
+        # breaker_krzywej=False → wyłączony (opt-out, kompatybilność wsteczna).
+        self.breaker_krzywej: Optional[BezpiecznikKrzywejKapitalu] = (
+            BezpiecznikKrzywejKapitalu() if breaker_krzywej else None
+        )
 
     # ── Fabryka pełnego składu (produkcyjna — wymaga TA-Lib) ─────────────────
     @classmethod
@@ -235,6 +244,11 @@ class Dyrygent:
             dzwignia_final = int(round(dzwignia_base * lewar_factor))
             dzwignia_final = max(1, min(dzwignia_final, 20))
 
+        # Equity-Curve Circuit Breaker (W-062): dolicz aktualny stan kapitału roju
+        # do krzywej i przelicz stan (NORMAL/REDUCED/HALT) przed sizingiem.
+        if self.breaker_krzywej is not None:
+            self.breaker_krzywej.aktualizuj(self.engine.kapital)
+
         plan = self.kalkulator.policz(
             symbol=symbol,
             kierunek=kierunek,
@@ -243,6 +257,7 @@ class Dyrygent:
             kapital_usdt=self.engine.kapital,
             pewnosc=pewnosc,
             rezim=raport.rezim,
+            breaker_krzywej=self.breaker_krzywej,
         )
 
         if not plan.checklist_ok:
@@ -255,6 +270,8 @@ class Dyrygent:
         powody = f"{raport.zgodnych_neuronow}/{raport.aktywnych_neuronow} neuronów zgodnych"
         if top_strat is not None:
             powody += f" | strategia {top_strat.strategia.id} {top_strat.kierunek} ({top_strat.wynik:.0%})"
+        if plan.frakcja_breaker < 1.0:
+            powody += f" | breaker krzywej REDUCED ×{plan.frakcja_breaker:.2f}"
         sygnal = SygnalWejscia(
             symbol=symbol,
             interwal=bary[-1].get("interwal", "") if bary else "",

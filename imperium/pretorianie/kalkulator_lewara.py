@@ -84,6 +84,115 @@ class BezpiecznikKapitalu:
 
 
 @dataclass
+class BezpiecznikKrzywejKapitalu:
+    """
+    Equity-Curve Circuit Breaker (wizja W-062) — meta-poziomowa ochrona anti-tail.
+
+    DLA NOWICJUSZA: ten bezpiecznik traktuje WŁASNĄ krzywą kapitału roju jak
+    instrument. Liczy średnią kroczącą (MA = Moving Average) na punktach kapitału
+    i pilnuje obsunięcia (drawdown) od szczytu. Ma trzy stany:
+
+      • NORMAL  — kapitał powyżej MA i drawdown mały  → grasz pełnym rozmiarem (×1.0)
+      • REDUCED — kapitał poniżej MA LUB drawdown umiarkowany → rozmiar ×0.5
+      • HALT    — drawdown duży (≥ prog_dd_halt) → blokada WSZYSTKICH nowych wejść
+
+    Powrót: gdy kapitał wróci ponad MA i drawdown spadnie poniżej prog_dd_reduced
+    → NORMAL. Z HALT wychodzimy dopiero gdy drawdown spadnie poniżej prog_dd_reduced
+    (HISTEREZA — nie migocz na granicy progu HALT).
+
+    GDZIE SIĘ PLASUJE: ten bezpiecznik siedzi PONAD twardym BezpiecznikKapitalu
+    (reguła AOA W-028, twardy STOP przy 30% obsunięcia). Jest WARSTWĄ MIĘKSZĄ,
+    reagującą WCZEŚNIEJ: najpierw przycina rozmiar (REDUCED), potem wstrzymuje
+    wejścia (HALT przy 20%), zanim AOA przepali się twardo przy 30%. To realizacja
+    Prawa XV (ochrona potencjału) w kodzie.
+
+    ŹRÓDŁO: ⚠️ to ugruntowana praktyka system-tradingu (traktowanie equity curve
+    jak instrumentu + MA filter), NIE pojedyncza recenzowana publikacja peer-review.
+
+    Użycie:
+        br = BezpiecznikKrzywejKapitalu(okno_ma=20)
+        br.aktualizuj(4200)              # po każdym zamknięciu pozycji
+        rozmiar *= br.frakcja_pozycji()  # NORMAL=1.0, REDUCED=0.5, HALT=0.0
+        if br.halt: ...                  # blokada wejść w checklist
+    """
+    okno_ma: int = 20
+    prog_dd_reduced: float = 0.10
+    prog_dd_halt: float = 0.20
+    frakcja_reduced: float = 0.5
+    historia_kapitalu: list = None
+    kapital_szczyt: float = 0.0
+    stan: str = "NORMAL"
+
+    def __post_init__(self):
+        if self.historia_kapitalu is None:
+            self.historia_kapitalu = []
+
+    def aktualizuj(self, kapital_biezacy: float) -> str:
+        """Po każdym zamknięciu pozycji — dolicz punkt do krzywej, przelicz stan."""
+        self.historia_kapitalu.append(kapital_biezacy)
+        if kapital_biezacy > self.kapital_szczyt:
+            self.kapital_szczyt = kapital_biezacy
+
+        dd = self.drawdown
+        ma = self.ma_kapitalu
+        poprzedni = self.stan
+
+        if dd >= self.prog_dd_halt:
+            nowy = "HALT"
+        elif self.stan == "HALT" and dd >= self.prog_dd_reduced:
+            # HISTEREZA: z HALT wychodzimy dopiero gdy dd < prog_dd_reduced
+            nowy = "HALT"
+        elif dd >= self.prog_dd_reduced or (ma is not None and kapital_biezacy < ma):
+            nowy = "REDUCED"
+        else:
+            nowy = "NORMAL"
+
+        self.stan = nowy
+        if nowy != poprzedni:
+            logger.warning(
+                f"🔻 BREAKER KRZYWEJ: {poprzedni} → {nowy} "
+                f"(equity DD {dd:.1%}, MA={ma if ma is None else round(ma, 2)}, "
+                f"kapitał={kapital_biezacy:.2f})"
+            )
+        return nowy
+
+    @property
+    def drawdown(self) -> float:
+        """Obsunięcie od szczytu krzywej kapitału (0.0–1.0)."""
+        if self.kapital_szczyt <= 0 or not self.historia_kapitalu:
+            return 0.0
+        return max(0.0, (self.kapital_szczyt - self.historia_kapitalu[-1]) / self.kapital_szczyt)
+
+    @property
+    def ma_kapitalu(self):
+        """Średnia krocząca z ostatnich okno_ma punktów; None gdy za mało danych."""
+        if len(self.historia_kapitalu) < self.okno_ma:
+            return None
+        okno = self.historia_kapitalu[-self.okno_ma:]
+        return sum(okno) / len(okno)
+
+    def frakcja_pozycji(self) -> float:
+        """Mnożnik rozmiaru pozycji: NORMAL=1.0, REDUCED=frakcja_reduced, HALT=0.0."""
+        if self.stan == "HALT":
+            return 0.0
+        if self.stan == "REDUCED":
+            return self.frakcja_reduced
+        return 1.0
+
+    @property
+    def halt(self) -> bool:
+        """Czy bezpiecznik wstrzymuje nowe wejścia (stan HALT)."""
+        return self.stan == "HALT"
+
+    def reset(self) -> None:
+        """Reset stanu i krzywej (np. po przeglądzie Komendanta)."""
+        self.historia_kapitalu = []
+        self.kapital_szczyt = 0.0
+        self.stan = "NORMAL"
+        logger.info("✅ Breaker krzywej kapitału zresetowany.")
+
+
+@dataclass
 class PlanPozycji:
     symbol: str
     kierunek: str              # LONG / SHORT
@@ -99,6 +208,7 @@ class PlanPozycji:
     checklist_ok: bool
     powod_veto: str            # "" jeśli checklist OK
     skala_vol: float = 1.0     # mnożnik volatility-targeting (W-059); 1.0 = brak skalowania
+    frakcja_breaker: float = 1.0  # mnożnik breakera krzywej kapitału (W-062); 1.0=NORMAL, 0.5=REDUCED, 0.0=HALT
 
 
 class KalkulatorLewara:
@@ -117,7 +227,8 @@ class KalkulatorLewara:
                pretorianie_ok: bool = True,
                bezpiecznik: "BezpiecznikKapitalu | None" = None,
                vol_realized: "float | None" = None,
-               vol_target: float = VOL_TARGET_DEFAULT) -> PlanPozycji:
+               vol_target: float = VOL_TARGET_DEFAULT,
+               breaker_krzywej: "BezpiecznikKrzywejKapitalu | None" = None) -> PlanPozycji:
 
         kierunek = kierunek.upper()
         assert kierunek in ("LONG", "SHORT"), "kierunek musi być LONG lub SHORT"
@@ -147,6 +258,13 @@ class KalkulatorLewara:
         skala_vol = self.skala_vol_targeting(vol_realized, vol_target)
         rozmiar_usdt *= skala_vol
 
+        # 5c. Equity-Curve Circuit Breaker (W-062): meta-poziom anti-tail.
+        # REDUCED → ×0.5 rozmiaru; HALT → blokada w checklist (rozmiar nieistotny).
+        # Brak breakera → frakcja 1.0 (kompatybilność wsteczna, zero zmian).
+        frakcja_breaker = breaker_krzywej.frakcja_pozycji() if breaker_krzywej is not None else 1.0
+        if frakcja_breaker > 0.0:
+            rozmiar_usdt *= frakcja_breaker
+
         # 6. Take-profit (min R:R 1:2)
         ruch_sl = abs(cena_wejscia - stop_loss)
         if kierunek == "LONG":
@@ -160,7 +278,7 @@ class KalkulatorLewara:
         ok, powod = self._checklist(
             kierunek, dzwignia, pewnosc, rezim,
             pretorianie_ok, bufor_pct, rozmiar_usdt, kapital_usdt,
-            bezpiecznik
+            bezpiecznik, breaker_krzywej
         )
 
         return PlanPozycji(
@@ -178,6 +296,7 @@ class KalkulatorLewara:
             checklist_ok=ok,
             powod_veto=powod,
             skala_vol=round(skala_vol, 4),
+            frakcja_breaker=round(frakcja_breaker, 4),
         )
 
     # ── Volatility Targeting (W-059) ────────────────────────────────────────────
@@ -217,7 +336,12 @@ class KalkulatorLewara:
     def _checklist(self, kierunek: str, dzwignia: int, pewnosc: float,
                    rezim: str, pretorianie_ok: bool,
                    bufor_pct: float, rozmiar: float, kapital: float,
-                   bezpiecznik: "BezpiecznikKapitalu | None" = None):
+                   bezpiecznik: "BezpiecznikKapitalu | None" = None,
+                   breaker_krzywej: "BezpiecznikKrzywejKapitalu | None" = None):
+        if breaker_krzywej is not None and breaker_krzywej.halt:
+            return False, (f"🛑 BREAKER KRZYWEJ: HALT — equity DD "
+                           f"{breaker_krzywej.drawdown:.1%} ≥ "
+                           f"{breaker_krzywej.prog_dd_halt:.0%}, nowe wejścia wstrzymane")
         if bezpiecznik is not None and bezpiecznik.przepalony:
             return False, (f"🛑 BEZPIECZNIK AOA przepalony — drawdown "
                            f"{bezpiecznik.drawdown:.1%} ≥ {MAX_DRAWDOWN_STOP:.0%}. "

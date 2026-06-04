@@ -149,6 +149,22 @@ def dopasuj_strategie(strategia: Strategia, sygnaly: Dict[str, object],
     )
 
 
+def _normalizuj_interwal(s: str) -> str:
+    """Normalizuje format interwału: '5m'→'M5', '1h'→'1H', 'M5'→'M5' itp.
+    Obsługuje oba konwencje: 'M5'/'M15' (strategie) i '5m'/'15m' (czytnik CSV).
+    """
+    s = s.strip().upper()
+    # Już w formacie 'M5', '4H', '1D' — zostawiamy
+    if s and not s[0].isdigit():
+        return s
+    # Format liczbowy '5M' → 'M5', '15M' → 'M15', '4H' → '4H'
+    for suffix in ('M', 'H', 'D', 'W'):
+        if s.endswith(suffix):
+            num = s[:-1]
+            return suffix + num
+    return s
+
+
 def _interwal_pasuje(strategia: Strategia, interwal: Optional[str]) -> bool:
     """
     Czy strategia jest przeznaczona na ten interwał? (Prawo XV — ożywia martwe
@@ -158,8 +174,8 @@ def _interwal_pasuje(strategia: Strategia, interwal: Optional[str]) -> bool:
     """
     if not interwal or not strategia.interwaly:
         return True
-    cel = interwal.upper().strip()
-    return any(cel == i.upper().strip() for i in strategia.interwaly)
+    cel = _normalizuj_interwal(interwal)
+    return any(cel == _normalizuj_interwal(i) for i in strategia.interwaly)
 
 
 def dobierz_najlepsze(strategie: List[Strategia], sygnaly: Dict[str, object],

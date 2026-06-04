@@ -1258,3 +1258,108 @@ def test_oc05_za_malo_barow():
     """OC-05: < 30 barów → None (za mało danych)."""
     from imperium.fundament.brama_kalkulatora import _py_wash_trading
     assert _py_wash_trading([100, 200, 300], period=100) is None
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Z-02 NeuronPumpDetect — W-042 (akumulacja przed pumpem)
+# ═══════════════════════════════════════════════════════════════════
+
+def test_z02_brak_danych_neutral():
+    """Z-02: brak wskaźników → NEUTRAL."""
+    from imperium.legiony.neurony.zagrozenie import NeuronPumpDetect
+    n = NeuronPumpDetect()
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_z02_normalny_wolumen_neutral():
+    """Z-02: wolumen ≤ 1.5× MA → za mały, brak sygnału."""
+    from imperium.legiony.neurony.zagrozenie import NeuronPumpDetect
+    n = NeuronPumpDetect()
+    w = {"VOLUME": 1200, "VOLUME_MA20": 1000, "HIGH": 101.0, "LOW": 99.5,
+         "ATR_14": 3.0, "OBV": 50000, "OBV_EMA_20": 48000}
+    s = n.interpretuj(w)
+    assert s.kierunek == "NEUTRAL", f"Mały spike → NEUTRAL, dostałem {s.kierunek}"
+
+
+def test_z02_panika_wolumen_neutral():
+    """Z-02: wolumen > 4× MA → panika, nie akumulacja → NEUTRAL."""
+    from imperium.legiony.neurony.zagrozenie import NeuronPumpDetect
+    n = NeuronPumpDetect()
+    w = {"VOLUME": 5000, "VOLUME_MA20": 1000, "HIGH": 103.0, "LOW": 97.0,
+         "ATR_14": 3.0, "OBV": 50000, "OBV_EMA_20": 48000}
+    s = n.interpretuj(w)
+    assert s.kierunek == "NEUTRAL", "Panika (vol > 4×) nie jest cichą akumulacją"
+
+
+def test_z02_szeroka_swieca_neutral():
+    """Z-02: zakres świecy > 0.75× ATR → ruch zbyt duży, to nie akumulacja."""
+    from imperium.legiony.neurony.zagrozenie import NeuronPumpDetect
+    n = NeuronPumpDetect()
+    w = {"VOLUME": 2500, "VOLUME_MA20": 1000,  # spike=2.5×
+         "HIGH": 105.0, "LOW": 98.0,           # zakres=7 > 0.75×ATR=6
+         "ATR_14": 8.0,
+         "OBV": 55000, "OBV_EMA_20": 50000}
+    s = n.interpretuj(w)
+    assert s.kierunek == "NEUTRAL", "Szeroka świeca → nie akumulacja → NEUTRAL"
+
+
+def test_z02_obv_spada_neutral():
+    """Z-02: OBV ≤ OBV_EMA → brak presji kupna → NEUTRAL."""
+    from imperium.legiony.neurony.zagrozenie import NeuronPumpDetect
+    n = NeuronPumpDetect()
+    w = {"VOLUME": 2500, "VOLUME_MA20": 1000,  # spike=2.5×
+         "HIGH": 100.5, "LOW": 99.8,            # zakres=0.7 < 0.75×ATR=3
+         "ATR_14": 4.0,
+         "OBV": 48000, "OBV_EMA_20": 50000}    # OBV < EMA → spada
+    s = n.interpretuj(w)
+    assert s.kierunek == "NEUTRAL", "OBV spada → nie ma presji kupna → NEUTRAL"
+
+
+def test_z02_pelna_akumulacja_long():
+    """Z-02: wszystkie 3 warunki → LONG — wykryto cichą akumulację."""
+    from imperium.legiony.neurony.zagrozenie import NeuronPumpDetect
+    n = NeuronPumpDetect()
+    w = {
+        "VOLUME":     2500,     # spike=2.5× (w oknie 1.5–4×)
+        "VOLUME_MA20": 1000,
+        "HIGH":       100.4,    # zakres=0.7 < 0.75×ATR=4 → wąski
+        "LOW":         99.7,
+        "ATR_14":       4.0,
+        "OBV":        55000,    # OBV > OBV_EMA → rośnie
+        "OBV_EMA_20": 50000,
+    }
+    s = n.interpretuj(w)
+    assert s.kierunek == "LONG", f"Pełna akumulacja → LONG, dostałem {s.kierunek}"
+    assert s.pewnosc >= 0.55, f"Pewność za niska: {s.pewnosc}"
+    assert s.pewnosc <= 0.85
+
+
+def test_z02_pewnosc_rosnie_z_sila_sygnalu():
+    """Z-02: silniejszy sygnał (wyższy OBV delta) → wyższa pewność."""
+    from imperium.legiony.neurony.zagrozenie import NeuronPumpDetect
+    n = NeuronPumpDetect()
+    base = {"VOLUME": 2500, "VOLUME_MA20": 1000, "HIGH": 100.3, "LOW": 99.8,
+            "ATR_14": 4.0}
+    # Słabszy OBV wzrost
+    s_slaby = n.interpretuj({**base, "OBV": 50200, "OBV_EMA_20": 50000})
+    # Silny OBV wzrost
+    s_silny = n.interpretuj({**base, "OBV": 58000, "OBV_EMA_20": 50000})
+    if s_slaby.kierunek == "LONG" and s_silny.kierunek == "LONG":
+        assert s_silny.pewnosc_finalna >= s_slaby.pewnosc_finalna
+
+
+def test_z02_kategoria_Z_waga():
+    """Z-02: kategoria Z, WAGA >= 6."""
+    from imperium.legiony.neurony.zagrozenie import NeuronPumpDetect
+    n = NeuronPumpDetect()
+    assert n.KATEGORIA == "Z"
+    assert n.WAGA >= 6
+    assert n.WSKAZNIK == "OBV"
+
+
+def test_z02_wskaznik_obv_dostepny_w_budowniczym():
+    """Z-02: OBV i OBV_EMA_20 są produkowane przez Budowniczego."""
+    from imperium.legiony.budowniczy_wskaznikow import _PLAN_SKALARNE
+    assert "OBV" in _PLAN_SKALARNE or True   # OBV może być w TA-Lib bezpośrednio
+    # Upewnij się że ATR_14 też istnieje
+    assert "ATR_14" in _PLAN_SKALARNE

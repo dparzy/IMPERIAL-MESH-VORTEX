@@ -6,8 +6,8 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-04 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 50 neuronów (zarejestrowane w roju) + 12 zwiadowców = **62 modułów w kodzie**
-**Aktywne / wyciszone:** 43 aktywnych + 7 wyciszonych, z czego:
+**Zaimplementowane:** 51 neuronów (zarejestrowane w roju) + 12 zwiadowców = **63 modułów w kodzie**
+**Aktywne / wyciszone:** 44 aktywnych + 7 wyciszonych, z czego:
   • **38 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, OC-05 WashTrading)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
@@ -142,6 +142,7 @@
 | H-01 | NeuronHurstDFA | H | 7 | ✅ aktywny | HURST_DFA_100 | meta-brama reżimu (DFA) |
 | N-01 | NeuronPermutationEntropy | N | 7 | ✅ aktywny | PERM_ENTROPY_100 | meta-brama chaosu (PE) |
 | Z-01 | NeuronToxicFlow | Z | 8 | ✅ aktywny | VPIN_50 | meta-brama obronna (VPIN) |
+| Z-02 | NeuronPumpDetect | Z | 7 | ✅ aktywny | OBV | akumulacja przed pumpem (W-042) |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
 > PANIC ×3.0) były pre-zarejestrowane — teraz mają realne neurony. Prawo XV.

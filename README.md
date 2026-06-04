@@ -26,7 +26,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **50 zaimplementowane** (43 aktywnych: 34 OHLCV + 4 kat. R + V-03 CVD + V-14 Choppiness + L-14 Ulcer + H-01 Hurst-DFA + N-01 Permutation Entropy + Z-01 VPIN ToxicFlow + OC-05 WashTrading przez adaptery publiczne; 3 budzone wewnętrznie SMC + 4 czeka na on-chain API) |
+| **Mikro-neurony** | **51 zaimplementowane** (44 aktywnych: 34 OHLCV + 4 kat. R + V-03 CVD + V-14 Choppiness + L-14 Ulcer + H-01 Hurst-DFA + N-01 Permutation Entropy + Z-01 VPIN ToxicFlow + OC-05 WashTrading, Z-02 PumpDetect przez adaptery publiczne; 3 budzone wewnętrznie SMC + 4 czeka na on-chain API) |
 | **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |

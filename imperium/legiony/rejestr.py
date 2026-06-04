@@ -58,7 +58,7 @@ from imperium.legiony.neurony.entropia import (
     NeuronPermutationEntropy,
 )
 from imperium.legiony.neurony.zagrozenie import (
-    NeuronToxicFlow,
+    NeuronToxicFlow, NeuronPumpDetect,
 )
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
@@ -100,8 +100,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronHurstDFA(),
         # Entropia (N) — Permutation Entropy meta-brama chaosu, OHLCV bez API
         NeuronPermutationEntropy(),
-        # Zagrożenie (Z) — VPIN ToxicFlow meta-brama obronna, OHLCV bez API
-        NeuronToxicFlow(),
+        # Zagrożenie (Z) — VPIN meta-brama obronna (Z-01) + PumpDetect kierunkowy (Z-02)
+        NeuronToxicFlow(), NeuronPumpDetect(),
     ]
 
 

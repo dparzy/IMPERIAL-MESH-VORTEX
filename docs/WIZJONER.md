@@ -61,7 +61,7 @@
 | W-039 | Kroniki Bitew — pamięć epizodyczna reżimów (spina VPIN+HMM+bariera) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/biblioteki/` Mnemosyne |
 | W-040 | Skarbiec Imperialny — danina/budżet kapitału jako twarda reguła | 🔴 Wysoki | 💭 Idea | `imperium/pretorianie/` + Bezpiecznik |
 | W-041 | NeuronSentiment (Fear-Greed) — strach i chciwość jako neuron kat. S (AUC 0.93) | 🔴 Wysoki | 💭 Idea (zwiad azjat.) | `imperium/legiony/neurony/` kat. S |
-| W-042 | NeuronPumpDetect — wykrywanie akumulacji przed pump (mikro-struktura, kat. Z) | 🔴 Wysoki | 💭 Idea (zwiad azjat.) | `imperium/legiony/neurony/` kat. Z |
+| W-042 | NeuronPumpDetect — wykrywanie akumulacji przed pump (mikro-struktura, kat. Z) | 🔴 Wysoki | ✅ WDROŻONE 2026-06-04 | `imperium/legiony/neurony/` kat. Z |
 | W-043 | Senat Bayesowski — ważona kombinacja głosów przez KL/JS divergence (wzorzec PolySwarm) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/legiony/legatus.py` |
 | W-044 | Staking Neuronów — neurony które "miały rację" dostają wyższe wagi przyszłościowo | 🟠 Średni | 💭 Idea (wzorzec Numerai) | `imperium/koloseum/` Igrzyska |
 | W-045 | KunQuant-styl kompilacja wskaźników — 170× szybciej niż Python dla Alpha101/158 | 🟡 Niski (Faza 2) | 💭 Idea (zwiad chiński) | `imperium/fundament/brama_kalkulatora.py` |

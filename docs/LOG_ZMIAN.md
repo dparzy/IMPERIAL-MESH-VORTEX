@@ -6,6 +6,15 @@
 
 ---
 
+## 2026-06-04 | FEATURE | NeuronPumpDetect Z-02 — detekcja akumulacji przed pumpem (wizja W-042)
+
+**Opis:** Nowy neuron Z-02 NeuronPumpDetect wykrywa cichą akumulację smart money przed pumpem. Pure-OHLCV, 3 warunki: wolumen ×1.5–4× MA20, wąski zakres świecy (< 0.75× ATR), OBV rośnie (> OBV_EMA_20 × 1.005). Gdy wszystkie 3 naraz → LONG, pewność 0.55–0.85 skalowana stopniem spełnienia. Ortogonalny wobec Z-01 (obrona vs ofensywa).
+**Powód:** arXiv 2504.15790 (2025) — akumulacja koncentruje się w ostatniej godzinie przed pumpem, >99% accuracy na krypto (preprint, niezweryfikowany peer-review ⚠️).
+**Pliki:** `imperium/legiony/neurony/zagrozenie.py`, `imperium/legiony/rejestr.py`, `tests/test_neurony.py` (9 testów Z-02), `tests/test_integracja.py`, `docs/MANIFEST_KODU.md`, `docs/WIZJONER.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`
+**Neurony:** 50→51 (44 aktywnych)
+
+---
+
 ## 2026-06-04 | FEATURE | Drawdown-Fractional Sizing (wizja W-063, Maier-Paape)
 
 ### Kontekst

@@ -28,7 +28,7 @@
 
 **Kiedy:** Brak aktywnej pozycji, szukamy punktu wejścia
 **Co robi:**
-- Aktywuje WSZYSTKIE skatalogowane neurony (299 w katalogu, 27 w kodzie)
+- Aktywuje WSZYSTKIE skatalogowane neurony (299 w katalogu, 47 w kodzie)
 - Skanuje całą watchlistę (BTC, ETH, SOL, BNB, top alts)
 - Dla każdego aktywa liczy `wynik_skaner` = suma ważona sygnałów
 - Wybiera 3 najlepszych kandydatów → przekazuje do Senatu
@@ -134,11 +134,30 @@ Generał dostosowuje wagi neuronów do bieżącego reżimu:
 
 | Reżim | Kategoria↑ | Kategoria↓ | Logika |
 |-------|-----------|-----------|--------|
-| TREND_STRONG | T (Trend) ×1.5, M (Momentum) ×1.2 | O (On-chain) ×0.7 | Trend is your friend |
-| RANGING | M (Momentum) ×1.5, V (Zmienność) ×1.3 | T (Trend) ×0.5 | Granice kanału |
+| TREND_STRONG | T (Trend) ×1.5, M (Momentum) ×1.2, H (Hurst) ×1.3 | O (On-chain) ×0.7 | Trend is your friend |
+| RANGING | M (Momentum) ×1.5, V (Zmienność) ×1.3, H (Hurst) ×1.2 | T (Trend) ×0.5 | Granice kanału |
 | VOLATILE | Wszystkie ×0.7, A (Anty-manip) ×2.0 | L (Leverage) ×0.3 | Ostrożność |
 | PANIC | A (Anty-manip) ×3.0 | Wszystkie inne ×0.1 | Tylko obrona |
 | ON-CHAIN_BULLISH | O (On-chain) ×2.0 | L (Leverage) ×0.8 | Fundamenty mówią |
+| NORMAL | H (Hurst) ×1.1 | — | Lekkie wzmocnienie pamięci długiego zasięgu |
+
+### Legenda kategorii neuronów
+
+| Litera | Kategoria | Opis |
+|--------|-----------|------|
+| M | Momentum | Wskaźniki pędu (RSI, MACD, StochRSI) |
+| T | Trend | Wskaźniki trendu (EMA, ADX, Supertrend) |
+| V | Zmienność | Wskaźniki zmienności (ATR, BB, Choppiness) |
+| F | Flow/Wolumen | Przepływ kapitału (CVD, OBV, OI) |
+| O | On-chain | Wskaźniki blockchain (MVRV, SOPR, Netflow) |
+| L | Lewarowanie | Wskaźniki ryzyka lewarowego (Funding, ATR-Lev) |
+| R | Rynki pochodne | Futures/opcje (Open Interest, Max Pain) |
+| S | Smart Money | SMC — struktury rynku (BOS, CHoCH, OB) |
+| A | Anty-manipulacja | Wykrywanie manipulacji i fałszywych wybić |
+| K | Korelacja | Korelacje i dywergencje między aktywami |
+| E | Eksploracja | Eksperymenty i nowe miary (EXP-*) |
+| G | Giełdowe | Dane z giełd (wolumeny, płynność) |
+| H | Hurst/Pamięć długiego zasięgu | Meta-brama reżimu: H>0.55 persystencja, H<0.45 antypersystencja, H≈0.5 NEUTRAL |
 
 ---
 

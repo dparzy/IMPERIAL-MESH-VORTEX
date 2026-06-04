@@ -19,7 +19,7 @@
 
 | Arena | Uczestnicy | Metryki | Częstotliwość |
 |-------|-----------|---------|---------------|
-| 🧬 **Arena Neuronów** | Mikro-neurony (299 w katalogu, 27 w kodzie) | Accuracy, Precision, F1, Contribution | Co 24h rolling |
+| 🧬 **Arena Neuronów** | Mikro-neurony (299 w katalogu, 47 w kodzie) | Accuracy, Precision, F1, Contribution | Co 24h rolling |
 | ⚔️ **Arena Legionów** | 4 Legiony + dywizje | Sharpe, WinRate, MaxDD, Calmar | Co tydzień |
 | 🏛️ **Arena Senatu** | Senatorzy (głosy LONG/SHORT) | Głosowania vs wynik, kalibracja | Po każdym trade |
 
@@ -349,4 +349,81 @@ def fokus_z_igrzyskami(self, symbol, wskazniki, rezim, igrzyska):
 
 *"Agonem vincit qui meretur." — Igrzyska wygrywa ten, kto na to zasługuje.*
 
-*— IGRZYSKA_IMPERIUM.md | v1.0 | 2026-06-01*
+*— IGRZYSKA_IMPERIUM.md | v1.1 | 2026-06-04*
+
+---
+
+## 🤖 HedgeMWU — Online Learning (W-049)
+
+> **Co to jest:** Multiplicative Weights Update (MWU) — algorytm online uczenia się z teoretyczną
+> gwarancją regretu O(√(T·ln N)).
+> Źródło: Freund & Schapire (1997) — https://doi.org/10.1006/jcss.1997.1504
+
+### Gdzie: `imperium/biblioteki/hedge_mwu.py`
+
+**Klasa:** `HedgeMWU(eta=0.5)`
+
+- `eta` — tempo uczenia (>0); domyślnie 0.5 (rozsądny balans szybkości i stabilności)
+- `min_waga` — podłoga wagi (ekspert nigdy nie umiera całkowicie, może wrócić do łask)
+
+### Jak działa
+
+Każdy neuron to "ekspert". Po każdym rozstrzygniętym trade'cie:
+- Neuron który trafił kierunek → waga utrzymana
+- Neuron który się pomylił → waga mnożona przez `exp(-η)` (wykładnicze obniżenie)
+
+Po wielu rundach wagi samoistnie wyłaniają najlepsze neurony — bez ręcznego strojenia.
+
+### Różnica od Igrzysk (oba są komplementarne, Prawo XVI)
+
+| | Igrzyska | HedgeMWU |
+|-|----------|----------|
+| Tryb | BATCH (np. co 30 dni) | ONLINE (po każdym wyniku) |
+| Rangi | Dyskretne (Tiro→Aquilifer) | Ciągłe wagi |
+| Gwarancja | Brak (empiryczna) | Regret O(√(T·ln N)) |
+| Informacja | Kompleksowy WYNIK_NEURONU | Czysta trafność kierunku |
+
+### Integracja przez Igrzyska.obserwatorzy (wzorzec DRY)
+
+```python
+ig = Igrzyska()
+mwu = HedgeMWU(eta=0.5)
+ig.obserwatorzy.append(mwu)   # MWU dostaje ten sam strumień wyników
+
+ig.przetworz_logi(logi)       # → zarejestruj_wynik() notyfikuje wszystkich obserwatorów
+```
+
+Pole `Igrzyska.obserwatorzy: list` — każdy obiekt na liście musi implementować
+`zarejestruj_wynik(klucz, kierunek, zyskowny_kierunek, contribution, timeliness)`.
+DRY: logika parowania SYGNAŁ↔TRADE_CLOSE nie jest duplikowana — MWU dostaje dokładnie
+ten sam strumień wyników co Igrzyska.
+
+### HedgeMWU.mnozniki() → dict[klucz → float]
+
+```python
+mnozniki = mwu.mnozniki()
+# → {"X-01": 1.42, "X-02": 1.01, "X-07": 0.63, ...}
+# Neutralny stan (równe wagi, brak danych): wszystkie = 1.0
+# Trafni eksperci: > 1.0 | Mylący się: < 1.0
+```
+
+Stan neutralny (brak historii lub równe wagi) zwraca `1.0` dla każdego neuronu —
+Legatus działa jak bez MWU (Prawo XV: brak zniekształcenia przy braku danych).
+
+### Jak Legatus konsumuje mnożniki
+
+```python
+legatus.ustaw_mnozniki_neuronow(mwu.mnozniki())
+# Wewnętrznie _dostosuj_wagi() mnoży: waga_finalna = waga_rezimu × mnoznik_mwu
+```
+
+Metoda `ustaw_mnozniki_neuronow(mnozniki: dict)` przechowuje mnożniki w `Legatus`.
+Przy kolejnej agregacji `_dostosuj_wagi()` mnoży wagę reżimową przez per-neuronowy
+mnożnik online-uczenia — efekt: trafne neurony mają zawsze wyższy głos.
+
+### Zapis z logów historycznych
+
+```python
+mwu = HedgeMWU.z_logow(logi, eta=0.5)
+# → buduje MWU ze strumienia logów, używa tej samej logiki co Igrzyska (DRY)
+```

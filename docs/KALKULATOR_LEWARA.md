@@ -241,3 +241,82 @@ class KalkulatorLewara:
 ---
 
 *"Znaj cenę likwidacji zanim wejdziesz. Żołnierz który nie wie gdzie jest przepaść, w nią wpada."* — VITRUVIUSZ
+
+---
+
+## 📐 Volatility Targeting (W-059)
+
+> **Cel:** Rozmiar pozycji rośnie, gdy rynek jest spokojny; maleje, gdy rynek jest zmienny.
+> Instytucjonalny standard — pozycja skalowana tak, by ryzyko (mierzone zmiennością) było stałe.
+
+### Stałe
+
+| Stała | Wartość | Znaczenie |
+|-------|---------|-----------|
+| `VOL_TARGET_DEFAULT` | `0.60` | 60% annualizowanej zmienności — typowy cel portfela krypto |
+| `SKALA_VOL_MIN` | `0.25` | Minimalna skala — nigdy nie zejdź poniżej 1/4 bazowego rozmiaru |
+| `SKALA_VOL_MAX` | `1.50` | Maksymalna skala — ostrożność ponad chciwość |
+
+### Wzór
+
+```
+skala_vol = clip(vol_target / vol_realized, SKALA_VOL_MIN, SKALA_VOL_MAX)
+rozmiar_pozycji = rozmiar_bazowy × skala_vol
+```
+
+- `vol_realized` — annualizowana realized vol (np. `YANG_ZHANG_20` z Bramy, W-055)
+- `vol_target` — cel zmienności portfela (default 60%)
+- Wynik przycięty do `[0.25, 1.50]`
+
+**Przykłady:**
+```
+vol_target=0.60, vol_realized=1.20 → skala = 0.50 (rynek 2× bardziej zmienny → pozycja o połowę mniejsza)
+vol_target=0.60, vol_realized=0.30 → skala = 1.50 (rynek 2× spokojniejszy → MAX skala)
+vol_target=0.60, vol_realized=0.60 → skala = 1.00 (neutralnie)
+```
+
+### PlanPozycji.skala_vol
+
+```python
+@dataclass
+class PlanPozycji:
+    ...
+    skala_vol: float = 1.0  # mnożnik volatility-targeting (W-059); 1.0 = brak skalowania
+```
+
+Pole `skala_vol` jest zawsze widoczne w raporcie `drukuj_plan()` jako `(vol×X.XX)`.
+
+### Jak policz() przyjmuje parametry vol
+
+```python
+def policz(self, symbol, kierunek, cena_wejscia, dzwignia, kapital_usdt,
+           pewnosc=0.7, rezim="NORMAL", pretorianie_ok=True,
+           bezpiecznik=None,
+           vol_realized=None,          # ← None = brak danych = skala 1.0
+           vol_target=VOL_TARGET_DEFAULT) -> PlanPozycji:
+```
+
+### Zachowanie gdy vol_realized jest None lub ≤ 0
+
+Gdy `vol_realized` jest `None` lub `≤ 0` — `skala_vol` = `1.0` (brak skalowania).
+Kompatybilność wsteczna: stary kod bez vol_realized działa identycznie jak przed wdrożeniem W-059.
+
+### Metoda statyczna skala_vol_targeting()
+
+```python
+@staticmethod
+def skala_vol_targeting(vol_realized: float | None,
+                        vol_target: float = VOL_TARGET_DEFAULT) -> float:
+    """
+    Mnożnik rozmiaru = vol_target / vol_realized, przycięty do [MIN, MAX].
+    vol_realized: None/≤0 → skala 1.0 (brak danych → neutralnie).
+    """
+    if vol_realized is None or vol_realized <= 0 or vol_target <= 0:
+        return 1.0
+    skala = vol_target / vol_realized
+    return max(SKALA_VOL_MIN, min(SKALA_VOL_MAX, skala))
+```
+
+### Źródło danych
+
+`vol_realized` dostarcza Brama Kalkulatora jako `YANG_ZHANG_20` (W-055) — ta sama skala annualizowana co `VOL_TARGET_DEFAULT`. Można podać dowolną inną annualizowaną vol (np. 30-dniową realized vol z własnego obliczenia).

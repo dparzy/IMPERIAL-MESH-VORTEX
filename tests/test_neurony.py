@@ -759,6 +759,83 @@ def test_h01_kategoria_H_zywa():
     assert len(kat_h) >= 1 and all(n.DOSTEPNY for n in kat_h)
 
 
+def test_brama_perm_entropy_zakres():
+    """Brama (W-054): Permutation Entropy zwraca PE ∈ [0,1] na realnej serii."""
+    from imperium.fundament.brama_kalkulatora import _py_permutation_entropy
+    import random
+    random.seed(5)
+    c = [100.0]
+    for _ in range(150):
+        c.append(c[-1] * (1 + random.gauss(0, 0.01)))
+    pe = _py_permutation_entropy(c, period=120)
+    assert pe is not None and 0.0 <= pe <= 1.0
+
+
+def test_brama_perm_entropy_za_malo_danych():
+    """Brama (W-054): < period świec → None (bez halucynacji, Prawo I)."""
+    from imperium.fundament.brama_kalkulatora import _py_permutation_entropy
+    assert _py_permutation_entropy([100, 101, 102], period=100) is None
+
+
+def test_brama_perm_entropy_chaos_wysoki():
+    """Brama (W-054): szereg losowy → wysokie PE (chaos, bliskie 1)."""
+    from imperium.fundament.brama_kalkulatora import _py_permutation_entropy
+    import random
+    random.seed(7)
+    c = [random.gauss(0, 1) for _ in range(200)]
+    pe = _py_permutation_entropy(c, period=120)
+    assert pe is not None and pe > 0.9
+
+
+def test_brama_perm_entropy_monotoniczny_niski():
+    """Brama (W-054): szereg monotoniczny rosnący → niskie PE (jeden wzorzec)."""
+    from imperium.fundament.brama_kalkulatora import _py_permutation_entropy
+    c = [float(i) for i in range(200)]
+    pe = _py_permutation_entropy(c, period=120)
+    assert pe is not None and pe < 0.05
+
+
+def test_brama_audyt_zrodlo_perm_entropy_pure_python():
+    """Prawo XIII: PERMUTATION_ENTROPY stemplowany jako pure-Python."""
+    from imperium.fundament.brama_kalkulatora import CalculatorGateway, SOURCE_TAG_PY
+    import random
+    random.seed(2)
+    c = [100.0]
+    for _ in range(140):
+        c.append(c[-1] * (1 + random.gauss(0, 0.01)))
+    r = CalculatorGateway().compute("PERMUTATION_ENTROPY", close=c, period=120)
+    assert r.source == SOURCE_TAG_PY
+
+
+def test_n01_chaos_meta_brama_neutral():
+    """N-01 (W-054): PE>0.85 → NEUTRAL (meta-brama: chaos, brak przewagi)."""
+    from imperium.legiony.neurony.entropia import NeuronPermutationEntropy
+    s = NeuronPermutationEntropy().interpretuj({"PERM_ENTROPY_100": 0.95, "CLOSE": 105, "CLOSE_PREV": 100})
+    assert s.kierunek == "NEUTRAL"
+    assert any("META-BRAMA" in p for p in s.powody)
+
+
+def test_n01_niski_pe_potwierdza_ruch():
+    """N-01 (W-054): PE<0.65 + ruch↑ → LONG (struktura potwierdza mikro-ruch)."""
+    from imperium.legiony.neurony.entropia import NeuronPermutationEntropy
+    s = NeuronPermutationEntropy().interpretuj({"PERM_ENTROPY_100": 0.40, "CLOSE": 105, "CLOSE_PREV": 100})
+    assert s.kierunek == "LONG"
+    assert s.pewnosc >= 0.55
+
+
+def test_n01_brak_danych_neutral():
+    """N-01 (W-054): brak PERM_ENTROPY_100 → NEUTRAL (abstynencja, Prawo I)."""
+    from imperium.legiony.neurony.entropia import NeuronPermutationEntropy
+    assert NeuronPermutationEntropy().interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_n01_kategoria_N_zywa():
+    """Kategoria N żywa w roju i poprawnie w legendzie (Prawo XV/XXI)."""
+    from imperium.legiony.rejestr import wszystkie_neurony
+    kat_n = [n for n in wszystkie_neurony() if n.KATEGORIA == "N"]
+    assert len(kat_n) >= 1 and all(n.DOSTEPNY for n in kat_n)
+
+
 def test_brama_audyt_zrodlo_pure_python():
     """Prawo XIII: pure-Python wskaźniki stemplowane jako pure-Python, nie TA-Lib."""
     from imperium.fundament.brama_kalkulatora import (

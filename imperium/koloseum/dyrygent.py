@@ -247,7 +247,9 @@ class Dyrygent:
         # Equity-Curve Circuit Breaker (W-062): dolicz aktualny stan kapitału roju
         # do krzywej i przelicz stan (NORMAL/REDUCED/HALT) przed sizingiem.
         if self.breaker_krzywej is not None:
-            self.breaker_krzywej.aktualizuj(self.engine.kapital)
+            # Prawdziwe equity (wolny + zablokowany margin), NIE sam wolny kapitał —
+            # inaczej breaker myli utylizację depozytu z drawdownem (Prawo XV).
+            self.breaker_krzywej.aktualizuj(self.engine.kapital_calkowity)
 
         plan = self.kalkulator.policz(
             symbol=symbol,

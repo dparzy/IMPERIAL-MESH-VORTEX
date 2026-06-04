@@ -10,6 +10,11 @@ imperium/**/raport_biegu_*.json
 imperium/**/DZIENNIK_WYNIKOW.md
 imperium/**/dane/*.csv
 
-# Dane historyczne CSV — minutowe są DUŻE (50-90 MB), trzymane lokalnie / zewnętrznie
+# Dane historyczne CSV — trzymane lokalnie / zewnętrznie (nie w repo)
 dane/minutowe/*.csv
+dane/*5m*.csv
+dane/*15m*.csv
+dane/*1m*.csv
+# Konwertowane pliki robocze (generowane przez backtest runner)
+dane/*_imp.csv
 # Dzienne (~320 KB) i godzinowe (~8 MB) — małe, śledzone w repo (NIE ignorowane)

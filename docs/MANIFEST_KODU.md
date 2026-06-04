@@ -5,10 +5,10 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-03 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 47 neuronów (zarejestrowane w roju) + 12 zwiadowców = **59 modułów w kodzie**
-**Aktywne / wyciszone:** 40 aktywnych + 7 wyciszonych, z czego:
-  • **35 czyste OHLCV** (M/T/F/A/L/V/H) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA)
+**Stan na:** 2026-06-04 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Zaimplementowane:** 48 neuronów (zarejestrowane w roju) + 12 zwiadowców = **60 modułów w kodzie**
+**Aktywne / wyciszone:** 41 aktywnych + 7 wyciszonych, z czego:
+  • **36 czyste OHLCV** (M/T/F/A/L/V/H/N) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 budzone WEWNĘTRZNIE** (SMC-01/02/03) — liczą z barów przez most EXP-05, ożywają w żywym Legatusie (`zbuduj_legatusa`), **bez żadnego API**
@@ -139,6 +139,7 @@
 | V-13 | NeuronRealizedVol | V | 7 | ✅ aktywny | YANG_ZHANG_20 | fallback HIST_VOL_20 |
 | V-14 | NeuronChoppiness | V | 7 | ✅ aktywny | CHOPPINESS_14 | — |
 | H-01 | NeuronHurstDFA | H | 7 | ✅ aktywny | HURST_DFA_100 | meta-brama reżimu (DFA) |
+| N-01 | NeuronPermutationEntropy | N | 7 | ✅ aktywny | PERM_ENTROPY_100 | meta-brama chaosu (PE) |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
 > PANIC ×3.0) były pre-zarejestrowane — teraz mają realne neurony. Prawo XV.
@@ -158,6 +159,18 @@
 > wielkości (jak duet Higuchi FD + Hurst R/S). Korelacja H-01↔EXP-03 do zmierzenia
 > `diagnostyka_korelacji` po zebraniu danych paper-tradingu. WAGI_REZIMU: H ×1.3
 > TREND_STRONG, ×1.2 RANGING, ×1.1 NORMAL.
+
+> **Kat. N narodzona — Permutation Entropy meta-brama chaosu** (2026-06-04, wizja
+> W-054): N-01 NeuronPermutationEntropy mierzy złożoność szeregu wzorcami
+> porządkowymi (ordinal patterns, Bandt & Pompe 2002, Phys. Rev. Lett. 88:174102)
+> z Bramy (`PERM_ENTROPY_100`, dim=3, delay=1, znormalizowana log(dim!) do [0,1]).
+> Nowa kategoria N = Entropia/Informacja, odrębna OŚ informacji (struktura porządku
+> vs Trend/Zmienność/Momentum) — w pełni ORTOGONALNA do RSI/MACD (Prawo XVI).
+> Rola meta-bramy: PE>0.85 → chaos → NEUTRAL („rynek efektywny, nie handluj");
+> PE<0.65 → przewidywalność (forbidden patterns) → struktura, potwierdza mikro-ruch.
+> ~34% czulsza niż GARCH na klasteryzację zmienności. Czyste OHLCV. Korelacja
+> N-01↔V/T/M do zmierzenia `diagnostyka_korelacji`. WAGI_REZIMU: N ×1.3 VOLATILE,
+> ×1.2 RANGING, ×1.1 NORMAL, ×1.0 TREND_STRONG.
 
 > **V-13 upgrade Yang-Zhang** (2026-06-03, wizja W-055): NeuronRealizedVol czyta
 > teraz `YANG_ZHANG_20` (annualizowana vol z pełnego OHLC, ~14× efektywniejszy

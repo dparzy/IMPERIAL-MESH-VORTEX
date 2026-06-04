@@ -63,11 +63,11 @@ class KandydatAktywa:
 #   H = Hurst/Pamięć długiego zasięgu (meta-brama reżimu) — OŻYWIONA 2026-06-03
 #       (H-01 Hurst-DFA). Wzmacnia trend gdy persystencja, range gdy mean-reversion.
 WAGI_REZIMU = {
-    "TREND_STRONG":    {"T": 1.5, "M": 1.2, "S": 1.3, "O": 0.7, "L": 0.8, "R": 0.8, "H": 1.3},
-    "RANGING":         {"M": 1.5, "F": 1.2, "T": 0.5, "R": 1.2, "H": 1.2},
-    "VOLATILE":        {"A": 2.0, "V": 1.5, "R": 1.3, "L": 0.3, "_default": 0.7},
+    "TREND_STRONG":    {"T": 1.5, "M": 1.2, "S": 1.3, "O": 0.7, "L": 0.8, "R": 0.8, "H": 1.3, "N": 1.0},
+    "RANGING":         {"M": 1.5, "F": 1.2, "T": 0.5, "R": 1.2, "H": 1.2, "N": 1.2},
+    "VOLATILE":        {"A": 2.0, "V": 1.5, "R": 1.3, "L": 0.3, "N": 1.3, "_default": 0.7},
     "PANIC":           {"A": 3.0, "R": 1.5, "_default": 0.1},
-    "NORMAL":          {"R": 1.1, "H": 1.1},
+    "NORMAL":          {"R": 1.1, "H": 1.1, "N": 1.1},
     "ON-CHAIN_BULLISH":{"O": 2.0, "L": 0.8, "R": 1.1},
     "SMC_ACTIVE":      {"S": 2.0, "F": 1.2, "T": 1.1},
 }

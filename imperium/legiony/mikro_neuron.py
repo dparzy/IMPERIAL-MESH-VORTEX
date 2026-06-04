@@ -64,6 +64,7 @@ class MikroNeuron(ABC):
     #   L=Leverage  R=Reżim/Sentyment  S=Struktura(SMC)  A=Anty-manipulacja
     #   K=Makro/Intermarket  E=Entropia/AI  G=Geo/Regionalne
     #   H=Hurst/Pamięć długiego zasięgu (meta-brama reżimu)
+    #   N=Entropia/Informacja (Permutation Entropy — meta-brama chaosu)
     KATEGORIA: str = "?"
     WAGA: int = 5
 

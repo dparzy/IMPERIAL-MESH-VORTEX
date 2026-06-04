@@ -54,6 +54,9 @@ from imperium.legiony.neurony.dzwignia import (
 from imperium.legiony.neurony.fraktal import (
     NeuronHurstDFA,
 )
+from imperium.legiony.neurony.entropia import (
+    NeuronPermutationEntropy,
+)
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
 from imperium.legiony.zwiadowcy import (
@@ -91,6 +94,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronATRLev(), NeuronRealizedVol(), NeuronChoppiness(), NeuronUlcer(),
         # Fraktal (H) — Hurst-DFA meta-brama reżimu, OHLCV bez API
         NeuronHurstDFA(),
+        # Entropia (N) — Permutation Entropy meta-brama chaosu, OHLCV bez API
+        NeuronPermutationEntropy(),
     ]
 
 

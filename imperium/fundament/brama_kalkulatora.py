@@ -54,7 +54,7 @@ SOURCE_TAG_PY = "pure-Python (deterministic)"
 # compute() stempluje je SOURCE_TAG_PY — audyt nie może kłamać o źródle (Prawo XIII).
 _PURE_PYTHON_INDICATORS = {
     "AO", "AO_PREV", "AC", "AC_PREV", "HMA", "HMA_PREV",
-    "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "CHOPPINESS", "ULCER",
+    "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "PERMUTATION_ENTROPY", "CHOPPINESS", "ULCER",
     "VWAP", "VWAP_STD",
     "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
 }
@@ -357,6 +357,55 @@ def _py_hurst_dfa(close, period: int = 100) -> Optional[float]:
     return round(max(0.01, min(0.99, slope)), 4)
 
 
+def _py_permutation_entropy(close, period: int = 100, dim: int = 3, delay: int = 1) -> Optional[float]:
+    """
+    Permutation Entropy (Entropia Permutacyjna) — Bandt & Pompe (2002).
+    Źródło: Phys. Rev. Lett. 88:174102, https://doi.org/10.1103/PhysRevLett.88.174102
+            (synteza: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7597144/)
+
+    Dla nowicjusza: mierzy ZŁOŻONOŚĆ szeregu czasowego patrząc na WZORCE PORZĄDKU
+    (ordinal patterns), a nie na kierunek czy magnitudę ruchu. Dla każdego okna
+    `dim` kolejnych wartości (z odstępem `delay`) liczymy permutację argsort —
+    czyli który punkt jest najmniejszy, który średni, który największy. Z dim!
+    możliwych wzorców liczymy ich częstość i entropię Shannona, znormalizowaną do
+    [0,1] przez log(dim!).
+
+      PE ≈ 1   → CHAOS: wszystkie wzorce równie częste → rynek efektywny, brak
+                 przewagi (meta-brama mówi „nie handluj").
+      PE niskie → przewidywalność: część wzorców „zakazana" (forbidden patterns) →
+                 rynek nieefektywny, jest struktura → przewaga obecna.
+
+    Dlaczego ORTOGONALNE do RSI/MACD (Prawo XVI): PE patrzy na STRUKTURĘ porządku,
+    nie na poziom ceny ani kierunek. To inna OŚ informacji niż Trend (T), Zmienność
+    (V) czy Momentum (M) — ~34% czulszy niż GARCH na klasteryzację zmienności.
+
+    Zwraca PE ∈ [0,1]. None gdy mniej niż `period` świec (Prawo I — bez halucynacji).
+    """
+    import math
+    from collections import Counter
+    c = list(close)
+    if len(c) < period:
+        return None
+    seria = c[-period:]
+    span = delay * (dim - 1)
+    if len(seria) <= span:
+        return None
+    wzorce = Counter()
+    for i in range(len(seria) - span):
+        okno = [seria[i + j * delay] for j in range(dim)]
+        # permutacja argsort jako krotka — wzorzec porządkowy
+        wzorzec = tuple(sorted(range(dim), key=lambda k: (okno[k], k)))
+        wzorce[wzorzec] += 1
+    total = sum(wzorce.values())
+    if total == 0:
+        return None
+    entropia = -sum((n / total) * math.log(n / total) for n in wzorce.values())
+    norm = math.log(math.factorial(dim))
+    if norm == 0:
+        return None
+    return round(max(0.0, min(1.0, entropia / norm)), 4)
+
+
 def _py_choppiness(high, low, close, period: int = 14) -> Optional[float]:
     """
     Choppiness Index (CHOP) — mierzy, czy rynek TRENDUJE czy się KONSOLIDUJE.
@@ -575,6 +624,9 @@ class CalculatorGateway:
 
             # ── Pure-Python: Hurst-DFA — pamięć długiego zasięgu / meta-brama (kat. H, W-053) ──
             "HURST_DFA": lambda close, period=100: _py_hurst_dfa(close, period),
+
+            # ── Pure-Python: Permutation Entropy — meta-brama chaosu (kat. N, W-054) ──
+            "PERMUTATION_ENTROPY": lambda close, period=100, dim=3, delay=1: _py_permutation_entropy(close, period, dim, delay),
 
             # ── Pure-Python: Choppiness Index — trend vs konsolidacja (kat. V) ──
             "CHOPPINESS": lambda high, low, close, period=14: _py_choppiness(high, low, close, period),

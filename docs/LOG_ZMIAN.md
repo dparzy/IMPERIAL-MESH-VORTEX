@@ -37,6 +37,47 @@ w dokumentach modułowych. Audyt wykazał luki (doc-gap). Prawo XXI + ZASADA PE�
 
 ---
 
+## 2026-06-04 | FEATURE | Permutation Entropy meta-brama chaosu — nowa kategoria N (wizja W-054)
+
+### Kontekst
+Brakowało osi informacji „złożoność/struktura porządku" jako meta-bramy chaosu
+(czy rynek ma STRUKTURĘ, czy jest czystym chaosem — efektywny, bez przewagi).
+Permutation Entropy (Bandt & Pompe 2002) patrzy na wzorce porządkowe (ordinal
+patterns), nie na kierunek — w pełni ortogonalna do RSI/MACD.
+
+### Decyzja Prawa XVI (redundancja mierzona, nie zgadywana)
+PE mierzy złożoność struktury porządku, nie poziom (RSI), crossover (MACD),
+magnitudę wahań (V) ani siłę kierunku (T) — inna OŚ informacji → dekoreluje z
+głosami kierunkowymi i z V/T/M. ~34% czulsza niż GARCH na klasteryzację
+zmienności. N-01 zaprojektowany jako META-BRAMA (PE>0.85 → NEUTRAL „chaos, nie
+handluj"), nie kolejny głos kierunkowy. Korelacja N-01↔V/T/M do zmierzenia
+`diagnostyka_korelacji` po zebraniu danych paper-tradingu.
+
+### Wdrożone
+- **Brama:** pure-Python `PERMUTATION_ENTROPY` (`_py_permutation_entropy`, close,
+  period=100, dim=3, delay=1) — Bandt & Pompe 2002; PE∈[0,1] (norm. log(dim!)),
+  None gdy <period (Prawo I). Stempel pure-Python (XIII).
+- **Budowniczy:** klucz `PERM_ENTROPY_100`.
+- **Neuron N-01** `neurony/entropia.py` (NeuronPermutationEntropy, kat. N): PE>0.85
+  chaos (NEUTRAL meta-brama), PE<0.65 struktura (potwierdza mikro-ruch), 0.65–0.85
+  szara strefa (NEUTRAL niska pewność).
+- **Nowa kategoria N** narodzona: legenda `mikro_neuron.py`, audyt `LEGENDA_KAT`,
+  `CLAUDE.md` KROK 0, `WAGI_REZIMU` (N ×1.3 VOLATILE, ×1.2 RANGING, ×1.1 NORMAL,
+  ×1.0 TREND_STRONG), rejestr.
+- **Liczby:** 47→48 neuronów (41 aktywnych), 59→60 modułów. Backlog 252→251.
+- **Testy:** +9 (Brama PE zakres/warmup/chaos/monotoniczny/źródło, N-01 4 sytuacje
+  + kat.). 425 → 434/434 zielone.
+
+### Pliki
+`imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/entropia.py`, `imperium/legiony/mikro_neuron.py`,
+`imperium/legiony/legatus.py`, `imperium/legiony/rejestr.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_neurony.py`,
+`docs/MANIFEST_KODU.md`, `docs/WIZJONER.md`, `docs/INDEKS_IMPERIUM.md`,
+`docs/LOG_ZMIAN.md`, `README.md`, `CLAUDE.md`.
+
+---
+
 ## 2026-06-03 | FEATURE | Hurst-DFA meta-brama reżimu — nowa kategoria H (wizja W-053)
 
 ### Kontekst

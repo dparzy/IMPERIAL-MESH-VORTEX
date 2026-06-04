@@ -836,6 +836,104 @@ def test_n01_kategoria_N_zywa():
     assert len(kat_n) >= 1 and all(n.DOSTEPNY for n in kat_n)
 
 
+# ─── W-036: VPIN ToxicFlow (Z-01, kategoria Z) ───────────────────────────────
+
+def test_brama_vpin_zakres():
+    """VPIN ∈ [0,1] na danych OHLCV z wolumenem."""
+    from imperium.fundament.brama_kalkulatora import _py_vpin
+    import random
+    random.seed(7)
+    c = [100.0]
+    for _ in range(80):
+        c.append(c[-1] + random.gauss(0, 1.0))
+    vol = [1000 + random.random() * 500 for _ in range(81)]
+    v = _py_vpin(c, vol, n_buckets=50)
+    assert v is not None and 0.0 <= v <= 1.0
+
+
+def test_brama_vpin_za_malo_danych():
+    """VPIN → None gdy mniej niż n_buckets+1 barów."""
+    from imperium.fundament.brama_kalkulatora import _py_vpin
+    assert _py_vpin([1, 2, 3], [1, 1, 1], n_buckets=50) is None
+
+
+def test_brama_vpin_jednostronny_wysoki():
+    """Silnie jednokierunkowy przepływ (drift dodatni) → wysoki VPIN (toksyczny)."""
+    from imperium.fundament.brama_kalkulatora import _py_vpin
+    import random
+    random.seed(1)
+    # Drift dużo większy niż szum → prawie każdy bar to "kupno" → nierównowaga
+    c = [100.0]
+    for _ in range(80):
+        c.append(c[-1] + 5.0 + random.gauss(0, 0.3))
+    vol = [1000] * 81
+    v_jednostronny = _py_vpin(c, vol, n_buckets=50)
+    # Zrównoważony przepływ dla porównania
+    c2 = [100.0]
+    for i in range(80):
+        c2.append(c2[-1] + (1.0 if i % 2 == 0 else -1.0) + random.gauss(0, 0.1))
+    v_zrown = _py_vpin(c2, vol, n_buckets=50)
+    assert v_jednostronny > v_zrown
+    assert v_jednostronny > 0.7
+
+
+def test_brama_vpin_zrownowazony_niski():
+    """Naprzemienny zrównoważony przepływ → niższy VPIN niż jednokierunkowy."""
+    from imperium.fundament.brama_kalkulatora import _py_vpin
+    import random
+    random.seed(3)
+    c = [100.0]
+    for i in range(80):
+        c.append(c[-1] + (2.0 if i % 2 == 0 else -2.0) + random.gauss(0, 0.1))
+    vol = [1000] * 81
+    v = _py_vpin(c, vol, n_buckets=50)
+    assert v is not None and v < 0.7
+
+
+def test_brama_audyt_zrodlo_vpin_pure_python():
+    """Prawo XIII: VPIN w zbiorze pure-Python."""
+    from imperium.fundament.brama_kalkulatora import _PURE_PYTHON_INDICATORS
+    assert "VPIN" in _PURE_PYTHON_INDICATORS
+
+
+def test_z01_spokoj_neutral():
+    """Z-01 (W-036): VPIN<0.3 → NEUTRAL, brak tłumienia (spokój)."""
+    from imperium.legiony.neurony.zagrozenie import NeuronToxicFlow
+    s = NeuronToxicFlow().interpretuj({"VPIN_50": 0.1})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc_przeciwnika == 0.0
+
+
+def test_z01_toksyczny_alarm():
+    """Z-01 (W-036): VPIN>0.7 → NEUTRAL z WYSOKIM pewnosc_przeciwnika (tłumi rój)."""
+    from imperium.legiony.neurony.zagrozenie import NeuronToxicFlow
+    s = NeuronToxicFlow().interpretuj({"VPIN_50": 0.9})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc_przeciwnika >= 0.6
+    assert any("TOKSYCZNY" in p for p in s.powody)
+
+
+def test_z01_brak_danych_neutral():
+    """Z-01 (W-036): brak VPIN_50 → NEUTRAL (abstynencja, Prawo I)."""
+    from imperium.legiony.neurony.zagrozenie import NeuronToxicFlow
+    assert NeuronToxicFlow().interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_z01_kategoria_Z_zywa():
+    """Kategoria Z żywa w roju (Prawo XV/XXI)."""
+    from imperium.legiony.rejestr import wszystkie_neurony
+    kat_z = [n for n in wszystkie_neurony() if n.KATEGORIA == "Z"]
+    assert len(kat_z) >= 1 and all(n.DOSTEPNY for n in kat_z)
+
+
+def test_z01_nigdy_kierunkowy():
+    """Z-01 to BRAMA — kierunek ZAWSZE NEUTRAL, nigdy LONG/SHORT."""
+    from imperium.legiony.neurony.zagrozenie import NeuronToxicFlow
+    n = NeuronToxicFlow()
+    for v in [None, 0.0, 0.1, 0.29, 0.3, 0.5, 0.7, 0.71, 0.9, 1.0]:
+        assert n.interpretuj({"VPIN_50": v}).kierunek == "NEUTRAL"
+
+
 def test_brama_audyt_zrodlo_pure_python():
     """Prawo XIII: pure-Python wskaźniki stemplowane jako pure-Python, nie TA-Lib."""
     from imperium.fundament.brama_kalkulatora import (
@@ -1061,3 +1159,102 @@ def test_xii06_ob_brak_danych():
     """XII-06: brak OPEN_PREV → NEUTRAL."""
     n = NeuronOBZone()
     assert n.interpretuj({"CLOSE": 100.0}).kierunek == "NEUTRAL"
+
+
+# ═══════════════════════════════════════════════════════════════════
+# OC-05 NeuronWashTrading — W-061 (Benford + zaokrąglenia)
+# ═══════════════════════════════════════════════════════════════════
+
+def test_oc05_brak_danych_neutral():
+    """OC-05: brak wskaźnika → NEUTRAL."""
+    from imperium.legiony.neurony.onchain import NeuronWashTrading
+    n = NeuronWashTrading()
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+    assert n.interpretuj({"WASH_SCORE_100": None}).kierunek == "NEUTRAL"
+
+
+def test_oc05_naturalny_wolumen():
+    """OC-05: niski score → NEUTRAL, tłumienie minimalne."""
+    from imperium.legiony.neurony.onchain import NeuronWashTrading
+    n = NeuronWashTrading()
+    s = n.interpretuj({"WASH_SCORE_100": 0.10})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc_przeciwnika < 0.1, "Niski score nie powinien tłumić roju"
+
+
+def test_oc05_umiarkowany_wash():
+    """OC-05: score 0.50 → NEUTRAL + umiarkowana pewnosc_przeciwnika."""
+    from imperium.legiony.neurony.onchain import NeuronWashTrading
+    n = NeuronWashTrading()
+    s = n.interpretuj({"WASH_SCORE_100": 0.50})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc_przeciwnika > 0.0, "Umiarkowany wash powinien tłumić rój"
+    assert s.pewnosc_przeciwnika < 0.90
+
+
+def test_oc05_silny_wash_alarm():
+    """OC-05: score 0.80 → NEUTRAL + wysoka pewnosc_przeciwnika."""
+    from imperium.legiony.neurony.onchain import NeuronWashTrading
+    n = NeuronWashTrading()
+    s = n.interpretuj({"WASH_SCORE_100": 0.80})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc_przeciwnika >= 0.70, f"Silny wash: przeciwnik={s.pewnosc_przeciwnika}"
+
+
+def test_oc05_nigdy_kierunkowy():
+    """OC-05: wash trading nigdy nie daje LONG/SHORT — tylko meta-gate."""
+    from imperium.legiony.neurony.onchain import NeuronWashTrading
+    n = NeuronWashTrading()
+    for score in [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]:
+        s = n.interpretuj({"WASH_SCORE_100": score})
+        assert s.kierunek == "NEUTRAL", f"score={score} → {s.kierunek} (oczekiwano NEUTRAL)"
+
+
+def test_oc05_kategoria_O():
+    """OC-05: kategoria O, waga >= 7."""
+    from imperium.legiony.neurony.onchain import NeuronWashTrading
+    n = NeuronWashTrading()
+    assert n.KATEGORIA == "O"
+    assert n.WAGA >= 7
+    assert n.WSKAZNIK == "WASH_SCORE_100"
+
+
+def test_oc05_wskaznik_benford_niski_dla_losowych():
+    """OC-05 Benford: losowe wolumeny → niski WASH_SCORE."""
+    import random
+    from imperium.fundament.brama_kalkulatora import _py_wash_trading
+    random.seed(42)
+    # Generujemy wolumeny zgodne z prawem Benforda (wykładnicze)
+    import math
+    vols = []
+    for _ in range(150):
+        # Benford-zgodny: pierwsza cyfra d z prawdopodobieństwem log10(1+1/d)
+        d = random.choices(range(1, 10), weights=[math.log10(1+1/k) for k in range(1, 10)])[0]
+        mag = random.randint(1, 4)
+        v = d * (10 ** mag) + random.randint(0, 10 ** mag - 1)
+        vols.append(v)
+    score = _py_wash_trading(vols, period=100)
+    assert score is not None
+    # Losowe powinny dać niski score (nie > 0.8)
+    assert score < 0.80, f"Losowe wolumeny dały score={score:.3f} — zbyt wysoki"
+
+
+def test_oc05_wskaznik_okragle_wysokie():
+    """OC-05: wolumeny okrągłe (100, 500, 1000) → wyższy score niż losowe."""
+    from imperium.fundament.brama_kalkulatora import _py_wash_trading
+    # Silnie zaokrąglone: 100, 200, 500, 1000 – typowe dla botów
+    vols = [100 * (i % 10 + 1) for i in range(150)]
+    score_round = _py_wash_trading(vols, period=100)
+    # Losowe
+    import random; random.seed(7)
+    vols_rand = [random.randint(137, 98765) for _ in range(150)]
+    score_rand = _py_wash_trading(vols_rand, period=100)
+    assert score_round is not None and score_rand is not None
+    assert score_round >= score_rand, (
+        f"Okrągłe={score_round:.3f} powinno być >= losowe={score_rand:.3f}")
+
+
+def test_oc05_za_malo_barow():
+    """OC-05: < 30 barów → None (za mało danych)."""
+    from imperium.fundament.brama_kalkulatora import _py_wash_trading
+    assert _py_wash_trading([100, 200, 300], period=100) is None

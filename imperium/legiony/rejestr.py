@@ -43,7 +43,7 @@ from imperium.legiony.neurony.psychologia import (
     NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv,
 )
 from imperium.legiony.neurony.onchain import (
-    NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow,
+    NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow, NeuronWashTrading,
 )
 from imperium.legiony.neurony.straz import (
     NeuronStopHunt, NeuronWickRejection, NeuronWashVol, NeuronBartPattern,
@@ -56,6 +56,9 @@ from imperium.legiony.neurony.fraktal import (
 )
 from imperium.legiony.neurony.entropia import (
     NeuronPermutationEntropy,
+)
+from imperium.legiony.neurony.zagrozenie import (
+    NeuronToxicFlow,
 )
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
@@ -86,8 +89,9 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronOrderBlock(), NeuronFVG(), NeuronBOS(), NeuronVSA(),
         # Psychologia (PSY)
         NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(), NeuronOIDiv(),
-        # On-chain (OC)
+        # On-chain (OC) + Wash Trading (OC-05, OHLCV, bez API)
         NeuronMVRV(), NeuronSOPR(), NeuronPuellMultiple(), NeuronExchangeNetflow(),
+        NeuronWashTrading(),
         # Straż / Anty-manipulacja (A)
         NeuronStopHunt(), NeuronWickRejection(), NeuronWashVol(), NeuronBartPattern(),
         # Dźwignia (L) + Zmienność (V) — OHLCV, bez API
@@ -96,6 +100,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronHurstDFA(),
         # Entropia (N) — Permutation Entropy meta-brama chaosu, OHLCV bez API
         NeuronPermutationEntropy(),
+        # Zagrożenie (Z) — VPIN ToxicFlow meta-brama obronna, OHLCV bez API
+        NeuronToxicFlow(),
     ]
 
 

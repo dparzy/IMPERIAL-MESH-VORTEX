@@ -6,9 +6,9 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-04 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 48 neuronów (zarejestrowane w roju) + 12 zwiadowców = **60 modułów w kodzie**
-**Aktywne / wyciszone:** 41 aktywnych + 7 wyciszonych, z czego:
-  • **36 czyste OHLCV** (M/T/F/A/L/V/H/N) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy)
+**Zaimplementowane:** 50 neuronów (zarejestrowane w roju) + 12 zwiadowców = **62 modułów w kodzie**
+**Aktywne / wyciszone:** 43 aktywnych + 7 wyciszonych, z czego:
+  • **38 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, OC-05 WashTrading)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 budzone WEWNĘTRZNIE** (SMC-01/02/03) — liczą z barów przez most EXP-05, ożywają w żywym Legatusie (`zbuduj_legatusa`), **bez żadnego API**
@@ -46,7 +46,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (42/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (43/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -125,6 +125,7 @@
 | OC-02 | NeuronSOPR | O | 8 | 🔇 wyciszony (API on-chain) | SOPR | — |
 | OC-03 | NeuronPuellMultiple | O | 7 | 🔇 wyciszony (API on-chain) | PUELL_MULTIPLE | — |
 | OC-04 | NeuronExchangeNetflow | O | 8 | 🔇 wyciszony (API on-chain) | EXCHANGE_NETFLOW | — |
+| OC-05 | NeuronWashTrading | O | 8 | ✅ aktywny (OHLCV) | WASH_SCORE_100 | W-061 |
 
 ### Plik: `neurony/straz.py` (Dywizja Anty-Manipulacji — KAT A)
 
@@ -140,6 +141,7 @@
 | V-14 | NeuronChoppiness | V | 7 | ✅ aktywny | CHOPPINESS_14 | — |
 | H-01 | NeuronHurstDFA | H | 7 | ✅ aktywny | HURST_DFA_100 | meta-brama reżimu (DFA) |
 | N-01 | NeuronPermutationEntropy | N | 7 | ✅ aktywny | PERM_ENTROPY_100 | meta-brama chaosu (PE) |
+| Z-01 | NeuronToxicFlow | Z | 8 | ✅ aktywny | VPIN_50 | meta-brama obronna (VPIN) |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
 > PANIC ×3.0) były pre-zarejestrowane — teraz mają realne neurony. Prawo XV.
@@ -171,6 +173,19 @@
 > ~34% czulsza niż GARCH na klasteryzację zmienności. Czyste OHLCV. Korelacja
 > N-01↔V/T/M do zmierzenia `diagnostyka_korelacji`. WAGI_REZIMU: N ×1.3 VOLATILE,
 > ×1.2 RANGING, ×1.1 NORMAL, ×1.0 TREND_STRONG.
+
+> **Kat. Z narodzona — VPIN ToxicFlow meta-brama obronna** (2026-06-04, wizja
+> W-036): Z-01 NeuronToxicFlow mierzy toksyczność przepływu zleceń metodą VPIN
+> (Volume-Synchronized Probability of Informed Trading) przez BVC (Bulk Volume
+> Classification) z Bramy (`VPIN_50`, n_buckets=50, proxy barowy). Źródło: Easley,
+> López de Prado, O'Hara (2012), Review of Financial Studies 25(5):1457,
+> https://doi.org/10.1093/rfs/hhs053. Nowa kategoria Z = Zagrożenie, META-BRAMA
+> OBRONNA: NIE wskazuje kierunku (zawsze NEUTRAL), tłumi rój przez
+> pewnosc_przeciwnika. VPIN<0.3 → spokój; 0.3–0.7 → czujność (skromne tłumienie);
+> VPIN>0.7 → 🚨 toksyczny przepływ, ryzyko kaskady likwidacji → wysokie tłumienie
+> („nie wchodź / schodź z lewara"). KOMPLEMENTARNA (Prawo XVI) do kat. A: A wykrywa
+> ślad pojedynczej zagrywki, Z mierzy agregat toksyczności przepływu. Czyste OHLCV.
+> WAGI_REZIMU: Z ×2.0 PANIC (max obrona), ×1.5 VOLATILE, ×1.1 NORMAL, ×1.0 reszta.
 
 > **V-13 upgrade Yang-Zhang** (2026-06-03, wizja W-055): NeuronRealizedVol czyta
 > teraz `YANG_ZHANG_20` (annualizowana vol z pełnego OHLC, ~14× efektywniejszy

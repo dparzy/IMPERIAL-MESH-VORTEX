@@ -55,7 +55,7 @@
 | W-033 | Agentki szpiegowskie — wykrywanie manipulacji giełdowych (pump&dump, spoofing, hunting) | 🔴 Wysoki | 💭 Idea | nowa kategoria neuronów / `imperium/oczy/` |
 | W-034 | Arbiter Fiduciae — meta-labeling (drugi mózg: ile postawić, López de Prado) | 🔴 Wysoki | 💭 Idea (zwiad) | `imperium/senat/` + `kalkulator_lewara.py` |
 | W-035 | Arena Trzech Bram — potrójna bariera (sprawiedliwy scoring Igrzysk) | 🔴 Wysoki | 💭 Idea (zwiad) | `imperium/koloseum/` + Igrzyska |
-| W-036 | NeuronToxicFlow — VPIN, radar polowania na likwidacje | 🔴 Wysoki | 💭 Idea (zwiad) | `imperium/legiony/` + `fundament/brama` |
+| W-036 | NeuronToxicFlow — VPIN, radar polowania na likwidacje | 🔴 Wysoki | ✅ WDROŻONE 2026-06-04 | Z-01 `neurony/zagrozenie.py` (nowa kat. Z), Brama VPIN |
 | W-037 | Senat Byka i Niedźwiedzia — strukturalna debata (lokalna, LLM tylko Cenzor) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/senat/` |
 | W-038 | Wyrocznia Stanów — HMM, miękki wykrywacz reżimu (płynne wagi) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/legiony/` Namiestnik |
 | W-039 | Kroniki Bitew — pamięć epizodyczna reżimów (spina VPIN+HMM+bariera) | 🟠 Średni | 💭 Idea (zwiad) | `imperium/biblioteki/` Mnemosyne |
@@ -80,7 +80,7 @@
 | W-058 | MF-DFA szerokość widma — multifraktalny early-warning krytycznego reżimu | 🟡 Niski | 💭 Idea (zwiad sygn.) | kat. D (fraktal) |
 | W-059 | Volatility Targeting — RDZEŃ kalkulatora lewara (pozycja = vol_target/vol_real) | 🔴 Wysoki | ✅ WDROŻONE 2026-06-03 | `kalkulator_lewara.skala_vol_targeting` (vol_realized=YANG_ZHANG_20) |
 | W-060 | OFI (Order Flow Imbalance, Cont) — przyczynowy driver ceny krótkoterm. | 🟠 Średni | 💭 Idea (zwiad risk) | kat. T, L2 feed |
-| W-061 | Wash trading detection (Benford + power-law) — veto fałszywego wolumenu MEXC | 🔴 Wysoki | 💭 Idea (zwiad risk) | kat. O, filtr przed głosem |
+| W-061 | Wash trading detection (Benford + power-law) — veto fałszywego wolumenu MEXC | 🔴 Wysoki | ✅ WDROŻONE 2026-06-04 → `neurony/onchain.NeuronWashTrading` OC-05 + `brama_kalkulatora._py_wash_trading` (10 testów ✅) | kat. O, meta-gate obronna |
 | W-062 | Equity-curve circuit breaker — rój handluje własną krzywą kapitału (HALT/REDUCE) | 🔴 Wysoki | ✅ WDROŻONE 2026-06-04 → `pretorianie/kalkulator_lewara.BezpiecznikKrzywejKapitalu` (7 testów ✅) | `pretorianie/` globalny |
 | W-063 | Drawdown-fractional sizing (Maier-Paape) — frakcja maleje z bieżącym DD | 🟠 Średni | 💭 Idea (zwiad risk) | `pretorianie/kalkulator_lewara.py` |
 | W-064 | Ulcer fitness + Calmar allocation — strojenie wag rojem na "ból" krzywej | 🟠 Średni | 💭 Idea (zwiad risk) | `koloseum/` Igrzyska |

@@ -6,6 +6,74 @@
 
 ---
 
+## 2026-06-04 | FEATURE | Wash Trading Detection OC-05 — Benford + zaokrąglenia (wizja W-061)
+
+### Kontekst
+MEXC i inne nieregulowane giełdy sztucznie pompują wolumen wash tradingiem. Fałszywy
+wolumen niszczy nasze wskaźniki wolumenowe (VPIN, OBV, Flow). OC-05 NeuronWashTrading
+wykrywa to przez dwa testy statystyczne na czystym OHLCV: Prawo Benforda (chi² na
+pierwszych cyfrach wolumenu) + klasterowanie zaokrągleń (frakcja okrągłych wolumenów).
+Źródło: Cong, Li, Tang, Yang (2023), "Crypto Wash Trading", NBER w30783.
+
+### Zmiany
+- `imperium/fundament/brama_kalkulatora.py` — `_py_wash_trading()` + `WASH_TRADING` w dispatch
+- `imperium/legiony/budowniczy_wskaznikow.py` — `WASH_SCORE_100` w `_PLAN_SKALARNE`
+- `imperium/legiony/neurony/onchain.py` — `NeuronWashTrading` (OC-05, WAGA=8, kat. O)
+- `imperium/legiony/rejestr.py` — rejestracja OC-05
+- `tests/test_neurony.py` — 10 nowych testów OC-05
+- `tests/test_integracja.py`, `docs/MANIFEST_KODU.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`, `docs/WIZJONER.md` — sync
+
+### Wynik
+462/462 testów ✅ | Audyt W1–W11 exit 0 ✅ | Neurony: 50 (43 aktywnych)
+
+---
+
+## 2026-06-04 | FEATURE | VPIN ToxicFlow meta-brama obronna — nowa kategoria Z (wizja W-036)
+
+### Kontekst
+Brakowało osi „zagrożenie/toksyczność przepływu" jako meta-bramy obronnej: czy
+gracze poinformowani (wieloryby, market makerzy) handlują przeciwko tłumowi, co
+poprzedza kaskady likwidacji (flash crash 2010 miał ekstremalny VPIN). VPIN
+(Volume-Synchronized Probability of Informed Trading; Easley, López de Prado,
+O'Hara 2012, Review of Financial Studies 25(5):1457) mierzy KTO handluje, nie
+gdzie idzie cena — odrębna oś od Momentum/Trend/Zmienność.
+
+### Decyzja Prawa XVI (redundancja mierzona, nie zgadywana)
+Z-01 to META-BRAMA OBRONNA — nigdy nie wskazuje kierunku (zawsze NEUTRAL), tłumi
+cały rój przez `pewnosc_przeciwnika`. KOMPLEMENTARNA do kat. A (anty-manipulacja):
+A wykrywa ślad pojedynczej zagrywki w jednej świecy, Z mierzy agregat toksyczności
+przepływu w oknie — krzyżowe potwierdzenie zagrożenia z dwóch perspektyw. Korelacja
+Z-01↔A do zmierzenia `diagnostyka_korelacji` po zebraniu danych paper-tradingu.
+
+### Wdrożone
+- **Brama:** pure-Python `VPIN` (`_py_vpin`, close+volume, n_buckets=50) metodą BVC
+  (Bulk Volume Classification): frakcja kupna = Φ(dP/sigma) przez math.erf, VPIN =
+  Σ|V_buy−V_sell|/Σ(V_buy+V_sell)∈[0,1]. Proxy barowy (ostatnie n_buckets barów)
+  zamiast kubełków o równym wolumenie — świadomy kompromis dla OHLCV bez tików
+  (Prawo I, jawnie udokumentowany). None gdy <n_buckets+1 barów lub zero wariancji/
+  wolumenu. Stempel pure-Python (XIII).
+- **Budowniczy:** klucz `VPIN_50`.
+- **Neuron Z-01** `neurony/zagrozenie.py` (NeuronToxicFlow, kat. Z, WAGA 8): VPIN<0.3
+  spokój (NEUTRAL, brak tłumienia), 0.3–0.7 czujność (skromne pewnosc_przeciwnika),
+  VPIN>0.7 🚨 toksyczny przepływ (wysokie pewnosc_przeciwnika — „nie wchodź / schodź
+  z lewara"). Zawsze NEUTRAL — czysta brama, nigdy głos kierunkowy.
+- **Nowa kategoria Z** narodzona: legenda `mikro_neuron.py`, audyt `LEGENDA_KAT`,
+  `CLAUDE.md` KROK 0, `WAGI_REZIMU` (Z ×2.0 PANIC max obrona, ×1.5 VOLATILE, ×1.1
+  NORMAL, ×1.0 TREND_STRONG/RANGING), rejestr.
+- **Liczby:** 48→49 neuronów (42 aktywnych), 60→61 modułów. Backlog 251→250.
+- **Testy:** +10 (Brama VPIN zakres/za-mało/jednostronny/zrównoważony/źródło, Z-01
+  spokój/alarm/brak-danych/kat./nigdy-kierunkowy). 443 → 453/453 zielone.
+
+### Pliki
+`imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/zagrozenie.py`, `imperium/legiony/mikro_neuron.py`,
+`imperium/legiony/legatus.py`, `imperium/legiony/rejestr.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_neurony.py`, `tests/test_integracja.py`,
+`docs/MANIFEST_KODU.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`, `docs/WIZJONER.md`,
+`docs/KATALOG_NEURONOW.md`, `CLAUDE.md`.
+
+---
+
 ## 2026-06-04 | FIX | Naprawa martwego breakera krzywej (W-062) — equity zamiast wolnego kapitału
 
 ### Kontekst

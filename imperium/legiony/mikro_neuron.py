@@ -65,6 +65,7 @@ class MikroNeuron(ABC):
     #   K=Makro/Intermarket  E=Entropia/AI  G=Geo/Regionalne
     #   H=Hurst/Pamięć długiego zasięgu (meta-brama reżimu)
     #   N=Entropia/Informacja (Permutation Entropy — meta-brama chaosu)
+    #   Z=Zagrożenie (VPIN toksyczny przepływ — meta-brama obronna)
     KATEGORIA: str = "?"
     WAGA: int = 5
 

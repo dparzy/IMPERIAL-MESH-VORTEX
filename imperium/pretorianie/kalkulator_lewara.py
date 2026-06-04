@@ -193,6 +193,70 @@ class BezpiecznikKrzywejKapitalu:
 
 
 @dataclass
+class SkalowanieFrakcjaDD:
+    """
+    Drawdown-Fractional Sizing (wizja W-063, Maier-Paape).
+
+    DLA NOWICJUSZA: gdy ponosisz stratę (drawdown od szczytu rośnie),
+    powinieneś grać MNIEJSZYMI pozycjami. Ten moduł robi to automatycznie:
+    frakcja = 1.0 przy DD=0% i płynnie maleje do min_frakcja przy DD = prog_max.
+
+    DLACZEGO LEPIEJ niż BezpiecznikKrzywejKapitalu (W-062):
+      - W-062 ma 3 stany: NORMAL/REDUCED/HALT (skokowe)
+      - W-063 jest CIĄGŁY: frakcja maleje proporcjonalnie do bieżącego DD
+      - Oba są komplementarne — W-063 usuwa nagłe "kliknięcia" między stanami W-062.
+      - Razem: W-062 = twardy wyłącznik bezpieczeństwa, W-063 = płynna regulacja
+
+    MATEMATYKA (uproszczona wersja Maier-Paape):
+      frakcja = max(min_frakcja, 1.0 − DD / prog_max)
+      - DD = 0.00 → frakcja = 1.00 (pełny rozmiar)
+      - DD = 0.10 → frakcja = 0.50 (gdy prog_max=0.20, min_frakcja=0.10)
+      - DD = 0.20 → frakcja = 0.10 (minimum)
+      - DD > 0.20 → frakcja = 0.10 (podłoga)
+
+    Źródło: Maier-Paape & Zhu (2018), "A General Framework for Portfolio Theory",
+             Risks 6(2), https://doi.org/10.3390/risks6020053
+             (rozszerzenie arXiv:1612.02985, opublikowane peer-reviewed).
+    Weryfikacja: ✅ peer-reviewed (MDPI Risks, 2018)
+    """
+    kapital_szczyt: float = 0.0
+    kapital_biezacy: float = 0.0
+    prog_max: float = 0.20      # DD przy którym frakcja osiąga min_frakcja (20%)
+    min_frakcja: float = 0.10   # podłoga — nigdy nie zejdź poniżej 10% bazy
+
+    def aktualizuj(self, kapital: float) -> None:
+        """Zaktualizuj śledzony kapitał po każdym zamknięciu pozycji."""
+        self.kapital_biezacy = kapital
+        if kapital > self.kapital_szczyt:
+            self.kapital_szczyt = kapital
+
+    @property
+    def drawdown(self) -> float:
+        """Bieżące obsunięcie od szczytu (0.0–1.0)."""
+        if self.kapital_szczyt <= 0:
+            return 0.0
+        return max(0.0, (self.kapital_szczyt - self.kapital_biezacy) / self.kapital_szczyt)
+
+    def frakcja(self) -> float:
+        """
+        Mnożnik rozmiaru pozycji ∈ [min_frakcja, 1.0].
+
+        Malejący liniowo z DD: frakcja = max(min_f, 1 − DD/prog_max).
+        DD=0 → 1.0 (pełny rozmiar). DD≥prog_max → min_frakcja (podłoga).
+        """
+        dd = self.drawdown
+        if self.prog_max <= 0:
+            return 1.0
+        raw = 1.0 - dd / self.prog_max
+        return round(max(self.min_frakcja, min(1.0, raw)), 4)
+
+    def reset(self) -> None:
+        """Ręczny reset przez Komendanta."""
+        self.kapital_szczyt = self.kapital_biezacy
+        logger.info(f"✅ FrakcjaDD zresetowana. Nowy szczyt = {self.kapital_biezacy:.2f}")
+
+
+@dataclass
 class PlanPozycji:
     symbol: str
     kierunek: str              # LONG / SHORT
@@ -207,8 +271,9 @@ class PlanPozycji:
     bufor_likwidacji_pct: float  # ile % między SL a likwidacją (bezpieczeństwo)
     checklist_ok: bool
     powod_veto: str            # "" jeśli checklist OK
-    skala_vol: float = 1.0     # mnożnik volatility-targeting (W-059); 1.0 = brak skalowania
+    skala_vol: float = 1.0        # mnożnik volatility-targeting (W-059); 1.0 = brak skalowania
     frakcja_breaker: float = 1.0  # mnożnik breakera krzywej kapitału (W-062); 1.0=NORMAL, 0.5=REDUCED, 0.0=HALT
+    frakcja_dd: float = 1.0       # mnożnik drawdown-fractional sizing (W-063); 1.0=DD=0, maleje z DD
 
 
 class KalkulatorLewara:
@@ -228,7 +293,8 @@ class KalkulatorLewara:
                bezpiecznik: "BezpiecznikKapitalu | None" = None,
                vol_realized: "float | None" = None,
                vol_target: float = VOL_TARGET_DEFAULT,
-               breaker_krzywej: "BezpiecznikKrzywejKapitalu | None" = None) -> PlanPozycji:
+               breaker_krzywej: "BezpiecznikKrzywejKapitalu | None" = None,
+               skalowanie_dd: "SkalowanieFrakcjaDD | None" = None) -> PlanPozycji:
 
         kierunek = kierunek.upper()
         assert kierunek in ("LONG", "SHORT"), "kierunek musi być LONG lub SHORT"
@@ -265,6 +331,12 @@ class KalkulatorLewara:
         if frakcja_breaker > 0.0:
             rozmiar_usdt *= frakcja_breaker
 
+        # 5d. Drawdown-Fractional Sizing (W-063, Maier-Paape): płynna redukcja z DD.
+        # Komplementarny do W-062: ten jest ciągły (nie skokowy), maleje proporcjonalnie.
+        # Brak skalowania_dd → frakcja 1.0 (kompatybilność wsteczna, zero zmian).
+        frakcja_dd = skalowanie_dd.frakcja() if skalowanie_dd is not None else 1.0
+        rozmiar_usdt *= frakcja_dd
+
         # 6. Take-profit (min R:R 1:2)
         ruch_sl = abs(cena_wejscia - stop_loss)
         if kierunek == "LONG":
@@ -278,7 +350,7 @@ class KalkulatorLewara:
         ok, powod = self._checklist(
             kierunek, dzwignia, pewnosc, rezim,
             pretorianie_ok, bufor_pct, rozmiar_usdt, kapital_usdt,
-            bezpiecznik, breaker_krzywej
+            bezpiecznik, breaker_krzywej, skalowanie_dd
         )
 
         return PlanPozycji(
@@ -297,6 +369,7 @@ class KalkulatorLewara:
             powod_veto=powod,
             skala_vol=round(skala_vol, 4),
             frakcja_breaker=round(frakcja_breaker, 4),
+            frakcja_dd=round(frakcja_dd, 4),
         )
 
     # ── Volatility Targeting (W-059) ────────────────────────────────────────────
@@ -337,7 +410,8 @@ class KalkulatorLewara:
                    rezim: str, pretorianie_ok: bool,
                    bufor_pct: float, rozmiar: float, kapital: float,
                    bezpiecznik: "BezpiecznikKapitalu | None" = None,
-                   breaker_krzywej: "BezpiecznikKrzywejKapitalu | None" = None):
+                   breaker_krzywej: "BezpiecznikKrzywejKapitalu | None" = None,
+                   skalowanie_dd: "SkalowanieFrakcjaDD | None" = None):
         if breaker_krzywej is not None and breaker_krzywej.halt:
             return False, (f"🛑 BREAKER KRZYWEJ: HALT — equity DD "
                            f"{breaker_krzywej.drawdown:.1%} ≥ "
@@ -390,7 +464,7 @@ class KalkulatorLewara:
 ║  Likwidacja:     {plan.cena_likwidacji:>12.2f} USDT
 ║  Bufor do lik:   {plan.bufor_likwidacji_pct:>11.1f}%
 ║──────────────────────────────────────────────────────
-║  Rozmiar:        {plan.rozmiar_usdt:>12.2f} USDT (vol×{plan.skala_vol:.2f})
+║  Rozmiar:        {plan.rozmiar_usdt:>12.2f} USDT (vol×{plan.skala_vol:.2f} dd×{plan.frakcja_dd:.2f})
 ║  Max ryzyko:     {plan.ryzyko_usdt:>12.2f} USDT
 ║  R:R ratio:      1:{plan.rr_ratio:.1f}
 ╠══════════════════════════════════════════════════════╣

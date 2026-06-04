@@ -70,6 +70,8 @@ _PLAN_SKALARNE = {
     "YANG_ZHANG_20": ("YANG_ZHANG", ("open", "high", "low", "close"), {"period": 20}),
     "HURST_DFA_100": ("HURST_DFA", ("close",), {"period": 100}),
     "PERM_ENTROPY_100": ("PERMUTATION_ENTROPY", ("close",), {"period": 100}),
+    "VPIN_50": ("VPIN", ("close", "volume"), {"n_buckets": 50}),
+    "WASH_SCORE_100": ("WASH_TRADING", ("volume",), {"period": 100}),
     "CHOPPINESS_14": ("CHOPPINESS", ("high", "low", "close"), {"period": 14}),
     "ULCER_14":      ("ULCER", ("close",), {"period": 14}),
     "VWAP":          ("VWAP", ("high", "low", "close", "volume"), {}),

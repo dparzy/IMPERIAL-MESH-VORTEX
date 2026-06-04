@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from imperium.pretorianie.kalkulator_lewara import (
     KalkulatorLewara, BezpiecznikKapitalu, MAX_DRAWDOWN_STOP,
     VOL_TARGET_DEFAULT, SKALA_VOL_MIN, SKALA_VOL_MAX,
-    BezpiecznikKrzywejKapitalu,
+    BezpiecznikKrzywejKapitalu, SkalowanieFrakcjaDD,
 )
 
 
@@ -220,3 +220,83 @@ def test_breaker_krzywej_reduced_zmniejsza_rozmiar():
                                pewnosc=0.9, rezim="TREND_STRONG", breaker_krzywej=br)
     assert plan_reduced.frakcja_breaker == 0.5
     assert abs(plan_reduced.rozmiar_usdt - plan_normal.rozmiar_usdt * 0.5) < 1.0
+
+
+# ── Drawdown-Fractional Sizing (W-063, Maier-Paape) ──────────────────────────
+
+def test_frakcja_dd_brak_drawdownu_frakcja_1():
+    """DD=0 → frakcja = 1.0 (pełny rozmiar)."""
+    sd = SkalowanieFrakcjaDD(prog_max=0.20, min_frakcja=0.10)
+    sd.aktualizuj(10_000)
+    assert sd.frakcja() == 1.0
+
+
+def test_frakcja_dd_polowa_prog_max():
+    """DD=10% przy prog_max=20% → frakcja = 0.5."""
+    sd = SkalowanieFrakcjaDD(prog_max=0.20, min_frakcja=0.10)
+    sd.aktualizuj(10_000)   # szczyt
+    sd.aktualizuj(9_000)    # DD = 10%
+    assert abs(sd.frakcja() - 0.5) < 0.01
+
+
+def test_frakcja_dd_osiaga_min():
+    """DD >= prog_max → frakcja = min_frakcja (podłoga)."""
+    sd = SkalowanieFrakcjaDD(prog_max=0.20, min_frakcja=0.10)
+    sd.aktualizuj(10_000)
+    sd.aktualizuj(7_500)    # DD = 25% > prog_max(20%)
+    assert sd.frakcja() == sd.min_frakcja
+
+
+def test_frakcja_dd_nie_przekracza_1():
+    """Kapitał rośnie → frakcja nigdy > 1.0."""
+    sd = SkalowanieFrakcjaDD(prog_max=0.20, min_frakcja=0.10)
+    sd.aktualizuj(10_000)
+    sd.aktualizuj(12_000)   # nowy szczyt — DD=0
+    assert sd.frakcja() == 1.0
+
+
+def test_frakcja_dd_plynna_redukcja():
+    """Frakcja maleje monotonicznie z rosnącym DD."""
+    sd = SkalowanieFrakcjaDD(prog_max=0.20, min_frakcja=0.10)
+    sd.aktualizuj(10_000)
+    frakcje = []
+    for kapital in [10_000, 9_500, 9_000, 8_500, 8_000, 7_500]:
+        sd.aktualizuj(kapital)
+        frakcje.append(sd.frakcja())
+    for i in range(len(frakcje) - 1):
+        assert frakcje[i] >= frakcje[i + 1], (
+            f"Frakcja powinna maleć: {frakcje[i]} >= {frakcje[i+1]}")
+
+
+def test_frakcja_dd_wplywa_na_rozmiar():
+    """skalowanie_dd redukuje rozmiar pozycji proportjonalnie do DD."""
+    kalk = KalkulatorLewara()
+    # Plan bez DD
+    plan_normalny = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 10_000,
+                                pewnosc=0.9, rezim="TREND_STRONG")
+    # Plan z DD=10% (frakcja ≈ 0.5 dla prog_max=0.20)
+    sd = SkalowanieFrakcjaDD(prog_max=0.20, min_frakcja=0.10)
+    sd.aktualizuj(10_000)
+    sd.aktualizuj(9_000)    # DD=10% → frakcja≈0.5
+    plan_dd = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 10_000,
+                           pewnosc=0.9, rezim="TREND_STRONG", skalowanie_dd=sd)
+    assert plan_dd.frakcja_dd < 1.0
+    assert plan_dd.rozmiar_usdt < plan_normalny.rozmiar_usdt
+
+
+def test_frakcja_dd_domyslnie_1_w_planie():
+    """Brak skalowania_dd → frakcja_dd=1.0 w planie (kompatybilność wsteczna)."""
+    kalk = KalkulatorLewara()
+    plan = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 10_000,
+                       pewnosc=0.9, rezim="TREND_STRONG")
+    assert plan.frakcja_dd == 1.0
+
+
+def test_frakcja_dd_reset():
+    """Reset FrakcjaDD: nowy szczyt = bieżący kapitał, frakcja = 1.0."""
+    sd = SkalowanieFrakcjaDD(prog_max=0.20, min_frakcja=0.10)
+    sd.aktualizuj(10_000)
+    sd.aktualizuj(8_000)    # DD=20% → min
+    assert sd.frakcja() == sd.min_frakcja
+    sd.reset()
+    assert sd.frakcja() == 1.0

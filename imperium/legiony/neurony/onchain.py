@@ -1,11 +1,13 @@
 """
 ⚔️ IMV-INS | Neurony On-Chain — Dywizja Wieszczowie
-MVRV-Z, SOPR, Puell Multiple, NVT, Exchange Netflow.
+MVRV-Z, SOPR, Puell Multiple, NVT, Exchange Netflow + Wash Trading Detection.
 Dane fundamentalne on-chain — cykle makro.
 
 UWAGA: OC-01..OC-04 wymagają zewnętrznego API on-chain (Glassnode/CryptoQuant).
 Brama Kalkulatora NIE dostarcza tych danych — neurony są wyciszone (DOSTEPNY=False)
 do czasu podpięcia adapterów API. Logika interpretacji jest gotowa i poprawna.
+
+OC-05 (NeuronWashTrading) działa na czystym OHLCV — dostępny od razu (DOSTEPNY=True).
 """
 
 from imperium.legiony.mikro_neuron import MikroNeuron, SygnalNeuronu
@@ -159,3 +161,71 @@ class NeuronExchangeNetflow(MikroNeuron):
             return self._bazowy_sygnal(netflow, "SHORT", pewnosc,
                 [f"Netflow={netflow:.0f} BTC — napływ na giełdy — bearish signal"])
         return self._bazowy_sygnal(netflow, "NEUTRAL", 0.10, ["Netflow neutralny"])
+
+
+class NeuronWashTrading(MikroNeuron):
+    """
+    OC-05 | Wash Trading Detection — Benford + zaokrąglenia (W-061).
+
+    Dla nowicjusza: Na nieregulowanych giełdach (MEXC, Binance w przeszłości)
+    giełdy lub market makerzy sztucznie handlują sami ze sobą, żeby wyglądać
+    na popularne. Fałszywy wolumen niszczy ALL nasze wskaźniki wolumenowe
+    (VPIN, OBV, Flow). Ten neuron to „detektor kłamstwa" dla danych.
+
+    Dwa testy statystyczne (czyste OHLCV, bez API):
+      1. Prawo Benforda — w naturalnych danych pierwsza cyfra wolumenu
+         jest silnie asymetryczna (1=30%, 2=18%...). Boty używają okrągłych
+         liczb → chi² odstępstwo wykrywa to wzorzec.
+      2. Klasterowanie zaokrągleń — legalne transakcje są losowe; boty
+         preferują 100, 500, 1000 (round numbers). Frakcja zaokrąglonych > 40% → alarm.
+
+    Zachowanie (meta-gate defensywna, jak VPIN/Entropy):
+      WASH_SCORE < 0.35 → NEUTRAL (niska pewność, brak sygnału manipulacji)
+      0.35–0.65 → ostrzeżenie: HIGH pewnosc_przeciwnika (tłumi rój globalnie)
+      > 0.65    → silny sygnał wash: NEUTRAL + bardzo wysoka pewnosc_przeciwnika
+
+    Nigdy nie głosuje kierunkowo (LONG/SHORT) — manipulacja nie mówi „dokąd",
+    tylko „nie ufaj tym danym". Tłumi rój poprzez pewnosc_przeciwnika.
+
+    Źródło: Cong, Li, Tang, Yang (2023), "Crypto Wash Trading", NBER w30783,
+            https://www.nber.org/papers/w30783
+    Weryfikacja: ✅ zweryfikowane peer-reviewed (NBER working paper, 2023)
+    """
+    KLUCZ = "OC-05"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "WASH_SCORE_100"
+    KATEGORIA = "O"
+    WAGA = 8
+    ELITARNY = False
+
+    _PROG_OSTRZEZENIE = 0.35   # powyżej → tłumienie roju
+    _PROG_SILNY       = 0.65   # powyżej → silny alarm manipulacji
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        score = wskazniki.get("WASH_SCORE_100")
+        if score is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak danych WashTrading (za mało barów wolumenu)"])
+
+        if score < self._PROG_OSTRZEZENIE:
+            return self._bazowy_sygnal(score, "NEUTRAL", 0.05,
+                [f"Wolumen naturalny (Benford OK): score={score:.3f}"])
+
+        if score < self._PROG_SILNY:
+            # Ostrzeżenie: tłumimy rój, nie głosujemy kierunkowo
+            pewnosc_p = round(min(0.70, 0.40 + (score - self._PROG_OSTRZEZENIE) * 1.0), 4)
+            s = self._bazowy_sygnal(score, "NEUTRAL", 0.0,
+                [f"⚠️ WASH SIGNAL (umiarkowany): score={score:.3f} — "
+                 f"wolumen podejrzany (Benford + zaokrąglenia), tłumię rój"])
+            s.pewnosc_przeciwnika = pewnosc_p
+            s.policz_finalna()
+            return s
+
+        # Silny sygnał fałszywego wolumenu
+        pewnosc_p = round(min(0.90, 0.70 + (score - self._PROG_SILNY) * 0.80), 4)
+        s = self._bazowy_sygnal(score, "NEUTRAL", 0.0,
+            [f"🚨 WASH TRADING ALARM: score={score:.3f} — "
+             f"wolumen prawdopodobnie sfałszowany, NIE HANDLUJ na tych danych"])
+        s.pewnosc_przeciwnika = pewnosc_p
+        s.policz_finalna()
+        return s

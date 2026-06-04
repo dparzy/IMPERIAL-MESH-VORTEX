@@ -54,7 +54,7 @@ SOURCE_TAG_PY = "pure-Python (deterministic)"
 # compute() stempluje je SOURCE_TAG_PY — audyt nie może kłamać o źródle (Prawo XIII).
 _PURE_PYTHON_INDICATORS = {
     "AO", "AO_PREV", "AC", "AC_PREV", "HMA", "HMA_PREV",
-    "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "PERMUTATION_ENTROPY", "CHOPPINESS", "ULCER",
+    "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "PERMUTATION_ENTROPY", "VPIN", "WASH_TRADING", "CHOPPINESS", "ULCER",
     "VWAP", "VWAP_STD",
     "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
 }
@@ -406,6 +406,137 @@ def _py_permutation_entropy(close, period: int = 100, dim: int = 3, delay: int =
     return round(max(0.0, min(1.0, entropia / norm)), 4)
 
 
+def _py_vpin(close, volume, n_buckets: int = 50, period: Optional[int] = None) -> Optional[float]:
+    """
+    VPIN — Volume-Synchronized Probability of Informed Trading (radar toksyczności przepływu).
+    Źródło: Easley, López de Prado, O'Hara (2012), "Flow Toxicity and Liquidity in a
+            High-Frequency World", Review of Financial Studies 25(5):1457,
+            https://doi.org/10.1093/rfs/hhs053
+
+    Dla nowicjusza: VPIN mierzy „toksyczność" przepływu zleceń — czy gracze
+    poinformowani (wieloryby, market makerzy) handlują przeciwko tłumowi. Wysoki
+    VPIN poprzedza kaskady likwidacji (flash crash 2010 miał ekstremalny VPIN).
+    NIE mówi „w górę / w dół" — mówi „jak niebezpiecznie jest teraz handlować".
+
+    Metoda (BVC — Bulk Volume Classification, klasyfikacja masowa wolumenu):
+      1. Zmiany ceny dP[i] = close[i] − close[i−1].
+      2. sigma = odchylenie std próbkowe dP (guard: zero → None).
+      3. Frakcja kupna = Φ(dP/sigma), gdzie Φ to dystrybuanta standardowego rozkładu
+         normalnego (przez math.erf). Frakcja sprzedaży = 1 − frakcja kupna.
+      4. V_buy[i] = volume[i]·frakcja_kupna; V_sell[i] = volume[i]·frakcja_sprzedaży.
+      5. Kubełkowanie: w tej wersji v1 używamy OSTATNICH `n_buckets` BARÓW jako
+         kubełków (proxy „per-bar"). Standardowy VPIN dzieli na kubełki o RÓWNYM
+         WOLUMENIE; proxy barowy jest prostszy i wystarcza na danych OHLCV bez
+         danych tickowych. Świadomy kompromis (Prawo I — jawnie udokumentowany).
+      6. VPIN = Σ|V_buy − V_sell| / Σ(V_buy + V_sell) ∈ [0,1].
+
+    Zwraca VPIN ∈ [0,1]. None gdy mniej niż n_buckets+1 barów lub zerowy wolumen.
+    """
+    import math
+    c = list(close)
+    v = list(volume)
+    if len(c) < n_buckets + 1 or len(v) < n_buckets + 1:
+        return None
+    # Zmiany ceny względem poprzedniego bara
+    dP = [c[i] - c[i - 1] for i in range(1, len(c))]
+    vol = v[1:]  # zrównaj długość z dP (volume bara, którego dotyczy zmiana)
+    # Odchylenie std próbkowe dP na całym dostępnym oknie
+    n = len(dP)
+    srednia = sum(dP) / n
+    war = sum((x - srednia) ** 2 for x in dP) / (n - 1) if n > 1 else 0.0
+    sigma = math.sqrt(war)
+    if sigma < 1e-12:
+        return None
+    # Ostatnie n_buckets barów jako kubełki (proxy barowy)
+    dP_okno = dP[-n_buckets:]
+    vol_okno = vol[-n_buckets:]
+    sqrt2 = math.sqrt(2.0)
+    sum_imbalance = 0.0
+    sum_total = 0.0
+    for dp, vbar in zip(dP_okno, vol_okno):
+        frac_buy = 0.5 * (1.0 + math.erf((dp / sigma) / sqrt2))
+        v_buy = vbar * frac_buy
+        v_sell = vbar * (1.0 - frac_buy)
+        sum_imbalance += abs(v_buy - v_sell)
+        sum_total += v_buy + v_sell
+    if sum_total < 1e-12:
+        return None
+    return round(max(0.0, min(1.0, sum_imbalance / sum_total)), 4)
+
+
+def _py_wash_trading(volume, period: int = 100) -> Optional[float]:
+    """
+    Wash Trading Score — detekcja fałszywego wolumenu (Benford + zaokrąglenia).
+    Źródło: Cong, Li, Tang, Yang (2023), "Crypto Wash Trading", NBER w30783,
+            https://www.nber.org/papers/w30783
+
+    Dla nowicjusza: Giełdy (szczególnie nieregulowane jak MEXC) sztucznie pompują
+    wolumen handlując ze sobą własnymi botami. Zdradza je łamanie dwóch praw statystyki:
+      1. Prawo Benforda — w naturalnych danych pierwsza cyfra wolumenu: 1 pojawia
+         się 30%, 2=18%, 3=12% itd. (malejąco). Wash boty używają okrągłych liczb
+         → 1, 2, 5 są przesadzone, 3, 4, 6–9 za rzadkie.
+      2. Efekt zaokrągleń — legalne wolumeny są losowe; boty używają okrągłych
+         liczb (100, 1000, 500) → ostatnie cyfry 0 i 5 są zbyt częste.
+
+    Wynik ∈ [0,1]:
+      0.0 = wolumen wydaje się naturalny (Benford OK, brak klasterowania)
+      1.0 = silny sygnał wash trading (dwa testy czerwone jednocześnie)
+
+    Algorytm:
+      Benford: chi² odstępstwo od rozkładu Benforda na pierwszych cyfrach.
+               chi²_znorm = min(chi²_obs / chi²_prog, 1.0), gdzie prog = χ²(0.01, df=8).
+      Okrągłe: frakcja wolumenów kończących się na 0 lub 5 (po ×1 skalowaniu do int).
+               Oczekiwane losowo: ~20%. Próg anomalii: 40%+.
+      score = sqrt(benford_score × rounding_score) (geometryczna — oba muszą być wysokie).
+    """
+    import math
+    vols = [v for v in list(volume)[-period:] if v and v > 0]
+    if len(vols) < 30:
+        return None
+
+    # ── Test 1: Prawo Benforda (pierwsza cyfra wolumenu) ──────────────────────
+    benford_expected = [0.30103, 0.17609, 0.12494, 0.09691, 0.07918,
+                        0.06695, 0.05799, 0.05115, 0.04576]  # log10(1+1/d)
+    counts = [0] * 9
+    for v in vols:
+        s = f"{int(v)}"
+        if s and s[0].isdigit() and '1' <= s[0] <= '9':
+            counts[int(s[0]) - 1] += 1
+    n_benf = sum(counts)
+    chi2 = 0.0
+    if n_benf > 0:
+        for i, cnt in enumerate(counts):
+            expected = benford_expected[i] * n_benf
+            if expected > 0:
+                chi2 += (cnt - expected) ** 2 / expected
+    # chi² krytyczne (α=0.01, df=8) ≈ 20.09; powyżej → anomalia
+    chi2_prog = 20.09
+    benford_score = min(1.0, chi2 / chi2_prog)
+
+    # ── Test 2: Klasterowanie zaokrągleń (ostatnia cyfra skali) ───────────────
+    # Skalujemy do najbardziej informacyjnego rzędu: interesują nas "okrągłe" wolumeny
+    round_count = 0
+    for v in vols:
+        # Pierwsza cyfra po wiodących zerach: sprawdzamy czy relatywnie okrągły
+        # (divisible by 10^(digits-2) — tj. trailing zeros relative to magnitude)
+        iv = int(v)
+        if iv <= 0:
+            continue
+        # Uproszczone: czy wolumen po podzieleniu przez najbliższą potęgę 10 ma resztę 0 lub 0.5
+        digits = len(str(iv))
+        scale = 10 ** max(0, digits - 2)
+        last2 = iv % (scale * 10)
+        if last2 == 0 or last2 == scale * 5:
+            round_count += 1
+    round_frac = round_count / len(vols)
+    # Oczekiwane losowo: ~20%; progowa anomalia wash = 40%. Normalizujemy [0→0, 0.4+→1.0].
+    rounding_score = min(1.0, max(0.0, (round_frac - 0.20) / 0.20))
+
+    # ── Wynik łączny (geometryczny — oba testy muszą pokazywać anomalię) ──────
+    score = math.sqrt(benford_score * rounding_score)
+    return round(max(0.0, min(1.0, score)), 4)
+
+
 def _py_choppiness(high, low, close, period: int = 14) -> Optional[float]:
     """
     Choppiness Index (CHOP) — mierzy, czy rynek TRENDUJE czy się KONSOLIDUJE.
@@ -627,6 +758,12 @@ class CalculatorGateway:
 
             # ── Pure-Python: Permutation Entropy — meta-brama chaosu (kat. N, W-054) ──
             "PERMUTATION_ENTROPY": lambda close, period=100, dim=3, delay=1: _py_permutation_entropy(close, period, dim, delay),
+
+            # ── Pure-Python: VPIN — radar toksycznego przepływu (kat. Z, W-036) ──
+            "VPIN": lambda close, volume, n_buckets=50: _py_vpin(close, volume, n_buckets),
+
+            # ── Pure-Python: Wash Trading Score — Benford + zaokrąglenia (kat. O, W-061) ──
+            "WASH_TRADING": lambda volume, period=100: _py_wash_trading(volume, period),
 
             # ── Pure-Python: Choppiness Index — trend vs konsolidacja (kat. V) ──
             "CHOPPINESS": lambda high, low, close, period=14: _py_choppiness(high, low, close, period),

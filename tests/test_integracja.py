@@ -51,7 +51,7 @@ def test_wagi_rezimowe_dzialaja():
 
 def test_rejestr_wszystkie_neurony():
     neurony = wszystkie_neurony()
-    assert len(neurony) == 48, f"Powinno być 48 neuronów, jest {len(neurony)}"
+    assert len(neurony) == 51, f"Powinno być 50 neuronów, jest {len(neurony)}"
 
 
 def test_rejestr_wszyscy_zwiadowcy():
@@ -65,7 +65,7 @@ def test_rejestr_wszyscy_zwiadowcy():
 
 def test_raport_potencjalu():
     rap = raport_potencjalu()
-    assert rap["neurony_lacznie"] == 48
+    assert rap["neurony_lacznie"] == 51
     assert rap["zwiadowcy_exp"] == 12
     # EXP-12 (L2) wyciszony do czasu feedu orderbook
     assert rap["zwiadowcy_wyciszeni"] >= 1

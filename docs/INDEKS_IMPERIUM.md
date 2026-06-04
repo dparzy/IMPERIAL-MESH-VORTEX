@@ -47,7 +47,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 11 | `archiwum/ARSENAL_AMERYKI.md` | 690 linków z 50+ krajów — pełny katalog regionalny (na wyraźne polecenie) | 📦 Archiwum |
 | 11 | `SYMBIOZA_MODULOW.md` | Interakcje modułów i mapowanie narzędzi | 🔗 Link |
 | 12 | `ROADMAP_IMPERIUM.md` | Roadmapa rozwoju i wersjonowanie | 🔗 Link |
-| 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (48 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
+| 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (51 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
 | 14 | `KATALOG_STRATEGII.md` | **~108+ strategii zmapowanych** (17 w kodzie) — Księga Azjatycka + Mistrzowie Świata + VSA/GEX/DeFi | ✅ Aktywny |
 | 15 | `GENERAL_LEGATUS.md` | Generał Legatus — SKANER/FOKUS, agregacja neuronów, reżimy | ✅ Aktywny |
 | 16 | `KALKULATOR_LEWARA.md` | Matematyka przeżycia — likwidacja, stop-loss, Kelly, dynamiczna dźwignia | ✅ Aktywny |
@@ -77,12 +77,12 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 |---------|-----------------|-------|--------|
 | `imperium/akwedukty/` | Rurociąg danych — pobieranie świec z MEXC przez CCXT | Akwedukty (Data Pipeline) | ✅ Gotowy |
 | `imperium/fundament/` | Brama Kalkulatora — TA-Lib oblicza wskaźniki, SHA-256 podpisuje | Calculator Gate | ✅ Gotowy |
-| `imperium/legiony/` | Legiony — mikro-neurony (48), Legatus, zwiadowcy (12), strategie (17) | Scout Legions | ✅ Rdzeń aktywny |
+| `imperium/legiony/` | Legiony — mikro-neurony (51), Legatus, zwiadowcy (12), strategie (17) | Scout Legions | ✅ Rdzeń aktywny |
 | `imperium/pretorianie/` | Pretorianie — weto ryzyka, ochrona kapitału | Risk Praetorians | ✅ Gotowy |
 | `imperium/senat/` | Senat — debata Popularów vs Optymantów nad sygnałem | Senate Debate | 🟡 Szkielet |
 | `imperium/cesarz/` | Cesarz — DeepSeek LLM podejmuje ostateczną decyzję | Emperor (LLM) | 🟡 Szkielet |
 | `imperium/drogi/` | Drogi — wykonanie zlecenia na MEXC (Via Romana) | Order Execution | 🟡 Szkielet |
-| `imperium/biblioteki/` | Biblioteki — **kronikarz.py** (logi) + **mnemosyne.py** (pamięć transakcji) + **pamiec_absolutna.py** (ImperiumLog, MAE/MFE, JSONL) + **igrzyska.py** (ranking batch) + **hedge_mwu.py** (online MWU, W-049) | Logs & Memory & Learning | ✅ Gotowy |
+| `imperium/biblioteki/` | Biblioteki — **kronikarz.py** (logi) + **mnemosyne.py** (pamięć transakcji) + **pamiec_absolutna.py** (ImperiumLog, MAE/MFE, JSONL) + **igrzyska.py** (ranking batch) + **hedge_mwu.py** (online MWU, W-049) + **arena_trzech_bram.py** (potrójna bariera, W-035) | Logs & Memory & Learning | ✅ Gotowy |
 | `imperium/swiatynie/` | Świątynie — wykresy, dashboard, wizualizacje | Charts & Dashboard | 🟡 Szkielet |
 | `imperium/koloseum/` | Koloseum — PaperTradingEngine + **Dyrygent** (orkiestrator: bary→**Namiestnik**→Legatus→Kalkulator→pozycja) + **Namiestnik** (Regime + Timeframe-Aware Gating Network) + **Backtest** + **Detektor Lookahead-bias** (LA-01, Freqtrade) | Backtesting Arena | ✅ Cykl Faza 1 aktywny |
 | `imperium/oczy/` | Oczy — newsy, sentyment, dane on-chain | News & Sentiment | 🔴 Planowany |
@@ -166,10 +166,10 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 | **C** ✅ | AdapterCVD (Binance aggTrades public) → V-03 CVD obudzony | ✅ ZREALIZOWANA 2026-06-03 | +1 neuron (V-03 kat. F) |
 | **D** 🔵 | OC-01..04 on-chain (MVRV, SOPR, Puell, Netflow) — wymaga klucza Glassnode/CryptoQuant | ⏳ OCZEKUJE — decyzja Cezara | +4 neurony (kat. O) |
 | **LIVE** 🟠 | Paper trading na żywych danych MEXC — `MEXC_API_KEY` + `MEXC_SECRET` | ⏳ Gotowe do uruchomienia | rdzeń kompletny |
-| **E** 🔵 | Dalsze neurony z katalogu (299−48=251 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
+| **E** 🔵 | Dalsze neurony z katalogu (299−51=248 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
-**Stan kategorii (2026-06-04):** aktywne M/T/F/A/L/V/R/H/N · wyciszone S(SMC feed)/O(on-chain API)
-**Neurony: 48** (41 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 434/434**
+**Stan kategorii (2026-06-04):** aktywne M/T/F/A/L/V/R/H/N/Z/O · wyciszone S(SMC feed)/O-API(on-chain API)
+**Neurony: 51** (44 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 485/485**
 
 ### Zadania bieżące (infrastruktura)
 | # | Zadanie | Moduł | Priorytet |

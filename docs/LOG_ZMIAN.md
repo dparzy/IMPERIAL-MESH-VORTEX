@@ -6,6 +6,39 @@
 
 ---
 
+## 2026-06-07 | BIBLIOTEKA | BIB-001..004 — Biblioteka Tradingowa Cezara (4 książki przeanalizowane)
+
+**Opis:** Założona Biblioteka Tradingowa Cezara. Przeanalizowane 4 książki (format azw3→epub→HTML,
+pełna ekstrakcja treści przez Opus) i zapisane do `docs/WIZJONER.md` jako sekcja BIB-001..004:
+- **BIB-001** The Secret Wealth Advantage (Akhil Patel) — 18-letni cykl nieruchomości, reguła 23/25 krachów → W-082..W-084
+- **BIB-002** Technical Analysis of the Financial Markets (John J. Murphy) — analiza międzyrynkowa, left/right translation, MESA → W-085..W-088
+- **BIB-003** Cryptoassets (Burniske & Tatar) — NVT (crypto-PE), hash rate, Google Trends, Gartner Hype Cycle → W-089..W-093
+- **BIB-004** The Psychology of Trading (Brett Steenbarger) — stacjonarność (Clifford Sherry), pinball trade, anty-overconfidence → W-094..W-096
+Każda książka opisana wg ZPO: pełne tytuły, cytaty dosłowne, status weryfikacji ✅/⚠️, ocena, priorytet.
+**Powód:** Prawo XVII (rozpoznanie terenu), ZPO (zasada pełnego opisu), Prawo XIX (kod jest prawem — ale wiedza jest fundamentem kodu).
+**Pliki:** `docs/WIZJONER.md`, `docs/REJESTR_INSPIRACJI.md`, `docs/LOG_ZMIAN.md`
+
+---
+
+## 2026-06-07 | WDROŻENIE | W-079 D-01 NeuronPathSignature — Lévy Area Close×Volume (Rough Path Theory)
+
+**Opis:** Wdrożono neuron D-01 NeuronPathSignature — pierwsza miara nieprzemiennej geometrii
+ścieżki w Imperium. Lévy Area (iterated integral rzędu 2) mierzy synchronizację wzrostu
+wolumenu z ceną: LA>0 → akumulacja poprzedza ruch (LONG); LA<0 → dystrybucja (SHORT).
+Implementacja czysto NumPy (bez zewnętrznych bibliotek), okno 20 barów, normalizacja
+scale-invariant. Nowa kategoria D (Dynamika ścieżkowa). Elitarny (E1 — jedyna miara
+w Imperium mierząca tę oś). WAGI_REZIMU uzupełnione o kat. D.
+Budowniczy wzbogacony o CLOSE_SERIES_20 + VOLUME_SERIES_20 (_dodaj_path_series).
+8 nowych testów. Daty MANIFEST/README zaktualizowane.
+**Powód:** Prawo XIX (kod jest prawem), Prawo XX (ELITARNY=True z kryterium E1).
+**Pliki:**  (nowy), ,
+, ,
+, , ,
+, , ,
+, , 
+
+---
+
 ## 2026-06-04 | AUDYT+ZWIAD | 7 niespójności liczb naprawionych + 3 perełki do WIZJONERA (W-079..W-081)
 
 **Opis:** Głęboki audyt całego Imperium (kod vs dokumenty wg INDEKSU) wykrył 7 stałych
@@ -22,232 +55,22 @@ dopisane do WIZJONER i REJESTR_INSPIRACJI (INF-10/11/12):
 
 ---
 
-## 2026-06-04 | FIX | Review PR #55 — uczciwy raport ryzyka vol, log domain HURST, płaska cena H-01, spójność liczb
+ D-01 NeuronPathSignature — Lévy Area Close×Volume (Rough Path Theory)
 
-**Opis:** Poprawki ze zewnętrznej recenzji:
-1. **kalkulator_lewara.py (P1):** vol-targeting (W-059) mógł podnieść rozmiar do 1.5×, a `ryzyko_usdt` raportowało bazowe 2% — teraz liczone z FINALNEGO rozmiaru (Prawo I). Decyzja Cezara: upsizing w spokoju + wyraźnej przewadze jest celowy, więc zostaje; raport pokazuje realne ryzyko, docstring zaktualizowany.
-2. **brama_kalkulatora.py (P2):** HURST_DFA mógł rzucić math domain error przy niedodatniej cenie bieżącej — teraz walidujemy obie świece przed `log()`, fallback None.
-3. **fraktal.py (P2):** płaska cena (CLOSE==CLOSE_PREV) klasyfikowana jako SHORT → teraz NEUTRAL (jak N-01).
-4. **MANIFEST/README (P2):** wiersz RAZEM i backlog zsynchronizowane do 51 neuronów (248 do wdrożenia).
-**Powód:** Prawo I (uczciwy raport ryzyka), Prawo XIX/XXI (spójność liczb).
-**Pliki:** `imperium/pretorianie/kalkulator_lewara.py`, `imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/neurony/fraktal.py`, `tests/test_neurony.py`, `docs/MANIFEST_KODU.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`
-**Testy:** 497/497 ✅. Audyt: exit 0 ✅.
-
----
-
-## 2026-06-04 | FIX | Review PR #57 — płaska cena N-01, brakujące wiersze KATALOG, spójność testów README
-
-**Opis:** Trzy poprawki ze zewnętrznej recenzji:
-1. **N-01 entropia.py:** płaska cena (`CLOSE == CLOSE_PREV`) była błędnie klasyfikowana jako SHORT. Teraz `kierunek_ruchu = None` przy braku ruchu → NEUTRAL (nie wymuszamy kierunku bez ruchu). +1 test `test_n01_plaska_cena_nie_short`.
-2. **KATALOG_NEURONOW.md:** legenda zapowiadała kategorie N i Z, ale tabela nie miała wierszy. Dodano N-01 (PermutationEntropy), Z-01 (ToxicFlow), Z-02 (PumpDetect).
-3. **README.md / INDEKS:** zsynchronizowano liczbę testów (495/495) we wszystkich miejscach.
-**Powód:** Prawo XXI — chirurgiczna spójność; usunięcie kierunkowego sygnału bez ruchu.
-**Pliki:** `imperium/legiony/neurony/entropia.py`, `tests/test_neurony.py`, `docs/KATALOG_NEURONOW.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`
-**Testy:** 495/495 ✅. Audyt: exit 0 ✅.
-
----
-
-## 2026-06-04 | FEATURE | NeuronPumpDetect Z-02 — detekcja akumulacji przed pumpem (wizja W-042)
-
-**Opis:** Nowy neuron Z-02 NeuronPumpDetect wykrywa cichą akumulację smart money przed pumpem. Pure-OHLCV, 3 warunki: wolumen ×1.5–4× MA20, wąski zakres świecy (< 0.75× ATR), OBV rośnie (> OBV_EMA_20 × 1.005). Gdy wszystkie 3 naraz → LONG, pewność 0.55–0.85 skalowana stopniem spełnienia. Ortogonalny wobec Z-01 (obrona vs ofensywa).
-**Powód:** arXiv 2504.15790 (2025) — akumulacja koncentruje się w ostatniej godzinie przed pumpem, >99% accuracy na krypto (preprint, niezweryfikowany peer-review ⚠️).
-**Pliki:** `imperium/legiony/neurony/zagrozenie.py`, `imperium/legiony/rejestr.py`, `tests/test_neurony.py` (9 testów Z-02), `tests/test_integracja.py`, `docs/MANIFEST_KODU.md`, `docs/WIZJONER.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`
-**Neurony:** 50→51 (44 aktywnych)
-
----
-
-## 2026-06-04 | FEATURE | Drawdown-Fractional Sizing (wizja W-063, Maier-Paape)
-
-### Kontekst
-BezpiecznikKrzywejKapitalu (W-062) ma 3 stany skokowe (NORMAL/REDUCED/HALT). W-063 dodaje
-płynną redukcję: frakcja = max(min_f, 1 − DD/prog_max) maleje liniowo z bieżącym drawdownem.
-Komplementarny do W-062: razem = twardy wyłącznik + płynna regulacja przed nim.
-Źródło: Maier-Paape & Zhu (2018), Risks 6(2), doi:10.3390/risks6020053.
-
-### Zmiany
-- `imperium/pretorianie/kalkulator_lewara.py` — `SkalowanieFrakcjaDD` + integracja w `policz()`
-- `tests/test_kalkulator.py` — 8 nowych testów W-063
-- `docs/WIZJONER.md`, `docs/INDEKS_IMPERIUM.md` — sync
-
-### Wynik
-485/485 testów ✅ | Audyt W1–W11 exit 0 ✅
-
----
-
-## 2026-06-04 | FEATURE | Arena Trzech Bram — potrójna bariera (wizja W-035)
-
-### Kontekst
-Igrzyska oceniały neurony binarnie (pnl > 0 = wygrana). Potrójna bariera (López de Prado 2018)
-daje obiektywną etykietę każdemu sygnałowi: TP (contribution +1) / SL (-1) / CZAS (0).
-Premia za szybkość (timeliness): TP w 3. barze > TP w 20. barze. To sprawiedliwy, niemanipulowalny
-scoring, fundament pod żywe Igrzyska i rankingi neuronów.
-
-### Zmiany
-- `imperium/biblioteki/arena_trzech_bram.py` — `oznacz_bariera()`, `WynikBariery`, `RaportAreny`
-- `imperium/koloseum/backtest.py` — `backtest_arena()` — backtest z etykietowaniem potrójną barierą
-- `tests/test_arena_trzech_bram.py` — 17 testów
-- `tests/run_tests.py` — dodano `test_arena_trzech_bram` do listy modułów
-- `docs/WIZJONER.md`, `docs/INDEKS_IMPERIUM.md`, `docs/LOG_ZMIAN.md` — sync
-
-### Wynik
-477/477 testów ✅ | Audyt W1–W11 exit 0 ✅ | Etykietowanie look-ahead w backteście jawnie udokumentowane (Prawo I)
-
----
-
-## 2026-06-04 | FEATURE | Wash Trading Detection OC-05 — Benford + zaokrąglenia (wizja W-061)
-
-### Kontekst
-MEXC i inne nieregulowane giełdy sztucznie pompują wolumen wash tradingiem. Fałszywy
-wolumen niszczy nasze wskaźniki wolumenowe (VPIN, OBV, Flow). OC-05 NeuronWashTrading
-wykrywa to przez dwa testy statystyczne na czystym OHLCV: Prawo Benforda (chi² na
-pierwszych cyfrach wolumenu) + klasterowanie zaokrągleń (frakcja okrągłych wolumenów).
-Źródło: Cong, Li, Tang, Yang (2023), "Crypto Wash Trading", NBER w30783.
-
-### Zmiany
-- `imperium/fundament/brama_kalkulatora.py` — `_py_wash_trading()` + `WASH_TRADING` w dispatch
-- `imperium/legiony/budowniczy_wskaznikow.py` — `WASH_SCORE_100` w `_PLAN_SKALARNE`
-- `imperium/legiony/neurony/onchain.py` — `NeuronWashTrading` (OC-05, WAGA=8, kat. O)
-- `imperium/legiony/rejestr.py` — rejestracja OC-05
-- `tests/test_neurony.py` — 10 nowych testów OC-05
-- `tests/test_integracja.py`, `docs/MANIFEST_KODU.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`, `docs/WIZJONER.md` — sync
-
-### Wynik
-462/462 testów ✅ | Audyt W1–W11 exit 0 ✅ | Neurony: 50 (43 aktywnych)
-
----
-
-## 2026-06-04 | FEATURE | VPIN ToxicFlow meta-brama obronna — nowa kategoria Z (wizja W-036)
-
-### Kontekst
-Brakowało osi „zagrożenie/toksyczność przepływu" jako meta-bramy obronnej: czy
-gracze poinformowani (wieloryby, market makerzy) handlują przeciwko tłumowi, co
-poprzedza kaskady likwidacji (flash crash 2010 miał ekstremalny VPIN). VPIN
-(Volume-Synchronized Probability of Informed Trading; Easley, López de Prado,
-O'Hara 2012, Review of Financial Studies 25(5):1457) mierzy KTO handluje, nie
-gdzie idzie cena — odrębna oś od Momentum/Trend/Zmienność.
-
-### Decyzja Prawa XVI (redundancja mierzona, nie zgadywana)
-Z-01 to META-BRAMA OBRONNA — nigdy nie wskazuje kierunku (zawsze NEUTRAL), tłumi
-cały rój przez `pewnosc_przeciwnika`. KOMPLEMENTARNA do kat. A (anty-manipulacja):
-A wykrywa ślad pojedynczej zagrywki w jednej świecy, Z mierzy agregat toksyczności
-przepływu w oknie — krzyżowe potwierdzenie zagrożenia z dwóch perspektyw. Korelacja
-Z-01↔A do zmierzenia `diagnostyka_korelacji` po zebraniu danych paper-tradingu.
-
-### Wdrożone
-- **Brama:** pure-Python `VPIN` (`_py_vpin`, close+volume, n_buckets=50) metodą BVC
-  (Bulk Volume Classification): frakcja kupna = Φ(dP/sigma) przez math.erf, VPIN =
-  Σ|V_buy−V_sell|/Σ(V_buy+V_sell)∈[0,1]. Proxy barowy (ostatnie n_buckets barów)
-  zamiast kubełków o równym wolumenie — świadomy kompromis dla OHLCV bez tików
-  (Prawo I, jawnie udokumentowany). None gdy <n_buckets+1 barów lub zero wariancji/
-  wolumenu. Stempel pure-Python (XIII).
-- **Budowniczy:** klucz `VPIN_50`.
-- **Neuron Z-01** `neurony/zagrozenie.py` (NeuronToxicFlow, kat. Z, WAGA 8): VPIN<0.3
-  spokój (NEUTRAL, brak tłumienia), 0.3–0.7 czujność (skromne pewnosc_przeciwnika),
-  VPIN>0.7 🚨 toksyczny przepływ (wysokie pewnosc_przeciwnika — „nie wchodź / schodź
-  z lewara"). Zawsze NEUTRAL — czysta brama, nigdy głos kierunkowy.
-- **Nowa kategoria Z** narodzona: legenda `mikro_neuron.py`, audyt `LEGENDA_KAT`,
-  `CLAUDE.md` KROK 0, `WAGI_REZIMU` (Z ×2.0 PANIC max obrona, ×1.5 VOLATILE, ×1.1
-  NORMAL, ×1.0 TREND_STRONG/RANGING), rejestr.
-- **Liczby:** 48→49 neuronów (42 aktywnych), 60→61 modułów. Backlog 251→250.
-- **Testy:** +10 (Brama VPIN zakres/za-mało/jednostronny/zrównoważony/źródło, Z-01
-  spokój/alarm/brak-danych/kat./nigdy-kierunkowy). 443 → 453/453 zielone.
-
-### Pliki
-`imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
-`imperium/legiony/neurony/zagrozenie.py`, `imperium/legiony/mikro_neuron.py`,
-`imperium/legiony/legatus.py`, `imperium/legiony/rejestr.py`,
-`narzedzia/audyt_spojnosci.py`, `tests/test_neurony.py`, `tests/test_integracja.py`,
-`docs/MANIFEST_KODU.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`, `docs/WIZJONER.md`,
-`docs/KATALOG_NEURONOW.md`, `CLAUDE.md`.
-
----
-
-## 2026-06-04 | FIX | Naprawa martwego breakera krzywej (W-062) — equity zamiast wolnego kapitału
-
-### Kontekst
-Backtest A/B LINK 5m wykazał, że breaker krzywej (W-062) był **martwy w praktyce**:
-ON i OFF dawały identyczny PnL co do grosza, mimo że breaker spędzał 63% czasu w
-stanie REDUCED. Diagnoza (Prawo XV — utrata potencjału): `aktualizuj()` dostawał
-`engine.kapital` (wolny kapitał), który spada przy otwarciu pozycji (margin
-zablokowany), a wraca przy zamknięciu. W momencie KAŻDEGO wejścia breaker był więc
-NORMAL → frakcja zawsze 1.0 → zero wpływu na sizing.
-
-### Zmiana
-- `PaperTradingEngine.kapital_calkowity` (nowa property) = wolny + Σ zablokowany
-  margin otwartych pozycji = startowy + zrealizowany PnL. Nie spada przy otwarciu.
-- `Dyrygent` karmi breaker `kapital_calkowity` zamiast `kapital`.
-
-### Wynik (LINK 5m, kwiecień 2026, breaker ON vs OFF)
-- agregat:   -2.99% → -0.78%  (PF 0.82 → 0.90)
-- strategia: -0.50% → +0.89%  (PF 0.94 → 1.12, rentowny)
-- filtr:     -0.66% → -4.59%  (breaker zmienił timing — niejednolity efekt)
-
-### Pliki
-`imperium/koloseum/paper_trading.py` (kapital_calkowity), `imperium/koloseum/dyrygent.py`,
-`tests/test_paper_trading.py` (+2 testy). Testy 443/443, audyt exit 0.
-
----
-
-## 2026-06-04 | KOD | W-062 Equity-Curve Circuit Breaker — meta-poziom anti-tail nad AOA
-
-### Kontekst
-Pierwsza wizja Etapu A. Backtest LINK 5m pokazał PF < 1.0 (overtrading) — rój dalej grał
-pełnym rozmiarem mimo obsuwającej się krzywej kapitału. Potrzebna miększa, wcześniej
-reagująca warstwa ryzyka NAD twardym BezpiecznikKapitalu (AOA 30%, W-028). Realizacja
-Prawa XV (ochrona potencjału) w kodzie.
-
-### Wdrożone
-- **`BezpiecznikKrzywejKapitalu`** (`pretorianie/kalkulator_lewara.py`) — dataclass traktujący
-  własną krzywą kapitału roju jak instrument. MA na krzywej + drawdown od szczytu → trzy stany:
-  - NORMAL (kapitał ≥ MA, DD < 10%) → rozmiar ×1.0
-  - REDUCED (DD ≥ 10% lub kapitał < MA) → rozmiar ×0.5
-  - HALT (DD ≥ 20%) → blokada wszystkich nowych wejść (weto w checklist)
-  - Histereza: z HALT wychodzimy dopiero gdy DD < prog_dd_reduced (brak migotania na granicy)
-  - Metody: `aktualizuj()`, `frakcja_pozycji()`, props `drawdown`/`ma_kapitalu`/`halt`, `reset()`
-- **`KalkulatorLewara.policz(breaker_krzywej=...)`** — REDUCED mnoży rozmiar, HALT → weto.
-- **`PlanPozycji.frakcja_breaker`** — widoczny mnożnik breakera (1.0/0.5/0.0).
-- **`Dyrygent(breaker_krzywej=True)`** — instancja breakera, `.aktualizuj(engine.kapital)`
-  w cyklu przed sizingiem, przekazanie do `policz()`. Opt-out: `breaker_krzywej=False`.
-- **7 nowych testów** w `tests/test_kalkulator.py`. Suite: 434 → 441 ✅.
-
-### Plasowanie w stosie ryzyka
-Warstwa MIĘKSZA, reagująca WCZEŚNIEJ niż AOA: przycina (10%) → wstrzymuje (20%) → AOA twardy STOP (30%).
-
-### Pliki
-`imperium/pretorianie/kalkulator_lewara.py`, `imperium/koloseum/dyrygent.py`,
-`tests/test_kalkulator.py`, `docs/MANIFEST_KODU.md`, `docs/KALKULATOR_LEWARA.md`,
-`docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`
-
----
-
-## 2026-06-04 | DOC | Prawo XXI doc-gap audit — pełna symbioza KALKULATOR/IGRZYSKA/LEGATUS/ARCHITEKTURA
-
-### Kontekst
-Zmiany kodu z poprzednich sesji (W-059 vol-targeting, HedgeMWU W-049, H-01 Hurst, legatus.py
-mnożniki, igrzyska.py obserwatorzy, 19→21 praw) nie były jeszcze odzwierciedlone w pełni
-w dokumentach modułowych. Audyt wykazał luki (doc-gap). Prawo XXI + ZASADA PEŁNEJ SYMBIOZY.
-
-### Naprawione
-- **KALKULATOR_LEWARA.md** — sekcja Volatility Targeting (W-059) była już obecna ✅
-- **IGRZYSKA_IMPERIUM.md** — sekcja HedgeMWU (W-049) była już obecna ✅
-- **GENERAL_LEGATUS.md** — dodano: legendę kategorii neuronów (A–H), wagi H w WAGI_REZIMU
-  (TREND_STRONG ×1.3, RANGING ×1.2, NORMAL ×1.1), nową sekcję integracji HedgeMWU
-  (mnozniki_neuronow, ustaw_mnozniki_neuronow, _dostosuj_wagi = reżim × MWU)
-- **LEGIONY_ARCHITEKTURA.md** — dodano legendę kategorii neuronów (M/T/V/F/O/L/R/S/A/K/E/G/H)
-  z opisem kategorii H = Hurst/Pamięć długiego zasięgu (meta-brama reżimu)
-- **ARCHITEKTURA_IMPERIUM.md** — poprawiono "19 praw" → "21 prawami"; dodano igrzyska.py
-  i hedge_mwu.py do opisu dzielnicy biblioteki/
-- **INDEKS_IMPERIUM.md** — dodano mnemosyne.py do wiersza biblioteki/ (W11 fix)
-- **audyt_spojnosci.py** — dodano Warstwa 10 (słowa kluczowe w dokumentach modułowych)
-  i Warstwa 11 (moduły biblioteki/ wymienione w INDEKS). Docstring zaktualizowany 7→11 warstw.
-
-### Wynik
-- Testy: 425/425 zielone
-- Audyt: exit 0 — pełna harmonia (W1–W11)
-
-### Pliki
-`docs/GENERAL_LEGATUS.md`, `docs/LEGIONY_ARCHITEKTURA.md`, `docs/ARCHITEKTURA_IMPERIUM.md`,
-`docs/INDEKS_IMPERIUM.md`, `narzedzia/audyt_spojnosci.py`, `docs/LOG_ZMIAN.md`.
+**Opis:** Wdrożono neuron D-01 NeuronPathSignature — pierwsza miara nieprzemiennej geometrii
+ścieżki w Imperium. Lévy Area (iterated integral rzędu 2) mierzy synchronizację wzrostu
+wolumenu z ceną: LA>0 → akumulacja poprzedza ruch (LONG); LA<0 → dystrybucja (SHORT).
+Implementacja czysto NumPy (bez zewnętrznych bibliotek), okno 20 barów, normalizacja
+scale-invariant. Nowa kategoria D (Dynamika ścieżkowa). Elitarny (E1 — jedyna miara
+w Imperium mierząca tę oś). WAGI_REZIMU uzupełnione o kat. D.
+Budowniczy wzbogacony o CLOSE_SERIES_20 + VOLUME_SERIES_20 (_dodaj_path_series).
+8 nowych testów. Daty MANIFEST/README zaktualizowane.
+**Powód:** Prawo XIX (kod jest prawem), Prawo XX (ELITARNY=True z kryterium E1).
+**Pliki:**  (nowy), ,
+, ,
+, , ,
+, , ,
+, , 
 
 ---
 

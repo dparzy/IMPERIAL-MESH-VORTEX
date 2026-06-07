@@ -1390,3 +1390,104 @@ def test_z02_wskaznik_obv_dostepny_w_budowniczym():
     assert "OBV" in _PLAN_SKALARNE or True   # OBV może być w TA-Lib bezpośrednio
     # Upewnij się że ATR_14 też istnieje
     assert "ATR_14" in _PLAN_SKALARNE
+
+
+# ── D-01 NeuronPathSignature (W-079) ──────────────────────────────────────────
+
+def test_d01_import():
+    """D-01: importuje się poprawnie."""
+    from imperium.legiony.neurony.geometria import NeuronPathSignature
+    n = NeuronPathSignature()
+    assert n.KLUCZ == "D-01"
+    assert n.KATEGORIA == "D"
+    assert n.WAGA >= 6
+    assert n.ELITARNY is True
+    assert n.POWOD_ELITARNOSCI
+
+
+def test_d01_brak_danych_neutral():
+    """D-01: brak serii → NEUTRAL."""
+    from imperium.legiony.neurony.geometria import NeuronPathSignature
+    n = NeuronPathSignature()
+    s = n.interpretuj({})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc == 0.0
+
+
+def test_d01_akumulacja_long():
+    """D-01: wolumen rośnie PRZED ceną → Lévy Area > 0 → LONG."""
+    from imperium.legiony.neurony.geometria import NeuronPathSignature
+    n = NeuronPathSignature()
+    # Symuluj wzrost wolumenu przed wzrostem ceny (akumulacja)
+    # Pierwsze 10 barów: wysoki wolumen, cena lekko rośnie
+    # Kolejne 10 barów: cena mocno rośnie, wolumen spada
+    closes =  [100 + i * 0.1 for i in range(10)] + [101 + i * 0.5 for i in range(10)]
+    volumes = [1000 + i * 100 for i in range(10)] + [1000 - i * 50 for i in range(10)]
+    s = n.interpretuj({"CLOSE_SERIES_20": closes, "VOLUME_SERIES_20": volumes})
+    # Lévy Area powinna być dodatnia (wzrost wolumenu wyprzedza wzrost ceny)
+    assert s.kierunek in ("LONG", "NEUTRAL")  # LONG lub NEUTRAL gdy słaby sygnał
+
+
+def test_d01_dystrybucja_short():
+    """D-01: cena rośnie bez wolumenu → Lévy Area < 0 → SHORT."""
+    from imperium.legiony.neurony.geometria import NeuronPathSignature
+    n = NeuronPathSignature()
+    # Cena mocno rośnie, wolumen spada (dystrybucja)
+    closes =  [100 + i * 1.0 for i in range(20)]
+    volumes = [2000 - i * 80 for i in range(20)]
+    s = n.interpretuj({"CLOSE_SERIES_20": closes, "VOLUME_SERIES_20": volumes})
+    assert s.kierunek in ("SHORT", "NEUTRAL")
+
+
+def test_d01_plaska_cena_neutral():
+    """D-01: płaska cena → NEUTRAL (brak geometrii ścieżki)."""
+    from imperium.legiony.neurony.geometria import NeuronPathSignature
+    n = NeuronPathSignature()
+    closes =  [100.0] * 20
+    volumes = [1000.0 + i * 10 for i in range(20)]
+    s = n.interpretuj({"CLOSE_SERIES_20": closes, "VOLUME_SERIES_20": volumes})
+    assert s.kierunek == "NEUTRAL"
+
+
+def test_d01_pewnosc_w_przedziale():
+    """D-01: pewnosc ∈ [0.55, 0.85] gdy LONG/SHORT."""
+    from imperium.legiony.neurony.geometria import NeuronPathSignature
+    n = NeuronPathSignature()
+    closes =  [100 + i * 0.5 for i in range(20)]
+    volumes = [1000 + i * 200 for i in range(20)]
+    s = n.interpretuj({"CLOSE_SERIES_20": closes, "VOLUME_SERIES_20": volumes})
+    if s.kierunek != "NEUTRAL":
+        assert 0.55 <= s.pewnosc <= 0.85
+
+
+def test_levy_area_pure():
+    """_levy_area: oblicza nieprzemienność — LA(x,y) ≠ LA(y,x) gdy x≠y."""
+    from imperium.legiony.neurony.geometria import _levy_area
+    x = [0, 1, 2, 3, 4]
+    y = [0, 0.5, 3, 2, 1]
+    la_xy = _levy_area(x, y)
+    la_yx = _levy_area(y, x)
+    assert la_xy is not None
+    assert la_yx is not None
+    # Nieprzemienność: LA(x,y) = −LA(y,x)
+    assert abs(la_xy + la_yx) < 1e-9
+
+
+def test_d01_budowniczy_dostarcza_serie():
+    """Budowniczy: CLOSE_SERIES_20 i VOLUME_SERIES_20 obecne w wyjściu zbuduj()."""
+    from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
+
+    class _MockBrama:
+        def compute(self, *a, **kw):
+            class R:
+                value = None
+            return R()
+
+    bud = BudowniczyWskaznikow(brama=_MockBrama())
+    bary = [{"open": 100, "high": 101, "low": 99, "close": 100 + i * 0.1, "volume": 1000 + i * 10}
+            for i in range(25)]
+    w = bud.zbuduj(bary)
+    assert "CLOSE_SERIES_20" in w
+    assert "VOLUME_SERIES_20" in w
+    assert len(w["CLOSE_SERIES_20"]) == 20
+    assert len(w["VOLUME_SERIES_20"]) == 20

@@ -1171,7 +1171,7 @@ Nie "albo-albo" — **trójfazowa hybryda:**
 > literatura quant. Weryfikacja adwersarialna (3-głos per teza). Trzy perełki ortogonalne
 > wobec obecnych 51 neuronów. Wszystkie inspiracje → `docs/REJESTR_INSPIRACJI.md`.
 
-**W-079 | Path Signature Transform — GEOMETRIA ŚCIEŻKI (Lévy Area)** 🔴 *(REKOMENDACJA #1)*
+**W-079 | Path Signature Transform — GEOMETRIA ŚCIEŻKI (Lévy Area)** ✅ WDROŻONE 2026-06-07 — D-01 neurony/geometria.py (nowa kat. D) *(REKOMENDACJA #1)*
 
 - **Pełna nazwa:** Rough Path Signature Transform (Transformacja Sygnatury Ścieżki Chena —
   Chen's Iterated Integrals, z teorii ścieżek szorstkich Lyonsa 1998).
@@ -1238,3 +1238,234 @@ sprawdzenia w cytowanych paperach przed kodowaniem.
 
 *Zwiad perełek złożony. 3 ortogonalne znaleziska (W-079..W-081). ARCH-MAX czeka na rozkaz Cezara.* ⚔️🏛️
 
+
+---
+
+## 📚 BIBLIOTEKA TRADINGOWA CEZARA — KOLEKCJA KSIĄG (BIB-001..BIB-004)
+
+> **Data założenia biblioteki:** 2026-06-07  
+> **Zasada:** Każda książka opisana KOMPLETNIE wg ZPO (pełne tytuły, rozwinięcia skrótów, status weryfikacji uczciwy). Wnioski implementacyjne powiązane z numerami Wizji (W-...).  
+> **Cel:** Biblioteka żywa — Cezar dokłada kolejne pozycje, Claude analizuje i dopisuje do tej sekcji.
+
+---
+
+### 📖 BIB-001 — "The Secret Wealth Advantage" — Akhil Patel
+
+**Pełny tytuł:** *The Secret Wealth Advantage: How You Can Profit from the Economy's Hidden Cycle*  
+**Autor:** Akhil Patel (analityk cyklu nieruchomości, kontynuator szkoły Freda Harrisona i Henry'ego George'a)  
+**Status weryfikacji:** ✅ Przeczytane — kluczowe rozdziały: Prolog, Handbook Parts 1–14, Chapter 11 (Kondratiew), Chapter 13 (timing), Chapter 14 (Summit), Appendix 1 (tabela dat dna)  
+**Ocena:** 9/10 · **Priorytet wdrożenia:** 🔴 Wysoki
+
+#### Teza centralna
+Gospodarka kapitalistyczna porusza się w **powtarzalnym ~18-letnim cyklu nieruchomości** (real estate cycle), napędzanym przez **prawo renty ekonomicznej** (law of economic rent) — wartość lokalizacji/ziemi przechwytuje cały wzrost produktywności, a kredyt bankowy wzmacnia ten proces aż do pęknięcia. Cykl jest tak regularny, że można go zmierzyć zegarem i wykorzystać do timingu rynków. Kluczowe załamania (>25% spadku) skupiają się w dwóch punktach: Śródcyklowym Szczycie (Mid-cycle Peak, rok ~7) i końcowym Szczycie (Summit, rok ~14).
+
+#### Kluczowe koncepcje
+
+1. **18-letni cykl nieruchomości (the 18-year real estate cycle)** — 4 akty: Recovery/Start (lata 1–6) → Mid-cycle Recession + Peak (lata 7–8) → Boom/Land Boom + Mania (lata 9–14) → Crisis/Crash (lata 15–18). Dla USA ostatnie dna: ~1992, ~2009/2012; następny szczyt makro wg autora: ~2026. *Implementacja:* zegar fazowy zwracający reżim makro {Recovery, Recession, Peak, LandBoom, Mania, Summit, Crash} sterujący mnożnikiem wielkości pozycji.
+
+2. **Prawo renty ekonomicznej (law of economic rent)** — cały nadwyżkowy zwrot z produktywności kapitalizuje się w cenie ziemi/lokalizacji ("the effortless return"). *Proxy dla crypto:* analogia = leverage/funding rate jako "renta spekulacyjna" rynku.
+
+3. **Reguła koncentracji krachów ("markets can be timed")** — *"Of the 25 falls of 25% or more in the US market since 1900, 23 have occurred in the aftermath of the Peak or Summit stages."* Implementacja: mnożnik ryzyka zależny od fazy.
+
+4. **Mid-cycle Peak + Recession (śródcyklowe fałszywe załamanie)** — korekta w roku ~7 NIE jest końcem hossy. Implementacja: neuron anti-paniki w środku cyklu (rozróżnienie "dołek śródcyklowy" vs. "koniec cyklu").
+
+5. **Mania / The Great Delusion** — finalne 2 lata (rok 13–14) rampującej spekulacji. Implementacja: detektor manii (akceleracja log-ceny + ekspansja dźwigni + euforia sentymentu).
+
+6. **Cykl Kondratiewa (Kondratieff long wave, ~54 lata)** — długi cykl surowcowo-wojenny; cykl 18-letni jest osadzony wewnątrz Kondratiewa. Implementacja: wolno-zmienny reżim surowcowy/geopolityczny nakładany na cykl 18-letni.
+
+7. **Banki jako maszyna renty + endogeniczne tworzenie pieniądza** (oparty na Richardzie Wernerze) — *"Money is always manufactured – and is drawn into real estate speculation."* Implementacja: monitoring tempa kreacji kredytu jako paliwa fazy Boom.
+
+#### Najważniejsze cytaty (dosłowne)
+> *"Of the 25 falls of 25% or more in the US market since 1900, 23 have occurred in the aftermath of the Peak or Summit stages."*
+
+> *"Do not invest more money at the end of the Expansion or Mania stages of the cycle, approximately 6–7 and 13–14 years after the Start respectively."*
+
+> *"The biggest falls in markets take place at the extreme points of the cycle, especially at the mid-cycle Peak and end-cycle Summit."*
+
+> *"Nobody rings a bell at the top of the market."* (Wall Street proverb, motto Chapter 14)
+
+#### Potencjalne Wizje (W-...)
+| Wizja | Nazwa | Opis | Kategoria |
+|---|---|---|---|
+| **W-082** | NeuronFazyCyklu18 | Zegar 18-letniego cyklu → reżim fazowy {Recovery/Peak/Mania/Summit/Crash}; wejście: data + tabela dat dna | Nowa kat. **C** (Cykl makro) |
+| **W-083** | StrategiaFazowa18 | Money-management: mnożnik wielkości pozycji sterowany fazą (redukcja w rok 7 i 14, zero w Summit) | Strategia |
+| **W-084** | DetektorManii | Akceleracja log-ceny + ekspansja dźwigni + euforia; aktywny tylko w oknach Peak/Summit | Kat. **C** lub **R** |
+
+---
+
+### 📖 BIB-002 — "Technical Analysis of the Financial Markets" — John J. Murphy
+
+**Pełny tytuł:** *Technical Analysis of the Financial Markets: A Comprehensive Guide to Trading Methods and Applications*  
+**Autor:** John J. Murphy (były główny analityk techniczny CNBC, pionier analizy międzyrynkowej, autor intermarket analysis)  
+**Status weryfikacji:** ✅ Rozdziały nieoczywiste w całości: ch.10 (Contrary Opinion/Sentiment), ch.14 (Time Cycles — dominant cycle, left/right translation, MESA, Kondratieff, presidential cycle, January Barometer), ch.17 (Intermarket — pełny łańcuch, deflacja, korelacja, relative strength, top-down, neural network). ⚠️ Rozdziały podstawowe (wzorce, oscylatory bazowe) przejrzane tylko przez TOC — celowo (RSI/MACD = znane).  
+**Ocena:** 8/10 · **Priorytet wdrożenia:** 🟠 Średni-Wysoki
+
+#### Teza centralna
+Cena dyskontuje wszystko i historia się powtarza — ale NAJSILNIEJSZY wkład Murphy'ego to **analiza międzyrynkowa (intermarket analysis)**: żaden rynek nie istnieje w izolacji. Obligacje ↔ surowce ↔ akcje ↔ waluty tworzą sprzężony łańcuch przyczynowy z sygnałami wyprzedzającymi. Rynki analizowane razem dają przewagę niedostępną dla analizy jednego instrumentu.
+
+#### Kluczowe koncepcje
+
+1. **Analiza międzyrynkowa (intermarket analysis)** — łańcuch: surowce ↔ obligacje (ujemna korelacja przez inflację) → akcje. *"Commodity prices usually trend in the opposite direction of bond prices… commodity prices are leading indicators of inflationary trends."* Implementacja: macierz korelacji obligacje/akcje/surowce/dolar jako wektor reżimu makro.
+
+2. **Scenariusz deflacyjny / dekuplacja (deflation decoupling)** — *"In a deflationary environment, bonds and stocks usually decouple. Bond prices rise while stock prices fall."* Implementacja: przełącznik reżimu — normalna korelacja vs. tryb deflacyjny (zmiana znaku zależności).
+
+3. **Korelacja mierzona (measured intermarket correlation)** — bezpośrednio mapuje na **Prawo XVI** Imperium: *"A high positive reading suggests a strong correlation."*
+
+4. **Analiza siły względnej / linia ratio (relative strength analysis)** — *"All you do is divide one market entity by another… plot a ratio of two market prices."* Implementacja: neuron ratio dla par (BTC/ETH, alt/BTC) — rotacja siły relatywnej.
+
+5. **Top-Down Market Approach (podejście od góry do dołu)** — najpierw reżim rynku → silne sektory → instrument. Implementacja: hierarchiczny pipeline filtrów.
+
+6. **Left/right translation (lewoprawoskrętność cyklu)** — *"Left and right translation refers to the shifting of the cycle peaks either to the left or the right of the ideal cycle midpoint."* Prawe przesunięcie szczytu = siła trendu wzrostowego; lewe = słabość. Implementacja: neuron asymetrii cyklu jako kierunkowy sygnał siły.
+
+7. **MESA — Maximum Entropy Spectral Analysis (analiza spektralna maksymalnej entropii, John Ehlers)** — cykle nie mają stałej długości; MESA adaptacyjnie wykrywa dominującą długość. Implementacja: adaptacyjny detektor długości cyklu (FFT/MESA) zamiast stałych okresów wskaźników.
+
+8. **Cykl prezydencki (presidential cycle, 4 lata)** — regularność sezonowa rynków akcji. Dla crypto: analogia = **cykl halvingowy (4-letni)** silniejszy niż cykl prezydencki.
+
+9. **Commitments of Traders Report (COT — raport zobowiązań traderów)** — pozycjonowanie komercyjnych (smart money) vs. large/small speculators jako sygnał kontrariański. *"Watch the Commercials."* Dla crypto analogia: pozycjonowanie wielorybów / funding rate / open interest.
+
+10. **Contrary opinion + Investor Sentiment (przeciwne nastawienie + sentyment inwestorów, Investors Intelligence)** — ekstremalny konsensus = sygnał odwrócenia (kontrarianizm).
+
+#### Najważniejsze cytaty (dosłowne)
+> *"Commodity prices are considered to be leading indicators of inflationary trends. As a result, commodity prices usually trend in the opposite direction of bond prices."*
+
+> *"In a deflationary environment, bonds and stocks usually decouple. Bond prices rise while stock prices fall."*
+
+> *"Left and right translation… may very well be the most useful aspect of cycle analysis."*
+
+> *"The search for the right dominant cycles in any market is complicated by the belief that cycle lengths aren't static; in other words, they keep changing over time."*
+
+> *"One major problem with the study of intermarket relationships is that there are so many of them—and they're all interacting at the same time. That's where neural networks [help]."*
+
+#### Potencjalne Wizje (W-...)
+| Wizja | Nazwa | Opis | Kategoria |
+|---|---|---|---|
+| **W-085** | NeuronKorelacjiMiedzyrynkowej | Wektor korelacji BTC vs. makro (obligacje/indeksy/dolar/surowce); bezpośrednie rozszerzenie `diagnostyka_korelacji.py` | Kat. **R** lub nowa **I** (Intermarket) |
+| **W-086** | NeuronSilyWzglednej | Linia ratio par instrumentów (BTC/ETH, alt/BTC); rotacja siły relatywnej | Kat. **T** lub **R** |
+| **W-087** | NeuronTranslacjiCyklu | Left/right translation jako sygnał siły trendu w wykrytym cyklu | Kat. **T** |
+| **W-088** | DetektorDominującegoCyklu (MESA) | Adaptacyjna długość cyklu (FFT/adaptacyjny) zamiast stałych okresów | Kat. **C** lub **T** |
+
+---
+
+### 📖 BIB-003 — "Cryptoassets: The Innovative Investor's Guide" — Chris Burniske & Jack Tatar
+
+**Pełny tytuł:** *Cryptoassets: The Innovative Investor's Guide to Bitcoin and Beyond*  
+**Autorzy:** Chris Burniske (analityk crypto ARK Invest) i Jack Tatar (inwestor/przedsiębiorca)  
+**Status weryfikacji:** ✅ Sekcje wyceny i on-chain przeczytane: ch.6 (portfel/Sharpe/korelacja), ch.9 (zmienność/Dash), ch.10 (spekulacja tłumów/Gartner/this-time-is-different), ch.12 (fundamental/utility value/velocity/crypto-PE), ch.13 (operating health/hash rate/Google Trends). ⚠️ Termin "NVT" nie pada literalnie — autorzy nazywają to *"crypto PE ratio"* (network value ÷ daily transaction volume); jest to dokładnie wskaźnik znany później jako NVT (Willy Woo).  
+**Ocena:** 9/10 · **Priorytet wdrożenia:** 🔴 Wysoki
+
+#### Teza centralna
+Kryptoaktywa to nowa klasa aktywów niemożliwa do wyceny jak akcje (brak przepływów pieniężnych). Wartość = **wartość użytkowa (utility value)** + **wartość spekulacyjna (speculative value)**. Gdy znika wartość spekulacyjna, cena opada do podłogi użytkowej. "Zdrowie operacyjne" sieci (on-chain) jest fundamentem — bańki napędzane są powtarzalnymi wzorcami tłumu (niezmiennymi).
+
+#### Kluczowe koncepcje
+
+1. **Wartość użytkowa vs. spekulacyjna (utility value vs. speculative value)** — dwuskładnikowy model wartości aktywa. *"With only utility value left, then there is no reason for the investor to continue to hold the asset."* Implementacja: estymacja "podłogi" użytkowej vs. nadwyżki spekulacyjnej (analogia: P/E dla akcji).
+
+2. **Krypto-PE Ratio = NVT (Network Value to Transactions, wartość sieci do wolumenu transakcji)** — *"we divide the network value of a cryptoasset by its daily transaction volume… could imply the price of the asset has outpaced its utility."* Wysoki NVT = przewartościowanie. Implementacja: flagowy neuron on-chain.
+
+3. **Velocity (prędkość obiegu kryptoaktywa)** — tempo zmiany właścicieli; wysoka prędkość przy stałym popycie obniża cenę równowagi. Implementacja: on-chain velocity jako modulator wyceny.
+
+4. **Zdrowie operacyjne sieci (operating health of network)** — analogia analizy fundamentalnej: aktywne adresy, liczba transakcji, wzrost bazy użytkowników. Implementacja: kompozyt neuronów on-chain health.
+
+5. **Hash rate jako miara bezpieczeństwa sieci (hash rate as security measure)** — *"A cryptoasset's hash rate is representative of the combined power of the mining computers."* Spadek hash rate = ryzyko kapitulacji górników. Implementacja: neuron trendu hash rate.
+
+6. **Google Trends jako proxy adopcji i euforii (Willy Woo)** — *"an effective proxy for the growth and engagement of bitcoin… peaks are in line with price bubbles."* Implementacja: neuron zainteresowania wyszukiwarkowego = detektor euforii/bańki.
+
+7. **Pięć wzorców destabilizacji rynku (five market destabilization patterns)** — 1) spekulacja tłumów (crowd speculation), 2) "this time is different" (tym razem jest inaczej), 3) Ponzi schemes, 4) misleading information (dezinformacja emitentów), 5) cornering (zapętlenie rynku). Implementacja: checklist-detektor faz bańki.
+
+8. **Cykl szumu Gartnera (Gartner Hype Cycle)** — 5 etapów: Innovation Trigger (Wyzwalacz Innowacji) → Peak of Inflated Expectations (Szczyt Nadmuchanych Oczekiwań) → Trough of Disillusionment (Dolina Rozczarowań) → Slope of Enlightenment (Stok Oświecenia) → Plateau of Productivity (Płaskowyż Produktywności). Implementacja: reżim sentymentu hype-cycle.
+
+9. **Płynność a zmienność (liquidity vs. volatility — przykład Dash/masternodes)** — wymóg blokowania podaży (lock-up/staking) obniża płynność i podnosi zmienność. Implementacja: neuron lock-up ratio on-chain.
+
+10. **Dywersyfikacja przez niską korelację (Sharpe Ratio, William F. Sharpe)** — crypto jako aktywo poprawiające portfel przez niską korelację z tradycyjnymi. Implementacja: warstwa alokacji portfelowej.
+
+#### Najważniejsze cytaty (dosłowne)
+> *"We call this the crypto 'PE ratio'… For cryptoassets we put forth that the denominator of valuation should be transaction volumes, not earnings, as these are not companies with cash flows."*
+
+> *"With only utility value left, then there is no reason for the investor to continue to hold the asset as it has reached its maximum potential and is unlikely to appreciate any further."*
+
+> *"One way to determine the relative safety of a cryptoasset is through its hash rate."*
+
+> *"[Google Trends searches for 'BTC USD'] peaks are in line with price bubbles, periods where more users head online to check the value of bitcoin."* (cytując Willy Woo)
+
+> *"Broadly, we categorize five main patterns that lead to markets destabilizing: The speculation of crowds; 'This time is different'; Ponzi schemes; Misleading information from asset issuers; Cornering."*
+
+#### Potencjalne Wizje (W-...)
+| Wizja | Nazwa | Opis | Kategoria |
+|---|---|---|---|
+| **W-089** | NeuronNVT (Network Value to Transactions) | Kapitalizacja rynkowa ÷ dzienny wolumen transakcji on-chain; wysoki NVT = przewartościowanie | Kat. **O** (On-chain) |
+| **W-090** | NeuronPredkosciObiegu (Velocity) | Prędkość obiegu on-chain; modulator wyceny | Kat. **O** |
+| **W-091** | NeuronHashRate | Trend hash rate; detektor kapitulacji górników | Kat. **O** |
+| **W-092** | NeuronTrendowWyszukiwarki (Google Trends) | Zainteresowanie wyszukiwarkowe = detektor euforii/bańki (Willy Woo) | Kat. **R** lub nowa |
+| **W-093** | NeuronEtapuHypeCycle | Reżim 5-fazowy wg Gartnera — mapowanie aktywa na etap hype-cycle | Kat. **R** |
+
+---
+
+### 📖 BIB-004 — "The Psychology of Trading" — Brett N. Steenbarger
+
+**Pełny tytuł:** *The Psychology of Trading: Tools and Techniques for Minding the Markets*  
+**Autor:** Brett N. Steenbarger (psycholog kliniczny, doradca traderów instytucjonalnych, podejście solution-focused brief therapy — terapia skoncentrowana na rozwiązaniach)  
+**Status weryfikacji:** ✅ Kluczowe rozdziały przeczytane: solution-focused, pivot chord, emotional temperature, internal observer, stationarity (Clifford Sherry), overconfidence (Terrance Odean), implicit learning (Arthur Reber), metacommunication/markers, pinball/contrary move, regression under stress. ⚠️ Książka narracyjno-przypadkowa (case studies) — koncepcje wyekstrahowane po słowach kluczowych z całego korpusu.  
+**Ocena:** 8/10 (9/10 za koncepcję stacjonarności dla algo) · **Priorytet wdrożenia:** 🟠 Średni
+
+#### Teza centralna
+Większość problemów traderów to NIE brak wiedzy, lecz **powtarzalne wzorce emocjonalne** uruchamiane przez pobudzenie (arousal). Rozwiązania tkwią w tym, co trader robi DOBRZE gdy problem nie występuje (solution-focused). Dla systemu algo kluczowe jest odkrycie Clifforda Sherry'ego o **niestacjonarności** (non-stationarity) rynków — gdy zmienia się proces generujący dane, statystyki przeszłości stają się bezużyteczne.
+
+#### Kluczowe koncepcje
+
+1. **Stacjonarność zmian cen (stationarity of price changes — Clifford Sherry)** — 🚨 NAJWAŻNIEJSZA koncepcja dla algo: *"A stationary price series is one that is generated by a single process."* Gdy proces się zmienia, strategie zbudowane na starym reżimie stają się martwe. Implementacja: rolling test stacjonarności (ADF/KPSS) wyłączający strategie na nieaktualnym procesie — bezpośrednio wzmacnia **Prawo XV** (martwy głos).
+
+2. **Overconfidence po serii zysków (overconfidence bias — Terrance Odean, Mark Fenton-O'Creevy)** — *"When they go through a period of winning, they tend to trade more frequently and subsequently underperform."* Iluzja kontroli po zysku = zwiększone ryzyko. Implementacja: throttle anty-tilt — automatyczna redukcja ekspozycji po serii zysków.
+
+3. **Wewnętrzny obserwator / pomiar temperatury emocjonalnej (internal observer / taking your emotional temperature)** — periodyczne pytanie "w jakim jestem stanie?". Implementacja dla algo: meta-warstwa monitorująca "temperaturę" systemu (zmienność decyzji, drawdown, częstotliwość sygnałów).
+
+4. **Zagranie Pinball / kontrariańskie na nieudanym wzorcu (pinball trade / failed pattern)** — *"identifying the earliest stages of a failure of a chart pattern as an entry point for a contrary move… taking advantage of the stunned, paralyzed traders."* Implementacja: neuron nieudanego breakoutu (failed breakout = sygnał odwrócenia, gra na bólu uwięzionych).
+
+5. **Reguły podczas emocji (rule-governed trading under emotional pressure)** — *"It is when traders—and markets—are most emotional that they want to become most rule-governed."* Implementacja: zaostrzenie reguł zarządzania ryzykiem podczas skrajnej zmienności (odwrotność intuicji).
+
+6. **Wzorce destrukcji przy pobudzeniu (destructive patterns at arousal extremes)** — under-arousal (nuda) LUB over-arousal (lęk/euforia) = ryzyko przehandlowania. Implementacja: dwukierunkowy detektor stanu systemu.
+
+7. **Podejście solution-focused (terapia skoncentrowana na rozwiązaniach)** — *"The resolution to problems can be found in what people are doing when those problems are not occurring."* Implementacja dla algo: automatyczna analiza warunków towarzyszących najlepszym transakcjom (wzmacnianie wygranych warunków).
+
+8. **Uczenie implicytne (implicit/tacit learning — Arthur Reber, Axel Cleeremans)** — eksperci znają wzorce bez ich werbalizacji; nabyte przez exemplar-based learning (uczenie przez przykłady). Implementacja: filozoficzne uzasadnienie ML na przykładach zamiast ręcznych reguł.
+
+9. **Metakomunikacja / markery przejścia (metacommunication / transition markers)** — *"markers… signify a transition point from one cognitive and emotional state to another."* Kontekst zmienia znaczenie sygnału. Implementacja: ten sam wzorzec techniczny = inne znaczenie w innym reżimie → warunkowanie neuronów reżimem (co Imperium już robi).
+
+10. **Regresja pod stresem (regression under stress)** — pod presją powrót do prymitywnych wzorców. Implementacja: tryb awaryjny po dużym drawdownie → blokada nowych pozycji, sztywne reguły (bezpośrednio = `BezpiecznikKrzywejKapitalu` już zaimplementowany).
+
+#### Najważniejsze cytaty (dosłowne)
+> *"A stationary price series is one that is generated by a single process."* — Clifford Sherry (cytat przez Steenbargera)
+
+> *"When they go through a period of winning, they tend to trade more frequently and subsequently underperform the market."* — badania Terrance'a Odeana
+
+> *"The 'pinball' trade… is identifying the earliest stages of a failure of a chart pattern as an entry point for a contrary move… taking advantage of the stunned, paralyzed traders."*
+
+> *"The resolution to problems can be found in what people are doing when those problems are not occurring."*
+
+> *"It is when traders—and markets—are most emotional that they want to become most rule-governed."*
+
+#### Potencjalne Wizje (W-...)
+| Wizja | Nazwa | Opis | Kategoria |
+|---|---|---|---|
+| **W-094** | NeuronStacjonarnosci (Stationarity Detector) | 🔴 Rolling ADF/KPSS test zmiany procesu generującego → wyłącza strategie na "martwym" reżimie; wzmacnia Prawo XV | Meta / Kat. **H** lub **R** |
+| **W-095** | NeuronNieudanegoBreakoutu (Failed Pattern / Pinball) | Wejście kontrariańskie na nieudanym breakoucie/wzorcu — gra na bólu uwięzionych traderów | Kat. **S** (Struktura) |
+| **W-096** | RegulatorThrottle (Anti-Overconfidence Throttle) | Automatyczna redukcja ekspozycji po serii zysków; anty-overconfidence risk manager | Meta / `pretorianie/` |
+
+---
+
+### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
+
+| BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |
+|---|---|---|---|---|---|
+| BIB-001 | Secret Wealth Advantage | Akhil Patel | 9/10 | 🔴 Wysoki | 18-letni cykl + reguła 23/25 krachów przy Peak/Summit |
+| BIB-002 | Technical Analysis | John J. Murphy | 8/10 | 🟠 Średni-Wysoki | Analiza międzyrynkowa + left/right translation + MESA |
+| BIB-003 | Cryptoassets | Burniske & Tatar | 9/10 | 🔴 Wysoki | NVT (crypto-PE) + hash rate + detektor euforii (Gartner/Google) |
+| BIB-004 | Psychology of Trading | Brett Steenbarger | 8/10 | 🟠 Średni | Stacjonarność (algo!) + pinball trade + anty-overconfidence |
+
+**Trzy najcenniejsze, bezpośrednio implementowalne wizje:**
+1. **W-089 NeuronNVT** — Network Value to Transactions (BIB-003) — twardy on-chain, brak odpowiednika w systemie
+2. **W-082 NeuronFazyCyklu18** — zegar 18-letniego cyklu (BIB-001) — makro-reżim sterujący wielkością pozycji
+3. **W-094 NeuronStacjonarnosci** — detektor zmiany procesu generującego (BIB-004) — wzmacnia Prawo XV
+
+🚨 **Prawo XV (utrata potencjału) — alert biblioteczny:** przed wdrożeniem neuronów W-085..W-088 (korelacja międzyrynkowa Murphy'ego) zmierzyć korelację z istniejącą `diagnostyka_korelacji.py` — ryzyko |r|>0.80 z istniejącymi głosami kat. R. Prawo XVI: mierzyć, nie zgadywać.
+
+*Biblioteka Tradingowa Cezara otwarta. Kolejne pozycje dopisywane do tej sekcji po dostarczeniu przez Cezara.* 📚⚔️🏛️

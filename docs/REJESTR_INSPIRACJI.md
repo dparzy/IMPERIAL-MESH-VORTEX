@@ -206,6 +206,10 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 | INF-10 | Path Signature Transform — Rough Path Signature (Chen's Iterated Integrals, Lyons 1998) | https://arxiv.org/pdf/1307.7244 | Neuron geometrii ścieżki: Lévy Area Close↔Volume = kolejność przyczynowa (W-079, kat. D) | Faza 1 |
 | INF-11 | Hawkes Branching Ratio — samowzmacniający proces punktowy (Hardiman & Bouchaud, Phys. Rev. E 2014) | https://arxiv.org/abs/1403.5227 | Neuron endogeniczności: n̂→1 = rynek krytyczny (kaskada PANIC), sensor reżimu (W-080, kat. R/F) | Faza 1 |
 | INF-12 | MFDFA — Multifractal Detrended Fluctuation Analysis (Rydin Gorjão et al., SoftwareX 2021) | https://arxiv.org/pdf/2104.10470 | Neuron wielofraktalny: szerokość spektrum Δα = heterogeniczność fluktuacji, early-warning (W-081, kat. F/D) | Faza 1 |
+| INF-13 | "The Secret Wealth Advantage" — Akhil Patel (2018) | Książka (BIB-001) | 18-letni cykl nieruchomości: reguła 23/25 krachów przy Peak/Summit, prawo renty ekonomicznej → W-082..W-084 (NeuronFazyCyklu18, StrategiaFazowa) | Faza 2 |
+| INF-14 | "Technical Analysis of the Financial Markets" — John J. Murphy (1999) | Książka (BIB-002) | Analiza międzyrynkowa, left/right translation cyklu, MESA (adaptacyjny detektor długości cyklu) → W-085..W-088 | Faza 2 |
+| INF-15 | "Cryptoassets" — Chris Burniske & Jack Tatar (2017) | Książka (BIB-003) | NVT (Network Value to Transactions, crypto-PE), hash rate, Google Trends jako detektor euforii, Gartner Hype Cycle → W-089..W-093 | Faza 2 |
+| INF-16 | "The Psychology of Trading" — Brett N. Steenbarger (2003) | Książka (BIB-004) | Stacjonarność Clifforda Sherry'ego (zmiana procesu generującego), pinball trade (nieudany breakout), anty-overconfidence throttle → W-094..W-096 | Faza 2 |
 
 > **Pełna lista (~220 narzędzi):** `docs/ARSENAL_IMPERIUM.md` — schemat architektoniczny + tabele weryfikacyjne.
 

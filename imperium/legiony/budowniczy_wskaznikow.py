@@ -136,6 +136,7 @@ class BudowniczyWskaznikow:
         self._dodaj_ichimoku(serie, w)
         self._dodaj_donchian(serie, w)
         self._dodaj_ha(bary, w)
+        self._dodaj_path_series(bary, w)
 
         return w
 
@@ -216,3 +217,12 @@ class BudowniczyWskaznikow:
                 w["HA_VOLATILITY_INDEX"] = 0.0
         except Exception as e:
             logger.debug(f"[Budowniczy] HA pominięty: {e}")
+
+    def _dodaj_path_series(self, bary, w):
+        """Dostarcza CLOSE_SERIES_20 i VOLUME_SERIES_20 dla D-01 NeuronPathSignature (W-079)."""
+        try:
+            window = bary[-20:]
+            w["CLOSE_SERIES_20"] = [float(b.get("close", 0)) for b in window]
+            w["VOLUME_SERIES_20"] = [float(b.get("volume", 0)) for b in window]
+        except Exception as e:
+            logger.debug(f"[Budowniczy] PATH_SERIES pominięty: {e}")

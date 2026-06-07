@@ -1171,7 +1171,7 @@ Nie "albo-albo" — **trójfazowa hybryda:**
 > literatura quant. Weryfikacja adwersarialna (3-głos per teza). Trzy perełki ortogonalne
 > wobec obecnych 51 neuronów. Wszystkie inspiracje → `docs/REJESTR_INSPIRACJI.md`.
 
-**W-079 | Path Signature Transform — GEOMETRIA ŚCIEŻKI (Lévy Area)** 🔴 *(REKOMENDACJA #1)*
+**W-079 | Path Signature Transform — GEOMETRIA ŚCIEŻKI (Lévy Area)** ✅ WDROŻONE 2026-06-07 — D-01 neurony/geometria.py (nowa kat. D) *(REKOMENDACJA #1)*
 
 - **Pełna nazwa:** Rough Path Signature Transform (Transformacja Sygnatury Ścieżki Chena —
   Chen's Iterated Integrals, z teorii ścieżek szorstkich Lyonsa 1998).

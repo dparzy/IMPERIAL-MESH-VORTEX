@@ -60,6 +60,9 @@ from imperium.legiony.neurony.entropia import (
 from imperium.legiony.neurony.zagrozenie import (
     NeuronToxicFlow, NeuronPumpDetect,
 )
+from imperium.legiony.neurony.geometria import (
+    NeuronPathSignature,
+)
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
 from imperium.legiony.zwiadowcy import (
@@ -102,6 +105,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronPermutationEntropy(),
         # Zagrożenie (Z) — VPIN meta-brama obronna (Z-01) + PumpDetect kierunkowy (Z-02)
         NeuronToxicFlow(), NeuronPumpDetect(),
+        # Geometria ścieżki (D) — Lévy Area Close×Volume, Rough Path Theory (W-079)
+        NeuronPathSignature(),
     ]
 
 

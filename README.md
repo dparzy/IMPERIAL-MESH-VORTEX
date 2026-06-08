@@ -33,7 +33,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Generał Legatus** | agregacja głosów + wagi reżimowe + odpalanie zwiadowców |
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
-| **Status elitarny** | **14 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26 + 12 zwiadowców |
+| **Status elitarny** | **15 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 + 12 zwiadowców |
 | **Testy** | `python tests/run_tests.py` → **505/505** ✅ |
 
 **Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 52) = backlog do zbudowania (partiami, z pomiarem dekorelacji).

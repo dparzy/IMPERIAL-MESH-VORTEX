@@ -1466,6 +1466,6 @@ Większość problemów traderów to NIE brak wiedzy, lecz **powtarzalne wzorce 
 2. **W-082 NeuronFazyCyklu18** — zegar 18-letniego cyklu (BIB-001) — makro-reżim sterujący wielkością pozycji
 3. **W-094 NeuronStacjonarnosci** — detektor zmiany procesu generującego (BIB-004) — wzmacnia Prawo XV
 
-🚨 **Prawo XV (utrata potencjału) — alert biblioteczny:** przed wdrożeniem neuronów W-085..W-088 (korelacja międzyrynkowa Murphy'ego) zmierzyć korelację z istniejącą `diagnostyka_korelacji.py` — ryzyko |r|>0.80 z istniejącymi głosami kat. R. Prawo XVI: mierzyć, nie zgadywać.
+🚨 **Prawo XVI (dekorelacja) — alert biblioteczny:** przed wdrożeniem neuronów W-085..W-088 (korelacja międzyrynkowa Murphy'ego) zmierzyć korelację z istniejącą `diagnostyka_korelacji.py` — ryzyko |r|>0.80 z istniejącymi głosami kat. R. Prawo XVI: mierzyć, nie zgadywać.
 
 *Biblioteka Tradingowa Cezara otwarta. Kolejne pozycje dopisywane do tej sekcji po dostarczeniu przez Cezara.* 📚⚔️🏛️

@@ -210,6 +210,8 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 | INF-14 | "Technical Analysis of the Financial Markets" — John J. Murphy (1999) | ISBN 978-0735200661 (BIB-002) | Analiza międzyrynkowa, left/right translation cyklu, MESA (adaptacyjny detektor długości cyklu) → W-085..W-088 | Faza 2 |
 | INF-15 | "Cryptoassets" — Chris Burniske & Jack Tatar (2017) | ISBN 978-1260026672 (BIB-003) | NVT (Network Value to Transactions, crypto-PE), hash rate, Google Trends jako detektor euforii, Gartner Hype Cycle → W-089..W-093 | Faza 2 |
 | INF-16 | "The Psychology of Trading" — Brett N. Steenbarger (2003) | ISBN 978-0471267614 (BIB-004) | Stacjonarność Clifforda Sherry'ego (zmiana procesu generującego), pinball trade (nieudany breakout), anty-overconfidence throttle → W-094..W-096 | Faza 2 |
+| INF-17 | "What Exactly Is Crypto?" — Jonatan Blum (2022) | thecryptobook.xyz (BIB-005) | Tokenomika (issuance−burn), szok podażowy unlock/vesting, płynność DEX (AMM x*y=k), ryzyko centralizacji/governance → W-097..W-100 (wymaga danych on-chain) | Faza 3 |
+| INF-18 | "High Probability Scalping Strategy Playbook" — Zachary Carson (2024) | self-published, Amazon KDP ⚠️ ASIN niezweryfikowany (BIB-006) | Konfluencja-z-dekorelacją (=Prawo XVI), filtr reżimu ADX (trend/range), MFI, sekwencja 9/13 (DeMark), ATR-stop → W-101..W-106 | Faza 2 |
 
 > **Pełna lista (~220 narzędzi):** `docs/ARSENAL_IMPERIUM.md` — schemat architektoniczny + tabele weryfikacyjne.
 

@@ -1452,6 +1452,119 @@ Większość problemów traderów to NIE brak wiedzy, lecz **powtarzalne wzorce 
 
 ---
 
+### 📕 BIB-005 — "What Exactly Is Crypto?" — Jonatan Blum
+
+**Pełny tytuł:** *What Exactly Is Crypto?* (pol. *Czym dokładnie jest krypto?*)
+**Autor:** Jonatan Blum (© 2022, thecryptobook.xyz) — książka edukacyjna/popularnonaukowa, NIE tradingowa
+**Status weryfikacji:** ✅ Przeczytane: spis treści, glosariusz, rozdz. 1–2 (kryptografia, mining, token emission, tokenomika), 6 (DeFi/AMM/Uniswap/order-book), 8 (poziomy decentralizacji, iluzja decentralizacji), fragmenty 10 (ZKP). ⚠️ Rozdziały o metaverse/NFT/CBDC przejrzane skrótowo — nieistotne dla tradingu algorytmicznego.
+**Ocena:** 4/10 (jako źródło dla systemu tradingowego) · **Priorytet wdrożenia:** 🟡 Niski
+
+#### Teza centralna
+Krypto to nie "magiczne pieniądze", lecz warstwowy stos technologii (kryptografia → blockchain → konsensus → tokenomika → DeFi → DAO → Web3). Teza przewodnia: **decentralizacja nie jest stanem 0/1, lecz ciągłym osiągnięciem (continuous achievement) o wielu poziomach** — wiele "zdecentralizowanych" projektów jest faktycznie scentralizowanych (iluzja decentralizacji). To książka o ZROZUMIENIU aktywów, nie o handlu.
+
+#### Kluczowe koncepcje (nieoczywiste — pomijam definicje BTC/ETH)
+
+1. **Emisja tokenów (token emission / issuance)** — tempo wprowadzania nowych tokenów do podaży w obiegu (circulating supply); presja inflacyjna od strony podaży. Implementacja: neuron kat. **D**/**F** liczący prognozowaną emisję w oknie (dni do halvingu, harmonogram odblokowań); rosnąca emisja = bias bearish.
+
+2. **Tokenomika jako system (issuance rate vs burn rate)** — polityki kodowane w protokole: emisja minus spalanie. Implementacja: `netto_podaz = issuance_rate − burn_rate`; <0 = deflacyjny (strukturalnie bullish), >0 = inflacyjny.
+
+3. **Mechanika cena vs podaż** — wzór `kapitalizacja / circulating_supply = cena_za_token`. Wniosek: zmiana podaży w obiegu (odblokowania, vesting) zmienia cenę przy stałej kapitalizacji. Implementacja: neuron monitorujący unlock/vesting jako szok podażowy.
+
+4. **Mempool i ryzyko cenzury transakcji** — przeciążenie sieci = rosnące opłaty gas/gwei. Implementacja: wskaźnik kongestii (gas/gwei, głębokość mempool) jako proxy popytu on-chain i kosztu wejścia/wyjścia.
+
+5. **AMM vs Order-Book (Automated Market Making — automatyczne tworzenie rynku)** — model `x*y=k` (constant product) puli płynności vs klasyczna księga zleceń; podatność na poślizg (slippage). Implementacja: wskaźnik głębokości puli DEX → ryzyko egzekucji dużego zlecenia. Kat. **L**.
+
+6. **Koncentrowana płynność (Uniswap V3)** — dostawcy podają kapitał w wąskich przedziałach cenowych. Implementacja: mapa płynności wokół ceny = miękkie poziomy wsparcia/oporu on-chain. Kat. **L**/**S**.
+
+7. **Poziomy decentralizacji (architektoniczny/polityczny/logiczny)** + cytowana praca *"Decentralization illusion in DeFi: Evidence from MakerDAO"* (University of Glasgow). Implementacja: wskaźnik ryzyka governance (koncentracja tokenów głosowania, liczba aktywnych deweloperów) → ostrzeżenie "centralization risk". Kat. **F**/**R**.
+
+8. **Web3: VC-Owned vs Public-Owned** — ile podaży trzymają fundusze venture capital; ryzyko nawisu podażowego (overhang). Implementacja: wskaźnik koncentracji posiadania (% w top-10 portfelach). Kat. **D**/**F**.
+
+9. **Statystyka oszustw (Chainalysis: 79% scamów krypto z DeFi)** — ryzyko strukturalne nowych/niezweryfikowanych tokenów. Implementacja: filtr jakości aktywa (wiek kontraktu, audyt) jako veto przed handlem. Kat. **R**.
+
+#### Najważniejsze cytaty (dosłowne)
+> *"Tokenomics is a term that combines the words 'token' and 'economics'... issuance rates... and burn rates (removal from circulating supply) may be preset in the code."*
+
+> *"That is why I say that decentralization is a continuous achievement. It's not an end goal."*
+
+> *"According to Chainalysis, 79% of all cryptocurrency scams last year came from DeFi alone."*
+
+> *"A research paper titled 'Decentralization illusion in DeFi: Evidence from MakerDAO'... argued that decentralization may be an illusion."*
+
+#### Potencjalne Wizje (W-...)
+| Wizja | Nazwa | Opis | Kategoria |
+|---|---|---|---|
+| **W-097** | NeuronEmisjiPodazy | `netto_podaz = issuance − burn`; sygnał deflacyjny/inflacyjny + alarm na unlock/vesting | Kat. **D**/**F** |
+| **W-098** | NeuronKongestiiSieci | gas/gwei + mempool jako proxy popytu i kosztu egzekucji on-chain | Kat. **D** |
+| **W-099** | NeuronPlynnosciDEX (Slippage) | głębokość puli AMM `x*y=k` → ryzyko poślizgu dużego zlecenia | Kat. **L** |
+| **W-100** | NeuronRyzykaCentralizacji | koncentracja posiadania (VC overhang, top-10 wallets) jako veto-filtr jakości | Kat. **R**/**F** |
+
+🚨 **Prawo XV (utrata potencjału) — alert:** neurony W-097..W-100 wymagają NOWEGO źródła danych on-chain (rozszerzenie Bramy). Bez danych byłyby "martwym głosem" (zawsze NEUTRAL). Budować dopiero po podpięciu źródła on-chain — inaczej utrata potencjału.
+
+---
+
+### 📗 BIB-006 — "High Probability Scalping Strategy Playbook" — Zachary Carson
+
+**Pełny tytuł:** *High Probability Scalping Strategy Playbook: High Win Rate Scalping Strategies for Trading the Crypto, Forex and Stock Market in 2024!* (pol. *Podręcznik strategii skalpowania o wysokim prawdopodobieństwie*)
+**Autor:** Zachary Carson (self-published, 2024). Skalping = handel na bardzo krótkich interwałach (1–5 min), dziesiątki szybkich transakcji
+**Status weryfikacji:** ✅ Przeczytane w całości: wstęp, Rozdz. 1 (komponenty, typy strategii, timing), Rozdz. 2 (trend/range, ADX, zmienność, reversale, sentyment), Rozdz. 3 (sygnały #1–#8), Rozdz. 4 (5 strategii wskaźnikowych — pełne reguły), Rozdz. 5 (4 strategie AI/ML — pełne reguły).
+**Ocena:** 4/10 (UCZCIWIE — patrz niżej) · **Priorytet wdrożenia:** 🟠 Średni (tylko quick winy na danych już w Bramie)
+
+#### Teza centralna
+Wysoki współczynnik trafień (win rate) w skalpingu osiąga się przez **konfluencję (confluence)**: filtr trendu (wyższy interwał) + sygnał wejścia + niezależny wskaźnik potwierdzający z INNEJ rodziny + ścisłe zarządzanie ryzykiem. Autor odrzuca pojedynczy wskaźnik na rzecz wielometrycznego potwierdzenia z RÓŻNYCH rodzin (by uniknąć confirmation bias).
+
+#### ⚠️ Ocena krytyczna (Prawo I — uczciwość)
+To **płytka książka**: ~70% to katalog "wpisz tę nazwę w TradingView" bez ujawnienia matematyki wskaźników, bez backtestów, bez statystyk win-rate (mimo tytułu "High Win Rate"!), z literówkami i niedokończonymi zdaniami. Tytułowe "high probability / high win rate" NIE jest poparte żadną liczbą ani testem — to marketing. ALE nie jest bezwartościowa: konfluencja-z-dekorelacją, filtr reżimu ADX, ATR-stop, MFI i sekwencja 9/13 to realne, kodowalne elementy.
+
+#### Kluczowe koncepcje
+
+1. **Konfluencja z dekorelacją wskaźników** — autor wprost: wskaźnik potwierdzający MUSI używać "different metric or methodology" niż sygnał główny (np. momentum + zmienność, NIE dwa momentum). To **dokładnie Prawo XVI Imperium**. Implementacja: wymóg, by głos potwierdzający pochodził z innej KATEGORII neuronu — reguła composera strategii.
+
+2. **Filtr trendu wielointerwałowy (Multi-Timeframe)** — kierunek na wyższym TF (500 SMA / 200 MA / 4h-daily), wejścia tylko zgodne na niższym TF. Implementacja: neuron-bramka **T**/**O** zwracający {LONG_ONLY, SHORT_ONLY, BLOCK}; gating całej strategii.
+
+3. **ATR-skalowany stop-loss (Average True Range — średni rzeczywisty zakres)** — stop jako wielokrotność ATR: szerszy przy wysokiej zmienności, węższy przy niskiej. Implementacja: `stop = entry ± k*ATR` w warstwie egzekucji/risk.
+
+4. **Filtr reżimu trend/range przez ADX (Average Directional Index — średni indeks kierunkowy)** — ADX<20 = rynek boczny (mean-reversion), ADX>20 = trend (breakout/momentum). Wybiera, KTÓRA strategia działa. Implementacja: neuron-przełącznik reżimu **O** sterujący doborem strategii.
+
+5. **Setup mean-reversion BB40+RSI5+ADX (Strategia #3)** — KONKRETNE reguły: wejście gdy cena przebije pasmo Bollingera ORAZ RSI wejdzie i WYJDZIE ze strefy wykupienia/wyprzedania, ADX potwierdza rynek boczny, wyjście na przeciwnym paśmie. Nietypowe parametry skalpingowe: BB length 40 (nie 20), RSI length 5 (bardzo szybki). W pełni kodowalne.
+
+6. **Setup momentum: koincydencja czasowa (Strategia AI/ML #1)** — cena > 200 SMA (bias long), sygnał RSI, wejście gdy cena przetnie 20 SMA **w ciągu max 2 świec od sygnału RSI**. Implementacja: reguła "sygnał + potwierdzenie w oknie N barów".
+
+7. **Heiken Ashi ważona + potrójny RSI (Sygnał #3)** — wygładzanie świec Heiken Ashi + trzy RSI (10/14/21) → głosowanie ensemble dla redukcji szumu.
+
+8. **True Strength Index (TSI — indeks prawdziwej siły)** — podwójnie wygładzony momentum; mniej fałszywych sygnałów niż surowy RSI. Kat. **M**.
+
+9. **Money Flow Index (MFI — indeks przepływu pieniądza)** — RSI ważony wolumenem (volume-weighted); łączy momentum i wolumen. Implementacja: MFI(21)+SMA(18), sygnał na przecięciu + potwierdzenie ceny. Kat. **V**/**M**. Dane JUŻ w Bramie.
+
+10. **Two-phase reversal detection (sekwencja 9 świec + faza wyczerpania 13 świec, mechanika typu DeMark/LuxAlgo)** — zliczanie sekwencji świec kierunkowych → sygnał wyczerpania trendu. Kodowalne deterministycznie. Kat. **S**.
+
+11. **Sentyment jako filtr reversal (Fear & Greed Index, long/short ratio giełdy)** — ekstremalny long/short ratio = warunek odwrócenia (overcrowded trade). Kat. **F**/**R**.
+
+12. **Lorentzian Classification / kNN (k-Nearest Neighbours — k najbliższych sąsiadów)** — klasyfikacja stanu rynku przez odległość na cechach historycznych; ADX filtruje rynki boczne. Realny algorytm ML, ale autor tylko wskazuje gotowy wskaźnik TradingView bez kodu i backtestów.
+
+#### Najważniejsze cytaty (dosłowne)
+> *"It's crucial to select an indicator that uses a different metric or methodology from your primary signal to avoid confirmation bias."* (= Prawo XVI słowami autora)
+
+> *"Enter long when price crosses above the 20 SMA (must be within 2 bars from the RSI signal)."*
+
+> *"When using the ATR indicator, scalpers can set their stop loss orders at a certain multiple of the ATR value."*
+
+> *"The ADX is used as a filter to only enter trades in sideways market conditions."*
+
+#### Potencjalne Wizje (W-...)
+| Wizja | Nazwa | Opis | Kategoria |
+|---|---|---|---|
+| **W-101** | StrategiaMeanReversion BB40+RSI5+ADX | Pełne reguły wejścia/wyjścia (Strategia #3); filtr ADX<20 | Strategia |
+| **W-102** | RegulaKoincydencjiCzasowej (composer) | Sygnał + potwierdzenie z innej kategorii w oknie ≤2 barów; wzmacnia composer | Composer strategii |
+| **W-103** | NeuronMFI (Money Flow Index) | MFI(21)+SMA(18) — momentum ważone wolumenem; dane już w Bramie | Kat. **V** |
+| **W-104** | NeuronReversalSekwencyjny | Zliczanie sekwencji 9/13 świec (DeMark/LuxAlgo) — detektor wyczerpania trendu | Kat. **S** |
+| **W-105** | NeuronSentymentuLongShort | Kontrarianski filtr ekstremów z long/short ratio giełdy (funding) | Kat. **F**/**R** |
+| **W-106** | ModulRiskATRStop | `stop = entry ± k*ATR` + position sizing (warstwa egzekucji, nie neuron) | `pretorianie/` |
+
+🟢 **Quick winy (dane już w Bramie):** W-103 NeuronMFI i W-101 BB40+RSI5+ADX — najniższy koszt, bez nowych źródeł danych.
+
+---
+
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
 
 | BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |
@@ -1460,6 +1573,8 @@ Większość problemów traderów to NIE brak wiedzy, lecz **powtarzalne wzorce 
 | BIB-002 | Technical Analysis | John J. Murphy | 8/10 | 🟠 Średni-Wysoki | Analiza międzyrynkowa + left/right translation + MESA |
 | BIB-003 | Cryptoassets | Burniske & Tatar | 9/10 | 🔴 Wysoki | NVT (crypto-PE) + hash rate + detektor euforii (Gartner/Google) |
 | BIB-004 | Psychology of Trading | Brett Steenbarger | 8/10 | 🟠 Średni | Stacjonarność (algo!) + pinball trade + anty-overconfidence |
+| BIB-005 | What Exactly Is Crypto? | Jonatan Blum | 4/10 | 🟡 Niski | Tokenomika (issuance−burn), płynność DEX, ryzyko centralizacji (wymaga danych on-chain) |
+| BIB-006 | High Probability Scalping Playbook | Zachary Carson | 4/10 | 🟠 Średni | Konfluencja-z-dekorelacją (=Prawo XVI), filtr reżimu ADX, MFI, ATR-stop, sekwencja 9/13 |
 
 **Trzy najcenniejsze, bezpośrednio implementowalne wizje:**
 1. **W-089 NeuronNVT** — Network Value to Transactions (BIB-003) — twardy on-chain, brak odpowiednika w systemie

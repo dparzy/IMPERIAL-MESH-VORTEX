@@ -1758,6 +1758,84 @@ Rynki NIE są gaussowskie (Bachelier/Markowitz/Black-Scholes się mylą). Rządz
 
 ---
 
+### 📗 BIB-010 — "Quantitative Trading" (2nd ed.) — Ernest P. Chan ⭐ PRAKTYK ALGO
+
+**Pełny tytuł:** *Quantitative Trading: How to Build Your Own Algorithmic Trading Business* (2nd ed.) (Handel ilościowy: jak zbudować własny biznes tradingu algorytmicznego)
+**Autor:** Ernest P. Chan (Wiley) — dr fizyki (Cornell), były quant IBM/Morgan Stanley/Credit Suisse, zarządzający funduszem. Praktyk, nie akademik — książka jest podręcznikiem "jak to zrobić".
+**Status weryfikacji:** ✅ Rozdziały merytoryczne (3 Backtesting, 6 Money/Risk/Kelly, 7 Special Topics) przeczytane dogłębnie przez analizę Opus. ⚠️ Rozdziały o infrastrukturze brokerskiej/setupie pominięte jako nieistotne.
+**Ocena:** 9/10 · **Priorytet wdrożenia:** 🔴 Wysoki (praktyczne, kodowalne, bezpośrednio karmi KALKULATOR_LEWARA, Koloseum, kat. R/S)
+
+#### Teza centralna
+Edge ilościowy = prosta strategia + żelazna higiena backtestu + matematyczne zarządzanie kapitałem. Chan kładzie nacisk na unikanie pułapek (data-snooping, look-ahead, survivorship), macierzowy Kelly z kowariancją, oraz rozróżnienie **kointegracji** (długoterminowa wspójność cen) od **korelacji** (krótkoterminowa współzmienność zwrotów) — dwa szeregi mogą być skorelowane bez kointegracji i odwrotnie.
+
+#### Potencjalne Wizje (W-160..W-169)
+| Wizja | Nazwa | Kat./moduł | Metoda źródłowa | Nowa oś? | Priorytet |
+|---|---|---|---|---|---|
+| **W-160** | NeuronHalfLife (Ornstein-Uhlenbeck) ⭐ | R | regresja Δz~(z−μ); half-life=−ln2/θ — skala czasowa rewersji | TAK (vs Hurst) | 🔴 |
+| **W-161** | Test spójności W-130: g_max=S²/2 | L (test) | wzrost złożony g=m−s²/2; weryfikacja volatility drag | — (test) | 🟠 |
+| **W-162** | Macierzowy Kelly portfela strategii ⭐ | L/legatus | F*=C⁻¹·M; zdekorelowane strategie→wyższy wzrost (dowód Prawa XVI) | TAK (infra) | 🔴 |
+| **W-163** | Cap lewara przez najgorszą stratę ⭐ | L | lewar_max=max_DD/\|najgorsza_strata\|; min(half-Kelly, cap) | TAK (ogony) | 🔴 |
+| **W-164** | Para kointegrująca (z-score spreadu) | S | hedge ratio OLS + ADF/CADF + Bollinger z na spreadzie | TAK (relacja 2 instr.) | 🟠 wymaga 2. symbolu |
+| **W-165** | Deflated Sharpe + min. długość backtestu | infra | Bailey 2012; Sharpe≥1 wymaga ≥681 obs. | TAK (infra) | 🟠 |
+| **W-166** | Truncation look-ahead test ⭐ | infra | backtest pełny vs obcięty; A≠B → look-ahead bias | TAK (infra) | 🔴 tani |
+| **W-167** | Stop-loss warunkowany reżimem | L/exit | stop pomaga w momentum, szkodzi w mean-rev (R+H+Z) | synergia | 🟠 |
+| **W-168** | Conditional Parameter Optimization (CPO) | legatus/ML | ML przewiduje zwrot STRATEGII wg warunków; dynamiczne progi | TAK (ML) | 🟡 decyzja Cezara |
+| **W-169** | PCA statistical factor model | M (cross-sec) | PCA koszyka; faktory; long/short oczekiwanych zwrotów | TAK | 🟡 wymaga koszyka |
+
+🔗 **Symbioza (Prawo XVI):** Chan dostarcza matematyczny dowód, dlaczego Prawo XVI podnosi wzrost kapitału — macierzowy Kelly (W-162) z macierzą kowariancji C: zdekorelowane strategie → C bliska diagonalnej → wyższy zagregowany Kelly. Sugestia: dodać test kointegracji (ADF na spreadzie) jako DRUGI wymiar dekorelacji w `diagnostyka_korelacji` (kointegracja ≠ korelacja).
+
+---
+
+### 📘 BIB-011 — "Algorithmic Trading: Winning Strategies and Their Rationale" — Ernest Chan ⭐ (ŻYCZ-04)
+
+**Pełny tytuł:** *Algorithmic Trading: Winning Strategies and Their Rationale* (算法交易：制胜策略与原理 — handel algorytmiczny: zwycięskie strategie i ich uzasadnienie). Wydanie chińskie (dostarczone przez Cezara).
+**Autor:** Ernest Chan (Wiley) — jak BIB-010, ale ta pozycja jest bardziej zaawansowana matematycznie (kointegracja Johansena, Kalman, Pearson-Kelly).
+**Status weryfikacji:** ✅ Rozdziały merytoryczne (2 mean-reversion/kointegracja, 3 Kalman, 6 momentum, 8 ryzyko/Kelly) przeczytane przez analizę Opus z chińskiego oryginału. ⚠️ Tłumaczenie terminów techn. zweryfikowane kontekstowo.
+**Ocena:** 9/10 · **Priorytet wdrożenia:** 🔴 Wysoki (Kalman dla par = rozszerzenie EXP-04; Monte-Carlo Kelly = fat-tail awareness dla KALKULATOR)
+
+#### Teza centralna
+Strategie mean-reversion i momentum mają RACJONALNE uzasadnienie (nie data-mining). Kluczowe narzędzia: filtr Kalmana do dynamicznego hedge ratio par, Hurst+half-life do klasyfikacji reżimu, oraz Kelly liczony Monte-Carlo na rozkładzie Pearsona (4 momenty) zamiast Gaussa — bo na grubych ogonach Gauss-Kelly prowadzi do ruiny.
+
+#### Potencjalne Wizje (W-170..W-178)
+| Wizja | Nazwa | Kat./moduł | Metoda źródłowa | Nowa oś? | Priorytet |
+|---|---|---|---|---|---|
+| **W-170** | NeuronHurst+VarianceRatio (Lo-MacKinlay) | R | Var(τ)∝τ^2H + test p-value random walk | TAK (vs ADF) | 🔴 |
+| **W-171** | NeuronHalfLife OU (auto-strojenie okien) | R/meta | −log2/λ dyktuje okna całego roju | TAK (meta) | 🔴 |
+| **W-172** | Kalman β dla par (rozszerz EXP-04) ⭐ | R/S | stan=[hedge_ratio,intercept]; std reszty=adaptacyjny Bollinger | rozszerzenie EXP-04 | 🔴 |
+| **W-173** | Kalman market-maker / VWAP fair-value | V/S | Ve∝wielkość transakcji; Kalman-ważony VWAP | TAK | 🟠 |
+| **W-174** | Time-series momentum (auto lookback/holding) | M | znak zwrotu→pozycja; okna z max korelacji | zmierzyć vs M | 🟡 redundancja? |
+| **W-175** | Cross-sectional momentum (ranking koszyka) | M | long top-decyl/short bottom; eliminuje beta | TAK (przekrojowa) | 🟡 wymaga koszyka |
+| **W-176** | Monte-Carlo Kelly (Pearson, fat tails) ⭐⭐ | L | symulacja 100k z 4 momentów; wykrywa ruin leverage | rozszerzenie Kelly | 🔴 |
+| **W-177** | CPPI (Constant Proportion Portfolio Insurance) | L/risk | D·equity w subkoncie z dźwignią; gwarantuje DD<D | TAK (alokacja) | 🟠 |
+| **W-178** | NeuronRyzykaWyprzedzajacego (leading risk) | R | proxy ryzyka NASTĘPNEGO okresu (funding/OI/depeg); wartość względna | TAK (asymetria) | 🟠 wymaga Bramy |
+
+🚨 **DWIE FLAGI Prawa XV do weryfikacji w kodzie (Chan dowodzi krytyczności):**
+1. **W-176:** czy KALKULATOR_LEWARA liczy Kelly tylko po Gaussie? Na rozkładach fat-tail (crypto!) Gauss-Kelly prowadzi do drawdown −1 (wipeout). Monte-Carlo Kelly z Pearsona to ujawnia. → **do sprawdzenia.**
+2. **W-172:** czy EXP-04 używa Kalmana tylko do 1-D filtrowania, czy też do dynamicznego hedge-ratio par? Jeśli nie — niewykorzystany potencjał. → **do sprawdzenia kodu EXP-04.**
+
+🔗 **Nakładanie z BIB-010:** obie książki Chana dzielą half-life OU (W-160≈W-171) i Kelly. Przy wdrożeniu — jeden neuron half-life, nie dwa. W-170 (Hurst+VR) jest mocniejszą wersją klasyfikatora reżimu niż sam half-life.
+
+---
+
+### 📕 BIB-012 — "Coding Capital" — Strauss & Van Der Post ⚠️ SŁABA (3/10)
+
+**Pełny tytuł:** *Coding Capital: The Art of Algorithmic Trading: A Comprehensive Guide for Algorithmic Trading with Python in 2024*
+**Autor:** Johann Strauss & Hayden Van Der Post (self-published, 2024) — Van Der Post produkuje dziesiątki podobnych tytułów rocznie.
+**Status weryfikacji:** ✅ Rozdziały 4, 5, 8, 13 przeczytane krytycznie przez analizę Opus.
+**Ocena:** ⚠️ **3/10 — słaba** · **Priorytet:** 🟡 Niski (niemal zero wartości dla Imperium)
+
+#### Werdykt (Prawo I — uczciwość)
+80% to wypełniacz prozą (metafory żeglarskie zamiast treści). Snippety toy-level i **często BŁĘDNE**: `volatility=returns.std()` na całym DataFrame, błędny wzór Expected Shortfall, Monte Carlo ze sztywnym sigma=2, mylone position sizing. Wszystko na yfinance/equities — zero crypto/futures. Zero cytowań, zero walidacji statystycznej. Wszystkie "techniki" (RSI/MACD/Sharpe/VaR/Kelly/Kalman) Imperium ma już lepiej i w testowanej formie.
+
+#### Jedyne ziarno warte kodu (W-180)
+| Wizja | Nazwa | Kat./moduł | Metoda | Nowa oś? | Priorytet |
+|---|---|---|---|---|---|
+| **W-180** | EVT/GPD — parametr kształtu ogona ξ | R/L | Peaks-Over-Threshold + Generalized Pareto Distribution; ξ>0=ciężki ogon | TAK (vs VaR/CVaR) | 🟠 |
+
+🚨 **Prawo XV:** W-180 to jedyna rzecz, której nasz stack ryzyka jeszcze NIE mierzy — parametr kształtu ogona ξ (gruby ogon ≠ wysoka wariancja). ⚠️ wymaga ręcznej implementacji MLE GPD (scipy łamie zasadę czystego runnera). Reszta książki: pominięta jako redundancja. **Rekomendacja: nie kupować więcej tytułów Van Der Posta** — López de Prado (BIB-007) ma EVT/meta-labeling na poważnie.
+
+---
+
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
 
 | BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |
@@ -1771,6 +1849,9 @@ Rynki NIE są gaussowskie (Bachelier/Markowitz/Black-Scholes się mylą). Rządz
 | BIB-007 ⭐ | Advances in Financial Machine Learning | Marcos López de Prado | **10/10** | 🔴 KRYTYCZNY | Autor VPIN/triple-barrier; FFD (domyka W-094), meta-labeling, purged CV, PBO/DSR, entropia, SADF → W-107..W-120 |
 | BIB-008 ⭐ | Volatility Trading (2nd ed.) | Euan Sinclair | 8/10 | 🔴 Wysoki | Wykładowca Yang-Zhang (mamy!); rodzina estymatorów→sygnatura zmienności, GARCH+vol cone, Kelly+korekta błędu, **volatility drag (W-130 WDROŻONE)** → W-121..W-139 |
 | BIB-009 ⭐ | The (Mis)behavior of Markets | Mandelbrot & Hudson | 7/10 | 🔴 Wysoki | Ojciec fraktali — celuje wprost w nasze najsłabsze osie D/H/N: tail-index α, wymiar fraktalny, trading-time, dependence-without-correlation, multifraktal → W-140..W-158 |
+| BIB-010 ⭐ | Quantitative Trading (2nd ed.) | Ernest P. Chan | 9/10 | 🔴 Wysoki | Praktyk algo: half-life OU, macierzowy Kelly (dowód Prawa XVI), cap lewara, para kointegrująca, deflated Sharpe, truncation look-ahead test → W-160..W-169 |
+| BIB-011 ⭐ | Algorithmic Trading: Winning Strategies (ŻYCZ-04) | Ernest Chan | 9/10 | 🔴 Wysoki | Kalman β dla par (rozszerza EXP-04), Monte-Carlo Kelly (fat tails!), Hurst+VarianceRatio, leading risk, CPPI → W-170..W-178 |
+| BIB-012 | Coding Capital | Strauss & Van Der Post | ⚠️ 3/10 | 🟡 Niski | SŁABA (self-published, snippety błędne). Jedyne ziarno: EVT/GPD parametr ogona ξ → W-180 |
 
 **Trzy najcenniejsze, bezpośrednio implementowalne wizje:**
 1. **W-089 NeuronNVT** — Network Value to Transactions (BIB-003) — twardy on-chain, brak odpowiednika w systemie
@@ -1803,9 +1884,9 @@ Rynki NIE są gaussowskie (Bachelier/Markowitz/Black-Scholes się mylą). Rządz
 
 | # | Tytuł | Autor | Luka / kat. | Dlaczego wartościowe | Gdzie szukać |
 |---|---|---|---|---|---|
-| ŻYCZ-04 | **Algorithmic Trading: Winning Strategies and Their Rationale** | Ernest P. Chan (2013) | R=4 (reżim), strategie | Regime detection (HMM — pod naszą kat. R/legatus), mean-reversion vs momentum, Kalman filter (mamy EXP-04!), stat-arb. Praktyczne, kodowalne strategie z uzasadnieniem. | Wiley; ISBN 978-1118460146 |
-| ŻYCZ-05 | **Mind Over Markets: Power Trading with Market Generated Information** | James F. Dalton (1990/2013) | V=2, S=3 (wolumen/struktura) | Auction Market Theory + Market Profile — JAK czytać wolumen w strukturze ceny (value area, POC). Fundament pod neurony wolumenowo-strukturalne (uzupełnia naszą najsłabszą parę V/S). | Wiley; ISBN 978-1118531730 |
-| ŻYCZ-06 | **Markets in Profile: Profiting from the Auction Process** | James F. Dalton (2007) | V/S (kontynuacja AMT) | Rozszerzenie auction theory na wiele ram czasowych. ⓘ Pełny PDF krąży legalnie w sieci (r-5.org) — łatwy do zdobycia. | Wiley; ISBN 978-0470039090 |
+| ✅ ŻYCZ-04 | **Algorithmic Trading** → **ZDOBYTE jako BIB-011** (2026-06-08) | Ernest P. Chan (2013) | R=4 (reżim), strategie | Kalman β dla par (rozszerza EXP-04), Monte-Carlo Kelly (fat tails!), Hurst+VarianceRatio, leading risk, CPPI → W-170..W-178. ⓘ Dostarczone wydanie chińskie. | Wiley; ISBN 978-1118460146 |
+| ✅ ŻYCZ-05 | **Mind Over Markets** → **ZDOBYTE jako BIB-014** (2026-06-08, w analizie) | James F. Dalton (1990/2013) | V=2, S=3 (wolumen/struktura) | Auction Market Theory + Market Profile — fundament pod najsłabszą parę V/S → W-200+. | Wiley; ISBN 978-1118531730 |
+| ✅ ŻYCZ-06 | **Markets in Profile** → **ZDOBYTE jako BIB-013** (2026-06-08, w analizie) | James F. Dalton (2007) | V/S (kontynuacja AMT) | Rozszerzenie auction theory na wiele ram czasowych → W-190+. | Wiley; ISBN 978-0470039090 |
 | ŻYCZ-07 | **Positional Option Trading** | Euan Sinclair (2020) | warstwa ryzyka (`pretorianie/`) | Kelly criterion z niepewnością estymacji, trade sizing, skew, stop-loss. Bezpośrednio pod nasz kalkulator lewara i W-096 throttle. | Wiley; ISBN 978-1119583516 |
 
 ### 🟡 PRIORYTET UZUPEŁNIAJĄCY (rozważyć później / zasoby zamiast książek)
@@ -1819,7 +1900,7 @@ Rynki NIE są gaussowskie (Bachelier/Markowitz/Black-Scholes się mylą). Rządz
 - **Prawo I (uczciwość):** ŻYCZ-03 (Mandelbrot), ŻYCZ-08 (Kahneman) rekomenduję z własnej wiedzy — NIE zweryfikowane tym konkretnym zwiadem internetowym. Reszta potwierdzona wyszukiwaniem 2026-06-08.
 - **Prawo XV (utrata potencjału):** książki on-chain (ŻYCZ-09) i część wizji wymagają NOWEGO źródła danych (API on-chain) — bez Bramy dostarczającej te dane neurony byłyby martwym głosem. Najpierw dane, potem neuron.
 - **Format:** najłatwiejsze do zdobycia jako pełny tekst: ŻYCZ-06 (PDF w sieci). Reszta — legalnie przez zakup/bibliotekę; wklejaj pliki jak poprzednie (azw3/epub/pdf), rozpakuję i przeanalizuję.
-- **Zdobyte:** ✅ ŻYCZ-01 (López de Prado → BIB-007), ✅ ŻYCZ-02 (Sinclair → BIB-008), ✅ ŻYCZ-03 (Mandelbrot → BIB-009). Trzy filary quant: ML, zmienność/lewar, fraktale.
-- **Rekomendacja #1 (następna):** **ŻYCZ-04 Ernest Chan "Algorithmic Trading"** — regime detection (HMM pod kat. R/legatus), Kalman filter (mamy EXP-04!), stat-arb. Praktyczne kodowalne strategie. ⚠️ rekomendacja z wiedzy, niezweryfikowana zwiadem.
+- **Zdobyte (8):** ✅ ŻYCZ-01 (→BIB-007 López de Prado), ✅ ŻYCZ-02 (→BIB-008 Sinclair), ✅ ŻYCZ-03 (→BIB-009 Mandelbrot), ✅ ŻYCZ-04 (→BIB-011 Chan Algo), ✅ ŻYCZ-05 (→BIB-014 Dalton MoM), ✅ ŻYCZ-06 (→BIB-013 Dalton MiP) + BIB-010 Chan QT, BIB-012 Coding Capital.
+- **Rekomendacja #1 (następna):** **ŻYCZ-07 Euan Sinclair "Positional Option Trading"** — Kelly z niepewnością estymacji, trade sizing, stop-loss; bezpośrednio pod KALKULATOR_LEWARA i W-096 throttle. Albo ŻYCZ-09 (zasoby on-chain) pod najsłabszą kat. O.
 
-*Lista życzeń otwarta — Cezar dostarcza, Claude analizuje i przenosi do BIB-009+.* 🎯📚⚔️
+*Lista życzeń otwarta — Cezar dostarcza, Claude analizuje i przenosi do BIB-014+.* 🎯📚⚔️

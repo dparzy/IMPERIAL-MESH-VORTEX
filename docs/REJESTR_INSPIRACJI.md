@@ -212,6 +212,7 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 | INF-16 | "The Psychology of Trading" — Brett N. Steenbarger (2003) | ISBN 978-0471267614 (BIB-004) | Stacjonarność Clifforda Sherry'ego (zmiana procesu generującego), pinball trade (nieudany breakout), anty-overconfidence throttle → W-094..W-096 | Faza 2 |
 | INF-17 | "What Exactly Is Crypto?" — Jonatan Blum (2022) | thecryptobook.xyz (BIB-005) | Tokenomika (issuance−burn), szok podażowy unlock/vesting, płynność DEX (AMM x*y=k), ryzyko centralizacji/governance → W-097..W-100 (wymaga danych on-chain) | Faza 3 |
 | INF-18 | "High Probability Scalping Strategy Playbook" — Zachary Carson (2024) | self-published, Amazon KDP ⚠️ ASIN niezweryfikowany (BIB-006) | Konfluencja-z-dekorelacją (=Prawo XVI), filtr reżimu ADX (trend/range), MFI, sekwencja 9/13 (DeMark), ATR-stop → W-101..W-106 | Faza 2 |
+| INF-19 ⭐ | "Advances in Financial Machine Learning" — Marcos López de Prado (2018) | ISBN 978-1119482086 (BIB-007) | **Autor VPIN (Z-01) i triple-barrier (W-035).** FFD/fractional differentiation (domyka W-094), meta-labeling, purged CV+embargo, CPCV, PBO, Deflated Sharpe, feature importance MDI/MDA/SFI, entropia (Kontoyiannis), SADF structural breaks → W-107..W-120 | Faza 1-2 |
 
 > **Pełna lista (~220 narzędzi):** `docs/ARSENAL_IMPERIUM.md` — schemat architektoniczny + tabele weryfikacyjne.
 

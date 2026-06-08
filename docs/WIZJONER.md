@@ -1565,6 +1565,91 @@ To **płytka książka**: ~70% to katalog "wpisz tę nazwę w TradingView" bez u
 
 ---
 
+### 📘 BIB-007 — "Advances in Financial Machine Learning" — Marcos López de Prado ⭐ FLAGOWA
+
+**Pełny tytuł:** *Advances in Financial Machine Learning* (Postępy w finansowym uczeniu maszynowym)
+**Autor:** Marcos López de Prado (Wiley, 2018) — dr ekonomii finansowej i fizyki, zarządzający miliardami USD + dorobek naukowy. **Twórca/współtwórca metod, które IMPERIUM JUŻ UŻYWA:** VPIN (nasz Z-01), triple-barrier (nasza Arena W-035), PBO, Deflated Sharpe Ratio. Autor: meta-labeling, fractional differentiation, purged CV, CPCV, HRP.
+**Status weryfikacji:** ✅ Rdzeń strategiczny (Części 1–4: rozdz. 1–5, 7, 8, 10, 15–19) przeczytany dogłębnie. ⚠️ Rozdz. 6, 9, 13, 14 oraz Część 5 (HPC, rozdz. 20–22) niepełne — wnioski o PSR/DSR z odniesień krzyżowych, nie z bezpośredniej lektury rozdz. 14.
+**Ocena:** 10/10 · **Priorytet wdrożenia:** 🔴 KRYTYCZNY (flagowa pozycja całej Biblioteki)
+
+#### Teza centralna
+Niemal wszystkie projekty finansowego ML zawodzą NIE przez słaby algorytm, lecz przez **fałszywe odkrycie** rodzące się z błędów metodologicznych, których standardowa literatura ML (założenie IID — independent and identically distributed) nie adresuje. Dane finansowe mają niski stosunek sygnału do szumu, pamięć (niestacjonarność), nakładające się etykiety i ekstremalne ryzyko przeuczenia. Autor dostarcza kompletny, kodowalny potok — od konstrukcji barów, przez etykietowanie i wagi próbek, po walidację odporną na przeciek — którego cel: **"jak nie oszukać samego siebie w ML finansowym".** Maksyma: *"Backtesting nie jest narzędziem badawczym. Feature importance jest."*
+
+#### Kluczowe koncepcje (16)
+
+1. **Information-Driven Bars (bary sterowane informacją)** — Tick/Volume/Dollar Bars + Imbalance/Runs Bars. Bary czasowe mają złe własności statystyczne; dollar bars najodporniejsze. Implementacja: nowy moduł Bramy/Budowniczego. **Symbioza: dollar/volume bars to natywny "volume clock" dla Z-01 VPIN** — jeśli liczymy VPIN na barach czasowych, tracimy precyzję (alarm Prawa XV).
+
+2. **Triple-Barrier Method** — JUŻ MAMY jako W-035 Arena. Książka daje kanoniczny kod (`getEvents`, `applyPtSlOnT1`, 8 konfiguracji `[pt,sl,t1]`) → warto **zweryfikować naszą implementację względem oryginału**.
+
+3. **Meta-Labeling (meta-etykietowanie)** — rozdziela decyzję o STRONIE (long/short, model pierwotny = nasz rój) od ROZMIARU (czy wchodzić, wtórny model ML {0,1}); podnosi F1-score. Implementacja: meta-warstwa Legatusa ucząca się, kiedy ufać konsensusowi roju. Działa najlepiej z structural break (kat. R) jako cechą.
+
+4. **Sample Weights: Concurrency & Average Uniqueness** — etykiety triple-barrier nakładają się → łamią IID. Ważenie unikalnością (0–1). Każdy trening ML na sygnałach roju musi to stosować.
+
+5. **Sequential Bootstrap** — bagging obniżający prawdopodobieństwo losowania nakładających się obserwacji (mediana unikalności 0.6→0.7).
+
+6. **Return Attribution & Time Decay** — waga = unikalność × |log-zwrot|; zanik czasowy c∈(−1,1] (rynki adaptacyjne, stare przykłady mniej istotne).
+
+7. **Fractionally Differentiated Features (FFD) ⭐ DOMYKA W-094** — dylemat stacjonarność vs pamięć: zwroty (d=1) są stacjonarne ale bezpamięciowe; FFD (d niecałkowite, Hosking 1981) znajduje minimalne d\* dające stacjonarność (test ADF) z MAKSYMALNĄ pamięcią. Empirycznie d<0.6, często d≈0.35, korelacja z oryginałem 0.995 (vs 0.03 dla zwrotów). Pełny kod w książce. **To dokładnie nasza wizja W-094 NeuronStacjonarnosci — flagowa implementacja.**
+
+8. **Cross-Validation: Purging & Embargo** — standardowy k-fold ZAWODZI w finansach (przeciek przez nakładające się etykiety). Purging: usuń z treningu obserwacje nakładające się czasowo z testem. Embargo: usuń też tuż po teście. Klasa `PurgedKFold`. OBOWIĄZKOWY moduł — bez niego każdy backtest roju podejrzany.
+
+9. **Feature Importance: MDI/MDA/SFI ⭐** — Mean Decrease Impurity / Mean Decrease Accuracy / Single Feature Importance. **Idealne narzędzie audytu roju** — które neurony niosą informację, a które to martwe głosy/redundancja. Substitution effect = nasza korelacja >0.80. **Bezpośrednio realizuje Prawo XV i XVI — ML-owy odpowiednik `diagnostyka_korelacji`.**
+
+10. **Bet Sizing** — rozmiar z prawdopodobieństwa: m=2·Z[z]−1; averaging active bets, dyskretyzacja. "Wysoka trafność na małych zakładach i niska na dużych cię zrujnuje." Zasilany meta-labelingiem → kat. L / KALKULATOR_LEWARA.
+
+11. **Dangers of Backtesting & PBO** — Probability of Backtest Overfitting przez CSCV. ~20 iteracji wystarcza by "odkryć" fałszywą strategię przy 5%. Bramka jakości dla każdej strategii.
+
+12. **Combinatorial Purged Cross-Validation (CPCV)** — wiele ścieżek backtestowych z purgingiem zamiast jednej (walk-forward łatwo przeucza). Docelowy silnik backtestu.
+
+13. **Backtest Statistics: PSR & Deflated Sharpe Ratio** — koryguje Sharpe'a o liczbę prób, skośność, kurtozę i selection bias. Finalna metryka akceptacji strategii.
+
+14. **Understanding Strategy Risk** — Sharpe to funkcja PRECYZJI (nie dokładności); próg precyzji π_λ → probability of strategy failure (EF3M). Monitor kat. R.
+
+15. **Structural Breaks: CUSUM & SADF ⭐** — Supremum Augmented Dickey-Fuller wykrywa eksplozywność (bąble/krachy) na log-cenach; pik SADF = bańka, powrót = pęknięcie. Wykrywa wiele reżimów bez znanej liczby przełamań. Potężna cecha dla kat. R i meta-labelingu.
+
+16. **Entropy Features ⭐⭐ (najsłabsza kat. N)** — Shannon/plug-in/Lempel-Ziv/Kontoyiannis + schematy kodowania. Mierzy redukowalność/przewidywalność: rynek efektywny = wysoka entropia; **"bąble formują się w rynkach niskiej entropii (skompresowanych)".** Encodować na seriach FFD. Bezpośrednio rozbudowuje naszą najsłabszą kat. N.
+
+**Bonus — Microstructural Features (kat. A/Z/V):** Tick Rule, Roll, Corwin-Schultz, Kyle's/Amihud's/Hasbrouck's λ, PIN, VPIN (=Z-01), predatory algos (quote stuffers, danglers), round-lot distribution (detekcja traderów GUI). Kopalnia cech dla kat. A/Z/V.
+
+#### Najważniejsze cytaty (dosłowne)
+> *"Backtesting is not a research tool. Feature importance is."*
+
+> *"The dilemma is that returns are stationary, however memory-less, and prices have memory, however they are non-stationary."*
+
+> *"In all cases stationarity is achieved with d < 0.6."* (FFD — Table 5.1)
+
+> *"One way to reduce leakage is to purge from the training set all observations whose labels overlapped in time with those labels included in the testing set."*
+
+> *"Achieving high accuracy on small bets and low accuracy on large bets will ruin you."*
+
+> *"A 'compressed' market is an inefficient market... Bubbles are formed in compressed (low entropy) markets."*
+
+> *"It typically takes about 20 such iterations to discover a (false) investment strategy subject to the standard significance level of 5%."*
+
+#### Potencjalne Wizje (W-107..W-120)
+| Wizja | Nazwa | Kat. | Metoda źródłowa | Priorytet |
+|---|---|---|---|---|
+| **W-107** | NeuronStacjonarnosci FFD (DOMYKA W-094) | H/R | Fractional Differentiation — d\* min. dla ADF, max pamięć | 🔴 |
+| **W-108** | NeuronEntropiiRynku | N | Kontoyiannis/plug-in/LZ entropy na FFD; niska entropia = bańka | 🔴 |
+| **W-109** | NeuronEksplozji SADF | R | Supremum ADF na log-cenach — bańka/krach | 🔴 |
+| **W-110** | NeuronPrzelomu CUSUM | R | Brown-Durbin-Evans + Chu-Stinchcombe-White | 🟠 |
+| **W-111** | Meta-Legatus (meta-labeling) | F/R | Wtórna warstwa ML — kiedy ufać konsensusowi roju | 🔴 |
+| **W-112** | Moduł Purged-CPCV + DSR | infra | PurgedKFold+embargo, CPCV, PBO, Deflated Sharpe | 🔴 |
+| **W-113** | Audytor Feature Importance MDI/MDA/SFI | infra | ML-audyt neuronów — realizuje Prawo XV i XVI | 🔴 |
+| **W-114** | Bramy Informacyjne (information-driven bars) | V/infra | Dollar/Volume/Imbalance bars — volume clock dla VPIN | 🟠 |
+| **W-115** | NeuronImpaktuLikwidnosci (λ) | Z/V | Kyle's/Amihud's/Hasbrouck's λ | 🟠 |
+| **W-116** | NeuronPredatorow | A | Quote stuffers/danglers/squeezers + cancellation rates | 🟠 |
+| **W-117** | NeuronTraderowGUI (round-lot) | A/F | Rozkład rozmiarów zleceń — ludzie vs boty | 🟡 |
+| **W-118** | NeuronRyzykaStrategii | R | Probability of strategy failure (π_λ, EF3M) | 🟠 |
+| **W-119** | Sizer (bet sizing z prawdopodobieństwa) | L | m=2Z[z]−1 + averaging, zasilany meta-labelingiem | 🟠 |
+| **W-120** | Moduł wag próbek (uniqueness + seq. bootstrap + time decay) | infra | Poprawne ważenie nakładających się etykiet | 🟡 |
+
+🚨 **Sygnały Prawa XV wyniesione z lektury (do weryfikacji):**
+1. Jeśli **Z-01 (VPIN)** liczony jest na barach czasowych zamiast wolumenowych (volume clock), traci precyzję projektowaną przez autora → W-114.
+2. IMPERIUM trenuje/ocenia moduły **bez purged CV+embargo i bez korekty PBO/DSR** — systemowa luka metodologiczna, przez którą backtesty roju są podatne na fałszywe odkrycie → **W-112 priorytet 🔴.**
+
+---
+
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
 
 | BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |
@@ -1575,6 +1660,7 @@ To **płytka książka**: ~70% to katalog "wpisz tę nazwę w TradingView" bez u
 | BIB-004 | Psychology of Trading | Brett Steenbarger | 8/10 | 🟠 Średni | Stacjonarność (algo!) + pinball trade + anty-overconfidence |
 | BIB-005 | What Exactly Is Crypto? | Jonatan Blum | 4/10 | 🟡 Niski | Tokenomika (issuance−burn), płynność DEX, ryzyko centralizacji (wymaga danych on-chain) |
 | BIB-006 | High Probability Scalping Playbook | Zachary Carson | 4/10 | 🟠 Średni | Konfluencja-z-dekorelacją (=Prawo XVI), filtr reżimu ADX, MFI, ATR-stop, sekwencja 9/13 |
+| BIB-007 ⭐ | Advances in Financial Machine Learning | Marcos López de Prado | **10/10** | 🔴 KRYTYCZNY | Autor VPIN/triple-barrier; FFD (domyka W-094), meta-labeling, purged CV, PBO/DSR, entropia, SADF → W-107..W-120 |
 
 **Trzy najcenniejsze, bezpośrednio implementowalne wizje:**
 1. **W-089 NeuronNVT** — Network Value to Transactions (BIB-003) — twardy on-chain, brak odpowiednika w systemie
@@ -1599,7 +1685,7 @@ To **płytka książka**: ~70% to katalog "wpisz tę nazwę w TradingView" bez u
 
 | # | Tytuł | Autor | Luka / kat. | Dlaczego KRYTYCZNE dla nas | Gdzie szukać |
 |---|---|---|---|---|---|
-| ŻYCZ-01 | **Advances in Financial Machine Learning** | Marcos López de Prado (2018) | D/N/Z + cała architektura ML | **Autor VPIN** (nasz Z-01!) i triple-barrier (nasza Arena W-035!). Zawiera: fractional differentiation (= nasz W-094 stacjonarność!), meta-labeling, feature importance, backtest overfitting (PBO), sample weights. To fundament POPRAWNEGO ML w finansach — uczy "jak nie oszukać samego siebie". Łączy 4 nasze wizje naraz. | Wiley; ISBN 978-1119482086 |
+| ✅ ŻYCZ-01 | **Advances in Financial Machine Learning** → **ZDOBYTE jako BIB-007** (2026-06-08) | Marcos López de Prado (2018) | D/N/Z + cała architektura ML | **Autor VPIN** (nasz Z-01!) i triple-barrier (nasza Arena W-035!). Zawiera: fractional differentiation (= nasz W-094 stacjonarność!), meta-labeling, feature importance, backtest overfitting (PBO), sample weights. Przeanalizowane → 14 wizji W-107..W-120. | Wiley; ISBN 978-1119482086 |
 | ŻYCZ-02 | **Volatility Trading** (2nd ed.) | Euan Sinclair (2013) | L=2, V=2 (dźwignia/zmienność) | Estymatory zmienności (używamy Yang-Zhang — on to wykłada!), variance premium, money management, GARCH. Bezpośrednio karmi kalkulator lewara (W-059 vol-targeting) i kat. L/V. | Wiley; ISBN 978-1118347133 |
 | ŻYCZ-03 | **The (Mis)behavior of Markets: A Fractal View of Financial Turbulence** | Benoît Mandelbrot & Richard Hudson (2004) | H=1, D=1, N=1 (fraktale/multifraktal) | OJCIEC geometrii fraktalnej. Bezpośrednio pod H-01 (Hurst-DFA), D-01 (Path Signature), W-081 (MFDFA Δα). Multifraktalność rynków, grube ogony, pamięć długoterminowa. Nasza najsłabsza oś (D/H/N po 1 neuronie). ⚠️ rekomendacja z wiedzy — niezweryfikowana tym zwiadem. | Basic Books; ISBN 978-0465043576 |
 

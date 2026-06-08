@@ -1650,6 +1650,73 @@ Niemal wszystkie projekty finansowego ML zawodzą NIE przez słaby algorytm, lec
 
 ---
 
+### 📙 BIB-008 — "Volatility Trading" (2nd ed.) — Euan Sinclair ⭐ RDZEŃ ZMIENNOŚCI/LEWARA
+
+**Pełny tytuł:** *Volatility Trading, Second Edition* (Handel zmiennością, wyd. 2)
+**Autor:** Euan Sinclair (Wiley, 2013; ISBN 978-1118347133) — zawodowy trader opcji (15+ lat), fizyk z wykształcenia. **Wykładowca estymatora Yang-Zhang, którego IMPERIUM JUŻ UŻYWA** (kat. L/V), oraz Kelly criterion zasilającego nasz KALKULATOR_LEWARA.
+**Status weryfikacji:** ✅ Rozdziały kluczowe dla bota futures bez opcji przeczytane dogłębnie przez 3 analizy Opus: rozdz. 2 (pomiar zmienności), 3 (stylized facts), 4 (prognozowanie), 8 (money management/Kelly), 9 (trade evaluation), 13 (leveraged ETFs/volatility drag). ⚠️ Rozdz. 1, 5–7, 10–12, 14 (stricte opcyjne: greeks, smile, hedging, VIX) pominięte jako nieistotne dla bota futures — świadoma decyzja zakresowa, nie luka.
+**Ocena:** 8/10 (dla bota futures; 10/10 dla tradera opcji) · **Priorytet wdrożenia:** 🔴 WYSOKI (rdzeń kategorii L/V/R + KALKULATOR_LEWARA)
+
+#### Teza centralna
+Przewaga w tradingu zmienności = **mierzyć zmienność lepiej niż rynek i zarządzać kapitałem matematycznie, nie emocjonalnie**. Zmienność jest jedyną wielkością, którą da się prognozować z sensowną dokładnością (returny — prawie nie). Sinclair dostarcza kodowalny arsenal: rodzinę estymatorów range-based (Parkinson/Garman-Klass/Rogers-Satchell/Yang-Zhang), GARCH z kotwicą długoterminową, Kelly z korektą błędu estymacji, oraz — KRYTYCZNE dla bota lewarowanego — matematykę erozji zmiennościowej (volatility drag).
+
+#### ⚠️ Niuans crypto 24/7 (różnica vs książka o akcjach)
+Książka zakłada akcje (sesja 6,5h + luka nocna). Crypto futures handluje 24/7 → **brak luki otwarcia**. To ma dwie konsekwencje sprawdzone przez analizę:
+1. **Yang-Zhang traci przewagę** — jego komponent close-to-open (luka) ≈ 0 na crypto, więc YZ degraduje się ku Rogers-Satchell. RS radzi sobie z trendem i nic nie traci na braku luk → **możliwa optymalizacja istniejącego neuronu L/V** (W-136, czerwony alarm Prawa XV).
+2. Cała sekcja "overnight vs intraday kurtosis" nie dotyczy nas.
+3. **Znak efektu dźwigni MUSI być kalibrowany na danych** (Prawo I) — w crypto może być odwrócony względem akcji (up-vol w hossie).
+
+#### Kluczowe koncepcje (5 rodzin)
+
+**1. Rodzina estymatorów zmienności (rozdz. 2)** — Parkinson (high-low), Garman-Klass (OHLC), Rogers-Satchell (odporny na trend), Yang-Zhang (mamy). Najcenniejsze NIE jako pojedyncze liczby (skorelowane), lecz jako **STOSUNKI** — sygnatura zmienności: `Parkinson/close-to-close` wysoki = dzika zmienność intrabar wracająca na zamknięciu; `RS/Parkinson` odróżnia zmienność trendową od oscylacyjnej. To realizuje Prawo XV (odzysk wielowymiarowości OHLC) i Prawo XVI (nowa oś).
+
+**2. Stylized facts (rozdz. 3)** — volatility clustering / długa pamięć (ACF |returnów|, synergia z H/Hurst), mean-reversion zmienności (variance ratio dzienne vs tyg. vs mies.), leverage effect (asymetria return-vol, symetryczny YZ jej nie widzi), volume-volatility (korelacja wolumenu z zakresem high-low = 0,85!), grube ogony (kurtoza, synergia z D/Lévy), log-normalny rozkład σ (wyższy poniżej 200-SMA → reżim).
+
+**3. Prognozowanie (rozdz. 4)** — GARCH(1,1) z kotwicą długoterminową `V=ω/(1−α−β)` i prognozą term-structure `σ²_{t+k}=V+(α+β)^k(σ²_t−V)` (nowa oś: KIERUNEK dryfu σ, nie poziom). Volatility Cone (percentyl bieżącej σ w rozkładzie historycznym — substytut implied vol dla bota bez opcji). Variance Premium (implied−realized) — **wymaga DVOL z Deribit**, bez niego martwy głos.
+
+**4. Money management / Kelly (rozdz. 8)** — `f*=μ/σ²` (twardy sufit lewara), fractional Kelly (c∈[0.2,0.5] — growth symetryczny wokół f=1, drawdowny super-liniowe), **korekta błędu estymacji** `E[p]=(w+1)/(N+2)` (Laplace — naiwne p=w/N zawsze zawyża; przy N=10 ~27% szans na ujemną przewagę). Bankroll ≠ margin (mylenie = likwidacja).
+
+**5. Volatility drag (rozdz. 13) ⭐ NAJWAŻNIEJSZE dla bota lewarowanego** — pozycja lewarowana λ eroduje jak `exp(−½λ(λ−1)σ²t)`. Dla λ=2: drag = −σ²·t; dla λ=3 przy σ_roczne=1.0: **−300%/rok dryfu**. To dokładnie ta sama erozja co leveraged ETF. Jeśli KALKULATOR_LEWARA nie odejmuje dragu → systematycznie zawyża atrakcyjność wysokiego lewara = CZERWONY ALARM Prawa XV + ryzyko ruiny.
+
+#### Najważniejsze cytaty (parafraza z analizy)
+> *"If Parkinson is 40% and close-to-close is 20%, much of the true vol is driven by large intraday ranges."* (rozdz. 2 — sygnatura zmienności)
+
+> *"Achieving high accuracy on small bets and low accuracy on large bets will ruin you."* (zbieżne z López de Prado — bet sizing)
+
+> *Optymalny lewar Kelly dla FXI w 2008 (σ=146%) = 0.04. Lewar 2 był matematyczną katastrofą.* (rozdz. 13)
+
+#### Potencjalne Wizje (W-121..W-139)
+| Wizja | Nazwa | Kat. | Metoda źródłowa | Nowa oś? | Priorytet |
+|---|---|---|---|---|---|
+| **W-121** | NeuronSygnaturaZmiennosci (ratio Parkinson/GK/RS/close) | R | Stosunki estymatorów — źródło zmienności | TAK | 🔴 |
+| **W-122** | NeuronEfektuDzwigni (asymetria return-vol) | R/M | korelacja(r,σ) + asymetria rozmiaru zwrotów | TAK | 🔴 |
+| **W-123** | NeuronVarianceRatio (mean-rev zmienności) | R | σ dzienna vs tyg. vs mies. (Campbell-Lo-MacKinlay) | TAK | 🟠 |
+| **W-124** | NeuronKurtozy (grube ogony / aftershock) | D | rolling excess kurtosis returnów | TAK (4. moment) | 🟠 |
+| **W-125** | NeuronKlasteryzacji (ACF długiej pamięci) | H | ACF\|r\| wolno gasnąca — synergia z Hurst | TAK | 🟡 |
+| **W-126** | NeuronGARCH (term-structure + vol anchor) ⭐ | L/R | σ²=ω+αr²+βσ²; V=ω/(1−α−β); prognoza kierunku σ | TAK (mocna) | 🔴 |
+| **W-127** | NeuronVolatilityCone (percentyl σ) ⭐ | R | rozkład historyczny σ per horyzont; korekta Hodges-Tompkins | TAK | 🔴 |
+| **W-128** | NeuronGARCH-Asym (GJR/EGARCH) | V/R | człon γr²·I(r<0); crypto może mieć odwrotny znak | TAK (do weryf.) | 🟡 |
+| **W-129** | NeuronVariancePremium (DVOL−RV) | V/R | implied (DVOL Deribit) − realized (YZ) | TAK (najmocniejsza) | 🟠 wymaga Bramy |
+| **W-130** | VolatilityDrag w KALKULATOR_LEWARA ⭐⭐ | L | korekta zwrotu −½λ(λ−1)σ²t | — (krytyczna korekta) | 🔴 KRYTYCZNY |
+| **W-131** | Kelly μ/σ² + fractional + Bayes (w+1)/(N+2) | L | twardy sufit lewara z korektą błędu estymacji | — (ulepszenie) | 🔴 |
+| **W-132** | Dynamiczny sufit lewara μ/σ² na bieżącej σ | L | sprzężenie z W-059 vol-targeting + W-096 throttle | — (ulepszenie) | 🔴 |
+| **W-133** | K-ratio (Kestner — edge vs szum) | infra/metryki | nachylenie/SE regresji equity = t-stat przewagi | nowa metryka | 🟠 |
+| **W-134** | SE(Sharpe) + zestaw metryk (Sortino/Calmar/Omega) | infra/metryki | przedział ufności Sharpe; metryki downside | nowa metryka | 🟠 |
+| **W-135** | Rejestr statystyk per-trade (μ,σ,p,N) | infra | dziennik karmiący Kelly (W-131) wejściami | fundament | 🟠 |
+| **W-136** | Weryfikacja YZ vs RS dla crypto 24/7 | L | pomiar udziału wariancji luki; może RS > YZ | optymalizacja | 🔴 Prawo XV |
+| **W-137** | Volume-volatility jako modulator pewności | V | korelacja wolumen↔zakres high-low (0,85) | wzmocnienie V | 🟡 |
+| **W-138** | First Exit Time estimator | D/L | σ=Δ/√(E[τ]); wymaga barów intraday | TAK | 🟡 wymaga intraday |
+| **W-139** | Tryb Browne (goal-reaching) w KALKULATOR_LEWARA | L | dynamiczny lewar pod cel-w-czasie (alt. Kelly) | nowa zdolność | 🟡 decyzja Cezara |
+
+🚨 **Sygnały Prawa XV wyniesione z lektury (do weryfikacji/naprawy):**
+1. **VolatilityDrag (W-130)** — jeśli KALKULATOR_LEWARA NIE odejmuje erozji `½λ(λ−1)σ²` od oczekiwanego zwrotu, czynnie zawyża atrakcyjność wysokiego lewara → **CZERWONY ALARM, priorytet 🔴 KRYTYCZNY.**
+2. **Yang-Zhang na crypto 24/7 (W-136)** — komponent luki ≈ 0, możliwe że Rogers-Satchell jest lepszym estymatorem L/V dla nas. Zmierzyć empirycznie udział wariancji luki przed decyzją.
+3. **Throttle (W-096) musi reagować na σ², nie σ** — krytyczny lewar Kelly to μ/σ²; przy skoku zmienności stały lewar przekracza optimum → ujemny wzrost mimo dodatniej przewagi.
+
+🔗 **Symbioza (Prawo XVI) — alert dekorelacji:** Kelly (W-131), vol-targeting (W-059) i dynamiczny sufit (W-132) to TA SAMA matematyka `μ/σ²` w trzech przebraniach — przed wdrożeniem zmierzyć korelację, by nie zdublować sygnału (vol-targeting = Kelly bez członu μ). Estymatory W-121 jako pojedyncze liczby są skorelowane z YZ — wartość leży w STOSUNKACH/asymetrii/momentach wyższych rzędów, nie w surowym poziomie.
+
+---
+
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
 
 | BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |
@@ -1661,6 +1728,7 @@ Niemal wszystkie projekty finansowego ML zawodzą NIE przez słaby algorytm, lec
 | BIB-005 | What Exactly Is Crypto? | Jonatan Blum | 4/10 | 🟡 Niski | Tokenomika (issuance−burn), płynność DEX, ryzyko centralizacji (wymaga danych on-chain) |
 | BIB-006 | High Probability Scalping Playbook | Zachary Carson | 4/10 | 🟠 Średni | Konfluencja-z-dekorelacją (=Prawo XVI), filtr reżimu ADX, MFI, ATR-stop, sekwencja 9/13 |
 | BIB-007 ⭐ | Advances in Financial Machine Learning | Marcos López de Prado | **10/10** | 🔴 KRYTYCZNY | Autor VPIN/triple-barrier; FFD (domyka W-094), meta-labeling, purged CV, PBO/DSR, entropia, SADF → W-107..W-120 |
+| BIB-008 ⭐ | Volatility Trading (2nd ed.) | Euan Sinclair | 8/10 | 🔴 Wysoki | Wykładowca Yang-Zhang (mamy!); rodzina estymatorów→sygnatura zmienności, GARCH+vol cone, Kelly+korekta błędu, **volatility drag** (krytyczny dla lewara) → W-121..W-139 |
 
 **Trzy najcenniejsze, bezpośrednio implementowalne wizje:**
 1. **W-089 NeuronNVT** — Network Value to Transactions (BIB-003) — twardy on-chain, brak odpowiednika w systemie
@@ -1686,7 +1754,7 @@ Niemal wszystkie projekty finansowego ML zawodzą NIE przez słaby algorytm, lec
 | # | Tytuł | Autor | Luka / kat. | Dlaczego KRYTYCZNE dla nas | Gdzie szukać |
 |---|---|---|---|---|---|
 | ✅ ŻYCZ-01 | **Advances in Financial Machine Learning** → **ZDOBYTE jako BIB-007** (2026-06-08) | Marcos López de Prado (2018) | D/N/Z + cała architektura ML | **Autor VPIN** (nasz Z-01!) i triple-barrier (nasza Arena W-035!). Zawiera: fractional differentiation (= nasz W-094 stacjonarność!), meta-labeling, feature importance, backtest overfitting (PBO), sample weights. Przeanalizowane → 14 wizji W-107..W-120. | Wiley; ISBN 978-1119482086 |
-| ŻYCZ-02 | **Volatility Trading** (2nd ed.) | Euan Sinclair (2013) | L=2, V=2 (dźwignia/zmienność) | Estymatory zmienności (używamy Yang-Zhang — on to wykłada!), variance premium, money management, GARCH. Bezpośrednio karmi kalkulator lewara (W-059 vol-targeting) i kat. L/V. | Wiley; ISBN 978-1118347133 |
+| ✅ ŻYCZ-02 | **Volatility Trading** (2nd ed.) → **ZDOBYTE jako BIB-008** (2026-06-08) | Euan Sinclair (2013) | L=2, V=2 (dźwignia/zmienność) | Wykładowca Yang-Zhang (mamy!). Rodzina estymatorów→sygnatura zmienności, GARCH+vol cone, Kelly+korekta błędu estymacji, **volatility drag** (krytyczny dla bota lewarowanego). Przeanalizowane 3 analizami Opus → 19 wizji W-121..W-139. | Wiley; ISBN 978-1118347133 |
 | ŻYCZ-03 | **The (Mis)behavior of Markets: A Fractal View of Financial Turbulence** | Benoît Mandelbrot & Richard Hudson (2004) | H=1, D=1, N=1 (fraktale/multifraktal) | OJCIEC geometrii fraktalnej. Bezpośrednio pod H-01 (Hurst-DFA), D-01 (Path Signature), W-081 (MFDFA Δα). Multifraktalność rynków, grube ogony, pamięć długoterminowa. Nasza najsłabsza oś (D/H/N po 1 neuronie). ⚠️ rekomendacja z wiedzy — niezweryfikowana tym zwiadem. | Basic Books; ISBN 978-0465043576 |
 
 ### 🟠 PRIORYTET ŚREDNI (praktyka strategii + struktura rynku)
@@ -1709,6 +1777,7 @@ Niemal wszystkie projekty finansowego ML zawodzą NIE przez słaby algorytm, lec
 - **Prawo I (uczciwość):** ŻYCZ-03 (Mandelbrot), ŻYCZ-08 (Kahneman) rekomenduję z własnej wiedzy — NIE zweryfikowane tym konkretnym zwiadem internetowym. Reszta potwierdzona wyszukiwaniem 2026-06-08.
 - **Prawo XV (utrata potencjału):** książki on-chain (ŻYCZ-09) i część wizji wymagają NOWEGO źródła danych (API on-chain) — bez Bramy dostarczającej te dane neurony byłyby martwym głosem. Najpierw dane, potem neuron.
 - **Format:** najłatwiejsze do zdobycia jako pełny tekst: ŻYCZ-06 (PDF w sieci). Reszta — legalnie przez zakup/bibliotekę; wklejaj pliki jak poprzednie (azw3/epub/pdf), rozpakuję i przeanalizuję.
-- **Rekomendacja #1 bezdyskusyjnie:** **ŻYCZ-01 López de Prado** — to autor metod, których JUŻ używamy (VPIN, triple-barrier). Jedna książka domyka 4 nasze wizje i całą architekturę ML.
+- **Zdobyte:** ✅ ŻYCZ-01 (López de Prado → BIB-007), ✅ ŻYCZ-02 (Sinclair → BIB-008). Oba autorzy metod, których JUŻ używamy (VPIN/triple-barrier; Yang-Zhang/Kelly).
+- **Rekomendacja #1 (następna):** **ŻYCZ-03 Mandelbrot "The (Mis)behavior of Markets"** — ojciec geometrii fraktalnej, bezpośrednio pod nasze najsłabsze osie D/H/N (po 1 neuronie). ⚠️ rekomendacja z wiedzy, niezweryfikowana zwiadem.
 
-*Lista życzeń otwarta — Cezar dostarcza, Claude analizuje i przenosi do BIB-007+.* 🎯📚⚔️
+*Lista życzeń otwarta — Cezar dostarcza, Claude analizuje i przenosi do BIB-008+.* 🎯📚⚔️

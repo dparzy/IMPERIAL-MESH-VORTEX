@@ -1584,3 +1584,45 @@ To **płytka książka**: ~70% to katalog "wpisz tę nazwę w TradingView" bez u
 🚨 **Prawo XVI (dekorelacja) — alert biblioteczny:** przed wdrożeniem neuronów W-085..W-088 (korelacja międzyrynkowa Murphy'ego) zmierzyć korelację z istniejącą `diagnostyka_korelacji.py` — ryzyko |r|>0.80 z istniejącymi głosami kat. R. Prawo XVI: mierzyć, nie zgadywać.
 
 *Biblioteka Tradingowa Cezara otwarta. Kolejne pozycje dopisywane do tej sekcji po dostarczeniu przez Cezara.* 📚⚔️🏛️
+
+---
+
+## 🎯 LISTA ŻYCZEŃ BIBLIOTEKI — KSIĄŻKI DO ZDOBYCIA (zwiad 2026-06-08)
+
+> **Cel:** Cezar szuka i dostarcza książki; Claude przeanalizuje i wpisze jako kolejne BIB.
+> **Metoda doboru:** celowanie w LUKI Imperium — kategorie najsłabiej obsadzone w kodzie:
+> **D=1** (geometria ścieżki), **H=1** (fraktal), **N=1** (entropia), **Z=2** (mikrostruktura/zagrożenie),
+> **V=2** (wolumen), **L=2** (dźwignia/zmienność). Biblioteka ma już mocno: cykle (BIB-001),
+> TA (BIB-002), wycena crypto (BIB-003), psychologia (BIB-004). Brakuje **twardej ilościowej (quant) podstawy**.
+
+### 🔴 PRIORYTET NAJWYŻSZY (rdzeń ilościowy — bezpośrednio rozszerza istniejące neurony)
+
+| # | Tytuł | Autor | Luka / kat. | Dlaczego KRYTYCZNE dla nas | Gdzie szukać |
+|---|---|---|---|---|---|
+| ŻYCZ-01 | **Advances in Financial Machine Learning** | Marcos López de Prado (2018) | D/N/Z + cała architektura ML | **Autor VPIN** (nasz Z-01!) i triple-barrier (nasza Arena W-035!). Zawiera: fractional differentiation (= nasz W-094 stacjonarność!), meta-labeling, feature importance, backtest overfitting (PBO), sample weights. To fundament POPRAWNEGO ML w finansach — uczy "jak nie oszukać samego siebie". Łączy 4 nasze wizje naraz. | Wiley; ISBN 978-1119482086 |
+| ŻYCZ-02 | **Volatility Trading** (2nd ed.) | Euan Sinclair (2013) | L=2, V=2 (dźwignia/zmienność) | Estymatory zmienności (używamy Yang-Zhang — on to wykłada!), variance premium, money management, GARCH. Bezpośrednio karmi kalkulator lewara (W-059 vol-targeting) i kat. L/V. | Wiley; ISBN 978-1118347133 |
+| ŻYCZ-03 | **The (Mis)behavior of Markets: A Fractal View of Financial Turbulence** | Benoît Mandelbrot & Richard Hudson (2004) | H=1, D=1, N=1 (fraktale/multifraktal) | OJCIEC geometrii fraktalnej. Bezpośrednio pod H-01 (Hurst-DFA), D-01 (Path Signature), W-081 (MFDFA Δα). Multifraktalność rynków, grube ogony, pamięć długoterminowa. Nasza najsłabsza oś (D/H/N po 1 neuronie). ⚠️ rekomendacja z wiedzy — niezweryfikowana tym zwiadem. | Basic Books; ISBN 978-0465043576 |
+
+### 🟠 PRIORYTET ŚREDNI (praktyka strategii + struktura rynku)
+
+| # | Tytuł | Autor | Luka / kat. | Dlaczego wartościowe | Gdzie szukać |
+|---|---|---|---|---|---|
+| ŻYCZ-04 | **Algorithmic Trading: Winning Strategies and Their Rationale** | Ernest P. Chan (2013) | R=4 (reżim), strategie | Regime detection (HMM — pod naszą kat. R/legatus), mean-reversion vs momentum, Kalman filter (mamy EXP-04!), stat-arb. Praktyczne, kodowalne strategie z uzasadnieniem. | Wiley; ISBN 978-1118460146 |
+| ŻYCZ-05 | **Mind Over Markets: Power Trading with Market Generated Information** | James F. Dalton (1990/2013) | V=2, S=3 (wolumen/struktura) | Auction Market Theory + Market Profile — JAK czytać wolumen w strukturze ceny (value area, POC). Fundament pod neurony wolumenowo-strukturalne (uzupełnia naszą najsłabszą parę V/S). | Wiley; ISBN 978-1118531730 |
+| ŻYCZ-06 | **Markets in Profile: Profiting from the Auction Process** | James F. Dalton (2007) | V/S (kontynuacja AMT) | Rozszerzenie auction theory na wiele ram czasowych. ⓘ Pełny PDF krąży legalnie w sieci (r-5.org) — łatwy do zdobycia. | Wiley; ISBN 978-0470039090 |
+| ŻYCZ-07 | **Positional Option Trading** | Euan Sinclair (2020) | warstwa ryzyka (`pretorianie/`) | Kelly criterion z niepewnością estymacji, trade sizing, skew, stop-loss. Bezpośrednio pod nasz kalkulator lewara i W-096 throttle. | Wiley; ISBN 978-1119583516 |
+
+### 🟡 PRIORYTET UZUPEŁNIAJĄCY (rozważyć później / zasoby zamiast książek)
+
+| # | Pozycja | Typ | Uwaga (Prawo I — uczciwie) |
+|---|---|---|---|
+| ŻYCZ-08 | **Thinking, Fast and Slow** — Daniel Kahneman | Książka (behawioralna) | Klasyk biasów poznawczych; uzupełnia BIB-004. Wartość średnia — bardziej tło niż sygnały. |
+| ŻYCZ-09 | **Glassnode Academy / checkonchain.com / woocharts** | Zasób on-line (NIE książka) | Dla on-chain (MVRV/SOPR/NUPL/NVT) NIE ma dobrej pojedynczej książki — najlepsza wiedza jest w darmowych zasobach. Pod neurony O i wizje W-089..W-093, W-097. Dane wymagają API (Prawo XV). |
+
+### 🚨 Uwagi metodologiczne (zgodnie z zasadami)
+- **Prawo I (uczciwość):** ŻYCZ-03 (Mandelbrot), ŻYCZ-08 (Kahneman) rekomenduję z własnej wiedzy — NIE zweryfikowane tym konkretnym zwiadem internetowym. Reszta potwierdzona wyszukiwaniem 2026-06-08.
+- **Prawo XV (utrata potencjału):** książki on-chain (ŻYCZ-09) i część wizji wymagają NOWEGO źródła danych (API on-chain) — bez Bramy dostarczającej te dane neurony byłyby martwym głosem. Najpierw dane, potem neuron.
+- **Format:** najłatwiejsze do zdobycia jako pełny tekst: ŻYCZ-06 (PDF w sieci). Reszta — legalnie przez zakup/bibliotekę; wklejaj pliki jak poprzednie (azw3/epub/pdf), rozpakuję i przeanalizuję.
+- **Rekomendacja #1 bezdyskusyjnie:** **ŻYCZ-01 López de Prado** — to autor metod, których JUŻ używamy (VPIN, triple-barrier). Jedna książka domyka 4 nasze wizje i całą architekturę ML.
+
+*Lista życzeń otwarta — Cezar dostarcza, Claude analizuje i przenosi do BIB-007+.* 🎯📚⚔️

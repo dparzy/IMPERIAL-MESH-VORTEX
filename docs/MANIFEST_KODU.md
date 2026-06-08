@@ -5,7 +5,7 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-07 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Stan na:** 2026-06-08 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 52 neuronów (zarejestrowane w roju) + 12 zwiadowców = **64 modułów w kodzie**
 **Aktywne / wyciszone:** 45 aktywnych + 7 wyciszonych, z czego:
   • **39 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, OC-05 WashTrading, D-01 PathSignature)

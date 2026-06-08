@@ -169,7 +169,7 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 | **E** 🔵 | Dalsze neurony z katalogu (299−52=247 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
 **Stan kategorii (2026-06-04):** aktywne M/T/F/A/L/V/R/H/N/Z/O · wyciszone S(SMC feed)/O-API(on-chain API)
-**Neurony: 52** (45 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 505/505**
+**Neurony: 52** (45 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 506/506**
 
 ### Zadania bieżące (infrastruktura)
 | # | Zadanie | Moduł | Priorytet |

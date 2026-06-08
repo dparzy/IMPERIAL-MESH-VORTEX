@@ -1836,6 +1836,66 @@ Strategie mean-reversion i momentum mają RACJONALNE uzasadnienie (nie data-mini
 
 ---
 
+### 📙 BIB-013 — "Markets in Profile" — James F. Dalton ⭐ AUCTION MARKET THEORY (filar V/S)
+
+**Pełny tytuł:** *Markets in Profile: Profiting from the Auction Process* (Rynki w profilu: zarabianie na procesie aukcyjnym)
+**Autor:** James F. Dalton (Wiley Trading, 2007) — twórca popularyzacji Market Profile (po Steidlmayerze/CBOT). ŻYCZ-06.
+**Status weryfikacji:** ✅ Rozdziały merytoryczne (2 Information/konstrukcja profilu, 4 Auctions/Indicators, 5-6 excess/kształty, 8 taksonomia otwarć) przeczytane przez analizę Opus.
+**Ocena:** 8/10 · **Priorytet wdrożenia:** 🟠 Średni-Wysoki (celuje wprost w nasze 2 najsłabsze filary V i S — ale wymaga warstwy profilu w Bramie/Budowniczym)
+
+#### Teza centralna + KLUCZOWA ocena realności na OHLCV
+Auction Market Theory (AMT): rynek to ciągła aukcja szukająca wartości. **Wartość ≠ cena** — cena szuka wartości, a profil cena×czas (TPO) pokazuje gdzie rynek zaakceptował wartość. **Realność dla bota:**
+- **TPO (Time Price Opportunity) = TYLKO CZAS przy cenie** → w pełni rekonstruowalne z czystego OHLC (zliczanie ilu barów objęło każdy poziom). ZIELONE.
+- **Volume Profile/POC** → przybliżenie przez rozsmarowanie wolumenu bara po [low,high]. ŻÓŁTE (działa, Dalton sam historycznie estymował wolumen wzorem cena×czas).
+- **Tickowy POC / delta kupna-sprzedaży** → wymaga rozszerzenia Bramy o trade-level. CZERWONE (nie blokuje startu, poprawia jakość).
+
+#### Potencjalne Wizje (W-190..W-199)
+| Wizja | Nazwa | Kat. | Metoda źródłowa | Dane | Priorytet |
+|---|---|---|---|---|---|
+| **W-190** | NeuronTPO ValueArea (pozycja vs VA 70%) ⭐ | S | histogram TPO; POC; ekspansja do 70% | OHLC ✅ | 🔴 |
+| **W-191** | NeuronVolumePOC (przybliżenie z OHLCV) | V | wolumen rozsmarowany per bar; POC_vol+VA | OHLCV 🟡 | 🟠 |
+| **W-192** | NeuronValueMigration (trend wartości vs bracket) | R | dryf POC dzień-do-dnia; overlap VA (Jaccard) | OHLC ✅ | 🟠 |
+| **W-193** | NeuronInitialBalance+RangeExtension ⭐ | S | IB=zakres 1. okresów; RE=wyjście poza IB | OHLC ✅ | 🔴 |
+| **W-194** | NeuronExcess/Tails (wyczerpanie aukcji) | S/M | single-print na ekstremie + niski wolumen | OHLCV 🟡 | 🟠 |
+| **W-195** | NeuronOpenType (Drive/Test/Reject/Auction) | S/R | klasyfikacja pierwszych barów sesji | OHLC ✅ | 🟠 |
+| **W-196** | NeuronProfileShape (Normal/Trend/Double/b/P) | S/R | skew+kurtoza+n_modów histogramu (WEKTOR!) | OHLC ✅ | 🟠 |
+| **W-197** | NeuronOpenVsValue (gap acceptance) | S | open vs poprz. VA; reguła akceptacji | OHLC ✅ | 🟡 |
+| **W-198** | NeuronVolumeTPODivergence ⭐⭐ | V | POC_vol − POC_tpo; ukryta dystrybucja | OHLCV 🟡 | 🔴 |
+| **W-199** | NeuronOneTimeframing (attempted direction) | T/M | seria barów bez cofnięcia poniżej poprz. low | OHLC ✅ | 🟡 |
+
+🚨 **Prawo XV — infrastruktura konieczna:** (1) definicja "sesji" w crypto 24/7 (umowny open UTC) dla W-193/195/197/199; (2) wspólny `profil_tpo()` i `profil_wolumenu()` w Budowniczym (rdzeń W-190/191/192/196/198); (3) bez tego te neurony = martwe głosy. **W-198 (volume-vs-TPO divergence) to najmocniejszy kandydat na "filar siły" Prawa XVI** (|ρ|<0.20 z trendem — czysta dywergencja).
+
+---
+
+### 📗 BIB-014 — "Mind Over Markets" — James F. Dalton ⭐ PODRĘCZNIK BAZOWY MARKET PROFILE (ŻYCZ-05)
+
+**Pełny tytuł:** *Mind Over Markets: Power Trading with Market Generated Information* (Umysł ponad rynkiem: trading w oparciu o informację generowaną przez rynek)
+**Autor:** James F. Dalton (Wiley, 1990/2013) — to podręcznik BAZOWY (wcześniejszy niż BIB-013), uczy Market Profile od podstaw.
+**Status weryfikacji:** ✅ Rozdziały 1-4 (Novice→Competent) + Załączniki (TPO vs Volume, Anomalies) przeczytane przez analizę Opus.
+**Ocena:** 8/10 · **Priorytet wdrożenia:** 🟠 Średni-Wysoki (te same filary V/S; precyzyjne reguły mierzalne)
+
+#### Relacja do BIB-013 (ważne — unikać duplikatów)
+Obie książki Daltona dzielą TEN SAM aparat (VA, POC, IB, day types, initiative/responsive, tails). **Fundamenty pokrywają się z W-190..W-199 — przy wdrożeniu JEDEN moduł, nie dwa.** Unikalne dla MoM (podręcznik): precyzyjne reguły TPO-count, 6 typów dnia, 4 typy otwarcia, anomalie TPO-vs-volume, reguła "ogon w ostatnim okresie się nie liczy".
+
+#### Potencjalne Wizje (W-200..W-209) — z oznaczeniem duplikatów
+| Wizja | Nazwa | Kat. | Duplikat z BIB-013? | Priorytet |
+|---|---|---|---|---|
+| **W-200** | Value Area 70% (z VAP agregacji świec) | S/V | ≈ W-190/191 (SCALIĆ) | 🔴 |
+| **W-201** | POC + TPO ValueArea (fallback bez wolumenu) | S | ≈ W-190 (SCALIĆ) | 🟠 |
+| **W-202** | Initial Balance + Range Extension | S/R | = W-193 (DUPLIKAT) | 🔴 |
+| **W-203** | Klasyfikator Day Type (6 typów) ⭐ | R | UNIKALNE (taksonomia 6-typowa) | 🔴 |
+| **W-204** | One-Timeframe Detector | R/S | ≈ W-199 (składnik W-203) | 🟡 |
+| **W-205** | Excess/Tails (reguła "ostatni okres nie liczy") | S/V | ≈ W-194 + unikalna reguła | 🟠 |
+| **W-206** | Initiative vs Responsive Activity ⭐⭐ | R/S | UNIKALNE (esencja: trend vs balans wg akceptacji wartości) | 🔴 |
+| **W-207** | Open Type Classifier (4 typy) | R/S | ≈ W-195 (DUPLIKAT) | 🟠 |
+| **W-208** | Trade Facilitation Score (2 wielkie pytania) | R/V | meta-agregat → STRATEGIA, nie neuron | 🟡 |
+| **W-209** | Anomaly/Structural Weakness Detector | S | UNIKALNE (TPO-vs-volume anomalia) | 🟡 |
+
+🚨 **Prawo XV — wąskie gardło Bramy:** cała wartość MP zależy od **agregacji krótkich świec → syntetyczny Volume-at-Price**. Jeśli Brama daje tylko OHLCV dzienne/godzinowe bez świec 1-5min → W-200/206/209 staną się martwymi głosami. Zweryfikować przed wdrożeniem.
+🔗 **Esencja Daltona (W-206 Initiative/Responsive):** "trend czy balans" wg akceptacji wartości — najmocniejszy zdekorelowany sygnał R, prawdopodobnie unikalny w całym roju. Po wdrożeniu W-190/191 (VA) — priorytet.
+
+---
+
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
 
 | BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |
@@ -1852,6 +1912,8 @@ Strategie mean-reversion i momentum mają RACJONALNE uzasadnienie (nie data-mini
 | BIB-010 ⭐ | Quantitative Trading (2nd ed.) | Ernest P. Chan | 9/10 | 🔴 Wysoki | Praktyk algo: half-life OU, macierzowy Kelly (dowód Prawa XVI), cap lewara, para kointegrująca, deflated Sharpe, truncation look-ahead test → W-160..W-169 |
 | BIB-011 ⭐ | Algorithmic Trading: Winning Strategies (ŻYCZ-04) | Ernest Chan | 9/10 | 🔴 Wysoki | Kalman β dla par (rozszerza EXP-04), Monte-Carlo Kelly (fat tails!), Hurst+VarianceRatio, leading risk, CPPI → W-170..W-178 |
 | BIB-012 | Coding Capital | Strauss & Van Der Post | ⚠️ 3/10 | 🟡 Niski | SŁABA (self-published, snippety błędne). Jedyne ziarno: EVT/GPD parametr ogona ξ → W-180 |
+| BIB-013 ⭐ | Markets in Profile (ŻYCZ-06) | James F. Dalton | 8/10 | 🟠 Śr-Wysoki | Auction Market Theory — filar V/S: TPO Value Area, POC, Initial Balance+Range Extension, value migration, volume-vs-TPO divergence → W-190..W-199 |
+| BIB-014 ⭐ | Mind Over Markets (ŻYCZ-05) | James F. Dalton | 8/10 | 🟠 Śr-Wysoki | Podręcznik bazowy MP: 6 day types, Initiative/Responsive (trend vs balans), 4 open types, anomalie TPO-vs-volume → W-200..W-209 (część scalić z W-19x) |
 
 **Trzy najcenniejsze, bezpośrednio implementowalne wizje:**
 1. **W-089 NeuronNVT** — Network Value to Transactions (BIB-003) — twardy on-chain, brak odpowiednika w systemie

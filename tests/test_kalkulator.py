@@ -54,6 +54,74 @@ def test_vol_targeting_domyslnie_neutralne_w_planie():
     assert plan.skala_vol == 1.0
 
 
+# ── Volatility Drag (W-130, Sinclair rozdz. 13) ──────────────────────────────
+
+def test_drag_brak_danych_none():
+    """Brak vol_realized → drag None (kompatybilność wsteczna, Prawo XV)."""
+    assert KalkulatorLewara.volatility_drag(10, None) is None
+    assert KalkulatorLewara.volatility_drag(10, 0.0) is None
+
+
+def test_drag_lewar_1_zero():
+    """λ=1 → brak erozji (½·1·0·σ² = 0)."""
+    assert KalkulatorLewara.volatility_drag(1, 0.80) == 0.0
+
+
+def test_drag_wzor_polowa_lambda():
+    """½·λ·(λ−1)·σ²: λ=3, σ=1.0 → 3.0 (300%/rok, przykład z analizy)."""
+    assert KalkulatorLewara.volatility_drag(3, 1.0) == 3.0
+    # λ=2, σ=0.6 → ½·2·1·0.36 = 0.36
+    assert abs(KalkulatorLewara.volatility_drag(2, 0.6) - 0.36) < 1e-9
+
+
+def test_drag_rosnie_z_lewarem():
+    """Drag rośnie super-liniowo z dźwignią przy tej samej vol."""
+    d2 = KalkulatorLewara.volatility_drag(2, 0.8)
+    d5 = KalkulatorLewara.volatility_drag(5, 0.8)
+    assert d5 > d2 * 3  # ½·5·4=10 vs ½·2·1=1 → 10×
+
+
+def test_drag_raportowany_w_planie():
+    """policz() z vol_realized wypełnia drag_roczny w planie."""
+    kalk = KalkulatorLewara()
+    plan = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 5_000, pewnosc=0.78,
+                       vol_realized=0.60)
+    # ½·10·9·0.36 = 16.2
+    assert plan.drag_roczny is not None
+    assert abs(plan.drag_roczny - 16.2) < 0.01
+
+
+def test_drag_domyslnie_none_w_planie():
+    """Bez vol_realized plan ma drag_roczny None (nic się nie zmienia)."""
+    kalk = KalkulatorLewara()
+    plan = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 5_000, pewnosc=0.78)
+    assert plan.drag_roczny is None
+
+
+def test_drag_weto_tylko_z_limitem():
+    """Weto na drag działa TYLKO gdy max_drag_roczny jawnie ustawiony."""
+    kalk = KalkulatorLewara()
+    # Bez limitu: wysoki drag NIE blokuje (kompatybilność wsteczna)
+    bez = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 5_000, pewnosc=0.78,
+                      rezim="TREND_STRONG", vol_realized=0.60)
+    assert bez.checklist_ok, "bez limitu drag nie może blokować"
+    # Z limitem 0.30: drag 16.2 >> 0.30 → weto
+    z_lim = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 5_000, pewnosc=0.78,
+                        rezim="TREND_STRONG", vol_realized=0.60, max_drag_roczny=0.30)
+    assert not z_lim.checklist_ok
+    assert "DRAG" in z_lim.powod_veto
+
+
+def test_drag_weto_przepuszcza_niski():
+    """Niski drag (mały lewar + spokój) przechodzi mimo ustawionego limitu."""
+    kalk = KalkulatorLewara()
+    plan = kalk.policz("BTCUSDT", "LONG", 100_000, 2, 5_000, pewnosc=0.78,
+                       rezim="TREND_STRONG", vol_realized=0.30, max_drag_roczny=0.30)
+    # ½·2·1·0.09 = 0.09 < 0.30 → przechodzi
+    assert plan.drag_roczny is not None and plan.drag_roczny < 0.30
+    assert plan.checklist_ok
+
+
 def test_likwidacja_long_ponizej_wejscia():
     kalk = KalkulatorLewara()
     plan = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 5_000, pewnosc=0.78,

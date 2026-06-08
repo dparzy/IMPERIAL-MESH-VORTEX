@@ -1491,3 +1491,14 @@ def test_d01_budowniczy_dostarcza_serie():
     assert "VOLUME_SERIES_20" in w
     assert len(w["CLOSE_SERIES_20"]) == 20
     assert len(w["VOLUME_SERIES_20"]) == 20
+
+
+def test_d01_staly_wolumen_neutral():
+    """D-01: stały wolumen → NEUTRAL (płaska linia nie tworzy pola Lévy, fix P1)."""
+    from imperium.legiony.neurony.geometria import NeuronPathSignature
+    n = NeuronPathSignature()
+    closes =  [100 + i * 1.0 for i in range(20)]   # cena rośnie
+    volumes = [1000.0] * 20                          # wolumen stały
+    s = n.interpretuj({"CLOSE_SERIES_20": closes, "VOLUME_SERIES_20": volumes})
+    assert s.kierunek == "NEUTRAL", "Stały wolumen nie może dać sygnału kierunkowego"
+    assert s.pewnosc == 0.0

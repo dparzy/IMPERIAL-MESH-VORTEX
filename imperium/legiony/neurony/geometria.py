@@ -122,8 +122,15 @@ class NeuronPathSignature(MikroNeuron):
             # Płaska cena — brak geometrii
             return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Płaska cena — brak geometrii ścieżki"])
 
+        if v_range < 1e-12:
+            # Stały wolumen — ścieżka jest poziomą linią w przestrzeni (Close, Volume).
+            # Lévy Area degeneruje się do fałszywego pola (dy=0, ale stała wartość y
+            # tworzy −0.25·Δx ≠ 0), więc sygnał kierunkowy byłby artefaktem. Brak
+            # synchronizacji wolumenu z ceną = brak geometrii → NEUTRAL.
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Stały wolumen — brak geometrii ścieżki"])
+
         c_norm = [(c - c_min) / c_range for c in closes]
-        v_norm = [(v - v_min) / v_range for v in volumes] if v_range > 1e-12 else [0.5] * len(volumes)
+        v_norm = [(v - v_min) / v_range for v in volumes]
 
         la = _levy_area(c_norm, v_norm)
         if la is None:

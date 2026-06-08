@@ -5,7 +5,7 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-07 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Stan na:** 2026-06-08 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 52 neuronów (zarejestrowane w roju) + 12 zwiadowców = **64 modułów w kodzie**
 **Aktywne / wyciszone:** 45 aktywnych + 7 wyciszonych, z czego:
   • **39 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, OC-05 WashTrading, D-01 PathSignature)
@@ -13,7 +13,7 @@
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 budzone WEWNĘTRZNIE** (SMC-01/02/03) — liczą z barów przez most EXP-05, ożywają w żywym Legatusie (`zbuduj_legatusa`), **bez żadnego API**
   • **4 wymaga ZEWNĘTRZNEGO API on-chain** (OC-01..04) — Glassnode/CryptoQuant (Faza D)
-**Elitarne (Prawo XX):** 14 (2 neurony + 12 zwiadowców)
+**Elitarne (Prawo XX):** 15 (3 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
 **Do wdrożenia:** 248 neuronów
 
@@ -262,6 +262,7 @@
 | KalkulatorLewara | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | BezpiecznikKapitalu (twardy circuit-breaker AOA 30%, W-028) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | BezpiecznikKrzywejKapitalu (Equity-Curve Circuit Breaker, W-062) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
+| Volatility Drag (W-130, Sinclair BIB-008 — erozja ½λ(λ−1)σ² lewara) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | PaperTradingEngine | `koloseum/paper_trading.py` | ✅ aktywny |
 | Dyrygent (orkiestrator cyklu end-to-end) | `koloseum/dyrygent.py` | ✅ aktywny |
 | Backtest (przejazd po historii) | `koloseum/backtest.py` | ✅ aktywny |

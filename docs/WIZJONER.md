@@ -1452,6 +1452,312 @@ Większość problemów traderów to NIE brak wiedzy, lecz **powtarzalne wzorce 
 
 ---
 
+### 📕 BIB-005 — "What Exactly Is Crypto?" — Jonatan Blum
+
+**Pełny tytuł:** *What Exactly Is Crypto?* (pol. *Czym dokładnie jest krypto?*)
+**Autor:** Jonatan Blum (© 2022, thecryptobook.xyz) — książka edukacyjna/popularnonaukowa, NIE tradingowa
+**Status weryfikacji:** ✅ Przeczytane: spis treści, glosariusz, rozdz. 1–2 (kryptografia, mining, token emission, tokenomika), 6 (DeFi/AMM/Uniswap/order-book), 8 (poziomy decentralizacji, iluzja decentralizacji), fragmenty 10 (ZKP). ⚠️ Rozdziały o metaverse/NFT/CBDC przejrzane skrótowo — nieistotne dla tradingu algorytmicznego.
+**Ocena:** 4/10 (jako źródło dla systemu tradingowego) · **Priorytet wdrożenia:** 🟡 Niski
+
+#### Teza centralna
+Krypto to nie "magiczne pieniądze", lecz warstwowy stos technologii (kryptografia → blockchain → konsensus → tokenomika → DeFi → DAO → Web3). Teza przewodnia: **decentralizacja nie jest stanem 0/1, lecz ciągłym osiągnięciem (continuous achievement) o wielu poziomach** — wiele "zdecentralizowanych" projektów jest faktycznie scentralizowanych (iluzja decentralizacji). To książka o ZROZUMIENIU aktywów, nie o handlu.
+
+#### Kluczowe koncepcje (nieoczywiste — pomijam definicje BTC/ETH)
+
+1. **Emisja tokenów (token emission / issuance)** — tempo wprowadzania nowych tokenów do podaży w obiegu (circulating supply); presja inflacyjna od strony podaży. Implementacja: neuron kat. **D**/**F** liczący prognozowaną emisję w oknie (dni do halvingu, harmonogram odblokowań); rosnąca emisja = bias bearish.
+
+2. **Tokenomika jako system (issuance rate vs burn rate)** — polityki kodowane w protokole: emisja minus spalanie. Implementacja: `netto_podaz = issuance_rate − burn_rate`; <0 = deflacyjny (strukturalnie bullish), >0 = inflacyjny.
+
+3. **Mechanika cena vs podaż** — wzór `kapitalizacja / circulating_supply = cena_za_token`. Wniosek: zmiana podaży w obiegu (odblokowania, vesting) zmienia cenę przy stałej kapitalizacji. Implementacja: neuron monitorujący unlock/vesting jako szok podażowy.
+
+4. **Mempool i ryzyko cenzury transakcji** — przeciążenie sieci = rosnące opłaty gas/gwei. Implementacja: wskaźnik kongestii (gas/gwei, głębokość mempool) jako proxy popytu on-chain i kosztu wejścia/wyjścia.
+
+5. **AMM vs Order-Book (Automated Market Making — automatyczne tworzenie rynku)** — model `x*y=k` (constant product) puli płynności vs klasyczna księga zleceń; podatność na poślizg (slippage). Implementacja: wskaźnik głębokości puli DEX → ryzyko egzekucji dużego zlecenia. Kat. **L**.
+
+6. **Koncentrowana płynność (Uniswap V3)** — dostawcy podają kapitał w wąskich przedziałach cenowych. Implementacja: mapa płynności wokół ceny = miękkie poziomy wsparcia/oporu on-chain. Kat. **L**/**S**.
+
+7. **Poziomy decentralizacji (architektoniczny/polityczny/logiczny)** + cytowana praca *"Decentralization illusion in DeFi: Evidence from MakerDAO"* (University of Glasgow). Implementacja: wskaźnik ryzyka governance (koncentracja tokenów głosowania, liczba aktywnych deweloperów) → ostrzeżenie "centralization risk". Kat. **F**/**R**.
+
+8. **Web3: VC-Owned vs Public-Owned** — ile podaży trzymają fundusze venture capital; ryzyko nawisu podażowego (overhang). Implementacja: wskaźnik koncentracji posiadania (% w top-10 portfelach). Kat. **D**/**F**.
+
+9. **Statystyka oszustw (Chainalysis: 79% scamów krypto z DeFi)** — ryzyko strukturalne nowych/niezweryfikowanych tokenów. Implementacja: filtr jakości aktywa (wiek kontraktu, audyt) jako veto przed handlem. Kat. **R**.
+
+#### Najważniejsze cytaty (dosłowne)
+> *"Tokenomics is a term that combines the words 'token' and 'economics'... issuance rates... and burn rates (removal from circulating supply) may be preset in the code."*
+
+> *"That is why I say that decentralization is a continuous achievement. It's not an end goal."*
+
+> *"According to Chainalysis, 79% of all cryptocurrency scams last year came from DeFi alone."*
+
+> *"A research paper titled 'Decentralization illusion in DeFi: Evidence from MakerDAO'... argued that decentralization may be an illusion."*
+
+#### Potencjalne Wizje (W-...)
+| Wizja | Nazwa | Opis | Kategoria |
+|---|---|---|---|
+| **W-097** | NeuronEmisjiPodazy | `netto_podaz = issuance − burn`; sygnał deflacyjny/inflacyjny + alarm na unlock/vesting | Kat. **D**/**F** |
+| **W-098** | NeuronKongestiiSieci | gas/gwei + mempool jako proxy popytu i kosztu egzekucji on-chain | Kat. **D** |
+| **W-099** | NeuronPlynnosciDEX (Slippage) | głębokość puli AMM `x*y=k` → ryzyko poślizgu dużego zlecenia | Kat. **L** |
+| **W-100** | NeuronRyzykaCentralizacji | koncentracja posiadania (VC overhang, top-10 wallets) jako veto-filtr jakości | Kat. **R**/**F** |
+
+🚨 **Prawo XV (utrata potencjału) — alert:** neurony W-097..W-100 wymagają NOWEGO źródła danych on-chain (rozszerzenie Bramy). Bez danych byłyby "martwym głosem" (zawsze NEUTRAL). Budować dopiero po podpięciu źródła on-chain — inaczej utrata potencjału.
+
+---
+
+### 📗 BIB-006 — "High Probability Scalping Strategy Playbook" — Zachary Carson
+
+**Pełny tytuł:** *High Probability Scalping Strategy Playbook: High Win Rate Scalping Strategies for Trading the Crypto, Forex and Stock Market in 2024!* (pol. *Podręcznik strategii skalpowania o wysokim prawdopodobieństwie*)
+**Autor:** Zachary Carson (self-published, 2024). Skalping = handel na bardzo krótkich interwałach (1–5 min), dziesiątki szybkich transakcji
+**Status weryfikacji:** ✅ Przeczytane w całości: wstęp, Rozdz. 1 (komponenty, typy strategii, timing), Rozdz. 2 (trend/range, ADX, zmienność, reversale, sentyment), Rozdz. 3 (sygnały #1–#8), Rozdz. 4 (5 strategii wskaźnikowych — pełne reguły), Rozdz. 5 (4 strategie AI/ML — pełne reguły).
+**Ocena:** 4/10 (UCZCIWIE — patrz niżej) · **Priorytet wdrożenia:** 🟠 Średni (tylko quick winy na danych już w Bramie)
+
+#### Teza centralna
+Wysoki współczynnik trafień (win rate) w skalpingu osiąga się przez **konfluencję (confluence)**: filtr trendu (wyższy interwał) + sygnał wejścia + niezależny wskaźnik potwierdzający z INNEJ rodziny + ścisłe zarządzanie ryzykiem. Autor odrzuca pojedynczy wskaźnik na rzecz wielometrycznego potwierdzenia z RÓŻNYCH rodzin (by uniknąć confirmation bias).
+
+#### ⚠️ Ocena krytyczna (Prawo I — uczciwość)
+To **płytka książka**: ~70% to katalog "wpisz tę nazwę w TradingView" bez ujawnienia matematyki wskaźników, bez backtestów, bez statystyk win-rate (mimo tytułu "High Win Rate"!), z literówkami i niedokończonymi zdaniami. Tytułowe "high probability / high win rate" NIE jest poparte żadną liczbą ani testem — to marketing. ALE nie jest bezwartościowa: konfluencja-z-dekorelacją, filtr reżimu ADX, ATR-stop, MFI i sekwencja 9/13 to realne, kodowalne elementy.
+
+#### Kluczowe koncepcje
+
+1. **Konfluencja z dekorelacją wskaźników** — autor wprost: wskaźnik potwierdzający MUSI używać "different metric or methodology" niż sygnał główny (np. momentum + zmienność, NIE dwa momentum). To **dokładnie Prawo XVI Imperium**. Implementacja: wymóg, by głos potwierdzający pochodził z innej KATEGORII neuronu — reguła composera strategii.
+
+2. **Filtr trendu wielointerwałowy (Multi-Timeframe)** — kierunek na wyższym TF (500 SMA / 200 MA / 4h-daily), wejścia tylko zgodne na niższym TF. Implementacja: neuron-bramka **T**/**O** zwracający {LONG_ONLY, SHORT_ONLY, BLOCK}; gating całej strategii.
+
+3. **ATR-skalowany stop-loss (Average True Range — średni rzeczywisty zakres)** — stop jako wielokrotność ATR: szerszy przy wysokiej zmienności, węższy przy niskiej. Implementacja: `stop = entry ± k*ATR` w warstwie egzekucji/risk.
+
+4. **Filtr reżimu trend/range przez ADX (Average Directional Index — średni indeks kierunkowy)** — ADX<20 = rynek boczny (mean-reversion), ADX>20 = trend (breakout/momentum). Wybiera, KTÓRA strategia działa. Implementacja: neuron-przełącznik reżimu **O** sterujący doborem strategii.
+
+5. **Setup mean-reversion BB40+RSI5+ADX (Strategia #3)** — KONKRETNE reguły: wejście gdy cena przebije pasmo Bollingera ORAZ RSI wejdzie i WYJDZIE ze strefy wykupienia/wyprzedania, ADX potwierdza rynek boczny, wyjście na przeciwnym paśmie. Nietypowe parametry skalpingowe: BB length 40 (nie 20), RSI length 5 (bardzo szybki). W pełni kodowalne.
+
+6. **Setup momentum: koincydencja czasowa (Strategia AI/ML #1)** — cena > 200 SMA (bias long), sygnał RSI, wejście gdy cena przetnie 20 SMA **w ciągu max 2 świec od sygnału RSI**. Implementacja: reguła "sygnał + potwierdzenie w oknie N barów".
+
+7. **Heiken Ashi ważona + potrójny RSI (Sygnał #3)** — wygładzanie świec Heiken Ashi + trzy RSI (10/14/21) → głosowanie ensemble dla redukcji szumu.
+
+8. **True Strength Index (TSI — indeks prawdziwej siły)** — podwójnie wygładzony momentum; mniej fałszywych sygnałów niż surowy RSI. Kat. **M**.
+
+9. **Money Flow Index (MFI — indeks przepływu pieniądza)** — RSI ważony wolumenem (volume-weighted); łączy momentum i wolumen. Implementacja: MFI(21)+SMA(18), sygnał na przecięciu + potwierdzenie ceny. Kat. **V**/**M**. Dane JUŻ w Bramie.
+
+10. **Two-phase reversal detection (sekwencja 9 świec + faza wyczerpania 13 świec, mechanika typu DeMark/LuxAlgo)** — zliczanie sekwencji świec kierunkowych → sygnał wyczerpania trendu. Kodowalne deterministycznie. Kat. **S**.
+
+11. **Sentyment jako filtr reversal (Fear & Greed Index, long/short ratio giełdy)** — ekstremalny long/short ratio = warunek odwrócenia (overcrowded trade). Kat. **F**/**R**.
+
+12. **Lorentzian Classification / kNN (k-Nearest Neighbours — k najbliższych sąsiadów)** — klasyfikacja stanu rynku przez odległość na cechach historycznych; ADX filtruje rynki boczne. Realny algorytm ML, ale autor tylko wskazuje gotowy wskaźnik TradingView bez kodu i backtestów.
+
+#### Najważniejsze cytaty (dosłowne)
+> *"It's crucial to select an indicator that uses a different metric or methodology from your primary signal to avoid confirmation bias."* (= Prawo XVI słowami autora)
+
+> *"Enter long when price crosses above the 20 SMA (must be within 2 bars from the RSI signal)."*
+
+> *"When using the ATR indicator, scalpers can set their stop loss orders at a certain multiple of the ATR value."*
+
+> *"The ADX is used as a filter to only enter trades in sideways market conditions."*
+
+#### Potencjalne Wizje (W-...)
+| Wizja | Nazwa | Opis | Kategoria |
+|---|---|---|---|
+| **W-101** | StrategiaMeanReversion BB40+RSI5+ADX | Pełne reguły wejścia/wyjścia (Strategia #3); filtr ADX<20 | Strategia |
+| **W-102** | RegulaKoincydencjiCzasowej (composer) | Sygnał + potwierdzenie z innej kategorii w oknie ≤2 barów; wzmacnia composer | Composer strategii |
+| **W-103** | NeuronMFI (Money Flow Index) | MFI(21)+SMA(18) — momentum ważone wolumenem; dane już w Bramie | Kat. **V** |
+| **W-104** | NeuronReversalSekwencyjny | Zliczanie sekwencji 9/13 świec (DeMark/LuxAlgo) — detektor wyczerpania trendu | Kat. **S** |
+| **W-105** | NeuronSentymentuLongShort | Kontrarianski filtr ekstremów z long/short ratio giełdy (funding) | Kat. **F**/**R** |
+| **W-106** | ModulRiskATRStop | `stop = entry ± k*ATR` + position sizing (warstwa egzekucji, nie neuron) | `pretorianie/` |
+
+🟢 **Quick winy (dane już w Bramie):** W-103 NeuronMFI i W-101 BB40+RSI5+ADX — najniższy koszt, bez nowych źródeł danych.
+
+---
+
+### 📘 BIB-007 — "Advances in Financial Machine Learning" — Marcos López de Prado ⭐ FLAGOWA
+
+**Pełny tytuł:** *Advances in Financial Machine Learning* (Postępy w finansowym uczeniu maszynowym)
+**Autor:** Marcos López de Prado (Wiley, 2018) — dr ekonomii finansowej i fizyki, zarządzający miliardami USD + dorobek naukowy. **Twórca/współtwórca metod, które IMPERIUM JUŻ UŻYWA:** VPIN (nasz Z-01), triple-barrier (nasza Arena W-035), PBO, Deflated Sharpe Ratio. Autor: meta-labeling, fractional differentiation, purged CV, CPCV, HRP.
+**Status weryfikacji:** ✅ Rdzeń strategiczny (Części 1–4: rozdz. 1–5, 7, 8, 10, 15–19) przeczytany dogłębnie. ⚠️ Rozdz. 6, 9, 13, 14 oraz Część 5 (HPC, rozdz. 20–22) niepełne — wnioski o PSR/DSR z odniesień krzyżowych, nie z bezpośredniej lektury rozdz. 14.
+**Ocena:** 10/10 · **Priorytet wdrożenia:** 🔴 KRYTYCZNY (flagowa pozycja całej Biblioteki)
+
+#### Teza centralna
+Niemal wszystkie projekty finansowego ML zawodzą NIE przez słaby algorytm, lecz przez **fałszywe odkrycie** rodzące się z błędów metodologicznych, których standardowa literatura ML (założenie IID — independent and identically distributed) nie adresuje. Dane finansowe mają niski stosunek sygnału do szumu, pamięć (niestacjonarność), nakładające się etykiety i ekstremalne ryzyko przeuczenia. Autor dostarcza kompletny, kodowalny potok — od konstrukcji barów, przez etykietowanie i wagi próbek, po walidację odporną na przeciek — którego cel: **"jak nie oszukać samego siebie w ML finansowym".** Maksyma: *"Backtesting nie jest narzędziem badawczym. Feature importance jest."*
+
+#### Kluczowe koncepcje (16)
+
+1. **Information-Driven Bars (bary sterowane informacją)** — Tick/Volume/Dollar Bars + Imbalance/Runs Bars. Bary czasowe mają złe własności statystyczne; dollar bars najodporniejsze. Implementacja: nowy moduł Bramy/Budowniczego. **Symbioza: dollar/volume bars to natywny "volume clock" dla Z-01 VPIN** — jeśli liczymy VPIN na barach czasowych, tracimy precyzję (alarm Prawa XV).
+
+2. **Triple-Barrier Method** — JUŻ MAMY jako W-035 Arena. Książka daje kanoniczny kod (`getEvents`, `applyPtSlOnT1`, 8 konfiguracji `[pt,sl,t1]`) → warto **zweryfikować naszą implementację względem oryginału**.
+
+3. **Meta-Labeling (meta-etykietowanie)** — rozdziela decyzję o STRONIE (long/short, model pierwotny = nasz rój) od ROZMIARU (czy wchodzić, wtórny model ML {0,1}); podnosi F1-score. Implementacja: meta-warstwa Legatusa ucząca się, kiedy ufać konsensusowi roju. Działa najlepiej z structural break (kat. R) jako cechą.
+
+4. **Sample Weights: Concurrency & Average Uniqueness** — etykiety triple-barrier nakładają się → łamią IID. Ważenie unikalnością (0–1). Każdy trening ML na sygnałach roju musi to stosować.
+
+5. **Sequential Bootstrap** — bagging obniżający prawdopodobieństwo losowania nakładających się obserwacji (mediana unikalności 0.6→0.7).
+
+6. **Return Attribution & Time Decay** — waga = unikalność × |log-zwrot|; zanik czasowy c∈(−1,1] (rynki adaptacyjne, stare przykłady mniej istotne).
+
+7. **Fractionally Differentiated Features (FFD) ⭐ DOMYKA W-094** — dylemat stacjonarność vs pamięć: zwroty (d=1) są stacjonarne ale bezpamięciowe; FFD (d niecałkowite, Hosking 1981) znajduje minimalne d\* dające stacjonarność (test ADF) z MAKSYMALNĄ pamięcią. Empirycznie d<0.6, często d≈0.35, korelacja z oryginałem 0.995 (vs 0.03 dla zwrotów). Pełny kod w książce. **To dokładnie nasza wizja W-094 NeuronStacjonarnosci — flagowa implementacja.**
+
+8. **Cross-Validation: Purging & Embargo** — standardowy k-fold ZAWODZI w finansach (przeciek przez nakładające się etykiety). Purging: usuń z treningu obserwacje nakładające się czasowo z testem. Embargo: usuń też tuż po teście. Klasa `PurgedKFold`. OBOWIĄZKOWY moduł — bez niego każdy backtest roju podejrzany.
+
+9. **Feature Importance: MDI/MDA/SFI ⭐** — Mean Decrease Impurity / Mean Decrease Accuracy / Single Feature Importance. **Idealne narzędzie audytu roju** — które neurony niosą informację, a które to martwe głosy/redundancja. Substitution effect = nasza korelacja >0.80. **Bezpośrednio realizuje Prawo XV i XVI — ML-owy odpowiednik `diagnostyka_korelacji`.**
+
+10. **Bet Sizing** — rozmiar z prawdopodobieństwa: m=2·Z[z]−1; averaging active bets, dyskretyzacja. "Wysoka trafność na małych zakładach i niska na dużych cię zrujnuje." Zasilany meta-labelingiem → kat. L / KALKULATOR_LEWARA.
+
+11. **Dangers of Backtesting & PBO** — Probability of Backtest Overfitting przez CSCV. ~20 iteracji wystarcza by "odkryć" fałszywą strategię przy 5%. Bramka jakości dla każdej strategii.
+
+12. **Combinatorial Purged Cross-Validation (CPCV)** — wiele ścieżek backtestowych z purgingiem zamiast jednej (walk-forward łatwo przeucza). Docelowy silnik backtestu.
+
+13. **Backtest Statistics: PSR & Deflated Sharpe Ratio** — koryguje Sharpe'a o liczbę prób, skośność, kurtozę i selection bias. Finalna metryka akceptacji strategii.
+
+14. **Understanding Strategy Risk** — Sharpe to funkcja PRECYZJI (nie dokładności); próg precyzji π_λ → probability of strategy failure (EF3M). Monitor kat. R.
+
+15. **Structural Breaks: CUSUM & SADF ⭐** — Supremum Augmented Dickey-Fuller wykrywa eksplozywność (bąble/krachy) na log-cenach; pik SADF = bańka, powrót = pęknięcie. Wykrywa wiele reżimów bez znanej liczby przełamań. Potężna cecha dla kat. R i meta-labelingu.
+
+16. **Entropy Features ⭐⭐ (najsłabsza kat. N)** — Shannon/plug-in/Lempel-Ziv/Kontoyiannis + schematy kodowania. Mierzy redukowalność/przewidywalność: rynek efektywny = wysoka entropia; **"bąble formują się w rynkach niskiej entropii (skompresowanych)".** Encodować na seriach FFD. Bezpośrednio rozbudowuje naszą najsłabszą kat. N.
+
+**Bonus — Microstructural Features (kat. A/Z/V):** Tick Rule, Roll, Corwin-Schultz, Kyle's/Amihud's/Hasbrouck's λ, PIN, VPIN (=Z-01), predatory algos (quote stuffers, danglers), round-lot distribution (detekcja traderów GUI). Kopalnia cech dla kat. A/Z/V.
+
+#### Najważniejsze cytaty (dosłowne)
+> *"Backtesting is not a research tool. Feature importance is."*
+
+> *"The dilemma is that returns are stationary, however memory-less, and prices have memory, however they are non-stationary."*
+
+> *"In all cases stationarity is achieved with d < 0.6."* (FFD — Table 5.1)
+
+> *"One way to reduce leakage is to purge from the training set all observations whose labels overlapped in time with those labels included in the testing set."*
+
+> *"Achieving high accuracy on small bets and low accuracy on large bets will ruin you."*
+
+> *"A 'compressed' market is an inefficient market... Bubbles are formed in compressed (low entropy) markets."*
+
+> *"It typically takes about 20 such iterations to discover a (false) investment strategy subject to the standard significance level of 5%."*
+
+#### Potencjalne Wizje (W-107..W-120)
+| Wizja | Nazwa | Kat. | Metoda źródłowa | Priorytet |
+|---|---|---|---|---|
+| **W-107** | NeuronStacjonarnosci FFD (DOMYKA W-094) | H/R | Fractional Differentiation — d\* min. dla ADF, max pamięć | 🔴 |
+| **W-108** | NeuronEntropiiRynku | N | Kontoyiannis/plug-in/LZ entropy na FFD; niska entropia = bańka | 🔴 |
+| **W-109** | NeuronEksplozji SADF | R | Supremum ADF na log-cenach — bańka/krach | 🔴 |
+| **W-110** | NeuronPrzelomu CUSUM | R | Brown-Durbin-Evans + Chu-Stinchcombe-White | 🟠 |
+| **W-111** | Meta-Legatus (meta-labeling) | F/R | Wtórna warstwa ML — kiedy ufać konsensusowi roju | 🔴 |
+| **W-112** | Moduł Purged-CPCV + DSR | infra | PurgedKFold+embargo, CPCV, PBO, Deflated Sharpe | 🔴 |
+| **W-113** | Audytor Feature Importance MDI/MDA/SFI | infra | ML-audyt neuronów — realizuje Prawo XV i XVI | 🔴 |
+| **W-114** | Bramy Informacyjne (information-driven bars) | V/infra | Dollar/Volume/Imbalance bars — volume clock dla VPIN | 🟠 |
+| **W-115** | NeuronImpaktuLikwidnosci (λ) | Z/V | Kyle's/Amihud's/Hasbrouck's λ | 🟠 |
+| **W-116** | NeuronPredatorow | A | Quote stuffers/danglers/squeezers + cancellation rates | 🟠 |
+| **W-117** | NeuronTraderowGUI (round-lot) | A/F | Rozkład rozmiarów zleceń — ludzie vs boty | 🟡 |
+| **W-118** | NeuronRyzykaStrategii | R | Probability of strategy failure (π_λ, EF3M) | 🟠 |
+| **W-119** | Sizer (bet sizing z prawdopodobieństwa) | L | m=2Z[z]−1 + averaging, zasilany meta-labelingiem | 🟠 |
+| **W-120** | Moduł wag próbek (uniqueness + seq. bootstrap + time decay) | infra | Poprawne ważenie nakładających się etykiet | 🟡 |
+
+🚨 **Sygnały Prawa XV wyniesione z lektury (do weryfikacji):**
+1. Jeśli **Z-01 (VPIN)** liczony jest na barach czasowych zamiast wolumenowych (volume clock), traci precyzję projektowaną przez autora → W-114.
+2. IMPERIUM trenuje/ocenia moduły **bez purged CV+embargo i bez korekty PBO/DSR** — systemowa luka metodologiczna, przez którą backtesty roju są podatne na fałszywe odkrycie → **W-112 priorytet 🔴.**
+
+---
+
+### 📙 BIB-008 — "Volatility Trading" (2nd ed.) — Euan Sinclair ⭐ RDZEŃ ZMIENNOŚCI/LEWARA
+
+**Pełny tytuł:** *Volatility Trading, Second Edition* (Handel zmiennością, wyd. 2)
+**Autor:** Euan Sinclair (Wiley, 2013; ISBN 978-1118347133) — zawodowy trader opcji (15+ lat), fizyk z wykształcenia. **Wykładowca estymatora Yang-Zhang, którego IMPERIUM JUŻ UŻYWA** (kat. L/V), oraz Kelly criterion zasilającego nasz KALKULATOR_LEWARA.
+**Status weryfikacji:** ✅ Rozdziały kluczowe dla bota futures bez opcji przeczytane dogłębnie przez 3 analizy Opus: rozdz. 2 (pomiar zmienności), 3 (stylized facts), 4 (prognozowanie), 8 (money management/Kelly), 9 (trade evaluation), 13 (leveraged ETFs/volatility drag). ⚠️ Rozdz. 1, 5–7, 10–12, 14 (stricte opcyjne: greeks, smile, hedging, VIX) pominięte jako nieistotne dla bota futures — świadoma decyzja zakresowa, nie luka.
+**Ocena:** 8/10 (dla bota futures; 10/10 dla tradera opcji) · **Priorytet wdrożenia:** 🔴 WYSOKI (rdzeń kategorii L/V/R + KALKULATOR_LEWARA)
+
+#### Teza centralna
+Przewaga w tradingu zmienności = **mierzyć zmienność lepiej niż rynek i zarządzać kapitałem matematycznie, nie emocjonalnie**. Zmienność jest jedyną wielkością, którą da się prognozować z sensowną dokładnością (returny — prawie nie). Sinclair dostarcza kodowalny arsenal: rodzinę estymatorów range-based (Parkinson/Garman-Klass/Rogers-Satchell/Yang-Zhang), GARCH z kotwicą długoterminową, Kelly z korektą błędu estymacji, oraz — KRYTYCZNE dla bota lewarowanego — matematykę erozji zmiennościowej (volatility drag).
+
+#### ⚠️ Niuans crypto 24/7 (różnica vs książka o akcjach)
+Książka zakłada akcje (sesja 6,5h + luka nocna). Crypto futures handluje 24/7 → **brak luki otwarcia**. To ma dwie konsekwencje sprawdzone przez analizę:
+1. **Yang-Zhang traci przewagę** — jego komponent close-to-open (luka) ≈ 0 na crypto, więc YZ degraduje się ku Rogers-Satchell. RS radzi sobie z trendem i nic nie traci na braku luk → **możliwa optymalizacja istniejącego neuronu L/V** (W-136, czerwony alarm Prawa XV).
+2. Cała sekcja "overnight vs intraday kurtosis" nie dotyczy nas.
+3. **Znak efektu dźwigni MUSI być kalibrowany na danych** (Prawo I) — w crypto może być odwrócony względem akcji (up-vol w hossie).
+
+#### Kluczowe koncepcje (5 rodzin)
+
+**1. Rodzina estymatorów zmienności (rozdz. 2)** — Parkinson (high-low), Garman-Klass (OHLC), Rogers-Satchell (odporny na trend), Yang-Zhang (mamy). Najcenniejsze NIE jako pojedyncze liczby (skorelowane), lecz jako **STOSUNKI** — sygnatura zmienności: `Parkinson/close-to-close` wysoki = dzika zmienność intrabar wracająca na zamknięciu; `RS/Parkinson` odróżnia zmienność trendową od oscylacyjnej. To realizuje Prawo XV (odzysk wielowymiarowości OHLC) i Prawo XVI (nowa oś).
+
+**2. Stylized facts (rozdz. 3)** — volatility clustering / długa pamięć (ACF |returnów|, synergia z H/Hurst), mean-reversion zmienności (variance ratio dzienne vs tyg. vs mies.), leverage effect (asymetria return-vol, symetryczny YZ jej nie widzi), volume-volatility (korelacja wolumenu z zakresem high-low = 0,85!), grube ogony (kurtoza, synergia z D/Lévy), log-normalny rozkład σ (wyższy poniżej 200-SMA → reżim).
+
+**3. Prognozowanie (rozdz. 4)** — GARCH(1,1) z kotwicą długoterminową `V=ω/(1−α−β)` i prognozą term-structure `σ²_{t+k}=V+(α+β)^k(σ²_t−V)` (nowa oś: KIERUNEK dryfu σ, nie poziom). Volatility Cone (percentyl bieżącej σ w rozkładzie historycznym — substytut implied vol dla bota bez opcji). Variance Premium (implied−realized) — **wymaga DVOL z Deribit**, bez niego martwy głos.
+
+**4. Money management / Kelly (rozdz. 8)** — `f*=μ/σ²` (twardy sufit lewara), fractional Kelly (c∈[0.2,0.5] — growth symetryczny wokół f=1, drawdowny super-liniowe), **korekta błędu estymacji** `E[p]=(w+1)/(N+2)` (Laplace — naiwne p=w/N zawsze zawyża; przy N=10 ~27% szans na ujemną przewagę). Bankroll ≠ margin (mylenie = likwidacja).
+
+**5. Volatility drag (rozdz. 13) ⭐ NAJWAŻNIEJSZE dla bota lewarowanego** — pozycja lewarowana λ eroduje jak `exp(−½λ(λ−1)σ²t)`. Dla λ=2: drag = −σ²·t; dla λ=3 przy σ_roczne=1.0: **−300%/rok dryfu**. To dokładnie ta sama erozja co leveraged ETF. Jeśli KALKULATOR_LEWARA nie odejmuje dragu → systematycznie zawyża atrakcyjność wysokiego lewara = CZERWONY ALARM Prawa XV + ryzyko ruiny.
+
+#### Najważniejsze cytaty (parafraza z analizy)
+> *"If Parkinson is 40% and close-to-close is 20%, much of the true vol is driven by large intraday ranges."* (rozdz. 2 — sygnatura zmienności)
+
+> *"Achieving high accuracy on small bets and low accuracy on large bets will ruin you."* (zbieżne z López de Prado — bet sizing)
+
+> *Optymalny lewar Kelly dla FXI w 2008 (σ=146%) = 0.04. Lewar 2 był matematyczną katastrofą.* (rozdz. 13)
+
+#### Potencjalne Wizje (W-121..W-139)
+| Wizja | Nazwa | Kat. | Metoda źródłowa | Nowa oś? | Priorytet |
+|---|---|---|---|---|---|
+| **W-121** | NeuronSygnaturaZmiennosci (ratio Parkinson/GK/RS/close) | R | Stosunki estymatorów — źródło zmienności | TAK | 🔴 |
+| **W-122** | NeuronEfektuDzwigni (asymetria return-vol) | R/M | korelacja(r,σ) + asymetria rozmiaru zwrotów | TAK | 🔴 |
+| **W-123** | NeuronVarianceRatio (mean-rev zmienności) | R | σ dzienna vs tyg. vs mies. (Campbell-Lo-MacKinlay) | TAK | 🟠 |
+| **W-124** | NeuronKurtozy (grube ogony / aftershock) | D | rolling excess kurtosis returnów | TAK (4. moment) | 🟠 |
+| **W-125** | NeuronKlasteryzacji (ACF długiej pamięci) | H | ACF\|r\| wolno gasnąca — synergia z Hurst | TAK | 🟡 |
+| **W-126** | NeuronGARCH (term-structure + vol anchor) ⭐ | L/R | σ²=ω+αr²+βσ²; V=ω/(1−α−β); prognoza kierunku σ | TAK (mocna) | 🔴 |
+| **W-127** | NeuronVolatilityCone (percentyl σ) ⭐ | R | rozkład historyczny σ per horyzont; korekta Hodges-Tompkins | TAK | 🔴 |
+| **W-128** | NeuronGARCH-Asym (GJR/EGARCH) | V/R | człon γr²·I(r<0); crypto może mieć odwrotny znak | TAK (do weryf.) | 🟡 |
+| **W-129** | NeuronVariancePremium (DVOL−RV) | V/R | implied (DVOL Deribit) − realized (YZ) | TAK (najmocniejsza) | 🟠 wymaga Bramy |
+| **W-130** ✅ | VolatilityDrag w KALKULATOR_LEWARA ⭐⭐ **WDROŻONE** | L | drag roczny ½λ(λ−1)σ²; raport + opcjonalne weto max_drag_roczny | — (krytyczna korekta) | ✅ KOD (8 testów) |
+| **W-131** | Kelly μ/σ² + fractional + Bayes (w+1)/(N+2) | L | twardy sufit lewara z korektą błędu estymacji | — (ulepszenie) | 🔴 |
+| **W-132** | Dynamiczny sufit lewara μ/σ² na bieżącej σ | L | sprzężenie z W-059 vol-targeting + W-096 throttle | — (ulepszenie) | 🔴 |
+| **W-133** | K-ratio (Kestner — edge vs szum) | infra/metryki | nachylenie/SE regresji equity = t-stat przewagi | nowa metryka | 🟠 |
+| **W-134** | SE(Sharpe) + zestaw metryk (Sortino/Calmar/Omega) | infra/metryki | przedział ufności Sharpe; metryki downside | nowa metryka | 🟠 |
+| **W-135** | Rejestr statystyk per-trade (μ,σ,p,N) | infra | dziennik karmiący Kelly (W-131) wejściami | fundament | 🟠 |
+| **W-136** | Weryfikacja YZ vs RS dla crypto 24/7 | L | pomiar udziału wariancji luki; może RS > YZ | optymalizacja | 🔴 Prawo XV |
+| **W-137** | Volume-volatility jako modulator pewności | V | korelacja wolumen↔zakres high-low (0,85) | wzmocnienie V | 🟡 |
+| **W-138** | First Exit Time estimator | D/L | σ=Δ/√(E[τ]); wymaga barów intraday | TAK | 🟡 wymaga intraday |
+| **W-139** | Tryb Browne (goal-reaching) w KALKULATOR_LEWARA | L | dynamiczny lewar pod cel-w-czasie (alt. Kelly) | nowa zdolność | 🟡 decyzja Cezara |
+
+🚨 **Sygnały Prawa XV wyniesione z lektury (do weryfikacji/naprawy):**
+1. ✅ **VolatilityDrag (W-130) — ROZWIĄZANE 2026-06-08.** KALKULATOR_LEWARA liczy teraz drag roczny `½λ(λ−1)σ²` (raport w PlanPozycji + opcjonalne weto `max_drag_roczny`). Alarm zamknięty kodem (8 testów).
+2. **Yang-Zhang na crypto 24/7 (W-136)** — komponent luki ≈ 0, możliwe że Rogers-Satchell jest lepszym estymatorem L/V dla nas. Zmierzyć empirycznie udział wariancji luki przed decyzją.
+3. **Throttle (W-096) musi reagować na σ², nie σ** — krytyczny lewar Kelly to μ/σ²; przy skoku zmienności stały lewar przekracza optimum → ujemny wzrost mimo dodatniej przewagi.
+
+🔗 **Symbioza (Prawo XVI) — alert dekorelacji:** Kelly (W-131), vol-targeting (W-059) i dynamiczny sufit (W-132) to TA SAMA matematyka `μ/σ²` w trzech przebraniach — przed wdrożeniem zmierzyć korelację, by nie zdublować sygnału (vol-targeting = Kelly bez członu μ). Estymatory W-121 jako pojedyncze liczby są skorelowane z YZ — wartość leży w STOSUNKACH/asymetrii/momentach wyższych rzędów, nie w surowym poziomie.
+
+---
+
+### 📕 BIB-009 — "The (Mis)behavior of Markets" — Benoît Mandelbrot & Richard Hudson ⭐ OŚ FRAKTALNA D/H/N
+
+**Pełny tytuł:** *The (Mis)behavior of Markets: A Fractal View of Financial Turbulence* (Niewłaściwe zachowanie rynków: fraktalne spojrzenie na turbulencje finansowe)
+**Autor:** Benoît Mandelbrot (ojciec geometrii fraktalnej, IBM/Yale) + Richard L. Hudson (Basic Books, 2004; ISBN 978-0465043576). **Mandelbrot to teoretyczny fundament naszych najsłabszych osi:** H-01 (Hurst), D-01 (Lévy/geometria ścieżki), W-081 (MFDFA multifraktal).
+**Status weryfikacji:** ✅ Cała książka (rozdz. I–XV) przeczytana przez 2 analizy Opus. Książka jest popularnonaukowa (intuicja > wzory) — algorytmy odtworzone z opisów + kanonicznej literatury, nie z gotowego kodu. ⚠️ konkretne estymatory (Hill, box-counting) wymagają kalibracji przy wdrożeniu.
+**Ocena:** 7/10 (intuicja 10/10, gotowość-do-kodu 5/10) · **Priorytet wdrożenia:** 🔴 Wysoki (jedyna pozycja celująca wprost w D/H/N — nasze 3 najsłabsze osie po 1 neuronie)
+
+#### Teza centralna
+Rynki NIE są gaussowskie (Bachelier/Markowitz/Black-Scholes się mylą). Rządzą nimi dwa „prymitywne efekty": **efekt Józefa** (long memory / persystencja — trendy trwają, wykładnik Hursta H≠0.5) i **efekt Noego** (nieciągłość — grube ogony, skoki, nieskończona wariancja, rozkłady potęgowe). Razem dają **multifraktalność** + **zniekształcony czas handlu** (trading time: czas płynie szybko w turbulencji, wolno w ciszy). Praktyczny wniosek dla bota: **nie prognozuj kierunku — prognozuj zmienność i chroń się przed ruiną** (ogony są grubsze niż zakłada VaR/Sharpe).
+
+#### Kluczowe koncepcje
+- **Efekt Józefa (H):** persystencja, R/S analysis (oryginalny estymator Hursta), długa pamięć zmienności.
+- **Efekt Noego (N/D):** grube ogony (power law α, Pareto/Lévy), skoki nieciągłe, kurtoza ekstremalna, nieskończona wariancja (Cauchy).
+- **Multifraktalność:** widmo multifraktalne Δα, model MMAR (Multifractal Model of Asset Returns), kaskady multiplikatywne.
+- **Trading time:** deformacja czasu — koncentracja ruchów ("46% szkód w 0.21% dni", "40% zysków S&P w 10 dni").
+- **Krytyka:** VaR, Sharpe i Gauss niedoszacowują ryzyka ogonowego; "dependence without correlation" (pamięć zmienności bez pamięci kierunku).
+
+#### Potencjalne Wizje (W-140..W-158, skonsolidowane z 2 analiz)
+| Wizja | Nazwa | Kat. | Metoda źródłowa | Nowa oś? | Priorytet |
+|---|---|---|---|---|---|
+| **W-140** | NeuronTailIndex α (Hill estimator) ⭐ | D/N | wykładnik ogona potęgowego; niskie α=dziki rynek | TAK (vs D-01) | 🔴 |
+| **W-141** | NeuronWymiaruFraktalnego (Higuchi/coastline) | D | "długość" ścieżki przy malejącym kroku; D≈2−H | TAK | 🔴 |
+| **W-142** | NeuronDetektorSkokow (Noah jump / bipower) | N/D | realized vs bipower variation; gap/range >k·ATR | TAK | 🔴 |
+| **W-143** | NeuronTradingTime (volatility clock / Gini wolumenu) ⭐ | N/V | zegar handlu θ=Σ\|r\|; koncentracja aktywności | TAK | 🔴 |
+| **W-144** | NeuronDependenceNoCorr (ACF\|r\| − ACF r) | H/R | pamięć rozmiaru vs kierunku — esencja Mandelbrota | TAK | 🔴 |
+| **W-145** | NeuronKoncentracjiCzasu (Gini ruchów) | R/N | krzywa Lorenza \|r\|; herezja 3 (timing matters) | TAK | 🟠 |
+| **W-146** | NeuronShockIndex (financial Richter, log-energia) | R | log10(vol/mediana_vol); detekcja skoku tempa | zmierzyć vs V | 🟠 |
+| **W-147** | NeuronMultifraktalΔα (partition function) | N | widmo f(α) z funkcji partycji Z(q,τ) | zmierzyć vs W-081 | 🟡 |
+| **W-148** | NeuronKlastrowFraktal (Cantor-dust ekstremów) | N | box-counting wymiaru zbioru \|r\|>próg | TAK | 🟡 |
+| **W-149** | NeuronKaskady (multiplicative cascade) | N | mnożniki zmienności między poziomami podziału | zmierzyć vs W-147 | 🟡 |
+| **W-150** | Walidator R/S dla H-01 (rozbieżność estymatorów) | H | R/S vs DFA — sygnał = zgodność, nie surowy H | TAK (rozbieżność) | 🟠 |
+
+🚨 **Sygnały Prawa XV/XVI wyniesione z lektury:**
+1. **Filozofia Mandelbrota = oś REŻIMU, nie kierunku** — wszystkie te neurony powinny zasilać głównie R/sizing/ryzyko, nie sygnał long/short (zgodne z botem futures: ochrona przed ruiną). Herezja 9: "cannot forecast prices, but can estimate odds of volatility".
+2. **Crossovery skalowania (rozdz. XI)** — skalowanie działa tylko w środku spektrum (dla dollar-DM: 2h–180 dni). Każdy neuron skalujący (W-140/147/149/150) musi mieć dolny I górny limit okna, inaczej mikrostruktura/wygasanie psują pomiar = martwy głos.
+3. **Bias estymatorów (Lo 1991, Fama)** — H z R/S i α z Hilla są wrażliwe na metodę; dlatego W-150 jako walidator-rozbieżność (nie konkurencyjny głos), a W-140 z testem stabilności k.
+
+🔗 **Symbioza (Prawo XVI) — alert dekorelacji osi N:** W-147/W-148/W-149 i istniejący W-081 (MFDFA) mierzą multifraktalność różnymi estymatorami — przed wdrożeniem WIELU naraz uruchomić `raport_dekorelacji`. Prawdopodobnie wystarczą dwa zdekorelowane (np. W-081 widmo + W-143 trading-time, które mierzą RÓŻNE rzeczy). W-140 (tail α) prawdopodobnie zdekorelowany z D-01 (Lévy Area) — geometria ścieżki ≠ grubość ogona.
+
+---
+
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
 
 | BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |
@@ -1460,12 +1766,60 @@ Większość problemów traderów to NIE brak wiedzy, lecz **powtarzalne wzorce 
 | BIB-002 | Technical Analysis | John J. Murphy | 8/10 | 🟠 Średni-Wysoki | Analiza międzyrynkowa + left/right translation + MESA |
 | BIB-003 | Cryptoassets | Burniske & Tatar | 9/10 | 🔴 Wysoki | NVT (crypto-PE) + hash rate + detektor euforii (Gartner/Google) |
 | BIB-004 | Psychology of Trading | Brett Steenbarger | 8/10 | 🟠 Średni | Stacjonarność (algo!) + pinball trade + anty-overconfidence |
+| BIB-005 | What Exactly Is Crypto? | Jonatan Blum | 4/10 | 🟡 Niski | Tokenomika (issuance−burn), płynność DEX, ryzyko centralizacji (wymaga danych on-chain) |
+| BIB-006 | High Probability Scalping Playbook | Zachary Carson | 4/10 | 🟠 Średni | Konfluencja-z-dekorelacją (=Prawo XVI), filtr reżimu ADX, MFI, ATR-stop, sekwencja 9/13 |
+| BIB-007 ⭐ | Advances in Financial Machine Learning | Marcos López de Prado | **10/10** | 🔴 KRYTYCZNY | Autor VPIN/triple-barrier; FFD (domyka W-094), meta-labeling, purged CV, PBO/DSR, entropia, SADF → W-107..W-120 |
+| BIB-008 ⭐ | Volatility Trading (2nd ed.) | Euan Sinclair | 8/10 | 🔴 Wysoki | Wykładowca Yang-Zhang (mamy!); rodzina estymatorów→sygnatura zmienności, GARCH+vol cone, Kelly+korekta błędu, **volatility drag (W-130 WDROŻONE)** → W-121..W-139 |
+| BIB-009 ⭐ | The (Mis)behavior of Markets | Mandelbrot & Hudson | 7/10 | 🔴 Wysoki | Ojciec fraktali — celuje wprost w nasze najsłabsze osie D/H/N: tail-index α, wymiar fraktalny, trading-time, dependence-without-correlation, multifraktal → W-140..W-158 |
 
 **Trzy najcenniejsze, bezpośrednio implementowalne wizje:**
 1. **W-089 NeuronNVT** — Network Value to Transactions (BIB-003) — twardy on-chain, brak odpowiednika w systemie
 2. **W-082 NeuronFazyCyklu18** — zegar 18-letniego cyklu (BIB-001) — makro-reżim sterujący wielkością pozycji
 3. **W-094 NeuronStacjonarnosci** — detektor zmiany procesu generującego (BIB-004) — wzmacnia Prawo XV
 
-🚨 **Prawo XV (utrata potencjału) — alert biblioteczny:** przed wdrożeniem neuronów W-085..W-088 (korelacja międzyrynkowa Murphy'ego) zmierzyć korelację z istniejącą `diagnostyka_korelacji.py` — ryzyko |r|>0.80 z istniejącymi głosami kat. R. Prawo XVI: mierzyć, nie zgadywać.
+🚨 **Prawo XVI (dekorelacja) — alert biblioteczny:** przed wdrożeniem neuronów W-085..W-088 (korelacja międzyrynkowa Murphy'ego) zmierzyć korelację z istniejącą `diagnostyka_korelacji.py` — ryzyko |r|>0.80 z istniejącymi głosami kat. R. Prawo XVI: mierzyć, nie zgadywać.
 
 *Biblioteka Tradingowa Cezara otwarta. Kolejne pozycje dopisywane do tej sekcji po dostarczeniu przez Cezara.* 📚⚔️🏛️
+
+---
+
+## 🎯 LISTA ŻYCZEŃ BIBLIOTEKI — KSIĄŻKI DO ZDOBYCIA (zwiad 2026-06-08)
+
+> **Cel:** Cezar szuka i dostarcza książki; Claude przeanalizuje i wpisze jako kolejne BIB.
+> **Metoda doboru:** celowanie w LUKI Imperium — kategorie najsłabiej obsadzone w kodzie:
+> **D=1** (geometria ścieżki), **H=1** (fraktal), **N=1** (entropia), **Z=2** (mikrostruktura/zagrożenie),
+> **V=2** (wolumen), **L=2** (dźwignia/zmienność). Biblioteka ma już mocno: cykle (BIB-001),
+> TA (BIB-002), wycena crypto (BIB-003), psychologia (BIB-004). Brakuje **twardej ilościowej (quant) podstawy**.
+
+### 🔴 PRIORYTET NAJWYŻSZY (rdzeń ilościowy — bezpośrednio rozszerza istniejące neurony)
+
+| # | Tytuł | Autor | Luka / kat. | Dlaczego KRYTYCZNE dla nas | Gdzie szukać |
+|---|---|---|---|---|---|
+| ✅ ŻYCZ-01 | **Advances in Financial Machine Learning** → **ZDOBYTE jako BIB-007** (2026-06-08) | Marcos López de Prado (2018) | D/N/Z + cała architektura ML | **Autor VPIN** (nasz Z-01!) i triple-barrier (nasza Arena W-035!). Zawiera: fractional differentiation (= nasz W-094 stacjonarność!), meta-labeling, feature importance, backtest overfitting (PBO), sample weights. Przeanalizowane → 14 wizji W-107..W-120. | Wiley; ISBN 978-1119482086 |
+| ✅ ŻYCZ-02 | **Volatility Trading** (2nd ed.) → **ZDOBYTE jako BIB-008** (2026-06-08) | Euan Sinclair (2013) | L=2, V=2 (dźwignia/zmienność) | Wykładowca Yang-Zhang (mamy!). Rodzina estymatorów→sygnatura zmienności, GARCH+vol cone, Kelly+korekta błędu estymacji, **volatility drag** (krytyczny dla bota lewarowanego). Przeanalizowane 3 analizami Opus → 19 wizji W-121..W-139. | Wiley; ISBN 978-1118347133 |
+| ✅ ŻYCZ-03 | **The (Mis)behavior of Markets** → **ZDOBYTE jako BIB-009** (2026-06-08) | Benoît Mandelbrot & Richard Hudson (2004) | H=1, D=1, N=1 (fraktale/multifraktal) | OJCIEC geometrii fraktalnej. Przeanalizowane 2 analizami Opus → 19 wizji W-140..W-158 celujących w D/H/N: tail-index α, wymiar fraktalny, trading-time, dependence-without-correlation, multifraktal Δα. | Basic Books; ISBN 978-0465043576 |
+
+### 🟠 PRIORYTET ŚREDNI (praktyka strategii + struktura rynku)
+
+| # | Tytuł | Autor | Luka / kat. | Dlaczego wartościowe | Gdzie szukać |
+|---|---|---|---|---|---|
+| ŻYCZ-04 | **Algorithmic Trading: Winning Strategies and Their Rationale** | Ernest P. Chan (2013) | R=4 (reżim), strategie | Regime detection (HMM — pod naszą kat. R/legatus), mean-reversion vs momentum, Kalman filter (mamy EXP-04!), stat-arb. Praktyczne, kodowalne strategie z uzasadnieniem. | Wiley; ISBN 978-1118460146 |
+| ŻYCZ-05 | **Mind Over Markets: Power Trading with Market Generated Information** | James F. Dalton (1990/2013) | V=2, S=3 (wolumen/struktura) | Auction Market Theory + Market Profile — JAK czytać wolumen w strukturze ceny (value area, POC). Fundament pod neurony wolumenowo-strukturalne (uzupełnia naszą najsłabszą parę V/S). | Wiley; ISBN 978-1118531730 |
+| ŻYCZ-06 | **Markets in Profile: Profiting from the Auction Process** | James F. Dalton (2007) | V/S (kontynuacja AMT) | Rozszerzenie auction theory na wiele ram czasowych. ⓘ Pełny PDF krąży legalnie w sieci (r-5.org) — łatwy do zdobycia. | Wiley; ISBN 978-0470039090 |
+| ŻYCZ-07 | **Positional Option Trading** | Euan Sinclair (2020) | warstwa ryzyka (`pretorianie/`) | Kelly criterion z niepewnością estymacji, trade sizing, skew, stop-loss. Bezpośrednio pod nasz kalkulator lewara i W-096 throttle. | Wiley; ISBN 978-1119583516 |
+
+### 🟡 PRIORYTET UZUPEŁNIAJĄCY (rozważyć później / zasoby zamiast książek)
+
+| # | Pozycja | Typ | Uwaga (Prawo I — uczciwie) |
+|---|---|---|---|
+| ŻYCZ-08 | **Thinking, Fast and Slow** — Daniel Kahneman | Książka (behawioralna) | Klasyk biasów poznawczych; uzupełnia BIB-004. Wartość średnia — bardziej tło niż sygnały. |
+| ŻYCZ-09 | **Glassnode Academy / checkonchain.com / woocharts** | Zasób on-line (NIE książka) | Dla on-chain (MVRV/SOPR/NUPL/NVT) NIE ma dobrej pojedynczej książki — najlepsza wiedza jest w darmowych zasobach. Pod neurony O i wizje W-089..W-093, W-097. Dane wymagają API (Prawo XV). |
+
+### 🚨 Uwagi metodologiczne (zgodnie z zasadami)
+- **Prawo I (uczciwość):** ŻYCZ-03 (Mandelbrot), ŻYCZ-08 (Kahneman) rekomenduję z własnej wiedzy — NIE zweryfikowane tym konkretnym zwiadem internetowym. Reszta potwierdzona wyszukiwaniem 2026-06-08.
+- **Prawo XV (utrata potencjału):** książki on-chain (ŻYCZ-09) i część wizji wymagają NOWEGO źródła danych (API on-chain) — bez Bramy dostarczającej te dane neurony byłyby martwym głosem. Najpierw dane, potem neuron.
+- **Format:** najłatwiejsze do zdobycia jako pełny tekst: ŻYCZ-06 (PDF w sieci). Reszta — legalnie przez zakup/bibliotekę; wklejaj pliki jak poprzednie (azw3/epub/pdf), rozpakuję i przeanalizuję.
+- **Zdobyte:** ✅ ŻYCZ-01 (López de Prado → BIB-007), ✅ ŻYCZ-02 (Sinclair → BIB-008), ✅ ŻYCZ-03 (Mandelbrot → BIB-009). Trzy filary quant: ML, zmienność/lewar, fraktale.
+- **Rekomendacja #1 (następna):** **ŻYCZ-04 Ernest Chan "Algorithmic Trading"** — regime detection (HMM pod kat. R/legatus), Kalman filter (mamy EXP-04!), stat-arb. Praktyczne kodowalne strategie. ⚠️ rekomendacja z wiedzy, niezweryfikowana zwiadem.
+
+*Lista życzeń otwarta — Cezar dostarcza, Claude analizuje i przenosi do BIB-009+.* 🎯📚⚔️

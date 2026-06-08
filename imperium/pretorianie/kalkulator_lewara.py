@@ -33,6 +33,20 @@ VOL_TARGET_DEFAULT = 0.60   # 60% annualizowanej zmienności — typowy cel port
 SKALA_VOL_MIN = 0.25        # nie schodź poniżej 1/4 bazowego rozmiaru
 SKALA_VOL_MAX = 1.50        # nie powiększaj ponad 1.5× (ostrożność > chciwość)
 
+# ── Volatility Drag (wizja W-130, Sinclair "Volatility Trading" rozdz. 13) ─────
+# Pozycja lewarowana λ× eroduje w czasie wskutek zmienności — to ta sama
+# matematyka co decay leveraged ETF. Dla dziennego rebalansowania do stałego
+# lewara realny dryf wartości to:
+#       drag_roczny = ½ · λ · (λ−1) · σ²
+# gdzie σ = annualizowana realized vol (ta sama skala co vol_realized / vol_target).
+# Dla λ=1 drag=0 (brak erozji); dla λ=3 przy σ=1.0 → drag = 3.0 = 300%/rok dryfu.
+# Sinclair (rozdz. 13, przykład FXI 2008 σ=146%): krytyczny lewar Kelly = μ/σ²;
+# powyżej niego człon erozji ½λ(λ−1)σ² przewyższa zysk λ·μ → ujemny wzrost mimo
+# dodatniej przewagi. Bez tej korekty kalkulator ZAWYŻA atrakcyjność wysokiego
+# lewara (czerwony alarm Prawa XV). Domyślnie tylko RAPORTUJEMY drag; twardą
+# bramkę (weto) włącza jawny parametr max_drag_roczny (kompatybilność wsteczna).
+DRAG_ROCZNY_OSTRZEZENIE = 0.50   # >50%/rok dryfu = głośne ostrzeżenie w logach
+
 
 @dataclass
 class BezpiecznikKapitalu:
@@ -276,6 +290,7 @@ class PlanPozycji:
     skala_vol: float = 1.0        # mnożnik volatility-targeting (W-059); 1.0 = brak skalowania
     frakcja_breaker: float = 1.0  # mnożnik breakera krzywej kapitału (W-062); 1.0=NORMAL, 0.5=REDUCED, 0.0=HALT
     frakcja_dd: float = 1.0       # mnożnik drawdown-fractional sizing (W-063); 1.0=DD=0, maleje z DD
+    drag_roczny: "float | None" = None  # volatility drag ½λ(λ−1)σ² annualizowany (W-130); None gdy brak vol_realized
 
 
 class KalkulatorLewara:
@@ -296,7 +311,8 @@ class KalkulatorLewara:
                vol_realized: "float | None" = None,
                vol_target: float = VOL_TARGET_DEFAULT,
                breaker_krzywej: "BezpiecznikKrzywejKapitalu | None" = None,
-               skalowanie_dd: "SkalowanieFrakcjaDD | None" = None) -> PlanPozycji:
+               skalowanie_dd: "SkalowanieFrakcjaDD | None" = None,
+               max_drag_roczny: "float | None" = None) -> PlanPozycji:
 
         kierunek = kierunek.upper()
         assert kierunek in ("LONG", "SHORT"), "kierunek musi być LONG lub SHORT"
@@ -304,6 +320,16 @@ class KalkulatorLewara:
         # 1. Dźwignia dynamiczna (jeśli nie podana = auto)
         if dzwignia <= 0:
             dzwignia = self.auto_dzwignia(pewnosc, rezim)
+
+        # 1b. Volatility Drag (W-130, Sinclair): erozja pozycji lewarowanej w czasie.
+        # Liczona z FINALNEJ dźwigni i annualizowanej realized vol. None gdy brak
+        # vol_realized (kompatybilność wsteczna — bez danych nie halucynujemy, Prawo XV).
+        drag_roczny = self.volatility_drag(dzwignia, vol_realized)
+        if drag_roczny is not None and drag_roczny >= DRAG_ROCZNY_OSTRZEZENIE:
+            logger.warning(
+                f"🌀 VOLATILITY DRAG {drag_roczny:.1%}/rok przy {dzwignia}× i "
+                f"vol={vol_realized:.0%} — erozja lewara (W-130, Sinclair rozdz. 13)"
+            )
 
         # 2. Cena likwidacji
         likwidacja = self._likwidacja(cena_wejscia, kierunek, dzwignia)
@@ -359,7 +385,8 @@ class KalkulatorLewara:
         ok, powod = self._checklist(
             kierunek, dzwignia, pewnosc, rezim,
             pretorianie_ok, bufor_pct, rozmiar_usdt, kapital_usdt,
-            bezpiecznik, breaker_krzywej, skalowanie_dd
+            bezpiecznik, breaker_krzywej, skalowanie_dd,
+            drag_roczny, max_drag_roczny
         )
 
         return PlanPozycji(
@@ -379,6 +406,7 @@ class KalkulatorLewara:
             skala_vol=round(skala_vol, 4),
             frakcja_breaker=round(frakcja_breaker, 4),
             frakcja_dd=round(frakcja_dd, 4),
+            drag_roczny=round(drag_roczny, 4) if drag_roczny is not None else None,
         )
 
     # ── Volatility Targeting (W-059) ────────────────────────────────────────────
@@ -397,6 +425,29 @@ class KalkulatorLewara:
             return 1.0
         skala = vol_target / vol_realized
         return max(SKALA_VOL_MIN, min(SKALA_VOL_MAX, skala))
+
+    # ── Volatility Drag (W-130) ──────────────────────────────────────────────────
+
+    @staticmethod
+    def volatility_drag(dzwignia: int, vol_realized: "float | None") -> "float | None":
+        """
+        Annualizowany dryf zmiennościowy pozycji lewarowanej: ½·λ·(λ−1)·σ².
+
+        DLA NOWICJUSZA: pozycja lewarowana λ× traci wartość w czasie nawet gdy
+        cena bazowa wraca do punktu wyjścia — bo lewar mnoży zmienność, a strata
+        na ruchu +x potem −x to −x² (skalowane przez λ²). To ta sama erozja co
+        w leveraged ETF (Sinclair, rozdz. 13). Im wyższy lewar i zmienność, tym
+        większy ubytek. Dla λ=1 erozja = 0.
+
+        dzwignia: finalny lewar λ (≥1).
+        vol_realized: annualizowana realized vol (np. YANG_ZHANG_20). None/≤0 →
+                      None (brak danych = brak halucynacji, Prawo XV).
+        Zwraca ułamek dryfu rocznego (0.0–∞) lub None.
+        """
+        if vol_realized is None or vol_realized <= 0:
+            return None
+        # λ=1 → ½·1·0·σ² = 0 (brak erozji) — wzór sam to daje, bez specjalnego przypadku.
+        return 0.5 * dzwignia * (dzwignia - 1) * vol_realized ** 2
 
     # ── Wzory ──────────────────────────────────────────────────────────────────
 
@@ -420,7 +471,16 @@ class KalkulatorLewara:
                    bufor_pct: float, rozmiar: float, kapital: float,
                    bezpiecznik: "BezpiecznikKapitalu | None" = None,
                    breaker_krzywej: "BezpiecznikKrzywejKapitalu | None" = None,
-                   skalowanie_dd: "SkalowanieFrakcjaDD | None" = None):
+                   skalowanie_dd: "SkalowanieFrakcjaDD | None" = None,
+                   drag_roczny: "float | None" = None,
+                   max_drag_roczny: "float | None" = None):
+        # W-130: weto na volatility drag — TYLKO gdy Komendant jawnie ustawił limit.
+        # Domyślnie max_drag_roczny=None → brak bramki (kompatybilność wsteczna).
+        if (max_drag_roczny is not None and drag_roczny is not None
+                and drag_roczny > max_drag_roczny):
+            return False, (f"🌀 VOLATILITY DRAG {drag_roczny:.1%}/rok > limit "
+                           f"{max_drag_roczny:.0%} — lewar eroduje kapitał szybciej "
+                           f"niż przewaga (W-130, Sinclair rozdz. 13)")
         if breaker_krzywej is not None and breaker_krzywej.halt:
             return False, (f"🛑 BREAKER KRZYWEJ: HALT — equity DD "
                            f"{breaker_krzywej.drawdown:.1%} ≥ "
@@ -463,6 +523,7 @@ class KalkulatorLewara:
 
     def drukuj_plan(self, plan: PlanPozycji):
         status = "✅ CHECKLIST OK" if plan.checklist_ok else f"⛔ VETO: {plan.powod_veto}"
+        drag_txt = f"{plan.drag_roczny:.1%}/rok" if plan.drag_roczny is not None else "—"
         print(f"""
 ╔══════════════════════════════════════════════════════╗
 ║  PLAN POZYCJI: {plan.symbol} {plan.kierunek} ×{plan.dzwignia}
@@ -475,6 +536,7 @@ class KalkulatorLewara:
 ║──────────────────────────────────────────────────────
 ║  Rozmiar:        {plan.rozmiar_usdt:>12.2f} USDT (vol×{plan.skala_vol:.2f} dd×{plan.frakcja_dd:.2f})
 ║  Max ryzyko:     {plan.ryzyko_usdt:>12.2f} USDT
+║  Vol drag:       {drag_txt:>12} (W-130)
 ║  R:R ratio:      1:{plan.rr_ratio:.1f}
 ╠══════════════════════════════════════════════════════╣
 ║  {status}

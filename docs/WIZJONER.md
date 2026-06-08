@@ -2016,6 +2016,59 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 
 ---
 
+### 📗 BIB-020 — "Trading and Exchanges: Market Microstructure for Practitioners" — Larry Harris ⭐ (ŻYCZ-10) 9/10
+
+**Autor:** Larry Harris (Fred V. Keenan Chair in Finance, USC Marshall; b. dyrektor ekonomiczny SEC) · **Wydawca:** Oxford University Press, 2003 · **Ocena:** ⭐ **9/10 — FUNDAMENT** · **Priorytet:** 🔴 Wysoki
+**Źródło:** ISBN 0-19-514470-8 (Financial Management Association Survey and Synthesis Series), 29 rozdziałów.
+
+**Werdykt (Prawo I — uczciwie):** to bezdyskusyjnie biblia mikrostruktury rynku dla praktyka — celuje wprost w nasze najsłabsze osie **Z (mikrostruktura, dziś tylko VPIN/Z-01)** i **L (płynność)**. Nie jest księgą wzorów gotowych do wklejenia jak López de Prado (BIB-007) — jest księgą MECHANIZMÓW: tłumaczy DLACZEGO spread się rozszerza, jak rozpoznać informowany przepływ, jak działa spoofing/squeeze/stop-gunning. Każdy mechanizm da się przełożyć na sygnał. Dlatego 9/10 (nie 10 — część wymaga danych L2/order-flow, których Brama dziś nie dostarcza → Prawo XV: najpierw dane, potem neuron).
+
+**Stan analizy:** rozdziały **11, 12, 14, 19, 20, 21** strawione w pełni (2 zwiadowców). Rozdziały **10 (Informed Traders), 16 (Value Traders), 17 (Arbitrageurs), 28 (Bubbles/Crashes/Circuit Breakers)** — zwiadowca trafił na limit sesji, **do dokończenia** (pula W-270..W-279 zarezerwowana).
+
+**Trzy filary wydobyte:**
+1. **Dekompozycja spreadu i zmienności na trwałe (informacja) vs przejściowe (szum)** — to jest GŁÓWNY przełącznik reżimu: ruch z trwałym impactem = trend (jedź), ruch przejściowy z ujemną autokorelacją = mean-reversion (fade). Naukowy fundament pod nasz Namiestnik.
+2. **Detekcja manipulacji** — spoofing (impact asymetryczny przy net-zero wolumenie), pump-on-social, wash-trade, stop-gunning, squeeze. Cała nowa kategoria obronna (Z/zagrożenie).
+3. **Pełny model kosztu transakcji jako globalna bramka edge** — żaden głos nie strzela, dopóki oczekiwany edge < pełny koszt round-trip (effective spread + impact Glosten-Harris + Amihud). Domyka lukę egzekucji.
+
+**🆕 Wizje BIB-020 — pula W-250..W-269 (rozdz. 11/12/14/19/20/21):**
+
+| Wizja | Opis | Cel / moduł | Rozdz. | Status |
+|---|---|---|---|---|
+| **W-250** | Detektor spoofingu/bluffu: net-zero signed-volume + przesunięcie ceny ⇒ impact asymetryczny (`\|λ_buy−λ_sell\|`) ⇒ FADE + risk-filter ⭐⭐ | neurony (Z) + legatus | 12/14 | 🔴 |
+| **W-251** | Order-flow imbalance autocorrelation (śledzenie dzielonego zlecenia parent) ⇒ momentum-przepływu | neurony (T/V) | 11 | 🔴 |
+| **W-252** | Stop-gunning fade: przebicie okrągłego poziomu/oczywistego stop-clustera + spike wolumenu + brak follow-through ⇒ rewersja ⭐ | neurony (S) | 11 | 🔴 |
+| **W-253** | Filtr ryzyka squeeze na cienkich shortach: funding spike + OI + koszt pożyczki ⇒ blok/zmniejszenie shorta (możliwy 🚨 Prawo XV) | pretorianie/legatus | 11 | 🔴 |
+| **W-254** | Pump-on-social fade: `volume_z + price_ret + spike social` bez głębokości księgi ⇒ FADE low-capa ⭐ | neurony (Z) | 12 | 🔴 |
+| **W-255** | Manipulability-score per aktywo (low-cap/nowy listing/cienka księga/brak perp) ⇒ haircut pewności wszystkich głosów | legatus | 12 | 🔴 |
+| **W-256** | Detektor wash-trade: wolumen bez deplecji top-of-book/ruchu spreadu ⇒ dyskont cech wolumenowych | brama/diagnostyka | 12 | 🔴 |
+| **W-257** | Miernik adverse-selection: udział impactu trwałego vs przejściowego ⇒ przełącznik momentum↔reversion ⭐⭐ | legatus (reżim) | 14 | 🔴 |
+| **W-258** | Glosten-Milgrom Bayesian fair-value drift: `+P·E` na kupno, `−P·E` na sprzedaż ⇒ trend mikrostrukturalny | neurony (T) | 14 | 🔴 |
+| **W-259** | Alarm rozszerzenia spreadu względnego (vs baseline) ⇒ obecność informowanego + risk-filter na pasywne | legatus/neurony | 14 | 🔴 |
+| **W-260** | 4 wymiary płynności (immediacy/width/depth/resiliency) — sizing wg depth + neuron OBI (order-book imbalance) | pretorianie/neurony (L) | 19 | 🔴 |
+| **W-261** | Resiliency: half-life rewersji po szoku ⇒ przełącznik fade vs trend | legatus (reżim) | 19 | 🔴 |
+| **W-262** | Detektor ukrytej płynności (iceberg): powtarzalne refille na poziomie = support/resistance | neurony (S) | 19 | 🔴 |
+| **W-263** | Dekompozycja zmienności fundamental vs transitory; znak autokowariancji = GŁÓWNY przełącznik reżimu ⭐⭐ | legatus (reżim) | 20 | 🔴 |
+| **W-264** | Estymator spreadu Roll (`2·√(−Cov(Δp,Δp₋₁))`) — koszt/spread bez danych quote, tylko z transakcji | brama/metryki | 20 | 🔴 |
+| **W-265** | Money flow (wolumen upticków − downticków) ⇒ neuron LONG/SHORT | neurony (V) | 21 | 🔴 |
+| **W-266** | Globalna bramka kosztu: effective/realized spread + impact Glosten-Harris + Amihud ⇒ edge > pełny koszt, inaczej NEUTRAL ⭐ | legatus/pretorianie | 21 | 🔴 |
+| **W-267** | Implementation Shortfall (Perold) jako scorer własnych fillów (egzekucja QA, nie VWAP na cienkich parach) | metryki/backtest | 21 | 🔴 |
+| **W-268** | Amihud illiquidity neuron/filtr — ⚠️ **NAKŁADKA z W-056** (Amihud+Corwin-Schultz) — scalić, nie dublować (Prawo XVI) | neurony (L) | 21 | 🟡 |
+| **W-269** | Kontroler agresywności egzekucji: market-vs-limit wg opp-cost vs marginal impact (most do ŻYCZ-12 Almgren-Chriss) | pretorianie | 21 | 🟠 kierunkowe |
+
+🚨 **Prawo XVI (dekorelacja) — alert biblioteczny BIB-020:** zanim wdrożymy te wizje, ZMIERZYĆ korelację z istniejącymi głosami mikrostruktury:
+- **W-268 (Amihud)** dubluje **W-056** (Amihud+Corwin-Schultz, już w WIZJONER) → scalić.
+- **W-251/W-265 (OFI/money-flow)** mogą dublować **W-060 (OFI)** → zmierzyć `\|r\|`.
+- **W-250/W-257 (adverse-selection/spoofing)** sąsiadują z **Z-01 (VPIN)** i **W-072 (Hawkes branching)** — VPIN to też miernik toksyczności przepływu → ryzyko `\|r\|>0.80`, mierzyć przed wdrożeniem.
+
+🚨 **Prawo XV (utrata potencjału) — BIB-020:** większość filarów (W-250, W-257, W-260, W-262, W-266) wymaga **danych order-flow / L2 order-book / signed-trade (Lee-Ready)**, których Brama dziś NIE dostarcza (mamy głównie OHLCV). Bez tego byłyby martwym głosem. **Najpierw rozszerzyć Bramę o L2/trade-stream, potem neurony.** Wyjątki wykonalne na samym OHLCV: **W-263, W-264, W-268** (Roll, Amihud, dekompozycja vol z serial-cov) — kandydaci na pierwsze wdrożenie.
+
+**Trzy najmocniejsze, priorytet wdrożenia:**
+1. **W-263** — dekompozycja fundamental/transitory vol + znak autokowariancji jako master-switch reżimu (wykonalne na OHLCV, domyka Namiestnik naukowo).
+2. **W-266** — globalna bramka kosztu transakcji (chroni realny kapitał, domyka lukę egzekucji).
+3. **W-250** — detektor spoofingu/bluffu (nowa oś obronna Z, ale wymaga signed-volume → po Bramie L2).
+
+---
+
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
 
 | BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |
@@ -2039,6 +2092,7 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 | BIB-017 ⭐ | Thinking, Fast and Slow (ŻYCZ-08) | Daniel Kahneman | 8/10 | 🟠 Śr-Wysoki | Biasy tłumu (4 neurony: anchor/overreact/disposition/panic) + 6 reguł ochrony procesu (deflated Sharpe, min. próbka, anty-martingale) → W-230..W-239 |
 | BIB-018 ⭐ | Positional Option Trading (ŻYCZ-07) | Euan Sinclair | 9/10 | 🔴 Wysoki | FINALNA matematyka sizingu: skew-Kelly, CI-Kelly (SD f̂), subkonto pełny-Kelly, doktryna stopów momentum-only, counterparty cap → W-240..W-249 |
 | BIB-019 | Handbook for Cryptocurrencies Trading | Virginia Harris | ❌ 2/10 | ⬛ Zero | ODRZUCONA — wypełniacz, anty-systematyczny, przeterminowany, zero matematyki/funding/perp. Wizji nie przyznano (Prawo I) |
+| BIB-020 ⭐ | Trading and Exchanges: Market Microstructure for Practitioners (ŻYCZ-10) | Larry Harris | 9/10 | 🔴 Wysoki | Biblia mikrostruktury — celuje w osie Z/L: dekompozycja spread/vol trwałe-vs-przejściowe (master-switch reżimu), detekcja spoofing/squeeze/stop-gunning/pump, globalna bramka kosztu transakcji (effective/realized spread, impact Glosten-Harris, Roll, Amihud, money-flow, IS) → W-250..W-269 (rozdz.10/16/17/28 do dokończenia → W-270..W-279) |
 
 **Trzy najcenniejsze, bezpośrednio implementowalne wizje:**
 1. **W-089 NeuronNVT** — Network Value to Transactions (BIB-003) — twardy on-chain, brak odpowiednika w systemie
@@ -2098,12 +2152,12 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 | # | Tytuł | Autor | Luka / kat. | Dlaczego krytyczne | Status |
 |---|---|---|---|---|---|
 | **ŻYCZ-09** ⭐ | Zasoby on-chain (Glassnode Academy / checkonchain.com / woocharts) | — | **O (prawie pusta!)** | MVRV, SOPR, NUPL, NVT, realized cap. Crypto bez on-chain = ślepota na wieloryby. ⚠️ wymaga API w Bramie | 🔴 PRIORYTET #1 |
-| **ŻYCZ-10** ⭐ | Trading and Exchanges: Market Microstructure for Practitioners | Larry Harris | Z/A (tylko VPIN) | Biblia mikrostruktury: order flow, market making, likwidność | 🔴 |
+| **ŻYCZ-10** ⭐ | Trading and Exchanges: Market Microstructure for Practitioners | Larry Harris | Z/A (tylko VPIN) | Biblia mikrostruktury: order flow, market making, likwidność | ✅ **ZDOBYTA → BIB-020** (9/10, W-250..W-269; rozdz.10/16/17/28 do dokończenia) |
 | **ŻYCZ-11** | Market Microstructure Theory | Easley & O'Hara | Z (teoria VPIN) | Autorzy VPIN — fundament teoretyczny naszego Z-01 | 🟠 |
 | **ŻYCZ-12** | Optimal Execution (Almgren-Chriss) | Almgren & Chriss | egzekucja (ZERO) | Jak wchodzić/wychodzić minimalizując impact — krytyczne przy realnym kapitale | 🟠 |
 | **ŻYCZ-13** | Analysis of Financial Time Series | Ruey Tsay | szeregi czasowe/ML | GARCH/VAR/reżimy od podstaw — domyka W-126 GARCH | 🟠 |
 | **ŻYCZ-14** | Mechanika perpetual futures + funding rate arbitrage | (zasób/książka) | crypto-specyfika | Bezpośrednio pod naszą giełdę (MEXC) — funding jako sygnał i koszt | 🟡 |
 
-**Bezdyskusyjny priorytet #1: ŻYCZ-09 on-chain** — jedyna prawie-pusta oś (O). Zaraz po: ŻYCZ-10 Harris (mikrostruktura Z).
+**Bezdyskusyjny priorytet #1: ŻYCZ-09 on-chain** — jedyna prawie-pusta oś (O). ✅ ŻYCZ-10 Harris (mikrostruktura Z) **ZDOBYTA → BIB-020**.
 
 *Lista życzeń otwarta — Cezar dostarcza, Claude analizuje i przenosi do BIB-019+.* 🎯📚⚔️

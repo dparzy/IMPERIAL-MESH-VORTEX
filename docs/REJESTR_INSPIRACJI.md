@@ -225,6 +225,8 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 | INF-29 ⭐ | "Thinking, Fast and Slow" — Daniel Kahneman (2011) | (BIB-017, ŻYCZ-08) | Biasy TŁUMU jako neurony (anchoring/overreaction/**disposition effect**/availability-panic, W-230..233) + reguły ochrony procesu (min. próbka, shrinkage+deflated Sharpe, WYSIATI/martwy głos, anty-martingale, W-234..239). Disposition = tradeable nieefektywność | Faza 2 |
 | INF-30 ⭐ | "Positional Option Trading" — Euan Sinclair (2020) | ISBN 978-1119583516 (BIB-018, ŻYCZ-07) | FINALNA matematyka sizingu (uściśla BIB-008): **skew-adjusted Kelly** (3. moment), **CI-Kelly wzór na SD(f̂)** + skalowanie pod P(over-bet), subkonto pełny-Kelly, trailing% subkonto, **doktryna stopów: cena-stop tylko dla momentum** (na mean-rev szkodzi!), counterparty cap (MEXC) → W-240..W-249 | Faza 1-2 |
 
+| INF-31 | "Handbook for Cryptocurrencies Trading" — Virginia Harris | (BIB-019) | ❌ ODRZUCONA 2/10 — wypełniacz dla nowicjusza spotowego, anty-systematyczny/anty-leverage, przeterminowane martwe giełdy, zero matematyki, brak funding/perp/DeFi/on-chain. Wizji NIE przyznano (Prawo I). Rekomendacja: porzucić handbooki detaliczne pod oś O → kierunek ŻYCZ-09..14 | — |
+
 > **Pełna lista (~220 narzędzi):** `docs/ARSENAL_IMPERIUM.md` — schemat architektoniczny + tabele weryfikacyjne.
 
 ---

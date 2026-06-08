@@ -2002,6 +2002,20 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 
 ---
 
+### 📕 BIB-019 — "Handbook for Cryptocurrencies Trading" — Virginia Harris ❌ ODRZUCONA (2/10)
+
+**Autor:** Virginia Harris (ghost-written "Mindful Finance", self-published) · **Ocena:** ❌ **2/10 — WYPEŁNIACZ** · **Priorytet:** ⬛ Zero
+
+**Werdykt (Prawo I — uczciwie):** beletrystyka dla nowicjusza spotowego HODL-era. Anty-systematyczna (*"90% of the time strict application of patterns will result in failing"*, *"matter of sixth sense"*), anty-leverage, anty-futures (radzi trzymać low-capy BEZ stop-lossa — dla nas wręcz szkodliwe). Przeterminowana: rekomenduje martwe/zhakowane giełdy (Cryptopia, CryptoBridge, CoinExchange) — łamie Prawo I. Zero matematyki operacyjnej (jedyne wzory SMA/EMA/StochRSI — mamy 10× lepiej). Patterny czysto wizualne, niekodowalne. Psychologia = przepisany Wall Street Cheat Sheet (redundancja z BIB-017/016).
+
+**Oś O (on-chain) NIE zostaje wypełniona:** obiecuje "on-chain metrics", dostarcza definicje słownikowe bez algorytmu/progu/normalizacji. **Brak funding rate, perpetual mechanics, basis, open interest, tokenomiki, DeFi TVL.** Pre-DeFi, czysto spotowa.
+
+**Wizje: NIE PRZYZNANO.** Pula W-250..W-259 wolna na lepsze źródło. Wpisanie czegokolwiek obok López de Prado/Sinclair/Mandelbrot byłoby naciąganiem (Prawo I).
+
+🚨 **Rekomendacja kierunkowa:** porzucić handbooki detaliczne jako źródło osi O. Właściwe źródła crypto-native: dokumentacja funding/basis (Binance/Deribit), VPIN na perpetualach, research Glassnode (NVT/SOPR/MVRV), tokenomika unlocków → to kierunek ŻYCZ-09..14.
+
+---
+
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
 
 | BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |
@@ -2024,6 +2038,7 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 | BIB-016 | Trading in the Zone | Mark Douglas | ⚠️ 4/10 | 🟡 Niski-Śr | Psychologia (85% martwa dla automatu). Cenne: W-224 Legatus=prawdopodobieństwo, W-220 edge na oknie≥20 → W-220..W-225 |
 | BIB-017 ⭐ | Thinking, Fast and Slow (ŻYCZ-08) | Daniel Kahneman | 8/10 | 🟠 Śr-Wysoki | Biasy tłumu (4 neurony: anchor/overreact/disposition/panic) + 6 reguł ochrony procesu (deflated Sharpe, min. próbka, anty-martingale) → W-230..W-239 |
 | BIB-018 ⭐ | Positional Option Trading (ŻYCZ-07) | Euan Sinclair | 9/10 | 🔴 Wysoki | FINALNA matematyka sizingu: skew-Kelly, CI-Kelly (SD f̂), subkonto pełny-Kelly, doktryna stopów momentum-only, counterparty cap → W-240..W-249 |
+| BIB-019 | Handbook for Cryptocurrencies Trading | Virginia Harris | ❌ 2/10 | ⬛ Zero | ODRZUCONA — wypełniacz, anty-systematyczny, przeterminowany, zero matematyki/funding/perp. Wizji nie przyznano (Prawo I) |
 
 **Trzy najcenniejsze, bezpośrednio implementowalne wizje:**
 1. **W-089 NeuronNVT** — Network Value to Transactions (BIB-003) — twardy on-chain, brak odpowiednika w systemie

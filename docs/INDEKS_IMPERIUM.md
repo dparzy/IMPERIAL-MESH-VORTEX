@@ -66,6 +66,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 30 | `WERSJONOWANIE.md` | Wersjonowanie i pieczęć Imperium — historia tagów i polityka wersji | ✅ Aktywny |
 | 31 | `WIZJONER.md` | Wizjoner — brudnopis Imperium: rozmowy → wizje → zadania → kod | ✅ Aktywny |
 | 32 | `NAMIESTNIK.md` | **Namiestnik** — Regime + Timeframe-Aware Gating Network (reżim×styl → tryb/lewar/rynek/próg), tabela dowodowa, fazy | ✅ Aktywny |
+| 33 | `MANUAL_MIGRACJA_I_SYMULATOR.md` | **Manual migracji na laptopa (Windows/Fujitsu) + symulator live** — pełny pipeline, bramki wstrzymania long/short, weryfikacja doradców (Hermes ✅, Chimera ❌) | ✅ Aktywny |
 
 ---
 

@@ -36,7 +36,6 @@ import time
 import hashlib
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)-7s | %(message)s')
 logger = logging.getLogger("Mnemosyne")

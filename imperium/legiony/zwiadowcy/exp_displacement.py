@@ -25,9 +25,9 @@ Logika:
   kierunek     = znak (close - close[lookback]) — dokąd poszedł impuls
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict
 
-from .baza import ZwiadowcaElitarny, RaportZwiadowcy, TypDanych
+from .baza import ZwiadowcaElitarny, RaportZwiadowcy
 
 
 def _atr_series(bary: List[Dict]) -> List[float]:
@@ -136,13 +136,13 @@ class ZwiadowcaDisplacement(ZwiadowcaElitarny):
         if kierunek_impulsu > 0:
             return self._buduj_raport(
                 kierunek="LONG", pewnosc=pewnosc,
-                powody=[f"IMPULS STRUKTURALNY w górę (kontynuacja) → LONG"] + powody,
+                powody=["IMPULS STRUKTURALNY w górę (kontynuacja) → LONG"] + powody,
                 diagnostics=diag, n_barow=len(bary),
             )
         if kierunek_impulsu < 0:
             return self._buduj_raport(
                 kierunek="SHORT", pewnosc=pewnosc,
-                powody=[f"IMPULS STRUKTURALNY w dół (kontynuacja) → SHORT"] + powody,
+                powody=["IMPULS STRUKTURALNY w dół (kontynuacja) → SHORT"] + powody,
                 diagnostics=diag, n_barow=len(bary),
             )
 

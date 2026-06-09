@@ -12,8 +12,6 @@ Mechanizm:
 """
 
 import time, logging
-from dataclasses import dataclass
-from typing import List, Optional
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)-7s | %(message)s')
 logger = logging.getLogger("AegisShield")

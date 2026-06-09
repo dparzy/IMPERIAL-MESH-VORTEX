@@ -22,7 +22,7 @@
 ║   v1.0 (2026-05-30) — 3 neurony, ważony głos, neuron reżimu.      ║
 ╚══════════════════════════════════════════════════════════════════╝
 """
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, Tuple
 import numpy as np
 

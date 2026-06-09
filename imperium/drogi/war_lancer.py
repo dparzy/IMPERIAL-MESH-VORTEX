@@ -13,7 +13,6 @@ Mechanizm:
 
 import time, random, hashlib, logging
 from dataclasses import dataclass
-from typing import Optional
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)-7s | %(message)s')
 logger = logging.getLogger("WarLancer")

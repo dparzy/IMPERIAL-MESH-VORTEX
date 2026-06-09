@@ -4,8 +4,7 @@ import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from imperium.drogi.scheduler import (
-    Scheduler, KonfiguracjaSchedulera, TrybSchedulera,
-    _mock_fetch, _mock_sygnal, _mock_execute,
+    Scheduler, KonfiguracjaSchedulera,
 )
 from imperium.pretorianie.kalkulator_lewara import BezpiecznikKapitalu
 

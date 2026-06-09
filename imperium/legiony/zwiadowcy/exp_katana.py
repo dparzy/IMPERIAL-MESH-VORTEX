@@ -23,10 +23,9 @@ Główne cechy:
   - Signal_Strength = |Price_Momentum| / ATR (siła względem zmienności)
 """
 
-import math
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Dict, Tuple, Optional
 
-from .baza import ZwiadowcaElitarny, RaportZwiadowcy, TypDanych
+from .baza import ZwiadowcaElitarny, RaportZwiadowcy
 
 
 # ── Pomocnicze ────────────────────────────────────────────────────────────────

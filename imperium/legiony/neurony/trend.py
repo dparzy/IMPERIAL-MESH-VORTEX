@@ -270,11 +270,11 @@ class NeuronFibonacci(MikroNeuron):
                 return self._bazowy_sygnal(close, "NEUTRAL", 0.20, powody)
             if momentum_long:
                 pewnosc = 0.60 + (0.10 if pozycja < 0.5 else 0.0)
-                powody.append(f"W złotej strefie + momentum w górę → wsparcie Fibo")
+                powody.append("W złotej strefie + momentum w górę → wsparcie Fibo")
                 return self._bazowy_sygnal(close, "LONG", pewnosc, powody)
             if momentum_short:
                 pewnosc = 0.60 + (0.10 if pozycja > 0.5 else 0.0)
-                powody.append(f"W złotej strefie + momentum w dół → opór Fibo")
+                powody.append("W złotej strefie + momentum w dół → opór Fibo")
                 return self._bazowy_sygnal(close, "SHORT", pewnosc, powody)
 
         elif pozycja > 0.618:
@@ -349,7 +349,7 @@ class NeuronRSIDiv(MikroNeuron):
 
         # Brak dywergencji — sygnały zgodne
         return self._bazowy_sygnal(rsi, "NEUTRAL", 0.10,
-            [f"Brak dywergencji: cena i RSI idą w tym samym kierunku"])
+            ["Brak dywergencji: cena i RSI idą w tym samym kierunku"])
 
 
 class NeuronHMA(MikroNeuron):

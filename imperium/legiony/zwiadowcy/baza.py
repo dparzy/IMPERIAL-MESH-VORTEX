@@ -23,8 +23,6 @@ RaportZwiadowcy zawiera:
   - pewnosc_metody: float — ile barów miało dane (jakość wejścia 0.0-1.0)
 """
 
-import time
-import hashlib
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field

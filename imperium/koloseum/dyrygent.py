@@ -47,7 +47,7 @@ from datetime import datetime, timezone
 from typing import Callable, List, Optional, Dict, Any
 
 from imperium.koloseum.paper_trading import (
-    PaperTradingEngine, SygnalWejscia, BarData,
+    PaperTradingEngine, SygnalWejscia,
 )
 from imperium.koloseum.namiestnik import Namiestnik, get_namiestnik
 from imperium.pretorianie.kalkulator_lewara import (

@@ -1,11 +1,11 @@
 """Testy Dywizji Exploratores — baza, igrzyska, HFD, HA Scalper Full, Hurst, Kalman."""
 
-import sys, os, math
+import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from imperium.legiony.zwiadowcy.baza import ZwiadowcaElitarny, RaportZwiadowcy, TypDanych
+from imperium.legiony.zwiadowcy.baza import ZwiadowcaElitarny, RaportZwiadowcy
 from imperium.legiony.zwiadowcy.igrzyska_exploratores import (
-    IgrzyskaExploratores, StatystykaZwiadowcy, okresl_range_exploratores, RANGI_EXPLORATORES,
+    IgrzyskaExploratores, okresl_range_exploratores,
 )
 from imperium.legiony.zwiadowcy.exp_higuchi import ZwiadowcaHiguchiFD, _higuchi_fd
 from imperium.legiony.zwiadowcy.exp_ha_scalper import ZwiadowcaHAScalper, _oblicz_ha
@@ -13,7 +13,7 @@ from imperium.legiony.zwiadowcy.exp_hurst import ZwiadowcaHurst, _hurst_rs
 from imperium.legiony.zwiadowcy.exp_kalman import ZwiadowcaKalmanATR, _kalman_filter_1d, _kalman_atr
 from imperium.legiony.zwiadowcy.exp_smc import (
     ZwiadowcaSMC, aktywuj_neurony_smc,
-    _swing_pivots, _wykryj_fvg, _wykryj_order_blocks, _wykryj_bos_mss,
+    _swing_pivots, _wykryj_fvg, _wykryj_order_blocks,
 )
 
 
@@ -577,7 +577,6 @@ def test_katana_oblicz_ha_nie_repaintuje():
     ha_open_1_rekurencyjny = (ha[0]["ha_open"] + ha[0]["ha_close"]) / 2
     assert abs(ha[1]["ha_open"] - ha_open_1_rekurencyjny) < 1e-9, "HA_Open NIE jest rekurencyjne!"
     # HA_Open[1] != (Open[0]+Close[0])/2 — weryfikacja że to nie buggy wersja
-    buggy_ha_open_1 = (bary[0]["open"] + bary[0]["close"]) / 2
     # Mogą być równe tylko przypadkowo — sprawdź HA_Open[2] (głębsza rekurencja)
     ha_open_2_rekurencyjny = (ha[1]["ha_open"] + ha[1]["ha_close"]) / 2
     assert abs(ha[2]["ha_open"] - ha_open_2_rekurencyjny) < 1e-9, "Rekurencja pęka na barze 2!"
@@ -758,9 +757,7 @@ def test_sweep_brak_lookahead():
     # bar sweep: wybija high, zamyka bearish
     bary = bazowe + [{"open": 100.4, "high": 102, "low": 100.0, "close": 100.1}]
     r1 = s.analizuj(bary)
-    # Dodaj "przyszłe" bary — sygnał dla tego samego ostatniego bara liczony osobno
-    bary_future = bary + [{"open": 100, "high": 105, "low": 99, "close": 104}]
-    # r1 liczony na barach do sweepu — nie zna przyszłości. To jest dowód.
+    # r1 liczony na barach do sweepu — nie zna przyszłości. To jest dowód braku lookahead.
     r2 = s.analizuj(bary[:20])  # identyczny zakres
     assert r1.kierunek == r2.kierunek  # determinizm bez lookahead
 

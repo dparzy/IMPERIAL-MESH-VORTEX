@@ -4,14 +4,13 @@ Reguły głosowania: 5/5=pełna pozycja, 4/5=ok, 3/5=50%, <3=blokada.
 IUSTITIA BLOKADA lub HERMES NIEKOMPLETNE = veto bezwarunkowe.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional
+from dataclasses import dataclass
 
-from .oracle import OcenaOracle, WerdyktOracle
-from .fulmen import OcenaFulmen, WerdyktFulmen
+from .oracle import OcenaOracle
+from .fulmen import OcenaFulmen
 from .iustitia import OcenaIustitia, WerdyktIustitia
 from .hermes import OcenaHermes, WerdyktHermes
-from .pythia import OcenaPythia, WerdyktPythia
+from .pythia import OcenaPythia
 
 
 @dataclass
@@ -29,7 +28,6 @@ class OpinaRady:
     decyzja: str = ""
 
     def raport(self, symbol: str = "", pewnosc_legatus: float = 0.0) -> str:
-        linia = "═" * 70
         def fmt(nazwa: str, werdykt: str, szczegol: str) -> str:
             return f"  {nazwa:<10} .......... {werdykt:<20} [{szczegol}]"
 

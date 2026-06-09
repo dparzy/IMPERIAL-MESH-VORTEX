@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-09 | INFRA | Wykrywanie bugów: ruff (Warstwa 13) + reguła test-granic + adversarial review
+
+**Kontekst:** Cezar zapytał, czemu zewnętrzny recenzent (cubic) łapie bugi, a my nie.
+Diagnoza: nasz audyt (12 warstw) sprawdzał SPÓJNOŚĆ (liczby/klucze/dokumenty=kod), nie
+POPRAWNOŚĆ logiki ani statyczną jakość; testy pisaliśmy na „happy path", bez granic;
+brak lintera. Wdrożono trzy uzupełniające się mechanizmy (wszystkie do zasad):
+
+1. **Warstwa 13 audytu — ruff** (`ruff.toml`, ruleset F+E9): linter łapie bugi/martwy
+   kod, których warstwy spójności nie widzą. Zweryfikowano: F811 łapie duplikat klasy
+   (dokładnie bug z merge, który cubic znalazł). Audyt blokuje commit przy znalezisku;
+   gdy ruff niezainstalowany → tylko nota (działa w minimalnym środowisku).
+2. **Reguła Test-Granic** (rozszerzenie Prawa XXI w CLAUDE.md): każdy moduł z progiem/
+   znakiem MUSI mieć testy granic (0/None/±/dokładny-próg/trwałość-stanu).
+3. **Adversarial `/code-review` przed każdym push** (rozkaz stały): wrogi przegląd
+   logiki/granic — ta sama perspektywa co cubic, ale ZANIM trafi na PR.
+
+**Sprzątanie przy okazji (Prawo XV/XIX):** ruff wyczyścił 88 nieużywanych importów +
+puste f-stringi, oraz realne znaleziska: martwy policzony sygnał `trend_napływu` (OC-04),
+martwe zmienne (`wzorzec`, `linia`, `powody`), zepsute demo `mikro_neuron.py` (odwołania
+do nieistniejących klas → NameError przy uruchomieniu), forward-ref `RaportAreny` przez
+TYPE_CHECKING.
+
+**Pliki:** `ruff.toml` (nowy), `requirements.txt`, `narzedzia/audyt_spojnosci.py` (W13),
+`CLAUDE.md` (3 zasady), 9 plików kodu/testów (sprzątanie ruff).
+**Testy:** 586/586 ✅. Audyt: 13 warstw, pełna harmonia (exit 0), ruff czysto.
+
+---
+
 ## 2026-06-09 | FIX | Force Index (V-05) — granice fi==0 + tag źródła pure-Python (PR review cubic)
 
 **Opis:** Dwie poprawki po recenzji PR (cubic-dev-ai):

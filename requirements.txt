@@ -20,3 +20,6 @@ openai>=1.0            # klucz: os.getenv("DEEPSEEK_API_KEY") — NIGDY w kodzie
 
 # ── Wizualizacja (świątynie/ — dashboard) ──
 matplotlib>=3.7
+
+# ── Kontrola jakości kodu (Warstwa 13 audytu — łapie bugi/martwy kod) ──
+ruff>=0.13             # linter bramki: F (pyflakes) + E9; konfiguracja w ruff.toml

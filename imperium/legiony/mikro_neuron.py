@@ -16,7 +16,6 @@ Nowy neuron = dziedziczysz po MikroNeuron i nadpisujesz interpretuj().
 """
 
 import time
-import hashlib
 import logging
 from dataclasses import dataclass, field
 from typing import List, Optional
@@ -154,10 +153,13 @@ class Roj:
 # ─── Demo ─────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
+    from imperium.legiony.neurony.momentum import NeuronStochRSI
+    from imperium.legiony.neurony.psychologia import NeuronFundingExtreme
+
     logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(message)s')
 
-    przyklad = {"StochRSI": 18.5, "FundingRate": 0.0005}
-    roj = Roj([NeuronStochRSI(), NeuronFundingRate()])
+    przyklad = {"STOCHRSI": 18.5, "FUNDING_RATE": 0.0005}
+    roj = Roj([NeuronStochRSI(), NeuronFundingExtreme()])
 
     print("=== Rój Imperium — demo 2 neuronów ===\n")
     for s in roj.zbierz_sygnaly(przyklad):

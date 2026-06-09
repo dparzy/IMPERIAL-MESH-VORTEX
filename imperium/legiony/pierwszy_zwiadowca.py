@@ -50,8 +50,8 @@ import os
 import importlib.util
 import logging
 import numpy as np
-from dataclasses import dataclass, field
-from typing import List, Optional, Dict
+from dataclasses import dataclass
+from typing import List, Optional
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)-7s | %(message)s')
 logger = logging.getLogger("PierwszyZwiadowca")

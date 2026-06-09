@@ -128,7 +128,7 @@ def raport_lookahead(sciezka: str, interwal: str, okno: int = 250,
     print(f"  🔍 DETEKTOR LOOKAHEAD — {sciezka} ({interwal}, {len(bary)} barów)")
     print(f"{'═'*70}")
     if not rozb:
-        print(f"  ✅ CZYSTO — zero przecieku przyszłości (Prawo I zachowane)")
+        print("  ✅ CZYSTO — zero przecieku przyszłości (Prawo I zachowane)")
     else:
         print(f"  🚨 LOOKAHEAD-BIAS — {len(rozb)} rozbieżności:")
         for r in rozb[:10]:

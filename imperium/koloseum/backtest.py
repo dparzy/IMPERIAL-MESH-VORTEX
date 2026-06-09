@@ -21,7 +21,11 @@ Użycie (CLI):
 
 import logging
 import sys
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional, Tuple, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Tylko do adnotacji typu — w runtime importowany leniwie w funkcji (unika cyklu)
+    from imperium.biblioteki.arena_trzech_bram import RaportAreny
 
 from imperium.akwedukty.czytnik_csv import wczytaj_csv
 from imperium.koloseum.dyrygent import Dyrygent

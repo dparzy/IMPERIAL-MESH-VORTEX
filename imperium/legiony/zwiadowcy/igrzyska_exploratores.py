@@ -43,8 +43,8 @@ FORMUŁA WYNIK_NEURONU dla Exploratores:
     Jeśli zwiadowca sygnalizuje 2× rzadziej od średniej → +0.05 do wyniku.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Tuple
+from dataclasses import dataclass
+from typing import List, Dict, Optional
 
 
 # ─── Rangi Exploratores ───────────────────────────────────────────────────────

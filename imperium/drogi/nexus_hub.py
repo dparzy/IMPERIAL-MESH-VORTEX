@@ -12,7 +12,7 @@ Mechanizm:
 4. AUDYTOWALNY DECISION LOG — każda decyzja routingu z hashem SHA-256.
 """
 
-import asyncio, time, hashlib, random, sqlite3, logging
+import asyncio, time, hashlib, random, logging
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 from enum import Enum

@@ -8,11 +8,10 @@ Bez logu = bez dowodu. Lex Memoriae (Prawo IX).
 import uuid
 import json
 import os
-import hashlib
 import logging
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from typing import List, Optional, Dict, Any
+from typing import List, Dict, Any
 from pathlib import Path
 
 logger = logging.getLogger("PamiecAbsolutna")
@@ -180,7 +179,6 @@ class PamiecAbsolutna:
         wyniki = []
         if not self.katalog.exists():
             return wyniki
-        wzorzec = f"{data}*{symbol}*{log_typ.lower()}*".replace("**", "*")
         for plik in self.katalog.rglob("*.jsonl"):
             if self._pasuje(plik.name, symbol, data, log_typ):
                 with open(plik, encoding="utf-8") as f:

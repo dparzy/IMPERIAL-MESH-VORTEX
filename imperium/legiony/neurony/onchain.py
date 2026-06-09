@@ -137,14 +137,8 @@ class NeuronExchangeNetflow(MikroNeuron):
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         netflow = wskazniki.get("EXCHANGE_NETFLOW_BTC")  # BTC: + = napływ, - = odpływ
-        netflow_ma7 = wskazniki.get("EXCHANGE_NETFLOW_MA7")
         if netflow is None:
             return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak Exchange Netflow"])
-
-        if netflow_ma7 is not None:
-            trend_napływu = netflow > netflow_ma7
-        else:
-            trend_napływu = netflow > 0
 
         if netflow < -5000:
             return self._bazowy_sygnal(netflow, "LONG", 0.85,

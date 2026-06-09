@@ -120,8 +120,6 @@ class NeuronCVD(MikroNeuron):
         if cvd is None:
             return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak CVD"])
 
-        powody = []
-
         # Dywergencja
         if cvd_prev is not None and close is not None and close_prev is not None:
             cvd_rosnie = cvd > cvd_prev

@@ -19,6 +19,7 @@ Sprawdza 12 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 10 — słowa kluczowe:  kluczowe dokumenty modułowe zawierają wymagane terminy
   Warstwa 11 — biblioteki/:     moduły w imperium/biblioteki/ wymienione w INDEKS_IMPERIUM
   Warstwa 12 — żywotność głosu: każdy aktywny neuron głosuje (≠martwy) w ≥1 scenariuszu (Prawo XV)
+  Warstwa 13 — ruff (linter):   bugi i martwy kod (F811 duplikaty, F821 undefined, F841/F401 martwe)
 
 Exit code:
   0 = pełna spójność (Imperium gotowe)
@@ -30,7 +31,8 @@ Zasada: ten skrypt NIE liczy z pamięci. Wszystkie liczby pochodzą z żywego ko
 import os
 import re
 import sys
-from datetime import date, datetime
+import subprocess
+from datetime import date
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -303,7 +305,6 @@ def audyt() -> tuple:
     # ── WARSTWA 8: LOG_ZMIAN — świeżość ─────────────────────────────────────
     try:
         import glob
-        import time
 
         log = _czytaj("docs/LOG_ZMIAN.md")
 
@@ -373,6 +374,43 @@ def audyt() -> tuple:
     bledy += w12_bledy
     info += w12_info
 
+    # ── WARSTWA 13: RUFF — bugi/martwy kod (linter, Prawo XXI) ─────────────────
+    w13_bledy, w13_info = _warstwa_13_ruff()
+    bledy += w13_bledy
+    info += w13_info
+
+    return bledy, info
+
+
+def _warstwa_13_ruff():
+    """
+    W13 — statyczny linter (ruff) łapie BUGI i martwy kod, których warstwy
+    spójności nie widzą: duplikaty klas (F811), niezdefiniowane nazwy (F821),
+    martwe zmienne (F841), nieużyte importy (F401). Konfiguracja: ruff.toml.
+
+    Filozofia jak testy: jeśli ruff NIE jest zainstalowany → tylko nota (audyt
+    działa w minimalnym środowisku). Jeśli JEST i znajdzie błąd → twarda blokada.
+    """
+    bledy, info = [], []
+    try:
+        wynik = subprocess.run(
+            [sys.executable, "-m", "ruff", "check", "imperium", "tests", "narzedzia",
+             "--quiet", "--output-format", "concise"],
+            cwd=ROOT, capture_output=True, text=True, timeout=120,
+        )
+    except FileNotFoundError:
+        info.append("⚠️ W13: ruff niezainstalowany — linter pominięty (pip install ruff)")
+        return bledy, info
+    except Exception as e:
+        info.append(f"⚠️ W13: ruff nie uruchomił się ({e}) — linter pominięty")
+        return bledy, info
+
+    if wynik.returncode == 0:
+        info.append("Ruff (W13): czysto ✅ (F+E9 — bez bugów/martwego kodu)")
+    else:
+        linie = [l for l in wynik.stdout.strip().splitlines() if l.strip()]
+        bledy.append(f"[W13] Ruff wykrył {len(linie)} problemów (bugi/martwy kod): "
+                     f"{linie[:8]}{' …' if len(linie) > 8 else ''}")
     return bledy, info
 
 

@@ -652,7 +652,7 @@ def test_brama_ulcer_dokladnie_period():
 def test_brama_yang_zhang_zakres():
     """Brama (W-055): Yang-Zhang zwraca annualizowaną vol > 0 na realnej serii OHLC."""
     from imperium.fundament.brama_kalkulatora import _py_yang_zhang
-    import math, random
+    import random
     random.seed(7)
     o, h, l, c = [], [], [], []
     cena = 100.0

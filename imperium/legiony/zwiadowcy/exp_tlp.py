@@ -27,9 +27,9 @@ Logika:
   SHORT gdy close przebija target_down ORAZ poprzedni close był > poprzedni target_down
 """
 
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Dict, Tuple
 
-from .baza import ZwiadowcaElitarny, RaportZwiadowcy, TypDanych
+from .baza import ZwiadowcaElitarny, RaportZwiadowcy
 
 
 def _atr_series(bary: List[Dict]) -> List[float]:

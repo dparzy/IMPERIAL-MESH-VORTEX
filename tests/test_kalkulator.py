@@ -1,14 +1,12 @@
 """Testy Kalkulatora Lewara — likwidacja, stop-loss, bezpiecznik AOA (W-028)."""
 
 import sys, os
-from datetime import date as _date
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from datetime import date
 
 from imperium.pretorianie.kalkulator_lewara import (
-    KalkulatorLewara, BezpiecznikKapitalu, MAX_DRAWDOWN_STOP,
-    VOL_TARGET_DEFAULT, SKALA_VOL_MIN, SKALA_VOL_MAX,
+    KalkulatorLewara, BezpiecznikKapitalu, SKALA_VOL_MIN, SKALA_VOL_MAX,
     BezpiecznikKrzywejKapitalu, SkalowanieFrakcjaDD,
     RegulaSzesciuProcentEldera,
 )

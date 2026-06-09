@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-06-09 | FIX | Reguła 6% Elder — data ze świecy + HALT do końca miesiąca + usunięcie duplikatu (PR review cubic)
+
+**Opis:** Trzy poprawki po recenzji PR (cubic-dev-ai):
+1. **P1 — data z czasu świecy:** `Dyrygent.cykl()` przekazywał `regula_6pct.aktualizuj()`
+   bez daty → w backteście używał `date.today()` (czas systemowy), błędnie licząc
+   reset/HALT względem zegara maszyny, nie kalendarza danych. Teraz konwertuje
+   `timestamp` świecy (ms epoch, UTC) na datę i przekazuje jako `dzisiaj=`.
+2. **P2 — HALT do końca miesiąca:** logika zdejmowała HALT, gdy kapitał chwilowo
+   odrobił w tym samym miesiącu — sprzecznie z komunikatem „HALT do końca miesiąca"
+   i doktryną Eldera. Usunięto gałąź `strata < prog → NORMAL`; HALT trwa do zmiany
+   miesiąca lub ręcznego `reset_miesiac()`.
+3. **Duplikat klasy:** `RegulaSzesciuProcentEldera` była zdefiniowana DWUKROTNIE
+   (pozostałość po rozwiązaniu konfliktu merge) — druguje shadowowała pierwszą.
+   Usunięto duplikat, została jedna definicja (przy bezpiecznikach AOA/W-062).
+
+**Pliki:** `imperium/koloseum/dyrygent.py`, `imperium/pretorianie/kalkulator_lewara.py`,
+`tests/test_kalkulator.py`, `tests/test_dyrygent.py`, `README.md`.
+**Testy:** +2 (582→584/584). Audyt: pełna harmonia (exit 0).
+**Symulator:** issues cubic w `symulator_live.html` zostawione do wersji on-demand
+(rozkaz stały Cezara — symulatory poza auto-audytem).
+
+---
+
 ## 2026-06-09 | FEATURE | Triple Screen Eldera (BIB-015) + neuron Force Index (V-05)
 
 **Opis:** Domknięcie BIB-015 (Alexander Elder). Dwa elementy:

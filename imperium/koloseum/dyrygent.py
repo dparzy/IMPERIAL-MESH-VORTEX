@@ -43,6 +43,7 @@ Użycie (test, bez TA-Lib):
 
 import logging
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Callable, List, Optional, Dict, Any
 
 from imperium.koloseum.paper_trading import (
@@ -258,7 +259,15 @@ class Dyrygent:
             # inaczej breaker myli utylizację depozytu z drawdownem (Prawo XV).
             self.breaker_krzywej.aktualizuj(self.engine.kapital_calkowity)
         if self.regula_6pct is not None:
-            self.regula_6pct.aktualizuj(self.engine.kapital_calkowity)
+            # Data z czasu ŚWIECY (nie systemowego!) — w backteście timestamp to
+            # czas bara, więc reset/HALT liczą się względem kalendarza danych, nie
+            # date.today() maszyny (Prawo I — zero zniekształcenia czasem systemu).
+            dzien_swiecy = None
+            if timestamp is not None:
+                dzien_swiecy = datetime.fromtimestamp(
+                    timestamp / 1000, tz=timezone.utc).date()
+            self.regula_6pct.aktualizuj(self.engine.kapital_calkowity,
+                                        dzisiaj=dzien_swiecy)
 
         plan = self.kalkulator.policz(
             symbol=symbol,

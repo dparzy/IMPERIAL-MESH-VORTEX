@@ -315,8 +315,10 @@ class RegulaSzesciuProcentEldera:
         if strata >= self.prog and self.stan != "HALT":
             self.stan = "HALT"
             logger.warning(f"📐 REGUŁA 6% (Elder): strata miesięczna {strata:.1%} ≥ {self.prog:.0%} — HALT do końca miesiąca (BIB-015)")
-        elif strata < self.prog and self.stan == "HALT":
-            self.stan = "NORMAL"
+        # UWAGA (Prawo I): HALT trwa DO KOŃCA MIESIĄCA — nie zdejmujemy go, gdy kapitał
+        # chwilowo odrobi (to byłoby sprzeczne z komunikatem i z doktryną Eldera:
+        # po przekroczeniu 6% odkładasz klawiaturę do nowego miesiąca). Reset tylko
+        # przez zmianę miesiąca (wyżej) albo ręczny reset_miesiac().
         return self.stan
 
     @property
@@ -648,94 +650,6 @@ class KalkulatorLewara:
 ╠══════════════════════════════════════════════════════╣
 ║  {status}
 ╚══════════════════════════════════════════════════════╝""")
-
-
-@dataclass
-class RegulaSzesciuProcentEldera:
-    """
-    Reguła 6% Alexandra Eldera (BIB-015 — "Come into My Trading Room", rozdz. Zarządzanie ryzykiem).
-
-    DLA NOWICJUSZA: Elder odkrył, że profesjonalni traderzy nigdy nie tracą więcej niż 6%
-    kapitału w jednym miesiącu. Gdy zbliżasz się do tej granicy — umysł pracuje w trybie
-    "muszę odrobić straty", podejmujesz złe decyzje i kopiesz dołek głębiej.
-    ROZWIĄZANIE: gdy strata miesiąca ≥ 6% kapitału na początku miesiąca → HALT, odłóż klawiaturę.
-    Reset automatyczny 1. dnia nowego miesiąca.
-
-    MATEMATYKA:
-      strata_miesiac = (kapital_start_miesiaca - kapital_biezacy) / kapital_start_miesiaca
-      gdy strata_miesiac ≥ prog (domyślnie 0.06) → stan = "HALT"
-      Reset: 1. dzień nowego miesiąca → kapital_start_miesiaca = kapital_biezacy, stan = "NORMAL"
-
-    DLACZEGO NIEZALEŻNY od BezpiecznikKrzywejKapitalu (W-062):
-      - W-062 pilnuje drawdownu intraday (od lokalnego szczytu)
-      - Reguła 6% pilnuje łącznej straty MIESIĘCZNEJ (od 1. dnia miesiąca)
-      - Razem: W-062 = twardy wyłącznik dzienny, Elder = limit miesięczny (meta-poziom)
-
-    Źródło: Alexander Elder, "Come into My Trading Room" (2002), rozdz. 9 "Zarządzanie ryzykiem".
-             Weryfikacja: ✅ kanoniczna zasada tradingu, powszechnie cytowana w literaturze.
-    """
-    prog: float = 0.06                          # próg miesięczny (6%)
-    kapital_start_miesiaca: float = 0.0         # kapitał na 1. dzień bieżącego miesiąca
-    stan: str = field(default="NORMAL")         # "NORMAL" lub "HALT"
-    _biezacy_miesiac: int = field(default=0, repr=False)   # numer miesiąca (1–12)
-
-    def __post_init__(self):
-        self._biezacy_miesiac = date.today().month
-
-    def aktualizuj(self, kapital_biezacy: float, dzisiaj: "date | None" = None) -> str:
-        """
-        Zaktualizuj stan po każdym cyklu/zamknięciu pozycji.
-        dzisiaj: date (domyślnie: date.today()) — parametr testowy.
-        Zwraca nowy stan: "NORMAL" lub "HALT".
-        """
-        if dzisiaj is None:
-            dzisiaj = date.today()
-
-        # Reset na początku nowego miesiąca
-        if dzisiaj.month != self._biezacy_miesiac:
-            self._biezacy_miesiac = dzisiaj.month
-            self.kapital_start_miesiaca = kapital_biezacy
-            self.stan = "NORMAL"
-            logger.info(
-                f"📐 REGUŁA 6% Elder: nowy miesiąc {dzisiaj.month} — reset, "
-                f"nowy kapitał bazowy = {kapital_biezacy:.2f} USDT"
-            )
-            return self.stan
-
-        # Inicjalizacja przy pierwszym użyciu
-        if self.kapital_start_miesiaca <= 0:
-            self.kapital_start_miesiaca = kapital_biezacy
-            return self.stan
-
-        strata = (self.kapital_start_miesiaca - kapital_biezacy) / self.kapital_start_miesiaca
-        if strata >= self.prog and self.stan != "HALT":
-            self.stan = "HALT"
-            logger.warning(
-                f"📐 REGUŁA 6% (Elder): strata miesięczna {strata:.1%} ≥ {self.prog:.0%} "
-                f"— HALT do końca miesiąca (BIB-015)"
-            )
-        elif strata < self.prog and self.stan == "HALT":
-            # Kapitał odrobiony (np. zyski z innych instrumentów) — wróć do NORMAL
-            self.stan = "NORMAL"
-
-        return self.stan
-
-    @property
-    def halt(self) -> bool:
-        """Czy Reguła 6% wstrzymuje nowe wejścia."""
-        return self.stan == "HALT"
-
-    @property
-    def strata_miesiac_pct(self) -> float:
-        """Bieżąca strata miesięczna (0.0–1.0). 0.0 gdy brak danych bazowych."""
-        return 0.0  # nadpisywane przez aktualizuj(); property tylko do odczytu zewnętrznego
-
-    def reset_miesiac(self, nowy_kapital: float) -> None:
-        """Ręczny reset (np. na początku backtestów lub po interwencji Komendanta)."""
-        self.kapital_start_miesiaca = nowy_kapital
-        self.stan = "NORMAL"
-        self._biezacy_miesiac = date.today().month
-        logger.info(f"✅ Reguła 6% Elder: ręczny reset. Kapitał bazowy = {nowy_kapital:.2f} USDT")
 
 
 # ─── Demo ─────────────────────────────────────────────────────────────────────

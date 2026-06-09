@@ -394,6 +394,18 @@ def test_regula_6pct_halt_po_przekroczeniu():
     assert reg.halt
 
 
+def test_regula_6pct_halt_trwa_do_konca_miesiaca():
+    """HALT nie znika gdy kapitał chwilowo odrobi w tym samym miesiącu (doktryna Eldera)."""
+    reg = RegulaSzesciuProcentEldera()
+    reg.reset_miesiac(10_000)
+    reg.aktualizuj(9_300, dzisiaj=date(2026, 6, 9))   # -7% → HALT
+    assert reg.halt
+    reg.aktualizuj(9_900, dzisiaj=date(2026, 6, 20))  # odrobił do -1%
+    assert reg.halt, "HALT obowiązuje DO KOŃCA MIESIĄCA — nie zdejmujemy go przy odrobieniu"
+    reg.aktualizuj(10_500, dzisiaj=date(2026, 6, 28))  # nawet na plusie
+    assert reg.halt, "HALT trwa do nowego miesiąca, nawet gdy kapitał > bazowego"
+
+
 def test_regula_6pct_reset_nowy_miesiac():
     """Po zmianie miesiąca stan wraca do NORMAL i liczy od nowego kapitału."""
     reg = RegulaSzesciuProcentEldera()

@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-09 | AUDYT | Warstwa W12 — żywotność głosu (automatyzacja Prawa XV)
+
+**Opis:** `narzedzia/audyt_spojnosci.py` rozszerzony z 11 → **12 warstw**. Nowa W12 karmi
+każdy aktywny neuron 5 syntetycznymi scenariuszami (byk/niedźwiedź/kaskada/bańka/spokój)
+zbudowanymi przez Bramę i flaguje neurony, które MILCZĄ (NEUTRAL pewnosc=0 + zero
+pewnosc_przeciwnika) we WSZYSTKICH scenariuszach = martwy głos.
+**Logika dwustanowa (Prawo XVIII — sensowne rozstrzygnięcie):**
+- milczący neuron spoza allowlisty adapterowej → ❌ błąd blokujący commit (regresja Prawa XV)
+- milczący neuron z allowlisty (`NEURONY_ZALEZNE_OD_ADAPTEROW`) → ⚠️ info (znana luka, nie blokuje)
+**Allowlista (5):** PSY-01 FUNDING_RATE, PSY-02 LONG_SHORT_RATIO, PSY-03 FEAR_GREED_INDEX,
+PSY-04 OPEN_INTEREST, V-03 CVD — czekają na dane adapterów w backteście czysto-OHLCV.
+**Powód:** Prawo XV było dotąd pilnowane ręcznie; teraz audyt łapie martwy głos automatycznie
+przy każdym starcie sesji i pre-commicie. Z-04/D-01 zweryfikowane jako żywe (budzą się w kaskadzie/trendzie).
+**Pliki:** `narzedzia/audyt_spojnosci.py`, `tests/test_spojnosc.py` (+3 testy), `README.md`,
+`docs/INDEKS_IMPERIUM.md`, `ZASADY_FUNDAMENTALNE.md`, `docs/LOG_ZMIAN.md`
+**Testy:** suite 558 → **561/561** (W12: zielona, raport adapterów, negatywny martwy-głos). Audyt: exit 0.
+
+---
+
 ## 2026-06-09 | NARZĘDZIE | Pomiar dekorelacji BIB-020 (Prawo XVI) — spłata długu „do zmierzenia"
 
 **Opis:** Nowe narzędzie read-only `narzedzia/pomiar_dekorelacji_bib020.py` mierzy |r| Pearsona

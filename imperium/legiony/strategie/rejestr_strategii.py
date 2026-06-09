@@ -174,6 +174,20 @@ def wszystkie_strategie() -> list:
             interwaly=["M15", "1H"], rezim_preferowany="VOLATILE",
             dzwignia="2×–4×", rr="1:2", status="SZKIC",
         ),
+        # ── Triple Screen Eldera (BIB-015) ───────────────────────────────────
+        Strategia(
+            id="IMV-TR-008", nazwa="TRÓJEKRAN ELDERA", legion="IMV", styl="TR",
+            warunki="Triple Screen: 1) trend MACD/EMA(50/200) wyższego TF, "
+                    "2) Force Index(13) zgodny z trendem, 3) FI(2) pullback = trigger (4H/1D)",
+            zrodlo="Alexander Elder — The New Trading for a Living (BIB-015)",
+            # 1. ekran (przypływ): MACD-Hist + EMA50/200 kierunek trendu wyższego TF
+            # 2./3. ekran (fala+trigger): Force Index trend(13) + pullback(2)
+            neurony_wejscie=["X-03", "V-05"],     # MACD trend + Force Index pullback-trigger
+            neurony_filtr=["XII-03", "X-02"],     # EMA50/200 zgodność trendu + StochRSI timing
+            neurony_wyjscie=["V-05", "X-03"],     # Force Index odwraca / MACD słabnie
+            interwaly=["4H", "1D"], rezim_preferowany="TREND_STRONG",
+            dzwignia="1×–3×", rr="1:3", status="SZKIC",
+        ),
         # ── Legio VI Ferrata: Futures/Leverage (Faza B — kat. R obudzona) ────
         Strategia(
             id="VI-LV-001", nazwa="ŻELAZNY KLIN (Funding Rate Contrarian)", legion="VI", styl="LV",

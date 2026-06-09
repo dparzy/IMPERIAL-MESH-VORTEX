@@ -184,6 +184,57 @@ class NeuronVolumeAnomaly(MikroNeuron):
         return self._bazowy_sygnal(ratio, "NEUTRAL", pewnosc * 0.5, [opis + " — brak kierunku ceny"])
 
 
+class NeuronForceIndex(MikroNeuron):
+    """
+    V-05 | Force Index Eldera (BIB-015, Alexander Elder "Trading for a Living").
+    Siła ruchu = kierunek × dystans × wolumen, wygładzona EMA.
+
+    Dwie skale (jak w Triple Screen Eldera):
+      • FI(13) — trend średnioterminowy (2. ekran): >0 byki, <0 niedźwiedzie
+      • FI(2)  — krótkoterminowy trigger pullbacku (wejście)
+
+    Doktryna Eldera: kupuj w trendzie wzrostowym (FI13>0), gdy FI(2) chwilowo
+    spadnie poniżej zera (pullback) — i odwrotnie dla short. To łączy kierunek
+    z timingiem w jednym głosie (Prawo XV — pełne wykorzystanie obu skal).
+    """
+    KLUCZ = "V-05"
+    LEGION = "SWING"
+    WSKAZNIK = "FORCE_INDEX"
+    KATEGORIA = "F"
+    WAGA = 7
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        fi13 = wskazniki.get("FORCE_INDEX_13")
+        fi2 = wskazniki.get("FORCE_INDEX_2")
+
+        if fi13 is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak Force Index"])
+
+        # Trend średnioterminowy (2. ekran)
+        trend_long = fi13 > 0
+
+        if fi2 is None:
+            # Bez krótkiej skali — sam kierunek trendu
+            kierunek = "LONG" if trend_long else "SHORT"
+            return self._bazowy_sygnal(fi13, kierunek, 0.55,
+                [f"Force Index(13)={fi13:.0f} — {'byki' if trend_long else 'niedźwiedzie'}"])
+
+        # Pullback Eldera: trend↑ + FI(2)<0 = okazja LONG (kupuj słabość w sile)
+        if trend_long and fi2 < 0:
+            return self._bazowy_sygnal(fi13, "LONG", 0.80,
+                [f"Pullback Eldera: FI(13)={fi13:.0f}>0 (trend↑), FI(2)={fi2:.0f}<0 — kup słabość"])
+        if not trend_long and fi2 > 0:
+            return self._bazowy_sygnal(fi13, "SHORT", 0.80,
+                [f"Odbicie Eldera: FI(13)={fi13:.0f}<0 (trend↓), FI(2)={fi2:.0f}>0 — sprzedaj siłę"])
+
+        # Momentum zgodny w obu skalach (słabszy sygnał — ruch już trwa)
+        if trend_long and fi2 > 0:
+            return self._bazowy_sygnal(fi13, "LONG", 0.58,
+                [f"Force Index zgodny↑: FI(13)={fi13:.0f}, FI(2)={fi2:.0f} — byki napierają"])
+        return self._bazowy_sygnal(fi13, "SHORT", 0.58,
+            [f"Force Index zgodny↓: FI(13)={fi13:.0f}, FI(2)={fi2:.0f} — niedźwiedzie napierają"])
+
+
 class NeuronRVOL(MikroNeuron):
     """
     X-11 | Relative Volume — czy ruch ma wsparcie wolumenu. RVOL = vol / średnia(20).

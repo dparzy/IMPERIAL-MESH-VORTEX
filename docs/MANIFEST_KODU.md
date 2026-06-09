@@ -6,20 +6,20 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-09 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 55 neuronów (zarejestrowane w roju) + 12 zwiadowców = **67 modułów w kodzie**
+**Zaimplementowane:** 56 neuronów (zarejestrowane w roju) + 12 zwiadowców = **68 modułów w kodzie**
 **Aktywne / wyciszone:** 48 aktywnych + 7 wyciszonych, z czego:
-  • **42 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, X-27 Value Convergence, OC-05 WashTrading, D-01 PathSignature)
+  • **44 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, X-27 Value Convergence, OC-05 WashTrading, D-01 PathSignature)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
-  • **3 budzone WEWNĘTRZNIE** (SMC-01/02/03) — liczą z barów przez most EXP-05, ożywają w żywym Legatusie (`zbuduj_legatusa`), **bez żadnego API**
+  • **3 SMC aktywne** (SMC-01/02/03, `DOSTEPNY=True`) — liczą z barów przez most EXP-05, **bez żadnego API** (abstynują w backteście bez EXP-05)
   • **4 wymaga ZEWNĘTRZNEGO API on-chain** (OC-01..04) — Glassnode/CryptoQuant (Faza D)
 **Elitarne (Prawo XX):** 15 (3 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
-**Do wdrożenia:** 244 neuronów
+**Do wdrożenia:** 243 neuronów
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 55). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 56). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -46,7 +46,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (55/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (56/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -92,21 +92,20 @@
 | V-02 | NeuronVWAP | F | 8 | ✅ aktywny | VWAP | — |
 | V-03 | NeuronCVD | F | 8 | ✅ aktywny (AdapterCVD) | CVD | — |
 | V-04 | NeuronVolumeAnomaly | F | 6 | ✅ aktywny | VOLUME_ANOMALY | — |
+| V-05 | NeuronForceIndex | F | 7 | ✅ aktywny | FORCE_INDEX | — |
 | X-11 | NeuronRVOL | F | 7 | ✅ aktywny | RVOL | — |
 
 ### Plik: `neurony/struktura.py`
 
 | KLUCZ | Klasa | KAT | WAGA | Status | WSKAZNIK (Brama) | 🎖️ |
 |-------|-------|-----|------|--------|-----------------|-----|
-| SMC-01 | NeuronOrderBlock | S | 8 | 🌙 budzony wewnętrznie (most EXP-05) | ORDER_BLOCK | — |
-| SMC-02 | NeuronFVG | S | 7 | 🌙 budzony wewnętrznie (most EXP-05) | FVG | — |
-| SMC-03 | NeuronBOS | S | 9 | 🌙 budzony wewnętrznie (most EXP-05) | BOS_MSS | — |
+| SMC-01 | NeuronOrderBlock | S | 8 | ✅ aktywny (most EXP-05) | ORDER_BLOCK | — |
+| SMC-02 | NeuronFVG | S | 7 | ✅ aktywny (most EXP-05) | FVG | — |
+| SMC-03 | NeuronBOS | S | 9 | ✅ aktywny (most EXP-05) | BOS_MSS | — |
 
-> **🌙 = budzony wewnętrznie (NIE wymaga API).** SMC-01/02/03 są `DOSTEPNY=False` w stanie
-> statycznym, ale `zbuduj_legatusa()` wywołuje `aktywuj_neurony_smc()` → `DOSTEPNY=True`,
-> a EXP-05 `wstrzyknij()` dostarcza strefy OB/FVG/BOS z **samych barów OHLCV**.
-> W żywym pipeline te 3 neurony GŁOSUJĄ w pełni. Audyt statyczny liczy je jako wyciszone
-> tylko dlatego, że bada klasy przed zbudowaniem Legatusa — to NIE jest brak danych z API.
+> **SMC-01/02/03 aktywne (`DOSTEPNY=True`, 2026-06-09, Prawo XV).** EXP-05 ZwiadowcaSMC
+> liczy strefy OB/FVG/BOS z **samych barów OHLCV** (bez API) i wstrzykuje je do `wskazniki`.
+> W backteście CSV bez EXP-05 te 3 neurony abstynują (NEUTRAL) — Prawo XV, bez halucynacji.
 | VSA-01 | NeuronVSA | F | 8 | ✅ aktywny | VSA | — |
 
 ### Plik: `neurony/psychologia.py`
@@ -246,10 +245,10 @@
 | Legion | Skatalogowane | Wdrożone | Do wdrożenia |
 |--------|--------------|---------|--------------|
 | X Equestris (M5/M15) | 26 | 9 (X-02,X-08,X-09,X-10,X-11,X-17,X-18,X-25,X-26) | 17 |
-| III Augusta (H1) | ~45 | 9 (XII-01..04, V-01..04, VSA-01) + PSY-01..04 ✅ (Faza B) + wyciszone: V-03,SMC-01..03 | ~36 |
+| III Augusta (H1) | ~45 | 10 (XII-01..04, V-01..05, VSA-01) + PSY-01..04 ✅ (Faza B) + V-03 ✅ + SMC-01..03 ✅ | ~35 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
-| **RAZEM** | **299** | **55** | **244** |
+| **RAZEM** | **299** | **56** | **243** |
 
 ---
 

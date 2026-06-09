@@ -66,16 +66,19 @@ python imperium/legiony/pierwszy_zwiadowca.py
 ## ⚡ FAZA 1 — Namiestnik *(TERAZ — aktualna)*
 
 **Status:** 🔄 W trakcie
-**Cel:** Regime + Timeframe-Aware Gating Network — 55 neuronów, 558 testów, master-switch Reżimu Faza 1
+**Cel:** Regime + Timeframe-Aware Gating Network — 55 neuronów, 575 testów, master-switch Reżimu Faza 2
 
 ### Stan Fazy 1 (2026-06-09)
 
 | Kamień milowy | Status |
 |---------------|--------|
-| 55 neuronów w kodzie (48 aktywnych) | ✅ DONE |
-| 558 testów automatycznych (0 zależności) | ✅ DONE |
+| 55 neuronów w kodzie (51 aktywnych — SMC-01/02/03 odblokowane) | ✅ DONE |
+| 575 testów automatycznych (0 zależności) | ✅ DONE |
 | Namiestnik (Regime×Timeframe Gating) | ✅ DONE |
 | Master-switch reżimu Faza 1 | ✅ DONE |
+| Master-switch reżimu Faza 2 (online Hedge/MWU głosów reżimu) | ✅ DONE |
+| BIB-015 Reguła 6% Elder (miesięczny circuit-breaker) | ✅ DONE |
+| BIB-018 skew-Kelly (sizing skorygowany o fat tails) | ✅ DONE |
 | BIB-020 (pomiar_dekorelacji tool) | ✅ DONE |
 | Neurony Z-03/Z-04/X-27 | ✅ DONE |
 | AdapterFutures + AdapterCVD + AdapterFearGreed | ✅ DONE |
@@ -177,7 +180,7 @@ python imperium/legiony/pierwszy_zwiadowca.py
 | v3.x | Faza 3 | Multi-giełda |
 | v4.x | Faza 4 | Autonomia |
 
-**Aktualna wersja: v0.9.0** (55 neuronów, 558 testów, Namiestnik Faza 1)
+**Aktualna wersja: v0.9.0** (55 neuronów / 51 aktywnych, 575 testów, Namiestnik Faza 1 + Master-switch Faza 2)
 
 ---
 

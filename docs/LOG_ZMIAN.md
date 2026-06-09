@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-06-09 | FEATURE | Triple Screen Eldera (BIB-015) + neuron Force Index (V-05)
+
+**Opis:** Domknięcie BIB-015 (Alexander Elder). Dwa elementy:
+- **Neuron V-05 `NeuronForceIndex`** (kat. F, waga 7): Force Index = kierunek×dystans×wolumen,
+  wygładzony EMA. Dwie skale — FI(13) trend, FI(2) trigger pullbacku. Doktryna Eldera:
+  kupuj słabość w sile (trend↑ + FI(2)<0). Pure-Python, bez API.
+- **Brama:** `FORCE_INDEX_13` / `FORCE_INDEX_2` (`_py_force_index` na talib.EMA surowego FI).
+- **Strategia `IMV-TR-008` TRÓJEKRAN ELDERA**: 3 ekrany — MACD/EMA(50/200) trend (X-03,XII-03),
+  Force Index pullback+trigger (V-05), StochRSI timing (X-02). Spójna z Regułą 6% Eldera.
+
+**Symbioza (Prawo XXI):** neurony 55→56 (52 aktywne), strategie 17→18. Zaktualizowane:
+README, MANIFEST (wiersz V-05, tabela legionów, status SMC), INDEKS, KATALOG_STRATEGII
+(blok IMV-TR-008), ROADMAP. SMC-01/02/03 opisane jako aktywne (były „budzone wewnętrznie").
+
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/wolumen.py`, `imperium/legiony/rejestr.py`,
+`imperium/legiony/strategie/rejestr_strategii.py`, `tests/test_neurony.py`,
+`tests/test_strategie.py`, `tests/test_integracja.py`, `docs/*` (README, MANIFEST, INDEKS,
+KATALOG_STRATEGII, ROADMAP).
+**Testy:** +7 (575→582/582). Audyt: pełna harmonia (exit 0).
+
+---
+
 ## 2026-06-09 | FEATURE | Master-switch Faza 2 — online-learning wag głosujących (Hedge/MWU)
 
 **Opis:** `MasterSwitchOnline` w `legiony/legatus.py` — Faza 2 master-switcha reżimu.

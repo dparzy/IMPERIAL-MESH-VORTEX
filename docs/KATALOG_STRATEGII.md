@@ -816,6 +816,40 @@ Momentum_Score = Slope_90D × R² × Annualization_Factor
 
 ---
 
+## 🌗 P2. Alexander Elder — Triple Screen Trading System (BIB-015)
+
+### IMV-TR-008 | "TRÓJEKRAN ELDERA" | Triple Screen Trading System
+**Twórca:** Alexander Elder ("The New Trading for a Living", BIB-015)
+**Interwał:** 4H–1D | **Warunki:** trend wyższego TF + pullback Force Index
+
+**Trzy ekrany (filozofia Eldera — "przypływ, fala, zmarszczka"):**
+1. **Ekran 1 — PRZYPŁYW (trend wyższego TF):** MACD-Histogram + EMA(50/200) określają
+   kierunek głównego trendu. Handlujemy TYLKO zgodnie z nim.
+2. **Ekran 2 — FALA (oscylator przeciw trendowi):** Force Index(13) zgodny z trendem;
+   gdy chwilowo cofa się przeciw trendowi → okazja (kupuj słabość w sile).
+3. **Ekran 3 — ZMARSZCZKA (trigger):** Force Index(2) przekracza zero w kierunku trendu —
+   moment wejścia (trailing buy-stop nad poprzednim barem).
+
+**Neurony WEJŚCIE:**
+- `X-03` MACD → 1. ekran: kierunek trendu (przypływ)
+- `V-05` Force Index → 2./3. ekran: pullback(13) + trigger(2)
+
+**Neurony FILTR:**
+- `XII-03` EMA(50/200) → zgodność trendu wyższego TF
+- `X-02` StochRSI → timing wejścia (wyprzedanie w trendzie↑)
+
+**Neurony WYJŚCIE:**
+- `V-05` Force Index → odwraca kierunek (fala wygasa)
+- `X-03` MACD → histogram słabnie (przypływ cofa się)
+
+**Reguła kapitału Eldera (BIB-015):** Reguła 6% (miesięczny circuit-breaker) +
+Reguła 2% per trade — obie w `kalkulator_lewara.py` (RegulaSzesciuProcentEldera).
+
+**Dźwignia:** 1×–3× | **R:R:** 1:3 | **Status:** SZKIC
+**Nowy Neuron:** `V-05` Force Index (Wolumen/F, waga 7) ✅ w kodzie
+
+---
+
 ## 🕯️ Q. Nial Fuller — Price Action (Pin Bar + Inside Bar)
 
 ### IMV-RV-002 | "IGŁA FULLER" | Pin Bar Reversal at Key Level

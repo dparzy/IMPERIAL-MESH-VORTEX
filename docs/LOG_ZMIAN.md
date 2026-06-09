@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-09 | DOKUMENT | Symulator canvas (styl v1-5.1) — aktualny + marzenie
+
+**Opis:** Nowy `docs/symulator_imperium.html` — symulator w stylu animowanych diagramów
+canvas (wzorowany na symulatorze z bazy DeepSeek wersja full, gdzie były wersje Imperium 1-5.1).
+Cząsteczki płyną po krawędziach między węzłami modułów (kolory wg typu: dane/Brama/rdzeń/
+doradcy/Pretorianie/egzekucja/pętla). **Przełącznik dwóch wersji:**
+- 🔵 STAN AKTUALNY v0.9.0 — realne moduły (Akwedukty+3 adaptery, Brama, 48 neuronów, Legatus,
+  Namiestnik, reżim, 5 doradców, Pretorianie, Drogi→paper, HedgeMWU). Ocena **8.0/10** z listą
+  mocnych stron i luk (on-chain 1/5, 7 wyciszonych, brak live, brak meta-labelingu).
+- 🟣 MARZENIE — wizja docelowa po wdrożeniu roadmapy (on-chain LIVE, Arbiter Fiduciae meta-
+  labeling, DeepSeek AI, Reguła 6%, skew-Kelly, master-switch Faza 2, live MEXC). Ocena **9.7/10**.
+**Prawo I:** wszystkie liczby/moduły z żywego kodu (rejestr.py, audyt). Węzły planowane wyraźnie
+oznaczone jako „marzenie" (fioletowe) — nie udają, że istnieją.
+**Pliki:** `docs/symulator_imperium.html` (nowy), `docs/INDEKS_IMPERIUM.md`, `docs/LOG_ZMIAN.md`
+**Testy:** statyczny HTML; suite 562/562. Audyt: exit 0.
+
+---
+
 ## 2026-06-09 | DOKUMENT | Symulator wizualny HTML (offline, animowany)
 
 **Opis:** Nowy `docs/symulator_live.html` — samodzielny (zero zależności) animowany symulator

@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-09 | KOD | Z-04 NeuronCascade — cascade detector + dead-cat bounce (W-279, BIB-020 rozdz.28) ✅ WDROŻONY
+
+**Opis:** Czwarte wdrożenie BIB-020, domyka rodzinę obronną kat. Z przy Z-03. Neuron dwustanowy:
+- **KASKADA** (CASCADE_FLAG=1): 3+ przyspieszające spadki przy rosnącym wolumenie (price accelerator
+  Treynora) → kill-switch: NEUTRAL z pewnosc_przeciwnika 0.92 (nie łap spadającego noża).
+- **DEAD-CAT** (DEADCAT_SETUP=1, gdy kaskada wygasła): krach ≥12% w oknie + dno wyhamowane +
+  słabnący wolumen + cena w dolnej 1/3 zakresu → taktyczny LONG 0.60 (krótki hold/stop zarządza egzekutor).
+- Priorytet KASKADA > DEAD-CAT (gdy lawina trwa, nie kupujemy).
+**Symbioza:** 2 obliczenia pure-Python w Bramie (`CASCADE_FLAG`/`DEADCAT_SETUP`) + 2 klucze Budowniczego +
+rejestracja Z-04 w zagrozenie.py/rejestr.py + 12 testów. MANIFEST/README/INDEKS: 54→55 neuronów,
+47→48 aktywnych, 42 OHLCV, testy 546→558.
+🚨 **Prawo XVI (do zmierzenia):** CASCADE_FLAG vs VoV/AR1 (Z-03) — sprawdzić |r| przed podniesieniem wagi.
+**Powód:** W-279 (priorytet #5 BIB-020 — domyka obronę kat. Z, taktyczny long post-crash), Prawo XV/XIX.
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/zagrozenie.py`, `imperium/legiony/rejestr.py`, `tests/test_neurony.py`,
+`tests/test_integracja.py`, `docs/MANIFEST_KODU.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`,
+`docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`
+**Testy:** +12 (Brama cascade/deadcat + Z-04 kaskada/priorytet/deadcat/spokój/abstynencja/rejestracja). Audyt: exit 0.
+
+---
+
 ## 2026-06-09 | KOD | Master-switch reżimu Faza 1 — W-263/W-274 (BIB-020 Harris rozdz.16/20) ✅ WDROŻONY
 
 **Opis:** Trzecie wdrożenie BIB-020 — wzmocnienie klasyfikatora reżimu (`klasyfikuj_rezim` w legatus.py).

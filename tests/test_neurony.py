@@ -1088,6 +1088,103 @@ def test_z03_zarejestrowany():
     assert any(n.KLUCZ == "Z-03" for n in wszystkie_neurony())
 
 
+# ─── W-279: Cascade / Dead-Cat (Z-04, kategoria Z, BIB-020 Harris rozdz. 28) ──
+
+def test_brama_cascade_flag_wykrywa_lawine():
+    """CASCADE_FLAG: 3 przyspieszające spadki + rosnący wolumen → 1.0."""
+    from imperium.fundament.brama_kalkulatora import _py_cascade_flag
+    close = [100, 99, 97, 94]          # spadki: -1, -2, -3 (przyspieszają)
+    volume = [100, 120, 150, 200]      # wolumen rośnie
+    assert _py_cascade_flag(close, volume, n=3) == 1.0
+
+
+def test_brama_cascade_flag_brak_przyspieszenia():
+    """CASCADE_FLAG: spadki bez przyspieszenia → 0.0."""
+    from imperium.fundament.brama_kalkulatora import _py_cascade_flag
+    close = [100, 97, 95, 94]          # -3, -2, -1 (zwalniają)
+    volume = [100, 120, 150, 200]
+    assert _py_cascade_flag(close, volume, n=3) == 0.0
+
+
+def test_brama_cascade_flag_za_malo_danych():
+    """CASCADE_FLAG → None gdy za mało barów."""
+    from imperium.fundament.brama_kalkulatora import _py_cascade_flag
+    assert _py_cascade_flag([100, 99], [10, 11], n=3) is None
+
+
+def test_brama_deadcat_setup_wykrywa_odbicie():
+    """DEADCAT_SETUP: krach + dno wyhamowane + słabnący wolumen + wyprzedanie → 1.0."""
+    from imperium.fundament.brama_kalkulatora import _py_deadcat_setup
+    # szczyt 100 → krach do 85 (−15%), ostatni bar nie robi nowego dołka
+    close = [100, 96, 90, 86, 85, 86]
+    low =   [99,  95, 89, 84, 83, 85]   # min dołek na -2 (83), ostatni low=85 > 83
+    high =  [101, 97, 91, 87, 86, 87]
+    volume = [200, 180, 160, 140, 120, 90]  # wolumen słabnie
+    assert _py_deadcat_setup(high, low, close, volume, lookback=6) == 1.0
+
+
+def test_brama_deadcat_setup_brak_krachu():
+    """DEADCAT_SETUP: spokojny rynek (brak krachu) → 0.0."""
+    from imperium.fundament.brama_kalkulatora import _py_deadcat_setup
+    close = [100, 100.5, 100.2, 100.8, 100.6, 101]
+    low =   [99,  99.5,  99.2,  99.8,  99.6,  100]
+    high =  [101, 101.5, 101.2, 101.8, 101.6, 102]
+    volume = [100, 100, 100, 100, 100, 100]
+    assert _py_deadcat_setup(high, low, close, volume, lookback=6) == 0.0
+
+
+def test_brama_audyt_zrodlo_w279_pure_python():
+    """Prawo XIII: CASCADE_FLAG/DEADCAT_SETUP w zbiorze pure-Python."""
+    from imperium.fundament.brama_kalkulatora import _PURE_PYTHON_INDICATORS
+    assert {"CASCADE_FLAG", "DEADCAT_SETUP"} <= _PURE_PYTHON_INDICATORS
+
+
+def test_z04_kaskada_killswitch():
+    """Z-04 (W-279): CASCADE_FLAG=1 → NEUTRAL z wysokim pewnosc_przeciwnika."""
+    from imperium.legiony.neurony.zagrozenie import NeuronCascade
+    s = NeuronCascade().interpretuj({"CASCADE_FLAG": 1.0, "DEADCAT_SETUP": 0.0})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc_przeciwnika >= 0.85
+    assert any("KASKADA" in p for p in s.powody)
+
+
+def test_z04_kaskada_bije_deadcat():
+    """Z-04: gdy kaskada trwa, NIE kupujemy dead-cat (priorytet kill-switcha)."""
+    from imperium.legiony.neurony.zagrozenie import NeuronCascade
+    s = NeuronCascade().interpretuj({"CASCADE_FLAG": 1.0, "DEADCAT_SETUP": 1.0})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc_przeciwnika >= 0.85
+
+
+def test_z04_deadcat_long():
+    """Z-04: kaskada wygasła + układ odbicia → taktyczny LONG."""
+    from imperium.legiony.neurony.zagrozenie import NeuronCascade
+    s = NeuronCascade().interpretuj({"CASCADE_FLAG": 0.0, "DEADCAT_SETUP": 1.0})
+    assert s.kierunek == "LONG"
+    assert s.pewnosc >= 0.55
+
+
+def test_z04_spokoj_neutral():
+    """Z-04: brak kaskady i odbicia → NEUTRAL bez wpływu."""
+    from imperium.legiony.neurony.zagrozenie import NeuronCascade
+    s = NeuronCascade().interpretuj({"CASCADE_FLAG": 0.0, "DEADCAT_SETUP": 0.0})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc == 0.0 and s.pewnosc_przeciwnika == 0.0
+
+
+def test_z04_brak_danych_neutral():
+    """Z-04: brak danych → NEUTRAL (abstynencja, Prawo I)."""
+    from imperium.legiony.neurony.zagrozenie import NeuronCascade
+    assert NeuronCascade().interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_z04_zarejestrowany():
+    """Z-04 żyje w roju z kategorią Z (Prawo XV/XIX/XXI)."""
+    from imperium.legiony.rejestr import wszystkie_neurony
+    n = [x for x in wszystkie_neurony() if x.KLUCZ == "Z-04"]
+    assert len(n) == 1 and n[0].KATEGORIA == "Z"
+
+
 # ─── W-273: Value Convergence (X-27, kategoria M, BIB-020 Harris rozdz. 16) ──
 
 def test_brama_value_z_wyprzedanie():

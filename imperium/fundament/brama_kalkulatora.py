@@ -56,6 +56,7 @@ _PURE_PYTHON_INDICATORS = {
     "AO", "AO_PREV", "AC", "AC_PREV", "HMA", "HMA_PREV",
     "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "PERMUTATION_ENTROPY", "VPIN", "WASH_TRADING", "CHOPPINESS", "ULCER",
     "BUBBLE_Z", "VOV", "RET_AR1", "VALUE_Z", "MOMA_Z", "OU_HALFLIFE", "VARIANCE_RATIO",
+    "CASCADE_FLAG", "DEADCAT_SETUP",
     "VWAP", "VWAP_STD",
     "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
 }
@@ -827,6 +828,69 @@ def _py_variance_ratio(close, k: int = 4, period: int = 100) -> Optional[float]:
     return round(vark / (k * var1), 4)
 
 
+def _py_cascade_flag(close, volume, n: int = 3) -> Optional[float]:
+    """
+    Cascade Flag — detektor kaskady krachu (BIB-020, Harris rozdz. 28; wizja W-279).
+
+    Dla nowicjusza: krachy nakręcają się lawiną zleceń stop-loss i margin calls (Treynor
+    "price accelerator"). Sygnatura: kilka kolejnych spadkowych barów, KAŻDY większy niż
+    poprzedni, przy ROSNĄCYM wolumenie. Gdy wszystkie trzy warunki naraz → kaskada trwa.
+
+    Zwraca 1.0 gdy ostatnie `n` barów spełnia jednocześnie:
+      1. wszystkie spadkowe (close[i] < close[i-1]),
+      2. |zwrot| rośnie (przyspieszenie),
+      3. wolumen rośnie (lawina).
+    Inaczej 0.0. None gdy za mało danych.
+    Źródło: Harris (2003) rozdz. 28 ("price accelerator"); wizja W-279.
+    """
+    c = list(close)
+    v = list(volume)
+    if len(c) < n + 1 or len(v) < n:
+        return None
+    zwroty = [c[-i] - c[-i - 1] for i in range(1, n + 1)]   # [r_ostatni, r_-1, r_-2]
+    vols = [v[-i] for i in range(1, n + 1)]                  # [v_ostatni, v_-1, v_-2]
+    spadki = all(r < 0 for r in zwroty)
+    # przyspieszenie: |r_ostatni| > |r_-1| > |r_-2|
+    przyspieszenie = all(abs(zwroty[i]) > abs(zwroty[i + 1]) for i in range(n - 1))
+    # wolumen rosnący ku teraźniejszości: v_ostatni > v_-1 > v_-2
+    wolumen_rosnie = all(vols[i] > vols[i + 1] for i in range(n - 1))
+    return 1.0 if (spadki and przyspieszenie and wolumen_rosnie) else 0.0
+
+
+def _py_deadcat_setup(high, low, close, volume, lookback: int = 6,
+                      crash_pct: float = 0.12) -> Optional[float]:
+    """
+    Dead-Cat Setup — układ odbicia po wyczerpaniu krachu (BIB-020, Harris rozdz. 28; wizja W-279).
+
+    Dla nowicjusza: panika w krachu zrzuca cenę PONIŻEJ wartości godziwej; gdy sprzedający
+    się wyczerpią, następuje krótkie odbicie ("dead-cat bounce"). To trade taktyczny, nie
+    odwrócenie trendu — krótki, z ciasnym stopem (zarządza egzekutor, nie neuron).
+
+    Zwraca 1.0 gdy SPEŁNIONE NARAZ:
+      1. niedawny krach: spadek od szczytu w oknie `lookback` ≥ crash_pct,
+      2. dno wyhamowane: ostatni bar NIE robi nowego dołka (low[-1] > min(low[-lookback:-1])),
+      3. wolumen słabnie: volume[-1] < max(volume[-lookback:]) (wyczerpanie sprzedających),
+      4. cena blisko dna: pozycja close[-1] w dolnej 1/3 zakresu okna (wciąż wyprzedana).
+    Inaczej 0.0. None gdy za mało danych.
+    Źródło: Harris (2003) rozdz. 28; wizja W-279.
+    """
+    c = list(close); l = list(low); v = list(volume)
+    if len(c) < lookback or len(l) < lookback or len(v) < lookback:
+        return None
+    okno_c = c[-lookback:]
+    szczyt = max(okno_c)
+    dno = min(okno_c)
+    if szczyt <= 0 or szczyt <= dno:
+        return None
+    spadek = (szczyt - c[-1]) / szczyt
+    krach = spadek >= crash_pct
+    dno_wyhamowane = l[-1] > min(l[-lookback:-1])
+    wolumen_slabnie = v[-1] < max(v[-lookback:])
+    pozycja_w_zakresie = (c[-1] - dno) / (szczyt - dno)   # 0=dno, 1=szczyt
+    blisko_dna = pozycja_w_zakresie < 0.35
+    return 1.0 if (krach and dno_wyhamowane and wolumen_slabnie and blisko_dna) else 0.0
+
+
 def _py_supertrend(high, low, close, period: int = 10, multiplier: float = 3.0):
     """
     Supertrend — pure Python, bez TA-Lib.
@@ -1024,6 +1088,10 @@ class CalculatorGateway:
             # ── Pure-Python: W-274/W-263 master-switch reżimu (BIB-020 Harris rozdz. 16/20) ──
             "OU_HALFLIFE":    lambda close, period=50: _py_ou_halflife(close, period),
             "VARIANCE_RATIO": lambda close, k=4, period=100: _py_variance_ratio(close, k, period),
+
+            # ── Pure-Python: W-279 cascade detector + dead-cat bounce (kat. Z, BIB-020 rozdz. 28) ──
+            "CASCADE_FLAG":  lambda close, volume, n=3: _py_cascade_flag(close, volume, n),
+            "DEADCAT_SETUP": lambda high, low, close, volume, lookback=6: _py_deadcat_setup(high, low, close, volume, lookback),
 
             # ── TA-Lib: wolumen ────────────────────────────────────────────────
             "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),

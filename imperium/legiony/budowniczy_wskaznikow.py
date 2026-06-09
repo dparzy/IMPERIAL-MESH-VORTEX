@@ -78,6 +78,8 @@ _PLAN_SKALARNE = {
     "MOMA_Z_200":   ("MOMA_Z", ("close",), {"period": 200}),
     "OU_HALFLIFE_50":   ("OU_HALFLIFE", ("close",), {"period": 50}),
     "VARIANCE_RATIO_4": ("VARIANCE_RATIO", ("close",), {"k": 4, "period": 100}),
+    "CASCADE_FLAG":     ("CASCADE_FLAG", ("close", "volume"), {"n": 3}),
+    "DEADCAT_SETUP":    ("DEADCAT_SETUP", ("high", "low", "close", "volume"), {"lookback": 6}),
     "WASH_SCORE_100": ("WASH_TRADING", ("volume",), {"period": 100}),
     "CHOPPINESS_14": ("CHOPPINESS", ("high", "low", "close"), {"period": 14}),
     "ULCER_14":      ("ULCER", ("close",), {"period": 14}),

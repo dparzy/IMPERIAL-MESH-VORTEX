@@ -2068,7 +2068,7 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 | **W-276** | Basis / funding neuron: `perp_basis_bps=(perp−spot)/spot×10000` + `funding_z=(funding−μ_30d)/σ_30d`; LONG gdy basis <−30 lub funding_z <−1.5 (squeeze), SHORT gdy basis >+50 lub funding_z >+2.0 ⭐⭐⭐ | neurony (N/Z) | 17 | 🔴 |
 | **W-277** | BTC lead-lag neuron: `btc_lag=(btc_ret_1h − alt_ret_1h)`; jeśli >1.5×ATR_alt → LONG alt (catch-up); decay 4h | neurony (T) | 17 | 🔴 |
 | **W-278** | Bubble/crash kill-switch: `bubble_z=log(price/EMA_200)/std`; VoV=`std(ATR_14,20)/mean(ATR_14,20)`; AR1=`corr(ret,ret_lag1,20)`; HARD-HALT gdy bubble_z>3.5 LUB VoV>1.2 LUB AR1>0.40 ⭐⭐⭐ | pretorianie (kill-switch) | 28 | ✅ **WDROŻONE** jako Z-03 NeuronBubbleCrash (defensywna meta-brama, 2026-06-09) |
-| **W-279** | Crash cascade detector: 3+ kolejne down-bary z rosnącym `\|ret\|` i wolumenem ⇒ zamknij wszystkie longi, halt do 3 barów bez cascade_flag. Post-crash dead-cat bounce: `z_score<−3.0` + malejący wolumen + brak nowych dołków ⇒ taktyczny LONG max 6 barów ⭐ | pretorianie (kill-switch) + neurony taktyczne | 28 | 🔴 |
+| **W-279** | Crash cascade detector: 3+ kolejne down-bary z rosnącym `\|ret\|` i wolumenem ⇒ zamknij wszystkie longi, halt do 3 barów bez cascade_flag. Post-crash dead-cat bounce: `z_score<−3.0` + malejący wolumen + brak nowych dołków ⇒ taktyczny LONG max 6 barów ⭐ | neurony (Z) | 28 | ✅ **WDROŻONE** jako Z-04 NeuronCascade (kill-switch kaskady + dead-cat LONG, 2026-06-09) |
 
 🚨 **Prawo XVI (dekorelacja) — alert biblioteczny BIB-020 (wszystkie wizje W-250..W-279):** przed wdrożeniem zmierzyć korelację:
 - **W-268 (Amihud)** dubluje **W-056** → scalić.
@@ -2092,7 +2092,7 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 2. ✅ **W-263/W-274** — master-switch reżimu (VARIANCE_RATIO + OU_HALFLIFE + AR1). WDROŻONE Faza 1. ⭐⭐
 3. **W-276** — basis+funding neuron. Najlepsza dostępna oś N/Z crypto (wymaga perp API — bliska). ⭐⭐⭐
 4. ✅ **W-273** — value convergence (z-score SMA_200 + MoMA). WDROŻONE jako X-27 (kat. M). ⭐⭐
-5. **W-279** — cascade detector + dead-cat bounce (kill-switch + taktyczny long post-crash). Na OHLCV. ⭐
+5. ✅ **W-279** — cascade detector + dead-cat bounce. WDROŻONE jako Z-04. ⭐
 
 **🔭 Master-switch reżimu — plan etapowy (decyzja Cezara 2026-06-09, Opcja 1):**
 - **Faza 1 (✅ WDROŻONA):** VARIANCE_RATIO (W-263) + OU_HALFLIFE (W-274) + RET_AR1 (istn.) jako głosowanie

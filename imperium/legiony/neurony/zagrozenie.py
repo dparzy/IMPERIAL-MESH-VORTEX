@@ -284,3 +284,61 @@ class NeuronBubbleCrash(MikroNeuron):
         return self._bazowy_sygnal(bz, "NEUTRAL", 0.0,
             [f"Struktura stabilna: bubble_z={bz if bz is not None else 0:+.2f}, "
              f"VoV={vovv:.2f}, AR1={aar1:+.2f}"])
+
+
+class NeuronCascade(MikroNeuron):
+    """
+    Z-04 | Cascade / Dead-Cat — kill-switch kaskady krachu + taktyczne odbicie (W-279, BIB-020 rozdz. 28).
+
+    Dla nowicjusza: dwustanowy strażnik krachu, komplementarny do Z-03:
+      • KASKADA (CASCADE_FLAG=1): trwa lawina krachu — kilka kolejnych spadkowych barów,
+        każdy większy, przy rosnącym wolumenie (stop-loss + margin calls się nakręcają).
+        → 🚨 KILL-SWITCH: NEUTRAL z wysokim pewnosc_przeciwnika (nie łap spadającego noża).
+      • DEAD-CAT (DEADCAT_SETUP=1, gdy kaskada już WYGASŁA): sprzedający wyczerpani,
+        dno wyhamowane, wolumen słabnie, cena głęboko wyprzedana → krótkie odbicie.
+        → taktyczny LONG (krótki hold + ciasny stop zarządza egzekutor, nie neuron).
+      • Inaczej → NEUTRAL bez wpływu.
+
+    Priorytet: KASKADA bije DEAD-CAT (gdy lawina trwa, nie kupujemy, choćby było wyprzedanie).
+
+    Dlaczego ORTOGONALNY (Prawo XVI): Z-03 mierzy NIESTABILNOŚĆ STRUKTURY (bubble_z/VoV/AR1,
+    okna długie), Z-04 łapie KONKRETNĄ SYGNATURĘ LAWINY w ostatnich 3 barach + układ odbicia.
+    Z-03 = stan ostrzegawczy, Z-04 = zdarzenie i jego wyczerpanie.
+    ⚠️ Prawo XVI (do zmierzenia): CASCADE_FLAG vs VoV/AR1 (Z-03) — sprawdzić |r|.
+
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 28 (price accelerator, dead-cat bounce);
+            wizja W-279 (docs/WIZJONER.md, BIB-020).
+    """
+    KLUCZ = "Z-04"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "CASCADE_FLAG"
+    KATEGORIA = "Z"
+    WAGA = 8
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        cascade = wskazniki.get("CASCADE_FLAG")
+        deadcat = wskazniki.get("DEADCAT_SETUP")
+
+        if cascade is None and deadcat is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak danych Cascade/Dead-Cat (wymaga serii close/volume)"])
+
+        # KASKADA — priorytet: nie łap spadającego noża
+        if cascade == 1.0:
+            s = self._bazowy_sygnal(1.0, "NEUTRAL", 0.0,
+                ["🚨 KASKADA KRACHU: 3+ przyspieszające spadki przy rosnącym wolumenie "
+                 "— kill-switch, nie wchodź (lawina stop-loss/margin call)"])
+            s.pewnosc_przeciwnika = 0.92
+            s.policz_finalna()
+            return s
+
+        # DEAD-CAT — kaskada wygasła, sprzedający wyczerpani → taktyczne odbicie
+        if deadcat == 1.0:
+            return self._bazowy_sygnal(1.0, "LONG", 0.60,
+                ["🐱 DEAD-CAT BOUNCE: krach wyhamowany, dno trzyma, wolumen słabnie, "
+                 "głębokie wyprzedanie → taktyczny LONG (krótki hold + ciasny stop)"])
+
+        return self._bazowy_sygnal(0.0, "NEUTRAL", 0.0,
+            ["Brak kaskady i układu odbicia — spokój"])

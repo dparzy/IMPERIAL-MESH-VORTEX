@@ -59,7 +59,7 @@ from imperium.legiony.neurony.entropia import (
     NeuronPermutationEntropy,
 )
 from imperium.legiony.neurony.zagrozenie import (
-    NeuronToxicFlow, NeuronPumpDetect, NeuronBubbleCrash,
+    NeuronToxicFlow, NeuronPumpDetect, NeuronBubbleCrash, NeuronCascade,
 )
 from imperium.legiony.neurony.geometria import (
     NeuronPathSignature,
@@ -107,8 +107,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         # Entropia (N) — Permutation Entropy meta-brama chaosu, OHLCV bez API
         NeuronPermutationEntropy(),
         # Zagrożenie (Z) — VPIN meta-brama obronna (Z-01) + PumpDetect kierunkowy (Z-02)
-        # + Bubble/Crash kill-switch (Z-03, W-278, BIB-020 Harris rozdz. 28)
-        NeuronToxicFlow(), NeuronPumpDetect(), NeuronBubbleCrash(),
+        # + Bubble/Crash kill-switch (Z-03, W-278) + Cascade/Dead-Cat (Z-04, W-279), BIB-020 rozdz. 28
+        NeuronToxicFlow(), NeuronPumpDetect(), NeuronBubbleCrash(), NeuronCascade(),
         # Geometria ścieżki (D) — Lévy Area Close×Volume, Rough Path Theory (W-079)
         NeuronPathSignature(),
     ]

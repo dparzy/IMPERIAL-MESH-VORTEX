@@ -55,7 +55,7 @@ SOURCE_TAG_PY = "pure-Python (deterministic)"
 _PURE_PYTHON_INDICATORS = {
     "AO", "AO_PREV", "AC", "AC_PREV", "HMA", "HMA_PREV",
     "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "PERMUTATION_ENTROPY", "VPIN", "WASH_TRADING", "CHOPPINESS", "ULCER",
-    "BUBBLE_Z", "VOV", "RET_AR1",
+    "BUBBLE_Z", "VOV", "RET_AR1", "VALUE_Z", "MOMA_Z",
     "VWAP", "VWAP_STD",
     "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
 }
@@ -690,6 +690,67 @@ def _py_ret_ar1(close, window: int = 20) -> Optional[float]:
     return round(cov / math.sqrt(vx * vy), 4)
 
 
+def _py_value_z(close, period: int = 200) -> Optional[float]:
+    """
+    Value-Z — odchylenie ceny od długoterminowej wartości godziwej w jednostkach σ
+    (BIB-020, Harris rozdz. 16 "Value Traders").
+
+    Dla nowicjusza: value traderzy wchodzą dopiero, gdy cena ODERWAŁA się materialnie
+    od swojej wartości godziwej (ich "outside spread"). Kotwicą wartości jest SMA-200,
+    a miarą oderwania — z-score: ile odchyleń standardowych cena jest poniżej/powyżej.
+      Value-Z < −2.0 → wyprzedanie (kandydat LONG, rewersja do wartości)
+      Value-Z > +2.0 → wykupienie (kandydat SHORT)
+      |Value-Z| < 1.5 → cena blisko wartości (NEUTRAL).
+
+    Wzór: z = (close[-1] − SMA_period) / std(close[-period:]).
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 16; wizja W-273.
+    """
+    import math
+    c = list(close)
+    if len(c) < period:
+        return None
+    okno = c[-period:]
+    n = len(okno)
+    mean = sum(okno) / n
+    var = sum((x - mean) ** 2 for x in okno) / (n - 1)
+    std = math.sqrt(var)
+    if std < 1e-12:
+        return 0.0
+    return round((c[-1] - mean) / std, 4)
+
+
+def _py_moma_z(close, period: int = 200) -> Optional[float]:
+    """
+    MoMA-Z — odchylenie ceny od ŚREDNIEJ ŚREDNICH (Moving average of Moving Averages),
+    wieloskalowa kotwica wartości (BIB-020, Harris rozdz. 16; wizja W-273).
+
+    Dla nowicjusza: pojedyncza SMA-200 jest mocno opóźniona. Value traderzy patrzą na
+    wartość w wielu horyzontach naraz. MoMA = średnia z SMA-20/50/100/200 — łączy
+    krótki, średni i długi obraz. z = (close − MoMA) / std(close, 200).
+    Komplementarny do Value-Z (inna kotwica) — krzyżowe potwierdzenie rewersji.
+
+    Wzór: MoMA = mean(SMA20, SMA50, SMA100, SMA200); z = (close[-1] − MoMA)/std(close[-200:]).
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 16; wizja W-273.
+    """
+    import math
+    c = list(close)
+    if len(c) < period:
+        return None
+
+    def _sma(seria, okr):
+        return sum(seria[-okr:]) / okr
+
+    moma = (_sma(c, 20) + _sma(c, 50) + _sma(c, 100) + _sma(c, period)) / 4.0
+    okno = c[-period:]
+    n = len(okno)
+    mean = sum(okno) / n
+    var = sum((x - mean) ** 2 for x in okno) / (n - 1)
+    std = math.sqrt(var)
+    if std < 1e-12:
+        return 0.0
+    return round((c[-1] - moma) / std, 4)
+
+
 def _py_supertrend(high, low, close, period: int = 10, multiplier: float = 3.0):
     """
     Supertrend — pure Python, bez TA-Lib.
@@ -879,6 +940,10 @@ class CalculatorGateway:
             "BUBBLE_Z":   lambda close, period=200: _py_bubble_z(close, period),
             "VOV":        lambda high, low, close, period=14, window=20: _py_vov(high, low, close, period, window),
             "RET_AR1":    lambda close, window=20: _py_ret_ar1(close, window),
+
+            # ── Pure-Python: W-273 value convergence (kat. M, BIB-020 Harris rozdz. 16) ──
+            "VALUE_Z":    lambda close, period=200: _py_value_z(close, period),
+            "MOMA_Z":     lambda close, period=200: _py_moma_z(close, period),
 
             # ── TA-Lib: wolumen ────────────────────────────────────────────────
             "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),

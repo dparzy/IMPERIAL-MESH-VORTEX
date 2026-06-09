@@ -74,6 +74,8 @@ _PLAN_SKALARNE = {
     "BUBBLE_Z_200": ("BUBBLE_Z", ("close",), {"period": 200}),
     "VOV_20":       ("VOV", ("high", "low", "close"), {"period": 14, "window": 20}),
     "RET_AR1_20":   ("RET_AR1", ("close",), {"window": 20}),
+    "VALUE_Z_200":  ("VALUE_Z", ("close",), {"period": 200}),
+    "MOMA_Z_200":   ("MOMA_Z", ("close",), {"period": 200}),
     "WASH_SCORE_100": ("WASH_TRADING", ("volume",), {"period": 100}),
     "CHOPPINESS_14": ("CHOPPINESS", ("high", "low", "close"), {"period": 14}),
     "ULCER_14":      ("ULCER", ("close",), {"period": 14}),

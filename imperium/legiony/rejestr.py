@@ -28,6 +28,7 @@ from imperium.legiony.neurony.momentum import (
     NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross,
     NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI,
     NeuronTRIX, NeuronAwesome, NeuronAccelerator, NeuronBBSqueeze,
+    NeuronValueConvergence,
 )
 from imperium.legiony.neurony.trend import (
     NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian,
@@ -83,6 +84,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronRSI(), NeuronMACD(), NeuronBBands(), NeuronEMACross(),
         NeuronWilliamsR(), NeuronATRDeviation(), NeuronHAScalper(), NeuronStochRSI(),
         NeuronTRIX(), NeuronAwesome(), NeuronAccelerator(), NeuronBBSqueeze(),
+        # Value convergence (M) — rewersja do wartości godziwej (X-27, W-273, BIB-020 Harris rozdz. 16)
+        NeuronValueConvergence(),
         # Trend (XII)
         NeuronADX(), NeuronIchimoku(), NeuronEMA50_200(), NeuronSupertrend(), NeuronDonchian(),
         NeuronHMA(), NeuronFibonacci(), NeuronRSIDiv(), NeuronOBZone(),

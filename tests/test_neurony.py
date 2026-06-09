@@ -1088,6 +1088,81 @@ def test_z03_zarejestrowany():
     assert any(n.KLUCZ == "Z-03" for n in wszystkie_neurony())
 
 
+# ─── W-273: Value Convergence (X-27, kategoria M, BIB-020 Harris rozdz. 16) ──
+
+def test_brama_value_z_wyprzedanie():
+    """VALUE_Z: cena znacznie poniżej SMA-200 → ujemny z-score (wyprzedanie)."""
+    from imperium.fundament.brama_kalkulatora import _py_value_z
+    c = [100.0] * 199 + [80.0]   # ostatni bar mocno poniżej średniej
+    z = _py_value_z(c, period=200)
+    assert z is not None and z < -2.0
+
+
+def test_brama_value_z_za_malo_danych():
+    """VALUE_Z → None gdy mniej niż period barów."""
+    from imperium.fundament.brama_kalkulatora import _py_value_z
+    assert _py_value_z([100.0] * 50, period=200) is None
+
+
+def test_brama_moma_z_zakres():
+    """MOMA_Z: liczone z 4 SMA; spike w górę → dodatni z-score."""
+    from imperium.fundament.brama_kalkulatora import _py_moma_z
+    import random
+    random.seed(9)
+    c = [100.0 + random.gauss(0, 1) for _ in range(199)] + [130.0]
+    z = _py_moma_z(c, period=200)
+    assert z is not None and z > 1.5
+
+
+def test_brama_audyt_zrodlo_w273_pure_python():
+    """Prawo XIII: VALUE_Z/MOMA_Z w zbiorze pure-Python."""
+    from imperium.fundament.brama_kalkulatora import _PURE_PYTHON_INDICATORS
+    assert {"VALUE_Z", "MOMA_Z"} <= _PURE_PYTHON_INDICATORS
+
+
+def test_x27_long_wyprzedanie():
+    """X-27 (W-273): blend-Z < −2.0 → LONG (rewersja do wartości)."""
+    from imperium.legiony.neurony.momentum import NeuronValueConvergence
+    s = NeuronValueConvergence().interpretuj({"VALUE_Z_200": -2.5, "MOMA_Z_200": -2.3})
+    assert s.kierunek == "LONG"
+    assert s.pewnosc >= 0.55
+
+
+def test_x27_short_wykupienie():
+    """X-27: blend-Z > +2.0 → SHORT."""
+    from imperium.legiony.neurony.momentum import NeuronValueConvergence
+    s = NeuronValueConvergence().interpretuj({"VALUE_Z_200": 2.8, "MOMA_Z_200": 2.4})
+    assert s.kierunek == "SHORT"
+
+
+def test_x27_neutral_blisko_wartosci():
+    """X-27: |blend-Z| < 1.5 → NEUTRAL (brak okazji rewersji)."""
+    from imperium.legiony.neurony.momentum import NeuronValueConvergence
+    s = NeuronValueConvergence().interpretuj({"VALUE_Z_200": 0.5, "MOMA_Z_200": -0.3})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc == 0.0
+
+
+def test_x27_brak_danych_neutral():
+    """X-27: brak danych → NEUTRAL (abstynencja, Prawo I)."""
+    from imperium.legiony.neurony.momentum import NeuronValueConvergence
+    assert NeuronValueConvergence().interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_x27_jeden_wskaznik_wystarcza():
+    """X-27: działa nawet gdy tylko jedna kotwica dostępna (blend z dostępnych)."""
+    from imperium.legiony.neurony.momentum import NeuronValueConvergence
+    s = NeuronValueConvergence().interpretuj({"VALUE_Z_200": -2.6})
+    assert s.kierunek == "LONG"
+
+
+def test_x27_zarejestrowany_kategoria_M():
+    """X-27 żyje w roju z kategorią M (Prawo XV/XIX/XXI)."""
+    from imperium.legiony.rejestr import wszystkie_neurony
+    n = [x for x in wszystkie_neurony() if x.KLUCZ == "X-27"]
+    assert len(n) == 1 and n[0].KATEGORIA == "M"
+
+
 def test_brama_audyt_zrodlo_pure_python():
     """Prawo XIII: pure-Python wskaźniki stemplowane jako pure-Python, nie TA-Lib."""
     from imperium.fundament.brama_kalkulatora import (

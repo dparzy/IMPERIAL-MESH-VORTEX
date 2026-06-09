@@ -259,6 +259,7 @@
 |-------|------|--------|
 | BudowniczyWskaznikow | `legiony/budowniczy_wskaznikow.py` | ✅ aktywny |
 | GeneralLegatus | `legiony/legatus.py` | ✅ aktywny |
+| MasterSwitchOnline (master-switch Faza 2 — wagi głosujących VR/HL/AR1 uczone Hedge/MWU) | `legiony/legatus.py` | ✅ aktywny |
 | DiagnostykaKorelacji | `legiony/diagnostyka_korelacji.py` | ✅ aktywny |
 | Igrzyska / Koloseum | `koloseum/` | ✅ aktywny |
 | BramaKalkulatora | `fundament/brama_kalkulatora.py` | ✅ aktywny |
@@ -267,6 +268,7 @@
 | BezpiecznikKrzywejKapitalu (Equity-Curve Circuit Breaker, W-062) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | Volatility Drag (W-130, Sinclair BIB-008 — erozja ½λ(λ−1)σ² lewara) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | RegulaSzesciuProcentEldera (Reguła 6% Elder BIB-015 — HALT gdy strata miesięczna ≥ 6%) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
+| Skew-Kelly (W-211, Sinclair BIB-018 — Kelly korygowany o skośność/fat tails) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | PaperTradingEngine | `koloseum/paper_trading.py` | ✅ aktywny |
 | Dyrygent (orkiestrator cyklu end-to-end) | `koloseum/dyrygent.py` | ✅ aktywny |
 | Backtest (przejazd po historii) | `koloseum/backtest.py` | ✅ aktywny |

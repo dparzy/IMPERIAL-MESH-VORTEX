@@ -6,6 +6,44 @@
 
 ---
 
+## 2026-06-09 | FEATURE | Master-switch Faza 2 — online-learning wag głosujących (Hedge/MWU)
+
+**Opis:** `MasterSwitchOnline` w `legiony/legatus.py` — Faza 2 master-switcha reżimu.
+Faza 1 (2-z-3) traktuje VR/half-life/AR1 równo; Faza 2 daje każdemu głosującemu wagę
+uczoną online z wyników: gdy ADX wyjdzie ze strefy spornej (>25 → był TREND; <20 →
+RANGING), `rozlicz()` aktualizuje wagi HedgeMWU (reuse W-049, DRY — ta sama matematyka
+co wagi neuronów). `klasyfikuj_rezim(wskazniki, master_switch_online=ms)` — opt-in.
+
+**Neutralność (Prawo XV):** przy równych wagach decyzja ważona = dokładnie 2-z-3 z Fazy 1
+(test `test_masterswitch_f2_neutralnosc_rowne_wagi` to dowodzi). Zero regresji.
+**Zero halucynacji (Prawo I):** ADX nadal sporny → `rozlicz()` nic nie uczy.
+
+**Pliki:** `imperium/legiony/legatus.py`, `tests/test_integracja.py`,
+`docs/MANIFEST_KODU.md`, `README.md`
+**Testy:** +4 (571→575/575). Audyt: exit 0.
+
+---
+
+## 2026-06-09 | FEATURE | Skew-Kelly (BIB-018, Sinclair) — sizing na grube ogony (W-211)
+
+**Opis:** `KalkulatorLewara.skew_kelly(mu, sigma, skos)` — Kelly skorygowany o trzeci
+moment rozkładu (skośność). Klasyczne Kelly (μ/σ²) zakłada symetrię; krypto ma gruby
+lewy ogon (krachy). Przy ujemnym skosie wzór automatycznie tnie frakcję, chroniąc
+przed ryzykiem ogona.
+
+**Matematyka:** rozwinięcie Taylora E[log(1+fX)] do 3. rzędu →
+f* = (σ² − √(σ⁴ − 4μ·m₃)) / (2m₃), gdzie m₃ = skos·σ³. Pierwiastek dobrany tak,
+że skos→0 daje dokładnie μ/σ². Dodatni skos → wracamy do klasycznego (nie zawyżamy).
+
+**Weryfikacja numeryczna:** μ=0.10, σ=0.20 → symetria 2.50, skos −1.0 → 1.83 (cięcie),
+skos +1.0 → 2.50, brak danych → None (Prawo XV).
+
+**Pliki:** `imperium/pretorianie/kalkulator_lewara.py`, `tests/test_kalkulator.py`,
+`docs/MANIFEST_KODU.md`, `README.md`
+**Testy:** +5 (566→571/571). Audyt: exit 0.
+
+---
+
 ## 2026-06-09 | FEATURE | Reguła 6% Alexandra Eldera (BIB-015) — miesięczny circuit-breaker
 
 **Opis:** Wdrożenie Reguły 6% z "Come Into My Trading Room" (Elder, BIB-015).

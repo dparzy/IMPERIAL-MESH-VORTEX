@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-09 | FEATURE | Master-switch Faza 2 — online-learning wag głosujących (Hedge/MWU)
+
+**Opis:** `MasterSwitchOnline` w `legiony/legatus.py` — Faza 2 master-switcha reżimu.
+Faza 1 (2-z-3) traktuje VR/half-life/AR1 równo; Faza 2 daje każdemu głosującemu wagę
+uczoną online z wyników: gdy ADX wyjdzie ze strefy spornej (>25 → był TREND; <20 →
+RANGING), `rozlicz()` aktualizuje wagi HedgeMWU (reuse W-049, DRY — ta sama matematyka
+co wagi neuronów). `klasyfikuj_rezim(wskazniki, master_switch_online=ms)` — opt-in.
+
+**Neutralność (Prawo XV):** przy równych wagach decyzja ważona = dokładnie 2-z-3 z Fazy 1
+(test `test_masterswitch_f2_neutralnosc_rowne_wagi` to dowodzi). Zero regresji.
+**Zero halucynacji (Prawo I):** ADX nadal sporny → `rozlicz()` nic nie uczy.
+
+**Pliki:** `imperium/legiony/legatus.py`, `tests/test_integracja.py`,
+`docs/MANIFEST_KODU.md`, `README.md`
+**Testy:** +4 (571→575/575). Audyt: exit 0.
+
+---
+
 ## 2026-06-09 | FEATURE | Skew-Kelly (BIB-018, Sinclair) — sizing na grube ogony (W-211)
 
 **Opis:** `KalkulatorLewara.skew_kelly(mu, sigma, skos)` — Kelly skorygowany o trzeci

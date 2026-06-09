@@ -259,6 +259,7 @@
 |-------|------|--------|
 | BudowniczyWskaznikow | `legiony/budowniczy_wskaznikow.py` | ✅ aktywny |
 | GeneralLegatus | `legiony/legatus.py` | ✅ aktywny |
+| MasterSwitchOnline (master-switch Faza 2 — wagi głosujących VR/HL/AR1 uczone Hedge/MWU) | `legiony/legatus.py` | ✅ aktywny |
 | DiagnostykaKorelacji | `legiony/diagnostyka_korelacji.py` | ✅ aktywny |
 | Igrzyska / Koloseum | `koloseum/` | ✅ aktywny |
 | BramaKalkulatora | `fundament/brama_kalkulatora.py` | ✅ aktywny |

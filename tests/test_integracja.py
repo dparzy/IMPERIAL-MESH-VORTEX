@@ -256,6 +256,60 @@ def test_masterswitch_nie_nadpisuje_adx():
     assert klasyfikuj_rezim(w) == "TREND_STRONG"  # master-switch NIE rusza działającego ADX
 
 
+# ─── Master-switch Faza 2: online-learning wag głosujących (Hedge/MWU) ────────
+
+def test_masterswitch_f2_neutralnosc_rowne_wagi():
+    """Faza 2 z równymi wagami (start) = identyczny wynik jak Faza 1 (Prawo XV)."""
+    from imperium.legiony.legatus import klasyfikuj_rezim, MasterSwitchOnline
+    ms = MasterSwitchOnline()
+    w_trend = {"ADX_14": 22.0, "ATR_DEVIATION": 1.5,
+               "VARIANCE_RATIO_4": 1.3, "OU_HALFLIFE_50": 60.0, "RET_AR1_20": 0.0}
+    w_rozbiezne = {"ADX_14": 22.0, "ATR_DEVIATION": 1.5,
+                   "VARIANCE_RATIO_4": 1.3, "OU_HALFLIFE_50": 8.0, "RET_AR1_20": 0.0}
+    assert klasyfikuj_rezim(w_trend, ms) == klasyfikuj_rezim(w_trend) == "TREND_STRONG"
+    ms2 = MasterSwitchOnline()
+    assert klasyfikuj_rezim(w_rozbiezne, ms2) == klasyfikuj_rezim(w_rozbiezne) == "NORMAL"
+
+
+def test_masterswitch_f2_rozliczenie_uczy_wagi():
+    """Po rozliczeniu prawdą ADX trafny głosujący zyskuje wagę, mylący traci."""
+    from imperium.legiony.legatus import klasyfikuj_rezim, MasterSwitchOnline
+    ms = MasterSwitchOnline()
+    # Strefa sporna: VR mówi TREND, HL mówi RANGING, AR1 milczy
+    w_sporna = {"ADX_14": 22.0, "ATR_DEVIATION": 1.5,
+                "VARIANCE_RATIO_4": 1.3, "OU_HALFLIFE_50": 8.0, "RET_AR1_20": 0.0}
+    klasyfikuj_rezim(w_sporna, ms)
+    # Prawda: ADX wychodzi w trend → VR trafił, HL się mylił
+    klasyfikuj_rezim({"ADX_14": 30.0, "ATR_DEVIATION": 1.2}, ms)
+    mn = ms.mwu.mnozniki()
+    assert mn["VR"] > mn["HL"], "trafny głosujący (VR) musi mieć wyższą wagę niż mylący (HL)"
+
+
+def test_masterswitch_f2_wagi_zmieniaja_decyzje():
+    """Po nauce waga przeważa: 1 trafny głosujący wygrywa z 1 mylącym (kiedyś remis→NORMAL)."""
+    from imperium.legiony.legatus import klasyfikuj_rezim, MasterSwitchOnline
+    ms = MasterSwitchOnline(eta=1.5, prog_przewagi=0.5)
+    w_sporna = {"ADX_14": 22.0, "ATR_DEVIATION": 1.5,
+                "VARIANCE_RATIO_4": 1.3, "OU_HALFLIFE_50": 8.0, "RET_AR1_20": 0.0}
+    # Kilka rund: VR zawsze trafia (prawda=TREND), HL zawsze się myli
+    for _ in range(5):
+        klasyfikuj_rezim(w_sporna, ms)
+        klasyfikuj_rezim({"ADX_14": 30.0, "ATR_DEVIATION": 1.2}, ms)
+    # Teraz ta sama sporna sytuacja → ważona decyzja przechyla się ku TREND
+    assert klasyfikuj_rezim(w_sporna, ms) == "TREND_STRONG", \
+        "wyuczona waga VR musi przeważyć mylącego HL"
+
+
+def test_masterswitch_f2_brak_rozliczenia_w_strefie_spornej():
+    """ADX nadal sporny (22) → rozlicz() nic nie uczy (zero halucynacji, Prawo I)."""
+    from imperium.legiony.legatus import MasterSwitchOnline
+    ms = MasterSwitchOnline()
+    ms.glosuj({"VARIANCE_RATIO_4": 1.3, "OU_HALFLIFE_50": 60.0})
+    assert ms.rozlicz({"ADX_14": 22.0}) is None
+    assert ms.rozlicz({}) is None
+    assert ms.mwu.rundy == {}, "bez prawdy ADX żadna waga nie może się zmienić"
+
+
 def test_brama_ou_halflife_rewersja_vs_trend():
     """OU half-life: seria rewertująca → krótki half-life; trendowa → 9999 (brak rewersji)."""
     from imperium.fundament.brama_kalkulatora import _py_ou_halflife

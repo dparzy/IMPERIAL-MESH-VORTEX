@@ -114,7 +114,109 @@ def _master_switch_rezimu(wskazniki: dict):
     return None
 
 
-def klasyfikuj_rezim(wskazniki: dict) -> str:
+def _glosy_master_switch(wskazniki: dict) -> dict:
+    """
+    Głosy trzech mierników master-switcha jako dict {ekspert: "TREND"/"RANGING"/None}.
+    Te same progi co Faza 1 (_master_switch_rezimu) — jedna prawda progowa, DRY.
+    """
+    vr = wskazniki.get("VARIANCE_RATIO_4")
+    hl = wskazniki.get("OU_HALFLIFE_50")
+    ar1 = wskazniki.get("RET_AR1_20")
+    return {
+        "VR":  None if vr is None else ("TREND" if vr > 1.05 else "RANGING" if vr < 0.95 else None),
+        "HL":  None if hl is None else ("TREND" if hl > 40 else "RANGING" if hl < 20 else None),
+        "AR1": None if ar1 is None else ("TREND" if ar1 > 0.10 else "RANGING" if ar1 < -0.10 else None),
+    }
+
+
+class MasterSwitchOnline:
+    """
+    Master-switch reżimu — Faza 2: online-learning wag głosujących (Hedge/MWU).
+
+    DLA NOWICJUSZA: Faza 1 traktuje trzech mierników dynamiki (VR / half-life / AR1)
+    równo — głosowanie 2-z-3. Ale na różnych rynkach różne mierniki bywają trafniejsze.
+    Faza 2 daje każdemu głosującemu WAGĘ uczoną z wyników: gdy ADX później wyjdzie
+    ze strefy spornej (>25 → był TREND; <20 → był RANGING), rozliczamy głosujących —
+    kto trafił, zyskuje wagę (HedgeMWU, ta sama matematyka co wagi neuronów W-049).
+
+    NEUTRALNOŚĆ (Prawo XV): przy równych wagach (start / brak historii) decyzja
+    ważona = dokładnie głosowanie 2-z-3 z Fazy 1 — zero zmian dopóki historia
+    faktycznie nie zróżnicuje głosujących.
+
+    Użycie:
+        ms = MasterSwitchOnline()
+        decyzja = ms.glosuj(wskazniki)            # "TREND_STRONG"/"RANGING"/None
+        ...następne bary, ADX wychodzi ze strefy spornej...
+        ms.rozlicz(wskazniki_pozniejsze)          # uczy wagi z prawdy ADX
+    """
+
+    # Eksperci (głosujący) master-switcha — klucze stabilne dla HedgeMWU
+    EKSPERCI = ("VR", "HL", "AR1")
+
+    def __init__(self, eta: float = 0.3, prog_przewagi: float = 0.5):
+        """
+        eta: tempo uczenia MWU (łagodniejsze niż dla neuronów — reżim zmienia się
+             wolniej niż trade'y, 0.3 zamiast 0.5).
+        prog_przewagi: minimalna przewaga ważona zwycięskiej strony nad przegraną
+             (w jednostkach mnożnika wagi; 0.5 ≈ „ponad pół eksperta więcej").
+        """
+        try:
+            from imperium.biblioteki.hedge_mwu import HedgeMWU
+        except ImportError:
+            from hedge_mwu import HedgeMWU
+        self.mwu = HedgeMWU(eta=eta)
+        self.prog_przewagi = prog_przewagi
+        # Ostatnie głosy oddane w strefie spornej — czekają na rozliczenie prawdą ADX
+        self._glosy_oczekujace: "dict | None" = None
+
+    def glosuj(self, wskazniki: dict) -> "str | None":
+        """
+        Ważona decyzja TREND_STRONG / RANGING / None (None → NORMAL u wołającego).
+        Zapamiętuje głosy do późniejszego rozliczenia przez rozlicz().
+        """
+        glosy = _glosy_master_switch(wskazniki)
+        self._glosy_oczekujace = {k: v for k, v in glosy.items() if v is not None}
+
+        mn = self.mwu.mnozniki()
+        suma_trend = sum(mn.get(k, 1.0) for k, v in glosy.items() if v == "TREND")
+        suma_ranging = sum(mn.get(k, 1.0) for k, v in glosy.items() if v == "RANGING")
+
+        if suma_trend - suma_ranging >= self.prog_przewagi:
+            return "TREND_STRONG"
+        if suma_ranging - suma_trend >= self.prog_przewagi:
+            return "RANGING"
+        return None
+
+    def rozlicz(self, wskazniki: dict) -> "str | None":
+        """
+        Rozlicza ostatnie oczekujące głosy prawdą z ADX (gdy wyszedł ze strefy spornej):
+          ADX_14 > 25 → prawda = "TREND";  ADX_14 < 20 → prawda = "RANGING";
+          20 ≤ ADX ≤ 25 lub brak → nadal sporna, nic nie uczymy (zero halucynacji, Prawo I).
+        Zwraca prawdę ("TREND"/"RANGING") gdy rozliczono, inaczej None.
+        """
+        if not self._glosy_oczekujace:
+            return None
+        adx = wskazniki.get("ADX_14")
+        if adx is None or 20 <= adx <= 25:
+            return None
+        prawda = "TREND" if adx > 25 else "RANGING"
+        for ekspert, glos in self._glosy_oczekujace.items():
+            strata = 0.0 if glos == prawda else 1.0
+            self.mwu.aktualizuj(ekspert, strata)
+        logger.info(
+            f"🔮 Master-switch Faza 2: rozliczono głosy {self._glosy_oczekujace} "
+            f"prawdą ADX={adx:.1f} → {prawda}; wagi: {self.mwu.mnozniki()}"
+        )
+        self._glosy_oczekujace = None
+        return prawda
+
+    def raport(self) -> list:
+        """Tabela głosujących z mnożnikami (diagnostyka — kto wygrywa zaufanie)."""
+        return self.mwu.raport()
+
+
+def klasyfikuj_rezim(wskazniki: dict,
+                     master_switch_online: "MasterSwitchOnline | None" = None) -> str:
     """
     Automatyczny klasyfikator reżimu rynku z gotowych wskaźników Bramy.
 
@@ -125,6 +227,10 @@ def klasyfikuj_rezim(wskazniki: dict) -> str:
       STREFA SPORNA (ADX 20–25 lub brak ADX) → master-switch 2-z-3 (W-263/W-274), inaczej NORMAL
       NORMAL    → domyślnie
 
+    master_switch_online (Faza 2, opt-in): zamiast sztywnego 2-z-3 — głosowanie
+    WAŻONE wagami uczonymi online (MasterSwitchOnline). Gdy ADX jest jednoznaczny,
+    rozlicza wcześniejsze głosy ze strefy spornej (uczenie). None → Faza 1.
+
     Prawo I: TYLKO czyta z wskazniki dict, nie liczy własnej matematyki.
     Prawo XVI: progi zmierzone (nie zgadywane) na standardowych parametrach TA.
     """
@@ -133,6 +239,10 @@ def klasyfikuj_rezim(wskazniki: dict) -> str:
     bb_upper = wskazniki.get("BB_UPPER")
     bb_lower = wskazniki.get("BB_LOWER")
     bb_middle = wskazniki.get("BB_MIDDLE")
+
+    # Faza 2: ADX jednoznaczny → rozlicz wcześniejsze głosy strefy spornej (uczenie)
+    if master_switch_online is not None:
+        master_switch_online.rozlicz(wskazniki)
 
     # VOLATILE: ekstremalnie wysoka zmienność
     if atr_dev is not None and atr_dev > 2.5:
@@ -150,9 +260,13 @@ def klasyfikuj_rezim(wskazniki: dict) -> str:
                 return "RANGING"
         return "RANGING"  # sam ADX < 20 wystarczy
 
-    # STREFA SPORNA (ADX 20–25 lub brak ADX): master-switch 2-z-3 (Faza 1, Opcja 1).
-    # ADX jest tu ślepy — dopiero dynamika (VR / half-life / AR1) rozstrzyga.
-    decyzja = _master_switch_rezimu(wskazniki)
+    # STREFA SPORNA (ADX 20–25 lub brak ADX): master-switch rozstrzyga.
+    # Faza 2 (gdy podana): głosowanie WAŻONE wagami uczonymi online.
+    # Faza 1 (domyślnie): sztywne 2-z-3. ADX jest tu ślepy — dynamika rozstrzyga.
+    if master_switch_online is not None:
+        decyzja = master_switch_online.glosuj(wskazniki)
+    else:
+        decyzja = _master_switch_rezimu(wskazniki)
     if decyzja is not None:
         return decyzja
 

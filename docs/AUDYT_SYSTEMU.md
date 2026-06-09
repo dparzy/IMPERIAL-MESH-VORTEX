@@ -15,9 +15,9 @@
 ╠══════════════════════════════════════════════════════════════════════╣
 ║  Moduły kodu:        58 plików .py                                  ║
 ║  Dokumenty:          25 plików .md                                   ║
-║  Neurony:            27 w kodzie / 299 katalog                      ║
+║  Neurony:            55 w kodzie / 299 katalog                      ║
 ║  Strategie:          ~108+ zmapowanych                               ║
-║  Testy automatyczne: 240 ✅ (wszystkie zielone)                     ║
+║  Testy automatyczne: 558 ✅ (wszystkie zielone)                     ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║  ✅ Działające (bez TA-Lib):    8 modułów                            ║
 ║  ⚠️  Blokowane przez TA-Lib:    9 modułów                            ║
@@ -80,10 +80,10 @@
 
 | # | Czego brakuje | Gdzie | Priorytet |
 |---|---------------|-------|-----------|
-| 1 | ✅ ZROBIONE — **Testy automatyczne** `tests/` (52 testów, 0 zależności) | `tests/` | ~~🔴~~ |
+| 1 | ✅ ZROBIONE — **Testy automatyczne** `tests/` (558 testów, 0 zależności) | `tests/` | ~~🔴~~ |
 | 2 | ✅ ZROBIONE — **Scorer Igrzysk** `igrzyska.py` (11 testów) | `biblioteki/igrzyska.py` | ~~🔴~~ |
 | 3 | ✅ ZROBIONE — **Doradcy Cara** Oracle/Fulmen/Iustitia/Hermes/Pythia+Rada (24 testów) | `cesarz/doradcy/` | ~~🟠~~ |
-| 4 | ✅ ZROBIONE — **52 neuronów + 12 zwiadowców** w kodzie (z 299 katalogu); 505 testów | `legiony/neurony/` | ~~🔴~~ |
+| 4 | ✅ ZROBIONE — **55 neuronów + 12 zwiadowców** w kodzie (z 299 katalogu); 558 testów | `legiony/neurony/` | ~~🔴~~ |
 | 5 | **Konektor CME Gap** — ⚠️ CME 24/7 od 29.05.2026 — strategia zanika historycznie | `oczy/cme_feed.py` | 🟡 Niski |
 | 6 | **Multi-exchange konektor** — Binance, OKX jako "prowincje" | `akwedukty/multi_exchange.py` | 🟠 Faza 2 |
 | 7 | ✅ ZROBIONE — **Scheduler** LIVE/BACKTEST/ONCE, bezpiecznik AOA, graceful shutdown | `drogi/scheduler.py` | ~~🟠~~ |
@@ -126,7 +126,7 @@
 | Dokument | Status | Aktualność |
 |----------|--------|-----------|
 | INDEKS_IMPERIUM.md | ✅ | v0.3.0 — aktualne |
-| KATALOG_NEURONOW.md | ✅ | 299 katalog / 27 w kodzie |
+| KATALOG_NEURONOW.md | ✅ | 299 katalog / 55 w kodzie |
 | KATALOG_STRATEGII.md | ✅ | ~103 strategie — aktualne |
 | IGRZYSKA_IMPERIUM.md | ✅ | Kij + Marchewka — aktualne |
 | PAMIEC_ABSOLUTNA.md | ✅ | ImperiumLog — aktualne |

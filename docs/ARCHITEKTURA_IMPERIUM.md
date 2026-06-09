@@ -1,6 +1,6 @@
 # 🏛️ ARCHITEKTURA IMPERIUM — pełna mapa
 
-> **Po co:** Jedno miejsce, które spina **21 prawami** z **realnym kodem** (17 modułów).
+> **Po co:** Jedno miejsce, które spina **21 prawami** z **realnym kodem** (75 modułów .py).
 > Pokazuje, jak Cesarstwo jest zbudowane i którędy płynie sygnał.
 
 ---

@@ -31,6 +31,9 @@
 | LangFuse | *(monitoring)* | *(darmowy tier — zewnętrzny)* | Monitoring | 🔴 | Monitorowanie kosztu wywołań LLM, śledzenie tokenów i latencji |
 | CrewAI | *(opcja dla Senatu)* | `senat/` | Framework | 🔴 | Rozważany jeśli debata Senatu urośnie powyżej obecnej architektury |
 | LangGraph | *(opcja dla Cesarza)* | `cesarz/` | Framework | 🔴 | Graf przepływu dla złożonej logiki decyzyjnej Cesarza |
+| Binance fapi (public) | **AdapterFutures** | `akwedukty/adaptery/futures.py` | Dane Derywatyw | ✅ | Funding Rate, Open Interest — budzą PSY-01/02/04 (kat. R), bez klucza API |
+| Binance aggTrades (public) | **AdapterCVD** | `akwedukty/adaptery/cvd.py` | Wolumen | ✅ | Cumulative Volume Delta — budzi V-03 (kat. F), bez klucza API |
+| alternative.me / CNN Fear&Greed | **AdapterFearGreed** | `akwedukty/adaptery/feargreed.py` | Sentyment | ✅ | Indeks Strachu i Chciwości — budzi neurony psychologii, bez klucza API |
 
 ---
 

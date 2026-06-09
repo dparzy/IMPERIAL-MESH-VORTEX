@@ -5,21 +5,21 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-08 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 52 neuronów (zarejestrowane w roju) + 12 zwiadowców = **64 modułów w kodzie**
-**Aktywne / wyciszone:** 45 aktywnych + 7 wyciszonych, z czego:
-  • **39 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, OC-05 WashTrading, D-01 PathSignature)
+**Stan na:** 2026-06-09 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Zaimplementowane:** 55 neuronów (zarejestrowane w roju) + 12 zwiadowców = **67 modułów w kodzie**
+**Aktywne / wyciszone:** 48 aktywnych + 7 wyciszonych, z czego:
+  • **42 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, X-27 Value Convergence, OC-05 WashTrading, D-01 PathSignature)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 budzone WEWNĘTRZNIE** (SMC-01/02/03) — liczą z barów przez most EXP-05, ożywają w żywym Legatusie (`zbuduj_legatusa`), **bez żadnego API**
   • **4 wymaga ZEWNĘTRZNEGO API on-chain** (OC-01..04) — Glassnode/CryptoQuant (Faza D)
 **Elitarne (Prawo XX):** 15 (3 neurony + 12 zwiadowców)
 **W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
-**Do wdrożenia:** 248 neuronów
+**Do wdrożenia:** 244 neuronów
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 51). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 55). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -46,7 +46,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (52/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (55/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -68,6 +68,7 @@
 | X-12 | NeuronBBSqueeze | M | 6 | ✅ aktywny | BB_UPPER | — |
 | X-25 🔱 | NeuronATRDeviation | M | 6 | ✅ aktywny | ATR_DEVIATION | E4+E5 |
 | X-26 🔱 | NeuronHAScalper | M | 7 | ✅ aktywny | HA_SCALPER | E4+E5+E7 |
+| X-27 | NeuronValueConvergence | M | 6 | ✅ aktywny | VALUE_Z_200 | rewersja do wartości: Value-Z+MoMA-Z (W-273, BIB-020 Harris rozdz.16) |
 
 ### Plik: `neurony/trend.py`
 
@@ -143,6 +144,8 @@
 | N-01 | NeuronPermutationEntropy | N | 7 | ✅ aktywny | PERM_ENTROPY_100 | meta-brama chaosu (PE) |
 | Z-01 | NeuronToxicFlow | Z | 8 | ✅ aktywny | VPIN_50 | meta-brama obronna (VPIN) |
 | Z-02 | NeuronPumpDetect | Z | 7 | ✅ aktywny | OBV | akumulacja przed pumpem (W-042) |
+| Z-03 | NeuronBubbleCrash | Z | 9 | ✅ aktywny | BUBBLE_Z_200 | bubble/crash kill-switch: bubble_z+VoV+AR1 (W-278, BIB-020 Harris rozdz.28) |
+| Z-04 | NeuronCascade | Z | 8 | ✅ aktywny | CASCADE_FLAG | kill-switch kaskady + dead-cat bounce LONG (W-279, BIB-020 Harris rozdz.28) |
 | D-01 | NeuronPathSignature | D | 7 | ✅ aktywny 🎖️ | CLOSE_SERIES_20 | Lévy Area Close×Volume — geometria ścieżki (W-079) |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
@@ -246,7 +249,7 @@
 | III Augusta (H1) | ~45 | 9 (XII-01..04, V-01..04, VSA-01) + PSY-01..04 ✅ (Faza B) + wyciszone: V-03,SMC-01..03 | ~36 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
-| **RAZEM** | **299** | **52** | **247** |
+| **RAZEM** | **299** | **55** | **244** |
 
 ---
 

@@ -28,6 +28,7 @@ from imperium.legiony.neurony.momentum import (
     NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross,
     NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI,
     NeuronTRIX, NeuronAwesome, NeuronAccelerator, NeuronBBSqueeze,
+    NeuronValueConvergence,
 )
 from imperium.legiony.neurony.trend import (
     NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian,
@@ -58,7 +59,7 @@ from imperium.legiony.neurony.entropia import (
     NeuronPermutationEntropy,
 )
 from imperium.legiony.neurony.zagrozenie import (
-    NeuronToxicFlow, NeuronPumpDetect,
+    NeuronToxicFlow, NeuronPumpDetect, NeuronBubbleCrash, NeuronCascade,
 )
 from imperium.legiony.neurony.geometria import (
     NeuronPathSignature,
@@ -83,6 +84,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronRSI(), NeuronMACD(), NeuronBBands(), NeuronEMACross(),
         NeuronWilliamsR(), NeuronATRDeviation(), NeuronHAScalper(), NeuronStochRSI(),
         NeuronTRIX(), NeuronAwesome(), NeuronAccelerator(), NeuronBBSqueeze(),
+        # Value convergence (M) — rewersja do wartości godziwej (X-27, W-273, BIB-020 Harris rozdz. 16)
+        NeuronValueConvergence(),
         # Trend (XII)
         NeuronADX(), NeuronIchimoku(), NeuronEMA50_200(), NeuronSupertrend(), NeuronDonchian(),
         NeuronHMA(), NeuronFibonacci(), NeuronRSIDiv(), NeuronOBZone(),
@@ -104,7 +107,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         # Entropia (N) — Permutation Entropy meta-brama chaosu, OHLCV bez API
         NeuronPermutationEntropy(),
         # Zagrożenie (Z) — VPIN meta-brama obronna (Z-01) + PumpDetect kierunkowy (Z-02)
-        NeuronToxicFlow(), NeuronPumpDetect(),
+        # + Bubble/Crash kill-switch (Z-03, W-278) + Cascade/Dead-Cat (Z-04, W-279), BIB-020 rozdz. 28
+        NeuronToxicFlow(), NeuronPumpDetect(), NeuronBubbleCrash(), NeuronCascade(),
         # Geometria ścieżki (D) — Lévy Area Close×Volume, Rough Path Theory (W-079)
         NeuronPathSignature(),
     ]

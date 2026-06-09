@@ -178,3 +178,167 @@ class NeuronPumpDetect(MikroNeuron):
         return self._bazowy_sygnal(spike, "LONG", sila,
             [f"🚀 AKUMULACJA WYKRYTA: vol×{spike:.2f} MA, zakres {zakres:.2f}× ATR, "
              f"OBV>{obv_e:.0f} — smart money zbiera pozycję → LONG ({sila:.0%})"])
+
+
+class NeuronBubbleCrash(MikroNeuron):
+    """
+    Z-03 | Bubble/Crash Kill-Switch — defensywna meta-brama (W-278, BIB-020 Harris rozdz. 28).
+
+    Dla nowicjusza: to bezpiecznik przed dwoma najgroźniejszymi dla kapitału stanami
+    rynku — PĘKAJĄCĄ BAŃKĄ i KRACHEM KASKADOWYM. Łączy trzy niezależne sygnały
+    liczone z samego OHLCV (Prawo XV — żadnych nowych danych nie trzeba):
+
+      1. BUBBLE_Z — odchylenie ceny od EMA-200 w jednostkach σ. Bańka = cena
+         oderwana od długoterminowej grawitacji (granice Fischera Blacka).
+      2. VoV (Volatility-of-Volatility) — czy sama zmienność jest niestabilna.
+         Przed krachem ATR skacze z baru na bar (rozpad konsensusu cenowego).
+      3. AR1 — autokorelacja zwrotów lag-1. Dodatnia = refleksywność: ceny napędzają
+         same siebie (kaskada momentum / margin calls), klasyczna dynamika krachu/paraboli.
+
+    Z-03 to META-BRAMA OBRONNA (jak Z-01) — NIGDY nie wybiera LONG/SHORT. Tłumi cały rój
+    przez pewnosc_przeciwnika, skalowany siłą najgroźniejszego z trzech sygnałów:
+      • Próg ALARM (bubble_z>3.5 LUB VoV>1.2 LUB AR1>0.40) → 🚨 KILL-SWITCH:
+        maksymalne tłumienie (pewnosc_przeciwnika do 0.97) — „nie wchodź, schodź z ryzyka".
+      • Strefa CZUJNOŚCI (bubble_z>2.5 / VoV>0.8 / AR1>0.25) → umiarkowane tłumienie.
+      • Poniżej → spokój, NEUTRAL bez tłumienia.
+
+    Dlaczego ORTOGONALNY (Prawo XVI): Z-01 mierzy toksyczność przepływu (KTO handluje),
+    Z-03 mierzy NIESTABILNOŚĆ STRUKTURY CENY (bańka/krach). Inna oś zagrożenia.
+    ⚠️ Nakładka do zmierzenia: AR1 vs HURST_DFA (H-01) i VoV vs Yang-Zhang — różne okna
+    i konstrukcja, ale warto sprawdzić |r| przed podniesieniem wagi (Prawo XVI).
+
+    Źródło: Harris, "Trading and Exchanges: Market Microstructure for Practitioners"
+            (Oxford 2003), rozdz. 28 "Bubbles, Crashes, and Circuit Breakers".
+            Wizja W-278 (docs/WIZJONER.md, BIB-020).
+    """
+    KLUCZ = "Z-03"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "BUBBLE_Z_200"
+    KATEGORIA = "Z"
+    WAGA = 9
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    # Progi ALARM (kill-switch) — dowolny przekroczony → maksymalne tłumienie
+    _BUBBLE_ALARM = 3.5
+    _VOV_ALARM    = 1.2
+    _AR1_ALARM    = 0.40
+    # Progi CZUJNOŚĆ — umiarkowane tłumienie skalowane
+    _BUBBLE_CZUJ  = 2.5
+    _VOV_CZUJ     = 0.8
+    _AR1_CZUJ     = 0.25
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        bz  = wskazniki.get("BUBBLE_Z_200")
+        vov = wskazniki.get("VOV_20")
+        ar1 = wskazniki.get("RET_AR1_20")
+
+        if bz is None and vov is None and ar1 is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak danych Bubble/Crash (wymaga BUBBLE_Z/VoV/AR1 — za mało barów)"])
+
+        abz = abs(bz) if bz is not None else 0.0
+        vovv = vov if vov is not None else 0.0
+        aar1 = ar1 if ar1 is not None else 0.0
+
+        # ── Próg ALARM — dowolny sygnał skrajny → KILL-SWITCH ──
+        alarmy = []
+        if abz >= self._BUBBLE_ALARM:
+            alarmy.append(f"bubble_z={bz:+.2f} (|{abz:.2f}|≥{self._BUBBLE_ALARM})")
+        if vovv >= self._VOV_ALARM:
+            alarmy.append(f"VoV={vovv:.2f}≥{self._VOV_ALARM}")
+        if aar1 >= self._AR1_ALARM:
+            alarmy.append(f"AR1={aar1:+.2f}≥{self._AR1_ALARM}")
+
+        if alarmy:
+            # Tłumienie skaluje się ponad próg, ale nie spada poniżej 0.85 przy alarmie
+            nadwyzka = max(
+                (abz - self._BUBBLE_ALARM) / self._BUBBLE_ALARM if abz >= self._BUBBLE_ALARM else 0.0,
+                (vovv - self._VOV_ALARM) / self._VOV_ALARM if vovv >= self._VOV_ALARM else 0.0,
+                (aar1 - self._AR1_ALARM) / self._AR1_ALARM if aar1 >= self._AR1_ALARM else 0.0,
+            )
+            przeciwnik = round(min(0.97, 0.85 + nadwyzka * 0.5), 4)
+            s = self._bazowy_sygnal(bz, "NEUTRAL", 0.0,
+                [f"🚨 BUBBLE/CRASH KILL-SWITCH: {', '.join(alarmy)} — "
+                 f"niestabilność struktury ceny, HALT/schodź z ryzyka"])
+            s.pewnosc_przeciwnika = przeciwnik
+            s.policz_finalna()
+            return s
+
+        # ── Strefa CZUJNOŚCI — umiarkowane tłumienie skalowane ──
+        czuj_score = max(
+            (abz - self._BUBBLE_CZUJ) / (self._BUBBLE_ALARM - self._BUBBLE_CZUJ) if abz > self._BUBBLE_CZUJ else 0.0,
+            (vovv - self._VOV_CZUJ) / (self._VOV_ALARM - self._VOV_CZUJ) if vovv > self._VOV_CZUJ else 0.0,
+            (aar1 - self._AR1_CZUJ) / (self._AR1_ALARM - self._AR1_CZUJ) if aar1 > self._AR1_CZUJ else 0.0,
+        )
+        if czuj_score > 0.0:
+            przeciwnik = round(min(0.6, czuj_score * 0.6), 4)
+            s = self._bazowy_sygnal(bz, "NEUTRAL", 0.0,
+                [f"⚠️ Czujność: bubble_z={bz if bz is not None else 0:+.2f}, "
+                 f"VoV={vovv:.2f}, AR1={aar1:+.2f} — rosnąca niestabilność struktury"])
+            s.pewnosc_przeciwnika = przeciwnik
+            s.policz_finalna()
+            return s
+
+        # ── Spokój ──
+        return self._bazowy_sygnal(bz, "NEUTRAL", 0.0,
+            [f"Struktura stabilna: bubble_z={bz if bz is not None else 0:+.2f}, "
+             f"VoV={vovv:.2f}, AR1={aar1:+.2f}"])
+
+
+class NeuronCascade(MikroNeuron):
+    """
+    Z-04 | Cascade / Dead-Cat — kill-switch kaskady krachu + taktyczne odbicie (W-279, BIB-020 rozdz. 28).
+
+    Dla nowicjusza: dwustanowy strażnik krachu, komplementarny do Z-03:
+      • KASKADA (CASCADE_FLAG=1): trwa lawina krachu — kilka kolejnych spadkowych barów,
+        każdy większy, przy rosnącym wolumenie (stop-loss + margin calls się nakręcają).
+        → 🚨 KILL-SWITCH: NEUTRAL z wysokim pewnosc_przeciwnika (nie łap spadającego noża).
+      • DEAD-CAT (DEADCAT_SETUP=1, gdy kaskada już WYGASŁA): sprzedający wyczerpani,
+        dno wyhamowane, wolumen słabnie, cena głęboko wyprzedana → krótkie odbicie.
+        → taktyczny LONG (krótki hold + ciasny stop zarządza egzekutor, nie neuron).
+      • Inaczej → NEUTRAL bez wpływu.
+
+    Priorytet: KASKADA bije DEAD-CAT (gdy lawina trwa, nie kupujemy, choćby było wyprzedanie).
+
+    Dlaczego ORTOGONALNY (Prawo XVI): Z-03 mierzy NIESTABILNOŚĆ STRUKTURY (bubble_z/VoV/AR1,
+    okna długie), Z-04 łapie KONKRETNĄ SYGNATURĘ LAWINY w ostatnich 3 barach + układ odbicia.
+    Z-03 = stan ostrzegawczy, Z-04 = zdarzenie i jego wyczerpanie.
+    ⚠️ Prawo XVI (do zmierzenia): CASCADE_FLAG vs VoV/AR1 (Z-03) — sprawdzić |r|.
+
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 28 (price accelerator, dead-cat bounce);
+            wizja W-279 (docs/WIZJONER.md, BIB-020).
+    """
+    KLUCZ = "Z-04"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "CASCADE_FLAG"
+    KATEGORIA = "Z"
+    WAGA = 8
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        cascade = wskazniki.get("CASCADE_FLAG")
+        deadcat = wskazniki.get("DEADCAT_SETUP")
+
+        if cascade is None and deadcat is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak danych Cascade/Dead-Cat (wymaga serii close/volume)"])
+
+        # KASKADA — priorytet: nie łap spadającego noża
+        if cascade == 1.0:
+            s = self._bazowy_sygnal(1.0, "NEUTRAL", 0.0,
+                ["🚨 KASKADA KRACHU: 3+ przyspieszające spadki przy rosnącym wolumenie "
+                 "— kill-switch, nie wchodź (lawina stop-loss/margin call)"])
+            s.pewnosc_przeciwnika = 0.92
+            s.policz_finalna()
+            return s
+
+        # DEAD-CAT — kaskada wygasła, sprzedający wyczerpani → taktyczne odbicie
+        if deadcat == 1.0:
+            return self._bazowy_sygnal(1.0, "LONG", 0.60,
+                ["🐱 DEAD-CAT BOUNCE: krach wyhamowany, dno trzyma, wolumen słabnie, "
+                 "głębokie wyprzedanie → taktyczny LONG (krótki hold + ciasny stop)"])
+
+        return self._bazowy_sygnal(0.0, "NEUTRAL", 0.0,
+            ["Brak kaskady i układu odbicia — spokój"])

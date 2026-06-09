@@ -527,3 +527,71 @@ class NeuronBBSqueeze(MikroNeuron):
             pewnosc = 0.60 + (0.15 if atr_dev < 1.0 else 0.0)
             powody.append(f"Cena ({close:.2f}) w dolnej połowie → bias SHORT")
             return self._bazowy_sygnal(bb_width, "SHORT", pewnosc, powody)
+
+
+class NeuronValueConvergence(MikroNeuron):
+    """
+    X-27 | Value Convergence — rewersja do wartości godziwej (W-273, BIB-020 Harris rozdz. 16).
+
+    Dla nowicjusza: value traderzy (najsilniejsi stabilizatorzy rynku) kupują dopiero, gdy
+    cena oderwała się materialnie PONIŻEJ wartości godziwej, i sprzedają, gdy jest znacznie
+    POWYŻEJ. Mierzymy oderwanie dwiema niezależnymi kotwicami i bierzemy ich średnią:
+      • Value-Z   = (close − SMA-200) / σ(close,200)              — kotwica jednoskalowa
+      • MoMA-Z    = (close − mean(SMA20/50/100/200)) / σ(close,200) — kotwica wieloskalowa
+    Sygnał (blend = średnia obu):
+      blend < −2.0 → LONG (głębokie wyprzedanie, rewersja w górę)
+      blend > +2.0 → SHORT (głębokie wykupienie)
+      |blend| < 1.5 → NEUTRAL (cena blisko wartości — nie ma okazji rewersji)
+    Pewność rośnie z |blend| (im głębsze oderwanie, tym mocniejszy argument value tradera).
+
+    Kategoria M (nie S): to neuron mean-reversion. W WAGI_REZIMU kat. M dostaje ×1.5 w
+    reżimie RANGING — dokładnie tam, gdzie rewersja do wartości ma przewagę (a w trendzie
+    jest słusznie tłumiona). Dołącza do rodziny oscylatorów wyprzedania/wykupienia (RSI/StochRSI).
+
+    ⚠️ Prawo XVI (do zmierzenia): nakładka z X-04 BBands (z-score 20-barowy) i X-01 RSI —
+    INNY horyzont (200 vs 20/14), ale sprawdzić |r| przed podniesieniem wagi.
+
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 16 "Value Traders"; wizja W-273.
+    """
+    KLUCZ = "X-27"
+    LEGION = "SWING"
+    WSKAZNIK = "VALUE_Z_200"
+    KATEGORIA = "M"
+    WAGA = 6
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    _PROG_WEJSCIA = 2.0    # |blend| ≥ 2.0 → sygnał kierunkowy
+    _PROG_NEUTRAL = 1.5    # |blend| < 1.5 → NEUTRAL (martwa strefa wokół wartości)
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        vz = wskazniki.get("VALUE_Z_200")
+        mz = wskazniki.get("MOMA_Z_200")
+
+        dostepne = [x for x in (vz, mz) if x is not None]
+        if not dostepne:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak danych Value Convergence (wymaga ≥200 barów)"])
+
+        blend = sum(dostepne) / len(dostepne)
+
+        if abs(blend) < self._PROG_NEUTRAL:
+            return self._bazowy_sygnal(round(blend, 3), "NEUTRAL", 0.0,
+                [f"Cena blisko wartości: blend-Z={blend:+.2f} (|{abs(blend):.2f}|<{self._PROG_NEUTRAL})"])
+
+        if abs(blend) < self._PROG_WEJSCIA:
+            # Strefa ostrzegawcza — słaby sygnał (nie pełne wejście)
+            kier = "LONG" if blend < 0 else "SHORT"
+            return self._bazowy_sygnal(round(blend, 3), kier, 0.30,
+                [f"Umiarkowane oderwanie: blend-Z={blend:+.2f} (Value-Z={vz}, MoMA-Z={mz}) "
+                 f"— rewersja możliwa, słaby sygnał"])
+
+        # Pełny sygnał rewersji — pewność rośnie z głębokością oderwania (cap 0.85)
+        sila = round(min(0.85, 0.55 + (abs(blend) - self._PROG_WEJSCIA) * 0.15), 4)
+        if blend < 0:
+            return self._bazowy_sygnal(round(blend, 3), "LONG", sila,
+                [f"📉→📈 WARTOŚĆ: blend-Z={blend:+.2f} (Value-Z={vz}, MoMA-Z={mz}) "
+                 f"— głębokie wyprzedanie vs wartość godziwa → rewersja LONG ({sila:.0%})"])
+        return self._bazowy_sygnal(round(blend, 3), "SHORT", sila,
+            [f"📈→📉 WARTOŚĆ: blend-Z={blend:+.2f} (Value-Z={vz}, MoMA-Z={mz}) "
+             f"— głębokie wykupienie vs wartość godziwa → rewersja SHORT ({sila:.0%})"])

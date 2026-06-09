@@ -1758,6 +1758,360 @@ Rynki NIE są gaussowskie (Bachelier/Markowitz/Black-Scholes się mylą). Rządz
 
 ---
 
+### 📗 BIB-010 — "Quantitative Trading" (2nd ed.) — Ernest P. Chan ⭐ PRAKTYK ALGO
+
+**Pełny tytuł:** *Quantitative Trading: How to Build Your Own Algorithmic Trading Business* (2nd ed.) (Handel ilościowy: jak zbudować własny biznes tradingu algorytmicznego)
+**Autor:** Ernest P. Chan (Wiley) — dr fizyki (Cornell), były quant IBM/Morgan Stanley/Credit Suisse, zarządzający funduszem. Praktyk, nie akademik — książka jest podręcznikiem "jak to zrobić".
+**Status weryfikacji:** ✅ Rozdziały merytoryczne (3 Backtesting, 6 Money/Risk/Kelly, 7 Special Topics) przeczytane dogłębnie przez analizę Opus. ⚠️ Rozdziały o infrastrukturze brokerskiej/setupie pominięte jako nieistotne.
+**Ocena:** 9/10 · **Priorytet wdrożenia:** 🔴 Wysoki (praktyczne, kodowalne, bezpośrednio karmi KALKULATOR_LEWARA, Koloseum, kat. R/S)
+
+#### Teza centralna
+Edge ilościowy = prosta strategia + żelazna higiena backtestu + matematyczne zarządzanie kapitałem. Chan kładzie nacisk na unikanie pułapek (data-snooping, look-ahead, survivorship), macierzowy Kelly z kowariancją, oraz rozróżnienie **kointegracji** (długoterminowa wspójność cen) od **korelacji** (krótkoterminowa współzmienność zwrotów) — dwa szeregi mogą być skorelowane bez kointegracji i odwrotnie.
+
+#### Potencjalne Wizje (W-160..W-169)
+| Wizja | Nazwa | Kat./moduł | Metoda źródłowa | Nowa oś? | Priorytet |
+|---|---|---|---|---|---|
+| **W-160** | NeuronHalfLife (Ornstein-Uhlenbeck) ⭐ | R | regresja Δz~(z−μ); half-life=−ln2/θ — skala czasowa rewersji | TAK (vs Hurst) | 🔴 |
+| **W-161** | Test spójności W-130: g_max=S²/2 | L (test) | wzrost złożony g=m−s²/2; weryfikacja volatility drag | — (test) | 🟠 |
+| **W-162** | Macierzowy Kelly portfela strategii ⭐ | L/legatus | F*=C⁻¹·M; zdekorelowane strategie→wyższy wzrost (dowód Prawa XVI) | TAK (infra) | 🔴 |
+| **W-163** | Cap lewara przez najgorszą stratę ⭐ | L | lewar_max=max_DD/\|najgorsza_strata\|; min(half-Kelly, cap) | TAK (ogony) | 🔴 |
+| **W-164** | Para kointegrująca (z-score spreadu) | S | hedge ratio OLS + ADF/CADF + Bollinger z na spreadzie | TAK (relacja 2 instr.) | 🟠 wymaga 2. symbolu |
+| **W-165** | Deflated Sharpe + min. długość backtestu | infra | Bailey 2012; Sharpe≥1 wymaga ≥681 obs. | TAK (infra) | 🟠 |
+| **W-166** | Truncation look-ahead test ⭐ | infra | backtest pełny vs obcięty; A≠B → look-ahead bias | TAK (infra) | 🔴 tani |
+| **W-167** | Stop-loss warunkowany reżimem | L/exit | stop pomaga w momentum, szkodzi w mean-rev (R+H+Z) | synergia | 🟠 |
+| **W-168** | Conditional Parameter Optimization (CPO) | legatus/ML | ML przewiduje zwrot STRATEGII wg warunków; dynamiczne progi | TAK (ML) | 🟡 decyzja Cezara |
+| **W-169** | PCA statistical factor model | M (cross-sec) | PCA koszyka; faktory; long/short oczekiwanych zwrotów | TAK | 🟡 wymaga koszyka |
+
+🔗 **Symbioza (Prawo XVI):** Chan dostarcza matematyczny dowód, dlaczego Prawo XVI podnosi wzrost kapitału — macierzowy Kelly (W-162) z macierzą kowariancji C: zdekorelowane strategie → C bliska diagonalnej → wyższy zagregowany Kelly. Sugestia: dodać test kointegracji (ADF na spreadzie) jako DRUGI wymiar dekorelacji w `diagnostyka_korelacji` (kointegracja ≠ korelacja).
+
+---
+
+### 📘 BIB-011 — "Algorithmic Trading: Winning Strategies and Their Rationale" — Ernest Chan ⭐ (ŻYCZ-04)
+
+**Pełny tytuł:** *Algorithmic Trading: Winning Strategies and Their Rationale* (算法交易：制胜策略与原理 — handel algorytmiczny: zwycięskie strategie i ich uzasadnienie). Wydanie chińskie (dostarczone przez Cezara).
+**Autor:** Ernest Chan (Wiley) — jak BIB-010, ale ta pozycja jest bardziej zaawansowana matematycznie (kointegracja Johansena, Kalman, Pearson-Kelly).
+**Status weryfikacji:** ✅ Rozdziały merytoryczne (2 mean-reversion/kointegracja, 3 Kalman, 6 momentum, 8 ryzyko/Kelly) przeczytane przez analizę Opus z chińskiego oryginału. ⚠️ Tłumaczenie terminów techn. zweryfikowane kontekstowo.
+**Ocena:** 9/10 · **Priorytet wdrożenia:** 🔴 Wysoki (Kalman dla par = rozszerzenie EXP-04; Monte-Carlo Kelly = fat-tail awareness dla KALKULATOR)
+
+#### Teza centralna
+Strategie mean-reversion i momentum mają RACJONALNE uzasadnienie (nie data-mining). Kluczowe narzędzia: filtr Kalmana do dynamicznego hedge ratio par, Hurst+half-life do klasyfikacji reżimu, oraz Kelly liczony Monte-Carlo na rozkładzie Pearsona (4 momenty) zamiast Gaussa — bo na grubych ogonach Gauss-Kelly prowadzi do ruiny.
+
+#### Potencjalne Wizje (W-170..W-178)
+| Wizja | Nazwa | Kat./moduł | Metoda źródłowa | Nowa oś? | Priorytet |
+|---|---|---|---|---|---|
+| **W-170** | NeuronHurst+VarianceRatio (Lo-MacKinlay) | R | Var(τ)∝τ^2H + test p-value random walk | TAK (vs ADF) | 🔴 |
+| **W-171** | NeuronHalfLife OU (auto-strojenie okien) | R/meta | −log2/λ dyktuje okna całego roju | TAK (meta) | 🔴 |
+| **W-172** | Kalman β dla par (rozszerz EXP-04) ⭐ | R/S | stan=[hedge_ratio,intercept]; std reszty=adaptacyjny Bollinger | rozszerzenie EXP-04 | 🔴 |
+| **W-173** | Kalman market-maker / VWAP fair-value | V/S | Ve∝wielkość transakcji; Kalman-ważony VWAP | TAK | 🟠 |
+| **W-174** | Time-series momentum (auto lookback/holding) | M | znak zwrotu→pozycja; okna z max korelacji | zmierzyć vs M | 🟡 redundancja? |
+| **W-175** | Cross-sectional momentum (ranking koszyka) | M | long top-decyl/short bottom; eliminuje beta | TAK (przekrojowa) | 🟡 wymaga koszyka |
+| **W-176** | Monte-Carlo Kelly (Pearson, fat tails) ⭐⭐ | L | symulacja 100k z 4 momentów; wykrywa ruin leverage | rozszerzenie Kelly | 🔴 |
+| **W-177** | CPPI (Constant Proportion Portfolio Insurance) | L/risk | D·equity w subkoncie z dźwignią; gwarantuje DD<D | TAK (alokacja) | 🟠 |
+| **W-178** | NeuronRyzykaWyprzedzajacego (leading risk) | R | proxy ryzyka NASTĘPNEGO okresu (funding/OI/depeg); wartość względna | TAK (asymetria) | 🟠 wymaga Bramy |
+
+🚨 **DWIE FLAGI Prawa XV do weryfikacji w kodzie (Chan dowodzi krytyczności):**
+1. **W-176:** czy KALKULATOR_LEWARA liczy Kelly tylko po Gaussie? Na rozkładach fat-tail (crypto!) Gauss-Kelly prowadzi do drawdown −1 (wipeout). Monte-Carlo Kelly z Pearsona to ujawnia. → **do sprawdzenia.**
+2. **W-172:** czy EXP-04 używa Kalmana tylko do 1-D filtrowania, czy też do dynamicznego hedge-ratio par? Jeśli nie — niewykorzystany potencjał. → **do sprawdzenia kodu EXP-04.**
+
+🔗 **Nakładanie z BIB-010:** obie książki Chana dzielą half-life OU (W-160≈W-171) i Kelly. Przy wdrożeniu — jeden neuron half-life, nie dwa. W-170 (Hurst+VR) jest mocniejszą wersją klasyfikatora reżimu niż sam half-life.
+
+---
+
+### 📕 BIB-012 — "Coding Capital" — Strauss & Van Der Post ⚠️ SŁABA (3/10)
+
+**Pełny tytuł:** *Coding Capital: The Art of Algorithmic Trading: A Comprehensive Guide for Algorithmic Trading with Python in 2024*
+**Autor:** Johann Strauss & Hayden Van Der Post (self-published, 2024) — Van Der Post produkuje dziesiątki podobnych tytułów rocznie.
+**Status weryfikacji:** ✅ Rozdziały 4, 5, 8, 13 przeczytane krytycznie przez analizę Opus.
+**Ocena:** ⚠️ **3/10 — słaba** · **Priorytet:** 🟡 Niski (niemal zero wartości dla Imperium)
+
+#### Werdykt (Prawo I — uczciwość)
+80% to wypełniacz prozą (metafory żeglarskie zamiast treści). Snippety toy-level i **często BŁĘDNE**: `volatility=returns.std()` na całym DataFrame, błędny wzór Expected Shortfall, Monte Carlo ze sztywnym sigma=2, mylone position sizing. Wszystko na yfinance/equities — zero crypto/futures. Zero cytowań, zero walidacji statystycznej. Wszystkie "techniki" (RSI/MACD/Sharpe/VaR/Kelly/Kalman) Imperium ma już lepiej i w testowanej formie.
+
+#### Jedyne ziarno warte kodu (W-180)
+| Wizja | Nazwa | Kat./moduł | Metoda | Nowa oś? | Priorytet |
+|---|---|---|---|---|---|
+| **W-180** | EVT/GPD — parametr kształtu ogona ξ | R/L | Peaks-Over-Threshold + Generalized Pareto Distribution; ξ>0=ciężki ogon | TAK (vs VaR/CVaR) | 🟠 |
+
+🚨 **Prawo XV:** W-180 to jedyna rzecz, której nasz stack ryzyka jeszcze NIE mierzy — parametr kształtu ogona ξ (gruby ogon ≠ wysoka wariancja). ⚠️ wymaga ręcznej implementacji MLE GPD (scipy łamie zasadę czystego runnera). Reszta książki: pominięta jako redundancja. **Rekomendacja: nie kupować więcej tytułów Van Der Posta** — López de Prado (BIB-007) ma EVT/meta-labeling na poważnie.
+
+---
+
+### 📙 BIB-013 — "Markets in Profile" — James F. Dalton ⭐ AUCTION MARKET THEORY (filar V/S)
+
+**Pełny tytuł:** *Markets in Profile: Profiting from the Auction Process* (Rynki w profilu: zarabianie na procesie aukcyjnym)
+**Autor:** James F. Dalton (Wiley Trading, 2007) — twórca popularyzacji Market Profile (po Steidlmayerze/CBOT). ŻYCZ-06.
+**Status weryfikacji:** ✅ Rozdziały merytoryczne (2 Information/konstrukcja profilu, 4 Auctions/Indicators, 5-6 excess/kształty, 8 taksonomia otwarć) przeczytane przez analizę Opus.
+**Ocena:** 8/10 · **Priorytet wdrożenia:** 🟠 Średni-Wysoki (celuje wprost w nasze 2 najsłabsze filary V i S — ale wymaga warstwy profilu w Bramie/Budowniczym)
+
+#### Teza centralna + KLUCZOWA ocena realności na OHLCV
+Auction Market Theory (AMT): rynek to ciągła aukcja szukająca wartości. **Wartość ≠ cena** — cena szuka wartości, a profil cena×czas (TPO) pokazuje gdzie rynek zaakceptował wartość. **Realność dla bota:**
+- **TPO (Time Price Opportunity) = TYLKO CZAS przy cenie** → w pełni rekonstruowalne z czystego OHLC (zliczanie ilu barów objęło każdy poziom). ZIELONE.
+- **Volume Profile/POC** → przybliżenie przez rozsmarowanie wolumenu bara po [low,high]. ŻÓŁTE (działa, Dalton sam historycznie estymował wolumen wzorem cena×czas).
+- **Tickowy POC / delta kupna-sprzedaży** → wymaga rozszerzenia Bramy o trade-level. CZERWONE (nie blokuje startu, poprawia jakość).
+
+#### Potencjalne Wizje (W-190..W-199)
+| Wizja | Nazwa | Kat. | Metoda źródłowa | Dane | Priorytet |
+|---|---|---|---|---|---|
+| **W-190** | NeuronTPO ValueArea (pozycja vs VA 70%) ⭐ | S | histogram TPO; POC; ekspansja do 70% | OHLC ✅ | 🔴 |
+| **W-191** | NeuronVolumePOC (przybliżenie z OHLCV) | V | wolumen rozsmarowany per bar; POC_vol+VA | OHLCV 🟡 | 🟠 |
+| **W-192** | NeuronValueMigration (trend wartości vs bracket) | R | dryf POC dzień-do-dnia; overlap VA (Jaccard) | OHLC ✅ | 🟠 |
+| **W-193** | NeuronInitialBalance+RangeExtension ⭐ | S | IB=zakres 1. okresów; RE=wyjście poza IB | OHLC ✅ | 🔴 |
+| **W-194** | NeuronExcess/Tails (wyczerpanie aukcji) | S/M | single-print na ekstremie + niski wolumen | OHLCV 🟡 | 🟠 |
+| **W-195** | NeuronOpenType (Drive/Test/Reject/Auction) | S/R | klasyfikacja pierwszych barów sesji | OHLC ✅ | 🟠 |
+| **W-196** | NeuronProfileShape (Normal/Trend/Double/b/P) | S/R | skew+kurtoza+n_modów histogramu (WEKTOR!) | OHLC ✅ | 🟠 |
+| **W-197** | NeuronOpenVsValue (gap acceptance) | S | open vs poprz. VA; reguła akceptacji | OHLC ✅ | 🟡 |
+| **W-198** | NeuronVolumeTPODivergence ⭐⭐ | V | POC_vol − POC_tpo; ukryta dystrybucja | OHLCV 🟡 | 🔴 |
+| **W-199** | NeuronOneTimeframing (attempted direction) | T/M | seria barów bez cofnięcia poniżej poprz. low | OHLC ✅ | 🟡 |
+
+🚨 **Prawo XV — infrastruktura konieczna:** (1) definicja "sesji" w crypto 24/7 (umowny open UTC) dla W-193/195/197/199; (2) wspólny `profil_tpo()` i `profil_wolumenu()` w Budowniczym (rdzeń W-190/191/192/196/198); (3) bez tego te neurony = martwe głosy. **W-198 (volume-vs-TPO divergence) to najmocniejszy kandydat na "filar siły" Prawa XVI** (|ρ|<0.20 z trendem — czysta dywergencja).
+
+---
+
+### 📗 BIB-014 — "Mind Over Markets" — James F. Dalton ⭐ PODRĘCZNIK BAZOWY MARKET PROFILE (ŻYCZ-05)
+
+**Pełny tytuł:** *Mind Over Markets: Power Trading with Market Generated Information* (Umysł ponad rynkiem: trading w oparciu o informację generowaną przez rynek)
+**Autor:** James F. Dalton (Wiley, 1990/2013) — to podręcznik BAZOWY (wcześniejszy niż BIB-013), uczy Market Profile od podstaw.
+**Status weryfikacji:** ✅ Rozdziały 1-4 (Novice→Competent) + Załączniki (TPO vs Volume, Anomalies) przeczytane przez analizę Opus.
+**Ocena:** 8/10 · **Priorytet wdrożenia:** 🟠 Średni-Wysoki (te same filary V/S; precyzyjne reguły mierzalne)
+
+#### Relacja do BIB-013 (ważne — unikać duplikatów)
+Obie książki Daltona dzielą TEN SAM aparat (VA, POC, IB, day types, initiative/responsive, tails). **Fundamenty pokrywają się z W-190..W-199 — przy wdrożeniu JEDEN moduł, nie dwa.** Unikalne dla MoM (podręcznik): precyzyjne reguły TPO-count, 6 typów dnia, 4 typy otwarcia, anomalie TPO-vs-volume, reguła "ogon w ostatnim okresie się nie liczy".
+
+#### Potencjalne Wizje (W-200..W-209) — z oznaczeniem duplikatów
+| Wizja | Nazwa | Kat. | Duplikat z BIB-013? | Priorytet |
+|---|---|---|---|---|
+| **W-200** | Value Area 70% (z VAP agregacji świec) | S/V | ≈ W-190/191 (SCALIĆ) | 🔴 |
+| **W-201** | POC + TPO ValueArea (fallback bez wolumenu) | S | ≈ W-190 (SCALIĆ) | 🟠 |
+| **W-202** | Initial Balance + Range Extension | S/R | = W-193 (DUPLIKAT) | 🔴 |
+| **W-203** | Klasyfikator Day Type (6 typów) ⭐ | R | UNIKALNE (taksonomia 6-typowa) | 🔴 |
+| **W-204** | One-Timeframe Detector | R/S | ≈ W-199 (składnik W-203) | 🟡 |
+| **W-205** | Excess/Tails (reguła "ostatni okres nie liczy") | S/V | ≈ W-194 + unikalna reguła | 🟠 |
+| **W-206** | Initiative vs Responsive Activity ⭐⭐ | R/S | UNIKALNE (esencja: trend vs balans wg akceptacji wartości) | 🔴 |
+| **W-207** | Open Type Classifier (4 typy) | R/S | ≈ W-195 (DUPLIKAT) | 🟠 |
+| **W-208** | Trade Facilitation Score (2 wielkie pytania) | R/V | meta-agregat → STRATEGIA, nie neuron | 🟡 |
+| **W-209** | Anomaly/Structural Weakness Detector | S | UNIKALNE (TPO-vs-volume anomalia) | 🟡 |
+
+🚨 **Prawo XV — wąskie gardło Bramy:** cała wartość MP zależy od **agregacji krótkich świec → syntetyczny Volume-at-Price**. Jeśli Brama daje tylko OHLCV dzienne/godzinowe bez świec 1-5min → W-200/206/209 staną się martwymi głosami. Zweryfikować przed wdrożeniem.
+🔗 **Esencja Daltona (W-206 Initiative/Responsive):** "trend czy balans" wg akceptacji wartości — najmocniejszy zdekorelowany sygnał R, prawdopodobnie unikalny w całym roju. Po wdrożeniu W-190/191 (VA) — priorytet.
+
+---
+
+### 📘 BIB-015 — "The New Trading for a Living" — Alexander Elder ⭐ NARZĘDZIA + RYZYKO
+
+**Pełny tytuł:** *The New Trading for a Living: Psychology, Discipline, Trading Tools and Systems, Risk Control, Trade Management*
+**Autor:** Alexander Elder (Wiley, 2014) — psychiatra i trader, klasyk edukacji tradingowej.
+**Status weryfikacji:** ✅ Rozdziały merytoryczne (23 MACD-Hist, 30 Force Index, 39 Triple Screen, 40 Impulse, 41 Channels, 50/51 reguły 2%/6%, 56/59 trade management) przeczytane + **skonfrontowane z realnym kodem Imperium** przez agenta.
+**Ocena:** 8/10 · **Priorytet:** 🔴 Wysoki (znaleziona realna luka bezpieczeństwa: Reguła 6%)
+
+#### Co już mamy (agent zweryfikował w kodzie)
+MACD pełny z histogramem (`momentum.py` NeuronMACD), 2%/trade (`MAX_RYZYKO=0.02`), bezpieczniki AOA/equity-curve/drawdown-fractional. **W-218 (equity-curve discipline) JUŻ ISTNIEJE** jako BreakerKrzywejKapitalu — Elder waliduje, że wyprzedziliśmy go.
+
+#### Potencjalne Wizje (W-210..W-219)
+| Wizja | Nazwa | Kat./moduł | Metoda | Nowa oś? | Priorytet |
+|---|---|---|---|---|---|
+| **W-210** | NeuronForceIndex (cena×wolumen) ⭐ | V | FI=(close−close₋₁)×vol; EMA2/EMA13 | TAK | 🔴 |
+| **W-211** | Impulse System jako gate (veto) | R/legatus | slope(EMA13) + slope(MACD_HIST) → 3 stany | gate (nie głos) | 🟠 |
+| **W-212** | Reguła 6% — miesięczny budżet ryzyka ⭐⭐ | L/pretorianie | 6%×kapitał − (straty_mies + ryzyko_otwarte) | TAK (LUKA!) | 🔴 |
+| **W-213** | MACD-Histogram Divergence | M | niższe dno ceny + płytsze dno hist + przecięcie zera | boost (nie głos) | 🟡 |
+| **W-214** | Triple Screen (multi-timeframe gate) | legatus | TF×5 trend + oscylator + entry | architektura | 🟠 wymaga multi-TF |
+| **W-215** | Autoenvelope (kanał 95% pokrycia) | S/L | EMA±k%, k dobrane do 95% z 100 barów | zmierzyć vs BBands | 🟡 |
+| **W-216** | A-trade grading (cel 30% kanału) | pretorianie | TP=0.30×wysokość kanału przy wejściu | TAK (TP) | 🟡 |
+| **W-217** | Average EMA Penetration (limit wejścia) | egzekucja | śr. głębokość pullbacku pod EMA → limit-buy | TAK (entry) | 🟡 |
+| **W-218** | Equity-curve discipline | — | ✅ JUŻ ISTNIEJE (BreakerKrzywejKapitalu) | — | ✅ mamy |
+| **W-219** | Force Index ATR-channel divergence | V/L | FI13 w kanale ATR; wyczerpanie siły | boost (rzadkie) | 🟡 |
+
+🚨 **Prawo XV — realna LUKA:** **W-212 Reguła 6%** — mamy 2%/trade i drawdown-breakers, ale NIE mamy portfelowego budżetu ryzyka (suma otwartego ryzyka + strat miesiąca ≤ 6%). To oś ortogonalna do istniejących bezpieczników. **Najwyższy priorytet z tej książki.**
+🚨 **W-214 Triple Screen** — wymaga multi-TF w Bramie/Budowniczym; jeśli liczymy jeden interwał → utrata potencjału (do sprawdzenia).
+
+---
+
+### 📗 BIB-016 — "Trading in the Zone" — Mark Douglas ⚠️ PSYCHOLOGIA (4/10 dla automatu)
+
+**Pełny tytuł:** *Trading in the Zone: Master the Market with Confidence, Discipline and a Winning Attitude*
+**Autor:** Mark Douglas (2000) — klasyk psychologii tradingu.
+**Status weryfikacji:** ✅ Cała przeczytana krytycznie. **Werdykt: ~85% nieaplikowalne do automatu** (kontrola emocji człowieka — bot nie ma psychiki).
+**Ocena:** ⚠️ 4/10 (kodowalnie) · **Priorytet:** 🟡 Niski-Średni
+
+#### Paradoks Douglasa
+Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego automatu. Jego "5 prawd" i "7 zasad konsystencji" = lista wymagań architektonicznych. Większość już realizujemy (predefiniowany stop, mechaniczne wejścia) → redundancja. Kilka rzeczy mierzalnych:
+
+#### Potencjalne Wizje (W-220..W-225)
+| Wizja | Nazwa | Kat./moduł | Wartość | Priorytet |
+|---|---|---|---|---|
+| **W-220** | Walidacja edge na oknie ≥20 (nie per-trade) ⭐ | R/monitoring | NOWA — kroczące expectancy + detektor wygasania edge | 🔴 |
+| **W-221** | Eliminacja cherry-pickingu (wskaźnik dyscypliny=1.0) | R (test) | test regresyjny ukrytych filtrów | 🟡 |
+| **W-222** | Stop ze STRUKTURY rynku, nie stałej kwoty | R/kalkulator | weryfikacja — czy stop strukturalny | 🟡 |
+| **W-223** | Skalowane wyjścia (TP1/TP2→BE/trailing) | pretorianie | częściowo nowe; R:R≥3:1 (NIE liczby Douglasa) | 🟠 |
+| **W-224** | Legatus zwraca PRAWDOPODOBIEŃSTWO, nie binarność ⭐⭐ | legatus | możliwy 🚨 Prawo XV (redukcja głosów roju) | 🔴 |
+| **W-225** | Runtime self-audyt naruszania reguł | R/audyt | invariant checks ścieżki egzekucji | 🟠 |
+
+🚨 **3 flagi Prawa XV do sprawdzenia w kodzie:** (1) **W-224** czy GeneralLegatus zwraca ciągłą pewność czy binarną decyzję (redukcja bogatych głosów = utrata potencjału); (2) **W-220** czy edge oceniany na oknie ≥20 z detekcją wygasania; (3) **W-222** czy stop ze struktury czy stałej kwoty.
+
+---
+
+### 📙 BIB-017 — "Thinking, Fast and Slow" — Daniel Kahneman ⭐ BIASY TŁUMU + OCHRONA PROCESU (ŻYCZ-08)
+
+**Pełny tytuł:** *Thinking, Fast and Slow* (Pułapki myślenia)
+**Autor:** Daniel Kahneman (2011, Nobel) — ojciec ekonomii behawioralnej.
+**Status weryfikacji:** ✅ Przeczytana, przefiltrowana na 2 tryby użyteczności (biasy tłumu = neurony; biasy nasze = reguły).
+**Ocena:** 8/10 · **Priorytet:** 🟠 Średni-Wysoki (blok reguł ochrony procesu = najczęstsze źródło fałszywego edge)
+
+#### Dwa tryby (Prawo I — bot nie ma biasów, ale...)
+(A) Biasy = przewidywalne wzorce TŁUMU → tradeable → NEURONY. (B) Biasy = pułapki NASZE/backtestu → REGUŁY ochrony.
+
+#### Potencjalne Wizje (W-230..W-239)
+| Wizja | Nazwa | Typ | Kat./moduł | Priorytet |
+|---|---|---|---|---|
+| **W-230** | NeuronAnchorRound (okrągłe poziomy/ATH) | neuron | O/L | 🟠 |
+| **W-231** | NeuronOverreactMR (law of small numbers filtr) | neuron | R | 🟡 zmierzyć vs R |
+| **W-232** | NeuronDisposition (asymetria zysk/strata tłumu) ⭐ | neuron | M | 🔴 wymaga vol kierunkowego |
+| **W-233** | NeuronAvailabilityPanic (przeszacowanie ogona) | neuron | V/R | 🟠 |
+| **W-234** | REGUŁA: min. próbka + CI metryki strategii | reguła | walidacja | 🔴 |
+| **W-235** | REGUŁA: shrinkage + deflated Sharpe + outside view | reguła | walidacja | 🔴 |
+| **W-236** | REGUŁA: anti-hindsight (ocena na rozkładzie) | reguła | raport_elity | 🟠 |
+| **W-237** | REGUŁA: WYSIATI guard (BRAK ≠ 0, martwy głos) | reguła | kontrakt neuronu | 🔴 wzmacnia Prawo XV |
+| **W-238** | REGUŁA: anti-anchoring progów (zero magic numbers) | reguła | kalkulator/audyt | 🟠 |
+| **W-239** | REGUŁA: sizing niezależny od bieżącego P&L (anty-martingale) | reguła | kalkulator | 🔴 |
+
+🚨 **Prawo XV:** W-232/W-233 wymagają **wolumenu kierunkowego (taker buy/sell)** z Bramy — jeśli mamy tylko zagregowany wolumen → martwe głosy. **Najwartościowsze:** W-232 (disposition — empirycznie potwierdzona nieefektywność, nowa oś M) + blok reguł W-234/235/239 (chronią przed fałszywym edge z NASZYCH biasów).
+
+---
+
+### 📕 BIB-018 — "Positional Option Trading" — Euan Sinclair ⭐⭐ SIZING/RYZYKO (ŻYCZ-07)
+
+**Pełny tytuł:** *Positional Option Trading: A Quantitative Approach*
+**Autor:** Euan Sinclair (2020) — drugi Sinclair w Bibliotece. **Tu jest FINALNA matematyka sizingu** (BIB-008 miał wcześniejsze, słabsze wersje tych samych wzorów).
+**Status weryfikacji:** ✅ Rdzeń (rozdz. 9 Trade Sizing, 10 Meta Risks) przeczytany. ⚠️ statusy redundancji to hipotezy z opisu, nie odczyt kodu.
+**Ocena:** 9/10 · **Priorytet:** 🔴 Wysoki (bezpośrednio uściśla/zastępuje wizje Kelly z BIB-008)
+
+#### Potencjalne Wizje (W-240..W-249)
+| Wizja | Nazwa | Moduł | Status vs BIB-008 | Priorytet |
+|---|---|---|---|---|
+| **W-240** | Skew-adjusted Kelly (korekta o 3. moment) ⭐ | kalkulator | NOWE (BIB-008 tylko σ²) | 🔴 |
+| **W-241** | CI-Kelly — wzór na SD(f̂) + skalowanie pod P(over-bet) ⭐⭐ | kalkulator | uściśla W-131 (Bayes) | 🔴 |
+| **W-242** | Subkonto pełny-Kelly (fixed-fraction stop) | pretorianie | NOWE | 🟠 kierunkowe |
+| **W-243** | Trailing % subkonto (najlepsza wg Tab.9.4) | pretorianie | ulepsza equity-breaker | 🟠 |
+| **W-244** | Doktryna stopów: cena-stop tylko dla momentum ⭐ | pretorianie/strategie | NOWE — możliwy 🚨 Prawo XV | 🔴 |
+| **W-245** | Empiryczne strojenie poziomu stopa per-strategia | metryki/backtest | NOWE (proces) | 🟡 |
+| **W-246** | P(bariera) + oczekiwany czas wyjścia | metryki | NOWE (zależy od f, nie μ/σ) | 🟠 |
+| **W-247** | Odrzucenie fixed-% risk per trade | audyt | walidacja kierunku | 🟡 |
+| **W-248** | Confidence-weighted forecast → size | legatus/kalkulator | NOWE (sprzęga z W-096) | 🟠 |
+| **W-249** | Meta-ryzyka: counterparty cap (limit na MEXC) | pretorianie | NOWE — możliwy 🚨 Prawo XV | 🟠 świadomościowy |
+
+🚨 **2 flagi Prawa XV:** (1) **W-244** czy stosujemy cena-stop bez rozróżnienia momentum/reversion (na mean-reversion stop AKTYWNIE szkodzi — utrata potencjału); (2) **W-249** brak limitu counterparty na MEXC (QuadrigaCX!). **Najmocniejsze:** W-241 (twardy wzór na niepewność Kelly — zastępuje opisowy W-131), W-240 (skośność — krytyczna dla lewarowanego crypto z ogonem likwidacji), W-244 (doktryna stopów).
+
+---
+
+### 📕 BIB-019 — "Handbook for Cryptocurrencies Trading" — Virginia Harris ❌ ODRZUCONA (2/10)
+
+**Autor:** Virginia Harris (ghost-written "Mindful Finance", self-published) · **Ocena:** ❌ **2/10 — WYPEŁNIACZ** · **Priorytet:** ⬛ Zero
+
+**Werdykt (Prawo I — uczciwie):** beletrystyka dla nowicjusza spotowego HODL-era. Anty-systematyczna (*"90% of the time strict application of patterns will result in failing"*, *"matter of sixth sense"*), anty-leverage, anty-futures (radzi trzymać low-capy BEZ stop-lossa — dla nas wręcz szkodliwe). Przeterminowana: rekomenduje martwe/zhakowane giełdy (Cryptopia, CryptoBridge, CoinExchange) — łamie Prawo I. Zero matematyki operacyjnej (jedyne wzory SMA/EMA/StochRSI — mamy 10× lepiej). Patterny czysto wizualne, niekodowalne. Psychologia = przepisany Wall Street Cheat Sheet (redundancja z BIB-017/016).
+
+**Oś O (on-chain) NIE zostaje wypełniona:** obiecuje "on-chain metrics", dostarcza definicje słownikowe bez algorytmu/progu/normalizacji. **Brak funding rate, perpetual mechanics, basis, open interest, tokenomiki, DeFi TVL.** Pre-DeFi, czysto spotowa.
+
+**Wizje: NIE PRZYZNANO.** Pula W-250..W-259 wolna na lepsze źródło. Wpisanie czegokolwiek obok López de Prado/Sinclair/Mandelbrot byłoby naciąganiem (Prawo I).
+
+🚨 **Rekomendacja kierunkowa:** porzucić handbooki detaliczne jako źródło osi O. Właściwe źródła crypto-native: dokumentacja funding/basis (Binance/Deribit), VPIN na perpetualach, research Glassnode (NVT/SOPR/MVRV), tokenomika unlocków → to kierunek ŻYCZ-09..14.
+
+---
+
+### 📗 BIB-020 — "Trading and Exchanges: Market Microstructure for Practitioners" — Larry Harris ⭐ (ŻYCZ-10) 9/10
+
+**Autor:** Larry Harris (Fred V. Keenan Chair in Finance, USC Marshall; b. dyrektor ekonomiczny SEC) · **Wydawca:** Oxford University Press, 2003 · **Ocena:** ⭐ **9/10 — FUNDAMENT** · **Priorytet:** 🔴 Wysoki
+**Źródło:** ISBN 0-19-514470-8 (Financial Management Association Survey and Synthesis Series), 29 rozdziałów.
+
+**Werdykt (Prawo I — uczciwie):** to bezdyskusyjnie biblia mikrostruktury rynku dla praktyka — celuje wprost w nasze najsłabsze osie **Z (mikrostruktura, dziś tylko VPIN/Z-01)** i **L (płynność)**. Nie jest księgą wzorów gotowych do wklejenia jak López de Prado (BIB-007) — jest księgą MECHANIZMÓW: tłumaczy DLACZEGO spread się rozszerza, jak rozpoznać informowany przepływ, jak działa spoofing/squeeze/stop-gunning. Każdy mechanizm da się przełożyć na sygnał. Dlatego 9/10 (nie 10 — część wymaga danych L2/order-flow, których Brama dziś nie dostarcza → Prawo XV: najpierw dane, potem neuron).
+
+**Stan analizy:** ✅ **KOMPLETNA** — wszystkie 29 rozdziałów. Rozdz. 11/12/14/19/20/21 (zwiadowca 1+2, wizje W-250..W-269). Rozdz. 10/16/17/28 (zwiadowca 3, wizje W-270..W-279). Biblia strawiona w całości.
+
+**Trzy filary wydobyte:**
+1. **Dekompozycja spreadu i zmienności na trwałe (informacja) vs przejściowe (szum)** — to jest GŁÓWNY przełącznik reżimu: ruch z trwałym impactem = trend (jedź), ruch przejściowy z ujemną autokorelacją = mean-reversion (fade). Naukowy fundament pod nasz Namiestnik.
+2. **Detekcja manipulacji** — spoofing (impact asymetryczny przy net-zero wolumenie), pump-on-social, wash-trade, stop-gunning, squeeze. Cała nowa kategoria obronna (Z/zagrożenie).
+3. **Pełny model kosztu transakcji jako globalna bramka edge** — żaden głos nie strzela, dopóki oczekiwany edge < pełny koszt round-trip (effective spread + impact Glosten-Harris + Amihud). Domyka lukę egzekucji.
+
+**🆕 Wizje BIB-020 — pula W-250..W-269 (rozdz. 11/12/14/19/20/21):**
+
+| Wizja | Opis | Cel / moduł | Rozdz. | Status |
+|---|---|---|---|---|
+| **W-250** | Detektor spoofingu/bluffu: net-zero signed-volume + przesunięcie ceny ⇒ impact asymetryczny (`\|λ_buy−λ_sell\|`) ⇒ FADE + risk-filter ⭐⭐ | neurony (Z) + legatus | 12/14 | 🔴 |
+| **W-251** | Order-flow imbalance autocorrelation (śledzenie dzielonego zlecenia parent) ⇒ momentum-przepływu | neurony (T/V) | 11 | 🔴 |
+| **W-252** | Stop-gunning fade: przebicie okrągłego poziomu/oczywistego stop-clustera + spike wolumenu + brak follow-through ⇒ rewersja ⭐ | neurony (S) | 11 | 🔴 |
+| **W-253** | Filtr ryzyka squeeze na cienkich shortach: funding spike + OI + koszt pożyczki ⇒ blok/zmniejszenie shorta (możliwy 🚨 Prawo XV) | pretorianie/legatus | 11 | 🔴 |
+| **W-254** | Pump-on-social fade: `volume_z + price_ret + spike social` bez głębokości księgi ⇒ FADE low-capa ⭐ | neurony (Z) | 12 | 🔴 |
+| **W-255** | Manipulability-score per aktywo (low-cap/nowy listing/cienka księga/brak perp) ⇒ haircut pewności wszystkich głosów | legatus | 12 | 🔴 |
+| **W-256** | Detektor wash-trade: wolumen bez deplecji top-of-book/ruchu spreadu ⇒ dyskont cech wolumenowych | brama/diagnostyka | 12 | 🔴 |
+| **W-257** | Miernik adverse-selection: udział impactu trwałego vs przejściowego ⇒ przełącznik momentum↔reversion ⭐⭐ | legatus (reżim) | 14 | 🔴 |
+| **W-258** | Glosten-Milgrom Bayesian fair-value drift: `+P·E` na kupno, `−P·E` na sprzedaż ⇒ trend mikrostrukturalny | neurony (T) | 14 | 🔴 |
+| **W-259** | Alarm rozszerzenia spreadu względnego (vs baseline) ⇒ obecność informowanego + risk-filter na pasywne | legatus/neurony | 14 | 🔴 |
+| **W-260** | 4 wymiary płynności (immediacy/width/depth/resiliency) — sizing wg depth + neuron OBI (order-book imbalance) | pretorianie/neurony (L) | 19 | 🔴 |
+| **W-261** | Resiliency: half-life rewersji po szoku ⇒ przełącznik fade vs trend | legatus (reżim) | 19 | 🔴 |
+| **W-262** | Detektor ukrytej płynności (iceberg): powtarzalne refille na poziomie = support/resistance | neurony (S) | 19 | 🔴 |
+| **W-263** | Dekompozycja zmienności fundamental vs transitory; znak autokowariancji = GŁÓWNY przełącznik reżimu ⭐⭐ | legatus (reżim) | 20 | ✅ **WDROŻONE** Faza 1 jako `VARIANCE_RATIO` (Lo-MacKinlay) w master-switchu klasyfikatora, strefa sporna 2-z-3 (2026-06-09) |
+| **W-264** | Estymator spreadu Roll (`2·√(−Cov(Δp,Δp₋₁))`) — koszt/spread bez danych quote, tylko z transakcji | brama/metryki | 20 | 🔴 |
+| **W-265** | Money flow (wolumen upticków − downticków) ⇒ neuron LONG/SHORT | neurony (V) | 21 | 🔴 |
+| **W-266** | Globalna bramka kosztu: effective/realized spread + impact Glosten-Harris + Amihud ⇒ edge > pełny koszt, inaczej NEUTRAL ⭐ | legatus/pretorianie | 21 | 🔴 |
+| **W-267** | Implementation Shortfall (Perold) jako scorer własnych fillów (egzekucja QA, nie VWAP na cienkich parach) | metryki/backtest | 21 | 🔴 |
+| **W-268** | Amihud illiquidity neuron/filtr — ⚠️ **NAKŁADKA z W-056** (Amihud+Corwin-Schultz) — scalić, nie dublować (Prawo XVI) | neurony (L) | 21 | 🟡 |
+| **W-269** | Kontroler agresywności egzekucji: market-vs-limit wg opp-cost vs marginal impact (most do ŻYCZ-12 Almgren-Chriss) | pretorianie | 21 | 🟠 kierunkowe |
+
+**🆕 Wizje BIB-020 — pula W-270..W-279 (rozdz. 10/16/17/28):**
+
+| Wizja | Opis | Cel / moduł | Rozdz. | Status |
+|---|---|---|---|---|
+| **W-270** | Volume-price flow type: (A) duży ruch + niski wolumen = stealth accumulation ⇒ LONG; (B) mały ruch + duży vol = absorption ⇒ NEUTRAL; (C) duży ruch + duży vol = news exhaustion ⇒ FADE ⭐⭐ | neurony (V/T) | 10 | 🔴 |
+| **W-271** | Staleness filter: `staleness_score=(price−price_24h)/ATR_14 > 2.0` ⇒ nie wchodzić w trend (trade jest już zrobiony) | legatus/pretorianie | 10 | 🔴 |
+| **W-272** | Efficiency proxy: `1/(spread_proxy × vol_rank)` ⇒ przełącznik reżim: low-efficiency → momentum, high-efficiency → mean-reversion ⭐ | legatus (reżim) | 10 | 🔴 |
+| **W-273** | Value convergence neuron: `z_score=(price−SMA_200)/std_200`; LONG <−2.0, SHORT >+2.0; wzmocniony przez MoMA = mean(SMA_20/50/100/200) ⭐⭐ | neurony (M — patrz nota) | 16 | ✅ **WDROŻONE** jako X-27 NeuronValueConvergence (kat. M, 2026-06-09) |
+| **W-274** | Resiliency half-life OU: `halflife=−ln(2)/ln(φ)` z AR(1) na (price−SMA_50) na oknie 50 barów ⇒ meta-przełącznik reversion↔momentum ⭐⭐ | legatus (reżim) | 16 | ✅ **WDROŻONE** Faza 1 jako `OU_HALFLIFE` w master-switchu klasyfikatora, strefa sporna 2-z-3 (2026-06-09) |
+| **W-275** | Winner's curse scaler: `uncertainty_mult=(ATR_14/SMA_50)*100`; jeśli >5% → progi wejścia value × 1.5 (wymaga −3σ zamiast −2σ) | pretorianie/legatus | 16 | 🔴 |
+| **W-276** | Basis / funding neuron: `perp_basis_bps=(perp−spot)/spot×10000` + `funding_z=(funding−μ_30d)/σ_30d`; LONG gdy basis <−30 lub funding_z <−1.5 (squeeze), SHORT gdy basis >+50 lub funding_z >+2.0 ⭐⭐⭐ | neurony (N/Z) | 17 | 🔴 |
+| **W-277** | BTC lead-lag neuron: `btc_lag=(btc_ret_1h − alt_ret_1h)`; jeśli >1.5×ATR_alt → LONG alt (catch-up); decay 4h | neurony (T) | 17 | 🔴 |
+| **W-278** | Bubble/crash kill-switch: `bubble_z=log(price/EMA_200)/std`; VoV=`std(ATR_14,20)/mean(ATR_14,20)`; AR1=`corr(ret,ret_lag1,20)`; HARD-HALT gdy bubble_z>3.5 LUB VoV>1.2 LUB AR1>0.40 ⭐⭐⭐ | pretorianie (kill-switch) | 28 | ✅ **WDROŻONE** jako Z-03 NeuronBubbleCrash (defensywna meta-brama, 2026-06-09) |
+| **W-279** | Crash cascade detector: 3+ kolejne down-bary z rosnącym `\|ret\|` i wolumenem ⇒ zamknij wszystkie longi, halt do 3 barów bez cascade_flag. Post-crash dead-cat bounce: `z_score<−3.0` + malejący wolumen + brak nowych dołków ⇒ taktyczny LONG max 6 barów ⭐ | neurony (Z) | 28 | ✅ **WDROŻONE** jako Z-04 NeuronCascade (kill-switch kaskady + dead-cat LONG, 2026-06-09) |
+
+🚨 **Prawo XVI (dekorelacja) — alert biblioteczny BIB-020 (wszystkie wizje W-250..W-279):** przed wdrożeniem zmierzyć korelację:
+- **W-268 (Amihud)** dubluje **W-056** → scalić.
+- **W-251/W-265 (OFI/money-flow)** vs **W-060 (OFI)** → zmierzyć `\|r\|`.
+- **W-250/W-257 (adverse-selection/spoofing)** vs **Z-01 (VPIN)** / **W-072 (Hawkes)** → możliwe `\|r\|>0.80`.
+- **W-273/W-274 (value z-score, OU half-life)** vs **istniejące neurony kat. S (rewersja)** → sprawdzić nakładkę.
+- **W-263/W-272/W-274 (trzy przełączniki reżimu)** — mogą się wzajemnie nakładać; zredukować do jednego master-switcha.
+- **W-276 (basis/funding)** vs **Z-01 / EXP-05** — nakładka na mierniki toksyczności przepływu → zmierzyć.
+
+✅ **POMIAR WYKONANY (2026-06-09, `narzedzia/pomiar_dekorelacji_bib020.py`, BTC 1h, 6000 barów, 1446 kroków):**
+wszystkie wdrożone wizje BIB-020 **ortogonalne — ZERO redundancji** (żadne |r|>0.80):
+- Z-03 ~ Z-01: r=−0.052 🟢 · Z-04 ~ Z-03: r=+0.005 🟢 · Z-04 ~ Z-01: r=+0.018 🟢 (rodzina Z w pełni niezależna)
+- X-27 ~ X-04 (BBands): r=−0.046 🟢 · X-27 ~ X-01 (RSI): r=+0.187 🟢 (value-conv. na innym horyzoncie niż oscylatory)
+- VARIANCE_RATIO ~ RET_AR1: r=+0.228 🟡 · OU_HALFLIFE ~ HURST_DFA: r=+0.010 🟢 · VR ~ OU: r=+0.099 🟢 (master-switch zdrowy)
+- Żywotność: Z-03 984/1446 kroków, Z-04 12/1446 (kill-switch z natury rzadki) — **brak martwych głosów (Prawo XV)**.
+- **Wniosek:** flagi „do zmierzenia" zamknięte; nowe głosy to filary dywersyfikacji, kandydaci do PODNIESIENIA wag (nie scalenia).
+
+🚨 **Prawo XV (utrata potencjału) — BIB-020:** większość filarów (W-250, W-257, W-260, W-262, W-266, W-276) wymaga **danych L2 / order-flow / perp-basis z Bramy**, których dziś NIE mamy. Bez nich = martwy głos. **Najpierw Brama, potem neuron.** Wyjątki wykonalne **na samym OHLCV już dziś** (priorytet):
+- **W-263** — dekompozycja vol z serial-cov ← OHLCV ✅
+- **W-264** — Roll spread estimator ← OHLCV ✅
+- **W-268** — Amihud (scalić z W-056) ← OHLCV ✅
+- **W-273** — value z-score SMA-200 + MoMA ← OHLCV ✅
+- **W-274** — OU half-life resiliency ← OHLCV ✅
+- **W-278** — bubble_z + VoV + AR1 kill-switch ← OHLCV ✅
+- **W-279** — cascade detector + dead-cat bounce ← OHLCV ✅
+
+**Pięć najmocniejszych z całego BIB-020, priorytet wdrożenia:**
+1. ✅ **W-278** — bubble/crash kill-switch (bubble_z, VoV, AR1). WDROŻONE jako Z-03. ⭐⭐⭐
+2. ✅ **W-263/W-274** — master-switch reżimu (VARIANCE_RATIO + OU_HALFLIFE + AR1). WDROŻONE Faza 1. ⭐⭐
+3. **W-276** — basis+funding neuron. Najlepsza dostępna oś N/Z crypto (wymaga perp API — bliska). ⭐⭐⭐
+4. ✅ **W-273** — value convergence (z-score SMA_200 + MoMA). WDROŻONE jako X-27 (kat. M). ⭐⭐
+5. ✅ **W-279** — cascade detector + dead-cat bounce. WDROŻONE jako Z-04. ⭐
+
+**🔭 Master-switch reżimu — plan etapowy (decyzja Cezara 2026-06-09, Opcja 1):**
+- **Faza 1 (✅ WDROŻONA):** VARIANCE_RATIO (W-263) + OU_HALFLIFE (W-274) + RET_AR1 (istn.) jako głosowanie
+  2-z-3 rozstrzygające TREND_STRONG↔RANGING **tylko w strefie spornej ADX (20–25 lub brak)** —
+  tam, gdzie ADX milczy a dziś rój jest płaski (NORMAL). Zero regresji istniejących reżimów (Prawo XVI).
+- **Faza 2 (⏳ po pomiarze):** awans do równorzędnego głosowania (Opcja 2) — dopiero gdy
+  `narzedzia/pomiar_namiestnik.py` potwierdzi przewagę nowego dyskryminatora nad samym ADX
+  (Prawo XVIII: kod+testy+pomiar > opinia). Nie wdrażać przed pomiarem.
+
+---
+
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
 
 | BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |
@@ -1771,6 +2125,17 @@ Rynki NIE są gaussowskie (Bachelier/Markowitz/Black-Scholes się mylą). Rządz
 | BIB-007 ⭐ | Advances in Financial Machine Learning | Marcos López de Prado | **10/10** | 🔴 KRYTYCZNY | Autor VPIN/triple-barrier; FFD (domyka W-094), meta-labeling, purged CV, PBO/DSR, entropia, SADF → W-107..W-120 |
 | BIB-008 ⭐ | Volatility Trading (2nd ed.) | Euan Sinclair | 8/10 | 🔴 Wysoki | Wykładowca Yang-Zhang (mamy!); rodzina estymatorów→sygnatura zmienności, GARCH+vol cone, Kelly+korekta błędu, **volatility drag (W-130 WDROŻONE)** → W-121..W-139 |
 | BIB-009 ⭐ | The (Mis)behavior of Markets | Mandelbrot & Hudson | 7/10 | 🔴 Wysoki | Ojciec fraktali — celuje wprost w nasze najsłabsze osie D/H/N: tail-index α, wymiar fraktalny, trading-time, dependence-without-correlation, multifraktal → W-140..W-158 |
+| BIB-010 ⭐ | Quantitative Trading (2nd ed.) | Ernest P. Chan | 9/10 | 🔴 Wysoki | Praktyk algo: half-life OU, macierzowy Kelly (dowód Prawa XVI), cap lewara, para kointegrująca, deflated Sharpe, truncation look-ahead test → W-160..W-169 |
+| BIB-011 ⭐ | Algorithmic Trading: Winning Strategies (ŻYCZ-04) | Ernest Chan | 9/10 | 🔴 Wysoki | Kalman β dla par (rozszerza EXP-04), Monte-Carlo Kelly (fat tails!), Hurst+VarianceRatio, leading risk, CPPI → W-170..W-178 |
+| BIB-012 | Coding Capital | Strauss & Van Der Post | ⚠️ 3/10 | 🟡 Niski | SŁABA (self-published, snippety błędne). Jedyne ziarno: EVT/GPD parametr ogona ξ → W-180 |
+| BIB-013 ⭐ | Markets in Profile (ŻYCZ-06) | James F. Dalton | 8/10 | 🟠 Śr-Wysoki | Auction Market Theory — filar V/S: TPO Value Area, POC, Initial Balance+Range Extension, value migration, volume-vs-TPO divergence → W-190..W-199 |
+| BIB-014 ⭐ | Mind Over Markets (ŻYCZ-05) | James F. Dalton | 8/10 | 🟠 Śr-Wysoki | Podręcznik bazowy MP: 6 day types, Initiative/Responsive (trend vs balans), 4 open types, anomalie TPO-vs-volume → W-200..W-209 (część scalić z W-19x) |
+| BIB-015 ⭐ | The New Trading for a Living | Alexander Elder | 8/10 | 🔴 Wysoki | Force Index, Impulse gate, **Reguła 6% (LUKA!)**, Triple Screen, MACD-Hist divergence → W-210..W-219 |
+| BIB-016 | Trading in the Zone | Mark Douglas | ⚠️ 4/10 | 🟡 Niski-Śr | Psychologia (85% martwa dla automatu). Cenne: W-224 Legatus=prawdopodobieństwo, W-220 edge na oknie≥20 → W-220..W-225 |
+| BIB-017 ⭐ | Thinking, Fast and Slow (ŻYCZ-08) | Daniel Kahneman | 8/10 | 🟠 Śr-Wysoki | Biasy tłumu (4 neurony: anchor/overreact/disposition/panic) + 6 reguł ochrony procesu (deflated Sharpe, min. próbka, anty-martingale) → W-230..W-239 |
+| BIB-018 ⭐ | Positional Option Trading (ŻYCZ-07) | Euan Sinclair | 9/10 | 🔴 Wysoki | FINALNA matematyka sizingu: skew-Kelly, CI-Kelly (SD f̂), subkonto pełny-Kelly, doktryna stopów momentum-only, counterparty cap → W-240..W-249 |
+| BIB-019 | Handbook for Cryptocurrencies Trading | Virginia Harris | ❌ 2/10 | ⬛ Zero | ODRZUCONA — wypełniacz, anty-systematyczny, przeterminowany, zero matematyki/funding/perp. Wizji nie przyznano (Prawo I) |
+| BIB-020 ⭐ | Trading and Exchanges: Market Microstructure for Practitioners (ŻYCZ-10) | Larry Harris | 9/10 | 🔴 Wysoki | **✅ STRAWIONA W CAŁOŚCI (30 wizji W-250..W-279).** Biblia mikrostruktury — osie Z/L/S/T: master-switch reżimu (dekompozycja vol, OU half-life, AR1 autocorr), detekcja spoofing/squeeze/stop-gunning/pump/bubble/crash, globalna bramka kosztu (Roll, Amihud, IS, Glosten-Harris), basis+funding neuron (W-276 ⭐⭐⭐), bubble/crash kill-switch (W-278 ⭐⭐⭐), value convergence (W-273), cascade detector (W-279) |
 
 **Trzy najcenniejsze, bezpośrednio implementowalne wizje:**
 1. **W-089 NeuronNVT** — Network Value to Transactions (BIB-003) — twardy on-chain, brak odpowiednika w systemie
@@ -1803,23 +2168,39 @@ Rynki NIE są gaussowskie (Bachelier/Markowitz/Black-Scholes się mylą). Rządz
 
 | # | Tytuł | Autor | Luka / kat. | Dlaczego wartościowe | Gdzie szukać |
 |---|---|---|---|---|---|
-| ŻYCZ-04 | **Algorithmic Trading: Winning Strategies and Their Rationale** | Ernest P. Chan (2013) | R=4 (reżim), strategie | Regime detection (HMM — pod naszą kat. R/legatus), mean-reversion vs momentum, Kalman filter (mamy EXP-04!), stat-arb. Praktyczne, kodowalne strategie z uzasadnieniem. | Wiley; ISBN 978-1118460146 |
-| ŻYCZ-05 | **Mind Over Markets: Power Trading with Market Generated Information** | James F. Dalton (1990/2013) | V=2, S=3 (wolumen/struktura) | Auction Market Theory + Market Profile — JAK czytać wolumen w strukturze ceny (value area, POC). Fundament pod neurony wolumenowo-strukturalne (uzupełnia naszą najsłabszą parę V/S). | Wiley; ISBN 978-1118531730 |
-| ŻYCZ-06 | **Markets in Profile: Profiting from the Auction Process** | James F. Dalton (2007) | V/S (kontynuacja AMT) | Rozszerzenie auction theory na wiele ram czasowych. ⓘ Pełny PDF krąży legalnie w sieci (r-5.org) — łatwy do zdobycia. | Wiley; ISBN 978-0470039090 |
-| ŻYCZ-07 | **Positional Option Trading** | Euan Sinclair (2020) | warstwa ryzyka (`pretorianie/`) | Kelly criterion z niepewnością estymacji, trade sizing, skew, stop-loss. Bezpośrednio pod nasz kalkulator lewara i W-096 throttle. | Wiley; ISBN 978-1119583516 |
+| ✅ ŻYCZ-04 | **Algorithmic Trading** → **ZDOBYTE jako BIB-011** (2026-06-08) | Ernest P. Chan (2013) | R=4 (reżim), strategie | Kalman β dla par (rozszerza EXP-04), Monte-Carlo Kelly (fat tails!), Hurst+VarianceRatio, leading risk, CPPI → W-170..W-178. ⓘ Dostarczone wydanie chińskie. | Wiley; ISBN 978-1118460146 |
+| ✅ ŻYCZ-05 | **Mind Over Markets** → **ZDOBYTE jako BIB-014** (2026-06-08, w analizie) | James F. Dalton (1990/2013) | V=2, S=3 (wolumen/struktura) | Auction Market Theory + Market Profile — fundament pod najsłabszą parę V/S → W-200+. | Wiley; ISBN 978-1118531730 |
+| ✅ ŻYCZ-06 | **Markets in Profile** → **ZDOBYTE jako BIB-013** (2026-06-08, w analizie) | James F. Dalton (2007) | V/S (kontynuacja AMT) | Rozszerzenie auction theory na wiele ram czasowych → W-190+. | Wiley; ISBN 978-0470039090 |
+| ✅ ŻYCZ-07 | **Positional Option Trading** → **ZDOBYTE jako BIB-018** (2026-06-08) | Euan Sinclair (2020) | warstwa ryzyka (`pretorianie/`) | Skew-Kelly, CI-Kelly (wzór na SD f̂), subkonto pełny-Kelly, doktryna stopów momentum-only, counterparty cap → W-240..W-249. | Wiley; ISBN 978-1119583516 |
 
 ### 🟡 PRIORYTET UZUPEŁNIAJĄCY (rozważyć później / zasoby zamiast książek)
 
 | # | Pozycja | Typ | Uwaga (Prawo I — uczciwie) |
 |---|---|---|---|
-| ŻYCZ-08 | **Thinking, Fast and Slow** — Daniel Kahneman | Książka (behawioralna) | Klasyk biasów poznawczych; uzupełnia BIB-004. Wartość średnia — bardziej tło niż sygnały. |
+| ✅ ŻYCZ-08 | **Thinking, Fast and Slow** → **ZDOBYTE jako BIB-017** (2026-06-08) | Daniel Kahneman | 4 neurony biasów tłumu (W-230..233) + 6 reguł ochrony procesu (W-234..239). Więcej niż tło — disposition effect to tradeable nieefektywność. |
 | ŻYCZ-09 | **Glassnode Academy / checkonchain.com / woocharts** | Zasób on-line (NIE książka) | Dla on-chain (MVRV/SOPR/NUPL/NVT) NIE ma dobrej pojedynczej książki — najlepsza wiedza jest w darmowych zasobach. Pod neurony O i wizje W-089..W-093, W-097. Dane wymagają API (Prawo XV). |
 
 ### 🚨 Uwagi metodologiczne (zgodnie z zasadami)
 - **Prawo I (uczciwość):** ŻYCZ-03 (Mandelbrot), ŻYCZ-08 (Kahneman) rekomenduję z własnej wiedzy — NIE zweryfikowane tym konkretnym zwiadem internetowym. Reszta potwierdzona wyszukiwaniem 2026-06-08.
 - **Prawo XV (utrata potencjału):** książki on-chain (ŻYCZ-09) i część wizji wymagają NOWEGO źródła danych (API on-chain) — bez Bramy dostarczającej te dane neurony byłyby martwym głosem. Najpierw dane, potem neuron.
 - **Format:** najłatwiejsze do zdobycia jako pełny tekst: ŻYCZ-06 (PDF w sieci). Reszta — legalnie przez zakup/bibliotekę; wklejaj pliki jak poprzednie (azw3/epub/pdf), rozpakuję i przeanalizuję.
-- **Zdobyte:** ✅ ŻYCZ-01 (López de Prado → BIB-007), ✅ ŻYCZ-02 (Sinclair → BIB-008), ✅ ŻYCZ-03 (Mandelbrot → BIB-009). Trzy filary quant: ML, zmienność/lewar, fraktale.
-- **Rekomendacja #1 (następna):** **ŻYCZ-04 Ernest Chan "Algorithmic Trading"** — regime detection (HMM pod kat. R/legatus), Kalman filter (mamy EXP-04!), stat-arb. Praktyczne kodowalne strategie. ⚠️ rekomendacja z wiedzy, niezweryfikowana zwiadem.
+- **Zdobyte (cała stara lista ŻYCZ-01..08 ✅):** BIB-007 López de Prado, BIB-008 Sinclair Vol, BIB-009 Mandelbrot, BIB-010 Chan QT, BIB-011 Chan Algo, BIB-012 Coding Capital, BIB-013 Dalton MiP, BIB-014 Dalton MoM, BIB-015 Elder, BIB-016 Douglas, BIB-017 Kahneman, BIB-018 Sinclair Positional. **Zostało tylko ŻYCZ-09 (zasoby on-chain).**
 
-*Lista życzeń otwarta — Cezar dostarcza, Claude analizuje i przenosi do BIB-009+.* 🎯📚⚔️
+---
+
+### 🌟 LISTA ŻYCZEŃ v2 — czego Claude pragnie, by domknąć luki Imperium (2026-06-08)
+
+> Stara lista (ŻYCZ-01..08) zdobyta. Oto NOWE życzenia celowane w pozostałe luki, wg priorytetu.
+
+| # | Tytuł | Autor | Luka / kat. | Dlaczego krytyczne | Status |
+|---|---|---|---|---|---|
+| **ŻYCZ-09** ⭐ | Zasoby on-chain (Glassnode Academy / checkonchain.com / woocharts) | — | **O (prawie pusta!)** | MVRV, SOPR, NUPL, NVT, realized cap. Crypto bez on-chain = ślepota na wieloryby. ⚠️ wymaga API w Bramie | 🔴 PRIORYTET #1 |
+| **ŻYCZ-10** ⭐ | Trading and Exchanges: Market Microstructure for Practitioners | Larry Harris | Z/A (tylko VPIN) | Biblia mikrostruktury: order flow, market making, likwidność | ✅ **ZDOBYTA → BIB-020** (9/10, **30 wizji W-250..W-279, analiza KOMPLETNA**) |
+| **ŻYCZ-11** | Market Microstructure Theory | Easley & O'Hara | Z (teoria VPIN) | Autorzy VPIN — fundament teoretyczny naszego Z-01 | 🟠 |
+| **ŻYCZ-12** | Optimal Execution (Almgren-Chriss) | Almgren & Chriss | egzekucja (ZERO) | Jak wchodzić/wychodzić minimalizując impact — krytyczne przy realnym kapitale | 🟠 |
+| **ŻYCZ-13** | Analysis of Financial Time Series | Ruey Tsay | szeregi czasowe/ML | GARCH/VAR/reżimy od podstaw — domyka W-126 GARCH | 🟠 |
+| **ŻYCZ-14** | Mechanika perpetual futures + funding rate arbitrage | (zasób/książka) | crypto-specyfika | Bezpośrednio pod naszą giełdę (MEXC) — funding jako sygnał i koszt | 🟡 |
+
+**Bezdyskusyjny priorytet #1: ŻYCZ-09 on-chain** — jedyna prawie-pusta oś (O). ✅ ŻYCZ-10 Harris (mikrostruktura Z) **ZDOBYTA → BIB-020**.
+
+*Lista życzeń otwarta — Cezar dostarcza, Claude analizuje i przenosi do BIB-019+.* 🎯📚⚔️

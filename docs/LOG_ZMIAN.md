@@ -6,6 +6,258 @@
 
 ---
 
+## 2026-06-09 | NARZĘDZIE | Pomiar dekorelacji BIB-020 (Prawo XVI) — spłata długu „do zmierzenia"
+
+**Opis:** Nowe narzędzie read-only `narzedzia/pomiar_dekorelacji_bib020.py` mierzy |r| Pearsona
+nowych głosów BIB-020 vs istniejące, na realnych danych (BTC 1h, 6000 barów, 1446 kroków).
+**Wynik — ZERO redundancji (żadne |r|>0.80):**
+- Z-03~Z-01 r=−0.052, Z-04~Z-03 r=+0.005, Z-04~Z-01 r=+0.018 (rodzina Z w pełni ortogonalna)
+- X-27~X-04 r=−0.046, X-27~X-01 r=+0.187 (value-conv. niezależny od BBands/RSI — inny horyzont)
+- VARIANCE_RATIO~RET_AR1 r=+0.228 (🟡 OK), OU_HALFLIFE~HURST_DFA r=+0.010, VR~OU r=+0.099 (master-switch zdrowy)
+**Żywotność (Prawo XV):** Z-03 984/1446, Z-04 12/1446 (kill-switch z natury rzadki) — brak martwych głosów.
+**Wniosek:** flagi „do zmierzenia" z poprzednich commitów ZAMKNIĘTE. Nowe głosy = filary dywersyfikacji,
+kandydaci do podniesienia wag (nie scalenia). Decyzja o wagach — osobno, kierunkowa.
+**Pliki:** `narzedzia/pomiar_dekorelacji_bib020.py` (nowe), `docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`
+**Testy:** narzędzie read-only, nie zmienia logiki; suite 558/558 bez zmian. Audyt: exit 0.
+
+---
+
+## 2026-06-09 | KOD | Z-04 NeuronCascade — cascade detector + dead-cat bounce (W-279, BIB-020 rozdz.28) ✅ WDROŻONY
+
+**Opis:** Czwarte wdrożenie BIB-020, domyka rodzinę obronną kat. Z przy Z-03. Neuron dwustanowy:
+- **KASKADA** (CASCADE_FLAG=1): 3+ przyspieszające spadki przy rosnącym wolumenie (price accelerator
+  Treynora) → kill-switch: NEUTRAL z pewnosc_przeciwnika 0.92 (nie łap spadającego noża).
+- **DEAD-CAT** (DEADCAT_SETUP=1, gdy kaskada wygasła): krach ≥12% w oknie + dno wyhamowane +
+  słabnący wolumen + cena w dolnej 1/3 zakresu → taktyczny LONG 0.60 (krótki hold/stop zarządza egzekutor).
+- Priorytet KASKADA > DEAD-CAT (gdy lawina trwa, nie kupujemy).
+**Symbioza:** 2 obliczenia pure-Python w Bramie (`CASCADE_FLAG`/`DEADCAT_SETUP`) + 2 klucze Budowniczego +
+rejestracja Z-04 w zagrozenie.py/rejestr.py + 12 testów. MANIFEST/README/INDEKS: 54→55 neuronów,
+47→48 aktywnych, 42 OHLCV, testy 546→558.
+🚨 **Prawo XVI (do zmierzenia):** CASCADE_FLAG vs VoV/AR1 (Z-03) — sprawdzić |r| przed podniesieniem wagi.
+**Powód:** W-279 (priorytet #5 BIB-020 — domyka obronę kat. Z, taktyczny long post-crash), Prawo XV/XIX.
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/zagrozenie.py`, `imperium/legiony/rejestr.py`, `tests/test_neurony.py`,
+`tests/test_integracja.py`, `docs/MANIFEST_KODU.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`,
+`docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`
+**Testy:** +12 (Brama cascade/deadcat + Z-04 kaskada/priorytet/deadcat/spokój/abstynencja/rejestracja). Audyt: exit 0.
+
+---
+
+## 2026-06-09 | KOD | Master-switch reżimu Faza 1 — W-263/W-274 (BIB-020 Harris rozdz.16/20) ✅ WDROŻONY
+
+**Opis:** Trzecie wdrożenie BIB-020 — wzmocnienie klasyfikatora reżimu (`klasyfikuj_rezim` w legatus.py).
+Dwa nowe obliczenia pure-Python w Bramie:
+- **VARIANCE_RATIO** (W-263, Lo-MacKinlay) = Var(r_k)/(k·Var(r_1)); >1 trend (zmienność trwała), <1 rewersja.
+- **OU_HALFLIFE** (W-274) = −ln(2)/β z regresji OU Δx na x dla spreadu (price−SMA_50); krótki=rewersja, długi=trend.
+**Integracja (Opcja 1 — decyzja Cezara):** master-switch 2-z-3 (VARIANCE_RATIO + OU_HALFLIFE + istn. RET_AR1)
+rozstrzyga TREND_STRONG↔RANGING **TYLKO w strefie spornej ADX (20–25 lub brak ADX)**, gdzie dotąd padał NORMAL
+(rój płaski). Poza strefą — logika ADX bez zmian (zero regresji, Prawo XVI). Prawo XV: aktywuje wagi reżimowe
+tam, gdzie ADX milczy.
+**Plan etapowy:** Faza 2 (awans do równorzędnego głosowania) DOPIERO po pomiarze `pomiar_namiestnik.py`
+(Prawo XVIII: kod+testy+pomiar > opinia) — nie przed.
+**Symbioza:** Brama (2 calc + pure-Python audit) + Budowniczy (VARIANCE_RATIO_4, OU_HALFLIFE_50) +
+klasyfikator (`_master_switch_rezimu`) + 8 testów. Bez nowych neuronów (54 bez zmian). Testy 538→546.
+🚨 **Prawo XVI (do zmierzenia):** VARIANCE_RATIO vs RET_AR1 (oba mierzą autokorelację — różne horyzonty/agregacja),
+OU_HALFLIFE vs HURST_DFA — sprawdzić |r| przy awansie do Fazy 2.
+**Powód:** W-263/W-274 (priorytet #2 BIB-020 — naukowy fundament Namiestnika), Prawo XV/XVI/XVIII/XIX.
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/legatus.py`, `tests/test_integracja.py`, `README.md`, `docs/INDEKS_IMPERIUM.md`,
+`docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`
+**Testy:** +8 (Brama VR/half-life + master-switch strefa sporna/większość/brak/nie-nadpisuje-ADX). Audyt: exit 0.
+
+---
+
+## 2026-06-09 | KOD | X-27 NeuronValueConvergence — rewersja do wartości (W-273, BIB-020 rozdz.16) ✅ WDROŻONY
+
+**Opis:** Druga wizja BIB-020 w kodzie. Neuron kierunkowy mean-reversion: mierzy oderwanie ceny od
+wartości godziwej dwiema kotwicami i bierze ich średnią (blend):
+- **Value-Z** = (close − SMA-200) / σ(close,200) — kotwica jednoskalowa.
+- **MoMA-Z** = (close − mean(SMA20/50/100/200)) / σ(close,200) — kotwica wieloskalowa (średnia średnich).
+blend < −2.0 → LONG (wyprzedanie), > +2.0 → SHORT (wykupienie), |blend|<1.5 → NEUTRAL. Pewność rośnie z |blend|.
+**Decyzja kategorii (Prawo XVIII):** kat. **M** (nie S jak w pierwszym szkicu W-273) — to mean-reversion,
+a w WAGI_REZIMU kat. M dostaje ×1.5 w RANGING (gdzie rewersja działa) i jest tłumiona w trendzie. S dostaje
+wagę tylko w trendzie = błędne dla rewersji. Uzasadnienie w docstringu.
+**Symbioza:** 2 obliczenia pure-Python w Bramie (`VALUE_Z`/`MOMA_Z`) + 2 klucze Budowniczego
+(`VALUE_Z_200`/`MOMA_Z_200`) + rejestracja X-27 w momentum.py/rejestr.py + 10 testów.
+MANIFEST/README/INDEKS: 53→54 neuronów, 46→47 aktywnych, 41 OHLCV, testy 528→538.
+🚨 **Prawo XVI (do zmierzenia):** nakładka z X-04 BBands (z-score 20-bar) i X-01 RSI — INNY horyzont
+(200 vs 20/14), ale sprawdzić |r| przed podniesieniem wagi.
+**Powód:** W-273 (priorytet #3 BIB-020 — głos rewersji do wartości na długim horyzoncie), Prawo XV/XIX.
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/momentum.py`, `imperium/legiony/rejestr.py`, `tests/test_neurony.py`,
+`tests/test_integracja.py`, `docs/MANIFEST_KODU.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`,
+`docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`
+**Testy:** +10. Audyt: exit 0.
+
+---
+
+## 2026-06-09 | KOD | Z-03 NeuronBubbleCrash — bubble/crash kill-switch (W-278, BIB-020) ✅ WDROŻONY
+
+**Opis:** Pierwsza wizja BIB-020 (Harris) w KODZIE. Z-03 to defensywna meta-brama (wzorzec Z-01):
+łączy trzy sygnały liczone z samego OHLCV (Prawo XV — bez nowych danych):
+- **BUBBLE_Z** = ln(close/EMA-200)/σ(log-dev) — odchylenie od długoterminowej grawitacji (granice Fischera Blacka).
+- **VoV** = std(ATR-14, 20)/mean(ATR-14, 20) — niestabilność zmienności (prekursor krachu).
+- **AR1** = corr(ret, ret_lag1, 20) — autokorelacja zwrotów = refleksywność (kaskada momentum/krach).
+Próg ALARM (bubble_z>3.5 LUB VoV>1.2 LUB AR1>0.40) → kill-switch: pewnosc_przeciwnika do 0.97
+(tłumi cały rój). Strefa czujności (2.5/0.8/0.25) → umiarkowane tłumienie. NIGDY kierunkowy (meta-brama).
+**Symbioza:** 3 obliczenia w Bramie (`BUBBLE_Z`/`VOV`/`RET_AR1`, pure-Python, stempel SOURCE_TAG_PY) +
+3 klucze w Budowniczym (`BUBBLE_Z_200`/`VOV_20`/`RET_AR1_20`) + rejestracja w rejestr.py + 14 testów.
+Kategoria Z istniała (WAGI_REZIMU bez zmian). MANIFEST/README/INDEKS: 52→53 neuronów, 45→46 aktywnych, 40 OHLCV.
+🚨 **Prawo XVI (do zmierzenia):** AR1 vs HURST_DFA (H-01), VoV vs Yang-Zhang — różne okna/konstrukcja,
+ale sprawdzić |r| przed podniesieniem wagi. Wpisane w docstring neuronu.
+**Powód:** W-278 (priorytet #1 BIB-020 — ochrona kapitału przed bańką/krachem), Prawo XV, Prawo XIX.
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/zagrozenie.py`, `imperium/legiony/rejestr.py`, `tests/test_neurony.py`,
+`tests/test_integracja.py`, `docs/MANIFEST_KODU.md`, `README.md`, `docs/INDEKS_IMPERIUM.md`,
+`docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`
+**Testy:** dodane 14 testów (Brama bubble_z/VoV/AR1 + Z-03 kill-switch/czujność/spokój/abstynencja). Audyt: exit 0.
+
+---
+
+## 2026-06-08 | INSPIRACJA | INF-32 — Rozmowa z DeepSeek "Kai" (baza wskaźników + manual 1.0→5.1) ⚠️/❌ głównie szum
+
+**Opis:** Cezar dostarczył 2,6 MB rozmowy z DeepSeek (28 wersji bazy wskaźników 1.0→2.9 + "MANUAL IMPERIUM 1.0→5.1",
+kody Python, 3 symulatory HTML). Pełna analiza 5 zwiadowcami Opus (po liniach: 1-560, 560-1100, 1100-2000,
+2000-2680, 2680-3300) + rdzeń roadmapy przeczytany osobiście. **Werdykt (Prawo I — twardy):**
+- **Inflacja 50→658 "wskaźników"** przez 28 wersji = zbieranie nazw, nie sygnału. Realny rdzeń ~30 standardowych
+  wskaźników (VWAP/EMA/RSI/MACD/BB/OBV/ADX/ATR/MFI/Ichimoku/Supertrend/CVD/OI/Funding/MVRV...) — w większości JUŻ MAMY.
+- **Fabrykacje (odrzucone):** Hermes Agent (jako orkiestrator), ShieldRegime, CogAlpha, MELT Dataset, Insider Wallets
+  Finder, "Andromeda scanner", "Complex Esco Theory", OpenClaw (250k⭐). **Wszystkie ID arXiv `2605.xxxxx` nieistnieją**,
+  cytaty `[N†Lx-Ly]` syntetyczne, gwiazdki zawyżone (TradingAgents 71k).
+- **Kod (31 funkcji): 0 produkcyjnych.** Powtarzalne bugi: fałszywy ATR `(h-l).mean()`, fałszywy ADX, lookahead
+  (`center=True`/`shift(-1)`/`bfill`/min-max całej serii), KeyError `data['equity']`, brak `np.random.seed`.
+  `SimpleNeuralNetwork` = losowe nietrenowane wagi (szum). `PhantomAIEngine` "LLM GPT-5.1" = zaszyte if-y zwracające 0.85.
+- **3 symulatory HTML = animowane diagramy** (canvas, `setInterval` co 4s cykluje LONG/SHORT/NEUTRAL), zero P&L/danych/strategii.
+- **Jedyny półrealny artefakt:** szkielet ERS/Archon (Hedge/Multiplicative-Weights-Update) — pokrywa się z planem ML-28 (Shapley).
+- **Idee neuronów** (Hurst/Hawkes/MFDFA/Path-Signature/VPIN/Permutation-Entropy/Kimchi) = RECYKLING naszego katalogu
+  (INF-10/11/12/19, kat. D/H/N/Z już w kodzie). Konceptualnie potwierdza kierunek (Prawo XVI dekorelacja, reżim-adaptacyjne
+  wagi, Senat multi-agent=ML-25/29) — nie dodaje nowego.
+**Realne narzędzia warte rozważenia (jedyna nowa wartość):** VectorBT+Optuna walk-forward (Koloseum), shapiq (ML-28),
+Conformal Prediction `mapie` (niepewność predykcji), Polars (szybkość). Reszta już w rejestrze (NautilusTrader ML-33, CrewAI/Senat).
+**Wizji NIE przyznano** (Prawo I — naciąganie byłoby fałszem). Zapisane jako INF-32 = referencja + blacklist fabrykacji.
+**Powód:** Prawo I (uczciwa ocena, demaskacja halucynacji), Prawo XVI (dekorelacja), ZPO, ochrona przed marnowaniem pracy na fikcję.
+**Pliki:** `docs/REJESTR_INSPIRACJI.md`, `docs/LOG_ZMIAN.md`
+**Testy:** 514/514 ✅. Audyt: exit 0 ✅. (czysto dokumentacyjne)
+
+---
+
+## 2026-06-08 | BIBLIOTEKA | BIB-020 ✅ ANALIZA KOMPLETNA — rozdz. 10/16/17/28 (wizje W-270..W-279)
+
+**Opis:** Dokończenie analizy Harrisa (zwiadowca 3). 10 nowych wizji W-270..W-279 z rozdziałów:
+Rozdz.10 (Informed Traders): W-270 (flow type: stealth/absorption/exhaustion), W-271 (staleness filter),
+W-272 (efficiency proxy → przełącznik reżimu). Rozdz.16 (Value Traders): W-273 (value z-score SMA-200+MoMA ⭐⭐),
+W-274 (OU half-life resiliency ⭐⭐), W-275 (winner's curse uncertainty scaler). Rozdz.17 (Arbitrageurs):
+W-276 (basis+funding neuron ⭐⭐⭐ — najlepsza dostępna oś N/Z crypto), W-277 (BTC lead-lag altcoin catch-up).
+Rozdz.28 (Bubbles/Crashes): W-278 (bubble/crash kill-switch: bubble_z + VoV + AR1 autocorr ⭐⭐⭐),
+W-279 (cascade detector + dead-cat bounce). BIB-020 strawiona w CAŁOŚCI (30 wizji W-250..W-279).
+**5 priorytetów wdrożenia:** W-278 (kill-switch na OHLCV), W-263/274 (master-switch reżimu, OHLCV),
+W-276 (basis+funding, wymaga perp API), W-273 (value z-score, OHLCV), W-279 (cascade, OHLCV).
+**Powód:** dokończenie ŻYCZ-10, Prawo XIX (tylko kod istnieje — wizje czekają na wdrożenie), Zasada Symbiozy.
+**Pliki:** `docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`
+**Testy:** 514/514 ✅. Audyt: exit 0 ✅. (czysto dokumentacyjne)
+
+---
+
+## 2026-06-08 | BIBLIOTEKA | BIB-020 ⭐ ZDOBYTA — "Trading and Exchanges" (Larry Harris, 9/10, ŻYCZ-10)
+
+**Opis:** Cezar dostarczył biblię mikrostruktury rynku (Oxford 2003, 29 rozdz., b. dyrektor ekon. SEC) — życzenie
+ŻYCZ-10. Rozdziały 11/12/14/19/20/21 strawione w pełni (2 zwiadowców Opus); rozdz. 10/16/17/28 do dokończenia
+(zwiadowca trafił na limit sesji — pula W-270..279 zarezerwowana). **Przyznano 20 wizji W-250..W-269** celowanych
+w najsłabsze osie Z (mikrostruktura, dziś tylko VPIN) i L (płynność). Trzy filary: (1) dekompozycja spread/vol na
+trwałe-vs-przejściowe = master-switch reżimu momentum↔reversion (W-257/W-263); (2) detekcja manipulacji —
+spoofing/squeeze/stop-gunning/pump/wash (W-250/252/253/254/256); (3) globalna bramka kosztu transakcji
+(effective/realized spread, impact Glosten-Harris, Roll, Amihud, money-flow, Implementation Shortfall — W-266/267).
+🚨 **Prawo XVI:** W-268 dubluje W-056 (Amihud) → scalić; W-251/265 vs W-060 (OFI), W-250/257 vs Z-01 (VPIN)/W-072
+(Hawkes) → zmierzyć korelację przed wdrożeniem. 🚨 **Prawo XV:** większość wizji wymaga danych L2/order-flow/signed-trade
+(Lee-Ready), których Brama dziś NIE ma — najpierw Brama L2, potem neuron. Wykonalne na OHLCV od razu: W-263, W-264, W-268.
+**Werdykt:** 9/10 (nie 10 — księga mechanizmów, nie gotowych wzorów jak López de Prado; część wymaga nowych danych).
+**Powód:** ŻYCZ-10 (priorytet po on-chain), ZPO, Prawo I (uczciwa ocena), Prawo XV/XVI (flagi przed wdrożeniem).
+**Pliki:** `docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`
+**Testy:** 514/514 ✅. Audyt: exit 0 ✅. (czysto dokumentacyjne — wizje są planem, nie kodem)
+
+---
+
+## 2026-06-08 | BIBLIOTEKA | BIB-019 ❌ ODRZUCONA — "Handbook for Cryptocurrencies Trading" (Harris, 2/10)
+
+**Opis:** Analiza Opus książki Virginii Harris. Werdykt: wypełniacz dla nowicjusza spotowego (ghost-written),
+anty-systematyczny, anty-leverage, przeterminowane martwe giełdy (Cryptopia/CryptoBridge), zero matematyki
+operacyjnej, brak funding/perpetual/DeFi/tokenomiki. Obiecuje on-chain, dostarcza definicje słownikowe.
+**Zgodnie z Prawem I — NIE przyznano żadnej wizji** (W-250..259 wolne); naciąganie wartości obok López de
+Prado/Sinclair byłoby zafałszowaniem rejestru. Zapisana jako udokumentowane odrzucenie (by nie kupować
+podobnych handbooków). INF-31. 🚨 Oś O (on-chain) NADAL pusta — rekomendacja: crypto-native źródła (ŻYCZ-09..14).
+**Powód:** Prawo I (uczciwa ocena), Prawo XV (oś O niewypełniona), ZPO.
+**Pliki:** `docs/WIZJONER.md`, `docs/REJESTR_INSPIRACJI.md`, `docs/LOG_ZMIAN.md`
+**Testy:** 514/514 ✅. Audyt: exit 0 ✅. (czysto dokumentacyjne)
+
+---
+
+## 2026-06-08 | BIBLIOTEKA | BIB-015/016/017/018 — 4 książki naraz (Elder, Douglas, Kahneman, Sinclair Positional)
+
+**Opis:** Cezar dostarczył 4 książki naraz; każda przeanalizowana osobnym agentem Opus. Stara lista życzeń
+ŻYCZ-01..08 KOMPLETNIE zdobyta. Rozkaz Cezara: gromadzić w WIZJONerze (brudnopis), wdrożenie później,
+wszystko dokładnie sprawdzać.
+- **BIB-015 Elder "New Trading for a Living" — 8/10:** agent przeczytał REALNY kod Imperium. Force Index (kat. V),
+  Impulse gate, **Reguła 6% miesięczny budżet ryzyka = REALNA LUKA**, Triple Screen multi-TF, MACD-Hist
+  divergence → W-210..W-219. W-218 (equity-curve) JUŻ mamy (BreakerKrzywejKapitalu).
+- **BIB-016 Douglas "Trading in the Zone" — ⚠️4/10:** 85% psychologii martwej dla automatu. 3 flagi:
+  W-224 (Legatus=prawdopodobieństwo nie binarność), W-220 (edge na oknie≥20), W-222 (stop ze struktury) → W-220..W-225.
+- **BIB-017 Kahneman "Thinking Fast and Slow" (ŻYCZ-08) — 8/10:** 4 neurony biasów tłumu (anchoring,
+  overreaction, disposition, availability-panic, W-230..233) + 6 reguł ochrony procesu (W-234..239).
+- **BIB-018 Sinclair "Positional Option Trading" (ŻYCZ-07) — 9/10:** FINALNA matematyka sizingu — skew-Kelly,
+  CI-Kelly (wzór na SD f̂), subkonto pełny-Kelly, doktryna stopów momentum-only, counterparty cap → W-240..W-249.
+ŻYCZ-07 i ŻYCZ-08 ✅ zdobyte → cała stara lista zamknięta. INF-27/28/29/30 w REJESTR.
+🌟 Dodana LISTA ŻYCZEŃ v2 (ŻYCZ-09..14) na prośbę Cezara: on-chain (#1, kat. O prawie pusta), Harris
+mikrostruktura, Easley/O'Hara, Almgren-Chriss egzekucja, Tsay szeregi czasowe, perpetual/funding.
+🚨 Flagi Prawa XV zebrane do weryfikacji w kodzie przy wdrożeniu: W-212 (brak reguły 6%), W-224 (Legatus
+binarny czy probabilistyczny?), W-244 (cena-stop na mean-reversion?), W-232/233 (wolumen kierunkowy w Bramie?),
+W-249 (counterparty cap MEXC), W-176 (Gauss-Kelly?), W-172 (EXP-04 hedge-ratio par?).
+**Powód:** Prawo XVII (rozpoznanie), Prawo XV (znaleziona luka 6% + flagi), ZPO (krytyczne oceny), rozkaz Cezara.
+**Pliki:** `docs/WIZJONER.md`, `docs/REJESTR_INSPIRACJI.md`, `docs/LOG_ZMIAN.md`
+**Testy:** 514/514 ✅. Audyt: exit 0 ✅. (zadanie czysto dokumentacyjne)
+
+---
+
+## 2026-06-08 | BIBLIOTEKA | BIB-013/014 — Dalton ×2 (Markets in Profile + Mind Over Markets, ŻYCZ-05/06)
+
+**Opis:** Cezar dostarczył 2 książki Daltona naraz; każda przeanalizowana osobnym agentem Opus. Obie o
+Auction Market Theory / Market Profile — celują wprost w nasze 2 NAJSŁABSZE filary: V (wolumen) i S (struktura).
+- **BIB-013 Markets in Profile (ŻYCZ-06) — 8/10:** TPO Value Area, Volume POC, value migration, Initial
+  Balance+Range Extension, excess/tails, open types, profile shapes, volume-vs-TPO divergence → W-190..W-199.
+- **BIB-014 Mind Over Markets (ŻYCZ-05) — 8/10:** podręcznik bazowy. 6 typów dnia, Initiative/Responsive
+  (esencja: trend vs balans wg akceptacji wartości), 4 typy otwarcia, anomalie TPO-vs-volume → W-200..W-209.
+ŻYCZ-05 i ŻYCZ-06 ✅ zdobyte. INF-25/26 w REJESTR.
+🔗 KLUCZOWE: obie książki dzielą ten sam aparat MP — W-200..W-209 mają duplikaty z W-190..W-199 (jawnie
+oznaczone "SCALIĆ/DUPLIKAT" w tabelach). Przy wdrożeniu JEDEN moduł profilu, nie dwa.
+🚨 Prawo XV — realność na OHLCV: TPO (czas przy cenie) = czysty OHLC ✅; Volume Profile = przybliżenie przez
+rozsmarowanie wolumenu per bar 🟡; tickowy POC = wymaga rozszerzenia Bramy (nie blokuje). Wymaga: (1) definicji
+"sesji" crypto 24/7, (2) wspólnego profil_tpo()/profil_wolumenu() w Budowniczym.
+**Powód:** Prawo XV (domknięcie 2 najsłabszych filarów V/S), ZPO (pełny opis), rozkaz Cezara (gromadzić pozycje).
+**Pliki:** `docs/WIZJONER.md`, `docs/REJESTR_INSPIRACJI.md`, `docs/LOG_ZMIAN.md`
+**Testy:** 514/514 ✅. Audyt: exit 0 ✅. (zadanie czysto dokumentacyjne)
+
+---
+
+## 2026-06-08 | BIBLIOTEKA | BIB-010/011/012 — 3 książki naraz (Chan ×2 + Coding Capital)
+
+**Opis:** Cezar dostarczył 3 pliki naraz; każdy rozpakowany i przeanalizowany osobnym agentem Opus.
+Rozkaz Cezara: gromadzić pozycje w WIZJONER, wdrożenie później ("jak zbierzemy pozycje, kontynuujemy").
+- **BIB-010 Chan "Quantitative Trading" (2nd ed.) — 9/10:** half-life OU, macierzowy Kelly F*=C⁻¹·M (dowód
+  Prawa XVI), cap lewara przez najgorszą stratę, para kointegrująca, deflated Sharpe, truncation look-ahead
+  test → W-160..W-169.
+- **BIB-011 Chan "Algorithmic Trading" (chińskie, ŻYCZ-04) — 9/10:** Kalman β dla par (rozszerza EXP-04),
+  Monte-Carlo Kelly z Pearsona (fat tails!), Hurst+Variance-Ratio, leading risk, CPPI → W-170..W-178.
+- **BIB-012 "Coding Capital" (Van Der Post) — ⚠️ 3/10 SŁABA:** self-published wypełniacz, snippety błędne.
+  Jedyne ziarno: EVT/GPD parametr ogona ξ → W-180. Rekomendacja: nie kupować więcej Van Der Posta.
+ŻYCZ-04 ✅ zdobyte. INF-22/23/24 w REJESTR.
+🚨 2 flagi Prawa XV z BIB-011 do weryfikacji w kodzie: (1) czy KALKULATOR liczy Kelly tylko po Gaussie
+(fat-tail crypto → ryzyko wipeout, W-176)? (2) czy EXP-04 używa Kalmana do hedge-ratio par (W-172)?
+🔗 Nakładanie: obie książki Chana dzielą half-life OU i Kelly — przy wdrożeniu jeden neuron, nie dwa.
+**Powód:** Prawo XVII (rozpoznanie), Prawo XV (domknięcie luk R/S + flagi), ZPO (pełny opis, krytyczna ocena BIB-012).
+**Pliki:** `docs/WIZJONER.md`, `docs/REJESTR_INSPIRACJI.md`, `docs/LOG_ZMIAN.md`
+**Testy:** 514/514 ✅. Audyt: exit 0 ✅. (zadanie czysto dokumentacyjne — zero zmian kodu)
+
+---
+
 ## 2026-06-08 | KOD+BIBLIOTEKA | W-130 Volatility Drag WDROŻONE + BIB-009 Mandelbrot "(Mis)behavior of Markets"
 
 **Opis (2 ruchy w jednym zadaniu — rozkaz Cezara "tak plus następna książka"):**

@@ -55,6 +55,8 @@ SOURCE_TAG_PY = "pure-Python (deterministic)"
 _PURE_PYTHON_INDICATORS = {
     "AO", "AO_PREV", "AC", "AC_PREV", "HMA", "HMA_PREV",
     "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "PERMUTATION_ENTROPY", "VPIN", "WASH_TRADING", "CHOPPINESS", "ULCER",
+    "BUBBLE_Z", "VOV", "RET_AR1", "VALUE_Z", "MOMA_Z", "OU_HALFLIFE", "VARIANCE_RATIO",
+    "CASCADE_FLAG", "DEADCAT_SETUP",
     "VWAP", "VWAP_STD",
     "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
 }
@@ -590,6 +592,305 @@ def _py_ulcer(close, period: int = 14) -> Optional[float]:
     return round(math.sqrt(sum(kwadraty) / len(kwadraty)), 4)
 
 
+def _py_bubble_z(close, period: int = 200) -> Optional[float]:
+    """
+    Bubble-Z — odchylenie ceny od długoterminowego trendu w jednostkach σ (BIB-020, Harris rozdz. 28).
+
+    Dla nowicjusza: bańka to cena oderwana od swojej długoterminowej "grawitacji".
+    Mierzymy logarytmiczne odchylenie ceny od EMA-200 i normalizujemy je przez jego
+    własną zmienność historyczną. Wynik to z-score:
+      bubble_z > +3.5 → 🚨 skrajne przegrzanie (możliwa bańka, ryzyko pęknięcia)
+      bubble_z < −3.5 → skrajne wyprzedanie (overshoot krachu, strefa odbicia)
+      |bubble_z| < 2  → cena "informacyjna" (granice Fischera Blacka: 0.5×–2× wartości).
+
+    Wzór: log_dev[i] = ln(close[i]) − ln(EMA200[i]); bubble_z = log_dev[-1] / std(log_dev).
+    Annualizacja zbędna — to czysty z-score (bezwymiarowy).
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 28; granice Fischera Blacka (1986).
+    """
+    import math
+    c = _arr(close)
+    if len(c) < period + 2:
+        return None
+    ema = talib.EMA(c, timeperiod=period)
+    log_dev = []
+    for i in range(len(c)):
+        e = ema[i]
+        if e is None or np.isnan(e) or e <= 0 or c[i] <= 0:
+            continue
+        log_dev.append(math.log(c[i]) - math.log(e))
+    # z-score wymaga sensownej próbki odchyleń (EMA-200 ma warmup 199 barów,
+    # więc dla wiarygodnego σ potrzeba ~period+15 barów). Mniej → None (Prawo I).
+    if len(log_dev) < 15:
+        return None
+    n = len(log_dev)
+    mean = sum(log_dev) / n
+    var = sum((x - mean) ** 2 for x in log_dev) / (n - 1)
+    std = math.sqrt(var)
+    if std < 1e-12:
+        return 0.0
+    return round(log_dev[-1] / std, 4)
+
+
+def _py_vov(high, low, close, period: int = 14, window: int = 20) -> Optional[float]:
+    """
+    VoV — Volatility-of-Volatility (BIB-020, Harris rozdz. 28): prekursor krachu.
+
+    Dla nowicjusza: przed krachem sama zmienność staje się NIESTABILNA — ATR nie tylko
+    rośnie, ale skacze z baru na bar (rozpad konsensusu cenowego). Stabilna wysoka vol
+    to co innego niż chaotyczna vol. Mierzymy współczynnik zmienności ATR:
+      VoV = std(ATR, window) / mean(ATR, window)
+      VoV > 1.2 → 🚨 skrajna niestabilność (kill-switch), VoV < 0.5 → spokój.
+
+    Zwraca współczynnik zmienności ATR-14 z ostatnich `window` barów (bezwymiarowy).
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 28 (portfolio insurance / "who would buy?").
+    """
+    import math
+    atr = talib.ATR(_arr(high), _arr(low), _arr(close), timeperiod=period)
+    vals = [x for x in atr[-window:] if x is not None and not np.isnan(x)]
+    if len(vals) < max(5, window // 2):
+        return None
+    n = len(vals)
+    mean = sum(vals) / n
+    if mean < 1e-12:
+        return None
+    var = sum((x - mean) ** 2 for x in vals) / (n - 1)
+    return round(math.sqrt(var) / mean, 4)
+
+
+def _py_ret_ar1(close, window: int = 20) -> Optional[float]:
+    """
+    AR1 — autokorelacja zwrotów lag-1 (BIB-020, Harris rozdz. 28): wskaźnik refleksywności.
+
+    Dla nowicjusza: w rynku efektywnym kolejne zwroty są nieskorelowane (AR1≈0).
+    Gdy AR1 robi się DODATNI, ceny napędzają same siebie (kaskada momentum / margin calls):
+      AR1 > +0.40 → 🚨 kaskada (dynamika krachu lub paraboli) — kill-switch
+      AR1 > +0.25 → refleksywność (reżim momentum, tłum dogania)
+      AR1 < −0.20 → silna rewersja (stabilny, efektywny rynek).
+
+    Wzór: r[i] = close[i]/close[i-1] − 1; AR1 = corr(r[t], r[t-1]) z ostatnich `window` par.
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 28; Soros (refleksywność).
+    """
+    import math
+    c = list(close)
+    if len(c) < window + 2:
+        return None
+    rets = [c[i] / c[i - 1] - 1.0 for i in range(1, len(c)) if c[i - 1] > 0]
+    rets = rets[-(window + 1):]
+    if len(rets) < window:
+        return None
+    x = rets[1:]      # r[t]
+    y = rets[:-1]     # r[t-1]
+    n = len(x)
+    mx = sum(x) / n
+    my = sum(y) / n
+    cov = sum((x[i] - mx) * (y[i] - my) for i in range(n))
+    vx = sum((v - mx) ** 2 for v in x)
+    vy = sum((v - my) ** 2 for v in y)
+    if vx < 1e-18 or vy < 1e-18:
+        return 0.0
+    return round(cov / math.sqrt(vx * vy), 4)
+
+
+def _py_value_z(close, period: int = 200) -> Optional[float]:
+    """
+    Value-Z — odchylenie ceny od długoterminowej wartości godziwej w jednostkach σ
+    (BIB-020, Harris rozdz. 16 "Value Traders").
+
+    Dla nowicjusza: value traderzy wchodzą dopiero, gdy cena ODERWAŁA się materialnie
+    od swojej wartości godziwej (ich "outside spread"). Kotwicą wartości jest SMA-200,
+    a miarą oderwania — z-score: ile odchyleń standardowych cena jest poniżej/powyżej.
+      Value-Z < −2.0 → wyprzedanie (kandydat LONG, rewersja do wartości)
+      Value-Z > +2.0 → wykupienie (kandydat SHORT)
+      |Value-Z| < 1.5 → cena blisko wartości (NEUTRAL).
+
+    Wzór: z = (close[-1] − SMA_period) / std(close[-period:]).
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 16; wizja W-273.
+    """
+    import math
+    c = list(close)
+    if len(c) < period:
+        return None
+    okno = c[-period:]
+    n = len(okno)
+    mean = sum(okno) / n
+    var = sum((x - mean) ** 2 for x in okno) / (n - 1)
+    std = math.sqrt(var)
+    if std < 1e-12:
+        return 0.0
+    return round((c[-1] - mean) / std, 4)
+
+
+def _py_moma_z(close, period: int = 200) -> Optional[float]:
+    """
+    MoMA-Z — odchylenie ceny od ŚREDNIEJ ŚREDNICH (Moving average of Moving Averages),
+    wieloskalowa kotwica wartości (BIB-020, Harris rozdz. 16; wizja W-273).
+
+    Dla nowicjusza: pojedyncza SMA-200 jest mocno opóźniona. Value traderzy patrzą na
+    wartość w wielu horyzontach naraz. MoMA = średnia z SMA-20/50/100/200 — łączy
+    krótki, średni i długi obraz. z = (close − MoMA) / std(close, 200).
+    Komplementarny do Value-Z (inna kotwica) — krzyżowe potwierdzenie rewersji.
+
+    Wzór: MoMA = mean(SMA20, SMA50, SMA100, SMA200); z = (close[-1] − MoMA)/std(close[-200:]).
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 16; wizja W-273.
+    """
+    import math
+    c = list(close)
+    if len(c) < period:
+        return None
+
+    def _sma(seria, okr):
+        return sum(seria[-okr:]) / okr
+
+    moma = (_sma(c, 20) + _sma(c, 50) + _sma(c, 100) + _sma(c, period)) / 4.0
+    okno = c[-period:]
+    n = len(okno)
+    mean = sum(okno) / n
+    var = sum((x - mean) ** 2 for x in okno) / (n - 1)
+    std = math.sqrt(var)
+    if std < 1e-12:
+        return 0.0
+    return round((c[-1] - moma) / std, 4)
+
+
+def _py_ou_halflife(close, period: int = 50) -> Optional[float]:
+    """
+    OU Half-Life — czas połowicznego powrotu do średniej (BIB-020, Harris rozdz. 16; wizja W-274).
+
+    Dla nowicjusza: gdy value traderzy są aktywni, rynek jest "sprężysty" (resilient) —
+    cena szybko wraca do średniej po szoku. Mierzymy to modelem Ornsteina-Uhlenbecka:
+    regresja Δx na x dla spreadu x=(price − SMA_period). Współczynnik β<0 = rewersja;
+    half-life = −ln(2)/β to liczba barów do przebycia połowy drogi powrotu.
+      half-life KRÓTKI (<~20 barów) → silna rewersja (value traderzy obecni) → RANGING
+      half-life DŁUGI (>~40 barów)  → słaba rewersja / trend dominuje → TREND_STRONG
+
+    Zwraca half-life w barach (float). Gdy β≥0 (brak rewersji, dynamika trendu) → 9999.0
+    (sygnał "bardzo długi" = trend). None gdy za mało danych.
+    Źródło: Harris (2003) rozdz. 16; Chan "Algorithmic Trading" (OU half-life); wizja W-274.
+    """
+    import math
+    c = list(close)
+    if len(c) < period + 5:
+        return None
+    okno = c[-period:]
+    n = len(okno)
+    sma = sum(okno) / n
+    x = [v - sma for v in okno]          # spread wokół średniej
+    lag = x[:-1]
+    delta = [x[i] - x[i - 1] for i in range(1, len(x))]
+    m = len(lag)
+    mean_lag = sum(lag) / m
+    var_lag = sum((v - mean_lag) ** 2 for v in lag)
+    if var_lag < 1e-12:
+        return None
+    mean_delta = sum(delta) / m
+    cov = sum((lag[i] - mean_lag) * (delta[i] - mean_delta) for i in range(m))
+    beta = cov / var_lag
+    if beta >= 0:
+        return 9999.0                    # brak rewersji → "nieskończenie długi" = trend
+    return round(-math.log(2) / beta, 4)
+
+
+def _py_variance_ratio(close, k: int = 4, period: int = 100) -> Optional[float]:
+    """
+    Variance Ratio (Lo-MacKinlay) — dekompozycja zmienności: trwała (trend) vs przejściowa
+    (szum/rewersja) (BIB-020, Harris rozdz. 20/16; wizja W-263).
+
+    Dla nowicjusza: jeśli zwroty są niezależne (błądzenie losowe), wariancja zwrotu
+    k-okresowego = k × wariancja zwrotu 1-okresowego, więc VR=1. Gdy ceny TRENDUJĄ
+    (dodatnia autokorelacja), wariancja rośnie SZYBCIEJ niż liniowo → VR>1. Gdy REWERTUJĄ
+    (ujemna autokorelacja), wolniej → VR<1. To kanoniczny "master-switch" reżimu:
+      VR > 1.05 → trend (zmienność trwała) → TREND_STRONG
+      VR < 0.95 → rewersja (zmienność przejściowa) → RANGING
+
+    Wzór: VR(k) = Var(r_k) / (k · Var(r_1)), r = logarytmiczne zwroty na oknie `period`.
+    Źródło: Lo & MacKinlay (1988); Harris (2003) rozdz. 20; wizja W-263.
+    """
+    import math
+    c = list(close)
+    if len(c) < period or len(c) < k + 2:
+        return None
+    okno = c[-period:]
+    logp = [math.log(v) for v in okno if v > 0]
+    if len(logp) < k + 2:
+        return None
+    r1 = [logp[i] - logp[i - 1] for i in range(1, len(logp))]
+    rk = [logp[i] - logp[i - k] for i in range(k, len(logp))]
+    n1 = len(r1)
+    nk = len(rk)
+    if n1 < 2 or nk < 2:
+        return None
+    m1 = sum(r1) / n1
+    var1 = sum((v - m1) ** 2 for v in r1) / (n1 - 1)
+    if var1 < 1e-18:
+        return None
+    mk = sum(rk) / nk
+    vark = sum((v - mk) ** 2 for v in rk) / (nk - 1)
+    return round(vark / (k * var1), 4)
+
+
+def _py_cascade_flag(close, volume, n: int = 3) -> Optional[float]:
+    """
+    Cascade Flag — detektor kaskady krachu (BIB-020, Harris rozdz. 28; wizja W-279).
+
+    Dla nowicjusza: krachy nakręcają się lawiną zleceń stop-loss i margin calls (Treynor
+    "price accelerator"). Sygnatura: kilka kolejnych spadkowych barów, KAŻDY większy niż
+    poprzedni, przy ROSNĄCYM wolumenie. Gdy wszystkie trzy warunki naraz → kaskada trwa.
+
+    Zwraca 1.0 gdy ostatnie `n` barów spełnia jednocześnie:
+      1. wszystkie spadkowe (close[i] < close[i-1]),
+      2. |zwrot| rośnie (przyspieszenie),
+      3. wolumen rośnie (lawina).
+    Inaczej 0.0. None gdy za mało danych.
+    Źródło: Harris (2003) rozdz. 28 ("price accelerator"); wizja W-279.
+    """
+    c = list(close)
+    v = list(volume)
+    if len(c) < n + 1 or len(v) < n:
+        return None
+    zwroty = [c[-i] - c[-i - 1] for i in range(1, n + 1)]   # [r_ostatni, r_-1, r_-2]
+    vols = [v[-i] for i in range(1, n + 1)]                  # [v_ostatni, v_-1, v_-2]
+    spadki = all(r < 0 for r in zwroty)
+    # przyspieszenie: |r_ostatni| > |r_-1| > |r_-2|
+    przyspieszenie = all(abs(zwroty[i]) > abs(zwroty[i + 1]) for i in range(n - 1))
+    # wolumen rosnący ku teraźniejszości: v_ostatni > v_-1 > v_-2
+    wolumen_rosnie = all(vols[i] > vols[i + 1] for i in range(n - 1))
+    return 1.0 if (spadki and przyspieszenie and wolumen_rosnie) else 0.0
+
+
+def _py_deadcat_setup(high, low, close, volume, lookback: int = 6,
+                      crash_pct: float = 0.12) -> Optional[float]:
+    """
+    Dead-Cat Setup — układ odbicia po wyczerpaniu krachu (BIB-020, Harris rozdz. 28; wizja W-279).
+
+    Dla nowicjusza: panika w krachu zrzuca cenę PONIŻEJ wartości godziwej; gdy sprzedający
+    się wyczerpią, następuje krótkie odbicie ("dead-cat bounce"). To trade taktyczny, nie
+    odwrócenie trendu — krótki, z ciasnym stopem (zarządza egzekutor, nie neuron).
+
+    Zwraca 1.0 gdy SPEŁNIONE NARAZ:
+      1. niedawny krach: spadek od szczytu w oknie `lookback` ≥ crash_pct,
+      2. dno wyhamowane: ostatni bar NIE robi nowego dołka (low[-1] > min(low[-lookback:-1])),
+      3. wolumen słabnie: volume[-1] < max(volume[-lookback:]) (wyczerpanie sprzedających),
+      4. cena blisko dna: pozycja close[-1] w dolnej 1/3 zakresu okna (wciąż wyprzedana).
+    Inaczej 0.0. None gdy za mało danych.
+    Źródło: Harris (2003) rozdz. 28; wizja W-279.
+    """
+    c = list(close); l = list(low); v = list(volume)
+    if len(c) < lookback or len(l) < lookback or len(v) < lookback:
+        return None
+    okno_c = c[-lookback:]
+    szczyt = max(okno_c)
+    dno = min(okno_c)
+    if szczyt <= 0 or szczyt <= dno:
+        return None
+    spadek = (szczyt - c[-1]) / szczyt
+    krach = spadek >= crash_pct
+    dno_wyhamowane = l[-1] > min(l[-lookback:-1])
+    wolumen_slabnie = v[-1] < max(v[-lookback:])
+    pozycja_w_zakresie = (c[-1] - dno) / (szczyt - dno)   # 0=dno, 1=szczyt
+    blisko_dna = pozycja_w_zakresie < 0.35
+    return 1.0 if (krach and dno_wyhamowane and wolumen_slabnie and blisko_dna) else 0.0
+
+
 def _py_supertrend(high, low, close, period: int = 10, multiplier: float = 3.0):
     """
     Supertrend — pure Python, bez TA-Lib.
@@ -774,6 +1075,23 @@ class CalculatorGateway:
 
             # ── Pure-Python: Ulcer Index — ryzyko spadkowe (kat. L) ───────────
             "ULCER":     lambda close, period=14: _py_ulcer(close, period),
+
+            # ── Pure-Python: W-278 bubble/crash kill-switch (kat. Z, BIB-020 Harris rozdz. 28) ──
+            "BUBBLE_Z":   lambda close, period=200: _py_bubble_z(close, period),
+            "VOV":        lambda high, low, close, period=14, window=20: _py_vov(high, low, close, period, window),
+            "RET_AR1":    lambda close, window=20: _py_ret_ar1(close, window),
+
+            # ── Pure-Python: W-273 value convergence (kat. M, BIB-020 Harris rozdz. 16) ──
+            "VALUE_Z":    lambda close, period=200: _py_value_z(close, period),
+            "MOMA_Z":     lambda close, period=200: _py_moma_z(close, period),
+
+            # ── Pure-Python: W-274/W-263 master-switch reżimu (BIB-020 Harris rozdz. 16/20) ──
+            "OU_HALFLIFE":    lambda close, period=50: _py_ou_halflife(close, period),
+            "VARIANCE_RATIO": lambda close, k=4, period=100: _py_variance_ratio(close, k, period),
+
+            # ── Pure-Python: W-279 cascade detector + dead-cat bounce (kat. Z, BIB-020 rozdz. 28) ──
+            "CASCADE_FLAG":  lambda close, volume, n=3: _py_cascade_flag(close, volume, n),
+            "DEADCAT_SETUP": lambda high, low, close, volume, lookback=6: _py_deadcat_setup(high, low, close, volume, lookback),
 
             # ── TA-Lib: wolumen ────────────────────────────────────────────────
             "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),

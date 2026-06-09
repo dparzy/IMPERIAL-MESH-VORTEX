@@ -274,6 +274,63 @@ class SkalowanieFrakcjaDD:
 
 
 @dataclass
+class RegulaSzesciuProcentEldera:
+    """
+    Reguła 6% Alexandra Eldera (BIB-015 — "Come into My Trading Room").
+
+    DLA NOWICJUSZA: Elder odkrył, że profesjonalni traderzy nigdy nie tracą więcej
+    niż 6% kapitału w jednym miesiącu. Gdy zbliżasz się do tej granicy — umysł
+    pracuje w trybie "muszę odrobić straty", podejmujesz złe decyzje.
+    ROZWIĄZANIE: gdy strata miesiąca ≥ 6% → HALT, odłóż klawiaturę do nowego miesiąca.
+
+    Komplementarna z BezpiecznikKrzywejKapitalu (W-062, intraday) i AOA (W-028, 30%):
+      Elder = miesięczny meta-limit (najszerszy horyzont)
+      W-062 = dzienny equity breaker
+      W-028 = twardy stop całości
+
+    Źródło: Alexander Elder, "Come into My Trading Room" (2002), BIB-015.
+             Weryfikacja: ✅ kanoniczna zasada tradingu.
+    """
+    prog: float = 0.06
+    kapital_start_miesiaca: float = 0.0
+    stan: str = field(default="NORMAL")
+    _biezacy_miesiac: int = field(default=0, repr=False)
+
+    def __post_init__(self):
+        self._biezacy_miesiac = date.today().month
+
+    def aktualizuj(self, kapital_biezacy: float, dzisiaj: "date | None" = None) -> str:
+        if dzisiaj is None:
+            dzisiaj = date.today()
+        if dzisiaj.month != self._biezacy_miesiac:
+            self._biezacy_miesiac = dzisiaj.month
+            self.kapital_start_miesiaca = kapital_biezacy
+            self.stan = "NORMAL"
+            logger.info(f"📐 Reguła 6% Elder: nowy miesiąc {dzisiaj.month} — reset, bazowy = {kapital_biezacy:.2f}")
+            return self.stan
+        if self.kapital_start_miesiaca <= 0:
+            self.kapital_start_miesiaca = kapital_biezacy
+            return self.stan
+        strata = (self.kapital_start_miesiaca - kapital_biezacy) / self.kapital_start_miesiaca
+        if strata >= self.prog and self.stan != "HALT":
+            self.stan = "HALT"
+            logger.warning(f"📐 REGUŁA 6% (Elder): strata miesięczna {strata:.1%} ≥ {self.prog:.0%} — HALT do końca miesiąca (BIB-015)")
+        elif strata < self.prog and self.stan == "HALT":
+            self.stan = "NORMAL"
+        return self.stan
+
+    @property
+    def halt(self) -> bool:
+        return self.stan == "HALT"
+
+    def reset_miesiac(self, nowy_kapital: float) -> None:
+        self.kapital_start_miesiaca = nowy_kapital
+        self.stan = "NORMAL"
+        self._biezacy_miesiac = date.today().month
+        logger.info(f"✅ Reguła 6% Elder: ręczny reset. Bazowy = {nowy_kapital:.2f}")
+
+
+@dataclass
 class PlanPozycji:
     symbol: str
     kierunek: str              # LONG / SHORT

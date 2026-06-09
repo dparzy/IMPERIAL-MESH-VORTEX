@@ -6,18 +6,15 @@ Analiza instytucjonalnych śladów w cenach.
 ARCHITEKTURA SMC:
   SMC-01..03 to WARSTWY INTERPRETACJI — interpretują z gotowych stref.
   Strefy (OB/FVG/BOS) muszą być wykryte przez Exploratores (wymaga serii barów).
-  Plan: EXP-05 ZwiadowcaSMC oblicza strefy → wstrzykuje je do wskazniki dict →
-        SMC-01..03 interpretują. Do czasu EXP-05 — wyciszone.
+  EXP-05 ZwiadowcaSMC oblicza strefy → wstrzykuje je do wskazniki dict →
+  SMC-01..03 interpretują. EXP-05 jest aktywny → SMC-01..03 AKTYWNE (2026-06-09).
 
   VSA-01 działa z bieżącego baru (HIGH/LOW/CLOSE/VOL) — dostępny od razu.
 """
 
 from imperium.legiony.mikro_neuron import MikroNeuron, SygnalNeuronu
 
-_POWOD_SMC = (
-    "Wykrycie stref OB/FVG/BOS wymaga serii barów (Exploratores). "
-    "Aktywuje się gdy EXP-05 ZwiadowcaSMC wstrzyknie strefy do wskazniki."
-)
+_POWOD_SMC = ""  # EXP-05 aktywny → SMC-01..03 dostępne (2026-06-09, Prawo XV)
 
 
 class NeuronOrderBlock(MikroNeuron):
@@ -32,8 +29,7 @@ class NeuronOrderBlock(MikroNeuron):
     WSKAZNIK = "ORDER_BLOCK"
     KATEGORIA = "S"
     WAGA = 8
-    DOSTEPNY = False
-    POWOD_NIEDOSTEPNOSCI = _POWOD_SMC
+    DOSTEPNY = True
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         close = wskazniki.get("CLOSE")
@@ -71,8 +67,7 @@ class NeuronFVG(MikroNeuron):
     WSKAZNIK = "FVG"
     KATEGORIA = "S"
     WAGA = 7
-    DOSTEPNY = False
-    POWOD_NIEDOSTEPNOSCI = _POWOD_SMC
+    DOSTEPNY = True
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         close = wskazniki.get("CLOSE")
@@ -108,8 +103,7 @@ class NeuronBOS(MikroNeuron):
     WSKAZNIK = "BOS_MSS"
     KATEGORIA = "S"
     WAGA = 9
-    DOSTEPNY = False
-    POWOD_NIEDOSTEPNOSCI = _POWOD_SMC
+    DOSTEPNY = True
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         bos_bull = wskazniki.get("BOS_BULLISH")        # bool: ostatni bar przebił HH

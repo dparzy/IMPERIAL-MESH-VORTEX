@@ -78,6 +78,42 @@ WAGI_REZIMU = {
 WAGI_REZIMU_PLANOWANE: set = set()  # L i V zaimplementowane (VI-13, V-13)
 
 
+def _master_switch_rezimu(wskazniki: dict):
+    """
+    Master-switch reżimu (W-263/W-274, BIB-020 Harris rozdz. 16/20) — Faza 1 (Opcja 1).
+
+    Rozstrzyga TREND_STRONG ↔ RANGING TYLKO w strefie spornej ADX (gdzie sam ADX milczy),
+    głosowaniem 2-z-3 trzema ortogonalnymi miernikami dynamiki:
+      • VARIANCE_RATIO_4 (W-263): >1.05 → TREND, <0.95 → RANGING (dekompozycja zmienności)
+      • OU_HALFLIFE_50  (W-274): >40 barów → TREND, <20 → RANGING (sprężystość rewersji)
+      • RET_AR1_20      (istn.):  >+0.10 → TREND, <−0.10 → RANGING (autokorelacja zwrotów)
+
+    Zwraca "TREND_STRONG" / "RANGING" gdy ≥2 głosy się zgadzają, inaczej None (→ NORMAL).
+    Prawo XV: aktywuje wagi reżimowe tam, gdzie dziś rój jest płaski (strefa NORMAL).
+    Prawo XVI: nie nadpisuje działającego ADX — dokłada rozstrzygnięcie, gdzie go brak.
+    Prawo I: tylko czyta z dict, nie liczy własnej matematyki.
+    """
+    vr = wskazniki.get("VARIANCE_RATIO_4")
+    hl = wskazniki.get("OU_HALFLIFE_50")
+    ar1 = wskazniki.get("RET_AR1_20")
+
+    glosy = []
+    if vr is not None:
+        glosy.append("TREND" if vr > 1.05 else "RANGING" if vr < 0.95 else None)
+    if hl is not None:
+        glosy.append("TREND" if hl > 40 else "RANGING" if hl < 20 else None)
+    if ar1 is not None:
+        glosy.append("TREND" if ar1 > 0.10 else "RANGING" if ar1 < -0.10 else None)
+
+    trend = glosy.count("TREND")
+    ranging = glosy.count("RANGING")
+    if trend >= 2 and trend > ranging:
+        return "TREND_STRONG"
+    if ranging >= 2 and ranging > trend:
+        return "RANGING"
+    return None
+
+
 def klasyfikuj_rezim(wskazniki: dict) -> str:
     """
     Automatyczny klasyfikator reżimu rynku z gotowych wskaźników Bramy.
@@ -86,6 +122,7 @@ def klasyfikuj_rezim(wskazniki: dict) -> str:
       VOLATILE  → ATR_DEVIATION > 2.5  (rynek bardzo rozchwiany)
       TREND_STRONG → ADX_14 > 25       (wyraźny trend)
       RANGING   → ADX_14 < 20 + wąskie BB (konsolidacja)
+      STREFA SPORNA (ADX 20–25 lub brak ADX) → master-switch 2-z-3 (W-263/W-274), inaczej NORMAL
       NORMAL    → domyślnie
 
     Prawo I: TYLKO czyta z wskazniki dict, nie liczy własnej matematyki.
@@ -112,6 +149,12 @@ def klasyfikuj_rezim(wskazniki: dict) -> str:
             if szerokosc < 0.04:  # BB węższe niż 4% mid-price → konsolidacja
                 return "RANGING"
         return "RANGING"  # sam ADX < 20 wystarczy
+
+    # STREFA SPORNA (ADX 20–25 lub brak ADX): master-switch 2-z-3 (Faza 1, Opcja 1).
+    # ADX jest tu ślepy — dopiero dynamika (VR / half-life / AR1) rozstrzyga.
+    decyzja = _master_switch_rezimu(wskazniki)
+    if decyzja is not None:
+        return decyzja
 
     return "NORMAL"
 

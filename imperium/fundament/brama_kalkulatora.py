@@ -55,7 +55,7 @@ SOURCE_TAG_PY = "pure-Python (deterministic)"
 _PURE_PYTHON_INDICATORS = {
     "AO", "AO_PREV", "AC", "AC_PREV", "HMA", "HMA_PREV",
     "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "PERMUTATION_ENTROPY", "VPIN", "WASH_TRADING", "CHOPPINESS", "ULCER",
-    "BUBBLE_Z", "VOV", "RET_AR1", "VALUE_Z", "MOMA_Z",
+    "BUBBLE_Z", "VOV", "RET_AR1", "VALUE_Z", "MOMA_Z", "OU_HALFLIFE", "VARIANCE_RATIO",
     "VWAP", "VWAP_STD",
     "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
 }
@@ -751,6 +751,82 @@ def _py_moma_z(close, period: int = 200) -> Optional[float]:
     return round((c[-1] - moma) / std, 4)
 
 
+def _py_ou_halflife(close, period: int = 50) -> Optional[float]:
+    """
+    OU Half-Life — czas połowicznego powrotu do średniej (BIB-020, Harris rozdz. 16; wizja W-274).
+
+    Dla nowicjusza: gdy value traderzy są aktywni, rynek jest "sprężysty" (resilient) —
+    cena szybko wraca do średniej po szoku. Mierzymy to modelem Ornsteina-Uhlenbecka:
+    regresja Δx na x dla spreadu x=(price − SMA_period). Współczynnik β<0 = rewersja;
+    half-life = −ln(2)/β to liczba barów do przebycia połowy drogi powrotu.
+      half-life KRÓTKI (<~20 barów) → silna rewersja (value traderzy obecni) → RANGING
+      half-life DŁUGI (>~40 barów)  → słaba rewersja / trend dominuje → TREND_STRONG
+
+    Zwraca half-life w barach (float). Gdy β≥0 (brak rewersji, dynamika trendu) → 9999.0
+    (sygnał "bardzo długi" = trend). None gdy za mało danych.
+    Źródło: Harris (2003) rozdz. 16; Chan "Algorithmic Trading" (OU half-life); wizja W-274.
+    """
+    import math
+    c = list(close)
+    if len(c) < period + 5:
+        return None
+    okno = c[-period:]
+    n = len(okno)
+    sma = sum(okno) / n
+    x = [v - sma for v in okno]          # spread wokół średniej
+    lag = x[:-1]
+    delta = [x[i] - x[i - 1] for i in range(1, len(x))]
+    m = len(lag)
+    mean_lag = sum(lag) / m
+    var_lag = sum((v - mean_lag) ** 2 for v in lag)
+    if var_lag < 1e-12:
+        return None
+    mean_delta = sum(delta) / m
+    cov = sum((lag[i] - mean_lag) * (delta[i] - mean_delta) for i in range(m))
+    beta = cov / var_lag
+    if beta >= 0:
+        return 9999.0                    # brak rewersji → "nieskończenie długi" = trend
+    return round(-math.log(2) / beta, 4)
+
+
+def _py_variance_ratio(close, k: int = 4, period: int = 100) -> Optional[float]:
+    """
+    Variance Ratio (Lo-MacKinlay) — dekompozycja zmienności: trwała (trend) vs przejściowa
+    (szum/rewersja) (BIB-020, Harris rozdz. 20/16; wizja W-263).
+
+    Dla nowicjusza: jeśli zwroty są niezależne (błądzenie losowe), wariancja zwrotu
+    k-okresowego = k × wariancja zwrotu 1-okresowego, więc VR=1. Gdy ceny TRENDUJĄ
+    (dodatnia autokorelacja), wariancja rośnie SZYBCIEJ niż liniowo → VR>1. Gdy REWERTUJĄ
+    (ujemna autokorelacja), wolniej → VR<1. To kanoniczny "master-switch" reżimu:
+      VR > 1.05 → trend (zmienność trwała) → TREND_STRONG
+      VR < 0.95 → rewersja (zmienność przejściowa) → RANGING
+
+    Wzór: VR(k) = Var(r_k) / (k · Var(r_1)), r = logarytmiczne zwroty na oknie `period`.
+    Źródło: Lo & MacKinlay (1988); Harris (2003) rozdz. 20; wizja W-263.
+    """
+    import math
+    c = list(close)
+    if len(c) < period or len(c) < k + 2:
+        return None
+    okno = c[-period:]
+    logp = [math.log(v) for v in okno if v > 0]
+    if len(logp) < k + 2:
+        return None
+    r1 = [logp[i] - logp[i - 1] for i in range(1, len(logp))]
+    rk = [logp[i] - logp[i - k] for i in range(k, len(logp))]
+    n1 = len(r1)
+    nk = len(rk)
+    if n1 < 2 or nk < 2:
+        return None
+    m1 = sum(r1) / n1
+    var1 = sum((v - m1) ** 2 for v in r1) / (n1 - 1)
+    if var1 < 1e-18:
+        return None
+    mk = sum(rk) / nk
+    vark = sum((v - mk) ** 2 for v in rk) / (nk - 1)
+    return round(vark / (k * var1), 4)
+
+
 def _py_supertrend(high, low, close, period: int = 10, multiplier: float = 3.0):
     """
     Supertrend — pure Python, bez TA-Lib.
@@ -944,6 +1020,10 @@ class CalculatorGateway:
             # ── Pure-Python: W-273 value convergence (kat. M, BIB-020 Harris rozdz. 16) ──
             "VALUE_Z":    lambda close, period=200: _py_value_z(close, period),
             "MOMA_Z":     lambda close, period=200: _py_moma_z(close, period),
+
+            # ── Pure-Python: W-274/W-263 master-switch reżimu (BIB-020 Harris rozdz. 16/20) ──
+            "OU_HALFLIFE":    lambda close, period=50: _py_ou_halflife(close, period),
+            "VARIANCE_RATIO": lambda close, k=4, period=100: _py_variance_ratio(close, k, period),
 
             # ── TA-Lib: wolumen ────────────────────────────────────────────────
             "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),

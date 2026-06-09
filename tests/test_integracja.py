@@ -216,6 +216,84 @@ def test_klasyfikator_brak_danych():
     assert klasyfikuj_rezim({}) == "NORMAL"
 
 
+# ─── W-263/W-274: master-switch reżimu w strefie spornej (Faza 1, Opcja 1) ───
+
+def test_masterswitch_strefa_sporna_trend():
+    """Strefa sporna ADX 22 + 2/3 sygnałów TREND (VR>1.05, half-life>40) → TREND_STRONG."""
+    from imperium.legiony.legatus import klasyfikuj_rezim
+    w = {"ADX_14": 22.0, "ATR_DEVIATION": 1.5,
+         "VARIANCE_RATIO_4": 1.3, "OU_HALFLIFE_50": 60.0, "RET_AR1_20": 0.0}
+    assert klasyfikuj_rezim(w) == "TREND_STRONG"
+
+
+def test_masterswitch_strefa_sporna_ranging():
+    """Strefa sporna ADX 22 + 2/3 sygnałów RANGING (VR<0.95, half-life<20) → RANGING."""
+    from imperium.legiony.legatus import klasyfikuj_rezim
+    w = {"ADX_14": 22.0, "ATR_DEVIATION": 1.5,
+         "VARIANCE_RATIO_4": 0.7, "OU_HALFLIFE_50": 8.0, "RET_AR1_20": 0.0}
+    assert klasyfikuj_rezim(w) == "RANGING"
+
+
+def test_masterswitch_brak_wiekszosci_normal():
+    """Strefa sporna, ale sygnały rozbieżne (1 trend, 1 ranging, 1 neutralny) → NORMAL."""
+    from imperium.legiony.legatus import klasyfikuj_rezim
+    w = {"ADX_14": 22.0, "ATR_DEVIATION": 1.5,
+         "VARIANCE_RATIO_4": 1.3, "OU_HALFLIFE_50": 8.0, "RET_AR1_20": 0.0}
+    assert klasyfikuj_rezim(w) == "NORMAL"
+
+
+def test_masterswitch_brak_danych_master_normal():
+    """Strefa sporna BEZ nowych wskaźników → NORMAL (zachowanie sprzed Fazy 1, zero regresji)."""
+    from imperium.legiony.legatus import klasyfikuj_rezim
+    assert klasyfikuj_rezim({"ADX_14": 22.0, "ATR_DEVIATION": 1.5}) == "NORMAL"
+
+
+def test_masterswitch_nie_nadpisuje_adx():
+    """ADX>25 (jednoznaczny trend) → TREND_STRONG NIEZALEŻNIE od sygnałów rewersji (Prawo XVI)."""
+    from imperium.legiony.legatus import klasyfikuj_rezim
+    w = {"ADX_14": 30.0, "ATR_DEVIATION": 1.2,
+         "VARIANCE_RATIO_4": 0.5, "OU_HALFLIFE_50": 5.0, "RET_AR1_20": -0.5}
+    assert klasyfikuj_rezim(w) == "TREND_STRONG"  # master-switch NIE rusza działającego ADX
+
+
+def test_brama_ou_halflife_rewersja_vs_trend():
+    """OU half-life: seria rewertująca → krótki half-life; trendowa → 9999 (brak rewersji)."""
+    from imperium.fundament.brama_kalkulatora import _py_ou_halflife
+    # Silnie rewertująca (piła wokół 100)
+    rev = [100 + (5 if i % 2 == 0 else -5) for i in range(60)]
+    hl_rev = _py_ou_halflife(rev, period=50)
+    # Trend monotoniczny (brak rewersji)
+    trend = [100 + i for i in range(60)]
+    hl_trend = _py_ou_halflife(trend, period=50)
+    assert hl_rev is not None and hl_rev < 20
+    assert hl_trend == 9999.0
+
+
+def test_brama_variance_ratio_trend_vs_rewersja():
+    """Variance Ratio: trwałe zwroty (momentum) → VR>1; piła (rewersja) → VR<1."""
+    import random
+    from imperium.fundament.brama_kalkulatora import _py_variance_ratio
+    random.seed(3)
+    # Momentum: zwroty z dodatnią autokorelacją (r_t = 0.6·r_{t-1} + szum)
+    r = 0.0
+    p = [100.0]
+    for _ in range(160):
+        r = 0.6 * r + random.gauss(0, 0.01)
+        p.append(p[-1] * (1 + r))
+    vr_trend = _py_variance_ratio(p, k=4, period=100)
+    # Rewersja: piła
+    rev = [100 + (3 if i % 2 == 0 else -3) for i in range(120)]
+    vr_rev = _py_variance_ratio(rev, k=4, period=100)
+    assert vr_trend is not None and vr_trend > 1.0
+    assert vr_rev is not None and vr_rev < 1.0
+
+
+def test_brama_audyt_zrodlo_w263_w274_pure_python():
+    """Prawo XIII: OU_HALFLIFE/VARIANCE_RATIO w zbiorze pure-Python."""
+    from imperium.fundament.brama_kalkulatora import _PURE_PYTHON_INDICATORS
+    assert {"OU_HALFLIFE", "VARIANCE_RATIO"} <= _PURE_PYTHON_INDICATORS
+
+
 def test_fokus_auto_klasyfikuje_rezim():
     """fokus() z rezim='NORMAL' + ADX > 25 → auto-wykrywa TREND_STRONG."""
     import math

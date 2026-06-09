@@ -2047,7 +2047,7 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 | **W-260** | 4 wymiary płynności (immediacy/width/depth/resiliency) — sizing wg depth + neuron OBI (order-book imbalance) | pretorianie/neurony (L) | 19 | 🔴 |
 | **W-261** | Resiliency: half-life rewersji po szoku ⇒ przełącznik fade vs trend | legatus (reżim) | 19 | 🔴 |
 | **W-262** | Detektor ukrytej płynności (iceberg): powtarzalne refille na poziomie = support/resistance | neurony (S) | 19 | 🔴 |
-| **W-263** | Dekompozycja zmienności fundamental vs transitory; znak autokowariancji = GŁÓWNY przełącznik reżimu ⭐⭐ | legatus (reżim) | 20 | 🔴 |
+| **W-263** | Dekompozycja zmienności fundamental vs transitory; znak autokowariancji = GŁÓWNY przełącznik reżimu ⭐⭐ | legatus (reżim) | 20 | ✅ **WDROŻONE** Faza 1 jako `VARIANCE_RATIO` (Lo-MacKinlay) w master-switchu klasyfikatora, strefa sporna 2-z-3 (2026-06-09) |
 | **W-264** | Estymator spreadu Roll (`2·√(−Cov(Δp,Δp₋₁))`) — koszt/spread bez danych quote, tylko z transakcji | brama/metryki | 20 | 🔴 |
 | **W-265** | Money flow (wolumen upticków − downticków) ⇒ neuron LONG/SHORT | neurony (V) | 21 | 🔴 |
 | **W-266** | Globalna bramka kosztu: effective/realized spread + impact Glosten-Harris + Amihud ⇒ edge > pełny koszt, inaczej NEUTRAL ⭐ | legatus/pretorianie | 21 | 🔴 |
@@ -2063,7 +2063,7 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 | **W-271** | Staleness filter: `staleness_score=(price−price_24h)/ATR_14 > 2.0` ⇒ nie wchodzić w trend (trade jest już zrobiony) | legatus/pretorianie | 10 | 🔴 |
 | **W-272** | Efficiency proxy: `1/(spread_proxy × vol_rank)` ⇒ przełącznik reżim: low-efficiency → momentum, high-efficiency → mean-reversion ⭐ | legatus (reżim) | 10 | 🔴 |
 | **W-273** | Value convergence neuron: `z_score=(price−SMA_200)/std_200`; LONG <−2.0, SHORT >+2.0; wzmocniony przez MoMA = mean(SMA_20/50/100/200) ⭐⭐ | neurony (M — patrz nota) | 16 | ✅ **WDROŻONE** jako X-27 NeuronValueConvergence (kat. M, 2026-06-09) |
-| **W-274** | Resiliency half-life OU: `halflife=−ln(2)/ln(φ)` z AR(1) na (price−SMA_50) na oknie 50 barów ⇒ meta-przełącznik reversion↔momentum ⭐⭐ | legatus (reżim) | 16 | 🔴 |
+| **W-274** | Resiliency half-life OU: `halflife=−ln(2)/ln(φ)` z AR(1) na (price−SMA_50) na oknie 50 barów ⇒ meta-przełącznik reversion↔momentum ⭐⭐ | legatus (reżim) | 16 | ✅ **WDROŻONE** Faza 1 jako `OU_HALFLIFE` w master-switchu klasyfikatora, strefa sporna 2-z-3 (2026-06-09) |
 | **W-275** | Winner's curse scaler: `uncertainty_mult=(ATR_14/SMA_50)*100`; jeśli >5% → progi wejścia value × 1.5 (wymaga −3σ zamiast −2σ) | pretorianie/legatus | 16 | 🔴 |
 | **W-276** | Basis / funding neuron: `perp_basis_bps=(perp−spot)/spot×10000` + `funding_z=(funding−μ_30d)/σ_30d`; LONG gdy basis <−30 lub funding_z <−1.5 (squeeze), SHORT gdy basis >+50 lub funding_z >+2.0 ⭐⭐⭐ | neurony (N/Z) | 17 | 🔴 |
 | **W-277** | BTC lead-lag neuron: `btc_lag=(btc_ret_1h − alt_ret_1h)`; jeśli >1.5×ATR_alt → LONG alt (catch-up); decay 4h | neurony (T) | 17 | 🔴 |
@@ -2088,11 +2088,19 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 - **W-279** — cascade detector + dead-cat bounce ← OHLCV ✅
 
 **Pięć najmocniejszych z całego BIB-020, priorytet wdrożenia:**
-1. **W-278** — bubble/crash kill-switch (trzy sygnały: bubble_z, VoV, AR1 autocorr). Chroni kapitał; na OHLCV. ⭐⭐⭐
-2. **W-263/W-274** — master-switch reżimu: dekompozycja vol + OU half-life = naukowy fundament Namiestnika. Na OHLCV. ⭐⭐
+1. ✅ **W-278** — bubble/crash kill-switch (bubble_z, VoV, AR1). WDROŻONE jako Z-03. ⭐⭐⭐
+2. ✅ **W-263/W-274** — master-switch reżimu (VARIANCE_RATIO + OU_HALFLIFE + AR1). WDROŻONE Faza 1. ⭐⭐
 3. **W-276** — basis+funding neuron. Najlepsza dostępna oś N/Z crypto (wymaga perp API — bliska). ⭐⭐⭐
-4. **W-273** — value convergence (z-score SMA_200 + MoMA). Na OHLCV, nowa oś S. ⭐⭐
+4. ✅ **W-273** — value convergence (z-score SMA_200 + MoMA). WDROŻONE jako X-27 (kat. M). ⭐⭐
 5. **W-279** — cascade detector + dead-cat bounce (kill-switch + taktyczny long post-crash). Na OHLCV. ⭐
+
+**🔭 Master-switch reżimu — plan etapowy (decyzja Cezara 2026-06-09, Opcja 1):**
+- **Faza 1 (✅ WDROŻONA):** VARIANCE_RATIO (W-263) + OU_HALFLIFE (W-274) + RET_AR1 (istn.) jako głosowanie
+  2-z-3 rozstrzygające TREND_STRONG↔RANGING **tylko w strefie spornej ADX (20–25 lub brak)** —
+  tam, gdzie ADX milczy a dziś rój jest płaski (NORMAL). Zero regresji istniejących reżimów (Prawo XVI).
+- **Faza 2 (⏳ po pomiarze):** awans do równorzędnego głosowania (Opcja 2) — dopiero gdy
+  `narzedzia/pomiar_namiestnik.py` potwierdzi przewagę nowego dyskryminatora nad samym ADX
+  (Prawo XVIII: kod+testy+pomiar > opinia). Nie wdrażać przed pomiarem.
 
 ---
 

@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-06-09 | DOKUMENT | Symulator wizualny HTML (offline, animowany)
+
+**Opis:** Nowy `docs/symulator_live.html` — samodzielny (zero zależności) animowany symulator
+do przeglądarki. Pokazuje aktualny stan Imperium v0.9.0: pipeline 8 etapów (Akwedukty→Brama→
+Namiestnik→Reżim→Legion→Doradcy→Pretorianie→Decyzja), rój 48 neuronów głosujący na żywo
+(LONG/SHORT/NEUTRAL, kill-switche Z wyróżnione), miernik przewagi (próg 0.55), 10 bramek
+wstrzymania, ścieżka pieniędzy (10 000 USDT), 12 kategorii, roadmap. 4 scenariusze:
+trend (WEJŚCIE LONG), range (wstrzymanie — słaba przewaga), bańka (Z-03 HARD-HALT),
+krach (Z-04 cascade). **Wszystkie liczby z żywego kodu** (rejestr.py — Prawo I).
+**Pliki:** `docs/symulator_live.html` (nowy), `docs/INDEKS_IMPERIUM.md`, `docs/LOG_ZMIAN.md`
+**Testy:** statyczny HTML, bez zmian logiki; suite 562/562. Audyt: exit 0.
+
+---
+
 ## 2026-06-09 | DOKUMENT | Manual migracji na laptopa + symulator live
 
 **Opis:** Nowy `docs/MANUAL_MIGRACJA_I_SYMULATOR.md` — przewodnik przeniesienia

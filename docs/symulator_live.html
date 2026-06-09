@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏛️ IMPERIAL MESH VORTEX — Symulator Live v0.9.0</title>
+<style>
+  :root{
+    --gold:#e8c87a; --gold2:#c9a24a; --bg:#0a0e16; --bg2:#111726; --panel:#141b2d;
+    --line:#243049; --long:#2ecc71; --short:#e74c3c; --neut:#5d6b85; --txt:#dfe6f2;
+    --muted:#8b99b5; --z:#ff7a45; --glow:0 0 18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:
+       radial-gradient(1200px 700px at 70% -10%,#16203a 0%,var(--bg) 55%);
+       color:var(--txt);min-height:100vh;overflow-x:hidden}
+  .wrap{max-width:1280px;margin:0 auto;padding:24px}
+  header{text-align:center;padding:20px 0 10px;border-bottom:1px solid var(--line);
+         position:relative}
+  h1{font-size:30px;letter-spacing:2px;background:linear-gradient(90deg,var(--gold),#fff,var(--gold2));
+     -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+  .sub{color:var(--muted);margin-top:6px;font-size:14px}
+  .badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  .badge{background:var(--panel);border:1px solid var(--line);border-radius:20px;
+         padding:6px 14px;font-size:13px}
+  .badge b{color:var(--gold)}
+  .grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:22px}
+  .panel{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);
+         border-radius:14px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+  .panel h2{font-size:16px;color:var(--gold);margin-bottom:14px;letter-spacing:1px;
+            display:flex;align-items:center;gap:8px}
+  .controls{display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;margin:8px 0 4px}
+  button{background:linear-gradient(180deg,var(--gold),var(--gold2));color:#1a1206;border:none;
+         font-weight:700;padding:11px 22px;border-radius:10px;cursor:pointer;font-size:14px;
+         transition:transform .12s,box-shadow .12s}
+  button:hover{transform:translateY(-2px);box-shadow:var(--glow) rgba(232,200,122,.4)}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+  .scen-sel{display:flex;gap:6px}
+  .scen-sel .ghost.active{border-color:var(--gold);color:var(--gold)}
+
+  /* PIPELINE */
+  .pipe{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:10px 0}
+  .stage{flex:1;min-width:118px;text-align:center;position:relative}
+  .stage .box{background:#0e1525;border:1px solid var(--line);border-radius:12px;padding:14px 8px;
+              height:100%;transition:.35s;position:relative}
+  .stage.active .box{border-color:var(--gold);box-shadow:var(--glow) rgba(232,200,122,.45);
+                     transform:translateY(-4px)}
+  .stage .ico{font-size:26px}
+  .stage .nm{font-size:12px;margin-top:6px;font-weight:700}
+  .stage .ds{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.3}
+  .stage .arrow{position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:var(--line);
+                font-size:20px;z-index:2}
+  .stage.flow .arrow{color:var(--gold);animation:pulse .6s infinite}
+  @keyframes pulse{50%{opacity:.3}}
+
+  /* SWARM */
+  .swarm-wrap{display:grid;grid-template-columns:1fr 280px;gap:16px}
+  @media(max-width:820px){.swarm-wrap{grid-template-columns:1fr}.swarm-wrap .side{order:-1}}
+  #swarm{display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;min-height:220px}
+  .nrn{width:20px;height:20px;border-radius:5px;background:var(--neut);position:relative;
+       transition:.3s;cursor:default;font-size:8px;display:flex;align-items:center;justify-content:center;
+       color:#0008;font-weight:700}
+  .nrn.long{background:var(--long);box-shadow:var(--glow) rgba(46,204,113,.6)}
+  .nrn.short{background:var(--short);box-shadow:var(--glow) rgba(231,76,60,.6)}
+  .nrn.zz{outline:2px solid var(--z)}
+  .nrn:hover{transform:scale(1.5);z-index:5}
+  .tally{display:flex;gap:14px;justify-content:center;font-size:14px;margin-top:12px}
+  .tally span{padding:4px 12px;border-radius:8px;background:#0e1525;border:1px solid var(--line)}
+
+  .meter{height:26px;background:#0e1525;border:1px solid var(--line);border-radius:13px;overflow:hidden;
+         position:relative;margin-top:8px}
+  .meter .fill{height:100%;width:0;transition:width .8s cubic-bezier(.2,.8,.2,1);
+               background:linear-gradient(90deg,var(--gold2),var(--gold))}
+  .meter .lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+              font-size:12px;font-weight:700;text-shadow:0 1px 2px #000}
+
+  /* GATES */
+  .gates{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+  .gate{background:#0e1525;border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12px;
+        display:flex;align-items:center;gap:8px;transition:.3s}
+  .gate .dot{width:11px;height:11px;border-radius:50%;background:var(--neut);flex-shrink:0}
+  .gate.pass{border-color:var(--long)}.gate.pass .dot{background:var(--long);box-shadow:var(--glow) var(--long)}
+  .gate.fail{border-color:var(--short)}.gate.fail .dot{background:var(--short);box-shadow:var(--glow) var(--short)}
+  .gate small{color:var(--muted);display:block;font-size:10px}
+
+  .verdict{text-align:center;font-size:26px;font-weight:800;padding:18px;border-radius:12px;
+           margin-top:8px;border:1px solid var(--line);background:#0e1525;letter-spacing:1px;transition:.4s}
+  .verdict.long{color:var(--long);border-color:var(--long);box-shadow:var(--glow) rgba(46,204,113,.3)}
+  .verdict.short{color:var(--short);border-color:var(--short);box-shadow:var(--glow) rgba(231,76,60,.3)}
+  .verdict.halt{color:var(--z);border-color:var(--z);box-shadow:var(--glow) rgba(255,122,69,.3)}
+  .vsub{font-size:13px;color:var(--muted);font-weight:400;margin-top:6px}
+
+  /* money */
+  .money{display:flex;flex-direction:column;gap:6px}
+  .mrow{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:13px;padding:8px 12px;
+        background:#0e1525;border:1px solid var(--line);border-radius:8px;opacity:.35;transition:.4s}
+  .mrow.on{opacity:1;border-color:var(--gold2)}
+  .mrow b{color:var(--gold)}
+
+  .cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:8px}
+  .cat{background:#0e1525;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:12px}
+  .cat .c-h{display:flex;justify-content:space-between;font-weight:700}
+  .cat .c-n{color:var(--muted);font-size:10px;margin-top:3px}
+  .ksw{display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--z);margin-right:4px}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin:26px 0 10px;line-height:1.7}
+  .legend{display:flex;gap:16px;justify-content:center;font-size:12px;color:var(--muted);margin-top:10px;flex-wrap:wrap}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block;vertical-align:-2px;margin-right:4px}
+  .roadmap{display:flex;gap:8px;flex-wrap:wrap}
+  .step{background:#0e1525;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:12px}
+  .step.done{border-color:var(--long)} .step.now{border-color:var(--gold);color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🏛️ IMPERIAL MESH VORTEX</h1>
+    <div class="sub">Symulator Live · autonomiczny rój decyzyjny krypto · <b>v0.9.0</b> — Faza: Namiestnik (Regime + Timeframe-Aware)</div>
+    <div class="badges">
+      <div class="badge">Neurony <b>55</b> (48 aktywnych)</div>
+      <div class="badge">Zwiadowcy <b>12</b></div>
+      <div class="badge">Elitarne <b>15</b></div>
+      <div class="badge">Strategie <b>17</b></div>
+      <div class="badge">Doradcy <b>6</b></div>
+      <div class="badge">Testy <b>562/562</b> ✅</div>
+      <div class="badge">Audyt <b>12 warstw</b> ✅</div>
+      <div class="badge">Stan na <b>2026-06-09</b></div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <button onclick="run()">▶ URUCHOM CYKL DECYZYJNY</button>
+    <div class="scen-sel">
+      <button class="ghost active" data-s="trend" onclick="pick('trend',this)">📈 Trend</button>
+      <button class="ghost" data-s="range" onclick="pick('range',this)">↔️ Range</button>
+      <button class="ghost" data-s="bubble" onclick="pick('bubble',this)">🫧 Bańka</button>
+      <button class="ghost" data-s="crash" onclick="pick('crash',this)">💥 Krach</button>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- PIPELINE -->
+    <div class="panel">
+      <h2>🔄 Pipeline decyzyjny — od świecy do zlecenia</h2>
+      <div class="pipe" id="pipe">
+        <div class="stage" data-st="0"><div class="box"><div class="ico">🕯️</div><div class="nm">Akwedukty</div><div class="ds">OHLCV + adaptery (funding/CVD/F&G)</div></div><div class="arrow">▶</div></div>
+        <div class="stage" data-st="1"><div class="box"><div class="ico">⚙️</div><div class="nm">Brama</div><div class="ds">81 wskaźników · hash SHA-256 (Prawo I)</div></div><div class="arrow">▶</div></div>
+        <div class="stage" data-st="2"><div class="box"><div class="ico">👑</div><div class="nm">Namiestnik</div><div class="ds">tryb · próg · lewar_cap · czy_grać</div></div><div class="arrow">▶</div></div>
+        <div class="stage" data-st="3"><div class="box"><div class="ico">🌡️</div><div class="nm">Reżim</div><div class="ds">VOLATILE→TREND→RANGE→master-switch</div></div><div class="arrow">▶</div></div>
+        <div class="stage" data-st="4"><div class="box"><div class="ico">⚔️</div><div class="nm">Legion</div><div class="ds">48 neuronów głosuje · HedgeMWU</div></div><div class="arrow">▶</div></div>
+        <div class="stage" data-st="5"><div class="box"><div class="ico">🏛️</div><div class="nm">Doradcy</div><div class="ds">Hermes·Fulmen·Iustitia·Oracle·Pythia</div></div><div class="arrow">▶</div></div>
+        <div class="stage" data-st="6"><div class="box"><div class="ico">🛡️</div><div class="nm">Pretorianie</div><div class="ds">vol-target · drag · bezpieczniki</div></div><div class="arrow">▶</div></div>
+        <div class="stage" data-st="7"><div class="box"><div class="ico">🎯</div><div class="nm">Decyzja</div><div class="ds">WEJŚCIE / WSTRZYMANIE</div></div></div>
+      </div>
+    </div>
+
+    <!-- SWARM + verdict -->
+    <div class="panel">
+      <h2>⚔️ Rój neuronów — głosowanie na żywo</h2>
+      <div class="swarm-wrap">
+        <div>
+          <div id="swarm"></div>
+          <div class="legend">
+            <span><i style="background:var(--long)"></i>LONG</span>
+            <span><i style="background:var(--short)"></i>SHORT</span>
+            <span><i style="background:var(--neut)"></i>NEUTRAL</span>
+            <span><i style="background:var(--z);outline:2px solid var(--z)"></i>Z — kill-switch</span>
+          </div>
+          <div class="tally">
+            <span style="color:var(--long)">LONG: <b id="tL">0</b></span>
+            <span style="color:var(--short)">SHORT: <b id="tS">0</b></span>
+            <span style="color:var(--neut)">NEUTRAL: <b id="tN">0</b></span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:10px">Przewaga agregatu (próg wejścia 0.55):</div>
+          <div class="meter"><div class="fill" id="conf"></div><div class="lbl" id="confL">0%</div></div>
+        </div>
+        <div class="side">
+          <div class="verdict" id="verdict">— gotowy —<div class="vsub" id="vsub">wybierz scenariusz i uruchom cykl</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GATES -->
+    <div class="panel">
+      <h2>🚦 10 bramek wstrzymania (progi z kodu)</h2>
+      <div class="gates" id="gates"></div>
+    </div>
+
+    <!-- MONEY -->
+    <div class="panel">
+      <h2>💰 Ścieżka pieniędzy (kapitał 10 000 USDT)</h2>
+      <div class="money" id="money">
+        <div class="mrow" data-m="0"><span>1. Ryzyko bazowe <b>2%</b> kapitału</span><b>200 USDT</b></div>
+        <div class="mrow" data-m="1"><span>2. ÷ stop% (ATR 1.5%) → brutto</span><b>13 333 USDT</b></div>
+        <div class="mrow" data-m="2"><span>3. × vol-targeting (W-059)</span><b id="mvt">6 667 USDT</b></div>
+        <div class="mrow" data-m="3"><span>4. × frakcja DD + bezpiecznik krzywej</span><b id="mdd">5 000 USDT</b></div>
+        <div class="mrow" data-m="4"><span>5. lewar_cap + drag check → <b>PLAN</b></span><b id="mfin">5 000 USDT</b></div>
+      </div>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="panel">
+      <h2>🧠 48 aktywnych neuronów — 12 kategorii</h2>
+      <div class="cats" id="cats"></div>
+    </div>
+
+    <!-- ROADMAP -->
+    <div class="panel">
+      <h2>🗺️ Etap rozwoju — gdzie jesteśmy</h2>
+      <div class="roadmap">
+        <div class="step done">✅ Faza 0 — Fundament (Brama, neurony)</div>
+        <div class="step done">✅ BIB-020 Harris (Z-03/Z-04/X-27)</div>
+        <div class="step done">✅ Master-switch reżimu Faza 1</div>
+        <div class="step done">✅ Audyt W12 — żywotność głosu (Prawo XV)</div>
+        <div class="step now">▶ Faza Namiestnik (TERAZ) — v0.9.0</div>
+        <div class="step">⏳ On-chain (kat. O) — Glassnode API</div>
+        <div class="step">⏳ BIB-015 Reguła 6% · BIB-007 de Prado</div>
+        <div class="step">⏳ Master-switch Faza 2 · skew-Kelly</div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    🏛️ IMPERIAL MESH VORTEX · gałąź <b>claude/sleepy-fermi-dsdE4</b> · 21 Praw Fundamentalnych<br>
+    Dane symulatora pochodzą z żywego kodu (Prawo I — zero halucynacji). Wygenerowano 2026-06-09.
+  </footer>
+</div>
+
+<script>
+// ── DANE Z ŻYWEGO KODU (rejestr.py, 2026-06-09) ──
+const CATS = {
+  M:{n:12,nm:"Momentum",keys:"X-01 X-02 X-03 X-04 X-06 X-08 X-09 X-12 X-17 X-25 X-26 X-27"},
+  T:{n:10,nm:"Trend",keys:"X-05 X-10 X-18 XII-01..07"},
+  F:{n:6,nm:"Wolumen/Flow",keys:"V-01 V-02 V-03 V-04 X-11 VSA-01"},
+  A:{n:4,nm:"Anomalie",keys:"A-01 A-02 A-03 A-05"},
+  R:{n:4,nm:"Psychologia",keys:"PSY-01..04 (adaptery)"},
+  Z:{n:4,nm:"Kill-switch",keys:"Z-01 VPIN · Z-02 pump · Z-03 bubble · Z-04 cascade",z:1},
+  L:{n:2,nm:"Lewandowski",keys:"VI-13 L-14"},
+  V:{n:2,nm:"Volatility",keys:"V-13 YangZhang · V-14"},
+  D:{n:1,nm:"Geometria",keys:"D-01 Lévy Area 🎖️"},
+  H:{n:1,nm:"Hurst",keys:"H-01 DFA"},
+  N:{n:1,nm:"Entropia",keys:"N-01 Permutation"},
+  O:{n:1,nm:"On-chain",keys:"OC-05 WashTrading"}
+};
+const GATES = [
+  ["Namiestnik","czy_grać = true"],["Min. neuronów","≥ 5 aktywnych"],
+  ["Kierunek roju","LONG/SHORT ≠ NEUTRAL"],["Przewaga","pewność ≥ 55%"],
+  ["Próg Namiestnika","pewność ≥ próg"],["Meta-bramy Z","brak kill-switch"],
+  ["IUSTITIA","ryzyko OK"],["Pretorianie","brak weta lewara"],
+  ["Bezpiecznik krzywej","stan ≠ HALT"],["Bezpiecznik AOA","drawdown < 30%"]
+];
+// scenariusze: rozkład głosów + który gate failuje
+const SCEN = {
+  trend:{L:31,S:6,N:11,conf:71,kill:0,verdict:"long",fail:-1,
+         vsub:"TREND_STRONG · 31 LONG vs 6 SHORT · wszystkie bramki OK → WEJŚCIE LONG 0.5×"},
+  range:{L:19,S:17,N:12,conf:52,kill:0,verdict:"halt",fail:3,
+         vsub:"RANGING · 19 vs 17 · przewaga 52% < 55% → WSTRZYMANIE (brak konsensusu)"},
+  bubble:{L:28,S:8,N:12,conf:68,kill:1,verdict:"halt",fail:5,
+         vsub:"VOLATILE · Z-03 bubble_z=3.8 (>3.5 HARD-HALT) tłumi rój → WSTRZYMANIE"},
+  crash:{L:5,S:31,N:12,conf:74,kill:1,verdict:"halt",fail:5,
+         vsub:"PANIC · Z-04 CASCADE_FLAG=1 → zamknij longi, halt 3 bary → WSTRZYMANIE"}
+};
+let scen='trend';
+
+// build swarm 48 dots
+const swarm=document.getElementById('swarm');
+const NRN=[];
+let id=0;
+for(const k in CATS){for(let i=0;i<CATS[k].n;i++){
+  const d=document.createElement('div');d.className='nrn'+(CATS[k].z?' zz':'');
+  d.textContent=k;d.title=CATS[k].nm;swarm.appendChild(d);NRN.push({el:d,kat:k});id++;
+}}
+// gates
+const gEl=document.getElementById('gates');
+GATES.forEach((g,i)=>{gEl.insertAdjacentHTML('beforeend',
+  `<div class="gate" data-g="${i}"><span class="dot"></span><div>${i+1}. ${g[0]}<small>${g[1]}</small></div></div>`)});
+// cats
+const cEl=document.getElementById('cats');
+for(const k in CATS){const c=CATS[k];cEl.insertAdjacentHTML('beforeend',
+  `<div class="cat"><div class="c-h"><span>${c.z?'<span class=ksw></span>':''}[${k}] ${c.nm}</span><b>${c.n}</b></div><div class="c-n">${c.keys}</div></div>`)}
+
+function pick(s,btn){scen=s;document.querySelectorAll('.scen-sel .ghost').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function run(){
+  const S=SCEN[scen];
+  // reset
+  document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active','flow'));
+  document.querySelectorAll('.gate').forEach(g=>g.classList.remove('pass','fail'));
+  document.querySelectorAll('.mrow').forEach(m=>m.classList.remove('on'));
+  NRN.forEach(n=>{n.el.className='nrn'+(CATS[n.kat].z?' zz':'')});
+  const V=document.getElementById('verdict');V.className='verdict';V.innerHTML='— liczę… —<div class="vsub">…</div>';
+  document.getElementById('conf').style.width='0%';document.getElementById('confL').textContent='0%';
+  document.getElementById('tL').textContent='0';document.getElementById('tS').textContent='0';document.getElementById('tN').textContent='0';
+
+  const stages=document.querySelectorAll('.stage');
+  for(let i=0;i<stages.length;i++){
+    stages[i].classList.add('active','flow');
+    await sleep(360);
+
+    if(i===4){ // Legion — animuj głosowanie
+      const order=[...NRN].sort(()=>Math.random()-.5);
+      let L=S.L,Sh=S.S; let cl=0,cs=0;
+      for(const n of order){
+        let cls='nrn'+(CATS[n.kat].z?' zz':'');
+        if(cl<L){cls+=' long';cl++}else if(cs<Sh){cls+=' short';cs++}
+        n.el.className=cls;
+        document.getElementById('tL').textContent=cl;
+        document.getElementById('tS').textContent=cs;
+        document.getElementById('tN').textContent=48-cl-cs;
+        await sleep(18);
+      }
+      // confidence meter
+      document.getElementById('conf').style.width=S.conf+'%';
+      document.getElementById('confL').textContent=S.conf+'% '+(S.conf>=55?'≥ 55 ✅':'< 55 ✗');
+      if(S.kill){NRN.filter(n=>n.kat==='Z').forEach(n=>n.el.style.outlineColor='#fff');}
+      await sleep(700);
+    }
+    if(i===6){ // pieniądze
+      const mv = scen==='trend'? ['6 667 USDT','5 000 USDT','5 000 USDT'] : ['—','—','0 USDT (wstrzymane)'];
+      for(let m=0;m<5;m++){document.querySelector(`.mrow[data-m="${m}"]`).classList.add('on');await sleep(160);}
+    }
+    stages[i].classList.remove('flow');
+  }
+
+  // gates resolve
+  for(let i=0;i<GATES.length;i++){
+    const g=document.querySelector(`.gate[data-g="${i}"]`);
+    const failed = (S.fail===i);
+    g.classList.add(failed?'fail':'pass');
+    await sleep(110);
+    if(failed) break; // wstrzymanie zatrzymuje łańcuch
+  }
+
+  // verdict
+  if(S.verdict==='long'){V.className='verdict long';V.innerHTML=`✅ WEJŚCIE LONG<div class="vsub">${S.vsub}</div>`}
+  else if(S.verdict==='short'){V.className='verdict short';V.innerHTML=`✅ WEJŚCIE SHORT<div class="vsub">${S.vsub}</div>`}
+  else{V.className='verdict halt';V.innerHTML=`⛔ WSTRZYMANIE<div class="vsub">${S.vsub}</div>`}
+}
+</script>
+</body>
+</html>

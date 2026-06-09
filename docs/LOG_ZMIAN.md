@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-06-09 | FIX | Force Index (V-05) — granice fi==0 + tag źródła pure-Python (PR review cubic)
+
+**Opis:** Dwie poprawki po recenzji PR (cubic-dev-ai):
+1. **P1 — błąd graniczny neuronu:** przy `FORCE_INDEX_2 == 0` w trendzie wzrostowym
+   kod spadał do gałęzi `return SHORT` (sygnał PRZECIWNY do trendu); `FORCE_INDEX_13 == 0`
+   było traktowane jako bessa. Teraz: FI(13)=0 → NEUTRAL (brak przewagi), FI(2)=0 →
+   słaby głos zgodny z trendem (pewność 0.40), zero implicytnego SHORT na zerze.
+2. **P2 — metadane źródła:** `FORCE_INDEX_13/2` (liczone `_py_force_index`, własna
+   formuła) były w sekcji TA-Lib → `compute()` stemplował je jako TA-Lib. Dodano do
+   `_PURE_PYTHON_INDICATORS` → poprawny tag `pure-Python` (Prawo XIII — audyt nie kłamie o źródle).
+
+**Pliki:** `imperium/legiony/neurony/wolumen.py`, `imperium/fundament/brama_kalkulatora.py`,
+`tests/test_neurony.py`, `README.md`.
+**Testy:** +2 graniczne (584→586/586). Audyt: pełna harmonia (exit 0).
+
+---
+
 ## 2026-06-09 | FIX | Reguła 6% Elder — data ze świecy + HALT do końca miesiąca + usunięcie duplikatu (PR review cubic)
 
 **Opis:** Trzy poprawki po recenzji PR (cubic-dev-ai):

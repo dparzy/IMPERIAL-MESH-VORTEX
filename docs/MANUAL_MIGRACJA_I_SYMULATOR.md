@@ -208,7 +208,151 @@ setx MEXC_SECRET "twoj_sekret"
 
 ---
 
-## 4. 📍 GDZIE JESTEŚMY / DOKĄD IDZIEMY
+## 4. 💰 ŚCIEŻKA PIENIĘDZY — jak kapitał płynie przez Imperium
+
+Liczby z realnego kodu (`pretorianie/kalkulator_lewara.py`).
+
+### 4.1. Matematyka rozmiaru pozycji (krok po kroku)
+
+Założenie: kapitał 10 000 USDT, BTCUSDT LONG, vol_realized=80% rocznie.
+
+```
+Krok 1 — Baza ryzyka (stały parametr: 2% kapitału na transakcję)
+   ryzyko_usdt = 10 000 × 0.02 = 200 USDT
+
+Krok 2 — Stop-loss (domyślnie ATR × multiplikator → np. stop = 1.5%)
+   rozmiar_bazowy = ryzyko_usdt / stop_pct = 200 / 0.015 = 13 333 USDT
+
+Krok 3 — Volatility Targeting (W-059: skala = vol_target / vol_realized)
+   vol_target = 40% (domyślny cel)
+   skala_vol  = 0.40 / 0.80 = 0.50   (clamped do [0.25, 4.0])
+   rozmiar    = 13 333 × 0.50 = 6 667 USDT
+
+Krok 4 — Lewar cap (Namiestnik: lewar_cap np. 5×)
+   max_pozycja = 10 000 × 5 = 50 000 USDT  →  6 667 < 50 000 ✅
+
+Krok 5 — Bezpiecznik krzywej (W-062)
+   NORMAL → frakcja = 1.0  → 6 667 × 1.0 = 6 667 USDT
+   REDUCED → frakcja = 0.5 → 6 667 × 0.5 = 3 334 USDT
+   HALT    → frakcja = 0.0 → 0 USDT (blokada)
+
+Krok 6 — Frakcja DD (W-063, ciągła, nie skokowa)
+   DD = 10% → frakcja_dd ≈ 0.75 → 6 667 × 0.75 = 5 000 USDT
+
+Krok 7 — Volatility Drag (W-130, Sinclair)
+   drag = ½ × lewar × (lewar−1) × vol² = ½×4×3×0.64 = 3.84% / rok
+   gdy drag > 20%/rok → WETO kalkulator (veto_lewar)
+
+   WYNIK KOŃCOWY: 5 000 USDT pozycji (ok. 0.05 BTC przy cenie 100 000)
+```
+
+### 4.2. Diagram ścieżki pieniędzy
+
+```
+  KAPITAŁ: 10 000 USDT (equity curve śledzona przez Pretorianów)
+       │
+       ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 1. ryzyko = 2% kapitału = 200 USDT (na transakcję)    │
+  └────────────────────┬───────────────────────────────────┘
+                       │
+                       ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 2. rozmiar = ryzyko / stop% (ATR-based)               │
+  │    → BRUTTO: 13 333 USDT (lewar nominalny ~1.33×)     │
+  └────────────────────┬───────────────────────────────────┘
+                       │
+              ×0.50 (vol zbyt wysoka?)
+                       ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 3. Vol-targeting skaluje w dół / w górę               │
+  │    niska vol → rozmiar rośnie (max ×4); wysoka → maleje│
+  │    → 6 667 USDT                                       │
+  └────────────────────┬───────────────────────────────────┘
+                       │
+              ×0.75 (DD = 10%)
+                       ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 4. Frakcja DD (ciągła) + Bezpiecznik krzywej          │
+  │    DD 0–10% → normalna gra; 10–20% → przycina;        │
+  │    ≥20% HALT — zero nowych wejść                      │
+  │    → 5 000 USDT                                       │
+  └────────────────────┬───────────────────────────────────┘
+                       │
+              lewar_cap check?
+                       ▼
+  ┌────────────────────────────────────────────────────────┐
+  │ 5. Lewar cap (Namiestnik: np. 5×) = max 50 000 USDT  │
+  │    5 000 < 50 000 → OK (bez przycinania)              │
+  │    drag > 20%/rok → WETO (nie wchodzisz)             │
+  │    → PLAN POZYCJI: 5 000 USDT, lewar 0.5×, stop 1.5% │
+  └────────────────────┬───────────────────────────────────┘
+                       │
+                       ▼
+           ZLECENIE → giełda MEXC (drogi/)
+```
+
+---
+
+## 5. ⏱️ TIMELINE JEDNEJ TRANSAKCJI (od sygnału do zamknięcia)
+
+Każda transakcja żyje przez te fazy. Czasy orientacyjne dla interwału 1H:
+
+```
+T=0  SYGNAŁ
+     Świeca 1H zamknięta → akwedukty dostarczają OHLCV + dane adapterów
+     → Brama liczy 81 wskaźników (SHA-256 hash na każdy — audit trail)
+     → Namiestnik: tryb SWING, reżim TREND_STRONG
+     → 48 neuronów głosuje: 29L/7S/12N, pewnosc=0.68 ≥ 0.55 ✅
+     → Z-03/Z-04/Z-01: brak kill-switch ✅
+     → RADA: czysto (Hermes OK, Fulmen OK, Iustitia OK, Oracle OK, Pythia p=0.63)
+     → Kalkulator: 5 000 USDT pozycji, stop 1.5%, lewar 0.5×
+
+T=0  WEJŚCIE LONG (ccxt → MEXC)
+     Pamięć Absolutna zapisuje: symbol, cena_wejscia, rozmiar, pewnosc,
+     reżim, wskaźniki (snapshot), odcisk_palca (fingerprint)
+
+T+1H..T+nH  MONITORING (każda świeca)
+     Rój głosuje na nowo — sygnał może odwrócić kierunek
+     IUSTITIA sprawdza ryzyko portfela w każdym cyklu
+     MAE (Maximum Adverse Excursion) — najgorszy punkt świecy rejestrowany
+     MFE (Maximum Favorable Excursion) — najlepszy punkt świecy rejestrowany
+     Bezpiecznik krzywej śledzi equity — gdy DD rośnie, frakcja maleje
+
+─── SCENARIUSZ A: zysk ─────────────────────────────────────────────
+T+6H  WYJŚCIE (take-profit lub odwrócenie sygnału)
+      Rój: SHORT 0.71 → Legatus → WYJŚCIE + nowy kierunek?
+      Pamięć Absolutna zapisuje: MAE, MFE, P&L, czas trwania
+      HedgeMWU aktualizuje wagi: neurony które głosowały poprawnie → +waga
+      PYTHIA dodaje fingerprint do historii → p(zysk) dla podobnych setupów rośnie
+
+─── SCENARIUSZ B: stop ─────────────────────────────────────────────
+T+2H  Cena spada 1.5% → STOP-LOSS uderza
+      Strata: 5 000 × 0.015 = 75 USDT = 0.75% kapitału (✅ mieści się w 2% ryzyko)
+      Pamięć Absolutna: P&L = −75, MAE = −1.5%
+      HedgeMWU: neurony SHORT miały rację → +waga; LONG → −waga (mała korekta)
+      Equity: 10 000 → 9 925 USDT (DD = 0.75% → bezpieczniki spokojne)
+
+─── SCENARIUSZ C: breaker krzywej ─────────────────────────────────
+T+8H  Po serii strat DD osiąga 18% → REDUCED (rozmiar ×0.5)
+T+10H DD = 21% → HALT (zero nowych wejść)
+      System żyje, audytuje, głosuje — ale NIE otwiera pozycji
+      Wyjście z HALT: gdy DD spada poniżej 10% (histereza — nie migocze na granicy)
+```
+
+### Gdzie jest każda informacja po transakcji
+
+| Dane | Gdzie zapisane | Do czego służy |
+|---|---|---|
+| MAE/MFE, P&L | `Pamięć Absolutna` | Walk-forward, replay sesji, PYTHIA |
+| Wagi neuronów | `HedgeMWU` (w pamięci) | Które neurony kłamały → cichną |
+| Fingerprint setupu | `PYTHIA.historia` | p(zysk) dla podobnych sytuacji w przyszłości |
+| Hash wskaźników | `Brama (SHA-256)` | Audit trail — nie ma halucynacji w danych |
+| Equity curve | `BezpiecznikKrzywej` | DD monitor — HALT gdy za źle |
+
+---
+
+## 6. 📍 GDZIE JESTEŚMY / DOKĄD IDZIEMY
 
 - **55 neuronów** (48 aktywnych) · **17 strategii** · **6 doradców** · **562 testy** ✅
 - Audyt 12-warstwowy pilnuje spójności automatycznie (W12 = żywotność głosu, Prawo XV).

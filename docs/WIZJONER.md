@@ -2067,7 +2067,7 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 | **W-275** | Winner's curse scaler: `uncertainty_mult=(ATR_14/SMA_50)*100`; jeśli >5% → progi wejścia value × 1.5 (wymaga −3σ zamiast −2σ) | pretorianie/legatus | 16 | 🔴 |
 | **W-276** | Basis / funding neuron: `perp_basis_bps=(perp−spot)/spot×10000` + `funding_z=(funding−μ_30d)/σ_30d`; LONG gdy basis <−30 lub funding_z <−1.5 (squeeze), SHORT gdy basis >+50 lub funding_z >+2.0 ⭐⭐⭐ | neurony (N/Z) | 17 | 🔴 |
 | **W-277** | BTC lead-lag neuron: `btc_lag=(btc_ret_1h − alt_ret_1h)`; jeśli >1.5×ATR_alt → LONG alt (catch-up); decay 4h | neurony (T) | 17 | 🔴 |
-| **W-278** | Bubble/crash kill-switch: `bubble_z=log(price/EMA_200)/std`; VoV=`std(ATR_14,20)/mean(ATR_14,20)`; AR1=`corr(ret,ret_lag1,20)`; HARD-HALT gdy bubble_z>3.5 LUB VoV>1.2 LUB AR1>0.40 ⭐⭐⭐ | pretorianie (kill-switch) | 28 | 🔴 |
+| **W-278** | Bubble/crash kill-switch: `bubble_z=log(price/EMA_200)/std`; VoV=`std(ATR_14,20)/mean(ATR_14,20)`; AR1=`corr(ret,ret_lag1,20)`; HARD-HALT gdy bubble_z>3.5 LUB VoV>1.2 LUB AR1>0.40 ⭐⭐⭐ | pretorianie (kill-switch) | 28 | ✅ **WDROŻONE** jako Z-03 NeuronBubbleCrash (defensywna meta-brama, 2026-06-09) |
 | **W-279** | Crash cascade detector: 3+ kolejne down-bary z rosnącym `\|ret\|` i wolumenem ⇒ zamknij wszystkie longi, halt do 3 barów bez cascade_flag. Post-crash dead-cat bounce: `z_score<−3.0` + malejący wolumen + brak nowych dołków ⇒ taktyczny LONG max 6 barów ⭐ | pretorianie (kill-switch) + neurony taktyczne | 28 | 🔴 |
 
 🚨 **Prawo XVI (dekorelacja) — alert biblioteczny BIB-020 (wszystkie wizje W-250..W-279):** przed wdrożeniem zmierzyć korelację:

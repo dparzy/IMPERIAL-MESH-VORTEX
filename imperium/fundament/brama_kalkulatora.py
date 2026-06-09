@@ -55,6 +55,7 @@ SOURCE_TAG_PY = "pure-Python (deterministic)"
 _PURE_PYTHON_INDICATORS = {
     "AO", "AO_PREV", "AC", "AC_PREV", "HMA", "HMA_PREV",
     "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "PERMUTATION_ENTROPY", "VPIN", "WASH_TRADING", "CHOPPINESS", "ULCER",
+    "BUBBLE_Z", "VOV", "RET_AR1",
     "VWAP", "VWAP_STD",
     "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
 }
@@ -590,6 +591,105 @@ def _py_ulcer(close, period: int = 14) -> Optional[float]:
     return round(math.sqrt(sum(kwadraty) / len(kwadraty)), 4)
 
 
+def _py_bubble_z(close, period: int = 200) -> Optional[float]:
+    """
+    Bubble-Z — odchylenie ceny od długoterminowego trendu w jednostkach σ (BIB-020, Harris rozdz. 28).
+
+    Dla nowicjusza: bańka to cena oderwana od swojej długoterminowej "grawitacji".
+    Mierzymy logarytmiczne odchylenie ceny od EMA-200 i normalizujemy je przez jego
+    własną zmienność historyczną. Wynik to z-score:
+      bubble_z > +3.5 → 🚨 skrajne przegrzanie (możliwa bańka, ryzyko pęknięcia)
+      bubble_z < −3.5 → skrajne wyprzedanie (overshoot krachu, strefa odbicia)
+      |bubble_z| < 2  → cena "informacyjna" (granice Fischera Blacka: 0.5×–2× wartości).
+
+    Wzór: log_dev[i] = ln(close[i]) − ln(EMA200[i]); bubble_z = log_dev[-1] / std(log_dev).
+    Annualizacja zbędna — to czysty z-score (bezwymiarowy).
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 28; granice Fischera Blacka (1986).
+    """
+    import math
+    c = _arr(close)
+    if len(c) < period + 2:
+        return None
+    ema = talib.EMA(c, timeperiod=period)
+    log_dev = []
+    for i in range(len(c)):
+        e = ema[i]
+        if e is None or np.isnan(e) or e <= 0 or c[i] <= 0:
+            continue
+        log_dev.append(math.log(c[i]) - math.log(e))
+    # z-score wymaga sensownej próbki odchyleń (EMA-200 ma warmup 199 barów,
+    # więc dla wiarygodnego σ potrzeba ~period+15 barów). Mniej → None (Prawo I).
+    if len(log_dev) < 15:
+        return None
+    n = len(log_dev)
+    mean = sum(log_dev) / n
+    var = sum((x - mean) ** 2 for x in log_dev) / (n - 1)
+    std = math.sqrt(var)
+    if std < 1e-12:
+        return 0.0
+    return round(log_dev[-1] / std, 4)
+
+
+def _py_vov(high, low, close, period: int = 14, window: int = 20) -> Optional[float]:
+    """
+    VoV — Volatility-of-Volatility (BIB-020, Harris rozdz. 28): prekursor krachu.
+
+    Dla nowicjusza: przed krachem sama zmienność staje się NIESTABILNA — ATR nie tylko
+    rośnie, ale skacze z baru na bar (rozpad konsensusu cenowego). Stabilna wysoka vol
+    to co innego niż chaotyczna vol. Mierzymy współczynnik zmienności ATR:
+      VoV = std(ATR, window) / mean(ATR, window)
+      VoV > 1.2 → 🚨 skrajna niestabilność (kill-switch), VoV < 0.5 → spokój.
+
+    Zwraca współczynnik zmienności ATR-14 z ostatnich `window` barów (bezwymiarowy).
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 28 (portfolio insurance / "who would buy?").
+    """
+    import math
+    atr = talib.ATR(_arr(high), _arr(low), _arr(close), timeperiod=period)
+    vals = [x for x in atr[-window:] if x is not None and not np.isnan(x)]
+    if len(vals) < max(5, window // 2):
+        return None
+    n = len(vals)
+    mean = sum(vals) / n
+    if mean < 1e-12:
+        return None
+    var = sum((x - mean) ** 2 for x in vals) / (n - 1)
+    return round(math.sqrt(var) / mean, 4)
+
+
+def _py_ret_ar1(close, window: int = 20) -> Optional[float]:
+    """
+    AR1 — autokorelacja zwrotów lag-1 (BIB-020, Harris rozdz. 28): wskaźnik refleksywności.
+
+    Dla nowicjusza: w rynku efektywnym kolejne zwroty są nieskorelowane (AR1≈0).
+    Gdy AR1 robi się DODATNI, ceny napędzają same siebie (kaskada momentum / margin calls):
+      AR1 > +0.40 → 🚨 kaskada (dynamika krachu lub paraboli) — kill-switch
+      AR1 > +0.25 → refleksywność (reżim momentum, tłum dogania)
+      AR1 < −0.20 → silna rewersja (stabilny, efektywny rynek).
+
+    Wzór: r[i] = close[i]/close[i-1] − 1; AR1 = corr(r[t], r[t-1]) z ostatnich `window` par.
+    Źródło: Harris, "Trading and Exchanges" (2003), rozdz. 28; Soros (refleksywność).
+    """
+    import math
+    c = list(close)
+    if len(c) < window + 2:
+        return None
+    rets = [c[i] / c[i - 1] - 1.0 for i in range(1, len(c)) if c[i - 1] > 0]
+    rets = rets[-(window + 1):]
+    if len(rets) < window:
+        return None
+    x = rets[1:]      # r[t]
+    y = rets[:-1]     # r[t-1]
+    n = len(x)
+    mx = sum(x) / n
+    my = sum(y) / n
+    cov = sum((x[i] - mx) * (y[i] - my) for i in range(n))
+    vx = sum((v - mx) ** 2 for v in x)
+    vy = sum((v - my) ** 2 for v in y)
+    if vx < 1e-18 or vy < 1e-18:
+        return 0.0
+    return round(cov / math.sqrt(vx * vy), 4)
+
+
 def _py_supertrend(high, low, close, period: int = 10, multiplier: float = 3.0):
     """
     Supertrend — pure Python, bez TA-Lib.
@@ -774,6 +874,11 @@ class CalculatorGateway:
 
             # ── Pure-Python: Ulcer Index — ryzyko spadkowe (kat. L) ───────────
             "ULCER":     lambda close, period=14: _py_ulcer(close, period),
+
+            # ── Pure-Python: W-278 bubble/crash kill-switch (kat. Z, BIB-020 Harris rozdz. 28) ──
+            "BUBBLE_Z":   lambda close, period=200: _py_bubble_z(close, period),
+            "VOV":        lambda high, low, close, period=14, window=20: _py_vov(high, low, close, period, window),
+            "RET_AR1":    lambda close, window=20: _py_ret_ar1(close, window),
 
             # ── TA-Lib: wolumen ────────────────────────────────────────────────
             "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),

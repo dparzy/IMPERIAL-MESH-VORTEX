@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-08 · **Testy:** 506/506 zielone · **Faza:** Namiestnik Regime + Timeframe-Aware (styl SCALP/SWING/INVEST, futures/spot, lewar_cap).
+> **Stan na:** 2026-06-09 · **Testy:** 528/528 zielone · **Faza:** Namiestnik Regime + Timeframe-Aware (styl SCALP/SWING/INVEST, futures/spot, lewar_cap).
 
 ---
 
@@ -26,7 +26,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **52 zaimplementowane** (45 aktywnych: 34 OHLCV + 4 kat. R + V-03 CVD + V-14 Choppiness + L-14 Ulcer + H-01 Hurst-DFA + N-01 Permutation Entropy + Z-01 VPIN ToxicFlow + OC-05 WashTrading, Z-02 PumpDetect przez adaptery publiczne; 3 budzone wewnętrznie SMC + 4 czeka na on-chain API) |
+| **Mikro-neurony** | **53 zaimplementowane** (46 aktywnych: 35 OHLCV + 4 kat. R + V-03 CVD + V-14 Choppiness + L-14 Ulcer + H-01 Hurst-DFA + N-01 Permutation Entropy + Z-01 VPIN ToxicFlow + Z-03 Bubble/Crash kill-switch + OC-05 WashTrading, Z-02 PumpDetect przez adaptery publiczne; 3 budzone wewnętrznie SMC + 4 czeka na on-chain API) |
 | **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
@@ -34,9 +34,9 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
 | **Status elitarny** | **15 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 + 12 zwiadowców |
-| **Testy** | `python tests/run_tests.py` → **506/506** ✅ |
+| **Testy** | `python tests/run_tests.py` → **528/528** ✅ |
 
-**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 52) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
+**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 53) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
 ---
 
@@ -82,7 +82,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ## 🧪 Uruchomienie testów
 
 ```bash
-python tests/run_tests.py     # 506/506, bez zależności zewnętrznych
+python tests/run_tests.py     # 528/528, bez zależności zewnętrznych
 ```
 
 ---

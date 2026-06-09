@@ -961,6 +961,133 @@ def test_z01_nigdy_kierunkowy():
         assert n.interpretuj({"VPIN_50": v}).kierunek == "NEUTRAL"
 
 
+# ─── W-278: Bubble/Crash Kill-Switch (Z-03, kategoria Z, BIB-020 Harris rozdz. 28) ──
+
+def test_brama_bubble_z_przegrzanie():
+    """BUBBLE_Z: terminalny blow-off → wyraźnie wyższy z-score niż ta sama seria bez niego."""
+    from imperium.fundament.brama_kalkulatora import _py_bubble_z
+    import random
+    random.seed(5)
+    base = [100.0]
+    for _ in range(239):
+        base.append(base[-1] * (1 + random.gauss(0, 0.01)))  # random walk (realny szum)
+    z_base = _py_bubble_z(base, period=200)
+    # Ten sam szereg, ale ostatnie 10 barów to gwałtowny run-up (parabola)
+    blow = base[:-10] + [base[-11] * (1 + 0.04 * k) for k in range(1, 11)]
+    z_blow = _py_bubble_z(blow, period=200)
+    assert z_base is not None and z_blow is not None
+    assert z_blow > z_base + 1.0   # blow-off wyraźnie podnosi bubble_z
+    assert z_blow > 1.0            # i jest dodatni (przegrzanie w górę)
+
+
+def test_brama_bubble_z_za_malo_danych():
+    """BUBBLE_Z → None gdy mniej niż period+2 barów."""
+    from imperium.fundament.brama_kalkulatora import _py_bubble_z
+    assert _py_bubble_z([100.0] * 50, period=200) is None
+
+
+def test_brama_vov_niestabilnosc():
+    """VoV: chaotyczna zmienność (ATR skacze) → wyższy VoV niż stabilna."""
+    from imperium.fundament.brama_kalkulatora import _py_vov
+    import random
+    random.seed(11)
+    # Stabilny zakres
+    h_stab = [100 + (i % 2) for i in range(60)]
+    l_stab = [v - 1.0 for v in h_stab]
+    c_stab = [(a + b) / 2 for a, b in zip(h_stab, l_stab)]
+    # Chaotyczny zakres (raz wąsko, raz szeroko)
+    h_chaos = [100 + (10.0 if i % 5 == 0 else 0.5) for i in range(60)]
+    l_chaos = [v - (8.0 if i % 5 == 0 else 0.2) for i, v in enumerate(h_chaos)]
+    c_chaos = [(a + b) / 2 for a, b in zip(h_chaos, l_chaos)]
+    vov_stab = _py_vov(h_stab, l_stab, c_stab)
+    vov_chaos = _py_vov(h_chaos, l_chaos, c_chaos)
+    assert vov_stab is not None and vov_chaos is not None
+    assert vov_chaos > vov_stab
+
+
+def test_brama_ret_ar1_zakres():
+    """AR1 ∈ [-1, 1]; naprzemienne zwroty → ujemna autokorelacja."""
+    from imperium.fundament.brama_kalkulatora import _py_ret_ar1
+    c = [100.0]
+    for i in range(40):
+        c.append(c[-1] * (1.02 if i % 2 == 0 else 0.985))  # naprzemiennie
+    ar1 = _py_ret_ar1(c, window=20)
+    assert ar1 is not None and -1.0 <= ar1 <= 1.0
+    assert ar1 < 0  # piła = ujemna autokorelacja (rewersja)
+
+
+def test_brama_ret_ar1_za_malo_danych():
+    """AR1 → None gdy za mało barów."""
+    from imperium.fundament.brama_kalkulatora import _py_ret_ar1
+    assert _py_ret_ar1([100, 101, 102], window=20) is None
+
+
+def test_brama_audyt_zrodlo_w278_pure_python():
+    """Prawo XIII: BUBBLE_Z/VOV/RET_AR1 w zbiorze pure-Python."""
+    from imperium.fundament.brama_kalkulatora import _PURE_PYTHON_INDICATORS
+    assert {"BUBBLE_Z", "VOV", "RET_AR1"} <= _PURE_PYTHON_INDICATORS
+
+
+def test_z03_killswitch_bubble():
+    """Z-03 (W-278): bubble_z>3.5 → NEUTRAL z wysokim pewnosc_przeciwnika (kill-switch)."""
+    from imperium.legiony.neurony.zagrozenie import NeuronBubbleCrash
+    s = NeuronBubbleCrash().interpretuj({"BUBBLE_Z_200": 4.2, "VOV_20": 0.3, "RET_AR1_20": 0.0})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc_przeciwnika >= 0.85
+    assert any("KILL-SWITCH" in p for p in s.powody)
+
+
+def test_z03_killswitch_crash_ar1():
+    """Z-03: AR1>0.40 (kaskada) → kill-switch nawet przy spokojnym bubble_z."""
+    from imperium.legiony.neurony.zagrozenie import NeuronBubbleCrash
+    s = NeuronBubbleCrash().interpretuj({"BUBBLE_Z_200": 0.5, "VOV_20": 0.4, "RET_AR1_20": 0.55})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc_przeciwnika >= 0.85
+
+
+def test_z03_killswitch_vov():
+    """Z-03: VoV>1.2 (niestabilność) → kill-switch."""
+    from imperium.legiony.neurony.zagrozenie import NeuronBubbleCrash
+    s = NeuronBubbleCrash().interpretuj({"BUBBLE_Z_200": 1.0, "VOV_20": 1.5, "RET_AR1_20": 0.1})
+    assert s.pewnosc_przeciwnika >= 0.85
+
+
+def test_z03_czujnosc_umiarkowana():
+    """Z-03: strefa czujności (bubble_z 2.5-3.5) → umiarkowane tłumienie, nie pełny alarm."""
+    from imperium.legiony.neurony.zagrozenie import NeuronBubbleCrash
+    s = NeuronBubbleCrash().interpretuj({"BUBBLE_Z_200": 3.0, "VOV_20": 0.3, "RET_AR1_20": 0.0})
+    assert s.kierunek == "NEUTRAL"
+    assert 0.0 < s.pewnosc_przeciwnika < 0.85
+
+
+def test_z03_spokoj():
+    """Z-03: wszystko poniżej progów → NEUTRAL bez tłumienia."""
+    from imperium.legiony.neurony.zagrozenie import NeuronBubbleCrash
+    s = NeuronBubbleCrash().interpretuj({"BUBBLE_Z_200": 0.5, "VOV_20": 0.3, "RET_AR1_20": 0.05})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc_przeciwnika == 0.0
+
+
+def test_z03_brak_danych_neutral():
+    """Z-03: brak wszystkich danych → NEUTRAL (abstynencja, Prawo I)."""
+    from imperium.legiony.neurony.zagrozenie import NeuronBubbleCrash
+    assert NeuronBubbleCrash().interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_z03_nigdy_kierunkowy():
+    """Z-03 to META-BRAMA — kierunek ZAWSZE NEUTRAL, nigdy LONG/SHORT."""
+    from imperium.legiony.neurony.zagrozenie import NeuronBubbleCrash
+    n = NeuronBubbleCrash()
+    for bz in [None, -5.0, -3.6, -1.0, 0.0, 1.0, 3.0, 3.6, 5.0]:
+        assert n.interpretuj({"BUBBLE_Z_200": bz}).kierunek == "NEUTRAL"
+
+
+def test_z03_zarejestrowany():
+    """Z-03 żyje w roju (Prawo XV/XIX)."""
+    from imperium.legiony.rejestr import wszystkie_neurony
+    assert any(n.KLUCZ == "Z-03" for n in wszystkie_neurony())
+
+
 def test_brama_audyt_zrodlo_pure_python():
     """Prawo XIII: pure-Python wskaźniki stemplowane jako pure-Python, nie TA-Lib."""
     from imperium.fundament.brama_kalkulatora import (

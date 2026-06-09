@@ -6,6 +6,48 @@
 
 ---
 
+## 2026-06-09 | DOKUMENT | Manual migracji na laptopa + symulator live
+
+**Opis:** Nowy `docs/MANUAL_MIGRACJA_I_SYMULATOR.md` — przewodnik przeniesienia
+Imperium na laptopa (Windows 10 Pro, Fujitsu 8 GB): instalacja Python 3.11, kopiowanie
+repo, testy bez zależności, pełna moc (TA-Lib/numpy/ccxt), klucze przez `setx` (Prawo
+Bezpieczeństwa), DeepSeek API, mapa RAM. Zawiera SYMULATOR LIVE: pełny diagram pipeline
+(Akwedukty→Brama→Namiestnik→reżim→Legion→Doradcy→Pretorianie→Drogi), 10 bramek wstrzymania
+long/short z progami z kodu, 4 przykłady symulacji (WEJŚCIE LONG / kill-switch / słaba
+przewaga / dead-cat SHORT).
+**Weryfikacja Prawa I:** sprawdzono „oryginalne narzędzia" — HERMES + 4 doradcy (Fulmen/
+Iustitia/Oracle/Pythia) + Rada ISTNIEJĄ (kod + 24 testy w `test_doradcy.py`).
+„Chimera/Hamachera" NIE ISTNIEJE nigdzie — halucynacja/pomyłka nazwy, nie liczy się (Prawo XIX).
+**Pliki:** `docs/MANUAL_MIGRACJA_I_SYMULATOR.md` (nowy), `docs/INDEKS_IMPERIUM.md`, `docs/LOG_ZMIAN.md`
+**Testy:** dokument, bez zmian logiki; suite 562/562. Audyt: exit 0.
+
+---
+
+## 2026-06-09 | AUDYT | Warstwa W12 — żywotność głosu (automatyzacja Prawa XV)
+
+**Opis:** `narzedzia/audyt_spojnosci.py` rozszerzony z 11 → **12 warstw**. Nowa W12 karmi
+każdy aktywny neuron 5 syntetycznymi scenariuszami (byk/niedźwiedź/kaskada/bańka/spokój)
+zbudowanymi przez Bramę i flaguje neurony, które MILCZĄ (NEUTRAL pewnosc=0 + zero
+pewnosc_przeciwnika) we WSZYSTKICH scenariuszach = martwy głos.
+**Logika dwustanowa (Prawo XVIII — sensowne rozstrzygnięcie):**
+- milczący neuron spoza allowlisty adapterowej → ❌ błąd blokujący commit (regresja Prawa XV)
+- milczący neuron z allowlisty (`NEURONY_ZALEZNE_OD_ADAPTEROW`) → ⚠️ info (znana luka, nie blokuje)
+**Allowlista (5):** PSY-01 FUNDING_RATE, PSY-02 LONG_SHORT_RATIO, PSY-03 FEAR_GREED_INDEX,
+PSY-04 OPEN_INTEREST, V-03 CVD — czekają na dane adapterów w backteście czysto-OHLCV.
+**Powód:** Prawo XV było dotąd pilnowane ręcznie; teraz audyt łapie martwy głos automatycznie
+przy każdym starcie sesji i pre-commicie. Z-04/D-01 zweryfikowane jako żywe (budzą się w kaskadzie/trendzie).
+**Dowód allowlisty (Prawo I):** W12 dodatkowo karmi każdy neuron adapterowy ekstremalną
+wartością jego klucza (`WERYFIKACJA_ADAPTEROW`) i wymaga, by OŻYŁ — PSY-01 SHORT0.85,
+PSY-02 SHORT0.80, PSY-03 LONG (strach), PSY-04 SHORT0.60, V-03 LONG0.60. Milczenie MIMO
+danych adaptera = realny bug (błąd blokujący). Allowlista zweryfikowana kodem, nie „na słowo".
+Potwierdzono też: adaptery (Futures/CVD/FearGreed) SĄ podpięte do live-pipeline Dyrygenta —
+te neurony żyją w trybie live/paper, milczą tylko w audycie offline (z natury bez sieci).
+**Pliki:** `narzedzia/audyt_spojnosci.py`, `tests/test_spojnosc.py` (+4 testy), `README.md`,
+`docs/INDEKS_IMPERIUM.md`, `ZASADY_FUNDAMENTALNE.md`, `docs/LOG_ZMIAN.md`
+**Testy:** suite 558 → **562/562** (W12: zielona, raport adapterów, dowód allowlisty, negatywny martwy-głos). Audyt: exit 0.
+
+---
+
 ## 2026-06-09 | NARZĘDZIE | Pomiar dekorelacji BIB-020 (Prawo XVI) — spłata długu „do zmierzenia"
 
 **Opis:** Nowe narzędzie read-only `narzedzia/pomiar_dekorelacji_bib020.py` mierzy |r| Pearsona

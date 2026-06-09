@@ -75,6 +75,24 @@ class NeuronWaddahAttar(MikroNeuron):
 
 ## 📜 HISTORIA WERSJI
 
+### [v0.9.0] — 2026-06-09 — *"Namiestnik Reżimu"*
+*(Regent of the Regime)*
+
+#### Dodano
+- `🏛️ IMV-ORI` `legiony/neurony/` — Z-03 (Bubble/Crash kill-switch), Z-04 (Cascade/Dead-Cat detector), X-27 (Value Convergence)
+- `🏛️ IMV-ORI` `koloseum/namiestnik.py` — Namiestnik Regime×Timeframe-Aware Gating: master-switch reżimu Faza 1 (TREND/RANGE/VOLATILE/PANIC/BULL/BEAR → styl SCALP/SWING/INVEST, lewar_cap, futures/spot, próg pewności)
+- `🏛️ IMV-ORI` `narzedzia/pomiar_dekorelacji.py` — BIB-020: narzędzie pomiaru dekorelacji sygnałów (|korelacja| > 0.80 → kandydat do scalenia)
+- `⚔️ IMV-INS` `akwedukty/adaptery/futures.py` — AdapterFutures (Binance fapi public): Funding Rate, Open Interest → PSY-01/02/04 (kat. R)
+- `⚔️ IMV-INS` `akwedukty/adaptery/cvd.py` — AdapterCVD (Binance aggTrades public): Cumulative Volume Delta → V-03 (kat. F)
+- `⚔️ IMV-INS` `akwedukty/adaptery/feargreed.py` — AdapterFearGreed (alternative.me): Indeks Strachu i Chciwości → neurony psychologii
+
+#### Zmieniono
+- Testy: 505 → **558** (+53 nowe testy)
+- Neurony: 48 → **55** (+7 nowych neuronów)
+- Namiestnik: Faza 0 (Regime filter) → Faza 1 (master-switch + timeframe-aware + kategorie)
+
+---
+
 ### [v0.8.0] — 2026-06-01 — *"Legio Surgit"*
 *(Legion Powstaje)*
 

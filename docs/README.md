@@ -10,17 +10,17 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 |------|-------|
 | [INDEKS_IMPERIUM.md](INDEKS_IMPERIUM.md) | 🧭 GŁÓWNY SPIS — punkt wejścia: mapa dokumentów, mapa kodu, Prawa Imperium, następne kroki |
 | [WZORZEC_DNSS.md](WZORZEC_DNSS.md) | Wzorzec DNSS — czego uczymy się od roju 79 agentów (Calculator Pattern, TA-Lib, Python/Rust/Zig) |
-| [AUDYT_ADOPCJI.md](AUDYT_ADOPCJI.md) | Audyt adopcji 17 modułów Kingdom Pixel → Imperium (mapowanie, prawa, ostrzeżenia) |
-| [ARCHITEKTURA_IMPERIUM.md](ARCHITEKTURA_IMPERIUM.md) | Pełna mapa Imperium — dzielnice, moduły, przepływ sygnału, cykl Fazy 0 |
+| [../archiwum/AUDYT_ADOPCJI.md](../archiwum/AUDYT_ADOPCJI.md) | 📦 Archiwum — Audyt adopcji 17 modułów Kingdom Pixel → Imperium (mapowanie, prawa, ostrzeżenia) |
+| [ARCHITEKTURA_IMPERIUM.md](ARCHITEKTURA_IMPERIUM.md) | Pełna mapa Imperium — dzielnice, moduły, przepływ sygnału, cykl Fazy 1 |
 | [ARSENAL_IMPERIUM.md](ARSENAL_IMPERIUM.md) | Zweryfikowany katalog ~320 narzędzi z pliku IMV (✅ realne / ⚠️ niepewne / ❌ halucynacje) |
 | [MAPA_IMPERIUM_FLOW.md](MAPA_IMPERIUM_FLOW.md) | Przepływ sygnału krok po kroku — kto z kim gada, frakcje Senatu, zasada zero duplikatów |
-| [ARSENAL_WSKAZNIKOW.md](ARSENAL_WSKAZNIKOW.md) | 157 wskaźników/strategii → mikro-neurony, mapowanie na legiony (scalp/swing/invest/leverage) |
+| [../archiwum/ARSENAL_WSKAZNIKOW.md](../archiwum/ARSENAL_WSKAZNIKOW.md) | 📦 Archiwum — 157 wskaźników/strategii (stary paradygmat) — superseded przez KATALOG_NEURONOW |
 | [PLAN_DEEPSEEK.md](PLAN_DEEPSEEK.md) | Jak podłączyć DeepSeek API jako mózg Cesarza i Senatu (Populares vs Optimates) |
-| [ARSENAL_AMERYKI.md](ARSENAL_AMERYKI.md) | 690 linków z 50+ krajów (Americas, Europa, Afryka, Australia, Oceania) — oceny 1-10, priorytety 1-5 |
+| [../archiwum/ARSENAL_AMERYKI.md](../archiwum/ARSENAL_AMERYKI.md) | 📦 Archiwum — 690 linków z 50+ krajów (Americas, Europa, Afryka, Australia, Oceania) — oceny 1-10, priorytety 1-5 |
 | [LEGIONY_ARCHITEKTURA.md](LEGIONY_ARCHITEKTURA.md) | Cztery Legiony (Equestris/Fulminata/Augusta/Ferrata) — mikro-neurony, schemat sygnału, Pretorianie |
 | [SYMBIOZA_MODULOW.md](SYMBIOZA_MODULOW.md) | Symbioza i korelacja — mapa narzędzi (oryginalne nazwy → Imperium), przepływ danych, zasada Alchemika |
 | [ROADMAP_IMPERIUM.md](ROADMAP_IMPERIUM.md) | Mapa rozwoju — Fazy 0-4, wersjonowanie, zasady Areny, zgodność z regulaminami giełd |
-| [KATALOG_NEURONOW.md](KATALOG_NEURONOW.md) | Katalog **299** mikro-neuronów (27 w kodzie) — 4 legiony + 14 dywizji (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, Howard Marks, TVL, L1/L2 RS, Cross-Sectional Momentum) |
+| [KATALOG_NEURONOW.md](KATALOG_NEURONOW.md) | Katalog **299** mikro-neuronów (55 w kodzie) — 4 legiony + 14 dywizji (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, Howard Marks, TVL, L1/L2 RS, Cross-Sectional Momentum) |
 | [MATRYCA_KORELACJI.md](MATRYCA_KORELACJI.md) | Kostka Rubika sygnałów — korelacje, konflikty, reżimy rynku, wagi dynamiczne, wpływ BTC |
 | [REGULAMINY_I_MANIPULACJE.md](REGULAMINY_I_MANIPULACJE.md) | Zgodność z regulaminami giełd + 7 manipulacji do wykrywania (obrona, nie atak) |
 | [GENERAL_LEGATUS.md](GENERAL_LEGATUS.md) | Generał Legatus — koordynator Legionów i Senatu, Tryb SKANER vs FOKUS, agregacja sygnałów |

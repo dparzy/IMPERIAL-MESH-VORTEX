@@ -6,7 +6,7 @@ Uruchamiany automatycznie przez hooki Claude Code (SessionStart + Stop) oraz rę
     python narzedzia/audyt_spojnosci.py            # raport + exit code
     python narzedzia/audyt_spojnosci.py --cichy     # tylko gdy są błędy
 
-Sprawdza 11 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
+Sprawdza 12 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 1  — żywy rój:        liczby, kategorie, elity, klucze
   Warstwa 2  — infrastruktura:  WAGI_REZIMU vs KAT w kodzie
   Warstwa 3  — dokumentacja:    MANIFEST klucze vs kod, liczby README/MANIFEST/CLAUDE
@@ -18,6 +18,7 @@ Sprawdza 11 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 9  — KATALOG_STRATEGII: cytowane klucze neuronów = klucze zaimplementowane
   Warstwa 10 — słowa kluczowe:  kluczowe dokumenty modułowe zawierają wymagane terminy
   Warstwa 11 — biblioteki/:     moduły w imperium/biblioteki/ wymienione w INDEKS_IMPERIUM
+  Warstwa 12 — żywotność głosu: każdy aktywny neuron głosuje (≠martwy) w ≥1 scenariuszu (Prawo XV)
 
 Exit code:
   0 = pełna spójność (Imperium gotowe)
@@ -367,6 +368,11 @@ def audyt() -> tuple:
     # ── WARSTWA 11: BIBLIOTEKI/ MODUŁY W INDEKS ───────────────────────────────
     bledy += _warstwa_11_biblioteki_indeks()
 
+    # ── WARSTWA 12: ŻYWOTNOŚĆ GŁOSU (Prawo XV) ────────────────────────────────
+    w12_bledy, w12_info = _warstwa_12_zywotnosc_glosu(neurony)
+    bledy += w12_bledy
+    info += w12_info
+
     return bledy, info
 
 
@@ -421,6 +427,146 @@ def _warstwa_11_biblioteki_indeks():
     except Exception as e:
         bledy.append(f"[W11] Błąd sprawdzania biblioteki: {e}")
     return bledy
+
+
+# Neurony świadomie zależne od danych adapterów zewnętrznych (futures/CVD/F&G).
+# W backteście czysto-OHLCV milczą (NEUTRAL pewnosc=0) — to ZNANA luka Prawa XV,
+# nie regresja: ożyją po podpięciu adapterów do pipeline. W12 raportuje je jako
+# ⚠️ ostrzeżenie (nie blokuje commita). Każdy INNY milczący neuron = błąd blokujący.
+NEURONY_ZALEZNE_OD_ADAPTEROW = {
+    "PSY-01": "FUNDING_RATE (AdapterFutures)",
+    "PSY-02": "LONG_SHORT_RATIO (AdapterFutures)",
+    "PSY-03": "FEAR_GREED_INDEX (AdapterFearGreed)",
+    "PSY-04": "OPEN_INTEREST (AdapterFutures)",
+    "V-03":   "CVD (AdapterCVD/trade-feed)",
+}
+
+# Dowód allowlisty (Prawo I — bez zaufania na słowo): każdy neuron adapterowy
+# MUSI ożyć, gdy nakarmimy go ekstremalną wartością jego klucza. Jeśli milczy
+# MIMO danych adaptera → realny bug (błąd blokujący, nie wybaczany allowlistą).
+WERYFIKACJA_ADAPTEROW = {
+    "PSY-01": {"FUNDING_RATE": 0.0025},                                   # crowded long → SHORT
+    "PSY-02": {"LONG_SHORT_RATIO": 0.82},                                 # tłum long → SHORT
+    "PSY-03": {"FEAR_GREED_INDEX": 8},                                    # ekstremalny strach → LONG
+    "PSY-04": {"OPEN_INTEREST": 150000.0, "OPEN_INTEREST_PREV": 100000.0,
+               "CLOSE": 101.0, "CLOSE_PREV": 100.0},                      # OI↑ + cena → sygnał
+    "V-03":   {"CVD": 5000.0, "CVD_PREV": 1000.0,
+               "CLOSE": 101.0, "CLOSE_PREV": 100.0},                      # napływ kupna → LONG
+}
+
+
+def _scenariusze_barow():
+    """5 syntetycznych reżimów rynku — każdy aktywny neuron powinien ożyć w ≥1.
+
+    byk/niedźwiedź — silny trend; kaskada — 4 przyspieszające spadki z rosnącym
+    wolumenem (budzi Z-04); bańka — paraboliczny blow-off (budzi Z-03);
+    spokój — wąski range (budzi neurony rewersji). Determinizm: stałe ziarno.
+    """
+    import random
+    scen = ["byk", "niedzwiedz", "kaskada", "banka", "spokoj"]
+    out = {}
+    for typ in scen:
+        random.seed(42)
+        b = []
+        p = 100.0
+        n = 260
+        for i in range(n):
+            v = 1000 + random.random() * 300
+            if typ == "byk":
+                p *= (1 + abs(random.gauss(0.004, 0.006)))
+            elif typ == "niedzwiedz":
+                p *= (1 - abs(random.gauss(0.004, 0.006)))
+            elif typ == "kaskada":
+                if i >= n - 4:
+                    p *= (1 - 0.03 * (i - (n - 5)))
+                    v = 1000 * (i - (n - 5)) * 1.5
+                else:
+                    p *= (1 + random.gauss(0.001, 0.004))
+            elif typ == "banka":
+                p *= (1 + (0.035 if i > n - 8 else random.gauss(0.001, 0.004)))
+            else:  # spokoj
+                p *= (1 + random.gauss(0, 0.003))
+            b.append({
+                "open": p, "high": p * 1.012, "low": p * 0.988,
+                "close": p * (1 + random.gauss(0, 0.004)), "volume": v,
+            })
+        out[typ] = b
+    return out
+
+
+def _warstwa_12_zywotnosc_glosu(neurony):
+    """W12 — Prawo XV: aktywny neuron, który MILCZY (NEUTRAL pewnosc=0 i zero
+    pewnosc_przeciwnika) we WSZYSTKICH scenariuszach = martwy głos.
+
+    Zwraca (bledy_blokujace, info_ostrzezenia):
+      • milczący neuron spoza allowlisty adapterowej → ❌ błąd (regresja Prawa XV)
+      • milczący neuron z allowlisty adapterowej      → ⚠️ info (znana luka)
+    """
+    bledy, info = [], []
+    try:
+        import logging
+        from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
+
+        # Wycisz logi Bramy na czas budowania scenariuszy (czysty raport audytu)
+        prev = logging.root.manager.disable
+        logging.disable(logging.CRITICAL)
+        try:
+            bud = BudowniczyWskaznikow()
+            wsk = {s: bud.zbuduj(b) for s, b in _scenariusze_barow().items()}
+        finally:
+            logging.disable(prev)
+
+        martwe = []
+        for n in neurony:
+            if not getattr(n, "DOSTEPNY", True):
+                continue
+            zywy = False
+            for s in wsk.values():
+                try:
+                    sig = n.interpretuj(s)
+                    if (sig.kierunek != "NEUTRAL" or sig.pewnosc > 0
+                            or getattr(sig, "pewnosc_przeciwnika", 0) > 0):
+                        zywy = True
+                        break
+                except Exception:
+                    continue
+            if not zywy:
+                martwe.append(n.KLUCZ)
+
+        regresje = [k for k in martwe if k not in NEURONY_ZALEZNE_OD_ADAPTEROW]
+        znane = [k for k in martwe if k in NEURONY_ZALEZNE_OD_ADAPTEROW]
+
+        if regresje:
+            bledy.append(
+                f"[W12] Martwy głos (Prawo XV) — aktywne neurony milczą we wszystkich "
+                f"scenariuszach: {sorted(regresje)}. Podłącz dane lub wycisz (DOSTEPNY=False)."
+            )
+        if znane:
+            powody = ", ".join(f"{k}:{NEURONY_ZALEZNE_OD_ADAPTEROW[k]}" for k in sorted(znane))
+            info.append(f"⚠️ Prawo XV — czekają na adaptery ({len(znane)}): {powody}")
+
+        # DOWÓD ALLOWLISTY (Prawo I): neuron adapterowy MUSI ożyć z danymi adaptera.
+        by_klucz = {n.KLUCZ: n for n in neurony}
+        martwe_mimo_danych = []
+        for klucz, trigger in WERYFIKACJA_ADAPTEROW.items():
+            n = by_klucz.get(klucz)
+            if n is None or not getattr(n, "DOSTEPNY", True):
+                continue
+            try:
+                sig = n.interpretuj(dict(trigger))
+                if (sig.kierunek == "NEUTRAL" and sig.pewnosc == 0
+                        and getattr(sig, "pewnosc_przeciwnika", 0) == 0):
+                    martwe_mimo_danych.append(klucz)
+            except Exception as e:
+                martwe_mimo_danych.append(f"{klucz}({e})")
+        if martwe_mimo_danych:
+            bledy.append(
+                f"[W12] Neuron adapterowy milczy MIMO danych adaptera (realny bug, nie "
+                f"luka): {sorted(martwe_mimo_danych)}. Sprawdź logikę interpretuj()."
+            )
+    except Exception as e:
+        bledy.append(f"[W12] Błąd testu żywotności głosu: {e}")
+    return bledy, info
 
 
 def main():

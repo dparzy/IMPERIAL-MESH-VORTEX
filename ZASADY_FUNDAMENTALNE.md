@@ -187,6 +187,12 @@ Przykłady utraty potencjału (czerwony alarm OBOWIĄZKOWY):
 **Milczenie o utracie potencjału = złamanie Prawa XV.**
 Potencjał Imperium ma być wykorzystany w 100%, nie w 11%.
 
+**Automatyzacja (W12 audytu):** `narzedzia/audyt_spojnosci.py` (warstwa 12) karmi każdy
+aktywny neuron 5 scenariuszami rynku (byk/niedźwiedź/kaskada/bańka/spokój) i flaguje
+„martwy głos" (NEUTRAL pewnosc=0 we wszystkich) automatycznie — przy starcie sesji i
+pre-commicie. Neuron milczący spoza allowlisty adapterowej (`NEURONY_ZALEZNE_OD_ADAPTEROW`)
+= błąd blokujący commit. Prawo XV przestało być pilnowane wyłącznie ręcznie.
+
 ---
 
 ## ⚖️ PRAWO XVI — REDUNDANCJA MIERZONA, NIE ZGADYWANA 📊

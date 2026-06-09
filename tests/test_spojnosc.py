@@ -104,3 +104,52 @@ def test_audyt_w7_ignoruje_zewnetrzne_url():
     w7_url = [b for b in bledy if "W7" in b and "Martwe linki" in b
               and ("http" in b or "mdpi" in b)]
     assert not w7_url, f"W7 fałszywie oznaczył zewnętrzne URL-e jako martwe linki: {w7_url}"
+
+
+def test_audyt_w12_zywotnosc_glosu_zielona():
+    """W12 (Prawo XV): żaden aktywny neuron spoza allowlisty adapterowej nie milczy."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, _ = a.audyt()
+    w12 = [b for b in bledy if "W12" in b]
+    assert not w12, f"W12 wykrył martwy głos (regresja Prawa XV): {w12}"
+
+
+def test_audyt_w12_raportuje_neurony_adapterowe():
+    """W12: 5 neuronów zależnych od adapterów raportowanych jako ⚠️ info (nie błąd)."""
+    import narzedzia.audyt_spojnosci as a
+    _bledy, info = a.audyt()
+    adaptery = [i for i in info if "Prawo XV" in i and "adaptery" in i]
+    assert adaptery, "W12 nie zaraportował neuronów czekających na adaptery"
+    # PSY-01..04 + V-03 muszą być wymienione
+    tekst = " ".join(adaptery)
+    for k in ("PSY-01", "PSY-02", "PSY-03", "PSY-04", "V-03"):
+        assert k in tekst, f"W12 info nie wymienia {k}"
+
+
+def test_audyt_w12_dowod_allowlisty():
+    """W12 (Prawo I): każdy neuron adapterowy OŻYWA, gdy nakarmić go danymi adaptera."""
+    import narzedzia.audyt_spojnosci as a
+    from imperium.legiony.rejestr import wszystkie_neurony
+    by = {n.KLUCZ: n for n in wszystkie_neurony()}
+    for klucz, trigger in a.WERYFIKACJA_ADAPTEROW.items():
+        n = by.get(klucz)
+        assert n is not None, f"Neuron {klucz} z WERYFIKACJA_ADAPTEROW nie istnieje"
+        sig = n.interpretuj(dict(trigger))
+        zywy = (sig.kierunek != "NEUTRAL" or sig.pewnosc > 0
+                or getattr(sig, "pewnosc_przeciwnika", 0) > 0)
+        assert zywy, f"{klucz} milczy MIMO danych adaptera {trigger} — realny bug"
+
+
+def test_audyt_w12_wykrywa_martwy_glos():
+    """W12 negatywny: usunięcie neuronu z allowlisty adapterowej → błąd blokujący."""
+    import narzedzia.audyt_spojnosci as a
+    orig = dict(a.NEURONY_ZALEZNE_OD_ADAPTEROW)
+    try:
+        # PSY-01 milczy bez adaptera; bez wpisu w allowliście MUSI dać błąd W12
+        a.NEURONY_ZALEZNE_OD_ADAPTEROW.pop("PSY-01", None)
+        bledy, _ = a.audyt()
+        assert any("W12" in b and "PSY-01" in b for b in bledy), \
+            "W12 nie wykrył martwego głosu po usunięciu z allowlisty"
+    finally:
+        a.NEURONY_ZALEZNE_OD_ADAPTEROW.clear()
+        a.NEURONY_ZALEZNE_OD_ADAPTEROW.update(orig)

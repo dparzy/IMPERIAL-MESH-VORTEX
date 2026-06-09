@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-09 | FEATURE | Reguła 6% Alexandra Eldera (BIB-015) — miesięczny circuit-breaker
+
+**Opis:** Wdrożenie Reguły 6% z "Come Into My Trading Room" (Elder, BIB-015).
+Gdy łączna strata w bieżącym miesiącu ≥ 6% kapitału z początku miesiąca → HALT:
+zero nowych wejść do końca miesiąca. Reset 1. dnia nowego miesiąca (automatyczny).
+
+**Gdzie działa:** wymiar MIESIĘCZNY — komplementarny z BezpiecznikKrzywejKapitalu (intraday W-062)
+i Bezpiecznikiem AOA (30%, W-028). Razem: Elder = miesięczny meta-limit, W-062 = dzienny ekwilib,
+W-028 = twardy stop całości. Weto Reguły 6% jest w `_checklist()` jako pierwsze.
+
+**Podpięcie:** `KalkulatorLewara.policz(regula_6pct=...)` + `Dyrygent(regula_6pct=True)`.
+W Dyrygent domyślnie wyłączone (opt-in), żeby nie łamać kompatybilności backtestu.
+
+**Pliki:** `imperium/pretorianie/kalkulator_lewara.py`, `imperium/koloseum/dyrygent.py`,
+`tests/test_kalkulator.py`, `docs/MANIFEST_KODU.md`, `README.md`
+**Testy:** +4 (562→566/566). Audyt: exit 0.
+
+---
+
 ## 2026-06-09 | DOKUMENT | Symulator canvas (styl v1-5.1) — aktualny + marzenie
 
 **Opis:** Nowy `docs/symulator_imperium.html` — symulator w stylu animowanych diagramów

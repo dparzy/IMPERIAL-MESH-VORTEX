@@ -3,10 +3,13 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from datetime import date
+
 from imperium.pretorianie.kalkulator_lewara import (
     KalkulatorLewara, BezpiecznikKapitalu, MAX_DRAWDOWN_STOP,
     VOL_TARGET_DEFAULT, SKALA_VOL_MIN, SKALA_VOL_MAX,
     BezpiecznikKrzywejKapitalu, SkalowanieFrakcjaDD,
+    RegulaSzesciuProcentEldera,
 )
 
 
@@ -368,3 +371,46 @@ def test_frakcja_dd_reset():
     assert sd.frakcja() == sd.min_frakcja
     sd.reset()
     assert sd.frakcja() == 1.0
+
+
+# ── Reguła 6% Eldera (BIB-015) ───────────────────────────────────────────────
+
+def test_regula_6pct_normal_ponizej_progu():
+    """Strata 3% tego miesiąca → stan NORMAL (poniżej progu 6%)."""
+    reg = RegulaSzesciuProcentEldera()
+    reg.reset_miesiac(10_000)
+    reg.aktualizuj(9_700, dzisiaj=date(2026, 6, 9))
+    assert reg.stan == "NORMAL"
+    assert not reg.halt
+
+
+def test_regula_6pct_halt_po_przekroczeniu():
+    """Strata 7% tego miesiąca → stan HALT (powyżej progu 6%)."""
+    reg = RegulaSzesciuProcentEldera()
+    reg.reset_miesiac(10_000)
+    reg.aktualizuj(9_300, dzisiaj=date(2026, 6, 9))
+    assert reg.stan == "HALT"
+    assert reg.halt
+
+
+def test_regula_6pct_reset_nowy_miesiac():
+    """Po zmianie miesiąca stan wraca do NORMAL i liczy od nowego kapitału."""
+    reg = RegulaSzesciuProcentEldera()
+    reg.reset_miesiac(10_000)
+    reg.aktualizuj(9_300, dzisiaj=date(2026, 6, 30))
+    assert reg.halt
+    reg.aktualizuj(9_300, dzisiaj=date(2026, 7, 1))
+    assert reg.stan == "NORMAL", "Nowy miesiąc musi resetować HALT"
+
+
+def test_regula_6pct_weto_w_planie():
+    """Gdy Reguła 6% HALT, policz() zwraca checklist_ok=False z odpowiednim powodem."""
+    kalk = KalkulatorLewara()
+    reg = RegulaSzesciuProcentEldera()
+    reg.reset_miesiac(10_000)
+    reg.aktualizuj(9_300, dzisiaj=date(2026, 6, 9))
+    assert reg.halt
+    plan = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 9_300,
+                       pewnosc=0.9, rezim="TREND_STRONG", regula_6pct=reg)
+    assert not plan.checklist_ok
+    assert "Elder" in plan.powod_veto or "6%" in plan.powod_veto

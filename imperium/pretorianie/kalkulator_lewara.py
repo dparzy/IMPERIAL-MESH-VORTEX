@@ -451,6 +451,50 @@ class KalkulatorLewara:
         # λ=1 → ½·1·0·σ² = 0 (brak erozji) — wzór sam to daje, bez specjalnego przypadku.
         return 0.5 * dzwignia * (dzwignia - 1) * vol_realized ** 2
 
+    # ── Skew-Kelly (W-211, Sinclair BIB-018 "Volatility Trading") ────────────────
+
+    @staticmethod
+    def skew_kelly(mu: "float | None", sigma: "float | None",
+                   skos: "float | None" = 0.0) -> "float | None":
+        """
+        Kelly skorygowany o skośność rozkładu (fat tails) — Sinclair, BIB-018.
+
+        DLA NOWICJUSZA: klasyczne Kelly (f = μ/σ²) zakłada rozkład symetryczny
+        (dzwon Gaussa). Rynek krypto ma GRUBY LEWY OGON — rzadkie, gwałtowne krachy.
+        Gdy skośność jest UJEMNA (krachy częstsze/głębsze niż wzrosty), klasyczne
+        Kelly ZAWYŻA optymalny rozmiar — bo nie widzi ryzyka ogona. Ten wzór
+        rozszerza Kelly o trzeci moment i automatycznie TNIE pozycję przy ujemnym
+        skosie. Przy skosie = 0 wraca dokładnie do μ/σ² (zero zmian).
+
+        MATEMATYKA (rozwinięcie Taylora E[log(1+fX)] do 3. rzędu):
+          g(f) = f·μ − ½f²σ² + ⅓f³·m₃,   gdzie m₃ = skos_std · σ³
+          g'(f) = μ − f·σ² + f²·m₃ = 0
+          f* = (σ² − √(σ⁴ − 4·μ·m₃)) / (2·m₃)     [pierwiastek → μ/σ² gdy m₃→0]
+
+        - skos = 0       → f* = μ/σ² (klasyczne Kelly)
+        - skos < 0       → f* < μ/σ² (mniejsza pozycja, ochrona przed krachem)
+        - skos > 0       → korzystne; wracamy do μ/σ² (rozwinięcie 3. rzędu
+                           rozbiega się dla dodatniego skosu — nie zawyżamy zakładu)
+
+        mu: oczekiwany zwrot na okres (np. dzienny edge). None/≤0 → None (brak przewagi).
+        sigma: odchylenie standardowe zwrotów (>0). None/≤0 → None (Prawo XV).
+        skos: standaryzowana skośność m₃/σ³ (domyślnie 0 = symetria).
+        Zwraca frakcję Kelly (≥0) lub None gdy brak danych.
+        """
+        if mu is None or sigma is None or mu <= 0 or sigma <= 0:
+            return None
+        sigma2 = sigma * sigma
+        kelly_klasyczne = mu / sigma2
+        # Dodatni lub zerowy skos → klasyczne Kelly (nie zawyżamy przy korzystnym ogonie)
+        if skos is None or skos >= 0:
+            return max(0.0, kelly_klasyczne)
+        m3 = skos * sigma ** 3                      # trzeci moment centralny (ujemny)
+        dyskryminanta = sigma2 ** 2 - 4.0 * mu * m3  # m3<0 → −4μm₃>0 → większa
+        if dyskryminanta < 0:                        # zabezpieczenie numeryczne
+            return max(0.0, kelly_klasyczne)
+        f = (sigma2 - dyskryminanta ** 0.5) / (2.0 * m3)
+        return max(0.0, f)
+
     # ── Wzory ──────────────────────────────────────────────────────────────────
 
     def _likwidacja(self, cena: float, kierunek: str, dzwignia: int) -> float:

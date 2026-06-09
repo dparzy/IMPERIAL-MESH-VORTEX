@@ -414,3 +414,40 @@ def test_regula_6pct_weto_w_planie():
                        pewnosc=0.9, rezim="TREND_STRONG", regula_6pct=reg)
     assert not plan.checklist_ok
     assert "Elder" in plan.powod_veto or "6%" in plan.powod_veto
+
+
+# ── Skew-Kelly (W-211, Sinclair BIB-018) ─────────────────────────────────────
+
+def test_skew_kelly_symetria_rowna_klasycznemu():
+    """Skos = 0 → f* = μ/σ² (klasyczne Kelly, zero zmian)."""
+    f = KalkulatorLewara.skew_kelly(0.10, 0.20, 0.0)
+    assert abs(f - 0.10 / 0.04) < 1e-6
+
+
+def test_skew_kelly_ujemny_skos_tnie_pozycje():
+    """Ujemny skos (gruby lewy ogon) → f* < klasyczne Kelly."""
+    klasyczne = 0.10 / 0.04
+    f = KalkulatorLewara.skew_kelly(0.10, 0.20, -1.0)
+    assert f < klasyczne, "ujemny skos musi zmniejszyć frakcję Kelly"
+    assert f > 0
+
+
+def test_skew_kelly_dodatni_skos_nie_zawysza():
+    """Dodatni skos → wracamy do klasycznego Kelly (nie zawyżamy zakładu)."""
+    f = KalkulatorLewara.skew_kelly(0.10, 0.20, 1.0)
+    assert abs(f - 0.10 / 0.04) < 1e-6
+
+
+def test_skew_kelly_brak_danych_none():
+    """Brak μ/σ lub niedodatnie → None (Prawo XV, bez halucynacji)."""
+    assert KalkulatorLewara.skew_kelly(None, 0.2, -1.0) is None
+    assert KalkulatorLewara.skew_kelly(0.10, None, -1.0) is None
+    assert KalkulatorLewara.skew_kelly(0.0, 0.2, -1.0) is None
+    assert KalkulatorLewara.skew_kelly(0.10, 0.0, -1.0) is None
+
+
+def test_skew_kelly_silniejszy_skos_mocniej_tnie():
+    """Im bardziej ujemny skos, tym mniejsza frakcja (monotonicznie)."""
+    f_slaby = KalkulatorLewara.skew_kelly(0.10, 0.20, -0.5)
+    f_silny = KalkulatorLewara.skew_kelly(0.10, 0.20, -2.0)
+    assert f_silny < f_slaby, "silniejszy ujemny skos = ostrożniejszy sizing"

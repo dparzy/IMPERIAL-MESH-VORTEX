@@ -36,6 +36,7 @@ from imperium.legiony.neurony.trend import (
 )
 from imperium.legiony.neurony.wolumen import (
     NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL,
+    NeuronForceIndex,
 )
 from imperium.legiony.neurony.struktura import (
     NeuronOrderBlock, NeuronFVG, NeuronBOS, NeuronVSA,
@@ -91,6 +92,7 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronHMA(), NeuronFibonacci(), NeuronRSIDiv(), NeuronOBZone(),
         # Wolumen (V)
         NeuronOBV(), NeuronVWAP(), NeuronCVD(), NeuronVolumeAnomaly(), NeuronRVOL(),
+        NeuronForceIndex(),
         # Struktura (SMC/VSA)
         NeuronOrderBlock(), NeuronFVG(), NeuronBOS(), NeuronVSA(),
         # Psychologia (PSY)

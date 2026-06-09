@@ -63,6 +63,8 @@ _PLAN_SKALARNE = {
     "RVOL":          ("RVOL", ("volume",), {"period": 20}),
     "OBV":           ("OBV", ("close", "volume"), {}),
     "OBV_EMA_20":    ("OBV_EMA_20", ("close", "volume"), {}),
+    "FORCE_INDEX_13":("FORCE_INDEX_13", ("close", "volume"), {}),
+    "FORCE_INDEX_2": ("FORCE_INDEX_2", ("close", "volume"), {}),
     "VOLUME_MA20":   ("VOLUME_MA20", ("volume",), {}),
     "ATR_14":        ("ATR", ("high", "low", "close"), {"period": 14}),
     "ATR_DEVIATION": ("ATR_DEVIATION", ("high", "low", "close"), {}),

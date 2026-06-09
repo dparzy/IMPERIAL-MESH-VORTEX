@@ -6,7 +6,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from imperium.legiony.neurony.momentum import NeuronRSI, NeuronMACD, NeuronBBands, NeuronEMACross, NeuronWilliamsR, NeuronATRDeviation, NeuronHAScalper, NeuronStochRSI, NeuronTRIX, NeuronAwesome, NeuronAccelerator, NeuronBBSqueeze
 from imperium.legiony.neurony.trend import NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian, NeuronHMA, NeuronFibonacci, NeuronRSIDiv, NeuronOBZone
 from imperium.legiony.neurony.straz import NeuronStopHunt, NeuronWickRejection, NeuronWashVol, NeuronBartPattern
-from imperium.legiony.neurony.wolumen import NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL
+from imperium.legiony.neurony.wolumen import NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL, NeuronForceIndex
 from imperium.legiony.neurony.psychologia import NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv
 from imperium.legiony.neurony.onchain import NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow
 from imperium.legiony.neurony.struktura import NeuronOrderBlock, NeuronFVG, NeuronBOS, NeuronVSA
@@ -169,6 +169,39 @@ def test_rvol_wsparcie_wolumenu():
     # niski RVOL → neutralny
     assert n.interpretuj({"RVOL": 0.5, "CLOSE": 101.0, "CLOSE_PREV": 100.0}).kierunek == "NEUTRAL"
     assert n.interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_force_index_pullback_long():
+    """Trend↑ (FI13>0) + FI(2)<0 pullback → LONG mocny (doktryna Eldera)."""
+    n = NeuronForceIndex()
+    s = n.interpretuj({"FORCE_INDEX_13": 1500.0, "FORCE_INDEX_2": -300.0})
+    assert s.kierunek == "LONG" and s.pewnosc == 0.80
+
+
+def test_force_index_odbicie_short():
+    """Trend↓ (FI13<0) + FI(2)>0 odbicie → SHORT mocny."""
+    n = NeuronForceIndex()
+    s = n.interpretuj({"FORCE_INDEX_13": -1500.0, "FORCE_INDEX_2": 300.0})
+    assert s.kierunek == "SHORT" and s.pewnosc == 0.80
+
+
+def test_force_index_momentum_zgodny():
+    """Obie skale zgodne → słabszy sygnał kierunkowy (ruch już trwa)."""
+    n = NeuronForceIndex()
+    s = n.interpretuj({"FORCE_INDEX_13": 1000.0, "FORCE_INDEX_2": 200.0})
+    assert s.kierunek == "LONG" and s.pewnosc < 0.70
+
+
+def test_force_index_brak_krotkiej_skali():
+    """Bez FI(2) — sam kierunek trendu FI(13)."""
+    n = NeuronForceIndex()
+    assert n.interpretuj({"FORCE_INDEX_13": 500.0}).kierunek == "LONG"
+    assert n.interpretuj({"FORCE_INDEX_13": -500.0}).kierunek == "SHORT"
+
+
+def test_force_index_brak_danych():
+    """Brak Force Index → NEUTRAL (Prawo XV, bez halucynacji)."""
+    assert NeuronForceIndex().interpretuj({}).kierunek == "NEUTRAL"
 
 
 def test_atr_deviation_szum_ignorowany():

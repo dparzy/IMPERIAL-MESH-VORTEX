@@ -82,6 +82,30 @@ def _second_last_valid(a: np.ndarray):
 
 # ── Pure-Python: wskaźniki których TA-Lib nie posiada ────────────────────────
 
+def _py_force_index(close, volume, period: int = 13):
+    """
+    Force Index Eldera (BIB-015, Elder "Trading for a Living"): siła ruchu
+    = kierunek × dystans × wolumen, wygładzona EMA.
+
+      raw[i] = (close[i] − close[i−1]) · volume[i]
+      FI(period) = EMA(raw, period)
+
+    FI(13) — sygnał trendu średnioterminowego (2. ekran Triple Screen).
+    FI(2)  — krótkoterminowy trigger pullbacku (wejście).
+    FI > 0 → byki dominują; FI < 0 → niedźwiedzie. Zwraca ostatnią wartość EMA.
+    """
+    c = _arr(close)
+    v = _arr(volume)
+    if c.size < 2:
+        return None
+    raw = np.empty(c.size, dtype=np.float64)
+    raw[0] = np.nan
+    raw[1:] = (c[1:] - c[:-1]) * v[1:]
+    # EMA tylko na ważnym fragmencie (TA-Lib nie lubi NaN na wejściu)
+    ema = talib.EMA(raw[1:], timeperiod=period)
+    return _last_valid(ema)
+
+
 def _py_vwap(high, low, close, volume) -> float:
     """VWAP = Σ(TypicalPrice × Volume) / Σ(Volume). Okres = cała podana seria."""
     tp = [(h + l + c) / 3 for h, l, c in zip(high, low, close)]
@@ -1097,6 +1121,8 @@ class CalculatorGateway:
             "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),
             "OBV_EMA_20":   lambda close, volume: _last_valid(talib.EMA(talib.OBV(_arr(close), _arr(volume)), timeperiod=20)),
             "VOLUME_MA20":  lambda volume: _last_valid(talib.SMA(_arr(volume), timeperiod=20)),
+            "FORCE_INDEX_13": lambda close, volume: _py_force_index(close, volume, 13),
+            "FORCE_INDEX_2":  lambda close, volume: _py_force_index(close, volume, 2),
             "VOLUME_PREV":  lambda volume: _second_last_valid(talib.SMA(_arr(volume), timeperiod=1)),
 
             # ── TA-Lib: ATR Deviation = (close[-1] - EMA_20) / ATR ────────────

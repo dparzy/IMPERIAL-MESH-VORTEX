@@ -76,6 +76,27 @@ def test_strategie_vi_lv_dobierane_w_volatile():
         "VI-LV-001 powinna pasować przy ekstremalnym fundingu w VOLATILE/1H"
 
 
+def test_strategia_trojekran_eldera_obecna():
+    """BIB-015: Triple Screen Eldera w rejestrze, używa Force Index V-05."""
+    strategie = {s.id: s for s in wszystkie_strategie()}
+    assert "IMV-TR-008" in strategie, "Brak IMV-TR-008 (Trójekran Eldera)"
+    klucze = strategie["IMV-TR-008"].wszystkie_klucze()
+    assert "V-05" in klucze, "Trójekran musi używać Force Index (V-05)"
+    assert "X-03" in klucze, "Trójekran musi używać MACD (1. ekran trendu)"
+
+
+def test_strategia_trojekran_dobierana_w_trendzie():
+    """Trójekran dopasowuje się w silnym trendzie wzrostowym (4H/1D)."""
+    sygnaly = {s.neuron_id: s for s in [
+        _syg("X-03", "LONG", 0.85), _syg("V-05", "LONG", 0.80),
+        _syg("XII-03", "LONG", 0.8), _syg("X-02", "LONG", 0.65),
+    ]}
+    top = dobierz_najlepsze(wszystkie_strategie(), sygnaly,
+                            rezim="TREND_STRONG", top=5, interwal="4H")
+    assert any(d.strategia.id == "IMV-TR-008" for d in top), \
+        "IMV-TR-008 powinna pasować w silnym trendzie na 4H"
+
+
 # ── SILNIK DOPASOWANIA ───────────────────────────────────────────────────────
 
 def test_dopasowanie_trend_wzrostowy():

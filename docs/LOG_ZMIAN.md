@@ -33,6 +33,23 @@ Conformal Prediction `mapie` (niepewność predykcji), Polars (szybkość). Resz
 
 ---
 
+## 2026-06-08 | BIBLIOTEKA | BIB-020 ✅ ANALIZA KOMPLETNA — rozdz. 10/16/17/28 (wizje W-270..W-279)
+
+**Opis:** Dokończenie analizy Harrisa (zwiadowca 3). 10 nowych wizji W-270..W-279 z rozdziałów:
+Rozdz.10 (Informed Traders): W-270 (flow type: stealth/absorption/exhaustion), W-271 (staleness filter),
+W-272 (efficiency proxy → przełącznik reżimu). Rozdz.16 (Value Traders): W-273 (value z-score SMA-200+MoMA ⭐⭐),
+W-274 (OU half-life resiliency ⭐⭐), W-275 (winner's curse uncertainty scaler). Rozdz.17 (Arbitrageurs):
+W-276 (basis+funding neuron ⭐⭐⭐ — najlepsza dostępna oś N/Z crypto), W-277 (BTC lead-lag altcoin catch-up).
+Rozdz.28 (Bubbles/Crashes): W-278 (bubble/crash kill-switch: bubble_z + VoV + AR1 autocorr ⭐⭐⭐),
+W-279 (cascade detector + dead-cat bounce). BIB-020 strawiona w CAŁOŚCI (30 wizji W-250..W-279).
+**5 priorytetów wdrożenia:** W-278 (kill-switch na OHLCV), W-263/274 (master-switch reżimu, OHLCV),
+W-276 (basis+funding, wymaga perp API), W-273 (value z-score, OHLCV), W-279 (cascade, OHLCV).
+**Powód:** dokończenie ŻYCZ-10, Prawo XIX (tylko kod istnieje — wizje czekają na wdrożenie), Zasada Symbiozy.
+**Pliki:** `docs/WIZJONER.md`, `docs/LOG_ZMIAN.md`
+**Testy:** 514/514 ✅. Audyt: exit 0 ✅. (czysto dokumentacyjne)
+
+---
+
 ## 2026-06-08 | BIBLIOTEKA | BIB-020 ⭐ ZDOBYTA — "Trading and Exchanges" (Larry Harris, 9/10, ŻYCZ-10)
 
 **Opis:** Cezar dostarczył biblię mikrostruktury rynku (Oxford 2003, 29 rozdz., b. dyrektor ekon. SEC) — życzenie

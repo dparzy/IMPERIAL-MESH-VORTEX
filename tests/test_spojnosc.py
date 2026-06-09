@@ -126,6 +126,20 @@ def test_audyt_w12_raportuje_neurony_adapterowe():
         assert k in tekst, f"W12 info nie wymienia {k}"
 
 
+def test_audyt_w12_dowod_allowlisty():
+    """W12 (Prawo I): każdy neuron adapterowy OŻYWA, gdy nakarmić go danymi adaptera."""
+    import narzedzia.audyt_spojnosci as a
+    from imperium.legiony.rejestr import wszystkie_neurony
+    by = {n.KLUCZ: n for n in wszystkie_neurony()}
+    for klucz, trigger in a.WERYFIKACJA_ADAPTEROW.items():
+        n = by.get(klucz)
+        assert n is not None, f"Neuron {klucz} z WERYFIKACJA_ADAPTEROW nie istnieje"
+        sig = n.interpretuj(dict(trigger))
+        zywy = (sig.kierunek != "NEUTRAL" or sig.pewnosc > 0
+                or getattr(sig, "pewnosc_przeciwnika", 0) > 0)
+        assert zywy, f"{klucz} milczy MIMO danych adaptera {trigger} — realny bug"
+
+
 def test_audyt_w12_wykrywa_martwy_glos():
     """W12 negatywny: usunięcie neuronu z allowlisty adapterowej → błąd blokujący."""
     import narzedzia.audyt_spojnosci as a

@@ -169,7 +169,7 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 | **E** 🔵 | Dalsze neurony z katalogu (299−55=244 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
 **Stan kategorii (2026-06-04):** aktywne M/T/F/A/L/V/R/H/N/Z/O · wyciszone S(SMC feed)/O-API(on-chain API)
-**Neurony: 55** (48 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 561/561**
+**Neurony: 55** (48 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 562/562**
 
 ### Zadania bieżące (infrastruktura)
 | # | Zadanie | Moduł | Priorytet |
@@ -210,7 +210,7 @@ python imperium/pretorianie/veto_check.py
 | v0.3.0 | 2026-06-01 | Skan IV (+16 neuronów → 303), IGRZYSKA_IMPERIUM, PAMIEC_ABSOLUTNA, DORADCY_CARA, pamiec_absolutna.py |
 | v0.4.0 | 2026-06-02 | +Adaptery API, +5 neuronów (A-03/A-05/XII-06 + F-01..04), Prawo XX elitarny, WAGI_REZIMU, LOG_ZMIAN, ZPO, REJESTR_INSPIRACJI |
 | v0.5.0 | 2026-06-03 | +Namiestnik (Regime-Aware Gating), +Detektor Lookahead, +Timeframe-Aware (styl SCALP/SWING/INVEST, lewar_cap, futures/spot, filtr strategii po interwale), tabela dowodowa, 346 testów |
-| v0.9.0 | 2026-06-09 | Z-03/Z-04/X-27, master-switch reżimu Faza 1, BIB-020 (pomiar_dekorelacji), porządek docs: archiwizacja duplikatu, aktualizacja liczb; 55 neuronów, 561 testów (W12 żywotność głosu) |
+| v0.9.0 | 2026-06-09 | Z-03/Z-04/X-27, master-switch reżimu Faza 1, BIB-020 (pomiar_dekorelacji), porządek docs: archiwizacja duplikatu, aktualizacja liczb; 55 neuronów, 562 testów (W12 żywotność głosu) |
 
 ---
 

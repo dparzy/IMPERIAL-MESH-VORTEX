@@ -441,6 +441,19 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
     "V-03":   "CVD (AdapterCVD/trade-feed)",
 }
 
+# Dowód allowlisty (Prawo I — bez zaufania na słowo): każdy neuron adapterowy
+# MUSI ożyć, gdy nakarmimy go ekstremalną wartością jego klucza. Jeśli milczy
+# MIMO danych adaptera → realny bug (błąd blokujący, nie wybaczany allowlistą).
+WERYFIKACJA_ADAPTEROW = {
+    "PSY-01": {"FUNDING_RATE": 0.0025},                                   # crowded long → SHORT
+    "PSY-02": {"LONG_SHORT_RATIO": 0.82},                                 # tłum long → SHORT
+    "PSY-03": {"FEAR_GREED_INDEX": 8},                                    # ekstremalny strach → LONG
+    "PSY-04": {"OPEN_INTEREST": 150000.0, "OPEN_INTEREST_PREV": 100000.0,
+               "CLOSE": 101.0, "CLOSE_PREV": 100.0},                      # OI↑ + cena → sygnał
+    "V-03":   {"CVD": 5000.0, "CVD_PREV": 1000.0,
+               "CLOSE": 101.0, "CLOSE_PREV": 100.0},                      # napływ kupna → LONG
+}
+
 
 def _scenariusze_barow():
     """5 syntetycznych reżimów rynku — każdy aktywny neuron powinien ożyć w ≥1.
@@ -531,6 +544,26 @@ def _warstwa_12_zywotnosc_glosu(neurony):
         if znane:
             powody = ", ".join(f"{k}:{NEURONY_ZALEZNE_OD_ADAPTEROW[k]}" for k in sorted(znane))
             info.append(f"⚠️ Prawo XV — czekają na adaptery ({len(znane)}): {powody}")
+
+        # DOWÓD ALLOWLISTY (Prawo I): neuron adapterowy MUSI ożyć z danymi adaptera.
+        by_klucz = {n.KLUCZ: n for n in neurony}
+        martwe_mimo_danych = []
+        for klucz, trigger in WERYFIKACJA_ADAPTEROW.items():
+            n = by_klucz.get(klucz)
+            if n is None or not getattr(n, "DOSTEPNY", True):
+                continue
+            try:
+                sig = n.interpretuj(dict(trigger))
+                if (sig.kierunek == "NEUTRAL" and sig.pewnosc == 0
+                        and getattr(sig, "pewnosc_przeciwnika", 0) == 0):
+                    martwe_mimo_danych.append(klucz)
+            except Exception as e:
+                martwe_mimo_danych.append(f"{klucz}({e})")
+        if martwe_mimo_danych:
+            bledy.append(
+                f"[W12] Neuron adapterowy milczy MIMO danych adaptera (realny bug, nie "
+                f"luka): {sorted(martwe_mimo_danych)}. Sprawdź logikę interpretuj()."
+            )
     except Exception as e:
         bledy.append(f"[W12] Błąd testu żywotności głosu: {e}")
     return bledy, info

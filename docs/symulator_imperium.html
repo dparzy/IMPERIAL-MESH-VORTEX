@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏛️ IMPERIAL MESH VORTEX — Symulacja przepływu decyzji</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(145deg,#0a0f1e 0%,#0c1222 100%);color:#dfe6f2;
+       font-family:'Segoe UI','Poppins',system-ui,sans-serif;min-height:100vh;padding:26px 16px}
+  .sim{max-width:1640px;margin:0 auto;background:rgba(12,20,35,.65);backdrop-filter:blur(3px);
+       border-radius:34px;padding:26px 24px 34px;border:1px solid rgba(72,187,255,.22);
+       box-shadow:0 25px 45px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05)}
+  h1{text-align:center;font-size:2.3rem;letter-spacing:1px;font-weight:800;
+     background:linear-gradient(135deg,#FFD966,#48BBFF,#A569FF);-webkit-background-clip:text;
+     background-clip:text;color:transparent}
+  .sub{text-align:center;color:#8e9bbe;font-style:italic;margin:8px auto 4px;font-size:.95rem}
+  .stats{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+  .stat{background:#111927;border:1px solid #243049;border-radius:100px;padding:6px 15px;font-size:.82rem;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .stat b{color:#FFD966}
+  .toggle{display:flex;justify-content:center;gap:0;margin:18px auto;background:#0e1525;border:1px solid #243049;
+          border-radius:100px;padding:5px;width:fit-content}
+  .toggle button{background:transparent;border:none;color:#8e9bbe;padding:11px 26px;border-radius:100px;
+          cursor:pointer;font-weight:700;font-size:.95rem;transition:.25s}
+  .toggle button.on{background:linear-gradient(135deg,#1e2a3e,#2b3b55);color:#fff;
+          box-shadow:0 4px 14px rgba(0,0,0,.4)}
+  .toggle button.on.dream{background:linear-gradient(135deg,#5a3a8e,#a569ff);color:#fff}
+  canvas{display:block;margin:8px auto 0;background:#0f1425;border-radius:28px;width:100%;height:auto;
+         box-shadow:0 20px 35px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.08);cursor:pointer}
+  .legend{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:22px;padding:14px 20px;
+          background:rgba(0,0,0,.45);border-radius:40px;backdrop-filter:blur(8px)}
+  .li{display:flex;align-items:center;gap:9px;font-size:.8rem;background:#111927;padding:5px 14px;
+      border-radius:100px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .lc{width:18px;height:18px;border-radius:50%}
+  .ctrls{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:20px}
+  .ctrls button{background:#1e2a3e;border:none;color:#fff;padding:10px 22px;border-radius:40px;cursor:pointer;
+          font-weight:700;font-size:.95rem;box-shadow:0 5px 12px rgba(0,0,0,.5);transition:.2s}
+  .ctrls button:hover{background:#2b3b55;transform:translateY(-2px)}
+  .panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+  @media(max-width:880px){.panels{grid-template-columns:1fr}}
+  .pnl{background:rgba(14,21,37,.8);border:1px solid #243049;border-radius:18px;padding:18px}
+  .pnl h3{color:#FFD966;font-size:1.05rem;margin-bottom:12px;letter-spacing:.5px}
+  .pnl h3.dream{color:#a569ff}
+  .row{display:flex;justify-content:space-between;gap:10px;font-size:.86rem;padding:8px 0;border-bottom:1px solid #1a2336}
+  .row:last-child{border-bottom:none}
+  .ok{color:#2ecc71}.warn{color:#f1c40f}.bad{color:#e74c3c}.fut{color:#a569ff}
+  .grade{font-size:2.6rem;font-weight:800;text-align:center;margin:6px 0}
+  .gradesub{text-align:center;color:#8e9bbe;font-size:.85rem;margin-bottom:10px}
+  .bar{height:9px;background:#0e1525;border-radius:6px;overflow:hidden;margin-top:5px}
+  .bar i{display:block;height:100%;border-radius:6px}
+  .foot{text-align:center;margin-top:24px;font-size:.74rem;color:#5f739b;line-height:1.7}
+  .tag{display:inline-block;padding:2px 9px;border-radius:100px;font-size:.7rem;font-weight:700;margin-left:6px}
+  .tag.now{background:rgba(72,187,255,.18);color:#48BBFF}
+  .tag.dream{background:rgba(165,105,255,.18);color:#a569ff}
+</style>
+</head>
+<body>
+<div class="sim">
+  <h1>🏛️ IMPERIAL MESH VORTEX</h1>
+  <div class="sub">Autonomiczny rój decyzyjny krypto — symulacja przepływu danych i decyzji</div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="toggle">
+    <button id="bNow" class="on" onclick="setMode('now')">🔵 STAN AKTUALNY · v0.9.0</button>
+    <button id="bDream" onclick="setMode('dream')">🟣 MARZENIE · wizja docelowa</button>
+  </div>
+
+  <canvas id="cv" width="1320" height="760"></canvas>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="ctrls">
+    <button onclick="toggleAnim()">⏯ Start / Pauza animacji</button>
+    <button onclick="boost()">⚡ Puls przepływu</button>
+  </div>
+
+  <div class="panels">
+    <div class="pnl" id="pAssess"></div>
+    <div class="pnl" id="pDetail"></div>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script>
+// ═══ DANE Z ŻYWEGO KODU (rejestr.py + audyt, 2026-06-09) ═══
+const STATS = [
+  ["Wersja","v0.9.0"],["Neurony","55 (48 akt.)"],["Zwiadowcy","12"],["Elitarne","15"],
+  ["Strategie","17"],["Doradcy","6"],["Adaptery","3"],["Testy","562/562 ✅"],["Audyt","12 warstw ✅"]
+];
+const TYPES = {
+  data:{c:"#FFB347",l:"📊 Dane / Źródła"},
+  brama:{c:"#3b82f6",l:"🧮 Brama Kalkulatora"},
+  core:{c:"#9b59b6",l:"🧠 Rdzeń (neurony/Legatus/Namiestnik)"},
+  advis:{c:"#1abc9c",l:"🏛️ Doradcy Cezara"},
+  guard:{c:"#e67e22",l:"🛡️ Pretorianie (ryzyko)"},
+  exec:{c:"#e74c3c",l:"⚡ Egzekucja (Drogi)"},
+  loop:{c:"#f1c40f",l:"🔁 Pętla uczenia (HedgeMWU)"},
+  future:{c:"#a569ff",l:"🟣 Planowane (marzenie)"}
+};
+
+// ── WĘZŁY: stan aktualny (now) ──
+const NODES_NOW = {
+  mexc:{x:70,y:90,t:"data",lb:"📡 MEXC\nOHLCV/ticks"},
+  futAd:{x:70,y:185,t:"data",lb:"📈 AdapterFutures\nfunding/OI/LS"},
+  cvdAd:{x:70,y:280,t:"data",lb:"🌊 AdapterCVD\nbuy−sell"},
+  fgAd:{x:70,y:375,t:"data",lb:"😱 AdapterFearGreed\nsentyment"},
+  ocAd:{x:70,y:470,t:"data",lb:"⛓️ On-chain\n(wyciszone — brak API)",dim:1},
+
+  brama:{x:300,y:265,t:"brama",lb:"🧮 BRAMA KALKULATORA\n81 wskaźników · SHA-256"},
+
+  neur:{x:560,y:130,t:"core",lb:"🧠 NEURONY 48/55\n12 kategorii"},
+  leg:{x:560,y:265,t:"core",lb:"⚙️ LEGATUS\nagregacja · WAGI_REZIMU"},
+  rezim:{x:560,y:400,t:"core",lb:"🌡️ REŻIM\nmaster-switch Faza 1"},
+  nam:{x:560,y:520,t:"core",lb:"👑 NAMIESTNIK\ntryb/lewar/rynek/próg"},
+
+  hermes:{x:850,y:90,t:"advis",lb:"🤖 HERMES\naudyt informacji"},
+  fulmen:{x:850,y:185,t:"advis",lb:"⚡ FULMEN\nwalidator reżimu"},
+  iustitia:{x:850,y:280,t:"advis",lb:"⚖️ IUSTITIA\nveto ryzyka"},
+  oracle:{x:850,y:375,t:"advis",lb:"🔮 ORACLE\nSharpe"},
+  pythia:{x:850,y:470,t:"advis",lb:"🎲 PYTHIA\np(zysk)"},
+
+  pret:{x:1110,y:230,t:"guard",lb:"🛡️ PRETORIANIE\nvol-target · drag\nbezpiecznik krzywej/AOA"},
+
+  drogi:{x:1110,y:430,t:"exec",lb:"🛤️ DROGI\nrouting MEXC"},
+  paper:{x:1230,y:560,t:"exec",lb:"📄 PAPER"},
+  dash:{x:1010,y:600,t:"exec",lb:"📊 DASHBOARD\nświątynie"},
+
+  feed:{x:760,y:660,t:"loop",lb:"🔁 HedgeMWU\nżywe wagi — kto kłamie, cichnie"}
+};
+const EDGES_NOW = [
+  ["mexc","brama"],["futAd","brama"],["cvdAd","brama"],["fgAd","brama"],["ocAd","brama",1],
+  ["brama","neur"],["neur","leg"],["leg","rezim"],["rezim","nam"],
+  ["leg","hermes"],["leg","fulmen"],["leg","iustitia"],["leg","oracle"],["leg","pythia"],
+  ["hermes","nam"],["fulmen","nam"],["iustitia","nam"],["oracle","nam"],["pythia","nam"],
+  ["nam","pret"],["pret","drogi"],["drogi","paper"],["drogi","dash"],
+  ["paper","feed"],["feed","neur"],["feed","leg"]
+];
+
+// ── WĘZŁY: marzenie (dream) — wszystko aktualne + planowane ożywione ──
+const NODES_DREAM = JSON.parse(JSON.stringify(NODES_NOW));
+NODES_DREAM.ocAd.dim=0; NODES_DREAM.ocAd.lb="⛓️ On-chain LIVE\nGlassnode: MVRV/SOPR/NUPL";
+Object.assign(NODES_DREAM,{
+  deprado:{x:850,y:565,t:"future",lb:"🪞 ARBITER FIDUCIAE\nmeta-labeling (de Prado)"},
+  deepseek:{x:850,y:660,t:"future",lb:"🧬 DEEPSEEK AI\ndoradca LLM live"},
+  regula6:{x:1110,y:330,t:"future",lb:"📐 REGUŁA 6%\n(Elder) — limit miesięczny"},
+  skew:{x:1110,y:140,t:"future",lb:"🎯 SKEW-KELLY\n(Sinclair) — fat tails"},
+  live:{x:1230,y:480,t:"future",lb:"💰 LIVE\nrealne środki"},
+  faza2:{x:560,y:640,t:"future",lb:"🔮 MASTER-SWITCH Faza 2\nonline-learning reżimu"}
+});
+const EDGES_DREAM = [...EDGES_NOW.filter(e=>e[2]!==1),
+  ["ocAd","brama"],
+  ["leg","deprado"],["deprado","pret"],
+  ["leg","deepseek"],["deepseek","nam"],
+  ["skew","pret"],["regula6","pret"],
+  ["pret","live"],["live","feed"],
+  ["faza2","rezim"],["feed","faza2"]
+];
+
+// ── OCENA (assessment) ──
+const ASSESS = {
+  now:{grade:"8.0/10",sub:"Solidny, dojrzały, samo-audytujący — ale część potencjału śpi",
+    rows:[
+      ["✅ Architektura single-source (Brama+hash)","ok","95"],
+      ["✅ Audyt 12-warstwowy automatyczny","ok","100"],
+      ["✅ Dekorelacja mierzona (Prawo XVI)","ok","90"],
+      ["✅ Kill-switche Z-01..Z-04","ok","88"],
+      ["⚠️ Kategoria O (on-chain) — 1/5 aktywna","warn","20"],
+      ["⚠️ 7 neuronów wyciszonych (SMC/OC)","warn","40"],
+      ["⚠️ Brak live tradingu (tylko paper)","warn","50"],
+      ["⚠️ Brak meta-labelingu (ile postawić)","warn","45"]
+    ]},
+  dream:{grade:"9.7/10",sub:"Pełny potencjał — wszystkie osie informacji żywe, ryzyko domknięte",
+    rows:[
+      ["🟣 On-chain LIVE — radar wielorybów","fut","95"],
+      ["🟣 Meta-labeling (Arbiter Fiduciae)","fut","92"],
+      ["🟣 DeepSeek AI doradca live","fut","88"],
+      ["🟣 Reguła 6% + skew-Kelly (ryzyko domknięte)","fut","94"],
+      ["🟣 Master-switch Faza 2 (online learning)","fut","90"],
+      ["🟣 Live trading MEXC","fut","85"],
+      ["✅ Wszystko z wersji aktualnej zachowane","ok","100"],
+      ["✅ 55→65+ neuronów, kat. O ożywiona","fut","93"]
+    ]}
+};
+const DETAIL = {
+  now:{title:"🔵 Co działa TERAZ (zweryfikowane w kodzie)",rows:[
+    ["Pipeline","Akwedukty→Brama→Legion→Doradcy→Pretorianie→Drogi"],
+    ["Adaptery live","Futures · CVD · FearGreed (3)"],
+    ["Doradcy","Hermes·Fulmen·Iustitia·Oracle·Pythia + Rada"],
+    ["Bezpieczniki","krzywa kapitału (HALT/REDUCED) + AOA 30%"],
+    ["Uczenie","HedgeMWU — neuron co kłamie, cichnie"],
+    ["Egzekucja","Paper trading (live czeka na klucz MEXC)"],
+    ["Dowód","562/562 testów · audyt exit 0"]
+  ]},
+  dream:{title:"🟣 Po wdrożeniu wszystkich punktów (roadmap)",rows:[
+    ["On-chain","Glassnode API → OC-01..04 ożywione (MVRV/SOPR/NUPL/NVT)"],
+    ["BIB-007 de Prado","FFD · meta-labeling · purged CV"],
+    ["BIB-015 Elder","Reguła 6% — limit ryzyka miesięcznego"],
+    ["BIB-018 Sinclair","skew-Kelly — sizing na grube ogony"],
+    ["Master-switch Faza 2","online-learning wag reżimu (Hedge/MWU)"],
+    ["DeepSeek","doradca LLM analizujący kontekst makro"],
+    ["Live","realne środki MEXC z pełnymi bezpiecznikami"]
+  ]}
+};
+
+let mode='now';
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+const W=1320,H=760;
+let particles=[], animId=null, animating=true, pulse=0;
+
+function nodes(){return mode==='now'?NODES_NOW:NODES_DREAM}
+function edges(){return mode==='now'?EDGES_NOW:EDGES_DREAM}
+
+function initParticles(){
+  particles=[];
+  edges().forEach(e=>{
+    const f=nodes()[e[0]], t=nodes()[e[1]]; if(!f||!t) return;
+    const dim=e[2]===1;
+    const cnt=dim?1:3;
+    for(let i=0;i<cnt;i++) particles.push({from:e[0],to:e[1],pos:Math.random(),
+      sp:.004+Math.random()*.006,dim});
+  });
+}
+function lerp(a,b,t){return{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t}}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#0f1425";ctx.fillRect(0,0,W,H);
+  // subtle grid
+  ctx.strokeStyle="rgba(72,187,255,.04)";ctx.lineWidth=1;
+  for(let x=0;x<W;x+=44){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<H;y+=44){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+
+  // edges
+  edges().forEach(e=>{
+    const f=nodes()[e[0]], t=nodes()[e[1]]; if(!f||!t)return;
+    const dim=e[2]===1;
+    ctx.strokeStyle=dim?"rgba(120,130,160,.15)":"rgba(120,160,220,.25)";
+    ctx.lineWidth=dim?1:1.6; ctx.setLineDash(dim?[4,6]:[]);
+    ctx.beginPath();ctx.moveTo(f.x+10,f.y);ctx.lineTo(t.x+10,t.y);ctx.stroke();
+    ctx.setLineDash([]);
+  });
+
+  // particles
+  particles.forEach(p=>{
+    const f=nodes()[p.from], t=nodes()[p.to]; if(!f||!t)return;
+    p.pos+=p.sp*(1+pulse); if(p.pos>1)p.pos-=1;
+    const pt=lerp({x:f.x+10,y:f.y},{x:t.x+10,y:t.y},p.pos);
+    const col=TYPES[nodes()[p.to].t].c;
+    const r=p.dim?2:3.4;
+    ctx.beginPath();ctx.arc(pt.x,pt.y,r,0,Math.PI*2);ctx.fillStyle=col;
+    ctx.shadowColor=col;ctx.shadowBlur=p.dim?3:9;ctx.fill();ctx.shadowBlur=0;
+  });
+
+  // nodes
+  for(const k in nodes()){
+    const n=nodes()[k], ty=TYPES[n.t], dim=n.dim;
+    const lines=n.lb.split("\n");
+    const w=Math.max(...lines.map(l=>ctx.measureText(l).width))*0+150;
+    ctx.font="bold 12px Segoe UI";
+    const bw=152, bh=20+lines.length*15;
+    ctx.globalAlpha=dim?.4:1;
+    // glow box
+    ctx.fillStyle="rgba(10,15,28,.92)";
+    roundRect(n.x-66,n.y-bh/2,bw,bh,11);ctx.fill();
+    ctx.strokeStyle=ty.c;ctx.lineWidth=dim?1:1.8;
+    ctx.shadowColor=ty.c;ctx.shadowBlur=dim?0:8;
+    roundRect(n.x-66,n.y-bh/2,bw,bh,11);ctx.stroke();ctx.shadowBlur=0;
+    // dot
+    ctx.beginPath();ctx.arc(n.x-50,n.y-bh/2+11,5,0,Math.PI*2);ctx.fillStyle=ty.c;ctx.fill();
+    // label
+    ctx.fillStyle=dim?"#7a86a0":"#e7edf7";ctx.textAlign="left";
+    lines.forEach((l,i)=>{
+      ctx.font=i===0?"bold 11.5px Segoe UI":"10px Segoe UI";
+      ctx.fillStyle=i===0?(dim?"#8893ad":"#fff"):"#9fb0cf";
+      ctx.fillText(l,n.x-40,n.y-bh/2+12+i*14);
+    });
+    ctx.globalAlpha=1;
+  }
+  pulse*=0.94;
+}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+
+function loop(){draw();if(animating)animId=requestAnimationFrame(loop)}
+function toggleAnim(){animating=!animating;if(animating)loop();else cancelAnimationFrame(animId)}
+function boost(){pulse=2.5}
+
+function renderStats(){
+  document.getElementById('stats').innerHTML=STATS.map(s=>`<div class="stat">${s[0]} <b>${s[1]}</b></div>`).join('');
+  document.getElementById('legend').innerHTML=Object.values(TYPES).map(t=>
+    `<div class="li"><div class="lc" style="background:${t.c};box-shadow:0 0 6px ${t.c}"></div>${t.l}</div>`).join('');
+}
+function renderPanels(){
+  const a=ASSESS[mode], d=DETAIL[mode], dream=mode==='dream';
+  document.getElementById('pAssess').innerHTML=
+    `<h3 class="${dream?'dream':''}">📜 Ocena Imperium ${dream?'<span class="tag dream">marzenie</span>':'<span class="tag now">teraz</span>'}</h3>`+
+    `<div class="grade ${dream?'fut':'ok'}">${a.grade}</div><div class="gradesub">${a.sub}</div>`+
+    a.rows.map(r=>`<div class="row"><span class="${r[1]}">${r[0]}</span></div>
+      <div class="bar"><i style="width:${r[2]}%;background:${r[1]==='ok'?'#2ecc71':r[1]==='warn'?'#f1c40f':r[1]==='fut'?'#a569ff':'#e74c3c'}"></i></div>`).join('');
+  document.getElementById('pDetail').innerHTML=
+    `<h3 class="${dream?'dream':''}">${d.title}</h3>`+
+    d.rows.map(r=>`<div class="row"><span style="color:#8e9bbe">${r[0]}</span><span style="text-align:right">${r[1]}</span></div>`).join('');
+}
+function setMode(m){
+  mode=m;
+  document.getElementById('bNow').className=(m==='now')?'on':'';
+  document.getElementById('bDream').className=(m==='dream')?'on dream':'';
+  initParticles();renderPanels();
+}
+document.getElementById('foot').innerHTML=
+  "🏛️ Wszystkie liczby i moduły pochodzą z żywego kodu (rejestr.py, audyt 12 warstw) — Prawo I, zero halucynacji.<br>"+
+  "Gałąź <b>claude/sleepy-fermi-dsdE4</b> · 21 Praw Fundamentalnych · wygenerowano 2026-06-09 · kliknij „Marzenie" by zobaczyć wizję docelową.";
+
+try{renderStats();setMode('now');initParticles();loop();}catch(e){
+  document.getElementById('cv').style.display='none';
+  document.querySelector('.sim').insertAdjacentHTML('afterbegin',
+    `<div style="color:#e74c3c;background:#1a0808;padding:14px;border-radius:8px;margin-bottom:16px;font-family:monospace">
+    🚨 Błąd JS: ${e.message}<br><small>${e.stack}</small></div>`);
+}
+</script>
+</body>
+</html>

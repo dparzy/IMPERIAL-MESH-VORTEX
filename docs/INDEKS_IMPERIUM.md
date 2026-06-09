@@ -67,6 +67,8 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 31 | `WIZJONER.md` | Wizjoner — brudnopis Imperium: rozmowy → wizje → zadania → kod | ✅ Aktywny |
 | 32 | `NAMIESTNIK.md` | **Namiestnik** — Regime + Timeframe-Aware Gating Network (reżim×styl → tryb/lewar/rynek/próg), tabela dowodowa, fazy | ✅ Aktywny |
 | 33 | `MANUAL_MIGRACJA_I_SYMULATOR.md` | **Manual migracji na laptopa (Windows/Fujitsu) + symulator live** — pełny pipeline, bramki wstrzymania long/short, weryfikacja doradców (Hermes ✅, Chimera ❌) | ✅ Aktywny |
+| 34 | `symulator_live.html` | **Symulator wizualny HTML (offline)** — animowany pipeline, rój 48 neuronów głosujący, 10 bramek, ścieżka pieniędzy, 4 scenariusze (trend/range/bańka/krach). Otwierany w przeglądarce | ✅ Aktywny |
+| 35 | `symulator_imperium.html` | **Symulator canvas (styl v1-5.1)** — animowane cząsteczki płynące przez moduły; przełącznik STAN AKTUALNY (ocena 8.0/10) ↔ MARZENIE (wizja docelowa 9.7/10 po wdrożeniu roadmapy) | ✅ Aktywny |
 
 ---
 

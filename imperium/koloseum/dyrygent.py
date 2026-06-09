@@ -51,6 +51,7 @@ from imperium.koloseum.paper_trading import (
 from imperium.koloseum.namiestnik import Namiestnik, get_namiestnik
 from imperium.pretorianie.kalkulator_lewara import (
     KalkulatorLewara, PlanPozycji, BezpiecznikKrzywejKapitalu,
+    RegulaSzesciuProcentEldera,
 )
 
 logger = logging.getLogger("Dyrygent")
@@ -86,6 +87,7 @@ class Dyrygent:
         namiestnik: Optional[Namiestnik] = None,
         adaptery: Optional[List[Any]] = None,
         breaker_krzywej: bool = True,
+        regula_6pct: bool = False,
     ) -> None:
         self.legatus = legatus
         self.kalkulator = kalkulator
@@ -110,6 +112,11 @@ class Dyrygent:
         # breaker_krzywej=False → wyłączony (opt-out, kompatybilność wsteczna).
         self.breaker_krzywej: Optional[BezpiecznikKrzywejKapitalu] = (
             BezpiecznikKrzywejKapitalu() if breaker_krzywej else None
+        )
+        # Reguła 6% Elder (BIB-015): miesięczny limit straty — meta-poziom ponad W-062.
+        # regula_6pct=True → aktywna (domyślnie wyłączona — opt-in, wymaga kapitału bazowego).
+        self.regula_6pct: Optional[RegulaSzesciuProcentEldera] = (
+            RegulaSzesciuProcentEldera() if regula_6pct else None
         )
 
     # ── Fabryka pełnego składu (produkcyjna — wymaga TA-Lib) ─────────────────
@@ -250,6 +257,8 @@ class Dyrygent:
             # Prawdziwe equity (wolny + zablokowany margin), NIE sam wolny kapitał —
             # inaczej breaker myli utylizację depozytu z drawdownem (Prawo XV).
             self.breaker_krzywej.aktualizuj(self.engine.kapital_calkowity)
+        if self.regula_6pct is not None:
+            self.regula_6pct.aktualizuj(self.engine.kapital_calkowity)
 
         plan = self.kalkulator.policz(
             symbol=symbol,
@@ -260,6 +269,7 @@ class Dyrygent:
             pewnosc=pewnosc,
             rezim=raport.rezim,
             breaker_krzywej=self.breaker_krzywej,
+            regula_6pct=self.regula_6pct,
         )
 
         if not plan.checklist_ok:

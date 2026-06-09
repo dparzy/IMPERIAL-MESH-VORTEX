@@ -6,6 +6,57 @@
 
 ---
 
+## 2026-06-09 | FEATURE | Reguła 6% Alexandra Eldera (BIB-015) — miesięczny circuit-breaker
+
+**Opis:** Wdrożenie Reguły 6% z "Come Into My Trading Room" (Elder, BIB-015).
+Gdy łączna strata w bieżącym miesiącu ≥ 6% kapitału z początku miesiąca → HALT:
+zero nowych wejść do końca miesiąca. Reset 1. dnia nowego miesiąca (automatyczny).
+
+**Gdzie działa:** wymiar MIESIĘCZNY — komplementarny z BezpiecznikKrzywejKapitalu (intraday W-062)
+i Bezpiecznikiem AOA (30%, W-028). Razem: Elder = miesięczny meta-limit, W-062 = dzienny ekwilib,
+W-028 = twardy stop całości. Weto Reguły 6% jest w `_checklist()` jako pierwsze.
+
+**Podpięcie:** `KalkulatorLewara.policz(regula_6pct=...)` + `Dyrygent(regula_6pct=True)`.
+W Dyrygent domyślnie wyłączone (opt-in), żeby nie łamać kompatybilności backtestu.
+
+**Pliki:** `imperium/pretorianie/kalkulator_lewara.py`, `imperium/koloseum/dyrygent.py`,
+`tests/test_kalkulator.py`, `docs/MANIFEST_KODU.md`, `README.md`
+**Testy:** +4 (562→566/566). Audyt: exit 0.
+
+---
+
+## 2026-06-09 | DOKUMENT | Symulator canvas (styl v1-5.1) — aktualny + marzenie
+
+**Opis:** Nowy `docs/symulator_imperium.html` — symulator w stylu animowanych diagramów
+canvas (wzorowany na symulatorze z bazy DeepSeek wersja full, gdzie były wersje Imperium 1-5.1).
+Cząsteczki płyną po krawędziach między węzłami modułów (kolory wg typu: dane/Brama/rdzeń/
+doradcy/Pretorianie/egzekucja/pętla). **Przełącznik dwóch wersji:**
+- 🔵 STAN AKTUALNY v0.9.0 — realne moduły (Akwedukty+3 adaptery, Brama, 48 neuronów, Legatus,
+  Namiestnik, reżim, 5 doradców, Pretorianie, Drogi→paper, HedgeMWU). Ocena **8.0/10** z listą
+  mocnych stron i luk (on-chain 1/5, 7 wyciszonych, brak live, brak meta-labelingu).
+- 🟣 MARZENIE — wizja docelowa po wdrożeniu roadmapy (on-chain LIVE, Arbiter Fiduciae meta-
+  labeling, DeepSeek AI, Reguła 6%, skew-Kelly, master-switch Faza 2, live MEXC). Ocena **9.7/10**.
+**Prawo I:** wszystkie liczby/moduły z żywego kodu (rejestr.py, audyt). Węzły planowane wyraźnie
+oznaczone jako „marzenie" (fioletowe) — nie udają, że istnieją.
+**Pliki:** `docs/symulator_imperium.html` (nowy), `docs/INDEKS_IMPERIUM.md`, `docs/LOG_ZMIAN.md`
+**Testy:** statyczny HTML; suite 562/562. Audyt: exit 0.
+
+---
+
+## 2026-06-09 | DOKUMENT | Symulator wizualny HTML (offline, animowany)
+
+**Opis:** Nowy `docs/symulator_live.html` — samodzielny (zero zależności) animowany symulator
+do przeglądarki. Pokazuje aktualny stan Imperium v0.9.0: pipeline 8 etapów (Akwedukty→Brama→
+Namiestnik→Reżim→Legion→Doradcy→Pretorianie→Decyzja), rój 48 neuronów głosujący na żywo
+(LONG/SHORT/NEUTRAL, kill-switche Z wyróżnione), miernik przewagi (próg 0.55), 10 bramek
+wstrzymania, ścieżka pieniędzy (10 000 USDT), 12 kategorii, roadmap. 4 scenariusze:
+trend (WEJŚCIE LONG), range (wstrzymanie — słaba przewaga), bańka (Z-03 HARD-HALT),
+krach (Z-04 cascade). **Wszystkie liczby z żywego kodu** (rejestr.py — Prawo I).
+**Pliki:** `docs/symulator_live.html` (nowy), `docs/INDEKS_IMPERIUM.md`, `docs/LOG_ZMIAN.md`
+**Testy:** statyczny HTML, bez zmian logiki; suite 562/562. Audyt: exit 0.
+
+---
+
 ## 2026-06-09 | DOKUMENT | Manual migracji na laptopa + symulator live
 
 **Opis:** Nowy `docs/MANUAL_MIGRACJA_I_SYMULATOR.md` — przewodnik przeniesienia

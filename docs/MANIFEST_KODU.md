@@ -266,6 +266,7 @@
 | BezpiecznikKapitalu (twardy circuit-breaker AOA 30%, W-028) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | BezpiecznikKrzywejKapitalu (Equity-Curve Circuit Breaker, W-062) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | Volatility Drag (W-130, Sinclair BIB-008 — erozja ½λ(λ−1)σ² lewara) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
+| RegulaSzesciuProcentEldera (Reguła 6% Elder BIB-015 — HALT gdy strata miesięczna ≥ 6%) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | PaperTradingEngine | `koloseum/paper_trading.py` | ✅ aktywny |
 | Dyrygent (orkiestrator cyklu end-to-end) | `koloseum/dyrygent.py` | ✅ aktywny |
 | Backtest (przejazd po historii) | `koloseum/backtest.py` | ✅ aktywny |

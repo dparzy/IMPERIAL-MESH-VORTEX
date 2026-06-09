@@ -1,6 +1,7 @@
 """Testy Kalkulatora Lewara — likwidacja, stop-loss, bezpiecznik AOA (W-028)."""
 
 import sys, os
+from datetime import date as _date
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from datetime import date

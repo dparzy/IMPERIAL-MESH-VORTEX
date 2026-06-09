@@ -250,7 +250,7 @@ function draw(){
     const pt=lerp({x:f.x+10,y:f.y},{x:t.x+10,y:t.y},p.pos);
     const col=TYPES[nodes()[p.to].t].c;
     const r=p.dim?2:3.4;
-    ctx.beginPath();ctx.arc(pt.x,pt.y,r,0,7);ctx.fillStyle=col;
+    ctx.beginPath();ctx.arc(pt.x,pt.y,r,0,Math.PI*2);ctx.fillStyle=col;
     ctx.shadowColor=col;ctx.shadowBlur=p.dim?3:9;ctx.fill();ctx.shadowBlur=0;
   });
 
@@ -269,7 +269,7 @@ function draw(){
     ctx.shadowColor=ty.c;ctx.shadowBlur=dim?0:8;
     roundRect(n.x-66,n.y-bh/2,bw,bh,11);ctx.stroke();ctx.shadowBlur=0;
     // dot
-    ctx.beginPath();ctx.arc(n.x-50,n.y-bh/2+11,5,0,7);ctx.fillStyle=ty.c;ctx.fill();
+    ctx.beginPath();ctx.arc(n.x-50,n.y-bh/2+11,5,0,Math.PI*2);ctx.fillStyle=ty.c;ctx.fill();
     // label
     ctx.fillStyle=dim?"#7a86a0":"#e7edf7";ctx.textAlign="left";
     lines.forEach((l,i)=>{
@@ -306,7 +306,6 @@ function renderPanels(){
 }
 function setMode(m){
   mode=m;
-  document.getElementById('bNow').className='on'===0?'':(m==='now'?'on':'');
   document.getElementById('bNow').className=(m==='now')?'on':'';
   document.getElementById('bDream').className=(m==='dream')?'on dream':'';
   initParticles();renderPanels();
@@ -315,7 +314,12 @@ document.getElementById('foot').innerHTML=
   "🏛️ Wszystkie liczby i moduły pochodzą z żywego kodu (rejestr.py, audyt 12 warstw) — Prawo I, zero halucynacji.<br>"+
   "Gałąź <b>claude/sleepy-fermi-dsdE4</b> · 21 Praw Fundamentalnych · wygenerowano 2026-06-09 · kliknij „Marzenie" by zobaczyć wizję docelową.";
 
-renderStats();setMode('now');initParticles();loop();
+try{renderStats();setMode('now');initParticles();loop();}catch(e){
+  document.getElementById('cv').style.display='none';
+  document.querySelector('.sim').insertAdjacentHTML('afterbegin',
+    `<div style="color:#e74c3c;background:#1a0808;padding:14px;border-radius:8px;margin-bottom:16px;font-family:monospace">
+    🚨 Błąd JS: ${e.message}<br><small>${e.stack}</small></div>`);
+}
 </script>
 </body>
 </html>

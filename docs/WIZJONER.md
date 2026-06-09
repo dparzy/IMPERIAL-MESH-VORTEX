@@ -2078,6 +2078,14 @@ Opisując czego CZŁOWIEK nie potrafi, Douglas opisuje SPECYFIKACJĘ dobrego aut
 - **W-263/W-272/W-274 (trzy przełączniki reżimu)** — mogą się wzajemnie nakładać; zredukować do jednego master-switcha.
 - **W-276 (basis/funding)** vs **Z-01 / EXP-05** — nakładka na mierniki toksyczności przepływu → zmierzyć.
 
+✅ **POMIAR WYKONANY (2026-06-09, `narzedzia/pomiar_dekorelacji_bib020.py`, BTC 1h, 6000 barów, 1446 kroków):**
+wszystkie wdrożone wizje BIB-020 **ortogonalne — ZERO redundancji** (żadne |r|>0.80):
+- Z-03 ~ Z-01: r=−0.052 🟢 · Z-04 ~ Z-03: r=+0.005 🟢 · Z-04 ~ Z-01: r=+0.018 🟢 (rodzina Z w pełni niezależna)
+- X-27 ~ X-04 (BBands): r=−0.046 🟢 · X-27 ~ X-01 (RSI): r=+0.187 🟢 (value-conv. na innym horyzoncie niż oscylatory)
+- VARIANCE_RATIO ~ RET_AR1: r=+0.228 🟡 · OU_HALFLIFE ~ HURST_DFA: r=+0.010 🟢 · VR ~ OU: r=+0.099 🟢 (master-switch zdrowy)
+- Żywotność: Z-03 984/1446 kroków, Z-04 12/1446 (kill-switch z natury rzadki) — **brak martwych głosów (Prawo XV)**.
+- **Wniosek:** flagi „do zmierzenia" zamknięte; nowe głosy to filary dywersyfikacji, kandydaci do PODNIESIENIA wag (nie scalenia).
+
 🚨 **Prawo XV (utrata potencjału) — BIB-020:** większość filarów (W-250, W-257, W-260, W-262, W-266, W-276) wymaga **danych L2 / order-flow / perp-basis z Bramy**, których dziś NIE mamy. Bez nich = martwy głos. **Najpierw Brama, potem neuron.** Wyjątki wykonalne **na samym OHLCV już dziś** (priorytet):
 - **W-263** — dekompozycja vol z serial-cov ← OHLCV ✅
 - **W-264** — Roll spread estimator ← OHLCV ✅

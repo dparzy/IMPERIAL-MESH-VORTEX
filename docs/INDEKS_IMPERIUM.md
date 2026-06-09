@@ -18,9 +18,9 @@
 |------------------|----------------------------------|
 | **Projekt**      | IMPERIUM — AI Crypto Trading     |
 | **Motto**        | Roma non est facta die una       |
-| **Wersja**       | v0.6.0                           |
-| **Faza**         | 🟡 Faza 1 — Namiestnik (Regime + Timeframe-Aware Gating) |
-| **Data**         | 2026-06-04                       |
+| **Wersja**       | v0.9.0                           |
+| **Faza**         | 🔄 Faza 1 — Namiestnik (Regime + Timeframe-Aware Gating) |
+| **Data**         | 2026-06-09                       |
 | **Giełda główna**| MEXC (konto zweryfikowane)       |
 | **Rdzeń AI**     | DeepSeek LLM via API             |
 
@@ -210,6 +210,7 @@ python imperium/pretorianie/veto_check.py
 | v0.3.0 | 2026-06-01 | Skan IV (+16 neuronów → 303), IGRZYSKA_IMPERIUM, PAMIEC_ABSOLUTNA, DORADCY_CARA, pamiec_absolutna.py |
 | v0.4.0 | 2026-06-02 | +Adaptery API, +5 neuronów (A-03/A-05/XII-06 + F-01..04), Prawo XX elitarny, WAGI_REZIMU, LOG_ZMIAN, ZPO, REJESTR_INSPIRACJI |
 | v0.5.0 | 2026-06-03 | +Namiestnik (Regime-Aware Gating), +Detektor Lookahead, +Timeframe-Aware (styl SCALP/SWING/INVEST, lewar_cap, futures/spot, filtr strategii po interwale), tabela dowodowa, 346 testów |
+| v0.9.0 | 2026-06-09 | Z-03/Z-04/X-27, master-switch reżimu Faza 1, BIB-020 (pomiar_dekorelacji), porządek docs: archiwizacja duplikatu, aktualizacja liczb; 55 neuronów, 558 testów |
 
 ---
 

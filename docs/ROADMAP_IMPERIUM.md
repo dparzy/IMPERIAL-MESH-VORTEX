@@ -1,9 +1,9 @@
 # 🏛️ ROADMAP IMPERIUM — MAPA DRÓG SYSTEMU
 
 **Dokument:** Plan rozwoju systemu IMPERIUM — AI crypto trading z motywem Cesarstwa Rzymskiego
-**Aktualna faza:** FAZA 0 — Fundament
-**Data:** 2026-06-01
-**Wersja:** v0.1-alpha
+**Aktualna faza:** FAZA 1 — Namiestnik (Regime + Timeframe-Aware Gating)
+**Data:** 2026-06-09
+**Wersja:** v0.9.0
 
 ---
 
@@ -24,9 +24,9 @@ BUDUJ → TESTUJ W KOLOSEUM → KALIBRUJ → WDRAŻAJ → ROZSZERZAJ
 
 ---
 
-## 🔄 FAZA 0 — Fundament *(TERAZ — aktualna)*
+## 🔄 FAZA 0 — Fundament *(UKOŃCZONA 2026-06-03)*
 
-**Status:** 🔄 W trakcie
+**Status:** ✅ Ukończona
 **Cel:** Pierwszy działający cykl na prawdziwych danych z minimalnymi modułami
 
 ### Wymagania techniczne
@@ -63,25 +63,40 @@ python imperium/legiony/pierwszy_zwiadowca.py
 
 ---
 
-## ⚡ FAZA 1 — Legiony *(najbliższe 1-3 miesiące)*
+## ⚡ FAZA 1 — Namiestnik *(TERAZ — aktualna)*
 
-**Status:** 📋 Zaplanowana
-**Cel:** 4 nazwane Legiony operacyjne z 20+ mikroneuronami każdy
+**Status:** 🔄 W trakcie
+**Cel:** Regime + Timeframe-Aware Gating Network — 55 neuronów, 558 testów, master-switch Reżimu Faza 1
 
-### Nowe moduły
+### Stan Fazy 1 (2026-06-09)
+
+| Kamień milowy | Status |
+|---------------|--------|
+| 55 neuronów w kodzie (48 aktywnych) | ✅ DONE |
+| 558 testów automatycznych (0 zależności) | ✅ DONE |
+| Namiestnik (Regime×Timeframe Gating) | ✅ DONE |
+| Master-switch reżimu Faza 1 | ✅ DONE |
+| BIB-020 (pomiar_dekorelacji tool) | ✅ DONE |
+| Neurony Z-03/Z-04/X-27 | ✅ DONE |
+| AdapterFutures + AdapterCVD + AdapterFearGreed | ✅ DONE |
+| Paper Trading Engine (TP/SL/LIQ/MAE/MFE) | ✅ DONE |
+
+### Dawne cele Fazy 1 (Legiony)
+
+### Legiony — docelowy skład
 
 | Legion | Specjalizacja | Aktualne neurony | Cel |
 |--------|--------------|-----------------|-----|
-| Legio X Equestris | Scalp (krótki termin) | 6 mikroneuronów | 15+ |
-| Legio XII Fulminata | Swing (średni termin) | 8 mikroneuronów | 20+ |
-| Legio III Augusta | Invest/Spot (długi termin) | 8 mikroneuronów | 15+ |
-| Legio VI Ferrata | Dźwignia *(najniebezpieczniejszy)* | 6 mikroneuronów | 10+ |
+| Legio X Equestris | Scalp (krótki termin) | ✅ aktywne | 15+ |
+| Legio XII Fulminata | Swing (średni termin) | ✅ aktywne | 20+ |
+| Legio III Augusta | Invest/Spot (długi termin) | ✅ aktywne | 15+ |
+| Legio VI Ferrata | Dźwignia *(najniebezpieczniejszy)* | ✅ aktywne | 10+ |
 
 ### Pozostałe cele Fazy 1
 
 - Debata Senatu w pełni operacyjna (**Populares** vs **Optimates**)
 - Koloseum uruchamia równoległe backtesty na każdej nowej strategii
-- **Cel łączny:** 79+ neuronów (jak system DNSS)
+- **Cel łączny:** 79+ neuronów (jak system DNSS) — 55 z 79 zaimplementowane
 
 ### Parametry operacyjne
 
@@ -162,7 +177,7 @@ python imperium/legiony/pierwszy_zwiadowca.py
 | v3.x | Faza 3 | Multi-giełda |
 | v4.x | Faza 4 | Autonomia |
 
-**Aktualna wersja: v0.1-alpha**
+**Aktualna wersja: v0.9.0** (55 neuronów, 558 testów, Namiestnik Faza 1)
 
 ---
 

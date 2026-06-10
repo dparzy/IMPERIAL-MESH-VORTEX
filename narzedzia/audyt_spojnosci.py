@@ -531,6 +531,10 @@ def _scenariusze_barow():
             b.append({
                 "open": p, "high": p * 1.012, "low": p * 0.988,
                 "close": p * (1 + random.gauss(0, 0.004)), "volume": v,
+                # Zegary rynku (SES-*): bary godzinowe od piątku 00:00 UTC
+                # (1970-01-02) — seria trafia w okno fundingu, piątek 21–23 UTC
+                # i domyka zakres Azji (budzi SES-01/SES-02 w scenariuszach).
+                "timestamp": 86_400_000 + i * 3_600_000,
             })
         out[typ] = b
     return out

@@ -55,6 +55,8 @@ def backtest(
     bary: Optional[List[Dict[str, Any]]] = None,
     auto_rezim: bool = False,
     ucz_mwu: bool = False,
+    min_pewnosc_interwalu: "Optional[Dict[str, float]]" = None,
+    max_bars_otwarcia: "Optional[int]" = None,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -84,12 +86,14 @@ def backtest(
     budowniczy = BudowniczyWskaznikow()
     suffix = "-AUTO" if auto_rezim else ""
     engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
-                                sesja_id=f"BT-{symbol}-{interwal}-{tryb}{suffix}")
+                                sesja_id=f"BT-{symbol}-{interwal}-{tryb}{suffix}",
+                                max_bars_otwarcia=max_bars_otwarcia)
     # auto_rezim → wstrzyknij Namiestnika (Regime-Aware Gating); inaczej tryb statyczny.
     namiestnik = get_namiestnik() if auto_rezim else None
     dyrygent = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(),
                         engine=engine, budowniczy=budowniczy,
-                        min_pewnosc=min_pewnosc, tryb=tryb, namiestnik=namiestnik)
+                        min_pewnosc=min_pewnosc, tryb=tryb, namiestnik=namiestnik,
+                        min_pewnosc_interwalu=min_pewnosc_interwalu)
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"
 
     # Pętla uczenia (opt-in): MWU z pamięcią reżimu + atrybucja głosów per pozycja
@@ -143,6 +147,8 @@ def backtest(
     #   from imperium.koloseum.walidacja import etap_pierwszy_koloseum
     #   werdykt = etap_pierwszy_koloseum(engine.krzywa_equity, engine.podsumowanie())
     engine.krzywa_equity = krzywa_equity
+    # Diagnostyka atrybucji (Faza B): raport MWU per neuron dostępny po przebiegu
+    engine.mwu = mwu
 
     logger.info(f"[Backtest] {symbol} {interwal}: {len(bary)} barów, "
                 f"{wejscia} wejść, {weta} wet Pretorianów")

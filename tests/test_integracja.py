@@ -51,7 +51,7 @@ def test_wagi_rezimowe_dzialaja():
 
 def test_rejestr_wszystkie_neurony():
     neurony = wszystkie_neurony()
-    assert len(neurony) == 56, f"Powinno być 56 neuronów, jest {len(neurony)}"
+    assert len(neurony) == 58, f"Powinno być 58 neuronów, jest {len(neurony)}"
 
 
 def test_rejestr_wszyscy_zwiadowcy():
@@ -65,7 +65,7 @@ def test_rejestr_wszyscy_zwiadowcy():
 
 def test_raport_potencjalu():
     rap = raport_potencjalu()
-    assert rap["neurony_lacznie"] == 56
+    assert rap["neurony_lacznie"] == 58
     assert rap["zwiadowcy_exp"] == 12
     # EXP-12 (L2) wyciszony do czasu feedu orderbook
     assert rap["zwiadowcy_wyciszeni"] >= 1
@@ -441,3 +441,51 @@ def test_kategorie_l_v_aktywne():
     assert vi13 is not None and vi13.DOSTEPNY
     assert v13 is not None and v13.DOSTEPNY
 
+
+
+# ── FAZA A (W-286): Formacja Legionów per interwał ──────────────────────────
+
+def test_formacja_1d_wycina_scalp():
+    """Na 1D neurony SCALP nie głosują; SWING+uniwersalne tak."""
+    leg = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    from imperium.legiony.mikro_neuron import SygnalNeuronu
+    syg = [SygnalNeuronu(neuron_id=f"N{i}", legion=lg, wskaznik="X", wartosc=1,
+                         kierunek="LONG", pewnosc=0.8, waga=5, kategoria="M")
+           for i, lg in enumerate(["SCALP", "SWING", "WSPOLNY", "STRAZ",
+                                   "VOLUME", "TREND", "EXPLORATORES"])]
+    w = leg._formacja_interwalu(syg, "1D")
+    legiony = {s.legion for s in w}
+    assert "SCALP" not in legiony, "SCALP nie gra na 1D"
+    assert {"SWING", "WSPOLNY", "EXPLORATORES"} <= legiony
+
+
+def test_formacja_m5_wycina_swing():
+    """Na M5 neurony SWING nie głosują; SCALP+uniwersalne tak."""
+    leg = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    from imperium.legiony.mikro_neuron import SygnalNeuronu
+    syg = [SygnalNeuronu(neuron_id=f"N{i}", legion=lg, wskaznik="X", wartosc=1,
+                         kierunek="LONG", pewnosc=0.8, waga=5, kategoria="M")
+           for i, lg in enumerate(["SCALP", "SWING", "WSPOLNY"])]
+    w = leg._formacja_interwalu(syg, "M5")
+    legiony = {s.legion for s in w}
+    assert "SWING" not in legiony and "SCALP" in legiony
+
+
+def test_formacja_1h_oba_style():
+    """1H = interwał przejściowy: SCALP i SWING grają razem."""
+    leg = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    from imperium.legiony.mikro_neuron import SygnalNeuronu
+    syg = [SygnalNeuronu(neuron_id=f"N{i}", legion=lg, wskaznik="X", wartosc=1,
+                         kierunek="LONG", pewnosc=0.8, waga=5, kategoria="M")
+           for i, lg in enumerate(["SCALP", "SWING"])]
+    assert len(leg._formacja_interwalu(syg, "1H")) == 2
+
+
+def test_formacja_nieznany_interwal_bez_filtra():
+    """Pusty/nieznany interwał → pełny rój (granica — stare zachowanie)."""
+    leg = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    from imperium.legiony.mikro_neuron import SygnalNeuronu
+    syg = [SygnalNeuronu(neuron_id="A", legion="SCALP", wskaznik="X", wartosc=1,
+                         kierunek="LONG", pewnosc=0.8, waga=5, kategoria="M")]
+    assert len(leg._formacja_interwalu(syg, "")) == 1
+    assert len(leg._formacja_interwalu(syg, "8H")) == 1

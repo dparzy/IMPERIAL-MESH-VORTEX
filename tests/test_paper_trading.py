@@ -214,3 +214,21 @@ def test_kapital_calkowity_odzwierciedla_strate():
     # Po zamknięciu całkowity = wolny (brak otwartych) i poniżej startowego
     assert e.kapital_calkowity == e.kapital
     assert e.kapital_calkowity < 10_000.0
+
+
+def test_max_bars_otwarcia_per_engine():
+    """FAZA B: TIMEOUT konfigurowalny per silnik; None → stała globalna."""
+    from imperium.koloseum.paper_trading import MAX_BARS_OTWARCIA
+    e_def = _engine()
+    assert e_def.max_bars_otwarcia == MAX_BARS_OTWARCIA
+    e_dlugi = PaperTradingEngine(kapital_startowy=10_000, sesja_id="T",
+                                 max_bars_otwarcia=144)
+    e_dlugi.wejdz(_sygnal(kierunek="LONG", wejscie=100.0, tp=200.0,
+                                sl=50.0, dzwignia=2))
+    # 100 barów bez TP/SL — przy limicie 144 pozycja ŻYJE (przy 48 by umarła)
+    for i in range(100):
+        e_dlugi.przetworz_bar(_bar(h=101.0, l=99.0, c=100.0))
+    assert len(e_dlugi.otwarte) == 1, "limit 144 nie może zamknąć po 100 barach"
+    for i in range(50):
+        e_dlugi.przetworz_bar(_bar(h=101.0, l=99.0, c=100.0))
+    assert len(e_dlugi.otwarte) == 0, "po 150 barach TIMEOUT musi zamknąć"

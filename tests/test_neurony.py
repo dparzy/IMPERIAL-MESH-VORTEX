@@ -1850,3 +1850,59 @@ def test_d01_staly_wolumen_neutral():
     s = n.interpretuj({"CLOSE_SERIES_20": closes, "VOLUME_SERIES_20": volumes})
     assert s.kierunek == "NEUTRAL", "Stały wolumen nie może dać sygnału kierunkowego"
     assert s.pewnosc == 0.0
+
+
+# ── SES-01/SES-02: Zegary Rynku (Faza C, W-286) ──────────────────────────────
+
+from imperium.legiony.neurony.sesje import NeuronZegarSesji, NeuronAzjaRange
+
+
+def test_ses01_okno_funding_ostroznosc():
+    """0–2h po settlement (00/08/16 UTC) → NEUTRAL z kontekstem ostrożności."""
+    n = NeuronZegarSesji()
+    H = 3_600_000
+    for baza in (0, 8 * H, 16 * H):          # wszystkie trzy settlementy
+        s = n.interpretuj({"TIMESTAMP": baza + H})       # 1h po
+        assert s.kierunek == "NEUTRAL" and s.pewnosc > 0.5
+    s2 = n.interpretuj({"TIMESTAMP": 0})                  # dokładnie settlement (granica)
+    assert s2.kierunek == "NEUTRAL" and s2.pewnosc > 0.5
+    s3 = n.interpretuj({"TIMESTAMP": 2 * H})              # dokładnie 2h (granica wyłączona)
+    assert s3.pewnosc < 0.5
+
+
+def test_ses01_piatek_2123_long_bias():
+    """Piątek 21–23 UTC → słaby LONG (sezonowość); czwartek 22 UTC → nie."""
+    n = NeuronZegarSesji()
+    # 1970-01-02 to piątek; 22:00 UTC
+    pt_22 = (1 * 86_400_000) + 22 * 3_600_000
+    assert n.interpretuj({"TIMESTAMP": pt_22}).kierunek == "LONG"
+    cz_22 = (0 * 86_400_000) + 22 * 3_600_000   # czwartek 1970-01-01
+    assert n.interpretuj({"TIMESTAMP": cz_22}).kierunek == "NEUTRAL"
+
+
+def test_ses01_brak_timestamp():
+    assert NeuronZegarSesji().interpretuj({}).kierunek == "NEUTRAL"
+
+
+def test_ses02_breakout_long_short_neutral():
+    n = NeuronAzjaRange()
+    w = {"ASIA_HIGH": 105.0, "ASIA_LOW": 100.0, "ASIA_GOTOWA": True}
+    assert n.interpretuj({**w, "CLOSE": 106.0}).kierunek == "LONG"
+    assert n.interpretuj({**w, "CLOSE": 99.0}).kierunek == "SHORT"
+    assert n.interpretuj({**w, "CLOSE": 102.0}).kierunek == "NEUTRAL"
+
+
+def test_ses02_granice():
+    """Azja trwa → NEUTRAL; zakres zdegenerowany → NEUTRAL; brak danych → NEUTRAL."""
+    n = NeuronAzjaRange()
+    s = n.interpretuj({"CLOSE": 110.0, "ASIA_HIGH": 105.0, "ASIA_LOW": 100.0,
+                       "ASIA_GOTOWA": False})
+    assert s.kierunek == "NEUTRAL", "niedomknięty zakres = brak sygnału (look-ahead!)"
+    z = n.interpretuj({"CLOSE": 110.0, "ASIA_HIGH": 100.0, "ASIA_LOW": 100.0,
+                       "ASIA_GOTOWA": True})
+    assert z.kierunek == "NEUTRAL"
+    assert n.interpretuj({"CLOSE": 110.0}).kierunek == "NEUTRAL"
+    # dokładnie na granicy zakresu (== high) → NEUTRAL, nie LONG
+    g = n.interpretuj({"CLOSE": 105.0, "ASIA_HIGH": 105.0, "ASIA_LOW": 100.0,
+                       "ASIA_GOTOWA": True})
+    assert g.kierunek == "NEUTRAL"

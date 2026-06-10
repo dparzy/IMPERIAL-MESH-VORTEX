@@ -6,6 +6,150 @@
 
 ---
 
+## 2026-06-10 | FAZA C (W-286) | ZEGARY RYNKU: SES-01/SES-02 — PRZEŁOM NA 1H (pierwszy Sharpe > 1.0!)
+
+**Zwiad (agent docs + deep search internet, pełne linki w neurony/sesje.py):**
+- Katalog: W-011 Azja Range Breakout = top kandydat (5/5, pure OHLCV+timestamp, kod czekał).
+- Internet: rytm fundingu 8h — spread peak ~2h po settlement 00/08/16 UTC (MDPI 2026,
+  badanie 26 giełd); sezonowość godzinowa BTC 21–23 UTC + efekt piątku (QuantPedia,
+  turn-of-the-candle PMC 2023). Wszystko liczone z SAMEGO TIMESTAMPU — działa w backteście.
+- ⚠️ W-010 CME Gap: agent ustalił, że CME handluje 24/7 od 29.05.2026 → strategia gapów
+  UMARŁA; w katalogu do rebrandu na Monday-effect.
+
+**Wdrożone (58 neuronów, 54 aktywne):**
+- **Budowniczy:** TIMESTAMP + ASIA_HIGH/ASIA_LOW/ASIA_GOTOWA (zakres 00–08 UTC bieżącej
+  doby; GOTOWA dopiero po 08:00 — bez look-ahead).
+- **SES-01 NeuronZegarSesji** (S, waga 4): 0–2h po settlement fundingu → kontekst
+  ostrożności; piątek 21–23 UTC → słaby LONG-bias. Kontekst, nie silnik.
+- **SES-02 NeuronAzjaRange** (S, waga 7, W-011): breakout/breakdown domkniętego zakresu
+  Azji, pewność rośnie z odległością od zakresu (cap 0.85).
+- W12 audytu: scenariusze syntetyczne dostały timestampy (piątek, godzinowe) — żywotność
+  SES-* weryfikowana co sesję. +7 testów granic (settlement dokładnie 0h/2h, close==high,
+  zakres zdegenerowany, Azja niedomknięta).
+
+**POMIAR (BTC, 4000 barów, AUTO, n_prob=4):**
+
+| Rynek | Wariant | Trades | WR | PF | MaxDD | PnL | Sharpe_r | DSR |
+|---|---|---|---|---|---|---|---|---|
+| 1H | baseline (przed) | 67 | 56.7% | 1.11 | 4.8% | +128 | 0.28 | 0.19 |
+| 1H | **+ZEGARY** | 65 | 52.3% | **1.59** | **2.5%** | **+540** | **1.47 ✅>1.0!** | 0.46 |
+| 4H | +ZEGARY | 74 | 41.9% | 0.59 | 14.5% | −1168 | −1.29 | 0.002 |
+
+**Werdykt PIERWOTNY:** 1H, 4000 barów: pierwszy Sharpe>1.0 w historii Imperium; DSR 0.46.
+
+**SUPLEMENT — dłuższa próba (Prawo I, bez lukru):** na 12000 barach 1H (≈16 mies.,
+2025-02→2026-06): trades=201, WR 49.3%, PF 0.72, Sharpe_r −1.34 → wynik się ODWRACA.
+**DSR 0.46 słusznie ostrzegał** — świetne okno 5,5-miesięczne nie jest stabilne w czasie;
+rok 2025 zjada strategię. To nie zegary zawiodły (kontekst, niska waga) — cały rój na 1H
+jest NIESTABILNY MIĘDZY OKRESAMI. Wnioski: (1) zegary SES-* zostają (tanie, badawczo
+uzasadnione, nieszkodliwe); (2) 1H NIE jest gotowe — następny krok: analiza per okres
+(czy strata skoncentrowana w jednym reżimie/krachu 2025?) i per para (5 par czeka);
+(3) nasza bramka DSR po raz kolejny obroniła przed wdrożeniem szczęśliwego okna.
+4H bez zmian (ziarno za grube dla sesji) — czeka na inne źródło przewagi.
+
+**Pliki:** `imperium/legiony/neurony/sesje.py` (nowy), `budowniczy_wskaznikow.py`,
+`rejestr.py`, `narzedzia/audyt_spojnosci.py` (W12 timestampy), `tests/test_neurony.py`,
+`tests/test_integracja.py`, docs (MANIFEST/README/INDEKS).
+**Testy:** 660/660 ✅. Audyt: pełna harmonia (58 neuronów).
+
+## 2026-06-10 | FAZA B (W-286) | Diagnoza 4H + grid TIMEOUT — bramka PBO ZABLOKOWAŁA kalibrację (wzorcowe!)
+
+**DIAGNOZA (atrybucja przez pętlę MWU + rozkład zamknięć, BTC 4H):**
+- **75% zamknięć = TIMEOUT** (54/72), tylko 2×TP vs 15×SL — pozycje umierają z czasu.
+- Przyczyna mechaniczna: `MAX_BARS_OTWARCIA=48` ŚWIEC stałe per system — 48 dni na 1D,
+  ale tylko 8 dni na 4H, podczas gdy TP (z dźwigni) wymaga podobnego ruchu %.
+- LONG i SHORT tracą symetrycznie → problem egzekucji wyjść, nie kierunku.
+- MWU najgorsi na 4H: XII-02 Ichimoku, H-01 Hurst, V-13, XII-05 Fibo, V-01 OBV.
+
+**MECHANIZMY (wdrożone, opt-in, zero regresji — +2 testy):**
+- `PaperTradingEngine(max_bars_otwarcia=N)` — TIMEOUT per silnik (None → stała stara).
+- `Dyrygent(min_pewnosc_interwalu={"4H": 0.65})` — próg pewności per interwał
+  (z Namiestnikiem: max(prog_reżimu, prog_interwału) — ostrzejszy wygrywa).
+- `backtest(...)` przelotowo wspiera oba.
+
+**GRID (BTC 4H, 4000 barów, AUTO; n_prob=4):**
+
+| max_bars | trades | WR | PF | PnL | DSR | TIMEOUT |
+|---|---|---|---|---|---|---|
+| 48 (baseline) | 74 | 41.9% | 0.59 | −1168 | 0.002 | 57 |
+| 96 | 45 | 37.8% | 0.85 | −382 | 0.072 | 29 |
+| 144 | 35 | 42.9% | **1.07** | **+167** | 0.193 | 18 |
+| 192 | 31 | 38.7% | 0.99 | −31 | 0.145 | 10 |
+| **PBO (CSCV, S=8)** | | | | | **0.614 ⛔** | |
+
+**WERDYKT (Prawo XVIII + W-282 — bramka obroniła nas przed samooszustwem):**
+Kierunek diagnozy POTWIERDZONY (monotoniczna poprawa z TIMEOUT), ale PBO=0.61 >> 0.20:
+wybór "najlepszego" wariantu z gridu to dopasowanie do szumu — zwycięzca in-sample
+niestabilny out-of-sample. NAJLEPSZY wariant i tak ledwo PF 1.07. **Wniosek:** edge
+dzienny roju NIE skaluje się na 4H przez samą mechanikę wyjść — 4H wymaga innego
+źródła przewagi (Faza C: mikrostruktura/scalp lub osobne wagi reżimowe — przyszły
+pomiar na WIĘKSZEJ próbie/wielu parach). Domyślne wartości BEZ ZMIAN; mechanizmy
+zostają jako narzędzia kalibracji.
+
+**To jest dokładnie po co zbudowaliśmy W-282** — pierwsza realna interwencja bramki.
+
+**Pliki:** `imperium/koloseum/paper_trading.py`, `imperium/koloseum/dyrygent.py`,
+`imperium/koloseum/backtest.py`, `tests/test_paper_trading.py`, `tests/test_dyrygent.py`.
+**Testy:** 655/655 ✅. Audyt: pełna harmonia.
+
+## 2026-06-10 | FAZA A (W-286) | Formacja Legionów per interwał — POMIAR: 1D lepsze, 4H czeka na Fazę B
+
+**Opis:** `Legatus._formacja_interwalu()` — na danym interwale głosują tylko neurony
+właściwego legionu: M1/M5/M15→SCALP; 1H→SCALP+SWING; 4H/1D/1W→SWING; uniwersalne
+(WSPOLNY/STRAZ/VOLUME/TREND/EXPLORATORES) zawsze; nieznany/pusty interwał → pełny rój
+(stare zachowanie, Prawo XV). +4 testy formacji (granice: 1D bez SCALP, M5 bez SWING,
+1H oba, nieznany bez filtra).
+
+**POMIAR (BTC, AUTO, n_prob=4) — formacja vs baseline z wcześniejszych testów:**
+
+| Rynek | Wariant | Trades | WR | PF | PnL | Sharpe_r | DSR |
+|---|---|---|---|---|---|---|---|
+| BTC 1D | baseline | 59 | 55.9% | 2.23 | +3622 | 0.825 | 0.938 |
+| BTC 1D | **FORMACJA** | 61 | 55.7% | **2.26** | **+3934** | **0.859** | **0.954 ✅>0.95** |
+| BTC 4H | baseline | 73 | 43.8% | 0.61 | −1012 | −1.18 | 0.003 |
+| BTC 4H | FORMACJA | 74 | 41.9% | 0.59 | −1168 | −1.29 | 0.002 |
+
+**Werdykt (Prawo XVIII):** Faza A PRZYJĘTA — na 1D poprawia wszystko (PnL +9%, DSR
+przekracza próg 0.95; do Etapu I brakuje już TYLKO Sharpe 0.86→1.0). Na 4H sama
+formacja nie wystarcza (problem leży w wagach reżimu/progach, nie w składzie roju) —
+dokładnie po to jest **Faza B: kalibracja per interwał** (następna sesja, pod bramką
+DSR/PBO). Plan W-286 (A✅→B→C) zapisany w WIZJONER.
+
+**Pliki:** `imperium/legiony/legatus.py`, `tests/test_integracja.py` (+4), `docs/WIZJONER.md`.
+**Testy:** 653/653 ✅. Audyt: pełna harmonia.
+
+## 2026-06-10 | NARZĘDZIE+POMIAR | Agregator 4H (5 par z 1H) + test bojowy 4H
+
+**Opis:** `narzedzia/agreguj_4h.py` — buduje bary 4H z 1H po siatce UTC (open/max/min/
+close/suma; NIEPEŁNE okna odrzucane — Prawo I). Wynik: 5 plików `dane/4h/Binance_*_4h.csv`
+(12.1k–18.6k barów, do 2026-06-08), prosty format Imperium, czytnik czyta wprost.
++2 testy (kompletność okna, luka w środku).
+
+**TEST BOJOWY 4H (4000 barów, AUTO, n_prob=4):**
+- BTC 4H: 73 trades, WR 43.8%, PF 0.61, PnL −1012, Sharpe_r −1.18 → ⛔ (STRATA!)
+- SOL 4H: 80 trades, WR 51.2%, PF 1.11, PnL +493, Sharpe_r 0.30 → ⛔
+
+**Werdykt (Prawo I):** rój w obecnej kalibracji jest GRACZEM DZIENNYM — edge na 1D
+(PF 2.23), brak na 1H (1.11), strata na 4H BTC (0.61). Progi/wagi/strategie wymagają
+kalibracji per interwał ZANIM pomyślimy o scalpie. To jest GŁÓWNE zadanie następnej
+sesji — teraz mamy do tego pełne dane (5 par × 1D/4H/1H do 2026-06-08).
+
+**Pliki:** `narzedzia/agreguj_4h.py` (nowy), `dane/4h/*` (5), `tests/test_czytnik_csv.py`.
+**Testy:** 649/649 ✅. Audyt: pełna harmonia.
+
+## 2026-06-10 | DANE+FIX | Świeże dane 5 par (1D+1H do 2026-06-08) + brud µs w CDD naprawiony w czytniku
+
+**Opis:** Cezar dostarczył 10 plików CryptoDataDownload (BTC/ETH/SOL/BNB/DOGE × 1D+1H,
+pełne historie do 2026-06-08). Weryfikacja wykryła REALNY BRUD ŹRÓDŁOWY: pliki 1h
+mieszają wiersze z unixem w MILISEKUNDACH i ~700/parę w MIKROSEKUNDACH (×1000 za duże,
+marzec 2025) → daty "rok 57163". Fix w `czytnik_csv._parse_ts`: heurystyka >1e14 → µs ÷1000;
+plus deduplikacja po timestamp (duble µs/ms tej samej świecy — zostaje nowszy wpis).
+Po fixie: 5×1H monotoniczne ✅ (49.6k–75.7k barów), 5×1D świeże ✅.
+
+**Pliki:** `dane/dzienne/*` (5), `dane/godzinowe/*` (5), `imperium/akwedukty/czytnik_csv.py`,
+`tests/test_czytnik_csv.py` (+2 testy granic heurystyki i dedup).
+**Testy:** 647/647 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | FEATURE | CLI backtestu z werdyktem Etapu I + flagi --auto/--ucz
 
 **Opis:** Każdy backtest z linii poleceń kończy się teraz JAWNYM werdyktem bramki

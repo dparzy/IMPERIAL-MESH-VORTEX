@@ -147,3 +147,66 @@ def test_eth_naglowek_volume_eth():
         assert bary[0]["volume"] == 795.15  # nadal wolumen bazowy (Volume ETH)
     finally:
         os.unlink(p)
+
+
+def test_unix_mikrosekundy_normalizowane():
+    """Brud CDD 2025+: unix w µs (>1e14) → ÷1000 do ms (granica heurystyki)."""
+    from imperium.akwedukty.czytnik_csv import _parse_ts
+    assert _parse_ts("1741734000000000") == 1741734000000   # µs → ms
+    assert _parse_ts("1741734000000") == 1741734000000      # ms zostaje
+    assert _parse_ts("1741734000") == 1741734000000         # s → ms
+
+
+def test_duplikaty_timestamp_deduplikowane(tmp_sciezka=None):
+    """Wiersze µs+ms tej samej świecy → po normalizacji zostaje jedna."""
+    import tempfile, os
+    from imperium.akwedukty.czytnik_csv import wczytaj_csv
+    tresc = (
+        "https://www.CryptoDataDownload.com\n"
+        "Unix,Date,Symbol,Open,High,Low,Close,Volume BTC,Volume USDT,tradecount\n"
+        "1741734000000000,2025-03-11,BTCUSDT,1,2,0.5,1.5,10,15,5\n"
+        "1741734000000,2025-03-11,BTCUSDT,1,2,0.5,1.6,11,16,6\n"
+        "1741737600000,2025-03-11,BTCUSDT,2,3,1.5,2.5,12,17,7\n"
+    )
+    with tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False) as f:
+        f.write(tresc); sciezka = f.name
+    try:
+        bary = wczytaj_csv(sciezka, interwal="1H")
+        assert len(bary) == 2, f"duplikat µs/ms ma zniknąć, jest {len(bary)}"
+        assert bary[0]["timestamp"] == 1741734000000
+    finally:
+        os.unlink(sciezka)
+
+
+def test_agregacja_4h_kompletne_okna():
+    """Agregator 4H: OHLCV poprawne, niepełne okna odrzucone (Prawo I)."""
+    import sys, os as _os
+    sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), "..", "narzedzia"))
+    from agreguj_4h import agreguj_4h, CZTERY_H_MS
+    h = 3600 * 1000
+    # 4 pełne godziny od północy + 2 luźne (niepełne okno) → 1 bar 4H
+    bary = [
+        {"timestamp": 0*h, "open": 10, "high": 12, "low": 9,  "close": 11, "volume": 1},
+        {"timestamp": 1*h, "open": 11, "high": 15, "low": 10, "close": 14, "volume": 2},
+        {"timestamp": 2*h, "open": 14, "high": 14, "low": 8,  "close": 9,  "volume": 3},
+        {"timestamp": 3*h, "open": 9,  "high": 10, "low": 9,  "close": 10, "volume": 4},
+        {"timestamp": 4*h, "open": 10, "high": 11, "low": 10, "close": 11, "volume": 5},
+        {"timestamp": 5*h, "open": 11, "high": 12, "low": 11, "close": 12, "volume": 6},
+    ]
+    w = agreguj_4h(bary)
+    assert len(w) == 1, "niepełne okno (2/4 barów) musi być odrzucone"
+    b = w[0]
+    assert b["timestamp"] == 0 and b["open"] == 10 and b["close"] == 10
+    assert b["high"] == 15 and b["low"] == 8 and b["volume"] == 10
+    assert CZTERY_H_MS == 4 * h
+
+
+def test_agregacja_4h_luka_w_srodku():
+    """Luka godzinowa w środku okna → okno 3/4 odrzucone (granica kompletności)."""
+    import sys, os as _os
+    sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), "..", "narzedzia"))
+    from agreguj_4h import agreguj_4h
+    h = 3600 * 1000
+    bary = [{"timestamp": t*h, "open": 1, "high": 2, "low": 0.5, "close": 1.5,
+             "volume": 1} for t in (0, 1, 3)]   # brak godziny 2
+    assert agreguj_4h(bary) == []

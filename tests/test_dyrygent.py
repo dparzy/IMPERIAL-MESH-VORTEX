@@ -173,3 +173,26 @@ def test_pelny_cykl_z_zarzadzaniem_pozycja():
         assert zamkniete[0].powod_zamkniecia == "TP_HIT"
         assert zamkniete[0].pnl_usdt > 0  # TP = zysk
         assert len(d.engine.otwarte) == 0
+
+
+def test_min_pewnosc_interwalu_nadpisuje_globalny():
+    """FAZA B: próg per interwał ostrzejszy niż globalny blokuje wejście."""
+    wsk = {"CLOSE": 130.0, "RSI_14": 22.0, "ADX_14": 30.0,
+           "MACD_HIST": 1.5, "EMA_50": 120.0, "EMA_200": 110.0}
+    legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    engine = PaperTradingEngine(kapital_startowy=10_000, sesja_id="T")
+    d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
+                 wskazniki_provider=lambda b: dict(wsk), min_pewnosc=0.1,
+                 min_pewnosc_interwalu={"1H": 0.99})
+    bary = _bary()
+    dec = d.cykl("BTCUSDT", bary)   # _bary() ma interwal=1H
+    assert not dec.wszedl and dec.etap in ("LEGATUS_SLABY", "LEGATUS_NEUTRAL",
+                                           "PRETORIANIE_WETO"), \
+        f"próg 0.99 na 1H musi blokować, etap={dec.etap}"
+    # bez wpisu dla interwału → próg globalny 0.1 (kontrola, że mapa nie psuje)
+    d2 = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(),
+                  engine=PaperTradingEngine(kapital_startowy=10_000, sesja_id="T2"),
+                  wskazniki_provider=lambda b: dict(wsk), min_pewnosc=0.1,
+                  min_pewnosc_interwalu={"4H": 0.99})
+    dec2 = d2.cykl("BTCUSDT", bary)
+    assert dec2.etap != "LEGATUS_SLABY" or dec2.pewnosc < 0.1

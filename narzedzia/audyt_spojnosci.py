@@ -6,7 +6,7 @@ Uruchamiany automatycznie przez hooki Claude Code (SessionStart + Stop) oraz rę
     python narzedzia/audyt_spojnosci.py            # raport + exit code
     python narzedzia/audyt_spojnosci.py --cichy     # tylko gdy są błędy
 
-Sprawdza 12 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
+Sprawdza 13 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 1  — żywy rój:        liczby, kategorie, elity, klucze
   Warstwa 2  — infrastruktura:  WAGI_REZIMU vs KAT w kodzie
   Warstwa 3  — dokumentacja:    MANIFEST klucze vs kod, liczby README/MANIFEST/CLAUDE
@@ -302,33 +302,31 @@ def audyt() -> tuple:
     except Exception as e:
         bledy.append(f"[W7] Błąd sprawdzania sierot/linków: {e}")
 
-    # ── WARSTWA 8: LOG_ZMIAN — świeżość ─────────────────────────────────────
+    # ── WARSTWA 8: LOG_ZMIAN — świeżość (git, NIE mtime) ────────────────────
+    # mtime systemu plików jest bezużyteczny po świeżym klonie/resetcie kontenera
+    # (wszystkie pliki dostają „teraz"). Używamy git: czy są zmienione pliki .py
+    # (staged + working tree) bez wpisu w LOG_ZMIAN z dzisiejszą datą.
     try:
-        import glob
-
         log = _czytaj("docs/LOG_ZMIAN.md")
-
-        # Ostatnia data w logu (format: ## YYYY-MM-DD)
         log_dates = re.findall(r"^## (\d{4}-\d{2}-\d{2})", log, re.M)
-        if log_dates:
-            last_log_date = date.fromisoformat(sorted(log_dates)[-1])
-
-            # Znajdź najnowszy plik .py w imperium/ (mtime)
-            py_files = glob.glob(os.path.join(ROOT, "imperium", "**", "*.py"), recursive=True)
-            if py_files:
-                newest_py = max(py_files, key=os.path.getmtime)
-                newest_mtime = date.fromtimestamp(os.path.getmtime(newest_py))
-
-                if newest_mtime > last_log_date:
-                    rel = os.path.relpath(newest_py, ROOT)
-                    bledy.append(
-                        f"[W8] Kod zmieniony ({rel}, {newest_mtime}) "
-                        f"po ostatnim wpisie w LOG_ZMIAN ({last_log_date}). "
-                        f"Dodaj wpis do docs/LOG_ZMIAN.md."
-                    )
-        else:
+        if not log_dates:
             bledy.append("[W8] docs/LOG_ZMIAN.md nie zawiera żadnej daty (format: ## YYYY-MM-DD)")
-
+        else:
+            last_log_date = date.fromisoformat(sorted(log_dates)[-1])
+            zmienione = set()
+            for args in (["diff", "--name-only", "HEAD"], ["diff", "--cached", "--name-only"]):
+                try:
+                    out = subprocess.run(["git", *args], cwd=ROOT, capture_output=True,
+                                         text=True, timeout=20).stdout
+                    zmienione |= {l for l in out.splitlines()
+                                  if l.startswith(("imperium/", "narzedzia/")) and l.endswith(".py")}
+                except Exception:
+                    pass
+            if zmienione and date.today() > last_log_date:
+                bledy.append(
+                    f"[W8] Kod .py zmieniony ({sorted(zmienione)[:3]}) bez wpisu w "
+                    f"LOG_ZMIAN z dzisiejszą datą (ostatni: {last_log_date}). Dodaj wpis."
+                )
     except Exception as e:
         bledy.append(f"[W8] Błąd sprawdzania świeżości LOG_ZMIAN: {e}")
 

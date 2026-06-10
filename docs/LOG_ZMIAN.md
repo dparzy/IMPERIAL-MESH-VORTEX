@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-10 | FIX | Warstwa 8 audytu — świeżość LOG przez git, nie mtime (fałszywy alarm po resecie)
+
+**Opis:** W8 (świeżość LOG_ZMIAN) używała `os.path.getmtime` — bezużytecznego po
+świeżym klonie/resecie kontenera: git ustawia mtime wszystkich plików na „teraz",
+więc audyt fałszywie raportował „kod zmieniony po ostatnim wpisie", mimo że treść
+== ostatni commit (working tree czysty). Naprawiono: W8 wykrywa zmienione pliki .py
+przez **git** (`git diff HEAD` + `git diff --cached`) w `imperium/` i `narzedzia/`,
+flaguje tylko gdy są REALNE zmiany bez wpisu LOG z dzisiejszą datą. Deterministyczne
+w CI/świeżym klonie. Przy okazji: docstring „12 warstw" → „13 warstw".
+
+**Dlaczego ważne:** bramka pre-commit była krucha — mogła blokować (lub przepuszczać)
+zależnie od mtime, nie treści. Teraz sygnał = faktyczna zmiana kodu (git), nie zegar.
+
+**Pliki:** `narzedzia/audyt_spojnosci.py`.
+**Testy:** 586/586 ✅. Audyt: 13 warstw, pełna harmonia (exit 0), ruff czysto.
+
+---
+
 ## 2026-06-09 | INFRA | Wykrywanie bugów: ruff (Warstwa 13) + reguła test-granic + adversarial review
 
 **Kontekst:** Cezar zapytał, czemu zewnętrzny recenzent (cubic) łapie bugi, a my nie.

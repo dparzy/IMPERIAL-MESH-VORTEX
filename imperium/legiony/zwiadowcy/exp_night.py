@@ -27,7 +27,7 @@ Filtry (potrójna bramka):
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 
-from .baza import ZwiadowcaElitarny, RaportZwiadowcy, TypDanych
+from .baza import ZwiadowcaElitarny, RaportZwiadowcy
 
 
 def _atr_series(bary: List[Dict]) -> List[float]:

@@ -7,7 +7,7 @@ OdciskPalca = (rezim, interwal, kierunek, pewnosc_bin, funding_bin, atr_bin)
 import statistics
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import List
 
 
 class WerdyktPythia(str, Enum):

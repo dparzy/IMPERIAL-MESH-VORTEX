@@ -120,8 +120,6 @@ class NeuronCVD(MikroNeuron):
         if cvd is None:
             return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak CVD"])
 
-        powody = []
-
         # Dywergencja
         if cvd_prev is not None and close is not None and close_prev is not None:
             cvd_rosnie = cvd > cvd_prev
@@ -210,7 +208,13 @@ class NeuronForceIndex(MikroNeuron):
         if fi13 is None:
             return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak Force Index"])
 
-        # Trend średnioterminowy (2. ekran)
+        # FI(13) == 0 → brak przewagi byków/niedźwiedzi (płaska siła trendu) → NEUTRAL.
+        # Nie zgadujemy kierunku na zerze (Prawo XV — bez fałszywego głosu).
+        if fi13 == 0:
+            return self._bazowy_sygnal(fi13, "NEUTRAL", 0.10,
+                ["Force Index(13)=0 — brak przewagi byków/niedźwiedzi"])
+
+        # Trend średnioterminowy (2. ekran) — znak FI(13) ściśle dodatni/ujemny
         trend_long = fi13 > 0
 
         if fi2 is None:
@@ -218,6 +222,13 @@ class NeuronForceIndex(MikroNeuron):
             kierunek = "LONG" if trend_long else "SHORT"
             return self._bazowy_sygnal(fi13, kierunek, 0.55,
                 [f"Force Index(13)={fi13:.0f} — {'byki' if trend_long else 'niedźwiedzie'}"])
+
+        # FI(2) == 0 → krótkoterminowa siła płaska, brak triggera wejścia → słaby głos trendu
+        # (nie spadamy implicytnie do SHORT — to był błąd graniczny przy trendzie↑).
+        if fi2 == 0:
+            kierunek = "LONG" if trend_long else "SHORT"
+            return self._bazowy_sygnal(fi13, kierunek, 0.40,
+                [f"FI(2)=0 brak triggera — słaby głos trendu FI(13)={fi13:.0f}"])
 
         # Pullback Eldera: trend↑ + FI(2)<0 = okazja LONG (kupuj słabość w sile)
         if trend_long and fi2 < 0:
@@ -227,11 +238,12 @@ class NeuronForceIndex(MikroNeuron):
             return self._bazowy_sygnal(fi13, "SHORT", 0.80,
                 [f"Odbicie Eldera: FI(13)={fi13:.0f}<0 (trend↓), FI(2)={fi2:.0f}>0 — sprzedaj siłę"])
 
-        # Momentum zgodny w obu skalach (słabszy sygnał — ruch już trwa)
-        if trend_long and fi2 > 0:
+        # Momentum zgodny w obu skalach (słabszy sygnał — ruch już trwa).
+        # Tu pozostają tylko: (trend↑ & FI(2)>0) → LONG, (trend↓ & FI(2)<0) → SHORT.
+        if trend_long:   # fi2 > 0
             return self._bazowy_sygnal(fi13, "LONG", 0.58,
                 [f"Force Index zgodny↑: FI(13)={fi13:.0f}, FI(2)={fi2:.0f} — byki napierają"])
-        return self._bazowy_sygnal(fi13, "SHORT", 0.58,
+        return self._bazowy_sygnal(fi13, "SHORT", 0.58,   # not trend_long & fi2 < 0
             [f"Force Index zgodny↓: FI(13)={fi13:.0f}, FI(2)={fi2:.0f} — niedźwiedzie napierają"])
 
 

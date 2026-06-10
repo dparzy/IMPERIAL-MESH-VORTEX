@@ -18,9 +18,8 @@ Ulepszenia względem oryginału MSX:
   5. Filtr reżimu blokuje sygnały w konsolidacji
 """
 
-import math
 import time
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 from .baza import ZwiadowcaElitarny, RaportZwiadowcy, TypDanych
 

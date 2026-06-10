@@ -28,7 +28,7 @@ Prawo XV: Gdy rezim=PANIC lub czy_grac=False → cisza (świadoma, nie błąd).
 Prawo XVI: Parametry taablicy mają tabele dowodową w docs/MANIFEST_KODU.md.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, Optional
 import logging
 

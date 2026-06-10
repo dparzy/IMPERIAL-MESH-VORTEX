@@ -164,6 +164,6 @@ class NeuronOIDiv(MikroNeuron):
                 [f"OI rośnie (+{oi_zmiana_pct:.1%}) + cena↓ — potwierdzona siła BEAR"])
         if cena_rosnie and not oi_rosnie:
             return self._bazowy_sygnal(oi, "SHORT", 0.60,
-                [f"DYWERGENCJA: cena↑ ale OI spada — słaby wzrost, dużo zamknięć"])
+                ["DYWERGENCJA: cena↑ ale OI spada — słaby wzrost, dużo zamknięć"])
         return self._bazowy_sygnal(oi, "LONG", 0.60,
-            [f"DYWERGENCJA: cena↓ ale OI spada — krótcy zamykają pozycje"])
+            ["DYWERGENCJA: cena↓ ale OI spada — krótcy zamykają pozycje"])

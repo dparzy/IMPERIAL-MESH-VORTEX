@@ -4,7 +4,7 @@ import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from imperium.biblioteki.igrzyska import (
-    Igrzyska, StatystykaNeuronu, okresl_range, _przeciwny, PROG_INFAMII,
+    Igrzyska, StatystykaNeuronu, okresl_range, _przeciwny,
 )
 
 

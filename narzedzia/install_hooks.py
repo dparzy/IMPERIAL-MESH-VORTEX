@@ -12,7 +12,6 @@ Instaluje:
 import os
 import shutil
 import stat
-import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOOKS_DIR = os.path.join(ROOT, ".git", "hooks")

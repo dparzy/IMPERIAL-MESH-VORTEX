@@ -129,6 +129,8 @@ Checklist Prawa XIX (sprawdzaj na początku sesji):
 - [ ] **Warstwa 2B (Budowniczy):** każdy WSKAZNIK aktywnego neuronu jest produkowany przez Budowniczego (`wskazniki["KLUCZ"]` w kodzie)
 - [ ] **Warstwa 3 (MANIFEST):** KLUCZ w tabeli = n.KLUCZ w kodzie — żadnych aliasów, żadnych starych nazw
 - [ ] **Warstwa 3 (README):** liczba neuronów, testy, prawa = liczby z kodu (policzone, nie z pamięci)
+- [ ] **Warstwa 13 (ruff):** linter czysty — zero bugów/martwego kodu (F811 duplikaty, F821 undefined, F841/F401 martwe). Audyt uruchamia ruff automatycznie.
+- [ ] **Testy granic:** każdy neuron/moduł z PROGAMI ma testy wartości granicznych (0/None/±/dokładnie-próg) — patrz Reguła Test-Granic niżej
 - [ ] **Data "Stan na:"** w MANIFEST i README = data bieżącego commitu
 
 **9 Nienaruszalnych Reguł (pełne: ZASADY_FUNDAMENTALNE.md § PRAWO XXI):**
@@ -141,6 +143,23 @@ Checklist Prawa XIX (sprawdzaj na początku sesji):
 7. Testy zielone przed każdym push
 8. Liczby w README/MANIFEST policzone, nie zaokrąglone
 9. Data "Stan na:" = data commitu
+10. **Ruff czysty (W13)** — żaden commit z F811/F821/F841/F401 (lekcja z recenzji cubic 2026-06-09)
+
+### 🎯 REGUŁA TEST-GRANIC (rozszerzenie Prawa XXI — ROZKAZ STAŁY, 2026-06-09)
+
+**Każdy moduł podejmujący decyzję na PROGU/ZNAKU musi mieć testy wartości granicznych.**
+Lekcja: recenzent (cubic) łapał bugi, których nie łapaliśmy, bo testowaliśmy tylko
+ścieżkę „happy path", którą właśnie napisaliśmy — nigdy granic. Autor testuje co
+ZAMIERZAŁ; recenzent testuje co MOŻE PÓJŚĆ ŹLE. Wymuszamy drugą perspektywę:
+
+- [ ] **Zero/None:** wartość dokładnie 0 i brak danych (None) — czy nie spada do
+      przeciwnego kierunku? (bug Force Index `fi2==0` → SHORT w trendzie↑)
+- [ ] **Znak graniczny:** `>0`, `==0`, `<0` — każdy gałąź osobno
+- [ ] **Próg dokładny:** wartość == próg (≥ vs >) — np. strata == 6%, ADX == 25
+- [ ] **Trwałość stanu:** stan który deklaruje „do końca X" faktycznie trwa
+      (bug Reguły 6% — HALT zdejmowany przy chwilowym odrobieniu)
+
+**Złamanie:** neuron/bezpiecznik z progiem bez testu granicy = niepełne pokrycie Prawa XXI.
 
 **Złamanie Prawa XXI:** commit z rozbieżnością między kodem a dokumentacją.
 
@@ -180,9 +199,17 @@ Cezar nie chce klikać przy każdej zmianie. Działasz autonomicznie wg zasad:
 **Przed każdym auto-commitem — obowiązkowa bramka (Prawo XXI):**
 ```bash
 python tests/run_tests.py          # musi: X/X zielone
-python narzedzia/audyt_spojnosci.py # musi: exit 0 (pełna harmonia)
+python narzedzia/audyt_spojnosci.py # musi: exit 0 (pełna harmonia — w tym Warstwa 13 ruff)
 ```
-Jeśli którakolwiek czerwona → NIE commitujesz, naprawiasz, dopiero potem commit+push.
+Audyt zawiera teraz **Warstwę 13 (ruff)** — linter łapie bugi/martwy kod (duplikaty
+klas, niezdefiniowane nazwy, martwe zmienne). Jeśli którakolwiek czerwona → NIE
+commitujesz, naprawiasz, dopiero potem commit+push.
+
+**Przed każdym PUSH — adversarial samo-recenzja (ROZKAZ STAŁY, 2026-06-09):**
+Uruchom `/code-review` na diffie (skill harnessa) — wrogi przegląd logiki/granic,
+ta sama perspektywa co zewnętrzny recenzent (cubic). Łapie błędy granic i kontradykcje,
+których linter nie widzi. Znalezione bugi naprawiasz PRZED pushem, nie po recenzji PR.
+(Powód: nie chcemy polegać na tym, że zewnętrzny bot znajdzie to, co my powinniśmy sami.)
 
 ## 🔐 Bezpieczeństwo (NIENARUSZALNE)
 
@@ -248,7 +275,7 @@ złamanie przez nieuwagę = takie samo złamanie jak celowe).
 tworzeniu PR — automatycznie sprawdzasz pełną spójność** gałęzi (żeby Cezar
 wklejał do main czysty, zweryfikowany stan):
 
-1. **Bramka kodu:** `python tests/run_tests.py` (X/X zielone) + `python narzedzia/audyt_spojnosci.py` (exit 0)
+1. **Bramka kodu:** `python tests/run_tests.py` (X/X zielone) + `python narzedzia/audyt_spojnosci.py` (exit 0, w tym ruff W13) + `/code-review` na diffie (adversarial)
 2. **Spójność gałąź↔main:**
    ```bash
    git fetch origin main <branch>

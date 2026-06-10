@@ -57,6 +57,7 @@ _PURE_PYTHON_INDICATORS = {
     "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "PERMUTATION_ENTROPY", "VPIN", "WASH_TRADING", "CHOPPINESS", "ULCER",
     "BUBBLE_Z", "VOV", "RET_AR1", "VALUE_Z", "MOMA_Z", "OU_HALFLIFE", "VARIANCE_RATIO",
     "CASCADE_FLAG", "DEADCAT_SETUP",
+    "FORCE_INDEX_13", "FORCE_INDEX_2",
     "VWAP", "VWAP_STD",
     "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
 }
@@ -1121,9 +1122,11 @@ class CalculatorGateway:
             "OBV":          lambda close, volume: _last_valid(talib.OBV(_arr(close), _arr(volume))),
             "OBV_EMA_20":   lambda close, volume: _last_valid(talib.EMA(talib.OBV(_arr(close), _arr(volume)), timeperiod=20)),
             "VOLUME_MA20":  lambda volume: _last_valid(talib.SMA(_arr(volume), timeperiod=20)),
+            "VOLUME_PREV":  lambda volume: _second_last_valid(talib.SMA(_arr(volume), timeperiod=1)),
+
+            # ── Pure-Python: Force Index Eldera (TA-Lib nie ma — własna formuła) ──
             "FORCE_INDEX_13": lambda close, volume: _py_force_index(close, volume, 13),
             "FORCE_INDEX_2":  lambda close, volume: _py_force_index(close, volume, 2),
-            "VOLUME_PREV":  lambda volume: _second_last_valid(talib.SMA(_arr(volume), timeperiod=1)),
 
             # ── TA-Lib: ATR Deviation = (close[-1] - EMA_20) / ATR ────────────
             "ATR_DEVIATION": self._atr_deviation,

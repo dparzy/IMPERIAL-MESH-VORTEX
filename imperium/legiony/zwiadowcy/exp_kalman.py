@@ -22,7 +22,6 @@ SYGNAŁ DLA LEGATUSA:
   kalman_atr spike > 2× 20-period avg → VOLATILITY_ALERT w diagnostics
 """
 
-import math
 import time
 from typing import List, Dict, Any, Tuple
 

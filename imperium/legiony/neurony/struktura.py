@@ -118,16 +118,16 @@ class NeuronBOS(MikroNeuron):
         # MSS > BOS (silniejszy sygnał)
         if mss_bull:
             return self._bazowy_sygnal(close, "LONG", 0.90,
-                [f"MSS BULLISH: zmiana struktury na wzrostową — instytucje akumulują"])
+                ["MSS BULLISH: zmiana struktury na wzrostową — instytucje akumulują"])
         if mss_bear:
             return self._bazowy_sygnal(close, "SHORT", 0.90,
-                [f"MSS BEARISH: zmiana struktury na spadkową — instytucje dystrybuują"])
+                ["MSS BEARISH: zmiana struktury na spadkową — instytucje dystrybuują"])
         if bos_bull:
             return self._bazowy_sygnal(close, "LONG", 0.75,
-                [f"BOS BULLISH: przebicie Higher High — kontynuacja wzrostów"])
+                ["BOS BULLISH: przebicie Higher High — kontynuacja wzrostów"])
         if bos_bear:
             return self._bazowy_sygnal(close, "SHORT", 0.75,
-                [f"BOS BEARISH: przebicie Lower Low — kontynuacja spadków"])
+                ["BOS BEARISH: przebicie Lower Low — kontynuacja spadków"])
         return self._bazowy_sygnal(close, "NEUTRAL", 0.15,
             ["Brak aktywnego BOS/MSS — konsolidacja"])
 

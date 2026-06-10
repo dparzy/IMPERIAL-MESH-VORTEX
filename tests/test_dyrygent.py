@@ -79,6 +79,20 @@ def test_cykl_silny_long_otwiera_pozycje():
                                 "LEGATUS_NEUTRAL", "ENGINE_ODRZUCIL")
 
 
+def test_regula_6pct_uzywa_daty_swiecy_nie_systemowej():
+    """Reguła 6% w backteście liczy miesiąc z timestampu ŚWIECY, nie date.today()."""
+    d = _dyrygent_z_providerem({"CLOSE": 100.0, "RSI_14": 50.0})
+    d.regula_6pct = __import__(
+        "imperium.pretorianie.kalkulator_lewara", fromlist=["RegulaSzesciuProcentEldera"]
+    ).RegulaSzesciuProcentEldera()
+    d.regula_6pct.reset_miesiac(10_000)
+    # Świeca ze stycznia 2020 (ms epoch) — gdyby użyć date.today(), miesiąc by się nie zgadzał
+    ts_styczen = 1_577_880_000_000   # 2020-01-01 12:00 UTC
+    d.cykl("BTCUSDT", _bary(), timestamp=ts_styczen)
+    assert d.regula_6pct._biezacy_miesiac == 1, \
+        "Reguła 6% musi przyjąć miesiąc ze świecy (styczeń), nie z zegara systemu"
+
+
 def test_decyzja_niesie_pelny_slad():
     d = _dyrygent_z_providerem({"CLOSE": 100.0, "RSI_14": 50.0})
     decyzja = d.cykl("BTCUSDT", _bary())

@@ -5,9 +5,9 @@ Q_score = 0.3×Sharpe + 0.25×Sortino + 0.25×Calmar + 0.2×Omega
 """
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional
+from typing import List
 
 
 class WerdyktOracle(str, Enum):

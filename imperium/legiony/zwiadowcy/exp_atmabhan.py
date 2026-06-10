@@ -36,7 +36,7 @@ Struktura snapshotu orderbook (gdy feed podpięty):
   }
 """
 
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 from .baza import ZwiadowcaElitarny, RaportZwiadowcy, TypDanych
 

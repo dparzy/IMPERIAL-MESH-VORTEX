@@ -103,7 +103,7 @@ def _ocena(r: Optional[float]) -> str:
 def main():
     sciezka = sys.argv[1] if len(sys.argv) > 1 else DOMYSLNY_CSV
     limit = int(sys.argv[2]) if len(sys.argv) > 2 else 4000
-    print(f"📊 POMIAR DEKORELACJI BIB-020 (Prawo XVI)")
+    print("📊 POMIAR DEKORELACJI BIB-020 (Prawo XVI)")
     print(f"   Dane: {sciezka} | ostatnie {limit} barów\n")
 
     bary = wczytaj_csv(sciezka, limit=limit)

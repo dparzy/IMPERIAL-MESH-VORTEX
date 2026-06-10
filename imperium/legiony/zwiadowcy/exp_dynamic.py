@@ -25,9 +25,9 @@ EXP-11 wnosi wartość przez bramkę egzekucji + ATR-potwierdzoną separację, n
 sam crossover. Bez tego byłaby to redundancja.
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict
 
-from .baza import ZwiadowcaElitarny, RaportZwiadowcy, TypDanych
+from .baza import ZwiadowcaElitarny, RaportZwiadowcy
 
 
 def _atr_series(bary: List[Dict]) -> List[float]:

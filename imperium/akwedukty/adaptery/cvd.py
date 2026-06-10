@@ -27,7 +27,7 @@ PRAWO XV: budzi V-03 tylko gdy adapter podpięty i dostarcza dane.
 
 import json
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 from imperium.akwedukty.adaptery.baza import AdapterDanych
 from imperium.legiony.neurony.wolumen import NeuronCVD

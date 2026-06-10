@@ -4,8 +4,7 @@ import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from imperium.koloseum.paper_trading import (
-    PaperTradingEngine, SygnalWejscia, BarData, StatystykiSesji,
-    PROWIZJA_TAKER_PCT, SLIPPAGE_PCT,
+    PaperTradingEngine, SygnalWejscia, BarData,
 )
 
 
@@ -110,7 +109,7 @@ def test_timeout():
 
 def test_likwidacja_long():
     e = _engine()
-    poz = e.wejdz(_sygnal(kierunek="LONG", wejscie=100.0, tp=120.0, sl=85.0, dzwignia=10))
+    e.wejdz(_sygnal(kierunek="LONG", wejscie=100.0, tp=120.0, sl=85.0, dzwignia=10))
     # Likwidacja LONG przy 1/dzwignia = 10% od wejścia w dół
     bar = _bar(h=102.0, l=89.0, c=90.0)  # l=89 < likwidacja ~90
     zamkniete = e.przetworz_bar(bar)

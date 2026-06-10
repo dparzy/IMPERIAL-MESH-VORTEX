@@ -2,14 +2,13 @@
 🏛️ Testy Areny Trzech Bram (W-035) — potrójna bariera, sprawiedliwy scoring Igrzysk.
 """
 
-from imperium.biblioteki.arena_trzech_bram import oznacz_bariera, RaportAreny, WynikBariery
+from imperium.biblioteki.arena_trzech_bram import oznacz_bariera, RaportAreny
 
 
 # ─── Pomocnicze ──────────────────────────────────────────────────────────────
 
 def _bary(highs, lows, closes=None):
     """Buduje uproszczone bary dla testów."""
-    n = len(highs)
     if closes is None:
         closes = [(h + l) / 2 for h, l in zip(highs, lows)]
     return [{"high": h, "low": l, "close": c}

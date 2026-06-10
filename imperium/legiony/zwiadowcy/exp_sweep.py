@@ -25,9 +25,9 @@ Logika "Hit & Run":
   sygnał      = fade kierunku sweepu (sweep high → SHORT, sweep low → LONG)
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict
 
-from .baza import ZwiadowcaElitarny, RaportZwiadowcy, TypDanych
+from .baza import ZwiadowcaElitarny, RaportZwiadowcy
 
 
 def _atr_series(bary: List[Dict]) -> List[float]:
@@ -114,7 +114,7 @@ class ZwiadowcaLiquiditySweep(ZwiadowcaElitarny):
             pewnosc = min(0.85, 0.60 + sila * 0.25)
             return self._buduj_raport(
                 kierunek="SHORT", pewnosc=pewnosc,
-                powody=[f"LIQUIDITY SWEEP HIGH + odwrócenie (fakeout w górę) → SHORT"] + powody,
+                powody=["LIQUIDITY SWEEP HIGH + odwrócenie (fakeout w górę) → SHORT"] + powody,
                 diagnostics=diag, n_barow=len(bary),
             )
 
@@ -125,7 +125,7 @@ class ZwiadowcaLiquiditySweep(ZwiadowcaElitarny):
             pewnosc = min(0.85, 0.60 + sila * 0.25)
             return self._buduj_raport(
                 kierunek="LONG", pewnosc=pewnosc,
-                powody=[f"LIQUIDITY SWEEP LOW + odwrócenie (fakeout w dół) → LONG"] + powody,
+                powody=["LIQUIDITY SWEEP LOW + odwrócenie (fakeout w dół) → LONG"] + powody,
                 diagnostics=diag, n_barow=len(bary),
             )
 

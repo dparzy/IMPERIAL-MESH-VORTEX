@@ -120,7 +120,7 @@ class Scheduler:
         signal.signal(signal.SIGTERM, self._graceful_shutdown)
 
         logger.info(f"Scheduler START | sesja={self.config.sesja_id} | interwał={self.config.interwal_s}s")
-        print(f"\n⚔️  SCHEDULER IMPERIUM URUCHOMIONY")
+        print("\n⚔️  SCHEDULER IMPERIUM URUCHOMIONY")
         print(f"   Sesja:    {self.config.sesja_id}")
         print(f"   Symbole:  {', '.join(self.config.symbole)}")
         print(f"   Interwał: co {self.config.interwal_s}s | Ctrl+C = zamknij gracefully\n")

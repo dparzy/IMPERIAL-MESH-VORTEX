@@ -204,6 +204,22 @@ def test_force_index_brak_danych():
     assert NeuronForceIndex().interpretuj({}).kierunek == "NEUTRAL"
 
 
+def test_force_index_fi13_zero_neutralny():
+    """FI(13)=0 → brak przewagi trendu → NEUTRAL (nie zgadujemy kierunku na zerze)."""
+    n = NeuronForceIndex()
+    assert n.interpretuj({"FORCE_INDEX_13": 0.0, "FORCE_INDEX_2": -50.0}).kierunek == "NEUTRAL"
+    assert n.interpretuj({"FORCE_INDEX_13": 0.0, "FORCE_INDEX_2": 50.0}).kierunek == "NEUTRAL"
+
+
+def test_force_index_fi2_zero_nie_odwraca_trendu():
+    """FI(2)=0 w trendzie↑ → słaby głos LONG (NIE SHORT — błąd graniczny naprawiony)."""
+    n = NeuronForceIndex()
+    s_long = n.interpretuj({"FORCE_INDEX_13": 1000.0, "FORCE_INDEX_2": 0.0})
+    assert s_long.kierunek == "LONG" and s_long.pewnosc < 0.55
+    s_short = n.interpretuj({"FORCE_INDEX_13": -1000.0, "FORCE_INDEX_2": 0.0})
+    assert s_short.kierunek == "SHORT" and s_short.pewnosc < 0.55
+
+
 def test_atr_deviation_szum_ignorowany():
     n = NeuronATRDeviation()
     s = n.interpretuj({"ATR_DEVIATION": 0.5})  # < MinDisplacement 1.0
@@ -636,7 +652,7 @@ def test_brama_ulcer_dokladnie_period():
 def test_brama_yang_zhang_zakres():
     """Brama (W-055): Yang-Zhang zwraca annualizowaną vol > 0 na realnej serii OHLC."""
     from imperium.fundament.brama_kalkulatora import _py_yang_zhang
-    import math, random
+    import random
     random.seed(7)
     o, h, l, c = [], [], [], []
     cena = 100.0

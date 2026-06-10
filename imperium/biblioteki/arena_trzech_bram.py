@@ -194,14 +194,14 @@ class RaportAreny:
 
     def drukuj(self):
         print(f"\n{'═'*62}")
-        print(f"  🏛️ ARENA TRZECH BRAM — raport")
+        print("  🏛️ ARENA TRZECH BRAM — raport")
         print(f"{'═'*62}")
         print(f"  Sygnały łącznie: {self.lacznie}")
         print(f"  ✅ TP (Brama I) : {self.sygnaly_tp:>4}  ({self.win_rate_tp:.1%})")
         print(f"  ❌ SL (Brama II): {self.sygnaly_sl:>4}")
         print(f"  ⏱️ CZAS(Brama III):{self.sygnaly_czas:>3}")
         if self.kontryb_neuronow:
-            print(f"\n  Top neuro-kontrybutorzy:")
+            print("\n  Top neuro-kontrybutorzy:")
             ranking = sorted(
                 self.kontryb_neuronow.items(),
                 key=lambda x: x[1]["contribution"],

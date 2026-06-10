@@ -102,7 +102,7 @@ def test_raport_dekorelacji_struktura():
 
 def test_raport_wykrywa_martwy_glos():
     """Moduł zawsze NEUTRAL w oknie = martwy głos (utrata potencjału)."""
-    from imperium.legiony.zwiadowcy.baza import ZwiadowcaElitarny, RaportZwiadowcy
+    from imperium.legiony.zwiadowcy.baza import ZwiadowcaElitarny
 
     class ZawszeNeutral(ZwiadowcaElitarny):
         KLUCZ = "EXP-TEST-N"

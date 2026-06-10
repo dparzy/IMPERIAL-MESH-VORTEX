@@ -145,7 +145,7 @@ def sekcja_git():
     print(f"  Last commit  : {last_commit}")
     print(f"  Ahead origin : {ahead} commit(ów)")
     if status:
-        print(f"  Niezatwierdzone:")
+        print("  Niezatwierdzone:")
         for line in status.splitlines()[:10]:
             print(f"    {line}")
     else:

@@ -6,6 +6,111 @@
 
 ---
 
+## 2026-06-10 | INFRA | Ruff (W13) — rozszerzony ruleset o realne klasy bugów + audyt wsteczny granic
+
+**Opis:** „Żeby było najlepiej" — zastosowano nową dyscyplinę WSTECZ i wzmocniono bramkę:
+1. **Audyt graniczny roju (Prawo XXI Reguła Test-Granic):** przeskanowano wszystkie
+   neurony pod kątem bugu granicznego typu Force Index (`==0`/próg → zły kierunek).
+   Wynik: rój zdrowy — TRIX/AO/AC i pozostałe poprawnie domykają granicę do NEUTRAL;
+   Force Index był jedynym wyjątkiem (już naprawiony). Wzorzec binarny (próg→A/B) przy
+   równości miary-zero jest świadomy i bezpieczny.
+2. **Ruff ruleset rozszerzony** z `F,E9` o realne klasy bugów (mierzone, nie zgadywane —
+   pełny zestaw zielony): `E711/E712/E714` (bugi porównań `==None`/`==True`/`not x is y`),
+   `B006/B008` (mutowalne argumenty domyślne — klasyczny bug współdzielonego stanu),
+   `B904` (raise w except bez `from` — gubi traceback), `PLE` (błędy pylintu).
+   Znaleziono i naprawiono 3× `== True/False` w `tests/test_scheduler.py` → `is`.
+
+**Pliki:** `ruff.toml`, `tests/test_scheduler.py`.
+**Testy:** 586/586 ✅. Audyt: 13 warstw, pełna harmonia. Ruff (9 reguł): czysto.
+
+---
+
+## 2026-06-10 | FIX | Warstwa 8 audytu — świeżość LOG przez git, nie mtime (fałszywy alarm po resecie)
+
+**Opis:** W8 (świeżość LOG_ZMIAN) używała `os.path.getmtime` — bezużytecznego po
+świeżym klonie/resecie kontenera: git ustawia mtime wszystkich plików na „teraz",
+więc audyt fałszywie raportował „kod zmieniony po ostatnim wpisie", mimo że treść
+== ostatni commit (working tree czysty). Naprawiono: W8 wykrywa zmienione pliki .py
+przez **git** (`git diff HEAD` + `git diff --cached`) w `imperium/` i `narzedzia/`,
+flaguje tylko gdy są REALNE zmiany bez wpisu LOG z dzisiejszą datą. Deterministyczne
+w CI/świeżym klonie. Przy okazji: docstring „12 warstw" → „13 warstw".
+
+**Dlaczego ważne:** bramka pre-commit była krucha — mogła blokować (lub przepuszczać)
+zależnie od mtime, nie treści. Teraz sygnał = faktyczna zmiana kodu (git), nie zegar.
+
+**Pliki:** `narzedzia/audyt_spojnosci.py`.
+**Testy:** 586/586 ✅. Audyt: 13 warstw, pełna harmonia (exit 0), ruff czysto.
+
+---
+
+## 2026-06-09 | INFRA | Wykrywanie bugów: ruff (Warstwa 13) + reguła test-granic + adversarial review
+
+**Kontekst:** Cezar zapytał, czemu zewnętrzny recenzent (cubic) łapie bugi, a my nie.
+Diagnoza: nasz audyt (12 warstw) sprawdzał SPÓJNOŚĆ (liczby/klucze/dokumenty=kod), nie
+POPRAWNOŚĆ logiki ani statyczną jakość; testy pisaliśmy na „happy path", bez granic;
+brak lintera. Wdrożono trzy uzupełniające się mechanizmy (wszystkie do zasad):
+
+1. **Warstwa 13 audytu — ruff** (`ruff.toml`, ruleset F+E9): linter łapie bugi/martwy
+   kod, których warstwy spójności nie widzą. Zweryfikowano: F811 łapie duplikat klasy
+   (dokładnie bug z merge, który cubic znalazł). Audyt blokuje commit przy znalezisku;
+   gdy ruff niezainstalowany → tylko nota (działa w minimalnym środowisku).
+2. **Reguła Test-Granic** (rozszerzenie Prawa XXI w CLAUDE.md): każdy moduł z progiem/
+   znakiem MUSI mieć testy granic (0/None/±/dokładny-próg/trwałość-stanu).
+3. **Adversarial `/code-review` przed każdym push** (rozkaz stały): wrogi przegląd
+   logiki/granic — ta sama perspektywa co cubic, ale ZANIM trafi na PR.
+
+**Sprzątanie przy okazji (Prawo XV/XIX):** ruff wyczyścił 88 nieużywanych importów +
+puste f-stringi, oraz realne znaleziska: martwy policzony sygnał `trend_napływu` (OC-04),
+martwe zmienne (`wzorzec`, `linia`, `powody`), zepsute demo `mikro_neuron.py` (odwołania
+do nieistniejących klas → NameError przy uruchomieniu), forward-ref `RaportAreny` przez
+TYPE_CHECKING.
+
+**Pliki:** `ruff.toml` (nowy), `requirements.txt`, `narzedzia/audyt_spojnosci.py` (W13),
+`CLAUDE.md` (3 zasady), 9 plików kodu/testów (sprzątanie ruff).
+**Testy:** 586/586 ✅. Audyt: 13 warstw, pełna harmonia (exit 0), ruff czysto.
+
+---
+
+## 2026-06-09 | FIX | Force Index (V-05) — granice fi==0 + tag źródła pure-Python (PR review cubic)
+
+**Opis:** Dwie poprawki po recenzji PR (cubic-dev-ai):
+1. **P1 — błąd graniczny neuronu:** przy `FORCE_INDEX_2 == 0` w trendzie wzrostowym
+   kod spadał do gałęzi `return SHORT` (sygnał PRZECIWNY do trendu); `FORCE_INDEX_13 == 0`
+   było traktowane jako bessa. Teraz: FI(13)=0 → NEUTRAL (brak przewagi), FI(2)=0 →
+   słaby głos zgodny z trendem (pewność 0.40), zero implicytnego SHORT na zerze.
+2. **P2 — metadane źródła:** `FORCE_INDEX_13/2` (liczone `_py_force_index`, własna
+   formuła) były w sekcji TA-Lib → `compute()` stemplował je jako TA-Lib. Dodano do
+   `_PURE_PYTHON_INDICATORS` → poprawny tag `pure-Python` (Prawo XIII — audyt nie kłamie o źródle).
+
+**Pliki:** `imperium/legiony/neurony/wolumen.py`, `imperium/fundament/brama_kalkulatora.py`,
+`tests/test_neurony.py`, `README.md`.
+**Testy:** +2 graniczne (584→586/586). Audyt: pełna harmonia (exit 0).
+
+---
+
+## 2026-06-09 | FIX | Reguła 6% Elder — data ze świecy + HALT do końca miesiąca + usunięcie duplikatu (PR review cubic)
+
+**Opis:** Trzy poprawki po recenzji PR (cubic-dev-ai):
+1. **P1 — data z czasu świecy:** `Dyrygent.cykl()` przekazywał `regula_6pct.aktualizuj()`
+   bez daty → w backteście używał `date.today()` (czas systemowy), błędnie licząc
+   reset/HALT względem zegara maszyny, nie kalendarza danych. Teraz konwertuje
+   `timestamp` świecy (ms epoch, UTC) na datę i przekazuje jako `dzisiaj=`.
+2. **P2 — HALT do końca miesiąca:** logika zdejmowała HALT, gdy kapitał chwilowo
+   odrobił w tym samym miesiącu — sprzecznie z komunikatem „HALT do końca miesiąca"
+   i doktryną Eldera. Usunięto gałąź `strata < prog → NORMAL`; HALT trwa do zmiany
+   miesiąca lub ręcznego `reset_miesiac()`.
+3. **Duplikat klasy:** `RegulaSzesciuProcentEldera` była zdefiniowana DWUKROTNIE
+   (pozostałość po rozwiązaniu konfliktu merge) — druguje shadowowała pierwszą.
+   Usunięto duplikat, została jedna definicja (przy bezpiecznikach AOA/W-062).
+
+**Pliki:** `imperium/koloseum/dyrygent.py`, `imperium/pretorianie/kalkulator_lewara.py`,
+`tests/test_kalkulator.py`, `tests/test_dyrygent.py`, `README.md`.
+**Testy:** +2 (582→584/584). Audyt: pełna harmonia (exit 0).
+**Symulator:** issues cubic w `symulator_live.html` zostawione do wersji on-demand
+(rozkaz stały Cezara — symulatory poza auto-audytem).
+
+---
+
 ## 2026-06-09 | FEATURE | Triple Screen Eldera (BIB-015) + neuron Force Index (V-05)
 
 **Opis:** Domknięcie BIB-015 (Alexander Elder). Dwa elementy:

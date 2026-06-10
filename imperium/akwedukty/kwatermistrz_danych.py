@@ -34,7 +34,6 @@ normalizator sprowadza każdy plik do schematu: timestamp, open, high, low, clos
 """
 
 import os
-import time
 import glob
 import logging
 from typing import List, Optional, Dict

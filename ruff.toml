@@ -1,0 +1,23 @@
+# 🔬 Ruff — bramka jakości kodu Imperium (Warstwa 13 audytu spójności).
+#
+# ZASADA: łapiemy BUGI i martwy kod, nie prowadzimy wojen o styl.
+#   F   = pyflakes — rdzeń: redefinicje (F811, duplikat klasy), niezdefiniowane
+#         nazwy (F821), martwe zmienne (F841), nieużyte importy (F401), puste
+#         f-stringi (F541). Lekcja z recenzji cubic-dev-ai (2026-06-09).
+#   E9  = błędy składni/runtime (E999 itd.) — zawsze blokują.
+#   E711/E712/E714 = bugi porównań: `== None`, `== True/False`, `not x is y`
+#         (mogą maskować błędy logiki przy wartościach truthy/None).
+#   B006/B008 = mutowalne argumenty domyślne / wywołanie w domyślnym (klasyczny bug
+#         współdzielonego stanu między wywołaniami).
+#   B904 = `raise` w `except` bez `from` — gubi łańcuch traceback (utrudnia debug).
+#   PLE  = błędy pylintu (realne, nie styl).
+#
+# Każda reguła wybrana bo łapie BUG, nie styl. Mierzone, nie zgadywane (Prawo XVI):
+# pełny zestaw jest zielony na całym kodzie. Rozszerzamy dalej tylko gdy nowa reguła
+# da sygnał > szum.
+
+line-length = 120
+target-version = "py310"
+
+[lint]
+select = ["F", "E9", "E711", "E712", "E714", "B006", "B008", "B904", "PLE"]

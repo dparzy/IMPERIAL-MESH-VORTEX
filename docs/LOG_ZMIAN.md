@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-10 | NARZĘDZIE+POMIAR | Agregator 4H (5 par z 1H) + test bojowy 4H
+
+**Opis:** `narzedzia/agreguj_4h.py` — buduje bary 4H z 1H po siatce UTC (open/max/min/
+close/suma; NIEPEŁNE okna odrzucane — Prawo I). Wynik: 5 plików `dane/4h/Binance_*_4h.csv`
+(12.1k–18.6k barów, do 2026-06-08), prosty format Imperium, czytnik czyta wprost.
++2 testy (kompletność okna, luka w środku).
+
+**TEST BOJOWY 4H (4000 barów, AUTO, n_prob=4):**
+- BTC 4H: 73 trades, WR 43.8%, PF 0.61, PnL −1012, Sharpe_r −1.18 → ⛔ (STRATA!)
+- SOL 4H: 80 trades, WR 51.2%, PF 1.11, PnL +493, Sharpe_r 0.30 → ⛔
+
+**Werdykt (Prawo I):** rój w obecnej kalibracji jest GRACZEM DZIENNYM — edge na 1D
+(PF 2.23), brak na 1H (1.11), strata na 4H BTC (0.61). Progi/wagi/strategie wymagają
+kalibracji per interwał ZANIM pomyślimy o scalpie. To jest GŁÓWNE zadanie następnej
+sesji — teraz mamy do tego pełne dane (5 par × 1D/4H/1H do 2026-06-08).
+
+**Pliki:** `narzedzia/agreguj_4h.py` (nowy), `dane/4h/*` (5), `tests/test_czytnik_csv.py`.
+**Testy:** 649/649 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | DANE+FIX | Świeże dane 5 par (1D+1H do 2026-06-08) + brud µs w CDD naprawiony w czytniku
 
 **Opis:** Cezar dostarczył 10 plików CryptoDataDownload (BTC/ETH/SOL/BNB/DOGE × 1D+1H,

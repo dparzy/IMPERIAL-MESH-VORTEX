@@ -176,3 +176,37 @@ def test_duplikaty_timestamp_deduplikowane(tmp_sciezka=None):
         assert bary[0]["timestamp"] == 1741734000000
     finally:
         os.unlink(sciezka)
+
+
+def test_agregacja_4h_kompletne_okna():
+    """Agregator 4H: OHLCV poprawne, niepełne okna odrzucone (Prawo I)."""
+    import sys, os as _os
+    sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), "..", "narzedzia"))
+    from agreguj_4h import agreguj_4h, CZTERY_H_MS
+    h = 3600 * 1000
+    # 4 pełne godziny od północy + 2 luźne (niepełne okno) → 1 bar 4H
+    bary = [
+        {"timestamp": 0*h, "open": 10, "high": 12, "low": 9,  "close": 11, "volume": 1},
+        {"timestamp": 1*h, "open": 11, "high": 15, "low": 10, "close": 14, "volume": 2},
+        {"timestamp": 2*h, "open": 14, "high": 14, "low": 8,  "close": 9,  "volume": 3},
+        {"timestamp": 3*h, "open": 9,  "high": 10, "low": 9,  "close": 10, "volume": 4},
+        {"timestamp": 4*h, "open": 10, "high": 11, "low": 10, "close": 11, "volume": 5},
+        {"timestamp": 5*h, "open": 11, "high": 12, "low": 11, "close": 12, "volume": 6},
+    ]
+    w = agreguj_4h(bary)
+    assert len(w) == 1, "niepełne okno (2/4 barów) musi być odrzucone"
+    b = w[0]
+    assert b["timestamp"] == 0 and b["open"] == 10 and b["close"] == 10
+    assert b["high"] == 15 and b["low"] == 8 and b["volume"] == 10
+    assert CZTERY_H_MS == 4 * h
+
+
+def test_agregacja_4h_luka_w_srodku():
+    """Luka godzinowa w środku okna → okno 3/4 odrzucone (granica kompletności)."""
+    import sys, os as _os
+    sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), "..", "narzedzia"))
+    from agreguj_4h import agreguj_4h
+    h = 3600 * 1000
+    bary = [{"timestamp": t*h, "open": 1, "high": 2, "low": 0.5, "close": 1.5,
+             "volume": 1} for t in (0, 1, 3)]   # brak godziny 2
+    assert agreguj_4h(bary) == []

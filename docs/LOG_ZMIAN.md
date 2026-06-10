@@ -35,11 +35,17 @@
 | 1H | **+ZEGARY** | 65 | 52.3% | **1.59** | **2.5%** | **+540** | **1.47 ✅>1.0!** | 0.46 |
 | 4H | +ZEGARY | 74 | 41.9% | 0.59 | 14.5% | −1168 | −1.29 | 0.002 |
 
-**Werdykt:** 1H = żywioł zegarów — PIERWSZY Sharpe roczny > 1.0 w historii Imperium;
-do Etapu I brakuje TYLKO DSR (0.46), który przy 4000 barach 1H (≈5,5 mies.) jest z natury
-niski — dłuższa próba w toku. 4H bez zmian (bary 4H mają za grube ziarno dla sesji) —
-potwierdza, że 4H czeka na inne źródło przewagi. Hipoteza Cezara (dedykowane neurony
-per interwał) POTWIERDZONA pomiarem.
+**Werdykt PIERWOTNY:** 1H, 4000 barów: pierwszy Sharpe>1.0 w historii Imperium; DSR 0.46.
+
+**SUPLEMENT — dłuższa próba (Prawo I, bez lukru):** na 12000 barach 1H (≈16 mies.,
+2025-02→2026-06): trades=201, WR 49.3%, PF 0.72, Sharpe_r −1.34 → wynik się ODWRACA.
+**DSR 0.46 słusznie ostrzegał** — świetne okno 5,5-miesięczne nie jest stabilne w czasie;
+rok 2025 zjada strategię. To nie zegary zawiodły (kontekst, niska waga) — cały rój na 1H
+jest NIESTABILNY MIĘDZY OKRESAMI. Wnioski: (1) zegary SES-* zostają (tanie, badawczo
+uzasadnione, nieszkodliwe); (2) 1H NIE jest gotowe — następny krok: analiza per okres
+(czy strata skoncentrowana w jednym reżimie/krachu 2025?) i per para (5 par czeka);
+(3) nasza bramka DSR po raz kolejny obroniła przed wdrożeniem szczęśliwego okna.
+4H bez zmian (ziarno za grube dla sesji) — czeka na inne źródło przewagi.
 
 **Pliki:** `imperium/legiony/neurony/sesje.py` (nowy), `budowniczy_wskaznikow.py`,
 `rejestr.py`, `narzedzia/audyt_spojnosci.py` (W12 timestampy), `tests/test_neurony.py`,

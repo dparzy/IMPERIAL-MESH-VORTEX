@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-06-10 | FEATURE | Bramka Etapu I Koloseum wpięta w backtest (ROADMAP × W-282)
+
+**Opis:** Domknięcie pętli walidacji — bramki przestały być "gotowe ale niepodpięte"
+(czerwony alarm Prawa XV z poprzedniej sesji):
+- `backtest()` zbiera teraz **krzywą equity per bar** (`engine.krzywa_equity`) —
+  +1 punkt po zamknięciu końcowym; testowany kontrakt długości.
+- NOWA `etap_pierwszy_koloseum(krzywa, statystyki, interwal, n_prob)` w
+  `koloseum/walidacja.py`: progi ROADMAP § ZASADA ARENY (≥10 trade'ów, Sharpe
+  roczny > 1.0 annualizowany wg interwału, MaxDD < 15%, WR > 55% LUB PF > 1.5)
+  **plus** DSR ≥ 0.95 (W-282) — jeden werdykt ok/powod. Strategia bez przejścia
+  bramki nie awansuje do Etapu II (paper).
+- Werdykt zawsze z czytelnym powodem pierwszego czerwonego progu (Prawo I).
+
+**Pliki:** `imperium/koloseum/backtest.py`, `imperium/koloseum/walidacja.py`,
+`tests/test_walidacja.py` (+8), `tests/test_backtest.py` (+1, kontrakt end-to-end).
+**Testy:** 643/643 ✅ (634+9). Audyt: pełna harmonia.
+
 ## 2026-06-10 | FEATURE+POMIAR | W-285.2 Dwu-zegarowy DSR (unikat) + pomiar W-281 (werdykt: ADX zostaje)
 
 **Opis:**

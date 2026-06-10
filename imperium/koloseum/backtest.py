@@ -88,12 +88,14 @@ def backtest(
 
     wejscia = 0
     weta = 0
+    krzywa_equity: List[float] = []   # equity po każdym barze (dla bramki W-282)
     for i in range(okno, len(bary)):
         biezacy = bary[i]
         okno_barow = bary[i - okno: i + 1]   # do bieżącej świecy włącznie (bez przyszłości)
 
         # 1. Aktualizuj otwarte pozycje bieżącą świecą
         engine.przetworz_bar(_bar_data(biezacy))
+        krzywa_equity.append(engine.kapital_calkowity)
 
         # 2. Decyzja na podstawie okna
         decyzja = dyrygent.cykl(symbol, okno_barow,
@@ -106,6 +108,11 @@ def backtest(
     # 3. Zamknij pozostałe otwarte po ostatniej cenie
     ostatnia_cena = {symbol: bary[-1]["close"]}
     engine.zamknij_wszystkie(ostatnia_cena, powod="MANUAL")
+    krzywa_equity.append(engine.kapital_calkowity)
+    # Krzywa equity per bar — wejście bramki walidacji Koloseum (W-282):
+    #   from imperium.koloseum.walidacja import etap_pierwszy_koloseum
+    #   werdykt = etap_pierwszy_koloseum(engine.krzywa_equity, engine.podsumowanie())
+    engine.krzywa_equity = krzywa_equity
 
     logger.info(f"[Backtest] {symbol} {interwal}: {len(bary)} barów, "
                 f"{wejscia} wejść, {weta} wet Pretorianów")

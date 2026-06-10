@@ -286,3 +286,80 @@ def test_dwuzegarowa_sygnal_fn_zla_dlugosc_rzuca():
         raise AssertionError("powinno rzucić ValueError")
     except ValueError:
         pass
+
+
+# ── Etap I Koloseum (ROADMAP + W-282 w jednej bramce) ────────────────────────
+
+from imperium.koloseum.walidacja import etap_pierwszy_koloseum  # noqa: E402
+
+
+class _Stat:
+    """Minimalny duck-type StatystykiSesji do testów."""
+    def __init__(self, trades=30, dd=8.0, wr=60.0, pf=2.0):
+        self.total_trades = trades
+        self.max_drawdown_pct = dd
+        self.win_rate = wr
+        self.profit_factor = pf
+
+
+def _krzywa_dobra(n=400, seed=21):
+    rng = np.random.default_rng(seed)
+    zw = rng.normal(0.003, 0.008, n)
+    return 10_000 * np.cumprod(1 + zw)
+
+
+def test_etap1_dobra_strategia_przechodzi():
+    w = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(), interwal="1D")
+    assert w["ok"], f"powinna przejść: {w}"
+    assert w["sharpe_roczny"] > 1.0 and w["dsr"] >= 0.95
+
+
+def test_etap1_szum_odpada_na_dsr_lub_sharpe():
+    rng = np.random.default_rng(4)
+    krzywa = 10_000 * np.cumprod(1 + rng.normal(0.0, 0.01, 400))
+    w = etap_pierwszy_koloseum(krzywa, _Stat(), interwal="1D")
+    assert not w["ok"] and w["powod"]
+
+
+def test_etap1_za_malo_tradow():
+    w = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(trades=5))
+    assert not w["ok"] and "za mało trade" in w["powod"]
+
+
+def test_etap1_drawdown_za_duzy():
+    w = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(dd=20.0))
+    assert not w["ok"] and "MaxDD" in w["powod"]
+
+
+def test_etap1_wr_lub_pf_wystarczy_jedno():
+    """WR niski ALE PF wysoki → przechodzi (alternatywa z ROADMAP)."""
+    w = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(wr=40.0, pf=2.5))
+    assert w["ok"], f"PF>1.5 powinno wystarczyć: {w}"
+    w2 = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(wr=40.0, pf=1.2))
+    assert not w2["ok"], "oba poniżej progu → odpada"
+
+
+def test_etap1_granice_krzywej():
+    """Za krótka krzywa i bankructwo (equity ≤ 0) odrzucone z powodem."""
+    w = etap_pierwszy_koloseum([10_000.0] * 10)
+    assert not w["ok"] and "za krótka" in w["powod"]
+    krzywa = list(_krzywa_dobra(50))
+    krzywa[25] = 0.0
+    w2 = etap_pierwszy_koloseum(krzywa)
+    assert not w2["ok"] and "bankructwo" in w2["powod"]
+
+
+def test_etap1_bez_statystyk_tylko_sharpe_dsr():
+    """statystyki=None → tylko progi z krzywej (Sharpe + DSR)."""
+    w = etap_pierwszy_koloseum(_krzywa_dobra(), statystyki=None)
+    assert w["ok"]
+
+
+def test_etap1_selection_bias_zaostrza():
+    """Słaba-pozytywna strategia: przy n_prob=200 odpada na DSR (uczciwość)."""
+    rng = np.random.default_rng(8)
+    krzywa = 10_000 * np.cumprod(1 + rng.normal(0.0006, 0.01, 300))
+    w1 = etap_pierwszy_koloseum(krzywa, _Stat(), n_prob=1)
+    w200 = etap_pierwszy_koloseum(krzywa, _Stat(), n_prob=200)
+    assert (w1["dsr"] or 0) > (w200["dsr"] or 0)
+    assert not w200["ok"]

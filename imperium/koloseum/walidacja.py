@@ -327,3 +327,75 @@ def bramka_dwuzegarowa(zwroty_kalendarzowe: Sequence[float],
                  " — strategia żyje z nierównej gęstości czasu, nie z przewagi")
     return {"zegar_kalendarzowy": dsr_kal, "zegar_wolumenowy": dsr_vol,
             "ok": ok, "powod": powod}
+
+
+# ─── 5. ETAP I KOLOSEUM — progi ROADMAP + DSR w jednej bramce ─────────────────
+
+# Progi z docs/ROADMAP_IMPERIUM.md § "ZASADA ARENY — Etap I" (Cezar zatwierdził):
+PROG_SHARPE_ROCZNY = 1.0     # Sharpe annualizowany > 1.0
+PROG_MAX_DD = 0.15           # maksymalny drawdown < 15%
+PROG_WIN_RATE = 0.55         # win rate > 55% LUB...
+PROG_PROFIT_FACTOR = 1.5     # ...profit factor > 1.5
+MIN_TRADES = 10              # poniżej — żadna statystyka nie ma sensu
+
+BARY_W_ROKU = {"1D": 365, "4H": 6 * 365, "1H": 24 * 365,
+               "M15": 96 * 365, "M5": 288 * 365}
+
+
+def etap_pierwszy_koloseum(krzywa_equity: Sequence[float],
+                           statystyki=None,
+                           interwal: str = "1D",
+                           n_prob: int = 1) -> dict:
+    """
+    Bramka Etapu I Koloseum (ROADMAP § ZASADA ARENY) + W-282 w jednym werdykcie.
+
+    DLA NOWICJUSZA: to jest sędzia, który mówi czy strategia z backtestu
+    w ogóle ZASŁUGUJE na Etap II (paper trading). Sprawdza w kolejności:
+      1. Liczba trade'ów ≥ 10 (mniej = anegdota, nie statystyka)
+      2. Sharpe roczny > 1.0 (liczony z krzywej equity per bar)
+      3. Max drawdown < 15%
+      4. Win rate > 55% LUB profit factor > 1.5
+      5. DSR ≥ 0.95 (W-282 — odporność na selection bias i grube ogony)
+    Werdykt: ok=True tylko gdy WSZYSTKIE zielone; powod = pierwszy czerwony.
+
+    krzywa_equity: equity po każdym barze (engine.krzywa_equity z backtestu).
+    statystyki: StatystykiSesji z engine.podsumowanie() (None → pomiń progi 1/3/4).
+    interwal: do annualizacji Sharpe ("1D"/"4H"/"1H"/"M15"/"M5").
+    n_prob: ile wariantów strategii przetestowano (korekta selection bias).
+    """
+    krzywa = np.asarray(list(krzywa_equity), dtype=float)
+    if krzywa.size < 30:
+        return {"ok": False, "powod": f"za krótka krzywa equity ({krzywa.size} < 30 barów)",
+                "sharpe_roczny": None, "dsr": None}
+    if (krzywa <= 0).any():
+        return {"ok": False, "powod": "equity ≤ 0 w historii (bankructwo)",
+                "sharpe_roczny": None, "dsr": None}
+    zwroty = np.diff(krzywa) / krzywa[:-1]
+    sd = zwroty.std(ddof=1)
+    skala = math.sqrt(BARY_W_ROKU.get(interwal, 365))
+    sharpe_roczny = float(zwroty.mean() / sd * skala) if sd > 0 else 0.0
+
+    kontrole = []
+    if statystyki is not None:
+        kontrole.append((statystyki.total_trades >= MIN_TRADES,
+                         f"za mało trade'ów ({statystyki.total_trades} < {MIN_TRADES})"))
+    kontrole.append((sharpe_roczny > PROG_SHARPE_ROCZNY,
+                     f"Sharpe roczny {sharpe_roczny:.2f} ≤ {PROG_SHARPE_ROCZNY}"))
+    if statystyki is not None:
+        kontrole.append((statystyki.max_drawdown_pct / 100.0 < PROG_MAX_DD,
+                         f"MaxDD {statystyki.max_drawdown_pct:.1f}% ≥ {PROG_MAX_DD:.0%}"))
+        wr_ok = statystyki.win_rate / 100.0 > PROG_WIN_RATE
+        pf_ok = statystyki.profit_factor > PROG_PROFIT_FACTOR
+        kontrole.append((wr_ok or pf_ok,
+                         f"WR {statystyki.win_rate:.1f}% ≤ {PROG_WIN_RATE:.0%} "
+                         f"i PF {statystyki.profit_factor:.2f} ≤ {PROG_PROFIT_FACTOR}"))
+    dsr = deflated_sharpe(zwroty, n_prob=n_prob)
+    kontrole.append((dsr["ok"],
+                     dsr.get("powod") or f"DSR {dsr['dsr']} < {PROG_DSR} (W-282)"))
+
+    for przeszedl, opis in kontrole:
+        if not przeszedl:
+            return {"ok": False, "powod": opis,
+                    "sharpe_roczny": round(sharpe_roczny, 3), "dsr": dsr["dsr"]}
+    return {"ok": True, "powod": "",
+            "sharpe_roczny": round(sharpe_roczny, 3), "dsr": dsr["dsr"]}

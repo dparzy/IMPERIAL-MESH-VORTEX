@@ -272,6 +272,7 @@
 | HedgeMWUzPamieciaRezimu (W-285.1 💎 unikat — mixing wg pamięci wag per-reżim z Namiestnika) | `biblioteki/hedge_mwu.py` | ✅ aktywny |
 | Walidacja Koloseum: Deflated Sharpe + PBO/CSCV (W-282, BIB-007 — bramka anty-overfittingu) | `koloseum/walidacja.py` | ✅ aktywny |
 | Dwu-zegarowy DSR (W-285.2 💎 unikat — bary wolumenowe/trading-time + podwójna bramka DSR) | `koloseum/walidacja.py` | ✅ aktywny |
+| EtapPierwszyKoloseum (progi ROADMAP Arena Etap I + DSR W-282 w jednym werdykcie; wpięty: backtest.krzywa_equity) | `koloseum/walidacja.py` | ✅ aktywny |
 | PomiarJumpModel (tabela dowodowa W-281 vs ADX — narzędzie Prawa XVIII) | `narzedzia/pomiar_jump_model.py` | ✅ aktywny |
 | JumpModel (W-281 — detektor reżimu z karą za skok; pomiar 2026-06-10: ADX-baseline lepszy → POZA pipeline) | `legiony/jump_model.py` | ✅ moduł (⏸️ niewpięty po pomiarze) |
 | PaperTradingEngine | `koloseum/paper_trading.py` | ✅ aktywny |

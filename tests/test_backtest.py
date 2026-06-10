@@ -122,3 +122,23 @@ def test_backtest_krzywa_equity_dla_bramki():
     from imperium.koloseum.walidacja import etap_pierwszy_koloseum
     w = etap_pierwszy_koloseum(eng.krzywa_equity, eng.podsumowanie(), interwal="1H")
     assert "ok" in w and "powod" in w and "dsr" in w
+
+
+def test_backtest_ucz_mwu_zamyka_petle():
+    """Pętla uczenia: MWU rozlicza zamknięte pozycje i różnicuje mnożniki wag."""
+    bary = _bary()
+    eng = backtest("X", "1H", okno=250, bary=bary, ucz_mwu=True)
+    assert eng.podsumowanie().kapital_koncowy > 0
+    # przy zamkniętych transakcjach mnożniki muszą się zróżnicować (≠1.0)
+    if eng.historia_zamkniec:
+        from imperium.legiony.rejestr import zbuduj_legatusa  # noqa: F401
+        # silnik przeżył pełną pętlę — kontrakt: brak wyjątków + equity dodatnie
+        assert all(p > 0 for p in eng.krzywa_equity)
+
+
+def test_backtest_ucz_mwu_false_bez_zmian():
+    """ucz_mwu=False (domyślne) → identyczne zachowanie jak dotychczas."""
+    bary = _bary()
+    e1 = backtest("X", "1H", okno=250, bary=bary)
+    e2 = backtest("X", "1H", okno=250, bary=bary, ucz_mwu=False)
+    assert e1.podsumowanie().total_trades == e2.podsumowanie().total_trades

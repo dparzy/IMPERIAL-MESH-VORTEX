@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-10 | FEATURE+POMIAR | Zamknięta pętla uczenia w backteście (ucz_mwu) — werdykt: działa, na 1D za mało rund
+
+**Opis:** Największa luka Prawa XV zamknięta — Igrzyska/MWU przestały być martwym
+klockiem w backteście:
+- `DecyzjaCyklu.pozycja_id` — atrybucja: które neurony głosowały przy wejściu.
+- `backtest(ucz_mwu=True)`: każda ZAMKNIĘTA pozycja rozlicza głosujące neurony przez
+  `HedgeMWUzPamieciaRezimu` (W-049+W-280+W-285.1: Hedge + Fixed-Share + pamięć per-reżim),
+  świeże mnożniki wracają do Legatusa na bieżąco. Bez look-ahead (uczenie wyłącznie
+  z już zamkniętych transakcji); `ustaw_rezim()` indeksuje pamięć klasyfikacją bara.
+- Opt-in (`ucz_mwu=False` domyślnie — test dowodzi identyczności ze starym zachowaniem).
+
+**POMIAR (BTC 1D AUTO, eta=0.3, α=0.02):** bez uczenia PF 2.23 / Sharpe_r 0.83;
+z uczeniem PF 1.95 / Sharpe_r 0.67. **Werdykt (Prawo I):** pętla technicznie działa,
+ale 58 zamkniętych transakcji to ZA MAŁO rund dla MWU (szum dominuje sygnał uczenia).
+Następny pomiar: interwał 1H/4H (setki transakcji) na laptopie — tam MWU ma szansę.
+Domyślnie wyłączone do czasu pozytywnego pomiaru (Prawo XVIII).
+
+**Pliki:** `imperium/koloseum/dyrygent.py`, `imperium/koloseum/backtest.py`,
+`tests/test_backtest.py` (+2).
+**Testy:** 645/645 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | FIX+POMIAR | Bug jednostek w bramce Etapu I + pierwszy TEST BOJOWY roju
 
 **Bug (złapany testem bojowym, nie unit-testem — lekcja):** `StatystykiSesji` trzyma

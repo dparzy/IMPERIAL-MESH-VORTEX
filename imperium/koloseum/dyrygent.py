@@ -71,6 +71,7 @@ class DecyzjaCyklu:
     raport: Optional[object] = None   # RaportLegatusa
     plan: Optional[PlanPozycji] = None
     sygnal: Optional[SygnalWejscia] = None
+    pozycja_id: str = ""          # ID otwartej pozycji (pętla uczenia MWU — atrybucja głosów)
 
 
 class Dyrygent:
@@ -318,7 +319,8 @@ class Dyrygent:
         return DecyzjaCyklu(symbol, "WEJSCIE", True, kierunek=kierunek,
                             pewnosc=pewnosc, rezim=raport.rezim,
                             powod=f"pozycja otwarta: {pozycja.pozycja_id}",
-                            raport=raport, plan=plan, sygnal=sygnal)
+                            raport=raport, plan=plan, sygnal=sygnal,
+                            pozycja_id=pozycja.pozycja_id)
 
     # ── Wewnętrzne ───────────────────────────────────────────────────────────
     def _wskazniki(self, bary: List[Dict[str, Any]], symbol: str = "") -> Dict[str, Any]:

@@ -178,3 +178,111 @@ if __name__ == "__main__":
             print(f"  ❌ {nazwa}: {e}")
     print(f"\n{len(fn)-bledy}/{len(fn)} zaliczone")
     sys.exit(1 if bledy else 0)
+
+
+# ── W-285.2: Dwu-zegarowy DSR (bary wolumenowe, trading-time) ────────────────
+
+from imperium.koloseum.walidacja import (  # noqa: E402
+    bary_wolumenowe, zwroty_z_barow, bramka_dwuzegarowa,
+)
+
+
+def _bary_syntetyczne(n=400, seed=5):
+    rng = np.random.default_rng(seed)
+    cena = 100.0
+    bary = []
+    for i in range(n):
+        ret = rng.normal(0.001, 0.01)
+        o = cena
+        cena = cena * (1 + ret)
+        bary.append({"open": o, "high": max(o, cena) * 1.001,
+                     "low": min(o, cena) * 0.999, "close": cena,
+                     "volume": float(rng.uniform(50, 150))})
+    return bary
+
+
+def test_bary_wolumenowe_rowny_wolumen():
+    """Każdy bar wolumenowy (poza odrzuconą końcówką) ma volume ≥ próg."""
+    bary = _bary_syntetyczne()
+    vb = bary_wolumenowe(bary, wolumen_na_bar=500.0)
+    assert len(vb) > 10
+    assert all(b["volume"] >= 500.0 for b in vb)
+
+
+def test_bary_wolumenowe_high_low_spojne():
+    """High ≥ open/close ≥ low w każdym barze zagregowanym."""
+    vb = bary_wolumenowe(_bary_syntetyczne(), wolumen_na_bar=400.0)
+    for b in vb:
+        assert b["high"] >= max(b["open"], b["close"]) - 1e-9
+        assert b["low"] <= min(b["open"], b["close"]) + 1e-9
+
+
+def test_bary_wolumenowe_granice():
+    """Granice: pusta lista → []; zerowy wolumen → []; próg ≤ 0 → ValueError."""
+    assert bary_wolumenowe([]) == []
+    zero = [{"open": 1, "high": 1, "low": 1, "close": 1, "volume": 0.0}] * 5
+    assert bary_wolumenowe(zero) == []
+    try:
+        bary_wolumenowe(_bary_syntetyczne(10), wolumen_na_bar=0.0)
+        raise AssertionError("próg 0 powinien rzucić")
+    except ValueError:
+        pass
+
+
+def test_bary_wolumenowe_auto_prog():
+    """Auto-próg (None) daje ≈ tyle barów co wejście (±50%)."""
+    bary = _bary_syntetyczne(200)
+    vb = bary_wolumenowe(bary)
+    assert 100 <= len(vb) <= 220
+
+
+def test_zwroty_z_barow():
+    bary = [{"close": 100.0}, {"close": 110.0}, {"close": 99.0}]
+    zw = zwroty_z_barow(bary)
+    assert abs(zw[0] - 0.10) < 1e-9 and abs(zw[1] + 0.10) < 1e-9
+
+
+def test_dwuzegarowa_buy_and_hold_z_dryfem_przechodzi():
+    """Strategia long-zawsze na rynku z realnym dryfem → oba zegary zielone."""
+    bary = _bary_syntetyczne(600, seed=9)
+    zw_kal = [p * z for p, z in zip([1.0] * (len(bary) - 1),
+                                    zwroty_z_barow(bary))]
+    w = bramka_dwuzegarowa(zw_kal, bary, sygnal_fn=lambda vb: [1] * len(vb))
+    assert w["zegar_wolumenowy"] is not None
+    assert w["ok"], f"realny dryf powinien przejść oba zegary: {w}"
+
+
+def test_dwuzegarowa_szum_nie_przechodzi():
+    """Strategia losowa na rynku bez dryfu → odrzucona z czytelnym powodem."""
+    rng = np.random.default_rng(3)
+    bary = []
+    cena = 100.0
+    for _ in range(600):
+        ret = rng.normal(0.0, 0.01)
+        o = cena
+        cena *= (1 + ret)
+        bary.append({"open": o, "high": max(o, cena), "low": min(o, cena),
+                     "close": cena, "volume": float(rng.uniform(50, 150))})
+    zw_kal = [float(rng.choice([-1, 1])) * z for z in zwroty_z_barow(bary)]
+    w = bramka_dwuzegarowa(zw_kal, bary,
+                           sygnal_fn=lambda vb: list(rng.choice([-1, 1], len(vb))))
+    assert not w["ok"] and w["powod"]
+
+
+def test_dwuzegarowa_za_malo_barow_wolumenowych():
+    """Granica: < 12 barów wolumenowych → odrzucone z powodem."""
+    bary = _bary_syntetyczne(8)
+    zw = zwroty_z_barow(bary)
+    w = bramka_dwuzegarowa(zw, bary, sygnal_fn=lambda vb: [1] * len(vb))
+    assert not w["ok"] and "za mało barów wolumenowych" in w["powod"]
+
+
+def test_dwuzegarowa_sygnal_fn_zla_dlugosc_rzuca():
+    """sygnal_fn zwracający złą długość → ValueError (kontrakt jawny)."""
+    bary = _bary_syntetyczne(300)
+    zw = zwroty_z_barow(bary)
+    try:
+        bramka_dwuzegarowa(zw, bary, sygnal_fn=lambda vb: [1] * (len(vb) - 1))
+        raise AssertionError("powinno rzucić ValueError")
+    except ValueError:
+        pass

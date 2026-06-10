@@ -228,3 +228,102 @@ def bramka_walidacji(zwroty_kandydata: Sequence[float],
         wynik["powod"] = (dsr.get("powod")
                           or f"DSR={dsr['dsr']} < {PROG_DSR} (Sharpe nieodporny na selection bias)")
     return wynik
+
+
+# ─── 4. DWU-ZEGAROWY DSR (W-285.2 💎 unikat Imperium) ─────────────────────────
+
+def bary_wolumenowe(bary: List[dict], wolumen_na_bar: "float | None" = None) -> List[dict]:
+    """
+    Trading-time Mandelbrota (BIB-009, W-144): agreguje bary kalendarzowe w bary
+    o (w przybliżeniu) RÓWNYM WOLUMENIE. Rynek "tyka" aktywnością, nie zegarem:
+    1 dzień paniki niesie więcej informacji niż tydzień ciszy.
+
+    bary: lista dictów OHLCV (open/high/low/close/volume).
+    wolumen_na_bar: próg wolumenu na 1 bar wolumenowy.
+        None → automatycznie: total_volume / len(bary) (≈ tyle samo barów co wejście).
+
+    Zwraca listę barów wolumenowych (open pierwszego, close ostatniego,
+    high=max, low=min, volume=suma). Końcówka poniżej progu jest ODRZUCANA
+    (niepełny bar = nieporównywalny — Prawo I).
+    """
+    if not bary:
+        return []
+    vols = [float(b.get("volume", 0.0)) for b in bary]
+    total = sum(vols)
+    if total <= 0:
+        return []
+    if wolumen_na_bar is None:
+        wolumen_na_bar = total / len(bary)
+    if wolumen_na_bar <= 0:
+        raise ValueError("wolumen_na_bar musi być > 0")
+    wynik: List[dict] = []
+    akum = 0.0
+    o = h = low = c = None
+    for b in bary:
+        v = float(b.get("volume", 0.0))
+        if o is None:
+            o = float(b["open"]); h = float(b["high"])
+            low = float(b["low"])
+        h = max(h, float(b["high"]))
+        low = min(low, float(b["low"]))
+        c = float(b["close"])
+        akum += v
+        if akum >= wolumen_na_bar:
+            wynik.append({"open": o, "high": h, "low": low, "close": c,
+                          "volume": akum})
+            akum = 0.0
+            o = None
+    return wynik
+
+
+def zwroty_z_barow(bary: List[dict]) -> List[float]:
+    """Proste zwroty close-to-close z listy barów."""
+    closes = [float(b["close"]) for b in bary]
+    return [(closes[i] - closes[i - 1]) / closes[i - 1]
+            for i in range(1, len(closes)) if closes[i - 1] != 0]
+
+
+def bramka_dwuzegarowa(zwroty_kalendarzowe: Sequence[float],
+                       bary_kalendarzowe: List[dict],
+                       sygnal_fn,
+                       n_prob: int = 1) -> dict:
+    """
+    💎 W-285.2 | Dwu-zegarowy DSR — ORYGINALNA bramka Imperium.
+
+    DLA NOWICJUSZA: niektóre strategie "działają" w backteście tylko dlatego,
+    że czas kalendarzowy nierówno rozkłada informację — długie ciche okresy
+    sztucznie wygładzają krzywą. Liczymy DSR DWA RAZY: (1) na zwrotach
+    kalendarzowych strategii, (2) na zwrotach tej samej strategii odtworzonej
+    w TRADING-TIME (bary wolumenowe). Przechodzi tylko, gdy OBA zegary zielone.
+
+    zwroty_kalendarzowe: zwroty strategii per bar kalendarzowy.
+    bary_kalendarzowe: surowe OHLCV (do przeliczenia na bary wolumenowe).
+    sygnal_fn: callable(bary) -> lista pozycji {-1, 0, +1} per bar — ta sama
+        logika strategii, odpalona na barach wolumenowych. Zwrot strategii
+        w trading-time = pozycja[i-1] · zwrot_baru[i] (bez look-ahead).
+    n_prob: liczba testowanych wariantów (korekta selection bias).
+
+    Zwraca dict: zegar_kalendarzowy, zegar_wolumenowy, ok (oba ✓), powod.
+    """
+    dsr_kal = deflated_sharpe(zwroty_kalendarzowe, n_prob=n_prob)
+    vb = bary_wolumenowe(bary_kalendarzowe)
+    if len(vb) < 12:
+        return {"zegar_kalendarzowy": dsr_kal, "zegar_wolumenowy": None,
+                "ok": False,
+                "powod": f"za mało barów wolumenowych ({len(vb)} < 12)"}
+    pozycje = list(sygnal_fn(vb))
+    if len(pozycje) != len(vb):
+        raise ValueError("sygnal_fn musi zwrócić pozycję dla każdego baru")
+    zw_vb = zwroty_z_barow(vb)
+    # pozycja z baru i-1 zarabia zwrot baru i (bez look-ahead, Prawo I)
+    zw_strat_vb = [pozycje[i - 1] * zw_vb[i - 1] for i in range(1, len(vb))]
+    dsr_vol = deflated_sharpe(zw_strat_vb, n_prob=n_prob)
+    ok = bool(dsr_kal["ok"] and dsr_vol["ok"])
+    powod = ""
+    if not dsr_kal["ok"]:
+        powod = f"zegar kalendarzowy: {dsr_kal.get('powod') or 'DSR=' + str(dsr_kal['dsr'])}"
+    elif not dsr_vol["ok"]:
+        powod = (f"zegar wolumenowy: {dsr_vol.get('powod') or 'DSR=' + str(dsr_vol['dsr'])}"
+                 " — strategia żyje z nierównej gęstości czasu, nie z przewagi")
+    return {"zegar_kalendarzowy": dsr_kal, "zegar_wolumenowy": dsr_vol,
+            "ok": ok, "powod": powod}

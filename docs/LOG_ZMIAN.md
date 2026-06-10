@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-06-10 | FEATURE+POMIAR | W-285.2 Dwu-zegarowy DSR (unikat) + pomiar W-281 (werdykt: ADX zostaje)
+
+**Opis:**
+1. **W-285.2 💎 Dwu-zegarowy DSR** (`koloseum/walidacja.py`): `bary_wolumenowe()` (trading-time
+   Mandelbrota, BIB-009/W-144 — bary o równym wolumenie, końcówka odrzucana) + `bramka_dwuzegarowa()` —
+   DSR liczony na zwrotach kalendarzowych ORAZ na strategii odtworzonej w trading-time
+   (`sygnal_fn` na barach wolumenowych, pozycja[i−1]·zwrot[i], bez look-ahead). Przechodzi
+   tylko gdy OBA zegary zielone — odpada strategia żyjąca z nierównej gęstości czasu. +9 testów.
+2. **Pomiar W-281** (`narzedzia/pomiar_jump_model.py`, NOWE narzędzie): przyczynowy walk-forward
+   (okno 250, refit 20, λ=30), miara = zwrot baru t+1 po stanie t. WYNIK NEGATYWNY dla JM:
+   BTC 1D sep(B−B) −5.0 bps vs ADX +20.9; ETH 1D −24.9 vs +31.0; przełączeń 4× więcej.
+   **Werdykt (Prawo XVIII): JumpModel NIE wchodzi do klasyfikuj_rezim(); W-285.3 Trybunał
+   odłożony.** Moduł+testy zostają. Uczciwy pomiar > entuzjazm papierów (Prawo I).
+   Bugi naprawione w narzędziu: CSV CryptoDataDownload od najnowszych (sort po Unix),
+   Volume ETH/BTC/USDT, stan bez wystąpień → NEUTRAL.
+
+**Pliki:** `imperium/koloseum/walidacja.py`, `tests/test_walidacja.py`,
+`narzedzia/pomiar_jump_model.py` (nowy), `docs/` (WIZJONER werdykt+tabela, MANIFEST, LOG, README).
+**Testy:** 634/634 ✅ (625+9). Audyt: pełna harmonia.
+
 ## 2026-06-10 | FEATURE | Pakiet "najlepsi z najlepszych": W-280 + W-281 + W-282 + W-285.1 (unikat)
 
 **Opis:** Wdrożenie pakietu z deep researchu (4 moduły, +39 testów, 586→625):

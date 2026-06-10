@@ -2132,7 +2132,20 @@ gdy czysty Hedge — STAŁY żal średni (nie zbiega!), bo za mocno commituje do
 mogą „grzebać" dobre neurony po złej passie. **Wdrożenie trywialne:** jedna linia w `hedge_mwu.py`
 (parametr α≈0.01–0.05), zero nowych zależności. Status: ⚠️ zweryfikowane wyszukiwaniem (papery arXiv).
 
-#### 🥈 W-281 | Statistical Jump Model — detektor reżimu lepszy niż HMM i progi ADX 🔴 ✅ WDROŻONE 2026-06-10 (`legiony/jump_model.py`, +10 testów; wpięcie do klasyfikuj_rezim = Faza 3 po pomiarze)
+#### 🥈 W-281 | Statistical Jump Model — detektor reżimu 🔴 ✅ MODUŁ WDROŻONY / ⏸️ FAZA 3 WSTRZYMANA PO POMIARZE (2026-06-10)
+
+**Werdykt pomiaru (Prawo XVIII — `narzedzia/pomiar_jump_model.py`, walk-forward przyczynowy,
+okno 250/refit 20/λ=30, cechy zwrot+vol20, miara = zwrot baru t+1 po stanie t):**
+
+| Rynek | JM sep(BULL−BEAR) | JM przełączeń/100 | ADX sep(BULL−BEAR) | ADX przełączeń/100 |
+|---|---|---|---|---|
+| BTC 1D (3192 barów) | **−5.0 bps** | 23.5 | **+20.9 bps** | 5.5 |
+| ETH 1D (3192 barów) | **−24.9 bps** | 21.6 | **+31.0 bps** | 5.3 |
+
+Baseline ADX wygrywa w obu wymiarach (predykcyjność i trwałość) → JumpModel NIE wchodzi
+do `klasyfikuj_rezim()`; W-285.3 (Trybunał) odłożony. Podejrzane słabości tej konfiguracji
+(do ew. dalszych prób): `przypisz_ostatni` klasyfikuje bez kary skoku (migocze między
+refitami) + nazwy stanów ze średnich in-sample. Moduł i testy zostają (klocek na przyszłość).
 
 **Co znalazłem:** Statistical Jump Model (Nystrup, Kolm, Lindström) — klastrowanie cech
 z JAWNĄ karą za skok między reżimami (jump penalty λ) → reżimy trwałe, mało fałszywych alarmów.

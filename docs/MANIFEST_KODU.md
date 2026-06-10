@@ -271,7 +271,9 @@
 | Fixed-Share w HedgeMWU (W-280 — mieszanie masy α: zakopane wagi wracają po zmianie reżimu) | `biblioteki/hedge_mwu.py` | ✅ aktywny |
 | HedgeMWUzPamieciaRezimu (W-285.1 💎 unikat — mixing wg pamięci wag per-reżim z Namiestnika) | `biblioteki/hedge_mwu.py` | ✅ aktywny |
 | Walidacja Koloseum: Deflated Sharpe + PBO/CSCV (W-282, BIB-007 — bramka anty-overfittingu) | `koloseum/walidacja.py` | ✅ aktywny |
-| JumpModel (W-281 — detektor reżimu z karą za skok; klocek Fazy 3 master-switcha, czeka na pomiar) | `legiony/jump_model.py` | ✅ aktywny |
+| Dwu-zegarowy DSR (W-285.2 💎 unikat — bary wolumenowe/trading-time + podwójna bramka DSR) | `koloseum/walidacja.py` | ✅ aktywny |
+| PomiarJumpModel (tabela dowodowa W-281 vs ADX — narzędzie Prawa XVIII) | `narzedzia/pomiar_jump_model.py` | ✅ aktywny |
+| JumpModel (W-281 — detektor reżimu z karą za skok; pomiar 2026-06-10: ADX-baseline lepszy → POZA pipeline) | `legiony/jump_model.py` | ✅ moduł (⏸️ niewpięty po pomiarze) |
 | PaperTradingEngine | `koloseum/paper_trading.py` | ✅ aktywny |
 | Dyrygent (orkiestrator cyklu end-to-end) | `koloseum/dyrygent.py` | ✅ aktywny |
 | Backtest (przejazd po historii) | `koloseum/backtest.py` | ✅ aktywny |

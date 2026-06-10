@@ -6,6 +6,164 @@
 
 ---
 
+## 2026-06-10 | FEATURE | CLI backtestu z werdyktem Etapu I + flagi --auto/--ucz
+
+**Opis:** Każdy backtest z linii poleceń kończy się teraz JAWNYM werdyktem bramki
+Etapu I Koloseum (✅ awans do paper / ⛔ powód odrzucenia) — Prawo I: koniec z
+"raportem bez wniosku". Nowe flagi CLI: `--auto` (Namiestnik AUTO-reżim),
+`--ucz` (pętla uczenia MWU). Użycie:
+`python -m imperium.koloseum.backtest dane/dzienne/Binance_BTCUSDT_d.csv 1D --auto`
+
+**POMIAR 1H (BTC, 4000 barów, AUTO — dokończenie pomiaru pętli uczenia z 1D):**
+- bez uczenia: 67 trades, WR 56.7%, PF 1.11, PnL +128, Sharpe_r 0.28 → ⛔
+- z uczeniem:  67 trades, WR 53.7%, PF 0.95, PnL −61, Sharpe_r −0.29 → ⛔
+
+**Werdykt (Prawo I):** hipoteza "gęstsze dane = więcej rund MWU" NIE potwierdziła się —
+rój na 1H wchodzi rzadko (67 wejść / 4000 barów; ostre progi pewności), więc rund uczenia
+nadal za mało, a edge roju na 1H w tym oknie jest słaby (PF 1.11). Wnioski na następne
+sesje (laptop): (a) kalibracja selektywności/progów pod 1H-4H, (b) świeże dane MEXC,
+(c) strojenie eta/alpha MWU dopiero przy ≥300 transakcjach. `ucz_mwu` zostaje OFF.
+
+**Pliki:** `imperium/koloseum/backtest.py`.
+**Testy:** 645/645 ✅. Audyt: pełna harmonia.
+
+---
+
+## 2026-06-10 | FEATURE+POMIAR | Zamknięta pętla uczenia w backteście (ucz_mwu) — werdykt: działa, na 1D za mało rund
+
+**Opis:** Największa luka Prawa XV zamknięta — Igrzyska/MWU przestały być martwym
+klockiem w backteście:
+- `DecyzjaCyklu.pozycja_id` — atrybucja: które neurony głosowały przy wejściu.
+- `backtest(ucz_mwu=True)`: każda ZAMKNIĘTA pozycja rozlicza głosujące neurony przez
+  `HedgeMWUzPamieciaRezimu` (W-049+W-280+W-285.1: Hedge + Fixed-Share + pamięć per-reżim),
+  świeże mnożniki wracają do Legatusa na bieżąco. Bez look-ahead (uczenie wyłącznie
+  z już zamkniętych transakcji); `ustaw_rezim()` indeksuje pamięć klasyfikacją bara.
+- Opt-in (`ucz_mwu=False` domyślnie — test dowodzi identyczności ze starym zachowaniem).
+
+**POMIAR (BTC 1D AUTO, eta=0.3, α=0.02):** bez uczenia PF 2.23 / Sharpe_r 0.83;
+z uczeniem PF 1.95 / Sharpe_r 0.67. **Werdykt (Prawo I):** pętla technicznie działa,
+ale 58 zamkniętych transakcji to ZA MAŁO rund dla MWU (szum dominuje sygnał uczenia).
+Następny pomiar: interwał 1H/4H (setki transakcji) na laptopie — tam MWU ma szansę.
+Domyślnie wyłączone do czasu pozytywnego pomiaru (Prawo XVIII).
+
+**Pliki:** `imperium/koloseum/dyrygent.py`, `imperium/koloseum/backtest.py`,
+`tests/test_backtest.py` (+2).
+**Testy:** 645/645 ✅. Audyt: pełna harmonia.
+
+## 2026-06-10 | FIX+POMIAR | Bug jednostek w bramce Etapu I + pierwszy TEST BOJOWY roju
+
+**Bug (złapany testem bojowym, nie unit-testem — lekcja):** `StatystykiSesji` trzyma
+`win_rate` i `max_drawdown_pct` jako UŁAMKI (0.5=50%) mimo sufiksu `_pct`; bramka
+dzieliła przez 100 → progi WR i MaxDD były martwe. Unit-test nie złapał, bo duck-type
+`_Stat` podawał procenty — test powielił błędne założenie autora. Naprawione
+(bramka + testy na ułamkach, komentarz ostrzegawczy o jednostkach).
+
+**TEST BOJOWY (pełny rój, realne dane, bramka Etapu I, n_prob=4):**
+
+| Rynek | Tryb | Trades | WR | PF | MaxDD | PnL | Sharpe_r | DSR | Werdykt |
+|---|---|---|---|---|---|---|---|---|---|
+| BTC 1D | agregat | 133 | 52% | 1.22 | — | +2353 | 0.34 | 0.47 | ⛔ Sharpe |
+| BTC 1D | agregat-AUTO | 59 | 55.9% | **2.23** | **4.3%** | **+3622** | 0.83 | 0.94 | ⛔ Sharpe 0.83≤1.0 |
+| ETH 1D | agregat-AUTO | 72 | 51.4% | 1.15 | 11.3% | +791 | 0.19 | 0.30 | ⛔ |
+
+**Wnioski (Prawo I — uczciwie):**
+1. **Namiestnik AUTO-reżim to ogromna wartość:** PF 1.22→2.23, DSR 0.47→0.94, połowa trade'ów.
+2. Rój ZARABIA na BTC z świetną kontrolą ryzyka (MaxDD 4.3%), ale Sharpe 0.83 — bramka
+   (słusznie surowa) jeszcze nie przepuszcza do Etapu II. Brakuje selektywności/rozmiaru.
+3. ETH 1D: brak przewagi — rój kalibrowany na BTC nie przenosi się 1:1.
+
+**Pliki:** `imperium/koloseum/walidacja.py`, `tests/test_walidacja.py`.
+**Testy:** 643/643 ✅. Audyt: pełna harmonia.
+
+## 2026-06-10 | FEATURE | Bramka Etapu I Koloseum wpięta w backtest (ROADMAP × W-282)
+
+**Opis:** Domknięcie pętli walidacji — bramki przestały być "gotowe ale niepodpięte"
+(czerwony alarm Prawa XV z poprzedniej sesji):
+- `backtest()` zbiera teraz **krzywą equity per bar** (`engine.krzywa_equity`) —
+  +1 punkt po zamknięciu końcowym; testowany kontrakt długości.
+- NOWA `etap_pierwszy_koloseum(krzywa, statystyki, interwal, n_prob)` w
+  `koloseum/walidacja.py`: progi ROADMAP § ZASADA ARENY (≥10 trade'ów, Sharpe
+  roczny > 1.0 annualizowany wg interwału, MaxDD < 15%, WR > 55% LUB PF > 1.5)
+  **plus** DSR ≥ 0.95 (W-282) — jeden werdykt ok/powod. Strategia bez przejścia
+  bramki nie awansuje do Etapu II (paper).
+- Werdykt zawsze z czytelnym powodem pierwszego czerwonego progu (Prawo I).
+
+**Pliki:** `imperium/koloseum/backtest.py`, `imperium/koloseum/walidacja.py`,
+`tests/test_walidacja.py` (+8), `tests/test_backtest.py` (+1, kontrakt end-to-end).
+**Testy:** 643/643 ✅ (634+9). Audyt: pełna harmonia.
+
+## 2026-06-10 | FEATURE+POMIAR | W-285.2 Dwu-zegarowy DSR (unikat) + pomiar W-281 (werdykt: ADX zostaje)
+
+**Opis:**
+1. **W-285.2 💎 Dwu-zegarowy DSR** (`koloseum/walidacja.py`): `bary_wolumenowe()` (trading-time
+   Mandelbrota, BIB-009/W-144 — bary o równym wolumenie, końcówka odrzucana) + `bramka_dwuzegarowa()` —
+   DSR liczony na zwrotach kalendarzowych ORAZ na strategii odtworzonej w trading-time
+   (`sygnal_fn` na barach wolumenowych, pozycja[i−1]·zwrot[i], bez look-ahead). Przechodzi
+   tylko gdy OBA zegary zielone — odpada strategia żyjąca z nierównej gęstości czasu. +9 testów.
+2. **Pomiar W-281** (`narzedzia/pomiar_jump_model.py`, NOWE narzędzie): przyczynowy walk-forward
+   (okno 250, refit 20, λ=30), miara = zwrot baru t+1 po stanie t. WYNIK NEGATYWNY dla JM:
+   BTC 1D sep(B−B) −5.0 bps vs ADX +20.9; ETH 1D −24.9 vs +31.0; przełączeń 4× więcej.
+   **Werdykt (Prawo XVIII): JumpModel NIE wchodzi do klasyfikuj_rezim(); W-285.3 Trybunał
+   odłożony.** Moduł+testy zostają. Uczciwy pomiar > entuzjazm papierów (Prawo I).
+   Bugi naprawione w narzędziu: CSV CryptoDataDownload od najnowszych (sort po Unix),
+   Volume ETH/BTC/USDT, stan bez wystąpień → NEUTRAL.
+
+**Pliki:** `imperium/koloseum/walidacja.py`, `tests/test_walidacja.py`,
+`narzedzia/pomiar_jump_model.py` (nowy), `docs/` (WIZJONER werdykt+tabela, MANIFEST, LOG, README).
+**Testy:** 634/634 ✅ (625+9). Audyt: pełna harmonia.
+
+## 2026-06-10 | FEATURE | Pakiet "najlepsi z najlepszych": W-280 + W-281 + W-282 + W-285.1 (unikat)
+
+**Opis:** Wdrożenie pakietu z deep researchu (4 moduły, +39 testów, 586→625):
+
+1. **W-280 Fixed-Share** (`biblioteki/hedge_mwu.py`): parametr `alpha_share` — po każdej
+   rundzie ułamek α masy wraca do puli (w_i ← (1−α)·w_i + α·średnia). Naprawia strukturalną
+   wadę czystego Hedge w niestacjonarności (zakopane wagi wracają po zmianie reżimu).
+   α=0 → dokładnie stary HedgeMWU (test dowodzi zero regresji).
+2. **W-282 Bramka anty-overfittingu** (`koloseum/walidacja.py`, NOWY): Deflated Sharpe Ratio
+   (korekta o liczbę prób + skośność/kurtozę; Bailey & de Prado 2014) + PBO przez CSCV
+   (C(S,S/2) podziałów; Bailey et al. 2015) + `bramka_walidacji()` — strategia przechodzi
+   tylko gdy DSR ≥ 0.95 ORAZ PBO < 0.20. Pure-Python (Φ przez erf, Φ⁻¹ Acklam).
+3. **W-281 JumpModel** (`legiony/jump_model.py`, NOWY): detektor reżimu z karą za skok λ
+   (Viterbi-DP + naprzemienna aktualizacja centroidów, multi-start, deterministyczny seed).
+   Krypto-paper: Cortese/Kolm/Lindström 2023 (3 stany bull/neutral/bear). KLOCEK Fazy 3
+   master-switcha — wpięcie do klasyfikuj_rezim() po pomiarze (Prawo XVIII).
+4. **W-285.1 💎 HedgeMWUzPamieciaRezimu** (unikat Imperium): Fixed-Share, ale masa mieszana
+   wg PAMIĘCI wag per-reżim (EMA) zamiast uniform — gdy wraca RANGING, neurony mean-reversion
+   odzyskują wagę natychmiast. Inspiracja: Bousquet & Warmuth (JMLR 2002) "sharing to past
+   posteriors"; nasz twist: indeksowanie reżimem z Namiestnika, nie czasem.
+
+**Infrastruktura przy okazji (Prawo XV):** `tests/run_tests.py` — AUTO-DISCOVERY plików
+test_*.py (sztywna lista cicho zgubiła test_walidacja — nowy strażnik istniał, ale nie był
+uruchamiany). Bramka W13 złapała w trakcie pracy 3 nieużywane importy — system działa.
+
+**Pliki:** `imperium/biblioteki/hedge_mwu.py`, `imperium/koloseum/walidacja.py` (nowy),
+`imperium/legiony/jump_model.py` (nowy), `tests/test_walidacja.py` (nowy),
+`tests/test_jump_model.py` (nowy), `tests/test_hedge_mwu.py`, `tests/run_tests.py`,
+`docs/` (MANIFEST, WIZJONER statusy, README, LOG).
+**Testy:** 625/625 ✅ (586+39). Audyt: 13 warstw, pełna harmonia.
+
+## 2026-06-10 | ZWIAD | Deep research 2024-2026 → wizje W-280..W-285 (WIZJONER)
+
+**Opis:** Zwiad internetowy (5 osi: agregacja głosów, detekcja reżimu, anty-overfitting,
+risk mgmt, darmowe dane). Najważniejsze znaleziska (pełne linki w WIZJONER § 2026-06-10):
+- **W-280 Fixed-Share** — naprawia strukturalną wadę Hedge/MWU w niestacjonarnych rynkach
+  (zakopane wagi nie wracają); wdrożenie = 1 linia w hedge_mwu.py. 🔴
+- **W-281 Statistical Jump Model** — detektor reżimu z karą za skok; na krypto (Cortese/Kolm/
+  Lindström 2023) bije HMM trwałością stanów; kandydat na Fazę 3 master-switcha. 🔴
+- **W-282 DSR + PBO/CSCV** — twarda bramka anty-overfittingu w Koloseum (procedura konkretna). 🔴
+- **W-283** — crypto-carry skompresowane od 2024 (BIS WP 1087): W-065 degradacja priorytetu;
+  PSY-01 funding-extreme zostaje (inny mechanizm).
+- **W-284** — OFI z L2 ma uniwersalną krótkoterminową moc (arXiv 2026) — potwierdza EXP-12/W-060.
+- **W-285** — 3 oryginalne syntezy Imperium: Fixed-Share z pamięcią reżimu (Mnemosyne-mixing),
+  dwu-zegarowy DSR (czas barowy × trading-time), Trybunał Trzech Zegarów (jump model jako
+  ekspert meta-gry rozliczany Fixed-Share).
+
+**Pliki:** `docs/WIZJONER.md` (nowa sekcja + 6 wizji), `docs/LOG_ZMIAN.md`.
+**Kod:** bez zmian (czysty zwiad — wdrożenia wg priorytetu po decyzji Cezara).
+
+---
+
 ## 2026-06-10 | INFRA | Ruff (W13) — rozszerzony ruleset o realne klasy bugów + audyt wsteczny granic
 
 **Opis:** „Żeby było najlepiej" — zastosowano nową dyscyplinę WSTECZ i wzmocniono bramkę:

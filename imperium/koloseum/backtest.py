@@ -54,6 +54,7 @@ def backtest(
     tryb: str = "agregat",
     bary: Optional[List[Dict[str, Any]]] = None,
     auto_rezim: bool = False,
+    ucz_mwu: bool = False,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -64,6 +65,11 @@ def backtest(
     bary:       opcjonalnie gotowe bary (oszczędza ponownego czytania CSV przy porównaniu trybów)
     auto_rezim: True → klasyfikuj_rezim() na każdym barze + Namiestnik steruje
                 trybem/dźwignią/progiem (Faza 1 ożywiona). False → stary "NORMAL".
+    ucz_mwu:    True → ZAMKNIĘTA PĘTLA UCZENIA (W-049/W-280/W-285.1): każda
+                zamknięta pozycja rozlicza neurony, które głosowały przy wejściu
+                (HedgeMWUzPamieciaRezimu — Fixed-Share + pamięć per-reżim), a
+                mnożniki wag wracają do Legatusa NA BIEŻĄCO. Bez look-ahead:
+                uczymy się wyłącznie z już ZAMKNIĘTYCH transakcji.
     """
     from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
     from imperium.legiony.rejestr import zbuduj_legatusa
@@ -86,26 +92,57 @@ def backtest(
                         min_pewnosc=min_pewnosc, tryb=tryb, namiestnik=namiestnik)
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"
 
+    # Pętla uczenia (opt-in): MWU z pamięcią reżimu + atrybucja głosów per pozycja
+    mwu = None
+    glosy_pozycji: Dict[str, list] = {}
+    if ucz_mwu:
+        from imperium.biblioteki.hedge_mwu import HedgeMWUzPamieciaRezimu
+        mwu = HedgeMWUzPamieciaRezimu(eta=0.3, alpha_share=0.02)
+
     wejscia = 0
     weta = 0
+    krzywa_equity: List[float] = []   # equity po każdym barze (dla bramki W-282)
     for i in range(okno, len(bary)):
         biezacy = bary[i]
         okno_barow = bary[i - okno: i + 1]   # do bieżącej świecy włącznie (bez przyszłości)
 
         # 1. Aktualizuj otwarte pozycje bieżącą świecą
-        engine.przetworz_bar(_bar_data(biezacy))
+        zamkniete = engine.przetworz_bar(_bar_data(biezacy))
+        krzywa_equity.append(engine.kapital_calkowity)
+
+        # 1b. PĘTLA UCZENIA: rozlicz neurony z ZAMKNIĘTYCH pozycji (bez look-ahead —
+        # wynik znany dopiero teraz), potem świeże mnożniki wracają do Legatusa.
+        if mwu is not None and zamkniete:
+            for w in zamkniete:
+                zyskowny = w.kierunek if w.pnl_usdt > 0 else (
+                    "SHORT" if w.kierunek == "LONG" else "LONG")
+                for neuron_id, kier in glosy_pozycji.pop(w.pozycja_id, []):
+                    mwu.zarejestruj_wynik(neuron_id, kier, zyskowny)
+            legatus.ustaw_mnozniki_neuronow(mwu.mnozniki())
 
         # 2. Decyzja na podstawie okna
         decyzja = dyrygent.cykl(symbol, okno_barow,
                                 rezim=rezim_arg, timestamp=biezacy["timestamp"])
+        if mwu is not None:
+            # pamięć reżimu indeksowana klasyfikacją z TEGO baru (W-285.1)
+            mwu.ustaw_rezim(decyzja.rezim)
         if decyzja.wszedl:
             wejscia += 1
+            if mwu is not None and decyzja.raport is not None:
+                glosy_pozycji[decyzja.pozycja_id] = [
+                    (s.neuron_id, s.kierunek) for s in decyzja.raport.sygnaly
+                    if s.kierunek in ("LONG", "SHORT")]
         elif decyzja.etap in ("PRETORIANIE_WETO", "LEGATUS_WETO"):
             weta += 1
 
     # 3. Zamknij pozostałe otwarte po ostatniej cenie
     ostatnia_cena = {symbol: bary[-1]["close"]}
     engine.zamknij_wszystkie(ostatnia_cena, powod="MANUAL")
+    krzywa_equity.append(engine.kapital_calkowity)
+    # Krzywa equity per bar — wejście bramki walidacji Koloseum (W-282):
+    #   from imperium.koloseum.walidacja import etap_pierwszy_koloseum
+    #   werdykt = etap_pierwszy_koloseum(engine.krzywa_equity, engine.podsumowanie())
+    engine.krzywa_equity = krzywa_equity
 
     logger.info(f"[Backtest] {symbol} {interwal}: {len(bary)} barów, "
                 f"{wejscia} wejść, {weta} wet Pretorianów")
@@ -241,8 +278,24 @@ def main():
     for t in ("agregat", "filtr", "strategia"):
         if t in sys.argv:
             tryb = t
-    engine = backtest(sciezka, interwal, max_barow=max_barow, tryb=tryb)
+    auto = "--auto" in sys.argv
+    ucz = "--ucz" in sys.argv
+    engine = backtest(sciezka, interwal, max_barow=max_barow, tryb=tryb,
+                      auto_rezim=auto, ucz_mwu=ucz)
     engine.drukuj_raport()
+
+    # Werdykt Etapu I Koloseum (ROADMAP Arena × W-282) — każdy backtest CLI
+    # kończy się jawnym TAK/NIE na awans do paper tradingu (Prawo I).
+    from imperium.koloseum.walidacja import etap_pierwszy_koloseum
+    st = engine.podsumowanie()
+    st.oblicz(engine.historia_zamkniec)
+    w = etap_pierwszy_koloseum(engine.krzywa_equity, st, interwal=interwal)
+    if w["ok"]:
+        print(f"\n🏟️ ETAP I KOLOSEUM: ✅ ZALICZONY (Sharpe_r={w['sharpe_roczny']}, "
+              f"DSR={w['dsr']}) — strategia może iść do Etapu II (paper).")
+    else:
+        print(f"\n🏟️ ETAP I KOLOSEUM: ⛔ ODRZUCONY — {w['powod']} "
+              f"(Sharpe_r={w['sharpe_roczny']}, DSR={w['dsr']})")
 
 
 if __name__ == "__main__":

@@ -45,17 +45,29 @@ class HedgeMWU:
         ig = Igrzyska(); ig.obserwatorzy.append(mwu); ig.przetworz_logi(logi)
     """
 
-    def __init__(self, eta: float = 0.5, min_waga: float = 1e-6):
+    def __init__(self, eta: float = 0.5, min_waga: float = 1e-6,
+                 alpha_share: float = 0.02):
         """
         eta: tempo uczenia (>0). Większe = szybsza, bardziej nerwowa adaptacja.
              0.5 to rozsądny default dla strumieni o umiarkowanym szumie.
         min_waga: podłoga wagi surowej — ekspert nigdy nie umiera całkowicie
                   (może wrócić do łask, gdy znów zacznie trafiać). Prawo XV.
+        alpha_share: Fixed-Share (W-280, Herbster & Warmuth 1998). Po każdej
+             rundzie ułamek α masy wraca równo do puli:
+                 w_i ← (1−α)·w_i + α·średnia(wag)
+             Czysty Hedge (α=0) ma strukturalną wadę na rynkach NIESTACJONARNYCH:
+             zakopana waga wraca tylko mnożnikowo (≈nigdy), nawet gdy reżim się
+             zmienił i ekspert znów trafia. Fixed-Share: żal O(1/√T) przy zmianach
+             reżimu vs STAŁY żal Hedge. Źródła: https://arxiv.org/pdf/2106.13021,
+             https://arxiv.org/pdf/1008.4532. α=0 → dokładnie stary HedgeMWU.
         """
         if eta <= 0:
             raise ValueError("eta musi być > 0")
+        if not (0.0 <= alpha_share < 1.0):
+            raise ValueError("alpha_share musi być w [0, 1)")
         self.eta = eta
         self.min_waga = min_waga
+        self.alpha_share = alpha_share
         self.wagi_raw: Dict[str, float] = {}   # nieznormalizowane wagi ekspertów
         self.rundy: Dict[str, int] = {}        # ile wyników widział dany ekspert
 
@@ -65,12 +77,19 @@ class HedgeMWU:
     def aktualizuj(self, klucz: str, strata: float):
         """
         Jedna runda dla eksperta: strata ∈ [0,1] (0=trafił, 1=pomylił się).
-        w ← max(min_waga, w · exp(-η·strata)).
+        Krok 1 (Hedge):       w ← max(min_waga, w · exp(-η·strata))
+        Krok 2 (Fixed-Share): w_i ← (1−α)·w_i + α·średnia(wag) dla WSZYSTKICH
+        znanych ekspertów — droga powrotu dla zakopanych wag (W-280).
         """
         strata = max(0.0, min(1.0, strata))
         w = self._waga(klucz) * math.exp(-self.eta * strata)
         self.wagi_raw[klucz] = max(self.min_waga, w)
         self.rundy[klucz] = self.rundy.get(klucz, 0) + 1
+        if self.alpha_share > 0.0 and len(self.wagi_raw) > 1:
+            srednia = sum(self.wagi_raw.values()) / len(self.wagi_raw)
+            for k in self.wagi_raw:
+                self.wagi_raw[k] = ((1.0 - self.alpha_share) * self.wagi_raw[k]
+                                    + self.alpha_share * srednia)
 
     def zarejestruj_wynik(self, klucz: str, kierunek: str,
                           zyskowny_kierunek: str,
@@ -134,6 +153,82 @@ class HedgeMWU:
         ]
         wiersze.sort(key=lambda x: x["mnoznik"], reverse=True)
         return wiersze
+
+
+class HedgeMWUzPamieciaRezimu(HedgeMWU):
+    """
+    💎 W-285.1 | "Pretorianin Pamięci Reżimów" — ORYGINALNY wariant Imperium.
+
+    DLA NOWICJUSZA: Fixed-Share (W-280) ratuje zakopane wagi, dosypując im masę
+    RÓWNO (uniform). Ale my wiemy więcej: Namiestnik mówi nam, JAKI jest reżim
+    (TREND/RANGING/VOLATILE...). Ten wariant pamięta, jakie wagi miał każdy
+    neuron W KAŻDYM REŻIMIE z przeszłości — i gdy reżim wraca, dosypywana masa
+    idzie wg TAMTYCH wag, nie uniform. Neurony mean-reversion odzyskują siłę
+    NATYCHMIAST, gdy wraca RANGING — bez rozgrzewki od zera.
+
+    Inspiracja literaturowa: "sharing to past posteriors" (Bousquet & Warmuth,
+    JMLR 2002, https://jmlr.org/papers/v3/bousquet02b.html) miesza do PRZESZŁYCH
+    rozkładów indeksowanych CZASEM. Nasz oryginalny twist: indeksowanie REŻIMEM
+    z Namiestnika — przeszłość ma sens przez podobieństwo rynku, nie kalendarz.
+
+    Mechanika:
+      • ustaw_rezim(r) — Dyrygent/Namiestnik woła przy każdej zmianie reżimu.
+      • po kroku Hedge: w_i ← (1−α)·w_i + α·pamięć[r][i]
+        (pamięć[r] = EMA znormalizowanych wag obserwowanych w reżimie r;
+         brak pamięci dla r → fallback uniform = czysty Fixed-Share).
+      • pamięć aktualizowana po każdej rundzie (EMA, beta_pamieci).
+    """
+
+    def __init__(self, eta: float = 0.5, min_waga: float = 1e-6,
+                 alpha_share: float = 0.02, beta_pamieci: float = 0.05):
+        super().__init__(eta=eta, min_waga=min_waga, alpha_share=alpha_share)
+        if not (0.0 < beta_pamieci <= 1.0):
+            raise ValueError("beta_pamieci musi być w (0, 1]")
+        self.beta_pamieci = beta_pamieci
+        self.rezim: str = "NORMAL"
+        # pamięć: rezim → {klucz: znormalizowana waga (EMA)}
+        self.pamiec: Dict[str, Dict[str, float]] = {}
+
+    def ustaw_rezim(self, rezim: str):
+        """Wołane przez Dyrygenta/Namiestnika przy każdej klasyfikacji reżimu."""
+        if rezim:
+            self.rezim = rezim
+
+    def aktualizuj(self, klucz: str, strata: float):
+        # Krok 1+2: Hedge + mixing (nadpisany kierunek mieszania niżej)
+        strata = max(0.0, min(1.0, strata))
+        w = self._waga(klucz) * math.exp(-self.eta * strata)
+        self.wagi_raw[klucz] = max(self.min_waga, w)
+        self.rundy[klucz] = self.rundy.get(klucz, 0) + 1
+        if self.alpha_share > 0.0 and len(self.wagi_raw) > 1:
+            cel = self._cel_mieszania()
+            suma = sum(self.wagi_raw.values())
+            for k in self.wagi_raw:
+                self.wagi_raw[k] = ((1.0 - self.alpha_share) * self.wagi_raw[k]
+                                    + self.alpha_share * suma * cel.get(
+                                        k, 1.0 / len(self.wagi_raw)))
+        # Krok 3: zapisz obecny rozkład do pamięci bieżącego reżimu (EMA)
+        self._zapamietaj()
+
+    def _cel_mieszania(self) -> Dict[str, float]:
+        """Rozkład docelowy mixing: pamięć reżimu albo uniform (fallback W-280)."""
+        pam = self.pamiec.get(self.rezim)
+        if not pam:
+            n = len(self.wagi_raw)
+            return {k: 1.0 / n for k in self.wagi_raw}
+        # normalizuj pamięć do sumy 1 na znanych ekspertach
+        suma = sum(pam.get(k, 0.0) for k in self.wagi_raw)
+        if suma <= 0:
+            n = len(self.wagi_raw)
+            return {k: 1.0 / n for k in self.wagi_raw}
+        return {k: pam.get(k, 0.0) / suma for k in self.wagi_raw}
+
+    def _zapamietaj(self):
+        wagi = self.wagi()
+        pam = self.pamiec.setdefault(self.rezim, {})
+        for k, w in wagi.items():
+            stara = pam.get(k, w)
+            pam[k] = (1.0 - self.beta_pamieci) * stara + self.beta_pamieci * w
 
 
 # ─── Demo ─────────────────────────────────────────────────────────────────────

@@ -2112,6 +2112,113 @@ wszystkie wdrożone wizje BIB-020 **ortogonalne — ZERO redundancji** (żadne |
 
 ---
 
+### 📅 2026-06-10 — DEEP RESEARCH: zwiad internetowy 2024-2026 (5 osi) — wizje W-280..W-285
+
+> *Cezar rozkazał: „poszukaj deep researchem najlepszych ulepszeń + zrób własne unikatowe".*
+> *Zwiad przeprowadzony 5 równoległymi wyszukiwaniami. Wszystkie źródła z linkami (ZPO).*
+
+#### 🥇 W-280 | Fixed-Share zamiast czystego Hedge/MWU — wagi które UMIEJĄ wybaczać 🔴 ✅ WDROŻONE 2026-06-10 (`hedge_mwu.py` alpha_share, +5 testów)
+
+**Co znalazłem:** Hedge/MWU (nasz W-049) ma strukturalną wadę w środowiskach NIESTACJONARNYCH:
+gdy waga eksperta spadnie blisko zera, może wracać tylko mnożnikowo (wolno) — nawet gdy reżim
+się zmienił i ten ekspert znów ma rację. **Fixed-Share** (Herbster & Warmuth 1998) po każdej
+rundzie „wstrzykuje" ułamek α masy prawdopodobieństwa z powrotem do puli (uniform mixing):
+`w_i ← (1−α)·w_i_hedge + α/N`. W zmiennych środowiskach Fixed-Share ma żal O(1/√T), podczas
+gdy czysty Hedge — STAŁY żal średni (nie zbiega!), bo za mocno commituje do zakończonego reżimu.
+Źródła: [Improved Regret Bounds for Tracking Experts with Memory](https://arxiv.org/pdf/2106.13021),
+[Switching between HMMs using Fixed Share](https://arxiv.org/pdf/1008.4532),
+[Score-based change point detection via tracking experts](https://arxiv.org/pdf/2408.14073).
+**Dla nas:** rynek krypto = ciągłe zmiany reżimu → nasze wagi MWU (neurony + MasterSwitchOnline)
+mogą „grzebać" dobre neurony po złej passie. **Wdrożenie trywialne:** jedna linia w `hedge_mwu.py`
+(parametr α≈0.01–0.05), zero nowych zależności. Status: ⚠️ zweryfikowane wyszukiwaniem (papery arXiv).
+
+#### 🥈 W-281 | Statistical Jump Model — detektor reżimu 🔴 ✅ MODUŁ WDROŻONY / ⏸️ FAZA 3 WSTRZYMANA PO POMIARZE (2026-06-10)
+
+**Werdykt pomiaru (Prawo XVIII — `narzedzia/pomiar_jump_model.py`, walk-forward przyczynowy,
+okno 250/refit 20/λ=30, cechy zwrot+vol20, miara = zwrot baru t+1 po stanie t):**
+
+| Rynek | JM sep(BULL−BEAR) | JM przełączeń/100 | ADX sep(BULL−BEAR) | ADX przełączeń/100 |
+|---|---|---|---|---|
+| BTC 1D (3192 barów) | **−5.0 bps** | 23.5 | **+20.9 bps** | 5.5 |
+| ETH 1D (3192 barów) | **−24.9 bps** | 21.6 | **+31.0 bps** | 5.3 |
+
+Baseline ADX wygrywa w obu wymiarach (predykcyjność i trwałość) → JumpModel NIE wchodzi
+do `klasyfikuj_rezim()`; W-285.3 (Trybunał) odłożony. Podejrzane słabości tej konfiguracji
+(do ew. dalszych prób): `przypisz_ostatni` klasyfikuje bez kary skoku (migocze między
+refitami) + nazwy stanów ze średnich in-sample. Moduł i testy zostają (klocek na przyszłość).
+
+**Co znalazłem:** Statistical Jump Model (Nystrup, Kolm, Lindström) — klastrowanie cech
+z JAWNĄ karą za skok między reżimami (jump penalty λ) → reżimy trwałe, mało fałszywych alarmów.
+Badania pokazują wyższą celność i lepszą ochronę przed spadkami niż klasyczne HMM (które migoczą).
+Kluczowe dla nas: praca [What drives cryptocurrency returns? A sparse statistical jump model
+approach](https://link.springer.com/article/10.1007/s42521-023-00085-x) (Cortese, Kolm, Lindström,
+Digital Finance 2023) — na KRYPTO: 3 stany (bull/neutral/bear) najlepiej opisują rynek, a sparse-wersja
+sama wybiera cechy (u nich wygrały: momentum/reversal, aktywność rynku, uwaga publiczna).
+Także: [Downside Risk Reduction Using Regime-Switching Signals: SJM](https://arxiv.org/html/2402.05272v3),
+[Dynamic Factor Allocation Leveraging Regime-Switching Signals](https://arxiv.org/html/2410.14841v1).
+**Dla nas:** to naturalna Faza 3 master-switcha — zamiast progów na VR/HL/AR1, jump model na
+NASZYCH cechach z Bramy (Hurst, VR, vol, entropia...). Pure-Python (k-means + programowanie
+dynamiczne). Status: ⚠️ zweryfikowane (peer-review Springer + arXiv).
+
+#### 🥉 W-282 | Bramka anty-overfittingu w Koloseum: DSR + PBO/CSCV jako MUR przed wdrożeniem 🔴 ✅ WDROŻONE 2026-06-10 (`koloseum/walidacja.py`: deflated_sharpe + pbo_cscv + bramka_walidacji, +19 testów)
+
+**Co znalazłem (potwierdzenie BIB-007/W-119, teraz z procedurą):** 
+- **Deflated Sharpe Ratio** (Bailey & López de Prado) — koryguje Sharpe o selection bias
+  (liczbę prób!), skośność i kurtozę: [paper](https://www.davidhbailey.com/dhbpapers/deflated-sharpe.pdf).
+- **PBO przez CSCV**: podziel historię na S=8–16 bloków, wszystkie C(S,S/2) podziały train/test,
+  w każdym wybierz najlepszą strategię in-sample i sprawdź jej ranking out-of-sample. PBO = odsetek
+  podziałów, gdzie zwycięzca IS wypada poniżej mediany OOS:
+  [The Probability of Backtest Overfitting](https://www.davidhbailey.com/dhbpapers/backtest-prob.pdf).
+**Dla nas — twarda bramka w Koloseum:** strategia wchodzi do żywego Legatusa TYLKO gdy
+DSR > 0 przy zadeklarowanej liczbie prób ORAZ PBO < ~20%. To jest matematyczna wersja
+Prawa I („nie okłamuj się własnym backtestem"). Pure-Python (numpy + scipy.stats.norm).
+Status: ⚠️ zweryfikowane (kanoniczne papery Bailey/de Prado).
+
+#### W-283 | Carry krypto UMARŁO w 2024/25 — funding tylko jako sygnał EKSTREMÓW, nie carry 🟠
+
+**Co znalazłem:** [BIS Working Paper No 1087 „Crypto carry"](https://www.bis.org/publ/work1087.pdf) +
+[Cryptocurrency as an Investable Asset Class](https://arxiv.org/pdf/2510.14435): zyskowność
+crypto-carry (cash-and-carry na fundingu) skompresowała się ostro od 2024, Sharpe ujemny w 2025.
+ALE: [Predictability of Funding Rates (SSRN 2026)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5576424)
+— poziom fundingu na następny okres JEST prognozowalny (lepiej niż no-change), choć stabilność zmienna.
+**Dla nas:** nie budować strategii carry (W-065 — zdegradować priorytet!); PSY-01 (funding extreme
+contrarian) pozostaje zasadny — squeeze przy ekstremach to inny mechanizm niż carry. 
+Status: ⚠️ zweryfikowane (BIS + arXiv).
+
+#### W-284 | Mikrostruktura L2: order-flow imbalance ma uniwersalną moc krótkoterminową 🟠
+
+**Co znalazłem:** [Explainable Patterns in Cryptocurrency Microstructure](https://arxiv.org/html/2602.00776v1)
+(2026): krótkoterminowa prognozowalność na krypto ma UNIWERSALNĄ reprezentację przez mały zestaw
+cech z top-of-book + trade flow (OFI, spread, głębokość) — podobna ważność cech między assetami;
+efekt OFI monotoniczny z wklęsłością na ekstremach. Potwierdza nasz kierunek EXP-12 (L2) i W-060 (OFI).
+**Dla nas:** gdy podepniemy feed L2 (EXP-12 czeka) — OFI jako pierwszy wskaźnik, nie egzotyka.
+Status: ⚠️ zweryfikowane (arXiv 2026).
+
+#### 💎 W-285 | ORYGINALNE POMYSŁY IMPERIUM (synteza zwiadu × nasza architektura) 🔴
+
+Trzy unikaty, których NIE znalazłem nigdzie w tej formie — nasza przewaga z połączenia istniejących klocków:
+
+1. **„Pretorianin Pamięci Reżimów" — Fixed-Share z pamięcią reżimu (W-280 × Namiestnik):**
+   zamiast uniform mixing (α/N do wszystkich), wstrzykuj masę proporcjonalnie do ŚREDNICH WAG
+   DANEGO NEURONU W PODOBNYM REŻIMIE z przeszłości (pamięć: Mnemosyne/W-039). Gdy wraca reżim
+   RANGING, neurony mean-reversion odzyskują wagę NATYCHMIAST, nie przez restart od zera.
+   Literatura zna „sharing to past posteriors" (Bousquet-Warmuth) — nasz twist: indeksowanie
+   pamięci REŻIMEM z Namiestnika, nie czasem. Nikt tego nie robi na roju wskaźnikowym.
+2. **„Dwu-zegarowy DSR" — bramka Koloseum liczona w czasie barowym ORAZ w trading-time
+   (W-282 × W-144 Mandelbrot):** DSR/PBO liczone dwa razy — raz na barach kalendarzowych,
+   raz na barach wolumenowych (trading-time). Strategia przechodzi tylko gdy OBA zielone.
+   Chroni przed strategiami „działającymi" tylko dzięki nierównej gęstości informacji w czasie.
+3. **„Trybunał Trzech Zegarów" dla master-switcha:** nasz MasterSwitchOnline (Faza 2) głosuje
+   VR/HL/AR1; dodać Jump Model (W-281) jako CZWARTEGO głosującego, ale rozliczanego przez
+   Fixed-Share (W-280) — system, w którym detektor reżimu sam jest ekspertem w meta-grze
+   i traci wagę, gdy się myli. Samonaprawiający się przełącznik reżimów.
+
+**Status wdrożenia (2026-06-10):** ✅ W-280 + ✅ W-282 + ✅ W-281 (moduł; wpięcie po pomiarze) +
+✅ W-285.1 `HedgeMWUzPamieciaRezimu` (unikat, `hedge_mwu.py`, +5 testów). Pozostają: W-285.2
+(dwu-zegarowy DSR — wymaga barów wolumenowych) i W-285.3 (Trybunał — po pomiarze Fazy 2/3).
+
+---
+
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
 
 | BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |

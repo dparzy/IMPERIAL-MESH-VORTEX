@@ -90,6 +90,7 @@ class Dyrygent:
         adaptery: Optional[List[Any]] = None,
         breaker_krzywej: bool = True,
         regula_6pct: bool = False,
+        min_pewnosc_interwalu: Optional[Dict[str, float]] = None,
     ) -> None:
         self.legatus = legatus
         self.kalkulator = kalkulator
@@ -97,6 +98,9 @@ class Dyrygent:
         self.budowniczy = budowniczy
         self.wskazniki_provider = wskazniki_provider
         self.min_pewnosc = min_pewnosc
+        # FAZA B (W-286): progi pewności per interwał (np. {"4H": 0.65}) —
+        # nadpisują min_pewnosc dla danego interwału; brak wpisu → próg globalny.
+        self.min_pewnosc_interwalu: Dict[str, float] = min_pewnosc_interwalu or {}
         # Adaptery danych (Faza B) — dolewają do wskaźników dane spoza OHLCV
         # (funding, OI, long/short, sentyment) po Budowniczym. Pusta lista = tryb
         # czysty OHLCV (np. backtest z CSV — neurony R abstynują, Prawo XV).
@@ -175,7 +179,7 @@ class Dyrygent:
         # Wyznacza: tryb, prog_pewnosci, lewar_factor, lewar_cap, rynek, czy_grac
         # dla pary (reżim × styl interwałowy).
         tryb_aktywny = self.tryb
-        prog_aktywny = self.min_pewnosc
+        prog_aktywny = self.min_pewnosc_interwalu.get(interwal, self.min_pewnosc)
         lewar_factor = 1.0
         decyzja_nam = None
         if self.namiestnik is not None:
@@ -184,7 +188,9 @@ class Dyrygent:
                 return DecyzjaCyklu(symbol, "NAMIESTNIK_CISZA", False,
                                     rezim=rezim, powod=f"Namiestnik: {decyzja_nam.opis}")
             tryb_aktywny = decyzja_nam.tryb
-            prog_aktywny = decyzja_nam.prog_pewnosci
+            # FAZA B (W-286): próg per interwał ma pierwszeństwo nad progiem
+            # reżimowym Namiestnika, gdy jest OSTRZEJSZY (max — bezpieczniej).
+            prog_aktywny = max(decyzja_nam.prog_pewnosci, prog_aktywny)
             lewar_factor = decyzja_nam.lewar_factor
 
         # 3. Legatus — agregacja roju

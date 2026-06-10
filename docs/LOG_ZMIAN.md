@@ -6,6 +6,46 @@
 
 ---
 
+## 2026-06-10 | FAZA B (W-286) | Diagnoza 4H + grid TIMEOUT — bramka PBO ZABLOKOWAŁA kalibrację (wzorcowe!)
+
+**DIAGNOZA (atrybucja przez pętlę MWU + rozkład zamknięć, BTC 4H):**
+- **75% zamknięć = TIMEOUT** (54/72), tylko 2×TP vs 15×SL — pozycje umierają z czasu.
+- Przyczyna mechaniczna: `MAX_BARS_OTWARCIA=48` ŚWIEC stałe per system — 48 dni na 1D,
+  ale tylko 8 dni na 4H, podczas gdy TP (z dźwigni) wymaga podobnego ruchu %.
+- LONG i SHORT tracą symetrycznie → problem egzekucji wyjść, nie kierunku.
+- MWU najgorsi na 4H: XII-02 Ichimoku, H-01 Hurst, V-13, XII-05 Fibo, V-01 OBV.
+
+**MECHANIZMY (wdrożone, opt-in, zero regresji — +2 testy):**
+- `PaperTradingEngine(max_bars_otwarcia=N)` — TIMEOUT per silnik (None → stała stara).
+- `Dyrygent(min_pewnosc_interwalu={"4H": 0.65})` — próg pewności per interwał
+  (z Namiestnikiem: max(prog_reżimu, prog_interwału) — ostrzejszy wygrywa).
+- `backtest(...)` przelotowo wspiera oba.
+
+**GRID (BTC 4H, 4000 barów, AUTO; n_prob=4):**
+
+| max_bars | trades | WR | PF | PnL | DSR | TIMEOUT |
+|---|---|---|---|---|---|---|
+| 48 (baseline) | 74 | 41.9% | 0.59 | −1168 | 0.002 | 57 |
+| 96 | 45 | 37.8% | 0.85 | −382 | 0.072 | 29 |
+| 144 | 35 | 42.9% | **1.07** | **+167** | 0.193 | 18 |
+| 192 | 31 | 38.7% | 0.99 | −31 | 0.145 | 10 |
+| **PBO (CSCV, S=8)** | | | | | **0.614 ⛔** | |
+
+**WERDYKT (Prawo XVIII + W-282 — bramka obroniła nas przed samooszustwem):**
+Kierunek diagnozy POTWIERDZONY (monotoniczna poprawa z TIMEOUT), ale PBO=0.61 >> 0.20:
+wybór "najlepszego" wariantu z gridu to dopasowanie do szumu — zwycięzca in-sample
+niestabilny out-of-sample. NAJLEPSZY wariant i tak ledwo PF 1.07. **Wniosek:** edge
+dzienny roju NIE skaluje się na 4H przez samą mechanikę wyjść — 4H wymaga innego
+źródła przewagi (Faza C: mikrostruktura/scalp lub osobne wagi reżimowe — przyszły
+pomiar na WIĘKSZEJ próbie/wielu parach). Domyślne wartości BEZ ZMIAN; mechanizmy
+zostają jako narzędzia kalibracji.
+
+**To jest dokładnie po co zbudowaliśmy W-282** — pierwsza realna interwencja bramki.
+
+**Pliki:** `imperium/koloseum/paper_trading.py`, `imperium/koloseum/dyrygent.py`,
+`imperium/koloseum/backtest.py`, `tests/test_paper_trading.py`, `tests/test_dyrygent.py`.
+**Testy:** 655/655 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | FAZA A (W-286) | Formacja Legionów per interwał — POMIAR: 1D lepsze, 4H czeka na Fazę B
 
 **Opis:** `Legatus._formacja_interwalu()` — na danym interwale głosują tylko neurony

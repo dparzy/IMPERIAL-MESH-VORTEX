@@ -179,11 +179,16 @@ class PaperTradingEngine:
         sesja_id: str = "",
         log_dir: Optional[Path] = None,
         max_otwartych: int = 3,
+        max_bars_otwarcia: "int | None" = None,
     ) -> None:
         self.kapital = kapital_startowy
         self.kapital_startowy = kapital_startowy
         self.sesja_id = sesja_id or f"PAPER-{uuid.uuid4().hex[:8].upper()}"
         self.max_otwartych = max_otwartych
+        # FAZA B (W-286): TIMEOUT per interwał — 48 świec to 48 dni na 1D, ale
+        # tylko 8 dni na 4H (diagnoza 2026-06-10: 75% zamknięć 4H = TIMEOUT).
+        # None → stała globalna (stare zachowanie, zero regresji).
+        self.max_bars_otwarcia = max_bars_otwarcia or MAX_BARS_OTWARCIA
 
         self.otwarte: Dict[str, OtwartaPozycja] = {}   # pozycja_id → pozycja
         self.historia_zamkniec: List[WynikZamkniecia] = []
@@ -355,7 +360,7 @@ class PaperTradingEngine:
             if bar.low <= poz.take_profit:
                 return "TP_HIT"
 
-        if poz.bar_count >= MAX_BARS_OTWARCIA:
+        if poz.bar_count >= self.max_bars_otwarcia:
             return "TIMEOUT"
         return None
 

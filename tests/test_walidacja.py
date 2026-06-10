@@ -295,7 +295,8 @@ from imperium.koloseum.walidacja import etap_pierwszy_koloseum  # noqa: E402
 
 class _Stat:
     """Minimalny duck-type StatystykiSesji do testów."""
-    def __init__(self, trades=30, dd=8.0, wr=60.0, pf=2.0):
+    def __init__(self, trades=30, dd=0.08, wr=0.60, pf=2.0):
+        # UWAGA: silnik trzyma wr/dd jako UŁAMKI (0.5=50%) mimo nazwy _pct
         self.total_trades = trades
         self.max_drawdown_pct = dd
         self.win_rate = wr
@@ -327,15 +328,15 @@ def test_etap1_za_malo_tradow():
 
 
 def test_etap1_drawdown_za_duzy():
-    w = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(dd=20.0))
+    w = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(dd=0.20))
     assert not w["ok"] and "MaxDD" in w["powod"]
 
 
 def test_etap1_wr_lub_pf_wystarczy_jedno():
     """WR niski ALE PF wysoki → przechodzi (alternatywa z ROADMAP)."""
-    w = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(wr=40.0, pf=2.5))
+    w = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(wr=0.40, pf=2.5))
     assert w["ok"], f"PF>1.5 powinno wystarczyć: {w}"
-    w2 = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(wr=40.0, pf=1.2))
+    w2 = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(wr=0.40, pf=1.2))
     assert not w2["ok"], "oba poniżej progu → odpada"
 
 

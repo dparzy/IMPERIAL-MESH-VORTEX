@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-06-10 | FIX+POMIAR | Bug jednostek w bramce Etapu I + pierwszy TEST BOJOWY roju
+
+**Bug (złapany testem bojowym, nie unit-testem — lekcja):** `StatystykiSesji` trzyma
+`win_rate` i `max_drawdown_pct` jako UŁAMKI (0.5=50%) mimo sufiksu `_pct`; bramka
+dzieliła przez 100 → progi WR i MaxDD były martwe. Unit-test nie złapał, bo duck-type
+`_Stat` podawał procenty — test powielił błędne założenie autora. Naprawione
+(bramka + testy na ułamkach, komentarz ostrzegawczy o jednostkach).
+
+**TEST BOJOWY (pełny rój, realne dane, bramka Etapu I, n_prob=4):**
+
+| Rynek | Tryb | Trades | WR | PF | MaxDD | PnL | Sharpe_r | DSR | Werdykt |
+|---|---|---|---|---|---|---|---|---|---|
+| BTC 1D | agregat | 133 | 52% | 1.22 | — | +2353 | 0.34 | 0.47 | ⛔ Sharpe |
+| BTC 1D | agregat-AUTO | 59 | 55.9% | **2.23** | **4.3%** | **+3622** | 0.83 | 0.94 | ⛔ Sharpe 0.83≤1.0 |
+| ETH 1D | agregat-AUTO | 72 | 51.4% | 1.15 | 11.3% | +791 | 0.19 | 0.30 | ⛔ |
+
+**Wnioski (Prawo I — uczciwie):**
+1. **Namiestnik AUTO-reżim to ogromna wartość:** PF 1.22→2.23, DSR 0.47→0.94, połowa trade'ów.
+2. Rój ZARABIA na BTC z świetną kontrolą ryzyka (MaxDD 4.3%), ale Sharpe 0.83 — bramka
+   (słusznie surowa) jeszcze nie przepuszcza do Etapu II. Brakuje selektywności/rozmiaru.
+3. ETH 1D: brak przewagi — rój kalibrowany na BTC nie przenosi się 1:1.
+
+**Pliki:** `imperium/koloseum/walidacja.py`, `tests/test_walidacja.py`.
+**Testy:** 643/643 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | FEATURE | Bramka Etapu I Koloseum wpięta w backtest (ROADMAP × W-282)
 
 **Opis:** Domknięcie pętli walidacji — bramki przestały być "gotowe ale niepodpięte"

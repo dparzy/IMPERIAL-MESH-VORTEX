@@ -382,12 +382,14 @@ def etap_pierwszy_koloseum(krzywa_equity: Sequence[float],
     kontrole.append((sharpe_roczny > PROG_SHARPE_ROCZNY,
                      f"Sharpe roczny {sharpe_roczny:.2f} ≤ {PROG_SHARPE_ROCZNY}"))
     if statystyki is not None:
-        kontrole.append((statystyki.max_drawdown_pct / 100.0 < PROG_MAX_DD,
-                         f"MaxDD {statystyki.max_drawdown_pct:.1f}% ≥ {PROG_MAX_DD:.0%}"))
-        wr_ok = statystyki.win_rate / 100.0 > PROG_WIN_RATE
+        # UWAGA jednostki (bug naprawiony 2026-06-10): StatystykiSesji trzyma
+        # win_rate i max_drawdown_pct jako UŁAMKI (0.5 = 50%), mimo sufiksu _pct.
+        kontrole.append((statystyki.max_drawdown_pct < PROG_MAX_DD,
+                         f"MaxDD {statystyki.max_drawdown_pct:.1%} ≥ {PROG_MAX_DD:.0%}"))
+        wr_ok = statystyki.win_rate > PROG_WIN_RATE
         pf_ok = statystyki.profit_factor > PROG_PROFIT_FACTOR
         kontrole.append((wr_ok or pf_ok,
-                         f"WR {statystyki.win_rate:.1f}% ≤ {PROG_WIN_RATE:.0%} "
+                         f"WR {statystyki.win_rate:.1%} ≤ {PROG_WIN_RATE:.0%} "
                          f"i PF {statystyki.profit_factor:.2f} ≤ {PROG_PROFIT_FACTOR}"))
     dsr = deflated_sharpe(zwroty, n_prob=n_prob)
     kontrole.append((dsr["ok"],

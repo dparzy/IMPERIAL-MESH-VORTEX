@@ -346,8 +346,34 @@ class Legatus:
 
         sygnaly = self.roj.zbierz_sygnaly(wskazniki)
         sygnaly = sygnaly + sygnaly_exp
+        # FAZA A (W-286): FORMACJA LEGIONÓW — na danym interwale głosują tylko
+        # neurony właściwego legionu (SCALP nie głosuje na 1D, SWING nie na M5).
+        sygnaly = self._formacja_interwalu(sygnaly, interwal)
         sygnaly = self._dostosuj_wagi(sygnaly, rezim)
         return self._agreguj(symbol, "FOKUS", rezim, sygnaly, rezim_zrodlo, interwal)
+
+    # Legiony zawsze w polu niezależnie od interwału (uniwersalne: wolumen,
+    # straż anty-manipulacyjna, wspólne). Pomiar 2026-06-10 = pierwsza kalibracja.
+    _LEGIONY_UNIWERSALNE = {"WSPOLNY", "STRAZ", "VOLUME", "TREND", "EXPLORATORES"}
+    _FORMACJE_INTERWALU = {
+        "M1": {"SCALP"}, "M5": {"SCALP"}, "M15": {"SCALP"},
+        "1H": {"SCALP", "SWING"},          # interwał przejściowy — oba style
+        "4H": {"SWING"},
+        "1D": {"SWING"}, "1W": {"SWING"},
+    }
+
+    def _formacja_interwalu(self, sygnaly: List[SygnalNeuronu],
+                            interwal: str) -> List[SygnalNeuronu]:
+        """
+        Filtruje sygnały po LEGIONIE zgodnie z interwałem (Faza A, W-286).
+        Nieznany/pusty interwał → bez filtra (pełny rój — stare zachowanie,
+        Prawo XV: nie wycinamy głosów, gdy nie wiemy, na jakim terenie gramy).
+        """
+        dozwolone = self._FORMACJE_INTERWALU.get(interwal)
+        if not dozwolone:
+            return sygnaly
+        pelne = dozwolone | self._LEGIONY_UNIWERSALNE
+        return [s for s in sygnaly if s.legion in pelne]
 
     def _odpal_zwiadowcow(self, wskazniki: dict, bary: list) -> List[SygnalNeuronu]:
         """

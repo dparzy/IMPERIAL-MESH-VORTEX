@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-06-10 | FAZA A (W-286) | Formacja Legionów per interwał — POMIAR: 1D lepsze, 4H czeka na Fazę B
+
+**Opis:** `Legatus._formacja_interwalu()` — na danym interwale głosują tylko neurony
+właściwego legionu: M1/M5/M15→SCALP; 1H→SCALP+SWING; 4H/1D/1W→SWING; uniwersalne
+(WSPOLNY/STRAZ/VOLUME/TREND/EXPLORATORES) zawsze; nieznany/pusty interwał → pełny rój
+(stare zachowanie, Prawo XV). +4 testy formacji (granice: 1D bez SCALP, M5 bez SWING,
+1H oba, nieznany bez filtra).
+
+**POMIAR (BTC, AUTO, n_prob=4) — formacja vs baseline z wcześniejszych testów:**
+
+| Rynek | Wariant | Trades | WR | PF | PnL | Sharpe_r | DSR |
+|---|---|---|---|---|---|---|---|
+| BTC 1D | baseline | 59 | 55.9% | 2.23 | +3622 | 0.825 | 0.938 |
+| BTC 1D | **FORMACJA** | 61 | 55.7% | **2.26** | **+3934** | **0.859** | **0.954 ✅>0.95** |
+| BTC 4H | baseline | 73 | 43.8% | 0.61 | −1012 | −1.18 | 0.003 |
+| BTC 4H | FORMACJA | 74 | 41.9% | 0.59 | −1168 | −1.29 | 0.002 |
+
+**Werdykt (Prawo XVIII):** Faza A PRZYJĘTA — na 1D poprawia wszystko (PnL +9%, DSR
+przekracza próg 0.95; do Etapu I brakuje już TYLKO Sharpe 0.86→1.0). Na 4H sama
+formacja nie wystarcza (problem leży w wagach reżimu/progach, nie w składzie roju) —
+dokładnie po to jest **Faza B: kalibracja per interwał** (następna sesja, pod bramką
+DSR/PBO). Plan W-286 (A✅→B→C) zapisany w WIZJONER.
+
+**Pliki:** `imperium/legiony/legatus.py`, `tests/test_integracja.py` (+4), `docs/WIZJONER.md`.
+**Testy:** 653/653 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | NARZĘDZIE+POMIAR | Agregator 4H (5 par z 1H) + test bojowy 4H
 
 **Opis:** `narzedzia/agreguj_4h.py` — buduje bary 4H z 1H po siatce UTC (open/max/min/

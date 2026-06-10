@@ -2219,6 +2219,26 @@ Trzy unikaty, których NIE znalazłem nigdzie w tej formie — nasza przewaga z 
 
 ---
 
+### 📅 2026-06-10 — W-286 | PLAN MULTI-INTERWAŁ (Cezar zatwierdził: Fazy A→B→C)
+
+**Kontekst (testy bojowe):** rój w kalibracji "dziennej": 1D PF 2.23 ✅ / 1H PF 1.11 / 4H PF 0.61 ⛔.
+Architektura MA fundamenty multi-TF (pole LEGION, Namiestnik styl, strategie.interwaly) —
+nie były używane w głosowaniu (UTRATA POTENCJAŁU, Prawo XV).
+
+- **Faza A ✅ WDROŻONA 2026-06-10:** `Legatus._formacja_interwalu()` — na danym interwale
+  głosują tylko właściwe legiony (M1-M15→SCALP; 1H→SCALP+SWING; 4H/1D/1W→SWING;
+  uniwersalne zawsze: WSPOLNY/STRAZ/VOLUME/TREND/EXPLORATORES; nieznany interwał → pełny
+  rój, bez filtra). +4 testy. Pomiar: patrz LOG 2026-06-10.
+- **Faza B (następna):** kalibracja per interwał — WAGI_REZIMU i progi Namiestnika osobno
+  dla 4H/1H, strojenie POD bramką DSR/PBO (anty-overfitting).
+- **Faza C (po B):** dedykowane neurony/strategie scalpowe (mikrostruktura: OFI/L2 EXP-12,
+  VPIN krótkie okna, sesje Azja/Londyn W-011, CME gap W-010) + dane 15M/5M + pomiar
+  strategii X-SC (Brooks M2B, Torpeda VWAP, Wschód Słońca) na ICH interwałach.
+
+**Zasada:** jedna armia, różne FORMACJE na różne tereny — żadnych rojów-klonów bez pomiaru.
+
+---
+
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE
 
 | BIB | Tytuł (skrót) | Autor | Ocena | Priorytet | Najcenniejszy wkład |

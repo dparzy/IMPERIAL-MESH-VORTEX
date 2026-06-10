@@ -462,3 +462,43 @@ def test_skew_kelly_silniejszy_skos_mocniej_tnie():
     f_slaby = KalkulatorLewara.skew_kelly(0.10, 0.20, -0.5)
     f_silny = KalkulatorLewara.skew_kelly(0.10, 0.20, -2.0)
     assert f_silny < f_slaby, "silniejszy ujemny skos = ostrożniejszy sizing"
+
+
+# ── W-288: SL z ATR (opt-in) ─────────────────────────────────────────────────
+
+def test_sl_atr_ciasniejszy_wygrywa():
+    """SL=2×ATR bliżej ceny niż połowa-do-likwidacji → ATR wygrywa (LONG i SHORT)."""
+    kalk = KalkulatorLewara()
+    p = kalk.policz("BTC", "LONG", 100.0, 2, 10_000, pewnosc=0.9,
+                    atr=1.0, sl_atr_mult=2.0)
+    assert abs(p.stop_loss - 98.0) < 1e-6, f"SL ma być 100−2×1={98}, jest {p.stop_loss}"
+    s = kalk.policz("BTC", "SHORT", 100.0, 2, 10_000, pewnosc=0.9,
+                    atr=1.0, sl_atr_mult=2.0)
+    assert abs(s.stop_loss - 102.0) < 1e-6
+
+
+def test_sl_atr_nigdy_szerszy_niz_lewarowy():
+    """Ogromny ATR → SL NIE wychodzi poza połowę drogi do likwidacji (bezpieczeństwo)."""
+    kalk = KalkulatorLewara()
+    bez = kalk.policz("BTC", "LONG", 100.0, 10, 10_000, pewnosc=0.9)
+    z = kalk.policz("BTC", "LONG", 100.0, 10, 10_000, pewnosc=0.9,
+                    atr=50.0, sl_atr_mult=2.0)   # 2×50=100 — absurdalnie szeroki
+    assert z.stop_loss >= bez.stop_loss - 1e-9, "ATR nie może odsunąć SL bliżej likwidacji"
+
+
+def test_sl_atr_granice_wejscia():
+    """atr=None / mult=None / atr==0 / mult==0 → stary SL (zero zmian)."""
+    kalk = KalkulatorLewara()
+    bez = kalk.policz("BTC", "LONG", 100.0, 5, 10_000, pewnosc=0.9)
+    for kw in ({"atr": None, "sl_atr_mult": 2.0}, {"atr": 1.0, "sl_atr_mult": None},
+               {"atr": 0.0, "sl_atr_mult": 2.0}, {"atr": 1.0, "sl_atr_mult": 0.0}):
+        p = kalk.policz("BTC", "LONG", 100.0, 5, 10_000, pewnosc=0.9, **kw)
+        assert abs(p.stop_loss - bez.stop_loss) < 1e-9, f"granica {kw} zmieniła SL"
+
+
+def test_sl_atr_tp_skaluje_sie_z_sl():
+    """TP = MIN_RR × dystans SL — ciaśniejszy SL daje bliższy, osiągalny TP."""
+    kalk = KalkulatorLewara()
+    p = kalk.policz("BTC", "LONG", 100.0, 2, 10_000, pewnosc=0.9,
+                    atr=1.0, sl_atr_mult=2.0)
+    assert abs(p.take_profit - 104.0) < 1e-6, f"TP ma być 100+2×2={104}, jest {p.take_profit}"

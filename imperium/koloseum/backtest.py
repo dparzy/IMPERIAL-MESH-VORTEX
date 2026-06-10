@@ -58,6 +58,7 @@ def backtest(
     min_pewnosc_interwalu: "Optional[Dict[str, float]]" = None,
     max_bars_otwarcia: "Optional[int]" = None,
     straznik_przewagi: bool = False,
+    sl_atr_mult: "Optional[float]" = None,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -94,7 +95,8 @@ def backtest(
     dyrygent = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(),
                         engine=engine, budowniczy=budowniczy,
                         min_pewnosc=min_pewnosc, tryb=tryb, namiestnik=namiestnik,
-                        min_pewnosc_interwalu=min_pewnosc_interwalu)
+                        min_pewnosc_interwalu=min_pewnosc_interwalu,
+                        sl_atr_mult=sl_atr_mult)
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"
 
     # 💎 W-287 Strażnik Przewagi (opt-in): HALT gdy rolling expectancy < 0,

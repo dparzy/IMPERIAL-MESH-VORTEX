@@ -91,6 +91,7 @@ class Dyrygent:
         breaker_krzywej: bool = True,
         regula_6pct: bool = False,
         min_pewnosc_interwalu: Optional[Dict[str, float]] = None,
+        sl_atr_mult: Optional[float] = None,
     ) -> None:
         self.legatus = legatus
         self.kalkulator = kalkulator
@@ -101,6 +102,8 @@ class Dyrygent:
         # FAZA B (W-286): progi pewności per interwał (np. {"4H": 0.65}) —
         # nadpisują min_pewnosc dla danego interwału; brak wpisu → próg globalny.
         self.min_pewnosc_interwalu: Dict[str, float] = min_pewnosc_interwalu or {}
+        # W-288: SL = sl_atr_mult × ATR_14 (opt-in; None = stary SL z dźwigni).
+        self.sl_atr_mult = sl_atr_mult
         # Adaptery danych (Faza B) — dolewają do wskaźników dane spoza OHLCV
         # (funding, OI, long/short, sentyment) po Budowniczym. Pusta lista = tryb
         # czysty OHLCV (np. backtest z CSV — neurony R abstynują, Prawo XV).
@@ -286,6 +289,8 @@ class Dyrygent:
             rezim=raport.rezim,
             breaker_krzywej=self.breaker_krzywej,
             regula_6pct=self.regula_6pct,
+            atr=wskazniki.get("ATR_14") if self.sl_atr_mult else None,
+            sl_atr_mult=self.sl_atr_mult,
         )
 
         if not plan.checklist_ok:

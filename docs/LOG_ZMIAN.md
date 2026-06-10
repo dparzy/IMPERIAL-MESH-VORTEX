@@ -6,6 +6,42 @@
 
 ---
 
+## 2026-06-10 | W-288 | ATR-SL/TP (opt-in) + fix sprzężenia sizing↔SL — mechanika naprawiona, edge obnażony
+
+**Wdrożone:**
+1. **SL z ATR (opt-in):** `policz(atr=…, sl_atr_mult=…)` → SL = cena ∓ k×ATR, ale
+   TYLKO ciaśniejszy niż lewarowy (nigdy bliżej likwidacji — clamp bezpieczeństwa).
+   TP=MIN_RR×SL skaluje się automatycznie. Dyrygent: `sl_atr_mult` → bierze ATR_14
+   z Bramy; backtest przelotowo. +4 testy granic (None/0, ogromny ATR, TP-skala).
+2. **Fix sprzężenia sizing↔SL (uniwersalny):** risk-sizing (2%/stop_pct) z ciasnym
+   SL żądał pozycji >>50% kapitału → checklist WETOWAŁ niemal każde wejście
+   (pomiar: 201→2 trade'y!). Teraz CLAMP rozmiaru do 50% kapitału przed checklistą
+   (ryzyko tylko maleje — uczciwy raport ryzyka z finalnego rozmiaru bez zmian).
+3. Clamp odsłonił 2 KRUCHE testy przechodzące dzięki staremu wetu (pewność agregatu
+   =1.0 przy zgodnym komplecie wskaźników) — naprawione na płaskie bary/sprzeczne
+   sygnały z komentarzem-lekcją.
+
+**POMIAR (BTC 1H, 12k barów, AUTO):**
+
+| Wariant | Trades | WR | PF | MaxDD | PnL | TP/SL/TIMEOUT |
+|---|---|---|---|---|---|---|
+| baseline | 201 | 49.3% | 0.72 | 10.8% | −838 | 0/3/198 |
+| ATR-SL 2.0 | 109 | 34.9% | 0.72 | 18.1% | −1536 | **29/66/14** |
+| ATR+Strażnik | 95 | 31.6% | 0.69 | 18.5% | −1572 | 24/59/12 |
+
+**Werdykt (Prawo I — pełna prawda):** mechanika wyjść NAPRAWIONA (TIMEOUT 198→14,
+TP wreszcie trafiane 0→29) — ale ekonomicznie GORZEJ: ciasny SL × większe pozycje
+(clamp) = częstsze i droższe SL-y. **TIMEOUT-y nie były źródłem straty — MASKOWAŁY
+ujemny kierunkowy edge 1H/2025 małymi stratami; ATR-SL go skrystalizował.**
+Wniosek strategiczny: problem 1H leży w PRZEWADZE KIERUNKOWEJ roju w tamtym okresie,
+nie w mechanice. W-288 zostaje jako poprawne narzędzie (opt-in, NIEzalecane bez
+zmierzonego edge); clamp 50% zostaje na stałe (naprawia realne sprzężenie).
+Dalej: trop "edge dojrzewa" (autopsja) + walidacja na 5 parach świeżego okna.
+
+**Pliki:** `imperium/pretorianie/kalkulator_lewara.py`, `imperium/koloseum/dyrygent.py`,
+`imperium/koloseum/backtest.py`, `tests/test_kalkulator.py` (+4), `tests/test_dyrygent.py`.
+**Testy:** 673/673 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | UNIKAT W-287 | Strażnik Przewagi + autopsja 1H — tarcza tnie krwawienie 5×
 
 **AUTOPSJA (12k barów 1H, per ćwiartka czasu):** PF 0.32→0.79→0.99→1.48 — edge roju

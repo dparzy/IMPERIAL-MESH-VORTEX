@@ -2240,6 +2240,24 @@ nie były używane w głosowaniu (UTRATA POTENCJAŁU, Prawo XV).
 
 **Zasada:** jedna armia, różne FORMACJE na różne tereny — żadnych rojów-klonów bez pomiaru.
 
+#### 💎 W-287 | STRAŻNIK PRZEWAGI — unikat (✅ WDROŻONY 2026-06-10, pomiar pozytywny)
+
+**Geneza (autopsja 12k barów 1H, per ćwiartka):** PF 0.32→0.79→0.99→1.48 — edge roju
+DOJRZEWA monotonicznie; wczesny 2025 zżera całość. Zamiast naprawiać edge wszędzie —
+system ma WIEDZIEĆ, kiedy nie grać. (Drugi trop autopsji: 198/201 zamknięć = TIMEOUT
+na 1H — mechanika wyjść do osobnej iteracji.)
+
+**Mechanika:** pretorianin meta-poziomu na samej PRZEWADZE (nie kapitale): rolling
+expectancy ostatnich N=12 zamkniętych < 0 → HALT (96 barów) → SONDA (dokładnie 1 pozycja
+zwiadowcza): wygrana → AKTYWNY z resetem pomiaru; przegrana → ponowny HALT.
+Oryginalność: "strategy decay" w literaturze = raport dla człowieka; u nas automat
+w pętli z tanim powrotem (sonda zamiast shadow-tradingu).
+
+**Pomiar (BTC 1H, 12k barów, AUTO):** PF 0.72→**0.95**, PnL −838→**−150**, MaxDD
+10.8%→**6.4%**, Sharpe_r −1.34→**−0.30**. Tarcza działa (tnie krwawienie ~5×);
+miecz (edge bazowy 2025) to osobna praca. `pretorianie/straznik_przewagi.py`,
++9 testów granic, opt-in w backteście.
+
 ---
 
 ### 📊 MAPA BIBLIOTEKI — PODSUMOWANIE

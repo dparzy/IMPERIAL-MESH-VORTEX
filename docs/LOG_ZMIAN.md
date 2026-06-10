@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-10 | UNIKAT W-287 | Strażnik Przewagi + autopsja 1H — tarcza tnie krwawienie 5×
+
+**AUTOPSJA (12k barów 1H, per ćwiartka czasu):** PF 0.32→0.79→0.99→1.48 — edge roju
+monotonicznie DOJRZEWA (wczesny 2025 wrogi, świeży rynek sprzyja). Drugi trop:
+198/201 zamknięć = TIMEOUT (mechanika wyjść na 1H — osobna iteracja). LONG −308 /
+SHORT −530 — obie strony, problem nie w kierunku.
+
+**💎 W-287 STRAŻNIK PRZEWAGI (unikat):** pretorianin patrzący na samą PRZEWAGĘ:
+rolling expectancy N=12 zamkniętych < 0 → HALT 96 barów → SONDA (1 pozycja zwiadowcza;
+wygrana=powrót z resetem, przegrana=ponowny HALT). Literatura zna "strategy decay"
+jako raport; u nas automat w pętli z tanim powrotem. Maszyna stanów + 9 testów granic
+(expectancy==0 nie halt, sonda PnL==0 = przegrana, jedna sonda naraz, parametry).
+
+**POMIAR (BTC 1H, 12k, AUTO):**
+
+| Wariant | Trades | PF | MaxDD | PnL | Sharpe_r | DSR |
+|---|---|---|---|---|---|---|
+| bez Strażnika | 201 | 0.72 | 10.8% | −838 | −1.34 | 0.003 |
+| **ze Strażnikiem** | 175 | **0.95** | **6.4%** | **−150** | **−0.30** | 0.082 |
+
+**Werdykt:** tarcza potwierdzona (strata ~5× mniejsza, DD prawie o połowę) — Strażnik
+automatycznie wyłącza rój w okresach wygasłego edge'a. To NIE tworzy przewagi (PF<1
+wciąż) — miecz (edge bazowy, mechanika TIMEOUT na 1H) to następna iteracja. Opt-in.
+
+**Pliki:** `imperium/pretorianie/straznik_przewagi.py` (nowy), `imperium/koloseum/backtest.py`,
+`tests/test_straznik_przewagi.py` (nowy), docs (MANIFEST/WIZJONER/LOG).
+**Testy:** 669/669 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | FAZA C (W-286) | ZEGARY RYNKU: SES-01/SES-02 — PRZEŁOM NA 1H (pierwszy Sharpe > 1.0!)
 
 **Zwiad (agent docs + deep search internet, pełne linki w neurony/sesje.py):**

@@ -57,6 +57,7 @@ def backtest(
     ucz_mwu: bool = False,
     min_pewnosc_interwalu: "Optional[Dict[str, float]]" = None,
     max_bars_otwarcia: "Optional[int]" = None,
+    straznik_przewagi: bool = False,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -96,6 +97,13 @@ def backtest(
                         min_pewnosc_interwalu=min_pewnosc_interwalu)
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"
 
+    # 💎 W-287 Strażnik Przewagi (opt-in): HALT gdy rolling expectancy < 0,
+    # powrót przez 1-pozycyjną sondę bojową. Patrz pretorianie/straznik_przewagi.py.
+    sp = None
+    if straznik_przewagi:
+        from imperium.pretorianie.straznik_przewagi import StraznikPrzewagi
+        sp = StraznikPrzewagi(okno=12, bary_halt=96)
+
     # Pętla uczenia (opt-in): MWU z pamięcią reżimu + atrybucja głosów per pozycja
     mwu = None
     glosy_pozycji: Dict[str, list] = {}
@@ -124,9 +132,20 @@ def backtest(
                     mwu.zarejestruj_wynik(neuron_id, kier, zyskowny)
             legatus.ustaw_mnozniki_neuronow(mwu.mnozniki())
 
+        # 1c. Strażnik Przewagi (W-287): tyknięcie + rozliczenie zamkniętych;
+        # w HALT/sondzie-w-locie pomijamy decyzję (świadoma cisza, Prawo XV).
+        if sp is not None:
+            sp.tyknij_bar()
+            for w in zamkniete:
+                sp.zarejestruj_zamkniecie(w.pnl_usdt)
+            if not sp.wolno_wejsc():
+                continue
+
         # 2. Decyzja na podstawie okna
         decyzja = dyrygent.cykl(symbol, okno_barow,
                                 rezim=rezim_arg, timestamp=biezacy["timestamp"])
+        if sp is not None and decyzja.wszedl:
+            sp.zarejestruj_wejscie()
         if mwu is not None:
             # pamięć reżimu indeksowana klasyfikacją z TEGO baru (W-285.1)
             mwu.ustaw_rezim(decyzja.rezim)

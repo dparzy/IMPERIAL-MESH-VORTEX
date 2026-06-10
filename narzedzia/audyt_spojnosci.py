@@ -404,7 +404,7 @@ def _warstwa_13_ruff():
         return bledy, info
 
     if wynik.returncode == 0:
-        info.append("Ruff (W13): czysto ✅ (F+E9 — bez bugów/martwego kodu)")
+        info.append("Ruff (W13): czysto ✅ (F/E9/E711-714/B006-008/B904/PLE — bez bugów/martwego kodu)")
     else:
         linie = [l for l in wynik.stdout.strip().splitlines() if l.strip()]
         bledy.append(f"[W13] Ruff wykrył {len(linie)} problemów (bugi/martwy kod): "

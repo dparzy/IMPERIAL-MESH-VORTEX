@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-10 | INFRA | Ruff (W13) — rozszerzony ruleset o realne klasy bugów + audyt wsteczny granic
+
+**Opis:** „Żeby było najlepiej" — zastosowano nową dyscyplinę WSTECZ i wzmocniono bramkę:
+1. **Audyt graniczny roju (Prawo XXI Reguła Test-Granic):** przeskanowano wszystkie
+   neurony pod kątem bugu granicznego typu Force Index (`==0`/próg → zły kierunek).
+   Wynik: rój zdrowy — TRIX/AO/AC i pozostałe poprawnie domykają granicę do NEUTRAL;
+   Force Index był jedynym wyjątkiem (już naprawiony). Wzorzec binarny (próg→A/B) przy
+   równości miary-zero jest świadomy i bezpieczny.
+2. **Ruff ruleset rozszerzony** z `F,E9` o realne klasy bugów (mierzone, nie zgadywane —
+   pełny zestaw zielony): `E711/E712/E714` (bugi porównań `==None`/`==True`/`not x is y`),
+   `B006/B008` (mutowalne argumenty domyślne — klasyczny bug współdzielonego stanu),
+   `B904` (raise w except bez `from` — gubi traceback), `PLE` (błędy pylintu).
+   Znaleziono i naprawiono 3× `== True/False` w `tests/test_scheduler.py` → `is`.
+
+**Pliki:** `ruff.toml`, `tests/test_scheduler.py`.
+**Testy:** 586/586 ✅. Audyt: 13 warstw, pełna harmonia. Ruff (9 reguł): czysto.
+
+---
+
 ## 2026-06-10 | FIX | Warstwa 8 audytu — świeżość LOG przez git, nie mtime (fałszywy alarm po resecie)
 
 **Opis:** W8 (świeżość LOG_ZMIAN) używała `os.path.getmtime` — bezużytecznego po

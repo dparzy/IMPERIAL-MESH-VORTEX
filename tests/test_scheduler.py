@@ -106,7 +106,7 @@ def test_blad_w_fetch_liczy_cykl_blad():
 
     scheduler = Scheduler(_config(max_bledow_z_rzędu=10, pauza_po_bledach_s=0), fetch_fn=broken_fetch)
     wynik = scheduler.jednorazowo()
-    assert wynik["ok"] == False
+    assert wynik["ok"] is False
     assert scheduler.stats.cykli_blad == 1
 
 
@@ -115,7 +115,7 @@ def test_jednorazowo_zwraca_wynik():
     wynik = scheduler.jednorazowo()
     assert "cykl" in wynik
     assert "symbole" in wynik
-    assert wynik["ok"] == True
+    assert wynik["ok"] is True
 
 
 def test_multi_symbol():
@@ -133,7 +133,7 @@ def test_brak_danych_nie_crashuje():
 
     scheduler = Scheduler(_config(), fetch_fn=no_data_fetch)
     wynik = scheduler.jednorazowo()
-    assert wynik["ok"] == True
+    assert wynik["ok"] is True
     assert wynik["symbole"]["BTCUSDT"]["status"] == "NO_DATA"
 
 

@@ -147,3 +147,32 @@ def test_eth_naglowek_volume_eth():
         assert bary[0]["volume"] == 795.15  # nadal wolumen bazowy (Volume ETH)
     finally:
         os.unlink(p)
+
+
+def test_unix_mikrosekundy_normalizowane():
+    """Brud CDD 2025+: unix w µs (>1e14) → ÷1000 do ms (granica heurystyki)."""
+    from imperium.akwedukty.czytnik_csv import _parse_ts
+    assert _parse_ts("1741734000000000") == 1741734000000   # µs → ms
+    assert _parse_ts("1741734000000") == 1741734000000      # ms zostaje
+    assert _parse_ts("1741734000") == 1741734000000         # s → ms
+
+
+def test_duplikaty_timestamp_deduplikowane(tmp_sciezka=None):
+    """Wiersze µs+ms tej samej świecy → po normalizacji zostaje jedna."""
+    import tempfile, os
+    from imperium.akwedukty.czytnik_csv import wczytaj_csv
+    tresc = (
+        "https://www.CryptoDataDownload.com\n"
+        "Unix,Date,Symbol,Open,High,Low,Close,Volume BTC,Volume USDT,tradecount\n"
+        "1741734000000000,2025-03-11,BTCUSDT,1,2,0.5,1.5,10,15,5\n"
+        "1741734000000,2025-03-11,BTCUSDT,1,2,0.5,1.6,11,16,6\n"
+        "1741737600000,2025-03-11,BTCUSDT,2,3,1.5,2.5,12,17,7\n"
+    )
+    with tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False) as f:
+        f.write(tresc); sciezka = f.name
+    try:
+        bary = wczytaj_csv(sciezka, interwal="1H")
+        assert len(bary) == 2, f"duplikat µs/ms ma zniknąć, jest {len(bary)}"
+        assert bary[0]["timestamp"] == 1741734000000
+    finally:
+        os.unlink(sciezka)

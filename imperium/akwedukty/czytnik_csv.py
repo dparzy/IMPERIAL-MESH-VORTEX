@@ -64,11 +64,15 @@ def _parse_ts(surowy: str) -> int:
       • epoch (sekundy lub milisekundy) jako liczba — format CryptoDataDownload,
       • ISO-datę ('2026-05-15 17:10:21.514319+00:00') — prosty format Imperium.
 
-    Heurystyka epoch: wartość > 1e12 traktujemy jako ms, mniejszą jako sekundy.
+    Heurystyka epoch: > 1e14 → MIKROsekundy (÷1000), > 1e12 → ms, inaczej sekundy.
+    (CryptoDataDownload od ~2025 miesza w plikach 1h wiersze w µs i ms — realny
+    brud danych wykryty 2026-06-10: ~700 wierszy/parę z unixem ×1000 za dużym.)
     """
     surowy = surowy.strip()
     try:
         liczba = float(surowy)
+        if liczba > 1e14:        # mikrosekundy (brud CDD)
+            return int(liczba / 1000)
         return int(liczba) if liczba > 1e12 else int(liczba * 1000)
     except ValueError:
         pass
@@ -156,6 +160,12 @@ def wczytaj_csv(sciezka: str, interwal: str = "",
                 continue
             bary.append(bar)
 
+    # Deduplikacja po timestamp (wiersze µs po normalizacji dublują świece ms;
+    # zostaje OSTATNI wpis = nowszy w pliku CDD). Potem sort rosnąco.
+    unikalne = {}
+    for b in bary:
+        unikalne[b["timestamp"]] = b
+    bary = list(unikalne.values())
     # CryptoDataDownload jest malejąco → sortuj rosnąco po czasie
     if chronologicznie:
         bary.sort(key=lambda b: b["timestamp"])

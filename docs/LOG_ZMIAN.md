@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-06-10 | DANE+FIX | Świeże dane 5 par (1D+1H do 2026-06-08) + brud µs w CDD naprawiony w czytniku
+
+**Opis:** Cezar dostarczył 10 plików CryptoDataDownload (BTC/ETH/SOL/BNB/DOGE × 1D+1H,
+pełne historie do 2026-06-08). Weryfikacja wykryła REALNY BRUD ŹRÓDŁOWY: pliki 1h
+mieszają wiersze z unixem w MILISEKUNDACH i ~700/parę w MIKROSEKUNDACH (×1000 za duże,
+marzec 2025) → daty "rok 57163". Fix w `czytnik_csv._parse_ts`: heurystyka >1e14 → µs ÷1000;
+plus deduplikacja po timestamp (duble µs/ms tej samej świecy — zostaje nowszy wpis).
+Po fixie: 5×1H monotoniczne ✅ (49.6k–75.7k barów), 5×1D świeże ✅.
+
+**Pliki:** `dane/dzienne/*` (5), `dane/godzinowe/*` (5), `imperium/akwedukty/czytnik_csv.py`,
+`tests/test_czytnik_csv.py` (+2 testy granic heurystyki i dedup).
+**Testy:** 647/647 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | FEATURE | CLI backtestu z werdyktem Etapu I + flagi --auto/--ucz
 
 **Opis:** Każdy backtest z linii poleceń kończy się teraz JAWNYM werdyktem bramki

@@ -14,8 +14,20 @@ Etapu I Koloseum (✅ awans do paper / ⛔ powód odrzucenia) — Prawo I: konie
 `--ucz` (pętla uczenia MWU). Użycie:
 `python -m imperium.koloseum.backtest dane/dzienne/Binance_BTCUSDT_d.csv 1D --auto`
 
+**POMIAR 1H (BTC, 4000 barów, AUTO — dokończenie pomiaru pętli uczenia z 1D):**
+- bez uczenia: 67 trades, WR 56.7%, PF 1.11, PnL +128, Sharpe_r 0.28 → ⛔
+- z uczeniem:  67 trades, WR 53.7%, PF 0.95, PnL −61, Sharpe_r −0.29 → ⛔
+
+**Werdykt (Prawo I):** hipoteza "gęstsze dane = więcej rund MWU" NIE potwierdziła się —
+rój na 1H wchodzi rzadko (67 wejść / 4000 barów; ostre progi pewności), więc rund uczenia
+nadal za mało, a edge roju na 1H w tym oknie jest słaby (PF 1.11). Wnioski na następne
+sesje (laptop): (a) kalibracja selektywności/progów pod 1H-4H, (b) świeże dane MEXC,
+(c) strojenie eta/alpha MWU dopiero przy ≥300 transakcjach. `ucz_mwu` zostaje OFF.
+
 **Pliki:** `imperium/koloseum/backtest.py`.
 **Testy:** 645/645 ✅. Audyt: pełna harmonia.
+
+---
 
 ## 2026-06-10 | FEATURE+POMIAR | Zamknięta pętla uczenia w backteście (ucz_mwu) — werdykt: działa, na 1D za mało rund
 

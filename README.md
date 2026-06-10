@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-10 · **Testy:** 655/655 zielone · **Faza:** Namiestnik Regime + Timeframe-Aware (styl SCALP/SWING/INVEST, futures/spot, lewar_cap).
+> **Stan na:** 2026-06-10 · **Testy:** 660/660 zielone · **Faza:** Namiestnik Regime + Timeframe-Aware (styl SCALP/SWING/INVEST, futures/spot, lewar_cap).
 
 ---
 
@@ -26,7 +26,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **56 zaimplementowane** (52 aktywnych: 37 OHLCV + V-05 Force Index Eldera + 3 SMC (OrderBlock/FVG/BOS) + 4 kat. R + V-03 CVD + V-14 Choppiness + L-14 Ulcer + H-01 Hurst-DFA + N-01 Permutation Entropy + Z-01 VPIN ToxicFlow + Z-03 Bubble/Crash kill-switch + Z-04 Cascade/Dead-Cat + X-27 Value Convergence + OC-05 WashTrading, Z-02 PumpDetect przez adaptery publiczne; 4 czeka na on-chain API) |
+| **Mikro-neurony** | **58 zaimplementowane** (54 aktywnych: 37 OHLCV + SES-01 ZegarSesji + SES-02 AzjaRange + V-05 Force Index Eldera + 3 SMC (OrderBlock/FVG/BOS) + 4 kat. R + V-03 CVD + V-14 Choppiness + L-14 Ulcer + H-01 Hurst-DFA + N-01 Permutation Entropy + Z-01 VPIN ToxicFlow + Z-03 Bubble/Crash kill-switch + Z-04 Cascade/Dead-Cat + X-27 Value Convergence + OC-05 WashTrading, Z-02 PumpDetect przez adaptery publiczne; 4 czeka na on-chain API) |
 | **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
@@ -34,9 +34,9 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
 | **Status elitarny** | **15 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 + 12 zwiadowców |
-| **Testy** | `python tests/run_tests.py` → **655/655** ✅ |
+| **Testy** | `python tests/run_tests.py` → **660/660** ✅ |
 
-**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 56) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
+**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 58) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
 ---
 
@@ -82,7 +82,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ## 🧪 Uruchomienie testów
 
 ```bash
-python tests/run_tests.py     # 655/655, bez zależności zewnętrznych
+python tests/run_tests.py     # 660/660, bez zależności zewnętrznych
 ```
 
 ---

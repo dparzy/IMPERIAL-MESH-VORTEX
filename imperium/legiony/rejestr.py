@@ -34,6 +34,7 @@ from imperium.legiony.neurony.trend import (
     NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian,
     NeuronHMA, NeuronFibonacci, NeuronRSIDiv, NeuronOBZone,
 )
+from imperium.legiony.neurony.sesje import NeuronZegarSesji, NeuronAzjaRange
 from imperium.legiony.neurony.wolumen import (
     NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL,
     NeuronForceIndex,
@@ -93,6 +94,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         # Wolumen (V)
         NeuronOBV(), NeuronVWAP(), NeuronCVD(), NeuronVolumeAnomaly(), NeuronRVOL(),
         NeuronForceIndex(),
+        # Zegary rynku (SES — Faza C, W-286)
+        NeuronZegarSesji(), NeuronAzjaRange(),
         # Struktura (SMC/VSA)
         NeuronOrderBlock(), NeuronFVG(), NeuronBOS(), NeuronVSA(),
         # Psychologia (PSY)

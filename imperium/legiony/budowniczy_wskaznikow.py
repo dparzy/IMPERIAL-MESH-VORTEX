@@ -124,6 +124,9 @@ class BudowniczyWskaznikow:
         w["HIGH"] = float(ostatni.get("high", 0))
         w["LOW"] = float(ostatni.get("low", 0))
         w["VOLUME"] = float(ostatni.get("volume", 0))
+        # Zegary rynku (Faza C, W-286): timestamp baru → neurony sesyjne SES-*
+        w["TIMESTAMP"] = ostatni.get("timestamp")
+        self._dodaj_sesje_azja(bary, w)
         if len(bary) >= 2:
             w["OPEN_PREV"] = float(bary[-2].get("open", 0))
             w["CLOSE_PREV"] = float(bary[-2].get("close", 0))
@@ -150,6 +153,32 @@ class BudowniczyWskaznikow:
         self._dodaj_path_series(bary, w)
 
         return w
+
+    def _dodaj_sesje_azja(self, bary, w):
+        """
+        Zakres sesji azjatyckiej (00:00–08:00 UTC) BIEŻĄCEJ doby UTC (W-011).
+        Pure timestamp+OHLC: ASIA_HIGH/ASIA_LOW z barów doby, ASIA_GOTOWA=True
+        gdy bieżący bar jest PO 08:00 UTC (zakres domknięty — bez look-ahead).
+        Brak timestampów / doba bez barów azjatyckich → klucze None (Prawo XV).
+        """
+        w["ASIA_HIGH"] = None
+        w["ASIA_LOW"] = None
+        w["ASIA_GOTOWA"] = False
+        ts = bary[-1].get("timestamp")
+        if ts is None:
+            return
+        DOBA = 86_400_000
+        H8 = 8 * 3_600_000
+        start_doby = (int(ts) // DOBA) * DOBA
+        konec_azji = start_doby + H8
+        azja = [b for b in bary
+                if b.get("timestamp") is not None
+                and start_doby <= int(b["timestamp"]) < konec_azji]
+        if not azja:
+            return
+        w["ASIA_HIGH"] = max(float(b["high"]) for b in azja)
+        w["ASIA_LOW"] = min(float(b["low"]) for b in azja)
+        w["ASIA_GOTOWA"] = int(ts) >= konec_azji
 
     def _dodaj_macd(self, serie, w):
         try:

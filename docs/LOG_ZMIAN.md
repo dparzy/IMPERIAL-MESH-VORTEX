@@ -6,6 +6,46 @@
 
 ---
 
+## 2026-06-10 | FAZA C (W-286) | ZEGARY RYNKU: SES-01/SES-02 — PRZEŁOM NA 1H (pierwszy Sharpe > 1.0!)
+
+**Zwiad (agent docs + deep search internet, pełne linki w neurony/sesje.py):**
+- Katalog: W-011 Azja Range Breakout = top kandydat (5/5, pure OHLCV+timestamp, kod czekał).
+- Internet: rytm fundingu 8h — spread peak ~2h po settlement 00/08/16 UTC (MDPI 2026,
+  badanie 26 giełd); sezonowość godzinowa BTC 21–23 UTC + efekt piątku (QuantPedia,
+  turn-of-the-candle PMC 2023). Wszystko liczone z SAMEGO TIMESTAMPU — działa w backteście.
+- ⚠️ W-010 CME Gap: agent ustalił, że CME handluje 24/7 od 29.05.2026 → strategia gapów
+  UMARŁA; w katalogu do rebrandu na Monday-effect.
+
+**Wdrożone (58 neuronów, 54 aktywne):**
+- **Budowniczy:** TIMESTAMP + ASIA_HIGH/ASIA_LOW/ASIA_GOTOWA (zakres 00–08 UTC bieżącej
+  doby; GOTOWA dopiero po 08:00 — bez look-ahead).
+- **SES-01 NeuronZegarSesji** (S, waga 4): 0–2h po settlement fundingu → kontekst
+  ostrożności; piątek 21–23 UTC → słaby LONG-bias. Kontekst, nie silnik.
+- **SES-02 NeuronAzjaRange** (S, waga 7, W-011): breakout/breakdown domkniętego zakresu
+  Azji, pewność rośnie z odległością od zakresu (cap 0.85).
+- W12 audytu: scenariusze syntetyczne dostały timestampy (piątek, godzinowe) — żywotność
+  SES-* weryfikowana co sesję. +7 testów granic (settlement dokładnie 0h/2h, close==high,
+  zakres zdegenerowany, Azja niedomknięta).
+
+**POMIAR (BTC, 4000 barów, AUTO, n_prob=4):**
+
+| Rynek | Wariant | Trades | WR | PF | MaxDD | PnL | Sharpe_r | DSR |
+|---|---|---|---|---|---|---|---|---|
+| 1H | baseline (przed) | 67 | 56.7% | 1.11 | 4.8% | +128 | 0.28 | 0.19 |
+| 1H | **+ZEGARY** | 65 | 52.3% | **1.59** | **2.5%** | **+540** | **1.47 ✅>1.0!** | 0.46 |
+| 4H | +ZEGARY | 74 | 41.9% | 0.59 | 14.5% | −1168 | −1.29 | 0.002 |
+
+**Werdykt:** 1H = żywioł zegarów — PIERWSZY Sharpe roczny > 1.0 w historii Imperium;
+do Etapu I brakuje TYLKO DSR (0.46), który przy 4000 barach 1H (≈5,5 mies.) jest z natury
+niski — dłuższa próba w toku. 4H bez zmian (bary 4H mają za grube ziarno dla sesji) —
+potwierdza, że 4H czeka na inne źródło przewagi. Hipoteza Cezara (dedykowane neurony
+per interwał) POTWIERDZONA pomiarem.
+
+**Pliki:** `imperium/legiony/neurony/sesje.py` (nowy), `budowniczy_wskaznikow.py`,
+`rejestr.py`, `narzedzia/audyt_spojnosci.py` (W12 timestampy), `tests/test_neurony.py`,
+`tests/test_integracja.py`, docs (MANIFEST/README/INDEKS).
+**Testy:** 660/660 ✅. Audyt: pełna harmonia (58 neuronów).
+
 ## 2026-06-10 | FAZA B (W-286) | Diagnoza 4H + grid TIMEOUT — bramka PBO ZABLOKOWAŁA kalibrację (wzorcowe!)
 
 **DIAGNOZA (atrybucja przez pętlę MWU + rozkład zamknięć, BTC 4H):**

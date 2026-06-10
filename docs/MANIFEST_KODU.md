@@ -6,7 +6,7 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-10 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 56 neuronów (zarejestrowane w roju) + 12 zwiadowców = **68 modułów w kodzie**
+**Zaimplementowane:** 58 neuronów (zarejestrowane w roju) + 12 zwiadowców = **70 modułów w kodzie**
 **Aktywne / wyciszone:** 48 aktywnych + 7 wyciszonych, z czego:
   • **44 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, X-27 Value Convergence, OC-05 WashTrading, D-01 PathSignature)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
@@ -19,7 +19,7 @@
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 56). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 58). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -46,7 +46,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (56/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (58/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -107,6 +107,13 @@
 > liczy strefy OB/FVG/BOS z **samych barów OHLCV** (bez API) i wstrzykuje je do `wskazniki`.
 > W backteście CSV bez EXP-05 te 3 neurony abstynują (NEUTRAL) — Prawo XV, bez halucynacji.
 | VSA-01 | NeuronVSA | F | 8 | ✅ aktywny | VSA | — |
+
+### Plik: `neurony/sesje.py` (Faza C, W-286 — Zegary Rynku)
+
+| KLUCZ | Klasa | KAT | WAGA | Status | WSKAZNIK (Brama) | 🎖️ |
+|-------|-------|-----|------|--------|-----------------|-----|
+| SES-01 | NeuronZegarSesji | S | 4 | ✅ aktywny | ZEGAR_SESJI (TIMESTAMP) | — |
+| SES-02 | NeuronAzjaRange | S | 7 | ✅ aktywny | ASIA_RANGE (W-011) | — |
 
 ### Plik: `neurony/psychologia.py`
 

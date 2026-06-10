@@ -278,8 +278,24 @@ def main():
     for t in ("agregat", "filtr", "strategia"):
         if t in sys.argv:
             tryb = t
-    engine = backtest(sciezka, interwal, max_barow=max_barow, tryb=tryb)
+    auto = "--auto" in sys.argv
+    ucz = "--ucz" in sys.argv
+    engine = backtest(sciezka, interwal, max_barow=max_barow, tryb=tryb,
+                      auto_rezim=auto, ucz_mwu=ucz)
     engine.drukuj_raport()
+
+    # Werdykt Etapu I Koloseum (ROADMAP Arena × W-282) — każdy backtest CLI
+    # kończy się jawnym TAK/NIE na awans do paper tradingu (Prawo I).
+    from imperium.koloseum.walidacja import etap_pierwszy_koloseum
+    st = engine.podsumowanie()
+    st.oblicz(engine.historia_zamkniec)
+    w = etap_pierwszy_koloseum(engine.krzywa_equity, st, interwal=interwal)
+    if w["ok"]:
+        print(f"\n🏟️ ETAP I KOLOSEUM: ✅ ZALICZONY (Sharpe_r={w['sharpe_roczny']}, "
+              f"DSR={w['dsr']}) — strategia może iść do Etapu II (paper).")
+    else:
+        print(f"\n🏟️ ETAP I KOLOSEUM: ⛔ ODRZUCONY — {w['powod']} "
+              f"(Sharpe_r={w['sharpe_roczny']}, DSR={w['dsr']})")
 
 
 if __name__ == "__main__":

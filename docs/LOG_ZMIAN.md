@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-06-10 | FEATURE | CLI backtestu z werdyktem Etapu I + flagi --auto/--ucz
+
+**Opis:** Każdy backtest z linii poleceń kończy się teraz JAWNYM werdyktem bramki
+Etapu I Koloseum (✅ awans do paper / ⛔ powód odrzucenia) — Prawo I: koniec z
+"raportem bez wniosku". Nowe flagi CLI: `--auto` (Namiestnik AUTO-reżim),
+`--ucz` (pętla uczenia MWU). Użycie:
+`python -m imperium.koloseum.backtest dane/dzienne/Binance_BTCUSDT_d.csv 1D --auto`
+
+**Pliki:** `imperium/koloseum/backtest.py`.
+**Testy:** 645/645 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | FEATURE+POMIAR | Zamknięta pętla uczenia w backteście (ucz_mwu) — werdykt: działa, na 1D za mało rund
 
 **Opis:** Największa luka Prawa XV zamknięta — Igrzyska/MWU przestały być martwym

@@ -6,7 +6,7 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-10 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 58 neuronów (zarejestrowane w roju) + 12 zwiadowców = **70 modułów w kodzie**
+**Zaimplementowane:** 59 neuronów (zarejestrowane w roju) + 12 zwiadowców = **71 modułów w kodzie**
 **Aktywne / wyciszone:** 48 aktywnych + 7 wyciszonych, z czego:
   • **44 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, X-27 Value Convergence, OC-05 WashTrading, D-01 PathSignature)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
@@ -19,7 +19,7 @@
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 58). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 59). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -46,7 +46,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (58/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (59/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -114,6 +114,7 @@
 |-------|-------|-----|------|--------|-----------------|-----|
 | SES-01 | NeuronZegarSesji | S | 4 | ✅ aktywny | ZEGAR_SESJI (TIMESTAMP) | — |
 | SES-02 | NeuronAzjaRange | S | 7 | ✅ aktywny | ASIA_RANGE (W-011) | — |
+| AUG-01 | NeuronAugur 💎 | R | 6 | ✅ aktywny (AdapterKronikarz) | EVENT_PROB_WZROSTU (W-289) | — |
 
 ### Plik: `neurony/psychologia.py`
 
@@ -281,6 +282,7 @@
 | Dwu-zegarowy DSR (W-285.2 💎 unikat — bary wolumenowe/trading-time + podwójna bramka DSR) | `koloseum/walidacja.py` | ✅ aktywny |
 | EtapPierwszyKoloseum (progi ROADMAP Arena Etap I + DSR W-282 w jednym werdykcie; wpięty: backtest.krzywa_equity) | `koloseum/walidacja.py` | ✅ aktywny |
 | PomiarJumpModel (tabela dowodowa W-281 vs ADX — narzędzie Prawa XVIII) | `narzedzia/pomiar_jump_model.py` | ✅ aktywny |
+| KronikarzZdarzen + AdapterKronikarz 💎 (W-289 — przyczynowe event-study zdarzeń fundamentalnych: HALVING/ETF/KRACH/REGULACJA/MAKRO → EVENT_* dla AUG-01) | `biblioteki/kronikarz_zdarzen.py` | ✅ aktywny |
 | StraznikPrzewagi 💎 (W-287 unikat — HALT gdy rolling expectancy<0, powrót przez 1-pozycyjną sondę bojową; opt-in `backtest(straznik_przewagi=True)`) | `pretorianie/straznik_przewagi.py` | ✅ aktywny |
 | JumpModel (W-281 — detektor reżimu z karą za skok; pomiar 2026-06-10: ADX-baseline lepszy → POZA pipeline) | `legiony/jump_model.py` | ✅ moduł (⏸️ niewpięty po pomiarze) |
 | PaperTradingEngine | `koloseum/paper_trading.py` | ✅ aktywny |

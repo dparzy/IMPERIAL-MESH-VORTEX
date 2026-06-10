@@ -6,6 +6,49 @@
 
 ---
 
+## 2026-06-10 | UNIKAT W-289 💎 | KRONIKARZ ZDARZEŃ (Augur) — zdarzenia fundamentalne jako głos roju
+
+**Wizja Cezara zrealizowana** (= ROADMAP Faza 3 "Macierz zdarzeń historycznych" + W-039):
+system zna zdarzenia fundamentalne, dopasowuje historyczne analogie do live i podaje
+PROCENTOWE prawdopodobieństwa jako głos w roju.
+
+**Architektura (3 płaszczyzny, pełna symbioza):**
+1. **`biblioteki/kronikarz_zdarzen.py`** — KATALOG 12 zdarzeń (HALVING×3, ETF×3,
+   KRACH×3, REGULACJA×2, MAKRO; daty powszechnie weryfikowalne) + **przyczynowe
+   event-study**: `studium(typ, ts)` liczy forward-zwroty WYŁĄCZNIE z epizodów
+   o domkniętym horyzoncie przed ts (test wymusza zero look-ahead; bieżące zdarzenie
+   nie zasila własnych statystyk).
+2. **AdapterKronikarz** (mechanizm adapterów Dyrygenta) → wstrzykuje EVENT_TYP/
+   DNI_PO/N/PROB_WZROSTU/MEDIANA_PCT tylko w oknie ≤30 dni po zdarzeniu.
+3. **AUG-01 NeuronAugur** (R, waga 6, WSPOLNY): n≥2 ∧ prob≥65% → LONG;
+   prob≤35% → SHORT; n<2 → NEUTRAL "za mało historii" (Prawo I). W12: allowlista
+   adapterowa + twarda weryfikacja ożywienia.
+
+**ORYGINALNOŚĆ:** literatura daje jedną liczbę z jednego badania — nasz augur
+SAMOKALIBRUJE się z własnych barów i mądrzeje z każdą parą/historią bez zmiany kodu.
+Źródła naukowe kierunku (ZPO, w docstringu): FOMC-drift (JFM 2022), halving-synthetic-
+control (+24.55%, arXiv 2511.05512), spot-ETF (IRFA 2025).
+
+**TABELA DOWODOWA (BTC 1D 2017–2026, policzona przez moduł, ts=2026-06-10):**
+
+| Typ | n | 30 dni: prob↑ / mediana | 90 dni: prob↑ / mediana |
+|---|---|---|---|
+| HALVING | 2 | **100% / +12.7%** | **100% / +19.6%** |
+| ETF | 3 | 33% / −5.5% ("sell the news"!) | 33% / −10.0% |
+| KRACH | 3 | 67% / +0.4% | 67% / +22.7% (odbicia) |
+| REGULACJA | 2 | 50% / +19.9% | 100% / +20.3% |
+
+**Bug złapany testem podczas budowy:** zdarzenie spoza pokrycia danych dopasowywało
+się do pierwszego dostępnego baru (halving 2016 → bar 2024, absurdalny zwrot) —
+naprawione tolerancją ≤3 dni w `_indeks_baru` (Prawo I: brak danych ≠ wymyślone).
+
+**Pliki:** `imperium/biblioteki/kronikarz_zdarzen.py` (nowy), `imperium/legiony/neurony/
+sesje.py` (AUG-01), `rejestr.py`, `narzedzia/audyt_spojnosci.py` (W12 allowlista+weryfikacja),
+`tests/test_kronikarz_zdarzen.py` (nowy, 8 testów z przyczynowością), docs.
+**Testy:** 681/681 ✅ (59 neuronów, 55 aktywnych). Audyt: pełna harmonia.
+**Następne rozszerzenia (zapisane):** kalendarz FOMC/CPI (cykliczne daty → przyszłe
+okna), zdarzenia per-para, wagi malejące z dni_po.
+
 ## 2026-06-10 | W-288 | ATR-SL/TP (opt-in) + fix sprzężenia sizing↔SL — mechanika naprawiona, edge obnażony
 
 **Wdrożone:**

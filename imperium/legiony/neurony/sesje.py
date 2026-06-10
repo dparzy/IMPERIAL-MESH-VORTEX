@@ -120,3 +120,47 @@ class NeuronAzjaRange(MikroNeuron):
                 [f"🌅 Breakdown < Asia Low {lo:.2f} (zakres {szer:.2f}) — W-011"])
         return self._bazowy_sygnal(close, "NEUTRAL", 0.15,
             [f"Wewnątrz zakresu Azji [{lo:.2f}–{hi:.2f}] — bez rozstrzygnięcia"])
+
+
+class NeuronAugur(MikroNeuron):
+    """
+    AUG-01 | Augur Zdarzeń (W-289 💎) — głos historycznych analogii.
+
+    Czyta kontekst Kronikarza Zdarzeń (AdapterKronikarz → EVENT_*): jeśli
+    jesteśmy w oknie wpływu zdarzenia fundamentalnego, głosuje wg PRZYCZYNOWO
+    policzonych statystyk wcześniejszych epizodów tego typu:
+      • n ≥ 2 i prob_wzrostu ≥ 65% → LONG (pewność ~ prob, cap 0.8)
+      • n ≥ 2 i prob_wzrostu ≤ 35% → SHORT
+      • n < 2 (za mało historii) lub prob w środku → NEUTRAL z kontekstem
+    Poza oknem wpływu (brak EVENT_*) → abstynencja (Prawo XV).
+    """
+    KLUCZ = "AUG-01"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "EVENT_PROB_WZROSTU"
+    KATEGORIA = "R"
+    WAGA = 6
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        prob = wskazniki.get("EVENT_PROB_WZROSTU")
+        n = wskazniki.get("EVENT_N")
+        typ = wskazniki.get("EVENT_TYP")
+        dni = wskazniki.get("EVENT_DNI_PO")
+        if prob is None or typ is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak okna zdarzenia (Augur milczy)"])
+        if n is None or n < 2:
+            return self._bazowy_sygnal(prob, "NEUTRAL", 0.30,
+                [f"📜 {typ} ({dni}d po): tylko {n or 0} epizodów w historii — "
+                 f"za mało na werdykt (Prawo I)"])
+        if prob >= 65.0:
+            pewnosc = min(0.80, prob / 100.0)
+            return self._bazowy_sygnal(prob, "LONG", pewnosc,
+                [f"📜 {typ} ({dni}d po): {prob:.0f}% wzrostów w n={n} "
+                 f"historycznych epizodach — analogia LONG"])
+        if prob <= 35.0:
+            pewnosc = min(0.80, (100.0 - prob) / 100.0)
+            return self._bazowy_sygnal(prob, "SHORT", pewnosc,
+                [f"📜 {typ} ({dni}d po): tylko {prob:.0f}% wzrostów w n={n} "
+                 f"epizodach — analogia SHORT"])
+        return self._bazowy_sygnal(prob, "NEUTRAL", 0.25,
+            [f"📜 {typ} ({dni}d po): {prob:.0f}% w n={n} — historia bez przewagi"])

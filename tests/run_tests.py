@@ -16,14 +16,16 @@ import sys, os, importlib, traceback
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-MODULY_TESTOWE = [
-    "test_kalkulator", "test_igrzyska", "test_hedge_mwu", "test_pamiec",
-    "test_doradcy", "test_paper_trading", "test_scheduler",
-    "test_neurony", "test_exploratores", "test_integracja",
-    "test_dekorelacja", "test_strategie", "test_adaptery", "test_spojnosc",
-    "test_dyrygent", "test_czytnik_csv", "test_lookahead", "test_namiestnik",
-    "test_backtest", "test_arena_trzech_bram",
-]
+# AUTO-DISCOVERY (Prawo XV): każdy tests/test_*.py jest zbierany automatycznie.
+# Sztywna lista cicho gubiła nowe pliki testów (test_walidacja, 2026-06-10) —
+# nowy moduł testowy "istniał", ale nie był uruchamiany = martwy strażnik.
+import glob as _glob
+
+MODULY_TESTOWE = sorted(
+    os.path.splitext(os.path.basename(p))[0]
+    for p in _glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                     "test_*.py"))
+)
 
 
 def uruchom():

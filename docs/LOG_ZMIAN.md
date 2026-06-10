@@ -6,6 +6,37 @@
 
 ---
 
+## 2026-06-10 | FEATURE | Pakiet "najlepsi z najlepszych": W-280 + W-281 + W-282 + W-285.1 (unikat)
+
+**Opis:** Wdrożenie pakietu z deep researchu (4 moduły, +39 testów, 586→625):
+
+1. **W-280 Fixed-Share** (`biblioteki/hedge_mwu.py`): parametr `alpha_share` — po każdej
+   rundzie ułamek α masy wraca do puli (w_i ← (1−α)·w_i + α·średnia). Naprawia strukturalną
+   wadę czystego Hedge w niestacjonarności (zakopane wagi wracają po zmianie reżimu).
+   α=0 → dokładnie stary HedgeMWU (test dowodzi zero regresji).
+2. **W-282 Bramka anty-overfittingu** (`koloseum/walidacja.py`, NOWY): Deflated Sharpe Ratio
+   (korekta o liczbę prób + skośność/kurtozę; Bailey & de Prado 2014) + PBO przez CSCV
+   (C(S,S/2) podziałów; Bailey et al. 2015) + `bramka_walidacji()` — strategia przechodzi
+   tylko gdy DSR ≥ 0.95 ORAZ PBO < 0.20. Pure-Python (Φ przez erf, Φ⁻¹ Acklam).
+3. **W-281 JumpModel** (`legiony/jump_model.py`, NOWY): detektor reżimu z karą za skok λ
+   (Viterbi-DP + naprzemienna aktualizacja centroidów, multi-start, deterministyczny seed).
+   Krypto-paper: Cortese/Kolm/Lindström 2023 (3 stany bull/neutral/bear). KLOCEK Fazy 3
+   master-switcha — wpięcie do klasyfikuj_rezim() po pomiarze (Prawo XVIII).
+4. **W-285.1 💎 HedgeMWUzPamieciaRezimu** (unikat Imperium): Fixed-Share, ale masa mieszana
+   wg PAMIĘCI wag per-reżim (EMA) zamiast uniform — gdy wraca RANGING, neurony mean-reversion
+   odzyskują wagę natychmiast. Inspiracja: Bousquet & Warmuth (JMLR 2002) "sharing to past
+   posteriors"; nasz twist: indeksowanie reżimem z Namiestnika, nie czasem.
+
+**Infrastruktura przy okazji (Prawo XV):** `tests/run_tests.py` — AUTO-DISCOVERY plików
+test_*.py (sztywna lista cicho zgubiła test_walidacja — nowy strażnik istniał, ale nie był
+uruchamiany). Bramka W13 złapała w trakcie pracy 3 nieużywane importy — system działa.
+
+**Pliki:** `imperium/biblioteki/hedge_mwu.py`, `imperium/koloseum/walidacja.py` (nowy),
+`imperium/legiony/jump_model.py` (nowy), `tests/test_walidacja.py` (nowy),
+`tests/test_jump_model.py` (nowy), `tests/test_hedge_mwu.py`, `tests/run_tests.py`,
+`docs/` (MANIFEST, WIZJONER statusy, README, LOG).
+**Testy:** 625/625 ✅ (586+39). Audyt: 13 warstw, pełna harmonia.
+
 ## 2026-06-10 | ZWIAD | Deep research 2024-2026 → wizje W-280..W-285 (WIZJONER)
 
 **Opis:** Zwiad internetowy (5 osi: agregacja głosów, detekcja reżimu, anty-overfitting,

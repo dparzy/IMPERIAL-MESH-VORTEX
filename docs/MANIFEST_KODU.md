@@ -5,7 +5,7 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-09 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Stan na:** 2026-06-10 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 56 neuronów (zarejestrowane w roju) + 12 zwiadowców = **68 modułów w kodzie**
 **Aktywne / wyciszone:** 48 aktywnych + 7 wyciszonych, z czego:
   • **44 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, X-27 Value Convergence, OC-05 WashTrading, D-01 PathSignature)
@@ -268,6 +268,10 @@
 | Volatility Drag (W-130, Sinclair BIB-008 — erozja ½λ(λ−1)σ² lewara) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | RegulaSzesciuProcentEldera (Reguła 6% Elder BIB-015 — HALT gdy strata miesięczna ≥ 6%) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
 | Skew-Kelly (W-211, Sinclair BIB-018 — Kelly korygowany o skośność/fat tails) | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |
+| Fixed-Share w HedgeMWU (W-280 — mieszanie masy α: zakopane wagi wracają po zmianie reżimu) | `biblioteki/hedge_mwu.py` | ✅ aktywny |
+| HedgeMWUzPamieciaRezimu (W-285.1 💎 unikat — mixing wg pamięci wag per-reżim z Namiestnika) | `biblioteki/hedge_mwu.py` | ✅ aktywny |
+| Walidacja Koloseum: Deflated Sharpe + PBO/CSCV (W-282, BIB-007 — bramka anty-overfittingu) | `koloseum/walidacja.py` | ✅ aktywny |
+| JumpModel (W-281 — detektor reżimu z karą za skok; klocek Fazy 3 master-switcha, czeka na pomiar) | `legiony/jump_model.py` | ✅ aktywny |
 | PaperTradingEngine | `koloseum/paper_trading.py` | ✅ aktywny |
 | Dyrygent (orkiestrator cyklu end-to-end) | `koloseum/dyrygent.py` | ✅ aktywny |
 | Backtest (przejazd po historii) | `koloseum/backtest.py` | ✅ aktywny |

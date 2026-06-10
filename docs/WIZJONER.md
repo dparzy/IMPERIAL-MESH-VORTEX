@@ -2117,7 +2117,7 @@ wszystkie wdrożone wizje BIB-020 **ortogonalne — ZERO redundancji** (żadne |
 > *Cezar rozkazał: „poszukaj deep researchem najlepszych ulepszeń + zrób własne unikatowe".*
 > *Zwiad przeprowadzony 5 równoległymi wyszukiwaniami. Wszystkie źródła z linkami (ZPO).*
 
-#### 🥇 W-280 | Fixed-Share zamiast czystego Hedge/MWU — wagi które UMIEJĄ wybaczać 🔴
+#### 🥇 W-280 | Fixed-Share zamiast czystego Hedge/MWU — wagi które UMIEJĄ wybaczać 🔴 ✅ WDROŻONE 2026-06-10 (`hedge_mwu.py` alpha_share, +5 testów)
 
 **Co znalazłem:** Hedge/MWU (nasz W-049) ma strukturalną wadę w środowiskach NIESTACJONARNYCH:
 gdy waga eksperta spadnie blisko zera, może wracać tylko mnożnikowo (wolno) — nawet gdy reżim
@@ -2132,7 +2132,7 @@ gdy czysty Hedge — STAŁY żal średni (nie zbiega!), bo za mocno commituje do
 mogą „grzebać" dobre neurony po złej passie. **Wdrożenie trywialne:** jedna linia w `hedge_mwu.py`
 (parametr α≈0.01–0.05), zero nowych zależności. Status: ⚠️ zweryfikowane wyszukiwaniem (papery arXiv).
 
-#### 🥈 W-281 | Statistical Jump Model — detektor reżimu lepszy niż HMM i progi ADX 🔴
+#### 🥈 W-281 | Statistical Jump Model — detektor reżimu lepszy niż HMM i progi ADX 🔴 ✅ WDROŻONE 2026-06-10 (`legiony/jump_model.py`, +10 testów; wpięcie do klasyfikuj_rezim = Faza 3 po pomiarze)
 
 **Co znalazłem:** Statistical Jump Model (Nystrup, Kolm, Lindström) — klastrowanie cech
 z JAWNĄ karą za skok między reżimami (jump penalty λ) → reżimy trwałe, mało fałszywych alarmów.
@@ -2147,7 +2147,7 @@ Także: [Downside Risk Reduction Using Regime-Switching Signals: SJM](https://ar
 NASZYCH cechach z Bramy (Hurst, VR, vol, entropia...). Pure-Python (k-means + programowanie
 dynamiczne). Status: ⚠️ zweryfikowane (peer-review Springer + arXiv).
 
-#### 🥉 W-282 | Bramka anty-overfittingu w Koloseum: DSR + PBO/CSCV jako MUR przed wdrożeniem 🔴
+#### 🥉 W-282 | Bramka anty-overfittingu w Koloseum: DSR + PBO/CSCV jako MUR przed wdrożeniem 🔴 ✅ WDROŻONE 2026-06-10 (`koloseum/walidacja.py`: deflated_sharpe + pbo_cscv + bramka_walidacji, +19 testów)
 
 **Co znalazłem (potwierdzenie BIB-007/W-119, teraz z procedurą):** 
 - **Deflated Sharpe Ratio** (Bailey & López de Prado) — koryguje Sharpe o selection bias
@@ -2200,8 +2200,9 @@ Trzy unikaty, których NIE znalazłem nigdzie w tej formie — nasza przewaga z 
    Fixed-Share (W-280) — system, w którym detektor reżimu sam jest ekspertem w meta-grze
    i traci wagę, gdy się myli. Samonaprawiający się przełącznik reżimów.
 
-**Priorytet wdrożenia (rekomendacja ARCH-MAX):** W-280 (1 linia, natychmiast) → W-282 (bramka
-Koloseum, ~150 linii) → W-281 (jump model, Faza 3 master-switcha) → W-285.1 (unikat, po W-280).
+**Status wdrożenia (2026-06-10):** ✅ W-280 + ✅ W-282 + ✅ W-281 (moduł; wpięcie po pomiarze) +
+✅ W-285.1 `HedgeMWUzPamieciaRezimu` (unikat, `hedge_mwu.py`, +5 testów). Pozostają: W-285.2
+(dwu-zegarowy DSR — wymaga barów wolumenowych) i W-285.3 (Trybunał — po pomiarze Fazy 2/3).
 
 ---
 

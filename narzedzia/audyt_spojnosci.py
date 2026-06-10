@@ -405,10 +405,16 @@ def _warstwa_13_ruff():
 
     if wynik.returncode == 0:
         info.append("Ruff (W13): czysto ✅ (F/E9/E711-714/B006-008/B904/PLE — bez bugów/martwego kodu)")
-    else:
-        linie = [l for l in wynik.stdout.strip().splitlines() if l.strip()]
-        bledy.append(f"[W13] Ruff wykrył {len(linie)} problemów (bugi/martwy kod): "
-                     f"{linie[:8]}{' …' if len(linie) > 8 else ''}")
+        return bledy, info
+    linie = [l for l in wynik.stdout.strip().splitlines() if l.strip()]
+    if not linie:
+        # rc≠0 bez znalezisk = ruff nie wykonał się (np. "No module named ruff" po
+        # resecie kontenera, błąd configu) — to NIE są znaleziska. Nota, nie blokada.
+        szczegol = wynik.stderr.strip().splitlines()[:1] or ["nieznany błąd"]
+        info.append(f"⚠️ W13: ruff nie wykonał się ({szczegol[0]}) — linter pominięty (pip install ruff)")
+        return bledy, info
+    bledy.append(f"[W13] Ruff wykrył {len(linie)} problemów (bugi/martwy kod): "
+                 f"{linie[:8]}{' …' if len(linie) > 8 else ''}")
     return bledy, info
 
 

@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-06-11 | W-292 💎📊 | NeuronPrzeplyw (RADAR-03) — neuron 62, wynik MIESZANY (uczciwie)
+
+**Opis:** PRZEPLYW_KAPITALU dostał neuron głosujący (napływ→LONG, odpływ→SHORT).
+Pomiar regresyjny — wynik MIESZANY (Prawo I, bez upiększania):
+
+| | Sharpe | PnL | PF | WR | Etap I |
+|---|--------|-----|----|----|--------|
+| RADAR-02 (przed) | 1.480 | +42986 | 2.69 | 55.4% | ✅ |
+| + RADAR-03 | 1.475 ↓ | **+43598** ↑ | **2.73** ↑ | 55.4% | ✅ |
+
+Sharpe −0.005 (szum), PnL i PF ↑. Bramka przechodzi z marginesem (DSR 1.0).
+ZOSTAWIONY: dodaje realny barometr risk-on/off (Prawo XVI — dywersyfikacja
+informacji), nie psuje bramki. Ale to NIE czysta wygrana jak RADAR-02 — raport
+uczciwy. Rój: 61→62 (58 aktywnych, 6 kat. R).
+
+**Pliki:** `sesje.py`, `rejestr.py`, `audyt_spojnosci.py`, `test_praeda.py`,
+`test_integracja.py`, `MANIFEST_KODU.md`, `INDEKS_IMPERIUM.md`, `README.md`.
+
+---
+
 ## 2026-06-11 | W-292 💎📈 | NeuronDominacja (RADAR-02) — neuron 61, zmierzony zysk
 
 **Opis:** BTC_DOMINANCJA dostała neuron głosujący (alt-season→LONG, ucieczka do BTC→

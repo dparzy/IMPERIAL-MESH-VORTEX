@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-11 | W-292 💎📈 | NeuronDominacja (RADAR-02) — neuron 61, zmierzony zysk
+
+**Opis:** BTC_DOMINANCJA dostała neuron głosujący (alt-season→LONG, ucieczka do BTC→
+SHORT). Pomiar regresyjny POTWIERDZIŁ poprawę (nie założenie — Prawo I):
+
+| | Sharpe | PnL | PF | WR | Etap I |
+|---|--------|-----|----|----|--------|
+| bez RADAR-02 | 1.463 | +42369 | 2.67 | 55.1% | ✅ |
+| z RADAR-02 | **1.480** | **+42986** | **2.69** | **55.4%** | ✅ |
+
+Wszystkie metryki ↑ (drobno, ale realnie), DSR=1.0. Neuron zarobił na miejsce.
+Rój: 60→61 neuronów (57 aktywnych, 5 kat. R). Pełna symbioza zsynchronizowana.
+
+**Pliki:** `imperium/legiony/neurony/sesje.py`, `rejestr.py`, `narzedzia/audyt_spojnosci.py`,
+`tests/test_praeda.py`, `tests/test_integracja.py`, `docs/MANIFEST_KODU.md`,
+`docs/INDEKS_IMPERIUM.md`, `README.md`.
+
+---
+
 ## 2026-06-11 | W-293 🗡️🏆 | ŁOWCA ODBLOKOWANY: tryb łupieżczy przechodzi Etap I
 
 **Opis:** Z ciaśniejszym bezpiecznikiem (HALT 13%) tryb łupieżczy (Praeda) też przechodzi

@@ -106,6 +106,10 @@ class Dyrygent:
         self.sl_atr_mult = sl_atr_mult
         # W-291: kontekst zewnętrzny dolewany do wskaźników (RADAR BTC: BTC_TREND).
         self.kontekst_dodatkowy: Dict[str, Any] = {}
+        # W-291 Praeda (tryb łowcy): Okazjon steruje agresją w potwierdzonych
+        # momentach. None = wyłączony. praeda_dd_normal ustawia portfel/breaker.
+        self.okazjon = None
+        self.praeda_dd_normal: bool = True
         # W-290 portfel: budżet sizingu pary (None = pełny wolny kapitał silnika).
         # W koszyku N par każdy Dyrygent sizinguje wg kapital/N (równe wagi).
         self.kapital_sizing: Optional[float] = None
@@ -288,11 +292,22 @@ class Dyrygent:
             self.regula_6pct.aktualizuj(self.engine.kapital_calkowity,
                                         dzisiaj=dzien_swiecy)
 
+        # 4b. 🗡️ PRAEDA (W-291): auto-skalowana agresja w POTWIERDZONYCH okazjach.
+        #     Tylko AMPLIFIKUJE w klatce: lewar cap 20, rozmiar clamp 50% kapitału;
+        #     śpi w drawdownie (praeda_dd_normal=False). Wszystkie weta nadal działają.
+        mnoznik_rozmiaru = 1.0
+        if self.okazjon is not None:
+            ok = self.okazjon.ocen(raport, wskazniki, kierunek, self.praeda_dd_normal)
+            if ok.potwierdzona:
+                dzwignia_final = max(1, min(20, int(round(dzwignia_final * ok.mnoznik_lewara))))
+                mnoznik_rozmiaru = ok.mnoznik_rozmiaru
+
         plan = self.kalkulator.policz(
             symbol=symbol,
             kierunek=kierunek,
             cena_wejscia=cena_wejscia,
             dzwignia=dzwignia_final,
+            mnoznik_rozmiaru=mnoznik_rozmiaru,
             kapital_usdt=(self.kapital_sizing if self.kapital_sizing is not None
                           else self.engine.kapital),
             pewnosc=pewnosc,

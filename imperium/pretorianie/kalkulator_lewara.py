@@ -375,7 +375,8 @@ class KalkulatorLewara:
                max_drag_roczny: "float | None" = None,
                regula_6pct: "RegulaSzesciuProcentEldera | None" = None,
                atr: "float | None" = None,
-               sl_atr_mult: "float | None" = None) -> PlanPozycji:
+               sl_atr_mult: "float | None" = None,
+               mnoznik_rozmiaru: float = 1.0) -> PlanPozycji:
 
         kierunek = kierunek.upper()
         assert kierunek in ("LONG", "SHORT"), "kierunek musi być LONG lub SHORT"
@@ -445,6 +446,9 @@ class KalkulatorLewara:
         # żąda pozycji ≈200% kapitału → stary checklist WETOWAŁ niemal każde
         # wejście (pomiar 2026-06-10: 201→2 trade'y). Przycięcie do 50% kapitału
         # tylko ZMNIEJSZA ryzyko (ryzyko_usdt liczone z finalnego rozmiaru niżej).
+        # W-291 Praeda: mnożnik chciwości (auto z siły okazji) — PRZED clampem 50%,
+        # więc nigdy nie przebije twardego sufitu kapitału (klatka nienaruszona).
+        rozmiar_usdt *= max(0.0, mnoznik_rozmiaru)
         rozmiar_usdt = min(rozmiar_usdt, kapital_usdt * 0.5)
 
         # 5e. Uczciwy raport ryzyka (Prawo I): ryzyko_usdt liczymy z FINALNEGO

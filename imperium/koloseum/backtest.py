@@ -185,6 +185,7 @@ def backtest_portfel(
     tryb: str = "agregat",
     auto_rezim: bool = True,
     dd_control: bool = True,
+    tryb_lupiezcy: bool = False,
     bary_per: "Optional[Dict[str, List[Dict[str, Any]]]]" = None,
 ) -> PaperTradingEngine:
     """
@@ -246,6 +247,11 @@ def backtest_portfel(
                      budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
                      namiestnik=namiestnik, breaker_krzywej=False)  # breaker wspólny
         d.kapital_sizing = budzet_pary
+        # 🗡️ PRAEDA (W-291): tryb łupieżczy — auto-skalowana agresja w POTWIERDZONYCH
+        # okazjach (confluence). Aktywny tylko gdy DD normalny (bezpieczeństwo > chciwość).
+        if tryb_lupiezcy:
+            from imperium.pretorianie.praeda import Okazjon
+            d.okazjon = Okazjon()
         dyrygenci[sym] = d
 
     # Chronologiczna oś: (timestamp, symbol, indeks_baru) — tylko bary po oknie.
@@ -270,6 +276,9 @@ def backtest_portfel(
             if breaker.halt:
                 continue   # blokada nowych wejść (świadoma cisza, Prawo XV)
             dyrygenci[sym].kapital_sizing = budzet_pary * breaker.frakcja_pozycji()
+        # PRAEDA: chciwość dozwolona TYLKO gdy bezpiecznik w stanie NORMAL (DD < próg).
+        if tryb_lupiezcy:
+            dyrygenci[sym].praeda_dd_normal = (breaker is None or breaker.stan == "NORMAL")
         # RADAR BTC: trend lidera z barów BTC do ts (przyczynowo, bez look-ahead)
         if _btc_close:
             import bisect as _bs

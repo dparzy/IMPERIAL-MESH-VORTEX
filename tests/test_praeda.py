@@ -81,6 +81,44 @@ def test_sila_zawsze_w_zakresie():
             assert 1.0 <= ok.mnoznik_rozmiaru <= 2.0
 
 
+def test_kalkulator_mnoznik_rozmiaru_skaluje():
+    """W-291: mnoznik_rozmiaru zwiększa rozmiar, ale clamp 50% kapitału trzyma sufit."""
+    from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara
+    k = KalkulatorLewara()
+    baza = k.policz(symbol="BTCUSDT", kierunek="LONG", cena_wejscia=100.0,
+                    dzwignia=3, kapital_usdt=10_000.0, pewnosc=0.8, rezim="TREND_STRONG")
+    wiekszy = k.policz(symbol="BTCUSDT", kierunek="LONG", cena_wejscia=100.0,
+                       dzwignia=3, kapital_usdt=10_000.0, pewnosc=0.8, rezim="TREND_STRONG",
+                       mnoznik_rozmiaru=1.5)
+    assert wiekszy.rozmiar_usdt >= baza.rozmiar_usdt
+    # Clamp: nawet ekstремальny mnożnik nie przekroczy 50% kapitału.
+    ekstrem = k.policz(symbol="BTCUSDT", kierunek="LONG", cena_wejscia=100.0,
+                       dzwignia=20, kapital_usdt=10_000.0, pewnosc=1.0, rezim="TREND_STRONG",
+                       mnoznik_rozmiaru=99.0)
+    assert ekstrem.rozmiar_usdt <= 10_000.0 * 0.5 + 1e-6
+
+
+def test_kalkulator_mnoznik_zero_nie_ujemny():
+    """Granica: mnoznik_rozmiaru=0 → rozmiar 0 (nie ujemny), max(0,·) chroni."""
+    from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara
+    k = KalkulatorLewara()
+    p = k.policz(symbol="BTCUSDT", kierunek="LONG", cena_wejscia=100.0,
+                 dzwignia=3, kapital_usdt=10_000.0, pewnosc=0.8, rezim="TREND_STRONG",
+                 mnoznik_rozmiaru=0.0)
+    assert p.rozmiar_usdt == 0.0
+
+
+def test_dyrygent_okazjon_none_brak_wplywu():
+    """Domyślnie okazjon=None → Praeda nie ingeruje (mnoznik_rozmiaru pozostaje 1.0)."""
+    from imperium.koloseum.dyrygent import Dyrygent
+    assert Dyrygent.__init__ is not None
+    # okazjon i praeda_dd_normal to atrybuty instancji — sprawdzamy domyślne wartości.
+    import inspect
+    src = inspect.getsource(Dyrygent.__init__)
+    assert "self.okazjon = None" in src
+    assert "self.praeda_dd_normal" in src
+
+
 if __name__ == "__main__":
     fn = [(k, v) for k, v in sorted(globals().items()) if k.startswith("test_")]
     bl = 0

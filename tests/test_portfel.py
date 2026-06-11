@@ -71,3 +71,13 @@ def test_portfel_dd_control_opt_in():
         eng = backtest_portfel({}, "1D", okno=250, bary_per=bary_per, dd_control=ddc)
         assert eng.kapital_calkowity > 0
         assert all(p > 0 for p in eng.krzywa_equity)
+
+
+def test_portfel_wstrzykuje_btc_trend():
+    """Radar BTC: portfel ustawia kontekst_dodatkowy z BTC_TREND (lead-lag)."""
+    import imperium.koloseum.backtest as bt
+    bary_per = {s: _bary(s, n=300, krok=(1.5 if s == "BTCUSDT" else 0.5))
+                for s in ("BTCUSDT", "ETHUSDT")}
+    eng = bt.backtest_portfel({}, "1D", okno=250, bary_per=bary_per)
+    # przebieg bez wyjątku + equity dodatnie (radar nie psuje pipeline)
+    assert eng.kapital_calkowity > 0

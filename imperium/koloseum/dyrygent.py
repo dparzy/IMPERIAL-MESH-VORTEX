@@ -104,6 +104,8 @@ class Dyrygent:
         self.min_pewnosc_interwalu: Dict[str, float] = min_pewnosc_interwalu or {}
         # W-288: SL = sl_atr_mult × ATR_14 (opt-in; None = stary SL z dźwigni).
         self.sl_atr_mult = sl_atr_mult
+        # W-291: kontekst zewnętrzny dolewany do wskaźników (RADAR BTC: BTC_TREND).
+        self.kontekst_dodatkowy: Dict[str, Any] = {}
         # W-290 portfel: budżet sizingu pary (None = pełny wolny kapitał silnika).
         # W koszyku N par każdy Dyrygent sizinguje wg kapital/N (równe wagi).
         self.kapital_sizing: Optional[float] = None
@@ -171,6 +173,10 @@ class Dyrygent:
         if not wskazniki:
             return DecyzjaCyklu(symbol, "BUDOWNICZY", False,
                                 powod="brak wskaźników (puste bary lub błąd Bramy)")
+        # Kontekst zewnętrzny (W-291): RADAR BTC i in. wstrzykiwane z poziomu
+        # silnika portfelowego (BTC_TREND lidera) — dolewane do wskaźników.
+        if self.kontekst_dodatkowy:
+            wskazniki.update(self.kontekst_dodatkowy)
 
         # 1b. Auto-klasyfikacja reżimu (Prawo XV — ożywia system reżimowy).
         # rezim="AUTO" → klasyfikator z gotowych wskaźników (nie zgadywanie, dane Bramy).

@@ -223,6 +223,14 @@ def backtest_portfel(
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"
     budzet_pary = kapital_startowy / n   # równe wagi (Markowitz)
 
+    # RADAR BTC (W-291): stan lidera (BTC_TREND) wstrzykiwany do KAŻDEJ pary jako
+    # kontekst lead-lag. Liczony przyczynowo z barów BTC do bieżącej świecy.
+    from imperium.legiony.radar_btc import RadarBTC
+    _radar = RadarBTC()
+    _btc_sym = next((s for s in bary_per if s.upper().startswith("BTC")), None)
+    _btc_close = [float(x["close"]) for x in bary_per[_btc_sym]] if _btc_sym else []
+    _btc_ts = [int(x["timestamp"]) for x in bary_per[_btc_sym]] if _btc_sym else []
+
     # DD-control portfela (W-290): JEDEN wspólny BezpiecznikKrzywejKapitalu na
     # poziomie koszyka (nie 5 z fragmentaryczną wizją). Domyślne progi W-062
     # (REDUCED@10% DD → ×0.5 sizingu, HALT@20% → blokada wejść) — NIE strojone
@@ -262,6 +270,12 @@ def backtest_portfel(
             if breaker.halt:
                 continue   # blokada nowych wejść (świadoma cisza, Prawo XV)
             dyrygenci[sym].kapital_sizing = budzet_pary * breaker.frakcja_pozycji()
+        # RADAR BTC: trend lidera z barów BTC do ts (przyczynowo, bez look-ahead)
+        if _btc_close:
+            import bisect as _bs
+            j = _bs.bisect_right(_btc_ts, ts)
+            bt = _radar.trend(_btc_close[:j]) if j >= 1 else None
+            dyrygenci[sym].kontekst_dodatkowy = {"BTC_TREND": bt} if bt is not None else {}
         okno_barow = bary[i - okno: i + 1]
         dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
 

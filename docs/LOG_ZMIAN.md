@@ -31,7 +31,8 @@ WIZJONER W-071/W-085/W-086 (intermarket/lead-lag) z idei → żywy neuron.
   przeciwprąd (LONG przeciw spadającemu BTC / SHORT pod rosnący).
 
 60 neuronów (56 aktywnych). +5 testów. W12: RADAR-01 na allowliście kontekstu (jak AUG-01).
-Następne: wstrzyknięcie BTC_TREND w silniku portfelowym (provider per timestamp) + pomiar.
+✅ Wstrzyknięcie BTC_TREND wpięte: `Dyrygent.kontekst_dodatkowy` + `backtest_portfel`
+liczy BTC_TREND z barów BTC przyczynowo (bisect do ts) i podaje każdej parze. Pomiar — w toku.
 
 **Pliki:** `imperium/legiony/radar_btc.py` (nowy), `imperium/legiony/neurony/sesje.py`,
 `imperium/legiony/rejestr.py`, `imperium/pretorianie/praeda.py`, `narzedzia/audyt_spojnosci.py`,

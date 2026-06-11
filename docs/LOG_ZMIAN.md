@@ -6,6 +6,30 @@
 
 ---
 
+## 2026-06-11 | Opcja A+B+C | Radar-adaptive strategy switching + vol-weighted portfolio + paper trading docs
+
+**Opcja A — radar-aware strategy switching:**
+- `bonus_radar(strategia, stan_rynku)`: score modifier per-styl wg RadarRynku
+  (TR/SC +10% przy PRZEPLYW>0.65 i BTC bullish; RV/RG +10% przy PRZEPLYW<0.35)
+- `decyduj_z_radarem()` w Namiestnik: lewar_factor ×1.2 bycze/×0.65 stres
+- `legatus.stan_rynku`, `dyrygent.stan_rynku` — przekazywane per-tick
+- Wynik: Sharpe=1.504, DSR=1.0 ✅ | 4H: Sharpe=2.196, DSR=1.0 ✅
+
+**Opcja B — vol-adjusted portfolio allocation:**
+- `wagi_inwerse_vol(bary_per, okno_vol)`: 1/σ wagi z warmup barów (kauzalne)
+- `backtest_portfel(..., wagi=dict)`: nowy parametr — równe wagi domyślnie
+- Vol-adj vs equal-weight 1D: Sharpe 1.504→1.559 (+4%)
+
+**Opcja C — paper trading MEXC:**
+- `docs/PAPER_TRADING_MEXC.md`: krok po kroku (klucze API, pętla live, Etap II)
+
+**Testy:** 729→743 (14 nowych). Ruff czysty. Audyt exit 0.
+**Pliki:** `baza.py`, `namiestnik.py`, `legatus.py`, `dyrygent.py`,
+`backtest.py`, `test_radar_rynku.py`, `test_portfel.py`,
+`docs/PAPER_TRADING_MEXC.md`, `docs/INDEKS_IMPERIUM.md`.
+
+---
+
 ## 2026-06-11 | W-292 💎📊 | NeuronPrzeplyw (RADAR-03) — neuron 62, wynik MIESZANY (uczciwie)
 
 **Opis:** PRZEPLYW_KAPITALU dostał neuron głosujący (napływ→LONG, odpływ→SHORT).

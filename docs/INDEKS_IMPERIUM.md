@@ -168,7 +168,7 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 | **B** ✅ | AdapterFutures (Binance fapi public) → PSY-01/02/04 obudzone, kat. **R** żywa | ✅ ZREALIZOWANA 2026-06-03 | +4 neurony (PSY), 2 strategie VI-LV |
 | **C** ✅ | AdapterCVD (Binance aggTrades public) → V-03 CVD obudzony | ✅ ZREALIZOWANA 2026-06-03 | +1 neuron (V-03 kat. F) |
 | **D** 🔵 | OC-01..04 on-chain (MVRV, SOPR, Puell, Netflow) — wymaga klucza Glassnode/CryptoQuant | ⏳ OCZEKUJE — decyzja Cezara | +4 neurony (kat. O) |
-| **LIVE** 🟠 | Paper trading na żywych danych MEXC — `MEXC_API_KEY` + `MEXC_SECRET` | ⏳ Gotowe do uruchomienia | rdzeń kompletny |
+| **LIVE** 🟠 | Paper trading na żywych danych MEXC — `MEXC_API_KEY` + `MEXC_SECRET` | ⏳ Instrukcja → `docs/PAPER_TRADING_MEXC.md` | rdzeń kompletny |
 | **E** 🔵 | Dalsze neurony z katalogu (299−55=244 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
 **Stan kategorii (2026-06-04):** aktywne M/T/F/A/L/V/R/H/N/Z/O · wyciszone S(SMC feed)/O-API(on-chain API)

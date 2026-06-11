@@ -21,8 +21,20 @@ każdy bar (ts, symbol) przetwarzany w kolejności czasu, bez look-ahead. Realiz
 ROADMAP Faza 3 "Kostka Rubika" jako kod, nie tylko pomiar.
 
 Wsparcie: `Dyrygent.kapital_sizing` (budżet sizingu pary; None = pełny kapitał silnika).
-+4 testy (wspólny kapitał, oś czasu, budżet równy, brak historii). Pomiar bojowy
-5 par przez silnik — patrz wynik (dopisany po przebiegu).
++4 testy (wspólny kapitał, oś czasu, budżet równy, brak historii).
+
+**🎯 BÓJ 5 PAR PRZEZ SILNIK (1D AUTO, krzywa dzienna, n_prob=5):**
+trades=422, WR 51.2%, PF 1.74, PnL +6057 (+60%), **Sharpe_r 1.427 ✅**, **DSR 0.9989 ✅**,
+MaxDD **16.5% ⛔** (próg <15%). Produkcyjny silnik z DYNAMICZNYM dzieleniem kapitału
+dał Sharpe NAWET WYŻSZY niż idealny pomiar równowag (1.24) — kapitał płynie do par,
+które akurat sygnalizują. Diagnoza krzywej potwierdzona: per-zdarzenie dawało 0.69
+(√365 zaniżał o √N), dzienne = 1.43.
+
+**JEDYNY BLOKER: MaxDD 16.5% > 15%** (o 1.5%!). To NIE overfitting do naprawy
+parametrem — mamy gotowe, ZASADNICZE moduły kontroli obsunięcia: W-062
+BezpiecznikKrzywejKapitalu (REDUCED@10%/HALT@20%) i W-063 SkalowanieFrakcjaDD
+(płynna redukcja rozmiaru z DD). Następny krok: wpiąć DD-control do silnika
+portfelowego i zmierzyć (DSR/PBO pilnują, by nie przeuczyć).
 
 **Pliki:** `imperium/koloseum/backtest.py` (backtest_portfel), `imperium/koloseum/dyrygent.py`
 (kapital_sizing), `tests/test_portfel.py` (nowy).

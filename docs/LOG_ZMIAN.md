@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-06-11 | W-293 🗡️🏆 | ŁOWCA ODBLOKOWANY: tryb łupieżczy przechodzi Etap I
+
+**Opis:** Z ciaśniejszym bezpiecznikiem (HALT 13%) tryb łupieżczy (Praeda) też przechodzi
+bramkę — i łupi prawie 2× więcej niż baza, legalnie.
+
+| Tryb | trades | WR | PF | PnL | Sharpe | DSR | Etap I |
+|------|--------|----|----|-----|--------|-----|--------|
+| BAZA | 664 | 55.1% | 2.67 | +42369 | 1.46 | 1.0 | ✅ |
+| ŁUPIEŻCZY | 749 | 53.3% | 3.03 | **+71671** | 1.29 | 1.0 | ✅ |
+
+**Wniosek:** ciaśniejszy bezpiecznik OKIEŁZNAŁ chciwość — Praeda wzmacnia na
+potwierdzonych okazjach (PnL +69% vs baza), a HALT@13% ucina krwawienie. Niższy
+Sharpe łupieżcy (1.29 vs 1.46) to cena agresji (większy zysk, większe wahania) —
+ale przechodzi DSR=1.0 + MaxDD<15%. Tryb OPT-IN (`tryb_lupiezcy=True`), nie domyślny —
+łowca na świadomą decyzję, nie na ślepo.
+
+**Pliki:** (pomiar potwierdzający integrację W-291/293 — bez zmian kodu).
+
+---
+
 ## 2026-06-11 | W-293 🎯🏆 | PORTFEL PRZECHODZI ETAP I: ciaśniejszy HALT (20%→13%)
 
 **Opis:** Debugging (nie zgadywanie) ustalił przyczynę MaxDD 20%: bezpiecznik HALT@20%

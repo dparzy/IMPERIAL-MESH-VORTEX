@@ -188,6 +188,8 @@ def backtest_portfel(
     tryb_lupiezcy: bool = False,
     ster_korelacyjny: bool = False,
     rygiel_ryzyka: bool = False,
+    dd_reduced: float = 0.10,
+    dd_halt: float = 0.20,
     bary_per: "Optional[Dict[str, List[Dict[str, Any]]]]" = None,
 ) -> PaperTradingEngine:
     """
@@ -246,7 +248,8 @@ def backtest_portfel(
     # pod ten backtest (dyscyplina anty-overfit; DSR/PBO pilnują reszty).
     breaker = None
     if dd_control:
-        breaker = BezpiecznikKrzywejKapitalu()
+        breaker = BezpiecznikKrzywejKapitalu(prog_dd_reduced=dd_reduced,
+                                             prog_dd_halt=dd_halt)
 
     dyrygenci = {}
     for sym in bary_per:

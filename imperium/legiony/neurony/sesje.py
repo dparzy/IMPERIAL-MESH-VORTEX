@@ -242,3 +242,35 @@ class NeuronDominacja(MikroNeuron):
                 [f"🌐 DOMINACJA {dom:+.2f}: ucieczka do BTC — alty słabną (SHORT-ostrzeżenie)"])
         return self._bazowy_sygnal(dom, "NEUTRAL", 0.15,
             [f"🌐 DOMINACJA {dom:+.2f}: przepływ kapitału niejednoznaczny"])
+
+
+class NeuronPrzeplyw(MikroNeuron):
+    """
+    RADAR-03 💎 | Strażnik Przepływu Kapitału (W-292) — breadth × momentum wolumenu.
+
+    PRZEPLYW_KAPITALU ∈ [0,1] (z RadarRynku): ułamek koszyka nad własną EMA ważony
+    momentum wolumenu. To barometr risk-on/risk-off całego rynku:
+      • PRZEPLYW ≥ 0.65 → napływ kapitału (breadth szeroki) → LONG-wsparcie (risk-on)
+      • PRZEPLYW ≤ 0.35 → odpływ kapitału (rynek wąski) → SHORT-ostrzeżenie (risk-off)
+      • między → NEUTRAL (rynek bez wyraźnego kierunku kapitału)
+    Brak PRZEPLYW_KAPITALU → abstynencja (Prawo XV). Waga umiarkowana — kontekst.
+    """
+    KLUCZ = "RADAR-03"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "PRZEPLYW_KAPITALU"
+    KATEGORIA = "R"
+    WAGA = 5
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        pk = wskazniki.get("PRZEPLYW_KAPITALU")
+        if pk is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak przepływu kapitału (radar milczy)"])
+        if pk >= 0.65:
+            return self._bazowy_sygnal(pk, "LONG", min(0.60, (pk - 0.5) * 1.2),
+                [f"💧 PRZEPŁYW {pk:.2f}: napływ kapitału, breadth szeroki (risk-on, LONG-wsparcie)"])
+        if pk <= 0.35:
+            return self._bazowy_sygnal(pk, "SHORT", min(0.60, (0.5 - pk) * 1.2),
+                [f"💧 PRZEPŁYW {pk:.2f}: odpływ kapitału, rynek wąski (risk-off, SHORT-ostrzeżenie)"])
+        return self._bazowy_sygnal(pk, "NEUTRAL", 0.15,
+            [f"💧 PRZEPŁYW {pk:.2f}: kapitał bez wyraźnego kierunku"])

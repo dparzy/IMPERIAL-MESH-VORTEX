@@ -26,7 +26,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **61 zaimplementowane** (57 aktywnych: 37 OHLCV + SES-01 ZegarSesji + SES-02 AzjaRange + V-05 Force Index Eldera + 3 SMC (OrderBlock/FVG/BOS) + 5 kat. R + V-03 CVD + V-14 Choppiness + L-14 Ulcer + H-01 Hurst-DFA + N-01 Permutation Entropy + Z-01 VPIN ToxicFlow + Z-03 Bubble/Crash kill-switch + Z-04 Cascade/Dead-Cat + X-27 Value Convergence + OC-05 WashTrading, Z-02 PumpDetect przez adaptery publiczne; 4 czeka na on-chain API) |
+| **Mikro-neurony** | **62 zaimplementowane** (58 aktywnych: 37 OHLCV + SES-01 ZegarSesji + SES-02 AzjaRange + V-05 Force Index Eldera + 3 SMC (OrderBlock/FVG/BOS) + 6 kat. R + V-03 CVD + V-14 Choppiness + L-14 Ulcer + H-01 Hurst-DFA + N-01 Permutation Entropy + Z-01 VPIN ToxicFlow + Z-03 Bubble/Crash kill-switch + Z-04 Cascade/Dead-Cat + X-27 Value Convergence + OC-05 WashTrading, Z-02 PumpDetect przez adaptery publiczne; 4 czeka na on-chain API) |
 | **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
@@ -36,7 +36,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Status elitarny** | **15 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 + 12 zwiadowców |
 | **Testy** | `python tests/run_tests.py` → **708/708** ✅ |
 
-**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 61) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
+**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 62) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
 ---
 

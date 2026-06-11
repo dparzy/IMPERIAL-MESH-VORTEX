@@ -138,6 +138,21 @@ def test_neuron_dominacja_glosuje():
     assert n.interpretuj({"BTC_DOMINANCJA": -0.29}).kierunek == "NEUTRAL"
 
 
+def test_neuron_przeplyw_glosuje():
+    """RADAR-03: napływ(pk≥0.65)→LONG, odpływ(pk≤0.35)→SHORT, środek→NEUTRAL, brak→abstynencja."""
+    from imperium.legiony.neurony.sesje import NeuronPrzeplyw
+    n = NeuronPrzeplyw()
+    assert n.interpretuj({"PRZEPLYW_KAPITALU": 0.9}).kierunek == "LONG"
+    assert n.interpretuj({"PRZEPLYW_KAPITALU": 0.1}).kierunek == "SHORT"
+    assert n.interpretuj({"PRZEPLYW_KAPITALU": 0.5}).kierunek == "NEUTRAL"
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+    # granice progów 0.65 / 0.35
+    assert n.interpretuj({"PRZEPLYW_KAPITALU": 0.65}).kierunek == "LONG"
+    assert n.interpretuj({"PRZEPLYW_KAPITALU": 0.64}).kierunek == "NEUTRAL"
+    assert n.interpretuj({"PRZEPLYW_KAPITALU": 0.35}).kierunek == "SHORT"
+    assert n.interpretuj({"PRZEPLYW_KAPITALU": 0.36}).kierunek == "NEUTRAL"
+
+
 def test_dyrygent_okazjon_none_brak_wplywu():
     """Domyślnie okazjon=None → Praeda nie ingeruje (mnoznik_rozmiaru pozostaje 1.0)."""
     from imperium.koloseum.dyrygent import Dyrygent

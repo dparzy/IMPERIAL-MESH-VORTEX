@@ -484,6 +484,7 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
     "AUG-01": "EVENT_* (AdapterKronikarz — okno zdarzenia fundamentalnego)",
     "RADAR-01": "BTC_TREND (RadarBTC — kontekst lidera rynku, lead-lag)",
     "RADAR-02": "BTC_DOMINANCJA (RadarRynku — przepływ kapitału BTC↔alty)",
+    "RADAR-03": "PRZEPLYW_KAPITALU (RadarRynku — breadth × momentum wolumenu)",
 }
 
 # Dowód allowlisty (Prawo I — bez zaufania na słowo): każdy neuron adapterowy
@@ -501,6 +502,7 @@ WERYFIKACJA_ADAPTEROW = {
                "EVENT_N": 3, "EVENT_PROB_WZROSTU": 100.0},                # analogia → LONG
     "RADAR-01": {"BTC_TREND": 0.9},                                       # BTC↑ → LONG-wsparcie
     "RADAR-02": {"BTC_DOMINANCJA": -0.9},                                 # alt-season → LONG-wsparcie
+    "RADAR-03": {"PRZEPLYW_KAPITALU": 0.95},                              # napływ → LONG-wsparcie
 }
 
 

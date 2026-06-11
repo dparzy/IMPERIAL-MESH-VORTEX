@@ -176,6 +176,84 @@ def backtest(
     return engine
 
 
+def backtest_portfel(
+    pliki: "Dict[str, str]",
+    interwal: str,
+    okno: int = 250,
+    kapital_startowy: float = 10_000.0,
+    min_pewnosc: float = 0.55,
+    tryb: str = "agregat",
+    auto_rezim: bool = True,
+    bary_per: "Optional[Dict[str, List[Dict[str, Any]]]]" = None,
+) -> PaperTradingEngine:
+    """
+    💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
+
+    Realizuje ROADMAP Faza 3 "Kostka Rubika": rój gra koszykiem, nie jedną parą.
+    Pomiar 2026-06-11 dowiódł, że portfel 5 par (korelacja ~0) przechodzi Etap I
+    (Sharpe 1.24), choć żadna para sama nie (Sharpe<1).
+
+    pliki: {symbol: ścieżka_csv}. interwal wspólny.
+    Mechanika (Prawo I — bez look-ahead):
+      • Jeden wspólny PaperTradingEngine (kapitał dzielony; max N pozycji naraz).
+      • Per-para Dyrygent współdzielący silnik; sizing wg kapital/N (równe wagi).
+      • Chronologiczna unia osi czasu: każdy bar (ts, symbol) przetwarzany w
+        kolejności czasu — najpierw aktualizacja otwartych, potem decyzja roju
+        na oknie barów DANEJ pary do bieżącej świecy włącznie.
+    Zwraca silnik z `krzywa_equity` (equity po każdym tyknięciu) — gotowe pod
+    `etap_pierwszy_koloseum`.
+    """
+    from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
+    from imperium.legiony.rejestr import zbuduj_legatusa
+
+    if bary_per is None:
+        bary_per = {sym: wczytaj_csv(sc, interwal=interwal)
+                    for sym, sc in pliki.items()}
+    bary_per = {s: b for s, b in bary_per.items() if len(b) > okno}
+    if not bary_per:
+        raise ValueError("Brak par z wystarczającą historią")
+    n = len(bary_per)
+
+    engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
+                                sesja_id=f"BT-PORTFEL-{n}x-{interwal}",
+                                max_otwartych=n)   # każda para max 1 pozycja
+    budowniczy = BudowniczyWskaznikow()
+    namiestnik = get_namiestnik() if auto_rezim else None
+    rezim_arg = "AUTO" if auto_rezim else "NORMAL"
+    budzet_pary = kapital_startowy / n   # równe wagi (Markowitz)
+
+    dyrygenci = {}
+    for sym in bary_per:
+        legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
+        d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
+                     budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
+                     namiestnik=namiestnik)
+        d.kapital_sizing = budzet_pary
+        dyrygenci[sym] = d
+
+    # Chronologiczna oś: (timestamp, symbol, indeks_baru) — tylko bary po oknie.
+    os_czasu = []
+    for sym, bary in bary_per.items():
+        for i in range(okno, len(bary)):
+            os_czasu.append((int(bary[i]["timestamp"]), sym, i))
+    os_czasu.sort(key=lambda x: x[0])
+
+    krzywa_equity: List[float] = []
+    for ts, sym, i in os_czasu:
+        bary = bary_per[sym]
+        engine.przetworz_bar(_bar_data(bary[i]))
+        krzywa_equity.append(engine.kapital_calkowity)
+        okno_barow = bary[i - okno: i + 1]
+        dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
+
+    # Domknij otwarte po ostatniej cenie każdej pary
+    ostatnie = {sym: bary_per[sym][-1]["close"] for sym in bary_per}
+    engine.zamknij_wszystkie(ostatnie, powod="MANUAL")
+    krzywa_equity.append(engine.kapital_calkowity)
+    engine.krzywa_equity = krzywa_equity
+    return engine
+
+
 def backtest_arena(
     sciezka: str,
     interwal: str,

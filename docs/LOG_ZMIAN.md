@@ -10,6 +10,24 @@
 
 ---
 
+---
+
+## 2026-06-11 | W-290 💎 | SILNIK PORTFELOWY — koszyk N par w jednej sesji (Kostka Rubika)
+
+**Opis:** `backtest_portfel(pliki, interwal)` — produkcyjny tryb koszyka: N par,
+JEDEN wspólny PaperTradingEngine (kapitał dzielony, max N pozycji), per-para Dyrygent
+sizingujący wg kapital/N (równe wagi, Markowitz). Chronologiczna unia osi czasu —
+każdy bar (ts, symbol) przetwarzany w kolejności czasu, bez look-ahead. Realizuje
+ROADMAP Faza 3 "Kostka Rubika" jako kod, nie tylko pomiar.
+
+Wsparcie: `Dyrygent.kapital_sizing` (budżet sizingu pary; None = pełny kapitał silnika).
++4 testy (wspólny kapitał, oś czasu, budżet równy, brak historii). Pomiar bojowy
+5 par przez silnik — patrz wynik (dopisany po przebiegu).
+
+**Pliki:** `imperium/koloseum/backtest.py` (backtest_portfel), `imperium/koloseum/dyrygent.py`
+(kapital_sizing), `tests/test_portfel.py` (nowy).
+**Testy:** 692/692 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-11 | KAMIEŃ MILOWY | Test 5 par 1D — EDGE UNIWERSALNY (wszystkie zarabiają!)
 
 **Pierwszy szeroki test (BTC/ETH/SOL/BNB/DOGE, 1D AUTO, pełne historie, formacja

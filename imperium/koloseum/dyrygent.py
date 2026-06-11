@@ -104,6 +104,9 @@ class Dyrygent:
         self.min_pewnosc_interwalu: Dict[str, float] = min_pewnosc_interwalu or {}
         # W-288: SL = sl_atr_mult × ATR_14 (opt-in; None = stary SL z dźwigni).
         self.sl_atr_mult = sl_atr_mult
+        # W-290 portfel: budżet sizingu pary (None = pełny wolny kapitał silnika).
+        # W koszyku N par każdy Dyrygent sizinguje wg kapital/N (równe wagi).
+        self.kapital_sizing: Optional[float] = None
         # Adaptery danych (Faza B) — dolewają do wskaźników dane spoza OHLCV
         # (funding, OI, long/short, sentyment) po Budowniczym. Pusta lista = tryb
         # czysty OHLCV (np. backtest z CSV — neurony R abstynują, Prawo XV).
@@ -284,7 +287,8 @@ class Dyrygent:
             kierunek=kierunek,
             cena_wejscia=cena_wejscia,
             dzwignia=dzwignia_final,
-            kapital_usdt=self.engine.kapital,
+            kapital_usdt=(self.kapital_sizing if self.kapital_sizing is not None
+                          else self.engine.kapital),
             pewnosc=pewnosc,
             rezim=raport.rezim,
             breaker_krzywej=self.breaker_krzywej,

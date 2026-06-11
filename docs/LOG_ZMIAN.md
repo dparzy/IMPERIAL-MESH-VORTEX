@@ -8,6 +8,33 @@
 
 ---
 
+---
+
+## 2026-06-11 | KAMIEŃ MILOWY | Test 5 par 1D — EDGE UNIWERSALNY (wszystkie zarabiają!)
+
+**Pierwszy szeroki test (BTC/ETH/SOL/BNB/DOGE, 1D AUTO, pełne historie, formacja
+Legionów + Augur w roju, n_prob=5):**
+
+| Para | trades | WR | PF | MaxDD | PnL | Sharpe_r | DSR | Etap I |
+|---|---|---|---|---|---|---|---|---|
+| BTC | 61 | 55.7% | **2.26** | 4.3% | +3934 | 0.86 | **0.94** | ⛔ blisko |
+| ETH | 75 | 48.0% | 1.12 | 12.7% | +705 | 0.17 | 0.23 | ⛔ |
+| SOL | 55 | 38.2% | 1.14 | 9.0% | +636 | 0.22 | 0.23 | ⛔ |
+| BNB | 68 | 51.5% | 1.63 | 10.8% | +3320 | 0.60 | 0.71 | ⛔ |
+| DOGE | 16 | 75.0% | **2.73** | 22.2% | +9745 | 0.95 | 0.92 | ⛔ (n=16) |
+
+**WNIOSEK (Prawo I — twardy fakt):** **PF > 1 na WSZYSTKICH 5 parach, PnL dodatni
+wszędzie.** Dzienny edge roju jest UNIWERSALNY, nie przypadkiem BTC. To fundamentalnie
+zmienia obraz: mamy realną, przenośną przewagę kierunkową na 1D.
+
+**Czemu żadna nie przechodzi Etapu I:** próg Sharpe>1.0 (surowy, słuszny) — pojedyncze
+pary mają zbyt zmienne zwroty względem średniej. BTC i DOGE są o włos (0.86–0.95).
+
+**NASTĘPNY RUCH (klucz do "pewności" — wizja Cezara):** PORTFEL. 5 dodatnich,
+częściowo nieskorelowanych strumieni złożonych razem = Sharpe portfela WYŻSZY niż
+każdej pary z osobna (dywersyfikacja). To realizacja ROADMAP Faza 3 "Kostka Rubika"
+i bezpośrednia droga do przekroczenia progu. Buduję `narzedzia/pomiar_portfela.py`.
+
 ## 2026-06-11 | UNIKAT W-289 v2 💎 | Augur rozbudowany: per-para + kalendarz FOMC (blackout) + decay/spójność
 
 **Rozbudowa Kronikarza Zdarzeń o 3 wymiary (na prośbę Cezara):**

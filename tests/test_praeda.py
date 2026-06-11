@@ -109,3 +109,30 @@ def test_radar_btc_weto_spadajacy_btc():
 def test_radar_btc_weto_short_pod_prad():
     ok = Okazjon().ocen(_R(), {"VPIN_50": 0.2, "BTC_TREND": 0.9}, "SHORT", dd_normal=True)
     assert not ok.potwierdzona and "BTC mocno rośnie" in ok.powody[0]
+
+
+def test_neuron_radar_btc_glosuje():
+    """RADAR-01: BTC↑→LONG-wsparcie, BTC↓→SHORT-ostrzeżenie, ~0→NEUTRAL, brak→abstynencja."""
+    from imperium.legiony.neurony.sesje import NeuronRadarBTC
+    n = NeuronRadarBTC()
+    assert n.interpretuj({"BTC_TREND": 0.8}).kierunek == "LONG"
+    assert n.interpretuj({"BTC_TREND": -0.8}).kierunek == "SHORT"
+    assert n.interpretuj({"BTC_TREND": 0.0}).kierunek == "NEUTRAL"
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+    # granica progu 0.30
+    assert n.interpretuj({"BTC_TREND": 0.30}).kierunek == "LONG"
+    assert n.interpretuj({"BTC_TREND": 0.29}).kierunek == "NEUTRAL"
+
+
+def test_radar_btc_provider_granice():
+    """RadarBTC: trend w [-1,1], za mało danych → None, parametry walidowane."""
+    from imperium.legiony.radar_btc import RadarBTC
+    r = RadarBTC()
+    assert r.trend([100.0] * 3) is None
+    up = [100 * 1.01 ** i for i in range(80)]
+    assert 0.5 < r.trend(up) <= 1.0
+    for zle in (dict(ema_szybka=30, ema_wolna=10), dict(okno_vol=2)):
+        try:
+            RadarBTC(**zle); raise AssertionError("zły parametr ma rzucić")
+        except ValueError:
+            pass

@@ -6,7 +6,7 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-11 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 59 neuronów (zarejestrowane w roju) + 12 zwiadowców = **71 modułów w kodzie**
+**Zaimplementowane:** 60 neuronów (zarejestrowane w roju) + 12 zwiadowców = **72 modułów w kodzie**
 **Aktywne / wyciszone:** 55 aktywnych + 4 wyciszone, z czego:
   • **44 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, X-27 Value Convergence, OC-05 WashTrading, D-01 PathSignature)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
@@ -19,7 +19,7 @@
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 59). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 60). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -46,7 +46,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (59/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (60/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -115,6 +115,7 @@
 | SES-01 | NeuronZegarSesji | S | 4 | ✅ aktywny | ZEGAR_SESJI (TIMESTAMP) | — |
 | SES-02 | NeuronAzjaRange | S | 7 | ✅ aktywny | ASIA_RANGE (W-011) | — |
 | AUG-01 | NeuronAugur 💎 | R | 6 | ✅ aktywny (AdapterKronikarz) | EVENT_PROB_WZROSTU (W-289) | — |
+| RADAR-01 | NeuronRadarBTC 💎 | R | 6 | ✅ aktywny (RadarBTC) | BTC_TREND (W-291, lead-lag) | — |
 
 ### Plik: `neurony/psychologia.py`
 

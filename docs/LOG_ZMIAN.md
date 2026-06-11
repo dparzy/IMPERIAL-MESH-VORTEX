@@ -16,6 +16,28 @@
 
 ---
 
+---
+
+## 2026-06-11 | W-291 💎 | RADAR BTC: provider + neuron RADAR-01 (lead-lag, wsparcie scalpu)
+
+**Wizja Cezara (BTC prowadzi, alty lecą za nim):** zrealizowane jako KOD —
+WIZJONER W-071/W-085/W-086 (intermarket/lead-lag) z idei → żywy neuron.
+
+- **`imperium/legiony/radar_btc.py`** — `RadarBTC.trend(close_btc)` → BTC_TREND ∈ [-1,1]
+  (momentum EMA-short vs EMA-long znormalizowane zmiennością, tanh; czysty OHLC, bez API).
+- **RADAR-01 NeuronRadarBTC** (R, waga 6, WSPOLNY): głos wsparcia — BTC↑ → LONG-wsparcie
+  altów, BTC↓ → SHORT-ostrzeżenie ("uważaj, alty lecą za BTC"), |trend|<0.3 → NEUTRAL.
+- Radar wpięty też w Okazjon (Praeda): bonus konfluencji gdy zgodny + WETO na silny
+  przeciwprąd (LONG przeciw spadającemu BTC / SHORT pod rosnący).
+
+60 neuronów (56 aktywnych). +5 testów. W12: RADAR-01 na allowliście kontekstu (jak AUG-01).
+Następne: wstrzyknięcie BTC_TREND w silniku portfelowym (provider per timestamp) + pomiar.
+
+**Pliki:** `imperium/legiony/radar_btc.py` (nowy), `imperium/legiony/neurony/sesje.py`,
+`imperium/legiony/rejestr.py`, `imperium/pretorianie/praeda.py`, `narzedzia/audyt_spojnosci.py`,
+`tests/test_praeda.py`, docs.
+**Testy:** 708/708 ✅. Audyt: 60 neuronów, pełna harmonia.
+
 ## 2026-06-11 | UNIKAT W-291 💎 | TRYB PRAEDA (Łowca) + RADAR BTC — auto-skalowana chciwość
 
 **Wizja Cezara:** Imperium jako organizm-łowca — skanuje monety, szuka OFIARY

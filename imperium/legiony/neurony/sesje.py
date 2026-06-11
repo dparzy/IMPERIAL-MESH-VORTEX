@@ -175,3 +175,37 @@ class NeuronAugur(MikroNeuron):
                  f"(waga {mod_waga:.2f}, {'zgodne' if zgodne else 'rozsypane'}) — SHORT"])
         return self._bazowy_sygnal(prob, "NEUTRAL", 0.25,
             [f"📜 {typ} ({dni}d po): {prob:.0f}% w n={n} — historia bez przewagi"])
+
+
+class NeuronRadarBTC(MikroNeuron):
+    """
+    RADAR-01 💎 | Strażnik BTC (W-291, lead-lag) — wsparcie kontekstowe dla altów.
+
+    BTC prowadzi rynek: gdy lider rośnie, alty mają wiatr w plecy; gdy spada, lecą
+    za nim. Ten neuron czyta BTC_TREND ∈ [-1,+1] (z RadarBTC, wstrzyknięty do
+    wskaźników) i głosuje JAKO RADAR — nie zastępuje analizy alta, lecz mówi
+    "uważaj / teraz" zgodnie z liderem:
+      • BTC_TREND ≥ +0.30 → LONG-wsparcie (siła ~ |trend|, cap 0.7)
+      • BTC_TREND ≤ −0.30 → SHORT-wsparcie / ostrzeżenie
+      • między → NEUTRAL (lider niezdecydowany)
+    Brak BTC_TREND (np. para = sam BTC bez kontekstu) → abstynencja (Prawo XV).
+    Waga umiarkowana: to RADAR wspierający, nie samodzielny silnik.
+    """
+    KLUCZ = "RADAR-01"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "BTC_TREND"
+    KATEGORIA = "R"
+    WAGA = 6
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        bt = wskazniki.get("BTC_TREND")
+        if bt is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak kontekstu BTC (radar milczy)"])
+        if bt >= 0.30:
+            return self._bazowy_sygnal(bt, "LONG", min(0.70, abs(bt)),
+                [f"🛰️ RADAR BTC: lider w trendzie↑ ({bt:+.2f}) — wiatr w plecy altów"])
+        if bt <= -0.30:
+            return self._bazowy_sygnal(bt, "SHORT", min(0.70, abs(bt)),
+                [f"🛰️ RADAR BTC: lider spada ({bt:+.2f}) — uważaj, alty lecą za BTC"])
+        return self._bazowy_sygnal(bt, "NEUTRAL", 0.15,
+            [f"🛰️ RADAR BTC: lider niezdecydowany ({bt:+.2f})"])

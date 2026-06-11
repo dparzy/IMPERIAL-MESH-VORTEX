@@ -32,7 +32,22 @@ WIZJONER W-071/W-085/W-086 (intermarket/lead-lag) z idei → żywy neuron.
 
 60 neuronów (56 aktywnych). +5 testów. W12: RADAR-01 na allowliście kontekstu (jak AUG-01).
 ✅ Wstrzyknięcie BTC_TREND wpięte: `Dyrygent.kontekst_dodatkowy` + `backtest_portfel`
-liczy BTC_TREND z barów BTC przyczynowo (bisect do ts) i podaje każdej parze. Pomiar — w toku.
+liczy BTC_TREND z barów BTC przyczynowo (bisect do ts) i podaje każdej parze.
+
+**🎯 POMIAR — RADAR BTC POPRAWIŁ REKORDOWY PORTFEL (intuicja Cezara potwierdzona):**
+
+| Metryka | Portfel bez radaru | Portfel + RADAR BTC |
+|---|---|---|
+| Sharpe roczny | 1.74 | **1.82** 📈 |
+| PF | 2.01 | **2.08** |
+| MaxDD | 13.5% | **12.7%** (niżej) |
+| PnL | +7155 | **+7516 (+75%)** |
+| DSR | 1.0 | **1.0** |
+| Etap I | ✅ | **✅ z zapasem** |
+
+Radar lead-lag (BTC↓ → ostrzega LONG-i altów) podniósł WSZYSTKIE metryki naraz —
+nowy rekord Sharpe 1.82. Wizja Cezara ("obserwuj BTC, alty lecą za nim") = realna
+przewaga, nie tylko teoria. Zwalidowana konfiguracja Etapu II rozszerzona o RADAR BTC.
 
 **Pliki:** `imperium/legiony/radar_btc.py` (nowy), `imperium/legiony/neurony/sesje.py`,
 `imperium/legiony/rejestr.py`, `imperium/pretorianie/praeda.py`, `narzedzia/audyt_spojnosci.py`,

@@ -314,6 +314,8 @@ def backtest_portfel(
                     alty_vol[s] = _vol[s][lo:k]
             stan = _radar.skanuj(btc_slice, alty_close, alty_vol)
             dyrygenci[sym].kontekst_dodatkowy = stan.jako_wskazniki()
+            # Opcja A: przekaż StanRynku do Dyrygenta → Namiestnik decyduj_z_radarem
+            dyrygenci[sym].stan_rynku = stan
             # 🛡️ STER KORELACYJNY (W-292, OPT-IN) — czynnik 1/√(1+(N-1)ρ) z teorii portfela.
             # POMIAR 2026-06-11 (Prawo I): na trwale skorelowanym koszyku krypto (ρ≈0.8
             # zawsze) działa jak ~stały haircut ×0.5 → tnie PnL o połowę, a MaxDD% (ratio,

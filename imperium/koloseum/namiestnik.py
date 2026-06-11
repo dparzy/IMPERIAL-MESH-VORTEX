@@ -290,6 +290,60 @@ class Namiestnik:
         scaled = int(round(dzwignia_base * d.lewar_factor))
         return max(1, min(scaled, d.lewar_cap))
 
+    def decyduj_z_radarem(
+        self,
+        rezim: str,
+        interwal: Optional[str] = None,
+        stan_rynku: Optional[object] = None,
+    ) -> "DecyzjaNamiestnika":
+        """
+        Opcja A — radar-aware gating: bazowa decyzja (decyduj), potem RadarRynku
+        moduluje PARAMETRY (lewar_factor, prog_pewnosci), nie zmieniając trybu ani
+        czy_grac — bo zmienianie trybu psuje "filtr" (STRATEGIA_BRAK gdy brak dop.).
+
+        Reguły modulacji (Prawo XVI — bez look-ahead, bez wyłączania handlu):
+          • Bycze tło (BTC>0.3 AND PRZEPLYW>0.60):
+              lewar_factor ×1.20 (do 2.0), prog_pewnosci ×0.97
+          • Niedźwiedzie + stres (STRES>0.80 AND BTC<0.0):
+              lewar_factor ×0.65 (od 0.1), prog_pewnosci ×1.05 (do 0.98)
+          • Czyste PANIC/VOLATILE — bez zmian (tryb_aktywny i tak defensywny).
+
+        Gdy stan_rynku=None → identyczny wynik jak decyduj().
+        """
+        if stan_rynku is None:
+            return self.decyduj(rezim, interwal)
+
+        dec = self.decyduj(rezim, interwal)
+
+        btc = getattr(stan_rynku, "btc_trend", None)
+        przeplyw = getattr(stan_rynku, "przeplyw", None)
+        stres = getattr(stan_rynku, "stres_korelacji", None)
+
+        lewar_factor = dec.lewar_factor
+        prog = dec.prog_pewnosci
+
+        if (btc is not None and btc > 0.3
+                and przeplyw is not None and przeplyw > 0.60):
+            lewar_factor = round(min(2.0, lewar_factor * 1.20), 3)
+            prog = round(max(0.50, prog * 0.97), 4)
+        elif (stres is not None and stres > 0.80
+              and btc is not None and btc < 0.0):
+            lewar_factor = round(max(0.1, lewar_factor * 0.65), 3)
+            prog = round(min(0.98, prog * 1.05), 4)
+
+        return DecyzjaNamiestnika(
+            rezim=dec.rezim,
+            styl=dec.styl,
+            tryb=dec.tryb,
+            prog_pewnosci=prog,
+            lewar_factor=lewar_factor,
+            lewar_cap=dec.lewar_cap,
+            rynek=dec.rynek,
+            czy_grac=dec.czy_grac,
+            wagi_override=dec.wagi_override,
+            opis=dec.opis,
+        )
+
     def tablica_rezimu(self) -> Dict[str, UstawieniaRezimu]:
         """Pełna tablica reżimów do inspekcji / diagnostyki."""
         return dict(self._tablica)

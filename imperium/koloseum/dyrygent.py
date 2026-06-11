@@ -113,6 +113,9 @@ class Dyrygent:
         # W-290 portfel: budżet sizingu pary (None = pełny wolny kapitał silnika).
         # W koszyku N par każdy Dyrygent sizinguje wg kapital/N (równe wagi).
         self.kapital_sizing: Optional[float] = None
+        # Opcja A: StanRynku z RadarRynku — przekazywany do Namiestnika i Klucznika
+        # (radar-aware gating + strategy selection). None = tryb bez radaru.
+        self.stan_rynku: Optional[Any] = None
         # Adaptery danych (Faza B) — dolewają do wskaźników dane spoza OHLCV
         # (funding, OI, long/short, sentyment) po Budowniczym. Pusta lista = tryb
         # czysty OHLCV (np. backtest z CSV — neurony R abstynują, Prawo XV).
@@ -199,7 +202,7 @@ class Dyrygent:
         lewar_factor = 1.0
         decyzja_nam = None
         if self.namiestnik is not None:
-            decyzja_nam = self.namiestnik.decyduj(rezim, interwal)
+            decyzja_nam = self.namiestnik.decyduj_z_radarem(rezim, interwal, self.stan_rynku)
             if not decyzja_nam.czy_grac:
                 return DecyzjaCyklu(symbol, "NAMIESTNIK_CISZA", False,
                                     rezim=rezim, powod=f"Namiestnik: {decyzja_nam.opis}")
@@ -209,7 +212,8 @@ class Dyrygent:
             prog_aktywny = max(decyzja_nam.prog_pewnosci, prog_aktywny)
             lewar_factor = decyzja_nam.lewar_factor
 
-        # 3. Legatus — agregacja roju
+        # 3. Legatus — agregacja roju (Opcja A: przekaż StanRynku → radar scoring strategii)
+        self.legatus.stan_rynku = self.stan_rynku
         raport = self.legatus.fokus(symbol, wskazniki, rezim=rezim, bary=bary)
 
         if raport.weto:

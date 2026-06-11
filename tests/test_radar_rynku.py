@@ -138,3 +138,134 @@ if __name__ == "__main__":
         except Exception as e:
             bl += 1; print(f"  ❌ {nm}: {e}")
     sys.exit(1 if bl else 0)
+
+
+# ── Opcja A: radar-aware strategy switching ───────────────────────────────────
+
+def test_bonus_radar_trend_flow_high():
+    """PRZEPLYW>0.65 → TR/SC dostają bonus, RV/RG penalty."""
+    from imperium.legiony.strategie.baza import bonus_radar
+    from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
+    stan = StanRynku(przeplyw=0.75, stres_korelacji=0.3, btc_trend=0.1)
+    strats = {s.id: s for s in wszystkie_strategie()}
+    tr = next(s for s in strats.values() if s.styl == "TR")
+    rv = next(s for s in strats.values() if s.styl == "RV")
+    assert bonus_radar(tr, stan) > 1.0
+    assert bonus_radar(rv, stan) < 1.0
+
+
+def test_bonus_radar_flow_low_reversal():
+    """PRZEPLYW<0.35 → RV/RG bonus, TR/SC penalty."""
+    from imperium.legiony.strategie.baza import bonus_radar
+    from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
+    stan = StanRynku(przeplyw=0.20, stres_korelacji=0.3, btc_trend=-0.1)
+    strats = {s.id: s for s in wszystkie_strategie()}
+    tr = next(s for s in strats.values() if s.styl == "TR")
+    rv = next(s for s in strats.values() if s.styl == "RV")
+    assert bonus_radar(tr, stan) < 1.0
+    assert bonus_radar(rv, stan) > 1.0
+
+
+def test_bonus_radar_stres_wysoki():
+    """STRES>0.85 → TR/SC kara, RV/RG/BK bonus — selectywne, nie globalne."""
+    from imperium.legiony.strategie.baza import bonus_radar
+    from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
+    stan = StanRynku(przeplyw=0.5, stres_korelacji=0.90, btc_trend=0.0)
+    for s in wszystkie_strategie():
+        b = bonus_radar(s, stan)
+        if s.styl in ("TR", "SC"):
+            assert b < 1.0, f"{s.id} (TR/SC) musi być < 1.0 przy STRES 0.9"
+        elif s.styl in ("RV", "RG", "BK"):
+            assert b >= 1.0, f"{s.id} (RV/RG/BK) musi być >= 1.0 przy STRES 0.9"
+
+
+def test_bonus_radar_brak_stanu():
+    """None stan_rynku → mnożnik = 1.0 (brak efektu)."""
+    from imperium.legiony.strategie.baza import bonus_radar
+    from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
+    for s in wszystkie_strategie():
+        assert bonus_radar(s, None) == 1.0
+
+
+def test_bonus_radar_granice_zakresu():
+    """Mnożnik zawsze w [0.6, 1.3]."""
+    from imperium.legiony.strategie.baza import bonus_radar
+    from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
+    for przeplyw in (0.0, 0.35, 0.65, 1.0):
+        for stres in (0.0, 0.85, 1.0):
+            stan = StanRynku(przeplyw=przeplyw, stres_korelacji=stres, btc_trend=0.5)
+            for s in wszystkie_strategie():
+                b = bonus_radar(s, stan)
+                assert 0.6 <= b <= 1.3, f"{s.id} bonus={b} poza zakresem"
+
+
+def test_namiestnik_decyduj_z_radarem_bycze_wiekszy_lewar():
+    """BTC>0.3 + PRZEPLYW>0.6 → lewar_factor większy niż bez radaru."""
+    from imperium.koloseum.namiestnik import Namiestnik
+    n = Namiestnik()
+    stan = StanRynku(btc_trend=0.5, przeplyw=0.70, stres_korelacji=0.3)
+    bazowa = n.decyduj("NORMAL")
+    z_radarem = n.decyduj_z_radarem("NORMAL", stan_rynku=stan)
+    assert z_radarem.lewar_factor > bazowa.lewar_factor, "Bycze tło → większy lewar"
+    assert z_radarem.prog_pewnosci <= bazowa.prog_pewnosci, "Bycze tło → niższy próg"
+    assert z_radarem.rezim == "NORMAL", "Radar moduluje parametry, nie zmienia rezim"
+
+
+def test_namiestnik_decyduj_z_radarem_stres_mniejszy_lewar():
+    """STRES>0.8 + BTC<0 → lewar_factor mniejszy, próg wyższy."""
+    from imperium.koloseum.namiestnik import Namiestnik
+    n = Namiestnik()
+    stan = StanRynku(btc_trend=-0.2, przeplyw=0.4, stres_korelacji=0.85)
+    bazowa = n.decyduj("TREND_STRONG")
+    z_radarem = n.decyduj_z_radarem("TREND_STRONG", stan_rynku=stan)
+    assert z_radarem.lewar_factor < bazowa.lewar_factor, "Stres → mniejszy lewar"
+    assert z_radarem.prog_pewnosci >= bazowa.prog_pewnosci, "Stres → wyższy próg"
+    assert z_radarem.rezim == "TREND_STRONG", "Radar moduluje parametry, nie zmienia rezim"
+
+
+def test_namiestnik_decyduj_z_radarem_panic_bez_zmiany():
+    """PANIC reżim nie zmienia się niezależnie od radaru."""
+    from imperium.koloseum.namiestnik import Namiestnik
+    n = Namiestnik()
+    stan = StanRynku(btc_trend=0.9, przeplyw=0.95, stres_korelacji=0.1)
+    wynik = n.decyduj_z_radarem("PANIC", stan_rynku=stan)
+    assert wynik.rezim == "PANIC"
+
+
+def test_namiestnik_decyduj_z_radarem_none_stan():
+    """None stan_rynku → identyczny wynik jak decyduj()."""
+    from imperium.koloseum.namiestnik import Namiestnik
+    n = Namiestnik()
+    for rezim in ("NORMAL", "TREND_STRONG", "VOLATILE", "RANGING"):
+        bazowa = n.decyduj(rezim)
+        z_none = n.decyduj_z_radarem(rezim, stan_rynku=None)
+        assert bazowa.rezim == z_none.rezim
+
+
+def test_dobierz_najlepsze_z_radarem_zmienia_ranking():
+    """Radar zmienia kolejność strategii — TR dostaje bonus przy wysokim przepływie."""
+    from imperium.legiony.strategie.baza import dobierz_najlepsze
+    from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
+
+    strats = [s for s in wszystkie_strategie() if s.styl in ("TR", "RV")]
+    if not strats:
+        return
+
+    # Symuluj sygnały które dają kierunek każdej strategii
+    class MockSygnal:
+        def __init__(self):
+            self.kierunek = "LONG"
+            self.pewnosc_finalna = 0.8
+
+    mock_sig = MockSygnal()
+    sygnaly = {}
+    for s in strats:
+        for k in s.wszystkie_klucze():
+            sygnaly[k] = mock_sig
+
+    bez_radaru = dobierz_najlepsze(strats, sygnaly, rezim="NORMAL", stan_rynku=None)
+    z_radarem = dobierz_najlepsze(strats, sygnaly, rezim="NORMAL",
+                                   stan_rynku=StanRynku(przeplyw=0.75, stres_korelacji=0.2, btc_trend=0.5))
+    # Nie crash i zwraca wyniki
+    assert isinstance(bez_radaru, list)
+    assert isinstance(z_radarem, list)

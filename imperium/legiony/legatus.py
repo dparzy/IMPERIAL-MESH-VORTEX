@@ -307,6 +307,9 @@ class Legatus:
         self.zwiadowcy = zwiadowcy or []
         self.strategie = strategie or []
         self.mnozniki_neuronow = mnozniki_neuronow or {}
+        # Opcja A: StanRynku z RadarRynku — radar-aware strategy scoring.
+        # Ustawiany przez Dyrygenta przed fokus(). None = bez radaru.
+        self.stan_rynku = None
 
     def ustaw_mnozniki_neuronow(self, mnozniki: dict):
         """
@@ -504,7 +507,7 @@ class Legatus:
             from imperium.legiony.strategie.baza import dobierz_najlepsze
             mapa = {s.neuron_id: s for s in sygnaly}
             return dobierz_najlepsze(self.strategie, mapa, rezim=rezim, top=3,
-                                     interwal=interwal)
+                                     interwal=interwal, stan_rynku=self.stan_rynku)
         except Exception as e:
             logger.error(f"[Legatus] Dobieranie strategii padło: {e}")
             return []

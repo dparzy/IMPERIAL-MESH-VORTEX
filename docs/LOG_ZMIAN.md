@@ -14,6 +14,30 @@
 
 ---
 
+---
+
+## 2026-06-11 | UNIKAT W-291 💎 | TRYB PRAEDA (Łowca) + RADAR BTC — auto-skalowana chciwość
+
+**Wizja Cezara:** Imperium jako organizm-łowca — skanuje monety, szuka OFIARY
+(najlepszej okazji), sam dobiera agresję wg SIŁY OKAZJI, łupi maksymalnie w
+potwierdzonych momentach. Plus: BTC jako sygnał wspierający/ostrzegający alty.
+
+**`imperium/pretorianie/praeda.py` — Okazjon (wykrywacz okazji):**
+- SIŁA OKAZJI ∈ [0,1] z konfluencji (model BONUSOWY — więcej potwierdzeń STACKUJE,
+  nigdy nie uśrednia w dół): rdzeń zgoda×reżim + bonusy za sentyment / Augur / RadarBTC.
+- AUTO-DECYZJA: mnoznik_lewara/rozmiaru rosną ciągle z siłą (cap ×2, i tak nadrzędne
+  MAX_DZWIGNIA + clamp 50% kapitału); pyramiding tylko gdy siła ≥ 0.80.
+- 🛰️ RADAR BTC (lead-lag): BTC_TREND ∈ [-1,1] → wiatr w plecy gdy zgodny; WETO gdy
+  LONG przeciw mocno spadającemu BTC ("alty lecą za BTC") lub SHORT pod rosnący BTC.
+- NIENARUSZALNA KLATKA: Praeda tylko amplifikuje wewnątrz bezpieczników; WYŁĄCZA SIĘ
+  w drawdownie (dd_normal=False → siła 0); weto na toksyczny VPIN, blackout FOMC, kaskadę.
+
+**Status:** detektor + radar gotowe i otestowane (13 testów). Wpięcie do Dyrygenta
+(tryb_lupiezcy) + provider RadarBTC w portfelu + pomiar 5 par — następny krok.
+
+**Pliki:** `imperium/pretorianie/praeda.py` (nowy), `tests/test_praeda.py` (nowy).
+**Testy:** 706/706 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-11 | W-290 | DD-control portfela (wspólny BezpiecznikKrzywejKapitalu W-062)
 
 **Opis:** `backtest_portfel(dd_control=True)` — JEDEN wspólny BezpiecznikKrzywejKapitalu

@@ -12,6 +12,19 @@
 
 ---
 
+---
+
+## 2026-06-11 | W-290 | DD-control portfela (wspólny BezpiecznikKrzywejKapitalu W-062)
+
+**Opis:** `backtest_portfel(dd_control=True)` — JEDEN wspólny BezpiecznikKrzywejKapitalu
+na poziomie koszyka (nie 5 z fragmentaryczną wizją), domyślne progi W-062
+(REDUCED@10% DD → ×0.5 sizingu wszystkich par, HALT@20% → blokada wejść). Per-para
+Dyrygenci mają breaker_krzywej=False (sterowanie centralne). Progi NIE strojone pod
+backtest — dyscyplina anty-overfit; DSR/PBO pilnują reszty. +1 test. Cel: ściąć
+MaxDD 16.5% poniżej progu Etapu I (<15%) bez utraty Sharpe. Wynik — patrz niżej.
+
+**Testy:** 693/693 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-11 | W-290 💎 | SILNIK PORTFELOWY — koszyk N par w jednej sesji (Kostka Rubika)
 
 **Opis:** `backtest_portfel(pliki, interwal)` — produkcyjny tryb koszyka: N par,

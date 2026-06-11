@@ -31,7 +31,7 @@ from imperium.akwedukty.czytnik_csv import wczytaj_csv
 from imperium.koloseum.dyrygent import Dyrygent
 from imperium.koloseum.namiestnik import get_namiestnik
 from imperium.koloseum.paper_trading import PaperTradingEngine, BarData
-from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara
+from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara, BezpiecznikKrzywejKapitalu
 
 logger = logging.getLogger("Backtest")
 
@@ -184,6 +184,7 @@ def backtest_portfel(
     min_pewnosc: float = 0.55,
     tryb: str = "agregat",
     auto_rezim: bool = True,
+    dd_control: bool = True,
     bary_per: "Optional[Dict[str, List[Dict[str, Any]]]]" = None,
 ) -> PaperTradingEngine:
     """
@@ -222,12 +223,20 @@ def backtest_portfel(
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"
     budzet_pary = kapital_startowy / n   # równe wagi (Markowitz)
 
+    # DD-control portfela (W-290): JEDEN wspólny BezpiecznikKrzywejKapitalu na
+    # poziomie koszyka (nie 5 z fragmentaryczną wizją). Domyślne progi W-062
+    # (REDUCED@10% DD → ×0.5 sizingu, HALT@20% → blokada wejść) — NIE strojone
+    # pod ten backtest (dyscyplina anty-overfit; DSR/PBO pilnują reszty).
+    breaker = None
+    if dd_control:
+        breaker = BezpiecznikKrzywejKapitalu()
+
     dyrygenci = {}
     for sym in bary_per:
         legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
         d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
                      budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
-                     namiestnik=namiestnik)
+                     namiestnik=namiestnik, breaker_krzywej=False)  # breaker wspólny
         d.kapital_sizing = budzet_pary
         dyrygenci[sym] = d
 
@@ -246,7 +255,13 @@ def backtest_portfel(
     for ts, sym, i in os_czasu:
         bary = bary_per[sym]
         engine.przetworz_bar(_bar_data(bary[i]))
-        equity_dnia[ts // _DZ] = engine.kapital_calkowity
+        eq = engine.kapital_calkowity
+        equity_dnia[ts // _DZ] = eq
+        if breaker is not None:
+            breaker.aktualizuj(eq)
+            if breaker.halt:
+                continue   # blokada nowych wejść (świadoma cisza, Prawo XV)
+            dyrygenci[sym].kapital_sizing = budzet_pary * breaker.frakcja_pozycji()
         okno_barow = bary[i - okno: i + 1]
         dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
 

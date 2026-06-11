@@ -62,3 +62,12 @@ if __name__ == "__main__":
         except Exception as e:
             bl += 1; print(f"  ❌ {nm}: {e}")
     sys.exit(1 if bl else 0)
+
+
+def test_portfel_dd_control_opt_in():
+    """dd_control=True/False oba działają; wspólny bezpiecznik nie wybucha."""
+    bary_per = {s: _bary(s, n=320) for s in ("BTCUSDT", "ETHUSDT", "SOLUSDT")}
+    for ddc in (False, True):
+        eng = backtest_portfel({}, "1D", okno=250, bary_per=bary_per, dd_control=ddc)
+        assert eng.kapital_calkowity > 0
+        assert all(p > 0 for p in eng.krzywa_equity)

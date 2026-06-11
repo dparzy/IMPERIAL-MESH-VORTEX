@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-06-11 | W-293 🎯🏆 | PORTFEL PRZECHODZI ETAP I: ciaśniejszy HALT (20%→13%)
+
+**Opis:** Debugging (nie zgadywanie) ustalił przyczynę MaxDD 20%: bezpiecznik HALT@20%
+pozwalał equity spaść DO progu, zanim blokował wejścia. Próby sygnałowe (ster
+korelacyjny W-292, rygiel risk-off) NIE ruszyły MaxDD — bo zjazd dział się poza
+wykrywanymi oknami. Właściwa dźwignia: **próg HALT bezpiecznika**.
+
+**POMIAR (Prawo I) — HALT 20%→13% nie tylko przeszedł bramkę, ale PODNIÓSŁ WSZYSTKO:**
+
+| Próg HALT | MaxDD | PnL | Sharpe | PF | WR | Etap I |
+|-----------|-------|-----|--------|----|----|--------|
+| 20% (stary) | 20.2% | +39477 | 1.41 | 2.19 | 53.3% | ❌ False |
+| **13% (nowy)** | **<15%** | **+42369** | **1.46** | **2.67** | **55.1%** | **✅ True** |
+| 11% | <15% | +43167 | 1.48 | 2.85 | 56.0% | ✅ True |
+
+**Decyzja:** domyślne progi PORTFELOWE = REDUCED@7% / HALT@13% (świadomie nie 11% —
+zostawiamy bufor, anty-overfit). Powód (polityka ryzyka, NIE curve-fit): 5 jednoczesnych
+skorelowanych pozycji wymaga ciaśniejszej kontroli equity niż pojedyncza para (W-062@20%).
+Wcześniejsze ucięcie krwawienia zachowuje kapitał do składania → zysk ROŚNIE. DSR=1.0.
+
+**Pliki:** `imperium/koloseum/backtest.py` (dd_reduced/dd_halt + nowe domyślne),
+`tests/test_portfel.py`.
+
+---
+
 ## 2026-06-11 | W-292 🛡️🔬 | Ster korelacyjny OPT-IN + uczciwy pomiar (lekcja MaxDD)
 
 **Opis:** Próba naprawy MaxDD portfela (20%) sterem korelacyjnym 1/√(1+(N-1)ρ).

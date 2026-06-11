@@ -73,6 +73,20 @@ def test_portfel_dd_control_opt_in():
         assert all(p > 0 for p in eng.krzywa_equity)
 
 
+def test_portfel_progi_bezpiecznika_parametryzowane():
+    """W-293: dd_reduced/dd_halt sterują bezpiecznikiem; domyślne portfelowe 7%/13%."""
+    import inspect
+    from imperium.koloseum.backtest import backtest_portfel
+    sig = inspect.signature(backtest_portfel)
+    assert sig.parameters["dd_reduced"].default == 0.07
+    assert sig.parameters["dd_halt"].default == 0.13
+    # Custom progi nie wybuchają, equity dodatnie
+    bary_per = {s: _bary(s, n=320) for s in ("BTCUSDT", "ETHUSDT", "SOLUSDT")}
+    eng = backtest_portfel({}, "1D", okno=250, bary_per=bary_per,
+                           dd_reduced=0.05, dd_halt=0.10)
+    assert eng.kapital_calkowity > 0
+
+
 def test_portfel_wstrzykuje_btc_trend():
     """Radar BTC: portfel ustawia kontekst_dodatkowy z BTC_TREND (lead-lag)."""
     import imperium.koloseum.backtest as bt

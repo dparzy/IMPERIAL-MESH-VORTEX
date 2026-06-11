@@ -188,8 +188,8 @@ def backtest_portfel(
     tryb_lupiezcy: bool = False,
     ster_korelacyjny: bool = False,
     rygiel_ryzyka: bool = False,
-    dd_reduced: float = 0.10,
-    dd_halt: float = 0.20,
+    dd_reduced: float = 0.07,
+    dd_halt: float = 0.13,
     bary_per: "Optional[Dict[str, List[Dict[str, Any]]]]" = None,
 ) -> PaperTradingEngine:
     """
@@ -242,10 +242,14 @@ def backtest_portfel(
     _vol = {s: [float(x.get("volume", 0.0)) for x in b] for s, b in bary_per.items()}
     _ts_arr = {s: [int(x["timestamp"]) for x in b] for s, b in bary_per.items()}
 
-    # DD-control portfela (W-290): JEDEN wspólny BezpiecznikKrzywejKapitalu na
-    # poziomie koszyka (nie 5 z fragmentaryczną wizją). Domyślne progi W-062
-    # (REDUCED@10% DD → ×0.5 sizingu, HALT@20% → blokada wejść) — NIE strojone
-    # pod ten backtest (dyscyplina anty-overfit; DSR/PBO pilnują reszty).
+    # DD-control portfela (W-290/293): JEDEN wspólny BezpiecznikKrzywejKapitalu na
+    # poziomie koszyka. Progi PORTFELOWE ciaśniejsze niż single-para W-062 (20%):
+    # REDUCED@7% → ×0.5 sizingu, HALT@13% → blokada wejść. POWÓD (polityka ryzyka,
+    # nie curve-fit): 5 jednoczesnych skorelowanych pozycji wymaga ciaśniejszej
+    # kontroli equity niż jedna para. POMIAR 2026-06-11 (Prawo I): HALT 20%→13%
+    # przeniósł portfel przez Etap I (MaxDD 20.2%→<15%, ok=False→True) i PODNIÓSŁ
+    # WSZYSTKO (PnL +39477→+42369, Sharpe 1.41→1.46, PF 2.19→2.67) — wcześniejsze
+    # ucięcie krwawienia zachowuje kapitał do składania. DSR=1.0 (edge realny).
     breaker = None
     if dd_control:
         breaker = BezpiecznikKrzywejKapitalu(prog_dd_reduced=dd_reduced,

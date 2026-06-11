@@ -238,19 +238,24 @@ def backtest_portfel(
             os_czasu.append((int(bary[i]["timestamp"]), sym, i))
     os_czasu.sort(key=lambda x: x[0])
 
-    krzywa_equity: List[float] = []
+    # Equity zapisywane per KALENDARZOWY DZIEŃ (ostatnia wartość w dniu), NIE per
+    # zdarzenie: przy N parach ~N zdarzeń/dzień fałszowałoby annualizację Sharpe
+    # (√365 zakłada 1 punkt/dzień). Prawo I — uczciwy współczynnik czasu.
+    _DZ = 86_400_000
+    equity_dnia: "Dict[int, float]" = {}
     for ts, sym, i in os_czasu:
         bary = bary_per[sym]
         engine.przetworz_bar(_bar_data(bary[i]))
-        krzywa_equity.append(engine.kapital_calkowity)
+        equity_dnia[ts // _DZ] = engine.kapital_calkowity
         okno_barow = bary[i - okno: i + 1]
         dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
 
     # Domknij otwarte po ostatniej cenie każdej pary
     ostatnie = {sym: bary_per[sym][-1]["close"] for sym in bary_per}
     engine.zamknij_wszystkie(ostatnie, powod="MANUAL")
-    krzywa_equity.append(engine.kapital_calkowity)
-    engine.krzywa_equity = krzywa_equity
+    if os_czasu:
+        equity_dnia[os_czasu[-1][0] // _DZ] = engine.kapital_calkowity
+    engine.krzywa_equity = [equity_dnia[d] for d in sorted(equity_dnia)]
     return engine
 
 

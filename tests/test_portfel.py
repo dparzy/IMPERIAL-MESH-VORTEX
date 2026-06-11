@@ -25,12 +25,14 @@ def test_portfel_wspolny_kapital_dziala():
     assert hasattr(eng, "krzywa_equity") and all(p > 0 for p in eng.krzywa_equity)
 
 
-def test_portfel_os_czasu_chronologiczna():
-    """Krzywa equity ma 1 punkt na każdy bar (po oknie) wszystkich par + domknięcie."""
+def test_portfel_krzywa_dzienna():
+    """Krzywa equity jest DZIENNA (1 punkt/dzień), nie per-zdarzenie — uczciwa
+    annualizacja Sharpe przy N parach (√365 zakłada 1 pkt/dzień)."""
     bary_per = {s: _bary(s, n=300) for s in ("BTCUSDT", "ETHUSDT")}
     eng = backtest_portfel({}, "1D", okno=250, bary_per=bary_per)
-    # (300-250) barów × 2 pary + 1 końcowy
-    assert len(eng.krzywa_equity) == (300 - 250) * 2 + 1
+    # 2 pary, te same daty 1D → ~50 dni handlowych (po oknie), nie 100 zdarzeń
+    assert len(eng.krzywa_equity) <= 51
+    assert all(p > 0 for p in eng.krzywa_equity)
 
 
 def test_portfel_sizing_budzet_rowny():

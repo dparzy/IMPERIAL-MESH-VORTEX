@@ -125,6 +125,19 @@ def test_kalkulator_mnoznik_zero_nie_ujemny():
     assert p.rozmiar_usdt == 0.0
 
 
+def test_neuron_dominacja_glosuje():
+    """RADAR-02: alt-season(dom<0)→LONG, ucieczka do BTC(dom>0)→SHORT, ~0→NEUTRAL, brak→abstynencja."""
+    from imperium.legiony.neurony.sesje import NeuronDominacja
+    n = NeuronDominacja()
+    assert n.interpretuj({"BTC_DOMINANCJA": -0.8}).kierunek == "LONG"
+    assert n.interpretuj({"BTC_DOMINANCJA": 0.8}).kierunek == "SHORT"
+    assert n.interpretuj({"BTC_DOMINANCJA": 0.0}).kierunek == "NEUTRAL"
+    assert n.interpretuj({}).kierunek == "NEUTRAL"
+    # granica progu 0.30
+    assert n.interpretuj({"BTC_DOMINANCJA": -0.30}).kierunek == "LONG"
+    assert n.interpretuj({"BTC_DOMINANCJA": -0.29}).kierunek == "NEUTRAL"
+
+
 def test_dyrygent_okazjon_none_brak_wplywu():
     """Domyślnie okazjon=None → Praeda nie ingeruje (mnoznik_rozmiaru pozostaje 1.0)."""
     from imperium.koloseum.dyrygent import Dyrygent

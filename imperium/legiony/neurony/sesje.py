@@ -209,3 +209,36 @@ class NeuronRadarBTC(MikroNeuron):
                 [f"🛰️ RADAR BTC: lider spada ({bt:+.2f}) — uważaj, alty lecą za BTC"])
         return self._bazowy_sygnal(bt, "NEUTRAL", 0.15,
             [f"🛰️ RADAR BTC: lider niezdecydowany ({bt:+.2f})"])
+
+
+class NeuronDominacja(MikroNeuron):
+    """
+    RADAR-02 💎 | Strażnik Dominacji BTC (W-292) — przepływ kapitału BTC↔alty.
+
+    BTC_DOMINANCJA ∈ [-1,+1] (z RadarRynku): siła względna BTC vs koszyk altów.
+    Z perspektywy ALTA (większość koszyka) głosuje jako RADAR bocznej flanki:
+      • DOMINANCJA ≤ −0.30 → alt-season (kapitał płynie w alty) → LONG-wsparcie
+      • DOMINANCJA ≥ +0.30 → ucieczka do BTC (alty słabną) → SHORT-ostrzeżenie
+      • między → NEUTRAL (przepływ niejednoznaczny)
+    Brak BTC_DOMINANCJA → abstynencja (Prawo XV). Waga umiarkowana — kontekst
+    wspierający, nie samodzielny silnik (jak RADAR-01).
+    """
+    KLUCZ = "RADAR-02"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "BTC_DOMINANCJA"
+    KATEGORIA = "R"
+    WAGA = 5
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        dom = wskazniki.get("BTC_DOMINANCJA")
+        if dom is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak dominacji BTC (radar milczy)"])
+        if dom <= -0.30:
+            return self._bazowy_sygnal(dom, "LONG", min(0.65, abs(dom)),
+                [f"🌐 DOMINACJA {dom:+.2f}: alt-season — kapitał płynie w alty (LONG-wsparcie)"])
+        if dom >= 0.30:
+            return self._bazowy_sygnal(dom, "SHORT", min(0.65, abs(dom)),
+                [f"🌐 DOMINACJA {dom:+.2f}: ucieczka do BTC — alty słabną (SHORT-ostrzeżenie)"])
+        return self._bazowy_sygnal(dom, "NEUTRAL", 0.15,
+            [f"🌐 DOMINACJA {dom:+.2f}: przepływ kapitału niejednoznaczny"])

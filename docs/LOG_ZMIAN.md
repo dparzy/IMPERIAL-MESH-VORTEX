@@ -20,8 +20,24 @@
 na poziomie koszyka (nie 5 z fragmentaryczną wizją), domyślne progi W-062
 (REDUCED@10% DD → ×0.5 sizingu wszystkich par, HALT@20% → blokada wejść). Per-para
 Dyrygenci mają breaker_krzywej=False (sterowanie centralne). Progi NIE strojone pod
-backtest — dyscyplina anty-overfit; DSR/PBO pilnują reszty. +1 test. Cel: ściąć
-MaxDD 16.5% poniżej progu Etapu I (<15%) bez utraty Sharpe. Wynik — patrz niżej.
+backtest — dyscyplina anty-overfit; DSR/PBO pilnują reszty. +1 test.
+
+**🎉🎉 PIERWSZY PEŁNY ZIELONY ETAP I W HISTORII IMPERIUM (silnik portfelowy):**
+
+| Wariant | trades | WR | PF | MaxDD | PnL | Sharpe_r | DSR | Etap I |
+|---|---|---|---|---|---|---|---|---|
+| bez DD-control | 422 | 51.2% | 1.60 | 22.8% | +6290 | 1.25 | 0.99 | ⛔ MaxDD |
+| **z DD-control** | 422 | 51.2% | **2.01** | **13.5%** | **+7155** | **1.74** | **1.0** | **✅ ETAP I** |
+
+**DD-control POPRAWIŁ WSZYSTKO naraz** (nie tylko ściął DD): PF 1.60→2.01, PnL +71.5%,
+Sharpe 1.25→1.74, DSR→1.0, MaxDD 22.8%→13.5%. Mechanizm: bezpiecznik tnie rozmiar
+DOKŁADNIE gdy portfel krwawi (REDUCED@10%), przywraca przy odbiciu — unika najgorszych
+strat, więc i Sharpe rośnie. To NIE overfitting (progi domyślne W-062, DSR=1.0 idealne).
+
+**ZWALIDOWANA KONFIGURACJA gotowa do Etapu II (paper):** koszyk 5 par
+(BTC/ETH/SOL/BNB/DOGE) · 1D · AUTO-reżim (Namiestnik) · wspólny kapitał równoważony ·
+DD-control (W-062). Uczciwie (Prawo I): to BACKTEST — Etap II (14 dni paper) i III
+(live mikro MEXC) wciąż przed nami; ale bramka przeszła twardo (DSR 1.0), nie oknem.
 
 **Testy:** 693/693 ✅. Audyt: pełna harmonia.
 

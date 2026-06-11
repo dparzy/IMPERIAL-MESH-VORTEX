@@ -230,6 +230,7 @@ def backtest_portfel(
     import bisect as _bs
     from imperium.legiony.radar_rynku import RadarRynku
     _radar = RadarRynku()
+    _RADAR_OGON = 200   # ogon serii wystarczający dla wszystkich okien radaru
     _btc_sym = next((s for s in bary_per if s.upper().startswith("BTC")), None)
     # Precompute per-symbol serie (close/vol/ts) raz — tnie się bisectem co tyk.
     _close = {s: [float(x["close"]) for x in b] for s, b in bary_per.items()}
@@ -286,16 +287,19 @@ def backtest_portfel(
         # RADAR RYNKU: skan koszyka do ts (przyczynowo, bez look-ahead). Każda seria
         # ucięta bisectem do świec ≤ ts — żadnej przyszłości w kontekście.
         if _btc_sym is not None:
+            # Tylko OGON serii (≤_RADAR_OGON barów) — radar patrzy na ostatnie ~90.
+            # Ucięcie z dołu czyni skan O(1)/tyk zamiast O(n) (koniec kwadratu).
             jb = _bs.bisect_right(_ts_arr[_btc_sym], ts)
-            btc_slice = _close[_btc_sym][:jb]
+            btc_slice = _close[_btc_sym][max(0, jb - _RADAR_OGON):jb]
             alty_close, alty_vol = {}, {}
             for s in bary_per:
                 if s == _btc_sym:
                     continue
                 k = _bs.bisect_right(_ts_arr[s], ts)
                 if k >= 1:
-                    alty_close[s] = _close[s][:k]
-                    alty_vol[s] = _vol[s][:k]
+                    lo = max(0, k - _RADAR_OGON)
+                    alty_close[s] = _close[s][lo:k]
+                    alty_vol[s] = _vol[s][lo:k]
             stan = _radar.skanuj(btc_slice, alty_close, alty_vol)
             dyrygenci[sym].kontekst_dodatkowy = stan.jako_wskazniki()
         okno_barow = bary[i - okno: i + 1]

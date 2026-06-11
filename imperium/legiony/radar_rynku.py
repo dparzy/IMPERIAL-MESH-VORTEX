@@ -59,6 +59,25 @@ class StanRynku:
         return out
 
 
+def frakcja_korelacyjna(n: int, rho: Optional[float]) -> float:
+    """
+    🛡️ STER KORELACYJNY — czynnik skalujący rozmiar pozycji w koszyku N par tak,
+    by zmienność portfela pozostała ~stała niezależnie od reżimu korelacji.
+
+    Teoria portfela (NIE strojona stała): N pozycji o korelacji ρ ma zmienność
+    ∝ √(1+(N-1)ρ) względem jednej. By sprowadzić ekspozycję do poziomu
+    zdekorelowanego (ρ=0), skaluj każdą pozycję przez 1/√(1+(N-1)ρ).
+
+      • ρ→0 (dywersyfikacja działa)  → 1.0 (pełny rozmiar, nie blokujemy potencjału)
+      • ρ→1 (kaskada, wszystko razem) → 1/√N (tnij, bo to faktycznie jedna pozycja N×)
+
+    n: liczba par w koszyku. rho: STRES_KORELACJI ∈ [0,1] (None → brak cięcia).
+    """
+    if n <= 1 or rho is None:
+        return 1.0
+    return 1.0 / math.sqrt(1.0 + (n - 1) * max(0.0, min(1.0, rho)))
+
+
 def _zwroty(close: Sequence[float], okno: int) -> List[float]:
     """Ostatnie `okno` stóp zwrotu (proste), pomijając zerowe mianowniki."""
     c = [float(x) for x in close if x is not None]

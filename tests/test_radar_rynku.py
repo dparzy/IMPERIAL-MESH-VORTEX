@@ -1,7 +1,8 @@
 """Testy RadarRynku (W-292) — wielowymiarowy kontekst: dominacja, przepływ, stres."""
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from imperium.legiony.radar_rynku import RadarRynku, StanRynku, _korelacja
+from imperium.legiony.radar_rynku import (RadarRynku, StanRynku, _korelacja,
+                                          frakcja_korelacyjna)
 
 
 def _seria(start, krok, n):
@@ -72,6 +73,22 @@ def test_korelacja_granice():
     assert abs(_korelacja([1, 2, 3, 4], [4, 3, 2, 1]) + 1.0) < 1e-9
     assert _korelacja([1, 1, 1, 1], [1, 2, 3, 4]) is None
     assert _korelacja([1], [1]) is None
+
+
+def test_frakcja_korelacyjna_teoria_portfela():
+    """Ster korelacyjny: ρ=0→1.0 (pełny), ρ=1→1/√N (tnij), monotonicznie maleje."""
+    import math
+    # Brak cięcia: dekorelacja lub brak danych lub pojedyncza para
+    assert frakcja_korelacyjna(5, 0.0) == 1.0
+    assert frakcja_korelacyjna(5, None) == 1.0
+    assert frakcja_korelacyjna(1, 0.9) == 1.0
+    # Pełna kaskada N=5 → 1/√5
+    assert abs(frakcja_korelacyjna(5, 1.0) - 1.0 / math.sqrt(5)) < 1e-9
+    # Monotoniczność: większa korelacja → mniejszy rozmiar
+    assert frakcja_korelacyjna(5, 0.3) > frakcja_korelacyjna(5, 0.7)
+    # Clamp ρ poza [0,1] nie wybucha
+    assert frakcja_korelacyjna(5, 1.5) == frakcja_korelacyjna(5, 1.0)
+    assert frakcja_korelacyjna(5, -0.5) == 1.0
 
 
 def test_walidacja_parametrow():

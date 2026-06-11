@@ -228,7 +228,7 @@ def backtest_portfel(
     # (BTC_TREND, BTC_DOMINANCJA, PRZEPLYW_KAPITALU, STRES_KORELACJI) wstrzykiwany
     # do KAŻDEJ pary. Liczony przyczynowo z barów DO bieżącej świecy (Prawo I).
     import bisect as _bs
-    from imperium.legiony.radar_rynku import RadarRynku
+    from imperium.legiony.radar_rynku import RadarRynku, frakcja_korelacyjna
     _radar = RadarRynku()
     _RADAR_OGON = 200   # ogon serii wystarczający dla wszystkich okien radaru
     _btc_sym = next((s for s in bary_per if s.upper().startswith("BTC")), None)
@@ -276,16 +276,18 @@ def backtest_portfel(
         engine.przetworz_bar(_bar_data(bary[i]))
         eq = engine.kapital_calkowity
         equity_dnia[ts // _DZ] = eq
+        frakcja_breaker = 1.0
         if breaker is not None:
             breaker.aktualizuj(eq)
             if breaker.halt:
                 continue   # blokada nowych wejść (świadoma cisza, Prawo XV)
-            dyrygenci[sym].kapital_sizing = budzet_pary * breaker.frakcja_pozycji()
+            frakcja_breaker = breaker.frakcja_pozycji()
         # PRAEDA: chciwość dozwolona TYLKO gdy bezpiecznik w stanie NORMAL (DD < próg).
         if tryb_lupiezcy:
             dyrygenci[sym].praeda_dd_normal = (breaker is None or breaker.stan == "NORMAL")
         # RADAR RYNKU: skan koszyka do ts (przyczynowo, bez look-ahead). Każda seria
         # ucięta bisectem do świec ≤ ts — żadnej przyszłości w kontekście.
+        frakcja_stres = 1.0
         if _btc_sym is not None:
             # Tylko OGON serii (≤_RADAR_OGON barów) — radar patrzy na ostatnie ~90.
             # Ucięcie z dołu czyni skan O(1)/tyk zamiast O(n) (koniec kwadratu).
@@ -302,6 +304,14 @@ def backtest_portfel(
                     alty_vol[s] = _vol[s][lo:k]
             stan = _radar.skanuj(btc_slice, alty_close, alty_vol)
             dyrygenci[sym].kontekst_dodatkowy = stan.jako_wskazniki()
+            # 🛡️ STER KORELACYJNY (W-292): trzymaj zmienność portfela ~stałą niezależnie
+            # od reżimu korelacji. Gdy koszyk się dekoreluje (ρ→0) — pełny rozmiar
+            # (dywersyfikacja działa). Gdy wpada w kaskadę (ρ→1) — tnij każdą pozycję
+            # czynnikiem 1/√(1+(N-1)ρ) (teoria portfela, NIE strojona stała). N skorelowanych
+            # pozycji ≈ jedna N×; ten czynnik sprowadza ekspozycję do poziomu zdekorelowanego.
+            frakcja_stres = frakcja_korelacyjna(n, stan.stres_korelacji)
+        # Sizing par: równy budżet × frakcja DD-control × ster korelacyjny (świeżo co tyk).
+        dyrygenci[sym].kapital_sizing = budzet_pary * frakcja_breaker * frakcja_stres
         okno_barow = bary[i - okno: i + 1]
         dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
 

@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-11 | W-292 🛡️🔬 | Ster korelacyjny OPT-IN + uczciwy pomiar (lekcja MaxDD)
+
+**Opis:** Próba naprawy MaxDD portfela (20%) sterem korelacyjnym 1/√(1+(N-1)ρ).
+POMIAR (Prawo I): MaxDD 20.2%→20.0% (bez zmian!), PnL +39477→+18969 (spadł o połowę).
+**Lekcja:** MaxDD to RATIO (peak-to-trough %), niezmienny pod równomiernym skalowaniem
+pozycji. Krypto-koszyk jest TRWALE skorelowany (ρ≈0.8 zawsze, nie spike'owo), więc
+czynnik działał jak stały haircut ×0.5 — ciął zysk, nie ruszał MaxDD%. Dlatego ster
+DOMYŚLNIE OFF (`ster_korelacyjny=False`) — nie blokujemy potencjału (Prawo XV).
+
+**Wniosek:** MaxDD 20% NIE pochodzi ze skoków korelacji, lecz ze złego okresu
+kierunkowej przewagi na pełnych danych. Wymaga STANOWEGO de-risku (cięcie w czasie
+złego okresu), nie równomiernego — do zaprojektowania i ZMIERZENIA osobno.
+
+**Pliki:** `imperium/koloseum/backtest.py`, `imperium/legiony/radar_rynku.py`,
+`tests/test_radar_rynku.py`.
+
+---
+
 ## 2026-06-11 | W-292 🛰️🌐 | RADAR RYNKU: dominacja BTC + przepływ kapitału + stres korelacji
 
 **Opis:** Rozwój RadarBTC (W-291) → wielowymiarowy `RadarRynku`. Stary radar patrzył

@@ -186,6 +186,7 @@ def backtest_portfel(
     auto_rezim: bool = True,
     dd_control: bool = True,
     tryb_lupiezcy: bool = False,
+    ster_korelacyjny: bool = False,
     bary_per: "Optional[Dict[str, List[Dict[str, Any]]]]" = None,
 ) -> PaperTradingEngine:
     """
@@ -304,12 +305,13 @@ def backtest_portfel(
                     alty_vol[s] = _vol[s][lo:k]
             stan = _radar.skanuj(btc_slice, alty_close, alty_vol)
             dyrygenci[sym].kontekst_dodatkowy = stan.jako_wskazniki()
-            # 🛡️ STER KORELACYJNY (W-292): trzymaj zmienność portfela ~stałą niezależnie
-            # od reżimu korelacji. Gdy koszyk się dekoreluje (ρ→0) — pełny rozmiar
-            # (dywersyfikacja działa). Gdy wpada w kaskadę (ρ→1) — tnij każdą pozycję
-            # czynnikiem 1/√(1+(N-1)ρ) (teoria portfela, NIE strojona stała). N skorelowanych
-            # pozycji ≈ jedna N×; ten czynnik sprowadza ekspozycję do poziomu zdekorelowanego.
-            frakcja_stres = frakcja_korelacyjna(n, stan.stres_korelacji)
+            # 🛡️ STER KORELACYJNY (W-292, OPT-IN) — czynnik 1/√(1+(N-1)ρ) z teorii portfela.
+            # POMIAR 2026-06-11 (Prawo I): na trwale skorelowanym koszyku krypto (ρ≈0.8
+            # zawsze) działa jak ~stały haircut ×0.5 → tnie PnL o połowę, a MaxDD% (ratio,
+            # niezmienny pod skalowaniem) zostaje 20%. Dlatego DOMYŚLNIE OFF — nie blokujemy
+            # potencjału (Prawo XV). Zostaje jako opcja dla koszyków zdekorelowanych.
+            if ster_korelacyjny:
+                frakcja_stres = frakcja_korelacyjna(n, stan.stres_korelacji)
         # Sizing par: równy budżet × frakcja DD-control × ster korelacyjny (świeżo co tyk).
         dyrygenci[sym].kapital_sizing = budzet_pary * frakcja_breaker * frakcja_stres
         okno_barow = bary[i - okno: i + 1]

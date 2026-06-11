@@ -124,14 +124,15 @@ class NeuronAzjaRange(MikroNeuron):
 
 class NeuronAugur(MikroNeuron):
     """
-    AUG-01 | Augur Zdarzeń (W-289 💎) — głos historycznych analogii.
+    AUG-01 | Augur Zdarzeń (W-289 💎 v2) — głos historycznych analogii.
 
-    Czyta kontekst Kronikarza Zdarzeń (AdapterKronikarz → EVENT_*): jeśli
-    jesteśmy w oknie wpływu zdarzenia fundamentalnego, głosuje wg PRZYCZYNOWO
-    policzonych statystyk wcześniejszych epizodów tego typu:
-      • n ≥ 2 i prob_wzrostu ≥ 65% → LONG (pewność ~ prob, cap 0.8)
-      • n ≥ 2 i prob_wzrostu ≤ 35% → SHORT
-      • n < 2 (za mało historii) lub prob w środku → NEUTRAL z kontekstem
+    Czyta kontekst Kronikarza (AdapterKronikarz → EVENT_*) i głosuje:
+      • BLACKOUT (FED w ≤2 dni PRZED nami) → NEUTRAL-ostrożność (pewność 0.55):
+        nie zgadujemy kierunku przed posiedzeniem, sygnalizujemy redukcję ryzyka.
+      • n ≥ 2, prob ≥ 65% → LONG; prob ≤ 35% → SHORT. Pewność modulowana:
+        bazowa × WAGA_ZANIKU (świeże zdarzenie mocniej) × bonus za ZGODNOŚĆ
+        kierunkową historycznych epizodów (wszystkie w tę samą stronę = pewniej).
+      • n < 2 (za mało historii) lub prob w środku → NEUTRAL z kontekstem.
     Poza oknem wpływu (brak EVENT_*) → abstynencja (Prawo XV).
     """
     KLUCZ = "AUG-01"
@@ -145,22 +146,32 @@ class NeuronAugur(MikroNeuron):
         n = wskazniki.get("EVENT_N")
         typ = wskazniki.get("EVENT_TYP")
         dni = wskazniki.get("EVENT_DNI_PO")
-        if prob is None or typ is None:
+        waga = wskazniki.get("EVENT_WAGA")
+        zgodne = wskazniki.get("EVENT_ZGODNE")
+        blackout = wskazniki.get("EVENT_BLACKOUT")
+        if typ is None:
             return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
                 ["Brak okna zdarzenia (Augur milczy)"])
-        if n is None or n < 2:
+        if blackout:
+            dni_do = wskazniki.get("EVENT_DNI_DO", abs(dni) if dni is not None else "?")
+            return self._bazowy_sygnal(0.0, "NEUTRAL", 0.55,
+                [f"⚠️📜 {typ} za ~{dni_do}d — BLACKOUT: zredukuj ryzyko przed posiedzeniem"])
+        if prob is None or n is None or n < 2:
             return self._bazowy_sygnal(prob, "NEUTRAL", 0.30,
                 [f"📜 {typ} ({dni}d po): tylko {n or 0} epizodów w historii — "
                  f"za mało na werdykt (Prawo I)"])
+        # Modulatory pewności: świeżość (decay) × zgodność kierunkowa.
+        mod_waga = waga if isinstance(waga, (int, float)) else 1.0
+        mod_zgod = 1.0 if zgodne else 0.8
         if prob >= 65.0:
-            pewnosc = min(0.80, prob / 100.0)
+            pewnosc = min(0.80, prob / 100.0 * mod_waga * mod_zgod)
             return self._bazowy_sygnal(prob, "LONG", pewnosc,
-                [f"📜 {typ} ({dni}d po): {prob:.0f}% wzrostów w n={n} "
-                 f"historycznych epizodach — analogia LONG"])
+                [f"📜 {typ} ({dni}d po): {prob:.0f}% wzrostów w n={n} epizodach "
+                 f"(waga {mod_waga:.2f}, {'zgodne' if zgodne else 'rozsypane'}) — LONG"])
         if prob <= 35.0:
-            pewnosc = min(0.80, (100.0 - prob) / 100.0)
+            pewnosc = min(0.80, (100.0 - prob) / 100.0 * mod_waga * mod_zgod)
             return self._bazowy_sygnal(prob, "SHORT", pewnosc,
-                [f"📜 {typ} ({dni}d po): tylko {prob:.0f}% wzrostów w n={n} "
-                 f"epizodach — analogia SHORT"])
+                [f"📜 {typ} ({dni}d po): tylko {prob:.0f}% wzrostów w n={n} epizodach "
+                 f"(waga {mod_waga:.2f}, {'zgodne' if zgodne else 'rozsypane'}) — SHORT"])
         return self._bazowy_sygnal(prob, "NEUTRAL", 0.25,
             [f"📜 {typ} ({dni}d po): {prob:.0f}% w n={n} — historia bez przewagi"])

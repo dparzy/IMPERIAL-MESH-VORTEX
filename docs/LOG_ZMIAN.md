@@ -6,6 +6,31 @@
 
 ---
 
+---
+
+## 2026-06-11 | UNIKAT W-289 v2 💎 | Augur rozbudowany: per-para + kalendarz FOMC (blackout) + decay/spójność
+
+**Rozbudowa Kronikarza Zdarzeń o 3 wymiary (na prośbę Cezara):**
+1. **PER-PARA:** zdarzenia mają pole `pary` (ETH ETF → tylko ETHUSDT; halving/krach/
+   FOMC = makro/BTC-dominacja → wszystkie). `kontekst(ts, symbol)` filtruje —
+   kluczowe pod test 5 par (ETH ETF nie zafałszuje SOL).
+2. **KALENDARZ FOMC (56 dat 2020–2026, publiczne):** dwie funkcje na raz —
+   • event-study post-FOMC (wysokie n → statystyka mocna),
+   • **BLACKOUT pre-FOMC**: ≤2 dni PRZED posiedzeniem augur WIE, że FED idzie →
+     AUG-01 głosuje NEUTRAL-ostrożność "zredukuj ryzyko". To "znajomość przyszłości",
+     o którą prosił Cezar (dokładny dzień/czas). Daty 2026 = znane przyszłe okna.
+3. **DECAY + SPÓJNOŚĆ:** `waga_zaniku` (1.0 w dniu zdarzenia → 0 na krawędzi okna)
+   i `zgodne_kierunkowo`/`rozrzut_pct` (czy historyczne epizody mówią jednym głosem).
+   AUG-01 moduluje pewność: bazowa × decay × bonus-zgodności.
+
+**Symbioza:** EVENT_* rozszerzone (WAGA, ZGODNE, BLACKOUT, DNI_DO); AUG-01 v2
+respektuje blackout (pierwszeństwo) i decay. +7 testów (per-para, blackout,
+pierwszeństwo, decay, spójność, neuron-blackout, neuron-decay).
+
+**Pliki:** `imperium/biblioteki/kronikarz_zdarzen.py`, `imperium/legiony/neurony/sesje.py`,
+`tests/test_kronikarz_zdarzen.py`.
+**Testy:** 688/688 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | UNIKAT W-289 💎 | KRONIKARZ ZDARZEŃ (Augur) — zdarzenia fundamentalne jako głos roju
 
 **Wizja Cezara zrealizowana** (= ROADMAP Faza 3 "Macierz zdarzeń historycznych" + W-039):

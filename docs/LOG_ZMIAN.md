@@ -30,10 +30,31 @@ zmienia obraz: mamy realną, przenośną przewagę kierunkową na 1D.
 **Czemu żadna nie przechodzi Etapu I:** próg Sharpe>1.0 (surowy, słuszny) — pojedyncze
 pary mają zbyt zmienne zwroty względem średniej. BTC i DOGE są o włos (0.86–0.95).
 
-**NASTĘPNY RUCH (klucz do "pewności" — wizja Cezara):** PORTFEL. 5 dodatnich,
-częściowo nieskorelowanych strumieni złożonych razem = Sharpe portfela WYŻSZY niż
-każdej pary z osobna (dywersyfikacja). To realizacja ROADMAP Faza 3 "Kostka Rubika"
-i bezpośrednia droga do przekroczenia progu. Buduję `narzedzia/pomiar_portfela.py`.
+**🎉 WYNIK PORTFELA (2026-06-11) — PIERWSZY RAZ W HISTORII IMPERIUM ETAP I ZALICZONY:**
+
+`narzedzia/pomiar_portfela.py` (W-290) złożył 5 krzywych equity w portfel równoważony
+(2945 dni, dzienne zwroty wyrównane po dacie UTC):
+
+| Metryka | Najlepsza para sama | PORTFEL 5 par |
+|---|---|---|
+| Sharpe roczny | 0.95 (DOGE) | **+1.24 ✅ >1.0** |
+| MaxDD | 4.3% (BTC) | **6.9% ✅ <15%** |
+| DSR (n_prob=5) | 0.94 (BTC) | **0.9962 ✅ ≥0.95** |
+| **Werdykt Etapu I** | ⛔ żadna | **✅ ZALICZONY** |
+
+**DLACZEGO DZIAŁA (Prawo XVI — zmierzone, nie zgadnięte):** średnia korelacja par
+dziennych zwrotów = **+0.02** (niemal ZEROWA!). Edge roju na każdej parze jest
+praktycznie NIEZALEŻNY → dywersyfikacja redukuje wariancję portfela ~5×, średnia
+zwrotu zostaje. Markowitz w czystej postaci. To NIE wymagało zmiany ani jednego
+neuronu — sama struktura portfela przeskoczyła próg.
+
+**ZNACZENIE:** mamy pierwszą konfigurację gotową do Etapu II (paper trading):
+NIE pojedyncza para, lecz KOSZYK 5 par równoważony (ROADMAP Faza 3 "Kostka Rubika"
+zrealizowana w pomiarze). Uczciwie: to backtest — Etap II (14 dni paper) i III (live
+mikro) wciąż przed nami; ale droga jest OTWARTA i zmierzona twardą bramką (DSR 0.996).
+
+**Pliki:** `narzedzia/pomiar_portfela.py`. **Następne:** silnik portfelowy (jedna
+sesja, N par, wspólny kapitał, realokacja) jako produkcyjny tryb backtestu.
 
 ## 2026-06-11 | UNIKAT W-289 v2 💎 | Augur rozbudowany: per-para + kalendarz FOMC (blackout) + decay/spójność
 

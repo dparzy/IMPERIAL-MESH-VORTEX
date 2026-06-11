@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-06-11 | W-292 🛰️🌐 | RADAR RYNKU: dominacja BTC + przepływ kapitału + stres korelacji
+
+**Opis:** Rozwój RadarBTC (W-291) → wielowymiarowy `RadarRynku`. Stary radar patrzył
+TYLKO na momentum ceny BTC. Nowy dokłada trzy KAUZALNE sygnały liczone z barów koszyka
+(bez API — Cezar na telefonie): **BTC_DOMINANCJA** (siła względna BTC vs alty — proxy
+dominacji, alt-season detector), **PRZEPLYW_KAPITALU** (breadth × momentum wolumenu —
+napływ/odpływ), **STRES_KORELACJI** (średnia korelacja par — detektor kaskady "alty za
+BTC w dół", Prawo XVI). Wstrzykiwane do KAŻDEJ pary w `backtest_portfel` (przyczynowo,
+bisect ≤ ts). Praeda: nowe weto STRES>0.85 (kaskada = brak dywersyfikacji = zero łupu)
++ bonus dominacji (alt-season wspiera LONG alta).
+
+**Powód:** Pytanie Cezara — czy radar sprawdza tylko cenę, czy też odpływ kapitału,
+wolumen, dominację BTC i ukryte rzeczy do skorelowania dla większej pewności ruchów.
+Odpowiedź w kodzie: cztery flanki zamiast jednej, wszystko zsynchronizowane.
+
+**Pliki:** `imperium/legiony/radar_rynku.py` (nowy), `imperium/koloseum/backtest.py`,
+`imperium/pretorianie/praeda.py`, `tests/test_radar_rynku.py` (nowy), `tests/test_praeda.py`.
+
+---
+
+## 2026-06-11 | W-291 🗡️ | PRAEDA wpięta w silnik portfelowy (tryb_lupiezcy)
+
+**Opis:** Domknięcie integracji Praedy: `Dyrygent` amplifikuje lewar+rozmiar w
+POTWIERDZONYCH okazjach (cap 20 / clamp 50%), `KalkulatorLewara.policz` przyjmuje
+`mnoznik_rozmiaru`. `backtest_portfel(tryb_lupiezcy=False)` — opt-in tryb łowcy:
+ustawia `Okazjon()` per para, śpi gdy breaker ≠ NORMAL.
+
+**Powód:** Wizja łowcy — auto-skalowana chciwość tylko gdy bezpiecznie. Domyślnie OFF.
+
+**Pliki:** `imperium/koloseum/dyrygent.py`, `imperium/pretorianie/kalkulator_lewara.py`,
+`imperium/koloseum/backtest.py`, `tests/test_praeda.py`.
+
 ---
 
 ---

@@ -85,6 +85,11 @@ class Okazjon:
             return self._brak(f"VPIN {vpin:.2f} > 0.7 — toksyczny flow, ofiara to MY")
         if wskazniki.get("CASCADE_FLAG"):
             return self._brak("Kaskada likwidacji — nie wchodzimy w lawinę")
+        # RADAR RYNKU (W-292): ekstremalny stres korelacji = cały koszyk leci razem
+        # (dywersyfikacja znika, ryzyko systemowe). Chciwość w kaskadzie = samobójstwo.
+        stres = wskazniki.get("STRES_KORELACJI")
+        if stres is not None and stres > 0.85:
+            return self._brak(f"STRES korelacji {stres:.2f} > 0.85 — koszyk w kaskadzie, brak dywersyfikacji")
         # RADAR BTC (W-291): BTC prowadzi rynek — gdy BTC mocno SPADA, alty lecą za
         # nim (lead-lag). LONG przeciw spadającemu BTC = pływanie pod prąd → weto.
         btc_trend = wskazniki.get("BTC_TREND")
@@ -122,6 +127,10 @@ class Okazjon:
         if btc:
             sila += btc * 0.25
             powody.append(f"+RadarBTC {btc:.2f}")
+        dom = self._dominacja(wskazniki, kierunek)
+        if dom:
+            sila += dom * 0.15
+            powody.append(f"+Dominacja {dom:.2f}")
         sila = min(1.0, sila)
 
         potwierdzona = sila >= self.prog_okazji
@@ -170,6 +179,18 @@ class Okazjon:
         if bt is None:
             return None
         return max(0.0, bt) if kierunek == "LONG" else max(0.0, -bt)
+
+    @staticmethod
+    def _dominacja(w: dict, kierunek: str):
+        """
+        BTC_DOMINANCJA ∈ [-1,+1] (RadarRynku). Dla ALTA: <0 = alt-season (kapitał
+        płynie w alty) wspiera LONG; >0 = ucieczka do BTC wspiera SHORT alta. To
+        proxy przepływu kapitału między BTC a koszykiem — wsparcie bocznej flanki.
+        """
+        dom = w.get("BTC_DOMINANCJA")
+        if dom is None:
+            return None
+        return max(0.0, -dom) if kierunek == "LONG" else max(0.0, dom)
 
     @staticmethod
     def _zdarzenie(w: dict, kierunek: str):

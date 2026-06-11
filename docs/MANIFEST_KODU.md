@@ -115,7 +115,7 @@
 | SES-01 | NeuronZegarSesji | S | 4 | ✅ aktywny | ZEGAR_SESJI (TIMESTAMP) | — |
 | SES-02 | NeuronAzjaRange | S | 7 | ✅ aktywny | ASIA_RANGE (W-011) | — |
 | AUG-01 | NeuronAugur 💎 | R | 6 | ✅ aktywny (AdapterKronikarz) | EVENT_PROB_WZROSTU (W-289) | — |
-| RADAR-01 | NeuronRadarBTC 💎 | R | 6 | ✅ aktywny (RadarBTC) | BTC_TREND (W-291, lead-lag) | — |
+| RADAR-01 | NeuronRadarBTC 💎 | R | 6 | ✅ aktywny (RadarRynku) | BTC_TREND (W-291/292, lead-lag) | — |
 
 ### Plik: `neurony/psychologia.py`
 

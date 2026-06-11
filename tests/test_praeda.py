@@ -41,6 +41,23 @@ def test_kaskada_weto():
     assert not ok.potwierdzona and "askad" in ok.powody[0]
 
 
+def test_stres_korelacji_weto():
+    """W-292: STRES_KORELACJI > 0.85 → kaskada koszyka → zero łupu (weto)."""
+    ok = Okazjon().ocen(_R(), {"VPIN_50": 0.2, "STRES_KORELACJI": 0.9}, "LONG", dd_normal=True)
+    assert not ok.potwierdzona and "STRES" in ok.powody[0]
+
+
+def test_dominacja_wspiera_alt_long():
+    """W-292: alt-season (BTC_DOMINANCJA<0) dodaje siłę LONG-owi alta (bonus)."""
+    bazowy = Okazjon().ocen(_R(), {"VPIN_50": 0.2}, "LONG", dd_normal=True)
+    z_dom = Okazjon().ocen(_R(), {"VPIN_50": 0.2, "BTC_DOMINANCJA": -0.8}, "LONG", dd_normal=True)
+    assert z_dom.sila >= bazowy.sila
+    # SHORT przy alt-season NIE dostaje bonusu (kierunek niezgodny)
+    short_dom = Okazjon().ocen(_R(), {"VPIN_50": 0.2, "BTC_DOMINANCJA": -0.8}, "SHORT", dd_normal=True)
+    short_baza = Okazjon().ocen(_R(), {"VPIN_50": 0.2}, "SHORT", dd_normal=True)
+    assert abs(short_dom.sila - short_baza.sila) < 1e-9
+
+
 def test_slaba_okazja_brak_wzmocnienia():
     """Słaba zgoda + RANGING → sila < próg → mnożniki 1.0 (zwykła pozycja)."""
     ok = Okazjon().ocen(_R(pew=0.6, rez="RANGING", zgod=12), {"VPIN_50": 0.3},

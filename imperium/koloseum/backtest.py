@@ -224,13 +224,17 @@ def backtest_portfel(
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"
     budzet_pary = kapital_startowy / n   # równe wagi (Markowitz)
 
-    # RADAR BTC (W-291): stan lidera (BTC_TREND) wstrzykiwany do KAŻDEJ pary jako
-    # kontekst lead-lag. Liczony przyczynowo z barów BTC do bieżącej świecy.
-    from imperium.legiony.radar_btc import RadarBTC
-    _radar = RadarBTC()
+    # RADAR RYNKU (W-292, rozwój W-291): wielowymiarowy kontekst lidera+koszyka
+    # (BTC_TREND, BTC_DOMINANCJA, PRZEPLYW_KAPITALU, STRES_KORELACJI) wstrzykiwany
+    # do KAŻDEJ pary. Liczony przyczynowo z barów DO bieżącej świecy (Prawo I).
+    import bisect as _bs
+    from imperium.legiony.radar_rynku import RadarRynku
+    _radar = RadarRynku()
     _btc_sym = next((s for s in bary_per if s.upper().startswith("BTC")), None)
-    _btc_close = [float(x["close"]) for x in bary_per[_btc_sym]] if _btc_sym else []
-    _btc_ts = [int(x["timestamp"]) for x in bary_per[_btc_sym]] if _btc_sym else []
+    # Precompute per-symbol serie (close/vol/ts) raz — tnie się bisectem co tyk.
+    _close = {s: [float(x["close"]) for x in b] for s, b in bary_per.items()}
+    _vol = {s: [float(x.get("volume", 0.0)) for x in b] for s, b in bary_per.items()}
+    _ts_arr = {s: [int(x["timestamp"]) for x in b] for s, b in bary_per.items()}
 
     # DD-control portfela (W-290): JEDEN wspólny BezpiecznikKrzywejKapitalu na
     # poziomie koszyka (nie 5 z fragmentaryczną wizją). Domyślne progi W-062
@@ -279,12 +283,21 @@ def backtest_portfel(
         # PRAEDA: chciwość dozwolona TYLKO gdy bezpiecznik w stanie NORMAL (DD < próg).
         if tryb_lupiezcy:
             dyrygenci[sym].praeda_dd_normal = (breaker is None or breaker.stan == "NORMAL")
-        # RADAR BTC: trend lidera z barów BTC do ts (przyczynowo, bez look-ahead)
-        if _btc_close:
-            import bisect as _bs
-            j = _bs.bisect_right(_btc_ts, ts)
-            bt = _radar.trend(_btc_close[:j]) if j >= 1 else None
-            dyrygenci[sym].kontekst_dodatkowy = {"BTC_TREND": bt} if bt is not None else {}
+        # RADAR RYNKU: skan koszyka do ts (przyczynowo, bez look-ahead). Każda seria
+        # ucięta bisectem do świec ≤ ts — żadnej przyszłości w kontekście.
+        if _btc_sym is not None:
+            jb = _bs.bisect_right(_ts_arr[_btc_sym], ts)
+            btc_slice = _close[_btc_sym][:jb]
+            alty_close, alty_vol = {}, {}
+            for s in bary_per:
+                if s == _btc_sym:
+                    continue
+                k = _bs.bisect_right(_ts_arr[s], ts)
+                if k >= 1:
+                    alty_close[s] = _close[s][:k]
+                    alty_vol[s] = _vol[s][:k]
+            stan = _radar.skanuj(btc_slice, alty_close, alty_vol)
+            dyrygenci[sym].kontekst_dodatkowy = stan.jako_wskazniki()
         okno_barow = bary[i - okno: i + 1]
         dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
 

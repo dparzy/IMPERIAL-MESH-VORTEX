@@ -95,3 +95,44 @@ def test_portfel_wstrzykuje_btc_trend():
     eng = bt.backtest_portfel({}, "1D", okno=250, bary_per=bary_per)
     # przebieg bez wyjątku + equity dodatnie (radar nie psuje pipeline)
     assert eng.kapital_calkowity > 0
+
+
+# ── Opcja B: wagi portfela ────────────────────────────────────────────────────
+
+def test_wagi_inwerse_vol_suma_jeden():
+    """wagi_inwerse_vol: suma wag = 1.0."""
+    from imperium.koloseum.backtest import wagi_inwerse_vol
+    bary_per = {s: _bary(s, n=100, krok=(0.1 if s == "BTC" else 2.0))
+                for s in ("BTC", "ETH", "DOGE")}
+    w = wagi_inwerse_vol(bary_per, okno_vol=60)
+    assert abs(sum(w.values()) - 1.0) < 1e-5, f"suma wag = {sum(w.values()):.6f}"
+
+
+def test_wagi_inwerse_vol_mniej_zmiennym_wieksza_waga():
+    """Para mniej zmienna dostaje wyższą wagę (risk-parity)."""
+    from imperium.koloseum.backtest import wagi_inwerse_vol
+    # BTC: krok=0.1 (stabilny), DOGE: krok=3.0 (bardzo zmienny)
+    bary_per = {
+        "BTCUSDT": _bary("BTCUSDT", n=100, krok=0.1),
+        "DOGEUSDT": _bary("DOGEUSDT", n=100, krok=3.0),
+    }
+    w = wagi_inwerse_vol(bary_per, okno_vol=80)
+    assert w["BTCUSDT"] > w["DOGEUSDT"], "stabilna para musi mieć wyższą wagę"
+
+
+def test_portfel_z_wagami_zewnetrznymi():
+    """backtest_portfel akceptuje wagi zewnętrzne bez błędu, equity dodatnie."""
+    bary_per = {s: _bary(s, n=320) for s in ("BTCUSDT", "ETHUSDT", "SOLUSDT")}
+    wagi_ext = {"BTCUSDT": 0.5, "ETHUSDT": 0.3, "SOLUSDT": 0.2}
+    eng = backtest_portfel({}, "1D", okno=250, bary_per=bary_per, wagi=wagi_ext)
+    assert eng.kapital_calkowity > 0
+
+
+def test_portfel_z_wagami_vol_adjusted():
+    """Portfel z wagi_inwerse_vol() działa bez błędu."""
+    from imperium.koloseum.backtest import wagi_inwerse_vol
+    bary_per = {s: _bary(s, n=320, krok=(0.1 if s == "BTCUSDT" else 2.0))
+                for s in ("BTCUSDT", "ETHUSDT")}
+    w = wagi_inwerse_vol(bary_per, okno_vol=60)
+    eng = backtest_portfel({}, "1D", okno=250, bary_per=bary_per, wagi=w)
+    assert eng.kapital_calkowity > 0

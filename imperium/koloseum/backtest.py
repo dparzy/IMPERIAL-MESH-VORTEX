@@ -176,6 +176,39 @@ def backtest(
     return engine
 
 
+def wagi_inwerse_vol(
+    bary_per: "Dict[str, List[Dict[str, Any]]]",
+    okno_vol: int = 60,
+) -> "Dict[str, float]":
+    """
+    Opcja B — volatility-adjusted allocation: wagi odwrotnie proporcjonalne do
+    ruchomej zmienności (σ dziennych zwrotów close z pierwszych `okno_vol` barów).
+
+    Normalizowane do sumy 1.0. Para z σ=0 dostaje wagę równą innym.
+    Cel: redukuje dominację wysokozmiennych par (DOGE 4× bardziej zmienny niż BTC),
+    poprawia Sharpe portfela (więcej risk-parity, mniej luck-of-symbol).
+
+    Prawo I: liczy tylko z dostępnych barów historycznych — bez look-ahead.
+    """
+    import math
+    sigmy = {}
+    for sym, bary in bary_per.items():
+        # Pierwsze okno_vol barów — to okres warmup PRZED startem handlu,
+        # gwarantuje kauzalność (Prawo I: brak look-ahead).
+        zamkniecia = [float(b["close"]) for b in bary[:okno_vol] if b.get("close")]
+        if len(zamkniecia) < 10:
+            sigmy[sym] = 1.0
+            continue
+        zwroty = [zamkniecia[i] / zamkniecia[i - 1] - 1 for i in range(1, len(zamkniecia))]
+        mean = sum(zwroty) / len(zwroty)
+        wariancja = sum((r - mean) ** 2 for r in zwroty) / max(1, len(zwroty) - 1)
+        sigmy[sym] = math.sqrt(wariancja) if wariancja > 0 else 1.0
+
+    inv = {sym: 1.0 / s for sym, s in sigmy.items()}
+    suma = sum(inv.values())
+    return {sym: round(v / suma, 6) for sym, v in inv.items()}
+
+
 def backtest_portfel(
     pliki: "Dict[str, str]",
     interwal: str,
@@ -191,18 +224,21 @@ def backtest_portfel(
     dd_reduced: float = 0.07,
     dd_halt: float = 0.13,
     bary_per: "Optional[Dict[str, List[Dict[str, Any]]]]" = None,
+    wagi: "Optional[Dict[str, float]]" = None,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
 
     Realizuje ROADMAP Faza 3 "Kostka Rubika": rój gra koszykiem, nie jedną parą.
-    Pomiar 2026-06-11 dowiódł, że portfel 5 par (korelacja ~0) przechodzi Etap I
-    (Sharpe 1.24), choć żadna para sama nie (Sharpe<1).
+    Pomiar 2026-06-11 dowiódł, że portfel 5 par przechodzi Etap I (Sharpe>1.0).
 
     pliki: {symbol: ścieżka_csv}. interwal wspólny.
+    wagi:  opcjonalny dict {symbol: waga} (suma 1.0) — alokacja kapitału per para.
+           None = równe wagi (1/N). Opcja B: wagi_inwerse_vol() dla risk-parity.
+
     Mechanika (Prawo I — bez look-ahead):
       • Jeden wspólny PaperTradingEngine (kapitał dzielony; max N pozycji naraz).
-      • Per-para Dyrygent współdzielący silnik; sizing wg kapital/N (równe wagi).
+      • Per-para Dyrygent współdzielący silnik; sizing wg kapital × waga_pary.
       • Chronologiczna unia osi czasu: każdy bar (ts, symbol) przetwarzany w
         kolejności czasu — najpierw aktualizacja otwartych, potem decyzja roju
         na oknie barów DANEJ pary do bieżącej świecy włącznie.
@@ -220,13 +256,19 @@ def backtest_portfel(
         raise ValueError("Brak par z wystarczającą historią")
     n = len(bary_per)
 
+    # Opcja B: wagi portfela (equal-weight lub zewnętrzne/vol-adjusted)
+    if wagi is None:
+        wagi_akt = {sym: 1.0 / n for sym in bary_per}
+    else:
+        suma_wag = sum(wagi.get(sym, 1.0 / n) for sym in bary_per)
+        wagi_akt = {sym: wagi.get(sym, 1.0 / n) / suma_wag for sym in bary_per}
+
     engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
                                 sesja_id=f"BT-PORTFEL-{n}x-{interwal}",
                                 max_otwartych=n)   # każda para max 1 pozycja
     budowniczy = BudowniczyWskaznikow()
     namiestnik = get_namiestnik() if auto_rezim else None
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"
-    budzet_pary = kapital_startowy / n   # równe wagi (Markowitz)
 
     # RADAR RYNKU (W-292, rozwój W-291): wielowymiarowy kontekst lidera+koszyka
     # (BTC_TREND, BTC_DOMINANCJA, PRZEPLYW_KAPITALU, STRES_KORELACJI) wstrzykiwany
@@ -261,7 +303,7 @@ def backtest_portfel(
         d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
                      budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
                      namiestnik=namiestnik, breaker_krzywej=False)  # breaker wspólny
-        d.kapital_sizing = budzet_pary
+        d.kapital_sizing = kapital_startowy * wagi_akt[sym]
         # 🗡️ PRAEDA (W-291): tryb łupieżczy — auto-skalowana agresja w POTWIERDZONYCH
         # okazjach (confluence). Aktywny tylko gdy DD normalny (bezpieczeństwo > chciwość).
         if tryb_lupiezcy:
@@ -331,7 +373,8 @@ def backtest_portfel(
                 if risk_off:
                     continue   # świadoma cisza (Prawo XV) — nie wchodzimy w lawinę
         # Sizing par: równy budżet × frakcja DD-control × ster korelacyjny (świeżo co tyk).
-        dyrygenci[sym].kapital_sizing = budzet_pary * frakcja_breaker * frakcja_stres
+        dyrygenci[sym].kapital_sizing = (kapital_startowy * wagi_akt[sym]
+                                         * frakcja_breaker * frakcja_stres)
         okno_barow = bary[i - okno: i + 1]
         dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
 

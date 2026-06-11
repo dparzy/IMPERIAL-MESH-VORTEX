@@ -78,6 +78,35 @@ def frakcja_korelacyjna(n: int, rho: Optional[float]) -> float:
     return 1.0 / math.sqrt(1.0 + (n - 1) * max(0.0, min(1.0, rho)))
 
 
+def rezim_risk_off(stan: "StanRynku",
+                   prog_stres: float = 0.85,
+                   prog_przeplyw: float = 0.35,
+                   prog_btc: float = 0.0) -> "tuple[bool, str]":
+    """
+    🚦 RYGIEL RYZYKA — STANOWY de-risk (W-293). Wykrywa reżim risk-off z radaru, by
+    BLOKOWAĆ nowe wejścia TYLKO na czas złego okresu (nie ciągły haircut — lekcja
+    z W-292: równomierne cięcie nie rusza MaxDD%, a stanowe omija zły okres).
+
+    Risk-off = JEDNOCZEŚNIE trzy ostrzeżenia (konfluencja, nie pojedynczy szum):
+      • STRES_KORELACJI > prog_stres   — koszyk w kaskadzie (dywersyfikacja znika)
+      • PRZEPLYW_KAPITALU < prog_przeplyw — odpływ kapitału (breadth słaby)
+      • BTC_TREND < prog_btc           — lider spada (alty lecą za nim, lead-lag)
+
+    Brak któregoś sygnału (None) → ten warunek nie blokuje (Prawo XV: bez danych
+    nie zgadujemy). Zwraca (risk_off, powód).
+    """
+    s = stan.stres_korelacji
+    p = stan.przeplyw
+    b = stan.btc_trend
+    kaskada = s is not None and s > prog_stres
+    odplyw = p is not None and p < prog_przeplyw
+    lider_spada = b is not None and b < prog_btc
+    if kaskada and odplyw and lider_spada:
+        return True, (f"RISK-OFF: stres={s:.2f}>{prog_stres} ∧ przepływ={p:.2f}<{prog_przeplyw} "
+                      f"∧ BTC={b:+.2f}<{prog_btc} — lawina, wstrzymaj wejścia")
+    return False, "rynek OK"
+
+
 def _zwroty(close: Sequence[float], okno: int) -> List[float]:
     """Ostatnie `okno` stóp zwrotu (proste), pomijając zerowe mianowniki."""
     c = [float(x) for x in close if x is not None]

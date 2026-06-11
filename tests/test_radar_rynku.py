@@ -2,7 +2,7 @@
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from imperium.legiony.radar_rynku import (RadarRynku, StanRynku, _korelacja,
-                                          frakcja_korelacyjna)
+                                          frakcja_korelacyjna, rezim_risk_off)
 
 
 def _seria(start, krok, n):
@@ -89,6 +89,36 @@ def test_frakcja_korelacyjna_teoria_portfela():
     # Clamp ρ poza [0,1] nie wybucha
     assert frakcja_korelacyjna(5, 1.5) == frakcja_korelacyjna(5, 1.0)
     assert frakcja_korelacyjna(5, -0.5) == 1.0
+
+
+def test_rezim_risk_off_konfluencja():
+    """Rygiel: risk-off TYLKO gdy kaskada ∧ odpływ ∧ BTC↓ jednocześnie (konfluencja)."""
+    # Wszystkie trzy spełnione → risk-off
+    pelny = StanRynku(btc_trend=-0.3, przeplyw=0.2, stres_korelacji=0.9)
+    off, powod = rezim_risk_off(pelny)
+    assert off and "RISK-OFF" in powod
+    # Brak jednego warunku → NIE blokuje (BTC rośnie)
+    assert not rezim_risk_off(StanRynku(btc_trend=0.3, przeplyw=0.2, stres_korelacji=0.9))[0]
+    # Brak jednego warunku → NIE blokuje (przepływ zdrowy)
+    assert not rezim_risk_off(StanRynku(btc_trend=-0.3, przeplyw=0.6, stres_korelacji=0.9))[0]
+    # Brak jednego warunku → NIE blokuje (brak kaskady)
+    assert not rezim_risk_off(StanRynku(btc_trend=-0.3, przeplyw=0.2, stres_korelacji=0.5))[0]
+
+
+def test_rezim_risk_off_brak_danych_nie_blokuje():
+    """None w którymkolwiek sygnale → ten warunek nie blokuje (Prawo XV)."""
+    assert not rezim_risk_off(StanRynku())[0]
+    assert not rezim_risk_off(StanRynku(btc_trend=-0.5, przeplyw=None, stres_korelacji=0.9))[0]
+
+
+def test_rezim_risk_off_granice_progow():
+    """Granice: dokładnie próg NIE wyzwala (≥/≤ vs ostre >/<)."""
+    # stres == prog (0.85) nie jest > 0.85 → brak kaskady → nie blokuje
+    assert not rezim_risk_off(StanRynku(btc_trend=-0.1, przeplyw=0.2, stres_korelacji=0.85))[0]
+    # przeplyw == prog (0.35) nie jest < 0.35 → nie blokuje
+    assert not rezim_risk_off(StanRynku(btc_trend=-0.1, przeplyw=0.35, stres_korelacji=0.9))[0]
+    # btc == prog (0.0) nie jest < 0.0 → nie blokuje
+    assert not rezim_risk_off(StanRynku(btc_trend=0.0, przeplyw=0.2, stres_korelacji=0.9))[0]
 
 
 def test_walidacja_parametrow():

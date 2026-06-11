@@ -187,6 +187,7 @@ def backtest_portfel(
     dd_control: bool = True,
     tryb_lupiezcy: bool = False,
     ster_korelacyjny: bool = False,
+    rygiel_ryzyka: bool = False,
     bary_per: "Optional[Dict[str, List[Dict[str, Any]]]]" = None,
 ) -> PaperTradingEngine:
     """
@@ -229,7 +230,8 @@ def backtest_portfel(
     # (BTC_TREND, BTC_DOMINANCJA, PRZEPLYW_KAPITALU, STRES_KORELACJI) wstrzykiwany
     # do KAŻDEJ pary. Liczony przyczynowo z barów DO bieżącej świecy (Prawo I).
     import bisect as _bs
-    from imperium.legiony.radar_rynku import RadarRynku, frakcja_korelacyjna
+    from imperium.legiony.radar_rynku import (RadarRynku, frakcja_korelacyjna,
+                                              rezim_risk_off)
     _radar = RadarRynku()
     _RADAR_OGON = 200   # ogon serii wystarczający dla wszystkich okien radaru
     _btc_sym = next((s for s in bary_per if s.upper().startswith("BTC")), None)
@@ -312,6 +314,13 @@ def backtest_portfel(
             # potencjału (Prawo XV). Zostaje jako opcja dla koszyków zdekorelowanych.
             if ster_korelacyjny:
                 frakcja_stres = frakcja_korelacyjna(n, stan.stres_korelacji)
+            # 🚦 RYGIEL RYZYKA (W-293): stanowy de-risk — w reżimie risk-off (kaskada
+            # ∧ odpływ ∧ BTC↓) wstrzymaj NOWE wejścia, by ominąć zły okres (atakuje
+            # MaxDD u źródła, w przeciwieństwie do równomiernego cięcia z W-292).
+            if rygiel_ryzyka:
+                risk_off, _ = rezim_risk_off(stan)
+                if risk_off:
+                    continue   # świadoma cisza (Prawo XV) — nie wchodzimy w lawinę
         # Sizing par: równy budżet × frakcja DD-control × ster korelacyjny (świeżo co tyk).
         dyrygenci[sym].kapital_sizing = budzet_pary * frakcja_breaker * frakcja_stres
         okno_barow = bary[i - okno: i + 1]

@@ -11,13 +11,13 @@
 
 ```
 ╔══════════════════════════════════════════════════════════════════════╗
-║               🏛️  AUDYT IMPERIUM v0.9.x — 2026-06-01 (zakt.)                ║
+║               🏛️  AUDYT IMPERIUM v0.9.1 — 2026-06-12 (zakt.)                ║
 ╠══════════════════════════════════════════════════════════════════════╣
-║  Moduły kodu:        58 plików .py                                  ║
-║  Dokumenty:          25 plików .md                                   ║
-║  Neurony:            55 w kodzie / 299 katalog                      ║
-║  Strategie:          ~108+ zmapowanych                               ║
-║  Testy automatyczne: 558 ✅ (wszystkie zielone)                     ║
+║  Moduły kodu:        88 plików .py                                  ║
+║  Dokumenty:          27 plików .md                                   ║
+║  Neurony:            62 w kodzie (58 aktywnych) / 299 katalog       ║
+║  Strategie:          18 aktywnych (26 kluczy)                        ║
+║  Testy automatyczne: 743 ✅ (wszystkie zielone)                     ║
 ╠══════════════════════════════════════════════════════════════════════╣
 ║  ✅ Działające (bez TA-Lib):    8 modułów                            ║
 ║  ⚠️  Blokowane przez TA-Lib:    9 modułów                            ║

@@ -169,10 +169,10 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 | **C** ✅ | AdapterCVD (Binance aggTrades public) → V-03 CVD obudzony | ✅ ZREALIZOWANA 2026-06-03 | +1 neuron (V-03 kat. F) |
 | **D** 🔵 | OC-01..04 on-chain (MVRV, SOPR, Puell, Netflow) — wymaga klucza Glassnode/CryptoQuant | ⏳ OCZEKUJE — decyzja Cezara | +4 neurony (kat. O) |
 | **LIVE** 🟠 | Paper trading na żywych danych MEXC — `MEXC_API_KEY` + `MEXC_SECRET` | ⏳ Instrukcja → `docs/PAPER_TRADING_MEXC.md` | rdzeń kompletny |
-| **E** 🔵 | Dalsze neurony z katalogu (299−55=244 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
+| **E** 🔵 | Dalsze neurony z katalogu (299−62=237 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
 **Stan kategorii (2026-06-04):** aktywne M/T/F/A/L/V/R/H/N/Z/O · wyciszone S(SMC feed)/O-API(on-chain API)
-**Neurony: 55** (48 aktywnych, 7 wyciszonych) · **Strategie: 17** · **Testy: 562/562**
+**Neurony: 62** (58 aktywnych, 4 wyciszone) · **Strategie: 18** · **Testy: 743/743**
 
 ### Zadania bieżące (infrastruktura)
 | # | Zadanie | Moduł | Priorytet |
@@ -214,6 +214,7 @@ python imperium/pretorianie/veto_check.py
 | v0.4.0 | 2026-06-02 | +Adaptery API, +5 neuronów (A-03/A-05/XII-06 + F-01..04), Prawo XX elitarny, WAGI_REZIMU, LOG_ZMIAN, ZPO, REJESTR_INSPIRACJI |
 | v0.5.0 | 2026-06-03 | +Namiestnik (Regime-Aware Gating), +Detektor Lookahead, +Timeframe-Aware (styl SCALP/SWING/INVEST, lewar_cap, futures/spot, filtr strategii po interwale), tabela dowodowa, 346 testów |
 | v0.9.0 | 2026-06-09 | Z-03/Z-04/X-27, master-switch reżimu Faza 1, BIB-020 (pomiar_dekorelacji), porządek docs: archiwizacja duplikatu, aktualizacja liczb; 55 neuronów, 562 testów (W12 żywotność głosu) |
+| v0.9.1 | 2026-06-12 | Radar Rynku Opcja A (decyduj_z_radarem), Opcja B (wagi_inwerse_vol+backtest_portfel), bonus_radar, 4 nowe neurony, 743 testów, Paper Trading Etap II instrukcja, 62 neurony |
 
 ---
 

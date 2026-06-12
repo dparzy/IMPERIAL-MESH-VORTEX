@@ -96,8 +96,51 @@ def _kierunek_i_sila(klucze: List[str], sygnaly: Dict[str, object]) -> tuple:
     return kierunek, sila_l, sila_s, n_l, n_s, n_akt
 
 
+def bonus_radar(strategia: Strategia, stan_rynku: Optional[object]) -> float:
+    """
+    Mnożnik score strategii na podstawie RadarRynku (Opcja A — radar-aware strategy switching).
+    Zwraca wartość w przedziale [0.6, 1.3].
+
+    Logika:
+      • PRZEPLYW wysoki (>0.65) → trend/scalp (TR/SC) dostają +10%; mean-rev (RV/RG) -10%
+      • PRZEPLYW niski  (<0.35) → RV/RG dostają +10%; TR/SC -10%
+      • STRES wysoki    (>0.85) → wszystkie -15% (market stress = mniej agresji)
+      • BTC_TREND silny (>0.4)  → TR/SC +5%  (bycze tło)
+    """
+    if stan_rynku is None:
+        return 1.0
+    mnoz = 1.0
+    styl = strategia.styl
+    przeplyw = getattr(stan_rynku, "przeplyw", None)
+    stres = getattr(stan_rynku, "stres_korelacji", None)
+    btc_trend = getattr(stan_rynku, "btc_trend", None)
+
+    if przeplyw is not None:
+        if przeplyw > 0.65 and styl in ("TR", "SC"):
+            mnoz *= 1.10
+        elif przeplyw > 0.65 and styl in ("RV", "RG"):
+            mnoz *= 0.90
+        elif przeplyw < 0.35 and styl in ("RV", "RG"):
+            mnoz *= 1.10
+        elif przeplyw < 0.35 and styl in ("TR", "SC"):
+            mnoz *= 0.90
+
+    # STRES: premiuje defensywne strategie (RV/RG/BK) zamiast globalnie karać
+    if stres is not None and stres > 0.85:
+        if styl in ("RV", "RG", "BK"):
+            mnoz *= 1.08   # obrona zyskuje przy turbulencji
+        elif styl in ("TR", "SC"):
+            mnoz *= 0.92   # trendy pod presją
+
+    if btc_trend is not None and btc_trend > 0.4 and styl in ("TR", "SC"):
+        mnoz *= 1.05
+
+    return round(max(0.6, min(1.3, mnoz)), 4)
+
+
 def dopasuj_strategie(strategia: Strategia, sygnaly: Dict[str, object],
-                      rezim: str = "NORMAL") -> DopasowanieStrategii:
+                      rezim: str = "NORMAL",
+                      stan_rynku: Optional[object] = None) -> DopasowanieStrategii:
     """
     Ocenia, jak strategia pasuje do bieżących sygnałów neuronów.
 
@@ -139,8 +182,13 @@ def dopasuj_strategie(strategia: Strategia, sygnaly: Dict[str, object],
         bonus_rezim = 1.15 if rezim == strategia.rezim_preferowany else 0.85
         powody.append(f"Reżim {rezim} vs preferowany {strategia.rezim_preferowany} → ×{bonus_rezim}")
 
+    # 4) Bonus RadarRynku — dynamiczne tło rynkowe
+    b_radar = bonus_radar(strategia, stan_rynku)
+    if b_radar != 1.0:
+        powody.append(f"Radar → ×{b_radar:.3f}")
+
     # Wynik łączny (0–1)
-    wynik = min(1.0, zgodnosc_wejsc * (0.5 + 0.5 * filtr_frakcja) * bonus_rezim)
+    wynik = min(1.0, zgodnosc_wejsc * (0.5 + 0.5 * filtr_frakcja) * bonus_rezim * b_radar)
 
     return DopasowanieStrategii(
         strategia=strategia, kierunek=kier, wynik=round(wynik, 4),
@@ -181,16 +229,19 @@ def _interwal_pasuje(strategia: Strategia, interwal: Optional[str]) -> bool:
 def dobierz_najlepsze(strategie: List[Strategia], sygnaly: Dict[str, object],
                       rezim: str = "NORMAL", top: int = 3,
                       min_wynik: float = 0.3,
-                      interwal: Optional[str] = None) -> List[DopasowanieStrategii]:
+                      interwal: Optional[str] = None,
+                      stan_rynku: Optional[object] = None) -> List[DopasowanieStrategii]:
     """
     Serce wizji: z całej bazy strategii wybiera TOP najlepiej pasujące
     do bieżących sygnałów neuronów. Pomija dopasowania poniżej min_wynik.
 
-    interwal: gdy podany, odfiltrowuje strategie nieprzeznaczone na ten timeframe
-              (Timeframe-Aware: scalp M5 nie konkuruje ze swingiem 1D). Prawo XV.
+    interwal:   gdy podany, odfiltrowuje strategie nieprzeznaczone na ten timeframe
+                (Timeframe-Aware: scalp M5 nie konkuruje ze swingiem 1D). Prawo XV.
+    stan_rynku: opcjonalny StanRynku z RadarRynku — dynamiczny bonus/kara per styl.
+                (Opcja A: radar-aware strategy switching)
     """
     kandydaci = [s for s in strategie if _interwal_pasuje(s, interwal)]
-    wyniki = [dopasuj_strategie(s, sygnaly, rezim) for s in kandydaci]
+    wyniki = [dopasuj_strategie(s, sygnaly, rezim, stan_rynku) for s in kandydaci]
     wyniki = [d for d in wyniki if d.wynik >= min_wynik and d.kierunek != "NEUTRAL"]
     wyniki.sort(key=lambda d: d.wynik, reverse=True)
     return wyniki[:top]

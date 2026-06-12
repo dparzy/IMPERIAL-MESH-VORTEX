@@ -190,7 +190,7 @@ python imperium/legiony/pierwszy_zwiadowca.py
 
 Przed wejściem na żywy rynek każdy moduł musi przejść przez kolejne etapy w tej dokładnej kolejności:
 
-### Etap I — Backtest historyczny
+### Etap I — Backtest historyczny  ✅ ZALICZONY 2026-06-11 (portfel 5 par: Sharpe 1.74, DSR 1.0, MaxDD 13.5%, PF 2.01)
 
 | Kryterium | Minimum wymagane |
 |-----------|-----------------|

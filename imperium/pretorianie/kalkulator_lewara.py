@@ -373,7 +373,10 @@ class KalkulatorLewara:
                breaker_krzywej: "BezpiecznikKrzywejKapitalu | None" = None,
                skalowanie_dd: "SkalowanieFrakcjaDD | None" = None,
                max_drag_roczny: "float | None" = None,
-               regula_6pct: "RegulaSzesciuProcentEldera | None" = None) -> PlanPozycji:
+               regula_6pct: "RegulaSzesciuProcentEldera | None" = None,
+               atr: "float | None" = None,
+               sl_atr_mult: "float | None" = None,
+               mnoznik_rozmiaru: float = 1.0) -> PlanPozycji:
 
         kierunek = kierunek.upper()
         assert kierunek in ("LONG", "SHORT"), "kierunek musi być LONG lub SHORT"
@@ -397,6 +400,18 @@ class KalkulatorLewara:
 
         # 3. Stop-loss (50% drogi do likwidacji)
         stop_loss = self._stop_loss(cena_wejscia, likwidacja, kierunek)
+        # ── W-288: SL z ATR (opt-in) — diagnoza 2026-06-10: SL z dźwigni (połowa
+        # drogi do likwidacji) przy lewarze 2× to −25% — na 1H nieosiągalny, stąd
+        # 198/201 zamknięć = TIMEOUT. SL=k×ATR domyka pozycje rytmem RYNKU.
+        # Bezpieczeństwo: SL ATR-owy może być tylko CIAŚNIEJSZY niż lewarowy
+        # (nigdy bliżej likwidacji niż połowa drogi — stary bufor zostaje).
+        if atr is not None and sl_atr_mult is not None and atr > 0 and sl_atr_mult > 0:
+            if kierunek == "LONG":
+                sl_atr = cena_wejscia - sl_atr_mult * atr
+                stop_loss = max(stop_loss, sl_atr)
+            else:
+                sl_atr = cena_wejscia + sl_atr_mult * atr
+                stop_loss = min(stop_loss, sl_atr)
 
         # 4. Bufor bezpieczeństwa
         odl_sl_od_lik = abs(likwidacja - stop_loss) / abs(cena_wejscia - likwidacja)
@@ -425,6 +440,16 @@ class KalkulatorLewara:
         # Brak skalowania_dd → frakcja 1.0 (kompatybilność wsteczna, zero zmian).
         frakcja_dd = skalowanie_dd.frakcja() if skalowanie_dd is not None else 1.0
         rozmiar_usdt *= frakcja_dd
+
+        # 5d2. CAP 50% kapitału — CLAMP zamiast weta (W-288, fix sprzężenia
+        # sizing↔SL): ciasny SL (np. 2×ATR na 1H) daje stop_pct ≈1% → risk-sizing
+        # żąda pozycji ≈200% kapitału → stary checklist WETOWAŁ niemal każde
+        # wejście (pomiar 2026-06-10: 201→2 trade'y). Przycięcie do 50% kapitału
+        # tylko ZMNIEJSZA ryzyko (ryzyko_usdt liczone z finalnego rozmiaru niżej).
+        # W-291 Praeda: mnożnik chciwości (auto z siły okazji) — PRZED clampem 50%,
+        # więc nigdy nie przebije twardego sufitu kapitału (klatka nienaruszona).
+        rozmiar_usdt *= max(0.0, mnoznik_rozmiaru)
+        rozmiar_usdt = min(rozmiar_usdt, kapital_usdt * 0.5)
 
         # 5e. Uczciwy raport ryzyka (Prawo I): ryzyko_usdt liczymy z FINALNEGO
         # rozmiaru po wszystkich skalowaniach. Vol-targeting może świadomie podnieść

@@ -47,10 +47,11 @@ def test_cykl_bez_wskaznikow_konczy_na_budowniczym():
 
 
 def test_cykl_neutralny_nie_wchodzi():
-    # Wskaźniki bez wyraźnej przewagi — rój neutralny
+    # Wskaźniki bez wyraźnej przewagi + PŁASKIE bary (krok=0) — zwiadowcy EXP
+    # liczą z barów, więc trendowe _bary() dawały LONG-zgodę pewność=1.0 i test
+    # przechodził tylko dzięki (usuniętemu w W-288) wetu rozmiaru. Teraz uczciwie:
     d = _dyrygent_z_providerem({"CLOSE": 100.0})
-    decyzja = d.cykl("BTCUSDT", _bary())
-    # Albo NEUTRAL, albo słaby — w każdym razie bez wejścia
+    decyzja = d.cykl("BTCUSDT", _bary(krok=0.0))
     assert decyzja.wszedl is False
     assert decyzja.etap in ("LEGATUS_NEUTRAL", "LEGATUS_SLABY", "PRETORIANIE_WETO")
 
@@ -177,14 +178,18 @@ def test_pelny_cykl_z_zarzadzaniem_pozycja():
 
 def test_min_pewnosc_interwalu_nadpisuje_globalny():
     """FAZA B: próg per interwał ostrzejszy niż globalny blokuje wejście."""
-    wsk = {"CLOSE": 130.0, "RSI_14": 22.0, "ADX_14": 30.0,
-           "MACD_HIST": 1.5, "EMA_50": 120.0, "EMA_200": 110.0}
+    # SPRZECZNE sygnały (RSI LONG vs MACD/EMA SHORT) → pewność ≈0.69 < 0.99.
+    # (Zgodny komplet dawał pewność 1.0 — wejście przy progu 0.99 byłoby SŁUSZNE.)
+    wsk = {"CLOSE": 100.0, "RSI_14": 22.0, "ADX_14": 30.0,
+           "MACD_HIST": -1.5, "EMA_50": 110.0, "EMA_200": 120.0}
     legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
     engine = PaperTradingEngine(kapital_startowy=10_000, sesja_id="T")
     d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
                  wskazniki_provider=lambda b: dict(wsk), min_pewnosc=0.1,
                  min_pewnosc_interwalu={"1H": 0.99})
-    bary = _bary()
+    # PŁASKIE bary: trendowe dawały EXP-om pewność 1.0 ≥ 0.99 → słuszne wejście;
+    # próg testujemy na realnie słabszym sygnale (W-288 odsłonił kruchość).
+    bary = _bary(krok=0.0)
     dec = d.cykl("BTCUSDT", bary)   # _bary() ma interwal=1H
     assert not dec.wszedl and dec.etap in ("LEGATUS_SLABY", "LEGATUS_NEUTRAL",
                                            "PRETORIANIE_WETO"), \
@@ -195,4 +200,5 @@ def test_min_pewnosc_interwalu_nadpisuje_globalny():
                   wskazniki_provider=lambda b: dict(wsk), min_pewnosc=0.1,
                   min_pewnosc_interwalu={"4H": 0.99})
     dec2 = d2.cykl("BTCUSDT", bary)
-    assert dec2.etap != "LEGATUS_SLABY" or dec2.pewnosc < 0.1
+    assert dec2.etap != "LEGATUS_SLABY" or dec2.pewnosc < 0.1, \
+        "bez wpisu 1H próg globalny 0.1 nie może blokować pewności ~0.69" 

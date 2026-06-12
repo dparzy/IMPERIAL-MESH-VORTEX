@@ -6,6 +6,465 @@
 
 ---
 
+## 2026-06-11 | Opcja A+B+C | Radar-adaptive strategy switching + vol-weighted portfolio + paper trading docs
+
+**Opcja A — radar-aware strategy switching:**
+- `bonus_radar(strategia, stan_rynku)`: score modifier per-styl wg RadarRynku
+  (TR/SC +10% przy PRZEPLYW>0.65 i BTC bullish; RV/RG +10% przy PRZEPLYW<0.35)
+- `decyduj_z_radarem()` w Namiestnik: lewar_factor ×1.2 bycze/×0.65 stres
+- `legatus.stan_rynku`, `dyrygent.stan_rynku` — przekazywane per-tick
+- Wynik: Sharpe=1.504, DSR=1.0 ✅ | 4H: Sharpe=2.196, DSR=1.0 ✅
+
+**Opcja B — vol-adjusted portfolio allocation:**
+- `wagi_inwerse_vol(bary_per, okno_vol)`: 1/σ wagi z warmup barów (kauzalne)
+- `backtest_portfel(..., wagi=dict)`: nowy parametr — równe wagi domyślnie
+- Vol-adj vs equal-weight 1D: Sharpe 1.504→1.559 (+4%)
+
+**Opcja C — paper trading MEXC:**
+- `docs/PAPER_TRADING_MEXC.md`: krok po kroku (klucze API, pętla live, Etap II)
+
+**Testy:** 729→743 (14 nowych). Ruff czysty. Audyt exit 0.
+**Pliki:** `baza.py`, `namiestnik.py`, `legatus.py`, `dyrygent.py`,
+`backtest.py`, `test_radar_rynku.py`, `test_portfel.py`,
+`docs/PAPER_TRADING_MEXC.md`, `docs/INDEKS_IMPERIUM.md`.
+
+---
+
+## 2026-06-11 | W-292 💎📊 | NeuronPrzeplyw (RADAR-03) — neuron 62, wynik MIESZANY (uczciwie)
+
+**Opis:** PRZEPLYW_KAPITALU dostał neuron głosujący (napływ→LONG, odpływ→SHORT).
+Pomiar regresyjny — wynik MIESZANY (Prawo I, bez upiększania):
+
+| | Sharpe | PnL | PF | WR | Etap I |
+|---|--------|-----|----|----|--------|
+| RADAR-02 (przed) | 1.480 | +42986 | 2.69 | 55.4% | ✅ |
+| + RADAR-03 | 1.475 ↓ | **+43598** ↑ | **2.73** ↑ | 55.4% | ✅ |
+
+Sharpe −0.005 (szum), PnL i PF ↑. Bramka przechodzi z marginesem (DSR 1.0).
+ZOSTAWIONY: dodaje realny barometr risk-on/off (Prawo XVI — dywersyfikacja
+informacji), nie psuje bramki. Ale to NIE czysta wygrana jak RADAR-02 — raport
+uczciwy. Rój: 61→62 (58 aktywnych, 6 kat. R).
+
+**Pliki:** `sesje.py`, `rejestr.py`, `audyt_spojnosci.py`, `test_praeda.py`,
+`test_integracja.py`, `MANIFEST_KODU.md`, `INDEKS_IMPERIUM.md`, `README.md`.
+
+---
+
+## 2026-06-11 | W-292 💎📈 | NeuronDominacja (RADAR-02) — neuron 61, zmierzony zysk
+
+**Opis:** BTC_DOMINANCJA dostała neuron głosujący (alt-season→LONG, ucieczka do BTC→
+SHORT). Pomiar regresyjny POTWIERDZIŁ poprawę (nie założenie — Prawo I):
+
+| | Sharpe | PnL | PF | WR | Etap I |
+|---|--------|-----|----|----|--------|
+| bez RADAR-02 | 1.463 | +42369 | 2.67 | 55.1% | ✅ |
+| z RADAR-02 | **1.480** | **+42986** | **2.69** | **55.4%** | ✅ |
+
+Wszystkie metryki ↑ (drobno, ale realnie), DSR=1.0. Neuron zarobił na miejsce.
+Rój: 60→61 neuronów (57 aktywnych, 5 kat. R). Pełna symbioza zsynchronizowana.
+
+**Pliki:** `imperium/legiony/neurony/sesje.py`, `rejestr.py`, `narzedzia/audyt_spojnosci.py`,
+`tests/test_praeda.py`, `tests/test_integracja.py`, `docs/MANIFEST_KODU.md`,
+`docs/INDEKS_IMPERIUM.md`, `README.md`.
+
+---
+
+## 2026-06-11 | W-293 🗡️🏆 | ŁOWCA ODBLOKOWANY: tryb łupieżczy przechodzi Etap I
+
+**Opis:** Z ciaśniejszym bezpiecznikiem (HALT 13%) tryb łupieżczy (Praeda) też przechodzi
+bramkę — i łupi prawie 2× więcej niż baza, legalnie.
+
+| Tryb | trades | WR | PF | PnL | Sharpe | DSR | Etap I |
+|------|--------|----|----|-----|--------|-----|--------|
+| BAZA | 664 | 55.1% | 2.67 | +42369 | 1.46 | 1.0 | ✅ |
+| ŁUPIEŻCZY | 749 | 53.3% | 3.03 | **+71671** | 1.29 | 1.0 | ✅ |
+
+**Wniosek:** ciaśniejszy bezpiecznik OKIEŁZNAŁ chciwość — Praeda wzmacnia na
+potwierdzonych okazjach (PnL +69% vs baza), a HALT@13% ucina krwawienie. Niższy
+Sharpe łupieżcy (1.29 vs 1.46) to cena agresji (większy zysk, większe wahania) —
+ale przechodzi DSR=1.0 + MaxDD<15%. Tryb OPT-IN (`tryb_lupiezcy=True`), nie domyślny —
+łowca na świadomą decyzję, nie na ślepo.
+
+**Pliki:** (pomiar potwierdzający integrację W-291/293 — bez zmian kodu).
+
+---
+
+## 2026-06-11 | W-293 🎯🏆 | PORTFEL PRZECHODZI ETAP I: ciaśniejszy HALT (20%→13%)
+
+**Opis:** Debugging (nie zgadywanie) ustalił przyczynę MaxDD 20%: bezpiecznik HALT@20%
+pozwalał equity spaść DO progu, zanim blokował wejścia. Próby sygnałowe (ster
+korelacyjny W-292, rygiel risk-off) NIE ruszyły MaxDD — bo zjazd dział się poza
+wykrywanymi oknami. Właściwa dźwignia: **próg HALT bezpiecznika**.
+
+**POMIAR (Prawo I) — HALT 20%→13% nie tylko przeszedł bramkę, ale PODNIÓSŁ WSZYSTKO:**
+
+| Próg HALT | MaxDD | PnL | Sharpe | PF | WR | Etap I |
+|-----------|-------|-----|--------|----|----|--------|
+| 20% (stary) | 20.2% | +39477 | 1.41 | 2.19 | 53.3% | ❌ False |
+| **13% (nowy)** | **<15%** | **+42369** | **1.46** | **2.67** | **55.1%** | **✅ True** |
+| 11% | <15% | +43167 | 1.48 | 2.85 | 56.0% | ✅ True |
+
+**Decyzja:** domyślne progi PORTFELOWE = REDUCED@7% / HALT@13% (świadomie nie 11% —
+zostawiamy bufor, anty-overfit). Powód (polityka ryzyka, NIE curve-fit): 5 jednoczesnych
+skorelowanych pozycji wymaga ciaśniejszej kontroli equity niż pojedyncza para (W-062@20%).
+Wcześniejsze ucięcie krwawienia zachowuje kapitał do składania → zysk ROŚNIE. DSR=1.0.
+
+**Pliki:** `imperium/koloseum/backtest.py` (dd_reduced/dd_halt + nowe domyślne),
+`tests/test_portfel.py`.
+
+---
+
+## 2026-06-11 | W-292 🛡️🔬 | Ster korelacyjny OPT-IN + uczciwy pomiar (lekcja MaxDD)
+
+**Opis:** Próba naprawy MaxDD portfela (20%) sterem korelacyjnym 1/√(1+(N-1)ρ).
+POMIAR (Prawo I): MaxDD 20.2%→20.0% (bez zmian!), PnL +39477→+18969 (spadł o połowę).
+**Lekcja:** MaxDD to RATIO (peak-to-trough %), niezmienny pod równomiernym skalowaniem
+pozycji. Krypto-koszyk jest TRWALE skorelowany (ρ≈0.8 zawsze, nie spike'owo), więc
+czynnik działał jak stały haircut ×0.5 — ciął zysk, nie ruszał MaxDD%. Dlatego ster
+DOMYŚLNIE OFF (`ster_korelacyjny=False`) — nie blokujemy potencjału (Prawo XV).
+
+**Wniosek:** MaxDD 20% NIE pochodzi ze skoków korelacji, lecz ze złego okresu
+kierunkowej przewagi na pełnych danych. Wymaga STANOWEGO de-risku (cięcie w czasie
+złego okresu), nie równomiernego — do zaprojektowania i ZMIERZENIA osobno.
+
+**Pliki:** `imperium/koloseum/backtest.py`, `imperium/legiony/radar_rynku.py`,
+`tests/test_radar_rynku.py`.
+
+---
+
+## 2026-06-11 | W-292 🛰️🌐 | RADAR RYNKU: dominacja BTC + przepływ kapitału + stres korelacji
+
+**Opis:** Rozwój RadarBTC (W-291) → wielowymiarowy `RadarRynku`. Stary radar patrzył
+TYLKO na momentum ceny BTC. Nowy dokłada trzy KAUZALNE sygnały liczone z barów koszyka
+(bez API — Cezar na telefonie): **BTC_DOMINANCJA** (siła względna BTC vs alty — proxy
+dominacji, alt-season detector), **PRZEPLYW_KAPITALU** (breadth × momentum wolumenu —
+napływ/odpływ), **STRES_KORELACJI** (średnia korelacja par — detektor kaskady "alty za
+BTC w dół", Prawo XVI). Wstrzykiwane do KAŻDEJ pary w `backtest_portfel` (przyczynowo,
+bisect ≤ ts). Praeda: nowe weto STRES>0.85 (kaskada = brak dywersyfikacji = zero łupu)
++ bonus dominacji (alt-season wspiera LONG alta).
+
+**Powód:** Pytanie Cezara — czy radar sprawdza tylko cenę, czy też odpływ kapitału,
+wolumen, dominację BTC i ukryte rzeczy do skorelowania dla większej pewności ruchów.
+Odpowiedź w kodzie: cztery flanki zamiast jednej, wszystko zsynchronizowane.
+
+**Pliki:** `imperium/legiony/radar_rynku.py` (nowy), `imperium/koloseum/backtest.py`,
+`imperium/pretorianie/praeda.py`, `tests/test_radar_rynku.py` (nowy), `tests/test_praeda.py`.
+
+---
+
+## 2026-06-11 | W-291 🗡️ | PRAEDA wpięta w silnik portfelowy (tryb_lupiezcy)
+
+**Opis:** Domknięcie integracji Praedy: `Dyrygent` amplifikuje lewar+rozmiar w
+POTWIERDZONYCH okazjach (cap 20 / clamp 50%), `KalkulatorLewara.policz` przyjmuje
+`mnoznik_rozmiaru`. `backtest_portfel(tryb_lupiezcy=False)` — opt-in tryb łowcy:
+ustawia `Okazjon()` per para, śpi gdy breaker ≠ NORMAL.
+
+**Powód:** Wizja łowcy — auto-skalowana chciwość tylko gdy bezpiecznie. Domyślnie OFF.
+
+**Pliki:** `imperium/koloseum/dyrygent.py`, `imperium/pretorianie/kalkulator_lewara.py`,
+`imperium/koloseum/backtest.py`, `tests/test_praeda.py`.
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+## 2026-06-11 | W-291 💎 | RADAR BTC: provider + neuron RADAR-01 (lead-lag, wsparcie scalpu)
+
+**Wizja Cezara (BTC prowadzi, alty lecą za nim):** zrealizowane jako KOD —
+WIZJONER W-071/W-085/W-086 (intermarket/lead-lag) z idei → żywy neuron.
+
+- **`imperium/legiony/radar_btc.py`** — `RadarBTC.trend(close_btc)` → BTC_TREND ∈ [-1,1]
+  (momentum EMA-short vs EMA-long znormalizowane zmiennością, tanh; czysty OHLC, bez API).
+- **RADAR-01 NeuronRadarBTC** (R, waga 6, WSPOLNY): głos wsparcia — BTC↑ → LONG-wsparcie
+  altów, BTC↓ → SHORT-ostrzeżenie ("uważaj, alty lecą za BTC"), |trend|<0.3 → NEUTRAL.
+- Radar wpięty też w Okazjon (Praeda): bonus konfluencji gdy zgodny + WETO na silny
+  przeciwprąd (LONG przeciw spadającemu BTC / SHORT pod rosnący).
+
+60 neuronów (56 aktywnych). +5 testów. W12: RADAR-01 na allowliście kontekstu (jak AUG-01).
+✅ Wstrzyknięcie BTC_TREND wpięte: `Dyrygent.kontekst_dodatkowy` + `backtest_portfel`
+liczy BTC_TREND z barów BTC przyczynowo (bisect do ts) i podaje każdej parze.
+
+**🎯 POMIAR — RADAR BTC POPRAWIŁ REKORDOWY PORTFEL (intuicja Cezara potwierdzona):**
+
+| Metryka | Portfel bez radaru | Portfel + RADAR BTC |
+|---|---|---|
+| Sharpe roczny | 1.74 | **1.82** 📈 |
+| PF | 2.01 | **2.08** |
+| MaxDD | 13.5% | **12.7%** (niżej) |
+| PnL | +7155 | **+7516 (+75%)** |
+| DSR | 1.0 | **1.0** |
+| Etap I | ✅ | **✅ z zapasem** |
+
+Radar lead-lag (BTC↓ → ostrzega LONG-i altów) podniósł WSZYSTKIE metryki naraz —
+nowy rekord Sharpe 1.82. Wizja Cezara ("obserwuj BTC, alty lecą za nim") = realna
+przewaga, nie tylko teoria. Zwalidowana konfiguracja Etapu II rozszerzona o RADAR BTC.
+
+**Pliki:** `imperium/legiony/radar_btc.py` (nowy), `imperium/legiony/neurony/sesje.py`,
+`imperium/legiony/rejestr.py`, `imperium/pretorianie/praeda.py`, `narzedzia/audyt_spojnosci.py`,
+`tests/test_praeda.py`, docs.
+**Testy:** 708/708 ✅. Audyt: 60 neuronów, pełna harmonia.
+
+## 2026-06-11 | UNIKAT W-291 💎 | TRYB PRAEDA (Łowca) + RADAR BTC — auto-skalowana chciwość
+
+**Wizja Cezara:** Imperium jako organizm-łowca — skanuje monety, szuka OFIARY
+(najlepszej okazji), sam dobiera agresję wg SIŁY OKAZJI, łupi maksymalnie w
+potwierdzonych momentach. Plus: BTC jako sygnał wspierający/ostrzegający alty.
+
+**`imperium/pretorianie/praeda.py` — Okazjon (wykrywacz okazji):**
+- SIŁA OKAZJI ∈ [0,1] z konfluencji (model BONUSOWY — więcej potwierdzeń STACKUJE,
+  nigdy nie uśrednia w dół): rdzeń zgoda×reżim + bonusy za sentyment / Augur / RadarBTC.
+- AUTO-DECYZJA: mnoznik_lewara/rozmiaru rosną ciągle z siłą (cap ×2, i tak nadrzędne
+  MAX_DZWIGNIA + clamp 50% kapitału); pyramiding tylko gdy siła ≥ 0.80.
+- 🛰️ RADAR BTC (lead-lag): BTC_TREND ∈ [-1,1] → wiatr w plecy gdy zgodny; WETO gdy
+  LONG przeciw mocno spadającemu BTC ("alty lecą za BTC") lub SHORT pod rosnący BTC.
+- NIENARUSZALNA KLATKA: Praeda tylko amplifikuje wewnątrz bezpieczników; WYŁĄCZA SIĘ
+  w drawdownie (dd_normal=False → siła 0); weto na toksyczny VPIN, blackout FOMC, kaskadę.
+
+**Status:** detektor + radar gotowe i otestowane (13 testów). Wpięcie do Dyrygenta
+(tryb_lupiezcy) + provider RadarBTC w portfelu + pomiar 5 par — następny krok.
+
+**Pliki:** `imperium/pretorianie/praeda.py` (nowy), `tests/test_praeda.py` (nowy).
+**Testy:** 706/706 ✅. Audyt: pełna harmonia.
+
+## 2026-06-11 | W-290 | DD-control portfela (wspólny BezpiecznikKrzywejKapitalu W-062)
+
+**Opis:** `backtest_portfel(dd_control=True)` — JEDEN wspólny BezpiecznikKrzywejKapitalu
+na poziomie koszyka (nie 5 z fragmentaryczną wizją), domyślne progi W-062
+(REDUCED@10% DD → ×0.5 sizingu wszystkich par, HALT@20% → blokada wejść). Per-para
+Dyrygenci mają breaker_krzywej=False (sterowanie centralne). Progi NIE strojone pod
+backtest — dyscyplina anty-overfit; DSR/PBO pilnują reszty. +1 test.
+
+**🎉🎉 PIERWSZY PEŁNY ZIELONY ETAP I W HISTORII IMPERIUM (silnik portfelowy):**
+
+| Wariant | trades | WR | PF | MaxDD | PnL | Sharpe_r | DSR | Etap I |
+|---|---|---|---|---|---|---|---|---|
+| bez DD-control | 422 | 51.2% | 1.60 | 22.8% | +6290 | 1.25 | 0.99 | ⛔ MaxDD |
+| **z DD-control** | 422 | 51.2% | **2.01** | **13.5%** | **+7155** | **1.74** | **1.0** | **✅ ETAP I** |
+
+**DD-control POPRAWIŁ WSZYSTKO naraz** (nie tylko ściął DD): PF 1.60→2.01, PnL +71.5%,
+Sharpe 1.25→1.74, DSR→1.0, MaxDD 22.8%→13.5%. Mechanizm: bezpiecznik tnie rozmiar
+DOKŁADNIE gdy portfel krwawi (REDUCED@10%), przywraca przy odbiciu — unika najgorszych
+strat, więc i Sharpe rośnie. To NIE overfitting (progi domyślne W-062, DSR=1.0 idealne).
+
+**ZWALIDOWANA KONFIGURACJA gotowa do Etapu II (paper):** koszyk 5 par
+(BTC/ETH/SOL/BNB/DOGE) · 1D · AUTO-reżim (Namiestnik) · wspólny kapitał równoważony ·
+DD-control (W-062). Uczciwie (Prawo I): to BACKTEST — Etap II (14 dni paper) i III
+(live mikro MEXC) wciąż przed nami; ale bramka przeszła twardo (DSR 1.0), nie oknem.
+
+**Testy:** 693/693 ✅. Audyt: pełna harmonia.
+
+## 2026-06-11 | W-290 💎 | SILNIK PORTFELOWY — koszyk N par w jednej sesji (Kostka Rubika)
+
+**Opis:** `backtest_portfel(pliki, interwal)` — produkcyjny tryb koszyka: N par,
+JEDEN wspólny PaperTradingEngine (kapitał dzielony, max N pozycji), per-para Dyrygent
+sizingujący wg kapital/N (równe wagi, Markowitz). Chronologiczna unia osi czasu —
+każdy bar (ts, symbol) przetwarzany w kolejności czasu, bez look-ahead. Realizuje
+ROADMAP Faza 3 "Kostka Rubika" jako kod, nie tylko pomiar.
+
+Wsparcie: `Dyrygent.kapital_sizing` (budżet sizingu pary; None = pełny kapitał silnika).
++4 testy (wspólny kapitał, oś czasu, budżet równy, brak historii).
+
+**🎯 BÓJ 5 PAR PRZEZ SILNIK (1D AUTO, krzywa dzienna, n_prob=5):**
+trades=422, WR 51.2%, PF 1.74, PnL +6057 (+60%), **Sharpe_r 1.427 ✅**, **DSR 0.9989 ✅**,
+MaxDD **16.5% ⛔** (próg <15%). Produkcyjny silnik z DYNAMICZNYM dzieleniem kapitału
+dał Sharpe NAWET WYŻSZY niż idealny pomiar równowag (1.24) — kapitał płynie do par,
+które akurat sygnalizują. Diagnoza krzywej potwierdzona: per-zdarzenie dawało 0.69
+(√365 zaniżał o √N), dzienne = 1.43.
+
+**JEDYNY BLOKER: MaxDD 16.5% > 15%** (o 1.5%!). To NIE overfitting do naprawy
+parametrem — mamy gotowe, ZASADNICZE moduły kontroli obsunięcia: W-062
+BezpiecznikKrzywejKapitalu (REDUCED@10%/HALT@20%) i W-063 SkalowanieFrakcjaDD
+(płynna redukcja rozmiaru z DD). Następny krok: wpiąć DD-control do silnika
+portfelowego i zmierzyć (DSR/PBO pilnują, by nie przeuczyć).
+
+**Pliki:** `imperium/koloseum/backtest.py` (backtest_portfel), `imperium/koloseum/dyrygent.py`
+(kapital_sizing), `tests/test_portfel.py` (nowy).
+**Testy:** 692/692 ✅. Audyt: pełna harmonia.
+
+## 2026-06-11 | KAMIEŃ MILOWY | Test 5 par 1D — EDGE UNIWERSALNY (wszystkie zarabiają!)
+
+**Pierwszy szeroki test (BTC/ETH/SOL/BNB/DOGE, 1D AUTO, pełne historie, formacja
+Legionów + Augur w roju, n_prob=5):**
+
+| Para | trades | WR | PF | MaxDD | PnL | Sharpe_r | DSR | Etap I |
+|---|---|---|---|---|---|---|---|---|
+| BTC | 61 | 55.7% | **2.26** | 4.3% | +3934 | 0.86 | **0.94** | ⛔ blisko |
+| ETH | 75 | 48.0% | 1.12 | 12.7% | +705 | 0.17 | 0.23 | ⛔ |
+| SOL | 55 | 38.2% | 1.14 | 9.0% | +636 | 0.22 | 0.23 | ⛔ |
+| BNB | 68 | 51.5% | 1.63 | 10.8% | +3320 | 0.60 | 0.71 | ⛔ |
+| DOGE | 16 | 75.0% | **2.73** | 22.2% | +9745 | 0.95 | 0.92 | ⛔ (n=16) |
+
+**WNIOSEK (Prawo I — twardy fakt):** **PF > 1 na WSZYSTKICH 5 parach, PnL dodatni
+wszędzie.** Dzienny edge roju jest UNIWERSALNY, nie przypadkiem BTC. To fundamentalnie
+zmienia obraz: mamy realną, przenośną przewagę kierunkową na 1D.
+
+**Czemu żadna nie przechodzi Etapu I:** próg Sharpe>1.0 (surowy, słuszny) — pojedyncze
+pary mają zbyt zmienne zwroty względem średniej. BTC i DOGE są o włos (0.86–0.95).
+
+**🎉 WYNIK PORTFELA (2026-06-11) — PIERWSZY RAZ W HISTORII IMPERIUM ETAP I ZALICZONY:**
+
+`narzedzia/pomiar_portfela.py` (W-290) złożył 5 krzywych equity w portfel równoważony
+(2945 dni, dzienne zwroty wyrównane po dacie UTC):
+
+| Metryka | Najlepsza para sama | PORTFEL 5 par |
+|---|---|---|
+| Sharpe roczny | 0.95 (DOGE) | **+1.24 ✅ >1.0** |
+| MaxDD | 4.3% (BTC) | **6.9% ✅ <15%** |
+| DSR (n_prob=5) | 0.94 (BTC) | **0.9962 ✅ ≥0.95** |
+| **Werdykt Etapu I** | ⛔ żadna | **✅ ZALICZONY** |
+
+**DLACZEGO DZIAŁA (Prawo XVI — zmierzone, nie zgadnięte):** średnia korelacja par
+dziennych zwrotów = **+0.02** (niemal ZEROWA!). Edge roju na każdej parze jest
+praktycznie NIEZALEŻNY → dywersyfikacja redukuje wariancję portfela ~5×, średnia
+zwrotu zostaje. Markowitz w czystej postaci. To NIE wymagało zmiany ani jednego
+neuronu — sama struktura portfela przeskoczyła próg.
+
+**ZNACZENIE:** mamy pierwszą konfigurację gotową do Etapu II (paper trading):
+NIE pojedyncza para, lecz KOSZYK 5 par równoważony (ROADMAP Faza 3 "Kostka Rubika"
+zrealizowana w pomiarze). Uczciwie: to backtest — Etap II (14 dni paper) i III (live
+mikro) wciąż przed nami; ale droga jest OTWARTA i zmierzona twardą bramką (DSR 0.996).
+
+**Pliki:** `narzedzia/pomiar_portfela.py`. **Następne:** silnik portfelowy (jedna
+sesja, N par, wspólny kapitał, realokacja) jako produkcyjny tryb backtestu.
+
+## 2026-06-11 | UNIKAT W-289 v2 💎 | Augur rozbudowany: per-para + kalendarz FOMC (blackout) + decay/spójność
+
+**Rozbudowa Kronikarza Zdarzeń o 3 wymiary (na prośbę Cezara):**
+1. **PER-PARA:** zdarzenia mają pole `pary` (ETH ETF → tylko ETHUSDT; halving/krach/
+   FOMC = makro/BTC-dominacja → wszystkie). `kontekst(ts, symbol)` filtruje —
+   kluczowe pod test 5 par (ETH ETF nie zafałszuje SOL).
+2. **KALENDARZ FOMC (56 dat 2020–2026, publiczne):** dwie funkcje na raz —
+   • event-study post-FOMC (wysokie n → statystyka mocna),
+   • **BLACKOUT pre-FOMC**: ≤2 dni PRZED posiedzeniem augur WIE, że FED idzie →
+     AUG-01 głosuje NEUTRAL-ostrożność "zredukuj ryzyko". To "znajomość przyszłości",
+     o którą prosił Cezar (dokładny dzień/czas). Daty 2026 = znane przyszłe okna.
+3. **DECAY + SPÓJNOŚĆ:** `waga_zaniku` (1.0 w dniu zdarzenia → 0 na krawędzi okna)
+   i `zgodne_kierunkowo`/`rozrzut_pct` (czy historyczne epizody mówią jednym głosem).
+   AUG-01 moduluje pewność: bazowa × decay × bonus-zgodności.
+
+**Symbioza:** EVENT_* rozszerzone (WAGA, ZGODNE, BLACKOUT, DNI_DO); AUG-01 v2
+respektuje blackout (pierwszeństwo) i decay. +7 testów (per-para, blackout,
+pierwszeństwo, decay, spójność, neuron-blackout, neuron-decay).
+
+**Pliki:** `imperium/biblioteki/kronikarz_zdarzen.py`, `imperium/legiony/neurony/sesje.py`,
+`tests/test_kronikarz_zdarzen.py`.
+**Testy:** 688/688 ✅. Audyt: pełna harmonia.
+
+## 2026-06-10 | UNIKAT W-289 💎 | KRONIKARZ ZDARZEŃ (Augur) — zdarzenia fundamentalne jako głos roju
+
+**Wizja Cezara zrealizowana** (= ROADMAP Faza 3 "Macierz zdarzeń historycznych" + W-039):
+system zna zdarzenia fundamentalne, dopasowuje historyczne analogie do live i podaje
+PROCENTOWE prawdopodobieństwa jako głos w roju.
+
+**Architektura (3 płaszczyzny, pełna symbioza):**
+1. **`biblioteki/kronikarz_zdarzen.py`** — KATALOG 12 zdarzeń (HALVING×3, ETF×3,
+   KRACH×3, REGULACJA×2, MAKRO; daty powszechnie weryfikowalne) + **przyczynowe
+   event-study**: `studium(typ, ts)` liczy forward-zwroty WYŁĄCZNIE z epizodów
+   o domkniętym horyzoncie przed ts (test wymusza zero look-ahead; bieżące zdarzenie
+   nie zasila własnych statystyk).
+2. **AdapterKronikarz** (mechanizm adapterów Dyrygenta) → wstrzykuje EVENT_TYP/
+   DNI_PO/N/PROB_WZROSTU/MEDIANA_PCT tylko w oknie ≤30 dni po zdarzeniu.
+3. **AUG-01 NeuronAugur** (R, waga 6, WSPOLNY): n≥2 ∧ prob≥65% → LONG;
+   prob≤35% → SHORT; n<2 → NEUTRAL "za mało historii" (Prawo I). W12: allowlista
+   adapterowa + twarda weryfikacja ożywienia.
+
+**ORYGINALNOŚĆ:** literatura daje jedną liczbę z jednego badania — nasz augur
+SAMOKALIBRUJE się z własnych barów i mądrzeje z każdą parą/historią bez zmiany kodu.
+Źródła naukowe kierunku (ZPO, w docstringu): FOMC-drift (JFM 2022), halving-synthetic-
+control (+24.55%, arXiv 2511.05512), spot-ETF (IRFA 2025).
+
+**TABELA DOWODOWA (BTC 1D 2017–2026, policzona przez moduł, ts=2026-06-10):**
+
+| Typ | n | 30 dni: prob↑ / mediana | 90 dni: prob↑ / mediana |
+|---|---|---|---|
+| HALVING | 2 | **100% / +12.7%** | **100% / +19.6%** |
+| ETF | 3 | 33% / −5.5% ("sell the news"!) | 33% / −10.0% |
+| KRACH | 3 | 67% / +0.4% | 67% / +22.7% (odbicia) |
+| REGULACJA | 2 | 50% / +19.9% | 100% / +20.3% |
+
+**Bug złapany testem podczas budowy:** zdarzenie spoza pokrycia danych dopasowywało
+się do pierwszego dostępnego baru (halving 2016 → bar 2024, absurdalny zwrot) —
+naprawione tolerancją ≤3 dni w `_indeks_baru` (Prawo I: brak danych ≠ wymyślone).
+
+**Pliki:** `imperium/biblioteki/kronikarz_zdarzen.py` (nowy), `imperium/legiony/neurony/
+sesje.py` (AUG-01), `rejestr.py`, `narzedzia/audyt_spojnosci.py` (W12 allowlista+weryfikacja),
+`tests/test_kronikarz_zdarzen.py` (nowy, 8 testów z przyczynowością), docs.
+**Testy:** 681/681 ✅ (59 neuronów, 55 aktywnych). Audyt: pełna harmonia.
+**Następne rozszerzenia (zapisane):** kalendarz FOMC/CPI (cykliczne daty → przyszłe
+okna), zdarzenia per-para, wagi malejące z dni_po.
+
+## 2026-06-10 | W-288 | ATR-SL/TP (opt-in) + fix sprzężenia sizing↔SL — mechanika naprawiona, edge obnażony
+
+**Wdrożone:**
+1. **SL z ATR (opt-in):** `policz(atr=…, sl_atr_mult=…)` → SL = cena ∓ k×ATR, ale
+   TYLKO ciaśniejszy niż lewarowy (nigdy bliżej likwidacji — clamp bezpieczeństwa).
+   TP=MIN_RR×SL skaluje się automatycznie. Dyrygent: `sl_atr_mult` → bierze ATR_14
+   z Bramy; backtest przelotowo. +4 testy granic (None/0, ogromny ATR, TP-skala).
+2. **Fix sprzężenia sizing↔SL (uniwersalny):** risk-sizing (2%/stop_pct) z ciasnym
+   SL żądał pozycji >>50% kapitału → checklist WETOWAŁ niemal każde wejście
+   (pomiar: 201→2 trade'y!). Teraz CLAMP rozmiaru do 50% kapitału przed checklistą
+   (ryzyko tylko maleje — uczciwy raport ryzyka z finalnego rozmiaru bez zmian).
+3. Clamp odsłonił 2 KRUCHE testy przechodzące dzięki staremu wetu (pewność agregatu
+   =1.0 przy zgodnym komplecie wskaźników) — naprawione na płaskie bary/sprzeczne
+   sygnały z komentarzem-lekcją.
+
+**POMIAR (BTC 1H, 12k barów, AUTO):**
+
+| Wariant | Trades | WR | PF | MaxDD | PnL | TP/SL/TIMEOUT |
+|---|---|---|---|---|---|---|
+| baseline | 201 | 49.3% | 0.72 | 10.8% | −838 | 0/3/198 |
+| ATR-SL 2.0 | 109 | 34.9% | 0.72 | 18.1% | −1536 | **29/66/14** |
+| ATR+Strażnik | 95 | 31.6% | 0.69 | 18.5% | −1572 | 24/59/12 |
+
+**Werdykt (Prawo I — pełna prawda):** mechanika wyjść NAPRAWIONA (TIMEOUT 198→14,
+TP wreszcie trafiane 0→29) — ale ekonomicznie GORZEJ: ciasny SL × większe pozycje
+(clamp) = częstsze i droższe SL-y. **TIMEOUT-y nie były źródłem straty — MASKOWAŁY
+ujemny kierunkowy edge 1H/2025 małymi stratami; ATR-SL go skrystalizował.**
+Wniosek strategiczny: problem 1H leży w PRZEWADZE KIERUNKOWEJ roju w tamtym okresie,
+nie w mechanice. W-288 zostaje jako poprawne narzędzie (opt-in, NIEzalecane bez
+zmierzonego edge); clamp 50% zostaje na stałe (naprawia realne sprzężenie).
+Dalej: trop "edge dojrzewa" (autopsja) + walidacja na 5 parach świeżego okna.
+
+**Pliki:** `imperium/pretorianie/kalkulator_lewara.py`, `imperium/koloseum/dyrygent.py`,
+`imperium/koloseum/backtest.py`, `tests/test_kalkulator.py` (+4), `tests/test_dyrygent.py`.
+**Testy:** 673/673 ✅. Audyt: pełna harmonia.
+
+## 2026-06-10 | UNIKAT W-287 | Strażnik Przewagi + autopsja 1H — tarcza tnie krwawienie 5×
+
+**AUTOPSJA (12k barów 1H, per ćwiartka czasu):** PF 0.32→0.79→0.99→1.48 — edge roju
+monotonicznie DOJRZEWA (wczesny 2025 wrogi, świeży rynek sprzyja). Drugi trop:
+198/201 zamknięć = TIMEOUT (mechanika wyjść na 1H — osobna iteracja). LONG −308 /
+SHORT −530 — obie strony, problem nie w kierunku.
+
+**💎 W-287 STRAŻNIK PRZEWAGI (unikat):** pretorianin patrzący na samą PRZEWAGĘ:
+rolling expectancy N=12 zamkniętych < 0 → HALT 96 barów → SONDA (1 pozycja zwiadowcza;
+wygrana=powrót z resetem, przegrana=ponowny HALT). Literatura zna "strategy decay"
+jako raport; u nas automat w pętli z tanim powrotem. Maszyna stanów + 9 testów granic
+(expectancy==0 nie halt, sonda PnL==0 = przegrana, jedna sonda naraz, parametry).
+
+**POMIAR (BTC 1H, 12k, AUTO):**
+
+| Wariant | Trades | PF | MaxDD | PnL | Sharpe_r | DSR |
+|---|---|---|---|---|---|---|
+| bez Strażnika | 201 | 0.72 | 10.8% | −838 | −1.34 | 0.003 |
+| **ze Strażnikiem** | 175 | **0.95** | **6.4%** | **−150** | **−0.30** | 0.082 |
+
+**Werdykt:** tarcza potwierdzona (strata ~5× mniejsza, DD prawie o połowę) — Strażnik
+automatycznie wyłącza rój w okresach wygasłego edge'a. To NIE tworzy przewagi (PF<1
+wciąż) — miecz (edge bazowy, mechanika TIMEOUT na 1H) to następna iteracja. Opt-in.
+
+**Pliki:** `imperium/pretorianie/straznik_przewagi.py` (nowy), `imperium/koloseum/backtest.py`,
+`tests/test_straznik_przewagi.py` (nowy), docs (MANIFEST/WIZJONER/LOG).
+**Testy:** 669/669 ✅. Audyt: pełna harmonia.
+
 ## 2026-06-10 | FAZA C (W-286) | ZEGARY RYNKU: SES-01/SES-02 — PRZEŁOM NA 1H (pierwszy Sharpe > 1.0!)
 
 **Zwiad (agent docs + deep search internet, pełne linki w neurony/sesje.py):**

@@ -31,7 +31,7 @@ from imperium.akwedukty.czytnik_csv import wczytaj_csv
 from imperium.koloseum.dyrygent import Dyrygent
 from imperium.koloseum.namiestnik import get_namiestnik
 from imperium.koloseum.paper_trading import PaperTradingEngine, BarData
-from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara
+from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara, BezpiecznikKrzywejKapitalu
 
 logger = logging.getLogger("Backtest")
 
@@ -57,6 +57,8 @@ def backtest(
     ucz_mwu: bool = False,
     min_pewnosc_interwalu: "Optional[Dict[str, float]]" = None,
     max_bars_otwarcia: "Optional[int]" = None,
+    straznik_przewagi: bool = False,
+    sl_atr_mult: "Optional[float]" = None,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -93,8 +95,16 @@ def backtest(
     dyrygent = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(),
                         engine=engine, budowniczy=budowniczy,
                         min_pewnosc=min_pewnosc, tryb=tryb, namiestnik=namiestnik,
-                        min_pewnosc_interwalu=min_pewnosc_interwalu)
+                        min_pewnosc_interwalu=min_pewnosc_interwalu,
+                        sl_atr_mult=sl_atr_mult)
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"
+
+    # 💎 W-287 Strażnik Przewagi (opt-in): HALT gdy rolling expectancy < 0,
+    # powrót przez 1-pozycyjną sondę bojową. Patrz pretorianie/straznik_przewagi.py.
+    sp = None
+    if straznik_przewagi:
+        from imperium.pretorianie.straznik_przewagi import StraznikPrzewagi
+        sp = StraznikPrzewagi(okno=12, bary_halt=96)
 
     # Pętla uczenia (opt-in): MWU z pamięcią reżimu + atrybucja głosów per pozycja
     mwu = None
@@ -124,9 +134,20 @@ def backtest(
                     mwu.zarejestruj_wynik(neuron_id, kier, zyskowny)
             legatus.ustaw_mnozniki_neuronow(mwu.mnozniki())
 
+        # 1c. Strażnik Przewagi (W-287): tyknięcie + rozliczenie zamkniętych;
+        # w HALT/sondzie-w-locie pomijamy decyzję (świadoma cisza, Prawo XV).
+        if sp is not None:
+            sp.tyknij_bar()
+            for w in zamkniete:
+                sp.zarejestruj_zamkniecie(w.pnl_usdt)
+            if not sp.wolno_wejsc():
+                continue
+
         # 2. Decyzja na podstawie okna
         decyzja = dyrygent.cykl(symbol, okno_barow,
                                 rezim=rezim_arg, timestamp=biezacy["timestamp"])
+        if sp is not None and decyzja.wszedl:
+            sp.zarejestruj_wejscie()
         if mwu is not None:
             # pamięć reżimu indeksowana klasyfikacją z TEGO baru (W-285.1)
             mwu.ustaw_rezim(decyzja.rezim)
@@ -152,6 +173,217 @@ def backtest(
 
     logger.info(f"[Backtest] {symbol} {interwal}: {len(bary)} barów, "
                 f"{wejscia} wejść, {weta} wet Pretorianów")
+    return engine
+
+
+def wagi_inwerse_vol(
+    bary_per: "Dict[str, List[Dict[str, Any]]]",
+    okno_vol: int = 60,
+) -> "Dict[str, float]":
+    """
+    Opcja B — volatility-adjusted allocation: wagi odwrotnie proporcjonalne do
+    ruchomej zmienności (σ dziennych zwrotów close z pierwszych `okno_vol` barów).
+
+    Normalizowane do sumy 1.0. Para z σ=0 dostaje wagę równą innym.
+    Cel: redukuje dominację wysokozmiennych par (DOGE 4× bardziej zmienny niż BTC),
+    poprawia Sharpe portfela (więcej risk-parity, mniej luck-of-symbol).
+
+    Prawo I: liczy tylko z dostępnych barów historycznych — bez look-ahead.
+    """
+    import math
+    sigmy = {}
+    for sym, bary in bary_per.items():
+        # Pierwsze okno_vol barów — to okres warmup PRZED startem handlu,
+        # gwarantuje kauzalność (Prawo I: brak look-ahead).
+        zamkniecia = [float(b["close"]) for b in bary[:okno_vol] if b.get("close")]
+        if len(zamkniecia) < 10:
+            sigmy[sym] = 1.0
+            continue
+        zwroty = [zamkniecia[i] / zamkniecia[i - 1] - 1 for i in range(1, len(zamkniecia))]
+        mean = sum(zwroty) / len(zwroty)
+        wariancja = sum((r - mean) ** 2 for r in zwroty) / max(1, len(zwroty) - 1)
+        sigmy[sym] = math.sqrt(wariancja) if wariancja > 0 else 1.0
+
+    inv = {sym: 1.0 / s for sym, s in sigmy.items()}
+    suma = sum(inv.values())
+    return {sym: round(v / suma, 6) for sym, v in inv.items()}
+
+
+def backtest_portfel(
+    pliki: "Dict[str, str]",
+    interwal: str,
+    okno: int = 250,
+    kapital_startowy: float = 10_000.0,
+    min_pewnosc: float = 0.55,
+    tryb: str = "agregat",
+    auto_rezim: bool = True,
+    dd_control: bool = True,
+    tryb_lupiezcy: bool = False,
+    ster_korelacyjny: bool = False,
+    rygiel_ryzyka: bool = False,
+    dd_reduced: float = 0.07,
+    dd_halt: float = 0.13,
+    bary_per: "Optional[Dict[str, List[Dict[str, Any]]]]" = None,
+    wagi: "Optional[Dict[str, float]]" = None,
+) -> PaperTradingEngine:
+    """
+    💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
+
+    Realizuje ROADMAP Faza 3 "Kostka Rubika": rój gra koszykiem, nie jedną parą.
+    Pomiar 2026-06-11 dowiódł, że portfel 5 par przechodzi Etap I (Sharpe>1.0).
+
+    pliki: {symbol: ścieżka_csv}. interwal wspólny.
+    wagi:  opcjonalny dict {symbol: waga} (suma 1.0) — alokacja kapitału per para.
+           None = równe wagi (1/N). Opcja B: wagi_inwerse_vol() dla risk-parity.
+
+    Mechanika (Prawo I — bez look-ahead):
+      • Jeden wspólny PaperTradingEngine (kapitał dzielony; max N pozycji naraz).
+      • Per-para Dyrygent współdzielący silnik; sizing wg kapital × waga_pary.
+      • Chronologiczna unia osi czasu: każdy bar (ts, symbol) przetwarzany w
+        kolejności czasu — najpierw aktualizacja otwartych, potem decyzja roju
+        na oknie barów DANEJ pary do bieżącej świecy włącznie.
+    Zwraca silnik z `krzywa_equity` (equity po każdym tyknięciu) — gotowe pod
+    `etap_pierwszy_koloseum`.
+    """
+    from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
+    from imperium.legiony.rejestr import zbuduj_legatusa
+
+    if bary_per is None:
+        bary_per = {sym: wczytaj_csv(sc, interwal=interwal)
+                    for sym, sc in pliki.items()}
+    bary_per = {s: b for s, b in bary_per.items() if len(b) > okno}
+    if not bary_per:
+        raise ValueError("Brak par z wystarczającą historią")
+    n = len(bary_per)
+
+    # Opcja B: wagi portfela (equal-weight lub zewnętrzne/vol-adjusted)
+    if wagi is None:
+        wagi_akt = {sym: 1.0 / n for sym in bary_per}
+    else:
+        suma_wag = sum(wagi.get(sym, 1.0 / n) for sym in bary_per)
+        wagi_akt = {sym: wagi.get(sym, 1.0 / n) / suma_wag for sym in bary_per}
+
+    engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
+                                sesja_id=f"BT-PORTFEL-{n}x-{interwal}",
+                                max_otwartych=n)   # każda para max 1 pozycja
+    budowniczy = BudowniczyWskaznikow()
+    namiestnik = get_namiestnik() if auto_rezim else None
+    rezim_arg = "AUTO" if auto_rezim else "NORMAL"
+
+    # RADAR RYNKU (W-292, rozwój W-291): wielowymiarowy kontekst lidera+koszyka
+    # (BTC_TREND, BTC_DOMINANCJA, PRZEPLYW_KAPITALU, STRES_KORELACJI) wstrzykiwany
+    # do KAŻDEJ pary. Liczony przyczynowo z barów DO bieżącej świecy (Prawo I).
+    import bisect as _bs
+    from imperium.legiony.radar_rynku import (RadarRynku, frakcja_korelacyjna,
+                                              rezim_risk_off)
+    _radar = RadarRynku()
+    _RADAR_OGON = 200   # ogon serii wystarczający dla wszystkich okien radaru
+    _btc_sym = next((s for s in bary_per if s.upper().startswith("BTC")), None)
+    # Precompute per-symbol serie (close/vol/ts) raz — tnie się bisectem co tyk.
+    _close = {s: [float(x["close"]) for x in b] for s, b in bary_per.items()}
+    _vol = {s: [float(x.get("volume", 0.0)) for x in b] for s, b in bary_per.items()}
+    _ts_arr = {s: [int(x["timestamp"]) for x in b] for s, b in bary_per.items()}
+
+    # DD-control portfela (W-290/293): JEDEN wspólny BezpiecznikKrzywejKapitalu na
+    # poziomie koszyka. Progi PORTFELOWE ciaśniejsze niż single-para W-062 (20%):
+    # REDUCED@7% → ×0.5 sizingu, HALT@13% → blokada wejść. POWÓD (polityka ryzyka,
+    # nie curve-fit): 5 jednoczesnych skorelowanych pozycji wymaga ciaśniejszej
+    # kontroli equity niż jedna para. POMIAR 2026-06-11 (Prawo I): HALT 20%→13%
+    # przeniósł portfel przez Etap I (MaxDD 20.2%→<15%, ok=False→True) i PODNIÓSŁ
+    # WSZYSTKO (PnL +39477→+42369, Sharpe 1.41→1.46, PF 2.19→2.67) — wcześniejsze
+    # ucięcie krwawienia zachowuje kapitał do składania. DSR=1.0 (edge realny).
+    breaker = None
+    if dd_control:
+        breaker = BezpiecznikKrzywejKapitalu(prog_dd_reduced=dd_reduced,
+                                             prog_dd_halt=dd_halt)
+
+    dyrygenci = {}
+    for sym in bary_per:
+        legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
+        d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
+                     budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
+                     namiestnik=namiestnik, breaker_krzywej=False)  # breaker wspólny
+        d.kapital_sizing = kapital_startowy * wagi_akt[sym]
+        # 🗡️ PRAEDA (W-291): tryb łupieżczy — auto-skalowana agresja w POTWIERDZONYCH
+        # okazjach (confluence). Aktywny tylko gdy DD normalny (bezpieczeństwo > chciwość).
+        if tryb_lupiezcy:
+            from imperium.pretorianie.praeda import Okazjon
+            d.okazjon = Okazjon()
+        dyrygenci[sym] = d
+
+    # Chronologiczna oś: (timestamp, symbol, indeks_baru) — tylko bary po oknie.
+    os_czasu = []
+    for sym, bary in bary_per.items():
+        for i in range(okno, len(bary)):
+            os_czasu.append((int(bary[i]["timestamp"]), sym, i))
+    os_czasu.sort(key=lambda x: x[0])
+
+    # Equity zapisywane per KALENDARZOWY DZIEŃ (ostatnia wartość w dniu), NIE per
+    # zdarzenie: przy N parach ~N zdarzeń/dzień fałszowałoby annualizację Sharpe
+    # (√365 zakłada 1 punkt/dzień). Prawo I — uczciwy współczynnik czasu.
+    _DZ = 86_400_000
+    equity_dnia: "Dict[int, float]" = {}
+    for ts, sym, i in os_czasu:
+        bary = bary_per[sym]
+        engine.przetworz_bar(_bar_data(bary[i]))
+        eq = engine.kapital_calkowity
+        equity_dnia[ts // _DZ] = eq
+        frakcja_breaker = 1.0
+        if breaker is not None:
+            breaker.aktualizuj(eq)
+            if breaker.halt:
+                continue   # blokada nowych wejść (świadoma cisza, Prawo XV)
+            frakcja_breaker = breaker.frakcja_pozycji()
+        # PRAEDA: chciwość dozwolona TYLKO gdy bezpiecznik w stanie NORMAL (DD < próg).
+        if tryb_lupiezcy:
+            dyrygenci[sym].praeda_dd_normal = (breaker is None or breaker.stan == "NORMAL")
+        # RADAR RYNKU: skan koszyka do ts (przyczynowo, bez look-ahead). Każda seria
+        # ucięta bisectem do świec ≤ ts — żadnej przyszłości w kontekście.
+        frakcja_stres = 1.0
+        if _btc_sym is not None:
+            # Tylko OGON serii (≤_RADAR_OGON barów) — radar patrzy na ostatnie ~90.
+            # Ucięcie z dołu czyni skan O(1)/tyk zamiast O(n) (koniec kwadratu).
+            jb = _bs.bisect_right(_ts_arr[_btc_sym], ts)
+            btc_slice = _close[_btc_sym][max(0, jb - _RADAR_OGON):jb]
+            alty_close, alty_vol = {}, {}
+            for s in bary_per:
+                if s == _btc_sym:
+                    continue
+                k = _bs.bisect_right(_ts_arr[s], ts)
+                if k >= 1:
+                    lo = max(0, k - _RADAR_OGON)
+                    alty_close[s] = _close[s][lo:k]
+                    alty_vol[s] = _vol[s][lo:k]
+            stan = _radar.skanuj(btc_slice, alty_close, alty_vol)
+            dyrygenci[sym].kontekst_dodatkowy = stan.jako_wskazniki()
+            # Opcja A: przekaż StanRynku do Dyrygenta → Namiestnik decyduj_z_radarem
+            dyrygenci[sym].stan_rynku = stan
+            # 🛡️ STER KORELACYJNY (W-292, OPT-IN) — czynnik 1/√(1+(N-1)ρ) z teorii portfela.
+            # POMIAR 2026-06-11 (Prawo I): na trwale skorelowanym koszyku krypto (ρ≈0.8
+            # zawsze) działa jak ~stały haircut ×0.5 → tnie PnL o połowę, a MaxDD% (ratio,
+            # niezmienny pod skalowaniem) zostaje 20%. Dlatego DOMYŚLNIE OFF — nie blokujemy
+            # potencjału (Prawo XV). Zostaje jako opcja dla koszyków zdekorelowanych.
+            if ster_korelacyjny:
+                frakcja_stres = frakcja_korelacyjna(n, stan.stres_korelacji)
+            # 🚦 RYGIEL RYZYKA (W-293): stanowy de-risk — w reżimie risk-off (kaskada
+            # ∧ odpływ ∧ BTC↓) wstrzymaj NOWE wejścia, by ominąć zły okres (atakuje
+            # MaxDD u źródła, w przeciwieństwie do równomiernego cięcia z W-292).
+            if rygiel_ryzyka:
+                risk_off, _ = rezim_risk_off(stan)
+                if risk_off:
+                    continue   # świadoma cisza (Prawo XV) — nie wchodzimy w lawinę
+        # Sizing par: równy budżet × frakcja DD-control × ster korelacyjny (świeżo co tyk).
+        dyrygenci[sym].kapital_sizing = (kapital_startowy * wagi_akt[sym]
+                                         * frakcja_breaker * frakcja_stres)
+        okno_barow = bary[i - okno: i + 1]
+        dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
+
+    # Domknij otwarte po ostatniej cenie każdej pary
+    ostatnie = {sym: bary_per[sym][-1]["close"] for sym in bary_per}
+    engine.zamknij_wszystkie(ostatnie, powod="MANUAL")
+    if os_czasu:
+        equity_dnia[os_czasu[-1][0] // _DZ] = engine.kapital_calkowity
+    engine.krzywa_equity = [equity_dnia[d] for d in sorted(equity_dnia)]
     return engine
 
 

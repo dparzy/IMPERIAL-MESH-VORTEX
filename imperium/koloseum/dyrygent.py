@@ -91,6 +91,7 @@ class Dyrygent:
         breaker_krzywej: bool = True,
         regula_6pct: bool = False,
         min_pewnosc_interwalu: Optional[Dict[str, float]] = None,
+        sl_atr_mult: Optional[float] = None,
     ) -> None:
         self.legatus = legatus
         self.kalkulator = kalkulator
@@ -101,6 +102,20 @@ class Dyrygent:
         # FAZA B (W-286): progi pewności per interwał (np. {"4H": 0.65}) —
         # nadpisują min_pewnosc dla danego interwału; brak wpisu → próg globalny.
         self.min_pewnosc_interwalu: Dict[str, float] = min_pewnosc_interwalu or {}
+        # W-288: SL = sl_atr_mult × ATR_14 (opt-in; None = stary SL z dźwigni).
+        self.sl_atr_mult = sl_atr_mult
+        # W-291: kontekst zewnętrzny dolewany do wskaźników (RADAR BTC: BTC_TREND).
+        self.kontekst_dodatkowy: Dict[str, Any] = {}
+        # W-291 Praeda (tryb łowcy): Okazjon steruje agresją w potwierdzonych
+        # momentach. None = wyłączony. praeda_dd_normal ustawia portfel/breaker.
+        self.okazjon = None
+        self.praeda_dd_normal: bool = True
+        # W-290 portfel: budżet sizingu pary (None = pełny wolny kapitał silnika).
+        # W koszyku N par każdy Dyrygent sizinguje wg kapital/N (równe wagi).
+        self.kapital_sizing: Optional[float] = None
+        # Opcja A: StanRynku z RadarRynku — przekazywany do Namiestnika i Klucznika
+        # (radar-aware gating + strategy selection). None = tryb bez radaru.
+        self.stan_rynku: Optional[Any] = None
         # Adaptery danych (Faza B) — dolewają do wskaźników dane spoza OHLCV
         # (funding, OI, long/short, sentyment) po Budowniczym. Pusta lista = tryb
         # czysty OHLCV (np. backtest z CSV — neurony R abstynują, Prawo XV).
@@ -165,6 +180,10 @@ class Dyrygent:
         if not wskazniki:
             return DecyzjaCyklu(symbol, "BUDOWNICZY", False,
                                 powod="brak wskaźników (puste bary lub błąd Bramy)")
+        # Kontekst zewnętrzny (W-291): RADAR BTC i in. wstrzykiwane z poziomu
+        # silnika portfelowego (BTC_TREND lidera) — dolewane do wskaźników.
+        if self.kontekst_dodatkowy:
+            wskazniki.update(self.kontekst_dodatkowy)
 
         # 1b. Auto-klasyfikacja reżimu (Prawo XV — ożywia system reżimowy).
         # rezim="AUTO" → klasyfikator z gotowych wskaźników (nie zgadywanie, dane Bramy).
@@ -183,7 +202,7 @@ class Dyrygent:
         lewar_factor = 1.0
         decyzja_nam = None
         if self.namiestnik is not None:
-            decyzja_nam = self.namiestnik.decyduj(rezim, interwal)
+            decyzja_nam = self.namiestnik.decyduj_z_radarem(rezim, interwal, self.stan_rynku)
             if not decyzja_nam.czy_grac:
                 return DecyzjaCyklu(symbol, "NAMIESTNIK_CISZA", False,
                                     rezim=rezim, powod=f"Namiestnik: {decyzja_nam.opis}")
@@ -193,7 +212,8 @@ class Dyrygent:
             prog_aktywny = max(decyzja_nam.prog_pewnosci, prog_aktywny)
             lewar_factor = decyzja_nam.lewar_factor
 
-        # 3. Legatus — agregacja roju
+        # 3. Legatus — agregacja roju (Opcja A: przekaż StanRynku → radar scoring strategii)
+        self.legatus.stan_rynku = self.stan_rynku
         raport = self.legatus.fokus(symbol, wskazniki, rezim=rezim, bary=bary)
 
         if raport.weto:
@@ -276,16 +296,30 @@ class Dyrygent:
             self.regula_6pct.aktualizuj(self.engine.kapital_calkowity,
                                         dzisiaj=dzien_swiecy)
 
+        # 4b. 🗡️ PRAEDA (W-291): auto-skalowana agresja w POTWIERDZONYCH okazjach.
+        #     Tylko AMPLIFIKUJE w klatce: lewar cap 20, rozmiar clamp 50% kapitału;
+        #     śpi w drawdownie (praeda_dd_normal=False). Wszystkie weta nadal działają.
+        mnoznik_rozmiaru = 1.0
+        if self.okazjon is not None:
+            ok = self.okazjon.ocen(raport, wskazniki, kierunek, self.praeda_dd_normal)
+            if ok.potwierdzona:
+                dzwignia_final = max(1, min(20, int(round(dzwignia_final * ok.mnoznik_lewara))))
+                mnoznik_rozmiaru = ok.mnoznik_rozmiaru
+
         plan = self.kalkulator.policz(
             symbol=symbol,
             kierunek=kierunek,
             cena_wejscia=cena_wejscia,
             dzwignia=dzwignia_final,
-            kapital_usdt=self.engine.kapital,
+            mnoznik_rozmiaru=mnoznik_rozmiaru,
+            kapital_usdt=(self.kapital_sizing if self.kapital_sizing is not None
+                          else self.engine.kapital),
             pewnosc=pewnosc,
             rezim=raport.rezim,
             breaker_krzywej=self.breaker_krzywej,
             regula_6pct=self.regula_6pct,
+            atr=wskazniki.get("ATR_14") if self.sl_atr_mult else None,
+            sl_atr_mult=self.sl_atr_mult,
         )
 
         if not plan.checklist_ok:

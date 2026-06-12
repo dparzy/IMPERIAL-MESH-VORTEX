@@ -481,6 +481,10 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
     "PSY-03": "FEAR_GREED_INDEX (AdapterFearGreed)",
     "PSY-04": "OPEN_INTEREST (AdapterFutures)",
     "V-03":   "CVD (AdapterCVD/trade-feed)",
+    "AUG-01": "EVENT_* (AdapterKronikarz — okno zdarzenia fundamentalnego)",
+    "RADAR-01": "BTC_TREND (RadarBTC — kontekst lidera rynku, lead-lag)",
+    "RADAR-02": "BTC_DOMINANCJA (RadarRynku — przepływ kapitału BTC↔alty)",
+    "RADAR-03": "PRZEPLYW_KAPITALU (RadarRynku — breadth × momentum wolumenu)",
 }
 
 # Dowód allowlisty (Prawo I — bez zaufania na słowo): każdy neuron adapterowy
@@ -494,6 +498,11 @@ WERYFIKACJA_ADAPTEROW = {
                "CLOSE": 101.0, "CLOSE_PREV": 100.0},                      # OI↑ + cena → sygnał
     "V-03":   {"CVD": 5000.0, "CVD_PREV": 1000.0,
                "CLOSE": 101.0, "CLOSE_PREV": 100.0},                      # napływ kupna → LONG
+    "AUG-01": {"EVENT_TYP": "HALVING", "EVENT_DNI_PO": 5.0,
+               "EVENT_N": 3, "EVENT_PROB_WZROSTU": 100.0},                # analogia → LONG
+    "RADAR-01": {"BTC_TREND": 0.9},                                       # BTC↑ → LONG-wsparcie
+    "RADAR-02": {"BTC_DOMINANCJA": -0.9},                                 # alt-season → LONG-wsparcie
+    "RADAR-03": {"PRZEPLYW_KAPITALU": 0.95},                              # napływ → LONG-wsparcie
 }
 
 

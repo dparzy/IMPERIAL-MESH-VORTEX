@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-06-12 | W-297 | NEWS-01 Sentyment Newsów LLM (DeepSeek + fallback słownikowy)
+
+**Nowy neuron sentymentu z newsów — offline-first, LLM-opcjonalny:**
+
+- `legiony/neurony/sentyment.py`: `NeuronSentymentNews` (NEWS-01, KAT=R, WAGA=6)
+  Czyta NEWS_SENTYMENT[-1..+1]/NEWS_PEWNOSC/NEWS_N → momentum informacyjny
+  (silnie bycze nagłówki→LONG, niedźwiedzie→SHORT, szum→cisza). Progi: szum 0.30.
+- `akwedukty/adaptery/news_llm.py`: `AdapterNewsLLM` — dwa tryby klasyfikacji:
+  (1) DeepSeek (GlosImperium) gdy DEEPSEEK_API_KEY; (2) fallback słownikowy
+  (leksykon byczy/niedźwiedzi, deterministyczny, OFFLINE, zero zależności/sieci).
+  Wstrzykiwany fetcher (jak AdapterFearGreed) → pełne testy offline.
+- Rejestracja w `rejestr.py` (63 neurony), allowlista adapterowa w audycie (W12).
+- 33 nowe testy (Reguła Test-Granic: progi/znaki/zero/None/clamp LLM) → **833/833** ✅
+- Liczby zsynchronizowane: MANIFEST 63/75, README 63 (59 aktywnych), INDEKS 63.
+
+---
+
 ## 2026-06-12 | W-293/294/295/296 | Monte Carlo + Optymalizator DSR + Pamięć Refleksyjna + Drift Adapter
 
 **4 nowe moduły antyoverfitting/samouczenia — inspiracja: Jesse, Freqtrade, TradingAgents, Qlib DDG-DA:**

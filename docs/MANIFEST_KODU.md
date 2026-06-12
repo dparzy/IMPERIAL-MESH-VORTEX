@@ -6,7 +6,7 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-12 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 62 neuronów (zarejestrowane w roju) + 12 zwiadowców = **74 modułów w kodzie**
+**Zaimplementowane:** 63 neuronów (zarejestrowane w roju) + 12 zwiadowców = **75 modułów w kodzie**
 **Aktywne / wyciszone:** 55 aktywnych + 4 wyciszone, z czego:
   • **44 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, X-27 Value Convergence, OC-05 WashTrading, D-01 PathSignature)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
@@ -127,6 +127,12 @@
 | PSY-02 | NeuronPanikaDetal | R | 7 | ✅ aktywny (AdapterFutures) | LS_RATIO | — |
 | PSY-03 | NeuronFearGreed | R | 7 | ✅ aktywny (AdapterFearGreed) | FEAR_GREED | — |
 | PSY-04 | NeuronOIDiv | R | 7 | ✅ aktywny (AdapterFutures) | OI_DIVERGENCE | — |
+
+### Plik: `neurony/sentyment.py` (Faza D, W-297 — Sentyment Newsów LLM)
+
+| KLUCZ | Klasa | KAT | WAGA | Status | WSKAZNIK (Brama) | 🎖️ |
+|-------|-------|-----|------|--------|-----------------|-----|
+| NEWS-01 | NeuronSentymentNews | R | 6 | ✅ aktywny (AdapterNewsLLM) | NEWS_SENTYMENT | — |
 
 ### Plik: `neurony/onchain.py`
 

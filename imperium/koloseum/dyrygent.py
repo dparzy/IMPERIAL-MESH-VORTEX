@@ -115,6 +115,11 @@ class Dyrygent:
         # W-296 DriftAdapter: antycypacyjna korekta WAGI_REZIMU przed zmianą reżimu.
         # None = wyłączony. Podpięty = dodaje reżim co bar i koryguje wagi Legatusa.
         self.drift_adapter = drift_adapter
+        # W-299 Synapsy Reżimowe: graf par neuronów per-reżim × dekorelacja.
+        # Przekazywany do legatus.synapsy. Dyrygent wykrywa nowe zamknięcia i wywołuje
+        # aktualizuj() — zamknięta pętla uczenia koalicji bez ingerencji z zewnątrz.
+        self._synapsy_pending: Dict[str, tuple] = {}  # pozycja_id → (sygnaly, rezim, kier)
+        self._synapsy_ostatni_idx: int = 0     # ile zamknięć już przetworzyliśmy
         # Rada Doradców: 5-osobowe kolegium (Oracle/Fulmen/Iustitia/Hermes/Pythia).
         # None = wyłączona. Gdy aktywna: sprawdza plan po Kalkulatorze, może zawetować
         # lub zredukować rozmiar pozycji (OpinaRady.modyfikator_pozycji).
@@ -184,6 +189,11 @@ class Dyrygent:
         Przeprowadza pełny łańcuch dla jednego symbolu i okna barów.
         Zwraca DecyzjaCyklu z przejrzystym śladem każdego etapu.
         """
+        # 0. W-299 Synapsy Reżimowe — uczenie z nowo zamkniętych pozycji.
+        # Sprawdzamy historia_zamkniec od ostatniego przetworzonego indeksu.
+        if self.legatus.synapsy is not None:
+            self._aktualizuj_synapsy()
+
         # 1. Wskaźniki (Prawo I — Brama/Budowniczy liczą, nie Dyrygent)
         wskazniki = self._wskazniki(bary, symbol)
         if not wskazniki:
@@ -407,11 +417,43 @@ class Dyrygent:
                                 powod="silnik odrzucił (limit pozycji / brak kapitału / duplikat)",
                                 raport=raport, plan=plan, sygnal=sygnal)
 
+        # W-299 Synapsy: zapamiętaj sygnały tej pozycji — po zamknięciu będziemy wiedzieć
+        # które pary neuronów głosowały i jak (uczenie post-hoc).
+        if self.legatus.synapsy is not None and raport.sygnaly:
+            self._synapsy_pending[pozycja.pozycja_id] = (
+                list(raport.sygnaly), raport.rezim, kierunek
+            )
+
         return DecyzjaCyklu(symbol, "WEJSCIE", True, kierunek=kierunek,
                             pewnosc=pewnosc, rezim=raport.rezim,
                             powod=f"pozycja otwarta: {pozycja.pozycja_id}",
                             raport=raport, plan=plan, sygnal=sygnal,
                             pozycja_id=pozycja.pozycja_id)
+
+    def _aktualizuj_synapsy(self) -> None:
+        """
+        W-299: wykrywa nowo zamknięte pozycje i aktualizuje SynapsyRezimowe.
+        Wywołaj na początku każdego cyklu zanim Legatus.fokus().
+        """
+        synapsy = self.legatus.synapsy
+        if synapsy is None:
+            return
+        hist = self.engine.historia_zamkniec
+        nowe = hist[self._synapsy_ostatni_idx:]
+        self._synapsy_ostatni_idx = len(hist)
+
+        for wynik in nowe:
+            pid = wynik.pozycja_id
+            pending = self._synapsy_pending.pop(pid, None)
+            if pending is None:
+                continue
+            sygnaly, rezim, kierunek = pending
+            synapsy.aktualizuj(
+                sygnaly=sygnaly,
+                kierunek_decyzji=kierunek,
+                pnl_pct=wynik.pnl_pct,
+                rezim=rezim,
+            )
 
     # ── Wewnętrzne ───────────────────────────────────────────────────────────
     def _wskazniki(self, bary: List[Dict[str, Any]], symbol: str = "") -> Dict[str, Any]:

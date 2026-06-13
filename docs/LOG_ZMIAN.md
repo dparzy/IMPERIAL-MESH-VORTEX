@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-06-13 | W-299 | Synapsy Reżimowe — Regime-Aware Decorrelated Coalition Graph
+
+**Flagowa unikalna technologia: Hebbian × per-reżim × Prawo XVI (dekorelacja):**
+
+- `biblioteki/synapsy_rezimowe.py`: `SynapsyRezimowe` — graf `w[i][j][reżim]` par neuronów.
+  Reguła uczenia: `delta = eta * pnl_znak / (1 + |corr(i,j)|)` — pary o wysokiej korelacji
+  uczą się wolniej (redundancja ≠ siła). Boost pewności max ±25%. Persystencja JSONL.
+- `legiony/legatus.py`: `self.synapsy` + `wzmocnij_pewnosc()` po kierunku/pewności.
+- `koloseum/dyrygent.py`: `_synapsy_pending` + `_aktualizuj_synapsy()` — zamknięta pętla
+  uczenia koalicji bez ingerencji zewnętrznej.
+- 22 testy granic W-299 → **863/863** ✅
+
+---
+
 ## 2026-06-13 | W-298 | DriftAdapter wpięty + Rada Doradców wpięta do Dyrygenta
 
 **Prawo XV — ożywienie gotowych modułów, które żyły poza pipeline:**

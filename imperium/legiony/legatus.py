@@ -307,6 +307,10 @@ class Legatus:
         self.zwiadowcy = zwiadowcy or []
         self.strategie = strategie or []
         self.mnozniki_neuronow = mnozniki_neuronow or {}
+        # W-299 Synapsy Reżimowe: opcjonalny graf koalicji par neuronów warunkowany
+        # reżimem × dekorelacja. Gdy podane: wzmacnia pewnosc_agregatu parami dobrych
+        # duetów, redukuje za złe (Prawo XVI — dekorelowana konfluencja = siła).
+        self.synapsy = None
         # Opcja A: StanRynku z RadarRynku — radar-aware strategy scoring.
         # Ustawiany przez Dyrygenta przed fokus(). None = bez radaru.
         self.stan_rynku = None
@@ -469,6 +473,12 @@ class Legatus:
 
         if pewnosc < 0.5:
             kierunek = "NEUTRAL"
+
+        # W-299 Synapsy Reżimowe: wzmocnienie/redukcja pewności przez aktywne pary duetów.
+        # Działa po wyliczeniu kierunku i pewności — modyfikuje tylko wartość, nie głos.
+        if self.synapsy is not None and kierunek != "NEUTRAL":
+            zgodne_sygn = long_s if kierunek == "LONG" else short_s
+            pewnosc = self.synapsy.wzmocnij_pewnosc(pewnosc, zgodne_sygn, rezim)
 
         # Filtr minimum
         weto = False

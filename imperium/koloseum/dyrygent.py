@@ -203,7 +203,7 @@ class Dyrygent:
         """
         # 0. W-299 Synapsy Reżimowe — uczenie z nowo zamkniętych pozycji.
         # Sprawdzamy historia_zamkniec od ostatniego przetworzonego indeksu.
-        if self.legatus.synapsy is not None:
+        if self.legatus.synapsy is not None or self.legatus.mwu is not None:
             self._aktualizuj_synapsy()
 
         # 1. Wskaźniki (Prawo I — Brama/Budowniczy liczą, nie Dyrygent)
@@ -429,9 +429,8 @@ class Dyrygent:
                                 powod="silnik odrzucił (limit pozycji / brak kapitału / duplikat)",
                                 raport=raport, plan=plan, sygnal=sygnal)
 
-        # W-299 Synapsy: zapamiętaj sygnały tej pozycji — po zamknięciu będziemy wiedzieć
-        # które pary neuronów głosowały i jak (uczenie post-hoc).
-        if self.legatus.synapsy is not None and raport.sygnaly:
+        # W-299/303: zapamiętaj sygnały tej pozycji dla SynapsyRezimowych i HedgeMWU.
+        if (self.legatus.synapsy is not None or self.legatus.mwu is not None) and raport.sygnaly:
             self._synapsy_pending[pozycja.pozycja_id] = (
                 list(raport.sygnaly), raport.rezim, kierunek
             )
@@ -444,11 +443,12 @@ class Dyrygent:
 
     def _aktualizuj_synapsy(self) -> None:
         """
-        W-299/302: wykrywa nowo zamknięte pozycje, aktualizuje SynapsyRezimowe
-        i (gdy podana) zapisuje lekcje do PamięciRefleksyjnej.
+        W-299/302/303: wykrywa nowo zamknięte pozycje, aktualizuje SynapsyRezimowe,
+        HedgeMWU (online wagi neuronów) i (gdy podana) PamięćRefleksyjną.
         Wywołaj na początku każdego cyklu zanim Legatus.fokus().
         """
         synapsy = self.legatus.synapsy
+        mwu = self.legatus.mwu
         hist = self.engine.historia_zamkniec
         nowe = hist[self._synapsy_ostatni_idx:]
         self._synapsy_ostatni_idx = len(hist)
@@ -466,6 +466,16 @@ class Dyrygent:
                     pnl_pct=wynik.pnl_pct,
                     rezim=rezim_wej,
                 )
+
+            # W-303: HedgeMWU — uaktualnij wagi neuronów z wyniku trade'u.
+            # Każdy neuron który głosował dostaje stratę: 0 (trafił) lub 1 (pomylił).
+            if mwu is not None and pending is not None:
+                sygnaly, _rezim, kierunek = pending
+                zyskowny = kierunek if wynik.pnl_pct > 0 else (
+                    "SHORT" if kierunek == "LONG" else "LONG"
+                )
+                for s in sygnaly:
+                    mwu.zarejestruj_wynik(s.neuron_id, s.kierunek, zyskowny)
 
             # W-302: PamięćRefleksyjna — lekcja per zamknięcie (cross-session learning).
             if self._pamiec is not None:
@@ -489,6 +499,10 @@ class Dyrygent:
 
             if pending is not None:
                 self._synapsy_pending.pop(pid, None)
+
+        # W-303: po przetworzeniu nowych zamknięć — odśwież mnożniki Legatusa.
+        if mwu is not None and nowe:
+            self.legatus.ustaw_mnozniki_neuronow(mwu.mnozniki())
 
     def odswiez_kontekst_rynku(
         self,

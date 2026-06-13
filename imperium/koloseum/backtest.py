@@ -228,6 +228,9 @@ def backtest_portfel(
     # W-299 Synapsy Reżimowe — opt-in, domyślnie False (zero kosztu na backteście
     # gdzie nowy model ma mało historii). True → każdy symbol uczy własny graf par.
     synapsy_rezimowe: bool = False,
+    # W-303 HedgeMWU — online multiplicative weights update (W-049). True → Legatus
+    # każdego symbolu ma własny MWU uczący wagi neuronów strumieniowo po trade'cie.
+    mwu_learning: bool = False,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -318,6 +321,9 @@ def backtest_portfel(
         if synapsy_rezimowe:
             from imperium.biblioteki.synapsy_rezimowe import SynapsyRezimowe
             d.legatus.synapsy = SynapsyRezimowe()
+        if mwu_learning:
+            from imperium.biblioteki.hedge_mwu import HedgeMWU
+            d.legatus.mwu = HedgeMWU()
         dyrygenci[sym] = d
 
     # Chronologiczna oś: (timestamp, symbol, indeks_baru) — tylko bary po oknie.

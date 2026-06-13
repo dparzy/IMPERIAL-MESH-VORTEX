@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-06-13 | W-303 | HedgeMWU wiring — online wagi neuronów wpięte w Legatusa
+
+**Online Multiplicative Weights Update (Freund & Schapire 1997) — zamknięta pętla uczenia:**
+- `Legatus.mwu = HedgeMWU()` — nowy slot (analogiczny do `synapsy`)
+- `Dyrygent._aktualizuj_synapsy()` — po każdym zamkniętym trade'cie rejestruje wynik każdego neuronu, potem pcha `mwu.mnozniki()` do `Legatus.mnozniki_neuronow`
+- `backtest_portfel(mwu_learning=True)` — opt-in per-symbol MWU learning
+- 9 nowych testów (`tests/test_mwu_wpiecie.py`) — pokrycie granic (Prawo XXI)
+- MANIFEST, LOG zaktualizowane
+
+**Pliki:** `legiony/legatus.py`, `koloseum/dyrygent.py`, `koloseum/backtest.py`, `tests/test_mwu_wpiecie.py`, `docs/MANIFEST_KODU.md`
+
+---
+
 ## 2026-06-13 | W-302 | PętlaLive + PamięćRefleksyjna wpięta w pipeline
 
 **Główny entrypoint systemu tradingowego + cross-session learning:**

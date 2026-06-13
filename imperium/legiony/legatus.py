@@ -311,6 +311,10 @@ class Legatus:
         # reżimem × dekorelacja. Gdy podane: wzmacnia pewnosc_agregatu parami dobrych
         # duetów, redukuje za złe (Prawo XVI — dekorelowana konfluencja = siła).
         self.synapsy = None
+        # W-303 HedgeMWU: online multiplicative weights update — wagi neuronów uczą się
+        # strumieniowo po każdym zamkniętym trade'cie (W-049 Freund & Schapire 1997).
+        # None = wyłączony (Prawo XV: domyślnie neutralny — mnozniki_neuronow = {}).
+        self.mwu = None
         # Opcja A: StanRynku z RadarRynku — radar-aware strategy scoring.
         # Ustawiany przez Dyrygenta przed fokus(). None = bez radaru.
         self.stan_rynku = None

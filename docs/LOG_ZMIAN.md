@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-06-13 | W-308 | Monte Carlo bridge — walidacja post-backtest z silnika
+
+**Odzysk potencjału (Prawo XV):** `monte_carlo.py` i jego `pelen_raport_mc()` istniały
+od dawna, ale nigdy nie były podpięte do `PaperTradingEngine` — trzeba było ręcznie
+budować listę PnL. W-308 zamyka tę lukę.
+
+Zmiany:
+- `waliduj_mc(engine)` w `monte_carlo.py`: pobiera `pnl_usdt` z `historia_zamkniec`
+  i wywołuje `pelen_raport_mc()` z `kapital_startowy` z silnika.
+- `Dyrygent.raport_monte_carlo()`: jeden-liniowy wrapper — `None` gdy < 10 trade'ów,
+  inaczej dict z shuffle+bootstrap (Sharpe mediana/p5/p95, MaxDD_p95, P(SR>0), ok).
+- 9 nowych testów: granica 10 trade'ów, dobry/zły edge, kapital z silnika,
+  Dyrygent z za-małą historią → None, struktura raportu.
+
+Zastosowanie: po backtestcie wywołaj `dyrygent.raport_monte_carlo()` lub
+`waliduj_mc(engine)` — dostaniesz potwierdzenie że edge jest prawdziwy
+(shuffle + bootstrap > 90% P(Sharpe>0), MaxDD_p95 < 25%).
+
+**Pliki:** `koloseum/monte_carlo.py`, `koloseum/dyrygent.py`,
+`tests/test_monte_carlo.py`, `docs/MANIFEST_KODU.md`, `README.md` (937/937)
+
+---
+
 ## 2026-06-13 | W-307 | Igrzyska wpięte w pipeline — batch ranking komplementarny do MWU
 
 **Domknięcie pętli uczenia neuronów: batch (Igrzyska) + online (HedgeMWU) razem.**

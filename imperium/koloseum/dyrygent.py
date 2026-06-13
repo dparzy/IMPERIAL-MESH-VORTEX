@@ -611,6 +611,39 @@ class Dyrygent:
             "liczba_neuronow": len(ranking),
         }
 
+    def raport_monte_carlo(self, n_symulacji: int = 1000,
+                           seed: Optional[int] = 42) -> Optional[Dict[str, Any]]:
+        """
+        W-308: walidacja Monte Carlo zamkniętych trade'ów (Prawo XV — odzysk potencjału).
+        Wywołaj po backteście: raport = dyrygent.raport_monte_carlo().
+        None gdy < 10 zamkniętych pozycji (za mało do MC).
+        """
+        from imperium.koloseum.monte_carlo import waliduj_mc
+        mc = waliduj_mc(self.engine, n_symulacji=n_symulacji, seed=seed)
+        if mc.n_transakcji < 10:
+            return None
+        return {
+            "ok": mc.ok,
+            "powod": mc.powod,
+            "n_transakcji": mc.n_transakcji,
+            "shuffle": {
+                "sharpe_mediana": mc.shuffle.sharpe_mediana,
+                "sharpe_p5": mc.shuffle.sharpe_p5,
+                "sharpe_p95": mc.shuffle.sharpe_p95,
+                "maxdd_p95": mc.shuffle.maxdd_p95,
+                "p_sharpe_dodatni": mc.shuffle.p_sharpe_dodatni,
+                "ok": mc.shuffle.ok,
+            },
+            "bootstrap": {
+                "sharpe_mediana": mc.bootstrap.sharpe_mediana,
+                "sharpe_p5": mc.bootstrap.sharpe_p5,
+                "sharpe_p95": mc.bootstrap.sharpe_p95,
+                "maxdd_p95": mc.bootstrap.maxdd_p95,
+                "p_sharpe_dodatni": mc.bootstrap.p_sharpe_dodatni,
+                "ok": mc.bootstrap.ok,
+            },
+        }
+
     def odswiez_kontekst_rynku(
         self,
         close_btc: List[float],

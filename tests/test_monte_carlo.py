@@ -2,6 +2,7 @@
 import numpy as np
 
 from imperium.koloseum.monte_carlo import (
+    waliduj_mc,
     monte_carlo_shuffle,
     monte_carlo_bootstrap,
     pelen_raport_mc,
@@ -127,3 +128,81 @@ def test_pelen_raport_nie_ok_gdy_jeden_nie_ok():
     pnl = _pnl_stratny(n=60)
     r = pelen_raport_mc(pnl, n_symulacji=200, seed=0)
     assert r.ok is False
+
+
+# ─── W-308: waliduj_mc() — most do PaperTradingEngine ────────────────────────
+
+class _MockWynik:
+    def __init__(self, pnl_usdt): self.pnl_usdt = pnl_usdt
+
+
+class _MockEngine:
+    def __init__(self, pnl_lista, kapital=10_000.0):
+        self.historia_zamkniec = [_MockWynik(p) for p in pnl_lista]
+        self.kapital_startowy = kapital
+
+
+def test_waliduj_mc_za_malo_transakcji():
+    """< 10 trade'ów → ok=False, n_transakcji < 10."""
+    eng = _MockEngine([10.0] * 5)
+    r = waliduj_mc(eng, n_symulacji=100)
+    assert r.ok is False
+    assert r.n_transakcji == 5
+
+
+def test_waliduj_mc_dobry_edge():
+    """Zyski > straty → P(Sharpe>0) wysoki → ok=True."""
+    pnl = [200.0] * 20 + [-50.0] * 10
+    eng = _MockEngine(pnl)
+    r = waliduj_mc(eng, n_symulacji=200, seed=1)
+    assert r.n_transakcji == 30
+    assert r.shuffle.p_sharpe_dodatni > 0.7
+
+
+def test_waliduj_mc_kapital_z_silnika():
+    """kapital_startowy z silnika trafia do MC (krzywa equity)."""
+    eng = _MockEngine([50.0] * 30, kapital=5_000.0)
+    r = waliduj_mc(eng, n_symulacji=100, seed=2)
+    assert r.n_transakcji == 30
+
+
+def test_waliduj_mc_granica_10_transakcji():
+    """Dokładnie 10 trade'ów → nie blokuje (<10 blokuje, ≥10 liczy)."""
+    eng_9 = _MockEngine([10.0] * 9)
+    eng_10 = _MockEngine([10.0] * 10)
+    r9 = waliduj_mc(eng_9, n_symulacji=50)
+    r10 = waliduj_mc(eng_10, n_symulacji=50)
+    assert r9.n_transakcji < 10
+    assert r10.n_transakcji == 10
+
+
+# ─── W-308: Dyrygent.raport_monte_carlo() ─────────────────────────────────────
+
+def test_dyrygent_raport_mc_za_malo_zamkniec():
+    """Dyrygent bez wystarczającej historii → raport_monte_carlo() = None."""
+    try:
+        import talib  # noqa: F401
+    except ImportError:
+        return
+    from imperium.koloseum.dyrygent import Dyrygent
+    d = Dyrygent.zbuduj(adaptery_live=False)
+    assert d.raport_monte_carlo() is None  # 0 zamknięć < 10
+
+
+def test_dyrygent_raport_mc_struktura():
+    """raport_monte_carlo() z wystarczającą historią → prawidłowe klucze."""
+    try:
+        import talib  # noqa: F401
+    except ImportError:
+        return
+    from imperium.koloseum.dyrygent import Dyrygent
+    d = Dyrygent.zbuduj(adaptery_live=False)
+    # Wstrzyknij fałszywe zamknięcia do silnika
+    for p in [200.0] * 20 + [-50.0] * 10:
+        d.engine.historia_zamkniec.append(_MockWynik(p))
+    raport = d.raport_monte_carlo(n_symulacji=100, seed=5)
+    assert raport is not None
+    assert "ok" in raport
+    assert "shuffle" in raport
+    assert "bootstrap" in raport
+    assert raport["n_transakcji"] == 30

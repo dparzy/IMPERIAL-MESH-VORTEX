@@ -320,6 +320,7 @@
 | **Raport dekorelacji neuronów** (W-306 — `raport_z_kolektora()` + `Dyrygent.raport_korelacji_neuronow()`: Prawo XVI „redundancja mierzona" rozszerzone z 11 zwiadowców na cały rój 59 neuronów; pary nadmiarowe vs filary siły) | `legiony/diagnostyka_korelacji.py` + `koloseum/dyrygent.py` | ✅ aktywny |
 | **Igrzyska wiring** (W-307 — `Dyrygent.zbuduj(igrzyska=True)` + `raport_igrzysk()` + `igrzyska_learning=True` w backtest_portfel; batch kumulatywny ranking neuronów komplementarny do online MWU; gdy oba aktywne — mnożniki łączone ×; Prawo XVI — różne informacje) | `biblioteki/igrzyska.py` + `koloseum/dyrygent.py` + `koloseum/backtest.py` | ✅ aktywny |
 | **Warstwy uczenia w PętliLive** (W-307 — `KonfigPetliLive.mwu/igrzyska` opt-in wpina HedgeMWU + Igrzyska do produkcyjnej pętli live, nie tylko backtestu; domyślnie OFF, zero zmiany zachowania) | `koloseum/petla_live.py` | ✅ aktywny |
+| **Monte Carlo bridge** (W-308 — `waliduj_mc(engine)` + `Dyrygent.raport_monte_carlo()`: most między PaperTradingEngine a istniejącą walidacją MC; shuffle+bootstrap antyoverfittingowe z historia_zamkniec; Prawo XV — odzysk potencjału) | `koloseum/monte_carlo.py` + `koloseum/dyrygent.py` | ✅ aktywny |
 
 ---
 

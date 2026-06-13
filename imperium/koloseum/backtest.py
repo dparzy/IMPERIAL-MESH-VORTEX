@@ -231,6 +231,9 @@ def backtest_portfel(
     # W-303 HedgeMWU — online multiplicative weights update (W-049). True → Legatus
     # każdego symbolu ma własny MWU uczący wagi neuronów strumieniowo po trade'cie.
     mwu_learning: bool = False,
+    # W-307 Igrzyska — batch ranking (accuracy/stability/ranga). True → per-symbol
+    # kumulatywne statystyki neuronów. Gdy oba mwu+igrzyska: mnożniki łączone (×).
+    igrzyska_learning: bool = False,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -324,6 +327,9 @@ def backtest_portfel(
         if mwu_learning:
             from imperium.biblioteki.hedge_mwu import HedgeMWU
             d.legatus.mwu = HedgeMWU()
+        if igrzyska_learning:
+            from imperium.biblioteki.igrzyska import Igrzyska as _Igrzyska
+            d._igrzyska = _Igrzyska()
         dyrygenci[sym] = d
 
     # Chronologiczna oś: (timestamp, symbol, indeks_baru) — tylko bary po oknie.

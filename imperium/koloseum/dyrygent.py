@@ -123,6 +123,10 @@ class Dyrygent:
         # W-305: kolektor korelacji par neuronów — domyka dekorelację SynapsyRezimowych
         # (Prawo XVI). Tworzony leniwie gdy legatus.synapsy aktywny. None = bez korelacji.
         self._kolektor_korelacji: Optional[Any] = None
+        # W-307 Igrzyska: batch-style ranking neuronów z wyników trade'ów (W-002).
+        # Komplementarne do online HedgeMWU — kumulatywne statystyki (accuracy/stability)
+        # zamiast eksponencjalnego zapomnienia. None = wyłączone (domyślnie, opt-in).
+        self._igrzyska: Optional[Any] = None
         # W-302 PamięćRefleksyjna: cross-session dziennik lekcji. Gdy podana:
         # każde zamknięcie pozycji → lekcja w JSONL (symbol, rezim, interwal, pnl).
         # None = wyłączona (domyślnie — zero kosztu, opt-in).
@@ -173,7 +177,8 @@ class Dyrygent:
                min_pewnosc: float = 0.55, log_dir=None, tryb: str = "agregat",
                adaptery_live: bool = True,
                drift: bool = False, rada: bool = False,
-               synapsy: bool = False, mwu: bool = False) -> "Dyrygent":
+               synapsy: bool = False, mwu: bool = False,
+               igrzyska: bool = False) -> "Dyrygent":
         """Składa Dyrygenta z pełnym rojem, Budowniczym (TA-Lib) i silnikiem paper.
 
         adaptery_live: gdy True (domyślnie), wpina publiczne adaptery futures+sentyment
@@ -181,10 +186,13 @@ class Dyrygent:
             danymi. Ustaw False dla czystego backtestu OHLCV z CSV (neurony R abstynują).
 
         Warstwy adaptacyjne (Prawo XV — domyślnie OFF, opt-in; produkcja je odblokowuje):
-            drift:   W-296 DriftAdapter — antycypacyjna korekta WAGI_REZIMU.
-            rada:    Rada Doradców (5) — weto/redukcja pozycji przed wejściem.
-            synapsy: W-299 SynapsyRezimowe — graf koalicji par neuronów (Legatus).
-            mwu:     W-303 HedgeMWU — online wagi neuronów po każdym trade'cie (Legatus).
+            drift:    W-296 DriftAdapter — antycypacyjna korekta WAGI_REZIMU.
+            rada:     Rada Doradców (5) — weto/redukcja pozycji przed wejściem.
+            synapsy:  W-299 SynapsyRezimowe — graf koalicji par neuronów (Legatus).
+            mwu:      W-303 HedgeMWU — online wagi neuronów po każdym trade'cie (Legatus).
+            igrzyska: W-307 Igrzyska — batch ranking neuronów (accuracy/stability/ranga).
+                      Komplementarne do mwu: kumulatywne vs eksponencjalne zapomnienie.
+                      Gdy oba aktywne: mnożniki mnożone (MWU × ranga Igrzysk).
         Domyślnie wszystkie False → zachowanie identyczne jak wcześniej (zero zmian).
         """
         from imperium.legiony.rejestr import zbuduj_legatusa
@@ -222,6 +230,9 @@ class Dyrygent:
         if mwu:
             from imperium.biblioteki.hedge_mwu import HedgeMWU
             legatus.mwu = HedgeMWU()
+        if igrzyska:
+            from imperium.biblioteki.igrzyska import Igrzyska as _Igrzyska
+            dyrygent._igrzyska = _Igrzyska()
         return dyrygent
 
     # ── Jeden cykl decyzyjny ─────────────────────────────────────────────────
@@ -233,7 +244,8 @@ class Dyrygent:
         """
         # 0. W-299 Synapsy Reżimowe — uczenie z nowo zamkniętych pozycji.
         # Sprawdzamy historia_zamkniec od ostatniego przetworzonego indeksu.
-        if self.legatus.synapsy is not None or self.legatus.mwu is not None:
+        if (self.legatus.synapsy is not None or self.legatus.mwu is not None
+                or self._igrzyska is not None):
             self._aktualizuj_synapsy()
 
         # 1. Wskaźniki (Prawo I — Brama/Budowniczy liczą, nie Dyrygent)
@@ -471,7 +483,8 @@ class Dyrygent:
                                 raport=raport, plan=plan, sygnal=sygnal)
 
         # W-299/303: zapamiętaj sygnały tej pozycji dla SynapsyRezimowych i HedgeMWU.
-        if (self.legatus.synapsy is not None or self.legatus.mwu is not None) and raport.sygnaly:
+        if (self.legatus.synapsy is not None or self.legatus.mwu is not None
+                or self._igrzyska is not None) and raport.sygnaly:
             self._synapsy_pending[pozycja.pozycja_id] = (
                 list(raport.sygnaly), raport.rezim, kierunek
             )
@@ -484,12 +497,13 @@ class Dyrygent:
 
     def _aktualizuj_synapsy(self) -> None:
         """
-        W-299/302/303: wykrywa nowo zamknięte pozycje, aktualizuje SynapsyRezimowe,
-        HedgeMWU (online wagi neuronów) i (gdy podana) PamięćRefleksyjną.
+        W-299/302/303/307: wykrywa nowo zamknięte pozycje, aktualizuje SynapsyRezimowe,
+        HedgeMWU (online wagi neuronów), Igrzyska (batch ranking) i PamięćRefleksyjną.
         Wywołaj na początku każdego cyklu zanim Legatus.fokus().
         """
         synapsy = self.legatus.synapsy
         mwu = self.legatus.mwu
+        igrzyska = self._igrzyska
         hist = self.engine.historia_zamkniec
         nowe = hist[self._synapsy_ostatni_idx:]
         self._synapsy_ostatni_idx = len(hist)
@@ -520,6 +534,16 @@ class Dyrygent:
                 for s in sygnaly:
                     mwu.zarejestruj_wynik(s.neuron_id, s.kierunek, zyskowny)
 
+            # W-307: Igrzyska — zarejestruj wynik dla rankingu kumulatywnego.
+            # Break-even (pnl_pct == 0) pominięty — brak sygnału kierunkowego.
+            if igrzyska is not None and pending is not None and wynik.pnl_pct != 0:
+                sygnaly, _rezim, kierunek = pending
+                zyskowny = kierunek if wynik.pnl_pct > 0 else (
+                    "SHORT" if kierunek == "LONG" else "LONG"
+                )
+                for s in sygnaly:
+                    igrzyska.zarejestruj_wynik(s.neuron_id, s.kierunek, zyskowny)
+
             # W-302: PamięćRefleksyjna — lekcja per zamknięcie (cross-session learning).
             if self._pamiec is not None:
                 try:
@@ -543,9 +567,15 @@ class Dyrygent:
             if pending is not None:
                 self._synapsy_pending.pop(pid, None)
 
-        # W-303: po przetworzeniu nowych zamknięć — odśwież mnożniki Legatusa.
-        if mwu is not None and nowe:
-            self.legatus.ustaw_mnozniki_neuronow(mwu.mnozniki())
+        # W-303/307: po przetworzeniu nowych zamknięć — odśwież mnożniki Legatusa.
+        # Gdy oba aktywne: MWU × ranga Igrzysk (komplementarne informacje — Prawo XVI).
+        if (mwu is not None or igrzyska is not None) and nowe:
+            wagi_mwu = mwu.mnozniki() if mwu is not None else {}
+            wagi_igr = igrzyska.nowe_wagi() if igrzyska is not None else {}
+            all_keys = set(wagi_mwu) | set(wagi_igr)
+            combined = {k: wagi_mwu.get(k, 1.0) * wagi_igr.get(k, 1.0)
+                        for k in all_keys}
+            self.legatus.ustaw_mnozniki_neuronow(combined)
 
     def raport_korelacji_neuronow(self, prog_redundancji: float = 0.80,
                                   prog_dywersyfikacji: float = 0.20) -> Optional[Dict[str, Any]]:
@@ -560,6 +590,26 @@ class Dyrygent:
         return raport_z_kolektora(self._kolektor_korelacji,
                                   prog_redundancji=prog_redundancji,
                                   prog_dywersyfikacji=prog_dywersyfikacji)
+
+    def raport_igrzysk(self, top_n: int = 10) -> Optional[Dict[str, Any]]:
+        """
+        W-307: raport rankingu neuronów z Igrzysk (accuracy/stability/ranga).
+        None gdy igrzyska wyłączone lub brak zarejestrowanych trade'ów.
+        """
+        if self._igrzyska is None:
+            return None
+        ranking = self._igrzyska.ranking()
+        if not ranking:
+            return None
+        return {
+            "ranking": ranking[:top_n],
+            "zloty_helm": self._igrzyska.zloty_helm(),
+            "lista_infamii": [
+                {"klucz": w.klucz, "wynik": w.wynik, "powod": w.powod}
+                for w in self._igrzyska.lista_infamii()
+            ],
+            "liczba_neuronow": len(ranking),
+        }
 
     def odswiez_kontekst_rynku(
         self,

@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-06-13 | W-307 | Igrzyska wpięte w pipeline — batch ranking komplementarny do MWU
+
+**Domknięcie pętli uczenia neuronów: batch (Igrzyska) + online (HedgeMWU) razem.**
+Igrzyska (W-002) istniały od dawna, ale nigdy nie były podpięte do Dyrygenta —
+`nowe_wagi()` nigdy nie trafiało do Legatusa. W-307 to naprawia (Prawo XV).
+
+Zmiany:
+- `Dyrygent.__init__`: `self._igrzyska: Optional[Any] = None`
+- `Dyrygent.zbuduj(igrzyska=True)`: opt-in jak MWU/synapsy/drift/rada
+- `_aktualizuj_synapsy()`: rejestruje każde zamknięcie trade'u w Igrzyskach
+- Mnożniki łączone: `combined = mwu_mult × igr_mult` per neuron (oba aktywne)
+- `raport_igrzysk()`: publiczny accessor (ranking/Złoty Hełm/Lista Infamii)
+- `backtest_portfel(igrzyska_learning=True)`: opt-in w backteście
+- 14 nowych testów (jednostkowe + integracyjne, test granic Prawa XXI)
+
+Prawo XVI: Igrzyska (cumulative accuracy/stability) vs MWU (eksponencjalne
+zapomnienie) niosą różną informację — dlatego mnożniki łączone, nie zastępowane.
+
+**Pliki:** `koloseum/dyrygent.py`, `koloseum/backtest.py`, `tests/test_igrzyska_wpiecie.py`,
+`docs/MANIFEST_KODU.md`, `README.md` (929/929 testów)
+
+---
+
 ## 2026-06-13 | W-306b | Pierwszy realny pomiar redundancji roju (Prawo XVI w akcji)
 
 **Użycie narzędzia W-305/306 na danych historycznych.** Przepuszczono BTCUSDT 4H

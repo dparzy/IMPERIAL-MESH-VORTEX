@@ -82,11 +82,24 @@ def test_zbuduj_wszystkie_warstwy_razem():
     assert d.legatus.mwu is not None
 
 
+def test_zbuduj_filtr_asymetrii_opt_in():
+    """W-314: filtr_asymetrii=True → FiltrAsymetriiRezimu zainstalowany."""
+    if not _ma_talib():
+        return
+    from imperium.koloseum.dyrygent import Dyrygent
+    d = Dyrygent.zbuduj(adaptery_live=False, filtr_asymetrii=True)
+    assert d.filtr_asymetrii is not None
+    assert type(d.filtr_asymetrii).__name__ == "FiltrAsymetriiRezimu"
+    # domyślnie OFF
+    d2 = Dyrygent.zbuduj(adaptery_live=False)
+    assert d2.filtr_asymetrii is None
+
+
 def test_zbuduj_sygnatura_ma_nowe_parametry():
-    """Sygnatura zbuduj() wystawia 4 nowe opt-in parametry, domyślnie False."""
+    """Sygnatura zbuduj() wystawia opt-in parametry warstw, domyślnie False."""
     from imperium.koloseum.dyrygent import Dyrygent
     import inspect
     sig = inspect.signature(Dyrygent.zbuduj)
-    for p in ("drift", "rada", "synapsy", "mwu"):
+    for p in ("drift", "rada", "synapsy", "mwu", "filtr_asymetrii"):
         assert p in sig.parameters, f"brak parametru {p}"
         assert sig.parameters[p].default is False, f"{p} musi domyślnie być False"

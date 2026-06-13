@@ -237,6 +237,9 @@ def backtest_portfel(
     # W-309 KsięgaWad — prewencyjny filtr wad setupu (rezim/interwal). True → per-symbol
     # księga uczy się z zamknięć i ostrzega/wetuje powtarzalnie stratne setupy.
     ksiega_wad: bool = False,
+    # W-314 Filtr Asymetrii Reżimu — weto na rynku bocznym (ADX niski) i dla słabych
+    # wejść kontr-trendowych. Czysty OHLCV (CLOSE/EMA_200/ADX_14). True → per-symbol.
+    filtr_asymetrii: bool = False,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -314,7 +317,8 @@ def backtest_portfel(
         legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
         d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
                      budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
-                     namiestnik=namiestnik, breaker_krzywej=False)  # breaker wspólny
+                     namiestnik=namiestnik, breaker_krzywej=False,  # breaker wspólny
+                     filtr_asymetrii=filtr_asymetrii)
         d.kapital_sizing = kapital_startowy * wagi_akt[sym]
         # 🗡️ PRAEDA (W-291): tryb łupieżczy — auto-skalowana agresja w POTWIERDZONYCH
         # okazjach (confluence). Aktywny tylko gdy DD normalny (bezpieczeństwo > chciwość).

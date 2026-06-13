@@ -54,6 +54,7 @@ from imperium.pretorianie.kalkulator_lewara import (
     KalkulatorLewara, PlanPozycji, BezpiecznikKrzywejKapitalu,
     RegulaSzesciuProcentEldera,
 )
+from imperium.pretorianie.filtr_asymetrii import FiltrAsymetriiRezimu
 
 logger = logging.getLogger("Dyrygent")
 
@@ -94,6 +95,7 @@ class Dyrygent:
         sl_atr_mult: Optional[float] = None,
         drift_adapter: Optional[Any] = None,
         rada_doradcow: Optional[Any] = None,
+        filtr_asymetrii: bool = False,
     ) -> None:
         self.legatus = legatus
         self.kalkulator = kalkulator
@@ -173,6 +175,11 @@ class Dyrygent:
         self.regula_6pct: Optional[RegulaSzesciuProcentEldera] = (
             RegulaSzesciuProcentEldera() if regula_6pct else None
         )
+        # W-314 Filtr Asymetrii Reżimu: podnosi próg pewności w rynku bocznym
+        # (ADX niski) i dla wejść kontr-trendowych. None = wyłączony (opt-in).
+        self.filtr_asymetrii: Optional[FiltrAsymetriiRezimu] = (
+            FiltrAsymetriiRezimu() if filtr_asymetrii else None
+        )
 
     # ── Fabryka pełnego składu (produkcyjna — wymaga TA-Lib) ─────────────────
     @classmethod
@@ -182,7 +189,8 @@ class Dyrygent:
                adaptery_live: bool = True,
                drift: bool = False, rada: bool = False,
                synapsy: bool = False, mwu: bool = False,
-               igrzyska: bool = False, ksiega_wad: bool = False) -> "Dyrygent":
+               igrzyska: bool = False, ksiega_wad: bool = False,
+               filtr_asymetrii: bool = False) -> "Dyrygent":
         """Składa Dyrygenta z pełnym rojem, Budowniczym (TA-Lib) i silnikiem paper.
 
         adaptery_live: gdy True (domyślnie), wpina publiczne adaptery futures+sentyment
@@ -229,7 +237,8 @@ class Dyrygent:
         dyrygent = cls(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
                        budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
                        namiestnik=get_namiestnik(), adaptery=adaptery,
-                       drift_adapter=drift_adapter, rada_doradcow=rada_doradcow)
+                       drift_adapter=drift_adapter, rada_doradcow=rada_doradcow,
+                       filtr_asymetrii=filtr_asymetrii)
         if synapsy:
             from imperium.biblioteki.synapsy_rezimowe import SynapsyRezimowe
             legatus.synapsy = SynapsyRezimowe()
@@ -370,6 +379,16 @@ class Dyrygent:
             # pewność = średnia dopasowania strategii i pewności neuronów (gdy zgodne — wzmocnienie)
             zgoda = 1.0 if top_strat.kierunek == raport.kierunek else 0.6
             pewnosc = round(min(1.0, (top_strat.wynik + raport.pewnosc_agregatu) / 2 * zgoda), 4)
+
+        # 3a. Filtr Asymetrii Reżimu (W-314): weto na rynku bocznym (ADX niski) i
+        #     dla słabych wejść kontr-trendowych. Czysty OHLCV (CLOSE/EMA_200/ADX_14).
+        if self.filtr_asymetrii is not None:
+            wa = self.filtr_asymetrii.ocen(kierunek, pewnosc, wskazniki)
+            if not wa.dozwolone:
+                return DecyzjaCyklu(symbol, "ASYMETRIA_WETO", False, kierunek=kierunek,
+                                    pewnosc=pewnosc, rezim=raport.rezim,
+                                    powod=f"Filtr Asymetrii Reżimu: {wa.powod}",
+                                    raport=raport)
 
         # 3. Pretorianie — matematyka przeżycia (SL/TP/dźwignia/rozmiar)
         cena_wejscia = wskazniki.get("CLOSE") or (bary[-1].get("close") if bary else 0.0)

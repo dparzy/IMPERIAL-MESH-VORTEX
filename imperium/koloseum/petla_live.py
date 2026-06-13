@@ -59,6 +59,8 @@ class KonfigPetliLive:
     igrzyska: bool = False
     # W-309: KsięgaWad — prewencyjny filtr wad setupu (rezim/interwal). Opt-in, OFF.
     ksiega_wad: bool = False
+    # W-314: Filtr Asymetrii Reżimu — weto na rynku bocznym (ADX) i kontr-trendzie. OFF.
+    filtr_asymetrii: bool = False
     plik_pamieci: str = "logs/pamiec_refleksyjna.jsonl"
     log_dir: Optional[str] = "logs"
     # Pauza po każdym barze (s). None = oblicz z interwal (zalecane).
@@ -141,6 +143,7 @@ def _buduj_dyrygencie(
             min_pewnosc=cfg.min_pewnosc,
             namiestnik=namiestnik,
             adaptery=[AdapterFutures(), AdapterFearGreed(), AdapterCVD(), AdapterNewsLLM()],
+            filtr_asymetrii=cfg.filtr_asymetrii,
         )
         d.kapital_sizing = kapital_per
         if cfg.igrzyska:
@@ -221,7 +224,8 @@ def handluj_live(
 
     logger.info(f"[PętlaLive] Start: {cfg.symbole}, interwal={cfg.interwal}, "
                 f"paper={cfg.paper}, synapsy={cfg.synapsy}, "
-                f"mwu={cfg.mwu}, igrzyska={cfg.igrzyska}, ksiega_wad={cfg.ksiega_wad}")
+                f"mwu={cfg.mwu}, igrzyska={cfg.igrzyska}, ksiega_wad={cfg.ksiega_wad}, "
+                f"filtr_asymetrii={cfg.filtr_asymetrii}")
 
     bar_nr = 0
     try:

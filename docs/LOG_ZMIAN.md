@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-13 | W-311 | Ablacja warstw adaptacyjnych — pomiar in-sample (Prawo XVI)
+
+**Pomiar, nie zgadywanie.** Ablacja 4 warstw (synapsy/mwu/igrzyska/ksiega_wad)
+osobno vs baseline na koszyku 5 par 4H (pełna historia), z metryką PnL/trade
+korygującą confound liczby trade'ów.
+
+Wynik (PnL/trade vs baseline +49,9$):
+- synapsy +64,4 (+29%, trade flat) — czysta jakość, najmocniejszy dowód
+- mwu +83,1 (+66%, +68% trade'ów) — działa, częściowo wolumen
+- igrzyska +55,3 (+11%, WR -1pp) — słaba, możliwa redundancja z mwu
+- ksiega_wad +49,9 (=baseline) — neutralna z projektu (nie wetuje domyślnie)
+
+⚠️ IN-SAMPLE — wymaga walk-forward OOS przed włączeniem w produkcji (Prawo I:
+bez fałszywej weryfikacji; Monte Carlo nie koryguje biasu trendu).
+
+**Pliki:** `docs/POMIAR_WARSTW_ADAPTACYJNYCH.md` (pomiar — bez zmian kodu)
+
+---
+
 ## 2026-06-13 | W-310 | Domknięcie pętli pamięci — KsięgaWad czyta przeszłe sesje
 
 **Prawo XV — martwy read-path PamięciRefleksyjnej.** Lekcje były pisane do

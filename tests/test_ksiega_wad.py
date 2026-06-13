@@ -245,3 +245,56 @@ def test_backtest_ksiega_wad_sygnatura():
     from imperium.koloseum.backtest import backtest_portfel
     sig = inspect.signature(backtest_portfel)
     assert "ksiega_wad" in sig.parameters
+
+
+# ─── W-310: bootstrap z persystentnej PamięciRefleksyjnej (cross-session) ──────
+
+def test_bootstrap_ksiega_wad_z_pamieci():
+    """W-310: _bootstrap_ksiega_wad zasila KsięgęWad lekcjami z poprzednich sesji."""
+    try:
+        import talib  # noqa: F401
+    except ImportError:
+        return
+    import tempfile
+    from imperium.cesarz.pamiec_refleksyjna import PamiecRefleksyjna
+    from imperium.koloseum.petla_live import _bootstrap_ksiega_wad
+    from imperium.koloseum.dyrygent import Dyrygent
+
+    with tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False) as f:
+        plik = f.name
+    try:
+        pam = PamiecRefleksyjna(plik=plik)
+        for _ in range(6):
+            pam.zapisz_wynik([-10.0], rezim="RANGING", interwal="4H")
+
+        d = Dyrygent.zbuduj(adaptery_live=False, ksiega_wad=True)
+        n = _bootstrap_ksiega_wad({"BTCUSDT": d}, pam)
+        assert n == 6
+        # Po bootstrapie KsięgaWad zna stratny setup od razu
+        w = d.ksiega_wad.sprawdz("RANGING", "4H")
+        assert w.czy_wada is True
+    finally:
+        os.unlink(plik)
+
+
+def test_bootstrap_ksiega_wad_bez_ksiegi_zero():
+    """Dyrygent bez KsięgiWad → bootstrap zwraca 0, nie pada."""
+    try:
+        import talib  # noqa: F401
+    except ImportError:
+        return
+    import tempfile
+    from imperium.cesarz.pamiec_refleksyjna import PamiecRefleksyjna
+    from imperium.koloseum.petla_live import _bootstrap_ksiega_wad
+    from imperium.koloseum.dyrygent import Dyrygent
+
+    with tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False) as f:
+        plik = f.name
+    try:
+        pam = PamiecRefleksyjna(plik=plik)
+        pam.zapisz_wynik([-10.0], rezim="RANGING", interwal="4H")
+        d = Dyrygent.zbuduj(adaptery_live=False)  # ksiega_wad OFF
+        n = _bootstrap_ksiega_wad({"BTCUSDT": d}, pam)
+        assert n == 0
+    finally:
+        os.unlink(plik)

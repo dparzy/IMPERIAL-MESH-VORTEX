@@ -322,6 +322,7 @@
 | **Warstwy uczenia w PętliLive** (W-307 — `KonfigPetliLive.mwu/igrzyska` opt-in wpina HedgeMWU + Igrzyska do produkcyjnej pętli live, nie tylko backtestu; domyślnie OFF, zero zmiany zachowania) | `koloseum/petla_live.py` | ✅ aktywny |
 | **Monte Carlo bridge** (W-308 — `waliduj_mc(engine)` + `Dyrygent.raport_monte_carlo()`: most między PaperTradingEngine a istniejącą walidacją MC; shuffle+bootstrap antyoverfittingowe z historia_zamkniec; Prawo XV — odzysk potencjału) | `koloseum/monte_carlo.py` + `koloseum/dyrygent.py` | ✅ aktywny |
 | **KsięgaWad** (W-309 — prewencyjny filtr powtarzalnych wad setupu rezim/interwal wyekstrahowany z Mnemosyne `book_of_flaws`; uczy się online z zamknięć, sprawdza PRZED wejściem: CZYSTO/OSTRZEŻENIE/WETO; opt-in `Dyrygent.zbuduj(ksiega_wad=True)`, `KonfigPetliLive.ksiega_wad`, `backtest_portfel(ksiega_wad=True)`; bootstrap `ucz_z_pamieci()` z PamięciRefleksyjnej — Prawo XVI jedno źródło) | `cesarz/ksiega_wad.py` + `koloseum/dyrygent.py` + `koloseum/petla_live.py` + `koloseum/backtest.py` | ✅ aktywny |
+| **Domknięcie pętli pamięci** (W-310 — `_bootstrap_ksiega_wad()` w PętliLive zasila KsięgęWad PERSYSTENTNYMI lekcjami z `pamiec_refleksyjna.jsonl` poprzednich sesji; read-path PamięciRefleksyjnej był martwy — lekcje pisane, nigdy czytane w produkcji; teraz świeży Dyrygent flaguje stratny setup od 1. baru — Prawo XV cross-session) | `koloseum/petla_live.py` | ✅ aktywny |
 
 ---
 

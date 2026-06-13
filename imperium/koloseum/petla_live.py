@@ -154,6 +154,21 @@ def _buduj_dyrygencie(
     return dyrygenci
 
 
+def _bootstrap_ksiega_wad(dyrygenci: Dict, pamiec) -> int:
+    """
+    W-310: zasila KsięgęWad każdego Dyrygenta lekcjami z persystentnej
+    PamięciRefleksyjnej (cross-session learning). Zwraca liczbę wczytanych lekcji.
+
+    Domyka pętlę pamięci (Prawo XV): lekcje pisane do JSONL co sesja były dotąd
+    nigdy nie czytane w produkcji — teraz oflagowują stratne setupy od 1. baru.
+    """
+    n_lekcji = 0
+    for d in dyrygenci.values():
+        if getattr(d, "ksiega_wad", None) is not None:
+            n_lekcji = d.ksiega_wad.ucz_z_pamieci(pamiec)
+    return n_lekcji
+
+
 def handluj_live(
     konfiguracja: KonfigPetliLive,
     max_barow: Optional[int] = None,      # None = nieskończona pętla; int = limit (testy)
@@ -189,6 +204,13 @@ def handluj_live(
     pamiec = PamiecRefleksyjna(plik=cfg.plik_pamieci)
     radar = RadarRynku()
     statystyki = StatystykiPetli()
+
+    # W-310: domknięcie pętli pamięci — bootstrap KsięgiWad z PERSYSTENTNYCH lekcji
+    # poprzednich sesji (Prawo XV: lekcje były pisane, nigdy czytane w produkcji).
+    if cfg.ksiega_wad:
+        n_lekcji = _bootstrap_ksiega_wad(dyrygenci, pamiec)
+        logger.info(f"[PętlaLive] KsięgaWad: bootstrap z {n_lekcji} lekcji "
+                    f"PamięciRefleksyjnej (cross-session, Prawo XV)")
 
     # Loader: wstrzykiwany (testy) lub prawdziwy DataLoader
     if _loader is None:

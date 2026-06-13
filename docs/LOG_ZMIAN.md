@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-13 | W-310 | Domknięcie pętli pamięci — KsięgaWad czyta przeszłe sesje
+
+**Prawo XV — martwy read-path PamięciRefleksyjnej.** Lekcje były pisane do
+`logs/pamiec_refleksyjna.jsonl` co sesja, ale NIGDY czytane w produkcji
+(`formatuj_dla_llm()`/`wczytaj_wszystkie()` bez konsumenta). Świeży Dyrygent
+startował ślepy — setup który tracił przez 10 poprzednich sesji nie był znany.
+
+W-310: `_bootstrap_ksiega_wad(dyrygenci, pamiec)` w PętliLive — gdy `ksiega_wad`
+aktywna, zasila KsięgęWad każdego Dyrygenta persystentnymi lekcjami przed 1. barem.
+Cross-session learning staje się realne: stratny setup flagowany od startu sesji.
+
+- Wydzielony testowalny helper `_bootstrap_ksiega_wad()` (zwraca n lekcji).
+- Log startowy raportuje liczbę wczytanych lekcji.
+- +2 testy (bootstrap zasila wadę z 6 lekcji; brak KsięgiWad → 0, nie pada).
+- 959/959 testów, audyt pełna harmonia, ruff czysty.
+
+**Pliki:** `koloseum/petla_live.py`, `tests/test_ksiega_wad.py`,
+`docs/MANIFEST_KODU.md`, `README.md`
+
+---
+
 ## 2026-06-13 | W-309 | KsięgaWad — prewencyjny filtr wad setupu (ekstrakcja z Mnemosyne)
 
 **Pomiar redundancji (Prawo XVI) + decyzja Cezara.** Audyt Mnemosyne (N-MEM-206):

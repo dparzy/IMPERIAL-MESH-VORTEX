@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-13 | W-306b | Pierwszy realny pomiar redundancji roju (Prawo XVI w akcji)
+
+**Użycie narzędzia W-305/306 na danych historycznych.** Przepuszczono BTCUSDT 4H
+(1500 barów, 1301 cykli) przez `Dyrygent.zbuduj(synapsy=True)` i odczytano
+`raport_korelacji_neuronow()`. Wynik zapisany do `docs/MATRYCA_KORELACJI.md`
+(żywy szablon wypełniony pierwszymi rzeczywistymi liczbami).
+
+- 🚨 **Alarm Prawa XV/XVI:** V-13 (Yang-Zhang vol) ~ VI-13 (ATR) = **+1.000** —
+  identyczny sygnał, podwójne liczenie zmienności. Potwierdza INF-20 (Sinclair):
+  Yang-Zhang traci przewagę na crypto 24/7. SynapsyRezimowe (W-305) już to częściowo
+  neutralizują (dekorelacja=0 → brak wzmocnienia). Scalenie/redukcja = decyzja Cezara
+  (Prawo XVIII — nie usuwam składu roju autonomicznie).
+- 8 dalszych par |corr|>0.80 (trend ADX~Ichimoku, przepływ OBV~Force Index).
+- 248 par dywersyfikujących (|corr|<0.20) — rój zdrowo zdekorelowany.
+
+**Pliki:** `docs/MATRYCA_KORELACJI.md`, `docs/LOG_ZMIAN.md` (pomiar — bez zmian kodu)
+
+---
+
 ## 2026-06-13 | W-306 | Raport dekorelacji neuronów — Prawo XVI dla całego roju
 
 **Korelacje par neuronów (W-305) były liczone, ale tylko konsumowane wewnętrznie

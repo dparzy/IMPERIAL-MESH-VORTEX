@@ -211,6 +211,51 @@ Każde **wydarzenie historyczne** ma swój powtarzalny **wzorzec**. System ma ro
 
 ---
 
+## 📡 PIERWSZY POMIAR RZECZYWISTY (W-306 · 2026-06-13)
+
+> 🧮 **To NIE jest szablon — to zmierzone liczby (Prawo XVI: redundancja mierzona, nie zgadywana).**
+> Źródło: `Dyrygent.raport_korelacji_neuronow()` na BTCUSDT 4H (ostatnie 1500 barów,
+> okno 200, 1301 cykli, 120 kroków korelacji). Narzędzie: `KolektorKorelacjiNeuronow`
+> (W-305) + `raport_z_kolektora()` (W-306). Pomiar obejmie 46 neuronów obecnych w głosach.
+
+### 🔴 Pary NADMIAROWE (|korelacja| > 0.80) — kandydaci do scalenia / wagi w dół
+
+| Para neuronów | Wskaźniki | Korelacja | Interpretacja |
+|---------------|-----------|-----------|---------------|
+| **V-13 ~ VI-13** | Yang-Zhang vol ~ ATR | **+1.000** | 🚨 **IDENTYCZNY sygnał** — dwa estymatory zmienności. INF-20 (Sinclair): na crypto 24/7 Yang-Zhang traci przewagę nad ATR (brak luk nocnych). Podwójne liczenie zmienności. |
+| EXP-05 ~ SMC-03 | (zwiadowca) ~ BOS/MSS | +0.972 | Struktura rynku — wykrywają to samo wybicie struktury |
+| XII-01 ~ XII-02 | ADX ~ Ichimoku | +0.935 | Dwa neurony siły trendu — silne nakładanie |
+| V-05 ~ XII-02 | Force Index ~ Ichimoku | +0.901 | Przepływ potwierdza trend (oczekiwane) |
+| V-05 ~ XII-01 | Force Index ~ ADX | +0.866 | jw. |
+| EXP-04 ~ XII-02 | (zwiadowca) ~ Ichimoku | +0.840 | |
+| V-01 ~ V-05 | OBV ~ Force Index | +0.814 | Dwa mierniki przepływu wolumenu |
+| EXP-04 ~ XII-01 | (zwiadowca) ~ ADX | +0.810 | |
+| V-01 ~ XII-01 | OBV ~ ADX | +0.804 | |
+
+### 🟢 Filary siły — rój zdrowo zdekorelowany
+
+248 par z |korelacja| < 0.20 (niezależna informacja). Przykłady bliskie zeru:
+A-03 ~ A-05, A-03 ~ XII-04, A-01 ~ V-02, A-02 ~ A-03 — straż anty-manipulacyjna (A)
+niesie informację ortogonalną do trendu/wolumenu = realna dywersyfikacja (Prawo XVI).
+
+### 🚨 ALARM PRAWA XV + REKOMENDACJA (decyzja Cezara — Prawo XVIII)
+
+**V-13 (Yang-Zhang) ~ VI-13 (ATR) = +1.000** to redundancja o najwyższym priorytecie:
+dwa neurony w różnych kategoriach (V i L) głosują identycznie. W bazowej agregacji
+Legatusa (`sila = Σ pewnosc·waga`) zmienność jest liczona PODWÓJNIE.
+
+- **Częściowa samonaprawa (już działa):** SynapsyRezimowe (W-305) liczą tej parze
+  `dekorelacja = 1 − corr = 0` → zero wzmocnienia koalicyjnego. Pewność agregatu
+  nie jest już sztucznie podbijana przez tę parę.
+- **Pozostaje decyzja kierunkowa (Prawo XVIII — Cezar):** scalić V-13+VI-13 w jeden
+  neuron zmienności / obniżyć wagę jednego / zostawić oba świadomie. Nie usuwam
+  autonomicznie — usunięcie/scalenie neuronu to zmiana składu roju.
+
+> Pomiar powtarzalny: `python -c "..."` z `Dyrygent.zbuduj(synapsy=True)` + pętla `cykl()`
+> + `raport_korelacji_neuronow()`. Liczby odświeżać po każdej zmianie składu roju.
+
+---
+
 ## 🏛️ Status dokumentu
 
 > ⚠️ **DOKUMENT ŻYWY (LIVING TEMPLATE).**

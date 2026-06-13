@@ -70,6 +70,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 34 | `symulator_live.html` | **Symulator wizualny HTML (offline)** — animowany pipeline, rój 48 neuronów głosujący, 10 bramek, ścieżka pieniędzy, 4 scenariusze (trend/range/bańka/krach). Otwierany w przeglądarce | ✅ Aktywny |
 | 35 | `symulator_imperium.html` | **Symulator canvas (styl v1-5.1)** — animowane cząsteczki płynące przez moduły; przełącznik STAN AKTUALNY (ocena 8.0/10) ↔ MARZENIE (wizja docelowa 9.7/10 po wdrożeniu roadmapy) | ✅ Aktywny |
 | 36 | `POMIAR_WARSTW_ADAPTACYJNYCH.md` | **Ablacja warstw adaptacyjnych** (W-311) — synapsy/mwu/igrzyska/ksiega_wad osobno vs baseline, PnL/trade, walidacja Monte Carlo; in-sample, wymaga OOS (Prawo XVI) | ⚠️ In-sample |
+| 37 | `POMIAR_FILTR_ASYMETRII.md` | **Dowód A/B Filtra Asymetrii Reżimu** (W-314) — OOS chop: strata −386$→−238$ (−38%), ADX+EMA-200, Moskowitz 2012 + Wilder 1978; wciąż ujemny ale realna przewaga (Prawo XVI) | ✅ Aktywny |
 
 ---
 

@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-06-13 | W-314 | Filtr Asymetrii Reżimu — brama wejścia oparta na trendzie
+
+**Odkrycie OOS:** pomiar kierunków na świeżym oknie (2024-10..2026-06, BTC płaski
++0,8%) ujawnił, że stare „+26 152$" było in-sample na hossie 2017-2021. Na płaskim
+rynku rój TRACI (−386$) — wchodzi za często w chopie. Split kierunków zbalansowany
+51/49 (SHORT nie jest martwym głosem, Prawo XV OK); warstwy adaptacyjne nie ratują
+chopu (synapsy+mwu −373$).
+
+**Wdrożenie:** FiltrAsymetriiRezimu (czysty OHLCV: CLOSE/EMA_200/ADX_14):
+- rynek boczny (ADX<20) → wymóg pewności ≥0,70
+- kontr-trend przy ADX≥25 → wymóg pewności ≥0,65 (Moskowitz/Ooi/Pedersen 2012)
+- zgodne z trendem / strefa neutralna → przepuść; brak danych → abstynencja
+
+**Dowód A/B (Prawo XVI):** OOS strata −386$ → −238$ (**−38% krwawienia**),
+PnL/trade −2,3 → −1,4, oba kierunki lepsze. Uczciwie: wciąż ujemny (chop pozostaje
+trudny) — filtr tnie stratę, nie czyni rynku bocznego zyskownym.
+
+**Pliki:** `imperium/pretorianie/filtr_asymetrii.py` (nowy), `dyrygent.py`,
+`backtest.py`, `petla_live.py` (opt-in OFF), `tests/test_filtr_asymetrii.py` (15),
+`tests/test_zbuduj_warstwy.py`, `docs/POMIAR_FILTR_ASYMETRII.md`, README. 978/978.
+
+---
+
 ## 2026-06-13 | W-313 | Naprawa deadlocka breakera krzywej — sondujący handel w HALT
 
 **Problem:** Po HALT (DD≥20%) żaden trade → equity zamrożona → DD nigdy nie spada

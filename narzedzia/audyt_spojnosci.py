@@ -485,6 +485,7 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
     "RADAR-01": "BTC_TREND (RadarBTC — kontekst lidera rynku, lead-lag)",
     "RADAR-02": "BTC_DOMINANCJA (RadarRynku — przepływ kapitału BTC↔alty)",
     "RADAR-03": "PRZEPLYW_KAPITALU (RadarRynku — breadth × momentum wolumenu)",
+    "NEWS-01": "NEWS_SENTYMENT (AdapterNewsLLM — DeepSeek + fallback słownikowy)",
 }
 
 # Dowód allowlisty (Prawo I — bez zaufania na słowo): każdy neuron adapterowy
@@ -503,6 +504,7 @@ WERYFIKACJA_ADAPTEROW = {
     "RADAR-01": {"BTC_TREND": 0.9},                                       # BTC↑ → LONG-wsparcie
     "RADAR-02": {"BTC_DOMINANCJA": -0.9},                                 # alt-season → LONG-wsparcie
     "RADAR-03": {"PRZEPLYW_KAPITALU": 0.95},                              # napływ → LONG-wsparcie
+    "NEWS-01": {"NEWS_SENTYMENT": 0.8, "NEWS_PEWNOSC": 0.9, "NEWS_N": 5},  # mocno bycze → LONG
 }
 
 

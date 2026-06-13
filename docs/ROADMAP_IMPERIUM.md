@@ -2,8 +2,8 @@
 
 **Dokument:** Plan rozwoju systemu IMPERIUM — AI crypto trading z motywem Cesarstwa Rzymskiego
 **Aktualna faza:** FAZA 1 — Namiestnik (Regime + Timeframe-Aware Gating)
-**Data:** 2026-06-09
-**Wersja:** v0.9.0
+**Data:** 2026-06-12
+**Wersja:** v0.9.1
 
 ---
 
@@ -66,14 +66,14 @@ python imperium/legiony/pierwszy_zwiadowca.py
 ## ⚡ FAZA 1 — Namiestnik *(TERAZ — aktualna)*
 
 **Status:** 🔄 W trakcie
-**Cel:** Regime + Timeframe-Aware Gating Network — 55 neuronów, 575 testów, master-switch Reżimu Faza 2
+**Cel:** Regime + Timeframe-Aware Gating Network — 62 neurony, 743 testy, master-switch Reżimu Faza 2
 
-### Stan Fazy 1 (2026-06-09)
+### Stan Fazy 1 (2026-06-12)
 
 | Kamień milowy | Status |
 |---------------|--------|
-| 55 neuronów w kodzie (51 aktywnych — SMC-01/02/03 odblokowane) | ✅ DONE |
-| 575 testów automatycznych (0 zależności) | ✅ DONE |
+| 62 neurony w kodzie (58 aktywnych — SMC-01/02/03 odblokowane) | ✅ DONE |
+| 743 testy automatyczne (0 zależności) | ✅ DONE |
 | Namiestnik (Regime×Timeframe Gating) | ✅ DONE |
 | Master-switch reżimu Faza 1 | ✅ DONE |
 | Master-switch reżimu Faza 2 (online Hedge/MWU głosów reżimu) | ✅ DONE |
@@ -99,7 +99,7 @@ python imperium/legiony/pierwszy_zwiadowca.py
 
 - Debata Senatu w pełni operacyjna (**Populares** vs **Optimates**)
 - Koloseum uruchamia równoległe backtesty na każdej nowej strategii
-- **Cel łączny:** 79+ neuronów (jak system DNSS) — 55 z 79 zaimplementowane
+- **Cel łączny:** 79+ neuronów (jak system DNSS) — 62 z 79 zaimplementowane
 
 ### Parametry operacyjne
 
@@ -180,7 +180,7 @@ python imperium/legiony/pierwszy_zwiadowca.py
 | v3.x | Faza 3 | Multi-giełda |
 | v4.x | Faza 4 | Autonomia |
 
-**Aktualna wersja: v0.9.0** (55 neuronów / 51 aktywnych, 575 testów, Namiestnik Faza 1 + Master-switch Faza 2)
+**Aktualna wersja: v0.9.1** (62 neurony / 58 aktywnych, 743 testy, Namiestnik+Radar Opcja A+B, Paper Trading Etap II)
 
 ---
 

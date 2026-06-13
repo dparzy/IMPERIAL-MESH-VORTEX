@@ -42,6 +42,7 @@ from imperium.legiony.neurony.wolumen import (
 from imperium.legiony.neurony.struktura import (
     NeuronOrderBlock, NeuronFVG, NeuronBOS, NeuronVSA,
 )
+from imperium.legiony.neurony.sentyment import NeuronSentymentNews
 from imperium.legiony.neurony.psychologia import (
     NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv,
 )
@@ -101,6 +102,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronOrderBlock(), NeuronFVG(), NeuronBOS(), NeuronVSA(),
         # Psychologia (PSY)
         NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(), NeuronOIDiv(),
+        # Sentyment newsów (NEWS) — LLM DeepSeek + fallback słownikowy (W-297)
+        NeuronSentymentNews(),
         # On-chain (OC) + Wash Trading (OC-05, OHLCV, bez API)
         NeuronMVRV(), NeuronSOPR(), NeuronPuellMultiple(), NeuronExchangeNetflow(),
         NeuronWashTrading(),

@@ -57,6 +57,8 @@ class KonfigPetliLive:
     # Gdy oba True: mnożniki łączone (MWU × ranga Igrzysk) w Legatusie.
     mwu: bool = False
     igrzyska: bool = False
+    # W-309: KsięgaWad — prewencyjny filtr wad setupu (rezim/interwal). Opt-in, OFF.
+    ksiega_wad: bool = False
     plik_pamieci: str = "logs/pamiec_refleksyjna.jsonl"
     log_dir: Optional[str] = "logs"
     # Pauza po każdym barze (s). None = oblicz z interwal (zalecane).
@@ -144,6 +146,9 @@ def _buduj_dyrygencie(
         if cfg.igrzyska:
             from imperium.biblioteki.igrzyska import Igrzyska as _Igrzyska
             d._igrzyska = _Igrzyska()
+        if cfg.ksiega_wad:
+            from imperium.cesarz.ksiega_wad import KsiegaWad as _KsiegaWad
+            d.ksiega_wad = _KsiegaWad()
         dyrygenci[sym] = d
 
     return dyrygenci
@@ -194,7 +199,7 @@ def handluj_live(
 
     logger.info(f"[PętlaLive] Start: {cfg.symbole}, interwal={cfg.interwal}, "
                 f"paper={cfg.paper}, synapsy={cfg.synapsy}, "
-                f"mwu={cfg.mwu}, igrzyska={cfg.igrzyska}")
+                f"mwu={cfg.mwu}, igrzyska={cfg.igrzyska}, ksiega_wad={cfg.ksiega_wad}")
 
     bar_nr = 0
     try:

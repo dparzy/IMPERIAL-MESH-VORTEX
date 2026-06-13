@@ -6,6 +6,39 @@
 
 ---
 
+## 2026-06-13 | W-309 | KsięgaWad — prewencyjny filtr wad setupu (ekstrakcja z Mnemosyne)
+
+**Pomiar redundancji (Prawo XVI) + decyzja Cezara.** Audyt Mnemosyne (N-MEM-206):
+- 🔴 zero testów (formalnie nie istnieje wg Prawa XIX), niepodpięta nigdzie.
+- trade-learning MIERZALNIE dubluje PamięćRefleksyjną (W-295) — obie zapisują
+  PnL+narrację lekcji. Prawo XVI: nie duplikować.
+- jedyna unikatowa zdolność: `book_of_flaws` — prewencyjny filtr (patrzy W PRZÓD,
+  czego PamięćRefleksyjna nie umie — ona tylko narratywnie opisuje przeszłość).
+
+Cezar (Prawo XVIII) wybrał: **wyekstrahuj Księgę Wad**, Mnemosyne nietknięta.
+
+Nowy moduł `cesarz/ksiega_wad.py`:
+- `KsiegaWad.zarejestruj(rezim, interwal, pnl)` — online, z każdego zamknięcia.
+- Sygnatura setupu staje się WADĄ gdy ≥ min_prob prób ORAZ wskaźnik strat ≥ prog_wady.
+- `sprawdz(rezim, interwal)` PRZED wejściem → CZYSTO / OSTRZEŻENIE / WETO.
+- Domyślnie tylko ostrzega (prog_weta=None → nigdy nie wetuje — bezpieczne).
+- `ucz_z_pamieci(pamiec)` — bootstrap z PamięciRefleksyjnej (Prawo XVI: jedno źródło).
+
+Wpięcie (opt-in, domyślnie OFF — Prawo XV, zero zmiany zachowania):
+- `Dyrygent.zbuduj(ksiega_wad=True)`, `.ksiega_wad`, `.raport_ksiegi_wad()`
+- uczenie w `_aktualizuj_synapsy()`, weto w `cykl()` (krok 4c, jak Rada Doradców)
+- `KonfigPetliLive.ksiega_wad`, `backtest_portfel(ksiega_wad=True)`
+- pending tuple rozszerzony 3→4 (dodano interwał setupu); 3 unpacki zaktualizowane.
+
+20 testów (logika, granice progów Prawa XXI, bootstrap, integracja Dyrygent/pętla).
+957/957 testów, audyt pełna harmonia, ruff czysty.
+
+**Pliki:** `cesarz/ksiega_wad.py`, `koloseum/dyrygent.py`, `koloseum/petla_live.py`,
+`koloseum/backtest.py`, `tests/test_ksiega_wad.py`, `tests/test_mwu_wpiecie.py`,
+`docs/MANIFEST_KODU.md`, `README.md`
+
+---
+
 ## 2026-06-13 | W-308 | Monte Carlo bridge — walidacja post-backtest z silnika
 
 **Odzysk potencjału (Prawo XV):** `monte_carlo.py` i jego `pelen_raport_mc()` istniały

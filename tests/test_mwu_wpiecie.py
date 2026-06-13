@@ -77,7 +77,7 @@ def test_mwu_podpiecie_do_legatusa():
                        kategoria="T", legion="TREND")
     s2 = SygnalNeuronu(neuron_id="M-01", kierunek="LONG", pewnosc=0.7, waga=3,
                        kategoria="M", legion="WSPOLNY")
-    d._synapsy_pending["pos-1"] = ([s1, s2], "TREND_STRONG", "LONG")
+    d._synapsy_pending["pos-1"] = ([s1, s2], "TREND_STRONG", "LONG", "4H")
 
     d._aktualizuj_synapsy()
 
@@ -109,7 +109,7 @@ def test_mwu_trade_na_zero_jest_neutralny():
 
     s1 = SygnalNeuronu(neuron_id="T-01", kierunek="LONG", pewnosc=0.8, waga=3,
                        kategoria="T", legion="TREND")
-    d._synapsy_pending["pos-zero"] = ([s1], "TREND_STRONG", "LONG")
+    d._synapsy_pending["pos-zero"] = ([s1], "TREND_STRONG", "LONG", "4H")
 
     d._aktualizuj_synapsy()
 

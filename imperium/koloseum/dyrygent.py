@@ -135,6 +135,10 @@ class Dyrygent:
         # None = wyłączona. Gdy aktywna: sprawdza plan po Kalkulatorze, może zawetować
         # lub zredukować rozmiar pozycji (OpinaRady.modyfikator_pozycji).
         self.rada_doradcow = rada_doradcow
+        # W-309 KsięgaWad: prewencyjny filtr powtarzalnych wad setupów (rezim/interwal).
+        # Uczy się online z zamknięć (jak synapsy/mwu), sprawdza przed wejściem.
+        # None = wyłączona (domyślnie — opt-in, Prawo XV: zero zmiany zachowania).
+        self.ksiega_wad: Optional[Any] = None
         # W-290 portfel: budżet sizingu pary (None = pełny wolny kapitał silnika).
         # W koszyku N par każdy Dyrygent sizinguje wg kapital/N (równe wagi).
         self.kapital_sizing: Optional[float] = None
@@ -178,7 +182,7 @@ class Dyrygent:
                adaptery_live: bool = True,
                drift: bool = False, rada: bool = False,
                synapsy: bool = False, mwu: bool = False,
-               igrzyska: bool = False) -> "Dyrygent":
+               igrzyska: bool = False, ksiega_wad: bool = False) -> "Dyrygent":
         """Składa Dyrygenta z pełnym rojem, Budowniczym (TA-Lib) i silnikiem paper.
 
         adaptery_live: gdy True (domyślnie), wpina publiczne adaptery futures+sentyment
@@ -193,6 +197,8 @@ class Dyrygent:
             igrzyska: W-307 Igrzyska — batch ranking neuronów (accuracy/stability/ranga).
                       Komplementarne do mwu: kumulatywne vs eksponencjalne zapomnienie.
                       Gdy oba aktywne: mnożniki mnożone (MWU × ranga Igrzysk).
+            ksiega_wad: W-309 KsięgaWad — prewencyjny filtr wad setupu (rezim/interwal);
+                      uczy się z zamknięć, ostrzega/wetuje powtarzalnie stratne setupy.
         Domyślnie wszystkie False → zachowanie identyczne jak wcześniej (zero zmian).
         """
         from imperium.legiony.rejestr import zbuduj_legatusa
@@ -233,6 +239,9 @@ class Dyrygent:
         if igrzyska:
             from imperium.biblioteki.igrzyska import Igrzyska as _Igrzyska
             dyrygent._igrzyska = _Igrzyska()
+        if ksiega_wad:
+            from imperium.cesarz.ksiega_wad import KsiegaWad
+            dyrygent.ksiega_wad = KsiegaWad()
         return dyrygent
 
     # ── Jeden cykl decyzyjny ─────────────────────────────────────────────────
@@ -245,7 +254,7 @@ class Dyrygent:
         # 0. W-299 Synapsy Reżimowe — uczenie z nowo zamkniętych pozycji.
         # Sprawdzamy historia_zamkniec od ostatniego przetworzonego indeksu.
         if (self.legatus.synapsy is not None or self.legatus.mwu is not None
-                or self._igrzyska is not None):
+                or self._igrzyska is not None or self.ksiega_wad is not None):
             self._aktualizuj_synapsy()
 
         # 1. Wskaźniki (Prawo I — Brama/Budowniczy liczą, nie Dyrygent)
@@ -454,6 +463,17 @@ class Dyrygent:
                                         powod=f"weto Pretorianów po redukcji Rady: {plan.powod_veto}",
                                         raport=raport, plan=plan)
 
+        # 4c. KsięgaWad — prewencyjny filtr powtarzalnych wad setupu (W-309).
+        # Sprawdza sygnaturę rezim/interwal: WETO = blokada, OSTRZEŻENIE = przepuszcza
+        # (zapisane w powodach). Default OFF (ksiega_wad=None) → ten blok nieaktywny.
+        if self.ksiega_wad is not None:
+            werdykt = self.ksiega_wad.sprawdz(raport.rezim, interwal)
+            if werdykt.blokada:
+                return DecyzjaCyklu(symbol, "KSIEGA_WAD_WETO", False, kierunek=kierunek,
+                                    pewnosc=pewnosc, rezim=raport.rezim,
+                                    powod=f"KsięgaWad weto: {werdykt.powod}",
+                                    raport=raport, plan=plan)
+
         # 4. Sygnał wejścia → silnik paper trading
         powody = f"{raport.zgodnych_neuronow}/{raport.aktywnych_neuronow} neuronów zgodnych"
         if top_strat is not None:
@@ -482,11 +502,12 @@ class Dyrygent:
                                 powod="silnik odrzucił (limit pozycji / brak kapitału / duplikat)",
                                 raport=raport, plan=plan, sygnal=sygnal)
 
-        # W-299/303: zapamiętaj sygnały tej pozycji dla SynapsyRezimowych i HedgeMWU.
+        # W-299/303/309: zapamiętaj sygnały tej pozycji dla warstw uczących się
+        # z zamknięć (Synapsy/MWU/Igrzyska/KsięgaWad). 4. element = interwał (W-309).
         if (self.legatus.synapsy is not None or self.legatus.mwu is not None
-                or self._igrzyska is not None) and raport.sygnaly:
+                or self._igrzyska is not None or self.ksiega_wad is not None) and raport.sygnaly:
             self._synapsy_pending[pozycja.pozycja_id] = (
-                list(raport.sygnaly), raport.rezim, kierunek
+                list(raport.sygnaly), raport.rezim, kierunek, interwal
             )
 
         return DecyzjaCyklu(symbol, "WEJSCIE", True, kierunek=kierunek,
@@ -514,7 +535,7 @@ class Dyrygent:
 
             # W-299: Synapsy Reżimowe — aktualizuj koalicje par neuronów.
             if synapsy is not None and pending is not None:
-                sygnaly, rezim_wej, kierunek = pending
+                sygnaly, rezim_wej, kierunek, _interwal = pending
                 synapsy.aktualizuj(
                     sygnaly=sygnaly,
                     kierunek_decyzji=kierunek,
@@ -527,7 +548,7 @@ class Dyrygent:
             # Trade na zero (pnl_pct == 0) jest neutralny — nie karze ani nie nagradza
             # (spójne z SynapsyRezimowe: pnl_sign=0 → zero delty; Prawo XV/XVI).
             if mwu is not None and pending is not None and wynik.pnl_pct != 0:
-                sygnaly, _rezim, kierunek = pending
+                sygnaly, _rezim, kierunek, _interwal = pending
                 zyskowny = kierunek if wynik.pnl_pct > 0 else (
                     "SHORT" if kierunek == "LONG" else "LONG"
                 )
@@ -537,12 +558,22 @@ class Dyrygent:
             # W-307: Igrzyska — zarejestruj wynik dla rankingu kumulatywnego.
             # Break-even (pnl_pct == 0) pominięty — brak sygnału kierunkowego.
             if igrzyska is not None and pending is not None and wynik.pnl_pct != 0:
-                sygnaly, _rezim, kierunek = pending
+                sygnaly, _rezim, kierunek, _interwal = pending
                 zyskowny = kierunek if wynik.pnl_pct > 0 else (
                     "SHORT" if kierunek == "LONG" else "LONG"
                 )
                 for s in sygnaly:
                     igrzyska.zarejestruj_wynik(s.neuron_id, s.kierunek, zyskowny)
+
+            # W-309: KsięgaWad — ucz sygnaturę setupu (rezim/interwal) wynikiem trade'u.
+            # Uczy się z KAŻDEGO zamknięcia (też break-even — liczy próbę, nie stratę).
+            # rezim/interwal z pending (stan wejścia), fallback gdy pending zgubione.
+            if self.ksiega_wad is not None:
+                rezim_kw = pending[1] if pending else (
+                    getattr(wynik, "rezim", None) or "NORMAL"
+                )
+                interwal_kw = pending[3] if pending else getattr(wynik, "interwal", "")
+                self.ksiega_wad.zarejestruj(rezim_kw, interwal_kw, wynik.pnl_pct)
 
             # W-302: PamięćRefleksyjna — lekcja per zamknięcie (cross-session learning).
             if self._pamiec is not None:
@@ -643,6 +674,15 @@ class Dyrygent:
                 "ok": mc.bootstrap.ok,
             },
         }
+
+    def raport_ksiegi_wad(self) -> Optional[Dict[str, Any]]:
+        """
+        W-309: raport wykrytych wad setupów (sygnatury rezim/interwal z wysokim
+        wskaźnikiem strat). None gdy KsięgaWad wyłączona.
+        """
+        if self.ksiega_wad is None:
+            return None
+        return self.ksiega_wad.raport()
 
     def odswiez_kontekst_rynku(
         self,

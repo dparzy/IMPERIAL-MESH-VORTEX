@@ -234,6 +234,9 @@ def backtest_portfel(
     # W-307 Igrzyska — batch ranking (accuracy/stability/ranga). True → per-symbol
     # kumulatywne statystyki neuronów. Gdy oba mwu+igrzyska: mnożniki łączone (×).
     igrzyska_learning: bool = False,
+    # W-309 KsięgaWad — prewencyjny filtr wad setupu (rezim/interwal). True → per-symbol
+    # księga uczy się z zamknięć i ostrzega/wetuje powtarzalnie stratne setupy.
+    ksiega_wad: bool = False,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -330,6 +333,9 @@ def backtest_portfel(
         if igrzyska_learning:
             from imperium.biblioteki.igrzyska import Igrzyska as _Igrzyska
             d._igrzyska = _Igrzyska()
+        if ksiega_wad:
+            from imperium.cesarz.ksiega_wad import KsiegaWad as _KsiegaWad
+            d.ksiega_wad = _KsiegaWad()
         dyrygenci[sym] = d
 
     # Chronologiczna oś: (timestamp, symbol, indeks_baru) — tylko bary po oknie.

@@ -316,6 +316,7 @@
 | **PętlaLive** (W-302 — główny entrypoint: DataLoader→Radar→Dyrygent.cykl→PamięćRefleksyjna; `handluj_live`/`uruchom`) | `koloseum/petla_live.py` | ✅ aktywny |
 | **HedgeMWU wiring** (W-303 — online MWU Freund&Schapire'97 wpięty w Legatus; po każdym zamknięciu neuronowe mnożniki wag uczą się strumieniowo; opt-in `mwu_learning=True` w backtest_portfel) | `biblioteki/hedge_mwu.py` + `legiony/legatus.py` + `koloseum/dyrygent.py` | ✅ aktywny |
 | **Fabryka warstw adaptacyjnych** (W-304 — `Dyrygent.zbuduj(drift/rada/synapsy/mwu=...)` odblokowuje 4 wpięte-lecz-martwe-w-produkcji moduły; domyślnie OFF, zero zmian zachowania; Prawo XV — odzysk potencjału) | `koloseum/dyrygent.py` | ✅ aktywny |
+| **Domknięcie korelacji SynapsyRezimowych** (W-305 — `KolektorKorelacjiNeuronow` zbiera głosy neuronów strumieniowo, liczy macierz korelacji par, zasila SynapsyRezimowe co cykl; dekorelacja Prawa XVI przestaje być martwa — pary niezależne wzmacniane mocniej; bez lookahead) | `legiony/diagnostyka_korelacji.py` + `biblioteki/synapsy_rezimowe.py` + `koloseum/dyrygent.py` | ✅ aktywny |
 
 ---
 

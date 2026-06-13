@@ -21,6 +21,7 @@ gdzie pojawiło się pytanie o redundancję elitarnych. Neurony wymagają Bramy
 
 import logging
 import math
+from collections import deque
 from typing import List, Dict, Any, Tuple, Optional
 
 logger = logging.getLogger("DiagKorelacji")
@@ -172,6 +173,75 @@ def raport_dekorelacji(
         "macierz": {f"{a}~{b}": (round(k, 3) if k is not None else None)
                     for (a, b), k in macierz.items()},
     }
+
+
+class KolektorKorelacjiNeuronow:
+    """
+    📡 W-305 | Online kolektor korelacji NEURONÓW (nie zwiadowców).
+
+    DLA NOWICJUSZA: SynapsyRezimowe (W-299) wzmacniają duety neuronów TYM bardziej,
+    im są od siebie NIEZALEŻNE (dekorelacja = Prawo XVI). Ale by wiedzieć, kto jest
+    niezależny, trzeba mierzyć korelację par neuronów na żywo. `diagnostyka_korelacji`
+    robiła to dotąd TYLKO dla zwiadowców EXP (pure Python). Neurony głosują przez Bramę
+    i pojawiają się dopiero w `raport.sygnaly` Legatusa. Ten kolektor zbiera te właśnie
+    głosy strumieniowo (okno przesuwne) i liczy macierz korelacji par neuronów —
+    domykając pętlę: kara_korelacji/dekorelacja w SynapsyRezimowych przestaje być martwa.
+
+    Brak lookahead (Prawo I): macierz zwracana w kroku t opiera się WYŁĄCZNIE na głosach
+    z kroków ≤ t. Dyrygent najpierw odczytuje korelacje (z przeszłości), potem rejestruje
+    bieżący głos — nigdy odwrotnie.
+
+    Wyrównanie czasowe: każdy znany neuron dostaje wartość w KAŻDYM kroku (nieobecny =
+    0.0 = NEUTRAL), więc wszystkie serie mają tę samą oś czasu; `[-n:]` obu wektorów
+    odnosi się do tych samych n ostatnich kroków.
+    """
+
+    def __init__(self, okno: int = 120, min_probek: int = 20):
+        """
+        okno:      ile ostatnich kroków trzymamy (przesuwne, bounded — O(N·okno) pamięci).
+        min_probek: minimalna liczba wspólnych próbek, by w ogóle liczyć korelację
+                   (mniej = None, czyli traktowane jak para niezależna — Prawo I).
+        """
+        self.okno = okno
+        self.min_probek = min_probek
+        self._serie: Dict[str, deque] = {}
+
+    def zarejestruj(self, sygnaly: list) -> None:
+        """Dokłada jeden krok: wektor głosów {neuron_id: ±pewnosc/0}. Nieobecni → 0.0."""
+        biezace = {s.neuron_id: sygnal_na_liczbe(s.kierunek, s.pewnosc) for s in sygnaly}
+        klucze = set(self._serie) | set(biezace)
+        for k in klucze:
+            d = self._serie.get(k)
+            if d is None:
+                d = deque(maxlen=self.okno)
+                self._serie[k] = d
+            d.append(biezace.get(k, 0.0))
+
+    def korelacje(self) -> Dict[Tuple[str, str], float]:
+        """
+        Macierz {(a, b): corr} dla par z ≥min_probek wspólnych próbek i określoną korelacją.
+        Pary o nieokreślonej korelacji (stały sygnał / za mało danych) są POMIJANE —
+        SynapsyRezimowe potraktują je wtedy jako niezależne (corr=0), co jest bezpiecznym
+        domyślnym (Prawo I: nie udawaj wiedzy, której nie masz).
+        """
+        klucze = sorted(self._serie)
+        wynik: Dict[Tuple[str, str], float] = {}
+        for i in range(len(klucze)):
+            for j in range(i + 1, len(klucze)):
+                a, b = klucze[i], klucze[j]
+                xa = list(self._serie[a])
+                xb = list(self._serie[b])
+                n = min(len(xa), len(xb))
+                if n < self.min_probek:
+                    continue
+                kor = korelacja_pearson(xa[-n:], xb[-n:])
+                if kor is not None:
+                    wynik[(a, b)] = round(kor, 4)
+        return wynik
+
+    def liczba_krokow(self) -> int:
+        """Ile kroków zebrano dla najdłuższej serii (diagnostyka)."""
+        return max((len(d) for d in self._serie.values()), default=0)
 
 
 def sformatuj_raport(rap: Dict[str, Any]) -> str:

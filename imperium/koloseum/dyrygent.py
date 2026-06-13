@@ -120,6 +120,9 @@ class Dyrygent:
         # aktualizuj() — zamknięta pętla uczenia koalicji bez ingerencji z zewnątrz.
         self._synapsy_pending: Dict[str, tuple] = {}  # pozycja_id → (sygnaly, rezim, kier)
         self._synapsy_ostatni_idx: int = 0     # ile zamknięć już przetworzyliśmy
+        # W-305: kolektor korelacji par neuronów — domyka dekorelację SynapsyRezimowych
+        # (Prawo XVI). Tworzony leniwie gdy legatus.synapsy aktywny. None = bez korelacji.
+        self._kolektor_korelacji: Optional[Any] = None
         # W-302 PamięćRefleksyjna: cross-session dziennik lekcji. Gdy podana:
         # każde zamknięcie pozycji → lekcja w JSONL (symbol, rezim, interwal, pnl).
         # None = wyłączona (domyślnie — zero kosztu, opt-in).
@@ -284,7 +287,18 @@ class Dyrygent:
 
         # 3. Legatus — agregacja roju (Opcja A: przekaż StanRynku → radar scoring strategii)
         self.legatus.stan_rynku = self.stan_rynku
+        # W-305: zasil SynapsyRezimowe korelacją par neuronów z PRZESZŁYCH barów
+        # (bez lookahead — bieżący głos rejestrujemy dopiero po fokus()). Domyka
+        # dekorelację Prawa XVI: pary niezależne wzmacniane mocniej niż skorelowane.
+        if self.legatus.synapsy is not None and self._kolektor_korelacji is not None:
+            self.legatus.synapsy.ustaw_korelacje(self._kolektor_korelacji.korelacje())
         raport = self.legatus.fokus(symbol, wskazniki, rezim=rezim, bary=bary)
+        # Zarejestruj bieżący wektor głosów neuronów do kolektora korelacji (po decyzji).
+        if self.legatus.synapsy is not None and raport.sygnaly:
+            if self._kolektor_korelacji is None:
+                from imperium.legiony.diagnostyka_korelacji import KolektorKorelacjiNeuronow
+                self._kolektor_korelacji = KolektorKorelacjiNeuronow()
+            self._kolektor_korelacji.zarejestruj(raport.sygnaly)
         # Reset override WAGI_REZIMU — każdy cykl startuje z czystym stanem.
         if self.drift_adapter is not None:
             self.legatus.resetuj_wagi_rezimu()

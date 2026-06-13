@@ -78,6 +78,10 @@ class SynapsyRezimowe:
         self._silo: Dict[str, float] = {}
         # {klucz_pary: liczba_aktualizacji} — pewność statystyczna pary
         self._licznik: Dict[str, int] = {}
+        # W-305: bieżąca macierz korelacji par neuronów {(ni, nj): corr}, ustawiana
+        # co cykl przez Dyrygenta (KolektorKorelacjiNeuronow). Fallback dla call-sites
+        # które nie podają korelacje= jawnie. Pusta = wszystkie pary niezależne (corr=0).
+        self._korelacje_biezace: Dict[Tuple[str, str], float] = {}
 
         if sciezka_stanu:
             self._wczytaj(sciezka_stanu)
@@ -109,7 +113,7 @@ class SynapsyRezimowe:
         if len(zgodne) < 2:
             return  # para potrzebuje co najmniej 2 neuronów
 
-        korelacje = korelacje or {}
+        korelacje = korelacje or self._korelacje_biezace or {}
 
         for idx_i in range(len(zgodne)):
             for idx_j in range(idx_i + 1, len(zgodne)):
@@ -126,6 +130,14 @@ class SynapsyRezimowe:
                 nowa = max(-1.0, min(1.0, stara + delta))
                 self._silo[klucz] = round(nowa, 6)
                 self._licznik[klucz] = self._licznik.get(klucz, 0) + 1
+
+    def ustaw_korelacje(self, korelacje: Optional[Dict[Tuple[str, str], float]]) -> None:
+        """
+        W-305: ustawia bieżącą macierz korelacji par neuronów (z KolektorKorelacjiNeuronow).
+        Używana jako fallback przez aktualizuj()/wzmocnij_pewnosc() gdy nie podano korelacje=.
+        None → czyści (wszystkie pary traktowane jako niezależne, corr=0).
+        """
+        self._korelacje_biezace = korelacje or {}
 
     def zapomnij(self) -> None:
         """Stosuje decay do wszystkich synaps (wywołaj co bar lub co N barów)."""
@@ -155,7 +167,7 @@ class SynapsyRezimowe:
         if len(sygnaly_zgodne) < 2:
             return pewnosc
 
-        korelacje = korelacje or {}
+        korelacje = korelacje or self._korelacje_biezace or {}
         score_sum = 0.0
         n_par = 0
 

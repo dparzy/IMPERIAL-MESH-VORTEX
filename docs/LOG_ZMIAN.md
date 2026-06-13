@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-06-13 | W-305 | Domknięcie pętli korelacji w SynapsyRezimowych (Prawo XVI)
+
+**Naprawa utraty potencjału z audytu W-304:** `kara_korelacji = 1.0 + corr` i
+`dekorelacja = 1.0 - corr` to serce Prawa XVI w SynapsyRezimowych (W-299), ale
+`corr` był ZAWSZE 0 — call-site nie podawał korelacji, a diagnostyka liczyła tylko
+zwiadowców (EXP), nie neurony. Pętla domknięta:
+
+- `KolektorKorelacjiNeuronow` (diagnostyka_korelacji.py) — online okno przesuwne
+  głosów neuronów z `raport.sygnaly`, macierz korelacji Pearsona par neuronów
+- `SynapsyRezimowe.ustaw_korelacje()` + fallback `_korelacje_biezace` w
+  `aktualizuj()`/`wzmocnij_pewnosc()` — bez zmiany sygnatur call-sites
+- `Dyrygent.cykl()`: odczyt korelacji PRZED fokus (z przeszłych barów), rejestracja
+  bieżącego głosu PO fokus → zero lookahead (Prawo I)
+- Pary niezależne (corr≈0) wzmacniane pełnym głosem; skorelowane (corr≈1) stłumione
+- 9 testów granicznych (`tests/test_korelacje_synapsy.py`) — 909/909
+
+**Pliki:** `legiony/diagnostyka_korelacji.py`, `biblioteki/synapsy_rezimowe.py`, `koloseum/dyrygent.py`, `tests/test_korelacje_synapsy.py`, `docs/MANIFEST_KODU.md`, `README.md`
+
+---
+
 ## 2026-06-13 | W-304 | Fabryka odblokowuje 4 martwe-w-produkcji warstwy (audyt Prawo XV)
 
 **Analiza całego Imperium + konkurencja wykazała UTRATĘ POTENCJAŁU:** DriftAdapter

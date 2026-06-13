@@ -225,6 +225,9 @@ def backtest_portfel(
     dd_halt: float = 0.13,
     bary_per: "Optional[Dict[str, List[Dict[str, Any]]]]" = None,
     wagi: "Optional[Dict[str, float]]" = None,
+    # W-299 Synapsy Reżimowe — opt-in, domyślnie False (zero kosztu na backteście
+    # gdzie nowy model ma mało historii). True → każdy symbol uczy własny graf par.
+    synapsy_rezimowe: bool = False,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -309,6 +312,12 @@ def backtest_portfel(
         if tryb_lupiezcy:
             from imperium.pretorianie.praeda import Okazjon
             d.okazjon = Okazjon()
+        # W-299 Synapsy Reżimowe: per-symbol graf koalicji par neuronów warunkowany
+        # reżimem × dekorelacja. Uczy się przez cały backtest — para dobrych duetów
+        # w TREND_STRONG kumuluje synaps, pary która systematycznie mylą = redukcja.
+        if synapsy_rezimowe:
+            from imperium.biblioteki.synapsy_rezimowe import SynapsyRezimowe
+            d.legatus.synapsy = SynapsyRezimowe()
         dyrygenci[sym] = d
 
     # Chronologiczna oś: (timestamp, symbol, indeks_baru) — tylko bary po oknie.

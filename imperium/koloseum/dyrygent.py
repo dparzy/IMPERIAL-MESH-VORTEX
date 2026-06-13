@@ -181,8 +181,11 @@ class Dyrygent:
                                     sesja_id=sesja_id, log_dir=log_dir)
         adaptery = []
         if adaptery_live:
-            from imperium.akwedukty.adaptery import AdapterFutures, AdapterFearGreed, AdapterCVD
-            adaptery = [AdapterFutures(), AdapterFearGreed(), AdapterCVD()]
+            from imperium.akwedukty.adaptery import (AdapterFutures, AdapterFearGreed,
+                                                     AdapterCVD, AdapterNewsLLM)
+            # AdapterNewsLLM z uzyj_llm=True (DeepSeek gdy klucz; fallback słownikowy
+            # gdy brak klucza; milczy gdy brak RSS fetcher — Prawo XV, bez halucynacji).
+            adaptery = [AdapterFutures(), AdapterFearGreed(), AdapterCVD(), AdapterNewsLLM()]
         return cls(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
                    budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
                    namiestnik=get_namiestnik(), adaptery=adaptery)

@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-06-13 | W-301 | Domknięcie adaptacyjnych plugi — SynapsyRezimowe w backtest_portfel + AdapterNewsLLM
+
+**Prawo XV — domykanie luk pomiędzy gotowym kodem a pipeline:**
+
+- `koloseum/backtest.py`: nowy parametr `synapsy_rezimowe=False` (opt-in, zero kosztu
+  bez włączenia). `True` → każdy symbol w portfelu dostaje własny `SynapsyRezimowe()` w
+  `legatus.synapsy` i uczy par przez cały backtest (1 linia, wstrzykiwana przez Prawo I).
+- `akwedukty/adaptery/__init__.py`: eksportuje `AdapterNewsLLM` (wcześniej osierocony —
+  klasa istniała, ale poza publicznym interfejsem pakietu).
+- `koloseum/dyrygent.py`: `zbuduj_bojowy(adaptery_live=True)` teraz zawiera
+  `AdapterNewsLLM()` — NEWS-01 próbuje pobrać nagłówki; bez RSS/klucza: abstynuje (Prawo XV).
+- `narzedzia/audyt_spojnosci.py`: opis NEWS-01 odzwierciedla że adapter wpięty.
+- 2 nowe testy portfela (synapsy opt-in + default=False) → **873/873** ✅
+
+---
+
 ## 2026-06-13 | W-300 | Hook RadarRynku — wpięcie RADAR-01/02/03 w sloty kontekstu
 
 **Prawo XV — koniec trzech martwych głosów (RADAR czytał klucze, których nikt nie podawał):**

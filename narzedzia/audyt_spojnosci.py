@@ -486,7 +486,8 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
                 "ożywa gdy pętla portfelowa poda serie BTC)",
     "RADAR-02": "BTC_DOMINANCJA (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300)",
     "RADAR-03": "PRZEPLYW_KAPITALU (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300)",
-    "NEWS-01": "NEWS_SENTYMENT (AdapterNewsLLM — DeepSeek + fallback słownikowy)",
+    "NEWS-01": "NEWS_SENTYMENT (AdapterNewsLLM — wpięty w zbuduj_bojowy W-301; "
+               "ożywa z RSS fetcher lub DEEPSEEK_API_KEY; bez feedu: abstynuje)",
 }
 
 # Dowód allowlisty (Prawo I — bez zaufania na słowo): każdy neuron adapterowy

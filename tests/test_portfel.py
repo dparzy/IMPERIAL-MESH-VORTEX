@@ -87,6 +87,25 @@ def test_portfel_progi_bezpiecznika_parametryzowane():
     assert eng.kapital_calkowity > 0
 
 
+def test_portfel_synapsy_rezimowe_opt_in():
+    """W-299: synapsy_rezimowe=True nie psuje pipeline; equity dodatnie = wpięcie działa."""
+    import imperium.koloseum.backtest as bt
+
+    bary_per = {s: _bary(s, n=300) for s in ("BTCUSDT", "ETHUSDT")}
+    eng = bt.backtest_portfel({}, "1D", okno=250, bary_per=bary_per,
+                              synapsy_rezimowe=True)
+    assert eng.kapital_calkowity > 0
+    assert all(p > 0 for p in eng.krzywa_equity)
+
+
+def test_portfel_synapsy_rezimowe_false_default():
+    """W-299: synapsy_rezimowe domyślnie False — backtest identyczny ze starym wywołaniem."""
+    import inspect
+    from imperium.koloseum.backtest import backtest_portfel
+    sig = inspect.signature(backtest_portfel)
+    assert sig.parameters["synapsy_rezimowe"].default is False
+
+
 def test_portfel_wstrzykuje_btc_trend():
     """Radar BTC: portfel ustawia kontekst_dodatkowy z BTC_TREND (lead-lag)."""
     import imperium.koloseum.backtest as bt

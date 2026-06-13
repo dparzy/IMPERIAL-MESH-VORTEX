@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-13 | W-304 | Fabryka odblokowuje 4 martwe-w-produkcji warstwy (audyt Prawo XV)
+
+**Analiza całego Imperium + konkurencja wykazała UTRATĘ POTENCJAŁU:** DriftAdapter
+(W-296), RadaDoradcow, SynapsyRezimowe (W-299) i HedgeMWU (W-303) były wpięte w
+logikę konstruktora/cyklu Dyrygenta, ale produkcyjna fabryka `Dyrygent.zbuduj()`
+(której używa `petla_live`) nigdy ich nie instancjonowała → martwe w realnym życiu.
+
+- `Dyrygent.zbuduj(drift=False, rada=False, synapsy=False, mwu=False)` — 4 opt-in
+- Domyślnie wszystkie OFF → zachowanie identyczne (zero zmian, kompatybilność wsteczna)
+- 7 testów (`tests/test_zbuduj_warstwy.py`) — 900/900
+- Pozostałe utraty potencjału (Igrzyska osierocony, korelacje nie docierają do
+  SynapsyRezimowych, Pamięć Refleksyjna zapis-bez-odczytu) — zaraportowane Cezarowi
+  jako decyzje kierunkowe (Prawo XVIII), nie naprawione autonomicznie.
+
+**Pliki:** `koloseum/dyrygent.py`, `tests/test_zbuduj_warstwy.py`, `docs/MANIFEST_KODU.md`, `README.md`
+
+---
+
 ## 2026-06-13 | W-303 | HedgeMWU wiring — online wagi neuronów wpięte w Legatusa
 
 **Online Multiplicative Weights Update (Freund & Schapire 1997) — zamknięta pętla uczenia:**

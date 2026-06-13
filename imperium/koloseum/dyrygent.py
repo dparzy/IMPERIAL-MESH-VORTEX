@@ -168,12 +168,21 @@ class Dyrygent:
     def zbuduj(cls, kapital_startowy: float = 10_000.0, sesja_id: str = "",
                min_neuronow: int = 5, min_przewaga: float = 0.55,
                min_pewnosc: float = 0.55, log_dir=None, tryb: str = "agregat",
-               adaptery_live: bool = True) -> "Dyrygent":
+               adaptery_live: bool = True,
+               drift: bool = False, rada: bool = False,
+               synapsy: bool = False, mwu: bool = False) -> "Dyrygent":
         """Składa Dyrygenta z pełnym rojem, Budowniczym (TA-Lib) i silnikiem paper.
 
         adaptery_live: gdy True (domyślnie), wpina publiczne adaptery futures+sentyment
             (Binance fapi + alternative.me, bez klucza) → kategoria R głosuje realnymi
             danymi. Ustaw False dla czystego backtestu OHLCV z CSV (neurony R abstynują).
+
+        Warstwy adaptacyjne (Prawo XV — domyślnie OFF, opt-in; produkcja je odblokowuje):
+            drift:   W-296 DriftAdapter — antycypacyjna korekta WAGI_REZIMU.
+            rada:    Rada Doradców (5) — weto/redukcja pozycji przed wejściem.
+            synapsy: W-299 SynapsyRezimowe — graf koalicji par neuronów (Legatus).
+            mwu:     W-303 HedgeMWU — online wagi neuronów po każdym trade'cie (Legatus).
+        Domyślnie wszystkie False → zachowanie identyczne jak wcześniej (zero zmian).
         """
         from imperium.legiony.rejestr import zbuduj_legatusa
         from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
@@ -190,9 +199,27 @@ class Dyrygent:
             # AdapterNewsLLM z uzyj_llm=True (DeepSeek gdy klucz; fallback słownikowy
             # gdy brak klucza; milczy gdy brak RSS fetcher — Prawo XV, bez halucynacji).
             adaptery = [AdapterFutures(), AdapterFearGreed(), AdapterCVD(), AdapterNewsLLM()]
-        return cls(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
-                   budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
-                   namiestnik=get_namiestnik(), adaptery=adaptery)
+
+        drift_adapter = None
+        if drift:
+            from imperium.koloseum.drift_adapter import DriftAdapter
+            drift_adapter = DriftAdapter()
+        rada_doradcow = None
+        if rada:
+            from imperium.cesarz.doradcy.rada import RadaDoradcow
+            rada_doradcow = RadaDoradcow()
+
+        dyrygent = cls(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
+                       budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
+                       namiestnik=get_namiestnik(), adaptery=adaptery,
+                       drift_adapter=drift_adapter, rada_doradcow=rada_doradcow)
+        if synapsy:
+            from imperium.biblioteki.synapsy_rezimowe import SynapsyRezimowe
+            legatus.synapsy = SynapsyRezimowe()
+        if mwu:
+            from imperium.biblioteki.hedge_mwu import HedgeMWU
+            legatus.mwu = HedgeMWU()
+        return dyrygent
 
     # ── Jeden cykl decyzyjny ─────────────────────────────────────────────────
     def cykl(self, symbol: str, bary: List[Dict[str, Any]],

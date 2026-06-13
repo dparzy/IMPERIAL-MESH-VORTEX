@@ -315,6 +315,7 @@
 | **Hook RadarRynku** (W-300 — `Dyrygent.odswiez_kontekst_rynku()` wypełnia sloty kontekstu → budzi RADAR-01/02/03) | `koloseum/dyrygent.py` | ✅ aktywny |
 | **PętlaLive** (W-302 — główny entrypoint: DataLoader→Radar→Dyrygent.cykl→PamięćRefleksyjna; `handluj_live`/`uruchom`) | `koloseum/petla_live.py` | ✅ aktywny |
 | **HedgeMWU wiring** (W-303 — online MWU Freund&Schapire'97 wpięty w Legatus; po każdym zamknięciu neuronowe mnożniki wag uczą się strumieniowo; opt-in `mwu_learning=True` w backtest_portfel) | `biblioteki/hedge_mwu.py` + `legiony/legatus.py` + `koloseum/dyrygent.py` | ✅ aktywny |
+| **Fabryka warstw adaptacyjnych** (W-304 — `Dyrygent.zbuduj(drift/rada/synapsy/mwu=...)` odblokowuje 4 wpięte-lecz-martwe-w-produkcji moduły; domyślnie OFF, zero zmian zachowania; Prawo XV — odzysk potencjału) | `koloseum/dyrygent.py` | ✅ aktywny |
 
 ---
 

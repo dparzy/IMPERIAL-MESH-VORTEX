@@ -310,6 +310,17 @@ class Legatus:
         # Opcja A: StanRynku z RadarRynku — radar-aware strategy scoring.
         # Ustawiany przez Dyrygenta przed fokus(). None = bez radaru.
         self.stan_rynku = None
+        # W-296 DriftAdapter: per-cykl override WAGI_REZIMU (antycypacyjna korekta).
+        # None = bez override (używa globalnego WAGI_REZIMU). Resetować po fokus().
+        self._wagi_rezimu_override: Optional[dict] = None
+
+    def ustaw_wagi_rezimu(self, wagi: dict) -> None:
+        """W-296: per-cykl override WAGI_REZIMU z DriftAdapter. Wywołaj PRZED fokus()."""
+        self._wagi_rezimu_override = wagi
+
+    def resetuj_wagi_rezimu(self) -> None:
+        """Czyści override po cyklu — następny cykl wraca do globalnego WAGI_REZIMU."""
+        self._wagi_rezimu_override = None
 
     def ustaw_mnozniki_neuronow(self, mnozniki: dict):
         """
@@ -519,7 +530,7 @@ class Legatus:
         mnożnik UCZENIA per-neuron (Igrzyska/HedgeMWU, wizja W-049). Prawo XV —
         wagi ożywione zarówno regułą reżimu, jak i wynikami historycznymi.
         """
-        mapa = WAGI_REZIMU.get(rezim, {})
+        mapa = (self._wagi_rezimu_override or WAGI_REZIMU).get(rezim, {})
         default = mapa.get("_default", 1.0)
         mn_neuron = self.mnozniki_neuronow
         if not mapa and not mn_neuron:

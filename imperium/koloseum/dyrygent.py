@@ -92,6 +92,8 @@ class Dyrygent:
         regula_6pct: bool = False,
         min_pewnosc_interwalu: Optional[Dict[str, float]] = None,
         sl_atr_mult: Optional[float] = None,
+        drift_adapter: Optional[Any] = None,
+        rada_doradcow: Optional[Any] = None,
     ) -> None:
         self.legatus = legatus
         self.kalkulator = kalkulator
@@ -110,6 +112,13 @@ class Dyrygent:
         # momentach. None = wyłączony. praeda_dd_normal ustawia portfel/breaker.
         self.okazjon = None
         self.praeda_dd_normal: bool = True
+        # W-296 DriftAdapter: antycypacyjna korekta WAGI_REZIMU przed zmianą reżimu.
+        # None = wyłączony. Podpięty = dodaje reżim co bar i koryguje wagi Legatusa.
+        self.drift_adapter = drift_adapter
+        # Rada Doradców: 5-osobowe kolegium (Oracle/Fulmen/Iustitia/Hermes/Pythia).
+        # None = wyłączona. Gdy aktywna: sprawdza plan po Kalkulatorze, może zawetować
+        # lub zredukować rozmiar pozycji (OpinaRady.modyfikator_pozycji).
+        self.rada_doradcow = rada_doradcow
         # W-290 portfel: budżet sizingu pary (None = pełny wolny kapitał silnika).
         # W koszyku N par każdy Dyrygent sizinguje wg kapital/N (równe wagi).
         self.kapital_sizing: Optional[float] = None
@@ -191,6 +200,18 @@ class Dyrygent:
             from imperium.legiony.legatus import klasyfikuj_rezim
             rezim = klasyfikuj_rezim(wskazniki)
 
+        # 1c. W-296 DriftAdapter — antycypacyjna korekta WAGI_REZIMU.
+        # Rejestruje reżim w historii, oblicza sygnał dryfu; gdy dryfuje, pre-przesuwa
+        # wagi kategorii ZANIM reżim oficjalnie się zmieni (mniej strat na przejściach).
+        if self.drift_adapter is not None:
+            self.drift_adapter.dodaj_rezim(rezim)
+            _sygnal_dryfu = self.drift_adapter.skanuj()
+            if _sygnal_dryfu.czy_drift:
+                from imperium.legiony.legatus import WAGI_REZIMU
+                self.legatus.ustaw_wagi_rezimu(
+                    self.drift_adapter.koryguj_wagi(WAGI_REZIMU, rezim, _sygnal_dryfu)
+                )
+
         # Interwał z danych — sterownik warstwy stylu (SCALP/SWING/INVEST).
         interwal = bary[-1].get("interwal", "") if bary else ""
 
@@ -215,6 +236,9 @@ class Dyrygent:
         # 3. Legatus — agregacja roju (Opcja A: przekaż StanRynku → radar scoring strategii)
         self.legatus.stan_rynku = self.stan_rynku
         raport = self.legatus.fokus(symbol, wskazniki, rezim=rezim, bary=bary)
+        # Reset override WAGI_REZIMU — każdy cykl startuje z czystym stanem.
+        if self.drift_adapter is not None:
+            self.legatus.resetuj_wagi_rezimu()
 
         if raport.weto:
             return DecyzjaCyklu(symbol, "LEGATUS_WETO", False,
@@ -328,6 +352,33 @@ class Dyrygent:
                                 powod=f"weto Pretorianów: {plan.powod_veto}",
                                 raport=raport, plan=plan)
 
+        # 4b. Rada Doradców — kolegium pięciorga (Oracle/Fulmen/Iustitia/Hermes/Pythia).
+        # Weto Rady (< 3/5 lub IUSTITIA BLOKADA) = brak wejścia. 3-4/5 = redukcja pozycji.
+        if self.rada_doradcow is not None:
+            opinia = self._opinia_rady(wskazniki, raport, plan, kierunek, interwal, rezim)
+            if opinia.blokada:
+                return DecyzjaCyklu(symbol, "RADA_WETO", False, kierunek=kierunek,
+                                    pewnosc=pewnosc, rezim=raport.rezim,
+                                    powod=f"Rada Doradców weto: {opinia.powod_blokady}",
+                                    raport=raport, plan=plan)
+            if opinia.modyfikator_pozycji < 1.0:
+                plan = self.kalkulator.policz(
+                    symbol=symbol, kierunek=kierunek, cena_wejscia=cena_wejscia,
+                    dzwignia=plan.dzwignia,
+                    mnoznik_rozmiaru=mnoznik_rozmiaru * opinia.modyfikator_pozycji,
+                    kapital_usdt=(self.kapital_sizing if self.kapital_sizing is not None
+                                  else self.engine.kapital),
+                    pewnosc=pewnosc, rezim=raport.rezim,
+                    breaker_krzywej=self.breaker_krzywej, regula_6pct=self.regula_6pct,
+                    atr=wskazniki.get("ATR_14") if self.sl_atr_mult else None,
+                    sl_atr_mult=self.sl_atr_mult,
+                )
+                if not plan.checklist_ok:
+                    return DecyzjaCyklu(symbol, "PRETORIANIE_WETO", False, kierunek=kierunek,
+                                        pewnosc=pewnosc, rezim=raport.rezim,
+                                        powod=f"weto Pretorianów po redukcji Rady: {plan.powod_veto}",
+                                        raport=raport, plan=plan)
+
         # 4. Sygnał wejścia → silnik paper trading
         powody = f"{raport.zgodnych_neuronow}/{raport.aktywnych_neuronow} neuronów zgodnych"
         if top_strat is not None:
@@ -384,3 +435,99 @@ class Dyrygent:
             except Exception as e:
                 logger.warning(f"[Dyrygent] adapter {getattr(adapter, 'NAZWA', '?')} pominięty: {e}")
         return wskazniki
+
+    def _opinia_rady(self, wskazniki: Dict[str, Any], raport, plan,
+                     kierunek: str, interwal: str, rezim: str):
+        """
+        Assembler Rady Doradców — zbiera dane z silnika/wskaźników i pyta każdego
+        z pięciorga doradców. Brak danych historycznych → doradcy graceful-fall do
+        BRAK_DANYCH/MILCZENIE (nie blokują — Prawo XV: cisza ≠ martwy głos).
+        """
+        from imperium.cesarz.doradcy.oracle import Oracle
+        from imperium.cesarz.doradcy.fulmen import Fulmen, DaneFulmen
+        from imperium.cesarz.doradcy.iustitia import (
+            Iustitia, DaneIustitia,
+            OtwartaPozycja as OtwartaPozycjaIustitia,
+        )
+        from imperium.cesarz.doradcy.hermes import Hermes, DaneHermes
+        from imperium.cesarz.doradcy.pythia import (
+            Pythia, buduj_odcisk, WpisHistorii,
+        )
+
+        # ORACLE: historia PnL z zamkniętych pozycji bieżącej sesji
+        wyniki_hist = list(self.engine.historia_zamkniec)
+        pnl_hist = [w.pnl_pct for w in wyniki_hist if hasattr(w, "pnl_pct")]
+        ocena_oracle = Oracle().ocen(pnl_hist)
+
+        # FULMEN: ortogonalna weryfikacja reżimu z wskaźników (DI+/DI- jako proxy VI)
+        ocena_fulmen = Fulmen().ocen(DaneFulmen(
+            adx_14=wskazniki.get("ADX_14") or 20.0,
+            vi_plus_14=wskazniki.get("DI_PLUS") or 0.5,
+            vi_minus_14=wskazniki.get("DI_MINUS") or 0.5,
+            choppiness_14=wskazniki.get("CHOPPINESS_14") or 50.0,
+            kaufman_er=0.5,   # nie liczony przez Budowniczego → neutral default
+            legatus_rezim=rezim,
+        ))
+
+        # IUSTITIA: portfolio heat + Kelly fraction
+        otwarte_poz = [
+            OtwartaPozycjaIustitia(
+                symbol=p.symbol,
+                ryzyko_usdt=abs(p.cena_wejscia - p.stop_loss) / p.cena_wejscia * p.rozmiar_usdt,
+                pnl_pct=0.0,   # brak bieżącej ceny w tym momencie
+            )
+            for p in self.engine.otwarte.values()
+        ]
+        ryzyko_new = abs(plan.cena_wejscia - plan.stop_loss) / plan.cena_wejscia * plan.rozmiar_usdt
+        ostatnie_pnl = [w.pnl_pct for w in wyniki_hist[-5:]] if wyniki_hist else []
+        wins = [p for p in ostatnie_pnl if p > 0]
+        loss = [p for p in ostatnie_pnl if p <= 0]
+        ocena_iustitia = Iustitia().ocen(DaneIustitia(
+            kapital_total=self.engine.kapital_calkowity,
+            nowe_ryzyko_usdt=ryzyko_new,
+            otwarte_pozycje=otwarte_poz,
+            ostatnie_5_pnl=ostatnie_pnl,
+            korelacja_z_otwartymi=0.0,
+            win_rate=len(wins) / max(len(ostatnie_pnl), 1),
+            avg_win_pct=sum(wins) / max(len(wins), 1),
+            avg_loss_pct=abs(sum(loss) / max(len(loss), 1)),
+        ))
+
+        # HERMES: kompletność danych + VPIN
+        kompletne = sum(1 for v in wskazniki.values() if v is not None) / max(len(wskazniki), 1)
+        _vpin_raw = wskazniki.get("VPIN_50")
+        vpin_val = float(_vpin_raw) if _vpin_raw is not None else 0.5
+        interwal_min = {"1m": 1, "5m": 5, "15m": 15, "30m": 30,
+                        "1H": 60, "4H": 240, "1D": 1440}.get(interwal, 60)
+        ocena_hermes = Hermes().ocen(DaneHermes(
+            kompletnosc_danych=round(kompletne, 3),
+            interwal_minut=interwal_min,
+            wiek_danych_minut=1,   # bieżący bar = tylko co obliczony
+            hash_ok=True,
+            vpin=vpin_val,
+        ))
+
+        # PYTHIA: fingerprint matching z historii sesji
+        odcisk = buduj_odcisk(
+            rezim=rezim, interwal=interwal, kierunek=kierunek,
+            pewnosc=raport.pewnosc_agregatu,
+            funding_rate=wskazniki.get("FUNDING_RATE") or 0.0,
+            atr_current=wskazniki.get("ATR_14") or 1.0,
+            atr_30d_avg=wskazniki.get("ATR_14") or 1.0,  # brak 30d avg → proxy bieżącym
+        )
+        historia_pythia = [
+            WpisHistorii(
+                odcisk=buduj_odcisk(
+                    rezim=w.rezim if hasattr(w, "rezim") else rezim,
+                    interwal=w.interwal if hasattr(w, "interwal") else interwal,
+                    kierunek=w.kierunek if hasattr(w, "kierunek") else "LONG",
+                    pewnosc=0.6, funding_rate=0.0, atr_current=1.0, atr_30d_avg=1.0,
+                ),
+                pnl_pct=w.pnl_pct,
+            )
+            for w in wyniki_hist if hasattr(w, "pnl_pct")
+        ]
+        ocena_pythia = Pythia().ocen(odcisk, historia_pythia)
+
+        return self.rada_doradcow.ocen(ocena_oracle, ocena_fulmen, ocena_iustitia,
+                                       ocena_hermes, ocena_pythia)

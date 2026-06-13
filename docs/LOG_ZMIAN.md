@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-06-13 | W-298 | DriftAdapter wpięty + Rada Doradców wpięta do Dyrygenta
+
+**Prawo XV — ożywienie gotowych modułów, które żyły poza pipeline:**
+
+- `legiony/legatus.py`: `ustaw_wagi_rezimu()` + `resetuj_wagi_rezimu()` + `_wagi_rezimu_override` —
+  per-cykl override WAGI_REZIMU dla DriftAdapter W-296 (antycypacja zmiany reżimu).
+- `koloseum/dyrygent.py`: param `drift_adapter` — rejestruje reżim co bar, koryguje wagi
+  kategorii gdy wykryje dryfowanie (entropia/momentum) przed pełną zmianą reżimu.
+- `koloseum/dyrygent.py`: param `rada_doradcow` + `_opinia_rady()` — Rada Pięciorga
+  (Oracle/Fulmen/Iustitia/Hermes/Pythia) wywołana po Kalkulatorze, może zawetować lub
+  zredukować rozmiar pozycji (×0.6–×0.8). Nowa ścieżka RADA_WETO w DecyzjaCyklu.
+
+---
+
 ## 2026-06-12 | W-297 | NEWS-01 Sentyment Newsów LLM (DeepSeek + fallback słownikowy)
 
 **Nowy neuron sentymentu z newsów — offline-first, LLM-opcjonalny:**

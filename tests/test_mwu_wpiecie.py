@@ -88,6 +88,35 @@ def test_mwu_podpiecie_do_legatusa():
     assert d.legatus.mnozniki_neuronow != {}
 
 
+def test_mwu_trade_na_zero_jest_neutralny():
+    """Granica: pnl_pct == 0 → MWU NIE karze ani nie nagradza (spójne z Synapsy, Prawo XVI)."""
+    from imperium.legiony.mikro_neuron import SygnalNeuronu
+    try:
+        from tests.helpers import zbuduj_dyrygenta_testowego
+    except ImportError:
+        return
+
+    d = zbuduj_dyrygenta_testowego()
+    mwu = HedgeMWU(eta=0.5)
+    d.legatus.mwu = mwu
+
+    from unittest.mock import MagicMock
+    wynik = MagicMock()
+    wynik.pozycja_id = "pos-zero"
+    wynik.pnl_pct = 0.0  # break-even
+    d.engine.historia_zamkniec = [wynik]
+    d._synapsy_ostatni_idx = 0
+
+    s1 = SygnalNeuronu(neuron_id="T-01", kierunek="LONG", pewnosc=0.8, waga=3,
+                       kategoria="T", legion="TREND")
+    d._synapsy_pending["pos-zero"] = ([s1], "TREND_STRONG", "LONG")
+
+    d._aktualizuj_synapsy()
+
+    # Trade na zero nie powinien dotknąć wag żadnego neuronu
+    assert "T-01" not in mwu.wagi_raw, "Break-even nie może karać ani nagradzać neuronu"
+
+
 def test_mwu_przegrana_obniza_wage():
     """Po przegranym trade'cie mnożnik mylącego neuronu spada poniżej 1."""
     mwu = HedgeMWU(eta=1.0)  # wysoka eta = szybka nauka

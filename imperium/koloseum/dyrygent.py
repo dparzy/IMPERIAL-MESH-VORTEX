@@ -469,7 +469,9 @@ class Dyrygent:
 
             # W-303: HedgeMWU — uaktualnij wagi neuronów z wyniku trade'u.
             # Każdy neuron który głosował dostaje stratę: 0 (trafił) lub 1 (pomylił).
-            if mwu is not None and pending is not None:
+            # Trade na zero (pnl_pct == 0) jest neutralny — nie karze ani nie nagradza
+            # (spójne z SynapsyRezimowe: pnl_sign=0 → zero delty; Prawo XV/XVI).
+            if mwu is not None and pending is not None and wynik.pnl_pct != 0:
                 sygnaly, _rezim, kierunek = pending
                 zyskowny = kierunek if wynik.pnl_pct > 0 else (
                     "SHORT" if kierunek == "LONG" else "LONG"

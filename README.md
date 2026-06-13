@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-12 · **Testy:** 835/835 zielone · **Faza:** Namiestnik Regime + Timeframe-Aware + Radar Rynku (Opcja A+B) + Paper Trading Etap II.
+> **Stan na:** 2026-06-13 · **Testy:** 883/883 zielone · **Faza:** PętlaLive (entrypoint) + Synapsy Reżimowe + PamięćRefleksyjna + Radar wpięty + Paper Trading Etap II.
 
 ---
 
@@ -58,17 +58,17 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ## 🗺️ Mapa Imperium (realne foldery w `imperium/`)
 
 ```
-👑 cesarz/       — mózg decyzyjny i doradcy        (9 modułów)
-🏛️ senat/        — debata / konsensus              (2)
-⚔️ legiony/      — neurony + zwiadowcy + Legatus    (29)
-🏟️ koloseum/     — Igrzyska, rangowanie             (2)
-🛡️ pretorianie/  — bezpieczeństwo, kalkulator lewara (3)
-🏗️ akwedukty/    — pipeline danych + adaptery API   (2)
-🛤️ drogi/        — API i egzekucja                 (3)
-🎨 swiatynie/    — dashboard / wizualizacja         (2)
-📚 biblioteki/   — wiedza, pamięć                   (4)
-👁️ oczy/         — obserwatorzy / źródła            (1)
-🧮 fundament/    — Brama Kalkulatora                (2)
+👑 cesarz/       — mózg decyzyjny, 5 Doradców, PamięćRefleksyjna   (9)
+🏛️ senat/        — debata / konsensus                              (2)
+⚔️ legiony/      — 63 neurony + 12 zwiadowców + Legatus + Radar     (40)
+🏟️ koloseum/     — Dyrygent, PętlaLive, Backtest portfela, Namiestnik (11)
+🛡️ pretorianie/  — bezpieczeństwo, kalkulator lewara, Praeda        (5)
+🏗️ akwedukty/    — pipeline danych + adaptery API (Futures/F&G/CVD/News) (8)
+🛤️ drogi/        — API i egzekucja (NexusHub)                       (3)
+🎨 swiatynie/    — dashboard / wizualizacja                         (2)
+📚 biblioteki/   — pamięć, MWU, SynapsyRezimowe, KronikarzZdarzeń   (8)
+👁️ oczy/         — obserwatorzy / źródła                            (1)
+🧮 fundament/    — Brama Kalkulatora                                (2)
 ```
 
 ---

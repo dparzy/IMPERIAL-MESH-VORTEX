@@ -311,6 +311,9 @@
 | **Optymalizator DSR-guided** (W-294 — Latin Hypercube Search + DSR jako cel; karze selection bias; 0 zależności) | `koloseum/optymalizator.py` | ✅ aktywny |
 | **Pamięć Refleksyjna Brain** (W-295 — JSONL lekcji narracyjnych; inject do Senat/Cesarz; inspiracja: TradingAgents/FinMem) | `cesarz/pamiec_refleksyjna.py` | ✅ aktywny |
 | **Drift Adapter** (W-296 — DDG-DA-lite: entropia reżimu + momentum → pre-shift WAGI_REZIMU; inspiracja: Qlib DDG-DA) | `koloseum/drift_adapter.py` | ✅ aktywny |
+| **Synapsy Reżimowe** (W-299 🧬 — Regime-Aware Decorrelated Coalition Graph: Hebbian × per-reżim × Prawo XVI; wpięte w Legatus.synapsy) | `biblioteki/synapsy_rezimowe.py` | ✅ aktywny |
+| **Hook RadarRynku** (W-300 — `Dyrygent.odswiez_kontekst_rynku()` wypełnia sloty kontekstu → budzi RADAR-01/02/03) | `koloseum/dyrygent.py` | ✅ aktywny |
+| **PętlaLive** (W-302 — główny entrypoint: DataLoader→Radar→Dyrygent.cykl→PamięćRefleksyjna; `handluj_live`/`uruchom`) | `koloseum/petla_live.py` | ✅ aktywny |
 
 ---
 

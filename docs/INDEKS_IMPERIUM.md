@@ -87,7 +87,7 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 | `imperium/drogi/` | Drogi — wykonanie zlecenia na MEXC (Via Romana) | Order Execution | 🟡 Szkielet |
 | `imperium/biblioteki/` | Biblioteki — **kronikarz.py** (logi) + **mnemosyne.py** (pamięć transakcji) + **pamiec_absolutna.py** (ImperiumLog, MAE/MFE, JSONL) + **igrzyska.py** (ranking batch) + **hedge_mwu.py** (online MWU, W-049) + **arena_trzech_bram.py** (potrójna bariera, W-035) + **kronikarz_zdarzen.py** (event-study, W-289 💎) + **synapsy_rezimowe.py** (Regime-Aware Decorrelated Coalition Graph, W-299 🧬) | Logs & Memory & Learning | ✅ Gotowy |
 | `imperium/swiatynie/` | Świątynie — wykresy, dashboard, wizualizacje | Charts & Dashboard | 🟡 Szkielet |
-| `imperium/koloseum/` | Koloseum — PaperTradingEngine + **Dyrygent** (orkiestrator: bary→**Namiestnik**→Legatus→Kalkulator→pozycja) + **Namiestnik** (Regime + Timeframe-Aware Gating Network) + **Backtest** + **Detektor Lookahead-bias** (LA-01, Freqtrade) | Backtesting Arena | ✅ Cykl Faza 1 aktywny |
+| `imperium/koloseum/` | Koloseum — PaperTradingEngine + **Dyrygent** (orkiestrator: bary→**Namiestnik**→Legatus→Kalkulator→pozycja) + **PętlaLive** (W-302 entrypoint live: DataLoader→Radar→cykl→PamięćRefleksyjna) + **Namiestnik** (Regime + Timeframe-Aware Gating) + **Backtest portfela** + **Detektor Lookahead-bias** (LA-01) | Backtesting Arena & Live | ✅ Cykl Faza 1 aktywny |
 | `imperium/oczy/` | Oczy — newsy, sentyment, dane on-chain | News & Sentiment | 🔴 Planowany |
 
 **Legenda:** ✅ Gotowy — działa produkcyjnie | 🟡 Szkielet — struktura istnieje, wypełnianie w toku | 🔴 Planowany — jeszcze nie rozpoczęty

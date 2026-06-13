@@ -482,9 +482,10 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
     "PSY-04": "OPEN_INTEREST (AdapterFutures)",
     "V-03":   "CVD (AdapterCVD/trade-feed)",
     "AUG-01": "EVENT_* (AdapterKronikarz — okno zdarzenia fundamentalnego)",
-    "RADAR-01": "BTC_TREND (RadarBTC — kontekst lidera rynku, lead-lag)",
-    "RADAR-02": "BTC_DOMINANCJA (RadarRynku — przepływ kapitału BTC↔alty)",
-    "RADAR-03": "PRZEPLYW_KAPITALU (RadarRynku — breadth × momentum wolumenu)",
+    "RADAR-01": "BTC_TREND (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300; "
+                "ożywa gdy pętla portfelowa poda serie BTC)",
+    "RADAR-02": "BTC_DOMINANCJA (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300)",
+    "RADAR-03": "PRZEPLYW_KAPITALU (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300)",
     "NEWS-01": "NEWS_SENTYMENT (AdapterNewsLLM — DeepSeek + fallback słownikowy)",
 }
 

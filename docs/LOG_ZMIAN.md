@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-13 | W-300 | Hook RadarRynku — wpięcie RADAR-01/02/03 w sloty kontekstu
+
+**Prawo XV — koniec trzech martwych głosów (RADAR czytał klucze, których nikt nie podawał):**
+
+- `koloseum/dyrygent.py`: `odswiez_kontekst_rynku(close_btc, close_alty, vol_alty=None)` —
+  woła `RadarRynku.skanuj()` i wypełnia DWA istniejące sloty (zaprojektowane w W-291/292,
+  nigdy niepodłączone): `kontekst_dodatkowy` (BTC_TREND/BTC_DOMINANCJA/PRZEPLYW_KAPITALU →
+  dolewane do wskaźników → budzą RADAR-01/02/03) i `stan_rynku` (→ Namiestnik, radar-aware
+  gating). Serie przyczynowe (DO bieżącej świecy — zero lookahead). `update()` nie kasuje
+  innego kontekstu. Za mało danych → StanRynku z None → neurony abstynują (Prawo XV).
+- Wołane RAZ na bar przez pętlę portfelową PRZED cyklami per-symbol (BTC = kontekst wspólny
+  koszyka). Sama pętla portfelowa jeszcze nie istnieje — to gotowy, przetestowany hook.
+- 8 testów: wypełnianie slotów, nie-kasowanie kontekstu, DOWÓD że RADAR-01 budzi się LONG
+  po wpięciu (abstynuje bez), granica za-mało-danych, płaski BTC → NEUTRAL. → **871/871** ✅
+- Audyt: notka Prawa XV zaktualizowana (hook gotowy, RADAR ożywa z serią BTC).
+
+---
+
 ## 2026-06-13 | W-299 | Synapsy Reżimowe — Regime-Aware Decorrelated Coalition Graph
 
 **Flagowa unikalna technologia: Hebbian × per-reżim × Prawo XVI (dekorelacja):**

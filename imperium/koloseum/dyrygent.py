@@ -130,6 +130,11 @@ class Dyrygent:
         # Opcja A: StanRynku z RadarRynku — przekazywany do Namiestnika i Klucznika
         # (radar-aware gating + strategy selection). None = tryb bez radaru.
         self.stan_rynku: Optional[Any] = None
+        # W-300: RadarRynku wpięty w sloty kontekstu. odswiez_kontekst_rynku() woła
+        # skanuj() i wypełnia kontekst_dodatkowy (BTC_TREND/DOMINACJA/PRZEPLYW →
+        # wskazniki → RADAR-01/02/03) oraz stan_rynku (→ Namiestnik). Bez tego
+        # wywołania trzy neurony RADAR abstynowały na zawsze (Prawo XV — martwy głos).
+        self._radar_rynku: Optional[Any] = None
         # Adaptery danych (Faza B) — dolewają do wskaźników dane spoza OHLCV
         # (funding, OI, long/short, sentyment) po Budowniczym. Pusta lista = tryb
         # czysty OHLCV (np. backtest z CSV — neurony R abstynują, Prawo XV).
@@ -454,6 +459,37 @@ class Dyrygent:
                 pnl_pct=wynik.pnl_pct,
                 rezim=rezim,
             )
+
+    def odswiez_kontekst_rynku(
+        self,
+        close_btc: List[float],
+        close_alty: Dict[str, List[float]],
+        vol_alty: Optional[Dict[str, List[float]]] = None,
+    ) -> Optional[Any]:
+        """
+        W-300: skanuje rynek RadarRynkiem i wypełnia oba sloty kontekstu Dyrygenta.
+
+        Wołane RAZ na bar przez pętlę portfelową/backtest PRZED cyklami per-symbol —
+        BTC i breadth to kontekst wspólny dla całego koszyka, nie per-symbol.
+        Serie muszą być przyczynowe (DO bieżącej świecy włącznie — zero lookahead).
+
+        Efekt:
+          • kontekst_dodatkowy ← BTC_TREND / BTC_DOMINANCJA / PRZEPLYW_KAPITALU
+            (dolewane do wskaźników w cyklu → budzą RADAR-01/02/03).
+          • stan_rynku ← StanRynku (radar-aware gating w Namiestniku/Kluczniku).
+
+        Zwraca StanRynku (lub None gdy radar nie ma dość danych — wtedy neurony
+        RADAR abstynują zgodnie z Prawem XV, zamiast zgadywać).
+        """
+        if self._radar_rynku is None:
+            from imperium.legiony.radar_rynku import RadarRynku
+            self._radar_rynku = RadarRynku()
+
+        stan = self._radar_rynku.skanuj(close_btc, close_alty, vol_alty)
+        self.stan_rynku = stan
+        # Aktualizuj tylko klucze radaru — nie kasuj innego kontekstu (np. W-291).
+        self.kontekst_dodatkowy.update(stan.jako_wskazniki())
+        return stan
 
     # ── Wewnętrzne ───────────────────────────────────────────────────────────
     def _wskazniki(self, bary: List[Dict[str, Any]], symbol: str = "") -> Dict[str, Any]:

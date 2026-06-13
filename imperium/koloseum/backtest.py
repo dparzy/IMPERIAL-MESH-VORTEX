@@ -358,9 +358,10 @@ def backtest_portfel(
         frakcja_breaker = 1.0
         if breaker is not None:
             breaker.aktualizuj(eq)
-            if breaker.halt:
-                continue   # blokada nowych wejść (świadoma cisza, Prawo XV)
             frakcja_breaker = breaker.frakcja_pozycji()
+            # W-313: HALT nie blokuje totalnie — frakcja_halt (0.1×) zapobiega deadlockowi
+            if frakcja_breaker <= 0.0:
+                continue
         # PRAEDA: chciwość dozwolona TYLKO gdy bezpiecznik w stanie NORMAL (DD < próg).
         if tryb_lupiezcy:
             dyrygenci[sym].praeda_dd_normal = (breaker is None or breaker.stan == "NORMAL")

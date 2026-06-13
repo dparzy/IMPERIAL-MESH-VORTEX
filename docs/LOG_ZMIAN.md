@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-06-13 | W-313 | Naprawa deadlocka breakera krzywej — sondujący handel w HALT
+
+**Problem:** Po HALT (DD≥20%) żaden trade → equity zamrożona → DD nigdy nie spada
+poniżej prog_dd_reduced (10%) → histereza trzyma HALT wiecznie → 5 lat martwego
+handlu w backteście BTC 4H (2021-09 → 2026-06). Structural impossibility.
+
+**Rozwiązanie (W-313):** `frakcja_halt=0.1` — HALT zwraca 0.1× (sondujący handel)
+zamiast 0.0× (totalna blokada). Kapitał może się poruszać → DD może spaść → HALT
+może się odblokować gdy warunki rynkowe się poprawią. Stary `frakcja_halt=0.0`
+dostępny jako jawna konfiguracja per instancja.
+
+**Pliki:** `imperium/pretorianie/kalkulator_lewara.py` (frakcja_halt + frakcja_pozycji),
+`imperium/koloseum/backtest.py` (blokada na frakcja_breaker≤0 zamiast halt),
+`tests/test_kalkulator.py` (zaktualizowane testy granic + 3 nowe)
+
+---
+
 ## 2026-06-13 | W-311 | Ablacja warstw adaptacyjnych — pomiar in-sample (Prawo XVI)
 
 **Pomiar, nie zgadywanie.** Ablacja 4 warstw (synapsy/mwu/igrzyska/ksiega_wad)

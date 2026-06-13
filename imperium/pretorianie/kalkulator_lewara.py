@@ -111,7 +111,7 @@ class BezpiecznikKrzywejKapitalu:
 
       • NORMAL  — kapitał powyżej MA i drawdown mały  → grasz pełnym rozmiarem (×1.0)
       • REDUCED — kapitał poniżej MA LUB drawdown umiarkowany → rozmiar ×0.5
-      • HALT    — drawdown duży (≥ prog_dd_halt) → blokada WSZYSTKICH nowych wejść
+      • HALT    — drawdown duży (≥ prog_dd_halt) → sondujący handel (frakcja_halt=0.1×)
 
     Powrót: gdy kapitał wróci ponad MA i drawdown spadnie poniżej prog_dd_reduced
     → NORMAL. Z HALT wychodzimy dopiero gdy drawdown spadnie poniżej prog_dd_reduced
@@ -129,13 +129,14 @@ class BezpiecznikKrzywejKapitalu:
     Użycie:
         br = BezpiecznikKrzywejKapitalu(okno_ma=20)
         br.aktualizuj(4200)              # po każdym zamknięciu pozycji
-        rozmiar *= br.frakcja_pozycji()  # NORMAL=1.0, REDUCED=0.5, HALT=0.0
+        rozmiar *= br.frakcja_pozycji()  # NORMAL=1.0, REDUCED=0.5, HALT=0.1
         if br.halt: ...                  # blokada wejść w checklist
     """
     okno_ma: int = 20
     prog_dd_reduced: float = 0.10
     prog_dd_halt: float = 0.20
     frakcja_reduced: float = 0.5
+    frakcja_halt: float = 0.1
     historia_kapitalu: list = None
     kapital_szczyt: float = 0.0
     stan: str = "NORMAL"
@@ -189,9 +190,14 @@ class BezpiecznikKrzywejKapitalu:
         return sum(okno) / len(okno)
 
     def frakcja_pozycji(self) -> float:
-        """Mnożnik rozmiaru pozycji: NORMAL=1.0, REDUCED=frakcja_reduced, HALT=0.0."""
+        """Mnożnik rozmiaru pozycji: NORMAL=1.0, REDUCED=frakcja_reduced, HALT=frakcja_halt.
+
+        W-313: HALT nie blokuje całkowicie — sondujący handel (frakcja_halt, domyślnie 0.1×)
+        zapobiega zamrożeniu krzywej kapitału w HALT i uniemożliwia wyjście z HALT
+        (deadlock: brak trade'ów → DD nie spada → histereza trzyma HALT wiecznie).
+        """
         if self.stan == "HALT":
-            return 0.0
+            return self.frakcja_halt
         if self.stan == "REDUCED":
             return self.frakcja_reduced
         return 1.0
@@ -615,7 +621,7 @@ class KalkulatorLewara:
             return False, (f"🌀 VOLATILITY DRAG {drag_roczny:.1%}/rok > limit "
                            f"{max_drag_roczny:.0%} — lewar eroduje kapitał szybciej "
                            f"niż przewaga (W-130, Sinclair rozdz. 13)")
-        if breaker_krzywej is not None and breaker_krzywej.halt:
+        if breaker_krzywej is not None and breaker_krzywej.halt and breaker_krzywej.frakcja_halt <= 0.0:
             return False, (f"🛑 BREAKER KRZYWEJ: HALT — equity DD "
                            f"{breaker_krzywej.drawdown:.1%} ≥ "
                            f"{breaker_krzywej.prog_dd_halt:.0%}, nowe wejścia wstrzymane")

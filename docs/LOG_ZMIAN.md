@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-06-13 | W-306 | Raport dekorelacji neuronów — Prawo XVI dla całego roju
+
+**Korelacje par neuronów (W-305) były liczone, ale tylko konsumowane wewnętrznie
+przez SynapsyRezimowe — Cezar ich nie widział.** Prawo XVI („redundancja mierzona,
+nie zgadywana") działało dotąd tylko dla 11 zwiadowców EXP. Rozszerzone na rój:
+
+- `raport_z_kolektora()` — z populowanego `KolektorKorelacjiNeuronow` produkuje
+  raport par nadmiarowych (|corr|>0.80, kandydat do wagi w dół) vs dywersyfikujących
+  (|corr|<0.20, filar siły); kształt zgodny z `raport_dekorelacji` (wspólny formater)
+- `Dyrygent.raport_korelacji_neuronow()` — akcesor po backteście/sesji
+- `KolektorKorelacjiNeuronow.klucze()` — lista zebranych neuronów
+- 6 testów (`tests/test_raport_korelacji_neuronow.py`) — 915/915
+
+**Pliki:** `legiony/diagnostyka_korelacji.py`, `koloseum/dyrygent.py`, `tests/test_raport_korelacji_neuronow.py`, `docs/MANIFEST_KODU.md`, `README.md`
+
+---
+
 ## 2026-06-13 | W-305 | Domknięcie pętli korelacji w SynapsyRezimowych (Prawo XVI)
 
 **Naprawa utraty potencjału z audytu W-304:** `kara_korelacji = 1.0 + corr` i

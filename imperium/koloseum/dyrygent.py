@@ -547,6 +547,20 @@ class Dyrygent:
         if mwu is not None and nowe:
             self.legatus.ustaw_mnozniki_neuronow(mwu.mnozniki())
 
+    def raport_korelacji_neuronow(self, prog_redundancji: float = 0.80,
+                                  prog_dywersyfikacji: float = 0.20) -> Optional[Dict[str, Any]]:
+        """
+        W-306: raport dekorelacji par neuronów (Prawo XVI) z kolektora zebranego
+        podczas cykli. None gdy synapsy wyłączone lub brak zebranych głosów.
+        Cezar woła po backteście/sesji: które pary są nadmiarowe vs filary siły.
+        """
+        if self._kolektor_korelacji is None:
+            return None
+        from imperium.legiony.diagnostyka_korelacji import raport_z_kolektora
+        return raport_z_kolektora(self._kolektor_korelacji,
+                                  prog_redundancji=prog_redundancji,
+                                  prog_dywersyfikacji=prog_dywersyfikacji)
+
     def odswiez_kontekst_rynku(
         self,
         close_btc: List[float],

@@ -243,6 +243,52 @@ class KolektorKorelacjiNeuronow:
         """Ile kroków zebrano dla najdłuższej serii (diagnostyka)."""
         return max((len(d) for d in self._serie.values()), default=0)
 
+    def klucze(self) -> List[str]:
+        """Lista neuronów, których głosy zebrano (diagnostyka)."""
+        return sorted(self._serie)
+
+
+def raport_z_kolektora(
+    kolektor: "KolektorKorelacjiNeuronow",
+    prog_redundancji: float = 0.80,
+    prog_dywersyfikacji: float = 0.20,
+) -> Dict[str, Any]:
+    """
+    📊 W-306 | Raport dekorelacji NEURONÓW (Prawo XVI) z populowanego kolektora.
+
+    Bliźniak `raport_dekorelacji` (zwiadowcy), ale dla pełnego roju neuronów —
+    korzysta z macierzy korelacji zebranej online w `KolektorKorelacjiNeuronow`
+    (W-305) podczas backtestu/live. Dzięki temu „redundancja mierzona, nie zgadywana"
+    działa nie tylko dla 11 zwiadowców EXP, ale dla wszystkich aktywnych neuronów.
+
+    prog_redundancji:    |corr| > prog → para nadmiarowa (kandydat do wagi w dół / scalenia)
+    prog_dywersyfikacji: |corr| < prog → para dywersyfikująca (filar siły Imperium)
+
+    Zwraca strukturę zgodną kształtem z `raport_dekorelacji` (do wspólnego formatera).
+    """
+    macierz = kolektor.korelacje()
+    redundantne = []
+    dywersyfikujace = []
+    for (a, b), kor in macierz.items():
+        if abs(kor) > prog_redundancji:
+            redundantne.append((a, b, round(kor, 3)))
+        elif abs(kor) < prog_dywersyfikacji:
+            dywersyfikujace.append((a, b, round(kor, 3)))
+    redundantne.sort(key=lambda t: -abs(t[2]))
+    dywersyfikujace.sort(key=lambda t: abs(t[2]))
+    return {
+        "liczba_modulow": len(kolektor.klucze()),
+        "liczba_krokow": kolektor.liczba_krokow(),
+        "pary_redundantne": redundantne,
+        "pary_dywersyfikujace": dywersyfikujace,
+        "pary_nieokreslone": [],          # kolektor pomija nieokreślone u źródła
+        "pary_niedostateczne_dane": [],
+        "moduly_stale": [],               # stałe serie nie wchodzą do macierzy (None)
+        "prog_redundancji": prog_redundancji,
+        "prog_dywersyfikacji": prog_dywersyfikacji,
+        "macierz": {f"{a}~{b}": k for (a, b), k in macierz.items()},
+    }
+
 
 def sformatuj_raport(rap: Dict[str, Any]) -> str:
     """Czytelny tekst raportu dekorelacji — do konsoli/logu."""

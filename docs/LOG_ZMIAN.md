@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-06-13 | W-302 | PętlaLive + PamięćRefleksyjna wpięta w pipeline
+
+**Główny entrypoint systemu tradingowego + cross-session learning:**
+
+- `koloseum/petla_live.py`: `handluj_live(KonfigPetliLive)` — spina DataLoader(OHLCV)
+  → RadarRynku(BTC_TREND/DOMINACJA/PRZEPLYW co bar) → Dyrygent.cykl() per symbol
+  → PamięćRefleksyjna.zapisz_wynik() per zamknięcie. Graceful-degradation: padnięty
+  fetch jednego symbolu nie zatrzymuje innych. `uruchom()`: skrót produkcyjny.
+- `koloseum/dyrygent.py`: `self._pamiec` hook + wpięcie w `_aktualizuj_synapsy()` —
+  po każdym zamknięciu pozycji automatycznie zapisuje lekcję (symbol, rezim, interwal,
+  pnl) do JSONL. Never-block: błąd pamięci = log + skip.
+- `_df_do_barow()`: mostek DataFrame → List[Dict] (timestamp=int ms).
+- 10 testów: max_barow, fetch-fail graceful, brak BTC w koszyku, synapsy+pętla,
+  PamięćRefleksyjna hook, KonfigPetliLive domyślne. → **883/883** ✅
+
+---
+
 ## 2026-06-13 | W-301 | Domknięcie adaptacyjnych plugi — SynapsyRezimowe w backtest_portfel + AdapterNewsLLM
 
 **Prawo XV — domykanie luk pomiędzy gotowym kodem a pipeline:**

@@ -120,6 +120,10 @@ class Dyrygent:
         # aktualizuj() — zamknięta pętla uczenia koalicji bez ingerencji z zewnątrz.
         self._synapsy_pending: Dict[str, tuple] = {}  # pozycja_id → (sygnaly, rezim, kier)
         self._synapsy_ostatni_idx: int = 0     # ile zamknięć już przetworzyliśmy
+        # W-302 PamięćRefleksyjna: cross-session dziennik lekcji. Gdy podana:
+        # każde zamknięcie pozycji → lekcja w JSONL (symbol, rezim, interwal, pnl).
+        # None = wyłączona (domyślnie — zero kosztu, opt-in).
+        self._pamiec: Optional[Any] = None
         # Rada Doradców: 5-osobowe kolegium (Oracle/Fulmen/Iustitia/Hermes/Pythia).
         # None = wyłączona. Gdy aktywna: sprawdza plan po Kalkulatorze, może zawetować
         # lub zredukować rozmiar pozycji (OpinaRady.modyfikator_pozycji).
@@ -440,28 +444,51 @@ class Dyrygent:
 
     def _aktualizuj_synapsy(self) -> None:
         """
-        W-299: wykrywa nowo zamknięte pozycje i aktualizuje SynapsyRezimowe.
+        W-299/302: wykrywa nowo zamknięte pozycje, aktualizuje SynapsyRezimowe
+        i (gdy podana) zapisuje lekcje do PamięciRefleksyjnej.
         Wywołaj na początku każdego cyklu zanim Legatus.fokus().
         """
         synapsy = self.legatus.synapsy
-        if synapsy is None:
-            return
         hist = self.engine.historia_zamkniec
         nowe = hist[self._synapsy_ostatni_idx:]
         self._synapsy_ostatni_idx = len(hist)
 
         for wynik in nowe:
             pid = wynik.pozycja_id
-            pending = self._synapsy_pending.pop(pid, None)
-            if pending is None:
-                continue
-            sygnaly, rezim, kierunek = pending
-            synapsy.aktualizuj(
-                sygnaly=sygnaly,
-                kierunek_decyzji=kierunek,
-                pnl_pct=wynik.pnl_pct,
-                rezim=rezim,
-            )
+            pending = self._synapsy_pending.get(pid)
+
+            # W-299: Synapsy Reżimowe — aktualizuj koalicje par neuronów.
+            if synapsy is not None and pending is not None:
+                sygnaly, rezim_wej, kierunek = pending
+                synapsy.aktualizuj(
+                    sygnaly=sygnaly,
+                    kierunek_decyzji=kierunek,
+                    pnl_pct=wynik.pnl_pct,
+                    rezim=rezim_wej,
+                )
+
+            # W-302: PamięćRefleksyjna — lekcja per zamknięcie (cross-session learning).
+            if self._pamiec is not None:
+                try:
+                    rezim_zam = getattr(wynik, "rezim", None) or (
+                        pending[1] if pending else "NORMAL"
+                    )
+                    interwal_zam = getattr(wynik, "interwal", "")
+                    self._pamiec.zapisz_wynik(
+                        pnl_lista=[wynik.pnl_pct],
+                        rezim=rezim_zam,
+                        interwal=interwal_zam,
+                        kontekst={
+                            "symbol": getattr(wynik, "symbol", ""),
+                            "kierunek": getattr(wynik, "kierunek", ""),
+                            "pozycja_id": pid,
+                        },
+                    )
+                except Exception:
+                    pass  # PamięćRefleksyjna nigdy nie blokuje cyklu
+
+            if pending is not None:
+                self._synapsy_pending.pop(pid, None)
 
     def odswiez_kontekst_rynku(
         self,

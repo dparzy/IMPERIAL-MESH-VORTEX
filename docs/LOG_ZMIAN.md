@@ -27,6 +27,12 @@ zapomnienie) niosą różną informację — dlatego mnożniki łączone, nie za
 **Pliki:** `koloseum/dyrygent.py`, `koloseum/backtest.py`, `tests/test_igrzyska_wpiecie.py`,
 `docs/MANIFEST_KODU.md`, `README.md` (929/929 testów)
 
+**W-307b (dopięcie):** warstwy uczenia wpięte też w produkcyjną `PętlęLive`
+(`KonfigPetliLive.mwu/igrzyska` opt-in, domyślnie OFF). Wcześniej dostępne tylko
+przez `Dyrygent.zbuduj()`/`backtest_portfel()` — teraz osiągalne z głównego
+entrypointa live. +2 testy (wpięcie + domyślnie OFF). 931/931.
+**Pliki:** `koloseum/petla_live.py`, `tests/test_petla_live.py`
+
 ---
 
 ## 2026-06-13 | W-306b | Pierwszy realny pomiar redundancji roju (Prawo XVI w akcji)

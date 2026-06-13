@@ -110,6 +110,43 @@ def test_petla_z_synapsy_nie_crashuje():
     assert st.bary_przetworzone >= 1
 
 
+def test_petla_mwu_igrzyska_wpiete_w_dyrygentow():
+    """W-307: cfg.mwu/igrzyska=True → każdy Dyrygent dostaje warstwy uczenia."""
+    try:
+        import talib  # noqa: F401
+    except ImportError:
+        return
+    from imperium.koloseum.petla_live import _buduj_dyrygencie
+    from imperium.koloseum.paper_trading import PaperTradingEngine
+    from imperium.biblioteki.hedge_mwu import HedgeMWU
+    from imperium.biblioteki.igrzyska import Igrzyska
+
+    engine = PaperTradingEngine(kapital_startowy=10_000.0)
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"], interwal="1H",
+                          synapsy=False, mwu=True, igrzyska=True)
+    dyr = _buduj_dyrygencie(["BTCUSDT"], kfg, engine)
+    d = dyr["BTCUSDT"]
+    assert isinstance(d.legatus.mwu, HedgeMWU)
+    assert isinstance(d._igrzyska, Igrzyska)
+
+
+def test_petla_mwu_igrzyska_domyslnie_off():
+    """Domyślna konfiguracja → warstwy uczenia wyłączone (zero zmiany zachowania)."""
+    try:
+        import talib  # noqa: F401
+    except ImportError:
+        return
+    from imperium.koloseum.petla_live import _buduj_dyrygencie
+    from imperium.koloseum.paper_trading import PaperTradingEngine
+
+    engine = PaperTradingEngine(kapital_startowy=10_000.0)
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"], interwal="1H", synapsy=False)
+    assert kfg.mwu is False and kfg.igrzyska is False
+    d = _buduj_dyrygencie(["BTCUSDT"], kfg, engine)["BTCUSDT"]
+    assert d.legatus.mwu is None
+    assert d._igrzyska is None
+
+
 def test_petla_zapisuje_pamiec_po_zamknięciach():
     """PamięćRefleksyjna: lekcja zapisana gdy pozycja zamknięta."""
     with tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False) as f:

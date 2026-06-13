@@ -51,6 +51,12 @@ class KonfigPetliLive:
     paper: bool = True                    # True=paper trading, False=realne zlecenia
     auto_rezim: bool = True               # True=auto-klasyfikacja reżimu (Namiestnik)
     synapsy: bool = True                  # True=SynapsyRezimowe per symbol
+    # W-307: warstwy uczenia wag neuronów (Prawo XV — opt-in, domyślnie OFF).
+    #   mwu      — HedgeMWU online (eksponencjalne, po każdym trade'cie)
+    #   igrzyska — Igrzyska batch (kumulatywny ranking accuracy/stability)
+    # Gdy oba True: mnożniki łączone (MWU × ranga Igrzysk) w Legatusie.
+    mwu: bool = False
+    igrzyska: bool = False
     plik_pamieci: str = "logs/pamiec_refleksyjna.jsonl"
     log_dir: Optional[str] = "logs"
     # Pauza po każdym barze (s). None = oblicz z interwal (zalecane).
@@ -121,6 +127,9 @@ def _buduj_dyrygencie(
         if cfg.synapsy:
             from imperium.biblioteki.synapsy_rezimowe import SynapsyRezimowe
             legatus.synapsy = SynapsyRezimowe()
+        if cfg.mwu:
+            from imperium.biblioteki.hedge_mwu import HedgeMWU
+            legatus.mwu = HedgeMWU()
 
         d = Dyrygent(
             legatus=legatus,
@@ -132,6 +141,9 @@ def _buduj_dyrygencie(
             adaptery=[AdapterFutures(), AdapterFearGreed(), AdapterCVD(), AdapterNewsLLM()],
         )
         d.kapital_sizing = kapital_per
+        if cfg.igrzyska:
+            from imperium.biblioteki.igrzyska import Igrzyska as _Igrzyska
+            d._igrzyska = _Igrzyska()
         dyrygenci[sym] = d
 
     return dyrygenci
@@ -181,7 +193,8 @@ def handluj_live(
         loader = _loader
 
     logger.info(f"[PętlaLive] Start: {cfg.symbole}, interwal={cfg.interwal}, "
-                f"paper={cfg.paper}, synapsy={cfg.synapsy}")
+                f"paper={cfg.paper}, synapsy={cfg.synapsy}, "
+                f"mwu={cfg.mwu}, igrzyska={cfg.igrzyska}")
 
     bar_nr = 0
     try:

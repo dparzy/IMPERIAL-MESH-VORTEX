@@ -55,6 +55,28 @@ potem dopracować SKALP (wymaga danych krótkointerwałowych — Etap C, live).
 | **Realna egzekucja spot/invest** | tryby 4 i 5 dziś tylko deklaratywne | ŚREDNI |
 | **Auto-kalibracja progów na live** | self-tuning min_adx/top_n/progi pewności | ŚREDNI (live, Etap C) |
 
-## Wynik symulacji trybu NAJLEPSZE (9 lat, 5 walut)
+## Wynik symulacji trybu NAJLEPSZE (9 lat, 5 walut) — Prawo XVI/I
 
-> _(uzupełniane po symulacji — sekcja poniżej)_
+| Konfig | Trade | PnL | Kapitał końcowy | WR |
+|---|---|---|---|---|
+| BASELINE (każda para gra) | 2870 | **+52 789$** | 62 659$ | 49% |
+| TRYB NAJLEPSZE (skaner TOP-2 + filtr + min_pewnosc 0.62) | 2247 | **+24 135$** | 34 032$ | 45% |
+
+**Rozkład per coin (BASELINE):** DOGE +52 327$ (1316 tr) ← prawie cały zysk; ETH +545,
+BTC +194, SOL +47, BNB −324. **Zysk jest GRUBO-OGONOWY: meme/alt pumpy (DOGE).**
+
+### 🚨 Lekcja (uczciwie, Prawo I): selekcja BEZ amplifikacji daje MNIEJ
+
+Tryb NAJLEPSZE jak skonfigurowany zarobił mniej niż baseline. Powód:
+- TOP-2 + filtry przycięły DOGE (1316→880 tr, +52327→+23803$) — **wycięto gruby ogon**.
+- Spadła też jakość per-trade na DOGE (39,8→27,0$/tr) — filtry nieskalibrowane pod meme.
+- Filtry POPRAWIŁY maruderów (BNB −324→+77, ETH/SOL lekko lepiej per-trade), ale strata
+  na zwycięzcy przeważyła.
+
+**Wniosek:** wizja „mało trade'ów, większy lewar na najlepszych" wymaga DWÓCH rzeczy
+naraz: (1) selekcji TOP-N **oraz** (2) **amplifikacji stawki/lewara na wyselekcjonowanych**
+(conviction sizing + compounding). Sama selekcja przycina gruby ogon → mniej zysku.
+Następny moduł: **conviction sizing** (większa stawka na TOP okazjach) + re-test.
+
+> Backtest 9-letni jednowalutowy to NIE werdykt (reframe audytu) — ale pokazuje,
+> gdzie jest przewaga: w grubym ogonie pomp altów, którego nie wolno odfiltrować.

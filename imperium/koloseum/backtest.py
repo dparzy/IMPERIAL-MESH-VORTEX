@@ -32,6 +32,7 @@ from imperium.koloseum.dyrygent import Dyrygent
 from imperium.koloseum.namiestnik import get_namiestnik
 from imperium.koloseum.paper_trading import PaperTradingEngine, BarData
 from imperium.koloseum.skaner_okazji import SkanerOkazji
+from imperium.pretorianie.sizing_przekonania import SizingPrzekonania
 from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara, BezpiecznikKrzywejKapitalu
 
 logger = logging.getLogger("Backtest")
@@ -247,6 +248,10 @@ def backtest_portfel(
     tryb_skaner: bool = False,
     skaner_top_n: int = 3,
     skaner_min_adx: float = 20.0,
+    # W-318 Sizing Przekonania — w trybie skanera mnoży budżet pozycji przez siłę
+    # okazji (mocniejsza okazja = większa stawka). Bez tego sama selekcja przycina
+    # gruby ogon. Domyślnie OFF.
+    sizing_przekonania: bool = False,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -365,6 +370,7 @@ def backtest_portfel(
     # W-317 TRYB NAJLEPSZE: skaner okazji + cache snapshotów wskaźników per symbol.
     # Snapshot symbolu aktualizujemy tylko na JEGO tyku (świeży bar) → ranking O(N)/tyk.
     skaner = SkanerOkazji(min_adx=skaner_min_adx) if tryb_skaner else None
+    sizer = SizingPrzekonania() if (tryb_skaner and sizing_przekonania) else None
     snapshot_per: "Dict[str, Dict[str, Any]]" = {}
     for ts, sym, i in os_czasu:
         bary = bary_per[sym]
@@ -421,15 +427,25 @@ def backtest_portfel(
         # W-317 TRYB NAJLEPSZE: zaktualizuj snapshot tego symbolu i sprawdź, czy jest
         # w TOP-N okazji koszyka. Jeśli NIE — brak nowego wejścia (exity już zrobione
         # w przetworz_bar). To zmienia system z „N botów" w „łowcę najlepszych okazji".
+        conviction_mult = 1.0
         if skaner is not None:
             snapshot_per[sym] = budowniczy.zbuduj(okno_barow)
-            najlepsze = {o.symbol for o in skaner.skanuj(snapshot_per, top_n=skaner_top_n)}
-            if sym not in najlepsze:
+            ranking = skaner.skanuj(snapshot_per)
+            top = ranking[:skaner_top_n]
+            if sym not in {o.symbol for o in top}:
                 continue   # nie w TOP-N → nie polujemy na tę okazję teraz
+            # W-318: większa stawka na mocniejszej okazji (przekonanie = score znormalizowany
+            # min-max w całym rankingu koszyka w tym tyku). Bez tego selekcja przycina ogon.
+            if sizer is not None and len(ranking) >= 2:
+                scores = [o.score for o in ranking]
+                smin, smax = min(scores), max(scores)
+                this = next(o.score for o in top if o.symbol == sym)
+                conv = (this - smin) / (smax - smin) if smax > smin else 1.0
+                conviction_mult = sizer.mnoznik(conv)
 
-        # Sizing par: równy budżet × frakcja DD-control × ster korelacyjny (świeżo co tyk).
+        # Sizing par: równy budżet × frakcja DD-control × ster korelacyjny × przekonanie.
         dyrygenci[sym].kapital_sizing = (kapital_startowy * wagi_akt[sym]
-                                         * frakcja_breaker * frakcja_stres)
+                                         * frakcja_breaker * frakcja_stres * conviction_mult)
         dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
 
     # Domknij otwarte po ostatniej cenie każdej pary

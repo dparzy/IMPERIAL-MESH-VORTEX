@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-14 | W-318 | Sizing Przekonania — większa stawka na mocniejszej okazji
+
+**Lekcja z symulacji 9-letniej (W-317):** sama selekcja TOP-N daje MNIEJ zysku
+(+24k vs baseline +52k), bo przycina gruby ogon (pompy DOGE) bez kompensacji większą
+stawką. Wizja Cezara: „mało trade'ów, ale większy lewar/stawka na najlepszych".
+
+**Wdrożenie:** `SizingPrzekonania` (`pretorianie/sizing_przekonania.py`). Mnożnik
+stawki ∈ [min,max] (domyślnie 0.5×–3.0×) rośnie z przekonaniem; prog_neutralny→1.0×.
+Plus `kelly_frakcja()` (fractional Kelly, half-Kelly domyślnie) jako principled backbone.
+W trybie skanera (`backtest_portfel(sizing_przekonania=True)`) mnoży budżet pozycji
+przez siłę okazji (score znormalizowany min-max w rankingu koszyka). Domyślnie OFF.
+
+**Pliki:** `pretorianie/sizing_przekonania.py` (nowy), `koloseum/backtest.py`,
+`tests/test_sizing_przekonania.py` (13 testów granic). Wynik re-testu: osobny commit.
+Źródła: Kelly (Zerodha/Coriva), fractional Kelly (enlightenedstocktrading). 1018/1018.
+
+---
+
 ## 2026-06-14 | W-317 | TRYB NAJLEPSZE — wpięcie Skanera Okazji do pętli portfelowej
 
 **Rozkaz Cezara:** system ma wyłapywać najlepsze okazje ze WSZYSTKICH walut i grać

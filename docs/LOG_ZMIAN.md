@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-14 | W-317 | TRYB NAJLEPSZE — wpięcie Skanera Okazji do pętli portfelowej
+
+**Rozkaz Cezara:** system ma wyłapywać najlepsze okazje ze WSZYSTKICH walut i grać
+tylko najmocniejszymi (kilka/tydzień). To zmienia Imperium z „N botów jednowalutowych"
+w łowcę okazji.
+
+**Wdrożenie:** `backtest_portfel(tryb_skaner=True, skaner_top_n=N, skaner_min_adx=...)`.
+W każdym tyku skaner rankuje koszyk (snapshot wskaźników per symbol, aktualizowany na
+jego barze → O(N)/tyk) i dopuszcza do WEJŚCIA tylko TOP-N okazji. Exity działają
+niezależnie (w `przetworz_bar`). Domyślnie OFF — zero regresji.
+
+Dokument trybów: `docs/TRYBY_IMPERIUM.md` — 5 trybów (NAJLEPSZE/SKALP/SWING/INVEST/
+OBRONA) + mapa brakujących neuronów/strategii. Wynik symulacji 9-letniej: osobny commit.
+
+**Pliki:** `koloseum/backtest.py` (tryb_skaner), `docs/TRYBY_IMPERIUM.md` (nowy), INDEKS.
+Część Etapu B audytu 2026-06-14. 1005/1005 zielone, audyt exit 0.
+
+---
+
 ## 2026-06-14 | W-316 | Skaner Okazji — łowca najlepszych setupów w koszyku (serce wizji)
 
 **Największa luka audytu 2026-06-14:** system był „N botów jednowalutowych", nie łowca

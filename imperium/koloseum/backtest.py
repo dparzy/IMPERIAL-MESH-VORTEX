@@ -31,6 +31,7 @@ from imperium.akwedukty.czytnik_csv import wczytaj_csv
 from imperium.koloseum.dyrygent import Dyrygent
 from imperium.koloseum.namiestnik import get_namiestnik
 from imperium.koloseum.paper_trading import PaperTradingEngine, BarData
+from imperium.koloseum.skaner_okazji import SkanerOkazji
 from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara, BezpiecznikKrzywejKapitalu
 
 logger = logging.getLogger("Backtest")
@@ -240,6 +241,12 @@ def backtest_portfel(
     # W-314 Filtr Asymetrii Reżimu — weto na rynku bocznym (ADX niski) i dla słabych
     # wejść kontr-trendowych. Czysty OHLCV (CLOSE/EMA_200/ADX_14). True → per-symbol.
     filtr_asymetrii: bool = False,
+    # W-317 TRYB NAJLEPSZE — Skaner Okazji jako brama selekcji: zamiast „każda para
+    # gra", w każdym tyku rankujemy koszyk i wpuszczamy do wejścia TYLKO TOP-N
+    # najmocniejszych okazji. Exity działają niezależnie. Domyślnie OFF (zero regresji).
+    tryb_skaner: bool = False,
+    skaner_top_n: int = 3,
+    skaner_min_adx: float = 20.0,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -354,6 +361,11 @@ def backtest_portfel(
     # (√365 zakłada 1 punkt/dzień). Prawo I — uczciwy współczynnik czasu.
     _DZ = 86_400_000
     equity_dnia: "Dict[int, float]" = {}
+
+    # W-317 TRYB NAJLEPSZE: skaner okazji + cache snapshotów wskaźników per symbol.
+    # Snapshot symbolu aktualizujemy tylko na JEGO tyku (świeży bar) → ranking O(N)/tyk.
+    skaner = SkanerOkazji(min_adx=skaner_min_adx) if tryb_skaner else None
+    snapshot_per: "Dict[str, Dict[str, Any]]" = {}
     for ts, sym, i in os_czasu:
         bary = bary_per[sym]
         engine.przetworz_bar(_bar_data(bary[i]))
@@ -404,10 +416,20 @@ def backtest_portfel(
                 risk_off, _ = rezim_risk_off(stan)
                 if risk_off:
                     continue   # świadoma cisza (Prawo XV) — nie wchodzimy w lawinę
+        okno_barow = bary[i - okno: i + 1]
+
+        # W-317 TRYB NAJLEPSZE: zaktualizuj snapshot tego symbolu i sprawdź, czy jest
+        # w TOP-N okazji koszyka. Jeśli NIE — brak nowego wejścia (exity już zrobione
+        # w przetworz_bar). To zmienia system z „N botów" w „łowcę najlepszych okazji".
+        if skaner is not None:
+            snapshot_per[sym] = budowniczy.zbuduj(okno_barow)
+            najlepsze = {o.symbol for o in skaner.skanuj(snapshot_per, top_n=skaner_top_n)}
+            if sym not in najlepsze:
+                continue   # nie w TOP-N → nie polujemy na tę okazję teraz
+
         # Sizing par: równy budżet × frakcja DD-control × ster korelacyjny (świeżo co tyk).
         dyrygenci[sym].kapital_sizing = (kapital_startowy * wagi_akt[sym]
                                          * frakcja_breaker * frakcja_stres)
-        okno_barow = bary[i - okno: i + 1]
         dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
 
     # Domknij otwarte po ostatniej cenie każdej pary

@@ -59,8 +59,9 @@ potem dopracować SKALP (wymaga danych krótkointerwałowych — Etap C, live).
 
 | Konfig | Trade | PnL | Kapitał końcowy | WR |
 |---|---|---|---|---|
-| BASELINE (każda para gra) | 2870 | **+52 789$** | 62 659$ | 49% |
-| TRYB NAJLEPSZE (skaner TOP-2 + filtr + min_pewnosc 0.62) | 2247 | **+24 135$** | 34 032$ | 45% |
+| BASELINE (każda para gra) | 2870 | +52 789$ | 62 659$ | 49% |
+| TRYB NAJLEPSZE (skaner TOP-2 + filtr + min_pewnosc 0.62) | 2247 | +24 135$ | 34 032$ | 45% |
+| **TRYB NAJLEPSZE + CONVICTION (skaner TOP-3 + Sizing Przekonania)** | **2665** | **+64 976$** | **74 782$** | 46% |
 
 **Rozkład per coin (BASELINE):** DOGE +52 327$ (1316 tr) ← prawie cały zysk; ETH +545,
 BTC +194, SOL +47, BNB −324. **Zysk jest GRUBO-OGONOWY: meme/alt pumpy (DOGE).**
@@ -75,8 +76,19 @@ Tryb NAJLEPSZE jak skonfigurowany zarobił mniej niż baseline. Powód:
 
 **Wniosek:** wizja „mało trade'ów, większy lewar na najlepszych" wymaga DWÓCH rzeczy
 naraz: (1) selekcji TOP-N **oraz** (2) **amplifikacji stawki/lewara na wyselekcjonowanych**
-(conviction sizing + compounding). Sama selekcja przycina gruby ogon → mniej zysku.
-Następny moduł: **conviction sizing** (większa stawka na TOP okazjach) + re-test.
+(conviction sizing). Sama selekcja przycina gruby ogon → mniej zysku.
+
+### ✅ Potwierdzenie: selekcja + CONVICTION bije baseline (W-318)
+
+Po dołożeniu Sizing Przekonania (TOP-3, większa stawka na mocniejszej okazji):
+- **+64 976$ vs baseline +52 789$ = +23% więcej zysku** przy **MNIEJSZEJ liczbie trade'ów**
+  (2665 vs 2870) — dokładnie wizja „mniej, ale lepiej".
+- **Wszystkie waluty na plusie** (BNB z −324$ baseline → +238$; ETH/SOL/BTC poprawione).
+- DOGE wzmocniony (+63 562 vs +52 327 baseline) — postawiliśmy WIĘCEJ na najmocniejszego.
+
+**To dowód tezy (Prawo XVI):** wybierz najlepsze okazje I postaw na nie więcej =
+więcej zysku, mniej trade'ów, gruby ogon zachowany i wzmocniony zamiast przycięty.
 
 > Backtest 9-letni jednowalutowy to NIE werdykt (reframe audytu) — ale pokazuje,
-> gdzie jest przewaga: w grubym ogonie pomp altów, którego nie wolno odfiltrować.
+> gdzie jest przewaga: w grubym ogonie pomp altów, którego nie wolno odfiltrować,
+> a NALEŻY na nim postawić więcej (conviction sizing).

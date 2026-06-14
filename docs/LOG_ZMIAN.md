@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-06-14 | W-319 | Compounding (pula łupów) — reinwestycja zysku w większe pozycje
+
+**Wizja Cezara:** zysk dorzucamy do puli łupów, powiększamy kapitał. Trzeci wzmacniacz
+trybu NAJLEPSZE (po selekcji W-317 i conviction W-318).
+
+**Wdrożenie:** `backtest_portfel(compounding=True)` — budżet sizingu liczony od
+BIEŻĄCEGO equity (`engine.kapital_calkowity`), nie od kapitału startowego. Zysk
+reinwestowany → wzrost geometryczny. Domyślnie OFF (stały sizing = liniowy, łatwiejsza
+ocena edge bez efektu składania).
+
+**Pliki:** `koloseum/backtest.py`, `tests/test_portfel.py` (+4 testy: skaner/top_n/
+conviction/compounding). 1022/1022. Etap B audytu — kompletny potok łowcy okazji:
+skan koszyka → TOP-N → conviction sizing → compounding.
+
+---
+
 ## 2026-06-14 | W-318 | Sizing Przekonania — większa stawka na mocniejszej okazji
 
 **Lekcja z symulacji 9-letniej (W-317):** sama selekcja TOP-N daje MNIEJ zysku

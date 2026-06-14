@@ -328,6 +328,8 @@
 | **Skaner Okazji** (W-316 — `SkanerOkazji`: ranking cross-symbol okazji koszyka, opportunity score = cross-sectional z-score momentum/trend/wolumen/zmienność, wybór TOP-N; serce wizji łowcy okazji) | `koloseum/skaner_okazji.py` | ✅ aktywny |
 | **Tryb NAJLEPSZE** (W-317 — `backtest_portfel(tryb_skaner=True, skaner_top_n=N)`: skaner jako brama selekcji w pętli portfelowej; tylko TOP-N okazji wchodzi, exity niezależne; domyślnie OFF) | `koloseum/backtest.py` | ✅ aktywny |
 | **Sizing Przekonania** (W-318 — `SizingPrzekonania`: mnożnik stawki 0.5×–3.0× rosnący z siłą okazji + fractional Kelly; w trybie skanera amplifikuje stawkę na najmocniejszych — kompensuje przycięcie grubego ogona przez selekcję) | `pretorianie/sizing_przekonania.py` + `koloseum/backtest.py` | ✅ aktywny |
+| **Compounding** (W-319 — `backtest_portfel(compounding=True)`: budżet sizingu od bieżącego equity, nie startowego → reinwestycja zysku, wzrost geometryczny; domyślnie OFF) | `koloseum/backtest.py` | ✅ aktywny |
+| **POTOK ŁOWCY OKAZJI (tryb NAJLEPSZE)** — pełny: skan koszyka (W-316) → TOP-N (W-317) → conviction sizing (W-318) → compounding (W-319). Symulacja 9 lat: +64 976$ vs baseline +52 789$ (+23%, mniej trade'ów, wszystkie pary +) | `koloseum/{skaner_okazji,backtest}.py` + `pretorianie/sizing_przekonania.py` | ✅ aktywny |
 
 ---
 

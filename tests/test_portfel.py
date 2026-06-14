@@ -155,3 +155,39 @@ def test_portfel_z_wagami_vol_adjusted():
     w = wagi_inwerse_vol(bary_per, okno_vol=60)
     eng = backtest_portfel({}, "1D", okno=250, bary_per=bary_per, wagi=w)
     assert eng.kapital_calkowity > 0
+
+
+# ─── Tryb NAJLEPSZE: skaner + conviction + compounding (W-317/318/319) ──────────
+
+def test_tryb_skaner_dziala():
+    """tryb_skaner=True przechodzi bez błędu, equity dodatnie."""
+    bary_per = {s: _bary(s, n=320) for s in ("BTCUSDT", "ETHUSDT", "SOLUSDT")}
+    eng = backtest_portfel({}, "1D", okno=250, bary_per=bary_per,
+                           tryb_skaner=True, skaner_top_n=2)
+    assert eng.kapital_calkowity > 0
+
+
+def test_tryb_skaner_top_n_ogranicza_wejscia():
+    """TOP-1 dopuszcza ≤ tyle wejść co baseline (selekcja zawęża)."""
+    bary_per = {s: _bary(s, n=320) for s in ("BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT")}
+    base = backtest_portfel({}, "1D", okno=250, bary_per=bary_per)
+    skan = backtest_portfel({}, "1D", okno=250, bary_per=bary_per,
+                            tryb_skaner=True, skaner_top_n=1)
+    assert len(skan.historia_zamkniec) <= len(base.historia_zamkniec)
+
+
+def test_sizing_przekonania_dziala():
+    """sizing_przekonania=True w trybie skanera przechodzi bez błędu."""
+    bary_per = {s: _bary(s, n=320) for s in ("BTCUSDT", "ETHUSDT", "SOLUSDT")}
+    eng = backtest_portfel({}, "1D", okno=250, bary_per=bary_per,
+                           tryb_skaner=True, skaner_top_n=2, sizing_przekonania=True)
+    assert eng.kapital_calkowity > 0
+
+
+def test_compounding_dziala():
+    """compounding=True przechodzi bez błędu, equity dodatnie."""
+    bary_per = {s: _bary(s, n=320) for s in ("BTCUSDT", "ETHUSDT", "SOLUSDT")}
+    eng = backtest_portfel({}, "1D", okno=250, bary_per=bary_per,
+                           tryb_skaner=True, skaner_top_n=2,
+                           sizing_przekonania=True, compounding=True)
+    assert eng.kapital_calkowity > 0

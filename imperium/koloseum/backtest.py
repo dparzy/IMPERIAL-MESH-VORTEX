@@ -252,6 +252,10 @@ def backtest_portfel(
     # okazji (mocniejsza okazja = większa stawka). Bez tego sama selekcja przycina
     # gruby ogon. Domyślnie OFF.
     sizing_przekonania: bool = False,
+    # W-319 Compounding (pula łupów) — budżet sizingu liczony od BIEŻĄCEGO equity,
+    # nie od kapitału startowego. Zysk reinwestowany w większe pozycje (wzrost
+    # geometryczny). Domyślnie OFF (stały sizing = liniowy wzrost, łatwiejsza ocena edge).
+    compounding: bool = False,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -443,8 +447,10 @@ def backtest_portfel(
                 conv = (this - smin) / (smax - smin) if smax > smin else 1.0
                 conviction_mult = sizer.mnoznik(conv)
 
-        # Sizing par: równy budżet × frakcja DD-control × ster korelacyjny × przekonanie.
-        dyrygenci[sym].kapital_sizing = (kapital_startowy * wagi_akt[sym]
+        # Sizing par: budżet × frakcja DD-control × ster korelacyjny × przekonanie.
+        # W-319 compounding: baza = bieżące equity (pula łupów) zamiast kapitału startowego.
+        baza_kapitalu = engine.kapital_calkowity if compounding else kapital_startowy
+        dyrygenci[sym].kapital_sizing = (baza_kapitalu * wagi_akt[sym]
                                          * frakcja_breaker * frakcja_stres * conviction_mult)
         dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
 

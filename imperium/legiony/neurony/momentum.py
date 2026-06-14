@@ -595,3 +595,108 @@ class NeuronValueConvergence(MikroNeuron):
         return self._bazowy_sygnal(round(blend, 3), "SHORT", sila,
             [f"📈→📉 WARTOŚĆ: blend-Z={blend:+.2f} (Value-Z={vz}, MoMA-Z={mz}) "
              f"— głębokie wykupienie vs wartość godziwa → rewersja SHORT ({sila:.0%})"])
+
+
+class NeuronKonfluencjaMultiTF(MikroNeuron):
+    """
+    X-28 | Konfluencja Multi-Timeframe — potwierdzenie kierunku na ≥2 interwałach (W-321).
+
+    Dla nowicjusza: każdy interwał daje inną perspektywę. Jeśli trend LONG widać
+    zarówno na 1h jak i na 4h, sygnał jest znacznie silniejszy niż sygnał tylko z 1h.
+    Ten neuron głosuje TYLKO gdy ≥2 z 3 interwałów (bieżący, 4H, 1D) są zgodne.
+    Brak danych wyższego TF → abstrakcja (Prawo XV: nie zmyśla sygnałów).
+
+    Mechanizm (TF-Consensus, podobieństwo do MSTF Altuq 2020):
+      • Bieżący TF:  RSI_14 + EMA crossover (EMA_9 vs EMA_21) → kierunek lokany
+      • 4H TF:       MTF_4H_RSI_14 + MTF_4H_EMA_50 vs Close → kierunek średni
+      • 1D TF:       MTF_1D_RSI_14 + MTF_1D_EMA_50 vs Close → kierunek długi
+      Pewność rośnie z konfluencją: 2/3 TF → 0.62, 3/3 TF → 0.80.
+
+    Źródło: technika TF-Confluence praktykowana w swing tradingu (Murphy, "Technical
+    Analysis of Financial Markets" 1999, rozdz. 8 — multiple timeframe approach).
+
+    Kategoria T (Trend): sprawdza spójność trendu przez TF, nie oscylatory. Specjalista —
+    głosuje rzadko (tylko przy konfluencji), ale ze wysoką pewnością.
+    """
+    KLUCZ = "X-28"
+    LEGION = "SWING"
+    WSKAZNIK = "MTF_4H_RSI_14"
+    KATEGORIA = "T"
+    WAGA = 7
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    _PROG_RSI_BULL = 50.0   # RSI > 50 = tendencja wzrostowa na danym TF
+    _PROG_RSI_BEAR = 50.0   # RSI < 50 = tendencja spadkowa
+    _PEWNOSC_2Z3 = 0.62
+    _PEWNOSC_3Z3 = 0.80
+
+    def _kierunek_tf(self, rsi, ema, close) -> str:
+        """Ocenia kierunek na podstawie RSI>50 + cena vs EMA. Zwraca 'LONG'/'SHORT'/'NEUTRAL'."""
+        if rsi is None and ema is None:
+            return "NEUTRAL"
+        rsi_bull = (rsi is not None and rsi > self._PROG_RSI_BULL)
+        rsi_bear = (rsi is not None and rsi < self._PROG_RSI_BEAR)
+        ema_bull = (ema is not None and close is not None and close > ema)
+        ema_bear = (ema is not None and close is not None and close < ema)
+
+        sygnaly_bull = sum([rsi_bull, ema_bull])
+        sygnaly_bear = sum([rsi_bear, ema_bear])
+
+        if sygnaly_bull >= 2:
+            return "LONG"
+        if sygnaly_bear >= 2:
+            return "SHORT"
+        if sygnaly_bull == 1 and sygnaly_bear == 0:
+            return "LONG"
+        if sygnaly_bear == 1 and sygnaly_bull == 0:
+            return "SHORT"
+        return "NEUTRAL"
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        close = wskazniki.get("CLOSE")
+
+        # Kierunek na bieżącym TF (z pełnych wskaźników)
+        kier_local = self._kierunek_tf(
+            wskazniki.get("RSI_14"), wskazniki.get("EMA_21"), close
+        )
+
+        # Kierunek 4H (z MTF agregacji)
+        kier_4h = self._kierunek_tf(
+            wskazniki.get("MTF_4H_RSI_14"), wskazniki.get("MTF_4H_EMA_50"), close
+        )
+
+        # Kierunek 1D (z MTF agregacji)
+        kier_1d = self._kierunek_tf(
+            wskazniki.get("MTF_1D_RSI_14"), wskazniki.get("MTF_1D_EMA_50"), close
+        )
+
+        brak_4h = wskazniki.get("MTF_4H_RSI_14") is None
+        brak_1d = wskazniki.get("MTF_1D_RSI_14") is None
+
+        if brak_4h and brak_1d:
+            # Bez danych wyższego TF abstynujemy (nie zmyślamy konfluencji)
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak danych 4H/1D — konfluencja niemożliwa (Prawo XV: abstynencja)"])
+
+        kierunki = [k for k in [kier_local, kier_4h, kier_1d] if k != "NEUTRAL"]
+        if not kierunki:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                [f"Wszystkie TF NEUTRAL: local={kier_local} 4H={kier_4h} 1D={kier_1d}"])
+
+        long_count = kierunki.count("LONG")
+        short_count = kierunki.count("SHORT")
+        total = long_count + short_count
+
+        if long_count > short_count and long_count >= 2:
+            pewnosc = self._PEWNOSC_3Z3 if long_count == 3 else self._PEWNOSC_2Z3
+            return self._bazowy_sygnal(round(float(long_count) / max(total, 1), 2), "LONG", pewnosc,
+                [f"📈 KONFLUENCJA LONG ({long_count}/{total}): local={kier_local} 4H={kier_4h} 1D={kier_1d} | pewność {pewnosc:.0%}"])
+
+        if short_count > long_count and short_count >= 2:
+            pewnosc = self._PEWNOSC_3Z3 if short_count == 3 else self._PEWNOSC_2Z3
+            return self._bazowy_sygnal(round(float(short_count) / max(total, 1), 2), "SHORT", pewnosc,
+                [f"📉 KONFLUENCJA SHORT ({short_count}/{total}): local={kier_local} 4H={kier_4h} 1D={kier_1d} | pewność {pewnosc:.0%}"])
+
+        return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+            [f"Brak konfluencji (sprzeczne TF): local={kier_local} 4H={kier_4h} 1D={kier_1d}"])

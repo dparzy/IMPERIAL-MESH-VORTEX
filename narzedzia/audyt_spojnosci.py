@@ -488,6 +488,8 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
     "RADAR-03": "PRZEPLYW_KAPITALU (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300)",
     "NEWS-01": "NEWS_SENTYMENT (AdapterNewsLLM — wpięty w zbuduj_bojowy W-301; "
                "ożywa z RSS fetcher lub DEEPSEEK_API_KEY; bez feedu: abstynuje)",
+    "X-28":   "MTF_4H_RSI_14/MTF_1D_RSI_14 (Budowniczy MTF — ożywa gdy bary mają "
+              "pole 'interwal' i odpowiedni TF; bez niego abstynuje per Prawo XV)",
 }
 
 # Dowód allowlisty (Prawo I — bez zaufania na słowo): każdy neuron adapterowy
@@ -507,6 +509,9 @@ WERYFIKACJA_ADAPTEROW = {
     "RADAR-02": {"BTC_DOMINANCJA": -0.9},                                 # alt-season → LONG-wsparcie
     "RADAR-03": {"PRZEPLYW_KAPITALU": 0.95},                              # napływ → LONG-wsparcie
     "NEWS-01": {"NEWS_SENTYMENT": 0.8, "NEWS_PEWNOSC": 0.9, "NEWS_N": 5},  # mocno bycze → LONG
+    "X-28":   {"CLOSE": 50000.0, "RSI_14": 60.0, "EMA_21": 49000.0,
+               "MTF_4H_RSI_14": 65.0, "MTF_4H_EMA_50": 47000.0,
+               "MTF_1D_RSI_14": 58.0, "MTF_1D_EMA_50": 46000.0},  # 3/3 TF LONG → LONG
 }
 
 

@@ -6,9 +6,9 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-14 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 64 neuronów (zarejestrowane w roju) + 12 zwiadowców = **76 modułów w kodzie**
-**Aktywne / wyciszone:** 60 aktywnych + 4 wyciszone, z czego:
-  • **45 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, OC-05 WashTrading, D-01 PathSignature)
+**Zaimplementowane:** 65 neuronów (zarejestrowane w roju) + 12 zwiadowców = **77 modułów w kodzie**
+**Aktywne / wyciszone:** 61 aktywnych + 4 wyciszone, z czego:
+  • **46 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 SMC aktywne** (SMC-01/02/03, `DOSTEPNY=True`) — liczą z barów przez most EXP-05, **bez żadnego API** (abstynują w backteście bez EXP-05)
@@ -69,6 +69,7 @@
 | X-25 🔱 | NeuronATRDeviation | M | 6 | ✅ aktywny | ATR_DEVIATION | E4+E5 |
 | X-26 🔱 | NeuronHAScalper | M | 7 | ✅ aktywny | HA_SCALPER | E4+E5+E7 |
 | X-27 | NeuronValueConvergence | M | 6 | ✅ aktywny | VALUE_Z_200 | rewersja do wartości: Value-Z+MoMA-Z (W-273, BIB-020 Harris rozdz.16) |
+| X-28 | NeuronKonfluencjaMultiTF | T | 7 | ✅ aktywny | MTF_4H_RSI_14 | konfluencja ≥2/3 TF (1h+4H+1D): RSI>50 + EMA crossover → LONG/SHORT z pewnością 0.62–0.80 (W-321) |
 
 ### Plik: `neurony/trend.py`
 

@@ -5,9 +5,9 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-12 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Stan na:** 2026-06-14 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 63 neuronów (zarejestrowane w roju) + 12 zwiadowców = **75 modułów w kodzie**
-**Aktywne / wyciszone:** 55 aktywnych + 4 wyciszone, z czego:
+**Aktywne / wyciszone:** 59 aktywnych + 4 wyciszone, z czego:
   • **44 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, X-27 Value Convergence, OC-05 WashTrading, D-01 PathSignature)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
@@ -19,7 +19,7 @@
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 60). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 63). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -46,7 +46,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (60/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (63/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -265,7 +265,7 @@
 | III Augusta (H1) | ~45 | 10 (XII-01..04, V-01..05, VSA-01) + PSY-01..04 ✅ (Faza B) + V-03 ✅ + SMC-01..03 ✅ | ~35 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
-| **RAZEM** | **299** | **56** | **243** |
+| **RAZEM** | **299** | **63** | **236** |
 
 ---
 
@@ -335,14 +335,14 @@
 |---------|------|------|
 | `Strategia` (model) | `strategie/baza.py` | przepis: które neurony, w jakiej roli (wejście/filtr/wyjście) |
 | `dobierz_najlepsze()` | `strategie/baza.py` | silnik: sygnały → top-3 pasujące strategie + kierunek |
-| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 15 strategii zmapowanych na ŻYWE klucze kodu |
+| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 18 strategii zmapowanych na ŻYWE klucze kodu |
 | **Wpięcie w Legatusa** | `legiony/legatus.py` | `RaportLegatusa.strategie_dopasowane` — Generał zwraca dobrane strategie w każdym raporcie |
 
 **Klucznik (strażnik spójności):** audyt Warstwa 4 (`narzedzia/audyt_spojnosci.py`)
 pilnuje, że KAŻDY klucz w strategii istnieje w kodzie i jest aktywny — żadnych
 neuronów-widm. Test: `test_klucznik_strategie_uzywaja_istniejacych_neuronow`.
 
-**Stan:** 15 strategii (klucze: 20 — wszystkie aktywne). Status każdej: SZKIC
+**Stan:** 18 strategii (klucze: 26 — wszystkie aktywne). Status każdej: SZKIC
 (czeka na kalibrację w Koloseum). Strategie z katalogu wymagające nieistniejących
 neuronów (OrderFlow, CVD, SMC, on-chain) wejdą gdy te neurony ożyją.
 

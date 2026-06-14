@@ -342,3 +342,99 @@ class NeuronCascade(MikroNeuron):
 
         return self._bazowy_sygnal(0.0, "NEUTRAL", 0.0,
             ["Brak kaskady i układu odbicia — spokój"])
+
+
+class NeuronDetektorRuchu(MikroNeuron):
+    """
+    Z-05 | Detektor Ruchu Klimaksowego — dwukierunkowy (W-315).
+
+    Dla nowicjusza: czasem coin skacze 20-30% w ciągu doby (pump) albo leci na łeb
+    (dump). Najlepsze okazje („migdałki", kilka razy w miesiącu) to KLIMAKS — moment
+    wyczerpania ruchu, gdy tłum kupuje na szczycie (blow-off top) albo panicznie
+    sprzedaje na dnie (kapitulacja). Ten neuron łapie OBA ekstrema i gra PRZECIW
+    wyczerpanemu ruchowi:
+
+      • SZCZYT (pump + wykupienie + klimaks wolumenu) → SHORT (blow-off top)
+      • DOŁEK (dump + wyprzedanie + klimaks wolumenu) → LONG  (kapitulacja, dno)
+
+    To NIE jest gonienie ruchu — to łapanie jego ODWRÓCENIA, gdy trzy dowody
+    wyczerpania zbiegają się naraz. Specjalista: abstynuje (NEUTRAL) prawie zawsze,
+    odzywa się tylko przy realnym ekstremum → realizuje „mało trade'ów wysokiej pewności".
+
+    Algorytm (czysty OHLCV):
+      ROC      = (close - close[-1-lookback]) / close[-1-lookback]  — ruch w oknie
+      vol_spike= VOLUME / VOLUME_MA20                                — klimaks wolumenu
+      RSI_14   = wykupienie (≥ prog_ob) / wyprzedanie (≤ prog_os)
+
+      SHORT gdy: ROC ≥ +prog_pump  ∧ RSI ≥ prog_ob ∧ vol_spike ≥ prog_vol
+      LONG  gdy: ROC ≤ −prog_dump  ∧ RSI ≤ prog_os ∧ vol_spike ≥ prog_vol
+
+    Pewność ∈ [0.55, 0.85] skalowana siłą trzech dowodów (im bardziej ekstremalnie,
+    tym pewniej). Brak danych → NEUTRAL (abstynencja, Prawo XV).
+
+    Ortogonalny do Z-02 (akumulacja PRZED pumpem): Z-05 łapie WYCZERPANIE ruchu już
+    zaistniałego (mean-reversion w klimaksie), nie jego początek.
+
+    Źródło: ⚠️ ugruntowana praktyka (blow-off top / capitulation bottom + volume
+    climax — Wyckoff, Murphy "Technical Analysis of the Financial Markets"); progi
+    do kalibracji walk-forward / live, nie peer-review na konkretnych liczbach.
+    """
+    KLUCZ = "Z-05"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "CLOSE_SERIES_20"
+    KATEGORIA = "Z"
+    WAGA = 7
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    _LOOKBACK = 6      # ile barów wstecz liczyć ROC (≈24h na 4H; 1 bar=1 dzień na D1)
+    _PROG_PUMP = 0.15  # +15% w oknie = pump (kandydat na szczyt)
+    _PROG_DUMP = 0.15  # -15% w oknie = dump (kandydat na dołek)
+    _PROG_OB = 70.0    # RSI ≥ 70 = wykupienie (szczyt)
+    _PROG_OS = 30.0    # RSI ≤ 30 = wyprzedanie (dołek)
+    _PROG_VOL = 2.0    # wolumen ≥ 2× MA20 = klimaks
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        closes = wskazniki.get("CLOSE_SERIES_20")
+        rsi = wskazniki.get("RSI_14")
+        vol = wskazniki.get("VOLUME")
+        vol_ma = wskazniki.get("VOLUME_MA20")
+
+        if not closes or rsi is None or vol is None or vol_ma is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak danych Detektora Ruchu (wymaga CLOSE_SERIES/RSI/VOLUME)"])
+        if len(closes) < self._LOOKBACK + 1 or vol_ma < 1e-9:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Za krótka seria / vol_ma≈0"])
+
+        cena = closes[-1]
+        baza = closes[-1 - self._LOOKBACK]
+        if baza < 1e-9:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["baza ceny ≈0"])
+        roc = (cena - baza) / baza
+        vol_spike = vol / vol_ma
+
+        # SZCZYT (blow-off top) → SHORT
+        if roc >= self._PROG_PUMP and rsi >= self._PROG_OB and vol_spike >= self._PROG_VOL:
+            sila_roc = min(1.0, (roc - self._PROG_PUMP) / self._PROG_PUMP)
+            sila_rsi = min(1.0, (rsi - self._PROG_OB) / (100.0 - self._PROG_OB))
+            sila_vol = min(1.0, (vol_spike - self._PROG_VOL) / self._PROG_VOL)
+            pewnosc = round(0.55 + 0.30 * (sila_roc + sila_rsi + sila_vol) / 3.0, 4)
+            return self._bazowy_sygnal(round(roc, 4), "SHORT", pewnosc,
+                [f"🔺 SZCZYT KLIMAKSOWY: ROC +{roc:.1%} ≥ +{self._PROG_PUMP:.0%}, "
+                 f"RSI {rsi:.0f} ≥ {self._PROG_OB:.0f} (wykupienie), "
+                 f"wolumen {vol_spike:.1f}× ≥ {self._PROG_VOL:.0f}× — blow-off top → SHORT"])
+
+        # DOŁEK (capitulation) → LONG
+        if roc <= -self._PROG_DUMP and rsi <= self._PROG_OS and vol_spike >= self._PROG_VOL:
+            sila_roc = min(1.0, (-roc - self._PROG_DUMP) / self._PROG_DUMP)
+            sila_rsi = min(1.0, (self._PROG_OS - rsi) / self._PROG_OS)
+            sila_vol = min(1.0, (vol_spike - self._PROG_VOL) / self._PROG_VOL)
+            pewnosc = round(0.55 + 0.30 * (sila_roc + sila_rsi + sila_vol) / 3.0, 4)
+            return self._bazowy_sygnal(round(roc, 4), "LONG", pewnosc,
+                [f"🔻 DOŁEK KAPITULACYJNY: ROC {roc:.1%} ≤ −{self._PROG_DUMP:.0%}, "
+                 f"RSI {rsi:.0f} ≤ {self._PROG_OS:.0f} (wyprzedanie), "
+                 f"wolumen {vol_spike:.1f}× ≥ {self._PROG_VOL:.0f}× — kapitulacja → LONG"])
+
+        return self._bazowy_sygnal(round(roc, 4), "NEUTRAL", 0.0,
+            ["Brak klimaksu (ruch/RSI/wolumen nie zbiegają się w ekstremum)"])

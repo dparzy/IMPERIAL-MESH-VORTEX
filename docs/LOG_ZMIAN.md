@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-06-14 | W-315 | Z-05 Detektor Ruchu Klimaksowego — dwukierunkowy (szczyt→SHORT, dołek→LONG)
+
+**Rozkaz Cezara:** detektor gwałtownych ruchów nie tylko pump, ale pump I dump
+(różne ROC), nie tylko dołek ale i szczyt — szczyt na SHORT, dołek na LONG.
+
+**Wdrożenie:** neuron Z-05 `NeuronDetektorRuchu` (czysty OHLCV: CLOSE_SERIES_20 +
+RSI_14 + VOLUME_MA20). Łapie KLIMAKS (wyczerpanie ruchu), gra przeciw niemu:
+- SZCZYT: ROC ≥ +15% ∧ RSI ≥ 70 ∧ wolumen ≥ 2× → SHORT (blow-off top)
+- DOŁEK: ROC ≤ −15% ∧ RSI ≤ 30 ∧ wolumen ≥ 2× → LONG (kapitulacja)
+- inaczej NEUTRAL (specjalista — abstynuje prawie zawsze, „mało trade'ów wysokiej pewności")
+
+Ortogonalny do Z-02 (akumulacja PRZED pumpem); Z-05 łapie ruch JUŻ zaistniały.
+Źródło: blow-off top / capitulation + volume climax (Wyckoff, Murphy) — progi do
+kalibracji walk-forward/live (Prawo I).
+
+**Pliki:** `neurony/zagrozenie.py` (Z-05), `rejestr.py`, `tests/test_detektor_ruchu.py`
+(14 testów granic), MANIFEST/README/INDEKS (64 neurony). Część Etapu B audytu 2026-06-14.
+
+---
+
 ## 2026-06-13 | W-314 | Filtr Asymetrii Reżimu — brama wejścia oparta na trendzie
 
 **Odkrycie OOS:** pomiar kierunków na świeżym oknie (2024-10..2026-06, BTC płaski

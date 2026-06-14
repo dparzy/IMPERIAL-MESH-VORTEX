@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-13 · **Testy:** 978/978 zielone · **Faza:** PętlaLive (entrypoint) + Synapsy Reżimowe + PamięćRefleksyjna + Radar wpięty + Paper Trading Etap II + Filtr Asymetrii Reżimu (W-314).
+> **Stan na:** 2026-06-14 · **Testy:** 992/992 zielone · **Faza:** PętlaLive (entrypoint) + Synapsy Reżimowe + PamięćRefleksyjna + Radar wpięty + Paper Trading Etap II + Filtr Asymetrii Reżimu (W-314).
 
 ---
 
@@ -26,7 +26,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **63 zaimplementowane** (59 aktywnych: 37 OHLCV + SES-01 ZegarSesji + SES-02 AzjaRange + V-05 Force Index Eldera + 3 SMC (OrderBlock/FVG/BOS) + 6 kat. R + NEWS-01 Sentyment LLM + V-03 CVD + V-14 Choppiness + L-14 Ulcer + H-01 Hurst-DFA + N-01 Permutation Entropy + Z-01 VPIN ToxicFlow + Z-03 Bubble/Crash kill-switch + Z-04 Cascade/Dead-Cat + X-27 Value Convergence + OC-05 WashTrading, Z-02 PumpDetect przez adaptery publiczne; 4 czeka na on-chain API) |
+| **Mikro-neurony** | **64 zaimplementowane** (60 aktywnych: 37 OHLCV + SES-01 ZegarSesji + SES-02 AzjaRange + V-05 Force Index Eldera + 3 SMC (OrderBlock/FVG/BOS) + 6 kat. R + NEWS-01 Sentyment LLM + V-03 CVD + V-14 Choppiness + L-14 Ulcer + H-01 Hurst-DFA + N-01 Permutation Entropy + Z-01 VPIN ToxicFlow + Z-03 Bubble/Crash kill-switch + Z-04 Cascade/Dead-Cat + Z-05 Detektor Ruchu Klimaksowego + X-27 Value Convergence + OC-05 WashTrading, Z-02 PumpDetect przez adaptery publiczne; 4 czeka na on-chain API) |
 | **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
@@ -35,9 +35,9 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
 | **Status elitarny** | **15 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 + 12 zwiadowców |
 | **Monte Carlo / Optymalizator / Pamięć Refleksyjna / Drift Adapter** | W-293/294/295/296 — antyoverfitting + samouczenie Brain |
-| **Testy** | `python tests/run_tests.py` → **978/978** ✅ |
+| **Testy** | `python tests/run_tests.py` → **992/992** ✅ |
 
-**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 63) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
+**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 64) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
 ---
 
@@ -60,7 +60,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ```
 👑 cesarz/       — mózg decyzyjny, 5 Doradców, PamięćRefleksyjna   (9)
 🏛️ senat/        — debata / konsensus                              (2)
-⚔️ legiony/      — 63 neurony + 12 zwiadowców + Legatus + Radar     (40)
+⚔️ legiony/      — 64 neurony + 12 zwiadowców + Legatus + Radar     (40)
 🏟️ koloseum/     — Dyrygent, PętlaLive, Backtest portfela, Namiestnik (11)
 🛡️ pretorianie/  — bezpieczeństwo, kalkulator lewara, Praeda        (5)
 🏗️ akwedukty/    — pipeline danych + adaptery API (Futures/F&G/CVD/News) (8)
@@ -83,7 +83,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ## 🧪 Uruchomienie testów
 
 ```bash
-python tests/run_tests.py     # 978/978, bez zależności zewnętrznych
+python tests/run_tests.py     # 992/992, bez zależności zewnętrznych
 ```
 
 ---

@@ -63,6 +63,7 @@ from imperium.legiony.neurony.entropia import (
 )
 from imperium.legiony.neurony.zagrozenie import (
     NeuronToxicFlow, NeuronPumpDetect, NeuronBubbleCrash, NeuronCascade,
+    NeuronDetektorRuchu,
 )
 from imperium.legiony.neurony.geometria import (
     NeuronPathSignature,
@@ -118,6 +119,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         # Zagrożenie (Z) — VPIN meta-brama obronna (Z-01) + PumpDetect kierunkowy (Z-02)
         # + Bubble/Crash kill-switch (Z-03, W-278) + Cascade/Dead-Cat (Z-04, W-279), BIB-020 rozdz. 28
         NeuronToxicFlow(), NeuronPumpDetect(), NeuronBubbleCrash(), NeuronCascade(),
+        # + Detektor Ruchu Klimaksowego dwukierunkowy (Z-05, W-315): szczyt→SHORT, dołek→LONG
+        NeuronDetektorRuchu(),
         # Geometria ścieżki (D) — Lévy Area Close×Volume, Rough Path Theory (W-079)
         NeuronPathSignature(),
     ]

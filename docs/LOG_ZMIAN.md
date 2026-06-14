@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-06-14 | W-320 | Dane 1h wpięte — Tryb NAJLEPSZY na krótszym interwale (Prawo XV)
+
+**Odkrycie (UTRATA POTENCJAŁU, Prawo XV):** w `dane/godzinowe/` leżą dane **1h**
+(~76k barów/parę, 5 par BTC/ETH/SOL/BNB/DOGE) — śledzone w repo, obsługiwane przez
+czytnik CSV, ale NIEUŻYWANE. Dotychczasowa diagnoza („gramy tylko 4H/1D") była błędna —
+najwyższy priorytet Cezara (krótkie interwały) był częściowo spełniony, tylko niewpięty.
+
+**Wdrożenie:** test integracyjny `test_realne_dane_1h_laduja_sie` (Prawo XIX — dowód
+kodem) ładuje realne pliki 1h i weryfikuje chronologię + OHLC. Tryb NAJLEPSZY (skaner+
+conviction+compounding) uruchomiony na pełnej serii 1h (~75k barów/parę) — wynik
+liczbowy zostanie dopisany po zakończeniu pomiaru (Prawo I: nie raportuję przed końcem).
+
+**Pełny stack na 4h (W-319, zmierzony):** 10 000$ → 902 295$ = **90.2x** (2665 trade'ów,
+WR 46%) — ⚠️ gruboogonowy (DOGE), bez prowizji/poślizgu = górna granica potencjału, nie obietnica.
+
+**Zostaje 🔴:** interwały sub-godzinne (1m/5m/15m) — `dane/minutowe/` puste.
+
+**Pliki:** `tests/test_czytnik_csv.py` (+1 test), `docs/{TRYBY_IMPERIUM,WIZJA_TRYBY_I_ROZWOJ}.md`,
+`README.md`. Testy: 1023/1023.
+
+---
+
 ## 2026-06-14 | W-319 | Compounding (pula łupów) — reinwestycja zysku w większe pozycje
 
 **Wizja Cezara:** zysk dorzucamy do puli łupów, powiększamy kapitał. Trzeci wzmacniacz

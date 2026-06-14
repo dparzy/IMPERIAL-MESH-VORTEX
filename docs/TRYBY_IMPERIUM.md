@@ -62,6 +62,15 @@ potem dopracować SKALP (wymaga danych krótkointerwałowych — Etap C, live).
 | BASELINE (każda para gra) | 2870 | +52 789$ | 62 659$ | 49% |
 | TRYB NAJLEPSZE (skaner TOP-2 + filtr + min_pewnosc 0.62) | 2247 | +24 135$ | 34 032$ | 45% |
 | **TRYB NAJLEPSZE + CONVICTION (skaner TOP-3 + Sizing Przekonania)** | **2665** | **+64 976$** | **74 782$** | 46% |
+| **PEŁNY STACK + COMPOUNDING (TOP-3 + Conviction + pula łupów, W-319)** | **2665** | **+892 295$** | **902 295$** | 46% |
+
+**Compounding (W-319) — wynik i uczciwe zastrzeżenie (Prawo I):** reinwestycja zysku
+(sizing z `kapital_calkowity`, nie ze stałego startu) daje **10 000$ → 902 295$ = 90.2x**
+w 9 lat. To geometryczny efekt składania na tej samej serii trade'ów (2665, WR 46%).
+⚠️ **Wynik jest gruboogonowy i zależny od DOGE** (meme-pumpy tworzą prawie cały zysk),
+liczony **bez prowizji/poślizgu/finansowania lewara** i bez limitu płynności — to dowód
+mechaniki (składanie działa), NIE obietnica 90x na żywo. Sufit ekspozycji per okazja
+(Prawo XXV) i koszty realne obetną tę liczbę; traktujemy ją jako górną granicę potencjału.
 
 **Rozkład per coin (BASELINE):** DOGE +52 327$ (1316 tr) ← prawie cały zysk; ETH +545,
 BTC +194, SOL +47, BNB −324. **Zysk jest GRUBO-OGONOWY: meme/alt pumpy (DOGE).**

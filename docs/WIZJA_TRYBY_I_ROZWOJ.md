@@ -22,8 +22,11 @@ i strategie z bazy, z auto-uczeniem i auto-modyfikacją.
 **Dowód (9 lat, 5 par):** +64 976$ vs baseline +52 789$ (+23%, mniej trade'ów, wszystkie pary +).
 
 **Czego brakuje do pełni Trybu 1:**
-- 🔴 **Interwały krótkie (1m/5m/15m/1h)** — dziś gramy tylko 4H/1D/swing; w godzinie dużo
-  się dzieje, bez krótkich interwałów ciężko trafić najlepszy moment. **Najwyższy priorytet danych.**
+- 🟢 **Interwał 1h — JEST i działa (W-320)**: mamy ~76k barów 1h/parę (5 par,
+  `dane/godzinowe/`) — czytnik je obsługuje, test ładowania zielony, symulacja 1h w toku.
+  (Wcześniejsza diagnoza „tylko 4H/1D" była błędna — Prawo XV: dane leżały nieużyte.)
+- 🔴 **Interwały bardzo krótkie (1m/5m/15m)** — `dane/minutowe/` puste; bez nich skalp
+  nie widzi najlepszego momentu w obrębie godziny. **Najwyższy priorytet danych.**
 - 🟡 Neurony bazowe per interwał — które neurony są najlepsze dla danego TF, kalibracja składu roju per interwał.
 - 🟡 Bayesian P(sukces) per setup (skalibrowane prawdopodobieństwo, nie tylko „pewność").
 
@@ -86,7 +89,7 @@ CoinGecko+DefiLlama = ocena jakości (cap/płynność/TVL). To nowy adapter `Ada
 
 ## 🗺️ KOLEJKA ROZWOJU (priorytet)
 
-1. **Dane krótkich interwałów** (1m/5m/15m/1h) — bez nich Tryb 1 nie widzi najlepszych momentów.
+1. **Dane bardzo krótkich interwałów** (1m/5m/15m) — 1h JUŻ wpięty (W-320); brakuje sub-godzinnych do skalpu.
 2. **AdapterKronikarz live** + Bayesian P(sukces) — Tryb 1 i 2.
 3. **AdapterKartaWaluty** (CoinGecko+GoPlus+DefiLlama) — Prawo XXIII, gra na wielu walutach.
 4. **Tryb BILANS** (spot/invest opportunity) + przełącznik z autoryzacją.

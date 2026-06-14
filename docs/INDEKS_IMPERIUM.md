@@ -73,6 +73,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 37 | `POMIAR_FILTR_ASYMETRII.md` | **Dowód A/B Filtra Asymetrii Reżimu** (W-314) — OOS chop: strata −386$→−238$ (−38%), ADX+EMA-200, Moskowitz 2012 + Wilder 1978; wciąż ujemny ale realna przewaga (Prawo XVI) | ✅ Aktywny |
 | 38 | `AUDYT_GLEBOKI_2026-06-14.md` | **Głęboki audyt: wizja łowcy okazji vs kod** — reframe oceny (wielowalutowy skaner zamiast 1 waluta/9 lat), 9 luk (brak skanera/rankingu okazji=serce), martwy AdapterKronikarz, rozbieżności MANIFEST, research technik (cross-sectional momentum, pump z-score, Bayesian Kelly), kolejność A/B/C | ✅ Aktywny |
 | 39 | `TRYBY_IMPERIUM.md` | **Propozycja 5 trybów** (NAJLEPSZE/SKALP/SWING/INVEST/OBRONA) + mechanika trybu NAJLEPSZE (skaner TOP-N, W-316/317) + mapa brakujących neuronów/strategii do łowcy okazji | ✅ Aktywny |
+| 40 | `WIZJA_TRYBY_I_ROZWOJ.md` | **Wizja Cezara: tryby + rozwój** — Tryb 1 NAJLEPSZY (potok W-315..319), Tryb 2 BILANS (spot/invest), Tryb 3 przełącznik z autoryzacją, propozycja Praw XXII-XXV, tabela narzędzi prześwietlania walut (CoinGecko/GoPlus/RugCheck/DefiLlama), kolejka rozwoju (krótkie interwały) | ✅ Aktywny |
 
 ---
 

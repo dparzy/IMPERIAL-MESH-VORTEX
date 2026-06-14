@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-14 · **Testy:** 992/992 zielone · **Faza:** PętlaLive (entrypoint) + Synapsy Reżimowe + PamięćRefleksyjna + Radar wpięty + Paper Trading Etap II + Filtr Asymetrii Reżimu (W-314).
+> **Stan na:** 2026-06-14 · **Testy:** 1005/1005 zielone · **Faza:** PętlaLive (entrypoint) + Synapsy Reżimowe + PamięćRefleksyjna + Radar wpięty + Paper Trading Etap II + Filtr Asymetrii Reżimu (W-314).
 
 ---
 
@@ -35,7 +35,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
 | **Status elitarny** | **15 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 + 12 zwiadowców |
 | **Monte Carlo / Optymalizator / Pamięć Refleksyjna / Drift Adapter** | W-293/294/295/296 — antyoverfitting + samouczenie Brain |
-| **Testy** | `python tests/run_tests.py` → **992/992** ✅ |
+| **Testy** | `python tests/run_tests.py` → **1005/1005** ✅ |
 
 **Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 64) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
@@ -83,7 +83,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ## 🧪 Uruchomienie testów
 
 ```bash
-python tests/run_tests.py     # 992/992, bez zależności zewnętrznych
+python tests/run_tests.py     # 1005/1005, bez zależności zewnętrznych
 ```
 
 ---

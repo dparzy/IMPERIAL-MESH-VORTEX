@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-06-14 | W-316 | Skaner Okazji — łowca najlepszych setupów w koszyku (serce wizji)
+
+**Największa luka audytu 2026-06-14:** system był „N botów jednowalutowych", nie łowca
+okazji. Skaner to warstwa SELEKCJI ponad rojem — patrzy na WSZYSTKIE monety naraz,
+liczy ocenę okazji i zwraca TOP-N najmocniejszych (realizuje „mało trade'ów wysokiej pewności").
+
+**Wdrożenie:** `imperium/koloseum/skaner_okazji.py` (`SkanerOkazji`, `OkazjaRank`).
+Ocena = cross-sectional z-score 4 składników (momentum/ROC, trend/ADX, wolumen, zmienność/ATR%):
+- momentum cross-sectional = relative strength (lider vs maruder koszyka)
+- kierunek ze znaku momentum (lider rosnący→LONG, spadający→SHORT)
+- chop (ADX<min_adx) odsiany z rankingu (lekcja W-314)
+- siła = |momentum_z| + trend_z + wolumen_z + zmiennosc_z
+
+Czysty OHLCV; brak danych monety → pomijana (Prawo XV). Skaner RANKUJE, nie handluje —
+decyzję wejścia podejmuje dalej Dyrygent. Następny krok: wpięcie do pętli portfelowej
+(selekcja TOP-N zamiast „każda para gra") + backtest cross-sectional.
+
+**Pliki:** `skaner_okazji.py` (nowy), `tests/test_skaner_okazji.py` (13 testów granic).
+Źródła: cross-sectional momentum (FXEmpire, Moskowitz 2012), ADX (Wilder 1978).
+
+---
+
 ## 2026-06-14 | W-315 | Z-05 Detektor Ruchu Klimaksowego — dwukierunkowy (szczyt→SHORT, dołek→LONG)
 
 **Rozkaz Cezara:** detektor gwałtownych ruchów nie tylko pump, ale pump I dump

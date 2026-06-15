@@ -150,19 +150,27 @@ trendzie (ADX≥50) i tylko jedną, najlepszą okazję. To zbliża 1h do progu r
 (z −12.8% baseline do −3.4%), ale **wciąż na minusie**.
 
 ⚠️ **Zastrzeżenie istotności (Prawo I):** −3.4% liczone na **94 trade'ach / 1.4 lat**
-(≈1.3/tydz.) — próbka mała, wynik w granicach szumu, NIE robustny edge. Gradient sugeruje,
-że jeszcze ostrzejszy filtr (adx≥55/60) mógłby przekroczyć zero, ale przy ~kilkudziesięciu
-trade'ach przewaga byłaby nieodróżnialna od przypadku.
+(≈1.3/tydz.) — próbka mała, wynik w granicach szumu, NIE robustny edge.
+
+**Probe adx≥55/60 (W-321c-v3 — domyka pytanie „czy przekroczy zero"):**
+| Konfig | Trade | WR | PnL% |
+|---|---|---|---|
+| adx≥55 / 0.75 / top1 | 62 | 46.8% | −2.6% |
+| adx≥60 / 0.75 / top1 | 27 | 48.1% | −2.5% |
+
+**Gradient się WYPŁASZCZA i NIE przekracza zera:** adx50 −3.4% → adx55 −2.6% → adx60 −2.5%
+(asymptota ~−2.5%), a liczba trade'ów zapada się 94→62→27. Przy 27 trade'ach przewaga
+byłaby i tak nieodróżnialna od przypadku. **Definitywnie: 1h nie da się doprowadzić do
+plusa samym zaostrzaniem progów.** Wizualizacja: `docs/wykres_kalibracja_1h.png`.
 
 **🚨 KONKLUZJA 1h (UTRATA POTENCJAŁU zmierzona, Prawo XV):** rój w obecnym kształcie
-**nie ma robustnego dodatniego edge'u na 1h**. Skrajna selektywność (adx≥50/top1) dociska
-stratę do −3.4%, ale na zbyt małej próbce i wciąż poniżej zera. Neurony/progi są
-strukturalnie dopasowane do 4h+ (trend, swing), nie do mikrostruktury 1h. **Rekomendacja:**
-NIE używać 1h z obecnym rojem jako trybu dochodowego. Ścieżki na przyszłość (jeśli 1h ma
-być priorytetem): (a) neurony mikrostrukturalne dedykowane 1h, (b) model kosztów (1h ma
-wielokrotnie wyższy obrót — prowizje dobiją), (c) zostać na 4h, gdzie stack jest dodatni
-(+5.8% na tym samym oknie); ewentualnie (d) probe adx≥55/60 top1 dla potwierdzenia
-przekroczenia zera, ze świadomością niskiej istotności.
+**nie ma robustnego dodatniego edge'u na 1h**. Skrajna selektywność asymptotuje przy ~−2.5%
+(na garstce trade'ów), nigdy nie przekraczając zera. Neurony/progi są strukturalnie
+dopasowane do 4h+ (trend, swing), nie do mikrostruktury 1h. **Rekomendacja:** NIE używać 1h
+z obecnym rojem jako trybu dochodowego. Ścieżki na przyszłość (jeśli 1h ma być priorytetem):
+(a) neurony mikrostrukturalne dedykowane 1h, (b) model kosztów (1h ma wielokrotnie wyższy
+obrót — prowizje dobiją), (c) **zostać na 4h, gdzie stack jest dodatni (+5.8% na tym samym
+oknie)** — rekomendowane.
 
 **Rozkład per coin (BASELINE):** DOGE +52 327$ (1316 tr) ← prawie cały zysk; ETH +545,
 BTC +194, SOL +47, BNB −324. **Zysk jest GRUBO-OGONOWY: meme/alt pumpy (DOGE).**

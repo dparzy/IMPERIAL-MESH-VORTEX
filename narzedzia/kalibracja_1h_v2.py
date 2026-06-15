@@ -32,11 +32,8 @@ MAX_BAROW = int(os.getenv("MAX_BAROW", "12000"))
 
 # Siatka: (min_adx, min_pewnosc, top_n). Pierwszy = baseline 4h-config (ref).
 SIATKA = [
-    (36.0, 0.70, 2),   # zwycięzca v1 (kotwica) — ref −6.4% na 12k
-    (45.0, 0.70, 2),   # −5.9%
-    (45.0, 0.70, 1),   # top1 gorszy: −6.5%
-    (36.0, 0.75, 1),
-    (50.0, 0.75, 1),   # NAJLEPSZY ze wszystkich 13 konfig: −3.4% (94 tr, skrajna selektywność)
+    (55.0, 0.75, 1),   # probe ekstremalnej selektywności
+    (60.0, 0.75, 1),   # maksymalny filtr trendu
 ]
 
 

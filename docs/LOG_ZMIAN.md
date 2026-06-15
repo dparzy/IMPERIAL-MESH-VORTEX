@@ -37,7 +37,19 @@ Dwa twarde wnioski: (1) 90.2x nie jest powtarzalny — ten sam stack 4h na ostat
 (krótkie interwały) z obecną konfiguracją pogarsza wynik → wymaga osobnej kalibracji
 progów pod 1h ZANIM wejdzie do gry. Szczegóły: `docs/TRYBY_IMPERIUM.md` § W-321b.
 
-**Pliki:** `narzedzia/sym_1h.py`, `narzedzia/sym_porownanie_tf.py`.
+**Kalibracja progów 1h (W-321c, `narzedzia/kalibracja_1h.py` + `_v2.py`):** 13 konfiguracji
+na oknie 1.4 lat (cap 12k). Ranking po PnL%:
+- **adx≥50 / pew≥0.75 / top1: −3.4% (94 tr)** — najlepszy ze wszystkich, skrajna selektywność.
+- adx≥45 / 0.70 / top2: −5.9%; adx≥36 / 0.70 / top2: −6.4%; baseline adx20: −12.8%.
+
+Korekta tezy (Prawo I): top1 NIE jest jednostajnie gorszy — przy umiarkowanym ADX traci
+mocno (adx36/top1 = −11.2%), ale przy ekstremalnym ADX jest najlepszy (adx50/top1 = −3.4%).
+Lewar = skrajna selektywność (silny trend + jedna okazja). **Wciąż minus**, a −3.4% na 94
+trade'ach jest w granicach szumu (nie robustny edge). KONKLUZJA: rój nie ma robustnego
+edge'u na 1h; zostać na 4h (+5.8%). Szczegóły: `docs/TRYBY_IMPERIUM.md` § W-321c / W-321c-v2.
+
+**Pliki:** `narzedzia/sym_1h.py`, `narzedzia/sym_porownanie_tf.py`,
+`narzedzia/kalibracja_1h.py`, `narzedzia/kalibracja_1h_v2.py`.
 
 ---
 

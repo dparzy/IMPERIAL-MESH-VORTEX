@@ -134,25 +134,35 @@ pełny stack). Cel: czy wyższe progi czynią 1h dodatnim? Ranking (po PnL%):
 
 | Konfig (min_adx / min_pewnosc / top_n) | Trade | WR | PnL% |
 |---|---|---|---|
-| 45 / 0.70 / **top2** | 217 | 41.9% | **−5.9%** (najlepszy ze WSZYSTKICH) |
+| **50 / 0.75 / top1** | **94** | 42.6% | **−3.4%** (najlepszy ze WSZYSTKICH 13 konfig) |
+| 45 / 0.70 / top2 | 217 | 41.9% | −5.9% |
 | 36 / 0.70 / top2 | 430 | 44.2% | −6.4% |
-| 45 / 0.70 / **top1** | 172 | 41.9% | −6.5% (top1 GORSZY — przekoncentrowanie) |
+| 45 / 0.70 / top1 | 172 | 41.9% | −6.5% |
+| 36 / 0.75 / top1 | 337 | 40.4% | −11.2% |
 
-**Werdykt kalibracji (Prawo I, ostateczny):** najostrzejszy filtr w całej kalibracji
-(adx≥45, top2) daje **−5.9%** — wciąż strata. Dwa twarde fakty domykają temat:
-- **Malejące zwroty:** ADX 36→45 poprawił tylko −6.4→−5.9% przy połowie trade'ów (430→217).
-  Gradient wypłaszczył się przy ~−6%; dalsze zaostrzanie nie kupuje już poprawy.
-- **top1 jest GORSZY niż top2** (−6.5% vs −5.9%): redukcja do jednej okazji na tik
-  przekoncentrowuje ryzyko i traci dywersyfikację koszyka — sprzeczne z hipotezą
-  „mniej = lepiej" doprowadzoną do skrajności.
+**Werdykt kalibracji (Prawo I — z korektą wcześniejszej tezy):** wbrew pierwotnemu
+wnioskowi „top1 gorszy", top1 nie jest jednostajnie zły — zależy od ostrości ADX:
+- przy umiarkowanym ADX top1 wpuszcza za dużo i traci mocno (adx36/top1 = −11.2%, 337 tr),
+- przy **ekstremalnym ADX** top1 jest NAJLEPSZY (adx50/top1 = **−3.4%**, tylko 94 tr).
 
-**🚨 KONKLUZJA 1h (UTRATA POTENCJAŁU rozpoznana i ZMIERZONA, Prawo XV):** rój w obecnym
-kształcie **nie ma dodatniego edge'u na 1h** — kalibracja progów połowi stratę
-(−12.8% → −5.9%), ale nie tworzy przewagi. Neurony/progi są strukturalnie dopasowane
-do 4h+ (trend, swing), a nie do mikrostruktury 1h. **Rekomendacja:** NIE używać 1h z
-obecnym rojem. Ścieżki na przyszłość (jeśli 1h ma być priorytetem): (a) neurony
-mikrostrukturalne dedykowane 1h, (b) model kosztów (1h ma 3.3× obrotu — prowizje
-dobiją), (c) zostać na 4h, gdzie stack jest dodatni (+5.8% na tym samym oknie).
+Prawdziwym lewarem jest **skrajna selektywność** — handluj tylko przy bardzo silnym
+trendzie (ADX≥50) i tylko jedną, najlepszą okazję. To zbliża 1h do progu rentowności
+(z −12.8% baseline do −3.4%), ale **wciąż na minusie**.
+
+⚠️ **Zastrzeżenie istotności (Prawo I):** −3.4% liczone na **94 trade'ach / 1.4 lat**
+(≈1.3/tydz.) — próbka mała, wynik w granicach szumu, NIE robustny edge. Gradient sugeruje,
+że jeszcze ostrzejszy filtr (adx≥55/60) mógłby przekroczyć zero, ale przy ~kilkudziesięciu
+trade'ach przewaga byłaby nieodróżnialna od przypadku.
+
+**🚨 KONKLUZJA 1h (UTRATA POTENCJAŁU zmierzona, Prawo XV):** rój w obecnym kształcie
+**nie ma robustnego dodatniego edge'u na 1h**. Skrajna selektywność (adx≥50/top1) dociska
+stratę do −3.4%, ale na zbyt małej próbce i wciąż poniżej zera. Neurony/progi są
+strukturalnie dopasowane do 4h+ (trend, swing), nie do mikrostruktury 1h. **Rekomendacja:**
+NIE używać 1h z obecnym rojem jako trybu dochodowego. Ścieżki na przyszłość (jeśli 1h ma
+być priorytetem): (a) neurony mikrostrukturalne dedykowane 1h, (b) model kosztów (1h ma
+wielokrotnie wyższy obrót — prowizje dobiją), (c) zostać na 4h, gdzie stack jest dodatni
+(+5.8% na tym samym oknie); ewentualnie (d) probe adx≥55/60 top1 dla potwierdzenia
+przekroczenia zera, ze świadomością niskiej istotności.
 
 **Rozkład per coin (BASELINE):** DOGE +52 327$ (1316 tr) ← prawie cały zysk; ETH +545,
 BTC +194, SOL +47, BNB −324. **Zysk jest GRUBO-OGONOWY: meme/alt pumpy (DOGE).**

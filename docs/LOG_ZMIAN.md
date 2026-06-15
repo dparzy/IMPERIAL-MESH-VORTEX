@@ -15,8 +15,13 @@ wyników. Wpis „Tryb NAJLEPSZY na danych 1h" był więc przedwczesny co do lic
 
 **Wdrożenie:** `narzedzia/sym_1h.py` (trwały, zacommitowany) — uruchamia
 `backtest_portfel` na 5 parach 1h, pełny stack (TOP-3 + Sizing Przekonania +
-Compounding + filtr asymetrii). Wynik liczbowy 1h zostanie dopisany po zakończeniu
-biegu (Prawo I: nie raportuję przed końcem pomiaru).
+Compounding + filtr asymetrii).
+
+**Odkrycie RAM (Prawo I):** pełny bieg 5 par × ~67k barów 1h akumuluje pamięć
+LINIOWO (~5.5MB/s, historia trade'ów per tik) i przekracza ~13GB → OOM w kontenerze
+15GB (pierwszy bieg zabity SIGKILL exit 137). Runner dostał cap `MAX_BAROW`
+(domyślnie 30k barów/parę ≈ 3.4 lat 1h) — ukończalny, uczciwy pomiar. Pełna historia
+tylko gdy RAM wystarcza (`MAX_BAROW=0`). Wynik liczbowy 1h dopisany po zakończeniu biegu.
 
 **Pliki:** `narzedzia/sym_1h.py`.
 

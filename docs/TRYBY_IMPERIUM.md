@@ -104,6 +104,32 @@ interwałów (`narzedzia/sym_porownanie_tf.py`). Cap 1h=30k barów/parę (pełna
 **Status:** 1h wpięte technicznie i ZMIERZONE, ale **nieopłacalne bez rekalibracji**.
 Nie włączamy go do trybu live. Następny krok: osobna kalibracja progów pod 1h.
 
+### W-321c — kalibracja progów 1h (siatka, `narzedzia/kalibracja_1h.py`)
+
+Wykonano kalibrację (8 konfiguracji, okno 2024-11→2026-06 ~1.4 lat, cap 12k barów/parę,
+pełny stack). Cel: czy wyższe progi czynią 1h dodatnim? Ranking (po PnL%):
+
+| Konfig (min_adx / min_pewnosc / top_n) | Trade | WR | PnL% |
+|---|---|---|---|
+| 36 / 0.70 / **top2** | 430 | 44.2% | **−6.4%** (najlepszy) |
+| 36 / 0.55 / top3 | 487 | 43.7% | −9.3% |
+| 28 / 0.65 / top2 | 694 | 45.8% | −9.4% |
+| 28 / 0.65 / top3 | 754 | 45.2% | −10.1% |
+| 28 / 0.55 / top3 | 769 | 45.6% | −10.1% |
+| 36 / 0.65 / top3 | 480 | 42.9% | −10.7% |
+| 20 / 0.65 / top3 | 922 | 46.5% | −12.5% |
+| 20 / 0.55 / top3 (baseline) | 929 | 46.8% | −12.8% |
+
+**Wnioski (Prawo I):**
+1. **Ostry filtr POŁOWI stratę** (−12.8% → −6.4%), gradient jednoznaczny: więcej
+   filtra = mniej straty. ALE **żaden config w siatce nie jest dodatni** — kalibracja
+   redukuje stratę, nie tworzy przewagi.
+2. **ADX to dominujący lewar** (20→36 tnie 929→487 trade'ów i −12.8→−9.3%). top2 vs
+   top3 pomaga modestnie. **min_pewnosc prawie nie kąsa** sam (929→922 przy 0.55→0.65)
+   — większość sygnałów ma już wysoką pewność; dopiero w combo z top2+adx36+0.70 dobija.
+3. Gradient sugeruje, że jeszcze ostrzejszy filtr (adx≥45, top1) MOŻE przekroczyć zero
+   — zmierzone w batchu „push harder" (W-321c-v2, `narzedzia/kalibracja_1h_v2.py`).
+
 **Rozkład per coin (BASELINE):** DOGE +52 327$ (1316 tr) ← prawie cały zysk; ETH +545,
 BTC +194, SOL +47, BNB −324. **Zysk jest GRUBO-OGONOWY: meme/alt pumpy (DOGE).**
 

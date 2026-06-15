@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-06-15 | W-321b | Runner symulacji 1h odtworzony + bieg pełnego stacku na danych godzinowych
+
+**Kontekst (Prawo I — uczciwość):** symulacja 1h z sesji 2026-06-14 (W-320) NIE
+ukończyła się — proces zginął razem z efemerycznym kontenerem, a tymczasowy skrypt
+runnera nie był zacommitowany. W `/tmp` zostały tylko linie ładowania danych, BEZ
+wyników. Wpis „Tryb NAJLEPSZY na danych 1h" był więc przedwczesny co do liczb 1h.
+
+**Wdrożenie:** `narzedzia/sym_1h.py` (trwały, zacommitowany) — uruchamia
+`backtest_portfel` na 5 parach 1h, pełny stack (TOP-3 + Sizing Przekonania +
+Compounding + filtr asymetrii). Wynik liczbowy 1h zostanie dopisany po zakończeniu
+biegu (Prawo I: nie raportuję przed końcem pomiaru).
+
+**Pliki:** `narzedzia/sym_1h.py`.
+
+---
+
 ## 2026-06-14 | W-320 | Dane 1h wpięte — Tryb NAJLEPSZY na krótszym interwale (Prawo XV)
 
 **Odkrycie (UTRATA POTENCJAŁU, Prawo XV):** w `dane/godzinowe/` leżą dane **1h**

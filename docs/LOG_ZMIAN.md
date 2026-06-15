@@ -23,7 +23,12 @@ LINIOWO (~5.5MB/s, historia trade'ów per tik) i przekracza ~13GB → OOM w kont
 (domyślnie 30k barów/parę ≈ 3.4 lat 1h) — ukończalny, uczciwy pomiar. Pełna historia
 tylko gdy RAM wystarcza (`MAX_BAROW=0`). Wynik liczbowy 1h dopisany po zakończeniu biegu.
 
-**Pliki:** `narzedzia/sym_1h.py`.
+**Porównanie TF na tym samym oknie (`narzedzia/sym_porownanie_tf.py`, Prawo I):**
+żeby rozdzielić efekt interwału od efektu okna (90.2x na 4h liczone na pełnej historii
+~9 lat zdominowanej przez pompę DOGE 2021), uruchomiono oba TF na IDENTYCZNYM oknie
+2022→2026 (~3.4 lat). Wyniki dopisane do `TRYBY_IMPERIUM.md` po zakończeniu biegu.
+
+**Pliki:** `narzedzia/sym_1h.py`, `narzedzia/sym_porownanie_tf.py`.
 
 ---
 

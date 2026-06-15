@@ -130,6 +130,30 @@ pełny stack). Cel: czy wyższe progi czynią 1h dodatnim? Ranking (po PnL%):
 3. Gradient sugeruje, że jeszcze ostrzejszy filtr (adx≥45, top1) MOŻE przekroczyć zero
    — zmierzone w batchu „push harder" (W-321c-v2, `narzedzia/kalibracja_1h_v2.py`).
 
+### W-321c-v2 — „push harder" (najostrzejsze filtry, to samo okno 1.4 lat)
+
+| Konfig (min_adx / min_pewnosc / top_n) | Trade | WR | PnL% |
+|---|---|---|---|
+| 45 / 0.70 / **top2** | 217 | 41.9% | **−5.9%** (najlepszy ze WSZYSTKICH) |
+| 36 / 0.70 / top2 | 430 | 44.2% | −6.4% |
+| 45 / 0.70 / **top1** | 172 | 41.9% | −6.5% (top1 GORSZY — przekoncentrowanie) |
+
+**Werdykt kalibracji (Prawo I, ostateczny):** najostrzejszy filtr w całej kalibracji
+(adx≥45, top2) daje **−5.9%** — wciąż strata. Dwa twarde fakty domykają temat:
+- **Malejące zwroty:** ADX 36→45 poprawił tylko −6.4→−5.9% przy połowie trade'ów (430→217).
+  Gradient wypłaszczył się przy ~−6%; dalsze zaostrzanie nie kupuje już poprawy.
+- **top1 jest GORSZY niż top2** (−6.5% vs −5.9%): redukcja do jednej okazji na tik
+  przekoncentrowuje ryzyko i traci dywersyfikację koszyka — sprzeczne z hipotezą
+  „mniej = lepiej" doprowadzoną do skrajności.
+
+**🚨 KONKLUZJA 1h (UTRATA POTENCJAŁU rozpoznana i ZMIERZONA, Prawo XV):** rój w obecnym
+kształcie **nie ma dodatniego edge'u na 1h** — kalibracja progów połowi stratę
+(−12.8% → −5.9%), ale nie tworzy przewagi. Neurony/progi są strukturalnie dopasowane
+do 4h+ (trend, swing), a nie do mikrostruktury 1h. **Rekomendacja:** NIE używać 1h z
+obecnym rojem. Ścieżki na przyszłość (jeśli 1h ma być priorytetem): (a) neurony
+mikrostrukturalne dedykowane 1h, (b) model kosztów (1h ma 3.3× obrotu — prowizje
+dobiją), (c) zostać na 4h, gdzie stack jest dodatni (+5.8% na tym samym oknie).
+
 **Rozkład per coin (BASELINE):** DOGE +52 327$ (1316 tr) ← prawie cały zysk; ETH +545,
 BTC +194, SOL +47, BNB −324. **Zysk jest GRUBO-OGONOWY: meme/alt pumpy (DOGE).**
 

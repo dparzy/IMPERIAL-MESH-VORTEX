@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-14 · **Testy:** 1038/1038 zielone · **Faza:** PętlaLive (entrypoint) + Synapsy Reżimowe + PamięćRefleksyjna + Radar wpięty + Paper Trading Etap II + Filtr Asymetrii Reżimu (W-314) + Tryb NAJLEPSZY na danych 1h (W-320).
+> **Stan na:** 2026-06-14 · **Testy:** 1038/1038 zielone · **Faza:** PętlaLive (entrypoint) + Synapsy Reżimowe + PamięćRefleksyjna + Radar wpięty + Paper Trading Etap II + Filtr Asymetrii Reżimu (W-314) + pomiar 1h vs 4h na tym samym oknie (W-321b: 1h −9.8% vs 4h +5.8%, 1h wymaga kalibracji).
 
 ---
 

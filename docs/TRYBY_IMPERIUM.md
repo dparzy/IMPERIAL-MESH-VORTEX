@@ -72,6 +72,38 @@ liczony **bez prowizji/poślizgu/finansowania lewara** i bez limitu płynności 
 mechaniki (składanie działa), NIE obietnica 90x na żywo. Sufit ekspozycji per okazja
 (Prawo XXV) i koszty realne obetną tę liczbę; traktujemy ją jako górną granicę potencjału.
 
+## 🚨 W-321b — POMIAR 1h + porównanie TF na tym samym oknie (Prawo I, UTRATA POTENCJAŁU)
+
+**Pytanie:** czy 90.2x to przewaga strategii, czy artefakt jednego okna? I czy
+krótszy interwał (1h, priorytet Cezara) poprawia wynik? Zmierzono — nie zgadywano.
+
+**Metoda:** ten sam pełny stack (TOP-3 + Conviction + Compounding + filtr asymetrii)
+na 5 parach, na **identycznym oknie kalendarzowym 2022→2026 (~3.4 lat)** dla obu
+interwałów (`narzedzia/sym_porownanie_tf.py`). Cap 1h=30k barów/parę (pełna historia
+1h OOM-uje w 15GB — patrz LOG W-321b). Bez prowizji/poślizgu (jak 4h).
+
+| Konfig (to samo okno 2022→2026, ~3.4 lat) | Trade | WR | PnL | Mnożnik |
+|---|---|---|---|---|
+| **4h** | 722 | 43.8% | **+579$ (+5.8%)** | **1.06x** ✅ |
+| **1h** | 2347 | 46.4% | **−977$ (−9.8%)** | **0.90x** ❌ |
+| *4h — pełne 9 lat (W-319, dla odniesienia)* | 2665 | 46% | *+892 295$* | *90.2x* |
+
+**Wnioski (Prawo I — twarde, niewygodne):**
+1. **90.2x to artefakt grubego ogona DOGE 2021, NIE powtarzalna przewaga.** Ten sam
+   stack 4h na ostatnich 3.4 lat (bez pompy DOGE 2021) daje tylko **+5.8%**. Okno
+   decyduje o rzędzie wielkości, nie sama strategia.
+2. **1h jest GORSZE od 4h na tym samym oknie:** −9.8% vs +5.8%. 3.3× więcej trade'ów
+   (2347 vs 722), WR wyższy (46.4% vs 43.8%), ale **edge per-trade jest ujemny** —
+   więcej małych strat. A to JESZCZE BEZ prowizji, które na 1h (3.3× obrotu) zabolą
+   wynik znacznie mocniej niż na 4h.
+3. **Priorytet Cezara (krótkie interwały) z obecną konfiguracją NIE poprawia wyników —
+   pogarsza je.** To czerwony alarm UTRATY POTENCJAŁU (Prawo XV): progi/filtry są
+   skalibrowane pod 4h i nie przenoszą się na 1h. Zanim 1h wejdzie do gry, wymaga
+   własnej kalibracji (min_adx, min_pewnosc, TP/SL, conviction) — inaczej tylko traci.
+
+**Status:** 1h wpięte technicznie i ZMIERZONE, ale **nieopłacalne bez rekalibracji**.
+Nie włączamy go do trybu live. Następny krok: osobna kalibracja progów pod 1h.
+
 **Rozkład per coin (BASELINE):** DOGE +52 327$ (1316 tr) ← prawie cały zysk; ETH +545,
 BTC +194, SOL +47, BNB −324. **Zysk jest GRUBO-OGONOWY: meme/alt pumpy (DOGE).**
 

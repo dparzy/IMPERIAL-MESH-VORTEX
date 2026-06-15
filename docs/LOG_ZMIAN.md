@@ -26,7 +26,16 @@ tylko gdy RAM wystarcza (`MAX_BAROW=0`). Wynik liczbowy 1h dopisany po zakończe
 **Porównanie TF na tym samym oknie (`narzedzia/sym_porownanie_tf.py`, Prawo I):**
 żeby rozdzielić efekt interwału od efektu okna (90.2x na 4h liczone na pełnej historii
 ~9 lat zdominowanej przez pompę DOGE 2021), uruchomiono oba TF na IDENTYCZNYM oknie
-2022→2026 (~3.4 lat). Wyniki dopisane do `TRYBY_IMPERIUM.md` po zakończeniu biegu.
+2022→2026 (~3.4 lat). **Wynik (UTRATA POTENCJAŁU, Prawo XV):**
+- 4h, to samo okno: 722 trade, WR 43.8%, **+5.8% (1.06x)** ✅
+- 1h, to samo okno: 2347 trade, WR 46.4%, **−9.8% (0.90x)** ❌
+- 4h pełne 9 lat (odniesienie): 90.2x — **artefakt grubego ogona DOGE 2021**, nie przewaga.
+
+Dwa twarde wnioski: (1) 90.2x nie jest powtarzalny — ten sam stack 4h na ostatnich
+3.4 lat daje tylko +5.8%; (2) 1h jest GORSZE od 4h na tym samym oknie (−9.8% vs +5.8%,
+3.3× więcej trade'ów, edge per-trade ujemny — i to bez prowizji). Priorytet Cezara
+(krótkie interwały) z obecną konfiguracją pogarsza wynik → wymaga osobnej kalibracji
+progów pod 1h ZANIM wejdzie do gry. Szczegóły: `docs/TRYBY_IMPERIUM.md` § W-321b.
 
 **Pliki:** `narzedzia/sym_1h.py`, `narzedzia/sym_porownanie_tf.py`.
 

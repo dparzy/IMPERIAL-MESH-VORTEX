@@ -6,6 +6,37 @@
 
 ---
 
+## 2026-06-16 | W-325 | GUBERNATOR — homeostatyczny sterownik portfela (nowy moduł)
+
+**Kontekst:** rozpoznanie terenu wykazało, że warstwy adaptacyjne JUŻ istnieją i są podpięte
+(HedgeMWU per-neuron, Synapsy Reżimowe per-para, router strategii per reżim+TF, drift adapter).
+Modyfikowanie SYGNAŁU wyczerpane (4 falsyfikacje). Realna luka: brak GLOBALNEGO sterownika
+portfela — każdy podsystem rządzi lokalnie, nikt nie steruje ekspozycją całej floty 5 par.
+
+**GUBERNATOR (`imperium/koloseum/gubernator.py`):** jeden ster na cały portfel. Po skanerze i
+bezpieczniku DD dokłada globalny mnożnik [floor=0.5×, ceiling=1.3×] z agregatu koszyka. Maszyna
+postaw z histerezą: KWARANTANNA→OBRONA→OSTROŻNY→NORMALNY→EKSPANSJA, mnożnik wygładzany wykładniczo.
+UNIKAT (niespotykany w retail): sygnał pewności = ROZRZUT OCEN SKANERA (meta-labeling López de
+Prado na poziomie PORTFELA — wewnętrzna dyspersja rankingu jako homeostatyczny regulator ryzyka).
+Neutralny w stanie bazowym (≈1.0, Prawo XV), audyt Warstwa 1 to weryfikuje. Domyślnie OPT-IN.
+
+**Wyniki A/B (`narzedzia/ab_w325.py`, 4h, 7500 barów/parę, Prawo I — SFALSYFIKOWANA dla celu zysk):**
+- BASELINE (OFF): +5.19% | MaxDD 13.7% | 717 trade
+- GUBERNATOR (ON): +4.16% | MaxDD 13.4% | 717 trade → **Δ = −1.04pp** 🔴
+Diagnostyka (rozkład postaw na realnych danych): mechanizm działa — śr. mnożnik 1.068 (netto
+wzmacnia), EKSPANSJA dominuje (224/361 tyków), zakres 0.889–1.223. Przyczyna minusu: w pętli
+`dd_frakcja=frakcja_breaker` → Gubernator hamuje NA WIERZCHU Bezpiecznika (podwójne tłumienie w DD),
+a ekspansja+compounding powiększa pozycje wjeżdżające potem w obsunięcie. To POKRĘTŁO ryzyko/zwrot:
+1pp zwrotu za 0.3pp niższy MaxDD na tym łagodnym oknie. NIE darmowy lunch.
+
+**Werdykt:** moduł zostaje jako OPT-IN (baseline nietknięty), w pełni otestowany (16 testów granic),
+udokumentowany (`docs/GUBERNATOR.md`). Realna przyszłość: ochrona drawdown / risk-off na żywo, gdzie
+łagodny backtest nie nagradza ostrożności. Piąta falsyfikacja z rzędu = dowód, że sygnał+architektura
+są dobrze dostrojone, a kapitał $50 wejdzie na system NIEPOPSUTY niesprawdzonymi pomysłami.
+
+**Pliki:** `imperium/koloseum/gubernator.py`, `imperium/koloseum/backtest.py`,
+`tests/test_gubernator.py`, `narzedzia/ab_w325.py`, `narzedzia/audyt_spojnosci.py`, `docs/GUBERNATOR.md`.
+
 ## 2026-06-16 | W-324 | Brama Momentum Bezwzględnego (TS Gate) — suchy proch w martwym rynku
 
 **Kontekst:** Skaner Okazji (W-316) był 100% cross-sectional — zawsze rankował i wybierał TOP-N,

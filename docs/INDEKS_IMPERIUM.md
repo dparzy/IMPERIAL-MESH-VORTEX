@@ -75,6 +75,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 39 | `TRYBY_IMPERIUM.md` | **Propozycja 5 trybów** (NAJLEPSZE/SKALP/SWING/INVEST/OBRONA) + mechanika trybu NAJLEPSZE (skaner TOP-N, W-316/317) + mapa brakujących neuronów/strategii do łowcy okazji | ✅ Aktywny |
 | 40 | `WIZJA_TRYBY_I_ROZWOJ.md` | **Wizja Cezara: tryby + rozwój** — Tryb 1 NAJLEPSZY (potok W-315..319), Tryb 2 BILANS (spot/invest), Tryb 3 przełącznik z autoryzacją, propozycja Praw XXII-XXV, tabela narzędzi prześwietlania walut (CoinGecko/GoPlus/RugCheck/DefiLlama), kolejka rozwoju (krótkie interwały) | ✅ Aktywny |
 | 41 | `ANALIZA_NEURONY_SCALP_SWING_INVEST.md` | **Porównanie 65 neuronów z best practices** (docs + internet 2026-06-15) + 6 unikatowych propozycji zdekorelowanych per styl: VPOC/Volume Profile, Amihud Illiquidity, Pi Cycle Top, Delta Divergence, Anchored VWAP, Cross-Sectional RS | ✅ Aktywny |
+| 42 | `GUBERNATOR.md` | **GUBERNATOR (W-325)** — homeostatyczny sterownik globalnej ekspozycji portfela; maszyna postaw z histerezą (KWARANTANNA→EKSPANSJA), meta-labeling López de Prado na poziomie portfela (rozrzut ocen skanera = sygnał pewności), wyniki A/B + diagnostyka | ✅ Aktywny |
 
 ---
 

@@ -110,6 +110,17 @@ def audyt() -> tuple:
             bledy.append(f"[W1] NEURONY_STYLU braki (neuron bez profilu stylu): {rp['braki_w_mapie']}")
         info.append(f"Profile stylu (W-323): SCALP {rp['scalp']} | SWING {rp['swing']} | INVEST {rp['invest']}")
 
+        # W-325: GUBERNATOR — neutralność (stan bazowy ≈1.0) i granice mnożnika.
+        from imperium.koloseum.gubernator import Gubernator
+        _g = Gubernator()
+        _baz = _g.ocen(konwikcja_koszyka=0.5, rozrzut_okazji=0.0, dd_frakcja=1.0, breadth=1.0)
+        if not (_g.floor <= _baz.mnoznik <= _g.ceiling):
+            bledy.append(f"[W1] Gubernator mnożnik poza [floor,ceiling]: {_baz.mnoznik}")
+        if abs(_baz.mnoznik - 1.0) > 0.15:
+            bledy.append(f"[W1] Gubernator nie-neutralny w stanie bazowym: {_baz.mnoznik} (Prawo XV)")
+        info.append(f"Gubernator (W-325): floor {_g.floor}× | ceiling {_g.ceiling}× | "
+                    f"baza {_baz.mnoznik}× ({_baz.postawa})")
+
     except Exception as e:
         bledy.append(f"[W1] Nie udało się załadować żywego roju: {e}")
         return bledy + ["(audyt przerwany — napraw import)"], info

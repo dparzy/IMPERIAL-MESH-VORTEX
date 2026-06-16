@@ -235,13 +235,22 @@ def test_breaker_krzywej_reduced_polowa():
     assert not br.halt
 
 
-def test_breaker_krzywej_halt_blokuje():
+def test_breaker_krzywej_halt_sondujacy():
+    """W-313: HALT zwraca frakcja_halt (0.1×), nie 0.0 — unika deadlocka krzywej."""
     br = BezpiecznikKrzywejKapitalu()
     br.aktualizuj(10_000)
     br.aktualizuj(7_900)        # -21% od szczytu ≥ 20%
     assert br.stan == "HALT"
     assert br.halt
-    assert br.frakcja_pozycji() == 0.0
+    assert br.frakcja_pozycji() == 0.1   # sondujący, nie blokada totalna
+
+
+def test_breaker_krzywej_halt_frakcja_konfigurowalna():
+    """frakcja_halt można zmienić per instancja."""
+    br = BezpiecznikKrzywejKapitalu(frakcja_halt=0.2)
+    br.aktualizuj(10_000)
+    br.aktualizuj(7_900)
+    assert br.frakcja_pozycji() == 0.2
 
 
 def test_breaker_krzywej_powrot_do_normal():
@@ -266,15 +275,27 @@ def test_breaker_krzywej_histereza_halt():
     assert br.stan != "HALT"
 
 
-def test_breaker_krzywej_w_checklist_blokuje():
+def test_breaker_krzywej_halt_frakcja_zero_blokuje():
+    """frakcja_halt=0.0 → twarda blokada (opcjonalna konfiguracja, nie domyślna)."""
     kalk = KalkulatorLewara()
-    br = BezpiecznikKrzywejKapitalu()
+    br = BezpiecznikKrzywejKapitalu(frakcja_halt=0.0)
     br.aktualizuj(10_000)
     br.aktualizuj(7_900)        # HALT
     plan = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 7_900, pewnosc=0.9,
                        rezim="TREND_STRONG", breaker_krzywej=br)
-    assert not plan.checklist_ok, "HALT breakera musi blokować wejście"
+    assert not plan.checklist_ok, "frakcja_halt=0.0 musi blokować wejście"
     assert "BREAKER KRZYWEJ" in plan.powod_veto
+
+
+def test_breaker_krzywej_halt_sondujacy_w_checklist():
+    """W-313: domyślny HALT (frakcja_halt=0.1) NIE blokuje — sondujący handel."""
+    kalk = KalkulatorLewara()
+    br = BezpiecznikKrzywejKapitalu()   # frakcja_halt=0.1 domyślnie
+    br.aktualizuj(10_000)
+    br.aktualizuj(7_900)        # HALT
+    plan = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 7_900, pewnosc=0.9,
+                       rezim="TREND_STRONG", breaker_krzywej=br)
+    assert plan.checklist_ok, "HALT sondujący pozwala na wejście (frakcja 0.1×)"
 
 
 def test_breaker_krzywej_reduced_zmniejsza_rozmiar():

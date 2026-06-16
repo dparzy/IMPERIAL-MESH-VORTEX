@@ -6,6 +6,568 @@
 
 ---
 
+## 2026-06-16 | W-323b/c | Profile WŁĄCZNE (po falsyfikacji) + scoreboard kontrybucji
+
+**Kontekst:** A/B W-323 obalił pierwszą (wykluczającą) tabelę profili — SWING 59 dał −3.29%
+vs pełnia +5.19% (−8.48pp). Przyczyna: wycięto 5 AKTYWNYCH neuronów (HA Scalper elitarny,
+CVD, AC, sesje) — momentum/flow działają cross-TF. OC-01..04 i tak wyciszone (DOSTEPNY=False).
+
+**W-323b — zasada włączności (Prawo I):** neuron należy do WSZYSTKICH stylów, CHYBA że
+strukturalnie niezdolny: OC-01..04 (feed on-chain → tylko INVEST), Z-07 Pi Cycle (cykl
+dzienny, szum na 4h → tylko INVEST). Reszta uniwersalna. Zestawy: SCALP 65 | SWING 65 | INVEST 70.
+
+**W-323c — scoreboard kontrybucji:** `backtest_portfel(igrzyska_learning=True)` dołącza
+`engine.ranking_neuronow` (scalone Igrzyska wszystkich par: accuracy/stability/wynik per neuron).
+`narzedzia/scoreboard_neuronow.py` drukuje ranking — MIERZONA baza do strojenia NEURONY_STYLU
+(„żonglowanie" danymi, nie intuicją). Kandydaci do rewizji = niska trafność przy wielu sygnałach.
+
+**Pliki:** `imperium/legiony/rejestr.py`, `imperium/koloseum/backtest.py`,
+`narzedzia/scoreboard_neuronow.py`, `tests/test_profile_stylu.py`,
+`docs/ANALIZA_NEURONY_SCALP_SWING_INVEST.md`.
+
+## 2026-06-16 | W-323 | Profile stylu gry — dedykowany zestaw neuronów per SCALP/SWING/INVEST
+
+**Kontekst:** lekcja W-322/W-322b — „więcej neuronów = lepiej" i wagowanie reżimowe per-kategoria
+SFALSYFIKOWANE pomiarem (rozcieńczenie sygnału / zabicie SMC w VOLATILE). Cezar: zamiast zawsze
+grać pełnym rojem (70), wybierać DEDYKOWANY zestaw neuronów do stylu/interwału — „żonglować"
+nimi w czasie.
+
+**Wdrożenie (kod jest prawem):**
+- `rejestr.NEURONY_STYLU` — jawna tabela KLUCZ→(style) dla wszystkich 70 (zero sierot/braków).
+- `rejestr.neurony_dla_trybu(styl)` + `raport_profili()` — selekcja zestawu + diagnostyka.
+- `zbuduj_legatusa(styl=)` i `backtest_portfel(styl=)` — opt-in (None=pełne 70, zero regresji).
+- Komplementarne do `namiestnik.styl_interwalu/ProfilStylu` (interwał→styl, ryzyko per styl).
+
+**Zestawy (po A/B):** SCALP 65 | SWING 65 | INVEST 70. Zasada włączności: wykluczamy TYLKO
+neurony abstynujące strukturalnie (OC-01..04 bez feedu + Z-07 cykl dzienny). SWING-59 (węższe
+wykluczenia) kosztowało −8.48pp (sfalsyfikowane); SWING-65 = +0.00pp (neutralne, bezpieczne).
+**Prawo I:** każda zmiana granicy = A/B. Audyt Warstwa 1. Testy: `tests/test_profile_stylu.py`.
+
+**Pliki:** `imperium/legiony/rejestr.py`, `imperium/koloseum/backtest.py`,
+`narzedzia/audyt_spojnosci.py`, `narzedzia/ab_w323.py`, `tests/test_profile_stylu.py`,
+`docs/ANALIZA_NEURONY_SCALP_SWING_INVEST.md`.
+
+## 2026-06-16 | W-322 | 5 nowych neuronów scalp/swing/invest (z analizy + research)
+
+**Kontekst:** po analizie `ANALIZA_NEURONY_SCALP_SWING_INVEST.md` (porównanie 65 neuronów
+z best practices docs+internet) wdrożono 5 z 6 zaproponowanych unikatowych, zdekorelowanych
+neuronów (wykonalne na OHLCV). Cross-Sectional RS (6.) odłożony — wymaga wpięcia
+cross-symbol w pętli portfelowej (nie pasuje do interfejsu single-symbol).
+
+**Wdrożone (65 → 70 neuronów):**
+- **V-06 NeuronDeltaDivergence** (F, SCALP) — dywergencja cena↔delta (proxy footprint z OHLCV).
+- **V-07 NeuronAnchoredVWAP** (F, SWING) — VWAP kotwiczony od pivotu swing.
+- **VP-01 NeuronVolumeProfile** (S, SWING) — Volume Profile/VPOC + Value Area (Dalton BIB-013).
+- **Z-06 NeuronAmihudIlliquidity** (Z, meta-brama) — impakt cenowy/krucha płynność (Amihud 2002).
+- **Z-07 NeuronPiCycleTop** (Z, INVEST 1D) — SMA-111 vs 2×SMA-350, kill-switch szczytu cyklu.
+
+**Brama (W-322):** 5 nowych obliczeń pure-Python (AMIHUD, VOLUME_PROFILE, PI_CYCLE,
+ANCHORED_VWAP, DELTA_DIVERGENCE) + wpięcie w Budowniczy (skalarne + dict-unpack VPOC/Pi).
+
+**Audyt:** Z-06 (płynne scenariusze) i Z-07 (≥350 barów) w allowliście W12 z dowodem
+WERYFIKACJA (ożywają z właściwymi danymi — Prawo I). Testy granic: `tests/test_neurony_w322.py`
+(22 testy: zero/None, znak, próg dokładny). Następny krok: pomiar dekorelacji
+(`raport_dekorelacji`) + ewentualne Cross-Sectional RS.
+
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/{wolumen,struktura,zagrozenie}.py`, `imperium/legiony/rejestr.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_neurony_w322.py`, MANIFEST/README/INDEKS.
+
+## 2026-06-15 | W-321b | Runner symulacji 1h odtworzony + bieg pełnego stacku na danych godzinowych
+
+**Kontekst (Prawo I — uczciwość):** symulacja 1h z sesji 2026-06-14 (W-320) NIE
+ukończyła się — proces zginął razem z efemerycznym kontenerem, a tymczasowy skrypt
+runnera nie był zacommitowany. W `/tmp` zostały tylko linie ładowania danych, BEZ
+wyników. Wpis „Tryb NAJLEPSZY na danych 1h" był więc przedwczesny co do liczb 1h.
+
+**Wdrożenie:** `narzedzia/sym_1h.py` (trwały, zacommitowany) — uruchamia
+`backtest_portfel` na 5 parach 1h, pełny stack (TOP-3 + Sizing Przekonania +
+Compounding + filtr asymetrii).
+
+**Odkrycie RAM (Prawo I):** pełny bieg 5 par × ~67k barów 1h akumuluje pamięć
+LINIOWO (~5.5MB/s, historia trade'ów per tik) i przekracza ~13GB → OOM w kontenerze
+15GB (pierwszy bieg zabity SIGKILL exit 137). Runner dostał cap `MAX_BAROW`
+(domyślnie 30k barów/parę ≈ 3.4 lat 1h) — ukończalny, uczciwy pomiar. Pełna historia
+tylko gdy RAM wystarcza (`MAX_BAROW=0`). Wynik liczbowy 1h dopisany po zakończeniu biegu.
+
+**Porównanie TF na tym samym oknie (`narzedzia/sym_porownanie_tf.py`, Prawo I):**
+żeby rozdzielić efekt interwału od efektu okna (90.2x na 4h liczone na pełnej historii
+~9 lat zdominowanej przez pompę DOGE 2021), uruchomiono oba TF na IDENTYCZNYM oknie
+2022→2026 (~3.4 lat). **Wynik (UTRATA POTENCJAŁU, Prawo XV):**
+- 4h, to samo okno: 722 trade, WR 43.8%, **+5.8% (1.06x)** ✅
+- 1h, to samo okno: 2347 trade, WR 46.4%, **−9.8% (0.90x)** ❌
+- 4h pełne 9 lat (odniesienie): 90.2x — **artefakt grubego ogona DOGE 2021**, nie przewaga.
+
+Dwa twarde wnioski: (1) 90.2x nie jest powtarzalny — ten sam stack 4h na ostatnich
+3.4 lat daje tylko +5.8%; (2) 1h jest GORSZE od 4h na tym samym oknie (−9.8% vs +5.8%,
+3.3× więcej trade'ów, edge per-trade ujemny — i to bez prowizji). Priorytet Cezara
+(krótkie interwały) z obecną konfiguracją pogarsza wynik → wymaga osobnej kalibracji
+progów pod 1h ZANIM wejdzie do gry. Szczegóły: `docs/TRYBY_IMPERIUM.md` § W-321b.
+
+**Kalibracja progów 1h (W-321c, `narzedzia/kalibracja_1h.py` + `_v2.py`):** 13 konfiguracji
+na oknie 1.4 lat (cap 12k). Ranking po PnL%:
+- **adx≥50 / pew≥0.75 / top1: −3.4% (94 tr)** — najlepszy ze wszystkich, skrajna selektywność.
+- adx≥45 / 0.70 / top2: −5.9%; adx≥36 / 0.70 / top2: −6.4%; baseline adx20: −12.8%.
+
+Korekta tezy (Prawo I): top1 NIE jest jednostajnie gorszy — przy umiarkowanym ADX traci
+mocno (adx36/top1 = −11.2%), ale przy ekstremalnym ADX jest najlepszy (adx50/top1 = −3.4%).
+Lewar = skrajna selektywność (silny trend + jedna okazja). **Wciąż minus**, a −3.4% na 94
+trade'ach jest w granicach szumu (nie robustny edge). KONKLUZJA: rój nie ma robustnego
+edge'u na 1h; zostać na 4h (+5.8%). Szczegóły: `docs/TRYBY_IMPERIUM.md` § W-321c / W-321c-v2.
+
+**Pliki:** `narzedzia/sym_1h.py`, `narzedzia/sym_porownanie_tf.py`,
+`narzedzia/kalibracja_1h.py`, `narzedzia/kalibracja_1h_v2.py`.
+
+---
+
+## 2026-06-14 | W-320 | Dane 1h wpięte — Tryb NAJLEPSZY na krótszym interwale (Prawo XV)
+
+**Odkrycie (UTRATA POTENCJAŁU, Prawo XV):** w `dane/godzinowe/` leżą dane **1h**
+(~76k barów/parę, 5 par BTC/ETH/SOL/BNB/DOGE) — śledzone w repo, obsługiwane przez
+czytnik CSV, ale NIEUŻYWANE. Dotychczasowa diagnoza („gramy tylko 4H/1D") była błędna —
+najwyższy priorytet Cezara (krótkie interwały) był częściowo spełniony, tylko niewpięty.
+
+**Wdrożenie:** test integracyjny `test_realne_dane_1h_laduja_sie` (Prawo XIX — dowód
+kodem) ładuje realne pliki 1h i weryfikuje chronologię + OHLC. Tryb NAJLEPSZY (skaner+
+conviction+compounding) uruchomiony na pełnej serii 1h (~75k barów/parę) — wynik
+liczbowy zostanie dopisany po zakończeniu pomiaru (Prawo I: nie raportuję przed końcem).
+
+**Pełny stack na 4h (W-319, zmierzony):** 10 000$ → 902 295$ = **90.2x** (2665 trade'ów,
+WR 46%) — ⚠️ gruboogonowy (DOGE), bez prowizji/poślizgu = górna granica potencjału, nie obietnica.
+
+**Zostaje 🔴:** interwały sub-godzinne (1m/5m/15m) — `dane/minutowe/` puste.
+
+**Pliki:** `tests/test_czytnik_csv.py` (+1 test), `docs/{TRYBY_IMPERIUM,WIZJA_TRYBY_I_ROZWOJ}.md`,
+`README.md`. Testy: 1023/1023.
+
+---
+
+## 2026-06-14 | W-319 | Compounding (pula łupów) — reinwestycja zysku w większe pozycje
+
+**Wizja Cezara:** zysk dorzucamy do puli łupów, powiększamy kapitał. Trzeci wzmacniacz
+trybu NAJLEPSZE (po selekcji W-317 i conviction W-318).
+
+**Wdrożenie:** `backtest_portfel(compounding=True)` — budżet sizingu liczony od
+BIEŻĄCEGO equity (`engine.kapital_calkowity`), nie od kapitału startowego. Zysk
+reinwestowany → wzrost geometryczny. Domyślnie OFF (stały sizing = liniowy, łatwiejsza
+ocena edge bez efektu składania).
+
+**Pliki:** `koloseum/backtest.py`, `tests/test_portfel.py` (+4 testy: skaner/top_n/
+conviction/compounding). 1022/1022. Etap B audytu — kompletny potok łowcy okazji:
+skan koszyka → TOP-N → conviction sizing → compounding.
+
+---
+
+## 2026-06-14 | W-318 | Sizing Przekonania — większa stawka na mocniejszej okazji
+
+**Lekcja z symulacji 9-letniej (W-317):** sama selekcja TOP-N daje MNIEJ zysku
+(+24k vs baseline +52k), bo przycina gruby ogon (pompy DOGE) bez kompensacji większą
+stawką. Wizja Cezara: „mało trade'ów, ale większy lewar/stawka na najlepszych".
+
+**Wdrożenie:** `SizingPrzekonania` (`pretorianie/sizing_przekonania.py`). Mnożnik
+stawki ∈ [min,max] (domyślnie 0.5×–3.0×) rośnie z przekonaniem; prog_neutralny→1.0×.
+Plus `kelly_frakcja()` (fractional Kelly, half-Kelly domyślnie) jako principled backbone.
+W trybie skanera (`backtest_portfel(sizing_przekonania=True)`) mnoży budżet pozycji
+przez siłę okazji (score znormalizowany min-max w rankingu koszyka). Domyślnie OFF.
+
+**Pliki:** `pretorianie/sizing_przekonania.py` (nowy), `koloseum/backtest.py`,
+`tests/test_sizing_przekonania.py` (13 testów granic). Wynik re-testu: osobny commit.
+Źródła: Kelly (Zerodha/Coriva), fractional Kelly (enlightenedstocktrading). 1018/1018.
+
+---
+
+## 2026-06-14 | W-317 | TRYB NAJLEPSZE — wpięcie Skanera Okazji do pętli portfelowej
+
+**Rozkaz Cezara:** system ma wyłapywać najlepsze okazje ze WSZYSTKICH walut i grać
+tylko najmocniejszymi (kilka/tydzień). To zmienia Imperium z „N botów jednowalutowych"
+w łowcę okazji.
+
+**Wdrożenie:** `backtest_portfel(tryb_skaner=True, skaner_top_n=N, skaner_min_adx=...)`.
+W każdym tyku skaner rankuje koszyk (snapshot wskaźników per symbol, aktualizowany na
+jego barze → O(N)/tyk) i dopuszcza do WEJŚCIA tylko TOP-N okazji. Exity działają
+niezależnie (w `przetworz_bar`). Domyślnie OFF — zero regresji.
+
+Dokument trybów: `docs/TRYBY_IMPERIUM.md` — 5 trybów (NAJLEPSZE/SKALP/SWING/INVEST/
+OBRONA) + mapa brakujących neuronów/strategii. Wynik symulacji 9-letniej: osobny commit.
+
+**Pliki:** `koloseum/backtest.py` (tryb_skaner), `docs/TRYBY_IMPERIUM.md` (nowy), INDEKS.
+Część Etapu B audytu 2026-06-14. 1005/1005 zielone, audyt exit 0.
+
+---
+
+## 2026-06-14 | W-316 | Skaner Okazji — łowca najlepszych setupów w koszyku (serce wizji)
+
+**Największa luka audytu 2026-06-14:** system był „N botów jednowalutowych", nie łowca
+okazji. Skaner to warstwa SELEKCJI ponad rojem — patrzy na WSZYSTKIE monety naraz,
+liczy ocenę okazji i zwraca TOP-N najmocniejszych (realizuje „mało trade'ów wysokiej pewności").
+
+**Wdrożenie:** `imperium/koloseum/skaner_okazji.py` (`SkanerOkazji`, `OkazjaRank`).
+Ocena = cross-sectional z-score 4 składników (momentum/ROC, trend/ADX, wolumen, zmienność/ATR%):
+- momentum cross-sectional = relative strength (lider vs maruder koszyka)
+- kierunek ze znaku momentum (lider rosnący→LONG, spadający→SHORT)
+- chop (ADX<min_adx) odsiany z rankingu (lekcja W-314)
+- siła = |momentum_z| + trend_z + wolumen_z + zmiennosc_z
+
+Czysty OHLCV; brak danych monety → pomijana (Prawo XV). Skaner RANKUJE, nie handluje —
+decyzję wejścia podejmuje dalej Dyrygent. Następny krok: wpięcie do pętli portfelowej
+(selekcja TOP-N zamiast „każda para gra") + backtest cross-sectional.
+
+**Pliki:** `skaner_okazji.py` (nowy), `tests/test_skaner_okazji.py` (13 testów granic).
+Źródła: cross-sectional momentum (FXEmpire, Moskowitz 2012), ADX (Wilder 1978).
+
+---
+
+## 2026-06-14 | W-315 | Z-05 Detektor Ruchu Klimaksowego — dwukierunkowy (szczyt→SHORT, dołek→LONG)
+
+**Rozkaz Cezara:** detektor gwałtownych ruchów nie tylko pump, ale pump I dump
+(różne ROC), nie tylko dołek ale i szczyt — szczyt na SHORT, dołek na LONG.
+
+**Wdrożenie:** neuron Z-05 `NeuronDetektorRuchu` (czysty OHLCV: CLOSE_SERIES_20 +
+RSI_14 + VOLUME_MA20). Łapie KLIMAKS (wyczerpanie ruchu), gra przeciw niemu:
+- SZCZYT: ROC ≥ +15% ∧ RSI ≥ 70 ∧ wolumen ≥ 2× → SHORT (blow-off top)
+- DOŁEK: ROC ≤ −15% ∧ RSI ≤ 30 ∧ wolumen ≥ 2× → LONG (kapitulacja)
+- inaczej NEUTRAL (specjalista — abstynuje prawie zawsze, „mało trade'ów wysokiej pewności")
+
+Ortogonalny do Z-02 (akumulacja PRZED pumpem); Z-05 łapie ruch JUŻ zaistniały.
+Źródło: blow-off top / capitulation + volume climax (Wyckoff, Murphy) — progi do
+kalibracji walk-forward/live (Prawo I).
+
+**Pliki:** `neurony/zagrozenie.py` (Z-05), `rejestr.py`, `tests/test_detektor_ruchu.py`
+(14 testów granic), MANIFEST/README/INDEKS (64 neurony). Część Etapu B audytu 2026-06-14.
+
+---
+
+## 2026-06-13 | W-314 | Filtr Asymetrii Reżimu — brama wejścia oparta na trendzie
+
+**Odkrycie OOS:** pomiar kierunków na świeżym oknie (2024-10..2026-06, BTC płaski
++0,8%) ujawnił, że stare „+26 152$" było in-sample na hossie 2017-2021. Na płaskim
+rynku rój TRACI (−386$) — wchodzi za często w chopie. Split kierunków zbalansowany
+51/49 (SHORT nie jest martwym głosem, Prawo XV OK); warstwy adaptacyjne nie ratują
+chopu (synapsy+mwu −373$).
+
+**Wdrożenie:** FiltrAsymetriiRezimu (czysty OHLCV: CLOSE/EMA_200/ADX_14):
+- rynek boczny (ADX<20) → wymóg pewności ≥0,70
+- kontr-trend przy ADX≥25 → wymóg pewności ≥0,65 (Moskowitz/Ooi/Pedersen 2012)
+- zgodne z trendem / strefa neutralna → przepuść; brak danych → abstynencja
+
+**Dowód A/B (Prawo XVI):** OOS strata −386$ → −238$ (**−38% krwawienia**),
+PnL/trade −2,3 → −1,4, oba kierunki lepsze. Uczciwie: wciąż ujemny (chop pozostaje
+trudny) — filtr tnie stratę, nie czyni rynku bocznego zyskownym.
+
+**Pliki:** `imperium/pretorianie/filtr_asymetrii.py` (nowy), `dyrygent.py`,
+`backtest.py`, `petla_live.py` (opt-in OFF), `tests/test_filtr_asymetrii.py` (15),
+`tests/test_zbuduj_warstwy.py`, `docs/POMIAR_FILTR_ASYMETRII.md`, README. 978/978.
+
+---
+
+## 2026-06-13 | W-313 | Naprawa deadlocka breakera krzywej — sondujący handel w HALT
+
+**Problem:** Po HALT (DD≥20%) żaden trade → equity zamrożona → DD nigdy nie spada
+poniżej prog_dd_reduced (10%) → histereza trzyma HALT wiecznie → 5 lat martwego
+handlu w backteście BTC 4H (2021-09 → 2026-06). Structural impossibility.
+
+**Rozwiązanie (W-313):** `frakcja_halt=0.1` — HALT zwraca 0.1× (sondujący handel)
+zamiast 0.0× (totalna blokada). Kapitał może się poruszać → DD może spaść → HALT
+może się odblokować gdy warunki rynkowe się poprawią. Stary `frakcja_halt=0.0`
+dostępny jako jawna konfiguracja per instancja.
+
+**Pliki:** `imperium/pretorianie/kalkulator_lewara.py` (frakcja_halt + frakcja_pozycji),
+`imperium/koloseum/backtest.py` (blokada na frakcja_breaker≤0 zamiast halt),
+`tests/test_kalkulator.py` (zaktualizowane testy granic + 3 nowe)
+
+---
+
+## 2026-06-13 | W-311 | Ablacja warstw adaptacyjnych — pomiar in-sample (Prawo XVI)
+
+**Pomiar, nie zgadywanie.** Ablacja 4 warstw (synapsy/mwu/igrzyska/ksiega_wad)
+osobno vs baseline na koszyku 5 par 4H (pełna historia), z metryką PnL/trade
+korygującą confound liczby trade'ów.
+
+Wynik (PnL/trade vs baseline +49,9$):
+- synapsy +64,4 (+29%, trade flat) — czysta jakość, najmocniejszy dowód
+- mwu +83,1 (+66%, +68% trade'ów) — działa, częściowo wolumen
+- igrzyska +55,3 (+11%, WR -1pp) — słaba, możliwa redundancja z mwu
+- ksiega_wad +49,9 (=baseline) — neutralna z projektu (nie wetuje domyślnie)
+
+⚠️ IN-SAMPLE — wymaga walk-forward OOS przed włączeniem w produkcji (Prawo I:
+bez fałszywej weryfikacji; Monte Carlo nie koryguje biasu trendu).
+
+**Pliki:** `docs/POMIAR_WARSTW_ADAPTACYJNYCH.md` (pomiar — bez zmian kodu)
+
+---
+
+## 2026-06-13 | W-310 | Domknięcie pętli pamięci — KsięgaWad czyta przeszłe sesje
+
+**Prawo XV — martwy read-path PamięciRefleksyjnej.** Lekcje były pisane do
+`logs/pamiec_refleksyjna.jsonl` co sesja, ale NIGDY czytane w produkcji
+(`formatuj_dla_llm()`/`wczytaj_wszystkie()` bez konsumenta). Świeży Dyrygent
+startował ślepy — setup który tracił przez 10 poprzednich sesji nie był znany.
+
+W-310: `_bootstrap_ksiega_wad(dyrygenci, pamiec)` w PętliLive — gdy `ksiega_wad`
+aktywna, zasila KsięgęWad każdego Dyrygenta persystentnymi lekcjami przed 1. barem.
+Cross-session learning staje się realne: stratny setup flagowany od startu sesji.
+
+- Wydzielony testowalny helper `_bootstrap_ksiega_wad()` (zwraca n lekcji).
+- Log startowy raportuje liczbę wczytanych lekcji.
+- +2 testy (bootstrap zasila wadę z 6 lekcji; brak KsięgiWad → 0, nie pada).
+- 959/959 testów, audyt pełna harmonia, ruff czysty.
+
+**Pliki:** `koloseum/petla_live.py`, `tests/test_ksiega_wad.py`,
+`docs/MANIFEST_KODU.md`, `README.md`
+
+---
+
+## 2026-06-13 | W-309 | KsięgaWad — prewencyjny filtr wad setupu (ekstrakcja z Mnemosyne)
+
+**Pomiar redundancji (Prawo XVI) + decyzja Cezara.** Audyt Mnemosyne (N-MEM-206):
+- 🔴 zero testów (formalnie nie istnieje wg Prawa XIX), niepodpięta nigdzie.
+- trade-learning MIERZALNIE dubluje PamięćRefleksyjną (W-295) — obie zapisują
+  PnL+narrację lekcji. Prawo XVI: nie duplikować.
+- jedyna unikatowa zdolność: `book_of_flaws` — prewencyjny filtr (patrzy W PRZÓD,
+  czego PamięćRefleksyjna nie umie — ona tylko narratywnie opisuje przeszłość).
+
+Cezar (Prawo XVIII) wybrał: **wyekstrahuj Księgę Wad**, Mnemosyne nietknięta.
+
+Nowy moduł `cesarz/ksiega_wad.py`:
+- `KsiegaWad.zarejestruj(rezim, interwal, pnl)` — online, z każdego zamknięcia.
+- Sygnatura setupu staje się WADĄ gdy ≥ min_prob prób ORAZ wskaźnik strat ≥ prog_wady.
+- `sprawdz(rezim, interwal)` PRZED wejściem → CZYSTO / OSTRZEŻENIE / WETO.
+- Domyślnie tylko ostrzega (prog_weta=None → nigdy nie wetuje — bezpieczne).
+- `ucz_z_pamieci(pamiec)` — bootstrap z PamięciRefleksyjnej (Prawo XVI: jedno źródło).
+
+Wpięcie (opt-in, domyślnie OFF — Prawo XV, zero zmiany zachowania):
+- `Dyrygent.zbuduj(ksiega_wad=True)`, `.ksiega_wad`, `.raport_ksiegi_wad()`
+- uczenie w `_aktualizuj_synapsy()`, weto w `cykl()` (krok 4c, jak Rada Doradców)
+- `KonfigPetliLive.ksiega_wad`, `backtest_portfel(ksiega_wad=True)`
+- pending tuple rozszerzony 3→4 (dodano interwał setupu); 3 unpacki zaktualizowane.
+
+20 testów (logika, granice progów Prawa XXI, bootstrap, integracja Dyrygent/pętla).
+957/957 testów, audyt pełna harmonia, ruff czysty.
+
+**Pliki:** `cesarz/ksiega_wad.py`, `koloseum/dyrygent.py`, `koloseum/petla_live.py`,
+`koloseum/backtest.py`, `tests/test_ksiega_wad.py`, `tests/test_mwu_wpiecie.py`,
+`docs/MANIFEST_KODU.md`, `README.md`
+
+---
+
+## 2026-06-13 | W-308 | Monte Carlo bridge — walidacja post-backtest z silnika
+
+**Odzysk potencjału (Prawo XV):** `monte_carlo.py` i jego `pelen_raport_mc()` istniały
+od dawna, ale nigdy nie były podpięte do `PaperTradingEngine` — trzeba było ręcznie
+budować listę PnL. W-308 zamyka tę lukę.
+
+Zmiany:
+- `waliduj_mc(engine)` w `monte_carlo.py`: pobiera `pnl_usdt` z `historia_zamkniec`
+  i wywołuje `pelen_raport_mc()` z `kapital_startowy` z silnika.
+- `Dyrygent.raport_monte_carlo()`: jeden-liniowy wrapper — `None` gdy < 10 trade'ów,
+  inaczej dict z shuffle+bootstrap (Sharpe mediana/p5/p95, MaxDD_p95, P(SR>0), ok).
+- 9 nowych testów: granica 10 trade'ów, dobry/zły edge, kapital z silnika,
+  Dyrygent z za-małą historią → None, struktura raportu.
+
+Zastosowanie: po backtestcie wywołaj `dyrygent.raport_monte_carlo()` lub
+`waliduj_mc(engine)` — dostaniesz potwierdzenie że edge jest prawdziwy
+(shuffle + bootstrap > 90% P(Sharpe>0), MaxDD_p95 < 25%).
+
+**Pliki:** `koloseum/monte_carlo.py`, `koloseum/dyrygent.py`,
+`tests/test_monte_carlo.py`, `docs/MANIFEST_KODU.md`, `README.md` (937/937)
+
+---
+
+## 2026-06-13 | W-307 | Igrzyska wpięte w pipeline — batch ranking komplementarny do MWU
+
+**Domknięcie pętli uczenia neuronów: batch (Igrzyska) + online (HedgeMWU) razem.**
+Igrzyska (W-002) istniały od dawna, ale nigdy nie były podpięte do Dyrygenta —
+`nowe_wagi()` nigdy nie trafiało do Legatusa. W-307 to naprawia (Prawo XV).
+
+Zmiany:
+- `Dyrygent.__init__`: `self._igrzyska: Optional[Any] = None`
+- `Dyrygent.zbuduj(igrzyska=True)`: opt-in jak MWU/synapsy/drift/rada
+- `_aktualizuj_synapsy()`: rejestruje każde zamknięcie trade'u w Igrzyskach
+- Mnożniki łączone: `combined = mwu_mult × igr_mult` per neuron (oba aktywne)
+- `raport_igrzysk()`: publiczny accessor (ranking/Złoty Hełm/Lista Infamii)
+- `backtest_portfel(igrzyska_learning=True)`: opt-in w backteście
+- 14 nowych testów (jednostkowe + integracyjne, test granic Prawa XXI)
+
+Prawo XVI: Igrzyska (cumulative accuracy/stability) vs MWU (eksponencjalne
+zapomnienie) niosą różną informację — dlatego mnożniki łączone, nie zastępowane.
+
+**Pliki:** `koloseum/dyrygent.py`, `koloseum/backtest.py`, `tests/test_igrzyska_wpiecie.py`,
+`docs/MANIFEST_KODU.md`, `README.md` (929/929 testów)
+
+**W-307b (dopięcie):** warstwy uczenia wpięte też w produkcyjną `PętlęLive`
+(`KonfigPetliLive.mwu/igrzyska` opt-in, domyślnie OFF). Wcześniej dostępne tylko
+przez `Dyrygent.zbuduj()`/`backtest_portfel()` — teraz osiągalne z głównego
+entrypointa live. +2 testy (wpięcie + domyślnie OFF). 931/931.
+**Pliki:** `koloseum/petla_live.py`, `tests/test_petla_live.py`
+
+---
+
+## 2026-06-13 | W-306b | Pierwszy realny pomiar redundancji roju (Prawo XVI w akcji)
+
+**Użycie narzędzia W-305/306 na danych historycznych.** Przepuszczono BTCUSDT 4H
+(1500 barów, 1301 cykli) przez `Dyrygent.zbuduj(synapsy=True)` i odczytano
+`raport_korelacji_neuronow()`. Wynik zapisany do `docs/MATRYCA_KORELACJI.md`
+(żywy szablon wypełniony pierwszymi rzeczywistymi liczbami).
+
+- 🚨 **Alarm Prawa XV/XVI:** V-13 (Yang-Zhang vol) ~ VI-13 (ATR) = **+1.000** —
+  identyczny sygnał, podwójne liczenie zmienności. Potwierdza INF-20 (Sinclair):
+  Yang-Zhang traci przewagę na crypto 24/7. SynapsyRezimowe (W-305) już to częściowo
+  neutralizują (dekorelacja=0 → brak wzmocnienia). Scalenie/redukcja = decyzja Cezara
+  (Prawo XVIII — nie usuwam składu roju autonomicznie).
+- 8 dalszych par |corr|>0.80 (trend ADX~Ichimoku, przepływ OBV~Force Index).
+- 248 par dywersyfikujących (|corr|<0.20) — rój zdrowo zdekorelowany.
+
+**Pliki:** `docs/MATRYCA_KORELACJI.md`, `docs/LOG_ZMIAN.md` (pomiar — bez zmian kodu)
+
+---
+
+## 2026-06-13 | W-306 | Raport dekorelacji neuronów — Prawo XVI dla całego roju
+
+**Korelacje par neuronów (W-305) były liczone, ale tylko konsumowane wewnętrznie
+przez SynapsyRezimowe — Cezar ich nie widział.** Prawo XVI („redundancja mierzona,
+nie zgadywana") działało dotąd tylko dla 11 zwiadowców EXP. Rozszerzone na rój:
+
+- `raport_z_kolektora()` — z populowanego `KolektorKorelacjiNeuronow` produkuje
+  raport par nadmiarowych (|corr|>0.80, kandydat do wagi w dół) vs dywersyfikujących
+  (|corr|<0.20, filar siły); kształt zgodny z `raport_dekorelacji` (wspólny formater)
+- `Dyrygent.raport_korelacji_neuronow()` — akcesor po backteście/sesji
+- `KolektorKorelacjiNeuronow.klucze()` — lista zebranych neuronów
+- 6 testów (`tests/test_raport_korelacji_neuronow.py`) — 915/915
+
+**Pliki:** `legiony/diagnostyka_korelacji.py`, `koloseum/dyrygent.py`, `tests/test_raport_korelacji_neuronow.py`, `docs/MANIFEST_KODU.md`, `README.md`
+
+---
+
+## 2026-06-13 | W-305 | Domknięcie pętli korelacji w SynapsyRezimowych (Prawo XVI)
+
+**Naprawa utraty potencjału z audytu W-304:** `kara_korelacji = 1.0 + corr` i
+`dekorelacja = 1.0 - corr` to serce Prawa XVI w SynapsyRezimowych (W-299), ale
+`corr` był ZAWSZE 0 — call-site nie podawał korelacji, a diagnostyka liczyła tylko
+zwiadowców (EXP), nie neurony. Pętla domknięta:
+
+- `KolektorKorelacjiNeuronow` (diagnostyka_korelacji.py) — online okno przesuwne
+  głosów neuronów z `raport.sygnaly`, macierz korelacji Pearsona par neuronów
+- `SynapsyRezimowe.ustaw_korelacje()` + fallback `_korelacje_biezace` w
+  `aktualizuj()`/`wzmocnij_pewnosc()` — bez zmiany sygnatur call-sites
+- `Dyrygent.cykl()`: odczyt korelacji PRZED fokus (z przeszłych barów), rejestracja
+  bieżącego głosu PO fokus → zero lookahead (Prawo I)
+- Pary niezależne (corr≈0) wzmacniane pełnym głosem; skorelowane (corr≈1) stłumione
+- 9 testów granicznych (`tests/test_korelacje_synapsy.py`) — 909/909
+
+**Pliki:** `legiony/diagnostyka_korelacji.py`, `biblioteki/synapsy_rezimowe.py`, `koloseum/dyrygent.py`, `tests/test_korelacje_synapsy.py`, `docs/MANIFEST_KODU.md`, `README.md`
+
+---
+
+## 2026-06-13 | W-304 | Fabryka odblokowuje 4 martwe-w-produkcji warstwy (audyt Prawo XV)
+
+**Analiza całego Imperium + konkurencja wykazała UTRATĘ POTENCJAŁU:** DriftAdapter
+(W-296), RadaDoradcow, SynapsyRezimowe (W-299) i HedgeMWU (W-303) były wpięte w
+logikę konstruktora/cyklu Dyrygenta, ale produkcyjna fabryka `Dyrygent.zbuduj()`
+(której używa `petla_live`) nigdy ich nie instancjonowała → martwe w realnym życiu.
+
+- `Dyrygent.zbuduj(drift=False, rada=False, synapsy=False, mwu=False)` — 4 opt-in
+- Domyślnie wszystkie OFF → zachowanie identyczne (zero zmian, kompatybilność wsteczna)
+- 7 testów (`tests/test_zbuduj_warstwy.py`) — 900/900
+- Pozostałe utraty potencjału (Igrzyska osierocony, korelacje nie docierają do
+  SynapsyRezimowych, Pamięć Refleksyjna zapis-bez-odczytu) — zaraportowane Cezarowi
+  jako decyzje kierunkowe (Prawo XVIII), nie naprawione autonomicznie.
+
+**Pliki:** `koloseum/dyrygent.py`, `tests/test_zbuduj_warstwy.py`, `docs/MANIFEST_KODU.md`, `README.md`
+
+---
+
+## 2026-06-13 | W-303 | HedgeMWU wiring — online wagi neuronów wpięte w Legatusa
+
+**Online Multiplicative Weights Update (Freund & Schapire 1997) — zamknięta pętla uczenia:**
+- `Legatus.mwu = HedgeMWU()` — nowy slot (analogiczny do `synapsy`)
+- `Dyrygent._aktualizuj_synapsy()` — po każdym zamkniętym trade'cie rejestruje wynik każdego neuronu, potem pcha `mwu.mnozniki()` do `Legatus.mnozniki_neuronow`
+- `backtest_portfel(mwu_learning=True)` — opt-in per-symbol MWU learning
+- 9 nowych testów (`tests/test_mwu_wpiecie.py`) — pokrycie granic (Prawo XXI)
+- MANIFEST, LOG zaktualizowane
+
+**Pliki:** `legiony/legatus.py`, `koloseum/dyrygent.py`, `koloseum/backtest.py`, `tests/test_mwu_wpiecie.py`, `docs/MANIFEST_KODU.md`
+
+---
+
+## 2026-06-13 | W-302 | PętlaLive + PamięćRefleksyjna wpięta w pipeline
+
+**Główny entrypoint systemu tradingowego + cross-session learning:**
+
+- `koloseum/petla_live.py`: `handluj_live(KonfigPetliLive)` — spina DataLoader(OHLCV)
+  → RadarRynku(BTC_TREND/DOMINACJA/PRZEPLYW co bar) → Dyrygent.cykl() per symbol
+  → PamięćRefleksyjna.zapisz_wynik() per zamknięcie. Graceful-degradation: padnięty
+  fetch jednego symbolu nie zatrzymuje innych. `uruchom()`: skrót produkcyjny.
+- `koloseum/dyrygent.py`: `self._pamiec` hook + wpięcie w `_aktualizuj_synapsy()` —
+  po każdym zamknięciu pozycji automatycznie zapisuje lekcję (symbol, rezim, interwal,
+  pnl) do JSONL. Never-block: błąd pamięci = log + skip.
+- `_df_do_barow()`: mostek DataFrame → List[Dict] (timestamp=int ms).
+- 10 testów: max_barow, fetch-fail graceful, brak BTC w koszyku, synapsy+pętla,
+  PamięćRefleksyjna hook, KonfigPetliLive domyślne. → **883/883** ✅
+
+---
+
+## 2026-06-13 | W-301 | Domknięcie adaptacyjnych plugi — SynapsyRezimowe w backtest_portfel + AdapterNewsLLM
+
+**Prawo XV — domykanie luk pomiędzy gotowym kodem a pipeline:**
+
+- `koloseum/backtest.py`: nowy parametr `synapsy_rezimowe=False` (opt-in, zero kosztu
+  bez włączenia). `True` → każdy symbol w portfelu dostaje własny `SynapsyRezimowe()` w
+  `legatus.synapsy` i uczy par przez cały backtest (1 linia, wstrzykiwana przez Prawo I).
+- `akwedukty/adaptery/__init__.py`: eksportuje `AdapterNewsLLM` (wcześniej osierocony —
+  klasa istniała, ale poza publicznym interfejsem pakietu).
+- `koloseum/dyrygent.py`: `zbuduj_bojowy(adaptery_live=True)` teraz zawiera
+  `AdapterNewsLLM()` — NEWS-01 próbuje pobrać nagłówki; bez RSS/klucza: abstynuje (Prawo XV).
+- `narzedzia/audyt_spojnosci.py`: opis NEWS-01 odzwierciedla że adapter wpięty.
+- 2 nowe testy portfela (synapsy opt-in + default=False) → **873/873** ✅
+
+---
+
+## 2026-06-13 | W-300 | Hook RadarRynku — wpięcie RADAR-01/02/03 w sloty kontekstu
+
+**Prawo XV — koniec trzech martwych głosów (RADAR czytał klucze, których nikt nie podawał):**
+
+- `koloseum/dyrygent.py`: `odswiez_kontekst_rynku(close_btc, close_alty, vol_alty=None)` —
+  woła `RadarRynku.skanuj()` i wypełnia DWA istniejące sloty (zaprojektowane w W-291/292,
+  nigdy niepodłączone): `kontekst_dodatkowy` (BTC_TREND/BTC_DOMINANCJA/PRZEPLYW_KAPITALU →
+  dolewane do wskaźników → budzą RADAR-01/02/03) i `stan_rynku` (→ Namiestnik, radar-aware
+  gating). Serie przyczynowe (DO bieżącej świecy — zero lookahead). `update()` nie kasuje
+  innego kontekstu. Za mało danych → StanRynku z None → neurony abstynują (Prawo XV).
+- Wołane RAZ na bar przez pętlę portfelową PRZED cyklami per-symbol (BTC = kontekst wspólny
+  koszyka). Sama pętla portfelowa jeszcze nie istnieje — to gotowy, przetestowany hook.
+- 8 testów: wypełnianie slotów, nie-kasowanie kontekstu, DOWÓD że RADAR-01 budzi się LONG
+  po wpięciu (abstynuje bez), granica za-mało-danych, płaski BTC → NEUTRAL. → **871/871** ✅
+- Audyt: notka Prawa XV zaktualizowana (hook gotowy, RADAR ożywa z serią BTC).
+
+---
+
+## 2026-06-13 | W-299 | Synapsy Reżimowe — Regime-Aware Decorrelated Coalition Graph
+
+**Flagowa unikalna technologia: Hebbian × per-reżim × Prawo XVI (dekorelacja):**
+
+- `biblioteki/synapsy_rezimowe.py`: `SynapsyRezimowe` — graf `w[i][j][reżim]` par neuronów.
+  Reguła uczenia: `delta = eta * pnl_znak / (1 + |corr(i,j)|)` — pary o wysokiej korelacji
+  uczą się wolniej (redundancja ≠ siła). Boost pewności max ±25%. Persystencja JSONL.
+- `legiony/legatus.py`: `self.synapsy` + `wzmocnij_pewnosc()` po kierunku/pewności.
+- `koloseum/dyrygent.py`: `_synapsy_pending` + `_aktualizuj_synapsy()` — zamknięta pętla
+  uczenia koalicji bez ingerencji zewnętrznej.
+- 22 testy granic W-299 → **863/863** ✅
+
+---
+
+## 2026-06-13 | W-298 | DriftAdapter wpięty + Rada Doradców wpięta do Dyrygenta
+
+**Prawo XV — ożywienie gotowych modułów, które żyły poza pipeline:**
+
+- `legiony/legatus.py`: `ustaw_wagi_rezimu()` + `resetuj_wagi_rezimu()` + `_wagi_rezimu_override` —
+  per-cykl override WAGI_REZIMU dla DriftAdapter W-296 (antycypacja zmiany reżimu).
+- `koloseum/dyrygent.py`: param `drift_adapter` — rejestruje reżim co bar, koryguje wagi
+  kategorii gdy wykryje dryfowanie (entropia/momentum) przed pełną zmianą reżimu.
+- `koloseum/dyrygent.py`: param `rada_doradcow` + `_opinia_rady()` — Rada Pięciorga
+  (Oracle/Fulmen/Iustitia/Hermes/Pythia) wywołana po Kalkulatorze, może zawetować lub
+  zredukować rozmiar pozycji (×0.6–×0.8). Nowa ścieżka RADA_WETO w DecyzjaCyklu.
+
+---
+
 ## 2026-06-12 | W-297 | NEWS-01 Sentyment Newsów LLM (DeepSeek + fallback słownikowy)
 
 **Nowy neuron sentymentu z newsów — offline-first, LLM-opcjonalny:**

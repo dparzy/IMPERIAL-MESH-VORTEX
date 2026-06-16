@@ -101,6 +101,9 @@ class WynikZamkniecia:
     powod_zamkniecia: str
     kapital_przed: float
     kapital_po: float
+    # W-312: znacznik wejścia (Unix ms) — umożliwia analizę czasową zamkniętych
+    # trade'ów (walk-forward OOS, filtrowanie po okresie). 0 = brak danych.
+    timestamp_wejscia: int = 0
 
 
 @dataclass
@@ -416,6 +419,7 @@ class PaperTradingEngine:
             powod_zamkniecia=powod,
             kapital_przed=round(kapital_przed, 4),
             kapital_po=round(self.kapital, 4),
+            timestamp_wejscia=poz.timestamp_wejscia,
         )
         self.historia_zamkniec.append(wynik)
         return wynik

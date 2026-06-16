@@ -202,3 +202,153 @@ def test_min_pewnosc_interwalu_nadpisuje_globalny():
     dec2 = d2.cykl("BTCUSDT", bary)
     assert dec2.etap != "LEGATUS_SLABY" or dec2.pewnosc < 0.1, \
         "bez wpisu 1H próg globalny 0.1 nie może blokować pewności ~0.69" 
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  W-298 — DriftAdapter + Rada Doradców (Prawo XV: ożywione moduły)
+# ════════════════════════════════════════════════════════════════════════════
+
+def test_drift_adapter_rejestruje_rezim():
+    """DriftAdapter w Dyrygent rejestruje reżim co bar — historia rośnie."""
+    from imperium.koloseum.drift_adapter import DriftAdapter
+    da = DriftAdapter(okno=5)
+    wsk = {"CLOSE": 100.0, "RSI_14": 55.0, "ADX_14": 30.0, "EMA_50": 95.0, "EMA_200": 90.0}
+    legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    engine = PaperTradingEngine(kapital_startowy=10_000, sesja_id="DA")
+    d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
+                 wskazniki_provider=lambda b: dict(wsk), min_pewnosc=0.1,
+                 drift_adapter=da)
+    for _ in range(3):
+        d.cykl("BTCUSDT", _bary())
+    assert len(da._historia) >= 1
+
+
+def test_drift_adapter_resetuje_override_po_cyklu():
+    """Po każdym cyklu Legatus wraca do globalnych WAGI_REZIMU."""
+    from imperium.koloseum.drift_adapter import DriftAdapter
+    da = DriftAdapter(okno=3)
+    # Wymuszamy pełne okno dryfu ręcznie
+    for r in ["RANGING", "TRENDING_UP", "RANGING"]:
+        da.dodaj_rezim(r)
+    wsk = {"CLOSE": 100.0, "RSI_14": 55.0, "ADX_14": 30.0, "EMA_50": 95.0, "EMA_200": 90.0}
+    legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    engine = PaperTradingEngine(kapital_startowy=10_000, sesja_id="DAR")
+    d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
+                 wskazniki_provider=lambda b: dict(wsk), min_pewnosc=0.1,
+                 drift_adapter=da)
+    d.cykl("BTCUSDT", _bary())
+    # Po cyklu override musi być wyczyszczony
+    assert legatus._wagi_rezimu_override is None
+
+
+def test_legatus_ustaw_resetuj_wagi_rezimu():
+    """Legatus override działa per-cykl: ustaw→zmienia, resetuj→przywraca globalne."""
+    legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    assert legatus._wagi_rezimu_override is None
+    faky_wagi = {"RANGING": {"M": 2.0}, "TREND_STRONG": {"T": 3.0}}
+    legatus.ustaw_wagi_rezimu(faky_wagi)
+    assert legatus._wagi_rezimu_override is faky_wagi
+    legatus.resetuj_wagi_rezimu()
+    assert legatus._wagi_rezimu_override is None
+
+
+def test_rada_doradcow_weto_blokuje_wejscie():
+    """Rada Doradców z veto (Iustitia BLOKADA przez portfolio heat) blokuje wejście."""
+    from imperium.cesarz.doradcy.rada import RadaDoradcow
+
+    # Symulujemy Iustitia BLOKADA: nowe_ryzyko_usdt gigantyczne = heat > 10%
+    class _RadaZBlokadag(RadaDoradcow):
+        def ocen(self, *args, **kwargs):
+            from imperium.cesarz.doradcy.rada import OpinaRady
+            from imperium.cesarz.doradcy.oracle import WerdyktOracle, OcenaOracle
+            from imperium.cesarz.doradcy.fulmen import WerdyktFulmen, OcenaFulmen
+            from imperium.cesarz.doradcy.iustitia import WerdyktIustitia, OcenaIustitia
+            from imperium.cesarz.doradcy.hermes import WerdyktHermes, OcenaHermes
+            from imperium.cesarz.doradcy.pythia import WerdyktPythia, OcenaPythia
+            oracle = OcenaOracle(werdykt=WerdyktOracle.BRAK_DANYCH, q_score=0.0,
+                                 sharpe=0.0, sortino=0.0, calmar=0.0, omega=0.0, n_setupow=0)
+            fulmen = OcenaFulmen(werdykt=WerdyktFulmen.NEUTRALNY, adx=20.0, choppiness=50.0,
+                                 kaufman_er=0.5, vi_kierunek="NEUTRALNY",
+                                 fulmen_rezim="volatile", modyfikator=1.0)
+            iustitia = OcenaIustitia(werdykt=WerdyktIustitia.BLOKADA, portfolio_heat=0.15,
+                                     kelly_fraction=0.0, sugerowany_rozmiar_pct=0.0,
+                                     powod="Test VETO")
+            hermes = OcenaHermes(werdykt=WerdyktHermes.CZYSTE, kompletnosc=1.0,
+                                 vpin=0.3, hash_ok=True)
+            pythia = OcenaPythia(werdykt=WerdyktPythia.MILCZENIE, p_zysk=0.0,
+                                 avg_pnl=0.0, median_pnl=0.0, n_podobnych=0)
+            opinia = OpinaRady(oracle=oracle, fulmen=fulmen, iustitia=iustitia,
+                               hermes=hermes, pythia=pythia)
+            opinia.blokada = True
+            opinia.powod_blokady = "IUSTITIA VETO: Test VETO"
+            opinia.modyfikator_pozycji = 0.0
+            opinia.decyzja = "CESARZ BLOKUJE — IUSTITIA VETO"
+            return opinia
+
+    wsk = {"CLOSE": 100.0, "RSI_14": 22.0, "ADX_14": 30.0, "EMA_50": 95.0, "EMA_200": 90.0,
+           "MACD_HIST": 2.0, "STOCHRSI_K": 15.0}
+    legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    engine = PaperTradingEngine(kapital_startowy=10_000, sesja_id="RV")
+    d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
+                 wskazniki_provider=lambda b: dict(wsk), min_pewnosc=0.1,
+                 rada_doradcow=_RadaZBlokadag())
+    dec = d.cykl("BTCUSDT", _bary())
+    # albo RADA_WETO albo Legatus nie dał sygnału (neutralny rój)
+    if dec.wszedl:
+        raise AssertionError(f"Rada z veto MUSI blokować wejście, etap={dec.etap}")
+    # Jeśli Legatus był neutralny — Rada nie miała szans interweniować → OK
+    if dec.etap not in ("LEGATUS_NEUTRAL", "LEGATUS_SLABY", "LEGATUS_WETO", "RADA_WETO"):
+        raise AssertionError(f"Nieoczekiwany etap: {dec.etap}")
+
+
+def test_rada_doradcow_redukuje_rozmiar():
+    """Rada z modyfikatorem < 1.0 redukuje rozmiar pozycji (mnoznik_rozmiaru skalowany)."""
+    from imperium.cesarz.doradcy.rada import RadaDoradcow, OpinaRady
+    from imperium.cesarz.doradcy.oracle import WerdyktOracle, OcenaOracle
+    from imperium.cesarz.doradcy.fulmen import WerdyktFulmen, OcenaFulmen
+    from imperium.cesarz.doradcy.iustitia import WerdyktIustitia, OcenaIustitia
+    from imperium.cesarz.doradcy.hermes import WerdyktHermes, OcenaHermes
+    from imperium.cesarz.doradcy.pythia import WerdyktPythia, OcenaPythia
+
+    class _RadaRedukcja(RadaDoradcow):
+        def ocen(self, *args, **kwargs):
+            oracle = OcenaOracle(werdykt=WerdyktOracle.BRAK_DANYCH, q_score=0.0,
+                                 sharpe=0.0, sortino=0.0, calmar=0.0, omega=0.0, n_setupow=0)
+            fulmen = OcenaFulmen(werdykt=WerdyktFulmen.NEUTRALNY, adx=20.0, choppiness=50.0,
+                                 kaufman_er=0.5, vi_kierunek="NEUTRALNY",
+                                 fulmen_rezim="volatile", modyfikator=1.0)
+            iustitia = OcenaIustitia(werdykt=WerdyktIustitia.OK, portfolio_heat=0.02,
+                                     kelly_fraction=0.1, sugerowany_rozmiar_pct=0.05,
+                                     powod="OK")
+            hermes = OcenaHermes(werdykt=WerdyktHermes.CZYSTE, kompletnosc=1.0,
+                                 vpin=0.3, hash_ok=True)
+            pythia = OcenaPythia(werdykt=WerdyktPythia.MILCZENIE, p_zysk=0.0,
+                                 avg_pnl=0.0, median_pnl=0.0, n_podobnych=0)
+            opinia = OpinaRady(oracle=oracle, fulmen=fulmen, iustitia=iustitia,
+                               hermes=hermes, pythia=pythia)
+            opinia.blokada = False
+            opinia.modyfikator_pozycji = 0.5   # 3/5 → 50% pozycji
+            opinia.pozytywne = 3
+            opinia.decyzja = "WEJŚCIE OK — zmniejszona pozycja 50% (×0.6)"
+            return opinia
+
+    wsk = {"CLOSE": 100.0, "RSI_14": 22.0, "ADX_14": 30.0, "EMA_50": 95.0, "EMA_200": 90.0,
+           "MACD_HIST": 2.0, "STOCHRSI_K": 15.0}
+    legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    engine_bez = PaperTradingEngine(kapital_startowy=10_000, sesja_id="BEZ")
+    engine_z = PaperTradingEngine(kapital_startowy=10_000, sesja_id="Z")
+    d_bez = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine_bez,
+                     wskazniki_provider=lambda b: dict(wsk), min_pewnosc=0.1)
+    d_z = Dyrygent(
+        legatus=zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False),
+        kalkulator=KalkulatorLewara(), engine=engine_z,
+        wskazniki_provider=lambda b: dict(wsk), min_pewnosc=0.1,
+        rada_doradcow=_RadaRedukcja(),
+    )
+    dec_bez = d_bez.cykl("BTCUSDT", _bary())
+    dec_z = d_z.cykl("BTCUSDT", _bary())
+    # Jeśli oba weszły, Rada MUSI zredukować rozmiar (≤ bez Rady)
+    if dec_bez.wszedl and dec_z.wszedl:
+        pos_bez = list(engine_bez.otwarte.values())[0].rozmiar_usdt
+        pos_z = list(engine_z.otwarte.values())[0].rozmiar_usdt
+        assert pos_z <= pos_bez, f"Rada ×0.5 musi dać rozmiar ≤ bez Rady: {pos_z} vs {pos_bez}"

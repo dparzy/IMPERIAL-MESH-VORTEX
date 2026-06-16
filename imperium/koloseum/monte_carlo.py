@@ -211,3 +211,19 @@ def pelen_raport_mc(
         powod=powod,
         n_transakcji=len(pnl),
     )
+
+
+def waliduj_mc(engine, n_symulacji: int = 1000,
+               seed: Optional[int] = 42) -> "PelenRaportMC":
+    """
+    W-308: most między PaperTradingEngine a Monte Carlo (Prawo XV — odzysk potencjału).
+
+    Pobiera pnl_usdt z historia_zamkniec silnika i uruchamia pelen_raport_mc().
+    Wywołaj po backteście: raport = waliduj_mc(engine).
+
+    Zwraca PelenRaportMC lub PelenRaportMC.ok=False gdy < 10 transakcji.
+    """
+    pnl = [w.pnl_usdt for w in engine.historia_zamkniec]
+    kapital_start = getattr(engine, "kapital_startowy", 10_000.0)
+    return pelen_raport_mc(pnl, n_symulacji=n_symulacji,
+                           kapital_start=kapital_start, seed=seed)

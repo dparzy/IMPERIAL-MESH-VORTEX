@@ -307,9 +307,28 @@ class Legatus:
         self.zwiadowcy = zwiadowcy or []
         self.strategie = strategie or []
         self.mnozniki_neuronow = mnozniki_neuronow or {}
+        # W-299 Synapsy Reżimowe: opcjonalny graf koalicji par neuronów warunkowany
+        # reżimem × dekorelacja. Gdy podane: wzmacnia pewnosc_agregatu parami dobrych
+        # duetów, redukuje za złe (Prawo XVI — dekorelowana konfluencja = siła).
+        self.synapsy = None
+        # W-303 HedgeMWU: online multiplicative weights update — wagi neuronów uczą się
+        # strumieniowo po każdym zamkniętym trade'cie (W-049 Freund & Schapire 1997).
+        # None = wyłączony (Prawo XV: domyślnie neutralny — mnozniki_neuronow = {}).
+        self.mwu = None
         # Opcja A: StanRynku z RadarRynku — radar-aware strategy scoring.
         # Ustawiany przez Dyrygenta przed fokus(). None = bez radaru.
         self.stan_rynku = None
+        # W-296 DriftAdapter: per-cykl override WAGI_REZIMU (antycypacyjna korekta).
+        # None = bez override (używa globalnego WAGI_REZIMU). Resetować po fokus().
+        self._wagi_rezimu_override: Optional[dict] = None
+
+    def ustaw_wagi_rezimu(self, wagi: dict) -> None:
+        """W-296: per-cykl override WAGI_REZIMU z DriftAdapter. Wywołaj PRZED fokus()."""
+        self._wagi_rezimu_override = wagi
+
+    def resetuj_wagi_rezimu(self) -> None:
+        """Czyści override po cyklu — następny cykl wraca do globalnego WAGI_REZIMU."""
+        self._wagi_rezimu_override = None
 
     def ustaw_mnozniki_neuronow(self, mnozniki: dict):
         """
@@ -459,6 +478,12 @@ class Legatus:
         if pewnosc < 0.5:
             kierunek = "NEUTRAL"
 
+        # W-299 Synapsy Reżimowe: wzmocnienie/redukcja pewności przez aktywne pary duetów.
+        # Działa po wyliczeniu kierunku i pewności — modyfikuje tylko wartość, nie głos.
+        if self.synapsy is not None and kierunek != "NEUTRAL":
+            zgodne_sygn = long_s if kierunek == "LONG" else short_s
+            pewnosc = self.synapsy.wzmocnij_pewnosc(pewnosc, zgodne_sygn, rezim)
+
         # Filtr minimum
         weto = False
         powod = ""
@@ -519,7 +544,7 @@ class Legatus:
         mnożnik UCZENIA per-neuron (Igrzyska/HedgeMWU, wizja W-049). Prawo XV —
         wagi ożywione zarówno regułą reżimu, jak i wynikami historycznymi.
         """
-        mapa = WAGI_REZIMU.get(rezim, {})
+        mapa = (self._wagi_rezimu_override or WAGI_REZIMU).get(rezim, {})
         default = mapa.get("_default", 1.0)
         mn_neuron = self.mnozniki_neuronow
         if not mapa and not mn_neuron:

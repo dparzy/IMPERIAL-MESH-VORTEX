@@ -180,3 +180,61 @@ class NeuronVSA(MikroNeuron):
                 [f"VSA: niski wolumen ({vol_ratio:.1f}×) — brak przekonania"])
 
         return self._bazowy_sygnal(vol_ratio, "NEUTRAL", 0.15, [f"VSA normalny ({vol_ratio:.1f}×)"])
+
+
+class NeuronVolumeProfile(MikroNeuron):
+    """
+    VP-01 | Volume Profile / VPOC — struktura wsparcia/oporu z WOLUMENU (SWING, W-322).
+
+    Dla nowicjusza: Volume Profile (Market Profile, Dalton) pokazuje, PRZY JAKIEJ CENIE
+    handlowano najwięcej. POC (Point of Control) = cena z największym wolumenem = silny
+    magnes/poziom. Value Area (VA) = zakres skupiający 70% wolumenu = strefa „uczciwej
+    wartości". Cena pod POC i pod VA-low = niedowartościowana, ciągnie do POC (LONG);
+    nad VA-high = wykupiona (SHORT); w VA = równowaga (NEUTRAL).
+
+    Sygnał:
+      • CLOSE < VA_LOW → LONG (poniżej wartości, powrót do POC).
+      • CLOSE > VA_HIGH → SHORT (powyżej wartości, powrót do POC).
+      • VA_LOW ≤ CLOSE ≤ VA_HIGH → NEUTRAL (w strefie wartości, równowaga).
+    Pewność rośnie z dystansem od krawędzi VA do POC.
+
+    Dlaczego ORTOGONALNY (Prawo XVI): nasze S/R to Donchian/BBands (EKSTREMA CENY) —
+    VP-01 buduje S/R z ROZKŁADU WOLUMENU po cenie (gdzie był obrót), inna oś. Nie myli
+    się z SMC (Order Block/FVG) — te szukają luk/nierównowagi, VP szuka akceptacji.
+
+    Źródło: Dalton „Markets in Profile" (BIB-013); Deepvue / Quantum 2025 (VPOC/Value Area).
+    """
+    KLUCZ = "VP-01"
+    LEGION = "SWING"
+    WSKAZNIK = "VPOC"
+    KATEGORIA = "S"
+    WAGA = 6
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        vpoc = wskazniki.get("VPOC")
+        va_hi = wskazniki.get("VA_HIGH")
+        va_lo = wskazniki.get("VA_LOW")
+        close = wskazniki.get("CLOSE")
+
+        if None in (vpoc, va_hi, va_lo, close) or vpoc <= 0 or va_hi <= va_lo:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak Volume Profile (wymaga ≥20 barów z wolumenem)"])
+
+        if close < va_lo:
+            dyst = (va_lo - close) / vpoc
+            pewnosc = round(min(0.80, 0.50 + dyst * 6.0), 4)
+            return self._bazowy_sygnal(round(vpoc, 2), "LONG", pewnosc,
+                [f"📊 Cena {close:.2f} < VA-low {va_lo:.2f} (POC {vpoc:.2f}) — "
+                 f"poniżej wartości → powrót do POC, LONG ({pewnosc:.0%})"])
+
+        if close > va_hi:
+            dyst = (close - va_hi) / vpoc
+            pewnosc = round(min(0.80, 0.50 + dyst * 6.0), 4)
+            return self._bazowy_sygnal(round(vpoc, 2), "SHORT", pewnosc,
+                [f"📊 Cena {close:.2f} > VA-high {va_hi:.2f} (POC {vpoc:.2f}) — "
+                 f"powyżej wartości → powrót do POC, SHORT ({pewnosc:.0%})"])
+
+        return self._bazowy_sygnal(round(vpoc, 2), "NEUTRAL", 0.0,
+            [f"Cena {close:.2f} w Value Area [{va_lo:.2f}, {va_hi:.2f}] — równowaga (POC {vpoc:.2f})"])

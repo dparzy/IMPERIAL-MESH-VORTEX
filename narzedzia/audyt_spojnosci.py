@@ -101,6 +101,15 @@ def audyt() -> tuple:
         if dup:
             bledy.append(f"[W1] Zduplikowane klucze neuronów: {sorted(dup)}")
 
+        # W-323: NEURONY_STYLU pokrywa KAŻDY neuron (zero sierot/braków, Prawo XXI)
+        from imperium.legiony.rejestr import raport_profili
+        rp = raport_profili()
+        if rp["sieroty_w_mapie"]:
+            bledy.append(f"[W1] NEURONY_STYLU sieroty (w mapie, brak w kodzie): {rp['sieroty_w_mapie']}")
+        if rp["braki_w_mapie"]:
+            bledy.append(f"[W1] NEURONY_STYLU braki (neuron bez profilu stylu): {rp['braki_w_mapie']}")
+        info.append(f"Profile stylu (W-323): SCALP {rp['scalp']} | SWING {rp['swing']} | INVEST {rp['invest']}")
+
     except Exception as e:
         bledy.append(f"[W1] Nie udało się załadować żywego roju: {e}")
         return bledy + ["(audyt przerwany — napraw import)"], info
@@ -482,10 +491,18 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
     "PSY-04": "OPEN_INTEREST (AdapterFutures)",
     "V-03":   "CVD (AdapterCVD/trade-feed)",
     "AUG-01": "EVENT_* (AdapterKronikarz — okno zdarzenia fundamentalnego)",
-    "RADAR-01": "BTC_TREND (RadarBTC — kontekst lidera rynku, lead-lag)",
-    "RADAR-02": "BTC_DOMINANCJA (RadarRynku — przepływ kapitału BTC↔alty)",
-    "RADAR-03": "PRZEPLYW_KAPITALU (RadarRynku — breadth × momentum wolumenu)",
-    "NEWS-01": "NEWS_SENTYMENT (AdapterNewsLLM — DeepSeek + fallback słownikowy)",
+    "RADAR-01": "BTC_TREND (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300; "
+                "ożywa gdy pętla portfelowa poda serie BTC)",
+    "RADAR-02": "BTC_DOMINANCJA (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300)",
+    "RADAR-03": "PRZEPLYW_KAPITALU (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300)",
+    "NEWS-01": "NEWS_SENTYMENT (AdapterNewsLLM — wpięty w zbuduj_bojowy W-301; "
+               "ożywa z RSS fetcher lub DEEPSEEK_API_KEY; bez feedu: abstynuje)",
+    "X-28":   "MTF_4H_RSI_14/MTF_1D_RSI_14 (Budowniczy MTF — ożywa gdy bary mają "
+              "pole 'interwal' i odpowiedni TF; bez niego abstynuje per Prawo XV)",
+    "Z-06":   "AMIHUD_20 wysoki (krucha płynność) — scenariusze audytu są płynne "
+              "(duży obrót); ożywa przy cienkiej księdze (W-322)",
+    "Z-07":   "PI_CYCLE wymaga ≥350 barów — scenariusze audytu mają 260; "
+              "ożywa na pełnej historii 1D (W-322, kill-switch szczytu)",
 }
 
 # Dowód allowlisty (Prawo I — bez zaufania na słowo): każdy neuron adapterowy
@@ -505,6 +522,12 @@ WERYFIKACJA_ADAPTEROW = {
     "RADAR-02": {"BTC_DOMINANCJA": -0.9},                                 # alt-season → LONG-wsparcie
     "RADAR-03": {"PRZEPLYW_KAPITALU": 0.95},                              # napływ → LONG-wsparcie
     "NEWS-01": {"NEWS_SENTYMENT": 0.8, "NEWS_PEWNOSC": 0.9, "NEWS_N": 5},  # mocno bycze → LONG
+    "X-28":   {"CLOSE": 50000.0, "RSI_14": 60.0, "EMA_21": 49000.0,
+               "MTF_4H_RSI_14": 65.0, "MTF_4H_EMA_50": 47000.0,
+               "MTF_1D_RSI_14": 58.0, "MTF_1D_EMA_50": 46000.0},  # 3/3 TF LONG → LONG
+    "Z-06":   {"AMIHUD_20": 5.0},                                 # krucha płynność → pewnosc_przeciwnika
+    "Z-07":   {"PI_111": 105.0, "PI_350X2": 100.0,
+               "PI_111_PREV": 98.0, "PI_350X2_PREV": 100.0},      # cross od dołu → SHORT
 }
 
 

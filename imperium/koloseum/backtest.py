@@ -31,6 +31,8 @@ from imperium.akwedukty.czytnik_csv import wczytaj_csv
 from imperium.koloseum.dyrygent import Dyrygent
 from imperium.koloseum.namiestnik import get_namiestnik
 from imperium.koloseum.paper_trading import PaperTradingEngine, BarData
+from imperium.koloseum.skaner_okazji import SkanerOkazji
+from imperium.pretorianie.sizing_przekonania import SizingPrzekonania
 from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara, BezpiecznikKrzywejKapitalu
 
 logger = logging.getLogger("Backtest")
@@ -225,6 +227,38 @@ def backtest_portfel(
     dd_halt: float = 0.13,
     bary_per: "Optional[Dict[str, List[Dict[str, Any]]]]" = None,
     wagi: "Optional[Dict[str, float]]" = None,
+    # W-299 Synapsy Reżimowe — opt-in, domyślnie False (zero kosztu na backteście
+    # gdzie nowy model ma mało historii). True → każdy symbol uczy własny graf par.
+    synapsy_rezimowe: bool = False,
+    # W-303 HedgeMWU — online multiplicative weights update (W-049). True → Legatus
+    # każdego symbolu ma własny MWU uczący wagi neuronów strumieniowo po trade'cie.
+    mwu_learning: bool = False,
+    # W-307 Igrzyska — batch ranking (accuracy/stability/ranga). True → per-symbol
+    # kumulatywne statystyki neuronów. Gdy oba mwu+igrzyska: mnożniki łączone (×).
+    igrzyska_learning: bool = False,
+    # W-309 KsięgaWad — prewencyjny filtr wad setupu (rezim/interwal). True → per-symbol
+    # księga uczy się z zamknięć i ostrzega/wetuje powtarzalnie stratne setupy.
+    ksiega_wad: bool = False,
+    # W-314 Filtr Asymetrii Reżimu — weto na rynku bocznym (ADX niski) i dla słabych
+    # wejść kontr-trendowych. Czysty OHLCV (CLOSE/EMA_200/ADX_14). True → per-symbol.
+    filtr_asymetrii: bool = False,
+    # W-317 TRYB NAJLEPSZE — Skaner Okazji jako brama selekcji: zamiast „każda para
+    # gra", w każdym tyku rankujemy koszyk i wpuszczamy do wejścia TYLKO TOP-N
+    # najmocniejszych okazji. Exity działają niezależnie. Domyślnie OFF (zero regresji).
+    tryb_skaner: bool = False,
+    skaner_top_n: int = 3,
+    skaner_min_adx: float = 20.0,
+    # W-318 Sizing Przekonania — w trybie skanera mnoży budżet pozycji przez siłę
+    # okazji (mocniejsza okazja = większa stawka). Bez tego sama selekcja przycina
+    # gruby ogon. Domyślnie OFF.
+    sizing_przekonania: bool = False,
+    # W-319 Compounding (pula łupów) — budżet sizingu liczony od BIEŻĄCEGO equity,
+    # nie od kapitału startowego. Zysk reinwestowany w większe pozycje (wzrost
+    # geometryczny). Domyślnie OFF (stały sizing = liniowy wzrost, łatwiejsza ocena edge).
+    compounding: bool = False,
+    # W-323 Profil Stylu — gdy podany (SCALP/SWING/INVEST), każdy Legatus dostaje
+    # DEDYKOWANY zestaw neuronów (neurony_dla_trybu), nie pełne 70. None = pełny rój.
+    styl: "Optional[str]" = None,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -299,16 +333,32 @@ def backtest_portfel(
 
     dyrygenci = {}
     for sym in bary_per:
-        legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
+        legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True, styl=styl)
         d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
                      budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
-                     namiestnik=namiestnik, breaker_krzywej=False)  # breaker wspólny
+                     namiestnik=namiestnik, breaker_krzywej=False,  # breaker wspólny
+                     filtr_asymetrii=filtr_asymetrii)
         d.kapital_sizing = kapital_startowy * wagi_akt[sym]
         # 🗡️ PRAEDA (W-291): tryb łupieżczy — auto-skalowana agresja w POTWIERDZONYCH
         # okazjach (confluence). Aktywny tylko gdy DD normalny (bezpieczeństwo > chciwość).
         if tryb_lupiezcy:
             from imperium.pretorianie.praeda import Okazjon
             d.okazjon = Okazjon()
+        # W-299 Synapsy Reżimowe: per-symbol graf koalicji par neuronów warunkowany
+        # reżimem × dekorelacja. Uczy się przez cały backtest — para dobrych duetów
+        # w TREND_STRONG kumuluje synaps, pary która systematycznie mylą = redukcja.
+        if synapsy_rezimowe:
+            from imperium.biblioteki.synapsy_rezimowe import SynapsyRezimowe
+            d.legatus.synapsy = SynapsyRezimowe()
+        if mwu_learning:
+            from imperium.biblioteki.hedge_mwu import HedgeMWU
+            d.legatus.mwu = HedgeMWU()
+        if igrzyska_learning:
+            from imperium.biblioteki.igrzyska import Igrzyska as _Igrzyska
+            d._igrzyska = _Igrzyska()
+        if ksiega_wad:
+            from imperium.cesarz.ksiega_wad import KsiegaWad as _KsiegaWad
+            d.ksiega_wad = _KsiegaWad()
         dyrygenci[sym] = d
 
     # Chronologiczna oś: (timestamp, symbol, indeks_baru) — tylko bary po oknie.
@@ -323,6 +373,12 @@ def backtest_portfel(
     # (√365 zakłada 1 punkt/dzień). Prawo I — uczciwy współczynnik czasu.
     _DZ = 86_400_000
     equity_dnia: "Dict[int, float]" = {}
+
+    # W-317 TRYB NAJLEPSZE: skaner okazji + cache snapshotów wskaźników per symbol.
+    # Snapshot symbolu aktualizujemy tylko na JEGO tyku (świeży bar) → ranking O(N)/tyk.
+    skaner = SkanerOkazji(min_adx=skaner_min_adx) if tryb_skaner else None
+    sizer = SizingPrzekonania() if (tryb_skaner and sizing_przekonania) else None
+    snapshot_per: "Dict[str, Dict[str, Any]]" = {}
     for ts, sym, i in os_czasu:
         bary = bary_per[sym]
         engine.przetworz_bar(_bar_data(bary[i]))
@@ -331,9 +387,10 @@ def backtest_portfel(
         frakcja_breaker = 1.0
         if breaker is not None:
             breaker.aktualizuj(eq)
-            if breaker.halt:
-                continue   # blokada nowych wejść (świadoma cisza, Prawo XV)
             frakcja_breaker = breaker.frakcja_pozycji()
+            # W-313: HALT nie blokuje totalnie — frakcja_halt (0.1×) zapobiega deadlockowi
+            if frakcja_breaker <= 0.0:
+                continue
         # PRAEDA: chciwość dozwolona TYLKO gdy bezpiecznik w stanie NORMAL (DD < próg).
         if tryb_lupiezcy:
             dyrygenci[sym].praeda_dd_normal = (breaker is None or breaker.stan == "NORMAL")
@@ -372,10 +429,32 @@ def backtest_portfel(
                 risk_off, _ = rezim_risk_off(stan)
                 if risk_off:
                     continue   # świadoma cisza (Prawo XV) — nie wchodzimy w lawinę
-        # Sizing par: równy budżet × frakcja DD-control × ster korelacyjny (świeżo co tyk).
-        dyrygenci[sym].kapital_sizing = (kapital_startowy * wagi_akt[sym]
-                                         * frakcja_breaker * frakcja_stres)
         okno_barow = bary[i - okno: i + 1]
+
+        # W-317 TRYB NAJLEPSZE: zaktualizuj snapshot tego symbolu i sprawdź, czy jest
+        # w TOP-N okazji koszyka. Jeśli NIE — brak nowego wejścia (exity już zrobione
+        # w przetworz_bar). To zmienia system z „N botów" w „łowcę najlepszych okazji".
+        conviction_mult = 1.0
+        if skaner is not None:
+            snapshot_per[sym] = budowniczy.zbuduj(okno_barow)
+            ranking = skaner.skanuj(snapshot_per)
+            top = ranking[:skaner_top_n]
+            if sym not in {o.symbol for o in top}:
+                continue   # nie w TOP-N → nie polujemy na tę okazję teraz
+            # W-318: większa stawka na mocniejszej okazji (przekonanie = score znormalizowany
+            # min-max w całym rankingu koszyka w tym tyku). Bez tego selekcja przycina ogon.
+            if sizer is not None and len(ranking) >= 2:
+                scores = [o.score for o in ranking]
+                smin, smax = min(scores), max(scores)
+                this = next(o.score for o in top if o.symbol == sym)
+                conv = (this - smin) / (smax - smin) if smax > smin else 1.0
+                conviction_mult = sizer.mnoznik(conv)
+
+        # Sizing par: budżet × frakcja DD-control × ster korelacyjny × przekonanie.
+        # W-319 compounding: baza = bieżące equity (pula łupów) zamiast kapitału startowego.
+        baza_kapitalu = engine.kapital_calkowity if compounding else kapital_startowy
+        dyrygenci[sym].kapital_sizing = (baza_kapitalu * wagi_akt[sym]
+                                         * frakcja_breaker * frakcja_stres * conviction_mult)
         dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
 
     # Domknij otwarte po ostatniej cenie każdej pary
@@ -384,6 +463,27 @@ def backtest_portfel(
     if os_czasu:
         equity_dnia[os_czasu[-1][0] // _DZ] = engine.kapital_calkowity
     engine.krzywa_equity = [equity_dnia[d] for d in sorted(equity_dnia)]
+
+    # W-323c SCOREBOARD KONTRYBUCJI — scal Igrzyska wszystkich par w jeden ranking
+    # neuronów (accuracy/stability/wynik) i dołącz do silnika. Mierzona baza do
+    # strojenia NEURONY_STYLU danymi, nie intuicją (Prawo I). Opt-in: igrzyska_learning.
+    if igrzyska_learning:
+        from imperium.biblioteki.igrzyska import Igrzyska as _Igrzyska, StatystykaNeuronu as _Stat
+        scalone = _Igrzyska()
+        _POLA = ("tp", "fp", "long_trafne", "long_total", "short_trafne",
+                 "short_total", "flipy", "sygnaly", "contribution_sum",
+                 "timeliness_sum", "contribution_n")
+        for d in dyrygenci.values():
+            ig = getattr(d, "_igrzyska", None)
+            if ig is None:
+                continue
+            for klucz, st in ig.statystyki.items():
+                if klucz not in scalone.statystyki:
+                    scalone.statystyki[klucz] = _Stat(klucz=klucz)
+                tgt = scalone.statystyki[klucz]
+                for pole in _POLA:
+                    setattr(tgt, pole, getattr(tgt, pole) + getattr(st, pole))
+        engine.ranking_neuronow = scalone.ranking()
     return engine
 
 

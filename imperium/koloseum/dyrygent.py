@@ -54,6 +54,7 @@ from imperium.pretorianie.kalkulator_lewara import (
     KalkulatorLewara, PlanPozycji, BezpiecznikKrzywejKapitalu,
     RegulaSzesciuProcentEldera,
 )
+from imperium.pretorianie.filtr_asymetrii import FiltrAsymetriiRezimu
 
 logger = logging.getLogger("Dyrygent")
 
@@ -92,6 +93,9 @@ class Dyrygent:
         regula_6pct: bool = False,
         min_pewnosc_interwalu: Optional[Dict[str, float]] = None,
         sl_atr_mult: Optional[float] = None,
+        drift_adapter: Optional[Any] = None,
+        rada_doradcow: Optional[Any] = None,
+        filtr_asymetrii: bool = False,
     ) -> None:
         self.legatus = legatus
         self.kalkulator = kalkulator
@@ -110,12 +114,44 @@ class Dyrygent:
         # momentach. None = wyłączony. praeda_dd_normal ustawia portfel/breaker.
         self.okazjon = None
         self.praeda_dd_normal: bool = True
+        # W-296 DriftAdapter: antycypacyjna korekta WAGI_REZIMU przed zmianą reżimu.
+        # None = wyłączony. Podpięty = dodaje reżim co bar i koryguje wagi Legatusa.
+        self.drift_adapter = drift_adapter
+        # W-299 Synapsy Reżimowe: graf par neuronów per-reżim × dekorelacja.
+        # Przekazywany do legatus.synapsy. Dyrygent wykrywa nowe zamknięcia i wywołuje
+        # aktualizuj() — zamknięta pętla uczenia koalicji bez ingerencji z zewnątrz.
+        self._synapsy_pending: Dict[str, tuple] = {}  # pozycja_id → (sygnaly, rezim, kier)
+        self._synapsy_ostatni_idx: int = 0     # ile zamknięć już przetworzyliśmy
+        # W-305: kolektor korelacji par neuronów — domyka dekorelację SynapsyRezimowych
+        # (Prawo XVI). Tworzony leniwie gdy legatus.synapsy aktywny. None = bez korelacji.
+        self._kolektor_korelacji: Optional[Any] = None
+        # W-307 Igrzyska: batch-style ranking neuronów z wyników trade'ów (W-002).
+        # Komplementarne do online HedgeMWU — kumulatywne statystyki (accuracy/stability)
+        # zamiast eksponencjalnego zapomnienia. None = wyłączone (domyślnie, opt-in).
+        self._igrzyska: Optional[Any] = None
+        # W-302 PamięćRefleksyjna: cross-session dziennik lekcji. Gdy podana:
+        # każde zamknięcie pozycji → lekcja w JSONL (symbol, rezim, interwal, pnl).
+        # None = wyłączona (domyślnie — zero kosztu, opt-in).
+        self._pamiec: Optional[Any] = None
+        # Rada Doradców: 5-osobowe kolegium (Oracle/Fulmen/Iustitia/Hermes/Pythia).
+        # None = wyłączona. Gdy aktywna: sprawdza plan po Kalkulatorze, może zawetować
+        # lub zredukować rozmiar pozycji (OpinaRady.modyfikator_pozycji).
+        self.rada_doradcow = rada_doradcow
+        # W-309 KsięgaWad: prewencyjny filtr powtarzalnych wad setupów (rezim/interwal).
+        # Uczy się online z zamknięć (jak synapsy/mwu), sprawdza przed wejściem.
+        # None = wyłączona (domyślnie — opt-in, Prawo XV: zero zmiany zachowania).
+        self.ksiega_wad: Optional[Any] = None
         # W-290 portfel: budżet sizingu pary (None = pełny wolny kapitał silnika).
         # W koszyku N par każdy Dyrygent sizinguje wg kapital/N (równe wagi).
         self.kapital_sizing: Optional[float] = None
         # Opcja A: StanRynku z RadarRynku — przekazywany do Namiestnika i Klucznika
         # (radar-aware gating + strategy selection). None = tryb bez radaru.
         self.stan_rynku: Optional[Any] = None
+        # W-300: RadarRynku wpięty w sloty kontekstu. odswiez_kontekst_rynku() woła
+        # skanuj() i wypełnia kontekst_dodatkowy (BTC_TREND/DOMINACJA/PRZEPLYW →
+        # wskazniki → RADAR-01/02/03) oraz stan_rynku (→ Namiestnik). Bez tego
+        # wywołania trzy neurony RADAR abstynowały na zawsze (Prawo XV — martwy głos).
+        self._radar_rynku: Optional[Any] = None
         # Adaptery danych (Faza B) — dolewają do wskaźników dane spoza OHLCV
         # (funding, OI, long/short, sentyment) po Budowniczym. Pusta lista = tryb
         # czysty OHLCV (np. backtest z CSV — neurony R abstynują, Prawo XV).
@@ -139,18 +175,39 @@ class Dyrygent:
         self.regula_6pct: Optional[RegulaSzesciuProcentEldera] = (
             RegulaSzesciuProcentEldera() if regula_6pct else None
         )
+        # W-314 Filtr Asymetrii Reżimu: podnosi próg pewności w rynku bocznym
+        # (ADX niski) i dla wejść kontr-trendowych. None = wyłączony (opt-in).
+        self.filtr_asymetrii: Optional[FiltrAsymetriiRezimu] = (
+            FiltrAsymetriiRezimu() if filtr_asymetrii else None
+        )
 
     # ── Fabryka pełnego składu (produkcyjna — wymaga TA-Lib) ─────────────────
     @classmethod
     def zbuduj(cls, kapital_startowy: float = 10_000.0, sesja_id: str = "",
                min_neuronow: int = 5, min_przewaga: float = 0.55,
                min_pewnosc: float = 0.55, log_dir=None, tryb: str = "agregat",
-               adaptery_live: bool = True) -> "Dyrygent":
+               adaptery_live: bool = True,
+               drift: bool = False, rada: bool = False,
+               synapsy: bool = False, mwu: bool = False,
+               igrzyska: bool = False, ksiega_wad: bool = False,
+               filtr_asymetrii: bool = False) -> "Dyrygent":
         """Składa Dyrygenta z pełnym rojem, Budowniczym (TA-Lib) i silnikiem paper.
 
         adaptery_live: gdy True (domyślnie), wpina publiczne adaptery futures+sentyment
             (Binance fapi + alternative.me, bez klucza) → kategoria R głosuje realnymi
             danymi. Ustaw False dla czystego backtestu OHLCV z CSV (neurony R abstynują).
+
+        Warstwy adaptacyjne (Prawo XV — domyślnie OFF, opt-in; produkcja je odblokowuje):
+            drift:    W-296 DriftAdapter — antycypacyjna korekta WAGI_REZIMU.
+            rada:     Rada Doradców (5) — weto/redukcja pozycji przed wejściem.
+            synapsy:  W-299 SynapsyRezimowe — graf koalicji par neuronów (Legatus).
+            mwu:      W-303 HedgeMWU — online wagi neuronów po każdym trade'cie (Legatus).
+            igrzyska: W-307 Igrzyska — batch ranking neuronów (accuracy/stability/ranga).
+                      Komplementarne do mwu: kumulatywne vs eksponencjalne zapomnienie.
+                      Gdy oba aktywne: mnożniki mnożone (MWU × ranga Igrzysk).
+            ksiega_wad: W-309 KsięgaWad — prewencyjny filtr wad setupu (rezim/interwal);
+                      uczy się z zamknięć, ostrzega/wetuje powtarzalnie stratne setupy.
+        Domyślnie wszystkie False → zachowanie identyczne jak wcześniej (zero zmian).
         """
         from imperium.legiony.rejestr import zbuduj_legatusa
         from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
@@ -162,11 +219,39 @@ class Dyrygent:
                                     sesja_id=sesja_id, log_dir=log_dir)
         adaptery = []
         if adaptery_live:
-            from imperium.akwedukty.adaptery import AdapterFutures, AdapterFearGreed, AdapterCVD
-            adaptery = [AdapterFutures(), AdapterFearGreed(), AdapterCVD()]
-        return cls(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
-                   budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
-                   namiestnik=get_namiestnik(), adaptery=adaptery)
+            from imperium.akwedukty.adaptery import (AdapterFutures, AdapterFearGreed,
+                                                     AdapterCVD, AdapterNewsLLM)
+            # AdapterNewsLLM z uzyj_llm=True (DeepSeek gdy klucz; fallback słownikowy
+            # gdy brak klucza; milczy gdy brak RSS fetcher — Prawo XV, bez halucynacji).
+            adaptery = [AdapterFutures(), AdapterFearGreed(), AdapterCVD(), AdapterNewsLLM()]
+
+        drift_adapter = None
+        if drift:
+            from imperium.koloseum.drift_adapter import DriftAdapter
+            drift_adapter = DriftAdapter()
+        rada_doradcow = None
+        if rada:
+            from imperium.cesarz.doradcy.rada import RadaDoradcow
+            rada_doradcow = RadaDoradcow()
+
+        dyrygent = cls(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
+                       budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
+                       namiestnik=get_namiestnik(), adaptery=adaptery,
+                       drift_adapter=drift_adapter, rada_doradcow=rada_doradcow,
+                       filtr_asymetrii=filtr_asymetrii)
+        if synapsy:
+            from imperium.biblioteki.synapsy_rezimowe import SynapsyRezimowe
+            legatus.synapsy = SynapsyRezimowe()
+        if mwu:
+            from imperium.biblioteki.hedge_mwu import HedgeMWU
+            legatus.mwu = HedgeMWU()
+        if igrzyska:
+            from imperium.biblioteki.igrzyska import Igrzyska as _Igrzyska
+            dyrygent._igrzyska = _Igrzyska()
+        if ksiega_wad:
+            from imperium.cesarz.ksiega_wad import KsiegaWad
+            dyrygent.ksiega_wad = KsiegaWad()
+        return dyrygent
 
     # ── Jeden cykl decyzyjny ─────────────────────────────────────────────────
     def cykl(self, symbol: str, bary: List[Dict[str, Any]],
@@ -175,6 +260,12 @@ class Dyrygent:
         Przeprowadza pełny łańcuch dla jednego symbolu i okna barów.
         Zwraca DecyzjaCyklu z przejrzystym śladem każdego etapu.
         """
+        # 0. W-299 Synapsy Reżimowe — uczenie z nowo zamkniętych pozycji.
+        # Sprawdzamy historia_zamkniec od ostatniego przetworzonego indeksu.
+        if (self.legatus.synapsy is not None or self.legatus.mwu is not None
+                or self._igrzyska is not None or self.ksiega_wad is not None):
+            self._aktualizuj_synapsy()
+
         # 1. Wskaźniki (Prawo I — Brama/Budowniczy liczą, nie Dyrygent)
         wskazniki = self._wskazniki(bary, symbol)
         if not wskazniki:
@@ -190,6 +281,18 @@ class Dyrygent:
         if rezim == "AUTO":
             from imperium.legiony.legatus import klasyfikuj_rezim
             rezim = klasyfikuj_rezim(wskazniki)
+
+        # 1c. W-296 DriftAdapter — antycypacyjna korekta WAGI_REZIMU.
+        # Rejestruje reżim w historii, oblicza sygnał dryfu; gdy dryfuje, pre-przesuwa
+        # wagi kategorii ZANIM reżim oficjalnie się zmieni (mniej strat na przejściach).
+        if self.drift_adapter is not None:
+            self.drift_adapter.dodaj_rezim(rezim)
+            _sygnal_dryfu = self.drift_adapter.skanuj()
+            if _sygnal_dryfu.czy_drift:
+                from imperium.legiony.legatus import WAGI_REZIMU
+                self.legatus.ustaw_wagi_rezimu(
+                    self.drift_adapter.koryguj_wagi(WAGI_REZIMU, rezim, _sygnal_dryfu)
+                )
 
         # Interwał z danych — sterownik warstwy stylu (SCALP/SWING/INVEST).
         interwal = bary[-1].get("interwal", "") if bary else ""
@@ -214,7 +317,21 @@ class Dyrygent:
 
         # 3. Legatus — agregacja roju (Opcja A: przekaż StanRynku → radar scoring strategii)
         self.legatus.stan_rynku = self.stan_rynku
+        # W-305: zasil SynapsyRezimowe korelacją par neuronów z PRZESZŁYCH barów
+        # (bez lookahead — bieżący głos rejestrujemy dopiero po fokus()). Domyka
+        # dekorelację Prawa XVI: pary niezależne wzmacniane mocniej niż skorelowane.
+        if self.legatus.synapsy is not None and self._kolektor_korelacji is not None:
+            self.legatus.synapsy.ustaw_korelacje(self._kolektor_korelacji.korelacje())
         raport = self.legatus.fokus(symbol, wskazniki, rezim=rezim, bary=bary)
+        # Zarejestruj bieżący wektor głosów neuronów do kolektora korelacji (po decyzji).
+        if self.legatus.synapsy is not None and raport.sygnaly:
+            if self._kolektor_korelacji is None:
+                from imperium.legiony.diagnostyka_korelacji import KolektorKorelacjiNeuronow
+                self._kolektor_korelacji = KolektorKorelacjiNeuronow()
+            self._kolektor_korelacji.zarejestruj(raport.sygnaly)
+        # Reset override WAGI_REZIMU — każdy cykl startuje z czystym stanem.
+        if self.drift_adapter is not None:
+            self.legatus.resetuj_wagi_rezimu()
 
         if raport.weto:
             return DecyzjaCyklu(symbol, "LEGATUS_WETO", False,
@@ -262,6 +379,16 @@ class Dyrygent:
             # pewność = średnia dopasowania strategii i pewności neuronów (gdy zgodne — wzmocnienie)
             zgoda = 1.0 if top_strat.kierunek == raport.kierunek else 0.6
             pewnosc = round(min(1.0, (top_strat.wynik + raport.pewnosc_agregatu) / 2 * zgoda), 4)
+
+        # 3a. Filtr Asymetrii Reżimu (W-314): weto na rynku bocznym (ADX niski) i
+        #     dla słabych wejść kontr-trendowych. Czysty OHLCV (CLOSE/EMA_200/ADX_14).
+        if self.filtr_asymetrii is not None:
+            wa = self.filtr_asymetrii.ocen(kierunek, pewnosc, wskazniki)
+            if not wa.dozwolone:
+                return DecyzjaCyklu(symbol, "ASYMETRIA_WETO", False, kierunek=kierunek,
+                                    pewnosc=pewnosc, rezim=raport.rezim,
+                                    powod=f"Filtr Asymetrii Reżimu: {wa.powod}",
+                                    raport=raport)
 
         # 3. Pretorianie — matematyka przeżycia (SL/TP/dźwignia/rozmiar)
         cena_wejscia = wskazniki.get("CLOSE") or (bary[-1].get("close") if bary else 0.0)
@@ -328,6 +455,44 @@ class Dyrygent:
                                 powod=f"weto Pretorianów: {plan.powod_veto}",
                                 raport=raport, plan=plan)
 
+        # 4b. Rada Doradców — kolegium pięciorga (Oracle/Fulmen/Iustitia/Hermes/Pythia).
+        # Weto Rady (< 3/5 lub IUSTITIA BLOKADA) = brak wejścia. 3-4/5 = redukcja pozycji.
+        if self.rada_doradcow is not None:
+            opinia = self._opinia_rady(wskazniki, raport, plan, kierunek, interwal, rezim)
+            if opinia.blokada:
+                return DecyzjaCyklu(symbol, "RADA_WETO", False, kierunek=kierunek,
+                                    pewnosc=pewnosc, rezim=raport.rezim,
+                                    powod=f"Rada Doradców weto: {opinia.powod_blokady}",
+                                    raport=raport, plan=plan)
+            if opinia.modyfikator_pozycji < 1.0:
+                plan = self.kalkulator.policz(
+                    symbol=symbol, kierunek=kierunek, cena_wejscia=cena_wejscia,
+                    dzwignia=plan.dzwignia,
+                    mnoznik_rozmiaru=mnoznik_rozmiaru * opinia.modyfikator_pozycji,
+                    kapital_usdt=(self.kapital_sizing if self.kapital_sizing is not None
+                                  else self.engine.kapital),
+                    pewnosc=pewnosc, rezim=raport.rezim,
+                    breaker_krzywej=self.breaker_krzywej, regula_6pct=self.regula_6pct,
+                    atr=wskazniki.get("ATR_14") if self.sl_atr_mult else None,
+                    sl_atr_mult=self.sl_atr_mult,
+                )
+                if not plan.checklist_ok:
+                    return DecyzjaCyklu(symbol, "PRETORIANIE_WETO", False, kierunek=kierunek,
+                                        pewnosc=pewnosc, rezim=raport.rezim,
+                                        powod=f"weto Pretorianów po redukcji Rady: {plan.powod_veto}",
+                                        raport=raport, plan=plan)
+
+        # 4c. KsięgaWad — prewencyjny filtr powtarzalnych wad setupu (W-309).
+        # Sprawdza sygnaturę rezim/interwal: WETO = blokada, OSTRZEŻENIE = przepuszcza
+        # (zapisane w powodach). Default OFF (ksiega_wad=None) → ten blok nieaktywny.
+        if self.ksiega_wad is not None:
+            werdykt = self.ksiega_wad.sprawdz(raport.rezim, interwal)
+            if werdykt.blokada:
+                return DecyzjaCyklu(symbol, "KSIEGA_WAD_WETO", False, kierunek=kierunek,
+                                    pewnosc=pewnosc, rezim=raport.rezim,
+                                    powod=f"KsięgaWad weto: {werdykt.powod}",
+                                    raport=raport, plan=plan)
+
         # 4. Sygnał wejścia → silnik paper trading
         powody = f"{raport.zgodnych_neuronow}/{raport.aktywnych_neuronow} neuronów zgodnych"
         if top_strat is not None:
@@ -356,11 +521,218 @@ class Dyrygent:
                                 powod="silnik odrzucił (limit pozycji / brak kapitału / duplikat)",
                                 raport=raport, plan=plan, sygnal=sygnal)
 
+        # W-299/303/309: zapamiętaj sygnały tej pozycji dla warstw uczących się
+        # z zamknięć (Synapsy/MWU/Igrzyska/KsięgaWad). 4. element = interwał (W-309).
+        if (self.legatus.synapsy is not None or self.legatus.mwu is not None
+                or self._igrzyska is not None or self.ksiega_wad is not None) and raport.sygnaly:
+            self._synapsy_pending[pozycja.pozycja_id] = (
+                list(raport.sygnaly), raport.rezim, kierunek, interwal
+            )
+
         return DecyzjaCyklu(symbol, "WEJSCIE", True, kierunek=kierunek,
                             pewnosc=pewnosc, rezim=raport.rezim,
                             powod=f"pozycja otwarta: {pozycja.pozycja_id}",
                             raport=raport, plan=plan, sygnal=sygnal,
                             pozycja_id=pozycja.pozycja_id)
+
+    def _aktualizuj_synapsy(self) -> None:
+        """
+        W-299/302/303/307: wykrywa nowo zamknięte pozycje, aktualizuje SynapsyRezimowe,
+        HedgeMWU (online wagi neuronów), Igrzyska (batch ranking) i PamięćRefleksyjną.
+        Wywołaj na początku każdego cyklu zanim Legatus.fokus().
+        """
+        synapsy = self.legatus.synapsy
+        mwu = self.legatus.mwu
+        igrzyska = self._igrzyska
+        hist = self.engine.historia_zamkniec
+        nowe = hist[self._synapsy_ostatni_idx:]
+        self._synapsy_ostatni_idx = len(hist)
+
+        for wynik in nowe:
+            pid = wynik.pozycja_id
+            pending = self._synapsy_pending.get(pid)
+
+            # W-299: Synapsy Reżimowe — aktualizuj koalicje par neuronów.
+            if synapsy is not None and pending is not None:
+                sygnaly, rezim_wej, kierunek, _interwal = pending
+                synapsy.aktualizuj(
+                    sygnaly=sygnaly,
+                    kierunek_decyzji=kierunek,
+                    pnl_pct=wynik.pnl_pct,
+                    rezim=rezim_wej,
+                )
+
+            # W-303: HedgeMWU — uaktualnij wagi neuronów z wyniku trade'u.
+            # Każdy neuron który głosował dostaje stratę: 0 (trafił) lub 1 (pomylił).
+            # Trade na zero (pnl_pct == 0) jest neutralny — nie karze ani nie nagradza
+            # (spójne z SynapsyRezimowe: pnl_sign=0 → zero delty; Prawo XV/XVI).
+            if mwu is not None and pending is not None and wynik.pnl_pct != 0:
+                sygnaly, _rezim, kierunek, _interwal = pending
+                zyskowny = kierunek if wynik.pnl_pct > 0 else (
+                    "SHORT" if kierunek == "LONG" else "LONG"
+                )
+                for s in sygnaly:
+                    mwu.zarejestruj_wynik(s.neuron_id, s.kierunek, zyskowny)
+
+            # W-307: Igrzyska — zarejestruj wynik dla rankingu kumulatywnego.
+            # Break-even (pnl_pct == 0) pominięty — brak sygnału kierunkowego.
+            if igrzyska is not None and pending is not None and wynik.pnl_pct != 0:
+                sygnaly, _rezim, kierunek, _interwal = pending
+                zyskowny = kierunek if wynik.pnl_pct > 0 else (
+                    "SHORT" if kierunek == "LONG" else "LONG"
+                )
+                for s in sygnaly:
+                    igrzyska.zarejestruj_wynik(s.neuron_id, s.kierunek, zyskowny)
+
+            # W-309: KsięgaWad — ucz sygnaturę setupu (rezim/interwal) wynikiem trade'u.
+            # Uczy się z KAŻDEGO zamknięcia (też break-even — liczy próbę, nie stratę).
+            # rezim/interwal z pending (stan wejścia), fallback gdy pending zgubione.
+            if self.ksiega_wad is not None:
+                rezim_kw = pending[1] if pending else (
+                    getattr(wynik, "rezim", None) or "NORMAL"
+                )
+                interwal_kw = pending[3] if pending else getattr(wynik, "interwal", "")
+                self.ksiega_wad.zarejestruj(rezim_kw, interwal_kw, wynik.pnl_pct)
+
+            # W-302: PamięćRefleksyjna — lekcja per zamknięcie (cross-session learning).
+            if self._pamiec is not None:
+                try:
+                    rezim_zam = getattr(wynik, "rezim", None) or (
+                        pending[1] if pending else "NORMAL"
+                    )
+                    interwal_zam = getattr(wynik, "interwal", "")
+                    self._pamiec.zapisz_wynik(
+                        pnl_lista=[wynik.pnl_pct],
+                        rezim=rezim_zam,
+                        interwal=interwal_zam,
+                        kontekst={
+                            "symbol": getattr(wynik, "symbol", ""),
+                            "kierunek": getattr(wynik, "kierunek", ""),
+                            "pozycja_id": pid,
+                        },
+                    )
+                except Exception:
+                    pass  # PamięćRefleksyjna nigdy nie blokuje cyklu
+
+            if pending is not None:
+                self._synapsy_pending.pop(pid, None)
+
+        # W-303/307: po przetworzeniu nowych zamknięć — odśwież mnożniki Legatusa.
+        # Gdy oba aktywne: MWU × ranga Igrzysk (komplementarne informacje — Prawo XVI).
+        if (mwu is not None or igrzyska is not None) and nowe:
+            wagi_mwu = mwu.mnozniki() if mwu is not None else {}
+            wagi_igr = igrzyska.nowe_wagi() if igrzyska is not None else {}
+            all_keys = set(wagi_mwu) | set(wagi_igr)
+            combined = {k: wagi_mwu.get(k, 1.0) * wagi_igr.get(k, 1.0)
+                        for k in all_keys}
+            self.legatus.ustaw_mnozniki_neuronow(combined)
+
+    def raport_korelacji_neuronow(self, prog_redundancji: float = 0.80,
+                                  prog_dywersyfikacji: float = 0.20) -> Optional[Dict[str, Any]]:
+        """
+        W-306: raport dekorelacji par neuronów (Prawo XVI) z kolektora zebranego
+        podczas cykli. None gdy synapsy wyłączone lub brak zebranych głosów.
+        Cezar woła po backteście/sesji: które pary są nadmiarowe vs filary siły.
+        """
+        if self._kolektor_korelacji is None:
+            return None
+        from imperium.legiony.diagnostyka_korelacji import raport_z_kolektora
+        return raport_z_kolektora(self._kolektor_korelacji,
+                                  prog_redundancji=prog_redundancji,
+                                  prog_dywersyfikacji=prog_dywersyfikacji)
+
+    def raport_igrzysk(self, top_n: int = 10) -> Optional[Dict[str, Any]]:
+        """
+        W-307: raport rankingu neuronów z Igrzysk (accuracy/stability/ranga).
+        None gdy igrzyska wyłączone lub brak zarejestrowanych trade'ów.
+        """
+        if self._igrzyska is None:
+            return None
+        ranking = self._igrzyska.ranking()
+        if not ranking:
+            return None
+        return {
+            "ranking": ranking[:top_n],
+            "zloty_helm": self._igrzyska.zloty_helm(),
+            "lista_infamii": [
+                {"klucz": w.klucz, "wynik": w.wynik, "powod": w.powod}
+                for w in self._igrzyska.lista_infamii()
+            ],
+            "liczba_neuronow": len(ranking),
+        }
+
+    def raport_monte_carlo(self, n_symulacji: int = 1000,
+                           seed: Optional[int] = 42) -> Optional[Dict[str, Any]]:
+        """
+        W-308: walidacja Monte Carlo zamkniętych trade'ów (Prawo XV — odzysk potencjału).
+        Wywołaj po backteście: raport = dyrygent.raport_monte_carlo().
+        None gdy < 10 zamkniętych pozycji (za mało do MC).
+        """
+        from imperium.koloseum.monte_carlo import waliduj_mc
+        mc = waliduj_mc(self.engine, n_symulacji=n_symulacji, seed=seed)
+        if mc.n_transakcji < 10:
+            return None
+        return {
+            "ok": mc.ok,
+            "powod": mc.powod,
+            "n_transakcji": mc.n_transakcji,
+            "shuffle": {
+                "sharpe_mediana": mc.shuffle.sharpe_mediana,
+                "sharpe_p5": mc.shuffle.sharpe_p5,
+                "sharpe_p95": mc.shuffle.sharpe_p95,
+                "maxdd_p95": mc.shuffle.maxdd_p95,
+                "p_sharpe_dodatni": mc.shuffle.p_sharpe_dodatni,
+                "ok": mc.shuffle.ok,
+            },
+            "bootstrap": {
+                "sharpe_mediana": mc.bootstrap.sharpe_mediana,
+                "sharpe_p5": mc.bootstrap.sharpe_p5,
+                "sharpe_p95": mc.bootstrap.sharpe_p95,
+                "maxdd_p95": mc.bootstrap.maxdd_p95,
+                "p_sharpe_dodatni": mc.bootstrap.p_sharpe_dodatni,
+                "ok": mc.bootstrap.ok,
+            },
+        }
+
+    def raport_ksiegi_wad(self) -> Optional[Dict[str, Any]]:
+        """
+        W-309: raport wykrytych wad setupów (sygnatury rezim/interwal z wysokim
+        wskaźnikiem strat). None gdy KsięgaWad wyłączona.
+        """
+        if self.ksiega_wad is None:
+            return None
+        return self.ksiega_wad.raport()
+
+    def odswiez_kontekst_rynku(
+        self,
+        close_btc: List[float],
+        close_alty: Dict[str, List[float]],
+        vol_alty: Optional[Dict[str, List[float]]] = None,
+    ) -> Optional[Any]:
+        """
+        W-300: skanuje rynek RadarRynkiem i wypełnia oba sloty kontekstu Dyrygenta.
+
+        Wołane RAZ na bar przez pętlę portfelową/backtest PRZED cyklami per-symbol —
+        BTC i breadth to kontekst wspólny dla całego koszyka, nie per-symbol.
+        Serie muszą być przyczynowe (DO bieżącej świecy włącznie — zero lookahead).
+
+        Efekt:
+          • kontekst_dodatkowy ← BTC_TREND / BTC_DOMINANCJA / PRZEPLYW_KAPITALU
+            (dolewane do wskaźników w cyklu → budzą RADAR-01/02/03).
+          • stan_rynku ← StanRynku (radar-aware gating w Namiestniku/Kluczniku).
+
+        Zwraca StanRynku (lub None gdy radar nie ma dość danych — wtedy neurony
+        RADAR abstynują zgodnie z Prawem XV, zamiast zgadywać).
+        """
+        if self._radar_rynku is None:
+            from imperium.legiony.radar_rynku import RadarRynku
+            self._radar_rynku = RadarRynku()
+
+        stan = self._radar_rynku.skanuj(close_btc, close_alty, vol_alty)
+        self.stan_rynku = stan
+        # Aktualizuj tylko klucze radaru — nie kasuj innego kontekstu (np. W-291).
+        self.kontekst_dodatkowy.update(stan.jako_wskazniki())
+        return stan
 
     # ── Wewnętrzne ───────────────────────────────────────────────────────────
     def _wskazniki(self, bary: List[Dict[str, Any]], symbol: str = "") -> Dict[str, Any]:
@@ -384,3 +756,99 @@ class Dyrygent:
             except Exception as e:
                 logger.warning(f"[Dyrygent] adapter {getattr(adapter, 'NAZWA', '?')} pominięty: {e}")
         return wskazniki
+
+    def _opinia_rady(self, wskazniki: Dict[str, Any], raport, plan,
+                     kierunek: str, interwal: str, rezim: str):
+        """
+        Assembler Rady Doradców — zbiera dane z silnika/wskaźników i pyta każdego
+        z pięciorga doradców. Brak danych historycznych → doradcy graceful-fall do
+        BRAK_DANYCH/MILCZENIE (nie blokują — Prawo XV: cisza ≠ martwy głos).
+        """
+        from imperium.cesarz.doradcy.oracle import Oracle
+        from imperium.cesarz.doradcy.fulmen import Fulmen, DaneFulmen
+        from imperium.cesarz.doradcy.iustitia import (
+            Iustitia, DaneIustitia,
+            OtwartaPozycja as OtwartaPozycjaIustitia,
+        )
+        from imperium.cesarz.doradcy.hermes import Hermes, DaneHermes
+        from imperium.cesarz.doradcy.pythia import (
+            Pythia, buduj_odcisk, WpisHistorii,
+        )
+
+        # ORACLE: historia PnL z zamkniętych pozycji bieżącej sesji
+        wyniki_hist = list(self.engine.historia_zamkniec)
+        pnl_hist = [w.pnl_pct for w in wyniki_hist if hasattr(w, "pnl_pct")]
+        ocena_oracle = Oracle().ocen(pnl_hist)
+
+        # FULMEN: ortogonalna weryfikacja reżimu z wskaźników (DI+/DI- jako proxy VI)
+        ocena_fulmen = Fulmen().ocen(DaneFulmen(
+            adx_14=wskazniki.get("ADX_14") or 20.0,
+            vi_plus_14=wskazniki.get("DI_PLUS") or 0.5,
+            vi_minus_14=wskazniki.get("DI_MINUS") or 0.5,
+            choppiness_14=wskazniki.get("CHOPPINESS_14") or 50.0,
+            kaufman_er=0.5,   # nie liczony przez Budowniczego → neutral default
+            legatus_rezim=rezim,
+        ))
+
+        # IUSTITIA: portfolio heat + Kelly fraction
+        otwarte_poz = [
+            OtwartaPozycjaIustitia(
+                symbol=p.symbol,
+                ryzyko_usdt=abs(p.cena_wejscia - p.stop_loss) / p.cena_wejscia * p.rozmiar_usdt,
+                pnl_pct=0.0,   # brak bieżącej ceny w tym momencie
+            )
+            for p in self.engine.otwarte.values()
+        ]
+        ryzyko_new = abs(plan.cena_wejscia - plan.stop_loss) / plan.cena_wejscia * plan.rozmiar_usdt
+        ostatnie_pnl = [w.pnl_pct for w in wyniki_hist[-5:]] if wyniki_hist else []
+        wins = [p for p in ostatnie_pnl if p > 0]
+        loss = [p for p in ostatnie_pnl if p <= 0]
+        ocena_iustitia = Iustitia().ocen(DaneIustitia(
+            kapital_total=self.engine.kapital_calkowity,
+            nowe_ryzyko_usdt=ryzyko_new,
+            otwarte_pozycje=otwarte_poz,
+            ostatnie_5_pnl=ostatnie_pnl,
+            korelacja_z_otwartymi=0.0,
+            win_rate=len(wins) / max(len(ostatnie_pnl), 1),
+            avg_win_pct=sum(wins) / max(len(wins), 1),
+            avg_loss_pct=abs(sum(loss) / max(len(loss), 1)),
+        ))
+
+        # HERMES: kompletność danych + VPIN
+        kompletne = sum(1 for v in wskazniki.values() if v is not None) / max(len(wskazniki), 1)
+        _vpin_raw = wskazniki.get("VPIN_50")
+        vpin_val = float(_vpin_raw) if _vpin_raw is not None else 0.5
+        interwal_min = {"1m": 1, "5m": 5, "15m": 15, "30m": 30,
+                        "1H": 60, "4H": 240, "1D": 1440}.get(interwal, 60)
+        ocena_hermes = Hermes().ocen(DaneHermes(
+            kompletnosc_danych=round(kompletne, 3),
+            interwal_minut=interwal_min,
+            wiek_danych_minut=1,   # bieżący bar = tylko co obliczony
+            hash_ok=True,
+            vpin=vpin_val,
+        ))
+
+        # PYTHIA: fingerprint matching z historii sesji
+        odcisk = buduj_odcisk(
+            rezim=rezim, interwal=interwal, kierunek=kierunek,
+            pewnosc=raport.pewnosc_agregatu,
+            funding_rate=wskazniki.get("FUNDING_RATE") or 0.0,
+            atr_current=wskazniki.get("ATR_14") or 1.0,
+            atr_30d_avg=wskazniki.get("ATR_14") or 1.0,  # brak 30d avg → proxy bieżącym
+        )
+        historia_pythia = [
+            WpisHistorii(
+                odcisk=buduj_odcisk(
+                    rezim=w.rezim if hasattr(w, "rezim") else rezim,
+                    interwal=w.interwal if hasattr(w, "interwal") else interwal,
+                    kierunek=w.kierunek if hasattr(w, "kierunek") else "LONG",
+                    pewnosc=0.6, funding_rate=0.0, atr_current=1.0, atr_30d_avg=1.0,
+                ),
+                pnl_pct=w.pnl_pct,
+            )
+            for w in wyniki_hist if hasattr(w, "pnl_pct")
+        ]
+        ocena_pythia = Pythia().ocen(odcisk, historia_pythia)
+
+        return self.rada_doradcow.ocen(ocena_oracle, ocena_fulmen, ocena_iustitia,
+                                       ocena_hermes, ocena_pythia)

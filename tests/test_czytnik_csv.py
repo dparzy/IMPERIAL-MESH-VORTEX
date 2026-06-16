@@ -201,6 +201,30 @@ def test_agregacja_4h_kompletne_okna():
     assert CZTERY_H_MS == 4 * h
 
 
+def test_realne_dane_1h_laduja_sie():
+    """
+    W-320 (Prawo XV/XIX): dane 1h z dane/godzinowe/ są w repo i ładują się poprawnie.
+    To dowód, że Tryb NAJLEPSZY ma realny interwał krótszy niż 4H (priorytet Cezara).
+    """
+    import os as _os
+    katalog = _os.path.join(_os.path.dirname(__file__), "..", "dane", "godzinowe")
+    pary = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "DOGEUSDT"]
+    znalezione = 0
+    for para in pary:
+        sciezka = _os.path.join(katalog, f"Binance_{para}_1h.csv")
+        if not _os.path.exists(sciezka):
+            continue
+        znalezione += 1
+        bary = wczytaj_csv(sciezka, interwal="1h", limit=500)
+        assert len(bary) > 0, f"{para}: brak barów 1h"
+        # Chronologia rosnąca + OHLC sensowne (high >= low, close > 0)
+        assert bary[0]["timestamp"] < bary[-1]["timestamp"]
+        for b in bary[:50]:
+            assert b["high"] >= b["low"] > 0
+            assert b["interwal"] == "1h"
+    assert znalezione == len(pary), f"brak plików 1h dla części par ({znalezione}/{len(pary)})"
+
+
 def test_agregacja_4h_luka_w_srodku():
     """Luka godzinowa w środku okna → okno 3/4 odrzucone (granica kompletności)."""
     import sys, os as _os

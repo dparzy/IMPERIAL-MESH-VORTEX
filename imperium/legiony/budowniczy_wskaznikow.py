@@ -90,6 +90,10 @@ _PLAN_SKALARNE = {
     "SUPERTREND":          ("SUPERTREND", ("high", "low", "close"), {}),
     "SUPERTREND_DIR":      ("SUPERTREND_DIR", ("high", "low", "close"), {}),
     "SUPERTREND_DIR_PREV": ("SUPERTREND_DIR_PREV", ("high", "low", "close"), {}),
+    # ── W-322: nowe neurony scalp/swing/invest (skalarne) ──
+    "AMIHUD_20":     ("AMIHUD", ("close", "volume"), {"period": 20}),
+    "AVWAP":         ("ANCHORED_VWAP", ("high", "low", "close", "volume"), {}),
+    "DELTA_DIV":     ("DELTA_DIVERGENCE", ("high", "low", "close", "volume"), {}),
 }
 
 
@@ -151,6 +155,9 @@ class BudowniczyWskaznikow:
         self._dodaj_donchian(serie, w)
         self._dodaj_ha(bary, w)
         self._dodaj_path_series(bary, w)
+        self._dodaj_mtf(bary, w)
+        self._dodaj_volume_profile(serie, w)
+        self._dodaj_pi_cycle(serie, w)
 
         return w
 
@@ -258,6 +265,30 @@ class BudowniczyWskaznikow:
         except Exception as e:
             logger.debug(f"[Budowniczy] HA pominięty: {e}")
 
+    def _dodaj_volume_profile(self, serie, w):
+        """VPOC + Value Area (W-322, S-VPOC) — struktura wolumenu po cenie."""
+        try:
+            d = self.brama.compute("VOLUME_PROFILE", high=serie["high"], low=serie["low"],
+                                   close=serie["close"], volume=serie["volume"]).value
+            w["VPOC"] = d.get("VPOC")
+            w["VA_HIGH"] = d.get("VA_HIGH")
+            w["VA_LOW"] = d.get("VA_LOW")
+        except Exception as e:
+            logger.debug(f"[Budowniczy] VOLUME_PROFILE pominięty: {e}")
+            w["VPOC"] = w["VA_HIGH"] = w["VA_LOW"] = None
+
+    def _dodaj_pi_cycle(self, serie, w):
+        """Pi Cycle Top (W-322, O-PICYCLE) — SMA-111 vs 2×SMA-350, kill-switch szczytu."""
+        try:
+            d = self.brama.compute("PI_CYCLE", close=serie["close"]).value
+            w["PI_111"] = d.get("PI_111")
+            w["PI_350X2"] = d.get("PI_350X2")
+            w["PI_111_PREV"] = d.get("PI_111_PREV")
+            w["PI_350X2_PREV"] = d.get("PI_350X2_PREV")
+        except Exception as e:
+            logger.debug(f"[Budowniczy] PI_CYCLE pominięty: {e}")
+            w["PI_111"] = w["PI_350X2"] = w["PI_111_PREV"] = w["PI_350X2_PREV"] = None
+
     def _dodaj_path_series(self, bary, w):
         """Dostarcza CLOSE_SERIES_20 i VOLUME_SERIES_20 dla D-01 NeuronPathSignature (W-079)."""
         try:
@@ -266,3 +297,60 @@ class BudowniczyWskaznikow:
             w["VOLUME_SERIES_20"] = [float(b.get("volume", 0)) for b in window]
         except Exception as e:
             logger.debug(f"[Budowniczy] PATH_SERIES pominięty: {e}")
+
+    # ── Multi-Timeframe (W-321, X-28 NeuronKonfluencjaMultiTF) ──────────────
+    # Agreguje bary do wyższego TF przez grupowanie po N barów niższego TF.
+    # Interwal wykrywany z pola 'interwal' baru (None = bez agregacji per TF).
+    # Produkuje: MTF_4H_RSI_14, MTF_4H_EMA_50, MTF_1D_RSI_14, MTF_1D_EMA_50
+    _MTF_INTERWAL_MNOZNIKI = {
+        "1h": {"4h": 4, "1d": 24},
+        "1H": {"4h": 4, "1d": 24},
+        "4h": {"1d": 6},
+        "4H": {"1d": 6},
+    }
+
+    def _agreguj_na_wyzszy_tf(self, bary: list, n: int) -> list:
+        """Agreguje bary do wyższego TF grupując po N barów (OHLCV poprawnie)."""
+        wynik = []
+        for i in range(0, len(bary) - n + 1, n):
+            okno = bary[i: i + n]
+            if len(okno) < n:
+                break
+            wynik.append({
+                "open":   float(okno[0].get("open", 0)),
+                "high":   max(float(b.get("high", 0)) for b in okno),
+                "low":    min(float(b.get("low", 0)) for b in okno),
+                "close":  float(okno[-1].get("close", 0)),
+                "volume": sum(float(b.get("volume", 0)) for b in okno),
+            })
+        return wynik
+
+    def _dodaj_mtf(self, bary: list, w: dict) -> None:
+        """Dodaje wskaźniki wyższego TF do dict wskaźników (Prawo XV: nie marnuj danych)."""
+        if not bary:
+            return
+        interwal = bary[-1].get("interwal", "")
+        mnozniki = self._MTF_INTERWAL_MNOZNIKI.get(interwal, {})
+        if not mnozniki:
+            return
+
+        prefix_map = {"4h": "MTF_4H", "1d": "MTF_1D"}
+        try:
+            for tf_name, n in mnozniki.items():
+                prefix = prefix_map.get(tf_name, f"MTF_{tf_name.upper()}")
+                bary_wyzsze = self._agreguj_na_wyzszy_tf(bary, n)
+                if len(bary_wyzsze) < 15:
+                    continue
+                serie = _serie(bary_wyzsze)
+                for klucz_out, (calc, args, kw) in [
+                    (f"{prefix}_RSI_14", ("RSI", ("close",), {"period": 14})),
+                    (f"{prefix}_EMA_50", ("EMA_50", ("close",), {})),
+                ]:
+                    try:
+                        params = {a: serie[a] for a in args}
+                        params.update(kw)
+                        w[klucz_out] = self.brama.compute(calc, **params).value
+                    except Exception as e:
+                        logger.debug(f"[Budowniczy] {klucz_out} pominięty: {e}")
+        except Exception as e:
+            logger.debug(f"[Budowniczy] MTF pominięty: {e}")

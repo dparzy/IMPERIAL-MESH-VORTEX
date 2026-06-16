@@ -178,6 +178,15 @@ def test_statystyki_max_drawdown():
     assert stats.losing_trades == 3
 
 
+def test_wynik_zamkniecia_niesie_timestamp_wejscia():
+    """W-312: zamknięty trade przenosi timestamp_wejscia (walk-forward OOS)."""
+    e = _engine(kapital=50_000.0)
+    e.wejdz(_sygnal("BTCUSDT"), timestamp=1_700_000_000_000)
+    wyniki = e.zamknij_wszystkie({"BTCUSDT": 105.0})
+    assert len(wyniki) == 1
+    assert wyniki[0].timestamp_wejscia == 1_700_000_000_000
+
+
 def test_zamknij_wszystkie():
     e = _engine(kapital=50_000.0)
     e.wejdz(_sygnal("BTCUSDT"))

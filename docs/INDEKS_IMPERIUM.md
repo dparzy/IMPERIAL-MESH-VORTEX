@@ -47,7 +47,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 11 | `archiwum/ARSENAL_AMERYKI.md` | 690 linków z 50+ krajów — pełny katalog regionalny (na wyraźne polecenie) | 📦 Archiwum |
 | 11 | `SYMBIOZA_MODULOW.md` | Interakcje modułów i mapowanie narzędzi | 🔗 Link |
 | 12 | `ROADMAP_IMPERIUM.md` | Roadmapa rozwoju i wersjonowanie | 🔗 Link |
-| 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (63 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
+| 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (70 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
 | 14 | `KATALOG_STRATEGII.md` | **~108+ strategii zmapowanych** (17 w kodzie) — Księga Azjatycka + Mistrzowie Świata + VSA/GEX/DeFi | ✅ Aktywny |
 | 15 | `GENERAL_LEGATUS.md` | Generał Legatus — SKANER/FOKUS, agregacja neuronów, reżimy | ✅ Aktywny |
 | 16 | `KALKULATOR_LEWARA.md` | Matematyka przeżycia — likwidacja, stop-loss, Kelly, dynamiczna dźwignia | ✅ Aktywny |
@@ -69,6 +69,12 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 33 | `MANUAL_MIGRACJA_I_SYMULATOR.md` | **Manual migracji na laptopa (Windows/Fujitsu) + symulator live** — pełny pipeline, bramki wstrzymania long/short, weryfikacja doradców (Hermes ✅, Chimera ❌) | ✅ Aktywny |
 | 34 | `symulator_live.html` | **Symulator wizualny HTML (offline)** — animowany pipeline, rój 48 neuronów głosujący, 10 bramek, ścieżka pieniędzy, 4 scenariusze (trend/range/bańka/krach). Otwierany w przeglądarce | ✅ Aktywny |
 | 35 | `symulator_imperium.html` | **Symulator canvas (styl v1-5.1)** — animowane cząsteczki płynące przez moduły; przełącznik STAN AKTUALNY (ocena 8.0/10) ↔ MARZENIE (wizja docelowa 9.7/10 po wdrożeniu roadmapy) | ✅ Aktywny |
+| 36 | `POMIAR_WARSTW_ADAPTACYJNYCH.md` | **Ablacja warstw adaptacyjnych** (W-311) — synapsy/mwu/igrzyska/ksiega_wad osobno vs baseline, PnL/trade, walidacja Monte Carlo; in-sample, wymaga OOS (Prawo XVI) | ⚠️ In-sample |
+| 37 | `POMIAR_FILTR_ASYMETRII.md` | **Dowód A/B Filtra Asymetrii Reżimu** (W-314) — OOS chop: strata −386$→−238$ (−38%), ADX+EMA-200, Moskowitz 2012 + Wilder 1978; wciąż ujemny ale realna przewaga (Prawo XVI) | ✅ Aktywny |
+| 38 | `AUDYT_GLEBOKI_2026-06-14.md` | **Głęboki audyt: wizja łowcy okazji vs kod** — reframe oceny (wielowalutowy skaner zamiast 1 waluta/9 lat), 9 luk (brak skanera/rankingu okazji=serce), martwy AdapterKronikarz, rozbieżności MANIFEST, research technik (cross-sectional momentum, pump z-score, Bayesian Kelly), kolejność A/B/C | ✅ Aktywny |
+| 39 | `TRYBY_IMPERIUM.md` | **Propozycja 5 trybów** (NAJLEPSZE/SKALP/SWING/INVEST/OBRONA) + mechanika trybu NAJLEPSZE (skaner TOP-N, W-316/317) + mapa brakujących neuronów/strategii do łowcy okazji | ✅ Aktywny |
+| 40 | `WIZJA_TRYBY_I_ROZWOJ.md` | **Wizja Cezara: tryby + rozwój** — Tryb 1 NAJLEPSZY (potok W-315..319), Tryb 2 BILANS (spot/invest), Tryb 3 przełącznik z autoryzacją, propozycja Praw XXII-XXV, tabela narzędzi prześwietlania walut (CoinGecko/GoPlus/RugCheck/DefiLlama), kolejka rozwoju (krótkie interwały) | ✅ Aktywny |
+| 41 | `ANALIZA_NEURONY_SCALP_SWING_INVEST.md` | **Porównanie 65 neuronów z best practices** (docs + internet 2026-06-15) + 6 unikatowych propozycji zdekorelowanych per styl: VPOC/Volume Profile, Amihud Illiquidity, Pi Cycle Top, Delta Divergence, Anchored VWAP, Cross-Sectional RS | ✅ Aktywny |
 
 ---
 
@@ -80,14 +86,14 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 |---------|-----------------|-------|--------|
 | `imperium/akwedukty/` | Rurociąg danych — pobieranie świec z MEXC przez CCXT | Akwedukty (Data Pipeline) | ✅ Gotowy |
 | `imperium/fundament/` | Brama Kalkulatora — TA-Lib oblicza wskaźniki, SHA-256 podpisuje | Calculator Gate | ✅ Gotowy |
-| `imperium/legiony/` | Legiony — mikro-neurony (63), Legatus, zwiadowcy (12), strategie (18) | Scout Legions | ✅ Rdzeń aktywny |
+| `imperium/legiony/` | Legiony — mikro-neurony (70), Legatus, zwiadowcy (12), strategie (18) | Scout Legions | ✅ Rdzeń aktywny |
 | `imperium/pretorianie/` | Pretorianie — weto ryzyka, ochrona kapitału | Risk Praetorians | ✅ Gotowy |
 | `imperium/senat/` | Senat — debata Popularów vs Optymantów nad sygnałem | Senate Debate | 🟡 Szkielet |
 | `imperium/cesarz/` | Cesarz — DeepSeek LLM podejmuje ostateczną decyzję | Emperor (LLM) | 🟡 Szkielet |
 | `imperium/drogi/` | Drogi — wykonanie zlecenia na MEXC (Via Romana) | Order Execution | 🟡 Szkielet |
-| `imperium/biblioteki/` | Biblioteki — **kronikarz.py** (logi) + **mnemosyne.py** (pamięć transakcji) + **pamiec_absolutna.py** (ImperiumLog, MAE/MFE, JSONL) + **igrzyska.py** (ranking batch) + **hedge_mwu.py** (online MWU, W-049) + **arena_trzech_bram.py** (potrójna bariera, W-035) + **kronikarz_zdarzen.py** (event-study zdarzeń fundamentalnych, W-289 💎) | Logs & Memory & Learning | ✅ Gotowy |
+| `imperium/biblioteki/` | Biblioteki — **kronikarz.py** (logi) + **mnemosyne.py** (pamięć transakcji) + **pamiec_absolutna.py** (ImperiumLog, MAE/MFE, JSONL) + **igrzyska.py** (ranking batch) + **hedge_mwu.py** (online MWU, W-049) + **arena_trzech_bram.py** (potrójna bariera, W-035) + **kronikarz_zdarzen.py** (event-study, W-289 💎) + **synapsy_rezimowe.py** (Regime-Aware Decorrelated Coalition Graph, W-299 🧬) | Logs & Memory & Learning | ✅ Gotowy |
 | `imperium/swiatynie/` | Świątynie — wykresy, dashboard, wizualizacje | Charts & Dashboard | 🟡 Szkielet |
-| `imperium/koloseum/` | Koloseum — PaperTradingEngine + **Dyrygent** (orkiestrator: bary→**Namiestnik**→Legatus→Kalkulator→pozycja) + **Namiestnik** (Regime + Timeframe-Aware Gating Network) + **Backtest** + **Detektor Lookahead-bias** (LA-01, Freqtrade) | Backtesting Arena | ✅ Cykl Faza 1 aktywny |
+| `imperium/koloseum/` | Koloseum — PaperTradingEngine + **Dyrygent** (orkiestrator: bary→**Namiestnik**→Legatus→Kalkulator→pozycja) + **PętlaLive** (W-302 entrypoint live: DataLoader→Radar→cykl→PamięćRefleksyjna) + **Namiestnik** (Regime + Timeframe-Aware Gating) + **Backtest portfela** + **Detektor Lookahead-bias** (LA-01) | Backtesting Arena & Live | ✅ Cykl Faza 1 aktywny |
 | `imperium/oczy/` | Oczy — newsy, sentyment, dane on-chain | News & Sentiment | 🔴 Planowany |
 
 **Legenda:** ✅ Gotowy — działa produkcyjnie | 🟡 Szkielet — struktura istnieje, wypełnianie w toku | 🔴 Planowany — jeszcze nie rozpoczęty
@@ -169,7 +175,7 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 | **C** ✅ | AdapterCVD (Binance aggTrades public) → V-03 CVD obudzony | ✅ ZREALIZOWANA 2026-06-03 | +1 neuron (V-03 kat. F) |
 | **D** 🔵 | OC-01..04 on-chain (MVRV, SOPR, Puell, Netflow) — wymaga klucza Glassnode/CryptoQuant | ⏳ OCZEKUJE — decyzja Cezara | +4 neurony (kat. O) |
 | **LIVE** 🟠 | Paper trading na żywych danych MEXC — `MEXC_API_KEY` + `MEXC_SECRET` | ⏳ Instrukcja → `docs/PAPER_TRADING_MEXC.md` | rdzeń kompletny |
-| **E** 🔵 | Dalsze neurony z katalogu (299−63=236 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
+| **E** 🔵 | Dalsze neurony z katalogu (299−70=229 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
 **Stan kategorii (2026-06-04):** aktywne M/T/F/A/L/V/R/H/N/Z/O · wyciszone S(SMC feed)/O-API(on-chain API)
 **Neurony: 62** (58 aktywnych, 4 wyciszone) · **Strategie: 18** · **Testy: 743/743**

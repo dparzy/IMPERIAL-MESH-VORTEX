@@ -5,10 +5,10 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-12 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 63 neuronów (zarejestrowane w roju) + 12 zwiadowców = **75 modułów w kodzie**
-**Aktywne / wyciszone:** 55 aktywnych + 4 wyciszone, z czego:
-  • **44 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, X-27 Value Convergence, OC-05 WashTrading, D-01 PathSignature)
+**Stan na:** 2026-06-16 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Zaimplementowane:** 70 neuronów (zarejestrowane w roju) + 12 zwiadowców = **82 modułów w kodzie**
+**Aktywne / wyciszone:** 66 aktywnych + 4 wyciszone, z czego:
+  • **51 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 SMC aktywne** (SMC-01/02/03, `DOSTEPNY=True`) — liczą z barów przez most EXP-05, **bez żadnego API** (abstynują w backteście bez EXP-05)
@@ -19,7 +19,7 @@
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 60). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 64). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -46,7 +46,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (60/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (64/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -69,6 +69,7 @@
 | X-25 🔱 | NeuronATRDeviation | M | 6 | ✅ aktywny | ATR_DEVIATION | E4+E5 |
 | X-26 🔱 | NeuronHAScalper | M | 7 | ✅ aktywny | HA_SCALPER | E4+E5+E7 |
 | X-27 | NeuronValueConvergence | M | 6 | ✅ aktywny | VALUE_Z_200 | rewersja do wartości: Value-Z+MoMA-Z (W-273, BIB-020 Harris rozdz.16) |
+| X-28 | NeuronKonfluencjaMultiTF | T | 7 | ✅ aktywny | MTF_4H_RSI_14 | konfluencja ≥2/3 TF (1h+4H+1D): RSI>50 + EMA crossover → LONG/SHORT z pewnością 0.62–0.80 (W-321) |
 
 ### Plik: `neurony/trend.py`
 
@@ -94,6 +95,8 @@
 | V-04 | NeuronVolumeAnomaly | F | 6 | ✅ aktywny | VOLUME_ANOMALY | — |
 | V-05 | NeuronForceIndex | F | 7 | ✅ aktywny | FORCE_INDEX | — |
 | X-11 | NeuronRVOL | F | 7 | ✅ aktywny | RVOL | — |
+| V-06 | NeuronDeltaDivergence | F | 5 | ✅ aktywny | DELTA_DIV | dywergencja cena↔delta (proxy footprint z OHLCV), wczesna rewersja (W-322) |
+| V-07 | NeuronAnchoredVWAP | F | 5 | ✅ aktywny | AVWAP | VWAP kotwiczony od pivotu swing (W-322) |
 
 ### Plik: `neurony/struktura.py`
 
@@ -107,6 +110,7 @@
 > liczy strefy OB/FVG/BOS z **samych barów OHLCV** (bez API) i wstrzykuje je do `wskazniki`.
 > W backteście CSV bez EXP-05 te 3 neurony abstynują (NEUTRAL) — Prawo XV, bez halucynacji.
 | VSA-01 | NeuronVSA | F | 8 | ✅ aktywny | VSA | — |
+| VP-01 | NeuronVolumeProfile | S | 6 | ✅ aktywny | VPOC | Volume Profile/VPOC + Value Area — S/R z wolumenu, swing OHLCV (W-322, Dalton BIB-013) |
 
 ### Plik: `neurony/sesje.py` (Faza C, W-286 — Zegary Rynku)
 
@@ -162,6 +166,9 @@
 | Z-02 | NeuronPumpDetect | Z | 7 | ✅ aktywny | OBV | akumulacja przed pumpem (W-042) |
 | Z-03 | NeuronBubbleCrash | Z | 9 | ✅ aktywny | BUBBLE_Z_200 | bubble/crash kill-switch: bubble_z+VoV+AR1 (W-278, BIB-020 Harris rozdz.28) |
 | Z-04 | NeuronCascade | Z | 8 | ✅ aktywny | CASCADE_FLAG | kill-switch kaskady + dead-cat bounce LONG (W-279, BIB-020 Harris rozdz.28) |
+| Z-05 | NeuronDetektorRuchu | Z | 7 | ✅ aktywny | CLOSE_SERIES_20 | klimaks dwukierunkowy: szczyt→SHORT, dołek→LONG (ROC+RSI+wolumen, W-315) |
+| Z-06 | NeuronAmihudIlliquidity | Z | 6 | ✅ aktywny (meta-brama) | AMIHUD_20 | Amihud illiquidity — impakt cenowy/krucha płynność, tłumi rój (W-322) |
+| Z-07 | NeuronPiCycleTop | Z | 6 | ✅ aktywny | PI_111 | Pi Cycle Top — SMA-111 vs 2×SMA-350, kill-switch szczytu cyklu, INVEST 1D (W-322) |
 | D-01 | NeuronPathSignature | D | 7 | ✅ aktywny 🎖️ | CLOSE_SERIES_20 | Lévy Area Close×Volume — geometria ścieżki (W-079) |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
@@ -265,7 +272,7 @@
 | III Augusta (H1) | ~45 | 10 (XII-01..04, V-01..05, VSA-01) + PSY-01..04 ✅ (Faza B) + V-03 ✅ + SMC-01..03 ✅ | ~35 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
-| **RAZEM** | **299** | **56** | **243** |
+| **RAZEM** | **299** | **64** | **235** |
 
 ---
 
@@ -311,6 +318,25 @@
 | **Optymalizator DSR-guided** (W-294 — Latin Hypercube Search + DSR jako cel; karze selection bias; 0 zależności) | `koloseum/optymalizator.py` | ✅ aktywny |
 | **Pamięć Refleksyjna Brain** (W-295 — JSONL lekcji narracyjnych; inject do Senat/Cesarz; inspiracja: TradingAgents/FinMem) | `cesarz/pamiec_refleksyjna.py` | ✅ aktywny |
 | **Drift Adapter** (W-296 — DDG-DA-lite: entropia reżimu + momentum → pre-shift WAGI_REZIMU; inspiracja: Qlib DDG-DA) | `koloseum/drift_adapter.py` | ✅ aktywny |
+| **Synapsy Reżimowe** (W-299 🧬 — Regime-Aware Decorrelated Coalition Graph: Hebbian × per-reżim × Prawo XVI; wpięte w Legatus.synapsy) | `biblioteki/synapsy_rezimowe.py` | ✅ aktywny |
+| **Hook RadarRynku** (W-300 — `Dyrygent.odswiez_kontekst_rynku()` wypełnia sloty kontekstu → budzi RADAR-01/02/03) | `koloseum/dyrygent.py` | ✅ aktywny |
+| **PętlaLive** (W-302 — główny entrypoint: DataLoader→Radar→Dyrygent.cykl→PamięćRefleksyjna; `handluj_live`/`uruchom`) | `koloseum/petla_live.py` | ✅ aktywny |
+| **HedgeMWU wiring** (W-303 — online MWU Freund&Schapire'97 wpięty w Legatus; po każdym zamknięciu neuronowe mnożniki wag uczą się strumieniowo; opt-in `mwu_learning=True` w backtest_portfel) | `biblioteki/hedge_mwu.py` + `legiony/legatus.py` + `koloseum/dyrygent.py` | ✅ aktywny |
+| **Fabryka warstw adaptacyjnych** (W-304 — `Dyrygent.zbuduj(drift/rada/synapsy/mwu=...)` odblokowuje 4 wpięte-lecz-martwe-w-produkcji moduły; domyślnie OFF, zero zmian zachowania; Prawo XV — odzysk potencjału) | `koloseum/dyrygent.py` | ✅ aktywny |
+| **Domknięcie korelacji SynapsyRezimowych** (W-305 — `KolektorKorelacjiNeuronow` zbiera głosy neuronów strumieniowo, liczy macierz korelacji par, zasila SynapsyRezimowe co cykl; dekorelacja Prawa XVI przestaje być martwa — pary niezależne wzmacniane mocniej; bez lookahead) | `legiony/diagnostyka_korelacji.py` + `biblioteki/synapsy_rezimowe.py` + `koloseum/dyrygent.py` | ✅ aktywny |
+| **Raport dekorelacji neuronów** (W-306 — `raport_z_kolektora()` + `Dyrygent.raport_korelacji_neuronow()`: Prawo XVI „redundancja mierzona" rozszerzone z 11 zwiadowców na cały rój 59 neuronów; pary nadmiarowe vs filary siły) | `legiony/diagnostyka_korelacji.py` + `koloseum/dyrygent.py` | ✅ aktywny |
+| **Igrzyska wiring** (W-307 — `Dyrygent.zbuduj(igrzyska=True)` + `raport_igrzysk()` + `igrzyska_learning=True` w backtest_portfel; batch kumulatywny ranking neuronów komplementarny do online MWU; gdy oba aktywne — mnożniki łączone ×; Prawo XVI — różne informacje) | `biblioteki/igrzyska.py` + `koloseum/dyrygent.py` + `koloseum/backtest.py` | ✅ aktywny |
+| **Warstwy uczenia w PętliLive** (W-307 — `KonfigPetliLive.mwu/igrzyska` opt-in wpina HedgeMWU + Igrzyska do produkcyjnej pętli live, nie tylko backtestu; domyślnie OFF, zero zmiany zachowania) | `koloseum/petla_live.py` | ✅ aktywny |
+| **Monte Carlo bridge** (W-308 — `waliduj_mc(engine)` + `Dyrygent.raport_monte_carlo()`: most między PaperTradingEngine a istniejącą walidacją MC; shuffle+bootstrap antyoverfittingowe z historia_zamkniec; Prawo XV — odzysk potencjału) | `koloseum/monte_carlo.py` + `koloseum/dyrygent.py` | ✅ aktywny |
+| **KsięgaWad** (W-309 — prewencyjny filtr powtarzalnych wad setupu rezim/interwal wyekstrahowany z Mnemosyne `book_of_flaws`; uczy się online z zamknięć, sprawdza PRZED wejściem: CZYSTO/OSTRZEŻENIE/WETO; opt-in `Dyrygent.zbuduj(ksiega_wad=True)`, `KonfigPetliLive.ksiega_wad`, `backtest_portfel(ksiega_wad=True)`; bootstrap `ucz_z_pamieci()` z PamięciRefleksyjnej — Prawo XVI jedno źródło) | `cesarz/ksiega_wad.py` + `koloseum/dyrygent.py` + `koloseum/petla_live.py` + `koloseum/backtest.py` | ✅ aktywny |
+| **Domknięcie pętli pamięci** (W-310 — `_bootstrap_ksiega_wad()` w PętliLive zasila KsięgęWad PERSYSTENTNYMI lekcjami z `pamiec_refleksyjna.jsonl` poprzednich sesji; read-path PamięciRefleksyjnej był martwy — lekcje pisane, nigdy czytane w produkcji; teraz świeży Dyrygent flaguje stratny setup od 1. baru — Prawo XV cross-session) | `koloseum/petla_live.py` | ✅ aktywny |
+| **Filtr Asymetrii Reżimu** (W-314 — `FiltrAsymetriiRezimu`: weto na rynku bocznym ADX<20 i kontr-trendzie ADX≥25; czysty OHLCV CLOSE/EMA_200/ADX_14; opt-in OFF w Dyrygent/zbuduj/backtest/petla_live; A/B OOS −38% straty; Moskowitz 2012 + Wilder 1978) | `pretorianie/filtr_asymetrii.py` | ✅ aktywny |
+| **Skaner Okazji** (W-316 — `SkanerOkazji`: ranking cross-symbol okazji koszyka, opportunity score = cross-sectional z-score momentum/trend/wolumen/zmienność, wybór TOP-N; serce wizji łowcy okazji) | `koloseum/skaner_okazji.py` | ✅ aktywny |
+| **Tryb NAJLEPSZE** (W-317 — `backtest_portfel(tryb_skaner=True, skaner_top_n=N)`: skaner jako brama selekcji w pętli portfelowej; tylko TOP-N okazji wchodzi, exity niezależne; domyślnie OFF) | `koloseum/backtest.py` | ✅ aktywny |
+| **Sizing Przekonania** (W-318 — `SizingPrzekonania`: mnożnik stawki 0.5×–3.0× rosnący z siłą okazji + fractional Kelly; w trybie skanera amplifikuje stawkę na najmocniejszych — kompensuje przycięcie grubego ogona przez selekcję) | `pretorianie/sizing_przekonania.py` + `koloseum/backtest.py` | ✅ aktywny |
+| **Compounding** (W-319 — `backtest_portfel(compounding=True)`: budżet sizingu od bieżącego equity, nie startowego → reinwestycja zysku, wzrost geometryczny; domyślnie OFF) | `koloseum/backtest.py` | ✅ aktywny |
+| **POTOK ŁOWCY OKAZJI (tryb NAJLEPSZE)** — pełny: skan koszyka (W-316) → TOP-N (W-317) → conviction sizing (W-318) → compounding (W-319). Symulacja 9 lat: +64 976$ vs baseline +52 789$ (+23%, mniej trade'ów, wszystkie pary +); z compoundingiem 10k→902k (90.2x, gruboogonowy/DOGE — górna granica) | `koloseum/{skaner_okazji,backtest}.py` + `pretorianie/sizing_przekonania.py` | ✅ aktywny |
+| **Dane 1h wpięte** (W-320 — `dane/godzinowe/` 5 par × ~76k barów; czytnik CSV obsługuje, test ładowania zielony; pełna symulacja 1h w toku; sub-godzinne 1m/5m/15m wciąż 🔴 brak) | `akwedukty/czytnik_csv.py` + `tests/test_czytnik_csv.py` | ✅ aktywny |
 
 ---
 
@@ -323,14 +349,14 @@
 |---------|------|------|
 | `Strategia` (model) | `strategie/baza.py` | przepis: które neurony, w jakiej roli (wejście/filtr/wyjście) |
 | `dobierz_najlepsze()` | `strategie/baza.py` | silnik: sygnały → top-3 pasujące strategie + kierunek |
-| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 15 strategii zmapowanych na ŻYWE klucze kodu |
+| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 18 strategii zmapowanych na ŻYWE klucze kodu |
 | **Wpięcie w Legatusa** | `legiony/legatus.py` | `RaportLegatusa.strategie_dopasowane` — Generał zwraca dobrane strategie w każdym raporcie |
 
 **Klucznik (strażnik spójności):** audyt Warstwa 4 (`narzedzia/audyt_spojnosci.py`)
 pilnuje, że KAŻDY klucz w strategii istnieje w kodzie i jest aktywny — żadnych
 neuronów-widm. Test: `test_klucznik_strategie_uzywaja_istniejacych_neuronow`.
 
-**Stan:** 15 strategii (klucze: 20 — wszystkie aktywne). Status każdej: SZKIC
+**Stan:** 18 strategii (klucze: 26 — wszystkie aktywne). Status każdej: SZKIC
 (czeka na kalibrację w Koloseum). Strategie z katalogu wymagające nieistniejących
 neuronów (OrderFlow, CVD, SMC, on-chain) wejdą gdy te neurony ożyją.
 

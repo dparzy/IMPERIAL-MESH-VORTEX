@@ -313,6 +313,7 @@
 | Adaptery testowe (OnChain/Futures/CVD mock) | `akwedukty/adaptery/testowy.py` | ✅ aktywny (mock) |
 | AdapterFearGreed (PSY-03, alternative.me) | `akwedukty/adaptery/feargreed.py` | ✅ aktywny (realne API) |
 | AdapterFutures (PSY-01/02/04, Binance fapi publiczne) | `akwedukty/adaptery/futures.py` | ✅ aktywny (realne API, bez klucza) |
+| AdapterMEXCFutures (PSY-01/04, MEXC contract publiczne — funding rodzimy dla LIVE) | `akwedukty/adaptery/mexc_futures.py` | ✅ aktywny (realne API, bez klucza, W-327) |
 | AdapterCVD (V-03, Binance aggTrades publiczne) | `akwedukty/adaptery/cvd.py` | ✅ aktywny (realne API, bez klucza) |
 | **Monte Carlo Robustness** (W-293 — shuffle+bootstrap: P(Sharpe>0), MaxDD_p95 CI; inspiracja: Jesse) | `koloseum/monte_carlo.py` | ✅ aktywny |
 | **Optymalizator DSR-guided** (W-294 — Latin Hypercube Search + DSR jako cel; karze selection bias; 0 zależności) | `koloseum/optymalizator.py` | ✅ aktywny |

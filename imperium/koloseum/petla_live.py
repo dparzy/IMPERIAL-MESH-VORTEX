@@ -61,6 +61,10 @@ class KonfigPetliLive:
     ksiega_wad: bool = False
     # W-314: Filtr Asymetrii Reżimu — weto na rynku bocznym (ADX) i kontr-trendzie. OFF.
     filtr_asymetrii: bool = False
+    # W-327: źródło funding/OI dla PSY-01/04. True=MEXC (rodzime — funding który
+    # FAKTYCZNIE płacisz na MEXC), False=Binance fapi. L/S ratio (PSY-02) zawsze z
+    # Binance (MEXC nie ma łatwego public L/S; sentyment rynkowy cross-giełdowy OK).
+    funding_mexc: bool = False
     plik_pamieci: str = "logs/pamiec_refleksyjna.jsonl"
     log_dir: Optional[str] = "logs"
     # Pauza po każdym barze (s). None = oblicz z interwal (zalecane).
@@ -118,7 +122,16 @@ def _buduj_dyrygencie(
     from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara
     from imperium.koloseum.dyrygent import Dyrygent
     from imperium.koloseum.namiestnik import get_namiestnik
-    from imperium.akwedukty.adaptery import AdapterFutures, AdapterFearGreed, AdapterCVD, AdapterNewsLLM
+    from imperium.akwedukty.adaptery import (
+        AdapterFutures, AdapterMEXCFutures, AdapterFearGreed, AdapterCVD, AdapterNewsLLM,
+    )
+
+    # W-327: lista adapterów sentymentu/flow. Gdy funding_mexc → MEXC dokładany PO
+    # Binance, więc nadpisuje funding+OI rodzimymi (L/S zostaje z Binance — MEXC go
+    # nie dostarcza, więc nie nadpisze). Kolejność = priorytet ostatniego dla klucza.
+    adaptery_sentymentu = [AdapterFutures(), AdapterFearGreed(), AdapterCVD(), AdapterNewsLLM()]
+    if getattr(cfg, "funding_mexc", False):
+        adaptery_sentymentu.insert(1, AdapterMEXCFutures())
 
     namiestnik = get_namiestnik() if cfg.auto_rezim else None
     budowniczy = BudowniczyWskaznikow()
@@ -142,7 +155,7 @@ def _buduj_dyrygencie(
             budowniczy=budowniczy,
             min_pewnosc=cfg.min_pewnosc,
             namiestnik=namiestnik,
-            adaptery=[AdapterFutures(), AdapterFearGreed(), AdapterCVD(), AdapterNewsLLM()],
+            adaptery=adaptery_sentymentu,
             filtr_asymetrii=cfg.filtr_asymetrii,
         )
         d.kapital_sizing = kapital_per

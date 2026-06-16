@@ -6,6 +6,30 @@
 
 ---
 
+## 2026-06-16 | W-327 | AdapterMEXCFutures — funding/OI rodzime dla LIVE na MEXC
+
+**Kontekst (Prawo I — poprawność dla LIVE):** Cezar wchodzi na żywo na MEXC ($50, 5 par).
+DataLoader już domyślnie ciągnie OHLCV z MEXC (ccxt), a petla_live wpina adaptery sentymentu.
+Luka: `AdapterFutures` ciągnie funding/OI z BINANCE, a funding który Cezar FAKTYCZNIE PŁACI to
+funding MEXC. Dla PSY-01 (contrarian na ekstremalnym fundingu) sygnał musi pochodzić z giełdy,
+na której trzymana jest pozycja — inaczej myli się o własnym koszcie.
+
+**AdapterMEXCFutures (`akwedukty/adaptery/mexc_futures.py`):** publiczne contract API MEXC
+(funding_rate + ticker/holdVol = OI), bez klucza. Budzi PSY-01 (Funding) i PSY-04 (OI). PSY-02
+(L/S ratio) zostaje przy AdapterFutures (MEXC nie ma łatwego public L/S; sentyment cross-giełdowy
+OK). Konwersja symbolu BTCUSDT→BTC_USDT, OI_PREV pamięć per symbol, fetcher wstrzykiwalny (testy
+offline). Bezpieczeństwo: endpointy publiczne; klucze podpisane (gdy zlecenia) WYŁĄCZNIE os.getenv.
+
+**Wpięcie:** `KonfigPetliLive.funding_mexc` (domyślnie False). Gdy True — MEXC dokładany PO Binance
+w liście adapterów, więc nadpisuje funding+OI rodzimymi, a L/S zostaje z Binance (MEXC go nie
+dostarcza → nie nadpisze). Kolejność listy = priorytet ostatniego dla danego klucza.
+
+**Testy:** 9 nowych (konwersja symbolu, dolewanie kluczy, OI_PREV pamięć, padnięty fetcher=None,
+uszkodzony JSON, brak pola, budzenie PSY-01/04). 1106/1106 zielone, audyt exit 0, ruff czysto.
+
+**Pliki:** `imperium/akwedukty/adaptery/mexc_futures.py`, `imperium/akwedukty/adaptery/__init__.py`,
+`imperium/koloseum/petla_live.py`, `tests/test_adapter_mexc_futures.py`, `docs/MANIFEST_KODU.md`.
+
 ## 2026-06-16 | W-326 | Oryginalne strategie SMC — Łowca Stref + Żniwa Szczytu (utrata potencjału)
 
 **Kontekst (Prawo XV):** audyt strategii ujawnił, że nasza najbardziej UNIKALNA broń —

@@ -17,7 +17,12 @@ wypada z rankingu PRZED z-score (jeszcze przed porównaniem cross-sectional). W 
 (wszystkie pary <próg) → wynik = 0 okazji = 0 wejść = "suchy proch". Domyślnie 0.0 (wsteczna
 zgodność). `backtest_portfel` przyjmuje `skaner_min_ts=`. A/B: `narzedzia/ab_w324.py`.
 
-**Wyniki A/B (4h, 7500 barów/parę):** [do uzupełnienia po biegu]
+**Wyniki A/B (4h, 7500 barów/parę, Prawo I — SFALSYFIKOWANA):**
+- BASELINE (0%): +5.19% (717 trade, WR 43.8%) ✅
+- TS-Gate 0.5%: −8.01% (−13.20pp) 🔴 | TS-Gate 1.0%: −9.41% (−14.60pp) 🔴 | TS-Gate 2.0%: −9.85% (−15.04pp) 🔴
+Lekcja: CS i TS już sprzęgnięte w score (momentum_z z wagą 1.0). Brama TS PRZED z-score = podwójny
+filtr niszczący edge. Moneta z ROC=0.5% przy ADX=35 to prawdziwa okazja gdy reszta koszyka=0%.
+Kod wstecznie zgodny (domyślnie=0.0), hipoteza sfalsyfikowana. Czwarta falsyfikacja z rzędu.
 
 **Testy:** 5 nowych testów granicznych w `test_skaner_okazji.py` — martwy rynek=0, próg dokładny
 (|ROC|==próg → przepuszcza), selektywny rynek, SHORT TS-gated, domyślnie wyłączony.

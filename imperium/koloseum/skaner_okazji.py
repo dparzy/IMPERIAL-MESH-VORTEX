@@ -27,6 +27,14 @@ Dyrygent (neurony, Pretorianie, filtry). To warstwa SELEKCJI ponad rojem — rea
 
 Czysty OHLCV: wszystkie składniki liczalne z barów (przez Budowniczego). Brak danych
 dla monety → pomijana (Prawo XV — nie zgadujemy).
+
+W-324 — Brama Momentum Bezwzględnego (Absolute TS Gate):
+Literaturowa lekcja (Han/Kang/Ryu 2024, SSRN): w krypto time-series momentum > cross-sectional.
+Poprzednia wersja była 100% cross-sectional — zawsze wybierała TOP-N, nawet gdy CAŁY koszyk
+stał w miejscu (dead market). min_bezwzgledny_ts wymusza minimalny |ROC| przed rankingiem:
+moneta z |ROC| < progu wypada z rankingu → w martwym rynku 0 wejść → "suchy proch" (dry powder).
+Domyślnie = 0.0 (wsteczna zgodność). Przy min_bezwzgledny_ts=0.01: moneta musi ruszyć ≥1%
+w oknie lookback żeby w ogóle być brana pod uwagę.
 """
 
 from dataclasses import dataclass, field
@@ -72,6 +80,7 @@ class SkanerOkazji:
     waga_zmiennosc: float = 0.4
     min_adx: float = 20.0
     lookback: int = 6
+    min_bezwzgledny_ts: float = 0.0   # W-324: brama TS; 0=wył.; 0.01 = wymagaj ≥1% ruchu
 
     def _roc(self, wsk: Dict[str, Any]) -> Optional[float]:
         closes = wsk.get("CLOSE_SERIES_20")
@@ -103,6 +112,8 @@ class SkanerOkazji:
                 continue
             if adx < self.min_adx:        # chop → poza rankingiem (lekcja W-314)
                 continue
+            if self.min_bezwzgledny_ts > 0 and abs(roc) < self.min_bezwzgledny_ts:
+                continue              # W-324: martwy rynek → suchy proch
             surowe.append((sym, roc, adx, vol / vol_ma, atr / close))
 
         if not surowe:

@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-16 | W-324 | Brama Momentum Bezwzględnego (TS Gate) — suchy proch w martwym rynku
+
+**Kontekst:** Skaner Okazji (W-316) był 100% cross-sectional — zawsze rankował i wybierał TOP-N,
+nawet gdy CAŁY koszyk stał w miejscu (dead market). Literatura (Han/Kang/Ryu 2024): TS momentum
+> CS w krypto. Gap: brak absolutnego progu jakości — wybieranie "najlepszego ze złych" w słabym rynku.
+
+**W-324 — `min_bezwzgledny_ts` (TS Gate):** nowy parametr `SkanerOkazji`. Moneta z |ROC| < próg
+wypada z rankingu PRZED z-score (jeszcze przed porównaniem cross-sectional). W martwym rynku
+(wszystkie pary <próg) → wynik = 0 okazji = 0 wejść = "suchy proch". Domyślnie 0.0 (wsteczna
+zgodność). `backtest_portfel` przyjmuje `skaner_min_ts=`. A/B: `narzedzia/ab_w324.py`.
+
+**Wyniki A/B (4h, 7500 barów/parę):** [do uzupełnienia po biegu]
+
+**Testy:** 5 nowych testów granicznych w `test_skaner_okazji.py` — martwy rynek=0, próg dokładny
+(|ROC|==próg → przepuszcza), selektywny rynek, SHORT TS-gated, domyślnie wyłączony.
+
+**Pliki:** `imperium/koloseum/skaner_okazji.py`, `imperium/koloseum/backtest.py`,
+`tests/test_skaner_okazji.py`, `narzedzia/ab_w324.py`.
+
 ## 2026-06-16 | W-323b/c | Profile WŁĄCZNE (po falsyfikacji) + scoreboard kontrybucji
 
 **Kontekst:** A/B W-323 obalił pierwszą (wykluczającą) tabelę profili — SWING 59 dał −3.29%

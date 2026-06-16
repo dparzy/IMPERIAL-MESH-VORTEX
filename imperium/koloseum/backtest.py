@@ -248,6 +248,7 @@ def backtest_portfel(
     tryb_skaner: bool = False,
     skaner_top_n: int = 3,
     skaner_min_adx: float = 20.0,
+    skaner_min_ts: float = 0.0,      # W-324: brama TS (0=wył.); np. 0.01 = ≥1% ruchu
     # W-318 Sizing Przekonania — w trybie skanera mnoży budżet pozycji przez siłę
     # okazji (mocniejsza okazja = większa stawka). Bez tego sama selekcja przycina
     # gruby ogon. Domyślnie OFF.
@@ -376,7 +377,7 @@ def backtest_portfel(
 
     # W-317 TRYB NAJLEPSZE: skaner okazji + cache snapshotów wskaźników per symbol.
     # Snapshot symbolu aktualizujemy tylko na JEGO tyku (świeży bar) → ranking O(N)/tyk.
-    skaner = SkanerOkazji(min_adx=skaner_min_adx) if tryb_skaner else None
+    skaner = SkanerOkazji(min_adx=skaner_min_adx, min_bezwzgledny_ts=skaner_min_ts) if tryb_skaner else None
     sizer = SizingPrzekonania() if (tryb_skaner and sizing_przekonania) else None
     snapshot_per: "Dict[str, Dict[str, Any]]" = {}
     for ts, sym, i in os_czasu:

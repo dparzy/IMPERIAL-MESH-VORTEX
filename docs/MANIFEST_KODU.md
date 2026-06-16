@@ -349,16 +349,19 @@
 |---------|------|------|
 | `Strategia` (model) | `strategie/baza.py` | przepis: które neurony, w jakiej roli (wejście/filtr/wyjście) |
 | `dobierz_najlepsze()` | `strategie/baza.py` | silnik: sygnały → top-3 pasujące strategie + kierunek |
-| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 18 strategii zmapowanych na ŻYWE klucze kodu |
+| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 20 strategii zmapowanych na ŻYWE klucze kodu |
 | **Wpięcie w Legatusa** | `legiony/legatus.py` | `RaportLegatusa.strategie_dopasowane` — Generał zwraca dobrane strategie w każdym raporcie |
 
 **Klucznik (strażnik spójności):** audyt Warstwa 4 (`narzedzia/audyt_spojnosci.py`)
 pilnuje, że KAŻDY klucz w strategii istnieje w kodzie i jest aktywny — żadnych
 neuronów-widm. Test: `test_klucznik_strategie_uzywaja_istniejacych_neuronow`.
 
-**Stan:** 18 strategii (klucze: 26 — wszystkie aktywne). Status każdej: SZKIC
-(czeka na kalibrację w Koloseum). Strategie z katalogu wymagające nieistniejących
-neuronów (OrderFlow, CVD, SMC, on-chain) wejdą gdy te neurony ożyją.
+**Stan:** 20 strategii (klucze: 34 — wszystkie aktywne). Status każdej: SZKIC
+(czeka na kalibrację w Koloseum). W-326: dodano 2 oryginalne strategie SMC
+(IMV-RV-006 ŁOWCA STREF, IMV-RV-007 ŻNIWA SZCZYTU) — pierwsze wykorzystujące
+naszą unikalną broń SMC-01/02/03 + VP-01 i pierwsze celujące reżim SMC_ACTIVE
+(był martwy w WAGI_REZIMU bez strategii — Prawo XV). Pozostałe strategie z katalogu
+wymagające nieistniejących neuronów (OrderFlow, CVD pełny) wejdą gdy te ożyją.
 
 ---
 

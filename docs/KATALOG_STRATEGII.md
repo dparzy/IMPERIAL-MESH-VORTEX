@@ -233,6 +233,31 @@ pojedynczego autora; popularyzowane na indeksach giełdowych od dekad).
 
 ## 🌌 STRATEGIE IMPERIUM VORTEX (Multi-legion)
 
+### IMV-RV-006 | "ŁOWCA STREF" | Smart Money Zone Hunter ⭐ ORYGINALNA (W-326)
+**Twórca:** IMV (oryginalna) — Smart Money Concepts / ICT
+**Interwał:** 4H / 1D
+**Reżim:** SMC_ACTIVE (pierwsza strategia celująca ten reżim — był martwy)
+**Warunki:** Złamanie struktury (BOS/MSS) + powrót do strefy Order Block + luka FVG potwierdza
+nierównowagę — wejście w instytucjonalnej strefie odwrotu (łapie dołki/górki gdzie kapitał odwraca).
+
+**Neurony WEJŚCIE:** `SMC-03` BOS/MSS (trigger zmiany trendu) + `SMC-01` Order Block (strefa)
+**Neurony FILTR:** `SMC-02` Fair Value Gap (nierównowaga) + `VP-01` VPOC (akceptacja wolumenowa) + `H-01` Hurst (nie szum)
+**Neurony WYJŚCIE:** `SMC-02` domknięcie luki FVG (cel) + `X-25` ATR dewiacja (ekstremum)
+**Dźwignia:** 1×–3× · **R:R:** 1:3 · **Status:** SZKIC
+
+### IMV-RV-007 | "ŻNIWA SZCZYTU" | Peak & Trough Harvest ⭐ ORYGINALNA (W-326)
+**Twórca:** IMV (oryginalna) — climax reversal + mean-reversion do wartości
+**Interwał:** 4H / 1D · **Reżim:** VOLATILE
+**Warunki:** Ruch klimaksowy (blow-off szczyt→SHORT / kapitulacja dołek→LONG) daleko od wartości
+(Value-Z) z powrotem do zakotwiczonego VWAP — żniwa górek i dołków.
+
+**Neurony WEJŚCIE:** `Z-05` Klimaks (szczyt/dołek) + `X-27` Value-Z (dystans od wartości)
+**Neurony FILTR:** `VP-01` VPOC (poziom akceptacji) + `V-07` Anchored VWAP (kierunek powrotu)
+**Neurony WYJŚCIE:** `V-07` powrót do AVWAP (wartość) + `X-25` ATR dewiacja
+**Dźwignia:** 1×–2× · **R:R:** 1:2.5 · **Status:** SZKIC
+
+---
+
 ### IMV-HY-001 | "TRIUMWIRAT" | Multi-Legion Confluence
 **Twórca:** VITRUVIUSZ / IMV
 **Interwał:** M15 (wejście) + 4H (kontekst) + 1D (makro)

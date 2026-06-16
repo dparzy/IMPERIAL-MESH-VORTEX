@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-06-16 | W-326 | Oryginalne strategie SMC — Łowca Stref + Żniwa Szczytu (utrata potencjału)
+
+**Kontekst (Prawo XV):** audyt strategii ujawnił, że nasza najbardziej UNIKALNA broń —
+SMC-01 (Order Block), SMC-02 (FVG), SMC-03 (BOS/MSS), VP-01 (VPOC) — NIE miała ŻADNEJ
+strategii. Reżim SMC_ACTIVE istniał w WAGI_REZIMU, ale żadna z 18 strategii go nie celowała
+(martwy reżim). Komentarz rejestru „SMC NIE wchodzą dopóki neurony nieaktywne" był przestarzały
+— SMC-01/02/03 i VP-01 są aktywne (DOSTEPNY=True). Nikt nie wrócił dodać strategii.
+
+**IMV-RV-006 ŁOWCA STREF (Smart Money Zone Hunter):** RV, reżim SMC_ACTIVE, 4H/1D.
+WEJSCIE: SMC-03 (złamanie struktury BOS/MSS) + SMC-01 (powrót do strefy Order Block).
+FILTR: SMC-02 (luka FVG = nierównowaga) + VP-01 (VPOC akceptacja) + H-01 (Hurst = nie szum).
+WYJSCIE: SMC-02 (domknięcie luki) + X-25 (rozciągnięcie ATR). Łapie dołki/górki w strefach
+instytucjonalnych — tam gdzie kapitał odwraca rynek. Źródło: ICT/Order Block + Fair Value Gap.
+
+**IMV-RV-007 ŻNIWA SZCZYTU (Peak & Trough Harvest):** RV, reżim VOLATILE, 4H/1D.
+WEJSCIE: Z-05 (Klimaks: blow-off szczyt→SHORT / kapitulacja dołek→LONG) + X-27 (Value-Z dystans).
+FILTR: VP-01 (VPOC) + V-07 (Anchored VWAP — kierunek powrotu do wartości). WYJSCIE: V-07 + X-25.
+Celuje wprost w górki i dołki klimaksowe z powrotem do wartości godziwej.
+
+**Spójność (Prawo XXI/XIX):** Klucznik czysty (34 klucze istnieją i aktywne), ID IMV-SMC-*
+wolne w KATALOG (kolizja z IMV-RV-* uniknięta), audyt exit 0. Reżimy pokryte: +SMC_ACTIVE.
+Testy: 4 nowe (obecność, pokrycie reżimu, dołek LONG, górka SHORT) — łącznie 20 testów strategii.
+
+**Pomiar (Prawo I — uczciwie):** strategie wpływają na tryby Dyrygenta „filtr"/„strategia", nie
+na etalon „agregat" (+5.19% niezmieniony). Pełny A/B trybu strategii = następny krok po wpięciu
+adapterów na żywo (SMC_ACTIVE wymaga realnej klasyfikacji reżimu z danych).
+
+**Pliki:** `imperium/legiony/strategie/rejestr_strategii.py`, `tests/test_strategie.py`,
+`docs/MANIFEST_KODU.md`, `docs/KATALOG_STRATEGII.md`, `docs/LOG_ZMIAN.md`.
+
 ## 2026-06-16 | W-325 | GUBERNATOR — homeostatyczny sterownik portfela (nowy moduł)
 
 **Kontekst:** rozpoznanie terenu wykazało, że warstwy adaptacyjne JUŻ istnieją i są podpięte

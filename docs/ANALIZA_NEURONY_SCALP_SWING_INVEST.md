@@ -194,3 +194,31 @@ Pi Cycle→szczyt cyklu 1D, VP/Delta/AVWAP→swing-rewersja). ALE: **nie zakład
 na 4h trend-following**. Realna wartość wymaga (a) wagowania reżimowego (WAGI_REZIMU — dać im
 wagę tam gdzie działają), lub (b) pomiaru w ich docelowym stylu (scalp/invest). Auto-założenie
 „więcej neuronów = lepiej" zostało SFALSYFIKOWANE pomiarem.
+
+---
+
+## 8. A/B W-322b — wagowanie reżimowe (Prawo I — zmierzony, nie założony)
+
+**Hipoteza:** VP-01 (S) silniejszy w RANGING (VPOC/VA = klucze S/R); AVWAP+DeltaDiv (F) silniejsze
+w RANGING; VP-01 słabszy w VOLATILE (VA wyrywa → poziomy tracą moc).
+**Implementacja:** S×1.8 w RANGING, F×1.5 w RANGING, S×0.6 w VOLATILE w `WAGI_REZIMU`.
+
+| Wariant | Trade | WR | PnL |
+|---------|-------|-----|-----|
+| PRZED (65, nowe wagi) | 723 | 43.6% | **+5.06%** |
+| PO (70, nowe wagi) | 716 | 43.6% | **+1.69%** |
+| **IMPAKT W-322b** | −7 | = | **−3.36 pp** |
+
+**vs W-322 (bez wagowania):** PRZED było +5.79%, PRZED z nowymi wagami = +5.06% → same wagi
+kosztują −0.73pp na 65 neuronach. Wagi reżimowe szkodzą nawet bez nowych neuronów.
+
+**Diagnoza (Prawo I):** `S×0.6 w VOLATILE` zabiło **wszystkie** neurony kategorii S (SMC-01/02/03
++ VP-01) w reżimie VOLATILE — który na 4h krypto jest kluczowy (breakouty, kontynuacje trendu).
+Zamiast celować w VP-01 specyficznie, waga uderzyła w cały ekosystem struktury. Hipoteza była
+logicznie słuszna dla VP-01 w izolacji, ale WAGI_REZIMU działają kategoryjnie — nie ma
+granularności per-neuron.
+
+**Decyzja (Prawo I):** wagi COFNIĘTE do stanu sprzed W-322b. Wagowanie per-kategoria jest zbyt
+grube do strojenia pojedynczego neuronu. Aby dać VP-01 wagę reżimową bez szkody dla SMC — potrzeba
+per-neuron mnożnika (osobny klucz w sygnale) lub wydzielenia S_VPOC vs S_SMC jako osobnych KAT.
+**To decyzja kierunkowa — odkładamy, nie implementujemy bez pomiaru.**

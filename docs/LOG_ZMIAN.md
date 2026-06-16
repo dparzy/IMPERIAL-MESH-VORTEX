@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-16 | W-328 | Nowe pary i backtest — skrypty pobierania i testowania (przygotowanie LIVE)
+
+**Kontekst:** Cezar pyta o rozszerzenie koszyka o nowe pary (ADA, AVAX, XRP, PEPE, WIF, memecoin).
+Środowisko cloud nie ma dostępu do internetu, więc: (1) przeanalizowano kandydatów; (2) dostarczono
+skrypt pobierania do uruchomienia lokalnie; (3) dostarczono skrypt backtestu dla porównania.
+
+**Kandydaci (uzasadnienie):**
+- ADA/USDT — niższa korelacja z BTC (~0.65), fundamentals-driven, duży volume
+- AVAX/USDT — silny momentum layer-1, dobra zmienność 4h
+- XRP/USDT — skoki regulacyjne, unikalny risk profile, top 5 volume
+- PEPE/USDT — memecoin: ekstremalne fundingi (PSY-01 złoto), korelacja ~0.45 z BTC
+
+**Nowe narzędzia:**
+- `narzedzia/pobierz_nowe_pary.py` — pobiera 1h OHLCV z MEXC (ccxt) i agreguje do 4h
+- `narzedzia/backtest_nowe_pary.py` — A/B test: baseline vs rozszerzony koszyk vs solo vs 1h TF
+
+**Protokół:** Uruchom lokalnie: `python narzedzia/pobierz_nowe_pary.py` (wymaga sieci) →
+potem `python narzedzia/backtest_nowe_pary.py` → dodaj pary tylko gdy zysk% > baseline (Prawo I).
+
+---
+
 ## 2026-06-16 | W-327 | AdapterMEXCFutures — funding/OI rodzime dla LIVE na MEXC
 
 **Kontekst (Prawo I — poprawność dla LIVE):** Cezar wchodzi na żywo na MEXC ($50, 5 par).

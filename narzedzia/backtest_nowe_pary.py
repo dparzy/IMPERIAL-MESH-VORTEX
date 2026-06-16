@@ -15,7 +15,7 @@ import os, sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from imperium.koloseum.backtest import backtest_portfel, backtest
+from imperium.koloseum.backtest import backtest_portfel
 
 
 BASELINE = {
@@ -39,9 +39,10 @@ def filtruj_dostepne(pliki: dict) -> dict:
 
 
 def raportuj(label: str, eng):
-    s = eng.statystyki()
-    print(f"  {label:<35} | {s['zysk_proc']:+7.2f}% | WR={s['win_rate']:.1%}"
-          f" | MaxDD={s['max_drawdown']:.1%} | trades={s['n_transakcji']}")
+    s = eng.podsumowanie()
+    pnl = (s.kapital_koncowy / s.kapital_startowy - 1) * 100
+    print(f"  {label:<35} | {pnl:+7.2f}% | WR={s.win_rate:.1%}"
+          f" | MaxDD={s.max_drawdown_pct:.1%} | trades={s.total_trades}")
 
 
 def main():
@@ -68,7 +69,7 @@ def main():
         print()
         for sym, sciezka in nowe_dostepne.items():
             try:
-                eng_c = backtest({sym: sciezka}, "4h", tryb_skaner=True)
+                eng_c = backtest_portfel({sym: sciezka}, "4h", tryb_skaner=True)
                 raportuj(f"C: {sym} solo", eng_c)
             except Exception as e:
                 print(f"  C: {sym} BLAD: {e}")

@@ -165,3 +165,32 @@ Pomiar na 220 barach 4h BTC (`narzedzia/dekorelacja_w322.py`), sygnał = kierune
   ≠ ADX (siła trendu) — wysokie |r| tu może być specyfiką trendowego okna BTC.
 - Z-06, Z-07 — warunkowe/uśpione w tym oknie (zgodnie z naturą: Amihud ożywa przy kruchej
   płynności, Pi Cycle na szczycie cyklu). Dowód żywotności: WERYFIKACJA_ADAPTEROW w audycie.
+
+---
+
+## 7. A/B IMPAKT na TRYB NAJLEPSZY (W-322, Prawo I — zmierzony, nie założony)
+
+Pełny stack 4h, to samo okno 2022→2026 (7500 barów/parę), `narzedzia/ab_w322.py`
+(monkey-patch `wszystkie_neurony` — czyste A/B 65 vs 70):
+
+| Wariant | Trade | WR | PnL |
+|---------|-------|-----|-----|
+| PRZED (65, bez W-322) | 722 | 43.8% | **+5.79%** |
+| PO (70, z W-322) | 717 | 43.8% | **+5.19%** |
+| **IMPAKT** | −5 | = | **−0.59 pp** |
+
+**Wniosek (Prawo I — niewygodny, ale prawdziwy):** dodanie 5 nowych neuronów NIE poprawiło
+TRYBU NAJLEPSZEGO na 4h — lekko pogorszyło (−0.6 pp, poziom szumu). PRZED odtworzył
+dokładnie udokumentowane +5.8% (W-321b) → patch i pomiar wiarygodne.
+
+**Dlaczego (mechanizm):** Z-06 Amihud (defensywny, tłumi przy cienkiej płynności) uciął
+5 trade'ów — a na tym gruboogonowym backteście ucinanie trade'ów ucina ekspozycję na ogon
+DOGE (ta sama lekcja co W-318: filtr ↓ryzyko, ale ↓gruby ogon). Pozostałe (VP/Delta/AVWAP)
+to neurony rewersji/struktury, lekko rozcieńczyły selekcję trend-following na 4h.
+
+**Decyzja (Prawo XV/XVI):** neurony ZOSTAJĄ aktywne (są zdekorelowane — niosą nową
+informację; −0.6pp to szum; celują w warunki NIEOBECNE w tym oknie: Amihud→cienka płynność,
+Pi Cycle→szczyt cyklu 1D, VP/Delta/AVWAP→swing-rewersja). ALE: **nie zakładamy ich korzyści
+na 4h trend-following**. Realna wartość wymaga (a) wagowania reżimowego (WAGI_REZIMU — dać im
+wagę tam gdzie działają), lub (b) pomiaru w ich docelowym stylu (scalp/invest). Auto-założenie
+„więcej neuronów = lepiej" zostało SFALSYFIKOWANE pomiarem.

@@ -101,6 +101,15 @@ def audyt() -> tuple:
         if dup:
             bledy.append(f"[W1] Zduplikowane klucze neuronów: {sorted(dup)}")
 
+        # W-323: NEURONY_STYLU pokrywa KAŻDY neuron (zero sierot/braków, Prawo XXI)
+        from imperium.legiony.rejestr import raport_profili
+        rp = raport_profili()
+        if rp["sieroty_w_mapie"]:
+            bledy.append(f"[W1] NEURONY_STYLU sieroty (w mapie, brak w kodzie): {rp['sieroty_w_mapie']}")
+        if rp["braki_w_mapie"]:
+            bledy.append(f"[W1] NEURONY_STYLU braki (neuron bez profilu stylu): {rp['braki_w_mapie']}")
+        info.append(f"Profile stylu (W-323): SCALP {rp['scalp']} | SWING {rp['swing']} | INVEST {rp['invest']}")
+
     except Exception as e:
         bledy.append(f"[W1] Nie udało się załadować żywego roju: {e}")
         return bledy + ["(audyt przerwany — napraw import)"], info

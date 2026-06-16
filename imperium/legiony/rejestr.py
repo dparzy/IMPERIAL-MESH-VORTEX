@@ -154,15 +154,17 @@ def wszyscy_zwiadowcy() -> list:
 
 
 def zbuduj_legatusa(min_neuronow: int = 5, min_przewaga: float = 0.55,
-                    aktywuj_smc: bool = True) -> Legatus:
+                    aktywuj_smc: bool = True, styl: str = None) -> Legatus:
     """
     Składa pełnego Legatusa: wszystkie neurony + zwiadowcy EXP + most SMC.
 
     aktywuj_smc: gdy True (domyślnie), budzi SMC-01/02/03 — bo ZwiadowcaSMC
                  jest w składzie i będzie wstrzykiwał strefy. Gdy nie podajesz
                  barów do fokus(), zostaw False (inaczej SMC dostaną puste strefy).
+    styl: gdy podany (SCALP/SWING/INVEST, W-323) — Legatus dostaje DEDYKOWANY
+          zestaw neuronów dla stylu (neurony_dla_trybu), nie pełne 70. None = pełny rój.
     """
-    neurony = wszystkie_neurony()
+    neurony = neurony_dla_trybu(styl) if styl else wszystkie_neurony()
     zwiadowcy = wszyscy_zwiadowcy()
     from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
     strategie = wszystkie_strategie()
@@ -233,4 +235,94 @@ def raport_elity() -> dict:
         "neurony_elite": [{"klucz": n.KLUCZ, "powod": n.POWOD_ELITARNOSCI} for n in elite_n],
         "zwiadowcy_elite": [{"klucz": z.KLUCZ, "powod": z.POWOD_ELITARNOSCI} for z in elite_z],
         "lacznie_elite": len(elite_n) + len(elite_z),
+    }
+
+
+# ── PROFILE STYLU GRY (W-323) — który neuron głosuje w jakim stylu ───────────────
+#
+# DLA NOWICJUSZA: nie każdy neuron ma sens na każdym interwale. RSI/StochRSI to
+# szybkie oscylatory (scalp/swing); MVRV-Z/SOPR to wolne wskaźniki on-chain (tylko
+# inwestycja 1D-1W); Pi Cycle to kill-switch szczytu cyklu (potrzebuje ≥350 barów 1D).
+# Zamiast zawsze uruchamiać pełne 70 (rozcieńcza sygnał — patrz W-322/W-322b), wybieramy
+# DEDYKOWANY ZESTAW per styl. To NIE wycisza neuronu — on dalej żyje w innych profilach.
+#
+# Prawo I: to HIPOTEZA WSTĘPNA oparta o naturę wskaźnika + sekcja 1 ANALIZA_NEURONY.
+#   Docelowo strojona pomiarem A/B (W-323+) — „z czasem żonglujemy neuronami".
+# Prawo XXI: KAŻDY z 70 neuronów MUSI tu być (audyt sprawdza brak sierot/braków).
+#   Nowy neuron bez wpisu = błąd spójności (nie wpada cicho do „uniwersalnych").
+#
+# Style: "SCALP" (M1-1h, szybkie momentum/mikrostruktura), "SWING" (4h-1D, trend/struktura),
+#        "INVEST" (1D-1W, makro/cykl/on-chain).
+
+STYL_SCALP = "SCALP"
+STYL_SWING = "SWING"
+STYL_INVEST = "INVEST"
+WSZYSTKIE_STYLE: tuple = (STYL_SCALP, STYL_SWING, STYL_INVEST)
+
+# Uniwersalny = bezpieczniki/reżim/sentyment działające na każdym interwale.
+_U = WSZYSTKIE_STYLE
+_SC_SW = (STYL_SCALP, STYL_SWING)
+_SW_IN = (STYL_SWING, STYL_INVEST)
+
+NEURONY_STYLU: dict = {
+    # Momentum (M) — oscylatory: szybkie sygnały scalp+swing; AC i HA czysto scalp
+    "X-01": _SC_SW, "X-02": _SC_SW, "X-03": _SC_SW, "X-04": _SC_SW,
+    "X-06": _SC_SW, "X-08": _SC_SW, "X-09": (STYL_SCALP,), "X-12": _SC_SW,
+    "X-17": _SC_SW, "X-25": _SC_SW, "X-26": (STYL_SCALP,),
+    "X-27": _SW_IN,                       # Value-Z: rewersja do wartości godziwej (swing/invest)
+    # Trend (T) — wolniejsze: swing/invest; MTF czysto swing; HA-szybkie EMA/HMA scalp+swing
+    "X-05": _SC_SW, "X-10": _SC_SW, "X-18": _SW_IN, "X-28": (STYL_SWING,),
+    "XII-01": _SW_IN, "XII-02": _SW_IN, "XII-03": _SW_IN, "XII-04": _SW_IN,
+    "XII-05": (STYL_SWING,), "XII-06": (STYL_SWING,), "XII-07": (STYL_SWING,),
+    # Wolumen/Flow (F) — CVD czysto scalp; OBV swing/invest; reszta scalp+swing lub swing
+    "V-01": _SW_IN, "V-02": _SC_SW, "V-03": (STYL_SCALP,), "V-04": _SC_SW,
+    "V-05": (STYL_SWING,), "V-06": _SC_SW, "V-07": (STYL_SWING,),
+    "VSA-01": (STYL_SWING,), "X-11": _SC_SW,
+    # Struktura/SMC (S) — sesje scalp; FVG scalp+swing; OB/BOS/VPOC swing
+    "SES-01": (STYL_SCALP,), "SES-02": (STYL_SCALP,),
+    "SMC-01": (STYL_SWING,), "SMC-02": _SC_SW, "SMC-03": (STYL_SWING,),
+    "VP-01": (STYL_SWING,),
+    # On-chain (O) — wolne fundamenty: tylko inwestycja
+    "OC-01": (STYL_INVEST,), "OC-02": (STYL_INVEST,), "OC-03": (STYL_INVEST,),
+    "OC-04": (STYL_INVEST,), "OC-05": (STYL_INVEST,),
+    # Reżim/Sentyment (R) — futures-sentyment scalp+swing; Fear&Greed/RADAR swing+invest
+    "PSY-01": _SC_SW, "PSY-02": _SC_SW, "PSY-04": _SC_SW, "PSY-03": _SW_IN,
+    "RADAR-01": _SW_IN, "RADAR-02": _SW_IN, "RADAR-03": _SW_IN,
+    "AUG-01": _U, "NEWS-01": _U,
+    # Meta-bramy reżimu/chaosu (H/N/V/D/L) — uniwersalne (klasyfikują każdy interwał)
+    "H-01": _SW_IN, "N-01": _U, "V-13": _U, "V-14": _U, "D-01": _U,
+    "L-14": _U, "VI-13": _U,
+    # Anty-manipulacja (A) — uniwersalna obrona
+    "A-01": _U, "A-02": _U, "A-03": _U, "A-05": _U,
+    # Zagrożenie (Z) — bezpieczniki uniwersalne; Bubble swing+invest; Pi Cycle czysto invest
+    "Z-01": _U, "Z-02": _U, "Z-03": _SW_IN, "Z-04": _U, "Z-05": _U,
+    "Z-06": _SC_SW, "Z-07": (STYL_INVEST,),
+}
+
+
+def neurony_dla_trybu(styl: str) -> List[MikroNeuron]:
+    """
+    W-323 — zwraca DEDYKOWANY zestaw neuronów dla stylu gry (SCALP/SWING/INVEST).
+
+    Filtruje pełny rój wg NEURONY_STYLU — neuron głosuje tylko gdy `styl` jest w jego
+    profilu. Bezpieczniki/reżim (uniwersalne) trafiają do każdego zestawu.
+    Prawo XV: to nie wyciszenie — neuron żyje w swoich docelowych stylach.
+    """
+    styl = styl.upper()
+    if styl not in WSZYSTKIE_STYLE:
+        raise ValueError(f"Nieznany styl: {styl!r}. Dozwolone: {WSZYSTKIE_STYLE}")
+    return [n for n in wszystkie_neurony()
+            if styl in NEURONY_STYLU.get(n.KLUCZ, WSZYSTKIE_STYLE)]
+
+
+def raport_profili() -> dict:
+    """W-323 — ile neuronów gra w każdym stylu + sieroty/braki vs kod (Prawo XXI)."""
+    klucze_kodu = {n.KLUCZ for n in wszystkie_neurony()}
+    klucze_mapy = set(NEURONY_STYLU)
+    return {
+        "scalp": len(neurony_dla_trybu(STYL_SCALP)),
+        "swing": len(neurony_dla_trybu(STYL_SWING)),
+        "invest": len(neurony_dla_trybu(STYL_INVEST)),
+        "sieroty_w_mapie": sorted(klucze_mapy - klucze_kodu),   # klucz w mapie, brak w kodzie
+        "braki_w_mapie": sorted(klucze_kodu - klucze_mapy),      # neuron w kodzie, brak w mapie
     }

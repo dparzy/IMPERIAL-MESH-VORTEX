@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-16 | W-323 | Profile stylu gry — dedykowany zestaw neuronów per SCALP/SWING/INVEST
+
+**Kontekst:** lekcja W-322/W-322b — „więcej neuronów = lepiej" i wagowanie reżimowe per-kategoria
+SFALSYFIKOWANE pomiarem (rozcieńczenie sygnału / zabicie SMC w VOLATILE). Cezar: zamiast zawsze
+grać pełnym rojem (70), wybierać DEDYKOWANY zestaw neuronów do stylu/interwału — „żonglować"
+nimi w czasie.
+
+**Wdrożenie (kod jest prawem):**
+- `rejestr.NEURONY_STYLU` — jawna tabela KLUCZ→(style) dla wszystkich 70 (zero sierot/braków).
+- `rejestr.neurony_dla_trybu(styl)` + `raport_profili()` — selekcja zestawu + diagnostyka.
+- `zbuduj_legatusa(styl=)` i `backtest_portfel(styl=)` — opt-in (None=pełne 70, zero regresji).
+- Komplementarne do `namiestnik.styl_interwalu/ProfilStylu` (interwał→styl, ryzyko per styl).
+
+**Zestawy:** SCALP 41 | SWING 59 | INVEST 35 (z 70). Bezpieczniki/anty-manip uniwersalne.
+**Hipoteza wstępna (Prawo I):** przypisanie = domain-knowledge (sekcja 1 ANALIZA), nie pomiar;
+strojone A/B w czasie. Audyt: Warstwa 1 sprawdza pokrycie mapy. Testy: `tests/test_profile_stylu.py`.
+
+**Pliki:** `imperium/legiony/rejestr.py`, `imperium/koloseum/backtest.py`,
+`narzedzia/audyt_spojnosci.py`, `narzedzia/ab_w323.py`, `tests/test_profile_stylu.py`,
+`docs/ANALIZA_NEURONY_SCALP_SWING_INVEST.md`.
+
 ## 2026-06-16 | W-322 | 5 nowych neuronów scalp/swing/invest (z analizy + research)
 
 **Kontekst:** po analizie `ANALIZA_NEURONY_SCALP_SWING_INVEST.md` (porównanie 65 neuronów

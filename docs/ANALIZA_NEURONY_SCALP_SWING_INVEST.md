@@ -222,3 +222,27 @@ granularności per-neuron.
 grube do strojenia pojedynczego neuronu. Aby dać VP-01 wagę reżimową bez szkody dla SMC — potrzeba
 per-neuron mnożnika (osobny klucz w sygnale) lub wydzielenia S_VPOC vs S_SMC jako osobnych KAT.
 **To decyzja kierunkowa — odkładamy, nie implementujemy bez pomiaru.**
+
+---
+
+## 9. W-323 — PROFILE STYLU: dedykowany zestaw neuronów per styl gry
+
+**Idea (zgodna z intuicją Cezara):** zamiast zawsze uruchamiać pełne 70 neuronów (co
+rozcieńcza sygnał — patrz W-322/W-322b), wybieramy DEDYKOWANY ZESTAW dla stylu gry, jaki
+prowadzimy na danym interwale. RSI/StochRSI/CVD/HA — scalp. EMA50/200, Ichimoku, ADX, SMC —
+swing. MVRV-Z, SOPR, Puell, Pi Cycle — invest. Bezpieczniki (VPIN, anty-manip) — wszędzie.
+
+**Implementacja (kod jest prawem, Prawo XIX):**
+- `rejestr.NEURONY_STYLU` — tabela `KLUCZ → (style...)`, JAWNIE dla wszystkich 70 (audyt W1
+  sprawdza zero sierot/braków). To „tablica do żonglowania" — strojona w czasie pomiarem.
+- `rejestr.neurony_dla_trybu(styl)` — zwraca zestaw dla SCALP/SWING/INVEST.
+- `zbuduj_legatusa(styl=...)` + `backtest_portfel(styl=...)` — opt-in (domyślnie None = pełne 70,
+  zero regresji na istniejących backtestach; interwał 4h NIE wymusza profilu automatycznie).
+- Spójność z `namiestnik.styl_interwalu()` (M1-15→SCALP, 30M-4H→SWING, 1D-1W→INVEST) i
+  `namiestnik.ProfilStylu` (lewar cap / rynek / próg per styl — RYZYKO, komplementarne do
+  doboru NEURONÓW tutaj).
+
+**Rozmiar zestawów:** SCALP 41 | SWING 59 | INVEST 35 (z 70). Bezpieczniki/reżim uniwersalne.
+
+**Hipoteza wstępna (Prawo I):** przypisanie stylów to domain-knowledge + sekcja 1 — NIE pomiar.
+Docelowo strojone A/B per styl. Pierwszy test: SWING-profil (59) vs pełnia (70) na 4h ↓ (W-323 A/B).

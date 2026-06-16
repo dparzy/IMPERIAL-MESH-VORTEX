@@ -256,6 +256,9 @@ def backtest_portfel(
     # nie od kapitału startowego. Zysk reinwestowany w większe pozycje (wzrost
     # geometryczny). Domyślnie OFF (stały sizing = liniowy wzrost, łatwiejsza ocena edge).
     compounding: bool = False,
+    # W-323 Profil Stylu — gdy podany (SCALP/SWING/INVEST), każdy Legatus dostaje
+    # DEDYKOWANY zestaw neuronów (neurony_dla_trybu), nie pełne 70. None = pełny rój.
+    styl: "Optional[str]" = None,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -330,7 +333,7 @@ def backtest_portfel(
 
     dyrygenci = {}
     for sym in bary_per:
-        legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
+        legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True, styl=styl)
         d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(), engine=engine,
                      budowniczy=budowniczy, min_pewnosc=min_pewnosc, tryb=tryb,
                      namiestnik=namiestnik, breaker_krzywej=False,  # breaker wspólny

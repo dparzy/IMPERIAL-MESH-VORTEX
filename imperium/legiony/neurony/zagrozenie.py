@@ -438,3 +438,116 @@ class NeuronDetektorRuchu(MikroNeuron):
 
         return self._bazowy_sygnal(round(roc, 4), "NEUTRAL", 0.0,
             ["Brak klimaksu (ruch/RSI/wolumen nie zbiegają się w ekstremum)"])
+
+
+class NeuronAmihudIlliquidity(MikroNeuron):
+    """
+    Z-06 | Amihud Illiquidity — radar kruchej płynności (meta-brama obronna, W-322).
+
+    Dla nowicjusza: Amihud (2002) mierzy IMPAKT CENOWY — ile cena rusza się na każdą
+    jednostkę obrotu. ILLIQ = średnia |zwrot| / obrót_USDT. Wysoki = cena „skacze" na
+    małym wolumenie (cienka, krucha księga, łatwa do manipulacji, duży poślizg). Niski
+    = głęboka płynność (bezpieczne wejście). Wartość skalowana ×1e6 dla czytelności.
+
+    Z-06 to META-BRAMA OBRONNA — NIE wybiera LONG/SHORT, tylko tłumi rój przez
+    pewnosc_przeciwnika, gdy płynność jest krucha (ryzyko poślizgu/manipulacji):
+      ILLIQ < prog_spokoj         → NEUTRAL, pewnosc_przeciwnika 0.0 (płynno, bezpiecznie).
+      prog_spokoj..prog_alarm     → CZUJNOŚĆ: skromne tłumienie skalowane ILLIQ.
+      ILLIQ ≥ prog_alarm          → 🚨 krucha płynność: silne tłumienie roju.
+
+    Dlaczego ORTOGONALNY (Prawo XVI): Z-01 VPIN mierzy TOKSYCZNOŚĆ przepływu (kto gra
+    przeciw tłumowi), Z-06 Amihud mierzy IMPAKT/PŁYNNOŚĆ (jak łatwo cena się rusza) —
+    inna oś ryzyka. Komplementarne: toksyczny przepływ ≠ cienka księga.
+
+    Źródło: Amihud, „Illiquidity and stock returns" (J. Financial Markets, 2002);
+            SSRN 2025 — przegląd faktorów płynności w krypto.
+    """
+    KLUCZ = "Z-06"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "AMIHUD_20"
+    KATEGORIA = "Z"
+    WAGA = 6
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    _PROG_SPOKOJ = 0.5    # ILLIQ (×1e6) poniżej = płynno, brak tłumienia
+    _PROG_ALARM = 3.0     # ILLIQ powyżej = krucha płynność, silne tłumienie
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        il = wskazniki.get("AMIHUD_20")
+        if il is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak AMIHUD_20 (wymaga ≥21 barów)"])
+
+        if il < self._PROG_SPOKOJ:
+            return self._bazowy_sygnal(round(il, 4), "NEUTRAL", 0.0,
+                [f"Płynność głęboka: ILLIQ {il:.2f} < {self._PROG_SPOKOJ} — brak tłumienia"])
+
+        # skala tłumienia: 0 przy prog_spokoj, ~0.9 przy/ponad prog_alarm
+        rozp = max(self._PROG_ALARM - self._PROG_SPOKOJ, 1e-9)
+        przeciwnik = round(min(0.9, 0.9 * (il - self._PROG_SPOKOJ) / rozp), 4)
+        alarm = il >= self._PROG_ALARM
+        powod = (f"🚨 KRUCHA PŁYNNOŚĆ: ILLIQ {il:.2f} ≥ {self._PROG_ALARM} — "
+                 f"ryzyko poślizgu/manipulacji, tłumię rój ({przeciwnik:.0%})") if alarm else \
+                (f"Czujność płynności: ILLIQ {il:.2f} — częściowe tłumienie ({przeciwnik:.0%})")
+        s = self._bazowy_sygnal(round(il, 4), "NEUTRAL", 0.0, [powod])
+        s.pewnosc_przeciwnika = przeciwnik
+        return s
+
+
+class NeuronPiCycleTop(MikroNeuron):
+    """
+    Z-07 | Pi Cycle Top — kill-switch szczytu cyklu (price-only, INVEST, W-322).
+
+    Dla nowicjusza: Pi Cycle Top to słynny detektor szczytu cyklu Bitcoina. Gdy
+    111-dniowa średnia (SMA-111) przecina OD DOŁU dwukrotność 350-dniowej (2×SMA-350),
+    historycznie oznaczało to szczyt hossy (trafił 2013, 2017, 2021 — potem spadki
+    52–86%). To czysta geometria średnich cenowych (zero on-chain API).
+
+    Sygnał:
+      • Świeży cross (PI_111 przebija 2×SMA-350 od dołu) → SHORT (szczyt cyklu, ucieczka).
+      • Stosunek PI_111 / 2×SMA-350 blisko 1.0 (≥ prog_blisko) → słaby SHORT (ostrzeżenie).
+      • W pozostałych przypadkach → NEUTRAL.
+    Działa na 1D (INVEST). Wymaga ≥350 barów — inaczej abstynuje (Prawo XV).
+
+    Dlaczego ORTOGONALNY (Prawo XVI): OC-01 MVRV mierzy WYCENĘ on-chain (cena vs koszt
+    bazowy HODLerów), Z-07 Pi Cycle to GEOMETRIA średnich cenowych — inna oś szczytu.
+
+    Źródło: Pi Cycle Top (Philip Swift); Newhedge / Pintu Academy 2025.
+    """
+    KLUCZ = "Z-07"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "PI_111"
+    KATEGORIA = "Z"
+    WAGA = 6
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    _PROG_BLISKO = 0.92   # PI_111 / 2×SMA-350 ≥ to → ostrzeżenie (zbliża się szczyt)
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        p111 = wskazniki.get("PI_111")
+        p350 = wskazniki.get("PI_350X2")
+        p111_prev = wskazniki.get("PI_111_PREV")
+        p350_prev = wskazniki.get("PI_350X2_PREV")
+
+        if None in (p111, p350) or p350 <= 0:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak Pi Cycle (wymaga ≥350 barów)"])
+
+        ratio = p111 / p350
+
+        # Świeży cross od dołu: poprzednio PI_111 < 2×SMA-350, teraz ≥
+        if None not in (p111_prev, p350_prev) and p350_prev > 0:
+            if p111_prev < p350_prev and p111 >= p350:
+                return self._bazowy_sygnal(round(ratio, 4), "SHORT", 0.85,
+                    [f"🔺 PI CYCLE TOP: SMA-111 przebiła 2×SMA-350 od dołu "
+                     f"(ratio {ratio:.3f}) — historyczny szczyt cyklu → SHORT"])
+
+        if ratio >= self._PROG_BLISKO:
+            sila = round(min(0.55, 0.25 + (ratio - self._PROG_BLISKO) / (1.0 - self._PROG_BLISKO) * 0.30), 4)
+            return self._bazowy_sygnal(round(ratio, 4), "SHORT", sila,
+                [f"⚠️ Pi Cycle zbliża się do szczytu: ratio {ratio:.3f} ≥ {self._PROG_BLISKO} "
+                 f"— ostrzeżenie szczytu cyklu (słaby SHORT {sila:.0%})"])
+
+        return self._bazowy_sygnal(round(ratio, 4), "NEUTRAL", 0.0,
+            [f"Pi Cycle spokojny: ratio {ratio:.3f} < {self._PROG_BLISKO} (daleko od szczytu)"])

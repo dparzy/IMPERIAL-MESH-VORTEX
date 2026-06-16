@@ -274,3 +274,100 @@ class NeuronRVOL(MikroNeuron):
         if rvol < 0.7:
             return self._bazowy_sygnal(rvol, "NEUTRAL", 0.15, [f"RVOL={rvol:.2f}× niski → brak zainteresowania"])
         return self._bazowy_sygnal(rvol, "NEUTRAL", 0.25, [f"RVOL={rvol:.2f}× przeciętny"])
+
+
+class NeuronDeltaDivergence(MikroNeuron):
+    """
+    V-06 | Delta Divergence — dywergencja cena↔delta wolumenu (SCALP, W-322).
+
+    Dla nowicjusza: „delta" to różnica między agresywnym kupnem a sprzedażą w barze.
+    Bez feedu L2 liczymy ją z OHLCV (proxy): jeśli świeca zamyka się przy szczycie =
+    presja kupna (+), przy dnie = presja sprzedaży (−). Sumujemy → CVD-proxy. Gdy
+    CENA robi nowy szczyt, a CVD-proxy NIE potwierdza (spada) → presja kupna słabnie
+    → wczesny sygnał REWERSJI (klasyka order-flow / footprint).
+
+    Sygnał (wartość ∈ [−1, 1] z Bramy):
+      • DELTA_DIV > +prog → cena↓ ale delta↑ (akumulacja w spadku) → LONG (rewersja w górę).
+      • DELTA_DIV < −prog → cena↑ ale delta↓ (dystrybucja w wzroście) → SHORT (rewersja w dół).
+      • |DELTA_DIV| ≤ prog → NEUTRAL (cena i delta zgodne — brak dywergencji).
+
+    Dlaczego ORTOGONALNY (Prawo XVI): V-03 CVD mierzy POZIOM delty (kierunek presji),
+    V-06 mierzy DYWERGENCJĘ delty względem ceny (rozjazd) — inna informacja, wczesny
+    sygnał wyczerpania ruchu. V-06 jest OHLCV-only (żywy bez feedu, w przeciwieństwie do V-03).
+
+    Źródło: order-flow / footprint (LiteFinance, NinjaTrader 2026) — delta divergence
+            jako wczesny sygnał rewersji.
+    """
+    KLUCZ = "V-06"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "DELTA_DIV"
+    KATEGORIA = "F"
+    WAGA = 5
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    _PROG = 0.15   # |dywergencja| powyżej = sygnał kierunkowy
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        dd = wskazniki.get("DELTA_DIV")
+        if dd is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak DELTA_DIV (wymaga ≥15 barów)"])
+
+        if abs(dd) <= self._PROG:
+            return self._bazowy_sygnal(round(dd, 4), "NEUTRAL", 0.0,
+                [f"Cena i delta zgodne: dywergencja {dd:+.2f} (|{abs(dd):.2f}| ≤ {self._PROG})"])
+
+        pewnosc = round(min(0.80, 0.45 + (abs(dd) - self._PROG) * 0.7), 4)
+        if dd > 0:
+            return self._bazowy_sygnal(round(dd, 4), "LONG", pewnosc,
+                [f"📉→📈 DELTA DIVERGENCE: cena↓ ale delta↑ ({dd:+.2f}) — akumulacja → LONG ({pewnosc:.0%})"])
+        return self._bazowy_sygnal(round(dd, 4), "SHORT", pewnosc,
+            [f"📈→📉 DELTA DIVERGENCE: cena↑ ale delta↓ ({dd:+.2f}) — dystrybucja → SHORT ({pewnosc:.0%})"])
+
+
+class NeuronAnchoredVWAP(MikroNeuron):
+    """
+    V-07 | Anchored VWAP — VWAP kotwiczony od pivotu (SWING, W-322).
+
+    Dla nowicjusza: zwykły VWAP (V-02) liczy średnią ważoną wolumenem od początku okna.
+    Anchored VWAP kotwiczy ją od OSTATNIEGO ISTOTNEGO PIVOTU (swing high/low) — przez co
+    pokazuje średni koszt uczestników OD tego wydarzenia. Cena nad AVWAP = kupujący od
+    pivotu są na plusie (przewaga byków); pod AVWAP = na minusie (przewaga niedźwiedzi).
+
+    Sygnał (odchylenie ceny od AVWAP, w %):
+      • CLOSE > AVWAP × (1 + prog) → LONG (przewaga kupujących od pivotu).
+      • CLOSE < AVWAP × (1 − prog) → SHORT (przewaga sprzedających).
+      • w paśmie ±prog wokół AVWAP → NEUTRAL (równowaga przy kotwicy).
+
+    Dlaczego ORTOGONALNY (Prawo XVI): V-02 VWAP to średnia OD POCZĄTKU OKNA (sesyjna),
+    V-07 kotwiczy od PIVOTU STRUKTURALNEGO — inny punkt odniesienia, inna informacja.
+
+    Źródło: Highstrike / XS 2025 — anchored VWAP w swing tradingu.
+    """
+    KLUCZ = "V-07"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "AVWAP"
+    KATEGORIA = "F"
+    WAGA = 5
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    _PROG = 0.005   # ±0.5% pasmo neutralne wokół AVWAP
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        avwap = wskazniki.get("AVWAP")
+        close = wskazniki.get("CLOSE")
+        if avwap is None or close is None or avwap <= 0:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak AVWAP/CLOSE"])
+
+        odchyl = (close - avwap) / avwap
+        if abs(odchyl) <= self._PROG:
+            return self._bazowy_sygnal(round(odchyl, 4), "NEUTRAL", 0.0,
+                [f"Cena przy AVWAP: odchyl {odchyl:+.2%} (|{abs(odchyl):.2%}| ≤ {self._PROG:.1%})"])
+
+        pewnosc = round(min(0.78, 0.50 + (abs(odchyl) - self._PROG) * 8.0), 4)
+        if odchyl > 0:
+            return self._bazowy_sygnal(round(odchyl, 4), "LONG", pewnosc,
+                [f"Cena {odchyl:+.2%} nad AVWAP ({avwap:.2f}) — kupujący od pivotu na plusie → LONG ({pewnosc:.0%})"])
+        return self._bazowy_sygnal(round(odchyl, 4), "SHORT", pewnosc,
+            [f"Cena {odchyl:+.2%} pod AVWAP ({avwap:.2f}) — sprzedający od pivotu na plusie → SHORT ({pewnosc:.0%})"])

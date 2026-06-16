@@ -38,10 +38,10 @@ from imperium.legiony.neurony.trend import (
 from imperium.legiony.neurony.sesje import NeuronZegarSesji, NeuronAzjaRange, NeuronAugur, NeuronRadarBTC, NeuronDominacja, NeuronPrzeplyw
 from imperium.legiony.neurony.wolumen import (
     NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL,
-    NeuronForceIndex,
+    NeuronForceIndex, NeuronDeltaDivergence, NeuronAnchoredVWAP,
 )
 from imperium.legiony.neurony.struktura import (
-    NeuronOrderBlock, NeuronFVG, NeuronBOS, NeuronVSA,
+    NeuronOrderBlock, NeuronFVG, NeuronBOS, NeuronVSA, NeuronVolumeProfile,
 )
 from imperium.legiony.neurony.sentyment import NeuronSentymentNews
 from imperium.legiony.neurony.psychologia import (
@@ -64,7 +64,7 @@ from imperium.legiony.neurony.entropia import (
 )
 from imperium.legiony.neurony.zagrozenie import (
     NeuronToxicFlow, NeuronPumpDetect, NeuronBubbleCrash, NeuronCascade,
-    NeuronDetektorRuchu,
+    NeuronDetektorRuchu, NeuronAmihudIlliquidity, NeuronPiCycleTop,
 )
 from imperium.legiony.neurony.geometria import (
     NeuronPathSignature,
@@ -96,14 +96,18 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         # Trend (XII)
         NeuronADX(), NeuronIchimoku(), NeuronEMA50_200(), NeuronSupertrend(), NeuronDonchian(),
         NeuronHMA(), NeuronFibonacci(), NeuronRSIDiv(), NeuronOBZone(),
-        # Wolumen (V)
+        # Wolumen (V/F)
         NeuronOBV(), NeuronVWAP(), NeuronCVD(), NeuronVolumeAnomaly(), NeuronRVOL(),
         NeuronForceIndex(),
+        # Delta Divergence (F, V-06) + Anchored VWAP (F, V-07) — order-flow/swing OHLCV (W-322)
+        NeuronDeltaDivergence(), NeuronAnchoredVWAP(),
         # Zegary rynku (SES — Faza C, W-286)
         NeuronZegarSesji(), NeuronAzjaRange(), NeuronAugur(), NeuronRadarBTC(),
         NeuronDominacja(), NeuronPrzeplyw(),
         # Struktura (SMC/VSA)
         NeuronOrderBlock(), NeuronFVG(), NeuronBOS(), NeuronVSA(),
+        # Volume Profile / VPOC (S, VP-01) — S/R z wolumenu, swing OHLCV (W-322, Dalton BIB-013)
+        NeuronVolumeProfile(),
         # Psychologia (PSY)
         NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(), NeuronOIDiv(),
         # Sentyment newsów (NEWS) — LLM DeepSeek + fallback słownikowy (W-297)
@@ -124,6 +128,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronToxicFlow(), NeuronPumpDetect(), NeuronBubbleCrash(), NeuronCascade(),
         # + Detektor Ruchu Klimaksowego dwukierunkowy (Z-05, W-315): szczyt→SHORT, dołek→LONG
         NeuronDetektorRuchu(),
+        # Amihud Illiquidity (Z-06, meta-brama płynności) + Pi Cycle Top (Z-07, kill-switch szczytu) — W-322
+        NeuronAmihudIlliquidity(), NeuronPiCycleTop(),
         # Geometria ścieżki (D) — Lévy Area Close×Volume, Rough Path Theory (W-079)
         NeuronPathSignature(),
     ]

@@ -141,3 +141,27 @@ AI/ML kat. E (Faza 2+) — wszystkie zablokowane danymi/zakresem, nie pomysłem.
 - [SSRN — Quantitative Alpha in Crypto Markets (review 2025)](https://papers.ssrn.com/sol3/Delivery.cfm/5225612.pdf?abstractid=5225612&mirid=1)
 - [Frontiers — Microstructure Alpha in Crypto (2026)](https://www.frontiersin.org/journals/blockchain/articles/10.3389/fbloc.2026.1811716/full)
 - [QuantPedia — Deep Order Flow Imbalance](https://quantpedia.com/how-to-use-deep-order-flow-imbalance/)
+
+---
+
+## 6. POMIAR DEKORELACJI po wdrożeniu (W-322, Prawo XVI — mierzone, nie zgadywane)
+
+5 z 6 propozycji wdrożono (Cross-Sectional RS odłożony — wymaga cross-symbol w pętli).
+Pomiar na 220 barach 4h BTC (`narzedzia/dekorelacja_w322.py`), sygnał = kierunek×pewność:
+
+| Neuron | Aktywny | max \|r\| | Werdykt |
+|--------|---------|-----------|---------|
+| V-06 Delta Divergence | 59/220 | 0.41 (vs X-03 MACD) | ✅ czysta dekorelacja |
+| V-07 Anchored VWAP | 147/220 | 0.54 (vs XII-02 Ichimoku) | ✅ czysta dekorelacja |
+| VP-01 Volume Profile | 133/220 | **0.85** (vs XII-01 ADX, r=−0.85) | ⚠️ graniczna — do OOS na innych parach |
+| Z-06 Amihud | 0/220 | — (stały) | uśpiony: BTC 4h płynny (warunkowy, ożywa przy cienkiej księdze) |
+| Z-07 Pi Cycle Top | 0/220 | — (stały) | uśpiony: brak szczytu cyklu w oknie (ożywa na cross 111/350) |
+
+**Wnioski (Prawo XVI):**
+- V-06, V-07 — niosą NOWĄ informację (|r|<0.8), filary dywersyfikacji. Zostają z pełną wagą.
+- VP-01 — graniczna antykorelacja z ADX (−0.85) NA JEDNYM oknie/parze. To NIE jest dowód
+  redundancji (jedno okno ≠ robustny pomiar — Prawo XVI). Zostaje, oznaczony do pomiaru
+  na 5 parach OOS przed ewentualną korektą wagi. Mechanicznie VPOC (struktura wolumenu)
+  ≠ ADX (siła trendu) — wysokie |r| tu może być specyfiką trendowego okna BTC.
+- Z-06, Z-07 — warunkowe/uśpione w tym oknie (zgodnie z naturą: Amihud ożywa przy kruchej
+  płynności, Pi Cycle na szczycie cyklu). Dowód żywotności: WERYFIKACJA_ADAPTEROW w audycie.

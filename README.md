@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-14 · **Testy:** 1038/1038 zielone · **Faza:** PętlaLive (entrypoint) + Synapsy Reżimowe + PamięćRefleksyjna + Radar wpięty + Paper Trading Etap II + Filtr Asymetrii Reżimu (W-314) + pomiar 1h vs 4h na tym samym oknie (W-321b: 1h −9.8% vs 4h +5.8%, 1h wymaga kalibracji).
+> **Stan na:** 2026-06-16 · **Testy:** patrz `python tests/run_tests.py` · **Faza:** PętlaLive + Synapsy Reżimowe + PamięćRefleksyjna + Radar + Paper Trading Etap II + Filtr Asymetrii (W-314) + pomiar 1h vs 4h (W-321) + 5 nowych neuronów scalp/swing/invest (W-322: Delta Divergence, Anchored VWAP, Volume Profile/VPOC, Amihud Illiquidity, Pi Cycle Top).
 
 ---
 
@@ -26,7 +26,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **65 zaimplementowane** (61 aktywnych: 37 OHLCV + SES-01 ZegarSesji + SES-02 AzjaRange + V-05 Force Index Eldera + 3 SMC (OrderBlock/FVG/BOS) + 6 kat. R + NEWS-01 Sentyment LLM + V-03 CVD + V-14 Choppiness + L-14 Ulcer + H-01 Hurst-DFA + N-01 Permutation Entropy + Z-01 VPIN ToxicFlow + Z-03 Bubble/Crash kill-switch + Z-04 Cascade/Dead-Cat + Z-05 Detektor Ruchu Klimaksowego + X-27 Value Convergence + X-28 KonfluencjaMultiTF + OC-05 WashTrading, Z-02 PumpDetect przez adaptery publiczne; 4 czeka na on-chain API) |
+| **Mikro-neurony** | **70 zaimplementowane** (66 aktywnych: OHLCV momentum/trend/wolumen + SES-01/02 + 3 SMC + 6 kat. R + NEWS-01 + V-03 CVD + Z-01..05 brama obronna + X-27 Value + X-28 MTF Confluence + OC-05 WashTrading + **W-322: V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile/VPOC, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top**; 4 czeka na on-chain API) |
 | **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
@@ -37,7 +37,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Monte Carlo / Optymalizator / Pamięć Refleksyjna / Drift Adapter** | W-293/294/295/296 — antyoverfitting + samouczenie Brain |
 | **Testy** | `python tests/run_tests.py` → **1038/1038** ✅ |
 
-**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 65) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
+**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 70) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
 ---
 
@@ -60,7 +60,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ```
 👑 cesarz/       — mózg decyzyjny, 5 Doradców, PamięćRefleksyjna   (9)
 🏛️ senat/        — debata / konsensus                              (2)
-⚔️ legiony/      — 65 neuronów + 12 zwiadowców + Legatus + Radar     (40)
+⚔️ legiony/      — 70 neuronów + 12 zwiadowców + Legatus + Radar     (40)
 🏟️ koloseum/     — Dyrygent, PętlaLive, Backtest portfela, Namiestnik (11)
 🛡️ pretorianie/  — bezpieczeństwo, kalkulator lewara, Praeda        (5)
 🏗️ akwedukty/    — pipeline danych + adaptery API (Futures/F&G/CVD/News) (8)

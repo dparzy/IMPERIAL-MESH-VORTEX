@@ -60,6 +60,7 @@ _PURE_PYTHON_INDICATORS = {
     "FORCE_INDEX_13", "FORCE_INDEX_2",
     "VWAP", "VWAP_STD",
     "SUPERTREND", "SUPERTREND_DIR", "SUPERTREND_DIR_PREV", "ICHIMOKU",
+    "AMIHUD", "VOLUME_PROFILE", "PI_CYCLE", "ANCHORED_VWAP", "DELTA_DIVERGENCE",
 }
 
 
@@ -990,6 +991,159 @@ def _py_ichimoku(high, low):
     }
 
 
+def _py_amihud(close, volume, period: int = 20) -> Optional[float]:
+    """
+    Amihud Illiquidity (2002) — impakt cenowy na jednostkę obrotu.
+    ILLIQ = średnia z |zwrot_baru| / obrót_USDT, w oknie `period`.
+    Wysoki = cena rusza się mocno na małym obrocie (krucha płynność). Niski = głęboka.
+    Skaluje ×1e6 dla czytelności (obrót w USDT jest duży). Wymaga period+1 barów.
+    """
+    c = _arr(close)
+    v = _arr(volume)
+    if len(c) < period + 1 or len(v) < period + 1:
+        return None
+    c = c[-(period + 1):]
+    v = v[-period:]
+    rety = np.abs(np.diff(c) / c[:-1])           # |zwrot| per bar (period szt.)
+    obrot = v * c[1:]                             # obrót USDT ≈ wolumen × cena
+    maska = obrot > 0
+    if not np.any(maska):
+        return None
+    illiq = np.mean(rety[maska] / obrot[maska]) * 1e6
+    return float(illiq)
+
+
+def _py_volume_profile(high, low, close, volume, period: int = 100,
+                       bins: int = 24, va_pct: float = 0.70) -> Dict[str, Optional[float]]:
+    """
+    Volume Profile / Market Profile (Dalton) — struktura wolumenu po CENIE.
+    Buduje histogram wolumenu w `bins` przedziałach cenowych z ostatnich `period` barów.
+    POC = cena przedziału z największym wolumenem (Point of Control).
+    Value Area = najwęższy zakres skupiający `va_pct` (70%) wolumenu wokół POC.
+    Wolumen baru rozkładany równomiernie po jego zakresie [low, high] (proxy z OHLCV).
+    """
+    h, l, c, v = _arr(high), _arr(low), _arr(close), _arr(volume)
+    n = min(len(h), len(l), len(c), len(v))
+    if n < max(20, period // 2):
+        return {"VPOC": None, "VA_HIGH": None, "VA_LOW": None}
+    h, l, v = h[-period:], l[-period:], v[-period:]
+    cena_min, cena_max = float(np.min(l)), float(np.max(h))
+    if cena_max <= cena_min:
+        return {"VPOC": None, "VA_HIGH": None, "VA_LOW": None}
+    krawedzie = np.linspace(cena_min, cena_max, bins + 1)
+    srodki = (krawedzie[:-1] + krawedzie[1:]) / 2
+    hist = np.zeros(bins)
+    for hi, lo, vol in zip(h, l, v):
+        if hi <= lo or vol <= 0:
+            idx = np.searchsorted(krawedzie, lo, side="right") - 1
+            idx = min(max(idx, 0), bins - 1)
+            hist[idx] += vol
+            continue
+        # bary nakładające zakres [lo, hi] na przedziały — wolumen pro rata
+        lo_i = min(max(np.searchsorted(krawedzie, lo, side="right") - 1, 0), bins - 1)
+        hi_i = min(max(np.searchsorted(krawedzie, hi, side="right") - 1, 0), bins - 1)
+        liczba = hi_i - lo_i + 1
+        hist[lo_i:hi_i + 1] += vol / liczba
+    poc_idx = int(np.argmax(hist))
+    vpoc = float(srodki[poc_idx])
+    # Value Area: rozszerzaj wokół POC aż objęte va_pct całości wolumenu
+    cel = va_pct * hist.sum()
+    lo_i = hi_i = poc_idx
+    objete = hist[poc_idx]
+    while objete < cel and (lo_i > 0 or hi_i < bins - 1):
+        lewo = hist[lo_i - 1] if lo_i > 0 else -1.0
+        prawo = hist[hi_i + 1] if hi_i < bins - 1 else -1.0
+        if prawo >= lewo:
+            hi_i += 1
+            objete += hist[hi_i]
+        else:
+            lo_i -= 1
+            objete += hist[lo_i]
+    return {"VPOC": vpoc, "VA_HIGH": float(krawedzie[hi_i + 1]), "VA_LOW": float(krawedzie[lo_i])}
+
+
+def _py_pi_cycle(close) -> Dict[str, Optional[float]]:
+    """
+    Pi Cycle Top — geometria średnich cenowych (price-only kill-switch szczytu cyklu).
+    SMA-111 oraz 2×SMA-350. Gdy SMA-111 przecina od dołu 2×SMA-350 → historyczny
+    szczyt cyklu (trafił 2013/2017/2021). Zwraca bieżące i poprzednie wartości (cross).
+    Wymaga ≥350 barów (inaczej None — neuron abstynuje, Prawo XV).
+    """
+    c = _arr(close)
+    if len(c) < 351:
+        return {"PI_111": None, "PI_350X2": None, "PI_111_PREV": None, "PI_350X2_PREV": None}
+    sma111 = talib.SMA(c, timeperiod=111)
+    sma350 = talib.SMA(c, timeperiod=350)
+    return {
+        "PI_111": _last_valid(sma111),
+        "PI_350X2": (_last_valid(sma350) * 2.0) if _last_valid(sma350) is not None else None,
+        "PI_111_PREV": _second_last_valid(sma111),
+        "PI_350X2_PREV": (_second_last_valid(sma350) * 2.0) if _second_last_valid(sma350) is not None else None,
+    }
+
+
+def _py_anchored_vwap(high, low, close, volume, lookback: int = 120) -> Optional[float]:
+    """
+    Anchored VWAP — VWAP kotwiczony od ostatniego istotnego pivotu (swing high/low)
+    w oknie `lookback`, nie od początku sesji. Kotwica = bar o ekstremalnym zakresie
+    (najwyższy high LUB najniższy low w oknie — bierzemy bliższy końca = świeższy).
+    Typowa cena baru (H+L+C)/3 ważona wolumenem od kotwicy do teraz.
+    """
+    h, l, c, v = _arr(high), _arr(low), _arr(close), _arr(volume)
+    n = min(len(h), len(l), len(c), len(v))
+    if n < 10:
+        return None
+    h, l, c, v = h[-lookback:], l[-lookback:], c[-lookback:], v[-lookback:]
+    m = len(h)
+    idx_hi = int(np.argmax(h))
+    idx_lo = int(np.argmin(l))
+    kotwica = max(idx_hi, idx_lo)          # świeższy z dwóch pivotów
+    if kotwica >= m - 1:
+        kotwica = max(0, m - 2)            # zostaw min. 2 bary do liczenia
+    tp = (h[kotwica:] + l[kotwica:] + c[kotwica:]) / 3.0
+    vv = v[kotwica:]
+    suma_v = float(np.sum(vv))
+    if suma_v <= 0:
+        return float(np.mean(tp))
+    return float(np.sum(tp * vv) / suma_v)
+
+
+def _py_delta_divergence(high, low, close, volume, period: int = 14) -> Optional[float]:
+    """
+    Delta Divergence — dywergencja cena↔delta wolumenu (proxy footprint z OHLCV).
+    Delta baru (proxy) = wolumen × (2×(close−low)/(high−low) − 1) ∈ [−vol, +vol]:
+      close przy high → +vol (presja kupna), przy low → −vol (presja sprzedaży).
+    CVD-proxy = skumulowana delta. Sygnał = znak(nachylenie ceny) ≠ znak(nachylenie CVD):
+      cena↑ a CVD↓ → dywergencja niedźwiedzia (ujemny wynik); cena↓ a CVD↑ → bycza (dodatni).
+    Zwraca wartość ∈ [−1, 1]: |duża| = silna dywergencja, znak = kierunek rewersji.
+    """
+    h, l, c, v = _arr(high), _arr(low), _arr(close), _arr(volume)
+    n = min(len(h), len(l), len(c), len(v))
+    if n < period + 1:
+        return None
+    h, l, c, v = h[-(period + 1):], l[-(period + 1):], c[-(period + 1):], v[-(period + 1):]
+    rng = np.where((h - l) > 0, h - l, np.nan)
+    pozycja = (2.0 * (c - l) / rng) - 1.0     # ∈ [-1, 1], NaN gdy h==l
+    pozycja = np.nan_to_num(pozycja, nan=0.0)
+    delta = v * pozycja
+    cvd = np.cumsum(delta)
+    # znormalizowane nachylenia (regresja liniowa) ceny i CVD na oknie
+    x = np.arange(len(c))
+    def _slope_norm(y):
+        rozp = float(np.ptp(y))
+        if rozp <= 0:
+            return 0.0
+        a = np.polyfit(x, y, 1)[0] * len(y)   # zmiana na całym oknie
+        return float(a / rozp)
+    sc = _slope_norm(c)
+    sd = _slope_norm(cvd)
+    # dywergencja gdy znaki przeciwne; siła = iloczyn |nachyleń|, znak = kierunek CVD
+    if sc == 0.0 or sd == 0.0 or (sc > 0) == (sd > 0):
+        return 0.0
+    sila = min(1.0, abs(sc) * abs(sd))
+    return float(sila if sd > 0 else -sila)   # CVD↑(cena↓)=bycza(+), CVD↓(cena↑)=niedźwiedzia(−)
+
+
 @dataclass
 class CalcResult:
     """Wynik obliczenia z pieczątką audytu (Prawo XIII — audytowalność)."""
@@ -1142,6 +1296,13 @@ class CalculatorGateway:
 
             # ── Pure-Python: Ichimoku (TA-Lib nie ma) ─────────────────────────
             "ICHIMOKU": self._ichimoku,
+
+            # ── Pure-Python: nowe neurony scalp/swing/invest (W-322) ──────────
+            "AMIHUD":           lambda close, volume, period=20: _py_amihud(close, volume, period),
+            "VOLUME_PROFILE":   lambda high, low, close, volume, period=100: _py_volume_profile(high, low, close, volume, period),
+            "PI_CYCLE":         lambda close: _py_pi_cycle(close),
+            "ANCHORED_VWAP":    lambda high, low, close, volume, lookback=120: _py_anchored_vwap(high, low, close, volume, lookback),
+            "DELTA_DIVERGENCE": lambda high, low, close, volume, period=14: _py_delta_divergence(high, low, close, volume, period),
         }
         self.audit_log: List[CalcResult] = []
 

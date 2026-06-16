@@ -5,10 +5,10 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-14 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 65 neuronów (zarejestrowane w roju) + 12 zwiadowców = **77 modułów w kodzie**
-**Aktywne / wyciszone:** 61 aktywnych + 4 wyciszone, z czego:
-  • **46 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature)
+**Stan na:** 2026-06-16 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Zaimplementowane:** 70 neuronów (zarejestrowane w roju) + 12 zwiadowców = **82 modułów w kodzie**
+**Aktywne / wyciszone:** 66 aktywnych + 4 wyciszone, z czego:
+  • **51 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 SMC aktywne** (SMC-01/02/03, `DOSTEPNY=True`) — liczą z barów przez most EXP-05, **bez żadnego API** (abstynują w backteście bez EXP-05)
@@ -95,6 +95,8 @@
 | V-04 | NeuronVolumeAnomaly | F | 6 | ✅ aktywny | VOLUME_ANOMALY | — |
 | V-05 | NeuronForceIndex | F | 7 | ✅ aktywny | FORCE_INDEX | — |
 | X-11 | NeuronRVOL | F | 7 | ✅ aktywny | RVOL | — |
+| V-06 | NeuronDeltaDivergence | F | 5 | ✅ aktywny | DELTA_DIV | dywergencja cena↔delta (proxy footprint z OHLCV), wczesna rewersja (W-322) |
+| V-07 | NeuronAnchoredVWAP | F | 5 | ✅ aktywny | AVWAP | VWAP kotwiczony od pivotu swing (W-322) |
 
 ### Plik: `neurony/struktura.py`
 
@@ -108,6 +110,7 @@
 > liczy strefy OB/FVG/BOS z **samych barów OHLCV** (bez API) i wstrzykuje je do `wskazniki`.
 > W backteście CSV bez EXP-05 te 3 neurony abstynują (NEUTRAL) — Prawo XV, bez halucynacji.
 | VSA-01 | NeuronVSA | F | 8 | ✅ aktywny | VSA | — |
+| VP-01 | NeuronVolumeProfile | S | 6 | ✅ aktywny | VPOC | Volume Profile/VPOC + Value Area — S/R z wolumenu, swing OHLCV (W-322, Dalton BIB-013) |
 
 ### Plik: `neurony/sesje.py` (Faza C, W-286 — Zegary Rynku)
 
@@ -164,6 +167,8 @@
 | Z-03 | NeuronBubbleCrash | Z | 9 | ✅ aktywny | BUBBLE_Z_200 | bubble/crash kill-switch: bubble_z+VoV+AR1 (W-278, BIB-020 Harris rozdz.28) |
 | Z-04 | NeuronCascade | Z | 8 | ✅ aktywny | CASCADE_FLAG | kill-switch kaskady + dead-cat bounce LONG (W-279, BIB-020 Harris rozdz.28) |
 | Z-05 | NeuronDetektorRuchu | Z | 7 | ✅ aktywny | CLOSE_SERIES_20 | klimaks dwukierunkowy: szczyt→SHORT, dołek→LONG (ROC+RSI+wolumen, W-315) |
+| Z-06 | NeuronAmihudIlliquidity | Z | 6 | ✅ aktywny (meta-brama) | AMIHUD_20 | Amihud illiquidity — impakt cenowy/krucha płynność, tłumi rój (W-322) |
+| Z-07 | NeuronPiCycleTop | Z | 6 | ✅ aktywny | PI_111 | Pi Cycle Top — SMA-111 vs 2×SMA-350, kill-switch szczytu cyklu, INVEST 1D (W-322) |
 | D-01 | NeuronPathSignature | D | 7 | ✅ aktywny 🎖️ | CLOSE_SERIES_20 | Lévy Area Close×Volume — geometria ścieżki (W-079) |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,

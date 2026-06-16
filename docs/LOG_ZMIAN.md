@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-06-16 | W-322 | 5 nowych neuronów scalp/swing/invest (z analizy + research)
+
+**Kontekst:** po analizie `ANALIZA_NEURONY_SCALP_SWING_INVEST.md` (porównanie 65 neuronów
+z best practices docs+internet) wdrożono 5 z 6 zaproponowanych unikatowych, zdekorelowanych
+neuronów (wykonalne na OHLCV). Cross-Sectional RS (6.) odłożony — wymaga wpięcia
+cross-symbol w pętli portfelowej (nie pasuje do interfejsu single-symbol).
+
+**Wdrożone (65 → 70 neuronów):**
+- **V-06 NeuronDeltaDivergence** (F, SCALP) — dywergencja cena↔delta (proxy footprint z OHLCV).
+- **V-07 NeuronAnchoredVWAP** (F, SWING) — VWAP kotwiczony od pivotu swing.
+- **VP-01 NeuronVolumeProfile** (S, SWING) — Volume Profile/VPOC + Value Area (Dalton BIB-013).
+- **Z-06 NeuronAmihudIlliquidity** (Z, meta-brama) — impakt cenowy/krucha płynność (Amihud 2002).
+- **Z-07 NeuronPiCycleTop** (Z, INVEST 1D) — SMA-111 vs 2×SMA-350, kill-switch szczytu cyklu.
+
+**Brama (W-322):** 5 nowych obliczeń pure-Python (AMIHUD, VOLUME_PROFILE, PI_CYCLE,
+ANCHORED_VWAP, DELTA_DIVERGENCE) + wpięcie w Budowniczy (skalarne + dict-unpack VPOC/Pi).
+
+**Audyt:** Z-06 (płynne scenariusze) i Z-07 (≥350 barów) w allowliście W12 z dowodem
+WERYFIKACJA (ożywają z właściwymi danymi — Prawo I). Testy granic: `tests/test_neurony_w322.py`
+(22 testy: zero/None, znak, próg dokładny). Następny krok: pomiar dekorelacji
+(`raport_dekorelacji`) + ewentualne Cross-Sectional RS.
+
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `imperium/legiony/budowniczy_wskaznikow.py`,
+`imperium/legiony/neurony/{wolumen,struktura,zagrozenie}.py`, `imperium/legiony/rejestr.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_neurony_w322.py`, MANIFEST/README/INDEKS.
+
 ## 2026-06-15 | W-321b | Runner symulacji 1h odtworzony + bieg pełnego stacku na danych godzinowych
 
 **Kontekst (Prawo I — uczciwość):** symulacja 1h z sesji 2026-06-14 (W-320) NIE

@@ -273,3 +273,26 @@ a momentum/flow działa cross-TF. „Dedykacja przez wykluczenie" odcięła real
    („żonglowanie" w czasie) — następny A/B: SWING-szeroki vs pełnia. Nie zmieniam w ciemno bez pomiaru.
 4. **Auto-założenie „dedykacja = lepiej" SFALSYFIKOWANE** — jak W-322 „więcej = lepiej". Tabela
    profili musi być STROJONA pomiarem per styl, nie przyjęta z intuicji.
+
+### 9b. A/B W-323b — SWING-profil (65, zasada włączności) vs pełnia (70) na 4h
+
+Po sfalsyfikowaniu W-323 zastosowano **zasadę włączności**: wykluczamy TYLKO gdy neuron jest
+STRUKTURALNIE NIEZDOLNY na TF (abstynuje z braku danych), nie z "wydaje się wolny/szybki":
+- OC-01..04 (on-chain feed) → WYCISZONE (`DOSTEPNY=False`) na czystym OHLCV; INVEST tylko
+- Z-07 Pi Cycle (SMA-111 vs 2×SMA-350) → sygnał cyklu dziennego (18 dni ≠ cykl na 4h) → INVEST
+
+| Wariant | Trade | WR | PnL |
+|---------|-------|-----|-----|
+| PEŁNIA (70 neuronów) | 717 | 43.8% | **+5.19%** |
+| PROFIL SWING (65, włączność) | 717 | 43.8% | **+5.19%** |
+| **IMPAKT W-323b** | = | = | **+0.00 pp** |
+
+**Wniosek (Prawo I):** Wykluczenie 5 abstynujących neuronów = **identyczny wynik** — bo te neurony
+i tak nie głosują na 4h OHLCV (OC-01..04 abstynują bez feedu; Z-07 abstynuje bo <350 barów 1D).
+SCALP/SWING różnica jest tylko te 5 INVEST-only. Pełnia i SWING-65 są równoważne na tym backtescie.
+
+**Decyzja (Prawo I — stan aktualny):**
+- `NEURONY_STYLU` ustawiona na **zasadę włączności**: SCALP 65 | SWING 65 | INVEST 70.
+- Różnicowanie SCALP↔SWING jest wspólne do czasu scoreboard kontrybucji per neuron per styl.
+- Tabela jest **jawna i strojona pomiarem** — to "tablica do żonglowania" jak powiedział Cezar.
+  Każde przesunięcie granicy per-neuron wymaga A/B, nie opinii.

@@ -38,9 +38,10 @@ nimi w czasie.
 - `zbuduj_legatusa(styl=)` i `backtest_portfel(styl=)` — opt-in (None=pełne 70, zero regresji).
 - Komplementarne do `namiestnik.styl_interwalu/ProfilStylu` (interwał→styl, ryzyko per styl).
 
-**Zestawy:** SCALP 41 | SWING 59 | INVEST 35 (z 70). Bezpieczniki/anty-manip uniwersalne.
-**Hipoteza wstępna (Prawo I):** przypisanie = domain-knowledge (sekcja 1 ANALIZA), nie pomiar;
-strojone A/B w czasie. Audyt: Warstwa 1 sprawdza pokrycie mapy. Testy: `tests/test_profile_stylu.py`.
+**Zestawy (po A/B):** SCALP 65 | SWING 65 | INVEST 70. Zasada włączności: wykluczamy TYLKO
+neurony abstynujące strukturalnie (OC-01..04 bez feedu + Z-07 cykl dzienny). SWING-59 (węższe
+wykluczenia) kosztowało −8.48pp (sfalsyfikowane); SWING-65 = +0.00pp (neutralne, bezpieczne).
+**Prawo I:** każda zmiana granicy = A/B. Audyt Warstwa 1. Testy: `tests/test_profile_stylu.py`.
 
 **Pliki:** `imperium/legiony/rejestr.py`, `imperium/koloseum/backtest.py`,
 `narzedzia/audyt_spojnosci.py`, `narzedzia/ab_w323.py`, `tests/test_profile_stylu.py`,

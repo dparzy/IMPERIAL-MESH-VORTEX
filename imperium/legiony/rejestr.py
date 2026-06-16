@@ -240,63 +240,63 @@ def raport_elity() -> dict:
 
 # ── PROFILE STYLU GRY (W-323) — który neuron głosuje w jakim stylu ───────────────
 #
-# DLA NOWICJUSZA: nie każdy neuron ma sens na każdym interwale. RSI/StochRSI to
-# szybkie oscylatory (scalp/swing); MVRV-Z/SOPR to wolne wskaźniki on-chain (tylko
-# inwestycja 1D-1W); Pi Cycle to kill-switch szczytu cyklu (potrzebuje ≥350 barów 1D).
-# Zamiast zawsze uruchamiać pełne 70 (rozcieńcza sygnał — patrz W-322/W-322b), wybieramy
-# DEDYKOWANY ZESTAW per styl. To NIE wycisza neuronu — on dalej żyje w innych profilach.
+# DLA NOWICJUSZA: nie każdy neuron ma sens na każdym interwale. Ale UWAGA — pomiar
+# (W-323 A/B) obalił intuicję „dedykacja przez wykluczenie". Wycięcie z 4h neuronów
+# oznaczonych „tylko-scalp" (HA Scalper *elitarny*, CVD, sesje) ZAŁAMAŁO wynik (−8.48pp):
+# momentum/flow DZIAŁAJĄ cross-TF. Lekcja: wykluczamy neuron ze stylu TYLKO gdy jest
+# STRUKTURALNIE NIEZDOLNY na tym interwale (brak danych / wskaźnik liczony na złym TF),
+# nie „bo wydaje się szybki/wolny". Domyślnie INCLUDE (zasada włączności).
 #
-# Prawo I: to HIPOTEZA WSTĘPNA oparta o naturę wskaźnika + sekcja 1 ANALIZA_NEURONY.
-#   Docelowo strojona pomiarem A/B (W-323+) — „z czasem żonglujemy neuronami".
+# ZASADA WŁĄCZNOŚCI (W-323b, Prawo I):
+#   • Neuron należy do WSZYSTKICH stylów (_U), CHYBA że pomiar/struktura nakazuje inaczej.
+#   • Wykluczenia DANE-uzasadnione (nie opinia):
+#       - OC-01..04 (MVRV/SOPR/Puell/Netflow): wymagają feedu on-chain → WYCISZONE
+#         (DOSTEPNY=False) na czystym OHLCV; sens tylko w INVEST (1D-1W z danymi łańcucha).
+#       - Z-07 Pi Cycle: SMA-111 vs 2×SMA-350 to sygnał CYKLU dziennego; na 4h/1h to szum
+#         (111 barów 4h ≈ 18 dni ≠ cykl) → tylko INVEST.
+#   • Wszystko inne — momentum/trend/flow/struktura/sentyment/bezpieczniki — uniwersalne,
+#     bo udowodniono cross-TF wartość lub to obrona działająca zawsze.
+#
+# Różnicowanie SCALP↔SWING: NA RAZIE wspólny aktywny skład (brak pomiaru per-neuron, a
+# zgadywanie szkodzi — W-323). Rozdzielimy DOPIERO gdy scoreboard kontrybucji per styl da
+# dowód (Prawo I). To „tablica do żonglowania" — strojona pomiarem, nie intuicją.
 # Prawo XXI: KAŻDY z 70 neuronów MUSI tu być (audyt sprawdza brak sierot/braków).
-#   Nowy neuron bez wpisu = błąd spójności (nie wpada cicho do „uniwersalnych").
 #
-# Style: "SCALP" (M1-1h, szybkie momentum/mikrostruktura), "SWING" (4h-1D, trend/struktura),
-#        "INVEST" (1D-1W, makro/cykl/on-chain).
+# Style: "SCALP" (M1-1h), "SWING" (4h-1D), "INVEST" (1D-1W; +on-chain +cykl).
 
 STYL_SCALP = "SCALP"
 STYL_SWING = "SWING"
 STYL_INVEST = "INVEST"
 WSZYSTKIE_STYLE: tuple = (STYL_SCALP, STYL_SWING, STYL_INVEST)
 
-# Uniwersalny = bezpieczniki/reżim/sentyment działające na każdym interwale.
+# Uniwersalny = działa/broni na każdym interwale (zasada włączności — domyślny).
 _U = WSZYSTKIE_STYLE
-_SC_SW = (STYL_SCALP, STYL_SWING)
-_SW_IN = (STYL_SWING, STYL_INVEST)
+_INV = (STYL_INVEST,)   # tylko inwestycja (on-chain feed / cykl dzienny)
 
 NEURONY_STYLU: dict = {
-    # Momentum (M) — oscylatory: szybkie sygnały scalp+swing; AC i HA czysto scalp
-    "X-01": _SC_SW, "X-02": _SC_SW, "X-03": _SC_SW, "X-04": _SC_SW,
-    "X-06": _SC_SW, "X-08": _SC_SW, "X-09": (STYL_SCALP,), "X-12": _SC_SW,
-    "X-17": _SC_SW, "X-25": _SC_SW, "X-26": (STYL_SCALP,),
-    "X-27": _SW_IN,                       # Value-Z: rewersja do wartości godziwej (swing/invest)
-    # Trend (T) — wolniejsze: swing/invest; MTF czysto swing; HA-szybkie EMA/HMA scalp+swing
-    "X-05": _SC_SW, "X-10": _SC_SW, "X-18": _SW_IN, "X-28": (STYL_SWING,),
-    "XII-01": _SW_IN, "XII-02": _SW_IN, "XII-03": _SW_IN, "XII-04": _SW_IN,
-    "XII-05": (STYL_SWING,), "XII-06": (STYL_SWING,), "XII-07": (STYL_SWING,),
-    # Wolumen/Flow (F) — CVD czysto scalp; OBV swing/invest; reszta scalp+swing lub swing
-    "V-01": _SW_IN, "V-02": _SC_SW, "V-03": (STYL_SCALP,), "V-04": _SC_SW,
-    "V-05": (STYL_SWING,), "V-06": _SC_SW, "V-07": (STYL_SWING,),
-    "VSA-01": (STYL_SWING,), "X-11": _SC_SW,
-    # Struktura/SMC (S) — sesje scalp; FVG scalp+swing; OB/BOS/VPOC swing
-    "SES-01": (STYL_SCALP,), "SES-02": (STYL_SCALP,),
-    "SMC-01": (STYL_SWING,), "SMC-02": _SC_SW, "SMC-03": (STYL_SWING,),
-    "VP-01": (STYL_SWING,),
-    # On-chain (O) — wolne fundamenty: tylko inwestycja
-    "OC-01": (STYL_INVEST,), "OC-02": (STYL_INVEST,), "OC-03": (STYL_INVEST,),
-    "OC-04": (STYL_INVEST,), "OC-05": (STYL_INVEST,),
-    # Reżim/Sentyment (R) — futures-sentyment scalp+swing; Fear&Greed/RADAR swing+invest
-    "PSY-01": _SC_SW, "PSY-02": _SC_SW, "PSY-04": _SC_SW, "PSY-03": _SW_IN,
-    "RADAR-01": _SW_IN, "RADAR-02": _SW_IN, "RADAR-03": _SW_IN,
-    "AUG-01": _U, "NEWS-01": _U,
-    # Meta-bramy reżimu/chaosu (H/N/V/D/L) — uniwersalne (klasyfikują każdy interwał)
-    "H-01": _SW_IN, "N-01": _U, "V-13": _U, "V-14": _U, "D-01": _U,
-    "L-14": _U, "VI-13": _U,
+    # Momentum (M) — oscylatory + Value-Z: cross-TF (pomiar: działają też na 4h)
+    "X-01": _U, "X-02": _U, "X-03": _U, "X-04": _U, "X-06": _U, "X-08": _U,
+    "X-09": _U, "X-12": _U, "X-17": _U, "X-25": _U, "X-26": _U, "X-27": _U,
+    # Trend (T) — EMA/HMA/ADX/Ichimoku/Supertrend/Donchian/MTF/Fib/OB/RSIdiv: cross-TF
+    "X-05": _U, "X-10": _U, "X-18": _U, "X-28": _U,
+    "XII-01": _U, "XII-02": _U, "XII-03": _U, "XII-04": _U,
+    "XII-05": _U, "XII-06": _U, "XII-07": _U,
+    # Wolumen/Flow (F) — OBV/VWAP/CVD/anomalia/ForceIndex/Delta/AVWAP/VSA/RVOL: cross-TF
+    "V-01": _U, "V-02": _U, "V-03": _U, "V-04": _U, "V-05": _U, "V-06": _U,
+    "V-07": _U, "VSA-01": _U, "X-11": _U,
+    # Struktura/SMC (S) — sesje/FVG/OB/BOS/VPOC: cross-TF (sesje istotne też na 4h)
+    "SES-01": _U, "SES-02": _U, "SMC-01": _U, "SMC-02": _U, "SMC-03": _U, "VP-01": _U,
+    # On-chain (O) — OC-01..04 wymagają feedu łańcucha → tylko INVEST; OC-05 (wash, OHLCV) uniwersalny
+    "OC-01": _INV, "OC-02": _INV, "OC-03": _INV, "OC-04": _INV, "OC-05": _U,
+    # Reżim/Sentyment (R) — futures/Fear&Greed/RADAR/news/augur: kontekst na każdym TF
+    "PSY-01": _U, "PSY-02": _U, "PSY-03": _U, "PSY-04": _U,
+    "RADAR-01": _U, "RADAR-02": _U, "RADAR-03": _U, "AUG-01": _U, "NEWS-01": _U,
+    # Meta-bramy reżimu/chaosu (H/N/V/D/L) — klasyfikują każdy interwał
+    "H-01": _U, "N-01": _U, "V-13": _U, "V-14": _U, "D-01": _U, "L-14": _U, "VI-13": _U,
     # Anty-manipulacja (A) — uniwersalna obrona
     "A-01": _U, "A-02": _U, "A-03": _U, "A-05": _U,
-    # Zagrożenie (Z) — bezpieczniki uniwersalne; Bubble swing+invest; Pi Cycle czysto invest
-    "Z-01": _U, "Z-02": _U, "Z-03": _SW_IN, "Z-04": _U, "Z-05": _U,
-    "Z-06": _SC_SW, "Z-07": (STYL_INVEST,),
+    # Zagrożenie (Z) — bezpieczniki uniwersalne; Pi Cycle (Z-07) to cykl dzienny → tylko INVEST
+    "Z-01": _U, "Z-02": _U, "Z-03": _U, "Z-04": _U, "Z-05": _U, "Z-06": _U, "Z-07": _INV,
 }
 
 

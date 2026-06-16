@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-16 | W-323b/c | Profile WŁĄCZNE (po falsyfikacji) + scoreboard kontrybucji
+
+**Kontekst:** A/B W-323 obalił pierwszą (wykluczającą) tabelę profili — SWING 59 dał −3.29%
+vs pełnia +5.19% (−8.48pp). Przyczyna: wycięto 5 AKTYWNYCH neuronów (HA Scalper elitarny,
+CVD, AC, sesje) — momentum/flow działają cross-TF. OC-01..04 i tak wyciszone (DOSTEPNY=False).
+
+**W-323b — zasada włączności (Prawo I):** neuron należy do WSZYSTKICH stylów, CHYBA że
+strukturalnie niezdolny: OC-01..04 (feed on-chain → tylko INVEST), Z-07 Pi Cycle (cykl
+dzienny, szum na 4h → tylko INVEST). Reszta uniwersalna. Zestawy: SCALP 65 | SWING 65 | INVEST 70.
+
+**W-323c — scoreboard kontrybucji:** `backtest_portfel(igrzyska_learning=True)` dołącza
+`engine.ranking_neuronow` (scalone Igrzyska wszystkich par: accuracy/stability/wynik per neuron).
+`narzedzia/scoreboard_neuronow.py` drukuje ranking — MIERZONA baza do strojenia NEURONY_STYLU
+(„żonglowanie" danymi, nie intuicją). Kandydaci do rewizji = niska trafność przy wielu sygnałach.
+
+**Pliki:** `imperium/legiony/rejestr.py`, `imperium/koloseum/backtest.py`,
+`narzedzia/scoreboard_neuronow.py`, `tests/test_profile_stylu.py`,
+`docs/ANALIZA_NEURONY_SCALP_SWING_INVEST.md`.
+
 ## 2026-06-16 | W-323 | Profile stylu gry — dedykowany zestaw neuronów per SCALP/SWING/INVEST
 
 **Kontekst:** lekcja W-322/W-322b — „więcej neuronów = lepiej" i wagowanie reżimowe per-kategoria

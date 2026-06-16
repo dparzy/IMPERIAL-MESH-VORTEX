@@ -463,6 +463,27 @@ def backtest_portfel(
     if os_czasu:
         equity_dnia[os_czasu[-1][0] // _DZ] = engine.kapital_calkowity
     engine.krzywa_equity = [equity_dnia[d] for d in sorted(equity_dnia)]
+
+    # W-323c SCOREBOARD KONTRYBUCJI — scal Igrzyska wszystkich par w jeden ranking
+    # neuronów (accuracy/stability/wynik) i dołącz do silnika. Mierzona baza do
+    # strojenia NEURONY_STYLU danymi, nie intuicją (Prawo I). Opt-in: igrzyska_learning.
+    if igrzyska_learning:
+        from imperium.biblioteki.igrzyska import Igrzyska as _Igrzyska, StatystykaNeuronu as _Stat
+        scalone = _Igrzyska()
+        _POLA = ("tp", "fp", "long_trafne", "long_total", "short_trafne",
+                 "short_total", "flipy", "sygnaly", "contribution_sum",
+                 "timeliness_sum", "contribution_n")
+        for d in dyrygenci.values():
+            ig = getattr(d, "_igrzyska", None)
+            if ig is None:
+                continue
+            for klucz, st in ig.statystyki.items():
+                if klucz not in scalone.statystyki:
+                    scalone.statystyki[klucz] = _Stat(klucz=klucz)
+                tgt = scalone.statystyki[klucz]
+                for pole in _POLA:
+                    setattr(tgt, pole, getattr(tgt, pole) + getattr(st, pole))
+        engine.ranking_neuronow = scalone.ranking()
     return engine
 
 

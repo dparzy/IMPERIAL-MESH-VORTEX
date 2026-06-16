@@ -245,4 +245,31 @@ swing. MVRV-Z, SOPR, Puell, Pi Cycle — invest. Bezpieczniki (VPIN, anty-manip)
 **Rozmiar zestawów:** SCALP 41 | SWING 59 | INVEST 35 (z 70). Bezpieczniki/reżim uniwersalne.
 
 **Hipoteza wstępna (Prawo I):** przypisanie stylów to domain-knowledge + sekcja 1 — NIE pomiar.
-Docelowo strojone A/B per styl. Pierwszy test: SWING-profil (59) vs pełnia (70) na 4h ↓ (W-323 A/B).
+Docelowo strojone A/B per styl.
+
+### 9a. A/B W-323 — SWING-profil (59) vs pełnia (70) na 4h — HIPOTEZA SFALSYFIKOWANA
+
+| Wariant | Trade | WR | PnL |
+|---------|-------|-----|-----|
+| PEŁNIA (70 neuronów) | 717 | 43.8% | **+5.19%** |
+| PROFIL SWING (59) | 716 | 42.9% | **−3.29%** |
+| **IMPAKT** | −1 | −0.9pp | **−8.48 pp** |
+
+**Wniosek (Prawo I — niewygodny, ale prawdziwy):** wycięcie 11 neuronów spoza SWING (5 „tylko-SCALP":
+X-26 HA Scalper *elitarny*, V-03 CVD, X-09 AC, SES-01/02 + 6 „tylko-INVEST": OC-01..05, Z-07)
+ZAŁAMAŁO wynik na 4h (−8.48pp, +5.19% → strata). Mimo prawie tej samej liczby trade'ów (717→716)
+WR i PnL spadły — usunięte neurony NIE były szumem, lecz niosły sygnał/filtr poprawiający selekcję.
+
+**Mechanizm:** moja klasyfikacja „X-26/V-03/sesje = tylko scalp" była błędna dla 4h. HA Scalper
+(elitarny), CVD i zegary sesji wnoszą wartość także na swingu — bo 4h to wciąż rynek intraday-ish,
+a momentum/flow działa cross-TF. „Dedykacja przez wykluczenie" odcięła realny edge.
+
+**Decyzja (Prawo I/XV):**
+1. **Mechanizm ZOSTAJE** — `NEURONY_STYLU`/`neurony_dla_trybu`/`styl=` są poprawne i przetestowane.
+   Wartość: czysty SCALP na 1h/M15 (gdzie OC/Pi-Cycle to czysty szum) i jawna kontrola składu.
+2. **Domyślnie pełne 70** (styl=None) — zero regresji; profil to opt-in, NIE auto z interwału.
+3. **Przypisanie SWING jest ZA WĄSKIE** — pomiar nakazuje WŁĄCZYĆ z powrotem do SWING neurony
+   momentum/flow dziś oznaczone scalp-only (X-26, V-03, X-09, SES). To strojenie tabeli
+   („żonglowanie" w czasie) — następny A/B: SWING-szeroki vs pełnia. Nie zmieniam w ciemno bez pomiaru.
+4. **Auto-założenie „dedykacja = lepiej" SFALSYFIKOWANE** — jak W-322 „więcej = lepiej". Tabela
+   profili musi być STROJONA pomiarem per styl, nie przyjęta z intuicji.

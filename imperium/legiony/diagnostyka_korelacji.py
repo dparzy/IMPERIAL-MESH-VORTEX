@@ -63,6 +63,150 @@ def korelacja_pearson(x: List[float], y: List[float]) -> Optional[float]:
     return cov / math.sqrt(vx * vy)
 
 
+def _dyskretyzuj(x: List[float], biny: int = 5) -> Optional[List[int]]:
+    """
+    Mapuje serię ciągłą na indeksy binów [0..biny-1] (równe szerokości).
+    Zwraca None gdy seria stała (max<=min) — entropia/MI nieokreślone.
+    """
+    if not x:
+        return None
+    lo, hi = min(x), max(x)
+    if hi <= lo:
+        return None  # stała seria — brak informacji
+    szer = (hi - lo) / biny
+    return [min(biny - 1, int((xi - lo) / szer)) for xi in x]
+
+
+def _entropia_shannon(etykiety: List[int]) -> float:
+    """Entropia Shannona (naturalna, nat) rozkładu etykiet dyskretnych."""
+    n = len(etykiety)
+    if n == 0:
+        return 0.0
+    from collections import Counter
+    c = Counter(etykiety)
+    return -sum((v / n) * math.log(v / n) for v in c.values())
+
+
+def informacja_wzajemna(x: List[float], y: List[float], biny: int = 5) -> Optional[float]:
+    """
+    Informacja wzajemna I(X;Y) (nat) przez histogram. Pure Python.
+    None gdy któraś seria stała (brak informacji) lub za mało danych.
+
+    MI = H(X) + H(Y) - H(X,Y). Łapie zależności NIELINIOWE, których Pearson nie widzi.
+    """
+    n = len(x)
+    if n < 2 or n != len(y):
+        return None
+    dx = _dyskretyzuj(x, biny)
+    dy = _dyskretyzuj(y, biny)
+    if dx is None or dy is None:
+        return None
+    hx = _entropia_shannon(dx)
+    hy = _entropia_shannon(dy)
+    hxy = _entropia_shannon([a * biny + b for a, b in zip(dx, dy)])  # łączny
+    mi = hx + hy - hxy
+    return max(0.0, mi)  # numeryczny floor (MI ≥ 0)
+
+
+def nmi(x: List[float], y: List[float], biny: int = 5) -> Optional[float]:
+    """
+    Znormalizowana informacja wzajemna ∈ [0,1]: NMI = I(X;Y)/sqrt(H(X)·H(Y)).
+    1 = pełna redundancja (ten sam rozkład informacji), 0 = niezależne.
+    None gdy seria stała. Wykrywa redundancję NIELINIOWĄ (Pearson ~0 a NMI wysokie).
+    """
+    n = len(x)
+    if n < 2 or n != len(y):
+        return None
+    dx = _dyskretyzuj(x, biny)
+    dy = _dyskretyzuj(y, biny)
+    if dx is None or dy is None:
+        return None
+    hx = _entropia_shannon(dx)
+    hy = _entropia_shannon(dy)
+    if hx <= 0 or hy <= 0:
+        return None
+    mi = max(0.0, hx + hy - _entropia_shannon([a * biny + b for a, b in zip(dx, dy)]))
+    return min(1.0, mi / math.sqrt(hx * hy))
+
+
+def variation_of_information(x: List[float], y: List[float], biny: int = 5) -> Optional[float]:
+    """
+    Znormalizowana Variation of Information ∈ [0,1] (López de Prado, MLAM).
+    VI_norm = (H(X,Y) - I(X;Y)) / H(X,Y).  0 = identyczna informacja, 1 = niezależne.
+    Metryka odległości (spełnia nierówność trójkąta) — lepsza do klastrowania niż |ρ|.
+    """
+    n = len(x)
+    if n < 2 or n != len(y):
+        return None
+    dx = _dyskretyzuj(x, biny)
+    dy = _dyskretyzuj(y, biny)
+    if dx is None or dy is None:
+        return None
+    hx = _entropia_shannon(dx)
+    hy = _entropia_shannon(dy)
+    hxy = _entropia_shannon([a * biny + b for a, b in zip(dx, dy)])
+    if hxy <= 0:
+        return None
+    mi = max(0.0, hx + hy - hxy)
+    return min(1.0, max(0.0, (hxy - mi) / hxy))
+
+
+def raport_informacji_wzajemnej(
+    serie: Dict[str, List[float]],
+    prog_nmi: float = 0.50,
+    prog_pearson_liniowy: float = 0.50,
+    biny: int = 5,
+) -> Dict[str, Any]:
+    """
+    📊 META-01 (research W-335) | Redundancja NIELINIOWA — czego Pearson nie widzi.
+
+    DLA NOWICJUSZA: dwa neurony mogą mieć korelację Pearsona ~0 (pozornie niezależne),
+    a jednocześnie nieść tę samą informację w sposób nieliniowy (np. jeden reaguje na
+    |ruch|, drugi na ruch — korelacja liniowa znika, ale wiedza ta sama). Pearson tego
+    NIE złapie. Informacja wzajemna i Variation-of-Information łapią.
+
+    Flaguje pary „ukrycie redundantne": wysokie NMI (≥prog_nmi) PRZY niskim |Pearson|
+    (<prog_pearson_liniowy) — to redundancja, którą reguła |ρ|>0.80 przegapiła.
+
+    Zwraca dict z listami par + metrykami (NMI, VI, Pearson) — uzupełnia Prawo XVI.
+    """
+    klucze = sorted(serie.keys())
+    ukryte_redundantne = []
+    wszystkie = []
+    for i in range(len(klucze)):
+        for j in range(i + 1, len(klucze)):
+            a, b = klucze[i], klucze[j]
+            xa, xb = serie[a], serie[b]
+            n_ab = min(len(xa), len(xb))
+            if n_ab < 2:
+                continue
+            xa2, xb2 = xa[-n_ab:], xb[-n_ab:]
+            wzajemna = nmi(xa2, xb2, biny)
+            vi = variation_of_information(xa2, xb2, biny)
+            pear = korelacja_pearson(xa2, xb2)
+            if wzajemna is None:
+                continue
+            wpis = {
+                "para": f"{a}~{b}",
+                "nmi": round(wzajemna, 3),
+                "vi": round(vi, 3) if vi is not None else None,
+                "pearson": round(pear, 3) if pear is not None else None,
+            }
+            wszystkie.append(wpis)
+            # Ukryta redundancja: silna informacyjnie, słaba liniowo
+            if wzajemna >= prog_nmi and (pear is None or abs(pear) < prog_pearson_liniowy):
+                ukryte_redundantne.append(wpis)
+
+    ukryte_redundantne.sort(key=lambda w: -w["nmi"])
+    return {
+        "liczba_modulow": len(serie),
+        "pary_ukryte_redundantne": ukryte_redundantne,
+        "wszystkie_pary": wszystkie,
+        "prog_nmi": prog_nmi,
+        "prog_pearson_liniowy": prog_pearson_liniowy,
+    }
+
+
 def zbierz_sygnaly_zwiadowcow(
     bary: List[Dict[str, Any]],
     zwiadowcy: list,

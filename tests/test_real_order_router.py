@@ -22,9 +22,15 @@ from imperium.koloseum.paper_trading import SygnalWejscia
 class MockExchange:
     """Imituje minimalny interfejs CCXT bez sieci."""
 
-    def __init__(self, fail_on: str = ""):
+    def __init__(self, fail_on: str = "", pozycje=None):
         self.orders: list = []
-        self.fail_on = fail_on  # "entry" | "exit" | "" (nigdy)
+        self.fail_on = fail_on  # "entry" | "exit" | "positions" | "" (nigdy)
+        self._pozycje = pozycje or []
+
+    def fetch_positions(self):
+        if self.fail_on == "positions":
+            raise ConnectionError("Mock: fetch_positions niedostępny")
+        return self._pozycje
 
     def create_order(self, symbol, type, side, amount, params=None):
         params = params or {}
@@ -195,6 +201,130 @@ def test_qty_obliczone_z_rozmiaru_i_ceny():
     expected = round(800.0 / 40000.0, 6)
     assert abs(qty - expected) < 1e-8
     assert qty > 0
+
+
+# ── Synchronizacja pozycji przy starcie (W-333) ─────────────────────────────
+
+def _poz_mexc(symbol="BTC/USDT:USDT", side="long", entry=50000.0, contracts=0.02,
+              leverage=5, liq=None):
+    return {
+        "symbol": symbol, "side": side, "entryPrice": entry,
+        "contracts": contracts, "leverage": leverage,
+        "notional": contracts * entry,
+        "liquidationPrice": liq,
+    }
+
+
+def test_sync_odtwarza_otwarta_pozycje_z_mexc():
+    """Po restarcie: pozycja na MEXC → odtworzona w trackingu (kontrola SL/TP)."""
+    ex = MockExchange(pozycje=[_poz_mexc(side="long", entry=50000.0, contracts=0.02)])
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex)
+    n = r.synchronizuj_pozycje(interwal="4h")
+    assert n == 1
+    assert len(r.otwarte) == 1
+    poz = list(r.otwarte.values())[0]
+    assert poz.kierunek == "LONG"
+    assert poz.cena_wejscia == 50000.0
+    assert r.raport_real()["otwarte_real"] == 1
+
+
+def test_sync_short_kierunek():
+    ex = MockExchange(pozycje=[_poz_mexc(side="short", entry=3000.0, contracts=1.0)])
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex)
+    r.synchronizuj_pozycje()
+    poz = list(r.otwarte.values())[0]
+    assert poz.kierunek == "SHORT"
+
+
+def test_sync_pomija_pozycje_zerowe():
+    """Granica: contracts==0 → pozycja zamknięta, NIE odtwarzamy."""
+    ex = MockExchange(pozycje=[
+        _poz_mexc(contracts=0.0),
+        _poz_mexc(symbol="ETH/USDT:USDT", contracts=1.0, entry=3000.0),
+    ])
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex)
+    n = r.synchronizuj_pozycje()
+    assert n == 1  # tylko ta z contracts>0
+
+
+def test_sync_pomija_pozycje_bez_ceny():
+    """Granica: entryPrice==0 → brak danych, pomijamy (nie odtwarzamy śmieci)."""
+    ex = MockExchange(pozycje=[_poz_mexc(entry=0.0, contracts=0.02)])
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex)
+    n = r.synchronizuj_pozycje()
+    assert n == 0
+
+
+def test_sync_brak_pozycji_zwraca_zero():
+    ex = MockExchange(pozycje=[])
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex)
+    assert r.synchronizuj_pozycje() == 0
+    assert len(r.otwarte) == 0
+
+
+def test_sync_blad_fetch_positions_nie_wywala():
+    """fetch_positions padł → log ERROR, engine startuje pusty (nie crash)."""
+    ex = MockExchange(fail_on="positions")
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex)
+    n = r.synchronizuj_pozycje()
+    assert n == 0
+
+
+def test_sync_dry_run_nie_odtwarza():
+    """dry_run nie składał zleceń → nie ma realnych pozycji do odtworzenia."""
+    ex = MockExchange(pozycje=[_poz_mexc(contracts=0.02)])
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex, dry_run=True)
+    n = r.synchronizuj_pozycje()
+    assert n == 0
+
+
+def test_sync_odtworzona_pozycja_zamykalna():
+    """Odtworzona pozycja musi być zamykalna (wysyła reduceOnly na MEXC)."""
+    ex = MockExchange(pozycje=[_poz_mexc(side="long", entry=50000.0, contracts=0.02)])
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex)
+    r.synchronizuj_pozycje()
+    pid = list(r.otwarte.keys())[0]
+    wynik = r._zamknij(pid, 51000.0, "MANUAL")
+    assert wynik is not None
+    close_orders = [o for o in ex.orders if o.get("reduceOnly")]
+    assert len(close_orders) == 1
+    assert close_orders[0]["side"] == "sell"  # zamknięcie LONG
+
+
+def test_sync_long_nie_zamyka_sie_na_pierwszym_barze():
+    """GRANICA: pozycja SYNC LONG nie może paść przez TP=0 na pierwszym barze."""
+    from imperium.koloseum.paper_trading import BarData
+    ex = MockExchange(pozycje=[_poz_mexc(side="long", entry=50000.0, contracts=0.02)])
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex)
+    r.synchronizuj_pozycje()
+    assert len(r.otwarte) == 1
+    bar = BarData(symbol="BTC/USDT:USDT", interwal="4h", timestamp=1,
+                  open=50100.0, high=50500.0, low=49800.0, close=50200.0, volume=1.0)
+    zamkniete = r.przetworz_bar(bar)
+    assert len(zamkniete) == 0, "SYNC LONG nie powinien zamknąć się na zwykłym barze"
+    assert len(r.otwarte) == 1
+
+
+def test_sync_short_nie_zamyka_sie_na_pierwszym_barze():
+    """GRANICA: pozycja SYNC SHORT nie może paść przez SL=0 na pierwszym barze."""
+    from imperium.koloseum.paper_trading import BarData
+    ex = MockExchange(pozycje=[_poz_mexc(side="short", entry=50000.0, contracts=0.02)])
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex)
+    r.synchronizuj_pozycje()
+    bar = BarData(symbol="BTC/USDT:USDT", interwal="4h", timestamp=1,
+                  open=49900.0, high=50200.0, low=49500.0, close=49800.0, volume=1.0)
+    zamkniete = r.przetworz_bar(bar)
+    assert len(zamkniete) == 0, "SYNC SHORT nie powinien zamknąć się na zwykłym barze"
+    assert len(r.otwarte) == 1
+
+
+def test_sync_uzywa_liquidation_z_gieldy():
+    """Jeśli giełda podaje liquidationPrice — używamy go, nie szacunku."""
+    ex = MockExchange(pozycje=[_poz_mexc(side="long", entry=50000.0, liq=45000.0)])
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex)
+    r.synchronizuj_pozycje()
+    poz = list(r.otwarte.values())[0]
+    assert poz.cena_likwidacji == 45000.0
 
 
 # ── Tryb dry-run (W-332) ────────────────────────────────────────────────────

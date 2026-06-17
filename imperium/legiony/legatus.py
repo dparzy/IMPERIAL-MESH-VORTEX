@@ -366,6 +366,11 @@ class Legatus:
         # Interwał z danych — Timeframe-Aware dobór strategii (Prawo XV)
         interwal = bary[-1].get("interwal", "") if bary else ""
 
+        # W-334: wstrzyknij reżim do wskaźników — neurony z progami adaptacyjnymi
+        # (RSI/ADX) czytają go i przesuwają progi wg kontekstu. Klucz _REZIM
+        # prefiksowany podkreśleniem (meta-kontekst, nie wskaźnik rynkowy).
+        wskazniki["_REZIM"] = rezim
+
         sygnaly = self.roj.zbierz_sygnaly(wskazniki)
         sygnaly = sygnaly + sygnaly_exp
         # FAZA A (W-286): FORMACJA LEGIONÓW — na danym interwale głosują tylko

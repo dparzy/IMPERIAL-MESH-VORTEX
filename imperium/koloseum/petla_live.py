@@ -255,6 +255,14 @@ def handluj_live(
             log_dir=cfg.log_dir,
             dry_run=cfg.dry_run,
         )
+        # W-333: odtwórz otwarte pozycje z MEXC (bezpieczeństwo po restarcie —
+        # inaczej pozycja wisi na giełdzie bez kontroli SL/TP roju).
+        try:
+            n_sync = engine.synchronizuj_pozycje(interwal=cfg.interwal)
+            if n_sync:
+                logger.warning(f"[PętlaLive] SYNC: odtworzono {n_sync} pozycji z MEXC.")
+        except Exception as e:
+            logger.error(f"[PętlaLive] Synchronizacja pozycji padła: {e}")
     dyrygenci = _buduj_dyrygencie(cfg.symbole, cfg, engine)
     pamiec = PamiecRefleksyjna(plik=cfg.plik_pamieci)
     radar = RadarRynku()

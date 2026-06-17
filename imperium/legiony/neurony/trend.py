@@ -9,12 +9,14 @@ ADX, Ichimoku, Supertrend, EMA 50/200, Fibonacci, RSI Divergence, HMA, Donchian
 """
 
 from imperium.legiony.mikro_neuron import MikroNeuron, SygnalNeuronu
+from imperium.legiony.progi_adaptacyjne import prog_adx, atr_pct
 
 
 class NeuronADX(MikroNeuron):
     """
     XII-01 | ADX (14) — siła trendu (bez kierunku).
-    ADX > 25 = trend. Kierunek z +DI/-DI.
+    Próg ADAPTACYJNY (W-334): w chaosie (VOLATILE/PANIC) wymaga mocniejszego
+    trendu (próg ~30), w spokoju niższy wystarczy. Kierunek z +DI/-DI.
     """
     KLUCZ = "XII-01"
     LEGION = "SWING"
@@ -30,15 +32,21 @@ class NeuronADX(MikroNeuron):
         if adx is None:
             return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak ADX"])
 
-        if adx < 20:
-            return self._bazowy_sygnal(adx, "NEUTRAL", 0.0, [f"ADX={adx:.1f} brak trendu"])
+        rezim = wskazniki.get("_REZIM")
+        prog = prog_adx(rezim, atr_pct(wskazniki))
+        # Strefa "brak trendu" = 5 pkt poniżej progu trendu (adaptacyjna)
+        prog_brak = max(10.0, prog - 5.0)
+
+        if adx < prog_brak:
+            return self._bazowy_sygnal(adx, "NEUTRAL", 0.0,
+                [f"ADX={adx:.1f} brak trendu (próg {prog_brak:.0f})"])
 
         if di_plus is None or di_minus is None:
             return self._bazowy_sygnal(adx, "NEUTRAL", 0.30, [f"ADX={adx:.1f} trend ale brak DI"])
 
         if adx >= 40:
             pewnosc_base = 0.90
-        elif adx >= 25:
+        elif adx >= prog:
             pewnosc_base = 0.70
         else:
             pewnosc_base = 0.50

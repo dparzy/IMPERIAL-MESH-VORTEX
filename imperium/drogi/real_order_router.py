@@ -199,8 +199,103 @@ class RealOrderRouter(PaperTradingEngine):
 
         return wynik
 
-    # ── Raport diagnostyczny ───────────────────────────────────────────────────
+    # ── Synchronizacja przy starcie (W-333) ────────────────────────────────────
 
+    def synchronizuj_pozycje(self, interwal: str = "4h") -> int:
+        """
+        Odczytuje otwarte pozycje z MEXC i odtwarza je w trackingu (Prawo XV).
+
+        KRYTYCZNE dla bezpieczeństwa kapitału: po restarcie procesu engine startuje
+        pusty, a na giełdzie mogą wisieć realne pozycje BEZ kontroli SL/TP roju.
+        Ta metoda przywraca kontrolę — czyta fetch_positions(), odtwarza
+        OtwartaPozycja dla każdej wiszącej pozycji, by przetwarzanie barów
+        (SL/TP/likwidacja/timeout) znów nad nią czuwało.
+
+        W dry_run nie ma realnych pozycji do odtworzenia (zlecenia nie szły) —
+        zwraca 0. Zwraca liczbę odtworzonych pozycji.
+        """
+        import time
+        import uuid
+
+        if self._dry_run:
+            logger.info("[SYNC] dry_run — brak realnych pozycji do odtworzenia.")
+            return 0
+
+        try:
+            pozycje = self._exchange.fetch_positions()
+        except Exception as exc:
+            logger.error("[SYNC] fetch_positions padł: %s — engine startuje pusty.", exc)
+            return 0
+
+        odtworzone = 0
+        for p in pozycje or []:
+            try:
+                contracts = float(p.get("contracts") or 0.0)
+                if contracts <= 0:
+                    continue  # zamknięta/pusta
+                symbol = p.get("symbol") or p.get("info", {}).get("symbol", "?")
+                kierunek = "LONG" if str(p.get("side", "")).lower() == "long" else "SHORT"
+                cena_wej = float(p.get("entryPrice") or p.get("info", {}).get("entryPrice") or 0.0)
+                dzwignia = max(1, int(float(p.get("leverage") or 1)))  # nigdy 0 (dzielenie)
+                notional = float(p.get("notional") or (contracts * cena_wej))
+                margin = notional / dzwignia if dzwignia > 0 else notional
+
+                if cena_wej <= 0 or notional <= 0:
+                    logger.warning("[SYNC] Pomijam %s — brak ceny/notional.", symbol)
+                    continue
+
+                # Likwidacja: z giełdy jeśli jest, inaczej szacunek 100% margin
+                likw = p.get("liquidationPrice")
+                if likw:
+                    likwidacja = float(likw)
+                elif kierunek == "LONG":
+                    likwidacja = cena_wej * (1 - 1.0 / dzwignia)
+                else:
+                    likwidacja = cena_wej * (1 + 1.0 / dzwignia)
+
+                # Brak SL/TP z giełdy → sentinele które NIGDY nie odpalą fałszywie
+                # na pierwszym barze (granica: take_profit=0.0 dawałby high>=0 → TP_HIT
+                # natychmiast dla LONG; stop_loss=0.0 → high>=0 → SL_HIT dla SHORT).
+                # Pozycję chroni LIKWIDACJA + TIMEOUT; rój dołoży realny SL przy decyzji.
+                if kierunek == "LONG":
+                    sl_sync, tp_sync = 0.0, float("inf")       # low<=0 i high>=inf nigdy
+                else:
+                    sl_sync, tp_sync = float("inf"), 0.0       # high>=inf i low<=0 nigdy
+
+                poz = OtwartaPozycja(
+                    pozycja_id=f"SYNC-{uuid.uuid4().hex[:8].upper()}",
+                    symbol=symbol,
+                    interwal=interwal,
+                    kierunek=kierunek,
+                    cena_wejscia=cena_wej,
+                    stop_loss=sl_sync,
+                    take_profit=tp_sync,
+                    cena_likwidacji=likwidacja,
+                    rozmiar_usdt=notional,
+                    dzwignia=dzwignia,
+                    kapital_zablokowany=margin,
+                    prowizja_wejscia=0.0,
+                    timestamp_wejscia=int(time.time() * 1000),
+                )
+                self.otwarte[poz.pozycja_id] = poz
+                self._pozycje_real[poz.pozycja_id] = {
+                    "symbol": symbol,
+                    "qty": round(contracts, 6),
+                    "entry_order_id": "SYNC",
+                }
+                odtworzone += 1
+                logger.warning(
+                    "[SYNC] Odtworzono %s %s qty=%.6f wejście=%.6f dźwignia=%dx "
+                    "(SL/TP=0 — rój dołoży przy kolejnej decyzji)",
+                    symbol, kierunek, contracts, cena_wej, dzwignia,
+                )
+            except Exception as exc:
+                logger.error("[SYNC] Błąd odtwarzania pozycji %s: %s", p, exc)
+
+        logger.info("[SYNC] Odtworzono %d pozycji z MEXC.", odtworzone)
+        return odtworzone
+
+    # ── Raport diagnostyczny ───────────────────────────────────────────────────
     def raport_real(self) -> Dict:
         """Zwraca stan śledzenia real — ile pozycji zsynchronizowanych z MEXC."""
         bledy_wejscia = sum(

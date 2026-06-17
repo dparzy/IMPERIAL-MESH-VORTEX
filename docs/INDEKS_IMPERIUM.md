@@ -77,6 +77,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 41 | `ANALIZA_NEURONY_SCALP_SWING_INVEST.md` | **Porównanie 65 neuronów z best practices** (docs + internet 2026-06-15) + 6 unikatowych propozycji zdekorelowanych per styl: VPOC/Volume Profile, Amihud Illiquidity, Pi Cycle Top, Delta Divergence, Anchored VWAP, Cross-Sectional RS | ✅ Aktywny |
 | 42 | `GUBERNATOR.md` | **GUBERNATOR (W-325)** — homeostatyczny sterownik globalnej ekspozycji portfela; maszyna postaw z histerezą (KWARANTANNA→EKSPANSJA), meta-labeling López de Prado na poziomie portfela (rozrzut ocen skanera = sygnał pewności), wyniki A/B + diagnostyka | ✅ Aktywny |
 | 43 | `ODLOZONE_DECYZJE.md` | **Odłożone decyzje** — rzeczy ustalone, ale świadomie odłożone do pomiaru A/B (Prawo I): +Igrzyska domyślnie ON (czeka na A/B W-329), progi adaptacyjne W-334 (czeka na ab_w334_progi) | ✅ Aktywny |
+| 44 | `RESEARCH_NOWE_KATEGORIE_2026-06-17.md` | **Deep research 6-kątowy** (APAC/konkursy/repo/papers/patenty/książki) — kandydaci na nowe kategorie: C (cross-sectional), B (meta/bet-sizing), U (microstructure L2), IV (options-implied), P (Hawkes); narzędzia META (VI/CFI, PBO/DSR, HRP). Status: RESEARCH/plan, nie kod (Prawo XIX) | ✅ Aktywny |
 
 ---
 

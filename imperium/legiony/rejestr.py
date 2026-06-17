@@ -72,6 +72,9 @@ from imperium.legiony.neurony.geometria import (
 from imperium.legiony.neurony.przekroj import (
     NeuronRelativeStrength,
 )
+from imperium.legiony.neurony.rezim_zmiana import (
+    NeuronChangePoint,
+)
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
 from imperium.legiony.zwiadowcy import (
@@ -137,6 +140,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronPathSignature(),
         # Przekrój koszyka (C) — Cross-sectional Relative Strength (C-01, W-335)
         NeuronRelativeStrength(),
+        # Zmiana reżimu (R) — CUSUM change-point, przełom strukturalny (CP-01, W-336)
+        NeuronChangePoint(),
     ]
 
 
@@ -304,6 +309,8 @@ NEURONY_STYLU: dict = {
     "Z-01": _U, "Z-02": _U, "Z-03": _U, "Z-04": _U, "Z-05": _U, "Z-06": _U, "Z-07": _INV,
     # Przekrój koszyka (C) — Cross-sectional RS, uniwersalny (zależy od koszyka, nie TF)
     "C-01": _U,
+    # Zmiana reżimu (R) — CUSUM change-point, uniwersalny na każdym interwale
+    "CP-01": _U,
 }
 
 

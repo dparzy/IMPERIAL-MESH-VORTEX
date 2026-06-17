@@ -316,8 +316,10 @@ def backtest_portfel(
     import bisect as _bs
     from imperium.legiony.radar_rynku import (RadarRynku, frakcja_korelacyjna,
                                               rezim_risk_off)
+    from imperium.legiony.przekroj_koszyka import cross_sectional_rs as _cross_sectional_rs
     _radar = RadarRynku()
     _RADAR_OGON = 200   # ogon serii wystarczający dla wszystkich okien radaru
+    _RS_LOOKBACK = 24   # okno zwrotu dla cross-sectional RS (~4 dni na 4h)
     _btc_sym = next((s for s in bary_per if s.upper().startswith("BTC")), None)
     # Precompute per-symbol serie (close/vol/ts) raz — tnie się bisectem co tyk.
     _close = {s: [float(x["close"]) for x in b] for s, b in bary_per.items()}
@@ -441,6 +443,22 @@ def backtest_portfel(
                 risk_off, _ = rezim_risk_off(stan)
                 if risk_off:
                     continue   # świadoma cisza (Prawo XV) — nie wchodzimy w lawinę
+
+        # C-01 CROSS-SECTIONAL RS (W-335): z-score zwrotu tego symbolu vs koszyk, do ts
+        # (przyczynowo). Tylko ogon (lookback+1) per symbol → O(lookback)/tyk. Neuron
+        # C-01 czyta CROSS_RS z kontekst_dodatkowy. Wstawione PO radarze (radar nadpisuje
+        # kontekst), by RS nie zginął.
+        if len(bary_per) >= 2:
+            close_koszyk = {}
+            for s in bary_per:
+                k = _bs.bisect_right(_ts_arr[s], ts)
+                if k >= 1:
+                    lo = max(0, k - _RS_LOOKBACK - 1)
+                    close_koszyk[s] = _close[s][lo:k]
+            rs_map = _cross_sectional_rs(close_koszyk, lookback=_RS_LOOKBACK)
+            if sym in rs_map:
+                dyrygenci[sym].kontekst_dodatkowy["CROSS_RS"] = rs_map[sym]
+
         okno_barow = bary[i - okno: i + 1]
 
         # W-317 TRYB NAJLEPSZE: zaktualizuj snapshot tego symbolu i sprawdź, czy jest

@@ -323,6 +323,21 @@ def handluj_live(
                 except Exception as e:
                     logger.warning(f"[PętlaLive] Radar padł: {e}")
 
+            # 2b. Cross-sectional RS (C-01, W-335) — z-score zwrotu vs koszyk.
+            # Tylko pętla portfelowa widzi wszystkie symbole naraz. Bez koszyka (1 para)
+            # → pusty dict → neuron C-01 abstynuje (Prawo XV).
+            if len(bary_per) >= 2:
+                try:
+                    from imperium.legiony.przekroj_koszyka import cross_sectional_rs
+                    close_koszyk = {s: [b["close"] for b in bs]
+                                    for s, bs in bary_per.items()}
+                    rs_map = cross_sectional_rs(close_koszyk, lookback=24)
+                    for s, d in dyrygenci.items():
+                        if s in rs_map:
+                            d.kontekst_dodatkowy["CROSS_RS"] = rs_map[s]
+                except Exception as e:
+                    logger.warning(f"[PętlaLive] Cross-sectional RS padł: {e}")
+
             # 3. Cykl decyzyjny per symbol
             for sym, bary in bary_per.items():
                 if sym not in dyrygenci:

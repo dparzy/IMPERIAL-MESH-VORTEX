@@ -6,7 +6,7 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-16 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 72 neuronów (zarejestrowane w roju) + 12 zwiadowców = **84 modułów w kodzie**
+**Zaimplementowane:** 73 neuronów (zarejestrowane w roju) + 12 zwiadowców = **85 modułów w kodzie**
 **Aktywne / wyciszone:** 66 aktywnych + 4 wyciszone, z czego:
   • **51 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
@@ -172,6 +172,7 @@
 | Z-06 | NeuronAmihudIlliquidity | Z | 6 | ✅ aktywny (meta-brama) | AMIHUD_20 | Amihud illiquidity — impakt cenowy/krucha płynność, tłumi rój (W-322) |
 | Z-07 | NeuronPiCycleTop | Z | 6 | ✅ aktywny | PI_111 | Pi Cycle Top — SMA-111 vs 2×SMA-350, kill-switch szczytu cyklu, INVEST 1D (W-322) |
 | D-01 | NeuronPathSignature | D | 7 | ✅ aktywny 🎖️ | CLOSE_SERIES_20 | Lévy Area Close×Volume — geometria ścieżki (W-079) |
+| C-01 | NeuronRelativeStrength | C | 6 | ✅ aktywny (pętla portfelowa) | CROSS_RS | Cross-sectional Relative Strength — z-score zwrotu vs koszyk (W-335, nowa kategoria C) |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
 > PANIC ×3.0) były pre-zarejestrowane — teraz mają realne neurony. Prawo XV.

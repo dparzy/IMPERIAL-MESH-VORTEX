@@ -69,6 +69,9 @@ from imperium.legiony.neurony.zagrozenie import (
 from imperium.legiony.neurony.geometria import (
     NeuronPathSignature,
 )
+from imperium.legiony.neurony.przekroj import (
+    NeuronRelativeStrength,
+)
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
 from imperium.legiony.zwiadowcy import (
@@ -132,6 +135,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronAmihudIlliquidity(), NeuronPiCycleTop(),
         # Geometria ścieżki (D) — Lévy Area Close×Volume, Rough Path Theory (W-079)
         NeuronPathSignature(),
+        # Przekrój koszyka (C) — Cross-sectional Relative Strength (C-01, W-335)
+        NeuronRelativeStrength(),
     ]
 
 
@@ -297,6 +302,8 @@ NEURONY_STYLU: dict = {
     "A-01": _U, "A-02": _U, "A-03": _U, "A-05": _U,
     # Zagrożenie (Z) — bezpieczniki uniwersalne; Pi Cycle (Z-07) to cykl dzienny → tylko INVEST
     "Z-01": _U, "Z-02": _U, "Z-03": _U, "Z-04": _U, "Z-05": _U, "Z-06": _U, "Z-07": _INV,
+    # Przekrój koszyka (C) — Cross-sectional RS, uniwersalny (zależy od koszyka, nie TF)
+    "C-01": _U,
 }
 
 

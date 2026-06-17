@@ -10,6 +10,12 @@ Wymagania:
   MEXC_SECRET   — zmienna środowiskowa
 
 Tryb testów: wstrzyknij exchange=MockExchange() — bez sieci, bez kluczy.
+
+W-332 — TRYB DRY-RUN (MEXC nie ma testnetu — potwierdzone: urls['test']=null):
+  dry_run=True → łączy się PRAWDZIWYM kluczem, weryfikuje uprawnienia/saldo,
+  ale create_order TYLKO LOGUJE co BY wysłał (nie wysyła). Najbliżej testnetu
+  jak się da na MEXC — łapie błędy integracji (zły symbol, brak uprawnień,
+  reduceOnly) bez ryzyka kapitału.
 """
 
 import os
@@ -73,14 +79,46 @@ class RealOrderRouter(PaperTradingEngine):
         *args,
         exchange=None,
         tryb_pozycji: str = "swap",
+        dry_run: bool = False,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         # exchange=None → buduj z kluczy środowiskowych; exchange=Mock → testy offline
         self._exchange = exchange if exchange is not None else _zbuduj_mexc(tryb_pozycji)
         self._tryb_pozycji = tryb_pozycji
+        # dry_run: prawdziwe połączenie, ale create_order tylko logowany (zero ryzyka)
+        self._dry_run = dry_run
+        self._dry_run_zlecenia: list = []  # log co BY wysłano (audyt)
         # pozycja_id → (symbol, qty_base, exchange_order_id)
         self._pozycje_real: Dict[str, Dict] = {}
+        if dry_run:
+            logger.warning(
+                "[DRY-RUN] Tryb sucho-bieżny: zlecenia NIE są wysyłane na MEXC, "
+                "tylko logowane. Zero ryzyka kapitału."
+            )
+
+    # ── Składanie zlecenia (real lub dry-run) ──────────────────────────────────
+
+    def _zloz_zlecenie(self, symbol: str, side: str, qty: float, params: Dict) -> Dict:
+        """
+        Składa zlecenie na MEXC. W dry_run — tylko loguje i zwraca atrapę z id,
+        bez wywołania create_order (zero ryzyka). Inaczej — realne CCXT.
+        """
+        if self._dry_run:
+            zlec = {
+                "symbol": symbol, "side": side, "amount": qty,
+                "params": dict(params), "kolejnosc": len(self._dry_run_zlecenia) + 1,
+            }
+            self._dry_run_zlecenia.append(zlec)
+            oid = f"DRYRUN-{zlec['kolejnosc']:04d}"
+            logger.info(
+                "[DRY-RUN] BY WYSŁAŁ: %s %s qty=%.6f params=%s → %s",
+                symbol, side, qty, params, oid,
+            )
+            return {"id": oid, "status": "dry_run", "filled": qty}
+        return self._exchange.create_order(
+            symbol=symbol, type="market", side=side, amount=qty, params=params,
+        )
 
     # ── Wejście ───────────────────────────────────────────────────────────────
 
@@ -96,11 +134,10 @@ class RealOrderRouter(PaperTradingEngine):
         qty = round(sygnal.rozmiar_usdt / max(sygnal.cena_wejscia, 1e-12), 6)
 
         try:
-            order = self._exchange.create_order(
+            order = self._zloz_zlecenie(
                 symbol=sygnal.symbol,
-                type="market",
                 side=side,
-                amount=qty,
+                qty=qty,
                 params={"leverage": int(sygnal.dzwignia)},
             )
             oid = order.get("id", "?")
@@ -142,11 +179,10 @@ class RealOrderRouter(PaperTradingEngine):
         qty = real["qty"]
 
         try:
-            order = self._exchange.create_order(
+            order = self._zloz_zlecenie(
                 symbol=poz_przed.symbol,
-                type="market",
                 side=side,
-                amount=qty,
+                qty=qty,
                 params={"reduceOnly": True},
             )
             oid = order.get("id", "?")
@@ -175,4 +211,6 @@ class RealOrderRouter(PaperTradingEngine):
             "otwarte_real": len(self._pozycje_real),
             "bledy_wejscia": bledy_wejscia,
             "exchange": type(self._exchange).__name__,
+            "dry_run": self._dry_run,
+            "dry_run_zlecen": len(self._dry_run_zlecenia),
         }

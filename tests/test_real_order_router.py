@@ -197,6 +197,70 @@ def test_qty_obliczone_z_rozmiaru_i_ceny():
     assert qty > 0
 
 
+# ── Tryb dry-run (W-332) ────────────────────────────────────────────────────
+
+def test_dry_run_nie_wysyla_zlecen_do_ccxt():
+    """Granica: dry_run=True → create_order NIGDY nie wywołany na exchange."""
+    ex = MockExchange()
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex, dry_run=True)
+    poz = r.wejdz(_sygnal(kierunek="LONG"))
+    assert poz is not None  # papier żyje
+    assert len(ex.orders) == 0  # NIC nie poszło na giełdę
+    raport = r.raport_real()
+    assert raport["dry_run"] is True
+    assert raport["dry_run_zlecen"] == 1
+
+
+def test_dry_run_loguje_wejscie_i_wyjscie():
+    """dry_run liczy zlecenia wejścia i wyjścia, ale nie wysyła."""
+    ex = MockExchange()
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex, dry_run=True)
+    poz = r.wejdz(_sygnal(kierunek="LONG", cena=50000.0))
+    r._zamknij(poz.pozycja_id, 51000.0, "TP")
+    assert len(ex.orders) == 0  # dalej zero realnych
+    raport = r.raport_real()
+    assert raport["dry_run_zlecen"] == 2  # wejście + wyjście
+    assert raport["bledy_wejscia"] == 0
+
+
+def test_dry_run_zachowuje_pnl_papierowy():
+    """dry_run nadal liczy P&L (to symulacja na realnym połączeniu)."""
+    ex = MockExchange()
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex, dry_run=True)
+    poz = r.wejdz(_sygnal(kierunek="LONG", cena=50000.0))
+    wynik = r._zamknij(poz.pozycja_id, 52000.0, "TP")
+    assert wynik is not None
+    assert wynik.pnl_usdt > 0  # LONG 50k→52k = zysk
+
+
+def test_petla_live_dry_run_uzywa_routera_z_flaga():
+    """petla_live paper=False, dry_run=True → RealOrderRouter(dry_run=True)."""
+    from imperium.koloseum.petla_live import KonfigPetliLive, handluj_live
+    from tests.test_petla_live import _MockLoader
+
+    ex = MockExchange()
+    flagi = {}
+
+    class _MockRR(RealOrderRouter):
+        def __init__(self, *a, **kw):
+            flagi["dry_run"] = kw.get("dry_run")
+            kw["exchange"] = ex
+            super().__init__(*a, **kw)
+
+    import imperium.drogi.real_order_router as ror_mod
+    original = ror_mod.RealOrderRouter
+    ror_mod.RealOrderRouter = _MockRR  # type: ignore[assignment]
+    try:
+        cfg = KonfigPetliLive(
+            symbole=["BTCUSDT"], interwal="4h",
+            kapital_startowy=1000.0, paper=False, dry_run=True,
+        )
+        handluj_live(cfg, max_barow=1, _loader=_MockLoader())
+    finally:
+        ror_mod.RealOrderRouter = original
+    assert flagi["dry_run"] is True
+
+
 def test_petla_live_paper_false_uzywa_real_order_router():
     """petla_live z paper=False instancjonuje RealOrderRouter."""
     from imperium.koloseum.petla_live import KonfigPetliLive, handluj_live

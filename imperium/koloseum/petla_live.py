@@ -49,6 +49,7 @@ class KonfigPetliLive:
     kapital_startowy: float = 10_000.0    # kapitał startowy (paper lub realny)
     min_pewnosc: float = 0.55             # próg pewności Legatusa
     paper: bool = True                    # True=paper trading, False=realne zlecenia
+    dry_run: bool = False                 # paper=False+dry_run=True: realny klucz, zlecenia tylko logowane (MEXC bez testnetu)
     auto_rezim: bool = True               # True=auto-klasyfikacja reżimu (Namiestnik)
     synapsy: bool = True                  # True=SynapsyRezimowe per symbol
     # W-307: warstwy uczenia wag neuronów (Prawo XV — opt-in, domyślnie OFF).
@@ -246,11 +247,13 @@ def handluj_live(
         )
     else:
         from imperium.drogi.real_order_router import RealOrderRouter
+        prefix = "DRYRUN" if cfg.dry_run else "REAL"
         engine = RealOrderRouter(
             kapital_startowy=cfg.kapital_startowy,
-            sesja_id=f"REAL-{cfg.interwal}-{len(cfg.symbole)}x",
+            sesja_id=f"{prefix}-{cfg.interwal}-{len(cfg.symbole)}x",
             max_otwartych=len(cfg.symbole),
             log_dir=cfg.log_dir,
+            dry_run=cfg.dry_run,
         )
     dyrygenci = _buduj_dyrygencie(cfg.symbole, cfg, engine)
     pamiec = PamiecRefleksyjna(plik=cfg.plik_pamieci)

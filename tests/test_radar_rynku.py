@@ -269,3 +269,72 @@ def test_dobierz_najlepsze_z_radarem_zmienia_ranking():
     # Nie crash i zwraca wyniki
     assert isinstance(bez_radaru, list)
     assert isinstance(z_radarem, list)
+
+
+# ── RADAR-04 NeuronStresKorelacji (W-329) — testy granic (Prawo XXI) ──────────
+
+def test_radar04_brak_danych_abstynuje():
+    """Prawo XV: brak STRES_KORELACJI → NEUTRAL pewność 0 (martwy głos zabroniony)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    s = n.interpretuj({})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc == 0.0
+
+
+def test_radar04_nizsza_korelacja_brak_kaskady():
+    """STRES < 0.80 → NEUTRAL (dywersyfikacja działa, brak sygnału)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    s = n.interpretuj({"STRES_KORELACJI": 0.5, "BTC_TREND": -0.5})
+    assert s.kierunek == "NEUTRAL"
+
+
+def test_radar04_prog_dokladny_080():
+    """Granica: STRES == 0.80 wpada w gałąź kaskady (>=), nie NEUTRAL (<)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    # przy 0.80 + BTC w dół → SHORT (kaskada aktywna od progu)
+    s = n.interpretuj({"STRES_KORELACJI": 0.80, "BTC_TREND": -0.3})
+    assert s.kierunek == "SHORT"
+    # tuż poniżej progu → NEUTRAL
+    s2 = n.interpretuj({"STRES_KORELACJI": 0.799, "BTC_TREND": -0.3})
+    assert s2.kierunek == "NEUTRAL"
+
+
+def test_radar04_kaskada_w_dol_short():
+    """Kaskada + BTC spada → SHORT (alty lecą za liderem)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    s = n.interpretuj({"STRES_KORELACJI": 0.95, "BTC_TREND": -0.5})
+    assert s.kierunek == "SHORT"
+    assert s.pewnosc > 0.4
+
+
+def test_radar04_kaskada_w_gore_slaby_long():
+    """Kaskada + BTC rośnie → LONG słaby (FOMO ryzykowny, pewność capowana ≤0.45)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    s = n.interpretuj({"STRES_KORELACJI": 0.95, "BTC_TREND": 0.5})
+    assert s.kierunek == "LONG"
+    assert s.pewnosc <= 0.45
+
+
+def test_radar04_kaskada_btc_plaski_neutral_ostrzegawczy():
+    """Kaskada bez kierunku BTC (płaski lub brak) → NEUTRAL ostrzegawczy (nie zgaduj)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    s = n.interpretuj({"STRES_KORELACJI": 0.9, "BTC_TREND": 0.0})
+    assert s.kierunek == "NEUTRAL"
+    # brak BTC_TREND też → NEUTRAL (nie crash)
+    s2 = n.interpretuj({"STRES_KORELACJI": 0.9})
+    assert s2.kierunek == "NEUTRAL"
+
+
+def test_radar04_kategoria_i_klucz():
+    """Spójność: RADAR-04, kategoria Z (obrona), wskaźnik STRES_KORELACJI."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    assert n.KLUCZ == "RADAR-04"
+    assert n.KATEGORIA == "Z"
+    assert n.WSKAZNIK == "STRES_KORELACJI"

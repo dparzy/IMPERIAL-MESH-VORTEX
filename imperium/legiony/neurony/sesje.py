@@ -274,3 +274,49 @@ class NeuronPrzeplyw(MikroNeuron):
                 [f"💧 PRZEPŁYW {pk:.2f}: odpływ kapitału, rynek wąski (risk-off, SHORT-ostrzeżenie)"])
         return self._bazowy_sygnal(pk, "NEUTRAL", 0.15,
             [f"💧 PRZEPŁYW {pk:.2f}: kapitał bez wyraźnego kierunku"])
+
+
+class NeuronStresKorelacji(MikroNeuron):
+    """
+    RADAR-04 💎 | Strażnik Kaskady Korelacyjnej (W-329) — detektor stresu systemowego.
+
+    STRES_KORELACJI ∈ [0,1] (z RadarRynku, Prawo XVI): średnia |korelacja| par koszyka.
+    Dotąd liczony, lecz BEZ GŁOSU (martwy wskaźnik — łamanie Prawa XV). Używały go tylko
+    rygiel ryzyka i ster korelacyjny. Teraz ma własny głos OBRONNY (kategoria Z).
+
+    LOGIKA KASKADY: gdy stres → 1, dywersyfikacja znika — wszystko leci RAZEM, w kierunku
+    lidera (BTC). Stres sam w sobie jest bezkierunkowy, więc kierunek bierze z BTC_TREND
+    (konfluencja, nie zgadywanie):
+      • STRES ≥ 0.80 ∧ BTC_TREND < −0.10 → SHORT (kaskada w dół — alty lecą za BTC)
+      • STRES ≥ 0.80 ∧ BTC_TREND > +0.10 → LONG słaby (rajd skorelowany — ryzykowny FOMO)
+      • STRES ≥ 0.80 ∧ BTC płaski      → NEUTRAL ostrzegawczy (kaskada bez kierunku = nie wchodź)
+      • STRES < 0.80                    → NEUTRAL (zdrowa dywersyfikacja, brak sygnału)
+
+    Brak STRES_KORELACJI → abstynencja (Prawo XV). Kategoria Z: wzmacniany w VOLATILE
+    (×1.5) i PANIC (×2.0) — dokładnie tam, gdzie kaskady niszczą koszyki.
+    """
+    KLUCZ = "RADAR-04"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "STRES_KORELACJI"
+    KATEGORIA = "Z"
+    WAGA = 6
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        sk = wskazniki.get("STRES_KORELACJI")
+        if sk is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak stresu korelacji (radar milczy)"])
+        if sk < 0.80:
+            return self._bazowy_sygnal(sk, "NEUTRAL", 0.10,
+                [f"🔗 STRES {sk:.2f}: dywersyfikacja działa, brak kaskady"])
+        # Kaskada wykryta — kierunek z lidera (BTC_TREND), jeśli dostępny
+        btc = wskazniki.get("BTC_TREND")
+        sila = min(0.70, (sk - 0.80) * 3.0 + 0.30)  # 0.30 przy progu → 0.70 przy 0.93+
+        if btc is not None and btc < -0.10:
+            return self._bazowy_sygnal(sk, "SHORT", sila,
+                [f"🔗 KASKADA {sk:.2f} + BTC {btc:+.2f}: lawina w dół — alty lecą za liderem"])
+        if btc is not None and btc > 0.10:
+            return self._bazowy_sygnal(sk, "LONG", min(0.45, sila),
+                [f"🔗 KASKADA {sk:.2f} + BTC {btc:+.2f}: rajd skorelowany (FOMO — ostrożny LONG)"])
+        return self._bazowy_sygnal(sk, "NEUTRAL", 0.20,
+            [f"🔗 KASKADA {sk:.2f}: wszystko skorelowane, BTC bez kierunku — wstrzymaj się"])

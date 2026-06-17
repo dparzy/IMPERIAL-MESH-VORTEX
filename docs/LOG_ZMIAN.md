@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-06-17 | W-329 | RADAR-04 NeuronStresKorelacji — głos dla martwego wskaźnika (Prawo XV)
+
+**Kontekst (głęboki audyt przed LIVE):** Radar liczył STRES_KORELACJI (średnia |korelacja|
+par koszyka, Prawo XVI) i używał go w ryglu ryzyka oraz sterze korelacyjnym — ale ŻADEN neuron
+nie głosował na jego podstawie. Martwy wskaźnik = utrata potencjału (Prawo XV).
+
+**RADAR-04 (`NeuronStresKorelacji`, kategoria Z, waga 6):** detektor kaskady systemowej.
+Stres sam jest bezkierunkowy → kierunek bierze z BTC_TREND (konfluencja, nie zgadywanie):
+- STRES ≥ 0.80 ∧ BTC_TREND < −0.10 → SHORT (lawina w dół — alty lecą za liderem)
+- STRES ≥ 0.80 ∧ BTC_TREND > +0.10 → LONG słaby ≤0.45 (rajd skorelowany — FOMO ryzykowny)
+- STRES ≥ 0.80 ∧ BTC płaski/brak → NEUTRAL ostrzegawczy (kaskada bez kierunku = nie wchodź)
+- STRES < 0.80 → NEUTRAL (zdrowa dywersyfikacja)
+
+Kategoria Z (nie R) celowo — wzmacniany w VOLATILE (×1.5) i PANIC (×2.0), dokładnie tam gdzie
+kaskady niszczą koszyki. Rój: 70 → **71 neuronów** (67 aktywnych).
+
+**Testy granic (Prawo XXI):** abstynencja bez danych, próg dokładny 0.80 (≥ vs <), kaskada↓/↑,
+płaski BTC, brak BTC_TREND (nie crash). Pliki: sesje.py, rejestr.py, audyt_spojnosci.py
+(allowlista + weryfikacja adaptera), test_radar_rynku.py, MANIFEST/README/INDEKS.
+
+---
+
 ## 2026-06-16 | W-328 | Nowe pary i backtest — skrypty pobierania i testowania (przygotowanie LIVE)
 
 **Kontekst:** Cezar pyta o rozszerzenie koszyka o nowe pary (ADA, AVAX, XRP, PEPE, WIF, memecoin).

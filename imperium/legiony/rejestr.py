@@ -35,7 +35,7 @@ from imperium.legiony.neurony.trend import (
     NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian,
     NeuronHMA, NeuronFibonacci, NeuronRSIDiv, NeuronOBZone,
 )
-from imperium.legiony.neurony.sesje import NeuronZegarSesji, NeuronAzjaRange, NeuronAugur, NeuronRadarBTC, NeuronDominacja, NeuronPrzeplyw
+from imperium.legiony.neurony.sesje import NeuronZegarSesji, NeuronAzjaRange, NeuronAugur, NeuronRadarBTC, NeuronDominacja, NeuronPrzeplyw, NeuronStresKorelacji
 from imperium.legiony.neurony.wolumen import (
     NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL,
     NeuronForceIndex, NeuronDeltaDivergence, NeuronAnchoredVWAP,
@@ -103,7 +103,7 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronDeltaDivergence(), NeuronAnchoredVWAP(),
         # Zegary rynku (SES — Faza C, W-286)
         NeuronZegarSesji(), NeuronAzjaRange(), NeuronAugur(), NeuronRadarBTC(),
-        NeuronDominacja(), NeuronPrzeplyw(),
+        NeuronDominacja(), NeuronPrzeplyw(), NeuronStresKorelacji(),
         # Struktura (SMC/VSA)
         NeuronOrderBlock(), NeuronFVG(), NeuronBOS(), NeuronVSA(),
         # Volume Profile / VPOC (S, VP-01) — S/R z wolumenu, swing OHLCV (W-322, Dalton BIB-013)
@@ -290,7 +290,7 @@ NEURONY_STYLU: dict = {
     "OC-01": _INV, "OC-02": _INV, "OC-03": _INV, "OC-04": _INV, "OC-05": _U,
     # Reżim/Sentyment (R) — futures/Fear&Greed/RADAR/news/augur: kontekst na każdym TF
     "PSY-01": _U, "PSY-02": _U, "PSY-03": _U, "PSY-04": _U,
-    "RADAR-01": _U, "RADAR-02": _U, "RADAR-03": _U, "AUG-01": _U, "NEWS-01": _U,
+    "RADAR-01": _U, "RADAR-02": _U, "RADAR-03": _U, "RADAR-04": _U, "AUG-01": _U, "NEWS-01": _U,
     # Meta-bramy reżimu/chaosu (H/N/V/D/L) — klasyfikują każdy interwał
     "H-01": _U, "N-01": _U, "V-13": _U, "V-14": _U, "D-01": _U, "L-14": _U, "VI-13": _U,
     # Anty-manipulacja (A) — uniwersalna obrona

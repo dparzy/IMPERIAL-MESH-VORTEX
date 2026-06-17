@@ -75,6 +75,11 @@ class KonfigPetliLive:
     # pamięci). Bez decay martwe pary nigdy nie wygasają w długim live (luka P4 audytu).
     # 0 = wyłączone. Domyślnie 50 barów (≈ 8 dni na 4h) — łagodne sprzątanie.
     synapsy_decay_co_bar: int = 50
+    # W-330: auto-dobór par z giełdy (SelektorPar — płynność × dekorelacja od BTC).
+    # False=sztywna lista cfg.symbole. True=zastąp listę rankingiem TOP-N (wymaga loadera).
+    auto_discover: bool = False
+    auto_discover_top_n: int = 5
+    auto_discover_min_obrot: float = 5_000_000.0
 
 
 @dataclass
@@ -211,6 +216,24 @@ def handluj_live(
 
     cfg = konfiguracja
     pauza = cfg.pauza_sekundy or _INTERWAL_SEKUNDY.get(cfg.interwal, 3600)
+
+    # W-330: auto-dobór par z giełdy (płynność × dekorelacja od BTC). Gdy włączony,
+    # zastępuje sztywną listę cfg.symbole rankingiem SelektorPar. Bez sieci/loadera →
+    # zostaje lista z konfiguracji (Prawo XV — nie zgadujemy).
+    if cfg.auto_discover and _loader is not None:
+        try:
+            from imperium.koloseum.selektor_par import SelektorPar
+            sel = SelektorPar(_loader)
+            wybrane = sel.wybierz(top_n=cfg.auto_discover_top_n,
+                                  min_obrot_usd=cfg.auto_discover_min_obrot)
+            if wybrane:
+                logger.info(f"[PętlaLive] Auto-discover: {len(wybrane)} par → {wybrane}")
+                cfg.symbole = wybrane
+            else:
+                logger.warning("[PętlaLive] Auto-discover pusty — zostaję przy liście z konfiguracji.")
+        except Exception as e:
+            logger.error(f"[PętlaLive] Auto-discover padł: {e} — lista z konfiguracji.")
+
     btc_sym = next((s for s in cfg.symbole if s.upper().startswith("BTC")), None)
 
     # Engine: paper lub (przyszłe) realne zlecenia

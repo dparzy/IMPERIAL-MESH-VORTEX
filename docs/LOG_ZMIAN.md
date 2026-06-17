@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-06-17 | W-330 | SelektorPar — auto-dobor par LIVE (plynnosc x dekorelacja)
+
+**Luka audytu (przed LIVE):** petla_live miala SZTYWNA liste par. System nie umial sam
+wykryc co jest dostepne i plynne na MEXC. DataLoader nie wolal load_markets().
+
+**SelektorPar (`koloseum/selektor_par.py`):** pipeline auto-doboru w 3 warstwach (Prawo I):
+  1. lista_par_rynku() — CCXT load_markets (wszystkie aktywne USDT-perp)
+  2. filtruj_plynne() — min. obrot 24h (chroni przed poslizgiem na cienkiej ksiedze)
+  3. ranking alfy = 0.60*obrot_norm + 0.40*(1-|korelacja BTC|) — Prawo XVI: premiujemy
+     pary niosace WLASNA informacje, nie kopie ruchu BTC (dywersyfikacja realna)
+
+**DataLoader (W-330):** nowe metody lista_par_rynku() + filtruj_plynne() (CCXT public).
+**petla_live (W-330):** KonfigPetliLive.auto_discover (domyslnie False — zero zmiany).
+  True → zastepuje cfg.symbole rankingiem TOP-N. Bez sieci/loadera → lista z konfiguracji.
+
+Loader wstrzykiwalny → testy OFFLINE (mock). 8 testow selektora + 2 wpiecia w petli.
+Prawo XXI: brak sieci, brak plynnych, dekorelacja premiowana, BTC kotwica, top_n.
+
+---
+
 ## 2026-06-17 | W-329b | P4 decay synaps w live — higiena pamieci (Prawo XV)
 
 **Luka audytu P4:** SynapsyRezimowe.zapomnij() istnial, ale NIGDY nie byl wolany w

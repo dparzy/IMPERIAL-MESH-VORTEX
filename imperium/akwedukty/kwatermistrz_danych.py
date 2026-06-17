@@ -85,6 +85,58 @@ class DataLoader:
         df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
         return df
 
+    # ─────────────────── Discovery par rynku (W-330, auto-LIVE) ───────────────
+    def lista_par_rynku(self, quote: str = "USDT", typ: Optional[str] = "swap") -> List[str]:
+        """
+        Lista dostępnych par z giełdy (CCXT load_markets). Filtruje po walucie kwotowanej
+        i typie rynku ('swap'=perpetual, 'spot'=spot, None=wszystko). Pusta gdy brak sieci.
+
+        DLA NOWICJUSZA: 'swap' to perpetual futures (to handlujemy z dźwignią na MEXC).
+        Zwraca symbole w formacie giełdy (np. 'BTC/USDT:USDT' dla perp).
+        """
+        if self._ex is None:
+            logger.warning("[Ładowarka] Brak CCXT — lista par pusta.")
+            return []
+        try:
+            rynki = self._ex.load_markets()
+        except Exception as e:
+            logger.error(f"[Ładowarka] load_markets padł: {e}")
+            return []
+        out = []
+        for sym, m in rynki.items():
+            if m.get("quote") != quote:
+                continue
+            if not m.get("active", True):
+                continue
+            if typ is not None and m.get("type") != typ:
+                continue
+            out.append(sym)
+        return sorted(out)
+
+    def filtruj_plynne(self, pary: List[str], min_obrot_usd: float = 5_000_000.0,
+                       limit: Optional[int] = None) -> List[Dict]:
+        """
+        Filtruje pary po min. obrocie 24h (płynność — chronimy przed cienkimi księgami
+        gdzie poślizg zjada zysk). Zwraca [{symbol, obrot_usd, cena}] zsortowane malejąco
+        po obrocie. `limit` ucina do TOP-N. Bez sieci → pusta lista (Prawo XV).
+
+        Każdy ticker pobierany osobno (CCXT fetch_ticker) — bezpiecznie pomija błędy.
+        """
+        if self._ex is None:
+            return []
+        wynik = []
+        for sym in pary:
+            try:
+                t = self._ex.fetch_ticker(sym)
+            except Exception:
+                continue
+            obrot = t.get("quoteVolume") or 0.0
+            if obrot and obrot >= min_obrot_usd:
+                wynik.append({"symbol": sym, "obrot_usd": float(obrot),
+                              "cena": t.get("last")})
+        wynik.sort(key=lambda x: x["obrot_usd"], reverse=True)
+        return wynik[:limit] if limit else wynik
+
     @staticmethod
     def synthetic(n: int = 500, seed: int = 2026, start: float = 50000.0) -> pd.DataFrame:
         rng = np.random.default_rng(seed)

@@ -237,3 +237,43 @@ def test_synapsy_zapomnij_redukuje_martwe_pary():
     assert syn._silo.get("X-01|X-02@NORMAL", 0) > 0
     # martwa para skasowana (poniżej progu alpha_decay)
     assert "X-03|X-04@NORMAL" not in syn._silo
+
+
+# ── W-330: auto-discovery par ─────────────────────────────────────────────────
+
+def test_auto_discover_domyslnie_off():
+    """Domyślnie auto_discover wyłączone (sztywna lista) — zero zmiany zachowania."""
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"])
+    assert kfg.auto_discover is False
+    assert kfg.auto_discover_top_n == 5
+
+
+def test_auto_discover_zastepuje_liste():
+    """handluj_live z loaderem discovery → cfg.symbole zastąpione rankingiem SelektorPar."""
+    import pandas as pd
+    from imperium.koloseum.petla_live import handluj_live
+
+    class _DiscoveryLoader(_MockLoader):
+        def lista_par_rynku(self, quote="USDT", typ="swap"):
+            return ["BTC/USDT:USDT", "XRP/USDT:USDT"]
+        def filtruj_plynne(self, pary, min_obrot_usd=5_000_000.0, limit=None):
+            dane = {"BTC/USDT:USDT": 100e6, "XRP/USDT:USDT": 60e6}
+            out = [{"symbol": s, "obrot_usd": dane[s], "cena": 1.0}
+                   for s in pary if dane.get(s, 0) >= min_obrot_usd]
+            return out[:limit] if limit else out
+        def fetch(self, symbol, timeframe="4h", limit=200):
+            return pd.DataFrame({"close": [100 + i for i in range(20)],
+                                 "open": [100 + i for i in range(20)],
+                                 "high": [101 + i for i in range(20)],
+                                 "low": [99 + i for i in range(20)],
+                                 "volume": [10.0] * 20,
+                                 "timestamp": pd.date_range("2026-01-01", periods=20, freq="4h")})
+
+    kfg = KonfigPetliLive(symbole=["PLACEHOLDER"], interwal="4H",
+                          auto_discover=True, auto_discover_top_n=2,
+                          auto_discover_min_obrot=1e6, synapsy=False)
+    loader = _DiscoveryLoader()
+    # max_barow=1 — jeden obieg wystarczy do sprawdzenia podmiany listy
+    handluj_live(kfg, max_barow=1, _loader=loader)
+    assert "PLACEHOLDER" not in kfg.symbole
+    assert "BTC/USDT:USDT" in kfg.symbole

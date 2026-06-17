@@ -236,13 +236,22 @@ def handluj_live(
 
     btc_sym = next((s for s in cfg.symbole if s.upper().startswith("BTC")), None)
 
-    # Engine: paper lub (przyszłe) realne zlecenia
-    engine = PaperTradingEngine(
-        kapital_startowy=cfg.kapital_startowy,
-        sesja_id=f"LIVE-{cfg.interwal}-{len(cfg.symbole)}x",
-        max_otwartych=len(cfg.symbole),
-        log_dir=cfg.log_dir,
-    )
+    # Engine: paper lub realne zlecenia MEXC (W-331)
+    if cfg.paper:
+        engine = PaperTradingEngine(
+            kapital_startowy=cfg.kapital_startowy,
+            sesja_id=f"LIVE-{cfg.interwal}-{len(cfg.symbole)}x",
+            max_otwartych=len(cfg.symbole),
+            log_dir=cfg.log_dir,
+        )
+    else:
+        from imperium.drogi.real_order_router import RealOrderRouter
+        engine = RealOrderRouter(
+            kapital_startowy=cfg.kapital_startowy,
+            sesja_id=f"REAL-{cfg.interwal}-{len(cfg.symbole)}x",
+            max_otwartych=len(cfg.symbole),
+            log_dir=cfg.log_dir,
+        )
     dyrygenci = _buduj_dyrygencie(cfg.symbole, cfg, engine)
     pamiec = PamiecRefleksyjna(plik=cfg.plik_pamieci)
     radar = RadarRynku()

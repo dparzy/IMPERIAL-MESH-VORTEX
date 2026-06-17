@@ -71,6 +71,10 @@ class KonfigPetliLive:
     pauza_sekundy: Optional[int] = None
     # Liczba barów pomiędzy odświeżeniem RADAR (domyślnie co bar = 1).
     radar_co_bar: int = 1
+    # W-329: decay synaps reżimowych — co ile barów wołać synapsy.zapomnij() (higiena
+    # pamięci). Bez decay martwe pary nigdy nie wygasają w długim live (luka P4 audytu).
+    # 0 = wyłączone. Domyślnie 50 barów (≈ 8 dni na 4h) — łagodne sprzątanie.
+    synapsy_decay_co_bar: int = 50
 
 
 @dataclass
@@ -295,6 +299,18 @@ def handluj_live(
                 except Exception as e:
                     statystyki.bledy += 1
                     logger.error(f"[PętlaLive] Błąd cyklu {sym}: {e}")
+
+            # 3b. Decay synaps (W-329, P4) — higiena pamięci: martwe pary łagodnie
+            # wygasają. Bez tego silos synaps rośnie bez końca w długim live.
+            if (cfg.synapsy and cfg.synapsy_decay_co_bar > 0
+                    and bar_nr % cfg.synapsy_decay_co_bar == 0):
+                for d in dyrygenci.values():
+                    syn = getattr(getattr(d, "legatus", None), "synapsy", None)
+                    if syn is not None:
+                        try:
+                            syn.zapomnij()
+                        except Exception as e:
+                            logger.warning(f"[PętlaLive] Decay synaps padł: {e}")
 
             # 4. Zamknięcia → PamięćRefleksyjna (per sesja, na koniec każdego baru)
             hist_now = len(engine.historia_zamkniec)

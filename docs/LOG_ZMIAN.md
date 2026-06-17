@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-06-17 | W-329b | P4 decay synaps w live — higiena pamieci (Prawo XV)
+
+**Luka audytu P4:** SynapsyRezimowe.zapomnij() istnial, ale NIGDY nie byl wolany w
+petla_live — martwe pary neuronow nigdy nie wygasaly w dlugim live (silos rosl bez konca).
+
+**Naprawa:** KonfigPetliLive.synapsy_decay_co_bar (domyslnie 50 barow ~8 dni na 4h).
+Co N barow petla wola synapsy.zapomnij() dla kazdego dyrygenta — lagodne tlumienie
+silosu + kasacja par ponizej alpha_decay. 0 = wylaczone.
+
+Testy: domyslna wartosc 50, zapomnij() redukuje zywe + kasuje martwe pary.
+Pliki: petla_live.py (config + krok 3b petli), test_petla_live.py.
+
+---
+
 ## 2026-06-17 | W-329 | RADAR-04 NeuronStresKorelacji — głos dla martwego wskaźnika (Prawo XV)
 
 **Kontekst (głęboki audyt przed LIVE):** Radar liczył STRES_KORELACJI (średnia |korelacja|

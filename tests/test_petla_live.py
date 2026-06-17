@@ -215,3 +215,25 @@ def test_konfiguracja_pauza_none_oblicza_z_interwal():
     kfg = KonfigPetliLive(symbole=["BTCUSDT"], interwal="4H")
     assert kfg.pauza_sekundy is None
     assert _INTERWAL_SEKUNDY["4H"] == 14400
+
+
+# ── W-329 P4: decay synaps reżimowych w live ──────────────────────────────────
+
+def test_konfiguracja_synapsy_decay_domyslnie_50():
+    """W-329: decay synaps domyślnie 50 barów (higiena pamięci długiego live)."""
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"])
+    assert kfg.synapsy_decay_co_bar == 50
+
+
+def test_synapsy_zapomnij_redukuje_martwe_pary():
+    """zapomnij() łagodnie tłumi silos i kasuje pary poniżej alpha_decay (Prawo XV P4)."""
+    from imperium.biblioteki.synapsy_rezimowe import SynapsyRezimowe
+    syn = SynapsyRezimowe()
+    syn._silo["X-01|X-02@NORMAL"] = 0.5        # żywa para
+    syn._silo["X-03|X-04@NORMAL"] = 0.0005     # prawie martwa (< alpha_decay typ.)
+    syn.zapomnij()
+    # żywa para osłabiona, ale nadal istnieje
+    assert syn._silo.get("X-01|X-02@NORMAL", 0) < 0.5
+    assert syn._silo.get("X-01|X-02@NORMAL", 0) > 0
+    # martwa para skasowana (poniżej progu alpha_decay)
+    assert "X-03|X-04@NORMAL" not in syn._silo

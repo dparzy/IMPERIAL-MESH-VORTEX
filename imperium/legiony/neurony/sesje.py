@@ -320,3 +320,37 @@ class NeuronStresKorelacji(MikroNeuron):
                 [f"🔗 KASKADA {sk:.2f} + BTC {btc:+.2f}: rajd skorelowany (FOMO — ostrożny LONG)"])
         return self._bazowy_sygnal(sk, "NEUTRAL", 0.20,
             [f"🔗 KASKADA {sk:.2f}: wszystko skorelowane, BTC bez kierunku — wstrzymaj się"])
+
+
+class NeuronLeadBTC(MikroNeuron):
+    """
+    RADAR-05 💎 | Strażnik Wyprzedzania BTC→alty (W-330, lead-lag / Transfer Entropy W-071).
+
+    LEAD_BTC ∈ [-1,+1] (z RadarRynku): świeży impuls BTC × siła historycznego wyprzedzania
+    altów. Sens: BTC prowadzi rynek — gdy lider właśnie pchnął i alty HISTORYCZNIE szły za
+    nim z opóźnieniem, to przyszły ruch alta jest przewidywalny (timing wejścia):
+      • LEAD_BTC ≥ +0.30 → LONG-wsparcie (BTC pchnął w górę, alty pójdą za nim)
+      • LEAD_BTC ≤ −0.30 → SHORT-ostrzeżenie (BTC pchnął w dół, alty go dogonią)
+      • między → NEUTRAL (brak wyraźnego sygnału wyprzedzającego)
+    Próg 0.30 (wyższy niż siostry) — odsiewa szum spornych lagów na krótkim oknie.
+    Brak LEAD_BTC → abstynencja (Prawo XV). Kategoria R: kontekst lidera, nie silnik.
+    """
+    KLUCZ = "RADAR-05"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "LEAD_BTC"
+    KATEGORIA = "R"
+    WAGA = 5
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        lead = wskazniki.get("LEAD_BTC")
+        if lead is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak sygnału lead-lag (radar milczy)"])
+        if lead >= 0.30:
+            return self._bazowy_sygnal(lead, "LONG", min(0.60, lead),
+                [f"🔭 LEAD {lead:+.2f}: BTC pchnął w górę — alty pójdą za liderem (LONG-wsparcie)"])
+        if lead <= -0.30:
+            return self._bazowy_sygnal(lead, "SHORT", min(0.60, abs(lead)),
+                [f"🔭 LEAD {lead:+.2f}: BTC pchnął w dół — alty dogonią lidera (SHORT-ostrzeżenie)"])
+        return self._bazowy_sygnal(lead, "NEUTRAL", 0.12,
+            [f"🔭 LEAD {lead:+.2f}: brak wyraźnego wyprzedzania BTC→alty"])

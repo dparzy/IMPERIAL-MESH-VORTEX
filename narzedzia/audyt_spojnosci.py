@@ -508,6 +508,8 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
     "RADAR-03": "PRZEPLYW_KAPITALU (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300)",
     "RADAR-04": "STRES_KORELACJI (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300; "
                 "ożywa gdy pętla portfelowa poda serie koszyka; detektor kaskady W-329)",
+    "RADAR-05": "LEAD_BTC (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300; "
+                "ożywa gdy pętla portfelowa poda serie koszyka; lead-lag BTC→alty W-330)",
     "NEWS-01": "NEWS_SENTYMENT (AdapterNewsLLM — wpięty w zbuduj_bojowy W-301; "
                "ożywa z RSS fetcher lub DEEPSEEK_API_KEY; bez feedu: abstynuje)",
     "X-28":   "MTF_4H_RSI_14/MTF_1D_RSI_14 (Budowniczy MTF — ożywa gdy bary mają "
@@ -535,6 +537,7 @@ WERYFIKACJA_ADAPTEROW = {
     "RADAR-02": {"BTC_DOMINANCJA": -0.9},                                 # alt-season → LONG-wsparcie
     "RADAR-03": {"PRZEPLYW_KAPITALU": 0.95},                              # napływ → LONG-wsparcie
     "RADAR-04": {"STRES_KORELACJI": 0.95, "BTC_TREND": -0.5},             # kaskada + BTC↓ → SHORT
+    "RADAR-05": {"LEAD_BTC": 0.8},                                       # BTC pchnął↑ → LONG-wsparcie
     "NEWS-01": {"NEWS_SENTYMENT": 0.8, "NEWS_PEWNOSC": 0.9, "NEWS_N": 5},  # mocno bycze → LONG
     "X-28":   {"CLOSE": 50000.0, "RSI_14": 60.0, "EMA_21": 49000.0,
                "MTF_4H_RSI_14": 65.0, "MTF_4H_EMA_50": 47000.0,

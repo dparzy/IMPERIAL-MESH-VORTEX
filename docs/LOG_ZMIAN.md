@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-06-17 | W-330b | RADAR-05 NeuronLeadBTC + wymiar lead-lag radaru (BTC->alty timing)
+
+**Rozbudowa radaru (wizja Cezara — wiecej oczu):** radar liczyl 4 wymiary. Dodano 5.:
+LEAD_BTC — sygnal wyprzedzajacy BTC->alty (lead-lag / Transfer Entropy W-071). Cross-korelacja
+zwrotow BTC opoznionych o k vs zwroty altow: najlepszy lag = sila wyprzedzania. Swiezy impuls
+BTC x ta sila = kierunkowy sygnal timingu ("BTC pchnal, alty pojda za nim").
+
+**RADAR-05 (`NeuronLeadBTC`, kategoria R, waga 5):** glos na LEAD_BTC, prog 0.30 (wyzszy niz
+siostry — odsiewa szum spornych lagow na krotkim oknie). LEAD>=0.30 LONG, <=-0.30 SHORT.
+Filar sily: tylko gdy |korelacja lag| >= 0.20 (slaby lead = brak sygnalu). Roj: 71 -> 72.
+
+**RadarRynku:** parametr max_lag (domyslnie 3, 0=wylaczony), pole StanRynku.lead_btc,
+eksport LEAD_BTC w jako_wskazniki(). Testy granic: alty podazaja za BTC, max_lag=0 off,
+prog 0.30 (>= vs <), walidacja max_lag<0. Spojnosc: MANIFEST/README/INDEKS/audyt = 72.
+
+UWAGA (Prawo I): RADAR-04/05 to glosy kontekstowe niskiej wagi wypelniajace zmierzone luki
+(STRES_KORELACJI byl martwy, lead-lag nowy). Wymagaja czystego A/B P&L na portfelu (TODO).
+
+---
+
 ## 2026-06-17 | W-330 | SelektorPar — auto-dobor par LIVE (plynnosc x dekorelacja)
 
 **Luka audytu (przed LIVE):** petla_live miala SZTYWNA liste par. System nie umial sam

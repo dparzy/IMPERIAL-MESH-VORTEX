@@ -6,7 +6,7 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-16 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 71 neuronów (zarejestrowane w roju) + 12 zwiadowców = **83 modułów w kodzie**
+**Zaimplementowane:** 72 neuronów (zarejestrowane w roju) + 12 zwiadowców = **84 modułów w kodzie**
 **Aktywne / wyciszone:** 66 aktywnych + 4 wyciszone, z czego:
   • **51 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
@@ -123,6 +123,7 @@
 | RADAR-02 | NeuronDominacja 💎 | R | 5 | ✅ aktywny (RadarRynku) | BTC_DOMINANCJA (W-292, przepływ kapitału) | — |
 | RADAR-03 | NeuronPrzeplyw 💎 | R | 5 | ✅ aktywny (RadarRynku) | PRZEPLYW_KAPITALU (W-292, breadth×wolumen) | — |
 | RADAR-04 | NeuronStresKorelacji 💎 | Z | 6 | ✅ aktywny (RadarRynku) | STRES_KORELACJI (W-329, detektor kaskady — kierunek z BTC_TREND) | — |
+| RADAR-05 | NeuronLeadBTC 💎 | R | 5 | ✅ aktywny (RadarRynku) | LEAD_BTC (W-330, lead-lag BTC→alty — timing wejść) | — |
 
 ### Plik: `neurony/psychologia.py`
 

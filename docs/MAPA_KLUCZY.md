@@ -118,6 +118,62 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 
 ---
 
+## 🧬 META-BRAMY I NEURONY BADAWCZE (poza klasycznym katalogiem)
+
+> Neurony zrodzone z deep-researchu (kategorie C/D/F-VSA/H/L/N/R/Z) — nie mają
+> katalogowego odpowiednika, klucz=klasa w kodzie. Pełne opisy: `MANIFEST_KODU.md`.
+
+| Klucz w kodzie | Klasa w kodzie | KAT | WAGA | Dostępny | WSKAZNIK (Brama) |
+|---|---|---|---|---|---|
+| C-01 | NeuronRelativeStrength | C | 6 | ✅ | CROSS_RS |
+| D-01 | NeuronPathSignature | D | 7 | ✅ | CLOSE_SERIES_20 |
+| VSA-01 | NeuronVSA | F | 8 | ✅ | VSA |
+| H-01 | NeuronHurstDFA | H | 7 | ✅ | HURST_DFA_100 |
+| L-14 | NeuronUlcer | L | 7 | ✅ | ULCER_14 |
+| VI-13 | NeuronATRLev | L | 8 | ✅ | ATR_14 |
+| N-01 | NeuronPermutationEntropy | N | 7 | ✅ | PERM_ENTROPY_100 |
+| N-02 | NeuronFracDiff | N | 6 | ✅ | CLOSE_SERIES_100 |
+| AUG-01 | NeuronAugur | R | 6 | ✅ | EVENT_PROB_WZROSTU |
+| BOCPD-01 | NeuronBOCPD | R | 6 | ✅ | CLOSE_SERIES_60 |
+| CP-01 | NeuronChangePoint | R | 6 | ✅ | CLOSE_SERIES_60 |
+| NEWS-01 | NeuronSentymentNews | R | 6 | ✅ | NEWS_SENTYMENT |
+| RADAR-01 | NeuronRadarBTC | R | 6 | ✅ | BTC_TREND |
+| RADAR-02 | NeuronDominacja | R | 5 | ✅ | BTC_DOMINANCJA |
+| RADAR-03 | NeuronPrzeplyw | R | 5 | ✅ | PRZEPLYW_KAPITALU |
+| RADAR-04 | NeuronStresKorelacji | Z | 6 | ✅ | STRES_KORELACJI |
+| RADAR-05 | NeuronLeadBTC | R | 5 | ✅ | LEAD_BTC |
+| Z-01 | NeuronToxicFlow | Z | 8 | ✅ | VPIN_50 |
+| Z-02 | NeuronPumpDetect | Z | 7 | ✅ | OBV |
+| Z-03 | NeuronBubbleCrash | Z | 9 | ✅ | BUBBLE_Z_200 |
+| Z-04 | NeuronCascade | Z | 8 | ✅ | CASCADE_FLAG |
+| Z-05 | NeuronDetektorRuchu | Z | 7 | ✅ | CLOSE_SERIES_20 |
+| Z-06 | NeuronAmihudIlliquidity | Z | 6 | ✅ | AMIHUD_20 |
+| Z-07 | NeuronPiCycleTop | Z | 6 | ✅ | PI_111 |
+
+> **Meta-warstwy B (nie neurony):** `neutralizacja.py` (B-02), `meta_labeling.py` (B-01),
+> `rezim_zmiennosci.py` (vol-gate W-340) — działają NAD Legatusem, nie głosują w roju.
+
+### Uzupełnienia klasycznych legionów (dodane po 2026-06-02)
+
+| Klucz w kodzie | Klasa w kodzie | KAT | WAGA | Dostępny | WSKAZNIK (Brama) |
+|---|---|---|---|---|---|
+| SES-01 | NeuronZegarSesji | S | 4 | ✅ | ZEGAR_SESJI |
+| SES-02 | NeuronAzjaRange | S | 7 | ✅ | ASIA_RANGE |
+| X-27 | NeuronValueConvergence | M | 6 | ✅ | VALUE_Z_200 |
+| X-28 | NeuronKonfluencjaMultiTF | T | 7 | ✅ | MTF_4H_RSI_14 |
+| XII-06 | NeuronOBZone | T | 6 | ✅ | CLOSE_PREV |
+| V-05 | NeuronForceIndex | F | 7 | ✅ | FORCE_INDEX |
+| V-06 | NeuronDeltaDivergence | F | 5 | ✅ | DELTA_DIV |
+| V-07 | NeuronAnchoredVWAP | F | 5 | ✅ | AVWAP |
+| V-13 | NeuronRealizedVol | V | 7 | ✅ | YANG_ZHANG_20 |
+| V-14 | NeuronChoppiness | V | 7 | ✅ | CHOPPINESS_14 |
+| VP-01 | NeuronVolumeProfile | S | 6 | ✅ | VPOC |
+| A-03 | NeuronWashVol | A | 6 | ✅ | VOLUME |
+| A-05 | NeuronBartPattern | A | 6 | ✅ | CLOSE_PREV |
+| OC-05 | NeuronWashTrading | O | 8 | ✅ | WASH_SCORE_100 |
+
+---
+
 ## 📋 ZASADA NA PRZYSZŁOŚĆ
 
 > **Gdy piszesz nową strategię:**
@@ -132,4 +188,4 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 
 ---
 
-*Stan na: 2026-06-02 | Źródło prawdy: `imperium/legiony/rejestr.py` → `wszystkie_neurony()`*
+*Stan na: 2026-06-18 | Źródło prawdy: `imperium/legiony/rejestr.py` → `wszystkie_neurony()` (76 neuronów)*

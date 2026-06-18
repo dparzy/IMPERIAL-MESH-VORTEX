@@ -5,8 +5,9 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-16 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Stan na:** 2026-06-18 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 74 neuronów (zarejestrowane w roju) + 12 zwiadowców = **86 modułów w kodzie**
+**Meta-warstwy (B):** 2 moduły (`neutralizacja.py` B-02, `meta_labeling.py` B-01) — warstwa NAD Legatusem, nie neurony
 **Aktywne / wyciszone:** 70 aktywnych + 4 wyciszone, z czego:
   • **51 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
@@ -43,6 +44,22 @@
 | EXP-10 🎖️ | ZwiadowcaDisplacement | `zwiadowcy/exp_displacement.py` | S | ✅ aktywny | Structural Displacement (IMV-ADO 🔱, E1+E5) |
 | EXP-11 🎖️ | ZwiadowcaDynamic | `zwiadowcy/exp_dynamic.py` | M | ✅ aktywny | Dynamic Pro + spread guard (IMV-ADO 🔱, E1+E5) |
 | EXP-12 🎖️ | ZwiadowcaAtmabhan | `zwiadowcy/exp_atmabhan.py` | F | 🔇 wyciszony (L2 feed) | AP-Mode microstructure (IMV-ADO 🔱, E1+E5) |
+
+---
+
+## 🧮 META-WARSTWY B (warstwa nad Legatusem — nie neurony, nie wchodzą do roju)
+
+> **Prawo XIX:** moduły tu wymienione mają kod + testy na branchu. Nie są neuronami —
+> nie głosują w roju, nie mają KLUCZ/KATEGORIA/WAGA. Działają po agregacji Legatusa.
+
+| Moduł | Plik | Klasa/Fn | Status | Opis |
+|-------|------|----------|--------|------|
+| B-02 Feature Neutralization | `legiony/neutralizacja.py` | `neutralizuj_sygnaly()` | ✅ W-337 | Residuum sygnałów po odjęciu składowej wspólnej roju (Numerai FNC / López de Prado MLAM Ch2) |
+| B-01 Meta-labeling scorer | `legiony/meta_labeling.py` | `MetaLabelingScorer` | ✅ W-337 | Online logistic scorer bet_size ∈ [0,1] na cechach RaportLegatusa (AFML Ch3) |
+
+> **B-02** realizuje Prawo XVI w runtime: neurony redundantne dostają wagę ≈ 0, unikalne ≈ 1.
+> **B-01** daje odpowiedź na „ile postawić?" (Kelly fraction × pewność meta-modelu).
+> Obie warstwy są **opt-in** — Legatus działa bez nich (passthrough), aktywacja przez wywołanie.
 
 ---
 

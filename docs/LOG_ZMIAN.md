@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-18 | W-337 | B-02 Feature Neutralization + B-01 Meta-labeling (nowa warstwa B nad Legatusem)
+
+**Luka strukturalna:** Legatus liczył głosy 74 neuronów, ale nie mierzył:
+(a) ile z sygnałów to ta sama informacja powtórzona N razy (redundancja),
+(b) ile postawić (bet-sizing po stronie pewności meta-modelu).
+
+**B-02 Feature Neutralization** (`imperium/legiony/neutralizacja.py`):
+Regresja każdego sygnału (pewnosc_finalna) na ważoną średnią roju.
+Zostaje residuum — ortogonalna część, niezawarta w innych neuronach.
+Czysta realizacja Prawa XVI: „redundancja mierzona, nie zgadywana". Opt-in, sila ∈ [0,1].
+Źródło: Numerai Feature Neutralization Coefficient (FNC); López de Prado MLAM Ch2 (⚠️ niezw.).
+Testy: `tests/test_neutralizacja.py` — 19 testów, w tym granice (sila=0, std=0, klamkowanie).
+
+**B-01 Meta-labeling scorer** (`imperium/legiony/meta_labeling.py`):
+Online logistic regression (SGD, D=6 cech: pewnosc_agregatu, sila_long/short, log aktywnych,
+log zgodnych, różnica sił). Przewiduje P(sygnał trafny | cechy raportu). Bet_size = Kelly × pewnosc.
+Przed 10 próbkami: passthrough z pewnością Legatusa (bezpieczny fallback).
+Uczenie: `scorer.zaktualizuj(raport, zysk=True/False)` po zamknięciu pozycji.
+Źródło: López de Prado, AFML Ch3 — Meta-labeling (⚠️ pełny tekst niezweryfikowany).
+Testy: `tests/test_meta_labeling.py` — 19 testów, w tym granice (weto=0, NEUTRAL=0, sigmoid).
+
+**Wynik:** 1260/1260 testów zielonych. Audyt spójności czysty.
+Nowe pliki: `neutralizacja.py`, `meta_labeling.py`, `test_neutralizacja.py`, `test_meta_labeling.py`.
+MANIFEST zaktualizowany: nowa sekcja "Meta-warstwy B".
+Kolejka ODLOZONE_DECYZJE zaktualizowana.
+
+---
+
 ## 2026-06-17 | W-330b | RADAR-05 NeuronLeadBTC + wymiar lead-lag radaru (BTC->alty timing)
 
 **Rozbudowa radaru (wizja Cezara — wiecej oczu):** radar liczyl 4 wymiary. Dodano 5.:

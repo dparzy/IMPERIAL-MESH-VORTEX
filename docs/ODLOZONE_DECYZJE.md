@@ -41,11 +41,11 @@
 ## 🛠️ KOLEJKA BUDOWY z deep researchu (RESEARCH_NOWE_KATEGORIE_2026-06-17.md)
 
 Decyzja Cezara (2026-06-17): „wszystko po kolei, decyduj sam". Kolejność: reżimowe →
-meta B → L2. **Zrobione:** META-01 (VI), C-01 (kat. C), CP-01 (CUSUM, kat. R).
+meta B → L2. **Zrobione:** META-01 (VI), C-01 (kat. C), CP-01 (CUSUM, kat. R), B-01+B-02 (W-337).
 
 **Następne (każde: kod+test+A/B, Prawo I/XIX/XXI):**
-1. **B-02 Neutralization** + **B-01 Meta-labeling** (nowa kategoria B / meta-warstwa nad
-   Legatusem) — ZMIANA RDZENIA agregacji. Wymaga świeżego kontekstu i ostrożnego A/B.
+1. ✅ **B-02 Neutralization** + **B-01 Meta-labeling** — WDROŻONE W-337 (2026-06-18).
+   Pliki: `neutralizacja.py`, `meta_labeling.py`. A/B: `narzedzia/ab_w337_meta.py` (do zbudowania).
 2. **Jump Model / BOCPD** — dodatkowe detektory reżimu (OHLCV, w stylu CP-01).
 3. **U (mikrostruktura L2)** + **P (Hawkes)** — wymaga wpięcia feedu order-book depth
    z MEXC (nowy pipeline danych — decyzja o koszcie/feedzie przed startem).
@@ -57,4 +57,4 @@ meta B → L2. **Zrobione:** META-01 (VI), C-01 (kat. C), CP-01 (CUSUM, kat. R).
 Po dokończeniu A/B: zaktualizuj ten plik (przenieś do „ZAMKNIĘTE" z wynikiem),
 wpisz LOG_ZMIAN, zaktualizuj MANIFEST/README jeśli zmienia się zachowanie domyślne.
 
-*Stan na: 2026-06-17*
+*Stan na: 2026-06-18*

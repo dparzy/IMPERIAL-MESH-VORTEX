@@ -141,6 +141,13 @@ class Dyrygent:
         # Uczy się online z zamknięć (jak synapsy/mwu), sprawdza przed wejściem.
         # None = wyłączona (domyślnie — opt-in, Prawo XV: zero zmiany zachowania).
         self.ksiega_wad: Optional[Any] = None
+        # W-343 Debata Senatu (Prawo XXII): KonsulSenatu po Legatusie — Byk/Niedźwiedź/
+        # Cenzor weryfikują kierunek. Weto Cenzora = SENAT_WETO; mnoznik_ryzyka skaluje
+        # rozmiar pozycji (Prawo XXIII via per-regime mechanizmy). None = wyłączony.
+        self._senat: Optional[Any] = None
+        # Ostatni sklasyfikowany reżim baru — potrzebny mnozniki_warunkowe() w
+        # _aktualizuj_synapsy() (gdzie jeszcze nie znamy reżimu nowego baru).
+        self._ostatni_rezim: str = "NORMAL"
         # W-290 portfel: budżet sizingu pary (None = pełny wolny kapitał silnika).
         # W koszyku N par każdy Dyrygent sizinguje wg kapital/N (równe wagi).
         self.kapital_sizing: Optional[float] = None
@@ -190,7 +197,8 @@ class Dyrygent:
                drift: bool = False, rada: bool = False,
                synapsy: bool = False, mwu: bool = False,
                igrzyska: bool = False, ksiega_wad: bool = False,
-               filtr_asymetrii: bool = False) -> "Dyrygent":
+               filtr_asymetrii: bool = False,
+               senat: bool = False) -> "Dyrygent":
         """Składa Dyrygenta z pełnym rojem, Budowniczym (TA-Lib) i silnikiem paper.
 
         adaptery_live: gdy True (domyślnie), wpina publiczne adaptery futures+sentyment
@@ -251,6 +259,9 @@ class Dyrygent:
         if ksiega_wad:
             from imperium.cesarz.ksiega_wad import KsiegaWad
             dyrygent.ksiega_wad = KsiegaWad()
+        if senat:
+            from imperium.senat.debata_senatu import KonsulSenatu
+            dyrygent._senat = KonsulSenatu()
         return dyrygent
 
     # ── Jeden cykl decyzyjny ─────────────────────────────────────────────────
@@ -315,6 +326,9 @@ class Dyrygent:
             prog_aktywny = max(decyzja_nam.prog_pewnosci, prog_aktywny)
             lewar_factor = decyzja_nam.lewar_factor
 
+        # Zapamiętaj reżim bieżącego baru (używany przez mnozniki_warunkowe w następnym cyklu)
+        self._ostatni_rezim = rezim
+
         # 3. Legatus — agregacja roju (Opcja A: przekaż StanRynku → radar scoring strategii)
         self.legatus.stan_rynku = self.stan_rynku
         # W-305: zasil SynapsyRezimowe korelacją par neuronów z PRZESZŁYCH barów
@@ -352,7 +366,28 @@ class Dyrygent:
                                 powod=f"pewność {raport.pewnosc_agregatu:.2f} < próg {prog_aktywny:.2f} (Namiestnik)",
                                 raport=raport)
 
-        # 3b. Warstwa strategii (Klucznik) — tryb określony przez Namiestnika
+        # 3b. W-343 Debata Senatu (opt-in): Byk/Niedźwiedź/Cenzor weryfikują kierunek.
+        # Weto Cenzora (reżim PANIC lub nadmiar ryzyka) → SENAT_WETO (Prawo XXII).
+        # mnoznik_ryzyka skaluje rozmiar pozycji (per-regime dekorelacja Prawa XXIII).
+        mnoznik_senatu = 1.0
+        if self._senat is not None and raport.sygnaly:
+            try:
+                from imperium.senat.debata_senatu import glosy_z_raportu
+                from imperium.legiony.rejestr import MECHANIZMY
+                glosy = glosy_z_raportu(raport, mapa_mechanizmow=MECHANIZMY)
+                werdykt = self._senat.obraduj(glosy, rezim=raport.rezim)
+                if werdykt.weto_cenzora:
+                    return DecyzjaCyklu(symbol, "SENAT_WETO", False,
+                                        kierunek=raport.kierunek,
+                                        pewnosc=raport.pewnosc_agregatu,
+                                        rezim=raport.rezim,
+                                        powod=f"Cenzor Senatu zawetował ({raport.rezim})",
+                                        raport=raport)
+                mnoznik_senatu = werdykt.mnoznik_ryzyka
+            except Exception as e:
+                logger.warning(f"[Dyrygent] Senat padł: {e} — pomijam")
+
+        # 3c. Warstwa strategii (Klucznik) — tryb określony przez Namiestnika
         kierunek = raport.kierunek
         pewnosc = raport.pewnosc_agregatu
         top_strat = raport.strategie_dopasowane[0] if raport.strategie_dopasowane else None
@@ -438,7 +473,7 @@ class Dyrygent:
             kierunek=kierunek,
             cena_wejscia=cena_wejscia,
             dzwignia=dzwignia_final,
-            mnoznik_rozmiaru=mnoznik_rozmiaru,
+            mnoznik_rozmiaru=mnoznik_rozmiaru * mnoznik_senatu,
             kapital_usdt=(self.kapital_sizing if self.kapital_sizing is not None
                           else self.engine.kapital),
             pewnosc=pewnosc,
@@ -621,7 +656,10 @@ class Dyrygent:
         # Gdy oba aktywne: MWU × ranga Igrzysk (komplementarne informacje — Prawo XVI).
         if (mwu is not None or igrzyska is not None) and nowe:
             wagi_mwu = mwu.mnozniki() if mwu is not None else {}
-            wagi_igr = igrzyska.nowe_wagi() if igrzyska is not None else {}
+            # Prawo XXIII: per-regime conditional weights — neuron który jest dobry
+            # w aktualnym reżimie dostaje bonus ×1.2; słaby w tym reżimie — karę ×0.8.
+            wagi_igr = (igrzyska.mnozniki_warunkowe(self._ostatni_rezim)
+                        if igrzyska is not None else {})
             all_keys = set(wagi_mwu) | set(wagi_igr)
             combined = {k: wagi_mwu.get(k, 1.0) * wagi_igr.get(k, 1.0)
                         for k in all_keys}

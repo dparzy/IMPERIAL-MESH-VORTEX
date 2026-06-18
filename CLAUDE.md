@@ -130,6 +130,7 @@ Checklist Prawa XIX (sprawdzaj na początku sesji):
 - [ ] **Warstwa 3 (MANIFEST):** KLUCZ w tabeli = n.KLUCZ w kodzie — żadnych aliasów, żadnych starych nazw
 - [ ] **Warstwa 3 (README):** liczba neuronów, testy, prawa = liczby z kodu (policzone, nie z pamięci)
 - [ ] **Warstwa 13 (ruff):** linter czysty — zero bugów/martwego kodu (F811 duplikaty, F821 undefined, F841/F401 martwe). Audyt uruchamia ruff automatycznie.
+- [ ] **Warstwa 14 (wszystkie docs):** MAPA_KLUCZY.md zawiera KAŻDY klucz z kodu (dodajesz neuron → dopisujesz mapę). Audyt skanuje wszystkie pliki .md.
 - [ ] **Testy granic:** każdy neuron/moduł z PROGAMI ma testy wartości granicznych (0/None/±/dokładnie-próg) — patrz Reguła Test-Granic niżej
 - [ ] **Data "Stan na:"** w MANIFEST i README = data bieżącego commitu
 
@@ -202,8 +203,15 @@ python tests/run_tests.py          # musi: X/X zielone
 python narzedzia/audyt_spojnosci.py # musi: exit 0 (pełna harmonia — w tym Warstwa 13 ruff)
 ```
 Audyt zawiera teraz **Warstwę 13 (ruff)** — linter łapie bugi/martwy kod (duplikaty
-klas, niezdefiniowane nazwy, martwe zmienne). Jeśli którakolwiek czerwona → NIE
-commitujesz, naprawiasz, dopiero potem commit+push.
+klas, niezdefiniowane nazwy, martwe zmienne) — oraz **Warstwę 14 (wszystkie dokumenty)**
+— skanuje KAŻDY plik .md i egzekwuje, że MAPA_KLUCZY zawiera wszystkie klucze z kodu.
+Jeśli którakolwiek czerwona → NIE commitujesz, naprawiasz, dopiero potem commit+push.
+
+**🔍 ROZKAZ STAŁY (Cezar, 2026-06-18): AUDYT ZAWSZE SPRAWDZA WSZYSTKIE PLIKI, DOKUMENTY I KOD.**
+Audyt nie ogranicza się do README/MANIFEST/INDEKS — obejmuje CAŁĄ dokumentację (54 pliki .md)
+i żywy kod. Datowane snapshoty (LOG_ZMIAN, AUDYT_*_<data>, ROADMAP vX, RESEARCH/ANALIZA/MANUAL
+z „Stan na/Data", WIZJONER) są POMIJANE świadomie — to prawda ich czasu (Prawo I: nie
+falsyfikujemy historii). Żywe dokumenty (źródła prawdy + MAPA_KLUCZY) MUSZĄ zgadzać się z kodem.
 
 **Przed każdym PUSH — adversarial samo-recenzja (ROZKAZ STAŁY, 2026-06-09):**
 Uruchom `/code-review` na diffie (skill harnessa) — wrogi przegląd logiki/granic,

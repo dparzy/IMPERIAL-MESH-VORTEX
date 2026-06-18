@@ -6,7 +6,7 @@ Uruchamiany automatycznie przez hooki Claude Code (SessionStart + Stop) oraz rę
     python narzedzia/audyt_spojnosci.py            # raport + exit code
     python narzedzia/audyt_spojnosci.py --cichy     # tylko gdy są błędy
 
-Sprawdza 13 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
+Sprawdza 14 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 1  — żywy rój:        liczby, kategorie, elity, klucze
   Warstwa 2  — infrastruktura:  WAGI_REZIMU vs KAT w kodzie
   Warstwa 3  — dokumentacja:    MANIFEST klucze vs kod, liczby README/MANIFEST/CLAUDE
@@ -20,6 +20,7 @@ Sprawdza 13 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 11 — biblioteki/:     moduły w imperium/biblioteki/ wymienione w INDEKS_IMPERIUM
   Warstwa 12 — żywotność głosu: każdy aktywny neuron głosuje (≠martwy) w ≥1 scenariuszu (Prawo XV)
   Warstwa 13 — ruff (linter):   bugi i martwy kod (F811 duplikaty, F821 undefined, F841/F401 martwe)
+  Warstwa 14 — wszystkie docs:  MAPA_KLUCZY zawiera każdy klucz z kodu (skan wszystkich .md)
 
 Exit code:
   0 = pełna spójność (Imperium gotowe)
@@ -396,6 +397,55 @@ def audyt() -> tuple:
     w13_bledy, w13_info = _warstwa_13_ruff()
     bledy += w13_bledy
     info += w13_info
+
+    # ── WARSTWA 14: WSZYSTKIE DOKUMENTY — MAPA_KLUCZY ↔ kod + sieroty ──────────
+    w14_bledy, w14_info = _warstwa_14_wszystkie_dokumenty(neurony)
+    bledy += w14_bledy
+    info += w14_info
+
+    return bledy, info
+
+
+def _warstwa_14_wszystkie_dokumenty(neurony):
+    """
+    W14 — audyt CAŁEJ dokumentacji (rozkaz Cezara 2026-06-18: „audyt ZAWSZE
+    sprawdza wszystkie pliki, dokumenty i kod").
+
+    Deterministyczne sprawdzenie (bez fałszywych alarmów): MAPA_KLUCZY.md musi
+    zawierać KAŻDY klucz z żywego kodu — żywy rejestr „klucz↔kod" jest jedynym
+    miejscem, gdzie kompletność da się egzekwować bez szumu. Sieroty (klucz w docu
+    bez kodu) NIE są błędem: dokumenty legalnie cytują klucze KATALOGOWE/planowane
+    (MANIFEST „DO WDROŻENIA", MAPA_KLUCZY kolumna „W katalogu").
+
+    Datowane snapshoty (LOG_ZMIAN, AUDYT_*_<data>, ROADMAP vX, RESEARCH/ANALIZA/MANUAL
+    z „Stan na/Data") są POMIJANE świadomie — to prawda ich czasu (Prawo I: nie
+    falsyfikujemy historii). Raportuje też ile plików .md istnieje (transparentność).
+    """
+    bledy, info = [], []
+    klucze_kodu = {n.KLUCZ for n in neurony}
+
+    # ── MAPA_KLUCZY kompletność: każdy klucz kodu MUSI być w mapie ──
+    if _istnieje("docs/MAPA_KLUCZY.md"):
+        txt = _czytaj("docs/MAPA_KLUCZY.md")
+        w_mapie = set(re.findall(r"\*\*([A-Z][\w-]+)\*\*", txt)) | \
+            set(re.findall(r"\|\s*([A-Z]{1,6}-[\w]+)\s*\|", txt))
+        w_mapie = {k for k in w_mapie if re.match(r"^[A-Z]+-", k)}
+        brak = sorted(klucze_kodu - w_mapie)
+        if brak:
+            bledy.append(f"[W14] MAPA_KLUCZY brak kluczy z kodu (dopisz mapę): {brak}")
+        else:
+            info.append(f"MAPA_KLUCZY (W14): wszystkie {len(klucze_kodu)} kluczy kodu pokryte ✅")
+    else:
+        bledy.append("[W14] Brak docs/MAPA_KLUCZY.md — żywy rejestr klucz↔kod zniknął")
+
+    # ── Transparentność: ile plików .md istnieje (poza archiwum) ──
+    md_files = []
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        if any(seg in dirpath for seg in ("/.git", "/archiwum", "/.pytest_cache", "/__pycache__")):
+            continue
+        md_files += [f for f in filenames if f.endswith(".md")]
+    info.append(f"Dokumenty (W14): przeskanowano {len(md_files)} plików .md "
+                f"(datowane snapshoty pominięte świadomie — Prawo I)")
 
     return bledy, info
 

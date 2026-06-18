@@ -153,3 +153,26 @@ def test_audyt_w12_wykrywa_martwy_glos():
     finally:
         a.NEURONY_ZALEZNE_OD_ADAPTEROW.clear()
         a.NEURONY_ZALEZNE_OD_ADAPTEROW.update(orig)
+
+
+def test_audyt_w14_mapa_kluczy_kompletna():
+    """W14 (rozkaz Cezara): MAPA_KLUCZY zawiera wszystkie klucze z żywego kodu."""
+    import narzedzia.audyt_spojnosci as a
+    from imperium.legiony.rejestr import wszystkie_neurony
+    bledy, info = a._warstwa_14_wszystkie_dokumenty(wszystkie_neurony())
+    w14 = [b for b in bledy if "W14" in b]
+    assert not w14, f"W14 wykrył dryf dokumentacji: {w14}"
+    assert any("kluczy kodu pokryte" in i for i in info)
+    assert any("plików .md" in i for i in info)
+
+
+def test_audyt_w14_wykrywa_brakujacy_klucz():
+    """W14 negatywny: neuron, którego klucza nie ma w MAPA_KLUCZY → błąd blokujący."""
+    import narzedzia.audyt_spojnosci as a
+
+    class _FakeNeuron:
+        KLUCZ = "ZZZ-99"  # klucz nieistniejący w MAPA_KLUCZY
+
+    bledy, _ = a._warstwa_14_wszystkie_dokumenty([_FakeNeuron()])
+    assert any("W14" in b and "ZZZ-99" in b for b in bledy), \
+        "W14 nie wykrył braku klucza w MAPA_KLUCZY"

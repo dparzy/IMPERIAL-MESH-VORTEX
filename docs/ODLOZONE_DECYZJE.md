@@ -34,7 +34,7 @@
 - **CP-01 CUSUM change-point** → `python narzedzia/ab_w336_changepoint.py`
 - Kod ma fallback (abstynują bez danych), więc bezpieczne; werdykt „pomaga?" po A/B.
 - META-01 (VI/informacja wzajemna) to narzędzie diagnostyczne — uruchom na zebranych
-  sygnałach paper-tradingu, by znaleźć ukrytą redundancję w roju 74 neuronów.
+  sygnałach paper-tradingu, by znaleźć ukrytą redundancję w roju 76 neuronów.
 
 ---
 

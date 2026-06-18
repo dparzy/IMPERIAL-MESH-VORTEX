@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-16 · **Testy:** patrz `python tests/run_tests.py` · **Faza:** PętlaLive + Synapsy Reżimowe + PamięćRefleksyjna + Radar + Paper Trading Etap II + Filtr Asymetrii (W-314) + pomiar 1h vs 4h (W-321) + 5 nowych neuronów scalp/swing/invest (W-322: Delta Divergence, Anchored VWAP, Volume Profile/VPOC, Amihud Illiquidity, Pi Cycle Top).
+> **Stan na:** 2026-06-18 · **Testy:** patrz `python tests/run_tests.py` · **Faza:** PętlaLive + Synapsy Reżimowe + PamięćRefleksyjna + Radar + Paper Trading Etap II + Filtr Asymetrii (W-314) + RealOrderRouter/dry-run (W-331/332) + sync pozycji (W-333) + progi adaptacyjne (W-334) + meta-warstwy B: Neutralizacja + Meta-labeling (W-337) + detektory reżimu: CUSUM/BOCPD/FracDiff (W-336/338/339) + vol-gate Jump Model opt-in (W-340).
 
 ---
 
@@ -37,7 +37,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Monte Carlo / Optymalizator / Pamięć Refleksyjna / Drift Adapter** | W-293/294/295/296 — antyoverfitting + samouczenie Brain |
 | **Testy** | `python tests/run_tests.py` → **1038/1038** ✅ |
 
-**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 74) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
+**Katalog projektowy** (`docs/KATALOG_NEURONOW.md`) opisuje **299 neuronów** docelowo — to mapa drogowa, nie kod. Różnica (299 − 76) = backlog do zbudowania (partiami, z pomiarem dekorelacji).
 
 ---
 

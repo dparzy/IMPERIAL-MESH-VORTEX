@@ -180,6 +180,34 @@ def test_prawo_xx_status_elitarny():
     assert raport["lacznie_elite"] > 0
 
 
+def test_prawo_xxii_mechanizm_pokrycie():
+    """Prawo XXII: każdy aktywny neuron ma jawnie zmapowany MECHANIZM (nie domyślny)."""
+    from imperium.legiony.rejestr import wszystkie_neurony, MECHANIZMY
+
+    DOZWOLONE = {"trend", "mean_rev", "breakout", "event",
+                 "regime", "stat_arb", "risk_filter", "vol_signal"}
+    for n in wszystkie_neurony():
+        assert n.KLUCZ in MECHANIZMY, f"Neuron {n.KLUCZ} bez mapy MECHANIZM (Prawo XXII)"
+        assert n.MECHANIZM in DOZWOLONE, f"{n.KLUCZ}: nieznany MECHANIZM '{n.MECHANIZM}'"
+        assert n.MECHANIZM == MECHANIZMY[n.KLUCZ], \
+            f"{n.KLUCZ}: MECHANIZM instancji != mapa rejestru"
+
+
+def test_prawo_xxii_raport_mechanizmow():
+    """Prawo XXII: raport dekorelacji grupuje po (KATEGORIA, MECHANIZM)."""
+    from imperium.legiony.rejestr import raport_mechanizmow
+
+    r = raport_mechanizmow()
+    assert "rozklad_mechanizmow" in r
+    assert "skupiska_redundancji" in r
+    assert r["liczba_mechanizmow"] >= 6, "Powinno być min 6 różnych mechanizmów"
+    # Skupiska muszą mieć ≥2 neurony (po to są — kandydaci do pomiaru korelacji)
+    for klucz, neurony in r["skupiska_redundancji"].items():
+        assert len(neurony) >= 2, f"Skupisko {klucz} ma <2 neuronów — błąd logiki"
+    # Suma rozkładu = liczba aktywnych neuronów
+    assert sum(r["rozklad_mechanizmow"].values()) == r["neuronow_aktywnych"]
+
+
 # ── KLASYFIKATOR REŻIMU ──────────────────────────────────────────────────────
 
 def test_klasyfikator_rezim_trend_strong():

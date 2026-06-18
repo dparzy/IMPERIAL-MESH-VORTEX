@@ -7,6 +7,9 @@ przyznaje Złoty Hełm. Spec: docs/IGRZYSKA_IMPERIUM.md.
 
 Zasada: neuron oceniany za WKŁAD w trafność — czy jego kierunek zgadzał
 się z kierunkiem, który okazał się zyskowny.
+
+Prawo XXIII — Niezawodność Warunkowa: trafność mierzona osobno per-reżim.
+„Martwy w trendzie, król w range" to wiedza do optymalizacji wag, nie wada.
 """
 
 import logging
@@ -44,6 +47,25 @@ def okresl_range(wynik: float) -> tuple:
 # ─── Statystyka pojedynczego neuronu ──────────────────────────────────────────
 
 @dataclass
+class _RezimStats:
+    """Trafność neuronu w jednym reżimie rynkowym (Prawo XXIII)."""
+    tp: int = 0
+    total: int = 0
+
+    def zarejestruj(self, trafny: bool) -> None:
+        self.total += 1
+        if trafny:
+            self.tp += 1
+
+    @property
+    def accuracy(self) -> float:
+        return self.tp / self.total if self.total > 0 else 0.0
+
+    def jako_dict(self) -> dict:
+        return {"tp": self.tp, "total": self.total, "accuracy": round(self.accuracy, 3)}
+
+
+@dataclass
 class StatystykaNeuronu:
     klucz: str
     # Macierz trafności względem kierunku zyskownego
@@ -61,10 +83,18 @@ class StatystykaNeuronu:
     contribution_sum: float = 0.0
     timeliness_sum: float = 0.0
     contribution_n: int = 0
+    # Prawo XXIII — niezawodność warunkowa per-reżim
+    stats_per_rezim: Dict[str, "_RezimStats"] = field(default_factory=dict)
+
+    def _rezim_stat(self, rezim: str) -> "_RezimStats":
+        if rezim not in self.stats_per_rezim:
+            self.stats_per_rezim[rezim] = _RezimStats()
+        return self.stats_per_rezim[rezim]
 
     def zarejestruj(self, kierunek: str, zyskowny_kierunek: str,
                     contribution: Optional[float] = None,
-                    timeliness: Optional[float] = None):
+                    timeliness: Optional[float] = None,
+                    rezim: Optional[str] = None):
         """Jeden sygnał neuronu + faktyczny zyskowny kierunek trade'u."""
         self.sygnaly += 1
 
@@ -94,6 +124,10 @@ class StatystykaNeuronu:
             self.contribution_n += 1
         if timeliness is not None:
             self.timeliness_sum += timeliness
+
+        # Prawo XXIII — tracking per-reżim
+        if rezim:
+            self._rezim_stat(rezim).zarejestruj(trafny)
 
     # ── Metryki ──
 
@@ -179,9 +213,10 @@ class Igrzyska:
     def zarejestruj_wynik(self, klucz: str, kierunek: str,
                           zyskowny_kierunek: str,
                           contribution: Optional[float] = None,
-                          timeliness: Optional[float] = None):
+                          timeliness: Optional[float] = None,
+                          rezim: Optional[str] = None):
         self._stat(klucz).zarejestruj(kierunek, zyskowny_kierunek,
-                                       contribution, timeliness)
+                                       contribution, timeliness, rezim=rezim)
         for obs in self.obserwatorzy:
             try:
                 obs.zarejestruj_wynik(klucz, kierunek, zyskowny_kierunek,
@@ -218,9 +253,11 @@ class Igrzyska:
                     if kier_wejscia not in ("LONG", "SHORT"):
                         continue
                     zyskowny = kier_wejscia if pnl > 0 else _przeciwny(kier_wejscia)
-                    self._przetworz_sygnaly_json(sig, zyskowny)
+                    rezim = getattr(sig, "rezim", None) or getattr(tc, "rezim", None)
+                    self._przetworz_sygnaly_json(sig, zyskowny, rezim=rezim)
 
-    def _przetworz_sygnaly_json(self, sig, zyskowny_kierunek: str):
+    def _przetworz_sygnaly_json(self, sig, zyskowny_kierunek: str,
+                                rezim: Optional[str] = None):
         raw = getattr(sig, "sygnaly_json", "")
         if not raw:
             return
@@ -232,7 +269,7 @@ class Igrzyska:
             klucz = s.get("k") or s.get("klucz")
             kier = s.get("d") or s.get("kierunek")
             if klucz and kier in ("LONG", "SHORT"):
-                self.zarejestruj_wynik(klucz, kier, zyskowny_kierunek)
+                self.zarejestruj_wynik(klucz, kier, zyskowny_kierunek, rezim=rezim)
 
     # ── Wyniki ──
 
@@ -248,9 +285,57 @@ class Igrzyska:
                 "accuracy": round(stat.accuracy, 3),
                 "stability": round(stat.stability, 3),
                 "sygnaly": stat.sygnaly,
+                "najlepszy_rezim": self._najlepszy_rezim(stat),
             })
         wyniki.sort(key=lambda x: x["wynik"], reverse=True)
         return wyniki
+
+    def niezawodnosc_per_rezim(self) -> Dict[str, Dict[str, dict]]:
+        """
+        Prawo XXIII — zwraca {klucz_neuronu: {rezim: {tp, total, accuracy}}}.
+        Pozwala Legatusowi wzmacniać neuron gdy aktualny reżim = jego najsilniejszy reżim.
+        """
+        wynik = {}
+        for klucz, stat in self.statystyki.items():
+            if not stat.stats_per_rezim:
+                continue
+            wynik[klucz] = {
+                r: rs.jako_dict()
+                for r, rs in stat.stats_per_rezim.items()
+                if rs.total >= 3  # min próbka by mieć sens
+            }
+        return wynik
+
+    def _najlepszy_rezim(self, stat: StatystykaNeuronu) -> Optional[str]:
+        """Reżim z najwyższą accuracy (min 3 próbki)."""
+        kandydaci = [
+            (r, rs.accuracy)
+            for r, rs in stat.stats_per_rezim.items()
+            if rs.total >= 3
+        ]
+        if not kandydaci:
+            return None
+        return max(kandydaci, key=lambda x: x[1])[0]
+
+    def mnozniki_warunkowe(self, aktualny_rezim: str) -> Dict[str, float]:
+        """
+        Prawo XXIII — mnożniki wag dostosowane do aktualnego reżimu.
+        Neuron z accuracy ≥0.70 w tym reżimie dostaje bonus +20%.
+        Neuron z accuracy <0.40 w tym reżimie dostaje karę −20%.
+        """
+        bazowe = self.nowe_wagi()
+        per_rezim = self.niezawodnosc_per_rezim()
+        wynik = {}
+        for klucz, mnoznik in bazowe.items():
+            rezim_stat = per_rezim.get(klucz, {}).get(aktualny_rezim)
+            if rezim_stat and rezim_stat["total"] >= 3:
+                acc = rezim_stat["accuracy"]
+                if acc >= 0.70:
+                    mnoznik = round(mnoznik * 1.2, 3)
+                elif acc < 0.40:
+                    mnoznik = round(mnoznik * 0.8, 3)
+            wynik[klucz] = mnoznik
+        return wynik
 
     def zloty_helm(self) -> Optional[dict]:
         r = self.ranking()
@@ -280,6 +365,7 @@ class Igrzyska:
         r = self.ranking()
         helm = self.zloty_helm()
         infamia = self.lista_infamii()
+        per_rezim = self.niezawodnosc_per_rezim()
         print("\n╔══════════════════════════════════════════════════════════════╗")
         print("║              🏛️  KAPITOL IMPERIUM — LIDERZY                  ║")
         print("╠══════════════════════════════════════════════════════════════╣")
@@ -288,8 +374,18 @@ class Igrzyska:
                   f"({helm['ranga']})")
         print("║  ── TOP NEURONY ──")
         for i, n in enumerate(r[:top_n], 1):
+            rezim_info = ""
+            if n.get("najlepszy_rezim"):
+                rezim_info = f" 👑{n['najlepszy_rezim']}"
             print(f"║   {i}. {n['klucz']:<10} {n['wynik']:.2f}  {n['ranga']:<12} "
-                  f"×{n['mnoznik']}")
+                  f"×{n['mnoznik']}{rezim_info}")
+            # pokaż rozkład per-reżim dla top-3
+            if i <= 3 and n["klucz"] in per_rezim:
+                for rezim, rs in sorted(per_rezim[n["klucz"]].items(),
+                                        key=lambda x: -x[1]["accuracy"]):
+                    bar = "█" * int(rs["accuracy"] * 10)
+                    print(f"║       {rezim:<18} {bar:<10} {rs['accuracy']:.0%} "
+                          f"({rs['tp']}/{rs['total']})")
         if infamia:
             print("║  ── ⚫ LISTA INFAMII ──")
             for w in infamia:

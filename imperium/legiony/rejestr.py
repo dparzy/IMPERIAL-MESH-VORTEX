@@ -88,9 +88,130 @@ from imperium.legiony.zwiadowcy import (
 logger = logging.getLogger("Rejestr")
 
 
+# ── MECHANIZM przewagi (Prawo XXII — prawdziwa dekorelacja sygnałów) ────────────
+# Jedno źródło prawdy: każdy KLUCZ → typ przewagi (nie dane wejściowe).
+# Wartości: trend / mean_rev / breakout / event / regime / stat_arb / risk_filter / vol_signal
+# Dwa neurony o tym samym MECHANIZM w tej samej KATEGORIA = kandydat do scalenia (Prawo XVI+XXII).
+MECHANIZMY: dict = {
+    # Momentum (M/T) — oscylatory vs podążanie
+    "X-01": "mean_rev",   # RSI oversold/overbought
+    "X-02": "mean_rev",   # StochRSI
+    "X-03": "trend",      # MACD
+    "X-04": "mean_rev",   # Bollinger Bands (powrót do środka)
+    "X-05": "trend",      # EMA cross
+    "X-06": "trend",      # Williams %R momentum
+    "X-08": "trend",      # TRIX
+    "X-09": "trend",      # Awesome Oscillator
+    "X-10": "trend",      # (T)
+    "X-11": "trend",      # (F-momentum wolumenowe)
+    "X-12": "breakout",   # BB Squeeze (ekspansja zmienności)
+    "X-17": "trend",      # Accelerator
+    "X-18": "trend",      # (T)
+    "X-25": "vol_signal", # ATR-Deviation
+    "X-26": "trend",      # HA-Scalper
+    "X-27": "mean_rev",   # Value Convergence
+    "X-28": "trend",      # MTF Confluence
+    # Trend (XII)
+    "XII-01": "regime",   # ADX (siła trendu = meta)
+    "XII-02": "trend",    # Ichimoku
+    "XII-03": "trend",    # EMA50/200 (golden/death cross)
+    "XII-04": "trend",    # Supertrend
+    "XII-05": "mean_rev", # Fibonacci retracement
+    "XII-06": "trend",    # Donchian/HMA trend
+    "XII-07": "mean_rev", # RSI Divergence
+    # Wolumen/Flow (F/V)
+    "V-01": "trend",      # OBV
+    "V-02": "mean_rev",   # VWAP (powrót do VWAP)
+    "V-03": "trend",      # CVD
+    "V-04": "breakout",   # Volume Anomaly
+    "V-05": "trend",      # Force Index
+    "V-06": "mean_rev",   # Delta Divergence
+    "V-07": "mean_rev",   # Anchored VWAP
+    "VP-01": "mean_rev",  # Volume Profile/VPOC (S/R magnet)
+    "VSA-01": "event",    # Volume Spread Analysis
+    "V-13": "vol_signal", # Realized Vol
+    "V-14": "regime",     # Choppiness Index
+    # Struktura / Sesje (S)
+    "SES-01": "event",    # Zegar Sesji
+    "SES-02": "breakout", # Azja Range breakout
+    "SMC-01": "mean_rev", # Order Block
+    "SMC-02": "mean_rev", # Fair Value Gap
+    "SMC-03": "breakout", # Break of Structure
+    # Radar / Augur (R/Z) — meta-kontekst
+    "AUG-01": "event",    # Augur (zdarzenia fundamentalne)
+    "RADAR-01": "regime", # BTC Trend
+    "RADAR-02": "regime", # BTC Dominacja
+    "RADAR-03": "regime", # Przepływ kapitału
+    "RADAR-04": "risk_filter",  # Stres korelacji (kaskada)
+    "RADAR-05": "regime", # Lead-lag BTC→alty
+    # Psychologia (R)
+    "PSY-01": "mean_rev", # Funding extreme (contrarian)
+    "PSY-02": "mean_rev", # Long/Short ratio
+    "PSY-03": "mean_rev", # Fear & Greed
+    "PSY-04": "mean_rev", # OI Divergence
+    # Sentyment (R)
+    "NEWS-01": "event",   # News sentyment
+    # On-chain (O)
+    "OC-01": "mean_rev",  # MVRV
+    "OC-02": "mean_rev",  # SOPR
+    "OC-03": "mean_rev",  # Puell Multiple
+    "OC-04": "event",     # Exchange Netflow
+    "OC-05": "risk_filter",  # Wash Trading
+    # Anty-manipulacja (A)
+    "A-01": "risk_filter",  # Stop Hunt
+    "A-02": "risk_filter",  # Wick Rejection
+    "A-03": "risk_filter",  # Wash Volume
+    "A-05": "risk_filter",  # Bart Pattern
+    # Dźwignia/Zmienność (L/V)
+    "VI-13": "risk_filter", # ATR Leverage
+    "L-14": "risk_filter",  # Ulcer Index
+    # Meta-bramy badawcze (H/N/Z/D/C)
+    "H-01": "regime",     # Hurst-DFA
+    "N-01": "regime",     # Permutation Entropy
+    "N-02": "regime",     # FracDiff
+    "Z-01": "risk_filter", # ToxicFlow VPIN
+    "Z-02": "risk_filter", # Pump Detect
+    "Z-03": "risk_filter", # Bubble/Crash
+    "Z-04": "risk_filter", # Cascade
+    "Z-05": "risk_filter", # Detektor Klimaksu
+    "Z-06": "risk_filter", # Amihud Illiquidity
+    "Z-07": "mean_rev",   # Pi Cycle Top
+    "D-01": "regime",     # Path Signature (Lévy Area)
+    "C-01": "stat_arb",   # Cross-sectional Relative Strength
+    # Zmiana reżimu (R)
+    "CP-01": "regime",    # CUSUM change-point
+    "BOCPD-01": "regime", # Bayesian change-point
+}
+
+# Mechanizmy zwiadowców Exploratores (EXP) — wszyscy meta/struktura
+MECHANIZMY_ZWIADOWCY: dict = {
+    "EXP-01": "regime",     # Higuchi FD
+    "EXP-02": "trend",      # HA Scalper
+    "EXP-03": "regime",     # Hurst
+    "EXP-04": "vol_signal", # Kalman ATR
+    "EXP-05": "mean_rev",   # SMC
+    "EXP-06": "breakout",   # Katana
+    "EXP-07": "trend",      # TLP
+    "EXP-08": "event",      # Night Turbo
+    "EXP-09": "breakout",   # Liquidity Sweep
+    "EXP-10": "breakout",   # Displacement
+    "EXP-11": "regime",     # Dynamic
+    "EXP-12": "event",      # Atmabhan (L2)
+}
+
+
+def _wstrzyknij_mechanizm(neurony: list) -> list:
+    """Prawo XXII — nadaje każdemu neuronowi jego MECHANIZM z mapy (jedno źródło prawdy)."""
+    for n in neurony:
+        mech = MECHANIZMY.get(n.KLUCZ)
+        if mech:
+            n.MECHANIZM = mech
+    return neurony
+
+
 def wszystkie_neurony() -> List[MikroNeuron]:
     """Tworzy instancje wszystkich zaimplementowanych neuronów."""
-    return [
+    return _wstrzyknij_mechanizm([
         # Momentum (X)
         NeuronRSI(), NeuronMACD(), NeuronBBands(), NeuronEMACross(),
         NeuronWilliamsR(), NeuronATRDeviation(), NeuronHAScalper(), NeuronStochRSI(),
@@ -142,7 +263,7 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronRelativeStrength(),
         # Zmiana reżimu (R) — CUSUM change-point (CP-01, W-336) + BOCPD Bayesowski (BOCPD-01, W-338)
         NeuronChangePoint(), NeuronBOCPD(),
-    ]
+    ])
 
 
 def wszyscy_zwiadowcy() -> list:
@@ -227,6 +348,35 @@ def raport_potencjalu() -> dict:
         "zwiadowcy_wyciszeni": len(zw_wyciszeni),
         "wykorzystanie_pct": round(len(aktywne) / len(neurony) * 100, 1),
         "wyciszone_powody": powody,
+    }
+
+
+def raport_mechanizmow() -> dict:
+    """
+    Prawo XXII — diagnostyka dekorelacji wg MECHANIZMU przewagi.
+    Grupuje neurony po (KATEGORIA, MECHANIZM) i wskazuje skupiska redundancji.
+    Dwa+ aktywne neurony o tym samym (KATEGORIA, MECHANIZM) = kandydaci do pomiaru
+    korelacji (Prawo XVI) i ewentualnego scalenia.
+    """
+    neurony = [n for n in wszystkie_neurony() if n.DOSTEPNY]
+    rozklad: dict = {}
+    pary: dict = {}
+    for n in neurony:
+        mech = getattr(n, "MECHANIZM", "trend")
+        rozklad[mech] = rozklad.get(mech, 0) + 1
+        klucz = (n.KATEGORIA, mech)
+        pary.setdefault(klucz, []).append(n.KLUCZ)
+
+    skupiska = {
+        f"{kat}/{mech}": klucze
+        for (kat, mech), klucze in pary.items()
+        if len(klucze) >= 2
+    }
+    return {
+        "rozklad_mechanizmow": dict(sorted(rozklad.items(), key=lambda x: -x[1])),
+        "liczba_mechanizmow": len(rozklad),
+        "skupiska_redundancji": skupiska,   # (KATEGORIA/MECHANIZM) → [klucze] gdy ≥2
+        "neuronow_aktywnych": len(neurony),
     }
 
 

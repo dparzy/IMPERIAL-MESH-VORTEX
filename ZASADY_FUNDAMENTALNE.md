@@ -512,8 +512,102 @@ Złamanie Prawa XXI = jakakolwiek z poniższych sytuacji:
 
 ---
 
+## ⚖️ PRAWO XXII — DEKORELACJA PRZEWAGI, NIE DANYCH 🧬
+
+> **"Dwa neurony patrzące na tę samą cenę nie są bliźniakami. Dwa neurony z tą samą PRZEWAGĄ — są."**
+
+Prawo XVI mierzy redundancję sygnału. Prawo XXII dodaje **drugi, jawny wymiar
+klasyfikacji**: każdy neuron deklaruje swój **MECHANIZM przewagi** — TYP edge'a,
+nie źródło danych. To rozróżnienie chroni przed fałszywą dekorelacją: dwa neurony
+kategorii M (Momentum) mogą być przeciwstawne (jeden `mean_rev`, drugi `trend`),
+a dwa z różnych kategorii mogą nieść tę samą przewagę.
+
+### Osiem mechanizmów (jedno źródło prawdy: `rejestr.MECHANIZMY`)
+
+| MECHANIZM | Przewaga | Przykłady |
+|-----------|----------|-----------|
+| `trend` | podążanie za kierunkiem | X-03 MACD, XII-03 EMA50/200, V-01 OBV |
+| `mean_rev` | powrót do średniej | X-01 RSI, X-04 BBands, V-02 VWAP, PSY-01 |
+| `breakout` | wybicia z zakresu | X-12 BB Squeeze, V-04 Vol Anomaly, SMC-03 BOS |
+| `event` | zdarzenia zewnętrzne | NEWS-01, AUG-01, VSA-01, OC-04 |
+| `regime` | klasyfikacja/zmiana stanu | XII-01 ADX, H-01 Hurst, CP-01, BOCPD-01 |
+| `stat_arb` | arbitraż przekrojowy | C-01 Cross-sectional RS |
+| `risk_filter` | detekcja zagrożeń (nie kierunek) | Z-01..06, A-01..05, RADAR-04 |
+| `vol_signal` | sygnał czystej zmienności | X-25 ATR-Dev, V-13 Realized Vol |
+
+### Obowiązek Prawa XXII
+
+- [ ] Każdy aktywny neuron ma wpis w `MECHANIZMY` (test `test_prawo_xxii_mechanizm_pokrycie`)
+- [ ] `raport_mechanizmow()` wykrywa **skupiska redundancji** (KATEGORIA, MECHANIZM) ≥2
+- [ ] Skupisko ≥2 → kandydat do pomiaru korelacji (Prawo XVI) i ewentualnego scalenia
+- [ ] Dodajesz neuron → dopisujesz jego MECHANIZM w tym samym commicie
+
+**Złamanie Prawa XXII:** aktywny neuron bez zmapowanego MECHANIZMU, lub deklaracja
+dekorelacji bez uwzględnienia mechanizmu przewagi.
+
+---
+
+## ⚖️ PRAWO XXIII — NIEZAWODNOŚĆ WARUNKOWA 🎯
+
+> **"Martwy w trendzie, król w range. To nie wada — to wiedza, której wróg nie ma."**
+
+Ufność neuronu jest mierzona **per-reżim**, nie globalnie. Neuron mean-reversion
+przegrywa w silnym trendzie i wygrywa w konsolidacji — uśrednianie tych dwóch
+światów do jednej liczby NISZCZY informację. Igrzyska (W-002) trackują trafność
+osobno w każdym reżimie i podbijają/tłumią wagę neuronu zależnie od tego, czy
+**aktualny reżim = jego najsilniejszy reżim**.
+
+### Mechanizm (kod: `igrzyska.py`)
+
+- `StatystykaNeuronu.stats_per_rezim` — trafność TP/total w każdym reżimie osobno
+- `niezawodnosc_per_rezim()` — raport {klucz: {reżim: accuracy}} (min 3 próbki)
+- `mnozniki_warunkowe(rezim)` — accuracy ≥70% w reżimie → ×1.2; <40% → ×0.8
+- `_najlepszy_rezim(stat)` — reżim z najwyższą trafnością (👑 w Kapitolu)
+
+### Obowiązek Prawa XXIII
+
+- [ ] Trafność trackowana per-reżim (nie tylko globalnie)
+- [ ] Min próbka 3 zanim reżim wpływa na wagę (ochrona przed szumem)
+- [ ] Mnożnik warunkowy stosowany dopiero przy istotnej próbce
+
+**Złamanie Prawa XXIII:** ocena neuronu jedną globalną liczbą, gdy dane per-reżim
+są dostępne; karanie neuronu za słabość w reżimie, w którym i tak nie powinien grać.
+
+---
+
+## ⚖️ PRAWO XXIV — WIDOCZNOŚĆ OPERACYJNA 👁️
+
+> **"Niewidoczny system to ślepy dowódca. Żaden trade na żywo bez kanału obserwacji."**
+
+Imperium handlujące realnym kapitałem MUSI być obserwowalne w czasie rzeczywistym.
+Wykres PNG po fakcie to za mało — operator musi widzieć reżim, pozycje, głosy
+neuronów i postawę Gubernatora **w trakcie**, oraz dostawać alert przy wejściu,
+wyjściu i wecie.
+
+### Mechanizm (kod: `swiatynie/live_monitor.py`)
+
+- `LiveMonitor` — TUI dashboard (czyste ANSI, zero zależności): reżim, P&L,
+  pozycje, top-neurony, meta-bet (B-01), Gubernator, vol-gate
+- `TelegramAlert` — powiadomienia przez Bot API; klucze WYŁĄCZNIE z env
+  (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`); brak kluczy = ciche wyłączenie
+- Alerty: sygnał wejścia, zamknięcie z P&L, weto/panika, błąd krytyczny
+
+### Obowiązek Prawa XXIV
+
+- [ ] Stan tradingu obserwowalny na żywo (dashboard lub alert)
+- [ ] Klucze powiadomień tylko przez zmienne środowiskowe (Prawo bezpieczeństwa)
+- [ ] Brak kanału → ostrzeżenie, nie crash (degradacja łagodna)
+
+**Złamanie Prawa XXIV:** uruchomienie handlu na żywo bez żadnego kanału obserwacji;
+klucz powiadomień w kodzie zamiast w env.
+
+---
+
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*
 > 🚨 *"Niewykorzystana siła to siła oddana wrogowi. Imperium nie marnuje niczego."*
 > 🗺️ *"Wódz, który nie zna własnego obozu, przegrywa bitwę przed jej początkiem."*
 > ⚙️ *"Architekt, który o każdą cegłę pyta Cezara, nie jest architektem."*
 > 🔱 *"Katalog mówi: chcemy. Kod mówi: mamy. Nie mylimy tych dwóch słów nigdy."*
+> 🧬 *"Dwa miecze tej samej stali to jeden miecz. Mierzymy przewagę, nie kształt."*
+> 🎯 *"Każdy legion ma swoje pole bitwy. Mądry wódz wie, gdzie kogo posłać."*
+> 👁️ *"Wódz, który nie widzi pola walki, już przegrał — choć jeszcze o tym nie wie."*

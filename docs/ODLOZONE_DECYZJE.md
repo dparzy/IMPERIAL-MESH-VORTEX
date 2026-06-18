@@ -46,7 +46,11 @@ meta B → L2. **Zrobione:** META-01 (VI), C-01 (kat. C), CP-01 (CUSUM, kat. R),
 **Następne (każde: kod+test+A/B, Prawo I/XIX/XXI):**
 1. ✅ **B-02 Neutralization** + **B-01 Meta-labeling** — WDROŻONE W-337 (2026-06-18).
    Pliki: `neutralizacja.py`, `meta_labeling.py`. A/B: `narzedzia/ab_w337_meta.py` (do zbudowania).
-2. **Jump Model / BOCPD** — dodatkowe detektory reżimu (OHLCV, w stylu CP-01).
+2. ✅/⏳ **Jump Model / BOCPD** — BOCPD wdrożony (W-338). JumpModel: kierunkowy ZMIERZONY
+   jako niespójny (BTC+/ETH−, Prawo I → NIE wpinamy kierunku). Vol-reżim WDROŻONY jako
+   brama opt-in (W-340): turbo→VOLATILE, zmierzone 1.22–1.56× |zwrot| t+1 na 4 aktywach.
+   **A/B PENDING:** `Legatus.uzyj_vol_regime=True` vs OFF na pełnym P&L (domyślnie OFF).
+   Gdy A/B delta>0 → flip domyślnej na ON + test + LOG_ZMIAN.
 3. **U (mikrostruktura L2)** + **P (Hawkes)** — wymaga wpięcia feedu order-book depth
    z MEXC (nowy pipeline danych — decyzja o koszcie/feedzie przed startem).
 4. **IV (options DVOL z Deribit)** — darmowy feed, forecast realized vol (nie kierunek).

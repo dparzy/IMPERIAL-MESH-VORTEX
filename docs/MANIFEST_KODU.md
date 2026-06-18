@@ -6,10 +6,10 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-18 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 74 neuronów (zarejestrowane w roju) + 12 zwiadowców = **86 modułów w kodzie**
+**Zaimplementowane:** 76 neuronów (zarejestrowane w roju) + 12 zwiadowców = **88 modułów w kodzie**
 **Meta-warstwy (B):** 2 moduły (`neutralizacja.py` B-02, `meta_labeling.py` B-01) — warstwa NAD Legatusem, nie neurony
-**Aktywne / wyciszone:** 70 aktywnych + 4 wyciszone, z czego:
-  • **51 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top)
+**Aktywne / wyciszone:** 72 aktywnych + 4 wyciszone, z czego:
+  • **53 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S/C/D/R) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, N-02 FracDiff, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top, CP-01 CUSUM, BOCPD-01 Bayesian change-point, C-01 Cross-sectional RS)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 SMC aktywne** (SMC-01/02/03, `DOSTEPNY=True`) — liczą z barów przez most EXP-05, **bez żadnego API** (abstynują w backteście bez EXP-05)
@@ -56,10 +56,13 @@
 |-------|------|----------|--------|------|
 | B-02 Feature Neutralization | `legiony/neutralizacja.py` | `neutralizuj_sygnaly()` | ✅ W-337 | Residuum sygnałów po odjęciu składowej wspólnej roju (Numerai FNC / López de Prado MLAM Ch2) |
 | B-01 Meta-labeling scorer | `legiony/meta_labeling.py` | `MetaLabelingScorer` | ✅ W-337 | Online logistic scorer bet_size ∈ [0,1] na cechach RaportLegatusa (AFML Ch3) |
+| Vol-gate (Jump Model zmienności) | `legiony/rezim_zmiennosci.py` | `vol_regime_turbo()` | ✅ W-340 (opt-in) | 2-stanowy detektor turbulencji → klasyfikator reżimu (turbo→VOLATILE); zmierzony 1.22–1.56× \|zwrot\| t+1 na BTC/ETH/SOL/DOGE; `Legatus.uzyj_vol_regime` domyślnie OFF (A/B P&L pending) |
 
 > **B-02** realizuje Prawo XVI w runtime: neurony redundantne dostają wagę ≈ 0, unikalne ≈ 1.
 > **B-01** daje odpowiedź na „ile postawić?" (Kelly fraction × pewność meta-modelu).
 > Obie warstwy są **opt-in** — Legatus działa bez nich (passthrough), aktywacja przez wywołanie.
+> **Vol-gate** wpina się w `klasyfikuj_rezim(uzyj_vol_regime=True)`; TF-agnostyczny (1m–1d), czysto-pythonowy.
+> JumpModel KIERUNKOWY (`jump_model.py`, W-281) ZMIERZONY jako niespójny (BTC+/ETH−) → używamy tylko osi zmienności.
 
 ---
 
@@ -191,6 +194,8 @@
 | D-01 | NeuronPathSignature | D | 7 | ✅ aktywny 🎖️ | CLOSE_SERIES_20 | Lévy Area Close×Volume — geometria ścieżki (W-079) |
 | C-01 | NeuronRelativeStrength | C | 6 | ✅ aktywny (pętla portfelowa) | CROSS_RS | Cross-sectional Relative Strength — z-score zwrotu vs koszyk (W-335, nowa kategoria C) |
 | CP-01 | NeuronChangePoint | R | 6 | ✅ aktywny | CLOSE_SERIES_60 | CUSUM change-point — przełom strukturalny reżimu (W-336, Page 1954 / AFML Ch17) |
+| BOCPD-01 | NeuronBOCPD | R | 6 | ✅ aktywny | CLOSE_SERIES_60 | Bayesian Online Change-Point Detection — P(zmiana reżimu) per-bar, ciągłe (W-338, Adams & MacKay 2007) |
+| N-02 | NeuronFracDiff | N | 6 | ✅ aktywny | CLOSE_SERIES_100 | Fractional Differentiation — min. d zachowujące stacjonarność + z-score persystentnej składowej (W-339, AFML Ch5) |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
 > PANIC ×3.0) były pre-zarejestrowane — teraz mają realne neurony. Prawo XV.

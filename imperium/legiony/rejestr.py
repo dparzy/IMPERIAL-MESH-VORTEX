@@ -60,7 +60,7 @@ from imperium.legiony.neurony.fraktal import (
     NeuronHurstDFA,
 )
 from imperium.legiony.neurony.entropia import (
-    NeuronPermutationEntropy,
+    NeuronPermutationEntropy, NeuronFracDiff,
 )
 from imperium.legiony.neurony.zagrozenie import (
     NeuronToxicFlow, NeuronPumpDetect, NeuronBubbleCrash, NeuronCascade,
@@ -73,7 +73,7 @@ from imperium.legiony.neurony.przekroj import (
     NeuronRelativeStrength,
 )
 from imperium.legiony.neurony.rezim_zmiana import (
-    NeuronChangePoint,
+    NeuronChangePoint, NeuronBOCPD,
 )
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
@@ -127,8 +127,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronATRLev(), NeuronRealizedVol(), NeuronChoppiness(), NeuronUlcer(),
         # Fraktal (H) — Hurst-DFA meta-brama reżimu, OHLCV bez API
         NeuronHurstDFA(),
-        # Entropia (N) — Permutation Entropy meta-brama chaosu, OHLCV bez API
-        NeuronPermutationEntropy(),
+        # Entropia/Pamięć (N) — PE meta-brama chaosu (N-01) + FracDiff persystencja (N-02, W-339)
+        NeuronPermutationEntropy(), NeuronFracDiff(),
         # Zagrożenie (Z) — VPIN meta-brama obronna (Z-01) + PumpDetect kierunkowy (Z-02)
         # + Bubble/Crash kill-switch (Z-03, W-278) + Cascade/Dead-Cat (Z-04, W-279), BIB-020 rozdz. 28
         NeuronToxicFlow(), NeuronPumpDetect(), NeuronBubbleCrash(), NeuronCascade(),
@@ -140,8 +140,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronPathSignature(),
         # Przekrój koszyka (C) — Cross-sectional Relative Strength (C-01, W-335)
         NeuronRelativeStrength(),
-        # Zmiana reżimu (R) — CUSUM change-point, przełom strukturalny (CP-01, W-336)
-        NeuronChangePoint(),
+        # Zmiana reżimu (R) — CUSUM change-point (CP-01, W-336) + BOCPD Bayesowski (BOCPD-01, W-338)
+        NeuronChangePoint(), NeuronBOCPD(),
     ]
 
 
@@ -302,15 +302,15 @@ NEURONY_STYLU: dict = {
     "PSY-01": _U, "PSY-02": _U, "PSY-03": _U, "PSY-04": _U,
     "RADAR-01": _U, "RADAR-02": _U, "RADAR-03": _U, "RADAR-04": _U, "RADAR-05": _U, "AUG-01": _U, "NEWS-01": _U,
     # Meta-bramy reżimu/chaosu (H/N/V/D/L) — klasyfikują każdy interwał
-    "H-01": _U, "N-01": _U, "V-13": _U, "V-14": _U, "D-01": _U, "L-14": _U, "VI-13": _U,
+    "H-01": _U, "N-01": _U, "N-02": _U, "V-13": _U, "V-14": _U, "D-01": _U, "L-14": _U, "VI-13": _U,
     # Anty-manipulacja (A) — uniwersalna obrona
     "A-01": _U, "A-02": _U, "A-03": _U, "A-05": _U,
     # Zagrożenie (Z) — bezpieczniki uniwersalne; Pi Cycle (Z-07) to cykl dzienny → tylko INVEST
     "Z-01": _U, "Z-02": _U, "Z-03": _U, "Z-04": _U, "Z-05": _U, "Z-06": _U, "Z-07": _INV,
     # Przekrój koszyka (C) — Cross-sectional RS, uniwersalny (zależy od koszyka, nie TF)
     "C-01": _U,
-    # Zmiana reżimu (R) — CUSUM change-point, uniwersalny na każdym interwale
-    "CP-01": _U,
+    # Zmiana reżimu (R) — CUSUM (CP-01) + BOCPD Bayesowski (BOCPD-01), oba uniwersalne
+    "CP-01": _U, "BOCPD-01": _U,
 }
 
 

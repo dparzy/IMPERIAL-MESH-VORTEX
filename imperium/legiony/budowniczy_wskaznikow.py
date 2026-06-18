@@ -295,8 +295,20 @@ class BudowniczyWskaznikow:
             window = bary[-20:]
             w["CLOSE_SERIES_20"] = [float(b.get("close", 0)) for b in window]
             w["VOLUME_SERIES_20"] = [float(b.get("volume", 0)) for b in window]
-            # CLOSE_SERIES_60 dla CP-01 NeuronChangePoint (CUSUM change-point, W-336)
+            # CLOSE_SERIES_60 dla CP-01/BOCPD-01 (CUSUM/Bayesian change-point, W-336/338)
             w["CLOSE_SERIES_60"] = [float(b.get("close", 0)) for b in bary[-60:]]
+            # CLOSE_SERIES_100 dla N-02 FracDiff (Fractional Differentiation, W-339)
+            seria_100 = [float(b.get("close", 0)) for b in bary[-100:]]
+            w["CLOSE_SERIES_100"] = seria_100
+            # VOL_REGIME_TURBO/SILA dla klasyfikatora reżimu (vol-gate, W-340, opt-in)
+            try:
+                from imperium.legiony.rezim_zmiennosci import vol_regime_turbo
+                turbo, trwalosc, sila = vol_regime_turbo(seria_100)
+                w["VOL_REGIME_TURBO"] = 1.0 if turbo else 0.0
+                w["VOL_REGIME_TRWALOSC"] = float(trwalosc)
+                w["VOL_REGIME_SILA"] = float(sila)
+            except Exception as e:
+                logger.debug(f"[Budowniczy] VOL_REGIME pominięty: {e}")
         except Exception as e:
             logger.debug(f"[Budowniczy] PATH_SERIES pominięty: {e}")
 

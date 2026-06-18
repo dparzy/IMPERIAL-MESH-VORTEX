@@ -1,15 +1,15 @@
 """
-⚔️ IMV-INS | Neurony Entropii — kategoria N (Entropia / Informacja).
+⚔️ IMV-INS | Neurony Entropii/Pamięci — kategoria N (Entropia / Informacja).
 
-Kategoria N to META-BRAMA chaosu: nie kolejny głos kierunkowy, lecz odpowiedź na
-pytanie „czy rynek ma teraz STRUKTURĘ, czy jest czystym chaosem (brak przewagi)?".
-Mierzy złożoność szeregu wzorcami porządkowymi (Permutation Entropy, Bandt & Pompe
-2002) — odrębna OŚ informacji od Trendu (T, siła kierunku), Zmienności (V, magnituda
-wahań) i Momentum (M). Patrzy na STRUKTURĘ porządku, nie na kierunek — w pełni
-ortogonalna do RSI/MACD (Prawo XVI: inna oś informacji, krzyżowe potwierdzenie).
+Kategoria N:
+  N-01 Permutation Entropy — META-BRAMA chaosu: czy rynek ma teraz STRUKTURĘ?
+  N-02 Fractional Differentiation — META-MIERNIK PAMIĘCI: ile historii przeżywa
+       stacjonaryzację? Niskie d → silna pamięć długiego zasięgu (persystencja),
+       normalna wartość z_last mówi o kierunku zdekorelowanej składowej.
 """
 
 from imperium.legiony.mikro_neuron import MikroNeuron, SygnalNeuronu
+from imperium.legiony.frac_diff import frac_diff_signal
 
 
 class NeuronPermutationEntropy(MikroNeuron):
@@ -84,3 +84,62 @@ class NeuronPermutationEntropy(MikroNeuron):
         return self._bazowy_sygnal(pe, "NEUTRAL", 0.20,
             [f"PE={pe:.3f} — szara strefa ({self._PE_STRUKTURA}–{self._PE_CHAOS}), "
              f"struktura niejednoznaczna"])
+
+
+class NeuronFracDiff(MikroNeuron):
+    """
+    N-02 | Fractional Differentiation — persystencja pamięci długiego zasięgu.
+
+    DLA NOWICJUSZA: standardowe zwroty (d=1) niszczą całą pamięć historyczną.
+    Raw log-cena (d=0) jest niestacjonarna. FracDiff (d∈[0.1,1.0]) to kompromis:
+    minimalne d zachowujące stacjonarność + maksymalna pamięć (López de Prado AFML Ch5).
+
+    Czyta CLOSE_SERIES_100 (Budowniczy). Znajduje minimalne d (ADF quasi-stacjonarność),
+    oblicza z_last (z-score ostatniej wartości znormalizowanej serii frac-diff).
+
+    Sygnał kierunkowy z z_last:
+      z_last > +PROG → LONG (zdekorelowana składowa rośnie)
+      z_last < −PROG → SHORT
+      inaczej → NEUTRAL (w zakresie szumu)
+
+    d_opt diagnostyczne: małe d (<0.4) → silna pamięć długiego zasięgu (trend persystuje),
+    duże d (≈1.0) → rynek bliski random walk (mała pamięć).
+
+    Ortogonalna do N-01 (PE mierzy złożoność wzorców, FracDiff mierzy persystencję
+    po stacjonaryzacji — różne matematyki, Prawo XVI).
+    """
+    KLUCZ = "N-02"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "CLOSE_SERIES_100"
+    KATEGORIA = "N"
+    WAGA = 6
+    ELITARNY = False
+    POWOD_ELITARNOSCI = ""
+
+    _PROG_Z = 1.5      # |z_last| > PROG_Z → sygnał kierunkowy
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        serie = wskazniki.get("CLOSE_SERIES_100")
+        if not serie or len(serie) < 31:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak CLOSE_SERIES_100"])
+
+        d_opt, z_last = frac_diff_signal(serie)
+        if d_opt is None or z_last is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Za mało danych FracDiff"])
+
+        pewnosc = min(1.0, abs(z_last) / (self._PROG_Z * 2.0))
+
+        if z_last > self._PROG_Z:
+            return self._bazowy_sygnal(
+                z_last, "LONG", pewnosc,
+                [f"FracDiff z={z_last:.2f} > {self._PROG_Z} (d={d_opt}) — persystentny ruch w górę"]
+            )
+        if z_last < -self._PROG_Z:
+            return self._bazowy_sygnal(
+                z_last, "SHORT", pewnosc,
+                [f"FracDiff z={z_last:.2f} < -{self._PROG_Z} (d={d_opt}) — persystentny ruch w dół"]
+            )
+        return self._bazowy_sygnal(
+            z_last, "NEUTRAL", pewnosc * 0.3,
+            [f"FracDiff z={z_last:.2f} ∈ (-{self._PROG_Z}, {self._PROG_Z}) (d={d_opt}) — brak sygnału"]
+        )

@@ -219,12 +219,14 @@ class MasterSwitchOnline:
 
 
 def klasyfikuj_rezim(wskazniki: dict,
-                     master_switch_online: "MasterSwitchOnline | None" = None) -> str:
+                     master_switch_online: "MasterSwitchOnline | None" = None,
+                     uzyj_vol_regime: bool = False) -> str:
     """
     Automatyczny klasyfikator reżimu rynku z gotowych wskaźników Bramy.
 
     Priorytety (od najsilniejszego):
       VOLATILE  → ATR_DEVIATION > 2.5  (rynek bardzo rozchwiany)
+                  LUB (opt-in) VOL_REGIME_TURBO trwały (Jump Model vol-gate, W-340)
       TREND_STRONG → ADX_14 > 25       (wyraźny trend)
       RANGING   → ADX_14 < 20 + wąskie BB (konsolidacja)
       STREFA SPORNA (ADX 20–25 lub brak ADX) → master-switch 2-z-3 (W-263/W-274), inaczej NORMAL
@@ -233,6 +235,12 @@ def klasyfikuj_rezim(wskazniki: dict,
     master_switch_online (Faza 2, opt-in): zamiast sztywnego 2-z-3 — głosowanie
     WAŻONE wagami uczonymi online (MasterSwitchOnline). Gdy ADX jest jednoznaczny,
     rozlicza wcześniejsze głosy ze strefy spornej (uczenie). None → Faza 1.
+
+    uzyj_vol_regime (W-340, opt-in, domyślnie OFF — A/B pending): gdy True, reżim
+    turbulentny z Jump Modelu zmienności (VOL_REGIME_TURBO + trwałość ≥4) wymusza
+    VOLATILE, łapiąc PERSYSTENTNĄ turbulencję, której ATR_DEVIATION>2.5 (chwilowy
+    skok) nie wykrywa. Pomiar (Prawo I): turbo przewiduje 1.22–1.56× wyższy |zwrot|
+    t+1 spójnie na BTC/ETH/SOL/DOGE. Domyślnie OFF do czasu A/B na pełnym P&L.
 
     Prawo I: TYLKO czyta z wskazniki dict, nie liczy własnej matematyki.
     Prawo XVI: progi zmierzone (nie zgadywane) na standardowych parametrach TA.
@@ -247,13 +255,23 @@ def klasyfikuj_rezim(wskazniki: dict,
     if master_switch_online is not None:
         master_switch_online.rozlicz(wskazniki)
 
-    # VOLATILE: ekstremalnie wysoka zmienność
+    # VOLATILE: ekstremalnie wysoka zmienność (chwilowy skok ATR)
     if atr_dev is not None and atr_dev > 2.5:
         return "VOLATILE"
 
-    # TREND_STRONG: ADX powyżej progu trendu
+    # TREND_STRONG: ADX powyżej progu trendu — WYGRYWA z vol-gate (jasny trend
+    # bije persystentną turbulencję; turbo zna magnitudę, nie kierunek — W-340).
     if adx is not None and adx > 25:
         return "TREND_STRONG"
+
+    # VOLATILE: persystentny reżim turbulentny z Jump Modelu (W-340, opt-in).
+    # Dopiero PO TREND_STRONG: turbo podnosi do VOLATILE tylko przypadki bez
+    # jednoznacznego trendu ADX (turbo mierzy zmienność, nie kierunek).
+    if uzyj_vol_regime:
+        turbo = wskazniki.get("VOL_REGIME_TURBO")
+        trwalosc = wskazniki.get("VOL_REGIME_TRWALOSC", 0.0)
+        if turbo is not None and turbo > 0.5 and trwalosc >= 4:
+            return "VOLATILE"
 
     # RANGING: ADX wskazuje brak trendu + wąskie wstęgi Bollingera
     if adx is not None and adx < 20:
@@ -324,6 +342,9 @@ class Legatus:
         # W-296 DriftAdapter: per-cykl override WAGI_REZIMU (antycypacyjna korekta).
         # None = bez override (używa globalnego WAGI_REZIMU). Resetować po fokus().
         self._wagi_rezimu_override: Optional[dict] = None
+        # W-340 vol-gate (Jump Model zmienności): opt-in detektor persystentnej
+        # turbulencji → VOLATILE. Domyślnie OFF (Prawo I: A/B na pełnym P&L pending).
+        self.uzyj_vol_regime: bool = False
 
     def ustaw_wagi_rezimu(self, wagi: dict) -> None:
         """W-296: per-cykl override WAGI_REZIMU z DriftAdapter. Wywołaj PRZED fokus()."""
@@ -361,7 +382,7 @@ class Legatus:
         # Auto-klasyfikacja reżimu gdy nie podano wprost (lub podano NORMAL)
         rezim_zrodlo = "manual"
         if rezim == "NORMAL":
-            wykryty = klasyfikuj_rezim(wskazniki)
+            wykryty = klasyfikuj_rezim(wskazniki, uzyj_vol_regime=self.uzyj_vol_regime)
             if wykryty != "NORMAL":
                 rezim = wykryty
                 rezim_zrodlo = "auto"

@@ -6,6 +6,37 @@
 
 ---
 
+## 2026-06-18 | W-340 | Vol-gate: Jump Model zmienności → klasyfikator reżimu (opt-in, zmierzony)
+
+**Odkrycie Prawa XV (utrata potencjału):** JumpModel (W-281) miał kod+testy+narzędzie
+pomiarowe, ale NIE był podpięty do niczego — gotowy moduł poza pipeline.
+
+**Pomiar (Prawo I) ROZSTRZYGNĄŁ kierunkowy JumpModel jako NIESPÓJNY:** narzędzie
+`pomiar_jump_model.py` na realnych danych 1D (walk-forward, bez look-ahead):
+  • BTC: separacja BULL−BEAR = **−6.3 bps** (odwrócona!), ETH = **−23.2 bps**
+  • ADX baseline bije go: BTC +20.9, ETH +32.5 bps; JM whipsaw 21–23 przeł/100 vs ADX 5.6
+  • Z cechami EWMA: BTC +26.9 (OK) ale ETH −21.1 (wciąż odwrócony) — aktywo-zależny.
+→ Kierunkowy naming bull/bear zawodzi out-of-sample (mean-reversion). NIE wpinamy kierunku.
+
+**Co DZIAŁA (zmierzone, aktywo-NIEZALEŻNE):** vol-reżim turbulentny/spokojny.
+Reżim turbulentny przewiduje **1.22–1.56× wyższy |zwrot| t+1** spójnie na
+BTC/ETH/SOL/DOGE, przełączeń tylko 2–3.4/100 (zero whipsaw). To stabilna oś.
+
+**Wdrożenie (`imperium/legiony/rezim_zmiennosci.py`):** lekki, czysto-pythonowy
+2-stanowy Jump Model zmienności (Viterbi z karą za skok, bez numpy w hot-path —
+tani na 1m/5m/15m, TF-agnostyczny — operuje na serii zwrotów). `vol_regime_turbo()`
+→ (turbo, trwałość, siła). Budowniczy eksponuje VOL_REGIME_TURBO/TRWALOSC/SILA.
+
+**Hook klasyfikatora (opt-in, domyślnie OFF — A/B na P&L pending):**
+`klasyfikuj_rezim(..., uzyj_vol_regime=True)` + `Legatus.uzyj_vol_regime`. Turbo
+trwały (≥4 bary) → VOLATILE, ale DOPIERO PO TREND_STRONG (jasny trend ADX wygrywa —
+turbo zna magnitudę, nie kierunek; fix z code-review).
+
+**Wynik:** 1315/1315 zielonych, audyt czysty. 21 testów granic (vol-regime + klasyfikator).
+Neurony bez zmian (76 — to infra klasyfikatora, nie neuron). NeuronBOCPD/CP-01 bez zmian.
+
+---
+
 ## 2026-06-18 | W-337 | B-02 Feature Neutralization + B-01 Meta-labeling (nowa warstwa B nad Legatusem)
 
 **Luka strukturalna:** Legatus liczył głosy 74 neuronów, ale nie mierzył:

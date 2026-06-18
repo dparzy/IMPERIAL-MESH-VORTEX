@@ -6,6 +6,212 @@
 
 ---
 
+## 2026-06-17 | W-330b | RADAR-05 NeuronLeadBTC + wymiar lead-lag radaru (BTC->alty timing)
+
+**Rozbudowa radaru (wizja Cezara — wiecej oczu):** radar liczyl 4 wymiary. Dodano 5.:
+LEAD_BTC — sygnal wyprzedzajacy BTC->alty (lead-lag / Transfer Entropy W-071). Cross-korelacja
+zwrotow BTC opoznionych o k vs zwroty altow: najlepszy lag = sila wyprzedzania. Swiezy impuls
+BTC x ta sila = kierunkowy sygnal timingu ("BTC pchnal, alty pojda za nim").
+
+**RADAR-05 (`NeuronLeadBTC`, kategoria R, waga 5):** glos na LEAD_BTC, prog 0.30 (wyzszy niz
+siostry — odsiewa szum spornych lagow na krotkim oknie). LEAD>=0.30 LONG, <=-0.30 SHORT.
+Filar sily: tylko gdy |korelacja lag| >= 0.20 (slaby lead = brak sygnalu). Roj: 71 -> 72.
+
+**RadarRynku:** parametr max_lag (domyslnie 3, 0=wylaczony), pole StanRynku.lead_btc,
+eksport LEAD_BTC w jako_wskazniki(). Testy granic: alty podazaja za BTC, max_lag=0 off,
+prog 0.30 (>= vs <), walidacja max_lag<0. Spojnosc: MANIFEST/README/INDEKS/audyt = 72.
+
+UWAGA (Prawo I): RADAR-04/05 to glosy kontekstowe niskiej wagi wypelniajace zmierzone luki
+(STRES_KORELACJI byl martwy, lead-lag nowy). Wymagaja czystego A/B P&L na portfelu (TODO).
+
+---
+
+## 2026-06-17 | W-330 | SelektorPar — auto-dobor par LIVE (plynnosc x dekorelacja)
+
+**Luka audytu (przed LIVE):** petla_live miala SZTYWNA liste par. System nie umial sam
+wykryc co jest dostepne i plynne na MEXC. DataLoader nie wolal load_markets().
+
+**SelektorPar (`koloseum/selektor_par.py`):** pipeline auto-doboru w 3 warstwach (Prawo I):
+  1. lista_par_rynku() — CCXT load_markets (wszystkie aktywne USDT-perp)
+  2. filtruj_plynne() — min. obrot 24h (chroni przed poslizgiem na cienkiej ksiedze)
+  3. ranking alfy = 0.60*obrot_norm + 0.40*(1-|korelacja BTC|) — Prawo XVI: premiujemy
+     pary niosace WLASNA informacje, nie kopie ruchu BTC (dywersyfikacja realna)
+
+**DataLoader (W-330):** nowe metody lista_par_rynku() + filtruj_plynne() (CCXT public).
+**petla_live (W-330):** KonfigPetliLive.auto_discover (domyslnie False — zero zmiany).
+  True → zastepuje cfg.symbole rankingiem TOP-N. Bez sieci/loadera → lista z konfiguracji.
+
+Loader wstrzykiwalny → testy OFFLINE (mock). 8 testow selektora + 2 wpiecia w petli.
+Prawo XXI: brak sieci, brak plynnych, dekorelacja premiowana, BTC kotwica, top_n.
+
+---
+
+## 2026-06-17 | W-329b | P4 decay synaps w live — higiena pamieci (Prawo XV)
+
+**Luka audytu P4:** SynapsyRezimowe.zapomnij() istnial, ale NIGDY nie byl wolany w
+petla_live — martwe pary neuronow nigdy nie wygasaly w dlugim live (silos rosl bez konca).
+
+**Naprawa:** KonfigPetliLive.synapsy_decay_co_bar (domyslnie 50 barow ~8 dni na 4h).
+Co N barow petla wola synapsy.zapomnij() dla kazdego dyrygenta — lagodne tlumienie
+silosu + kasacja par ponizej alpha_decay. 0 = wylaczone.
+
+Testy: domyslna wartosc 50, zapomnij() redukuje zywe + kasuje martwe pary.
+Pliki: petla_live.py (config + krok 3b petli), test_petla_live.py.
+
+---
+
+## 2026-06-17 | W-329 | RADAR-04 NeuronStresKorelacji — głos dla martwego wskaźnika (Prawo XV)
+
+**Kontekst (głęboki audyt przed LIVE):** Radar liczył STRES_KORELACJI (średnia |korelacja|
+par koszyka, Prawo XVI) i używał go w ryglu ryzyka oraz sterze korelacyjnym — ale ŻADEN neuron
+nie głosował na jego podstawie. Martwy wskaźnik = utrata potencjału (Prawo XV).
+
+**RADAR-04 (`NeuronStresKorelacji`, kategoria Z, waga 6):** detektor kaskady systemowej.
+Stres sam jest bezkierunkowy → kierunek bierze z BTC_TREND (konfluencja, nie zgadywanie):
+- STRES ≥ 0.80 ∧ BTC_TREND < −0.10 → SHORT (lawina w dół — alty lecą za liderem)
+- STRES ≥ 0.80 ∧ BTC_TREND > +0.10 → LONG słaby ≤0.45 (rajd skorelowany — FOMO ryzykowny)
+- STRES ≥ 0.80 ∧ BTC płaski/brak → NEUTRAL ostrzegawczy (kaskada bez kierunku = nie wchodź)
+- STRES < 0.80 → NEUTRAL (zdrowa dywersyfikacja)
+
+Kategoria Z (nie R) celowo — wzmacniany w VOLATILE (×1.5) i PANIC (×2.0), dokładnie tam gdzie
+kaskady niszczą koszyki. Rój: 70 → **71 neuronów** (67 aktywnych).
+
+**Testy granic (Prawo XXI):** abstynencja bez danych, próg dokładny 0.80 (≥ vs <), kaskada↓/↑,
+płaski BTC, brak BTC_TREND (nie crash). Pliki: sesje.py, rejestr.py, audyt_spojnosci.py
+(allowlista + weryfikacja adaptera), test_radar_rynku.py, MANIFEST/README/INDEKS.
+
+---
+
+## 2026-06-16 | W-328 | Nowe pary i backtest — skrypty pobierania i testowania (przygotowanie LIVE)
+
+**Kontekst:** Cezar pyta o rozszerzenie koszyka o nowe pary (ADA, AVAX, XRP, PEPE, WIF, memecoin).
+Środowisko cloud nie ma dostępu do internetu, więc: (1) przeanalizowano kandydatów; (2) dostarczono
+skrypt pobierania do uruchomienia lokalnie; (3) dostarczono skrypt backtestu dla porównania.
+
+**Kandydaci (uzasadnienie):**
+- ADA/USDT — niższa korelacja z BTC (~0.65), fundamentals-driven, duży volume
+- AVAX/USDT — silny momentum layer-1, dobra zmienność 4h
+- XRP/USDT — skoki regulacyjne, unikalny risk profile, top 5 volume
+- PEPE/USDT — memecoin: ekstremalne fundingi (PSY-01 złoto), korelacja ~0.45 z BTC
+
+**Nowe narzędzia:**
+- `narzedzia/pobierz_nowe_pary.py` — pobiera 1h OHLCV z MEXC (ccxt) i agreguje do 4h
+- `narzedzia/backtest_nowe_pary.py` — A/B test: baseline vs rozszerzony koszyk vs solo vs 1h TF
+
+**Protokół:** Uruchom lokalnie: `python narzedzia/pobierz_nowe_pary.py` (wymaga sieci) →
+potem `python narzedzia/backtest_nowe_pary.py` → dodaj pary tylko gdy zysk% > baseline (Prawo I).
+
+---
+
+## 2026-06-16 | W-327 | AdapterMEXCFutures — funding/OI rodzime dla LIVE na MEXC
+
+**Kontekst (Prawo I — poprawność dla LIVE):** Cezar wchodzi na żywo na MEXC ($50, 5 par).
+DataLoader już domyślnie ciągnie OHLCV z MEXC (ccxt), a petla_live wpina adaptery sentymentu.
+Luka: `AdapterFutures` ciągnie funding/OI z BINANCE, a funding który Cezar FAKTYCZNIE PŁACI to
+funding MEXC. Dla PSY-01 (contrarian na ekstremalnym fundingu) sygnał musi pochodzić z giełdy,
+na której trzymana jest pozycja — inaczej myli się o własnym koszcie.
+
+**AdapterMEXCFutures (`akwedukty/adaptery/mexc_futures.py`):** publiczne contract API MEXC
+(funding_rate + ticker/holdVol = OI), bez klucza. Budzi PSY-01 (Funding) i PSY-04 (OI). PSY-02
+(L/S ratio) zostaje przy AdapterFutures (MEXC nie ma łatwego public L/S; sentyment cross-giełdowy
+OK). Konwersja symbolu BTCUSDT→BTC_USDT, OI_PREV pamięć per symbol, fetcher wstrzykiwalny (testy
+offline). Bezpieczeństwo: endpointy publiczne; klucze podpisane (gdy zlecenia) WYŁĄCZNIE os.getenv.
+
+**Wpięcie:** `KonfigPetliLive.funding_mexc` (domyślnie False). Gdy True — MEXC dokładany PO Binance
+w liście adapterów, więc nadpisuje funding+OI rodzimymi, a L/S zostaje z Binance (MEXC go nie
+dostarcza → nie nadpisze). Kolejność listy = priorytet ostatniego dla danego klucza.
+
+**Testy:** 9 nowych (konwersja symbolu, dolewanie kluczy, OI_PREV pamięć, padnięty fetcher=None,
+uszkodzony JSON, brak pola, budzenie PSY-01/04). 1106/1106 zielone, audyt exit 0, ruff czysto.
+
+**Pliki:** `imperium/akwedukty/adaptery/mexc_futures.py`, `imperium/akwedukty/adaptery/__init__.py`,
+`imperium/koloseum/petla_live.py`, `tests/test_adapter_mexc_futures.py`, `docs/MANIFEST_KODU.md`.
+
+## 2026-06-16 | W-326 | Oryginalne strategie SMC — Łowca Stref + Żniwa Szczytu (utrata potencjału)
+
+**Kontekst (Prawo XV):** audyt strategii ujawnił, że nasza najbardziej UNIKALNA broń —
+SMC-01 (Order Block), SMC-02 (FVG), SMC-03 (BOS/MSS), VP-01 (VPOC) — NIE miała ŻADNEJ
+strategii. Reżim SMC_ACTIVE istniał w WAGI_REZIMU, ale żadna z 18 strategii go nie celowała
+(martwy reżim). Komentarz rejestru „SMC NIE wchodzą dopóki neurony nieaktywne" był przestarzały
+— SMC-01/02/03 i VP-01 są aktywne (DOSTEPNY=True). Nikt nie wrócił dodać strategii.
+
+**IMV-RV-006 ŁOWCA STREF (Smart Money Zone Hunter):** RV, reżim SMC_ACTIVE, 4H/1D.
+WEJSCIE: SMC-03 (złamanie struktury BOS/MSS) + SMC-01 (powrót do strefy Order Block).
+FILTR: SMC-02 (luka FVG = nierównowaga) + VP-01 (VPOC akceptacja) + H-01 (Hurst = nie szum).
+WYJSCIE: SMC-02 (domknięcie luki) + X-25 (rozciągnięcie ATR). Łapie dołki/górki w strefach
+instytucjonalnych — tam gdzie kapitał odwraca rynek. Źródło: ICT/Order Block + Fair Value Gap.
+
+**IMV-RV-007 ŻNIWA SZCZYTU (Peak & Trough Harvest):** RV, reżim VOLATILE, 4H/1D.
+WEJSCIE: Z-05 (Klimaks: blow-off szczyt→SHORT / kapitulacja dołek→LONG) + X-27 (Value-Z dystans).
+FILTR: VP-01 (VPOC) + V-07 (Anchored VWAP — kierunek powrotu do wartości). WYJSCIE: V-07 + X-25.
+Celuje wprost w górki i dołki klimaksowe z powrotem do wartości godziwej.
+
+**Spójność (Prawo XXI/XIX):** Klucznik czysty (34 klucze istnieją i aktywne), ID IMV-SMC-*
+wolne w KATALOG (kolizja z IMV-RV-* uniknięta), audyt exit 0. Reżimy pokryte: +SMC_ACTIVE.
+Testy: 4 nowe (obecność, pokrycie reżimu, dołek LONG, górka SHORT) — łącznie 20 testów strategii.
+
+**Pomiar (Prawo I — uczciwie):** strategie wpływają na tryby Dyrygenta „filtr"/„strategia", nie
+na etalon „agregat" (+5.19% niezmieniony). Pełny A/B trybu strategii = następny krok po wpięciu
+adapterów na żywo (SMC_ACTIVE wymaga realnej klasyfikacji reżimu z danych).
+
+**Pliki:** `imperium/legiony/strategie/rejestr_strategii.py`, `tests/test_strategie.py`,
+`docs/MANIFEST_KODU.md`, `docs/KATALOG_STRATEGII.md`, `docs/LOG_ZMIAN.md`.
+
+## 2026-06-16 | W-325 | GUBERNATOR — homeostatyczny sterownik portfela (nowy moduł)
+
+**Kontekst:** rozpoznanie terenu wykazało, że warstwy adaptacyjne JUŻ istnieją i są podpięte
+(HedgeMWU per-neuron, Synapsy Reżimowe per-para, router strategii per reżim+TF, drift adapter).
+Modyfikowanie SYGNAŁU wyczerpane (4 falsyfikacje). Realna luka: brak GLOBALNEGO sterownika
+portfela — każdy podsystem rządzi lokalnie, nikt nie steruje ekspozycją całej floty 5 par.
+
+**GUBERNATOR (`imperium/koloseum/gubernator.py`):** jeden ster na cały portfel. Po skanerze i
+bezpieczniku DD dokłada globalny mnożnik [floor=0.5×, ceiling=1.3×] z agregatu koszyka. Maszyna
+postaw z histerezą: KWARANTANNA→OBRONA→OSTROŻNY→NORMALNY→EKSPANSJA, mnożnik wygładzany wykładniczo.
+UNIKAT (niespotykany w retail): sygnał pewności = ROZRZUT OCEN SKANERA (meta-labeling López de
+Prado na poziomie PORTFELA — wewnętrzna dyspersja rankingu jako homeostatyczny regulator ryzyka).
+Neutralny w stanie bazowym (≈1.0, Prawo XV), audyt Warstwa 1 to weryfikuje. Domyślnie OPT-IN.
+
+**Wyniki A/B (`narzedzia/ab_w325.py`, 4h, 7500 barów/parę, Prawo I — SFALSYFIKOWANA dla celu zysk):**
+- BASELINE (OFF): +5.19% | MaxDD 13.7% | 717 trade
+- GUBERNATOR (ON): +4.16% | MaxDD 13.4% | 717 trade → **Δ = −1.04pp** 🔴
+Diagnostyka (rozkład postaw na realnych danych): mechanizm działa — śr. mnożnik 1.068 (netto
+wzmacnia), EKSPANSJA dominuje (224/361 tyków), zakres 0.889–1.223. Przyczyna minusu: w pętli
+`dd_frakcja=frakcja_breaker` → Gubernator hamuje NA WIERZCHU Bezpiecznika (podwójne tłumienie w DD),
+a ekspansja+compounding powiększa pozycje wjeżdżające potem w obsunięcie. To POKRĘTŁO ryzyko/zwrot:
+1pp zwrotu za 0.3pp niższy MaxDD na tym łagodnym oknie. NIE darmowy lunch.
+
+**Werdykt:** moduł zostaje jako OPT-IN (baseline nietknięty), w pełni otestowany (16 testów granic),
+udokumentowany (`docs/GUBERNATOR.md`). Realna przyszłość: ochrona drawdown / risk-off na żywo, gdzie
+łagodny backtest nie nagradza ostrożności. Piąta falsyfikacja z rzędu = dowód, że sygnał+architektura
+są dobrze dostrojone, a kapitał $50 wejdzie na system NIEPOPSUTY niesprawdzonymi pomysłami.
+
+**Pliki:** `imperium/koloseum/gubernator.py`, `imperium/koloseum/backtest.py`,
+`tests/test_gubernator.py`, `narzedzia/ab_w325.py`, `narzedzia/audyt_spojnosci.py`, `docs/GUBERNATOR.md`.
+
+## 2026-06-16 | W-324 | Brama Momentum Bezwzględnego (TS Gate) — suchy proch w martwym rynku
+
+**Kontekst:** Skaner Okazji (W-316) był 100% cross-sectional — zawsze rankował i wybierał TOP-N,
+nawet gdy CAŁY koszyk stał w miejscu (dead market). Literatura (Han/Kang/Ryu 2024): TS momentum
+> CS w krypto. Gap: brak absolutnego progu jakości — wybieranie "najlepszego ze złych" w słabym rynku.
+
+**W-324 — `min_bezwzgledny_ts` (TS Gate):** nowy parametr `SkanerOkazji`. Moneta z |ROC| < próg
+wypada z rankingu PRZED z-score (jeszcze przed porównaniem cross-sectional). W martwym rynku
+(wszystkie pary <próg) → wynik = 0 okazji = 0 wejść = "suchy proch". Domyślnie 0.0 (wsteczna
+zgodność). `backtest_portfel` przyjmuje `skaner_min_ts=`. A/B: `narzedzia/ab_w324.py`.
+
+**Wyniki A/B (4h, 7500 barów/parę, Prawo I — SFALSYFIKOWANA):**
+- BASELINE (0%): +5.19% (717 trade, WR 43.8%) ✅
+- TS-Gate 0.5%: −8.01% (−13.20pp) 🔴 | TS-Gate 1.0%: −9.41% (−14.60pp) 🔴 | TS-Gate 2.0%: −9.85% (−15.04pp) 🔴
+Lekcja: CS i TS już sprzęgnięte w score (momentum_z z wagą 1.0). Brama TS PRZED z-score = podwójny
+filtr niszczący edge. Moneta z ROC=0.5% przy ADX=35 to prawdziwa okazja gdy reszta koszyka=0%.
+Kod wstecznie zgodny (domyślnie=0.0), hipoteza sfalsyfikowana. Czwarta falsyfikacja z rzędu.
+
+**Testy:** 5 nowych testów granicznych w `test_skaner_okazji.py` — martwy rynek=0, próg dokładny
+(|ROC|==próg → przepuszcza), selektywny rynek, SHORT TS-gated, domyślnie wyłączony.
+
+**Pliki:** `imperium/koloseum/skaner_okazji.py`, `imperium/koloseum/backtest.py`,
+`tests/test_skaner_okazji.py`, `narzedzia/ab_w324.py`.
+
 ## 2026-06-16 | W-323b/c | Profile WŁĄCZNE (po falsyfikacji) + scoreboard kontrybucji
 
 **Kontekst:** A/B W-323 obalił pierwszą (wykluczającą) tabelę profili — SWING 59 dał −3.29%

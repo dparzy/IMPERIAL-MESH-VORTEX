@@ -269,3 +269,133 @@ def test_dobierz_najlepsze_z_radarem_zmienia_ranking():
     # Nie crash i zwraca wyniki
     assert isinstance(bez_radaru, list)
     assert isinstance(z_radarem, list)
+
+
+# ── RADAR-04 NeuronStresKorelacji (W-329) — testy granic (Prawo XXI) ──────────
+
+def test_radar04_brak_danych_abstynuje():
+    """Prawo XV: brak STRES_KORELACJI → NEUTRAL pewność 0 (martwy głos zabroniony)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    s = n.interpretuj({})
+    assert s.kierunek == "NEUTRAL"
+    assert s.pewnosc == 0.0
+
+
+def test_radar04_nizsza_korelacja_brak_kaskady():
+    """STRES < 0.80 → NEUTRAL (dywersyfikacja działa, brak sygnału)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    s = n.interpretuj({"STRES_KORELACJI": 0.5, "BTC_TREND": -0.5})
+    assert s.kierunek == "NEUTRAL"
+
+
+def test_radar04_prog_dokladny_080():
+    """Granica: STRES == 0.80 wpada w gałąź kaskady (>=), nie NEUTRAL (<)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    # przy 0.80 + BTC w dół → SHORT (kaskada aktywna od progu)
+    s = n.interpretuj({"STRES_KORELACJI": 0.80, "BTC_TREND": -0.3})
+    assert s.kierunek == "SHORT"
+    # tuż poniżej progu → NEUTRAL
+    s2 = n.interpretuj({"STRES_KORELACJI": 0.799, "BTC_TREND": -0.3})
+    assert s2.kierunek == "NEUTRAL"
+
+
+def test_radar04_kaskada_w_dol_short():
+    """Kaskada + BTC spada → SHORT (alty lecą za liderem)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    s = n.interpretuj({"STRES_KORELACJI": 0.95, "BTC_TREND": -0.5})
+    assert s.kierunek == "SHORT"
+    assert s.pewnosc > 0.4
+
+
+def test_radar04_kaskada_w_gore_slaby_long():
+    """Kaskada + BTC rośnie → LONG słaby (FOMO ryzykowny, pewność capowana ≤0.45)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    s = n.interpretuj({"STRES_KORELACJI": 0.95, "BTC_TREND": 0.5})
+    assert s.kierunek == "LONG"
+    assert s.pewnosc <= 0.45
+
+
+def test_radar04_kaskada_btc_plaski_neutral_ostrzegawczy():
+    """Kaskada bez kierunku BTC (płaski lub brak) → NEUTRAL ostrzegawczy (nie zgaduj)."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    s = n.interpretuj({"STRES_KORELACJI": 0.9, "BTC_TREND": 0.0})
+    assert s.kierunek == "NEUTRAL"
+    # brak BTC_TREND też → NEUTRAL (nie crash)
+    s2 = n.interpretuj({"STRES_KORELACJI": 0.9})
+    assert s2.kierunek == "NEUTRAL"
+
+
+def test_radar04_kategoria_i_klucz():
+    """Spójność: RADAR-04, kategoria Z (obrona), wskaźnik STRES_KORELACJI."""
+    from imperium.legiony.neurony.sesje import NeuronStresKorelacji
+    n = NeuronStresKorelacji()
+    assert n.KLUCZ == "RADAR-04"
+    assert n.KATEGORIA == "Z"
+    assert n.WSKAZNIK == "STRES_KORELACJI"
+
+
+# ── RADAR-05 NeuronLeadBTC + lead-lag radaru (W-330) — testy granic (Prawo XXI) ──
+
+def test_lead_lag_radar_alty_podazaja_za_btc():
+    """Gdy alty kopiują BTC z lagiem → lead_btc silny w kierunku świeżego ruchu BTC."""
+    n = 60
+    btc = [100 * (1.01) ** i for i in range(n)]
+    alt = [btc[max(0, i - 1)] for i in range(n)]   # alty = BTC opóźniony o 1 bar
+    stan = RadarRynku().skanuj(btc, {"ETH": alt, "SOL": alt})
+    assert stan.lead_btc is not None
+    assert stan.lead_btc > 0.3   # świeży wzrost BTC → dodatni lead
+
+
+def test_lead_lag_wylaczony_max_lag_zero():
+    """max_lag=0 → lead-lag wyłączony (lead_btc None)."""
+    n = 60
+    btc = [100 * (1.01) ** i for i in range(n)]
+    alt = [btc[max(0, i - 1)] for i in range(n)]
+    stan = RadarRynku(max_lag=0).skanuj(btc, {"ETH": alt})
+    assert stan.lead_btc is None
+
+
+def test_lead_lag_eksport_wskaznika():
+    """lead_btc != None → klucz LEAD_BTC w jako_wskazniki()."""
+    s = StanRynku(lead_btc=0.5)
+    assert s.jako_wskazniki().get("LEAD_BTC") == 0.5
+    s2 = StanRynku()
+    assert "LEAD_BTC" not in s2.jako_wskazniki()
+
+
+def test_radar05_brak_danych_abstynuje():
+    """Prawo XV: brak LEAD_BTC → NEUTRAL pewność 0."""
+    from imperium.legiony.neurony.sesje import NeuronLeadBTC
+    n = NeuronLeadBTC()
+    s = n.interpretuj({})
+    assert s.kierunek == "NEUTRAL" and s.pewnosc == 0.0
+
+
+def test_radar05_prog_dokladny_030():
+    """Granica: LEAD == 0.30 → LONG (>=), tuż poniżej → NEUTRAL."""
+    from imperium.legiony.neurony.sesje import NeuronLeadBTC
+    n = NeuronLeadBTC()
+    assert n.interpretuj({"LEAD_BTC": 0.30}).kierunek == "LONG"
+    assert n.interpretuj({"LEAD_BTC": 0.299}).kierunek == "NEUTRAL"
+    assert n.interpretuj({"LEAD_BTC": -0.30}).kierunek == "SHORT"
+
+
+def test_radar05_kategoria_klucz():
+    from imperium.legiony.neurony.sesje import NeuronLeadBTC
+    n = NeuronLeadBTC()
+    assert n.KLUCZ == "RADAR-05"
+    assert n.KATEGORIA == "R"
+    assert n.WSKAZNIK == "LEAD_BTC"
+
+
+def test_radar_walidacja_max_lag_ujemny():
+    """max_lag < 0 → ValueError (Prawo I — parametr sensowny)."""
+    import pytest
+    with pytest.raises(ValueError):
+        RadarRynku(max_lag=-1)

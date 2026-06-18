@@ -49,6 +49,7 @@ class KonfigPetliLive:
     kapital_startowy: float = 10_000.0    # kapitał startowy (paper lub realny)
     min_pewnosc: float = 0.55             # próg pewności Legatusa
     paper: bool = True                    # True=paper trading, False=realne zlecenia
+    dry_run: bool = False                 # paper=False+dry_run=True: realny klucz, zlecenia tylko logowane (MEXC bez testnetu)
     auto_rezim: bool = True               # True=auto-klasyfikacja reżimu (Namiestnik)
     synapsy: bool = True                  # True=SynapsyRezimowe per symbol
     # W-307: warstwy uczenia wag neuronów (Prawo XV — opt-in, domyślnie OFF).
@@ -61,12 +62,25 @@ class KonfigPetliLive:
     ksiega_wad: bool = False
     # W-314: Filtr Asymetrii Reżimu — weto na rynku bocznym (ADX) i kontr-trendzie. OFF.
     filtr_asymetrii: bool = False
+    # W-327: źródło funding/OI dla PSY-01/04. True=MEXC (rodzime — funding który
+    # FAKTYCZNIE płacisz na MEXC), False=Binance fapi. L/S ratio (PSY-02) zawsze z
+    # Binance (MEXC nie ma łatwego public L/S; sentyment rynkowy cross-giełdowy OK).
+    funding_mexc: bool = False
     plik_pamieci: str = "logs/pamiec_refleksyjna.jsonl"
     log_dir: Optional[str] = "logs"
     # Pauza po każdym barze (s). None = oblicz z interwal (zalecane).
     pauza_sekundy: Optional[int] = None
     # Liczba barów pomiędzy odświeżeniem RADAR (domyślnie co bar = 1).
     radar_co_bar: int = 1
+    # W-329: decay synaps reżimowych — co ile barów wołać synapsy.zapomnij() (higiena
+    # pamięci). Bez decay martwe pary nigdy nie wygasają w długim live (luka P4 audytu).
+    # 0 = wyłączone. Domyślnie 50 barów (≈ 8 dni na 4h) — łagodne sprzątanie.
+    synapsy_decay_co_bar: int = 50
+    # W-330: auto-dobór par z giełdy (SelektorPar — płynność × dekorelacja od BTC).
+    # False=sztywna lista cfg.symbole. True=zastąp listę rankingiem TOP-N (wymaga loadera).
+    auto_discover: bool = False
+    auto_discover_top_n: int = 5
+    auto_discover_min_obrot: float = 5_000_000.0
 
 
 @dataclass
@@ -118,7 +132,16 @@ def _buduj_dyrygencie(
     from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara
     from imperium.koloseum.dyrygent import Dyrygent
     from imperium.koloseum.namiestnik import get_namiestnik
-    from imperium.akwedukty.adaptery import AdapterFutures, AdapterFearGreed, AdapterCVD, AdapterNewsLLM
+    from imperium.akwedukty.adaptery import (
+        AdapterFutures, AdapterMEXCFutures, AdapterFearGreed, AdapterCVD, AdapterNewsLLM,
+    )
+
+    # W-327: lista adapterów sentymentu/flow. Gdy funding_mexc → MEXC dokładany PO
+    # Binance, więc nadpisuje funding+OI rodzimymi (L/S zostaje z Binance — MEXC go
+    # nie dostarcza, więc nie nadpisze). Kolejność = priorytet ostatniego dla klucza.
+    adaptery_sentymentu = [AdapterFutures(), AdapterFearGreed(), AdapterCVD(), AdapterNewsLLM()]
+    if getattr(cfg, "funding_mexc", False):
+        adaptery_sentymentu.insert(1, AdapterMEXCFutures())
 
     namiestnik = get_namiestnik() if cfg.auto_rezim else None
     budowniczy = BudowniczyWskaznikow()
@@ -142,7 +165,7 @@ def _buduj_dyrygencie(
             budowniczy=budowniczy,
             min_pewnosc=cfg.min_pewnosc,
             namiestnik=namiestnik,
-            adaptery=[AdapterFutures(), AdapterFearGreed(), AdapterCVD(), AdapterNewsLLM()],
+            adaptery=adaptery_sentymentu,
             filtr_asymetrii=cfg.filtr_asymetrii,
         )
         d.kapital_sizing = kapital_per
@@ -194,15 +217,52 @@ def handluj_live(
 
     cfg = konfiguracja
     pauza = cfg.pauza_sekundy or _INTERWAL_SEKUNDY.get(cfg.interwal, 3600)
+
+    # W-330: auto-dobór par z giełdy (płynność × dekorelacja od BTC). Gdy włączony,
+    # zastępuje sztywną listę cfg.symbole rankingiem SelektorPar. Bez sieci/loadera →
+    # zostaje lista z konfiguracji (Prawo XV — nie zgadujemy).
+    if cfg.auto_discover and _loader is not None:
+        try:
+            from imperium.koloseum.selektor_par import SelektorPar
+            sel = SelektorPar(_loader)
+            wybrane = sel.wybierz(top_n=cfg.auto_discover_top_n,
+                                  min_obrot_usd=cfg.auto_discover_min_obrot)
+            if wybrane:
+                logger.info(f"[PętlaLive] Auto-discover: {len(wybrane)} par → {wybrane}")
+                cfg.symbole = wybrane
+            else:
+                logger.warning("[PętlaLive] Auto-discover pusty — zostaję przy liście z konfiguracji.")
+        except Exception as e:
+            logger.error(f"[PętlaLive] Auto-discover padł: {e} — lista z konfiguracji.")
+
     btc_sym = next((s for s in cfg.symbole if s.upper().startswith("BTC")), None)
 
-    # Engine: paper lub (przyszłe) realne zlecenia
-    engine = PaperTradingEngine(
-        kapital_startowy=cfg.kapital_startowy,
-        sesja_id=f"LIVE-{cfg.interwal}-{len(cfg.symbole)}x",
-        max_otwartych=len(cfg.symbole),
-        log_dir=cfg.log_dir,
-    )
+    # Engine: paper lub realne zlecenia MEXC (W-331)
+    if cfg.paper:
+        engine = PaperTradingEngine(
+            kapital_startowy=cfg.kapital_startowy,
+            sesja_id=f"LIVE-{cfg.interwal}-{len(cfg.symbole)}x",
+            max_otwartych=len(cfg.symbole),
+            log_dir=cfg.log_dir,
+        )
+    else:
+        from imperium.drogi.real_order_router import RealOrderRouter
+        prefix = "DRYRUN" if cfg.dry_run else "REAL"
+        engine = RealOrderRouter(
+            kapital_startowy=cfg.kapital_startowy,
+            sesja_id=f"{prefix}-{cfg.interwal}-{len(cfg.symbole)}x",
+            max_otwartych=len(cfg.symbole),
+            log_dir=cfg.log_dir,
+            dry_run=cfg.dry_run,
+        )
+        # W-333: odtwórz otwarte pozycje z MEXC (bezpieczeństwo po restarcie —
+        # inaczej pozycja wisi na giełdzie bez kontroli SL/TP roju).
+        try:
+            n_sync = engine.synchronizuj_pozycje(interwal=cfg.interwal)
+            if n_sync:
+                logger.warning(f"[PętlaLive] SYNC: odtworzono {n_sync} pozycji z MEXC.")
+        except Exception as e:
+            logger.error(f"[PętlaLive] Synchronizacja pozycji padła: {e}")
     dyrygenci = _buduj_dyrygencie(cfg.symbole, cfg, engine)
     pamiec = PamiecRefleksyjna(plik=cfg.plik_pamieci)
     radar = RadarRynku()
@@ -263,6 +323,21 @@ def handluj_live(
                 except Exception as e:
                     logger.warning(f"[PętlaLive] Radar padł: {e}")
 
+            # 2b. Cross-sectional RS (C-01, W-335) — z-score zwrotu vs koszyk.
+            # Tylko pętla portfelowa widzi wszystkie symbole naraz. Bez koszyka (1 para)
+            # → pusty dict → neuron C-01 abstynuje (Prawo XV).
+            if len(bary_per) >= 2:
+                try:
+                    from imperium.legiony.przekroj_koszyka import cross_sectional_rs
+                    close_koszyk = {s: [b["close"] for b in bs]
+                                    for s, bs in bary_per.items()}
+                    rs_map = cross_sectional_rs(close_koszyk, lookback=24)
+                    for s, d in dyrygenci.items():
+                        if s in rs_map:
+                            d.kontekst_dodatkowy["CROSS_RS"] = rs_map[s]
+                except Exception as e:
+                    logger.warning(f"[PętlaLive] Cross-sectional RS padł: {e}")
+
             # 3. Cykl decyzyjny per symbol
             for sym, bary in bary_per.items():
                 if sym not in dyrygenci:
@@ -282,6 +357,18 @@ def handluj_live(
                 except Exception as e:
                     statystyki.bledy += 1
                     logger.error(f"[PętlaLive] Błąd cyklu {sym}: {e}")
+
+            # 3b. Decay synaps (W-329, P4) — higiena pamięci: martwe pary łagodnie
+            # wygasają. Bez tego silos synaps rośnie bez końca w długim live.
+            if (cfg.synapsy and cfg.synapsy_decay_co_bar > 0
+                    and bar_nr % cfg.synapsy_decay_co_bar == 0):
+                for d in dyrygenci.values():
+                    syn = getattr(getattr(d, "legatus", None), "synapsy", None)
+                    if syn is not None:
+                        try:
+                            syn.zapomnij()
+                        except Exception as e:
+                            logger.warning(f"[PętlaLive] Decay synaps padł: {e}")
 
             # 4. Zamknięcia → PamięćRefleksyjna (per sesja, na koniec każdego baru)
             hist_now = len(engine.historia_zamkniec)

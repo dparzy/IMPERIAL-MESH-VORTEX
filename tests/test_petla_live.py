@@ -215,3 +215,65 @@ def test_konfiguracja_pauza_none_oblicza_z_interwal():
     kfg = KonfigPetliLive(symbole=["BTCUSDT"], interwal="4H")
     assert kfg.pauza_sekundy is None
     assert _INTERWAL_SEKUNDY["4H"] == 14400
+
+
+# ── W-329 P4: decay synaps reżimowych w live ──────────────────────────────────
+
+def test_konfiguracja_synapsy_decay_domyslnie_50():
+    """W-329: decay synaps domyślnie 50 barów (higiena pamięci długiego live)."""
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"])
+    assert kfg.synapsy_decay_co_bar == 50
+
+
+def test_synapsy_zapomnij_redukuje_martwe_pary():
+    """zapomnij() łagodnie tłumi silos i kasuje pary poniżej alpha_decay (Prawo XV P4)."""
+    from imperium.biblioteki.synapsy_rezimowe import SynapsyRezimowe
+    syn = SynapsyRezimowe()
+    syn._silo["X-01|X-02@NORMAL"] = 0.5        # żywa para
+    syn._silo["X-03|X-04@NORMAL"] = 0.0005     # prawie martwa (< alpha_decay typ.)
+    syn.zapomnij()
+    # żywa para osłabiona, ale nadal istnieje
+    assert syn._silo.get("X-01|X-02@NORMAL", 0) < 0.5
+    assert syn._silo.get("X-01|X-02@NORMAL", 0) > 0
+    # martwa para skasowana (poniżej progu alpha_decay)
+    assert "X-03|X-04@NORMAL" not in syn._silo
+
+
+# ── W-330: auto-discovery par ─────────────────────────────────────────────────
+
+def test_auto_discover_domyslnie_off():
+    """Domyślnie auto_discover wyłączone (sztywna lista) — zero zmiany zachowania."""
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"])
+    assert kfg.auto_discover is False
+    assert kfg.auto_discover_top_n == 5
+
+
+def test_auto_discover_zastepuje_liste():
+    """handluj_live z loaderem discovery → cfg.symbole zastąpione rankingiem SelektorPar."""
+    import pandas as pd
+    from imperium.koloseum.petla_live import handluj_live
+
+    class _DiscoveryLoader(_MockLoader):
+        def lista_par_rynku(self, quote="USDT", typ="swap"):
+            return ["BTC/USDT:USDT", "XRP/USDT:USDT"]
+        def filtruj_plynne(self, pary, min_obrot_usd=5_000_000.0, limit=None):
+            dane = {"BTC/USDT:USDT": 100e6, "XRP/USDT:USDT": 60e6}
+            out = [{"symbol": s, "obrot_usd": dane[s], "cena": 1.0}
+                   for s in pary if dane.get(s, 0) >= min_obrot_usd]
+            return out[:limit] if limit else out
+        def fetch(self, symbol, timeframe="4h", limit=200):
+            return pd.DataFrame({"close": [100 + i for i in range(20)],
+                                 "open": [100 + i for i in range(20)],
+                                 "high": [101 + i for i in range(20)],
+                                 "low": [99 + i for i in range(20)],
+                                 "volume": [10.0] * 20,
+                                 "timestamp": pd.date_range("2026-01-01", periods=20, freq="4h")})
+
+    kfg = KonfigPetliLive(symbole=["PLACEHOLDER"], interwal="4H",
+                          auto_discover=True, auto_discover_top_n=2,
+                          auto_discover_min_obrot=1e6, synapsy=False)
+    loader = _DiscoveryLoader()
+    # max_barow=1 — jeden obieg wystarczy do sprawdzenia podmiany listy
+    handluj_live(kfg, max_barow=1, _loader=loader)
+    assert "PLACEHOLDER" not in kfg.symbole
+    assert "BTC/USDT:USDT" in kfg.symbole

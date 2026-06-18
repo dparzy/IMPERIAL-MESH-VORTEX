@@ -38,7 +38,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
 # Litery KATEGORII dozwolone w kodzie (legenda — jedyne źródło prawdy)
-LEGENDA_KAT = set("MTVFOLRSAKEGHmNZD")
+LEGENDA_KAT = set("MTVFOLRSAKEGHmNZDC")
 
 # Pliki docs/ które celowo NIE są w INDEKS (archiwum, pliki techniczne)
 INDEKS_WHITELIST = {
@@ -109,6 +109,17 @@ def audyt() -> tuple:
         if rp["braki_w_mapie"]:
             bledy.append(f"[W1] NEURONY_STYLU braki (neuron bez profilu stylu): {rp['braki_w_mapie']}")
         info.append(f"Profile stylu (W-323): SCALP {rp['scalp']} | SWING {rp['swing']} | INVEST {rp['invest']}")
+
+        # W-325: GUBERNATOR — neutralność (stan bazowy ≈1.0) i granice mnożnika.
+        from imperium.koloseum.gubernator import Gubernator
+        _g = Gubernator()
+        _baz = _g.ocen(konwikcja_koszyka=0.5, rozrzut_okazji=0.0, dd_frakcja=1.0, breadth=1.0)
+        if not (_g.floor <= _baz.mnoznik <= _g.ceiling):
+            bledy.append(f"[W1] Gubernator mnożnik poza [floor,ceiling]: {_baz.mnoznik}")
+        if abs(_baz.mnoznik - 1.0) > 0.15:
+            bledy.append(f"[W1] Gubernator nie-neutralny w stanie bazowym: {_baz.mnoznik} (Prawo XV)")
+        info.append(f"Gubernator (W-325): floor {_g.floor}× | ceiling {_g.ceiling}× | "
+                    f"baza {_baz.mnoznik}× ({_baz.postawa})")
 
     except Exception as e:
         bledy.append(f"[W1] Nie udało się załadować żywego roju: {e}")
@@ -495,6 +506,12 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
                 "ożywa gdy pętla portfelowa poda serie BTC)",
     "RADAR-02": "BTC_DOMINANCJA (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300)",
     "RADAR-03": "PRZEPLYW_KAPITALU (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300)",
+    "RADAR-04": "STRES_KORELACJI (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300; "
+                "ożywa gdy pętla portfelowa poda serie koszyka; detektor kaskady W-329)",
+    "RADAR-05": "LEAD_BTC (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300; "
+                "ożywa gdy pętla portfelowa poda serie koszyka; lead-lag BTC→alty W-330)",
+    "C-01":   "CROSS_RS (cross-sectional RS — pętla portfelowa wstrzykuje z-score zwrotu "
+              "vs koszyk; backtest_portfel/petla_live; bez koszyka 1 para: abstynuje, W-335)",
     "NEWS-01": "NEWS_SENTYMENT (AdapterNewsLLM — wpięty w zbuduj_bojowy W-301; "
                "ożywa z RSS fetcher lub DEEPSEEK_API_KEY; bez feedu: abstynuje)",
     "X-28":   "MTF_4H_RSI_14/MTF_1D_RSI_14 (Budowniczy MTF — ożywa gdy bary mają "
@@ -521,6 +538,9 @@ WERYFIKACJA_ADAPTEROW = {
     "RADAR-01": {"BTC_TREND": 0.9},                                       # BTC↑ → LONG-wsparcie
     "RADAR-02": {"BTC_DOMINANCJA": -0.9},                                 # alt-season → LONG-wsparcie
     "RADAR-03": {"PRZEPLYW_KAPITALU": 0.95},                              # napływ → LONG-wsparcie
+    "RADAR-04": {"STRES_KORELACJI": 0.95, "BTC_TREND": -0.5},             # kaskada + BTC↓ → SHORT
+    "RADAR-05": {"LEAD_BTC": 0.8},                                       # BTC pchnął↑ → LONG-wsparcie
+    "C-01":    {"CROSS_RS": 1.5},                                        # lider koszyka → LONG
     "NEWS-01": {"NEWS_SENTYMENT": 0.8, "NEWS_PEWNOSC": 0.9, "NEWS_N": 5},  # mocno bycze → LONG
     "X-28":   {"CLOSE": 50000.0, "RSI_14": 60.0, "EMA_21": 49000.0,
                "MTF_4H_RSI_14": 65.0, "MTF_4H_EMA_50": 47000.0,

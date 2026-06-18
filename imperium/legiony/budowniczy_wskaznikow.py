@@ -295,6 +295,8 @@ class BudowniczyWskaznikow:
             window = bary[-20:]
             w["CLOSE_SERIES_20"] = [float(b.get("close", 0)) for b in window]
             w["VOLUME_SERIES_20"] = [float(b.get("volume", 0)) for b in window]
+            # CLOSE_SERIES_60 dla CP-01 NeuronChangePoint (CUSUM change-point, W-336)
+            w["CLOSE_SERIES_60"] = [float(b.get("close", 0)) for b in bary[-60:]]
         except Exception as e:
             logger.debug(f"[Budowniczy] PATH_SERIES pominięty: {e}")
 

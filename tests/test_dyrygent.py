@@ -178,9 +178,11 @@ def test_pelny_cykl_z_zarzadzaniem_pozycja():
 
 def test_min_pewnosc_interwalu_nadpisuje_globalny():
     """FAZA B: próg per interwał ostrzejszy niż globalny blokuje wejście."""
-    # SPRZECZNE sygnały (RSI LONG vs MACD/EMA SHORT) → pewność ≈0.69 < 0.99.
+    # SPRZECZNE sygnały (RSI LONG vs MACD/EMA SHORT) → pewność < 0.99.
     # (Zgodny komplet dawał pewność 1.0 — wejście przy progu 0.99 byłoby SŁUSZNE.)
-    wsk = {"CLOSE": 100.0, "RSI_14": 22.0, "ADX_14": 30.0,
+    # W-334: progi RSI adaptacyjne — w TREND_STRONG próg wyprzedania=20, więc
+    # RSI=15 (a nie 22) gwarantuje głos LONG kontra trendowi SHORT (realny konflikt).
+    wsk = {"CLOSE": 100.0, "RSI_14": 15.0, "ADX_14": 30.0,
            "MACD_HIST": -1.5, "EMA_50": 110.0, "EMA_200": 120.0}
     legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
     engine = PaperTradingEngine(kapital_startowy=10_000, sesja_id="T")

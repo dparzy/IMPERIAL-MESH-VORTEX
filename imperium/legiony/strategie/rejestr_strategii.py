@@ -209,6 +209,39 @@ def wszystkie_strategie() -> list:
             interwaly=["M15", "1H"], rezim_preferowany="VOLATILE",
             dzwignia="2×–4×", rr="1:3", status="SZKIC",
         ),
+        # ── Legio IMV (Smart Money Concepts) — oryginalne, W-326 ──────────────
+        # POWÓD (Prawo XV — utrata potencjału): SMC-01/02/03 i VP-01 to nasza
+        # najbardziej unikalna, instytucjonalna broń, a NIE miały ŻADNEJ strategii.
+        # Reżim SMC_ACTIVE istniał w WAGI_REZIMU bez jednej strategii go celującej.
+        # Te dwie strategie „celują w dołki i górki" — strefy, gdzie kapitał odwraca rynek.
+        Strategia(
+            id="IMV-RV-006", nazwa="ŁOWCA STREF (Smart Money Zone Hunter)", legion="IMV", styl="RV",
+            warunki="Złamanie struktury (BOS/MSS) z powrotem do strefy Order Block + luka FVG "
+                    "potwierdza nierównowagę — wejście w instytucjonalnej strefie odwrotu (4H/1D)",
+            zrodlo="IMV (oryginalna) — Smart Money Concepts: ICT/Order Block + Fair Value Gap",
+            # WEJSCIE: złamanie struktury (zmiana trendu) + powrót do strefy Order Block
+            neurony_wejscie=["SMC-03", "SMC-01"],   # BOS/MSS (trigger) + Order Block (strefa)
+            # FILTR: luka wartości godziwej (nierównowaga) + VPOC (akceptacja wolumenowa) + Hurst (nie szum)
+            neurony_filtr=["SMC-02", "VP-01", "H-01"],
+            # WYJSCIE: domknięcie luki FVG (cel) / rozciągnięcie ATR (ekstremum)
+            neurony_wyjscie=["SMC-02", "X-25"],
+            interwaly=["4H", "1D"], rezim_preferowany="SMC_ACTIVE",
+            dzwignia="1×–3×", rr="1:3", status="SZKIC",
+        ),
+        Strategia(
+            id="IMV-RV-007", nazwa="ŻNIWA SZCZYTU (Peak & Trough Harvest)", legion="IMV", styl="RV",
+            warunki="Ruch klimaksowy (blow-off szczyt → SHORT / kapitulacja dołek → LONG) daleko od "
+                    "wartości (Value-Z) z powrotem do zakotwiczonego VWAP — żniwa górek i dołków (4H/1D)",
+            zrodlo="IMV (oryginalna) — climax reversal: VPOC value-area + Anchored VWAP mean-reversion",
+            # WEJSCIE: detektor klimaksu (szczyt/dołek) + cena daleko od wartości (przereagowanie)
+            neurony_wejscie=["Z-05", "X-27"],       # Klimaks (szczyt→SHORT/dołek→LONG) + Value-Z dystans
+            # FILTR: VPOC (poziom akceptacji) + zakotwiczony VWAP (kierunek powrotu do wartości)
+            neurony_filtr=["VP-01", "V-07"],
+            # WYJSCIE: powrót do AVWAP (wartość) / rozciągnięcie ATR
+            neurony_wyjscie=["V-07", "X-25"],
+            interwaly=["4H", "1D"], rezim_preferowany="VOLATILE",
+            dzwignia="1×–2×", rr="1:2.5", status="SZKIC",
+        ),
     ]
 
 

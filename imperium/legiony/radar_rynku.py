@@ -43,6 +43,7 @@ class StanRynku:
     dominacja: Optional[float] = None        # [-1,+1] siła BTC vs alty
     przeplyw: Optional[float] = None         # [0,1] breadth × wolumen
     stres_korelacji: Optional[float] = None  # [0,1] kaskada
+    lead_btc: Optional[float] = None         # [-1,+1] sygnał wyprzedzający BTC→alty
     powody: List[str] = field(default_factory=list)
 
     def jako_wskazniki(self) -> Dict[str, float]:
@@ -56,6 +57,8 @@ class StanRynku:
             out["PRZEPLYW_KAPITALU"] = self.przeplyw
         if self.stres_korelacji is not None:
             out["STRES_KORELACJI"] = self.stres_korelacji
+        if self.lead_btc is not None:
+            out["LEAD_BTC"] = self.lead_btc
         return out
 
 
@@ -147,13 +150,16 @@ class RadarRynku:
     """
 
     def __init__(self, okno_rs: int = 20, okno_breadth: int = 30,
-                 okno_korelacji: int = 30, ema_breadth: int = 20):
+                 okno_korelacji: int = 30, ema_breadth: int = 20, max_lag: int = 3):
         if okno_rs < 5 or okno_breadth < 5 or okno_korelacji < 5:
             raise ValueError("okna muszą być ≥ 5 (statystyka, nie szum)")
+        if max_lag < 0:
+            raise ValueError("max_lag ≥ 0 (0 = lead-lag wyłączony)")
         self.okno_rs = okno_rs
         self.okno_breadth = okno_breadth
         self.okno_korelacji = okno_korelacji
         self.ema_breadth = ema_breadth
+        self.max_lag = max_lag
         self._radar_btc = RadarBTC()
 
     def skanuj(self, close_btc: Sequence[float],
@@ -236,5 +242,38 @@ class RadarRynku:
                 stan.stres_korelacji = sum(kor) / len(kor)
                 if stan.stres_korelacji > 0.8:
                     stan.powody.append("KASKADA — wszystko leci razem (ryzyko)")
+
+        # 5. LEAD_BTC — sygnał wyprzedzający BTC→alty (lead-lag, Transfer Entropy W-071).
+        # Czy przeszły ruch BTC PRZEWIDUJE przyszły ruch altów? Liczymy cross-korelację
+        # zwrotów BTC opóźnionych o k vs zwroty altów; najlepszy lag → siła wyprzedzania.
+        # Świeży ruch BTC × ta siła = kierunkowy sygnał: "BTC pchnął, alty pójdą za nim".
+        zr_btc_ll = _zwroty(close_btc, self.okno_korelacji)
+        rety_alt_ll = []
+        for c in close_alty.values():
+            z = _zwroty(c, self.okno_korelacji)
+            if len(z) >= self.okno_korelacji - 1:
+                rety_alt_ll.append(z)
+        if zr_btc_ll and rety_alt_ll and self.max_lag >= 1:
+            n_ll = min(len(zr_btc_ll), min(len(z) for z in rety_alt_ll))
+            zr_btc_ll = zr_btc_ll[-n_ll:]
+            # średni zwrot altów per bar (koszyk jako jeden „alt")
+            alt_sredni = [sum(z[-n_ll:][i] for z in rety_alt_ll) / len(rety_alt_ll)
+                          for i in range(n_ll)]
+            najlepsza_kor = 0.0
+            for lag in range(1, min(self.max_lag, n_ll - 5) + 1):
+                # BTC z przeszłości (t-lag) vs alty teraz (t): BTC[:-lag] ~ alt[lag:]
+                k = _korelacja(zr_btc_ll[:-lag], alt_sredni[lag:])
+                if k is not None and abs(k) > abs(najlepsza_kor):
+                    najlepsza_kor = k
+            if abs(najlepsza_kor) >= 0.20:  # filar siły — słaby lead = brak sygnału
+                # świeży impuls BTC (ostatnie ~3 zwroty), znormalizowany przez zmienność
+                swiezy = sum(zr_btc_ll[-3:])
+                sd = (sum(r * r for r in zr_btc_ll) / len(zr_btc_ll)) ** 0.5 or 1e-9
+                impuls = math.tanh(swiezy / (3 * sd))
+                stan.lead_btc = max(-1.0, min(1.0, impuls * abs(najlepsza_kor)))
+                if abs(stan.lead_btc) > 0.25:
+                    kier = "wzrost" if stan.lead_btc > 0 else "spadek"
+                    stan.powody.append(
+                        f"LEAD BTC→alty: świeży {kier} BTC (korelacja lag {najlepsza_kor:+.2f})")
 
         return stan

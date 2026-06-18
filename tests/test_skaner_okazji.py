@@ -127,3 +127,63 @@ def test_granica_adx_dokladnie_min_przechodzi():
                      "B": _wsk(roc=0.2, adx=25.0, vol_spike=2.0)})
     symbole = {o.symbol for o in rank}
     assert "A" in symbole
+
+
+# ─── W-324: Brama Momentum Bezwzględnego (TS gate) ────────────────────────────
+
+def test_w324_domyslnie_wylaczona():
+    """min_bezwzgledny_ts=0.0 → brama TS wyłączona, zachowanie identyczne jak dotąd."""
+    s = SkanerOkazji(min_bezwzgledny_ts=0.0)
+    # Słaby ruch 0.001 (0.1%) → powinien przejść przy ADX > min_adx
+    rank = s.skanuj({
+        "A": _wsk(roc=0.001, adx=25, vol_spike=2.0),
+        "B": _wsk(roc=0.002, adx=30, vol_spike=2.0),
+    })
+    assert len(rank) == 2
+
+
+def test_w324_dead_market_zero_wejsc():
+    """W-324: martwy rynek — wszystkie |ROC| < próg → 0 okazji (suchy proch)."""
+    s = SkanerOkazji(min_bezwzgledny_ts=0.01)
+    rank = s.skanuj({
+        "A": _wsk(roc=0.003, adx=25, vol_spike=2.0),
+        "B": _wsk(roc=-0.004, adx=30, vol_spike=2.0),
+        "C": _wsk(roc=0.005, adx=28, vol_spike=1.5),
+    })
+    assert rank == [], f"Oczekiwano 0 okazji, dostano {len(rank)}"
+
+
+def test_w324_prog_dokładnie_przepuszcza():
+    """W-324: |ROC| == próg → przepuszcza (warunek < próg, nie <=)."""
+    s = SkanerOkazji(min_bezwzgledny_ts=0.01)
+    rank = s.skanuj({
+        "NA_GRANICY": _wsk(roc=0.01, adx=25, vol_spike=2.0),
+        "PONIZEJ":    _wsk(roc=0.009, adx=25, vol_spike=2.0),
+    })
+    symbole = {o.symbol for o in rank}
+    assert "NA_GRANICY" in symbole, "ROC==próg powinien przejść"
+    assert "PONIZEJ" not in symbole, "ROC<próg powinien być odsiany"
+
+
+def test_w324_selektywny_rynek():
+    """W-324: jeden mocny ruch przepuszczony, słabe odsiane."""
+    s = SkanerOkazji(min_bezwzgledny_ts=0.02)
+    rank = s.skanuj({
+        "MOCNY": _wsk(roc=0.05, adx=35, vol_spike=3.0),
+        "SLABY1": _wsk(roc=0.01, adx=25, vol_spike=2.0),
+        "SLABY2": _wsk(roc=-0.01, adx=28, vol_spike=2.0),
+    })
+    assert len(rank) == 1
+    assert rank[0].symbol == "MOCNY"
+
+
+def test_w324_krótka_pozycja_ts_gate():
+    """W-324: SHORT (ujemne ROC) też podlega bramie — |ROC| < próg → odsiany."""
+    s = SkanerOkazji(min_bezwzgledny_ts=0.03)
+    rank = s.skanuj({
+        "MOCNY_SHORT": _wsk(roc=-0.10, adx=40, vol_spike=3.0),
+        "SLABY_SHORT": _wsk(roc=-0.01, adx=30, vol_spike=2.0),
+    })
+    assert len(rank) == 1
+    assert rank[0].symbol == "MOCNY_SHORT"
+    assert rank[0].kierunek == "SHORT"

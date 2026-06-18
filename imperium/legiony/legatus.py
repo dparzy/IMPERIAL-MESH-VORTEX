@@ -64,12 +64,15 @@ class KandydatAktywa:
 #       (H-01 Hurst-DFA). Wzmacnia trend gdy persystencja, range gdy mean-reversion.
 #   Z = Zagrożenie (VPIN toksyczny przepływ — meta-brama obronna) — OŻYWIONA 2026-06-04
 #       (Z-01 ToxicFlow). Najsilniejsza w reżimach niebezpiecznych (PANIC ×2.0).
+#   C = Przekrój koszyka (Cross-sectional Relative Strength) — OŻYWIONA 2026-06-17
+#       (C-01). Najsilniejsza w trendzie (lider/maruder kontynuują) i NORMAL; w PANIC
+#       korelacje→1 (wszystko spada razem), więc RS traci moc rozróżniającą → niska waga.
 WAGI_REZIMU = {
-    "TREND_STRONG":    {"T": 1.5, "M": 1.2, "S": 1.3, "O": 0.7, "L": 0.8, "R": 0.8, "H": 1.3, "N": 1.0, "Z": 1.0, "D": 1.3},
-    "RANGING":         {"M": 1.5, "F": 1.2, "T": 0.5, "R": 1.2, "H": 1.2, "N": 1.2, "Z": 1.0, "D": 1.2},
-    "VOLATILE":        {"A": 2.0, "V": 1.5, "R": 1.3, "L": 0.3, "N": 1.3, "Z": 1.5, "D": 1.4, "_default": 0.7},
+    "TREND_STRONG":    {"T": 1.5, "M": 1.2, "S": 1.3, "O": 0.7, "L": 0.8, "R": 0.8, "H": 1.3, "N": 1.0, "Z": 1.0, "D": 1.3, "C": 1.3},
+    "RANGING":         {"M": 1.5, "F": 1.2, "T": 0.5, "R": 1.2, "H": 1.2, "N": 1.2, "Z": 1.0, "D": 1.2, "C": 0.9},
+    "VOLATILE":        {"A": 2.0, "V": 1.5, "R": 1.3, "L": 0.3, "N": 1.3, "Z": 1.5, "D": 1.4, "C": 0.7, "_default": 0.7},
     "PANIC":           {"A": 3.0, "R": 1.5, "Z": 2.0, "D": 0.5, "_default": 0.1},
-    "NORMAL":          {"R": 1.1, "H": 1.1, "N": 1.1, "Z": 1.1, "D": 1.1},
+    "NORMAL":          {"R": 1.1, "H": 1.1, "N": 1.1, "Z": 1.1, "D": 1.1, "C": 1.1},
     "ON-CHAIN_BULLISH":{"O": 2.0, "L": 0.8, "R": 1.1},
     "SMC_ACTIVE":      {"S": 2.0, "F": 1.2, "T": 1.1},
 }
@@ -365,6 +368,11 @@ class Legatus:
 
         # Interwał z danych — Timeframe-Aware dobór strategii (Prawo XV)
         interwal = bary[-1].get("interwal", "") if bary else ""
+
+        # W-334: wstrzyknij reżim do wskaźników — neurony z progami adaptacyjnymi
+        # (RSI/ADX) czytają go i przesuwają progi wg kontekstu. Klucz _REZIM
+        # prefiksowany podkreśleniem (meta-kontekst, nie wskaźnik rynkowy).
+        wskazniki["_REZIM"] = rezim
 
         sygnaly = self.roj.zbierz_sygnaly(wskazniki)
         sygnaly = sygnaly + sygnaly_exp

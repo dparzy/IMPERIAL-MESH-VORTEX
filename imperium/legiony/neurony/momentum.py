@@ -6,13 +6,15 @@ Neurony: RSI, StochRSI, MACD, BBands, ADX, EMA Cross, Williams %R, ATR Deviation
 """
 
 from imperium.legiony.mikro_neuron import MikroNeuron, SygnalNeuronu
+from imperium.legiony.progi_adaptacyjne import progi_rsi, atr_pct
 
 
 class NeuronRSI(MikroNeuron):
     """
     X-01 | RSI (14) — klasyczny momentum oscillator.
-    Progi: <30 wyprzedanie → LONG, >70 wykupienie → SHORT.
-    Ekstremalne: <20 / >80 = pewność 0.9.
+    Progi ADAPTACYJNE (W-334): dolny/górny przesuwają się wg reżimu i zmienności
+    (np. TREND_STRONG → 20/80, RANGING → 35/65). Bez kontekstu → 30/70 bazowe.
+    Strefa ekstremalna = 10 pkt poza progiem (np. próg 30 → ekstremum 20).
     """
     KLUCZ = "X-01"
     LEGION = "SCALP"
@@ -25,14 +27,24 @@ class NeuronRSI(MikroNeuron):
         if rsi is None:
             return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak RSI_14"])
 
-        if rsi <= 20:
-            return self._bazowy_sygnal(rsi, "LONG", 0.90, [f"RSI={rsi:.1f} ekstremalnie wyprzedany"])
-        if rsi <= 30:
-            return self._bazowy_sygnal(rsi, "LONG", 0.70, [f"RSI={rsi:.1f} wyprzedany"])
-        if rsi >= 80:
-            return self._bazowy_sygnal(rsi, "SHORT", 0.90, [f"RSI={rsi:.1f} ekstremalnie wykupiony"])
-        if rsi >= 70:
-            return self._bazowy_sygnal(rsi, "SHORT", 0.70, [f"RSI={rsi:.1f} wykupiony"])
+        rezim = wskazniki.get("_REZIM")
+        dolny, gorny = progi_rsi(rezim, atr_pct(wskazniki))
+        # Strefa ekstremalna: 10 pkt poza progiem (klamrowana do 1..99)
+        dolny_eks = max(1.0, dolny - 10.0)
+        gorny_eks = min(99.0, gorny + 10.0)
+
+        if rsi <= dolny_eks:
+            return self._bazowy_sygnal(rsi, "LONG", 0.90,
+                [f"RSI={rsi:.1f} ekstremalnie wyprzedany (próg {dolny_eks:.0f})"])
+        if rsi <= dolny:
+            return self._bazowy_sygnal(rsi, "LONG", 0.70,
+                [f"RSI={rsi:.1f} wyprzedany (próg {dolny:.0f})"])
+        if rsi >= gorny_eks:
+            return self._bazowy_sygnal(rsi, "SHORT", 0.90,
+                [f"RSI={rsi:.1f} ekstremalnie wykupiony (próg {gorny_eks:.0f})"])
+        if rsi >= gorny:
+            return self._bazowy_sygnal(rsi, "SHORT", 0.70,
+                [f"RSI={rsi:.1f} wykupiony (próg {gorny:.0f})"])
         if rsi > 50:
             return self._bazowy_sygnal(rsi, "LONG", 0.40, [f"RSI={rsi:.1f} lekki byk"])
         if rsi < 50:

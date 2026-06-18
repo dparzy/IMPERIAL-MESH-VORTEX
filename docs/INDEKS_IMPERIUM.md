@@ -47,7 +47,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 11 | `archiwum/ARSENAL_AMERYKI.md` | 690 linków z 50+ krajów — pełny katalog regionalny (na wyraźne polecenie) | 📦 Archiwum |
 | 11 | `SYMBIOZA_MODULOW.md` | Interakcje modułów i mapowanie narzędzi | 🔗 Link |
 | 12 | `ROADMAP_IMPERIUM.md` | Roadmapa rozwoju i wersjonowanie | 🔗 Link |
-| 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (70 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
+| 13 | `KATALOG_NEURONOW.md` | **299 mikro-neuronów** (72 w kodzie) — 4 legiony + 14 dywizji (Skan I-IV) | ✅ Aktywny |
 | 14 | `KATALOG_STRATEGII.md` | **~108+ strategii zmapowanych** (17 w kodzie) — Księga Azjatycka + Mistrzowie Świata + VSA/GEX/DeFi | ✅ Aktywny |
 | 15 | `GENERAL_LEGATUS.md` | Generał Legatus — SKANER/FOKUS, agregacja neuronów, reżimy | ✅ Aktywny |
 | 16 | `KALKULATOR_LEWARA.md` | Matematyka przeżycia — likwidacja, stop-loss, Kelly, dynamiczna dźwignia | ✅ Aktywny |
@@ -75,6 +75,9 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 39 | `TRYBY_IMPERIUM.md` | **Propozycja 5 trybów** (NAJLEPSZE/SKALP/SWING/INVEST/OBRONA) + mechanika trybu NAJLEPSZE (skaner TOP-N, W-316/317) + mapa brakujących neuronów/strategii do łowcy okazji | ✅ Aktywny |
 | 40 | `WIZJA_TRYBY_I_ROZWOJ.md` | **Wizja Cezara: tryby + rozwój** — Tryb 1 NAJLEPSZY (potok W-315..319), Tryb 2 BILANS (spot/invest), Tryb 3 przełącznik z autoryzacją, propozycja Praw XXII-XXV, tabela narzędzi prześwietlania walut (CoinGecko/GoPlus/RugCheck/DefiLlama), kolejka rozwoju (krótkie interwały) | ✅ Aktywny |
 | 41 | `ANALIZA_NEURONY_SCALP_SWING_INVEST.md` | **Porównanie 65 neuronów z best practices** (docs + internet 2026-06-15) + 6 unikatowych propozycji zdekorelowanych per styl: VPOC/Volume Profile, Amihud Illiquidity, Pi Cycle Top, Delta Divergence, Anchored VWAP, Cross-Sectional RS | ✅ Aktywny |
+| 42 | `GUBERNATOR.md` | **GUBERNATOR (W-325)** — homeostatyczny sterownik globalnej ekspozycji portfela; maszyna postaw z histerezą (KWARANTANNA→EKSPANSJA), meta-labeling López de Prado na poziomie portfela (rozrzut ocen skanera = sygnał pewności), wyniki A/B + diagnostyka | ✅ Aktywny |
+| 43 | `ODLOZONE_DECYZJE.md` | **Odłożone decyzje** — rzeczy ustalone, ale świadomie odłożone do pomiaru A/B (Prawo I): +Igrzyska domyślnie ON (czeka na A/B W-329), progi adaptacyjne W-334 (czeka na ab_w334_progi) | ✅ Aktywny |
+| 44 | `RESEARCH_NOWE_KATEGORIE_2026-06-17.md` | **Deep research 6-kątowy** (APAC/konkursy/repo/papers/patenty/książki) — kandydaci na nowe kategorie: C (cross-sectional), B (meta/bet-sizing), U (microstructure L2), IV (options-implied), P (Hawkes); narzędzia META (VI/CFI, PBO/DSR, HRP). Status: RESEARCH/plan, nie kod (Prawo XIX) | ✅ Aktywny |
 
 ---
 
@@ -86,7 +89,7 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 |---------|-----------------|-------|--------|
 | `imperium/akwedukty/` | Rurociąg danych — pobieranie świec z MEXC przez CCXT | Akwedukty (Data Pipeline) | ✅ Gotowy |
 | `imperium/fundament/` | Brama Kalkulatora — TA-Lib oblicza wskaźniki, SHA-256 podpisuje | Calculator Gate | ✅ Gotowy |
-| `imperium/legiony/` | Legiony — mikro-neurony (70), Legatus, zwiadowcy (12), strategie (18) | Scout Legions | ✅ Rdzeń aktywny |
+| `imperium/legiony/` | Legiony — mikro-neurony (74), Legatus, zwiadowcy (12), strategie (20) | Scout Legions | ✅ Rdzeń aktywny |
 | `imperium/pretorianie/` | Pretorianie — weto ryzyka, ochrona kapitału | Risk Praetorians | ✅ Gotowy |
 | `imperium/senat/` | Senat — debata Popularów vs Optymantów nad sygnałem | Senate Debate | 🟡 Szkielet |
 | `imperium/cesarz/` | Cesarz — DeepSeek LLM podejmuje ostateczną decyzję | Emperor (LLM) | 🟡 Szkielet |
@@ -175,7 +178,7 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 | **C** ✅ | AdapterCVD (Binance aggTrades public) → V-03 CVD obudzony | ✅ ZREALIZOWANA 2026-06-03 | +1 neuron (V-03 kat. F) |
 | **D** 🔵 | OC-01..04 on-chain (MVRV, SOPR, Puell, Netflow) — wymaga klucza Glassnode/CryptoQuant | ⏳ OCZEKUJE — decyzja Cezara | +4 neurony (kat. O) |
 | **LIVE** 🟠 | Paper trading na żywych danych MEXC — `MEXC_API_KEY` + `MEXC_SECRET` | ⏳ Instrukcja → `docs/PAPER_TRADING_MEXC.md` | rdzeń kompletny |
-| **E** 🔵 | Dalsze neurony z katalogu (299−70=229 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
+| **E** 🔵 | Dalsze neurony z katalogu (299−72=227 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
 **Stan kategorii (2026-06-04):** aktywne M/T/F/A/L/V/R/H/N/Z/O · wyciszone S(SMC feed)/O-API(on-chain API)
 **Neurony: 62** (58 aktywnych, 4 wyciszone) · **Strategie: 18** · **Testy: 743/743**

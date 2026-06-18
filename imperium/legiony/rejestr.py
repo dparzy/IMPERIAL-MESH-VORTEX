@@ -35,7 +35,7 @@ from imperium.legiony.neurony.trend import (
     NeuronADX, NeuronIchimoku, NeuronEMA50_200, NeuronSupertrend, NeuronDonchian,
     NeuronHMA, NeuronFibonacci, NeuronRSIDiv, NeuronOBZone,
 )
-from imperium.legiony.neurony.sesje import NeuronZegarSesji, NeuronAzjaRange, NeuronAugur, NeuronRadarBTC, NeuronDominacja, NeuronPrzeplyw
+from imperium.legiony.neurony.sesje import NeuronZegarSesji, NeuronAzjaRange, NeuronAugur, NeuronRadarBTC, NeuronDominacja, NeuronPrzeplyw, NeuronStresKorelacji, NeuronLeadBTC
 from imperium.legiony.neurony.wolumen import (
     NeuronOBV, NeuronVWAP, NeuronCVD, NeuronVolumeAnomaly, NeuronRVOL,
     NeuronForceIndex, NeuronDeltaDivergence, NeuronAnchoredVWAP,
@@ -68,6 +68,12 @@ from imperium.legiony.neurony.zagrozenie import (
 )
 from imperium.legiony.neurony.geometria import (
     NeuronPathSignature,
+)
+from imperium.legiony.neurony.przekroj import (
+    NeuronRelativeStrength,
+)
+from imperium.legiony.neurony.rezim_zmiana import (
+    NeuronChangePoint,
 )
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
@@ -103,7 +109,7 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronDeltaDivergence(), NeuronAnchoredVWAP(),
         # Zegary rynku (SES — Faza C, W-286)
         NeuronZegarSesji(), NeuronAzjaRange(), NeuronAugur(), NeuronRadarBTC(),
-        NeuronDominacja(), NeuronPrzeplyw(),
+        NeuronDominacja(), NeuronPrzeplyw(), NeuronStresKorelacji(), NeuronLeadBTC(),
         # Struktura (SMC/VSA)
         NeuronOrderBlock(), NeuronFVG(), NeuronBOS(), NeuronVSA(),
         # Volume Profile / VPOC (S, VP-01) — S/R z wolumenu, swing OHLCV (W-322, Dalton BIB-013)
@@ -132,6 +138,10 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronAmihudIlliquidity(), NeuronPiCycleTop(),
         # Geometria ścieżki (D) — Lévy Area Close×Volume, Rough Path Theory (W-079)
         NeuronPathSignature(),
+        # Przekrój koszyka (C) — Cross-sectional Relative Strength (C-01, W-335)
+        NeuronRelativeStrength(),
+        # Zmiana reżimu (R) — CUSUM change-point, przełom strukturalny (CP-01, W-336)
+        NeuronChangePoint(),
     ]
 
 
@@ -290,13 +300,17 @@ NEURONY_STYLU: dict = {
     "OC-01": _INV, "OC-02": _INV, "OC-03": _INV, "OC-04": _INV, "OC-05": _U,
     # Reżim/Sentyment (R) — futures/Fear&Greed/RADAR/news/augur: kontekst na każdym TF
     "PSY-01": _U, "PSY-02": _U, "PSY-03": _U, "PSY-04": _U,
-    "RADAR-01": _U, "RADAR-02": _U, "RADAR-03": _U, "AUG-01": _U, "NEWS-01": _U,
+    "RADAR-01": _U, "RADAR-02": _U, "RADAR-03": _U, "RADAR-04": _U, "RADAR-05": _U, "AUG-01": _U, "NEWS-01": _U,
     # Meta-bramy reżimu/chaosu (H/N/V/D/L) — klasyfikują każdy interwał
     "H-01": _U, "N-01": _U, "V-13": _U, "V-14": _U, "D-01": _U, "L-14": _U, "VI-13": _U,
     # Anty-manipulacja (A) — uniwersalna obrona
     "A-01": _U, "A-02": _U, "A-03": _U, "A-05": _U,
     # Zagrożenie (Z) — bezpieczniki uniwersalne; Pi Cycle (Z-07) to cykl dzienny → tylko INVEST
     "Z-01": _U, "Z-02": _U, "Z-03": _U, "Z-04": _U, "Z-05": _U, "Z-06": _U, "Z-07": _INV,
+    # Przekrój koszyka (C) — Cross-sectional RS, uniwersalny (zależy od koszyka, nie TF)
+    "C-01": _U,
+    # Zmiana reżimu (R) — CUSUM change-point, uniwersalny na każdym interwale
+    "CP-01": _U,
 }
 
 

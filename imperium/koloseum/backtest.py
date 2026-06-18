@@ -248,6 +248,7 @@ def backtest_portfel(
     tryb_skaner: bool = False,
     skaner_top_n: int = 3,
     skaner_min_adx: float = 20.0,
+    skaner_min_ts: float = 0.0,      # W-324: brama TS (0=wył.); np. 0.01 = ≥1% ruchu
     # W-318 Sizing Przekonania — w trybie skanera mnoży budżet pozycji przez siłę
     # okazji (mocniejsza okazja = większa stawka). Bez tego sama selekcja przycina
     # gruby ogon. Domyślnie OFF.
@@ -256,6 +257,11 @@ def backtest_portfel(
     # nie od kapitału startowego. Zysk reinwestowany w większe pozycje (wzrost
     # geometryczny). Domyślnie OFF (stały sizing = liniowy wzrost, łatwiejsza ocena edge).
     compounding: bool = False,
+    # W-325 GUBERNATOR — homeostatyczny sterownik globalnej ekspozycji portfela.
+    # Po skanerze i bezpieczniku DD dokłada JEDEN globalny mnożnik [floor,ceiling]
+    # z agregatu koszyka (pewność top-okazji × wyrazistość lidera × stan DD). Płynna
+    # histereza postaw. Domyślnie OFF (neutralny ≈1.0 w stanie bazowym, Prawo XV).
+    gubernator: bool = False,
     # W-323 Profil Stylu — gdy podany (SCALP/SWING/INVEST), każdy Legatus dostaje
     # DEDYKOWANY zestaw neuronów (neurony_dla_trybu), nie pełne 70. None = pełny rój.
     styl: "Optional[str]" = None,
@@ -310,8 +316,10 @@ def backtest_portfel(
     import bisect as _bs
     from imperium.legiony.radar_rynku import (RadarRynku, frakcja_korelacyjna,
                                               rezim_risk_off)
+    from imperium.legiony.przekroj_koszyka import cross_sectional_rs as _cross_sectional_rs
     _radar = RadarRynku()
     _RADAR_OGON = 200   # ogon serii wystarczający dla wszystkich okien radaru
+    _RS_LOOKBACK = 24   # okno zwrotu dla cross-sectional RS (~4 dni na 4h)
     _btc_sym = next((s for s in bary_per if s.upper().startswith("BTC")), None)
     # Precompute per-symbol serie (close/vol/ts) raz — tnie się bisectem co tyk.
     _close = {s: [float(x["close"]) for x in b] for s, b in bary_per.items()}
@@ -376,8 +384,14 @@ def backtest_portfel(
 
     # W-317 TRYB NAJLEPSZE: skaner okazji + cache snapshotów wskaźników per symbol.
     # Snapshot symbolu aktualizujemy tylko na JEGO tyku (świeży bar) → ranking O(N)/tyk.
-    skaner = SkanerOkazji(min_adx=skaner_min_adx) if tryb_skaner else None
+    skaner = SkanerOkazji(min_adx=skaner_min_adx, min_bezwzgledny_ts=skaner_min_ts) if tryb_skaner else None
     sizer = SizingPrzekonania() if (tryb_skaner and sizing_przekonania) else None
+    # W-325 GUBERNATOR — jeden sterownik na CAŁY portfel (nie per-para). Karmiony
+    # agregatem rankingu skanera w każdym tyku; działa tylko w trybie skanera.
+    gub = None
+    if gubernator and tryb_skaner:
+        from imperium.koloseum.gubernator import Gubernator, rozrzut_ocen
+        gub = Gubernator()
     snapshot_per: "Dict[str, Dict[str, Any]]" = {}
     for ts, sym, i in os_czasu:
         bary = bary_per[sym]
@@ -429,12 +443,29 @@ def backtest_portfel(
                 risk_off, _ = rezim_risk_off(stan)
                 if risk_off:
                     continue   # świadoma cisza (Prawo XV) — nie wchodzimy w lawinę
+
+        # C-01 CROSS-SECTIONAL RS (W-335): z-score zwrotu tego symbolu vs koszyk, do ts
+        # (przyczynowo). Tylko ogon (lookback+1) per symbol → O(lookback)/tyk. Neuron
+        # C-01 czyta CROSS_RS z kontekst_dodatkowy. Wstawione PO radarze (radar nadpisuje
+        # kontekst), by RS nie zginął.
+        if len(bary_per) >= 2:
+            close_koszyk = {}
+            for s in bary_per:
+                k = _bs.bisect_right(_ts_arr[s], ts)
+                if k >= 1:
+                    lo = max(0, k - _RS_LOOKBACK - 1)
+                    close_koszyk[s] = _close[s][lo:k]
+            rs_map = _cross_sectional_rs(close_koszyk, lookback=_RS_LOOKBACK)
+            if sym in rs_map:
+                dyrygenci[sym].kontekst_dodatkowy["CROSS_RS"] = rs_map[sym]
+
         okno_barow = bary[i - okno: i + 1]
 
         # W-317 TRYB NAJLEPSZE: zaktualizuj snapshot tego symbolu i sprawdź, czy jest
         # w TOP-N okazji koszyka. Jeśli NIE — brak nowego wejścia (exity już zrobione
         # w przetworz_bar). To zmienia system z „N botów" w „łowcę najlepszych okazji".
         conviction_mult = 1.0
+        gub_mult = 1.0
         if skaner is not None:
             snapshot_per[sym] = budowniczy.zbuduj(okno_barow)
             ranking = skaner.skanuj(snapshot_per)
@@ -443,18 +474,31 @@ def backtest_portfel(
                 continue   # nie w TOP-N → nie polujemy na tę okazję teraz
             # W-318: większa stawka na mocniejszej okazji (przekonanie = score znormalizowany
             # min-max w całym rankingu koszyka w tym tyku). Bez tego selekcja przycina ogon.
+            scores = [o.score for o in ranking] if ranking else []
             if sizer is not None and len(ranking) >= 2:
-                scores = [o.score for o in ranking]
                 smin, smax = min(scores), max(scores)
                 this = next(o.score for o in top if o.symbol == sym)
                 conv = (this - smin) / (smax - smin) if smax > smin else 1.0
                 conviction_mult = sizer.mnoznik(conv)
+            # W-325 GUBERNATOR: globalny mnożnik z agregatu koszyka (pewność lidera ×
+            # wyrazistość rankingu × stan DD). Jeden ster na całą flotę, płynna histereza.
+            if gub is not None and scores:
+                # Konwikcja = BEZWZGLĘDNA siła lidera (score sumy z-score'ów, lider=ranking[0]),
+                # squashowana do [0,1]: score≥3 (mocny setup) → pełna pewność. Nie min-max
+                # (lider zawsze=1.0 — zdegenerowane), lecz absolutna jakość najlepszej okazji.
+                konw = max(0.0, min(1.0, ranking[0].score / 3.0))
+                stan_g = gub.ocen(konwikcja_koszyka=konw,
+                                  rozrzut_okazji=rozrzut_ocen(scores),
+                                  dd_frakcja=frakcja_breaker,
+                                  breadth=len(ranking) / max(1, n))
+                gub_mult = stan_g.mnoznik
 
-        # Sizing par: budżet × frakcja DD-control × ster korelacyjny × przekonanie.
+        # Sizing par: budżet × frakcja DD-control × ster korelacyjny × przekonanie × gubernator.
         # W-319 compounding: baza = bieżące equity (pula łupów) zamiast kapitału startowego.
         baza_kapitalu = engine.kapital_calkowity if compounding else kapital_startowy
         dyrygenci[sym].kapital_sizing = (baza_kapitalu * wagi_akt[sym]
-                                         * frakcja_breaker * frakcja_stres * conviction_mult)
+                                         * frakcja_breaker * frakcja_stres
+                                         * conviction_mult * gub_mult)
         dyrygenci[sym].cykl(sym, okno_barow, rezim=rezim_arg, timestamp=ts)
 
     # Domknij otwarte po ostatniej cenie każdej pary

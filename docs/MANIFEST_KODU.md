@@ -6,8 +6,8 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-16 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 70 neuronów (zarejestrowane w roju) + 12 zwiadowców = **82 modułów w kodzie**
-**Aktywne / wyciszone:** 66 aktywnych + 4 wyciszone, z czego:
+**Zaimplementowane:** 74 neuronów (zarejestrowane w roju) + 12 zwiadowców = **86 modułów w kodzie**
+**Aktywne / wyciszone:** 70 aktywnych + 4 wyciszone, z czego:
   • **51 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
@@ -122,6 +122,8 @@
 | RADAR-01 | NeuronRadarBTC 💎 | R | 6 | ✅ aktywny (RadarRynku) | BTC_TREND (W-291/292, lead-lag) | — |
 | RADAR-02 | NeuronDominacja 💎 | R | 5 | ✅ aktywny (RadarRynku) | BTC_DOMINANCJA (W-292, przepływ kapitału) | — |
 | RADAR-03 | NeuronPrzeplyw 💎 | R | 5 | ✅ aktywny (RadarRynku) | PRZEPLYW_KAPITALU (W-292, breadth×wolumen) | — |
+| RADAR-04 | NeuronStresKorelacji 💎 | Z | 6 | ✅ aktywny (RadarRynku) | STRES_KORELACJI (W-329, detektor kaskady — kierunek z BTC_TREND) | — |
+| RADAR-05 | NeuronLeadBTC 💎 | R | 5 | ✅ aktywny (RadarRynku) | LEAD_BTC (W-330, lead-lag BTC→alty — timing wejść) | — |
 
 ### Plik: `neurony/psychologia.py`
 
@@ -170,6 +172,8 @@
 | Z-06 | NeuronAmihudIlliquidity | Z | 6 | ✅ aktywny (meta-brama) | AMIHUD_20 | Amihud illiquidity — impakt cenowy/krucha płynność, tłumi rój (W-322) |
 | Z-07 | NeuronPiCycleTop | Z | 6 | ✅ aktywny | PI_111 | Pi Cycle Top — SMA-111 vs 2×SMA-350, kill-switch szczytu cyklu, INVEST 1D (W-322) |
 | D-01 | NeuronPathSignature | D | 7 | ✅ aktywny 🎖️ | CLOSE_SERIES_20 | Lévy Area Close×Volume — geometria ścieżki (W-079) |
+| C-01 | NeuronRelativeStrength | C | 6 | ✅ aktywny (pętla portfelowa) | CROSS_RS | Cross-sectional Relative Strength — z-score zwrotu vs koszyk (W-335, nowa kategoria C) |
+| CP-01 | NeuronChangePoint | R | 6 | ✅ aktywny | CLOSE_SERIES_60 | CUSUM change-point — przełom strukturalny reżimu (W-336, Page 1954 / AFML Ch17) |
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
 > PANIC ×3.0) były pre-zarejestrowane — teraz mają realne neurony. Prawo XV.
@@ -313,6 +317,7 @@
 | Adaptery testowe (OnChain/Futures/CVD mock) | `akwedukty/adaptery/testowy.py` | ✅ aktywny (mock) |
 | AdapterFearGreed (PSY-03, alternative.me) | `akwedukty/adaptery/feargreed.py` | ✅ aktywny (realne API) |
 | AdapterFutures (PSY-01/02/04, Binance fapi publiczne) | `akwedukty/adaptery/futures.py` | ✅ aktywny (realne API, bez klucza) |
+| AdapterMEXCFutures (PSY-01/04, MEXC contract publiczne — funding rodzimy dla LIVE) | `akwedukty/adaptery/mexc_futures.py` | ✅ aktywny (realne API, bez klucza, W-327) |
 | AdapterCVD (V-03, Binance aggTrades publiczne) | `akwedukty/adaptery/cvd.py` | ✅ aktywny (realne API, bez klucza) |
 | **Monte Carlo Robustness** (W-293 — shuffle+bootstrap: P(Sharpe>0), MaxDD_p95 CI; inspiracja: Jesse) | `koloseum/monte_carlo.py` | ✅ aktywny |
 | **Optymalizator DSR-guided** (W-294 — Latin Hypercube Search + DSR jako cel; karze selection bias; 0 zależności) | `koloseum/optymalizator.py` | ✅ aktywny |
@@ -349,16 +354,19 @@
 |---------|------|------|
 | `Strategia` (model) | `strategie/baza.py` | przepis: które neurony, w jakiej roli (wejście/filtr/wyjście) |
 | `dobierz_najlepsze()` | `strategie/baza.py` | silnik: sygnały → top-3 pasujące strategie + kierunek |
-| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 18 strategii zmapowanych na ŻYWE klucze kodu |
+| `wszystkie_strategie()` | `strategie/rejestr_strategii.py` | 20 strategii zmapowanych na ŻYWE klucze kodu |
 | **Wpięcie w Legatusa** | `legiony/legatus.py` | `RaportLegatusa.strategie_dopasowane` — Generał zwraca dobrane strategie w każdym raporcie |
 
 **Klucznik (strażnik spójności):** audyt Warstwa 4 (`narzedzia/audyt_spojnosci.py`)
 pilnuje, że KAŻDY klucz w strategii istnieje w kodzie i jest aktywny — żadnych
 neuronów-widm. Test: `test_klucznik_strategie_uzywaja_istniejacych_neuronow`.
 
-**Stan:** 18 strategii (klucze: 26 — wszystkie aktywne). Status każdej: SZKIC
-(czeka na kalibrację w Koloseum). Strategie z katalogu wymagające nieistniejących
-neuronów (OrderFlow, CVD, SMC, on-chain) wejdą gdy te neurony ożyją.
+**Stan:** 20 strategii (klucze: 34 — wszystkie aktywne). Status każdej: SZKIC
+(czeka na kalibrację w Koloseum). W-326: dodano 2 oryginalne strategie SMC
+(IMV-RV-006 ŁOWCA STREF, IMV-RV-007 ŻNIWA SZCZYTU) — pierwsze wykorzystujące
+naszą unikalną broń SMC-01/02/03 + VP-01 i pierwsze celujące reżim SMC_ACTIVE
+(był martwy w WAGI_REZIMU bez strategii — Prawo XV). Pozostałe strategie z katalogu
+wymagające nieistniejących neuronów (OrderFlow, CVD pełny) wejdą gdy te ożyją.
 
 ---
 

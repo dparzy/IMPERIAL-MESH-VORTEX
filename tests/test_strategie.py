@@ -76,6 +76,49 @@ def test_strategie_vi_lv_dobierane_w_volatile():
         "VI-LV-001 powinna pasować przy ekstremalnym fundingu w VOLATILE/1H"
 
 
+def test_strategie_smc_imv_obecne():
+    """W-326: oryginalne strategie SMC (Łowca Stref, Żniwa Szczytu) w rejestrze."""
+    strategie = {s.id: s for s in wszystkie_strategie()}
+    assert "IMV-RV-006" in strategie, "Brak IMV-RV-006 (Łowca Stref)"
+    assert "IMV-RV-007" in strategie, "Brak IMV-RV-007 (Żniwa Szczytu)"
+    # Łowca Stref używa naszej unikalnej broni SMC + VPOC
+    k1 = strategie["IMV-RV-006"].wszystkie_klucze()
+    assert {"SMC-01", "SMC-02", "SMC-03", "VP-01"} <= k1, "Łowca Stref musi używać SMC + VPOC"
+    # Żniwa Szczytu celuje w klimaks (górki/dołki) + powrót do wartości
+    k2 = strategie["IMV-RV-007"].wszystkie_klucze()
+    assert {"Z-05", "VP-01", "V-07"} <= k2, "Żniwa Szczytu: Klimaks + VPOC + AVWAP"
+
+
+def test_smc_active_rezim_pokryty():
+    """W-326 (Prawo XV): reżim SMC_ACTIVE ma co najmniej jedną strategię (był martwy)."""
+    rezimy = {s.rezim_preferowany for s in wszystkie_strategie()}
+    assert "SMC_ACTIVE" in rezimy, "Reżim SMC_ACTIVE bez strategii = utrata potencjału"
+
+
+def test_lowca_stref_dobierany_w_smc_active_long():
+    """IMV-RV-006 łapie dołek: BOS↑ + OrderBlock LONG w SMC_ACTIVE (4H) → dołki."""
+    sygnaly = {s.neuron_id: s for s in [
+        _syg("SMC-03", "LONG", 0.85), _syg("SMC-01", "LONG", 0.80),
+        _syg("SMC-02", "LONG", 0.7), _syg("VP-01", "LONG", 0.65), _syg("H-01", "LONG", 0.6),
+    ]}
+    top = dobierz_najlepsze(wszystkie_strategie(), sygnaly,
+                            rezim="SMC_ACTIVE", top=5, interwal="4H")
+    assert any(d.strategia.id == "IMV-RV-006" and d.kierunek == "LONG" for d in top), \
+        "IMV-RV-006 powinna łapać dołek (LONG) w SMC_ACTIVE/4H"
+
+
+def test_zniwa_szczytu_dobierane_short_gora():
+    """IMV-RV-007 łapie górkę: Klimaks SHORT (blow-off) + Value-Z daleko w VOLATILE (4H)."""
+    sygnaly = {s.neuron_id: s for s in [
+        _syg("Z-05", "SHORT", 0.85), _syg("X-27", "SHORT", 0.80),
+        _syg("VP-01", "SHORT", 0.7), _syg("V-07", "SHORT", 0.65),
+    ]}
+    top = dobierz_najlepsze(wszystkie_strategie(), sygnaly,
+                            rezim="VOLATILE", top=5, interwal="4H")
+    assert any(d.strategia.id == "IMV-RV-007" and d.kierunek == "SHORT" for d in top), \
+        "IMV-RV-007 powinna łapać górkę (SHORT) klimaksu w VOLATILE/4H"
+
+
 def test_strategia_trojekran_eldera_obecna():
     """BIB-015: Triple Screen Eldera w rejestrze, używa Force Index V-05."""
     strategie = {s.id: s for s in wszystkie_strategie()}

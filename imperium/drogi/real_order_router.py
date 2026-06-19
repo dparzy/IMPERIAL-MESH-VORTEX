@@ -80,6 +80,9 @@ class RealOrderRouter(PaperTradingEngine):
         exchange=None,
         tryb_pozycji: str = "swap",
         dry_run: bool = False,
+        sledz_oms: bool = False,
+        oms_max_prob: int = 3,
+        oms_backoff_s: float = 0.0,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -91,6 +94,15 @@ class RealOrderRouter(PaperTradingEngine):
         self._dry_run_zlecenia: list = []  # log co BY wysłano (audyt)
         # pozycja_id → (symbol, qty_base, exchange_order_id)
         self._pozycje_real: Dict[str, Dict] = {}
+        # W-344 OMS (opt-in): jawna maszyna stanów cyklu życia zlecenia +
+        # retry z backoffem + akumulacja partial-fill. submit_fn=_oms_submit czyta
+        # args z klient_meta. None = stare zachowanie (bezpośredni _zloz_zlecenie).
+        self.oms = None
+        if sledz_oms:
+            from imperium.drogi.oms import ZarzadcaZlecen
+            self.oms = ZarzadcaZlecen(submit_fn=self._oms_submit,
+                                      max_prob=oms_max_prob,
+                                      backoff_bazowy_s=oms_backoff_s)
         if dry_run:
             logger.warning(
                 "[DRY-RUN] Tryb sucho-bieżny: zlecenia NIE są wysyłane na MEXC, "
@@ -120,6 +132,47 @@ class RealOrderRouter(PaperTradingEngine):
             symbol=symbol, type="market", side=side, amount=qty, params=params,
         )
 
+    # ── OMS: składanie śledzone maszyną stanów (W-344) ─────────────────────────
+
+    def _oms_submit(self, zlecenie) -> Dict:
+        """submit_fn dla OMS: czyta args z klient_meta, woła _zloz_zlecenie,
+        zapisuje wynik z powrotem do klient_meta (Prawo I — fakt z giełdy)."""
+        m = zlecenie.klient_meta
+        order = self._zloz_zlecenie(m["symbol"], m["side"], zlecenie.ilosc, m["params"])
+        m["_order"] = order
+        return order
+
+    def _zloz_sledzone(self, symbol: str, side: str, qty: float,
+                       params: Dict, rola: str) -> Dict:
+        """
+        Składa zlecenie przez OMS (gdy aktywny): tworzy Zlecenie, zloz() z retry,
+        rejestruje wypełnienie z odpowiedzi giełdy. Gdy OMS wyłączony → bezpośredni
+        _zloz_zlecenie (stare zachowanie, zero zmiany). Zwraca dict zlecenia giełdy.
+        """
+        if self.oms is None:
+            return self._zloz_zlecenie(symbol, side, qty, params)
+        from imperium.drogi.oms import Strona
+        strona = Strona.KUP if side == "buy" else Strona.SPRZEDAJ
+        z = self.oms.utworz(symbol, strona, qty, klient_meta={
+            "symbol": symbol, "side": side, "params": dict(params), "rola": rola,
+        })
+        ok = self.oms.zloz(z)  # owija _oms_submit w retry+maszynę stanów
+        order = z.klient_meta.get("_order", {})
+        if ok:
+            filled = order.get("filled")
+            filled = qty if filled is None else min(float(filled), qty)
+            cena = order.get("average") or order.get("price") or 0.0
+            if filled > 0 and cena:
+                try:
+                    self.oms.zarejestruj_wypelnienie(z.zlecenie_id, filled, float(cena))
+                except Exception as e:  # noqa: BLE001 — tracking nie blokuje egzekucji
+                    logger.warning("[OMS] fill %s pominięty: %s", z.zlecenie_id, e)
+        return order
+
+    def raport_oms(self) -> Optional[Dict]:
+        """Diagnostyka stanów zleceń OMS. None gdy OMS wyłączony."""
+        return self.oms.raport() if self.oms is not None else None
+
     # ── Wejście ───────────────────────────────────────────────────────────────
 
     def wejdz(
@@ -134,11 +187,12 @@ class RealOrderRouter(PaperTradingEngine):
         qty = round(sygnal.rozmiar_usdt / max(sygnal.cena_wejscia, 1e-12), 6)
 
         try:
-            order = self._zloz_zlecenie(
+            order = self._zloz_sledzone(
                 symbol=sygnal.symbol,
                 side=side,
                 qty=qty,
                 params={"leverage": int(sygnal.dzwignia)},
+                rola="WEJSCIE",
             )
             oid = order.get("id", "?")
             self._pozycje_real[poz.pozycja_id] = {
@@ -179,11 +233,12 @@ class RealOrderRouter(PaperTradingEngine):
         qty = real["qty"]
 
         try:
-            order = self._zloz_zlecenie(
+            order = self._zloz_sledzone(
                 symbol=poz_przed.symbol,
                 side=side,
                 qty=qty,
                 params={"reduceOnly": True},
+                rola="WYJSCIE",
             )
             oid = order.get("id", "?")
             logger.info(

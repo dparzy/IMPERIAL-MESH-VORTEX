@@ -25,12 +25,17 @@ Nielegalne przejście = wyjątek (Prawo I), nie cisza. Klasy: `StanZlecenia`,
   • Tryb paper (submit_fn=None, domyślny) = od razu ZLOZONE bez sieci; realny = owija
     `RealOrderRouter._zloz_zlecenie` w retry+maszynę stanów (parity backtest=live).
 
-**Bezpieczeństwo:** zero realnego kapitału — pure-Python, testowany mockiem.
-Gotowy do wpięcia w `RealOrderRouter` (Faza egzekucji), domyślnie nieaktywny.
+**Wpięcie (Prawo XV — bez osieroconego modułu):** `RealOrderRouter` dostał opt-in
+`sledz_oms=True` → każde wejście/wyjście idzie przez `_zloz_sledzone()` (OMS owija
+`_zloz_zlecenie` w retry+maszynę stanów, rejestruje fill z odpowiedzi giełdy).
+Domyślnie OFF = stare zachowanie bez zmian. `raport_oms()` = diagnostyka stanów.
 
-**Testy:** +30 (`tests/test_oms.py`) — nacisk na granice: nielegalne przejścia,
-0/over-fill, dokładne domknięcie do zera, wyczerpanie retry, reconciliacja rozjazdu.
-**1372 → 1402/1402 zielone.** Audyt: pełna harmonia.
+**Bezpieczeństwo:** zero realnego kapitału — pure-Python, testowany mockiem.
+Retry re-submituje tylko po wyjątku (zlecenie nieprzyjęte); idempotency-key (client
+order ID) to przyszłe wzmocnienie pełnej ochrony przed double-submit.
+
+**Testy:** +30 (`tests/test_oms.py`) granice OMS + 5 integracji (`test_real_order_router.py`).
+**1372 → 1407/1407 zielone.** Audyt: pełna harmonia.
 
 ---
 

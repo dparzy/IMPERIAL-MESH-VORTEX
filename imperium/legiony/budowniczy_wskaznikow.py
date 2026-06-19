@@ -84,6 +84,7 @@ _PLAN_SKALARNE = {
     "DEADCAT_SETUP":    ("DEADCAT_SETUP", ("high", "low", "close", "volume"), {"lookback": 6}),
     "WASH_SCORE_100": ("WASH_TRADING", ("volume",), {"period": 100}),
     "CHOPPINESS_14": ("CHOPPINESS", ("high", "low", "close"), {"period": 14}),
+    "KAUFMAN_ER_10": ("KAUFMAN_ER", ("close",), {"period": 10}),
     "ULCER_14":      ("ULCER", ("close",), {"period": 14}),
     "VWAP":          ("VWAP", ("high", "low", "close", "volume"), {}),
     "VWAP_STD":      ("VWAP_STD", ("high", "low", "close", "volume"), {}),

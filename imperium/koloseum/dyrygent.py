@@ -824,7 +824,7 @@ class Dyrygent:
             vi_plus_14=wskazniki.get("DI_PLUS") or 0.5,
             vi_minus_14=wskazniki.get("DI_MINUS") or 0.5,
             choppiness_14=wskazniki.get("CHOPPINESS_14") or 50.0,
-            kaufman_er=0.5,   # nie liczony przez Budowniczego → neutral default
+            kaufman_er=wskazniki.get("KAUFMAN_ER_10") or 0.5,   # W-353: liczony przez Budowniczego (rdzeń KAMA)
             legatus_rezim=rezim,
         ))
 

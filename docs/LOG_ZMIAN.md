@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-06-19 | W-353 | Kaufman Efficiency Ratio — ożywienie martwego głosu Fulmena (Prawo XV)
+
+**Pochodzenie:** lektura książki "High Win Rate Day Trading Setups" (INF-33/BIB-021,
+ocena 3/10 — detaliczny katalog skryptów TradingView, ~80% pokrycia z rojem). Rozdział
+o KAMA (Kaufman Adaptive MA) naprowadził na audyt: gdzie używamy Efficiency Ratio?
+
+**Diagnoza (dowód, nie zgadywanie):** Doradca **Fulmen** (ortogonalna weryfikacja reżimu)
+w `ocen()` używa `kaufman_er > ER_EFEKTYWNY (0.6)` jako JEDNEGO Z TRZECH warunków
+potwierdzenia TRENDU (obok ADX i Choppiness). Ale `Dyrygent._zbuduj_rade()` przekazywał
+`kaufman_er=0.5` na sztywno z komentarzem *"nie liczony przez Budowniczego → neutral default"*.
+Efekt: **1/3 logiki trendu Fulmena była trwale martwa** (wąskie gardło, Prawo XV) — ER nigdy
+nie mógł przekroczyć progu 0.6, więc nigdy nie współpotwierdzał trendu.
+
+**Wdrożenie:**
+- `brama_kalkulatora.py`: nowa funkcja `_py_kaufman_er(close, period=10)` — ER = |zmiana netto| / Σ|ruchy brutto|, zakres [0,1]. Rejestracja `KAUFMAN_ER` + dopis do `_PURE_PYTHON_INDICATORS` (uczciwa pieczątka źródła, Prawo XIII).
+- `budowniczy_wskaznikow.py`: `KAUFMAN_ER_10` w planie skalarnym (period=10).
+- `dyrygent.py`: `kaufman_er=wskazniki.get("KAUFMAN_ER_10") or 0.5` — martwy głos ożył.
+
+**Testy granic (6 nowych, reguła Test-Granic):**
+- trend liniowy → ER=1.0 | piła (zero netto) → 0.0 | płasko → 0.0 (NIE dzielenie przez zero)
+- < period+1 barów → None (Prawo XV) | realna zaszumiona seria → ER∈[0,1]
+- symbioza: Budowniczy faktycznie produkuje `KAUFMAN_ER_10`
+
+**Decyzja o reszcie książki (Prawo XVI):** MFI już skatalogowany (INF-18, W-101..W-106) —
+nie dublujemy. Pozostałe wskaźniki redundantne z rojem. Liczba neuronów bez zmian (78).
+
+**Wynik testów:** 1472/1472 ✅ | ruff ✅ | audyt exit 0 ✅ | Pliki: `brama_kalkulatora.py`, `budowniczy_wskaznikow.py`, `dyrygent.py`, `test_neurony.py`, `REJESTR_INSPIRACJI.md`
+
+---
+
 ## 2026-06-19 | W-352 | Persystencja uczenia — MWU/Igrzyska/Synapsy pamiętają między sesjami
 
 **Diagnoza:** Wszystkie trzy mechanizmy uczenia (HedgeMWU, Igrzyska, SynapsyRezimowe) działały

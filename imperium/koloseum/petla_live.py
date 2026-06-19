@@ -96,6 +96,10 @@ class KonfigPetliLive:
     sciezka_mwu: Optional[str] = "logs/mwu_stan.json"
     sciezka_igrzyska: Optional[str] = "logs/igrzyska_stan.json"
     sciezka_synapsy: Optional[str] = "logs/synapsy_{sym}.json"  # {sym} → symbol
+    # W-354: TradingView Webhook Receiver. True = uruchom POST /webhook/tv obok dashboardu.
+    # Wymaga dashboard=True (serwer HTTP musi być uruchomiony).
+    # Sekret: WEBHOOK_TV_SEKRET w env (Prawo bezpieczeństwa — nigdy w kodzie/configu).
+    webhook_tv: bool = False
 
 
 @dataclass
@@ -313,9 +317,15 @@ def handluj_live(
         if not telegram.aktywny:
             logger.warning("[PętlaLive] TelegramAlert wyłączony — brak TELEGRAM_BOT_TOKEN/CHAT_ID")
     serwer_web = None
+    odbiornik_tv = None
     if getattr(cfg, "dashboard", False):
         from imperium.swiatynie.web_dashboard import SerwerDashboard
         serwer_web = SerwerDashboard(port=getattr(cfg, "dashboard_port", 8777))
+        if getattr(cfg, "webhook_tv", False):
+            from imperium.swiatynie.webhook_tradingview import OdbiornikWebhook
+            odbiornik_tv = OdbiornikWebhook()
+            serwer_web.podepnij_webhook(odbiornik_tv)
+            logger.info("[PętlaLive] W-354 Webhook TV aktywny → POST /webhook/tv")
         serwer_web.start()
 
     # W-310: domknięcie pętli pamięci — bootstrap KsięgiWad z PERSYSTENTNYCH lekcji
@@ -350,6 +360,35 @@ def handluj_live(
                     bary_per[sym] = _df_do_barow(df, sym, cfg.interwal)
                 except Exception as e:
                     logger.warning(f"[PętlaLive] Fetch {sym} padł: {e}")
+
+            # 1b. W-354 Webhook TV — dołącz alerty z TradingView do bary_per.
+            # Alert = jeden nowy bar → appendujemy na koniec historii danego symbolu.
+            if odbiornik_tv is not None:
+                for alert in odbiornik_tv.pobierz_wszystkie():
+                    sym_tv = alert.symbol
+                    bar_tv = alert.jako_bar()
+                    bar_tv["symbol"] = sym_tv
+                    bar_tv["interwal"] = alert.interwal
+                    # timestamp z alertu lub now
+                    try:
+                        ts_tv = int(float(alert.czas)) if alert.czas else int(time.time() * 1000)
+                    except (ValueError, TypeError):
+                        import datetime as _dt
+                        try:
+                            ts_tv = int(_dt.datetime.fromisoformat(alert.czas.replace("Z", "+00:00")).timestamp() * 1000)
+                        except Exception:
+                            ts_tv = int(time.time() * 1000)
+                    bar_tv["timestamp"] = ts_tv
+                    if sym_tv not in bary_per:
+                        bary_per[sym_tv] = []
+                    bary_per[sym_tv].append(bar_tv)
+                    # Zarejestruj dyrygenta dla nowego symbolu z TV (jeśli nieznany)
+                    if sym_tv not in dyrygenci:
+                        try:
+                            dyrygenci[sym_tv] = _buduj_dyrygencie(sym_tv, cfg, engine, pamiec)
+                            logger.info("[PętlaLive] W-354 Nowy symbol z TV: %s", sym_tv)
+                        except Exception as e:
+                            logger.warning("[PętlaLive] W-354 Nie udało się dodać %s: %s", sym_tv, e)
 
             if not bary_per:
                 logger.error("[PętlaLive] Brak danych dla żadnego symbolu — czekam.")

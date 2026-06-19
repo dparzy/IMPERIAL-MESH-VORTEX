@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-06-19 | W-354 | TradingView Webhook Receiver — sygnały na żywo w roju (Prawo XV)
+
+**Cel:** Podłączenie TradingView do Imperium przez HTTP POST webhook — alerty z Pine Script
+trafiają bezpośrednio do roju (Dyrygent.cykl). Wykres świecowy (Lightweight Charts, MIT)
+w Panelu Kapitolu. Selector pary/interwału. Cross-session bar buffer per symbol.
+
+**Nowe pliki:**
+- `imperium/swiatynie/webhook_tradingview.py` — `AlertTV`, `parsuj_alert_tv()`, `OdbiornikWebhook`
+- `tests/test_webhook_tv.py` — 25 testów (granice, sekret, historia, dashboard routing)
+
+**Zmiany:**
+- `web_dashboard.py` — `do_POST` w `DashboardHandler`, `/webhook/tv`, `/wykresy/{SYM}.json`,
+  Lightweight Charts widget, symbol selector, Pine Script template w panelu, `obsluz_post()`
+- `petla_live.py` — `KonfigPetliLive.webhook_tv: bool`, `OdbiornikWebhook` tworzony przy
+  `dashboard=True, webhook_tv=True`; alerty z TV dołączane do `bary_per` w pętli live;
+  auto-rejestracja nowych symboli z TV w `dyrygenci`
+- `docs/LOG_ZMIAN.md` — ten wpis
+
+**Bezpieczeństwo:** sekret webhooka WYŁĄCZNIE przez `WEBHOOK_TV_SEKRET` env (nigdy hardcode).
+Domyślny bind 127.0.0.1. Zewnętrzny dostęp przez ngrok/Cloudflare Tunnel — poinstruowane
+w Pine Script template i docs.
+
+**Testy:** 1497/1497 ✅ | Audyt: pełna harmonia ✅
+
+---
+
 ## 2026-06-19 | W-353 | Kaufman Efficiency Ratio — ożywienie martwego głosu Fulmena (Prawo XV)
 
 **Pochodzenie:** lektura książki "High Win Rate Day Trading Setups" (INF-33/BIB-021,

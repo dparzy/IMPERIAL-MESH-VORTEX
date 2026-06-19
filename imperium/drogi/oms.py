@@ -109,6 +109,12 @@ class Zlecenie:
     timestamp: float = field(default_factory=time.time)
 
     @property
+    def klucz_idempotencji(self) -> str:
+        """Stabilny klucz do deduplikacji na giełdzie (clientOrderId). Niezmienny przez
+        cały cykl życia — re-submit z tym samym kluczem giełda odrzuca/scala (anty-double)."""
+        return self.zlecenie_id
+
+    @property
     def ilosc_pozostala(self) -> float:
         """Ile jeszcze do wypełnienia (nie schodzi poniżej zera)."""
         return max(0.0, round(self.ilosc - self.ilosc_wypelniona, 12))
@@ -150,16 +156,24 @@ class ZarzadcaZlecen:
     """
 
     def __init__(self, submit_fn: Optional[Callable[[Zlecenie], dict]] = None,
-                 max_prob: int = 3, backoff_bazowy_s: float = 0.0):
+                 max_prob: int = 3, backoff_bazowy_s: float = 0.0,
+                 query_fn: Optional[Callable[[Zlecenie], Optional[dict]]] = None):
         """
         submit_fn: callable(Zlecenie) -> dict potwierdzenia giełdy. None = tryb paper
                    (zlecenie od razu ZLOZONE bez sieci). Wyjątek z submit_fn → retry.
         max_prob:  ile razy próbować złożyć przy błędach przejściowych (>=1).
         backoff_bazowy_s: baza backoffu wykładniczego (proba i → bazowy*2^i). 0 = bez
                    pauzy (testy). Produkcja: 1.0–2.0 s.
+        query_fn:  callable(Zlecenie) -> Optional[dict] — pyta giełdę po kluczu
+                   idempotencji czy zlecenie JUŻ istnieje. Wołany PRZED każdą
+                   ponowną próbą (anti-double-submit): jeśli poprzednia próba jednak
+                   weszła mimo wyjątku, OMS to wykryje zamiast wysłać duplikat
+                   (Prawo I — fakt z giełdy bije założenie „nie weszło"). None = bez
+                   zabezpieczenia (zakłada, że wyjątek = zlecenie nieprzyjęte).
         """
         assert max_prob >= 1, "max_prob musi być >= 1"
         self.submit_fn = submit_fn
+        self.query_fn = query_fn
         self.max_prob = max_prob
         self.backoff_bazowy_s = backoff_bazowy_s
         self._zlecenia: Dict[str, Zlecenie] = {}
@@ -205,6 +219,20 @@ class ZarzadcaZlecen:
 
         for i in range(self.max_prob):
             zlecenie.proby += 1
+            # Anti-double-submit (Prawo I): na ponowną próbę najpierw sprawdź, czy
+            # poprzednia próba jednak weszła mimo wyjątku — zanim wyślesz duplikat.
+            if i > 0 and self.query_fn is not None:
+                try:
+                    istniejace = self.query_fn(zlecenie)
+                    if istniejace:
+                        zlecenie.klient_meta["_order"] = istniejace
+                        zlecenie._przejdz(StanZlecenia.ZLOZONE)
+                        logger.info(
+                            f"[OMS] {zlecenie.zlecenie_id}: poprzednia próba jednak "
+                            f"weszła (query) — nie wysyłam duplikatu")
+                        return True
+                except Exception as e:  # noqa: BLE001 — query nie blokuje retry
+                    logger.warning(f"[OMS] query({zlecenie.zlecenie_id}) padł: {e}")
             try:
                 self.submit_fn(zlecenie)
                 zlecenie._przejdz(StanZlecenia.ZLOZONE)

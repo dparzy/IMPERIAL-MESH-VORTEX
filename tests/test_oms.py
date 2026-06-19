@@ -334,3 +334,58 @@ def test_wymagaj_nieznane_blad():
         assert False
     except KeyError:
         pass
+
+
+# ── W-345: Idempotencja / anti-double-submit ────────────────────────────────
+
+def test_klucz_idempotencji_stabilny():
+    oms = ZarzadcaZlecen()
+    z = oms.utworz("BTCUSDT", Strona.KUP, 1.0, zlecenie_id="ORD-X")
+    assert z.klucz_idempotencji == "ORD-X"
+    # niezmienny przez cykl życia
+    oms.zloz(z)
+    assert z.klucz_idempotencji == "ORD-X"
+
+
+def test_query_wykrywa_ze_poprzednia_proba_weszla():
+    """Pierwsza próba pada wyjątkiem, ale query mówi że zlecenie JEST → bez duplikatu."""
+    submits = {"n": 0}
+    def submit(z):
+        submits["n"] += 1
+        raise ConnectionError("timeout odpowiedzi (ale zlecenie mogło wejść)")
+    def query(z):
+        # giełda potwierdza: zlecenie z poprzedniej próby istnieje
+        return {"id": z.klucz_idempotencji, "status": "open"}
+    oms = ZarzadcaZlecen(submit_fn=submit, query_fn=query, max_prob=3)
+    z = oms.utworz("BTCUSDT", Strona.KUP, 1.0)
+    assert oms.zloz(z) is True
+    assert z.stan == StanZlecenia.ZLOZONE
+    assert submits["n"] == 1   # tylko PIERWSZA próba wysłana — duplikat NIE wysłany
+    assert z.klient_meta["_order"]["status"] == "open"
+
+
+def test_query_brak_zlecenia_normalny_retry():
+    """query zwraca None (nie weszło) → normalny retry wysyła ponownie."""
+    submits = {"n": 0}
+    def submit(z):
+        submits["n"] += 1
+        if submits["n"] < 2:
+            raise ConnectionError("padł")
+        return {"id": "ok"}
+    def query(z):
+        return None  # nie ma zlecenia → trzeba wysłać ponownie
+    oms = ZarzadcaZlecen(submit_fn=submit, query_fn=query, max_prob=3)
+    z = oms.utworz("BTCUSDT", Strona.KUP, 1.0)
+    assert oms.zloz(z) is True
+    assert submits["n"] == 2   # druga próba faktycznie wysłana
+
+
+def test_query_pierwsza_proba_nie_pyta():
+    """query NIE jest wołany przed pierwszą próbą (nie ma czego sprawdzać)."""
+    pytania = {"n": 0}
+    def submit(z): return {"id": "ok"}
+    def query(z): pytania["n"] += 1; return None
+    oms = ZarzadcaZlecen(submit_fn=submit, query_fn=query, max_prob=3)
+    z = oms.utworz("BTCUSDT", Strona.KUP, 1.0)
+    oms.zloz(z)
+    assert pytania["n"] == 0   # sukces za pierwszym razem → query nie pytany

@@ -55,12 +55,16 @@ Nielegalne przejście = wyjątek (Prawo I), nie cisza. Klasy: `StanZlecenia`,
 `_zloz_zlecenie` w retry+maszynę stanów, rejestruje fill z odpowiedzi giełdy).
 Domyślnie OFF = stare zachowanie bez zmian. `raport_oms()` = diagnostyka stanów.
 
-**Bezpieczeństwo:** zero realnego kapitału — pure-Python, testowany mockiem.
-Retry re-submituje tylko po wyjątku (zlecenie nieprzyjęte); idempotency-key (client
-order ID) to przyszłe wzmocnienie pełnej ochrony przed double-submit.
+**Idempotencja (anti-double-submit, W-345):** `Zlecenie.klucz_idempotencji`
+(= stabilny zlecenie_id) → wysyłany jako `newClientOrderId` (MEXC dedupuje duplikat).
+OMS dostał `query_fn`: PRZED każdą ponowną próbą pyta giełdę (`fetch_order` po kluczu)
+czy poprzednia próba jednak weszła mimo wyjątku — jeśli tak, NIE wysyła duplikatu
+(Prawo I — fakt z giełdy bije założenie „nie weszło"). Zamyka ryzyko double-submit.
 
-**Testy:** +30 (`tests/test_oms.py`) granice OMS + 5 integracji (`test_real_order_router.py`).
-**1372 → 1407/1407 zielone.** Audyt: pełna harmonia.
+**Bezpieczeństwo:** zero realnego kapitału — pure-Python, testowany mockiem.
+
+**Testy:** +34 (`tests/test_oms.py`: granice + idempotencja) + 5 integracji
+(`test_real_order_router.py`). **1372 → 1430/1430 zielone.** Audyt: pełna harmonia.
 
 ---
 

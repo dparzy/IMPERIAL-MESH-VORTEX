@@ -102,7 +102,8 @@ class RealOrderRouter(PaperTradingEngine):
             from imperium.drogi.oms import ZarzadcaZlecen
             self.oms = ZarzadcaZlecen(submit_fn=self._oms_submit,
                                       max_prob=oms_max_prob,
-                                      backoff_bazowy_s=oms_backoff_s)
+                                      backoff_bazowy_s=oms_backoff_s,
+                                      query_fn=self._oms_query)
         if dry_run:
             logger.warning(
                 "[DRY-RUN] Tryb sucho-bieżny: zlecenia NIE są wysyłane na MEXC, "
@@ -135,12 +136,28 @@ class RealOrderRouter(PaperTradingEngine):
     # ── OMS: składanie śledzone maszyną stanów (W-344) ─────────────────────────
 
     def _oms_submit(self, zlecenie) -> Dict:
-        """submit_fn dla OMS: czyta args z klient_meta, woła _zloz_zlecenie,
-        zapisuje wynik z powrotem do klient_meta (Prawo I — fakt z giełdy)."""
+        """submit_fn dla OMS: czyta args z klient_meta, woła _zloz_zlecenie z kluczem
+        idempotencji (newClientOrderId), zapisuje wynik do klient_meta (Prawo I)."""
         m = zlecenie.klient_meta
-        order = self._zloz_zlecenie(m["symbol"], m["side"], zlecenie.ilosc, m["params"])
+        params = dict(m["params"])
+        # Klucz idempotencji → MEXC dedupuje duplikat o tym samym clientOrderId.
+        params.setdefault("newClientOrderId", zlecenie.klucz_idempotencji)
+        order = self._zloz_zlecenie(m["symbol"], m["side"], zlecenie.ilosc, params)
         m["_order"] = order
         return order
+
+    def _oms_query(self, zlecenie) -> Optional[Dict]:
+        """query_fn dla OMS: pyta giełdę czy zlecenie o kluczu idempotencji już
+        istnieje (anti-double-submit przed retry). dry-run/brak metody → None."""
+        if self._dry_run:
+            return None
+        fetch = getattr(self._exchange, "fetch_order", None)
+        if fetch is None:
+            return None
+        try:
+            return fetch(zlecenie.klucz_idempotencji, zlecenie.klient_meta.get("symbol"))
+        except Exception:  # noqa: BLE001 — brak zlecenia / błąd → traktuj jak „nie ma"
+            return None
 
     def _zloz_sledzone(self, symbol: str, side: str, qty: float,
                        params: Dict, rola: str) -> Dict:

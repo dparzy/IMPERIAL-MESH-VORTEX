@@ -25,6 +25,9 @@ import webbrowser
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Dodaj root repo do ścieżki — działa niezależnie od CWD (Windows/Linux/Mac)
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from imperium.koloseum.backtest import backtest_portfel
 
 

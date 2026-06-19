@@ -6,6 +6,68 @@
 
 ---
 
+## 2026-06-19 | W-345 | Walk-Forward — kroczące okna IS/OOS (obrona przed przeuczeniem)
+
+**Luka #2 ze skanu konkurencji (Prawo XV):** Freqtrade/Jesse mają WFO od lat.
+Mieliśmy hyperopt (`optymalizator.py`, DSR-guided) i walidację (`walidacja.py`,
+PBO/DSR), ale BRAK orkiestracji walk-forward — jedynej uczciwej obrony przed
+przeuczeniem przy 76 neuronach × wagi reżimowe (ogromna przestrzeń parametrów).
+
+**Wdrożenie (`imperium/koloseum/walk_forward.py`):** kroczące pary okien:
+  • IS (In-Sample) — `optymalizuj()` szuka parametrów (wykorzystuje istniejący
+    DSR-guided hyperopt — Prawo XVI, nie dubluje).
+  • OOS (Out-of-Sample) — egzamin tych parametrów na danych NIEWIDZIANYCH.
+  • Okno sunie (rolling) lub rośnie od zera (anchored); OOS zawsze PO IS (zero look-ahead).
+
+**WFE (Walk-Forward Efficiency)** = Sharpe_OOS / Sharpe_IS:
+  • ≥ próg (0.5, Pardo) + OOS Sharpe > 0 → **ROBUST** (parametry trzymają poza próbą)
+  • IS uczył przewagi ale WFE < próg → **PRZEUCZONY** (degradacja OOS)
+  • OOS Sharpe ≤ 0 → **SLABY** (brak przewagi poza próbą, niezależnie od WFE)
+Werdykt liczony WYŁĄCZNIE z OOS (Prawo I — egzamin na nieznanym). Raport zawiera
+też stabilność parametrów (CV między oknami) — skaczący parametr = ostrożność.
+
+**Testy:** +19 (`tests/test_walk_forward.py`) — granice: brak look-ahead, za mało
+barów, zero-wariancji Sharpe, IS≤0→WFE=0, trzy werdykty. **1407 → 1426/1426 zielone.**
+
+---
+
+## 2026-06-19 | W-344 | OMS — Zarządca Zleceń: maszyna stanów cyklu życia zlecenia
+
+**Luka ze skanu konkurencji (Prawo XV):** NautilusTrader/Freqtrade mają jawny
+order-lifecycle od lat; my mieliśmy fire-and-forget `create_order` w
+`RealOrderRouter` (try/except, bez stanu zlecenia, retry, akumulacji partial-fill).
+„Mózg bez rąk" — najlepszy rój sygnałów bez solidnej egzekucji.
+
+**Wdrożenie (`imperium/drogi/oms.py`):** jawna maszyna stanów
+`NOWE→ZLOZONE→CZESCIOWE→WYPELNIONE` (+ ODRZUCONE/ANULOWANE/BLAD jako końcowe).
+Nielegalne przejście = wyjątek (Prawo I), nie cisza. Klasy: `StanZlecenia`,
+`Zlecenie` (akumuluje partial-fille, cena średnia ważona wolumenem), `ZarzadcaZlecen`.
+
+**Funkcje:**
+  • `zloz()` — retry z backoffem wykładniczym; po wyczerpaniu prób → BLAD + False (jawna porażka).
+  • `zarejestruj_wypelnienie()` — akumuluje partial-fille; over-fill → wyjątek (granica Prawa XXI).
+  • `reconcile(stan_gieldy)` — uzgadnia OMS z prawdą giełdy (Prawo I), nie cofa stanów końcowych.
+  • Tryb paper (submit_fn=None, domyślny) = od razu ZLOZONE bez sieci; realny = owija
+    `RealOrderRouter._zloz_zlecenie` w retry+maszynę stanów (parity backtest=live).
+
+**Wpięcie (Prawo XV — bez osieroconego modułu):** `RealOrderRouter` dostał opt-in
+`sledz_oms=True` → każde wejście/wyjście idzie przez `_zloz_sledzone()` (OMS owija
+`_zloz_zlecenie` w retry+maszynę stanów, rejestruje fill z odpowiedzi giełdy).
+Domyślnie OFF = stare zachowanie bez zmian. `raport_oms()` = diagnostyka stanów.
+
+**Idempotencja (anti-double-submit, W-345):** `Zlecenie.klucz_idempotencji`
+(= stabilny zlecenie_id) → wysyłany jako `newClientOrderId` (MEXC dedupuje duplikat).
+OMS dostał `query_fn`: PRZED każdą ponowną próbą pyta giełdę (`fetch_order` po kluczu)
+czy poprzednia próba jednak weszła mimo wyjątku — jeśli tak, NIE wysyła duplikatu
+(Prawo I — fakt z giełdy bije założenie „nie weszło"). Zamyka ryzyko double-submit.
+
+**Bezpieczeństwo:** zero realnego kapitału — pure-Python, testowany mockiem.
+
+**Testy:** +34 (`tests/test_oms.py`: granice + idempotencja) + 5 integracji
+(`test_real_order_router.py`). **1372 → 1430/1430 zielone.** Audyt: pełna harmonia.
+
+---
+
 ## 2026-06-18 | W-340 | Vol-gate: Jump Model zmienności → klasyfikator reżimu (opt-in, zmierzony)
 
 **Odkrycie Prawa XV (utrata potencjału):** JumpModel (W-281) miał kod+testy+narzędzie

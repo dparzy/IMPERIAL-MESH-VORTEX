@@ -421,3 +421,75 @@ def test_petla_live_paper_false_uzywa_real_order_router():
         ror_mod.RealOrderRouter = original
 
     assert _MockRealRouter.UZYTY, "RealOrderRouter powinien być użyty przy paper=False"
+
+
+# ── W-344: Integracja OMS (maszyna stanów cyklu życia zlecenia) ──────────────
+
+class MockExchangeCena(MockExchange):
+    """Mock zwracający średnią cenę wypełnienia (jak realny CCXT market order)."""
+    def __init__(self, cena=50000.0, fail_razy=0, **kw):
+        super().__init__(**kw)
+        self._cena = cena
+        self._fail_razy = fail_razy   # ile pierwszych wywołań ma paść (test retry)
+        self._n = 0
+
+    def create_order(self, symbol, type, side, amount, params=None):
+        self._n += 1
+        if self._n <= self._fail_razy:
+            raise ConnectionError(f"Mock: przejściowy błąd #{self._n}")
+        order = super().create_order(symbol, type, side, amount, params)
+        order["average"] = self._cena
+        return order
+
+
+def test_oms_wylaczony_domyslnie():
+    """Bez sledz_oms → oms None, raport_oms None, zachowanie niezmienione."""
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=MockExchange())
+    assert r.oms is None
+    assert r.raport_oms() is None
+    r.wejdz(_sygnal())
+    assert r.raport_oms() is None
+
+
+def test_oms_wejscie_wypelnione():
+    """sledz_oms=True + mock z ceną → zlecenie wejścia WYPELNIONE w OMS."""
+    ex = MockExchangeCena(cena=50000.0)
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex, sledz_oms=True)
+    r.wejdz(_sygnal(cena=50000.0))
+    rap = r.raport_oms()
+    assert rap["lacznie"] == 1
+    assert rap["rozklad_stanow"].get("WYPELNIONE") == 1
+    z = r.oms.wszystkie()[0]
+    assert z.cena_srednia == 50000.0
+    assert z.klient_meta["rola"] == "WEJSCIE"
+
+
+def test_oms_bez_ceny_zostaje_zlozone():
+    """Mock bez 'average'/'price' → OMS śledzi jako ZLOZONE (Prawo I — brak ceny fill)."""
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=MockExchange(), sledz_oms=True)
+    r.wejdz(_sygnal())
+    rap = r.raport_oms()
+    assert rap["rozklad_stanow"].get("ZLOZONE") == 1
+
+
+def test_oms_retry_przejsciowy_blad():
+    """Pierwsze wywołanie pada, drugie sukces → OMS retry → ZLOZONE/WYPELNIONE."""
+    ex = MockExchangeCena(cena=50000.0, fail_razy=1)
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex,
+                        sledz_oms=True, oms_max_prob=3, oms_backoff_s=0.0)
+    r.wejdz(_sygnal(cena=50000.0))
+    z = r.oms.wszystkie()[0]
+    assert z.proby == 2           # pierwsza padła, druga przeszła
+    assert z.stan.value == "WYPELNIONE"
+
+
+def test_oms_wejscie_i_wyjscie_dwa_zlecenia():
+    """Pełny cykl: wejście + zamknięcie ręczne → 2 zlecenia w OMS (WEJSCIE/WYJSCIE)."""
+    ex = MockExchangeCena(cena=50000.0)
+    r = RealOrderRouter(kapital_startowy=5000.0, exchange=ex, sledz_oms=True)
+    poz = r.wejdz(_sygnal(cena=50000.0))
+    r.zamknij_manualnie(poz.pozycja_id, 51000.0, powod="MANUAL")
+    rap = r.raport_oms()
+    assert rap["lacznie"] == 2
+    role = {z.klient_meta["rola"] for z in r.oms.wszystkie()}
+    assert role == {"WEJSCIE", "WYJSCIE"}

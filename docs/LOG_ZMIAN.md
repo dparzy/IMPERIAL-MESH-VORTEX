@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-19 | W-344 | OMS — Zarządca Zleceń: maszyna stanów cyklu życia zlecenia
+
+**Luka ze skanu konkurencji (Prawo XV):** NautilusTrader/Freqtrade mają jawny
+order-lifecycle od lat; my mieliśmy fire-and-forget `create_order` w
+`RealOrderRouter` (try/except, bez stanu zlecenia, retry, akumulacji partial-fill).
+„Mózg bez rąk" — najlepszy rój sygnałów bez solidnej egzekucji.
+
+**Wdrożenie (`imperium/drogi/oms.py`):** jawna maszyna stanów
+`NOWE→ZLOZONE→CZESCIOWE→WYPELNIONE` (+ ODRZUCONE/ANULOWANE/BLAD jako końcowe).
+Nielegalne przejście = wyjątek (Prawo I), nie cisza. Klasy: `StanZlecenia`,
+`Zlecenie` (akumuluje partial-fille, cena średnia ważona wolumenem), `ZarzadcaZlecen`.
+
+**Funkcje:**
+  • `zloz()` — retry z backoffem wykładniczym; po wyczerpaniu prób → BLAD + False (jawna porażka).
+  • `zarejestruj_wypelnienie()` — akumuluje partial-fille; over-fill → wyjątek (granica Prawa XXI).
+  • `reconcile(stan_gieldy)` — uzgadnia OMS z prawdą giełdy (Prawo I), nie cofa stanów końcowych.
+  • Tryb paper (submit_fn=None, domyślny) = od razu ZLOZONE bez sieci; realny = owija
+    `RealOrderRouter._zloz_zlecenie` w retry+maszynę stanów (parity backtest=live).
+
+**Bezpieczeństwo:** zero realnego kapitału — pure-Python, testowany mockiem.
+Gotowy do wpięcia w `RealOrderRouter` (Faza egzekucji), domyślnie nieaktywny.
+
+**Testy:** +30 (`tests/test_oms.py`) — nacisk na granice: nielegalne przejścia,
+0/over-fill, dokładne domknięcie do zera, wyczerpanie retry, reconciliacja rozjazdu.
+**1372 → 1402/1402 zielone.** Audyt: pełna harmonia.
+
+---
+
 ## 2026-06-18 | W-340 | Vol-gate: Jump Model zmienności → klasyfikator reżimu (opt-in, zmierzony)
 
 **Odkrycie Prawa XV (utrata potencjału):** JumpModel (W-281) miał kod+testy+narzędzie

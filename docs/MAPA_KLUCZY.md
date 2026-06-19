@@ -171,6 +171,8 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 | A-03 | NeuronWashVol | A | 6 | ✅ | VOLUME |
 | A-05 | NeuronBartPattern | A | 6 | ✅ | CLOSE_PREV |
 | OC-05 | NeuronWashTrading | O | 8 | ✅ | WASH_SCORE_100 |
+| K-01 | NeuronDXYTrend | K | 5 | 🔇 (dane makro) | DXY_MOM |
+| K-02 | NeuronGoldBTC | K | 4 | 🔇 (dane makro) | GOLD_BTC_MOM |
 
 ---
 

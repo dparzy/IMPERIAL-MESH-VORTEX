@@ -51,7 +51,7 @@ def test_wagi_rezimowe_dzialaja():
 
 def test_rejestr_wszystkie_neurony():
     neurony = wszystkie_neurony()
-    assert len(neurony) == 76, f"Powinno być 76 neuronów, jest {len(neurony)}"
+    assert len(neurony) == 78, f"Powinno być 78 neuronów, jest {len(neurony)}"
 
 
 def test_rejestr_wszyscy_zwiadowcy():
@@ -65,7 +65,7 @@ def test_rejestr_wszyscy_zwiadowcy():
 
 def test_raport_potencjalu():
     rap = raport_potencjalu()
-    assert rap["neurony_lacznie"] == 76
+    assert rap["neurony_lacznie"] == 78
     assert rap["zwiadowcy_exp"] == 12
     # EXP-12 (L2) wyciszony do czasu feedu orderbook
     assert rap["zwiadowcy_wyciszeni"] >= 1
@@ -185,7 +185,7 @@ def test_prawo_xxii_mechanizm_pokrycie():
     from imperium.legiony.rejestr import wszystkie_neurony, MECHANIZMY
 
     DOZWOLONE = {"trend", "mean_rev", "breakout", "event",
-                 "regime", "stat_arb", "risk_filter", "vol_signal"}
+                 "regime", "stat_arb", "risk_filter", "vol_signal", "macro"}
     for n in wszystkie_neurony():
         assert n.KLUCZ in MECHANIZMY, f"Neuron {n.KLUCZ} bez mapy MECHANIZM (Prawo XXII)"
         assert n.MECHANIZM in DOZWOLONE, f"{n.KLUCZ}: nieznany MECHANIZM '{n.MECHANIZM}'"

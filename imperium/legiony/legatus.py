@@ -55,6 +55,7 @@ class KandydatAktywa:
 #
 # Prawo XXI — spójność kategorii:
 #   AKTYWNE kategorie w kodzie (2026-06-02): A F M O R S T
+#   K = Makro/Intermarket OŻYWIONA 2026-06-19 (K-01 DXY, K-02 Gold/BTC — Murphy BIB-002 W-085)
 #   PLANOWANE (pre-zarejestrowane na przyszłe neurony):
 #     L = Leverage          (brak neuronu — reguła czeka na wdrożenie)
 #     V = Zmienność         (EXP-04/EXP-12 mają V, ale są wyciszone — reguła uśpiona)
@@ -68,12 +69,12 @@ class KandydatAktywa:
 #       (C-01). Najsilniejsza w trendzie (lider/maruder kontynuują) i NORMAL; w PANIC
 #       korelacje→1 (wszystko spada razem), więc RS traci moc rozróżniającą → niska waga.
 WAGI_REZIMU = {
-    "TREND_STRONG":    {"T": 1.5, "M": 1.2, "S": 1.3, "O": 0.7, "L": 0.8, "R": 0.8, "H": 1.3, "N": 1.0, "Z": 1.0, "D": 1.3, "C": 1.3},
-    "RANGING":         {"M": 1.5, "F": 1.2, "T": 0.5, "R": 1.2, "H": 1.2, "N": 1.2, "Z": 1.0, "D": 1.2, "C": 0.9},
-    "VOLATILE":        {"A": 2.0, "V": 1.5, "R": 1.3, "L": 0.3, "N": 1.3, "Z": 1.5, "D": 1.4, "C": 0.7, "_default": 0.7},
-    "PANIC":           {"A": 3.0, "R": 1.5, "Z": 2.0, "D": 0.5, "_default": 0.1},
-    "NORMAL":          {"R": 1.1, "H": 1.1, "N": 1.1, "Z": 1.1, "D": 1.1, "C": 1.1},
-    "ON-CHAIN_BULLISH":{"O": 2.0, "L": 0.8, "R": 1.1},
+    "TREND_STRONG":    {"T": 1.5, "M": 1.2, "S": 1.3, "O": 0.7, "L": 0.8, "R": 0.8, "H": 1.3, "N": 1.0, "Z": 1.0, "D": 1.3, "C": 1.3, "K": 1.2},
+    "RANGING":         {"M": 1.5, "F": 1.2, "T": 0.5, "R": 1.2, "H": 1.2, "N": 1.2, "Z": 1.0, "D": 1.2, "C": 0.9, "K": 1.1},
+    "VOLATILE":        {"A": 2.0, "V": 1.5, "R": 1.3, "L": 0.3, "N": 1.3, "Z": 1.5, "D": 1.4, "C": 0.7, "K": 1.4, "_default": 0.7},
+    "PANIC":           {"A": 3.0, "R": 1.5, "Z": 2.0, "D": 0.5, "K": 1.8, "_default": 0.1},
+    "NORMAL":          {"R": 1.1, "H": 1.1, "N": 1.1, "Z": 1.1, "D": 1.1, "C": 1.1, "K": 1.1},
+    "ON-CHAIN_BULLISH":{"O": 2.0, "L": 0.8, "R": 1.1, "K": 1.0},
     "SMC_ACTIVE":      {"S": 2.0, "F": 1.2, "T": 1.1},
 }
 

@@ -5,7 +5,7 @@
 ## 📜 Konstytucja
 
 Pełne prawa: [`ZASADY_FUNDAMENTALNE.md`](./ZASADY_FUNDAMENTALNE.md).
-Każda decyzja musi być zgodna z **21 Prawami Imperium**.
+Każda decyzja musi być zgodna z **24 Prawami Imperium**.
 
 **Prawo XVIII (decyzyjność):** gdy widzisz niespójność/błąd — rozstrzygasz SAM
 (najlepsza opcja zgodna z zasadami), nie pytasz o błahostki. Źródło prawdy:

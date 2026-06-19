@@ -81,6 +81,13 @@ class KonfigPetliLive:
     auto_discover: bool = False
     auto_discover_top_n: int = 5
     auto_discover_min_obrot: float = 5_000_000.0
+    # W-343 LiveMonitor (Prawo XXIV): TUI panel w terminalu co bar. OFF domyślnie.
+    monitor: bool = False
+    # W-343 TelegramAlert (Prawo XXIV): alerty na wejścia/zamknięcia/weto PANIC.
+    # Wymaga TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID w zmiennych środowiskowych.
+    telegram: bool = False
+    # W-343 Senat Debaty (Prawo XXII): KonsulSenatu per symbol weryfikuje kierunek.
+    senat: bool = False
 
 
 @dataclass
@@ -175,6 +182,9 @@ def _buduj_dyrygencie(
         if cfg.ksiega_wad:
             from imperium.cesarz.ksiega_wad import KsiegaWad as _KsiegaWad
             d.ksiega_wad = _KsiegaWad()
+        if getattr(cfg, "senat", False):
+            from imperium.senat.debata_senatu import KonsulSenatu as _KonsulSenatu
+            d._senat = _KonsulSenatu()
         dyrygenci[sym] = d
 
     return dyrygenci
@@ -268,6 +278,18 @@ def handluj_live(
     radar = RadarRynku()
     statystyki = StatystykiPetli()
 
+    # W-343 LiveMonitor (Prawo XXIV): TUI panel + TelegramAlert
+    monitor = None
+    telegram = None
+    if getattr(cfg, "monitor", False):
+        from imperium.swiatynie.live_monitor import LiveMonitor
+        monitor = LiveMonitor()
+    if getattr(cfg, "telegram", False):
+        from imperium.swiatynie.live_monitor import TelegramAlert
+        telegram = TelegramAlert()
+        if not telegram.aktywny:
+            logger.warning("[PętlaLive] TelegramAlert wyłączony — brak TELEGRAM_BOT_TOKEN/CHAT_ID")
+
     # W-310: domknięcie pętli pamięci — bootstrap KsięgiWad z PERSYSTENTNYCH lekcji
     # poprzednich sesji (Prawo XV: lekcje były pisane, nigdy czytane w produkcji).
     if cfg.ksiega_wad:
@@ -350,8 +372,18 @@ def handluj_live(
                         statystyki.decyzje_wejscia += 1
                         logger.info(f"[PętlaLive] WEJŚCIE {sym} {decyzja.kierunek} "
                                     f"pewność={decyzja.pewnosc:.0%} reżim={decyzja.rezim}")
+                        if telegram is not None:
+                            telegram.alert_sygnal(
+                                symbol=sym,
+                                kierunek=decyzja.kierunek,
+                                pewnosc=decyzja.pewnosc,
+                                rezim=decyzja.rezim,
+                                kapital=engine.kapital_calkowity,
+                            )
                     elif "WETO" in decyzja.etap:
                         statystyki.weta += 1
+                        if decyzja.etap == "SENAT_WETO" and telegram is not None:
+                            telegram.alert_weto(decyzja.powod, decyzja.rezim)
                     else:
                         statystyki.decyzje_neutralne += 1
                 except Exception as e:
@@ -392,6 +424,55 @@ def handluj_live(
                         )
                     except Exception as e:
                         logger.warning(f"[PętlaLive] PamięćRefleksyjna padła: {e}")
+
+            # 4b. Alerty Telegram dla nowych zamknięć
+            hist_now_new = len(engine.historia_zamkniec)
+            if telegram is not None and hist_now_new > statystyki._pamiec_zamkniec:
+                nowe_zam = engine.historia_zamkniec[statystyki._pamiec_zamkniec:]
+                for zam in nowe_zam:
+                    if hasattr(zam, "pnl_pct"):
+                        telegram.alert_zamkniecie(
+                            symbol=getattr(zam, "symbol", "?"),
+                            pnl_pct=zam.pnl_pct,
+                            kapital=engine.kapital_calkowity,
+                        )
+
+            # 4c. LiveMonitor TUI render
+            if monitor is not None:
+                try:
+                    from imperium.swiatynie.live_monitor import StanPozycji, StanDashboardu
+                    from datetime import datetime
+                    aktualny_rezim = (
+                        list(dyrygenci.values())[0]._ostatni_rezim if dyrygenci else "NORMAL"
+                    )
+                    pozycje_tui = [
+                        StanPozycji(
+                            symbol=p.symbol,
+                            kierunek=getattr(p, "kierunek", "?"),
+                            wejscie=getattr(p, "cena_wejscia", 0.0),
+                            aktualny=bary_per.get(p.symbol, [{}])[-1].get("close", 0.0),
+                            wielkosc=getattr(p, "rozmiar_usdt", 0.0),
+                            sl=getattr(p, "stop_loss", 0.0),
+                            tp=getattr(p, "take_profit", 0.0),
+                        )
+                        for p in engine.otwarte.values()
+                    ]
+                    stan = StanDashboardu(
+                        symbol=", ".join(cfg.symbole[:3]),
+                        rezim=aktualny_rezim,
+                        kapital=engine.kapital_calkowity,
+                        kapital_start=cfg.kapital_startowy,
+                        pozycje=pozycje_tui,
+                        bary_przetworzone=statystyki.bary_przetworzone,
+                        decyzje_wejscia=statystyki.decyzje_wejscia,
+                        weta=statystyki.weta,
+                        bledy=statystyki.bledy,
+                        czas_ostatniego_bara=datetime.now(),
+                    )
+                    monitor.aktualizuj(stan)
+                    monitor.render()
+                except Exception as e:
+                    logger.debug(f"[PętlaLive] Monitor render padł: {e}")
 
             # 5. Logi diagnostyczne co 10 barów
             if bar_nr % 10 == 0:

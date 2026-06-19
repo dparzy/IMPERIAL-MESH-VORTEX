@@ -78,6 +78,18 @@ class MikroNeuron(ABC):
     ELITARNY: bool = False
     POWOD_ELITARNOSCI: str = ""   # które kryteria E1–E7 spełnia (do audytu)
 
+    # Prawo XXII — MECHANIZM przewagi (prawdziwa dekorelacja sygnałów).
+    # Opisuje TYP przewagi, nie dane wejściowe. Wartości dozwolone:
+    #   "trend"        — podążanie za trendem (momentum/direction bias)
+    #   "mean_rev"     — powrót do średniej (mean-reversion/contrarian)
+    #   "breakout"     — wybicia z konsolidacji/zakresów
+    #   "event"        — zdarzenia fundamentalne/zewnętrzne (news, on-chain, makro)
+    #   "regime"       — klasyfikacja / zmiana stanu rynku (meta-signal)
+    #   "stat_arb"     — arbitraż statystyczny / cross-sectional
+    #   "risk_filter"  — filtr ryzyka / detekcja zagrożeń (nie prognoza kierunku)
+    #   "vol_signal"   — sygnał oparty wyłącznie na zmienności (vol-regime, vol-anomaly)
+    MECHANIZM: str = "trend"  # domyślnie — każdy neuron powinien nadpisać
+
     def __init__(self):
         if self.KLUCZ == "???-00":
             raise NotImplementedError(f"{type(self).__name__} musi ustawić KLUCZ.")

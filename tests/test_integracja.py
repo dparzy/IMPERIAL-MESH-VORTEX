@@ -180,6 +180,34 @@ def test_prawo_xx_status_elitarny():
     assert raport["lacznie_elite"] > 0
 
 
+def test_prawo_xxii_mechanizm_pokrycie():
+    """Prawo XXII: każdy aktywny neuron ma jawnie zmapowany MECHANIZM (nie domyślny)."""
+    from imperium.legiony.rejestr import wszystkie_neurony, MECHANIZMY
+
+    DOZWOLONE = {"trend", "mean_rev", "breakout", "event",
+                 "regime", "stat_arb", "risk_filter", "vol_signal"}
+    for n in wszystkie_neurony():
+        assert n.KLUCZ in MECHANIZMY, f"Neuron {n.KLUCZ} bez mapy MECHANIZM (Prawo XXII)"
+        assert n.MECHANIZM in DOZWOLONE, f"{n.KLUCZ}: nieznany MECHANIZM '{n.MECHANIZM}'"
+        assert n.MECHANIZM == MECHANIZMY[n.KLUCZ], \
+            f"{n.KLUCZ}: MECHANIZM instancji != mapa rejestru"
+
+
+def test_prawo_xxii_raport_mechanizmow():
+    """Prawo XXII: raport dekorelacji grupuje po (KATEGORIA, MECHANIZM)."""
+    from imperium.legiony.rejestr import raport_mechanizmow
+
+    r = raport_mechanizmow()
+    assert "rozklad_mechanizmow" in r
+    assert "skupiska_redundancji" in r
+    assert r["liczba_mechanizmow"] >= 6, "Powinno być min 6 różnych mechanizmów"
+    # Skupiska muszą mieć ≥2 neurony (po to są — kandydaci do pomiaru korelacji)
+    for klucz, neurony in r["skupiska_redundancji"].items():
+        assert len(neurony) >= 2, f"Skupisko {klucz} ma <2 neuronów — błąd logiki"
+    # Suma rozkładu = liczba aktywnych neuronów
+    assert sum(r["rozklad_mechanizmow"].values()) == r["neuronow_aktywnych"]
+
+
 # ── KLASYFIKATOR REŻIMU ──────────────────────────────────────────────────────
 
 def test_klasyfikator_rezim_trend_strong():
@@ -489,3 +517,80 @@ def test_formacja_nieznany_interwal_bez_filtra():
                          kierunek="LONG", pewnosc=0.8, waga=5, kategoria="M")]
     assert len(leg._formacja_interwalu(syg, "")) == 1
     assert len(leg._formacja_interwalu(syg, "8H")) == 1
+
+
+# ── W-343: Integracja Senatu + per-regime Igrzysk ─────────────────────────
+
+def test_dyrygent_senat_nie_blokuje_zwyklego():
+    """Dyrygent z Senatem: normalny sygnał LONG → Senat nie blokuje (przepuszcza)."""
+    from imperium.koloseum.dyrygent import Dyrygent
+    from imperium.koloseum.paper_trading import PaperTradingEngine
+    from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara
+    from imperium.senat.debata_senatu import KonsulSenatu
+    from imperium.legiony.neurony.momentum import NeuronRSI
+
+    legatus = Legatus([NeuronRSI()], min_neuronow=1, min_przewaga=0.1)
+    engine = PaperTradingEngine(kapital_startowy=10_000.0)
+    d = Dyrygent(
+        legatus=legatus,
+        kalkulator=KalkulatorLewara(),
+        engine=engine,
+        wskazniki_provider=lambda bary: {"RSI_14": 15.0, "CLOSE": 100.0},
+        breaker_krzywej=False,
+    )
+    d._senat = KonsulSenatu()
+    wynik = d.cykl("BTCUSDT", [{"close": 100.0, "open": 99.0,
+                                  "high": 101.0, "low": 98.0,
+                                  "volume": 1000.0, "timestamp": 0}],
+                    rezim="TREND_STRONG")
+    # Senat nie powinien blokować — brak risk_filter alarmów → przepuszcza
+    assert wynik.etap != "SENAT_WETO"
+
+
+def test_senat_weto_cenzora_bezposrednio():
+    """KonsulSenatu.obraduj() z PANIC → weto Cenzora (test bezpośredni Senatu)."""
+    from imperium.senat.debata_senatu import KonsulSenatu, GlosNeuronu
+
+    konsul = KonsulSenatu()
+    glosy = [GlosNeuronu("X-03", "LONG", 0.8, 8, "trend", "T")]
+    w = konsul.obraduj(glosy, rezim="PANIC")
+    assert w.weto_cenzora
+    assert w.kierunek == "NEUTRAL"
+
+
+def test_dyrygent_senat_mnoznik_redukcja():
+    """Senat bez weta ale z alarmami → mnoznik_ryzyka < 1.0 skaluje pozycję."""
+    from imperium.senat.debata_senatu import KonsulSenatu, GlosNeuronu
+
+    konsul = KonsulSenatu()
+    glosy = [
+        GlosNeuronu("X-03", "LONG", 0.8, 8, "trend", "T"),
+        GlosNeuronu("Z-01", "SHORT", 0.5, 6, "risk_filter", "Z"),  # alarm < prog
+    ]
+    w = konsul.obraduj(glosy, rezim="NORMAL")
+    assert not w.weto_cenzora
+    assert 0.0 < w.mnoznik_ryzyka < 1.0
+
+
+def test_igrzyska_mnozniki_warunkowe_w_dyrygent():
+    """Igrzyska.mnozniki_warunkowe() używane zamiast nowe_wagi() w _aktualizuj_synapsy."""
+    from imperium.biblioteki.igrzyska import Igrzyska
+    ig = Igrzyska()
+    for _ in range(5):
+        ig.zarejestruj_wynik("X-01", "LONG", "LONG", rezim="TREND_STRONG")
+    wagi_flat = ig.nowe_wagi()
+    wagi_cond = ig.mnozniki_warunkowe("TREND_STRONG")
+    # W TREND_STRONG z 100% accuracy X-01 dostaje bonus ×1.2
+    assert wagi_cond.get("X-01", 1.0) >= wagi_flat.get("X-01", 1.0)
+
+
+def test_konfigpetli_ma_nowe_pola():
+    """KonfigPetliLive ma pola: monitor, telegram, senat."""
+    from imperium.koloseum.petla_live import KonfigPetliLive
+    cfg = KonfigPetliLive(symbole=["BTCUSDT"])
+    assert hasattr(cfg, "monitor")
+    assert hasattr(cfg, "telegram")
+    assert hasattr(cfg, "senat")
+    assert cfg.monitor is False
+    assert cfg.telegram is False
+    assert cfg.senat is False

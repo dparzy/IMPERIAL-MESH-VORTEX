@@ -91,6 +91,11 @@ class KonfigPetliLive:
     telegram: bool = False
     # W-343 Senat Debaty (Prawo XXII): KonsulSenatu per symbol weryfikuje kierunek.
     senat: bool = False
+    # W-352: Persystencja uczenia (cross-session). None = bez zapisu stanu.
+    # Gdy podane — MWU, Igrzyska i Synapsy ładują stan na starcie i zapisują na końcu.
+    sciezka_mwu: Optional[str] = "logs/mwu_stan.json"
+    sciezka_igrzyska: Optional[str] = "logs/igrzyska_stan.json"
+    sciezka_synapsy: Optional[str] = "logs/synapsy_{sym}.json"  # {sym} → symbol
 
 
 @dataclass
@@ -163,10 +168,20 @@ def _buduj_dyrygencie(
         legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
         if cfg.synapsy:
             from imperium.biblioteki.synapsy_rezimowe import SynapsyRezimowe
-            legatus.synapsy = SynapsyRezimowe()
+            sciezka_syn = (
+                cfg.sciezka_synapsy.replace("{sym}", sym)
+                if cfg.sciezka_synapsy else None
+            )
+            legatus.synapsy = SynapsyRezimowe(sciezka_stanu=sciezka_syn)
         if cfg.mwu:
-            from imperium.biblioteki.hedge_mwu import HedgeMWU
-            legatus.mwu = HedgeMWU()
+            from imperium.biblioteki.hedge_mwu import HedgeMWUzPamieciaRezimu
+            mwu = HedgeMWUzPamieciaRezimu()
+            if cfg.sciezka_mwu:
+                # per-symbol: logs/mwu_BTCUSDT.json
+                sch = cfg.sciezka_mwu.replace(".json", f"_{sym}.json")
+                mwu.wczytaj(sch)
+                mwu._sciezka = sch
+            legatus.mwu = mwu
 
         d = Dyrygent(
             legatus=legatus,
@@ -181,7 +196,12 @@ def _buduj_dyrygencie(
         d.kapital_sizing = kapital_per
         if cfg.igrzyska:
             from imperium.biblioteki.igrzyska import Igrzyska as _Igrzyska
-            d._igrzyska = _Igrzyska()
+            ig = _Igrzyska()
+            if cfg.sciezka_igrzyska:
+                sch = cfg.sciezka_igrzyska.replace(".json", f"_{sym}.json")
+                ig.wczytaj(sch)
+                ig._sciezka = sch
+            d._igrzyska = ig
         if cfg.ksiega_wad:
             from imperium.cesarz.ksiega_wad import KsiegaWad as _KsiegaWad
             d.ksiega_wad = _KsiegaWad()
@@ -498,6 +518,29 @@ def handluj_live(
 
     except KeyboardInterrupt:
         logger.info("[PętlaLive] Zatrzymano (Ctrl+C). Zamykam otwarte pozycje...")
+
+    # W-352: Zapisz stan uczenia (cross-session persistence)
+    for sym, d in dyrygenci.items():
+        try:
+            leg = getattr(d, "legatus", None)
+            if leg is None:
+                continue
+            mwu = getattr(leg, "mwu", None)
+            if mwu is not None:
+                sch = getattr(mwu, "_sciezka", None)
+                if sch:
+                    mwu.zapisz(sch)
+            syn = getattr(leg, "synapsy", None)
+            if syn is not None:
+                syn.zapisz()
+            ig = getattr(d, "_igrzyska", None)
+            if ig is not None:
+                sch = getattr(ig, "_sciezka", None)
+                if sch:
+                    ig.zapisz(sch)
+        except Exception as e:
+            logger.warning(f"[PętlaLive] Zapis stanu uczenia {sym} padł: {e}")
+    logger.info("[PętlaLive] Stan uczenia zapisany (MWU/Igrzyska/Synapsy).")
 
     # Domknij otwarte po ostatniej cenie (paper mode)
     if cfg.paper:

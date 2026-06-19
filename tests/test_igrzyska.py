@@ -197,3 +197,53 @@ def test_bez_rezim_nie_crashuje():
     ig.zarejestruj_wynik("X-07", "LONG", "LONG")  # brak rezim — OK
     assert "X-07" in ig.statystyki
     assert ig.statystyki["X-07"].stats_per_rezim == {}
+
+
+# ── W-352: Persystencja cross-session ─────────────────────────────────────────
+
+def test_igrzyska_zapisz_wczytaj_roundtrip():
+    """Statystyki przeżywają zapis → wczytaj → rangi identyczne."""
+    import tempfile, os
+    ig = Igrzyska()
+    for _ in range(8):
+        ig.zarejestruj_wynik("X-01", "LONG", "LONG", rezim="TREND_STRONG")
+    for _ in range(2):
+        ig.zarejestruj_wynik("X-01", "SHORT", "LONG", rezim="TREND_STRONG")
+    ranking_przed = ig.ranking()[0]
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+        sciezka = f.name
+    try:
+        ig.zapisz(sciezka)
+        ig2 = Igrzyska()
+        ig2.wczytaj(sciezka)
+        ranking_po = ig2.ranking()[0]
+        assert ranking_po["klucz"] == ranking_przed["klucz"]
+        assert abs(ranking_po["wynik"] - ranking_przed["wynik"]) < 1e-6
+        assert "TREND_STRONG" in ig2.statystyki["X-01"].stats_per_rezim
+    finally:
+        os.unlink(sciezka)
+
+
+def test_igrzyska_wczytaj_nieistniejacy_plik_nie_crashuje():
+    """Wczytanie nieistniejącego pliku → puste statystyki (nie crash)."""
+    ig = Igrzyska()
+    ig.wczytaj("/tmp/nieistniejacy_igrzyska_8324982.json")
+    assert ig.statystyki == {}
+
+
+def test_igrzyska_akumuluje_po_wczytaniu():
+    """Nowe wyniki dokładają się do wczytanej historii."""
+    import tempfile, os
+    ig = Igrzyska()
+    for _ in range(6):
+        ig.zarejestruj_wynik("X-03", "LONG", "LONG")
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+        sciezka = f.name
+    try:
+        ig.zapisz(sciezka)
+        ig2 = Igrzyska()
+        ig2.wczytaj(sciezka)
+        ig2.zarejestruj_wynik("X-03", "LONG", "LONG")
+        assert ig2.statystyki["X-03"].sygnaly == 7
+    finally:
+        os.unlink(sciezka)

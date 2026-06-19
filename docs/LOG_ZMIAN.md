@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-19 | W-352 | Persystencja uczenia — MWU/Igrzyska/Synapsy pamiętają między sesjami
+
+**Diagnoza:** Wszystkie trzy mechanizmy uczenia (HedgeMWU, Igrzyska, SynapsyRezimowe) działały
+poprawnie WEWNĄTRZ sesji, ale po restarcie kasowały się do stanu startowego (zerowe wagi).
+Brak cross-session persistence = rój zaczyna uczyć się od zera przy każdym uruchomieniu.
+To była kluczowa **utrata potencjału (Prawo XV)** — uczenie istniało, ale bez pamięci.
+
+**Wdrożenie:**
+- `HedgeMWU`: dodano `zapisz(sciezka)` i `wczytaj(sciezka)` — serialize `wagi_raw` + `rundy` do JSON.
+- `HedgeMWUzPamieciaRezimu`: nadpisuje `zapisz()`/`wczytaj()` — dodatkowo serializuje `pamiec` reżimową i `rezim`.
+- `Igrzyska`: dodano `zapisz(sciezka)` i `wczytaj(sciezka)` — serialize pełne `StatystykaNeuronu` (tp, fp, per-reżim, stability, contribution) do JSON.
+- `KonfigPetliLive`: dodano trzy nowe pola: `sciezka_mwu`, `sciezka_igrzyska`, `sciezka_synapsy` (domyślnie `logs/`).
+- `petla_live.py`: 
+  - bootstrap przy starcie: `mwu.wczytaj()`, `ig.wczytaj()`, `SynapsyRezimowe(sciezka_stanu=...)`.
+  - zapis przy zakończeniu (w bloku po `except KeyboardInterrupt`): `mwu.zapisz()`, `ig.zapisz()`, `syn.zapisz()`.
+  - MWU upgraded do `HedgeMWUzPamieciaRezimu` (pamięć reżimowa aktywna domyślnie).
+  - Per-symbol paths: `logs/mwu_BTCUSDT.json`, `logs/igrzyska_ETHUSDT.json` (izolacja par).
+
+**Testy (6 nowych):**
+- `test_mwu_zapisz_wczytaj_roundtrip`, `test_mwu_pamiec_rezimowa_roundtrip` — wagi i pamięć reżimowa identyczne po roundtrip.
+- `test_mwu_wczytaj_nieistniejacy_plik_nie_crashuje` — bezpieczny start od zera.
+- `test_igrzyska_zapisz_wczytaj_roundtrip`, `test_igrzyska_akumuluje_po_wczytaniu` — rangi i akumulacja cross-session.
+- `test_igrzyska_wczytaj_nieistniejacy_plik_nie_crashuje` — bezpieczny start od zera.
+
+**Wynik testów:** 1466/1466 ✅ | Pliki: `hedge_mwu.py`, `igrzyska.py`, `petla_live.py`, `test_hedge_mwu.py`, `test_igrzyska.py`
+
+---
+
 ## 2026-06-19 | W-351 | Trailing Stop — koniec oddawania szczytu zysku (Prawo XV)
 
 **Diagnoza (dowód, nie zgadywanie):** dashboard skanera pokazał zyskowne pozycje

@@ -26,8 +26,10 @@ Neutralność (Prawo XV — brak zniekształcenia, brak martwego głosu):
   oddala się od 1.0 dopiero, gdy historia faktycznie różnicuje neurony.
 """
 
+import json
 import math
 import logging
+from pathlib import Path
 from typing import Dict, List, Optional
 
 logger = logging.getLogger("HedgeMWU")
@@ -143,6 +145,34 @@ class HedgeMWU:
         ig.przetworz_logi(logi)
         return mwu
 
+    # ── Persystencja ─────────────────────────────────────────────────────────
+
+    def zapisz(self, sciezka: str) -> None:
+        """Zapisuje wagi i liczniki do JSON (cross-session learning)."""
+        dane = {
+            "eta": self.eta,
+            "min_waga": self.min_waga,
+            "alpha_share": self.alpha_share,
+            "wagi_raw": self.wagi_raw,
+            "rundy": self.rundy,
+        }
+        Path(sciezka).parent.mkdir(parents=True, exist_ok=True)
+        Path(sciezka).write_text(
+            json.dumps(dane, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
+    def wczytaj(self, sciezka: str) -> None:
+        """Ładuje wagi z JSON (bootstrap na starcie sesji)."""
+        p = Path(sciezka)
+        if not p.exists():
+            return
+        try:
+            dane = json.loads(p.read_text(encoding="utf-8"))
+            self.wagi_raw = dane.get("wagi_raw", {})
+            self.rundy = dane.get("rundy", {})
+        except Exception:
+            pass  # uszkodzony plik → zaczynamy od zera
+
     def raport(self) -> List[dict]:
         """Tabela ekspertów posortowana wg mnożnika (do diagnostyki/logów)."""
         mn = self.mnozniki()
@@ -229,6 +259,37 @@ class HedgeMWUzPamieciaRezimu(HedgeMWU):
         for k, w in wagi.items():
             stara = pam.get(k, w)
             pam[k] = (1.0 - self.beta_pamieci) * stara + self.beta_pamieci * w
+
+    def zapisz(self, sciezka: str) -> None:
+        """Rozszerza bazowy zapisz() o pamięć reżimową."""
+        dane = {
+            "eta": self.eta,
+            "min_waga": self.min_waga,
+            "alpha_share": self.alpha_share,
+            "beta_pamieci": self.beta_pamieci,
+            "rezim": self.rezim,
+            "wagi_raw": self.wagi_raw,
+            "rundy": self.rundy,
+            "pamiec": self.pamiec,
+        }
+        Path(sciezka).parent.mkdir(parents=True, exist_ok=True)
+        Path(sciezka).write_text(
+            json.dumps(dane, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
+    def wczytaj(self, sciezka: str) -> None:
+        """Ładuje wagi + pamięć reżimową z JSON."""
+        p = Path(sciezka)
+        if not p.exists():
+            return
+        try:
+            dane = json.loads(p.read_text(encoding="utf-8"))
+            self.wagi_raw = dane.get("wagi_raw", {})
+            self.rundy = dane.get("rundy", {})
+            self.pamiec = dane.get("pamiec", {})
+            self.rezim = dane.get("rezim", "NORMAL")
+        except Exception:
+            pass
 
 
 # ─── Demo ─────────────────────────────────────────────────────────────────────

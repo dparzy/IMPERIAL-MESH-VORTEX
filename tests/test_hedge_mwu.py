@@ -290,3 +290,52 @@ def test_pamiec_rozdzielona_per_rezim():
     m.ustaw_rezim("TREND_STRONG"); _trenuj(m, "TR", "MR")
     assert m.pamiec["RANGING"]["MR"] > m.pamiec["RANGING"]["TR"]
     assert m.pamiec["TREND_STRONG"]["TR"] > m.pamiec["TREND_STRONG"]["MR"]
+
+
+# ── W-352: Persystencja cross-session ─────────────────────────────────────────
+
+def test_mwu_zapisz_wczytaj_roundtrip():
+    """Wagi przeżywają zapis → wczytaj → mnożniki identyczne."""
+    import tempfile, os
+    from imperium.biblioteki.hedge_mwu import HedgeMWU
+    m = HedgeMWU(eta=0.5)
+    m.zarejestruj_wynik("X-01", "LONG", "LONG")
+    m.zarejestruj_wynik("X-02", "SHORT", "LONG")  # pomylił się
+    mn_przed = m.mnozniki()
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+        sciezka = f.name
+    try:
+        m.zapisz(sciezka)
+        m2 = HedgeMWU(eta=0.5)
+        m2.wczytaj(sciezka)
+        assert abs(m2.mnozniki().get("X-01", 0) - mn_przed["X-01"]) < 1e-9
+        assert abs(m2.mnozniki().get("X-02", 0) - mn_przed["X-02"]) < 1e-9
+    finally:
+        os.unlink(sciezka)
+
+
+def test_mwu_wczytaj_nieistniejacy_plik_nie_crashuje():
+    """Wczytanie nieistniejącego pliku → czyste wagi (nie crash)."""
+    from imperium.biblioteki.hedge_mwu import HedgeMWU
+    m = HedgeMWU()
+    m.wczytaj("/tmp/nieistniejacy_mwu_8324982.json")
+    assert m.wagi_raw == {}
+
+
+def test_mwu_pamiec_rezimowa_roundtrip():
+    """HedgeMWUzPamieciaRezimu: pamięć reżimowa przeżywa roundtrip."""
+    import tempfile, os
+    from imperium.biblioteki.hedge_mwu import HedgeMWUzPamieciaRezimu
+    m = HedgeMWUzPamieciaRezimu(alpha_share=0.05, beta_pamieci=0.3)
+    m.ustaw_rezim("RANGING")
+    _trenuj(m, "MR", "TR")
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+        sciezka = f.name
+    try:
+        m.zapisz(sciezka)
+        m2 = HedgeMWUzPamieciaRezimu()
+        m2.wczytaj(sciezka)
+        assert "RANGING" in m2.pamiec
+        assert m2.rezim == "RANGING"
+    finally:
+        os.unlink(sciezka)

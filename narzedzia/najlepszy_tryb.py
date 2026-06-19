@@ -201,6 +201,9 @@ def main():
         gubernator=True,
         compounding=True,
         auto_rezim=True,
+        mwu_learning=True,       # W-303 per-coin: każda waluta uczy się własnych wag neuronów
+        igrzyska_learning=True,  # W-307 per-coin: ranking accuracy/stability per symbol
+        synapsy_rezimowe=True,   # W-299 per-coin: koalicje par neuronów warunkowane reżimem
     )
 
     engine.drukuj_raport()

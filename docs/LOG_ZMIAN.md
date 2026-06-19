@@ -6,6 +6,30 @@
 
 ---
 
+## 2026-06-19 | W-346 | Web Dashboard — Panel Kapitolu (realizuje W-004 + W-031)
+
+**Luka #3 ze skanu konkurencji (Prawo XV):** Freqtrade FreqUI, Jesse UI mają panel
+webowy; mieliśmy tylko LiveMonitor TUI + Telegram. Rój 76 neuronów decydował „w ciemno"
+— Cezar nie WIDZIAŁ walki neuronów na żywo (ukryta utrata potencjału).
+
+**Wdrożenie (`imperium/swiatynie/web_dashboard.py`):** ZERO ZALEŻNOŚCI (jak cały
+Imperium) — stdlib `http.server` + samowystarczalny HTML (inline CSS/JS, fetch),
+zamiast FastAPI. Ten sam `StanDashboardu` co LiveMonitor (jedno źródło — Prawo XVI).
+  • `obsluz_sciezke()` — czysty router (testowalny bez gniazda): `/` HTML,
+    `/stan.json` JSON, `/godlo.svg` godło (W-342).
+  • `SerwerDashboard` — serwer w wątku-daemonie, bind 127.0.0.1 (tylko lokalnie,
+    nie wychodzi na świat — bezpieczeństwo), `aktualizuj(stan)` co bar.
+  • **W-031 Roman Naming**: BTC→Capitolium, ETH→Patricii Aeterni, SOL→Velocitas
+    Barbari, DOGE→Mimus Augusti — szlacheckie nazwy walut w panelu.
+
+**Wpięcie (Prawo XV):** `KonfigPetliLive.dashboard=True` (opt-in, OFF) → serwer
+startuje, `aktualizuj(stan)` współdzieli StanDashboardu z LiveMonitorem, stop po pętli.
+
+**Testy:** +18 (`tests/test_web_dashboard.py`) — routing, serializacja, Roman Naming,
+granica zero-kapitał-start, e2e serwer na efemerycznym porcie. **1430 → 1447/1447 zielone.**
+
+---
+
 ## 2026-06-19 | W-345 | Walk-Forward — kroczące okna IS/OOS (obrona przed przeuczeniem)
 
 **Luka #2 ze skanu konkurencji (Prawo XV):** Freqtrade/Jesse mają WFO od lat.

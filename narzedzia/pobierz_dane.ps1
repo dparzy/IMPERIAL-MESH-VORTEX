@@ -49,7 +49,7 @@ foreach ($interw in $Interwaly) {
         $cel  = Join-Path $cfg.folder "Binance_${para}_$($cfg.sufiks).csv"
         Write-Host -NoNewline "  $para [$interw] ... "
         try {
-            curl.exe -s -f -o $cel $url
+            curl.exe -s -f -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" -o $cel $url
             if ($LASTEXITCODE -eq 0 -and (Test-Path $cel) -and (Get-Item $cel).Length -gt 200) {
                 $kb = [math]::Round((Get-Item $cel).Length / 1KB)
                 Write-Host "OK ($kb KB)" -ForegroundColor Green
@@ -67,4 +67,9 @@ foreach ($interw in $Interwaly) {
 }
 
 Write-Host "`nGotowe. Pobrano: $ok | Pominieto/blad: $blad" -ForegroundColor Cyan
-Write-Host "Sprawdz dane:  python -c `"from imperium.akwedukty.czytnik_csv import wczytaj_csv; b=wczytaj_csv('dane/godzinowe/Binance_BTCUSDT_1h.csv', interwal='1H'); print(len(b), 'barow')`"" -ForegroundColor DarkGray
+if ($Interwaly -contains "4h") {
+    Write-Host "`n[4h] Jesli 4h nie pobrane automatycznie — CDD wymaga przegladarki." -ForegroundColor Yellow
+    Write-Host "  Wejdz na: https://www.cryptodatadownload.com/data/binance/" -ForegroundColor Yellow
+    Write-Host "  Kliknij 'Binance <PARA>USDT 4-Hour' i zapisz do dane/4h/" -ForegroundColor Yellow
+}
+Write-Host "`nSprawdz dane:  python -c `"from imperium.akwedukty.czytnik_csv import wczytaj_csv; b=wczytaj_csv('dane/godzinowe/Binance_BTCUSDT_1h.csv', interwal='1H'); print(len(b), 'barow')`"" -ForegroundColor DarkGray

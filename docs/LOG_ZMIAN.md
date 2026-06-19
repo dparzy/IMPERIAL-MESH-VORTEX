@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-06-19 | W-345 | Walk-Forward — kroczące okna IS/OOS (obrona przed przeuczeniem)
+
+**Luka #2 ze skanu konkurencji (Prawo XV):** Freqtrade/Jesse mają WFO od lat.
+Mieliśmy hyperopt (`optymalizator.py`, DSR-guided) i walidację (`walidacja.py`,
+PBO/DSR), ale BRAK orkiestracji walk-forward — jedynej uczciwej obrony przed
+przeuczeniem przy 76 neuronach × wagi reżimowe (ogromna przestrzeń parametrów).
+
+**Wdrożenie (`imperium/koloseum/walk_forward.py`):** kroczące pary okien:
+  • IS (In-Sample) — `optymalizuj()` szuka parametrów (wykorzystuje istniejący
+    DSR-guided hyperopt — Prawo XVI, nie dubluje).
+  • OOS (Out-of-Sample) — egzamin tych parametrów na danych NIEWIDZIANYCH.
+  • Okno sunie (rolling) lub rośnie od zera (anchored); OOS zawsze PO IS (zero look-ahead).
+
+**WFE (Walk-Forward Efficiency)** = Sharpe_OOS / Sharpe_IS:
+  • ≥ próg (0.5, Pardo) + OOS Sharpe > 0 → **ROBUST** (parametry trzymają poza próbą)
+  • IS uczył przewagi ale WFE < próg → **PRZEUCZONY** (degradacja OOS)
+  • OOS Sharpe ≤ 0 → **SLABY** (brak przewagi poza próbą, niezależnie od WFE)
+Werdykt liczony WYŁĄCZNIE z OOS (Prawo I — egzamin na nieznanym). Raport zawiera
+też stabilność parametrów (CV między oknami) — skaczący parametr = ostrożność.
+
+**Testy:** +19 (`tests/test_walk_forward.py`) — granice: brak look-ahead, za mało
+barów, zero-wariancji Sharpe, IS≤0→WFE=0, trzy werdykty. **1407 → 1426/1426 zielone.**
+
+---
+
 ## 2026-06-19 | W-344 | OMS — Zarządca Zleceń: maszyna stanów cyklu życia zlecenia
 
 **Luka ze skanu konkurencji (Prawo XV):** NautilusTrader/Freqtrade mają jawny

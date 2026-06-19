@@ -20,3 +20,6 @@ dane/*4h*.csv
 dane/*_imp.csv
 # Dzienne (~320 KB) i godzinowe (~8 MB) — małe, śledzone w repo (NIE ignorowane)
 raporty/
+
+# Stan uczenia cross-session (generowany w runtime — nie wersjonowany)
+logs/

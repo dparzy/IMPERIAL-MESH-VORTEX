@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-06-19 | W-351 | Trailing Stop — koniec oddawania szczytu zysku (Prawo XV)
+
+**Diagnoza (dowód, nie zgadywanie):** dashboard skanera pokazał zyskowne pozycje
+zamykane przez `TIMEOUT` daleko poniżej szczytu (np. LTC SHORT +12% ceny → TIMEOUT,
+DOT SHORT +13% → TIMEOUT), a stratne lecące do pełnego SL mimo wcześniejszego ruchu
+w naszą stronę. W kodzie `paper_trading.py` MAE/MFE były LICZONE co bar, ale NIGDY
+nieużywane do wyjścia — `_sprawdz_wyzwalacze` znał tylko `LIQ > SL > TP > TIMEOUT`.
+Brak blokady zysku = **utrata potencjału (Prawo XV)**.
+
+**Wdrożenie (`imperium/koloseum/paper_trading.py`):** trailing stop oparty na szczycie
+korzystnej ceny.
+  • Uzbraja się dopiero po ruchu korzystnym ≥ `TRAILING_AKTYWACJA_PCT` (4%), potem
+    podąża za szczytem oddając max `TRAILING_GIVEBACK_FRAC` (35%) — blokuje 65% szczytu.
+  • Stop **monotoniczny** — tylko się zaciska, nigdy nie cofa przeciw pozycji.
+  • Kolejność wyjść: `LIQ > SL > TRAIL > TP > TIMEOUT`.
+  • **Anty-look-ahead:** bar uzbrajający NIE wyzwala trailingu (nie znamy ścieżki
+    intrabar — high mógł paść po low); trailing działa po poziomie z POCZĄTKU bara.
+    Zamknięcie po poziomie sprzed bara (pesymizm wykonania) + slippage.
+  • Domyślnie **OFF** (`trailing=False`) — zero regresji dla istniejących sesji;
+    `backtest_portfel(trailing=...)` przekazuje flagę; `najlepszy_tryb.py` ma ON.
+
+**Testy:** +7 (`tests/test_paper_trading.py`) — Reguła Test-Granic: próg dokładny (≥),
+tuż-poniżej-progu, LONG/SHORT lustrzanie, monotonia stopu, cena zamknięcia = poziom
+stopu, zero-regresji przy OFF. **1453 → 1460/1460 zielone.** Audyt exit 0, ruff czysto.
+
+**Pliki:** imperium/koloseum/paper_trading.py, imperium/koloseum/backtest.py,
+narzedzia/najlepszy_tryb.py, tests/test_paper_trading.py, docs/LOG_ZMIAN.md.
+
+---
+
 ## 2026-06-19 | W-346 | Web Dashboard — Panel Kapitolu (realizuje W-004 + W-031)
 
 **Luka #3 ze skanu konkurencji (Prawo XV):** Freqtrade FreqUI, Jesse UI mają panel

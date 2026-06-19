@@ -207,6 +207,7 @@ def main():
         mwu_learning=True,       # W-303 per-coin: każda waluta uczy się własnych wag neuronów
         igrzyska_learning=True,  # W-307 per-coin: ranking accuracy/stability per symbol
         synapsy_rezimowe=True,   # W-299 per-coin: koalicje par neuronów warunkowane reżimem
+        trailing=True,           # W-351: trailing stop blokuje zysk po ruchu (koniec oddawania szczytu do TIMEOUT)
     )
 
     engine.drukuj_raport()

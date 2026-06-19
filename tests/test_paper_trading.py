@@ -241,3 +241,97 @@ def test_max_bars_otwarcia_per_engine():
     for i in range(50):
         e_dlugi.przetworz_bar(_bar(h=101.0, l=99.0, c=100.0))
     assert len(e_dlugi.otwarte) == 0, "po 150 barach TIMEOUT musi zamknąć"
+
+
+# ─── Trailing stop (W-351) — Reguła Test-Granic ───────────────────────────────
+
+def _engine_trail(kapital: float = 10_000.0) -> PaperTradingEngine:
+    return PaperTradingEngine(kapital_startowy=kapital, sesja_id="TRAIL", trailing=True)
+
+
+def test_trailing_off_domyslnie_brak_regresji():
+    """trailing=False (domyślnie) → stary tor: zysk oddany do TIMEOUT, nie TRAIL."""
+    e = _engine()                      # trailing OFF
+    assert e.trailing is False
+    e.wejdz(_sygnal(kierunek="LONG", wejscie=100.0, tp=200.0, sl=50.0, dzwignia=2))
+    powody = []
+    for _ in range(48):
+        for w in e.przetworz_bar(_bar(h=110.0, l=99.0, c=100.0)):
+            powody.append(w.powod_zamkniecia)
+    assert powody == ["TIMEOUT"], "bez trailingu winner ma wygasnąć przez TIMEOUT"
+
+
+def test_trailing_uzbraja_i_blokuje_zysk_long():
+    """LONG: ruch +6% uzbraja trailing; retrace → TRAIL_HIT z zyskiem."""
+    e = _engine_trail()
+    poz = e.wejdz(_sygnal(kierunek="LONG", wejscie=100.0, tp=300.0, sl=50.0, dzwignia=2))
+    we = poz.cena_wejscia
+    e.przetworz_bar(_bar(h=we * 1.06, l=we, c=we * 1.05))   # +6% → armed
+    assert poz.trailing_aktywny is True
+    stop = poz.trailing_stop
+    zamkniete = e.przetworz_bar(_bar(h=we * 1.055, l=stop - 0.01, c=stop))
+    assert len(zamkniete) == 1
+    assert zamkniete[0].powod_zamkniecia == "TRAIL_HIT"
+    assert zamkniete[0].pnl_usdt > 0, "trailing musi zablokować zysk, nie stratę"
+
+
+def test_trailing_prog_osiagniety_uzbraja():
+    """Granica: ruch == próg (TRAILING_AKTYWACJA_PCT, warunek >=) UZBRAJA trailing."""
+    from imperium.koloseum.paper_trading import TRAILING_AKTYWACJA_PCT
+    e = _engine_trail()
+    poz = e.wejdz(_sygnal(kierunek="LONG", wejscie=100.0, tp=300.0, sl=50.0, dzwignia=2))
+    we = poz.cena_wejscia
+    # minimalny high osiągający próg (>= po stronie float); +epsilon kasuje szum mnożenia
+    e.przetworz_bar(_bar(h=we * (1 + TRAILING_AKTYWACJA_PCT) + 1e-6, l=we, c=we))
+    assert poz.trailing_aktywny is True
+
+
+def test_trailing_ponizej_progu_nie_uzbraja():
+    """Granica: tuż poniżej progu NIE uzbraja — żadnego TRAIL_HIT przedwcześnie."""
+    from imperium.koloseum.paper_trading import TRAILING_AKTYWACJA_PCT
+    e = _engine_trail()
+    poz = e.wejdz(_sygnal(kierunek="LONG", wejscie=100.0, tp=300.0, sl=50.0, dzwignia=2))
+    we = poz.cena_wejscia
+    e.przetworz_bar(_bar(h=we * (1 + TRAILING_AKTYWACJA_PCT - 0.001), l=we, c=we))  # tuż pod progiem
+    assert poz.trailing_aktywny is False
+    zamkniete = e.przetworz_bar(_bar(h=we * 1.02, l=we * 1.005, c=we * 1.01))
+    assert zamkniete == [], "nieuzbrojony trailing nie zamyka pozycji"
+
+
+def test_trailing_short_lustrzane():
+    """SHORT: ruch -6% (korzystny) uzbraja; odbicie → TRAIL_HIT z zyskiem."""
+    e = _engine_trail()
+    poz = e.wejdz(_sygnal(kierunek="SHORT", wejscie=100.0, tp=50.0, sl=150.0, dzwignia=2))
+    we = poz.cena_wejscia
+    e.przetworz_bar(_bar(h=we, l=we * 0.94, c=we * 0.95))   # -6% favorable → armed
+    assert poz.trailing_aktywny is True
+    stop = poz.trailing_stop
+    zamkniete = e.przetworz_bar(_bar(h=stop + 0.01, l=we * 0.945, c=stop))
+    assert len(zamkniete) == 1
+    assert zamkniete[0].powod_zamkniecia == "TRAIL_HIT"
+    assert zamkniete[0].pnl_usdt > 0
+
+
+def test_trailing_stop_tylko_sie_zaciska():
+    """Monotonia: po szczycie +10% trailing nie cofa się przy niższym high."""
+    e = _engine_trail()
+    poz = e.wejdz(_sygnal(kierunek="LONG", wejscie=100.0, tp=400.0, sl=50.0, dzwignia=2))
+    we = poz.cena_wejscia
+    e.przetworz_bar(_bar(h=we * 1.10, l=we * 1.05, c=we * 1.09))   # szczyt +10%
+    stop_po_szczycie = poz.trailing_stop
+    e.przetworz_bar(_bar(h=we * 1.07, l=stop_po_szczycie + 0.01, c=we * 1.068))  # niższy high
+    assert poz.trailing_stop == stop_po_szczycie, "stop nie może się rozluźnić"
+
+
+def test_trailing_cena_zamkniecia_na_poziomie_stopu():
+    """TRAIL_HIT zamyka po cenie trailing_stop (minus slippage), nie po bar.close."""
+    from imperium.koloseum.paper_trading import SLIPPAGE_PCT
+    e = _engine_trail()
+    poz = e.wejdz(_sygnal(kierunek="LONG", wejscie=100.0, tp=400.0, sl=50.0, dzwignia=2))
+    we = poz.cena_wejscia
+    e.przetworz_bar(_bar(h=we * 1.10, l=we * 1.05, c=we * 1.09))   # armed
+    stop = poz.trailing_stop
+    zamkniete = e.przetworz_bar(_bar(h=we * 1.07, l=stop - 1.0, c=stop - 0.5))  # low przebija stop
+    assert zamkniete[0].powod_zamkniecia == "TRAIL_HIT"
+    oczekiwana = round(stop * (1 - SLIPPAGE_PCT), 6)
+    assert abs(zamkniete[0].cena_zamkniecia - oczekiwana) < 1e-6

@@ -5,6 +5,7 @@ Loguje każdy trade do Pamięci Absolutnej, dostarcza dane dla Igrzysk.
 
 Tryby zamknięcia pozycji:
   SL_HIT    — cena dotknęła stop-loss
+  TRAIL_HIT — cena dotknęła trailing stop (W-351, blokada zysku po ruchu)
   TP_HIT    — cena dotknęła take-profit
   LIQUIDATION — cena dotknęła poziom likwidacji
   TIMEOUT   — pozycja otwarta zbyt długo (max_bars)
@@ -26,6 +27,13 @@ from imperium.biblioteki.pamiec_absolutna import ImperiumLog, PamiecAbsolutna, T
 PROWIZJA_TAKER_PCT = 0.0005   # 0.05% taker fee (MEXC Futures standard)
 SLIPPAGE_PCT = 0.0003         # 0.03% poślizg (konserwatywny)
 MAX_BARS_OTWARCIA = 48        # Maks. liczba świec bez TP/SL → TIMEOUT
+
+# Trailing stop (W-351, diagnoza 2026-06-19: zyskowne pozycje oddawały szczyt
+# zysku do bara TIMEOUT — brak mechanizmu blokady zysku). MFE było liczone, ale
+# nieużywane do wyjścia → utrata potencjału (Prawo XV). Trailing uzbraja się
+# dopiero po znaczącym ruchu korzystnym i oddaje tylko ułamek szczytu.
+TRAILING_AKTYWACJA_PCT = 0.04   # uzbrój trailing gdy ruch korzystny na cenie ≥ 4%
+TRAILING_GIVEBACK_FRAC = 0.35   # po uzbrojeniu oddaj max 35% szczytu (blokuje 65%)
 
 
 # ─── Struktury danych ─────────────────────────────────────────────────────────
@@ -82,6 +90,10 @@ class OtwartaPozycja:
     mfe_pct: float = 0.0        # Maximum Favorable Excursion
     rezim: str = "NORMAL"
     sygnaly_json: str = ""
+    # Trailing stop (W-351) — szczyt korzystnej ceny + dynamiczny stop blokujący zysk
+    szczyt_cena: float = 0.0       # najlepsza osiągnięta cena (high LONG / low SHORT)
+    trailing_stop: float = 0.0     # poziom trailing (0.0 = nieuzbrojony)
+    trailing_aktywny: bool = False
 
 
 @dataclass
@@ -183,11 +195,14 @@ class PaperTradingEngine:
         log_dir: Optional[Path] = None,
         max_otwartych: int = 3,
         max_bars_otwarcia: "int | None" = None,
+        trailing: bool = False,
     ) -> None:
         self.kapital = kapital_startowy
         self.kapital_startowy = kapital_startowy
         self.sesja_id = sesja_id or f"PAPER-{uuid.uuid4().hex[:8].upper()}"
         self.max_otwartych = max_otwartych
+        # Trailing stop (W-351) — domyślnie OFF (zero regresji dla istniejących sesji)
+        self.trailing = trailing
         # FAZA B (W-286): TIMEOUT per interwał — 48 świec to 48 dni na 1D, ale
         # tylko 8 dni na 4H (diagnoza 2026-06-10: 75% zamknięć 4H = TIMEOUT).
         # None → stała globalna (stare zachowanie, zero regresji).
@@ -282,9 +297,21 @@ class PaperTradingEngine:
             poz.mae_pct = max(poz.mae_pct, ruch_niekorzystny)
             poz.mfe_pct = max(poz.mfe_pct, ruch_korzystny)
 
-            # Sprawdź wyzwalacze (kolejność ważna: LIQ > SL > TP > TIMEOUT)
-            powod = self._sprawdz_wyzwalacze(poz, bar)
+            # Trailing stop (W-351) — wyzwalamy po poziomie ustalonym w POPRZEDNICH
+            # barach (nie znamy ścieżki intrabar: high który uzbraja trailing mógł
+            # paść PO low — więc bar uzbrajający nie może sam się zamknąć trailingiem).
+            armed_przed = poz.trailing_aktywny
+            stop_przed = poz.trailing_stop
+            if self.trailing:
+                self._aktualizuj_trailing(poz, bar)
+
+            # Sprawdź wyzwalacze (kolejność: LIQ > SL > TRAIL > TP > TIMEOUT)
+            powod = self._sprawdz_wyzwalacze(poz, bar, armed_przed, stop_przed)
             if powod:
+                # TRAIL zamyka po poziomie z POCZĄTKU bara (to on został przebity),
+                # nie po ewentualnie zacieśnionym w tym barze — pesymizm wykonania.
+                if powod == "TRAIL_HIT":
+                    poz.trailing_stop = stop_przed
                 do_zamkniecia.append((pid, powod, bar))
 
         for pid, powod, bar in do_zamkniecia:
@@ -346,13 +373,43 @@ class PaperTradingEngine:
 
     # ── Wewnętrzne ─────────────────────────────────────────────────────────────
 
-    def _sprawdz_wyzwalacze(self, poz: OtwartaPozycja, bar: BarData) -> Optional[str]:
-        """Sprawdza czy pozycja powinna być zamknięta. Kolejność: LIQ > SL > TP > TIMEOUT."""
+    def _aktualizuj_trailing(self, poz: OtwartaPozycja, bar: BarData) -> None:
+        """
+        W-351 — aktualizuje szczyt korzystnej ceny i poziom trailing stop.
+        Uzbraja się dopiero po ruchu korzystnym ≥ TRAILING_AKTYWACJA_PCT, potem
+        podąża za szczytem, oddając max TRAILING_GIVEBACK_FRAC zysku. Stop tylko
+        się zaciska (monotonicznie) — nigdy nie cofa się przeciw pozycji.
+        """
+        we = poz.cena_wejscia
+        if poz.kierunek == "LONG":
+            poz.szczyt_cena = bar.high if poz.szczyt_cena == 0.0 else max(poz.szczyt_cena, bar.high)
+            zysk_szczyt = (poz.szczyt_cena - we) / we
+            if zysk_szczyt >= TRAILING_AKTYWACJA_PCT:
+                nowy = poz.szczyt_cena - (poz.szczyt_cena - we) * TRAILING_GIVEBACK_FRAC
+                poz.trailing_stop = nowy if not poz.trailing_aktywny else max(poz.trailing_stop, nowy)
+                poz.trailing_aktywny = True
+        else:  # SHORT
+            poz.szczyt_cena = bar.low if poz.szczyt_cena == 0.0 else min(poz.szczyt_cena, bar.low)
+            zysk_szczyt = (we - poz.szczyt_cena) / we
+            if zysk_szczyt >= TRAILING_AKTYWACJA_PCT:
+                nowy = poz.szczyt_cena + (we - poz.szczyt_cena) * TRAILING_GIVEBACK_FRAC
+                poz.trailing_stop = nowy if not poz.trailing_aktywny else min(poz.trailing_stop, nowy)
+                poz.trailing_aktywny = True
+
+    def _sprawdz_wyzwalacze(self, poz: OtwartaPozycja, bar: BarData,
+                            trail_armed: bool = False, trail_stop: float = 0.0) -> Optional[str]:
+        """
+        Sprawdza czy pozycja powinna być zamknięta. Kolejność: LIQ > SL > TRAIL > TP > TIMEOUT.
+        trail_armed/trail_stop = stan trailingu na POCZĄTKU bara (W-351) — bar uzbrajający
+        nie wyzwala trailingu (brak wiedzy o ścieżce intrabar).
+        """
         if poz.kierunek == "LONG":
             if bar.low <= poz.cena_likwidacji:
                 return "LIQUIDATION"
             if bar.low <= poz.stop_loss:
                 return "SL_HIT"
+            if trail_armed and bar.low <= trail_stop:
+                return "TRAIL_HIT"
             if bar.high >= poz.take_profit:
                 return "TP_HIT"
         else:  # SHORT
@@ -360,6 +417,8 @@ class PaperTradingEngine:
                 return "LIQUIDATION"
             if bar.high >= poz.stop_loss:
                 return "SL_HIT"
+            if trail_armed and bar.high >= trail_stop:
+                return "TRAIL_HIT"
             if bar.low <= poz.take_profit:
                 return "TP_HIT"
 
@@ -371,6 +430,8 @@ class PaperTradingEngine:
         """Wyznacza cenę zamknięcia z uwzględnieniem slippage."""
         if powod == "SL_HIT":
             cena = poz.stop_loss
+        elif powod == "TRAIL_HIT":
+            cena = poz.trailing_stop
         elif powod == "TP_HIT":
             cena = poz.take_profit
         elif powod == "LIQUIDATION":

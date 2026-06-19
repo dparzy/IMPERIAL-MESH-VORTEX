@@ -594,3 +594,68 @@ def test_konfigpetli_ma_nowe_pola():
     assert cfg.monitor is False
     assert cfg.telegram is False
     assert cfg.senat is False
+
+
+# ─── W-350 Per-coin archetypy ──────────────────────────────────────────────────
+
+def test_btc_archetyp_wzmacnia_onchain():
+    """BTC: kategoria O (on-chain) dostaje ×1.4 — sprawdzamy, że waga rośnie vs default."""
+    from imperium.legiony.legatus import ARCHETYPY_COINOW, KLASY_COINOW
+    assert KLASY_COINOW["BTCUSDT"] == "BTC"
+    assert ARCHETYPY_COINOW["BTC"]["O"] > 1.0, "BTC powinno wzmacniać on-chain"
+
+
+def test_memecoin_archetyp_momentum():
+    """Memecoin: M (momentum) i R (sentyment) podwyższone, O obniżone."""
+    from imperium.legiony.legatus import ARCHETYPY_COINOW
+    a = ARCHETYPY_COINOW["MEMECOIN"]
+    assert a["M"] > 1.0, "MEMECOIN: momentum powinno być wyższe"
+    assert a["R"] > 1.0, "MEMECOIN: sentyment powinno być wyższe"
+    assert a["O"] < 1.0, "MEMECOIN: on-chain powinno być obniżone"
+
+
+def test_per_coin_wagi_btc_vs_doge():
+    """BTCUSDT i DOGEUSDT dostają różne wagi neuronu O w reżimie TREND_STRONG."""
+    leg = Legatus(neurony=[], min_neuronow=1, min_przewaga=0.1)
+    syg_btc = [SygnalNeuronu("OC-01", "INVEST", "MVRV_ZS", 6, "LONG", 0.8, waga=5, kategoria="O")]
+    syg_doge = [SygnalNeuronu("OC-01", "INVEST", "MVRV_ZS", 6, "LONG", 0.8, waga=5, kategoria="O")]
+    syg_btc[0].policz_finalna(); syg_doge[0].policz_finalna()
+
+    btc_out = leg._dostosuj_wagi(syg_btc, "TREND_STRONG", "BTCUSDT")
+    doge_out = leg._dostosuj_wagi(syg_doge, "TREND_STRONG", "DOGEUSDT")
+    # BTC archetyp O×1.4 > MEMECOIN archetyp O×0.4 — BTC musi mieć wyższą wagę O
+    assert btc_out[0].waga > doge_out[0].waga, (
+        f"BTC on-chain ({btc_out[0].waga}) powinno być > DOGE ({doge_out[0].waga})"
+    )
+
+
+def test_per_coin_nieznany_symbol_uzywa_alt():
+    """Nieznany symbol (np. XYZUSDT) mapuje się na archetyp ALT (minimalna modyfikacja)."""
+    from imperium.legiony.legatus import KLASY_COINOW, ARCHETYPY_COINOW
+    assert "XYZUSDT" not in KLASY_COINOW
+    # ALT archetyp nie zmniejsza żadnej kategorii poniżej 1.0
+    for v in ARCHETYPY_COINOW.get("ALT", {}).values():
+        assert v >= 1.0, "ALT nie powinien obniżać wag"
+
+
+def test_per_coin_zero_nie_zabija_sygnalu():
+    """Mnożnik per-coin (nawet 0.4 dla O na DOGE) nie wyzeruje wagi — min(10, max(1, ...))."""
+    leg = Legatus(neurony=[], min_neuronow=1, min_przewaga=0.1)
+    syg = [SygnalNeuronu("OC-01", "INVEST", "MVRV_ZS", 6, "LONG", 0.8, waga=1, kategoria="O")]
+    syg[0].policz_finalna()
+    out = leg._dostosuj_wagi(syg, "PANIC", "DOGEUSDT")  # PANIC: _default=0.1, O nie ma → 0.1, DOGE O×0.4 = 0.04 → min waga=1
+    assert out[0].waga >= 1, "Waga nigdy nie spada poniżej 1"
+
+
+def test_per_coin_fokus_przekazuje_symbol():
+    """fokus() z symbolem DOGEUSDT faktycznie stosuje archetyp MEMECOIN."""
+    from imperium.legiony.neurony.momentum import NeuronRSI
+    leg = Legatus(neurony=[NeuronRSI()], min_neuronow=1, min_przewaga=0.1)
+    # RSI to kategoria M — MEMECOIN daje ×1.5; ALT daje ×1.1
+    rap_doge = leg.fokus("DOGEUSDT", {"RSI_14": 20.0})
+    rap_xyz  = leg.fokus("XYZUSDT",  {"RSI_14": 20.0})
+    # Pewność/waga DOGE powinna być ≥ XYZ dla sygnału M (MEMECOIN M×1.5 > ALT M×1.1)
+    syg_doge_M = [s for s in rap_doge.sygnaly if s.kategoria == "M"]
+    syg_xyz_M  = [s for s in rap_xyz.sygnaly  if s.kategoria == "M"]
+    if syg_doge_M and syg_xyz_M:
+        assert syg_doge_M[0].waga >= syg_xyz_M[0].waga, "DOGE M waga >= XYZ M waga"

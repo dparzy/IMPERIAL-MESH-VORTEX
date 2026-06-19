@@ -81,6 +81,41 @@ WAGI_REZIMU = {
 WAGI_REZIMU_PLANOWANE: set = set()  # L i V zaimplementowane (VI-13, V-13)
 
 
+# ─── Per-coin archetypy (W-350) ───────────────────────────────────────────────
+#
+# Każda waluta ma inny charakter — BTC institutionalny, ETH ekosystemowy,
+# memecoiny czysto sentymentalne. WAGI_REZIMU są globalne (per reżim),
+# a ARCHETYPY dodają mnożnik NA WIERZCH wag kategorii (bez zastępowania logiki roju).
+#
+# Wzór: waga_finalna = waga_rezim × mnoznik_uczenie × mnoznik_archetypu
+#
+# Zasada (Prawo XVI — mierzone, nie zgadywane):
+#   O=On-chain  M=Momentum  T=Trend  R=Sentyment/Wyrocznia  S=Struktura  A=Antymanip
+#
+# BTC:      na-łańcuchowe (MVRV, SOPR, Puell) = prawdziwa przewaga; trend silny
+# ETH/SOL:  ekosystemowe — balans trend+struktura; lekko mniej on-chain niż BTC
+# MEMECOIN: czyste momentum + sentyment (funding, L/S, newsy); on-chain bez wartości
+# DEFAULT:  brak modyfikacji (1.0) — nowe/nieznane coiny
+ARCHETYPY_COINOW: dict = {
+    "BTC":      {"O": 1.4, "T": 1.2, "M": 0.9, "R": 0.9},
+    "ETH":      {"O": 1.2, "T": 1.1, "S": 1.1, "M": 1.0},
+    "ALT":      {"M": 1.1, "S": 1.1, "T": 1.0},
+    "MEMECOIN": {"M": 1.5, "R": 1.6, "T": 0.7, "O": 0.4, "S": 0.8},
+}
+
+# Mapowanie symbolu na archetyp. Można rozszerzać bez zmiany logiki.
+KLASY_COINOW: dict = {
+    "BTCUSDT": "BTC", "BTCBUSD": "BTC", "BTCFDUSD": "BTC",
+    "ETHUSDT": "ETH", "ETHBUSD": "ETH", "ETHFDUSD": "ETH",
+    "BNBUSDT": "ETH", "SOLUSDT": "ETH", "AVAXUSDT": "ETH",
+    "ADAUSDT": "ETH", "DOTUSDT": "ETH", "LINKUSDT": "ETH",
+    "MATICUSDT": "ETH", "LTCUSDT": "ETH", "TRXUSDT": "ETH",
+    "DOGEUSDT": "MEMECOIN", "SHIBUSDT": "MEMECOIN", "PEPEUSDT": "MEMECOIN",
+    "WIFUSDT": "MEMECOIN", "BONKUSDT": "MEMECOIN", "FLOKIUSDT": "MEMECOIN",
+    "MOGUSDT": "MEMECOIN", "1000SHIBUSDT": "MEMECOIN", "1000PEPEUSDT": "MEMECOIN",
+}
+
+
 def _master_switch_rezimu(wskazniki: dict):
     """
     Master-switch reżimu (W-263/W-274, BIB-020 Harris rozdz. 16/20) — Faza 1 (Opcja 1).
@@ -400,7 +435,7 @@ class Legatus:
         # FAZA A (W-286): FORMACJA LEGIONÓW — na danym interwale głosują tylko
         # neurony właściwego legionu (SCALP nie głosuje na 1D, SWING nie na M5).
         sygnaly = self._formacja_interwalu(sygnaly, interwal)
-        sygnaly = self._dostosuj_wagi(sygnaly, rezim)
+        sygnaly = self._dostosuj_wagi(sygnaly, rezim, symbol)
         return self._agreguj(symbol, "FOKUS", rezim, sygnaly, rezim_zrodlo, interwal)
 
     # Legiony zawsze w polu niezależnie od interwału (uniwersalne: wolumen,
@@ -567,16 +602,19 @@ class Legatus:
             return []
 
     def _dostosuj_wagi(self, sygnaly: List[SygnalNeuronu],
-                       rezim: str) -> List[SygnalNeuronu]:
+                       rezim: str, symbol: str = "") -> List[SygnalNeuronu]:
         """
         Modyfikuje wagi neuronów: mnożnik REŻIMOWY (wg kategorii, WAGI_REZIMU) ×
-        mnożnik UCZENIA per-neuron (Igrzyska/HedgeMWU, wizja W-049). Prawo XV —
-        wagi ożywione zarówno regułą reżimu, jak i wynikami historycznymi.
+        mnożnik UCZENIA per-neuron (Igrzyska/HedgeMWU, wizja W-049) ×
+        mnożnik ARCHETYPU per-waluta (W-350 KLASY_COINOW — BTC/ETH/ALT/MEMECOIN).
+        Prawo XV — wagi ożywione regułą reżimu, wynikami historycznymi i charakterem coina.
         """
         mapa = (self._wagi_rezimu_override or WAGI_REZIMU).get(rezim, {})
         default = mapa.get("_default", 1.0)
         mn_neuron = self.mnozniki_neuronow
-        if not mapa and not mn_neuron:
+        archetyp = KLASY_COINOW.get(symbol, "ALT")
+        mn_archetyp = ARCHETYPY_COINOW.get(archetyp, {})
+        if not mapa and not mn_neuron and not mn_archetyp:
             return sygnaly
 
         wynik = []
@@ -584,7 +622,8 @@ class Legatus:
             k = s.kategoria if s.kategoria != "?" else None
             mnoznik_rezim = (mapa.get(k, default) if k else default) if mapa else 1.0
             mnoznik_uczenie = mn_neuron.get(s.neuron_id, 1.0)
-            mnoznik = mnoznik_rezim * mnoznik_uczenie
+            mnoznik_coin = mn_archetyp.get(k, 1.0) if k else 1.0
+            mnoznik = mnoznik_rezim * mnoznik_uczenie * mnoznik_coin
             if mnoznik != 1.0:
                 import copy
                 s2 = copy.copy(s)

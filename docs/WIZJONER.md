@@ -163,11 +163,13 @@
 
 | Metryka | Wartość |
 |---------|---------|
-| Łącznie wizji | 78 |
-| W trakcie analizy | 49 |
-| Przeniesione do katalogów (Higuchi, CME, Azja Range) | 3 |
-| Zaimplementowane (W-002 Igrzyska, W-028 Bezpiecznik) | 2 |
+| Łącznie unikalnych ID wizji (policzone z pliku) | 265 |
+| Zaimplementowane (✅ — pełna lista w `LOG_ZMIAN.md`) | dziesiątki (W-002, W-028, W-035/36, W-049, W-053/54/55, W-059, W-061/62/63, …, W-340, W-341/342/343) |
 | Odrzucone (niezgodne z zasadami) | 0 |
+
+> ⚠️ Tabela orientacyjna — WIZJONER to żywy brudnopis. Twardy rejestr „co wdrożone"
+> to `LOG_ZMIAN.md` + `MANIFEST_KODU.md` (Prawo XIX: kod jest prawem). Wizje
+> W-288..W-343 są udokumentowane w `LOG_ZMIAN.md` (brudnopis nie nadąża z każdą).
 
 ---
 

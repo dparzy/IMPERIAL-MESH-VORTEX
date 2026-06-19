@@ -208,8 +208,8 @@ klas, niezdefiniowane nazwy, martwe zmienne) — oraz **Warstwę 14 (wszystkie d
 Jeśli którakolwiek czerwona → NIE commitujesz, naprawiasz, dopiero potem commit+push.
 
 **🔍 ROZKAZ STAŁY (Cezar, 2026-06-18): AUDYT ZAWSZE SPRAWDZA WSZYSTKIE PLIKI, DOKUMENTY I KOD.**
-Audyt nie ogranicza się do README/MANIFEST/INDEKS — obejmuje CAŁĄ dokumentację (54 pliki .md)
-i żywy kod. Datowane snapshoty (LOG_ZMIAN, AUDYT_*_<data>, ROADMAP vX, RESEARCH/ANALIZA/MANUAL
+Audyt nie ogranicza się do README/MANIFEST/INDEKS — obejmuje CAŁĄ dokumentację (każdy plik .md
+poza archiwum/ i .git; liczbę przeskanowanych plików audyt podaje na żywo) i żywy kod. Datowane snapshoty (LOG_ZMIAN, AUDYT_*_<data>, ROADMAP vX, RESEARCH/ANALIZA/MANUAL
 z „Stan na/Data", WIZJONER) są POMIJANE świadomie — to prawda ich czasu (Prawo I: nie
 falsyfikujemy historii). Żywe dokumenty (źródła prawdy + MAPA_KLUCZY) MUSZĄ zgadzać się z kodem.
 

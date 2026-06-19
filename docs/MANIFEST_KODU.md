@@ -20,7 +20,7 @@
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 64). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 76). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -66,7 +66,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (64/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (76/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -298,7 +298,7 @@
 | III Augusta (H1) | ~45 | 10 (XII-01..04, V-01..05, VSA-01) + PSY-01..04 ✅ (Faza B) + V-03 ✅ + SMC-01..03 ✅ | ~35 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
-| **RAZEM** | **299** | **64** | **235** |
+| **RAZEM** | **299** | **76** | **223** |
 
 ---
 

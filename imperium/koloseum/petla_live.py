@@ -83,6 +83,9 @@ class KonfigPetliLive:
     auto_discover_min_obrot: float = 5_000_000.0
     # W-343 LiveMonitor (Prawo XXIV): TUI panel w terminalu co bar. OFF domyślnie.
     monitor: bool = False
+    # W-346 Web dashboard (Panel Kapitolu): serwer HTTP localhost co bar. OFF domyślnie.
+    dashboard: bool = False
+    dashboard_port: int = 8777
     # W-343 TelegramAlert (Prawo XXIV): alerty na wejścia/zamknięcia/weto PANIC.
     # Wymaga TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID w zmiennych środowiskowych.
     telegram: bool = False
@@ -289,6 +292,11 @@ def handluj_live(
         telegram = TelegramAlert()
         if not telegram.aktywny:
             logger.warning("[PętlaLive] TelegramAlert wyłączony — brak TELEGRAM_BOT_TOKEN/CHAT_ID")
+    serwer_web = None
+    if getattr(cfg, "dashboard", False):
+        from imperium.swiatynie.web_dashboard import SerwerDashboard
+        serwer_web = SerwerDashboard(port=getattr(cfg, "dashboard_port", 8777))
+        serwer_web.start()
 
     # W-310: domknięcie pętli pamięci — bootstrap KsięgiWad z PERSYSTENTNYCH lekcji
     # poprzednich sesji (Prawo XV: lekcje były pisane, nigdy czytane w produkcji).
@@ -437,8 +445,8 @@ def handluj_live(
                             kapital=engine.kapital_calkowity,
                         )
 
-            # 4c. LiveMonitor TUI render
-            if monitor is not None:
+            # 4c. LiveMonitor TUI render + Web dashboard (współdzielą StanDashboardu)
+            if monitor is not None or serwer_web is not None:
                 try:
                     from imperium.swiatynie.live_monitor import StanPozycji, StanDashboardu
                     from datetime import datetime
@@ -469,10 +477,13 @@ def handluj_live(
                         bledy=statystyki.bledy,
                         czas_ostatniego_bara=datetime.now(),
                     )
-                    monitor.aktualizuj(stan)
-                    monitor.render()
+                    if monitor is not None:
+                        monitor.aktualizuj(stan)
+                        monitor.render()
+                    if serwer_web is not None:
+                        serwer_web.aktualizuj(stan)
                 except Exception as e:
-                    logger.debug(f"[PętlaLive] Monitor render padł: {e}")
+                    logger.debug(f"[PętlaLive] Monitor/dashboard render padł: {e}")
 
             # 5. Logi diagnostyczne co 10 barów
             if bar_nr % 10 == 0:
@@ -496,6 +507,9 @@ def handluj_live(
                 ostatnie[sym] = bary[-1]["close"]
         if ostatnie:
             engine.zamknij_wszystkie(ostatnie, powod="PETLA_STOP")
+
+    if serwer_web is not None:
+        serwer_web.stop()
 
     return statystyki
 

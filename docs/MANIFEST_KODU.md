@@ -6,7 +6,7 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-18 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 76 neuronów (zarejestrowane w roju) + 12 zwiadowców = **88 modułów w kodzie**
+**Zaimplementowane:** 78 neuronów (zarejestrowane w roju) + 12 zwiadowców = **90 modułów w kodzie**
 **Meta-warstwy (B):** 2 moduły (`neutralizacja.py` B-02, `meta_labeling.py` B-01) — warstwa NAD Legatusem, nie neurony
 **Aktywne / wyciszone:** 72 aktywnych + 4 wyciszone, z czego:
   • **53 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S/C/D/R) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, N-02 FracDiff, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top, CP-01 CUSUM, BOCPD-01 Bayesian change-point, C-01 Cross-sectional RS)
@@ -66,7 +66,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (76/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (78/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -196,6 +196,13 @@
 | CP-01 | NeuronChangePoint | R | 6 | ✅ aktywny | CLOSE_SERIES_60 | CUSUM change-point — przełom strukturalny reżimu (W-336, Page 1954 / AFML Ch17) |
 | BOCPD-01 | NeuronBOCPD | R | 6 | ✅ aktywny | CLOSE_SERIES_60 | Bayesian Online Change-Point Detection — P(zmiana reżimu) per-bar, ciągłe (W-338, Adams & MacKay 2007) |
 | N-02 | NeuronFracDiff | N | 6 | ✅ aktywny | CLOSE_SERIES_100 | Fractional Differentiation — min. d zachowujące stacjonarność + z-score persystentnej składowej (W-339, AFML Ch5) |
+| K-01 | NeuronDXYTrend | K | 5 | 🔇 czeka na makro CSV | DXY_MOM | DXY Trend — dolar ↑ → presja na krypto SHORT; ↓ → tailwind LONG (W-085, Murphy BIB-002 rozdz.15) |
+| K-02 | NeuronGoldBTC | K | 4 | 🔇 czeka na makro CSV | GOLD_BTC_MOM | Gold/BTC ratio momentum — złoto outperformuje → risk-off SHORT; BTC leads → risk-on LONG (W-089, Burniske BIB-015) |
+
+> **Kat. K ożywiona 2026-06-19 (W-085, Murphy intermarket):** DXY i Gold/BTC
+> jako makro-kontekst poza krypto. Wyciszone (DOSTEPNY=False) do czasu dostarczenia
+> plików CSV z Yahoo Finance (narzedzia/pobierz_makro.py). Prawo XV: świadome wyciszenie,
+> nie martwy głos — ożywają gdy dane dostępne.
 
 > **Litera A ożywiona** (2026-06-02): reguły WAGI_REZIMU dla A (VOLATILE ×2.0,
 > PANIC ×3.0) były pre-zarejestrowane — teraz mają realne neurony. Prawo XV.

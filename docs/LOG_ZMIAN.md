@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-06-20 | DOC | Analiza Hermes Agent vs Pamięć Imperium + status książek
+
+`docs/ANALIZA_HERMES_I_PAMIEC.md` — odpowiedź na pytanie Cezara o pamięć absolutną „jak Hermes".
+Ustalenia (Prawo I + web research 2026-06-20): (1) „Hermes Agent" tradingowy = fabrykacja
+z rozmowy DeepSeek (już w INF-32); (2) realny Hermes Agent Nous Research istnieje — asystent
+osobisty, pamięć 5-filarowa (memory/skills/soul/crons/self-improving). Porównanie z naszymi
+8 modułami pamięci (2135 linii): wygrywamy hashem SHA-256, MAE/MFE, synapsami reżimowymi;
+luki: wyszukiwanie semantyczne, graf wiedzy, auto-lekcje, pamięć proceduralna. Status 21 książek
+BIB (esencja wyciągnięta, wdrożenie w kodzie = backlog). Plan W-360..363 + rekomendacja
+kolejnej książki (López de Prado "ML for Asset Managers"). Powód: Cezar prosił o ciągłość pamięci.
+
+---
+
 ## 2026-06-20 | DOC | Manual dodawania agentów + 2 subagenci Claude Code
 
 `docs/MANUAL_DODAWANIE_AGENTOW.md` — rozróżnienie dwóch typów „agentów": Doradcy Imperium

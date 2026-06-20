@@ -81,6 +81,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 45 | `MANUAL_UZYTKOWNIKA.md` | **Manual Użytkownika (pełny, dla nowicjusza)** — instalacja od zera (Win/Mac/Linux), tryby paper/dry-run/real, panel webowy, TradingView+ngrok krok po kroku, wszystkie opcje KonfigPetliLive, wszystkie komendy, klucze API, narzędzia AFML (W-355..W-359), tabela problemów | ✅ Aktywny |
 | 46 | `MANUAL_CLAUDE_CODE.md` | **Manual Claude Code** — instalacja Node.js+claude-code, logowanie Pro, pierwsze uruchomienie z Imperium, hook SessionStart, uprawnienia, tryb autonomiczny, MCP GitHub/Filesystem, klucze API (Prawo V), codzienna praca, skróty klawiszowe, Plan Mode, tabela problemów | ✅ Aktywny |
 | 47 | `MANUAL_DODAWANIE_AGENTOW.md` | **Manual dodawania agentów** — rozróżnienie Doradcy Imperium (moduł Python) vs Subagenci Claude Code (.claude/agents/*.md); krok po kroku jak dodać każdy typ (wzorzec doradcy VULCAN, struktura subagenta), kiedy który typ, zasady (Prawo VII/VIII/XIX/XXI) | ✅ Aktywny |
+| 48 | `ANALIZA_HERMES_I_PAMIEC.md` | **Analiza Hermes Agent vs Pamięć Imperium** — prawda o „Hermes Agent" (fabrykacja INF-32 vs realny Nous Research 5-filarowy), porównanie pamięci (8 modułów/2135 linii kodu, gdzie wygrywamy: hash/MAE-MFE/synapsy, gdzie luki: semantyka/graf/auto-lekcje), status 21 książek BIB, rekomendacja kolejnej książki, plan W-360..363 (auto-lekcje/podobieństwo/skills/self-improving) | ✅ Aktywny |
 
 ---
 

@@ -231,6 +231,34 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 
 | INF-33 | "High Win Rate Day Trading Setups" — autor anonimowy (self-published, 2023) | brak ISBN (BIB-021), plik .azw3 dostarczony 2026-06-19 (~35 kB tekstu) | ⚠️ NISKA 3/10 (Prawo I). Detaliczny katalog 9 skryptów-wskaźników TradingView community (UT Bot, HalfTrend, AlphaTrend, KDJ Whale Pump, Bjorgum MTF MA, Gaussian Loxx, TTF, Reversal Finder, Zero-Lag MACD) + 7 mechanicznych strategii scalp/mean-rev (BB+UT, MFI+HMA, RSI(5)+BB+ADX, Pivot+Williams%R…). **Zero backtestów, "70%+ win rate" bez dowodu** (nie powtarzamy jako fakt). ~80% pokrywa się z rojem (BB X-04, RSI X-01, Williams%R X-06, HMA X-10, ADX XII-01, Choppiness V-14, Supertrend XII-04≈AlphaTrend/HalfTrend). MFI już skatalogowany w INF-18 (BIB-006, W-101..W-106). **Jedyne realne ziarno: Kaufman Efficiency Ratio** (rdzeń KAMA) — zainspirował odkrycie martwego wejścia: doradca Fulmen używał `kaufman_er>0.6` jako 1 z 3 warunków TRENDU, ale Budowniczy nigdy go nie liczył (stały default 0.5 = martwy głos, Prawo XV). **→ W-353 WDROŻONE:** `KAUFMAN_ER` w Bramie + `KAUFMAN_ER_10` w Budowniczym + wpięcie w Dyrygenta. Reszta = referencja | ✅ W-353 (Kaufman ER) wdrożone |
 
+| INF-34 | "Optimal Trading Strategies" — Robert Kissell & Morton Glantz (2003) | (BIB-022, plik .djvu dostarczony 2026-06-20, 783k znaków OCR) | ⚠️ 4/10 dla bota crypto. Kanon Transaction Cost Analysis (TCA) i optymalnej egzekucji (Almgren-Chriss). **W ~80% nieadekwatne dla małego kapitału** — market impact ma sens tylko gdy zlecenie to znaczący % wolumenu; przy małym kapitale na płynnych parach MEXC impact znikomy (sam Kissell definiuje impact = f(rozmiar/wolumen)). **Esencja:** Implementation Shortfall (IS = cena_realizacji − cena_decyzji), market impact temporary vs permanent, Trader's Dilemma (impact vs timing risk), VWAP/TWAP/POV, efficient trading frontier. **NAKŁADKA (Prawo XVI):** IS = **już W-267** (Perold, z BIB-020); market-impact gate = **już W-266/W-269** (BIB-020). **Jedyne realnie nowe ziarno: EXEC-01** — slippage zależny od płynności (`k·σ·√(rozmiar/ADV)+spread/2`) zamiast stałego `slippage_pct` (🚨 Prawo XV: stały slippage = utrata potencjału). Reszta = potwierdza kierunek BIB-020, nie dodaje | ⚠️ EXEC-01 kandydat; reszta = duplikat W-266/267/269 |
+
+| INF-35 ⭐ | "Machine Learning for Asset Managers" — Marcos López de Prado (2020) | ISBN 978-1108792899 (BIB-023, .pdf dostarczony 2026-06-20, 152 str.) | ✅ **8/10 — SKARB, ten sam autor co BIB-007.** Krótka, gęsta, każdy rozdz. ma snippet Python. **Celuje wprost w nasze 2 udokumentowane luki** (ANALIZA_HERMES: brak wyszukiwania podobieństwa + brak dekorelacji macierzowej). Nasze neurony = "aktywa", macierz korelacji ich głosów = problem który ta książka rozwiązuje. **NOWE vs BIB-007:** (1) **Denoising** macierzy kowariancji (Marchenko-Pastur + KDE) — bije Ledoit-Wolf shrinkage; (2) **Detoning** (usuń ton rynkowy); (3) **Distance metrics** — korelacja NIE jest metryką; **Variation of Information** `VI=H[X]+H[Y]−2I[X,Y]` łapie zależności NIELINIOWE (uogólnienie Pearsona); (4) **ONC** (Optimal Number of Clusters, K-Means+silhouette); (5) **NCO/HRP** (Nested Clustered Optimization, RMSE −47-55% vs Markowitz); (6) feature importance NA KLASTRACH. **JUŻ MAMY (nie powielać):** triple-barrier/CUSUM/purged-kfold/bet-sizing (W-355..359), Deflated Sharpe+PBO+CSCV (W-282, `koloseum/walidacja.py`). 🚨 **Prawo XV:** `diagnostyka_korelacji` mierzy TYLKO Pearsona liniowo → redundancja nieliniowa między głosami dziś niewidoczna. **→ Wizje W-364..W-368** (patrz niżej) | ✅ esencja; W-364..368 zaplanowane |
+
+| INF-36 | "Bitcoin and Cryptocurrency Trading for Beginners" — Lowe | (BIB-024, .epub dostarczony 2026-06-20, 191k znaków) | ❌ **ODRZUCONA 1/10 — niżej niż INF-31.** Poradnik życiowy "jak nie zgubić hasła" z TA doklejonym na kilka stron (~60% to bezpieczeństwo haseł, historia Satoshiego, opisy giełd, NFT). "10 strategii" = redundancja nazewnicza (Strategy 5="Buy the Dip", 8="Hedging again"), zero progów/reguł. **Błędy merytoryczne:** odwrócony opis korpusu świecy japońskiej, "strategie działają nawet gdy BTC spada do zera". Datowana (BTC "$8000", era ICO). **Zero ziarna** (jedyny kandydat OBV/dywergencje już w roju, bez formuł). **Wizji NIE przyznano** (Prawo I, jak INF-31) | ❌ odrzucona, archiwum |
+
+> **📗 BIB-020 (Harris "Trading and Exchanges") — UWAGA SPÓJNOŚCI:** fizyczny plik epub dodano 2026-06-20,
+> ale **książka była już w pełni przeżyta** w `docs/WIZJONER.md` (ŻYCZ-10, 9/10, pula wizji W-250..W-279,
+> dekorelacja zmierzona `narzedzia/pomiar_dekorelacji_bib020.py`). **5 wizji JUŻ W KODZIE:** X-27 (W-273),
+> Z-03 (W-278), Z-04 (W-279), VARIANCE_RATIO (W-263), OU_HALFLIFE (W-274). Nie ma osobnego wpisu INF —
+> jego dom to WIZJONER (większa pula niż mieści tabela INF). To wyjaśnia lukę numeracji BIB-020 w tabeli.
+
+---
+
+## 🔟 WIZJE BIB-023 (López de Prado ML for Asset Managers) — W-364..W-368
+
+> Zamykają 2 luki pamięci z `ANALIZA_HERMES_I_PAMIEC.md`. Kolejność kumulatywna (Prawo VII).
+
+| Wizja | Opis | Cel / moduł | Status |
+|---|---|---|---|
+| **W-364** ⭐ | **Variation of Information** — nieliniowa miara podobieństwa głosów neuronów (`VI=H[X]+H[Y]−2I[X,Y]`). Dziś `diagnostyka_korelacji` widzi tylko Pearsona; VI łapie redundancję nieliniową (dwa głosy ρ≈0 ale wysokie I[X,Y]). Łączy lukę „podobieństwo" (W-361) + Prawo XVI. ~20 linii + binning. **ZACZNIJ TU.** | `diagnostyka_korelacji.py` | 🔴 plan |
+| **W-365** | **Denoising macierzy korelacji** głosów (Marchenko-Pastur + KDE) — odszum macierz ZANIM policzymy dekorelację. Dziś surowa korelacja magnifikuje szum. | `diagnostyka_korelacji.py` | 🔴 plan |
+| **W-366** | **ONC clustering** głosów + feature importance na klastrach — auto-grupowanie skorelowanych neuronów (zamiast ręcznego patrzenia na pary >0.80). | `legiony/` | 🔴 plan |
+| **W-367** | **NCO wag neuronów per-reżim** — podnosi `synapsy_rezimowe` (dziś PARY) do poziomu macierzowego: klastruj → alokuj wewnątrz/między klastrami. | `synapsy_rezimowe.py` | 🔴 plan |
+| **W-368** | **Detoning** — usuń „ton rynkowy" (dominujący czynnik wspólny) przed klastrowaniem → wzmacnia zdekorelowane głosy. | `legiony/` | 🔴 plan |
+
+---
+
 > **Pełna lista (~220 narzędzi):** `docs/ARSENAL_IMPERIUM.md` — schemat architektoniczny + tabele weryfikacyjne.
 
 ---

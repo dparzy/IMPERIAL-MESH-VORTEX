@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-20 | RESEARCH | Analiza 4 nowych książek (BIB-020/022/023/024) — 4 zwiadowców Opus
+
+Cezar wrzucił do `bibliotheca_ulpia/` 24 książki (20 starych już w rejestrze + 4 nowe pliki).
+Ekstrakcja tekstu: epub→unzip+html, pdf→pymupdf, djvu→djvutxt. 4 agentów Opus przeżyło każdą:
+
+- **BIB-020 Harris "Trading and Exchanges"** — fizyczny plik dodany, ale **książka była już
+  przeżyta w WIZJONER** (ŻYCZ-10, W-250..279, 5 wizji w kodzie: X-27/Z-03/Z-04/VR/OU). Agent
+  „odkrył" U-01 Roll = już W-264, U-03 resiliency = już W-274. **Nic nowego** (Prawo XXI: spójność).
+- **BIB-022 Kissell "Optimal Trading Strategies"** → INF-34, 4/10. IS = już W-267, impact gate =
+  już W-266/269. Jedyne ziarno: EXEC-01 (slippage zależny od płynności vs stały slippage_pct).
+- **BIB-023 López de Prado "ML for Asset Managers"** → INF-35 ⭐ 8/10 SKARB. Realnie nowe:
+  denoising (Marchenko-Pastur), Variation of Information (nieliniowa metryka), ONC, NCO, detoning.
+  Zamyka 2 luki pamięci z ANALIZA_HERMES. **→ W-364..368 zaplanowane** (VI najpierw).
+- **BIB-024 Lowe "Bitcoin for Beginners"** → INF-36 ❌ 1/10 odrzucona (niżej niż INF-31, błędy
+  merytoryczne, zero ziarna). Wizji nie przyznano (Prawo I).
+
+🚨 Prawo XV: `diagnostyka_korelacji` mierzy tylko Pearsona liniowo — redundancja nieliniowa między
+głosami niewidoczna. W-364 (Variation of Information) to zamyka. Pliki książek w `bibliotheca_ulpia/`.
+
+---
+
 ## 2026-06-20 | DOC | Analiza Hermes Agent vs Pamięć Imperium + status książek
 
 `docs/ANALIZA_HERMES_I_PAMIEC.md` — odpowiedź na pytanie Cezara o pamięć absolutną „jak Hermes".

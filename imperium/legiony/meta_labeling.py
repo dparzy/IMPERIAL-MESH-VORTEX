@@ -28,7 +28,7 @@ import math
 import time
 import logging
 from dataclasses import dataclass, field
-from typing import List
+from typing import Dict, List
 
 logger = logging.getLogger("MetaLabeling")
 
@@ -236,3 +236,107 @@ class MetaLabelingScorer:
             "wagi": [round(w, 4) for w in self._model._w],
             "bias": round(self._model._b, 4),
         }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# W-359 | Bet Sizing LdP — Gaussian CDF + averaging + dyskretyzacja (AFML Ch. 10)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+"""
+Ulepszony bet sizing per López de Prado (AFML Ch. 10, §10.2-10.4).
+
+Trzy uzupełnienia nad istniejącym Kelly:
+
+1. GAUSSIAN CDF MAPPING (§10.2):
+   m = 2·Φ(z) − 1,  gdzie z = (p − 1/K) / √(p·(1-p))
+   Zamiast liniowego Kelly 2p-1, mapuje przez CDF normalną:
+   • p=0.5 → z=0 → m=0 (neutral)
+   • p=0.6 → m≈0.32 vs Kelly 0.20 (mocniej skaluje przy większej pewności)
+   • p=1.0 → m=1.0 (pełna pozycja)
+   Bardziej agresywna w środku, ta sama granica 0/1.
+
+2. AVERAGING ACTIVE BETS (§10.3):
+   Gdy masz N aktywnych pozycji, ich sugerowane rozmiary uśredniaj → niższy
+   turnover, mniej przehandlowania. Zamiast skakać bet_size co bar — stopniowe
+   wygładzanie przez bufor aktywnych pozycji.
+
+3. SIZE DISCRETIZATION (§10.4):
+   m* = round(m / d) × d   np. d=0.1 → m∈{0, 0.1, 0.2,...,1.0}
+   Eliminuje mikrodrgania (0.731 → 0.73 → zlecenie, 0.734 → znowu 0.73 = brak ruchu).
+   Drastycznie redukuje koszty transakcyjne.
+"""
+
+
+def _phi(x: float) -> float:
+    """Dystrybuanta N(0,1) przez erf (stdlib, bez scipy)."""
+    return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
+
+
+def bet_size_ldp(
+    p: float,
+    k: int = 2,
+    dyskretyzacja: float = 0.05,
+) -> float:
+    """
+    Bet size z prawdopodobieństwa klasyfikatora przez CDF normalną (AFML §10.2).
+
+    Parametry:
+      p              — P(dobry sygnał) ∈ [0, 1]
+      k              — liczba klas (2 = binary: dobry/zły)
+      dyskretyzacja  — krok zaokrąglenia (0.05 → {0, 0.05, 0.10,...,1.0})
+
+    Zwraca: m ∈ [0, 1] — rozmiar betu.
+    """
+    p = max(0.0, min(1.0, p))
+    pvar = p * (1.0 - p)
+    if pvar <= 0:
+        m = 1.0 if p >= 0.5 else 0.0
+    else:
+        z = (p - 1.0 / k) / math.sqrt(pvar)
+        m = max(0.0, 2.0 * _phi(z) - 1.0)
+
+    if dyskretyzacja > 0:
+        m = round(m / dyskretyzacja) * dyskretyzacja
+
+    return round(min(1.0, max(0.0, m)), 4)
+
+
+class BuforAktywnych:
+    """
+    Averaging Active Bets (AFML §10.3) — wygładza bet_size przez uśrednianie
+    sugerowanych rozmiarów dla nakładających się pozycji.
+
+    Użycie:
+      bufor = BuforAktywnych(max_pozycji=10)
+      bufor.dodaj("BTCUSDT", 0.8)
+      m = bufor.srednia()   # uśredniona wielkość
+      bufor.zamknij("BTCUSDT")
+    """
+
+    def __init__(self, max_pozycji: int = 20) -> None:
+        self._aktywne: Dict[str, float] = {}
+        self._max = max_pozycji
+
+    def dodaj(self, symbol: str, bet_size: float) -> None:
+        """Dodaje lub aktualizuje bet_size dla symbolu."""
+        if len(self._aktywne) >= self._max and symbol not in self._aktywne:
+            logger.warning("[BuforAktywnych] Bufor pełny (%d) — %s pominięty", self._max, symbol)
+            return
+        self._aktywne[symbol] = bet_size
+
+    def zamknij(self, symbol: str) -> None:
+        """Usuwa symbol po zamknięciu pozycji."""
+        self._aktywne.pop(symbol, None)
+
+    def srednia(self) -> float:
+        """Uśredniony bet_size aktywnych pozycji (averaging active bets)."""
+        if not self._aktywne:
+            return 0.0
+        return sum(self._aktywne.values()) / len(self._aktywne)
+
+    def bet_dla(self, symbol: str) -> float:
+        """Bieżący bet_size dla symbolu (lub 0.0 jeśli nieaktywny)."""
+        return self._aktywne.get(symbol, 0.0)
+
+    def aktywne(self) -> Dict[str, float]:
+        return dict(self._aktywne)

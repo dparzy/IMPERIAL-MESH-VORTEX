@@ -6,6 +6,44 @@
 
 ---
 
+## 2026-06-20 | W-355..W-359 | AFML (López de Prado) — 5 modułów z "Advances in Financial ML"
+
+**Źródło:** Lektura i analiza książki "Advances in Financial Machine Learning" (INF-34),
+najważniejsza pozycja w dziedzinie. Agent Opus przeczytał całość i wskazał 5 braków vs Imperium.
+
+**W-355 | Feature Importance: MDA + SFI (AFML Ch. 8)**
+`imperium/legiony/feature_importance.py` — `raport_waznosci(historia, wyniki)`.
+MDA (Mean Decrease Accuracy): permutuje sygnał neuronu → mierzy spadek accuracy roju.
+SFI (Single Feature Importance): accuracy każdego neuronu samodzielnie (odporna na korelacje).
+Realizuje Prawo XV (martwy głos = neuron z MDA≤0) i Prawo XVI (redundancja mierzona OOS).
+
+**W-356 | Dollar/Volume/Tick/Imbalance Bars (AFML Ch. 2)**
+`imperium/akwedukty/bary_zdarzeniowe.py` — próbkowanie zdarzeniowe zamiast czasowego.
+Dollar bars (co N USD obrotu) mają homoskedastyczność i własności bliższe IID vs świece 1h.
+Aproksymacja z OHLCV (4 syntetyczne ticki per bar) + prawdziwe websocket ticki.
+Imbalance bars: adaptacyjne próbkowanie przy asymetrii Buy/Sell (detekcja informatywnych flow'ów).
+
+**W-357 | Triple-Barrier Method + CUSUM Filter (AFML Ch. 3 + 17)**
+`imperium/legiony/triple_barrier.py` — spójny silnik etykiet pod meta-labeling (B-01).
+Dynamiczne progi w wielokrotnościach σ zmienności (nie fixed %). CUSUM sampler zdarzeń.
+Sample Uniqueness (AFML Ch. 4) — wagi próbek odwrotnie proporcjonalne do nakładania etykiet.
+
+**W-358 | Purged K-Fold + Embargo (AFML Ch. 7)**
+`imperium/koloseum/walidacja.py` — `purged_kfold_podzialy()` + `cross_val_score_purged()`.
+Purging: usuwa train-obs nakładające się z test (brak information leakage).
+Embargo: usuwa obs tuż PO teście (embargo_pct × n barów, autokorelacja residualna).
+
+**W-359 | Bet Sizing LdP: Gaussian CDF + averaging + dyskretyzacja (AFML Ch. 10)**
+`imperium/legiony/meta_labeling.py` — `bet_size_ldp()` + `BuforAktywnych`.
+Gaussian CDF: m = 2Φ((p−0.5)/√(p(1-p)))−1 zamiast Kelly 2p−1 (mocniej skaluje).
+Averaging active bets: uśrednione bet_size nakładających się pozycji → niższy turnover.
+Size discretization: round(m/d)×d → eliminuje mikrodrgania i koszt transakcyjny.
+
+**Testy:** 1531/1532 → 1531+35 nowych (test_afml.py) po naprawie.
+**Audyt:** pełna harmonia ✅ | Ruff: czysty ✅
+
+---
+
 ## 2026-06-19 | W-354 | TradingView Webhook Receiver — sygnały na żywo w roju (Prawo XV)
 
 **Cel:** Podłączenie TradingView do Imperium przez HTTP POST webhook — alerty z Pine Script

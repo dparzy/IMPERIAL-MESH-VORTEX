@@ -38,9 +38,11 @@ testów na paper.
 
 ---
 
-## 2. INSTALACJA OD ZERA <a name="2-instalacja"></a>
+## 2. INSTALACJA <a name="2-instalacja"></a>
 
-### Krok 2.1 — Zainstaluj Pythona
+> **Masz już Pythona 3.11+, git i TA-Lib?** Przejdź od razu do kroku 2.3 →
+
+### Krok 2.1 — Zainstaluj Pythona (pomiń jeśli masz już 3.11+)
 
 Imperium działa na **Pythonie 3.11+**.
 
@@ -62,13 +64,13 @@ brew install python@3.12
 sudo apt update && sudo apt install python3 python3-pip python3-venv git
 ```
 
-### Krok 2.2 — Sprawdź że Python działa
+### Krok 2.2 — Sprawdź że Python działa (pomiń jeśli już masz)
 
 Otwórz terminal (Windows: wpisz „cmd" w menu Start; Mac: „Terminal"):
 ```bash
 python --version
 ```
-Powinno pokazać `Python 3.12.x` lub podobne. Jeśli błąd — Python nie jest w PATH
+Powinno pokazać `Python 3.11.x` lub nowszy. Jeśli błąd — Python nie jest w PATH
 (Windows: odinstaluj i zainstaluj ponownie z ptaszkiem „Add to PATH").
 
 ### Krok 2.3 — Pobierz Imperium
@@ -78,23 +80,26 @@ git clone https://github.com/dparzy/imperial-mesh-vortex.git
 cd imperial-mesh-vortex
 ```
 
-Jeśli nie masz git: pobierz ZIP z GitHub (zielony przycisk „Code" → „Download ZIP"),
-rozpakuj, wejdź do folderu w terminalu (`cd ścieżka/do/folderu`).
+Jeśli już masz sklonowane — zaktualizuj:
+```bash
+cd imperial-mesh-vortex
+git pull origin main
+```
 
 ### Krok 2.4 — Stwórz środowisko wirtualne (zalecane)
 
 To izoluje pakiety Imperium od reszty systemu:
 ```bash
 # Windows:
-python -m venv venv
-venv\Scripts\activate
+python -m venv .venv
+.venv\Scripts\activate
 
 # Mac/Linux:
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-Po aktywacji w terminalu zobaczysz `(venv)` na początku linii. To znaczy że działa.
+Po aktywacji w terminalu zobaczysz `(.venv)` na początku linii. To znaczy że działa.
 
 ### Krok 2.5 — Zainstaluj zależności
 
@@ -102,10 +107,11 @@ Po aktywacji w terminalu zobaczysz `(venv)` na początku linii. To znaczy że dz
 pip install -r requirements.txt
 ```
 
-To instaluje: numpy, pandas, ccxt (giełdy), TA-Lib (matematyka), matplotlib (wykresy),
+To instaluje: numpy, pandas, ccxt (giełdy), matplotlib (wykresy),
 openai (doradca AI), ruff (kontrola jakości).
 
-> ⚠️ **TA-Lib** czasem sprawia problemy na Windows. Jeśli `pip install` się wywali na TA-Lib:
+> ⚠️ **TA-Lib** — jeśli masz już zainstalowaną (np. z poprzedniej sesji), `pip install`
+> ją wykryje i pominie. Jeśli pojawi się błąd:
 > - Windows: pobierz gotowy plik `.whl` z https://github.com/cgohlke/talib-build/releases
 >   i zainstaluj: `pip install ta_lib‑0.6.0‑cp312‑cp312‑win_amd64.whl`
 > - Mac: `brew install ta-lib` PRZED `pip install`

@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-20 | W-365..368 | Denoising/Clustering macierzy (López de Prado MLAM, BIB-023)
+
+Wdrożono `imperium/legiony/denoising_macierzy.py` (czysty numpy — scipy/sklearn niedostępne):
+- **W-365 Denoising** — `denoise_macierz()` metodą Marchenko-Pastur + constant residual
+  eigenvalue. `mp_pdf()` (teoretyczna gęstość MP), `znajdz_max_eval()` (dopasowanie wariancji
+  szumu przez KDE Gaussa w czystym numpy + grid search, bo brak scipy.minimize).
+- **W-366 ONC** — `klastruj_onc()`: auto-klastrowanie na metryce `√(½(1−ρ))`, K-Means +
+  silhouette w czystym numpy, auto-dobór k przez t-stat jakości (śr/odch silhouette).
+- **W-367 NCO** — `nco_wagi()`: Nested Clustered Optimization, wagi min-wariancji odporne
+  na klątwę Markowitza (klastruj → wewnątrz → między klastrami). `_wagi_min_wariancji()` (pinv).
+- **W-368 Detoning** — `detone_macierz()`: usuwa „ton rynkowy" (n czołowych wartości własnych).
+
+16 testów (`test_denoising_macierzy.py`) z REGUŁĄ TEST-GRANIC (identyczność=szum, blok znany,
+pojedynczy element, q≤1 ValueError, n_czynnikow=0 bez zmian, determinizm seed). Zamyka lukę
+dekorelacji macierzowej z ANALIZA_HERMES_I_PAMIEC. 🚨 ODKRYCIE SPÓJNOŚCI: **W-364 (Variation
+of Information) JUŻ był w kodzie** (`diagnostyka_korelacji.py`) — agent mylił MANIFEST z kodem.
+
+---
+
 ## 2026-06-20 | RESEARCH | Analiza 4 nowych książek (BIB-020/022/023/024) — 4 zwiadowców Opus
 
 Cezar wrzucił do `bibliotheca_ulpia/` 24 książki (20 starych już w rejestrze + 4 nowe pliki).

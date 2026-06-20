@@ -251,11 +251,27 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 
 | Wizja | Opis | Cel / moduł | Status |
 |---|---|---|---|
-| **W-364** ⭐ | **Variation of Information** — nieliniowa miara podobieństwa głosów neuronów (`VI=H[X]+H[Y]−2I[X,Y]`). Dziś `diagnostyka_korelacji` widzi tylko Pearsona; VI łapie redundancję nieliniową (dwa głosy ρ≈0 ale wysokie I[X,Y]). Łączy lukę „podobieństwo" (W-361) + Prawo XVI. ~20 linii + binning. **ZACZNIJ TU.** | `diagnostyka_korelacji.py` | 🔴 plan |
-| **W-365** | **Denoising macierzy korelacji** głosów (Marchenko-Pastur + KDE) — odszum macierz ZANIM policzymy dekorelację. Dziś surowa korelacja magnifikuje szum. | `diagnostyka_korelacji.py` | 🔴 plan |
-| **W-366** | **ONC clustering** głosów + feature importance na klastrach — auto-grupowanie skorelowanych neuronów (zamiast ręcznego patrzenia na pary >0.80). | `legiony/` | 🔴 plan |
-| **W-367** | **NCO wag neuronów per-reżim** — podnosi `synapsy_rezimowe` (dziś PARY) do poziomu macierzowego: klastruj → alokuj wewnątrz/między klastrami. | `synapsy_rezimowe.py` | 🔴 plan |
-| **W-368** | **Detoning** — usuń „ton rynkowy" (dominujący czynnik wspólny) przed klastrowaniem → wzmacnia zdekorelowane głosy. | `legiony/` | 🔴 plan |
+| **W-364** ⭐ | **Variation of Information** — nieliniowa miara podobieństwa głosów neuronów (`VI=H[X]+H[Y]−2I[X,Y]`). Łapie redundancję nieliniową (dwa głosy ρ≈0 ale wysokie I[X,Y]). | `diagnostyka_korelacji.py` | ✅ **JUŻ BYŁO** — `variation_of_information()`, `informacja_wzajemna()`, `nmi()`, `raport_informacji_wzajemnej()` + testy `test_informacja_wzajemna.py` (odkrycie spójności 2026-06-20: agent mylił MANIFEST z kodem) |
+| **W-365** | **Denoising macierzy korelacji** (Marchenko-Pastur + KDE) — odszum macierz ZANIM policzymy dekorelację. Wartości własne ≤ λ⁺ = szum → constant residual eigenvalue. | `denoising_macierzy.py` | ✅ **WDROŻONE** 2026-06-20 — `denoise_macierz()`, `mp_pdf()`, `znajdz_max_eval()` (KDE w czystym numpy) |
+| **W-366** | **ONC clustering** — auto-grupowanie skorelowanych neuronów (K-Means na metryce `√(½(1−ρ))` + silhouette, auto-k). | `denoising_macierzy.py` | ✅ **WDROŻONE** 2026-06-20 — `klastruj_onc()` (K-Means+silhouette w czystym numpy) |
+| **W-367** | **NCO wag neuronów** — podnosi alokację do poziomu macierzowego: klastruj → alokuj wewnątrz/między klastrami (odporne na klątwę Markowitza). | `denoising_macierzy.py` | ✅ **WDROŻONE** 2026-06-20 — `nco_wagi()`, `_wagi_min_wariancji()` |
+| **W-368** | **Detoning** — usuń „ton rynkowy" (dominujący czynnik wspólny) przed klastrowaniem → wzmacnia zdekorelowane głosy. | `denoising_macierzy.py` | ✅ **WDROŻONE** 2026-06-20 — `detone_macierz()` |
+
+---
+
+## 📖 NASTĘPNE KSIĄŻKI — lista życzeń (ŻYCZ, do wrzucenia do `bibliotheca_ulpia/`)
+
+> Rekomendacje pod nasze udokumentowane luki — NIE powielać tego co mamy (Prawo VIII/XVI).
+> Wrzuć plik epub/pdf/azw3, nazwij `BIB-0XX_Autor_Tytul.ext`, napisz „masz nową książkę".
+
+| ŻYCZ | Książka | Po co (luka którą zamyka) | Priorytet |
+|---|---|---|---|
+| **ŻYCZ-15** | Grinold & Kahn — "Active Portfolio Management" (2nd ed.) | **Fundamental Law of Active Management** (IR = IC·√breadth) — matematyczny dowód że „więcej zdekorelowanych sygnałów = lepiej" (wprost pod nasz rój + Prawo XVI). Information Ratio jako miara jakości. | 🥇 TOP |
+| **ŻYCZ-16** | Rishi Narang — "Inside the Black Box" (2nd ed.) | Architektura systematycznych funduszy quant (alpha/risk/execution/data) — audyt naszej własnej struktury vs standard branżowy. Jak myślą prawdziwe fundusze. | 🥈 wysoki |
+| **ŻYCZ-17** | Irene Aldridge — "High-Frequency Trading" (2nd ed.) | Odblokowuje martwe wizje wymagające order book L2 (W-260/U-04/U-05) — gdy podłączymy feed L2. Mikrostruktura wykonawcza HFT. | 🥉 gdy L2 |
+| **ŻYCZ-18** | Stefan Jansen — "Machine Learning for Algorithmic Trading" (2nd ed.) | Praktyczny pipeline ML+backtest (alphalens, zipline, feature eng.) — wzorzec inżynierski dla Fazy 2 (Kronos A-12, SHARP). | 🔵 Faza 2 |
+
+> **Po co BIB-020 Harris jest już „domknięty":** patrz nota spójności wyżej (WIZJONER, W-250..279).
 
 ---
 

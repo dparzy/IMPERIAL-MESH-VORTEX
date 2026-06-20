@@ -14,9 +14,9 @@ BIB-023_Harris_Trading-Exchanges.pdf
 ```
 git checkout claude/sleepy-fermi-dsdE4
 git pull
-# skopiuj plik epub/pdf do tego folderu (ksiazki/)
-git add ksiazki/nazwa-pliku.epub
+# skopiuj plik epub/pdf do tego folderu (bibliotheca_ulpia/)
+git add bibliotheca_ulpia/nazwa-pliku.epub
 git commit -m "dodaj ksiazke BIB-022"
 git push
 ```
-Potem napisz mi "masz nową książkę w ksiazki/" — przeczytam i wrócę z esencją.
+Potem napisz mi "masz nową książkę w bibliotheca_ulpia/" — przeczytam i wrócę z esencją.

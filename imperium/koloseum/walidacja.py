@@ -31,7 +31,7 @@ Zero zależności poza numpy (Phi przez math.erf). Prawo I: matematyka, nie opin
 
 import math
 from itertools import combinations
-from typing import List, Sequence
+from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
@@ -401,3 +401,162 @@ def etap_pierwszy_koloseum(krzywa_equity: Sequence[float],
                     "sharpe_roczny": round(sharpe_roczny, 3), "dsr": dsr["dsr"]}
     return {"ok": True, "powod": "",
             "sharpe_roczny": round(sharpe_roczny, 3), "dsr": dsr["dsr"]}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# W-358 | PURGED K-FOLD + EMBARGO (AFML Ch. 7, §7.3-7.4)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+"""
+Purged K-Fold Cross-Validation — rozwiązanie wycieku danych w finansach.
+
+DLA NOWICJUSZA: Standardowy k-fold losowo miesza dane — w szeregach czasowych
+z nakładającymi się etykietami (np. triple-barrier) obserwacje treningowe mogą
+NAKŁADAĆ SIĘ CZASOWO z testowymi → model "podgląda" przyszłość (information leakage).
+
+Dwa mechanizmy ochrony:
+  1. PURGING — usuń z zestawu treningowego wszystkie obserwacje, których etykiety
+     nakładają się czasowo z etykietami testowymi.
+     Jeśli etykieta testowa obejmuje t=5..15 → purge train bar z t=3..12.
+
+  2. EMBARGO — usuń też obserwacje treningowe TURAZ PO teście (∆t = pct × T).
+     Autokorelacja zwrotów może sprawiać, że dane tuż po teście "pamiętają" test.
+     LdP: embargo = 0.01 × długość_serii (1% T).
+
+Źródło: AFML (2018), Ch. 7, Snippet 7.1-7.3.
+"""
+
+
+def purged_kfold_podzialy(
+    n: int,
+    k: int = 5,
+    t1: Optional[List[int]] = None,
+    embargo_pct: float = 0.01,
+) -> List[Tuple[List[int], List[int]]]:
+    """
+    Generuje K podziałów (train_idx, test_idx) z purgingiem i embargo.
+
+    Parametry:
+      n            — liczba obserwacji
+      k            — liczba foldów
+      t1           — List[int] indeksów KOŃCA etykiety per obserwacja
+                     (np. z Triple-Barrier: idx_dotknięcia). None → brak purgingu.
+      embargo_pct  — ułamek n do embargo po bloku testowym (domyślnie 1%)
+
+    Zwraca: List[(train_idx, test_idx)] — k par list indeksów.
+
+    Przykład:
+      podzialy = purged_kfold_podzialy(len(bary), k=5, t1=t1_lista)
+      for train, test in podzialy:
+          model.fit(X[train], y[train], sample_weight=wagi[train])
+          score = model.score(X[test], y[test])
+    """
+    rozmiar_bloku = n // k
+    embargo_n = int(n * embargo_pct)
+    wynik: List[Tuple[List[int], List[int]]] = []
+
+    for fold in range(k):
+        # Blok testowy: [fold*blok, (fold+1)*blok)
+        test_start = fold * rozmiar_bloku
+        test_end = (fold + 1) * rozmiar_bloku if fold < k - 1 else n
+        test_idx = list(range(test_start, test_end))
+
+        if not test_idx:
+            continue
+
+        # Pozostałe indeksy jako kandydaci na train
+        train_kandydaci = [i for i in range(n) if i not in set(test_idx)]
+
+        if t1 is None:
+            # Brak purgingu — tylko embargo
+            embargo_end = min(n, test_end + embargo_n)
+            train_idx = [i for i in train_kandydaci if i >= embargo_end or i < test_start]
+        else:
+            # Purging: usuń train, których etykieta kończy się w oknie testu
+            embargo_end = min(n, test_end + embargo_n)
+
+            train_idx = []
+            for i in train_kandydaci:
+                # Embargo: usuń obserwacje tuż po teście
+                if test_start <= i < embargo_end:
+                    continue
+                # Purging: usuń jeśli koniec etykiety nakłada się z testem
+                end_i = t1[i] if i < len(t1) else i
+                if any(test_start <= end_i <= test_end for _ in [None]):
+                    continue
+                # Sprawdź nakładanie: etykieta i pokrywa jakiś bar testowy?
+                start_i = i
+                if any(start_i <= tb <= end_i for tb in test_idx):
+                    continue
+                train_idx.append(i)
+
+        if train_idx and test_idx:
+            wynik.append((train_idx, test_idx))
+
+    return wynik
+
+
+def cross_val_score_purged(
+    model_ucz_fn,
+    model_ocen_fn,
+    X: List,
+    y: List[int],
+    k: int = 5,
+    t1: Optional[List[int]] = None,
+    embargo_pct: float = 0.01,
+    wagi: Optional[List[float]] = None,
+) -> Dict:
+    """
+    Cross-validation z purged k-fold i embargo. Bezszkieletowe (zero scikit-learn).
+
+    Parametry:
+      model_ucz_fn  — callable(X_train, y_train, wagi_train) → None
+      model_ocen_fn — callable(X_test, y_test) → float (accuracy)
+      X, y          — dane i etykiety (listy)
+      k             — liczba foldów
+      t1            — indeksy końca etykiety (purging); None = brak
+      embargo_pct   — ułamek do embargo
+      wagi          — wagi obserwacji (np. sample_uniqueness); None = równe
+
+    Zwraca: dict z wynikami OOS (mean, std, per-fold).
+    """
+    n = min(len(X), len(y))
+    podzialy = purged_kfold_podzialy(n, k, t1, embargo_pct)
+
+    scores: List[float] = []
+    for fold_nr, (train_idx, test_idx) in enumerate(podzialy):
+        X_tr = [X[i] for i in train_idx]
+        y_tr = [y[i] for i in train_idx]
+        X_te = [X[i] for i in test_idx]
+        y_te = [y[i] for i in test_idx]
+        w_tr = [wagi[i] for i in train_idx] if wagi else None
+
+        try:
+            model_ucz_fn(X_tr, y_tr, w_tr)
+            score = model_ocen_fn(X_te, y_te)
+            scores.append(score)
+        except Exception as exc:
+            import logging as _l
+            _l.getLogger("Walidacja").warning("Purged CV fold %d padł: %s", fold_nr, exc)
+
+    if not scores:
+        return {"ok": False, "powod": "Brak wyników CV", "scores": []}
+
+    mean_s = sum(scores) / len(scores)
+    var_s = sum((s - mean_s) ** 2 for s in scores) / max(1, len(scores))
+    std_s = math.sqrt(var_s)
+
+    return {
+        "ok": True,
+        "mean": round(mean_s, 4),
+        "std": round(std_s, 4),
+        "scores": [round(s, 4) for s in scores],
+        "n_foldow": len(scores),
+        "embargo_pct": embargo_pct,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# W-359 integracja: import Optional i List już jest powyżej
+# (Bet Sizing LdP jest w meta_labeling.py — patrz tamten plik)
+# ═══════════════════════════════════════════════════════════════════════════════

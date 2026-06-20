@@ -265,6 +265,9 @@ def backtest_portfel(
     # W-323 Profil Stylu — gdy podany (SCALP/SWING/INVEST), każdy Legatus dostaje
     # DEDYKOWANY zestaw neuronów (neurony_dla_trybu), nie pełne 70. None = pełny rój.
     styl: "Optional[str]" = None,
+    # W-351 Trailing Stop — blokuje zysk po ruchu korzystnym (MFE było liczone, ale
+    # nieużywane do wyjścia → utrata potencjału, Prawo XV). Domyślnie OFF (zero regresji).
+    trailing: bool = False,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -305,7 +308,8 @@ def backtest_portfel(
 
     engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
                                 sesja_id=f"BT-PORTFEL-{n}x-{interwal}",
-                                max_otwartych=n)   # każda para max 1 pozycja
+                                max_otwartych=n,   # każda para max 1 pozycja
+                                trailing=trailing)
     budowniczy = BudowniczyWskaznikow()
     namiestnik = get_namiestnik() if auto_rezim else None
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"

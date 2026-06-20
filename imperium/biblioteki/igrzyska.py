@@ -361,6 +361,61 @@ class Igrzyska:
         """Mnożniki wag do przekazania Legatusowi."""
         return {k: okresl_range(s.wynik)[1] for k, s in self.statystyki.items()}
 
+    # ── Persystencja ─────────────────────────────────────────────────────────
+
+    def zapisz(self, sciezka: str) -> None:
+        """Zapisuje skumulowane statystyki do JSON (cross-session learning)."""
+        from pathlib import Path
+        dane = {}
+        for klucz, s in self.statystyki.items():
+            dane[klucz] = {
+                "tp": s.tp, "fp": s.fp,
+                "long_trafne": s.long_trafne, "long_total": s.long_total,
+                "short_trafne": s.short_trafne, "short_total": s.short_total,
+                "ostatni_kierunek": s.ostatni_kierunek,
+                "flipy": s.flipy, "sygnaly": s.sygnaly,
+                "contribution_sum": s.contribution_sum,
+                "timeliness_sum": s.timeliness_sum,
+                "contribution_n": s.contribution_n,
+                "stats_per_rezim": {
+                    r: {"tp": rs.tp, "total": rs.total}
+                    for r, rs in s.stats_per_rezim.items()
+                },
+            }
+        Path(sciezka).parent.mkdir(parents=True, exist_ok=True)
+        Path(sciezka).write_text(
+            json.dumps(dane, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
+    def wczytaj(self, sciezka: str) -> None:
+        """Ładuje statystyki z JSON (bootstrap na starcie sesji)."""
+        from pathlib import Path
+        p = Path(sciezka)
+        if not p.exists():
+            return
+        try:
+            dane = json.loads(p.read_text(encoding="utf-8"))
+            for klucz, d in dane.items():
+                s = self._stat(klucz)
+                s.tp = d.get("tp", 0)
+                s.fp = d.get("fp", 0)
+                s.long_trafne = d.get("long_trafne", 0)
+                s.long_total = d.get("long_total", 0)
+                s.short_trafne = d.get("short_trafne", 0)
+                s.short_total = d.get("short_total", 0)
+                s.ostatni_kierunek = d.get("ostatni_kierunek", "")
+                s.flipy = d.get("flipy", 0)
+                s.sygnaly = d.get("sygnaly", 0)
+                s.contribution_sum = d.get("contribution_sum", 0.0)
+                s.timeliness_sum = d.get("timeliness_sum", 0.0)
+                s.contribution_n = d.get("contribution_n", 0)
+                for r, rs_d in d.get("stats_per_rezim", {}).items():
+                    rs = s._rezim_stat(r)
+                    rs.tp = rs_d.get("tp", 0)
+                    rs.total = rs_d.get("total", 0)
+        except Exception:
+            pass  # uszkodzony plik → zaczynamy od zera
+
     def drukuj_kapitol(self, top_n: int = 5):
         r = self.ranking()
         helm = self.zloty_helm()

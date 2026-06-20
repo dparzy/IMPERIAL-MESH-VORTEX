@@ -820,6 +820,55 @@ def test_hurst_dfa_nieujemna_cena_fallback():
     assert r.value is None or isinstance(r.value, float)
 
 
+def test_kaufman_er_trend_idealny():
+    """W-353: czysty trend liniowy → ER = 1.0 (ruch idealnie efektywny)."""
+    from imperium.fundament.brama_kalkulatora import _py_kaufman_er
+    trend = [float(i) for i in range(1, 30)]
+    assert _py_kaufman_er(trend, period=10) == 1.0
+
+
+def test_kaufman_er_pila_szum():
+    """W-353: piła (zero netto, sam szum) → ER = 0.0."""
+    from imperium.fundament.brama_kalkulatora import _py_kaufman_er
+    pila = [100.0, 101.0] * 15
+    assert _py_kaufman_er(pila, period=10) == 0.0
+
+
+def test_kaufman_er_plasko_brak_ruchu():
+    """W-353 granica: brak ruchu (płaska seria) → 0.0, NIE dzielenie przez zero."""
+    from imperium.fundament.brama_kalkulatora import _py_kaufman_er
+    assert _py_kaufman_er([100.0] * 30, period=10) == 0.0
+
+
+def test_kaufman_er_za_malo_danych_none():
+    """W-353 granica: < period+1 barów → None (Prawo XV, nie zgadujemy)."""
+    from imperium.fundament.brama_kalkulatora import _py_kaufman_er
+    assert _py_kaufman_er([1.0, 2.0, 3.0], period=10) is None
+
+
+def test_kaufman_er_zakres_0_1():
+    """W-353: ER zawsze w [0,1] na realnej zaszumionej serii."""
+    from imperium.fundament.brama_kalkulatora import _py_kaufman_er
+    import random
+    random.seed(7)
+    c = [100.0]
+    for _ in range(60):
+        c.append(c[-1] * (1 + random.gauss(0, 0.01)))
+    er = _py_kaufman_er(c, period=10)
+    assert er is not None and 0.0 <= er <= 1.0
+
+
+def test_kaufman_er_wpiety_w_budowniczego():
+    """W-353 symbioza: Budowniczy produkuje KAUFMAN_ER_10 (martwy głos Fulmena ożył)."""
+    from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
+    b = BudowniczyWskaznikow()
+    bary = [{"open": i, "high": i + 1, "low": i - 1, "close": float(i),
+             "volume": 100, "timestamp": i * 3_600_000} for i in range(1, 40)]
+    w = b.zbuduj(bary)
+    assert "KAUFMAN_ER_10" in w
+    assert w["KAUFMAN_ER_10"] == 1.0  # czysty trend
+
+
 def test_h01_kategoria_H_zywa():
     """Kategoria H żywa w roju i poprawnie w legendzie (Prawo XV/XXI)."""
     from imperium.legiony.rejestr import wszystkie_neurony

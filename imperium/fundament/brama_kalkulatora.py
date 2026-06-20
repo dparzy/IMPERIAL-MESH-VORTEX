@@ -54,7 +54,7 @@ SOURCE_TAG_PY = "pure-Python (deterministic)"
 # compute() stempluje je SOURCE_TAG_PY — audyt nie może kłamać o źródle (Prawo XIII).
 _PURE_PYTHON_INDICATORS = {
     "AO", "AO_PREV", "AC", "AC_PREV", "HMA", "HMA_PREV",
-    "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "PERMUTATION_ENTROPY", "VPIN", "WASH_TRADING", "CHOPPINESS", "ULCER",
+    "DONCHIAN", "RVOL", "HIST_VOL", "YANG_ZHANG", "HURST_DFA", "PERMUTATION_ENTROPY", "VPIN", "WASH_TRADING", "CHOPPINESS", "ULCER", "KAUFMAN_ER",
     "BUBBLE_Z", "VOV", "RET_AR1", "VALUE_Z", "MOMA_Z", "OU_HALFLIFE", "VARIANCE_RATIO",
     "CASCADE_FLAG", "DEADCAT_SETUP",
     "FORCE_INDEX_13", "FORCE_INDEX_2",
@@ -594,6 +594,33 @@ def _py_choppiness(high, low, close, period: int = 14) -> Optional[float]:
     if rozpietosc <= 0 or suma_tr <= 0:
         return None
     return round(100 * math.log10(suma_tr / rozpietosc) / math.log10(period), 2)
+
+
+def _py_kaufman_er(close, period: int = 10) -> Optional[float]:
+    """
+    Kaufman Efficiency Ratio (ER) — efektywność ruchu kierunkowego (Perry Kaufman,
+    "Trading Systems and Methods"). Rdzeń adaptacyjnej średniej KAMA.
+
+    Wzór: ER = |close[t] − close[t−n]| / Σ|close[i] − close[i−1]|  (n ostatnich barów)
+      • licznik  = zmiana NETTO (kierunkowa, "po linii prostej")
+      • mianownik = suma ruchów BRUTTO (cała przebyta droga, z szumem)
+
+    Zakres 0–1:
+      • ER → 1.0 = ruch idealnie efektywny (czysty trend, brak szumu)
+      • ER → 0.0 = pełen szum / konsolidacja (droga długa, zmiana netto ~0)
+
+    Dla nowicjusza: mierzy „ile drogi dotarło do celu". Jak jazda autostradą (ER≈1)
+    vs błądzenie po mieście (ER≈0). Doradca Fulmen używa ER>0.6 jako jednego z trzech
+    warunków potwierdzenia TRENDU (komplementarnie do ADX i Choppiness).
+    """
+    c = list(close)
+    if len(c) < period + 1:
+        return None
+    zmiana_netto = abs(c[-1] - c[-1 - period])
+    suma_brutto = sum(abs(c[i] - c[i - 1]) for i in range(len(c) - period, len(c)))
+    if suma_brutto <= 0:
+        return 0.0  # brak ruchu = brak efektywności (nie dzielimy przez zero)
+    return round(zmiana_netto / suma_brutto, 4)
 
 
 def _py_ulcer(close, period: int = 14) -> Optional[float]:
@@ -1254,6 +1281,9 @@ class CalculatorGateway:
 
             # ── Pure-Python: Ulcer Index — ryzyko spadkowe (kat. L) ───────────
             "ULCER":     lambda close, period=14: _py_ulcer(close, period),
+
+            # ── Pure-Python: Kaufman Efficiency Ratio — rdzeń KAMA (doradca Fulmen) ──
+            "KAUFMAN_ER": lambda close, period=10: _py_kaufman_er(close, period),
 
             # ── Pure-Python: W-278 bubble/crash kill-switch (kat. Z, BIB-020 Harris rozdz. 28) ──
             "BUBBLE_Z":   lambda close, period=200: _py_bubble_z(close, period),

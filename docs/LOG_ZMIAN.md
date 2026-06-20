@@ -6,6 +6,158 @@
 
 ---
 
+## 2026-06-20 | W-355..W-359 | AFML (López de Prado) — 5 modułów z "Advances in Financial ML"
+
+**Źródło:** Lektura i analiza książki "Advances in Financial Machine Learning" (INF-34),
+najważniejsza pozycja w dziedzinie. Agent Opus przeczytał całość i wskazał 5 braków vs Imperium.
+
+**W-355 | Feature Importance: MDA + SFI (AFML Ch. 8)**
+`imperium/legiony/feature_importance.py` — `raport_waznosci(historia, wyniki)`.
+MDA (Mean Decrease Accuracy): permutuje sygnał neuronu → mierzy spadek accuracy roju.
+SFI (Single Feature Importance): accuracy każdego neuronu samodzielnie (odporna na korelacje).
+Realizuje Prawo XV (martwy głos = neuron z MDA≤0) i Prawo XVI (redundancja mierzona OOS).
+
+**W-356 | Dollar/Volume/Tick/Imbalance Bars (AFML Ch. 2)**
+`imperium/akwedukty/bary_zdarzeniowe.py` — próbkowanie zdarzeniowe zamiast czasowego.
+Dollar bars (co N USD obrotu) mają homoskedastyczność i własności bliższe IID vs świece 1h.
+Aproksymacja z OHLCV (4 syntetyczne ticki per bar) + prawdziwe websocket ticki.
+Imbalance bars: adaptacyjne próbkowanie przy asymetrii Buy/Sell (detekcja informatywnych flow'ów).
+
+**W-357 | Triple-Barrier Method + CUSUM Filter (AFML Ch. 3 + 17)**
+`imperium/legiony/triple_barrier.py` — spójny silnik etykiet pod meta-labeling (B-01).
+Dynamiczne progi w wielokrotnościach σ zmienności (nie fixed %). CUSUM sampler zdarzeń.
+Sample Uniqueness (AFML Ch. 4) — wagi próbek odwrotnie proporcjonalne do nakładania etykiet.
+
+**W-358 | Purged K-Fold + Embargo (AFML Ch. 7)**
+`imperium/koloseum/walidacja.py` — `purged_kfold_podzialy()` + `cross_val_score_purged()`.
+Purging: usuwa train-obs nakładające się z test (brak information leakage).
+Embargo: usuwa obs tuż PO teście (embargo_pct × n barów, autokorelacja residualna).
+
+**W-359 | Bet Sizing LdP: Gaussian CDF + averaging + dyskretyzacja (AFML Ch. 10)**
+`imperium/legiony/meta_labeling.py` — `bet_size_ldp()` + `BuforAktywnych`.
+Gaussian CDF: m = 2Φ((p−0.5)/√(p(1-p)))−1 zamiast Kelly 2p−1 (mocniej skaluje).
+Averaging active bets: uśrednione bet_size nakładających się pozycji → niższy turnover.
+Size discretization: round(m/d)×d → eliminuje mikrodrgania i koszt transakcyjny.
+
+**Testy:** 1531/1532 → 1531+35 nowych (test_afml.py) po naprawie.
+**Audyt:** pełna harmonia ✅ | Ruff: czysty ✅
+
+---
+
+## 2026-06-19 | W-354 | TradingView Webhook Receiver — sygnały na żywo w roju (Prawo XV)
+
+**Cel:** Podłączenie TradingView do Imperium przez HTTP POST webhook — alerty z Pine Script
+trafiają bezpośrednio do roju (Dyrygent.cykl). Wykres świecowy (Lightweight Charts, MIT)
+w Panelu Kapitolu. Selector pary/interwału. Cross-session bar buffer per symbol.
+
+**Nowe pliki:**
+- `imperium/swiatynie/webhook_tradingview.py` — `AlertTV`, `parsuj_alert_tv()`, `OdbiornikWebhook`
+- `tests/test_webhook_tv.py` — 25 testów (granice, sekret, historia, dashboard routing)
+
+**Zmiany:**
+- `web_dashboard.py` — `do_POST` w `DashboardHandler`, `/webhook/tv`, `/wykresy/{SYM}.json`,
+  Lightweight Charts widget, symbol selector, Pine Script template w panelu, `obsluz_post()`
+- `petla_live.py` — `KonfigPetliLive.webhook_tv: bool`, `OdbiornikWebhook` tworzony przy
+  `dashboard=True, webhook_tv=True`; alerty z TV dołączane do `bary_per` w pętli live;
+  auto-rejestracja nowych symboli z TV w `dyrygenci`
+- `docs/LOG_ZMIAN.md` — ten wpis
+
+**Bezpieczeństwo:** sekret webhooka WYŁĄCZNIE przez `WEBHOOK_TV_SEKRET` env (nigdy hardcode).
+Domyślny bind 127.0.0.1. Zewnętrzny dostęp przez ngrok/Cloudflare Tunnel — poinstruowane
+w Pine Script template i docs.
+
+**Testy:** 1497/1497 ✅ | Audyt: pełna harmonia ✅
+
+---
+
+## 2026-06-19 | W-353 | Kaufman Efficiency Ratio — ożywienie martwego głosu Fulmena (Prawo XV)
+
+**Pochodzenie:** lektura książki "High Win Rate Day Trading Setups" (INF-33/BIB-021,
+ocena 3/10 — detaliczny katalog skryptów TradingView, ~80% pokrycia z rojem). Rozdział
+o KAMA (Kaufman Adaptive MA) naprowadził na audyt: gdzie używamy Efficiency Ratio?
+
+**Diagnoza (dowód, nie zgadywanie):** Doradca **Fulmen** (ortogonalna weryfikacja reżimu)
+w `ocen()` używa `kaufman_er > ER_EFEKTYWNY (0.6)` jako JEDNEGO Z TRZECH warunków
+potwierdzenia TRENDU (obok ADX i Choppiness). Ale `Dyrygent._zbuduj_rade()` przekazywał
+`kaufman_er=0.5` na sztywno z komentarzem *"nie liczony przez Budowniczego → neutral default"*.
+Efekt: **1/3 logiki trendu Fulmena była trwale martwa** (wąskie gardło, Prawo XV) — ER nigdy
+nie mógł przekroczyć progu 0.6, więc nigdy nie współpotwierdzał trendu.
+
+**Wdrożenie:**
+- `brama_kalkulatora.py`: nowa funkcja `_py_kaufman_er(close, period=10)` — ER = |zmiana netto| / Σ|ruchy brutto|, zakres [0,1]. Rejestracja `KAUFMAN_ER` + dopis do `_PURE_PYTHON_INDICATORS` (uczciwa pieczątka źródła, Prawo XIII).
+- `budowniczy_wskaznikow.py`: `KAUFMAN_ER_10` w planie skalarnym (period=10).
+- `dyrygent.py`: `kaufman_er=wskazniki.get("KAUFMAN_ER_10") or 0.5` — martwy głos ożył.
+
+**Testy granic (6 nowych, reguła Test-Granic):**
+- trend liniowy → ER=1.0 | piła (zero netto) → 0.0 | płasko → 0.0 (NIE dzielenie przez zero)
+- < period+1 barów → None (Prawo XV) | realna zaszumiona seria → ER∈[0,1]
+- symbioza: Budowniczy faktycznie produkuje `KAUFMAN_ER_10`
+
+**Decyzja o reszcie książki (Prawo XVI):** MFI już skatalogowany (INF-18, W-101..W-106) —
+nie dublujemy. Pozostałe wskaźniki redundantne z rojem. Liczba neuronów bez zmian (78).
+
+**Wynik testów:** 1472/1472 ✅ | ruff ✅ | audyt exit 0 ✅ | Pliki: `brama_kalkulatora.py`, `budowniczy_wskaznikow.py`, `dyrygent.py`, `test_neurony.py`, `REJESTR_INSPIRACJI.md`
+
+---
+
+## 2026-06-19 | W-352 | Persystencja uczenia — MWU/Igrzyska/Synapsy pamiętają między sesjami
+
+**Diagnoza:** Wszystkie trzy mechanizmy uczenia (HedgeMWU, Igrzyska, SynapsyRezimowe) działały
+poprawnie WEWNĄTRZ sesji, ale po restarcie kasowały się do stanu startowego (zerowe wagi).
+Brak cross-session persistence = rój zaczyna uczyć się od zera przy każdym uruchomieniu.
+To była kluczowa **utrata potencjału (Prawo XV)** — uczenie istniało, ale bez pamięci.
+
+**Wdrożenie:**
+- `HedgeMWU`: dodano `zapisz(sciezka)` i `wczytaj(sciezka)` — serialize `wagi_raw` + `rundy` do JSON.
+- `HedgeMWUzPamieciaRezimu`: nadpisuje `zapisz()`/`wczytaj()` — dodatkowo serializuje `pamiec` reżimową i `rezim`.
+- `Igrzyska`: dodano `zapisz(sciezka)` i `wczytaj(sciezka)` — serialize pełne `StatystykaNeuronu` (tp, fp, per-reżim, stability, contribution) do JSON.
+- `KonfigPetliLive`: dodano trzy nowe pola: `sciezka_mwu`, `sciezka_igrzyska`, `sciezka_synapsy` (domyślnie `logs/`).
+- `petla_live.py`: 
+  - bootstrap przy starcie: `mwu.wczytaj()`, `ig.wczytaj()`, `SynapsyRezimowe(sciezka_stanu=...)`.
+  - zapis przy zakończeniu (w bloku po `except KeyboardInterrupt`): `mwu.zapisz()`, `ig.zapisz()`, `syn.zapisz()`.
+  - MWU upgraded do `HedgeMWUzPamieciaRezimu` (pamięć reżimowa aktywna domyślnie).
+  - Per-symbol paths: `logs/mwu_BTCUSDT.json`, `logs/igrzyska_ETHUSDT.json` (izolacja par).
+
+**Testy (6 nowych):**
+- `test_mwu_zapisz_wczytaj_roundtrip`, `test_mwu_pamiec_rezimowa_roundtrip` — wagi i pamięć reżimowa identyczne po roundtrip.
+- `test_mwu_wczytaj_nieistniejacy_plik_nie_crashuje` — bezpieczny start od zera.
+- `test_igrzyska_zapisz_wczytaj_roundtrip`, `test_igrzyska_akumuluje_po_wczytaniu` — rangi i akumulacja cross-session.
+- `test_igrzyska_wczytaj_nieistniejacy_plik_nie_crashuje` — bezpieczny start od zera.
+
+**Wynik testów:** 1466/1466 ✅ | Pliki: `hedge_mwu.py`, `igrzyska.py`, `petla_live.py`, `test_hedge_mwu.py`, `test_igrzyska.py`
+
+---
+
+## 2026-06-19 | W-351 | Trailing Stop — koniec oddawania szczytu zysku (Prawo XV)
+
+**Diagnoza (dowód, nie zgadywanie):** dashboard skanera pokazał zyskowne pozycje
+zamykane przez `TIMEOUT` daleko poniżej szczytu (np. LTC SHORT +12% ceny → TIMEOUT,
+DOT SHORT +13% → TIMEOUT), a stratne lecące do pełnego SL mimo wcześniejszego ruchu
+w naszą stronę. W kodzie `paper_trading.py` MAE/MFE były LICZONE co bar, ale NIGDY
+nieużywane do wyjścia — `_sprawdz_wyzwalacze` znał tylko `LIQ > SL > TP > TIMEOUT`.
+Brak blokady zysku = **utrata potencjału (Prawo XV)**.
+
+**Wdrożenie (`imperium/koloseum/paper_trading.py`):** trailing stop oparty na szczycie
+korzystnej ceny.
+  • Uzbraja się dopiero po ruchu korzystnym ≥ `TRAILING_AKTYWACJA_PCT` (4%), potem
+    podąża za szczytem oddając max `TRAILING_GIVEBACK_FRAC` (35%) — blokuje 65% szczytu.
+  • Stop **monotoniczny** — tylko się zaciska, nigdy nie cofa przeciw pozycji.
+  • Kolejność wyjść: `LIQ > SL > TRAIL > TP > TIMEOUT`.
+  • **Anty-look-ahead:** bar uzbrajający NIE wyzwala trailingu (nie znamy ścieżki
+    intrabar — high mógł paść po low); trailing działa po poziomie z POCZĄTKU bara.
+    Zamknięcie po poziomie sprzed bara (pesymizm wykonania) + slippage.
+  • Domyślnie **OFF** (`trailing=False`) — zero regresji dla istniejących sesji;
+    `backtest_portfel(trailing=...)` przekazuje flagę; `najlepszy_tryb.py` ma ON.
+
+**Testy:** +7 (`tests/test_paper_trading.py`) — Reguła Test-Granic: próg dokładny (≥),
+tuż-poniżej-progu, LONG/SHORT lustrzanie, monotonia stopu, cena zamknięcia = poziom
+stopu, zero-regresji przy OFF. **1453 → 1460/1460 zielone.** Audyt exit 0, ruff czysto.
+
+**Pliki:** imperium/koloseum/paper_trading.py, imperium/koloseum/backtest.py,
+narzedzia/najlepszy_tryb.py, tests/test_paper_trading.py, docs/LOG_ZMIAN.md.
+
+---
+
 ## 2026-06-19 | W-346 | Web Dashboard — Panel Kapitolu (realizuje W-004 + W-031)
 
 **Luka #3 ze skanu konkurencji (Prawo XV):** Freqtrade FreqUI, Jesse UI mają panel

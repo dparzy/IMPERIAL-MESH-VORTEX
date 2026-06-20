@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-06-20 | W-365 INTEGRACJA | Denoising wpięty w żywy przepływ synaps
+
+`KolektorKorelacjiNeuronow.korelacje_denoised()` (diagnostyka_korelacji.py) — buduje pełną
+macierz korelacji par neuronów, odszumia ją (Marchenko-Pastur, W-365) i zwraca pary w formacie
+zgodnym z `korelacje()`. Dyrygent (linia ~343) preferuje wersję ODSZUMIONĄ przy zasilaniu
+SynapsyRezimowe (flaga `denoising_korelacji=True`). Dzięki temu synapsy karzą/wzmacniają za
+SYGNAŁ, nie szum — Prawo XVI działa tam gdzie jest konsumowane. BEZPIECZNY FALLBACK do surowej:
+<2 neuronów / t<min_probek / q=T/N≤1 / seria stała (NaN). 5 testów granic (`test_kolektor_denoised.py`).
+1555/1555 testów, audyt exit 0, adversarialna recenzja czysta przed pushem.
+
+---
+
 ## 2026-06-20 | W-365..368 | Denoising/Clustering macierzy (López de Prado MLAM, BIB-023)
 
 Wdrożono `imperium/legiony/denoising_macierzy.py` (czysty numpy — scipy/sklearn niedostępne):

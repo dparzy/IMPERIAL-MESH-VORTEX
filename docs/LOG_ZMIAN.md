@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-06-20 | DOC | Manual dodawania agentów + 2 subagenci Claude Code
+
+`docs/MANUAL_DODAWANIE_AGENTOW.md` — rozróżnienie dwóch typów „agentów": Doradcy Imperium
+(moduły Python w `imperium/cesarz/doradcy/`) vs Subagenci Claude Code (`.claude/agents/*.md`).
+Krok po kroku jak dodać każdy typ — wzorzec doradcy VULCAN (audytor płynności), struktura
+subagenta z nagłówkiem YAML, kiedy który typ, zasady Prawo VII/VIII/XIX/XXI.
+Dodano 2 działające subagenty: `straznik-prawa-xxi` (kontrola spójności przed commitem),
+`hermes-audytor-danych` (audyt jakości danych, wzorowany na doradcy HERMES).
+Powód: Cezar zapytał jak dodawać narzędzia typu „Hermes agent" zgodnie z dokumentacją.
+
+---
+
 ## 2026-06-20 | DOC | Manual Claude Code — instalacja i konfiguracja z Imperium
 
 `docs/MANUAL_CLAUDE_CODE.md` — kompletny przewodnik instalacji Claude Code na laptopie:

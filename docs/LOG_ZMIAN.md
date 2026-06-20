@@ -6,6 +6,16 @@
 
 ---
 
+## 2026-06-20 | DOC | Manual Użytkownika — pełna instrukcja dla nowicjusza
+
+`docs/MANUAL_UZYTKOWNIKA.md` — kompletny przewodnik krok po kroku: instalacja od zera
+(Windows/Mac/Linux), pierwsze uruchomienie, wszystkie tryby (paper/dry-run/real), panel
+webowy, TradingView+ngrok krok po kroku, wszystkie opcje KonfigPetliLive, wszystkie komendy,
+klucze API (bezpieczeństwo), narzędzia AFML (W-355..W-359), tabela problemów i rozwiązań.
+Powód: Cezar (nowicjusz, ZPO) poprosił o pełny manual obsługi.
+
+---
+
 ## 2026-06-20 | W-355..W-359 | AFML (López de Prado) — 5 modułów z "Advances in Financial ML"
 
 **Źródło:** Lektura i analiza książki "Advances in Financial Machine Learning" (INF-34),

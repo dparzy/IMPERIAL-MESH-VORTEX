@@ -6,6 +6,16 @@
 
 ---
 
+## 2026-06-20 | DOC | Manual Claude Code — instalacja i konfiguracja z Imperium
+
+`docs/MANUAL_CLAUDE_CODE.md` — kompletny przewodnik instalacji Claude Code na laptopie:
+Node.js, npm install claude-code, logowanie Pro, pierwsze uruchomienie z Imperium,
+automatyki (hook SessionStart, uprawnienia, tryb autonomiczny), MCP GitHub i Filesystem,
+klucze API (Prawo V), codzienna praca (komendy, skróty, Plan Mode), tabela problemów.
+Powód: Cezar ma już repo na laptopie, chce uruchamiać Claude Code lokalnie z pełną integracją.
+
+---
+
 ## 2026-06-20 | DOC | Manual Użytkownika — pełna instrukcja dla nowicjusza
 
 `docs/MANUAL_UZYTKOWNIKA.md` — kompletny przewodnik krok po kroku: instalacja od zera

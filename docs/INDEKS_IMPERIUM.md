@@ -79,6 +79,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 43 | `ODLOZONE_DECYZJE.md` | **Odłożone decyzje** — rzeczy ustalone, ale świadomie odłożone do pomiaru A/B (Prawo I): +Igrzyska domyślnie ON (czeka na A/B W-329), progi adaptacyjne W-334 (czeka na ab_w334_progi) | ✅ Aktywny |
 | 44 | `RESEARCH_NOWE_KATEGORIE_2026-06-17.md` | **Deep research 6-kątowy** (APAC/konkursy/repo/papers/patenty/książki) — kandydaci na nowe kategorie: C (cross-sectional), B (meta/bet-sizing), U (microstructure L2), IV (options-implied), P (Hawkes); narzędzia META (VI/CFI, PBO/DSR, HRP). Status: RESEARCH/plan, nie kod (Prawo XIX) | ✅ Aktywny |
 | 45 | `MANUAL_UZYTKOWNIKA.md` | **Manual Użytkownika (pełny, dla nowicjusza)** — instalacja od zera (Win/Mac/Linux), tryby paper/dry-run/real, panel webowy, TradingView+ngrok krok po kroku, wszystkie opcje KonfigPetliLive, wszystkie komendy, klucze API, narzędzia AFML (W-355..W-359), tabela problemów | ✅ Aktywny |
+| 46 | `MANUAL_CLAUDE_CODE.md` | **Manual Claude Code** — instalacja Node.js+claude-code, logowanie Pro, pierwsze uruchomienie z Imperium, hook SessionStart, uprawnienia, tryb autonomiczny, MCP GitHub/Filesystem, klucze API (Prawo V), codzienna praca, skróty klawiszowe, Plan Mode, tabela problemów | ✅ Aktywny |
 
 ---
 

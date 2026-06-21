@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-06-21 | W-384 | Konfluencja Multi-Timeframe na poziomie roju (odpowiedź na pytanie Cezara)
+
+Cezar: "czy Imperium widzi wszystkie interwały podczas wybierania ordera?" — NIE w pełni.
+Diagnoza: decyzja na JEDNYM TF; jedyna nadbudowa MTF (X-28) to RSI+EMA dla 1 neuronu.
+
+ROZWIĄZANIE: `imperium/legiony/mtf_konfluencja.py` — brama konfluencji na poziomie ROJU
+(jak Senat, warstwa nad Legatusem). Po decyzji kierunkowej agreguje bary w GÓRĘ na 2 wyższe
+TF (stos: 1h→4h+1d, 4h→1d+1w, itd.), liczy robustny trend każdego (EMA50vsEMA200 + cena
+vs EMA50 + MACD znak) i zwraca:
+  • wyrownanie -1..+1, mnoznik 0.5..1.2, weto (opt-in), werdykt
+Wpięte w Dyrygenta (opt-in, domyślnie OFF — zero zmiany zachowania):
+  • mtf_konfluencja=True → mnoznik skaluje rozmiar pozycji (zgodność↑ / konflikt↓)
+  • mtf_weto_przeciwtrend=True → twarde weto wejść przeciw wyższym TF (MTF_WETO)
+Mnoznik aplikowany w OBU ścieżkach sizingu (przy okazji naprawiono gubienie mnoznik_senatu
+w ścieżce Rady Doradców).
+
+14 testów (test_mtf_konfluencja.py): agregacja bez lookahead, kierunek trendu, zgodność
+wzmacnia, konflikt tłumi, weto, mnoznik w zakresie, Dyrygent domyślnie OFF.
+1648/1648 testów, audyt exit 0, ruff czysty.
+
+Pliki: `legiony/mtf_konfluencja.py` (NEW), `koloseum/dyrygent.py` (brama + 2× sizing),
+`tests/test_mtf_konfluencja.py` (NEW, 14), `docs/MANIFEST_KODU.md`, `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-06-21 | POMIAR MATRYCOWY + naprawa EXP-14 | 5 par × 3 interwały (Prawo XV/XVI)
 
 Cezar wskazał słabość: pomiar tylko na BTC 4h. Rozszerzono `pomiar_nowe_moduly.py` na

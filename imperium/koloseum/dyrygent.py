@@ -149,6 +149,14 @@ class Dyrygent:
         # Cenzor weryfikują kierunek. Weto Cenzora = SENAT_WETO; mnoznik_ryzyka skaluje
         # rozmiar pozycji (Prawo XXIII via per-regime mechanizmy). None = wyłączony.
         self._senat: Optional[Any] = None
+        # W-384 Konfluencja Multi-Timeframe (Prawo XV — odpowiedź na pytanie Cezara
+        # "czy Imperium widzi wszystkie interwały przy orderze"). Brama na poziomie ROJU:
+        # po decyzji kierunkowej sprawdza, czy WYŻSZE TF potwierdzają. Zgodność → mnoznik>1,
+        # konflikt → mnoznik<1 lub weto. None = wyłączona (opt-in, zero zmiany zachowania).
+        #   self.mtf_konfluencja = True            → tłumienie/wzmocnienie pewności
+        #   self.mtf_weto_przeciwtrend = True      → twarde weto wejść przeciw wyższym TF
+        self.mtf_konfluencja: bool = False
+        self.mtf_weto_przeciwtrend: bool = False
         # Ostatni sklasyfikowany reżim baru — potrzebny mnozniki_warunkowe() w
         # _aktualizuj_synapsy() (gdzie jeszcze nie znamy reżimu nowego baru).
         self._ostatni_rezim: str = "NORMAL"
@@ -375,6 +383,26 @@ class Dyrygent:
                                 powod=f"pewność {raport.pewnosc_agregatu:.2f} < próg {prog_aktywny:.2f} (Namiestnik)",
                                 raport=raport)
 
+        # 3a². W-384 Konfluencja Multi-Timeframe (opt-in): czy WYŻSZE TF potwierdzają
+        # kierunek roju? Konflikt z wyższym TF → tłumienie pewności lub weto (Prawo XV).
+        mnoznik_mtf = 1.0
+        if getattr(self, "mtf_konfluencja", False) and bary:
+            try:
+                from imperium.legiony.mtf_konfluencja import ocena_konfluencji_tf
+                prog_weta = -0.5 if getattr(self, "mtf_weto_przeciwtrend", False) else -1.0
+                ocena_mtf = ocena_konfluencji_tf(bary, interwal, raport.kierunek,
+                                                 prog_weta=prog_weta)
+                if ocena_mtf["weto"]:
+                    return DecyzjaCyklu(symbol, "MTF_WETO", False,
+                                        kierunek=raport.kierunek,
+                                        pewnosc=raport.pewnosc_agregatu,
+                                        rezim=raport.rezim,
+                                        powod=f"konflikt z wyższym TF: {ocena_mtf['werdykt']}",
+                                        raport=raport)
+                mnoznik_mtf = ocena_mtf["mnoznik"]
+            except Exception as e:
+                logger.debug(f"[Dyrygent] MTF konfluencja pominięta: {e}")
+
         # 3b. W-343 Debata Senatu (opt-in): Byk/Niedźwiedź/Cenzor weryfikują kierunek.
         # Weto Cenzora (reżim PANIC lub nadmiar ryzyka) → SENAT_WETO (Prawo XXII).
         # mnoznik_ryzyka skaluje rozmiar pozycji (per-regime dekorelacja Prawa XXIII).
@@ -482,7 +510,7 @@ class Dyrygent:
             kierunek=kierunek,
             cena_wejscia=cena_wejscia,
             dzwignia=dzwignia_final,
-            mnoznik_rozmiaru=mnoznik_rozmiaru * mnoznik_senatu,
+            mnoznik_rozmiaru=mnoznik_rozmiaru * mnoznik_senatu * mnoznik_mtf,
             kapital_usdt=(self.kapital_sizing if self.kapital_sizing is not None
                           else self.engine.kapital),
             pewnosc=pewnosc,
@@ -512,7 +540,8 @@ class Dyrygent:
                 plan = self.kalkulator.policz(
                     symbol=symbol, kierunek=kierunek, cena_wejscia=cena_wejscia,
                     dzwignia=plan.dzwignia,
-                    mnoznik_rozmiaru=mnoznik_rozmiaru * opinia.modyfikator_pozycji,
+                    mnoznik_rozmiaru=(mnoznik_rozmiaru * mnoznik_senatu * mnoznik_mtf
+                                      * opinia.modyfikator_pozycji),
                     kapital_usdt=(self.kapital_sizing if self.kapital_sizing is not None
                                   else self.engine.kapital),
                     pewnosc=pewnosc, rezim=raport.rezim,

@@ -47,7 +47,7 @@
 | EXP-12 🎖️ | ZwiadowcaAtmabhan | `zwiadowcy/exp_atmabhan.py` | F | 🔇 wyciszony (L2 feed) | AP-Mode microstructure (IMV-ADO 🔱, E1+E5) |
 | EXP-13 🎖️ | ZwiadowcaGARCH | `zwiadowcy/exp_garch.py` | V | ✅ aktywny (OHLCV) | GJR-GARCH(1,1) zmienność warunkowa (W-376, Tsay BIB-031, E1) |
 | EXP-14 🎖️ | ZwiadowcaKyleLambda | `zwiadowcy/exp_kyle_lambda.py` | L | ✅ aktywny (OHLCV) | Kyle's Lambda price impact OLS (W-380, O'Hara BIB-032, E1) |
-| EXP-15 🎖️ | ZwiadowcaPIN | `zwiadowcy/exp_pin.py` | L | ✅ aktywny (OHLCV) | PIN informed trading metodą momentów (W-383, O'Hara BIB-032, E1) |
+| EXP-15 🎖️ | ZwiadowcaPIN | `zwiadowcy/exp_pin.py` | L | 🔇 wyciszony (tick-data) | PIN — POMIAR: martwy głos na OHLCV (0.1%), ożywa z aggTrades (W-383, O'Hara BIB-032, E1) |
 
 ---
 

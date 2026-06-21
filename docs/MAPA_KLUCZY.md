@@ -179,7 +179,7 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 | OC-08 | NeuronBTCSupplyInflation | O | 5 | ✅ (block z timestampu) | BTC_SUPPLY_INFLATION_PCT |
 | EXP-13 | ZwiadowcaGARCH | V | 7 | ✅ (OHLCV) | GARCH_SIGMA |
 | EXP-14 | ZwiadowcaKyleLambda | L | 6 | ✅ (OHLCV) | KYLE_LAMBDA |
-| EXP-15 | ZwiadowcaPIN | L | 6 | ✅ (OHLCV) | PIN |
+| EXP-15 | ZwiadowcaPIN | L | 6 | 🔇 (tick-data) | PIN |
 
 ---
 

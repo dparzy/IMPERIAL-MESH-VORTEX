@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-06-21 | POMIAR (Prawo XVI) | Dekorelacja + IC nowych modułów → EXP-15 wyciszony
+
+Narzędzie `narzedzia/pomiar_nowe_moduly.py` — pomiar EXP-13/14/15 na realnych danych
+(Binance BTC 4h, 18631 barów). Cel: czy nowe moduły niosą nową informację (Prawo XVI),
+nie zgadywanie.
+
+WYNIKI DEKORELACJI (|ρ| z resztą zwiadowców):
+- EXP-13 (GARCH): max|ρ|=0.143 → 🟢 UNIKALNY (justified — nowa informacja)
+- EXP-14 (Kyle): max|ρ|=0.143 → 🟢 UNIKALNY
+- EXP-15 (PIN): stały sygnał → nie da się skorelować (martwy)
+
+WYNIKI IC (Spearman sygnał_t vs zwrot_{t+h}, h=1/6/30 barów 4h):
+- EXP-13 GARCH: IC≈+0.10..0.12 (realny skill, ostrożność vol)
+- EXP-14 Kyle: IC≈+0.48 (PODEJRZANIE WYSOKIE — flaga, artefakt reżimowy? wymaga backtestu;
+  zweryfikowano że NIE jest trywialnym lookahead: zgodność ze znakiem bieżącej świecy 38%)
+- EXP-15 PIN: n/a (stały sygnał)
+
+🚨 DECYZJA (Prawo XV + Prawo I): EXP-15 PIN WYCISZONY (DOSTEPNY=False).
+PIN > próg tylko 0.1% czasu (2/1858 barów), pewnosc_przeciwnika>0 raptem 2× w całej historii.
+Przyczyna strukturalna: PIN to zjawisko TICK-LEVEL; uśrednianie buy/sell z tick-rule po barach
+OHLCV niszczy asymetrię (mean_buy≈mean_sell→PIN≈0). Dodany przedwcześnie — pomiar to wychwycił.
+Ożywa po podpięciu feedu aggTrades (trade-by-trade) — jak EXP-12 (L2). To jest CEL pomiaru:
+nie dodawać w ciemno, mierzyć i cofać gdy moduł nie niesie wartości.
+
+Liczniki: 81 neuronów (75 aktywnych) + 15 zwiadowców (13 aktywnych, 2 wyciszone: EXP-12, EXP-15).
+1632/1632 testów, audyt exit 0.
+
+Pliki: `narzedzia/pomiar_nowe_moduly.py` (NEW), `legiony/zwiadowcy/exp_pin.py` (DOSTEPNY=False),
+`docs/MANIFEST_KODU.md`, `docs/MAPA_KLUCZY.md`, `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-06-21 | W-377..379 obudzenie + W-383 | OC-06..08 ożywione + EXP-15 PIN scout
 
 Obudzenie 3 martwych głosów (Prawo XV) + wpięcie PIN do roju:

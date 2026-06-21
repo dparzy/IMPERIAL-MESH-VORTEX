@@ -6,6 +6,125 @@
 
 ---
 
+## 2026-06-21 | W-384 | Backtest A/B MTF — brama NIE poprawia wyniku na tym oknie (hipoteza DD obalona) 🔻
+
+Pytanie Cezara (o pieniądze): czy widzenie wyższych TF (brama konfluencji W-384) poprawia
+wynik? Hipoteza Cezara: najlepszy efekt MTF to NIŻSZY drawdown (wycięte wejścia przeciw
+głównemu trendowi), nie wyższy zysk.
+
+NARZĘDZIE: `narzedzia/backtest_ab_mtf.py` — uczciwe A/B na identycznych barach. Do
+`backtest()` dodano opt-in `mtf_konfluencja`/`mtf_weto_przeciwtrend` (domyślnie False —
+ZERO zmiany domyślnego zachowania). Baza 4h, okno=400 → stos {"1d":6} daje 66 barów
+dziennych ≥60 ⇒ brama ocenia TREND DZIENNY (główny trend). 15 par, 1209 barów-obserwacji.
+
+TABELA A/B (BASELINE mtf=False vs MTF mtf=True+weto):
+  metryka            baseline     MTF       Δ
+  PnL [%]            +0.68%      +0.18%    -0.50%  🔻
+  Transakcje          177         164       -13   (brama wycięła 13 wejść)
+  Win rate           47.5%       48.2%     +0.7%  ✅ (marginalnie)
+  Sharpe portfela     1.62        1.61     -0.01  ≈
+  MaxDD portfela      2.3%        3.9%     +1.5%  🔻 (DD WYŻSZY!)
+  MaxDD śr/para       2.8%        3.5%     +0.7%  🔻
+  DSR (n_prob=2)      0.79        0.81     +0.01  ≈  (oba dsr_ok=False, <0.95)
+  PBO (selekcja par)  0.43        0.60     +0.17  🔻 (oba pbo_ok=False)
+
+WERDYKT WARUNKOWY (Prawo I):
+  • Kryterium „niższy DD" (hipoteza Cezara): ❌ NIESPEŁNIONE — DD WYŻSZY (2.3%→3.9%).
+  • Kryterium „lepszy Sharpe/DSR": ≈ neutralnie (zmiany w granicach szumu).
+  • Brama wycięła 13 wejść, ale netto te wejścia były ZYSKOWNE (PnL spadł o połowę), a DD
+    wzrósł — prawdopodobny mechanizm: mnoznik konfluencji skaluje zgodne wejścia do 1.2×,
+    większe pozycje → głębszy DD; weto usunęło zyskowne kontrtrendy (I–VI 2026 sprzyjał
+    mean-reversion). Brama nie selekcjonuje tu dobrze.
+  • OGRANICZENIE: 6 mies., 1 reżim, ~11 transakcji/parę — pomiar INDYKATYWNY, nie
+    ostateczny. Różnice DD małe bezwzględnie, mogą się odwrócić na innych danych.
+
+DECYZJA: default pozostaje OFF (mtf_konfluencja=False) — dane nie dają podstaw do włączenia.
+Przed jakąkolwiek decyzją o włączeniu: re-test na dłuższej, wieloreżimowej historii (4h
+paginowane do lat / baza 1h ze stosem dziennym). Domyślne ustawienia NIEZMIENIONE.
+
+Kod: backtest opt-in (domyślnie False) + nowe narzędzie. 1648/1648 testów, audyt exit 0,
+ruff czysty, /code-review na diffie.
+Pliki: `imperium/koloseum/backtest.py` (opt-in MTF), `narzedzia/backtest_ab_mtf.py` (NEW),
+`docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-06-21 | Prawo I | Backward-IC (--backward) — ROZSTRZYGNIĘCIE: EXP-13/14 OPISUJĄ REŻIM, nie przewidują 🚩
+
+Krok A.2 (rozstrzygający, po nieprzekonującym teście lagu): backward-IC =
+Spearman(sygnał_t, zwrot PRZESZŁY t-h→t). Jeśli ≈ forward-IC, sygnał opisuje ruch,
+który WŁAŚNIE się dokonał (reżim/współbieżność), a nie przewiduje przyszłość.
+
+POMIAR OBOK SIEBIE (matryca 15×3, n=45):
+
+  moduł    h    IC_forward   IC_backward   |Δ|
+  EXP-13   1     +0.245       +0.263      0.018
+  EXP-13   6     +0.249       +0.284      0.035
+  EXP-13   30    +0.251       +0.283      0.032
+  EXP-14   1     +0.304       +0.310      0.006
+  EXP-14   6     +0.305       +0.313      0.008
+  EXP-14   30    +0.310       +0.317      0.007
+
+WERDYKT (Prawo I — kryterium Cezara |Δ|<0.05):
+  🚩 WSZYSTKIE 6 przypadków |Δ|<0.05 → sygnał OPISUJE REŻIM, nie przewiduje.
+  • EXP-14 Kyle: forward≈backward co do trzeciego miejsca (Δ 0.006–0.008) — czysty
+    deskryptor współbieżny. Wysokie IC to NIE predykcja.
+  • EXP-13 GARCH: Δ 0.018–0.035, też <0.05; backward nawet WYŻSZE niż forward.
+  • Brak dodatniej asymetrii czasowej (fwd>bwd) w ŻADNYM przypadku — przeciwnie,
+    backward ≥ forward → zero śladu predykcji; forward-IC to echo współbieżnej
+    korelacji reżimu rzutowane w przyszłość przez persystencję.
+
+INTERPRETACJA (spójna z teorią): GARCH = zmienność warunkowa (stan/reżim), Kyle's λ =
+illikwidność/impact (stan mikrostruktury). Z definicji to MIARY STANU, nie predyktory
+kierunku. IC ~0.25–0.30 było artefaktem persystencji reżimu + Spearman łapiący asocjację
+współbieżną. Edge kierunkowy OOS implikowany przez to IC — ILUZORYCZNY.
+
+DECYZJA (Prawo XV/XVI, bez przesady w drugą stronę): NIE kasujemy — moduły niosą
+ORTOGONALNĄ informację (max|ρ|<0.20, dekorelacja trzyma), ale to informacja o REŻIMIE,
+nie kierunku. Stosować jako FILTR reżimu / kontekst sizingu, NIE jako sygnał wejścia.
+Waga jako predyktor kierunku — w dół.
+
+Zmiana wyłącznie narzędziowa. 1648/1648 testów, audyt exit 0, ruff czysty.
+Pliki: `narzedzia/pomiar_nowe_moduly.py` (flaga `--backward`, `wstecz` w zwrotach i IC),
+`docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-06-21 | Prawo I | Kontrola look-ahead IC (--przesuniecie) — leak czasowy obalony, ale lag skonfundowany persystencją
+
+Krok A diagnostyki IC (po obaleniu nakładania): czy sygnał PRZEWIDUJE przyszłość, czy
+tylko OPISUJE teraźniejszość (współbieżność / leak bieżącego baru)?
+
+Dodano flagę `--przesuniecie LAG` (lag w barach): IC = Spearman(sygnał_{t-lag}, zwrot od
+t do t+h) — sygnał z PRZESZŁOŚCI vs przyszły zwrot. Lag aplikowany na siatce próbkowania
+(eff = round(lag/krok)·krok). Sweep 0/3/6/9/30 barów, pełna matryca 15×3 (n=45):
+
+  EXP-13 GARCH:  IC(h=1) 0.245→0.250→0.253→0.249→0.245 | IC(h=30) 0.251→...→0.208 (lekki spadek)
+  EXP-14 Kyle:   IC(h=1) 0.304→0.303→0.307→0.309→0.307 | IC(h=30) 0.310→...→0.294 (płasko)
+
+WERDYKT (Prawo I):
+  1. TWARDY LOOK-AHEAD (użycie przyszłych barów) — DISFAVORED. Realny leak przyszłości
+     opadałby gwałtownie, gdy odsuwamy sygnał w przeszłość; tu IC jest ~płaskie. Brak
+     oznak buga lookahead.
+  2. ALE lag NIE rozstrzyga współbieżności — bo sygnały są wysoce PERSYSTENTNE (okno 60,
+     zmienność/illikwidność klastrują): sygnał_{t-30} ≈ sygnał_t, więc IC z definicji się
+     nie rusza, niezależnie czy jest prawdziwa predykcja czy nie. To konfundent zapowiedziany
+     w poprzednim wpisie.
+  3. Sama PŁASKOŚĆ IC przez 30 barów jest podejrzana: realna krótkoterminowa przewaga
+     powinna zanikać ze starzeniem sygnału. Brak zaniku → asocjacja na poziomie REŻIMU
+     (wolnozmienny stan), nie ostry timing. Magnituda IC ~0.25–0.30 prawdopodobnie zawyża
+     realny edge out-of-sample.
+
+DECYZJA: leak/bug wykluczony, ale „realny skill" wciąż NIEpotwierdzony. Rozstrzygający tani
+test: backward-IC (sygnał_t vs PRZESZŁY zwrot t-h→t) — jeśli ≈ forward-IC, sygnał opisuje
+reżim, nie przewiduje. Ostatecznym arbitrem jest backtest OOS z DSR/PBO (krok B).
+
+Zmiana wyłącznie narzędziowa. 1648/1648 testów, audyt exit 0, ruff czysty.
+Pliki: `narzedzia/pomiar_nowe_moduly.py` (flaga `--przesuniecie`, lag w `_ic_modulu`),
+`docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-06-21 | Prawo I | Kontrola autokorelacji IC — wysokie IC NIE jest artefaktem nakładania
 
 Cezar (Prawo I): IC nowych modułów 0.25–0.30 podejrzanie wysokie — może łapać

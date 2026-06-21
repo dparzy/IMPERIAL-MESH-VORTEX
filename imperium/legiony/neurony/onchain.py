@@ -245,6 +245,46 @@ _MAX_SUPPLY_BTC = 21_000_000.0
 _BLOKI_NA_EPOKE = 210_000
 _SREDNI_CZAS_BLOKU_MIN = 10.0
 
+# Kotwice (block_height, unix_timestamp) — znane daty halvingów (dla interpolacji).
+# Źródło: blockchain (deterministyczne). Pozwala oszacować block_height z timestampu
+# baru BEZ sieci — działa też w backteście (Prawo XV: ożywia OC-06..08).
+_KOTWICE_BLOKOW = [
+    (0,       1_231_006_505),   # genesis 2009-01-03
+    (210_000, 1_354_116_278),   # 1. halving 2012-11-28
+    (420_000, 1_468_082_773),   # 2. halving 2016-07-09
+    (630_000, 1_589_225_023),   # 3. halving 2020-05-11
+    (840_000, 1_713_571_200),   # 4. halving 2024-04-20
+]
+
+
+def szacuj_block_height(timestamp: float) -> int:
+    """
+    Szacuje wysokość bloku BTC z unixowego timestampu (sekundy).
+    Interpolacja liniowa między znanymi kotwicami halvingów; ekstrapolacja
+    poza ostatnią kotwicą wg 10 min/blok. Deterministyczne, bez sieci.
+    """
+    ts = float(timestamp)
+    # Normalizacja jednostki: system używa timestampów w MILISEKUNDACH (bary MEXC).
+    # Kotwice są w sekundach. Jeśli ts wygląda na ms (>1e11) → konwersja na sekundy.
+    if ts > 1e11:
+        ts = ts / 1000.0
+    kotwice = _KOTWICE_BLOKOW
+
+    if ts <= kotwice[0][1]:
+        return 0
+
+    # interpolacja w obrębie znanych przedziałów
+    for i in range(len(kotwice) - 1):
+        b0, t0 = kotwice[i]
+        b1, t1 = kotwice[i + 1]
+        if t0 <= ts < t1:
+            frac = (ts - t0) / (t1 - t0) if t1 > t0 else 0.0
+            return int(b0 + frac * (b1 - b0))
+
+    # ekstrapolacja po ostatniej kotwicy: 10 min/blok = 600 s
+    b_last, t_last = kotwice[-1]
+    return int(b_last + (ts - t_last) / (_SREDNI_CZAS_BLOKU_MIN * 60))
+
 
 def _info_bloku(block_height: int) -> dict:
     """Wylicza nagrode, epokę, S2F i dni-do-halvingu z block_height."""
@@ -305,8 +345,7 @@ class NeuronS2F(MikroNeuron):
     WSKAZNIK = "BTC_S2F"
     KATEGORIA = "O"
     WAGA = 6
-    DOSTEPNY = False
-    POWOD_NIEDOSTEPNOSCI = _POWOD_BLOK
+    DOSTEPNY = True
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         block_height = wskazniki.get("BTC_BLOCK_HEIGHT")
@@ -342,8 +381,7 @@ class NeuronDaysToHalving(MikroNeuron):
     WSKAZNIK = "BTC_DAYS_TO_HALVING"
     KATEGORIA = "O"
     WAGA = 7
-    DOSTEPNY = False
-    POWOD_NIEDOSTEPNOSCI = _POWOD_BLOK
+    DOSTEPNY = True
 
     _PROG_BLISKI = 180    # dni — historyczne okno dyskontowania halvingu
     _PROG_BARDZO_BLISKI = 60
@@ -381,8 +419,7 @@ class NeuronBTCSupplyInflation(MikroNeuron):
     WSKAZNIK = "BTC_SUPPLY_INFLATION_PCT"
     KATEGORIA = "O"
     WAGA = 5
-    DOSTEPNY = False
-    POWOD_NIEDOSTEPNOSCI = _POWOD_BLOK
+    DOSTEPNY = True
 
     def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
         block_height = wskazniki.get("BTC_BLOCK_HEIGHT")

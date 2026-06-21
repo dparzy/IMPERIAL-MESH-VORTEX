@@ -33,7 +33,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Generał Legatus** | agregacja głosów + wagi reżimowe + odpalanie zwiadowców |
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
-| **Status elitarny** | **15 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 + 14 zwiadowców |
+| **Status elitarny** | **15 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 + 15 zwiadowców |
 | **Monte Carlo / Optymalizator / Pamięć Refleksyjna / Drift Adapter** | W-293/294/295/296 — antyoverfitting + samouczenie Brain |
 | **Testy** | `python tests/run_tests.py` → **1038/1038** ✅ |
 
@@ -60,7 +60,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ```
 👑 cesarz/       — mózg decyzyjny, 5 Doradców, PamięćRefleksyjna   (9)
 🏛️ senat/        — debata / konsensus                              (2)
-⚔️ legiony/      — 81 neuronów + 14 zwiadowców + Legatus + Radar     (40)
+⚔️ legiony/      — 81 neuronów + 15 zwiadowców + Legatus + Radar     (40)
 🏟️ koloseum/     — Dyrygent, PętlaLive, Backtest portfela, Namiestnik (11)
 🛡️ pretorianie/  — bezpieczeństwo, kalkulator lewara, Praeda        (5)
 🏗️ akwedukty/    — pipeline danych + adaptery API (Futures/F&G/CVD/News) (8)

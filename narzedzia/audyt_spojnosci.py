@@ -570,6 +570,12 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
               "(duży obrót); ożywa przy cienkiej księdze (W-322)",
     "Z-07":   "PI_CYCLE wymaga ≥350 barów — scenariusze audytu mają 260; "
               "ożywa na pełnej historii 1D (W-322, kill-switch szczytu)",
+    "OC-06":   "BTC_S2F wymaga realnego timestampu (block z daty) — scenariusze audytu "
+               "mają sztuczny ts z ery 1970 → block 0 → S2F=0; ożywa na realnych barach (W-377)",
+    "OC-07":   "BTC_DAYS_TO_HALVING wymaga realnego timestampu — jak OC-06; "
+               "ożywa gdy bar ma datę w oknie ~180 dni przed halvingiem (W-378)",
+    "OC-08":   "BTC_SUPPLY_INFLATION wymaga realnego timestampu — jak OC-06; "
+               "ożywa gdy block daje inflację <2% (po 3. halvingu, W-379)",
 }
 
 # Dowód allowlisty (Prawo I — bez zaufania na słowo): każdy neuron adapterowy
@@ -598,6 +604,9 @@ WERYFIKACJA_ADAPTEROW = {
     "Z-06":   {"AMIHUD_20": 5.0},                                 # krucha płynność → pewnosc_przeciwnika
     "Z-07":   {"PI_111": 105.0, "PI_350X2": 100.0,
                "PI_111_PREV": 98.0, "PI_350X2_PREV": 100.0},      # cross od dołu → SHORT
+    "OC-06":   {"BTC_BLOCK_HEIGHT": 900_000},                      # po 4. halvingu, S2F>100 → LONG
+    "OC-07":   {"BTC_BLOCK_HEIGHT": 839_700},                      # ~60 dni do halvingu → LONG
+    "OC-08":   {"BTC_BLOCK_HEIGHT": 900_000},                      # inflacja <1% → LONG
 }
 
 

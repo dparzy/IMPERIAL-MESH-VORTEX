@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-06-21 | W-377..379 obudzenie + W-383 | OC-06..08 ożywione + EXP-15 PIN scout
+
+Obudzenie 3 martwych głosów (Prawo XV) + wpięcie PIN do roju:
+- **W-377..379 obudzenie**: `szacuj_block_height(timestamp)` w onchain.py — interpolacja
+  po kotwicach halvingów (genesis/210k/420k/630k/840k) + ekstrapolacja 10min/blok +
+  normalizacja ms→s (bary MEXC w ms). Wpięte do `BudowniczyWskaznikow._dodaj_btc_onchain()`.
+  OC-06/07/08 DOSTEPNY=True — działają w backteście i live (bez sieci, deterministyczne).
+- **W-383 EXP-15 ZwiadowcaPIN** (`zwiadowcy/exp_pin.py`): PIN metodą momentów na buy/sell
+  z tick-rule OHLCV. Wysoki PIN → NEUTRAL + pewnosc_przeciwnika (tłumi rój, adverse
+  selection). Komplementarny do VPIN Z-01 i Kyle EXP-14.
+- Audyt: OC-06/07/08 dodane do NEURONY_ZALEZNE_OD_ADAPTEROW + WERYFIKACJA_ADAPTEROW
+  (dowód ożywienia przy realnym BTC_BLOCK_HEIGHT — Prawo I, wzorzec Z-06/Z-07).
+- 14 nowych testów (test_block_height_pin_scout.py): kotwice halvingów, ekstrapolacja,
+  Budowniczy wpina block height, OC-06..08 żywe, PIN scout granice.
+Liczniki: 81 neuronów (75 aktywnych) + 15 zwiadowców = 96 modułów. 1632/1632 testów, audyt exit 0.
+
+Pliki: `legiony/neurony/onchain.py` (szacuj_block_height + DOSTEPNY=True),
+`legiony/budowniczy_wskaznikow.py` (_dodaj_btc_onchain), `legiony/zwiadowcy/exp_pin.py` (NEW),
+`legiony/rejestr.py` (EXP-15), `narzedzia/audyt_spojnosci.py` (allowlist+weryfikacja),
+`tests/test_block_height_pin_scout.py` (NEW, 14), `tests/test_integracja.py` (liczniki),
+`docs/REJESTR_INSPIRACJI.md`, `docs/LOG_ZMIAN.md`, `docs/MANIFEST_KODU.md`, `docs/MAPA_KLUCZY.md`,
+`README.md`, `docs/INDEKS_IMPERIUM.md`.
+
+---
+
 ## 2026-06-21 | W-374/381/382 | HRP + PIN + Engle-Granger kointegracja (pure numpy)
 
 Kontynuacja kolejki kandydatów z BIB-025..032 — wszystko pure numpy, bez scipy/sklearn:

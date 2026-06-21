@@ -90,6 +90,7 @@ from imperium.legiony.zwiadowcy import (
 )
 from imperium.legiony.zwiadowcy.exp_garch import ZwiadowcaGARCH
 from imperium.legiony.zwiadowcy.exp_kyle_lambda import ZwiadowcaKyleLambda
+from imperium.legiony.zwiadowcy.exp_pin import ZwiadowcaPIN
 
 logger = logging.getLogger("Rejestr")
 
@@ -300,6 +301,7 @@ def wszyscy_zwiadowcy() -> list:
         ZwiadowcaAtmabhan(),   # EXP-12 L2 mikrostruktura (IMV-ADO, WYCISZONY do feedu L2)
         ZwiadowcaGARCH(),      # EXP-13 GJR-GARCH(1,1) zmienność warunkowa (W-376, Tsay BIB-031)
         ZwiadowcaKyleLambda(), # EXP-14 Kyle's Lambda price impact (W-380, O'Hara BIB-032)
+        ZwiadowcaPIN(),        # EXP-15 PIN informed trading (W-383, O'Hara BIB-032)
     ]
 
 

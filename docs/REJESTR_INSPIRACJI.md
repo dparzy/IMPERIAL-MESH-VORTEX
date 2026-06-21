@@ -291,6 +291,9 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 | **W-381** | **PIN — Probability of Informed Trading** (Easley-O'Hara, BIB-032). Procent transakcji od inwestorów Z INFORMACJĄ. Metoda momentów: ε=min(buy,sell) baza szumu, informed=\|buy−sell\| asymetria, PIN=informed/(informed+2ε). Komplementarny do VPIN (Z-01: imbalance vs PIN: proporcja). | `mikrostruktura.py` → `pin_metoda_momentow()` | ✅ **WDROŻONE** 2026-06-21 — bez scipy (metoda momentów). 5 testów granic. |
 | **W-382** | **Engle-Granger kointegracja par** (Tsay BIB-031 rozdz. 8). Dwustopniowo: OLS log(a)∼log(b) → spread; ADF na spreadzie. Skointegrowane → z-score spreadu = sygnał stat-arb (z<−2 LONG a/SHORT b). Próg ADF −3.4 (anty-spurious). | `mikrostruktura.py` → `kointegracja_engle_granger()` | ✅ **WDROŻONE** 2026-06-21 — Engle-Granger + ADF w pure numpy. 7 testów (skointegrowane vs spurious random walks). |
 
+| **W-377..379 obudzenie** | OC-06/07/08 **OŻYWIONE** — `BTC_BLOCK_HEIGHT` szacowany z timestampu baru (interpolacja po kotwicach halvingów, normalizacja ms→s, bez sieci). 3 martwe głosy → aktywne (Prawo XV). | `budowniczy_wskaznikow._dodaj_btc_onchain()` + `onchain.szacuj_block_height()` | ✅ **WDROŻONE** 2026-06-21 — działa w backteście i live. 14 testów. |
+| **W-383** | **EXP-15 PIN scout** — wpięcie W-381 PIN do roju jako zwiadowca. Buy/sell z tick-rule OHLCV → PIN metodą momentów. Wysoki PIN → tłumi rój (pewnosc_przeciwnika). Komplementarny do VPIN Z-01 + Kyle EXP-14. | `zwiadowcy/exp_pin.py` | ✅ **WDROŻONE** 2026-06-21 — 5 testów granic. |
+
 > **Uwaga (Prawo XVI):** W-381 PIN i W-382 kointegracja to BIBLIOTEKI (funkcje), nie neurony —
 > czekają na wpięcie jako zwiadowcy/sygnały gdy pętla portfelowa dostarczy dane par + aggTrades.
 > HRP (W-374) dostępne dla alokacji wag w Senacie obok NCO (W-367).

@@ -42,9 +42,9 @@ def _get_model():
     return _model_cache
 
 
-def _szukaj(zapytanie: str, topk: int = 5, tryb: str = "hybrid") -> str:
+def _szukaj(zapytanie: str, topk: int = 5, tryb: str = "hybrid", korpus: str | None = None) -> str:
     from szukaj import szukaj, formatuj  # type: ignore[import]
-    wyniki = szukaj(zapytanie, topk, tryb, DEFAULT_BAZA, cichy=True)
+    wyniki = szukaj(zapytanie, topk, tryb, DEFAULT_BAZA, cichy=True, korpus=korpus)
     return formatuj(wyniki, zapytanie)
 
 
@@ -55,10 +55,18 @@ def _info() -> str:
     n_chunks = conn.execute("SELECT COUNT(*) FROM fragmenty").fetchone()[0]
     n_sources = conn.execute("SELECT COUNT(DISTINCT zrodlo) FROM fragmenty").fetchone()[0]
     n_vecs = conn.execute("SELECT COUNT(*) FROM wektory").fetchone()[0]
+    # rozbicie per korpus (jesli kolumna istnieje)
+    kolumny = {r[1] for r in conn.execute("PRAGMA table_info(fragmenty)").fetchall()}
+    rozbicie = ""
+    if "korpus" in kolumny:
+        rows = conn.execute(
+            "SELECT korpus, COUNT(*) FROM fragmenty GROUP BY korpus ORDER BY 2 DESC"
+        ).fetchall()
+        rozbicie = " | korpusy: " + ", ".join(f"{k}={n}" for k, n in rows)
     conn.close()
     return (
         f"Bibliotheca-RAG: {n_chunks} fragmentów z {n_sources} źródeł | "
-        f"wektory: {'✅' if n_vecs > 0 else '❌ (tylko FTS)'}"
+        f"wektory: {'✅' if n_vecs > 0 else '❌ (tylko FTS)'}{rozbicie}"
     )
 
 
@@ -82,6 +90,11 @@ TOOLS = [
                     "enum": ["hybrid", "fts", "wektor"],
                     "default": "hybrid",
                     "description": "hybrid=FTS+semantic, fts=keyword only, wektor=semantic only",
+                },
+                "korpus": {
+                    "type": "string",
+                    "enum": ["biblioteka", "dane", "docs"],
+                    "description": "Ogranicz do korpusu: biblioteka=książki+encyklopedia, dane=dane tematyczne, docs=dokumentacja Imperium. Domyślnie wszystkie.",
                 },
             },
             "required": ["zapytanie"],
@@ -125,6 +138,7 @@ def _handle(req: dict) -> dict:
                     args["zapytanie"],
                     int(args.get("topk", 5)),
                     args.get("tryb", "hybrid"),
+                    args.get("korpus"),
                 )
             elif name == "biblioteka_info":
                 result = _info()

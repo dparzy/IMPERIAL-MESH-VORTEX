@@ -1,16 +1,31 @@
 #!/usr/bin/env python3
 """
-Bibliotheca-RAG: indeksacja ksiazek + encyklopedii.
+Bibliotheca-RAG: indeksacja ksiazek + encyklopedii + (opcjonalnie) dokumentow Imperium.
 
 Uzycie:
-    python narzedzia/rag/indeksuj.py [--baza PATH] [--model MODEL] [--tylko-enc]
+    python narzedzia/rag/indeksuj.py                      # pelna reindeksacja biblioteki
+    python narzedzia/rag/indeksuj.py --tylko-nowe         # PRZYROSTOWO (tylko nowe/zmienione)
+    python narzedzia/rag/indeksuj.py --korpus wszystko    # biblioteka + dane/ + docs/
+    python narzedzia/rag/indeksuj.py --korpus docs        # tylko dokumentacja Imperium
+    python narzedzia/rag/indeksuj.py --tylko-enc          # tylko encyklopedia (szybkie)
+    python narzedzia/rag/indeksuj.py --bez-wektorow       # tylko FTS (bez modelu/sieci)
 
-Tworzy baze_wiedzy.db z:
+Korpusy (--korpus):
+    biblioteka  (domyslny) — ksiazki BIB-* + encyklopedia + vademecum + bibliotheca_ulpia/dane/
+    docs        — dokumentacja Imperium (docs/*.md) jako osobne zrodlo
+    wszystko    — biblioteka + docs
+
+Tryby:
+    pelny (domyslny)   — kasuje baze i buduje od zera (deterministyczny)
+    --tylko-nowe       — przyrostowy: po hashu pliku, tylko nowe/zmienione reindeksowane
+
+Baza:
 - FTS5 (szybki fulltext BM25) — zawsze
-- Tabela wektorow (embeddingi) — gdy sentence-transformers dostepne
+- Tabela wektorow (embeddingi) — gdy sentence-transformers + model dostepne
 """
 from __future__ import annotations
 import argparse
+import hashlib
 import sqlite3
 import sys
 import time
@@ -18,8 +33,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 BIBLIOTEKA = ROOT / "bibliotheca_ulpia"
+DOCS = ROOT / "docs"
 DEFAULT_BAZA = ROOT / "narzedzia" / "rag" / "baza_wiedzy.db"
 DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+
+# Formaty ksiazek/danych obslugiwane przez ekstraktor
+SUF_KSIAZKI = ("*.epub", "*.pdf", "*.azw3", "*.mobi", "*.djvu")
+SUF_DANE = ("*.md", "*.txt", "*.csv", "*.json")
 
 sys.path.insert(0, str(ROOT / "narzedzia" / "rag"))
 from ekstraktor import ekstrahuj, podziel_na_chunki, wyczysc  # noqa: E402
@@ -31,6 +51,7 @@ def _init_db(conn: sqlite3.Connection) -> None:
             id       INTEGER PRIMARY KEY,
             zrodlo   TEXT NOT NULL,
             tytul    TEXT NOT NULL,
+            korpus   TEXT NOT NULL DEFAULT 'biblioteka',
             nr_chunk INTEGER NOT NULL,
             tekst    TEXT NOT NULL,
             meta     TEXT DEFAULT '{}'
@@ -46,40 +67,87 @@ def _init_db(conn: sqlite3.Connection) -> None:
             wektor      BLOB NOT NULL
         )
     """)
+    # rejestr plikow dla trybu przyrostowego
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS pliki (
+            zrodlo TEXT PRIMARY KEY,
+            hash   TEXT NOT NULL,
+            korpus TEXT NOT NULL DEFAULT 'biblioteka',
+            ts     REAL NOT NULL
+        )
+    """)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_zrodlo ON fragmenty(zrodlo)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_korpus ON fragmenty(korpus)")
     conn.commit()
+
+
+def _migruj_schema(conn: sqlite3.Connection) -> bool:
+    """Zwraca True gdy baza ma stary schemat (brak kolumny korpus/tabeli pliki)."""
+    kolumny = {r[1] for r in conn.execute("PRAGMA table_info(fragmenty)").fetchall()}
+    if not kolumny:
+        return False  # pusta baza, _init_db zrobi swoje
+    return "korpus" not in kolumny
 
 
 def _wyczysc_db(conn: sqlite3.Connection) -> None:
     conn.execute("DELETE FROM wektory")
     conn.execute("DELETE FROM fts")
     conn.execute("DELETE FROM fragmenty")
+    conn.execute("DELETE FROM pliki")
     conn.commit()
 
 
-def _dodaj_fragmenty(conn: sqlite3.Connection, zrodlo: str, tytul: str, chunki: list[str]) -> list[int]:
+def _hash_pliku(p: Path) -> str:
+    h = hashlib.sha256()
+    h.update(str(p.stat().st_size).encode())
+    h.update(str(int(p.stat().st_mtime)).encode())
+    return h.hexdigest()[:16]
+
+
+def _usun_zrodlo(conn: sqlite3.Connection, zrodlo: str) -> None:
+    """Usuwa wszystkie fragmenty (i wektory) danego zrodla — przed reindeksacja."""
+    ids = [r[0] for r in conn.execute("SELECT id FROM fragmenty WHERE zrodlo=?", (zrodlo,))]
+    if ids:
+        ph = ",".join("?" * len(ids))
+        conn.execute(f"DELETE FROM wektory WHERE fragment_id IN ({ph})", ids)
+        conn.execute("DELETE FROM fragmenty WHERE zrodlo=?", (zrodlo,))
+    conn.commit()
+
+
+def _dodaj_fragmenty(
+    conn: sqlite3.Connection, zrodlo: str, tytul: str, korpus: str, chunki: list[str]
+) -> list[int]:
     ids = []
     for nr, tekst in enumerate(chunki):
         cur = conn.execute(
-            "INSERT INTO fragmenty (zrodlo, tytul, nr_chunk, tekst) VALUES (?,?,?,?)",
-            (zrodlo, tytul, nr, tekst),
+            "INSERT INTO fragmenty (zrodlo, tytul, korpus, nr_chunk, tekst) VALUES (?,?,?,?,?)",
+            (zrodlo, tytul, korpus, nr, tekst),
         )
         ids.append(cur.lastrowid)
-    conn.commit()
-    # sync FTS
-    conn.execute("INSERT INTO fts(fts) VALUES('rebuild')")
     conn.commit()
     return ids
 
 
-def _zbierz_pliki(tylko_enc: bool) -> list[Path]:
-    pliki: list[Path] = []
-    if not tylko_enc:
-        for suf in ("*.epub", "*.pdf", "*.azw3", "*.mobi", "*.djvu"):
-            pliki += sorted(BIBLIOTEKA.glob(suf))
-    # encyklopedia + vademecum .md
-    for folder in ("encyklopedia", "vademecum"):
-        pliki += sorted((BIBLIOTEKA / folder).glob("*.md"))
+def _zbierz_pliki(korpus: str, tylko_enc: bool) -> list[tuple[Path, str]]:
+    """Zwraca liste (sciezka, korpus)."""
+    pliki: list[tuple[Path, str]] = []
+
+    if korpus in ("biblioteka", "wszystko"):
+        if not tylko_enc:
+            for suf in SUF_KSIAZKI:
+                pliki += [(p, "biblioteka") for p in sorted(BIBLIOTEKA.glob(suf))]
+            # dane tematyczne (csv/json/txt/md) w bibliotheca_ulpia/dane/
+            dane_dir = BIBLIOTEKA / "dane"
+            if dane_dir.is_dir():
+                for suf in SUF_DANE:
+                    pliki += [(p, "dane") for p in sorted(dane_dir.glob(suf))]
+        # encyklopedia + vademecum .md (zawsze w korpusie biblioteka)
+        for folder in ("encyklopedia", "vademecum"):
+            pliki += [(p, "biblioteka") for p in sorted((BIBLIOTEKA / folder).glob("*.md"))]
+
+    if korpus in ("docs", "wszystko"):
+        pliki += [(p, "docs") for p in sorted(DOCS.glob("*.md"))]
+
     return pliki
 
 
@@ -95,35 +163,66 @@ def _tytul(p: Path) -> str:
     return n.replace("_", " ").replace("-", " ")
 
 
+def _zaladuj_model(model_name: str, bez_wektorow: bool):
+    if bez_wektorow:
+        return None
+    try:
+        from sentence_transformers import SentenceTransformer
+        print(f"[RAG] Ładuję model: {model_name}...")
+        model = SentenceTransformer(model_name)
+        print("[RAG] Model gotowy ✅")
+        return model
+    except ImportError:
+        print("[RAG] sentence-transformers niedostępne — tylko FTS")
+    except Exception as e:
+        print(f"[RAG] Model niedostępny ({type(e).__name__}) — tylko FTS")
+    return None
+
+
 def indeksuj(
     baza: Path = DEFAULT_BAZA,
     model_name: str = DEFAULT_MODEL,
     tylko_enc: bool = False,
     bez_wektorow: bool = False,
-) -> None:
+    korpus: str = "biblioteka",
+    tylko_nowe: bool = False,
+) -> dict:
     baza.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(baza))
+
+    # migracja starego schematu: jesli brak kolumny korpus → przebuduj od zera
+    if baza.exists() and _migruj_schema(conn):
+        print("[RAG] Stary schemat bazy — przebudowuję strukturę.")
+        for t in ("wektory", "fts", "fragmenty", "pliki"):
+            conn.execute(f"DROP TABLE IF EXISTS {t}")
+        conn.commit()
+        tylko_nowe = False  # pelna reindeksacja po migracji
+
     _init_db(conn)
-    _wyczysc_db(conn)
+    if not tylko_nowe:
+        _wyczysc_db(conn)
 
-    # model embeddingów
-    model = None
-    if not bez_wektorow:
-        try:
-            from sentence_transformers import SentenceTransformer
-            print(f"[RAG] Ładuję model: {model_name}...")
-            model = SentenceTransformer(model_name)
-            print("[RAG] Model gotowy ✅")
-        except ImportError:
-            print("[RAG] sentence-transformers niedostępne — tylko FTS")
+    model = _zaladuj_model(model_name, bez_wektorow)
+    pliki = _zbierz_pliki(korpus, tylko_enc)
+    print(f"[RAG] Korpus={korpus} | plików: {len(pliki)} | tryb={'przyrostowy' if tylko_nowe else 'pełny'}")
 
-    pliki = _zbierz_pliki(tylko_enc)
-    print(f"[RAG] Pliki do indeksacji: {len(pliki)}")
+    znane_hashe: dict[str, str] = {}
+    if tylko_nowe:
+        znane_hashe = {r[0]: r[1] for r in conn.execute("SELECT zrodlo, hash FROM pliki")}
 
     total_chunks = 0
+    pominiete = 0
+    przetworzone = 0
     t0 = time.time()
-    for p in pliki:
-        print(f"  → {p.name} ...", end=" ", flush=True)
+    for p, kor in pliki:
+        zrodlo = p.name
+        h = _hash_pliku(p)
+
+        if tylko_nowe and znane_hashe.get(zrodlo) == h:
+            pominiete += 1
+            continue
+
+        print(f"  → {zrodlo} [{kor}] ...", end=" ", flush=True)
         tekst = wyczysc(ekstrahuj(p))
         if not tekst.strip():
             print("pominięto (brak tekstu)")
@@ -132,8 +231,12 @@ def indeksuj(
         if not chunki:
             print("pominięto (0 chunków)")
             continue
-        tytul = _tytul(p)
-        ids = _dodaj_fragmenty(conn, p.name, tytul, chunki)
+
+        # tryb przyrostowy: usun stare fragmenty tego zrodla przed dodaniem nowych
+        if tylko_nowe:
+            _usun_zrodlo(conn, zrodlo)
+
+        ids = _dodaj_fragmenty(conn, zrodlo, _tytul(p), kor, chunki)
 
         if model is not None:
             import numpy as np
@@ -143,20 +246,49 @@ def indeksuj(
                     "INSERT OR REPLACE INTO wektory (fragment_id, wektor) VALUES (?,?)",
                     (fid, np.array(vec, dtype="float32").tobytes()),
                 )
-            conn.commit()
 
+        conn.execute(
+            "INSERT OR REPLACE INTO pliki (zrodlo, hash, korpus, ts) VALUES (?,?,?,?)",
+            (zrodlo, h, kor, time.time()),
+        )
+        conn.commit()
         total_chunks += len(chunki)
+        przetworzone += 1
         print(f"{len(chunki)} chunków")
 
-    print(f"\n[RAG] Gotowe: {total_chunks} fragmentów w {time.time()-t0:.1f}s → {baza}")
+    # przebuduj FTS na koniec (raz — szybsze niz po kazdym pliku)
+    conn.execute("INSERT INTO fts(fts) VALUES('rebuild')")
+    conn.commit()
+
+    dt = time.time() - t0
+    stat = {
+        "fragmenty_nowe": total_chunks,
+        "pliki_przetworzone": przetworzone,
+        "pliki_pominiete": pominiete,
+        "czas_s": round(dt, 1),
+    }
+    print(
+        f"\n[RAG] Gotowe: +{total_chunks} fragmentów, {przetworzone} plików, "
+        f"{pominiete} bez zmian, {dt:.1f}s → {baza}"
+    )
     conn.close()
+    return stat
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Indeksacja Bibliothecy-RAG")
     ap.add_argument("--baza", default=str(DEFAULT_BAZA))
     ap.add_argument("--model", default=DEFAULT_MODEL)
+    ap.add_argument("--korpus", choices=["biblioteka", "docs", "wszystko"], default="biblioteka")
     ap.add_argument("--tylko-enc", action="store_true", help="tylko encyklopedia (szybkie)")
+    ap.add_argument("--tylko-nowe", action="store_true", help="PRZYROSTOWO — tylko nowe/zmienione pliki")
     ap.add_argument("--bez-wektorow", action="store_true", help="tylko FTS, bez embeddingow")
     args = ap.parse_args()
-    indeksuj(Path(args.baza), args.model, args.tylko_enc, args.bez_wektorow)
+    indeksuj(
+        Path(args.baza),
+        args.model,
+        args.tylko_enc,
+        args.bez_wektorow,
+        args.korpus,
+        args.tylko_nowe,
+    )

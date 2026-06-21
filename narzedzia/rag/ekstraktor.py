@@ -42,6 +42,51 @@ def _md(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def _txt(path: Path) -> str:
+    return path.read_text(encoding="utf-8", errors="replace")
+
+
+def _csv(path: Path) -> str:
+    """CSV → tekst: nagłówek + wiersze jako 'kol: wartość' (kontekst dla wyszukiwania)."""
+    import csv as _csvmod
+    linie: list[str] = []
+    with path.open(encoding="utf-8", errors="replace", newline="") as f:
+        reader = _csvmod.reader(f)
+        try:
+            naglowek = next(reader)
+        except StopIteration:
+            return ""
+        linie.append("Kolumny: " + ", ".join(naglowek))
+        for wiersz in reader:
+            pary = [f"{k}: {v}" for k, v in zip(naglowek, wiersz) if v.strip()]
+            if pary:
+                linie.append(" | ".join(pary))
+    return "\n".join(linie)
+
+
+def _json(path: Path) -> str:
+    """JSON → tekst: spłaszczona reprezentacja klucz=wartość (rekurencyjnie)."""
+    import json as _jsonmod
+
+    def splaszcz(obj, prefix=""):
+        czesci: list[str] = []
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                czesci += splaszcz(v, f"{prefix}{k}.")
+        elif isinstance(obj, list):
+            for i, v in enumerate(obj):
+                czesci += splaszcz(v, f"{prefix}{i}.")
+        else:
+            czesci.append(f"{prefix.rstrip('.')}: {obj}")
+        return czesci
+
+    try:
+        dane = _jsonmod.loads(path.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        return ""
+    return "\n".join(splaszcz(dane))
+
+
 def _calibre(path: Path) -> str:
     """Fallback: ebook-convert → txt (wymaga calibre)."""
     tmp = path.with_suffix(".txt.tmp")
@@ -80,8 +125,14 @@ def ekstrahuj(path: Path) -> str:
             return _epub(path)
         if suf == ".pdf":
             return _pdf(path)
-        if suf in (".md", ".txt"):
+        if suf == ".md":
             return _md(path)
+        if suf == ".txt":
+            return _txt(path)
+        if suf == ".csv":
+            return _csv(path)
+        if suf == ".json":
+            return _json(path)
         if suf in (".azw3", ".mobi"):
             return _calibre(path)
         if suf == ".djvu":

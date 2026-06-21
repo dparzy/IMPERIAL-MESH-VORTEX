@@ -31,26 +31,44 @@ class Wynik(NamedTuple):
     nr_chunk: int
     tekst: str
     score: float
+    korpus: str = "biblioteka"
 
 
-def _fts_szukaj(conn: sqlite3.Connection, zapytanie: str, topk: int) -> list[Wynik]:
+def _ma_korpus(conn: sqlite3.Connection) -> bool:
+    kolumny = {r[1] for r in conn.execute("PRAGMA table_info(fragmenty)").fetchall()}
+    return "korpus" in kolumny
+
+
+def _fts_szukaj(
+    conn: sqlite3.Connection, zapytanie: str, topk: int, korpus: str | None = None
+) -> list[Wynik]:
+    ma_kor = _ma_korpus(conn)
+    kol_kor = "f.korpus" if ma_kor else "'biblioteka' AS korpus"
+    warunek = ""
+    params: list = [zapytanie]
+    if korpus and ma_kor:
+        warunek = "AND f.korpus = ?"
+        params.append(korpus)
+    params.append(topk * 3)
     rows = conn.execute(
-        """
+        f"""
         SELECT f.id, f.zrodlo, f.tytul, f.nr_chunk, f.tekst,
-               bm25(fts) AS score
+               bm25(fts) AS score, {kol_kor}
         FROM fts
         JOIN fragmenty f ON fts.rowid = f.id
-        WHERE fts MATCH ?
+        WHERE fts MATCH ? {warunek}
         ORDER BY score
         LIMIT ?
         """,
-        (zapytanie, topk * 3),
+        params,
     ).fetchall()
     # bm25() zwraca ujemne wartości — mniejsza = lepsza
     return [Wynik(*r) for r in rows]
 
 
-def _wektor_szukaj(conn: sqlite3.Connection, zapytanie: str, topk: int, model) -> list[Wynik]:
+def _wektor_szukaj(
+    conn: sqlite3.Connection, zapytanie: str, topk: int, model, korpus: str | None = None
+) -> list[Wynik]:
     import numpy as np
 
     qvec = model.encode([zapytanie], show_progress_bar=False)[0].astype("float32")
@@ -68,20 +86,30 @@ def _wektor_szukaj(conn: sqlite3.Connection, zapytanie: str, topk: int, model) -
         scored.append((sim, fid))
 
     scored.sort(reverse=True)
-    top_ids = [fid for _, fid in scored[:topk]]
+    # bierzemy z zapasem (korpus filtruje pozniej)
+    kandydaci = scored[: topk * 5] if korpus else scored[:topk]
+    top_ids = [fid for _, fid in kandydaci]
     if not top_ids:
         return []
 
+    ma_kor = _ma_korpus(conn)
+    kol_kor = "korpus" if ma_kor else "'biblioteka' AS korpus"
     placeholders = ",".join("?" * len(top_ids))
     frag_rows = conn.execute(
-        f"SELECT id, zrodlo, tytul, nr_chunk, tekst FROM fragmenty WHERE id IN ({placeholders})",
+        f"SELECT id, zrodlo, tytul, nr_chunk, tekst, {kol_kor} "
+        f"FROM fragmenty WHERE id IN ({placeholders})",
         top_ids,
     ).fetchall()
 
-    id_to_sim = {fid: sim for sim, fid in scored[:topk]}
-    wyniki = [Wynik(*r, id_to_sim.get(r[0], 0.0)) for r in frag_rows]
+    id_to_sim = {fid: sim for sim, fid in kandydaci}
+    wyniki = [
+        Wynik(r[0], r[1], r[2], r[3], r[4], id_to_sim.get(r[0], 0.0), r[5])
+        for r in frag_rows
+    ]
+    if korpus and ma_kor:
+        wyniki = [w for w in wyniki if w.korpus == korpus]
     wyniki.sort(key=lambda x: -x.score)
-    return wyniki
+    return wyniki[:topk]
 
 
 def szukaj(
@@ -91,6 +119,7 @@ def szukaj(
     baza: Path = DEFAULT_BAZA,
     model_name: str = DEFAULT_MODEL,
     cichy: bool = False,
+    korpus: str | None = None,
 ) -> list[Wynik]:
     if not baza.exists():
         print(f"[RAG] Baza nie istnieje: {baza}\nUruchom najpierw: python narzedzia/rag/indeksuj.py", file=sys.stderr)
@@ -110,18 +139,18 @@ def szukaj(
 
     # sprawdź czy są wektory
     has_vecs = conn.execute("SELECT COUNT(*) FROM wektory").fetchone()[0] > 0
-    if tryb in ("wektor", "hybrid") and not has_vecs:
+    if tryb in ("wektor", "hybrid") and (not has_vecs or model is None):
         tryb = "fts"
         if not cichy:
-            print("[RAG] Brak wektorów w bazie, używam FTS", file=sys.stderr)
+            print("[RAG] Brak wektorów/modelu, używam FTS", file=sys.stderr)
 
     if tryb == "fts":
-        wyniki = _fts_szukaj(conn, zapytanie, topk)[:topk]
+        wyniki = _fts_szukaj(conn, zapytanie, topk, korpus)[:topk]
     elif tryb == "wektor":
-        wyniki = _wektor_szukaj(conn, zapytanie, topk, model)[:topk]
+        wyniki = _wektor_szukaj(conn, zapytanie, topk, model, korpus)[:topk]
     else:  # hybrid
-        fts_wyniki = _fts_szukaj(conn, zapytanie, topk)
-        vec_wyniki = _wektor_szukaj(conn, zapytanie, topk, model)
+        fts_wyniki = _fts_szukaj(conn, zapytanie, topk, korpus)
+        vec_wyniki = _wektor_szukaj(conn, zapytanie, topk, model, korpus)
         # połącz po ID, preferuj te które wystąpiły w obu
         seen: dict[int, Wynik] = {}
         bonus_ids = {w.id for w in fts_wyniki} & {w.id for w in vec_wyniki}
@@ -141,7 +170,9 @@ def formatuj(wyniki: list[Wynik], zapytanie: str = "") -> str:
     linie = [f"[RAG] Wyniki dla: {zapytanie!r} ({len(wyniki)})\n"]
     for i, w in enumerate(wyniki, 1):
         linie.append(f"{'='*60}")
-        linie.append(f"#{i} | {w.tytul} ({w.zrodlo}, chunk #{w.nr_chunk}) | score={w.score:.4f}")
+        linie.append(
+            f"#{i} | [{w.korpus}] {w.tytul} ({w.zrodlo}, chunk #{w.nr_chunk}) | score={w.score:.4f}"
+        )
         linie.append(f"{'-'*60}")
         preview = w.tekst[:600].replace("\n", " ")
         if len(w.tekst) > 600:
@@ -155,9 +186,11 @@ if __name__ == "__main__":
     ap.add_argument("zapytanie", nargs="+", help="Zapytanie tekstowe")
     ap.add_argument("--topk", type=int, default=5)
     ap.add_argument("--tryb", choices=["hybrid", "fts", "wektor"], default="hybrid")
+    ap.add_argument("--korpus", choices=["biblioteka", "dane", "docs"], default=None,
+                    help="ogranicz do korpusu (domyslnie: wszystkie)")
     ap.add_argument("--baza", default=str(DEFAULT_BAZA))
     ap.add_argument("--model", default=DEFAULT_MODEL)
     args = ap.parse_args()
     q = " ".join(args.zapytanie)
-    wyniki = szukaj(q, args.topk, args.tryb, Path(args.baza), args.model)
+    wyniki = szukaj(q, args.topk, args.tryb, Path(args.baza), args.model, korpus=args.korpus)
     print(formatuj(wyniki, q))

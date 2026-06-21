@@ -64,6 +64,7 @@ def _stworz_testowa_baze(tmp_path: Path) -> Path:
     conn.execute("""
         CREATE TABLE fragmenty (
             id INTEGER PRIMARY KEY, zrodlo TEXT, tytul TEXT,
+            korpus TEXT NOT NULL DEFAULT 'biblioteka',
             nr_chunk INTEGER, tekst TEXT, meta TEXT DEFAULT '{}'
         )
     """)
@@ -76,7 +77,7 @@ def _stworz_testowa_baze(tmp_path: Path) -> Path:
         CREATE TABLE wektory (fragment_id INTEGER PRIMARY KEY, wektor BLOB)
     """)
     conn.execute("CREATE INDEX idx_zrodlo ON fragmenty(zrodlo)")
-    # wstaw testowe dane
+    # wstaw testowe dane (dwa korpusy)
     tekst = (
         "Kelly criterion is a formula for position sizing. "
         "GARCH model estimates conditional volatility regime. "
@@ -86,9 +87,15 @@ def _stworz_testowa_baze(tmp_path: Path) -> Path:
     chunki = podziel_na_chunki(tekst * 10, max_slow=50, overlap=10)
     for nr, c in enumerate(chunki):
         conn.execute(
-            "INSERT INTO fragmenty (zrodlo, tytul, nr_chunk, tekst) VALUES (?,?,?,?)",
-            ("test.md", "Test", nr, c),
+            "INSERT INTO fragmenty (zrodlo, tytul, korpus, nr_chunk, tekst) VALUES (?,?,?,?,?)",
+            ("test.md", "Test", "biblioteka", nr, c),
         )
+    # jeden fragment w korpusie docs
+    conn.execute(
+        "INSERT INTO fragmenty (zrodlo, tytul, korpus, nr_chunk, tekst) VALUES (?,?,?,?,?)",
+        ("docs.md", "Docs", "docs", 0,
+         "Gubernator GARCH regime multiplier neuron Imperium dokumentacja kodu"),
+    )
     conn.commit()
     conn.execute("INSERT INTO fts(fts) VALUES('rebuild')")
     conn.commit()
@@ -136,6 +143,118 @@ def test_formatuj():
         wyniki = szukaj("GARCH", topk=2, tryb="fts", baza=baza, cichy=True)
         tekst = formatuj(wyniki, "GARCH")
         assert "GARCH" in tekst or "Wyniki dla" in tekst
+
+
+def test_filtr_korpusu():
+    with tempfile.TemporaryDirectory() as tmp:
+        baza = _stworz_testowa_baze(Path(tmp))
+        from szukaj import szukaj  # type: ignore[import]
+        # GARCH wystepuje i w biblioteka i w docs
+        w_docs = szukaj("GARCH", topk=5, tryb="fts", baza=baza, cichy=True, korpus="docs")
+        assert all(w.korpus == "docs" for w in w_docs)
+        assert any("Gubernator" in w.tekst for w in w_docs)
+        w_bib = szukaj("GARCH", topk=5, tryb="fts", baza=baza, cichy=True, korpus="biblioteka")
+        assert all(w.korpus == "biblioteka" for w in w_bib)
+
+
+def test_korpus_w_wyniku():
+    with tempfile.TemporaryDirectory() as tmp:
+        baza = _stworz_testowa_baze(Path(tmp))
+        from szukaj import szukaj  # type: ignore[import]
+        wyniki = szukaj("Kelly", topk=2, tryb="fts", baza=baza, cichy=True)
+        assert all(hasattr(w, "korpus") for w in wyniki)
+        assert all(w.korpus for w in wyniki)
+
+
+# ── ekstraktor: formaty danych tematycznych ──────────────────────────────────
+
+def test_ekstraktor_csv():
+    from ekstraktor import ekstrahuj
+    with tempfile.TemporaryDirectory() as tmp:
+        p = Path(tmp) / "dane.csv"
+        p.write_text("symbol,strategia,wynik\nBTC,trend,zysk\nETH,range,strata\n", encoding="utf-8")
+        tekst = ekstrahuj(p)
+        assert "Kolumny" in tekst
+        assert "BTC" in tekst
+        assert "trend" in tekst
+
+
+def test_ekstraktor_json():
+    from ekstraktor import ekstrahuj
+    with tempfile.TemporaryDirectory() as tmp:
+        p = Path(tmp) / "dane.json"
+        p.write_text('{"neuron": "EXP-14", "opis": "Kyle lambda", "waga": 1.5}', encoding="utf-8")
+        tekst = ekstrahuj(p)
+        assert "EXP-14" in tekst
+        assert "Kyle lambda" in tekst
+
+
+def test_ekstraktor_txt():
+    from ekstraktor import ekstrahuj
+    with tempfile.TemporaryDirectory() as tmp:
+        p = Path(tmp) / "notatka.txt"
+        p.write_text("Lekcja z backtestu: MTF gate to tarcza bessy.", encoding="utf-8")
+        tekst = ekstrahuj(p)
+        assert "tarcza bessy" in tekst
+
+
+def test_ekstraktor_csv_pusty():
+    from ekstraktor import ekstrahuj
+    with tempfile.TemporaryDirectory() as tmp:
+        p = Path(tmp) / "pusty.csv"
+        p.write_text("", encoding="utf-8")
+        assert ekstrahuj(p) == ""
+
+
+def test_ekstraktor_json_uszkodzony():
+    from ekstraktor import ekstrahuj
+    with tempfile.TemporaryDirectory() as tmp:
+        p = Path(tmp) / "zly.json"
+        p.write_text("{nie jest json", encoding="utf-8")
+        assert ekstrahuj(p) == ""
+
+
+# ── indeksacja: korpus + tryb przyrostowy ────────────────────────────────────
+
+def _mini_korpus(tmp: Path) -> Path:
+    """Tworzy mini strukturę bibliotheca_ulpia/dane/ do testów indeksacji."""
+    dane = tmp / "bib" / "dane"
+    dane.mkdir(parents=True)
+    (dane / "lekcje.txt").write_text(
+        "Kelly criterion sizing. GARCH volatility regime. " * 10, encoding="utf-8"
+    )
+    return tmp / "bib"
+
+
+def test_indeksacja_przyrostowa():
+    import importlib
+    sys.path.insert(0, str(ROOT / "narzedzia" / "rag"))
+    indeksuj_mod = importlib.import_module("indeksuj")
+    with tempfile.TemporaryDirectory() as tmp:
+        tmpp = Path(tmp)
+        baza = tmpp / "test.db"
+        dane = tmpp / "dane"
+        dane.mkdir()
+        f1 = dane / "a.txt"
+        f1.write_text("Kelly criterion sizing strategy. " * 15, encoding="utf-8")
+
+        # monkeypatch _zbierz_pliki by uzyc naszego folderu
+        orig = indeksuj_mod._zbierz_pliki
+        indeksuj_mod._zbierz_pliki = lambda korpus, tylko_enc: [(p, "dane") for p in sorted(dane.glob("*.txt"))]
+        try:
+            s1 = indeksuj_mod.indeksuj(baza=baza, bez_wektorow=True)
+            assert s1["pliki_przetworzone"] == 1
+            # drugie uruchomienie przyrostowe — nic nowego
+            s2 = indeksuj_mod.indeksuj(baza=baza, bez_wektorow=True, tylko_nowe=True)
+            assert s2["pliki_przetworzone"] == 0
+            assert s2["pliki_pominiete"] == 1
+            # dodaj nowy plik
+            (dane / "b.txt").write_text("GARCH volatility regime filter. " * 15, encoding="utf-8")
+            s3 = indeksuj_mod.indeksuj(baza=baza, bez_wektorow=True, tylko_nowe=True)
+            assert s3["pliki_przetworzone"] == 1
+            assert s3["pliki_pominiete"] == 1
+        finally:
+            indeksuj_mod._zbierz_pliki = orig
 
 
 # ── mcp server ───────────────────────────────────────────────────────────────

@@ -6,6 +6,96 @@
 
 ---
 
+## 2026-06-21 | W-384 | Konfluencja Multi-Timeframe na poziomie roju (odpowiedź na pytanie Cezara)
+
+Cezar: "czy Imperium widzi wszystkie interwały podczas wybierania ordera?" — NIE w pełni.
+Diagnoza: decyzja na JEDNYM TF; jedyna nadbudowa MTF (X-28) to RSI+EMA dla 1 neuronu.
+
+ROZWIĄZANIE: `imperium/legiony/mtf_konfluencja.py` — brama konfluencji na poziomie ROJU
+(jak Senat, warstwa nad Legatusem). Po decyzji kierunkowej agreguje bary w GÓRĘ na 2 wyższe
+TF (stos: 1h→4h+1d, 4h→1d+1w, itd.), liczy robustny trend każdego (EMA50vsEMA200 + cena
+vs EMA50 + MACD znak) i zwraca:
+  • wyrownanie -1..+1, mnoznik 0.5..1.2, weto (opt-in), werdykt
+Wpięte w Dyrygenta (opt-in, domyślnie OFF — zero zmiany zachowania):
+  • mtf_konfluencja=True → mnoznik skaluje rozmiar pozycji (zgodność↑ / konflikt↓)
+  • mtf_weto_przeciwtrend=True → twarde weto wejść przeciw wyższym TF (MTF_WETO)
+Mnoznik aplikowany w OBU ścieżkach sizingu (przy okazji naprawiono gubienie mnoznik_senatu
+w ścieżce Rady Doradców).
+
+14 testów (test_mtf_konfluencja.py): agregacja bez lookahead, kierunek trendu, zgodność
+wzmacnia, konflikt tłumi, weto, mnoznik w zakresie, Dyrygent domyślnie OFF.
+1648/1648 testów, audyt exit 0, ruff czysty.
+
+Pliki: `legiony/mtf_konfluencja.py` (NEW), `koloseum/dyrygent.py` (brama + 2× sizing),
+`tests/test_mtf_konfluencja.py` (NEW, 14), `docs/MANIFEST_KODU.md`, `docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-06-21 | POMIAR MATRYCOWY + naprawa EXP-14 | 5 par × 3 interwały (Prawo XV/XVI)
+
+Cezar wskazał słabość: pomiar tylko na BTC 4h. Rozszerzono `pomiar_nowe_moduly.py` na
+PEŁNĄ matrycę 5 par (BTC/ETH/BNB/SOL/DOGE) × 3 interwały (1h/4h/1d). To ujawniło BUG:
+
+🚨 EXP-14 Kyle's Lambda — próg ABSOLUTNY (1.5e-5) był 50× za wysoki i zależny od skali
+wolumenu (BTC λ~3e-7, inne pary inaczej). Neuron NIGDY nie strzelał na realnych danych
+(n/a na wszystkich 15 kombinacjach). Pojedynczy pomiar BTC 4h na pełnej historii dał
+mylące IC=0.48 z garstki sygnałów ze starej, niepłynnej ery BTC.
+
+NAPRAWA (W-380): próg ADAPTACYJNY — stosunek bieżącego impactu (|Δp|/|netflow|, ostatnie
+5 barów) do mediany okna. Bezwymiarowy → skalowalny na KAŻDĄ z 15 par. Progi skalibrowane
+na realny rozkład (mediana ratio=2.05, p85=6.2): HIGH=6.0 (~15%), EXTREME=12.0 (~8%).
+
+WYNIK PO NAPRAWIE (średnia 5 par × 3 TF):
+- EXP-13 GARCH: max|ρ|=0.124, IC≈+0.25 — strzela na każdej parze/TF, zdekorelowany ✅
+- EXP-14 Kyle:  max|ρ|=0.063, IC≈+0.31 — NAJBARDZIEJ zdekorelowany, teraz strzela wszędzie ✅
+- EXP-15 PIN: martwy (wyciszony w poprzedniej turze)
+
+UWAGA METODOLOGICZNA (Prawo I): IC ~0.25-0.31 jest płaskie przez h=1/6/30 — to częściowo
+artefakt persystencji sygnału (wolnozmienny sygnał × trendujący rynek zawyża IC). Wartość
+bezwzględna IC zawyżona; realny dowód wartości to backtest P&L, nie surowe IC. Pewne są:
+(1) dekorelacja (nowa informacja), (2) skalowalność na wszystkie pary po naprawie.
+
+Lekcja: pomiar na 1 parze/1 TF = pułapka (Prawo XV). Absolutne progi nie generalizują
+na pary o różnej skali — domyślnie progi adaptacyjne/względne.
+
+Testy: +2 (skalowalność progu, impact_ratio w diagnostyce). 1634/1634, audyt exit 0.
+Pliki: `zwiadowcy/exp_kyle_lambda.py` (próg adaptacyjny), `narzedzia/pomiar_nowe_moduly.py`
+(matryca 5×3), `tests/test_garch_kyle.py` (+2), `docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-06-21 | POMIAR (Prawo XVI) | Dekorelacja + IC nowych modułów → EXP-15 wyciszony
+
+Narzędzie `narzedzia/pomiar_nowe_moduly.py` — pomiar EXP-13/14/15 na realnych danych
+(Binance BTC 4h, 18631 barów). Cel: czy nowe moduły niosą nową informację (Prawo XVI),
+nie zgadywanie.
+
+WYNIKI DEKORELACJI (|ρ| z resztą zwiadowców):
+- EXP-13 (GARCH): max|ρ|=0.143 → 🟢 UNIKALNY (justified — nowa informacja)
+- EXP-14 (Kyle): max|ρ|=0.143 → 🟢 UNIKALNY
+- EXP-15 (PIN): stały sygnał → nie da się skorelować (martwy)
+
+WYNIKI IC (Spearman sygnał_t vs zwrot_{t+h}, h=1/6/30 barów 4h):
+- EXP-13 GARCH: IC≈+0.10..0.12 (realny skill, ostrożność vol)
+- EXP-14 Kyle: IC≈+0.48 (PODEJRZANIE WYSOKIE — flaga, artefakt reżimowy? wymaga backtestu;
+  zweryfikowano że NIE jest trywialnym lookahead: zgodność ze znakiem bieżącej świecy 38%)
+- EXP-15 PIN: n/a (stały sygnał)
+
+🚨 DECYZJA (Prawo XV + Prawo I): EXP-15 PIN WYCISZONY (DOSTEPNY=False).
+PIN > próg tylko 0.1% czasu (2/1858 barów), pewnosc_przeciwnika>0 raptem 2× w całej historii.
+Przyczyna strukturalna: PIN to zjawisko TICK-LEVEL; uśrednianie buy/sell z tick-rule po barach
+OHLCV niszczy asymetrię (mean_buy≈mean_sell→PIN≈0). Dodany przedwcześnie — pomiar to wychwycił.
+Ożywa po podpięciu feedu aggTrades (trade-by-trade) — jak EXP-12 (L2). To jest CEL pomiaru:
+nie dodawać w ciemno, mierzyć i cofać gdy moduł nie niesie wartości.
+
+Liczniki: 81 neuronów (75 aktywnych) + 15 zwiadowców (13 aktywnych, 2 wyciszone: EXP-12, EXP-15).
+1632/1632 testów, audyt exit 0.
+
+Pliki: `narzedzia/pomiar_nowe_moduly.py` (NEW), `legiony/zwiadowcy/exp_pin.py` (DOSTEPNY=False),
+`docs/MANIFEST_KODU.md`, `docs/MAPA_KLUCZY.md`, `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-06-21 | W-377..379 obudzenie + W-383 | OC-06..08 ożywione + EXP-15 PIN scout
 
 Obudzenie 3 martwych głosów (Prawo XV) + wpięcie PIN do roju:

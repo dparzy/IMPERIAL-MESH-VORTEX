@@ -47,7 +47,7 @@
 | EXP-12 🎖️ | ZwiadowcaAtmabhan | `zwiadowcy/exp_atmabhan.py` | F | 🔇 wyciszony (L2 feed) | AP-Mode microstructure (IMV-ADO 🔱, E1+E5) |
 | EXP-13 🎖️ | ZwiadowcaGARCH | `zwiadowcy/exp_garch.py` | V | ✅ aktywny (OHLCV) | GJR-GARCH(1,1) zmienność warunkowa (W-376, Tsay BIB-031, E1) |
 | EXP-14 🎖️ | ZwiadowcaKyleLambda | `zwiadowcy/exp_kyle_lambda.py` | L | ✅ aktywny (OHLCV) | Kyle's Lambda price impact OLS (W-380, O'Hara BIB-032, E1) |
-| EXP-15 🎖️ | ZwiadowcaPIN | `zwiadowcy/exp_pin.py` | L | ✅ aktywny (OHLCV) | PIN informed trading metodą momentów (W-383, O'Hara BIB-032, E1) |
+| EXP-15 🎖️ | ZwiadowcaPIN | `zwiadowcy/exp_pin.py` | L | 🔇 wyciszony (tick-data) | PIN — POMIAR: martwy głos na OHLCV (0.1%), ożywa z aggTrades (W-383, O'Hara BIB-032, E1) |
 
 ---
 
@@ -326,6 +326,7 @@
 | DiagnostykaKorelacji | `legiony/diagnostyka_korelacji.py` | ✅ aktywny |
 | DenoisingMacierzy (W-365..368 denoising/ONC/NCO/detoning + **W-374 HRP**, López de Prado BIB-023/INF-35, Jansen BIB-026/INF-38) | `legiony/denoising_macierzy.py` | ✅ aktywny |
 | MetrykiIC (W-369..371 IC per-neuron + breadth + Fundamental Law IR=IC·√breadth, Grinold&Kahn BIB-025/INF-37) | `legiony/metryki_ic.py` | ✅ aktywny |
+| KonfluencjaMTF (W-384 — brama multi-timeframe na poziomie roju: wyższe TF potwierdzają/wetują decyzję; opt-in Dyrygent.mtf_konfluencja) | `legiony/mtf_konfluencja.py` | ✅ aktywny (opt-in) |
 | Mikrostruktura (W-381 PIN metodą momentów + W-382 Engle-Granger kointegracja par, O'Hara BIB-032/INF-44, Tsay BIB-031/INF-43) | `legiony/mikrostruktura.py` | ✅ aktywny |
 | Igrzyska / Koloseum | `koloseum/` | ✅ aktywny |
 | BramaKalkulatora | `fundament/brama_kalkulatora.py` | ✅ aktywny |

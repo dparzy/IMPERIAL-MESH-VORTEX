@@ -62,8 +62,16 @@ class ZwiadowcaKyleLambda(ZwiadowcaElitarny):
     ELITARNY = True
     POWOD_ELITARNOSCI = "E1: Exploratores — Kyle's Lambda OLS w pure numpy (BIB-032 O'Hara)"
 
-    _PROG_HIGH = 1.5e-5    # λ > 1.5e-5 → wysoki impact (cienki rynek)
-    _PROG_EXTREME = 5e-5   # λ > 5e-5  → ekstremalny impact
+    # Próg ADAPTACYJNY (Prawo XV — pomiar 2026-06-21): absolutny próg λ był 50× za
+    # wysoki i zależny od skali wolumenu (BTC vs DOGE) → neuron nigdy nie strzelał.
+    # Zamiast wartości bezwzględnej: stosunek BIEŻĄCEGO impactu do mediany okna.
+    # Skalowalny na KAŻDĄ parę (ratio jest bezwymiarowy).
+    # Progi skalibrowane na realny rozkład (pomiar 2026-06-21, 5 par × 3 TF):
+    # mediana ratio=2.05, p85=6.2, p95=18 → HIGH≈p85 (~15%), EXTREME≈p93 (~8%).
+    # Detektor ryzyka ogonowego (cienki rynek), nie sygnał co-drugi-bar.
+    _RATIO_HIGH = 6.0      # bieżący impact > 6× mediana okna → podwyższony (~15%)
+    _RATIO_EXTREME = 12.0  # > 12× → ekstremalny, cienki rynek/stop-gun ryzyko (~8%)
+    _OGON_BARY = 5         # ile ostatnich barów uśredniamy jako "bieżący impact"
 
     def analizuj(self, bary: List[Dict[str, Any]]) -> RaportZwiadowcy:
         t0 = time.time()
@@ -93,32 +101,36 @@ class ZwiadowcaKyleLambda(ZwiadowcaElitarny):
         if mask.sum() < 10:
             return self._brak_danych("Za mało barów z wolumenem > 0")
 
-        lam = _ols_slope(nf[mask], dp[mask])
+        lam = _ols_slope(nf[mask], dp[mask])  # globalna λ okna (diagnostyka)
 
-        if np.isnan(lam):
-            return self._brak_danych("OLS nie powiodło się (zerowa wariancja netflow)")
+        # Per-bar impact |Δp|/|netflow| — szereg do progu adaptacyjnego (skalowalny)
+        lambda_bars = np.abs(dp[mask]) / (np.abs(nf[mask]) + 1e-10)
+        if len(lambda_bars) < self._OGON_BARY + 5:
+            return self._brak_danych("Za mało barów do progu adaptacyjnego")
 
-        lam_abs = abs(lam)
+        mediana = float(np.median(lambda_bars))
+        biezacy = float(np.mean(lambda_bars[-self._OGON_BARY:]))
+        ratio = biezacy / mediana if mediana > 1e-15 else 1.0
+
         # Korelacja pearson (diagnostyka Prawa XVI vs Amihud)
         amihud_proxy = np.where(volumes[:-1][mask] > 0,
                                 np.abs(dp[mask]) / volumes[:-1][mask], 0.0)
-        lambda_bars = np.abs(dp[mask]) / (np.abs(nf[mask]) + 1e-10)
         corr_amihud = float(np.corrcoef(amihud_proxy, lambda_bars)[0, 1]) if len(lambda_bars) > 2 else 0.0
 
-        if lam_abs >= self._PROG_EXTREME:
+        if ratio >= self._RATIO_EXTREME:
             kierunek, pewnosc = "SHORT", 0.75
             powody = [
-                f"λ={lam:.2e} EKSTREMALNY — cienki rynek, stop-gun ryzyko",
-                "Nawet mały net-flow przesuwa cenę znacząco",
+                f"impact {ratio:.1f}× mediany okna — EKSTREMALNY, cienki rynek/stop-gun ryzyko",
+                "Net-flow przesuwa cenę dużo mocniej niż zwykle",
             ]
-        elif lam_abs >= self._PROG_HIGH:
+        elif ratio >= self._RATIO_HIGH:
             kierunek, pewnosc = "SHORT", 0.55
             powody = [
-                f"λ={lam:.2e} wysoki — ograniczona głębokość rynku, ostrożność",
+                f"impact {ratio:.1f}× mediany okna — podwyższony, ograniczona głębokość",
             ]
         else:
             kierunek, pewnosc = "NEUTRAL", 0.0
-            powody = [f"λ={lam:.2e} normalny — wystarczająca głębokość rynku"]
+            powody = [f"impact {ratio:.1f}× mediany — normalna głębokość rynku"]
 
         if abs(corr_amihud) > 0.80:
             powody.append(f"⚠️ Prawo XVI: |ρ(λ,Amihud)|={corr_amihud:.2f}>0.8 → kandydat scalenia z Z-06")
@@ -129,8 +141,9 @@ class ZwiadowcaKyleLambda(ZwiadowcaElitarny):
             pewnosc=pewnosc,
             powody=powody,
             diagnostics={
-                "main_value": round(float(lam), 8),
-                "kyle_lambda": round(float(lam), 8),
+                "main_value": round(ratio, 3),
+                "kyle_lambda": round(float(lam), 10),
+                "impact_ratio": round(ratio, 3),
                 "corr_z06_amihud": round(corr_amihud, 3),
                 "n_bars_used": int(mask.sum()),
             },

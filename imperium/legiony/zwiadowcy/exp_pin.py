@@ -40,7 +40,17 @@ class ZwiadowcaPIN(ZwiadowcaElitarny):
     KATEGORIA = "L"
     WAGA = 6
     WYMAGA_BAROW = 30
-    TYP_DANYCH = TypDanych.OHLCV
+    TYP_DANYCH = TypDanych.TICK
+    # WYCISZONY (DOSTEPNY=False) — POMIAR 2026-06-21 (narzedzia/pomiar_nowe_moduly.py):
+    # PIN > próg tylko 0.1% czasu (2/1858 barów BTC 4h), pewnosc_przeciwnika>0 raptem 2×.
+    # Przyczyna strukturalna (Prawo I): PIN to zjawisko TICK-LEVEL; uśrednianie buy/sell
+    # z tick-rule po barach OHLCV niszczy asymetrię informed (mean_buy≈mean_sell→PIN≈0).
+    # Ożywa po podpięciu feedu aggTrades (prawdziwe buy/sell per transakcja) — jak EXP-12 (L2).
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = (
+        "PIN wymaga tick-data (aggTrades) — proxy z OHLCV zmierzony jako martwy głos "
+        "(0.1% aktywacji, pomiar 2026-06-21). Ożywa z feedem trade-by-trade."
+    )
     OPIS_METODY = (
         "PIN (Probability of Informed Trading) metodą momentów na buy/sell z tick-rule. "
         "Komplementarny do VPIN (Z-01). BIB-032 O'Hara rozdz. 3."

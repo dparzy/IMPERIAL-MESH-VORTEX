@@ -280,6 +280,11 @@ def backtest_portfel(
     # Eliminuje redundantne wywołania TA-Lib (zysk ~5-8×). n_jobs=None → auto cpu_count.
     cache_wskaznikow: bool = False,
     cache_n_jobs: Optional[int] = None,
+    # W-sentyment: historyczny funding/OI/L-S do POMIARU PSY-01/02/04 w backteście
+    # (Prawo XVI). {sym: {ts_baru: {FUNDING_RATE, OPEN_INTEREST, OPEN_INTEREST_PREV,
+    # LONG_SHORT_RATIO}}}. Buduj przez sentyment_historyczny.forward_fill_na_bary.
+    # None = PSY abstynują (jak dotąd, zero regresji).
+    sentyment_per: "Optional[Dict[str, Dict[int, Dict[str, Any]]]]" = None,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -489,6 +494,20 @@ def backtest_portfel(
             rs_map = _cross_sectional_rs(close_koszyk, lookback=_RS_LOOKBACK)
             if sym in rs_map:
                 dyrygenci[sym].kontekst_dodatkowy["CROSS_RS"] = rs_map[sym]
+
+        # W-sentyment: wstrzyknij historyczny funding/OI/L-S dla TEGO baru (Prawo XVI).
+        # Forward-fillowany kauzalnie (ts ≤ bar) → PSY-01/02/04 budzą się w backteście.
+        # Po radarze i RS (kontekst może być nadpisany przez radar), by sentyment przetrwał.
+        # WAŻNE: czyść klucze sentymentu PRZED update — bez tego (gdy radar nie wstaje,
+        # np. koszyk bez BTC) stary funding z poprzedniego baru zostaje w kontekście
+        # i neuron głosuje na nieaktualnych danych zamiast spać (stale-data, Prawo XV).
+        if sentyment_per is not None:
+            kontekst = dyrygenci[sym].kontekst_dodatkowy
+            for _k in ("FUNDING_RATE", "OPEN_INTEREST", "OPEN_INTEREST_PREV", "LONG_SHORT_RATIO"):
+                kontekst.pop(_k, None)
+            sent = sentyment_per.get(sym, {}).get(int(ts))
+            if sent:
+                kontekst.update(sent)
 
         okno_barow = bary[i - okno: i + 1]
 

@@ -37,7 +37,7 @@ Razem: sweep z **8 minut → ~30-40 sekund**.
 
 | Feed | Dane | Koszt | Status | Neurony które ożywią |
 |------|------|-------|--------|---------------------|
-| **Binance public** | OHLCV 1h/4h/1d, funding, OI, L/S ratio | darmowy | ⏳ brak adaptera | PSY-01, PSY-02, PSY-04, V-03, RADAR-01-05 (7+) |
+| **Binance public** | OHLCV 1h/4h/1d, funding, OI, L/S ratio | darmowy | ✅ adapter live + backfill historyczny | PSY-01, PSY-02, PSY-04, V-03, RADAR-01-05 (7+) |
 | **Fear & Greed** (alternative.me) | Indeks 0-100 | darmowy | ⏳ brak adaptera | PSY-03 |
 | **DeepSeek API** | LLM: news sentyment, adversarial gate | klucz | ⏳ klucz gotowy | NEWS-01 |
 | **RSS/CryptoPanic** 💎 | News sentyment bez API key | darmowy | ⏳ brak adaptera | NEWS-01 (częściowo) |
@@ -105,6 +105,21 @@ Razem: sweep z **8 minut → ~30-40 sekund**.
 - Bug: infinite loop w `podziel_na_chunki` gdy `overlap == max_slow` → fix: `overlap = min(overlap, max_slow - 1)`
 - HuggingFace zablokowany w chmurze (403) → tylko FTS w cloud; wektory działają lokalnie
 - MCP server: `biblioteka_szukaj(zapytanie, topk, tryb, korpus)` + `biblioteka_info()`
+
+### 2026-06-21 — Speedup backtestu 2.9× (GARCH + BOCPD)
+- Profiler (cProfile): wąskie gardło to NIE TA-Lib (23%), lecz GJR-GARCH recursion (34.5%) i BOCPD (18.9%) — czyste Python loops
+- GARCH: scipy.signal.lfilter (IIR w C) zamiast Python for-loop → 2.6×
+- BOCPD: scipy.special.gammaln wektorowy zamiast 531K math.lgamma calls + numpy log_w
+- Numba zablokowana w chmurze (pip timeout) → numpy/scipy zamiast JIT
+- cache_wskaznikow (opt-in, multiprocessing): prekalkulacja wskaźników per symbol
+- Wynik: 30.1s → 10.5s (2 pary × 150 barów)
+
+### 2026-06-21 — Backfill sentymentu (PSY-01/02/04 mierzalne w backteście)
+- ODKRYCIE: adaptery futures/feargreed/cvd JUŻ istnieją i są wpięte do petla_live + factory Dyrygenta. Neurony PSY żyją LIVE, ale abstynują w backteście (brak historii)
+- Luka Prawa XVI: PSY-01/02/04 nigdy nie zmierzone (tylko live, niemierzalne)
+- Rozwiązanie: AdapterFutures.pobierz_historie() (Binance /fapi/v1/fundingRate pełna historia + openInterestHist/L-S ~30 dni), forward_fill_na_bary() kauzalny, narzedzia/backfill_sentyment.py (CSV cache), backtest_portfel(sentyment_per=...)
+- Funding ma PEŁNĄ historię; OI/L-S tylko ostatnie ~30 dni (limit Binance)
+- Cezar odpala backfill lokalnie (sieć), potem backtest mierzy czy PSY dodają przewagę
 
 ### 2026-06-21 — MTF bear-shield finding (KROK B backtest)
 - MTF gate NIE poprawia wyników globalnie (Sharpe BULL_2021: 0.95→0.71, RANGE_2023: 0.65→0.47)

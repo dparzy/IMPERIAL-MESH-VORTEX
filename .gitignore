@@ -23,3 +23,4 @@ raporty/
 
 # Stan uczenia cross-session (generowany w runtime — nie wersjonowany)
 logs/
+narzedzia/rag/baza_wiedzy.db

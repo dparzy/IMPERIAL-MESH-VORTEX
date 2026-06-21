@@ -4,11 +4,20 @@
 Odpowiada na pytanie Cezara: czy nowe moduły NIOSĄ NOWĄ INFORMACJĘ, czy dublują
 istniejące? (Prawo XVI: redundancja mierzona, nie zgadywana.)
 
-Dwa pomiary na realnych danych (Binance 4h, ~18k barów):
+Dwa pomiary na realnych danych:
   1. DEKORELACJA — korelacja sygnałów EXP-13/14/15 vs reszta zwiadowców.
      |ρ|>0.80 → redundancja (waga w dół); |ρ|<0.20 → filar siły (zachować).
   2. IC (Information Coefficient, W-369) — Spearman(sygnał_t, zwrot_{t+h}).
      IC mierzy SKILL: IC≈0 = szum, IC>0.03 = realna przewaga predykcyjna.
+
+AUTO-SKAN: narzędzie samo wykrywa WSZYSTKIE pary .csv w folderach interwałów
+(dane/godzinowe, dane/4h, dane/dzienne) — działa dla dowolnej liczby par (5, 15, 50…)
+bez edycji kodu. Wystarczy wrzucić pliki i uruchomić.
+
+Format pliku CSV (jeden z dwóch, oba czytane):
+  • prosty: timestamp,open,high,low,close,volume
+  • CryptoDataDownload: Unix,Date,Symbol,Open,High,Low,Close,Volume...
+Nazwa pliku musi zawierać symbol pary (np. Binance_BTCUSDT_4h.csv, PEPEUSDT-1h.csv).
 
 Uruchom: python narzedzia/pomiar_nowe_moduly.py
 """
@@ -27,17 +36,55 @@ from imperium.legiony.diagnostyka_korelacji import (
 )
 from imperium.legiony.metryki_ic import _spearman
 
+import glob
+import re
+
 NOWE = {"EXP-13", "EXP-14", "EXP-15"}
 OKNO = 60
 HORYZONTY = (1, 6, 30)
 
-# Pełna matryca: 5 par × 3 interwały (wszystko co mamy w repo).
-PARY = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT"]
-INTERWALY = {
-    "1h": "dane/godzinowe/Binance_{p}_1h.csv",
-    "4h": "dane/4h/Binance_{p}_4h.csv",
-    "1d": "dane/dzienne/Binance_{p}_d.csv",
+# Foldery interwałów (etykieta TF → katalog). Auto-skan WSZYSTKICH par w środku.
+# Działa dla dowolnej liczby par (5 w chmurze, 15+ na laptopie) — bez edycji kodu.
+INTERWALY_FOLDERY = {
+    "1h": "dane/godzinowe",
+    "4h": "dane/4h",
+    "1d": "dane/dzienne",
 }
+
+
+def _wykryj_pare(nazwa_pliku: str) -> str:
+    """Wyciąga symbol pary z nazwy pliku, np. 'Binance_BTCUSDT_4h.csv' → 'BTCUSDT'."""
+    baza = os.path.basename(nazwa_pliku)
+    # Para = symbol bazowy + waluta kwotowana (USDT/USDC/BUSD/USD). USDT przed USD.
+    m = re.search(r"([A-Z0-9]{2,}(?:USDT|USDC|BUSD|USD))", baza.upper())
+    if m:
+        return m.group(1)
+    # fallback: pierwszy człon alfanumeryczny dłuższy niż 4 znaki
+    czesci = re.split(r"[_\-.]", baza)
+    for c in czesci:
+        if len(c) >= 4 and c.upper() not in ("BINANCE", "MEXC", "DANE"):
+            return c.upper()
+    return baza
+
+
+def _odkryj_dane(base: str) -> dict:
+    """
+    Skanuje foldery interwałów i zwraca {interwal: {para: sciezka}}.
+    Auto-wykrywa wszystkie pliki .csv — dowolna liczba par.
+    """
+    out = {}
+    for interwal, folder in INTERWALY_FOLDERY.items():
+        sciezka_folderu = os.path.join(base, folder)
+        if not os.path.isdir(sciezka_folderu):
+            continue
+        pliki = glob.glob(os.path.join(sciezka_folderu, "*.csv"))
+        pary = {}
+        for p in pliki:
+            para = _wykryj_pare(p)
+            pary[para] = p
+        if pary:
+            out[interwal] = pary
+    return out
 
 
 def _zwroty_forward(bary, okno, h, krok=1):
@@ -103,36 +150,42 @@ def _fmt(v):
 
 def main():
     base = os.path.join(os.path.dirname(__file__), "..")
-    print("POMIAR MATRYCOWY: 5 par × 3 interwały (Prawo XVI + Prawo I)\n")
+    odkryte = _odkryj_dane(base)
+
+    if not odkryte:
+        print("BRAK DANYCH — wrzuć pliki .csv do dane/godzinowe, dane/4h lub dane/dzienne")
+        return
+
+    liczba_par = len({p for pary in odkryte.values() for p in pary})
+    print(f"POMIAR MATRYCOWY (auto-skan): {liczba_par} par × {len(odkryte)} interwałów "
+          f"(Prawo XVI + Prawo I)")
+    print(f"Wykryte interwały: {', '.join(odkryte.keys())}\n")
 
     # agregacja IC i dekorelacji po wszystkich (para,TF)
     agg_dekor = {m: [] for m in NOWE}
     agg_ic = {m: {h: [] for h in HORYZONTY} for m in NOWE}
 
-    for interwal, wzor in INTERWALY.items():
+    for interwal, pary_map in odkryte.items():
         print("=" * 78)
-        print(f" INTERWAŁ {interwal}")
+        print(f" INTERWAŁ {interwal} ({len(pary_map)} par)")
         print("=" * 78)
-        naglowek = f"{'para':9} {'moduł':8} {'max|ρ|':>8}  " + \
+        naglowek = f"{'para':12} {'moduł':8} {'max|ρ|':>8}  " + \
                    "  ".join(f"IC(h={h})" for h in HORYZONTY)
         print(naglowek)
-        for para in PARY:
-            sciezka = os.path.join(base, wzor.format(p=para))
-            if not os.path.exists(sciezka):
-                print(f"{para:9} BRAK PLIKU {sciezka}")
-                continue
+        for para in sorted(pary_map):
+            sciezka = pary_map[para]
             try:
                 dekor, ic, n = _pomiar_jednego(sciezka, interwal)
             except Exception as e:
-                print(f"{para:9} BŁĄD: {e}")
+                print(f"{para:12} BŁĄD: {e}")
                 continue
             if dekor is None:
-                print(f"{para:9} za mało barów ({n})")
+                print(f"{para:12} za mało barów ({n})")
                 continue
             for nowy in sorted(NOWE):
                 mx = dekor.get(nowy)
                 ics = ic.get(nowy, [None] * len(HORYZONTY))
-                print(f"{para:9} {nowy:8} {(_fmt(mx) if mx is not None else '  n/a '):>8}  " +
+                print(f"{para:12} {nowy:8} {(_fmt(mx) if mx is not None else '  n/a '):>8}  " +
                       "   ".join(_fmt(v) for v in ics))
                 if mx is not None:
                     agg_dekor[nowy].append(mx)

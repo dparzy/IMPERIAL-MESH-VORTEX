@@ -6,6 +6,41 @@
 
 ---
 
+## 2026-06-21 | Prawo I | Kontrola look-ahead IC (--przesuniecie) — leak czasowy obalony, ale lag skonfundowany persystencją
+
+Krok A diagnostyki IC (po obaleniu nakładania): czy sygnał PRZEWIDUJE przyszłość, czy
+tylko OPISUJE teraźniejszość (współbieżność / leak bieżącego baru)?
+
+Dodano flagę `--przesuniecie LAG` (lag w barach): IC = Spearman(sygnał_{t-lag}, zwrot od
+t do t+h) — sygnał z PRZESZŁOŚCI vs przyszły zwrot. Lag aplikowany na siatce próbkowania
+(eff = round(lag/krok)·krok). Sweep 0/3/6/9/30 barów, pełna matryca 15×3 (n=45):
+
+  EXP-13 GARCH:  IC(h=1) 0.245→0.250→0.253→0.249→0.245 | IC(h=30) 0.251→...→0.208 (lekki spadek)
+  EXP-14 Kyle:   IC(h=1) 0.304→0.303→0.307→0.309→0.307 | IC(h=30) 0.310→...→0.294 (płasko)
+
+WERDYKT (Prawo I):
+  1. TWARDY LOOK-AHEAD (użycie przyszłych barów) — DISFAVORED. Realny leak przyszłości
+     opadałby gwałtownie, gdy odsuwamy sygnał w przeszłość; tu IC jest ~płaskie. Brak
+     oznak buga lookahead.
+  2. ALE lag NIE rozstrzyga współbieżności — bo sygnały są wysoce PERSYSTENTNE (okno 60,
+     zmienność/illikwidność klastrują): sygnał_{t-30} ≈ sygnał_t, więc IC z definicji się
+     nie rusza, niezależnie czy jest prawdziwa predykcja czy nie. To konfundent zapowiedziany
+     w poprzednim wpisie.
+  3. Sama PŁASKOŚĆ IC przez 30 barów jest podejrzana: realna krótkoterminowa przewaga
+     powinna zanikać ze starzeniem sygnału. Brak zaniku → asocjacja na poziomie REŻIMU
+     (wolnozmienny stan), nie ostry timing. Magnituda IC ~0.25–0.30 prawdopodobnie zawyża
+     realny edge out-of-sample.
+
+DECYZJA: leak/bug wykluczony, ale „realny skill" wciąż NIEpotwierdzony. Rozstrzygający tani
+test: backward-IC (sygnał_t vs PRZESZŁY zwrot t-h→t) — jeśli ≈ forward-IC, sygnał opisuje
+reżim, nie przewiduje. Ostatecznym arbitrem jest backtest OOS z DSR/PBO (krok B).
+
+Zmiana wyłącznie narzędziowa. 1648/1648 testów, audyt exit 0, ruff czysty.
+Pliki: `narzedzia/pomiar_nowe_moduly.py` (flaga `--przesuniecie`, lag w `_ic_modulu`),
+`docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-06-21 | Prawo I | Kontrola autokorelacji IC — wysokie IC NIE jest artefaktem nakładania
 
 Cezar (Prawo I): IC nowych modułów 0.25–0.30 podejrzanie wysokie — może łapać

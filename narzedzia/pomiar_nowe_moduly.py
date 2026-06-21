@@ -103,7 +103,7 @@ def _zwroty_forward(bary, okno, h, krok=1):
     return zwroty
 
 
-def _ic_modulu(serie, bary, nowy, krok=1, nienakladajace=False):
+def _ic_modulu(serie, bary, nowy, krok=1, nienakladajace=False, przesuniecie=0):
     """IC modułu dla każdego horyzontu (lub None).
 
     nienakladajace=True → próbkowanie tak, by okna zwrotu forward [t, t+h] NIE
@@ -111,18 +111,30 @@ def _ic_modulu(serie, bary, nowy, krok=1, nienakladajace=False):
     Kontrola Prawa I: czy wysokie IC to realny skill, czy artefakt persystencji
     (autokorelacja zmienności na nakładających się zwrotach). Te same sygnały i
     zwroty co tryb standardowy — usuwamy wyłącznie nakładające się próbki.
+
+    przesuniecie>0 (lag w barach) → IC liczone jako Spearman(sygnał_{t-lag}, zwrot
+    od t do t+h): sygnał z PRZESZŁOŚCI vs przyszły zwrot. Kontrola look-ahead (Prawo I):
+    jeśli wysokie IC bierze się ze współbieżności/leaku bieżącego baru, przesunięcie
+    sygnału w przeszłość powinno IC zabić. Lag aplikowany na siatce próbkowania
+    (1 próbka = krok barów) → efektywny lag = round(lag/krok)*krok barów.
     """
     if nowy not in serie or not serie[nowy]:
         return [None] * len(HORYZONTY)
     syg = np.array(serie[nowy], dtype=float)
+    m = max(0, round(przesuniecie / krok))   # lag w próbkach (1 próbka = krok barów)
     out = []
     for h in HORYZONTY:
         zwr = _zwroty_forward(bary, OKNO, h, krok=krok)
         s, z = syg, zwr
+        if m > 0:
+            # sygnał_{t-lag} vs zwrot od t: zrzuć ostatnie m próbek sygnału i
+            # pierwsze m próbek zwrotu → para (syg[i-m], zwr[i])
+            s = syg[:len(syg) - m]
+            z = zwr[m:]
         if nienakladajace:
             factor = max(1, math.ceil(h / krok))
-            s = syg[::factor]
-            z = zwr[::factor]
+            s = s[::factor]
+            z = z[::factor]
         pary = [(sv, zv) for sv, zv in zip(s, z) if zv is not None and not np.isnan(sv)]
         if len(pary) < 30 or np.std([p[0] for p in pary]) < 1e-10:
             out.append(None)
@@ -136,7 +148,7 @@ MAX_BAROW = 6000   # limit na plik (1h ma 76k — ścinamy do ostatnich 6k dla s
 KROK = 3           # próbkowanie okna (kompromis szybkość/dokładność)
 
 
-def _pomiar_jednego(sciezka, interwal, nienakladajace=False):
+def _pomiar_jednego(sciezka, interwal, nienakladajace=False, przesuniecie=0):
     """Zwraca (dekorelacja_max{mod:|ρ|}, ic{mod:[ic_h...]}) dla jednego pliku."""
     bary = wczytaj_csv(sciezka, interwal=interwal)
     if len(bary) < OKNO + max(HORYZONTY) + 50:
@@ -154,7 +166,8 @@ def _pomiar_jednego(sciezka, interwal, nienakladajace=False):
                 kor.append(abs(k))
         dekor[nowy] = max(kor) if kor else None
     serie = zbierz_sygnaly_zwiadowcow(bary, zwiadowcy, okno=OKNO, krok=KROK)
-    ic = {nowy: _ic_modulu(serie, bary, nowy, krok=KROK, nienakladajace=nienakladajace)
+    ic = {nowy: _ic_modulu(serie, bary, nowy, krok=KROK,
+                           nienakladajace=nienakladajace, przesuniecie=przesuniecie)
           for nowy in NOWE}
     return dekor, ic, len(bary)
 
@@ -170,6 +183,11 @@ def main():
         "--nienakladajace", action="store_true",
         help="IC na NIENAKŁADAJĄCYCH się zwrotach (odstęp próbek ≥ h) — kontrola "
              "persystencji wg Prawa I: czy wysokie IC to skill, czy artefakt autokorelacji.")
+    parser.add_argument(
+        "--przesuniecie", type=int, default=0, metavar="LAG",
+        help="Lag sygnału w barach (kontrola look-ahead, Prawo I): IC = "
+             "Spearman(sygnał_{t-lag}, zwrot od t do t+h). 0 = bieżące zachowanie. "
+             "Efektywny lag zaokrąglany do wielokrotności krok-u próbkowania.")
     args = parser.parse_args()
 
     base = os.path.join(os.path.dirname(__file__), "..")
@@ -181,6 +199,10 @@ def main():
 
     tryb = ("NIENAKŁADAJĄCE zwroty (odstęp≥h — kontrola persystencji, Prawo I)"
             if args.nienakladajace else "STANDARD (nakładające się zwroty, krok=3)")
+    m_prob = max(0, round(args.przesuniecie / KROK))
+    eff_lag = m_prob * KROK
+    if args.przesuniecie:
+        tryb += f" | LAG sygnału = {eff_lag} barów (żądano {args.przesuniecie}b, siatka co {KROK}b)"
     liczba_par = len({p for pary in odkryte.values() for p in pary})
     print(f"POMIAR MATRYCOWY (auto-skan): {liczba_par} par × {len(odkryte)} interwałów "
           f"(Prawo XVI + Prawo I)")
@@ -202,7 +224,8 @@ def main():
             sciezka = pary_map[para]
             try:
                 dekor, ic, n = _pomiar_jednego(sciezka, interwal,
-                                               nienakladajace=args.nienakladajace)
+                                               nienakladajace=args.nienakladajace,
+                                               przesuniecie=args.przesuniecie)
             except Exception as e:
                 print(f"{para:12} BŁĄD: {e}")
                 continue

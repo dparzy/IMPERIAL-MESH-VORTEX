@@ -240,7 +240,7 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 
 | INF-37 ⭐ | "Active Portfolio Management" (+ "Advances in Active Portfolio Management") — Grinold & Kahn | (BIB-025, .pdf dostarczony 2026-06-21, 477 str.) | ✅ **9/10 — FUNDAMENT QUANT.** Prawo Fundamentalne Aktywnego Zarządzania: **IR = IC · √breadth = TC · IC · √BR**. IC = Spearman(sygnał_neuronu_t, zwrot_{t+h}) ∈ [−1,1], zdrowe IC ≤ 0.2. Breadth = liczba niezależnych zakładów (≈ klastry ONC). TC = Transfer Coefficient = corr(idealny_portfel, portfel_po_ograniczeniach). Alpha = vol · IC · score. **Dlaczego krytyczne dla Imperium:** po raz pierwszy mamy matematyczny dowód, że rój 78 neuronów jest lepszy od 1 — ale tylko gdy sygnały są NIEZALEŻNE (breadth). Prawo XVI + W-366 ONC = ten sam warunek. Nasze neurony = "strategie alpha", IC = miara ich kalibracji. **Zidentyfikowane luki:** (1) brak IC per-neuron, (2) brak IR roju, (3) TC niezmierzony. **→ W-369..373** | ✅ W-369 (IC), W-370 (breadth), W-371 (IR) wdrożone 2026-06-21 |
 
-| INF-38 | "Machine Learning for Algorithmic Trading" (2nd ed.) — Stefan Jansen | (BIB-026, .mobi dostarczony 2026-06-21, 1254 str., 1.63M znaków) | ⚠️ **5/10 — WZORZEC INŻYNIERSKI ale nie nasz stos.** ~100% sklearn/torch/zipline — niedostępne w produkcji. **Jedyne numpy-feasible ziarno:** (1) **IC Scorer** = `rank_ic = spearman(sygnał_t, zwrot_{t+h})` — konwerguje z INF-37! Potwierdza że IC jest branżowym standardem; (2) **HRP Allocator** = hierarchical risk parity w numpy (kandydat W-374). **Architektura ML:** Jansen oddziela "feature engineering" (sygnały) od "ML model" (wagi) — odwzorowuje nasz podział neuron/Senat. Potwierdza: ML należy do WAŻENIA sygnałów (warstwa Senatu), NIE do generowania. | ⚠️ IC Scorer = nakładka na INF-37; HRP kandydat W-374 |
+| INF-38 | "Machine Learning for Algorithmic Trading" (2nd ed.) — Stefan Jansen | (BIB-026, .mobi dostarczony 2026-06-21, 1254 str., 1.63M znaków) | ⚠️ **5/10 — WZORZEC INŻYNIERSKI ale nie nasz stos.** ~100% sklearn/torch/zipline — niedostępne w produkcji. **Jedyne numpy-feasible ziarno:** (1) **IC Scorer** = `rank_ic = spearman(sygnał_t, zwrot_{t+h})` — konwerguje z INF-37! Potwierdza że IC jest branżowym standardem; (2) **HRP Allocator** = hierarchical risk parity w numpy (kandydat W-374). **Architektura ML:** Jansen oddziela "feature engineering" (sygnały) od "ML model" (wagi) — odwzorowuje nasz podział neuron/Senat. Potwierdza: ML należy do WAŻENIA sygnałów (warstwa Senatu), NIE do generowania. | ⚠️ IC Scorer = nakładka na INF-37; ✅ HRP W-374 wdrożone (denoising_macierzy.hrp_wagi) |
 
 | INF-39 | "High-Frequency Trading: A Practical Guide" (2nd ed.) — Irene Aldridge | (BIB-027, .pdf dostarczony 2026-06-21, 299 str.) | ⚠️ **4/10 — HFT infrastruktura niedostępna.** ~80% = colocation, order book L2 w μs, FPGA, dark pools — nieadekwatne dla MEXC REST/WS małego kapitału. **Realne ziarno:** (1) **Kyle's Lambda** `λ = Δp/Δv` — miara Impact/Likiditiness; lekki kandydat gdy mamy ticker+volume; (2) potwierdza Z-01/Z-03/Z-04/Z-06/RADAR. **Prawo XVI nakazuje:** zmierzyć korelację Kyle's Lambda vs Z-06 Amihud zanim wdrożymy — jeśli |ρ|>0.8 = redundancja, odpuść. | ⚠️ Kyle's Lambda = kandydat W-374b po teście Prawa XVI |
 
@@ -280,6 +280,20 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 | **INF-43** ⭐ | Tsay — "Analysis of Financial Time Series" (3rd ed., BIB-031) | **9/10** | SKARB. Kompletny podręcznik szeregów finansowych. GARCH(1,1) rekurencja Bollersleva = zwykła pętla numpy (bez scipy). GJR-GARCH, EGARCH, VAR/VECM, Markov-Switching. Zamknął martwą wizję W-126. | ✅ EXP-13 GJR-GARCH(1,1) wdrożony (W-376) |
 | **INF-44** | O'Hara — "Market Microstructure Theory" (BIB-032) | **8/10** | Fundament teorii VPIN/PIN/Kyle's Lambda. Kyle λ = OLS nachylenie Δp∼netflow. PIN metodą momentów (numpy.linalg.solve — bez scipy). Glosten-Harris decomposition: spread = transakcyjny + adverse selection. Poprawa VPIN: ważenie wolumenem. | ✅ EXP-14 Kyle's Lambda wdrożony (W-380) |
 
+
+---
+
+## 🔟 WIZJE BIB-031/032 (Tsay + O'Hara) — W-381/382 + HRP W-374
+
+| Wizja | Opis | Moduł | Status |
+|---|---|---|---|
+| **W-374** | **HRP — Hierarchical Risk Parity** (López de Prado 2016, Jansen BIB-026). Alokacja z dendrogramu: odległość √(½(1−ρ)) → single-linkage → quasi-diagonalizacja → recursive bisection. NIE odwraca macierzy → odporna na klątwę Markowitza. Dopełnia NCO (W-367). | `denoising_macierzy.py` → `hrp_wagi()` | ✅ **WDROŻONE** 2026-06-21 — single-linkage + seriation + bisection w pure numpy. 7 testów (sumują do 1, dodatnie, preferuje niską wariancję). |
+| **W-381** | **PIN — Probability of Informed Trading** (Easley-O'Hara, BIB-032). Procent transakcji od inwestorów Z INFORMACJĄ. Metoda momentów: ε=min(buy,sell) baza szumu, informed=\|buy−sell\| asymetria, PIN=informed/(informed+2ε). Komplementarny do VPIN (Z-01: imbalance vs PIN: proporcja). | `mikrostruktura.py` → `pin_metoda_momentow()` | ✅ **WDROŻONE** 2026-06-21 — bez scipy (metoda momentów). 5 testów granic. |
+| **W-382** | **Engle-Granger kointegracja par** (Tsay BIB-031 rozdz. 8). Dwustopniowo: OLS log(a)∼log(b) → spread; ADF na spreadzie. Skointegrowane → z-score spreadu = sygnał stat-arb (z<−2 LONG a/SHORT b). Próg ADF −3.4 (anty-spurious). | `mikrostruktura.py` → `kointegracja_engle_granger()` | ✅ **WDROŻONE** 2026-06-21 — Engle-Granger + ADF w pure numpy. 7 testów (skointegrowane vs spurious random walks). |
+
+> **Uwaga (Prawo XVI):** W-381 PIN i W-382 kointegracja to BIBLIOTEKI (funkcje), nie neurony —
+> czekają na wpięcie jako zwiadowcy/sygnały gdy pętla portfelowa dostarczy dane par + aggTrades.
+> HRP (W-374) dostępne dla alokacji wag w Senacie obok NCO (W-367).
 
 ---
 

@@ -367,3 +367,142 @@ def nco_wagi(cov: np.ndarray, klucze: Optional[List[str]] = None,
         "klastry": onc["klastry"],
         "k": onc["k"],
     }
+
+
+# ─── W-374 HRP (Hierarchical Risk Parity) ────────────────────────────────────
+
+def _odleglosc_korelacji(corr: np.ndarray) -> np.ndarray:
+    """Metryka odległości López de Prado: d = √(½(1−ρ)) ∈ [0,1]."""
+    return np.sqrt(np.clip(0.5 * (1.0 - corr), 0.0, 1.0))
+
+
+def _linkage_single(dist: np.ndarray) -> List[Tuple[int, int, float, int]]:
+    """
+    Aglomeracyjne klastrowanie single-linkage w czystym numpy.
+    Zwraca listę połączeń [(klaster_a, klaster_b, odległość, rozmiar)] (jak scipy.linkage).
+    """
+    n = dist.shape[0]
+    # aktywne klastry: id → lista indeksów oryginalnych
+    klastry: Dict[int, List[int]] = {i: [i] for i in range(n)}
+    nastepny_id = n
+    linkage: List[Tuple[int, int, float, int]] = []
+    aktywne = list(range(n))
+
+    while len(aktywne) > 1:
+        # znajdź najbliższą parę (single-linkage = min odległość między elementami)
+        najmniej = np.inf
+        para = (aktywne[0], aktywne[1])
+        for ia in range(len(aktywne)):
+            for ib in range(ia + 1, len(aktywne)):
+                a, b = aktywne[ia], aktywne[ib]
+                # single linkage: minimalna odległość między członkami
+                sub = dist[np.ix_(klastry[a], klastry[b])]
+                d = float(np.min(sub))
+                if d < najmniej:
+                    najmniej = d
+                    para = (a, b)
+
+        a, b = para
+        nowy = klastry[a] + klastry[b]
+        linkage.append((a, b, najmniej, len(nowy)))
+        klastry[nastepny_id] = nowy
+        aktywne.remove(a)
+        aktywne.remove(b)
+        aktywne.append(nastepny_id)
+        nastepny_id += 1
+
+    return linkage
+
+
+def _kolejnosc_quasi_diag(linkage: List[Tuple[int, int, float, int]], n: int) -> List[int]:
+    """Seriation: kolejność liści z dendrogramu (quasi-diagonalizacja macierzy)."""
+    if not linkage:
+        return list(range(n))
+    # ostatnie połączenie zawiera korzeń
+    kolejnosc = [linkage[-1][0], linkage[-1][1]]
+    # rozwijaj klastry > n-1 do liści
+    zmiana = True
+    while zmiana:
+        zmiana = False
+        nowa = []
+        for item in kolejnosc:
+            if item >= n:  # to klaster, rozwiń
+                idx = item - n
+                nowa.append(linkage[idx][0])
+                nowa.append(linkage[idx][1])
+                zmiana = True
+            else:
+                nowa.append(item)
+        kolejnosc = nowa
+    return kolejnosc
+
+
+def _wariancja_klastra(cov: np.ndarray, idx: List[int]) -> float:
+    """Wariancja portfela inverse-variance wewnątrz klastra."""
+    sub = cov[np.ix_(idx, idx)]
+    diag = np.diag(sub).copy()
+    diag[diag <= 1e-12] = 1e-12  # guard: aktyw o zerowej wariancji nie psuje 1/var
+    iv = 1.0 / diag
+    iv = iv / iv.sum()
+    return float(iv @ sub @ iv)
+
+
+def hrp_wagi(cov: np.ndarray, klucze: Optional[List[str]] = None) -> Dict[str, object]:
+    """
+    🌲 W-374 | HRP — Hierarchical Risk Parity (López de Prado 2016, Jansen BIB-026).
+
+    Alokacja oparta na dendrogramie — NIE wymaga odwracania macierzy (w przeciwieństwie
+    do Markowitza/min-wariancji), więc odporna na klątwę Markowitza i numerycznie stabilna.
+
+    Algorytm:
+      (1) odległość korelacji d=√(½(1−ρ)), (2) single-linkage clustering,
+      (3) quasi-diagonalizacja (seriation), (4) recursive bisection — dziel kapitał
+          między dwie połowy proporcjonalnie do odwrotności ich wariancji.
+
+    cov:    macierz kowariancji (N×N)
+    klucze: nazwy zmiennych
+    Zwraca: {wagi: {klucz: waga}, wagi_wektor, kolejnosc}.
+    """
+    cov = np.asarray(cov, dtype=float)
+    n = cov.shape[0]
+    if klucze is None:
+        klucze = [str(i) for i in range(n)]
+    if n == 1:
+        return {"wagi": {klucze[0]: 1.0}, "wagi_wektor": np.array([1.0]), "kolejnosc": [0]}
+
+    corr = cov_na_corr(cov)
+    dist = _odleglosc_korelacji(corr)
+    linkage = _linkage_single(dist)
+    kolejnosc = _kolejnosc_quasi_diag(linkage, n)
+
+    # recursive bisection
+    wagi = np.ones(n)
+    klastry_do_podzialu = [kolejnosc]
+    while klastry_do_podzialu:
+        nowe = []
+        for grupa in klastry_do_podzialu:
+            if len(grupa) <= 1:
+                continue
+            polowa = len(grupa) // 2
+            lewa, prawa = grupa[:polowa], grupa[polowa:]
+            var_l = _wariancja_klastra(cov, lewa)
+            var_p = _wariancja_klastra(cov, prawa)
+            # alfa = udział lewej połowy (mniejsza wariancja → większy udział)
+            alfa = 1.0 - var_l / (var_l + var_p) if (var_l + var_p) > 1e-12 else 0.5
+            for i in lewa:
+                wagi[i] *= alfa
+            for i in prawa:
+                wagi[i] *= (1.0 - alfa)
+            nowe.append(lewa)
+            nowe.append(prawa)
+        klastry_do_podzialu = nowe
+
+    suma = wagi.sum()
+    if abs(suma) > 1e-12:
+        wagi = wagi / suma
+
+    return {
+        "wagi": {klucze[i]: float(wagi[i]) for i in range(n)},
+        "wagi_wektor": wagi,
+        "kolejnosc": kolejnosc,
+    }

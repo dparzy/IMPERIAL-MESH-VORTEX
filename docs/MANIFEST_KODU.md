@@ -323,6 +323,9 @@
 | GeneralLegatus | `legiony/legatus.py` | ✅ aktywny |
 | MasterSwitchOnline (master-switch Faza 2 — wagi głosujących VR/HL/AR1 uczone Hedge/MWU) | `legiony/legatus.py` | ✅ aktywny |
 | DiagnostykaKorelacji | `legiony/diagnostyka_korelacji.py` | ✅ aktywny |
+| DenoisingMacierzy (W-365..368 denoising/ONC/NCO/detoning + **W-374 HRP**, López de Prado BIB-023/INF-35, Jansen BIB-026/INF-38) | `legiony/denoising_macierzy.py` | ✅ aktywny |
+| MetrykiIC (W-369..371 IC per-neuron + breadth + Fundamental Law IR=IC·√breadth, Grinold&Kahn BIB-025/INF-37) | `legiony/metryki_ic.py` | ✅ aktywny |
+| Mikrostruktura (W-381 PIN metodą momentów + W-382 Engle-Granger kointegracja par, O'Hara BIB-032/INF-44, Tsay BIB-031/INF-43) | `legiony/mikrostruktura.py` | ✅ aktywny |
 | Igrzyska / Koloseum | `koloseum/` | ✅ aktywny |
 | BramaKalkulatora | `fundament/brama_kalkulatora.py` | ✅ aktywny |
 | KalkulatorLewara | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |

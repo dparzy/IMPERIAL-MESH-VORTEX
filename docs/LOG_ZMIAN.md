@@ -6,6 +6,30 @@
 
 ---
 
+## 2026-06-21 | W-374/381/382 | HRP + PIN + Engle-Granger kointegracja (pure numpy)
+
+Kontynuacja kolejki kandydatów z BIB-025..032 — wszystko pure numpy, bez scipy/sklearn:
+- **W-374 HRP** (`denoising_macierzy.py` → `hrp_wagi()`): Hierarchical Risk Parity
+  (López de Prado 2016, Jansen BIB-026). Single-linkage clustering + quasi-diagonalizacja
+  (seriation) + recursive bisection. NIE odwraca macierzy → odporna na klątwę Markowitza.
+  Dopełnia NCO (W-367). 7 testów.
+- **W-381 PIN** (`mikrostruktura.py` → `pin_metoda_momentow()`): Probability of Informed
+  Trading (Easley-O'Hara, BIB-032). Metoda momentów zamiast MLE: ε=min(buy,sell) baza
+  szumu, informed=|buy−sell|, PIN=informed/(informed+2ε). Komplementarny do VPIN Z-01. 5 testów.
+- **W-382 Engle-Granger** (`mikrostruktura.py` → `kointegracja_engle_granger()`): kointegracja
+  par (Tsay BIB-031 rozdz. 8). OLS log-log → spread; ADF na spreadzie (próg −3.4 anty-spurious).
+  z-score spreadu = sygnał stat-arb. 7 testów (skointegrowane vs spurious random walks).
+
+Nowy moduł `imperium/legiony/mikrostruktura.py`. denoising_macierzy.py + metryki_ic.py +
+mikrostruktura.py dopisane do MANIFEST (sekcja Moduły Infrastruktury).
+1618/1618 testów, audyt exit 0, ruff czysty.
+
+Pliki: `legiony/mikrostruktura.py` (NEW), `legiony/denoising_macierzy.py` (+hrp_wagi),
+`tests/test_hrp_mikrostruktura.py` (NEW, 19 testów), `docs/REJESTR_INSPIRACJI.md`,
+`docs/LOG_ZMIAN.md`, `docs/MANIFEST_KODU.md`.
+
+---
+
 ## 2026-06-21 | W-376..380 + BIB-029..032 | GARCH/Kyle's Lambda/BTC halvings (INF-41..44)
 
 4 nowe książki przeanalizowane (BIB-029..032):

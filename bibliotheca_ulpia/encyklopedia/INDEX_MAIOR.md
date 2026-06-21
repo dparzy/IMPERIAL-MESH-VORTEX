@@ -28,12 +28,12 @@
 | **LEW** | [Futury i lewar](LEW_futury_i_lewar.md) | ⭐⭐⭐⭐⭐ | PSY-01..04, Z-01..07, KalkulatorLewara, Gubernator | ✅ |
 | **TRD** | [Słynni traderzy](TRD_slynni_traderzy.md) | ⭐⭐⭐⭐ | strategie X-*, RADAR-*, Senat | ✅ |
 | **IMP** | [Ulepszenia Imperium](IMP_ulepszenia_imperium.md) | ⭐⭐⭐⭐⭐ | mapa wiedza→kod, roadmapa | ✅ |
-| **STR** | Strategie i zagrania | ⭐⭐⭐⭐ | rejestr_strategii | 🔲 Faza 2 |
-| **RSK** | Zarządzanie ryzykiem | ⭐⭐⭐⭐⭐ | Z-01..07, Reguła 6%, HALT | 🔲 Faza 2 |
-| **PSY** | Psychologia tradingu | ⭐⭐⭐ | PSY-*, Senat | 🔲 Faza 2 |
-| **MKS** | Mikrostruktura rynku | ⭐⭐⭐⭐ | EXP-12/14/15, V-03 CVD | 🔲 Faza 2 |
-| **ONC** | On-chain i krypto | ⭐⭐⭐ | OC-01..08 | 🔲 Faza 2 |
-| **ALG** | Algorytmy i ML | ⭐⭐⭐⭐ | denoising, HRP, metryki IC | 🔲 Faza 2 |
+| **RSK** | [Zarządzanie ryzykiem](RSK_zarzadzanie_ryzykiem.md) | ⭐⭐⭐⭐⭐ | Z-01..07, Reguła 6%, HALT, HRP, DSR/PBO | ✅ |
+| **MKS** | [Mikrostruktura rynku](MKS_mikrostruktura_rynku.md) | ⭐⭐⭐⭐ | EXP-12/14/15, V-03 CVD, kointegracja | ✅ |
+| **ALG** | [Algorytmy i ML](ALG_algorytmy_i_ml.md) | ⭐⭐⭐⭐ | denoising, HRP, metryki IC, GARCH | ✅ |
+| **STR** | [Strategie i zagrania](STR_strategie_i_zagrania.md) | ⭐⭐⭐⭐ | rejestr_strategii (20), MTF, Senat | ✅ |
+| **PSY** | [Psychologia tradingu](PSY_psychologia_tradingu.md) | ⭐⭐⭐ | PSY-01..04, Senat, Reguła 6% | ✅ |
+| **ONC** | [On-chain i krypto](ONC_onchain_i_krypto.md) | ⭐⭐⭐ | OC-01..08, RADAR-02/03, Z-07 | ✅ |
 
 Legenda statusu: ✅ gotowy · 🔲 zaplanowany · 🚧 w budowie
 

@@ -76,8 +76,23 @@ to nie luksus — to różnica między zyskiem a stratą.**
 
 - **Zasada:** kierunek z wyższego TF, timing z niższego. Nie handluj przeciw głównemu trendowi.
 - **W Imperium (W-384):** brama konfluencji MTF — EMA50/200 + MACD na zagregowanych barach.
-- **Status:** opt-in **OFF** (backtest KROK B: na jednym reżimie szkodzi). Re-test wieloreżimowy w toku.
-- **Lekcja:** MTF to nie zawsze „lepiej" — w mean-reversion brama trendowa może szkodzić.
+- **Status:** opt-in **OFF** (werdykt KROK B per-reżim 2021-2026 — patrz tabela poniżej).
+
+### 📊 Wyniki MTF per-reżim (KROK B, 2026-06-21, 15 par × 3 TF, 4h bary):
+
+| Reżim | Wynik MTF vs baseline | Mechanizm |
+|-------|----------------------|-----------|
+| BULL_2021 | ❌ gorszy | blokuje silne longi w trendzie ↑ |
+| BEAR_2022 | ✅ **spektakularny** (strata→zysk) | weto dla longów w trendzie ↓ = tarcza |
+| RANGE_2023 | ❌ gorszy | blokuje mean-reversion wejścia |
+| RECENT_2025-26 | ❌ gorszy | brak dominującego trendu ↓ |
+
+**Wniosek KROK B:** MTF gate = **tarcza niedźwiedzia** (bear shield), nie „lepsza jakość sygnału".
+Pomaga TYLKO podczas twardego, sostenuto trendu spadkowego (BEAR_2022). W każdym innym reżimie
+blokuje dobre wejścia → gorsze wyniki.
+
+**Kierunek:** warunkowe weto niedźwiedzie przez Namiestnika (aktywuj MTF gdy RADAR-01 = BEAR).
+Wymaga walidacji na 2018/2025 bear markets PRZED implementacją. Bez walidacji: MTF OFF.
 
 ---
 

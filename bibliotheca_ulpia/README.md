@@ -1,7 +1,17 @@
-# 📚 Biblioteka Imperium — Książki do analizy
+# 📚 Biblioteka Imperium — Bibliotheca Ulpia
 
 Wrzuć tu pliki epub/pdf/azw3 — Claude Code je przeczyta i wyciągnie esencję
 (neurony, strategie, W-xxx) zgodnie z Zasadą Pełnego Opisu (ZPO).
+
+## 🗂️ Struktura biblioteki
+- **`BIB-001..032`** — kanon źródłowy (32 książki, pliki epub/pdf/azw3/mobi/djvu)
+- **`encyklopedia/`** — tematyczna biblia wiedzy operacyjnej (działy LEW/TRD/IMP/...),
+  z oceną ważności i wprost wskazanym wpływem na kod. Start: [`encyklopedia/INDEX_MAIOR.md`](encyklopedia/INDEX_MAIOR.md)
+- **`vademecum/`** — szybkie ściągi (checklisty, wzory) — 1 strona na temat
+
+> Encyklopedia jest **żywa**: aktualizowana po każdej nowej książce/lekcji (Prawo XVII),
+> pamiętana przez Claude (chmura) i lokalnego Claude. Następny krok: warstwa
+> Bibliotheca-RAG (pamięć semantyczna — patrz `encyklopedia/IMP_ulepszenia_imperium.md`).
 
 ## Format nazwy pliku
 ```

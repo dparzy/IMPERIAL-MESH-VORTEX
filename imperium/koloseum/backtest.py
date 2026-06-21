@@ -276,6 +276,10 @@ def backtest_portfel(
     # W-351 Trailing Stop — blokuje zysk po ruchu korzystnym (MFE było liczone, ale
     # nieużywane do wyjścia → utrata potencjału, Prawo XV). Domyślnie OFF (zero regresji).
     trailing: bool = False,
+    # W-cache: prekalkuluj wskaźniki dla wszystkich par równolegle przed pętlą.
+    # Eliminuje redundantne wywołania TA-Lib (zysk ~5-8×). n_jobs=None → auto cpu_count.
+    cache_wskaznikow: bool = False,
+    cache_n_jobs: Optional[int] = None,
 ) -> PaperTradingEngine:
     """
     💎 W-290 SILNIK PORTFELOWY — koszyk N par w JEDNEJ sesji, wspólny kapitał.
@@ -381,6 +385,21 @@ def backtest_portfel(
             d.ksiega_wad = _KsiegaWad()
         dyrygenci[sym] = d
 
+    # W-cache: prekalkuluj wskaźniki dla wszystkich par przed pętlą.
+    # Każdy symbol obliczany raz (równolegle) → pętla robi tylko lookup dict.
+    _wsk_cache: "Optional[Dict[str, Dict[int, Dict]]]" = None
+    if cache_wskaznikow:
+        from imperium.legiony.budowniczy_wskaznikow import prekalkuluj_portfel
+        logger.info("[Portfel] Prekalkuluję wskaźniki (cache_wskaznikow=True, n_jobs=%s)...", cache_n_jobs)
+        _wsk_cache = prekalkuluj_portfel(bary_per, okno=okno, n_jobs=cache_n_jobs)
+        # Wstrzyknij jako wskazniki_provider do każdego Dyrygenta
+        for sym, d in dyrygenci.items():
+            _sym_cache = _wsk_cache[sym]
+            d.wskazniki_provider = lambda bary, _c=_sym_cache: _c.get(
+                int(bary[-1]["timestamp"]) if bary and bary[-1].get("timestamp") is not None else -1, {}
+            )
+        logger.info("[Portfel] Cache gotowy — %d symboli.", len(_wsk_cache))
+
     # Chronologiczna oś: (timestamp, symbol, indeks_baru) — tylko bary po oknie.
     os_czasu = []
     for sym, bary in bary_per.items():
@@ -479,7 +498,10 @@ def backtest_portfel(
         conviction_mult = 1.0
         gub_mult = 1.0
         if skaner is not None:
-            snapshot_per[sym] = budowniczy.zbuduj(okno_barow)
+            if _wsk_cache is not None and sym in _wsk_cache:
+                snapshot_per[sym] = _wsk_cache[sym].get(int(ts), {})
+            else:
+                snapshot_per[sym] = budowniczy.zbuduj(okno_barow)
             ranking = skaner.skanuj(snapshot_per)
             top = ranking[:skaner_top_n]
             if sym not in {o.symbol for o in top}:

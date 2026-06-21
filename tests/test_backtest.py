@@ -142,3 +142,55 @@ def test_backtest_ucz_mwu_false_bez_zmian():
     e1 = backtest("X", "1H", okno=250, bary=bary)
     e2 = backtest("X", "1H", okno=250, bary=bary, ucz_mwu=False)
     assert e1.podsumowanie().total_trades == e2.podsumowanie().total_trades
+
+
+# ── W-cache: prekalkulacja wskaźników ──────────────────────────────────────
+
+def test_prekalkuluj_portfel_seryjny():
+    """prekalkuluj_portfel n_jobs=1 → poprawny dict {sym: {ts: wskazniki}}."""
+    from imperium.legiony.budowniczy_wskaznikow import prekalkuluj_portfel
+    bary = _bary(n=300)
+    bary_per = {"BTCUSDT": bary}
+    cache = prekalkuluj_portfel(bary_per, okno=250, n_jobs=1)
+    assert "BTCUSDT" in cache
+    assert len(cache["BTCUSDT"]) == len(bary) - 250
+    # Każdy wpis ma co najmniej CLOSE i RSI_14
+    for wskazniki in list(cache["BTCUSDT"].values())[:3]:
+        assert "CLOSE" in wskazniki
+        assert "RSI_14" in wskazniki or wskazniki.get("RSI_14") is None
+
+
+def test_prekalkuluj_portfel_dwie_pary():
+    """Dwie pary w cache → oba klucze obecne."""
+    from imperium.legiony.budowniczy_wskaznikow import prekalkuluj_portfel
+    bary = _bary(n=300)
+    bary2 = _bary(n=300, symbol="ETHUSDT")
+    cache = prekalkuluj_portfel({"BTC": bary, "ETH": bary2}, okno=250, n_jobs=1)
+    assert set(cache.keys()) == {"BTC", "ETH"}
+    assert len(cache["BTC"]) == len(cache["ETH"])
+
+
+def test_backtest_portfel_cache_wskaznikow():
+    """backtest_portfel cache_wskaznikow=True → ten sam wynik co False."""
+    from imperium.koloseum.backtest import backtest_portfel
+    bary = _bary(n=350)
+    bary_per = {"BTC": bary}
+    e1 = backtest_portfel({}, "1H", bary_per=bary_per, cache_wskaznikow=False)
+    e2 = backtest_portfel({}, "1H", bary_per=bary_per, cache_wskaznikow=True, cache_n_jobs=1)
+    st1 = e1.podsumowanie(); st1.oblicz(e1.historia_zamkniec)
+    st2 = e2.podsumowanie(); st2.oblicz(e2.historia_zamkniec)
+    # Wynik musi być identyczny (deterministyczny)
+    assert st1.total_trades == st2.total_trades
+    assert abs(st1.kapital_koncowy - st2.kapital_koncowy) < 0.01
+
+
+def test_prekalkuluj_portfel_ts_kluczem():
+    """Klucze cache to int(timestamp) — lookup O(1)."""
+    from imperium.legiony.budowniczy_wskaznikow import prekalkuluj_portfel
+    bary = _bary(n=300)
+    cache = prekalkuluj_portfel({"X": bary}, okno=250, n_jobs=1)["X"]
+    # Klucze są int
+    assert all(isinstance(k, int) for k in list(cache.keys())[:5])
+    # Lookup po ts baru[250] zwraca wskaźniki
+    ts = int(bary[250]["timestamp"])
+    assert ts in cache

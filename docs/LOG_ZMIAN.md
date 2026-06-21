@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-06-21 | Prawo I | Kontrola autokorelacji IC — wysokie IC NIE jest artefaktem nakładania
+
+Cezar (Prawo I): IC nowych modułów 0.25–0.30 podejrzanie wysokie — może łapać
+autokorelację zmienności na NAKŁADAJĄCYCH się oknach forward-return, nie czysty skill.
+
+DOMKNIĘCIE WĄTKU: do `pomiar_nowe_moduly.py` dodano flagę `--nienakladajace` — IC liczone
+na rozłącznych oknach zwrotu (odstęp próbek = krok·ceil(h/krok) ≥ h, więc okna [t,t+h] się
+nie nachodzą). Te same sygnały i zwroty co tryb standardowy — usuwamy WYŁĄCZNIE nakładające
+się próbki, by odizolować efekt persystencji.
+
+POMIAR (pełna matryca 15 par × 3 TF, n=45):
+  • EXP-13 GARCH:  standard IC h1/6/30 = +0.245/+0.249/+0.251  →  nienakł. +0.245/+0.248/+0.249
+  • EXP-14 Kyle:   standard IC h1/6/30 = +0.304/+0.305/+0.310  →  nienakł. +0.304/+0.308/+0.301
+  • max|ρ| bez zmian: EXP-13=0.149, EXP-14=0.093 (oba <0.20 → filary siły, zdekorelowane)
+
+WERDYKT (Prawo I, bez przeceniania): hipoteza „IC zawyżone przez nakładanie" ODRZUCONA —
+IC stabilne pod kontrolą rozłączności (zmiana <0.01). Dodatkowy dowód: IC dla h=1 (z natury
+nienakładające) było równie wysokie — czyli nakładanie NIGDY nie było źródłem. ALE to NIE
+dowodzi realnego skillu tradingowego: IC ~0.25–0.30 pozostaje nienaturalnie wysokie jak na
+forward-return i wymaga osobnej kontroli (leak bieżącego baru / współbieżność sygnał↔zwrot).
+Wykluczyliśmy jeden konfundent, nie wszystkie.
+
+Zmiana wyłącznie narzędziowa (pomiar) — zero wpływu na sygnały/strategie roju.
+1648/1648 testów, audyt exit 0, ruff czysty.
+
+Pliki: `narzedzia/pomiar_nowe_moduly.py` (flaga `--nienakladajace`, `_ic_modulu` rozłączne
+próbkowanie), `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-06-21 | W-384 | Konfluencja Multi-Timeframe na poziomie roju (odpowiedź na pytanie Cezara)
 
 Cezar: "czy Imperium widzi wszystkie interwały podczas wybierania ordera?" — NIE w pełni.

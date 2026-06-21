@@ -38,6 +38,8 @@ from imperium.legiony.metryki_ic import _spearman
 
 import glob
 import re
+import math
+import argparse
 
 NOWE = {"EXP-13", "EXP-14", "EXP-15"}
 OKNO = 60
@@ -101,15 +103,27 @@ def _zwroty_forward(bary, okno, h, krok=1):
     return zwroty
 
 
-def _ic_modulu(serie, bary, nowy, krok=1):
-    """IC modułu dla każdego horyzontu (lub None)."""
+def _ic_modulu(serie, bary, nowy, krok=1, nienakladajace=False):
+    """IC modułu dla każdego horyzontu (lub None).
+
+    nienakladajace=True → próbkowanie tak, by okna zwrotu forward [t, t+h] NIE
+    nachodziły na siebie (odstęp próbek = krok*factor ≥ h barów, factor=ceil(h/krok)).
+    Kontrola Prawa I: czy wysokie IC to realny skill, czy artefakt persystencji
+    (autokorelacja zmienności na nakładających się zwrotach). Te same sygnały i
+    zwroty co tryb standardowy — usuwamy wyłącznie nakładające się próbki.
+    """
     if nowy not in serie or not serie[nowy]:
         return [None] * len(HORYZONTY)
     syg = np.array(serie[nowy], dtype=float)
     out = []
     for h in HORYZONTY:
         zwr = _zwroty_forward(bary, OKNO, h, krok=krok)
-        pary = [(s, z) for s, z in zip(syg, zwr) if z is not None and not np.isnan(s)]
+        s, z = syg, zwr
+        if nienakladajace:
+            factor = max(1, math.ceil(h / krok))
+            s = syg[::factor]
+            z = zwr[::factor]
+        pary = [(sv, zv) for sv, zv in zip(s, z) if zv is not None and not np.isnan(sv)]
         if len(pary) < 30 or np.std([p[0] for p in pary]) < 1e-10:
             out.append(None)
         else:
@@ -122,7 +136,7 @@ MAX_BAROW = 6000   # limit na plik (1h ma 76k — ścinamy do ostatnich 6k dla s
 KROK = 3           # próbkowanie okna (kompromis szybkość/dokładność)
 
 
-def _pomiar_jednego(sciezka, interwal):
+def _pomiar_jednego(sciezka, interwal, nienakladajace=False):
     """Zwraca (dekorelacja_max{mod:|ρ|}, ic{mod:[ic_h...]}) dla jednego pliku."""
     bary = wczytaj_csv(sciezka, interwal=interwal)
     if len(bary) < OKNO + max(HORYZONTY) + 50:
@@ -140,7 +154,8 @@ def _pomiar_jednego(sciezka, interwal):
                 kor.append(abs(k))
         dekor[nowy] = max(kor) if kor else None
     serie = zbierz_sygnaly_zwiadowcow(bary, zwiadowcy, okno=OKNO, krok=KROK)
-    ic = {nowy: _ic_modulu(serie, bary, nowy, krok=KROK) for nowy in NOWE}
+    ic = {nowy: _ic_modulu(serie, bary, nowy, krok=KROK, nienakladajace=nienakladajace)
+          for nowy in NOWE}
     return dekor, ic, len(bary)
 
 
@@ -149,6 +164,14 @@ def _fmt(v):
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="Pomiar dekorelacji + IC nowych modułów (EXP-13/14/15).")
+    parser.add_argument(
+        "--nienakladajace", action="store_true",
+        help="IC na NIENAKŁADAJĄCYCH się zwrotach (odstęp próbek ≥ h) — kontrola "
+             "persystencji wg Prawa I: czy wysokie IC to skill, czy artefakt autokorelacji.")
+    args = parser.parse_args()
+
     base = os.path.join(os.path.dirname(__file__), "..")
     odkryte = _odkryj_dane(base)
 
@@ -156,9 +179,12 @@ def main():
         print("BRAK DANYCH — wrzuć pliki .csv do dane/godzinowe, dane/4h lub dane/dzienne")
         return
 
+    tryb = ("NIENAKŁADAJĄCE zwroty (odstęp≥h — kontrola persystencji, Prawo I)"
+            if args.nienakladajace else "STANDARD (nakładające się zwroty, krok=3)")
     liczba_par = len({p for pary in odkryte.values() for p in pary})
     print(f"POMIAR MATRYCOWY (auto-skan): {liczba_par} par × {len(odkryte)} interwałów "
           f"(Prawo XVI + Prawo I)")
+    print(f"TRYB IC: {tryb}")
     print(f"Wykryte interwały: {', '.join(odkryte.keys())}\n")
 
     # agregacja IC i dekorelacji po wszystkich (para,TF)
@@ -175,7 +201,8 @@ def main():
         for para in sorted(pary_map):
             sciezka = pary_map[para]
             try:
-                dekor, ic, n = _pomiar_jednego(sciezka, interwal)
+                dekor, ic, n = _pomiar_jednego(sciezka, interwal,
+                                               nienakladajace=args.nienakladajace)
             except Exception as e:
                 print(f"{para:12} BŁĄD: {e}")
                 continue

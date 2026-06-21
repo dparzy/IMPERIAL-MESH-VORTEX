@@ -28,16 +28,24 @@ from imperium.legiony.diagnostyka_korelacji import (
 from imperium.legiony.metryki_ic import _spearman
 
 NOWE = {"EXP-13", "EXP-14", "EXP-15"}
-DANE = "dane/4h/Binance_BTCUSDT_4h.csv"
 OKNO = 60
-HORYZONTY = (1, 6, 30)  # 4h, 1d, 5d
+HORYZONTY = (1, 6, 30)
+
+# Pełna matryca: 5 par × 3 interwały (wszystko co mamy w repo).
+PARY = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "DOGEUSDT"]
+INTERWALY = {
+    "1h": "dane/godzinowe/Binance_{p}_1h.csv",
+    "4h": "dane/4h/Binance_{p}_4h.csv",
+    "1d": "dane/dzienne/Binance_{p}_d.csv",
+}
 
 
-def _zwroty_forward(bary, okno, h):
-    """Forward return zwrot_{t+h} dla każdego kroku okna (wyrównane z sygnałami)."""
+def _zwroty_forward(bary, okno, h, krok=1):
+    """Forward return zwrot_{t+h} dla każdego kroku okna (wyrównane z sygnałami).
+    krok = to samo próbkowanie co zbierz_sygnaly_zwiadowcow (range(okno, n+1, krok))."""
     closes = [float(b["close"]) for b in bary]
     zwroty = []
-    for koniec in range(okno, len(bary) + 1):
+    for koniec in range(okno, len(bary) + 1, krok):
         idx = koniec - 1            # bieżący bar (ostatni w oknie)
         if idx + h < len(closes):
             zwroty.append(closes[idx + h] / closes[idx] - 1.0)
@@ -46,95 +54,109 @@ def _zwroty_forward(bary, okno, h):
     return zwroty
 
 
-def main():
-    sciezka = os.path.join(os.path.dirname(__file__), "..", DANE)
-    bary = wczytaj_csv(sciezka, interwal="4h")
-    print(f"Wczytano {len(bary)} barów 4h ({DANE})\n")
-
-    zwiadowcy = wszyscy_zwiadowcy()
-
-    # ── 1. DEKORELACJA ────────────────────────────────────────────────────
-    print("=" * 70)
-    print(" 1. DEKORELACJA (Prawo XVI) — czy nowe moduły dublują istniejące?")
-    print("=" * 70)
-    raport = raport_dekorelacji(bary, zwiadowcy, okno=OKNO, krok=4)
-    print(f"Moduły: {raport['liczba_modulow']} | kroki: {raport['liczba_krokow']}\n")
-
-    # Pary z udziałem nowych modułów
-    print("Pary z udziałem EXP-13/14/15 (sortowane po |ρ|):")
-    pary_nowe = []
-    for klucz, k in raport["macierz"].items():
-        a, b = klucz.split("~")
-        if (a in NOWE or b in NOWE) and k is not None:
-            pary_nowe.append((a, b, k))
-    pary_nowe.sort(key=lambda t: -abs(t[2]))
-    for a, b, k in pary_nowe[:20]:
-        flaga = "🔴 REDUNDANCJA" if abs(k) > 0.80 else ("🟢 filar" if abs(k) < 0.20 else "")
-        print(f"  {a:8} ~ {b:8}  ρ={k:+.3f}  {flaga}")
-
-    # Werdykt per nowy moduł: max |ρ| z innymi
-    print("\nWerdykt per nowy moduł (max |ρ| z dowolnym innym):")
-    for nowy in sorted(NOWE):
-        kor = [abs(k) for (a, b, k) in pary_nowe if a == nowy or b == nowy]
-        if kor:
-            mx = max(kor)
-            status = "🔴 redundantny" if mx > 0.80 else ("🟢 unikalny" if mx < 0.40 else "🟡 umiarkowany")
-            print(f"  {nowy}: max|ρ|={mx:.3f} → {status}")
+def _ic_modulu(serie, bary, nowy, krok=1):
+    """IC modułu dla każdego horyzontu (lub None)."""
+    if nowy not in serie or not serie[nowy]:
+        return [None] * len(HORYZONTY)
+    syg = np.array(serie[nowy], dtype=float)
+    out = []
+    for h in HORYZONTY:
+        zwr = _zwroty_forward(bary, OKNO, h, krok=krok)
+        pary = [(s, z) for s, z in zip(syg, zwr) if z is not None and not np.isnan(s)]
+        if len(pary) < 30 or np.std([p[0] for p in pary]) < 1e-10:
+            out.append(None)
         else:
-            print(f"  {nowy}: brak danych (stały sygnał?)")
+            out.append(_spearman(np.array([p[0] for p in pary]),
+                                 np.array([p[1] for p in pary])))
+    return out
 
-    # ── 2. IC (skill) ─────────────────────────────────────────────────────
-    print("\n" + "=" * 70)
-    print(" 2. IC (W-369) — czy nowe moduły mają SKILL predykcyjny?")
-    print("=" * 70)
-    serie = zbierz_sygnaly_zwiadowcow(bary, zwiadowcy, okno=OKNO, krok=1)
 
-    print(f"{'Moduł':10} " + " ".join(f"IC(h={h})".rjust(10) for h in HORYZONTY))
+MAX_BAROW = 6000   # limit na plik (1h ma 76k — ścinamy do ostatnich 6k dla szybkości)
+KROK = 3           # próbkowanie okna (kompromis szybkość/dokładność)
+
+
+def _pomiar_jednego(sciezka, interwal):
+    """Zwraca (dekorelacja_max{mod:|ρ|}, ic{mod:[ic_h...]}) dla jednego pliku."""
+    bary = wczytaj_csv(sciezka, interwal=interwal)
+    if len(bary) < OKNO + max(HORYZONTY) + 50:
+        return None, None, 0
+    if len(bary) > MAX_BAROW:
+        bary = bary[-MAX_BAROW:]
+    zwiadowcy = wszyscy_zwiadowcy()
+    raport = raport_dekorelacji(bary, zwiadowcy, okno=OKNO, krok=KROK)
+    dekor = {}
+    for nowy in NOWE:
+        kor = []
+        for klucz, k in raport["macierz"].items():
+            a, b = klucz.split("~")
+            if (a == nowy or b == nowy) and k is not None:
+                kor.append(abs(k))
+        dekor[nowy] = max(kor) if kor else None
+    serie = zbierz_sygnaly_zwiadowcow(bary, zwiadowcy, okno=OKNO, krok=KROK)
+    ic = {nowy: _ic_modulu(serie, bary, nowy, krok=KROK) for nowy in NOWE}
+    return dekor, ic, len(bary)
+
+
+def _fmt(v):
+    return f"{v:+.3f}" if v is not None else "  n/a "
+
+
+def main():
+    base = os.path.join(os.path.dirname(__file__), "..")
+    print("POMIAR MATRYCOWY: 5 par × 3 interwały (Prawo XVI + Prawo I)\n")
+
+    # agregacja IC i dekorelacji po wszystkich (para,TF)
+    agg_dekor = {m: [] for m in NOWE}
+    agg_ic = {m: {h: [] for h in HORYZONTY} for m in NOWE}
+
+    for interwal, wzor in INTERWALY.items():
+        print("=" * 78)
+        print(f" INTERWAŁ {interwal}")
+        print("=" * 78)
+        naglowek = f"{'para':9} {'moduł':8} {'max|ρ|':>8}  " + \
+                   "  ".join(f"IC(h={h})" for h in HORYZONTY)
+        print(naglowek)
+        for para in PARY:
+            sciezka = os.path.join(base, wzor.format(p=para))
+            if not os.path.exists(sciezka):
+                print(f"{para:9} BRAK PLIKU {sciezka}")
+                continue
+            try:
+                dekor, ic, n = _pomiar_jednego(sciezka, interwal)
+            except Exception as e:
+                print(f"{para:9} BŁĄD: {e}")
+                continue
+            if dekor is None:
+                print(f"{para:9} za mało barów ({n})")
+                continue
+            for nowy in sorted(NOWE):
+                mx = dekor.get(nowy)
+                ics = ic.get(nowy, [None] * len(HORYZONTY))
+                print(f"{para:9} {nowy:8} {(_fmt(mx) if mx is not None else '  n/a '):>8}  " +
+                      "   ".join(_fmt(v) for v in ics))
+                if mx is not None:
+                    agg_dekor[nowy].append(mx)
+                for h, v in zip(HORYZONTY, ics):
+                    if v is not None:
+                        agg_ic[nowy][h].append(v)
+        print()
+
+    # ── PODSUMOWANIE ZBIORCZE ─────────────────────────────────────────────
+    print("=" * 78)
+    print(" PODSUMOWANIE ZBIORCZE (średnia po wszystkich parach i interwałach)")
+    print("=" * 78)
     for nowy in sorted(NOWE):
-        if nowy not in serie or not serie[nowy]:
-            print(f"{nowy:10} brak sygnałów")
-            continue
-        syg = np.array(serie[nowy], dtype=float)
-        wiersz = f"{nowy:10} "
-        for h in HORYZONTY:
-            zwr = _zwroty_forward(bary, OKNO, h)
-            pary = [(s, z) for s, z in zip(syg, zwr)
-                    if z is not None and not np.isnan(s)]
-            if len(pary) < 30 or np.std([p[0] for p in pary]) < 1e-10:
-                wiersz += "      n/a "
-                continue
-            x = np.array([p[0] for p in pary])
-            y = np.array([p[1] for p in pary])
-            ic = _spearman(x, y)
-            wiersz += f"{ic:+.4f}".rjust(10) + " "
-        print(wiersz)
+        d = agg_dekor[nowy]
+        d_txt = f"max|ρ| śr={np.mean(d):.3f} (n={len(d)})" if d else "brak (martwy)"
+        ic_txt = " | ".join(
+            f"IC(h={h})={np.mean(agg_ic[nowy][h]):+.3f}" if agg_ic[nowy][h] else f"IC(h={h})=n/a"
+            for h in HORYZONTY
+        )
+        print(f"  {nowy}: {d_txt}  →  {ic_txt}")
 
-    # Baseline: IC kilku ugruntowanych zwiadowców dla porównania
-    print("\n  (baseline — ugruntowane moduły dla porównania skali IC):")
-    for ref in ("EXP-01", "EXP-03", "EXP-04"):
-        if ref not in serie or not serie[ref]:
-            continue
-        syg = np.array(serie[ref], dtype=float)
-        wiersz = f"  {ref:8} "
-        for h in HORYZONTY:
-            zwr = _zwroty_forward(bary, OKNO, h)
-            pary = [(s, z) for s, z in zip(syg, zwr)
-                    if z is not None and not np.isnan(s)]
-            if len(pary) < 30 or np.std([p[0] for p in pary]) < 1e-10:
-                wiersz += "      n/a "
-                continue
-            ic = _spearman(np.array([p[0] for p in pary]), np.array([p[1] for p in pary]))
-            wiersz += f"{ic:+.4f}".rjust(10) + " "
-        print(wiersz)
-
-    print("\n" + "=" * 70)
-    print(" INTERPRETACJA:")
-    print("  • |ρ|>0.80 = redundancja → rozważ wagę w dół lub scalenie")
-    print("  • |IC|>0.03 = realny skill predykcyjny (na crypto już dobre)")
-    print("  • |IC|≈0 + |ρ| niskie = dywersyfikuje ryzyko, ale nie przewiduje")
-    print("  • Sygnały obronne (EXP-15 PIN) mają z natury niski IC kierunkowy —")
-    print("    ich wartość to tłumienie roju, nie predykcja kierunku.")
-    print("=" * 70)
+    print("\n  INTERPRETACJA:")
+    print("  • |ρ|>0.80 redundancja | |IC|>0.03 realny skill | martwy = wyciszyć")
+    print("=" * 78)
 
 
 if __name__ == "__main__":

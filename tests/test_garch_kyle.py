@@ -158,6 +158,38 @@ def test_kyle_klucz_kategoria():
     assert z.KATEGORIA == "L"
 
 
+def test_kyle_prog_adaptacyjny_skalowalny():
+    # KLUCZOWA NAPRAWA (W-380): próg ratio jest bezwymiarowy → działa niezależnie
+    # od skali ceny/wolumenu. Ten sam wzorzec na cenie ~50000 i ~0.1 daje ten sam ratio.
+    z = ZwiadowcaKyleLambda()
+
+    def _spike_bary(skala, seed=0):
+        rng = np.random.default_rng(seed)
+        bary = []
+        for i in range(50):
+            c = skala * (1 + rng.normal(0, 0.005))
+            bary.append({"open": skala, "high": c * 1.002, "low": c * 0.998,
+                         "close": c, "volume": 1000.0, "timestamp": i})
+        # ostatnie 5 barów: skok impactu (duży ruch, mały net-flow → wysoki impact)
+        for i in range(5):
+            bary.append({"open": skala, "high": skala * 1.05, "low": skala * 0.95,
+                         "close": skala * 1.04, "volume": 1000.0, "timestamp": 50 + i})
+        return bary
+
+    r_duza = z.analizuj(_spike_bary(50000.0))
+    r_mala = z.analizuj(_spike_bary(0.1))
+    # Ratio (bezwymiarowy) powinien być zbliżony mimo 500000× różnicy ceny
+    assert r_duza.sygnal.kierunek == r_mala.sygnal.kierunek
+    assert abs(r_duza.diagnostics["impact_ratio"] - r_mala.diagnostics["impact_ratio"]) < 0.5
+
+
+def test_kyle_impact_ratio_w_diagnostyce():
+    z = ZwiadowcaKyleLambda()
+    r = z.analizuj(_bary(50))
+    assert "impact_ratio" in r.diagnostics
+    assert r.diagnostics["impact_ratio"] >= 0
+
+
 # ---------------------------------------------------------------------------
 # _info_bloku (BTC deterministyczne)
 # ---------------------------------------------------------------------------

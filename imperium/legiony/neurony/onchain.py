@@ -223,3 +223,182 @@ class NeuronWashTrading(MikroNeuron):
         s.pewnosc_przeciwnika = pewnosc_p
         s.policz_finalna()
         return s
+
+
+# ---------------------------------------------------------------------------
+# OC-06 / OC-07 / OC-08 — deterministyczne neurony BTC on-chain
+# Źródło: BIB-030 Ammous "The Bitcoin Standard" (INF-41)
+# Nie wymagają zewnętrznego API — wyliczane z block height i harmonogramu halvingów.
+# ---------------------------------------------------------------------------
+
+# Harmonogram halvingów BTC (deterministyczny)
+_HALVING_EPOCHS = [
+    (0,       50.0),      # blok 0 — genesis
+    (210_000, 25.0),      # 1. halving ~2012
+    (420_000, 12.5),      # 2. halving ~2016
+    (630_000, 6.25),      # 3. halving ~2020
+    (840_000, 3.125),     # 4. halving ~2024
+    (1_050_000, 1.5625),  # 5. halving ~2028
+    (1_260_000, 0.78125), # 6. halving ~2032
+]
+_MAX_SUPPLY_BTC = 21_000_000.0
+_BLOKI_NA_EPOKE = 210_000
+_SREDNI_CZAS_BLOKU_MIN = 10.0
+
+
+def _info_bloku(block_height: int) -> dict:
+    """Wylicza nagrode, epokę, S2F i dni-do-halvingu z block_height."""
+    # Aktualna nagroda
+    nagroda = 50.0
+    for prog, rew in _HALVING_EPOCHS:
+        if block_height >= prog:
+            nagroda = rew
+        else:
+            break
+
+    # Następny próg halvingu
+    nastepna_epoka_idx = (block_height // _BLOKI_NA_EPOKE) + 1
+    nastepny_prog = nastepna_epoka_idx * _BLOKI_NA_EPOKE
+    bloki_do = nastepny_prog - block_height
+    dni_do = bloki_do * _SREDNI_CZAS_BLOKU_MIN / (60 * 24)
+
+    # Szacowana aktualna podaż (trójkąt geometryczny)
+    podaz = 0.0
+    ep_rew = 50.0
+    for i, (prog, rew) in enumerate(_HALVING_EPOCHS):
+        nastepny = _HALVING_EPOCHS[i + 1][0] if i + 1 < len(_HALVING_EPOCHS) else block_height
+        if block_height <= prog:
+            break
+        bloki_w_epoce = min(block_height, nastepny) - prog
+        podaz += bloki_w_epoce * ep_rew
+        ep_rew = rew
+
+    # Roczna emisja = nagroda_blokowa * 6 bloków/h * 24h * 365
+    roczna_emisja = nagroda * 6 * 24 * 365
+    s2f = podaz / roczna_emisja if roczna_emisja > 0 else 0.0
+    inflacja_pct = (roczna_emisja / podaz * 100) if podaz > 0 else 0.0
+
+    return {
+        "nagroda_blokowa": nagroda,
+        "podaz_btc": round(podaz, 2),
+        "roczna_emisja": round(roczna_emisja, 4),
+        "s2f": round(s2f, 2),
+        "inflacja_pct": round(inflacja_pct, 4),
+        "dni_do_halvingu": round(dni_do, 1),
+        "bloki_do_halvingu": bloki_do,
+    }
+
+
+_POWOD_BLOK = "Wymaga BTC_BLOCK_HEIGHT w wskaznikach (adapter blockchain lub REST BTC node)."
+
+
+class NeuronS2F(MikroNeuron):
+    """
+    OC-06 | BTC Stock-to-Flow Ratio — twardość monetarna (W-377).
+    S2F = podaż_całkowita / roczna_nowa_emisja.
+    S2F > 50 (jak złoto) = historycznie bull phase (po halvingach).
+    Dane: deterministyczne z block_height — zero zewnętrznych API poza numerem bloku.
+    Źródło: BIB-030 Ammous, INF-41.
+    """
+    KLUCZ = "OC-06"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "BTC_S2F"
+    KATEGORIA = "O"
+    WAGA = 6
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = _POWOD_BLOK
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        block_height = wskazniki.get("BTC_BLOCK_HEIGHT")
+        if not block_height:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak BTC_BLOCK_HEIGHT — neuron abstynuje (DOSTEPNY po wstrzyknięciu)"])
+
+        info = _info_bloku(int(block_height))
+        s2f = info["s2f"]
+
+        if s2f >= 100:
+            return self._bazowy_sygnal(s2f, "LONG", 0.75,
+                [f"S2F={s2f:.0f} — po halvingu, BTC twardszy niż złoto (S2F złota≈55)",
+                 f"Roczna inflacja podaży: {info['inflacja_pct']:.3f}%"])
+        if s2f >= 50:
+            return self._bazowy_sygnal(s2f, "LONG", 0.55,
+                [f"S2F={s2f:.0f} — poziom złota (~55x), środek cyklu bull"])
+        if s2f >= 25:
+            return self._bazowy_sygnal(s2f, "NEUTRAL", 0.0,
+                [f"S2F={s2f:.0f} — przed halvingiem, neutralny makro-kontekst"])
+        return self._bazowy_sygnal(s2f, "NEUTRAL", 0.0,
+            [f"S2F={s2f:.0f} — wczesna faza (niska twardość monetarna)"])
+
+
+class NeuronDaysToHalving(MikroNeuron):
+    """
+    OC-07 | Dni do halvingu BTC — supply shock countdown (W-378).
+    Rynek historycznie dyskontuje halving z wyprzedzeniem ~180 dni.
+    Źródło: BIB-030 Ammous, INF-41. Deterministyczne z block_height.
+    """
+    KLUCZ = "OC-07"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "BTC_DAYS_TO_HALVING"
+    KATEGORIA = "O"
+    WAGA = 7
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = _POWOD_BLOK
+
+    _PROG_BLISKI = 180    # dni — historyczne okno dyskontowania halvingu
+    _PROG_BARDZO_BLISKI = 60
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        block_height = wskazniki.get("BTC_BLOCK_HEIGHT")
+        if not block_height:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak BTC_BLOCK_HEIGHT"])
+
+        info = _info_bloku(int(block_height))
+        dni = info["dni_do_halvingu"]
+
+        if dni <= self._PROG_BARDZO_BLISKI:
+            return self._bazowy_sygnal(dni, "LONG", 0.80,
+                [f"Halving za {dni:.0f} dni — SUPPLY SHOCK bliski",
+                 f"Nagroda blokowa: {info['nagroda_blokowa']} BTC → po halvingu: {info['nagroda_blokowa']/2:.4f}"])
+        if dni <= self._PROG_BLISKI:
+            return self._bazowy_sygnal(dni, "LONG", 0.60,
+                [f"Halving za {dni:.0f} dni — okno dyskontowania (historycznie bull)",
+                 f"S2F po halvingu wzrośnie 2× (do {info['s2f']*2:.0f}x)"])
+        return self._bazowy_sygnal(dni, "NEUTRAL", 0.0,
+            [f"Halving za {dni:.0f} dni — poza oknem historycznego dyskontowania ({self._PROG_BLISKI} dni)"])
+
+
+class NeuronBTCSupplyInflation(MikroNeuron):
+    """
+    OC-08 | BTC Supply Inflation Rate — tempo wzrostu podaży (W-379).
+    Im niższa inflacja, tym twardszy pieniądz → fundamentalny bull factor.
+    Deterministyczne: 0 zewnętrznych API poza numerem bloku.
+    Źródło: BIB-030 Ammous, INF-41.
+    """
+    KLUCZ = "OC-08"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "BTC_SUPPLY_INFLATION_PCT"
+    KATEGORIA = "O"
+    WAGA = 5
+    DOSTEPNY = False
+    POWOD_NIEDOSTEPNOSCI = _POWOD_BLOK
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        block_height = wskazniki.get("BTC_BLOCK_HEIGHT")
+        if not block_height:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0,
+                ["Brak BTC_BLOCK_HEIGHT"])
+
+        info = _info_bloku(int(block_height))
+        inf_pct = info["inflacja_pct"]
+
+        if inf_pct <= 1.0:
+            return self._bazowy_sygnal(inf_pct, "LONG", 0.60,
+                [f"BTC inflacja={inf_pct:.3f}% < 1% rocznie — twardszy niż złoto (~1.7%)",
+                 f"Nagroda blokowa: {info['nagroda_blokowa']} BTC"])
+        if inf_pct <= 2.0:
+            return self._bazowy_sygnal(inf_pct, "LONG", 0.40,
+                [f"BTC inflacja={inf_pct:.3f}% — porównywalna ze złotem"])
+        return self._bazowy_sygnal(inf_pct, "NEUTRAL", 0.0,
+            [f"BTC inflacja={inf_pct:.3f}% — przed halvingiem (wyższa podaż)"])

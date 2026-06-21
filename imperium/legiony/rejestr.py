@@ -49,6 +49,7 @@ from imperium.legiony.neurony.psychologia import (
 )
 from imperium.legiony.neurony.onchain import (
     NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow, NeuronWashTrading,
+    NeuronS2F, NeuronDaysToHalving, NeuronBTCSupplyInflation,
 )
 from imperium.legiony.neurony.straz import (
     NeuronStopHunt, NeuronWickRejection, NeuronWashVol, NeuronBartPattern,
@@ -87,6 +88,8 @@ from imperium.legiony.zwiadowcy import (
     ZwiadowcaLiquiditySweep, ZwiadowcaDisplacement,
     ZwiadowcaDynamic, ZwiadowcaAtmabhan,
 )
+from imperium.legiony.zwiadowcy.exp_garch import ZwiadowcaGARCH
+from imperium.legiony.zwiadowcy.exp_kyle_lambda import ZwiadowcaKyleLambda
 
 logger = logging.getLogger("Rejestr")
 
@@ -160,6 +163,9 @@ MECHANIZMY: dict = {
     "OC-03": "mean_rev",  # Puell Multiple
     "OC-04": "event",     # Exchange Netflow
     "OC-05": "risk_filter",  # Wash Trading
+    "OC-06": "mean_rev",    # S2F (cykl halvingu)
+    "OC-07": "event",       # Days to Halving
+    "OC-08": "mean_rev",    # Supply Inflation Rate
     # Anty-manipulacja (A)
     "A-01": "risk_filter",  # Stop Hunt
     "A-02": "risk_filter",  # Wick Rejection
@@ -248,6 +254,9 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         # On-chain (OC) + Wash Trading (OC-05, OHLCV, bez API)
         NeuronMVRV(), NeuronSOPR(), NeuronPuellMultiple(), NeuronExchangeNetflow(),
         NeuronWashTrading(),
+        # On-chain deterministyczne (OC-06..08) — BTC S2F, halvings, supply inflation (Ammous BIB-030)
+        # Wymagają BTC_BLOCK_HEIGHT w wskaznikach (Budowniczy lub adapter blokchain).
+        NeuronS2F(), NeuronDaysToHalving(), NeuronBTCSupplyInflation(),
         # Straż / Anty-manipulacja (A)
         NeuronStopHunt(), NeuronWickRejection(), NeuronWashVol(), NeuronBartPattern(),
         # Dźwignia (L) + Zmienność (V) — OHLCV, bez API
@@ -289,6 +298,8 @@ def wszyscy_zwiadowcy() -> list:
         ZwiadowcaDisplacement(), # EXP-10 Displacement impuls strukturalny (IMV-ADO)
         ZwiadowcaDynamic(),    # EXP-11 Dynamic cross + slippage guard (IMV-ADO)
         ZwiadowcaAtmabhan(),   # EXP-12 L2 mikrostruktura (IMV-ADO, WYCISZONY do feedu L2)
+        ZwiadowcaGARCH(),      # EXP-13 GJR-GARCH(1,1) zmienność warunkowa (W-376, Tsay BIB-031)
+        ZwiadowcaKyleLambda(), # EXP-14 Kyle's Lambda price impact (W-380, O'Hara BIB-032)
     ]
 
 
@@ -455,7 +466,9 @@ NEURONY_STYLU: dict = {
     # Struktura/SMC (S) — sesje/FVG/OB/BOS/VPOC: cross-TF (sesje istotne też na 4h)
     "SES-01": _U, "SES-02": _U, "SMC-01": _U, "SMC-02": _U, "SMC-03": _U, "VP-01": _U,
     # On-chain (O) — OC-01..04 wymagają feedu łańcucha → tylko INVEST; OC-05 (wash, OHLCV) uniwersalny
+    # OC-06..08 deterministyczne (S2F/halvings) → czysto makro → INVEST
     "OC-01": _INV, "OC-02": _INV, "OC-03": _INV, "OC-04": _INV, "OC-05": _U,
+    "OC-06": _INV, "OC-07": _INV, "OC-08": _INV,
     # Reżim/Sentyment (R) — futures/Fear&Greed/RADAR/news/augur: kontekst na każdym TF
     "PSY-01": _U, "PSY-02": _U, "PSY-03": _U, "PSY-04": _U,
     "RADAR-01": _U, "RADAR-02": _U, "RADAR-03": _U, "RADAR-04": _U, "RADAR-05": _U, "AUG-01": _U, "NEWS-01": _U,

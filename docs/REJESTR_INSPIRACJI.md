@@ -271,6 +271,18 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 
 ---
 
+## 📚 BIB-029..032 (Blockchain/TimeSeries/Microstructure) — INF-41..44
+
+| Nr | Książka | Ocena | Werdykt | Wdrożone |
+|---|---|---|---|---|
+| **INF-41** ❌ | Bashir — "Mastering Blockchain" (4th ed., BIB-029) | **2/10** | Podręcznik DApp/Solidity/DeFi — zero on-chain analytics (brak MVRV/SOPR/NVT/NUPL/Glassnode). Jedyne ziarno: Health Factor `HF=Σ(col·thr)/debt` i AMM `x·y=k` — architektura DEX, nie sygnały. Wizji NIE przyznano. | — |
+| **INF-42** | Ammous — "The Bitcoin Standard" (BIB-030) | **3/10** | Ekonomia austriacka, nie trading. 95% filozofia monetarna. Jedyne numpy-feasible: 3 deterministyczne neurony z block_height — S2F, DAYS_TO_HALVING, SUPPLY_INFLATION. Stock-to-Flow opisany konceptualnie (bez formuły predykcyjnej — model Plan B 2019 to osobny artykuł). | ✅ OC-06/07/08 wdrożone (W-377..379) |
+| **INF-43** ⭐ | Tsay — "Analysis of Financial Time Series" (3rd ed., BIB-031) | **9/10** | SKARB. Kompletny podręcznik szeregów finansowych. GARCH(1,1) rekurencja Bollersleva = zwykła pętla numpy (bez scipy). GJR-GARCH, EGARCH, VAR/VECM, Markov-Switching. Zamknął martwą wizję W-126. | ✅ EXP-13 GJR-GARCH(1,1) wdrożony (W-376) |
+| **INF-44** | O'Hara — "Market Microstructure Theory" (BIB-032) | **8/10** | Fundament teorii VPIN/PIN/Kyle's Lambda. Kyle λ = OLS nachylenie Δp∼netflow. PIN metodą momentów (numpy.linalg.solve — bez scipy). Glosten-Harris decomposition: spread = transakcyjny + adverse selection. Poprawa VPIN: ważenie wolumenem. | ✅ EXP-14 Kyle's Lambda wdrożony (W-380) |
+
+
+---
+
 ## 🔟 WIZJE BIB-025 (Grinold & Kahn — Fundamental Law) — W-369..373
 
 > Zamykają lukę kalibracji sygnałów: mierzymy jakość każdego neuronu indywidualnie (IC) oraz roju (IR).

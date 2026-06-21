@@ -26,14 +26,14 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **78 zaimplementowane** (74 aktywnych: OHLCV momentum/trend/wolumen + SES-01/02 + 3 SMC + 6 kat. R + NEWS-01 + V-03 CVD + Z-01..05 brama obronna + X-27 Value + X-28 MTF Confluence + OC-05 WashTrading + **W-322: V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile/VPOC, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top** + **W-329: RADAR-04 kaskada korelacyjna + RADAR-05 lead-lag BTC→alty** + **W-335: C-01 Cross-sectional Relative Strength** + **W-336: CP-01 CUSUM change-point** + **W-338: BOCPD-01 Bayesian change-point** + **W-339: N-02 Fractional Differentiation**; 4 czeka na on-chain API) |
+| **Mikro-neurony** | **81 zaimplementowane** (74 aktywnych: OHLCV momentum/trend/wolumen + SES-01/02 + 3 SMC + 6 kat. R + NEWS-01 + V-03 CVD + Z-01..05 brama obronna + X-27 Value + X-28 MTF Confluence + OC-05 WashTrading + **W-322: V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile/VPOC, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top** + **W-329: RADAR-04 kaskada korelacyjna + RADAR-05 lead-lag BTC→alty** + **W-335: C-01 Cross-sectional Relative Strength** + **W-336: CP-01 CUSUM change-point** + **W-338: BOCPD-01 Bayesian change-point** + **W-339: N-02 Fractional Differentiation**; 4 czeka na on-chain API) |
 | **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
 | **Generał Legatus** | agregacja głosów + wagi reżimowe + odpalanie zwiadowców |
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
-| **Status elitarny** | **15 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 + 12 zwiadowców |
+| **Status elitarny** | **15 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 + 14 zwiadowców |
 | **Monte Carlo / Optymalizator / Pamięć Refleksyjna / Drift Adapter** | W-293/294/295/296 — antyoverfitting + samouczenie Brain |
 | **Testy** | `python tests/run_tests.py` → **1038/1038** ✅ |
 
@@ -60,7 +60,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 ```
 👑 cesarz/       — mózg decyzyjny, 5 Doradców, PamięćRefleksyjna   (9)
 🏛️ senat/        — debata / konsensus                              (2)
-⚔️ legiony/      — 78 neuronów + 12 zwiadowców + Legatus + Radar     (40)
+⚔️ legiony/      — 81 neuronów + 14 zwiadowców + Legatus + Radar     (40)
 🏟️ koloseum/     — Dyrygent, PętlaLive, Backtest portfela, Namiestnik (11)
 🛡️ pretorianie/  — bezpieczeństwo, kalkulator lewara, Praeda        (5)
 🏗️ akwedukty/    — pipeline danych + adaptery API (Futures/F&G/CVD/News) (8)

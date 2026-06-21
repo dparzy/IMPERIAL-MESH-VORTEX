@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-21 | W-376..380 + BIB-029..032 | GARCH/Kyle's Lambda/BTC halvings (INF-41..44)
+
+4 nowe książki przeanalizowane (BIB-029..032):
+- INF-41 Bashir Mastering Blockchain 2/10 → ODRZUCONA (DApp inżynierska, zero metryk tradingowych)
+- INF-42 Ammous Bitcoin Standard 3/10 → OC-06..08 deterministyczne
+- INF-43 Tsay Analysis of Financial Time Series 9/10 → EXP-13 GJR-GARCH
+- INF-44 O'Hara Market Microstructure Theory 8/10 → EXP-14 Kyle's Lambda
+
+Nowe moduły:
+- **W-376 EXP-13 ZwiadowcaGARCH** (`zwiadowcy/exp_garch.py`): GJR-GARCH(1,1) =
+  σ²_t = α₀ + (α₁+γ·I[a<0])·a²_{t-1} + β₁·σ²_{t-1}. Grid search log-likelihood
+  (pure numpy, zero scipy). HIGH_VOL/EXTREME_VOL → SHORT, LOW_VOL → LONG. 5 testów.
+- **W-377..379 OC-06..08** (onchain.py): NeuronS2F (S2F = podaż/roczna_emisja),
+  NeuronDaysToHalving (bloki_do×10min/1440), NeuronBTCSupplyInflation — wszystkie
+  deterministyczne z BTC_BLOCK_HEIGHT, zero API zewnętrznych.
+- **W-380 EXP-14 ZwiadowcaKyleLambda** (`zwiadowcy/exp_kyle_lambda.py`): Kyle's Lambda
+  OLS: λ = Δp/netflow — nachylenie regresji. Prawo XVI: mierzy |ρ(λ, Amihud)| live.
+  27 testów granic (zero wolumenu, OLS fail, bloki zerowe).
+Liczniki: 81 neuronów, 14 zwiadowców = 95 modułów. 1599/1599 testów, audyt exit 0.
+
+Pliki: `zwiadowcy/exp_garch.py` (NEW), `zwiadowcy/exp_kyle_lambda.py` (NEW),
+`neurony/onchain.py` (OC-06..08 dodane), `rejestr.py` (rejestracja),
+`tests/test_garch_kyle.py` (NEW, 27 testów), `tests/test_integracja.py` (liczniki),
+`docs/REJESTR_INSPIRACJI.md` (INF-41..44), `docs/MANIFEST_KODU.md`, `docs/MAPA_KLUCZY.md`,
+`README.md`, `docs/INDEKS_IMPERIUM.md`.
+
+---
+
 ## 2026-06-21 | W-369..371 | Fundamental Law (IC/breadth/IR) — Grinold & Kahn (BIB-025..028)
 
 Nowy moduł `imperium/legiony/metryki_ic.py` (W-369..371, pure numpy):

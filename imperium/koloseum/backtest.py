@@ -61,6 +61,8 @@ def backtest(
     max_bars_otwarcia: "Optional[int]" = None,
     straznik_przewagi: bool = False,
     sl_atr_mult: "Optional[float]" = None,
+    mtf_konfluencja: bool = False,
+    mtf_weto_przeciwtrend: bool = False,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -76,6 +78,9 @@ def backtest(
                 (HedgeMWUzPamieciaRezimu — Fixed-Share + pamięć per-reżim), a
                 mnożniki wag wracają do Legatusa NA BIEŻĄCO. Bez look-ahead:
                 uczymy się wyłącznie z już ZAMKNIĘTYCH transakcji.
+    mtf_konfluencja:        W-384 (opt-in, domyślnie False → zero zmiany zachowania) —
+                brama konfluencji wyższych TF na poziomie roju (mnoznik pewności/sizingu).
+    mtf_weto_przeciwtrend:  W-384 (opt-in) — twarde weto wejść przeciw wyższym TF.
     """
     from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
     from imperium.legiony.rejestr import zbuduj_legatusa
@@ -99,6 +104,9 @@ def backtest(
                         min_pewnosc=min_pewnosc, tryb=tryb, namiestnik=namiestnik,
                         min_pewnosc_interwalu=min_pewnosc_interwalu,
                         sl_atr_mult=sl_atr_mult)
+    # W-384 Konfluencja MTF (opt-in, A/B) — domyślnie False, zero zmiany zachowania.
+    dyrygent.mtf_konfluencja = mtf_konfluencja
+    dyrygent.mtf_weto_przeciwtrend = mtf_weto_przeciwtrend
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"
 
     # 💎 W-287 Strażnik Przewagi (opt-in): HALT gdy rolling expectancy < 0,

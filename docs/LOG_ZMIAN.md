@@ -6,6 +6,49 @@
 
 ---
 
+## 2026-06-21 | W-384 | Backtest A/B MTF — brama NIE poprawia wyniku na tym oknie (hipoteza DD obalona) 🔻
+
+Pytanie Cezara (o pieniądze): czy widzenie wyższych TF (brama konfluencji W-384) poprawia
+wynik? Hipoteza Cezara: najlepszy efekt MTF to NIŻSZY drawdown (wycięte wejścia przeciw
+głównemu trendowi), nie wyższy zysk.
+
+NARZĘDZIE: `narzedzia/backtest_ab_mtf.py` — uczciwe A/B na identycznych barach. Do
+`backtest()` dodano opt-in `mtf_konfluencja`/`mtf_weto_przeciwtrend` (domyślnie False —
+ZERO zmiany domyślnego zachowania). Baza 4h, okno=400 → stos {"1d":6} daje 66 barów
+dziennych ≥60 ⇒ brama ocenia TREND DZIENNY (główny trend). 15 par, 1209 barów-obserwacji.
+
+TABELA A/B (BASELINE mtf=False vs MTF mtf=True+weto):
+  metryka            baseline     MTF       Δ
+  PnL [%]            +0.68%      +0.18%    -0.50%  🔻
+  Transakcje          177         164       -13   (brama wycięła 13 wejść)
+  Win rate           47.5%       48.2%     +0.7%  ✅ (marginalnie)
+  Sharpe portfela     1.62        1.61     -0.01  ≈
+  MaxDD portfela      2.3%        3.9%     +1.5%  🔻 (DD WYŻSZY!)
+  MaxDD śr/para       2.8%        3.5%     +0.7%  🔻
+  DSR (n_prob=2)      0.79        0.81     +0.01  ≈  (oba dsr_ok=False, <0.95)
+  PBO (selekcja par)  0.43        0.60     +0.17  🔻 (oba pbo_ok=False)
+
+WERDYKT WARUNKOWY (Prawo I):
+  • Kryterium „niższy DD" (hipoteza Cezara): ❌ NIESPEŁNIONE — DD WYŻSZY (2.3%→3.9%).
+  • Kryterium „lepszy Sharpe/DSR": ≈ neutralnie (zmiany w granicach szumu).
+  • Brama wycięła 13 wejść, ale netto te wejścia były ZYSKOWNE (PnL spadł o połowę), a DD
+    wzrósł — prawdopodobny mechanizm: mnoznik konfluencji skaluje zgodne wejścia do 1.2×,
+    większe pozycje → głębszy DD; weto usunęło zyskowne kontrtrendy (I–VI 2026 sprzyjał
+    mean-reversion). Brama nie selekcjonuje tu dobrze.
+  • OGRANICZENIE: 6 mies., 1 reżim, ~11 transakcji/parę — pomiar INDYKATYWNY, nie
+    ostateczny. Różnice DD małe bezwzględnie, mogą się odwrócić na innych danych.
+
+DECYZJA: default pozostaje OFF (mtf_konfluencja=False) — dane nie dają podstaw do włączenia.
+Przed jakąkolwiek decyzją o włączeniu: re-test na dłuższej, wieloreżimowej historii (4h
+paginowane do lat / baza 1h ze stosem dziennym). Domyślne ustawienia NIEZMIENIONE.
+
+Kod: backtest opt-in (domyślnie False) + nowe narzędzie. 1648/1648 testów, audyt exit 0,
+ruff czysty, /code-review na diffie.
+Pliki: `imperium/koloseum/backtest.py` (opt-in MTF), `narzedzia/backtest_ab_mtf.py` (NEW),
+`docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-06-21 | Prawo I | Backward-IC (--backward) — ROZSTRZYGNIĘCIE: EXP-13/14 OPISUJĄ REŻIM, nie przewidują 🚩
 
 Krok A.2 (rozstrzygający, po nieprzekonującym teście lagu): backward-IC =

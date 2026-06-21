@@ -6,6 +6,47 @@
 
 ---
 
+## 2026-06-21 | Prawo I | Backward-IC (--backward) — ROZSTRZYGNIĘCIE: EXP-13/14 OPISUJĄ REŻIM, nie przewidują 🚩
+
+Krok A.2 (rozstrzygający, po nieprzekonującym teście lagu): backward-IC =
+Spearman(sygnał_t, zwrot PRZESZŁY t-h→t). Jeśli ≈ forward-IC, sygnał opisuje ruch,
+który WŁAŚNIE się dokonał (reżim/współbieżność), a nie przewiduje przyszłość.
+
+POMIAR OBOK SIEBIE (matryca 15×3, n=45):
+
+  moduł    h    IC_forward   IC_backward   |Δ|
+  EXP-13   1     +0.245       +0.263      0.018
+  EXP-13   6     +0.249       +0.284      0.035
+  EXP-13   30    +0.251       +0.283      0.032
+  EXP-14   1     +0.304       +0.310      0.006
+  EXP-14   6     +0.305       +0.313      0.008
+  EXP-14   30    +0.310       +0.317      0.007
+
+WERDYKT (Prawo I — kryterium Cezara |Δ|<0.05):
+  🚩 WSZYSTKIE 6 przypadków |Δ|<0.05 → sygnał OPISUJE REŻIM, nie przewiduje.
+  • EXP-14 Kyle: forward≈backward co do trzeciego miejsca (Δ 0.006–0.008) — czysty
+    deskryptor współbieżny. Wysokie IC to NIE predykcja.
+  • EXP-13 GARCH: Δ 0.018–0.035, też <0.05; backward nawet WYŻSZE niż forward.
+  • Brak dodatniej asymetrii czasowej (fwd>bwd) w ŻADNYM przypadku — przeciwnie,
+    backward ≥ forward → zero śladu predykcji; forward-IC to echo współbieżnej
+    korelacji reżimu rzutowane w przyszłość przez persystencję.
+
+INTERPRETACJA (spójna z teorią): GARCH = zmienność warunkowa (stan/reżim), Kyle's λ =
+illikwidność/impact (stan mikrostruktury). Z definicji to MIARY STANU, nie predyktory
+kierunku. IC ~0.25–0.30 było artefaktem persystencji reżimu + Spearman łapiący asocjację
+współbieżną. Edge kierunkowy OOS implikowany przez to IC — ILUZORYCZNY.
+
+DECYZJA (Prawo XV/XVI, bez przesady w drugą stronę): NIE kasujemy — moduły niosą
+ORTOGONALNĄ informację (max|ρ|<0.20, dekorelacja trzyma), ale to informacja o REŻIMIE,
+nie kierunku. Stosować jako FILTR reżimu / kontekst sizingu, NIE jako sygnał wejścia.
+Waga jako predyktor kierunku — w dół.
+
+Zmiana wyłącznie narzędziowa. 1648/1648 testów, audyt exit 0, ruff czysty.
+Pliki: `narzedzia/pomiar_nowe_moduly.py` (flaga `--backward`, `wstecz` w zwrotach i IC),
+`docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-06-21 | Prawo I | Kontrola look-ahead IC (--przesuniecie) — leak czasowy obalony, ale lag skonfundowany persystencją
 
 Krok A diagnostyki IC (po obaleniu nakładania): czy sygnał PRZEWIDUJE przyszłość, czy

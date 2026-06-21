@@ -6,6 +6,208 @@
 
 ---
 
+## 2026-06-21 | W-377..379 obudzenie + W-383 | OC-06..08 ożywione + EXP-15 PIN scout
+
+Obudzenie 3 martwych głosów (Prawo XV) + wpięcie PIN do roju:
+- **W-377..379 obudzenie**: `szacuj_block_height(timestamp)` w onchain.py — interpolacja
+  po kotwicach halvingów (genesis/210k/420k/630k/840k) + ekstrapolacja 10min/blok +
+  normalizacja ms→s (bary MEXC w ms). Wpięte do `BudowniczyWskaznikow._dodaj_btc_onchain()`.
+  OC-06/07/08 DOSTEPNY=True — działają w backteście i live (bez sieci, deterministyczne).
+- **W-383 EXP-15 ZwiadowcaPIN** (`zwiadowcy/exp_pin.py`): PIN metodą momentów na buy/sell
+  z tick-rule OHLCV. Wysoki PIN → NEUTRAL + pewnosc_przeciwnika (tłumi rój, adverse
+  selection). Komplementarny do VPIN Z-01 i Kyle EXP-14.
+- Audyt: OC-06/07/08 dodane do NEURONY_ZALEZNE_OD_ADAPTEROW + WERYFIKACJA_ADAPTEROW
+  (dowód ożywienia przy realnym BTC_BLOCK_HEIGHT — Prawo I, wzorzec Z-06/Z-07).
+- 14 nowych testów (test_block_height_pin_scout.py): kotwice halvingów, ekstrapolacja,
+  Budowniczy wpina block height, OC-06..08 żywe, PIN scout granice.
+Liczniki: 81 neuronów (75 aktywnych) + 15 zwiadowców = 96 modułów. 1632/1632 testów, audyt exit 0.
+
+Pliki: `legiony/neurony/onchain.py` (szacuj_block_height + DOSTEPNY=True),
+`legiony/budowniczy_wskaznikow.py` (_dodaj_btc_onchain), `legiony/zwiadowcy/exp_pin.py` (NEW),
+`legiony/rejestr.py` (EXP-15), `narzedzia/audyt_spojnosci.py` (allowlist+weryfikacja),
+`tests/test_block_height_pin_scout.py` (NEW, 14), `tests/test_integracja.py` (liczniki),
+`docs/REJESTR_INSPIRACJI.md`, `docs/LOG_ZMIAN.md`, `docs/MANIFEST_KODU.md`, `docs/MAPA_KLUCZY.md`,
+`README.md`, `docs/INDEKS_IMPERIUM.md`.
+
+---
+
+## 2026-06-21 | W-374/381/382 | HRP + PIN + Engle-Granger kointegracja (pure numpy)
+
+Kontynuacja kolejki kandydatów z BIB-025..032 — wszystko pure numpy, bez scipy/sklearn:
+- **W-374 HRP** (`denoising_macierzy.py` → `hrp_wagi()`): Hierarchical Risk Parity
+  (López de Prado 2016, Jansen BIB-026). Single-linkage clustering + quasi-diagonalizacja
+  (seriation) + recursive bisection. NIE odwraca macierzy → odporna na klątwę Markowitza.
+  Dopełnia NCO (W-367). 7 testów.
+- **W-381 PIN** (`mikrostruktura.py` → `pin_metoda_momentow()`): Probability of Informed
+  Trading (Easley-O'Hara, BIB-032). Metoda momentów zamiast MLE: ε=min(buy,sell) baza
+  szumu, informed=|buy−sell|, PIN=informed/(informed+2ε). Komplementarny do VPIN Z-01. 5 testów.
+- **W-382 Engle-Granger** (`mikrostruktura.py` → `kointegracja_engle_granger()`): kointegracja
+  par (Tsay BIB-031 rozdz. 8). OLS log-log → spread; ADF na spreadzie (próg −3.4 anty-spurious).
+  z-score spreadu = sygnał stat-arb. 7 testów (skointegrowane vs spurious random walks).
+
+Nowy moduł `imperium/legiony/mikrostruktura.py`. denoising_macierzy.py + metryki_ic.py +
+mikrostruktura.py dopisane do MANIFEST (sekcja Moduły Infrastruktury).
+1618/1618 testów, audyt exit 0, ruff czysty.
+
+Pliki: `legiony/mikrostruktura.py` (NEW), `legiony/denoising_macierzy.py` (+hrp_wagi),
+`tests/test_hrp_mikrostruktura.py` (NEW, 19 testów), `docs/REJESTR_INSPIRACJI.md`,
+`docs/LOG_ZMIAN.md`, `docs/MANIFEST_KODU.md`.
+
+---
+
+## 2026-06-21 | W-376..380 + BIB-029..032 | GARCH/Kyle's Lambda/BTC halvings (INF-41..44)
+
+4 nowe książki przeanalizowane (BIB-029..032):
+- INF-41 Bashir Mastering Blockchain 2/10 → ODRZUCONA (DApp inżynierska, zero metryk tradingowych)
+- INF-42 Ammous Bitcoin Standard 3/10 → OC-06..08 deterministyczne
+- INF-43 Tsay Analysis of Financial Time Series 9/10 → EXP-13 GJR-GARCH
+- INF-44 O'Hara Market Microstructure Theory 8/10 → EXP-14 Kyle's Lambda
+
+Nowe moduły:
+- **W-376 EXP-13 ZwiadowcaGARCH** (`zwiadowcy/exp_garch.py`): GJR-GARCH(1,1) =
+  σ²_t = α₀ + (α₁+γ·I[a<0])·a²_{t-1} + β₁·σ²_{t-1}. Grid search log-likelihood
+  (pure numpy, zero scipy). HIGH_VOL/EXTREME_VOL → SHORT, LOW_VOL → LONG. 5 testów.
+- **W-377..379 OC-06..08** (onchain.py): NeuronS2F (S2F = podaż/roczna_emisja),
+  NeuronDaysToHalving (bloki_do×10min/1440), NeuronBTCSupplyInflation — wszystkie
+  deterministyczne z BTC_BLOCK_HEIGHT, zero API zewnętrznych.
+- **W-380 EXP-14 ZwiadowcaKyleLambda** (`zwiadowcy/exp_kyle_lambda.py`): Kyle's Lambda
+  OLS: λ = Δp/netflow — nachylenie regresji. Prawo XVI: mierzy |ρ(λ, Amihud)| live.
+  27 testów granic (zero wolumenu, OLS fail, bloki zerowe).
+Liczniki: 81 neuronów, 14 zwiadowców = 95 modułów. 1599/1599 testów, audyt exit 0.
+
+Pliki: `zwiadowcy/exp_garch.py` (NEW), `zwiadowcy/exp_kyle_lambda.py` (NEW),
+`neurony/onchain.py` (OC-06..08 dodane), `rejestr.py` (rejestracja),
+`tests/test_garch_kyle.py` (NEW, 27 testów), `tests/test_integracja.py` (liczniki),
+`docs/REJESTR_INSPIRACJI.md` (INF-41..44), `docs/MANIFEST_KODU.md`, `docs/MAPA_KLUCZY.md`,
+`README.md`, `docs/INDEKS_IMPERIUM.md`.
+
+---
+
+## 2026-06-21 | W-369..371 | Fundamental Law (IC/breadth/IR) — Grinold & Kahn (BIB-025..028)
+
+Nowy moduł `imperium/legiony/metryki_ic.py` (W-369..371, pure numpy):
+- **W-369 IC per-neuron** — `KolektorIC`: buforuje sygnały neuronów i zrealizowane forward
+  returny, liczy `Spearman(sygnał_t, zwrot_{t+h})` dla h∈{1,5,21}. `_spearman()` w czystym
+  numpy (rank z uśrednieniem ties). Fallback NaN gdy <min_probek, stała seria, pusta baza.
+- **W-370 Breadth** — liczba niezależnych zakładów wyliczana z ONC (W-366), fallback do
+  `len(neurony)`. Zintegrowane w `prawo_fundamentalne()`.
+- **W-371 IR decomposition** — `prawo_fundamentalne()`: IR = IC_śr · √breadth. Diagnoza
+  4-poziomowa (IC_NISKI/BREADTH_NISKI/IR_DOBRY/IR_SREDNI/IR_SLABY). Sortuje neurony wg |IC|.
+- 17 nowych testów (`test_metryki_ic.py`) — granice: NaN, stała seria, pusta baza, idealna
+  antykorelacja, ties, diagnoza IC_NISKI/IR_DOBRY, kolejność sortowania.
+
+BIB-025..028 przeanalizowane i zarejestrowane (INF-37..40):
+- INF-37 ⭐ Grinold&Kahn 9/10: Fundamental Law IR=IC·√breadth (W-369..371 wdrożone)
+- INF-38 Jansen 5/10: IC Scorer konwerguje z INF-37; HRP kandydat W-374
+- INF-39 Aldridge 4/10: Kyle's Lambda kandydat W-374b (czeka test Prawa XVI)
+- INF-40 Narang 7/10: audyt architektoniczny 8 kategorii alpha; point-in-time kandydat W-375
+ŻYCZ-15..18 zamknięte (BIB-025..028 dostarczone i przeanalizowane).
+Daty "Stan na:" zaktualizowane (MANIFEST+README → 2026-06-21).
+1572/1572 testów, audyt exit 0.
+
+Pliki: `imperium/legiony/metryki_ic.py` (NEW), `tests/test_metryki_ic.py` (NEW),
+`docs/REJESTR_INSPIRACJI.md` (INF-37..40 + wizje W-369..373 + ŻYCZ-15..18 zamknięte),
+`docs/LOG_ZMIAN.md`, `docs/MANIFEST_KODU.md` (data), `README.md` (data).
+
+---
+
+## 2026-06-20 | W-365 INTEGRACJA | Denoising wpięty w żywy przepływ synaps
+
+`KolektorKorelacjiNeuronow.korelacje_denoised()` (diagnostyka_korelacji.py) — buduje pełną
+macierz korelacji par neuronów, odszumia ją (Marchenko-Pastur, W-365) i zwraca pary w formacie
+zgodnym z `korelacje()`. Dyrygent (linia ~343) preferuje wersję ODSZUMIONĄ przy zasilaniu
+SynapsyRezimowe (flaga `denoising_korelacji=True`). Dzięki temu synapsy karzą/wzmacniają za
+SYGNAŁ, nie szum — Prawo XVI działa tam gdzie jest konsumowane. BEZPIECZNY FALLBACK do surowej:
+<2 neuronów / t<min_probek / q=T/N≤1 / seria stała (NaN). 5 testów granic (`test_kolektor_denoised.py`).
+1555/1555 testów, audyt exit 0, adversarialna recenzja czysta przed pushem.
+
+---
+
+## 2026-06-20 | W-365..368 | Denoising/Clustering macierzy (López de Prado MLAM, BIB-023)
+
+Wdrożono `imperium/legiony/denoising_macierzy.py` (czysty numpy — scipy/sklearn niedostępne):
+- **W-365 Denoising** — `denoise_macierz()` metodą Marchenko-Pastur + constant residual
+  eigenvalue. `mp_pdf()` (teoretyczna gęstość MP), `znajdz_max_eval()` (dopasowanie wariancji
+  szumu przez KDE Gaussa w czystym numpy + grid search, bo brak scipy.minimize).
+- **W-366 ONC** — `klastruj_onc()`: auto-klastrowanie na metryce `√(½(1−ρ))`, K-Means +
+  silhouette w czystym numpy, auto-dobór k przez t-stat jakości (śr/odch silhouette).
+- **W-367 NCO** — `nco_wagi()`: Nested Clustered Optimization, wagi min-wariancji odporne
+  na klątwę Markowitza (klastruj → wewnątrz → między klastrami). `_wagi_min_wariancji()` (pinv).
+- **W-368 Detoning** — `detone_macierz()`: usuwa „ton rynkowy" (n czołowych wartości własnych).
+
+16 testów (`test_denoising_macierzy.py`) z REGUŁĄ TEST-GRANIC (identyczność=szum, blok znany,
+pojedynczy element, q≤1 ValueError, n_czynnikow=0 bez zmian, determinizm seed). Zamyka lukę
+dekorelacji macierzowej z ANALIZA_HERMES_I_PAMIEC. 🚨 ODKRYCIE SPÓJNOŚCI: **W-364 (Variation
+of Information) JUŻ był w kodzie** (`diagnostyka_korelacji.py`) — agent mylił MANIFEST z kodem.
+
+---
+
+## 2026-06-20 | RESEARCH | Analiza 4 nowych książek (BIB-020/022/023/024) — 4 zwiadowców Opus
+
+Cezar wrzucił do `bibliotheca_ulpia/` 24 książki (20 starych już w rejestrze + 4 nowe pliki).
+Ekstrakcja tekstu: epub→unzip+html, pdf→pymupdf, djvu→djvutxt. 4 agentów Opus przeżyło każdą:
+
+- **BIB-020 Harris "Trading and Exchanges"** — fizyczny plik dodany, ale **książka była już
+  przeżyta w WIZJONER** (ŻYCZ-10, W-250..279, 5 wizji w kodzie: X-27/Z-03/Z-04/VR/OU). Agent
+  „odkrył" U-01 Roll = już W-264, U-03 resiliency = już W-274. **Nic nowego** (Prawo XXI: spójność).
+- **BIB-022 Kissell "Optimal Trading Strategies"** → INF-34, 4/10. IS = już W-267, impact gate =
+  już W-266/269. Jedyne ziarno: EXEC-01 (slippage zależny od płynności vs stały slippage_pct).
+- **BIB-023 López de Prado "ML for Asset Managers"** → INF-35 ⭐ 8/10 SKARB. Realnie nowe:
+  denoising (Marchenko-Pastur), Variation of Information (nieliniowa metryka), ONC, NCO, detoning.
+  Zamyka 2 luki pamięci z ANALIZA_HERMES. **→ W-364..368 zaplanowane** (VI najpierw).
+- **BIB-024 Lowe "Bitcoin for Beginners"** → INF-36 ❌ 1/10 odrzucona (niżej niż INF-31, błędy
+  merytoryczne, zero ziarna). Wizji nie przyznano (Prawo I).
+
+🚨 Prawo XV: `diagnostyka_korelacji` mierzy tylko Pearsona liniowo — redundancja nieliniowa między
+głosami niewidoczna. W-364 (Variation of Information) to zamyka. Pliki książek w `bibliotheca_ulpia/`.
+
+---
+
+## 2026-06-20 | DOC | Analiza Hermes Agent vs Pamięć Imperium + status książek
+
+`docs/ANALIZA_HERMES_I_PAMIEC.md` — odpowiedź na pytanie Cezara o pamięć absolutną „jak Hermes".
+Ustalenia (Prawo I + web research 2026-06-20): (1) „Hermes Agent" tradingowy = fabrykacja
+z rozmowy DeepSeek (już w INF-32); (2) realny Hermes Agent Nous Research istnieje — asystent
+osobisty, pamięć 5-filarowa (memory/skills/soul/crons/self-improving). Porównanie z naszymi
+8 modułami pamięci (2135 linii): wygrywamy hashem SHA-256, MAE/MFE, synapsami reżimowymi;
+luki: wyszukiwanie semantyczne, graf wiedzy, auto-lekcje, pamięć proceduralna. Status 21 książek
+BIB (esencja wyciągnięta, wdrożenie w kodzie = backlog). Plan W-360..363 + rekomendacja
+kolejnej książki (López de Prado "ML for Asset Managers"). Powód: Cezar prosił o ciągłość pamięci.
+
+---
+
+## 2026-06-20 | DOC | Manual dodawania agentów + 2 subagenci Claude Code
+
+`docs/MANUAL_DODAWANIE_AGENTOW.md` — rozróżnienie dwóch typów „agentów": Doradcy Imperium
+(moduły Python w `imperium/cesarz/doradcy/`) vs Subagenci Claude Code (`.claude/agents/*.md`).
+Krok po kroku jak dodać każdy typ — wzorzec doradcy VULCAN (audytor płynności), struktura
+subagenta z nagłówkiem YAML, kiedy który typ, zasady Prawo VII/VIII/XIX/XXI.
+Dodano 2 działające subagenty: `straznik-prawa-xxi` (kontrola spójności przed commitem),
+`hermes-audytor-danych` (audyt jakości danych, wzorowany na doradcy HERMES).
+Powód: Cezar zapytał jak dodawać narzędzia typu „Hermes agent" zgodnie z dokumentacją.
+
+---
+
+## 2026-06-20 | DOC | Manual Claude Code — instalacja i konfiguracja z Imperium
+
+`docs/MANUAL_CLAUDE_CODE.md` — kompletny przewodnik instalacji Claude Code na laptopie:
+Node.js, npm install claude-code, logowanie Pro, pierwsze uruchomienie z Imperium,
+automatyki (hook SessionStart, uprawnienia, tryb autonomiczny), MCP GitHub i Filesystem,
+klucze API (Prawo V), codzienna praca (komendy, skróty, Plan Mode), tabela problemów.
+Powód: Cezar ma już repo na laptopie, chce uruchamiać Claude Code lokalnie z pełną integracją.
+
+---
+
+## 2026-06-20 | DOC | Manual Użytkownika — pełna instrukcja dla nowicjusza
+
+`docs/MANUAL_UZYTKOWNIKA.md` — kompletny przewodnik krok po kroku: instalacja od zera
+(Windows/Mac/Linux), pierwsze uruchomienie, wszystkie tryby (paper/dry-run/real), panel
+webowy, TradingView+ngrok krok po kroku, wszystkie opcje KonfigPetliLive, wszystkie komendy,
+klucze API (bezpieczeństwo), narzędzia AFML (W-355..W-359), tabela problemów i rozwiązań.
+Powód: Cezar (nowicjusz, ZPO) poprosił o pełny manual obsługi.
+
+---
+
 ## 2026-06-20 | W-355..W-359 | AFML (López de Prado) — 5 modułów z "Advances in Financial ML"
 
 **Źródło:** Lektura i analiza książki "Advances in Financial Machine Learning" (INF-34),

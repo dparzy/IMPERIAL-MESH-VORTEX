@@ -5,18 +5,19 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-18 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 78 neuronów (zarejestrowane w roju) + 12 zwiadowców = **90 modułów w kodzie**
+**Stan na:** 2026-06-21 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Zaimplementowane:** 81 neuronów (zarejestrowane w roju) + 15 zwiadowców = **96 modułów w kodzie**
 **Meta-warstwy (B):** 2 moduły (`neutralizacja.py` B-02, `meta_labeling.py` B-01) — warstwa NAD Legatusem, nie neurony
-**Aktywne / wyciszone:** 72 aktywnych + 4 wyciszone, z czego:
+**Aktywne / wyciszone:** 75 aktywnych + 6 wyciszonych, z czego:
   • **53 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S/C/D/R) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, N-02 FracDiff, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top, CP-01 CUSUM, BOCPD-01 Bayesian change-point, C-01 Cross-sectional RS)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
   • **3 SMC aktywne** (SMC-01/02/03, `DOSTEPNY=True`) — liczą z barów przez most EXP-05, **bez żadnego API** (abstynują w backteście bez EXP-05)
   • **4 wymaga ZEWNĘTRZNEGO API on-chain** (OC-01..04) — Glassnode/CryptoQuant (Faza D)
-**Elitarne (Prawo XX):** 15 (3 neurony + 12 zwiadowców)
-**W katalogu:** 299 neuronów + 12 zwiadowców = **311 zaplanowanych**
-**Do wdrożenia:** 243 neuronów
+  • **3 deterministyczne on-chain AKTYWNE** (OC-06..08) — BTC_BLOCK_HEIGHT szacowany z timestampu baru (interpolacja po halvingach, bez sieci, W-377..379)
+**Elitarne (Prawo XX):** 18 (3 neurony + 15 zwiadowców)
+**W katalogu:** 299 neuronów + 15 zwiadowców = **314 zaplanowanych**
+**Do wdrożenia:** 240 neuronów
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
@@ -26,7 +27,7 @@
 
 ---
 
-## 🔬 ZWIADOWCY EXPLORATORES (12/12 w kodzie) — wszyscy 🎖️ elitarni (E1)
+## 🔬 ZWIADOWCY EXPLORATORES (15/15 w kodzie) — wszyscy 🎖️ elitarni (E1)
 
 > **Prawo XX:** każdy Exploratores = ELITARNY=True z definicji klasy (kryterium E1 — własna matematyka poza Bramą).
 
@@ -44,6 +45,9 @@
 | EXP-10 🎖️ | ZwiadowcaDisplacement | `zwiadowcy/exp_displacement.py` | S | ✅ aktywny | Structural Displacement (IMV-ADO 🔱, E1+E5) |
 | EXP-11 🎖️ | ZwiadowcaDynamic | `zwiadowcy/exp_dynamic.py` | M | ✅ aktywny | Dynamic Pro + spread guard (IMV-ADO 🔱, E1+E5) |
 | EXP-12 🎖️ | ZwiadowcaAtmabhan | `zwiadowcy/exp_atmabhan.py` | F | 🔇 wyciszony (L2 feed) | AP-Mode microstructure (IMV-ADO 🔱, E1+E5) |
+| EXP-13 🎖️ | ZwiadowcaGARCH | `zwiadowcy/exp_garch.py` | V | ✅ aktywny (OHLCV) | GJR-GARCH(1,1) zmienność warunkowa (W-376, Tsay BIB-031, E1) |
+| EXP-14 🎖️ | ZwiadowcaKyleLambda | `zwiadowcy/exp_kyle_lambda.py` | L | ✅ aktywny (OHLCV) | Kyle's Lambda price impact OLS (W-380, O'Hara BIB-032, E1) |
+| EXP-15 🎖️ | ZwiadowcaPIN | `zwiadowcy/exp_pin.py` | L | ✅ aktywny (OHLCV) | PIN informed trading metodą momentów (W-383, O'Hara BIB-032, E1) |
 
 ---
 
@@ -66,7 +70,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (78/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (81/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -169,6 +173,9 @@
 | OC-03 | NeuronPuellMultiple | O | 7 | 🔇 wyciszony (API on-chain) | PUELL_MULTIPLE | — |
 | OC-04 | NeuronExchangeNetflow | O | 8 | 🔇 wyciszony (API on-chain) | EXCHANGE_NETFLOW | — |
 | OC-05 | NeuronWashTrading | O | 8 | ✅ aktywny (OHLCV) | WASH_SCORE_100 | W-061 |
+| OC-06 | NeuronS2F | O | 6 | ✅ aktywny (block z timestampu) | BTC_S2F | W-377 |
+| OC-07 | NeuronDaysToHalving | O | 7 | ✅ aktywny (block z timestampu) | BTC_DAYS_TO_HALVING | W-378 |
+| OC-08 | NeuronBTCSupplyInflation | O | 5 | ✅ aktywny (block z timestampu) | BTC_SUPPLY_INFLATION_PCT | W-379 |
 
 ### Plik: `neurony/straz.py` (Dywizja Anty-Manipulacji — KAT A)
 
@@ -317,6 +324,9 @@
 | GeneralLegatus | `legiony/legatus.py` | ✅ aktywny |
 | MasterSwitchOnline (master-switch Faza 2 — wagi głosujących VR/HL/AR1 uczone Hedge/MWU) | `legiony/legatus.py` | ✅ aktywny |
 | DiagnostykaKorelacji | `legiony/diagnostyka_korelacji.py` | ✅ aktywny |
+| DenoisingMacierzy (W-365..368 denoising/ONC/NCO/detoning + **W-374 HRP**, López de Prado BIB-023/INF-35, Jansen BIB-026/INF-38) | `legiony/denoising_macierzy.py` | ✅ aktywny |
+| MetrykiIC (W-369..371 IC per-neuron + breadth + Fundamental Law IR=IC·√breadth, Grinold&Kahn BIB-025/INF-37) | `legiony/metryki_ic.py` | ✅ aktywny |
+| Mikrostruktura (W-381 PIN metodą momentów + W-382 Engle-Granger kointegracja par, O'Hara BIB-032/INF-44, Tsay BIB-031/INF-43) | `legiony/mikrostruktura.py` | ✅ aktywny |
 | Igrzyska / Koloseum | `koloseum/` | ✅ aktywny |
 | BramaKalkulatora | `fundament/brama_kalkulatora.py` | ✅ aktywny |
 | KalkulatorLewara | `pretorianie/kalkulator_lewara.py` | ✅ aktywny |

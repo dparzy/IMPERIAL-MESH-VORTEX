@@ -231,6 +231,104 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 
 | INF-33 | "High Win Rate Day Trading Setups" — autor anonimowy (self-published, 2023) | brak ISBN (BIB-021), plik .azw3 dostarczony 2026-06-19 (~35 kB tekstu) | ⚠️ NISKA 3/10 (Prawo I). Detaliczny katalog 9 skryptów-wskaźników TradingView community (UT Bot, HalfTrend, AlphaTrend, KDJ Whale Pump, Bjorgum MTF MA, Gaussian Loxx, TTF, Reversal Finder, Zero-Lag MACD) + 7 mechanicznych strategii scalp/mean-rev (BB+UT, MFI+HMA, RSI(5)+BB+ADX, Pivot+Williams%R…). **Zero backtestów, "70%+ win rate" bez dowodu** (nie powtarzamy jako fakt). ~80% pokrywa się z rojem (BB X-04, RSI X-01, Williams%R X-06, HMA X-10, ADX XII-01, Choppiness V-14, Supertrend XII-04≈AlphaTrend/HalfTrend). MFI już skatalogowany w INF-18 (BIB-006, W-101..W-106). **Jedyne realne ziarno: Kaufman Efficiency Ratio** (rdzeń KAMA) — zainspirował odkrycie martwego wejścia: doradca Fulmen używał `kaufman_er>0.6` jako 1 z 3 warunków TRENDU, ale Budowniczy nigdy go nie liczył (stały default 0.5 = martwy głos, Prawo XV). **→ W-353 WDROŻONE:** `KAUFMAN_ER` w Bramie + `KAUFMAN_ER_10` w Budowniczym + wpięcie w Dyrygenta. Reszta = referencja | ✅ W-353 (Kaufman ER) wdrożone |
 
+| INF-34 | "Optimal Trading Strategies" — Robert Kissell & Morton Glantz (2003) | (BIB-022, plik .djvu dostarczony 2026-06-20, 783k znaków OCR) | ⚠️ 4/10 dla bota crypto. Kanon Transaction Cost Analysis (TCA) i optymalnej egzekucji (Almgren-Chriss). **W ~80% nieadekwatne dla małego kapitału** — market impact ma sens tylko gdy zlecenie to znaczący % wolumenu; przy małym kapitale na płynnych parach MEXC impact znikomy (sam Kissell definiuje impact = f(rozmiar/wolumen)). **Esencja:** Implementation Shortfall (IS = cena_realizacji − cena_decyzji), market impact temporary vs permanent, Trader's Dilemma (impact vs timing risk), VWAP/TWAP/POV, efficient trading frontier. **NAKŁADKA (Prawo XVI):** IS = **już W-267** (Perold, z BIB-020); market-impact gate = **już W-266/W-269** (BIB-020). **Jedyne realnie nowe ziarno: EXEC-01** — slippage zależny od płynności (`k·σ·√(rozmiar/ADV)+spread/2`) zamiast stałego `slippage_pct` (🚨 Prawo XV: stały slippage = utrata potencjału). Reszta = potwierdza kierunek BIB-020, nie dodaje | ⚠️ EXEC-01 kandydat; reszta = duplikat W-266/267/269 |
+
+| INF-35 ⭐ | "Machine Learning for Asset Managers" — Marcos López de Prado (2020) | ISBN 978-1108792899 (BIB-023, .pdf dostarczony 2026-06-20, 152 str.) | ✅ **8/10 — SKARB, ten sam autor co BIB-007.** Krótka, gęsta, każdy rozdz. ma snippet Python. **Celuje wprost w nasze 2 udokumentowane luki** (ANALIZA_HERMES: brak wyszukiwania podobieństwa + brak dekorelacji macierzowej). Nasze neurony = "aktywa", macierz korelacji ich głosów = problem który ta książka rozwiązuje. **NOWE vs BIB-007:** (1) **Denoising** macierzy kowariancji (Marchenko-Pastur + KDE) — bije Ledoit-Wolf shrinkage; (2) **Detoning** (usuń ton rynkowy); (3) **Distance metrics** — korelacja NIE jest metryką; **Variation of Information** `VI=H[X]+H[Y]−2I[X,Y]` łapie zależności NIELINIOWE (uogólnienie Pearsona); (4) **ONC** (Optimal Number of Clusters, K-Means+silhouette); (5) **NCO/HRP** (Nested Clustered Optimization, RMSE −47-55% vs Markowitz); (6) feature importance NA KLASTRACH. **JUŻ MAMY (nie powielać):** triple-barrier/CUSUM/purged-kfold/bet-sizing (W-355..359), Deflated Sharpe+PBO+CSCV (W-282, `koloseum/walidacja.py`). 🚨 **Prawo XV:** `diagnostyka_korelacji` mierzy TYLKO Pearsona liniowo → redundancja nieliniowa między głosami dziś niewidoczna. **→ Wizje W-364..W-368** (patrz niżej) | ✅ esencja; W-364..368 zaplanowane |
+
+| INF-36 | "Bitcoin and Cryptocurrency Trading for Beginners" — Lowe | (BIB-024, .epub dostarczony 2026-06-20, 191k znaków) | ❌ **ODRZUCONA 1/10 — niżej niż INF-31.** Poradnik życiowy "jak nie zgubić hasła" z TA doklejonym na kilka stron (~60% to bezpieczeństwo haseł, historia Satoshiego, opisy giełd, NFT). "10 strategii" = redundancja nazewnicza (Strategy 5="Buy the Dip", 8="Hedging again"), zero progów/reguł. **Błędy merytoryczne:** odwrócony opis korpusu świecy japońskiej, "strategie działają nawet gdy BTC spada do zera". Datowana (BTC "$8000", era ICO). **Zero ziarna** (jedyny kandydat OBV/dywergencje już w roju, bez formuł). **Wizji NIE przyznano** (Prawo I, jak INF-31) | ❌ odrzucona, archiwum |
+
+
+| INF-37 ⭐ | "Active Portfolio Management" (+ "Advances in Active Portfolio Management") — Grinold & Kahn | (BIB-025, .pdf dostarczony 2026-06-21, 477 str.) | ✅ **9/10 — FUNDAMENT QUANT.** Prawo Fundamentalne Aktywnego Zarządzania: **IR = IC · √breadth = TC · IC · √BR**. IC = Spearman(sygnał_neuronu_t, zwrot_{t+h}) ∈ [−1,1], zdrowe IC ≤ 0.2. Breadth = liczba niezależnych zakładów (≈ klastry ONC). TC = Transfer Coefficient = corr(idealny_portfel, portfel_po_ograniczeniach). Alpha = vol · IC · score. **Dlaczego krytyczne dla Imperium:** po raz pierwszy mamy matematyczny dowód, że rój 78 neuronów jest lepszy od 1 — ale tylko gdy sygnały są NIEZALEŻNE (breadth). Prawo XVI + W-366 ONC = ten sam warunek. Nasze neurony = "strategie alpha", IC = miara ich kalibracji. **Zidentyfikowane luki:** (1) brak IC per-neuron, (2) brak IR roju, (3) TC niezmierzony. **→ W-369..373** | ✅ W-369 (IC), W-370 (breadth), W-371 (IR) wdrożone 2026-06-21 |
+
+| INF-38 | "Machine Learning for Algorithmic Trading" (2nd ed.) — Stefan Jansen | (BIB-026, .mobi dostarczony 2026-06-21, 1254 str., 1.63M znaków) | ⚠️ **5/10 — WZORZEC INŻYNIERSKI ale nie nasz stos.** ~100% sklearn/torch/zipline — niedostępne w produkcji. **Jedyne numpy-feasible ziarno:** (1) **IC Scorer** = `rank_ic = spearman(sygnał_t, zwrot_{t+h})` — konwerguje z INF-37! Potwierdza że IC jest branżowym standardem; (2) **HRP Allocator** = hierarchical risk parity w numpy (kandydat W-374). **Architektura ML:** Jansen oddziela "feature engineering" (sygnały) od "ML model" (wagi) — odwzorowuje nasz podział neuron/Senat. Potwierdza: ML należy do WAŻENIA sygnałów (warstwa Senatu), NIE do generowania. | ⚠️ IC Scorer = nakładka na INF-37; ✅ HRP W-374 wdrożone (denoising_macierzy.hrp_wagi) |
+
+| INF-39 | "High-Frequency Trading: A Practical Guide" (2nd ed.) — Irene Aldridge | (BIB-027, .pdf dostarczony 2026-06-21, 299 str.) | ⚠️ **4/10 — HFT infrastruktura niedostępna.** ~80% = colocation, order book L2 w μs, FPGA, dark pools — nieadekwatne dla MEXC REST/WS małego kapitału. **Realne ziarno:** (1) **Kyle's Lambda** `λ = Δp/Δv` — miara Impact/Likiditiness; lekki kandydat gdy mamy ticker+volume; (2) potwierdza Z-01/Z-03/Z-04/Z-06/RADAR. **Prawo XVI nakazuje:** zmierzyć korelację Kyle's Lambda vs Z-06 Amihud zanim wdrożymy — jeśli |ρ|>0.8 = redundancja, odpuść. | ⚠️ Kyle's Lambda = kandydat W-374b po teście Prawa XVI |
+
+| INF-40 | "Inside the Black Box: A Simple Guide to Systematic Investing" (2nd ed.) — Rishi Narang | (BIB-028, .epub dostarczony 2026-06-21, ~350 str.) | ✅ **7/10 — AUDYT ARCHITEKTONICZNY.** 8 kategorii alpha (trend/mean-rev/technical-sentiment/value/growth/supply-demand/quality/tactical) = mapa audytu roju: mamy trend ✅, mean-rev ✅, brak quality ⚠️, brak supply-demand ⚠️ (OI/futures basis). **ML teza:** ML należy do WAŻENIA sygnałów (potwierdza INF-38). **3 krytyczne insighty:** (1) **Point-in-time data** — dane historyczne muszą odzwierciedlać co WTEDY było dostępne; (2) **Parameter plateau** — nie wybieraj lokalnego max Sharpe, wybieraj płaskowyż odporny na perturbacje (Punkt B); (3) **Transaction cost model** — nasz stały `slippage_pct` = zbyt prosty (konwerguje z INF-34 EXEC-01). **Architektura:** Alpha→Risk→Execution→Data = odzwierciedla Imperium. | ✅ audyt kategorii alpha; W-375 (point-in-time) kandydat |
+
+> **📗 BIB-020 (Harris "Trading and Exchanges") — UWAGA SPÓJNOŚCI:** fizyczny plik epub dodano 2026-06-20,
+> ale **książka była już w pełni przeżyta** w `docs/WIZJONER.md` (ŻYCZ-10, 9/10, pula wizji W-250..W-279,
+> dekorelacja zmierzona `narzedzia/pomiar_dekorelacji_bib020.py`). **5 wizji JUŻ W KODZIE:** X-27 (W-273),
+> Z-03 (W-278), Z-04 (W-279), VARIANCE_RATIO (W-263), OU_HALFLIFE (W-274). Nie ma osobnego wpisu INF —
+> jego dom to WIZJONER (większa pula niż mieści tabela INF). To wyjaśnia lukę numeracji BIB-020 w tabeli.
+
+---
+
+## 🔟 WIZJE BIB-023 (López de Prado ML for Asset Managers) — W-364..W-368
+
+> Zamykają 2 luki pamięci z `ANALIZA_HERMES_I_PAMIEC.md`. Kolejność kumulatywna (Prawo VII).
+
+| Wizja | Opis | Cel / moduł | Status |
+|---|---|---|---|
+| **W-364** ⭐ | **Variation of Information** — nieliniowa miara podobieństwa głosów neuronów (`VI=H[X]+H[Y]−2I[X,Y]`). Łapie redundancję nieliniową (dwa głosy ρ≈0 ale wysokie I[X,Y]). | `diagnostyka_korelacji.py` | ✅ **JUŻ BYŁO** — `variation_of_information()`, `informacja_wzajemna()`, `nmi()`, `raport_informacji_wzajemnej()` + testy `test_informacja_wzajemna.py` (odkrycie spójności 2026-06-20: agent mylił MANIFEST z kodem) |
+| **W-365** | **Denoising macierzy korelacji** (Marchenko-Pastur + KDE) — odszum macierz ZANIM policzymy dekorelację. Wartości własne ≤ λ⁺ = szum → constant residual eigenvalue. | `denoising_macierzy.py` | ✅ **WDROŻONE + WPIĘTE** 2026-06-20 — `denoise_macierz()`, `mp_pdf()`, `znajdz_max_eval()`; **WPIĘTE w żywy przepływ:** `KolektorKorelacjiNeuronow.korelacje_denoised()` → Dyrygent zasila SynapsyRezimowe odszumioną macierzą (flaga `denoising_korelacji`, bezpieczny fallback) |
+| **W-366** | **ONC clustering** — auto-grupowanie skorelowanych neuronów (K-Means na metryce `√(½(1−ρ))` + silhouette, auto-k). | `denoising_macierzy.py` | ✅ **WDROŻONE** 2026-06-20 — `klastruj_onc()` (K-Means+silhouette w czystym numpy) |
+| **W-367** | **NCO wag neuronów** — podnosi alokację do poziomu macierzowego: klastruj → alokuj wewnątrz/między klastrami (odporne na klątwę Markowitza). | `denoising_macierzy.py` | ✅ **WDROŻONE** 2026-06-20 — `nco_wagi()`, `_wagi_min_wariancji()` |
+| **W-368** | **Detoning** — usuń „ton rynkowy" (dominujący czynnik wspólny) przed klastrowaniem → wzmacnia zdekorelowane głosy. | `denoising_macierzy.py` | ✅ **WDROŻONE** 2026-06-20 — `detone_macierz()` |
+
+---
+
+
+---
+
+## 📚 BIB-029..032 (Blockchain/TimeSeries/Microstructure) — INF-41..44
+
+| Nr | Książka | Ocena | Werdykt | Wdrożone |
+|---|---|---|---|---|
+| **INF-41** ❌ | Bashir — "Mastering Blockchain" (4th ed., BIB-029) | **2/10** | Podręcznik DApp/Solidity/DeFi — zero on-chain analytics (brak MVRV/SOPR/NVT/NUPL/Glassnode). Jedyne ziarno: Health Factor `HF=Σ(col·thr)/debt` i AMM `x·y=k` — architektura DEX, nie sygnały. Wizji NIE przyznano. | — |
+| **INF-42** | Ammous — "The Bitcoin Standard" (BIB-030) | **3/10** | Ekonomia austriacka, nie trading. 95% filozofia monetarna. Jedyne numpy-feasible: 3 deterministyczne neurony z block_height — S2F, DAYS_TO_HALVING, SUPPLY_INFLATION. Stock-to-Flow opisany konceptualnie (bez formuły predykcyjnej — model Plan B 2019 to osobny artykuł). | ✅ OC-06/07/08 wdrożone (W-377..379) |
+| **INF-43** ⭐ | Tsay — "Analysis of Financial Time Series" (3rd ed., BIB-031) | **9/10** | SKARB. Kompletny podręcznik szeregów finansowych. GARCH(1,1) rekurencja Bollersleva = zwykła pętla numpy (bez scipy). GJR-GARCH, EGARCH, VAR/VECM, Markov-Switching. Zamknął martwą wizję W-126. | ✅ EXP-13 GJR-GARCH(1,1) wdrożony (W-376) |
+| **INF-44** | O'Hara — "Market Microstructure Theory" (BIB-032) | **8/10** | Fundament teorii VPIN/PIN/Kyle's Lambda. Kyle λ = OLS nachylenie Δp∼netflow. PIN metodą momentów (numpy.linalg.solve — bez scipy). Glosten-Harris decomposition: spread = transakcyjny + adverse selection. Poprawa VPIN: ważenie wolumenem. | ✅ EXP-14 Kyle's Lambda wdrożony (W-380) |
+
+
+---
+
+## 🔟 WIZJE BIB-031/032 (Tsay + O'Hara) — W-381/382 + HRP W-374
+
+| Wizja | Opis | Moduł | Status |
+|---|---|---|---|
+| **W-374** | **HRP — Hierarchical Risk Parity** (López de Prado 2016, Jansen BIB-026). Alokacja z dendrogramu: odległość √(½(1−ρ)) → single-linkage → quasi-diagonalizacja → recursive bisection. NIE odwraca macierzy → odporna na klątwę Markowitza. Dopełnia NCO (W-367). | `denoising_macierzy.py` → `hrp_wagi()` | ✅ **WDROŻONE** 2026-06-21 — single-linkage + seriation + bisection w pure numpy. 7 testów (sumują do 1, dodatnie, preferuje niską wariancję). |
+| **W-381** | **PIN — Probability of Informed Trading** (Easley-O'Hara, BIB-032). Procent transakcji od inwestorów Z INFORMACJĄ. Metoda momentów: ε=min(buy,sell) baza szumu, informed=\|buy−sell\| asymetria, PIN=informed/(informed+2ε). Komplementarny do VPIN (Z-01: imbalance vs PIN: proporcja). | `mikrostruktura.py` → `pin_metoda_momentow()` | ✅ **WDROŻONE** 2026-06-21 — bez scipy (metoda momentów). 5 testów granic. |
+| **W-382** | **Engle-Granger kointegracja par** (Tsay BIB-031 rozdz. 8). Dwustopniowo: OLS log(a)∼log(b) → spread; ADF na spreadzie. Skointegrowane → z-score spreadu = sygnał stat-arb (z<−2 LONG a/SHORT b). Próg ADF −3.4 (anty-spurious). | `mikrostruktura.py` → `kointegracja_engle_granger()` | ✅ **WDROŻONE** 2026-06-21 — Engle-Granger + ADF w pure numpy. 7 testów (skointegrowane vs spurious random walks). |
+
+| **W-377..379 obudzenie** | OC-06/07/08 **OŻYWIONE** — `BTC_BLOCK_HEIGHT` szacowany z timestampu baru (interpolacja po kotwicach halvingów, normalizacja ms→s, bez sieci). 3 martwe głosy → aktywne (Prawo XV). | `budowniczy_wskaznikow._dodaj_btc_onchain()` + `onchain.szacuj_block_height()` | ✅ **WDROŻONE** 2026-06-21 — działa w backteście i live. 14 testów. |
+| **W-383** | **EXP-15 PIN scout** — wpięcie W-381 PIN do roju jako zwiadowca. Buy/sell z tick-rule OHLCV → PIN metodą momentów. Wysoki PIN → tłumi rój (pewnosc_przeciwnika). Komplementarny do VPIN Z-01 + Kyle EXP-14. | `zwiadowcy/exp_pin.py` | ✅ **WDROŻONE** 2026-06-21 — 5 testów granic. |
+
+> **Uwaga (Prawo XVI):** W-381 PIN i W-382 kointegracja to BIBLIOTEKI (funkcje), nie neurony —
+> czekają na wpięcie jako zwiadowcy/sygnały gdy pętla portfelowa dostarczy dane par + aggTrades.
+> HRP (W-374) dostępne dla alokacji wag w Senacie obok NCO (W-367).
+
+---
+
+## 🔟 WIZJE BIB-025 (Grinold & Kahn — Fundamental Law) — W-369..373
+
+> Zamykają lukę kalibracji sygnałów: mierzymy jakość każdego neuronu indywidualnie (IC) oraz roju (IR).
+
+| Wizja | Opis | Cel / moduł | Status |
+|---|---|---|---|
+| **W-369** ⭐ | **IC per-neuron** — Information Coefficient = `Spearman(sygnał_t, zwrot_{t+h})` dla h∈{1,5,21}. Miara kalibracji sygnału: IC=0 = losowy, IC=0.1 = dobry, IC>0.2 = podejrzany (overfitting). | `metryki_ic.py` → `KolektorIC` | ✅ **WDROŻONE** 2026-06-21 — `KolektorIC`, `_spearman()`, testy granic (NaN, stała seria, pusta baza). 17 testów zielone. |
+| **W-370** | **Breadth** — liczba niezależnych zakładów = `len(klastruj_onc(corr_denoised).klastry)`. Wykorzystuje W-366 ONC bezpośrednio. | `metryki_ic.py` → `prawo_fundamentalne()` | ✅ **WDROŻONE** 2026-06-21 — `prawo_fundamentalne()` wylicza breadth z ONC lub fallback do `len(neurony)`. |
+| **W-371** | **IR roju** = `IC_śr · √breadth`. Rozkłada słaby IR na dwa pytania: "mamy IC?" vs "mamy breadth?". Diagnostyka: IC_NISKI / BREADTH_NISKI / IR_DOBRY / IR_SREDNI / IR_SLABY. | `metryki_ic.py` → `prawo_fundamentalne()` | ✅ **WDROŻONE** 2026-06-21 — pełny raport z diagnozą. Sortowanie neuronów wg |IC| malejąco. |
+| **W-372** | **Alpha kalibrowany** = `vol · IC · score` — przelicza surowe sygnały na spodziewane zwroty w %. Wymaga stabilnego IC (≥60 obserwacji). | `metryki_ic.py` | 🔵 PLANOWANE — Faza 2 (po zebraniu danych produkcyjnych) |
+| **W-373** | **Transfer Coefficient** = `corr(idealny_portfel_alpha, portfel_po_ograniczeniach)` — mierzy ile alpha tracimy przez ograniczenia (min_notional, size_cap). | `metryki_ic.py` | 🔵 PLANOWANE — Faza 2 (backtest diagnostic) |
+
+
+## 📖 NASTĘPNE KSIĄŻKI — lista życzeń (ŻYCZ, do wrzucenia do `bibliotheca_ulpia/`)
+
+> Rekomendacje pod nasze udokumentowane luki — NIE powielać tego co mamy (Prawo VIII/XVI).
+> Wrzuć plik epub/pdf/azw3, nazwij `BIB-0XX_Autor_Tytul.ext`, napisz „masz nową książkę".
+
+| ŻYCZ | Książka | Po co (luka którą zamyka) | Priorytet |
+|---|---|---|---|
+| **ŻYCZ-15** ✅ | Grinold & Kahn — "Active Portfolio Management" | **DOSTARCZONA** jako BIB-025. Wizje W-369..371 wdrożone (IC/breadth/IR). → INF-37 ⭐ | ✅ BIB-025 |
+| **ŻYCZ-16** ✅ | Rishi Narang — "Inside the Black Box" | **DOSTARCZONA** jako BIB-028. Audyt architektoniczny ukończony. → INF-40 | ✅ BIB-028 |
+| **ŻYCZ-17** ✅ | Irene Aldridge — "High-Frequency Trading" | **DOSTARCZONA** jako BIB-027. Kyle's Lambda = kandydat W-374b (czeka test Prawa XVI). → INF-39 | ✅ BIB-027 |
+| **ŻYCZ-18** ✅ | Stefan Jansen — "Machine Learning for Algorithmic Trading" | **DOSTARCZONA** jako BIB-026. IC Scorer konwerguje z INF-37; HRP = kandydat W-374. → INF-38 | ✅ BIB-026 |
+
+> **Po co BIB-020 Harris jest już „domknięty":** patrz nota spójności wyżej (WIZJONER, W-250..279).
+
+---
+
 > **Pełna lista (~220 narzędzi):** `docs/ARSENAL_IMPERIUM.md` — schemat architektoniczny + tabele weryfikacyjne.
 
 ---

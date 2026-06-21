@@ -383,6 +383,53 @@ class KolektorKorelacjiNeuronow:
                     wynik[(a, b)] = round(kor, 4)
         return wynik
 
+    def korelacje_denoised(self, bwidth: float = 0.25) -> Dict[Tuple[str, str], float]:
+        """
+        🧬 W-365 | Macierz korelacji par neuronów PO denoisingu Marchenko-Pastur.
+
+        Buduje pełną macierz korelacji z zebranych serii, odszumia ją (constant residual
+        eigenvalue — `denoising_macierzy.denoise_macierz`) i zwraca pary w formacie
+        zgodnym z `korelacje()`. Dzięki temu SynapsyRezimowe karzą/wzmacniają na podstawie
+        SYGNAŁU (struktura), nie szumu — podnosi jakość Prawa XVI tam, gdzie jest konsumowana.
+
+        BEZPIECZNY FALLBACK (Prawo I — nie udawaj wiedzy): zwraca surową `korelacje()` gdy:
+        - <2 neuronów, lub
+        - za mało wspólnych próbek (t < min_probek), lub
+        - q = T/N ≤ 1 (za mało obserwacji na zmienną — MP niezdefiniowane), lub
+        - którakolwiek seria stała (NaN w corrcoef).
+        Denoising aktywuje się dopiero gdy danych jest dość, by był wiarygodny.
+        """
+        klucze = sorted(self._serie)
+        n = len(klucze)
+        if n < 2:
+            return {}
+        t = min(len(self._serie[k]) for k in klucze)
+        if t < self.min_probek:
+            return self.korelacje()
+        q = t / n
+        if q <= 1:
+            return self.korelacje()  # za mało obserwacji na zmienną — MP niezdefiniowane
+
+        import numpy as np
+        M = np.array([list(self._serie[k])[-t:] for k in klucze], dtype=float)
+        with np.errstate(invalid="ignore", divide="ignore"):
+            corr = np.corrcoef(M)
+        if not np.all(np.isfinite(corr)):
+            return self.korelacje()  # stała seria → NaN → fallback do surowej
+
+        from imperium.legiony.denoising_macierzy import denoise_macierz
+        try:
+            cd = denoise_macierz(corr, q=q, bwidth=bwidth)["corr_denoised"]
+        except Exception as e:
+            logger.error(f"[Kolektor] denoising padł, fallback do surowej: {e}")
+            return self.korelacje()
+
+        wynik: Dict[Tuple[str, str], float] = {}
+        for i in range(n):
+            for j in range(i + 1, n):
+                wynik[(klucze[i], klucze[j])] = round(float(cd[i, j]), 4)
+        return wynik
+
     def liczba_krokow(self) -> int:
         """Ile kroków zebrano dla najdłuższej serii (diagnostyka)."""
         return max((len(d) for d in self._serie.values()), default=0)

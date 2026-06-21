@@ -159,8 +159,25 @@ class BudowniczyWskaznikow:
         self._dodaj_mtf(bary, w)
         self._dodaj_volume_profile(serie, w)
         self._dodaj_pi_cycle(serie, w)
+        self._dodaj_btc_onchain(w)
 
         return w
+
+    def _dodaj_btc_onchain(self, w):
+        """
+        BTC_BLOCK_HEIGHT oszacowany z timestampu baru (W-377..379, OC-06..08).
+        Deterministyczne — interpolacja po halvingach, bez sieci (działa w backteście).
+        """
+        ts = w.get("TIMESTAMP")
+        if ts is None:
+            w["BTC_BLOCK_HEIGHT"] = None
+            return
+        try:
+            from imperium.legiony.neurony.onchain import szacuj_block_height
+            w["BTC_BLOCK_HEIGHT"] = szacuj_block_height(float(ts))
+        except Exception as e:
+            logger.debug(f"[Budowniczy] BTC_BLOCK_HEIGHT pominięty: {e}")
+            w["BTC_BLOCK_HEIGHT"] = None
 
     def _dodaj_sesje_azja(self, bary, w):
         """

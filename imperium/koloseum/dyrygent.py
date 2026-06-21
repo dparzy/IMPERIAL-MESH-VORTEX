@@ -125,6 +125,10 @@ class Dyrygent:
         # W-305: kolektor korelacji par neuronów — domyka dekorelację SynapsyRezimowych
         # (Prawo XVI). Tworzony leniwie gdy legatus.synapsy aktywny. None = bez korelacji.
         self._kolektor_korelacji: Optional[Any] = None
+        # W-365: denoising macierzy korelacji (Marchenko-Pastur) przed zasileniem synaps.
+        # True = synapsy widzą korelacje ODSZUMIONE (sygnał, nie szum). Bezpieczny fallback
+        # do surowej gdy za mało danych (q≤1 / t<min_probek) — patrz korelacje_denoised().
+        self.denoising_korelacji: bool = True
         # W-307 Igrzyska: batch-style ranking neuronów z wyników trade'ów (W-002).
         # Komplementarne do online HedgeMWU — kumulatywne statystyki (accuracy/stability)
         # zamiast eksponencjalnego zapomnienia. None = wyłączone (domyślnie, opt-in).
@@ -335,7 +339,12 @@ class Dyrygent:
         # (bez lookahead — bieżący głos rejestrujemy dopiero po fokus()). Domyka
         # dekorelację Prawa XVI: pary niezależne wzmacniane mocniej niż skorelowane.
         if self.legatus.synapsy is not None and self._kolektor_korelacji is not None:
-            self.legatus.synapsy.ustaw_korelacje(self._kolektor_korelacji.korelacje())
+            # W-365: preferuj korelacje ODSZUMIONE (Marchenko-Pastur) — synapsy karzą
+            # za SYGNAŁ, nie szum. Metoda sama spada do surowej gdy za mało danych.
+            kor = (self._kolektor_korelacji.korelacje_denoised()
+                   if getattr(self, "denoising_korelacji", True)
+                   else self._kolektor_korelacji.korelacje())
+            self.legatus.synapsy.ustaw_korelacje(kor)
         raport = self.legatus.fokus(symbol, wskazniki, rezim=rezim, bary=bary)
         # Zarejestruj bieżący wektor głosów neuronów do kolektora korelacji (po decyzji).
         if self.legatus.synapsy is not None and raport.sygnaly:

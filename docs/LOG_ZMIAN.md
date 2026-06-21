@@ -6,6 +6,52 @@
 
 ---
 
+## 2026-06-21 | W-384 | A/B MTF PER REŻIM — brama pomaga TYLKO w bessie, szkodzi w hossie/range
+
+Po obaleniu na 6-mies. oknie: re-test na WIELOREŻIMOWEJ historii (paginacja). Hipoteza
+Cezara warunkowa: brama pomaga w TRENDZIE, szkodzi w RANGE. Test rozbity na 4 reżimy.
+
+NARZĘDZIA: `pobierz_4h_binance.py` + paginacja (`--od YYYY-MM-DD`, pętla po startTime,
+sklejanie stron → 11987 barów 4h/para od 2021). `backtest_ab_mtf_rezimy.py` — A/B na
+wycinkach reżimowych. 5 par z pełnym pokryciem 2021 (BTC/ETH/BNB/XRP/ADA).
+
+TABELA A/B PER REŻIM (baseline → MTF):
+  reżim                 PnL%          Sharpe        MaxDD        DSR       werdykt
+  BULL_2021 (↑)   +7.54→+2.06   3.01→0.74    1.8%→3.6%   0.86→0.43   🔻 MTF gorzej
+  BEAR_2022 (↓)   -1.15→+3.16  -0.39→+1.99   6.1%→5.1%   0.24→0.69   ✅ MTF DUŻO lepiej
+  RANGE_2023(bok) +0.70→-0.07   1.03→-0.15   1.0%→2.1%   0.49→0.28   🔻 MTF gorzej
+  RECENT_25-26    -1.09→-3.35  -1.05→-2.42   3.4%→4.4%   0.13→0.03   🔻 MTF gorzej
+
+WERDYKT WARUNKOWY (Prawo I — hipoteza CZĘŚCIOWO obalona):
+  • „Pomaga w trendzie" — TYLKO W BESSIE. W BEAR_2022 brama zamieniła stratę w zysk
+    (-1.15%→+3.16%), podniosła Sharpe (-0.39→+1.99), DSR (0.24→0.69) i OBNIŻYŁA DD
+    (6.1%→5.1%) — klasyczne „nie walcz ze spadkiem": weto wycięło kontrtrendowe longi.
+  • W HOSSIE (BULL_2021) brama SZKODZI (Sharpe 3.01→0.74, DD↑) — mnoznik 1.2× powiększał
+    longi przed korektą V.2021 / weto cięło zyskowne pullbacki.
+  • W RANGE — szkodzi (zgodnie z hipotezą: tnie mean-reversion).
+  • Wniosek: MTF to NIE uniwersalna wygrana ani prosty „trend vs range". Jedyna wyraźna
+    korzyść = OCHRONA KAPITAŁU w trwałej BESSIE.
+
+OGRANICZENIE: 5 par, po JEDNYM oknie/reżim (~5 mies., 50–85 transakcji). BEAR=Apr–Aug
+2022 (kaskada LUNA/3AC — wyjątkowo czysty jednokierunkowy zjazd; może nie generalizować).
+DSR w większości <0.95 (niewalidowane).
+
+WNIOSEK PER-REŻIM (jednozdaniowo): **BEAR = TARCZA** (brama chroni kapitał w trwałym
+zjeździe: −1.15%→+3.16%, DD 6.1%→5.1%, DSR 0.24→0.69), **HOSSA / RANGE / MIX = SZKODZI**
+(tnie zyskowne pullbacki i mean-reversion, powiększa longi 1.2× przed korektą).
+
+DECYZJA: default OFF bez zmian (brama uniwersalna szkodzi w 3/4 reżimów).
+KIERUNEK PRZYSZŁY (nie teraz): **warunkowe weto MTF TYLKO w reżimie BESSA/wysoki-stres**
+przez Namiestnika (który już klasyfikuje reżim) — „tarcza bessy" zamiast uniwersalnej bramy.
+WARUNEK WDROŻENIA: najpierw WALIDACJA na niezależnych bessach 2018 i 2025 (czy efekt
+BEAR_2022 generalizuje, czy to artefakt kaskady LUNA/3AC). Bez tej walidacji — NIE wdrażać.
+
+Kod: paginacja + nowy harness reżimowy. 1648/1648 testów, audyt exit 0, ruff czysty.
+Pliki: `narzedzia/pobierz_4h_binance.py` (paginacja `--od`),
+`narzedzia/backtest_ab_mtf_rezimy.py` (NEW), `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-06-21 | W-384 | Backtest A/B MTF — brama NIE poprawia wyniku na tym oknie (hipoteza DD obalona) 🔻
 
 Pytanie Cezara (o pieniądze): czy widzenie wyższych TF (brama konfluencji W-384) poprawia

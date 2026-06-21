@@ -237,6 +237,15 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 
 | INF-36 | "Bitcoin and Cryptocurrency Trading for Beginners" — Lowe | (BIB-024, .epub dostarczony 2026-06-20, 191k znaków) | ❌ **ODRZUCONA 1/10 — niżej niż INF-31.** Poradnik życiowy "jak nie zgubić hasła" z TA doklejonym na kilka stron (~60% to bezpieczeństwo haseł, historia Satoshiego, opisy giełd, NFT). "10 strategii" = redundancja nazewnicza (Strategy 5="Buy the Dip", 8="Hedging again"), zero progów/reguł. **Błędy merytoryczne:** odwrócony opis korpusu świecy japońskiej, "strategie działają nawet gdy BTC spada do zera". Datowana (BTC "$8000", era ICO). **Zero ziarna** (jedyny kandydat OBV/dywergencje już w roju, bez formuł). **Wizji NIE przyznano** (Prawo I, jak INF-31) | ❌ odrzucona, archiwum |
 
+
+| INF-37 ⭐ | "Active Portfolio Management" (+ "Advances in Active Portfolio Management") — Grinold & Kahn | (BIB-025, .pdf dostarczony 2026-06-21, 477 str.) | ✅ **9/10 — FUNDAMENT QUANT.** Prawo Fundamentalne Aktywnego Zarządzania: **IR = IC · √breadth = TC · IC · √BR**. IC = Spearman(sygnał_neuronu_t, zwrot_{t+h}) ∈ [−1,1], zdrowe IC ≤ 0.2. Breadth = liczba niezależnych zakładów (≈ klastry ONC). TC = Transfer Coefficient = corr(idealny_portfel, portfel_po_ograniczeniach). Alpha = vol · IC · score. **Dlaczego krytyczne dla Imperium:** po raz pierwszy mamy matematyczny dowód, że rój 78 neuronów jest lepszy od 1 — ale tylko gdy sygnały są NIEZALEŻNE (breadth). Prawo XVI + W-366 ONC = ten sam warunek. Nasze neurony = "strategie alpha", IC = miara ich kalibracji. **Zidentyfikowane luki:** (1) brak IC per-neuron, (2) brak IR roju, (3) TC niezmierzony. **→ W-369..373** | ✅ W-369 (IC), W-370 (breadth), W-371 (IR) wdrożone 2026-06-21 |
+
+| INF-38 | "Machine Learning for Algorithmic Trading" (2nd ed.) — Stefan Jansen | (BIB-026, .mobi dostarczony 2026-06-21, 1254 str., 1.63M znaków) | ⚠️ **5/10 — WZORZEC INŻYNIERSKI ale nie nasz stos.** ~100% sklearn/torch/zipline — niedostępne w produkcji. **Jedyne numpy-feasible ziarno:** (1) **IC Scorer** = `rank_ic = spearman(sygnał_t, zwrot_{t+h})` — konwerguje z INF-37! Potwierdza że IC jest branżowym standardem; (2) **HRP Allocator** = hierarchical risk parity w numpy (kandydat W-374). **Architektura ML:** Jansen oddziela "feature engineering" (sygnały) od "ML model" (wagi) — odwzorowuje nasz podział neuron/Senat. Potwierdza: ML należy do WAŻENIA sygnałów (warstwa Senatu), NIE do generowania. | ⚠️ IC Scorer = nakładka na INF-37; HRP kandydat W-374 |
+
+| INF-39 | "High-Frequency Trading: A Practical Guide" (2nd ed.) — Irene Aldridge | (BIB-027, .pdf dostarczony 2026-06-21, 299 str.) | ⚠️ **4/10 — HFT infrastruktura niedostępna.** ~80% = colocation, order book L2 w μs, FPGA, dark pools — nieadekwatne dla MEXC REST/WS małego kapitału. **Realne ziarno:** (1) **Kyle's Lambda** `λ = Δp/Δv` — miara Impact/Likiditiness; lekki kandydat gdy mamy ticker+volume; (2) potwierdza Z-01/Z-03/Z-04/Z-06/RADAR. **Prawo XVI nakazuje:** zmierzyć korelację Kyle's Lambda vs Z-06 Amihud zanim wdrożymy — jeśli |ρ|>0.8 = redundancja, odpuść. | ⚠️ Kyle's Lambda = kandydat W-374b po teście Prawa XVI |
+
+| INF-40 | "Inside the Black Box: A Simple Guide to Systematic Investing" (2nd ed.) — Rishi Narang | (BIB-028, .epub dostarczony 2026-06-21, ~350 str.) | ✅ **7/10 — AUDYT ARCHITEKTONICZNY.** 8 kategorii alpha (trend/mean-rev/technical-sentiment/value/growth/supply-demand/quality/tactical) = mapa audytu roju: mamy trend ✅, mean-rev ✅, brak quality ⚠️, brak supply-demand ⚠️ (OI/futures basis). **ML teza:** ML należy do WAŻENIA sygnałów (potwierdza INF-38). **3 krytyczne insighty:** (1) **Point-in-time data** — dane historyczne muszą odzwierciedlać co WTEDY było dostępne; (2) **Parameter plateau** — nie wybieraj lokalnego max Sharpe, wybieraj płaskowyż odporny na perturbacje (Punkt B); (3) **Transaction cost model** — nasz stały `slippage_pct` = zbyt prosty (konwerguje z INF-34 EXEC-01). **Architektura:** Alpha→Risk→Execution→Data = odzwierciedla Imperium. | ✅ audyt kategorii alpha; W-375 (point-in-time) kandydat |
+
 > **📗 BIB-020 (Harris "Trading and Exchanges") — UWAGA SPÓJNOŚCI:** fizyczny plik epub dodano 2026-06-20,
 > ale **książka była już w pełni przeżyta** w `docs/WIZJONER.md` (ŻYCZ-10, 9/10, pula wizji W-250..W-279,
 > dekorelacja zmierzona `narzedzia/pomiar_dekorelacji_bib020.py`). **5 wizji JUŻ W KODZIE:** X-27 (W-273),
@@ -259,6 +268,22 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 
 ---
 
+
+---
+
+## 🔟 WIZJE BIB-025 (Grinold & Kahn — Fundamental Law) — W-369..373
+
+> Zamykają lukę kalibracji sygnałów: mierzymy jakość każdego neuronu indywidualnie (IC) oraz roju (IR).
+
+| Wizja | Opis | Cel / moduł | Status |
+|---|---|---|---|
+| **W-369** ⭐ | **IC per-neuron** — Information Coefficient = `Spearman(sygnał_t, zwrot_{t+h})` dla h∈{1,5,21}. Miara kalibracji sygnału: IC=0 = losowy, IC=0.1 = dobry, IC>0.2 = podejrzany (overfitting). | `metryki_ic.py` → `KolektorIC` | ✅ **WDROŻONE** 2026-06-21 — `KolektorIC`, `_spearman()`, testy granic (NaN, stała seria, pusta baza). 17 testów zielone. |
+| **W-370** | **Breadth** — liczba niezależnych zakładów = `len(klastruj_onc(corr_denoised).klastry)`. Wykorzystuje W-366 ONC bezpośrednio. | `metryki_ic.py` → `prawo_fundamentalne()` | ✅ **WDROŻONE** 2026-06-21 — `prawo_fundamentalne()` wylicza breadth z ONC lub fallback do `len(neurony)`. |
+| **W-371** | **IR roju** = `IC_śr · √breadth`. Rozkłada słaby IR na dwa pytania: "mamy IC?" vs "mamy breadth?". Diagnostyka: IC_NISKI / BREADTH_NISKI / IR_DOBRY / IR_SREDNI / IR_SLABY. | `metryki_ic.py` → `prawo_fundamentalne()` | ✅ **WDROŻONE** 2026-06-21 — pełny raport z diagnozą. Sortowanie neuronów wg |IC| malejąco. |
+| **W-372** | **Alpha kalibrowany** = `vol · IC · score` — przelicza surowe sygnały na spodziewane zwroty w %. Wymaga stabilnego IC (≥60 obserwacji). | `metryki_ic.py` | 🔵 PLANOWANE — Faza 2 (po zebraniu danych produkcyjnych) |
+| **W-373** | **Transfer Coefficient** = `corr(idealny_portfel_alpha, portfel_po_ograniczeniach)` — mierzy ile alpha tracimy przez ograniczenia (min_notional, size_cap). | `metryki_ic.py` | 🔵 PLANOWANE — Faza 2 (backtest diagnostic) |
+
+
 ## 📖 NASTĘPNE KSIĄŻKI — lista życzeń (ŻYCZ, do wrzucenia do `bibliotheca_ulpia/`)
 
 > Rekomendacje pod nasze udokumentowane luki — NIE powielać tego co mamy (Prawo VIII/XVI).
@@ -266,10 +291,10 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 
 | ŻYCZ | Książka | Po co (luka którą zamyka) | Priorytet |
 |---|---|---|---|
-| **ŻYCZ-15** | Grinold & Kahn — "Active Portfolio Management" (2nd ed.) | **Fundamental Law of Active Management** (IR = IC·√breadth) — matematyczny dowód że „więcej zdekorelowanych sygnałów = lepiej" (wprost pod nasz rój + Prawo XVI). Information Ratio jako miara jakości. | 🥇 TOP |
-| **ŻYCZ-16** | Rishi Narang — "Inside the Black Box" (2nd ed.) | Architektura systematycznych funduszy quant (alpha/risk/execution/data) — audyt naszej własnej struktury vs standard branżowy. Jak myślą prawdziwe fundusze. | 🥈 wysoki |
-| **ŻYCZ-17** | Irene Aldridge — "High-Frequency Trading" (2nd ed.) | Odblokowuje martwe wizje wymagające order book L2 (W-260/U-04/U-05) — gdy podłączymy feed L2. Mikrostruktura wykonawcza HFT. | 🥉 gdy L2 |
-| **ŻYCZ-18** | Stefan Jansen — "Machine Learning for Algorithmic Trading" (2nd ed.) | Praktyczny pipeline ML+backtest (alphalens, zipline, feature eng.) — wzorzec inżynierski dla Fazy 2 (Kronos A-12, SHARP). | 🔵 Faza 2 |
+| **ŻYCZ-15** ✅ | Grinold & Kahn — "Active Portfolio Management" | **DOSTARCZONA** jako BIB-025. Wizje W-369..371 wdrożone (IC/breadth/IR). → INF-37 ⭐ | ✅ BIB-025 |
+| **ŻYCZ-16** ✅ | Rishi Narang — "Inside the Black Box" | **DOSTARCZONA** jako BIB-028. Audyt architektoniczny ukończony. → INF-40 | ✅ BIB-028 |
+| **ŻYCZ-17** ✅ | Irene Aldridge — "High-Frequency Trading" | **DOSTARCZONA** jako BIB-027. Kyle's Lambda = kandydat W-374b (czeka test Prawa XVI). → INF-39 | ✅ BIB-027 |
+| **ŻYCZ-18** ✅ | Stefan Jansen — "Machine Learning for Algorithmic Trading" | **DOSTARCZONA** jako BIB-026. IC Scorer konwerguje z INF-37; HRP = kandydat W-374. → INF-38 | ✅ BIB-026 |
 
 > **Po co BIB-020 Harris jest już „domknięty":** patrz nota spójności wyżej (WIZJONER, W-250..279).
 

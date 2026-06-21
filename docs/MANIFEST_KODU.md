@@ -5,7 +5,7 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-06-18 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Stan na:** 2026-06-21 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 78 neuronów (zarejestrowane w roju) + 12 zwiadowców = **90 modułów w kodzie**
 **Meta-warstwy (B):** 2 moduły (`neutralizacja.py` B-02, `meta_labeling.py` B-01) — warstwa NAD Legatusem, nie neurony
 **Aktywne / wyciszone:** 72 aktywnych + 4 wyciszone, z czego:

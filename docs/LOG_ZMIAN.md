@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-21 | W-369..371 | Fundamental Law (IC/breadth/IR) — Grinold & Kahn (BIB-025..028)
+
+Nowy moduł `imperium/legiony/metryki_ic.py` (W-369..371, pure numpy):
+- **W-369 IC per-neuron** — `KolektorIC`: buforuje sygnały neuronów i zrealizowane forward
+  returny, liczy `Spearman(sygnał_t, zwrot_{t+h})` dla h∈{1,5,21}. `_spearman()` w czystym
+  numpy (rank z uśrednieniem ties). Fallback NaN gdy <min_probek, stała seria, pusta baza.
+- **W-370 Breadth** — liczba niezależnych zakładów wyliczana z ONC (W-366), fallback do
+  `len(neurony)`. Zintegrowane w `prawo_fundamentalne()`.
+- **W-371 IR decomposition** — `prawo_fundamentalne()`: IR = IC_śr · √breadth. Diagnoza
+  4-poziomowa (IC_NISKI/BREADTH_NISKI/IR_DOBRY/IR_SREDNI/IR_SLABY). Sortuje neurony wg |IC|.
+- 17 nowych testów (`test_metryki_ic.py`) — granice: NaN, stała seria, pusta baza, idealna
+  antykorelacja, ties, diagnoza IC_NISKI/IR_DOBRY, kolejność sortowania.
+
+BIB-025..028 przeanalizowane i zarejestrowane (INF-37..40):
+- INF-37 ⭐ Grinold&Kahn 9/10: Fundamental Law IR=IC·√breadth (W-369..371 wdrożone)
+- INF-38 Jansen 5/10: IC Scorer konwerguje z INF-37; HRP kandydat W-374
+- INF-39 Aldridge 4/10: Kyle's Lambda kandydat W-374b (czeka test Prawa XVI)
+- INF-40 Narang 7/10: audyt architektoniczny 8 kategorii alpha; point-in-time kandydat W-375
+ŻYCZ-15..18 zamknięte (BIB-025..028 dostarczone i przeanalizowane).
+Daty "Stan na:" zaktualizowane (MANIFEST+README → 2026-06-21).
+1572/1572 testów, audyt exit 0.
+
+Pliki: `imperium/legiony/metryki_ic.py` (NEW), `tests/test_metryki_ic.py` (NEW),
+`docs/REJESTR_INSPIRACJI.md` (INF-37..40 + wizje W-369..373 + ŻYCZ-15..18 zamknięte),
+`docs/LOG_ZMIAN.md`, `docs/MANIFEST_KODU.md` (data), `README.md` (data).
+
+---
+
 ## 2026-06-20 | W-365 INTEGRACJA | Denoising wpięty w żywy przepływ synaps
 
 `KolektorKorelacjiNeuronow.korelacje_denoised()` (diagnostyka_korelacji.py) — buduje pełną

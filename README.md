@@ -3,7 +3,7 @@
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-06-18 · **Testy:** patrz `python tests/run_tests.py` · **Faza:** PętlaLive + Synapsy Reżimowe + PamięćRefleksyjna + Radar + Paper Trading Etap II + Filtr Asymetrii (W-314) + RealOrderRouter/dry-run (W-331/332) + sync pozycji (W-333) + progi adaptacyjne (W-334) + meta-warstwy B: Neutralizacja + Meta-labeling (W-337) + detektory reżimu: CUSUM/BOCPD/FracDiff (W-336/338/339) + vol-gate Jump Model opt-in (W-340) + **niezawodność warunkowa per-reżim (W-341, Prawo XXIII) + LiveMonitor/TelegramAlert (W-341, Prawo XXIV) + MECHANIZM przewagi (W-342, Prawo XXII) + godło SVG (W-342) + Debata Senatu Byk/Niedźwiedź/Cenzor (W-343)**.
+> **Stan na:** 2026-06-21 · **Testy:** patrz `python tests/run_tests.py` · **Faza:** PętlaLive + Synapsy Reżimowe + PamięćRefleksyjna + Radar + Paper Trading Etap II + Filtr Asymetrii (W-314) + RealOrderRouter/dry-run (W-331/332) + sync pozycji (W-333) + progi adaptacyjne (W-334) + meta-warstwy B: Neutralizacja + Meta-labeling (W-337) + detektory reżimu: CUSUM/BOCPD/FracDiff (W-336/338/339) + vol-gate Jump Model opt-in (W-340) + **niezawodność warunkowa per-reżim (W-341, Prawo XXIII) + LiveMonitor/TelegramAlert (W-341, Prawo XXIV) + MECHANIZM przewagi (W-342, Prawo XXII) + godło SVG (W-342) + Debata Senatu Byk/Niedźwiedź/Cenzor (W-343)**.
 
 ---
 

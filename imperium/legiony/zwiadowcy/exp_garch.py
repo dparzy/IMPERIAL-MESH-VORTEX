@@ -28,13 +28,25 @@ logger = logging.getLogger("Exploratores")
 # ---------------------------------------------------------------------------
 
 def _rekurencja_gjr(a: np.ndarray, a0: float, a1: float, b1: float, gamma: float) -> np.ndarray:
+    """
+    GJR-GARCH variance recursion. Scipy lfilter dla sekwencji IIR:
+      sigma2[t] = innovation[t-1] + b1 * sigma2[t-1]
+    Innowacje wektoryzowane numpy; recursja przez scipy (C), nie Python loop.
+    """
+    from scipy.signal import lfilter
     T = len(a)
+    sigma2_0 = max(float(np.var(a)), 1e-10)
+    if T <= 1:
+        return np.full(T, sigma2_0)
+    # Innowacje (wektoryzowane — bez Python loop)
+    ind = (a[:-1] < 0).view(np.uint8).astype(np.float64)
+    innovation = a0 + (a1 + gamma * ind) * (a[:-1] ** 2)
+    # IIR: sigma2[t] = innovation[t-1] + b1*sigma2[t-1] = lfilter([1],[1,-b1], innovation, zi)
+    # zi = [b1 * sigma2_0] — warunek początkowy
+    sigma2_rest, _ = lfilter([1.0], [1.0, -b1], innovation, zi=np.array([b1 * sigma2_0]))
     sigma2 = np.empty(T)
-    sigma2[0] = max(float(np.var(a)), 1e-10)
-    for t in range(1, T):
-        ind = 1.0 if a[t - 1] < 0 else 0.0
-        v = a0 + (a1 + gamma * ind) * a[t - 1] ** 2 + b1 * sigma2[t - 1]
-        sigma2[t] = max(v, 1e-10)
+    sigma2[0] = sigma2_0
+    sigma2[1:] = np.maximum(sigma2_rest, 1e-10)
     return sigma2
 
 

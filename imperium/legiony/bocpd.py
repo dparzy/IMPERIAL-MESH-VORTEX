@@ -31,6 +31,8 @@ Uproszczenia dla online/real-time:
 import math
 from typing import List, Optional, Tuple
 
+import numpy as np
+
 
 # ─── Normal-InverseGamma sufficient statistics (conjugate prior) ──────────────
 
@@ -108,6 +110,40 @@ class _NIGStats:
         return log_p
 
 
+def _pred_log_prob_batch(stats: "List[_NIGStats]", x: float) -> np.ndarray:
+    """
+    Wektoryzowany odpowiednik [s.predictive_log_prob(x) for s in stats].
+    Zastępuje ~30 wywołań Python math.lgamma na 3 wywołania scipy.special.gammaln.
+    """
+    from scipy.special import gammaln
+    k0, a0, b0, mu0 = 1.0, 1.0, 0.01, 0.0
+    ns = np.array([s.n for s in stats], dtype=np.float64)
+    means = np.array([s.mean for s in stats], dtype=np.float64)
+    m2s = np.array([s.m2 for s in stats], dtype=np.float64)
+
+    kn = k0 + ns
+    an = a0 + ns / 2.0
+    prior_term = np.where(kn > 0,
+                          k0 * ns * (means - mu0) ** 2 / (2.0 * kn),
+                          0.0)
+    bn = b0 + 0.5 * m2s + prior_term
+    mu_n = np.where(kn > 0, (k0 * mu0 + ns * means) / kn, mu0)
+    dof = 2.0 * an
+    scale2 = np.where((an > 0) & (kn > 0),
+                      bn * (kn + 1.0) / (an * kn),
+                      1.0)
+    scale = np.sqrt(np.maximum(scale2, 1e-30))
+    t = (x - mu_n) / np.maximum(scale, 1e-15)
+    log_p = (
+        gammaln((dof + 1.0) / 2.0)
+        - gammaln(dof / 2.0)
+        - 0.5 * np.log(np.maximum(dof * np.pi, 1e-30))
+        - np.log(np.maximum(scale, 1e-15))
+        - ((dof + 1.0) / 2.0) * np.log1p(np.maximum(t ** 2 / np.maximum(dof, 1e-15), 0.0))
+    )
+    return log_p
+
+
 def _zwroty(close: List[float]) -> List[float]:
     """Zwroty procentowe bar-do-bara."""
     out = []
@@ -153,66 +189,64 @@ def bocpd_changepoint_prob(
     hazard = 1.0 / max(1.0, hazard_lambda)
     prior = _NIGStats()
 
-    log_w: List[float] = [0.0]  # log(1.0)
+    log_w_arr = np.zeros(1)  # log(1.0)
     stats: List[_NIGStats] = [prior.copy()]
 
     # Śledzimy P(zmiana) w ostatnich okno_swiezosci barach
     window_start = n - okno_swiezosci
     best_p = 0.0
     best_kier_sila = 0.0
+    log1p_survival = math.log1p(-hazard)
+    log_hazard = math.log(hazard)
 
     for t, x in enumerate(r):
-        new_log_w: List[float] = []
+        # Wektoryzowana predykcja (zastępuje 531K Python math.lgamma calls)
+        log_preds = _pred_log_prob_batch(stats, x)   # np.ndarray
+
+        # Growth: wszystkie runy się przedłużają (wektoryzowane log_w)
+        new_log_w_arr = log_w_arr + log_preds + log1p_survival
         new_stats: List[_NIGStats] = []
-
-        log_preds = [s.predictive_log_prob(x) for s in stats]
-
-        # Growth: każdy run przedłuża się
-        for lw, lp, s in zip(log_w, log_preds, stats):
+        for s in stats:
             ns = s.copy()
             ns.update(x)
-            new_log_w.append(lw + lp + math.log1p(-hazard))
             new_stats.append(ns)
 
-        # Changepoint: nowy run od 0
-        cp_log_w = math.log(hazard) + _logsumexp(
-            [lw + lp for lw, lp in zip(log_w, log_preds)]
-        )
+        # Changepoint: nowy run od 0 (logsumexp przez numpy)
+        lse_cp = float(np.max(log_w_arr + log_preds))
+        lse_cp = lse_cp + math.log(float(np.sum(np.exp(log_w_arr + log_preds - lse_cp))))
+        cp_log_w = log_hazard + lse_cp
         new_cp = prior.copy()
         new_cp.update(x)
-        # Zapamiętaj referencję do obiektu changepoint — po kompresji identyfikujemy go przez id()
         cp_obj_id = id(new_cp)
-        new_log_w.append(cp_log_w)
+        new_log_w_arr = np.append(new_log_w_arr, cp_log_w)
         new_stats.append(new_cp)
 
-        # Normalizacja
-        lse = _logsumexp(new_log_w)
-        new_log_w = [lw - lse for lw in new_log_w]
+        # Normalizacja (numpy)
+        lse = float(np.max(new_log_w_arr))
+        new_log_w_arr = new_log_w_arr - lse - math.log(float(np.sum(np.exp(new_log_w_arr - lse))))
 
         # Kompresja pamięci
-        if len(new_log_w) > max_rl + 1:
-            indices = sorted(range(len(new_log_w)), key=lambda i: new_log_w[i], reverse=True)[:max_rl + 1]
-            kept_lw = [new_log_w[i] for i in indices]
-            lse2 = _logsumexp(kept_lw)
-            new_log_w = [lw - lse2 for lw in kept_lw]
+        if len(new_log_w_arr) > max_rl + 1:
+            indices = np.argpartition(new_log_w_arr, -(max_rl + 1))[-(max_rl + 1):]
+            new_log_w_arr = new_log_w_arr[indices]
             new_stats = [new_stats[i] for i in indices]
+            lse2 = float(np.max(new_log_w_arr))
+            new_log_w_arr = new_log_w_arr - lse2 - math.log(float(np.sum(np.exp(new_log_w_arr - lse2))))
 
         # Rejestruj P(zmiana) dla barów w oknie świeżości
         if t >= window_start:
-            # Szukamy changepoint run po id() — nie po n<=1 (n może być małe też u starych runów)
             cp_idx = next((i for i, s in enumerate(new_stats) if id(s) == cp_obj_id), None)
             if cp_idx is not None:
-                p_t = math.exp(new_log_w[cp_idx])
+                p_t = float(np.exp(new_log_w_arr[cp_idx]))
                 p_t = min(1.0, max(0.0, p_t))
                 if p_t > best_p:
                     best_p = p_t
-                    # Kierunek: nowy run vs najdłuższy istniejący run (poprzedni reżim)
                     longest_idx = max(range(len(new_stats)), key=lambda i: new_stats[i].n)
                     mean_after = new_stats[cp_idx].mean
                     mean_before = new_stats[longest_idx].mean
                     best_kier_sila = mean_after - mean_before
 
-        log_w = new_log_w
+        log_w_arr = new_log_w_arr
         stats = new_stats
 
     return best_p, best_kier_sila

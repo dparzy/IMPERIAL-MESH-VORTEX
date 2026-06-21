@@ -27,3 +27,10 @@ if [ -f narzedzia/audyt_spojnosci.py ]; then
   echo "[hook] KROK 0 — audyt spójności (Prawo XXI):"
   python narzedzia/audyt_spojnosci.py || true
 fi
+
+# 3) PAMIĘĆ SESJI (W-360) — mapa podpięć + ostatnie lekcje na starcie KAŻDEJ sesji,
+#    by ciągłość nie ginęła w kompakcji kontekstu (problem zgłoszony przez Cezara).
+if [ -f imperium/biblioteki/pamiec_sesji.py ]; then
+  echo "[hook] PAMIĘĆ SESJI (W-360):"
+  python -m imperium.biblioteki.pamiec_sesji start || true
+fi

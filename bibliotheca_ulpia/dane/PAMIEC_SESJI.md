@@ -15,7 +15,7 @@
 | ID | Serwer | Status | Priorytet | Co daje |
 |----|--------|--------|-----------|---------|
 | A1 | **GitHub MCP** | ✅ działa (cloud) | — | PR, issues, CI |
-| A2 | **Memory MCP** 💎 | ⏳ nie skonfigurowany | 3 | Trwała pamięć między sesjami (ROZWIĄZUJE W-360) |
+| A2 | **Memory MCP** 💎 | ✅ natywny (imperium/biblioteki/pamiec_sesji.py + hook) | — | Trwała pamięć między sesjami (ROZWIĄZUJE W-360) |
 | A3 | **Bibliotheca-RAG MCP** 💎 | ✅ zbudowany (W-360 RAG v2) | — | Szukaj w 32 książkach + encyklopedii + docs |
 | A4 | **Filesystem MCP** 🔵 | ⏳ opcjonalny | niski | Dostęp do plików lokalnych bez Read tool |
 | A5 | **Fetch/Web MCP** 🔵 | ⏳ opcjonalny | niski | WebFetch przez MCP |
@@ -97,6 +97,14 @@ Razem: sweep z **8 minut → ~30-40 sekund**.
 ---
 
 ## 📚 LEKCJE Z SESJI
+
+### 2026-06-21 — Memory MCP natywny (pamiec_sesji.py)
+- Zamiast zewnętrznego Node Memory MCP (nietestowalny w chmurze) → natywny moduł Python (Prawo XIX: kod+testy)
+- imperium/biblioteki/pamiec_sesji.py: lekcje()/dopisz_lekcje()/szukaj()/mapa_podpiec()/podsumowanie_startowe()
+- Źródło prawdy: docs/PAMIEC_SESJI.md (markdown — czytelny dla Cezara, w git, indeksowany w RAG korpus dane)
+- Wpięte do SessionStart hook: mapa + 3 ostatnie lekcje wyświetlane na starcie KAŻDEJ sesji → koniec utraty kontekstu w kompakcji
+- Warstwa 3 pamięci (Warstwa 1=transakcje/Mnemosyne, Warstwa 2=RAG/książki, Warstwa 3=ciągłość sesji)
+- 12 testów (granice: pusty plik, brak sekcji, dopisanie do nieistniejącej sekcji, roundtrip)
 
 ### 2026-06-21 — Bibliotheca-RAG v1 + v2
 - RAG zbudowany: FTS5 (BM25) + opcjonalne wektory, 7760 fragmentów, 80 źródeł

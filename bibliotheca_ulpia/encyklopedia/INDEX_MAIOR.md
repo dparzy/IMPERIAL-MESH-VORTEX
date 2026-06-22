@@ -35,6 +35,11 @@
 | **PSY** | [Psychologia tradingu](PSY_psychologia_tradingu.md) | ⭐⭐⭐ | PSY-01..04, Senat, Reguła 6% | ✅ |
 | **ONC** | [On-chain i krypto](ONC_onchain_i_krypto.md) | ⭐⭐⭐ | OC-01..08, RADAR-02/03, Z-07 | ✅ |
 | **MEM** | [Pamięć agentów AI](MEM_pamiec_agentow_ai.md) | ⭐⭐⭐⭐⭐ | centrum_pamieci, pamiec_sesji, kronika_czatu, mnemosyne, pamiec_absolutna, pamiec_refleksyjna | ✅ |
+| **MAK** | [Makroekonomia, cykle długu i pieniądz](MAK_makroekonomia_i_cykle.md) | ⭐⭐⭐⭐ | RADAR-01..05, Gubernator, Senat | 🔲 |
+| **BAN** | [Bańki, krachy i finanse behawioralne](BAN_banki_krachy_behawioralne.md) | ⭐⭐⭐⭐ | Z-07 PI-Cycle, PSY-03, Senat, Reguła 6% | 🔲 |
+| **QNT** | [Matematyka ilościowa i procesy stochastyczne](QNT_matematyka_stochastyczna.md) | ⭐⭐⭐⭐ | GARCH, BOCPD, neurony zmienności, arena trzech bram | 🔲 |
+| **RLA** | [Uczenie ze wzmocnieniem i deep learning](RLA_uczenie_wzmocnieniem_dl.md) | ⭐⭐⭐⭐ | hedge_mwu, Legatus, MEM, przyszli agenci RL | 🔲 |
+| **DEF** | [DeFi, tokenomika i Web3](DEF_defi_tokenomika_web3.md) | ⭐⭐⭐ | OC-*, przyszłe neurony DeFi, Senat | 🔲 |
 
 Legenda statusu: ✅ gotowy · 🔲 zaplanowany · 🚧 w budowie
 
@@ -55,6 +60,11 @@ Mapa: która książka zasila który dział. (Pliki: `bibliotheca_ulpia/BIB-xxx_
 | ALG | BIB-007/023 López de Prado, BIB-026 Jansen, BIB-031 Tsay, BIB-025 Grinold&Kahn |
 | STR | BIB-002 Murphy, BIB-013/014 Dalton, BIB-006/021 scalping, BIB-019 Harris (Crypto) |
 | MEM | (bez książek — żywi się badaniami arXiv: REJESTR_INSPIRACJI MEM-01..04 + Generative Agents/Hermes/Zep) |
+| MAK | 🔲 BIB-056 Dalio (Big Debt Crises), BIB-057 Dalio (Changing World Order), BIB-058 Dalio (How Countries Go Broke) |
+| BAN | 🔲 BIB-059 Kindleberger, BIB-060 Shiller, BIB-061 Thaler, BIB-062 Chancellor, BIB-063 MacKay, BIB-064 Reinhart-Rogoff |
+| QNT | 🔲 BIB-065 Shreve I (Binomial), BIB-066 Shreve II (Continuous-Time) |
+| RLA | 🔲 BIB-067 Sutton & Barto (RL), BIB-068 Goodfellow (Deep Learning) |
+| DEF | 🔲 BIB-069 Voshmgir (Token Economy 3rd ed) |
 
 ---
 

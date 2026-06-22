@@ -2,7 +2,7 @@
 🧠 PAMIĘĆ REFLEKSYJNA — zamknięta pętla uczenia narracyjnego Brain (W-295).
 
 Inspiracja: TradingAgents (arXiv:2412.20138 § 3.3 Memory Module),
-FinMem (arXiv:2408.14900) — reflective memory dla LLM trading agentów.
+FinMem (arXiv:2311.13743) — reflective layered memory dla LLM trading agentów.
 
 DLA NOWICJUSZA: MWU (Multiplicative Weights Update) uczy się NUMERYCZNIE
 (które neurony głosowały trafnie). Pamięć Refleksyjna dodaje uczenie NARRACYJNE:

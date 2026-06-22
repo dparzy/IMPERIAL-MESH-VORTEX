@@ -27,3 +27,25 @@ if [ -f narzedzia/audyt_spojnosci.py ]; then
   echo "[hook] KROK 0 — audyt spójności (Prawo XXI):"
   python narzedzia/audyt_spojnosci.py || true
 fi
+
+# 3) CENTRUM PAMIĘCI (W-360 v3) — scored TOP-k lekcji (Generative Agents: recency×importance×relevance)
+#    + profil Cezara + alarm przepełnienia + cross-layer search. Zastępuje proste "ostatnie 3".
+if [ -f imperium/biblioteki/centrum_pamieci.py ]; then
+  echo "[hook] CENTRUM PAMIĘCI (W-360 v3):"
+  python -m imperium.biblioteki.centrum_pamieci start || \
+    python -m imperium.biblioteki.pamiec_sesji start || true
+else
+  # Fallback: stara warstwa W3 (gdy centrum jeszcze niedostępne)
+  if [ -f imperium/biblioteki/pamiec_sesji.py ]; then
+    echo "[hook] PAMIĘĆ SESJI (W-360):"
+    python -m imperium.biblioteki.pamiec_sesji start || true
+  fi
+fi
+
+# 4) KRONIKA CZATU (W-360) — destyluj transkrypty do repo (przyrostowo), by CAŁY
+#    czat przetrwał kompakcję i wygaśnięcie kontenera chmury (commit niesie historię).
+if [ -f imperium/biblioteki/kronika_czatu.py ]; then
+  echo "[hook] KRONIKA CZATU (W-360):"
+  python -m imperium.biblioteki.kronika_czatu eksportuj || true
+  python -m imperium.biblioteki.kronika_czatu statystyki || true
+fi

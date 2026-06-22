@@ -17,7 +17,8 @@ UWAGA TA-Lib:
 """
 
 import logging
-from typing import List, Dict, Any
+import os
+from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger("Budowniczy")
 
@@ -386,3 +387,52 @@ class BudowniczyWskaznikow:
                         logger.debug(f"[Budowniczy] {klucz_out} pominięty: {e}")
         except Exception as e:
             logger.debug(f"[Budowniczy] MTF pominięty: {e}")
+
+
+# ── Prekalkulacja wskaźników (W-cache, optymalizacja backtestu) ─────────────
+
+def _prekalkuluj_symbol_args(args: tuple) -> tuple:
+    """
+    Pomocnik multiprocessing — tworzy BudowniczyWskaznikow w podprocesie
+    i prekalkuluje wskaźniki dla jednego symbolu.
+    Argumenty: (sym, bary_list, okno).
+    Zwraca: (sym, {timestamp: wskazniki_dict}).
+    """
+    sym, bary_list, okno = args
+    bud = BudowniczyWskaznikow()
+    cache: Dict[int, Dict[str, Any]] = {}
+    for i in range(okno, len(bary_list)):
+        ts = bary_list[i].get("timestamp")
+        if ts is not None:
+            cache[int(ts)] = bud.zbuduj(bary_list[i - okno: i + 1])
+    return sym, cache
+
+
+def prekalkuluj_portfel(
+    bary_per: Dict[str, List[Dict[str, Any]]],
+    okno: int = 250,
+    n_jobs: Optional[int] = None,
+) -> Dict[str, Dict[int, Dict[str, Any]]]:
+    """
+    Prekalkuluje wskaźniki dla koszyka par (opcjonalnie równolegle per symbol).
+
+    Zwraca {sym: {timestamp_ms: wskazniki_dict}}.
+    Przy n_jobs=1 działa seryjnie (bezpieczne w testach i środowiskach bez fork).
+    n_jobs=None → auto: min(len(bary_per), cpu_count).
+    """
+    if n_jobs is None:
+        n_jobs = min(len(bary_per), os.cpu_count() or 1)
+
+    args_list = [(sym, bary, okno) for sym, bary in bary_per.items()]
+
+    if n_jobs <= 1 or len(args_list) <= 1:
+        return dict(_prekalkuluj_symbol_args(a) for a in args_list)
+
+    try:
+        from concurrent.futures import ProcessPoolExecutor
+        with ProcessPoolExecutor(max_workers=n_jobs) as ex:
+            wyniki = list(ex.map(_prekalkuluj_symbol_args, args_list))
+        return dict(wyniki)
+    except Exception as e:
+        logger.warning(f"[Budowniczy] multiprocessing nieudany ({e}), fallback seryjny")
+        return dict(_prekalkuluj_symbol_args(a) for a in args_list)

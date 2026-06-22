@@ -57,6 +57,16 @@ class AdapterFutures(AdapterDanych):
     URL_LS = ("https://fapi.binance.com/futures/data/globalLongShortAccountRatio"
               "?symbol={s}&period=5m&limit=1")
 
+    # ── Endpointy HISTORYCZNE (W-cache/backfill — pomiar PSY w backteście) ──
+    # Funding: pełna historia od startu kontraktu (8h interwał), do 1000/zapytanie.
+    URL_FUNDING_HIST = ("https://fapi.binance.com/fapi/v1/fundingRate"
+                        "?symbol={s}&limit={limit}")
+    # OI/LS history: TYLKO ostatnie ~30 dni (ograniczenie Binance), period konfig.
+    URL_OI_HIST = ("https://fapi.binance.com/futures/data/openInterestHist"
+                   "?symbol={s}&period={period}&limit={limit}")
+    URL_LS_HIST = ("https://fapi.binance.com/futures/data/globalLongShortAccountRatio"
+                   "?symbol={s}&period={period}&limit={limit}")
+
     def __init__(self, fetcher=None, timeout: int = 8):
         """
         fetcher: opcjonalny callable(url:str) -> str (surowy JSON). Domyślnie HTTP.
@@ -123,3 +133,58 @@ class AdapterFutures(AdapterDanych):
             logger.warning(f"[Adapter:Futures] open interest {s} padł: {e}")
 
         return wynik
+
+    # ── BACKFILL HISTORYCZNY (Prawo XVI — mierz PSY-01/02/04, nie zgaduj) ──────
+
+    def pobierz_historie(
+        self, symbol: str, limit: int = 1000, period: str = "1h"
+    ) -> "list[dict]":
+        """
+        Pobiera historię funding (pełną) + OI/LS (ostatnie ~30 dni) z Binance public.
+
+        Zwraca listę rekordów posortowaną rosnąco po timestamp:
+          [{"timestamp": ms, "FUNDING_RATE": f, "OPEN_INTEREST": oi,
+            "LONG_SHORT_RATIO": ls}, ...]
+        Każde pole może być None (osobne osie czasu — funding co 8h, OI/LS wg period).
+        Surowe punkty; forward-fill do osi barów robi `dolacz_sentyment_do_barow`.
+        """
+        s = (symbol or "BTCUSDT").upper().replace("/", "")
+        rekordy: "dict[int, dict]" = {}
+
+        # Funding (pełna historia, 8h)
+        try:
+            raw = json.loads(self._fetcher(self.URL_FUNDING_HIST.format(s=s, limit=limit)))
+            for r in (raw if isinstance(raw, list) else []):
+                ts = int(r.get("fundingTime", 0))
+                if ts:
+                    rekordy.setdefault(ts, {})["FUNDING_RATE"] = self._bezpieczny_float(r, "fundingRate")
+        except Exception as e:
+            logger.warning(f"[Adapter:Futures] funding-hist {s} padł: {e}")
+
+        # Open Interest history (~30 dni)
+        try:
+            raw = json.loads(self._fetcher(self.URL_OI_HIST.format(s=s, period=period, limit=limit)))
+            for r in (raw if isinstance(raw, list) else []):
+                ts = int(r.get("timestamp", 0))
+                if ts:
+                    rekordy.setdefault(ts, {})["OPEN_INTEREST"] = self._bezpieczny_float(r, "sumOpenInterest")
+        except Exception as e:
+            logger.warning(f"[Adapter:Futures] oi-hist {s} padł: {e}")
+
+        # Long/Short ratio history (~30 dni)
+        try:
+            raw = json.loads(self._fetcher(self.URL_LS_HIST.format(s=s, period=period, limit=limit)))
+            for r in (raw if isinstance(raw, list) else []):
+                ts = int(r.get("timestamp", 0))
+                if ts:
+                    rekordy.setdefault(ts, {})["LONG_SHORT_RATIO"] = self._bezpieczny_float(r, "longAccount")
+        except Exception as e:
+            logger.warning(f"[Adapter:Futures] ls-hist {s} padł: {e}")
+
+        return [
+            {"timestamp": ts,
+             "FUNDING_RATE": v.get("FUNDING_RATE"),
+             "OPEN_INTEREST": v.get("OPEN_INTEREST"),
+             "LONG_SHORT_RATIO": v.get("LONG_SHORT_RATIO")}
+            for ts, v in sorted(rekordy.items())
+        ]

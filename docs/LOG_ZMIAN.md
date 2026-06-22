@@ -6,6 +6,55 @@
 
 ---
 
+## 2026-06-22 | W-360 v3 | FinMem layered decay + scan rynku pamięci (MEM-01..04)
+
+Cezar: „FinMem (2311.13743)/FinAgent (2402.18485) to nasza dziedzina — czy to mamy? poszukaj
+unikatów temat mem0 i pamięć absolutna, i nasz unikat".
+
+Weryfikacja ID arXiv na żywo (WebSearch, Prawo I — zero fabrykacji): FinMem=**2311.13743**
+(nasz `pamiec_refleksyjna.py` cytował błędnie 2408.14900 → NAPRAWIONE), FinAgent=2402.18485,
+Mem0=2504.19413, A-Mem=2502.12110. Dopisane do REJESTR_INSPIRACJI jako MEM-01..04 (pełny ZPO).
+
+WDROŻONE (Prawo XIX — kod+testy, nie deklaracja): **zanik warstwowy FinMem** w
+`centrum_pamieci._decay_dla_waznosci()`. Tempo zaniku zależy od ważności lekcji:
+rutyna (i=0.3) → 0.99/dzień (half-life ~69 dni), krytyczna (i=1.0, „utrata potencjału") →
+0.999/dzień (half-life ~690 dni). NASZ UNIKAT: funkcja CIĄGŁA vs 3 dyskretne kubełki FinMem.
+
+NAPRAWA UTRATY POTENCJAŁU (Prawo XV): wcześniej jeden zanik 0.995 dla wszystkich — lekcja
+o krytycznym bugu znikała z pamięci tak szybko jak notatka o profilu. Teraz krytyczne trwają ~10×.
+
+Plany (wzorce, jeszcze nie kod): MEM-02 dual-level reflection, MEM-03 auto-konsolidacja/dedup
+(Mem0), MEM-04 auto-linkowanie lekcji (A-Mem Zettelkasten). Unikat Imperium: pamięć rynku +
+pełny dialog+lekcje+profil w git (przeżywa kompakcję/wygaśnięcie kontenera) — brak na rynku.
+
+- Pliki: `centrum_pamieci.py` (+`_decay_dla_waznosci`, `_recency(importance)`), `pamiec_refleksyjna.py`
+  (fix ID arXiv), `tests/test_centrum_pamieci.py` (+4 testy granic zaniku, 19 total),
+  `docs/REJESTR_INSPIRACJI.md` (MEM-01..04), `docs/PAMIEC_SESJI.md` (lekcja). Testy 1740/1740, audyt exit 0.
+
+---
+
+## 2026-06-22 | W-360 | Pamięć v2: CRUD lekcji + profil Cezara + Kronika Czatu (adopcja Hermes/Zep/Mem0)
+
+Cezar: „porównaj naszą pamięć z hermes-agent.org i dodaj, byśmy pamiętali cały czat — lokal+chmura".
+Research konkurencji (5 agentów): Hermes (MEMORY.md/USER.md), Zep/Graphiti (bi-temporal KG),
+Cognee (ECL poly-store), Mem0 (ADD/UPDATE/DELETE/NOOP), MemGPT (paging), Generative Agents
+(recency·importance·relevance), CoALA (episodic/semantic/procedural), RAPTOR (tree-summary).
+
+WNIOSEK: nasza Warstwa 3 zbiegła się architektonicznie z Hermesem (markdown rdzeń + FTS5).
+Domknięto 3 luki + dodano pełną pamięć czatu:
+- CRUD: `usun_lekcje()` / `aktualizuj_lekcje()` (wcześniej tylko append — UTRATA POTENCJAŁU)
+- Limit zwięzłości `LIMIT_ZNAKOW_LEKCJA=1200` (Hermes-style twardy błąd) + `alarm_przepelnienia`
+- Profil Cezara (`docs/PROFIL_CEZARA.md`) = odpowiednik USER.md (model użytkownika ⊥ środowisko)
+- Kronika Czatu (`kronika_czatu.py`): destyluje 148MB transkryptów ~/.claude → ~6MB dialogu
+  w repo (git niesie historię lokal↔chmura), redakcja kluczy API, przyrostowa, wpięta w hook
+
+PLIKI: imperium/biblioteki/pamiec_sesji.py, imperium/biblioteki/kronika_czatu.py,
+docs/PROFIL_CEZARA.md, docs/PAMIEC_SESJI.md, .claude/hooks/session-start.sh,
+tests/test_pamiec_sesji.py (+15), tests/test_kronika_czatu.py (+10),
+bibliotheca_ulpia/dane/kronika/ (100 sesji destylatu), docs/INDEKS_IMPERIUM.md, docs/LOG_ZMIAN.md
+
+---
+
 ## 2026-06-21 | W-384 | A/B MTF PER REŻIM — brama pomaga TYLKO w bessie, szkodzi w hossie/range
 
 Po obaleniu na 6-mies. oknie: re-test na WIELOREŻIMOWEJ historii (paginacja). Hipoteza

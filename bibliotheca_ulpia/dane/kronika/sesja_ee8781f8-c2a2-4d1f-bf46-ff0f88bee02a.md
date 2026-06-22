@@ -1,0 +1,522 @@
+# Kronika sesji ee8781f8-c2a2-4d1f-bf46-ff0f88bee02a
+
+## 🧑 Cezar
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary Request and Intent:
+
+**Latest (current) request:** "dobra dawaj propozycje i listę co będziemy robic najpierw dawaj podaj plan przyjacielu" — User wants a concrete prioritized plan of what to implement first from the 78 visions in WIZJONER.
+
+**Session activities (in order):**
+- WIZJONER.md inaugurated as creative conversation journal between Cezar Pixel & ARCH-MAX
+- AI title established: **ARCHITECTUS MAXIMUS IMPERIALIS (ARCH-MAX)**; user title: **Cezar Pixel** (with Pixel restored)
+- Voice input recommendations given (Win+H, Whispering/Whisper)
+- Long voice session captured as W-029..W-033 (adaptive weights, reconnaissance, Roman Naming, Lupanar, spy agents)
+- Global reconnaissance: W-034..W-040 (meta-labeling/Arbiter Fiduciae, triple barrier/Arena Trzech Bram, VPIN/NeuronToxicFlow, Senat Byk/Niedźwiedź, HMM/Wyrocznia Stanów, Kroniki Bitew, Skarbiec Imperialny)
+- Nocny zwiad Azja/Australia/Rosja: W-041..W-048 (Sentiment/PumpDetect/Staking/Bayesian/Audyt Zasad/J-Quants/KunQuant/Oficina)
+- Full impact report: all 48 visions rated 6.5→9.7/10 across 4 etaps
+- Deep tech audit: Python vs Rust vs Zig vs TA-Lib — full analysis with verdict table
+- **GRAND SCOUT MISSION (4 parallel agents):** Added W-049..W-078 (30 new visions). Total: 78 visions.
+- Bug fix: W7 audit falsely flagging URLs with ".md" in domain (www.mdpi.com). Fixed + regression test added. Tests: 391/391.
+
+**Security constraints (verbatim, must remain in effect):**
+- "KLUCZE API NIGDY W KODZIE, NIGDY W CZACIE — tylko zmienne środowiskowe"
+- "DeepSeek: [ZREDAGOWANO]
+- "MEXC: os.getenv("MEXC_API_KEY"), os.getenv("MEXC_SECRET")"
+
+2. Key Technical Concepts:
+- **IMPERIAL MESH VORTEX** — autonomous AI trading system, Python, branch `claude/sleepy-fermi-dsdE4`
+- **MikroNeuron** — KLUCZ, KATEGORIA, WAGA, WSKAZNIK, DOSTEPNY, ELITARNY
+- **46 neurons** (39 active): categories M/T/V/F/A/L/R/S/O/S active; 7 silenced (API-dependent)
+- **17 strategies**, 12 scouts (EXP-01..12), 14 elite modules
+- **WAGI_REZIMU** — regime-based weight maps in `legatus.py`
+- **Namiestnik** — Regime-Aware + Timeframe-Aware gating
+- **Dyrygent** — full decision orchestrator: Budowniczy→Adaptery→Namiestnik→Legatus→Klucznik→Pretorianie
+- **BezpiecznikKapitalu** — 30% drawdown circuit breaker (built, 12 tests)
+- **Igrzyska** — neuron scoring/ranking system (built, 11 tests)
+- **audyt_spojnosci.py** — Prawo XXI consistency engine (W1-W9 layers)
+- **Pre-commit hook** — staged isolation + full audit before every commit
+
+**New concepts from visions research:**
+- **Hedge/MWU** (Multiplicative Weights Update) — online adaptive weighting for Legatus
+- **Conformal Prediction / ACI** — calibrated uncertainty intervals per neuron vote
+- **BOCPD** — Bayesian Online Changepoint Detection (regime change detector)
+- **Thompson Sampling** — bandit algorithm for strategy/neuron coalition selection
+- **Hurst-DFA** — long memory exponent (H>0.5 trend, H<0.5 mean-reversion, H≈0.5 don't trade)
+- **Permutation Entropy** — chaos detector orthogonal to RSI/MACD
+- **Yang-Zhang Volatility** — 14× more efficient than std(close), uses full OHLC
+- **Volatility Targeting** — position = vol_target/vol_realized (institutional standard)
+- **Wash Trading Detection** — Benford's Law + power-law on volume for MEXC (unregulated)
+- **Equity-Curve Circuit Breaker** — swarm trades its own equity curve (NORMAL→REDUCED→HALT)
+- **VPIN** — Volume-Synchronized Probability of Informed Trading (confirmed W-036)
+- **DVOL/VRP** — Variance Risk Premium via Deribit free public API
+- **Coinbase Premium + Kimchi Premium** — institutional vs retail flow
+- **SSR** (Stablecoin Supply Ratio) — "dry powder" / latent buying pressure
+- **Google Trends + Wikipedia Attention** — most consistent academic pricing factor
+- **LLMoE** — LLM-based MoE routing (DeepSeek as MoE router)
+- **River + ADWIN** — online learning backbone + drift detector
+- **gplearn** — genetic programming for alpha factor discovery (Oficina Imperialis)
+- **Transfer Entropy** — directional information flow (BTC leads alts)
+- **RQA** (Recurrence Quantification Analysis) — early-warning crash detection
+- **CME gap edge DEAD** — CME launched 24/7 BTC futures 2026-05-29, weekend gaps gone
+
+**Tech stack decision (Python vs Rust vs Zig vs TA-Lib):**
+- Pure Python: ✅ STAYS always
+- TA-Lib: ✅ RETURNS as optional backend (Phase 2, local laptop, binary wheels fixed v0.6.8)
+- Polars: ✅ PLANNED (Phase 2, 3-10× faster than Pandas)
+- Rust/NautilusTrader: 🔄 DEFERRED (Phase 3, execution layer only)
+- Zig: ❌ ABANDONED PERMANENTLY (zero quant ecosystem, pre-1.0)
+- ZeroMQ+Arrow: 🔄 DEFERRED (Phase 3, multi-node only)
+
+3. Files and Code Sections:
+
+- **`docs/WIZJONER.md`** — Main creative/vision file. Extended massively:
+  - Added "Dziennik Rozmów — Cezar Pixel & ARCHITECTUS MAXIMUS" section
+  - W-029..W-033 (voice session visions)
+  - W-034..W-040 (first global recon)
+  - W-041..W-048 (nocny zwiad Azja/Australia/Rosja)
+  - Full impact report (etaps A-D, 6.5→9.7/10 rating)
+  - Full Python vs Rust vs Zig vs TA-Lib analysis with verdict table
+  - W-049..W-078 (grand 4-agent scout mission — 30 new visions)
+  - Statistics updated: 78 total visions
+  - Status table updated with W-049..W-078
+
+- **`narzedzia/audyt_spojnosci.py`** — Fixed W7 false positive bug:
+  ```python
+  for text, href in link_pattern.findall(content):
+      href_clean = href.split("#")[0].strip()
+      if not href_clean:
+          continue
+      # NEW: Skip external URLs (http/https/mailto)
+      # URLs like "www.mdpi.com" contain ".md" and were falsely flagged
+      if re.match(r"^(https?:|mailto:|ftp:)", href_clean, re.I):
+          continue
+  ```
+
+- **`tests/test_spojnosc.py`** — Added regression test for W7 URL fix:
+  ```python
+  def test_audyt_w7_ignoruje_zewnetrzne_url():
+      """W7: zewnętrzne URL-e (np. www.mdpi.com zawierający '.md' w domenie) NIE są martwymi linkami."""
+      import narzedzia.audyt_spojnosci as a
+      bledy, _ = a.audyt()
+      w7_url = [b for b in bledy if "W7" in b and "Martwe linki" in b
+                and ("http" in b or "mdpi" in b)]
+      assert not w7_url, f"W7 fałszywie oznaczył zewnętrzne URL-e jako martwe linki: {w7_url}"
+  ```
+
+4. Errors and Fixes:
+
+- **W7 audyt false positive on external URLs:** Pre-commit hook blocked commit because WIZJONER.md contains URLs like `https://www.mdpi.com/...` which have ".md" in the domain name. The W7 regex `r"\[([^\]]+)\]\(([^)#]+\.md[^)]*)\)"` matched these as supposed cross-doc links. **Fix:** Added early `continue` for any href matching `^(https?:|mailto:|ftp:)`. Added regression test. Tests went 390/390 → 391/391.
+
+5. Problem Solving:
+
+- **WIZJONER as living document:** Established pattern of recording every idea, conversation, and scout report to WIZJONER.md with commit+push after each session.
+- **Tech debt decision:** Made definitive decision on Python+Rust+Zig+TA-Lib vs pure Python — documented with 4 clear reasons and phased roadmap.
+- **CME gap edge alert:** Identified that classic CME weekend gap edge died 2026-05-29. Must not implement as live signal.
+- **78 vision backlog:** Organized into implementation etaps A/B/C/D with clear priorities.
+- **Yang-Zhang alert (Prawo XV):** Identified utrata potencjału — using std(close) instead of OHLC-based YZ wastes 7-14× information.
+
+6. All User Messages:
+- "zapisuj wszystko w pliku wizjonerze ok" — record everything in WIZJONER
+- "dobra mam takie pytanie jeszcze bo jesteśmy w tej wizji [long voice session about voice input tools]"
+- "bo tak sobie myślę że kurde wiesz ostatnio żeś mi podawał... [LONG voice session about adaptive neuron weighting, multi-TF recon, Roman naming currencies, training neurons, spy agents for manipulation, paper trading expansion, MEXC focus, Igrzyska harmonogram]"
+- "spoko spoko jeszcze mam dwa dni za dwa dni dopiero jadę... weź coś tam jeszcze poszukaj głęboko wysyłam ci go zwiad bardzo głęboki fajne pomysły... a i też nie wiem czy obserwujemy też te dominacje... [LONG voice requesting deep research in Asian/Australian/Russian quant communities, looking for similar systems, unique tools, psychological factors]"
+- "wejdz do wizjonera i zdaj pelny raport jak poszczegolne pomysly wplynely by na nasz aktualne imperium i jak podniosly poziom i ocena jakosci imperium dawaj dla kazdego po koleji" — full impact report of all visions
+- "dopisz do wizji ta rekomendacje powiedz mi dalej mamy wizje pierwotnie nasz system opierał się na python rust zap i ta lib powiedz dlaczego to zmieniliśmy dopisujemy do wizji pytanie i twoja odpowiedz ma być pełne uzasadnienei i głęboką analiza audyt policzona z głębokim wyszukiwaniem w internecie dokładnie zbadane za i przeciw i określeniem najlepszego wyboru"
+- "ok dodaj jakies pomyzsy do wizjonera wszystko czego nie mamy a wydatnie podniesie nasza jakosc i dokladnosc systemu jest wiecej narzedzi i kategori krorych nam brakuje a nie zaburza naszego ekosystemu i imperium wyslij zwiadowcow niech gleboko poszukaja wszedzie w lokalnych jezykach na rynkach scryptach i badaniach i forach studenckick konkursach jakies rewolucyjne niszowe potwierdzone rewolicyjne wzory i patenty dawaj bleboki reserch dawaj duzo co uzupelni nasze luki i dodaj do wizjonera jako nastepne pomysly"
+- "dobra dawaj propozycje i listę co będziemy robic najpierw dawaj podaj plan przyjacielu" — **CURRENT REQUEST: give a concrete plan of what to implement first**
+
+7. Pending Tasks:
+- **CURRENT:** Deliver concrete prioritized implementation plan from the 78 WIZJONER visions
+- Implement Etap A: W-035 (Arena Trzech Bram) → W-036 (VPIN) → W-041 (Sentiment) → W-042 (PumpDetect)
+- Implement Etap B: W-038 (HMM) → W-029 (adaptive weights) → W-034 (Arbiter) → W-001 (Valhalla+neurons)
+- Implement Etap C (after 90 days paper trading): W-039 (Kroniki Bitew) → W-044 (Staking) → W-005 (Walk-Forward)
+- Implement Etap D (when DeepSeek API): W-017 (Outlines) → W-009 (SHARP) → W-018 (Reflexion) → W-037 (Senat)
+- Yang-Zhang upgrade for category V (Prawo XV utrata potencjału)
+- W-049 Hedge/MWU for Legatus live weights
+- W-059 Volatility Targeting as core of kalkulator_lewara
+- W-053 Hurst-DFA as meta-gate
+- W-061 Wash Trading Detection for MEXC
+- W-062 Equity-Curve Circuit Breaker
+- W-067 DVOL/VRP zwiadowca (Deribit free API)
+- Download more historical paper trading data (multiple currencies, all timeframes)
+- Future: New laptop 32GB RAM 17-18", ~5000 PLN, local Claude Code installation
+- Future: DeepSeek API key integration
+- Future: MEXC API key → live paper trading first cycle
+
+8. Current Work:
+Immediately before this summary request, the work was:
+1. All 4 scout agents returned with 49 total research findings
+2. Added W-049..W-078 to WIZJONER status table and full detailed report in Dziennik
+3. Attempted git commit — FAILED because W7 audit falsely flagged `www.mdpi.com` URL (contains ".md") as a dead local cross-doc link
+4. Fixed `narzedzia/audyt_spojnosci.py` W7 layer to skip external URLs with `re.match(r"^(https?:|mailto:|ftp:)", href_clean, re.I): continue`
+5. Added regression test `test_audyt_w7_ignoruje_zewnetrzne_url` to `tests/test_spojnosc.py`
+6. Tests: 391/391 ✅, audit exit 0 ✅
+7. Committed and pushed: commit `6f6a722`
+8. User then asked: "dobra dawaj propozycje i listę co będziemy robic najpierw dawaj podaj plan przyjacielu"
+
+9. Optional Next Step:
+The user's most recent explicit request: **"dobra dawaj propozycje i listę co będziemy robic najpierw dawaj podaj plan przyjacielu"** — deliver a concrete, prioritized implementation plan.
+
+The plan should cover:
+- **Etap 0 (immediate, this session, ~3-5 hours each):** Pure Python, no API, highest ROI:
+  1. W-055 Yang-Zhang (Prawo XV urgent — upgrade existing vol calc, 0.5 day)
+  2. W-049 Hedge/MWU on Legatus (brakujący mózg, 1 day, ~20 lines)
+  3. W-059 Volatility Targeting in kalkulator_lewara (1 day)
+  4. W-053 Hurst-DFA new category H (1-2 days)
+  5. W-054 Permutation Entropy new category N (0.5 day)
+
+- **Etap A (1-2 weeks, pure Python):** W-035 Arena Trzech Bram → W-036/W-061 (VPIN+WashTrading) → W-041 Sentiment → W-062 Equity-curve breaker
+
+- **Etap B (2-3 weeks):** W-038 HMM → W-050 Conformal → W-029 adaptive weights → W-034 Arbiter → W-001 Valhalla+real neurons
+
+- **Etap C (after 90 days paper trading data):** W-039 Kroniki → W-044 Staking → W-005 Walk-Forward
+
+- **Etap D (when DeepSeek API available):** W-067 DVOL → W-068/W-069/W-070 free data scouts → W-017/W-009/W-018/W-037 Cesarz layer
+
+- **Never/deferred:** Zig (❌ permanent), CME weekend gap (❌ dead), Rust (Faza 3 only for execution)
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /root/.claude/projects/-home-user-IMPERIAL-MESH-VORTEX/6e50f74a-ea08-44b9-9c36-ae7b4d3be249.jsonl
+Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened.
+
+## 🏛️ Claude
+# PLAN IMPLEMENTACJI — IMPERIUM MESH VORTEX
+## ARCH-MAX → Cezar Pixel | 2026-06-03
+
+---
+
+## ⚡ ETAP 0 — NATYCHMIAST (ta sesja / kolejna, 0 API, czysty Python)
+
+Wszystko to upgrade istniejącego kodu, bez nowych zależności, bez API. Maksymalny ROI za minimalny czas.
+
+| # | Wizja | Co robimy | Gdzie | Czas | Impact |
+|---|-------|-----------|-------|------|--------|
+| 1 | **W-055 Yang-Zhang** | Zastąp `std(close)` pełnym OHLC estimatorem — 7-14× lepsza wycena vol | `imperium/legiony/neurony/wolumen.py` + `kategoria V` | **2h** | 🔥🔥🔥 Prawo XV |
+| 2 | **W-049 Hedge/MWU** | Online multiplicative weights na `Legatus` — wagi uczą się same w czasie | `imperium/legiony/legatus.py` | **3h** | 🔥🔥🔥 brakujący mózg |
+| 3 | **W-059 Vol Targeting** | `pozycja = vol_target / vol_realized` w kalkulatorze lewara — standard instytucjonalny | `imperium/kapital/kalkulator_lewara.py` | **2h** | 🔥🔥 |
+| 4 | **W-053 Hurst-DFA** | Nowy neuron `H-01` kategoria `H` — trend/mean-rev/random meta-gate | nowy plik `neurony/hurst.py` | **4h** | 🔥🔥🔥 |
+| 5 | **W-054 Permutation Entropy** | Nowy neuron `PE-01` kategoria `N` — detektor chaosu ortogonalny do RSI | nowy plik `neurony/perm_entropy.py` | **2h** | 🔥🔥 |
+
+**Łącznie: ~13h pracy, zero nowych zależności, 5 znaczących ulepszeń.**
+
+---
+
+## 🏛️ ETAP A — 1-2 tygodnie (pure Python, bez zewnętrznych API)
+
+| # | Wizja | Co robimy | Impact |
+|---|-------|-----------|--------|
+| 6 | **W-035 Arena Trzech Bram** | Triple Barrier Method jako nowa meta-labeling warstwa dla strategii | 🔥🔥🔥 jakość sygnałów |
+| 7 | **W-061 Wash Trading** | Benford + power-law na wolumenie MEXC — filtr trucizny | 🔥🔥🔥 MEXC specyfika |
+| 8 | **W-062 Equity-Curve Breaker** | Rój handluje własną krzywą kapitału NORMAL→REDUCED→HALT | 🔥🔥🔥 survival |
+| 9 | **W-036 VPIN** | Volume-Synchronized Probability of Informed Trading jako neuron | 🔥🔥 flow toksyczny |
+| 10 | **W-041 Sentiment** | Fear & Greed Index jako zwiadowca (Free API) | 🔥🔥 |
+
+---
+
+## 🔱 ETAP B — 2-4 tygodnie (bardziej złożone, wymagają danych historycznych)
+
+| # | Wizja | Co robimy | Warunek |
+|---|-------|-----------|---------|
+| 11 | **W-038 HMM Wyrocznia** | Hidden Markov Model — detektor reżimów jako zastąpienie/wsparcie Namiestnika | min. 30 dni danych |
+| 12 | **W-050 Conformal Prediction** | Skalibrowane przedziały niepewności dla każdego głosu neuronu | po etapie 0 |
+| 13 | **W-067 DVOL/VRP** | Deribit DVOL (free API) — premia za ryzyko zmienności jako zwiadowca | free API |
+| 14 | **W-029 Adaptive Weights** | Pełny harmonogram Igrzysk → auto-wagi Legata co 30 dni | po Igrzyskach |
+| 15 | **W-034 Arbiter Fiduciae** | Meta-labeling — filtr pewności dla każdego sygnału strategii | po Arena |
+
+---
+
+## 📜 ETAP C — po 90 dniach paper tradingu
+
+| # | Wizja | Co robimy |
+|---|-------|-----------|
+| 16 | **W-039 Kroniki Bitew** | Pełna baza transakcji + analityka historyczna (Bokeh dashboard) |
+| 17 | **W-044 Staking Sentinel** | Monitoring staking APY jako sygnał onchain |
+| 18 | **W-005 Walk-Forward** | Walidacja walk-forward wszystkich strategii |
+| 19 | **W-068/069/070** | Nowe darmowe źródła danych: Glassnode-lite, SSR, Coinbase Premium |
+
+---
+
+## 🤖 ETAP D — gdy DeepSeek API gotowe
+
+| # | Wizja | Co robimy |
+|---|-------|-----------|
+| 20 | **W-017 Outlines** | Structured output z LLM (pewne JSON z DeepSeek) |
+| 21 | **W-037 Senat Byk/Niedź** | LLM głosowanie bycze/niedźwiedzie z uzasadnieniem |
+| 22 | **W-009 SHARP** | Self-evolving rubric policy — LLM ocenia własne reguły |
+| 23 | **W-018 Reflexion** | Pętla samo-korekcji błędów przez LLM |
+
+---
+
+## ❌ NIGDY / ODŁOŻONE NA ZAWSZE
+
+- **Zig** — ekosystem zerowy, pre-1.0, porzucamy permanentnie
+- **CME Weekend Gap** — dead signal od 2026-05-29 (24/7 futures)
+- **Rust/NautilusTrader** — tylko Faza 3, tylko warstwa wykonania, nie wcześniej
+
+---
+
+## 🎯 PROPOZYCJA NA DZIŚ
+
+Zaczynam od **W-055 Yang-Zhang** (Prawo XV — utrata potencjału, pilne) + **W-049 Hedge/MWU** (brakujący mózg Legata).
+
+To są dwie zmiany, które podniosą jakość CAŁEGO systemu bez dodawania nowych neuronów — ulepszają silnik, który już mamy.
+
+**Daję zielone światło?** → Piszesz "tak" i zaczynam od Yang-Zhang, potem MWU, commit+push na koniec.
+
+## 🧑 Cezar
+tak zielone światło i pamiętaj ze zawsze musisz aktualizować komplet wszystko musi się wszystko zgadzać jak cos wprowadzamy zawsze postępujesz wg zasad i jeżeli jakaś zasada blokuje  i przeszkadza raportujesz i dajesz propozycje pamiętaj zasady w miarę postępu tez mogą być aktualizowane i modyfikowane albo dodawane nowe za zgoda cezara Pixel zawsze musi być pełna symbioza i  zgodność dokumentów i kodu żywego  zawsze sprawdzasz i porównujesz wszystko aktualizujesz i utrzymujesz doskonały porządek
+
+## 🏛️ Claude
+Zielone światło przyjęte. Zaczynam od KROK 0 — czytam żywy kod zanim cokolwiek zmienię.
+
+## 🏛️ Claude
+Stan żywy: 46 neuronów, kategoria V już aktywna (V-13). Muszę zrozumieć istniejący neuron zmienności i Budowniczego, zanim wprowadzę Yang-Zhang. Czytam teren.
+
+## 🏛️ Claude
+Teren rozpoznany. Architektura: Brama (pure-Python obliczenia) → Budowniczy (dict) → Neuron. Yang-Zhang wpisuje się idealnie jako lepszy estymator tej samej annualizowanej vol co V-13 (te same progi pozostają ważne — to ulepszenie estymatora, nie zmiana skali).
+
+Zaczynam od **W-055 Yang-Zhang**. Krok 1 — dodaję obliczenie do Bramy.
+
+## 🏛️ Claude
+Krok 2 — Budowniczy produkuje klucz `YANG_ZHANG_20`.
+
+## 🏛️ Claude
+Krok 3 — upgrade neuronu V-13, by używał Yang-Zhang jako podstawy, z HIST_VOL jako fallback (zero martwych głosów):
+
+## 🏛️ Claude
+Krok 4 — testy. Sprawdzam istniejący styl testów Bramy.
+
+## 🏛️ Claude
+Dodaję testy Yang-Zhang — Brama, fallback i upgrade V-13. Wstawiam po testach choppiness:
+
+## 🏛️ Claude
+398/398 ✅ (było 391, +7). Teraz audyt spójności i symbioza dokumentów.
+
+## 🏛️ Claude
+Sprawdzam datę "Stan na:" i czy liczba obliczeń Bramy jest gdzieś dokumentowana (dodałem YANG_ZHANG).
+
+## 🏛️ Claude
+README ma nieaktualną liczbę testów (390 → 398). Naprawiam.
+
+## 🏛️ Claude
+Aktualizuję WIZJONER (W-055 → wdrożone) i LOG_ZMIAN.
+
+## 🏛️ Claude
+Dopisuję wpis LOG_ZMIAN na górze:
+
+## 🏛️ Claude
+Bramka przed commitem (Prawo XXI): testy + audyt.
+
+## 🏛️ Claude
+Zielone. Commit + push Yang-Zhang.
+
+## 🏛️ Claude
+✅ **W-055 Yang-Zhang wdrożone i wypchnięte** (commit `8f768cd`, 398/398, audyt exit 0, pełna symbioza).
+
+Teraz **W-049 Hedge/MWU**. Tu kluczowe pytanie symbiozy (Prawo XV): MWU potrzebuje źródła sprzężenia zwrotnego, inaczej będzie "gotowy ale niepodpięty". Sprawdzam Igrzyska — czy dostarcza oceny neuronów do karmienia wag.
+
+## 🏛️ Claude
+Igrzyska już produkuje `nowe_wagi()` (batch, co 30 dni). MWU to komplementarny **online** uczeń (regret-bound, aktualizacja po każdym wyniku). Muszę sprawdzić, gdzie wagi Igrzysk są realnie konsumowane — by MWU podpiąć w tym samym punkcie (Prawo XV: nie "gotowy ale niepodpięty").
+
+## 🏛️ Claude
+Ważne odkrycie (Prawo XV — czerwony alarm): `Igrzyska.nowe_wagi()` produkuje mnożniki wag neuronów, ale **Legatus ich nigdzie nie konsumuje** — policzony potencjał leży odłogiem. W-049 zamyka tę lukę: dodaję MWU jako online ucznia + slot wstrzykiwania mnożników do Legatusa (konsumuje i Igrzyska, i MWU).
+
+Tworzę moduł HedgeMWU:
+
+## 🏛️ Claude
+Teraz dodaję `obserwatorzy` do Igrzysk (wspólny strumień wyników, DRY):
+
+## 🏛️ Claude
+Teraz wstrzykiwanie mnożników per-neuron do Legatusa (zamyka lukę Prawa XV — konsumuje Igrzyska ORAZ MWU):
+
+## 🏛️ Claude
+Krok testy. Sprawdzam jak run_tests.py wykrywa moduły testowe.
+
+## 🏛️ Claude
+Tworzę testy MWU i rejestruję moduł.
+
+## 🏛️ Claude
+Poprawiam test (zostawiłem błędny import):
+
+## 🏛️ Claude
+410/410 ✅ (+12). MWU działa pięknie — trafny ×3.0, mylący ×0.001. Symbioza dokumentów dla W-049.
+
+## 🏛️ Claude
+Aktualizuję INDEKS (biblioteki) i dopisuję LOG_ZMIAN:
+
+## 🏛️ Claude
+Bramka przed commitem:
+
+## 🏛️ Claude
+Oba commity wypchnięte, drzewo czyste, local == remote `e40673f`. 
+
+---
+
+## ✅ Raport — dwie wizje wdrożone (sesja zakończona)
+
+### 1️⃣ W-055 — Yang-Zhang Volatility (commit `8f768cd`)
+**Prawo XV (utrata potencjału) naprawione.** V-13 liczył vol tylko z `close`, ignorując luki overnight i zakres high/low.
+- **Brama:** nowe pure-Python `YANG_ZHANG` (OHLC, ~14× efektywniejszy estymator, Yang & Zhang 2000)
+- **Budowniczy:** produkuje `YANG_ZHANG_20`
+- **V-13:** czyta YZ z fallbackiem `HIST_VOL_20` (bez martwego głosu). Ta sama skala → progi reżimu bez zmian.
+- **+7 testów**
+
+### 2️⃣ W-049 — HedgeMWU (commit `e40673f`)
+**Czerwony alarm Prawa XV zamknięty:** `Igrzyska.nowe_wagi()` liczyło mnożniki, ale **Legatus ich nie konsumował** — potencjał leżał odłogiem.
+- **`hedge_mwu.py`:** algorytm Hedge/MWU (regret O(√(T·ln N))). Online uczenie — trafny neuron rośnie, mylący cichnie (demo: ×3.0 vs ×0.001)
+- **Igrzyska.obserwatorzy:** MWU uczy się z tego samego strumienia (DRY)
+- **Legatus:** slot `mnozniki_neuronow` — konsumuje teraz i batch (Igrzyska), i online (MWU)
+- **+12 testów**
+
+### 🔬 Stan symbiozy (twardy dowód)
+```
+Testy:  410/410 zielone
+Audyt:  exit 0 — pełna harmonia
+Neurony: 46 (39 aktywne) | Zwiadowcy 12 | Elitarne 14 | Strategie 17
+```
+Zaktualizowane w tym samym ruchu: **MANIFEST, WIZJONER, INDEKS, LOG_ZMIAN, README** — wszystkie liczby i klucze zgadzają się z żywym kodem.
+
+### ⚠️ Uwaga (zgodnie z Twoim rozkazem o raportowaniu)
+Żadna zasada nie blokowała — przeciwnie, W-049 **odkrył istniejące złamanie Prawa XV** (osierocone wagi Igrzysk) i je naprawił. To pokazuje wartość ZASADY PEŁNEJ SYMBIOZY.
+
+---
+
+**Następne z Etapu 0** (gdy dasz znak): W-059 Volatility Targeting → W-053 Hurst-DFA (nowa kat. H) → W-054 Permutation Entropy. Mówisz „dawaj dalej" i lecę z W-059.
+
+## 🧑 Cezar
+tak zielone swiatlo
+
+## 🏛️ Claude
+Lecę z **W-059 Volatility Targeting**. Czytam kalkulator lewara, by zrozumieć teren.
+
+## 🏛️ Claude
+Teren jasny. Obecnie rozmiar = ryzyko/stop_pct (risk-based). W-059 dodaje **skalowanie zmiennościowe**: `mnożnik = vol_target/vol_realized` — wysoka vol → mniejsza pozycja. Piękna symbioza z W-055: `vol_realized` to nasz `YANG_ZHANG_20` (annualizowany). Opcjonalne → kompatybilność wsteczna.
+
+## 🏛️ Claude
+Dodaję skalę do wydruku planu i piszę testy.
+
+## 🏛️ Claude
+416/416 ✅ (+6). Symbioza dokumentów dla W-059.
+
+## 🏛️ Claude
+✅ **W-059 wypchnięte** (commit `dbde428`, local == remote, drzewo czyste).
+
+## Raport — W-059 Volatility Targeting
+
+**Standard instytucjonalny wdrożony.** Kalkulator liczył rozmiar tylko risk-based; teraz skaluje go celem zmienności:
+- `skala_vol_targeting(vol_realized, vol_target)` = `vol_target/vol_realized`, przycięte do `[0.25, 1.50]`
+- **Burza** (vol 120% vs cel 60%) → pozycja ×0.5. **Spokój** → większa, ale max ×1.5 (ostrożność > chciwość)
+- **Symbioza z W-055:** `vol_realized` = nasz świeży `YANG_ZHANG_20` — ta sama annualizowana skala
+- Domyślnie `1.0` → pełna kompatybilność wsteczna
+- **+6 testów**
+
+### 🔬 Stan po trzech wizjach tej sesji
+```
+Testy:  416/416 zielone (391 → 398 → 410 → 416)
+Audyt:  exit 0 — pełna harmonia
+Commity: 8f768cd (W-055) · e40673f (W-049) · dbde428 (W-059)
+```
+Trzy filary ryzyka/uczenia zazębione: **Yang-Zhang** mierzy vol → **Volatility Targeting** skaluje nią pozycję → **HedgeMWU** uczy się, którym neuronom wierzyć. Każda zmiana w pełnej symbiozie (MANIFEST/WIZJONER/INDEKS/LOG_ZMIAN/README zsynchronizowane).
+
+### Pozostało w Etapie 0
+- **W-053 Hurst-DFA** — nowy neuron, nowa kategoria `H` (trend/mean-rev/random meta-gate) — większy kawałek (nowa kategoria → WAGI_REZIMU, MANIFEST, audyt)
+- **W-054 Permutation Entropy** — nowy neuron, kategoria `N` (detektor chaosu)
+
+Mówisz „dawaj" i biorę **W-053 Hurst-DFA** — uprzedzam, że to wprowadza nową literę kategorii, więc dotknę WAGI_REZIMU i warstw audytu (zrobię to w pełnej symbiozie).
+
+## 🧑 Cezar
+dawaj zielone swiatlo
+
+## 🏛️ Claude
+Biorę **W-053 Hurst-DFA** (nowa kategoria `H`). Najpierw rozpoznanie: jak rejestrowane są neurony, jak audyt waliduje kategorie, gdzie legenda kategorii.
+
+## 🏛️ Claude
+Uwaga (Prawo XVI): istnieje już **EXP-03 ZwiadowcaHurst**. Muszę sprawdzić, czy neuron Hurst-DFA nie byłby redundantny, zanim go dodam.
+
+## 🏛️ Claude
+EXP-03 już liczy Hurst metodą R/S (kategoria T). To ważne dla Prawa XVI. Sprawdzam, jak audyt waliduje kategorie i martwe litery WAGI_REZIMU — by decyzja o nowej kategorii H była w pełni spójna.
+
+## 🏛️ Claude
+Decyzja (Prawo XVI + XVIII): DFA detrenduje każde okno wielomianem — jest odporny na niestacjonarność, gdzie R/S (EXP-03) daje obciążony wynik. Na trendującym krypto dadzą **różne** H → realna dekorelacja, jak istniejący duet Higuchi+Hurst. Wprowadzam H-01 jako **meta-bramę reżimu** w nowej kategorii H, metodą DFA. Zaraportuję uwagę Prawa XVI i plan pomiaru korelacji.
+
+Krok 1 — DFA w Bramie:
+
+## 🏛️ Claude
+Krok 2 — Budowniczy produkuje `HURST_DFA_100`:
+
+## 🏛️ Claude
+Krok 3 — neuron H-01 w nowym pliku `fraktal.py`:
+
+## 🏛️ Claude
+Krok 4 — legenda kategorii (mikro_neuron.py), audyt LEGENDA_KAT, rejestr, WAGI_REZIMU:
+
+## 🏛️ Claude
+Krok 5 — WAGI_REZIMU dodaje wagi kategorii H (meta-brama wzmacnia trend i range):
+
+## 🏛️ Claude
+Szybka weryfikacja kodu przed testami i dokumentacją:
+
+## 🏛️ Claude
+DFA działa (ograniczony do (0,1), None przy za małej próbie, deterministyczny). Dodaję testy — Brama strukturalnie + neuron H-01 sterowany wstrzykniętą wartością (czysta logika interpretacji):
+
+## 🏛️ Claude
+Audyt działa idealnie — łapie wszystkie rozjazdy. Naprawiam je kolejno. Najpierw testy z zahardkodowaną liczbą 46:
+
+## 🏛️ Claude
+Teraz wiersz tabeli H-01 i nota reżimowa w MANIFEST:
+
+## 🏛️ Claude
+Teraz README i INDEKS (liczby 46→47, 39→40):
+
+## 🏛️ Claude
+425/425 ✅, audyt exit 0, kategoria H żywa. Finalizuję dokumenty: README (testy), WIZJONER W-053, LOG_ZMIAN.
+
+## 🏛️ Claude
+Aktualizuję też legendę kategorii w CLAUDE.md KROK 0 (symbioza):
+
+## 🏛️ Claude
+Pełna bramka przed commitem:
+
+## 🏛️ Claude
+✅ **W-053 wdrożone i wypchnięte** (commit `3790970`, local == remote, drzewo czyste).
+
+## Raport — W-053 Hurst-DFA (nowa kategoria H)
+
+Wprowadziłem **nową literę kategorii H** — w pełnej symbiozie dotknąłem wszystkich warstw, jak zapowiedziałem:
+- **Brama:** pure-Python `HURST_DFA` (DFA, Peng i in. 1994)
+- **Budowniczy:** `HURST_DFA_100`
+- **Neuron H-01** (`neurony/fraktal.py`): meta-brama reżimu — H>0.55 trend, H<0.45 mean-reversion, **H≈0.5 → NEUTRAL „nie handluj"** (najważniejsza rola gate'a)
+- **Kategoria H ożywiona:** legenda `mikro_neuron.py`, `LEGENDA_KAT` audytu, `WAGI_REZIMU` (×1.3 TREND, ×1.2 RANGE), rejestr, CLAUDE.md KROK 0
+- **+9 testów**, liczby 46→47 neuronów (40 aktywnych)
+
+### ⚠️ Uwaga Prawa XVI (raportuję, zgodnie z Twoim rozkazem)
+Odkryłem, że **EXP-03 już liczy Hursta** (metodą R/S). Aby NIE wprowadzić redundancji:
+- H-01 używa **DFA** (detrenduje okna → odporny na trendy), gdzie R/S jest obciążony. Na trendującym krypto dają **różne H** → realna dekorelacja (jak istniejący duet Higuchi+Hurst, który zespół świadomie utrzymuje)
+- H-01 to **meta-brama**, nie trzeci głos kierunkowy
+- **Plan:** korelację H-01↔EXP-03 zmierzymy `diagnostyka_korelacji` po zebraniu danych paper-tradingu. Jeśli |r|>0.80 → scalimy/zważymy w dół (proces Prawa XVI). Zapisane w MANIFEST i LOG_ZMIAN.
+
+### 🔬 Stan po czterech wizjach tej sesji
+```
+Testy:   425/425 zielone (391→398→410→416→425)
+Audyt:   exit 0 — pełna harmonia
+Neurony: 47 (40 aktywnych) | Kategorie: A F H L M O R S T V | Elitarne 14
+Commity: 8f768cd W-055 · e40673f W-049 · dbde428 W-059 · 3790970 W-053
+```
+
+### Pozostało w Etapie 0
+- **W-054 Permutation Entropy** — ostatni element, nowa kategoria `N` (detektor chaosu ortogonalny do RSI/MACD). Czystszy niż W-053 (brak istniejącego odpowiednika).
+
+Mówisz „dawaj" i domykam Etap 0 wizją **W-054 Permutation Entropy**.
+
+## 🧑 Cezar
+powiedz mi zanim zrobisz kolejne dlaczego podczas wprowadzania kolejnych ulepszen nie aktualizujesz naszej pelnej dokumentacji wedlug index sprawdz co mamy zgodnie zywy kod a co jest w dokumentacji wg naszego index dokladnie a pozniej zgodnie z planem ktory aktualnie prowadzimy zasada i musisz to wprowadzic do audytu
+
+## 🏛️ Claude
+Słuszna uwaga, Cezarze. To jest dokładnie troska Prawa XVII/XXI — czy KAŻDY dokument z INDEKSU jest zsynchronizowany z żywym kodem, czy tylko te, które audyt akurat sprawdza. Zanim cokolwiek zmienię, robię pełne rozpoznanie: czytam INDEKS w całości i audyt, potem porównuję każdą pozycję z kodem.
+
+## 🏛️ Claude
+Zanim cokolwiek napiszę — masz rację i chcę to udowodnić liczbami, nie słowami. Robię twarde porównanie: skanuję WSZYSTKIE dokumenty z INDEKSU pod kątem liczb/kategorii, które właśnie zmieniłem (46→47, 39→40, nowa kat. H, kalkulator, igrzyska), i sprawdzam, których audyt w ogóle NIE pilnuje.
+
+## 🏛️ Claude
+You've hit your session limit · resets 2:20am (UTC)

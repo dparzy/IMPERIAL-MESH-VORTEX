@@ -12,7 +12,8 @@ Testuje TYLKO moduły niewymagające TA-Lib/numpy/API (czysty Python):
   - pamiec_absolutna (logi JSONL)
 """
 
-import sys, os, importlib, traceback
+import sys, os, importlib, traceback, inspect, tempfile
+from pathlib import Path
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -20,6 +21,27 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 # Sztywna lista cicho gubiła nowe pliki testów (test_walidacja, 2026-06-10) —
 # nowy moduł testowy "istniał", ale nie był uruchamiany = martwy strażnik.
 import glob as _glob
+
+class _MonkeyPatch:
+    """Minimal monkeypatch — wystarczy do setattr."""
+    def __init__(self):
+        self._undo = []
+
+    def setattr(self, obj, name, value):
+        self._undo.append((obj, name, getattr(obj, name, None)))
+        object.__setattr__(obj, name, value) if isinstance(obj, type) else setattr(obj, name, value)
+
+    def undo(self):
+        for obj, name, old in reversed(self._undo):
+            if old is None:
+                try:
+                    delattr(obj, name)
+                except AttributeError:
+                    pass
+            else:
+                object.__setattr__(obj, name, old) if isinstance(obj, type) else setattr(obj, name, old)
+        self._undo.clear()
+
 
 MODULY_TESTOWE = sorted(
     os.path.splitext(os.path.basename(p))[0]
@@ -46,8 +68,16 @@ def uruchom():
 
         for nazwa_f in funkcje:
             funkcja = getattr(modul, nazwa_f)
+            params = list(inspect.signature(funkcja).parameters)
+            mp = _MonkeyPatch() if "monkeypatch" in params else None
+            tmp = tempfile.mkdtemp() if "tmp_path" in params else None
+            kwargs = {}
+            if mp is not None:
+                kwargs["monkeypatch"] = mp
+            if tmp is not None:
+                kwargs["tmp_path"] = Path(tmp)
             try:
-                funkcja()
+                funkcja(**kwargs)
                 print(f"  ✅ {nazwa_f}")
                 zaliczone += 1
             except AssertionError as e:
@@ -58,6 +88,9 @@ def uruchom():
                 print(f"  💥 {nazwa_f}: {type(e).__name__}: {e}")
                 oblane += 1
                 bledy.append((nazwa_modulu, nazwa_f, traceback.format_exc()))
+            finally:
+                if mp is not None:
+                    mp.undo()
 
     print("\n" + "═" * 60)
     print(f"  WYNIK: {zaliczone} zaliczone, {oblane} oblane "

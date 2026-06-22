@@ -18,8 +18,11 @@ dane/*1m*.csv
 dane/*4h*.csv
 # Konwertowane pliki robocze (generowane przez backtest runner)
 dane/*_imp.csv
+# Cache sentymentu (funding/OI/L-S) — pobierany lokalnie z Binance public (backfill_sentyment.py)
+dane/sentyment/*.csv
 # Dzienne (~320 KB) i godzinowe (~8 MB) — małe, śledzone w repo (NIE ignorowane)
 raporty/
 
 # Stan uczenia cross-session (generowany w runtime — nie wersjonowany)
 logs/
+narzedzia/rag/baza_wiedzy.db

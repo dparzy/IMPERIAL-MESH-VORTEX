@@ -34,6 +34,10 @@
 | 12 | ML-33 | NautilusTrader — Rust+Python event-driven | github.com/nautechsystems/nautilus_trader | ✅ zweryfikowany | Wzorzec architektury (referencja) |
 | 13 | ML-34 | Multi-Timeframe Confluence (QuantPedia/TrendRider) | quantpedia.com/.../multi-timeframe-trend-strategy | ✅ zweryfikowany | **WDROŻONY** styl SCALP/SWING/INVEST w Namiestniku |
 | 14 | ML-35 | Systematic Trend-Following (arXiv 2602.11708) | arxiv.org/abs/2602.11708 | ✅ zweryfikowany | Wzorzec MTF bias-filter (Faza MTF) |
+| 15 | MEM-01 | FinMem — Layered Memory LLM Trading Agent | arxiv.org/abs/2311.13743 | ✅ zweryfikowany | **WDROŻONY** zanik warstwowy w centrum_pamieci (decay∝ważność) |
+| 16 | MEM-02 | FinAgent — Multimodal Foundation Agent (dual reflection) | arxiv.org/abs/2402.18485 | ✅ zweryfikowany | Wzorzec dual-level reflection (plan dla pamiec_refleksyjna) |
+| 17 | MEM-03 | Mem0 — Scalable Long-Term Memory (extract→consolidate→retrieve) | arxiv.org/abs/2504.19413 | ✅ zweryfikowany | Wzorzec scope + konsolidacja/dedup (plan centrum_pamieci) |
+| 18 | MEM-04 | A-Mem — Agentic Memory (Zettelkasten, auto-linking) | arxiv.org/abs/2502.12110 | ✅ zweryfikowany | Wzorzec auto-linkowania lekcji (plan, kandydat) |
 
 > **Odkrycie deep-research (2026-06-03):** auto-selekcja **timeframe + strategia wg reżimu**
 > to **OTWARTY PROBLEM** — Freqtrade (informative pairs), Jesse, NautilusTrader, OctoBot
@@ -401,6 +405,73 @@ ewentualnie zacząć szkic kodu dla A-12 Kronos w Fazie 2.
 > - **VORTEX** (LabLab Milan) — niezweryfikowalny, brak projektu o tej nazwie w źródłach. ❌
 > - **OpenAlice** (rzekomo do backtestu) — to agent LLM w Node.js, NIE silnik backtestu. ❌ niekompatybilny.
 > - **AetherEdge** — realny wskaźnik TradingView, ale opis „RL agenci" przesadzony. ⚠️ tylko jako idea konsensusu.
+
+---
+
+## 🧠 KLASTER PAMIĘCI (MEM-01..04) — scan rynku „mem0 i pamięć absolutna" (2026-06-22)
+
+Deep-research na żądanie Cezara: „FinMem/FinAgent to nasza dziedzina — czy to mamy?".
+Wszystkie ID arXiv zweryfikowane na żywo (WebSearch, czerwiec 2026). Prawo I — zero fabrykacji.
+
+### MEM-01 | FinMem — Layered Memory LLM Trading Agent
+- **Pełna nazwa:** FinMem: A Performance-Enhanced LLM Trading Agent with Layered Memory and Character Design
+- **Źródło (link):** https://arxiv.org/abs/2311.13743 | github.com/pipiku915/FinMem-LLM-StockTrading
+- **Status weryfikacji:** ✅ zweryfikowany (AAAI-SS 2024; autor Yangyang Yu i in.)
+- **Co robi (dla nowicjusza):** agent LLM do tradingu z pamięcią 3-warstwową (płytka/średnia/głęboka),
+  KAŻDA z innym tempem zaniku. Ważne wydarzenia rynkowe „spadają głębiej" i żyją dłużej; rutyna
+  zanika szybko. Plus moduł charakteru (profiling) — odpowiednik naszego PROFIL_CEZARA.md.
+- **Co z tego mamy:** ✅ **WDROŻONE** — `centrum_pamieci._decay_dla_waznosci()` realizuje zanik
+  warstwowy jako funkcję CIĄGŁĄ ważności (nasz unikat vs 3 dyskretne kubełki FinMem). Lekcja
+  krytyczna zanika ~10× wolniej niż rutynowa. Wcześniej: jeden zanik 0.995 dla wszystkich =
+  UTRATA POTENCJAŁU (Prawo XV). Profiling już mieliśmy (PROFIL_CEZARA.md, W-360 v2).
+- **Status implementacji:** ✅ aktywny (centrum_pamieci.py, testy granic zaniku)
+- **Powiązania:** centrum_pamieci.py (W-360 v3), pamiec_refleksyjna.py (W-295), MEM-02
+
+### MEM-02 | FinAgent — Multimodal Foundation Agent (dual-level reflection)
+- **Pełna nazwa:** A Multimodal Foundation Agent for Financial Trading: Tool-Augmented, Diversified, and Generalist (FinAgent)
+- **Źródło (link):** https://arxiv.org/abs/2402.18485 (KDD 2024; Wentao Zhang, Bo An i in., NTU)
+- **Status weryfikacji:** ✅ zweryfikowany
+- **Co robi (dla nowicjusza):** agent multimodalny (liczby+tekst+wykresy) z DWUPOZIOMOWĄ refleksją:
+  niski poziom (refleksja nad ceną/rynkiem) + wysoki poziom (refleksja nad WYNIKIEM własnych
+  transakcji). Do tego „diversified memory retrieval" — osobne pamięci pobierane niezależnie.
+- **Co z tego mamy:** ⚠️ CZĘŚCIOWO — `pamiec_refleksyjna.py` robi refleksję jednopoziomową
+  (narracja po serii transakcji). Brak rozdziału low/high-level. **Kandydat do wdrożenia:**
+  rozdzielić refleksję „co zrobił rynek" od „co zrobiłem ja" (plan, nie kod — Prawo XIX).
+- **Status implementacji:** 🔴 wzorzec (plan rozbudowy pamiec_refleksyjna)
+- **Powiązania:** pamiec_refleksyjna.py, MEM-01
+
+### MEM-03 | Mem0 — Scalable Long-Term Memory
+- **Pełna nazwa:** Mem0: Building Production-Ready AI Agents with Scalable Long-Term Memory
+- **Źródło (link):** https://arxiv.org/abs/2504.19413 (Chhikara, Khant i in., 2025; mem0.ai)
+- **Status weryfikacji:** ✅ zweryfikowany (–90% kosztu tokenów, –91% p95 latencji vs pełny kontekst)
+- **Co robi (dla nowicjusza):** pipeline pamięci EXTRACT→CONSOLIDATE→RETRIEVE: wyłuskuje istotne
+  fakty z rozmowy, KONSOLIDUJE (deduplikuje, rozwiązuje konflikty „stary fakt vs nowy"),
+  potem pobiera. Wariant grafowy łapie relacje. Multi-level scope (sesja/user/agent).
+- **Co z tego mamy:** ⚠️ CZĘŚCIOWO — mamy scope (`lekcje_scope`, Mem0-style) + CRUD
+  (`usun/aktualizuj_lekcje`). Brak AUTOMATYCZNEJ konsolidacji/dedup/rozwiązywania konfliktów —
+  dziś robimy to ręcznie. **Kandydat:** auto-dedup lekcji o tym samym temacie (plan).
+- **Status implementacji:** ⚠️ częściowo wdrożony (scope+CRUD ✅; auto-konsolidacja 🔴 plan)
+- **Powiązania:** centrum_pamieci.py (scope), pamiec_sesji.py (CRUD)
+
+### MEM-04 | A-Mem — Agentic Memory (Zettelkasten)
+- **Pełna nazwa:** A-MEM: Agentic Memory for LLM Agents
+- **Źródło (link):** https://arxiv.org/abs/2502.12110 (Rutgers, Ant Group, Salesforce; 2025)
+- **Status weryfikacji:** ✅ zweryfikowany
+- **Co robi (dla nowicjusza):** pamięć w stylu Zettelkasten — każda notatka jest „atomowa", ma
+  auto-generowane słowa kluczowe/tagi/LINKI do innych notatek. Nowa notatka może AKTUALIZOWAĆ
+  kontekst starych (ewolucja sieci wiedzy). Brak sztywnych, predefiniowanych operacji pamięci.
+- **Co z tego mamy:** ❌ NIE — nasze lekcje są płaskie (lista markdown), bez auto-linkowania.
+  **Kandydat odległy:** linkowanie powiązanych lekcji (np. „bug GARCH" ↔ „speedup GARCH").
+- **Status implementacji:** 🔴 wzorzec (kandydat, niski priorytet — wymaga embeddingów lub LLM)
+- **Powiązania:** bibliotheca_ulpia/ (RAG ma już embeddingi — możliwa baza pod auto-linki)
+
+> **🎯 NASZ UNIKAT (czego NIE ma rynek):** żaden z powyższych nie łączy pamięci tradingowej
+> z **pamięcią sesji deweloperskiej w git** (Memory MCP natywny) ani z **etyką falsyfikacji
+> (Prawo I)** wbudowaną w pipeline. FinMem/FinAgent pamiętają RYNEK; my pamiętamy rynek +
+> CAŁY dialog z Cezarem + lekcje + profil, wszystko wersjonowane gitem (przeżywa kompakcję
+> i wygaśnięcie kontenera chmury). Zanik warstwowy ciągły (nie 3 kubełki) to nasz wkład.
+> **Regime-stale bug** (cosine retrieval gubi trafność przy zmianie reżimu) — otwarty problem
+> rynku; nasz scoring ma już `reżim` w słowach ważnych, ale metadana reżimu per-lekcja = plan.
 
 ---
 

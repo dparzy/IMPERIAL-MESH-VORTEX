@@ -40,6 +40,21 @@ Twarde wnioski z sesji 2026-06-21 (zapisane w LOG_ZMIAN, tu skondensowane):
 | Wysokie IC nie z nakładania | --nienakladajace: IC stabilne | overlap obalony |
 | Brak twardego look-ahead bugu | --przesuniecie: IC płaskie z lagiem | kod czysty od leaku przyszłości |
 | GARCH = stan zmienności, Kyle = stan płynności | teoria + pomiar zgodne | użyć jako kontekst sizingu |
+| MTF gate NIE poprawia wyników ogólnie | backtest A/B, 6 mies. → MTF gorsze (DSR<0.95) | MTF **OFF** jako domyślne — potwierdzone |
+| MTF gate = **tarcza niedźwiedzia** (bear shield) | per-reżim 2021-2026: BEAR_2022 spektakularny | MTF pomaga TYLKO w trendzie spadkowym; szkodzi w bull/range |
+
+### 📊 Szczegółowe wyniki per-reżim MTF (KROK B, 2026-06-21)
+
+| Reżim | Okno | Baseline (OFF) | MTF (ON) | Różnica | Wniosek |
+|-------|------|----------------|----------|---------|---------|
+| BULL_2021 | 2021-01 → 2021-12 | lepszy | gorszy | MTF szkodzi | blokuje silne longi |
+| BEAR_2022 | 2022-01 → 2022-12 | strata | zysk | **MTF ratuje** ⭐ | tarcza przed trendem ↓ |
+| RANGE_2023 | 2023-01 → 2023-12 | lepszy | gorszy | MTF szkodzi | blokuje mean-reversion |
+| RECENT_25-26 | 2025-01 → 2026-06 | lepszy | gorszy | MTF szkodzi | brak dominującego trendu ↓ |
+
+**Kluczowy wniosek:** MTF gate ≠ „lepsza jakość sygnału" — to **weto dla trendów ↓**.
+Właściwe użycie: **warunkowe weto niedźwiedzie** (tylko gdy BTC-trend = BEAR), nie globalna brama.
+Wymaga walidacji na 2018/2025 bear markets zanim implementacja przez Namiestnika.
 
 **Reguła wyniesiona (kandydat do CLAUDE.md):** każdy nowy moduł z wysokim IC →
 OBOWIĄZKOWO backward-IC zanim uznamy za predyktor. Tani test, chroni przed iluzorycznym edge.

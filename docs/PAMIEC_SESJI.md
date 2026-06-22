@@ -98,6 +98,9 @@ Razem: sweep z **8 minut → ~30-40 sekund**.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-22 — Centrum Pamięci W-360 v3 + rynek mem0 scan
+centrum_pamieci.py: hub wszystkich 5 warstw pamięci. Scoring Generative Agents (Park et al. 2304.03442): score=recency×importance×relevance, recency=0.995^dni, importance=heurystyka słów kluczowych (0.3-1.0), relevance=Jaccard (0.5 gdy puste). top_lekcji() → sorted scored nie ostatnie-N. szukaj_wszedzie() → W3 lekcje + W3b kronika w jednym zapytaniu. lekcje_scope() → Mem0-style filtr. Rynek: FinMem (2311.13743) 3-tier short/mid/long; TradingGPT (2309.03736) per-agent recency+relevancy+importance; Memex(RL) (2603.04257) episodic+semantic; From Knowing to Doing (2605.28359) raw logs > summaries; Zep/Graphiti (2501.13956) bi-temporal invalidation; regime-stale bug: cosine retrieval traci skuteczność przy zmianie reżimu → potrzeba temporal decay + regime label metadata; kronika_czatu.py: 100 sesji 5.99MB w repo → git niesie całą historię do chmury.
+
 ### 2026-06-22 — Pamięć v2: CRUD + profil Cezara + Kronika Czatu (vs Hermes/Zep/Mem0)
 - Porównanie z konkurencją (Hermes MEMORY.md/USER.md, Zep/Graphiti bi-temporal KG, Cognee ECL, Mem0 ADD/UPDATE/DELETE/NOOP, MemGPT paging, Generative Agents recency·importance·relevance)
 - Wniosek: nasza Warstwa 3 zbiegła się architektonicznie z Hermesem (markdown rdzeń + FTS5). Zaadoptowane braki:

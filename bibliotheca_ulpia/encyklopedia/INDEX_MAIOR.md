@@ -1,6 +1,6 @@
 # 📖 BIBLIOTHECA ULPIA MAIOR — Master Index
 
-> **Stan na:** 2026-06-21
+> **Stan na:** 2026-06-22
 > **Co to jest:** żywa, tematyczna biblia wiedzy Imperium. Nie streszczenia książek —
 > skondensowana wiedza operacyjna podzielona na działy, z oceną ważności i wprost
 > wskazanym wpływem na kod Imperium (neurony / strategie / bezpieczniki).
@@ -34,6 +34,7 @@
 | **STR** | [Strategie i zagrania](STR_strategie_i_zagrania.md) | ⭐⭐⭐⭐ | rejestr_strategii (20), MTF, Senat | ✅ |
 | **PSY** | [Psychologia tradingu](PSY_psychologia_tradingu.md) | ⭐⭐⭐ | PSY-01..04, Senat, Reguła 6% | ✅ |
 | **ONC** | [On-chain i krypto](ONC_onchain_i_krypto.md) | ⭐⭐⭐ | OC-01..08, RADAR-02/03, Z-07 | ✅ |
+| **MEM** | [Pamięć agentów AI](MEM_pamiec_agentow_ai.md) | ⭐⭐⭐⭐⭐ | centrum_pamieci, pamiec_sesji, kronika_czatu, mnemosyne, pamiec_absolutna, pamiec_refleksyjna | ✅ |
 
 Legenda statusu: ✅ gotowy · 🔲 zaplanowany · 🚧 w budowie
 
@@ -53,6 +54,7 @@ Mapa: która książka zasila który dział. (Pliki: `bibliotheca_ulpia/BIB-xxx_
 | ONC | BIB-030 Ammous (Bitcoin Standard), BIB-029 Bashir (Blockchain), BIB-003 Burniske |
 | ALG | BIB-007/023 López de Prado, BIB-026 Jansen, BIB-031 Tsay, BIB-025 Grinold&Kahn |
 | STR | BIB-002 Murphy, BIB-013/014 Dalton, BIB-006/021 scalping, BIB-019 Harris (Crypto) |
+| MEM | (bez książek — żywi się badaniami arXiv: REJESTR_INSPIRACJI MEM-01..04 + Generative Agents/Hermes/Zep) |
 
 ---
 

@@ -19,10 +19,16 @@ WARSTWY (każda pozostaje samodzielna, tu tylko spięta w całość):
 NOWOŚCI (adopcja badań 2024-2026):
   • Scoring Generative Agents (Park et al., arXiv:2304.03442):
     score = recency × importance × relevance
-    - recency  : wykładniczy zanik (decay^Δdn), dn = dni od lekcji, decay=0.995^Δdn
+    - recency  : wykładniczy zanik (decay^Δdn) — tempo zaniku ZALEŻY OD WAŻNOŚCI
     - importance: heurystyka z słów kluczowych (brak LLM → zero kosztu), 0.0–1.0
     - relevance : Jaccard słów (FTS bez wektorów → działa offline), 0.0–1.0
     EFEKT: lekcje ważne + świeże + trafne wypływają na górę; stare/nieistotne toną.
+
+  • Zanik warstwowy (adopcja FinMem, arXiv:2311.13743 — layered long-term memory):
+    FinMem trzyma 3 dyskretne warstwy (shallow/intermediate/deep) z różnym tempem
+    zaniku. NASZ UNIKAT: ciągła funkcja zaniku od ważności (importance → decay).
+    Lekcja krytyczna ("utrata potencjału") zanika ~10× wolniej niż rutynowa →
+    nie znika z pamięci tak szybko jak drobiazg (naprawa UTRATY POTENCJAŁU, Prawo XV).
 
   • Mem0-style multi-level scope: sesja / użytkownik (Cezar) / agent (Imperium).
     Każda lekcja nosi scope, co pozwala filtrować (lekcje tylko o backteście etc.).
@@ -37,7 +43,7 @@ NOWOŚCI (adopcja badań 2024-2026):
 ARCHITEKTURA PAMIĘCI (dla SessionStart hook — zastępuje wywołanie pamiec_sesji.py):
   centrum_pamieci podsumowanie_startowe → hook wyświetla scored TOP-3 + cross-layer
 
-Bez zależności zewnętrznych (stdlib: re, math, datetime, pathlib) → działa w chmurze.
+Bez zależności zewnętrznych (stdlib: re, datetime, pathlib) → działa w chmurze.
 """
 
 from __future__ import annotations
@@ -55,8 +61,28 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 
 # ─── SCORING GENERATIVE AGENTS (Park et al., 2304.03442) ─────────────────────
 
-_DECAY = 0.995           # wykładniczy zanik jak w oryginalnym paper (per dzień)
 _EPOKA = date(2026, 6, 1)  # data referencyjna (daty w PAMIEC_SESJI są YYYY-MM-DD)
+# (poprzedni stały zanik 0.995 zastąpiony zanikiem warstwowym — patrz niżej)
+
+# ── ZANIK WARSTWOWY (adopcja FinMem arXiv:2311.13743 — layered long-term memory) ──
+# FinMem trzyma 3 dyskretne warstwy (shallow/intermediate/deep) z RÓŻNYM tempem
+# zaniku — ważne wydarzenia trafiają głębiej i żyją dłużej. Nasz UNIKAT: zamiast
+# 3 kubełków robimy CIĄGŁĄ funkcję zaniku od ważności (importance → tempo zaniku).
+# Lekcja rutynowa (i=0.3) zanika szybko (half-life ~69 dni); lekcja krytyczna
+# (i=1.0, "utrata potencjału") zanika wolno (half-life ~690 dni). Bez tego lekcja
+# o bugu znikała tak samo szybko jak notatka o profilu — UTRATA POTENCJAŁU (Prawo XV).
+_DECAY_SHALLOW = 0.99    # rutyna (importance≈0.3) — płytka warstwa, szybki zanik
+_DECAY_DEEP = 0.999     # krytyczne (importance≈1.0) — głęboka warstwa, wolny zanik
+
+
+def _decay_dla_waznosci(importance: float) -> float:
+    """
+    FinMem layered decay jako funkcja ciągła: importance → tempo zaniku per dzień.
+    i=0.3 → 0.99 (płytka), i=1.0 → 0.999 (głęboka). Interpolacja liniowa, clamp [0.3,1.0].
+    """
+    i = min(max(importance, 0.3), 1.0)
+    frakcja = (i - 0.3) / (1.0 - 0.3)
+    return _DECAY_SHALLOW + frakcja * (_DECAY_DEEP - _DECAY_SHALLOW)
 
 # Słowa wskazujące na ważność lekcji (heurystyka zamiast LLM — zero kosztu).
 # Wzorowane na Mem0 ADD/UPDATE metadanych: lekcje z bugiem/odkryciem/prawem ważniejsze.
@@ -69,14 +95,18 @@ _SLOWA_WAZNE = {
 }
 
 
-def _recency(data_str: str) -> float:
-    """Wykładniczy zanik od daty lekcji do dziś (1.0 = dziś, ~0.6 = rok temu)."""
+def _recency(data_str: str, importance: float = 0.6) -> float:
+    """
+    Wykładniczy zanik od daty lekcji do dziś (1.0 = dziś).
+    Tempo zaniku zależy od ważności (FinMem layered decay): lekcja krytyczna
+    zanika wolniej niż rutynowa. importance domyślnie 0.6 (środek) gdy nieznana.
+    """
     try:
         d = date.fromisoformat(data_str)
     except ValueError:
         return 0.5
     delta = (date.today() - d).days
-    return _DECAY ** max(delta, 0)
+    return _decay_dla_waznosci(importance) ** max(delta, 0)
 
 
 def _importance(tytul: str, tresc: str) -> float:
@@ -105,8 +135,8 @@ def score_lekcji(lekcja: Dict[str, str], zapytanie: str = "") -> float:
     Scoring Generative Agents: score = recency × importance × relevance.
     Normalizowany do [0,1] per wywołanie (nie globalnie — brak potrzeby kalibracji).
     """
-    r = _recency(lekcja["data"])
     i = _importance(lekcja["tytul"], lekcja["tresc"])
+    r = _recency(lekcja["data"], i)   # FinMem: tempo zaniku zależy od ważności
     v = _relevance(zapytanie, lekcja["tytul"], lekcja["tresc"])
     return r * i * v if zapytanie else r * i
 

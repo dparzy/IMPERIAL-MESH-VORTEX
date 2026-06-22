@@ -98,6 +98,9 @@ Razem: sweep z **8 minut → ~30-40 sekund**.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-22 — FinMem layered decay wdrożony + scan rynku pamięci (MEM-01..04)
+Pytanie Cezara: czy mamy FinMem/FinAgent. Weryfikacja na żywo (WebSearch): FinMem=2311.13743 (NASZ KOD cytował błędnie 2408.14900 → naprawione, Prawo I), FinAgent=2402.18485, Mem0=2504.19413, A-Mem=2502.12110. WDROŻONE: zanik warstwowy FinMem w centrum_pamieci._decay_dla_waznosci() — tempo zaniku zależy od ważności (i=0.3→0.99 płytka, i=1.0→0.999 głęboka). Naprawia UTRATA POTENCJAŁU (Prawo XV): wcześniej lekcja krytyczna zanikała tak szybko jak rutyna (jeden 0.995). Nasz unikat: funkcja CIĄGŁA vs 3 kubełki FinMem. Rejestr: MEM-01 wdrożony, MEM-02 dual-reflection (plan), MEM-03 Mem0 auto-konsolidacja (plan), MEM-04 A-Mem auto-linki (kandydat). Unikat Imperium: pamięć rynku + pełny dialog+lekcje+profil w git (przeżywa kompakcję), brak na rynku. 4 testy granic zaniku. _DECAY martwy usunięty.
+
 ### 2026-06-22 — Centrum Pamięci W-360 v3 + rynek mem0 scan
 centrum_pamieci.py: hub wszystkich 5 warstw pamięci. Scoring Generative Agents (Park et al. 2304.03442): score=recency×importance×relevance, recency=0.995^dni, importance=heurystyka słów kluczowych (0.3-1.0), relevance=Jaccard (0.5 gdy puste). top_lekcji() → sorted scored nie ostatnie-N. szukaj_wszedzie() → W3 lekcje + W3b kronika w jednym zapytaniu. lekcje_scope() → Mem0-style filtr. Rynek: FinMem (2311.13743) 3-tier short/mid/long; TradingGPT (2309.03736) per-agent recency+relevancy+importance; Memex(RL) (2603.04257) episodic+semantic; From Knowing to Doing (2605.28359) raw logs > summaries; Zep/Graphiti (2501.13956) bi-temporal invalidation; regime-stale bug: cosine retrieval traci skuteczność przy zmianie reżimu → potrzeba temporal decay + regime label metadata; kronika_czatu.py: 100 sesji 5.99MB w repo → git niesie całą historię do chmury.
 

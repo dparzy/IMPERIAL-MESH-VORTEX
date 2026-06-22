@@ -40,6 +40,45 @@ def test_recency_malejacy():
 def test_recency_dzisiaj_rowny_1():
     dzis = date.today().isoformat()
     assert cp._recency(dzis) == 1.0
+    # Dziś = 1.0 niezależnie od ważności (decay^0 == 1)
+    assert cp._recency(dzis, 0.3) == 1.0
+    assert cp._recency(dzis, 1.0) == 1.0
+
+
+# ── Zanik warstwowy (FinMem layered decay, 2311.13743) ────────────────────────
+
+def test_decay_warstwowy_krytyczne_wolniej():
+    """Lekcja krytyczna (i=1.0) ma wolniejszy zanik niż rutynowa (i=0.3)."""
+    assert cp._decay_dla_waznosci(1.0) > cp._decay_dla_waznosci(0.3)
+
+
+def test_decay_warstwowy_granice():
+    """Clamp: importance poza [0.3,1.0] nie wychodzi poza warstwy."""
+    assert cp._decay_dla_waznosci(0.0) == cp._decay_dla_waznosci(0.3)
+    assert cp._decay_dla_waznosci(2.0) == cp._decay_dla_waznosci(1.0)
+    assert cp._decay_dla_waznosci(0.3) == cp._DECAY_SHALLOW
+    assert cp._decay_dla_waznosci(1.0) == cp._DECAY_DEEP
+
+
+def test_recency_krytyczna_przetrwa_dluzej():
+    """Po 200 dniach lekcja krytyczna zachowuje wyższy recency niż rutynowa."""
+    from datetime import date as _d
+    data_str = _d.fromordinal(date.today().toordinal() - 200).isoformat()
+    assert cp._recency(data_str, 1.0) > cp._recency(data_str, 0.3)
+
+
+def test_score_krytyczna_wyprzedza_rutyne_po_czasie():
+    """
+    Regresja UTRATA POTENCJAŁU (Prawo XV): stara lekcja krytyczna ('utrata
+    potencjału') po czasie bije świeższą rutynową dzięki wolniejszemu zanikowi.
+    """
+    from datetime import date as _d
+    stara_data = _d.fromordinal(date.today().toordinal() - 150).isoformat()
+    swieza_data = _d.fromordinal(date.today().toordinal() - 30).isoformat()
+    kryt = {"data": stara_data, "tytul": "utrata potencjału w GARCH",
+            "tresc": "krytyczny błąd"}
+    rut = {"data": swieza_data, "tytul": "profil drobiazg", "tresc": "notatka"}
+    assert cp.score_lekcji(kryt) > cp.score_lekcji(rut)
 
 
 def test_importance_krytyczne_slowo():

@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-06-22 | W-360 | Pamięć v2: CRUD lekcji + profil Cezara + Kronika Czatu (adopcja Hermes/Zep/Mem0)
+
+Cezar: „porównaj naszą pamięć z hermes-agent.org i dodaj, byśmy pamiętali cały czat — lokal+chmura".
+Research konkurencji (5 agentów): Hermes (MEMORY.md/USER.md), Zep/Graphiti (bi-temporal KG),
+Cognee (ECL poly-store), Mem0 (ADD/UPDATE/DELETE/NOOP), MemGPT (paging), Generative Agents
+(recency·importance·relevance), CoALA (episodic/semantic/procedural), RAPTOR (tree-summary).
+
+WNIOSEK: nasza Warstwa 3 zbiegła się architektonicznie z Hermesem (markdown rdzeń + FTS5).
+Domknięto 3 luki + dodano pełną pamięć czatu:
+- CRUD: `usun_lekcje()` / `aktualizuj_lekcje()` (wcześniej tylko append — UTRATA POTENCJAŁU)
+- Limit zwięzłości `LIMIT_ZNAKOW_LEKCJA=1200` (Hermes-style twardy błąd) + `alarm_przepelnienia`
+- Profil Cezara (`docs/PROFIL_CEZARA.md`) = odpowiednik USER.md (model użytkownika ⊥ środowisko)
+- Kronika Czatu (`kronika_czatu.py`): destyluje 148MB transkryptów ~/.claude → ~6MB dialogu
+  w repo (git niesie historię lokal↔chmura), redakcja kluczy API, przyrostowa, wpięta w hook
+
+PLIKI: imperium/biblioteki/pamiec_sesji.py, imperium/biblioteki/kronika_czatu.py,
+docs/PROFIL_CEZARA.md, docs/PAMIEC_SESJI.md, .claude/hooks/session-start.sh,
+tests/test_pamiec_sesji.py (+15), tests/test_kronika_czatu.py (+10),
+bibliotheca_ulpia/dane/kronika/ (100 sesji destylatu), docs/INDEKS_IMPERIUM.md, docs/LOG_ZMIAN.md
+
+---
+
 ## 2026-06-21 | W-384 | A/B MTF PER REŻIM — brama pomaga TYLKO w bessie, szkodzi w hossie/range
 
 Po obaleniu na 6-mies. oknie: re-test na WIELOREŻIMOWEJ historii (paginacja). Hipoteza

@@ -4,7 +4,7 @@
 > Aktualizuj PO każdej sesji. Wczytywana przez SessionStart hook.
 > Indeksowana w RAG jako korpus `pamiec` (plik .md → `bibliotheca_ulpia/dane/`).
 
-## Ostatnia aktualizacja: 2026-06-21
+## Ostatnia aktualizacja: 2026-06-22
 
 ---
 
@@ -98,6 +98,15 @@ Razem: sweep z **8 minut → ~30-40 sekund**.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-22 — Pamięć v2: CRUD + profil Cezara + Kronika Czatu (vs Hermes/Zep/Mem0)
+- Porównanie z konkurencją (Hermes MEMORY.md/USER.md, Zep/Graphiti bi-temporal KG, Cognee ECL, Mem0 ADD/UPDATE/DELETE/NOOP, MemGPT paging, Generative Agents recency·importance·relevance)
+- Wniosek: nasza Warstwa 3 zbiegła się architektonicznie z Hermesem (markdown rdzeń + FTS5). Zaadoptowane braki:
+- (1) CRUD pamięci: usun_lekcje()/aktualizuj_lekcje() — wcześniej tylko append (UTRATA POTENCJAŁU, Prawo XV)
+- (2) limit zwięzłości LIMIT_ZNAKOW_LEKCJA=1200 (Hermes-style twardy błąd) + alarm_przepelnienia sekcji
+- (3) profil_cezara() = odpowiednik USER.md (model użytkownika ⊥ środowisko) → docs/PROFIL_CEZARA.md, wstrzykiwany na starcie
+- (4) kronika_czatu.py: destyluje 148MB transkryptów ~/.claude → 6MB czystego dialogu w repo (git niesie historię lokal↔chmura, rozwiązuje ulotność kontenera). Redakcja kluczy API. Przyrostowa. Wpięta w hook.
+- Do rozważenia później: bi-temporal invalidation (Zep), recency·importance·relevance scoring (Generative Agents), RAPTOR tree-summary
+
 ### 2026-06-21 — Memory MCP natywny (pamiec_sesji.py)
 - Zamiast zewnętrznego Node Memory MCP (nietestowalny w chmurze) → natywny moduł Python (Prawo XIX: kod+testy)
 - imperium/biblioteki/pamiec_sesji.py: lekcje()/dopisz_lekcje()/szukaj()/mapa_podpiec()/podsumowanie_startowe()
@@ -139,8 +148,9 @@ Razem: sweep z **8 minut → ~30-40 sekund**.
 
 ## 🔄 STAN BIEŻĄCY (auto-aktualizuj każdą sesję)
 
-- **Testy:** 1668/1668 ✅ (2026-06-21)
+- **Testy:** 1720/1720 ✅ (2026-06-22)
 - **Neurony:** 81 (aktywne 75, wyciszone 6) | **Zwiadowcy:** 15 (aktywni 13)
 - **Elitarne (Prawo XX):** 18
 - **Branch:** `claude/sleepy-fermi-dsdE4`
-- **Ostatni commit:** 3315f59 — Bibliotheca-RAG v2 (incremental, CSV/JSON/TXT, corpus system)
+- **Ostatni commit:** 7a0dbf8 — W-360 Memory MCP natywny (pamiec_sesji.py)
+- **Pamięć v2 (2026-06-22):** CRUD lekcji + profil Cezara (USER.md-style) + Kronika Czatu (100 sesji destylatu w repo)

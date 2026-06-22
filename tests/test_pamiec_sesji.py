@@ -175,3 +175,108 @@ def test_wielokrotny_dopisz_nie_psuje_parsowania():
     assert len(lek) == 5
     assert lek[0]["tytul"] == "Lekcja 4"   # ostatnia dopisana na górze
     assert lek[-1]["tytul"] == "Lekcja 0"
+
+
+# ── CRUD pamięci (inspiracja Hermes memory tool: add/replace/remove) ──────────
+
+def test_usun_lekcje():
+    """remove: lekcja po tytule znika, reszta zostaje, kolejność zachowana."""
+    p = _plik()
+    assert ps.usun_lekcje("Pierwsza lekcja", p) is True
+    lek = ps.lekcje(p)
+    assert len(lek) == 1
+    assert lek[0]["tytul"] == "Druga lekcja"
+
+
+def test_usun_lekcje_nieistniejaca():
+    p = _plik()
+    assert ps.usun_lekcje("Nie ma takiej", p) is False
+    assert len(ps.lekcje(p)) == 2          # nic nie tknięte
+
+
+def test_usun_zachowuje_ogon_stan_biezacy():
+    """remove nie może zjeść sekcji STAN BIEŻĄCY pod lekcjami."""
+    p = _plik()
+    ps.usun_lekcje("Druga lekcja", p)
+    assert "## 🔄 STAN BIEŻĄCY" in ps.wczytaj(p)
+    assert "Stan." in ps.wczytaj(p)
+
+
+def test_aktualizuj_lekcje():
+    """replace: podmiana treści zachowuje pozycję i datę."""
+    p = _plik()
+    assert ps.aktualizuj_lekcje("Druga lekcja", "Zupełnie nowa treść", p) is True
+    lek = [x for x in ps.lekcje(p) if x["tytul"] == "Druga lekcja"][0]
+    assert "Zupełnie nowa treść" in lek["tresc"]
+    assert "Treść drugiej" not in lek["tresc"]
+
+
+def test_aktualizuj_z_nowym_tytulem():
+    p = _plik()
+    ps.aktualizuj_lekcje("Druga lekcja", "T", p, nowy_tytul="Przemianowana")
+    tytuly = [x["tytul"] for x in ps.lekcje(p)]
+    assert "Przemianowana" in tytuly and "Druga lekcja" not in tytuly
+
+
+def test_aktualizuj_nieistniejaca():
+    p = _plik()
+    assert ps.aktualizuj_lekcje("Brak", "x", p) is False
+
+
+def test_usun_nie_duplikuje_przy_h2_w_tresci():
+    """Regresja: linia '## ' w treści lekcji NIE może zduplikować lekcji ani zjeść ogona."""
+    p = _plik("# P\n\n## 📚 LEKCJE Z SESJI\n\n"
+              "### 2026-06-22 — Nowa\nopis\n## wtrącenie w treści\ndalej\n\n"
+              "### 2026-06-20 — Stara\ntreść stara\n\n"
+              "## 🔄 STAN BIEŻĄCY\nstan\n")
+    assert ps.usun_lekcje("Stara", p) is True
+    tekst = ps.wczytaj(p)
+    # STAN BIEŻĄCY zachowany dokładnie raz, brak duplikatu "Nowa"
+    assert tekst.count("## 🔄 STAN BIEŻĄCY") == 1
+    assert tekst.count("### 2026-06-22 — Nowa") == 1
+    assert "### 2026-06-20 — Stara" not in tekst
+
+
+def test_limit_pojedynczej_lekcji_blokuje():
+    """Hermes-style: lekcja > limit → twardy błąd, nie ciche ucięcie."""
+    import pytest
+    p = _plik()
+    dluga = "x" * (ps.LIMIT_ZNAKOW_LEKCJA + 10)
+    with pytest.raises(ValueError):
+        ps.dopisz_lekcje("Za długa", dluga, plik=p)
+
+
+def test_alarm_przepelnienia_gdy_male_ok():
+    p = _plik()
+    assert ps.alarm_przepelnienia(p) is None
+
+
+def test_alarm_przepelnienia_gdy_duze():
+    """Sekcja ponad limit → alarm Prawa XV (string z 🚨)."""
+    p = _plik("# P\n\n## 📚 LEKCJE Z SESJI\n\n## 🔄 STAN\nx\n")
+    for i in range(40):
+        ps.dopisz_lekcje(f"L{i}", "t" * (ps.LIMIT_ZNAKOW_LEKCJA - 50),
+                         data=f"2026-01-{(i % 28) + 1:02d}", plik=p)
+    alarm = ps.alarm_przepelnienia(p)
+    assert alarm is not None and "🚨" in alarm
+
+
+# ── Profil Cezara (odpowiednik USER.md Hermesa) ──────────────────────────────
+
+def test_profil_cezara_czyta():
+    d = tempfile.mkdtemp()
+    pf = Path(d) / "PROFIL.md"
+    pf.write_text("# Profil\n\n- Lubi krótko\n- Tryb autonomiczny\n", encoding="utf-8")
+    assert "Lubi krótko" in ps.profil_cezara(pf)
+
+
+def test_profil_skrot_zwraca_punkty():
+    d = tempfile.mkdtemp()
+    pf = Path(d) / "PROFIL.md"
+    pf.write_text("# H\n\n- A\n- B\nopis\n- C\n", encoding="utf-8")
+    skrot = ps.profil_skrot(pf, maks_linii=2)
+    assert skrot == ["- A", "- B"]
+
+
+def test_profil_brak_pliku():
+    assert ps.profil_cezara(Path("/nieistnieje/p.md")) == ""

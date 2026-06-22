@@ -34,3 +34,11 @@ if [ -f imperium/biblioteki/pamiec_sesji.py ]; then
   echo "[hook] PAMIĘĆ SESJI (W-360):"
   python -m imperium.biblioteki.pamiec_sesji start || true
 fi
+
+# 4) KRONIKA CZATU (W-360) — destyluj transkrypty do repo (przyrostowo), by CAŁY
+#    czat przetrwał kompakcję i wygaśnięcie kontenera chmury (commit niesie historię).
+if [ -f imperium/biblioteki/kronika_czatu.py ]; then
+  echo "[hook] KRONIKA CZATU (W-360):"
+  python -m imperium.biblioteki.kronika_czatu eksportuj || true
+  python -m imperium.biblioteki.kronika_czatu statystyki || true
+fi

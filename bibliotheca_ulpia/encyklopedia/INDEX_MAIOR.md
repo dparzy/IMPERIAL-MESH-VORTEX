@@ -1,6 +1,6 @@
 # 📖 BIBLIOTHECA ULPIA MAIOR — Master Index
 
-> **Stan na:** 2026-06-22
+> **Stan na:** 2026-06-25
 > **Co to jest:** żywa, tematyczna biblia wiedzy Imperium. Nie streszczenia książek —
 > skondensowana wiedza operacyjna podzielona na działy, z oceną ważności i wprost
 > wskazanym wpływem na kod Imperium (neurony / strategie / bezpieczniki).
@@ -45,7 +45,7 @@ Legenda statusu: ✅ gotowy · 🔲 zaplanowany · 🚧 w budowie
 
 ---
 
-## 📕 KANON ŹRÓDŁOWY (32 książki → działy)
+## 📕 KANON ŹRÓDŁOWY (36 książek → działy)
 
 Mapa: która książka zasila który dział. (Pliki: `bibliotheca_ulpia/BIB-xxx_*`)
 
@@ -59,7 +59,7 @@ Mapa: która książka zasila który dział. (Pliki: `bibliotheca_ulpia/BIB-xxx_
 | ONC | BIB-030 Ammous (Bitcoin Standard), BIB-029 Bashir (Blockchain), BIB-003 Burniske |
 | ALG | BIB-007/023 López de Prado, BIB-026 Jansen, BIB-031 Tsay, BIB-025 Grinold&Kahn |
 | STR | BIB-002 Murphy, BIB-013/014 Dalton, BIB-006/021 scalping, BIB-019 Harris (Crypto) |
-| MEM | (bez książek — żywi się badaniami arXiv: REJESTR_INSPIRACJI MEM-01..04 + Generative Agents/Hermes/Zep) |
+| MEM | BIB-033 Huyen (AI Engineering), BIB-034 Infante (AI Agents), BIB-035 Iusztin&Labonne (LLM Engineer's Handbook), BIB-036 Alto (Building LLM Powered Apps) + arXiv MEM-01..04 (FinMem/FinAgent/Mem0/A-Mem) |
 | MAK | 🔲 BIB-056 Dalio (Big Debt Crises), BIB-057 Dalio (Changing World Order), BIB-058 Dalio (How Countries Go Broke) |
 | BAN | 🔲 BIB-059 Kindleberger, BIB-060 Shiller, BIB-061 Thaler, BIB-062 Chancellor, BIB-063 MacKay, BIB-064 Reinhart-Rogoff |
 | QNT | 🔲 BIB-065 Shreve I (Binomial), BIB-066 Shreve II (Continuous-Time) |

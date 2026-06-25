@@ -76,7 +76,7 @@ TOOLS = [
     {
         "name": "biblioteka_szukaj",
         "description": (
-            "Przeszukuje Bibliothecę Ulpię — 32 książki o tradingu + encyklopedię Imperium. "
+            "Przeszukuje Bibliothecę Ulpię — 36 książek o tradingu + encyklopedię Imperium. "
             "Zwraca najbliższe semantycznie fragmenty z podaniem źródła (BIB-xxx, tytuł, chunk). "
             "Użyj zamiast czytania całych plików epub/pdf."
         ),

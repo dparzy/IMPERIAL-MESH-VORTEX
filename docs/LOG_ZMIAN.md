@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-06-25 | Biblioteka | Kanon 32→36: analiza BIB-033..036 → dział MEM
+
+Cezar wgrał 4 książki o inżynierii LLM/agentów (BIB-033 Huyen *AI Engineering*, BIB-034 Infante
+*AI Agents and Applications*, BIB-035 Iusztin&Labonne *LLM Engineer's Handbook*, BIB-036 Alto
+*Building LLM Powered Applications*) i polecił dokładną analizę zgodnie z zasadami.
+
+Wykonane: ekstrakcja pełnych tekstów (EPUB/AZW3), analiza 4 równoległymi agentami, esencja
+wyciśnięta do działu **MEM** (nowa §8 „Kanon książkowy" + mapa wiedza→kod z 17 konceptów).
+Metadane zweryfikowane (Prawo I): ISBN BIB-033 978-1-098-16630-4, BIB-035 978-1-83620-007-9,
+BIB-036 978-1-83546-231-7 (w plikach); BIB-034 978-1-63343-654-1 + autor **Roberto** Infante
+(nie Michael) potwierdzone WebSearch — autor pracuje dla londyńskiego hedge fundu (nasza dziedzina).
+
+Esencja kluczowa: Huyen — trójwarstwowa pamięć (internal/short/long) + reguła routingu +
+pułapka FIFO (uzasadnia nasz zanik warstwowy) + reranking wg świeżości („stock market") +
+RAG vs fine-tuning + compound mistakes 0,95ⁿ. Infante — stan grafu=pamięć (checkpoint),
+Router vs Supervisor (Senat), MCP. Iusztin — FTI + hybrid search + reranking cross-encoderem.
+Alto — taksonomia pamięci (Buffer/Summary/Entity/KG) + CONDENSE_QUESTION + 3 warstwy anty-halucynacji.
+
+🚨 Prawo XV: blueprint domknięcia Bibliotheca-RAG (W2) z książek — ingestion⊥inference,
+hybryda BM25+dense, reranking, context precision/recall jako metryki.
+
+Symbioza (Prawo XXI): liczba 32→36 zsynchronizowana w README biblioteki, INDEX_MAIOR (tabela+Kanon),
+MEM (W2), centrum_pamieci.py (docstring), mcp_server.py, SETUP_LOKALNY.md, PAMIEC_SESJI (tabela A3).
+Wpisy datowane (snapshot indeksu 7760 fragm./32 z 2026-06-21) świadomie nietknięte — Prawo I.
+
+- Pliki: `bibliotheca_ulpia/BIB-033..036` (4 e-booki), `encyklopedia/MEM_pamiec_agentow_ai.md` (+§8),
+  `encyklopedia/INDEX_MAIOR.md`, `bibliotheca_ulpia/README.md`, `centrum_pamieci.py`,
+  `narzedzia/rag/mcp_server.py`, `narzedzia/rag/SETUP_LOKALNY.md`, `docs/PAMIEC_SESJI.md`,
+  `bibliotheca_ulpia/dane/PAMIEC_SESJI.md`. Testy zielone, audyt exit 0.
+
+---
+
 ## 2026-06-22 | W-360 v3 | FinMem layered decay + scan rynku pamięci (MEM-01..04)
 
 Cezar: „FinMem (2311.13743)/FinAgent (2402.18485) to nasza dziedzina — czy to mamy? poszukaj

@@ -1,11 +1,12 @@
 # 🧠 MEM — Pamięć agentów AI | Encyklopedia Imperium
 
-> **Stan na:** 2026-06-22 | **Ważność:** ⭐⭐⭐⭐⭐ (krytyczny — ciągłość Imperium między sesjami)
+> **Stan na:** 2026-06-25 | **Ważność:** ⭐⭐⭐⭐⭐ (krytyczny — ciągłość Imperium między sesjami)
 > **Co to jest:** dział o PAMIĘCI sztucznych agentów (LLM) — jak Imperium pamięta między
 > sesjami, jak robi to rynek (FinMem/Mem0/Hermes/Zep) i gdzie mamy przewagę. Spina temat,
 > który dotąd był rozproszony po 8 modułach kodu i 4 dokumentach (luka Prawo XV — naprawiona).
 > **Karmi (moduły):** centrum_pamieci, pamiec_sesji, kronika_czatu, mnemosyne,
 > pamiec_absolutna, pamiec_refleksyjna · **Źródła rynku:** REJESTR_INSPIRACJI MEM-01..04.
+> **Kanon książkowy:** BIB-033 Huyen · BIB-034 Infante · BIB-035 Iusztin&Labonne · BIB-036 Alto (§8).
 
 ## 📑 SPIS TREŚCI
 1. [Dlaczego pamięć to problem (dla nowicjusza)](#1-dlaczego-pamięć-to-problem)
@@ -15,6 +16,7 @@
 5. [Nasz unikat (czego nie ma rynek)](#5-nasz-unikat)
 6. [Backlog (kandydaci do wdrożenia)](#6-backlog)
 7. [Mapa: warstwa → moduł kodu](#7-mapa-warstwa--moduł-kodu)
+8. [Kanon książkowy — esencja BIB-033..036](#8-kanon-książkowy)
 
 ---
 
@@ -39,7 +41,7 @@ Pięć warstw, każda samodzielna, spięta fasadą `centrum_pamieci.py` (W-360 v
 |---------|-------|------------|----------|
 | **W1** | `mnemosyne.py` | TRANSAKCJE (trade learning, Book of Flaws) | SQLite |
 | **W1** | `pamiec_absolutna.py` | logi SYGNAŁÓW/TRADE/ANALIZA/TEST (MAE/MFE) | JSONL |
-| **W2** | `bibliotheca_ulpia/` | RAG semantyczny (32 książki + encyklopedia + kronika) | FTS5+wektory |
+| **W2** | `bibliotheca_ulpia/` | RAG semantyczny (36 książek + encyklopedia + kronika) | FTS5+wektory |
 | **W3** | `pamiec_sesji.py` | LEKCJE z sesji + PROFIL Cezara (markdown) | git |
 | **W3b** | `kronika_czatu.py` | PEŁNY DIALOG (destylat transkryptów) | git |
 | **—** | `pamiec_refleksyjna.py` | refleksja narracyjna po seriach transakcji (W-295) | JSONL |
@@ -135,6 +137,140 @@ Pętla decyzyjna / trading
    ├─ pamiec_refleksyjna        → lekcje narracyjne do promptu Senatu/Cesarza (W-295)
    └─ bibliotheca_ulpia (RAG)   → wiedza semantyczna (W2)
 ```
+
+---
+
+## 8. KANON KSIĄŻKOWY
+
+Cztery książki o inżynierii aplikacji LLM i agentów AI — bezpośrednie źródło dla działu MEM,
+Bibliotheca-RAG i doradcy DeepSeek. Esencja wyciśnięta z pełnych tekstów (Prawo XIX —
+analiza na żywo, nie z pamięci). Pełny opis (ZPO): pełna nazwa, ISBN, link, weryfikacja.
+
+| BIB | Autor | Tytuł | Wyd. | ISBN | Format | Weryfikacja |
+|-----|-------|-------|------|------|--------|-------------|
+| 033 | Chip Huyen | AI Engineering: Building Applications with Foundation Models | O'Reilly 2025 | [978-1-098-16630-4](https://www.oreilly.com/library/view/ai-engineering/9781098166298/) | EPUB | ✅ ISBN w pliku |
+| 034 | Roberto Infante | AI Agents and Applications: With LangChain, LangGraph, and MCP | Manning 2025 | [978-1-63343-654-1](https://www.manning.com/books/ai-agents-and-applications) | EPUB | ✅ ISBN+autor zweryf. web |
+| 035 | Paul Iusztin & Maxime Labonne | LLM Engineer's Handbook | Packt 2024 | [978-1-83620-007-9](https://www.packtpub.com/en-us/product/llm-engineers-handbook-9781836200079) | AZW3 | ⚠️ ekstrakcja AZW3 częściowa |
+| 036 | Valentina Alto | Building LLM Powered Applications | Packt 2024 | [978-1-83546-231-7](https://www.packtpub.com/en-us/product/building-llm-powered-applications-9781835462317) | EPUB | ✅ ISBN w pliku |
+
+> **Kontekst (Prawo I):** R. Infante (BIB-034) pracuje dla londyńskiego hedge fundu i buduje
+> agentów do analizy ilościowej — to nasza dziedzina. Książki używają OpenAI/LangChain/Chroma
+> w przykładach; dla Imperium liczy się ARCHITEKTURA (wzorce), nie konkretny dostawca.
+
+### 8.1 BIB-033 Huyen — trójwarstwowa pamięć (fundament teoretyczny)
+
+Najważniejsza dla MEM. Huyen (rozdz. 6 „Memory") definiuje **trzy mechanizmy pamięci agenta**,
+które wprost mapują się na naszą architekturę:
+
+1. **Wiedza wewnętrzna** (internal) — w wagach modelu z treningu (= wagi DeepSeek). Stała.
+2. **Pamięć krótkoterminowa** (short-term) — okno kontekstu, bieżąca sesja/bar. Szybka, ograniczona.
+3. **Pamięć długoterminowa** (long-term) — zewnętrzne dane przez retrieval (= RAG). Trwała,
+   usuwalna bez ruszania modelu.
+
+**Reguła routingu informacji** (idea #1 do zapamiętania): esencjalne dla wszystkich zadań →
+wiedza wewnętrzna; rzadko potrzebne → długoterminowa (RAG); natychmiastowe/kontekstowe →
+krótkoterminowa. **System pamięci = zarządzanie (co gdzie) + retrieval (jak wyciągnąć).**
+
+Strategie przycinania krótkoterminowej (wprost do `centrum_pamieci`):
+- **FIFO** — proste, ale „fatally wrong": wczesne wiadomości (deklaracja celu/reżimu) niosą
+  najwięcej informacji. 🚨 To dokładnie pułapka, którą nasz zanik warstwowy (§3) omija.
+- **Podsumowanie** (kompresja rozmowy) + śledzenie nazwanych encji.
+- **Reflection** (Liu et al. 2023): po akcji agent decyduje WSTAW / SCAL / ZASTĄP sprzeczne lub
+  przestarzałe — wzorzec aktualizacji pamięci po decyzji neuronów.
+- **Alokacja kontekstu:** rezerwa % okna na retrieval long-term (np. 30%), reszta short-term.
+
+**RAG = długoterminowa pamięć modelu.** Retriever (term-based BM25 vs embedding-based dense)
+→ **hybryda** łączy zalety. Vector search = najbliżsi sąsiedzi → ANN (FAISS, HNSW/LSH).
+Ewaluacja: **context precision / context recall**, ranking NDCG/MAP/MRR, embeddingi → MTEB.
+**Reranking wg świeżości** — Huyen wprost wymienia „stock market analysis" jako przypadek
+time-weighted rerankingu (most do doradcy HERMES audytującego świeżość danych).
+
+**Reguła RAG vs fine-tuning** (idea #2): błędy *information-based* (fakty) → RAG; *behavior-based*
+(forma/styl) → fine-tuning. Dla danych rynkowych (z natury świeżych) RAG bije fine-tuning.
+
+**Compound mistakes** (idea #3): 0,95/krok → 60% po 10 krokach, 0,6% po 100. Twardy argument
+za krótkimi łańcuchami decyzyjnymi + guardraile + Reguła Test-Granic.
+
+### 8.2 BIB-034 Infante — stan grafu jako pamięć (LangGraph)
+
+**Trzy zakresy pamięci:** short-term (sesja), long-term-user (między sesjami), long-term-app
+(wspólna dla wszystkich). Książka świadomie pomija dwa ostatnie jako „system-specific" —
+**to luka, którą Imperium wypełnia samo** (nasza wielowarstwowa pamięć w git).
+
+**Kluczowa idea: stan grafu = pamięć, nie lista wiadomości.** Checkpoint = snapshot CAŁEGO
+stanu (historia + wyniki narzędzi + zmienne + metadane), zapisywany po każdym węźle. Daje za
+darmo: (1) **state rehydration po awarii** (wznowienie bez powtarzania drogich kroków),
+(2) **human-in-the-loop** (pauza→zatwierdzenie→wznowienie), (3) kontekst wielowątkowy.
+Sesja = `thread_id`; backend produkcyjny = PostgreSQL.
+
+**Wzorce wieloagentowe (dla Senatu):** **Router** (one-way: pytanie → jeden agent → koniec)
+vs **Supervisor** („agent of agents": orkiestrator odpytuje doradców wielokrotnie, łączy
+i rozumuje nad cząstkowymi wynikami). Senat wielogłosowy = Supervisor; **wymaga mocniejszego
+modelu-orkiestratora** (konsekwencja kosztowa). **MCP** (Model Context Protocol, Anthropic) —
+standaryzuje integrację narzędzi u źródła: dane Imperium (Brama, baza neuronów, wskaźniki)
+wystawione raz jako serwery MCP zamiast adaptera per-neuron.
+
+### 8.3 BIB-035 Iusztin & Labonne — RAG produkcyjny + FTI (LLMOps)
+
+⚠️ Ekstrakcja AZW3 częściowa (czytelny TOC + sekcje RAG; reszta to szum binarny). Pewne:
+
+**Architektura FTI (Feature / Training / Inference)** — trzy niezależne pipeline'y spięte
+feature store + model registry; lek na monolit ML, każdy skalowalny osobno. Szkielet dla
+rozdzielenia pamięci / treningu / decyzji w Imperium.
+
+**RAG = dwa rozdzielone pipeline'y:** *ingestion* (dane → chunking → embedding → vector DB)
+i *inference* (retrieval → augmentacja → generacja). Vector store = **Qdrant** + metadane
+(pre-filtering). Embedder wg **MTEB** (start: `all-MiniLM-L6-v2` na CPU; domenowy: INSTRUCTOR
+lub fine-tuning). **Hybrid search (alpha)** — łączy semantykę z exact-match (łapie tickery!).
+**Reranking cross-encoderem** (`ms-marco`) — największy skok jakości RAG przy małym koszcie:
+retrieval daje kandydatów (szybko), cross-encoder wybiera trafne (dokładnie). Cykl modelu:
+SFT → ewaluacja → **DPO** (preference, tańsze niż RLHF) → optymalizacja inferencji → deploy.
+
+### 8.4 BIB-036 Alto — taksonomia pamięci konwersacyjnej (LangChain)
+
+Najbardziej konkretna mapa typów pamięci (dla `centrum_pamieci`):
+
+- **BufferMemory** — wszystko dosłownie (wierne, drogie, rośnie bez końca).
+- **BufferWindowMemory** — przesuwne okno K ostatnich tur.
+- **TokenBufferMemory** — okno limitowane tokenami, nie turami.
+- **SummaryMemory** — streszcza rozmowę przez LLM (długie dialogi, stratne).
+- **SummaryBufferMemory** — hybryda: świeże dosłownie + stare streszczone (najlepszy kompromis).
+- **EntityMemory** — fakty o encjach (osoba/instrument/reżim) budowane w czasie.
+- **KGMemory** — trójki podmiot–predykat–dopełnienie w grafie wiedzy („neuron X → kategoria Y").
+- **VectorStore memory** — interakcje jako wektory, retrieval top-K (semantyczna, niechronologiczna).
+
+**Brak uniwersalnego przepisu** — warstwuj świadomie. **CONDENSE_QUESTION pattern**: przed
+retrievalem scal historię + bieżące pytanie w jedno samodzielne zapytanie (bez tego RAG gubi
+follow-upy). **3 warstwy mitygacji halucynacji:** model (fine-tune) / metaprompt (grounding:
+„jeśli nie wiesz — powiedz") / UX (cytowanie źródeł).
+
+### 8.5 MAPA WIEDZA → KOD IMPERIUM (synteza 4 książek)
+
+| Koncept | Źródło | Gdzie w Imperium |
+|---------|--------|------------------|
+| Trójwarstwowa pamięć (internal/short/long) | Huyen r.6 | szkielet `centrum_pamieci` (wagi DeepSeek / kontekst / RAG) |
+| Reguła routingu wg częstości użycia | Huyen r.6 | polityka co→która warstwa pamięci |
+| Reflection (wstaw/scal/zastąp sprzeczne) | Huyen r.6 | aktualizacja lekcji po decyzji (zgodne z Prawem XVIII) |
+| Pułapka FIFO (wczesne = najważniejsze) | Huyen r.6 | uzasadnienie zaniku warstwowego §3 (nie czysty FIFO) |
+| Reranking wg świeżości („stock market") | Huyen r.6 | Bibliotheca-RAG waży świeżość; most do HERMES |
+| Hybrid search (term+embedding, alpha) | Huyen r.6 / Iusztin r.10 | Bibliotheca-RAG: BM25 (klucze/tickery) + dense (semantyka) |
+| Reranking cross-encoderem | Iusztin r.10 | Bibliotheca-RAG: tani retrieval → precyzyjny rerank top-K |
+| context precision/recall, MTEB, NDCG | Huyen r.6 / Iusztin r.8 | metryki ewaluacji Bibliotheca (Prawo XX/XXI — mierzone) |
+| Stan grafu = pamięć (checkpoint) | Infante r.14 | model pełnego stanu sesji; rehydration po awarii pipeline'u |
+| Router vs Supervisor | Infante r.12 | Senat = Supervisor (wielokrotne odpytanie + synteza) |
+| MCP (narzędzia u źródła) | Infante r.13 | wystaw Bramę/neurony/wskaźniki jako serwery MCP |
+| Architektura FTI | Iusztin r.1 | rozdzielenie Feature/Training/Inference pipeline |
+| CONDENSE_QUESTION | Alto r.6 | scalanie historii+pytania przed retrievalem Bibliotheca |
+| Taksonomia pamięci (Buffer/Summary/Entity/KG) | Alto r.5 | warstwy `centrum_pamieci`: okno / summary / encje / KG |
+| RAG vs fine-tuning (info vs behavior) | Huyen r.7 | decyzja kierunkowa dla DeepSeek (Cezar, Prawo XVIII) |
+| Compound mistakes (0,95ⁿ) | Huyen r.6 | krótkie łańcuchy + guardraile + Test-Granic |
+| 3 warstwy mitygacji halucynacji | Alto r.12 | metaprompt groundingowy + walidacja odpowiedzi DeepSeek |
+| Guardraile wyjścia + retry + fallback | Huyen r.10 | walidacja formatu sygnału doradcy (JSON + retry) |
+
+🚨 **PRAWO XV — potencjał do wykorzystania:** Bibliotheca-RAG (W2) jest dziś zaplanowana, nie
+wdrożona. Książki dają gotowy blueprint: ingestion⊥inference, hybryda BM25+dense, reranking
+cross-encoderem, reranking wg świeżości, context precision/recall jako metryki. To konkretna
+ścieżka domknięcia W2 (patrz dział IMP → Bibliotheca-RAG).
 
 ---
 

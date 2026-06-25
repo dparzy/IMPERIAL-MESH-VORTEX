@@ -12,7 +12,7 @@ centrum_pamieci as pm`.
 WARSTWY (każda pozostaje samodzielna, tu tylko spięta w całość):
   W1 — mnemosyne.py      : pamięć TRANSAKCJI (trade learning, Book of Flaws, SQLite)
   W1 — pamiec_absolutna.py: logi SYGNAŁÓW, TRADE, ANALIZA, TEST (JSONL / TypLogu)
-  W2 — bibliotheca_ulpia/ : RAG semantyczny (FTS5+wektory, 32 książki + docs + kronika)
+  W2 — bibliotheca_ulpia/ : RAG semantyczny (FTS5+wektory, 36 książek + docs + kronika)
   W3 — pamiec_sesji.py   : LEKCJE z sesji + PROFIL Cezara (markdown → git)
   W3 — kronika_czatu.py  : PEŁNY DIALOG (destylat transkryptów → git)
 

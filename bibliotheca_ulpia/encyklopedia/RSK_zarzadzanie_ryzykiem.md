@@ -1,6 +1,6 @@
 # 🏛️ RSK — Zarządzanie Ryzykiem | Encyklopedia Imperium
 
-> **Stan na:** 2026-06-21 | **Ważność:** ⭐⭐⭐⭐⭐ (krytyczny — to fundament przetrwania)
+> **Stan na:** 2026-06-25 | **Ważność:** ⭐⭐⭐⭐⭐ (krytyczny — to fundament przetrwania)
 > **Dla nowicjusza (ZPO):** zarządzanie ryzykiem to NIE „jak zarobić", lecz „jak NIE
 > stracić wszystkiego". 90% traderów upada nie przez złe wejścia, lecz przez brak kontroli
 > straty. Pierwsza zasada: przetrwać, by móc grać dalej. Druga: patrz na zasadę pierwszą.
@@ -122,7 +122,25 @@ walidacji. To uczciwe — 6 mies. danych to za mało, by cokolwiek udowodnić.
 ---
 
 ## 8. ŹRÓDŁA
+- **BIB-042 Jorion** — *Value at Risk: The New Benchmark* (3 ed., McGraw-Hill 2007,
+  978-0-07-146495-6) ✅ — biblia VaR/FRM. Esencja: **VaR** = kwantyl straty (95%→α=1.645,
+  99%→α=2.326); **Expected Shortfall (ES/CVaR)** = średnia strata POZA VaR, lepiej oddaje
+  ryzyko ogona (dla grubych ogonów krypto ES >> VaR) i jest koherentna. **EWMA λ=0.94**
+  (dzienne) — złoty środek między MA (ghosting) a GARCH (kosztowny); gotowy wzór do neuronów
+  zmienności (kat. V). **Backtest VaR** (test Kupca, strefy Basel green/yellow/red) — wzorzec
+  samokontroli bezpiecznika. „VaR jest konieczny, ale **niewystarczający**" → + stress testy.
+- **BIB-041 Taleb** — *Fooled by Randomness* (Random House 2005, 2 ed., 978-0-8129-7521-5) ✅ —
+  esencja: liczy się **magnituda, nie częstotliwość** (P(zysk) × wypłata, nie win-rate);
+  **survivorship bias** (313 „geniuszy" z uczciwej monety po 5 latach) → wprost uzasadnia
+  **DSR/PBO** (deflacja Sharpe liczbą prób); katastrofa **nieobecna w danych** (negatywna
+  skośność) → backtest usypia, potrzebne bezpieczniki ogona; anty-overfit/data-snooping.
+- **BIB-040 Bernstein** — *Against the Gods: The Remarkable Story of Risk* (Wiley 1996,
+  978-0-471-12104-6) ✅ web — esencja: **loss aversion** („they hate losing, not uncertainty";
+  przy stratach ludzie stają się poszukiwaczami ryzyka) → uzasadnia TWARDY, nieprzełamywalny
+  HALT/stop-loss. **Trzy pułapki regresji do średniej** (szok / brak zatrzymania / ruchoma
+  średnia) → strategia „wróci do normy" wymaga detekcji zmiany reżimu. „Vast ills have
+  followed a belief in certainty" (Arrow) — model ≠ rynek (Prawo XVI/weryfikacja ⚠️).
 - BIB-007 López de Prado — *Advances in Financial ML* (DSR, PBO, HRP)
 - BIB-009 Mandelbrot — *Misbehavior of Markets* (grube ogony)
 - BIB-025 Grinold & Kahn — *Active Portfolio Management*
-- Powiązane: **LEW**, **ALG**, **TRD** (Seykota, PTJ, Hite)
+- Powiązane: **LEW**, **ALG**, **TRD** (Seykota, PTJ, Hite), **BAN** (overreaction, loss aversion), **QNT** (EWMA/GARCH)

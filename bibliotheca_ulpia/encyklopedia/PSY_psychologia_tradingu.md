@@ -1,6 +1,6 @@
 # 🏛️ PSY — Psychologia Tradingu | Encyklopedia Imperium
 
-> **Stan na:** 2026-06-21 | **Ważność:** ⭐⭐⭐ (średni dla automatu, krytyczny dla człowieka)
+> **Stan na:** 2026-06-25 | **Ważność:** ⭐⭐⭐ (średni dla automatu, krytyczny dla człowieka)
 > **Dla nowicjusza (ZPO):** psychologia to powód, dla którego większość traderów przegrywa
 > mimo dobrego systemu. Strach i chciwość łamią dyscyplinę. **Imperium istnieje po to, by
 > WYELIMINOWAĆ emocje z decyzji** — rój wykonuje plan bez paniki. Ale Cezar (człowiek) wciąż
@@ -89,8 +89,16 @@ Psychologia TŁUMU jest mierzalna i kontrariańska na ekstremach:
 ---
 
 ## 7. ŹRÓDŁA
+- **BIB-039 Lefèvre** — *Reminiscences of a Stock Operator* (978-0-470-59322-6) ✅ — esencja PSY:
+  **nadzieję i strach trzeba ODWRÓCIĆ** — instynkt każe trzymać stratę (nadzieja) i zamykać
+  zysk za wcześnie (strach), dokładnie odwrotnie niż trzeba. „**The market does not beat them.
+  They beat themselves... they cannot sit tight**" (wróg wewnątrz). Cztery wrogi: *ignorance,
+  greed, fear, hope*. Tłum pyramiduje na szczycie i panikuje na dnie (whipsaw).
+- **BIB-038 Schwager** — *Market Wizards* (978-1-118-27305-0) ✅ — esencja PSY: najgorsze straty
+  przychodzą po najlepszych wynikach (ego); „wyjdę na zero" = pułapka; zakaz uśredniania strat;
+  redukcja wielkości po serii strat → kandydaci na bezpieczniki behawioralne.
 - BIB-017 Kahneman — *Thinking Fast and Slow*
 - BIB-016 Douglas — *Trading in the Zone*
 - BIB-004 Steenbarger — *Psychology of Trading*
 - BIB-015 Elder — *New Trading for a Living* (psychologia + ryzyko)
-- Powiązane: **TRD**, **RSK**, **LEW**
+- Powiązane: **TRD**, **RSK**, **LEW**, **BAN** (loss aversion — Bernstein/Taleb)

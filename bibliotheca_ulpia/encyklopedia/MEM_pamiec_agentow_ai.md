@@ -41,7 +41,7 @@ Pięć warstw, każda samodzielna, spięta fasadą `centrum_pamieci.py` (W-360 v
 |---------|-------|------------|----------|
 | **W1** | `mnemosyne.py` | TRANSAKCJE (trade learning, Book of Flaws) | SQLite |
 | **W1** | `pamiec_absolutna.py` | logi SYGNAŁÓW/TRADE/ANALIZA/TEST (MAE/MFE) | JSONL |
-| **W2** | `bibliotheca_ulpia/` | RAG semantyczny (36 książek + encyklopedia + kronika) | FTS5+wektory |
+| **W2** | `bibliotheca_ulpia/` | RAG semantyczny (42 książki + encyklopedia + kronika) | FTS5+wektory |
 | **W3** | `pamiec_sesji.py` | LEKCJE z sesji + PROFIL Cezara (markdown) | git |
 | **W3b** | `kronika_czatu.py` | PEŁNY DIALOG (destylat transkryptów) | git |
 | **—** | `pamiec_refleksyjna.py` | refleksja narracyjna po seriach transakcji (W-295) | JSONL |

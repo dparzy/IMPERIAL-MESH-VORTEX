@@ -1,6 +1,6 @@
 # 🏛️ TRD — Słynni Traderzy | Encyklopedia Imperium
 
-> **Stan na:** 2026-06-21 | **Ważność:** ⭐⭐⭐⭐ (wysoki — sprawdzone w boju techniki)
+> **Stan na:** 2026-06-25 | **Ważność:** ⭐⭐⭐⭐ (wysoki — sprawdzone w boju techniki)
 > **Dla nowicjusza (ZPO):** to lista legend tradingu z dokładnym opisem ICH techniki
 > i — co najważniejsze — **przypisaniem do konkretnego modułu/strategii Imperium**.
 > Nie „ciekawostki", tylko mapa: czego nauczył nas każdy mistrz i gdzie to żyje w kodzie.
@@ -159,9 +159,19 @@
 ---
 
 ## 8. ŹRÓDŁA
+- **BIB-038 Schwager** — *Market Wizards: Interviews with Top Traders* (Wiley,
+  978-1-118-27305-0) ✅ — kanon wywiadów. Esencja: brak „świętego Graala" (metody różne,
+  wspólne = bezwzględna kontrola ryzyka + dyscyplina + dopasowanie do osobowości).
+  Kovner/Seykota/Hite: **1–2% na trade**; Kovner i Hite **mierzą korelację pozycji codziennie**
+  („8 skorelowanych = 1 pozycja 8×" — wprost Prawo XVI). „**Undertrade, undertrade, undertrade**"
+  — wielkość pozycji, nie wejście, decyduje czy rządzi strach. Oceniaj **proces, nie wynik**.
+- **BIB-039 Lefèvre** — *Reminiscences of a Stock Operator* (Wiley 2010 annotated, oryg. 1923,
+  978-0-470-59322-6) ✅ — życie Jesse Livermore'a. Esencja: „**It was never my thinking that
+  made the big money — it was my sitting**" (cierpliwość > inteligencja); **line of least
+  resistance** (trend); „**always sell what shows you a loss**" (anty-uśrednianie); trend
+  wyprzedza newsy; **anty-tip** („nobody can make big money on what someone else tells him" = Prawo I).
 - BIB-015 Elder — *New Trading for a Living*
 - BIB-028 Narang — *Inside the Black Box* (systematic)
 - BIB-010/011 Chan — *Quantitative/Algorithmic Trading*
 - BIB-016 Douglas, BIB-017 Kahneman, BIB-004 Steenbarger (psychologia)
-- *Market Wizards* (Schwager) — kanon wywiadów z traderami [⚠️ niezweryfikowany w bibliotece — kandydat do dodania]
 - Powiązane działy: **LEW**, **RSK**, **PSY**, **STR**

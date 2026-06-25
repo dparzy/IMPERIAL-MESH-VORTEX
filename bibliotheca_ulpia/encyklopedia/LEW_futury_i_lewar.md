@@ -1,6 +1,6 @@
 # 🏛️ LEW — Futury i Lewar | Encyklopedia Imperium
 
-> **Stan na:** 2026-06-21 | **Ważność:** ⭐⭐⭐⭐⭐ (krytyczny — bezpośrednio dotyka kapitału)
+> **Stan na:** 2026-06-25 | **Ważność:** ⭐⭐⭐⭐⭐ (krytyczny — bezpośrednio dotyka kapitału)
 > **Dla nowicjusza (ZPO):** lewar (dźwignia) = pożyczasz kapitał, by handlować większą
 > pozycją niż masz. 10× lewar = 1000 USD steruje pozycją 10 000 USD. Zysk ×10, ale i
 > strata ×10 — i jest **likwidacja**: gdy strata zje Twój depozyt, giełda zamyka pozycję siłą.
@@ -144,8 +144,16 @@ To najtańszy duży skok jakości — patrz dział IMP.
 ---
 
 ## 6. ŹRÓDŁA
+- **BIB-037 Hull** — *Options, Futures, and Other Derivatives* (11 ed., Pearson 2022,
+  978-0-13-693997-9) ✅ — kanon derywatów. Esencja LEW:
+  - **Mechanika margin** (Rdz 2.4): initial vs maintenance; po margin call dopłaca się do
+    poziomu **initial**, nie maintenance — wzorzec dla bufora likwidacyjnego KalkulatoraLewara.
+  - **Lekcja Lehman 31:1** — przy lewarze 31× spadek aktywów o 3–4% wymazuje kapitał → twardy limit lewara.
+  - **Daily settlement (mark-to-market)** — odpowiednik likwidacji na futures crypto.
+  - ⚠️ Prawo I: Hull NIE pokrywa crypto perpetual swap/funding ("perpetual" u Hulla =
+    wieczyste opcje amerykańskie). Nie cytować jako źródła dla funding rate.
 - BIB-008 Sinclair — *Volatility Trading* (zmienność, sizing)
 - BIB-018 Sinclair — *Positional Option Trading*
 - BIB-027 Aldridge — *High-Frequency Trading* (mikrostruktura, impact)
 - BIB-020 Harris — *Trading and Exchanges* (mechanika rynku)
-- Powiązane działy: **RSK** (ryzyko), **MKS** (mikrostruktura), **TRD** (traderzy)
+- Powiązane działy: **RSK** (ryzyko), **MKS** (mikrostruktura), **TRD** (traderzy), **QNT** (EWMA/GARCH — Hull Rdz 23)

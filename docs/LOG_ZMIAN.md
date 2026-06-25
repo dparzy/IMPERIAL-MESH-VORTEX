@@ -6,6 +6,33 @@
 
 ---
 
+## 2026-06-25 | Biblioteka | Kanon 36→42: analiza BIB-037..042 → LEW/TRD/PSY/RSK
+
+Cezar wgrał 6 klasyków na branch roboczy: BIB-037 Hull *Options, Futures and Other Derivatives*,
+BIB-038 Schwager *Market Wizards*, BIB-039 Lefèvre *Reminiscences of a Stock Operator*,
+BIB-040 Bernstein *Against the Gods*, BIB-041 Taleb *Fooled by Randomness*, BIB-042 Jorion *Value at Risk*.
+
+Wykonane: ekstrakcja EPUB + 6 równoległych agentów → esencja do działów LEW (Hull), TRD
+(Schwager+Lefèvre), PSY (Schwager+Lefèvre), RSK (Bernstein+Taleb+Jorion). ISBN zweryfikowane
+(Prawo I): Hull 978-0-13-693997-9, Schwager 978-1-118-27305-0, Lefèvre 978-0-470-59322-6 (w plikach);
+Bernstein 978-0-471-12104-6 i Taleb 978-0-8129-7521-5 (plik=bundel Incerto → web). Jorion 978-0-07-146495-6.
+
+Esencja kluczowa: Hull — margin call dopłaca do INITIAL nie maintenance, Lehman 31:1, GARCH>EWMA;
+⚠️ Hull NIE pokrywa crypto perpetual/funding (Prawo I). Schwager — undertrade, korelacja pozycji
+codziennie (Prawo XVI), oceniaj proces nie wynik. Lefèvre — sit tight, anty-uśrednianie, hope/fear
+odwrócone, anty-tip=Prawo I. Bernstein — loss aversion (uzasadnia twardy HALT), 3 pułapki regresji.
+Taleb — magnituda nie częstotliwość, survivorship bias→DSR/PBO, katastrofa nieobecna w danych.
+Jorion — VaR vs Expected Shortfall (krypto: ES>>VaR), EWMA λ=0.94, backtest VaR strefy Basel.
+
+Symbioza (Prawo XXI): 36→42 zsync w README, INDEX_MAIOR (Kanon+wiersze LEW/TRD/PSY/RSK),
+MEM (W2), centrum_pamieci.py, mcp_server.py, SETUP_LOKALNY, PAMIEC_SESJI (A3). Daty działów → 2026-06-25.
+
+- Pliki: `bibliotheca_ulpia/BIB-037..042` (6 e-booków), działy `LEW/TRD/PSY/RSK_*.md`,
+  `INDEX_MAIOR.md`, `MEM_*.md`, `README.md`, `centrum_pamieci.py`, `mcp_server.py`,
+  `SETUP_LOKALNY.md`, `docs/PAMIEC_SESJI.md`, `dane/PAMIEC_SESJI.md`. Testy zielone, audyt exit 0.
+
+---
+
 ## 2026-06-25 | Biblioteka | Kanon 32→36: analiza BIB-033..036 → dział MEM
 
 Cezar wgrał 4 książki o inżynierii LLM/agentów (BIB-033 Huyen *AI Engineering*, BIB-034 Infante

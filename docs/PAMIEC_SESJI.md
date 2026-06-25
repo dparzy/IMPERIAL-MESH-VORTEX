@@ -16,7 +16,7 @@
 |----|--------|--------|-----------|---------|
 | A1 | **GitHub MCP** | ✅ działa (cloud) | — | PR, issues, CI |
 | A2 | **Memory MCP** 💎 | ✅ natywny (imperium/biblioteki/pamiec_sesji.py + hook) | — | Trwała pamięć między sesjami (ROZWIĄZUJE W-360) |
-| A3 | **Bibliotheca-RAG MCP** 💎 | ✅ zbudowany (W-360 RAG v2) | — | Szukaj w 36 książkach + encyklopedii + docs (indeks do przebudowy po BIB-033..036) |
+| A3 | **Bibliotheca-RAG MCP** 💎 | ✅ zbudowany (W-360 RAG v2) | — | Szukaj w 42 książkach + encyklopedii + docs (indeks do przebudowy po BIB-033..042) |
 | A4 | **Filesystem MCP** 🔵 | ⏳ opcjonalny | niski | Dostęp do plików lokalnych bez Read tool |
 | A5 | **Fetch/Web MCP** 🔵 | ⏳ opcjonalny | niski | WebFetch przez MCP |
 | A6 | **Sequential-Thinking MCP** 💎 | ⏳ nie skonfigurowany | średni | Ustrukturyzowane rozumowanie krok po kroku |
@@ -97,6 +97,9 @@ Razem: sweep z **8 minut → ~30-40 sekund**.
 ---
 
 ## 📚 LEKCJE Z SESJI
+
+### 2026-06-25 — Kanon 36→42: 6 klasyków → LEW/TRD/PSY/RSK
+Cezar wgrał BIB-037..042 (Hull, Schwager, Lefèvre, Bernstein, Taleb, Jorion). Ekstrakcja EPUB + 6 agentów → esencja do działów. ISBN zweryf. (Prawo I; Bernstein/Taleb przez web bo plik Taleba=bundel Incerto). Esencja: Hull — margin call dopłaca do INITIAL nie maintenance, Lehman 31:1, ⚠️ Hull NIE pokrywa crypto perpetual/funding. Schwager — undertrade, korelacja pozycji codziennie (Prawo XVI), proces>wynik. Lefèvre — sit tight, anty-uśrednianie, hope/fear odwrócone, anty-tip=Prawo I. Bernstein — loss aversion uzasadnia twardy HALT + 3 pułapki regresji do średniej. Taleb — magnituda>częstotliwość, survivorship bias→DSR/PBO, katastrofa nieobecna w danych→bezpieczniki ogona. Jorion — Expected Shortfall>VaR dla grubych ogonów krypto, EWMA λ=0.94, backtest VaR strefy Basel. Symbioza 36→42 w 8 plikach.
 
 ### 2026-06-25 — Kanon 32→36: 4 książki LLM/agentów → dział MEM
 Cezar wgrał BIB-033..036 (Huyen *AI Engineering*, Infante *AI Agents and Applications*, Iusztin&Labonne *LLM Engineer's Handbook*, Alto *Building LLM Powered Applications*). Pełna analiza: ekstrakcja EPUB/AZW3 + 4 równoległe agenty → esencja do MEM §8 (mapa 17 konceptów→kod). Prawo I: zweryfikowano ISBN-y; BIB-034 to **Roberto** Infante (nie Michael), ISBN 978-1-63343-654-1, hedge-fund quant. Esencja: Huyen — 3-warstwowa pamięć (internal/short/long) + pułapka FIFO (uzasadnia nasz zanik warstwowy) + reranking wg świeżości („stock market") + RAG>fine-tuning dla świeżych danych + compound mistakes 0,95ⁿ. Infante — stan grafu=pamięć (checkpoint), Router vs Supervisor (Senat=Supervisor, mocniejszy model), MCP. Iusztin — FTI + hybrid search (BM25+dense łapie tickery) + reranking cross-encoderem (największy zysk RAG). Alto — taksonomia pamięci (Buffer/Summary/Entity/KG) + CONDENSE_QUESTION. 🚨 Prawo XV: gotowy blueprint domknięcia Bibliotheca-RAG (W2). UWAGA techniczna: `git checkout origin/main -- ` nadpisuje pliki lokalne — książki były na branchu roboczym, nie main; sync przez merge (nie reset --hard, blokuje auto-mode).

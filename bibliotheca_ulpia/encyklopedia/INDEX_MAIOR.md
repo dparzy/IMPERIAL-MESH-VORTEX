@@ -45,16 +45,16 @@ Legenda statusu: ✅ gotowy · 🔲 zaplanowany · 🚧 w budowie
 
 ---
 
-## 📕 KANON ŹRÓDŁOWY (36 książek → działy)
+## 📕 KANON ŹRÓDŁOWY (42 książki → działy)
 
 Mapa: która książka zasila który dział. (Pliki: `bibliotheca_ulpia/BIB-xxx_*`)
 
 | Dział | Książki źródłowe |
 |-------|------------------|
-| LEW | BIB-008 Sinclair (Volatility), BIB-018 Sinclair (Options), BIB-027 Aldridge (HFT) |
-| TRD | BIB-015 Elder, BIB-028 Narang (Black Box), BIB-010/011 Chan |
-| RSK | BIB-007 López de Prado (AFML), BIB-025 Grinold&Kahn, BIB-009 Mandelbrot |
-| PSY | BIB-004 Steenbarger, BIB-016 Douglas, BIB-017 Kahneman, BIB-015 Elder |
+| LEW | BIB-008 Sinclair (Volatility), BIB-018 Sinclair (Options), BIB-027 Aldridge (HFT), **BIB-037 Hull (Options, Futures and Other Derivatives)** |
+| TRD | BIB-015 Elder, BIB-028 Narang (Black Box), BIB-010/011 Chan, **BIB-038 Schwager (Market Wizards), BIB-039 Lefèvre (Reminiscences)** |
+| RSK | BIB-007 López de Prado (AFML), BIB-025 Grinold&Kahn, BIB-009 Mandelbrot, **BIB-040 Bernstein (Against the Gods), BIB-041 Taleb (Fooled by Randomness), BIB-042 Jorion (Value at Risk)** |
+| PSY | BIB-004 Steenbarger, BIB-016 Douglas, BIB-017 Kahneman, BIB-015 Elder, **BIB-038 Schwager, BIB-039 Lefèvre** |
 | MKS | BIB-020 Harris (Trading&Exchanges), BIB-032 O'Hara, BIB-022 Kissell, BIB-027 Aldridge |
 | ONC | BIB-030 Ammous (Bitcoin Standard), BIB-029 Bashir (Blockchain), BIB-003 Burniske |
 | ALG | BIB-007/023 López de Prado, BIB-026 Jansen, BIB-031 Tsay, BIB-025 Grinold&Kahn |

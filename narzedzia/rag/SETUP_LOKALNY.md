@@ -84,7 +84,7 @@ rozmiar+mtime), reszta pomijana. Przy 200 książkach to sekundy zamiast minut.
 
 | Korpus | Zawartość | Po co |
 |--------|-----------|-------|
-| `biblioteka` | 36 książek + encyklopedia + vademecum | wiedza zewnętrzna (autorzy) |
+| `biblioteka` | 42 książki + encyklopedia + vademecum | wiedza zewnętrzna (autorzy) |
 | `dane` | `bibliotheca_ulpia/dane/` (CSV/JSON/notatki) | dane tematyczne, wyniki |
 | `docs` | dokumentacja Imperium (`docs/*.md`) | "co mamy w kodzie" |
 

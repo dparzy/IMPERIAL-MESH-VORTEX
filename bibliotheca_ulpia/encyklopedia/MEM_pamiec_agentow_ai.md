@@ -58,15 +58,25 @@ dialogu w `bibliotheca_ulpia/dane/kronika/` · testy całości 1740/1740.
 
 ## 3. SCORING I ZANIK WARSTWOWY
 
-Co pamiętać „na wierzchu"? Scoring **Generative Agents** (Park et al., arXiv:2304.03442):
+Co pamiętać „na wierzchu"? Scoring **Generative Agents** (Park et al., arXiv:2304.03442)
++ **4. wymiar reżimowy** (UNIKAT Imperium, MEM-06):
 
 ```
-score = recency × importance × relevance
+score = recency × importance × relevance × regime_match
 ```
 
 - **recency** — wykładniczy zanik od daty lekcji (świeże ważą więcej),
 - **importance** — heurystyka słów kluczowych bez LLM (bug/odkrycie/prawo = ważniejsze), 0.3–1.0,
-- **relevance** — podobieństwo Jaccarda do zapytania (offline, bez wektorów), 0.0–1.0.
+- **relevance** — podobieństwo Jaccarda do zapytania (offline, bez wektorów), 0.0–1.0,
+- **regime_match** (UNIKAT) — 1.0 gdy wspomnienie z bieżącego reżimu / bez tagu; `_DAMPEN_REZIM`
+  (0.4) gdy z innego reżimu. `rezim_biezacy=''` → 1.0 (wyłączone, wstecznie kompatybilne).
+
+**🎯 Pamięć Reżimowa (regime-conditioned retrieval) — czego NIE ma konkurencja:** Mem0, Zep/Graphiti,
+Letta, A-Mem są domenowo-ślepe (retrieval = semantyka + recency + ewent. czas). ŻADEN nie wie, że
+ważność wspomnienia tradingowego zależy od reżimu rynku. Lekcja „kupuj dołki" z hossy (TREND_STRONG)
+jest aktywnie szkodliwa w bessie/krachu. Warunkujemy retrieval na bieżącym reżimie (z `klasyfikuj_rezim`
+/Gubernatora): logi W1 mają jawne pole `rezim` (dopasowanie precyzyjne), lekcje W3 — token z treści.
+Naprawia „regime-stale bug" (otwarty problem rynku) u źródła. CLI: `szukaj "..." --rezim TREND_STRONG`.
 
 **Zanik warstwowy (adopcja FinMem, arXiv:2311.13743):** tempo zaniku ZALEŻY od ważności.
 Rutyna (i=0.3) → 0.99/dzień (half-life ~69 dni); lekcja krytyczna (i=1.0, „utrata

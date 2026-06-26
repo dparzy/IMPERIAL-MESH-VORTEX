@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-26 | UNIKAT | 🎯 Pamięć Reżimowa (Regime-Conditioned Retrieval) — lepsza od konkurencji
+
+Cezar: „czy da lepszą opcję pamięci, zrób unikat lepsze od konkurencji". Research SOTA 2026
+(Mem0/Zep/Graphiti/Letta/A-Mem + MemEvolve/SSGM) → wszystkie DOMENOWO ŚLEPE: retrieval =
+semantyka + recency + ewent. czas. ŻADEN nie warunkuje pamięci na reżimie rynku.
+
+**Unikat wdrożony:** 4. wymiar scoringu Generative Agents — `score = recency × importance ×
+relevance × regime_match`. Wspomnienie z bieżącego reżimu (z klasyfikuj_rezim/Gubernatora) →
+pełna waga; z innego → ×0.4; bez tagu → 1.0 (lekcje ogólne nietknięte). Logi W1 mają JAWNE
+pole rezim (dopasowanie precyzyjne), lekcje W3 — token z treści. Naprawia „regime-stale bug"
+(otwarty problem rynku) u źródła: pamięć nie wyciąga bańkowych lekcji w krachu.
+
+Kod: centrum_pamieci.py (_regime_match, _wykryj_rezim, +param rezim_biezacy w score_lekcji/
+szukaj_wszedzie/top_lekcji/_szukaj_w_logach), CLI `szukaj --rezim`. +9 testów granic.
+Wstecznie kompatybilne (rezim_biezacy='' → wyłączone). Dokumenty: REJESTR_INSPIRACJI MEM-05/06,
+encyklopedia MEM §3. Testy 1743→1752 ✅ · audyt exit 0 · ruff czysto.
+
+---
+
 ## 2026-06-26 | Pamięć | W1 (logi pamiec_absolutna) podpięta do cross-layer search — naprawa Prawa XV
 
 UTRATA POTENCJAŁU naprawiona: `szukaj_wszedzie()` przeszukiwał tylko W3 (lekcje) + W3b (kronika),

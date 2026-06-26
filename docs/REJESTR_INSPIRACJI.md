@@ -38,6 +38,8 @@
 | 16 | MEM-02 | FinAgent — Multimodal Foundation Agent (dual reflection) | arxiv.org/abs/2402.18485 | ✅ zweryfikowany | Wzorzec dual-level reflection (plan dla pamiec_refleksyjna) |
 | 17 | MEM-03 | Mem0 — Scalable Long-Term Memory (extract→consolidate→retrieve) | arxiv.org/abs/2504.19413 | ✅ zweryfikowany | Wzorzec scope + konsolidacja/dedup (plan centrum_pamieci) |
 | 18 | MEM-04 | A-Mem — Agentic Memory (Zettelkasten, auto-linking) | arxiv.org/abs/2502.12110 | ✅ zweryfikowany | Wzorzec auto-linkowania lekcji (plan, kandydat) |
+| 19 | MEM-05 | Krajobraz konkurencji 2026 (Mem0/Zep/Letta/A-Mem + MemEvolve/SSGM) | arxiv.org/abs/2501.13956 | ✅ zweryfikowany | Scan rynku — wspólna ślepota domenowa (brak reżimu) |
+| 20 | MEM-06 | 🎯 UNIKAT: Pamięć Reżimowa (Regime-Conditioned Retrieval) | (własny — Imperium) | ✅ WDROŻONY | **WDROŻONY** 4. wymiar scoringu: ×regime_match w centrum_pamieci |
 
 > **Odkrycie deep-research (2026-06-03):** auto-selekcja **timeframe + strategia wg reżimu**
 > to **OTWARTY PROBLEM** — Freqtrade (informative pairs), Jesse, NautilusTrader, OctoBot
@@ -465,13 +467,45 @@ Wszystkie ID arXiv zweryfikowane na żywo (WebSearch, czerwiec 2026). Prawo I �
 - **Status implementacji:** 🔴 wzorzec (kandydat, niski priorytet — wymaga embeddingów lub LLM)
 - **Powiązania:** bibliotheca_ulpia/ (RAG ma już embeddingi — możliwa baza pod auto-linki)
 
-> **🎯 NASZ UNIKAT (czego NIE ma rynek):** żaden z powyższych nie łączy pamięci tradingowej
-> z **pamięcią sesji deweloperskiej w git** (Memory MCP natywny) ani z **etyką falsyfikacji
-> (Prawo I)** wbudowaną w pipeline. FinMem/FinAgent pamiętają RYNEK; my pamiętamy rynek +
-> CAŁY dialog z Cezarem + lekcje + profil, wszystko wersjonowane gitem (przeżywa kompakcję
-> i wygaśnięcie kontenera chmury). Zanik warstwowy ciągły (nie 3 kubełki) to nasz wkład.
-> **Regime-stale bug** (cosine retrieval gubi trafność przy zmianie reżimu) — otwarty problem
-> rynku; nasz scoring ma już `reżim` w słowach ważnych, ale metadana reżimu per-lekcja = plan.
+### MEM-05 | Krajobraz konkurencji 2026 (scan na żądanie Cezara, 2026-06-26)
+
+Deep-research „czy da się lepszą pamięć od konkurencji". Stan rynku (2026):
+- **Mem0** (https://arxiv.org/abs/2504.19413, ECAI 2025) — ekstrakcja wektorowa + multi-signal
+  retrieval; benchmark LoCoMo. Token-efficient single-pass hierarchiczna ekstrakcja (kwi 2026).
+- **Zep / Graphiti** (https://arxiv.org/abs/2501.13956) — **temporalny graf wiedzy**: rozwiązywanie
+  konfliktów po metadanych czasowych, inkrementalne aktualizacje, stan historyczny bi-temporalny.
+- **Letta / MemGPT** — pamięć OS-owa: core (RAM) / recall / archival, samo-edycja kontekstu.
+- **A-Mem** (https://arxiv.org/abs/2502.12110) — Zettelkasten auto-linking przez embeddingi.
+- **Nowe 2026:** MemEvolve/EvolveMem (meta-ewolucja pamięci, https://arxiv.org/pdf/2512.18746),
+  SSGM — Stability & Safety Governed Memory (governance ewoluującej pamięci, arXiv 2603.11768).
+
+> **WSPÓLNA ŚLEPOTA KONKURENCJI:** wszystkie są **domenowo-agnostyczne**. Retrieval = podobieństwo
+> semantyczne + recency + (Zep) ważność czasowa. ŻADEN nie wie, że ważność wspomnienia
+> TRADINGOWEGO zależy od **reżimu rynku**. Lekcja „kupuj dołki" z hossy jest aktywnie szkodliwa
+> w bessie — a cosine/temporal retrieval i tak ją wyciągnie.
+
+### MEM-06 | 🎯 UNIKAT IMPERIUM — Pamięć Reżimowa (Regime-Conditioned Retrieval) ✅ WDROŻONY
+
+- **Co to (dla nowicjusza):** dokładamy **4. wymiar** do scoringu Generative Agents.
+  Było: `recency × importance × relevance`. Jest: `× regime_match`. Wspomnienie z tego samego
+  reżimu co BIEŻĄCY (z `klasyfikuj_rezim`/Gubernatora) → pełna waga; z innego → tłumione
+  (`_DAMPEN_REZIM=0.4`); bez tagu reżimu → neutralne 1.0 (nie karzemy lekcji ogólnych).
+- **Dlaczego lepsze od konkurencji:** to jedyny znany nam system, który **warunkuje retrieval
+  pamięci na reżimie rynku**. Naprawia „regime-stale bug" (otwarty problem rynku) u źródła:
+  pamięć nie wyciąga bańkowych lekcji w krachu. Logi W1 mają JAWNE pole `rezim` → dopasowanie
+  precyzyjne (nie zgadywane z tekstu); lekcje W3 — token reżimu wykrywany z treści.
+- **Status implementacji:** ✅ KOD + TESTY — `centrum_pamieci.py` (`score_lekcji`, `szukaj_wszedzie`,
+  `top_lekcji`, `_regime_match`, `_wykryj_rezim`), CLI `szukaj --rezim`, +9 testów granic.
+  Wstecznie kompatybilne (`rezim_biezacy=''` → funkcja wyłączona).
+- **Powiązania:** legatus.klasyfikuj_rezim (źródło reżimu), pamiec_absolutna (pole rezim),
+  MEM-01 FinMem (zanik), MEM-03 Mem0 (scope). Backlog: metadana reżimu per-lekcja w PAMIEC.md.
+
+> **🎯 NASZ UNIKAT (pełny):** (1) **Pamięć Reżimowa** — retrieval warunkowany reżimem (MEM-06,
+> nikt na rynku tego nie ma); (2) pamięć tradingowa + **sesja deweloperska w git** + **etyka
+> falsyfikacji (Prawo I)** w pipeline; (3) **zanik warstwowy ciągły** (nie 3 kubełki FinMem);
+> (4) cross-layer search łączy lekcje (W3) + kronikę (W3b) + logi PnL/MAE/MFE (W1) jednym
+> zapytaniem. FinMem/FinAgent pamiętają RYNEK; my pamiętamy rynek + dialog + lekcje + profil,
+> wersjonowane gitem (przeżywa kompakcję i wygaśnięcie kontenera) — i warunkowane reżimem.
 
 ---
 

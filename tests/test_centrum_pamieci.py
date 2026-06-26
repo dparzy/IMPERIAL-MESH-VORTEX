@@ -162,6 +162,70 @@ def test_szukaj_posortowane_malejaco(monkeypatch, tmp_path):
         assert wyniki[i]["score"] >= wyniki[i + 1]["score"]
 
 
+# ── PAMIĘĆ REŻIMOWA (unikat — 4. wymiar scoringu) ──────────────────────────────
+
+def test_wykryj_rezim_token():
+    assert cp._wykryj_rezim("lekcja w reżimie TREND_STRONG działa") == "TREND_STRONG"
+    assert cp._wykryj_rezim("rynek VOLATILE — uważaj") == "VOLATILE"
+    assert cp._wykryj_rezim("ogólna lekcja bez reżimu") is None
+
+
+def test_regime_match_zgodny_pelna_waga():
+    """Granica: ten sam reżim → 1.0."""
+    assert cp._regime_match("TREND_STRONG", "TREND_STRONG") == 1.0
+
+
+def test_regime_match_inny_tlumiony():
+    """Granica: inny reżim → _DAMPEN_REZIM (<1.0)."""
+    assert cp._regime_match("BULL", "BEAR") == cp._DAMPEN_REZIM
+    assert cp._DAMPEN_REZIM < 1.0
+
+
+def test_regime_match_brak_tagu_neutralny():
+    """Granica: wspomnienie bez tagu reżimu → 1.0 (nie karzemy lekcji ogólnych)."""
+    assert cp._regime_match(None, "BEAR") == 1.0
+
+
+def test_regime_match_brak_biezacego_wylaczone():
+    """Granica: brak bieżącego reżimu ('') → 1.0 (funkcja wyłączona, wstecznie kompat.)."""
+    assert cp._regime_match("BULL", "") == 1.0
+
+
+def test_regime_match_case_insensitive():
+    assert cp._regime_match("bull", "BULL") == 1.0
+
+
+def test_score_lekcji_rezim_tlumi_inny():
+    """Lekcja z innego reżimu ma niższy score niż ta sama bez warunkowania."""
+    lek = {"data": date.today().isoformat(), "tytul": "BULL kupuj dołki", "tresc": "działa w hossie"}
+    bez = cp.score_lekcji(lek, "kupuj")
+    w_bessie = cp.score_lekcji(lek, "kupuj", rezim_biezacy="BEAR")
+    assert w_bessie < bez
+    assert abs(w_bessie - bez * cp._DAMPEN_REZIM) < 1e-9
+
+
+def test_score_lekcji_rezim_zgodny_bez_zmian():
+    """Lekcja z bieżącego reżimu — score jak bez warunkowania (×1.0)."""
+    lek = {"data": date.today().isoformat(), "tytul": "BULL kupuj dołki", "tresc": "działa w hossie"}
+    bez = cp.score_lekcji(lek, "kupuj")
+    w_hossie = cp.score_lekcji(lek, "kupuj", rezim_biezacy="BULL")
+    assert abs(w_hossie - bez) < 1e-9
+
+
+def test_szukaj_logi_rezim_tlumi(monkeypatch, tmp_path):
+    """W1: log z innego reżimu dostaje niższy score przy warunkowaniu reżimem."""
+    from imperium.biblioteki import pamiec_absolutna as pa
+    monkeypatch.setattr(pa, "LOG_DIR", tmp_path)
+    _zapisz_log_close(tmp_path, rezim="BULL", notatka="GARCH spike")
+    p = _plik_z_lekcjami()
+    monkeypatch.setattr(cp._ps, "DOMYSLNY_PLIK", p)
+    bez = cp.szukaj_wszedzie("GARCH", cel_kronika=tmp_path)
+    w_bessie = cp.szukaj_wszedzie("GARCH", cel_kronika=tmp_path, rezim_biezacy="BEAR")
+    s_bez = next(w["score"] for w in bez if w["warstwa"] == "logi")
+    s_bessie = next(w["score"] for w in w_bessie if w["warstwa"] == "logi")
+    assert s_bessie < s_bez
+
+
 # ── szukaj_wszedzie() — warstwa W1 (logi pamiec_absolutna) ─────────────────────
 
 def _zapisz_log_close(katalog, symbol="BTCUSDT", rezim="BULL", notatka="GARCH spike"):

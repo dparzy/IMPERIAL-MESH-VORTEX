@@ -133,33 +133,75 @@ def _relevance(zapytanie: str, tytul: str, tresc: str) -> float:
     return len(q & t) / len(q | t)
 
 
-def score_lekcji(lekcja: Dict[str, str], zapytanie: str = "") -> float:
+# ── PAMIĘĆ REŻIMOWA (UNIKAT IMPERIUM — 4. wymiar scoringu) ───────────────────
+# Konkurencja (Mem0, Zep/Graphiti, Letta, A-Mem) jest DOMENOWO ŚLEPA: retrieval po
+# podobieństwie semantycznym + recency + (Zep) ważności czasowej. ŻADEN nie wie, że
+# ważność wspomnienia TRADINGOWEGO zależy od REŻIMU rynku. Lekcja „kupuj dołki" z
+# hossy (TREND_STRONG) jest AKTYWNIE SZKODLIWA w bessie/krachu. Warunkujemy retrieval
+# na bieżącym reżimie (z Gubernatora / klasyfikuj_rezim): wspomnienie z tego samego
+# reżimu pełna waga, z innego — tłumione. Wspomnienie bez tagu reżimu → neutralne 1.0
+# (nie karzemy lekcji ogólnych). To czyni pamięć Imperium reżimowo-świadomą.
+_DAMPEN_REZIM = 0.4   # mnożnik dla wspomnienia z INNEGO reżimu (zmierzona ostrożność)
+
+# Kanoniczne tokeny reżimu (z legatus.klasyfikuj_rezim + pole log.rezim + lekcje).
+_REZIMY_KANON = ("VOLATILE", "TREND_STRONG", "RANGING", "NORMAL", "BULL", "BEAR")
+
+
+def _wykryj_rezim(tekst: str) -> Optional[str]:
+    """Wykrywa kanoniczny token reżimu we wspomnieniu. None = brak tagu (neutralne)."""
+    g = tekst.upper()
+    # TREND_STRONG przed BULL/BEAR (bardziej specyficzny), by nie złapać podłańcucha
+    for r in _REZIMY_KANON:
+        if r in g:
+            return r
+    return None
+
+
+def _regime_match(rezim_wspomnienia: Optional[str], rezim_biezacy: str) -> float:
     """
-    Scoring Generative Agents: score = recency × importance × relevance.
-    Normalizowany do [0,1] per wywołanie (nie globalnie — brak potrzeby kalibracji).
+    Dopasowanie reżimu: 1.0 gdy zgodny / brak tagu, _DAMPEN_REZIM gdy inny.
+    Brak bieżącego reżimu ('') → 1.0 (funkcja wyłączona, wstecznie kompatybilne).
+    """
+    if not rezim_biezacy or rezim_wspomnienia is None:
+        return 1.0
+    return 1.0 if rezim_wspomnienia.upper() == rezim_biezacy.upper() else _DAMPEN_REZIM
+
+
+def score_lekcji(lekcja: Dict[str, str], zapytanie: str = "",
+                 rezim_biezacy: str = "") -> float:
+    """
+    Scoring Generative Agents + UNIKAT reżimowy:
+    score = recency × importance × relevance × regime_match.
+    rezim_biezacy='' → regime_match=1.0 (wstecznie kompatybilne, funkcja wyłączona).
     """
     i = _importance(lekcja["tytul"], lekcja["tresc"])
     r = _recency(lekcja["data"], i)   # FinMem: tempo zaniku zależy od ważności
     v = _relevance(zapytanie, lekcja["tytul"], lekcja["tresc"])
-    return r * i * v if zapytanie else r * i
+    rz = _regime_match(_wykryj_rezim(lekcja["tytul"] + " " + lekcja["tresc"]), rezim_biezacy)
+    baza = r * i * v if zapytanie else r * i
+    return baza * rz
 
 
 # ─── CROSS-LAYER SEARCH ───────────────────────────────────────────────────────
 
 def szukaj_wszedzie(zapytanie: str, limit: int = 10,
-                   cel_kronika: Optional[Path] = None) -> List[Dict[str, Any]]:
+                   cel_kronika: Optional[Path] = None,
+                   rezim_biezacy: str = "") -> List[Dict[str, Any]]:
     """
     Cross-layer search: jedno zapytanie → lekcje (W3) + kronika (W3b) + logi (W1).
     Wyniki rankowane scoringiem Generative Agents (lekcje), flat 0.3 (kronika),
     recency×relevance (logi pamiec_absolutna — niosą rezim/PnL/MAE/MFE).
 
+    rezim_biezacy (UNIKAT): gdy podany (np. 'TREND_STRONG' z Gubernatora) — pamięć
+    reżimowo-świadoma: wspomnienia z innego reżimu tłumione (×_DAMPEN_REZIM).
+
     Returns [{"warstwa": "lekcje"|"kronika"|"logi", "score": float, "tresc": str, ...}]
     """
     wyniki: List[Dict[str, Any]] = []
 
-    # W3 — lekcje (scored)
+    # W3 — lekcje (scored + reżimowo)
     for lek in _ps.lekcje(plik=_ps.DOMYSLNY_PLIK):
-        s = score_lekcji(lek, zapytanie)
+        s = score_lekcji(lek, zapytanie, rezim_biezacy)
         q = zapytanie.lower()
         if q and (q not in lek["tytul"].lower() and q not in lek["tresc"].lower()) and s < 0.05:
             continue
@@ -183,18 +225,20 @@ def szukaj_wszedzie(zapytanie: str, limit: int = 10,
 
     # W1 — logi transakcji (pamiec_absolutna: najbogatsze dane — rezim/PnL/MAE/MFE).
     # Naprawa UTRATY POTENCJAŁU (Prawo XV): te logi były dotąd poza zasięgiem fasady.
-    for w in _szukaj_w_logach(zapytanie, limit):
+    for w in _szukaj_w_logach(zapytanie, limit, rezim_biezacy):
         wyniki.append(w)
 
     wyniki.sort(key=lambda x: x["score"], reverse=True)
     return wyniki[:limit]
 
 
-def _szukaj_w_logach(zapytanie: str, limit: int) -> List[Dict[str, Any]]:
+def _szukaj_w_logach(zapytanie: str, limit: int,
+                     rezim_biezacy: str = "") -> List[Dict[str, Any]]:
     """
     W1 cross-layer: przeszukuje logi TRADE_CLOSE z pamiec_absolutna.
     Tekst budowany z pól semantycznych (symbol/rezim/powód/notatka/kierunek),
-    scoring = recency(timestamp) × relevance(Jaccard). Resilient: brak logów → [].
+    scoring = recency × relevance × regime_match. Resilient: brak logów → [].
+    Logi mają JAWNE pole rezim → dopasowanie reżimowe jest precyzyjne (nie z tekstu).
     """
     try:
         from imperium.biblioteki import pamiec_absolutna as _pa
@@ -216,7 +260,8 @@ def _szukaj_w_logach(zapytanie: str, limit: int) -> List[Dict[str, Any]]:
         # logi mają znaczenie bazowe 0.7 (twarde dane wyniku, nie proza)
         rec = _recency(data, 0.7)
         rel = _relevance(zapytanie, log.symbol, tekst)
-        score = rec * 0.7 * rel if zapytanie else rec * 0.7
+        rz = _regime_match(log.rezim or None, rezim_biezacy)   # jawne pole rezim
+        score = (rec * 0.7 * rel if zapytanie else rec * 0.7) * rz
         if zapytanie and rel < 0.05:
             continue
         wyniki.append({
@@ -235,13 +280,15 @@ def _szukaj_w_logach(zapytanie: str, limit: int) -> List[Dict[str, Any]]:
 
 # ─── TOP-K LEKCJI (SCORED) ────────────────────────────────────────────────────
 
-def top_lekcji(k: int = 3, zapytanie: str = "") -> List[Dict[str, Any]]:
+def top_lekcji(k: int = 3, zapytanie: str = "",
+               rezim_biezacy: str = "") -> List[Dict[str, Any]]:
     """
-    Top-k lekcji wg scoringu Generative Agents (recency × importance × relevance).
-    Zastępuje proste 'ostatnie N' — wypływają najważniejsze+świeże, nie tylko najnowsze.
+    Top-k lekcji wg scoringu Generative Agents + reżim (recency×importance×relevance×regime).
+    Zastępuje proste 'ostatnie N' — wypływają najważniejsze+świeże+pasujące do reżimu.
+    rezim_biezacy='' → bez warunkowania reżimem (wstecznie kompatybilne).
     """
     wszystkie = _ps.lekcje(plik=_ps.DOMYSLNY_PLIK)
-    scored = [(score_lekcji(lek, zapytanie), lek) for lek in wszystkie]
+    scored = [(score_lekcji(lek, zapytanie, rezim_biezacy), lek) for lek in wszystkie]
     scored.sort(key=lambda x: x[0], reverse=True)
     return [{"score": s, **lek} for s, lek in scored[:k]]
 
@@ -323,9 +370,11 @@ if __name__ == "__main__":
     sub = ap.add_subparsers(dest="cmd")
     sub.add_parser("start", help="podsumowanie startowe (hook)")
     sub.add_parser("top", help="top-3 lekcji wg scoringu GA")
-    p_szuk = sub.add_parser("szukaj", help="cross-layer search")
+    p_szuk = sub.add_parser("szukaj", help="cross-layer search (opcjonalnie reżimowy)")
     p_szuk.add_argument("zapytanie", nargs="+")
     p_szuk.add_argument("--limit", type=int, default=10)
+    p_szuk.add_argument("--rezim", default="",
+                        help="UNIKAT: warunkuj reżimem (TREND_STRONG/VOLATILE/RANGING/NORMAL/BULL/BEAR)")
     args = ap.parse_args()
 
     if args.cmd == "start":
@@ -335,7 +384,7 @@ if __name__ == "__main__":
             print(f"[{lek['score']:.3f}] [{lek['data']}] {lek['tytul']}")
     elif args.cmd == "szukaj":
         q = " ".join(args.zapytanie)
-        for w in szukaj_wszedzie(q, args.limit):
+        for w in szukaj_wszedzie(q, args.limit, rezim_biezacy=args.rezim):
             warstwa = w["warstwa"]
             tresc = w.get("tytul", w.get("tresc", ""))[:80]
             print(f"[{w['score']:.3f}][{warstwa}] {tresc}")

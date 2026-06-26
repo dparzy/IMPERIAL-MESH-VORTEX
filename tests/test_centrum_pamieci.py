@@ -1,12 +1,13 @@
 """
-Testy Centrum Pamięci (W-360 v3) — hub wszystkich warstw.
+Testy Centrum Pamięci (W-360 v5) — hub wszystkich warstw.
 
 Weryfikuje:
-  • scoring Generative Agents (recency × importance × relevance),
+  • scoring Generative Agents (recency × importance × relevance × regime),
   • top_lekcji() — posortowane scored, nie "ostatnie N",
-  • szukaj_wszedzie() — cross-layer (lekcje + kronika),
+  • szukaj_wszedzie() — cross-layer 6 warstw (lekcje+kronika+wizje+logi+wiedza+refleksje),
+  • W4 rejestr_wizji + dedup, W5 most chmura↔lokal (srodowisko_pamieci),
   • lekcje_scope() — filtr Mem0-style,
-  • podsumowanie_startowe() — zawiera profil + top-k + statystyki,
+  • podsumowanie_startowe() — zawiera profil + top-k + manifest + statystyki,
   • granice: brak pliku, puste zapytanie, scoring decay.
 """
 
@@ -432,3 +433,123 @@ def test_kronika_score_nie_jest_flat(monkeypatch, tmp_path):
     assert scores["aaa111"] > scores["bbb222"], (
         f"Oczekiwano nowy > stary, got aaa111={scores['aaa111']:.3f} bbb222={scores['bbb222']:.3f}"
     )
+
+
+# ── W5 Most Chmura↔Lokal (srodowisko_pamieci) ────────────────────────────────
+
+def test_wykryj_srodowisko_chmura(monkeypatch):
+    """CLAUDE_CODE_REMOTE=true → 'chmura'."""
+    from imperium.biblioteki import srodowisko_pamieci as sp
+    monkeypatch.setenv("CLAUDE_CODE_REMOTE", "true")
+    assert sp.wykryj_srodowisko() == "chmura"
+
+
+def test_wykryj_srodowisko_lokal(monkeypatch):
+    """Brak zmiennych web → 'lokal'."""
+    from imperium.biblioteki import srodowisko_pamieci as sp
+    monkeypatch.delenv("CLAUDE_CODE_REMOTE", raising=False)
+    monkeypatch.delenv("CLAUDE_ENV_FILE", raising=False)
+    assert sp.wykryj_srodowisko() == "lokal"
+
+
+def test_raport_dostepnosci_ma_klucze():
+    """raport_dostepnosci() zwraca komplet pól do manifestu."""
+    from imperium.biblioteki import srodowisko_pamieci as sp
+    r = sp.raport_dostepnosci()
+    for klucz in ("srodowisko", "rag_tryb", "rag_fragmenty", "rag_wektory",
+                  "kronika_sesje", "wizje_wpisy", "model_embeddings"):
+        assert klucz in r, f"Brak klucza {klucz} w raporcie"
+
+
+def test_manifest_zawiera_srodowisko():
+    """manifest_pamieci() zawiera nazwę środowiska i warstwy."""
+    from imperium.biblioteki import srodowisko_pamieci as sp
+    m = sp.manifest_pamieci()
+    assert "MANIFEST PAMIĘCI" in m
+    assert "W3" in m and "W2" in m
+    assert "kronika" in m.lower()
+
+
+def test_instrukcja_lokal_ma_kroki():
+    """instrukcja_lokal() zawiera konkretne komendy odblokowania wektorów."""
+    from imperium.biblioteki import srodowisko_pamieci as sp
+    i = sp.instrukcja_lokal()
+    assert "git pull" in i
+    assert "indeksuj.py" in i
+
+
+def test_alarm_rag_bez_wektorow(monkeypatch):
+    """Gdy RAG istnieje ale wektory=0 → alarm UTRATY POTENCJAŁU."""
+    from imperium.biblioteki import srodowisko_pamieci as sp
+    rap = {
+        "srodowisko": "lokal", "rag_baza_istnieje": True, "rag_wektory": 0,
+        "rag_fragmenty": 100, "model_embeddings": True,
+    }
+    alarmy = sp._alarmy(rap)
+    assert any("FTS" in a or "wektor" in a.lower() for a in alarmy)
+
+
+# ── W2 RAG + W5 refleksje podpięte do szukaj_wszedzie ────────────────────────
+
+def test_szukaj_wszedzie_zawiera_wiedze(monkeypatch, tmp_path):
+    """szukaj_wszedzie() z zapytaniem zwraca warstwę 'wiedza' (RAG), gdy baza istnieje."""
+    from imperium.biblioteki import centrum_pamieci as cp
+    # izoluj lekcje/kronikę/wizje, by nie zaszumiały
+    plik_lekcji = tmp_path / "PAMIEC.md"
+    plik_lekcji.write_text("# P\n\n## 📚 LEKCJE Z SESJI\n\n", encoding="utf-8")
+    monkeypatch.setattr(cp._ps, "DOMYSLNY_PLIK", plik_lekcji)
+    monkeypatch.setattr(cp._kc, "CEL_DOMYSLNY", tmp_path / "brak")
+    monkeypatch.setattr(cp._rw, "PLIK_DOMYSLNY", tmp_path / "brak.jsonl")
+
+    # RAG: jeśli baza istnieje, oczekuj warstwy 'wiedza'; jeśli nie — graceful brak
+    from imperium.biblioteki import srodowisko_pamieci as sp
+    if sp.RAG_BAZA.exists():
+        wyniki = cp.szukaj_wszedzie("liquidity order book", limit=5)
+        warstwy = {w["warstwa"] for w in wyniki}
+        assert "wiedza" in warstwy, f"RAG istnieje ale brak warstwy wiedza: {warstwy}"
+
+
+def test_szukaj_w_rag_resilient_blad(monkeypatch):
+    """_szukaj_w_rag nie wybucha gdy RAG rzuca wyjątek (zwraca [])."""
+    from imperium.biblioteki import centrum_pamieci as cp
+    from narzedzia.rag import szukaj as rag
+    def wybuch(*a, **k):
+        raise RuntimeError("symulowany błąd RAG")
+    monkeypatch.setattr(rag, "szukaj", wybuch)
+    assert cp._szukaj_w_rag("cokolwiek", 5) == []
+
+
+def test_szukaj_w_refleksjach_resilient(monkeypatch):
+    """_szukaj_w_refleksjach zwraca [] gdy brak danych (chmura: logs/ gitignore)."""
+    from imperium.biblioteki import centrum_pamieci as cp
+    wynik = cp._szukaj_w_refleksjach("strata trend", 5)
+    assert isinstance(wynik, list)   # nie wybucha, lista (pusta lub z danymi)
+
+
+# ── Deduplikacja (L6) ─────────────────────────────────────────────────────────
+
+def test_rejestr_wizji_dedup_pomija_duplikat(tmp_path):
+    """dodaj() z dedup=True pomija wpis o tym samym (typ, tytuł)."""
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    assert rw.dodaj("WIZJA", "Portfel 20 par", "opis1", plik=plik) is True
+    assert rw.dodaj("WIZJA", "Portfel 20 par", "opis2 inny", plik=plik) is False
+    assert len(rw.wszystkie(plik=plik)) == 1
+
+
+def test_rejestr_wizji_dedup_rozne_typy_ok(tmp_path):
+    """Ten sam tytuł ale różny typ → nie duplikat (dopisywane oba)."""
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    assert rw.dodaj("WIZJA", "RAG", "wizja", plik=plik) is True
+    assert rw.dodaj("POMYSŁ", "RAG", "pomysł", plik=plik) is True
+    assert len(rw.wszystkie(plik=plik)) == 2
+
+
+def test_rejestr_wizji_dedup_wylaczony(tmp_path):
+    """dedup=False → dopisuje nawet duplikat."""
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    rw.dodaj("ZMIANA", "X", "a", plik=plik)
+    assert rw.dodaj("ZMIANA", "X", "b", plik=plik, dedup=False) is True
+    assert len(rw.wszystkie(plik=plik)) == 2

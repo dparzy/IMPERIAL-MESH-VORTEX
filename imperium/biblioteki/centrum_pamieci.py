@@ -1,5 +1,5 @@
 """
-🧠 Centrum Pamięci Imperium (W-360 v4) — zunifikowany hub wszystkich warstw pamięci.
+🧠 Centrum Pamięci Imperium (W-360 v5) — zunifikowany hub wszystkich warstw pamięci.
 
 PROBLEM: pamięć Imperium rozrosła się do 5 warstw, każda z osobnym API. Jedynym
 wejściem jest git/RAG (wyszukiwanie ręczne). Brak: cross-layer search, scoringu
@@ -19,6 +19,16 @@ WARSTWY (każda pozostaje samodzielna, tu tylko spięta w całość):
   (~) ksiega_wad.py       : prewencja powtarzania błędów (imperium/cesarz/) ✅ ŻYWA
   WYCOFANY: mnemosyne.py  — SQLite trade-learning zastąpiony przez pamiec_refleksyjna
                             + ksiega_wad (Prawo XVI: mierzalna redundancja → wycofanie)
+
+NOWOŚCI v5 (2026-06-26 — Pełna Symbioza + Most Chmura↔Lokal):
+  • W2 RAG podpięty do szukaj_wszedzie (naprawa L2): fasada konsultuje 42 książki —
+    wcześniej "jedyna ścieżka do pamięci" pomijała największą warstwę wiedzy.
+  • W5 refleksje rynkowe podpięte (naprawa L4): narracyjne lekcje z pipeline teraz
+    widoczne w cross-layer search (graceful: chmura logs/ gitignore → pusto).
+  • Most Chmura↔Lokal (srodowisko_pamieci.py, UNIKAT): pamięć środowiskowo-adaptacyjna —
+    chmura FTS (przeżywa przez git), lokal upgrade do wektorów semantycznych.
+  • Deduplikacja (naprawa L6): auto_lekcja + rejestr_wizji nie dublują wpisów.
+  • Cross-layer = 6 warstw: lekcje+kronika+wizje+logi+wiedza(RAG)+refleksje.
 
 NOWOŚCI v4 (2026-06-26):
   • W4 Rejestr Wizji i Decyzji: ustrukturyzowana pamięć WIZJI/DECYZJI/POMYSŁÓW/ZMIAN.
@@ -60,8 +70,8 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 
 # ─── SCORING GENERATIVE AGENTS (Park et al., 2304.03442) ─────────────────────
 
-_EPOKA = date(2026, 6, 1)  # data referencyjna (daty w PAMIEC_SESJI są YYYY-MM-DD)
-# (poprzedni stały zanik 0.995 zastąpiony zanikiem warstwowym — patrz niżej)
+# (poprzedni stały zanik 0.995 zastąpiony zanikiem warstwowym — patrz niżej;
+#  recency liczone względem date.today() — patrz _recency)
 
 # ── ZANIK WARSTWOWY (adopcja FinMem arXiv:2311.13743 — layered long-term memory) ──
 # FinMem trzyma 3 dyskretne warstwy (shallow/intermediate/deep) z RÓŻNYM tempem
@@ -184,14 +194,14 @@ def szukaj_wszedzie(zapytanie: str, limit: int = 10,
                    cel_kronika: Optional[Path] = None,
                    rezim_biezacy: str = "") -> List[Dict[str, Any]]:
     """
-    Cross-layer search: jedno zapytanie → lekcje (W3) + kronika (W3b) + logi (W1).
-    Wyniki rankowane scoringiem Generative Agents (lekcje), flat 0.3 (kronika),
-    recency×relevance (logi pamiec_absolutna — niosą rezim/PnL/MAE/MFE).
+    Cross-layer search (v5 — 6 warstw): jedno zapytanie → lekcje (W3) + kronika (W3b)
+    + wizje (W4) + logi (W1) + wiedza/RAG (W2) + refleksje (W5). Każda warstwa scored.
 
     rezim_biezacy (UNIKAT): gdy podany (np. 'TREND_STRONG' z Gubernatora) — pamięć
     reżimowo-świadoma: wspomnienia z innego reżimu tłumione (×_DAMPEN_REZIM).
 
-    Returns [{"warstwa": "lekcje"|"kronika"|"logi", "score": float, "tresc": str, ...}]
+    Returns [{"warstwa": "lekcje"|"kronika"|"wizje"|"logi"|"wiedza"|"refleksje",
+              "score": float, "tresc": str, ...}]
     """
     wyniki: List[Dict[str, Any]] = []
 
@@ -233,6 +243,18 @@ def szukaj_wszedzie(zapytanie: str, limit: int = 10,
     # W1 — logi transakcji (pamiec_absolutna: najbogatsze dane — rezim/PnL/MAE/MFE).
     # Naprawa UTRATY POTENCJAŁU (Prawo XV): te logi były dotąd poza zasięgiem fasady.
     for w in _szukaj_w_logach(zapytanie, limit, rezim_biezacy):
+        wyniki.append(w)
+
+    # W2 — RAG (42 książki + encyklopedia + docs). Naprawa L2 (audyt 2026-06-26):
+    # fasada reklamowana jako "jedyna ścieżka do całej pamięci" pomijała największą
+    # warstwę wiedzy. Teraz konsultuje wiedzę domenową. Graceful: brak bazy → [].
+    if zapytanie:
+        for w in _szukaj_w_rag(zapytanie, limit):
+            wyniki.append(w)
+
+    # W5 — pamięć refleksyjna (narracyjne lekcje rynkowe, imperium/cesarz/).
+    # Graceful: w chmurze logs/ gitignore → pusto; lokalnie żywa. Naprawa L4.
+    for w in _szukaj_w_refleksjach(zapytanie, limit, rezim_biezacy):
         wyniki.append(w)
 
     wyniki.sort(key=lambda x: x["score"], reverse=True)
@@ -285,6 +307,93 @@ def _szukaj_w_logach(zapytanie: str, limit: int,
     return wyniki[:limit]
 
 
+def _wektory_dostepne() -> bool:
+    """True gdy baza RAG ma wektory semantyczne (lokal po indeksacji). Chmura: False."""
+    try:
+        from imperium.biblioteki import srodowisko_pamieci as _sp
+        return _sp._wektory_w_bazie() > 0 and _sp._model_embeddings_dostepny()
+    except Exception:
+        return False
+
+
+def _szukaj_w_rag(zapytanie: str, limit: int) -> List[Dict[str, Any]]:
+    """
+    W2 cross-layer: przeszukuje RAG (42 książki + encyklopedia + docs).
+    Naprawa L2 (audyt 2026-06-26): wiedza domenowa była poza zasięgiem fasady.
+    BM25 zwraca ujemne (mniejsze=lepsze) → normalizujemy do skali GA 0–1.
+    Resilient: brak bazy/modułu → []. Limit ≤3 by nie zalać wynikami z książek.
+    """
+    try:
+        from narzedzia.rag import szukaj as _rag
+    except Exception:
+        return []
+    try:
+        # tryb="fts" wymusza BM25 — nie próbuje ładować modelu embeddings (proxy blokuje
+        # huggingface w chmurze → wyjątek sieciowy). Lokalnie można podnieść do hybrid.
+        tryb = "hybrid" if _wektory_dostepne() else "fts"
+        trafienia = _rag.szukaj(zapytanie, topk=min(limit, 3), tryb=tryb, cichy=True)
+    except Exception:
+        return []
+
+    wyniki: List[Dict[str, Any]] = []
+    for w in trafienia:
+        # BM25 ujemny (np. -8 silne, -1 słabe) → mapowanie na 0–1; brak recency (książki ponadczasowe)
+        try:
+            ga = min(1.0, abs(float(w.score)) / 10.0)
+        except (TypeError, ValueError):
+            ga = 0.3
+        wyniki.append({
+            "warstwa": "wiedza",   # W2 RAG — wiedza domenowa z książek
+            "score": ga * 0.6,     # waga 0.6: wiedza wspiera, nie dominuje nad lekcjami z sesji
+            "zrodlo": getattr(w, "zrodlo", ""),
+            "tytul": getattr(w, "tytul", ""),
+            "tresc": (getattr(w, "tekst", "") or "")[:200],
+        })
+    return wyniki
+
+
+def _szukaj_w_refleksjach(zapytanie: str, limit: int,
+                          rezim_biezacy: str = "") -> List[Dict[str, Any]]:
+    """
+    W5 cross-layer: narracyjne refleksje rynkowe (imperium/cesarz/pamiec_refleksyjna).
+    Naprawa L4 (audyt 2026-06-26): refleksje były czytane tylko w pipeline backtestu,
+    nigdy w cross-layer search ani podsumowaniu startowym. Resilient: brak danych → [].
+    W chmurze logs/ gitignore → zwykle pusto; lokalnie żywe.
+    """
+    try:
+        from imperium.cesarz import pamiec_refleksyjna as _pr
+    except Exception:
+        return []
+    try:
+        wszystkie = _pr.PamiecRefleksyjna().wczytaj_wszystkie()
+    except Exception:
+        return []
+
+    wyniki: List[Dict[str, Any]] = []
+    for r in wszystkie:
+        # Lekcja (dataclass): data, rezim, interwal, wynik, pnl_usdt, lekcja_tekst, zrodlo
+        tekst = " ".join(str(x) for x in (
+            getattr(r, "lekcja_tekst", ""), getattr(r, "rezim", ""),
+            getattr(r, "interwal", ""), getattr(r, "wynik", ""),
+        ) if x)
+        rezim_r = getattr(r, "rezim", None)
+        data = str(getattr(r, "data", ""))[:10]
+        rel = _relevance(zapytanie, "", tekst) if zapytanie else 0.5
+        if zapytanie and rel < 0.05:
+            continue
+        rz = _regime_match(rezim_r, rezim_biezacy)
+        rec = _recency(data, 0.6) if data else 0.5
+        score = (rec * 0.6 * rel if zapytanie else rec * 0.6) * rz
+        wyniki.append({
+            "warstwa": "refleksje",
+            "score": score,
+            "data": data,
+            "tresc": tekst[:200].strip(),
+        })
+    wyniki.sort(key=lambda x: x["score"], reverse=True)
+    return wyniki[:limit]
+
+
 # ─── TOP-K LEKCJI (SCORED) ────────────────────────────────────────────────────
 
 def top_lekcji(k: int = 3, zapytanie: str = "",
@@ -321,7 +430,19 @@ def podsumowanie_startowe(k: int = 3, zapytanie: str = "") -> str:
     profil Cezara + top-k lekcji (Generative Agents scoring) + alarm + mapa.
     Wstrzyknięte przez hook (centrum_pamieci.py nadpisuje wywołanie pamiec_sesji.start).
     """
-    linie = ["🧠 CENTRUM PAMIĘCI (W-360 v3) — ciągłość między sesjami:"]
+    linie = ["🧠 CENTRUM PAMIĘCI (W-360 v5) — ciągłość między sesjami:"]
+
+    # Most chmura↔lokal (W5) — środowisko + alarmy dostępności (UTRATA POTENCJAŁU)
+    try:
+        from imperium.biblioteki import srodowisko_pamieci as _sp
+        rap = _sp.raport_dostepnosci()
+        linie.append(
+            f"   🌉 Środowisko: {rap['srodowisko'].upper()} | "
+            f"RAG: {rap['rag_tryb']} ({rap['rag_fragmenty']} frag.) | "
+            f"kronika: {rap['kronika_sesje']} sesji | wizje: {rap['wizje_wpisy']}"
+        )
+    except Exception:
+        pass
 
     # Profil Cezara (USER.md-style)
     profil = _ps.profil_skrot()
@@ -373,7 +494,7 @@ def eksportuj_kroniki() -> Dict[str, int]:
 
 if __name__ == "__main__":
     import argparse
-    ap = argparse.ArgumentParser(description="Centrum Pamięci Imperium (W-360 v3)")
+    ap = argparse.ArgumentParser(description="Centrum Pamięci Imperium (W-360 v5)")
     sub = ap.add_subparsers(dest="cmd")
     sub.add_parser("start", help="podsumowanie startowe (hook)")
     sub.add_parser("top", help="top-3 lekcji wg scoringu GA")

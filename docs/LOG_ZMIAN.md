@@ -6,6 +6,30 @@
 
 ---
 
+## 2026-06-26 | WARSTWA | 🌉 W-360 v5 — Most Chmura↔Lokal + Pełna Symbioza Pamięci
+
+Cezar: „rób mocniejsze memory, dokładny audyt, unikaty, następna warstwa dla chmury i lokala, pełen wypas".
+Audyt agentowy wykrył 9 luk UTRATY POTENCJAŁU (Prawo XV). Naprawione najcięższe:
+
+- **L2:** W2 RAG (42 książki) podpięty do `szukaj_wszedzie` — fasada „jedyna ścieżka do pamięci"
+  wcześniej pomijała największą warstwę wiedzy. Teraz 6 warstw: lekcje+kronika+wizje+logi+wiedza+refleksje.
+- **L4:** W5 pamięć refleksyjna (narracyjne lekcje rynkowe) podpięta do cross-layer search.
+- **L6:** Deduplikacja — `rejestr_wizji.dodaj(dedup=True)` zwraca bool; `auto_lekcja` sprawdza istnienie
+  przed dopisem (DeepSeek nie dubluje lekcji co sesję).
+- **L9:** Usunięto martwą stałą `_EPOKA` (Prawo XV/martwy kod).
+
+**UNIKAT — Most Chmura↔Lokal** (`imperium/biblioteki/srodowisko_pamieci.py`): pamięć
+środowiskowo-adaptacyjna (żaden konkurent — Mem0/Zep/Letta/A-Mem — tego nie ma). Wykrywa
+chmura/lokal, raportuje co działa gdzie, generuje MANIFEST pamięci który lokalny Claude czyta
+po `git pull`. Chmura: FTS (przeżywa przez git). Lokal: upgrade do wektorów semantycznych
+(huggingface zablokowany proxy w chmurze). Most = git + manifest. Wpięty w podsumowanie startowe.
+
+Testy: 1760→1772 (+12 granic). Audyt exit 0. Ruff czysty. Dogfooding: v5 zarejestrowane w W4.
+Pliki: centrum_pamieci.py, srodowisko_pamieci.py (nowy), rejestr_wizji.py, auto_lekcja.py,
+kronika_czatu.py, tests/run_tests.py (+setenv/delenv), INDEKS_IMPERIUM.md.
+
+---
+
 ## 2026-06-26 | UNIKAT | 🎯 Pamięć Reżimowa (Regime-Conditioned Retrieval) — lepsza od konkurencji
 
 Cezar: „czy da lepszą opcję pamięci, zrób unikat lepsze od konkurencji". Research SOTA 2026

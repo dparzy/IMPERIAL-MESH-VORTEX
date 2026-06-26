@@ -104,8 +104,14 @@ def _nadpisz(wszystkie_wpisy: List[Dict[str, Any]], plik: Optional[Path] = None)
 def dodaj(typ: str, tytul: str, tresc: str,
           status: str = "POMYSŁ", rezim: str = "",
           data: Optional[str] = None,
-          plik: Optional[Path] = None) -> None:
-    """Dodaje nowy wpis do rejestru."""
+          plik: Optional[Path] = None,
+          dedup: bool = True) -> bool:
+    """
+    Dodaje nowy wpis do rejestru. Zwraca True gdy dopisano, False gdy pominięto (duplikat).
+
+    dedup=True (domyślnie): pomija wpis, jeśli istnieje już wpis o TYM SAMYM (typ, tytuł).
+    Naprawa L6 (audyt 2026-06-26): auto_lekcja co sesję mogła dublować te same wizje.
+    """
     if plik is None:
         plik = PLIK_DOMYSLNY
     typ = typ.upper()
@@ -114,15 +120,24 @@ def dodaj(typ: str, tytul: str, tresc: str,
         raise ValueError(f"Typ musi być jednym z: {TYPY_DOZWOLONE}")
     if status not in STATUSY_DOZWOLONE:
         raise ValueError(f"Status musi być jednym z: {STATUSY_DOZWOLONE}")
+
+    tytul = tytul.strip()
+    if dedup:
+        for istn in _wczytaj(plik):
+            if (istn.get("typ", "").upper() == typ
+                    and istn.get("tytul", "").strip().lower() == tytul.lower()):
+                return False   # duplikat — nie dopisujemy
+
     wpis = {
         "data": data or _dzis(),
         "typ": typ,
-        "tytul": tytul.strip(),
+        "tytul": tytul,
         "tresc": tresc.strip(),
         "status": status,
         "rezim": rezim.upper() if rezim else "",
     }
     _zapisz_dopisz(wpis, plik)
+    return True
 
 
 def wszystkie(plik: Optional[Path] = None) -> List[Dict[str, Any]]:

@@ -123,12 +123,18 @@ def _zapisz_wyniki(wyniki: List[Dict[str, Any]], data_sesji: str) -> int:
             continue
 
         if typ == "LEKCJA":
+            # Dedup (naprawa L6): nie dopisuj lekcji o tytule, który już istnieje.
+            if _ps.szukaj(tytul):
+                continue
             _ps.dopisz_lekcje(tytul, tresc, data=data_sesji)
         elif typ in ("WIZJA", "DECYZJA", "POMYSŁ", "ZMIANA"):
+            # rejestr_wizji.dodaj ma wbudowany dedup (typ+tytuł) → zwraca False gdy duplikat
             try:
-                _rw.dodaj(typ, tytul, tresc, status=status, rezim=rezim, data=data_sesji)
+                dopisano = _rw.dodaj(typ, tytul, tresc, status=status, rezim=rezim, data=data_sesji)
             except ValueError:
-                _rw.dodaj(typ, tytul, tresc, status="POMYSŁ", data=data_sesji)
+                dopisano = _rw.dodaj(typ, tytul, tresc, status="POMYSŁ", data=data_sesji)
+            if not dopisano:
+                continue
         else:
             continue
         zapisane += 1

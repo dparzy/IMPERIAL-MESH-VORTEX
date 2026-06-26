@@ -10,11 +10,14 @@ pamięci Imperium. Zastępuje rozsiane importy jednym `from imperium.biblioteki 
 centrum_pamieci as pm`.
 
 WARSTWY (każda pozostaje samodzielna, tu tylko spięta w całość):
-  W1 — mnemosyne.py      : pamięć TRANSAKCJI (trade learning, Book of Flaws, SQLite)
-  W1 — pamiec_absolutna.py: logi SYGNAŁÓW, TRADE, ANALIZA, TEST (JSONL / TypLogu)
-  W2 — bibliotheca_ulpia/ : RAG semantyczny (FTS5+wektory, 42 książki + docs + kronika)
-  W3 — pamiec_sesji.py   : LEKCJE z sesji + PROFIL Cezara (markdown → git)
-  W3 — kronika_czatu.py  : PEŁNY DIALOG (destylat transkryptów → git)
+  W1 — pamiec_absolutna.py: logi SYGNAŁÓW, TRADE, ANALIZA, TEST (JSONL / TypLogu) ✅ ŻYWA
+  W2 — bibliotheca_ulpia/ : RAG semantyczny (FTS5, 41/42 książek + encyklopedia) ✅ ZBUDOWANA
+  W3 — pamiec_sesji.py   : LEKCJE z sesji + PROFIL Cezara (markdown → git) ✅ ŻYWA
+  W3 — kronika_czatu.py  : PEŁNY DIALOG (destylat transkryptów → git) ✅ ŻYWA
+  (~) pamiec_refleksyjna.py: narracyjne refleksje po handlu (imperium/cesarz/) ✅ ŻYWA
+  (~) ksiega_wad.py       : prewencja powtarzania błędów (imperium/cesarz/) ✅ ŻYWA
+  WYCOFANY: mnemosyne.py  — SQLite trade-learning zastąpiony przez pamiec_refleksyjna
+                            + ksiega_wad (Prawo XVI: mierzalna redundancja → wycofanie)
 
 NOWOŚCI (adopcja badań 2024-2026):
   • Scoring Generative Agents (Park et al., arXiv:2304.03442):
@@ -33,8 +36,8 @@ NOWOŚCI (adopcja badań 2024-2026):
   • Mem0-style multi-level scope: sesja / użytkownik (Cezar) / agent (Imperium).
     Każda lekcja nosi scope, co pozwala filtrować (lekcje tylko o backteście etc.).
 
-  • Cross-layer search: jedno zapytanie → szuka w lekcjach (W3) + kronice (W3b) +
-    Mnemosyne trade lessons (W1) naraz. Wyniki z każdej warstwy oznaczone źródłem.
+  • Cross-layer search: jedno zapytanie → szuka w lekcjach (W3) + kronice (W3b).
+    Wyniki z każdej warstwy oznaczone źródłem. Backlog: dodać logi pamiec_absolutna (W1).
 
   • Proaktywne przypomnienie startowe (`podsumowanie_startowe_rozszerzone`):
     Top-k lekcji wg scoringu + alarm przepełnienia + profil Cezara. Wstrzyknięte
@@ -146,9 +149,9 @@ def score_lekcji(lekcja: Dict[str, str], zapytanie: str = "") -> float:
 def szukaj_wszedzie(zapytanie: str, limit: int = 10,
                    cel_kronika: Optional[Path] = None) -> List[Dict[str, Any]]:
     """
-    Cross-layer search (Mem0-style multi-level scope): jedno zapytanie →
-    szuka w lekcjach (W3), kronice (W3b) i zwraca wyniki ze źródłem.
-    Wyniki rankowane scoringiem Generative Agents (lekcje) lub tf-idf proxy (kronika).
+    Cross-layer search: jedno zapytanie → lekcje (W3) + kronika (W3b).
+    Wyniki rankowane scoringiem Generative Agents (lekcje) lub flat 0.3 (kronika).
+    Backlog: W1 (logi pamiec_absolutna — MAE/MFE/PnL) do dodania w przyszłości.
 
     Returns [{"warstwa": "lekcje"|"kronika", "score": float, "tresc": str, ...}]
     """

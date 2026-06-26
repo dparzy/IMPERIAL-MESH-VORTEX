@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-06-26 | RAG + Pamięć + Testy | Przebudowa RAG na 41/42 książek + naprawa rozjazdu doc↔kod
+
+**RAG:** ekstraktor.py rozszerzony o ekstrakcję azw3/mobi przez pakiet `mobi` (rozpakowuje do epub → _epub).
+Pełna przebudowa indeksu: 24→41 książek w FTS5 (15 204 fragmentów, 82 MB, 44 s).
+BIB-032 O'Hara — skan obrazowy, OCR daje bełkot → NIE zaindeksowany (Prawo I); esencja w MKS encyklopedii.
+Wektory niedostępne (huggingface.co zablokowane przez proxy środowiska) — tryb FTS-only.
+
+**Testy (audyt):** 1740/1740 ✅, 81 plików, zero trywialnych. 11 duplikatów NAZW funkcji —
+to helpery (_bar, _bary, _bary_trend) kopiowane między plikami, bez redundancji asercji.
+6 plików importuje pytest.approx/raises — działają, bo pytest jest w env (runner to wykrywa).
+
+**Pamięć (rozjazd doc↔kod Prawo XXI):** mnemosyne.py był podawany jako żywa warstwa W1 —
+kod pokazuje świadome wycofanie (Prawo XVI: redundancja vs pamiec_refleksyjna + ksiega_wad).
+Naprawiono: centrum_pamieci.py docstring, MEM_pamiec_agentow_ai.md §2/§7 (diagram, tabela warstw),
+SETUP_LOKALNY.md (nota BIB-032 + wektory FTS-only). Ścieżka pamiec_refleksyjna skorygowana
+na imperium/cesarz/ (nie biblioteki/). Backlog: podpięcie pamiec_absolutna do szukaj_wszedzie.
+
+Pliki: narzedzia/rag/ekstraktor.py, narzedzia/rag/SETUP_LOKALNY.md,
+       imperium/biblioteki/centrum_pamieci.py, bibliotheca_ulpia/encyklopedia/MEM_pamiec_agentow_ai.md
+
+---
+
 ## 2026-06-26 | Dokumentacja | Sekcje „📚 Źródła (Kanon BIB)" w 4 dokumentach strategicznych
 
 Cezar: „esencja była wcześniej wpisywana z książek… zobacz czy 42 książki są ujęte w wizji,

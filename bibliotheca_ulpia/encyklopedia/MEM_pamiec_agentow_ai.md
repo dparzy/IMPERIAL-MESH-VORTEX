@@ -4,8 +4,8 @@
 > **Co to jest:** dział o PAMIĘCI sztucznych agentów (LLM) — jak Imperium pamięta między
 > sesjami, jak robi to rynek (FinMem/Mem0/Hermes/Zep) i gdzie mamy przewagę. Spina temat,
 > który dotąd był rozproszony po 8 modułach kodu i 4 dokumentach (luka Prawo XV — naprawiona).
-> **Karmi (moduły):** centrum_pamieci, pamiec_sesji, kronika_czatu, mnemosyne,
-> pamiec_absolutna, pamiec_refleksyjna · **Źródła rynku:** REJESTR_INSPIRACJI MEM-01..04.
+> **Karmi (moduły):** centrum_pamieci, pamiec_sesji, kronika_czatu, pamiec_absolutna,
+> pamiec_refleksyjna (cesarz/), ksiega_wad (cesarz/) · **Źródła rynku:** REJESTR_INSPIRACJI MEM-01..04.
 > **Kanon książkowy:** BIB-033 Huyen · BIB-034 Infante · BIB-035 Iusztin&Labonne · BIB-036 Alto (§8).
 
 ## 📑 SPIS TREŚCI
@@ -39,12 +39,13 @@ Pięć warstw, każda samodzielna, spięta fasadą `centrum_pamieci.py` (W-360 v
 
 | Warstwa | Moduł | Co pamięta | Trwałość |
 |---------|-------|------------|----------|
-| **W1** | `mnemosyne.py` | TRANSAKCJE (trade learning, Book of Flaws) | SQLite |
 | **W1** | `pamiec_absolutna.py` | logi SYGNAŁÓW/TRADE/ANALIZA/TEST (MAE/MFE) | JSONL |
-| **W2** | `bibliotheca_ulpia/` | RAG semantyczny (42 książki + encyklopedia + kronika) | FTS5+wektory |
+| **W2** | `bibliotheca_ulpia/` | RAG semantyczny (41/42 książek + encyklopedia) | FTS5 |
 | **W3** | `pamiec_sesji.py` | LEKCJE z sesji + PROFIL Cezara (markdown) | git |
 | **W3b** | `kronika_czatu.py` | PEŁNY DIALOG (destylat transkryptów) | git |
-| **—** | `pamiec_refleksyjna.py` | refleksja narracyjna po seriach transakcji (W-295) | JSONL |
+| **(~)** | `imperium/cesarz/pamiec_refleksyjna.py` | refleksja narracyjna po seriach transakcji (W-295) | JSONL |
+| **(~)** | `imperium/cesarz/ksiega_wad.py` | prewencja powtarzania błędów | JSONL |
+| **WYCOFANY** | ~~`mnemosyne.py`~~ | SQLite trade-learning zastąpiony przez pamiec_refleksyjna + ksiega_wad (Prawo XVI) | — |
 
 Wejście dla hooka startowego: `centrum_pamieci.podsumowanie_startowe()` → profil Cezara +
 Top-k scored lekcji + alarm przepełnienia + statystyki kroniki. Cross-layer search
@@ -132,10 +133,11 @@ SessionStart hook
         └─ _decay_dla_waznosci()                          (FinMem layered decay)
 
 Pętla decyzyjna / trading
-   ├─ mnemosyne                 → pamięć transakcji (W1, SQLite)
-   ├─ pamiec_absolutna          → logi sygnałów/trade (W1, JSONL)
-   ├─ pamiec_refleksyjna        → lekcje narracyjne do promptu Senatu/Cesarza (W-295)
-   └─ bibliotheca_ulpia (RAG)   → wiedza semantyczna (W2)
+   ├─ pamiec_absolutna             → logi sygnałów/trade (W1, JSONL)
+   ├─ imperium/cesarz/pamiec_refleksyjna → lekcje narracyjne do promptu Senatu/Cesarza (W-295)
+   ├─ imperium/cesarz/ksiega_wad   → prewencja powtórzeń błędów
+   └─ bibliotheca_ulpia (RAG)      → wiedza semantyczna (W2, FTS5)
+   UWAGA: mnemosyne.py wycofany — zastąpiony przez pamiec_refleksyjna + ksiega_wad (Prawo XVI)
 ```
 
 ---

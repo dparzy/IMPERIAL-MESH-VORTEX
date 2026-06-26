@@ -36,8 +36,8 @@ NOWOŚCI (adopcja badań 2024-2026):
   • Mem0-style multi-level scope: sesja / użytkownik (Cezar) / agent (Imperium).
     Każda lekcja nosi scope, co pozwala filtrować (lekcje tylko o backteście etc.).
 
-  • Cross-layer search: jedno zapytanie → szuka w lekcjach (W3) + kronice (W3b).
-    Wyniki z każdej warstwy oznaczone źródłem. Backlog: dodać logi pamiec_absolutna (W1).
+  • Cross-layer search: jedno zapytanie → lekcje (W3) + kronika (W3b) + logi (W1).
+    Wyniki z każdej warstwy oznaczone źródłem; logi pamiec_absolutna niosą rezim/PnL/MAE/MFE.
 
   • Proaktywne przypomnienie startowe (`podsumowanie_startowe_rozszerzone`):
     Top-k lekcji wg scoringu + alarm przepełnienia + profil Cezara. Wstrzyknięte
@@ -149,11 +149,11 @@ def score_lekcji(lekcja: Dict[str, str], zapytanie: str = "") -> float:
 def szukaj_wszedzie(zapytanie: str, limit: int = 10,
                    cel_kronika: Optional[Path] = None) -> List[Dict[str, Any]]:
     """
-    Cross-layer search: jedno zapytanie → lekcje (W3) + kronika (W3b).
-    Wyniki rankowane scoringiem Generative Agents (lekcje) lub flat 0.3 (kronika).
-    Backlog: W1 (logi pamiec_absolutna — MAE/MFE/PnL) do dodania w przyszłości.
+    Cross-layer search: jedno zapytanie → lekcje (W3) + kronika (W3b) + logi (W1).
+    Wyniki rankowane scoringiem Generative Agents (lekcje), flat 0.3 (kronika),
+    recency×relevance (logi pamiec_absolutna — niosą rezim/PnL/MAE/MFE).
 
-    Returns [{"warstwa": "lekcje"|"kronika", "score": float, "tresc": str, ...}]
+    Returns [{"warstwa": "lekcje"|"kronika"|"logi", "score": float, "tresc": str, ...}]
     """
     wyniki: List[Dict[str, Any]] = []
 
@@ -181,6 +181,54 @@ def szukaj_wszedzie(zapytanie: str, limit: int = 10,
             "tresc": t["fragment"],
         })
 
+    # W1 — logi transakcji (pamiec_absolutna: najbogatsze dane — rezim/PnL/MAE/MFE).
+    # Naprawa UTRATY POTENCJAŁU (Prawo XV): te logi były dotąd poza zasięgiem fasady.
+    for w in _szukaj_w_logach(zapytanie, limit):
+        wyniki.append(w)
+
+    wyniki.sort(key=lambda x: x["score"], reverse=True)
+    return wyniki[:limit]
+
+
+def _szukaj_w_logach(zapytanie: str, limit: int) -> List[Dict[str, Any]]:
+    """
+    W1 cross-layer: przeszukuje logi TRADE_CLOSE z pamiec_absolutna.
+    Tekst budowany z pól semantycznych (symbol/rezim/powód/notatka/kierunek),
+    scoring = recency(timestamp) × relevance(Jaccard). Resilient: brak logów → [].
+    """
+    try:
+        from imperium.biblioteki import pamiec_absolutna as _pa
+    except Exception:
+        return []
+    try:
+        # jawne LOG_DIR (nie default arg) → testowalne przez monkeypatch
+        logi = _pa.PamiecAbsolutna(_pa.LOG_DIR).wczytaj(log_typ=_pa.TypLogu.TRADE_CLOSE)
+    except Exception:
+        return []
+
+    wyniki: List[Dict[str, Any]] = []
+    for log in logi:
+        tekst = " ".join(str(x) for x in (
+            log.symbol, log.rezim, log.kierunek_pozycji,
+            log.powod_zamkniecia, log.notatka, log.strategia_id,
+        ) if x)
+        data = (log.timestamp_utc or "")[:10]
+        # logi mają znaczenie bazowe 0.7 (twarde dane wyniku, nie proza)
+        rec = _recency(data, 0.7)
+        rel = _relevance(zapytanie, log.symbol, tekst)
+        score = rec * 0.7 * rel if zapytanie else rec * 0.7
+        if zapytanie and rel < 0.05:
+            continue
+        wyniki.append({
+            "warstwa": "logi",
+            "score": score,
+            "data": data,
+            "symbol": log.symbol,
+            "rezim": log.rezim,
+            "tresc": f"{log.kierunek_pozycji} {log.symbol} PnL={log.pnl_pct:+.2f}% "
+                     f"MAE={log.mae_pct:.2f}% MFE={log.mfe_pct:.2f}% "
+                     f"({log.powod_zamkniecia}) {log.notatka}".strip(),
+        })
     wyniki.sort(key=lambda x: x["score"], reverse=True)
     return wyniki[:limit]
 

@@ -162,6 +162,56 @@ def test_szukaj_posortowane_malejaco(monkeypatch, tmp_path):
         assert wyniki[i]["score"] >= wyniki[i + 1]["score"]
 
 
+# ── szukaj_wszedzie() — warstwa W1 (logi pamiec_absolutna) ─────────────────────
+
+def _zapisz_log_close(katalog, symbol="BTCUSDT", rezim="BULL", notatka="GARCH spike"):
+    from imperium.biblioteki import pamiec_absolutna as pa
+    from datetime import datetime, timezone
+    log = pa.ImperiumLog(
+        log_typ=pa.TypLogu.TRADE_CLOSE, sesja_id="s1", symbol=symbol, interwal="1h",
+        rezim=rezim, kierunek_pozycji="LONG", pnl_pct=2.5, mae_pct=1.0, mfe_pct=3.0,
+        powod_zamkniecia="take_profit", notatka=notatka,
+        timestamp_utc=datetime.now(timezone.utc).isoformat(),
+    )
+    pa.PamiecAbsolutna(katalog).zapisz(log)
+
+
+def test_szukaj_zawiera_warstwe_logi(monkeypatch, tmp_path):
+    """W1: logi TRADE_CLOSE pojawiają się w cross-layer search (naprawa Prawa XV)."""
+    from imperium.biblioteki import pamiec_absolutna as pa
+    monkeypatch.setattr(pa, "LOG_DIR", tmp_path)
+    _zapisz_log_close(tmp_path, notatka="GARCH spike reżim")
+    p = _plik_z_lekcjami()
+    monkeypatch.setattr(cp._ps, "DOMYSLNY_PLIK", p)
+    wyniki = cp.szukaj_wszedzie("GARCH", limit=10, cel_kronika=tmp_path)
+    warstwy = {w["warstwa"] for w in wyniki}
+    assert "logi" in warstwy
+    log_wynik = next(w for w in wyniki if w["warstwa"] == "logi")
+    assert "PnL=" in log_wynik["tresc"]
+    assert log_wynik["rezim"] == "BULL"
+
+
+def test_szukaj_logi_brak_dopasowania_odfiltrowany(monkeypatch, tmp_path):
+    """Granica: log niepasujący do zapytania (relevance<0.05) nie wchodzi."""
+    from imperium.biblioteki import pamiec_absolutna as pa
+    monkeypatch.setattr(pa, "LOG_DIR", tmp_path)
+    _zapisz_log_close(tmp_path, symbol="ETHUSDT", notatka="zwykłe zamknięcie")
+    p = _plik_z_lekcjami()
+    monkeypatch.setattr(cp._ps, "DOMYSLNY_PLIK", p)
+    wyniki = cp.szukaj_wszedzie("kompletnie inne zapytanie xyz", cel_kronika=tmp_path)
+    assert not any(w["warstwa"] == "logi" for w in wyniki)
+
+
+def test_szukaj_logi_brak_katalogu_nie_wybucha(monkeypatch, tmp_path):
+    """Granica: brak katalogu logów → [] (resilient, nie wyjątek)."""
+    from imperium.biblioteki import pamiec_absolutna as pa
+    monkeypatch.setattr(pa, "LOG_DIR", tmp_path / "nieistnieje")
+    p = _plik_z_lekcjami()
+    monkeypatch.setattr(cp._ps, "DOMYSLNY_PLIK", p)
+    wyniki = cp.szukaj_wszedzie("cokolwiek", cel_kronika=tmp_path)
+    assert isinstance(wyniki, list)  # nie wybucha
+
+
 # ── lekcje_scope() ────────────────────────────────────────────────────────────
 
 def test_lekcje_scope_filtr(monkeypatch):

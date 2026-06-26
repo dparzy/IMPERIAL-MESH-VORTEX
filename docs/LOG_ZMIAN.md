@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-06-26 | Pamięć | W1 (logi pamiec_absolutna) podpięta do cross-layer search — naprawa Prawa XV
+
+UTRATA POTENCJAŁU naprawiona: `szukaj_wszedzie()` przeszukiwał tylko W3 (lekcje) + W3b (kronika),
+a najbogatsze dane (logi TRADE_CLOSE: rezim/PnL/MAE/MFE/powód) były POZA zasięgiem fasady pamięci.
+Dodano `_szukaj_w_logach()` — scoring recency×relevance, resilient (brak logów/katalogu → []).
+LOG_DIR przekazywany jawnie (testowalność przez monkeypatch). +3 testy granic (dopasowanie,
+brak dopasowania <0.05, brak katalogu). Docstringi zaktualizowane (W1 podpięty, nie backlog).
+
+Pliki: imperium/biblioteki/centrum_pamieci.py, tests/test_centrum_pamieci.py
+Testy: 1740→1743 ✅ · Audyt exit 0 · Ruff czysto
+
+---
+
 ## 2026-06-26 | RAG + Pamięć + Testy | Przebudowa RAG na 41/42 książek + naprawa rozjazdu doc↔kod
 
 **RAG:** ekstraktor.py rozszerzony o ekstrakcję azw3/mobi przez pakiet `mobi` (rozpakowuje do epub → _epub).

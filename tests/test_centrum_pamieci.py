@@ -308,3 +308,127 @@ def test_podsumowanie_zawiera_centrum(monkeypatch, tmp_path):
     assert "CENTRUM PAMIĘCI" in out
     assert "Top-1" in out
     assert "Kronika" in out
+
+
+# ── W4 Rejestr Wizji i Decyzji ────────────────────────────────────────────────
+
+def test_rejestr_wizji_dodaj_i_czytaj(tmp_path):
+    """Dodany wpis pojawia się w wszystkie()."""
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "wizje.jsonl"
+    rw.dodaj("WIZJA", "Portfel 20 par", "Multiasset docelowo", plik=plik)
+    wpisy = rw.wszystkie(plik=plik)
+    assert len(wpisy) == 1
+    assert wpisy[0]["typ"] == "WIZJA"
+    assert wpisy[0]["tytul"] == "Portfel 20 par"
+    assert wpisy[0]["status"] == "POMYSŁ"
+
+
+def test_rejestr_wizji_zmien_status(tmp_path):
+    """zmien_status() aktualizuje pole status."""
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "wizje.jsonl"
+    rw.dodaj("ZMIANA", "Dodano X-28", "MTF neuron", status="WDROŻONA", plik=plik)
+    ok = rw.zmien_status("Dodano X-28", "ZAMKNIĘTA", plik=plik)
+    assert ok
+    assert rw.wszystkie(plik=plik)[0]["status"] == "ZAMKNIĘTA"
+
+
+def test_rejestr_wizji_zmien_status_nie_istnieje(tmp_path):
+    """zmien_status() zwraca False gdy tytuł nie znaleziony."""
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "wizje.jsonl"
+    rw.dodaj("POMYSŁ", "Coś", "opis", plik=plik)
+    assert not rw.zmien_status("Nieistniejący", "WDROŻONA", plik=plik)
+
+
+def test_rejestr_wizji_scored_search(tmp_path):
+    """szukaj_scored() zwraca wyniki z 'warstwa'='wizje'."""
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "wizje.jsonl"
+    from datetime import date
+    rw.dodaj("WIZJA", "portfel multiasset", "20 par krypto", plik=plik, data=date.today().isoformat())
+    wyniki = rw.szukaj_scored("portfel", plik=plik)
+    assert wyniki, "Brak wyników dla 'portfel'"
+    assert wyniki[0]["warstwa"] == "wizje"
+    assert wyniki[0]["score"] > 0
+
+
+def test_rejestr_wizji_scored_pusty_plik(tmp_path):
+    """szukaj_scored() na pustym pliku zwraca []."""
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "wizje_empty.jsonl"
+    assert rw.szukaj_scored("cokolwiek", plik=plik) == []
+
+
+def test_rejestr_wizji_bledny_typ_rzuca(tmp_path):
+    """dodaj() z błędnym typem rzuca ValueError."""
+    import pytest
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    with pytest.raises(ValueError):
+        rw.dodaj("NIEZNANY_TYP", "tytuł", "treść", plik=plik)
+
+
+def test_szukaj_wszedzie_zawiera_wizje(monkeypatch, tmp_path):
+    """szukaj_wszedzie() po wdrożeniu W4 zwraca wyniki z warstwy 'wizje'."""
+    from datetime import date
+    from imperium.biblioteki import rejestr_wizji as rw
+    from imperium.biblioteki import centrum_pamieci as cp
+
+    plik_wizje = tmp_path / "wizje.jsonl"
+    rw.dodaj("WIZJA", "portfel multiasset", "20 par krypto long-term",
+             plik=plik_wizje, data=date.today().isoformat())
+
+    # podmień domyślny plik rejestr_wizji w obu miejscach (moduł + alias w cp)
+    monkeypatch.setattr(rw, "PLIK_DOMYSLNY", plik_wizje)
+    monkeypatch.setattr(cp._rw, "PLIK_DOMYSLNY", plik_wizje)
+    # podmień lekcje na puste
+    plik_lekcji = tmp_path / "PAMIEC.md"
+    plik_lekcji.write_text("# P\n\n## 📚 LEKCJE Z SESJI\n\n", encoding="utf-8")
+    monkeypatch.setattr(cp._ps, "DOMYSLNY_PLIK", plik_lekcji)
+    # pusta kronika
+    monkeypatch.setattr(cp._kc, "CEL_DOMYSLNY", tmp_path / "brak_kroniki")
+
+    wyniki = cp.szukaj_wszedzie("portfel", limit=5)
+    warstwy = {w["warstwa"] for w in wyniki}
+    assert "wizje" in warstwy, f"Brak warstwy 'wizje' w wynikach: {warstwy}"
+
+
+# ── Scoring kroniki (Opcja B) ─────────────────────────────────────────────────
+
+def test_kronika_score_nie_jest_flat(monkeypatch, tmp_path):
+    """Kronika ma zróżnicowany score — nie flat 0.3."""
+    from imperium.biblioteki import centrum_pamieci as cp
+    from imperium.biblioteki import kronika_czatu as kc
+
+    # utwórz dwa pliki kroniki: jeden nowy, jeden stary
+    kronika_dir = tmp_path / "kronika"
+    kronika_dir.mkdir()
+    import time
+
+    plik_nowy = kronika_dir / "sesja_aaa111.md"
+    plik_nowy.write_text("## 🧑 Cezar\nportfel multiasset krypto\n", encoding="utf-8")
+
+    plik_stary = kronika_dir / "sesja_bbb222.md"
+    plik_stary.write_text("## 🧑 Cezar\nportfel multiasset krypto\n", encoding="utf-8")
+    # sztucznie "zestarzeć" plik — ustawiamy mtime na 2 lata temu
+    stary_mtime = time.time() - 2 * 365 * 24 * 3600
+    import os
+    os.utime(str(plik_stary), (stary_mtime, stary_mtime))
+
+    monkeypatch.setattr(kc, "CEL_DOMYSLNY", kronika_dir)
+    monkeypatch.setattr(cp._kc, "CEL_DOMYSLNY", kronika_dir)
+
+    plik_lekcji = tmp_path / "PAMIEC.md"
+    plik_lekcji.write_text("# P\n\n## 📚 LEKCJE Z SESJI\n\n", encoding="utf-8")
+    monkeypatch.setattr(cp._ps, "DOMYSLNY_PLIK", plik_lekcji)
+
+    wyniki = cp.szukaj_wszedzie("portfel", cel_kronika=kronika_dir, limit=10)
+    kroniki = [w for w in wyniki if w["warstwa"] == "kronika"]
+    assert len(kroniki) == 2
+    scores = {w["sesja"]: w["score"] for w in kroniki}
+    # nowy plik powinien mieć wyższy score niż stary
+    assert scores["aaa111"] > scores["bbb222"], (
+        f"Oczekiwano nowy > stary, got aaa111={scores['aaa111']:.3f} bbb222={scores['bbb222']:.3f}"
+    )

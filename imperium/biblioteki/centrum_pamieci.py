@@ -1,5 +1,5 @@
 """
-🧠 Centrum Pamięci Imperium (W-360 v3) — zunifikowany hub wszystkich warstw pamięci.
+🧠 Centrum Pamięci Imperium (W-360 v4) — zunifikowany hub wszystkich warstw pamięci.
 
 PROBLEM: pamięć Imperium rozrosła się do 5 warstw, każda z osobnym API. Jedynym
 wejściem jest git/RAG (wyszukiwanie ręczne). Brak: cross-layer search, scoringu
@@ -14,36 +14,31 @@ WARSTWY (każda pozostaje samodzielna, tu tylko spięta w całość):
   W2 — bibliotheca_ulpia/ : RAG semantyczny (FTS5, 41/42 książek + encyklopedia) ✅ ZBUDOWANA
   W3 — pamiec_sesji.py   : LEKCJE z sesji + PROFIL Cezara (markdown → git) ✅ ŻYWA
   W3 — kronika_czatu.py  : PEŁNY DIALOG (destylat transkryptów → git) ✅ ŻYWA
+  W4 — rejestr_wizji.py  : WIZJE, DECYZJE, POMYSŁY, ZMIANY (JSONL → git) ✅ ŻYWA [v4]
   (~) pamiec_refleksyjna.py: narracyjne refleksje po handlu (imperium/cesarz/) ✅ ŻYWA
   (~) ksiega_wad.py       : prewencja powtarzania błędów (imperium/cesarz/) ✅ ŻYWA
   WYCOFANY: mnemosyne.py  — SQLite trade-learning zastąpiony przez pamiec_refleksyjna
                             + ksiega_wad (Prawo XVI: mierzalna redundancja → wycofanie)
 
-NOWOŚCI (adopcja badań 2024-2026):
+NOWOŚCI v4 (2026-06-26):
+  • W4 Rejestr Wizji i Decyzji: ustrukturyzowana pamięć WIZJI/DECYZJI/POMYSŁÓW/ZMIAN.
+    szukaj_wszedzie() teraz zwraca wyniki z 4 warstw (lekcje+kronika+logi+wizje).
+    Każdy wpis ma typ, status, pełny scoring GA × reżim.
+
+  • Scoring kroniki (opcja B): kronika dostaje recency×relevance zamiast flat 0.3.
+    Świeższy fragment z pasującym słowem kluczowym wyprzedza stary przypadkowy.
+
+  • Auto-lekcja (opcja C): narzedzia/auto_lekcja.py — DeepSeek API ekstrahuje lekcje,
+    wizje i decyzje z ostatniej sesji. Uruchamiany przez SessionStart hook.
+
+NOWOŚCI v3 (adopcja badań 2024-2026):
   • Scoring Generative Agents (Park et al., arXiv:2304.03442):
     score = recency × importance × relevance
-    - recency  : wykładniczy zanik (decay^Δdn) — tempo zaniku ZALEŻY OD WAŻNOŚCI
-    - importance: heurystyka z słów kluczowych (brak LLM → zero kosztu), 0.0–1.0
-    - relevance : Jaccard słów (FTS bez wektorów → działa offline), 0.0–1.0
-    EFEKT: lekcje ważne + świeże + trafne wypływają na górę; stare/nieistotne toną.
+  • Zanik warstwowy (adopcja FinMem, arXiv:2311.13743).
+  • Pamięć Reżimowa (UNIKAT): 4. wymiar scoringu — regime_match.
+  • Cross-layer search: lekcje (W3) + kronika (W3b) + logi (W1) + wizje (W4).
 
-  • Zanik warstwowy (adopcja FinMem, arXiv:2311.13743 — layered long-term memory):
-    FinMem trzyma 3 dyskretne warstwy (shallow/intermediate/deep) z różnym tempem
-    zaniku. NASZ UNIKAT: ciągła funkcja zaniku od ważności (importance → decay).
-    Lekcja krytyczna ("utrata potencjału") zanika ~10× wolniej niż rutynowa →
-    nie znika z pamięci tak szybko jak drobiazg (naprawa UTRATY POTENCJAŁU, Prawo XV).
-
-  • Mem0-style multi-level scope: sesja / użytkownik (Cezar) / agent (Imperium).
-    Każda lekcja nosi scope, co pozwala filtrować (lekcje tylko o backteście etc.).
-
-  • Cross-layer search: jedno zapytanie → lekcje (W3) + kronika (W3b) + logi (W1).
-    Wyniki z każdej warstwy oznaczone źródłem; logi pamiec_absolutna niosą rezim/PnL/MAE/MFE.
-
-  • Proaktywne przypomnienie startowe (`podsumowanie_startowe_rozszerzone`):
-    Top-k lekcji wg scoringu + alarm przepełnienia + profil Cezara. Wstrzyknięte
-    do SessionStart hooka zamiast prostego „ostatnie 3".
-
-ARCHITEKTURA PAMIĘCI (dla SessionStart hook — zastępuje wywołanie pamiec_sesji.py):
+ARCHITEKTURA PAMIĘCI (dla SessionStart hook):
   centrum_pamieci podsumowanie_startowe → hook wyświetla scored TOP-3 + cross-layer
 
 Bez zależności zewnętrznych (stdlib: re, datetime, pathlib) → działa w chmurze.
@@ -59,6 +54,7 @@ from typing import List, Dict, Optional, Any
 # Importy warstw (leniwe → nie wymuszają wszystkich zależności, jeśli warstwa niedostępna)
 from imperium.biblioteki import pamiec_sesji as _ps
 from imperium.biblioteki import kronika_czatu as _kc
+from imperium.biblioteki import rejestr_wizji as _rw
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 
@@ -213,15 +209,26 @@ def szukaj_wszedzie(zapytanie: str, limit: int = 10,
             "tresc": lek["tresc"][:200],
         })
 
-    # W3b — kronika (FTS prosty)
+    # W3b — kronika (FTS + scoring recency×relevance zamiast flat 0.3)
     cel = cel_kronika or _kc.CEL_DOMYSLNY
     for t in _kc.szukaj(zapytanie, cel, limit=limit):
+        sesja_data = t.get("data", "")
+        rec = _recency(sesja_data, 0.5) if sesja_data else 0.5
+        rel = _relevance(zapytanie, "", t["fragment"]) if zapytanie else 0.5
+        score_k = rec * max(rel, 0.3)   # floor 0.3 by kronika nie spadła poniżej szumu
         wyniki.append({
             "warstwa": "kronika",
-            "score": 0.3,    # kronika nie ma scoringu GA — jednorodny poziom
+            "score": score_k,
             "sesja": t["sesja"],
             "tresc": t["fragment"],
         })
+
+    # W4 — wizje, decyzje, pomysły, zmiany (rejestr_wizji — scored GA × reżim)
+    try:
+        for w in _rw.szukaj_scored(zapytanie, limit, rezim_biezacy):
+            wyniki.append(w)
+    except Exception:
+        pass
 
     # W1 — logi transakcji (pamiec_absolutna: najbogatsze dane — rezim/PnL/MAE/MFE).
     # Naprawa UTRATY POTENCJAŁU (Prawo XV): te logi były dotąd poza zasięgiem fasady.

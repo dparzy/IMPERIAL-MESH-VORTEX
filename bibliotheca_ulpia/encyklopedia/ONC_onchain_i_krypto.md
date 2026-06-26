@@ -1,6 +1,6 @@
 # 🏛️ ONC — On-chain i Krypto | Encyklopedia Imperium
 
-> **Stan na:** 2026-06-21 | **Ważność:** ⭐⭐⭐ (średni — unikat krypto, dane wymagają feedów)
+> **Stan na:** 2026-06-25 | **Ważność:** ⭐⭐⭐ (średni — unikat krypto, dane wymagają feedów)
 > **Dla nowicjusza (ZPO):** on-chain to dane Z BLOCKCHAINA (nie z giełdy) — ile BTC się
 > przemieszcza, po jakiej cenie kupiono monety, ile leży na giełdach. To „rentgen" sieci,
 > niedostępny w tradycyjnych rynkach. Krypto ma fundamenty, których akcje nie mają: podaż
@@ -83,5 +83,10 @@
 - BIB-030 Ammous — *The Bitcoin Standard* (fundamenty, twardy pieniądz)
 - BIB-029 Bashir — *Mastering Blockchain* (technika)
 - BIB-003 Burniske & Tatar — *Cryptoassets* (wycena)
-- BIB-005 Blum — *What Exactly Is Crypto*
-- Powiązane: **TRD** (krypto-natywni), **RSK**, **ALG**
+- BIB-005 Blum — *What Exactly Is Crypto* (self-pub 2022, ISBN ⚠️ brak — wprowadzenie/glosariusz
+  ONC dla nowicjusza; ⭐⭐, poboczny **DEF**)
+- **BIB-024 Lowe** — *Bitcoin and Cryptocurrency Trading for Beginners* (self-pub, ISBN ⚠️ brak)
+  ⭐ 1/5 — poziom 0 (jak kupić BTC na Coinbase/eToro). 🚨 Zawiera ANTYWZORZEC: „uśrednianie
+  w dół" (EMA buy-the-dip) — SPRZECZNE z dyscypliną stop-loss i Regułą 6% Imperium. Trzymać
+  jako referencję nowicjusza, NIE jako źródło logiki handlowej. Poboczny **RSK** (wallet security).
+- Powiązane: **TRD** (krypto-natywni), **RSK**, **ALG**, **DEF**

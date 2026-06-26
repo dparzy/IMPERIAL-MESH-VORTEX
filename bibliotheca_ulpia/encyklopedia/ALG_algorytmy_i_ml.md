@@ -1,6 +1,6 @@
 # 🏛️ ALG — Algorytmy i Machine Learning | Encyklopedia Imperium
 
-> **Stan na:** 2026-06-21 | **Ważność:** ⭐⭐⭐⭐ (wysoki — mózg analityczny roju)
+> **Stan na:** 2026-06-25 | **Ważność:** ⭐⭐⭐⭐ (wysoki — mózg analityczny roju)
 > **Dla nowicjusza (ZPO):** to dział o tym, jak Imperium PRZETWARZA dane w decyzje —
 > statystyka, ML, walidacja. Kluczowa lekcja całego działu: **łatwo oszukać samego siebie**
 > (overfitting, leak, fałszywy edge). Połowa pracy to budowa modelu, druga połowa to
@@ -111,4 +111,10 @@ To esencja całego działu — narzędzia, które Imperium realnie używa:
 - BIB-031 Tsay — *Analysis of Financial Time Series* (GARCH, ARIMA)
 - BIB-025 Grinold & Kahn — *Active Portfolio Management* (prawo fundamentalne)
 - BIB-026 Jansen — *ML for Algorithmic Trading*
-- Powiązane: **RSK**, **MKS**, **STR**
+- **BIB-012 Van Der Post, Strauss & Schwartz** — *Coding Capital: The Art of Algorithmic
+  Trading* (Reactive Publishing 2024, 979-8-87385-994-8) ✅ web — warsztat budowy systemu
+  algo w Pythonie od zera. Esencja: backtesting OBOWIĄZKOWY przed live (pyfolio tear-sheets);
+  ewolucja reguły→ML (regresja/NN/RL); ryzyko wpisane w strategię (VaR/stop-loss/sizing);
+  infrastruktura real-time jako warunek wejścia. Most do **IMP** (wydajność/pipeline) i
+  **RSK** (rozdz. 8). Poziom: praktyczny przegląd, niżej niż López de Prado.
+- Powiązane: **RSK**, **MKS**, **STR**, **IMP**

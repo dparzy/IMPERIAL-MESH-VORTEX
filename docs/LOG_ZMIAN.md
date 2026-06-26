@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-06-25 | Audyt | Głęboki audyt przypisania 42 książek → 4 sieroty naprawione
+
+Cezar: „zrób głęboki audyt wszystkich książek z biblioteki i przypisz do naszych dokumentów".
+
+Metoda: macierz pokrycia 42 książek (plik fizyczny ↔ dział encyklopedii). Wykryto **3 prawdziwe
+sieroty** (nigdzie nieprzypisane) + 1 półsierotę (w dziale, brak w Kanonie INDEX). Każdą
+przeczytano agentem przed przypisaniem (ZPO, Prawo I — nie z tytułu).
+
+Naprawione przypisania:
+- **BIB-001 Patel** *The Secret Wealth Advantage* (978-0-85719-857-0 ✅ web) → **MAK** (główny:
+  18-letni cykl nieruchomości; MAK 🔲→🚧, pierwszy realny tom + esencja) + **BAN** (poboczny).
+- **BIB-012 Van Der Post/Strauss/Schwartz** *Coding Capital* (979-8-87385-994-8 ✅ web) → **ALG**
+  (główny: warsztat algo-Python) + **IMP/RSK** (poboczny).
+- **BIB-024 Lowe** *Bitcoin & Crypto Trading for Beginners* (ISBN ⚠️ self-pub) → **ONC** (główny,
+  ⭐1/5) + **RSK**. 🚨 Oznaczono ANTYWZORZEC: „uśrednianie w dół" sprzeczne z Regułą 6%.
+- **BIB-005 Blum** *What Exactly Is Crypto* (ISBN ⚠️ self-pub, ⭐2) — był w ONC, dopisany do Kanonu INDEX.
+
+Wynik: **pokrycie 42/42 — zero sierot.** Każda książka przypisana do ≥1 działu. ISBN
+zweryfikowane web dla Patel/Coding Capital; Blum/Lowe to self-publishing bez ISBN (uczciwe ⚠️).
+
+- Pliki: `INDEX_MAIOR.md` (Kanon ONC/ALG/MAK, status MAK 🚧), `MAK_*.md` (esencja Patel),
+  `BAN_*.md`, `ONC_*.md`, `ALG_*.md`. Testy zielone, audyt exit 0.
+
+---
+
 ## 2026-06-25 | Biblioteka | Kanon 36→42: analiza BIB-037..042 → LEW/TRD/PSY/RSK
 
 Cezar wgrał 6 klasyków na branch roboczy: BIB-037 Hull *Options, Futures and Other Derivatives*,

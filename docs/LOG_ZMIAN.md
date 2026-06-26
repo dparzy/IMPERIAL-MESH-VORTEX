@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-06-26 | Dokumentacja | Sekcje „📚 Źródła (Kanon BIB)" w 4 dokumentach strategicznych
+
+Cezar: „esencja była wcześniej wpisywana z książek… zobacz czy 42 książki są ujęte w wizji,
+strategii, planowaniu". Audyt wykazał: WIZJONER.md miał 77 odwołań BIB (✅), ale KATALOG_NEURONOW,
+KATALOG_STRATEGII, ARCHITEKTURA i ROADMAP miały 0–3 odwołania.
+
+Naprawa: dodano sekcję „📚 Źródła — Kanon biblioteki (BIB)" do 4 dokumentów, mapując REALNE
+powiązania koncept→książka (2 agentów zbudowało mapowania z WIZJONER + encyklopedii + rejestr_strategii.py).
+**Zero fabrykacji (Prawo I):** neurony kanonu AT/skanu TradingView NIE przypisane punktowo do BIB;
+tylko 2 strategie mają twardy numer BIB w kodzie (IMV-TR-008→Elder, IMV-RG-002→Lefèvre). BIB-024 Lowe
+oznaczony jako ANTYWZORZEC. Pełna symbioza: dokumenty linkują wzajemnie do swoich § Źródła.
+
+Pliki: docs/KATALOG_NEURONOW.md, docs/KATALOG_STRATEGII.md, docs/ARCHITEKTURA_IMPERIUM.md, docs/ROADMAP_IMPERIUM.md
+
+---
+
 ## 2026-06-25 | Audyt | Głęboki audyt przypisania 42 książek → 4 sieroty naprawione
 
 Cezar: „zrób głęboki audyt wszystkich książek z biblioteki i przypisz do naszych dokumentów".

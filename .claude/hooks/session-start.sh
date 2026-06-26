@@ -49,3 +49,11 @@ if [ -f imperium/biblioteki/kronika_czatu.py ]; then
   python -m imperium.biblioteki.kronika_czatu eksportuj || true
   python -m imperium.biblioteki.kronika_czatu statystyki || true
 fi
+
+# 5) AUTO-LEKCJA (W-360 v4 — Opcja C) — DeepSeek ekstrahuje lekcje/wizje/decyzje
+#    z nowych sesji kroniki (przyrostowo, max 3 sesje per start = kontrola kosztów).
+#    Silent gdy brak DEEPSEEK_API_KEY (Prawo Bezpieczeństwa: bez klucza nic nie robi).
+if [ -f narzedzia/auto_lekcja.py ]; then
+  echo "[hook] AUTO-LEKCJA (W-360 v4):"
+  python narzedzia/auto_lekcja.py --maks 3 || true
+fi

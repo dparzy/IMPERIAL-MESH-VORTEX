@@ -1505,4 +1505,43 @@ Spike wolumenu o 01:00 EST (07:00 CET) → wejście instytucji Londynu.
 
 ---
 
+## 📚 ŹRÓDŁA — Kanon biblioteki (BIB → strategia)
+
+> **Stan na:** 2026-06-26 | **Zasada (Prawo I — zero fabrykacji):** poniżej tylko realne powiązania.
+> Źródło prawdy = pole `zrodlo` w `imperium/legiony/strategie/rejestr_strategii.py`.
+> Wiele strategii to konstrukcje własne IMV lub adaptacje autorów BEZ numeru BIB w bibliotece
+> (Bollinger, Hosoda, Minervini, Brooks, Darvas, Connors/Raschke, McMillan) — oznaczone „— (własna/skan)".
+> Pełna esencja traderów: `bibliotheca_ulpia/encyklopedia/TRD_slynni_traderzy.md` i `STR_strategie_i_zagrania.md`.
+
+| Strategia (klucz + nazwa) | Idea | Źródło BIB |
+|---------------------------|------|-----------|
+| **IMV-TR-008** Trójekran Eldera | Triple Screen: trend HTF + Force Index pullback + FI(2) trigger | **BIB-015 Elder** (jawnie w kodzie) |
+| **IMV-RG-002** Rytm Livermore'a | Pivot/Donchian, „czekaj na potwierdzenie", handel w kanale | **BIB-039 Lefèvre** (Reminiscences — jawnie) |
+| **IMV-TR-001** Strategia Turtles | Wybicie Donchian 20/55D, sizing N=ATR (Dennis/Eckhardt) | BIB-038 Schwager (powiązanie pośrednie — Market Wizards) |
+| **XII-TR-001** Złoty Orzeł | Golden Cross EMA(50/200) + Supertrend + ADX/OBV | BIB-002 Murphy (powiązanie ideowe — kanon TA) |
+| **XII-RV-001** Bumerang Senatu | Dywergencja RSI + złota strefa Fibo → odwrócenie | — (własna; ideowo BIB-002 Murphy) |
+| **XII-BK-001** Piorunowa Brama | Bollinger squeeze → wybicie + Donchian + OBV | — (własna/skan; Bollinger bez BIB) |
+| **IMV-HY-003** Ichimoku Shogun | Pozycja względem chmury Kumo + EMA timing + OBV | — (własna/skan; Hosoda bez BIB) |
+| **IMV-TR-003** Mistrz Minervini | SEPA Trend Template + Supertrend + VCP/RVOL | — (własna/skan; Minervini bez BIB) |
+| **X-SC-003** Brooks M2B | Dwunożny pullback do EMA, drugie wejście + RSI | — (własna/skan; Brooks bez BIB) |
+| **IMV-TR-002** Pudełko Darvasa | Wybicie z „pudełek" Donchian+BB z wolumenem | — (własna/skan; Darvas bez BIB) |
+| **IMV-RG-001** Street Smarts | Mean-reversion w konsolidacji przy VWAP | — (własna/skan; Connors/Raschke bez BIB) |
+| **X-SC-001** Piorun Cezara | Trend-scalp M5: EMA cross + StochRSI, ADX>25 | — (własna IMV) |
+| **X-SC-002** Torpeda VWAP | VWAP bounce w zakresie dziennym + StochRSI | — (własna/skan day-trading) |
+| **IMV-SC-002** Wschód Słońca | Dawn breakout sesji azjat./londyńskiej przy VWAP | — (własna IMV) |
+| **IMV-DEF-001** Tarcza Pretorianów | Kontra na stop-hunt / wick rejection (anty-MM) | — (własna IMV anty-manipulacja) |
+| **IMV-DEF-002** Mur Kontrwywiadu | Kontra na wash volume + wzorzec Barta (anty-MM) | — (własna IMV anty-manipulacja) |
+| **VI-LV-001** Żelazny Klin | Funding contrarian + Long/Short na squeeze | — (własna VI; ideowo funding/LEW) |
+| **VI-LV-002** Kaskada Stalowa | Stop-hunt + dywergencja OI → odbicie po kaskadzie | — (własna VI Ferrata) |
+| **IMV-RV-006** Łowca Stref | SMC: BOS/MSS + Order Block + FVG + VPOC | — (własna IMV; ICT/SMC bez BIB) |
+| **IMV-RV-007** Żniwa Szczytu | Climax reversal + mean-rev do Anchored VWAP / VPOC | — (własna IMV) |
+
+> **Uwaga (Prawo I):** tylko **2 strategie** mają twardy numer BIB w kodzie (IMV-TR-008→BIB-015, IMV-RG-002→BIB-039).
+> Książki **BIB-007 López de Prado, BIB-024 Lowe, BIB-025 Grinold&Kahn, BIB-013/014 Dalton, BIB-010/011 Chan,
+> BIB-020 Harris** zasilają MODUŁY ryzyka/sizing/walidacji i neurony (patrz KATALOG_NEURONOW.md § Źródła),
+> NIE konkretne strategie — przypisanie ich do strategii byłoby fabrykacją. BIB-024 Lowe = **ANTYWZORZEC**
+> (uśrednianie w dół) sprzeczny z Regułą 6% — żadnej strategii nie zasila, służy jako przestroga.
+
+---
+
 *"Strategia bez neuronu to plan bez żołnierzy. Neuron bez strategii to żołnierz bez rozkazu."* — VITRUVIUSZ

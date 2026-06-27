@@ -87,6 +87,54 @@ def _json(path: Path) -> str:
     return "\n".join(splaszcz(dane))
 
 
+def _strip_html(html: str) -> str:
+    """Usuwa tagi HTML, zwraca czysty tekst (dzieli akapity)."""
+    from html.parser import HTMLParser
+
+    class _Strip(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.parts: list[str] = []
+
+        def handle_data(self, data: str):
+            self.parts.append(data)
+
+    p = _Strip()
+    p.feed(html)
+    return " ".join(p.parts)
+
+
+def _mobi(path: Path) -> str:
+    """azw3/mobi → tekst przez pakiet `mobi` (rozpakowuje do epub/html). Fallback: calibre."""
+    try:
+        import mobi as _mobimod
+    except ImportError:
+        return _calibre(path)
+    tempdir = None
+    try:
+        tempdir, fp = _mobimod.extract(str(path))
+        fp_path = Path(fp)
+        suf = fp_path.suffix.lower()
+        if suf == ".epub":
+            return _epub(fp_path)
+        if suf in (".html", ".htm", ".xhtml"):
+            return _strip_html(fp_path.read_text(encoding="utf-8", errors="replace"))
+        # nieznany format pojemnika — zbierz wszystkie html z tempdira
+        teksty: list[str] = []
+        for h in sorted(Path(tempdir).rglob("*.htm*")):
+            teksty.append(_strip_html(h.read_text(encoding="utf-8", errors="replace")))
+        if teksty:
+            return "\n\n".join(teksty)
+        return _calibre(path)
+    except Exception:
+        return _calibre(path)
+    finally:
+        if tempdir:
+            import shutil
+
+            shutil.rmtree(tempdir, ignore_errors=True)
+
+
 def _calibre(path: Path) -> str:
     """Fallback: ebook-convert → txt (wymaga calibre)."""
     tmp = path.with_suffix(".txt.tmp")
@@ -134,7 +182,7 @@ def ekstrahuj(path: Path) -> str:
         if suf == ".json":
             return _json(path)
         if suf in (".azw3", ".mobi"):
-            return _calibre(path)
+            return _mobi(path)
         if suf == ".djvu":
             return _djvu(path)
     except Exception as e:

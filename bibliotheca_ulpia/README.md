@@ -4,7 +4,7 @@ Wrzuć tu pliki epub/pdf/azw3 — Claude Code je przeczyta i wyciągnie esencję
 (neurony, strategie, W-xxx) zgodnie z Zasadą Pełnego Opisu (ZPO).
 
 ## 🗂️ Struktura biblioteki
-- **`BIB-001..032`** — kanon źródłowy (32 książki, pliki epub/pdf/azw3/mobi/djvu)
+- **`BIB-001..042`** — kanon źródłowy (42 książki, pliki epub/pdf/azw3/mobi/djvu)
 - **`encyklopedia/`** — tematyczna biblia wiedzy operacyjnej (działy LEW/TRD/IMP/...),
   z oceną ważności i wprost wskazanym wpływem na kod. Start: [`encyklopedia/INDEX_MAIOR.md`](encyklopedia/INDEX_MAIOR.md)
 - **`vademecum/`** — szybkie ściągi (checklisty, wzory) — 1 strona na temat

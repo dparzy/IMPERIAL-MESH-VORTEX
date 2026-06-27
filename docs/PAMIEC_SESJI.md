@@ -16,7 +16,7 @@
 |----|--------|--------|-----------|---------|
 | A1 | **GitHub MCP** | ✅ działa (cloud) | — | PR, issues, CI |
 | A2 | **Memory MCP** 💎 | ✅ natywny (imperium/biblioteki/pamiec_sesji.py + hook) | — | Trwała pamięć między sesjami (ROZWIĄZUJE W-360) |
-| A3 | **Bibliotheca-RAG MCP** 💎 | ✅ zbudowany (W-360 RAG v2) | — | Szukaj w 32 książkach + encyklopedii + docs |
+| A3 | **Bibliotheca-RAG MCP** 💎 | ✅ zbudowany (W-360 RAG v2) | — | Szukaj w 42 książkach + encyklopedii + docs (indeks do przebudowy po BIB-033..042) |
 | A4 | **Filesystem MCP** 🔵 | ⏳ opcjonalny | niski | Dostęp do plików lokalnych bez Read tool |
 | A5 | **Fetch/Web MCP** 🔵 | ⏳ opcjonalny | niski | WebFetch przez MCP |
 | A6 | **Sequential-Thinking MCP** 💎 | ⏳ nie skonfigurowany | średni | Ustrukturyzowane rozumowanie krok po kroku |
@@ -97,6 +97,15 @@ Razem: sweep z **8 minut → ~30-40 sekund**.
 ---
 
 ## 📚 LEKCJE Z SESJI
+
+### 2026-06-25 — Głęboki audyt przypisania książek: 42/42 pokryte, 4 sieroty naprawione
+Cezar zlecił audyt przypisania wszystkich książek do działów. Macierz pokrycia (plik↔dział) wykryła 3 prawdziwe sieroty + 1 brak w Kanonie INDEX. Każdą przeczytano agentem przed przypisaniem (ZPO, nie z tytułu). BIB-001 Patel (978-0-85719-857-0)→MAK (18-letni cykl nieruchomości, MAK 🔲→🚧+esencja)+BAN. BIB-012 Coding Capital (979-8-87385-994-8)→ALG+IMP. BIB-024 Lowe (self-pub ⚠️)→ONC ⭐1 z oznaczeniem ANTYWZORCA (uśrednianie w dół vs Reguła 6%). BIB-005 Blum→dopisany do Kanonu INDEX (był w ONC). Wynik: 42/42, zero sierot. Lekcja metodologiczna: „sierota wg INDEX_MAIOR" ≠ „sierota faktyczna" — sprawdzaj WSZYSTKIE pliki działów, nie tylko Kanon (BIB-005 był w ONC, fałszywie wyglądał na sierotę).
+
+### 2026-06-25 — Kanon 36→42: 6 klasyków → LEW/TRD/PSY/RSK
+Cezar wgrał BIB-037..042 (Hull, Schwager, Lefèvre, Bernstein, Taleb, Jorion). Ekstrakcja EPUB + 6 agentów → esencja do działów. ISBN zweryf. (Prawo I; Bernstein/Taleb przez web bo plik Taleba=bundel Incerto). Esencja: Hull — margin call dopłaca do INITIAL nie maintenance, Lehman 31:1, ⚠️ Hull NIE pokrywa crypto perpetual/funding. Schwager — undertrade, korelacja pozycji codziennie (Prawo XVI), proces>wynik. Lefèvre — sit tight, anty-uśrednianie, hope/fear odwrócone, anty-tip=Prawo I. Bernstein — loss aversion uzasadnia twardy HALT + 3 pułapki regresji do średniej. Taleb — magnituda>częstotliwość, survivorship bias→DSR/PBO, katastrofa nieobecna w danych→bezpieczniki ogona. Jorion — Expected Shortfall>VaR dla grubych ogonów krypto, EWMA λ=0.94, backtest VaR strefy Basel. Symbioza 36→42 w 8 plikach.
+
+### 2026-06-25 — Kanon 32→36: 4 książki LLM/agentów → dział MEM
+Cezar wgrał BIB-033..036 (Huyen *AI Engineering*, Infante *AI Agents and Applications*, Iusztin&Labonne *LLM Engineer's Handbook*, Alto *Building LLM Powered Applications*). Pełna analiza: ekstrakcja EPUB/AZW3 + 4 równoległe agenty → esencja do MEM §8 (mapa 17 konceptów→kod). Prawo I: zweryfikowano ISBN-y; BIB-034 to **Roberto** Infante (nie Michael), ISBN 978-1-63343-654-1, hedge-fund quant. Esencja: Huyen — 3-warstwowa pamięć (internal/short/long) + pułapka FIFO (uzasadnia nasz zanik warstwowy) + reranking wg świeżości („stock market") + RAG>fine-tuning dla świeżych danych + compound mistakes 0,95ⁿ. Infante — stan grafu=pamięć (checkpoint), Router vs Supervisor (Senat=Supervisor, mocniejszy model), MCP. Iusztin — FTI + hybrid search (BM25+dense łapie tickery) + reranking cross-encoderem (największy zysk RAG). Alto — taksonomia pamięci (Buffer/Summary/Entity/KG) + CONDENSE_QUESTION. 🚨 Prawo XV: gotowy blueprint domknięcia Bibliotheca-RAG (W2). UWAGA techniczna: `git checkout origin/main -- ` nadpisuje pliki lokalne — książki były na branchu roboczym, nie main; sync przez merge (nie reset --hard, blokuje auto-mode).
 
 ### 2026-06-22 — FinMem layered decay wdrożony + scan rynku pamięci (MEM-01..04)
 Pytanie Cezara: czy mamy FinMem/FinAgent. Weryfikacja na żywo (WebSearch): FinMem=2311.13743 (NASZ KOD cytował błędnie 2408.14900 → naprawione, Prawo I), FinAgent=2402.18485, Mem0=2504.19413, A-Mem=2502.12110. WDROŻONE: zanik warstwowy FinMem w centrum_pamieci._decay_dla_waznosci() — tempo zaniku zależy od ważności (i=0.3→0.99 płytka, i=1.0→0.999 głęboka). Naprawia UTRATA POTENCJAŁU (Prawo XV): wcześniej lekcja krytyczna zanikała tak szybko jak rutyna (jeden 0.995). Nasz unikat: funkcja CIĄGŁA vs 3 kubełki FinMem. Rejestr: MEM-01 wdrożony, MEM-02 dual-reflection (plan), MEM-03 Mem0 auto-konsolidacja (plan), MEM-04 A-Mem auto-linki (kandydat). Unikat Imperium: pamięć rynku + pełny dialog+lekcje+profil w git (przeżywa kompakcję), brak na rynku. 4 testy granic zaniku. _DECAY martwy usunięty.

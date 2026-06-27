@@ -84,7 +84,7 @@ rozmiar+mtime), reszta pomijana. Przy 200 książkach to sekundy zamiast minut.
 
 | Korpus | Zawartość | Po co |
 |--------|-----------|-------|
-| `biblioteka` | 32 książki + encyklopedia + vademecum | wiedza zewnętrzna (autorzy) |
+| `biblioteka` | 41/42 książek + encyklopedia + vademecum | wiedza zewnętrzna (autorzy) |
 | `dane` | `bibliotheca_ulpia/dane/` (CSV/JSON/notatki) | dane tematyczne, wyniki |
 | `docs` | dokumentacja Imperium (`docs/*.md`) | "co mamy w kodzie" |
 
@@ -105,3 +105,8 @@ jest mostem (mapuje wiedzę na nasze moduły, np. "Kyle's λ → EXP-14").
 
 `baza_wiedzy.db` jest w `.gitignore` (odtwarzalna deterministycznie przez `indeksuj.py`).
 Nie commitujemy jej — każdy odtwarza lokalnie z książek + dokumentów.
+
+> **BIB-032 O'Hara** (PDF): to skan obrazowy — narzędzia OCR zwracają bełkot dla tego pliku.
+> Esencja książki jest dostępna w `encyklopedia/MKS_mikrostruktura_rynku.md`.
+> Indeks RAG: 41/42 książek + encyklopedia (FTS5). Wektory: wymagają modelu embeddingów
+> (huggingface.co) — w środowisku proxy-blocked działamy w trybie FTS-only.

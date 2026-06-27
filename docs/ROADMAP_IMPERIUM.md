@@ -236,5 +236,25 @@ Przed wejściem na żywy rynek każdy moduł musi przejść przez kolejne etapy 
 
 ---
 
+## 📚 ŹRÓDŁA — Biblioteka napędza roadmapę (BIB)
+
+> **Stan na:** 2026-06-26 | Każdy duży kierunek rozwoju ma fundament w bibliotece (42 książki).
+> Pełna esencja: `bibliotheca_ulpia/encyklopedia/INDEX_MAIOR.md` (16 działów).
+
+| Kierunek roadmapy | Fundament (koncept) | Źródło BIB |
+|-------------------|---------------------|-----------|
+| Reguła 6% + bezpieczniki ryzyka | budżet ryzyka portfela + circuit-breaker | BIB-015 Elder; uzasadnienie BIB-040 Bernstein |
+| Walidacja w Koloseum (DSR/PBO) | anty-overfitting, magnituda > częstotliwość | BIB-007 López de Prado + BIB-041 Taleb |
+| HRP / alokacja portfela | Hierarchical Risk Parity (klastry korelacji) | BIB-007 López de Prado + BIB-026 Jansen |
+| Warstwa ryzyka EWMA/VaR/ES | EWMA λ=0.94, Expected Shortfall (grube ogony) | BIB-042 Jorion |
+| Bibliotheca-RAG (pamięć semantyczna) | RAG nad książkami, CONDENSE_QUESTION, FTI | BIB-033 Huyen + BIB-036 Alto + BIB-035 Iusztin&Labonne |
+| Kontekst makro (RADAR/Gubernator) | faza 18-letniego cyklu jako TŁO reżimu | BIB-001 Patel (+ planowane BIB-056..058 Dalio) |
+| Neurony zmienności / GARCH | GARCH, vol cone, realized vol | BIB-031 Tsay + BIB-008 Sinclair |
+
+> Mapa książka→neuron: `docs/KATALOG_NEURONOW.md` § Źródła. Książka→strategia: `docs/KATALOG_STRATEGII.md` § Źródła.
+> Książka→warstwa architektury: `docs/ARCHITEKTURA_IMPERIUM.md` § Źródła.
+
+---
+
 *Dokument żywy — aktualizowany wraz z postępem systemu IMPERIUM.*
 *"Alea iacta est." — kości zostały rzucone.*

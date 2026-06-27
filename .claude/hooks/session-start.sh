@@ -28,10 +28,10 @@ if [ -f narzedzia/audyt_spojnosci.py ]; then
   python narzedzia/audyt_spojnosci.py || true
 fi
 
-# 3) CENTRUM PAMIĘCI (W-360 v3) — scored TOP-k lekcji (Generative Agents: recency×importance×relevance)
+# 3) CENTRUM PAMIĘCI (W-360 v5) — scored TOP-k lekcji (Generative Agents: recency×importance×relevance)
 #    + profil Cezara + alarm przepełnienia + cross-layer search. Zastępuje proste "ostatnie 3".
 if [ -f imperium/biblioteki/centrum_pamieci.py ]; then
-  echo "[hook] CENTRUM PAMIĘCI (W-360 v3):"
+  echo "[hook] CENTRUM PAMIĘCI (W-360 v5):"
   python -m imperium.biblioteki.centrum_pamieci start || \
     python -m imperium.biblioteki.pamiec_sesji start || true
 else
@@ -48,4 +48,12 @@ if [ -f imperium/biblioteki/kronika_czatu.py ]; then
   echo "[hook] KRONIKA CZATU (W-360):"
   python -m imperium.biblioteki.kronika_czatu eksportuj || true
   python -m imperium.biblioteki.kronika_czatu statystyki || true
+fi
+
+# 5) AUTO-LEKCJA (W-360 v5 — Opcja C) — DeepSeek ekstrahuje lekcje/wizje/decyzje
+#    z nowych sesji kroniki (przyrostowo, max 3 sesje per start = kontrola kosztów).
+#    Silent gdy brak DEEPSEEK_API_KEY (Prawo Bezpieczeństwa: bez klucza nic nie robi).
+if [ -f narzedzia/auto_lekcja.py ]; then
+  echo "[hook] AUTO-LEKCJA (W-360 v5):"
+  python narzedzia/auto_lekcja.py --maks 3 || true
 fi

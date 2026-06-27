@@ -132,15 +132,21 @@ def szukaj(zapytanie: str, cel: Path = CEL_DOMYSLNY,
     Pełnotekstowe przeszukanie kroniki (fallback gdy RAG niedostępny).
     Zwraca [{"sesja": id, "fragment": "...linia z trafieniem..."}], max `limit`.
     """
+    from datetime import datetime
     q = zapytanie.lower()
     trafienia: List[Dict[str, str]] = []
     if not cel.exists():
         return trafienia
-    for plik in sorted(cel.glob("sesja_*.md")):
+    for plik in sorted(cel.glob("sesja_*.md"), reverse=True):
+        mtime = plik.stat().st_mtime
+        data_pliku = datetime.utcfromtimestamp(mtime).strftime("%Y-%m-%d")
         for linia in plik.read_text(encoding="utf-8", errors="ignore").splitlines():
             if q in linia.lower():
-                trafienia.append({"sesja": plik.stem.replace("sesja_", ""),
-                                  "fragment": linia.strip()[:300]})
+                trafienia.append({
+                    "sesja": plik.stem.replace("sesja_", ""),
+                    "fragment": linia.strip()[:300],
+                    "data": data_pliku,
+                })
                 if len(trafienia) >= limit:
                     return trafienia
     return trafienia

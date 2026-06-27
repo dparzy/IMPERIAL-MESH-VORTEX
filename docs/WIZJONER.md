@@ -4,6 +4,10 @@
 >
 > **Zasada:** Każda idea zapisana tutaj → analizuję wpływ → jeśli dojrzała, przenosimy do właściwego dokumentu.
 > Kiedy zbierze się 3+ wizji na temat → przypominam Komendantowi: "Mamy tyle pomysłów — co robimy?"
+>
+> **📚 Kanon biblioteki (42 książki):** ten brudnopis cytuje BIB-xxx inline przy wizjach. Skonsolidowane
+> mapy książka→kod znajdziesz w sekcjach „📚 Źródła": `KATALOG_NEURONOW.md`, `KATALOG_STRATEGII.md`,
+> `ARCHITEKTURA_IMPERIUM.md`, `ROADMAP_IMPERIUM.md` oraz `bibliotheca_ulpia/encyklopedia/INDEX_MAIOR.md`.
 
 ---
 

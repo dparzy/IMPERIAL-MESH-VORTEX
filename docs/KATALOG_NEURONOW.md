@@ -918,4 +918,51 @@ Gdy pojawi się coś czego NIE mamy w katalogu → zgłaszamy lukę → badamy �
 
 ---
 
+## 📚 ŹRÓDŁA — Kanon biblioteki (BIB → zaimplementowany neuron/moduł)
+
+> **Stan na:** 2026-06-26 | **Zasada (Prawo I — zero fabrykacji):** poniżej TYLKO neurony/moduły
+> z udokumentowanym powiązaniem książka→kod (WIZJONER.md, encyklopedia „Mapa wiedza→kod", MAPA_KLUCZY.md).
+> Neurony klasycznego kanonu AT (RSI/MACD/BBands/EMA/Ichimoku/ADX/Supertrend…) oraz ze skanu TradingView
+> NIE są tu przypisywane punktowo do BIB — pochodzą z domeny publicznej / skryptów, nie z linku książka→klucz.
+> Pełna esencja każdej książki: `bibliotheca_ulpia/encyklopedia/` (16 działów) + `INDEX_MAIOR.md`.
+
+| Neuron / moduł (klucz) | Koncept | Źródło BIB |
+|------------------------|---------|-----------|
+| **N-02** NeuronFracDiff | Fractional Differentiation (FFD) — stacjonarność z zachowaniem pamięci (W-107) | BIB-007 López de Prado (AFML) |
+| **N-01** NeuronPermutationEntropy | Entropy features — niska entropia = rynek nieefektywny (W-108) | BIB-007 López de Prado (AFML) |
+| **Z-01** NeuronToxicFlow | VPIN (Volume-Synchronized PIN) — toksyczny przepływ | BIB-007 López de Prado; pojęcie też BIB-020 Harris |
+| **Z-03** NeuronBubbleCrash | bubble_z + VoV + AR1 hard-halt; dekompozycja zmienności (W-278) | BIB-020 Harris (Trading & Exchanges) |
+| **Z-04** NeuronCascade | crash cascade detector + dead-cat bounce LONG (W-279) | BIB-020 Harris (Trading & Exchanges) |
+| **Z-06** NeuronAmihudIlliquidity | Amihud illiquidity (λ) z OHLCV (W-268) | BIB-020 Harris; λ także BIB-007 |
+| **Z-07** NeuronPiCycleTop | Pi-Cycle Top (111 DMA × 350 DMA×2) — szczyt cyklu halvingowego | BIB-030 Ammous / dział ONC |
+| **X-27** NeuronValueConvergence | value convergence z-score; mean-reversion (W-273) | BIB-020 Harris (Trading & Exchanges) |
+| **V-05** NeuronForceIndex | Force Index = (close−close₋₁)×vol, EMA2/EMA13 (W-210) | BIB-015 Elder (New Trading for a Living) |
+| **V-13** NeuronRealizedVol | Yang-Zhang realized volatility (estymator range-based) | BIB-008 Sinclair (Volatility Trading) |
+| **OC-06** NeuronS2F | Stock-to-Flow — twardy pieniądz, szok podażowy | BIB-030 Ammous (Bitcoin Standard) |
+| **OC-07** NeuronDaysToHalving | harmonogram halvingów (szok podażowy) | BIB-030 Ammous (Bitcoin Standard) |
+| **OC-08** NeuronBTCSupplyInflation | inflacja podaży BTC / S2F | BIB-030 Ammous (Bitcoin Standard) |
+| **OC-01** NeuronMVRV 🔇 | MVRV ratio (wycena on-chain) | BIB-003 Burniske & Tatar (Cryptoassets) |
+| **OC-02** NeuronSOPR 🔇 | SOPR (realized profit/loss) | BIB-003 Burniske & Tatar |
+| **OC-03** NeuronPuellMultiple 🔇 | Puell Multiple (przychód górników) | dział ONC / BIB-003 |
+| **OC-04** NeuronExchangeNetflow 🔇 | Exchange netflow (presja podaży) | dział ONC / BIB-003 |
+| **PSY-01** NeuronFundingExtreme 🔇 | Funding rate jako sentyment lewara (kontrarian) | BIB-015 Elder + dział LEW |
+| **PSY-03** NeuronFearGreed 🔇 | Fear & Greed Index — kontrarian na ekstremach tłumu | BIB-017 Kahneman / BIB-016 Douglas |
+| **EXP-13** ZwiadowcaGARCH | GJR-GARCH(1,1) — zmienność warunkowa | BIB-031 Tsay + BIB-008 Sinclair |
+| **EXP-14** ZwiadowcaKyleLambda | Kyle's λ (1985) — impact/illikwidność | BIB-032 O'Hara / BIB-020 Harris |
+| **EXP-15** ZwiadowcaPIN 🔇 | PIN (Easley-O'Hara, Prob. of Informed Trading) | BIB-032 O'Hara (Market Microstructure Theory) |
+| **A-01** NeuronStopHunt | stop-gunning / liquidity sweep | BIB-020 Harris (rozdz. 11) |
+| **A-03** NeuronWashVol | detekcja wash-trade (wolumen bez ruchu) | BIB-020 Harris (rozdz. 12) |
+| **OC-05** NeuronWashTrading | wash trading detection | BIB-020 Harris (manipulacje) |
+
+> **Niebędące neuronami moduły/bezpieczniki ze źródłem książkowym:** Reguła 6%/2% → **BIB-015 Elder**;
+> Arena Trzech Bram (triple-barrier), meta_labeling, HRP, DSR/PBO → **BIB-007 López de Prado**;
+> denoising Marčenko-Pastur → **BIB-023 López de Prado**; HRP też → **BIB-026 Jansen**;
+> EWMA λ=0.94 / VaR / ES → **BIB-042 Jorion**; VolatilityDrag / Kelly → **BIB-008/018 Sinclair**;
+> IR=IC·√breadth → **BIB-025 Grinold & Kahn**; kointegracja → **BIB-031 Tsay + BIB-010/011 Chan**;
+> HALT/loss-aversion (uzasadnienie) → **BIB-040 Bernstein**; backward-IC/anty-overfitting → **BIB-041 Taleb**;
+> faza 18-letniego cyklu jako TŁO reżimu (Gubernator) → **BIB-001 Patel**;
+> moduły pamięci (centrum_pamieci, mnemosyne, kronika) → **BIB-033..036 Huyen/Infante/Iusztin&Labonne/Alto** (dział MEM).
+
+---
+
 *VITRUVIUSZ — "Trzysta dwadzieścia osiem par oczu jednego organizmu. Imperium nie ma ślepego pola."*

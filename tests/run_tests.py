@@ -31,9 +31,23 @@ class _MonkeyPatch:
         self._undo.append((obj, name, getattr(obj, name, None)))
         object.__setattr__(obj, name, value) if isinstance(obj, type) else setattr(obj, name, value)
 
+    def setenv(self, name, value):
+        self._undo.append((os.environ, name, os.environ.get(name)))
+        os.environ[name] = value
+
+    def delenv(self, name, raising=True):
+        self._undo.append((os.environ, name, os.environ.get(name)))
+        os.environ.pop(name, None)
+
     def undo(self):
         for obj, name, old in reversed(self._undo):
-            if old is None:
+            if obj is os.environ:
+                # env: słownikowo (None → usuń klucz)
+                if old is None:
+                    os.environ.pop(name, None)
+                else:
+                    os.environ[name] = old
+            elif old is None:
                 try:
                     delattr(obj, name)
                 except AttributeError:

@@ -6,6 +6,184 @@
 
 ---
 
+## 2026-06-26 | WARSTWA | 🌉 W-360 v5 — Most Chmura↔Lokal + Pełna Symbioza Pamięci
+
+Cezar: „rób mocniejsze memory, dokładny audyt, unikaty, następna warstwa dla chmury i lokala, pełen wypas".
+Audyt agentowy wykrył 9 luk UTRATY POTENCJAŁU (Prawo XV). Naprawione najcięższe:
+
+- **L2:** W2 RAG (42 książki) podpięty do `szukaj_wszedzie` — fasada „jedyna ścieżka do pamięci"
+  wcześniej pomijała największą warstwę wiedzy. Teraz 6 warstw: lekcje+kronika+wizje+logi+wiedza+refleksje.
+- **L4:** W5 pamięć refleksyjna (narracyjne lekcje rynkowe) podpięta do cross-layer search.
+- **L6:** Deduplikacja — `rejestr_wizji.dodaj(dedup=True)` zwraca bool; `auto_lekcja` sprawdza istnienie
+  przed dopisem (DeepSeek nie dubluje lekcji co sesję).
+- **L9:** Usunięto martwą stałą `_EPOKA` (Prawo XV/martwy kod).
+
+**UNIKAT — Most Chmura↔Lokal** (`imperium/biblioteki/srodowisko_pamieci.py`): pamięć
+środowiskowo-adaptacyjna (żaden konkurent — Mem0/Zep/Letta/A-Mem — tego nie ma). Wykrywa
+chmura/lokal, raportuje co działa gdzie, generuje MANIFEST pamięci który lokalny Claude czyta
+po `git pull`. Chmura: FTS (przeżywa przez git). Lokal: upgrade do wektorów semantycznych
+(huggingface zablokowany proxy w chmurze). Most = git + manifest. Wpięty w podsumowanie startowe.
+
+Testy: 1760→1772 (+12 granic). Audyt exit 0. Ruff czysty. Dogfooding: v5 zarejestrowane w W4.
+Pliki: centrum_pamieci.py, srodowisko_pamieci.py (nowy), rejestr_wizji.py, auto_lekcja.py,
+kronika_czatu.py, tests/run_tests.py (+setenv/delenv), INDEKS_IMPERIUM.md.
+
+---
+
+## 2026-06-26 | UNIKAT | 🎯 Pamięć Reżimowa (Regime-Conditioned Retrieval) — lepsza od konkurencji
+
+Cezar: „czy da lepszą opcję pamięci, zrób unikat lepsze od konkurencji". Research SOTA 2026
+(Mem0/Zep/Graphiti/Letta/A-Mem + MemEvolve/SSGM) → wszystkie DOMENOWO ŚLEPE: retrieval =
+semantyka + recency + ewent. czas. ŻADEN nie warunkuje pamięci na reżimie rynku.
+
+**Unikat wdrożony:** 4. wymiar scoringu Generative Agents — `score = recency × importance ×
+relevance × regime_match`. Wspomnienie z bieżącego reżimu (z klasyfikuj_rezim/Gubernatora) →
+pełna waga; z innego → ×0.4; bez tagu → 1.0 (lekcje ogólne nietknięte). Logi W1 mają JAWNE
+pole rezim (dopasowanie precyzyjne), lekcje W3 — token z treści. Naprawia „regime-stale bug"
+(otwarty problem rynku) u źródła: pamięć nie wyciąga bańkowych lekcji w krachu.
+
+Kod: centrum_pamieci.py (_regime_match, _wykryj_rezim, +param rezim_biezacy w score_lekcji/
+szukaj_wszedzie/top_lekcji/_szukaj_w_logach), CLI `szukaj --rezim`. +9 testów granic.
+Wstecznie kompatybilne (rezim_biezacy='' → wyłączone). Dokumenty: REJESTR_INSPIRACJI MEM-05/06,
+encyklopedia MEM §3. Testy 1743→1752 ✅ · audyt exit 0 · ruff czysto.
+
+---
+
+## 2026-06-26 | Pamięć | W1 (logi pamiec_absolutna) podpięta do cross-layer search — naprawa Prawa XV
+
+UTRATA POTENCJAŁU naprawiona: `szukaj_wszedzie()` przeszukiwał tylko W3 (lekcje) + W3b (kronika),
+a najbogatsze dane (logi TRADE_CLOSE: rezim/PnL/MAE/MFE/powód) były POZA zasięgiem fasady pamięci.
+Dodano `_szukaj_w_logach()` — scoring recency×relevance, resilient (brak logów/katalogu → []).
+LOG_DIR przekazywany jawnie (testowalność przez monkeypatch). +3 testy granic (dopasowanie,
+brak dopasowania <0.05, brak katalogu). Docstringi zaktualizowane (W1 podpięty, nie backlog).
+
+Pliki: imperium/biblioteki/centrum_pamieci.py, tests/test_centrum_pamieci.py
+Testy: 1740→1743 ✅ · Audyt exit 0 · Ruff czysto
+
+---
+
+## 2026-06-26 | RAG + Pamięć + Testy | Przebudowa RAG na 41/42 książek + naprawa rozjazdu doc↔kod
+
+**RAG:** ekstraktor.py rozszerzony o ekstrakcję azw3/mobi przez pakiet `mobi` (rozpakowuje do epub → _epub).
+Pełna przebudowa indeksu: 24→41 książek w FTS5 (15 204 fragmentów, 82 MB, 44 s).
+BIB-032 O'Hara — skan obrazowy, OCR daje bełkot → NIE zaindeksowany (Prawo I); esencja w MKS encyklopedii.
+Wektory niedostępne (huggingface.co zablokowane przez proxy środowiska) — tryb FTS-only.
+
+**Testy (audyt):** 1740/1740 ✅, 81 plików, zero trywialnych. 11 duplikatów NAZW funkcji —
+to helpery (_bar, _bary, _bary_trend) kopiowane między plikami, bez redundancji asercji.
+6 plików importuje pytest.approx/raises — działają, bo pytest jest w env (runner to wykrywa).
+
+**Pamięć (rozjazd doc↔kod Prawo XXI):** mnemosyne.py był podawany jako żywa warstwa W1 —
+kod pokazuje świadome wycofanie (Prawo XVI: redundancja vs pamiec_refleksyjna + ksiega_wad).
+Naprawiono: centrum_pamieci.py docstring, MEM_pamiec_agentow_ai.md §2/§7 (diagram, tabela warstw),
+SETUP_LOKALNY.md (nota BIB-032 + wektory FTS-only). Ścieżka pamiec_refleksyjna skorygowana
+na imperium/cesarz/ (nie biblioteki/). Backlog: podpięcie pamiec_absolutna do szukaj_wszedzie.
+
+Pliki: narzedzia/rag/ekstraktor.py, narzedzia/rag/SETUP_LOKALNY.md,
+       imperium/biblioteki/centrum_pamieci.py, bibliotheca_ulpia/encyklopedia/MEM_pamiec_agentow_ai.md
+
+---
+
+## 2026-06-26 | Dokumentacja | Sekcje „📚 Źródła (Kanon BIB)" w 4 dokumentach strategicznych
+
+Cezar: „esencja była wcześniej wpisywana z książek… zobacz czy 42 książki są ujęte w wizji,
+strategii, planowaniu". Audyt wykazał: WIZJONER.md miał 77 odwołań BIB (✅), ale KATALOG_NEURONOW,
+KATALOG_STRATEGII, ARCHITEKTURA i ROADMAP miały 0–3 odwołania.
+
+Naprawa: dodano sekcję „📚 Źródła — Kanon biblioteki (BIB)" do 4 dokumentów, mapując REALNE
+powiązania koncept→książka (2 agentów zbudowało mapowania z WIZJONER + encyklopedii + rejestr_strategii.py).
+**Zero fabrykacji (Prawo I):** neurony kanonu AT/skanu TradingView NIE przypisane punktowo do BIB;
+tylko 2 strategie mają twardy numer BIB w kodzie (IMV-TR-008→Elder, IMV-RG-002→Lefèvre). BIB-024 Lowe
+oznaczony jako ANTYWZORZEC. Pełna symbioza: dokumenty linkują wzajemnie do swoich § Źródła.
+
+Pliki: docs/KATALOG_NEURONOW.md, docs/KATALOG_STRATEGII.md, docs/ARCHITEKTURA_IMPERIUM.md, docs/ROADMAP_IMPERIUM.md
+
+---
+
+## 2026-06-25 | Audyt | Głęboki audyt przypisania 42 książek → 4 sieroty naprawione
+
+Cezar: „zrób głęboki audyt wszystkich książek z biblioteki i przypisz do naszych dokumentów".
+
+Metoda: macierz pokrycia 42 książek (plik fizyczny ↔ dział encyklopedii). Wykryto **3 prawdziwe
+sieroty** (nigdzie nieprzypisane) + 1 półsierotę (w dziale, brak w Kanonie INDEX). Każdą
+przeczytano agentem przed przypisaniem (ZPO, Prawo I — nie z tytułu).
+
+Naprawione przypisania:
+- **BIB-001 Patel** *The Secret Wealth Advantage* (978-0-85719-857-0 ✅ web) → **MAK** (główny:
+  18-letni cykl nieruchomości; MAK 🔲→🚧, pierwszy realny tom + esencja) + **BAN** (poboczny).
+- **BIB-012 Van Der Post/Strauss/Schwartz** *Coding Capital* (979-8-87385-994-8 ✅ web) → **ALG**
+  (główny: warsztat algo-Python) + **IMP/RSK** (poboczny).
+- **BIB-024 Lowe** *Bitcoin & Crypto Trading for Beginners* (ISBN ⚠️ self-pub) → **ONC** (główny,
+  ⭐1/5) + **RSK**. 🚨 Oznaczono ANTYWZORZEC: „uśrednianie w dół" sprzeczne z Regułą 6%.
+- **BIB-005 Blum** *What Exactly Is Crypto* (ISBN ⚠️ self-pub, ⭐2) — był w ONC, dopisany do Kanonu INDEX.
+
+Wynik: **pokrycie 42/42 — zero sierot.** Każda książka przypisana do ≥1 działu. ISBN
+zweryfikowane web dla Patel/Coding Capital; Blum/Lowe to self-publishing bez ISBN (uczciwe ⚠️).
+
+- Pliki: `INDEX_MAIOR.md` (Kanon ONC/ALG/MAK, status MAK 🚧), `MAK_*.md` (esencja Patel),
+  `BAN_*.md`, `ONC_*.md`, `ALG_*.md`. Testy zielone, audyt exit 0.
+
+---
+
+## 2026-06-25 | Biblioteka | Kanon 36→42: analiza BIB-037..042 → LEW/TRD/PSY/RSK
+
+Cezar wgrał 6 klasyków na branch roboczy: BIB-037 Hull *Options, Futures and Other Derivatives*,
+BIB-038 Schwager *Market Wizards*, BIB-039 Lefèvre *Reminiscences of a Stock Operator*,
+BIB-040 Bernstein *Against the Gods*, BIB-041 Taleb *Fooled by Randomness*, BIB-042 Jorion *Value at Risk*.
+
+Wykonane: ekstrakcja EPUB + 6 równoległych agentów → esencja do działów LEW (Hull), TRD
+(Schwager+Lefèvre), PSY (Schwager+Lefèvre), RSK (Bernstein+Taleb+Jorion). ISBN zweryfikowane
+(Prawo I): Hull 978-0-13-693997-9, Schwager 978-1-118-27305-0, Lefèvre 978-0-470-59322-6 (w plikach);
+Bernstein 978-0-471-12104-6 i Taleb 978-0-8129-7521-5 (plik=bundel Incerto → web). Jorion 978-0-07-146495-6.
+
+Esencja kluczowa: Hull — margin call dopłaca do INITIAL nie maintenance, Lehman 31:1, GARCH>EWMA;
+⚠️ Hull NIE pokrywa crypto perpetual/funding (Prawo I). Schwager — undertrade, korelacja pozycji
+codziennie (Prawo XVI), oceniaj proces nie wynik. Lefèvre — sit tight, anty-uśrednianie, hope/fear
+odwrócone, anty-tip=Prawo I. Bernstein — loss aversion (uzasadnia twardy HALT), 3 pułapki regresji.
+Taleb — magnituda nie częstotliwość, survivorship bias→DSR/PBO, katastrofa nieobecna w danych.
+Jorion — VaR vs Expected Shortfall (krypto: ES>>VaR), EWMA λ=0.94, backtest VaR strefy Basel.
+
+Symbioza (Prawo XXI): 36→42 zsync w README, INDEX_MAIOR (Kanon+wiersze LEW/TRD/PSY/RSK),
+MEM (W2), centrum_pamieci.py, mcp_server.py, SETUP_LOKALNY, PAMIEC_SESJI (A3). Daty działów → 2026-06-25.
+
+- Pliki: `bibliotheca_ulpia/BIB-037..042` (6 e-booków), działy `LEW/TRD/PSY/RSK_*.md`,
+  `INDEX_MAIOR.md`, `MEM_*.md`, `README.md`, `centrum_pamieci.py`, `mcp_server.py`,
+  `SETUP_LOKALNY.md`, `docs/PAMIEC_SESJI.md`, `dane/PAMIEC_SESJI.md`. Testy zielone, audyt exit 0.
+
+---
+
+## 2026-06-25 | Biblioteka | Kanon 32→36: analiza BIB-033..036 → dział MEM
+
+Cezar wgrał 4 książki o inżynierii LLM/agentów (BIB-033 Huyen *AI Engineering*, BIB-034 Infante
+*AI Agents and Applications*, BIB-035 Iusztin&Labonne *LLM Engineer's Handbook*, BIB-036 Alto
+*Building LLM Powered Applications*) i polecił dokładną analizę zgodnie z zasadami.
+
+Wykonane: ekstrakcja pełnych tekstów (EPUB/AZW3), analiza 4 równoległymi agentami, esencja
+wyciśnięta do działu **MEM** (nowa §8 „Kanon książkowy" + mapa wiedza→kod z 17 konceptów).
+Metadane zweryfikowane (Prawo I): ISBN BIB-033 978-1-098-16630-4, BIB-035 978-1-83620-007-9,
+BIB-036 978-1-83546-231-7 (w plikach); BIB-034 978-1-63343-654-1 + autor **Roberto** Infante
+(nie Michael) potwierdzone WebSearch — autor pracuje dla londyńskiego hedge fundu (nasza dziedzina).
+
+Esencja kluczowa: Huyen — trójwarstwowa pamięć (internal/short/long) + reguła routingu +
+pułapka FIFO (uzasadnia nasz zanik warstwowy) + reranking wg świeżości („stock market") +
+RAG vs fine-tuning + compound mistakes 0,95ⁿ. Infante — stan grafu=pamięć (checkpoint),
+Router vs Supervisor (Senat), MCP. Iusztin — FTI + hybrid search + reranking cross-encoderem.
+Alto — taksonomia pamięci (Buffer/Summary/Entity/KG) + CONDENSE_QUESTION + 3 warstwy anty-halucynacji.
+
+🚨 Prawo XV: blueprint domknięcia Bibliotheca-RAG (W2) z książek — ingestion⊥inference,
+hybryda BM25+dense, reranking, context precision/recall jako metryki.
+
+Symbioza (Prawo XXI): liczba 32→36 zsynchronizowana w README biblioteki, INDEX_MAIOR (tabela+Kanon),
+MEM (W2), centrum_pamieci.py (docstring), mcp_server.py, SETUP_LOKALNY.md, PAMIEC_SESJI (tabela A3).
+Wpisy datowane (snapshot indeksu 7760 fragm./32 z 2026-06-21) świadomie nietknięte — Prawo I.
+
+- Pliki: `bibliotheca_ulpia/BIB-033..036` (4 e-booki), `encyklopedia/MEM_pamiec_agentow_ai.md` (+§8),
+  `encyklopedia/INDEX_MAIOR.md`, `bibliotheca_ulpia/README.md`, `centrum_pamieci.py`,
+  `narzedzia/rag/mcp_server.py`, `narzedzia/rag/SETUP_LOKALNY.md`, `docs/PAMIEC_SESJI.md`,
+  `bibliotheca_ulpia/dane/PAMIEC_SESJI.md`. Testy zielone, audyt exit 0.
+
+---
+
 ## 2026-06-22 | W-360 v3 | FinMem layered decay + scan rynku pamięci (MEM-01..04)
 
 Cezar: „FinMem (2311.13743)/FinAgent (2402.18485) to nasza dziedzina — czy to mamy? poszukaj

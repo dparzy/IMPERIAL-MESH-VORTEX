@@ -26,7 +26,7 @@ PLIKI = {
 
 N_BAROW = 1500  # ostatnie ~1500 barow 4h (~8 mies) — szybko, wspolne dla wariantow
 
-BAZA = dict(tryb_skaner=True, synapsy_rezimowe=True)
+BAZA = dict(tryb_skaner=True, synapsy_rezimowe=True, cache_wskaznikow=True)
 
 WARIANTY = {
     "BASELINE (synapsy)":      {},

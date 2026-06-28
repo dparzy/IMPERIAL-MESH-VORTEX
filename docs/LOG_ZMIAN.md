@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-28 | WYDAJNOŚĆ | ⚡ Cache wskaźników wpięty w sweepy AB (zmierzone 1.4×)
+
+Cezar: „dawaj" (wydajność). Odkrycie (Prawo XV): cache wskaźników + multiprocessing
+(`cache_wskaznikow`, `prekalkuluj_portfel`) BYŁ zaimplementowany i przetestowany jako
+identyczny wynikowo, ale `cache_wskaznikow` domyślnie False → ŻADNE narzędzie sweepu
+go nie włączało. Optymalizacja spała.
+
+**Pomiar (dane, nie obietnice):** 3 pary / 400 barów 4h → OFF 30.1s, ON 21.5s = **1.4×**,
+kapitał identyczny (9979.80). Wcześniejsze „6-8×" w dokumentacji było aspiracyjne —
+skorygowane (Prawo XXI/I). Pętli portfela NIE da się zrównoleglić po parach (współdzielą
+kapitał → złamana semantyka); cache obejmuje prekalkulację wskaźników (równoległą).
+
+**Zmiana:** `cache_wskaznikow=True` w BAZA 5 narzędzi sweepu (ab_w329/330/334/335/336).
+Bezpieczne — wyniki dowiedzione identyczne (test_backtest_portfel_cache_wskaznikow).
+Dokument PAMIEC_SESJI A2 zaktualizowany zmierzonymi liczbami.
+
+---
+
 ## 2026-06-28 | NAPRAWA | 🚨 Kronika czatu — re-eksport rosnącej sesji (UTRATA POTENCJAŁU)
 
 Audyt hooka wykrył: kronika bieżącej sesji zamrożona na 2026-06-22 (24 KB), a żywy

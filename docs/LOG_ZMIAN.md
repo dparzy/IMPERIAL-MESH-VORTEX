@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-28 | WYDAJNOŚĆ | ⚡ W-380: Numba/JIT na Viterbi Jump Model (zmierzone 256×)
+
+Cezar: „dawaj numba". Numba była omawiana, nigdy zaimplementowana (W6 Dziennik to wychwycił).
+
+**Cel wybrany pomiarem, nie zgadywaniem:** GARCH używa już scipy lfilter (C) → Numba mało by
+dała. Prawdziwa gorąca pętla Python to `_viterbi` w Jump Model (DP, wołany n_startow×max_iter
+razy na każde dopasuj(); zagnieżdżone pętle + np.argmin w środku).
+
+**Wdrożenie:** `imperium/legiony/_jit.py` — most JIT: `njit` kompiluje gdy numba dostępna,
+inaczej no-op (czysty Python). Prawo I: testy/audyt działają bez numby (fallback). Rdzeń
+`_viterbi_core` (jawne pętle) wydzielony i jit-owany. `_viterbi` deleguje do niego.
+
+**Pomiar (Prawo I):** rdzeń Viterbi 5.36 ms → 0.021 ms = **256× szybciej**. Wynik IDENTYCZNY
+z referencją numpy (test na 4 wartościach kary). numba>=0.59 w requirements (opcjonalna).
++3 testy (identyczność jit vs ref, no-op fallback bez numby, determinizm). 1782→1785.
+Pliki: _jit.py (nowy), jump_model.py, requirements.txt, test_jump_model.py.
+
+---
+
 ## 2026-06-28 | UNIKAT+NAPRAWA | ♾️ W-360 v6: Dziennik Nieśmiertelny + naprawa wyszukiwarki
 
 Cezar (niezadowolony, słusznie): „każde zdanie, każdy punkt co zrobiliśmy ma być pamiętane

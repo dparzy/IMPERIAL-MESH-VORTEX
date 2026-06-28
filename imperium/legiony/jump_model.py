@@ -32,7 +32,62 @@ from typing import Optional
 
 import numpy as np
 
+from imperium.legiony._jit import njit
+
 logger = logging.getLogger("JumpModel")
+
+
+@njit(cache=True)
+def _viterbi_core(xs: np.ndarray, c: np.ndarray, kara: float) -> np.ndarray:
+    """
+    Rdzeń Viterbi (DP po koszcie) — jawne pętle, JIT-owalne przez Numba (W-380).
+    Wynik IDENTYCZNY z wersją numpy (ta sama logika, ta sama konwencja argmin=pierwszy).
+    Gorąca ścieżka: wołany n_startow × max_iter razy na każde dopasuj() w backteście.
+    """
+    t = xs.shape[0]
+    k = c.shape[0]
+    f = xs.shape[1]
+    # koszt emisji ||x_t − c_k||² (jawne pętle — numba je kompiluje do C)
+    emisja = np.empty((t, k))
+    for i in range(t):
+        for m in range(k):
+            s = 0.0
+            for d in range(f):
+                diff = xs[i, d] - c[m, d]
+                s += diff * diff
+            emisja[i, m] = s
+    koszt = np.empty((t, k))
+    wstecz = np.zeros((t, k), dtype=np.int64)
+    for m in range(k):
+        koszt[0, m] = emisja[0, m]
+    for i in range(1, t):
+        # najtańszy stan w t-1 (pierwszy minimalny — jak np.argmin)
+        mn = koszt[i - 1, 0]
+        arg = 0
+        for j in range(1, k):
+            if koszt[i - 1, j] < mn:
+                mn = koszt[i - 1, j]
+                arg = j
+        najtanszy_skok = mn + kara
+        for m in range(k):
+            zostan = koszt[i - 1, m]               # j == m (brak skoku)
+            if zostan <= najtanszy_skok:
+                koszt[i, m] = zostan + emisja[i, m]
+                wstecz[i, m] = m
+            else:
+                koszt[i, m] = najtanszy_skok + emisja[i, m]
+                wstecz[i, m] = arg
+    stany = np.empty(t, dtype=np.int64)
+    mn = koszt[t - 1, 0]
+    arg = 0
+    for j in range(1, k):
+        if koszt[t - 1, j] < mn:
+            mn = koszt[t - 1, j]
+            arg = j
+    stany[t - 1] = arg
+    for i in range(t - 2, -1, -1):
+        stany[i] = wstecz[i + 1, stany[i + 1]]
+    return stany
 
 
 class JumpModel:
@@ -146,30 +201,14 @@ class JumpModel:
     # ── rdzeń ────────────────────────────────────────────────────────────────
 
     def _viterbi(self, xs: np.ndarray, c: np.ndarray) -> np.ndarray:
-        """Optymalna sekwencja stanów przy danych centroidach (DP po koszcie)."""
-        t = xs.shape[0]
-        k = self.n_stanow
-        # koszt emisji: ||x_t − c_k||² dla każdego t,k
-        emisja = ((xs[:, None, :] - c[None, :, :]) ** 2).sum(axis=2)
-        koszt = np.empty((t, k))
-        wstecz = np.zeros((t, k), dtype=int)
-        koszt[0] = emisja[0]
-        for i in range(1, t):
-            # przejście z j do m: koszt[i-1, j] + λ·1[j≠m]
-            zostan = koszt[i - 1]                       # j == m
-            najtanszy_skok = koszt[i - 1].min() + self.kara_skoku
-            for m in range(k):
-                if zostan[m] <= najtanszy_skok:
-                    koszt[i, m] = zostan[m] + emisja[i, m]
-                    wstecz[i, m] = m
-                else:
-                    koszt[i, m] = najtanszy_skok + emisja[i, m]
-                    wstecz[i, m] = int(np.argmin(koszt[i - 1]))
-        stany = np.empty(t, dtype=int)
-        stany[-1] = int(np.argmin(koszt[-1]))
-        for i in range(t - 2, -1, -1):
-            stany[i] = wstecz[i + 1, stany[i + 1]]
-        return stany
+        """
+        Optymalna sekwencja stanów przy danych centroidach (DP po koszcie).
+        Deleguje do _viterbi_core (JIT/Numba gdy dostępna, inaczej czysty Python).
+        Tablice w C-contiguous float64 — numba lubi przewidywalny layout.
+        """
+        xs = np.ascontiguousarray(xs, dtype=np.float64)
+        c = np.ascontiguousarray(c, dtype=np.float64)
+        return _viterbi_core(xs, c, float(self.kara_skoku))
 
     def _koszt(self, xs, stany, c) -> float:
         emis = float(((xs - c[stany]) ** 2).sum())

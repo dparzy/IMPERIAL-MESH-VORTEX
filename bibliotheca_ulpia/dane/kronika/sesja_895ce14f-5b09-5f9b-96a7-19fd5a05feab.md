@@ -3174,3 +3174,52 @@ Kod gotowy, neurony abstynują bo **brak danych wejściowych**. Pogrupowane wg a
 ## ❓ Decyzja należy do Ciebie
 
 To są kierunki, nie błahostki — wskaż gdzie uderzamy:
+
+## 🧑 Cezar
+Continue from where you left off.
+
+## 🏛️ Claude
+Pytanie nie przeszło (błąd uprawnień), a Ty mówisz „kontynuuj". Wybieram autonomicznie najlepszą opcję wg zasad: **darmowy feed o największym zysku, samodzielny, testowalny offline** — adapter Fear & Greed (ożywia PSY-03, zero kosztów, zero kluczy). Najpierw rozpoznaję wzorzec istniejących adapterów:
+
+## 🏛️ Claude
+Adapter `feargreed.py` **już istnieje** — moje założenie było błędne. Luka jest gdzie indziej: czy jest **wpięty w pipeline** (zbuduj_bojowy W-301). Sprawdzam co naprawdę brakuje:
+
+## 🏛️ Claude
+Ważna korekta do mojego wcześniejszego raportu (Prawo I — uczciwość). Sprawdziłem kod: **adaptery już istnieją i są wpięte** w pipeline (`dyrygent.py`, `petla_live.py`). Mój poprzedni raport sugerował, że feedy trzeba budować — to było nieprecyzyjne.
+
+## 📊 SKORYGOWANY STAN — co naprawdę jest do zrobienia
+
+**Kluczowe odkrycie:** „19 neuronów czeka na adaptery" to **NIE backlog kodu** — to kod kompletny, który **poprawnie abstynuje** (Prawo XV) dopóki nie płyną żywe dane. AdapterFutures, AdapterFearGreed, AdapterCVD, AdapterNewsLLM — wszystkie zbudowane i podpięte. Milczą tylko bo w audycie/chmurze brak żywego feedu sieciowego.
+
+### Podział realnego backlogu:
+
+| Kategoria | Co brakuje | Czyje działanie |
+|-----------|-----------|-----------------|
+| **PSY-01..04, V-03, NEWS-01** | żywa sieć (paper/live run) | runtime, nie kod ✅ |
+| **RADAR-01..05, C-01** | pętla portfelowa (koszyk par) | **kod** — większy projekt |
+| **OC-06/07/08, Z-07** | realne bary 1D z timestampem | runtime ✅ |
+| **DEEPSEEK_API_KEY** | klucz (auto-lekcja, NEWS-01) | **Ty** — `setx` |
+| **Wektory RAG** | uruchomienie lokalne | **Ty** — lokal |
+| **Wydajność backtestu** | cache + multiprocessing | **kod** — 8min→40s |
+| **RAG per-decyzja** | wpięcie w pętlę decyzyjną | **kod** — domyka pamięć v5 |
+
+### Co czysto kodowe (mogę zrobić sam, w chmurze):
+1. **Wydajność** — cache sygnałów + multiprocessing (6-8× szybciej) 🥇
+2. **RAG per-decyzja** — wiedza z 42 książek w pętli (domyka v5)
+3. **Pętla portfelowa** — ożywia 6 neuronów RADAR/C (większy projekt)
+
+---
+
+To są decyzje kierunkowe (Prawo XVIII), a tool do pytania padł. **Powiedz jednym słowem gdzie uderzamy** — „wydajność", „RAG", „portfel" — albo „dawaj" jeśli mam wybrać sam (wtedy biorę **wydajność**: najbezpieczniejsza, mierzalna, przyspiesza każdy kolejny eksperyment, nie rusza logiki tradingowej).
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+Tylko kronika sesji urosła (hook ją zaktualizował). Commituję i pushuję:
+
+## 🏛️ Claude
+Zsynchronizowane — repo czyste, wszystko wypchnięte na `claude/sleepy-fermi-dsdE4`.
+
+Czekam na Twój kierunek: **„wydajność", „RAG", „portfel"** — albo **„dawaj"** i wybieram sam (wezmę wydajność backtestu: 8 min → ~40 s, najbezpieczniejsza i przyspiesza każdy kolejny krok).

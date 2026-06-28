@@ -3392,3 +3392,89 @@ Cezarze — zrobione. Rozumiem Twoją frustrację i miałeś **całkowitą racj�
 **Stan:** 1782/1782 testów (+8), audyt harmonia, wszystko wypchnięte. Backfill zrobiony — oś czasu już pokazuje v4, v5, naprawę kroniki i dzisiejszą pracę.
 
 Od teraz: **nie cofamy się.** Każdy nasz krok jest na osi, widoczny od pierwszej sekundy sesji. Następny realny kandydat wydajności to **Numba/JIT** (~3-4×, niezrobiona) — ale to Twoja decyzja, czy tam idziemy.
+
+## 🧑 Cezar
+dawaj numba
+
+## 🏛️ Claude
+Cezar — robię Numba/JIT. Najpierw rozpoznanie: gdzie jest najcięższe liczenie (GARCH, Budowniczy), bo Numba ma sens tylko na pętlach numerycznych. Sprawdzam i czy numba w ogóle wstanie w chmurze:
+
+## 🏛️ Claude
+Numba **nie jest zainstalowana**. Sprawdzam czy da się ją zainstalować w chmurze (inaczej nie zmierzę i nie zweryfikuję — Prawo I):
+
+## 🏛️ Claude
+Numba 0.65.1 działa. Szukam najgorętszej pętli numerycznej — GARCH był wskazany jako cel 3-4×:
+
+## 🏛️ Claude
+GARCH używa już scipy lfilter (C) — Numba mało pomoże. Szukam **prawdziwych pętli Python** po barach (to są kandydaci na Numba). Sprawdzam moduły z jawnymi `for i in range`:
+
+## 🏛️ Claude
+Najsilniejszy kandydat: **jump_model.py** — Viterbi-style DP z zagnieżdżonymi pętlami (regime detection). Czytam:
+
+## 🏛️ Claude
+`_viterbi` to DP hot loop, wołany iteracyjnie w dopasowaniu. Sprawdzam pętlę fit (ile razy woła viterbi) — to mówi o realnym zysku:
+
+## 🏛️ Claude
+`_viterbi` wołany `n_startow × max_iter` razy na każde dopasowanie — idealny cel. Buduję wspólny helper JIT (numba lub no-op fallback) + jit-owany rdzeń Viterbi. Najpierw helper:
+
+## 🏛️ Claude
+Teraz jit-owany rdzeń Viterbi w jump_model. Czytam górę pliku (importy):
+
+## 🏛️ Claude
+Dodaję jit-owany rdzeń i przepinam `_viterbi`:
+
+## 🏛️ Claude
+Teraz weryfikacja: identyczność wyników + benchmark (Prawo I — mierzone):
+
+## 🏛️ Claude
+Identyczne wyniki, numba działa. Mierzę realne przyspieszenie jit vs czysty Python (Prawo I):
+
+## 🏛️ Claude
+**256× przyspieszenie** na rdzeniu Viterbi (0.021 ms vs 5.36 ms) — bo stara wersja miała pętle Python + np.argmin w środku. Wynik identyczny. Teraz testy + requirements + dokumentacja. Najpierw testy:
+
+## 🏛️ Claude
+Dodaję numba do requirements (opcjonalna w kodzie, ale instalowana gdzie się da):
+
+## 🏛️ Claude
+Pełny zestaw testów + audyt:
+
+## 🏛️ Claude
+Ruff: `NUMBA_DOSTEPNA` zaimportowane, nieużywane w jump_model. Usuwam z importu:
+
+## 🏛️ Claude
+**1785/1785 zielone, audyt harmonia.** Dokumentacja + wpis do Dziennika (ROZKAZ STAŁY) + commit:
+
+## 🏛️ Claude
+Cezar — **Numba zrobiona, zmierzona, wypchnięta.** 🏛️⚡
+
+## Co zrobiłem
+
+**Wybór celu pomiarem, nie zgadywaniem (Prawo I):**
+- GARCH sprawdzony — używa już `scipy lfilter` (kod C), Numba mało by dała
+- Prawdziwa gorąca pętla Python = **Viterbi w Jump Model** (DP, wołany `n_startów × max_iter` razy na każde dopasowanie, z `np.argmin` w środku pętli)
+
+**Wdrożenie:**
+- `imperium/legiony/_jit.py` — most JIT: `njit` kompiluje gdy numba jest, **no-op fallback** gdy jej nie ma (Prawo I — testy/audyt działają bez numby)
+- `_viterbi_core` (jawne pętle) wydzielony i jit-owany; `_viterbi` deleguje
+- `numba>=0.59` w requirements (opcjonalna)
+
+**Pomiar (twardy dowód):**
+```
+JIT:          0.021 ms/wywołanie
+Python/numpy: 5.362 ms/wywołanie
+PRZYSPIESZENIE: 256×
+```
+Wynik **identyczny** z referencją numpy (test na 4 wartościach kary).
+
+**Stan:** 1785/1785 testów (+3), audyt harmonia, wszystko wypchnięte.
+
+---
+
+## ♾️ I najważniejsze — pamięć zadziałała
+
+Numba **była omawiana w 4 sesjach, nigdy zrobiona** — i właśnie dlatego ciągle wracaliśmy. Dziś:
+1. **W6 Dziennik** wychwycił to na starcie („NUMBA: NIEZROBIONA — kandydat")
+2. Zrobiliśmy ją
+3. **Odhaczyłem w Dzienniku** — wpis: „Numba ODHACZONA — była tylko omawiana, teraz wdrożona+zmierzona"
+
+Następna sesja zobaczy na osi, że Numba jest **zrobiona** — nie zaproponuję jej ponownie. Błędne koło przerwane. To dokładnie to, o co walczyłeś, Cezarze.

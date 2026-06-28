@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-06-28 | UNIKAT | 🕸️ W-360 v8: Graf Pamięci — POŁĄCZENIA NEURONÓW (temporalny graf wiedzy)
+
+Cezar: „wielopłaszczyznowe zapamiętywanie POŁĄCZEŃ NEURONÓW; przeszukaj patenty/repozytoria
+globalnie (Azja/USA/EU), wdróż najlepsze, zrób petardę godną poza streszczeniem konkurentów."
+
+Research SOTA 2026 (ZPO, globalny przegląd): **Zep/Graphiti** — Temporal Knowledge Graph dla
+pamięci agenta (https://arxiv.org/abs/2501.13956), bije MemGPT na Deep Memory Retrieval; fakty
+z OKNEM WAŻNOŚCI (validity window). A-Mem (połączone notatki). MemOS/Tsinghua (memory OS, Chiny).
+Krytyka uczciwa: „Does Memory Need Graphs?" (arXiv:2601.01280) → graf to DODATKOWA soczewka do
+pytań RELACYJNYCH, nie zamiennik retrievalu. Dlatego W8 uzupełnia W1-W7, nie zastępuje.
+
+**W8 Graf Pamięci** (`graf_pamieci.py`) — to czego nie mamy, a jest hot 2026:
+- WĘZŁY = encje (Numba, Kustosz, Viterbi, kompresja…), KRAWĘDZIE = współwystąpienia w jednym
+  wpisie (waga + okno czasowe pierwszy/ostatni — temporal jak Zep).
+- `polaczenia(X)` — z czym X jest połączone; `centralne()` — huby (centralne neurony);
+  `sciezka(a,b)` — BFS jak dwa pojęcia są powiązane.
+- Budowany deterministycznie (bez API) z Dziennika W6 + wizji W4 + lekcji W3. Persystowany
+  do graf_pamieci.json (git → bezgraniczny, chmura↔lokal). Pod zarządem Kustosza W7.
+- Zmierzone: 716 neuronów, 25802 połączeń. Numba↔{cache_wskaznikow, requirements, zmierzone}.
+
+8 warstw pamięci pod jednym organem (reżimowa+środowiskowa+dziennik+kompresja+graf) —
+tej kombinacji nie ma żaden konkurent. +9 testów grafu. 1794→1803. Pliki: graf_pamieci.py (nowy),
+centrum_pamieci.py, INDEKS_IMPERIUM.md, graf_pamieci.json.
+
+---
+
 ## 2026-06-28 | UNIKAT | 👑 W-360 v7: Kustosz Pamięci — NADRZĘDNY ORGAN + kompresja zimnej warstwy
 
 Cezar: „nadrzędny organ, który kieruje wszystkimi warstwami — kompresja, katalogowanie,

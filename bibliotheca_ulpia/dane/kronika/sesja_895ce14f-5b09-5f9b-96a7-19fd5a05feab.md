@@ -3093,3 +3093,30 @@ Teraz dopisuję test re-eksportu (regresja granicy mtime) i sprawdzam test przyr
 
 ## 🏛️ Claude
 Testy kroniki zielone. Teraz uruchamiam realny eksport — żeby cała praca v4/v5 trafiła do repo:
+
+## 🏛️ Claude
+**Naprawione.** Kronika sesji urosła z 24 KB (22 czerwca) → **214 KB** — cała praca v4/v5 (21 wzmianek) teraz w repo. `1 zaktualizowane` potwierdza re-eksport. Pełny audyt + testy:
+
+## 🏛️ Claude
+Audyt łapie: brak wpisu LOG_ZMIAN z dziś + przestarzałe daty "Stan na:". Naprawiam wszystkie trzy. Najpierw LOG_ZMIAN:
+
+## 🏛️ Claude
+1774/1774 zielone, audyt pełna harmonia. Commit + push (kronika + naprawa):
+
+## 🏛️ Claude
+Gotowe. Patrząc na hooka znalazłem realny, poważny problem — i naprawiłem.
+
+## 🚨 Co znalazłem w hooku (UTRATA POTENCJAŁU, Prawo XV)
+
+Hook od dawna wypisywał **„0 zapisane, 100 pominięte"** — i to nie było OK. Kronika bieżącej sesji była **zamrożona na 22 czerwca** (24 KB), podczas gdy żywy transkrypt miał już całą pracę nad pamięcią v4/v5 (27-28 czerwca, 1933 linie).
+
+**Przyczyna:** `eksportuj(tylko_nowe=True)` pomijał każdy istniejący plik `.md`. Aktywna sesja była eksportowana **raz** — na pierwszym starcie, gdy była krótka — i nigdy nie dostawała reszty dialogu. Efekt: **5 dni pracy, w tym cała budowa pamięci, ginęło razem z efemerycznym kontenerem chmury.** Dokładnie zaprzeczenie tego, o co prosiłeś: „mamy wszystko pamiętać każdy krok rozmowy".
+
+## Naprawa
+
+- `eksportuj` re-destyluje sesję, gdy źródło jest świeższe niż zapis (mtime) → rosnąca sesja jest doeksportowywana, aż cały dialog trafi do repo/git
+- Nowy licznik `zaktualizowane`
+- **Po naprawie:** `sesja_895ce14f` urosła 24 KB → **214 KB** (cała praca v5 w repo, 21 wzmianek)
+- +2 testy granic mtime
+
+**Stan:** 1774/1774 testów, audyt pełna harmonia, commit `40b6fad` wypchnięty. Hook przy następnym starcie pokaże teraz „zaktualizowane" zamiast wiecznego „0 zapisane" — i Twoje rozmowy faktycznie przeżyją.

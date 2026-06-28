@@ -3478,3 +3478,29 @@ Numba **była omawiana w 4 sesjach, nigdy zrobiona** — i właśnie dlatego ci�
 3. **Odhaczyłem w Dzienniku** — wpis: „Numba ODHACZONA — była tylko omawiana, teraz wdrożona+zmierzona"
 
 Następna sesja zobaczy na osi, że Numba jest **zrobiona** — nie zaproponuję jej ponownie. Błędne koło przerwane. To dokładnie to, o co walczyłeś, Cezarze.
+
+## 🧑 Cezar
+ok hook zobaczymy
+
+## 🏛️ Claude
+Widać, Cezarze — **pamięć działa dokładnie jak chciałeś.** Dziennik pokazuje teraz **5 sesji**, a Numba jest **odhaczona**:
+
+```
+📅 2026-06-28  ✓ W-380: Numba/JIT na Viterbi — 256×
+              ⚖️ Numba ODHACZONA — była tylko omawiana, teraz wdrożona+zmierzona
+```
+
+Dowód że błędne koło przerwane: poprzednia oś mówiła „Numba NIEZROBIONA — kandydat", teraz mówi „ODHACZONA". W następnej sesji już jej nie zaproponuję — widzę na starcie że jest gotowa.
+
+Synchronizuję urosłą kronikę (hook ją zaktualizował), żeby stop-hook nie marudził:
+
+## 🏛️ Claude
+Gotowe — repo czyste, wszystko wypchnięte.
+
+**Podsumowanie tego co widzisz w hooku:**
+- ✅ Pamięć W-360 v6 działa — Dziennik wstrzykuje pełną oś (5 sesji) na starcie
+- ✅ Numba odhaczona — 256× zmierzone, nie wróci jako „do zrobienia"
+- ✅ Wyszukiwarka pamięci naprawiona (po słowach)
+- ✅ 1785/1785 testów, audyt harmonia
+
+System pamięta każdy krok. Czekam na następny ruch — albo „dawaj" i wezmę kolejny realny cel (np. JIT na frac_diff/bocpd jeśli profil pokaże je jako gorące, albo darmowe feedy PSY).

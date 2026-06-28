@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-06-28 | UNIKAT | 👑 W-360 v7: Kustosz Pamięci — NADRZĘDNY ORGAN + kompresja zimnej warstwy
+
+Cezar: „nadrzędny organ, który kieruje wszystkimi warstwami — kompresja, katalogowanie,
+pamięć bezgraniczna, niezależnie chmura/lokal. Coś czego nikt nie ma."
+
+Research SOTA 2026 (ZPO): MemGPT/Letta (OS-like tiering, arXiv:2310.08560), TiMem
+(arXiv:2601.02845), przegląd arXiv:2603.07670. Główny problem literatury: „memory blindness"
+— agent nie wie, że fakt jest w zimnym magazynie. Nasz Dziennik (W6) już to łamie.
+
+**W7 Kustosz Pamięci** (`kustosz_pamieci.py`) — jeden organ nad 7 warstwami:
+- `census()` — stan wszystkich warstw (W1-W6) naraz
+- `zbuduj_katalog()` — katalog nadrzędny (anti-blindness): każda sesja → tematy/data/rozmiar
+- `kompresuj_zimne(dni)` — zimne sesje .md→.md.gz, WCIĄŻ przeszukiwalne (dekompresja w locie
+  w kronika.szukaj) → zero blindness. Zmierzone 22× na sesji testowej.
+- `szukaj()` — routing nadrzędny (6 warstw cross-layer + dziennik W6)
+
+Pamięć BEZGRANICZNA: git = storage bez limitu; Kustosz trzyma kontekst ograniczony
+(Dziennik zwięzły + zimne skompresowane), a NIC nie ginie. Wpięty w podsumowanie startowe.
+
+Decyzja Prawo XVI (mierzone, nie przedwczesne): NIE kompresuję masowo teraz — przy 6 MB
+to przedwczesne, .gz traci czytelność historii w git. Mechanizm gotowy, włączy się gdy urośnie.
+
+kronika_czatu: szukaj/statystyki czytają .md i .md.gz (transparentnie). +9 testów Kustosza,
++ regresja „zimna przeszukiwalna". 1785→1794. Katalog nadrzędny zbudowany (100 sesji).
+Pliki: kustosz_pamieci.py (nowy), kronika_czatu.py, centrum_pamieci.py, INDEKS_IMPERIUM.md, katalog_nadrzedny.json.
+
+---
+
 ## 2026-06-28 | WYDAJNOŚĆ | ⚡ W-380: Numba/JIT na Viterbi Jump Model (zmierzone 256×)
 
 Cezar: „dawaj numba". Numba była omawiana, nigdy zaimplementowana (W6 Dziennik to wychwycił).

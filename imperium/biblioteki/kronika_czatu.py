@@ -164,15 +164,17 @@ def szukaj(zapytanie: str, cel: Path = CEL_DOMYSLNY,
     wyniki: List[Dict[str, str]] = []
     if not cel.exists():
         return wyniki
-    for plik in sorted(cel.glob("sesja_*.md"), reverse=True):
+    # Czyta zarówno .md (ciepłe) jak i .md.gz (zimne, skompresowane przez Kustosza W7)
+    # → ZERO „memory blindness": skompresowana historia wciąż przeszukiwalna.
+    for plik in sorted(_pliki_sesji(cel), reverse=True):
         mtime = plik.stat().st_mtime
         data_pliku = datetime.utcfromtimestamp(mtime).strftime("%Y-%m-%d")
-        for linia in plik.read_text(encoding="utf-8", errors="ignore").splitlines():
+        for linia in _czytaj_sesje_tekst(plik).splitlines():
             low = linia.lower()
             n_traf = sum(1 for s in slowa if s in low)
             if n_traf:
                 wyniki.append({
-                    "sesja": plik.stem.replace("sesja_", ""),
+                    "sesja": _id_sesji(plik),
                     "fragment": linia.strip()[:300],
                     "data": data_pliku,
                     "trafienia": n_traf,
@@ -182,13 +184,41 @@ def szukaj(zapytanie: str, cel: Path = CEL_DOMYSLNY,
     return wyniki[:limit]
 
 
+def _pliki_sesji(cel: Path) -> List[Path]:
+    """Wszystkie pliki sesji: .md (ciepłe) + .md.gz (zimne/skompresowane)."""
+    return list(cel.glob("sesja_*.md")) + list(cel.glob("sesja_*.md.gz"))
+
+
+def _id_sesji(plik: Path) -> str:
+    """ID sesji z nazwy pliku (obsługuje .md i .md.gz)."""
+    nazwa = plik.name
+    if nazwa.endswith(".md.gz"):
+        nazwa = nazwa[:-6]
+    elif nazwa.endswith(".md"):
+        nazwa = nazwa[:-3]
+    return nazwa.replace("sesja_", "")
+
+
+def _czytaj_sesje_tekst(plik: Path) -> str:
+    """Czyta treść sesji — przezroczyście dekompresuje .md.gz."""
+    if plik.suffix == ".gz":
+        import gzip
+        try:
+            with gzip.open(plik, "rt", encoding="utf-8", errors="ignore") as f:
+                return f.read()
+        except OSError:
+            return ""
+    return plik.read_text(encoding="utf-8", errors="ignore")
+
+
 def statystyki(cel: Path = CEL_DOMYSLNY) -> Dict[str, int]:
-    """Ile sesji i znaków jest już w kronice (do raportu startowego)."""
+    """Ile sesji i znaków jest już w kronice (ciepłe .md + zimne .md.gz)."""
     if not cel.exists():
-        return {"sesje": 0, "znaki": 0}
-    pliki = list(cel.glob("sesja_*.md"))
-    znaki = sum(p.stat().st_size for p in pliki)
-    return {"sesje": len(pliki), "znaki": znaki}
+        return {"sesje": 0, "znaki": 0, "zimne": 0}
+    cieple = list(cel.glob("sesja_*.md"))
+    zimne = list(cel.glob("sesja_*.md.gz"))
+    znaki = sum(p.stat().st_size for p in cieple) + sum(p.stat().st_size for p in zimne)
+    return {"sesje": len(cieple) + len(zimne), "znaki": znaki, "zimne": len(zimne)}
 
 
 if __name__ == "__main__":

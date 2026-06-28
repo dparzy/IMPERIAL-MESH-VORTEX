@@ -468,6 +468,13 @@ def podsumowanie_startowe(k: int = 3, zapytanie: str = "") -> str:
     linie.append(f"   📜 Kronika: {st['sesje']} sesji, {st['znaki']/1e6:.1f} MB dialogu w repo")
     linie.append("   📍 Mapa podpięć + wdrożenia: docs/PAMIEC_SESJI.md")
 
+    # W7 — Kustosz Pamięci (nadrzędny organ): zwięzły stan zarządzania warstwami.
+    try:
+        from imperium.biblioteki import kustosz_pamieci as _ku
+        linie.append(_ku.raport_startowy())
+    except Exception:
+        pass
+
     # W6 — Dziennik Nieśmiertelny: PEŁNA oś czasu projektu (każdy krok, dożywotnio).
     # Wstrzykiwana w CAŁOŚCI (ostatnie 12 pełnych, starsze jednolinijkowe) — gwarancja,
     # że widzę cały łuk projektu, nie tylko top-3 lekcje (ROZKAZ Cezara 2026-06-28).

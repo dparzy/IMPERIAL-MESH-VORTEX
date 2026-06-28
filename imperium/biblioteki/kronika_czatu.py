@@ -104,24 +104,40 @@ def eksportuj(zrodlo: Path = ZRODLO_DOMYSLNE, cel: Path = CEL_DOMYSLNY,
               tylko_nowe: bool = True, min_wiadomosci: int = 2) -> Dict[str, int]:
     """
     Destyluje wszystkie transkrypty z `zrodlo` do `cel` (jeden .md per sesja).
-    tylko_nowe=True → pomija sesje już wyeksportowane (przyrostowy, jak RAG --tylko-nowe).
-    Zwraca statystyki {sesje, zapisane, pominiete, wiadomosci}.
+
+    tylko_nowe=True → re-eksportuje sesję TYLKO gdy źródło jest świeższe niż zapisany
+    .md (mtime źródła > mtime celu). Naprawa UTRATY POTENCJAŁU (Prawo XV, audyt 2026-06-27):
+    poprzednio pomijało KAŻDY istniejący .md → AKTYWNA sesja, eksportowana raz na starcie
+    (gdy krótka), nigdy nie dostawała reszty dialogu. 5 dni pracy ginęło z kontenerem.
+    Teraz rosnąca sesja jest re-destylowana, aż cały dialog trafi do repo (git).
+
+    Zwraca statystyki {sesje, zapisane, zaktualizowane, pominiete, wiadomosci}.
     """
     cel.mkdir(parents=True, exist_ok=True)
-    stat = {"sesje": 0, "zapisane": 0, "pominiete": 0, "wiadomosci": 0}
+    stat = {"sesje": 0, "zapisane": 0, "zaktualizowane": 0, "pominiete": 0, "wiadomosci": 0}
     for src in _pliki_zrodlowe(zrodlo):
         stat["sesje"] += 1
         id_sesji = src.stem
         cel_plik = cel / f"sesja_{id_sesji}.md"
-        if tylko_nowe and cel_plik.exists():
-            stat["pominiete"] += 1
-            continue
+        istnial = cel_plik.exists()
+        if tylko_nowe and istnial:
+            # Re-eksport tylko gdy źródło świeższe niż zapis (aktywna sesja rośnie).
+            try:
+                if src.stat().st_mtime <= cel_plik.stat().st_mtime:
+                    stat["pominiete"] += 1
+                    continue
+            except OSError:
+                stat["pominiete"] += 1
+                continue
         dialog = destyluj_jsonl(src)
         if len(dialog) < min_wiadomosci:
             stat["pominiete"] += 1
             continue
         cel_plik.write_text(_na_markdown(dialog, id_sesji), encoding="utf-8")
-        stat["zapisane"] += 1
+        if istnial:
+            stat["zaktualizowane"] += 1
+        else:
+            stat["zapisane"] += 1
         stat["wiadomosci"] += len(dialog)
     return stat
 
@@ -174,8 +190,8 @@ if __name__ == "__main__":
 
     if args.cmd == "eksportuj":
         s = eksportuj(tylko_nowe=not args.wszystko)
-        print(f"📜 Kronika: {s['zapisane']} zapisane, {s['pominiete']} pominięte, "
-              f"{s['wiadomosci']} wiadomości z {s['sesje']} sesji.")
+        print(f"📜 Kronika: {s['zapisane']} zapisane, {s.get('zaktualizowane', 0)} zaktualizowane, "
+              f"{s['pominiete']} pominięte, {s['wiadomosci']} wiadomości z {s['sesje']} sesji.")
     elif args.cmd == "szukaj":
         for t in szukaj(" ".join(args.zapytanie)):
             print(f"[{t['sesja'][:8]}] {t['fragment']}")

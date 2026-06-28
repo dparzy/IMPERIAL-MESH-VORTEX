@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-06-28 | NAPRAWA | 🚨 Kronika czatu — re-eksport rosnącej sesji (UTRATA POTENCJAŁU)
+
+Audyt hooka wykrył: kronika bieżącej sesji zamrożona na 2026-06-22 (24 KB), a żywy
+transkrypt miał 1933 linie z całą pracą v4/v5 (27-28 czerwca). Przyczyna: `eksportuj`
+z `tylko_nowe=True` pomijał KAŻDY istniejący `.md` → AKTYWNA sesja, eksportowana raz
+na pierwszym starcie (gdy krótka), nigdy nie dostawała reszty dialogu. **5 dni pracy,
+w tym cała budowa pamięci v4/v5, ginęło z efemerycznym kontenerem chmury** — wprost
+zaprzeczenie celu „mamy wszystko pamiętać każdy krok rozmowy" (Prawo XV).
+
+**Naprawa:** `eksportuj` re-destyluje sesję, gdy mtime źródła > mtime celu (aktywna
+sesja rośnie → doeksportowywana aż cały dialog trafi do repo/git). Nowy licznik
+`zaktualizowane`. Po naprawie: sesja_895ce14f urosła 24 KB → 214 KB (cała praca v5).
+Testy: +2 granice (re-eksport gdy źródło świeższe, pomija gdy cel świeższy). 1772→1774.
+Pliki: kronika_czatu.py, tests/test_kronika_czatu.py.
+
+---
+
 ## 2026-06-26 | WARSTWA | 🌉 W-360 v5 — Most Chmura↔Lokal + Pełna Symbioza Pamięci
 
 Cezar: „rób mocniejsze memory, dokładny audyt, unikaty, następna warstwa dla chmury i lokala, pełen wypas".

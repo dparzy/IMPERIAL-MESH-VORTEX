@@ -3120,3 +3120,57 @@ Hook od dawna wypisywał **„0 zapisane, 100 pominięte"** — i to nie było O
 - +2 testy granic mtime
 
 **Stan:** 1774/1774 testów, audyt pełna harmonia, commit `40b6fad` wypchnięty. Hook przy następnym starcie pokaże teraz „zaktualizowane" zamiast wiecznego „0 zapisane" — i Twoje rozmowy faktycznie przeżyją.
+
+## 🧑 Cezar
+zobacz dokładnie stan i co jest do zrobienia
+
+## 🏛️ Claude
+Robię pełny przegląd stanu. Sprawdzam git, backlog z W4, mapę podpięć i dokumentowane luki naraz:
+
+## 🏛️ Claude
+Kronika znów urosła (343 wiadomości — hook ją zaktualizował, niezacommitowana). Sprawdzam 19 modułów 🔴 w MANIFEST i zalecaną kolejność wdrożeń:
+
+## 🏛️ Claude
+Mam pełny obraz. Commituję najpierw porządkową kronikę, potem raport:
+
+## 🏛️ Claude
+Pre-commit (pełne testy) przekroczył 2 min. Commituję z dłuższym limitem:
+
+## 🏛️ Claude
+Zsynchronizowane. Oto pełny stan i lista zadań.
+
+## 📊 STAN IMPERIUM (2026-06-28)
+
+**Zdrowie systemu — wszystko zielone:**
+- ✅ Testy: **1774/1774** · Audyt: pełna harmonia · Ruff czysty · git czysty
+- ✅ Pamięć W-360 v5: 6 warstw, most chmura↔lokal, kronika naprawiona (rozmowy przeżywają)
+- ✅ 81 neuronów (75 aktywnych) · 15 zwiadowców · 18 elitarnych · 20 strategii
+
+---
+
+## 📋 CO JEST DO ZROBIENIA (priorytetowo)
+
+### 🥇 1. Feedy danych — 19 neuronów żyje, ale „milczy" (Prawo XV)
+Kod gotowy, neurony abstynują bo **brak danych wejściowych**. Pogrupowane wg adaptera:
+
+| Feed | Odblokuje | Koszt | Status |
+|------|-----------|-------|--------|
+| **Binance futures** (funding/OI/L-S) | PSY-01/02/04 | darmowy | adapter jest — trzeba wpiąć live |
+| **Fear & Greed** (alternative.me) | PSY-03 | darmowy | brak adaptera |
+| **Pętla portfelowa** (koszyk par) | RADAR-01..05, C-01 | — | wymaga serii BTC+koszyk |
+| **DEEPSEEK_API_KEY** | NEWS-01 + auto-lekcja | klucz | ⚠️ **nieustawiony** |
+| **Realne bary 1D** (timestamp) | OC-06/07/08, Z-07 | — | ożywa na żywej historii |
+
+### 🥈 2. Wydajność (z PAMIEC_SESJI — 🥇 NAJWYŻSZY)
+- Cache sygnałów + multiprocessing → backtest **8 min → ~40 s** (6-8×)
+
+### 🥉 3. Pamięć — domknięcie v5
+- **Wektory RAG** — działają tylko lokalnie (chmura: proxy blokuje huggingface). Most gotowy, czeka na `indeksuj.py` na Twoim kompie
+- **DEEPSEEK_API_KEY** — bez niego auto-lekcja śpi (widać w hooku: „pomijam")
+- **RAG per-decyzja** — wiedza z 42 książek nie jest jeszcze odpytywana w pętli decyzyjnej (tylko w cross-layer search)
+
+---
+
+## ❓ Decyzja należy do Ciebie
+
+To są kierunki, nie błahostki — wskaż gdzie uderzamy:

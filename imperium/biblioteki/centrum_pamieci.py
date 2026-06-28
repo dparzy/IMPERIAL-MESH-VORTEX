@@ -467,6 +467,21 @@ def podsumowanie_startowe(k: int = 3, zapytanie: str = "") -> str:
     st = _kc.statystyki()
     linie.append(f"   📜 Kronika: {st['sesje']} sesji, {st['znaki']/1e6:.1f} MB dialogu w repo")
     linie.append("   📍 Mapa podpięć + wdrożenia: docs/PAMIEC_SESJI.md")
+
+    # W6 — Dziennik Nieśmiertelny: PEŁNA oś czasu projektu (każdy krok, dożywotnio).
+    # Wstrzykiwana w CAŁOŚCI (ostatnie 12 pełnych, starsze jednolinijkowe) — gwarancja,
+    # że widzę cały łuk projektu, nie tylko top-3 lekcje (ROZKAZ Cezara 2026-06-28).
+    try:
+        from imperium.biblioteki import dziennik_niesmiertelny as _dn
+        os_t = _dn.os_czasu(ostatnie=12)
+        if "pusty" not in os_t:
+            linie.append("")
+            linie.append(os_t)
+        if _dn.brak_wpisu_dzis():
+            linie.append("   ⚠️ Prawo XV: dzisiejsza sesja NIE zostawiła jeszcze wpisu w Dzienniku — dopisz przed końcem!")
+    except Exception:
+        pass
+
     return "\n".join(linie)
 
 

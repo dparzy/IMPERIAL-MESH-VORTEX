@@ -6,6 +6,33 @@
 
 ---
 
+## 2026-06-28 | UNIKAT+NAPRAWA | ♾️ W-360 v6: Dziennik Nieśmiertelny + naprawa wyszukiwarki
+
+Cezar (niezadowolony, słusznie): „każde zdanie, każdy punkt co zrobiliśmy ma być pamiętane
+DOŻYWOTNIO. Cofamy się, tracimy czas/tokeny/potencjał — to dziadostwo, łamie zasady."
+
+**Diagnoza twarda (dane, nie zgadywanie):**
+- NUMBA/JIT — SPRAWDZONE: NIE zaimplementowana (zero kodu, brak w requirements), była tylko
+  OMAWIANA w 4 sesjach (jest w kronice). Dowód, że pamięć przechowuje, ale nie surfacuje.
+- **Bug KRYTYCZNY wyszukiwarki kroniki:** `if zapytanie in linia` — cała fraza jako jeden
+  substring. „numba JIT wydajność" → 0 trafień, samo „numba" → 4. Każde naturalne wielosłowne
+  pytanie NIE znajdowało historii → wracaliśmy do zamkniętych tematów. To rdzeń problemu Cezara.
+
+**Naprawa 1:** wyszukiwarka kroniki token-based (po słowach, ranking = liczba trafionych słów).
+Teraz „numba JIT wydajność wskaźniki" → 6 trafień z historii. +2 testy regresji.
+
+**Naprawa 2 (UNIKAT) — W6 Dziennik Nieśmiertelny** (`dziennik_niesmiertelny.py`): dożywotnia
+ZWIĘZŁA oś czasu. Każda sesja = co zrobiono/decyzje/następny krok (~5 linii). Wstrzykiwana
+W CAŁOŚCI na starcie (ostatnie 12 pełne, starsze jednolinijkowe) → na początku KAŻDEJ sesji
+widzę cały łuk projektu, nie tylko top-3 lekcje. Deterministyczne: pisze Claude SAM (bez
+DeepSeek). ROZKAZ STAŁY w CLAUDE.md; brak wpisu z dziś = alarm w podsumowaniu startowym.
+Backfill 4 sesji. +6 testów. 1774→1782.
+
+Różnica od konkurencji: Mem0/Zep/Letta polegają na retrievalu (gubi). Dziennik GWARANTUJE
+widoczność całej historii — pełne wstrzyknięcie, nie statystyka.
+
+---
+
 ## 2026-06-28 | WYDAJNOŚĆ | ⚡ Cache wskaźników wpięty w sweepy AB (zmierzone 1.4×)
 
 Cezar: „dawaj" (wydajność). Odkrycie (Prawo XV): cache wskaźników + multiprocessing

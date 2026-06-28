@@ -164,3 +164,30 @@ def test_statystyki():
     (cel / "sesja_a.md").write_text("abc", encoding="utf-8")
     st = kc.statystyki(cel)
     assert st["sesje"] == 1 and st["znaki"] == 3
+
+
+def test_szukaj_po_slowach_nie_cala_fraza():
+    """
+    Regresja KRYTYCZNA (Prawo XV, 2026-06-28): wyszukiwarka MUSI działać po słowach.
+    Bug: 'numba JIT wydajność' (cała fraza) → 0 trafień, choć linie o tym istnieją.
+    """
+    import tempfile
+    cel = Path(tempfile.mkdtemp())
+    (cel / "sesja_aaa.md").write_text(
+        "## 🏛️ Claude\nRozważamy numba do przyspieszenia wskaźników GARCH\n",
+        encoding="utf-8")
+    # cała fraza wieloslowna — nie istnieje jako ciągły substring, ale słowa tak
+    wyniki = kc.szukaj("numba wydajność wskaźniki", cel=cel)
+    assert wyniki, "Wyszukiwarka po słowach nie znalazła linii (regresja bug-frazy)"
+    assert wyniki[0]["trafienia"] >= 1
+
+
+def test_szukaj_ranking_wiecej_slow_wyzej():
+    """Linia z większą liczbą trafionych słów jest wyżej."""
+    import tempfile
+    cel = Path(tempfile.mkdtemp())
+    (cel / "sesja_aaa.md").write_text(
+        "## x\nnumba jit wydajność wskaźniki razem\nsamo wskaźniki tutaj\n",
+        encoding="utf-8")
+    wyniki = kc.szukaj("numba wydajność wskaźniki", cel=cel)
+    assert wyniki[0]["trafienia"] >= wyniki[-1]["trafienia"]

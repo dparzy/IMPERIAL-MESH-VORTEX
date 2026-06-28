@@ -145,27 +145,41 @@ def eksportuj(zrodlo: Path = ZRODLO_DOMYSLNE, cel: Path = CEL_DOMYSLNY,
 def szukaj(zapytanie: str, cel: Path = CEL_DOMYSLNY,
            limit: int = 20) -> List[Dict[str, str]]:
     """
-    Pełnotekstowe przeszukanie kroniki (fallback gdy RAG niedostępny).
-    Zwraca [{"sesja": id, "fragment": "...linia z trafieniem..."}], max `limit`.
+    Przeszukanie kroniki PO SŁOWACH (token-based), nie po całej frazie.
+
+    NAPRAWA KRYTYCZNA (Prawo XV, 2026-06-28): poprzednio `if zapytanie in linia` —
+    całe zapytanie jako jeden substring. "numba JIT wydajność" → 0 trafień, choć
+    historia o tym jest (samo "numba" → 4). Każde naturalne wielosłowne pytanie nie
+    znajdowało historii → wracaliśmy, traciliśmy czas (dokładnie problem Cezara).
+
+    Teraz: linia pasuje, gdy zawiera CHOĆ JEDNO słowo zapytania; ranking = liczba
+    trafionych słów (więcej = wyżej), remis → świeższa sesja. Zwraca pole "trafienia"
+    (ile słów pasuje) do scoringu w centrum_pamieci.
     """
     from datetime import datetime
-    q = zapytanie.lower()
-    trafienia: List[Dict[str, str]] = []
+    import re as _re
+    slowa = [s for s in _re.findall(r"\w+", zapytanie.lower()) if len(s) >= 2]
+    if not slowa:
+        return []
+    wyniki: List[Dict[str, str]] = []
     if not cel.exists():
-        return trafienia
+        return wyniki
     for plik in sorted(cel.glob("sesja_*.md"), reverse=True):
         mtime = plik.stat().st_mtime
         data_pliku = datetime.utcfromtimestamp(mtime).strftime("%Y-%m-%d")
         for linia in plik.read_text(encoding="utf-8", errors="ignore").splitlines():
-            if q in linia.lower():
-                trafienia.append({
+            low = linia.lower()
+            n_traf = sum(1 for s in slowa if s in low)
+            if n_traf:
+                wyniki.append({
                     "sesja": plik.stem.replace("sesja_", ""),
                     "fragment": linia.strip()[:300],
                     "data": data_pliku,
+                    "trafienia": n_traf,
                 })
-                if len(trafienia) >= limit:
-                    return trafienia
-    return trafienia
+    # ranking: więcej trafionych słów najpierw (sesje już od najnowszej w pętli → stabilne)
+    wyniki.sort(key=lambda x: x["trafienia"], reverse=True)
+    return wyniki[:limit]
 
 
 def statystyki(cel: Path = CEL_DOMYSLNY) -> Dict[str, int]:

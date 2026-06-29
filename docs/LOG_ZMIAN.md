@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-29 | UNIKAT | 🔍 W-360 v13: Pamięć Proweniencji — ŚLAD POCHODZENIA („skąd to wiemy")
+
+Cezar: „dawaj". Deep research: „From Agent Traces to Trust — Evidence Tracing and Execution
+Provenance in LLM Agents" (arXiv:2606.04990) — pamięć agenta potrzebuje PROVENANCE-AWARE
+RETRIEVAL + temporal credit assignment: wiedzieć skąd info, kiedy weszła, jak wędrowała.
+
+**W13 Pamięć Proweniencji** (`pamiec_proweniencji.py`): dla dowolnego pojęcia buduje
+ŚLAD POCHODZENIA — wystąpienia w czasie przez wszystkie warstwy (kronika W3b + dziennik W6
++ lekcje W3 + wizje W4), z datą i sesją. `geneza()` = pierwsze wystąpienie („tu się narodziło"),
+`raport()` = ugruntowanie (ile sesji/warstw — temporal credit). Odpowiada: „skąd to wiemy?",
+„świeży pomysł czy ugruntowana wiedza?". Zmierzone: „numba" → geneza 2026-06-21, 3 warstwy.
+
+Różne od Grafu (W8=połączenia) i Katalogu (W7=indeks): proweniencja = oś czasu JEDNEGO
+pojęcia z atrybucją źródła. Bez własnego pliku (czyta z warstw — Prawo XVI). +6 testów.
+13 warstw pamięci pod Kustoszem. 1833→1839. Pliki: pamiec_proweniencji.py (nowy), INDEKS_IMPERIUM.md.
+
+---
+
 ## 2026-06-29 | UNIKAT | 🛠️🎯 W-360 v11+v12: Pamięć Proceduralna + Robocza — pełna czwórka CoALA
 
 Cezar: „jeszcze kilka warstw pamięci, poszukaj, wg zasad." Deep research: CoALA

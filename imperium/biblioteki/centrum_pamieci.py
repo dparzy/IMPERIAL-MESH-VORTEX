@@ -482,6 +482,15 @@ def podsumowanie_startowe(k: int = 3, zapytanie: str = "") -> str:
     except Exception:
         pass
 
+    # W9 — Refleksja: sprzeczności + przedawnienia (tylko gdy jest co zgłosić).
+    try:
+        from imperium.biblioteki import refleksja_pamieci as _rp
+        r9 = _rp.raport_startowy()
+        if r9:
+            linie.append(r9)
+    except Exception:
+        pass
+
     # W6 — Dziennik Nieśmiertelny: PEŁNA oś czasu projektu (każdy krok, dożywotnio).
     # Wstrzykiwana w CAŁOŚCI (ostatnie 12 pełnych, starsze jednolinijkowe) — gwarancja,
     # że widzę cały łuk projektu, nie tylko top-3 lekcje (ROZKAZ Cezara 2026-06-28).

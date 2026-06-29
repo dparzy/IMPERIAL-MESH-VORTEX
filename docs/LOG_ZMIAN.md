@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-06-29 | UNIKAT | 🪞 W-360 v9: Refleksja Pamięci — SPRZECZNOŚCI + PRZEDAWNIENIE
+
+Cezar: „czy pamięć jest najlepsza na świecie? ulepsz o kolejne warstwy/autorskie moduły —
+deep research, kreatywność, wizja, wg zasad."
+
+UCZCIWA OCENA (Prawo I): żaden system nie jest „najlepszy na świecie" na wszystkich osiach.
+Nasza przewaga = wyjątkowo KOMPLETNA, deterministyczna, domenowa kombinacja (8→9 warstw +
+reżim + graf). Deep research granicy 2026 (arXiv:2603.07670 przegląd; arXiv:2602.01966
+self-consolidation) wskazał czego nam brakowało: TRUSTWORTHY REFLECTION, contradiction
+handling, learned forgetting. OSTRZEŻENIE z literatury: refleksja potrafi UTRWALAĆ błędy.
+
+**W9 Refleksja Pamięci** (`refleksja_pamieci.py`) — autorski moduł wg granicy:
+- `wykryj_sprzecznosci()` — wpisy o tym samym temacie z przeciwnym kierunkiem statusu
+  w czasie: ROZSTRZYGNIĘTE (- →+, postęp/koniec krążenia) vs SPRZECZNE (+ →-, kolizja).
+- `wykryj_przedawnienia(dni)` — otwarte POMYSŁ/PLANOWANE starsze niż N dni bez śladu
+  realizacji (okno ważności à la Zep) → „wisi, zdecyduj".
+- ZASADA ANTY-UTRWALANIA (wprost z literatury): TYLKO zgłasza, NIGDY nie kasuje —
+  maszyna proponuje, Cezar dysponuje (Prawo XVIII). Test pilnuje braku metod kasujących.
+- Deterministyczny (bez API), z W4 wizji + W6 dziennika; wpięty w start (gdy jest co zgłosić).
+
+9 warstw pamięci pod Kustoszem. +9 testów. 1803→1812. Pliki: refleksja_pamieci.py (nowy),
+centrum_pamieci.py, INDEKS_IMPERIUM.md.
+
+---
+
 ## 2026-06-28 | UNIKAT | 🕸️ W-360 v8: Graf Pamięci — POŁĄCZENIA NEURONÓW (temporalny graf wiedzy)
 
 Cezar: „wielopłaszczyznowe zapamiętywanie POŁĄCZEŃ NEURONÓW; przeszukaj patenty/repozytoria

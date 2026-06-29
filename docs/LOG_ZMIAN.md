@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-06-29 | UNIKAT | 🛠️🎯 W-360 v11+v12: Pamięć Proceduralna + Robocza — pełna czwórka CoALA
+
+Cezar: „jeszcze kilka warstw pamięci, poszukaj, wg zasad." Deep research: CoALA
+(arXiv:2309.02427) definiuje 4 kanoniczne typy pamięci agenta. Mieliśmy 2 (epizodyczna=kronika,
+semantyczna=lekcje/RAG). Brakowało PROCEDURALNEJ i ROBOCZEJ — dobudowane (Prawo XVI: nie
+redundancja, lecz domknięcie taksonomii poznawczej).
+
+**W11 Pamięć Proceduralna** (`pamiec_proceduralna.py`) — runbooki JAK wykonać zadanie
+(różne od lekcji=CO wiemy): „dodać neuron", „naprawić audyt W11", „bezpieczny commit",
+„dodać warstwę pamięci". Każda = wyzwalacz (kiedy użyć) + KROKI + źródło. szukaj() po
+słowach → właściwa procedura pod ręką. Ziarno 4 realnych procedur Imperium. JSONL→git.
+
+**W12 Pamięć Robocza** (`pamiec_robocza.py`) — CoALA working memory: AKTYWNY CEL bieżącego
+cyklu (ostatni „następny" z Dziennika W6) + pilne sygnały (sprzeczności W9). Bez własnego
+pliku (czyta z W6/W9 — zero kosztu, nie duplikuje). Różne od Dziennika: oś=cały łuk vs
+robocza=jedno ostrze TU-I-TERAZ. Wstrzykiwana na starcie: jednym rzutem wiesz gdzie wejść.
+
+DOMKNIĘTA pełna czwórka CoALA: robocza(W12)+epizodyczna(W3b)+semantyczna(W3/W2)+proceduralna(W11).
+12 warstw pamięci pod Kustoszem. +11 testów. 1822→1833. Pliki: pamiec_proceduralna.py,
+pamiec_robocza.py (nowe), centrum_pamieci.py, INDEKS_IMPERIUM.md, procedury.jsonl.
+
+---
+
 ## 2026-06-29 | UNIKAT | 🍂 W-360 v10: Mądre Zapominanie — LEARNED FORGETTING
 
 Cezar: „wszystko dawaj". Trzeci (po reflection i contradiction = W9) nierozwiązany problem

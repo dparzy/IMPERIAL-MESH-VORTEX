@@ -500,6 +500,24 @@ def podsumowanie_startowe(k: int = 3, zapytanie: str = "") -> str:
     except Exception:
         pass
 
+    # W11 — Pamięć Proceduralna: ile runbooków gotowych (CoALA procedural).
+    try:
+        from imperium.biblioteki import pamiec_proceduralna as _pp
+        r11 = _pp.raport_startowy()
+        if r11:
+            linie.append(r11)
+    except Exception:
+        pass
+
+    # W12 — Pamięć Robocza: aktywny cel bieżącego cyklu (CoALA working).
+    try:
+        from imperium.biblioteki import pamiec_robocza as _prob
+        r12 = _prob.raport_startowy()
+        if r12:
+            linie.append(r12)
+    except Exception:
+        pass
+
     # W6 — Dziennik Nieśmiertelny: PEŁNA oś czasu projektu (każdy krok, dożywotnio).
     # Wstrzykiwana w CAŁOŚCI (ostatnie 12 pełnych, starsze jednolinijkowe) — gwarancja,
     # że widzę cały łuk projektu, nie tylko top-3 lekcje (ROZKAZ Cezara 2026-06-28).

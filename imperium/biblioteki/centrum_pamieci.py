@@ -491,6 +491,15 @@ def podsumowanie_startowe(k: int = 3, zapytanie: str = "") -> str:
     except Exception:
         pass
 
+    # W10 — Mądre Zapominanie: kandydaci do schłodzenia (tylko gdy są).
+    try:
+        from imperium.biblioteki import zapominanie as _zap
+        r10 = _zap.raport_startowy()
+        if r10:
+            linie.append(r10)
+    except Exception:
+        pass
+
     # W6 — Dziennik Nieśmiertelny: PEŁNA oś czasu projektu (każdy krok, dożywotnio).
     # Wstrzykiwana w CAŁOŚCI (ostatnie 12 pełnych, starsze jednolinijkowe) — gwarancja,
     # że widzę cały łuk projektu, nie tylko top-3 lekcje (ROZKAZ Cezara 2026-06-28).

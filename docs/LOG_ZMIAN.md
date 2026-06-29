@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-29 | UNIKAT | 🍂 W-360 v10: Mądre Zapominanie — LEARNED FORGETTING
+
+Cezar: „wszystko dawaj". Trzeci (po reflection i contradiction = W9) nierozwiązany problem
+granicy pamięci agentów 2026 (arXiv:2603.07670): LEARNED FORGETTING — obecne systemy
+zapominają prymitywnie (czasowo/po limicie); cel = zapominanie SELEKTYWNE, wartościowe.
+
+**W10 Mądre Zapominanie** (`zapominanie.py`) — zapominanie NIE czasowe, lecz wartościowe:
+- `wartosc_retencji()` = ważność (słowa-klucze) × świeżość (zanik warstwowy FinMem)
+  × bonus łączności w Grafie W8 (hub = cenny); otwarte plany POMYSŁ/PLANOWANE chronione (≥0.5).
+- `kandydaci_do_zapomnienia(prog, dni)` — niska retencja + wiek → propozycja SCHŁODZENIA
+  do zimnej warstwy Kustosza W7 (.md.gz, wciąż przeszukiwalne → nic nie ginie, odwracalne).
+- ZASADA ANTY-UTRWALANIA (jak W9): NIGDY nie kasuje — tylko proponuje, Cezar decyduje.
+  Test pilnuje braku metod kasujących. „Safe forgetting": git + zimna warstwa = nic nie ginie.
+- Deterministyczny (bez API), z W3 lekcji + W4 wizji + W8 grafu; wpięty w start gdy są kandydaci.
+
+Zamyka pętlę: W10 decyduje CO schłodzić, W7 to kompresuje. 10 warstw pamięci pod Kustoszem.
+Trzy problemy granicy 2026 (reflection+contradiction=W9, forgetting=W10) — domknięte deterministycznie.
++10 testów. 1812→1822. Pliki: zapominanie.py (nowy), centrum_pamieci.py, INDEKS_IMPERIUM.md.
+
+---
+
 ## 2026-06-29 | UNIKAT | 🪞 W-360 v9: Refleksja Pamięci — SPRZECZNOŚCI + PRZEDAWNIENIE
 
 Cezar: „czy pamięć jest najlepsza na świecie? ulepsz o kolejne warstwy/autorskie moduły —

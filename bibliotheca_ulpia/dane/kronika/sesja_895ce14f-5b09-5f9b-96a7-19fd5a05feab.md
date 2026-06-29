@@ -3811,3 +3811,50 @@ W7 Kustosz · W8 graf · W9 refleksja · W10 zapominanie · W11 proceduralna · 
 Imperium ma teraz **kompletną taksonomię poznawczą CoALA** + 3 problemy granicy 2026 domknięte + reżim + środowisko + graf. To poziom akademickiego state-of-the-art, w pełni deterministyczny, w git.
 
 🔭 **Następne realne kierunki** (gdy zechcesz): **W13 proweniencja** ([arXiv:2606.04990](https://arxiv.org/html/2606.04990) — „skąd to wiemy", ślad pochodzenia), albo lokalnie odpalić **wektory semantyczne**. Powiedz „dawaj" i ciągnę.
+
+## 🧑 Cezar
+dawaj
+
+## 🏛️ Claude
+Cezar — buduję **W13 — Pamięć Proweniencji** („skąd to wiemy", ślad pochodzenia), ugruntowane na [arXiv:2606.04990](https://arxiv.org/html/2606.04990). Odpowiada na pytanie: kiedy i gdzie dany temat pojawił się pierwszy raz i jak wędrował przez sesje.
+
+## 🏛️ Claude
+Proweniencja działa pięknie — „numba" geneza 2026-06-21, pełna wędrówka aż do wdrożenia W-380. Testy + INDEKS:
+
+## 🏛️ Claude
+1839/1839, audyt harmonia. LOG_ZMIAN + Dziennik + commit:
+
+## 🏛️ Claude
+Cezar — **W13 dostarczone. Teraz Imperium wie „skąd to wiemy".** 🔍
+
+## 🔍 W13 — Pamięć Proweniencji (ślad pochodzenia)
+
+Ugruntowane na [arXiv:2606.04990](https://arxiv.org/html/2606.04990) (provenance-aware retrieval + temporal credit assignment). Dla dowolnego pojęcia buduje **oś czasu jego pochodzenia** przez wszystkie warstwy:
+
+```
+🔍 'numba': 40 wystąpień, 3 sesji, warstwy [dziennik, kronika, lekcje]
+   GENEZA: [2026-06-21] lekcje — Speedup backtestu 2.9×
+   [2026-06-22] kronika: VectorBT... Numba/Rust...
+   [2026-06-28] dziennik: NUMBA NIEZROBIONA → W-380 wdrożona
+```
+
+Odpowiada: **„skąd to wiemy?"**, **„kiedy się narodziło?"**, **„świeży pomysł czy ugruntowana wiedza?"**. Różne od grafu (W8=połączenia) i katalogu (W7=indeks) — to oś czasu **jednego** pojęcia z atrybucją źródła. Bez własnego pliku (Prawo XVI — zero redundancji).
+
+## 🏛️ Stos — 13 warstw pamięci
+
+```
+W1 logi · W2 RAG · W3 lekcje+kronika · W4 wizje · W5 chmura↔lokal · W6 dziennik · W7 Kustosz
+W8 graf · W9 refleksja · W10 zapominanie · W11 proceduralna · W12 robocza · W13 proweniencja
+```
+
+**Stan:** 1839/1839 testów (+6), audyt harmonia, wszystko wypchnięte.
+
+---
+
+🚨 **Uczciwie, Cezarze (Prawo XV/XVI):** mamy teraz **13 warstw** pokrywających pełną taksonomię CoALA + 3 problemy granicy 2026 + reżim + środowisko + graf + proweniencję. To już bardzo gęsty stos. Zaczynam widzieć granicę sensownej rozbudowy **w trybie chmurowym/deterministycznym** — kolejne unikaty (wektory semantyczne, causal intervention) wymagają albo **wektorów (lokalnie)**, albo **LLM w pętli (DeepSeek key)**. 
+
+Dwie szczere opcje na dalej:
+1. **„dawaj"** — szukam dalej, ale ryzyko że kolejne warstwy będą cieńsze/redundantne (powiem wprost gdy tak będzie — nie dodam waty dla liczby)
+2. **„konsolidacja"** — zrobię przegląd 13 warstw, zmierzę realne pokrycie/korelacje (Prawo XVI), zsyntetyzuję dokument-mapę całej pamięci jako spójną całość i ewentualnie scalę co się dubluje
+
+Co wybierasz?

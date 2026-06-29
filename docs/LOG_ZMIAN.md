@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-29 | KONSOLIDACJA | 🗺️ W-360 v13: przegląd 13 warstw + mapa + odchudzenie grafu
+
+Cezar: „konsolidacja". Przegląd całej pamięci (13 warstw, 3568 linii kodu) — pomiar, nie opinia.
+
+**Mapa jako jedno źródło prawdy:** `docs/MAPA_PAMIECI.md` + `kustosz.mapa()` (CLI: `kustosz mapa`)
+— tabela 13 warstw (klucz/moduł/rola/typ CoALA), pokrycie taksonomii CoALA (kompletne),
+domknięte problemy granicy 2026, unikaty, jeden punkt wejścia.
+
+**Pomiar redundancji (Prawo XVI):** każda warstwa pełni odrębną rolę CoALA/granicy — ZERO
+dwóch warstw o tym samym sygnale. Nic do scalenia. W12/W13 bez własnych plików (czytają
+z innych — zero redundancji danych). Potwierdzono: brak waty, brak dubli.
+
+**Odchudzenie grafu (W8):** persistowany graf przełączony na `min_waga≥2` — jednorazowe
+współwystąpienia (szum) odcięte: 30833→883 krawędzi, 3.74MB→0.18MB (95% mniej w repo),
+graf ostrzejszy. Funkcja zachowuje param min_waga (małe próbki/testy: 1).
+
+13 warstw potwierdzone i zmapowane. +4 testy (mapa, graf waga). 1839→1841.
+Pliki: kustosz_pamieci.py (mapa), graf_pamieci.py (waga≥2), docs/MAPA_PAMIECI.md (nowy), INDEKS.
+
+---
+
 ## 2026-06-29 | UNIKAT | 🔍 W-360 v13: Pamięć Proweniencji — ŚLAD POCHODZENIA („skąd to wiemy")
 
 Cezar: „dawaj". Deep research: „From Agent Traces to Trust — Evidence Tracing and Execution

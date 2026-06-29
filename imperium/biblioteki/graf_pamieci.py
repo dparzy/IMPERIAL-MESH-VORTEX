@@ -245,8 +245,10 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     if args.cmd == "buduj":
-        g = zbuduj_graf()
-        print(f"✅ Graf: {g['n_wezlow']} neuronów, {g['n_krawedzi']} połączeń (synaps)")
+        # min_waga=2: tnie szum (jednorazowe współwystąpienia) — graf ostrzejszy i ~20× mniejszy
+        # (Prawo XVI: trzymamy zmierzone-powtarzalne powiązania, nie przypadkowe). Konsolidacja v13.
+        g = zbuduj_graf(min_waga=2)
+        print(f"✅ Graf: {g['n_wezlow']} neuronów, {g['n_krawedzi']} połączeń (synaps, waga≥2)")
     elif args.cmd == "polacz":
         for s in polaczenia(args.encja):
             print(f"  {args.encja} ↔ {s['encja']} (waga {s['waga']}, {s['od']}…{s['do']})")

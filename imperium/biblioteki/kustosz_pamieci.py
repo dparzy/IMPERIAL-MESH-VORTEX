@@ -172,6 +172,34 @@ def census() -> Dict[str, Any]:
     return wynik
 
 
+# Mapa 13 warstw pamięci (jedno źródło prawdy o architekturze — konsolidacja v13).
+# (klucz, nazwa, rola, typ CoALA). Kustosz = organ nadrzędny (W7), nie warstwa-dana.
+WARSTWY = [
+    ("W1", "pamiec_absolutna", "logi transakcji (PnL/MAE/MFE/rezim)", "epizodyczna"),
+    ("W2", "RAG (bibliotheca)", "wiedza z 42 książek + encyklopedia (FTS)", "semantyczna"),
+    ("W3", "pamiec_sesji", "lekcje z sesji + profil Cezara", "semantyczna"),
+    ("W3b", "kronika_czatu", "pełny dialog (re-eksport rosnący)", "epizodyczna"),
+    ("W4", "rejestr_wizji", "wizje/decyzje/pomysły/zmiany (scored)", "semantyczna"),
+    ("W5", "srodowisko_pamieci", "most chmura↔lokal + manifest", "meta"),
+    ("W6", "dziennik_niesmiertelny", "dożywotnia oś czasu (anti-blindness)", "epizodyczna"),
+    ("W7", "kustosz_pamieci", "NADRZĘDNY ORGAN: katalog+kompresja+routing", "organ"),
+    ("W8", "graf_pamieci", "połączenia neuronów (temporal KG)", "relacyjna"),
+    ("W9", "refleksja_pamieci", "sprzeczności + przedawnienia (trustworthy)", "refleksyjna"),
+    ("W10", "zapominanie", "learned forgetting (wartościowe, safe)", "meta"),
+    ("W11", "pamiec_proceduralna", "runbooki JAK wykonać (CoALA)", "proceduralna"),
+    ("W12", "pamiec_robocza", "aktywny cel cyklu (CoALA working)", "robocza"),
+    ("W13", "pamiec_proweniencji", "ślad pochodzenia 'skąd to wiemy'", "meta"),
+]
+
+
+def mapa() -> str:
+    """Jednolity przegląd wszystkich 13 warstw pamięci (organ widzi architekturę)."""
+    linie = ["🗺️ MAPA PAMIĘCI IMPERIUM — 13 warstw pod Kustoszem (W-360 v13):"]
+    for klucz, nazwa, rola, typ in WARSTWY:
+        linie.append(f"   {klucz:4s} {nazwa:24s} [{typ:12s}] {rola}")
+    return "\n".join(linie)
+
+
 # ─── ROUTING ZAPYTAŃ (organ kieruje do właściwej warstwy) ──────────────────────
 
 def szukaj(zapytanie: str, limit: int = 10, rezim_biezacy: str = "") -> List[Dict[str, Any]]:
@@ -210,7 +238,8 @@ if __name__ == "__main__":
     import argparse
     p = argparse.ArgumentParser(description="Kustosz Pamięci — W7 Nadrzędny Organ (W-360 v7)")
     sub = p.add_subparsers(dest="cmd")
-    sub.add_parser("census", help="Stan wszystkich 7 warstw")
+    sub.add_parser("census", help="Stan wszystkich warstw")
+    sub.add_parser("mapa", help="Mapa 13 warstw pamięci")
     sub.add_parser("kataloguj", help="Zbuduj katalog nadrzędny (anti-blindness)")
     pk = sub.add_parser("kompresuj", help="Skompresuj zimną warstwę (.md→.md.gz)")
     pk.add_argument("--dni", type=int, default=30)
@@ -220,6 +249,8 @@ if __name__ == "__main__":
 
     if args.cmd == "census":
         print(json.dumps(census(), ensure_ascii=False, indent=2))
+    elif args.cmd == "mapa":
+        print(mapa())
     elif args.cmd == "kataloguj":
         k = zbuduj_katalog()
         print(f"✅ Katalog: {k['n']} sesji, tematy globalne: {', '.join(k['tematy_globalne'][:10])}")

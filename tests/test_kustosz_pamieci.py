@@ -90,3 +90,16 @@ def test_id_sesji_obsluguje_gz(tmp_path):
 def test_raport_startowy_nie_wybucha():
     r = ku.raport_startowy()
     assert "Kustosz" in r
+
+
+def test_mapa_ma_13_warstw():
+    """Konsolidacja: mapa() wymienia wszystkie 13 warstw pamięci."""
+    m = ku.mapa()
+    for klucz in ("W1", "W6", "W7", "W8", "W11", "W12", "W13"):
+        assert klucz in m
+    assert len(ku.WARSTWY) == 14   # W1..W13 + W3b
+
+
+def test_mapa_warstwy_maja_komplet_pol():
+    for w in ku.WARSTWY:
+        assert len(w) == 4 and all(w)   # (klucz, nazwa, rola, typ) — nic pustego

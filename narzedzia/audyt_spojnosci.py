@@ -564,6 +564,8 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
               "vs koszyk; backtest_portfel/petla_live; bez koszyka 1 para: abstynuje, W-335)",
     "NEWS-01": "NEWS_SENTYMENT (AdapterNewsLLM — wpięty w zbuduj_bojowy W-301; "
                "ożywa z RSS fetcher lub DEEPSEEK_API_KEY; bez feedu: abstynuje)",
+    "NEWS-02": "NEWS_EVENT_KIERUNEK (AdapterNewsLLM + klasyfikator zdarzeń W-381 — "
+               "kierunek per typ; ożywa z FetcherNewsRSS/feed; bez nagłówków: abstynuje)",
     "X-28":   "MTF_4H_RSI_14/MTF_1D_RSI_14 (Budowniczy MTF — ożywa gdy bary mają "
               "pole 'interwal' i odpowiedni TF; bez niego abstynuje per Prawo XV)",
     "Z-06":   "AMIHUD_20 wysoki (krucha płynność) — scenariusze audytu są płynne "

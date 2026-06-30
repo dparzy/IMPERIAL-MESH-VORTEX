@@ -39,7 +39,7 @@ Każda = osobny wskaźnik/neuron, wdrażana z testami + pomiarem przewagi (Prawo
 | # | Moduł | Co daje | Inspiracja/źródło | Status |
 |---|-------|---------|-------------------|--------|
 | 1 | **FetcherNewsRSS** | feed nagłówków (unlock) | CoinDesk/CT/Decrypt RSS | ✅ ZROBIONE |
-| 2 | **Taksonomia zdarzeń** (NEWS-02) | LLM klasyfikuje TYP (hack/ETF/regulacja/rumor/macro); kierunek zależny od typu — rumor=kontrariański! | arXiv:2508.07408 | 🔵 plan |
+| 2 | **Taksonomia zdarzeń** (NEWS-02) | klasyfikuje TYP (hack/ETF/regulacja/rumor/macro); kierunek zależny od typu — rumor=kontrariański! | arXiv:2508.07408 | ✅ ZROBIONE |
 | 3 | **Spike uwagi** (NEWS-03) | nagły wysyp nagłówków = zwiastun zmienności (niezależnie od kierunku) → modulator ryzyka | attention→vol | 🔵 plan |
 | 4 | **Momentum sentymentu Δ** (NEWS-04) | ZMIANA sentymentu w czasie (przyspieszenie) = sygnał wyprzedzający | event-driven | 🔵 plan |
 | 5 | **Waga wiarygodności źródła** | nagłówek z CoinDesk waży > anonimowy blog | source credibility (research) | 🔵 plan |
@@ -59,7 +59,7 @@ Każda = osobny wskaźnik/neuron, wdrażana z testami + pomiarem przewagi (Prawo
 
 ## 5. PROPOZYCJA NOWEJ ZASADY (do decyzji Cezara)
 
-> **PRAWO XXII — PRZEWAGA KONKURENCYJNA (proponowane):** Imperium nieustannie mierzy się
+> **PRAWO XXV — PRZEWAGA KONKURENCYJNA (proponowane; XXII zajęte):** Imperium nieustannie mierzy się
 > z najlepszymi na świecie. Gdy moduł jest słabszy od stanu sztuki — szukamy lepszego
 > rozwiązania (research + adopcja), zachowując pełną symbiozę i pomiar (Prawo XVI). Cel
 > nadrzędny: najlepszy zysk przy najlepszym momencie wejścia (LONG/SHORT/HOLD), sterowany

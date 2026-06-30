@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-06-30 | NEURON | 🏷️ NEWS-02 Taksonomia Zdarzeń — kierunek per TYP (W-381)
+
+Cezar: „dawaj wszystko". Drugi neuron newsowy — research-grounded (arXiv:2508.07408):
+kierunek zależy od TYPU zdarzenia, nie samej polaryzacji. Rumor/spekulacja = KONTRARIAŃSKIE
+(ujemny Sharpe → fade hype). To czyni NEWS-02 mądrzejszym od płaskiego NEWS-01.
+
+- `imperium/akwedukty/klasyfikator_zdarzen.py`: deterministyczna taksonomia 8 typów
+  (HACK/UPADEK/REGULACJA_NEG → ujemne; ETF/INSTYTUCJONALNY/TECHNICZNY → dodatnie;
+  RUMOR → ujemny kontrariański; MAKRO → 0). Słowniki pełnych słów, kierunek znakowany netto.
+- `imperium/legiony/neurony/zdarzenia.py`: NEWS-02 NeuronTaksonomiaZdarzen (kat. R, waga 6,
+  WSKAZNIK NEWS_EVENT_KIERUNEK). Próg 0.30/0.65; abstynuje bez feedu (Prawo XV).
+- AdapterNewsLLM rozszerzony: dolewa NEWS_EVENT_KIERUNEK/TYP/PEWNOSC; budzi NEWS-02.
+- Rejestracja: rejestr.py (import+lista+2 mapy), MANIFEST, MAPA_KLUCZY, audyt whitelist.
+- Neurony 81→82 (76 aktywnych). +11 testów. 1851→1862.
+
+Różne od NEWS-01 (Prawo XVI — nie redundancja): NEWS-01=JAK pozytywny (sentyment),
+NEWS-02=JAKI TYP i jego kierunek (rumor=kontrariański). Dwa różne sygnały.
+
+UWAGA (Prawo I): Prawo XXII już istnieje (Dekorelacja Przewagi). Proponowana „przewaga
+konkurencyjna" → Prawo XXV (do decyzji Cezara — zmiana konstytucji).
+
+---
+
 ## 2026-06-30 | UNLOCK+RESEARCH | 📰 FetcherNewsRSS — odblokowanie NEWS-01 + plan rozbudowy
 
 Cezar: rozbuduj NEWS-01, sweep świata, oryginalne moduły, wyprzedzać konkurencję.

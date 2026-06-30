@@ -1832,3 +1832,285 @@ Użyłem naszej pamięci (proweniencja W13 + kronika) i znalazłem: **lokal konf
 ---
 
 Następny realny krok: gdy odpalisz lokala wg `START_LOKAL.md`, zróbmy **pierwszy paper-trading DOGE/MEXC z logowaniem do W1** — domknie to lukę testu, którego pamięć nie zachowała. Chcesz, żebym przygotował gotowy skrypt tego konkretnego testu z logowaniem? Powiedz „dawaj".
+
+## 🧑 Cezar
+ok później odpalę lokala dzisiaj wieczorem od ostatnich testów MT coś takiego że robiliśmy te testy wtedy do butów lokal testy może masz tam gdzieś te w pamięci to były kilkanaście dni temu a tamtego momentu lokala w ogóle nie odpalałem co wy zrobiliśmy kurze na pamięci i tak dalej także będziemy później będę wieczorem dzisiaj odpalę lokala i zaktualizują wszystko że woliliśmy też skrótu aktualizuj chyba jeden coś takiego więc pamiętasz co masz to też pamięci to był taki skrót aby to aktualizować no zobaczymy no weź tam a w międzyczasie zaproponuj mi coś ciekawego sprawdź dokładnie zrób głęboki audyt naszego z całego systemu zasadami znaczy tam repozytorium no widzisz że jeszcze też nie ostatniego baca nie nie przepchnąłem do maila też nie miałem kilka dni od tych dni czasu na to za kilka dni wracam z mordą do pracy więc będę pracował w trybie nocnym zresztą zapamiętać nie wiem może zobaczymy prawdopodobnie będzie tryb nocny i będziemy mieli używać w której lokala ciebie w chmurze będę chciał dzisiaj podpiąć też pod lokala deep seek api także zobaczymy weź mnie tak głęboko sprawdź dokładnie wszystkie dokumenty cały kod jakie mamy propozytorium i ewentualnie zobaczymy dokładnie mi tam później podasz jak się będzie zapytam co mam zrobić żeby wszystko zaktualizować na lokalnym naszym tutaj systemie wcześniej kupowaliśmy to chyba w pełen powershella coś takiego i tam po kolei były komendy co się robi a ja zobaczę odpalę później to zobaczę jak to wygląda nie dobra weź mi tam zrób to wszystko E tak i przestaw mi głęboki taki pełny raport z tego wszystkiego naszego imperium co mamy dokumentach jakie kroki byśmy byśmy proponował co będziemy później robić po odpaleniu tego lokala dokładnie co będziemy robić
+
+## 🏛️ Claude
+Cezar — rozumiem: dziś wieczorem odpalasz lokala (+ podepniesz DeepSeek API), pracujesz nocą, i chcesz **głęboki audyt całego repozytorium + pełny raport + konkretny plan co robimy po odpaleniu lokala**. Robię głęboki przegląd. Najpierw twarde dane — struktura, skrót „aktualizuj", skrypt PowerShell, ślad testów MT:
+
+## 🏛️ Claude
+`aktualizuj.ps1` istnieje w katalogu głównym — to ten skrót PowerShell, który pamiętasz! Sprawdzam czy aktualny + szukam testów MT w pamięci:
+
+## 🏛️ Claude
+Świetne odkrycia. Pamięć pokazuje że lokalne testy to był **backtest na `dane/BTC_1h.csv`/`ETH_1d.csv` — 2026-06-29** (nie MetaTrader; „MT" to prawdopodobnie skrót). DeepSeek jeszcze nietestowany (06-29: „nie mam dostępu do komputera"). `aktualizuj.ps1` działa, ale robi tylko pull+testy — nie pełny setup. Dokończę dane do raportu + ulepszę skrypt. Głęboki skan równolegle:
+
+## 🏛️ Claude
+17 commitów czeka na merge do main (cała sesja). DeepSeek wpięty w 5 miejscach. Sprawdzam gdzie dane CSV + jak podpiąć DeepSeek (Cezar podepnie wieczorem):
+
+## 🏛️ Claude
+Mam wszystko: dane DOGE są (`dane/4h/Binance_DOGEUSDT_4h.csv` + dzienne), DeepSeek przez `deepseek_glos.py` (`GlosImperium`, `test_polaczenia()`). Ulepszam `aktualizuj.ps1` do **pełnego** setupu lokala (pull + instalacja + RAG + DeepSeek test + mapa):
+
+## 🏛️ Claude
+Ulepszyłem `aktualizuj.ps1` — teraz jedno kliknięcie robi WSZYSTKO (pull+pip+testy+RAG+pamięć+DeepSeek test). Dodaję wzmiankę w przewodniku i czekam na raport z głębokiego audytu:
+
+## 🏛️ Claude
+Audyt harmonia. Commituję ulepszenia (skrypt + przewodnik), a raport złożę gdy agent skończy głęboki skan:
+
+## 🏛️ Claude
+Czekam na raport z głębokiego audytu (agent skanuje cały kod) — w międzyczasie repo zsynchronizowane.
+
+## 🏛️ Claude
+Agent dostarczył twarde fakty. Złapał drobny rozjazd: README mówi 74 aktywne, kod 75. Weryfikuję i naprawiam (Prawo XXI):
+
+## 🏛️ Claude
+README ma realny rozjazd (74 vs 75 aktywne; też zwiadowcy 12 vs 15). Naprawiam (Prawo XXI — błahostka, auto-naprawa):
+
+## 🏛️ Claude
+Wszystko zsynchronizowane. Oto **pełny głęboki raport Imperium + plan na wieczór**, Cezarze.
+
+---
+
+# 📊 GŁĘBOKI RAPORT IMPERIUM — 2026-06-30
+
+## 🧪 1. Test pamięci — co naprawdę robiliśmy na lokalu
+
+Pamięć (proweniencja + kronika) pokazuje: ostatnie lokalne testy to **backtest na danych CSV — 2026-06-29** (nie „kilkanaście dni temu", nie MetaTrader — „MT" to prawdopodobnie Twój skrót). Uczciwie:
+- ✅ Zamknęliśmy **Front 3 (Backtest)** — czytnik CSV + 8 testów + dowód out-of-the-box
+- ❌ **DeepSeek nietestowany** (06-29: „nie mam dostępu do komputera")
+- ❌ Test DOGE/MEXC z logowaniem do W1 — wciąż **nie wykonany** (luka)
+
+## 🔄 2. Twój skrót „aktualizuj" — ZNALEZIONY i ulepszony
+
+To `aktualizuj.ps1` w katalogu repo. **Rozszerzyłem go** — teraz jedno kliknięcie robi WSZYSTKO:
+```powershell
+.\aktualizuj.ps1
+```
+pull → pip install → testy → indeks RAG (wektory) → odświeżenie pamięci (katalog+graf+mapa) → test DeepSeek (jeśli klucz). Bezpieczny: chowa Twoje zmiany, dane `dane/` nietknięte.
+
+## 🏛️ 3. Stan systemu (głęboki audyt kodu)
+
+| Obszar | Stan |
+|--------|------|
+| **Testy** | ✅ 1841/1841 zielone |
+| **Backtest** | ✅ **działa end-to-end** (BTC 4h: +1.11%, 7 trade, PF 1.55, breaker krzywej) |
+| **Paper trading** | ✅ silnik działa (symulacja) |
+| **Live trading** | ⚠️ szkielet `RealOrderRouter` (dry-run) — **brak konektora giełdy (ccxt niepodpięty)** |
+| **Dane** | ✅ 15 CSV Binance (BTC/ETH/BNB/**DOGE**/SOL) w 4h/godzinowe/dzienne; minutowe puste |
+| **Neurony** | 81 (75 aktywnych); **tylko 6 wyłączonych** (czekają na on-chain API — nie martwy kod) |
+| **Pamięć** | ✅ 13 warstw, mapa w `docs/MAPA_PAMIECI.md` |
+
+🚨 **Sprostowanie (Prawo I):** hook straszy „19 neuronów czeka na adaptery" — to **mylące**. Realnie tylko **6 neuronów** wyłączonych (potrzebują feedu on-chain). Reszta z tych 19 to neurony **gotowe**, które abstynują dopóki nie płyną żywe dane (poprawne zachowanie).
+
+🔧 **Naprawiłem przy okazji:** README mówił 74 aktywne/12 zwiadowców → kod ma 75/15. Zsynchronizowane (Prawo XXI).
+
+## 📁 4. Co mamy w dokumentach
+
+277 plików kodu (~40 700 linii), 88 plików testów, 191 dokumentów. Rdzeń: `imperium/` (legiony=neurony, koloseum=silnik, cesarz=LLM, pretorianie=ryzyko, drogi=egzekucja, biblioteki=pamięć). Źródła prawdy aktualne (README/MANIFEST: Stan na 2026-06-30).
+
+---
+
+# 🎯 PLAN NA WIECZÓR (co robimy po odpaleniu lokala)
+
+**Krok 1 — Aktualizacja (1 komenda):**
+```powershell
+.\aktualizuj.ps1
+```
+
+**Krok 2 — Podłącz DeepSeek (chcesz to zrobić):**
+```powershell
+setx DEEPSEEK_API_KEY "twój-klucz"      # potem NOWY terminal
+python -c "from imperium.cesarz.deepseek_glos import GlosImperium; print(GlosImperium().test_polaczenia())"
+```
+→ ożywia: auto-lekcje pamięci (W6), doradcę LLM, sentyment newsów (NEWS-01).
+
+**Krok 3 — Wektory semantyczne (pełna moc pamięci):**
+```powershell
+pip install sentence-transformers
+python narzedzia/rag/indeksuj.py --korpus wszystko
+```
+
+**Krok 4 — DOMKNIĘCIE LUKI: pierwszy paper-trading DOGE z logowaniem do W1** 🎯
+To najważniejsze — żeby test, którego pamięć nie zachowała, w końcu trafił do pamięci na zawsze:
+```powershell
+python skrypty/start.py          # rój + dashboard :8777
+```
+
+## 🔭 Co proponuję jako kierunki (tryb nocny):
+1. **Podpięcie konektora giełdy (ccxt/MEXC)** — to jedyne brakujące ogniwo do realnego live; teraz mamy tylko dry-run
+2. **Backtest na DOGE** (`python -m imperium.koloseum.backtest dane/4h/Binance_DOGEUSDT_4h.csv 4h`) — domknięcie tematu DOGE
+3. **On-chain feed** dla 4 neuronów INVEST (MVRV/SOPR/Puell/Netflow) — ożywi pełny tryb inwestycyjny
+
+---
+
+Wszystko wypchnięte na zdalny (`claude/sleepy-fermi-dsdE4`). 🚨 **Pamiętaj:** masz **17 commitów niewmergowanych do main** — gdy zechcesz, zmerguj PR ręcznie (lokal i tak ciągnie z gałęzi, więc to nie blokuje pracy wieczorem).
+
+Gdy odpalisz lokala i napiszesz — przeprowadzę Cię przez każdy krok na żywo. Miłego powrotu do pracy w trybie nocnym, Cezarze. 🌙
+
+## 🧑 Cezar
+<task-notification>
+<task-id>bt29gewds</task-id>
+<tool-use-id>toolu_01JBFXeQ8zdExVbhNqZo7a9K</tool-use-id>
+<output-file>/tmp/claude-0/-home-user-IMPERIAL-MESH-VORTEX/895ce14f-5b09-5f9b-96a7-19fd5a05feab/tasks/bt29gewds.output</output-file>
+<status>completed</status>
+<summary>Background command "cd /home/user/IMPERIAL-MESH-VORTEX
+for i in $(seq 1 40); do
+  if [ -f /tmp/claude-0/-home-user-IMPERIAL-MESH-VORTEX/895ce14f-5b09-5f9b-96a7-19fd5a05feab/tasks/ab254bb05292ec00e.output ]; then
+    if grep -q '"type":"result"' /tmp/claude-0/-home-user-IMPERIAL-MESH-VORTEX/895ce14f-5b09-5f9b-96a7-19fd5a05feab/tasks/ab254bb05292ec00e.output 2&gt;/dev/null; then echo "AGENT GOTOWY"; break; fi
+  fi
+  sleep 8
+done
+echo "koniec oczekiwania"" completed (exit code 0)</summary>
+</task-notification>
+
+## 🏛️ Claude
+To było tylko zakończenie pętli oczekiwania na agenta (raport już dostarczyłem powyżej). Nic do roboty — wszystko gotowe i wypchnięte.
+
+**Podsumowanie stanu na teraz:**
+- ✅ Raport dostarczony, `aktualizuj.ps1` ulepszony do pełnego setupu, `docs/START_LOKAL.md` gotowy
+- ✅ README zsynchronizowany (75 neuronów / 15 zwiadowców), audyt harmonia, 1841/1841 testów
+- ✅ Wszystko na `claude/sleepy-fermi-dsdE4`
+
+Wieczorem po odpaleniu lokala: `.\aktualizuj.ps1` → `setx DEEPSEEK_API_KEY` → i piszesz do mnie. Przeprowadzę Cię krok po kroku, w szczególności przez **domknięcie luki: paper-trading DOGE z logowaniem do W1**. 🌙
+
+## 🧑 Cezar
+ok super a co z news 01 opisz dokładnie co dokładnie po podłączeniu API na news 01 pokazuje chodzi mi dokładnie szczegóły co dokładnie i może ewentualnie masz jakieś propozycje żeby to jeszcze bardziej rozbudować aby w pełni wykorzystać tej pani neuron news tak ewentualnie kilka innych różnych płaszczyzn z którą mogłyby one pokazywać powiedz mi dokładnie i jak możemy to zgodnie z zasadami o określić i ulepszyć aby postaw co mamy bazę pokaż no i będziemy próbować tak jak najbardziej rozwinąć aby wspierać nasz całej imperium ulepszać metody treningowe
+
+## 🏛️ Claude
+Cezar — najpierw dokładnie rozłożę NEWS-01 na czynniki (Prawo XVII — czytam kod, nie zgaduję), potem propozycje rozbudowy. Czytam neuron + adapter:
+
+## 🏛️ Claude
+Teraz adapter — co dokładnie produkuje po podłączeniu API:
+
+## 🏛️ Claude
+Przeczytałem cały kod NEWS-01 (neuron + adapter). Mam kluczowy, uczciwy wniosek dla Ciebie. Sprawdzam jeszcze czy fetcher jest gdzieś podpięty:
+
+## 🏛️ Claude
+Przeczytałem cały NEWS-01 do dna. Mam dla Ciebie precyzyjny rozkład + ważną prawdę.
+
+## 📰 NEWS-01 — co dokładnie pokazuje
+
+**Trzy liczby, które adapter dostarcza neuronowi:**
+| Wskaźnik | Zakres | Znaczenie |
+|----------|--------|-----------|
+| `NEWS_SENTYMENT` | −1.0 … +1.0 | wydźwięk: −1 skrajnie zły (hacki, krach), +1 skrajnie dobry (ETF, adopcja) |
+| `NEWS_PEWNOSC` | 0.0 … 1.0 | jak jednoznaczny jest wydźwięk (modulator siły głosu) |
+| `NEWS_N` | liczba | ile nagłówków złożyło się na werdykt |
+
+**Jak neuron głosuje** (momentum informacyjny, nie kontrariański):
+- `N < 2` nagłówki → **NEUTRAL** (anegdota, nie sygnał)
+- `|sentyment| < 0.30` → **NEUTRAL** (szum)
+- `≥ +0.30` → **LONG** (pewność = |s| × pewność_LLM, sufit 0.85); `≥ 0.65` = „MOCNO pozytywny"
+- `≤ −0.30` → **SHORT** analogicznie
+
+## 🚨 KLUCZOWA PRAWDA (Prawo I — uczciwie)
+
+**Samo podłączenie DeepSeek API NIE sprawi, że NEWS-01 cokolwiek pokaże.** Sprawdziłem: w `dyrygent.py` i `petla_live.py` adapter jest tworzony jako `AdapterNewsLLM()` — **z pustym fetcherem** (`lambda: []`). Nie ma w całym kodzie żadnego pobieracza newsów (RSS/API).
+
+Łańcuch jest taki:
+```
+FETCHER (pobiera nagłówki) → KLASYFIKATOR (LLM lub słownik) → liczba → neuron głosuje
+   ❌ BRAK                       ✅ gotowy (DeepSeek/fallback)
+```
+
+DeepSeek tylko **klasyfikuje** nagłówki, których... nie ma. **Brakującym ogniwem jest FEED nagłówków, nie API.**
+
+Co więcej: jest **fallback słownikowy** (leksykon ~60 słów byczych/niedźwiedzich, offline) — więc **gdy podłączymy fetcher, NEWS-01 zadziała nawet BEZ DeepSeek**. DeepSeek tylko podnosi jakość (rozumie kontekst, sarkazm, niuans).
+
+## 🧱 Co realnie trzeba (kolejność)
+1. **Fetcher RSS** (darmowy, bez klucza) — to ODBLOKUJE NEWS-01 (CryptoPanic/CoinDesk RSS)
+2. **DeepSeek** — upgrade klasyfikacji z leksykonu na rozumienie języka
+
+---
+
+## 🚀 Propozycje rozbudowy — kilka NOWYCH płaszczyzn
+
+Teraz NEWS-01 to **jedna skalarna liczba**. Można z newsów wycisnąć dużo więcej (każde = osobny wskaźnik/neuron, mierzony wg Prawa XVI):
+
+| # | Płaszczyzna | Co daje | Inspiracja |
+|---|-------------|---------|-----------|
+| 1 | **Sentyment per-aktywo** | BTC-news ≠ DOGE-news (fetcher już dostaje `symbol`) | precyzja |
+| 2 | **Momentum sentymentu (Δ)** | nie poziom, lecz ZMIANA — news kręci się na plus = sygnał wyprzedzający | acceleration |
+| 3 | **Spike uwagi (NEWS_N nagle rośnie)** | nagły wysyp nagłówków = zwiastun zmienności (niezależnie od kierunku) | attention→vol |
+| 4 | **Taksonomia zdarzeń** | LLM klasyfikuje TYP: hack/regulacja/ETF/partnerstwo/makro — różny wpływ i half-life (hack=ostry short, ETF=trwały long) | event-driven |
+| 5 | **Rozrzut/niezgoda** | nagłówki podzielone (część byczo, część niedźwiedzio) = niepewność — jak meta-labeling Gubernatora | dispersion |
+| 6 | **Nowość vs przeżute** | dedup wobec naszej PAMIĘCI — powtórzony news = już wyceniony, niski wpływ | novelty |
+| 7 | **Zanik czasowy** | świeży nagłówek waży więcej (news szybko się starzeje) | half-life |
+
+## 🎓 Wsparcie metod treningowych (Prawo XVI — mierzone)
+- **Loguj `NEWS_SENTYMENT` do W1** (pamiec_absolutna) przy każdym barze → potem zmierzymy **korelację sentymentu z przyszłym zwrotem** (czy w ogóle ma przewagę predykcyjną — zanim mu zaufamy)
+- **News jako cecha Jump Modelu** (W8 reżim) — sentyment + zmienność jako wejście do detektora reżimu
+- **Pamięć reżimowa** (już mamy) — lekcja „news-driven pump w TREND_STRONG" inaczej waży niż w BEAR
+
+---
+
+## 🎯 Moja rekomendacja
+
+Zbudujmy w tej kolejności (każdy krok = kod + testy + pomiar):
+1. **`AdapterNewsRSS` / fetcher** (darmowy RSS, wstrzykiwalny, testowalny offline) — **to odblokowuje NEWS-01 już teraz**, nawet bez DeepSeek
+2. **Spike uwagi (#3) + Δ sentymentu (#2)** — dwa najtańsze, najmocniejsze nowe wymiary
+3. **Taksonomia zdarzeń (#4)** — gdy DeepSeek podłączony (to jego mocna strona)
+4. **Logowanie do W1 + pomiar predykcyjności** — zanim damy mu większą wagę (Prawo XVI)
+
+Powiedz **„dawaj"** i zaczynam od fetchera RSS (unlock), albo wskaż którą płaszczyznę bierzemy pierwszą. Wszystko z testami i pomiarem, zgodnie z zasadami.
+
+## 🧑 Cezar
+zgadzam się plus zrób głęboki audyt poszukaj wszędzie cały internet lokalny skrypty unikatowe na opcje z tego tematu new który teraz budujemy daj więcej propozycji jakieś unikatowych mega najlepszych modułów systemów narzędzi ewentualnie stwórz oryginalne nasze moduły narzędzia wzorując się na najlepszych na rynku mamy być pamiętaj jednoznacznie zasad nie wiem czy mamy taką zasadę być zawsze lepszym od innych być lepszym wyprzedzać konkurencję a jeżeli mamy coś w tyle gorsze szukamy lepszych rozwiązań podpatrujemy konkurencję ewentualnie mamy możliwość i dążymy do takich możliwości aby tworzyć automatycznie ulepszając się sugeruje zawsze sugerujesz wykorzystanie pełnego potencjału mamy to zasadach i zawsze sugerujesz rozwinięcie się w najlepszym kierunku celem jest zawsze osiągnięciem najlepszego zysku i trafienie w najlepszym moment złożenia zamówienia na longu szorcie bo ktoś trzymanie się w zależności od sytuacji na rynku opierając się na naszym systemie kodowym bramki kodowej naszych kodowych naszych neuronów systemów które kontrolują to wszystko a więc poszukaj dokładnie zaproponuj jak największą liczbę możliwości rozbudowy tych newsów systemów które by były prawdziwe wiarygodne poszukaj na internecie tego wszystkiego dokładnie rynek lokalny azjatycki cały świat europejski amerykański australijski wyspy Oceanii i Pacyfiku no i wiele więcej więcej opcji które by spowodowały to że jesteśmy najlepsi i wyprzedzamy konkurencję
+
+## 🏛️ Claude
+Cezar — zgoda, zaczynam. Najpierw sprawdzam czy mamy zasadę „zawsze lepszy od konkurencji", potem głęboki sweep researchowy (Azja/EU/USA/świat) — kilka przeszukań naraz:
+
+## 🏛️ Claude
+Mocne ugruntowanie. Złoty wniosek z badań ([arXiv:2508.07408](https://arxiv.org/html/2508.07408v1)): **typ zdarzenia decyduje o kierunku** — np. „Rumor/Speculation" i „Retail Buzz" mają **ujemny Sharpe** (są KONTRARIAŃSKIE!). Płaski „pozytywny=LONG" to za mało. Co do zasady — mamy Prawo XV (pełny potencjał), ale **nie** explicit „bądź lepszy od konkurencji". Zaproponuję ją.
+
+Najpierw buduję uzgodniony **unlock — fetcher RSS** (darmowy, stdlib, testowalny offline):
+
+## 🏛️ Claude
+Działa end-to-end: BTC→ETF rally (+1.0), ETH→hack, pełny feed +0.655. Piszę testy:
+
+## 🏛️ Claude
+Test złapał realny błąd: gdy wstrzyknięty pobieracz rzuca, nie ma osłony (try/except jest tylko w domyślnym HTTP). Naprawiam — osłaniam każde wywołanie źródła:
+
+## 🏛️ Claude
+10/10. Teraz pełny dokument badawczy z propozycjami (wszystkie płaszczyzny + grounding + źródła):
+
+## 🏛️ Claude
+Pełny zestaw + audyt (datowany dokument jest pomijany przez audyt — snapshot, Prawo I):
+
+## 🏛️ Claude
+Dodaję dokument do INDEKS:
+
+## 🏛️ Claude
+1851/1851, audyt harmonia. Wpinam fetcher w pętlę live (żeby NEWS-01 realnie żył w trybie live — fetcher jest graceful, więc niczego nie psuje):
+
+## 🏛️ Claude
+1851/1851, audyt harmonia. LOG_ZMIAN + Dziennik + commit:
+
+## 🏛️ Claude
+Cezar — zrobione. Oto pełna odpowiedź na Twoje pytanie + nowy moduł + research.
+
+## 🔍 Co dokładnie pokazuje NEWS-01 (i ważna prawda)
+
+Po podłączeniu DeepSeek NEWS-01 daje **trzy wymiary**: `NEWS_SENTYMENT` (−1…+1), `NEWS_PEWNOSC` (0…1), `NEWS_N` (liczba nagłówków) → głos LONG/SHORT/NEUTRAL (próg 0.30, mocny 0.65).
+
+🚨 **ALE audyt wykrył:** sam DeepSeek **nic nie pokaże** — adapter miał **pusty feed**. DeepSeek tylko *klasyfikuje* nagłówki, których nie było. Brakowało **FEEDU**, nie API.
+
+## ✅ Zbudowałem UNLOCK — `FetcherNewsRSS`
+
+Darmowy feed RSS (CoinDesk/CoinTelegraph/Decrypt), stdlib (zero nowych zależności), filtr per-aktywo (BTC≠DOGE), dedup między wydawcami, w pełni testowalny offline. **Teraz NEWS-01 żyje nawet bez DeepSeek** (fallback słownikowy); DeepSeek to upgrade jakości. Wpięty w `petla_live`. Dowód: BTC→„ETF rally" +1.0, ETH→„hack" negatyw, pełny feed +0.655.
+
+## 🌍 Research świata + 10 propozycji modułów
+
+Sweep globalny ([CoinGecko News](https://www.coingecko.com/learn/best-crypto-news-api), [CoinDesk API](https://developers.coindesk.com/), badania 2026). **Złoty wniosek** ([arXiv:2508.07408](https://arxiv.org/abs/2508.07408)): **typ zdarzenia decyduje o kierunku** — „Rumor/Speculation" i „Retail Buzz" mają **ujemny Sharpe = są KONTRARIAŃSKIE!** Płaski „pozytywny=LONG" to za mało.
+
+10 modułów w `docs/NEWS_ROZBUDOWA_2026-06-30.md`: taksonomia zdarzeń (NEWS-02), spike uwagi, Δ sentymentu, wiarygodność źródła, novelty (vs pamięć), rozrzut/niezgoda, social buzz, on-chain events.
+
+## ⚖️ Co do Twojej zasady
+
+Sprawdziłem — **nie mamy** explicit „bądź lepszy od konkurencji". Mamy Prawo XV (pełny potencjał) + XVI (pomiar). **Zaproponowałem Prawo XXII — Przewaga Konkurencyjna** (w dokumencie) — spina to w jawny imperatyw. To decyzja kierunkowa (Prawo XVIII) → **Twoja zgoda?**
+
+**Stan:** 1851/1851 testów (+10), audyt harmonia, wszystko wypchnięte.
+
+---
+
+Następny krok (rekomendacja): **NEWS-02 Taksonomia zdarzeń** — kierunek per typ (rumor=kontrariański), to największa przewaga z researchu. Powiedz **„dawaj NEWS-02"** (buduję) albo **„Prawo XXII"** (dopiszę zasadę), albo jedno i drugie.

@@ -30,7 +30,9 @@ import re
 from typing import Callable, List, Optional
 
 from imperium.akwedukty.adaptery.baza import AdapterDanych
+from imperium.akwedukty.klasyfikator_zdarzen import klasyfikuj as _klasyfikuj_zdarzenia
 from imperium.legiony.neurony.sentyment import NeuronSentymentNews
+from imperium.legiony.neurony.zdarzenia import NeuronTaksonomiaZdarzen
 
 logger = logging.getLogger("Adapter")
 
@@ -89,8 +91,9 @@ class AdapterNewsLLM(AdapterDanych):
     przekazywany do fetchera, który może filtrować nagłówki per aktywo.
     """
     NAZWA = "NewsLLM(DeepSeek+fallback)"
-    KLUCZE = ["NEWS_SENTYMENT", "NEWS_PEWNOSC", "NEWS_N"]
-    _NEURONY = (NeuronSentymentNews,)
+    KLUCZE = ["NEWS_SENTYMENT", "NEWS_PEWNOSC", "NEWS_N",
+              "NEWS_EVENT_KIERUNEK", "NEWS_EVENT_TYP", "NEWS_EVENT_PEWNOSC"]
+    _NEURONY = (NeuronSentymentNews, NeuronTaksonomiaZdarzen)
     _POWOD_USPIENIA = "Wymaga feedu newsów (AdapterNewsLLM — RSS/API + LLM/fallback)."
 
     def __init__(
@@ -204,8 +207,15 @@ class AdapterNewsLLM(AdapterDanych):
         if wynik is None:
             wynik = self._sentyment_slownikowy(naglowki)
 
+        # NEWS-02: taksonomia zdarzeń (kierunek per typ — deterministyczna, zawsze liczona)
+        zdarz = _klasyfikuj_zdarzenia(naglowki)
+        kier = zdarz["kierunek"] if zdarz["typ"] != "BRAK" else None
+
         return {
             "NEWS_SENTYMENT": wynik["sentyment"],
             "NEWS_PEWNOSC": wynik["pewnosc"],
             "NEWS_N": len(naglowki),
+            "NEWS_EVENT_KIERUNEK": kier,
+            "NEWS_EVENT_TYP": zdarz["typ"] if kier is not None else None,
+            "NEWS_EVENT_PEWNOSC": zdarz["pewnosc"] if kier is not None else None,
         }

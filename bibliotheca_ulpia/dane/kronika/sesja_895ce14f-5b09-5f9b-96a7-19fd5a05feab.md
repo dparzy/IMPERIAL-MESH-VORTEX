@@ -3858,3 +3858,71 @@ Dwie szczere opcje na dalej:
 2. **„konsolidacja"** — zrobię przegląd 13 warstw, zmierzę realne pokrycie/korelacje (Prawo XVI), zsyntetyzuję dokument-mapę całej pamięci jako spójną całość i ewentualnie scalę co się dubluje
 
 Co wybierasz?
+
+## 🧑 Cezar
+konsolidacja
+
+## 🏛️ Claude
+Cezar — konsolidacja. Najpierw twardy spis 13 warstw z kodu (nie z pamięci), potem mapa-dokument i sprawdzenie redundancji (Prawo XVI):
+
+## 🏛️ Claude
+14 modułów (13 warstw + fasada), 3568 linii. Zauważam jedną realną rzecz do naprawy w konsolidacji: **graf_pamieci.json = 3.3 MB** (27k krawędzi, commitowany co sesję — puchnie repo). Sprawdzam wpływ przycięcia słabych krawędzi:
+
+## 🏛️ Claude
+**95% redukcji** (3.74MB→0.18MB) przy `min_waga≥2` — bo krawędzie o wadze 1 to przypadkowe jednorazowe współwystąpienia (szum), a ≥2 to realne, powtarzalne powiązania. To czysty Prawo XVI: trzymamy zmierzone-silne, tniemy szum. Ustawiam to dla commitowanego grafu:
+
+## 🏛️ Claude
+Teraz dodaję `mapa()` do Kustosza (jednolity przegląd 13 warstw) i buduję skonsolidowaną mapę-dokument:
+
+## 🏛️ Claude
+Dodaję komendę CLI `mapa` do Kustosza:
+
+## 🏛️ Claude
+Mapa działa, graf 3.74MB→0.18MB. Tworzę skonsolidowany dokument-mapę pamięci:
+
+## 🏛️ Claude
+Test mapy + pełny zestaw + audyt:
+
+## 🏛️ Claude
+MAPA_PAMIECI.md trzeba dopisać do INDEKS. Sprawdzam sekcję docs:
+
+## 🏛️ Claude
+1841/1841, audyt harmonia. LOG_ZMIAN + Dziennik + commit:
+
+## 🏛️ Claude
+Cezar — **konsolidacja zrobiona. Pamięć 13-warstwowa zmapowana, zmierzona i odchudzona.** 🗺️
+
+## Co dała konsolidacja (pomiar, nie opinia)
+
+**1. Jedna mapa — `docs/MAPA_PAMIECI.md` + `kustosz mapa`**
+Jedno źródło prawdy o całej architekturze: 13 warstw, ich rola, typ CoALA, unikaty, punkt wejścia. Już nie zgadujesz co masz — widzisz całość naraz:
+
+```
+W1 logi · W2 RAG · W3 lekcje · W3b kronika · W4 wizje · W5 chmura↔lokal
+W6 dziennik · W7 Kustosz(organ) · W8 graf · W9 refleksja · W10 zapominanie
+W11 proceduralna · W12 robocza · W13 proweniencja
+```
+
+**2. Pomiar redundancji (Prawo XVI) — ZERO dubli**
+Sprawdziłem każdą warstwę: pełni odrębną rolę w taksonomii CoALA lub na granicy 2026. **Nic do scalenia** — nie ma dwóch warstw o tym samym sygnale. W12/W13 nawet nie mają własnych plików (czytają z innych). To nie wata — to gęsta, niereduntantna architektura.
+
+**3. Odchudzenie grafu (W8) — 95% mniej**
+Graf miał 3.74 MB (commitowany co sesję!). Krawędzie o wadze 1 to przypadkowe jednorazowe współwystąpienia (szum). Przełączyłem persystencję na **waga≥2** (realne, powtarzalne powiązania):
+```
+30833 → 883 krawędzi   |   3.74 MB → 0.18 MB
+```
+Repo lżejsze, graf ostrzejszy. Czysty Prawo XVI.
+
+## Werdykt
+
+| | |
+|--|--|
+| Warstwy | 13, zmapowane, zero redundancji |
+| Taksonomia CoALA | kompletna (4/4 typy) |
+| Problemy granicy 2026 | domknięte (reflection, contradiction, forgetting, blindness) |
+| Testy | 1841/1841 ✅ |
+| Audyt | pełna harmonia ✅ |
+
+Pamięć jest **dojrzała i spójna** — nie chaotyczny stos, lecz zmapowany organizm pod jednym organem (Kustosz). Pozostaje jedno realne ogniwo: **wektory semantyczne lokalnie** (`indeksuj.py`) — most gotowy, czeka na Twój komputer.
+
+Imperium pamięta każdy krok, wie skąd to wie, łączy pojęcia, zapomina mądrze i nigdy się nie cofa. To jest ten poziom, o który walczyłeś.

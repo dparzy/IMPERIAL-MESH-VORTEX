@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-06-30 | NAPRAWA+LOKAL | 🖥️ Przewodnik startu lokalnego + naprawa reprodukowalności
+
+Cezar: „jak pamięć działa w chmurze vs lokal, czy lokal ma dostęp do wszystkich plików,
+sprawdź nowinki, i kiedy ostatnio używaliśmy lokala (test pamięci)."
+
+**Test pamięci (zdał):** proweniencja + kronika znalazły — lokal konfigurowany ~2026-06-22
+(TA-Lib Windows 10, Paper Trading, plan MEXC live, test DOGE). UCZCIWIE (Prawo I): brak
+twardego logu W1 → test DOGE/MEXC był OMAWIANY, wynik nie trafił do pamięci. Luka do domknięcia.
+
+**🚨 CZERWONY ALARM złapany (Prawo XV):** świeży kontener wystartował na ZŁYM commicie
+(main merge #101 = stara migawka v5) zamiast na czubku gałęzi (065f789 = pełne v6-v13).
+Cała praca sesji „zniknęła" z working tree. DIAGNOZA: praca BEZPIECZNA na origin; lokalny
+desync. NAPRAWA: `git reset --hard origin/claude/sleepy-fermi-dsdE4` → wszystko wróciło.
+
+**🚨 Luka reprodukowalności (Prawo XV):** `scipy` i `pytest` NIE były w requirements.txt —
+działało tylko bo stary kontener je miał. Świeży: BOCPD-01 milczy (martwy głos), 17 testów
+import-error. NAPRAWA: dodane do requirements (scipy>=1.10 runtime, pytest>=7.0 dev).
+Po instalacji: 1841/1841 zielone, audyt harmonia, BOCPD-01 znów głosuje.
+
+**Deliverable:** `skrypty/start_lokal.py` (jednokomendowy rozruch lokala: env→audyt→katalog+graf
+→RAG→mapa) + `docs/START_LOKAL.md` (przewodnik dla nowicjusza: chmura vs lokal, dodatki
+tylko-lokal = wektory/Filesystem MCP/DeepSeek/trwałe logi W1, domknięcie luki testu DOGE).
+Pliki: requirements.txt, skrypty/start_lokal.py (nowy), docs/START_LOKAL.md (nowy), INDEKS.
+
+---
+
 ## 2026-06-29 | KONSOLIDACJA | 🗺️ W-360 v13: przegląd 13 warstw + mapa + odchudzenie grafu
 
 Cezar: „konsolidacja". Przegląd całej pamięci (13 warstw, 3568 linii kodu) — pomiar, nie opinia.

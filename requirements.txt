@@ -9,6 +9,7 @@
 
 # ── Rdzeń matematyczny (Brama Kalkulatora + zwiadowcy Exploratores) ──
 numpy>=1.24
+scipy>=1.10            # GARCH (lfilter IIR) + BOCPD — bez niego BOCPD-01 milczy (martwy głos, Prawo XV)
 TA-Lib>=0.6.0          # Brama Kalkulatora — Prawo I (zero halucynacji, prawdziwe wskaźniki)
 
 # ── Dane i rynek ──
@@ -24,5 +25,6 @@ matplotlib>=3.7
 # ── Przyspieszenie gorących pętli (opcjonalne — Prawo I: fallback bez numby) ──
 numba>=0.59            # JIT na Viterbi Jump Model (W-380, zmierzone 256× na rdzeniu); brak → czysty Python
 
-# ── Kontrola jakości kodu (Warstwa 13 audytu — łapie bugi/martwy kod) ──
+# ── Testy i jakość kodu (dev) ──
+pytest>=7.0            # część testów używa fixtures (tmp_path/monkeypatch); runner bez-zależności: tests/run_tests.py
 ruff>=0.13             # linter bramki: F (pyflakes) + E9; konfiguracja w ruff.toml

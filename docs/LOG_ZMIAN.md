@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-06-30 | NEURONY+PRAWO | 📈 NEWS-03/04 dynamika newsów + PRAWO XXV (W-382)
+
+Cezar: „dawaj wszystko". Dwa neurony dynamiki + zatwierdzona zasada przewagi.
+
+**Stan kroczący adaptera** (AdapterNewsLLM): deque per symbol pamięta poprzednie
+sentymenty i liczby nagłówków → dolewa NEWS_SENTYMENT_DELTA + NEWS_ATTENTION_SPIKE.
+
+- **NEWS-04 Δ Sentymentu** (`news_dynamika.py`): momentum informacyjny = pochodna
+  sentymentu (bieżący − średnia historii). Rośnie→LONG, opada→SHORT. WSKAZNIK
+  NEWS_SENTYMENT_DELTA, kat R, waga 5, mechanizm event.
+- **NEWS-03 Spike Uwagi**: przełom informacyjny = liczba nagłówków / średnia historyczna.
+  Spike ≥2× × kierunek sentymentu → breakout LONG/SHORT; spike bez kierunku → czujność
+  (NEUTRAL). WSKAZNIK NEWS_ATTENTION_SPIKE, kat R, waga 5, mechanizm vol_signal.
+- Cztery wymiary newsów (Prawo XVI — nie redundancja): poziom (01), typ (02), uwaga (03),
+  momentum (04). Rejestracja pełna; neurony 82→84 (78 aktywnych). +11 testów. 1862→1873.
+
+**PRAWO XXV — PRZEWAGA KONKURENCYJNA** (ZASADY_FUNDAMENTALNE.md): Cezar zatwierdził.
+Imperium mierzy się ze stanem sztuki; gdy słabsze — research+adopcja+pomiar (spina XV+XVI+XXII).
+Konstytucja 24→25 praw (CLAUDE.md, README zaktualizowane). XXII pozostaje „Dekorelacja Przewagi".
+
+UWAGA (Prawo XVI — następny krok): logowanie sentymentu do W1 dla pomiaru predykcyjności
+per kategoria — NIE zrobione w tej rundzie (infra pomiarowa), zaplanowane.
+
+---
+
 ## 2026-06-30 | NEURON | 🏷️ NEWS-02 Taksonomia Zdarzeń — kierunek per TYP (W-381)
 
 Cezar: „dawaj wszystko". Drugi neuron newsowy — research-grounded (arXiv:2508.07408):

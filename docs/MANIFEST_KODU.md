@@ -6,9 +6,9 @@
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
 **Stan na:** 2026-06-30 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 82 neuronów (zarejestrowane w roju) + 15 zwiadowców = **97 modułów w kodzie**
+**Zaimplementowane:** 84 neuronów (zarejestrowane w roju) + 15 zwiadowców = **99 modułów w kodzie**
 **Meta-warstwy (B):** 2 moduły (`neutralizacja.py` B-02, `meta_labeling.py` B-01) — warstwa NAD Legatusem, nie neurony
-**Aktywne / wyciszone:** 76 aktywnych + 6 wyciszonych, z czego:
+**Aktywne / wyciszone:** 78 aktywnych + 6 wyciszonych, z czego:
   • **53 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S/C/D/R) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, N-02 FracDiff, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top, CP-01 CUSUM, BOCPD-01 Bayesian change-point, C-01 Cross-sectional RS)
   • **4 kat. R obudzone (Faza B)** — PSY-01/02/04 z AdapterFutures (Binance fapi publiczne, bez klucza), PSY-03 z AdapterFearGreed (alternative.me) — wpięte w pipeline Dyrygenta
   • **1 kat. F obudzony (Faza C)** — V-03 CVD z AdapterCVD (Binance aggTrades publiczne, bez klucza)
@@ -70,7 +70,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (82/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (84/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -164,6 +164,8 @@
 |-------|-------|-----|------|--------|-----------------|-----|
 | NEWS-01 | NeuronSentymentNews | R | 6 | ✅ aktywny (AdapterNewsLLM) | NEWS_SENTYMENT | — |
 | NEWS-02 | NeuronTaksonomiaZdarzen | R | 6 | ✅ aktywny (AdapterNewsLLM + klasyfikator) | NEWS_EVENT_KIERUNEK | W-381: kierunek per typ zdarzenia (rumor=kontrariański, arXiv:2508.07408) |
+| NEWS-03 | NeuronSpikeUwagi | R | 5 | ✅ aktywny (AdapterNewsLLM stan kroczący) | NEWS_ATTENTION_SPIKE | W-382: przełom uwagi (nagły wysyp nagłówków) × kierunek sentymentu |
+| NEWS-04 | NeuronDeltaeSentymentu | R | 5 | ✅ aktywny (AdapterNewsLLM stan kroczący) | NEWS_SENTYMENT_DELTA | W-382: momentum informacyjny (pochodna sentymentu w czasie) |
 
 ### Plik: `neurony/onchain.py`
 

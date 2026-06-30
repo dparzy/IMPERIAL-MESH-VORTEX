@@ -566,6 +566,10 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
                "ożywa z RSS fetcher lub DEEPSEEK_API_KEY; bez feedu: abstynuje)",
     "NEWS-02": "NEWS_EVENT_KIERUNEK (AdapterNewsLLM + klasyfikator zdarzeń W-381 — "
                "kierunek per typ; ożywa z FetcherNewsRSS/feed; bez nagłówków: abstynuje)",
+    "NEWS-03": "NEWS_ATTENTION_SPIKE (AdapterNewsLLM stan kroczący W-382 — przełom uwagi; "
+               "ożywa po kilku barach z feedem; bez historii nagłówków: abstynuje)",
+    "NEWS-04": "NEWS_SENTYMENT_DELTA (AdapterNewsLLM stan kroczący W-382 — momentum sentymentu; "
+               "ożywa po ≥2 barach z feedem; bez historii: abstynuje)",
     "X-28":   "MTF_4H_RSI_14/MTF_1D_RSI_14 (Budowniczy MTF — ożywa gdy bary mają "
               "pole 'interwal' i odpowiedni TF; bez niego abstynuje per Prawo XV)",
     "Z-06":   "AMIHUD_20 wysoki (krucha płynność) — scenariusze audytu są płynne "

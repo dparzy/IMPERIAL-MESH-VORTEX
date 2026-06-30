@@ -45,6 +45,7 @@ from imperium.legiony.neurony.struktura import (
 )
 from imperium.legiony.neurony.sentyment import NeuronSentymentNews
 from imperium.legiony.neurony.zdarzenia import NeuronTaksonomiaZdarzen
+from imperium.legiony.neurony.news_dynamika import NeuronDeltaeSentymentu, NeuronSpikeUwagi
 from imperium.legiony.neurony.psychologia import (
     NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv,
 )
@@ -160,6 +161,8 @@ MECHANIZMY: dict = {
     # Sentyment (R)
     "NEWS-01": "event",   # News sentyment
     "NEWS-02": "event",   # Taksonomia zdarzeń (kierunek per typ)
+    "NEWS-03": "vol_signal",  # Spike uwagi (przełom = zwiastun zmienności)
+    "NEWS-04": "event",       # Δ sentymentu (momentum informacyjny, event-driven)
     # On-chain (O)
     "OC-01": "mean_rev",  # MVRV
     "OC-02": "mean_rev",  # SOPR
@@ -256,6 +259,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronSentymentNews(),
         # Taksonomia zdarzeń (NEWS-02) — kierunek per typ; rumor=kontrariański (W-381)
         NeuronTaksonomiaZdarzen(),
+        # Dynamika newsów (NEWS-03 spike uwagi, NEWS-04 Δ sentymentu) — W-382
+        NeuronSpikeUwagi(), NeuronDeltaeSentymentu(),
         # On-chain (OC) + Wash Trading (OC-05, OHLCV, bez API)
         NeuronMVRV(), NeuronSOPR(), NeuronPuellMultiple(), NeuronExchangeNetflow(),
         NeuronWashTrading(),
@@ -477,7 +482,7 @@ NEURONY_STYLU: dict = {
     "OC-06": _INV, "OC-07": _INV, "OC-08": _INV,
     # Reżim/Sentyment (R) — futures/Fear&Greed/RADAR/news/augur: kontekst na każdym TF
     "PSY-01": _U, "PSY-02": _U, "PSY-03": _U, "PSY-04": _U,
-    "RADAR-01": _U, "RADAR-02": _U, "RADAR-03": _U, "RADAR-04": _U, "RADAR-05": _U, "AUG-01": _U, "NEWS-01": _U, "NEWS-02": _U,
+    "RADAR-01": _U, "RADAR-02": _U, "RADAR-03": _U, "RADAR-04": _U, "RADAR-05": _U, "AUG-01": _U, "NEWS-01": _U, "NEWS-02": _U, "NEWS-03": _U, "NEWS-04": _U,
     # Meta-bramy reżimu/chaosu (H/N/V/D/L) — klasyfikują każdy interwał
     "H-01": _U, "N-01": _U, "N-02": _U, "V-13": _U, "V-14": _U, "D-01": _U, "L-14": _U, "VI-13": _U,
     # Anty-manipulacja (A) — uniwersalna obrona

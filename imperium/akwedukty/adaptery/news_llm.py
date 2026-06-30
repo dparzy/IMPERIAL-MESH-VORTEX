@@ -33,6 +33,7 @@ from imperium.akwedukty.adaptery.baza import AdapterDanych
 from imperium.akwedukty.klasyfikator_zdarzen import klasyfikuj as _klasyfikuj_zdarzenia
 from imperium.legiony.neurony.sentyment import NeuronSentymentNews
 from imperium.legiony.neurony.zdarzenia import NeuronTaksonomiaZdarzen
+from imperium.legiony.neurony.news_dynamika import NeuronDeltaeSentymentu, NeuronSpikeUwagi
 
 logger = logging.getLogger("Adapter")
 
@@ -92,8 +93,10 @@ class AdapterNewsLLM(AdapterDanych):
     """
     NAZWA = "NewsLLM(DeepSeek+fallback)"
     KLUCZE = ["NEWS_SENTYMENT", "NEWS_PEWNOSC", "NEWS_N",
-              "NEWS_EVENT_KIERUNEK", "NEWS_EVENT_TYP", "NEWS_EVENT_PEWNOSC"]
-    _NEURONY = (NeuronSentymentNews, NeuronTaksonomiaZdarzen)
+              "NEWS_EVENT_KIERUNEK", "NEWS_EVENT_TYP", "NEWS_EVENT_PEWNOSC",
+              "NEWS_SENTYMENT_DELTA", "NEWS_ATTENTION_SPIKE"]
+    _NEURONY = (NeuronSentymentNews, NeuronTaksonomiaZdarzen,
+                NeuronDeltaeSentymentu, NeuronSpikeUwagi)
     _POWOD_USPIENIA = "Wymaga feedu newsów (AdapterNewsLLM — RSS/API + LLM/fallback)."
 
     def __init__(
@@ -111,6 +114,11 @@ class AdapterNewsLLM(AdapterDanych):
         self._fetcher = fetcher or (lambda symbol: [])
         self.uzyj_llm = uzyj_llm
         self._glos = glos
+        # Stan kroczący per symbol (do NEWS-03 spike uwagi + NEWS-04 Δ sentymentu).
+        # Adapter żyje przez całą pętlę (live/backtest) → pamięta poprzednie wartości.
+        from collections import deque, defaultdict
+        self._hist_sent = defaultdict(lambda: deque(maxlen=10))   # poprzednie sentymenty
+        self._hist_n = defaultdict(lambda: deque(maxlen=20))      # poprzednia liczba nagłówków
 
     # ── Klasyfikacja słownikowa (offline, deterministyczna) ───────────────────
 
@@ -211,11 +219,30 @@ class AdapterNewsLLM(AdapterDanych):
         zdarz = _klasyfikuj_zdarzenia(naglowki)
         kier = zdarz["kierunek"] if zdarz["typ"] != "BRAK" else None
 
+        sent = wynik["sentyment"]
+        n = len(naglowki)
+
+        # NEWS-04: Δ sentymentu = bieżący − średnia z historii (momentum informacyjny).
+        # Liczone WZGLĘDEM przeszłości (przed dopisaniem bieżącego). Brak historii → None.
+        hist_s = self._hist_sent[symbol]
+        delta = round(sent - (sum(hist_s) / len(hist_s)), 4) if hist_s else None
+
+        # NEWS-03: spike uwagi = bieżąca liczba nagłówków / średnia historyczna (≥1 = normalnie).
+        hist_n = self._hist_n[symbol]
+        srednia_n = (sum(hist_n) / len(hist_n)) if hist_n else 0.0
+        spike = round(n / srednia_n, 4) if srednia_n > 0 else None
+
+        # dopisz bieżące do historii (po obliczeniu Δ/spike względem przeszłości)
+        hist_s.append(sent)
+        hist_n.append(n)
+
         return {
-            "NEWS_SENTYMENT": wynik["sentyment"],
+            "NEWS_SENTYMENT": sent,
             "NEWS_PEWNOSC": wynik["pewnosc"],
-            "NEWS_N": len(naglowki),
+            "NEWS_N": n,
             "NEWS_EVENT_KIERUNEK": kier,
             "NEWS_EVENT_TYP": zdarz["typ"] if kier is not None else None,
             "NEWS_EVENT_PEWNOSC": zdarz["pewnosc"] if kier is not None else None,
+            "NEWS_SENTYMENT_DELTA": delta,
+            "NEWS_ATTENTION_SPIKE": spike,
         }

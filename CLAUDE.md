@@ -5,7 +5,7 @@
 ## 📜 Konstytucja
 
 Pełne prawa: [`ZASADY_FUNDAMENTALNE.md`](./ZASADY_FUNDAMENTALNE.md).
-Każda decyzja musi być zgodna z **24 Prawami Imperium**.
+Każda decyzja musi być zgodna z **25 Prawami Imperium**.
 
 ## ♾️ DZIENNIK NIEŚMIERTELNY (ROZKAZ STAŁY — Cezar 2026-06-28)
 

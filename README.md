@@ -26,8 +26,8 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **81 zaimplementowane** (74 aktywnych: OHLCV momentum/trend/wolumen + SES-01/02 + 3 SMC + 6 kat. R + NEWS-01 + V-03 CVD + Z-01..05 brama obronna + X-27 Value + X-28 MTF Confluence + OC-05 WashTrading + **W-322: V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile/VPOC, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top** + **W-329: RADAR-04 kaskada korelacyjna + RADAR-05 lead-lag BTC→alty** + **W-335: C-01 Cross-sectional Relative Strength** + **W-336: CP-01 CUSUM change-point** + **W-338: BOCPD-01 Bayesian change-point** + **W-339: N-02 Fractional Differentiation**; 4 czeka na on-chain API) |
-| **Zwiadowcy Exploratores (EXP)** | **12** (EXP-01..12; 11 aktywnych + EXP-12 wyciszony do feedu L2) |
+| **Mikro-neurony** | **81 zaimplementowane** (75 aktywnych: OHLCV momentum/trend/wolumen + SES-01/02 + 3 SMC + 6 kat. R + NEWS-01 + V-03 CVD + Z-01..05 brama obronna + X-27 Value + X-28 MTF Confluence + OC-05 WashTrading + **W-322: V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile/VPOC, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top** + **W-329: RADAR-04 kaskada korelacyjna + RADAR-05 lead-lag BTC→alty** + **W-335: C-01 Cross-sectional Relative Strength** + **W-336: CP-01 CUSUM change-point** + **W-338: BOCPD-01 Bayesian change-point** + **W-339: N-02 Fractional Differentiation**; 4 czeka na on-chain API) |
+| **Zwiadowcy Exploratores (EXP)** | **15** (EXP-01..15; 13 aktywnych + 2 wyciszone do feedu) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
 | **Generał Legatus** | agregacja głosów + wagi reżimowe + odpalanie zwiadowców |

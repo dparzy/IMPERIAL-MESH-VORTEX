@@ -63,6 +63,7 @@ def backtest(
     sl_atr_mult: "Optional[float]" = None,
     mtf_konfluencja: bool = False,
     mtf_weto_przeciwtrend: bool = False,
+    mierz_ic: bool = False,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -123,6 +124,14 @@ def backtest(
         from imperium.biblioteki.hedge_mwu import HedgeMWUzPamieciaRezimu
         mwu = HedgeMWUzPamieciaRezimu(eta=0.3, alpha_share=0.02)
 
+    # W-385 Pomiar IC roju (opt-in, Prawo XVI): Spearman(sygnał_neuronu_t, zwrot_{t+h}).
+    # Mierzy realną przewagę predykcyjną KAŻDEGO neuronu (w tym NEWS-01..04, gdy mają feed).
+    # Zero look-ahead: sygnał_t paruje z PRZYSZŁYM zwrotem; rejestr po decyzji.
+    kol_ic = None
+    if mierz_ic:
+        from imperium.legiony.metryki_ic import KolektorIC
+        kol_ic = KolektorIC()
+
     wejscia = 0
     weta = 0
     krzywa_equity: List[float] = []   # equity po każdym barze (dla bramki W-282)
@@ -169,6 +178,22 @@ def backtest(
                     if s.kierunek in ("LONG", "SHORT")]
         elif decyzja.etap in ("PRETORIANIE_WETO", "LEGATUS_WETO"):
             weta += 1
+
+        # Pomiar IC (W-385): sygnał_t (kierunek×pewność) + zwrot wejściowy bieżącego baru.
+        # Kolektor paruje sygnał_t z zwrotem_{t+h} (przyszłym) — bez look-ahead.
+        if kol_ic is not None and decyzja.raport is not None:
+            sygnaly_ic = {
+                s.neuron_id: (s.pewnosc if s.kierunek == "LONG"
+                              else -s.pewnosc if s.kierunek == "SHORT" else 0.0)
+                for s in decyzja.raport.sygnaly}
+            kol_ic.rejestruj_sygnal(sygnaly_ic)
+            poprz = bary[i - 1]["close"]
+            kol_ic.rejestruj_zwrot(biezacy["close"] / poprz - 1 if poprz else 0.0)
+
+    # Pomiar IC (W-385): dołącz raport do silnika (Prawo XVI — przewaga mierzona).
+    if kol_ic is not None:
+        engine.ic_srednie = kol_ic.ic_srednie()
+        engine.ic_pelne = kol_ic.ic()
 
     # 3. Zamknij pozostałe otwarte po ostatniej cenie
     ostatnia_cena = {symbol: bary[-1]["close"]}

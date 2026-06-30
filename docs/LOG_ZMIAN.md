@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-30 | POMIAR | 📊 W-385: IC roju w backteście — fundament Prawa XVI
+
+Cezar: „dawaj". Logowanie/pomiar predykcyjności newsów. UCZCIWIE (Prawo I): brak historycznych
+danych newsów → newsów nie da się zbacktestować TERAZ. Ale infrastruktura pomiaru wpięta dla
+CAŁEGO roju — NEWS-01..04 dołączą automatycznie, gdy popłynie feed (lokal+RSS/DeepSeek).
+
+Reuse (Prawo XVI — nie dublujemy): `KolektorIC` (W-369, Spearman) i `_spearman` już istniały,
+ale NIE były wpięte nigdzie. Teraz `backtest(mierz_ic=True)` zbiera sygnał_t każdego neuronu
+(kierunek×pewność) i paruje z PRZYSZŁYM zwrotem_{t+h} — zero look-ahead (sygnał nie widzi t+h).
+
+- `imperium/koloseum/backtest.py`: opt-in `mierz_ic` → `engine.ic_srednie` + `engine.ic_pelne`.
+  Domyślnie False (zero narzutu). Zmierzone na syntetyku: 34/91 neuronów z IC; NEWS-01..04 śledzone.
+- +4 testy (raport dołączony, NEWS objęte, zakres [-1,1], brak narzutu gdy off). 1873→1877.
+
+To domyka „metody treningowe": każdy neuron (w tym news) dostaje MIERZALNĄ przewagę
+predykcyjną (IC) zanim dostanie większą wagę — zgodnie z Prawem XVI i nowym Prawem XXV.
+
+---
+
 ## 2026-06-30 | NEURONY+PRAWO | 📈 NEWS-03/04 dynamika newsów + PRAWO XXV (W-382)
 
 Cezar: „dawaj wszystko". Dwa neurony dynamiki + zatwierdzona zasada przewagi.

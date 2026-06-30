@@ -22,16 +22,19 @@
 | A6 | **Sequential-Thinking MCP** 💎 | ⏳ nie skonfigurowany | średni | Ustrukturyzowane rozumowanie krok po kroku |
 | A7 | **SQLite MCP** ⚡ | ⏳ nie skonfigurowany | średni | Zapytania SQL do wyników backtestów bezpośrednio |
 
-### A2. Wydajność — WĄSKIE GARDŁO CPU (backtest 8 min → ~40 s)
+### A2. Wydajność — WĄSKIE GARDŁO CPU (zmierzone, nie zgadywane — Prawo XXI)
 
-| Optymalizacja | Zysk | Priorytet |
-|---------------|------|-----------|
-| **Cache sygnałów** ⚡ | ~5-7× szybszy | 🥇 NAJWYŻSZY |
-| **multiprocessing po parach** ⚡ | ~6-8× szybszy | 🥇 NAJWYŻSZY |
-| **Snapshot sygnałów .npy** ⚡ | eliminacja re-kalkulacji | wysoki |
-| **Numba/JIT na GARCH** ⚡ | ~3-4× na wskaźnikach | wysoki |
+| Optymalizacja | Zysk (zmierzony) | Status |
+|---------------|------------------|--------|
+| **Cache wskaźników** (`cache_wskaznikow`, `prekalkuluj_portfel` multiprocessing) | **~1.4×** (3 pary/400 barów, wyniki IDENTYCZNE) | ✅ wdrożone + wpięte w sweepy AB (2026-06-28) |
+| **multiprocessing po parach (pętla portfela)** | — | ❌ NIEMOŻLIWE: portfel dzieli kapitał między pary → równoległość łamie semantykę |
+| **Snapshot sygnałów .npy** ⚡ | eliminacja re-kalkulacji | ⏳ wysoki |
+| **Numba/JIT na GARCH** ⚡ | ~3-4× na wskaźnikach | ⏳ wysoki |
 
-Razem: sweep z **8 minut → ~30-40 sekund**.
+**Korekta (2026-06-28):** wcześniejsze „6-8×" było aspiracyjne. Pomiar: cache wskaźników
+daje **1.4×** (prekalkulacja równoległa; pętla barów dominuje czas i pozostaje seryjna,
+bo pary współdzielą kapitał portfela). Realny dalszy zysk wymaga Numba/JIT na wskaźnikach
+lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ### B. Dane wejściowe (feedy rynkowe)
 

@@ -153,3 +153,69 @@ if __name__ == "__main__":
             print(f"  ❌ {nazwa}: {e}")
     print(f"\n{len(fn)-bledy}/{len(fn)} zaliczone")
     sys.exit(1 if bledy else 0)
+
+
+# ── W-380: JIT Viterbi (Numba opcjonalna, wynik identyczny z fallback) ─────────
+
+def _viterbi_ref(xs, c, kara):
+    """Referencyjna czysto-numpy wersja DP — wyrocznia poprawności dla JIT."""
+    t = len(xs); k = len(c)
+    emis = ((xs[:, None, :] - c[None, :, :]) ** 2).sum(2)
+    koszt = np.empty((t, k)); wst = np.zeros((t, k), int); koszt[0] = emis[0]
+    for i in range(1, t):
+        zo = koszt[i - 1]; nj = koszt[i - 1].min() + kara
+        for m in range(k):
+            if zo[m] <= nj:
+                koszt[i, m] = zo[m] + emis[i, m]; wst[i, m] = m
+            else:
+                koszt[i, m] = nj + emis[i, m]; wst[i, m] = int(np.argmin(koszt[i - 1]))
+    s = np.empty(t, int); s[-1] = int(np.argmin(koszt[-1]))
+    for i in range(t - 2, -1, -1):
+        s[i] = wst[i + 1, s[i + 1]]
+    return s
+
+
+def test_viterbi_core_identyczny_z_referencja():
+    """JIT-owany rdzeń = referencyjna numpy (ten sam wynik, niezależnie od numby)."""
+    from imperium.legiony.jump_model import _viterbi_core
+    rng = np.random.default_rng(11)
+    xs = np.ascontiguousarray(np.vstack([
+        rng.normal(-2, 0.5, (120, 2)),
+        rng.normal(2, 0.5, (120, 2)),
+    ]))
+    c = np.ascontiguousarray(xs[rng.choice(len(xs), 3, replace=False)].copy())
+    for kara in (0.0, 5.0, 20.0, 100.0):
+        r_jit = _viterbi_core(xs, c, float(kara))
+        r_ref = _viterbi_ref(xs, c, kara)
+        assert np.array_equal(r_jit, r_ref), f"Rozbieżność JIT vs ref dla kara={kara}"
+
+
+def test_njit_fallback_no_op_bez_numby():
+    """Gdy numba niedostępna, njit zwraca funkcję bez zmian (no-op dekorator)."""
+    import importlib
+    import imperium.legiony._jit as jit_mod
+    # symuluj brak numby: podmień flagę i zbuduj nowy dekorator jak w fallbacku
+    oryg = jit_mod.NUMBA_DOSTEPNA
+    try:
+        jit_mod.NUMBA_DOSTEPNA = False
+        @jit_mod.njit(cache=True)
+        def f(x):
+            return x * 2
+        assert f(21) == 42                      # działa jako czysty Python
+        @jit_mod.njit
+        def g(x):
+            return x + 1
+        assert g(41) == 42                      # forma bez nawiasów też
+    finally:
+        jit_mod.NUMBA_DOSTEPNA = oryg
+        importlib.reload(jit_mod)
+
+
+def test_dopasuj_deterministyczny_z_jit():
+    """dopasuj() z JIT zwraca stabilny, deterministyczny wynik (seed)."""
+    rng = np.random.default_rng(5)
+    xs = np.vstack([rng.normal(-3, 0.4, (100, 2)), rng.normal(3, 0.4, (100, 2))])
+    s1 = JumpModel(n_stanow=2, kara_skoku=10.0, seed=1).dopasuj(xs)
+    s2 = JumpModel(n_stanow=2, kara_skoku=10.0, seed=1).dopasuj(xs)
+    assert np.array_equal(s1, s2)
+    assert len(set(s1.tolist())) == 2          # wykrył 2 reżimy

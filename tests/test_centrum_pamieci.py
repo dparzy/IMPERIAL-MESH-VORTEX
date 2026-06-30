@@ -553,3 +553,62 @@ def test_rejestr_wizji_dedup_wylaczony(tmp_path):
     rw.dodaj("ZMIANA", "X", "a", plik=plik)
     assert rw.dodaj("ZMIANA", "X", "b", plik=plik, dedup=False) is True
     assert len(rw.wszystkie(plik=plik)) == 2
+
+
+# ── W6 Dziennik Nieśmiertelny (dożywotnia oś czasu) ──────────────────────────
+
+def test_dziennik_dopisz_i_wczytaj(tmp_path):
+    from imperium.biblioteki import dziennik_niesmiertelny as dn
+    plik = tmp_path / "dz.jsonl"
+    assert dn.dopisz(["zrobiono X"], ["decyzja Y"], "krok Z", sesja="abc123", data="2026-06-28", plik=plik)
+    w = dn.wszystkie(plik=plik)
+    assert len(w) == 1
+    assert w[0]["co"] == ["zrobiono X"]
+    assert w[0]["sesja"] == "abc123"
+    assert w[0]["nastepny"] == "krok Z"
+
+
+def test_dziennik_ostatni_wpis(tmp_path):
+    from imperium.biblioteki import dziennik_niesmiertelny as dn
+    plik = tmp_path / "dz.jsonl"
+    dn.dopisz(["a"], data="2026-06-01", plik=plik)
+    dn.dopisz(["b"], data="2026-06-02", plik=plik)
+    assert dn.ostatni_wpis(plik=plik)["co"] == ["b"]
+
+
+def test_dziennik_os_czasu_pelna(tmp_path):
+    from imperium.biblioteki import dziennik_niesmiertelny as dn
+    plik = tmp_path / "dz.jsonl"
+    dn.dopisz(["pierwszy krok"], data="2026-06-01", plik=plik)
+    dn.dopisz(["drugi krok"], data="2026-06-02", plik=plik)
+    txt = dn.os_czasu(plik=plik)
+    assert "pierwszy krok" in txt and "drugi krok" in txt
+    assert "2 sesji" in txt
+
+
+def test_dziennik_os_czasu_skraca_starsze(tmp_path):
+    from imperium.biblioteki import dziennik_niesmiertelny as dn
+    plik = tmp_path / "dz.jsonl"
+    for i in range(5):
+        dn.dopisz([f"krok {i}"], nastepny=f"next {i}", data=f"2026-06-0{i+1}", plik=plik)
+    txt = dn.os_czasu(ostatnie=2, plik=plik)
+    # najnowsze 2 mają 'następny', starsze są jednolinijkowe (bez 'następny')
+    assert "next 4" in txt and "next 3" in txt
+    assert "next 0" not in txt
+
+
+def test_dziennik_szukaj_po_slowach(tmp_path):
+    from imperium.biblioteki import dziennik_niesmiertelny as dn
+    plik = tmp_path / "dz.jsonl"
+    dn.dopisz(["wdrożono Numba JIT na wskaźnikach"], data="2026-06-01", plik=plik)
+    dn.dopisz(["coś zupełnie innego"], data="2026-06-02", plik=plik)
+    wyniki = dn.szukaj("numba wskaźniki", plik=plik)
+    assert wyniki and "Numba" in wyniki[0]["co"][0]
+
+
+def test_dziennik_brak_wpisu_dzis(tmp_path):
+    from imperium.biblioteki import dziennik_niesmiertelny as dn
+    plik = tmp_path / "dz.jsonl"
+    assert dn.brak_wpisu_dzis(plik=plik) is True   # pusty
+    dn.dopisz(["x"], plik=plik)                      # dziś
+    assert dn.brak_wpisu_dzis(plik=plik) is False

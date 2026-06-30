@@ -1,0 +1,10469 @@
+{
+ "wezly": {
+  "auto-lekcja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "auto_lekcja": {
+   "liczba": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "cezara": {
+   "liczba": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  "decyzji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "deepseek": {
+   "liczba": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-28"
+  },
+  "ekstrahuje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "flat": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "hooku": {
+   "liczba": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-28"
+  },
+  "jsonl": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "krok": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  "kroniki": {
+   "liczba": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-28"
+  },
+  "lekcje": {
+   "liczba": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  "opcja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "pamięci": {
+   "liczba": 13,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  "pomysłów": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "recency": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  "rejestr": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  "relevance": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  "rozbudowa": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "scoring": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  "sesji": {
+   "liczba": 6,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "w-360": {
+   "liczba": 10,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  "wizji": {
+   "liczba": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "zamiast": {
+   "liczba": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  "zgoda": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "zmian": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  "blokuje": {
+   "liczba": 3,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  "chmura": {
+   "liczba": 4,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  "deduplikacja": {
+   "liczba": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "domknięcie": {
+   "liczba": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  "huggingface": {
+   "liczba": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  "książki": {
+   "liczba": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  "lekcji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "lokal": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  "lokalnie": {
+   "liczba": 10,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  "most": {
+   "liczba": 5,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  "podpięte": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "podpięty": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "proxy": {
+   "liczba": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "refleksje": {
+   "liczba": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "rynkowe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "srodowisko_pamieci": {
+   "liczba": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "szukaj_wszedzie": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  "unikat": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  "warstw": {
+   "liczba": 8,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  "wektory": {
+   "liczba": 9,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  "środowiskowy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "214kb": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "24kb": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "audyt": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-28"
+  },
+  "cała": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "dialog": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  "ginie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "kronika": {
+   "liczba": 5,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  "mtime": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "naprawa": {
+   "liczba": 3,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-28"
+  },
+  "praca": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "re-eksportuje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "repo": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  "rosnącą": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "sesja_895ce14f": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "sesję": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "stanu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "trafiła": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "true": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "tylko_nowe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "świeższe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "źródło": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "cache": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "cache_wskaznikow": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "czasu": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "dożywotnia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "dziennik": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "dziennika": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "fraza": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "identyczne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "kandydat": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  "kapitał": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "każdej": {
+   "liczba": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  "kodu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "końcu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "krytyczna": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  "niezrobiona": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "nieśmiertelny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "numba": {
+   "liczba": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  "pisać": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "pisze": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "portfela": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "pętli": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "realny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "requirements": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "rozkaz": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "sprawdzone": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "starcie": {
+   "liczba": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "stały": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "sufit": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "sweepów": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "słowach": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "trafień": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wdrożenia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wdrożenie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wpis": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wpięty": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wskaźnikach": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "współdzielony": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wstrzykiwana": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wydajności": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wydajność": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wyszukiwarka": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "zaimplementowana": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "zero": {
+   "liczba": 5,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  "zrównoleglić": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "zysk": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-28"
+  },
+  "021ms": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "36ms": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "_jit": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "backtestu": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "bocpd": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "fallback": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "frac_diff": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "garch": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "identyczny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "jako": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "jeśli": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "jit-owany": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "jump": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "lfilter": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "model": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  "niej": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "njit": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "no-op": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "numpy": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "odhaczona": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "opcjonalna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "pokaże": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "pomiarem": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "prawo": {
+   "liczba": 9,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  "profil": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  "rdzeniu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "scipy": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "używa": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "viterbi": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "w-380": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wdrożona": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wybrany": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wynik": {
+   "liczba": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "zgadywaniem": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "zmierzona": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "anti-blindness": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "auto-kompresja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "bezgraniczna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "blindness": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "bounded": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "census": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "context": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "czytelność": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "dylemat": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "gotowy": {
+   "liczba": 4,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  "katalog": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "kompresja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "kompresuję": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "kustosz": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "kustosz_pamieci": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "literatury": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "masowo": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "mechanizm": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "memory": {
+   "liczba": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  "nadrzędny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "organ": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "pamięć": {
+   "liczba": 6,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  "przedwczesne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "przekroczy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "przeszukiwalna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "próg": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "routing": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "rozwiązuje": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  "semantyczny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "storage": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "tematy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "traci": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  "warstwami": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "warstwy": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "wzrost": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "zapytań": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "zimnej": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "a-mem": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  "arxiv": {
+   "liczba": 4,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "auto-rebuild": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "centralne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "czasowe": {
+   "liczba": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "danymi": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "deterministyczny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "dodaje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "does": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "encje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "globalny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "graf": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "graf_pamieci": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "grafu": {
+   "liczba": 3,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  "graphiti": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  "graphs": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "krawędzie": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "kustoszem": {
+   "liczba": 5,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "maleje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "memos": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "need": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "neuronów": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "okno": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "ostrzeje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "polaczenia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "połączenia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "połączeń": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "przybywa": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "pytania": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "relacyjna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "relacyjne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "research": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "retrievalu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "sciezka-bfs": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "semantyczne": {
+   "liczba": 4,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  "soczewka": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "sota": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "szum": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "temporalny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "tsinghua": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "uczciwie": {
+   "liczba": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  "w1-w7": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "wiedzy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "współwystąpienia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "współwystąpień": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "węzły": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "zastępuje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  "anty-utrwalanie": {
+   "liczba": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "błąd": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  "czasie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "decyduje": {
+   "liczba": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "deep": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "deterministyczna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "domenowa": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "forgetting": {
+   "liczba": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "granicy": {
+   "liczba": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "jesteśmy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "kasuje": {
+   "liczba": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "kierunek": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "kombinacja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "kompletna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "learned": {
+   "liczba": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "moduł": {
+   "liczba": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  "najlepsi": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "nigdy": {
+   "liczba": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  "pomysły": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "przeciwny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "przedawnień": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "przedawnione": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "przewaga": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "reflection": {
+   "liczba": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "refleksja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "refleksja_pamieci": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "rozstrzygnięte": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "selektywne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "sprzeczne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "sprzeczności": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "statusu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "testów": {
+   "liczba": 5,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  "trustworthy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "utrwalić": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "ważności": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  "wykrywanie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "zgłasza": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "świecie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "causal": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "chronione": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "contradiction": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "domknięty": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "indeksuj": {
+   "liczba": 4,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  "mądre": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "plany": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "problem": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "proponuje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "retencja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "retrieval": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  "safe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "schłodzenie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "trzeci": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "wartościowe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "ważność": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "zapominanie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "zbudować": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "łączność_w_grafie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "świeżość": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "aktywny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "coala": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "cyklu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "czwórka": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "czyta": {
+   "liczba": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "domknięta": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "epizodyczna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "kosztu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "odpalić": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "pamiec_proceduralna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "pamiec_robocza": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "pełna": {
+   "liczba": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  "pilne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "pliku": {
+   "liczba": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "proceduralna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "procedury": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "proweniencja": {
+   "liczba": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "redundancja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "robocza": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "runbooki": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "semantyczna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "taksonomii": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "utrzymania": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "własnego": {
+   "liczba": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "ziarna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "2026-06-21": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "atrybucją": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "credit": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "danych": {
+   "liczba": 3,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  "geneza": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "jednego": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "konsolidacja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "pamiec_proweniencji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "pierwsze": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "pochodzenia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "pojęcia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "provenance-aware": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "proweniencji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "przeglądu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "raport": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "redundancji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "skąd": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "temporal": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  "ugruntowane": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "ugruntowanie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "wiemy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "wszystkie": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  "wystąpienie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "ślad": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "źródła": {
+   "liczba": 1,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  "audytu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "chmura-lokal": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "fasadzie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "manifest": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "nowy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "podpięto": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "rejestr_wizji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "chmurze": {
+   "liczba": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  "czeka": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "lokalne": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-26"
+  },
+  "odblokuje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "uruchomienie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  "zablokowany": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  "18-letni": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "978-0-85719-857-0": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "979-8-87385-994-8": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "agentem": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "antywzorca": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bib-001": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bib-005": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bib-012": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bib-024": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "blum": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "capital": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "coding": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "cykl": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "dopisany": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "dział": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "działów": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "esencja": {
+   "liczba": 3,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "faktyczna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "fałszywie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "głęboki": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "index": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "index_maior": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "kanon": {
+   "liczba": 3,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "kanonie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "kanonu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "każdą": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "książek": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "lekcja": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  "lowe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "macierz": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "metodologiczna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "naprawione": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  "nieruchomości": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "oznaczeniem": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "patel": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "plik": {
+   "liczba": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  "pliki": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "pokrycia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "pokryte": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "prawdziwe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "przeczytano": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "przypisania": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "przypisaniem": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "reguła": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "self-pub": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "sierot": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "sierota": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "sieroty": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "sierotę": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "sprawdzaj": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "tytułu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "uśrednianie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "wszystkich": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  "wyglądał": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "wykryła": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "zlecił": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "agentów": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "anty-tip": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "anty-uśrednianie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "aversion": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "backtest": {
+   "liczba": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  "basel": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bernstein": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bezpieczniki": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bias": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bib-037": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bundel": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "call": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "codziennie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "crypto": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "częstotliwość": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "dopłaca": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "ekstrakcja": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "epub": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "ewma": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "expected": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "fear": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "funding": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  "grubych": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "halt": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "hope": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "hull": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "incerto": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "initial": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "isbn": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "jorion": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "katastrofa": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "klasyków": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "korelacja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "krypto": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "lehman": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "loss": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "magnituda": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "maintenance": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "margin": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "nieobecna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "odwrócone": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "ogona": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "ogonów": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "perpetual": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "plikach": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "pokrywa": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "pozycji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "proces": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "pułapki": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "regresji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "schwager": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "shortfall": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "strefy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "survivorship": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "symbioza": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "taleb": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "taleba": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "tight": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "twardy": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  "undertrade": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "uzasadnia": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "wgrał": {
+   "liczba": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "zweryf": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "średniej": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "--hard": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "3-warstwowa": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "978-1-63343-654-1": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "agents": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  "agenty": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "alto": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "analiza": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "applications": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "auto-mode": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "azw3": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bib-033": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bib-034": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bibliotheca-rag": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  "blueprint": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "bm25": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  "branchu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "buffer": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "building": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "checkout": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "checkpoint": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "compound": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "condense_question": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "cross-encoderem": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "dense": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "domknięcia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "engineer": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "engineering": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "entity": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "fifo": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "fine-tuning": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "handbook": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "hedge-fund": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "huyen": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "hybrid": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "infante": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "internal": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "isbn-y": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "iusztin": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "konceptów": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "labonne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "long": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  "main": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "mapa": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  "market": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "merge": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "michael": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "mistakes": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "mocniejszy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "nadpisuje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "największy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "origin": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "powered": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "pułapka": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "quant": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "reranking": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "reset": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "roberto": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "roboczym": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "router": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "równoległe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "search": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "senat": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "short": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  "stan": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "stock": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "summary": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "supervisor": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "sync": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "taksonomia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "techniczna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "tickery": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "uwaga": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "warstwowy": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  "zanik": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  "zweryfikowano": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "łapie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "świeżości": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "świeżych": {
+   "liczba": 1,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  "_decay": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "_decay_dla_waznosci": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "auto-konsolidacja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "auto-linki": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "błędnie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "centrum_pamieci": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "ciągła": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "cytował": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "decay": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "dual-reflection": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "finagent": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "finmem": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "funkcja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "granic": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "głęboka": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "imperium": {
+   "liczba": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  "jeden": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "kompakcję": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "kubełki": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "layered": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "mamy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "martwy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "mem-01": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "mem-02": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "mem-03": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "mem-04": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "mem0": {
+   "liczba": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "naprawia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "pełny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "plan": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "potencjału": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "przeżywa": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "pytanie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "płytka": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "rutyna": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "rynku": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "scan": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "szybko": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "tempo": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "testy": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  "usunięty": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "utrata": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "wcześniej": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "wdrożone": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "wdrożony": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "websearch": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "weryfikacja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "zależy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "zanikała": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "zaniku": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "żywo": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "3-tier": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "99mb": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "bi-temporal": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "centrum": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "chmury": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "cosine": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "doing": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "episodic": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "filtr": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "generative": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "heurystyka": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "historię": {
+   "liczba": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  "importance": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "invalidation": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "jaccard": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "jednym": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "kluczowych": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "knowing": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "kronika_czatu": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "label": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "lekcje_scope": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "logs": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "mem0-style": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "memex": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "metadata": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "niesie": {
+   "liczba": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "ostatnie-n": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "park": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "per-agent": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "potrzeba": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "puste": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "regime": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "regime-stale": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "relevancy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "reżimu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "rynek": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "score": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "scored": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "semantic": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "skuteczność": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "sorted": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "summaries": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "słów": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "top_lekcji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "tradinggpt": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "zapytaniu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "zmianie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "148mb": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "aktualizuj_lekcje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "alarm_przepelnienia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "append": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "architektonicznie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "braki": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "cognee": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "crud": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "czatu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "czystego": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "delete": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "destyluje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "dialogu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "docs": {
+   "liczba": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  "fts5": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  "hermes": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "hermes-style": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "hermesem": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "hook": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  "kluczy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "konkurencją": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "kontenera": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "limit": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  "limit_znakow_lekcja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "markdown": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  "memgpt": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "nasza": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "noop": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "odpowiednik": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "paging": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "porównanie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "profil_cezara": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "przyrostowa": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "później": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "raptor": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "rdzeń": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "redakcja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "rozważenia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "sekcji": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  "transkryptów": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "tree-summary": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "ulotność": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "update": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "user": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "usun_lekcje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "użytkownika": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "warstwa": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  "wniosek": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  "wpięta": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "wstrzykiwany": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "zaadoptowane": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "zbiegła": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "zwięzłości": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "środowisko": {
+   "liczba": 1,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  "biblioteki": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "ciągłość": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "czytelny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "dane": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "dopisanie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "dopisz_lekcje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "granice": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "indeksowany": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "kompakcji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "koniec": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "kontekstu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "korpus": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "mapa_podpiec": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "mnemosyne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "natywny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "nieistniejącej": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "nietestowalny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "node": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "ostatnie": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "pamiec_sesji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "podsumowanie_startowe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "prawdy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "pusty": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "python": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "roundtrip": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "sessionstart": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "szukaj": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "transakcje": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "utraty": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "wpięte": {
+   "liczba": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "wyświetlane": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "zewnętrznego": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "--tylko-nowe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "biblioteka": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "biblioteka_info": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "biblioteka_szukaj": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "cloud": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "dokumentacja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "działają": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "fragmentów": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "infinite": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "json": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "korpusy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "loop": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "max_slow": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "opcjonalne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "overlap": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "podziel_na_chunki": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "przyrostowy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "server": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "topk": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "tryb": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "zapytanie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "zbudowany": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "źródeł": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "531k": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "barów": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "calls": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "cprofile": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "czyste": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "for-loop": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "gammaln": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "gardło": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "gjr-garch": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "lecz": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "lgamma": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "log_w": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "loops": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "math": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "multiprocessing": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "opt-in": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "pary": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "prekalkulacja": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "profiler": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "recursion": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "signal": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "special": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "speedup": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "symbol": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "ta-lib": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "timeout": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "wektorowy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "wskaźników": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "wąskie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "zablokowana": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "abstynują": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "adapterfutures": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "adaptery": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "backfill": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "backfill_sentyment": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "backtest_portfel": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "backteście": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "binance": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "dodają": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "dyrygenta": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "factory": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "fapi": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "feargreed": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "forward_fill_na_bary": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "fundingrate": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "futures": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "historia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "historii": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "istnieją": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "kauzalny": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "live": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "luka": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "mierzalne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "mierzy": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "narzedzia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "neurony": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "niemierzalne": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "odkrycie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "odpala": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "openinteresthist": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "petla_live": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "pełną": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "pobierz_historie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "prawa": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "przewagę": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "psy-01": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "rozwiązanie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "sentyment_per": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "sentymentu": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "sieć": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "żyją": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "backward-ic": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "bear-shield": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "bear_2022": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "bull_2021": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "exp-13": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "finding": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "forward-ic": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "gate": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "globalnie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "kierunku": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "maxdd": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "najpierw": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "namiestnika": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "niedźwiedzia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "niedźwiedzie": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "opisują": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "poprawia": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "przewidują": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "range_2023": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "reżim": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "sharpe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "tarcza": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "walidacji": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "warunkowe": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "weto": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "wymaga": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  "wyników": {
+   "liczba": 1,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  }
+ },
+ "krawedzie": [
+  {
+   "a": "auto_lekcja",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "cezara",
+   "b": "lekcje",
+   "waga": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "cezara",
+   "b": "pamięci",
+   "waga": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "cezara",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "cezara",
+   "b": "rejestr",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "cezara",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "cezara",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "cezara",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "cezara",
+   "b": "zamiast",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "deepseek",
+   "b": "kroniki",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "deepseek",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "hooku",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "hooku",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "hooku",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "kroniki",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "lekcje",
+   "b": "pamięci",
+   "waga": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lekcje",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lekcje",
+   "b": "rejestr",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lekcje",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lekcje",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lekcje",
+   "b": "sesji",
+   "waga": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lekcje",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lekcje",
+   "b": "zamiast",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "pamięci",
+   "b": "recency",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "pamięci",
+   "b": "rejestr",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "pamięci",
+   "b": "relevance",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "pamięci",
+   "b": "scoring",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "pamięci",
+   "b": "sesji",
+   "waga": 5,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "pamięci",
+   "b": "w-360",
+   "waga": 9,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "wizji",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "pamięci",
+   "b": "zamiast",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "recency",
+   "b": "relevance",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "recency",
+   "b": "scoring",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "recency",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "recency",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "relevance",
+   "b": "scoring",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "relevance",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "relevance",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "scoring",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "scoring",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "sesji",
+   "b": "w-360",
+   "waga": 4,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "sesji",
+   "b": "zamiast",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "w-360",
+   "b": "wizji",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "blokuje",
+   "b": "chmura",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "blokuje",
+   "b": "huggingface",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "blokuje",
+   "b": "książki",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "blokuje",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "blokuje",
+   "b": "most",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "blokuje",
+   "b": "pamięci",
+   "waga": 3,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "blokuje",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "blokuje",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "blokuje",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "chmura",
+   "b": "deduplikacja",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "chmura",
+   "b": "huggingface",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "chmura",
+   "b": "lokal",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "chmura",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "chmura",
+   "b": "most",
+   "waga": 3,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "chmura",
+   "b": "pamięci",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "chmura",
+   "b": "refleksje",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "chmura",
+   "b": "srodowisko_pamieci",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "chmura",
+   "b": "szukaj_wszedzie",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "chmura",
+   "b": "w-360",
+   "waga": 3,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "chmura",
+   "b": "warstw",
+   "waga": 3,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "chmura",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "deduplikacja",
+   "b": "lokal",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "deduplikacja",
+   "b": "most",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "deduplikacja",
+   "b": "refleksje",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "deduplikacja",
+   "b": "srodowisko_pamieci",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "deduplikacja",
+   "b": "szukaj_wszedzie",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "deduplikacja",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "deduplikacja",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "domknięcie",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "domknięcie",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "domknięcie",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "domknięcie",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "domknięcie",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "huggingface",
+   "b": "książki",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "huggingface",
+   "b": "lokalnie",
+   "waga": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "huggingface",
+   "b": "most",
+   "waga": 3,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "huggingface",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "huggingface",
+   "b": "proxy",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "huggingface",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "huggingface",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "huggingface",
+   "b": "wektory",
+   "waga": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "książki",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "książki",
+   "b": "pamięci",
+   "waga": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "książki",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lokal",
+   "b": "most",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lokal",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lokal",
+   "b": "refleksje",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lokal",
+   "b": "srodowisko_pamieci",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lokal",
+   "b": "szukaj_wszedzie",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lokal",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lokal",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lokalnie",
+   "b": "most",
+   "waga": 3,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "pamięci",
+   "waga": 7,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "proxy",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lokalnie",
+   "b": "w-360",
+   "waga": 7,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "warstw",
+   "waga": 6,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "wektory",
+   "waga": 9,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "most",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "most",
+   "b": "proxy",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "most",
+   "b": "refleksje",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "most",
+   "b": "srodowisko_pamieci",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "most",
+   "b": "szukaj_wszedzie",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "most",
+   "b": "w-360",
+   "waga": 3,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "most",
+   "b": "warstw",
+   "waga": 3,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "most",
+   "b": "wektory",
+   "waga": 3,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "szukaj_wszedzie",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "pamięci",
+   "b": "unikat",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "pamięci",
+   "b": "warstw",
+   "waga": 7,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "wektory",
+   "waga": 7,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "proxy",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "refleksje",
+   "b": "srodowisko_pamieci",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "refleksje",
+   "b": "szukaj_wszedzie",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "refleksje",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "refleksje",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "srodowisko_pamieci",
+   "b": "szukaj_wszedzie",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "srodowisko_pamieci",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "srodowisko_pamieci",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "szukaj_wszedzie",
+   "b": "w-360",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "szukaj_wszedzie",
+   "b": "warstw",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "w-360",
+   "b": "warstw",
+   "waga": 8,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "w-360",
+   "b": "wektory",
+   "waga": 7,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "warstw",
+   "b": "wektory",
+   "waga": 6,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "cała",
+   "b": "naprawa",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "cała",
+   "b": "sesję",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "kronika",
+   "b": "repo",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "naprawa",
+   "b": "sesję",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "cache_wskaznikow",
+   "b": "numba",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "czasu",
+   "b": "numba",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasu",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "dziennik",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "dziennik",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "dziennika",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kandydat",
+   "b": "krytyczna",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "każdej",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "każdej",
+   "b": "starcie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "numba",
+   "b": "requirements",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "numba",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "sesji",
+   "b": "starcie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "sesji",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "backtestu",
+   "b": "bocpd",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "backtestu",
+   "b": "garch",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "backtestu",
+   "b": "lfilter",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "backtestu",
+   "b": "numba",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "backtestu",
+   "b": "numpy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "backtestu",
+   "b": "scipy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "backtestu",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "bocpd",
+   "b": "garch",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "bocpd",
+   "b": "lfilter",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "bocpd",
+   "b": "numba",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "bocpd",
+   "b": "numpy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "bocpd",
+   "b": "scipy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "bocpd",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "garch",
+   "b": "lfilter",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "garch",
+   "b": "numba",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "garch",
+   "b": "numpy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "garch",
+   "b": "scipy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "garch",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "lfilter",
+   "b": "numba",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "lfilter",
+   "b": "numpy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "lfilter",
+   "b": "scipy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "lfilter",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "model",
+   "b": "prawo",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "model",
+   "b": "profil",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "numba",
+   "b": "numpy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "numba",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "numba",
+   "b": "scipy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "numba",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "numpy",
+   "b": "scipy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "numpy",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "prawo",
+   "b": "profil",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "prawo",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "scipy",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "gotowy",
+   "b": "lokalnie",
+   "waga": 3,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "gotowy",
+   "b": "pamięci",
+   "waga": 3,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "gotowy",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "gotowy",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "gotowy",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "gotowy",
+   "b": "wektory",
+   "waga": 3,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "katalog",
+   "b": "kronika",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "katalog",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "katalog",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "katalog",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "katalog",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "katalog",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "katalog",
+   "b": "warstwy",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "katalog",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "katalog",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kronika",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kronika",
+   "b": "memory",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "kronika",
+   "b": "pamięci",
+   "waga": 4,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kronika",
+   "b": "pamięć",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kronika",
+   "b": "prawo",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kronika",
+   "b": "rozwiązuje",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "kronika",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "kronika",
+   "b": "traci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "kronika",
+   "b": "w-360",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kronika",
+   "b": "warstwy",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kronika",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kronika",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "memory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "lokalnie",
+   "b": "pamięć",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "prawo",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "lokalnie",
+   "b": "warstwy",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "zero",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "memory",
+   "b": "pamięci",
+   "waga": 4,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "memory",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "memory",
+   "b": "prawo",
+   "waga": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "memory",
+   "b": "rozwiązuje",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "memory",
+   "b": "sesji",
+   "waga": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "memory",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "memory",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "pamięci",
+   "b": "pamięć",
+   "waga": 6,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "prawo",
+   "waga": 7,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "rozwiązuje",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "pamięci",
+   "b": "traci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "pamięci",
+   "b": "warstwy",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "zero",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięć",
+   "b": "prawo",
+   "waga": 6,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięć",
+   "b": "rozwiązuje",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "pamięć",
+   "b": "w-360",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięć",
+   "b": "warstwy",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięć",
+   "b": "wektory",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięć",
+   "b": "zero",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "prawo",
+   "b": "rozwiązuje",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "prawo",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "prawo",
+   "b": "w-360",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "prawo",
+   "b": "warstwy",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "prawo",
+   "b": "wektory",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "prawo",
+   "b": "zero",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "sesji",
+   "b": "traci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "sesji",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "traci",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "w-360",
+   "b": "warstwy",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "w-360",
+   "b": "zero",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "warstwy",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "warstwy",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "wektory",
+   "b": "zero",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "a-mem",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "arxiv",
+   "b": "czasowe",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "graf",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "kustoszem",
+   "waga": 4,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "lokalnie",
+   "waga": 4,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "okno",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "pamięci",
+   "waga": 4,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "research",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "uczciwie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "w-360",
+   "waga": 4,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "warstw",
+   "waga": 4,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "wektory",
+   "waga": 4,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "grafu",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "krawędzie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "kustoszem",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "lokalnie",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "okno",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "pamięci",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "research",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "semantyczne",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "uczciwie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "w-360",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "warstw",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "wektory",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "graf",
+   "b": "kustoszem",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "graf",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "graf",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "graf",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "graf",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "graf",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "grafu",
+   "b": "krawędzie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "grafu",
+   "b": "kustoszem",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "grafu",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "grafu",
+   "b": "pamięci",
+   "waga": 3,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "grafu",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "grafu",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "grafu",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "grafu",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "graphiti",
+   "b": "memory",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "graphiti",
+   "b": "pamięci",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "graphiti",
+   "b": "sesji",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "graphiti",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "graphiti",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "krawędzie",
+   "b": "kustoszem",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "krawędzie",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "krawędzie",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "krawędzie",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "krawędzie",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "krawędzie",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "krawędzie",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "lokalnie",
+   "waga": 5,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "okno",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "pamięci",
+   "waga": 5,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "research",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "semantyczne",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "uczciwie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "w-360",
+   "waga": 5,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "warstw",
+   "waga": 5,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "wektory",
+   "waga": 5,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "okno",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "research",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "semantyczne",
+   "waga": 4,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "uczciwie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "okno",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "okno",
+   "b": "research",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "okno",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "okno",
+   "b": "uczciwie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "okno",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "okno",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "okno",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "research",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "semantyczne",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "uczciwie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "research",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "research",
+   "b": "uczciwie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "research",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "research",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "research",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "semantyczne",
+   "b": "uczciwie",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "semantyczne",
+   "b": "w-360",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "semantyczne",
+   "b": "warstw",
+   "waga": 3,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "semantyczne",
+   "b": "wektory",
+   "waga": 4,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "sesji",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-28"
+  },
+  {
+   "a": "uczciwie",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "uczciwie",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "uczciwie",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-28",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "czasowe",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "decyduje",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "forgetting",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "granicy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "kasuje",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "kustoszem",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "learned",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "nigdy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "reflection",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "anty-utrwalanie",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "testów",
+   "waga": 3,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "błąd",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "decyduje",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "forgetting",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "granicy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "kasuje",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "learned",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "nigdy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "reflection",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czasowe",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "forgetting",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "granicy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "kasuje",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "kustoszem",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "learned",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "nigdy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "reflection",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "decyduje",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "granicy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "kasuje",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "kustoszem",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "learned",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "nigdy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "reflection",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "forgetting",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "kasuje",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "kustoszem",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "learned",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "nigdy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "reflection",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "granicy",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kasuje",
+   "b": "kustoszem",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kasuje",
+   "b": "learned",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kasuje",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kasuje",
+   "b": "nigdy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kasuje",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kasuje",
+   "b": "reflection",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kasuje",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kasuje",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kasuje",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kasuje",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kasuje",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "każdej",
+   "b": "moduł",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "każdej",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "każdej",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "learned",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "nigdy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "reflection",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "testów",
+   "waga": 4,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "learned",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "learned",
+   "b": "nigdy",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "learned",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "learned",
+   "b": "reflection",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "learned",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "learned",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "learned",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "learned",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "learned",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "nigdy",
+   "waga": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "reflection",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "testów",
+   "waga": 4,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "moduł",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "moduł",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "moduł",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "moduł",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "nigdy",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "nigdy",
+   "b": "reflection",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "nigdy",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "nigdy",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "nigdy",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "nigdy",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "nigdy",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "reflection",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "testów",
+   "waga": 5,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "ważności",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "reflection",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "reflection",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "reflection",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "reflection",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "reflection",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "semantyczne",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "testów",
+   "b": "w-360",
+   "waga": 4,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "testów",
+   "b": "warstw",
+   "waga": 4,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "testów",
+   "b": "wektory",
+   "waga": 4,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "blokuje",
+   "b": "gotowy",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "blokuje",
+   "b": "grafu",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "gotowy",
+   "b": "grafu",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "gotowy",
+   "b": "huggingface",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "gotowy",
+   "b": "indeksuj",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "gotowy",
+   "b": "most",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "gotowy",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "huggingface",
+   "b": "indeksuj",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "huggingface",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "kustoszem",
+   "waga": 3,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "lokalnie",
+   "waga": 4,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "most",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "pamięci",
+   "waga": 3,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "retrieval",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "testów",
+   "waga": 3,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "w-360",
+   "waga": 3,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "warstw",
+   "waga": 3,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "wektory",
+   "waga": 4,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "retrieval",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "retrieval",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "most",
+   "b": "semantyczne",
+   "waga": 2,
+   "pierwszy": "2026-06-26",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "retrieval",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "retrieval",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "retrieval",
+   "b": "w-360",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "retrieval",
+   "b": "warstw",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "retrieval",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "czyta",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "indeksuj",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "pliku",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "proweniencja",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "arxiv",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "indeksuj",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "kustoszem",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "pliku",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "proweniencja",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "czyta",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "pliku",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "proweniencja",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "indeksuj",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "pliku",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "proweniencja",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kustoszem",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "pełna",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "pliku",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "proweniencja",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "lokalnie",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "pełna",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "pliku",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "proweniencja",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięć",
+   "b": "pełna",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięć",
+   "b": "pliku",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięć",
+   "b": "proweniencja",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięć",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięć",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięć",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pełna",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pliku",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pliku",
+   "b": "proweniencja",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pliku",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pliku",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pliku",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pliku",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pliku",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pliku",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "prawo",
+   "b": "proweniencja",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "prawo",
+   "b": "testów",
+   "waga": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "prawo",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "prawo",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "proweniencja",
+   "b": "testów",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "proweniencja",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "proweniencja",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "proweniencja",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "proweniencja",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "proweniencja",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "testów",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "testów",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "w-360",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "warstw",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "warstw",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "wektory",
+   "b": "własnego",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "własnego",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-29",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "danych",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "danych",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "danych",
+   "b": "prawo",
+   "waga": 3,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kronika",
+   "b": "retrieval",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kronika",
+   "b": "temporal",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "kronika",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "pamięci",
+   "b": "temporal",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "retrieval",
+   "b": "temporal",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "temporal",
+   "b": "w-360",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "temporal",
+   "b": "warstw",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "wszystkie",
+   "b": "zero",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-29"
+  },
+  {
+   "a": "chmurze",
+   "b": "huggingface",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "chmurze",
+   "b": "lokalnie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "chmurze",
+   "b": "wektory",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "chmurze",
+   "b": "zablokowany",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "gotowy",
+   "b": "lokalne",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "huggingface",
+   "b": "zablokowany",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "lokalnie",
+   "b": "zablokowany",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "wektory",
+   "b": "zablokowany",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-26"
+  },
+  {
+   "a": "dział",
+   "b": "esencja",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "dział",
+   "b": "kanon",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "dział",
+   "b": "pliki",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "działów",
+   "b": "esencja",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "działów",
+   "b": "kanon",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "działów",
+   "b": "plik",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "działów",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "esencja",
+   "b": "kanon",
+   "waga": 3,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "esencja",
+   "b": "plik",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "esencja",
+   "b": "pliki",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "esencja",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "kanon",
+   "b": "plik",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "kanon",
+   "b": "pliki",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "kanon",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "lekcja",
+   "b": "naprawione",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "plik",
+   "b": "wynik",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agentów",
+   "b": "danych",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agentów",
+   "b": "ekstrakcja",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agentów",
+   "b": "epub",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agentów",
+   "b": "esencja",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agentów",
+   "b": "isbn",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agentów",
+   "b": "kanon",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agentów",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agentów",
+   "b": "uzasadnia",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agentów",
+   "b": "wgrał",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "backtest",
+   "b": "funding",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "danych",
+   "b": "ekstrakcja",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "danych",
+   "b": "epub",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "danych",
+   "b": "esencja",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "danych",
+   "b": "isbn",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "danych",
+   "b": "kanon",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "danych",
+   "b": "uzasadnia",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "danych",
+   "b": "wgrał",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "ekstrakcja",
+   "b": "epub",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "ekstrakcja",
+   "b": "esencja",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "ekstrakcja",
+   "b": "isbn",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "ekstrakcja",
+   "b": "kanon",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "ekstrakcja",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "ekstrakcja",
+   "b": "uzasadnia",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "ekstrakcja",
+   "b": "wgrał",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "epub",
+   "b": "esencja",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "epub",
+   "b": "isbn",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "epub",
+   "b": "kanon",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "epub",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "epub",
+   "b": "uzasadnia",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "epub",
+   "b": "wgrał",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "esencja",
+   "b": "isbn",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "esencja",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "esencja",
+   "b": "uzasadnia",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "esencja",
+   "b": "wgrał",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "isbn",
+   "b": "kanon",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "isbn",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "isbn",
+   "b": "uzasadnia",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "isbn",
+   "b": "wgrał",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "kanon",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "kanon",
+   "b": "uzasadnia",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "kanon",
+   "b": "wgrał",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "plik",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "prawo",
+   "b": "twardy",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "prawo",
+   "b": "uzasadnia",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "prawo",
+   "b": "wgrał",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "uzasadnia",
+   "b": "wgrał",
+   "waga": 2,
+   "pierwszy": "2026-06-25",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agents",
+   "b": "long",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agents",
+   "b": "model",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agents",
+   "b": "pamięci",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agents",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agents",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "agents",
+   "b": "short",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "bibliotheca-rag",
+   "b": "bm25",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "bibliotheca-rag",
+   "b": "książki",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "bm25",
+   "b": "książki",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "książki",
+   "b": "mapa",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "książki",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "long",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "long",
+   "b": "short",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "mapa",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "mapa",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "model",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "model",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "pamięci",
+   "b": "short",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "pamięci",
+   "b": "warstwowy",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "pamięci",
+   "b": "zanik",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "pamięć",
+   "b": "warstwowy",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "pamięć",
+   "b": "zanik",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "prawo",
+   "b": "warstwowy",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "prawo",
+   "b": "zanik",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "warstwowy",
+   "b": "zanik",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-25"
+  },
+  {
+   "a": "centrum_pamieci",
+   "b": "decay",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "centrum_pamieci",
+   "b": "finmem",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "centrum_pamieci",
+   "b": "lekcje",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "centrum_pamieci",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "centrum_pamieci",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "centrum_pamieci",
+   "b": "scan",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "imperium",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "potencjału",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "prawo",
+   "waga": 3,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "profil",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "testy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "utrata",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "wcześniej",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "decay",
+   "b": "finmem",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "decay",
+   "b": "lekcje",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "decay",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "decay",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "decay",
+   "b": "scan",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "finmem",
+   "b": "lekcje",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "finmem",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "finmem",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "finmem",
+   "b": "scan",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "imperium",
+   "b": "lekcje",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "imperium",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "imperium",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "imperium",
+   "b": "testy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "lekcje",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "lekcje",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "lekcje",
+   "b": "scan",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "lekcje",
+   "b": "testy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "pamięci",
+   "waga": 3,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "pamięć",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "potencjału",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "profil",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "scan",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "utrata",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "wcześniej",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięci",
+   "b": "potencjału",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięci",
+   "b": "profil",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięci",
+   "b": "scan",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięci",
+   "b": "testy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięci",
+   "b": "utrata",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięci",
+   "b": "wcześniej",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięć",
+   "b": "potencjału",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięć",
+   "b": "profil",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięć",
+   "b": "utrata",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięć",
+   "b": "wcześniej",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "potencjału",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "potencjału",
+   "b": "profil",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "potencjału",
+   "b": "utrata",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "potencjału",
+   "b": "wcześniej",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "prawo",
+   "b": "testy",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "prawo",
+   "b": "utrata",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "prawo",
+   "b": "wcześniej",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "profil",
+   "b": "utrata",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "profil",
+   "b": "wcześniej",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "utrata",
+   "b": "wcześniej",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "bi-temporal",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "generative",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "graphiti",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "historię",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "importance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "invalidation",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "kronika",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "kronika_czatu",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "niesie",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "agents",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "generative",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "graphiti",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "historię",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "importance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "invalidation",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "kronika",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "kronika_czatu",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "niesie",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "bi-temporal",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "graphiti",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "historię",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "importance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "invalidation",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "kronika",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "kronika_czatu",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "niesie",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "generative",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "graphiti",
+   "b": "historię",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "graphiti",
+   "b": "importance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "graphiti",
+   "b": "invalidation",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "graphiti",
+   "b": "kronika",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "graphiti",
+   "b": "kronika_czatu",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "graphiti",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "graphiti",
+   "b": "niesie",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "graphiti",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "graphiti",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "graphiti",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "graphiti",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "importance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "invalidation",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "kronika",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "kronika_czatu",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "niesie",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "importance",
+   "b": "invalidation",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "importance",
+   "b": "kronika",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "importance",
+   "b": "kronika_czatu",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "importance",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "importance",
+   "b": "niesie",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "importance",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "importance",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "importance",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "importance",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "importance",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "invalidation",
+   "b": "kronika",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "invalidation",
+   "b": "kronika_czatu",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "invalidation",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "invalidation",
+   "b": "niesie",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "invalidation",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "invalidation",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "invalidation",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "invalidation",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "invalidation",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika",
+   "b": "kronika_czatu",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika",
+   "b": "niesie",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika_czatu",
+   "b": "mem0",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika_czatu",
+   "b": "niesie",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika_czatu",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika_czatu",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika_czatu",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika_czatu",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "kronika_czatu",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "niesie",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "mem0",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "niesie",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "niesie",
+   "b": "recency",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "niesie",
+   "b": "relevance",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "niesie",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "niesie",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięci",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "recency",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "relevance",
+   "b": "repo",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "repo",
+   "b": "scoring",
+   "waga": 2,
+   "pierwszy": "2026-06-22",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "docs",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "hook",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "markdown",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "memory",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "sekcji",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "starcie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "cezara",
+   "b": "warstwa",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "docs",
+   "b": "fts5",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "docs",
+   "b": "hook",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "docs",
+   "b": "markdown",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "docs",
+   "b": "memory",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "docs",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "docs",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "docs",
+   "b": "sekcji",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "docs",
+   "b": "starcie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "docs",
+   "b": "warstwa",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "historię",
+   "b": "limit",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "hook",
+   "b": "markdown",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "hook",
+   "b": "memory",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "hook",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "hook",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "hook",
+   "b": "sekcji",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "hook",
+   "b": "starcie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "hook",
+   "b": "warstwa",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "markdown",
+   "b": "memory",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "markdown",
+   "b": "pamięci",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "markdown",
+   "b": "prawo",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "markdown",
+   "b": "sekcji",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "markdown",
+   "b": "starcie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "markdown",
+   "b": "warstwa",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "memory",
+   "b": "sekcji",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "memory",
+   "b": "starcie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "memory",
+   "b": "warstwa",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięci",
+   "b": "sekcji",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięci",
+   "b": "starcie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "pamięci",
+   "b": "warstwa",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "prawo",
+   "b": "sekcji",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "prawo",
+   "b": "starcie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "prawo",
+   "b": "warstwa",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "sekcji",
+   "b": "starcie",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "sekcji",
+   "b": "warstwa",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "starcie",
+   "b": "warstwa",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-22"
+  },
+  {
+   "a": "chmurze",
+   "b": "dane",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "chmurze",
+   "b": "docs",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "chmurze",
+   "b": "imperium",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "chmurze",
+   "b": "korpus",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "chmurze",
+   "b": "książki",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "chmurze",
+   "b": "python",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "chmurze",
+   "b": "zamiast",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "dane",
+   "b": "docs",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "dane",
+   "b": "imperium",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "dane",
+   "b": "korpus",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "dane",
+   "b": "książki",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "docs",
+   "b": "imperium",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "docs",
+   "b": "korpus",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "docs",
+   "b": "książki",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "imperium",
+   "b": "korpus",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "imperium",
+   "b": "książki",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "korpus",
+   "b": "książki",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "ostatnie",
+   "b": "wpięte",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  },
+  {
+   "a": "python",
+   "b": "zamiast",
+   "waga": 2,
+   "pierwszy": "2026-06-21",
+   "ostatni": "2026-06-21"
+  }
+ ],
+ "n_wezlow": 856,
+ "n_krawedzi": 883
+}

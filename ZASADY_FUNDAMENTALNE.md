@@ -603,6 +603,33 @@ klucz powiadomień w kodzie zamiast w env.
 
 ---
 
+## ⚖️ PRAWO XXV — PRZEWAGA KONKURENCYJNA 🏆
+
+> **"Imperium mierzy się z najlepszymi na świecie. Gorsze rozwiązanie to oddany rynek."**
+> *(Cezar zatwierdził 2026-06-30)*
+
+Imperium nieustannie porównuje swoje moduły ze STANEM SZTUKI (research, konkurencja,
+literatura). Gdy nasz moduł jest słabszy od najlepszego dostępnego rozwiązania —
+szukamy lepszego, podpatrujemy konkurencję, adoptujemy i ulepszamy (z pełnym ZPO i
+pomiarem). Cel nadrzędny: **najlepszy zysk przy najlepszym momencie wejścia**
+(LONG / SHORT / HOLD), sterowany kodem neuronów i bramek.
+
+### Obowiązek Prawa XXV
+- [ ] Nowy moduł zestawiony z najlepszym znanym odpowiednikiem (kto to robi lepiej?)
+- [ ] Gdy jesteśmy w tyle — research + propozycja adopcji (REJESTR_INSPIRACJI, ZPO)
+- [ ] Każda adopcja zmierzona (Prawo XVI) zanim dostanie wagę — nie kopiujemy na ślepo
+- [ ] Zawsze sugeruj rozwinięcie w najlepszym kierunku (pełny potencjał — Prawo XV)
+
+### Relacja do innych praw
+Prawo XXV spina **XV** (pełny potencjał) + **XVI** (pomiar) + **XXII** (dekorelacja
+przewagi) w jawny imperatyw: nie wystarczy działać — trzeba być LEPSZYM i to udowodnić.
+Stagnacja przy gorszym rozwiązaniu, gdy lepsze jest w zasięgu = utrata potencjału (Prawo XV).
+
+**Złamanie Prawa XXV:** zadowolenie się rozwiązaniem słabszym od dostępnego stanu sztuki
+bez researchu i bez planu dogonienia; kopiowanie konkurencji bez pomiaru (ślepa adopcja).
+
+---
+
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*
 > 🚨 *"Niewykorzystana siła to siła oddana wrogowi. Imperium nie marnuje niczego."*
 > 🗺️ *"Wódz, który nie zna własnego obozu, przegrywa bitwę przed jej początkiem."*
@@ -611,3 +638,4 @@ klucz powiadomień w kodzie zamiast w env.
 > 🧬 *"Dwa miecze tej samej stali to jeden miecz. Mierzymy przewagę, nie kształt."*
 > 🎯 *"Każdy legion ma swoje pole bitwy. Mądry wódz wie, gdzie kogo posłać."*
 > 👁️ *"Wódz, który nie widzi pola walki, już przegrał — choć jeszcze o tym nie wie."*
+> 🏆 *"Nie ścigamy się z wczorajszym sobą. Ścigamy się z najlepszymi — i wygrywamy."*

@@ -467,6 +467,71 @@ def podsumowanie_startowe(k: int = 3, zapytanie: str = "") -> str:
     st = _kc.statystyki()
     linie.append(f"   📜 Kronika: {st['sesje']} sesji, {st['znaki']/1e6:.1f} MB dialogu w repo")
     linie.append("   📍 Mapa podpięć + wdrożenia: docs/PAMIEC_SESJI.md")
+
+    # W7 — Kustosz Pamięci (nadrzędny organ): zwięzły stan zarządzania warstwami.
+    try:
+        from imperium.biblioteki import kustosz_pamieci as _ku
+        linie.append(_ku.raport_startowy())
+    except Exception:
+        pass
+
+    # W8 — Graf Pamięci (połączenia neuronów): rozmiar + huby.
+    try:
+        from imperium.biblioteki import graf_pamieci as _gp
+        linie.append(_gp.raport_startowy())
+    except Exception:
+        pass
+
+    # W9 — Refleksja: sprzeczności + przedawnienia (tylko gdy jest co zgłosić).
+    try:
+        from imperium.biblioteki import refleksja_pamieci as _rp
+        r9 = _rp.raport_startowy()
+        if r9:
+            linie.append(r9)
+    except Exception:
+        pass
+
+    # W10 — Mądre Zapominanie: kandydaci do schłodzenia (tylko gdy są).
+    try:
+        from imperium.biblioteki import zapominanie as _zap
+        r10 = _zap.raport_startowy()
+        if r10:
+            linie.append(r10)
+    except Exception:
+        pass
+
+    # W11 — Pamięć Proceduralna: ile runbooków gotowych (CoALA procedural).
+    try:
+        from imperium.biblioteki import pamiec_proceduralna as _pp
+        r11 = _pp.raport_startowy()
+        if r11:
+            linie.append(r11)
+    except Exception:
+        pass
+
+    # W12 — Pamięć Robocza: aktywny cel bieżącego cyklu (CoALA working).
+    try:
+        from imperium.biblioteki import pamiec_robocza as _prob
+        r12 = _prob.raport_startowy()
+        if r12:
+            linie.append(r12)
+    except Exception:
+        pass
+
+    # W6 — Dziennik Nieśmiertelny: PEŁNA oś czasu projektu (każdy krok, dożywotnio).
+    # Wstrzykiwana w CAŁOŚCI (ostatnie 12 pełnych, starsze jednolinijkowe) — gwarancja,
+    # że widzę cały łuk projektu, nie tylko top-3 lekcje (ROZKAZ Cezara 2026-06-28).
+    try:
+        from imperium.biblioteki import dziennik_niesmiertelny as _dn
+        os_t = _dn.os_czasu(ostatnie=12)
+        if "pusty" not in os_t:
+            linie.append("")
+            linie.append(os_t)
+        if _dn.brak_wpisu_dzis():
+            linie.append("   ⚠️ Prawo XV: dzisiejsza sesja NIE zostawiła jeszcze wpisu w Dzienniku — dopisz przed końcem!")
+    except Exception:
+        pass
+
     return "\n".join(linie)
 
 

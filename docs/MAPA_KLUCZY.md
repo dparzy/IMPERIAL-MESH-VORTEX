@@ -137,6 +137,9 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 | BOCPD-01 | NeuronBOCPD | R | 6 | ✅ | CLOSE_SERIES_60 |
 | CP-01 | NeuronChangePoint | R | 6 | ✅ | CLOSE_SERIES_60 |
 | NEWS-01 | NeuronSentymentNews | R | 6 | ✅ | NEWS_SENTYMENT |
+| NEWS-02 | NeuronTaksonomiaZdarzen | R | 6 | ✅ | NEWS_EVENT_KIERUNEK |
+| NEWS-03 | NeuronSpikeUwagi | R | 5 | ✅ | NEWS_ATTENTION_SPIKE |
+| NEWS-04 | NeuronDeltaeSentymentu | R | 5 | ✅ | NEWS_SENTYMENT_DELTA |
 | RADAR-01 | NeuronRadarBTC | R | 6 | ✅ | BTC_TREND |
 | RADAR-02 | NeuronDominacja | R | 5 | ✅ | BTC_DOMINANCJA |
 | RADAR-03 | NeuronPrzeplyw | R | 5 | ✅ | PRZEPLYW_KAPITALU |

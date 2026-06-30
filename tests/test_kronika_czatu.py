@@ -90,6 +90,54 @@ def test_eksportuj_i_przyrostowy():
     assert s2["zapisane"] == 0 and s2["pominiete"] == 1
 
 
+def test_eksportuj_reeksport_gdy_zrodlo_swiezsze():
+    """
+    Regresja UTRATA POTENCJAŁU (Prawo XV): aktywna sesja, która ROŚNIE, musi być
+    re-destylowana — nie zamrożona na pierwszym eksporcie. Granica: mtime źródła > mtime celu.
+    """
+    import os
+    import time
+    zrodlo = Path(tempfile.mkdtemp())
+    src = _jsonl([
+        {"message": {"role": "user", "content": "start"}},
+        {"message": {"role": "assistant", "content": "ok"}},
+    ], d=str(zrodlo))
+    cel = Path(tempfile.mkdtemp())
+    s1 = kc.eksportuj(zrodlo, cel)
+    assert s1["zapisane"] == 1
+    md = cel / "sesja_sesja1.md"
+
+    # cofnij mtime celu w przeszłość, by źródło było jednoznacznie świeższe
+    stary = time.time() - 1000
+    os.utime(str(md), (stary, stary))
+
+    # dopisz dalszy dialog (sesja urosła) i ponów eksport
+    src.write_text(src.read_text(encoding="utf-8") + "\n" + json.dumps(
+        {"message": {"role": "user", "content": "v5 most chmura-lokal"}}), encoding="utf-8")
+    s2 = kc.eksportuj(zrodlo, cel)
+    assert s2["zaktualizowane"] == 1, f"Oczekiwano re-eksportu, got {s2}"
+    assert "v5 most chmura-lokal" in md.read_text(encoding="utf-8")
+
+
+def test_eksportuj_pomija_gdy_cel_swiezszy():
+    """Granica odwrotna: gdy cel jest świeższy niż źródło → pomija (brak zbędnego zapisu)."""
+    import os
+    import time
+    zrodlo = Path(tempfile.mkdtemp())
+    _jsonl([
+        {"message": {"role": "user", "content": "a"}},
+        {"message": {"role": "assistant", "content": "b"}},
+    ], d=str(zrodlo))
+    cel = Path(tempfile.mkdtemp())
+    kc.eksportuj(zrodlo, cel)
+    # ustaw cel w przyszłość (świeższy niż źródło)
+    md = cel / "sesja_sesja1.md"
+    przyszlosc = time.time() + 1000
+    os.utime(str(md), (przyszlosc, przyszlosc))
+    s = kc.eksportuj(zrodlo, cel)
+    assert s["pominiete"] == 1 and s["zaktualizowane"] == 0
+
+
 def test_eksportuj_pomija_za_krotkie():
     zrodlo = Path(tempfile.mkdtemp())
     _jsonl([{"message": {"role": "user", "content": "tylko jedna"}}], d=str(zrodlo))
@@ -116,3 +164,30 @@ def test_statystyki():
     (cel / "sesja_a.md").write_text("abc", encoding="utf-8")
     st = kc.statystyki(cel)
     assert st["sesje"] == 1 and st["znaki"] == 3
+
+
+def test_szukaj_po_slowach_nie_cala_fraza():
+    """
+    Regresja KRYTYCZNA (Prawo XV, 2026-06-28): wyszukiwarka MUSI działać po słowach.
+    Bug: 'numba JIT wydajność' (cała fraza) → 0 trafień, choć linie o tym istnieją.
+    """
+    import tempfile
+    cel = Path(tempfile.mkdtemp())
+    (cel / "sesja_aaa.md").write_text(
+        "## 🏛️ Claude\nRozważamy numba do przyspieszenia wskaźników GARCH\n",
+        encoding="utf-8")
+    # cała fraza wieloslowna — nie istnieje jako ciągły substring, ale słowa tak
+    wyniki = kc.szukaj("numba wydajność wskaźniki", cel=cel)
+    assert wyniki, "Wyszukiwarka po słowach nie znalazła linii (regresja bug-frazy)"
+    assert wyniki[0]["trafienia"] >= 1
+
+
+def test_szukaj_ranking_wiecej_slow_wyzej():
+    """Linia z większą liczbą trafionych słów jest wyżej."""
+    import tempfile
+    cel = Path(tempfile.mkdtemp())
+    (cel / "sesja_aaa.md").write_text(
+        "## x\nnumba jit wydajność wskaźniki razem\nsamo wskaźniki tutaj\n",
+        encoding="utf-8")
+    wyniki = kc.szukaj("numba wydajność wskaźniki", cel=cel)
+    assert wyniki[0]["trafienia"] >= wyniki[-1]["trafienia"]

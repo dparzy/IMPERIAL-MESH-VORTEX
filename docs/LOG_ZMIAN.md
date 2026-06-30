@@ -6,6 +6,363 @@
 
 ---
 
+## 2026-06-30 | POMIAR | 📊 W-385: IC roju w backteście — fundament Prawa XVI
+
+Cezar: „dawaj". Logowanie/pomiar predykcyjności newsów. UCZCIWIE (Prawo I): brak historycznych
+danych newsów → newsów nie da się zbacktestować TERAZ. Ale infrastruktura pomiaru wpięta dla
+CAŁEGO roju — NEWS-01..04 dołączą automatycznie, gdy popłynie feed (lokal+RSS/DeepSeek).
+
+Reuse (Prawo XVI — nie dublujemy): `KolektorIC` (W-369, Spearman) i `_spearman` już istniały,
+ale NIE były wpięte nigdzie. Teraz `backtest(mierz_ic=True)` zbiera sygnał_t każdego neuronu
+(kierunek×pewność) i paruje z PRZYSZŁYM zwrotem_{t+h} — zero look-ahead (sygnał nie widzi t+h).
+
+- `imperium/koloseum/backtest.py`: opt-in `mierz_ic` → `engine.ic_srednie` + `engine.ic_pelne`.
+  Domyślnie False (zero narzutu). Zmierzone na syntetyku: 34/91 neuronów z IC; NEWS-01..04 śledzone.
+- +4 testy (raport dołączony, NEWS objęte, zakres [-1,1], brak narzutu gdy off). 1873→1877.
+
+To domyka „metody treningowe": każdy neuron (w tym news) dostaje MIERZALNĄ przewagę
+predykcyjną (IC) zanim dostanie większą wagę — zgodnie z Prawem XVI i nowym Prawem XXV.
+
+---
+
+## 2026-06-30 | NEURONY+PRAWO | 📈 NEWS-03/04 dynamika newsów + PRAWO XXV (W-382)
+
+Cezar: „dawaj wszystko". Dwa neurony dynamiki + zatwierdzona zasada przewagi.
+
+**Stan kroczący adaptera** (AdapterNewsLLM): deque per symbol pamięta poprzednie
+sentymenty i liczby nagłówków → dolewa NEWS_SENTYMENT_DELTA + NEWS_ATTENTION_SPIKE.
+
+- **NEWS-04 Δ Sentymentu** (`news_dynamika.py`): momentum informacyjny = pochodna
+  sentymentu (bieżący − średnia historii). Rośnie→LONG, opada→SHORT. WSKAZNIK
+  NEWS_SENTYMENT_DELTA, kat R, waga 5, mechanizm event.
+- **NEWS-03 Spike Uwagi**: przełom informacyjny = liczba nagłówków / średnia historyczna.
+  Spike ≥2× × kierunek sentymentu → breakout LONG/SHORT; spike bez kierunku → czujność
+  (NEUTRAL). WSKAZNIK NEWS_ATTENTION_SPIKE, kat R, waga 5, mechanizm vol_signal.
+- Cztery wymiary newsów (Prawo XVI — nie redundancja): poziom (01), typ (02), uwaga (03),
+  momentum (04). Rejestracja pełna; neurony 82→84 (78 aktywnych). +11 testów. 1862→1873.
+
+**PRAWO XXV — PRZEWAGA KONKURENCYJNA** (ZASADY_FUNDAMENTALNE.md): Cezar zatwierdził.
+Imperium mierzy się ze stanem sztuki; gdy słabsze — research+adopcja+pomiar (spina XV+XVI+XXII).
+Konstytucja 24→25 praw (CLAUDE.md, README zaktualizowane). XXII pozostaje „Dekorelacja Przewagi".
+
+UWAGA (Prawo XVI — następny krok): logowanie sentymentu do W1 dla pomiaru predykcyjności
+per kategoria — NIE zrobione w tej rundzie (infra pomiarowa), zaplanowane.
+
+---
+
+## 2026-06-30 | NEURON | 🏷️ NEWS-02 Taksonomia Zdarzeń — kierunek per TYP (W-381)
+
+Cezar: „dawaj wszystko". Drugi neuron newsowy — research-grounded (arXiv:2508.07408):
+kierunek zależy od TYPU zdarzenia, nie samej polaryzacji. Rumor/spekulacja = KONTRARIAŃSKIE
+(ujemny Sharpe → fade hype). To czyni NEWS-02 mądrzejszym od płaskiego NEWS-01.
+
+- `imperium/akwedukty/klasyfikator_zdarzen.py`: deterministyczna taksonomia 8 typów
+  (HACK/UPADEK/REGULACJA_NEG → ujemne; ETF/INSTYTUCJONALNY/TECHNICZNY → dodatnie;
+  RUMOR → ujemny kontrariański; MAKRO → 0). Słowniki pełnych słów, kierunek znakowany netto.
+- `imperium/legiony/neurony/zdarzenia.py`: NEWS-02 NeuronTaksonomiaZdarzen (kat. R, waga 6,
+  WSKAZNIK NEWS_EVENT_KIERUNEK). Próg 0.30/0.65; abstynuje bez feedu (Prawo XV).
+- AdapterNewsLLM rozszerzony: dolewa NEWS_EVENT_KIERUNEK/TYP/PEWNOSC; budzi NEWS-02.
+- Rejestracja: rejestr.py (import+lista+2 mapy), MANIFEST, MAPA_KLUCZY, audyt whitelist.
+- Neurony 81→82 (76 aktywnych). +11 testów. 1851→1862.
+
+Różne od NEWS-01 (Prawo XVI — nie redundancja): NEWS-01=JAK pozytywny (sentyment),
+NEWS-02=JAKI TYP i jego kierunek (rumor=kontrariański). Dwa różne sygnały.
+
+UWAGA (Prawo I): Prawo XXII już istnieje (Dekorelacja Przewagi). Proponowana „przewaga
+konkurencyjna" → Prawo XXV (do decyzji Cezara — zmiana konstytucji).
+
+---
+
+## 2026-06-30 | UNLOCK+RESEARCH | 📰 FetcherNewsRSS — odblokowanie NEWS-01 + plan rozbudowy
+
+Cezar: rozbuduj NEWS-01, sweep świata, oryginalne moduły, wyprzedzać konkurencję.
+
+AUDYT NEWS-01: neuron + adapter (DeepSeek + fallback słownikowy) gotowe, ale adapter miał
+PUSTY fetcher → NEWS-01 zawsze milczał, nawet z DeepSeek. Brakującym ogniwem był FEED, nie API.
+
+**UNLOCK — FetcherNewsRSS** (`imperium/akwedukty/news_fetcher.py`): pobiera nagłówki z darmowych
+RSS (CoinDesk/CoinTelegraph/Decrypt), parsowanie stdlib (xml.etree, ZERO nowych zależności),
+filtr per-aktywo (BTC/ETH/DOGE...), dedup między wydawcami, wstrzykiwalny pobieracz (offline-test).
+Graceful: brak sieci → [] → NEWS-01 abstynuje (Prawo XV). Wpięty w petla_live (opt-in live).
++10 testów. Działa: BTC→"ETF rally" +1.0, ETH→"hack" neg, pełny feed +0.655.
+
+RESEARCH (sweep świata, ZPO): dostawcy CoinGecko News/CoinDesk/Crypto News API; badania granicy
+2026 — event-aware sentiment (arXiv:2508.07408: rumor/retail-buzz = KONTRARIAŃSKIE, ujemny Sharpe!),
+Janus-Q (arXiv:2602.19919). Plan 10 modułów: taksonomia zdarzeń, spike uwagi, Δ sentymentu,
+wiarygodność źródła, novelty, rozrzut, social, on-chain. Propozycja Prawa XXII (przewaga konkurencyjna).
+Pełny plan: docs/NEWS_ROZBUDOWA_2026-06-30.md. 1841→1851.
+
+---
+
+## 2026-06-30 | NAPRAWA+LOKAL | 🖥️ Przewodnik startu lokalnego + naprawa reprodukowalności
+
+Cezar: „jak pamięć działa w chmurze vs lokal, czy lokal ma dostęp do wszystkich plików,
+sprawdź nowinki, i kiedy ostatnio używaliśmy lokala (test pamięci)."
+
+**Test pamięci (zdał):** proweniencja + kronika znalazły — lokal konfigurowany ~2026-06-22
+(TA-Lib Windows 10, Paper Trading, plan MEXC live, test DOGE). UCZCIWIE (Prawo I): brak
+twardego logu W1 → test DOGE/MEXC był OMAWIANY, wynik nie trafił do pamięci. Luka do domknięcia.
+
+**🚨 CZERWONY ALARM złapany (Prawo XV):** świeży kontener wystartował na ZŁYM commicie
+(main merge #101 = stara migawka v5) zamiast na czubku gałęzi (065f789 = pełne v6-v13).
+Cała praca sesji „zniknęła" z working tree. DIAGNOZA: praca BEZPIECZNA na origin; lokalny
+desync. NAPRAWA: `git reset --hard origin/claude/sleepy-fermi-dsdE4` → wszystko wróciło.
+
+**🚨 Luka reprodukowalności (Prawo XV):** `scipy` i `pytest` NIE były w requirements.txt —
+działało tylko bo stary kontener je miał. Świeży: BOCPD-01 milczy (martwy głos), 17 testów
+import-error. NAPRAWA: dodane do requirements (scipy>=1.10 runtime, pytest>=7.0 dev).
+Po instalacji: 1841/1841 zielone, audyt harmonia, BOCPD-01 znów głosuje.
+
+**Deliverable:** `skrypty/start_lokal.py` (jednokomendowy rozruch lokala: env→audyt→katalog+graf
+→RAG→mapa) + `docs/START_LOKAL.md` (przewodnik dla nowicjusza: chmura vs lokal, dodatki
+tylko-lokal = wektory/Filesystem MCP/DeepSeek/trwałe logi W1, domknięcie luki testu DOGE).
+Pliki: requirements.txt, skrypty/start_lokal.py (nowy), docs/START_LOKAL.md (nowy), INDEKS.
+
+---
+
+## 2026-06-29 | KONSOLIDACJA | 🗺️ W-360 v13: przegląd 13 warstw + mapa + odchudzenie grafu
+
+Cezar: „konsolidacja". Przegląd całej pamięci (13 warstw, 3568 linii kodu) — pomiar, nie opinia.
+
+**Mapa jako jedno źródło prawdy:** `docs/MAPA_PAMIECI.md` + `kustosz.mapa()` (CLI: `kustosz mapa`)
+— tabela 13 warstw (klucz/moduł/rola/typ CoALA), pokrycie taksonomii CoALA (kompletne),
+domknięte problemy granicy 2026, unikaty, jeden punkt wejścia.
+
+**Pomiar redundancji (Prawo XVI):** każda warstwa pełni odrębną rolę CoALA/granicy — ZERO
+dwóch warstw o tym samym sygnale. Nic do scalenia. W12/W13 bez własnych plików (czytają
+z innych — zero redundancji danych). Potwierdzono: brak waty, brak dubli.
+
+**Odchudzenie grafu (W8):** persistowany graf przełączony na `min_waga≥2` — jednorazowe
+współwystąpienia (szum) odcięte: 30833→883 krawędzi, 3.74MB→0.18MB (95% mniej w repo),
+graf ostrzejszy. Funkcja zachowuje param min_waga (małe próbki/testy: 1).
+
+13 warstw potwierdzone i zmapowane. +4 testy (mapa, graf waga). 1839→1841.
+Pliki: kustosz_pamieci.py (mapa), graf_pamieci.py (waga≥2), docs/MAPA_PAMIECI.md (nowy), INDEKS.
+
+---
+
+## 2026-06-29 | UNIKAT | 🔍 W-360 v13: Pamięć Proweniencji — ŚLAD POCHODZENIA („skąd to wiemy")
+
+Cezar: „dawaj". Deep research: „From Agent Traces to Trust — Evidence Tracing and Execution
+Provenance in LLM Agents" (arXiv:2606.04990) — pamięć agenta potrzebuje PROVENANCE-AWARE
+RETRIEVAL + temporal credit assignment: wiedzieć skąd info, kiedy weszła, jak wędrowała.
+
+**W13 Pamięć Proweniencji** (`pamiec_proweniencji.py`): dla dowolnego pojęcia buduje
+ŚLAD POCHODZENIA — wystąpienia w czasie przez wszystkie warstwy (kronika W3b + dziennik W6
++ lekcje W3 + wizje W4), z datą i sesją. `geneza()` = pierwsze wystąpienie („tu się narodziło"),
+`raport()` = ugruntowanie (ile sesji/warstw — temporal credit). Odpowiada: „skąd to wiemy?",
+„świeży pomysł czy ugruntowana wiedza?". Zmierzone: „numba" → geneza 2026-06-21, 3 warstwy.
+
+Różne od Grafu (W8=połączenia) i Katalogu (W7=indeks): proweniencja = oś czasu JEDNEGO
+pojęcia z atrybucją źródła. Bez własnego pliku (czyta z warstw — Prawo XVI). +6 testów.
+13 warstw pamięci pod Kustoszem. 1833→1839. Pliki: pamiec_proweniencji.py (nowy), INDEKS_IMPERIUM.md.
+
+---
+
+## 2026-06-29 | UNIKAT | 🛠️🎯 W-360 v11+v12: Pamięć Proceduralna + Robocza — pełna czwórka CoALA
+
+Cezar: „jeszcze kilka warstw pamięci, poszukaj, wg zasad." Deep research: CoALA
+(arXiv:2309.02427) definiuje 4 kanoniczne typy pamięci agenta. Mieliśmy 2 (epizodyczna=kronika,
+semantyczna=lekcje/RAG). Brakowało PROCEDURALNEJ i ROBOCZEJ — dobudowane (Prawo XVI: nie
+redundancja, lecz domknięcie taksonomii poznawczej).
+
+**W11 Pamięć Proceduralna** (`pamiec_proceduralna.py`) — runbooki JAK wykonać zadanie
+(różne od lekcji=CO wiemy): „dodać neuron", „naprawić audyt W11", „bezpieczny commit",
+„dodać warstwę pamięci". Każda = wyzwalacz (kiedy użyć) + KROKI + źródło. szukaj() po
+słowach → właściwa procedura pod ręką. Ziarno 4 realnych procedur Imperium. JSONL→git.
+
+**W12 Pamięć Robocza** (`pamiec_robocza.py`) — CoALA working memory: AKTYWNY CEL bieżącego
+cyklu (ostatni „następny" z Dziennika W6) + pilne sygnały (sprzeczności W9). Bez własnego
+pliku (czyta z W6/W9 — zero kosztu, nie duplikuje). Różne od Dziennika: oś=cały łuk vs
+robocza=jedno ostrze TU-I-TERAZ. Wstrzykiwana na starcie: jednym rzutem wiesz gdzie wejść.
+
+DOMKNIĘTA pełna czwórka CoALA: robocza(W12)+epizodyczna(W3b)+semantyczna(W3/W2)+proceduralna(W11).
+12 warstw pamięci pod Kustoszem. +11 testów. 1822→1833. Pliki: pamiec_proceduralna.py,
+pamiec_robocza.py (nowe), centrum_pamieci.py, INDEKS_IMPERIUM.md, procedury.jsonl.
+
+---
+
+## 2026-06-29 | UNIKAT | 🍂 W-360 v10: Mądre Zapominanie — LEARNED FORGETTING
+
+Cezar: „wszystko dawaj". Trzeci (po reflection i contradiction = W9) nierozwiązany problem
+granicy pamięci agentów 2026 (arXiv:2603.07670): LEARNED FORGETTING — obecne systemy
+zapominają prymitywnie (czasowo/po limicie); cel = zapominanie SELEKTYWNE, wartościowe.
+
+**W10 Mądre Zapominanie** (`zapominanie.py`) — zapominanie NIE czasowe, lecz wartościowe:
+- `wartosc_retencji()` = ważność (słowa-klucze) × świeżość (zanik warstwowy FinMem)
+  × bonus łączności w Grafie W8 (hub = cenny); otwarte plany POMYSŁ/PLANOWANE chronione (≥0.5).
+- `kandydaci_do_zapomnienia(prog, dni)` — niska retencja + wiek → propozycja SCHŁODZENIA
+  do zimnej warstwy Kustosza W7 (.md.gz, wciąż przeszukiwalne → nic nie ginie, odwracalne).
+- ZASADA ANTY-UTRWALANIA (jak W9): NIGDY nie kasuje — tylko proponuje, Cezar decyduje.
+  Test pilnuje braku metod kasujących. „Safe forgetting": git + zimna warstwa = nic nie ginie.
+- Deterministyczny (bez API), z W3 lekcji + W4 wizji + W8 grafu; wpięty w start gdy są kandydaci.
+
+Zamyka pętlę: W10 decyduje CO schłodzić, W7 to kompresuje. 10 warstw pamięci pod Kustoszem.
+Trzy problemy granicy 2026 (reflection+contradiction=W9, forgetting=W10) — domknięte deterministycznie.
++10 testów. 1812→1822. Pliki: zapominanie.py (nowy), centrum_pamieci.py, INDEKS_IMPERIUM.md.
+
+---
+
+## 2026-06-29 | UNIKAT | 🪞 W-360 v9: Refleksja Pamięci — SPRZECZNOŚCI + PRZEDAWNIENIE
+
+Cezar: „czy pamięć jest najlepsza na świecie? ulepsz o kolejne warstwy/autorskie moduły —
+deep research, kreatywność, wizja, wg zasad."
+
+UCZCIWA OCENA (Prawo I): żaden system nie jest „najlepszy na świecie" na wszystkich osiach.
+Nasza przewaga = wyjątkowo KOMPLETNA, deterministyczna, domenowa kombinacja (8→9 warstw +
+reżim + graf). Deep research granicy 2026 (arXiv:2603.07670 przegląd; arXiv:2602.01966
+self-consolidation) wskazał czego nam brakowało: TRUSTWORTHY REFLECTION, contradiction
+handling, learned forgetting. OSTRZEŻENIE z literatury: refleksja potrafi UTRWALAĆ błędy.
+
+**W9 Refleksja Pamięci** (`refleksja_pamieci.py`) — autorski moduł wg granicy:
+- `wykryj_sprzecznosci()` — wpisy o tym samym temacie z przeciwnym kierunkiem statusu
+  w czasie: ROZSTRZYGNIĘTE (- →+, postęp/koniec krążenia) vs SPRZECZNE (+ →-, kolizja).
+- `wykryj_przedawnienia(dni)` — otwarte POMYSŁ/PLANOWANE starsze niż N dni bez śladu
+  realizacji (okno ważności à la Zep) → „wisi, zdecyduj".
+- ZASADA ANTY-UTRWALANIA (wprost z literatury): TYLKO zgłasza, NIGDY nie kasuje —
+  maszyna proponuje, Cezar dysponuje (Prawo XVIII). Test pilnuje braku metod kasujących.
+- Deterministyczny (bez API), z W4 wizji + W6 dziennika; wpięty w start (gdy jest co zgłosić).
+
+9 warstw pamięci pod Kustoszem. +9 testów. 1803→1812. Pliki: refleksja_pamieci.py (nowy),
+centrum_pamieci.py, INDEKS_IMPERIUM.md.
+
+---
+
+## 2026-06-28 | UNIKAT | 🕸️ W-360 v8: Graf Pamięci — POŁĄCZENIA NEURONÓW (temporalny graf wiedzy)
+
+Cezar: „wielopłaszczyznowe zapamiętywanie POŁĄCZEŃ NEURONÓW; przeszukaj patenty/repozytoria
+globalnie (Azja/USA/EU), wdróż najlepsze, zrób petardę godną poza streszczeniem konkurentów."
+
+Research SOTA 2026 (ZPO, globalny przegląd): **Zep/Graphiti** — Temporal Knowledge Graph dla
+pamięci agenta (https://arxiv.org/abs/2501.13956), bije MemGPT na Deep Memory Retrieval; fakty
+z OKNEM WAŻNOŚCI (validity window). A-Mem (połączone notatki). MemOS/Tsinghua (memory OS, Chiny).
+Krytyka uczciwa: „Does Memory Need Graphs?" (arXiv:2601.01280) → graf to DODATKOWA soczewka do
+pytań RELACYJNYCH, nie zamiennik retrievalu. Dlatego W8 uzupełnia W1-W7, nie zastępuje.
+
+**W8 Graf Pamięci** (`graf_pamieci.py`) — to czego nie mamy, a jest hot 2026:
+- WĘZŁY = encje (Numba, Kustosz, Viterbi, kompresja…), KRAWĘDZIE = współwystąpienia w jednym
+  wpisie (waga + okno czasowe pierwszy/ostatni — temporal jak Zep).
+- `polaczenia(X)` — z czym X jest połączone; `centralne()` — huby (centralne neurony);
+  `sciezka(a,b)` — BFS jak dwa pojęcia są powiązane.
+- Budowany deterministycznie (bez API) z Dziennika W6 + wizji W4 + lekcji W3. Persystowany
+  do graf_pamieci.json (git → bezgraniczny, chmura↔lokal). Pod zarządem Kustosza W7.
+- Zmierzone: 716 neuronów, 25802 połączeń. Numba↔{cache_wskaznikow, requirements, zmierzone}.
+
+8 warstw pamięci pod jednym organem (reżimowa+środowiskowa+dziennik+kompresja+graf) —
+tej kombinacji nie ma żaden konkurent. +9 testów grafu. 1794→1803. Pliki: graf_pamieci.py (nowy),
+centrum_pamieci.py, INDEKS_IMPERIUM.md, graf_pamieci.json.
+
+---
+
+## 2026-06-28 | UNIKAT | 👑 W-360 v7: Kustosz Pamięci — NADRZĘDNY ORGAN + kompresja zimnej warstwy
+
+Cezar: „nadrzędny organ, który kieruje wszystkimi warstwami — kompresja, katalogowanie,
+pamięć bezgraniczna, niezależnie chmura/lokal. Coś czego nikt nie ma."
+
+Research SOTA 2026 (ZPO): MemGPT/Letta (OS-like tiering, arXiv:2310.08560), TiMem
+(arXiv:2601.02845), przegląd arXiv:2603.07670. Główny problem literatury: „memory blindness"
+— agent nie wie, że fakt jest w zimnym magazynie. Nasz Dziennik (W6) już to łamie.
+
+**W7 Kustosz Pamięci** (`kustosz_pamieci.py`) — jeden organ nad 7 warstwami:
+- `census()` — stan wszystkich warstw (W1-W6) naraz
+- `zbuduj_katalog()` — katalog nadrzędny (anti-blindness): każda sesja → tematy/data/rozmiar
+- `kompresuj_zimne(dni)` — zimne sesje .md→.md.gz, WCIĄŻ przeszukiwalne (dekompresja w locie
+  w kronika.szukaj) → zero blindness. Zmierzone 22× na sesji testowej.
+- `szukaj()` — routing nadrzędny (6 warstw cross-layer + dziennik W6)
+
+Pamięć BEZGRANICZNA: git = storage bez limitu; Kustosz trzyma kontekst ograniczony
+(Dziennik zwięzły + zimne skompresowane), a NIC nie ginie. Wpięty w podsumowanie startowe.
+
+Decyzja Prawo XVI (mierzone, nie przedwczesne): NIE kompresuję masowo teraz — przy 6 MB
+to przedwczesne, .gz traci czytelność historii w git. Mechanizm gotowy, włączy się gdy urośnie.
+
+kronika_czatu: szukaj/statystyki czytają .md i .md.gz (transparentnie). +9 testów Kustosza,
++ regresja „zimna przeszukiwalna". 1785→1794. Katalog nadrzędny zbudowany (100 sesji).
+Pliki: kustosz_pamieci.py (nowy), kronika_czatu.py, centrum_pamieci.py, INDEKS_IMPERIUM.md, katalog_nadrzedny.json.
+
+---
+
+## 2026-06-28 | WYDAJNOŚĆ | ⚡ W-380: Numba/JIT na Viterbi Jump Model (zmierzone 256×)
+
+Cezar: „dawaj numba". Numba była omawiana, nigdy zaimplementowana (W6 Dziennik to wychwycił).
+
+**Cel wybrany pomiarem, nie zgadywaniem:** GARCH używa już scipy lfilter (C) → Numba mało by
+dała. Prawdziwa gorąca pętla Python to `_viterbi` w Jump Model (DP, wołany n_startow×max_iter
+razy na każde dopasuj(); zagnieżdżone pętle + np.argmin w środku).
+
+**Wdrożenie:** `imperium/legiony/_jit.py` — most JIT: `njit` kompiluje gdy numba dostępna,
+inaczej no-op (czysty Python). Prawo I: testy/audyt działają bez numby (fallback). Rdzeń
+`_viterbi_core` (jawne pętle) wydzielony i jit-owany. `_viterbi` deleguje do niego.
+
+**Pomiar (Prawo I):** rdzeń Viterbi 5.36 ms → 0.021 ms = **256× szybciej**. Wynik IDENTYCZNY
+z referencją numpy (test na 4 wartościach kary). numba>=0.59 w requirements (opcjonalna).
++3 testy (identyczność jit vs ref, no-op fallback bez numby, determinizm). 1782→1785.
+Pliki: _jit.py (nowy), jump_model.py, requirements.txt, test_jump_model.py.
+
+---
+
+## 2026-06-28 | UNIKAT+NAPRAWA | ♾️ W-360 v6: Dziennik Nieśmiertelny + naprawa wyszukiwarki
+
+Cezar (niezadowolony, słusznie): „każde zdanie, każdy punkt co zrobiliśmy ma być pamiętane
+DOŻYWOTNIO. Cofamy się, tracimy czas/tokeny/potencjał — to dziadostwo, łamie zasady."
+
+**Diagnoza twarda (dane, nie zgadywanie):**
+- NUMBA/JIT — SPRAWDZONE: NIE zaimplementowana (zero kodu, brak w requirements), była tylko
+  OMAWIANA w 4 sesjach (jest w kronice). Dowód, że pamięć przechowuje, ale nie surfacuje.
+- **Bug KRYTYCZNY wyszukiwarki kroniki:** `if zapytanie in linia` — cała fraza jako jeden
+  substring. „numba JIT wydajność" → 0 trafień, samo „numba" → 4. Każde naturalne wielosłowne
+  pytanie NIE znajdowało historii → wracaliśmy do zamkniętych tematów. To rdzeń problemu Cezara.
+
+**Naprawa 1:** wyszukiwarka kroniki token-based (po słowach, ranking = liczba trafionych słów).
+Teraz „numba JIT wydajność wskaźniki" → 6 trafień z historii. +2 testy regresji.
+
+**Naprawa 2 (UNIKAT) — W6 Dziennik Nieśmiertelny** (`dziennik_niesmiertelny.py`): dożywotnia
+ZWIĘZŁA oś czasu. Każda sesja = co zrobiono/decyzje/następny krok (~5 linii). Wstrzykiwana
+W CAŁOŚCI na starcie (ostatnie 12 pełne, starsze jednolinijkowe) → na początku KAŻDEJ sesji
+widzę cały łuk projektu, nie tylko top-3 lekcje. Deterministyczne: pisze Claude SAM (bez
+DeepSeek). ROZKAZ STAŁY w CLAUDE.md; brak wpisu z dziś = alarm w podsumowaniu startowym.
+Backfill 4 sesji. +6 testów. 1774→1782.
+
+Różnica od konkurencji: Mem0/Zep/Letta polegają na retrievalu (gubi). Dziennik GWARANTUJE
+widoczność całej historii — pełne wstrzyknięcie, nie statystyka.
+
+---
+
+## 2026-06-28 | WYDAJNOŚĆ | ⚡ Cache wskaźników wpięty w sweepy AB (zmierzone 1.4×)
+
+Cezar: „dawaj" (wydajność). Odkrycie (Prawo XV): cache wskaźników + multiprocessing
+(`cache_wskaznikow`, `prekalkuluj_portfel`) BYŁ zaimplementowany i przetestowany jako
+identyczny wynikowo, ale `cache_wskaznikow` domyślnie False → ŻADNE narzędzie sweepu
+go nie włączało. Optymalizacja spała.
+
+**Pomiar (dane, nie obietnice):** 3 pary / 400 barów 4h → OFF 30.1s, ON 21.5s = **1.4×**,
+kapitał identyczny (9979.80). Wcześniejsze „6-8×" w dokumentacji było aspiracyjne —
+skorygowane (Prawo XXI/I). Pętli portfela NIE da się zrównoleglić po parach (współdzielą
+kapitał → złamana semantyka); cache obejmuje prekalkulację wskaźników (równoległą).
+
+**Zmiana:** `cache_wskaznikow=True` w BAZA 5 narzędzi sweepu (ab_w329/330/334/335/336).
+Bezpieczne — wyniki dowiedzione identyczne (test_backtest_portfel_cache_wskaznikow).
+Dokument PAMIEC_SESJI A2 zaktualizowany zmierzonymi liczbami.
+
+---
+
+## 2026-06-28 | NAPRAWA | 🚨 Kronika czatu — re-eksport rosnącej sesji (UTRATA POTENCJAŁU)
+
+Audyt hooka wykrył: kronika bieżącej sesji zamrożona na 2026-06-22 (24 KB), a żywy
+transkrypt miał 1933 linie z całą pracą v4/v5 (27-28 czerwca). Przyczyna: `eksportuj`
+z `tylko_nowe=True` pomijał KAŻDY istniejący `.md` → AKTYWNA sesja, eksportowana raz
+na pierwszym starcie (gdy krótka), nigdy nie dostawała reszty dialogu. **5 dni pracy,
+w tym cała budowa pamięci v4/v5, ginęło z efemerycznym kontenerem chmury** — wprost
+zaprzeczenie celu „mamy wszystko pamiętać każdy krok rozmowy" (Prawo XV).
+
+**Naprawa:** `eksportuj` re-destyluje sesję, gdy mtime źródła > mtime celu (aktywna
+sesja rośnie → doeksportowywana aż cały dialog trafi do repo/git). Nowy licznik
+`zaktualizowane`. Po naprawie: sesja_895ce14f urosła 24 KB → 214 KB (cała praca v5).
+Testy: +2 granice (re-eksport gdy źródło świeższe, pomija gdy cel świeższy). 1772→1774.
+Pliki: kronika_czatu.py, tests/test_kronika_czatu.py.
+
+---
+
 ## 2026-06-26 | WARSTWA | 🌉 W-360 v5 — Most Chmura↔Lokal + Pełna Symbioza Pamięci
 
 Cezar: „rób mocniejsze memory, dokładny audyt, unikaty, następna warstwa dla chmury i lokala, pełen wypas".

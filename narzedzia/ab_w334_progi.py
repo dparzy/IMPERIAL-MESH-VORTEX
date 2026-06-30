@@ -23,7 +23,7 @@ PLIKI = {
     "DOGEUSDT": "dane/4h/Binance_DOGEUSDT_4h.csv",
 }
 N_BAROW = 1500
-BAZA = dict(tryb_skaner=True, synapsy_rezimowe=True)
+BAZA = dict(tryb_skaner=True, synapsy_rezimowe=True, cache_wskaznikow=True)
 
 
 def _bary():

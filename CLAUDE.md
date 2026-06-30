@@ -5,7 +5,26 @@
 ## 📜 Konstytucja
 
 Pełne prawa: [`ZASADY_FUNDAMENTALNE.md`](./ZASADY_FUNDAMENTALNE.md).
-Każda decyzja musi być zgodna z **24 Prawami Imperium**.
+Każda decyzja musi być zgodna z **25 Prawami Imperium**.
+
+## ♾️ DZIENNIK NIEŚMIERTELNY (ROZKAZ STAŁY — Cezar 2026-06-28)
+
+**Na KONIEC KAŻDEJ sesji — przed ostatnim commitem — dopisz wpis do Dziennika
+Nieśmiertelnego.** To gwarancja, że żaden krok nie ginie i nigdy nie cofamy się do
+tematu już zamkniętego (Prawo XV: koniec utraty czasu/tokenów/potencjału).
+
+```bash
+python -m imperium.biblioteki.dziennik_niesmiertelny wpis \
+  --co "co konkretnie zrobiliśmy (punkty)" \
+  --decyzje "co ustalono / czego NIE robić" \
+  --nastepny "jednozdaniowy następny krok" --sesja "<id8>"
+```
+
+Dziennik (W6) to dożywotnia ZWIĘZŁA oś czasu — wstrzykiwana W CAŁOŚCI na starcie
+(`centrum_pamieci start`), więc na początku KAŻDEJ sesji widzisz cały łuk projektu.
+Detale całych rozmów: kronika (W3b, przeszukiwalna po słowach: `centrum_pamieci szukaj`).
+**Pisze ją Claude SAM (jesteś LLM — bez DeepSeek).** Brak wpisu z dziś = czerwony alarm
+w podsumowaniu startowym. Złamanie tego rozkazu = złamanie Prawa XV.
 
 **Prawo XVIII (decyzyjność):** gdy widzisz niespójność/błąd — rozstrzygasz SAM
 (najlepsza opcja zgodna z zasadami), nie pytasz o błahostki. Źródło prawdy:

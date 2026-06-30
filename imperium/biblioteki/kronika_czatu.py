@@ -104,24 +104,40 @@ def eksportuj(zrodlo: Path = ZRODLO_DOMYSLNE, cel: Path = CEL_DOMYSLNY,
               tylko_nowe: bool = True, min_wiadomosci: int = 2) -> Dict[str, int]:
     """
     Destyluje wszystkie transkrypty z `zrodlo` do `cel` (jeden .md per sesja).
-    tylko_nowe=True → pomija sesje już wyeksportowane (przyrostowy, jak RAG --tylko-nowe).
-    Zwraca statystyki {sesje, zapisane, pominiete, wiadomosci}.
+
+    tylko_nowe=True → re-eksportuje sesję TYLKO gdy źródło jest świeższe niż zapisany
+    .md (mtime źródła > mtime celu). Naprawa UTRATY POTENCJAŁU (Prawo XV, audyt 2026-06-27):
+    poprzednio pomijało KAŻDY istniejący .md → AKTYWNA sesja, eksportowana raz na starcie
+    (gdy krótka), nigdy nie dostawała reszty dialogu. 5 dni pracy ginęło z kontenerem.
+    Teraz rosnąca sesja jest re-destylowana, aż cały dialog trafi do repo (git).
+
+    Zwraca statystyki {sesje, zapisane, zaktualizowane, pominiete, wiadomosci}.
     """
     cel.mkdir(parents=True, exist_ok=True)
-    stat = {"sesje": 0, "zapisane": 0, "pominiete": 0, "wiadomosci": 0}
+    stat = {"sesje": 0, "zapisane": 0, "zaktualizowane": 0, "pominiete": 0, "wiadomosci": 0}
     for src in _pliki_zrodlowe(zrodlo):
         stat["sesje"] += 1
         id_sesji = src.stem
         cel_plik = cel / f"sesja_{id_sesji}.md"
-        if tylko_nowe and cel_plik.exists():
-            stat["pominiete"] += 1
-            continue
+        istnial = cel_plik.exists()
+        if tylko_nowe and istnial:
+            # Re-eksport tylko gdy źródło świeższe niż zapis (aktywna sesja rośnie).
+            try:
+                if src.stat().st_mtime <= cel_plik.stat().st_mtime:
+                    stat["pominiete"] += 1
+                    continue
+            except OSError:
+                stat["pominiete"] += 1
+                continue
         dialog = destyluj_jsonl(src)
         if len(dialog) < min_wiadomosci:
             stat["pominiete"] += 1
             continue
         cel_plik.write_text(_na_markdown(dialog, id_sesji), encoding="utf-8")
-        stat["zapisane"] += 1
+        if istnial:
+            stat["zaktualizowane"] += 1
+        else:
+            stat["zapisane"] += 1
         stat["wiadomosci"] += len(dialog)
     return stat
 
@@ -129,36 +145,80 @@ def eksportuj(zrodlo: Path = ZRODLO_DOMYSLNE, cel: Path = CEL_DOMYSLNY,
 def szukaj(zapytanie: str, cel: Path = CEL_DOMYSLNY,
            limit: int = 20) -> List[Dict[str, str]]:
     """
-    Pełnotekstowe przeszukanie kroniki (fallback gdy RAG niedostępny).
-    Zwraca [{"sesja": id, "fragment": "...linia z trafieniem..."}], max `limit`.
+    Przeszukanie kroniki PO SŁOWACH (token-based), nie po całej frazie.
+
+    NAPRAWA KRYTYCZNA (Prawo XV, 2026-06-28): poprzednio `if zapytanie in linia` —
+    całe zapytanie jako jeden substring. "numba JIT wydajność" → 0 trafień, choć
+    historia o tym jest (samo "numba" → 4). Każde naturalne wielosłowne pytanie nie
+    znajdowało historii → wracaliśmy, traciliśmy czas (dokładnie problem Cezara).
+
+    Teraz: linia pasuje, gdy zawiera CHOĆ JEDNO słowo zapytania; ranking = liczba
+    trafionych słów (więcej = wyżej), remis → świeższa sesja. Zwraca pole "trafienia"
+    (ile słów pasuje) do scoringu w centrum_pamieci.
     """
     from datetime import datetime
-    q = zapytanie.lower()
-    trafienia: List[Dict[str, str]] = []
+    import re as _re
+    slowa = [s for s in _re.findall(r"\w+", zapytanie.lower()) if len(s) >= 2]
+    if not slowa:
+        return []
+    wyniki: List[Dict[str, str]] = []
     if not cel.exists():
-        return trafienia
-    for plik in sorted(cel.glob("sesja_*.md"), reverse=True):
+        return wyniki
+    # Czyta zarówno .md (ciepłe) jak i .md.gz (zimne, skompresowane przez Kustosza W7)
+    # → ZERO „memory blindness": skompresowana historia wciąż przeszukiwalna.
+    for plik in sorted(_pliki_sesji(cel), reverse=True):
         mtime = plik.stat().st_mtime
         data_pliku = datetime.utcfromtimestamp(mtime).strftime("%Y-%m-%d")
-        for linia in plik.read_text(encoding="utf-8", errors="ignore").splitlines():
-            if q in linia.lower():
-                trafienia.append({
-                    "sesja": plik.stem.replace("sesja_", ""),
+        for linia in _czytaj_sesje_tekst(plik).splitlines():
+            low = linia.lower()
+            n_traf = sum(1 for s in slowa if s in low)
+            if n_traf:
+                wyniki.append({
+                    "sesja": _id_sesji(plik),
                     "fragment": linia.strip()[:300],
                     "data": data_pliku,
+                    "trafienia": n_traf,
                 })
-                if len(trafienia) >= limit:
-                    return trafienia
-    return trafienia
+    # ranking: więcej trafionych słów najpierw (sesje już od najnowszej w pętli → stabilne)
+    wyniki.sort(key=lambda x: x["trafienia"], reverse=True)
+    return wyniki[:limit]
+
+
+def _pliki_sesji(cel: Path) -> List[Path]:
+    """Wszystkie pliki sesji: .md (ciepłe) + .md.gz (zimne/skompresowane)."""
+    return list(cel.glob("sesja_*.md")) + list(cel.glob("sesja_*.md.gz"))
+
+
+def _id_sesji(plik: Path) -> str:
+    """ID sesji z nazwy pliku (obsługuje .md i .md.gz)."""
+    nazwa = plik.name
+    if nazwa.endswith(".md.gz"):
+        nazwa = nazwa[:-6]
+    elif nazwa.endswith(".md"):
+        nazwa = nazwa[:-3]
+    return nazwa.replace("sesja_", "")
+
+
+def _czytaj_sesje_tekst(plik: Path) -> str:
+    """Czyta treść sesji — przezroczyście dekompresuje .md.gz."""
+    if plik.suffix == ".gz":
+        import gzip
+        try:
+            with gzip.open(plik, "rt", encoding="utf-8", errors="ignore") as f:
+                return f.read()
+        except OSError:
+            return ""
+    return plik.read_text(encoding="utf-8", errors="ignore")
 
 
 def statystyki(cel: Path = CEL_DOMYSLNY) -> Dict[str, int]:
-    """Ile sesji i znaków jest już w kronice (do raportu startowego)."""
+    """Ile sesji i znaków jest już w kronice (ciepłe .md + zimne .md.gz)."""
     if not cel.exists():
-        return {"sesje": 0, "znaki": 0}
-    pliki = list(cel.glob("sesja_*.md"))
-    znaki = sum(p.stat().st_size for p in pliki)
-    return {"sesje": len(pliki), "znaki": znaki}
+        return {"sesje": 0, "znaki": 0, "zimne": 0}
+    cieple = list(cel.glob("sesja_*.md"))
+    zimne = list(cel.glob("sesja_*.md.gz"))
+    znaki = sum(p.stat().st_size for p in cieple) + sum(p.stat().st_size for p in zimne)
+    return {"sesje": len(cieple) + len(zimne), "znaki": znaki, "zimne": len(zimne)}
 
 
 if __name__ == "__main__":
@@ -174,8 +234,8 @@ if __name__ == "__main__":
 
     if args.cmd == "eksportuj":
         s = eksportuj(tylko_nowe=not args.wszystko)
-        print(f"📜 Kronika: {s['zapisane']} zapisane, {s['pominiete']} pominięte, "
-              f"{s['wiadomosci']} wiadomości z {s['sesje']} sesji.")
+        print(f"📜 Kronika: {s['zapisane']} zapisane, {s.get('zaktualizowane', 0)} zaktualizowane, "
+              f"{s['pominiete']} pominięte, {s['wiadomosci']} wiadomości z {s['sesje']} sesji.")
     elif args.cmd == "szukaj":
         for t in szukaj(" ".join(args.zapytanie)):
             print(f"[{t['sesja'][:8]}] {t['fragment']}")

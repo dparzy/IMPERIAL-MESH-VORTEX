@@ -76,14 +76,46 @@ if ($schowano) {
     }
 }
 
-# --- Krok 5: testy ---
-Krok 5 "Uruchamiam testy (musza byc zielone)..."
+# --- Krok 5: zaleznosci (pip) ---
+Krok 5 "Instaluje/aktualizuje zaleznosci (requirements.txt)..."
+python -m pip install -q -r requirements.txt
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "  UWAGA: pip mial problem - sprawdz powyzej (czesc moze dzialac mimo to)." -ForegroundColor Yellow
+}
+
+# --- Krok 6: testy ---
+Krok 6 "Uruchamiam testy (musza byc zielone)..."
 python tests/run_tests.py
 if ($LASTEXITCODE -ne 0) {
     Write-Host "`nUWAGA: testy NIE przeszly. Sprawdz powyzej." -ForegroundColor Red
     exit 1
 }
 
+# --- Krok 7: indeks RAG (wektory lokalnie jesli dostepne, inaczej FTS) ---
+Krok 7 "Buduje indeks wiedzy RAG (pelny korpus)..."
+python narzedzia/rag/indeksuj.py --korpus wszystko --tylko-nowe
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "  Wektory niedostepne - probuje FTS (bez modelu)..." -ForegroundColor Yellow
+    python narzedzia/rag/indeksuj.py --korpus wszystko --bez-wektorow --tylko-nowe
+}
+
+# --- Krok 8: pamiec - katalog + graf + mapa 13 warstw ---
+Krok 8 "Odswiezam pamiec (katalog, graf) i pokazuje mape..."
+python -m imperium.biblioteki.kustosz_pamieci kataloguj
+python -m imperium.biblioteki.graf_pamieci buduj
+python -m imperium.biblioteki.kustosz_pamieci mapa
+
+# --- Krok 9: DeepSeek (jesli klucz ustawiony) ---
+Krok 9 "Sprawdzam DeepSeek (opcjonalny - tylko jesli ustawiles klucz)..."
+if ($env:DEEPSEEK_API_KEY) {
+    python -c "from imperium.cesarz.deepseek_glos import GlosImperium; print('DeepSeek:', 'OK' if GlosImperium().test_polaczenia() else 'BLAD')"
+} else {
+    Write-Host "  DeepSeek pominiety (brak DEEPSEEK_API_KEY). Aby wlaczyc:" -ForegroundColor Yellow
+    Write-Host '     setx DEEPSEEK_API_KEY "twoj-klucz"  (potem nowy terminal)' -ForegroundColor Yellow
+}
+
 Write-Host "`n=====================================================" -ForegroundColor Green
-Write-Host " GOTOWE. Imperium aktualne, testy zielone." -ForegroundColor Green
+Write-Host " GOTOWE. Imperium aktualne, testy zielone, pamiec odswiezona." -ForegroundColor Green
+Write-Host " Paper-trading:  python skrypty/start.py  (dashboard :8777)" -ForegroundColor Green
+Write-Host " Przewodnik:     docs/START_LOKAL.md" -ForegroundColor Green
 Write-Host "=====================================================" -ForegroundColor Green

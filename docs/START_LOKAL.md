@@ -20,15 +20,26 @@ płynie przez git. Lokal **DODAJE** moce, nie zastępuje.
 
 ---
 
-## 1️⃣ Aktualizacja lokala (masz już zainstalowanego — tylko odśwież)
+## 1️⃣ Aktualizacja lokala — JEDNO KLIKNIĘCIE (Windows/PowerShell)
 
-W terminalu, w folderze repo:
+W folderze repo uruchom:
 
+```powershell
+.\aktualizuj.ps1
+```
+(jeśli PowerShell blokuje: `powershell -ExecutionPolicy Bypass -File .\aktualizuj.ps1`)
+
+Ten jeden skrypt robi WSZYSTKO po kolei: właściwa gałąź → chowa Twoje lokalne zmiany →
+`git pull` (cała pamięć 13 warstw) → `pip install` → testy → indeks RAG (wektory) →
+odświeża pamięć (katalog+graf) → mapa 13 warstw → test DeepSeek (jeśli ustawiłeś klucz).
+Bezpieczny: dane w `dane/` nietknięte, lokalne zmiany schowane i przywrócone.
+
+### Ręcznie (Linux/Mac lub gdy wolisz krok po kroku):
 ```bash
-git fetch origin claude/sleepy-fermi-dsdE4
 git checkout claude/sleepy-fermi-dsdE4
-git pull origin claude/sleepy-fermi-dsdE4      # cała pamięć 13 warstw z chmury
-pip install -r requirements.txt                # zależności (numpy, scipy, numba, pytest...)
+git pull origin claude/sleepy-fermi-dsdE4
+pip install -r requirements.txt
+python skrypty/start_lokal.py                  # rozruch + weryfikacja
 ```
 
 > ⚠️ Jeśli `git checkout` narzeka na lokalne zmiany — zrób `git stash` najpierw.

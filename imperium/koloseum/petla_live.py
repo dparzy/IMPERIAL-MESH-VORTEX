@@ -158,7 +158,11 @@ def _buduj_dyrygencie(
     # W-327: lista adapterów sentymentu/flow. Gdy funding_mexc → MEXC dokładany PO
     # Binance, więc nadpisuje funding+OI rodzimymi (L/S zostaje z Binance — MEXC go
     # nie dostarcza, więc nie nadpisze). Kolejność = priorytet ostatniego dla klucza.
-    adaptery_sentymentu = [AdapterFutures(), AdapterFearGreed(), AdapterCVD(), AdapterNewsLLM()]
+    # NEWS-01 dostaje żywy feed RSS (CoinDesk/CT/Decrypt) — unlock 2026-06-30. Graceful:
+    # brak sieci → fetcher zwraca [] → NEWS-01 abstynuje (Prawo XV), nic się nie psuje.
+    from imperium.akwedukty.news_fetcher import FetcherNewsRSS
+    adaptery_sentymentu = [AdapterFutures(), AdapterFearGreed(), AdapterCVD(),
+                           AdapterNewsLLM(fetcher=FetcherNewsRSS())]
     if getattr(cfg, "funding_mexc", False):
         adaptery_sentymentu.insert(1, AdapterMEXCFutures())
 

@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-30 | UNLOCK+RESEARCH | 📰 FetcherNewsRSS — odblokowanie NEWS-01 + plan rozbudowy
+
+Cezar: rozbuduj NEWS-01, sweep świata, oryginalne moduły, wyprzedzać konkurencję.
+
+AUDYT NEWS-01: neuron + adapter (DeepSeek + fallback słownikowy) gotowe, ale adapter miał
+PUSTY fetcher → NEWS-01 zawsze milczał, nawet z DeepSeek. Brakującym ogniwem był FEED, nie API.
+
+**UNLOCK — FetcherNewsRSS** (`imperium/akwedukty/news_fetcher.py`): pobiera nagłówki z darmowych
+RSS (CoinDesk/CoinTelegraph/Decrypt), parsowanie stdlib (xml.etree, ZERO nowych zależności),
+filtr per-aktywo (BTC/ETH/DOGE...), dedup między wydawcami, wstrzykiwalny pobieracz (offline-test).
+Graceful: brak sieci → [] → NEWS-01 abstynuje (Prawo XV). Wpięty w petla_live (opt-in live).
++10 testów. Działa: BTC→"ETF rally" +1.0, ETH→"hack" neg, pełny feed +0.655.
+
+RESEARCH (sweep świata, ZPO): dostawcy CoinGecko News/CoinDesk/Crypto News API; badania granicy
+2026 — event-aware sentiment (arXiv:2508.07408: rumor/retail-buzz = KONTRARIAŃSKIE, ujemny Sharpe!),
+Janus-Q (arXiv:2602.19919). Plan 10 modułów: taksonomia zdarzeń, spike uwagi, Δ sentymentu,
+wiarygodność źródła, novelty, rozrzut, social, on-chain. Propozycja Prawa XXII (przewaga konkurencyjna).
+Pełny plan: docs/NEWS_ROZBUDOWA_2026-06-30.md. 1841→1851.
+
+---
+
 ## 2026-06-30 | NAPRAWA+LOKAL | 🖥️ Przewodnik startu lokalnego + naprawa reprodukowalności
 
 Cezar: „jak pamięć działa w chmurze vs lokal, czy lokal ma dostęp do wszystkich plików,

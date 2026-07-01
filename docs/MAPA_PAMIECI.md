@@ -1,6 +1,6 @@
 # 🗺️ MAPA PAMIĘCI IMPERIUM — Centrum Pamięci W-360 v13
 
-> **Stan na:** 2026-06-30 · **Jedno źródło prawdy o architekturze pamięci.**
+> **Stan na:** 2026-07-01 · **Jedno źródło prawdy o architekturze pamięci.**
 > Konsolidacja 13 warstw. Liczby policzone z kodu (`kustosz_pamieci mapa`), nie z pamięci.
 
 ## 📜 Czym jest Centrum Pamięci

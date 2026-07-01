@@ -13,11 +13,11 @@ Weryfikuje:
 from imperium.biblioteki import graf_pamieci as gp
 
 
-def _graf_z_wpisow(tmp_path, monkeypatch, wpisy):
+def _graf_z_wpisow(tmp_path, monkeypatch, wpisy, min_waga=1):
     """Buduje graf z podanych (data, tekst) — podmienia źródła na kontrolowane."""
     monkeypatch.setattr(gp, "_zrodla_wpisow", lambda: wpisy)
     plik = tmp_path / "graf.json"
-    return gp.zbuduj_graf(plik=plik), plik
+    return gp.zbuduj_graf(plik=plik, min_waga=min_waga), plik
 
 
 def test_buduj_wezly_i_krawedzie(tmp_path, monkeypatch):
@@ -86,13 +86,26 @@ def test_pusty_graf_nie_wybucha(tmp_path):
 
 
 def test_szum_odfiltrowany(tmp_path, monkeypatch):
-    """Słowa-szum (była, brak, przez) NIE stają się węzłami."""
+    """Słowa-szum (była, brak, przez) NIE stają się węzłami; realne tokeny tak
+    (dwa realne słowa → krawędź → węzły zachowane po filtrze izolowanych)."""
     g, _ = _graf_z_wpisow(tmp_path, monkeypatch, [
-        ("2026-06-01", "numba była zmierzone przez brak rozważyć"),
+        ("2026-06-01", "numba viterbi była zmierzone przez brak rozważyć"),
     ])
     assert "była" not in g["wezly"]
     assert "brak" not in g["wezly"]
-    assert "numba" in g["wezly"]
+    assert "numba" in g["wezly"] and "viterbi" in g["wezly"]
+
+
+def test_izolowane_wezly_odfiltrowane(tmp_path, monkeypatch):
+    """min_waga>1 usuwa krawędzie-szum ORAZ osierocone węzły (niequeryowalne)."""
+    g, _ = _graf_z_wpisow(tmp_path, monkeypatch, [
+        ("2026-06-01", "alfa beta"),          # krawędź alfa-beta waga 1
+        ("2026-06-02", "gamma delta"),        # krawędź gamma-delta waga 1
+        ("2026-06-03", "alfa beta"),          # alfa-beta waga 2
+    ], min_waga=2)
+    # tylko alfa-beta przetrwa (waga 2); gamma/delta to izolowane węzły → usunięte
+    assert "alfa" in g["wezly"] and "beta" in g["wezly"]
+    assert "gamma" not in g["wezly"] and "delta" not in g["wezly"]
 
 
 def test_raport_startowy_nie_wybucha(tmp_path):

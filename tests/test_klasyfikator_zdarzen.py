@@ -71,3 +71,18 @@ def test_neuron_neutral_w_strefie_szumu():
     s = NeuronTaksonomiaZdarzen().interpretuj(
         {"NEWS_EVENT_KIERUNEK": 0.1, "NEWS_EVENT_TYP": "TECHNICZNY", "NEWS_EVENT_PEWNOSC": 0.5})
     assert s.kierunek == "NEUTRAL"
+
+
+def test_neuron_neutral_pewnosc_wartosc():
+    """Pewność w strefie szumu to intencjonalne 0.15."""
+    s = NeuronTaksonomiaZdarzen().interpretuj(
+        {"NEWS_EVENT_KIERUNEK": 0.1, "NEWS_EVENT_TYP": "TECHNICZNY", "NEWS_EVENT_PEWNOSC": 0.5})
+    assert s.kierunek == "NEUTRAL" and s.pewnosc == 0.15
+
+
+def test_makro_tylko_nie_wybucha():
+    """Regresja P0: tylko MAKRO (kierunek=0.0) → brak ZeroDivisionError, kierunek 0."""
+    r = klasyfikuj(["Fed raises rates amid inflation, macro recession fears"])
+    assert r["typ"] == "MAKRO"
+    assert r["kierunek"] == 0.0
+    assert r["pewnosc"] >= 0.0   # policzona, nie crash

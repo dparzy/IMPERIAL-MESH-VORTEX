@@ -398,7 +398,7 @@ def test_frakcja_dd_reset():
 def test_regula_6pct_normal_ponizej_progu():
     """Strata 3% tego miesiąca → stan NORMAL (poniżej progu 6%)."""
     reg = RegulaSzesciuProcentEldera()
-    reg.reset_miesiac(10_000)
+    reg.reset_miesiac(10_000, dzisiaj=date(2026, 6, 1))
     reg.aktualizuj(9_700, dzisiaj=date(2026, 6, 9))
     assert reg.stan == "NORMAL"
     assert not reg.halt
@@ -407,7 +407,7 @@ def test_regula_6pct_normal_ponizej_progu():
 def test_regula_6pct_halt_po_przekroczeniu():
     """Strata 7% tego miesiąca → stan HALT (powyżej progu 6%)."""
     reg = RegulaSzesciuProcentEldera()
-    reg.reset_miesiac(10_000)
+    reg.reset_miesiac(10_000, dzisiaj=date(2026, 6, 1))
     reg.aktualizuj(9_300, dzisiaj=date(2026, 6, 9))
     assert reg.stan == "HALT"
     assert reg.halt
@@ -416,7 +416,7 @@ def test_regula_6pct_halt_po_przekroczeniu():
 def test_regula_6pct_halt_trwa_do_konca_miesiaca():
     """HALT nie znika gdy kapitał chwilowo odrobi w tym samym miesiącu (doktryna Eldera)."""
     reg = RegulaSzesciuProcentEldera()
-    reg.reset_miesiac(10_000)
+    reg.reset_miesiac(10_000, dzisiaj=date(2026, 6, 1))
     reg.aktualizuj(9_300, dzisiaj=date(2026, 6, 9))   # -7% → HALT
     assert reg.halt
     reg.aktualizuj(9_900, dzisiaj=date(2026, 6, 20))  # odrobił do -1%
@@ -428,7 +428,7 @@ def test_regula_6pct_halt_trwa_do_konca_miesiaca():
 def test_regula_6pct_reset_nowy_miesiac():
     """Po zmianie miesiąca stan wraca do NORMAL i liczy od nowego kapitału."""
     reg = RegulaSzesciuProcentEldera()
-    reg.reset_miesiac(10_000)
+    reg.reset_miesiac(10_000, dzisiaj=date(2026, 6, 1))
     reg.aktualizuj(9_300, dzisiaj=date(2026, 6, 30))
     assert reg.halt
     reg.aktualizuj(9_300, dzisiaj=date(2026, 7, 1))
@@ -439,7 +439,7 @@ def test_regula_6pct_weto_w_planie():
     """Gdy Reguła 6% HALT, policz() zwraca checklist_ok=False z odpowiednim powodem."""
     kalk = KalkulatorLewara()
     reg = RegulaSzesciuProcentEldera()
-    reg.reset_miesiac(10_000)
+    reg.reset_miesiac(10_000, dzisiaj=date(2026, 6, 1))
     reg.aktualizuj(9_300, dzisiaj=date(2026, 6, 9))
     assert reg.halt
     plan = kalk.policz("BTCUSDT", "LONG", 100_000, 10, 9_300,

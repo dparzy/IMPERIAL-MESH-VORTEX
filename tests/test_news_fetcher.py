@@ -44,7 +44,7 @@ def test_filtr_per_aktywo():
 
 def test_bez_symbolu_wszystko():
     f = FetcherNewsRSS(zrodla=["x"], pobieracz=lambda url: RSS)
-    assert len(f.pobierz()) >= 3
+    assert len(f.pobierz()) == 3   # 3 pozycje item (tytuł kanału pominięty)
 
 
 def test_deduplikacja_miedzy_zrodlami():

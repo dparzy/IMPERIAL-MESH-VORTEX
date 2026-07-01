@@ -331,10 +331,12 @@ class RegulaSzesciuProcentEldera:
     def halt(self) -> bool:
         return self.stan == "HALT"
 
-    def reset_miesiac(self, nowy_kapital: float) -> None:
+    def reset_miesiac(self, nowy_kapital: float, dzisiaj: "date | None" = None) -> None:
+        # dzisiaj: stempluje bieżący miesiąc spójnie (bez zależności od wall-clock —
+        # inaczej reset w lipcu + aktualizuj(dzisiaj=czerwiec) dawał fałszywy reset miesiąca).
         self.kapital_start_miesiaca = nowy_kapital
         self.stan = "NORMAL"
-        self._biezacy_miesiac = date.today().month
+        self._biezacy_miesiac = (dzisiaj or date.today()).month
         logger.info(f"✅ Reguła 6% Elder: ręczny reset. Bazowy = {nowy_kapital:.2f}")
 
 

@@ -6,6 +6,43 @@
 
 ---
 
+## 2026-07-01 | RECENZJA | 🔧 Naprawa 30 uwag recenzenta (cubic) — P0/P1/P2/P3
+
+Recenzja cubic na PR: 38 uwag. Naprawione wszystkie trafne (Prawo XXI — bugi PRZED mergem):
+
+**P0:** `klasyfikator_zdarzen.py` — ZeroDivisionError gdy tylko MAKRO (kierunek=0) trafiony
+(sum(wklad)=0). Fix: gałąź suma_wkladu==0 → typ po rozkładzie, kierunek 0. +test regresji.
+**P1:** `start_lokal.py` — brak `sys.path.insert(ROOT)` → importy imperium.* padały lokalnie. Fix.
+
+**P2 (bugi):**
+- `news_fetcher.py`: (a) BUSD przed USD w kolejności sufiksów (BTCBUSD→BTC); (b) tylko tytuły
+  item/entry (tytuł kanału to metadane, nie nagłówek); (c) aliasy per-aktywo z granicą \b (nie podciąg).
+- `backtest.py`: zwrot IC rejestrowany KAŻDY bar (nie tylko z raportem) — zgodność horyzontów.
+- `graf_pamieci.py`: filtr węzłów do obecnych w zachowanych krawędziach (koniec węzłów-sierot).
+- `dziennik_niesmiertelny.py`: walidacja że wczytany JSON to obiekt (jedna zła linia nie psuje recall).
+- `zapominanie.py`: raport() bez limitu (pełna liczba kandydatów, nie ucięta do 30).
+- `pamiec_proweniencji.py`: tokeny ≥2 znaki (śledzenie W3/W8); kronika bez limitu przed sortem.
+- `kronika_czatu.py`: (a) .md.gz liczone jako istniejący eksport (koniec duplikatów); (b) sort po mtime.
+- `kustosz_pamieci.py`: walidacja dni<0 (nie kompresuj aktywnych sesji).
+- `centrum_pamieci.py`: pusty Dziennik wykrywany po dokładnym markerze (nie substring „pusty").
+- `_jit.py`: @njit i @njit() spójne (cache=True domyślnie w obu).
+- `audyt_spojnosci.py`: NEWS-02/03/04 dodane do WERYFIKACJA_ADAPTEROW (kontrakt weryfikacji).
+- `pamiec_robocza.py` → CoALA + Zep + event-sentiment w REJESTR_INSPIRACJI (ZPO).
+
+**P3:** typo CLI (biblioteci→biblioteki ×2); `dziennik` ostatnie≤0; `proceduralna` CLI --zrodlo;
+procedury.jsonl — sprostowanie o pre-commit hooku (nie klonuje się); klasyfikator pewnosc w teście.
+
+**Testy graniczne (Reguła Test-Granic):** +14 testów granic (news_dynamika Δ/spike/sent,
+zapominanie prog/wiek, kustosz dni=30 dokładnie + dni<0, proceduralna limit/regex, graf izolowane,
+klasyfikator MAKRO-only, fetcher exact count). Zachowana logika, wynik identyczny.
+
+**Bonus (Prawo XVIII) — krucha zależność od daty:** `RegulaSzesciuProcentEldera.reset_miesiac`
+stemplowała `date.today().month` → w nowym miesiącu (lipiec) 4 testy 6% pękały (fałszywy reset
+przy aktualizuj z czerwcową datą). Fix: reset_miesiac przyjmuje `dzisiaj` (deterministyczny miesiąc);
+testy go używają. Testy 6% niezależne od wall-clock.
+
+---
+
 ## 2026-06-30 | POMIAR | 📊 W-385: IC roju w backteście — fundament Prawa XVI
 
 Cezar: „dawaj". Logowanie/pomiar predykcyjności newsów. UCZCIWIE (Prawo I): brak historycznych

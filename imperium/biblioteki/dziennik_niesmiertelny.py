@@ -62,9 +62,11 @@ def _wczytaj(plik: Optional[Path] = None) -> List[Dict[str, Any]]:
         if not linia:
             continue
         try:
-            wynik.append(json.loads(linia))
+            obj = json.loads(linia)
         except (json.JSONDecodeError, ValueError):
             continue
+        if isinstance(obj, dict):     # linia poprawna-ale-nie-obiekt (np. liczba/lista) → pomiń
+            wynik.append(obj)
     return wynik
 
 
@@ -148,6 +150,12 @@ def os_czasu(plik: Optional[Path] = None, ostatnie: Optional[int] = None) -> str
     if not wpisy:
         return "♾️ DZIENNIK NIEŚMIERTELNY — pusty (pierwsza sesja zostawi ślad)."
     linie = [f"♾️ DZIENNIK NIEŚMIERTELNY — {len(wpisy)} sesji, pełna oś projektu:"]
+    if ostatnie is not None and ostatnie <= 0:
+        # ostatnie=0 (lub ujemne) → wszystkie jednolinijkowe (slice [:-0] dałby PEŁNE — bug)
+        for w in wpisy:
+            co0 = (w.get("co") or ["—"])[0]
+            linie.append(f"   · {w.get('data','?')}: {co0}")
+        return "\n".join(linie)
     if ostatnie is not None and len(wpisy) > ostatnie:
         # starsze: jednolinijkowe; najnowsze `ostatnie`: pełne
         starsze, nowsze = wpisy[:-ostatnie], wpisy[-ostatnie:]

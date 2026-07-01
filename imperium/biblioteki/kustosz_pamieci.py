@@ -117,8 +117,13 @@ def kompresuj_zimne(dni: int = 30, kronika_dir: Path = KRONIKA_DIR,
     Bezpieczne: kompresuje tylko gdy .gz jeszcze nie istnieje; usuwa .md po sukcesie.
     """
     import time
-    prog = (teraz if teraz is not None else time.time()) - dni * 86400
     raport = {"skompresowane": 0, "bajty_przed": 0, "bajty_po": 0, "pominiete": 0}
+    if dni < 0:
+        # Ujemne dni kompresowałoby wszystkie ciepłe sesje (nawet aktywną) — zabronione.
+        # „starsze niż dni" nie ma sensu dla dni<0; zwracamy pusty raport bezpiecznie.
+        raport["ratio"] = 0.0
+        return raport
+    prog = (teraz if teraz is not None else time.time()) - dni * 86400
     if not kronika_dir.exists():
         return raport
     for plik in sorted(kronika_dir.glob("sesja_*.md")):

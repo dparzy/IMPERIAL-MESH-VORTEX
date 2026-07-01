@@ -524,7 +524,7 @@ def podsumowanie_startowe(k: int = 3, zapytanie: str = "") -> str:
     try:
         from imperium.biblioteki import dziennik_niesmiertelny as _dn
         os_t = _dn.os_czasu(ostatnie=12)
-        if "pusty" not in os_t:
+        if not os_t.startswith("♾️ DZIENNIK NIEŚMIERTELNY — pusty"):
             linie.append("")
             linie.append(os_t)
         if _dn.brak_wpisu_dzis():

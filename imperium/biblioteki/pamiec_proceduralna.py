@@ -154,7 +154,8 @@ _ZIARNO = [
             "python narzedzia/audyt_spojnosci.py — musi być exit 0 (w tym ruff W13)",
             "Dopisz wpis do Dziennika Nieśmiertelnego (ROZKAZ STAŁY)",
             "Zaktualizuj 'Stan na:' w MANIFEST/README na datę commitu",
-            "git add -A && git commit (pre-commit hook zweryfikuje); git push -u origin <branch>",
+            "URUCHOM bramkę RĘCZNIE (testy+audyt powyżej) — hook pre-commit NIE jest w repo "
+            "(nie klonuje się); git add -A && git commit; git push -u origin <branch>",
         ],
         "zrodlo": "TRYB AUTONOMICZNY + Prawo XXI",
     },
@@ -202,6 +203,7 @@ if __name__ == "__main__":
     pd.add_argument("nazwa")
     pd.add_argument("--wyzwalacz", default="")
     pd.add_argument("--kroki", nargs="+", required=True)
+    pd.add_argument("--zrodlo", default="")
     args = p.parse_args()
 
     if args.cmd == "zasiej":
@@ -212,7 +214,7 @@ if __name__ == "__main__":
             for i, k in enumerate(pr["kroki"], 1):
                 print(f"   {i}. {k}")
     elif args.cmd == "dodaj":
-        ok = dodaj(args.nazwa, args.kroki, args.wyzwalacz)
+        ok = dodaj(args.nazwa, args.kroki, args.wyzwalacz, args.zrodlo)
         print("✅ Dodano" if ok else "— Duplikat nazwy")
     else:
         for pr in wszystkie():

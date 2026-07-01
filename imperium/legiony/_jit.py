@@ -43,9 +43,13 @@ def njit(*args, **kwargs):
             return _numba_njit(cache=True)(fn)
         return fn
 
-    # forma z opcjami: @njit(...) → zwraca dekorator
+    # forma z opcjami: @njit(...) → zwraca dekorator.
+    # Domyślnie cache=True (spójnie z formą bez nawiasów) — @njit i @njit() zachowują się
+    # identycznie; jawne cache=... w kwargs ma pierwszeństwo.
+    opcje = {"cache": True, **kwargs}
+
     def _dekorator(fn):
         if NUMBA_DOSTEPNA:
-            return _numba_njit(*args, **kwargs)(fn)
+            return _numba_njit(*args, **opcje)(fn)
         return fn
     return _dekorator

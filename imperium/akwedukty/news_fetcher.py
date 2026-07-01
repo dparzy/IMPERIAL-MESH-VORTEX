@@ -55,7 +55,8 @@ _ALIASY = {
 def _baza_z_symbolu(symbol: str) -> str:
     """'BTCUSDT' → 'BTC'; 'ETH/USDT' → 'ETH'; '' → ''."""
     s = re.sub(r"[^A-Za-z]", "", symbol).upper()
-    for koncowka in ("USDT", "USDC", "USD", "PERP", "BUSD"):
+    # BUSD/USDT/USDC PRZED USD — inaczej "BTCBUSD" ucięłoby tylko "USD" → "BTCB" (zły alias).
+    for koncowka in ("USDT", "USDC", "BUSD", "USD", "PERP"):
         if s.endswith(koncowka) and len(s) > len(koncowka):
             return s[: -len(koncowka)]
     return s
@@ -69,14 +70,24 @@ def _tytuly_z_rss(xml_tekst: str) -> List[str]:
     try:
         root = ElementTree.fromstring(xml_tekst)
     except ElementTree.ParseError:
-        # fallback regexowy gdy XML lekko uszkodzony
-        return [re.sub(r"<.*?>", "", t).strip()
-                for t in re.findall(r"<title[^>]*>(.*?)</title>", xml_tekst, re.DOTALL | re.I)]
+        # fallback regexowy gdy XML lekko uszkodzony: bierz tytuły z <item>/<entry>,
+        # pomijając <title> kanału (metadane feedu, nie nagłówek).
+        pozycje = re.findall(r"<(?:item|entry)[^>]*>(.*?)</(?:item|entry)>",
+                             xml_tekst, re.DOTALL | re.I)
+        for poz in pozycje:
+            m = re.search(r"<title[^>]*>(.*?)</title>", poz, re.DOTALL | re.I)
+            if m:
+                tytuly.append(re.sub(r"<.*?>", "", m.group(1)).strip())
+        return tytuly
+    # Tylko tytuły POZYCJI (item/entry) — <title> kanału/feedu to metadane, nie nagłówek.
     for el in root.iter():
         tag = el.tag.split("}")[-1].lower()   # bez namespace
-        if tag == "title" and el.text and el.text.strip():
-            tytuly.append(el.text.strip())
-    # pierwszy <title> to zwykle nazwa kanału — odfiltruj jeśli powtórzony jako nagłówek
+        if tag not in ("item", "entry"):
+            continue
+        for dziecko in el:
+            if dziecko.tag.split("}")[-1].lower() == "title" and dziecko.text and dziecko.text.strip():
+                tytuly.append(dziecko.text.strip())
+                break
     return tytuly
 
 
@@ -136,8 +147,12 @@ class FetcherNewsRSS:
                 klucz = _normalizuj(tytul)
                 if not klucz or klucz in widziane:
                     continue
-                if aliasy and not any(a in tytul.lower() for a in aliasy):
-                    continue   # filtr per-aktywo
+                # filtr per-aktywo: alias jako PEŁNE słowo (granice \b), nie podciąg —
+                # inaczej "eth" trafiałby "ethics", "sol" → "solid" (zaśmiecanie NEWS-01).
+                low = tytul.lower()
+                if aliasy and not any(
+                        re.search(r"\b" + re.escape(a) + r"\b", low) for a in aliasy):
+                    continue
                 widziane.add(klucz)
                 wynik.append(tytul)
                 if len(wynik) >= self.limit:

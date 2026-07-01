@@ -87,10 +87,17 @@ def klasyfikuj(naglowki: List[str]) -> Dict[str, object]:
     if not rozklad:
         return {"typ": "BRAK", "kierunek": 0.0, "pewnosc": 0.0, "n_trafien": 0, "rozklad": {}}
 
-    typ_dominujacy = max(wklad.items(), key=lambda x: x[1])[0]
     kierunek_netto = round(max(-1.0, min(1.0, suma_kierunek / suma_waga)), 4)
+    suma_wkladu = sum(wklad.values())
+    if suma_wkladu > 0:
+        typ_dominujacy = max(wklad.items(), key=lambda x: x[1])[0]
+        udzial_dom = wklad[typ_dominujacy] / suma_wkladu
+    else:
+        # tylko zdarzenia neutralne KIERUNKOWO (np. MAKRO, kierunek=0.0) → brak wkładu.
+        # Typ po liczbie trafień; kierunek 0 (bez przewagi). Zapobiega ZeroDivisionError.
+        typ_dominujacy = max(rozklad.items(), key=lambda x: x[1])[0]
+        udzial_dom = 1.0
     # pewność: saturacja liczby trafień × udział dominującego typu w wkładzie
-    udzial_dom = wklad[typ_dominujacy] / sum(wklad.values())
     pewnosc = round(min(1.0, (0.3 + n_trafien / 10.0)) * udzial_dom, 4)
 
     return {

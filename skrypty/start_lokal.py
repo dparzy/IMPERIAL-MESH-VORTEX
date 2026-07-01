@@ -25,6 +25,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+# Uruchamiany jako `python skrypty/start_lokal.py` z korzenia repo → dodaj ROOT do ścieżki,
+# inaczej importy `imperium.*` (KROK 1) zawodzą ModuleNotFoundError.
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 
 def _krok(nr: int, opis: str):

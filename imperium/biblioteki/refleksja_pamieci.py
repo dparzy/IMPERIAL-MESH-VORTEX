@@ -32,7 +32,7 @@ Pod zarządem Kustosza (W7); używa temporalności Grafu (W8) i statusów Rejest
 CLI:
   python -m imperium.biblioteki.refleksja_pamieci raport
   python -m imperium.biblioteki.refleksja_pamieci sprzecznosci
-  python -m imperium.biblioteci.refleksja_pamieci przedawnienia --dni 21
+  python -m imperium.biblioteki.refleksja_pamieci przedawnienia --dni 21
 """
 
 from __future__ import annotations

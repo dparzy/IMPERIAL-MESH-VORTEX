@@ -43,3 +43,19 @@ def test_raport_startowy(tmp_path):
     assert pp.raport_startowy(plik=plik) == ""   # pusto
     pp.dodaj("X", ["k"], plik=plik)
     assert "proceduralna" in pp.raport_startowy(plik=plik)
+
+
+def test_szukaj_limit(tmp_path):
+    """szukaj() przycina do limit gdy jest więcej trafień (Reguła Test-Granic)."""
+    plik = tmp_path / "p.jsonl"
+    for i in range(8):
+        pp.dodaj(f"Proc {i} commit", ["k"], "commit", plik=plik)
+    assert len(pp.szukaj("commit", limit=5, plik=plik)) == 5
+
+
+def test_szukaj_regex_granica_dlugosci(tmp_path):
+    """\\w{3,}: słowo 2-znakowe pomijane, 3-znakowe łapane."""
+    plik = tmp_path / "p.jsonl"
+    pp.dodaj("XY procedura", ["k"], "abc", plik=plik)   # wyzwalacz 'abc' (3 znaki)
+    assert pp.szukaj("ab", plik=plik) == []             # 2 znaki → brak tokenów → []
+    assert pp.szukaj("abc", plik=plik)                  # 3 znaki → trafienie

@@ -119,11 +119,15 @@ def eksportuj(zrodlo: Path = ZRODLO_DOMYSLNE, cel: Path = CEL_DOMYSLNY,
         stat["sesje"] += 1
         id_sesji = src.stem
         cel_plik = cel / f"sesja_{id_sesji}.md"
-        istnial = cel_plik.exists()
+        cel_gz = cel / f"sesja_{id_sesji}.md.gz"   # zimna (skompresowana) wersja
+        # Sesja „istnieje" jeśli jest ciepła (.md) LUB zimna (.md.gz) — inaczej re-eksport
+        # utworzyłby duplikat .md obok archiwum .md.gz.
+        cel_istniejacy = cel_plik if cel_plik.exists() else (cel_gz if cel_gz.exists() else None)
+        istnial = cel_istniejacy is not None
         if tylko_nowe and istnial:
             # Re-eksport tylko gdy źródło świeższe niż zapis (aktywna sesja rośnie).
             try:
-                if src.stat().st_mtime <= cel_plik.stat().st_mtime:
+                if src.stat().st_mtime <= cel_istniejacy.stat().st_mtime:
                     stat["pominiete"] += 1
                     continue
             except OSError:
@@ -133,6 +137,9 @@ def eksportuj(zrodlo: Path = ZRODLO_DOMYSLNE, cel: Path = CEL_DOMYSLNY,
         if len(dialog) < min_wiadomosci:
             stat["pominiete"] += 1
             continue
+        # Źródło świeższe — re-warm: usuń nieaktualną zimną kopię, zapisz ciepłą .md.
+        if cel_gz.exists():
+            cel_gz.unlink()
         cel_plik.write_text(_na_markdown(dialog, id_sesji), encoding="utf-8")
         if istnial:
             stat["zaktualizowane"] += 1
@@ -166,7 +173,7 @@ def szukaj(zapytanie: str, cel: Path = CEL_DOMYSLNY,
         return wyniki
     # Czyta zarówno .md (ciepłe) jak i .md.gz (zimne, skompresowane przez Kustosza W7)
     # → ZERO „memory blindness": skompresowana historia wciąż przeszukiwalna.
-    for plik in sorted(_pliki_sesji(cel), reverse=True):
+    for plik in sorted(_pliki_sesji(cel), key=lambda p: p.stat().st_mtime, reverse=True):
         mtime = plik.stat().st_mtime
         data_pliku = datetime.utcfromtimestamp(mtime).strftime("%Y-%m-%d")
         for linia in _czytaj_sesje_tekst(plik).splitlines():

@@ -27,6 +27,9 @@
 | 5 | A-12 | Kronos — Foundation Model for K-line | github.com/shiyu-coder/Kronos | ✅ zweryfikowany | Neuron predykcyjny świec |
 | 6 | LA-01 | Freqtrade lookahead-analysis | freqtrade.io/en/stable/lookahead-analysis | ✅ **WDROŻONY** | Detektor lookahead-bias w backteście |
 | 7 | ML-28 | MRC — Market Regime Council (Shapley) | arxiv.org/abs/2605.24490 | ✅ zweryfikowany | Dynamiczne wagi agentów (plan) |
+| 8 | MEM-05 | CoALA — Cognitive Architectures for Language Agents | arxiv.org/abs/2309.02427 | ✅ zweryfikowany | Taksonomia pamięci (robocza W12 + proceduralna W11 + epizodyczna + semantyczna) |
+| 9 | MEM-06 | Zep/Graphiti — Temporal Knowledge Graph Memory | arxiv.org/abs/2501.13956 | ✅ zweryfikowany | Graf pamięci W8 (węzły+krawędzie+okno ważności) |
+| 10 | MEM-07 | Event-Aware Sentiment Factors (LLM tweets) | arxiv.org/abs/2508.07408 | ✅ zweryfikowany | NEWS-02 taksonomia zdarzeń (kierunek per typ, rumor=kontrariański) |
 | 8 | ML-29 | TradingAgents — Multi-Agent LLM | arxiv.org/abs/2412.20138 | ✅ zweryfikowany | Wzorzec Senatu/ról (referencja) |
 | 9 | ML-30 | Volatility-Adaptive MoE (Adaptive Market Intelligence) | arxiv.org/abs/2508.02686 | ✅ zweryfikowany | **WDROŻONY** jako Namiestnik TABLICA |
 | 10 | ML-31 | Adaptive Regime-Aware Stock Prediction (Transformer+RL) | arxiv.org/abs/2603.19136 | ✅ zweryfikowany | Wzorzec dla Namiestnik Faza 2 |

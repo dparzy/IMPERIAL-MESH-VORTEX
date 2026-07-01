@@ -24,7 +24,7 @@ Pod zarządem Kustosza (W7).
 
 CLI:
   python -m imperium.biblioteki.pamiec_proweniencji skad "numba"
-  python -m imperium.biblioteci.pamiec_proweniencji geneza "kustosz"
+  python -m imperium.biblioteki.pamiec_proweniencji geneza "kustosz"
 """
 
 from __future__ import annotations
@@ -34,7 +34,8 @@ from typing import Dict, Any, List, Optional
 
 
 def _slowa(zapytanie: str) -> List[str]:
-    return [s for s in re.findall(r"\w{3,}", zapytanie.lower())]
+    # min. 2 znaki (spójne z kronika/dziennik) — pozwala śledzić ID warstw jak "W3", "W8".
+    return [s for s in re.findall(r"\w+", zapytanie.lower()) if len(s) >= 2]
 
 
 def _trafienie(tekst: str, slowa: List[str]) -> bool:
@@ -85,10 +86,12 @@ def slad(encja: str, limit: int = 40) -> List[Dict[str, Any]]:
     except Exception:
         pass
 
-    # W3b kronika (data + sesja + fragment) — najbogatsze źródło chronologii
+    # W3b kronika (data + sesja + fragment) — najbogatsze źródło chronologii.
+    # limit szeroki: pełny ślad przed globalnym sortem chronologicznym (inaczej geneza
+    # mogłaby zwrócić trafienie rankowane/ucięte, nie prawdziwy początek).
     try:
         from imperium.biblioteki import kronika_czatu as _kc
-        for t in _kc.szukaj(encja, limit=limit):
+        for t in _kc.szukaj(encja, limit=max(limit, 500)):
             wyst.append({"data": t.get("data", ""), "sesja": t.get("sesja", "")[:8],
                          "warstwa": "kronika", "fragment": t.get("fragment", "")[:140]})
     except Exception:

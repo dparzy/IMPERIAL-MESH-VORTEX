@@ -78,3 +78,32 @@ def test_adapter_spike_liczony_z_liczby_naglowkow():
         box["i"] = k
         d = ad.pobierz("BTCUSDT")
     assert d["NEWS_ATTENTION_SPIKE"] > 2.0          # 8 nagłówków vs średnia ~1
+
+
+# ── GRANICE PROGÓW (Reguła Test-Granic, Prawo XXI) ────────────────────────────
+
+def test_delta_dokladnie_prog_long():
+    """Δ == 0.25 dokładnie: abs(d) < 0.25 = False → LONG (nie NEUTRAL)."""
+    assert NeuronDeltaeSentymentu().interpretuj({"NEWS_SENTYMENT_DELTA": 0.25}).kierunek == "LONG"
+
+
+def test_delta_dokladnie_prog_short():
+    assert NeuronDeltaeSentymentu().interpretuj({"NEWS_SENTYMENT_DELTA": -0.25}).kierunek == "SHORT"
+
+
+def test_delta_zero_neutral():
+    assert NeuronDeltaeSentymentu().interpretuj({"NEWS_SENTYMENT_DELTA": 0.0}).kierunek == "NEUTRAL"
+
+
+def test_spike_dokladnie_prog_2_z_sentymentem():
+    """spike == 2.0 dokładnie: spike < 2.0 = False → przechodzi do kierunku sentymentu."""
+    s = NeuronSpikeUwagi().interpretuj({"NEWS_ATTENTION_SPIKE": 2.0, "NEWS_SENTYMENT": 0.6})
+    assert s.kierunek == "LONG"
+
+
+def test_spike_dokladnie_prog_sentymentu_020():
+    """sent == 0.20 dokładnie: abs(sent) < 0.20 = False → zajmuje pozycję."""
+    s = NeuronSpikeUwagi().interpretuj({"NEWS_ATTENTION_SPIKE": 3.0, "NEWS_SENTYMENT": 0.20})
+    assert s.kierunek == "LONG"
+    s2 = NeuronSpikeUwagi().interpretuj({"NEWS_ATTENTION_SPIKE": 3.0, "NEWS_SENTYMENT": -0.20})
+    assert s2.kierunek == "SHORT"

@@ -604,6 +604,10 @@ WERYFIKACJA_ADAPTEROW = {
     "RADAR-05": {"LEAD_BTC": 0.8},                                       # BTC pchnął↑ → LONG-wsparcie
     "C-01":    {"CROSS_RS": 1.5},                                        # lider koszyka → LONG
     "NEWS-01": {"NEWS_SENTYMENT": 0.8, "NEWS_PEWNOSC": 0.9, "NEWS_N": 5},  # mocno bycze → LONG
+    "NEWS-02": {"NEWS_EVENT_KIERUNEK": -0.9, "NEWS_EVENT_TYP": "HACK",
+                "NEWS_EVENT_PEWNOSC": 0.9},                                # hack → SHORT
+    "NEWS-03": {"NEWS_ATTENTION_SPIKE": 3.0, "NEWS_SENTYMENT": 0.6},        # spike+byczo → LONG
+    "NEWS-04": {"NEWS_SENTYMENT_DELTA": 0.5},                               # sentyment↑ → LONG
     "X-28":   {"CLOSE": 50000.0, "RSI_14": 60.0, "EMA_21": 49000.0,
                "MTF_4H_RSI_14": 65.0, "MTF_4H_EMA_50": 47000.0,
                "MTF_1D_RSI_14": 58.0, "MTF_1D_EMA_50": 46000.0},  # 3/3 TF LONG → LONG

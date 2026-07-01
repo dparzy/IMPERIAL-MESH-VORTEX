@@ -84,3 +84,30 @@ def test_anti_utrwalanie_brak_metod_kasujacych():
 def test_raport_startowy_pusty_gdy_brak(monkeypatch):
     monkeypatch.setattr(zp, "kandydaci_do_zapomnienia", lambda *a, **k: [])
     assert zp.raport_startowy() == ""
+
+
+# ── GRANICE (Reguła Test-Granic, Prawo XXI) ───────────────────────────────────
+
+def test_kandydaci_dokladnie_prog_wieku(monkeypatch):
+    """dni graniczne: wiek == dni → wiek < dni False → NIE pomija (kwalifikuje)."""
+    from datetime import date as _d
+    data30 = _d.fromordinal(_d.today().toordinal() - 30).isoformat()
+    monkeypatch.setattr(zp, "_zrodla", lambda: [
+        {"zrodlo": "lekcje", "tytul": "drobiazg", "tresc": "nic", "data": data30, "status": ""}])
+    monkeypatch.setattr(zp, "_stopien_w_grafie", lambda: {})
+    # prog=0.6 izoluje granicę WIEKU (retencja ~0.22 < 0.6): wiek==30 nie jest pomijany
+    assert zp.kandydaci_do_zapomnienia(prog=0.6, dni=30)   # wiek==30 kwalifikuje (>= dni)
+
+
+def test_kandydaci_prog_zero_nic(monkeypatch):
+    """prog=0: r < 0 nigdy prawdziwe → zero kandydatów (retencja zawsze ≥0)."""
+    monkeypatch.setattr(zp, "_zrodla", lambda: [
+        {"zrodlo": "lekcje", "tytul": "x", "tresc": "y", "data": "2020-01-01", "status": ""}])
+    monkeypatch.setattr(zp, "_stopien_w_grafie", lambda: {})
+    assert zp.kandydaci_do_zapomnienia(prog=0.0, dni=30) == []
+
+
+def test_plan_dokladnie_prog_retencji():
+    """Plan otwarty: retencja == 0.5 dokładnie (granica max(...,0.5))."""
+    stary = {"tytul": "x", "tresc": "y", "data": "2020-01-01", "status": "PLANOWANE"}
+    assert zp.wartosc_retencji(stary, stopnie={}) == 0.5

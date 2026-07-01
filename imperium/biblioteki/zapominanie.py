@@ -139,7 +139,8 @@ def kandydaci_do_zapomnienia(prog: float = 0.15, dni: int = 30,
 
 
 def raport(prog: float = 0.15, dni: int = 30) -> Dict[str, Any]:
-    kand = kandydaci_do_zapomnienia(prog=prog, dni=dni)
+    # limit wysoki — raport ma podać PEŁNĄ liczbę kandydatów, nie uciętą do 30.
+    kand = kandydaci_do_zapomnienia(prog=prog, dni=dni, limit=10_000)
     wszystkie = _zrodla()
     return {"ocenionych": len(wszystkie), "kandydatow": len(kand), "kandydaci": kand}
 

@@ -181,12 +181,14 @@ def backtest(
 
         # Pomiar IC (W-385): sygnał_t (kierunek×pewność) + zwrot wejściowy bieżącego baru.
         # Kolektor paruje sygnał_t z zwrotem_{t+h} (przyszłym) — bez look-ahead.
-        if kol_ic is not None and decyzja.raport is not None:
-            sygnaly_ic = {
-                s.neuron_id: (s.pewnosc if s.kierunek == "LONG"
-                              else -s.pewnosc if s.kierunek == "SHORT" else 0.0)
-                for s in decyzja.raport.sygnaly}
-            kol_ic.rejestruj_sygnal(sygnaly_ic)
+        if kol_ic is not None:
+            # Sygnał tylko gdy jest raport; ZWROT rejestrujemy KAŻDY bar — inaczej
+            # brakujący bar (weto/HALT bez raportu) rozjeżdża horyzonty forward-zwrotu.
+            if decyzja.raport is not None:
+                kol_ic.rejestruj_sygnal({
+                    s.neuron_id: (s.pewnosc if s.kierunek == "LONG"
+                                  else -s.pewnosc if s.kierunek == "SHORT" else 0.0)
+                    for s in decyzja.raport.sygnaly})
             poprz = bary[i - 1]["close"]
             kol_ic.rejestruj_zwrot(biezacy["close"] / poprz - 1 if poprz else 0.0)
 

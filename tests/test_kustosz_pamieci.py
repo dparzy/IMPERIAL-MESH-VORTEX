@@ -103,3 +103,27 @@ def test_mapa_ma_13_warstw():
 def test_mapa_warstwy_maja_komplet_pol():
     for w in ku.WARSTWY:
         assert len(w) == 4 and all(w)   # (klucz, nazwa, rola, typ) — nic pustego
+
+
+def test_kompresuj_granica_dni_dokladnie(tmp_path):
+    """Granica dni: st_mtime > prog (ściśle). Deterministyczny `teraz` (bez wyścigu z zegarem):
+    wiek dokładnie 30 dni (mtime==prog) NIE kompresowany; 31 dni (mtime<prog) tak (Reguła Test-Granic)."""
+    import os
+    TERAZ = 2_000_000_000.0
+    # Kod: `if mtime > prog: pomiń`. prog = teraz - 30d. Więc mtime==prog (dokładnie 30 dni)
+    # → NIE > prog → KOMPRESOWANA; mtime>prog (29 dni, świeższa) → pominięta.
+    p30 = _sesja(tmp_path, "sesja_30.md", "## Cezar\ntreść graniczna\n" * 40)
+    p29 = _sesja(tmp_path, "sesja_29.md", "## Cezar\ntreść świeższa\n" * 40)
+    os.utime(p30, (TERAZ - 30 * 86400, TERAZ - 30 * 86400))   # mtime == prog → kompres
+    os.utime(p29, (TERAZ - 29 * 86400, TERAZ - 29 * 86400))   # mtime >  prog → pominięta
+    ku.kompresuj_zimne(dni=30, kronika_dir=tmp_path, teraz=TERAZ)
+    assert (tmp_path / "sesja_30.md.gz").exists()             # dokładnie 30 dni → skompresowana
+    assert (tmp_path / "sesja_29.md").exists()                # 29 dni → NIE (świeższa niż próg)
+
+
+def test_kompresuj_dni_ujemne_bezpieczne(tmp_path):
+    """dni<0 nie kompresuje aktywnych sesji (walidacja)."""
+    _sesja(tmp_path, "sesja_teraz.md", "## Cezar\nświeża\n", wiek_dni=0)
+    r = ku.kompresuj_zimne(dni=-5, kronika_dir=tmp_path)
+    assert r["skompresowane"] == 0
+    assert (tmp_path / "sesja_teraz.md").exists()

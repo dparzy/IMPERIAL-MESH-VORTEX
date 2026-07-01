@@ -146,6 +146,10 @@ def zbuduj_graf(plik: Path = GRAF_PLIK, min_waga: int = 1) -> Dict[str, Any]:
         {"a": a, "b": b, "waga": v["waga"], "pierwszy": v["pierwszy"], "ostatni": v["ostatni"]}
         for (a, b), v in krawedzie.items() if v["waga"] >= min_waga
     ]
+    # Filtruj węzły do tych obecnych w ZACHOWANYCH krawędziach — inaczej przy min_waga>1
+    # graf trzymałby izolowane węzły-szum niequeryowalne przez polaczenia/centralne.
+    aktywne = {kr["a"] for kr in kraw_lista} | {kr["b"] for kr in kraw_lista}
+    wezly = {e: dane for e, dane in wezly.items() if e in aktywne}
     graf = {
         "wezly": wezly,
         "krawedzie": kraw_lista,

@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-07-01 | POMIAR | 📊 Raport IC roju — który neuron ma realny skill (Prawo XVI)
+
+Domknięcie „metod treningowych": `narzedzia/raport_ic.py` uruchamia backtest(mierz_ic=True)
+na prawdziwych świecach i rankuje Information Coefficient per neuron przez pary. Interpretacja
+Grinold&Kahn (BIB-025): |IC|<0.02 szum, ~0.03 słaba przewaga, >0.05 mocny; IC ujemne = kandydat
+do odwrócenia. Flaguje neurony do wygaszenia i pokazuje status NEWS-01..04.
+
+UCZCIWIE (Prawo I): na KRÓTKICH danych IC bywa zawyżone (|IC|>0.2 = artefakt rzadkich sygnałów
++ remisów Spearmana, NIE realny skill; prawdziwy IC krypto ~0.02-0.05). Raport sam OSTRZEGA gdy
+za dużo |IC|>0.2 i zaleca pełną historię. Wiarygodny pomiar = pełna historia + kontrole
+(narzedzia/pomiar_nowe_moduly.py backward-IC/non-overlapping). +3 testy. 1892→1895.
+
+To baza pod Prawo XXV: wagi neuronów mają iść za ZMIERZONYM IC, nie intuicją. PR #103 (naprawy
+cubic) zmergowany do main — cubic zamknięty.
+
+---
+
 ## 2026-07-01 | RECENZJA | 🔧 Naprawa 30 uwag recenzenta (cubic) — P0/P1/P2/P3
 
 Recenzja cubic na PR: 38 uwag. Naprawione wszystkie trafne (Prawo XXI — bugi PRZED mergem):

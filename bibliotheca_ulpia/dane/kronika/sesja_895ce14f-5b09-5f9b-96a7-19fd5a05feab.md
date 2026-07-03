@@ -3963,3 +3963,138 @@ until grep -qE "WYNIK|\\$" /tmp/claude-0/-home-user-IMPERIAL-MESH-VORTEX/895ce14
 sleep 5
 cat /tmp/claude-0/-home-user-IMPERIAL-MESH-VORTEX/895ce14f-5b09-5f9b-96a7-19fd5a05feab/tasks/bxojrpp2l.output | head -20" was stopped</summary>
 </task-notification>
+
+## 🧑 Cezar
+<system-reminder>
+The container was restarted. The following background tasks were running and are now stopped:
+- cd /home/user/IMPERIAL-MESH-VORTEX
+until grep -qE "WYNIK|\\$" /tmp/claude-0/-home-user-IMPERIAL-MESH-VORTEX/895ce14f-5b09-5f9b-96a7-19fd5a05feab/tasks/bxojrpp2l.output 2>/dev/null; do sleep 3; done
+sleep 5
+cat /tmp/claude-0/-home-user-IMPERIAL-MESH-VORTEX/895ce14f-5b09-5f9b-96a7-19fd5a05feab/tasks/bxojrpp2l.output | head -20 (task bavio5u6v)
+Re-create them if still needed.
+</system-reminder>
+
+## 🧑 Cezar
+This session's worker process was restarted. If your previous turn was already complete, take no action and wait for the next event. Otherwise, continue from where you left off.
+
+## 🏛️ Claude
+Kontener się zrestartował — kontynuuję naprawy cubica. Sprawdzam kontekst (WERYFIKACJA_ADAPTEROW + pre-commit hook):
+
+## 🏛️ Claude
+Zweryfikowane. Pre-commit hook faktycznie nie jest w repo (działa tylko w moim środowisku) — cubic ma rację co do świeżego klona. Naprawiam wszystkie trafne. Zaczynam od **P0 (ZeroDivision)**:
+
+## 🏛️ Claude
+Teraz **P1 — start_lokal.py sys.path** + audyt WERYFIKACJA_ADAPTEROW dla NEWS-02/03/04:
+
+## 🏛️ Claude
+Naprawiam `pusty` marker w centrum_pamieci (dokładne dopasowanie) + kustosz `dni` walidacja:
+
+## 🏛️ Claude
+Naprawiam news_fetcher (3 bugi: BUSD, tytuły kanału, granice aliasów):
+
+## 🏛️ Claude
+Teraz granice aliasów (token-boundary zamiast substring):
+
+## 🏛️ Claude
+Backtest IC — rejestruj zwrot ZAWSZE gdy IC włączone (tylko sygnał zależny od raportu):
+
+## 🏛️ Claude
+Naprawiam dziennik (walidacja dict + ostatnie≤0):
+
+## 🏛️ Claude
+Graf — filtruj węzły do tych w zachowanych krawędziach:
+
+## 🏛️ Claude
+Zapominanie — raport bez limitu:
+
+## 🏛️ Claude
+Proweniencja — 2-char tokeny, kronika bez limitu przed sortem, CLI typo:
+
+## 🏛️ Claude
+Kronika_czatu — sort po mtime w szukaj + duplikaty .gz w eksportuj:
+
+## 🏛️ Claude
+_jit — spójne cache dla obu form (@njit i @njit()):
+
+## 🏛️ Claude
+Proceduralna — dodaję `--zrodlo` do CLI:
+
+## 🏛️ Claude
+Procedury — poprawiam mylące zdanie o pre-commit hooku (w ziarnie + regeneruję plik):
+
+## 🏛️ Claude
+Rejestruję CoALA w REJESTR_INSPIRACJI (ZPO). Sprawdzam format:
+
+## 🏛️ Claude
+Kod naprawiony. Weryfikuję że nic nie zepsułem + dodaję testy graniczne których żądał cubic:
+
+## 🏛️ Claude
+Mój filtr węzłów słusznie usunął izolowany „numba" (bez krawędzi = niequeryowalny). Test trzeba dostosować — dodaję drugi znaczący token, by powstała krawędź:
+
+## 🏛️ Claude
+Teraz dodaję testy graniczne (news_dynamika, zapominanie, kustosz dni=30, proceduralna, klasyfikator, news_fetcher exact):
+
+## 🏛️ Claude
+Test granicy wieku myli się z progiem retencji — izoluję wiek wyższym progiem:
+
+## 🏛️ Claude
+Dodaję pozostałe testy graniczne (kustosz, proceduralna, klasyfikator, fetcher):
+
+## 🏛️ Claude
+Test granicy jest wyścigiem z zegarem — używam deterministycznego `teraz`:
+
+## 🏛️ Claude
+Mój test miał odwróconą logikę granicy — kod kompresuje mtime≤prog (30 dni = kompresja, 29 = zostaje). Poprawiam:
+
+## 🏛️ Claude
+Wszystkie naprawy przechodzą. Pełny zestaw + audyt:
+
+## 🏛️ Claude
+Audyt wymaga wpisu LOG_ZMIAN z dziś (2026-07-01). Dodaję + czekam na testy:
+
+## 🏛️ Claude
+Audyt harmonia, ale 4 testy oblane. Sprawdzam które:
+
+## 🏛️ Claude
+4 błędy w `test_kalkulator.py` (reguła 6%) — nie tykałem tego modułu, to prawdopodobnie zależne od daty (nowy miesiąc). Sprawdzam:
+
+## 🏛️ Claude
+To pre-istniejąca krucha zależność od daty (nie moja zmiana — `reset_miesiac` stempluje `date.today()`=lipiec, test używa czerwca → fałszywy reset miesiąca). Prawo XVIII — naprawiam u źródła. Czytam klasę:
+
+## 🏛️ Claude
+Naprawa u źródła: `reset_miesiac` przyjmuje `dzisiaj` (deterministyczny miesiąc), testy go używają:
+
+## 🏛️ Claude
+5 zamian, 57/57 kalkulator zielone. Dopisuję naprawę daty do LOG_ZMIAN + pełny zestaw:
+
+## 🏛️ Claude
+**1892/1892 zielone, audyt harmonia.** Wpis do Dziennika + commit + push:
+
+## 🏛️ Claude
+Cezar — **wszystkie trafne uwagi cubica naprawione i wypchnięte.** ✅
+
+## Co naprawiłem (z 38 uwag)
+
+**🔴 Krytyczne:**
+- **P0** — `klasyfikator_zdarzen`: `ZeroDivisionError` gdy tylko news makro (kierunek=0). Naprawione + test regresji.
+- **P1** — `start_lokal.py`: brakowało `sys.path` → importy padały przy lokalnym uruchomieniu.
+
+**🟠 P2 (realne bugi):**
+- `news_fetcher`: BUSD przed USD, tylko tytuły artykułów (nie nazwa kanału), filtr aliasów po pełnym słowie
+- `backtest` IC: zwrot rejestrowany każdy bar (zgodność horyzontów)
+- `graf`: filtr węzłów-sierot; `dziennik`: walidacja JSON; `kronika`: koniec duplikatów .gz + sort po świeżości
+- + 8 innych (kustosz, centrum, _jit, audyt, zapominanie, proweniencja, REJESTR_INSPIRACJI)
+
+**🟡 P3:** literówki CLI, `--zrodlo`, sprostowanie o pre-commit hooku
+
+**➕ Bonus (złapane przy okazji):** krucha zależność od daty w **Regule 6%** — w nowym miesiącu (dziś lipiec) 4 testy pękały. Naprawione u źródła (`reset_miesiac` deterministyczny).
+
+## Uczciwie o cubicu (Prawo I)
+- **Nie wszystkie 38 to były bugi** — kilka to sprawy stylu/opinii (np. `errors="ignore"` to konwencja całego kodu). Naprawiłem **wszystkie trafne**, w tym wszystkie z realnym ryzykiem.
+- Dodałem **+14 testów granicznych** (Reguła Test-Granic z CLAUDE.md) — dokładnie to, o co słusznie prosił recenzent.
+
+**Stan:** 1877→**1892 testów zielone**, audyt harmonia, wszystko na `claude/sleepy-fermi-dsdE4`.
+
+---
+
+🚨 **Ważne dla Ciebie:** naprawiłem też `aktualizuj.ps1` i `start_lokal.py` — więc wieczorem lokal ruszy czyściej. Gdy odpalisz i przejdzie na zielono, napisz — domkniemy **paper-trading DOGE z logowaniem do W1**. Chcesz, żebym teraz jeszcze odpowiedział cubicowi na PR (podziękowanie + które uwagi odrzuciłem i dlaczego), czy zostawiamy?

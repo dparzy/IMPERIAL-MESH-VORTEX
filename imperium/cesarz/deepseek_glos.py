@@ -18,6 +18,23 @@ from openai import OpenAI  # DeepSeek kompatybilny z OpenAI
 logger = logging.getLogger("GlosImperium")
 
 
+def _napraw_zepsuty_cert_env() -> None:
+    """
+    Zabezpieczenie (Prawo XV): gdy SSL_CERT_FILE/SSL_CERT_DIR wskazuje na plik/katalog,
+    który NIE ISTNIEJE, httpx/openai wywala się FileNotFoundError zanim dojdzie do API
+    (realny przypadek Cezara 2026-07-01: leftover C:\\...\\Temp\\cacert.pem). Usuwamy taki
+    martwy wpis z env → biblioteki wracają do domyślnych certów (certifi). Nie ruszamy
+    poprawnych ścieżek — tylko nieistniejące.
+    """
+    for zmienna, sprawdz in (("SSL_CERT_FILE", os.path.isfile),
+                             ("SSL_CERT_DIR", os.path.isdir)):
+        sciezka = os.environ.get(zmienna)
+        if sciezka and not sprawdz(sciezka):
+            logger.warning(f"[GlosImperium] {zmienna}='{sciezka}' nie istnieje — usuwam z env "
+                           "(fallback na domyślne certyfikaty).")
+            os.environ.pop(zmienna, None)
+
+
 class GlosImperium:
     """Most do DeepSeek. Jedyne wejście LLM w Imperium."""
 
@@ -35,6 +52,7 @@ class GlosImperium:
                 "Linux/Mac: export DEEPSEEK_API_KEY=\"twój-klucz\"\n"
                 "NIGDY nie wklejaj klucza bezpośrednio w kod."
             )
+        _napraw_zepsuty_cert_env()   # broni przed martwym SSL_CERT_FILE (Prawo XV)
         self.client = OpenAI(
             api_key=klucz,
             base_url="https://api.deepseek.com/v1",

@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-07-01 | NAPRAWA | 🔒 DeepSeek odporny na zepsuty SSL_CERT_FILE (Prawo XV)
+
+Realny przypadek Cezara na lokalu: `SSL_CERT_FILE=C:\...\Temp\cacert.pem` (leftover po jakimś
+narzędziu) wskazywał na NIEISTNIEJĄCY plik → httpx/openai wywalał FileNotFoundError zanim
+dotarł do DeepSeek API. Klucz był poprawny — winna martwa zmienna środowiskowa.
+
+Fix (`deepseek_glos.py`): `_napraw_zepsuty_cert_env()` przed utworzeniem klienta — gdy
+SSL_CERT_FILE/SSL_CERT_DIR wskazuje na nieistniejący plik/katalog, usuwa go z env (fallback
+na certifi). Poprawne ścieżki nietknięte. +4 testy (bez sieci). 1895→1899. Chroni każdą maszynę.
+
+---
+
 ## 2026-07-01 | POMIAR | 📊 Raport IC roju — który neuron ma realny skill (Prawo XVI)
 
 Domknięcie „metod treningowych": `narzedzia/raport_ic.py` uruchamia backtest(mierz_ic=True)

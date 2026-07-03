@@ -38,13 +38,19 @@ def zbierz_ic(pliki, interwal: str, okno: int = 250, max_barow=None) -> dict:
     suma: dict = {}
     liczba: dict = {}
     pary = 0
-    for plik in pliki:
+    n = len(pliki)
+    for i, plik in enumerate(pliki, 1):
+        # Pasek postępu na stderr (widoczny na żywo — backtest per para trwa) — bez tego
+        # 15 par wygląda jak zawieszenie. flush=True: pokazuje się natychmiast.
+        print(f"  [{i}/{n}] {Path(plik).name} — liczę IC...", file=sys.stderr, flush=True)
         try:
             eng = backtest(plik, interwal, okno=okno, max_barow=max_barow, mierz_ic=True)
         except Exception as e:  # noqa: BLE001 — pojedyncza para nie może wywalić raportu
-            print(f"  ⚠️ {Path(plik).name}: {e}")
+            print(f"  ⚠️ {Path(plik).name}: {e}", file=sys.stderr, flush=True)
             continue
-        ic = getattr(eng, "ic_srednie", {}) or {}
+        # IC WARUNKOWY (tylko bary z głosem) — wiarygodny dla rzadko głosujących neuronów,
+        # bez inflacji od remisów zer (poprawka Prawo XVI 2026-07-01).
+        ic = getattr(eng, "ic_warunkowy", None) or getattr(eng, "ic_srednie", {}) or {}
         pary += 1
         for nid, v in ic.items():
             if v == v:   # nie-NaN

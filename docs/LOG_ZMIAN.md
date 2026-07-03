@@ -33,6 +33,13 @@ za dużo |IC|>0.2 i zaleca pełną historię. Wiarygodny pomiar = pełna histori
 To baza pod Prawo XXV: wagi neuronów mają iść za ZMIERZONYM IC, nie intuicją. PR #103 (naprawy
 cubic) zmergowany do main — cubic zamknięty.
 
+**Update 2026-07-01 (lokal Cezara):** dodany pasek postępu na stderr (15 par bez niego wyglądało
+jak zawieszenie). POMIAR na danych dziennych/krótkich → ostrzeżenie „niska wiarygodność" działa
+poprawnie (IC 0.4-0.5 = ARTEFAKT rzadkich głosów + remisów Spearmana, NIE skill). WNIOSEK (Prawo I):
+IC z DYSKRETNYCH głosów (kierunek×pewność, w większości 0) jest zawyżony dla rzadko głosujących
+neuronów. Prawidłowy pomiar = IC WARUNKOWY (tylko bary gdzie neuron głosuje) lub ciągły sygnał
+(pomiar_nowe_moduly.py). Następny krok: warunkowy IC w KolektorIC. **ZROBIONE (ten sam dzień):** KolektorIC.ic(tylko_glosy=True) — IC warunkowy liczony tylko na barach z głosem; backtest wystawia engine.ic_warunkowy; raport_ic używa go domyślnie. Inflacja znikła (DOGE 4h: brak ostrzeżenia, rozkład 0.10-0.25 + neurony ujemne widoczne). +2 testy. 1899→1901.
+
 ---
 
 ## 2026-07-01 | RECENZJA | 🔧 Naprawa 30 uwag recenzenta (cubic) — P0/P1/P2/P3

@@ -27,3 +27,25 @@ def test_usuwa_nieistniejacy_cert_dir(monkeypatch):
     monkeypatch.setenv("SSL_CERT_DIR", "/nie/ma/takiego/katalogu")
     _napraw_zepsuty_cert_env()
     assert "SSL_CERT_DIR" not in os.environ
+
+
+def test_zachowuje_istniejacy_cert_dir(tmp_path, monkeypatch):
+    """Istniejący katalog CA-bundle NIE jest kasowany (enterprise CA)."""
+    monkeypatch.setenv("SSL_CERT_DIR", str(tmp_path))
+    _napraw_zepsuty_cert_env()
+    assert os.environ.get("SSL_CERT_DIR") == str(tmp_path)
+
+
+def test_cert_dir_lista_zachowuje_gdy_jeden_istnieje(tmp_path, monkeypatch):
+    """SSL_CERT_DIR = lista (os.pathsep); zachowaj gdy CHOĆ JEDEN komponent istnieje."""
+    lista = os.pathsep.join(["/nie/ma", str(tmp_path)])
+    monkeypatch.setenv("SSL_CERT_DIR", lista)
+    _napraw_zepsuty_cert_env()
+    assert os.environ.get("SSL_CERT_DIR") == lista   # cały wpis nietknięty
+
+
+def test_cert_dir_lista_kasuje_gdy_zaden_nie_istnieje(monkeypatch):
+    """Lista samych martwych katalogów → usuń cały wpis."""
+    monkeypatch.setenv("SSL_CERT_DIR", os.pathsep.join(["/nie/ma/1", "/nie/ma/2"]))
+    _napraw_zepsuty_cert_env()
+    assert "SSL_CERT_DIR" not in os.environ

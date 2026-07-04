@@ -86,7 +86,7 @@ def raport(pliki, interwal: str, top: int = 15, okno: int = 250, max_barow=None)
         linie.append("      Uruchom na PEŁNEJ historii (--max-barow bez limitu, wszystkie pary).")
     linie.append("")
     linie.append(f"   {'NEURON':<10} {'IC':>8}  {'par':>4}  ocena")
-    for nid, v in ranking[:top]:
+    for nid, v in ranking[:max(0, top)]:   # top<0 nie odsłania ogona (kontrakt „top N")
         linie.append(f"   {nid:<10} {v:>+8.4f}  {w['pokrycie'][nid]:>4}  {_klasa_ic(v)}")
     # neurony ujemne (systematyczny błąd — kandydaci do odwrócenia)
     ujemne = [(n, v) for n, v in ranking if v < -0.02]

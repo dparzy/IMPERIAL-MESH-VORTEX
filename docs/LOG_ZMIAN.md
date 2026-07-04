@@ -6,6 +6,37 @@
 
 ---
 
+## 2026-07-04 | RECENZJA | 🔍 Cubic PR #104 — 12 uwag naprawionych (granice + robustność)
+
+Adversarial review (cubic) na PR #104. Ważne uwagi naprawione u źródła:
+- **news_fetcher**: daty pubDate/ISO bez strefy normalizowane do UTC (naive→tzinfo=utc),
+  koniec błędnego wieku nagłówka przy porównaniu świeżości (NEWS-08).
+- **deepseek_glos**: SSL_CERT_DIR traktowany jako lista os.pathsep — nie kasujemy całego
+  wpisu gdy CHOĆ JEDEN komponent CA-bundle istnieje (enterprise CA nietknięty).
+- **walk_forward_ic**: `_ic_per_okno` rzuca ValueError przy okna<1 (zamiast dzielenia przez 0).
+- **wykres_backtestu**: guardy okno>=1 i max_barow>=1.
+- **raport_ic**: `ranking[:max(0, top)]` — top<0 nie odsłania ogona (kontrakt „top N").
+- **README**: usunięty hardkod „1038/1038" (Prawo I: liczby nie przeterminowane).
+
+Test-Granice dodane (Reguła Test-Granic): _klasa_ic na 0.0/0.02/0.05/±; walk_forward
+średni IC==prog(0.03) i spójność==prog(0.75) → ROBUST (>=); SSL_CERT_DIR lista zachowana
+gdy jeden istnieje / skasowana gdy wszystkie martwe. 1946/1946 zielone, audyt exit 0.
+
+**Pliki:** news_fetcher.py, deepseek_glos.py, walk_forward_ic.py, wykres_backtestu.py,
+raport_ic.py, README.md, test_raport_ic.py, test_walk_forward_ic.py, test_deepseek_cert.py.
+
+---
+
+## 2026-07-04 | NAPRAWA | 📅 Audyt W6: data vs OSTATNI COMMIT (koniec codziennego fałszywego alarmu)
+
+Cezar (lokal): testy pękały co kilka dni — audyt W6 porównywał „Stan na:" z date.today(),
+tolerancja 2 dni → repo leżące bez commitu szło czerwone, choć data dokumentu = data ostatniej
+zmiany (poprawna). Fix: odniesienie = data OSTATNIEGO COMMITU (git log -1 --date=short),
+nie zegar. Wciąż łapie prawdziwą niespójność (kod zmieniony + stara data → alarm), ale repo
+w spoczynku pozostaje zielone. Fallback na dziś gdy brak gita. 13/13 test_spojnosc.
+
+---
+
 ## 2026-07-04 | NEWS | ⏳ NEWS-08: half-life — świeży nagłówek waży więcej
 
 Plan NEWS pkt 8. Fetcher: `_pozycje_z_rss()` wyłuskuje pubDate (RSS RFC822) / published/updated

@@ -9938,3 +9938,76 @@ You've hit your session limit · resets 6:30pm (UTC)
 <status>killed</status>
 <summary>Background command "Wait for tests to finish" was stopped</summary>
 </task-notification>
+
+## 🧑 Cezar
+<system-reminder>
+The container was restarted. The following background tasks were running and are now stopped:
+- Wait for tests to finish (task b9ox4l82v)
+Re-create them if still needed.
+</system-reminder>
+
+## 🧑 Cezar
+This session's worker process was restarted. If your previous turn was already complete, take no action and wait for the next event. Otherwise, continue from where you left off.
+
+## 🏛️ Claude
+Kontener się zrestartował, a agent researchu trafił na limit sesji — ale mam wszystko, czego trzeba: fakty z repo + moją wiedzę. Odpowiadam wprost, wg zasad (Prawo I: co pewne vs do weryfikacji; Prawo XVI: nie dokładamy redundancji; XXV: przewaga).
+
+## 1. Co JUŻ mamy (z kodu)
+
+- **Własny serwer MCP** — `narzedzia/rag/mcp_server.py`, wystawia `biblioteka_szukaj` (semantyczny + FTS przeszukiwacz całej naszej wiedzy/pamięci). **To jest unikat** — Claude może pytać naszą bibliotekę przez MCP.
+- **Warstwy uczenia live (to są nasze najlepsze moduły, nie MCP):**
+  - `synapsy_rezimowe` — pamięć „co działa w TREND vs RANGE vs PANIC"
+  - **MWU** (Multiplicative Weights Update) — online uczenie wag neuronów po każdym trade
+  - `igrzyska` — ranking neuronów po skuteczności
+  - `ksiega_wad` — filtr błędnych setupów z przeszłości
+  - `drift_adapter` + `namiestnik` — adaptacja do zmiany reżimu
+  - `pamiec_refleksyjna` — destylacja lekcji
+
+**Kluczowa myśl (wg zasad):** *uczy się nasz KOD, nie MCP.* MCP to **rura** (dane wchodzą) i **soczewka** (Claude może obejrzeć wyniki areny). Nie mylmy tego.
+
+## 2. MCP, które REALNIE dokładają wartość (tylko te — Prawo XVI)
+
+| MCP | Co daje arenie | Status (ZPO) | Werdykt |
+|---|---|---|---|
+| **Filesystem** (oficjalny) | Claude-lokal ma pełny dysk: czyta wszystkie CSV, logi, wyniki | ✅ `github.com/modelcontextprotocol/servers` | **Bierzemy** — już w planie (START_LOKAL) |
+| **SQLite / DuckDB MCP** | Claude pyta SQL-em o trades, IC, equity — „pokaż neurony z ujemnym IC w bessie" | ⚠️ oficjalny SQLite ref istnieje; DuckDB community — zweryfikuj lokalnie | **Bierzemy** — to prawdziwa „nauka areny": interrogacja wyników |
+| **Fetch** (oficjalny) | Pobieranie stron/RSS na żądanie | ✅ ten sam repo | Opcjonalnie (mamy własny news_fetcher — częściowa redundancja) |
+| **CCXT / Binance MCP** | Żywy feed z giełdy przez Claude | ⚠️ istnieją community wersje — **nie podam pewnego repo, zweryfikuj** | Może — ale mamy `pobierz_4h_binance.py`; MCP dokłada tylko real-time |
+
+## 3. Czego świadomie NIE bierzemy (Prawo XVI — redundancja mierzona)
+
+- **Official „Memory" MCP** (knowledge-graph) — **odrzucamy.** Mamy własne **13 warstw pamięci** + graf, lepsze i zintegrowane. Dokładanie = skorelowana funkcja bez nowej informacji.
+- Losowe „crypto trading" MCP z marketplace — większość to cienkie wrappery bez testów. Prawo XIX: nie ufamy bez kodu+weryfikacji.
+
+## 4. Rekomendacja (najlepsze, minimalny zestaw)
+
+Dla „nauki areny live" realnie warte podpięcia to **dwa**:
+1. **Filesystem MCP** — Claude widzi cały dysk (wyniki, logi, CSV) → może analizować arenę bez kopiowania.
+2. **SQLite/DuckDB MCP nad naszą bazą wyników** — Claude pyta SQL-em o skuteczność neuronów per reżim. To domyka pętlę: rój gra → wyniki do bazy → Claude je bada → stroimy wagi. **To jest przewaga (Prawo XXV).**
+
+Feed live (CCXT/TradingView webhook — już mamy) karmi **nasze** moduły uczenia (MWU, synapsy). MCP ich nie zastępuje.
+
+---
+
+Chcesz, żebym:
+- **(A)** dopisał gotowy blok `mcpServers` do `.claude/settings.json` (Filesystem + nasz RAG), żebyś miał to wpięte na lokalu, oraz
+- **(B)** sprawdził/zbudował mały **SQLite MCP nad bazą wyników areny** (nasz, zgodny z zasadami — kod+testy), żeby Claude mógł pytać SQL-em o skuteczność roju?
+
+Powiedz które (A / B / oba). Research zewnętrznych repo (dokładne linki CCXT-MCP) dokończę osobnym agentem, gdy odnowi się limit — teraz nie chcę podać niepewnego URL (Prawo I).
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+Tylko auto-generowany plik pamięci (kronika bieżącej sesji). To dokładnie zadanie hooka pamięci — odpalam go:
+
+## 🏛️ Claude
+Zrobione — hook pamięci zacommitował i wypchnął kronikę sesji, drzewo czyste. To był auto-generowany plik pamięci (zapis tej rozmowy), więc trafił dokładnie tam, gdzie ma: do gita, żeby przetrwał i zsynchronizował się na laptop.
+
+Wracając do Twojego pytania o MCP — czekam na Twój wybór:
+- **(A)** wpiąć `mcpServers` (Filesystem + nasz RAG) do `.claude/settings.json`,
+- **(B)** zbudować mały SQLite MCP nad bazą wyników areny (nasz, kod+testy), żeby Claude pytał SQL-em o skuteczność roju,
+- albo **oba**.
+
+Powiedz A / B / oba, to działam.

@@ -1,0 +1,191 @@
+# 🧾 ŚCIĄGA LOKAL — wszystko krok po kroku (dla nowicjusza)
+
+> Jedna kartka ze WSZYSTKIMI komendami do obsługi Imperium na laptopie.
+> Kopiuj-wklej do PowerShella. Kolejność sekcji = kolejność, w jakiej ich zwykle używasz.
+> **Stan na:** 2026-07-04
+
+---
+
+## 0. Trzy złote zasady (przeczytaj raz)
+
+1. **Zawsze najpierw wejdź do folderu projektu:**
+   ```powershell
+   cd C:\Projekty\imperial-mesh-vortex
+   ```
+2. **Używaj jednej maszyny na raz** (albo laptop, albo chmura) — inaczej zmiany się rozjadą.
+3. **`bash` w PowerShellu = zepsute WSL.** Do ręcznego odpalania skryptów `.sh` używaj Git Basha:
+   ```powershell
+   & "C:\Program Files\Git\bin\bash.exe" <ścieżka-skryptu.sh>
+   ```
+   (Claude Code robi to sam w tle — Ciebie to dotyczy tylko przy ręcznym teście hooka.)
+
+---
+
+## 1. Codzienny start (to robisz najczęściej)
+
+Otwórz terminal i uruchom Claude w folderze projektu:
+```powershell
+cd C:\Projekty\imperial-mesh-vortex
+claude
+```
+Na starcie zobaczysz komunikaty `[hook] ...`. Szukaj:
+- `[hook] SYNC ✅` — laptop sam ściągnął najnowszy stan z GitHub.
+- `AUDYT SPÓJNOŚCI ... ✅ pełna harmonia` — kod zgadza się z dokumentacją.
+- `CENTRUM PAMIĘCI` — wstrzyknięta pamięć (asystent zna cały łuk projektu).
+
+**To wszystko dzieje się automatycznie.** Jak widzisz te linie — jest dobrze.
+
+---
+
+## 2. Synchronizacja z GitHub (już automatyczna)
+
+- **Start sesji** → auto-pull (Claude sam ściąga).
+- **Koniec sesji** → auto-commit + push pamięci (Claude sam zapisuje).
+
+**Ręcznie potrzebujesz tego rzadko.** Gdyby auto-pull się pominął (bo drzewo brudne):
+```powershell
+git status                                              # co jest zmienione
+git stash push -m "chwilowo"                            # schowaj zmiany
+git pull --rebase origin claude/sleepy-fermi-dsdE4      # ściągnij najnowsze
+git stash pop                                           # przywróć zmiany
+```
+
+Sprawdzenie, czy jesteś zsynchronizowany:
+```powershell
+git status                 # "working tree clean" = czysto
+git log --oneline -3       # ostatnie 3 commity
+```
+
+---
+
+## 3. Testy i audyt (przed każdą większą zmianą)
+
+```powershell
+python tests/run_tests.py            # wszystkie testy — muszą być zielone
+python narzedzia/audyt_spojnosci.py  # spójność kod↔dokumenty — musi być exit 0
+python narzedzia/status.py           # pulpit: rój, testy, git, ostatni LOG_ZMIAN
+```
+
+---
+
+## 4. Uruchomienie systemu
+
+### A) Przygotowanie lokala (raz po świeżym `git pull`)
+```powershell
+python skrypty/start_lokal.py        # audyt + pamięć + indeks RAG + mapa 13 warstw
+```
+
+### B) Paper trading (symulacja — ZERO prawdziwych pieniędzy, tu zaczynasz)
+```powershell
+python skrypty/start.py              # uruchamia rój + panel
+```
+Potem otwórz w przeglądarce: **http://localhost:8777**
+Zatrzymanie: **Ctrl+C** w terminalu.
+
+---
+
+## 5. Backtest i wykresy (oczy Cezara)
+
+### Backtest z panelem HTML (otwiera się sam w przeglądarce):
+```powershell
+python narzedzia/backtest_dashboard.py dane/4h/Binance_BTCUSDT_4h.csv 4H
+python narzedzia/backtest_dashboard.py dane/godzinowe/Binance_ETHUSDT_1h.csv 1H --okno 500
+```
+
+### Wykres PNG (cena + transakcje + krzywa kapitału):
+```powershell
+python narzedzia/wykres_backtestu.py dane/4h/Binance_DOGEUSDT_4h.csv 4h
+python narzedzia/wykres_backtestu.py dane/4h/Binance_BTCUSDT_4h.csv 4h --max-barow 3000
+```
+→ zapisze `wykres_<PARA>_4h.png` obok repo — otwierasz dwuklikiem.
+
+---
+
+## 6. Pomiary skilla neuronów (czy rój naprawdę przewiduje)
+
+```powershell
+python narzedzia/raport_ic.py                         # IC roju (który neuron ma przewagę)
+python narzedzia/raport_ic.py --glob "dane/dzienne/*_d.csv" --interwal 1d
+python narzedzia/walk_forward_ic.py --glob "dane/4h/Binance_*_4h.csv" 4h --okna 4
+python narzedzia/scoreboard_neuronow.py               # ranking kontrybucji neuronów
+```
+Interpretacja IC: `|IC|<0.02` = szum · `~0.03+` = realna przewaga · `>0.05` = mocny sygnał.
+
+---
+
+## 7. Pobieranie danych rynkowych (lokalnie, poza gitem)
+
+```powershell
+python narzedzia/pobierz_4h_binance.py                # 4h z Binance (bez klucza)
+python narzedzia/pobierz_4h_binance.py --pary XRP,ADA,LINK
+python narzedzia/pobierz_nowe_pary.py                 # nowe pary z MEXC (1h→4h)
+python narzedzia/pobierz_makro.py                     # dane makro
+```
+> Dane rynkowe (CSV) są **lokalne per-maszyna** — nie idą do gita (celowo). Pobierasz je na laptopie.
+
+---
+
+## 8. Pamięć (13 warstw) — komendy
+
+```powershell
+python -m imperium.biblioteki.centrum_pamieci start       # to co widzisz na starcie sesji
+python -m imperium.biblioteki.centrum_pamieci szukaj "słowo"   # szukaj w całej pamięci
+python -m imperium.biblioteki.dziennik_niesmiertelny ostatni   # ostatnie wpisy osi czasu
+python -m imperium.biblioteki.kronika_czatu statystyki    # ile rozmów zapamiętane
+```
+Dziennik (oś czasu projektu) **pisze Claude sam na koniec sesji** — Ty nie musisz.
+
+---
+
+## 9. Klucze API (bezpieczeństwo — NIGDY w kodzie/czacie)
+
+Ustawiasz raz jako zmienne środowiskowe (Windows), potem **zamknij i otwórz terminal**:
+```powershell
+setx DEEPSEEK_API_KEY "twój-klucz"     # doradca AI (platform.deepseek.com)
+setx MEXC_API_KEY "twój-klucz"         # giełda MEXC (tylko dla trybu REAL)
+setx MEXC_SECRET  "twój-sekret"
+```
+Test DeepSeek: `python -m imperium.cesarz.deepseek_glos` → ma napisać „Cesarz słyszy".
+
+---
+
+## 10. Rozwiązywanie problemów (rzeczy, na które już wpadliśmy)
+
+| Problem | Objaw | Rozwiązanie |
+|---|---|---|
+| **Firma blokuje git przez SSH** | `ssh: connect ... port 22: timed out` | SSH przez port 443 — patrz niżej ⬇️ |
+| **DeepSeek nie działa** | `FileNotFoundError: ...cacert.pem` | `Remove-Item Env:SSL_CERT_FILE` (kod sam to teraz naprawia) |
+| **`bash` nie działa** | `WSL ERROR: /bin/bash` | użyj Git Basha: `& "C:\Program Files\Git\bin\bash.exe" ...` |
+| **`git pull` blokuje** | `you have unstaged changes` | `git stash` → `git pull --rebase ...` → `git stash pop` |
+| **Utknięty konflikt** | `needs merge` | `git reset` → potem stash/pull/pop |
+| **Brak biblioteki** | `ImportError` | `pip install -r requirements.txt` |
+
+### SSH przez port 443 (gdy firma blokuje port 22) — robisz raz:
+```powershell
+Add-Content "$HOME\.ssh\config" -Value "Host github.com`n Hostname ssh.github.com`n Port 443`n User git"
+```
+
+---
+
+## 11. Git — komendy awaryjne
+
+```powershell
+git status                     # co jest zmienione
+git stash list                 # co masz schowane w kieszeni
+git reset                      # odblokuj zablokowany indeks (pliki zostają)
+git checkout -- <plik>         # cofnij zmiany w PLIKU (uwaga: kasuje lokalne zmiany)
+git log --oneline -5           # ostatnie 5 commitów
+```
+> Gałąź robocza: **`claude/sleepy-fermi-dsdE4`**. Do `main` merguje **tylko Cezar ręcznie**.
+
+---
+
+## 🏁 Najprostszy dzień w 3 komendach
+
+```powershell
+cd C:\Projekty\imperial-mesh-vortex     # 1. wejdź do projektu
+claude                                  # 2. odpal Claude (reszta dzieje się sama)
+# ...pracujesz, rozmawiasz z Claude...  # 3. zamykasz — pamięć zapisze się sama
+```
+
+Wszystko inne z tej ściągi odpalasz **tylko gdy tego potrzebujesz**. Na co dzień: te 3 linie.

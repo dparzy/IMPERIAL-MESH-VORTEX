@@ -4,7 +4,7 @@
 > Aktualizuj PO każdej sesji. Wczytywana przez SessionStart hook.
 > Indeksowana w RAG jako korpus `pamiec` (plik .md → `bibliotheca_ulpia/dane/`).
 
-## Ostatnia aktualizacja: 2026-07-04
+## Ostatnia aktualizacja: 2026-06-30
 
 ---
 
@@ -100,6 +100,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 ---
 
 ## 📚 LEKCJE Z SESJI
+
+### 2026-06-30 — Kategoria R w WAGI_REZIMU istniała tylko w PANIC
+Sentyment (R) miał wagę tylko w trybie PANIC (veto). Dodano mnożniki dla VOLATILE (×1.3), RANGING (×1.2), NORMAL (×1.1), TREND_STRONG (×0.8).
+
+### 2026-06-30 — Bart Pattern threshold 30% Donchian zbyt rzadki
+Warunek 30% kanału Donchiana występuje ekstremalnie rzadko. Zmieniono na 10%.
+
+### 2026-06-30 — RSI Div threshold 2.0 zbyt wysoki dla sąsiednich barów daily
+Delta RSI między sąsiednimi barami daily rzadko przekracza 2 pkt. Zmieniono na 0.3.
+
+### 2026-06-30 — BB Squeeze threshold 4% zbyt restrykcyjny dla BTC daily
+Na dziennych barach BTC typowa szerokość BB to 3-8%, próg 4% był praktycznie nieosiągalny. Zmieniono na 2.5%.
 
 ### 2026-07-04 — POTRZEBA CEZARA: wizualizacja live (krytyczne)
 Cezar czuje się 'jak dziecko we mgle' — brak podglądu wykresów i wizualizacji live jak zachowuje się Imperium. PRIORYTET: dashboardy/wykresy (equity, cena+wejścia/wyjścia, IC ranking, głosy neuronów na żywo). Każde narzędzie ma mieć wyjście WIZUALNE, nie tylko tekst.

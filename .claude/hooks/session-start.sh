@@ -9,6 +9,29 @@ set -euo pipefail
 
 cd "${CLAUDE_PROJECT_DIR:-.}"
 
+# 0) SYNC Z GITHUB (koniec „kręcenia się w kółko" — Cezar 2026-07-04)
+#    Root cause: laptop i chmura to DWA osobne checkouty. Gdy laptop nie pociągnął
+#    ostatnich commitów, Claude czyta STARE dokumenty i „nic nie wie" o świeżej pracy.
+#    Bezpieczny auto-pull: TYLKO gdy drzewo czyste i pull jest fast-forward (--ff-only).
+#    Brudne drzewo / rozjazd → NIE ruszamy nic, tylko podpowiedź (żadnych konfliktów, żadnej utraty).
+if git rev-parse --git-dir >/dev/null 2>&1; then
+  GALAZ="$(git symbolic-ref --short HEAD 2>/dev/null || echo '')"
+  if [ -n "$GALAZ" ]; then
+    if [ -z "$(git status --porcelain 2>/dev/null)" ]; then
+      echo "[hook] SYNC — git pull --ff-only origin $GALAZ (aktualny status z GitHub)..."
+      if git pull --ff-only origin "$GALAZ" 2>&1 | grep -qE "Already up to date|Updating|Fast-forward"; then
+        echo "[hook] SYNC ✅ — repo na najnowszym commicie."
+      else
+        echo "[hook] SYNC ⚠️ — nie fast-forward (lokalne commity lub rozjazd). Zrób ręcznie:"
+        echo "         git pull --rebase origin $GALAZ"
+      fi
+    else
+      echo "[hook] SYNC ⏭️ — drzewo brudne (niezacommitowane zmiany), pomijam auto-pull."
+      echo "         Zacommituj albo 'git stash', potem: git pull --rebase origin $GALAZ"
+    fi
+  fi
+fi
+
 # 1) Instalacja zależności — tylko w środowisku zdalnym (lokalnie masz swoje venv)
 if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ]; then
   if [ -f requirements.txt ]; then

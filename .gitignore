@@ -26,3 +26,11 @@ raporty/
 # Stan uczenia cross-session (generowany w runtime — nie wersjonowany)
 logs/
 narzedzia/rag/baza_wiedzy.db
+
+# Lokalne artefakty A/B (generowane przez backtest_ab_* — nie wersjonowane, wynik w LOG_ZMIAN)
+ab_mtf_metryki.json
+ab_mtf_wynik.txt
+ab_mtf_rezimy_metryki.json
+ab_mtf_rezimy_wynik.txt
+# Marker przetworzonych sesji auto-lekcji (stan runtime, per-maszyna)
+bibliotheca_ulpia/dane/.auto_lekcja_przetworzone.txt

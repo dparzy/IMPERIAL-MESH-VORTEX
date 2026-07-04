@@ -10,17 +10,13 @@ imperium/**/raport_biegu_*.json
 imperium/**/DZIENNIK_WYNIKOW.md
 imperium/**/dane/*.csv
 
-# Dane historyczne CSV — trzymane lokalnie / zewnętrznie (nie w repo)
-dane/minutowe/*.csv
-dane/*5m*.csv
-dane/*15m*.csv
-dane/*1m*.csv
-dane/*4h*.csv
+# Dane historyczne CSV — trzymane LOKALNIE per-maszyna (decyzja Cezara 2026-07-04).
+# Rynkowe dane pobiera się skryptem na laptopie; testy są syntetyczne (nie potrzebują ich),
+# narzędzia IC/backtest odpalasz lokalnie. Trzymanie w repo powodowało churn i blokadę
+# auto-pull (drzewo wiecznie brudne). Dlatego WSZYSTKIE dane/**/*.csv poza repo.
+dane/**/*.csv
 # Konwertowane pliki robocze (generowane przez backtest runner)
 dane/*_imp.csv
-# Cache sentymentu (funding/OI/L-S) — pobierany lokalnie z Binance public (backfill_sentyment.py)
-dane/sentyment/*.csv
-# Dzienne (~320 KB) i godzinowe (~8 MB) — małe, śledzone w repo (NIE ignorowane)
 raporty/
 
 # Stan uczenia cross-session (generowany w runtime — nie wersjonowany)

@@ -15,6 +15,17 @@ def test_klasa_ic_progi():
     assert _klasa_ic(-0.06) == "MOCNY"   # znak nieistotny dla klasy siły
 
 
+def test_klasa_ic_granice_dokladne():
+    """Reguła Test-Granic: wartości DOKŁADNIE na progu (<0.02, <0.05 → który bok?)."""
+    assert _klasa_ic(0.0) == "szum"       # zero = brak sygnału
+    assert _klasa_ic(0.02) == "słaba przewaga"   # 0.02 nie jest <0.02 → już nie szum
+    assert _klasa_ic(-0.02) == "słaba przewaga"  # znak nieistotny
+    assert _klasa_ic(0.05) == "MOCNY"     # 0.05 nie jest <0.05 → już MOCNY
+    assert _klasa_ic(-0.05) == "MOCNY"
+    assert _klasa_ic(0.0199) == "szum"    # tuż pod progiem
+    assert _klasa_ic(0.0499) == "słaba przewaga"
+
+
 def test_zbierz_ic_pusta_lista():
     w = zbierz_ic([], "4h")
     assert w["ic"] == {} and w["pary"] == 0

@@ -63,6 +63,10 @@ def rysuj(plik_csv: str, interwal: str, max_barow=None, okno: int = 250,
     from imperium.koloseum.backtest import backtest
     from imperium.swiatynie.kartograf import plot_run
 
+    if okno < 1:
+        raise ValueError("okno musi być >= 1")
+    if max_barow is not None and max_barow < 1:
+        raise ValueError("max_barow musi być >= 1 (lub None = całość)")
     bary = wczytaj_csv(plik_csv, interwal)
     if max_barow:
         bary = bary[-max_barow:]

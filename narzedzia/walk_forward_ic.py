@@ -40,6 +40,8 @@ def _ic_per_okno(bary, interwal, okna, okno_backtest, max_barow=None):
     from imperium.koloseum.backtest import backtest
     if max_barow:
         bary = bary[-max_barow:]
+    if okna < 1:
+        raise ValueError("okna musi być >= 1")
     n = len(bary)
     rozmiar = n // okna
     per_neuron: dict = {}

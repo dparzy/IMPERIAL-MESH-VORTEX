@@ -92,14 +92,22 @@ def _parsuj_date_pub(s: "Optional[str]") -> "Optional[float]":
     s = s.strip()
     try:
         from email.utils import parsedate_to_datetime
+        from datetime import timezone
         dt = parsedate_to_datetime(s)
         if dt is not None:
+            # feed bez strefy → traktuj jako UTC (inaczej timestamp() użyłby strefy hosta
+            # i przesunął wiek → skrzywił half-life NEWS-08).
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
             return dt.timestamp()
     except (TypeError, ValueError, IndexError):
         pass
     try:
-        from datetime import datetime
-        return datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp()
+        from datetime import datetime, timezone
+        dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.timestamp()
     except ValueError:
         return None
 

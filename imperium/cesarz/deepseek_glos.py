@@ -26,12 +26,17 @@ def _napraw_zepsuty_cert_env() -> None:
     martwy wpis z env → biblioteki wracają do domyślnych certów (certifi). Nie ruszamy
     poprawnych ścieżek — tylko nieistniejące.
     """
-    for zmienna, sprawdz in (("SSL_CERT_FILE", os.path.isfile),
-                             ("SSL_CERT_DIR", os.path.isdir)):
+    # SSL_CERT_FILE = pojedynczy plik. SSL_CERT_DIR = lista katalogów (os.pathsep) —
+    # nie kasuj jeśli CHOĆ JEDEN komponent istnieje (nie psuj enterprise CA-bundle).
+    for zmienna, sprawdz, lista in (("SSL_CERT_FILE", os.path.isfile, False),
+                                    ("SSL_CERT_DIR", os.path.isdir, True)):
         sciezka = os.environ.get(zmienna)
-        if sciezka and not sprawdz(sciezka):
-            logger.warning(f"[GlosImperium] {zmienna}='{sciezka}' nie istnieje — usuwam z env "
-                           "(fallback na domyślne certyfikaty).")
+        if not sciezka:
+            continue
+        czesci = sciezka.split(os.pathsep) if lista else [sciezka]
+        if not any(sprawdz(c) for c in czesci if c):
+            logger.warning(f"[GlosImperium] {zmienna}='{sciezka}' nie wskazuje na istniejącą "
+                           "ścieżkę — usuwam z env (fallback na domyślne certyfikaty).")
             os.environ.pop(zmienna, None)
 
 

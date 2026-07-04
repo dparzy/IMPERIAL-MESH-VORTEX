@@ -6,6 +6,21 @@
 
 ---
 
+## 2026-07-04 | POMIAR | 🔬 Walk-forward IC — stabilność skillu neuronu w czasie (OOS, Prawo XVI)
+
+Pojedynczy IC mówi ILE, nie czy POWTARZALNE. `narzedzia/walk_forward_ic.py`: dzieli historię
+na K kolejnych okien, mierzy IC WARUNKOWY per okno, werdykt po SPÓJNOŚCI ZNAKU:
+  • ROBUST — |śr.IC|>0.03 + ten sam znak w ≥75% okien (skill stabilny, nie przeuczony)
+  • ROBUST (odwróć) — stabilnie ujemny → kandydat do odwrócenia wagi
+  • niepewny/szum — miesza znak lub IC ~0.
+Neurony=reguły stałe → każde okno OOS z natury (zero look-ahead). Reuse czytnik_csv + backtest.
+
+DOGE 4h (4 okna): SMC-01/02, V-14, X-28, X-17, V-02, X-01 → 100% spójność (skill POTWIERDZONY
+OOS); SES-02 robustnie ujemny (odwróć). Zgodne z raportem IC z 15 par — walidacja krzyżowa.
++6 testów. Pasek postępu per para/okno. To baza decyzji o wagach (Prawo XXV).
+
+---
+
 ## 2026-07-01 | NAPRAWA | 🔒 DeepSeek odporny na zepsuty SSL_CERT_FILE (Prawo XV)
 
 Realny przypadek Cezara na lokalu: `SSL_CERT_FILE=C:\...\Temp\cacert.pem` (leftover po jakimś

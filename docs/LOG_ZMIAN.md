@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-07-04 | HIPOTEZA | ⏳ MTF-weto per-reżim: tarcza tylko w bessie (czeka na walidację)
+
+**Status: HIPOTEZA badawcza, NIE wdrożone (Prawo XIX — brak kodu+testów = nie istnieje).**
+Artefakty A/B `ab_mtf_rezimy_*` są LOKALNE, poza commitem (dane/artefakty nie wchodzą do repo) —
+więc liczby NIE są tu weryfikowalne (Prawo I: nie falsyfikuję wyniku, którego repo nie potwierdza).
+
+Ustalenie z lokalnego A/B (do niezależnej walidacji): **warunkowe weto MTF pomaga TYLKO
+w reżimie bessy / wysokiego stresu — w pozostałych reżimach SZKODZI** (zbyt częsty blokuje
+dobre wejścia). Wniosek: weto MTF nie może być globalne — musi być bramkowane reżimem.
+
+**Kierunek przyszły (przed wdrożeniem — bramka walidacji):**
+- warunkowe weto MTF aktywne wyłącznie w reżimie BEAR/wysoki-stres, sterowane przez Namiestnika;
+- WYMAGA walidacji OOS na bessach **2018 i 2025** zanim trafi do żywego kodu;
+- dopiero po zielonej walidacji: implementacja + testy granic + wpis MANIFEST (Prawo XXI).
+
+Do czasu walidacji — żadnej zmiany w pipeline decyzyjnym.
+
+**Pliki:** docs/LOG_ZMIAN.md (tylko zapis kierunku; brak zmian w kodzie).
+
+---
+
 ## 2026-07-04 | RECENZJA | 🔍 Cubic PR #104 — 12 uwag naprawionych (granice + robustność)
 
 Adversarial review (cubic) na PR #104. Ważne uwagi naprawione u źródła:

@@ -6,6 +6,21 @@
 
 ---
 
+## 2026-07-04 | WIZUALIZACJA | 🖼️ Wykres backtestu — oczy Cezara (Prawo XV: Kartograf wpięty)
+
+Cezar: „czuję się jak dziecko we mgle — nie mam podglądu wykresów jak zachowuje się Imperium".
+AUDYT WIZUALIZACJI: mamy web_dashboard :8777 (świecowy live przy skrypty/start.py), LiveMonitor
+TUI+Telegram, 2 symulatory HTML — ale 🚨 UTRATA POTENCJAŁU: `swiatynie/kartograf.py` (PNG:
+cena+EMA+trades+equity) wpięty TYLKO w pierwszy_zwiadowca — backtesty były ślepe.
+
+**`narzedzia/wykres_backtestu.py`** (reuse Kartografa, Prawo XVI): jedna komenda backtest→PNG,
+2 panele: cena+EMA-50+znaczniki transakcji (▲/▼, zysk/strata kolorem, linia wejście↔wyjście)
++ krzywa kapitału per bar. Mapowanie WynikZamkniecia→indeksy barów po timestamp_wejscia
+(ts=0 pomijany; exit przycinany). Zweryfikowane na DOGE 4h (uczciwy obraz: bessa, -1281$, WR 39%
+— Cezar to ZOBACZYŁ zamiast zgadywać). +6 testów. Lekcja o potrzebie wizualizacji → W3 (profil).
+
+---
+
 ## 2026-07-04 | POMIAR | 🔬 Walk-forward IC — stabilność skillu neuronu w czasie (OOS, Prawo XVI)
 
 Pojedynczy IC mówi ILE, nie czy POWTARZALNE. `narzedzia/walk_forward_ic.py`: dzieli historię

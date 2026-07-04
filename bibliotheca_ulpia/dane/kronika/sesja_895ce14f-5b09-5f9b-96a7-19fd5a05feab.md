@@ -10087,3 +10087,64 @@ Ta sama treść jest już w ściądze (`docs/SCIAGA_LOKAL.md`, sekcja 8b), więc
 Już ją mamy: **Prawo XVII — Rozpoznanie terenu (ROBISZ TO PIERWSZE)** w CLAUDE.md. Nie duplikowałem; wg niej właśnie zacząłem tę pracę (sprawdziłem kod+docs przed budową). 
 
 Testuj spokojnie z telefonu — jak Arena MCP ruszy u Ciebie, powiedz, dorobimy narzędzie, które jednym ruchem wrzuca wynik `raport_ic` do bazy areny, żeby Claude czytał skuteczność roju SQL-em.
+
+## 🧑 Cezar
+dokładnie opisz mi i wyjaśnij co zrobiliśmy teraz ma być to wpisane w zasady i pamięć zobacz czy już mam
+
+## 🏛️ Claude
+Sprawdzam najpierw co już masz w zasadach i pamięci (Prawo XVII: nie zgaduję):
+
+## 🏛️ Claude
+Sprawdzone — oto stan i wyjaśnienie.
+
+## Czy już masz regułę „sprawdź wszystko zanim coś zrobisz"? → **TAK**
+
+Jest skodyfikowana w dwóch miejscach (potwierdzone teraz z plików, nie z pamięci):
+- **`ZASADY_FUNDAMENTALNE.md` linia 226** — `PRAWO XVII — ROZPOZNANIE TERENU I PORZĄDEK`
+- **`CLAUDE.md` linia 34** — `PRAWO XVII — ROZPOZNANIE TERENU (ROZKAZ STAŁY, ROBISZ TO PIERWSZE)` + „NIE zgaduj z pamięci" (linia 89)
+
+Nie dubluję prawa (to samo złamałoby Prawo XXI o spójności). Wg niego właśnie zacząłem dzisiejszą pracę.
+
+## Czego brakowało → **Arena MCP nie było jeszcze w Dzienniku (pamięci)**
+
+Było w `LOG_ZMIAN`, ale nie w Dzienniku Nieśmiertelnym (oś czasu wstrzykiwana na starcie). Dopisuję teraz:
+
+## 🏛️ Claude
+Teraz część **„w zasady"**. Meta-reguła (sprawdzaj wszystko przed działaniem) już jest jako Prawo XVII. Ale zasada MCP, którą dziś ustaliliśmy, jest nowa — dopisuję ją zwięźle do CLAUDE.md (standing orders, czytane co sesję), bez zmiany liczby praw (Prawo XXI — brak kaskady):
+
+## 🏛️ Claude
+Wszystko zapisane i wypchnięte. Oto **dokładne wyjaśnienie co zrobiliśmy** — po ludzku.
+
+## Co zbudowaliśmy (Arena MCP)
+
+Wyobraź sobie, że Twój rój neuronów gra na arenie, a Ty (i ja-Claude) patrzymy z trybun. Do tej pory, żeby zobaczyć „jak radzi sobie rój", trzeba było ręcznie odpalać narzędzia i czytać ściany tekstu. **Arena MCP to okno na arenę** — Claude może teraz zapytać krótką komendą i dostać odpowiedź:
+- **`arena_roj`** — „pokaż stan roju teraz": ile neuronów aktywnych, ile wyciszonych, ilu zwiadowców, ile elitarnych, jakie kategorie. Natychmiast.
+- **`arena_neuron`** — „opowiedz o tym jednym neuronie": kategoria, waga, czy elitarny.
+- **`arena_zapisz` / `arena_pytaj`** — mała baza danych (SQLite), do której Claude **zapisuje pomiary** (np. skuteczność neuronu) i **pyta o nie później**. Dzięki temu przez całą Twoją 12-godzinną wachtę wiedza o skuteczności roju się **gromadzi**, zamiast znikać.
+
+To jest kod + 15 testów, wszystko zielone, audyt czysty. Już na GitHub (commit `ab3cfbd`).
+
+## Zasada, którą przy tym ustaliliśmy (i dlaczego ważna)
+
+> **MCP to SOCZEWKA, nie MÓZG.**
+
+Kluczowe rozróżnienie, żebyś nie został wprowadzony w błąd: **rój uczy się w naszym KODZIE** (moduły MWU, synapsy reżimowe, igrzyska). MCP niczego nie uczy — tylko pozwala patrzeć i podawać dane. Z tego wynikają trzy reguły:
+1. **Nie dodajemy MCP, który dubluje to, co mamy.** Przykład: odrzuciłem oficjalny „Memory" MCP, bo mamy własne, lepsze 13 warstw pamięci (Prawo XVI — nie mnożymy skorelowanych rzeczy).
+2. MCP wchodzi **tylko gdy daje coś NOWEGO** (pełny dysk, SQL nad wynikami).
+3. **Pliki startowe (`.mcp.json`, hooki) to zawsze Twoja decyzja** — nie wpinam ich sam w automat.
+
+## Gdzie to teraz jest zapisane (Twoje pytanie „zobacz czy już mam")
+
+| Co | Gdzie | Status |
+|---|---|---|
+| Reguła „sprawdź stan+kod+docs zanim działasz" | **Prawo XVII** (ZASADY_FUNDAMENTALNE.md:226 + CLAUDE.md:34) | ✅ **już miałeś** |
+| Zasada „MCP = soczewka, nie mózg" | **CLAUDE.md** (nowa sekcja 🔌, standing order) | ✅ dopisane dziś |
+| Cała praca (Arena MCP + decyzje) | **Dziennik Nieśmiertelny** (pamięć, wstrzykiwana na starcie) | ✅ dopisane dziś |
+| Szczegóły techniczne | **LOG_ZMIAN.md** | ✅ dopisane dziś |
+
+Wszystko zacommitowane i na GitHub. Przy następnym starcie Claude (laptop albo chmura) zobaczy tę zasadę w CLAUDE.md **i** wpis w Dzienniku na samym początku — więc już nigdy „nie będzie wiedział".
+
+## Jeden ruch po Twojej stronie (gdy zechcesz)
+Żeby Arena MCP faktycznie działała u Ciebie, dodaj plik `.mcp.json` (treść dałem w poprzedniej wiadomości i jest w ściądze, sekcja 8b). Bez tego kod istnieje i ma testy, ale Claude go nie „widzi" jako narzędzia.
+
+Nie dodałem nowego Prawa do konstytucji celowo — „25 praw" to liczba pilnowana przez audyt, a nowe prawo pociągnęłoby zmianę w README i wielu dokumentach (Prawo XXI). Zasada MCP jako standing order w CLAUDE.md działa tak samo mocno, bez kaskady. Jeśli wolisz, żeby to było formalne **Prawo XXVI** — powiedz, zrobię to porządnie ze wszystkimi liczbami.

@@ -94,7 +94,7 @@ class AdapterNewsLLM(AdapterDanych):
     NAZWA = "NewsLLM(DeepSeek+fallback)"
     KLUCZE = ["NEWS_SENTYMENT", "NEWS_PEWNOSC", "NEWS_N",
               "NEWS_EVENT_KIERUNEK", "NEWS_EVENT_TYP", "NEWS_EVENT_PEWNOSC",
-              "NEWS_SENTYMENT_DELTA", "NEWS_ATTENTION_SPIKE", "NEWS_WIARYGODNOSC", "NEWS_NOVELTY"]
+              "NEWS_SENTYMENT_DELTA", "NEWS_ATTENTION_SPIKE", "NEWS_WIARYGODNOSC", "NEWS_NOVELTY", "NEWS_ROZRZUT"]
     _NEURONY = (NeuronSentymentNews, NeuronTaksonomiaZdarzen,
                 NeuronDeltaeSentymentu, NeuronSpikeUwagi)
     _POWOD_USPIENIA = "Wymaga feedu newsów (AdapterNewsLLM — RSS/API + LLM/fallback)."
@@ -157,6 +157,32 @@ class AdapterNewsLLM(AdapterDanych):
         # pewność: saturuje przy ~6 trafieniach
         pewnosc = min(1.0, 0.3 + trafienia / 10.0)
         return {"sentyment": round(sentyment, 4), "pewnosc": round(pewnosc, 4)}
+
+    @staticmethod
+    def _rozrzut_naglowkow(naglowki: List[str]) -> Optional[float]:
+        """
+        NEWS-07 (dispersion, research 2026): niezgoda MIĘDZY nagłówkami.
+        Klasyfikuje każdy nagłówek osobno (leksykon) na byczy/niedźwiedzi i mierzy
+        podział głosów: 0.0 = jednomyślne, 1.0 = pół na pół (maksymalna niepewność).
+        None = żaden nagłówek nie miał wydźwięku (brak informacji o niezgodzie).
+
+        UWAGA (Prawo XVI): sam WSKAŹNIK, celowo NIE mnoży pewności — wartość
+        predykcyjna rozrzutu zostanie zmierzona (IC), zanim dostanie wpływ na głos.
+        """
+        byki = 0
+        niedzwiedzie = 0
+        for naglowek in naglowki:
+            tekst = naglowek.lower()
+            b = sum(w for s, w in SLOWA_BYCZE.items() if _slowo_wystepuje(s, tekst))
+            n = sum(w for s, w in SLOWA_NIEDZWIEDZIE.items() if _slowo_wystepuje(s, tekst))
+            if b > n:
+                byki += 1
+            elif n > b:
+                niedzwiedzie += 1
+        glosy = byki + niedzwiedzie
+        if glosy == 0:
+            return None
+        return round(1.0 - abs(byki - niedzwiedzie) / glosy, 4)
 
     # ── Klasyfikacja LLM (DeepSeek) ────────────────────────────────────────────
 
@@ -282,4 +308,5 @@ class AdapterNewsLLM(AdapterDanych):
             "NEWS_ATTENTION_SPIKE": spike,
             "NEWS_WIARYGODNOSC": wiarygodnosc,
             "NEWS_NOVELTY": novelty,
+            "NEWS_ROZRZUT": self._rozrzut_naglowkow(naglowki),
         }

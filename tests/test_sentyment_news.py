@@ -332,3 +332,38 @@ def test_novelty_per_symbol_niezalezna():
     ad.pobierz("BTCUSDT")
     d_eth = ad.pobierz("ETHUSDT")
     assert d_eth["NEWS_NOVELTY"] == 1.0   # dla ETH to pierwszy raz
+
+
+# ── NEWS-07: rozrzut/niezgoda między nagłówkami (dispersion) ──────────────────
+
+def test_rozrzut_jednomyslne_zero():
+    r = AdapterNewsLLM._rozrzut_naglowkow(["Bitcoin rally surge", "ETH record breakout"])
+    assert r == 0.0
+
+
+def test_rozrzut_pol_na_pol_jeden():
+    r = AdapterNewsLLM._rozrzut_naglowkow(["Bitcoin rally surge", "ETH crash collapse"])
+    assert r == 1.0
+
+
+def test_rozrzut_bez_wydzwieku_none():
+    assert AdapterNewsLLM._rozrzut_naglowkow(["market update today"]) is None
+
+
+def test_rozrzut_2_1_wartosc():
+    """2 bycze + 1 niedźwiedzi → 1 - |2-1|/3 = 0.6667."""
+    r = AdapterNewsLLM._rozrzut_naglowkow(
+        ["BTC rally", "ETH surge", "SOL crash"])
+    assert abs(r - 0.6667) < 1e-3
+
+
+def test_rozrzut_w_pobierz():
+    ad = AdapterNewsLLM(fetcher=lambda s: ["BTC rally", "BTC crash"], uzyj_llm=False)
+    assert ad.pobierz()["NEWS_ROZRZUT"] == 1.0
+
+
+def test_rozrzut_nie_zmienia_pewnosci():
+    """Prawo XVI: rozrzut to wskaźnik informacyjny — NIE mnoży pewności (zanim IC zmierzony)."""
+    zgodne = AdapterNewsLLM(fetcher=lambda s: ["BTC rally", "ETH surge"], uzyj_llm=False).pobierz()
+    # pewność wynika z trafień/wiarygodności/novelty — rozrzut osobno w kluczu
+    assert "NEWS_ROZRZUT" in zgodne and "NEWS_PEWNOSC" in zgodne

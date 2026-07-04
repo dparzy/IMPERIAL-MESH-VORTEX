@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-07-04 | NEWS | ⚖️ NEWS-07: rozrzut/niezgoda nagłówków (dispersion)
+
+Plan NEWS pkt 7. `_rozrzut_naglowkow()`: każdy nagłówek klasyfikowany osobno (leksykon)
+na byczy/niedźwiedzi; NEWS_ROZRZUT = 1 − |byki−niedźwiedzie|/głosy (0=jednomyślne,
+1=pół-na-pół, None=brak wydźwięku). Zmierzone: 2:1 → 0.667.
+
+DECYZJA (Prawo XVI — pomiar przed wpływem): rozrzut jest WSKAŹNIKIEM informacyjnym w kluczu,
+celowo NIE mnoży pewności (mamy już stack 05×06) — wartość predykcyjna zostanie zmierzona
+IC zanim dostanie wpływ na głos. +6 testów (45/45 sentyment_news).
+
+---
+
 ## 2026-07-04 | NEWS | 🔄 NEWS-06: novelty — powtórzony news już wyceniony (original-vs-amplified)
 
 Plan NEWS pkt 6. Adapter pamięta znormalizowane nagłówki z poprzednich pobrań (deque 300

@@ -240,8 +240,20 @@ def audyt() -> tuple:
 
     # ── WARSTWA 6: DATY "Stan na:" ──────────────────────────────────────────
     try:
-        today = date.today()
-        # Tolerancja: "Stan na:" może być z poprzedniego dnia (np. commit był wieczorem)
+        # NAPRAWA (2026-07-04): odniesienie = data OSTATNIEGO COMMITU, nie date.today().
+        # Powód: porównanie z „dziś" powodowało FAŁSZYWY alarm co kilka dni gdy repo leżało
+        # bez commitu (data dokumentu = data ostatniej zmiany = poprawna, ale „starsza niż
+        # dziś"). Teraz: doc-date musi nadążać za ostatnią ZMIANĄ (commitem), nie za zegarem.
+        # To wciąż łapie prawdziwą niespójność: kod zmieniony (nowy commit) + stara data → alarm.
+        import subprocess
+        ref = date.today()
+        try:
+            _out = subprocess.run(["git", "log", "-1", "--format=%cd", "--date=short"],
+                                  capture_output=True, text=True, timeout=5)
+            if _out.returncode == 0 and _out.stdout.strip():
+                ref = date.fromisoformat(_out.stdout.strip())
+        except Exception:  # noqa: BLE001 — brak gita → fallback na dziś
+            pass
         TOLERANCJA_DNI = 2
 
         for doc_path, label in [("docs/MANIFEST_KODU.md", "MANIFEST"), ("README.md", "README")]:
@@ -250,11 +262,11 @@ def audyt() -> tuple:
             m = re.search(r"Stan na:\s*\**\s*(\d{4}-\d{2}-\d{2})", doc)
             if m:
                 doc_date = date.fromisoformat(m.group(1))
-                delta = (today - doc_date).days
+                delta = (ref - doc_date).days
                 if delta > TOLERANCJA_DNI:
                     bledy.append(
                         f"[W6] {label} 'Stan na:' = {m.group(1)} — "
-                        f"przestarzałe o {delta} dni (dziś {today}). Zaktualizuj po każdej sesji."
+                        f"starsze o {delta} dni niż ostatni commit ({ref}). Zaktualizuj po zmianie."
                     )
             else:
                 bledy.append(

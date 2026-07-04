@@ -6,6 +6,16 @@
 
 ---
 
+## 2026-07-04 | NAPRAWA | 📅 Audyt W6: data vs OSTATNI COMMIT (koniec codziennego fałszywego alarmu)
+
+Cezar (lokal): testy pękały co kilka dni — audyt W6 porównywał „Stan na:" z date.today(),
+tolerancja 2 dni → repo leżące bez commitu szło czerwone, choć data dokumentu = data ostatniej
+zmiany (poprawna). Fix: odniesienie = data OSTATNIEGO COMMITU (git log -1 --date=short),
+nie zegar. Wciąż łapie prawdziwą niespójność (kod zmieniony + stara data → alarm), ale repo
+w spoczynku pozostaje zielone. Fallback na dziś gdy brak gita. 13/13 test_spojnosc.
+
+---
+
 ## 2026-07-04 | NEWS | ⏳ NEWS-08: half-life — świeży nagłówek waży więcej
 
 Plan NEWS pkt 8. Fetcher: `_pozycje_z_rss()` wyłuskuje pubDate (RSS RFC822) / published/updated

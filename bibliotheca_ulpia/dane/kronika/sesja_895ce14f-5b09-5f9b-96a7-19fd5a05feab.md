@@ -10011,3 +10011,79 @@ Wracając do Twojego pytania o MCP — czekam na Twój wybór:
 - albo **oba**.
 
 Powiedz A / B / oba, to działam.
+
+## 🧑 Cezar
+zaczynam  właśnie wachtę od 0000 do 1200 zazwyczaj będę używał telefonu dawaj oba zgodnie z zasadami zawsze sprawdzaj wszystko nasz obecny stan dokumenty i kod zanim coś zrobisz to nasza zasada jeżeli jej nie mamy to zaktualizuj
+
+## 🏛️ Claude
+Zaczynam od naszej zasady — **rozpoznanie terenu przed działaniem**. Sprawdzam, czy ta zasada jest już skodyfikowana, robię KROK 0 (stan/kod/docs) i badam, gdzie żyją wyniki areny (pod kątem B).
+
+## 🏛️ Claude
+Potwierdzam: **zasadę już mamy** — `Prawo XVII — ROZPOZNANIE TERENU (ROZKAZ STAŁY, ROBISZ TO PIERWSZE)` w CLAUDE.md (linia 34) + „NIE zgaduj z pamięci" (linia 89). Nie duplikuję prawa; właśnie wg niego działam. KROK 0 czysty: 84 neurony / 15 zwiadowców, drzewo zsynchronizowane.
+
+Ustalenie dla **B**: nie ma jeszcze bazy wyników — IC/scoreboard liczą się na żądanie i znikają. Więc B zbuduję uczciwie jako **Arena MCP** z realną bazą SQLite, która akumuluje pomiary. Czytam istniejący serwer MCP, żeby zachować ten sam wzorzec (Prawo XVI — reuse):
+
+## 🏛️ Claude
+Wzorzec jasny. Sprawdzam API rejestru dla migawki roju (Arena MCP):
+
+## 🏛️ Claude
+Mam komplet. Buduję **Arena MCP** — instant migawka roju + baza SQLite wyników (którą Claude zapisuje i przeszukuje). Piszę z czystymi funkcjami (testowalnymi) + wrapper JSON-RPC, wzorem istniejącego serwera:
+
+## 🏛️ Claude
+Teraz testy z granicami (Reguła Test-Granic):
+
+## 🏛️ Claude
+Gitignore bazy areny (runtime, per-maszyna) + **A: blok `mcpServers`** w settings:
+
+## 🏛️ Claude
+Teraz **A** — dopisuję serwery MCP w `.claude/settings.json`. Używam `${CLAUDE_PROJECT_DIR}`, żeby ścieżki działały i na laptopie, i w chmurze (różne dyski). Serwer, który się nie załaduje, nie psuje reszty — więc to bezpieczne.
+
+## 🏛️ Claude
+`mcpServers` nie należy do `settings.json` — walidacja słusznie odrzuciła (edit się nie zapisał). Poprawny wzorzec Claude Code: plik **`.mcp.json`** w katalogu projektu + zgoda w `settings.json`. Robię to prawidłowo:
+
+## 🏛️ Claude
+Blokada dotyczy `.mcp.json` (config startowy + zewnętrzny serwer npx) — szanuję ją; dam Ci ten plik do wklejenia samodzielnie (poniżej). Najpierw domykam **B** (nasz kod — Arena MCP), bo to jest testowalny deliverable. Uruchamiam testy:
+
+## 🏛️ Claude
+15/15 zielone. Pełny gate + smoke-test serwera (czy odpowiada na JSON-RPC):
+
+## 🏛️ Claude
+Serwer działa (4 narzędzia), pełne testy zielone, audyt exit 0. Dopisuję LOG_ZMIAN + sekcję do ściągi, i commituję kod (B):
+
+## 🏛️ Claude
+Dodaję sekcję MCP do ściągi (żeby było „wszystko w jednym miejscu"):
+
+## 🏛️ Claude
+Gotowe — **B wdrożone i wypchnięte** (`ab3cfbd`), wszystko wg zasad. **A wymaga Twojego jednego ruchu** (blokada auto-mode na config startowy — słuszna).
+
+## ✅ B — Arena MCP (nasz kod, gotowy)
+
+`narzedzia/arena_mcp.py` — serwer MCP, którym Claude „uczy się areny":
+- **`arena_roj`** — migawka roju natychmiast (aktywne/wyciszone neurony, zwiadowcy, elita, kategorie, wykorzystanie %)
+- **`arena_neuron`** — szczegóły neuronu po kluczu
+- **`arena_zapisz` / `arena_pytaj`** — baza SQLite, do której Claude zapisuje pomiary (IC/scoreboard) i pyta o nie później → **wiedza akumuluje się przez całą wachtę**
+
+15 testów (z granicami), pełne testy zielone, audyt exit 0, smoke-test serwera OK. Zgodnie z zasadami: rój uczy się w kodzie (MWU/synapsy), MCP to soczewka; świadomie **bez** oficjalnego Memory MCP (redundancja z naszymi 13 warstwami — Prawo XVI).
+
+## ⏳ A — `.mcp.json` (Ty wklejasz, bo to config startowy)
+
+Auto-mode zablokował mi zapis pliku startowego z serwerem npx — i dobrze, to Twoja decyzja. Na laptopie **utwórz plik `.mcp.json`** w `C:\Projekty\imperial-mesh-vortex` z treścią:
+
+```json
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/narzedzia/rag/mcp_server.py"] },
+    "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/narzedzia/arena_mcp.py"] },
+    "filesystem": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "${CLAUDE_PROJECT_DIR}"] }
+  }
+}
+```
+
+Przy następnym starcie Claude zapyta o zgodę na te serwery — potwierdzasz. (Filesystem wymaga Node/npx; jak nie masz Node, usuń tę jedną linię — `biblioteka` i `arena` chodzą na samym Pythonie.)
+
+Ta sama treść jest już w ściądze (`docs/SCIAGA_LOKAL.md`, sekcja 8b), więc masz ją zawsze pod ręką.
+
+## Zasada, o którą pytałeś
+Już ją mamy: **Prawo XVII — Rozpoznanie terenu (ROBISZ TO PIERWSZE)** w CLAUDE.md. Nie duplikowałem; wg niej właśnie zacząłem tę pracę (sprawdziłem kod+docs przed budową). 
+
+Testuj spokojnie z telefonu — jak Arena MCP ruszy u Ciebie, powiedz, dorobimy narzędzie, które jednym ruchem wrzuca wynik `raport_ic` do bazy areny, żeby Claude czytał skuteczność roju SQL-em.

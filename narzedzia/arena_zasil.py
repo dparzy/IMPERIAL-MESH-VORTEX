@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from narzedzia.arena_mcp import DEFAULT_DB, zapisz_pomiar  # noqa: E402
+from imperium.biblioteki.arena_baza import DEFAULT_DB, zapisz_pomiar  # noqa: E402
 
 
 def zasil_z_ic(ic: dict, interwal: str, nota_extra: str = "",

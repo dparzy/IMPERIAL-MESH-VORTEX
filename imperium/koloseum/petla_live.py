@@ -100,6 +100,10 @@ class KonfigPetliLive:
     # Wymaga dashboard=True (serwer HTTP musi być uruchomiony).
     # Sekret: WEBHOOK_TV_SEKRET w env (Prawo bezpieczeństwa — nigdy w kodzie/configu).
     webhook_tv: bool = False
+    # Arena auto-log (opt-in, OFF): każde zamknięcie loguje realny PnL% do bazy areny
+    # (arena_wyniki.db, rodzaj='LIVE_PNL') → Claude czyta skuteczność live MCP-em arena_pytaj.
+    # Domyślnie False = ZERO zmiany zachowania (wzorzec opt-in jak mwu/igrzyska).
+    arena_log: bool = False
 
 
 @dataclass
@@ -495,6 +499,20 @@ def handluj_live(
                         )
                     except Exception as e:
                         logger.warning(f"[PętlaLive] PamięćRefleksyjna padła: {e}")
+
+                # Arena auto-log (opt-in): realny PnL% każdego zamknięcia → baza areny.
+                if cfg.arena_log:
+                    try:
+                        from imperium.biblioteki.arena_baza import zapisz_pomiar
+                        for w in nowe:
+                            if not hasattr(w, "pnl_pct"):
+                                continue
+                            sym = getattr(w, "symbol", None) or "ROJ"
+                            rez = getattr(w, "rezim", None) or "NORMAL"
+                            zapisz_pomiar("LIVE_PNL", str(sym), float(w.pnl_pct),
+                                          nota=f"{cfg.interwal} {rez} bar{bar_nr}")
+                    except Exception as e:
+                        logger.warning(f"[PętlaLive] Arena auto-log padł: {e}")
 
             # 4b. Alerty Telegram dla nowych zamknięć
             hist_now_new = len(engine.historia_zamkniec)

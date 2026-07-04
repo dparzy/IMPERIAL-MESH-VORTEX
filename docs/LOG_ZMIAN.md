@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-07-04 | UNIKAT | 🎯 Kalibrator Konformalny (ACI) + auto-log areny w pętli live
+
+Po przeglądzie vs konkurencja (mamy DSR/PBO/purged-CV/meta-labeling na poziomie AFML;
+luka: brak kalibracji prawdopodobieństwa) — zbudowano DWA ulepszenia:
+
+**#1 KalibratorKonformalny** (`imperium/legiony/kalibrator_konformalny.py`) — Adaptive
+Conformal Inference (Gibbs & Candès 2021, arXiv:2106.00170; ZPO w REJESTR_INSPIRACJI ML-36).
+Zamienia mgliste „pewność 0.7" w przedział z GWARANCJĄ pokrycia; ACI dostraja poziom po
+każdym barze pod dryf rynku. Split-conformal kwantyl z korektą skończonej próby (n+1);
+alpha=0→inf uczciwie (Prawo I). Unikat, dekorelowany (nie generuje kierunku — szerokość
+zaufania). 13 testów granic (pusta próba, alpha 0/1, order-statistic, ACI clamp, zbieżność).
+
+**#2 Auto-log areny w pętli live** — wspólna warstwa `imperium/biblioteki/arena_baza.py`
+(SQL wyjęty z arena_mcp — Prawo XVI reuse, poprawne warstwy). `KonfigPetliLive.arena_log`
+opt-in (domyślnie False = zero zmiany): każde zamknięcie loguje realny PnL% do arena_wyniki.db
+(rodzaj='LIVE_PNL') → Claude czyta skuteczność live MCP-em arena_pytaj. Domyka pętlę
+graj→mierz→ucz się bez udziału człowieka.
+
+1984/1984 testów zielone, audyt exit 0 (ruff czysto, INDEKS zsynchronizowany).
+**Pliki:** `kalibrator_konformalny.py` (NEW), `arena_baza.py` (NEW), `arena_mcp.py`
+(przepięty na wspólną warstwę), `arena_zasil.py`, `petla_live.py` (opt-in arena_log),
+4 nowe pliki testów, `REJESTR_INSPIRACJI.md`, `INDEKS_IMPERIUM.md`, `LOG_ZMIAN.md`.
+
+---
+
 ## 2026-07-04 | MCP | 🔁 Arena Zasil — domknięcie pętli graj→mierz→ucz się
 
 `narzedzia/arena_zasil.py`: liczy IC roju (raport_ic.zbierz_ic) i ZAPISUJE per neuron do

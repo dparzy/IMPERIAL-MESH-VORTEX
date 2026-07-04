@@ -29,17 +29,18 @@ Dostepne narzedzia MCP:
 from __future__ import annotations
 
 import json
-import sqlite3
 import sys
-import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-# Baza wyników areny — lokalna, runtime (per-maszyna), gitignore jak baza_wiedzy.db.
-DEFAULT_DB = ROOT / "bibliotheca_ulpia" / "dane" / "arena_wyniki.db"
+# Baza wyników areny — wspólna warstwa (Prawo XVI reuse); rdzeń SQL w imperium/biblioteki.
+from imperium.biblioteki.arena_baza import (  # noqa: E402
+    pytaj_pomiary,
+    zapisz_pomiar,
+)
 
 
 # ── Rdzeń: migawka roju (czyste funkcje, testowalne bez MCP) ─────────────────
@@ -86,64 +87,7 @@ def neuron_szczegoly(klucz: str) -> dict | None:
     return None
 
 
-# ── Rdzeń: baza wyników areny (SQLite) ───────────────────────────────────────
-
-def _polacz(db_path: Path | str = DEFAULT_DB) -> sqlite3.Connection:
-    Path(db_path).parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(db_path))
-    conn.execute(
-        "CREATE TABLE IF NOT EXISTS pomiary ("
-        " id INTEGER PRIMARY KEY AUTOINCREMENT,"
-        " ts REAL NOT NULL,"
-        " rodzaj TEXT NOT NULL,"
-        " neuron TEXT NOT NULL,"
-        " wartosc REAL NOT NULL,"
-        " nota TEXT DEFAULT '')"
-    )
-    return conn
-
-
-def zapisz_pomiar(rodzaj: str, neuron: str, wartosc: float, nota: str = "",
-                  db_path: Path | str = DEFAULT_DB, ts: float | None = None) -> int:
-    """Zapisuje jeden pomiar areny (np. IC neuronu). Zwraca id wiersza."""
-    if not rodzaj or not neuron:
-        raise ValueError("rodzaj i neuron nie mogą być puste")
-    conn = _polacz(db_path)
-    try:
-        cur = conn.execute(
-            "INSERT INTO pomiary (ts, rodzaj, neuron, wartosc, nota) VALUES (?,?,?,?,?)",
-            (float(ts if ts is not None else time.time()), rodzaj, neuron, float(wartosc), nota),
-        )
-        conn.commit()
-        return int(cur.lastrowid)
-    finally:
-        conn.close()
-
-
-def pytaj_pomiary(rodzaj: str | None = None, neuron: str | None = None,
-                  limit: int = 20, db_path: Path | str = DEFAULT_DB) -> list[dict]:
-    """Zwraca zapisane pomiary (najnowsze pierwsze), z opcjonalnym filtrem."""
-    if limit < 1:
-        return []
-    if not Path(db_path).exists():
-        return []
-    conn = _polacz(db_path)
-    try:
-        warunki, param = [], []
-        if rodzaj:
-            warunki.append("rodzaj = ?"); param.append(rodzaj)
-        if neuron:
-            warunki.append("neuron = ?"); param.append(neuron)
-        gdzie = (" WHERE " + " AND ".join(warunki)) if warunki else ""
-        param.append(int(limit))
-        rows = conn.execute(
-            f"SELECT id, ts, rodzaj, neuron, wartosc, nota FROM pomiary{gdzie} "
-            "ORDER BY id DESC LIMIT ?", param,
-        ).fetchall()
-        return [{"id": r[0], "ts": r[1], "rodzaj": r[2], "neuron": r[3],
-                 "wartosc": r[4], "nota": r[5]} for r in rows]
-    finally:
-        conn.close()
+# (baza wyników areny: zapisz_pomiar / pytaj_pomiary importowane z arena_baza wyżej)
 
 
 # ── Formatowanie tekstu dla Claude ───────────────────────────────────────────

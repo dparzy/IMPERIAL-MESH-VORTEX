@@ -286,6 +286,22 @@ nieaktualna liczba, neuron bez strategii, dokument niezsynchronizowany).
 **Złamanie:** archiwizacja pliku bez przeczytania (nawet przez nieuwagę — Prawo XVIII:
 złamanie przez nieuwagę = takie samo złamanie jak celowe).
 
+## 🔌 ZASADA MCP — SOCZEWKA, NIE MÓZG (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-04)
+
+**Rój UCZY SIĘ w KODZIE** (MWU, synapsy reżimowe, igrzyska, ksiega_wad, drift_adapter).
+**MCP to SOCZEWKA i RURA** — pozwala Claude oglądać/karmić arenę, ale **nie jest uczącym się
+modułem.** Nie mylić: dodanie MCP nie zastępuje logiki uczenia.
+
+- **Nie dodawaj MCP redundantnego** z tym, co już mamy (Prawo XVI). Przykład: odrzucono
+  oficjalny „Memory" MCP — mamy własne 13 warstw pamięci. MCP wchodzi TYLKO gdy dokłada
+  NOWĄ informację/zdolność (np. Filesystem = pełny dysk, SQL nad wynikami areny).
+- **Nasze serwery MCP:** `narzedzia/rag/mcp_server.py` (biblioteka RAG) +
+  `narzedzia/arena_mcp.py` (migawka roju + baza wyników `arena_wyniki.db`).
+- **Config startowy (`.mcp.json`, hooki) = ZAWSZE decyzja Cezara** — nie wpinamy w auto.
+
+**Złamanie:** dodanie MCP skorelowanego z istniejącym modułem, albo traktowanie MCP jak
+learnera zamiast soczewki.
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`

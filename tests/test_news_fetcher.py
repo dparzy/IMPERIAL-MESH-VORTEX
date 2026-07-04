@@ -101,3 +101,37 @@ def test_pobierz_wstecznie_kompatybilne():
     f = FetcherNewsRSS(zrodla=["x"], pobieracz=lambda u: RSS)
     w = f.pobierz()
     assert w and all(isinstance(t, str) for t in w)
+
+
+# ── NEWS-08: data publikacji z RSS (half-life) ────────────────────────────────
+
+def test_parsuj_date_rss_rfc822():
+    from imperium.akwedukty.news_fetcher import _parsuj_date_pub
+    assert _parsuj_date_pub("Wed, 02 Jul 2026 14:30:00 +0000") is not None
+
+
+def test_parsuj_date_atom_iso():
+    from imperium.akwedukty.news_fetcher import _parsuj_date_pub
+    assert _parsuj_date_pub("2026-07-02T14:30:00Z") is not None
+
+
+def test_parsuj_date_pusta_none():
+    from imperium.akwedukty.news_fetcher import _parsuj_date_pub
+    assert _parsuj_date_pub("") is None and _parsuj_date_pub("bzdura") is None
+
+
+def test_pozycje_z_data_pub():
+    from imperium.akwedukty.news_fetcher import _pozycje_z_rss
+    xml = ("<rss><channel><title>CD</title><item><title>BTC rally</title>"
+           "<pubDate>Wed, 02 Jul 2026 14:30:00 +0000</pubDate></item></channel></rss>")
+    poz = _pozycje_z_rss(xml)
+    assert poz[0]["tytul"] == "BTC rally" and poz[0]["data_pub"] is not None
+
+
+def test_metadane_zawieraja_date_pub():
+    from imperium.akwedukty.news_fetcher import FetcherNewsRSS
+    xml = ("<rss><channel><title>X</title><item><title>BTC surge</title>"
+           "<pubDate>Wed, 02 Jul 2026 14:30:00 +0000</pubDate></item></channel></rss>")
+    f = FetcherNewsRSS(zrodla=["https://www.coindesk.com/rss"], pobieracz=lambda u: xml)
+    m = f.pobierz_z_metadanymi()
+    assert "data_pub" in m[0]

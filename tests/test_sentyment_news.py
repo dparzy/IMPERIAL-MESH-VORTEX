@@ -367,3 +367,38 @@ def test_rozrzut_nie_zmienia_pewnosci():
     zgodne = AdapterNewsLLM(fetcher=lambda s: ["BTC rally", "ETH surge"], uzyj_llm=False).pobierz()
     # pewność wynika z trafień/wiarygodności/novelty — rozrzut osobno w kluczu
     assert "NEWS_ROZRZUT" in zgodne and "NEWS_PEWNOSC" in zgodne
+
+
+# ── NEWS-08: half-life świeżości ──────────────────────────────────────────────
+
+def test_swiezosc_swiezy_pelna_stary_tlumiony():
+    import time
+    HL = AdapterNewsLLM.HALF_LIFE_SEK
+    t = time.time()
+    w = AdapterNewsLLM._wagi_swiezosci([t, t - HL, None])   # świeży, 1 half-life, brak daty
+    assert w[0] == 1.0 and abs(w[1] - 0.5) < 0.02 and w[2] == 1.0
+
+
+def test_swiezosc_wszystkie_bez_daty_neutralne():
+    assert AdapterNewsLLM._wagi_swiezosci([None, None]) == [1.0, 1.0]
+
+
+def test_swiezosc_wzgledem_najnowszego():
+    """Wiek liczony względem najnowszego w partii (nie zegara)."""
+    w = AdapterNewsLLM._wagi_swiezosci([1000.0, 1000.0 - AdapterNewsLLM.HALF_LIFE_SEK])
+    assert w[0] == 1.0 and abs(w[1] - 0.5) < 0.02
+
+
+def test_swiezy_news_wazy_wiecej_w_sentymencie():
+    """Bycze świeże + niedźwiedzie stare → sentyment DODATNI (świeżość przeważa)."""
+    class F:
+        def __call__(self, s): return ["BTC rally surge", "BTC crash collapse"]
+        def pobierz_z_metadanymi(self, s):
+            import time
+            t = time.time()
+            return [
+                {"tytul": "BTC rally surge", "waga": 1.0, "data_pub": t},
+                {"tytul": "BTC crash collapse", "waga": 1.0, "data_pub": t - 48 * 3600}]
+    d = AdapterNewsLLM(fetcher=F(), uzyj_llm=False).pobierz("BTCUSDT")
+    assert d["NEWS_SENTYMENT"] > 0   # świeży byczy przeważa nad starym niedźwiedzim
+    assert d["NEWS_SWIEZOSC"] < 1.0

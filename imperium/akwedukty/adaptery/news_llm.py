@@ -94,7 +94,7 @@ class AdapterNewsLLM(AdapterDanych):
     NAZWA = "NewsLLM(DeepSeek+fallback)"
     KLUCZE = ["NEWS_SENTYMENT", "NEWS_PEWNOSC", "NEWS_N",
               "NEWS_EVENT_KIERUNEK", "NEWS_EVENT_TYP", "NEWS_EVENT_PEWNOSC",
-              "NEWS_SENTYMENT_DELTA", "NEWS_ATTENTION_SPIKE", "NEWS_WIARYGODNOSC", "NEWS_NOVELTY", "NEWS_ROZRZUT"]
+              "NEWS_SENTYMENT_DELTA", "NEWS_ATTENTION_SPIKE", "NEWS_WIARYGODNOSC", "NEWS_NOVELTY", "NEWS_ROZRZUT", "NEWS_SWIEZOSC"]
     _NEURONY = (NeuronSentymentNews, NeuronTaksonomiaZdarzen,
                 NeuronDeltaeSentymentu, NeuronSpikeUwagi)
     _POWOD_USPIENIA = "Wymaga feedu newsów (AdapterNewsLLM — RSS/API + LLM/fallback)."
@@ -184,6 +184,28 @@ class AdapterNewsLLM(AdapterDanych):
             return None
         return round(1.0 - abs(byki - niedzwiedzie) / glosy, 4)
 
+    # NEWS-08: okres półtrwania świeżości newsa (sekundy). ~12h — po dobie news traci ~3/4 wagi.
+    HALF_LIFE_SEK = 12 * 3600
+
+    @classmethod
+    def _wagi_swiezosci(cls, daty_pub: "List[Optional[float]]") -> List[float]:
+        """
+        Waga świeżości per nagłówek: 0.5^(wiek/half_life), gdzie wiek liczony względem
+        NAJNOWSZEGO nagłówka w partii (samowystarczalne). Brak daty → 1.0 (neutralna).
+        """
+        znane = [d for d in daty_pub if d is not None]
+        if not znane:
+            return [1.0] * len(daty_pub)
+        t_max = max(znane)
+        wagi = []
+        for d in daty_pub:
+            if d is None:
+                wagi.append(1.0)
+            else:
+                wiek = max(0.0, t_max - d)
+                wagi.append(round(0.5 ** (wiek / cls.HALF_LIFE_SEK), 4))
+        return wagi
+
     # ── Klasyfikacja LLM (DeepSeek) ────────────────────────────────────────────
 
     def _sentyment_llm(self, naglowki: List[str]) -> Optional[dict]:
@@ -236,14 +258,16 @@ class AdapterNewsLLM(AdapterDanych):
         Brak nagłówków → NEWS_SENTYMENT None (wzbogac() pominie → neuron śpi).
         """
         try:
-            # NEWS-05 (source credibility): jeśli fetcher zna źródła — bierz z wagami.
+            # NEWS-05/08: jeśli fetcher zna metadane — bierz źródła + daty publikacji.
             if hasattr(self._fetcher, "pobierz_z_metadanymi"):
                 meta = list(self._fetcher.pobierz_z_metadanymi(symbol) or [])
                 naglowki = [m["tytul"] for m in meta]
                 wagi_zrodel = [float(m.get("waga", 1.0)) for m in meta]
+                daty_pub = [m.get("data_pub") for m in meta]
             else:
                 naglowki = list(self._fetcher(symbol) or [])
                 wagi_zrodel = [1.0] * len(naglowki)
+                daty_pub = [None] * len(naglowki)
         except Exception as e:
             logger.warning(f"[Adapter:NewsLLM] fetcher padł dla {symbol}: {e}")
             return {"NEWS_SENTYMENT": None, "NEWS_PEWNOSC": None, "NEWS_N": 0}
@@ -252,6 +276,13 @@ class AdapterNewsLLM(AdapterDanych):
             return {"NEWS_SENTYMENT": None, "NEWS_PEWNOSC": None, "NEWS_N": 0}
 
         wiarygodnosc = round(sum(wagi_zrodel) / len(wagi_zrodel), 4)
+
+        # NEWS-08 half-life: świeży nagłówek waży więcej. Wiek liczony WZGLĘDEM najnowszego
+        # w tej partii (samowystarczalne, bez zewnętrznego zegara). waga = 0.5^(wiek/half_life).
+        # Brak daty → waga 1.0 (neutralna). Wagi świeżości mnożą wagi źródeł (05×08).
+        wagi_swiez = self._wagi_swiezosci(daty_pub)
+        swiezosc = round(sum(wagi_swiez) / len(wagi_swiez), 4)
+        wagi_laczne = [wz * ws for wz, ws in zip(wagi_zrodel, wagi_swiez)]
 
         # NEWS-06 novelty (liczone WZGLĘDEM przeszłości, przed dopisaniem bieżących):
         # frakcja nagłówków NIEwidzianych wcześniej. 1.0 = wszystko świeże;
@@ -269,7 +300,7 @@ class AdapterNewsLLM(AdapterDanych):
         if self.uzyj_llm:
             wynik = self._sentyment_llm(naglowki)
         if wynik is None:
-            wynik = self._sentyment_slownikowy(naglowki, wagi_zrodel=wagi_zrodel)
+            wynik = self._sentyment_slownikowy(naglowki, wagi_zrodel=wagi_laczne)
         # NEWS-05: pewność × średnia wiarygodność źródeł (blogi ważą mniej).
         # NEWS-06: pewność × (0.5 + 0.5·novelty) — całkiem przeżuty feed waży o połowę
         # mniej (stary news już w cenie), całkiem świeży bez kary.
@@ -309,4 +340,5 @@ class AdapterNewsLLM(AdapterDanych):
             "NEWS_WIARYGODNOSC": wiarygodnosc,
             "NEWS_NOVELTY": novelty,
             "NEWS_ROZRZUT": self._rozrzut_naglowkow(naglowki),
+            "NEWS_SWIEZOSC": swiezosc,
         }

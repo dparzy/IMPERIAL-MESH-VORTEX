@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-07-04 | NEWS | ⏳ NEWS-08: half-life — świeży nagłówek waży więcej
+
+Plan NEWS pkt 8. Fetcher: `_pozycje_z_rss()` wyłuskuje pubDate (RSS RFC822) / published/updated
+(Atom ISO) → `_parsuj_date_pub()` (email.utils + fromisoformat, stdlib). Metadane dostają
+`data_pub`. Adapter `_wagi_swiezosci()`: waga = 0.5^(wiek/half_life), wiek WZGLĘDEM najnowszego
+w partii (samowystarczalne, bez zegara); half-life 12h; brak daty → 1.0. Wagi świeżości ×
+wagi źródeł (05×08) w ważonym sentymencie; NEWS_SWIEZOSC jako wskaźnik. Zmierzone: świeży 1.0,
+sprzed 24h ≈0.25; świeży byczy przeważa stary niedźwiedzi. +9 testów (84/84 news).
+
+System NEWS: 8/10 punktów planu (fetcher+01-08). Zostały: social(9)/on-chain(10).
+
+---
+
 ## 2026-07-04 | NEWS | ⚖️ NEWS-07: rozrzut/niezgoda nagłówków (dispersion)
 
 Plan NEWS pkt 7. `_rozrzut_naglowkow()`: każdy nagłówek klasyfikowany osobno (leksykon)

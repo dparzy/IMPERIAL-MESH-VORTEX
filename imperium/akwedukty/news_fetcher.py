@@ -82,33 +82,66 @@ def _baza_z_symbolu(symbol: str) -> str:
     return s
 
 
-def _tytuly_z_rss(xml_tekst: str) -> List[str]:
-    """Wyłuskuje <title> z surowego RSS/Atom (stdlib, odporne na drobne błędy)."""
+def _parsuj_date_pub(s: "Optional[str]") -> "Optional[float]":
+    """
+    Data publikacji → epoch (float) lub None. RSS: RFC822 ('Wed, 02 Jul 2026 14:30:00 +0000'),
+    Atom: ISO ('2026-07-02T14:30:00Z'). Stdlib, tolerancyjne. NEWS-08 half-life.
+    """
+    if not s or not s.strip():
+        return None
+    s = s.strip()
+    try:
+        from email.utils import parsedate_to_datetime
+        dt = parsedate_to_datetime(s)
+        if dt is not None:
+            return dt.timestamp()
+    except (TypeError, ValueError, IndexError):
+        pass
+    try:
+        from datetime import datetime
+        return datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        return None
+
+
+def _pozycje_z_rss(xml_tekst: str) -> "List[Dict[str, object]]":
+    """
+    Wyłuskuje POZYCJE (item/entry) z RSS/Atom: [{"tytul": str, "data_pub": epoch|None}].
+    Tytuł kanału pominięty. data_pub z <pubDate> (RSS) lub <published>/<updated> (Atom).
+    """
     if not xml_tekst:
         return []
-    tytuly: List[str] = []
+    poz: "List[Dict[str, object]]" = []
     try:
         root = ElementTree.fromstring(xml_tekst)
     except ElementTree.ParseError:
-        # fallback regexowy gdy XML lekko uszkodzony: bierz tytuły z <item>/<entry>,
-        # pomijając <title> kanału (metadane feedu, nie nagłówek).
-        pozycje = re.findall(r"<(?:item|entry)[^>]*>(.*?)</(?:item|entry)>",
-                             xml_tekst, re.DOTALL | re.I)
-        for poz in pozycje:
-            m = re.search(r"<title[^>]*>(.*?)</title>", poz, re.DOTALL | re.I)
-            if m:
-                tytuly.append(re.sub(r"<.*?>", "", m.group(1)).strip())
-        return tytuly
-    # Tylko tytuły POZYCJI (item/entry) — <title> kanału/feedu to metadane, nie nagłówek.
+        # fallback regexowy: tytuł + data z bloków item/entry
+        for blok in re.findall(r"<(?:item|entry)[^>]*>(.*?)</(?:item|entry)>",
+                               xml_tekst, re.DOTALL | re.I):
+            mt = re.search(r"<title[^>]*>(.*?)</title>", blok, re.DOTALL | re.I)
+            md = re.search(r"<(?:pubDate|published|updated)[^>]*>(.*?)</", blok, re.DOTALL | re.I)
+            if mt:
+                poz.append({"tytul": re.sub(r"<.*?>", "", mt.group(1)).strip(),
+                            "data_pub": _parsuj_date_pub(md.group(1) if md else None)})
+        return poz
     for el in root.iter():
-        tag = el.tag.split("}")[-1].lower()   # bez namespace
-        if tag not in ("item", "entry"):
+        if el.tag.split("}")[-1].lower() not in ("item", "entry"):
             continue
+        tytul, data = None, None
         for dziecko in el:
-            if dziecko.tag.split("}")[-1].lower() == "title" and dziecko.text and dziecko.text.strip():
-                tytuly.append(dziecko.text.strip())
-                break
-    return tytuly
+            tag = dziecko.tag.split("}")[-1].lower()
+            if tag == "title" and dziecko.text and dziecko.text.strip() and tytul is None:
+                tytul = dziecko.text.strip()
+            elif tag in ("pubdate", "published", "updated") and dziecko.text and data is None:
+                data = _parsuj_date_pub(dziecko.text)
+        if tytul:
+            poz.append({"tytul": tytul, "data_pub": data})
+    return poz
+
+
+def _tytuly_z_rss(xml_tekst: str) -> List[str]:
+    """Same tytuły POZYCJI (item/entry) — wstecznie kompatybilne opakowanie na _pozycje_z_rss."""
+    return [str(p["tytul"]) for p in _pozycje_z_rss(xml_tekst)]
 
 
 def _normalizuj(tytul: str) -> str:
@@ -173,7 +206,8 @@ class FetcherNewsRSS:
                 continue
             domena = _domena(url)
             waga = WIARYGODNOSC_ZRODEL.get(domena, WAGA_NIEZNANE)
-            for tytul in _tytuly_z_rss(surowe):
+            for poz in _pozycje_z_rss(surowe):
+                tytul = str(poz["tytul"])
                 klucz = _normalizuj(tytul)
                 if not klucz or klucz in widziane:
                     continue
@@ -184,7 +218,8 @@ class FetcherNewsRSS:
                         re.search(r"\b" + re.escape(a) + r"\b", low) for a in aliasy):
                     continue
                 widziane.add(klucz)
-                wynik.append({"tytul": tytul, "zrodlo": domena, "waga": waga})
+                wynik.append({"tytul": tytul, "zrodlo": domena, "waga": waga,
+                              "data_pub": poz.get("data_pub")})
                 if len(wynik) >= self.limit:
                     return wynik
         return wynik

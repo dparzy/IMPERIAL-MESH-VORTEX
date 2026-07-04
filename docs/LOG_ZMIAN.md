@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-07-04 | NEWS | 📰 NEWS-05: wiarygodność źródła (source credibility, research 2026)
+
+Plan z NEWS_ROZBUDOWA pkt 5. Decyzja (Prawo XVI): to MODYFIKATOR jakości sentymentu, nie osobny
+neuron (byłby skorelowany z NEWS-01). Wpięte w fetcher+adapter:
+- `news_fetcher.py`: WIARYGODNOSC_ZRODEL (coindesk 1.0, cointelegraph 0.9, decrypt 0.85,
+  reuters/bloomberg 1.0; nieznane 0.5) + `pobierz_z_metadanymi()` → [{tytul, zrodlo, waga}].
+  Stare `pobierz()` nietknięte (wstecznie kompatybilne).
+- `news_llm.py`: słownikowy sentyment WAŻONY wagą źródła (trafienie z CoinDesk > blog);
+  NEWS_PEWNOSC × średnia wiarygodność; nowy klucz NEWS_WIARYGODNOSC.
+Zmierzone: ten sam nagłówek — CoinDesk pewność 0.6 vs nieznany blog 0.3. +7 testów.
+
+---
+
 ## 2026-07-04 | WIZUALIZACJA | 🖼️ Wykres backtestu — oczy Cezara (Prawo XV: Kartograf wpięty)
 
 Cezar: „czuję się jak dziecko we mgle — nie mam podglądu wykresów jak zachowuje się Imperium".

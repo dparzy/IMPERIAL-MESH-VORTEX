@@ -267,3 +267,33 @@ def test_adapter_budzi_neuron_long():
     wskazniki.update(a.pobierz("BTCUSDT"))
     s = NeuronSentymentNews().interpretuj(wskazniki)
     assert s.kierunek == "LONG"
+
+
+# ── NEWS-05: wiarygodność źródła skaluje pewność ──────────────────────────────
+
+def test_wiarygodnosc_skaluje_pewnosc():
+    """Ten sam nagłówek: źródło 1.0 → wyższa pewność niż źródło 0.5."""
+    class FMeta:
+        def __init__(self, waga): self.waga = waga
+        def __call__(self, s): return ["Bitcoin ETF approval rally"]
+        def pobierz_z_metadanymi(self, s):
+            return [{"tytul": "Bitcoin ETF approval rally", "zrodlo": "x", "waga": self.waga}]
+    a1 = AdapterNewsLLM(fetcher=FMeta(1.0), uzyj_llm=False).pobierz()
+    a5 = AdapterNewsLLM(fetcher=FMeta(0.5), uzyj_llm=False).pobierz()
+    assert a1["NEWS_PEWNOSC"] > a5["NEWS_PEWNOSC"]
+    assert a1["NEWS_WIARYGODNOSC"] == 1.0 and a5["NEWS_WIARYGODNOSC"] == 0.5
+
+
+def test_fetcher_bez_metadanych_wiarygodnosc_1():
+    """Stary fetcher (List[str]) → wiarygodność neutralna 1.0 (wstecznie kompatybilne)."""
+    ad = AdapterNewsLLM(fetcher=lambda s: ["Bitcoin rally record"], uzyj_llm=False)
+    d = ad.pobierz()
+    assert d["NEWS_WIARYGODNOSC"] == 1.0
+
+
+def test_wagi_zrodel_wplywaja_na_kierunek():
+    """Bycze z mocnego źródła + niedźwiedzie ze słabego → sentyment netto DODATNI."""
+    w = AdapterNewsLLM._sentyment_slownikowy(
+        ["Bitcoin rally surge record", "Bitcoin crash collapse dump"],
+        wagi_zrodel=[1.0, 0.3])
+    assert w["sentyment"] > 0

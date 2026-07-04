@@ -94,7 +94,7 @@ class AdapterNewsLLM(AdapterDanych):
     NAZWA = "NewsLLM(DeepSeek+fallback)"
     KLUCZE = ["NEWS_SENTYMENT", "NEWS_PEWNOSC", "NEWS_N",
               "NEWS_EVENT_KIERUNEK", "NEWS_EVENT_TYP", "NEWS_EVENT_PEWNOSC",
-              "NEWS_SENTYMENT_DELTA", "NEWS_ATTENTION_SPIKE"]
+              "NEWS_SENTYMENT_DELTA", "NEWS_ATTENTION_SPIKE", "NEWS_WIARYGODNOSC"]
     _NEURONY = (NeuronSentymentNews, NeuronTaksonomiaZdarzen,
                 NeuronDeltaeSentymentu, NeuronSpikeUwagi)
     _POWOD_USPIENIA = "Wymaga feedu newsów (AdapterNewsLLM — RSS/API + LLM/fallback)."
@@ -123,23 +123,29 @@ class AdapterNewsLLM(AdapterDanych):
     # ── Klasyfikacja słownikowa (offline, deterministyczna) ───────────────────
 
     @staticmethod
-    def _sentyment_slownikowy(naglowki: List[str]) -> dict:
+    def _sentyment_slownikowy(naglowki: List[str],
+                              wagi_zrodel: "Optional[List[float]]" = None) -> dict:
         """
         Liczy sentyment z leksykonu: (bycze - niedźwiedzie) / (bycze + niedźwiedzie).
         Pewność rośnie z liczbą trafień (saturacja). Zero trafień → 0.0 neutralny.
+
+        wagi_zrodel (NEWS-05, source credibility): waga wiarygodności per nagłówek —
+        trafienie z CoinDesk (1.0) liczy się mocniej niż z nieznanego bloga (0.5).
+        None → wszystkie 1.0 (wstecznie kompatybilne).
         """
         score_byk = 0.0
         score_niedz = 0.0
         trafienia = 0
-        for naglowek in naglowki:
+        for i, naglowek in enumerate(naglowki):
+            w_zrodla = wagi_zrodel[i] if wagi_zrodel and i < len(wagi_zrodel) else 1.0
             tekst = naglowek.lower()
             for slowo, waga in SLOWA_BYCZE.items():
                 if _slowo_wystepuje(slowo, tekst):
-                    score_byk += waga
+                    score_byk += waga * w_zrodla
                     trafienia += 1
             for slowo, waga in SLOWA_NIEDZWIEDZIE.items():
                 if _slowo_wystepuje(slowo, tekst):
-                    score_niedz += waga
+                    score_niedz += waga * w_zrodla
                     trafienia += 1
         suma = score_byk + score_niedz
         if suma == 0:
@@ -201,7 +207,14 @@ class AdapterNewsLLM(AdapterDanych):
         Brak nagłówków → NEWS_SENTYMENT None (wzbogac() pominie → neuron śpi).
         """
         try:
-            naglowki = list(self._fetcher(symbol) or [])
+            # NEWS-05 (source credibility): jeśli fetcher zna źródła — bierz z wagami.
+            if hasattr(self._fetcher, "pobierz_z_metadanymi"):
+                meta = list(self._fetcher.pobierz_z_metadanymi(symbol) or [])
+                naglowki = [m["tytul"] for m in meta]
+                wagi_zrodel = [float(m.get("waga", 1.0)) for m in meta]
+            else:
+                naglowki = list(self._fetcher(symbol) or [])
+                wagi_zrodel = [1.0] * len(naglowki)
         except Exception as e:
             logger.warning(f"[Adapter:NewsLLM] fetcher padł dla {symbol}: {e}")
             return {"NEWS_SENTYMENT": None, "NEWS_PEWNOSC": None, "NEWS_N": 0}
@@ -209,11 +222,16 @@ class AdapterNewsLLM(AdapterDanych):
         if not naglowki:
             return {"NEWS_SENTYMENT": None, "NEWS_PEWNOSC": None, "NEWS_N": 0}
 
+        wiarygodnosc = round(sum(wagi_zrodel) / len(wagi_zrodel), 4)
         wynik = None
         if self.uzyj_llm:
             wynik = self._sentyment_llm(naglowki)
         if wynik is None:
-            wynik = self._sentyment_slownikowy(naglowki)
+            wynik = self._sentyment_slownikowy(naglowki, wagi_zrodel=wagi_zrodel)
+        # NEWS-05: pewność klasyfikacji skalowana średnią wiarygodnością źródeł —
+        # werdykt z samych nieznanych blogów (0.5) waży w roju o połowę mniej.
+        wynik = dict(wynik)
+        wynik["pewnosc"] = round(wynik["pewnosc"] * wiarygodnosc, 4)
 
         # NEWS-02: taksonomia zdarzeń (kierunek per typ — deterministyczna, zawsze liczona)
         zdarz = _klasyfikuj_zdarzenia(naglowki)
@@ -245,4 +263,5 @@ class AdapterNewsLLM(AdapterDanych):
             "NEWS_EVENT_PEWNOSC": zdarz["pewnosc"] if kier is not None else None,
             "NEWS_SENTYMENT_DELTA": delta,
             "NEWS_ATTENTION_SPIKE": spike,
+            "NEWS_WIARYGODNOSC": wiarygodnosc,
         }

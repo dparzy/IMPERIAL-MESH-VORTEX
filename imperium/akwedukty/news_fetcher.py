@@ -43,6 +43,26 @@ ZRODLA_DOMYSLNE = [
     "https://decrypt.co/feed",
 ]
 
+# NEWS-05: wiarygodność wydawcy (source credibility weighting — research 2026).
+# Skala 0..1: ile waży nagłówek z danego źródła w ważonym sentymencie. Uzasadnienie:
+# CoinDesk/CoinTelegraph = redakcje z fact-checkiem; nieznane źródło = ostrożnie (0.5).
+WIARYGODNOSC_ZRODEL = {
+    "coindesk.com": 1.0,
+    "cointelegraph.com": 0.9,
+    "decrypt.co": 0.85,
+    "theblock.co": 0.9,
+    "reuters.com": 1.0,
+    "bloomberg.com": 1.0,
+}
+WAGA_NIEZNANE = 0.5   # nieznana domena → połowa wagi (nie zero — może być wartościowa)
+
+
+def _domena(url: str) -> str:
+    """'https://www.coindesk.com/arc/...' → 'coindesk.com'."""
+    m = re.search(r"https?://(?:www\.)?([^/]+)", url)
+    return m.group(1).lower() if m else url
+
+
 # Mapowanie symbol→aliasy do filtrowania per-aktywo (nazwa bazowa + pełna).
 _ALIASY = {
     "BTC": ["btc", "bitcoin"], "ETH": ["eth", "ethereum", "ether"],
@@ -133,16 +153,26 @@ class FetcherNewsRSS:
 
     def pobierz(self, symbol: str = "") -> List[str]:
         """Zwraca zdeduplikowane nagłówki (opcjonalnie filtrowane per-aktywo)."""
+        return [m["tytul"] for m in self.pobierz_z_metadanymi(symbol)]
+
+    def pobierz_z_metadanymi(self, symbol: str = "") -> List[Dict[str, object]]:
+        """
+        NEWS-05 (source credibility, research 2026): nagłówki Z WAGĄ ŹRÓDŁA.
+        Zwraca [{"tytul": str, "zrodlo": domena, "waga": float}] — CoinDesk waży
+        więcej niż nieznany blog. Adapter używa wag do ważonego sentymentu.
+        """
         baza = _baza_z_symbolu(symbol)
         aliasy = _ALIASY.get(baza, [baza.lower()] if baza else [])
         widziane = set()
-        wynik: List[str] = []
+        wynik: List[Dict[str, object]] = []
         for url in self.zrodla:
             try:
                 surowe = self._pobieracz(url)
             except Exception as e:  # noqa: BLE001 — źródło zawodne → pomiń, nie crash
                 logger.info(f"[Fetcher] źródło {url} padło: {e}")
                 continue
+            domena = _domena(url)
+            waga = WIARYGODNOSC_ZRODEL.get(domena, WAGA_NIEZNANE)
             for tytul in _tytuly_z_rss(surowe):
                 klucz = _normalizuj(tytul)
                 if not klucz or klucz in widziane:
@@ -154,7 +184,7 @@ class FetcherNewsRSS:
                         re.search(r"\b" + re.escape(a) + r"\b", low) for a in aliasy):
                     continue
                 widziane.add(klucz)
-                wynik.append(tytul)
+                wynik.append({"tytul": tytul, "zrodlo": domena, "waga": waga})
                 if len(wynik) >= self.limit:
                     return wynik
         return wynik

@@ -137,6 +137,31 @@ Dziennik (oś czasu projektu) **pisze Claude sam na koniec sesji** — Ty nie mu
 
 ---
 
+## 8b. MCP — Claude uczy się areny (soczewka na rój)
+
+Mamy dwa własne serwery MCP + opcjonalny filesystem. Żeby je włączyć, utwórz plik
+**`.mcp.json`** w katalogu projektu (raz):
+```json
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/narzedzia/rag/mcp_server.py"] },
+    "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/narzedzia/arena_mcp.py"] },
+    "filesystem": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "${CLAUDE_PROJECT_DIR}"] }
+  }
+}
+```
+Przy starcie Claude zapyta o zgodę na te serwery — potwierdź. (Filesystem wymaga Node/npx;
+jak nie masz Node, usuń tę linię — biblioteka i arena działają na samym Pythonie.)
+
+Ręczny test Areny bez Claude:
+```powershell
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | python narzedzia/arena_mcp.py
+```
+Narzędzia areny (Claude woła je sam): `arena_roj` (migawka roju), `arena_neuron` (szczegóły),
+`arena_zapisz`/`arena_pytaj` (baza wyników — akumuluje IC/scoreboard przez wachtę).
+
+---
+
 ## 9. Klucze API (bezpieczeństwo — NIGDY w kodzie/czacie)
 
 Ustawiasz raz jako zmienne środowiskowe (Windows), potem **zamknij i otwórz terminal**:

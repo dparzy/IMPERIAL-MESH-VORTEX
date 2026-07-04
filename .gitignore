@@ -30,3 +30,5 @@ ab_mtf_rezimy_metryki.json
 ab_mtf_rezimy_wynik.txt
 # Marker przetworzonych sesji auto-lekcji (stan runtime, per-maszyna)
 bibliotheca_ulpia/dane/.auto_lekcja_przetworzone.txt
+# Baza wyników areny (Arena MCP — pomiary IC/scoreboard, runtime per-maszyna)
+bibliotheca_ulpia/dane/arena_wyniki.db

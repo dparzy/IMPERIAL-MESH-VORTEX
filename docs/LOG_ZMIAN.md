@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-07-04 | MCP | 🔁 Arena Zasil — domknięcie pętli graj→mierz→ucz się
+
+`narzedzia/arena_zasil.py`: liczy IC roju (raport_ic.zbierz_ic) i ZAPISUJE per neuron do
+bazy areny (arena_mcp.zapisz_pomiar). Rdzeń `zasil_z_ic(ic, interwal, ...)` czysty/testowalny,
+pomija NaN i niepoprawne typy (Prawo I: do bazy tylko realny pomiar). CLI dokłada backtest.
+Efekt: pomiar z lokalnego biegu trafia do arena_wyniki.db → Claude czyta go MCP-em `arena_pytaj`
+bez ponownego liczenia; wiedza akumuluje się między wachtami. 6 testów granic (NaN/None/typy/
+pusty/nota/rodzaj). Pełne testy zielone, audyt exit 0.
+
+**Pliki:** `narzedzia/arena_zasil.py` (NEW), `tests/test_arena_zasil.py` (NEW),
+`docs/LOG_ZMIAN.md`, `docs/SCIAGA_LOKAL.md`.
+
+---
+
 ## 2026-07-04 | MCP | 🏟️ Arena MCP — Claude uczy się areny (migawka roju + baza wyników)
 
 Cezar (wachta): „opcje MCP do nauki areny — tylko najlepsze wg zasad". Zbudowany

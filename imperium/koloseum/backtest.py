@@ -195,7 +195,9 @@ def backtest(
     # Pomiar IC (W-385): dołącz raport do silnika (Prawo XVI — przewaga mierzona).
     if kol_ic is not None:
         engine.ic_srednie = kol_ic.ic_srednie()
+        engine.ic_warunkowy = kol_ic.ic_srednie(tylko_glosy=True)  # tylko bary z głosem
         engine.ic_pelne = kol_ic.ic()
+        engine.ic_kolektor = kol_ic
 
     # 3. Zamknij pozostałe otwarte po ostatniej cenie
     ostatnia_cena = {symbol: bary[-1]["close"]}

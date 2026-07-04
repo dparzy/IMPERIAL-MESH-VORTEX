@@ -87,10 +87,15 @@ class KolektorIC:
         self._krok += 1
 
     # ------------------------------------------------------------------
-    def _para_sygnal_zwrot(self, h: int) -> Dict[str, Tuple[List[float], List[float]]]:
+    def _para_sygnal_zwrot(self, h: int,
+                           tylko_glosy: bool = False) -> Dict[str, Tuple[List[float], List[float]]]:
         """
         Dla horyzontu h: łącz sygnał na kroku t z zwrotem na kroku t+h.
         Zwraca {neuron_id: ([sygnały_t], [zwroty_{t+h}])}.
+
+        tylko_glosy=True → pomija bary gdzie sygnał==0 (neuron abstynował). To liczy
+        IC WARUNKOWY: „gdy neuron GŁOSUJE, czy trafia?" — usuwa inflację Spearmana od
+        tysięcy zerowych remisów (Prawo XVI, poprawka pomiaru 2026-07-01).
         """
         zwroty = {k: v for k, v in self._bufor_zwrotow}
         wynik: Dict[str, Tuple[List[float], List[float]]] = {}
@@ -100,6 +105,8 @@ class KolektorIC:
                 continue
             r = zwroty[krok_h]
             for nid, s in mapa.items():
+                if tylko_glosy and abs(s) < 1e-12:
+                    continue   # neuron nie głosował na tym barze — pomiń
                 if nid not in wynik:
                     wynik[nid] = ([], [])
                 wynik[nid][0].append(s)
@@ -107,18 +114,20 @@ class KolektorIC:
         return wynik
 
     # ------------------------------------------------------------------
-    def ic(self, h: Optional[int] = None) -> Dict[str, Dict[int, float]]:
+    def ic(self, h: Optional[int] = None, tylko_glosy: bool = False) -> Dict[str, Dict[int, float]]:
         """
         Oblicz IC per neuron, per horyzont.
 
         Zwraca: {neuron_id: {h: IC_value}} lub {neuron_id: {h: None}} gdy brak danych.
         Gdy h podane — tylko dla tego horyzontu.
+        tylko_glosy=True → IC warunkowy (tylko bary z niezerowym głosem) — wiarygodniejszy
+        dla rzadko głosujących neuronów (bez inflacji od remisów zer).
         """
         horyzonty = (h,) if h is not None else self.horyzonty
         neurony: Dict[str, Dict[int, float]] = {}
 
         for hz in horyzonty:
-            pary = self._para_sygnal_zwrot(hz)
+            pary = self._para_sygnal_zwrot(hz, tylko_glosy=tylko_glosy)
             for nid, (sigs, rets) in pary.items():
                 if nid not in neurony:
                     neurony[nid] = {}
@@ -136,10 +145,10 @@ class KolektorIC:
         return neurony
 
     # ------------------------------------------------------------------
-    def ic_srednie(self) -> Dict[str, float]:
-        """IC uśrednione po horyzontach (ignoruje NaN)."""
+    def ic_srednie(self, tylko_glosy: bool = False) -> Dict[str, float]:
+        """IC uśrednione po horyzontach (ignoruje NaN). tylko_glosy → IC warunkowy."""
         wyniki = {}
-        for nid, hz_dict in self.ic().items():
+        for nid, hz_dict in self.ic(tylko_glosy=tylko_glosy).items():
             wartosci = [v for v in hz_dict.values() if not np.isnan(v)]
             wyniki[nid] = round(float(np.mean(wartosci)), 4) if wartosci else float("nan")
         return wyniki

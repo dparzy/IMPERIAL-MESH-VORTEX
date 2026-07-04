@@ -4,7 +4,7 @@
 > Aktualizuj PO każdej sesji. Wczytywana przez SessionStart hook.
 > Indeksowana w RAG jako korpus `pamiec` (plik .md → `bibliotheca_ulpia/dane/`).
 
-## Ostatnia aktualizacja: 2026-06-22
+## Ostatnia aktualizacja: 2026-07-04
 
 ---
 
@@ -100,6 +100,9 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 ---
 
 ## 📚 LEKCJE Z SESJI
+
+### 2026-07-04 — POTRZEBA CEZARA: wizualizacja live (krytyczne)
+Cezar czuje się 'jak dziecko we mgle' — brak podglądu wykresów i wizualizacji live jak zachowuje się Imperium. PRIORYTET: dashboardy/wykresy (equity, cena+wejścia/wyjścia, IC ranking, głosy neuronów na żywo). Każde narzędzie ma mieć wyjście WIZUALNE, nie tylko tekst.
 
 ### 2026-06-25 — Głęboki audyt przypisania książek: 42/42 pokryte, 4 sieroty naprawione
 Cezar zlecił audyt przypisania wszystkich książek do działów. Macierz pokrycia (plik↔dział) wykryła 3 prawdziwe sieroty + 1 brak w Kanonie INDEX. Każdą przeczytano agentem przed przypisaniem (ZPO, nie z tytułu). BIB-001 Patel (978-0-85719-857-0)→MAK (18-letni cykl nieruchomości, MAK 🔲→🚧+esencja)+BAN. BIB-012 Coding Capital (979-8-87385-994-8)→ALG+IMP. BIB-024 Lowe (self-pub ⚠️)→ONC ⭐1 z oznaczeniem ANTYWZORCA (uśrednianie w dół vs Reguła 6%). BIB-005 Blum→dopisany do Kanonu INDEX (był w ONC). Wynik: 42/42, zero sierot. Lekcja metodologiczna: „sierota wg INDEX_MAIOR" ≠ „sierota faktyczna" — sprawdzaj WSZYSTKIE pliki działów, nie tylko Kanon (BIB-005 był w ONC, fałszywie wyglądał na sierotę).

@@ -157,3 +157,30 @@ def test_prawo_fundamentalne_posortowane_neurony():
     # posortowane wg |IC| malejąco
     wartosci = [abs(wynik["neurony"][k]) for k in klucze]
     assert wartosci == sorted(wartosci, reverse=True)
+
+
+def test_ic_warunkowy_pomija_zerowe_glosy():
+    """IC warunkowy (tylko_glosy) liczy tylko bary z niezerowym sygnałem (Prawo XVI)."""
+    kol = KolektorIC(min_probek=3, horyzonty=(1,))
+    # neuron 'A' głosuje tylko co drugi bar (reszta 0), 'B' zawsze
+    import random
+    rng = random.Random(1)
+    for i in range(40):
+        glos_a = 0.0 if i % 2 == 0 else (0.5 if rng.random() > 0.5 else -0.5)
+        kol.rejestruj_sygnal({"A": glos_a, "B": 0.3})
+        kol.rejestruj_zwrot(rng.gauss(0, 0.01))
+    pary_pelne = kol._para_sygnal_zwrot(1, tylko_glosy=False)
+    pary_glosy = kol._para_sygnal_zwrot(1, tylko_glosy=True)
+    # A: warunkowy ma MNIEJ próbek (pominięte zera) niż pełny
+    assert len(pary_glosy["A"][0]) < len(pary_pelne["A"][0])
+    # żadna próbka warunkowa A nie jest zerem
+    assert all(abs(s) > 1e-12 for s in pary_glosy["A"][0])
+
+
+def test_ic_srednie_warunkowy_param():
+    kol = KolektorIC(min_probek=3, horyzonty=(1,))
+    for i in range(30):
+        kol.rejestruj_sygnal({"X": 0.0 if i % 3 else 0.5})
+        kol.rejestruj_zwrot(0.01 * (1 if i % 3 else -1))
+    w = kol.ic_srednie(tylko_glosy=True)
+    assert "X" in w   # nie wybucha, zwraca wynik

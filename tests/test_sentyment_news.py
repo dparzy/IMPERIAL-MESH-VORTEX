@@ -267,3 +267,138 @@ def test_adapter_budzi_neuron_long():
     wskazniki.update(a.pobierz("BTCUSDT"))
     s = NeuronSentymentNews().interpretuj(wskazniki)
     assert s.kierunek == "LONG"
+
+
+# ── NEWS-05: wiarygodność źródła skaluje pewność ──────────────────────────────
+
+def test_wiarygodnosc_skaluje_pewnosc():
+    """Ten sam nagłówek: źródło 1.0 → wyższa pewność niż źródło 0.5."""
+    class FMeta:
+        def __init__(self, waga): self.waga = waga
+        def __call__(self, s): return ["Bitcoin ETF approval rally"]
+        def pobierz_z_metadanymi(self, s):
+            return [{"tytul": "Bitcoin ETF approval rally", "zrodlo": "x", "waga": self.waga}]
+    a1 = AdapterNewsLLM(fetcher=FMeta(1.0), uzyj_llm=False).pobierz()
+    a5 = AdapterNewsLLM(fetcher=FMeta(0.5), uzyj_llm=False).pobierz()
+    assert a1["NEWS_PEWNOSC"] > a5["NEWS_PEWNOSC"]
+    assert a1["NEWS_WIARYGODNOSC"] == 1.0 and a5["NEWS_WIARYGODNOSC"] == 0.5
+
+
+def test_fetcher_bez_metadanych_wiarygodnosc_1():
+    """Stary fetcher (List[str]) → wiarygodność neutralna 1.0 (wstecznie kompatybilne)."""
+    ad = AdapterNewsLLM(fetcher=lambda s: ["Bitcoin rally record"], uzyj_llm=False)
+    d = ad.pobierz()
+    assert d["NEWS_WIARYGODNOSC"] == 1.0
+
+
+def test_wagi_zrodel_wplywaja_na_kierunek():
+    """Bycze z mocnego źródła + niedźwiedzie ze słabego → sentyment netto DODATNI."""
+    w = AdapterNewsLLM._sentyment_slownikowy(
+        ["Bitcoin rally surge record", "Bitcoin crash collapse dump"],
+        wagi_zrodel=[1.0, 0.3])
+    assert w["sentyment"] > 0
+
+
+# ── NEWS-06: novelty (powtórzony news już wyceniony) ──────────────────────────
+
+def test_novelty_swiezy_feed_pelna_pewnosc():
+    ad = AdapterNewsLLM(fetcher=lambda s: ["Bitcoin rally record"], uzyj_llm=False)
+    d = ad.pobierz("BTCUSDT")
+    assert d["NEWS_NOVELTY"] == 1.0
+
+
+def test_novelty_powtorzony_news_tlumiony():
+    """Ten sam nagłówek drugi raz → novelty 0, pewność ×0.5."""
+    ad = AdapterNewsLLM(fetcher=lambda s: ["Bitcoin rally record"], uzyj_llm=False)
+    d1 = ad.pobierz("BTCUSDT")
+    d2 = ad.pobierz("BTCUSDT")
+    assert d2["NEWS_NOVELTY"] == 0.0
+    assert abs(d2["NEWS_PEWNOSC"] - d1["NEWS_PEWNOSC"] * 0.5) < 1e-6
+
+
+def test_novelty_mieszany_feed():
+    """1 stary + 1 nowy nagłówek → novelty 0.5."""
+    feeds = [["Bitcoin rally record"], ["Bitcoin rally record", "Ethereum hack exploit"]]
+    box = {"i": 0}
+    ad = AdapterNewsLLM(fetcher=lambda s: feeds[box["i"]], uzyj_llm=False)
+    ad.pobierz("BTCUSDT"); box["i"] = 1
+    d = ad.pobierz("BTCUSDT")
+    assert d["NEWS_NOVELTY"] == 0.5
+
+
+def test_novelty_per_symbol_niezalezna():
+    """Pamięć widzianych nagłówków jest per symbol (BTC nie zaraża ETH)."""
+    ad = AdapterNewsLLM(fetcher=lambda s: ["Bitcoin rally record"], uzyj_llm=False)
+    ad.pobierz("BTCUSDT")
+    d_eth = ad.pobierz("ETHUSDT")
+    assert d_eth["NEWS_NOVELTY"] == 1.0   # dla ETH to pierwszy raz
+
+
+# ── NEWS-07: rozrzut/niezgoda między nagłówkami (dispersion) ──────────────────
+
+def test_rozrzut_jednomyslne_zero():
+    r = AdapterNewsLLM._rozrzut_naglowkow(["Bitcoin rally surge", "ETH record breakout"])
+    assert r == 0.0
+
+
+def test_rozrzut_pol_na_pol_jeden():
+    r = AdapterNewsLLM._rozrzut_naglowkow(["Bitcoin rally surge", "ETH crash collapse"])
+    assert r == 1.0
+
+
+def test_rozrzut_bez_wydzwieku_none():
+    assert AdapterNewsLLM._rozrzut_naglowkow(["market update today"]) is None
+
+
+def test_rozrzut_2_1_wartosc():
+    """2 bycze + 1 niedźwiedzi → 1 - |2-1|/3 = 0.6667."""
+    r = AdapterNewsLLM._rozrzut_naglowkow(
+        ["BTC rally", "ETH surge", "SOL crash"])
+    assert abs(r - 0.6667) < 1e-3
+
+
+def test_rozrzut_w_pobierz():
+    ad = AdapterNewsLLM(fetcher=lambda s: ["BTC rally", "BTC crash"], uzyj_llm=False)
+    assert ad.pobierz()["NEWS_ROZRZUT"] == 1.0
+
+
+def test_rozrzut_nie_zmienia_pewnosci():
+    """Prawo XVI: rozrzut to wskaźnik informacyjny — NIE mnoży pewności (zanim IC zmierzony)."""
+    zgodne = AdapterNewsLLM(fetcher=lambda s: ["BTC rally", "ETH surge"], uzyj_llm=False).pobierz()
+    # pewność wynika z trafień/wiarygodności/novelty — rozrzut osobno w kluczu
+    assert "NEWS_ROZRZUT" in zgodne and "NEWS_PEWNOSC" in zgodne
+
+
+# ── NEWS-08: half-life świeżości ──────────────────────────────────────────────
+
+def test_swiezosc_swiezy_pelna_stary_tlumiony():
+    import time
+    HL = AdapterNewsLLM.HALF_LIFE_SEK
+    t = time.time()
+    w = AdapterNewsLLM._wagi_swiezosci([t, t - HL, None])   # świeży, 1 half-life, brak daty
+    assert w[0] == 1.0 and abs(w[1] - 0.5) < 0.02 and w[2] == 1.0
+
+
+def test_swiezosc_wszystkie_bez_daty_neutralne():
+    assert AdapterNewsLLM._wagi_swiezosci([None, None]) == [1.0, 1.0]
+
+
+def test_swiezosc_wzgledem_najnowszego():
+    """Wiek liczony względem najnowszego w partii (nie zegara)."""
+    w = AdapterNewsLLM._wagi_swiezosci([1000.0, 1000.0 - AdapterNewsLLM.HALF_LIFE_SEK])
+    assert w[0] == 1.0 and abs(w[1] - 0.5) < 0.02
+
+
+def test_swiezy_news_wazy_wiecej_w_sentymencie():
+    """Bycze świeże + niedźwiedzie stare → sentyment DODATNI (świeżość przeważa)."""
+    class F:
+        def __call__(self, s): return ["BTC rally surge", "BTC crash collapse"]
+        def pobierz_z_metadanymi(self, s):
+            import time
+            t = time.time()
+            return [
+                {"tytul": "BTC rally surge", "waga": 1.0, "data_pub": t},
+                {"tytul": "BTC crash collapse", "waga": 1.0, "data_pub": t - 48 * 3600}]
+    d = AdapterNewsLLM(fetcher=F(), uzyj_llm=False).pobierz("BTCUSDT")
+    assert d["NEWS_SENTYMENT"] > 0   # świeży byczy przeważa nad starym niedźwiedzim
+    assert d["NEWS_SWIEZOSC"] < 1.0

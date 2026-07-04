@@ -94,7 +94,7 @@ class AdapterNewsLLM(AdapterDanych):
     NAZWA = "NewsLLM(DeepSeek+fallback)"
     KLUCZE = ["NEWS_SENTYMENT", "NEWS_PEWNOSC", "NEWS_N",
               "NEWS_EVENT_KIERUNEK", "NEWS_EVENT_TYP", "NEWS_EVENT_PEWNOSC",
-              "NEWS_SENTYMENT_DELTA", "NEWS_ATTENTION_SPIKE"]
+              "NEWS_SENTYMENT_DELTA", "NEWS_ATTENTION_SPIKE", "NEWS_WIARYGODNOSC", "NEWS_NOVELTY", "NEWS_ROZRZUT", "NEWS_SWIEZOSC"]
     _NEURONY = (NeuronSentymentNews, NeuronTaksonomiaZdarzen,
                 NeuronDeltaeSentymentu, NeuronSpikeUwagi)
     _POWOD_USPIENIA = "Wymaga feedu newsów (AdapterNewsLLM — RSS/API + LLM/fallback)."
@@ -119,27 +119,36 @@ class AdapterNewsLLM(AdapterDanych):
         from collections import deque, defaultdict
         self._hist_sent = defaultdict(lambda: deque(maxlen=10))   # poprzednie sentymenty
         self._hist_n = defaultdict(lambda: deque(maxlen=20))      # poprzednia liczba nagłówków
+        # NEWS-06 novelty: znormalizowane nagłówki widziane w POPRZEDNICH pobraniach —
+        # powtórzony news jest już wyceniony (original-vs-amplified, research 2026).
+        self._widziane = defaultdict(lambda: deque(maxlen=300))   # klucze nagłówków per symbol
 
     # ── Klasyfikacja słownikowa (offline, deterministyczna) ───────────────────
 
     @staticmethod
-    def _sentyment_slownikowy(naglowki: List[str]) -> dict:
+    def _sentyment_slownikowy(naglowki: List[str],
+                              wagi_zrodel: "Optional[List[float]]" = None) -> dict:
         """
         Liczy sentyment z leksykonu: (bycze - niedźwiedzie) / (bycze + niedźwiedzie).
         Pewność rośnie z liczbą trafień (saturacja). Zero trafień → 0.0 neutralny.
+
+        wagi_zrodel (NEWS-05, source credibility): waga wiarygodności per nagłówek —
+        trafienie z CoinDesk (1.0) liczy się mocniej niż z nieznanego bloga (0.5).
+        None → wszystkie 1.0 (wstecznie kompatybilne).
         """
         score_byk = 0.0
         score_niedz = 0.0
         trafienia = 0
-        for naglowek in naglowki:
+        for i, naglowek in enumerate(naglowki):
+            w_zrodla = wagi_zrodel[i] if wagi_zrodel and i < len(wagi_zrodel) else 1.0
             tekst = naglowek.lower()
             for slowo, waga in SLOWA_BYCZE.items():
                 if _slowo_wystepuje(slowo, tekst):
-                    score_byk += waga
+                    score_byk += waga * w_zrodla
                     trafienia += 1
             for slowo, waga in SLOWA_NIEDZWIEDZIE.items():
                 if _slowo_wystepuje(slowo, tekst):
-                    score_niedz += waga
+                    score_niedz += waga * w_zrodla
                     trafienia += 1
         suma = score_byk + score_niedz
         if suma == 0:
@@ -148,6 +157,54 @@ class AdapterNewsLLM(AdapterDanych):
         # pewność: saturuje przy ~6 trafieniach
         pewnosc = min(1.0, 0.3 + trafienia / 10.0)
         return {"sentyment": round(sentyment, 4), "pewnosc": round(pewnosc, 4)}
+
+    @staticmethod
+    def _rozrzut_naglowkow(naglowki: List[str]) -> Optional[float]:
+        """
+        NEWS-07 (dispersion, research 2026): niezgoda MIĘDZY nagłówkami.
+        Klasyfikuje każdy nagłówek osobno (leksykon) na byczy/niedźwiedzi i mierzy
+        podział głosów: 0.0 = jednomyślne, 1.0 = pół na pół (maksymalna niepewność).
+        None = żaden nagłówek nie miał wydźwięku (brak informacji o niezgodzie).
+
+        UWAGA (Prawo XVI): sam WSKAŹNIK, celowo NIE mnoży pewności — wartość
+        predykcyjna rozrzutu zostanie zmierzona (IC), zanim dostanie wpływ na głos.
+        """
+        byki = 0
+        niedzwiedzie = 0
+        for naglowek in naglowki:
+            tekst = naglowek.lower()
+            b = sum(w for s, w in SLOWA_BYCZE.items() if _slowo_wystepuje(s, tekst))
+            n = sum(w for s, w in SLOWA_NIEDZWIEDZIE.items() if _slowo_wystepuje(s, tekst))
+            if b > n:
+                byki += 1
+            elif n > b:
+                niedzwiedzie += 1
+        glosy = byki + niedzwiedzie
+        if glosy == 0:
+            return None
+        return round(1.0 - abs(byki - niedzwiedzie) / glosy, 4)
+
+    # NEWS-08: okres półtrwania świeżości newsa (sekundy). ~12h — po dobie news traci ~3/4 wagi.
+    HALF_LIFE_SEK = 12 * 3600
+
+    @classmethod
+    def _wagi_swiezosci(cls, daty_pub: "List[Optional[float]]") -> List[float]:
+        """
+        Waga świeżości per nagłówek: 0.5^(wiek/half_life), gdzie wiek liczony względem
+        NAJNOWSZEGO nagłówka w partii (samowystarczalne). Brak daty → 1.0 (neutralna).
+        """
+        znane = [d for d in daty_pub if d is not None]
+        if not znane:
+            return [1.0] * len(daty_pub)
+        t_max = max(znane)
+        wagi = []
+        for d in daty_pub:
+            if d is None:
+                wagi.append(1.0)
+            else:
+                wiek = max(0.0, t_max - d)
+                wagi.append(round(0.5 ** (wiek / cls.HALF_LIFE_SEK), 4))
+        return wagi
 
     # ── Klasyfikacja LLM (DeepSeek) ────────────────────────────────────────────
 
@@ -201,7 +258,16 @@ class AdapterNewsLLM(AdapterDanych):
         Brak nagłówków → NEWS_SENTYMENT None (wzbogac() pominie → neuron śpi).
         """
         try:
-            naglowki = list(self._fetcher(symbol) or [])
+            # NEWS-05/08: jeśli fetcher zna metadane — bierz źródła + daty publikacji.
+            if hasattr(self._fetcher, "pobierz_z_metadanymi"):
+                meta = list(self._fetcher.pobierz_z_metadanymi(symbol) or [])
+                naglowki = [m["tytul"] for m in meta]
+                wagi_zrodel = [float(m.get("waga", 1.0)) for m in meta]
+                daty_pub = [m.get("data_pub") for m in meta]
+            else:
+                naglowki = list(self._fetcher(symbol) or [])
+                wagi_zrodel = [1.0] * len(naglowki)
+                daty_pub = [None] * len(naglowki)
         except Exception as e:
             logger.warning(f"[Adapter:NewsLLM] fetcher padł dla {symbol}: {e}")
             return {"NEWS_SENTYMENT": None, "NEWS_PEWNOSC": None, "NEWS_N": 0}
@@ -209,11 +275,37 @@ class AdapterNewsLLM(AdapterDanych):
         if not naglowki:
             return {"NEWS_SENTYMENT": None, "NEWS_PEWNOSC": None, "NEWS_N": 0}
 
+        wiarygodnosc = round(sum(wagi_zrodel) / len(wagi_zrodel), 4)
+
+        # NEWS-08 half-life: świeży nagłówek waży więcej. Wiek liczony WZGLĘDEM najnowszego
+        # w tej partii (samowystarczalne, bez zewnętrznego zegara). waga = 0.5^(wiek/half_life).
+        # Brak daty → waga 1.0 (neutralna). Wagi świeżości mnożą wagi źródeł (05×08).
+        wagi_swiez = self._wagi_swiezosci(daty_pub)
+        swiezosc = round(sum(wagi_swiez) / len(wagi_swiez), 4)
+        wagi_laczne = [wz * ws for wz, ws in zip(wagi_zrodel, wagi_swiez)]
+
+        # NEWS-06 novelty (liczone WZGLĘDEM przeszłości, przed dopisaniem bieżących):
+        # frakcja nagłówków NIEwidzianych wcześniej. 1.0 = wszystko świeże;
+        # 0.0 = wszystko przeżute (już wycenione przez rynek) → tłumimy pewność.
+        from imperium.akwedukty.news_fetcher import _normalizuj
+        widziane = self._widziane[symbol]
+        klucze = [_normalizuj(t) for t in naglowki]
+        nowe = sum(1 for k in klucze if k and k not in widziane)
+        novelty = round(nowe / len(klucze), 4) if klucze else 1.0
+        for k in klucze:
+            if k:
+                widziane.append(k)
+
         wynik = None
         if self.uzyj_llm:
             wynik = self._sentyment_llm(naglowki)
         if wynik is None:
-            wynik = self._sentyment_slownikowy(naglowki)
+            wynik = self._sentyment_slownikowy(naglowki, wagi_zrodel=wagi_laczne)
+        # NEWS-05: pewność × średnia wiarygodność źródeł (blogi ważą mniej).
+        # NEWS-06: pewność × (0.5 + 0.5·novelty) — całkiem przeżuty feed waży o połowę
+        # mniej (stary news już w cenie), całkiem świeży bez kary.
+        wynik = dict(wynik)
+        wynik["pewnosc"] = round(wynik["pewnosc"] * wiarygodnosc * (0.5 + 0.5 * novelty), 4)
 
         # NEWS-02: taksonomia zdarzeń (kierunek per typ — deterministyczna, zawsze liczona)
         zdarz = _klasyfikuj_zdarzenia(naglowki)
@@ -245,4 +337,8 @@ class AdapterNewsLLM(AdapterDanych):
             "NEWS_EVENT_PEWNOSC": zdarz["pewnosc"] if kier is not None else None,
             "NEWS_SENTYMENT_DELTA": delta,
             "NEWS_ATTENTION_SPIKE": spike,
+            "NEWS_WIARYGODNOSC": wiarygodnosc,
+            "NEWS_NOVELTY": novelty,
+            "NEWS_ROZRZUT": self._rozrzut_naglowkow(naglowki),
+            "NEWS_SWIEZOSC": swiezosc,
         }

@@ -6,6 +6,121 @@
 
 ---
 
+## 2026-07-04 | NEWS | ⏳ NEWS-08: half-life — świeży nagłówek waży więcej
+
+Plan NEWS pkt 8. Fetcher: `_pozycje_z_rss()` wyłuskuje pubDate (RSS RFC822) / published/updated
+(Atom ISO) → `_parsuj_date_pub()` (email.utils + fromisoformat, stdlib). Metadane dostają
+`data_pub`. Adapter `_wagi_swiezosci()`: waga = 0.5^(wiek/half_life), wiek WZGLĘDEM najnowszego
+w partii (samowystarczalne, bez zegara); half-life 12h; brak daty → 1.0. Wagi świeżości ×
+wagi źródeł (05×08) w ważonym sentymencie; NEWS_SWIEZOSC jako wskaźnik. Zmierzone: świeży 1.0,
+sprzed 24h ≈0.25; świeży byczy przeważa stary niedźwiedzi. +9 testów (84/84 news).
+
+System NEWS: 8/10 punktów planu (fetcher+01-08). Zostały: social(9)/on-chain(10).
+
+---
+
+## 2026-07-04 | NEWS | ⚖️ NEWS-07: rozrzut/niezgoda nagłówków (dispersion)
+
+Plan NEWS pkt 7. `_rozrzut_naglowkow()`: każdy nagłówek klasyfikowany osobno (leksykon)
+na byczy/niedźwiedzi; NEWS_ROZRZUT = 1 − |byki−niedźwiedzie|/głosy (0=jednomyślne,
+1=pół-na-pół, None=brak wydźwięku). Zmierzone: 2:1 → 0.667.
+
+DECYZJA (Prawo XVI — pomiar przed wpływem): rozrzut jest WSKAŹNIKIEM informacyjnym w kluczu,
+celowo NIE mnoży pewności (mamy już stack 05×06) — wartość predykcyjna zostanie zmierzona
+IC zanim dostanie wpływ na głos. +6 testów (45/45 sentyment_news).
+
+---
+
+## 2026-07-04 | NEWS | 🔄 NEWS-06: novelty — powtórzony news już wyceniony (original-vs-amplified)
+
+Plan NEWS pkt 6. Adapter pamięta znormalizowane nagłówki z poprzednich pobrań (deque 300
+per symbol). NEWS_NOVELTY = frakcja świeżych nagłówków (liczona WZGLĘDEM przeszłości, przed
+dopisaniem bieżących — jak Δ/spike). Pewność × (0.5+0.5·novelty): feed całkiem przeżuty waży
+o połowę mniej (stary news już w cenie), świeży bez kary. Pamięć per symbol (BTC nie zaraża ETH).
+Zmierzone: ten sam nagłówek bar2 → novelty 0.0, pewność 0.7→0.35. +4 testy (69/69 news).
+Modyfikator jakości jak NEWS-05 (Prawo XVI — nie neuron).
+
+---
+
+## 2026-07-04 | NEWS | 📰 NEWS-05: wiarygodność źródła (source credibility, research 2026)
+
+Plan z NEWS_ROZBUDOWA pkt 5. Decyzja (Prawo XVI): to MODYFIKATOR jakości sentymentu, nie osobny
+neuron (byłby skorelowany z NEWS-01). Wpięte w fetcher+adapter:
+- `news_fetcher.py`: WIARYGODNOSC_ZRODEL (coindesk 1.0, cointelegraph 0.9, decrypt 0.85,
+  reuters/bloomberg 1.0; nieznane 0.5) + `pobierz_z_metadanymi()` → [{tytul, zrodlo, waga}].
+  Stare `pobierz()` nietknięte (wstecznie kompatybilne).
+- `news_llm.py`: słownikowy sentyment WAŻONY wagą źródła (trafienie z CoinDesk > blog);
+  NEWS_PEWNOSC × średnia wiarygodność; nowy klucz NEWS_WIARYGODNOSC.
+Zmierzone: ten sam nagłówek — CoinDesk pewność 0.6 vs nieznany blog 0.3. +7 testów.
+
+---
+
+## 2026-07-04 | WIZUALIZACJA | 🖼️ Wykres backtestu — oczy Cezara (Prawo XV: Kartograf wpięty)
+
+Cezar: „czuję się jak dziecko we mgle — nie mam podglądu wykresów jak zachowuje się Imperium".
+AUDYT WIZUALIZACJI: mamy web_dashboard :8777 (świecowy live przy skrypty/start.py), LiveMonitor
+TUI+Telegram, 2 symulatory HTML — ale 🚨 UTRATA POTENCJAŁU: `swiatynie/kartograf.py` (PNG:
+cena+EMA+trades+equity) wpięty TYLKO w pierwszy_zwiadowca — backtesty były ślepe.
+
+**`narzedzia/wykres_backtestu.py`** (reuse Kartografa, Prawo XVI): jedna komenda backtest→PNG,
+2 panele: cena+EMA-50+znaczniki transakcji (▲/▼, zysk/strata kolorem, linia wejście↔wyjście)
++ krzywa kapitału per bar. Mapowanie WynikZamkniecia→indeksy barów po timestamp_wejscia
+(ts=0 pomijany; exit przycinany). Zweryfikowane na DOGE 4h (uczciwy obraz: bessa, -1281$, WR 39%
+— Cezar to ZOBACZYŁ zamiast zgadywać). +6 testów. Lekcja o potrzebie wizualizacji → W3 (profil).
+
+---
+
+## 2026-07-04 | POMIAR | 🔬 Walk-forward IC — stabilność skillu neuronu w czasie (OOS, Prawo XVI)
+
+Pojedynczy IC mówi ILE, nie czy POWTARZALNE. `narzedzia/walk_forward_ic.py`: dzieli historię
+na K kolejnych okien, mierzy IC WARUNKOWY per okno, werdykt po SPÓJNOŚCI ZNAKU:
+  • ROBUST — |śr.IC|>0.03 + ten sam znak w ≥75% okien (skill stabilny, nie przeuczony)
+  • ROBUST (odwróć) — stabilnie ujemny → kandydat do odwrócenia wagi
+  • niepewny/szum — miesza znak lub IC ~0.
+Neurony=reguły stałe → każde okno OOS z natury (zero look-ahead). Reuse czytnik_csv + backtest.
+
+DOGE 4h (4 okna): SMC-01/02, V-14, X-28, X-17, V-02, X-01 → 100% spójność (skill POTWIERDZONY
+OOS); SES-02 robustnie ujemny (odwróć). Zgodne z raportem IC z 15 par — walidacja krzyżowa.
++6 testów. Pasek postępu per para/okno. To baza decyzji o wagach (Prawo XXV).
+
+---
+
+## 2026-07-01 | NAPRAWA | 🔒 DeepSeek odporny na zepsuty SSL_CERT_FILE (Prawo XV)
+
+Realny przypadek Cezara na lokalu: `SSL_CERT_FILE=C:\...\Temp\cacert.pem` (leftover po jakimś
+narzędziu) wskazywał na NIEISTNIEJĄCY plik → httpx/openai wywalał FileNotFoundError zanim
+dotarł do DeepSeek API. Klucz był poprawny — winna martwa zmienna środowiskowa.
+
+Fix (`deepseek_glos.py`): `_napraw_zepsuty_cert_env()` przed utworzeniem klienta — gdy
+SSL_CERT_FILE/SSL_CERT_DIR wskazuje na nieistniejący plik/katalog, usuwa go z env (fallback
+na certifi). Poprawne ścieżki nietknięte. +4 testy (bez sieci). 1895→1899. Chroni każdą maszynę.
+
+---
+
+## 2026-07-01 | POMIAR | 📊 Raport IC roju — który neuron ma realny skill (Prawo XVI)
+
+Domknięcie „metod treningowych": `narzedzia/raport_ic.py` uruchamia backtest(mierz_ic=True)
+na prawdziwych świecach i rankuje Information Coefficient per neuron przez pary. Interpretacja
+Grinold&Kahn (BIB-025): |IC|<0.02 szum, ~0.03 słaba przewaga, >0.05 mocny; IC ujemne = kandydat
+do odwrócenia. Flaguje neurony do wygaszenia i pokazuje status NEWS-01..04.
+
+UCZCIWIE (Prawo I): na KRÓTKICH danych IC bywa zawyżone (|IC|>0.2 = artefakt rzadkich sygnałów
++ remisów Spearmana, NIE realny skill; prawdziwy IC krypto ~0.02-0.05). Raport sam OSTRZEGA gdy
+za dużo |IC|>0.2 i zaleca pełną historię. Wiarygodny pomiar = pełna historia + kontrole
+(narzedzia/pomiar_nowe_moduly.py backward-IC/non-overlapping). +3 testy. 1892→1895.
+
+To baza pod Prawo XXV: wagi neuronów mają iść za ZMIERZONYM IC, nie intuicją. PR #103 (naprawy
+cubic) zmergowany do main — cubic zamknięty.
+
+**Update 2026-07-01 (lokal Cezara):** dodany pasek postępu na stderr (15 par bez niego wyglądało
+jak zawieszenie). POMIAR na danych dziennych/krótkich → ostrzeżenie „niska wiarygodność" działa
+poprawnie (IC 0.4-0.5 = ARTEFAKT rzadkich głosów + remisów Spearmana, NIE skill). WNIOSEK (Prawo I):
+IC z DYSKRETNYCH głosów (kierunek×pewność, w większości 0) jest zawyżony dla rzadko głosujących
+neuronów. Prawidłowy pomiar = IC WARUNKOWY (tylko bary gdzie neuron głosuje) lub ciągły sygnał
+(pomiar_nowe_moduly.py). Następny krok: warunkowy IC w KolektorIC. **ZROBIONE (ten sam dzień):** KolektorIC.ic(tylko_glosy=True) — IC warunkowy liczony tylko na barach z głosem; backtest wystawia engine.ic_warunkowy; raport_ic używa go domyślnie. Inflacja znikła (DOGE 4h: brak ostrzeżenia, rozkład 0.10-0.25 + neurony ujemne widoczne). +2 testy. 1899→1901.
+
+---
+
 ## 2026-07-01 | RECENZJA | 🔧 Naprawa 30 uwag recenzenta (cubic) — P0/P1/P2/P3
 
 Recenzja cubic na PR: 38 uwag. Naprawione wszystkie trafne (Prawo XXI — bugi PRZED mergem):

@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-07-04 | NEWS | 🔄 NEWS-06: novelty — powtórzony news już wyceniony (original-vs-amplified)
+
+Plan NEWS pkt 6. Adapter pamięta znormalizowane nagłówki z poprzednich pobrań (deque 300
+per symbol). NEWS_NOVELTY = frakcja świeżych nagłówków (liczona WZGLĘDEM przeszłości, przed
+dopisaniem bieżących — jak Δ/spike). Pewność × (0.5+0.5·novelty): feed całkiem przeżuty waży
+o połowę mniej (stary news już w cenie), świeży bez kary. Pamięć per symbol (BTC nie zaraża ETH).
+Zmierzone: ten sam nagłówek bar2 → novelty 0.0, pewność 0.7→0.35. +4 testy (69/69 news).
+Modyfikator jakości jak NEWS-05 (Prawo XVI — nie neuron).
+
+---
+
 ## 2026-07-04 | NEWS | 📰 NEWS-05: wiarygodność źródła (source credibility, research 2026)
 
 Plan z NEWS_ROZBUDOWA pkt 5. Decyzja (Prawo XVI): to MODYFIKATOR jakości sentymentu, nie osobny

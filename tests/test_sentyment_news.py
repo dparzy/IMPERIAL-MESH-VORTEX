@@ -297,3 +297,38 @@ def test_wagi_zrodel_wplywaja_na_kierunek():
         ["Bitcoin rally surge record", "Bitcoin crash collapse dump"],
         wagi_zrodel=[1.0, 0.3])
     assert w["sentyment"] > 0
+
+
+# ── NEWS-06: novelty (powtórzony news już wyceniony) ──────────────────────────
+
+def test_novelty_swiezy_feed_pelna_pewnosc():
+    ad = AdapterNewsLLM(fetcher=lambda s: ["Bitcoin rally record"], uzyj_llm=False)
+    d = ad.pobierz("BTCUSDT")
+    assert d["NEWS_NOVELTY"] == 1.0
+
+
+def test_novelty_powtorzony_news_tlumiony():
+    """Ten sam nagłówek drugi raz → novelty 0, pewność ×0.5."""
+    ad = AdapterNewsLLM(fetcher=lambda s: ["Bitcoin rally record"], uzyj_llm=False)
+    d1 = ad.pobierz("BTCUSDT")
+    d2 = ad.pobierz("BTCUSDT")
+    assert d2["NEWS_NOVELTY"] == 0.0
+    assert abs(d2["NEWS_PEWNOSC"] - d1["NEWS_PEWNOSC"] * 0.5) < 1e-6
+
+
+def test_novelty_mieszany_feed():
+    """1 stary + 1 nowy nagłówek → novelty 0.5."""
+    feeds = [["Bitcoin rally record"], ["Bitcoin rally record", "Ethereum hack exploit"]]
+    box = {"i": 0}
+    ad = AdapterNewsLLM(fetcher=lambda s: feeds[box["i"]], uzyj_llm=False)
+    ad.pobierz("BTCUSDT"); box["i"] = 1
+    d = ad.pobierz("BTCUSDT")
+    assert d["NEWS_NOVELTY"] == 0.5
+
+
+def test_novelty_per_symbol_niezalezna():
+    """Pamięć widzianych nagłówków jest per symbol (BTC nie zaraża ETH)."""
+    ad = AdapterNewsLLM(fetcher=lambda s: ["Bitcoin rally record"], uzyj_llm=False)
+    ad.pobierz("BTCUSDT")
+    d_eth = ad.pobierz("ETHUSDT")
+    assert d_eth["NEWS_NOVELTY"] == 1.0   # dla ETH to pierwszy raz

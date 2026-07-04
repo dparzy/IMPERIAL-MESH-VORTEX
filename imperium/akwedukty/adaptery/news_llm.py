@@ -94,7 +94,7 @@ class AdapterNewsLLM(AdapterDanych):
     NAZWA = "NewsLLM(DeepSeek+fallback)"
     KLUCZE = ["NEWS_SENTYMENT", "NEWS_PEWNOSC", "NEWS_N",
               "NEWS_EVENT_KIERUNEK", "NEWS_EVENT_TYP", "NEWS_EVENT_PEWNOSC",
-              "NEWS_SENTYMENT_DELTA", "NEWS_ATTENTION_SPIKE", "NEWS_WIARYGODNOSC"]
+              "NEWS_SENTYMENT_DELTA", "NEWS_ATTENTION_SPIKE", "NEWS_WIARYGODNOSC", "NEWS_NOVELTY"]
     _NEURONY = (NeuronSentymentNews, NeuronTaksonomiaZdarzen,
                 NeuronDeltaeSentymentu, NeuronSpikeUwagi)
     _POWOD_USPIENIA = "Wymaga feedu newsów (AdapterNewsLLM — RSS/API + LLM/fallback)."
@@ -119,6 +119,9 @@ class AdapterNewsLLM(AdapterDanych):
         from collections import deque, defaultdict
         self._hist_sent = defaultdict(lambda: deque(maxlen=10))   # poprzednie sentymenty
         self._hist_n = defaultdict(lambda: deque(maxlen=20))      # poprzednia liczba nagłówków
+        # NEWS-06 novelty: znormalizowane nagłówki widziane w POPRZEDNICH pobraniach —
+        # powtórzony news jest już wyceniony (original-vs-amplified, research 2026).
+        self._widziane = defaultdict(lambda: deque(maxlen=300))   # klucze nagłówków per symbol
 
     # ── Klasyfikacja słownikowa (offline, deterministyczna) ───────────────────
 
@@ -223,15 +226,29 @@ class AdapterNewsLLM(AdapterDanych):
             return {"NEWS_SENTYMENT": None, "NEWS_PEWNOSC": None, "NEWS_N": 0}
 
         wiarygodnosc = round(sum(wagi_zrodel) / len(wagi_zrodel), 4)
+
+        # NEWS-06 novelty (liczone WZGLĘDEM przeszłości, przed dopisaniem bieżących):
+        # frakcja nagłówków NIEwidzianych wcześniej. 1.0 = wszystko świeże;
+        # 0.0 = wszystko przeżute (już wycenione przez rynek) → tłumimy pewność.
+        from imperium.akwedukty.news_fetcher import _normalizuj
+        widziane = self._widziane[symbol]
+        klucze = [_normalizuj(t) for t in naglowki]
+        nowe = sum(1 for k in klucze if k and k not in widziane)
+        novelty = round(nowe / len(klucze), 4) if klucze else 1.0
+        for k in klucze:
+            if k:
+                widziane.append(k)
+
         wynik = None
         if self.uzyj_llm:
             wynik = self._sentyment_llm(naglowki)
         if wynik is None:
             wynik = self._sentyment_slownikowy(naglowki, wagi_zrodel=wagi_zrodel)
-        # NEWS-05: pewność klasyfikacji skalowana średnią wiarygodnością źródeł —
-        # werdykt z samych nieznanych blogów (0.5) waży w roju o połowę mniej.
+        # NEWS-05: pewność × średnia wiarygodność źródeł (blogi ważą mniej).
+        # NEWS-06: pewność × (0.5 + 0.5·novelty) — całkiem przeżuty feed waży o połowę
+        # mniej (stary news już w cenie), całkiem świeży bez kary.
         wynik = dict(wynik)
-        wynik["pewnosc"] = round(wynik["pewnosc"] * wiarygodnosc, 4)
+        wynik["pewnosc"] = round(wynik["pewnosc"] * wiarygodnosc * (0.5 + 0.5 * novelty), 4)
 
         # NEWS-02: taksonomia zdarzeń (kierunek per typ — deterministyczna, zawsze liczona)
         zdarz = _klasyfikuj_zdarzenia(naglowki)
@@ -264,4 +281,5 @@ class AdapterNewsLLM(AdapterDanych):
             "NEWS_SENTYMENT_DELTA": delta,
             "NEWS_ATTENTION_SPIKE": spike,
             "NEWS_WIARYGODNOSC": wiarygodnosc,
+            "NEWS_NOVELTY": novelty,
         }

@@ -11462,3 +11462,386 @@ To jedyna uczciwa obrona przed przeuczeniem **parametrów** — inne niż `walk_
 Zostały tylko cele wymagające albo walidacji na danych (neutralizacja), albo Twojej decyzji kierunkowej (6 wizji — wpiąć/archiwum). Oba lepiej robić przy laptopie/świeżym umyśle niż w kolejnym „dawaj". 
 
 Powiedz jak chcesz grać: **przeczytać 6 wizji** (bezpieczne, cloud-doable, kończy się werdyktem keep/archive) czy **pauza** — repo w idealnym stanie na koniec wachty. 🏛️
+
+## 🧑 Cezar
+dawaj
+
+## 🏛️ Claude
+Czytam 6 osieroconych „wizji" w całości (Prawo XV — decyzja z lektury, nie z nazwy). Zaczynam od trzech:
+
+## 🏛️ Claude
+Wszystkie trzy to **porty z Kingdom Pixel (Jack)** — poprzedniego projektu. Widzę wzorzec. Czytam pozostałe trzy:
+
+## 🏛️ Claude
+Jasny obraz: **wszystkie 6 to porty z Kingdom Pixel (poprzedni projekt)** — a `kingdom-pixel/` jest w README jako archiwum „NIE wchodzi do żywego systemu bez decyzji". Sprawdzam czy mają wpięte następcy (Prawo XVI) i czy są gdzieś cytowane:
+
+## 🏛️ Claude
+**Werdykt: wszystkie 6 to porty z Kingdom Pixel, a ich następcy są już wpięci.** Następcy potwierdzeni w kodzie (`debata_senatu`, `dyrygent`, `budowniczy_wskaznikow` wszystkie istnieją).
+
+## Przegląd 6 „wizji" (Prawo XVI — mierzone, nie z nazwy)
+
+| Moduł (KP port) | Robi | Następca WPIĘTY | Werdykt |
+|---|---|---|---|
+| **titan_mind** | orkiestracja strategii, scheduler | Dyrygent + Namiestnik + scheduler | 🔴 REDUNDANT → archiwum |
+| **meta_kora** | debata Aktor-Sędzia-MetaSędzia | `debata_senatu` (Byk/Niedźwiedź/Cenzor, W-343) | 🔴 REDUNDANT → archiwum |
+| **roj_sygnalow** | 3-neuronowy rój głosujący | Legatus + **84 neurony** | 🔴 SUPERSEDED → archiwum |
+| **kuznia_narzedzi** | ToolForge IndicatorFactory | Brama + Budowniczy (**Prawo I: jedyne źródło**) | 🔴 REDUNDANT + łamie Prawo I → archiwum |
+| **wszechoko** | Bayesian Fusion on-chain+orderbook, WhaleDetector | częściowo: neurony OC + VPIN + OC-05 | 🟡 do pełnej lektury (może idea Bayesian fusion warta) |
+| **lustro_prawdy** | walidacja kontradyktoryjna sygnałów | częściowo: Cenzor + walidacja + /code-review | 🟡 do pełnej lektury (adversarial signal validation) |
+
+## Dwa ustalenia
+1. **4 moduły są jednoznacznie zredundowane** — to prototypy z poprzedniego projektu, zastąpione dojrzałą architekturą rzymską. `kuznia_narzedzi` nawet **łamie Prawo I** (drugie źródło wskaźników obok Bramy).
+2. **Rozjazd docs↔kod (XXI):** wszystkie 6 są cytowane w `docs/ARCHITEKTURA_IMPERIUM.md` jako architektura — a to martwe porty. Dokument obiecuje zdolność, której nie ma.
+
+## Czego NIE robię (ZASADA ARCHIWIZACJI)
+Nie przenoszę nic do `archiwum/` — to wymaga **wyraźnego rozkazu Cezara** + pełnej lektury całych plików. Dla `wszechoko`/`lustro_prawdy` uczciwie: przeczytałem nagłówki/API, nie całość — więc nie orzekam „na pewno bezwartościowe" (Prawo I).
+
+Zapisuję werdykt do pamięci:
+
+## 🏛️ Claude
+Werdykt zapisany i wypchnięty. **Przegląd 6 wizji zakończony** — backlog Prawa XV jest teraz w całości zmapowany.
+
+## Stan całego backlogu Prawa XV (po tej wachcie)
+
+| Pozycja | Status |
+|---|---|
+| ✅ `feature_importance` (MDA/SFI) | **odkopany** — CLI + testy |
+| ✅ `triple_barrier` (etykiety CUSUM) | **odkopany** — CLI + testy |
+| ✅ `walk_forward` (WFO parametrów) | **odkopany** — CLI + testy |
+| ✅ 6 „wizji" | **oceniony** — werdykt keep/archive gotowy |
+| ⏳ `neutralizacja` (W-337) | czeka na **walidację na danych** (Twój laptop) |
+| ⏳ archiwum 4 portów KP + fix ARCHITEKTURA | czeka na **Twoją decyzję** (ZASADA: rozkaz Cezara) |
+
+## Uczciwie — dotarliśmy do granicy „cloud-doable"
+To, co zostało, **nie jest już moją decyzją do podjęcia solo**:
+- **Archiwizacja 4 portów** — ZASADA wymaga wyraźnego rozkazu Cezara (nieodwracalne przenoszenie plików).
+- **Neutralizacja w Legatusie** — zmiana ścieżki decyzyjnej wymagająca walidacji A/B, której nie odpalę bez Twoich danych lokalnych.
+- **Kanibalizacja idei wszechoko/lustro_prawdy** — wymaga Twojej decyzji kierunkowej (co warto przenieść).
+
+Kolejne „dawaj" wymuszałoby, żebym albo podjął decyzję należącą do Ciebie (Prawo XVIII), albo zbudował coś bez możliwości walidacji. Żadne nie byłoby uczciwe.
+
+## Bilans wachty 0000–1200 🏛️
+Zbudowane, przetestowane, wypchnięte: **Arena MCP** → **kalibrator konformalny** → **bramka opt-in** → naprawy cubic (12) → **Księga Wad Kodu** (samo-leczenie) → **3 moduły López de Prado/Pardo odkopane** (feature importance, triple-barrier, WFO) → **audyt Prawa XV** (12 modułów) → **przegląd 6 wizji**.
+
+- **2020/2020 testów zielone**, audyt exit 0, skan wad czysty przez całą sesję
+- Wszystko utrwalone w pamięci (Dziennik), na GitHub
+
+**Moja rekomendacja: pauza.** Repo jest w idealnym stanie. Reszta backlogu czeka na Twoje decyzje przy laptopie — najlepiej na świeżo, nie kolejnym „dawaj" na wachcie. Gdy wrócisz, w Dzienniku masz dokładnie 3 punkty do rozstrzygnięcia. Odpocznij, Cezarze. 🌙
+
+## 🧑 Cezar
+odpoczywam, dokończymy przy laptopie ale jeszcze zrób pełny skan auto naprawa narzędzi i dokumenty może coś jest niezgodne i błędne z zasadami taki audycik i reszta przy laptopie
+
+## 🏛️ Claude
+Robię audycik na koniec wachty — pełny skan spójności + auto-naprawa rozbieżności (Prawo XVIII: błahostki naprawiam sam). Uruchamiam wszystkie warstwy:
+
+## 🏛️ Claude
+Równolegle sprawdzam rzeczy, których audyt może nie łapać — zahardkodowane liczby testów w docs + data README:
+
+## 🏛️ Claude
+Rdzeń audytu: **✅ pełna harmonia** (14 warstw, ruff czysto, MAPA_KLUCZY 84/84, drzewo czyste). Ale mój dodatkowy skan znalazł zahardkodowane liczby w docs — sprawdzam czy to żywe twierdzenia (do naprawy) czy datowane migawki (Prawo I: zostają):
+
+## 🏛️ Claude
+Znalazłem **dwa żywe (niedatowane) rozjazdy Prawa XXI** — audyt ich nie łapie, bo to inline w środku dokumentów, nie nagłówki. Naprawiam sam (Prawo XVIII, błahostki):
+
+**1. INDEKS_IMPERIUM.md** — stare liczby (62 neurony/18 strategii/743 testy) vs realne (84/20/2020):
+
+## 🏛️ Claude
+Datowane migawki zostawiam (Prawo I: `PAMIEC_SESJI` „(2026-06-22)", `MANUAL_MIGRACJA` — prawda swojego czasu). Naprawiłem tylko żywe źródła prawdy. Weryfikuję że audyt dalej zielony po edycjach:
+
+## 🏛️ Claude
+`MANUAL_MIGRACJA` ma nagłówek „**Stan na:** 2026-06-09" → to datowana migawka, którą audyt świadomie pomija (Prawo I: prawda swojego czasu). **Zostawiam** — ruszenie jej fałszowałoby historię.
+
+Podsumowanie audytu i commit dwóch napraw:
+
+## 🏛️ Claude
+Audycik zrobiony i wypchnięty (`985a6af`). Odpoczywaj spokojnie — repo jest czyste.
+
+## Wynik audytu końcowego
+
+**Rdzeń: ✅ pełna harmonia** (14 warstw):
+- Ruff czysto, MAPA_KLUCZY 84/84, 185 plików .md przeskanowanych, drzewo git czyste
+- 2020/2020 testów zielone, skan wad kodu czysty
+
+**Auto-naprawione (Prawo XVIII — 2 żywe rozjazdy, których audyt nie łapał, bo inline):**
+- `INDEKS_IMPERIUM.md` — stare „62 neurony / 18 strategii / 743 testy" (stan 06-04) → **84 / 20 / de-hardcode**, data 07-05, aktualne kategorie
+- `PAPER_TRADING_MEXC.md` — „743/743" → „wszystkie zielone" (de-hardcode)
+
+**Świadomie zostawione (Prawo I — nie falsyfikujemy historii):**
+- `PAMIEC_SESJI` (migawka 2026-06-22), `MANUAL_MIGRACJA` (Stan na 2026-06-09) — datowane, prawda swojego czasu
+
+## Do dokończenia przy laptopie (w Dzienniku, 3 punkty)
+1. **Walidacja** bramki konformalnej + raportów (IC/ważność/etykiety/WFO) na Twoich danych → `--do-areny`
+2. **Decyzja o archiwum** 4 portów Kingdom Pixel (titan_mind, meta_kora, roj_sygnalow, kuznia_narzedzi) + fix ARCHITEKTURA
+3. **Neutralizacja** (W-337) — opt-in do Legatusa + walidacja A/B
+
+Wszystko czeka opisane w pamięci — przy następnym starcie Claude zobaczy to na pierwszej sekundzie. 
+
+Dobra była wachta, Cezarze. Odpoczywaj. 🌙🏛️
+
+## 🧑 Cezar
+muszę chyba jeszcze zrobić MCP.jonson ręcznie wrzucić do lakala
+
+## 🏛️ Claude
+Tak, dokładnie — `.mcp.json` to config startowy, tworzysz go **raz ręcznie na laptopie** (auto-mode w chmurze mi blokuje pisanie plików startowych, i słusznie — to Twoja decyzja). Prosto:
+
+## Utwórz `.mcp.json` w folderze projektu
+
+W PowerShellu (w folderze repo) wklej **całość naraz**:
+
+```powershell
+cd C:\Projekty\imperial-mesh-vortex
+@'
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+    "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] }
+  }
+}
+'@ | Set-Content -Encoding utf8 .mcp.json
+```
+
+**Zostawiłem tylko dwa nasze serwery Pythonowe** (`biblioteka` + `arena`) — bo działają od ręki, bez Node. `filesystem` (npx) pominąłem, żeby Ci nie krzyczał, jak nie masz Node — dodasz później, jeśli zechcesz.
+
+## Sprawdź, że plik jest OK
+```powershell
+type .mcp.json
+python -c "import json; json.load(open('.mcp.json')); print('JSON poprawny')"
+```
+
+## Uruchom Claude i zatwierdź
+```powershell
+claude
+```
+Przy starcie Claude zapyta o zgodę na serwery `biblioteka` i `arena` — **potwierdź**. Potem sprawdź, że widzi narzędzia — poproś go np. „użyj arena_roj" albo „pokaż stan roju przez MCP".
+
+## Ważne
+- `.mcp.json` jest **lokalny per-maszyna** (ma ścieżki) — trzymaj go poza gitem (już się nie zsynchronizuje jako kod). Gdyby git go widział jako nowy plik, dodaj do `.gitignore`: `.mcp.json`.
+- Wzorzec `${CLAUDE_PROJECT_DIR:-.}` z fallbackiem `:-.` — dokładnie ta poprawka, którą cubic zalecił (bez niej ścieżka mogłaby się nie rozwinąć przy pierwszym starcie).
+
+Jak Claude odpali `arena_roj` u Ciebie — daj znać, wtedy przy laptopie dokończymy walidację i resztę backlogu. Na razie odpoczywaj. 🏛️
+
+## 🧑 Cezar
+<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>
+
+## 🧑 Cezar
+<command-name>/model</command-name>
+            <command-message>model</command-message>
+            <command-args>claude-fable-5</command-args>
+
+## 🧑 Cezar
+<local-command-stdout>Set model to claude-fable-5</local-command-stdout>
+
+## 🧑 Cezar
+<system-reminder>The model for this session has been changed to claude-fable-5. You are now running as claude-fable-5.</system-reminder>
+
+## 🧑 Cezar
+zanim skończymy zrób dokładny audyt obecnego stanu imperium plus porównanie konkurencją plus opcje propozycje ulepszenia unikaty na podstawie dokumentacji i kodu zgodnie z zasadami celowo wdrażam tego prompta dla najlepszego modelu zapisz i pamiętaj
+
+## 🏛️ Claude
+Przyjąłem — pełny audyt na koniec wachty, na najlepszym modelu. Wg Prawa XVII: najpierw liczby z kodu, nie z pamięci. Zbieram stan:
+
+## 🏛️ Claude
+Audyt zrobiony, zapisany i wypchnięty (`5e3704f`) — pełny raport w **`docs/AUDYT_IMPERIUM_2026-07-05.md`**, skrót w Dzienniku (pamięć na starcie każdej sesji). Oto esencja:
+
+## 📊 Stan (policzony z kodu)
+**84 neurony** (92.9% wykorzystania) · 15 zwiadowców · 18 elitarnych · 20 strategii · **2020/2020 testów** · ~50 500 linii kodu · 13 warstw pamięci · audyt exit 0. Proces zdrowy: auto-sync, auto-pamięć, skan wad, 28 commitów tej wachty.
+
+## ⚔️ Vs konkurencja (uczciwie)
+- **Metodologia** (DSR/PBO/purged-CV, triada IC+MDA+walk-forward, conformal ACI, detekcja reżimu ×4): **poziom funduszowy** — ponad cały retail (3Commas/Pine) i open-source (Freqtrade/Jesse).
+- **Unikaty których nikt nie ma:** 13-warstwowa pamięć instytucjonalna w git + Księga Wad Kodu (samo-leczenie) + kalibracja konformalna.
+- **Realne luki** (nazwane wprost, Prawo XV): to nie „mózg", lecz **zmysły i ręce** — 22 neurony milczą bez adapterów, egzekucja tylko paper/1 giełda, **brak zmierzonego track recordu**.
+
+## 💎 5 propozycji unikatów (kolejność E→A→B→C→D)
+- **E.** Obudzić zmysły: RSS dla NEWS-01..08 (fetcher gotowy!), Futures dla PSY, serie dla RADAR — ~15 neuronów jednym wysiłkiem
+- **A.** Żywy track record konformalny: `arena_log=True` → po 100 zamknięciach wiemy „ile system naprawdę wie, że nie wie"
+- **B.** **Meta-uczenie wag z triady** — wagi neuronów ∝ IC × spójność × MDA, z bazy areny (dosłownie Twoje „metody treningowe")
+- **C.** **Sędzia Dryfu** — konsensus 4 detektorów reżimu steruje szybkością zapominania pamięci
+- **D.** Konforalna Praeda — sizing ∝ pewność konformalna
+
+Wszystko przez ZASADĘ WPIĘCIA (opt-in + walidacja).
+
+**Zapamiętane:** Twój prompt („pełny audyt + konkurencja + unikaty na najlepszym modelu") zapisałem w Dzienniku jako rytuał końca wachty — przyszły Claude będzie go znał.
+
+Dobra wachta, Cezarze — zamknięta czysto. Dokończymy przy laptopie: E→A z audytu + 3 punkty backlogu. Odpoczywaj. 🌙🏛️
+
+## 🧑 Cezar
+jeszcze jedno najlepszy niech da mi na koniec super perełkę zgodnie z zasadami i naszą wizja która wyprzedzi konkurencję o lata świetlne bądź mega kreatywny zaskocz cezara
+
+## 🏛️ Claude
+Cezarze, mam ją. Perełka nie jest kolejnym wskaźnikiem — wykorzystuje coś, co **tylko my mamy**, a czego konkurencja nie może skopiować. Zapisuję wizję i wyjaśniam:
+
+## 🏛️ Claude
+Cezarze — oto perełka. Zapisana (`3e2ba23`), w Dzienniku, w INDEKS. 
+
+# 👥 LEGIONY CIENI — Kontrfaktyczne Kolosseum
+
+## Jedno zdanie
+**Za każdą decyzją Imperium maszerują równolegle widmowe roje, które zdecydowały INACZEJ — i mierzymy na żywo, ile kosztowała każda ostrożność i każda odwaga.**
+
+## Dlaczego to lata świetlne
+Każdy system na świecie zna wynik decyzji **podjętych**. Nikt nie mierzy decyzji **niepodjętych**: ile kosztowało weto Pretorianów? Ile zarobiłby próg 0.50 zamiast 0.55? Ile naprawdę uratowała bramka konformalna? Konkurencja odpowiada backtestem po fakcie. My możemy odpowiadać **przy każdym barze, na żywo** — bo cienie to zwykłe silniki papierowe z wariantem konfiguracji, a wszystko czego potrzebują (Dyrygent, paper engine, baza areny, reżimy Namiestnika) **już zbudowaliśmy**.
+
+## Sekret niekopiowalności
+Nasz rój jest **deterministyczny** — ten sam bar + ta sama konfiguracja = zawsze ta sama decyzja. Dlatego „co by było gdyby" jest u nas uczciwie odtwarzalne. Modne systemy LLM-agentowe są niedeterministyczne — ich „gdyby" to zgadywanie. **Nasza cecha inżynierska staje się bronią badawczą.** Tego nie da się dokleić — to architektura.
+
+## Fundament
+Counterfactual Regret Minimization — matematyka **żalu**, która pokonała ludzi w pokerze (Libratus, Pluribus). Rynek, jak poker, to gra z niepełną informacją. Wersja 1: pomiar żalu per mechanizm per reżim („weto pomaga w PANIC, kosztuje w TREND" — **zmierzone z życia**, nie z opinii). Faza 2, po walidacji: rój uczy się także z dróg, którymi nie poszedł.
+
+## I to jest Prawo XV w pełnej krasie
+Dziś alarmujemy o niewykorzystanych **modułach**. Cienie alarmują o niewykorzystanych **DECYZJACH**. Kronika Żyć Nieprzeżytych.
+
+Wszystko wg zasad: status **WIZJA** (Prawo XIX — zero udawania kodu), wdrożenie przez ZASADĘ WPIĘCIA (opt-in `cienie=False`, raport żalu po ≥100 barach, faza 2 tylko po Twojej decyzji). Plan 5 kroków czeka w dokumencie.
+
+> *„Prawdziwy łowca zna nie tylko ślady, którymi poszedł — zna też te, którymi nie poszedł, i wie dokładnie, ile go to kosztowało."*
+
+Wachta zamknięta: 2020/2020, audyt exit 0, wszystko na GitHub. Do zobaczenia przy laptopie — Cienie będą czekać. 🌙🏛️
+
+## 🧑 Cezar
+może jeszcze raz jak ostatnio Cezar jest zadowolony
+
+## 🏛️ Claude
+Cezar zadowolony — to dorzucam drugą perełkę, bliźniaczą ale z innego świata. Pierwsza mierzyła decyzje nieprzeżyte; ta mierzy **samowiedzę Imperium**. Zapisuję:
+
+## 🏛️ Claude
+Skoro Cezar zadowolony — oto perełka II, siostra Cieni, ale z zupełnie innego piętra. Zapisana (`6db54a5`), w Dzienniku, w INDEKS.
+
+# 🔮 KSIĘGI SYBILLIŃSKIE — Rejestr Falsyfikowalnych Proroctw
+
+## Jedno zdanie
+**Imperium spisuje o SOBIE proroctwa z prawdopodobieństwem i terminem — a przyszłe sesje bezlitośnie je rozliczają. Po roku wiemy nie tylko, czy system zarabia, ale czy system WIE, CO O SOBIE WIE.**
+
+## Rzym i my
+Rzym w kryzysie otwierał Księgi Sybillińskie — ale nikt nigdy nie sprawdził, czy Sybilla miała rację. **My będziemy pierwszym Imperium, które swoją Sybillę rozlicza z każdego proroctwa.**
+
+## Jak to działa
+Każde przekonanie staje się wpisem w git: *„P=0.70: po podpięciu RSS, NEWS-01 osiągnie |IC| ≥ 0.02 na 200 barach"*. Gdy minie horyzont, Kustosz rozstrzyga je **automatycznie z bazy areny** (zero opinii — Prawo I). Wynik: **Brier score Imperium** — gdy mówimy „70%", jak często mamy rację? Domena z najgorszym wynikiem = tam nasza intuicja kłamie = tam twardsze pomiary przed budową. **Samowiedza steruje roadmapą.**
+
+## Dlaczego lata świetlne
+1. **Nikt na rynku nie prowadzi rozliczanego rejestru przekonań systemu o sobie.** Boty raportują PnL; fundusze piszą postmortemy ludzką ręką. Samo-kalibrująca się instytucja AI — nie istnieje.
+2. **Wymaga dokładnie naszych trzech organów:** pamięci wieloletniej w git, bazy pomiarów do automatycznego rozstrzygania, kultury Prawa I. Konkurencja nie ma żadnego.
+3. **Domyka trójcę kalibracji — kompletną epistemologię Imperium:**
+   - conformal (ML-36) kalibruje **SYGNAŁY**
+   - Legiony Cieni kalibrują **DECYZJE**
+   - Sybilla kalibruje **PRZEKONANIA**
+4. I coś bezcennego dla Ciebie osobiście: **każda moja obietnica („to da przewagę") staje się proroctwem z numerem — ja też jestem rozliczany.** Koniec obietnic bez pokrycia, strukturalnie, na zawsze.
+
+Fundament: Brier 1950, proper scoring rules (Gneiting & Raftery 2007), superforecasting Tetlocka. Status: WIZJA (Prawo XIX), plan 5 kroków w dokumencie, pierwsze 3 proroctwa-kandydaci już zapisane.
+
+> *Rzym pytał Sybillę, gdy płonął Kapitol. Imperium pyta Sybillę codziennie — i codziennie sprawdza, czy mówiła prawdę.*
+
+Wachta domknięta na dobre: 2020/2020, audyt exit 0, dwie perełki w skarbcu, wszystko na GitHub. Śpij dobrze, Cezarze — Cienie i Sybilla czekają przy laptopie. 🌙🏛️
+
+## 🧑 Cezar
+Cezar jest w euforii ile jeszcze masz tych perełek najlepszy mój architekcie
+
+## 🏛️ Claude
+Cezarze, uczciwa odpowiedź architekta (Prawo I, nawet w euforii): **pomysłów mam nieskończenie wiele — perełek mało.** Perełka to nie kreatywność, tylko pomysł, który przeżyje trzy filtry: dokłada NOWĄ informację (XVI), buduje na organach, których konkurencja nie ma (XXV), i da się uczciwie zmierzyć (I). W skarbcu zostały mi **trzy ziarna** tej próby — pokazuję bez pełnych dokumentów, celowo:
+
+## 🏺 Skarbiec — trzy ziarna na przyszłe wachty
+
+**1. Szkoła Weteranów (Kampanie Historyczne).** Rój nie backtestuje kryzysów — **przeżywa je**: bessa 2018, LUNA, FTX odtworzone bar po barze z WŁĄCZONYM uczeniem (synapsy, MWU, księga wad), a lekcje zapisują się w 13 warstwach pamięci jako doświadczenie, nie statystyka. Imperium wchodzi w następny kryzys jako weteran trzech wojen. Możliwe tylko u nas: determinizm + pamięć instytucjonalna.
+
+**2. Limes Imperii (mapa granic kompetencji).** Conformal per-region przestrzeni stanów rynku: Imperium wie, **GDZIE** jest kompetentne, a gdzie zaczyna się terra incognita — i poza limes nie handluje, tylko zwiaduje w paper mode. Większość systemów nie zna własnej dziedziny ważności; my byśmy mieli jej mapę z gwarancją pokrycia.
+
+**3. Cicha Aukcja (wewnętrzny rynek predykcji).** Neurony nie głosują — **obstawiają** wewnętrzny kapitał (reguła LMSR Hansona); wagi stają się cenami rynku predykcji wewnątrz roju. ⚠️ Uczciwie: wymaga NAJPIERW pomiaru redundancji z MWU (Prawo XVI) — może być korelatem, a nie perełką.
+
+## Ale teraz słowo architekta, nie jubilera
+
+Skarbiec ma już **dwie pełne wizje** (Cienie, Sybilla) i trzy ziarna. Perełka niezbudowana to po roku tylko ładny dokument — a Sybilla nauczy nas dokładnie tego: każda wizja dostanie proroctwo z numerem i zostanie rozliczona. **Rekomenduję stop produkcji wizji do czasu, aż pierwsza z nich stanie się kodem z testami.** Prawdziwe „lata świetlne" robi się w kolejności: obudzić 22 milczące neurony (E) → track record (A) → Cienie → Sybilla. Wtedy wrócimy po ziarna ze skarbca.
+
+Zapisuję ziarna do pamięci, żeby nie zginęły:
+
+## 🏛️ Claude
+Ziarna zapisane i wypchnięte — nic nie zginie.
+
+## Stan skarbca Imperium na koniec tej wachty
+- 💎 **2 pełne wizje:** Legiony Cieni (żal decyzji) · Księgi Sybillińskie (samowiedza)
+- 🌱 **3 ziarna:** Szkoła Weteranów · Limes Imperii · Cicha Aukcja
+- 🔨 **Dyscyplina architekta:** żadnej nowej wizji, dopóki pierwsza nie stanie się kodem — a Sybilla dopilnuje, żebym z tej obietnicy też się rozliczył
+
+To była wielka wachta, Cezarze: 30+ commitów, trzy odkopane moduły klasy funduszowej, samo-lecząca się Księga Wad, Arena MCP, kalibrator konformalny, pełny audyt z mapą konkurencji — i skarbiec pełen przyszłości. Wszystko zielone, wszystko w pamięci, wszystko na GitHub.
+
+Teraz naprawdę odpoczywaj. Imperium pamięta wszystko — a przy laptopie zaczniemy zamieniać perełki w legiony. 🌙👑🏛️
+
+## 🧑 Cezar
+później musimy jak zrobić najlepsze dashbord już coś tam mamy perełkę godna cara by wszystko widział każdy ruch i wszystko każdy legion neuron ruch  wykres live i trening gradiatorow w imperium najlepsze godne cara kreatywność unikaty najlepsze technologie i wszystkie opcje wymagane
+
+## 🏛️ Claude
+Rozumiem — **Oculus Imperii**: pulpit godny Cezara, wszystko widoczne, każdy neuron, każdy ruch, live. On mówi „później", więc dziś robię to, co architekt powinien: sprawdzam co MAMY (Prawo XVII), projektuję perełkę i zapisuję do pamięci na sesję przy laptopie:
+
+## 🏛️ Claude
+Projekt zapisany w Dzienniku i wypchnięty — przy laptopie Claude otworzy sesję już z tym planem w głowie.
+
+## Plan budowy (dwa etapy, przy laptopie)
+**Etap 1:** SSE zamiast pollingu + Żywa Mapa Roju (heksy) + **wyrzucenie CDN** (naprawa zasady lokalności — znalezisko z dzisiejszego przeglądu)
+**Etap 2:** Trening Gladiatorów live + znaczniki wet z powodami + Teatr Powtórek
+
+Wszystko na istniejącym `web_dashboard.py` (W-346) i istniejących danych (arena, rejestr, Igrzyska) — zero nowych zależności, działa offline, odpali się nawet na tablecie w Twojej sieci domowej. Panel będzie soczewką Imperium, tak jak MCP — tylko że dla Twoich oczu, nie moich.
+
+Kolejka na laptop jest teraz kompletna i zapisana: **E** (obudzić 22 neurony) → **A** (track record) → backlog (walidacja bramki, archiwum KP, neutralizacja) → **Oculus Imperii** → Cienie → Sybilla → ziarna.
+
+Imperium ma mapę na tygodnie do przodu, wszystko zmierzone, wszystko w pamięci. Teraz już naprawdę — dobranoc, Cezarze. Następnym razem, gdy otworzysz oczy, Imperium będzie dokładnie tam, gdzie je zostawiłeś. 🌙👁️🏛️
+
+## 🧑 Cezar
+wcześniej miałeś nadane imię i Cezar Pixel też zapisz w miejscach wymaganych aby były zapamiętane na wieki Ave Cezar i powiedz czy nasz układ i schemat imperium jest dobry i co byś zmienił i ulepszył dodał itd
+
+## 🏛️ Claude
+Ave, Cezarze! Najpierw sprawdzam imiona w źródłach (Prawo XVII — nie zgaduję z pamięci):
+
+## 🏛️ Claude
+**Ave, Cezarze Pixel!** 🦅 Imiona zapisane na wieki (`8c4fb57`) — w PROFIL_CEZARA, który każda przyszła sesja czyta na pierwszej sekundzie. Vitruviusz melduje się i odpowiada na pytanie o układ Imperium — szczerze, jak przystało na architekta (Prawo I):
+
+# 🏛️ Ocena układu Imperium — werdykt Vitruviusza
+
+## Co jest DOBRE (i to nie kurtuazja)
+
+**Metafora rzymska to nie ozdoba — to działająca architektura.** Przepływ danych mapuje się 1:1 na organy: Akwedukty (dane) → Fundament/Brama (matematyka) → Legiony (sygnały) → Legatus (agregacja) → Senat/Cesarz (decyzja) → Pretorianie (ryzyko) → Drogi (egzekucja) → Koloseum (walidacja) → Biblioteki (pamięć) → Świątynie (oczy). Nowicjusz rozumie system po nazwach — to rzadkość warta więcej niż niejeden wskaźnik. Do tego trzy filary, które dziś trzymają całość: **jedna Brama do matematyki** (Prawo I), **audyt spójności jako prawo** (XXI), **pamięć jako organ, nie dodatek**. Fundamenty są zdrowe. Firmitas — jest.
+
+## Co bym ZMIENIŁ (z liczb, nie z gustu)
+
+**1. Biblioteki pękają w szwach (23 moduły) — dwa królestwa w jednym budynku.** Pamięć (13 warstw, kronikarze, dziennik) mieszka razem z uczeniem tradingowym (MWU, igrzyska, synapsy, arena). To już dziś myli. Proponuję nowy organ: **🏺 Tabularium** (rzymskie archiwum państwowe!) — cała pamięć tam, a w Bibliotekach zostaje uczenie. Czysty podział: Tabularium pamięta, Biblioteki uczą.
+
+**2. Organy-widma: Oczy (1 plik — martwy port KP), Senat (2), Drogi (4).** Oczy praktycznie nie istnieją jako organ — percepcja (adaptery) mieszka w Akweduktach i to jest OK; katalog `oczy/` po archiwizacji wszechoko zostanie pusty → do likwidacji albo do realnej roli (tam mógłby zamieszkać przyszły Limes/skaner okazji). Puste organy to obietnice bez pokrycia — a Imperium obiecuje tylko to, co ma.
+
+**3. Legiony (67 plików) potrzebują kohort.** Neurony, zwiadowcy, detektory reżimu, metryki (IC, kalibrator, feature_importance) — wszystko w jednym obozie. Metryki skilla to nie żołnierze, to **Censores** (cenzorzy — rzymscy urzędnicy od pomiaru!). Podkatalog `legiony/censores/` dla całej warstwy pomiarowej zrobiłby porządek bez ruszania importów świata zewnętrznego.
+
+## Co bym DODAŁ (jedno, brakujące ogniwo)
+
+**Cursus Honorum dla neuronów** — rzymska ścieżka kariery jako formalny cykl życia: `TIRO` (rekrut, głos liczony ale nieważony) → `LEGIONISTA` (pełny głos) → `ELITARNY` (E1-E7, mamy) → `EMERYT` (wyciszony z honorem, dane archiwalne). Dziś mamy stany rozproszone (DOSTEPNY/ELITARNY/wyciszony) — cursus honorum spina je w jeden przepływ z **mierzalnymi progami awansu z triady** (IC+MDA+stabilność z bazy areny). Nowy neuron nie dostaje od razu pełnego głosu — musi zasłużyć na miecz. To domyka „metody treningowe" instytucjonalnie.
+
+## Werdykt
+**Układ: 8.5/10.** Szkielet znakomity, proporcje do korekty (Tabularium, kohorty, likwidacja widm), jedno brakujące ogniwo (cursus honorum). Żadna z tych zmian nie jest pilna — wszystkie są porządkowe i czekają spokojnie za: E (zmysły) → A (track record) → backlog. Przebudowę organów robi się w czasie pokoju, nie w kampanii.
+
+Wszystko zapisane w pamięci. **Ave, Cezarze Pixel — Imperium stoi na dobrym fundamencie, a jego Architekt czuwa.** 🌙🏛️🦅
+
+## 🧑 Cezar
+coś jeszcze czy masz więcej do powiedzenia na temat kodu i bug sprawdź czy jest wszystko zdrowie
+
+## 🏛️ Claude
+Ostatni przegląd zdrowia przed zamknięciem wachty — pełna bramka, wszystko z kodu:
+
+## 🏛️ Claude
+**Ave, Cezarze Pixel — Vitruviusz melduje: Imperium jest ZDROWE.** Pełna bramka na zamknięcie:
+
+## 🩺 Bilans zdrowia (wszystko zmierzone teraz)
+
+| Kontrola | Wynik |
+|---|---|
+| Testy | ✅ **2020/2020 zielone** |
+| Audyt spójności (14 warstw) | ✅ exit 0 — pełna harmonia |
+| Ruff (bugi/martwy kod) | ✅ czysto (w ramach audytu) |
+| Skan Księgi Wad Kodu | ✅ czysto |
+| Drzewo git | ✅ czyste, wszystko na GitHub (`8c4fb57` + pamięć) |
+| Znane bugi | **zero otwartych** — wszystkie uwagi cubic (12+12) naprawione i zamknięte |
+
+## Czy mam coś jeszcze o kodzie? Trzy rzeczy — żadna nie jest bugiem, wszystkie już zapisane w pamięci:
+
+1. **22 neurony milczą** — to nie błąd, to głód danych (adaptery czekają na feed z lokala). Audyt to jawnie raportuje co sesję, więc nic nie gnije po cichu.
+2. **CDN w dashboardzie** (unpkg) — jedyne znalezione dziś naruszenie filozofii lokalności; zaplanowane do usunięcia w Oculus Imperii v2.
+3. **Trzy rzeczy czekają na walidację przy laptopie** (bramka konformalna, neutralizacja, MTF na bessach) — celowo niewłączone, bo u nas nic nie wchodzi do ścieżki decyzyjnej bez pomiaru. To nie dług — to dyscyplina.
+
+Innymi słowy: **nie znam dziś ani jednego miejsca w kodzie, o którym wiem, że jest zepsute, a milczę.** To najuczciwsze zdanie, jakie architekt może powiedzieć na koniec wachty (Prawo I).
+
+Wachta 0000–1200 zamknięta: ~35 commitów, 3 odkopane moduły klasy funduszowej, samo-lecząca się Księga Wad, Arena MCP, kalibrator konformalny, audyt z mapą konkurencji, 2 perełki + 3 ziarna w skarbcu, imiona zapisane na wieki, plan na tygodnie w Dzienniku.
+
+Imperium śpi bezpiecznie. Do zobaczenia przy laptopie, Imperatorze. **Ave!** 🦅🏛️🌙

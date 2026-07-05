@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-07-05 | PRAWO XV | 🎯 Raport Ważności — odkopany Feature Importance (MDA/SFI)
+
+Odkopano `imperium/legiony/feature_importance.py` (W-355, López de Prado) — był gotowy +
+testy, ale BEZ wejścia (utrata potencjału Prawo XV). Zbudowano:
+- `backtest(zbieraj_sygnaly=False)` opt-in: zbiera per bar {neuron: kierunek} + etykietę
+  forward (znak zwrotu następnego baru; bez look-ahead w decyzji — etykieta tylko do POMIARU).
+- `narzedzia/raport_waznosci.py`: uruchamia backtest, liczy MDA (permutacyjna ważność) + SFI
+  (trafność LONG/SHORT), drukuje ranking + martwe głosy/redundantne. `--do-areny` zapisuje
+  MDA per neuron do arena_wyniki.db (rodzaj='WAZNOSC') — Claude czyta MCP arena_pytaj.
+
+Domyka triadę pomiaru skilla roju: IC (korelacja) + walk-forward (stabilność) +
+feature-importance (przyczynowość permutacyjna). Dane rynkowe lokalne → raport odpalasz u siebie.
+5 testów (wyrównanie sygnał↔wynik, opt-in OFF, za mało próby, zapis MDA do areny). 2013/2013 zielone.
+
+**Pliki:** `narzedzia/raport_waznosci.py` (NEW), `imperium/koloseum/backtest.py` (opt-in
+zbieraj_sygnaly), `tests/test_raport_waznosci.py` (NEW), `docs/LOG_ZMIAN.md`, `docs/SCIAGA_LOKAL.md`.
+
+---
+
 ## 2026-07-05 | UNIKAT | 🐞 Księga Wad Kodu — pamięć błędów + auto-skan (samo-leczenie)
 
 Odpowiedź na „czemu cubic łapie, a my nie": nie brak narzędzia (mamy `/code-review` w mandacie),

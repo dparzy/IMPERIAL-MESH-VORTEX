@@ -65,6 +65,7 @@ def backtest(
     mtf_weto_przeciwtrend: bool = False,
     mierz_ic: bool = False,
     kalibruj_prog: bool = False,
+    zbieraj_sygnaly: bool = False,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -138,6 +139,12 @@ def backtest(
         from imperium.legiony.metryki_ic import KolektorIC
         kol_ic = KolektorIC()
 
+    # W-355 Kolektor sygnałów dla Feature Importance (opt-in): per bar {neuron: kierunek}
+    # + etykieta forward = znak zwrotu NASTĘPNEGO baru (bez look-ahead w decyzji — etykieta
+    # tylko do POMIARU ważności po fakcie). Zasila raport_waznosci() (MDA/SFI, López de Prado).
+    hist_sygnalow: List[Dict[str, str]] = []
+    hist_wynikow: List[int] = []
+
     wejscia = 0
     weta = 0
     krzywa_equity: List[float] = []   # equity po każdym barze (dla bramki W-282)
@@ -202,6 +209,16 @@ def backtest(
                     for s in decyzja.raport.sygnaly})
             poprz = bary[i - 1]["close"]
             kol_ic.rejestruj_zwrot(biezacy["close"] / poprz - 1 if poprz else 0.0)
+
+        # W-355: zbierz sygnały + etykietę forward (znak zwrotu następnego baru).
+        if zbieraj_sygnaly and decyzja.raport is not None and i < len(bary) - 1:
+            hist_sygnalow.append({s.neuron_id: s.kierunek for s in decyzja.raport.sygnaly})
+            nast = bary[i + 1]["close"]
+            hist_wynikow.append(1 if nast > biezacy["close"] else -1)
+
+    if zbieraj_sygnaly:
+        engine.historia_sygnalow = hist_sygnalow
+        engine.historia_wynikow = hist_wynikow
 
     # Pomiar IC (W-385): dołącz raport do silnika (Prawo XVI — przewaga mierzona).
     if kol_ic is not None:

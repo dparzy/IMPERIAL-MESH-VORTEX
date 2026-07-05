@@ -108,7 +108,10 @@ python narzedzia/raport_ic.py                         # IC roju (który neuron m
 python narzedzia/raport_ic.py --glob "dane/dzienne/*_d.csv" --interwal 1d
 python narzedzia/walk_forward_ic.py --glob "dane/4h/Binance_*_4h.csv" 4h --okna 4
 python narzedzia/scoreboard_neuronow.py               # ranking kontrybucji neuronów
+python narzedzia/raport_waznosci.py --do-areny        # Feature Importance MDA/SFI (López de Prado)
 ```
+Triada pomiaru skilla: **IC** (korelacja) + **walk-forward** (stabilność) + **ważność** (MDA/SFI,
+przyczynowość permutacyjna). `--do-areny` zapisuje MDA do bazy → Claude czyta `arena_pytaj`.
 Interpretacja IC: `|IC|<0.02` = szum · `~0.03+` = realna przewaga · `>0.05` = mocny sygnał.
 
 Walidacja bramki konformalnej (przed włączeniem `kalibruj_prog`) — A/B baza vs kalibracja:

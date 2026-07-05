@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-07-05 | PRAWO XVI | 📏 Pomiar redundancji: triple_barrier & walk_forward — NIE duplikaty
+
+Skan Prawa XV znalazł 12 niepodpiętych modułów. Zmierzono funkcjonalnie 2 podejrzenia o redundancję
+(Prawo XVI — pomiar, nie opinia):
+- **triple_barrier (W-357) vs arena_trzech_bram (W-035, wpięty):** NIE duplikaty. arena_trzech_bram
+  = scoring Igrzysk, stałe % TP/SL. triple_barrier = etykietowanie ML: bariery ×zmienność + filtr
+  CUSUM + sample_uniqueness (AFML Ch.3-4). triple_barrier dokłada NOWĄ zdolność (research-grade) →
+  utrata potencjału XV, nie redundancja. Wspólny tylko prymityw „która bariera pierwsza" (drobne).
+- **walk_forward (W-345) vs walk_forward_ic (wpięty):** różne cele. walk_forward_ic = stabilność IC
+  neuronów (bez parametrów). walk_forward = WFO optymalizacji PARAMETRÓW (ewaluator IS/OOS). NIE
+  redundancja; walk_forward niepodpięty (brak optymalizatora+CLI) = utrata potencjału XV, odrębny.
+
+Wniosek: backlog XV nie kurczy się archiwizacją — „niepodpięte" wersje to realna nieodkopana zdolność.
+Dokument-only (pomiar+werdykt), zero zmian w kodzie.
+
+---
+
 ## 2026-07-05 | PRAWO XV | 🎯 Raport Ważności — odkopany Feature Importance (MDA/SFI)
 
 Odkopano `imperium/legiony/feature_importance.py` (W-355, López de Prado) — był gotowy +

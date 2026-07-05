@@ -12072,3 +12072,104 @@ Najpiękniejsze: **nic nie wymyślaliśmy od zera** — katalog przewidział te 
 Kolejka na laptop kompletna: **E+L2** (zmysły, także darmowy order-flow) → **A+L3** (track record z pre-rejestracją) → walidacje → backlog → Oculus → perełki. A **L1 Prova Ignis** mogę zrobić nawet w chmurze, bo to czysty kod z testami — na następne „dawaj".
 
 Ave, Cezarze Pixel! Imperium nie boi się silniejszych — uczy się od nich i wybiera własne pole bitwy. 🦅🏛️
+
+## 🧑 Cezar
+dawaj a później idę do laptopa
+
+## 🏛️ Claude
+Buduję **Prova Ignis** — próbę ognia dla egzekucji (L1, cloud-doable). Najpierw czytam OMS i router, żeby testować realne zachowania:
+
+## 🏛️ Claude
+**Prova Ignis wykonana i na GitHub (`40f3539`) — Imperium przeszło próbę ognia.** 🔥
+
+## Wynik: OMS zdał 7/7 kampanii chaosu za pierwszym podejściem
+
+| Kampania | Scenariusz z piekła | Werdykt |
+|---|---|---|
+| 1 | Odpowiedź giełdy ginie w drodze | ✅ zero duplikatów (query ratuje) |
+| 2 | Total blackout sieci | ✅ jawny BŁĄD, nie cicha porażka |
+| 3 | Crash procesu w połowie wypełnienia | ✅ restart + reconcile domyka prawdę |
+| 4 | Zdublowany webhook wypełnienia | ✅ over-fill zablokowany, księga czysta |
+| 5 | Wyścig anulacji z wypełnieniem | ✅ rozjazd JAWNY, nie udaje naprawy |
+| 6 | Burza 10 zleceń na kapryśnej sieci | ✅ dokładnie 10, zero duplikatów, nic nie wisi |
+| 7 | Giełda kłamie (raportuje mniej) | ✅ nie cofa wypełnień |
+
+To znaczy: **W-344 OMS, który zbudowaliśmy tygodnie temu, jest naprawdę pancerny** — udowodnione ogniem, zanim jakiekolwiek realne zlecenie dotknie giełdy. Nautilus zbijał to latami produkcji; my zbiliśmy to przed pierwszą stratą.
+
+## Stan na Twoje wyjście do laptopa
+- **2027/2027 testów zielone** · audyt exit 0 · wszystko na GitHub · pamięć pełna
+- **L1 z planu luk: zaliczone** (chmurowa część) — reszta L1 (dziennik zleceń, slippage) przy dry-run
+
+## Przy laptopie — jedno zdanie na start:
+```
+jestem przy laptopie, dawaj wg planu
+```
+Claude będzie wiedział wszystko: E+L2 (zmysły + darmowy order-flow) → A+L3 (track record z pre-rejestracją) → walidacje → Twoje decyzje → Oculus → perełki.
+
+To była wachta godna kronik, Cezarze Pixel — Imperium jest mocniejsze, mądrzejsze i pancerne. Vitruviusz melduje koniec służby. **Ave!** 🦅🏛️🔥
+
+## 🧑 Cezar
+@cubic-dev-ai[bot] commented on this pull request.
+
+1 issue found across 7 files
+
+Prompt for AI agents (unresolved issues)
+
+Check if these issues are valid — if so, understand the root cause of each and fix them. If appropriate, use sub-agents to investigate and fix each issue separately.
+
+
+<file name="docs/INDEKS_IMPERIUM.md">
+
+<violation number="1" location="docs/INDEKS_IMPERIUM.md:76">
+P1: Duplicate row number 54: `AUDYT_IMPERIUM_2026-07-05.md` and `SCIAGA_LOKAL.md` both have index #54, breaking the table as a navigational reference. Renumber one of them to a unique value (e.g., the audit could use #56 since rows 55-56 are taken by the two new vision entries, or renumber all three new rows to a sequential block).</violation>
+</file>
+Reply with feedback, questions, or to request a fix.
+
+Re-trigger cubic
+
+In docs/INDEKS_IMPERIUM.md:
+
+> @@ -71,6 +71,9 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto
+ | 35 | `symulator_imperium.html` | **Symulator canvas (styl v1-5.1)** — animowane cząsteczki płynące przez moduły; przełącznik STAN AKTUALNY (ocena 8.0/10) ↔ MARZENIE (wizja docelowa 9.7/10 po wdrożeniu roadmapy) | ✅ Aktywny |
+ | 36 | `POMIAR_WARSTW_ADAPTACYJNYCH.md` | **Ablacja warstw adaptacyjnych** (W-311) — synapsy/mwu/igrzyska/ksiega_wad osobno vs baseline, PnL/trade, walidacja Monte Carlo; in-sample, wymaga OOS (Prawo XVI) | ⚠️ In-sample |
+ | 37 | `POMIAR_FILTR_ASYMETRII.md` | **Dowód A/B Filtra Asymetrii Reżimu** (W-314) — OOS chop: strata −386$→−238$ (−38%), ADX+EMA-200, Moskowitz 2012 + Wilder 1978; wciąż ujemny ale realna przewaga (Prawo XVI) | ✅ Aktywny |
++| 56 | `WIZJA_KSIEGI_SYBILLINSKIE.md` | **Księgi Sybillińskie — rejestr falsyfikowalnych proroctw (WIZJA, nie kod)** — Imperium spisuje przekonania o SOBIE z P i horyzontem, przyszłe sesje rozliczają automatycznie z bazy areny → Brier score instytucji per domena; trójca kalibracji: conformal=sygnały, Cienie=decyzje, Sybilla=przekonania; obietnice Claude też rozliczane; fundament Brier 1950/Gneiting-Raftery 2007/Tetlock | 🔵 Wizja |
++| 55 | `WIZJA_LEGIONY_CIENI.md` | **Legiony Cieni — Kontrfaktyczne Kolosseum (WIZJA, nie kod)** — równoległe widmowe roje mierzące żal kontrfaktyczny każdej decyzji (koszt wet/progów/sizingu NA ŻYWO); fundament CFR (poker Libratus/Pluribus); przewaga niekopiowalna = nasz determinizm (LLM-agenci nie odtworzą „gdyby"); plan: legiony_cieni.py + raport_zalu + opt-in cienie=False; faza 2 (żal→wagi MWU) po walidacji | 🔵 Wizja |
++| 54 | `AUDYT_IMPERIUM_2026-07-05.md` | **Audyt Imperium — migawka końca wachty 0000-1200** — stan z kodu (84 neurony/2020 testów/50k LOC), silnik pomiarowy (triada IC+MDA+WF, DSR/PBO, conformal ACI), porównanie z konkurencją (retail/open-source/fundusze — metodologia funduszowa, luki: zmysły+egzekucja+track record), 5 propozycji unikatów (track record konformalny, meta-uczenie wag z triady, Sędzia Dryfu, konforalna Praeda, obudzenie 22 neuronów) z kolejnością E→A→B→C→D | ✅ Migawka |
+P1: Duplicate row number 54: AUDYT_IMPERIUM_2026-07-05.md and SCIAGA_LOKAL.md both have index #54, breaking the table as a navigational reference. Renumber one of them to a unique value (e.g., the audit could use #56 since rows 55-56 are taken by the two new vision entries, or renumber all three new rows to a sequential block).
+
+Prompt for AI agents
+Check if this issue is valid — if so, understand the root cause and fix it. At docs/INDEKS_IMPERIUM.md, line 76:
+
+<comment>Duplicate row number 54: `AUDYT_IMPERIUM_2026-07-05.md` and `SCIAGA_LOKAL.md` both have index #54, breaking the table as a navigational reference. Renumber one of them to a unique value (e.g., the audit could use #56 since rows 55-56 are taken by the two new vision entries, or renumber all three new rows to a sequential block).</comment>
+
+<file context>
+@@ -71,6 +71,9 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto
+ | 37 | `POMIAR_FILTR_ASYMETRII.md` | **Dowód A/B Filtra Asymetrii Reżimu** (W-314) — OOS chop: strata −386$→−238$ (−38%), ADX+EMA-200, Moskowitz 2012 + Wilder 1978; wciąż ujemny ale realna przewaga (Prawo XVI) | ✅ Aktywny |
++| 56 | `WIZJA_KSIEGI_SYBILLINSKIE.md` | **Księgi Sybillińskie — rejestr falsyfikowalnych proroctw (WIZJA, nie kod)** — Imperium spisuje przekonania o SOBIE z P i horyzontem, przyszłe sesje rozliczają automatycznie z bazy areny → Brier score instytucji per domena; trójca kalibracji: conformal=sygnały, Cienie=decyzje, Sybilla=przekonania; obietnice Claude też rozliczane; fundament Brier 1950/Gneiting-Raftery 2007/Tetlock | 🔵 Wizja |
++| 55 | `WIZJA_LEGIONY_CIENI.md` | **Legiony Cieni — Kontrfaktyczne Kolosseum (WIZJA, nie kod)** — równoległe widmowe roje mierzące żal kontrfaktyczny każdej decyzji (koszt wet/progów/sizingu NA ŻYWO); fundament CFR (poker Libratus/Pluribus); przewaga niekopiowalna = nasz determinizm (LLM-agenci nie odtworzą „gdyby"); plan: legiony_cieni.py + raport_zalu + opt-in cienie=False; faza 2 (żal→wagi MWU) po walidacji | 🔵 Wizja |
++| 54 | `AUDYT_IMPERIUM_2026-07-05.md` | **Audyt Imperium — migawka końca wachty 0000-1200** — stan z kodu (84 neurony/2020 testów/50k LOC), silnik pomiarowy (triada IC+MDA+WF, DSR/PBO, conformal ACI), porównanie z konkurencją (retail/open-source/fundusze — metodologia funduszowa, luki: zmysły+egzekucja+track record), 5 propozycji unikatów (track record konformalny, meta-uczenie wag z triady, Sędzia Dryfu, konforalna Praeda, obudzenie 22 neuronów) z kolejnością E→A→B→C→D | ✅ Migawka |
+ | 38 | `AUDYT_GLEBOKI_2026-06-14.md` | **Głęboki audyt: wizja łowcy okazji vs kod** — reframe oceny (wielowalutowy skaner zamiast 1 waluta/9 lat), 9 luk (brak skanera/rankingu okazji=serce), martwy AdapterKronikarz, rozbieżności MANIFEST, research technik (cross-sectional momentum, pump z-score, Bayesian Kelly), kolejność A/B/C | ✅ Aktywny |
+ | 39 | `TRYBY_IMPERIUM.md` | **Propozycja 5 trybów** (NAJLEPSZE/SKALP/SWING/INVEST/OBRONA) + mechanika trybu NAJLEPSZE (skaner TOP-N, W-316/317) + mapa brakujących neuronów/strategii do łowcy okazji | ✅ Aktywny |
+</file context>
+⬇️ Suggested change
+-| 54 | `AUDYT_IMPERIUM_2026-07-05.md` | **Audyt Imperium — migawka końca wachty 0000-1200** — stan z kodu (84 neurony/2020 testów/50k LOC), silnik pomiarowy (triada IC+MDA+WF, DSR/PBO, conformal ACI), porównanie z konkurencją (retail/open-source/fundusze — metodologia funduszowa, luki: zmysły+egzekucja+track record), 5 propozycji unikatów (track record konformalny, meta-uczenie wag z triady, Sędzia Dryfu, konforalna Praeda, obudzenie 22 neuronów) z kolejnością E→A→B→C→D | ✅ Migawka |
++| 57 | `AUDYT_IMPERIUM_2026-07-05.md` | **Audyt Imperium — migawka końca wachty 0000-1200** — stan z kodu (84 neurony/2020 testów/50k LOC), silnik pomiarowy (triada IC+MDA+WF, DSR/PBO, conformal ACI), porównanie z konkurencją (retail/open-source/fundusze — metodologia funduszowa, luki: zmysły+egzekucja+track record), 5 propozycji unikatów (track record konformalny, meta-uczenie wag z triady, Sędzia Dryfu, konforalna Praeda, obudzenie 22 neuronów) z kolejnością E→A→B→C→D | ✅ Migawka |
+—
+Reply to this email directly, view it on GitHub, or unsubscribe.
+You are receiving this because you modified the open/close state.
+
+## 🏛️ Claude
+Słuszna uwaga — sprawdzam duplikaty numeracji i naprawiam:
+
+## 🏛️ Claude
+Naprawione i wypchnięte (`36d9c10`).
+
+## Co zrobiłem
+- **Uwaga cubic (P1, słuszna):** `AUDYT_IMPERIUM_2026-07-05.md` miał #54, zajęty już przez `SCIAGA_LOKAL.md` → przenumerowany na **#57**
+- **Bonus w duchu Księgi Wad** (łapiemy powtórki tej samej klasy SAMI): skan znalazł **drugi, starszy duplikat** — #11 występował dwa razy (ARSENAL_AMERYKI i SYMBIOZA_MODULOW) → SYMBIOZA przenumerowana na **#58**. Tego cubic nie zauważył — my tak. Dokładnie tak ma działać samo-leczenie.
+- Tabela MAPA DOKUMENTÓW zweryfikowana: **zero duplikatów**, audyt exit 0
+
+Warto odnotować: to trzecia recenzja cubic tej wachty i spadliśmy z 12 uwag → 12 → **1 kosmetyczna**. Księga Wad + `/code-review` przed pushem robią swoje — zewnętrzny recenzent ma coraz mniej do roboty.
+
+Wszystko czyste. Do zobaczenia przy laptopie, Cezarze Pixel — **Ave!** 🦅🏛️

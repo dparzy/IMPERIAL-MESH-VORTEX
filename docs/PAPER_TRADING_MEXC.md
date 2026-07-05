@@ -12,7 +12,7 @@
 |---------|-----------|--------|
 | RAM | ≥16 GB | ⏳ upgrade laptopa |
 | Python | 3.10+ z ta-lib | ✅ |
-| Testy | 743/743 zielone | ✅ |
+| Testy | wszystkie zielone (`python tests/run_tests.py`) | ✅ |
 | Klucz API MEXC | read-only (spot/futures) | ⏳ do konfiguracji |
 | Klucz API DeepSeek | opcjonalny (AI advisor) | ⏳ |
 

@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-07-05 | AUDYT | 🧹 Naprawa żywych rozjazdów docs↔kod (Prawo XXI/XVIII)
+
+Audycik na koniec wachty. Rdzeń audytu zielony (14 warstw, ruff, MAPA_KLUCZY 84/84). Dodatkowy
+skan złapał 2 ŻYWE (niedatowane) rozjazdy, których audyt nie łapie (inline, nie nagłówki):
+- `INDEKS_IMPERIUM.md`: „Neurony: 62 / Strategie: 18 / Testy: 743/743" (stan 2026-06-04) →
+  odświeżone na 84/20 + de-hardcode testów + data 2026-07-05 + aktualne kategorie A..Z.
+- `PAPER_TRADING_MEXC.md`: „Testy: 743/743" → de-hardcode („wszystkie zielone").
+Datowane migawki (PAMIEC_SESJI 2026-06-22, MANUAL_MIGRACJA 2026-06-09) POZOSTAWIONE świadomie
+(Prawo I: prawda ich czasu). Audyt exit 0 po naprawie.
+
+---
+
 ## 2026-07-05 | PRAWO XV | 🔄 Raport WFO — odkopany Walk-Forward Optimization (W-345)
 
 Odkopano `imperium/koloseum/walk_forward.py` (Pardo WFO; był gotowy+testy bez wejścia).

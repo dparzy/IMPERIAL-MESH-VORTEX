@@ -190,8 +190,8 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 | **LIVE** 🟠 | Paper trading na żywych danych MEXC — `MEXC_API_KEY` + `MEXC_SECRET` | ⏳ Instrukcja → `docs/PAPER_TRADING_MEXC.md` | rdzeń kompletny |
 | **E** 🔵 | Dalsze neurony z katalogu (299−72=227 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
-**Stan kategorii (2026-06-04):** aktywne M/T/F/A/L/V/R/H/N/Z/O · wyciszone S(SMC feed)/O-API(on-chain API)
-**Neurony: 62** (58 aktywnych, 4 wyciszone) · **Strategie: 18** · **Testy: 743/743**
+**Stan kategorii (2026-07-05):** A/C/D/F/H/K/L/M/N/O/R/S/T/V/Z · wyciszone: część O/S czeka na adaptery/feed
+**Neurony: 84** (78 aktywnych, 6 wyciszonych) · **Strategie: 20** · **Testy: patrz `python tests/run_tests.py`** (nie hardkodujemy)
 
 ### Zadania bieżące (infrastruktura)
 | # | Zadanie | Moduł | Priorytet |

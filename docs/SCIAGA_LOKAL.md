@@ -202,6 +202,15 @@ Test DeepSeek: `python -m imperium.cesarz.deepseek_glos` → ma napisać „Cesa
 | **`git pull` blokuje** | `you have unstaged changes` | `git stash` → `git pull --rebase ...` → `git stash pop` |
 | **Utknięty konflikt** | `needs merge` | `git reset` → potem stash/pull/pop |
 | **Brak biblioteki** | `ImportError` | `pip install -r requirements.txt` |
+| **Emoji wywala narzędzia** | `UnicodeEncodeError` / `cp1250 codec` | `setx PYTHONIOENCODING utf-8` (raz, potem nowy terminal) — patrz niżej ⬇️ |
+
+### UTF-8 na Windows (konsola cp1250 dławi się emoji) — robisz raz:
+```powershell
+setx PYTHONIOENCODING utf-8
+```
+Potem **zamknij i otwórz terminal**. To naprawia WSZYSTKIE narzędzia Pythona naraz (mamy
+pełno emoji w wynikach). `run_tests.py` i `audyt_spojnosci.py` mają dodatkowy bezpiecznik
+w kodzie, ale ta zmienna załatwia całą resztę (raport_ic, arena_mcp, skan_wad…).
 
 ### SSH przez port 443 (gdy firma blokuje port 22) — robisz raz:
 ```powershell

@@ -35,6 +35,13 @@ import sys
 import subprocess
 from datetime import date
 
+# Windows: konsola cp1250 wywala się na emoji audytu → wymuś UTF-8 (no-op na Linux/macOS).
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding="utf-8")   # type: ignore[union-attr]
+    except Exception:  # noqa: BLE001
+        pass
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 

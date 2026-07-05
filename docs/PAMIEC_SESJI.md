@@ -101,6 +101,21 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Prawo I: Zero halucynacji matematycznych
+AI nigdy nie oblicza matematyki. Kod (TA-Lib, C) oblicza RSI/EMA/ATR → JSON 'answer key' → AI tylko interpretuje. Brama Kalkulatora nie uruchomi się bez TA-Lib.
+
+### 2026-06-30 — Halucynacje w ARSENAL: defensywne repo i anegdoty
+Weryfikacja ~320 linków z IMV wykazała halucynacje w klastrze 'defensywnych repozytoriów GitHub' i anegdot tradingowych. Główny stack technologiczny jest prawdziwy.
+
+### 2026-06-30 — Bug: __pycache__ śledzone w gicie
+Po kompilacji brama_kalkulatora.py, pliki __pycache__ zostały przypadkowo commitowane. Naprawiono przez git rm --cached i dodanie .gitignore.
+
+### 2026-06-30 — Bug: loader modułów po reorganizacji folderów
+Po przeniesieniu modułów z płaskiej struktury do folderów rzymskich, pierwszy_zwiadowca.py szukał plików po starych nazwach. Naprawiono przez użycie względnych ścieżek (../fundament/brama_kalkulatora.py).
+
+### 2026-06-30 — Bug: mieszanie zasad Kingdom Pixel z Imperium
+Mieszanie zasad Kingdom Pixel (79 Zasad) z Imperium powodowało chaos. Rozwiązanie: stworzenie 14 Praw Imperium od zera, bez kopiowania. Kingdom Pixel = archiwum, Imperium = aktywne.
+
 ### 2026-06-30 — Kategoria R w WAGI_REZIMU istniała tylko w PANIC
 Sentyment (R) miał wagę tylko w trybie PANIC (veto). Dodano mnożniki dla VOLATILE (×1.3), RANGING (×1.2), NORMAL (×1.1), TREND_STRONG (×0.8).
 

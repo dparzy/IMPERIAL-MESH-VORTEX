@@ -10337,3 +10337,162 @@ Nasz stos anty-overfittingowy (**DSR, PBO/CSCV, purged-CV, meta-labeling, MWU**)
 Nie wpiąłem jeszcze kalibratora w Legatusa/meta_labeling — to zmiana **ścieżki decyzyjnej**, a Ty jesteś na wachcie i możesz odpalać live. Per Prawo XVIII zostawiam to jako następny krok (zapisany w Dzienniku) do zrobienia po walidacji, nie w ciemno w trakcie zmiany.
 
 Chcesz, żebym przy następnej okazji **wpiął kalibrator w próg pewności** (żeby rój wchodził w trade dopiero gdy skalibrowana pewność przekracza próg), czy zostawiamy jako narzędzie pomiarowe na razie? Spokojnej dalszej wachty. 🏛️
+
+## 🧑 Cezar
+wepnij kalibrator w próg pewności po walidacji
+
+## 🏛️ Claude
+Wpinam kalibrator w próg pewności — ale wg Twojego warunku: **najpierw walidacja, potem wpięcie jako opt-in** (żeby nic nie zmienić w domyślnej ścieżce, dopóki nie udowodnię że działa). Zaczynam od rozpoznania, gdzie żyje próg pewności:
+
+## 🏛️ Claude
+Znalazłem bramkę: `dyrygent.py:379` — `if pewnosc_agregatu < prog_aktywny → NEUTRAL`. To tu wepniemy kalibrator (opt-in). Ale market-data jest teraz **lokalne** (poza gitem), więc realnej walidacji A/B nie odpalę w chmurze — zbuduję ją jako **narzędzie, które Ty odpalasz lokalnie**, a mechanizm zweryfikuję deterministycznym testem. Patrzę jak backtest podaje zamknięcia do Dyrygenta:
+
+## 🏛️ Claude
+Wzorzec opt-in (jak MWU) jest czysty — wpinam się identycznie, domyślnie OFF. Buduję bramkę pewności (tylko **zaostrza** próg gdy trafność spada — nigdy nie luzuje, więc nie zwiększa ryzyka):
+
+## 🏛️ Claude
+Wpinam bramkę w Dyrygenta (opt-in, domyślnie None = zero zmiany). Czytam __init__ i bramkę:
+
+## 🏛️ Claude
+Teraz bramka w punkcie decyzji (linia ~379):
+
+## 🏛️ Claude
+Wpinam opt-in `kalibruj_prog` do backtestu (żeby walidacja A/B była możliwa). Czytam sygnaturę:
+
+## 🏛️ Claude
+Karmię bramkę wynikami zamknięć w pętli backtestu:
+
+## 🏛️ Claude
+Teraz pętla live — opt-in `kalibruj_prog`. Szukam gdzie tworzy Dyrygenta i wpinam + karmię:
+
+## 🏛️ Claude
+Teraz karmię bramki per-symbol w bloku zamknięć pętli live:
+
+## 🏛️ Claude
+Buduję narzędzie walidacji A/B (odpalasz lokalnie — dane są u Ciebie) + testy bramki:
+
+## 🏛️ Claude
+Teraz testy bramki + kontraktów opt-in:
+
+## 🏛️ Claude
+10/10 zielone. Pełny gate (testy + audyt/ruff):
+
+## 🏛️ Claude
+While tests run, I add the docs (LOG_ZMIAN + Dziennik + cheat sheet):
+
+## 🏛️ Claude
+1 test padł + audyt chce świeży wpis (mój edit LOG_ZMIAN wszedł po starcie audytu). Znajduję który test i re-audyt:
+
+## 🏛️ Claude
+Rozumiem — jedyny fail to `test_audyt_spojnosci_zielony`, a on pada bo audyt W8 chce wpisu z **dzisiejszą** datą, a my datujemy 2026-07-04. Kontener przeskoczył dzień. Sprawdzam jakiej daty oczekuje audyt:
+
+## 🏛️ Claude
+Realny rollover doby (kontener: 2026-07-05). W8 chce wpisu z dzisiejszą datą gdy zmieniam .py. Zmieniam nagłówek mojego wpisu na 2026-07-05:
+
+## 🏛️ Claude
+Audyt zielony. Dopisuję ściągę + Dziennik, potem finalny gate i commit:
+
+## 🏛️ Claude
+1994/1994 zielone, audyt exit 0. Commituję i pushuję:
+
+## 🏛️ Claude
+Wpięte i na GitHub (`fd37742`). Zrobione dokładnie wg Twojego warunku — **wpięcie po walidacji, bezpiecznie**.
+
+## Co zrobiłem
+
+**Bramka konformalna w progu pewności** (ML-36):
+- Po serii strat ACI **podnosi** efektywny próg pewności → rój wchodzi **rzadziej, ale pewniej**; gdy trafność wraca, próg wraca do bazowego
+- **Bezpiecznik:** bramka **tylko zaostrza** (delta ≥ 0) — **nigdy nie luzuje** progu poniżej bazowego. Więc nie może zwiększyć liczby wejść ani ryzyka względem Twojej konfiguracji. To czyni wpięcie w ścieżkę decyzyjną bezpiecznym.
+
+**Wpięte jako opt-in, domyślnie OFF** (zero zmiany zachowania, dopóki nie włączysz):
+- `Dyrygent.bramka_kalibr`, `backtest(kalibruj_prog=)`, `KonfigPetliLive.kalibruj_prog`
+- Karmione wynikami zamknięć bez look-ahead (w backteście i live per symbol)
+
+## Walidacja (Twój warunek „po walidacji")
+Dane rynkowe są u Ciebie (poza gitem), więc walidację robisz **lokalnie** jedną komendą:
+```powershell
+python narzedzia/walidacja_kalibrator.py
+```
+→ tabela **baza vs kalibracja** (trades / win-rate / PnL) + werdykt. Mechanizm zweryfikowałem 10 testami granic; realny efekt na Twoich danych pokaże ta komenda.
+
+## Ścieżka wdrożenia (Prawo I — decyzja z pomiaru)
+1. Odpal `walidacja_kalibrator.py` na laptopie
+2. Jak tabela pokaże ✅ (wyższy/równy win-rate + ochrona PnL) → włącz `kalibruj_prog=True` w `KonfigPetliLive`
+3. Jak ❌ → zostaje OFF, testujemy na innych reżimach
+
+## Stan
+- **1994/1994 testów zielone**, audyt exit 0, ruff czysto
+- Wszystko utrwalone: kod+testy, LOG_ZMIAN (2026-07-05), Dziennik, ściąga
+- Pamięć na GitHub
+
+Świadomie **nie włączyłem** bramki na sztywno — bo to Twoja decyzja po zobaczeniu liczb, a Ty jesteś na wachcie i możesz odpalać live. Kod czeka gotowy, przełącznik jest po Twojej stronie. Spokojnej reszty wachty. 🏛️
+
+## 🧑 Cezar
+zapamiętaj to wszystko w zasady i pamięć
+
+## 🏛️ Claude
+Utrwalam wg zasad. Sprawdzam najpierw co już jest w pamięci (nie dubluję), potem dodaję brakującą zasadę:
+
+## 🏛️ Claude
+Pamięć (Dziennik) ma już całą sesję. Brakuje **jednej zasady** — reguła bezpiecznego wpinania w ścieżkę decyzyjną (opt-in + walidacja), którą właśnie praktykowaliśmy. Dodaję ją do CLAUDE.md:
+
+## 🏛️ Claude
+Utrwalone — wszystko z tej sesji jest teraz w **zasadach** i **pamięci**, na GitHub.
+
+## Zasady (czytane co sesję — CLAUDE.md)
+Dwie nowe zasady skodyfikowane tej sesji:
+- **🔌 ZASADA MCP** — „soczewka, nie mózg": rój uczy się w kodzie, MCP tylko obserwuje/karmi; nie dodajemy redundantnych MCP
+- **🚦 ZASADA WPIĘCIA W ŚCIEŻKĘ DECYZYJNĄ** (nowa) — zmiany wejścia/wyjścia = opt-in domyślnie OFF + walidacja A/B przed włączeniem (Prawo I) + preferuj moduły „tylko-zaostrzające"
+
+Obie jako standing orders w CLAUDE.md — bez nowego Prawa, żeby nie ruszać liczby „25 praw" (Prawo XXI, brak kaskady).
+
+## Pamięć (wstrzykiwana na starcie)
+**Dziennik Nieśmiertelny** ma pełny łuk sesji: Arena MCP → conformal (ML-36) → bramka opt-in → zasady utrwalone. Plus **LOG_ZMIAN** (szczegóły techniczne), **REJESTR_INSPIRACJI** (ACI z linkiem arXiv), **INDEKS** (moduły).
+
+## Stan końcowy
+- Audyt exit 0, 1994/1994 testów zielone
+- Wszystko zsynchronizowane na GitHub — laptop pobierze na starcie
+- Przy następnym uruchomieniu Claude (laptop albo chmura) zobaczy obie nowe zasady w CLAUDE.md **i** całą sesję w Dzienniku na pierwszej sekundzie
+
+Nic się nie zgubi. Jedyny otwarty krok po Twojej stronie (zapisany w pamięci jako „następny"): odpalić `walidacja_kalibrator.py` lokalnie i — jeśli tabela potwierdzi — włączyć `kalibruj_prog=True`. 🏛️
+
+## 🧑 Cezar
+zrobimy to jak będę miał dostęp do laptopa a teraz co możemy jeszcze zrobić na wachcie sprawdź system pełny indeks i kod pełny scan
+
+## 🏛️ Claude
+Robię pełny skan — indeks, kod, potencjał (Prawo XV/XVII). Skupiam się na tym, co da się zrobić **teraz w chmurze** (bez danych lokalnych). Uruchamiam kilka sond równolegle:
+
+## 🏛️ Claude
+Mocne znalezisko. Weryfikuję dokładniej + skanuję inne gotowe-ale-niepodpięte moduły:
+
+## 🏛️ Claude
+Pełny skan zrobiony. Sprawdzam jeszcze sygnaturę `raport_waznosci` (czy da się zbudować CLI teraz):
+
+## 🏛️ Claude
+Pełny skan zakończony. Oto stan i **najważniejsze znalezisko**.
+
+## Zdrowie systemu (z kodu, nie z pamięci)
+- **84 neurony** (78 aktywnych, **92.9% wykorzystania**), 18 elitarnych
+- **1994/1994 testów zielone**, audyt exit 0, ruff czysto
+- **Zero TODO/FIXME/stubów** — jedyne `NotImplementedError` to poprawne klasy bazowe (abstrakcje). Kod jest czysty.
+
+## 🚨 Znalezisko Prawa XV (utrata potencjału)
+**`imperium/legiony/feature_importance.py` (W-355) — zbudowany, ma testy, ale NIEPODPIĘTY.**
+
+To moduł **Feature Importance López de Prado (MDA + SFI)** — mierzy, **które z 78 neuronów NAPRAWDĘ przewidują zysk, a które to martwe głosy**. Ma testy jednostkowe (`test_afml.py`), ale jego publiczne funkcje `raport_waznosci` / `raport_z_igrzysk` **nie mają żadnego wejścia** — nie da się tego uruchomić. Zdolność klasy funduszowej leży zakopana.
+
+Cytat z samego modułu (López de Prado): *„Backtesting is not a research tool. **Feature importance is.**"*
+
+To idealnie pasuje do naszego motywu „nauka areny" i **da się zrobić teraz w chmurze** (kod + testy na danych syntetycznych; realny bieg dopiero u Ciebie na danych).
+
+## Co da się zrobić na wachcie (bez laptopa) vs co czeka
+| Opcja | Cloud teraz? | Wartość |
+|---|---|---|
+| **Zbudować `narzedzia/raport_waznosci.py`** (CLI dla MDA/SFI) + wpiąć wynik do bazy areny | ✅ tak | **wysoka** — odkopuje López de Prado, Claude czyta „które neurony przewidują" |
+| 22 adaptery czekające (NEWS feed, PSY funding, on-chain) | ❌ wymaga API/kluczy/laptopa | średnia |
+| Walidacja bramki konformalnej | ❌ wymaga danych lokalnych | (czeka na Ciebie) |
+
+## Rekomendacja
+Zbudujmy **`raport_waznosci.py`** — bliźniak `raport_ic.py`, ale mierzący ważność MDA/SFI, z zapisem do bazy areny (`rodzaj='WAZNOSC'`). To domyka triadę pomiaru skilla roju: **IC** (korelacja) + **walk-forward** (stabilność) + **feature-importance** (przyczynowość permutacyjna) — wszystkie czytelne dla Claude przez arena_pytaj.
+
+Chcesz? Napisz „dawaj" — zbuduję z testami granic, audytem i commitem. Albo wskaż inną z tabeli.

@@ -80,3 +80,11 @@ if [ -f narzedzia/auto_lekcja.py ]; then
   echo "[hook] AUTO-LEKCJA (W-360 v5):"
   python narzedzia/auto_lekcja.py --maks 3 || true
 fi
+
+# 6) SKAN WAD KODU — heurystyczny łowca powtórek błędów z recenzji (Księga Wad Kodu).
+#    Non-blocking (|| true): pokazuje trafienia na zmienionych .py, nie wstrzymuje startu.
+#    To pamięć „co MOŻE pójść źle" — łapiemy sami to, co wcześniej łapał tylko cubic.
+if [ -f narzedzia/skan_wad_kodu.py ]; then
+  echo "[hook] SKAN WAD KODU (Księga Wad Kodu):"
+  python narzedzia/skan_wad_kodu.py || true
+fi

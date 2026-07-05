@@ -237,6 +237,10 @@ Uruchom `/code-review` na diffie (skill harnessa) — wrogi przegląd logiki/gra
 ta sama perspektywa co zewnętrzny recenzent (cubic). Łapie błędy granic i kontradykcje,
 których linter nie widzi. Znalezione bugi naprawiasz PRZED pushem, nie po recenzji PR.
 (Powód: nie chcemy polegać na tym, że zewnętrzny bot znajdzie to, co my powinniśmy sami.)
+**Dodatkowo** uruchom `python narzedzia/skan_wad_kodu.py` — heurystyczny łowca POWTÓREK
+znanych klas błędów (Księga Wad Kodu, `imperium/biblioteki/ksiega_wad_kodu.py`). Każdą nową
+wadę z recenzji dopisujesz do księgi (`dodaj`), żeby następnym razem złapać ją SAMI, nie cubic.
+Skan biegnie też automatycznie w hooku startowym (informacyjnie).
 
 ## 🔐 Bezpieczeństwo (NIENARUSZALNE)
 

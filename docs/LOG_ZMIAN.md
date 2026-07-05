@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-07-05 | UNIKAT | 🐞 Księga Wad Kodu — pamięć błędów + auto-skan (samo-leczenie)
+
+Odpowiedź na „czemu cubic łapie, a my nie": nie brak narzędzia (mamy `/code-review` w mandacie),
+lecz brak PAMIĘCI wzorców i wymuszenia. Zbudowano:
+- `imperium/biblioteki/ksiega_wad_kodu.py` — KsiegaWadKodu: JSONL wzorców błędów (kat/regex/
+  opis/lekcja/zrodlo), `dodaj` (dedup+walidacja regex), `skanuj(tekst)` (heurystyczny nudge z nr linii),
+  `zasiej_startowe`. 5 wzorców startowych z realnych uwag cubic (parse-in-try, ORDER BY id,
+  clamp limit, test-None, SQLite-w-pętli). Księga wersjonowana w git (wiedza uniwersalna).
+- `narzedzia/skan_wad_kodu.py` — CLI: skanuje zmienione+untracked .py przeciw księdze, exit 2
+  na trafienia. Wpięty w hook startowy (informacyjnie, non-blocking) + rytuał pre-push w CLAUDE.md.
+- Dogfood złapał 2 własne luki: skaner pomijał untracked (naprawione) i trafiał w plik definicji
+  (wykluczony). To NUDGE, nie dowód (Prawo I).
+
+Lekcja procesowa utrwalona: każdą nową wadę z recenzji dopisujemy do księgi → z czasem łapiemy
+SAMI to, co dziś łapie cubic. 9 testów granic (dedup, zły/pusty regex, nr linii, idempotencja).
+
+**Pliki:** `ksiega_wad_kodu.py` (NEW), `narzedzia/skan_wad_kodu.py` (NEW),
+`tests/test_ksiega_wad_kodu.py` (NEW), `.claude/hooks/session-start.sh` (krok 6),
+`CLAUDE.md` (rytuał pre-push), `docs/INDEKS_IMPERIUM.md`, `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`.
+
+---
+
 ## 2026-07-05 | RECENZJA | 🔍 Cubic PR — 12 uwag naprawionych (arena/kalibrator/walidacja)
 
 Adversarial review (cubic) na PR z Areną+conformalem. Naprawione u źródła:

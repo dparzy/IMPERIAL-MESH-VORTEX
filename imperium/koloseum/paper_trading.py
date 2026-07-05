@@ -116,6 +116,8 @@ class WynikZamkniecia:
     # W-312: znacznik wejścia (Unix ms) — umożliwia analizę czasową zamkniętych
     # trade'ów (walk-forward OOS, filtrowanie po okresie). 0 = brak danych.
     timestamp_wejscia: int = 0
+    # Reżim rynku w chwili wejścia (z Pozycji) — dla arena-logu i analizy per-reżim.
+    rezim: str = "NORMAL"
 
 
 @dataclass
@@ -481,6 +483,7 @@ class PaperTradingEngine:
             kapital_przed=round(kapital_przed, 4),
             kapital_po=round(self.kapital, 4),
             timestamp_wejscia=poz.timestamp_wejscia,
+            rezim=getattr(poz, "rezim", "NORMAL"),
         )
         self.historia_zamkniec.append(wynik)
         return wynik

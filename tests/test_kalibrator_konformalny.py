@@ -25,6 +25,16 @@ def test_okno_i_gamma_walidacja():
         KalibratorKonformalny(gamma=0)
 
 
+def test_none_w_parametrach_rzuca():
+    """Reguła Test-Granic: None w progu/oknie/gamma → wyjątek (TypeError z porównania)."""
+    with pytest.raises(TypeError):
+        KalibratorKonformalny(cel_pokrycia=None)
+    with pytest.raises(TypeError):
+        KalibratorKonformalny(okno=None)
+    with pytest.raises(TypeError):
+        KalibratorKonformalny(gamma=None)
+
+
 # ── kwantyl: granice ─────────────────────────────────────────────────────────
 
 def test_kwantyl_bez_danych_inf():
@@ -60,7 +70,7 @@ def test_kwantyl_uzywa_wartosci_bezwzglednej():
     k = KalibratorKonformalny(okno=10)
     k.dodaj_score(-0.4)   # |−0.4| = 0.4
     k.dodaj_score(0.2)
-    assert k.kwantyl(alpha=0.5) in (0.2, 0.4)   # jeden z order-stats, nieujemny
+    assert k.kwantyl(alpha=0.5) == 0.4   # order-stat 2/2 = 0.4 (|−0.4|), deterministycznie
     assert all(s >= 0 for s in k._scores)
 
 
@@ -125,7 +135,8 @@ def test_dlugofalowe_pokrycie_zbiega_do_celu():
         k.dodaj_score(prawda)
         prob += 1
     pokrycie = pokryte / prob
-    assert 0.80 <= pokrycie <= 1.0    # w okolicy celu 0.9 (tolerancja na skończoną próbę)
+    # cel 0.9: pokrycie w sensownym pasmie — 100% byłoby sprzeczne z poziomem istotności 0.1.
+    assert 0.80 <= pokrycie <= 0.98
 
 
 def test_obserwuj_cykl_dziala():

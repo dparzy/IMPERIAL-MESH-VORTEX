@@ -6,6 +6,126 @@
 
 ---
 
+## 2026-07-05 | AUDYT | 🧹 Naprawa żywych rozjazdów docs↔kod (Prawo XXI/XVIII)
+
+Audycik na koniec wachty. Rdzeń audytu zielony (14 warstw, ruff, MAPA_KLUCZY 84/84). Dodatkowy
+skan złapał 2 ŻYWE (niedatowane) rozjazdy, których audyt nie łapie (inline, nie nagłówki):
+- `INDEKS_IMPERIUM.md`: „Neurony: 62 / Strategie: 18 / Testy: 743/743" (stan 2026-06-04) →
+  odświeżone na 84/20 + de-hardcode testów + data 2026-07-05 + aktualne kategorie A..Z.
+- `PAPER_TRADING_MEXC.md`: „Testy: 743/743" → de-hardcode („wszystkie zielone").
+Datowane migawki (PAMIEC_SESJI 2026-06-22, MANUAL_MIGRACJA 2026-06-09) POZOSTAWIONE świadomie
+(Prawo I: prawda ich czasu). Audyt exit 0 po naprawie.
+
+---
+
+## 2026-07-05 | PRAWO XV | 🔄 Raport WFO — odkopany Walk-Forward Optimization (W-345)
+
+Odkopano `imperium/koloseum/walk_forward.py` (Pardo WFO; był gotowy+testy bez wejścia).
+`narzedzia/raport_wfo.py`: optymalizuje próg `min_pewnosc` na oknie IS (DSR-guided `optymalizuj`),
+egzaminuje na OOS, przesuwa okno. Werdykt z OOS (Prawo I): WFE=Sharpe_OOS/Sharpe_IS (>0.5=ROBUST,
+~0/<0=PRZEUCZONY). Ewaluator = backtest na wycinku barów z danym progiem (okno warmup=60 < OOS,
+by OOS produkował decyzje). Różne od walk_forward_ic (stabilność IC neuronów) — tu stroimy próg
+wejścia i badamy czy generalizuje. 3 testy (ewaluator zwraca kapitał+zwroty, formatowanie werdyktu,
+brak danych). Dane lokalne → WFO odpalasz u siebie (ciężkie: kilka minut).
+
+**Pliki:** `narzedzia/raport_wfo.py` (NEW), `tests/test_raport_wfo.py` (NEW), `docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-07-05 | PRAWO XV | 🏷️ Raport Etykiet — odkopany Triple-Barrier + CUSUM (W-357)
+
+Odkopano `imperium/legiony/triple_barrier.py` (López de Prado AFML Ch.3-4; był gotowy bez
+wejścia). `narzedzia/raport_etykiet.py`: próbkuje zdarzenia filtrem CUSUM, etykietuje serię
+Triple-Barrier (bariery ×σ: która padła pierwsza TP/SL/czas) i liczy sample-uniqueness
+(obserwacje z nakładającymi się oknami nie są IID — waga próbki = unikalność). Rdzeń
+`raport_z_close` testowalny bez CSV. Fundament pod trening ML (uczciwe etykiety vs naiwne
+„cena wzrosła"). Dane rynkowe lokalne → raport odpalasz u siebie. 4 testy (statystyki,
+za mało barów, CUSUM bez zdarzeń, suma TP+SL+timeout=100%). Skan wad czysty.
+
+**Pliki:** `narzedzia/raport_etykiet.py` (NEW), `tests/test_raport_etykiet.py` (NEW), `docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-07-05 | PRAWO XVI | 📏 Pomiar redundancji: triple_barrier & walk_forward — NIE duplikaty
+
+Skan Prawa XV znalazł 12 niepodpiętych modułów. Zmierzono funkcjonalnie 2 podejrzenia o redundancję
+(Prawo XVI — pomiar, nie opinia):
+- **triple_barrier (W-357) vs arena_trzech_bram (W-035, wpięty):** NIE duplikaty. arena_trzech_bram
+  = scoring Igrzysk, stałe % TP/SL. triple_barrier = etykietowanie ML: bariery ×zmienność + filtr
+  CUSUM + sample_uniqueness (AFML Ch.3-4). triple_barrier dokłada NOWĄ zdolność (research-grade) →
+  utrata potencjału XV, nie redundancja. Wspólny tylko prymityw „która bariera pierwsza" (drobne).
+- **walk_forward (W-345) vs walk_forward_ic (wpięty):** różne cele. walk_forward_ic = stabilność IC
+  neuronów (bez parametrów). walk_forward = WFO optymalizacji PARAMETRÓW (ewaluator IS/OOS). NIE
+  redundancja; walk_forward niepodpięty (brak optymalizatora+CLI) = utrata potencjału XV, odrębny.
+
+Wniosek: backlog XV nie kurczy się archiwizacją — „niepodpięte" wersje to realna nieodkopana zdolność.
+Dokument-only (pomiar+werdykt), zero zmian w kodzie.
+
+---
+
+## 2026-07-05 | PRAWO XV | 🎯 Raport Ważności — odkopany Feature Importance (MDA/SFI)
+
+Odkopano `imperium/legiony/feature_importance.py` (W-355, López de Prado) — był gotowy +
+testy, ale BEZ wejścia (utrata potencjału Prawo XV). Zbudowano:
+- `backtest(zbieraj_sygnaly=False)` opt-in: zbiera per bar {neuron: kierunek} + etykietę
+  forward (znak zwrotu następnego baru; bez look-ahead w decyzji — etykieta tylko do POMIARU).
+- `narzedzia/raport_waznosci.py`: uruchamia backtest, liczy MDA (permutacyjna ważność) + SFI
+  (trafność LONG/SHORT), drukuje ranking + martwe głosy/redundantne. `--do-areny` zapisuje
+  MDA per neuron do arena_wyniki.db (rodzaj='WAZNOSC') — Claude czyta MCP arena_pytaj.
+
+Domyka triadę pomiaru skilla roju: IC (korelacja) + walk-forward (stabilność) +
+feature-importance (przyczynowość permutacyjna). Dane rynkowe lokalne → raport odpalasz u siebie.
+5 testów (wyrównanie sygnał↔wynik, opt-in OFF, za mało próby, zapis MDA do areny). 2013/2013 zielone.
+
+**Pliki:** `narzedzia/raport_waznosci.py` (NEW), `imperium/koloseum/backtest.py` (opt-in
+zbieraj_sygnaly), `tests/test_raport_waznosci.py` (NEW), `docs/LOG_ZMIAN.md`, `docs/SCIAGA_LOKAL.md`.
+
+---
+
+## 2026-07-05 | UNIKAT | 🐞 Księga Wad Kodu — pamięć błędów + auto-skan (samo-leczenie)
+
+Odpowiedź na „czemu cubic łapie, a my nie": nie brak narzędzia (mamy `/code-review` w mandacie),
+lecz brak PAMIĘCI wzorców i wymuszenia. Zbudowano:
+- `imperium/biblioteki/ksiega_wad_kodu.py` — KsiegaWadKodu: JSONL wzorców błędów (kat/regex/
+  opis/lekcja/zrodlo), `dodaj` (dedup+walidacja regex), `skanuj(tekst)` (heurystyczny nudge z nr linii),
+  `zasiej_startowe`. 5 wzorców startowych z realnych uwag cubic (parse-in-try, ORDER BY id,
+  clamp limit, test-None, SQLite-w-pętli). Księga wersjonowana w git (wiedza uniwersalna).
+- `narzedzia/skan_wad_kodu.py` — CLI: skanuje zmienione+untracked .py przeciw księdze, exit 2
+  na trafienia. Wpięty w hook startowy (informacyjnie, non-blocking) + rytuał pre-push w CLAUDE.md.
+- Dogfood złapał 2 własne luki: skaner pomijał untracked (naprawione) i trafiał w plik definicji
+  (wykluczony). To NUDGE, nie dowód (Prawo I).
+
+Lekcja procesowa utrwalona: każdą nową wadę z recenzji dopisujemy do księgi → z czasem łapiemy
+SAMI to, co dziś łapie cubic. 9 testów granic (dedup, zły/pusty regex, nr linii, idempotencja).
+
+**Pliki:** `ksiega_wad_kodu.py` (NEW), `narzedzia/skan_wad_kodu.py` (NEW),
+`tests/test_ksiega_wad_kodu.py` (NEW), `.claude/hooks/session-start.sh` (krok 6),
+`CLAUDE.md` (rytuał pre-push), `docs/INDEKS_IMPERIUM.md`, `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`.
+
+---
+
+## 2026-07-05 | RECENZJA | 🔍 Cubic PR — 12 uwag naprawionych (arena/kalibrator/walidacja)
+
+Adversarial review (cubic) na PR z Areną+conformalem. Naprawione u źródła:
+- **arena_mcp**: parsowanie `params/name` WEWNĄTRZ try (malformed request → JSON-RPC error,
+  nie crash procesu, P1); `limit` clampowany do 1-100 (P2).
+- **arena_baza**: `pytaj_pomiary` sortuje `ORDER BY ts DESC, id DESC` (backfill nie udaje
+  najnowszego, P2); nowy `zapisz_pomiary` (batch, jedno połączenie — P2 latencja live).
+- **petla_live**: arena-log batchem raz/bar (nie per-trade connect, P2).
+- **paper_trading**: `WynikZamkniecia.rezim` dodane i wypełniane z `poz.rezim` — arena-log
+  przestaje kłamać „NORMAL" (P2).
+- **walidacja_kalibrator**: agreguje parę TYLKO gdy oba tryby OK (fair A/B, P1); dodane
+  maxDD do metryk i werdyktu (ochrona kapitału, P2).
+- **arena_zasil**: zły klucz łapany (ValueError→skip), batch odporny (P2).
+- **testy kalibratora**: None→TypeError, `==0.4` zamiast `in`, pokrycie ≤0.98 (P2/P3).
+- **SCIAGA**: `${CLAUDE_PROJECT_DIR:-.}` z fallbackiem (P2).
+
+Lekcja procesu: uruchomiono `/code-review` na diffie PRZED pushem (mandat CLAUDE.md,
+którego wcześniej w sesji nie dopełniłem — stąd cubic łapał to, co my sami powinniśmy).
+2000/2000 testów zielone, audyt exit 0.
+
+---
+
 ## 2026-07-05 | UNIKAT | 🎯 Bramka konformalna w progu pewności (opt-in) + narzędzie walidacji
 
 Wpięcie KalibratorKonformalnego (ML-36) w ścieżkę decyzyjną — zgodnie z rozkazem „po walidacji".

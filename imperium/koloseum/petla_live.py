@@ -515,16 +515,15 @@ def handluj_live(
                             d.bramka_kalibr.zaktualizuj(getattr(w, "pnl_usdt", 0.0) > 0)
 
                 # Arena auto-log (opt-in): realny PnL% każdego zamknięcia → baza areny.
+                # Batch: JEDNO połączenie SQLite na bar (nie per-trade — cubic P2 latencja).
                 if cfg.arena_log:
                     try:
-                        from imperium.biblioteki.arena_baza import zapisz_pomiar
-                        for w in nowe:
-                            if not hasattr(w, "pnl_pct"):
-                                continue
-                            sym = getattr(w, "symbol", None) or "ROJ"
-                            rez = getattr(w, "rezim", None) or "NORMAL"
-                            zapisz_pomiar("LIVE_PNL", str(sym), float(w.pnl_pct),
-                                          nota=f"{cfg.interwal} {rez} bar{bar_nr}")
+                        from imperium.biblioteki.arena_baza import zapisz_pomiary
+                        wiersze = [("LIVE_PNL", getattr(w, "symbol", None) or "ROJ",
+                                    float(w.pnl_pct),
+                                    f"{cfg.interwal} {getattr(w, 'rezim', None) or 'NORMAL'} bar{bar_nr}")
+                                   for w in nowe if hasattr(w, "pnl_pct")]
+                        zapisz_pomiary(wiersze)
                     except Exception as e:
                         logger.warning(f"[PętlaLive] Arena auto-log padł: {e}")
 

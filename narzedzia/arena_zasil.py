@@ -45,7 +45,10 @@ def zasil_z_ic(ic: dict, interwal: str, nota_extra: str = "",
             continue
         if w != w:   # NaN
             continue
-        zapisz_pomiar(rodzaj, str(neuron), w, nota, db_path=db_path)
+        try:
+            zapisz_pomiar(rodzaj, str(neuron), w, nota, db_path=db_path)
+        except ValueError:
+            continue   # np. pusty klucz neuronu — pomiń, nie wywalaj całego batcha
         zapisane += 1
     return zapisane
 

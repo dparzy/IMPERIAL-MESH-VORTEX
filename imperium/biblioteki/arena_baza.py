@@ -50,9 +50,32 @@ def zapisz_pomiar(rodzaj: str, neuron: str, wartosc: float, nota: str = "",
         conn.close()
 
 
+def zapisz_pomiary(wiersze, db_path: Path | str = DEFAULT_DB, ts: float | None = None) -> int:
+    """Batch: lista krotek (rodzaj, neuron, wartosc, nota). JEDNO połączenie SQLite
+    (mniej I/O w pętli live — cubic P2). Pomija wiersze z pustym rodzaj/neuron. Zwraca ile zapisano."""
+    wiersze = list(wiersze)
+    if not wiersze:
+        return 0
+    conn = _polacz(db_path)
+    try:
+        t = float(ts if ts is not None else time.time())
+        n = 0
+        for rodzaj, neuron, wartosc, nota in wiersze:
+            if not rodzaj or not neuron:
+                continue
+            conn.execute(
+                "INSERT INTO pomiary (ts, rodzaj, neuron, wartosc, nota) VALUES (?,?,?,?,?)",
+                (t, str(rodzaj), str(neuron), float(wartosc), nota or ""))
+            n += 1
+        conn.commit()
+        return n
+    finally:
+        conn.close()
+
+
 def pytaj_pomiary(rodzaj: str | None = None, neuron: str | None = None,
                   limit: int = 20, db_path: Path | str = DEFAULT_DB) -> list[dict]:
-    """Zwraca pomiary (najnowsze pierwsze), z opcjonalnym filtrem rodzaj/neuron."""
+    """Zwraca pomiary (najnowsze wg CZASU pierwsze), z opcjonalnym filtrem rodzaj/neuron."""
     if limit < 1:
         return []
     if not Path(db_path).exists():
@@ -66,9 +89,10 @@ def pytaj_pomiary(rodzaj: str | None = None, neuron: str | None = None,
             warunki.append("neuron = ?"); param.append(neuron)
         gdzie = (" WHERE " + " AND ".join(warunki)) if warunki else ""
         param.append(int(limit))
+        # ORDER BY ts (czas zdarzenia), id jako tie-breaker — backfill nie udaje „najnowszego".
         rows = conn.execute(
             f"SELECT id, ts, rodzaj, neuron, wartosc, nota FROM pomiary{gdzie} "
-            "ORDER BY id DESC LIMIT ?", param,
+            "ORDER BY ts DESC, id DESC LIMIT ?", param,
         ).fetchall()
         return [{"id": r[0], "ts": r[1], "rodzaj": r[2], "neuron": r[3],
                  "wartosc": r[4], "nota": r[5]} for r in rows]

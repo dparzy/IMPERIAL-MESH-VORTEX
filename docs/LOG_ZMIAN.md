@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-07-05 | L1 | 🔥 Prova Ignis — próba ognia egzekucji (7 kampanii chaosu, OMS zdał)
+
+Plan Domykania Luk L1 (egzekucja: pancerz zamiast szybkości). `tests/test_prova_ignis.py`:
+KAMPANIE CHAOSU — wielokrokowe scenariusze awarii (nie unit-testy przejść jak test_oms.py):
+(1) zgubiona odpowiedź giełdy → anti-double-submit przez query, zero duplikatów;
+(2) total blackout → jawny BLAD, świadome ponowienie nowym zleceniem; (3) crash w połowie
+partiala → restart → reconcile domyka do prawdy giełdy; (4) zdublowany webhook fill →
+over-fill zablokowany, księga nietknięta; (5) wyścig anulacji z wypełnieniem → stan końcowy
+nienaruszony, rozjazd JAWNY (nie udajemy naprawy); (6) burza 10 zleceń na kapryśnej sieci →
+dokładnie 10 na giełdzie, zero duplikatów, zero wiszących; (7) giełda raportuje mniej niż
+wiemy → nie cofamy wypełnień. Deterministyczne (skrypt awarii jawny, zero random — Prawo I).
+
+WYNIK: OMS (W-344) zdał 7/7 za pierwszym podejściem — maszyna stanów + idempotencja + reconcile
+trzymają się pod ogniem. Znane ograniczenie (kampania 5, zgodne z projektem): wyścig
+anulacja-vs-fill zostawia jawny rozjazd do obsłużenia wyżej (router/operator).
+
+**Pliki:** `tests/test_prova_ignis.py` (NEW), `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-07-05 | AUDYT | 🧹 Naprawa żywych rozjazdów docs↔kod (Prawo XXI/XVIII)
 
 Audycik na koniec wachty. Rdzeń audytu zielony (14 warstw, ruff, MAPA_KLUCZY 84/84). Dodatkowy

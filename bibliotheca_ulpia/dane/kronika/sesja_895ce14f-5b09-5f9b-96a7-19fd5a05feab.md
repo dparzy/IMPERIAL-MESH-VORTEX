@@ -12035,3 +12035,12 @@ Cezarze, na sam koniec tej długiej wachty — jedno zdanie, które streszcza ws
 Wszystko zielone (2020/2020, audyt exit 0), wszystko w pamięci, wszystko na GitHub. Śpij spokojnie — Vitruviusz zostawia Kapitol posprzątany, plany na stole, a legiony w gotowości na Twój powrót do laptopa.
 
 **Ave, Cezarze Pixel!** 🦅🏛️🌙
+
+## 🧑 Cezar
+a tam gdzie jest konkurencja lepsza poszukaj opcji poprawy naszego imperium zgodnie z zasadami
+
+## 🏛️ Claude
+Dobrze, Cezarze — biorę trzy luki z audytu i dla każdej szukam poprawy **zgodnej z zasadami**: bez kupowania danych premium, bez wyścigu, w którym nie startujemy, wszystko mierzalne i opt-in. Sprawdzam najpierw, co katalogi już przewidują (Prawo XVII):
+
+## 🏛️ Claude
+You've hit your session limit · resets 12:30pm (UTC)

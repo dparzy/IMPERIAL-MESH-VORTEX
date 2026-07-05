@@ -12235,3 +12235,106 @@ To jest żywy przykład naszej reguły: **auto-sync działa MIĘDZY sesjami, nie
 Moja rekomendacja: **Opcja A** — lokal już to robi, jest najbliżej problemu, niech dokończy. Ja czekam w gotowości. Jak lokal skończy i powiesz „lokal wolny", dorobię cokolwiek zostanie + wpiszę tę klasę błędu (Windows/emoji) do Księgi Wad Kodu, żebyśmy łapali ją sami na przyszłość. 🦅
 
 Powiedz jak wolisz — A czy B?
+
+## 🧑 Cezar
+▐▛███▜▌   Claude Code v2.1.185
+▝▜█████▛▘  Opus 4.8 · Claude Pro
+  ▘▘ ▝▝    C:\Projekty\imperial-mesh-vortex
+
+ ▎ Meet Fable 5, our newest model for complex, long-running work. Switch anytime with /model.
+ ▎ Included in your plan limits until Jul 8, then switch to usage credits to continue.
+
+> model
+
+  Ran 3 shell commands
+
+Windows console encoding (cp1250) chokes on emoji. Let me force UTF-8.
+
+  Read 1 file, listed 1 directory, ran 3 shell commands
+
+Task still running (empty output, 0 bytes). Let me wait for it to complete.
+
+  Ran 2 shell commands
+
+The backgrounded task produced nothing. Let me run fresh in the foreground.
+
+  Read 1 file, ran 2 shell commands
+
+● Background command "Run tests and audit with UTF-8 encoding" completed (exit code 0)
+
+Tests green, audit exit 0. The fresh run I kicked off is now redundant — let me stop it and grab the swarm numbers for a complete KROK 0 report.
+
+  Ran 1 shell command
+
+● Stop Task
+export PYTHONIOENCODING=utf-8; python tests/run_tests.py 2>&1 | tail -4 · stopped
+
+KROK 0 zakończony — Imperium spójne. Raport:
+
+🔒 KROK 0 — weryfikacja spójności (Prawo XVII + XXI)
+
+┌────────────────┬───────────────────────────────────────────────────────────────────┐
+│  Sprawdzenie   │                                             Wynik                                              │
+├────────────────┼───────────────────────────────────────────────────────────────────┤
+│ Testy          │ ✅ Wszystkie zielone                                                                           │
+├────────────────┼───────────────────────────────────────────────────────────────────┤
+│ Audyt          │ ✅ exit 0 — pełna harmonia (Ruff W13 czysto, MAPA_KLUCZY W14 pełna, 195 plików .md             │
+│ spójności      │ przeskanowanych)                                                  │
+├────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Neurony        │ 84 (78 aktywnych, 6 wycis                                         │
+├────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Zwiadowcy      │ 15 (13 aktywnych, 2 wycis                                         │
+├────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Elitarne       │ 18                                                                │
+├────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ Strategie      │ 20 (34 klucze, Klucznik s                                         │
+└────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+Git: working tree nie jest w 100% czysty — dwa pliki zmienione przez hook startowy (to normalny churn pamięci, nie
+kod):
+- bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl
+- docs/PAMIEC_SESJI.md
+
+⚠️ Prawo XV — 22 neurony czekają na adapterytynują świadomie wg Prawa XV): rodziny NEWS-, PSY- (funding/OI/long-short/fear-greed), RADAR-* (kontekst BTC), OC-06/07/08 (BTC on-chain — potrzebują realnego
+timestampu), C-01 (cross-sectional RS — potrZ-06/Z-07. Wszystkie ożywają gdy dostaną swój feed — to znany, udokumentowany stan, nie regresja.
+
+Techniczna uwaga: konsola Windows jest w cp1250 i wywala się na emoji — testy/audyt wymagają PYTHONIOENCODING=utf-8
+(ustawiam to per-komenda).
+
+Imperium gotowe. Jaki rozkaz na tę sesję, Ce
+
+✻ Baked for 9m 3s musze chyba dodac recznie plik mcp.jsonl
+
+## 🏛️ Claude
+Dwie rzeczy, Cezarze — najpierw drobna korekta, potem najprostsza droga.
+
+## Nazwa: to `.mcp.json`, nie `mcp.jsonl`
+- **`.mcp.json`** = zwykły JSON (klamry `{ }`), w **katalogu projektu**, z kropką na początku
+- `.jsonl` (JSON Lines) to zupełnie inny format — nie ten. Gdybyś nazwał plik `mcp.jsonl`, Claude by go nie zobaczył
+
+## Najprościej: niech lokal sam go stworzy
+Twój lokalny Claude siedzi teraz na prompcie i pyta *„jaki rozkaz na tę sesję"* — jest **aktywną maszyną** (KROK 0 skończony, working tree praktycznie czysty). Zamiast ręcznie klepać plik, **wklej mu jeden rozkaz**:
+
+```
+Utwórz plik .mcp.json w katalogu projektu z dwoma serwerami MCP (biblioteka + arena,
+oba Python, ścieżki ${CLAUDE_PROJECT_DIR:-.}), dodaj .mcp.json do .gitignore.
+Przy okazji: wymuś UTF-8 w tests/run_tests.py na stałe (koniec problemu cp1250/emoji)
+i dopisz tę klasę błędu (Windows konsola cp1250 vs emoji) do Księgi Wad Kodu.
+Potem commit + push wg zasad.
+```
+
+To załatwia **trzy rzeczy naraz**: MCP wpięte, UTF-8 naprawione na stałe (żeby lokal już nigdy nie tracił 9 minut na to co teraz), i Księga Wad zapamiętuje problem — wszystko zacommitowane w jednym ruchu, przez maszynę, która i tak jest aktywna.
+
+## Dlaczego JA (chmura) tego nie robię teraz
+Bo lokal jest **aktywną maszyną** — dokładnie ta zasada, o której mówiliśmy minutę temu: jedna maszyna na raz. Lokal jest na miejscu, ma Twoje dane, sam znalazł problem UTF-8. Niech on to zrobi. Ja czekam w gotowości.
+
+Po tym Claude potwierdzi „`.mcp.json` utworzony, push zrobiony" i przy **następnym starcie** zapyta o zgodę na serwery `biblioteka` i `arena` — potwierdzasz i masz Arenę w akcji (`arena_roj`, `arena_pytaj`).
+
+Jak lokal skończy i zsynchronizuje — wtedy chmura i lokal znów będą zgodne. Powiedz mu ten rozkaz. 🦅
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+You've hit your session limit · resets 5:30pm (UTC)

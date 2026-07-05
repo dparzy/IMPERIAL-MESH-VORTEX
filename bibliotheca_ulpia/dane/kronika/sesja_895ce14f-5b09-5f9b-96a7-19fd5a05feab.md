@@ -11412,3 +11412,53 @@ Przykład na danych syntetycznych zadziałał: 299 zdarzeń, TP 49.8% / SL 49.5%
 - Wszystko utrwalone: kod+testy, LOG_ZMIAN, Dziennik, pamięć na GitHub
 
 Backlog jasny, każdy kolejny to samodzielna robota. Następny naturalny: **`walk_forward` (W-345)** — ale to większe (potrzebuje optymalizatora). Powiedz „dawaj" na kolejny, albo to dobry moment na odpoczynek — repo jest w idealnym stanie. 🏛️
+
+## 🧑 Cezar
+dawaj
+
+## 🏛️ Claude
+Buduję `walk_forward` (W-345, WFO parametrów). Czytam moduł, by poprawnie wpiąć optymalizator + CLI:
+
+## 🏛️ Claude
+Moduł kompletny (używa `optymalizuj`, WFE Pardo). Buduję CLI z ewaluatorem opartym na backteście. Uwaga na okno warmup < OOS. Piszę:
+
+## 🏛️ Claude
+Testy — ewaluator na barach syntetycznych + formatowanie raportu (monkeypatch ciężkiego WFO):
+
+## 🏛️ Claude
+3/3 zielone. Skan wad + pełny gate:
+
+## 🏛️ Claude
+2020/2020 zielone, audyt exit 0, skan czysty. Dziennik + commit:
+
+## 🏛️ Claude
+Odkopane i na GitHub (`1205213`). **`walk_forward` (W-345) — trzeci moduł Prawa XV z powrotem w grze.**
+
+## Co odkopaliśmy
+`narzedzia/raport_wfo.py` — Walk-Forward Optimization (Pardo):
+- Optymalizuje próg `min_pewnosc` na oknie **IS** (in-sample, DSR-guided `optymalizuj`)
+- Egzaminuje te parametry na **OOS** (out-of-sample, dane których nie widział)
+- Przesuwa okno, powtarza. Werdykt z OOS (Prawo I): **WFE = Sharpe_OOS / Sharpe_IS**
+  - WFE > 0.5 → **ROBUST** (parametry generalizują)
+  - WFE ~0/ujemne → **PRZEUCZONY** (IS świetny, OOS słaby)
+
+To jedyna uczciwa obrona przed przeuczeniem **parametrów** — inne niż `walk_forward_ic` (który mierzy skill neuronów).
+
+## Backlog Prawa XV — postęp
+| Moduł | Status |
+|---|---|
+| ✅ `feature_importance` (MDA/SFI) | odkopany |
+| ✅ `triple_barrier` (etykiety CUSUM) | odkopany |
+| ✅ `walk_forward` (WFO parametrów) | odkopany teraz |
+| ⏳ `neutralizacja` (W-337) | opt-in + walidacja (dedykowana sesja) |
+| ⏳ 6 „wizji" | do przeczytania |
+
+**Trzy moduły klasy funduszowej (López de Prado × 2 + Pardo) odkopane** — każdy miał kod i testy, ale zero wejścia. Teraz wszystkie mają CLI i Claude może je czytać.
+
+## Stan
+- **2020/2020 testów zielone**, audyt exit 0, skan wad czysty
+- Wszystko utrwalone, pamięć na GitHub
+
+Zostały tylko cele wymagające albo walidacji na danych (neutralizacja), albo Twojej decyzji kierunkowej (6 wizji — wpiąć/archiwum). Oba lepiej robić przy laptopie/świeżym umyśle niż w kolejnym „dawaj". 
+
+Powiedz jak chcesz grać: **przeczytać 6 wizji** (bezpieczne, cloud-doable, kończy się werdyktem keep/archive) czy **pauza** — repo w idealnym stanie na koniec wachty. 🏛️

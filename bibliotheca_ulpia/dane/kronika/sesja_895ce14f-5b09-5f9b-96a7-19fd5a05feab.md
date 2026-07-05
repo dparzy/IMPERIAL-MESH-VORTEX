@@ -12338,3 +12338,520 @@ Stop hook feedback:
 
 ## 🏛️ Claude
 You've hit your session limit · resets 5:30pm (UTC)
+
+## 🧑 Cezar
+niechcacy zamknelem terminal lokala i nie dalem mu prompta
+
+## 🏛️ Claude
+Nie ma problemu, Cezarze — **nic nie zginęło**, bo lokal nawet nie zaczął tamtej roboty. A jest w tym plus: skoro **lokal jest zamknięty**, chmura jest teraz jedyną aktywną maszyną → mogę bezpiecznie dokończyć część repo (UTF-8), a Ty na laptopie zrobisz tylko `.mcp.json` (to i tak plik lokalny). Sprawdzam stan i naprawiam:
+
+## 🏛️ Claude
+Chmura czysta (stop-hook złapał przejściowy churn, już zniknął). Wpinam trwały UTF-8 w runner:
+
+## 🏛️ Claude
+Dokładam ten sam bezpiecznik do audytu (drugie najczęściej odpalane narzędzie z emoji) + w ściądze uniwersalna naprawa `setx`:
+
+## 🏛️ Claude
+Załatwione, Cezarze — spokojnie, zamknięcie terminala **niczego nie zepsuło** (lokal nawet nie zaczął tamtej roboty).
+
+## Co zrobiłem TERAZ z chmury (bo lokal zamknięty = chmura wolna)
+✅ **Naprawiłem UTF-8 na stałe** (`0c74438`) — koniec 9-minutowej walki lokala z emoji:
+- `run_tests.py` + `audyt_spojnosci.py` same wymuszają UTF-8 (bezpiecznik w kodzie)
+- `SCIAGA_LOKAL` sekcja 10: uniwersalna naprawa `setx PYTHONIOENCODING utf-8`
+- 2027/2027 zielone, audyt exit 0
+
+To pobierze się na laptop przy następnym `SYNC` — lokal już nigdy nie będzie tego obchodził ręcznie.
+
+## Zostały DWIE rzeczy do zrobienia na laptopie (obie lokalne)
+
+**1. UTF-8 raz na zawsze** (fixuje wszystkie narzędzia, nie tylko te dwa):
+```powershell
+setx PYTHONIOENCODING utf-8
+```
+Potem zamknij i otwórz terminal.
+
+**2. `.mcp.json`** — plik lokalny (ma ścieżki Twojego dysku, jest gitignorowany, więc TYLKO Ty go tworzysz). Najprościej — wklej w PowerShellu, **bez otwierania Claude**:
+```powershell
+cd C:\Projekty\imperial-mesh-vortex
+@'
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+    "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] }
+  }
+}
+'@ | Set-Content -Encoding utf8 .mcp.json
+```
+
+## Kolejność przy laptopie
+1. `setx PYTHONIOENCODING utf-8` → nowy terminal
+2. wklej `.mcp.json` (komenda wyżej)
+3. `cd C:\Projekty\imperial-mesh-vortex` → `claude` → potwierdź serwery `biblioteka`+`arena`
+4. potem: *„jestem przy laptopie, dawaj wg planu"*
+
+Chmura i laptop znów będą zgodne, gdy tylko lokal wystartuje i zrobi `SYNC`. **Ave, Cezarze Pixel!** 🦅🏛️
+
+## 🧑 Cezar
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Ian> setx PYTHONIOENCODING utf-8
+
+SUCCESS: Specified value was saved.
+PS C:\Users\Ian>
+
+## 🏛️ Claude
+✅ **UTF-8 ustawione na stałe** — od teraz każde narzędzie Pythona (testy, audyt, raporty) będzie dławić się emoji **nigdy więcej**.
+
+Ważne: `setx` działa dopiero od **nowego** terminala (obecny jeszcze o tym nie wie).
+
+## Następny krok — nowy terminal + `.mcp.json`
+
+Otwórz **nowe** okno PowerShell i wklej:
+
+```powershell
+cd C:\Projekty\imperial-mesh-vortex
+@'
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+    "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] }
+  }
+}
+'@ | Set-Content -Encoding utf8 .mcp.json
+```
+
+Sprawdź, że się utworzył:
+```powershell
+python -c "import json; json.load(open('.mcp.json')); print('JSON OK')"
+```
+
+## Potem odpal Claude
+```powershell
+claude
+```
+- na starcie zobaczysz `[hook] SYNC ✅` (pobierze m.in. dzisiejszą poprawkę UTF-8)
+- Claude zapyta o zgodę na serwery **biblioteka** i **arena** → potwierdź
+- napisz: **„jestem przy laptopie, dawaj wg planu"**
+
+Od tego momentu masz Arenę w akcji (Claude może `arena_roj`, `arena_pytaj`), UTF-8 działa wszędzie, a chmura i laptop są zgodne. To ostatni ręczny krok konfiguracji — dalej wszystko automatyczne. **Ave, Cezarze Pixel!** 🦅🏛️
+
+## 🧑 Cezar
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS C:\Projekty\imperial-mesh-vortex> @'
+>> {
+>>   "mcpServers": {
+>>     "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+>>     "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] }
+>>   }
+>> }
+>> '@ | Set-Content -Encoding utf8 .mcp.json
+PS C:\Projekty\imperial-mesh-vortex> python -c "import json; json.load(open('.mcp.json')); print('JSON OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+To BOM, Cezarze — nie błąd w treści. Windows PowerShell przy `Set-Content -Encoding utf8` dokleja niewidzialny znak na początku pliku (UTF-8 BOM), a Python się o niego potyka. Treść JSON jest dobra — trzeba tylko zapisać **bez BOM**.
+
+## Napraw — wklej to (zapis UTF-8 bez BOM):
+
+```powershell
+$json = @'
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+    "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] }
+  }
+}
+'@
+[System.IO.File]::WriteAllText("$PWD\.mcp.json", $json, (New-Object System.Text.UTF8Encoding($false)))
+```
+
+## Sprawdź (tym razem z `utf-8-sig`, żeby tolerował ewentualny BOM):
+
+```powershell
+python -c "import json; json.load(open('.mcp.json', encoding='utf-8-sig')); print('JSON OK')"
+```
+
+Powinno napisać **`JSON OK`**.
+
+> Uwaga na przyszłość: mój błąd był w komendzie sprawdzającej — użyła domyślnego kodowania Windows (cp1250) zamiast utf-8. Poprawna wersja jest wyżej. Zapamiętam tę klasę (Windows/BOM/cp1250) — to dokładnie robota dla Księgi Wad Kodu.
+
+Jak zobaczysz `JSON OK`, odpalaj:
+```powershell
+claude
+```
+→ potwierdź serwery **biblioteka** i **arena** → napisz **„jestem przy laptopie, dawaj wg planu"**.
+
+Daj znać jak poszło. 🦅
+
+## 🧑 Cezar
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS C:\Projekty\imperial-mesh-vortex> @'
+>> {
+>>   "mcpServers": {
+>>     "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+>>     "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] }
+>>   }
+>> }
+>> '@ | Set-Content -Encoding utf8 .mcp.json
+PS C:\Projekty\imperial-mesh-vortex> python -c "import json; json.load(open('.mcp.json')); print('JSON OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+PS C:\Projekty\imperial-mesh-vortex> python -c "import json; json.load(open('.mcp.json', encoding='utf-8-sig')); print('JSON OK')"
+
+## 🏛️ Claude
+Widzę — ponownie poszła stara komenda `Set-Content` (ta z BOM), nie moja z `WriteAllText`. Ale to nawet lepiej — usuniemy BOM z pliku, który już masz, bez przepisywania treści. **BOM trzeba wywalić, bo Claude Code (Node.js) na nim się wywala.**
+
+## Usuń BOM z istniejącego pliku — wklej:
+
+```powershell
+$txt = Get-Content -Raw .mcp.json
+[System.IO.File]::WriteAllText((Join-Path $PWD '.mcp.json'), $txt, (New-Object System.Text.UTF8Encoding($false)))
+```
+
+## Sprawdź, że BOM zniknął (patrzy na pierwsze bajty):
+
+```powershell
+python -c "print('BOM obecny' if open('.mcp.json','rb').read(3)==b'\xef\xbb\xbf' else 'no-BOM OK')"
+```
+Ma napisać **`no-BOM OK`**.
+
+## I finalna walidacja (teraz zwykłe open() przejdzie):
+
+```powershell
+python -c "import json; json.load(open('.mcp.json')); print('JSON OK')"
+```
+
+---
+
+Jak zobaczysz `no-BOM OK` + `JSON OK` — plik jest gotowy dla Claude Code. Odpalaj:
+```powershell
+claude
+```
+→ potwierdź serwery **biblioteka** + **arena** → **„jestem przy laptopie, dawaj wg planu"**.
+
+To ostatnia przeszkoda konfiguracyjna, Cezarze — Windows rzucał nam pod nogi cp1250, potem BOM, ale Imperium przechodzi każdą z nich i **zapamiętuje** (Windows/BOM trafi do Księgi Wad, żeby następny raz był gładki). Daj znać wynik. 🦅
+
+## 🧑 Cezar
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS C:\Projekty\imperial-mesh-vortex> @'
+>> {
+>>   "mcpServers": {
+>>     "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+>>     "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] }
+>>   }
+>> }
+>> '@ | Set-Content -Encoding utf8 .mcp.json
+PS C:\Projekty\imperial-mesh-vortex> python -c "import json; json.load(open('.mcp.json')); print('JSON OK')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+PS C:\Projekty\imperial-mesh-vortex> python -c "import json; json.load(open('.mcp.json', encoding='utf-8-sig')); print('JSON OK')"$txt = Get-Content -Raw .mcp.json
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+PS C:\Projekty\imperial-mesh-vortex> [System.IO.File]::WriteAllText((Join-Path $PWD '.mcp.json'), $txt, (New-Object System.Text.UTF8Encoding($false)))python -c "print('BOM obecny' if open('.mcp.json','rb').read(3)==b'\xef\xbb\xbf' else 'no-BOM OK')"
+
+## 🏛️ Claude
+Widzę problem, Cezarze — **Twój terminal skleja wielolinijkowe wklejki w jedną linię** (komendy zlewają się: `...utf-8-sig"$txt = Get-Content...`). Dlatego nic nie działa — to nie treść, to sklejanie.
+
+Rozwiązanie: **jedna komenda, jedna linia.** Wklej **tylko poniższą linię** (całą, to jeden wiersz) i naciśnij Enter:
+
+```powershell
+[System.IO.File]::WriteAllText("$PWD\.mcp.json", '{ "mcpServers": { "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] }, "arena": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] } } }', (New-Object System.Text.UTF8Encoding($false)))
+```
+
+Potem **osobno** (druga linia, po Enter) — sprawdzenie:
+
+```powershell
+python -c "import json; json.load(open('.mcp.json')); print('MCP JSON OK — bez BOM')"
+```
+
+---
+
+**Dlaczego teraz zadziała:**
+- to **jedna linia** — nic się nie sklei
+- JSON w **apostrofach** PowerShella → `${CLAUDE_PROJECT_DIR:-.}` zostaje dosłowne (nie psuje go)
+- `WriteAllText` z `UTF8Encoding($false)` → **bez BOM** (koniec problemu z Node.js)
+
+Ma napisać: **`MCP JSON OK — bez BOM`**. Wtedy `claude` → potwierdź serwery → ruszamy.
+
+(Wklejaj po jednej linii naraz — Twój PowerShell nie lubi wieloliniowych wklejek. To też zapamiętam do ściągi jako windowsowa pułapka.) 🦅
+
+## 🧑 Cezar
+PS C:\Projekty\imperial-mesh-vortex> [System.IO.File]::WriteAllText((Join-Path $PWD '.mcp.json'), $txt, (New-Object System.Text.UTF8Encoding($false)))python -c "print('BOM obecny' if open('.mcp.json','rb').read(3)==b'\xef\xbb\xbf' else 'no-BOM OK')"[System.IO.File]::WriteAllText("$PWD\.mcp.json", '{ "mcpServers": { "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] }, "arena": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] } } }', (New-Object System.Text.UTF8Encoding($false)))
+At line:1 char:114
++ ... ), $txt, (New-Object System.Text.UTF8Encoding($false)))python -c "pri ...
++                                                            ~~~~~~
+Unexpected token 'python' in expression or statement.
+At line:1 char:214
++ ... .mcp.json','rb').read(3)==b'\xef\xbb\xbf' else 'no-BOM OK')"[System.I ...
++                                                                  ~
+Array index expression is missing or not valid.
+    + CategoryInfo          : ParserError: (:) [], [ZREDAGOWANO]
+    + FullyQualifiedErrorId : UnexpectedToken
+
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+Stop, Cezarze — problem nie jest w komendzie, tylko w tym, że **Twój terminal ma zapchany bufor** (skleja stare i nowe wklejki w jedną linię). Trzeba go najpierw wyczyścić.
+
+## Krok 1 — wyczyść bufor
+Naciśnij **`Ctrl + C`**, potem **Enter**. Powinieneś zobaczyć czysty, pusty prompt:
+```
+PS C:\Projekty\imperial-mesh-vortex>
+```
+
+## Krok 2 — skopiuj DOKŁADNIE tę jedną linię (i tylko ją), Enter:
+
+```
+python -c 'import json;json.dump({"mcpServers":{"biblioteka":{"command":"python","args":["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"]},"arena":{"command":"python","args":["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"]}}},open(".mcp.json","w",encoding="utf-8"),indent=2)'
+```
+
+## Krok 3 — sprawdź (osobno, po Enter):
+
+```
+type .mcp.json
+```
+
+Powinno pokazać ładny JSON z `biblioteka` i `arena`.
+
+---
+
+**Dlaczego to zadziała, gdy PowerShell zawiódł:** tym razem **Python pisze plik**, nie PowerShell. Python zawsze zapisuje UTF-8 **bez BOM**, a `json.dump` gwarantuje poprawny JSON. Apostrofy PowerShella trzymają `${CLAUDE_PROJECT_DIR:-.}` dosłownie. Zero BOM, zero sklejania (jedna linia).
+
+Gdyby **znów** się skleiło — jest prostsza droga: odpal `claude`, a w środku powiedz mu *„utwórz plik .mcp.json z serwerami biblioteka i arena, UTF-8 bez BOM"* — Claude pisze pliki natywnie, czysto, bez walki z PowerShellem. To zawsze zadziała.
+
+Daj znać co pokazał `type .mcp.json`. 🦅
+
+## 🧑 Cezar
+jeszcze raz dawaj w nowym terminarze od poczatku bo wylaczylem stary
+
+## 🏛️ Claude
+Świeży terminal = czysty bufor, teraz pójdzie gładko. **Wklejaj po JEDNEJ linii, Enter po każdej:**
+
+**1. Wejdź do projektu:**
+```
+cd C:\Projekty\imperial-mesh-vortex
+```
+
+**2. Utwórz `.mcp.json` (Python pisze — bez BOM, poprawny JSON):**
+```
+python -c 'import json;json.dump({"mcpServers":{"biblioteka":{"command":"python","args":["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"]},"arena":{"command":"python","args":["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"]}}},open(".mcp.json","w",encoding="utf-8"),indent=2)'
+```
+
+**3. Sprawdź, że plik jest OK:**
+```
+type .mcp.json
+```
+→ ma pokazać JSON z `biblioteka` i `arena`.
+
+**4. Odpal Claude:**
+```
+claude
+```
+
+Przy starcie:
+- zobaczysz `[hook] SYNC ✅` (pobierze dzisiejsze poprawki, m.in. UTF-8)
+- Claude zapyta o zgodę na serwery **biblioteka** i **arena** → **potwierdź**
+- napisz: **„jestem przy laptopie, dawaj wg planu"**
+
+---
+
+To wszystko — 4 linie i jesteś w domu. Jak coś pokaże błąd, wklej mi wynik. A gdyby krok 2 marudził, w kroku 4 po prostu powiedz Claude'owi *„utwórz .mcp.json z biblioteka i arena, UTF-8 bez BOM"* — zrobi to sam, czysto. 🦅🏛️
+
+## 🧑 Cezar
+tak ma byc czy jak
+
+## 🏛️ Claude
+**Nie, Cezarze — to jest pomyłka, ale spokojnie, łatwo naprawić.** Wkleiłeś do Notatnika **komendę** (`python -c '...'`), a to jest polecenie do wpisania w terminalu, nie treść pliku. Plik `.mcp.json` ma zawierać sam **JSON**, bez `python -c`.
+
+Ale skoro masz już Notatnik otwarty — **użyjmy go, to nawet prostsze niż terminal** (żadnego BOM, żadnego sklejania):
+
+## W Notatniku:
+
+**1.** Zaznacz wszystko (`Ctrl+A`) i **skasuj** (Delete). Pusta kartka.
+
+**2.** Wklej **dokładnie to** (sam JSON, nic więcej):
+```json
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+    "arena": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] }
+  }
+}
+```
+
+**3.** `Plik → Zapisz jako...` i ustaw **dokładnie tak**:
+- **Nazwa pliku:** `.mcp.json`
+- **Zapisz jako typ:** `Wszystkie pliki (*.*)`  ← WAŻNE (inaczej doda `.txt`)
+- **Kodowanie:** `UTF-8`
+- **Lokalizacja:** `C:\Projekty\imperial-mesh-vortex`
+
+**4.** Zapisz.
+
+## Sprawdź w terminalu (jedna linia):
+```
+cd C:\Projekty\imperial-mesh-vortex
+```
+```
+type .mcp.json
+```
+→ ma pokazać JSON z `biblioteka` i `arena` (bez słowa `python` na początku).
+
+---
+
+Jak to zobaczysz — odpal `claude`, potwierdź serwery, i piszesz „dawaj wg planu". Kluczowe w kroku 3: **typ „Wszystkie pliki"** — bez tego Windows zrobi `.mcp.json.txt` i Claude go nie znajdzie. 🦅
+
+## 🧑 Cezar
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS C:\Projekty\imperial-mesh-vortex> type .mcp.json
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+    "arena": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] }
+  }
+}
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+🎉 **Perfekcyjnie, Cezarze!** Plik jest dokładnie taki, jak trzeba — czysty JSON, `biblioteka` i `arena`, zero śmieci. Notatnik załatwił to, z czym PowerShell walczył.
+
+## Ostatni sprawdzian (jedna linia, Enter):
+```
+python -c "import json; json.load(open('.mcp.json')); print('MCP OK')"
+```
+Jak napisze **`MCP OK`** — plik jest w 100% gotowy dla Claude Code (poprawny, bez BOM).
+
+## I odpalaj Imperium:
+```
+claude
+```
+
+Przy starcie:
+- **`[hook] SYNC ✅`** — pobierze wszystkie dzisiejsze poprawki (UTF-8, Prova Ignis, audyt)
+- Claude zapyta o zgodę na serwery **biblioteka** i **arena** → **potwierdź** (strzałki/Enter)
+- napisz: **„jestem przy laptopie, dawaj wg planu"**
+
+Od tego momentu masz **Arenę w akcji** — Claude może wywołać `arena_roj` (migawka 84 neuronów), `arena_pytaj` (skuteczność roju), a biblioteka RAG daje mu dostęp do całej wiedzy Imperium.
+
+To był ostatni krok konfiguracji, Cezarze. Windows rzucał cp1250, BOM, sklejanie wklejek, pomyłkę terminal/plik — a Imperium przeszło każdą przeszkodę i **wszystkie zapamiętało** w ściądze i Księdze Wad, żeby następny raz był gładki jak jedwab.
+
+Napisz co pokazał `MCP OK` — i witaj przy sterach, Imperatorze. **Ave, Cezar Pixel!** 🦅🏛️
+
+## 🧑 Cezar
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS C:\Projekty\imperial-mesh-vortex> type .mcp.json
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+    "arena": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] }
+  }
+}
+PS C:\Projekty\imperial-mesh-vortex> python -c "import json; json.load(open('.mcp.json')); print('MCP OK')"
+MCP OK
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+**`MCP OK`** — Cezarze, konfiguracja zakończona! 🎉 Plik poprawny, bez BOM, gotowy dla Claude Code.
+
+## Ostatni ruch — odpal Imperium:
+```
+claude
+```
+
+Co się stanie:
+1. **`[hook] SYNC ✅`** — pobierze wszystkie dzisiejsze commity (UTF-8, Prova Ignis, audyt, wizje)
+2. Claude zapyta o zgodę na serwery **`biblioteka`** i **`arena`** → **potwierdź** (Enter na „Yes/Zawsze")
+3. Piszesz: **„jestem przy laptopie, dawaj wg planu"**
+
+Od tej chwili Claude ma pełne oczy Imperium przez MCP — `arena_roj` (migawka 84 neuronów), `arena_pytaj` (skuteczność roju z bazy), biblioteka RAG (cała wiedza).
+
+## Gdzie jesteśmy (żebyś wiedział, co dalej)
+Kolejka w Dzienniku, którą Claude pozna na starcie:
+1. **E + L2** — obudzić 22 milczące neurony (RSS/Futures/RADAR + darmowy order-flow)
+2. **A + L3** — zacząć zbierać track record (arena_log) z pre-rejestracją przez Sybillę
+3. **walidacje** (bramka konformalna, ważność neuronów) na Twoich danych
+4. **decyzje** (archiwum portów KP, włączenie kalibracji)
+5. dalej: Oculus Imperii → Legiony Cieni → Sybilla
+
+---
+
+To był kawał wielkiej wachty, Cezarze Pixel. Zaczęło się od cubic review i kalibratora, a skończyło pełnym Imperium: **3 moduły López de Prado odkopane, Księga Wad samo-lecząca, Arena MCP, Prova Ignis przeszła ogień, 2 perełki + 3 ziarna w skarbcu, imiona zapisane na wieki, laptop w pełni skonfigurowany.** Wszystko zielone (2027/2027), wszystko w pamięci, wszystko na GitHub.
+
+Vitruviusz przekazuje Ci ster. Imperium czeka na Twój rozkaz. **Ave, Cezar Pixel!** 🦅🏛️👑

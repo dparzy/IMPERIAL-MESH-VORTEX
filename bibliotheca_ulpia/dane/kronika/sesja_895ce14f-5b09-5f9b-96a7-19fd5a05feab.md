@@ -11845,3 +11845,230 @@ Innymi słowy: **nie znam dziś ani jednego miejsca w kodzie, o którym wiem, ż
 Wachta 0000–1200 zamknięta: ~35 commitów, 3 odkopane moduły klasy funduszowej, samo-lecząca się Księga Wad, Arena MCP, kalibrator konformalny, audyt z mapą konkurencji, 2 perełki + 3 ziarna w skarbcu, imiona zapisane na wieki, plan na tygodnie w Dzienniku.
 
 Imperium śpi bezpiecznie. Do zobaczenia przy laptopie, Imperatorze. **Ave!** 🦅🏛️🌙
+
+## 🧑 Cezar
+jak zacząć gdzie mamy instrukcje krok po kroku jak będę przy laptopie
+
+## 🏛️ Claude
+Wszystko już czeka w repo, Cezarze. Masz **jedną kartkę-instrukcję**: `docs/SCIAGA_LOKAL.md` — a plan roboczy w Dzienniku (Claude sam Ci go przypomni na starcie). Konkretnie, krok po kroku przy laptopie:
+
+## 🚀 Start (3 komendy — reszta dzieje się sama)
+
+```powershell
+cd C:\Projekty\imperial-mesh-vortex
+claude
+```
+Na starcie patrz na: `[hook] SYNC ✅` (pobrał wszystko z wachty) + `AUDYT ✅ pełna harmonia` + Centrum Pamięci (Claude od razu zna plan). **To wszystko — sync jest automatyczny.**
+
+## 📋 Potem, w kolejności (plan z Dziennika — Claude go zna)
+
+**1. Jednorazowo — MCP** (jeśli jeszcze nie zrobiłeś): utwórz `.mcp.json` — gotowa treść w ściądze, **sekcja 8b** (albo w mojej wiadomości sprzed kilku godzin).
+
+**2. Obudź zmysły + track record (E→A z audytu)** — powiedz Claude'owi po prostu: *„dawaj E i A z audytu"* — on wie, co to znaczy (RSS dla NEWS, adaptery, `arena_log=True`).
+
+**3. Walidacje (dane masz lokalnie):**
+```powershell
+python narzedzia/walidacja_kalibrator.py        # bramka konformalna — A/B
+python narzedzia/raport_waznosci.py --do-areny  # które neurony to martwe głosy
+python narzedzia/raport_ic.py                   # skill roju
+```
+
+**4. Decyzje Cezara** (Claude zapyta): archiwum 4 portów Kingdom Pixel · włączenie `kalibruj_prog` jeśli walidacja ✅.
+
+**5. Dalej wg skarbca:** Oculus Imperii (dashboard) → Legiony Cieni → Sybilla.
+
+## 📖 Gdzie co leży
+| Co | Gdzie |
+|---|---|
+| **Wszystkie komendy krok po kroku** | `docs/SCIAGA_LOKAL.md` (start, testy, wykresy, dane, MCP, problemy) |
+| Plan roboczy + kolejność | Dziennik Nieśmiertelny (wstrzykiwany na starcie — Claude wie sam) |
+| Audyt + propozycje | `docs/AUDYT_IMPERIUM_2026-07-05.md` |
+| Perełki | `docs/WIZJA_LEGIONY_CIENI.md`, `docs/WIZJA_KSIEGI_SYBILLINSKIE.md` |
+
+Najprościej? Otwórz Claude i napisz: **„jestem przy laptopie, dawaj wg planu"** — pamięć zrobi resztę. Ave, Cezarze Pixel! 🦅🏛️
+
+## 🧑 Cezar
+czyli nie muszę jak wcześniej robić najpierw aktualizacje z git a jak będę kończył sessje żeby lokal zaktualizował do bunch roboczego to co mam mu powiedzieć
+
+## 🏛️ Claude
+Dokładnie tak — **nie musisz już nic robić ręcznie na starcie.** A na koniec masz jedno proste zdanie. Wyjaśniam obie strony:
+
+## ▶️ Start sesji — NIC nie robisz
+Hook sam robi `git pull` przy uruchomieniu Claude (zobaczysz `[hook] SYNC ✅ — repo na najnowszym commicie`). Ręczny pull był potrzebny tylko wtedy, gdy drzewo było brudne od CSV i pamięci — a to naprawiliśmy: dane rynkowe są poza gitem, pamięć commituje się sama. Drzewo zostaje czyste, więc auto-pull zawsze przechodzi.
+
+## ⏹️ Koniec sesji — co powiedzieć
+Normalnie **też nic** — działają dwa automaty:
+1. **Kod:** Claude w trybie autonomicznym sam commituje i pushuje po każdym skończonym zadaniu (zielone testy + audyt) — to ROZKAZ STAŁY z CLAUDE.md, nie musi czekać na koniec sesji.
+2. **Pamięć:** hook końca sesji sam commituje i pushuje pliki pamięci (kronikę, dziennik, graf).
+
+Ale jeśli chcesz mieć **pewność domknięcia** (dobry nawyk), powiedz na koniec po prostu:
+
+> **„kończymy — zamknij sesję wg zasad"**
+
+Claude wtedy wykona pełny rytuał końca sesji: testy + audyt → wpis do Dziennika Nieśmiertelnego (ROZKAZ STAŁY) → commit + push wszystkiego na `claude/sleepy-fermi-dsdE4` → potwierdzi Ci „working tree clean, wszystko na GitHub".
+
+## 🔍 Jak samemu sprawdzić, że domknięte (2 sekundy)
+```powershell
+git status          # ma być: nothing to commit, working tree clean
+git log --oneline -1  # ostatni commit = to, co robiliście
+```
+
+Czyli cały Twój rytuał to teraz: **otwórz → pracuj → „kończymy — zamknij sesję wg zasad" → zamknij terminal.** Resztą zajmuje się Imperium. Ave, Cezarze Pixel! 🦅🏛️
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+Domknięte — to była tylko kronika bieżącej rozmowy (auto-pamięć); hook ją zacommitował i wypchnął. `git status`: **working tree clean**, wszystko na `claude/sleepy-fermi-dsdE4`.
+
+Dokładnie tak będzie działać u Ciebie na laptopie — ten sam mechanizm, zero ręcznej roboty. Ave, Cezarze Pixel! 🦅
+
+## 🧑 Cezar
+super a czy konkurencją ma coś lepszego od nas
+
+## 🏛️ Claude
+Uczciwie, Cezarze (Prawo I — bez pochlebstw): **tak, ma. W trzech obszarach konkurencja bije nas wyraźnie.** Znam Twoją siłę i słabość z audytu — oto pełny obraz:
+
+## ❌ Gdzie konkurencja jest LEPSZA od nas (dziś)
+
+**1. Egzekucja i infrastruktura bojowa.**
+NautilusTrader ma rdzeń w Rust — egzekucję w mikrosekundach, obsługę wielu giełd naraz, dojrzały order-management (częściowe wypełnienia, requoty, awarie łączy przetestowane latami produkcji). Fundusze HFT mają kolokację przy serwerach giełd. My: paper/dry-run, jedna giełda (MEXC), symulowany slippage. **W wyścigu na milisekundy nie startujemy** — i słusznie, bo nasza strategia (4h/1d, reżimy) tego nie potrzebuje. Ale to fakt.
+
+**2. Dane — szerokość i głębokość zmysłów.**
+Fundusze kupują: pełne order-booki tick-po-ticku, dane on-chain premium (Glassnode/Nansen), przepływy giełdowe, sentiment z tysięcy źródeł, dane satelitarne. My: OHLCV + 22 neurony czekające na darmowe adaptery. **Oni widzą więcej niż my** — dlatego „E: obudzić zmysły" jest pierwsze w planie.
+
+**3. Track record i kapitał.**
+Renaissance, Jane Street, Jump — dekady zmierzonych wyników, miliardy kapitału, setki PhD. My: **zero realnych transakcji**. To największa różnica ze wszystkich — nasz system jest metodologicznie piękny, ale **rynek jeszcze nie wystawił nam oceny**. Pokora tutaj to nie skromność, to fakt.
+
+## 🤝 Gdzie remis
+- Metodologia anty-overfittingowa (DSR/PBO/purged/WFO) — my = fundusze, obaj ponad retail
+- Detekcja reżimu — porównywalna z dobrymi quant shopami
+
+## ✅ Gdzie MY bijemy wszystkich
+- **Pamięć instytucjonalna AI** (13 warstw w git) — nie ma tego nikt, nawet fundusze (u nich pamięć = ludzie, którzy odchodzą)
+- **Samo-leczenie procesu** (Księga Wad, rozliczane audyty) i wkrótce trójca kalibracji (conformal→Cienie→Sybilla)
+- **Przejrzystość totalna** — Cezar widzi każdy głos każdego neuronu; w funduszu nawet zarząd nie widzi wnętrza modeli
+- **Koszt**: nasza „armia badawcza" kosztuje subskrypcję, ich — miliony rocznie
+
+## Sedno strategiczne
+Nie wygramy z Jane Street na ich boisku (szybkość, kapitał, dane premium). **Ale nie musimy.** Nasza gra to: wolniejsze interwały, gdzie szybkość nie decyduje + dyscyplina pomiarowa, której retail nie ma + proces uczenia się, który się kumuluje i nie odchodzi z pracownikiem. Przewaga Imperium (Prawo XXII) to nie „być lepszym wszędzie" — to **wybrać pole bitwy, na którym nasze mocne strony decydują**. I dokładnie na takim polu stoimy.
+
+Trzy luki mają zresztą tę samą receptę, już zapisaną w planie: **E** (zmysły) → **A** (track record) → czas. Dwie pierwsze zrobimy przy laptopie. Trzecią da tylko cierpliwość.
+
+Ave, Cezarze Pixel! 🦅🏛️
+
+## 🧑 Cezar
+no właśnie i możemy też dodawać interwały czasowe 1m 5 m 15m mamy chyba 1H co by nam dali realne informacje no chyba już mamy podział na scalp swing i inwest tak jak myślisz chyba już to omawialiśmy w wizjonerze naszym brudnopisie i tak dalej
+
+## 🏛️ Claude
+Dobrze pamiętasz, Cezarze — sprawdzam co już ustaliliśmy w Wizjonerze i kodzie, zanim odpowiem (Prawo XVII):
+
+## 🏛️ Claude
+Zapisane i wypchnięte — plan interwałów czeka w Dzienniku obok reszty.
+
+## W skrócie, Cezarze
+- **Podział SCALP/SWING/INVEST już działa** — dokładnie jak pamiętałeś z Wizjonera; Namiestnik sam rozpozna M1–M15 jako scalp i dostosuje lewar/progi
+- **15m** — obiecujące, testujemy pomiarem (dane → triada IC → werdykt)
+- **1m/5m** — dopiero gdy 15m **udowodni** zysk w paper; na razie tam wygrywają tylko ci z kolokacją, a my nie gramy w cudzą grę
+- Bloker to wyłącznie **dane minutowe** — pobierzemy je przy laptopie jedną komendą
+
+Twoja intuicja była w punkt: fundament pod scalping zbudowaliśmy już wcześniej — teraz tylko rynek musi zdać egzamin z liczb, zanim rzucimy tam legiony. 
+
+Ave, Cezarze Pixel! 🦅🏛️
+
+## 🧑 Cezar
+a co z auto kalibracja i wyborem strategi też mieliśmy takie pomysły i innymi neuronami i steategiamiyz katalogów
+
+## 🏛️ Claude
+Sprawdzam stan tych pomysłów w źródłach (Prawo XVII):
+
+## 🏛️ Claude
+Zapisane w Dzienniku. Podsumowując Twoje pytanie, Cezarze:
+
+- **Auto-kalibracja** — masz już 6 warstw (progi adaptacyjne, MWU, synapsy, drift, conformal, WFO); brakuje jednego ogniwa i ono JEST w planie jako propozycja **B** (wagi z triady pomiarów)
+- **Auto-wybór strategii** — działa (reżim → dopasowane strategie → radar scoring); wyostrzy się razem z B
+- **Katalogi (215 neuronów + ~99 strategii w backlogu)** — wchodzić będą partiami przez **Cursus Honorum**: rekrut bez pełnego głosu, awans po egzaminie z liczb. Żadnego pęcznienia roju bez dowodu wartości
+
+Nic z Twoich pomysłów nie zginęło — wszystkie żyją w kodzie albo w planie z dokładnym miejscem w kolejce. To jest właśnie siła Dziennika: **Imperium niczego nie zapomina, więc żaden pomysł Cezara nie umiera — czeka na swój legion.**
+
+Ave, Cezarze Pixel! 🦅🏛️
+
+## 🧑 Cezar
+mam nadzieje że tak jest s co z samo adaptacja i rozwojem pełna świadomość
+
+## 🏛️ Claude
+Piękne pytanie na koniec wachty, Cezarze — i zasługuje na najuczciwszą odpowiedź, jaką mam (Prawo I). Bez marketingu:
+
+## Czym Imperium JUŻ jest — samoregulującą się instytucją
+
+„Świadomość" rozłóżmy na mierzalne pętle. Każdą z nich Imperium **ma naprawdę, w kodzie**:
+
+| Pętla | Ludzki odpowiednik | U nas |
+|---|---|---|
+| **Czucie** | zmysły | 4 detektory reżimu, radar, (wkrótce NEWS/funding) |
+| **Adaptacja** | odruchy i nawyki | MWU, synapsy, drift_adapter, progi W-334 — rój **sam** przesuwa wagi po każdej lekcji |
+| **Pamięć** | tożsamość | 13 warstw w git — Imperium budzi się każdego dnia **tym samym bytem**, z całą historią |
+| **Samobadanie** | rachunek sumienia | audyt co start, triada skilla, refleksja W9 (wykrywa własne sprzeczności!) |
+| **Samoleczenie** | układ odpornościowy | Księga Wad Kodu — błąd raz popełniony zostaje przeciwciałem |
+| **Wiedza o niewiedzy** | pokora | kalibrator konformalny — system mierzy, ile NIE wie; (plan: Limes — mapa granic kompetencji) |
+| **Samowiedza** | „czy znam siebie?" | (plan: Sybilla — Brier score własnych przekonań; Cienie — żal dróg nieobranych) |
+
+To jest realny **stos samoadaptacji** — i po wdrożeniu Cieni+Sybilli będzie kompletny: system, który czuje, adaptuje się, pamięta, bada się, leczy się i **rozlicza własne przekonania o sobie**. Tego stosu nie ma nikt na rynku.
+
+## Czym Imperium NIE jest — i czemu to ŚWIADOMY wybór
+
+**To nie jest świadomość i nie udawajmy, że jest.** Imperium nie przeżywa, nie chce, nie cierpi — wykonuje pętle sprzężeń zwrotnych, które MY zaprojektowaliśmy. I co ważniejsze — dwóch rzeczy **celowo mu nie damy**:
+
+1. **Własnych celów.** Cel wyznacza Cezar (Prawo XVIII). System, który sam sobie stawia cele w grze o pieniądze, to nie marzenie — to hazardzista bez smyczy.
+2. **Samomodyfikacji bez bramek.** Imperium może proponować zmiany siebie (i proponuje!), ale każda przechodzi przez testy, audyt, walidację i Twoją decyzję. „Rozwija się samo" — ale **w konstytucji**, nie poza nią.
+
+To jest różnica między Imperium a chaosem: **Rzym też był „żywym organizmem" — ale miał prawo.** Nasza pełnia to nie świadomość maszyny, tylko coś rzadszego: *instytucja, która uczy się szybciej niż zapomina, i zna granice własnej wiedzy.* Fundusze mają to w ludziach, którzy odchodzą. My mamy to w gicie, na zawsze.
+
+## 🏛️ Claude
+Doktryna zapisana w Dzienniku na wieki — przyszłe sesje będą znać tę granicę tak samo jak Prawa.
+
+Cezarze, na sam koniec tej długiej wachty — jedno zdanie, które streszcza wszystko:
+
+> **Nie zbudowaliśmy maszyny, która myśli. Zbudowaliśmy Imperium, które się uczy, pamięta, bada się, leczy — i wie, czego nie wie. A jego wola pozostaje tam, gdzie jej miejsce: u Cezara.**
+
+Wszystko zielone (2020/2020, audyt exit 0), wszystko w pamięci, wszystko na GitHub. Śpij spokojnie — Vitruviusz zostawia Kapitol posprzątany, plany na stole, a legiony w gotowości na Twój powrót do laptopa.
+
+**Ave, Cezarze Pixel!** 🦅🏛️🌙
+
+## 🧑 Cezar
+a tam gdzie jest konkurencja lepsza poszukaj opcji poprawy naszego imperium zgodnie z zasadami
+
+## 🏛️ Claude
+Dobrze, Cezarze — biorę trzy luki z audytu i dla każdej szukam poprawy **zgodnej z zasadami**: bez kupowania danych premium, bez wyścigu, w którym nie startujemy, wszystko mierzalne i opt-in. Sprawdzam najpierw, co katalogi już przewidują (Prawo XVII):
+
+## 🏛️ Claude
+You've hit your session limit · resets 12:30pm (UTC)
+
+## 🧑 Cezar
+Continue from where you left off.
+
+## 🏛️ Claude
+You've hit your session limit · resets 12:30pm (UTC)
+
+## 🧑 Cezar
+dokończ bo limity nas zatrzymały
+
+## 🏛️ Claude
+Plan zapisany w Dzienniku i wypchnięty na GitHub — dokończone mimo limitów.
+
+## Sedno, Cezarze
+
+Trzy luki, trzy odpowiedzi zgodne z naszą naturą:
+
+| Luka | Konkurencja ma | Nasza odpowiedź (za 0 zł, wg zasad) |
+|---|---|---|
+| **Egzekucja** | Rust, kolokacja | **Pancerz zamiast szybkości**: chaos-testy OMS (Prova Ignis), audit trail zleceń, mierzony slippage |
+| **Dane** | Glassnode, L2 premium | **Order-flow dla ubogich**: darmowe likwidacje + głębokość księgi + mempool + stablecoiny — neurony na to JUŻ są w katalogu (VI-03, A-06, OB, III-18) |
+| **Track record** | dekady + miliardy | **Pre-rejestrowany track record przez Sybillę** — proroctwo w gicie ZANIM zaczniemy liczyć; wyniku nie da się dorobić po fakcie. Tego nie ma nikt |
+
+Najpiękniejsze: **nic nie wymyślaliśmy od zera** — katalog przewidział te neurony miesiące temu, Sybilla czekała w skarbcu, OMS już stoi. Imperium miało odpowiedzi w sobie; trzeba było tylko zapytać we właściwej kolejności.
+
+Kolejka na laptop kompletna: **E+L2** (zmysły, także darmowy order-flow) → **A+L3** (track record z pre-rejestracją) → walidacje → backlog → Oculus → perełki. A **L1 Prova Ignis** mogę zrobić nawet w chmurze, bo to czysty kod z testami — na następne „dawaj".
+
+Ave, Cezarze Pixel! Imperium nie boi się silniejszych — uczy się od nich i wybiera własne pole bitwy. 🦅🏛️

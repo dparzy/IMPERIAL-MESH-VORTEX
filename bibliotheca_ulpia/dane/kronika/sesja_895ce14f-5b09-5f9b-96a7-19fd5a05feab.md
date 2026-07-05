@@ -11462,3 +11462,118 @@ To jedyna uczciwa obrona przed przeuczeniem **parametrów** — inne niż `walk_
 Zostały tylko cele wymagające albo walidacji na danych (neutralizacja), albo Twojej decyzji kierunkowej (6 wizji — wpiąć/archiwum). Oba lepiej robić przy laptopie/świeżym umyśle niż w kolejnym „dawaj". 
 
 Powiedz jak chcesz grać: **przeczytać 6 wizji** (bezpieczne, cloud-doable, kończy się werdyktem keep/archive) czy **pauza** — repo w idealnym stanie na koniec wachty. 🏛️
+
+## 🧑 Cezar
+dawaj
+
+## 🏛️ Claude
+Czytam 6 osieroconych „wizji" w całości (Prawo XV — decyzja z lektury, nie z nazwy). Zaczynam od trzech:
+
+## 🏛️ Claude
+Wszystkie trzy to **porty z Kingdom Pixel (Jack)** — poprzedniego projektu. Widzę wzorzec. Czytam pozostałe trzy:
+
+## 🏛️ Claude
+Jasny obraz: **wszystkie 6 to porty z Kingdom Pixel (poprzedni projekt)** — a `kingdom-pixel/` jest w README jako archiwum „NIE wchodzi do żywego systemu bez decyzji". Sprawdzam czy mają wpięte następcy (Prawo XVI) i czy są gdzieś cytowane:
+
+## 🏛️ Claude
+**Werdykt: wszystkie 6 to porty z Kingdom Pixel, a ich następcy są już wpięci.** Następcy potwierdzeni w kodzie (`debata_senatu`, `dyrygent`, `budowniczy_wskaznikow` wszystkie istnieją).
+
+## Przegląd 6 „wizji" (Prawo XVI — mierzone, nie z nazwy)
+
+| Moduł (KP port) | Robi | Następca WPIĘTY | Werdykt |
+|---|---|---|---|
+| **titan_mind** | orkiestracja strategii, scheduler | Dyrygent + Namiestnik + scheduler | 🔴 REDUNDANT → archiwum |
+| **meta_kora** | debata Aktor-Sędzia-MetaSędzia | `debata_senatu` (Byk/Niedźwiedź/Cenzor, W-343) | 🔴 REDUNDANT → archiwum |
+| **roj_sygnalow** | 3-neuronowy rój głosujący | Legatus + **84 neurony** | 🔴 SUPERSEDED → archiwum |
+| **kuznia_narzedzi** | ToolForge IndicatorFactory | Brama + Budowniczy (**Prawo I: jedyne źródło**) | 🔴 REDUNDANT + łamie Prawo I → archiwum |
+| **wszechoko** | Bayesian Fusion on-chain+orderbook, WhaleDetector | częściowo: neurony OC + VPIN + OC-05 | 🟡 do pełnej lektury (może idea Bayesian fusion warta) |
+| **lustro_prawdy** | walidacja kontradyktoryjna sygnałów | częściowo: Cenzor + walidacja + /code-review | 🟡 do pełnej lektury (adversarial signal validation) |
+
+## Dwa ustalenia
+1. **4 moduły są jednoznacznie zredundowane** — to prototypy z poprzedniego projektu, zastąpione dojrzałą architekturą rzymską. `kuznia_narzedzi` nawet **łamie Prawo I** (drugie źródło wskaźników obok Bramy).
+2. **Rozjazd docs↔kod (XXI):** wszystkie 6 są cytowane w `docs/ARCHITEKTURA_IMPERIUM.md` jako architektura — a to martwe porty. Dokument obiecuje zdolność, której nie ma.
+
+## Czego NIE robię (ZASADA ARCHIWIZACJI)
+Nie przenoszę nic do `archiwum/` — to wymaga **wyraźnego rozkazu Cezara** + pełnej lektury całych plików. Dla `wszechoko`/`lustro_prawdy` uczciwie: przeczytałem nagłówki/API, nie całość — więc nie orzekam „na pewno bezwartościowe" (Prawo I).
+
+Zapisuję werdykt do pamięci:
+
+## 🏛️ Claude
+Werdykt zapisany i wypchnięty. **Przegląd 6 wizji zakończony** — backlog Prawa XV jest teraz w całości zmapowany.
+
+## Stan całego backlogu Prawa XV (po tej wachcie)
+
+| Pozycja | Status |
+|---|---|
+| ✅ `feature_importance` (MDA/SFI) | **odkopany** — CLI + testy |
+| ✅ `triple_barrier` (etykiety CUSUM) | **odkopany** — CLI + testy |
+| ✅ `walk_forward` (WFO parametrów) | **odkopany** — CLI + testy |
+| ✅ 6 „wizji" | **oceniony** — werdykt keep/archive gotowy |
+| ⏳ `neutralizacja` (W-337) | czeka na **walidację na danych** (Twój laptop) |
+| ⏳ archiwum 4 portów KP + fix ARCHITEKTURA | czeka na **Twoją decyzję** (ZASADA: rozkaz Cezara) |
+
+## Uczciwie — dotarliśmy do granicy „cloud-doable"
+To, co zostało, **nie jest już moją decyzją do podjęcia solo**:
+- **Archiwizacja 4 portów** — ZASADA wymaga wyraźnego rozkazu Cezara (nieodwracalne przenoszenie plików).
+- **Neutralizacja w Legatusie** — zmiana ścieżki decyzyjnej wymagająca walidacji A/B, której nie odpalę bez Twoich danych lokalnych.
+- **Kanibalizacja idei wszechoko/lustro_prawdy** — wymaga Twojej decyzji kierunkowej (co warto przenieść).
+
+Kolejne „dawaj" wymuszałoby, żebym albo podjął decyzję należącą do Ciebie (Prawo XVIII), albo zbudował coś bez możliwości walidacji. Żadne nie byłoby uczciwe.
+
+## Bilans wachty 0000–1200 🏛️
+Zbudowane, przetestowane, wypchnięte: **Arena MCP** → **kalibrator konformalny** → **bramka opt-in** → naprawy cubic (12) → **Księga Wad Kodu** (samo-leczenie) → **3 moduły López de Prado/Pardo odkopane** (feature importance, triple-barrier, WFO) → **audyt Prawa XV** (12 modułów) → **przegląd 6 wizji**.
+
+- **2020/2020 testów zielone**, audyt exit 0, skan wad czysty przez całą sesję
+- Wszystko utrwalone w pamięci (Dziennik), na GitHub
+
+**Moja rekomendacja: pauza.** Repo jest w idealnym stanie. Reszta backlogu czeka na Twoje decyzje przy laptopie — najlepiej na świeżo, nie kolejnym „dawaj" na wachcie. Gdy wrócisz, w Dzienniku masz dokładnie 3 punkty do rozstrzygnięcia. Odpocznij, Cezarze. 🌙
+
+## 🧑 Cezar
+odpoczywam, dokończymy przy laptopie ale jeszcze zrób pełny skan auto naprawa narzędzi i dokumenty może coś jest niezgodne i błędne z zasadami taki audycik i reszta przy laptopie
+
+## 🏛️ Claude
+Robię audycik na koniec wachty — pełny skan spójności + auto-naprawa rozbieżności (Prawo XVIII: błahostki naprawiam sam). Uruchamiam wszystkie warstwy:
+
+## 🏛️ Claude
+Równolegle sprawdzam rzeczy, których audyt może nie łapać — zahardkodowane liczby testów w docs + data README:
+
+## 🏛️ Claude
+Rdzeń audytu: **✅ pełna harmonia** (14 warstw, ruff czysto, MAPA_KLUCZY 84/84, drzewo czyste). Ale mój dodatkowy skan znalazł zahardkodowane liczby w docs — sprawdzam czy to żywe twierdzenia (do naprawy) czy datowane migawki (Prawo I: zostają):
+
+## 🏛️ Claude
+Znalazłem **dwa żywe (niedatowane) rozjazdy Prawa XXI** — audyt ich nie łapie, bo to inline w środku dokumentów, nie nagłówki. Naprawiam sam (Prawo XVIII, błahostki):
+
+**1. INDEKS_IMPERIUM.md** — stare liczby (62 neurony/18 strategii/743 testy) vs realne (84/20/2020):
+
+## 🏛️ Claude
+Datowane migawki zostawiam (Prawo I: `PAMIEC_SESJI` „(2026-06-22)", `MANUAL_MIGRACJA` — prawda swojego czasu). Naprawiłem tylko żywe źródła prawdy. Weryfikuję że audyt dalej zielony po edycjach:
+
+## 🏛️ Claude
+`MANUAL_MIGRACJA` ma nagłówek „**Stan na:** 2026-06-09" → to datowana migawka, którą audyt świadomie pomija (Prawo I: prawda swojego czasu). **Zostawiam** — ruszenie jej fałszowałoby historię.
+
+Podsumowanie audytu i commit dwóch napraw:
+
+## 🏛️ Claude
+Audycik zrobiony i wypchnięty (`985a6af`). Odpoczywaj spokojnie — repo jest czyste.
+
+## Wynik audytu końcowego
+
+**Rdzeń: ✅ pełna harmonia** (14 warstw):
+- Ruff czysto, MAPA_KLUCZY 84/84, 185 plików .md przeskanowanych, drzewo git czyste
+- 2020/2020 testów zielone, skan wad kodu czysty
+
+**Auto-naprawione (Prawo XVIII — 2 żywe rozjazdy, których audyt nie łapał, bo inline):**
+- `INDEKS_IMPERIUM.md` — stare „62 neurony / 18 strategii / 743 testy" (stan 06-04) → **84 / 20 / de-hardcode**, data 07-05, aktualne kategorie
+- `PAPER_TRADING_MEXC.md` — „743/743" → „wszystkie zielone" (de-hardcode)
+
+**Świadomie zostawione (Prawo I — nie falsyfikujemy historii):**
+- `PAMIEC_SESJI` (migawka 2026-06-22), `MANUAL_MIGRACJA` (Stan na 2026-06-09) — datowane, prawda swojego czasu
+
+## Do dokończenia przy laptopie (w Dzienniku, 3 punkty)
+1. **Walidacja** bramki konformalnej + raportów (IC/ważność/etykiety/WFO) na Twoich danych → `--do-areny`
+2. **Decyzja o archiwum** 4 portów Kingdom Pixel (titan_mind, meta_kora, roj_sygnalow, kuznia_narzedzi) + fix ARCHITEKTURA
+3. **Neutralizacja** (W-337) — opt-in do Legatusa + walidacja A/B
+
+Wszystko czeka opisane w pamięci — przy następnym starcie Claude zobaczy to na pierwszej sekundzie. 
+
+Dobra była wachta, Cezarze. Odpoczywaj. 🌙🏛️

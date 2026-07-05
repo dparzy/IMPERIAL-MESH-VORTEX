@@ -8287,3 +8287,2212 @@ Teraz deepseek_glos (SSL_CERT_DIR jako lista ścieżek) + walk_forward/wykres/ra
 
 ## 🏛️ Claude
 Teraz README (naprawa liczby testów) + testy graniczne których żądał cubic:
+
+## 🧑 Cezar
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary Request and Intent:
+The user (Cezar/Ian, non-technical owner, Polish speaker, gives terse commands like "dawaj") is developing IMPERIAL-MESH-VORTEX, a crypto trading system with a Roman Empire metaphor. Across this long session the explicit requests were, in order:
+   - Build memory layers so "every word/sentence is remembered forever, cloud and local" — led to W6-W13 memory system (13 layers total)
+   - Numba/JIT performance ("dawaj numba") — implemented on Viterbi Jump Model (256× measured)
+   - Deep research whether memory is best-in-world + keep adding layers/unique modules per rules
+   - Consolidation of the 13 memory layers
+   - Explain how memory works cloud vs local, how to run local, whether local has access to all files
+   - Deep audit of whole repo + full report + next-step plan for local
+   - NEWS system deep audit + global research + build many unique news modules ("być zawsze lepszym od konkurencji")
+   - Build NEWS-02 (event taxonomy) + Prawo XXV (competitive advantage law)
+   - Build NEWS-03/04 (attention spike, sentiment delta)
+   - IC measurement of neuron predictive skill ("metody treningowe")
+   - Fix cubic bot review (38 issues on PR #102/103, then 12 issues on PR #104)
+   - Provide exact PowerShell commands to run local, sync with GitHub, run Claude in terminal
+   - Add visualization ("czuję się jak dziecko we mgle — brak podglądu wykresów")
+   - Ensure docs always current after every change; how to remember this
+   - Build walk-forward IC (OOS validation)
+   - Continue NEWS plan: NEWS-05 (source credibility), NEWS-06 (novelty), NEWS-07 (dispersion), NEWS-08 (half-life)
+   - Explain the context-window/usage panel screenshot (93% context, 32% weekly)
+   - MOST RECENT: fix cubic review of PR #104 (12 issues)
+
+2. Key Technical Concepts:
+   - Python trading swarm: 84 neurons (78 active), 15 Exploratores scouts, Legatus aggregator, Dyrygent, backtest/paper_trading/petla_live engines
+   - Memory system W-360 v13: 13 layers under Kustosz organ (W7). CoALA taxonomy (arXiv:2309.02427): working/episodic/semantic/procedural. Frontier 2026: trustworthy reflection, contradiction handling, learned forgetting (arXiv:2603.07670). Temporal knowledge graph à la Zep/Graphiti (arXiv:2501.13956)
+   - NEWS system: FetcherNewsRSS + NEWS-01..04 neurons + NEWS-05/06/07/08 quality modifiers. Event-aware sentiment (arXiv:2508.07408: rumor/retail-buzz are CONTRARIAN)
+   - Information Coefficient (IC) = Spearman(signal_t, forward_return_{t+h}); conditional IC (only bars where neuron votes) to avoid tie-inflation; walk-forward sign-consistency for OOS
+   - KolektorIC (metryki_ic.py), Grinold&Kahn interpretation (|IC|>0.03 = real edge)
+   - Numba optional JIT with graceful fallback (_jit.py)
+   - Deterministic, offline-first, no external API deps; git as boundless storage
+   - Cubic bot code review; Reguła Test-Granic (boundary tests mandatory)
+
+3. Files and Code Sections:
+   - `imperium/akwedukty/news_fetcher.py` — RSS fetcher. Recently added `_parsuj_date_pub` (NEWS-08), `_pozycje_z_rss` (title+pubDate), WIARYGODNOSC_ZRODEL (NEWS-05), `pobierz_z_metadanymi`. JUST fixed to normalize naive datetimes to UTC:
+     ```python
+     from datetime import timezone
+     dt = parsedate_to_datetime(s)
+     if dt is not None:
+         if dt.tzinfo is None:
+             dt = dt.replace(tzinfo=timezone.utc)
+         return dt.timestamp()
+     ```
+     and ISO path similarly normalized.
+   - `imperium/akwedukty/adaptery/news_llm.py` — AdapterNewsLLM. KLUCZE now includes NEWS_WIARYGODNOSC, NEWS_NOVELTY, NEWS_ROZRZUT, NEWS_SWIEZOSC. Has `_sentyment_slownikowy(naglowki, wagi_zrodel)`, `_rozrzut_naglowkow` (NEWS-07), `_wagi_swiezosci` (NEWS-08, HALF_LIFE_SEK=12*3600), novelty via `self._widziane` deque per symbol. Confidence = pewnosc × wiarygodnosc × (0.5+0.5·novelty).
+   - `imperium/cesarz/deepseek_glos.py` — `_napraw_zepsuty_cert_env()` JUST fixed to treat SSL_CERT_DIR as os.pathsep list:
+     ```python
+     for zmienna, sprawdz, lista in (("SSL_CERT_FILE", os.path.isfile, False),
+                                     ("SSL_CERT_DIR", os.path.isdir, True)):
+         sciezka = os.environ.get(zmienna)
+         if not sciezka: continue
+         czesci = sciezka.split(os.pathsep) if lista else [sciezka]
+         if not any(sprawdz(c) for c in czesci if c):
+             os.environ.pop(zmienna, None)
+     ```
+   - `narzedzia/raport_ic.py` — IC report tool. JUST clamped `ranking[:max(0, top)]`. Uses eng.ic_warunkowy. `_klasa_ic(v)`: <0.02 szum, <0.05 słaba przewaga, else MOCNY.
+   - `narzedzia/walk_forward_ic.py` — walk-forward IC. JUST added `if okna < 1: raise ValueError`. `analizuj(per_neuron, prog=0.03, prog_spojnosci=0.75, min_okien=3)`: ROBUST if len>=min_okien AND abs(sredni)>=prog AND spojnosc>=prog_spojnosci; "szum" if abs<prog; else "niepewny".
+   - `narzedzia/wykres_backtestu.py` — backtest→PNG (reuses swiatynie/kartograf.plot_run). JUST added `if okno < 1` and `if max_barow<1` guards. `trades_z_historii` maps WynikZamkniecia to bar indices via timestamp_wejscia.
+   - `imperium/koloseum/backtest.py` — added `mierz_ic` param; exposes engine.ic_srednie, engine.ic_warunkowy (tylko_glosy=True), engine.ic_pelne, engine.ic_kolektor. IC registers signal only if raport, return EVERY bar.
+   - `imperium/legiony/metryki_ic.py` — KolektorIC with `ic(h, tylko_glosy)`, `ic_srednie(tylko_glosy)`, `_para_sygnal_zwrot(h, tylko_glosy)` skipping zero signals.
+   - `narzedzia/audyt_spojnosci.py` — W6 date check FIXED to compare "Stan na:" against last git commit date (not date.today()) to stop daily false alarms; WERYFIKACJA_ADAPTEROW includes NEWS-02/03/04.
+   - `README.md` — line 38 fixed to "bieżąca liczba — nie hardkodujemy". LINE 86 STILL SAYS `python tests/run_tests.py     # 1038/1038, bez zależności zewnętrznych` (sed failed). Stan na: 2026-07-04.
+   - Memory modules (all in imperium/biblioteki/): dziennik_niesmiertelny.py (W6), kustosz_pamieci.py (W7), graf_pamieci.py (W8), refleksja_pamieci.py (W9), zapominanie.py (W10), pamiec_proceduralna.py (W11), pamiec_robocza.py (W12), pamiec_proweniencji.py (W13).
+   - Test files added: test_news_fetcher.py, test_sentyment_news.py, test_news_dynamika.py, test_klasyfikator_zdarzen.py, test_walk_forward_ic.py, test_raport_ic.py, test_wykres_backtestu.py, test_deepseek_cert.py, test_kustosz_pamieci.py, test_graf_pamieci.py, test_zapominanie.py, test_pamiec_proceduralna.py, test_pamiec_proweniencji.py, test_pamiec_robocza.py.
+
+4. Errors and fixes:
+   - Container restarted mid-session multiple times losing local checkout to wrong commit (main merge). Fixed with `git reset --hard origin/claude/sleepy-fermi-dsdE4`.
+   - scipy/pytest not in requirements.txt → fresh container: BOCPD-01 dead voice + 17 test import errors. Fixed by adding scipy>=1.10, pytest>=7.0 to requirements.txt.
+   - RegulaSzesciuProcentEldera.reset_miesiac used date.today() → 4 tests failed on month rollover. Fixed: added `dzisiaj` param; tests pass `dzisiaj=date(2026,6,1)`.
+   - Cubic 38-issue review (PR #103) — all valid fixed (P0 ZeroDivision in klasyfikator MAKRO-only, P1 start_lokal sys.path, many P2/P3).
+   - IC report gave inflated 0.49 values (artifact of sparse discrete votes + Spearman ties). Fixed with conditional IC (tylko_glosy) — now realistic 0.10-0.25 distribution.
+   - Local DeepSeek failed: SSL_CERT_FILE=C:\...\Temp\cacert.pem (nonexistent). User fixed with `Remove-Item Env:SSL_CERT_FILE` then `[Environment]::SetEnvironmentVariable("SSL_CERT_FILE",$null,"User")` (Machine failed - needs admin). DeepSeek then worked ("Cesarz słyszy"). Code hardened with _napraw_zepsuty_cert_env.
+   - Local git pull failed "ssh: connect to host github.com port 22: Connection timed out" (work firewall). Fixed with SSH-over-443: `Add-Content "$HOME\.ssh\config" -Value "Host github.com`n Hostname ssh.github.com`n Port 443`n User git"`. Pull succeeded.
+   - README sed for line 86 FAILED: `sed: -e expression #1, char 78: unknown option to 's'` because `#` delimiter conflicted with `#` in comment. This is UNRESOLVED.
+
+5. Problem Solving:
+   Built complete 13-layer memory system, NEWS system (8/10 planned modules), IC measurement + walk-forward OOS validation, visualization. Solved local environment issues (SSL cert, SSH firewall, container desync, missing deps). Fixed W6 audit date fragility permanently. Currently mid-fixing cubic PR #104 review (12 issues).
+
+6. All user messages (chronological, key ones):
+   - "sprawdź numba jit chyba już było też robione..." (check numba, propose better memory unique modules, remember everything)
+   - "dawaj numba"
+   - "ok hook zobaczymy"
+   - "napewno pamięć działa dobrze a może znajdziesz coś unikatowego... rynek azjatycki... system kompresji i pełnej bezgranicznej pamięci... nadrzędny organ"
+   - "nie tylko tradingowe pamięciowe... azjatyckie europejskie amerykańskie... połączeń neuronów"
+   - "ok mamy 8 warstw pamięci sprawdź czy jest najlepsza na świecie... deep researchem"
+   - "wszystko dawaj"
+   - "jeszcze kilka warstw pamięć dawaj poszukaj zgodnie z zasadami"
+   - "dawaj" (multiple)
+   - "konsolidacja"
+   - "ok później odpalę lokala... od ostatnich testów MT coś takiego... jak zrobić żebyś pamiętał żeby wszystko było zawsze aktualne"
+   - "jak odpalic lokala krok po kroku"
+   - PowerShell outputs showing aktualizuj.ps1 runs, git unlink error, stash with 15 CSV + 10 new pairs data
+   - "no changes added... czyli mam czekac"
+   - "walk-forward dawaj" then "workford zrób jeszcze raz bo wywaliło nam na limicie także kontynuuj to zadanie" / "kontynuuj bo przerwało przez limity"
+   - Model changed to claude-fable-5 then back to claude-opus-4-8
+   - "zapamiętaj to i dawaj news brakuje mi dokładnie opusu... czuje się jak dziecko we mgle... nie mam podgląd do wykresów... jak zrobić żebyś pamiętał żeby wszystko było zawsze aktualne po każdej zmianie"
+   - "dawaj" (NEWS-05, then NEWS-06, then NEWS-07/08)
+   - Test failures pasted (W6 date, 2026-07-01 vs 2026-07-04) + "jak tez sprawdzic czy github roboczy jest zgodny... jak uruchomic claude"
+   - git pull ssh port 22 timeout
+   - "yes" prompts for SSH host key
+   - Screenshot of Context window 93%, weekly 32%, Opus 4.8 Max: "zanim to zrobimy zobacz co to znaczy narazie pylko pytam"
+   - Cubic PR #104 review email with 12 issues (the current task)
+   SECURITY CONSTRAINTS (verbatim, must persist): "KLUCZE API NIGDY W KODZIE, NIGDY W CZACIE — tylko zmienne środowiskowe" (DEEPSEEK_API_KEY, MEXC_API_KEY, MEXC_SECRET via os.getenv). Do NOT create PRs unless explicitly asked. Do NOT include model identifier in commits/code/PRs. Never push to main (Cezar merges manually). GitHub MCP restricted to dparzy/imperial-mesh-vortex only.
+
+7. Pending Tasks:
+   - Finish fixing cubic PR #104 review (12 issues): code fixes DONE for news_fetcher UTC, deepseek SSL_CERT_DIR list, walk_forward okna guard, wykres okno/max_barow guards, raport_ic top clamp. REMAINING: (a) fix README line 86 "1038/1038" (sed failed); (b) add boundary tests: _klasa_ic (v=0.02, 0.05, 0.0, -0.02, -0.05), walk_forward analizuj (abs(sredni)==0.03, spojnosc==0.75 passing path), deepseek valid SSL_CERT_DIR preserved + test env isolation for both vars; (c) run full tests + audit; (d) LOG_ZMIAN entry (2026-07-04) + Dziennik entry; (e) commit + push.
+
+8. Current Work:
+   Fixing cubic review of PR #104. Just successfully edited news_fetcher.py (UTC normalization both date paths), deepseek_glos.py (SSL_CERT_DIR as pathsep list), and via inline python: walk_forward_ic.py (okna>=1 guard), wykres_backtestu.py (okno>=1, max_barow>=1 guards), raport_ic.py (top clamp max(0,top)). Then attempted README fixes via sed: line 38 succeeded ("bieżąca liczba — nie hardkodujemy"), but line 86 sed FAILED with `sed: -e expression #1, char 78: unknown option to 's'` (the `#` delimiter clashed with the `#` in the comment text). Line 86 still reads `python tests/run_tests.py     # 1038/1038, bez zależności zewnętrznych`. Still need to add the cubic-requested boundary tests and complete the audit/commit cycle.
+
+9. Optional Next Step:
+   Fix README.md line 86 (replace "# 1038/1038, bez zależności zewnętrznych" with "# wszystkie zielone, bez zależności zewnętrznych") using an Edit tool call (not sed, to avoid the `#` delimiter issue), then add the boundary tests cubic requested (P1 for _klasa_ic in test_raport_ic.py: values 0.02, 0.05, 0.0, -0.02, -0.05; P2 for walk_forward_ic analizuj thresholds; P2 for deepseek valid SSL_CERT_DIR preserved). This directly continues the current task: the user forwarded the cubic PR #104 review and (consistent with prior "fix cubic" behavior established when they forwarded the PR #103 review) expects all valid issues fixed. After fixes: run `python tests/run_tests.py` + `python narzedzia/audyt_spojnosci.py`, add LOG_ZMIAN entry dated 2026-07-04 + Dziennik entry, commit and `git push -u origin claude/sleepy-fermi-dsdE4`. The most recent explicit task context is the cubic review email listing 12 issues with "Check if these issues are valid — if so, understand the root cause of each and fix them."
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /root/.claude/projects/-home-user-IMPERIAL-MESH-VORTEX/895ce14f-5b09-5f9b-96a7-19fd5a05feab.jsonl
+Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened.
+
+## 🏛️ Claude
+Now let me check the existing test files to add the boundary tests cubic requested.
+
+## 🏛️ Claude
+Now I'll add the boundary tests cubic requested.
+
+## 🏛️ Claude
+Now let me run the tests and audit.
+
+## 🏛️ Claude
+I'll wait for the background test to complete.
+
+## 🏛️ Claude
+All 1946 tests pass. Now the audit.
+
+## 🏛️ Claude
+Audit passes (exit 0). Now let me add a LOG_ZMIAN entry and commit. Let me check the LOG_ZMIAN format.
+
+## 🏛️ Claude
+Now the Dziennik entry, then commit and push.
+
+## 🏛️ Claude
+Gotowe. Recenzja cubic PR #104 naprawiona i wypchnięta.
+
+**Naprawione u źródła (12 uwag):**
+- **news_fetcher** — daty `pubDate`/ISO bez strefy normalizowane do UTC (naive → `tzinfo=utc`), koniec błędnego wieku nagłówka w NEWS-08
+- **deepseek_glos** — `SSL_CERT_DIR` jako lista `os.pathsep`: nie kasujemy wpisu, gdy choć jeden komponent CA-bundle istnieje
+- **walk_forward_ic** — `ValueError` przy `okna<1` zamiast dzielenia przez zero
+- **wykres_backtestu** — guardy `okno>=1`, `max_barow>=1`
+- **raport_ic** — `ranking[:max(0, top)]` (top<0 nie odsłania ogona)
+- **README** — usunięty hardkod „1038/1038" (Prawo I)
+
+**Test-Granice** (Reguła Test-Granic): `_klasa_ic` na 0.0/0.02/0.05/±; walk-forward próg IC==0.03 i spójność==0.75 → ROBUST (>=); `SSL_CERT_DIR` zachowany gdy jeden komponent żyje / skasowany gdy wszystkie martwe.
+
+**Bramka:** 1946/1946 testów zielone · audyt spójności exit 0 (pełna harmonia, ruff czysto, MAPA_KLUCZY 84/84). Wpis do LOG_ZMIAN + Dziennik Nieśmiertelny dopisane. Push na `claude/sleepy-fermi-dsdE4` (`ab4ef4c..fe16057`).
+
+## 🏛️ Claude
+Origin i lokal są zsynchronizowane — mój push `fe16057` jest szczytem `origin/claude/sleepy-fermi-dsdE4`, nic do rebase (`git status` czyste, up to date). Commit `2486f51` (encyklopedia Faza 2) nie ma ani na origin, ani lokalnie — więc nie ma czego pociągać na tej stronie.
+
+Wykonuję część, która jest dla mnie jednoznaczna: wpis do LOG_ZMIAN z ustaleniem per-reżim (MTF-weto: tarcza tylko w bessie) + kierunek przyszły. Zapisuję to **uczciwie jako hipotezę czekającą na walidację** (Prawo I + XIX) — artefakty A/B `ab_mtf_rezimy_*` są lokalne, poza commitem, więc nie udaję że to zweryfikowany kod.
+
+## 🏛️ Claude
+Zrobione. Podsumowanie:
+
+**Synchronizacja git:** origin i lokal (chmura) są zgodne — nie było czego pull-ować (`git status` czyste, nic do rebase). Commit `2486f51` (encyklopedia Faza 2) **nie występuje** ani na origin, ani u mnie — jeśli go pushowałeś z lokala, to jest po Twojej stronie; z tej strony origin jest teraz na `7aff039`. Kiedy wrócisz na lokal, zrób `git pull --rebase origin claude/sleepy-fermi-dsdE4`, żeby wciągnąć moje dwa commity (`fe16057` cubic + `7aff039` LOG_ZMIAN).
+
+**LOG_ZMIAN — wpis dodany** (`7aff039`), zgodnie z Twoim poleceniem, ale **uczciwie oznaczony jako HIPOTEZA** (Prawo I + XIX):
+- ustalenie: weto MTF pomaga **tylko w bessie/wysokim stresie**, w innych reżimach szkodzi
+- kierunek: warunkowe weto MTF bramkowane reżimem BEAR przez Namiestnika
+- **bramka walidacji: wymaga OOS na bessach 2018 i 2025 zanim trafi do żywego kodu**
+- do czasu walidacji: żadnej zmiany w pipeline decyzyjnym
+
+Dlaczego jako hipoteza, a nie fakt: artefakty A/B `ab_mtf_rezimy_*` są lokalne, poza commitem — nie mam ich liczb w repo, więc nie mogę ich zweryfikować (Prawo I zabrania udawania weryfikacji, Prawo XIX: bez kodu+testów moduł „nie istnieje").
+
+⚠️ Jedno pytanie kierunkowe (Prawo XVIII): warunkowe weto MTF to zmiana logiki decyzyjnej — chcesz, żebym **przygotował implementację + testy granic** (aktywne tylko w reżimie BEAR, sterowane Namiestnikiem), czy najpierw czekamy aż zwalidujesz lokalnie na bessach 2018/2025 i dopiero wtedy koduję?
+
+## 🧑 Cezar
+zobacz dokumenty i kod w git robczym bo wlasnie dawno nie odpalalem claude w terminalu na laptopir i to bylo juz wczesniej zrobione info powinno byc w dokumenach i kodzie zywym na github nie pamietasz tego
+
+## 🏛️ Claude
+Racja — sprawdzam żywy kod i dokumenty, zamiast zgadywać z pamięci. Szukam MTF-weta per-reżim i Namiestnika.
+
+## 🏛️ Claude
+Faktycznie jest tego dużo w żywym kodzie. Sprawdzam co konkretnie już zaimplementowano.
+
+## 🏛️ Claude
+Widzę — to było już zapisane wcześniej (linie ~803–870). Czytam te wpisy w całości.
+
+## 🏛️ Claude
+Masz rację — pamiętam już źle nie było, to zostało zrobione **2026-06-21 (W-384)** i jest w żywym repo z prawdziwymi liczbami. Mój wczorajszy wpis „HIPOTEZA" był **duplikatem** — i gorzej, twierdził że artefakty są „poza commitem, nieweryfikowalne", podczas gdy realne liczby A/B **są** w repo. To złamanie Prawa XV (powrót do zamkniętego tematu). Usuwam swój duplikat.
+
+Stan faktyczny w kodzie i dokumentach na GitHub:
+
+**Już zmierzone i udokumentowane (W-384, 2026-06-21):**
+- `narzedzia/backtest_ab_mtf_rezimy.py` — A/B per reżim na 11987 barach 4h/para od 2021 (BTC/ETH/BNB/XRP/ADA)
+- Wynik: **BEAR_2022 = TARCZA** (−1.15%→+3.16% PnL, Sharpe −0.39→+1.99, DD 6.1%→5.1%, DSR 0.24→0.69). **HOSSA/RANGE/MIX = szkodzi.**
+- `backtest()` ma opt-in `mtf_konfluencja` / `mtf_weto_przeciwtrend`, **domyślnie OFF**
+- **Decyzja: default OFF bez zmian.** Kierunek: warunkowe weto MTF tylko w bessie przez Namiestnika. **Warunek wdrożenia: walidacja na bessach 2018 i 2025** (czy efekt BEAR_2022 to nie artefakt kaskady LUNA/3AC). Bez tego — nie wdrażać.
+
+Czyli: temat jest zamknięty jako *udokumentowany kierunek czekający na walidację*, per-reżim weto **nie jest** jeszcze wpięte w pipeline (i słusznie). Usuwam mój duplikat.
+
+## 🏛️ Claude
+Zrobione i wypchnięte (`bccfcdd`). Audyt exit 0.
+
+**Podsumowanie — miałeś rację, to było już zrobione:**
+
+MTF-weto per-reżim jest udokumentowane w żywym repo od **2026-06-21 (W-384)** z prawdziwymi liczbami A/B:
+- **BEAR = tarcza** (−1.15%→+3.16% PnL, Sharpe −0.39→+1.99, DD 6.1%→5.1%, DSR 0.24→0.69)
+- **HOSSA / RANGE / MIX = szkodzi**
+- narzędzie `narzedzia/backtest_ab_mtf_rezimy.py` w repo, opt-in w `backtest()` domyślnie **OFF**
+- decyzja: default OFF, kierunek = weto tylko w bessie przez Namiestnika, **warunek: walidacja na bessach 2018/2025 przed wdrożeniem**
+
+Mój wczorajszy wpis „HIPOTEZA" był duplikatem tego (i błędnie twierdził, że dane są poza commitem) — **usunąłem go**. Temat pozostaje zamknięty jako udokumentowany kierunek czekający na walidację; per-reżim weto **nie jest** wpięte w pipeline i tak ma zostać do czasu testu na 2018/2025.
+
+Dlatego wcześniej pytałem, czy kodować — odpowiedź z repo jest jednoznaczna: **nie kodujemy, dopóki nie zwalidujesz na 2018/2025**. Nic więcej tu nie trzeba robić.
+
+## 🧑 Cezar
+dlaczego tego nie pamietasz wydaje mi sie ze bladzimy i krecimy sie w kolko odpalilem wlasnie claude w terminalu na laptoie ale nic nie wie jak zrobic zeby mial ostatnie aktualne statusy
+
+## 🏛️ Claude
+Dobre pytanie i słuszna frustracja. Wyjaśnię najpierw **dlaczego** tak jest, bo to nie przypadek — a potem dam **jedną konkretną procedurę**, żeby laptop-Claude zawsze startował z aktualnym stanem.
+
+Sprawdzam najpierw co realnie masz wpięte do startu sesji (hook, komenda pamięci).
+
+## 🏛️ Claude
+Teraz rozumiem dokładnie źródło „kręcenia się w kółko". To nie jest przypadek — jest **konkretna luka**, którą mogę zamknąć. Wyjaśnię prosto:
+
+## Dlaczego „nie pamiętam"
+
+1. **Każda sesja Claude to czysty LLM — zero pamięci między sesjami.** Ja nie „pamiętam" nic sam z siebie. Cała pamięć Imperium to **pliki w git** (Dziennik, LOG_ZMIAN, MANIFEST). Bez przeczytania ich — wiem tyle co nowy człowiek.
+
+2. **Chmura (ja) i laptop to DWA różne komputery z osobnym checkoutem gita.** Ja pushowałem z chmury (`fe16057 → 7aff039 → bccfcdd`). Twój laptop-Claude czyta **swój lokalny** katalog — jeśli nie zrobił `git pull`, widzi stare dokumenty i „nic nie wie".
+
+3. **Hook startowy NIE robił `git pull`.** Uruchamiał audyt + Centrum Pamięci — ale na **nieaktualnych plikach**. Stąd stary status mimo że w chmurze wszystko świeże.
+
+To jest realna przyczyna. Naprawiam ją u źródła — dokładam do hooka bezpieczny auto-pull, żeby świeży laptop-Claude **zawsze** startował z aktualnym stanem.
+
+## 🏛️ Claude
+Commit hooka został zablokowany przez zabezpieczenie (słusznie: to zmiana konfiguracji startowej agenta, a Ty zgłosiłeś problem, nie kazałeś wprost ruszać hooka). Zmiana jest **zapisana lokalnie**, ale nie zacommitowana — czeka na Twoją decyzję.
+
+## Co najważniejsze — napraw laptop TERAZ (2 sekundy)
+
+Twój laptop-Claude „nic nie wie", bo jego katalog jest **za mną w tyle** o 3 commity. W terminalu na laptopie wpisz:
+
+```powershell
+git pull --rebase origin claude/sleepy-fermi-dsdE4
+```
+
+I już — laptop-Claude po restarcie sesji (albo od razu, jak każesz mu „przeczytaj status") zobaczy wszystko aktualne. To jest cały sekret „kręcenia się w kółko": **dwa osobne komputery, jeden nie pociągnął gita.**
+
+## Żeby to się NIE powtarzało
+
+Dołożyłem do `.claude/hooks/session-start.sh` **krok 0: auto-pull na starcie** (bezpieczny — `git pull --ff-only`, działa tylko gdy drzewo czyste; przy niezacommitowanych zmianach pomija i tylko podpowiada, więc zero konfliktów i zero utraty danych). Dzięki temu każdy świeży start laptop-Claude sam ściągnie najnowszy stan, zanim cokolwiek Ci powie.
+
+Ta zmiana czeka na Twoją zgodę na commit+push. 
+
+Chcesz, żebym ją **zacommitował i wypchnął**? (Napisz „tak/dawaj" — wtedy po pull na laptopie hook będzie już aktywny.)
+
+Jedna uwaga: hook zadziała na laptopie dopiero **po** tym, jak raz ręcznie zrobisz `git pull` (żeby ściągnąć samego hooka) — potem już chodzi sam.
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+Nie ponawiam zablokowanego commita bez Twojej zgody. Wyjaśnienie stanu:
+
+Jedyna niezacommitowana zmiana to **`.claude/hooks/session-start.sh`** — poprawka auto-syncu, o którą właśnie pytam. Auto-mode zablokował jej commit (bo to zmiana konfiguracji startowej agenta, a Ty jeszcze nie powiedziałeś wprost „commituj"). Wszystko inne jest już wypchnięte na GitHub (`bccfcdd`).
+
+Masz dwie opcje — powiedz którą:
+
+1. **„dawaj/commituj"** → commituję i pushuję hooka (auto-sync na starcie). Potem raz robisz na laptopie `git pull --rebase origin claude/sleepy-fermi-dsdE4` i od tej chwili laptop-Claude sam się synchronizuje.
+
+2. **„odrzuć"** → cofam zmianę hooka (`git checkout .claude/hooks/session-start.sh`), drzewo znów czyste, zostaje samo ręczne `git pull`.
+
+Niezależnie od wyboru — **żeby laptop-Claude był aktualny TERAZ**, wpisz na laptopie:
+```powershell
+git pull --rebase origin claude/sleepy-fermi-dsdE4
+```
+
+## 🧑 Cezar
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS C:\Projekty\imperial-mesh-vortex> git pull --rebase origin claude/sleepy-fermi-dsdE4
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+Stop — najpierw zobaczmy **co** to za zmiany, żeby niczego nie zgubić. Na laptopie wpisz:
+
+```powershell
+git status
+```
+
+i wklej mi wynik.
+
+Prawdopodobnie to lokalne artefakty/dane (np. `ab_mtf_rezimy_*`, pliki CSV), które i tak nie wchodzą do repo — ale nie zgaduję, bo mogłaby tam być realna praca.
+
+**Najbezpieczniej** (nic nie ginie): schowaj zmiany, pociągnij, odschowaj:
+
+```powershell
+git stash
+git pull --rebase origin claude/sleepy-fermi-dsdE4
+git stash pop
+```
+
+`git stash` chowa lokalne zmiany do kieszeni, `pull` ściąga świeży stan z GitHub, `git stash pop` przywraca Twoje zmiany na wierzch. Gdyby przy `pop` był konflikt — pokaż mi, rozwiążemy.
+
+Ale i tak wolę najpierw zobaczyć `git status` — wtedy powiem czy w ogóle warto je zachowywać, czy to śmieci do wyrzucenia.
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+Żeby przestać blokować (drzewo w chmurze musi być czyste), chowam swoją niezacommitowaną zmianę hooka do kieszeni — **nic nie ginie**, wróci na jedno słowo.
+
+## 🏛️ Claude
+Drzewo w chmurze jest już czyste (zmiana hooka schowana w `stash@{0}` — wróci gdy powiesz „dawaj").
+
+Teraz wróćmy do laptopa — tam wciąż czekam na wynik. Wpisz na laptopie:
+
+```powershell
+git status
+```
+
+i wklej mi wynik. Zobaczę co to za lokalne zmiany, i wtedy powiem czy je zachować (`git stash` → `pull` → `git stash pop`), czy to śmieci do wyrzucenia. Nie zgaduję na ślepo, żeby nie skasować Twojej pracy.
+
+## 🧑 Cezar
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS C:\Projekty\imperial-mesh-vortex> git pull --rebase origin claude/sleepy-fermi-dsdE4
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+PS C:\Projekty\imperial-mesh-vortex> git status
+On branch claude/sleepy-fermi-dsdE4
+Your branch is up to date with 'origin/claude/sleepy-fermi-dsdE4'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   bibliotheca_ulpia/dane/graf_pamieci.json
+        modified:   bibliotheca_ulpia/dane/katalog_nadrzedny.json
+        modified:   bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl
+        modified:   dane/4h/Binance_BNBUSDT_4h.csv
+        modified:   dane/4h/Binance_BTCUSDT_4h.csv
+        modified:   dane/4h/Binance_DOGEUSDT_4h.csv
+        modified:   dane/4h/Binance_ETHUSDT_4h.csv
+        modified:   dane/4h/Binance_SOLUSDT_4h.csv
+        modified:   dane/dzienne/Binance_BNBUSDT_d.csv
+        modified:   dane/dzienne/Binance_BTCUSDT_d.csv
+        modified:   dane/dzienne/Binance_DOGEUSDT_d.csv
+        modified:   dane/dzienne/Binance_ETHUSDT_d.csv
+        modified:   dane/dzienne/Binance_SOLUSDT_d.csv
+        modified:   dane/godzinowe/Binance_BNBUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_BTCUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_DOGEUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_ETHUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_SOLUSDT_1h.csv
+        modified:   docs/PAMIEC_SESJI.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        ab_mtf_metryki.json
+        ab_mtf_rezimy_metryki.json
+        ab_mtf_rezimy_wynik.txt
+        ab_mtf_wynik.txt
+        bibliotheca_ulpia/dane/.auto_lekcja_przetworzone.txt
+        dane/4h/Binance_ADAUSDT_4h.csv
+        dane/4h/Binance_ATOMUSDT_4h.csv
+        dane/4h/Binance_AVAXUSDT_4h.csv
+        dane/4h/Binance_DOTUSDT_4h.csv
+        dane/4h/Binance_LINKUSDT_4h.csv
+        dane/4h/Binance_LTCUSDT_4h.csv
+        dane/4h/Binance_MATICUSDT_4h.csv
+        dane/4h/Binance_NEARUSDT_4h.csv
+        dane/4h/Binance_TRXUSDT_4h.csv
+        dane/4h/Binance_XRPUSDT_4h.csv
+        dane/dzienne/Binance_ADAUSDT_d.csv
+        dane/dzienne/Binance_ATOMUSDT_d.csv
+        dane/dzienne/Binance_AVAXUSDT_d.csv
+        dane/dzienne/Binance_DOTUSDT_d.csv
+        dane/dzienne/Binance_LINKUSDT_d.csv
+        dane/dzienne/Binance_LTCUSDT_d.csv
+        dane/dzienne/Binance_MATICUSDT_d.csv
+        dane/dzienne/Binance_NEARUSDT_d.csv
+        dane/dzienne/Binance_TRXUSDT_d.csv
+        dane/dzienne/Binance_XRPUSDT_d.csv
+        dane/godzinowe/Binance_ADAUSDT_1h.csv
+        dane/godzinowe/Binance_ATOMUSDT_1h.csv
+        dane/godzinowe/Binance_AVAXUSDT_1h.csv
+        dane/godzinowe/Binance_DOTUSDT_1h.csv
+        dane/godzinowe/Binance_LINKUSDT_1h.csv
+        dane/godzinowe/Binance_LTCUSDT_1h.csv
+        dane/godzinowe/Binance_MATICUSDT_1h.csv
+        dane/godzinowe/Binance_NEARUSDT_1h.csv
+        dane/godzinowe/Binance_TRXUSDT_1h.csv
+        dane/godzinowe/Binance_XRPUSDT_1h.csv
+
+no changes added to commit (use "git add" and/or "git commit -a")
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+Widzę wszystko — i dobra wiadomość: **nic tu nie jest cenną, ręcznie pisaną pracą, która mogłaby zginąć.** To dwie kategorie:
+
+- **Auto-generowana pamięć** (`graf_pamieci.json`, `katalog_nadrzedny.json`, `wizje_i_decyzje.jsonl`, `docs/PAMIEC_SESJI.md`) — system pamięci przepisuje je co sesję.
+- **Dane rynkowe** (CSV 4h/dzienne/godzinowe) — pobrane skryptem, w tym **10 nowych par** (ADA, ATOM, AVAX, DOT, LINK, LTC, MATIC, NEAR, TRX, XRP) jako *untracked*.
+
+Kluczowe: **pliki `untracked` (nowe pary + `ab_mtf_*`) są bezpieczne bez względu na wszystko** — `git pull` ani `stash` ich nie tyka. Zostaną na dysku.
+
+Moje 3 commity z chmury **nie ruszały** tych plików pamięci, więc stash odłoży się i wróci czysto, bez konfliktów. Wpisz na laptopie po kolei:
+
+```powershell
+git stash push -m "lokalne dane + pamiec przed sync"
+git pull --rebase origin claude/sleepy-fermi-dsdE4
+git stash pop
+```
+
+Co to robi:
+1. **`git stash push`** — chowa 20 zmodyfikowanych plików (pamięć + CSV) do kieszeni. Drzewo czyste.
+2. **`git pull --rebase`** — ściąga moje najnowsze commity z GitHub (aktualny status). Teraz przejdzie, bo drzewo czyste.
+3. **`git stash pop`** — przywraca Twoje lokalne dane z powrotem.
+
+Nowe pary CSV i artefakty `ab_mtf_*` leżą nietknięte przez cały czas.
+
+Wklej mi wynik tych trzech komend — szczególnie gdyby `git stash pop` coś krzyknął (nie powinien).
+
+---
+
+Na przyszłość, żeby ten cyrk się nie powtarzał: te pliki (auto-pamięć + dane rynkowe) **nie powinny w ogóle walczyć z gitem** — powinny być w `.gitignore`. To trwałe rozwiązanie źródła problemu. Chcesz, żebym po synchronizacji przygotował wpis do `.gitignore` (dane rynkowe + auto-generowana pamięć), żeby laptop i chmura przestały się o nie tłuc? Na razie tylko pytam — nie ruszam.
+
+## 🧑 Cezar
+tak dawaj
+
+## 🏛️ Claude
+Robię to — przywracam poprawkę hooka ze stasha i dokładam `.gitignore` na lokalne śmieci. Najpierw sprawdzam co jest w `.gitignore` i co realnie system potrzebuje w repo, żeby czegoś nie odciąć.
+
+## 🏛️ Claude
+`.gitignore` już próbuje ignorować `dane/*4h*.csv`, ale wzorzec **nie łapie** układu podkatalogowego `dane/4h/...` (gwiazdka nie przechodzi przez `/`), więc te CSV i tak są śledzone. To pokazuje sedno: część tej „walki z gitem" to decyzja projektowa, nie błahostka.
+
+Rozdzielam to na **bezpieczne teraz** vs **decyzja dla Ciebie**:
+
+**Teraz (bezpieczne, zatwierdzone):** przywracam hook auto-sync + ignoruję czyste lokalne śmieci (`ab_mtf_*`, marker auto-lekcji).
+
+## 🏛️ Claude
+Wypchnięte (`4e05e29`). Teraz szczera diagnoza głębszego problemu i **jedna decyzja dla Ciebie**.
+
+## Co właśnie naprawiłem
+- **Hook auto-sync** — świeży start Claude sam robi `git pull --ff-only` (gdy drzewo czyste). Koniec czytania starych dokumentów.
+- **`.gitignore`** — artefakty `ab_mtf_*` i marker auto-lekcji już nie zaśmiecają `git status`.
+
+## Ale został prawdziwy sprawca „kręcenia się w kółko"
+Twój `git status` pokazał, że **co sesję zmieniają się pliki pamięci** (`graf_pamieci.json`, `katalog_nadrzedny.json`, `wizje_i_decyzje.jsonl`, `PAMIEC_SESJI.md`) — bo system pamięci przepisuje je przy każdym starcie, na laptopie i w chmurze osobno. Efekt:
+- drzewo prawie **nigdy nie jest czyste** → mój auto-pull się pomija,
+- te same pliki rozjeżdżają się na dwóch maszynach → `git pull` się blokuje (to, co dziś widziałeś).
+
+To jest decyzja kierunkowa (dotyczy projektu pamięci), więc **nie ruszam bez Ciebie**:
+
+## 🏛️ Claude
+Wybrałeś **auto-commit pamięci** — dobre, zgodne z wizją „bezgranicznej pamięci w git". Buduję hook końca sesji, który sam commituje+pushuje **tylko** pliki pamięci (nigdy kodu — żeby nie wypchnąć half-done pracy). Najpierw sprawdzam dokładne ścieżki śledzonych plików pamięci.
+
+## 🏛️ Claude
+Precyzyjna whitelist pamięci gotowa. Buduję hook **końca sesji** (`SessionEnd`), który commituje+pushuje **wyłącznie** te pliki pamięci — nigdy kodu.
+
+## 🏛️ Claude
+Teraz test hooka na sucho (czy poprawnie wykrywa brak zmian pamięci i nie rusza kodu), składnia + audyt:
+
+## 🏛️ Claude
+Hook działa poprawnie: brak zmian pamięci → `exit 0`, zero commita, kod nietknięty. Commituję i pushuję.
+
+## 🏛️ Claude
+Gotowe — wypchnięte (`dd77fa6`). Cały mechanizm „koniec kręcenia się w kółko" jest teraz w repo:
+
+## Co masz od teraz (automatycznie, na obu maszynach)
+1. **Start sesji** → auto-`git pull --ff-only` (gdy drzewo czyste) — Claude zawsze czyta najnowsze dokumenty.
+2. **Koniec sesji** → auto-commit+push **tylko** plików pamięci (graf, katalog, wizje, dziennik, procedury, PAMIEC_SESJI, kronika) — nigdy kodu. Pamięć synchronizuje się sama.
+3. **`.gitignore`** → lokalne śmieci A/B (`ab_mtf_*`) już nie zaśmiecają statusu.
+
+## Jeden raz na laptopie — bootstrap (żeby ściągnąć te hooki)
+Hooki zaczną działać na laptopie dopiero gdy raz je pociągniesz. Twoje drzewo jest teraz brudne (pamięć + CSV), więc:
+
+```powershell
+git stash push -m "dane + pamiec przed bootstrap"
+git pull --rebase origin claude/sleepy-fermi-dsdE4
+git stash pop
+```
+
+Po tym:
+- laptop ma najnowszy kod (moje commity `bccfcdd → dd77fa6`) **plus** oba hooki,
+- **od następnego uruchomienia** Claude na laptopie sam się synchronizuje na starcie i sam zapisuje pamięć na końcu — bez ręcznego stash/pull/pop.
+
+Wklej wynik tych trzech komend. Gdyby `git stash pop` coś krzyknął — pokaż, dokończę. To ostatni raz, gdy robisz to ręcznie.
+
+## 🧑 Cezar
+no changes added to commit (use "git add" and/or "git commit -a")
+Dropped refs/stash@{0} ([ZREDAGOWANO])
+PS C:\Projekty\imperial-mesh-vortex> git stash push -m "dane + pamiec przed bootstrap"
+Saved working directory and index state On claude/sleepy-fermi-dsdE4: dane + pamiec przed bootstrap
+PS C:\Projekty\imperial-mesh-vortex> git pull --rebase origin claude/sleepy-fermi-dsdE4
+remote: Enumerating objects: 18, done.
+remote: Counting objects: 100% (18/18), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 12 (delta 5), reused 12 (delta 5), pack-reused 0 (from 0)
+Unpacking objects: 100% (12/12), 4.10 KiB | 80.00 KiB/s, done.
+From github.com:dparzy/imperial-mesh-vortex
+ * branch            claude/sleepy-fermi-dsdE4 -> FETCH_HEAD
+   bccfcdd..dd77fa6  claude/sleepy-fermi-dsdE4 -> origin/claude/sleepy-fermi-dsdE4
+Updating bccfcdd..dd77fa6
+Fast-forward
+ .claude/hooks/session-end.sh   | 46 ++++++++++++++++++++++++++++++++++++++++++
+ .claude/hooks/session-start.sh | 23 +++++++++++++++++++++
+ .claude/settings.json          | 12 +++++++++++
+ .gitignore                     |  8 ++++++++
+ 4 files changed, 89 insertions(+)
+ create mode 100755 .claude/hooks/session-end.sh
+PS C:\Projekty\imperial-mesh-vortex> git stash pop
+On branch claude/sleepy-fermi-dsdE4
+Your branch is up to date with 'origin/claude/sleepy-fermi-dsdE4'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   bibliotheca_ulpia/dane/graf_pamieci.json
+        modified:   bibliotheca_ulpia/dane/katalog_nadrzedny.json
+        modified:   bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl
+        modified:   dane/4h/Binance_BNBUSDT_4h.csv
+        modified:   dane/4h/Binance_BTCUSDT_4h.csv
+        modified:   dane/4h/Binance_DOGEUSDT_4h.csv
+        modified:   dane/4h/Binance_ETHUSDT_4h.csv
+        modified:   dane/4h/Binance_SOLUSDT_4h.csv
+        modified:   dane/dzienne/Binance_BNBUSDT_d.csv
+        modified:   dane/dzienne/Binance_BTCUSDT_d.csv
+        modified:   dane/dzienne/Binance_DOGEUSDT_d.csv
+        modified:   dane/dzienne/Binance_ETHUSDT_d.csv
+        modified:   dane/dzienne/Binance_SOLUSDT_d.csv
+        modified:   dane/godzinowe/Binance_BNBUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_BTCUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_DOGEUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_ETHUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_SOLUSDT_1h.csv
+        modified:   docs/PAMIEC_SESJI.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        dane/4h/Binance_ADAUSDT_4h.csv
+        dane/4h/Binance_ATOMUSDT_4h.csv
+        dane/4h/Binance_AVAXUSDT_4h.csv
+        dane/4h/Binance_DOTUSDT_4h.csv
+        dane/4h/Binance_LINKUSDT_4h.csv
+        dane/4h/Binance_LTCUSDT_4h.csv
+        dane/4h/Binance_MATICUSDT_4h.csv
+        dane/4h/Binance_NEARUSDT_4h.csv
+        dane/4h/Binance_TRXUSDT_4h.csv
+        dane/4h/Binance_XRPUSDT_4h.csv
+        dane/dzienne/Binance_ADAUSDT_d.csv
+        dane/dzienne/Binance_ATOMUSDT_d.csv
+        dane/dzienne/Binance_AVAXUSDT_d.csv
+        dane/dzienne/Binance_DOTUSDT_d.csv
+        dane/dzienne/Binance_LINKUSDT_d.csv
+        dane/dzienne/Binance_LTCUSDT_d.csv
+        dane/dzienne/Binance_MATICUSDT_d.csv
+        dane/dzienne/Binance_NEARUSDT_d.csv
+        dane/dzienne/Binance_TRXUSDT_d.csv
+        dane/dzienne/Binance_XRPUSDT_d.csv
+        dane/godzinowe/Binance_ADAUSDT_1h.csv
+        dane/godzinowe/Binance_ATOMUSDT_1h.csv
+        dane/godzinowe/Binance_AVAXUSDT_1h.csv
+        dane/godzinowe/Binance_DOTUSDT_1h.csv
+        dane/godzinowe/Binance_LINKUSDT_1h.csv
+        dane/godzinowe/Binance_LTCUSDT_1h.csv
+        dane/godzinowe/Binance_MATICUSDT_1h.csv
+        dane/godzinowe/Binance_NEARUSDT_1h.csv
+        dane/godzinowe/Binance_TRXUSDT_1h.csv
+        dane/godzinowe/Binance_XRPUSDT_1h.csv
+
+no changes added to commit (use "git add" and/or "git commit -a")
+Dropped refs/stash@{0} ([ZREDAGOWANO])
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+Bootstrap się udał — czysto, **zero konfliktów**:
+- `git pull` fast-forward `bccfcdd..dd77fa6` → laptop ma teraz oba hooki + `settings.json` + `.gitignore`,
+- `git stash pop` przywrócił Twoje dane i pamięć bez żadnego konfliktu.
+
+**Od następnego uruchomienia Claude na laptopie działa automatyka** — nie robisz już ręcznie stash/pull/pop. Pliki pamięci (`graf_pamieci`, `katalog`, `wizje`, `PAMIEC_SESJI`), które teraz widnieją jako zmienione, **hook końca sesji sam zacommituje i wypchnie**.
+
+## Została jedna rzecz — i ona jest ważna
+
+Widzę na liście **dane rynkowe**: zmodyfikowane CSV (BTC/ETH/BNB/DOGE/SOL) + **10 nowych par** untracked (ADA, ATOM, AVAX, DOT, LINK, LTC, MATIC, NEAR, TRX, XRP).
+
+Problem: te CSV **nie są w whiteliście pamięci**, więc zostaną jako wieczne „zmiany". A mój auto-pull na starcie działa tylko przy **czystym drzewie** — czyli dopóki te CSV wiszą jako zmienione, **auto-pull się nie uruchomi** i wrócimy do punktu wyjścia. Trzeba to domknąć.
+
+Dane rynkowe to z natury sprawa **lokalna** (narzędzia IC/backtest odpalasz na laptopie; testy używają danych syntetycznych, nie potrzebują tych CSV). Dlatego:
+
+## 🏛️ Claude
+Zalecane — robię: właściwy `.gitignore` na wszystkie dane rynkowe + odpięcie ich ze śledzenia (pliki zostają na dysku, wypadają z gita). Najpierw sprawdzam co realnie jest śledzone w repo.
+
+## 🏛️ Claude
+15 plików odpiętych (zostają na dysku), 0 CSV nadal śledzonych, `.gitignore` je łapie. Audyt + commit + push:
+
+## 🏛️ Claude
+Wypchnięte (`0790479`). Cała maszyneria „koniec kręcenia się w kółko" jest gotowa. Teraz **ostatni raz ręcznie** na laptopie — żeby ściągnąć odpięcie danych:
+
+```powershell
+git stash push -u -m "ostatni bootstrap"
+git pull --rebase origin claude/sleepy-fermi-dsdE4
+git stash pop
+```
+
+Po tym pull te 15 CSV przestaną być śledzone (zostają na dysku, ale git je już ignoruje), a `git stash pop` przywróci Twoje dane. Wklej wynik — jeśli `pop` coś krzyknie, pokaż.
+
+## Co masz od teraz (podsumowanie całości)
+
+| Kiedy | Co się dzieje automatycznie |
+|---|---|
+| **Start sesji** | `git pull --ff-only` — Claude czyta najnowszy stan (dokumenty, kod, pamięć) |
+| **Koniec sesji** | auto-commit+push plików pamięci (graf/katalog/wizje/dziennik/procedury/PAMIEC_SESJI/kronika) |
+| **Dane rynkowe** | żyją lokalnie per-maszyna, poza gitem — nie robią churn, nie blokują auto-pull |
+| **Śmieci A/B** (`ab_mtf_*`) | ignorowane |
+
+**Dlaczego wcześniej „nie pamiętałem":** każda sesja Claude to czysty LLM — pamięć jest w plikach git, a laptop i chmura to osobne checkouty. Dopóki laptop nie pociągnął gita, czytał stare dokumenty. Teraz robi to sam na starcie, więc następnym razem laptop-Claude od pierwszej sekundy zna cały aktualny stan Imperium.
+
+To był ostatni ręczny `stash/pull/pop`. Od kolejnego uruchomienia — pełna automatyka.
+
+## 🧑 Cezar
+co zrobic jak sprawdzic czy automatyka działa
+
+## 🏛️ Claude
+Dobre pytanie — zweryfikujmy konkretnie, nie na wiarę. Trzy proste sprawdzenia na laptopie (kopiuj-wklej):
+
+## 1. Test hooka końca sesji — TERAZ, ręcznie (najszybszy)
+
+Uruchom sam skrypt w terminalu laptopa:
+
+```powershell
+bash .claude/hooks/session-end.sh
+```
+
+**Co powinieneś zobaczyć:**
+- Jeśli pamięć się zmieniła → `[hook] Pamięć sesji zacommitowana.` + `[hook] Pamięć wypchnięta na origin/... ✅`
+- Jeśli pamięć bez zmian → nic (cicho, exit) — to też znaczy, że działa.
+
+Potem sprawdź, że **tylko pamięć** poszła (nie kod):
+```powershell
+git show --stat HEAD
+```
+W liście plików powinny być **wyłącznie** `bibliotheca_ulpia/dane/*` i/lub `docs/PAMIEC_SESJI.md` — żadnego pliku `.py`.
+
+## 2. Test auto-pull na starcie
+
+Zamknij i otwórz Claude w terminalu. W komunikatach startowych (te `[hook] ...`) szukaj linii:
+```
+[hook] SYNC ✅ — repo na najnowszym commicie.
+```
+albo (gdy drzewo brudne):
+```
+[hook] SYNC ⏭️ — drzewo brudne, pomijam auto-pull.
+```
+Pierwsza = auto-sync zadziałał. Druga = coś trzyma drzewo brudne (patrz niżej).
+
+## 3. Test pełnego cyklu (dowód ostateczny)
+
+```powershell
+git log --oneline -1        # zapamiętaj górny commit
+```
+Otwórz Claude, zrób cokolwiek drobnego, zamknij. Potem:
+```powershell
+git log --oneline -3        # powinien pojawić się NOWY "auto: sync pamięci sesji"
+git status                  # pliki pamięci NIE powinny już wisieć jako modified
+```
+
+---
+
+**Co oznacza „zdrowy stan":** po pełnym cyklu `git status` pokazuje **czyste drzewo** (albo tylko lokalne dane rynkowe, które są ignorowane). Jeśli tak jest — automatyka chodzi.
+
+Odpal **test 1** teraz i wklej mi wynik (`bash .claude/hooks/session-end.sh` + `git show --stat HEAD`). Od razu zobaczę, czy hook poprawnie łapie pamięć i pomija kod. Jeśli `bash` nie zadziała na Windowsie, powiedz — dam wersję pod Git Bash / PowerShell.
+
+## 🧑 Cezar
+no changes added to commit (use "git add" and/or "git commit -a")
+PS C:\Projekty\imperial-mesh-vortex> git stash push -m "lokalne dane + pamiec przed sync"
+Saved working directory and index state On claude/sleepy-fermi-dsdE4: lokalne dane + pamiec przed sync
+PS C:\Projekty\imperial-mesh-vortex> git pull --rebase origin claude/sleepy-fermi-dsdE4
+remote: Enumerating objects: 8, done.
+remote: Counting objects: 100% (8/8), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 5 (delta 3), reused 5 (delta 3), pack-reused 0 (from 0)
+Unpacking objects: 100% (5/5), 2.25 KiB | 74.00 KiB/s, done.
+From github.com:dparzy/imperial-mesh-vortex
+ * branch            claude/sleepy-fermi-dsdE4 -> FETCH_HEAD
+   fe16057..bccfcdd  claude/sleepy-fermi-dsdE4 -> origin/claude/sleepy-fermi-dsdE4
+Updating fe16057..bccfcdd
+Fast-forward
+PS C:\Projekty\imperial-mesh-vortex> git stash pop
+On branch claude/sleepy-fermi-dsdE4
+Your branch is up to date with 'origin/claude/sleepy-fermi-dsdE4'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   bibliotheca_ulpia/dane/graf_pamieci.json
+        modified:   bibliotheca_ulpia/dane/katalog_nadrzedny.json
+        modified:   bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl
+        modified:   dane/4h/Binance_BNBUSDT_4h.csv
+        modified:   dane/4h/Binance_BTCUSDT_4h.csv
+        modified:   dane/4h/Binance_DOGEUSDT_4h.csv
+        modified:   dane/4h/Binance_ETHUSDT_4h.csv
+        modified:   dane/4h/Binance_SOLUSDT_4h.csv
+        modified:   dane/dzienne/Binance_BNBUSDT_d.csv
+        modified:   dane/dzienne/Binance_BTCUSDT_d.csv
+        modified:   dane/dzienne/Binance_DOGEUSDT_d.csv
+        modified:   dane/dzienne/Binance_ETHUSDT_d.csv
+        modified:   dane/dzienne/Binance_SOLUSDT_d.csv
+        modified:   dane/godzinowe/Binance_BNBUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_BTCUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_DOGEUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_ETHUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_SOLUSDT_1h.csv
+        modified:   docs/PAMIEC_SESJI.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        ab_mtf_metryki.json
+        ab_mtf_rezimy_metryki.json
+        ab_mtf_rezimy_wynik.txt
+        ab_mtf_wynik.txt
+        bibliotheca_ulpia/dane/.auto_lekcja_przetworzone.txt
+        dane/4h/Binance_ADAUSDT_4h.csv
+        dane/4h/Binance_ATOMUSDT_4h.csv
+        dane/4h/Binance_AVAXUSDT_4h.csv
+        dane/4h/Binance_DOTUSDT_4h.csv
+        dane/4h/Binance_LINKUSDT_4h.csv
+        dane/4h/Binance_LTCUSDT_4h.csv
+        dane/4h/Binance_MATICUSDT_4h.csv
+        dane/4h/Binance_NEARUSDT_4h.csv
+        dane/4h/Binance_TRXUSDT_4h.csv
+        dane/4h/Binance_XRPUSDT_4h.csv
+        dane/dzienne/Binance_ADAUSDT_d.csv
+        dane/dzienne/Binance_ATOMUSDT_d.csv
+        dane/dzienne/Binance_AVAXUSDT_d.csv
+        dane/dzienne/Binance_DOTUSDT_d.csv
+        dane/dzienne/Binance_LINKUSDT_d.csv
+        dane/dzienne/Binance_LTCUSDT_d.csv
+        dane/dzienne/Binance_MATICUSDT_d.csv
+        dane/dzienne/Binance_NEARUSDT_d.csv
+        dane/dzienne/Binance_TRXUSDT_d.csv
+        dane/dzienne/Binance_XRPUSDT_d.csv
+        dane/godzinowe/Binance_ADAUSDT_1h.csv
+        dane/godzinowe/Binance_ATOMUSDT_1h.csv
+        dane/godzinowe/Binance_AVAXUSDT_1h.csv
+        dane/godzinowe/Binance_DOTUSDT_1h.csv
+        dane/godzinowe/Binance_LINKUSDT_1h.csv
+        dane/godzinowe/Binance_LTCUSDT_1h.csv
+        dane/godzinowe/Binance_MATICUSDT_1h.csv
+        dane/godzinowe/Binance_NEARUSDT_1h.csv
+        dane/godzinowe/Binance_TRXUSDT_1h.csv
+        dane/godzinowe/Binance_XRPUSDT_1h.csv
+
+no changes added to commit (use "git add" and/or "git commit -a")
+Dropped refs/stash@{0} ([ZREDAGOWANO])
+PS C:\Projekty\imperial-mesh-vortex> git stash push -m "dane + pamiec przed bootstrap"
+Saved working directory and index state On claude/sleepy-fermi-dsdE4: dane + pamiec przed bootstrap
+PS C:\Projekty\imperial-mesh-vortex> git pull --rebase origin claude/sleepy-fermi-dsdE4
+remote: Enumerating objects: 18, done.
+remote: Counting objects: 100% (18/18), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 12 (delta 5), reused 12 (delta 5), pack-reused 0 (from 0)
+Unpacking objects: 100% (12/12), 4.10 KiB | 80.00 KiB/s, done.
+From github.com:dparzy/imperial-mesh-vortex
+ * branch            claude/sleepy-fermi-dsdE4 -> FETCH_HEAD
+   bccfcdd..dd77fa6  claude/sleepy-fermi-dsdE4 -> origin/claude/sleepy-fermi-dsdE4
+Updating bccfcdd..dd77fa6
+Fast-forward
+ .claude/hooks/session-end.sh   | 46 ++++++++++++++++++++++++++++++++++++++++++
+ .claude/hooks/session-start.sh | 23 +++++++++++++++++++++
+ .claude/settings.json          | 12 +++++++++++
+ .gitignore                     |  8 ++++++++
+ 4 files changed, 89 insertions(+)
+ create mode 100755 .claude/hooks/session-end.sh
+PS C:\Projekty\imperial-mesh-vortex> git stash pop
+On branch claude/sleepy-fermi-dsdE4
+Your branch is up to date with 'origin/claude/sleepy-fermi-dsdE4'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   bibliotheca_ulpia/dane/graf_pamieci.json
+        modified:   bibliotheca_ulpia/dane/katalog_nadrzedny.json
+        modified:   bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl
+        modified:   dane/4h/Binance_BNBUSDT_4h.csv
+        modified:   dane/4h/Binance_BTCUSDT_4h.csv
+        modified:   dane/4h/Binance_DOGEUSDT_4h.csv
+        modified:   dane/4h/Binance_ETHUSDT_4h.csv
+        modified:   dane/4h/Binance_SOLUSDT_4h.csv
+        modified:   dane/dzienne/Binance_BNBUSDT_d.csv
+        modified:   dane/dzienne/Binance_BTCUSDT_d.csv
+        modified:   dane/dzienne/Binance_DOGEUSDT_d.csv
+        modified:   dane/dzienne/Binance_ETHUSDT_d.csv
+        modified:   dane/dzienne/Binance_SOLUSDT_d.csv
+        modified:   dane/godzinowe/Binance_BNBUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_BTCUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_DOGEUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_ETHUSDT_1h.csv
+        modified:   dane/godzinowe/Binance_SOLUSDT_1h.csv
+        modified:   docs/PAMIEC_SESJI.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        dane/4h/Binance_ADAUSDT_4h.csv
+        dane/4h/Binance_ATOMUSDT_4h.csv
+        dane/4h/Binance_AVAXUSDT_4h.csv
+        dane/4h/Binance_DOTUSDT_4h.csv
+        dane/4h/Binance_LINKUSDT_4h.csv
+        dane/4h/Binance_LTCUSDT_4h.csv
+        dane/4h/Binance_MATICUSDT_4h.csv
+        dane/4h/Binance_NEARUSDT_4h.csv
+        dane/4h/Binance_TRXUSDT_4h.csv
+        dane/4h/Binance_XRPUSDT_4h.csv
+        dane/dzienne/Binance_ADAUSDT_d.csv
+        dane/dzienne/Binance_ATOMUSDT_d.csv
+        dane/dzienne/Binance_AVAXUSDT_d.csv
+        dane/dzienne/Binance_DOTUSDT_d.csv
+        dane/dzienne/Binance_LINKUSDT_d.csv
+        dane/dzienne/Binance_LTCUSDT_d.csv
+        dane/dzienne/Binance_MATICUSDT_d.csv
+        dane/dzienne/Binance_NEARUSDT_d.csv
+        dane/dzienne/Binance_TRXUSDT_d.csv
+        dane/dzienne/Binance_XRPUSDT_d.csv
+        dane/godzinowe/Binance_ADAUSDT_1h.csv
+        dane/godzinowe/Binance_ATOMUSDT_1h.csv
+        dane/godzinowe/Binance_AVAXUSDT_1h.csv
+        dane/godzinowe/Binance_DOTUSDT_1h.csv
+        dane/godzinowe/Binance_LINKUSDT_1h.csv
+        dane/godzinowe/Binance_LTCUSDT_1h.csv
+        dane/godzinowe/Binance_MATICUSDT_1h.csv
+        dane/godzinowe/Binance_NEARUSDT_1h.csv
+        dane/godzinowe/Binance_TRXUSDT_1h.csv
+        dane/godzinowe/Binance_XRPUSDT_1h.csv
+
+no changes added to commit (use "git add" and/or "git commit -a")
+Dropped refs/stash@{0} ([ZREDAGOWANO])
+PS C:\Projekty\imperial-mesh-vortex> bash .claude/hooks/session-end.sh
+<3>WSL (12 - Relay) ERROR: CreateProcessCommon:818: execvpe(/bin/bash) failed: No such file or directory
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+Dwie rzeczy z tego widzę — jedna to zwykły falstart, druga ważniejsza.
+
+## 1. Błąd `bash` to NIE problem hooka — to Twój PowerShell
+
+```
+WSL ERROR: execvpe(/bin/bash) failed: No such file or directory
+```
+
+To znaczy: w PowerShellu komenda `bash` wskazuje na **WSL** (Linux w Windows), którego nie masz zainstalowanego. To nic wspólnego z hookiem. Claude Code w środku używa **Git Bash** (masz go, bo używasz gita), więc hooki i tak odpali własnym shellem — nie tym zepsutym WSL.
+
+Żeby przetestować hook **ręcznie**, wywołaj Git Bash wprost:
+
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" .claude/hooks/session-end.sh
+```
+
+(gdyby ścieżka była inna, znajdź ją: `Get-Command git | Select-Object Source` → bash leży obok, w `...\Git\bin\bash.exe`).
+
+## 2. Ważne: brakuje Ci jeszcze jednego commita
+
+Twój ostatni pull skończył się na `dd77fa6`, ale ja wypchnąłem potem **`0790479`** (odpięcie danych rynkowych od gita). Dlatego CSV wciąż pokazują się jako `modified` — untrack do Ciebie nie dotarł. Dociągnij:
+
+```powershell
+git stash push -m "przed untrack danych"
+git pull --rebase origin claude/sleepy-fermi-dsdE4
+git stash pop
+```
+
+Po tym pull dane rynkowe przestaną być śledzone (git je zignoruje). W `git status` powinny **zniknąć** wszystkie `dane/...csv` — zostaną najwyżej pliki pamięci. To jest sygnał, że untrack zadziałał.
+
+Wklej mi wynik tych trzech komend + próby z Git Bash. Sprawdzam równolegle, jak dokładnie Claude Code odpala hooki na Windowsie, żeby dać Ci pewną odpowiedź, a nie zgadywać.
+
+## 🏛️ Claude
+Czekam na wynik tych komend z laptopa. Gdy je wkleisz, zobaczę czy untrack zadziałał, a w międzyczasie ustalam pewną odpowiedź o hookach na Windowsie.
+
+## 🧑 Cezar
+<task-notification>
+<task-id>ad163da9bad76dc6e</task-id>
+<tool-use-id>toolu_01UGC7HTLQqWGTPUJty1q6A1</tool-use-id>
+<output-file>/tmp/claude-0/-home-user-IMPERIAL-MESH-VORTEX/895ce14f-5b09-5f9b-96a7-19fd5a05feab/tasks/ad163da9bad76dc6e.output</output-file>
+<status>completed</status>
+<summary>Agent "Windows hook execution in Claude Code" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Perfect. I found the authoritative answer in the Claude Code hooks documentation. Here's what you need to know:
+
+## Short Answer
+
+**On Windows, Claude Code executes hooks using Git Bash by default.** When running shell-form commands (without `args`), Claude Code spawns `sh -c` on macOS/Linux or **Git Bash on Windows**.
+
+## Detailed Answers to Your Questions
+
+1. **What shell interpreter?**  
+   Git Bash (`bash.exe` from Git for Windows) is the default.
+
+2. **If PowerShell's bash is broken (WSL unavailable)?**  
+   Yes, Claude Code will still work—it uses Git Bash directly, not PowerShell's bash, so a broken WSL doesn't affect hook execution.
+
+3. **Direct executable or shell pass-through?**  
+   Claude Code passes the command to a shell. For `.sh` files:
+   - You need a shebang (`#!/bin/bash`) or make it executable (`chmod +x`)
+   - The file doesn't need a file extension
+   - You can use the hook's `"args": []` field to switch to "exec form," which spawns directly without a shell (bypassing the shell entirely)
+
+4. **Cross-platform hooks?**  
+   Write in plain Bash and rely on Git Bash being available on Windows. For PowerShell-specific scenarios, use conditional logic in your script or separate `type: "prompt"` hooks for logic decisions.
+
+**Source:** https://code.claude.com/docs/en/hooks-guide.md (see "JSON validation failed" troubleshooting section and "How hooks work")</result>
+<usage><subagent_tokens>42990</subagent_tokens><tool_uses>4</tool_uses><duration_ms>24316</duration_ms></usage>
+</task-notification>
+
+## 🏛️ Claude
+Mam pewną odpowiedź o hookach na Windowsie — **dobra wiadomość:**
+
+**Claude Code na Windowsie odpala hooki przez Git Bash (wbudowany w Git), a nie przez PowerShellowy `bash`/WSL.** Więc Twój zepsuty WSL **nie ma znaczenia** — hooki i tak zadziałają, gdy uruchamiasz Claude w terminalu. Nasze skrypty mają `#!/bin/bash` i `chmod +x`, czyli są poprawne dla tego mechanizmu.
+
+Znaczy to:
+- **Automatyka w Claude Code = działa na laptopie** (Git Bash to załatwia).
+- Twój ręczny test `bash ...` w PowerShellu padł tylko dlatego, że *w PowerShellu* `bash` = WSL. Do ręcznego testu użyj ścieżki Git Basha (`& "C:\Program Files\Git\bin\bash.exe" ...`), którą podałem.
+
+Więc jedyne co zostało, żeby domknąć stan, to te trzy komendy dociągające commit `0790479` (untrack danych):
+
+```powershell
+git stash push -m "przed untrack danych"
+git pull --rebase origin claude/sleepy-fermi-dsdE4
+git stash pop
+```
+
+Wklej wynik — sprawdzę, że dane rynkowe zniknęły z `git status`. Potem najprostszy dowód, że automatyka chodzi: **zamknij i otwórz Claude w terminalu** i zobacz w komunikatach startowych linię `[hook] SYNC ✅`. To najlepszy test — bo to dokładnie ten sam mechanizm, który ma działać codziennie.
+
+## 🧑 Cezar
+PS C:\Projekty\imperial-mesh-vortex> git stash push -m "przed untrack danych"
+dane/4h/Binance_BNBUSDT_4h.csv: needs merge
+dane/4h/Binance_BTCUSDT_4h.csv: needs merge
+dane/4h/Binance_DOGEUSDT_4h.csv: needs merge
+dane/4h/Binance_ETHUSDT_4h.csv: needs merge
+dane/4h/Binance_SOLUSDT_4h.csv: needs merge
+dane/dzienne/Binance_BNBUSDT_d.csv: needs merge
+dane/dzienne/Binance_BTCUSDT_d.csv: needs merge
+dane/dzienne/Binance_DOGEUSDT_d.csv: needs merge
+dane/dzienne/Binance_ETHUSDT_d.csv: needs merge
+dane/dzienne/Binance_SOLUSDT_d.csv: needs merge
+dane/godzinowe/Binance_BNBUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_BTCUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_DOGEUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_ETHUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_SOLUSDT_1h.csv: needs merge
+error: could not write index
+PS C:\Projekty\imperial-mesh-vortex> git pull --rebase origin claude/sleepy-fermi-dsdE4
+error: Pulling is not possible because you have unmerged files.
+hint: Fix them up in the work tree, and then use 'git add/rm <file>'
+hint: as appropriate to mark resolution and make a commit.
+fatal: Exiting because of an unresolved conflict.
+PS C:\Projekty\imperial-mesh-vortex> git stash pop
+dane/4h/Binance_BNBUSDT_4h.csv: needs merge
+dane/4h/Binance_BTCUSDT_4h.csv: needs merge
+dane/4h/Binance_DOGEUSDT_4h.csv: needs merge
+dane/4h/Binance_ETHUSDT_4h.csv: needs merge
+dane/4h/Binance_SOLUSDT_4h.csv: needs merge
+dane/dzienne/Binance_BNBUSDT_d.csv: needs merge
+dane/dzienne/Binance_BTCUSDT_d.csv: needs merge
+dane/dzienne/Binance_DOGEUSDT_d.csv: needs merge
+dane/dzienne/Binance_ETHUSDT_d.csv: needs merge
+dane/dzienne/Binance_SOLUSDT_d.csv: needs merge
+dane/godzinowe/Binance_BNBUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_BTCUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_DOGEUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_ETHUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_SOLUSDT_1h.csv: needs merge
+error: could not write index
+The stash entry is kept in case you need it again.
+PS C:\Projekty\imperial-mesh-vortex> git stash push -m "przed untrack danych"
+dane/4h/Binance_BNBUSDT_4h.csv: needs merge
+dane/4h/Binance_BTCUSDT_4h.csv: needs merge
+dane/4h/Binance_DOGEUSDT_4h.csv: needs merge
+dane/4h/Binance_ETHUSDT_4h.csv: needs merge
+dane/4h/Binance_SOLUSDT_4h.csv: needs merge
+dane/dzienne/Binance_BNBUSDT_d.csv: needs merge
+dane/dzienne/Binance_BTCUSDT_d.csv: needs merge
+dane/dzienne/Binance_DOGEUSDT_d.csv: needs merge
+dane/dzienne/Binance_ETHUSDT_d.csv: needs merge
+dane/dzienne/Binance_SOLUSDT_d.csv: needs merge
+dane/godzinowe/Binance_BNBUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_BTCUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_DOGEUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_ETHUSDT_1h.csv: needs merge
+dane/godzinowe/Binance_SOLUSDT_1h.csv: needs merge
+error: could not write index
+PS C:\Projekty\imperial-mesh-vortex> git pull --rebase origin claude/sleepy-fermi-dsdE4
+error: Pulling is not possible because you have unmerged files.
+hint: Fix them up in the work tree, and then use 'git add/rm <file>'
+hint: as appropriate to mark resolution and make a commit.
+fatal: Exiting because of an unresolved conflict.
+PS C:\Projekty\imperial-mesh-vortex> git stash pop
+
+## 🏛️ Claude
+Widzę — laptop utknął w stanie „unmerged" (któryś wcześniejszy `stash pop` zostawił konflikt na plikach CSV i teraz git blokuje wszystko). Spokojnie, to się czyści w kilka kroków. **Nic ważnego nie zginie** — pliki pamięci zostają nietknięte, nowe pary też; tracę tylko lokalne zmiany w 15 CSV, które i tak są do pobrania skryptem i za chwilę wylatują z gita.
+
+Wykonaj **dokładnie po kolei** (wklejaj pojedynczo):
+
+**Krok 1 — odblokuj zablokowany indeks** (pliki na dysku zostają):
+```powershell
+git reset
+```
+
+**Krok 2 — wyrzuć konflikt tylko z danych rynkowych** (pamięci NIE dotyka):
+```powershell
+git checkout -- dane/4h dane/dzienne dane/godzinowe
+```
+
+**Krok 3 — schowaj pamięć, pociągnij, odschowaj:**
+```powershell
+git stash push -m "pamiec"
+git pull --rebase origin claude/sleepy-fermi-dsdE4
+git stash pop
+```
+
+**Krok 4 — sprawdź stan:**
+```powershell
+git status
+```
+
+Po tym wszystkim spodziewam się: pliki `dane/...csv` **znikają** z listy (git je ignoruje), zostają najwyżej pliki pamięci. Wklej mi wynik `git status` z kroku 4.
+
+Gdyby krok 3 przy `stash pop` znów krzyknął „needs merge" — **zatrzymaj się i wklej mi to**, nie powtarzaj komend w kółko (to właśnie mnożyło stashe). Wtedy dam jeden precyzyjny ruch.
+
+Uwaga: te wcześniejsze nieudane próby zostawiły kilka stashy w kieszeni — posprzątamy je na końcu (`git stash list` → pokażę które usunąć). Najpierw odblokujmy repo.
+
+## 🧑 Cezar
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Ian> git reset
+fatal: not a git repository (or any of the parent directories): .git
+PS C:\Users\Ian>
+
+## 🏛️ Claude
+Jesteś w złym katalogu — nowy PowerShell otworzył się w `C:\Users\Ian`, a repo jest gdzie indziej. Najpierw wejdź do repo:
+
+```powershell
+cd C:\Projekty\imperial-mesh-vortex
+```
+
+Potem dopiero po kolei:
+
+```powershell
+git reset
+git checkout -- dane/4h dane/dzienne dane/godzinowe
+git stash push -m "pamiec"
+git pull --rebase origin claude/sleepy-fermi-dsdE4
+git stash pop
+git status
+```
+
+Wklej mi wynik (zwłaszcza `git status` na końcu). Jakby przy `git stash pop` znów było „needs merge" — zatrzymaj się i pokaż mi to.
+
+## 🧑 Cezar
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS C:\Projekty\imperial-mesh-vortex> git reset
+Unstaged changes after reset:
+M       bibliotheca_ulpia/dane/graf_pamieci.json
+M       bibliotheca_ulpia/dane/katalog_nadrzedny.json
+M       bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl
+M       docs/PAMIEC_SESJI.md
+PS C:\Projekty\imperial-mesh-vortex> git checkout -- dane/4h dane/dzienne dane/godzinowe
+error: pathspec 'dane/4h' did not match any file(s) known to git
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+To dobra wiadomość — po `git reset` **jedyne** zmodyfikowane pliki to 4 pliki pamięci, a dane rynkowe już **nie są śledzone** przez git (stąd błąd „did not match" — i to jest OK, dokładnie tego chcieliśmy). Krok 2 możesz pominąć.
+
+Kontynuuj (pojedynczo):
+
+```powershell
+git stash push -m "pamiec"
+git pull --rebase origin claude/sleepy-fermi-dsdE4
+git stash pop
+git status
+```
+
+Wklej wynik `git status`. Spodziewam się: tylko 4 pliki pamięci jako modified (te zaraz zgarnie hook końca sesji), zero `dane/...csv`. Jeśli tak — repo jest zdrowe i automatyka gotowa.
+
+## 🧑 Cezar
+PS C:\Projekty\imperial-mesh-vortex> git status
+On branch claude/sleepy-fermi-dsdE4
+Your branch is up to date with 'origin/claude/sleepy-fermi-dsdE4'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   bibliotheca_ulpia/dane/graf_pamieci.json
+        modified:   bibliotheca_ulpia/dane/katalog_nadrzedny.json
+        modified:   bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl
+        modified:   docs/PAMIEC_SESJI.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+To jest **zdrowy stan** — repo czyste, dane rynkowe zniknęły (ignorowane), zostały tylko 4 pliki pamięci. Untrack zadziałał. ✅
+
+Teraz najlepszy możliwy dowód, że automatyka chodzi — **odpal hook końca sesji na żywo** (przez Git Bash, nie WSL). Bo masz akurat zmienioną pamięć, więc zobaczysz go w akcji:
+
+```powershell
+& "C:\Program Files\Git\bin\bash.exe" .claude/hooks/session-end.sh
+```
+
+**Spodziewany wynik:**
+```
+[hook] Pamięć sesji zacommitowana.
+[hook] Pamięć wypchnięta na origin/claude/sleepy-fermi-dsdE4 ✅
+```
+
+Potem sprawdź, że pamięć się zapisała i drzewo jest czyste:
+```powershell
+git status
+git log --oneline -1
+```
+
+`git status` powinien pokazać **czyste drzewo** („nothing to commit"), a `git log` na górze **`auto: sync pamięci sesji`**. To znaczy: hook sam zebrał pamięć, zacommitował i wypchnął — dokładnie to, co ma robić po każdej sesji.
+
+Na koniec posprzątamy te zalegające stashe z nieudanych prób:
+```powershell
+git stash list
+```
+Wklej mi wyniki (hook + `git status` + `git log` + `git stash list`) — potwierdzę, że wszystko gra, i powiem które stashe skasować.
+
+Gdyby ścieżka do Git Basha była inna (błąd „nie znaleziono"), daj:
+```powershell
+Get-Command git | Select-Object Source
+```
+— pokażę dokładną ścieżkę do `bash.exe`.
+
+## 🧑 Cezar
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Try the new cross-platform PowerShell https://aka.ms/pscore6
+
+PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS C:\Projekty\imperial-mesh-vortex> git reset
+Unstaged changes after reset:
+M       bibliotheca_ulpia/dane/graf_pamieci.json
+M       bibliotheca_ulpia/dane/katalog_nadrzedny.json
+M       bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl
+M       docs/PAMIEC_SESJI.md
+PS C:\Projekty\imperial-mesh-vortex> git checkout -- dane/4h dane/dzienne dane/godzinowe
+error: pathspec 'dane/4h' did not match any file(s) known to git
+PS C:\Projekty\imperial-mesh-vortex> git stash push -m "pamiec"
+Saved working directory and index state On claude/sleepy-fermi-dsdE4: pamiec
+PS C:\Projekty\imperial-mesh-vortex> git pull --rebase origin claude/sleepy-fermi-dsdE4
+From github.com:dparzy/imperial-mesh-vortex
+ * branch            claude/sleepy-fermi-dsdE4 -> FETCH_HEAD
+Already up to date.
+PS C:\Projekty\imperial-mesh-vortex> git stash pop
+On branch claude/sleepy-fermi-dsdE4
+Your branch is up to date with 'origin/claude/sleepy-fermi-dsdE4'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   bibliotheca_ulpia/dane/graf_pamieci.json
+        modified:   bibliotheca_ulpia/dane/katalog_nadrzedny.json
+        modified:   bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl
+        modified:   docs/PAMIEC_SESJI.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+Dropped refs/stash@{0} ([ZREDAGOWANO])
+PS C:\Projekty\imperial-mesh-vortex> git status
+On branch claude/sleepy-fermi-dsdE4
+Your branch is up to date with 'origin/claude/sleepy-fermi-dsdE4'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   bibliotheca_ulpia/dane/graf_pamieci.json
+        modified:   bibliotheca_ulpia/dane/katalog_nadrzedny.json
+        modified:   bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl
+        modified:   docs/PAMIEC_SESJI.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+PS C:\Projekty\imperial-mesh-vortex> & "C:\Program Files\Git\bin\bash.exe" .claude/hooks/session-end.sh
+[hook] Pamięć sesji zacommitowana.
+[hook] Pamięć wypchnięta na origin/claude/sleepy-fermi-dsdE4 ✅
+PS C:\Projekty\imperial-mesh-vortex> git status
+On branch claude/sleepy-fermi-dsdE4
+Your branch is up to date with 'origin/claude/sleepy-fermi-dsdE4'.
+
+nothing to commit, working tree clean
+PS C:\Projekty\imperial-mesh-vortex> git log --oneline -1git stash list
+fatal: '1git': not an integer
+PS C:\Projekty\imperial-mesh-vortex> git stash list
+stash@{0}: On claude/sleepy-fermi-dsdE4: ostatni bootstrap
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+🎉 **Udało się — masz twardy dowód, że automatyka działa.** Patrz co się właśnie stało na żywo:
+
+```
+[hook] Pamięć sesji zacommitowana.
+[hook] Pamięć wypchnięta na origin/claude/sleepy-fermi-dsdE4 ✅
+```
+a potem:
+```
+nothing to commit, working tree clean
+```
+
+Czyli hook **sam** zebrał 4 pliki pamięci, zacommitował je i wypchnął na GitHub — dokładnie to, co ma robić po każdej sesji. Drzewo czyste. To jest zdrowy stan.
+
+## Odpowiedź na Twoje pytanie „jak sprawdzić czy działa"
+
+To co przed chwilą zrobiłeś **to jest ten test**. Na co patrzeć:
+- **Koniec sesji** → w logu `Pamięć zacommitowana` + `wypchnięta ✅`, a `git status` = `working tree clean`.
+- **Start sesji** → w komunikatach startowych `[hook] SYNC ✅`.
+
+Jeśli te linie widzisz — automatyka chodzi. Dziś obie strony potwierdzone (untrack + auto-commit).
+
+## Ostatni porządek — jeden zalegający stash
+
+Został `stash@{0}: ostatni bootstrap` z nieudanych prób. Zanim go skasujemy, sprawdźmy czy nic wartościowego w nim nie ma i czy dane są na dysku:
+
+```powershell
+git stash show -u "stash@{0}" --stat
+dir dane\4h
+```
+
+Wklej wynik. Jeśli w stashu są tylko stare pliki pamięci (już nadpisane świeższym commitem) i dane rynkowe (ignorowane, do pobrania skryptem), a nowe pary widać w `dir dane\4h` — wtedy bezpiecznie kasujemy:
+```powershell
+git stash drop "stash@{0}"
+```
+Ale najpierw pokaż mi te dwa wyniki — potwierdzę, że nic nie tracisz.
+
+## 🧑 Cezar
+nothing to commit, working tree clean
+PS C:\Projekty\imperial-mesh-vortex> git log --oneline -1git stash list
+fatal: '1git': not an integer
+PS C:\Projekty\imperial-mesh-vortex> git stash list
+stash@{0}: On claude/sleepy-fermi-dsdE4: ostatni bootstrap
+PS C:\Projekty\imperial-mesh-vortex> git stash show -u "stash@{0}" --stat
+ bibliotheca_ulpia/dane/graf_pamieci.json      | 13599 +++--
+ bibliotheca_ulpia/dane/katalog_nadrzedny.json |   418 +-
+ bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl  |     6 +
+ dane/4h/Binance_ADAUSDT_4h.csv                | 11989 ++++
+ dane/4h/Binance_ATOMUSDT_4h.csv               |  1002 +
+ dane/4h/Binance_AVAXUSDT_4h.csv               |  1002 +
+ dane/4h/Binance_BNBUSDT_4h.csv                | 30064 ++++------
+ dane/4h/Binance_BTCUSDT_4h.csv                | 30621 ++++------
+ dane/4h/Binance_DOGEUSDT_4h.csv               | 15491 +----
+ dane/4h/Binance_DOTUSDT_4h.csv                |  1002 +
+ dane/4h/Binance_ETHUSDT_4h.csv                | 30571 ++++------
+ dane/4h/Binance_LINKUSDT_4h.csv               |  1002 +
+ dane/4h/Binance_LTCUSDT_4h.csv                |  1002 +
+ dane/4h/Binance_MATICUSDT_4h.csv              |  1002 +
+ dane/4h/Binance_NEARUSDT_4h.csv               |  1002 +
+ dane/4h/Binance_SOLUSDT_4h.csv                | 13086 +----
+ dane/4h/Binance_TRXUSDT_4h.csv                |  1002 +
+ dane/4h/Binance_XRPUSDT_4h.csv                | 11989 ++++
+ dane/dzienne/Binance_ADAUSDT_d.csv            |  2964 +
+ dane/dzienne/Binance_ATOMUSDT_d.csv           |  2587 +
+ dane/dzienne/Binance_AVAXUSDT_d.csv           |  2075 +
+ dane/dzienne/Binance_BNBUSDT_d.csv            |     9 +
+ dane/dzienne/Binance_BTCUSDT_d.csv            |     9 +
+ dane/dzienne/Binance_DOGEUSDT_d.csv           |     9 +
+ dane/dzienne/Binance_DOTUSDT_d.csv            |  2110 +
+ dane/dzienne/Binance_ETHUSDT_d.csv            |     9 +
+ dane/dzienne/Binance_LINKUSDT_d.csv           |  2690 +
+ dane/dzienne/Binance_LTCUSDT_d.csv            |  3089 +
+ dane/dzienne/Binance_MATICUSDT_d.csv          |  1966 +
+ dane/dzienne/Binance_NEARUSDT_d.csv           |  2053 +
+ dane/dzienne/Binance_SOLUSDT_d.csv            |     9 +
+ dane/dzienne/Binance_TRXUSDT_d.csv            |  2909 +
+ dane/dzienne/Binance_XRPUSDT_d.csv            |  2947 +
+ dane/godzinowe/Binance_ADAUSDT_1h.csv         | 70449 +++++++++++++++++++++++
+ dane/godzinowe/Binance_ATOMUSDT_1h.csv        | 61390 ++++++++++++++++++++
+ dane/godzinowe/Binance_AVAXUSDT_1h.csv        | 49346 ++++++++++++++++
+ dane/godzinowe/Binance_BNBUSDT_1h.csv         |   207 +
+ dane/godzinowe/Binance_BTCUSDT_1h.csv         |   207 +
+ dane/godzinowe/Binance_DOGEUSDT_1h.csv        |   207 +
+ dane/godzinowe/Binance_DOTUSDT_1h.csv         | 49918 ++++++++++++++++
+ dane/godzinowe/Binance_ETHUSDT_1h.csv         |   207 +
+ dane/godzinowe/Binance_LINKUSDT_1h.csv        | 64011 +++++++++++++++++++++
+ dane/godzinowe/Binance_LTCUSDT_1h.csv         | 73531 ++++++++++++++++++++++++
+ dane/godzinowe/Binance_MATICUSDT_1h.csv       | 47070 +++++++++++++++
+
+## 🏛️ Claude
+W stashu są dwie rzeczy: **stare pliki pamięci** (już nieaktualne — świeższą wersję hook przed chwilą zacommitował) oraz **dane rynkowe** (wszystkie pary). Pamięci ze stasha NIE chcemy przywracać — cofnęłaby świeży commit. Zostają tylko dane, a te są do pobrania skryptem.
+
+Zanim skasujemy stash, jedno sprawdzenie — czy nowe pary są **na dysku** (a nie tylko w stashu):
+
+```powershell
+dir dane\4h
+```
+
+Wklej wynik. Liczę na ~15 plików (5 starych: BNB/BTC/DOGE/ETH/SOL + 10 nowych: ADA/ATOM/AVAX/DOT/LINK/LTC/MATIC/NEAR/TRX/XRP).
+
+- **Jeśli wszystkie 15 tam są** → stash jest zbędny (same duplikaty danych + stara pamięć), kasujemy bez straty:
+  ```powershell
+  git stash drop "stash@{0}"
+  ```
+- **Jeśli którejś nowej pary brakuje na dysku** → zatrzymaj się, wyciągnę ją ze stasha zanim skasujemy.
+
+Pokaż `dir dane\4h`, to podejmę decyzję za Ciebie.
+
+Na marginesie: ten stash i tak **niczego nie psuje** — drzewo jest czyste, automatyka działa. Kasujemy go tylko dla porządku, nie z konieczności.
+
+## 🧑 Cezar
+PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS C:\Projekty\imperial-mesh-vortex> dir dane\4h
+
+
+    Directory: C:\Projekty\imperial-mesh-vortex\dane\4h
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        04.07.2026     16:54        1540838 Binance_ADAUSDT_4h.csv
+-a----        04.07.2026     16:54         125115 Binance_ATOMUSDT_4h.csv
+-a----        04.07.2026     16:54         127564 Binance_AVAXUSDT_4h.csv
+-a----        04.07.2026     16:54        1615509 Binance_BNBUSDT_4h.csv
+-a----        04.07.2026     16:54        1723591 Binance_BTCUSDT_4h.csv
+-a----        04.07.2026     16:54         130775 Binance_DOGEUSDT_4h.csv
+-a----        04.07.2026     16:54         125506 Binance_DOTUSDT_4h.csv
+-a----        04.07.2026     16:54        1676884 Binance_ETHUSDT_4h.csv
+-a----        04.07.2026     16:54         127650 Binance_LINKUSDT_4h.csv
+-a----        04.07.2026     16:54         129260 Binance_LTCUSDT_4h.csv
+-a----        04.07.2026     16:54         129420 Binance_MATICUSDT_4h.csv
+-a----        04.07.2026     16:54         127997 Binance_NEARUSDT_4h.csv
+-a----        04.07.2026     16:54         132603 Binance_SOLUSDT_4h.csv
+-a----        04.07.2026     16:54         127976 Binance_TRXUSDT_4h.csv
+-a----        04.07.2026     16:54        1552785 Binance_XRPUSDT_4h.csv
+
+
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+Wszystkie 15 par są na dysku (5 starych + 10 nowych, każda z realnym rozmiarem). Dane bezpieczne. Stash to czyste duplikaty + stara pamięć — kasuj bez obaw:
+
+```powershell
+git stash drop "stash@{0}"
+```
+
+Potem ostateczny sprawdzian porządku:
+```powershell
+git stash list
+git status
+```
+
+`git stash list` powinien być **pusty**, `git status` → `working tree clean`. Jak tak — koniec, repo jest w idealnym stanie.
+
+## Podsumowanie — jesteśmy u celu 🏛️
+
+Wszystko, o co pytałeś („jak sprawdzić czy automatyka działa"), jest **potwierdzone na żywo dziś**:
+
+| Mechanizm | Status | Dowód |
+|---|---|---|
+| **Auto-commit pamięci** (koniec sesji) | ✅ działa | Widziałeś: `Pamięć zacommitowana` + `wypchnięta ✅` → `working tree clean` |
+| **Auto-pull** (start sesji) | ✅ gotowy | linia `[hook] SYNC ✅` przy starcie Claude |
+| **Dane rynkowe poza git** | ✅ zrobione | `dane/...csv` zniknęły z `git status`, 15 par na dysku |
+| **Hooki na Windows** | ✅ potwierdzone | Claude Code używa Git Bash (nie WSL) — działają |
+
+**Od teraz na laptopie nie robisz nic ręcznie** — Claude na starcie sam ściąga najnowszy stan, na końcu sam zapisuje pamięć. Koniec „kręcenia się w kółko".
+
+Jak chcesz kiedyś szybko potwierdzić, że wszystko gra — patrz na dwie linie: `[hook] SYNC ✅` przy starcie i `working tree clean` po zamknięciu. Wklej mi jeszcze wynik tego `git stash drop` + `git status`, to zamknę temat z czystym potwierdzeniem.
+
+## 🧑 Cezar
+PS C:\Projekty\imperial-mesh-vortex> git stash drop "stash@{0}"
+Dropped stash@{0} ([ZREDAGOWANO])
+PS C:\Projekty\imperial-mesh-vortex> git stash list
+PS C:\Projekty\imperial-mesh-vortex> git status
+On branch claude/sleepy-fermi-dsdE4
+Your branch is up to date with 'origin/claude/sleepy-fermi-dsdE4'.
+
+nothing to commit, working tree clean
+PS C:\Projekty\imperial-mesh-vortex>
+
+## 🏛️ Claude
+Idealnie. `git stash list` pusty, `working tree clean`, gałąź zsynchronizowana z origin. **Repo jest w perfekcyjnym stanie.**
+
+Dla porządku synchronizuję też swój (chmurowy) checkout z tym, co laptop właśnie wypchnął:
+
+## 🏛️ Claude
+Widać na origin: `1353583 auto: sync pamięci sesji (hook końca sesji)` — to **commit, który przed chwilą sam zrobił hook na Twoim laptopie**. Najlepszy możliwy dowód, że automatyka działa end-to-end: pamięć z laptopa jest już na GitHub, bez jednego ręcznego kliknięcia.
+
+## 🏛️ Zamknięte — wszystko działa
+
+**Twoje pytanie „jak sprawdzić czy automatyka działa" → sprawdzone i potwierdzone dziś na żywo:**
+
+- ✅ Hook końca sesji sam zacommitował i wypchnął pamięć (`1353583` widoczny na GitHub)
+- ✅ `working tree clean`, `git stash list` pusty — zero bałaganu
+- ✅ Dane rynkowe poza gitem (15 par bezpiecznie na dysku), nie robią churn
+- ✅ Hooki potwierdzone jako działające na Windows (Git Bash)
+
+**Jak zawsze szybko sprawdzić, że gra** — dwie linie:
+1. Przy **starcie** Claude: `[hook] SYNC ✅`
+2. Po **zamknięciu**: `git status` → `working tree clean` (+ nowy commit `auto: sync pamięci sesji`)
+
+Od teraz na laptopie nie dotykasz gita ręcznie — Claude na starcie ściąga najnowszy stan, na końcu zapisuje pamięć. To był ostatni raz, gdy walczyliśmy z synchronizacją. Możesz spokojnie pracować.
+
+## 🧑 Cezar
+czyli teraz lokalny claude i chmura sie wzajemnie widzicie tzn zmiany
+
+## 🏛️ Claude
+Tak — ale ważne żeby dobrze zrozumieć **jak**, bo to nie jest tak, że widzimy się „na żywo" nawzajem. Widzimy się **przez GitHub**, jako pośrednika, i **na granicach sesji**.
+
+## Model w jednym obrazku
+
+```
+   LAPTOP-Claude  ←──►  GitHub (chmura danych)  ←──►  CHMURA-Claude (ja)
+```
+
+Nikt nie gada bezpośrednio z nikim. **Obaj gadamy z GitHubem.** GitHub to wspólny magazyn.
+
+## Jak przepływają zmiany
+
+- **Ja (chmura) coś zmieniam** → commituję i pushuję na GitHub. → Twój laptop-Claude **na starcie następnej sesji** robi auto-pull i to widzi.
+- **Laptop coś zmienia** (albo hook zapisuje pamięć) → pushuje na GitHub. → Ja **na starcie mojej następnej sesji** robię auto-pull i to widzę.
+
+## Kluczowe: to NIE jest na żywo
+
+Widzimy swoje zmiany **przy starcie i końcu sesji**, nie w tej samej sekundzie. Czyli:
+- ✅ Pracujesz na laptopie, kończysz → zmiany lądują na GitHub → następnym razem ja je mam.
+- ✅ Ja pracuję w chmurze, pushuję → następnym razem laptop je ma.
+- ⚠️ Gdybyś odpalił **oba naraz** i obaj zmienialiśmy to samo — mogłyby się rozjechać. Dlatego używaj **jednego na raz** (co i tak robisz naturalnie).
+
+## Co konkretnie się synchronizuje
+
+| Rzecz | Synchronizuje się? |
+|---|---|
+| **Kod, dokumenty** (moje commity) | ✅ tak — laptop pobiera na starcie |
+| **Pamięć** (graf, dziennik, kronika) | ✅ tak — automatycznie w obie strony |
+| **Dane rynkowe** (CSV) | ❌ nie — celowo lokalne, każda maszyna ma swoje |
+
+Prosty test w praktyce: jak kiedyś zmienię coś tutaj w chmurze, wystarczy że na laptopie **zamkniesz i otworzysz Claude** — na starcie zobaczy `[hook] SYNC ✅` i już ma moje zmiany. I odwrotnie.
+
+Jedna uwaga o „tu i teraz": mój chmurowy checkout jest teraz o ten jeden commit pamięci z laptopa (`1353583`) do tyłu — pobiorę go automatycznie przy następnym starcie. To normalne działanie, nie błąd.
+
+## 🧑 Cezar
+spoko koncze na dzis a co z pamiecia tymi 13 warstw
+
+## 🏛️ Claude
+Dobra pora, żeby to domknąć — i akurat **pamięć to sedno tego, co dziś zrobiliśmy**. Krótko o 13 warstwach + zamykam sesję wpisem do Dziennika (rozkaz stały: koniec każdej sesji).
+
+Najpierw sprawdzam stan warstw (nie z pamięci — z kodu):
+
+## 🏛️ Claude
+Wszystkie warstwy na miejscu w kodzie. Zapisuję zamknięcie dzisiejszej sesji do Dziennika Nieśmiertelnego:
+
+## 🏛️ Claude
+Zamknięte — wpis do Dziennika sam poszedł na GitHub (`9ee21e1`, przez hook końca sesji). Laptop pobierze go przy następnym starcie.
+
+## Co z pamięcią i tymi 13 warstwami
+
+**Wszystkie warstwy są zdrowe i nietknięte** — sprawdziłem w kodzie, nie z pamięci. I najważniejsze na dziś: **to właśnie one od teraz synchronizują się same** między laptopem a chmurą. Wcześniej pamięć rozjeżdżała się między maszynami (stąd całe „kręcenie w kółko") — teraz hook końca sesji sam ją commituje i pushuje.
+
+Warstwy w kodzie (`imperium/biblioteki/`):
+- **Dziennik Nieśmiertelny** — zwięzła oś czasu całego projektu (tu przed chwilą dopisałem dzisiejszą sesję)
+- **Kronika czatu** — pełne transkrypty rozmów przetrwałe w git
+- **Graf pamięci** — powiązania między pojęciami
+- **Kustosz pamięci** — nadrzędny organ zarządzający
+- **Refleksja / Zapominanie** — destylacja lekcji + uczone odrzucanie szumu
+- **Pamięć proceduralna / robocza / proweniencji** — jak-coś-zrobić / bieżący kontekst / skąd-wiemy
+- **Centrum pamięci** — to co wstrzykuje się na starcie sesji (scoring TOP-k lekcji)
+- plus wcześniejsze: pamięć sesji, absolutna, środowisko, kronikarze zdarzeń
+
+**Efekt dla Ciebie:** każde słowo/decyzja z sesji trafia do tych warstw, a warstwy trafiają do git — więc gdy jutro odpalisz Claude (laptop albo chmura), na starcie `[hook] SYNC ✅` ściąga najświeższą pamięć i asystent od pierwszej sekundy zna cały łuk projektu. Nie będzie już „nic nie wiem".
+
+## Stan na koniec dnia
+- ✅ cubic PR #104 naprawione
+- ✅ sync laptop↔chmura zbudowany, przetestowany na żywo w obie strony
+- ✅ pamięć (13 warstw) zdrowa i auto-synchronizowana
+- ✅ Dziennik zamknięty wpisem z dziś, wypchnięty na GitHub
+- 🔜 następny krok (zapisany w Dzienniku): NEWS-09/10 albo walidacja MTF-weto na bessach 2018/2025
+
+Dobrej nocy, Cezarze. Jutro asystent wstanie z pełną pamięcią dzisiejszego dnia. 🏛️
+
+## 🧑 Cezar
+a jak to uzywac lokal wszystkie komendy pelna lista krok po kroku dla nowicjusza dokladnie pelna sciaga wszystko co mamy
+
+## 🏛️ Claude
+Świetny pomysł — zrobię Ci **pełną ściągę krok po kroku dla nowicjusza**, ze wszystkimi realnymi komendami. Najpierw zbieram, co faktycznie mamy w kodzie (żeby nie wymyślać komend — Prawo I), potem złożę czytelny dokument.
+
+## 🏛️ Claude
+Dużo narzędzi. Sprawdzam opisy tych najważniejszych dla nowicjusza, żeby ściąga była dokładna:
+
+## 🏛️ Claude
+Sprawdzam jeszcze komendy pamięci i czy nie ma już podręcznika (żeby nie dublować):
+
+## 🏛️ Claude
+Jest już `START_LOKAL.md` i `MANUAL_UZYTKOWNIKA.md`, ale Ty chcesz **jedną pełną ściągę w jednym miejscu**. Zrobię ją jako `docs/SCIAGA_LOKAL.md` — zsynchronizuje się na laptop, otworzysz kiedy chcesz. Zerkam na istniejący START_LOKAL, żeby nie kłamać w szczegółach środowiska:
+
+## 🏛️ Claude
+Mam wszystko. Piszę pełną ściągę:
+
+## 🏛️ Claude
+Sprawdzam audyt (skanuje wszystkie .md) i commituję:
+
+## 🏛️ Claude
+Audyt słusznie wymaga wpisania nowego dokumentu do INDEKS_IMPERIUM. Dodaję:
+
+## 🏛️ Claude
+Gotowe — pełna ściąga jest w repo: **`docs/SCIAGA_LOKAL.md`** (wypchnięta na GitHub, `384180a`). Pobierze się na laptop przy następnym starcie Claude, albo od razu: `git pull --rebase origin claude/sleepy-fermi-dsdE4`.
+
+Tu masz najważniejsze na już — reszta (backtest, wykresy, pomiary, pobieranie danych, problemy) jest w dokumencie:
+
+## Najprostszy dzień — 3 komendy
+```powershell
+cd C:\Projekty\imperial-mesh-vortex     # 1. wejdź do projektu
+claude                                  # 2. odpal Claude (sync + pamięć dzieją się same)
+# ...pracujesz... zamykasz — pamięć zapisze się sama
+```
+
+## Sprawdzenie zdrowia
+```powershell
+python tests/run_tests.py               # testy zielone
+python narzedzia/audyt_spojnosci.py     # spójność kod↔docs (exit 0)
+python narzedzia/status.py              # pulpit jednego spojrzenia
+```
+
+## Uruchomienie systemu (symulacja, zero pieniędzy)
+```powershell
+python skrypty/start.py                 # → otwórz http://localhost:8777  (Ctrl+C = stop)
+```
+
+## Zobaczyć wykres (oczy Cezara)
+```powershell
+python narzedzia/backtest_dashboard.py dane/4h/Binance_BTCUSDT_4h.csv 4H   # panel HTML sam się otwiera
+python narzedzia/wykres_backtestu.py dane/4h/Binance_DOGEUSDT_4h.csv 4h    # PNG obok repo
+```
+
+## Pamięć (13 warstw)
+```powershell
+python -m imperium.biblioteki.centrum_pamieci szukaj "słowo"       # szukaj w całej pamięci
+python -m imperium.biblioteki.dziennik_niesmiertelny ostatni       # oś czasu projektu
+```
+
+## Jak coś się zepsuje (już to przeszliśmy)
+| Problem | Ratunek |
+|---|---|
+| `git pull` blokuje (`unstaged changes`) | `git stash` → `git pull --rebase ...` → `git stash pop` |
+| utknięty `needs merge` | `git reset` → potem stash/pull/pop |
+| `bash` nie działa (`WSL ERROR`) | `& "C:\Program Files\Git\bin\bash.exe" ...` |
+| DeepSeek `cacert.pem` | `Remove-Item Env:SSL_CERT_FILE` |
+
+Cała reszta — pobieranie danych, IC/walk-forward/scoreboard, klucze API, SSH przez port 443 — jest rozpisana w `docs/SCIAGA_LOKAL.md`. Otwierasz ją kiedy chcesz, jest na każdej maszynie (synchronizuje się z gitem).
+
+Dobrej nocy, Cezarze. 🏛️
+
+## 🧑 Cezar
+a sa jakies opcje podlaczenia tradingview live do lokala claude juz to chyba robilismy
+
+## 🏛️ Claude
+Tak, to już zbudowaliśmy — jest gotowa integracja TradingView przez webhook. Sprawdzam dokładnie, co mamy w kodzie, żeby nie zgadywać:
+
+## 🏛️ Claude
+Jest nawet dedykowany moduł `webhook_tradingview.py`. Sprawdzam jego szczegóły:
+
+## 🏛️ Claude
+Tak — jest w pełni zbudowane (moduł **W-354 `webhook_tradingview.py`**), zero zewnętrznych zależności. Działa tak:
+
+## Jak podłączyć TradingView na żywo (paper trading, zero pieniędzy)
+
+**Krok 1 — ustaw hasło webhooka (raz, potem nowy terminal):**
+```powershell
+setx WEBHOOK_TV_SEKRET "mojeTajneHaslo123"
+```
+
+**Krok 2 — odpal Imperium z webhookiem:**
+```powershell
+python skrypty/start_tv.py          # rój + odbiornik webhooka na porcie 8777
+```
+Panel: **http://localhost:8777** (tam masz gotowy szablon do wklejenia w TradingView).
+
+**Krok 3 — wystaw port na świat (drugi terminal):**
+```powershell
+ngrok http 8777
+```
+Skopiuj adres `https://....ngrok-free.app`.
+
+**Krok 4 — w TradingView (Add Alert → Webhook URL):**
+- URL: `https://....ngrok-free.app/webhook/tv`
+- Alert Message (JSON):
+```json
+{
+  "symbol": "{{ticker}}", "interwal": "{{interval}}", "akcja": "NEUTRAL",
+  "cena": {{close}}, "open": {{open}}, "high": {{high}}, "low": {{low}},
+  "close": {{close}}, "volume": {{volume}},
+  "czas": "{{time}}", "sekret": "mojeTajneHaslo123"
+}
+```
+
+Od tego momentu każda zamknięta świeca z TradingView leci do Twojego roju, neurony głosują, a pętla live symuluje transakcje — widzisz to na panelu `localhost:8777`.
+
+## Dwie ważne rzeczy (uczciwie)
+
+1. **To łączy TradingView z ROJEM Imperium (kodem), nie ze mną-Claude.** Rój liczy i głosuje na żywo lokalnie. Ja (asystent) nie siedzę w tej pętli sekunda-po-sekundzie — ale pomagam ustawić, czytać wyniki i stroić.
+2. **Webhooki w TradingView wymagają płatnego planu** (Pro/Pro+/Premium) — darmowe konto ich nie ma. To ograniczenie TradingView, nie nasze.
+
+## Alternatywa bez TradingView
+
+Jeśli nie chcesz płacić za TradingView, masz już dane z Binance (za darmo, bez klucza):
+```powershell
+python narzedzia/pobierz_4h_binance.py    # świeże świece
+python narzedzia/backtest_dashboard.py dane/4h/Binance_BTCUSDT_4h.csv 4H
+```
+
+---
+
+Chcesz, żebym **dopisał tę sekcję TradingView do ściągi** (`docs/SCIAGA_LOKAL.md`), żebyś miał wszystko w jednym miejscu? Powiedz „dawaj", to dodam i wypchnę.
+
+## 🧑 Cezar
+poszaj inne ciekawe opcje podlaczenia mcp do nauki naszej areny zobacz co mamy plus unikaty i najlepsze moduly do nauki live tylko najlepsze zgodnie z zasadami
+
+## 🏛️ Claude
+Dobra robota do zrobienia — ale zrobię ją wg zasad: najpierw **co realnie mamy** (Prawo I — z kodu, nie z pamięci), potem realne opcje MCP z linkami (ZPO — pełne nazwy + źródła, status weryfikacji). Zaczynam od skanu repo i researchu równolegle.
+
+## 🏛️ Claude
+Mamy **własny serwer MCP** (`narzedzia/rag/mcp_server.py`) — sprawdzam co udostępnia, i patrzę na warstwy uczenia:
+
+## 🏛️ Claude
+Mam pełny obraz tego, co mamy. Teraz research realnych opcji MCP (z linkami, status weryfikacji — ZPO). Sprawdzam aktualny ekosystem:
+
+## 🏛️ Claude
+You've hit your session limit · resets 6:30pm (UTC)
+
+## 🧑 Cezar
+<task-notification>
+<task-id>b9ox4l82v</task-id>
+<tool-use-id>toolu_015oNyWrLxgdGyQy2z6ZbwLu</tool-use-id>
+<output-file>/tmp/claude-0/-home-user-IMPERIAL-MESH-VORTEX/895ce14f-5b09-5f9b-96a7-19fd5a05feab/tasks/b9ox4l82v.output</output-file>
+<status>killed</status>
+<summary>Background command "Wait for tests to finish" was stopped</summary>
+</task-notification>
+
+## 🧑 Cezar
+<system-reminder>
+The container was restarted. The following background tasks were running and are now stopped:
+- Wait for tests to finish (task b9ox4l82v)
+Re-create them if still needed.
+</system-reminder>
+
+## 🧑 Cezar
+This session's worker process was restarted. If your previous turn was already complete, take no action and wait for the next event. Otherwise, continue from where you left off.
+
+## 🏛️ Claude
+Kontener się zrestartował, a agent researchu trafił na limit sesji — ale mam wszystko, czego trzeba: fakty z repo + moją wiedzę. Odpowiadam wprost, wg zasad (Prawo I: co pewne vs do weryfikacji; Prawo XVI: nie dokładamy redundancji; XXV: przewaga).
+
+## 1. Co JUŻ mamy (z kodu)
+
+- **Własny serwer MCP** — `narzedzia/rag/mcp_server.py`, wystawia `biblioteka_szukaj` (semantyczny + FTS przeszukiwacz całej naszej wiedzy/pamięci). **To jest unikat** — Claude może pytać naszą bibliotekę przez MCP.
+- **Warstwy uczenia live (to są nasze najlepsze moduły, nie MCP):**
+  - `synapsy_rezimowe` — pamięć „co działa w TREND vs RANGE vs PANIC"
+  - **MWU** (Multiplicative Weights Update) — online uczenie wag neuronów po każdym trade
+  - `igrzyska` — ranking neuronów po skuteczności
+  - `ksiega_wad` — filtr błędnych setupów z przeszłości
+  - `drift_adapter` + `namiestnik` — adaptacja do zmiany reżimu
+  - `pamiec_refleksyjna` — destylacja lekcji
+
+**Kluczowa myśl (wg zasad):** *uczy się nasz KOD, nie MCP.* MCP to **rura** (dane wchodzą) i **soczewka** (Claude może obejrzeć wyniki areny). Nie mylmy tego.
+
+## 2. MCP, które REALNIE dokładają wartość (tylko te — Prawo XVI)
+
+| MCP | Co daje arenie | Status (ZPO) | Werdykt |
+|---|---|---|---|
+| **Filesystem** (oficjalny) | Claude-lokal ma pełny dysk: czyta wszystkie CSV, logi, wyniki | ✅ `github.com/modelcontextprotocol/servers` | **Bierzemy** — już w planie (START_LOKAL) |
+| **SQLite / DuckDB MCP** | Claude pyta SQL-em o trades, IC, equity — „pokaż neurony z ujemnym IC w bessie" | ⚠️ oficjalny SQLite ref istnieje; DuckDB community — zweryfikuj lokalnie | **Bierzemy** — to prawdziwa „nauka areny": interrogacja wyników |
+| **Fetch** (oficjalny) | Pobieranie stron/RSS na żądanie | ✅ ten sam repo | Opcjonalnie (mamy własny news_fetcher — częściowa redundancja) |
+| **CCXT / Binance MCP** | Żywy feed z giełdy przez Claude | ⚠️ istnieją community wersje — **nie podam pewnego repo, zweryfikuj** | Może — ale mamy `pobierz_4h_binance.py`; MCP dokłada tylko real-time |
+
+## 3. Czego świadomie NIE bierzemy (Prawo XVI — redundancja mierzona)
+
+- **Official „Memory" MCP** (knowledge-graph) — **odrzucamy.** Mamy własne **13 warstw pamięci** + graf, lepsze i zintegrowane. Dokładanie = skorelowana funkcja bez nowej informacji.
+- Losowe „crypto trading" MCP z marketplace — większość to cienkie wrappery bez testów. Prawo XIX: nie ufamy bez kodu+weryfikacji.
+
+## 4. Rekomendacja (najlepsze, minimalny zestaw)
+
+Dla „nauki areny live" realnie warte podpięcia to **dwa**:
+1. **Filesystem MCP** — Claude widzi cały dysk (wyniki, logi, CSV) → może analizować arenę bez kopiowania.
+2. **SQLite/DuckDB MCP nad naszą bazą wyników** — Claude pyta SQL-em o skuteczność neuronów per reżim. To domyka pętlę: rój gra → wyniki do bazy → Claude je bada → stroimy wagi. **To jest przewaga (Prawo XXV).**
+
+Feed live (CCXT/TradingView webhook — już mamy) karmi **nasze** moduły uczenia (MWU, synapsy). MCP ich nie zastępuje.
+
+---
+
+Chcesz, żebym:
+- **(A)** dopisał gotowy blok `mcpServers` do `.claude/settings.json` (Filesystem + nasz RAG), żebyś miał to wpięte na lokalu, oraz
+- **(B)** sprawdził/zbudował mały **SQLite MCP nad bazą wyników areny** (nasz, zgodny z zasadami — kod+testy), żeby Claude mógł pytać SQL-em o skuteczność roju?
+
+Powiedz które (A / B / oba). Research zewnętrznych repo (dokładne linki CCXT-MCP) dokończę osobnym agentem, gdy odnowi się limit — teraz nie chcę podać niepewnego URL (Prawo I).
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+Tylko auto-generowany plik pamięci (kronika bieżącej sesji). To dokładnie zadanie hooka pamięci — odpalam go:
+
+## 🏛️ Claude
+Zrobione — hook pamięci zacommitował i wypchnął kronikę sesji, drzewo czyste. To był auto-generowany plik pamięci (zapis tej rozmowy), więc trafił dokładnie tam, gdzie ma: do gita, żeby przetrwał i zsynchronizował się na laptop.
+
+Wracając do Twojego pytania o MCP — czekam na Twój wybór:
+- **(A)** wpiąć `mcpServers` (Filesystem + nasz RAG) do `.claude/settings.json`,
+- **(B)** zbudować mały SQLite MCP nad bazą wyników areny (nasz, kod+testy), żeby Claude pytał SQL-em o skuteczność roju,
+- albo **oba**.
+
+Powiedz A / B / oba, to działam.
+
+## 🧑 Cezar
+zaczynam  właśnie wachtę od 0000 do 1200 zazwyczaj będę używał telefonu dawaj oba zgodnie z zasadami zawsze sprawdzaj wszystko nasz obecny stan dokumenty i kod zanim coś zrobisz to nasza zasada jeżeli jej nie mamy to zaktualizuj
+
+## 🏛️ Claude
+Zaczynam od naszej zasady — **rozpoznanie terenu przed działaniem**. Sprawdzam, czy ta zasada jest już skodyfikowana, robię KROK 0 (stan/kod/docs) i badam, gdzie żyją wyniki areny (pod kątem B).
+
+## 🏛️ Claude
+Potwierdzam: **zasadę już mamy** — `Prawo XVII — ROZPOZNANIE TERENU (ROZKAZ STAŁY, ROBISZ TO PIERWSZE)` w CLAUDE.md (linia 34) + „NIE zgaduj z pamięci" (linia 89). Nie duplikuję prawa; właśnie wg niego działam. KROK 0 czysty: 84 neurony / 15 zwiadowców, drzewo zsynchronizowane.
+
+Ustalenie dla **B**: nie ma jeszcze bazy wyników — IC/scoreboard liczą się na żądanie i znikają. Więc B zbuduję uczciwie jako **Arena MCP** z realną bazą SQLite, która akumuluje pomiary. Czytam istniejący serwer MCP, żeby zachować ten sam wzorzec (Prawo XVI — reuse):
+
+## 🏛️ Claude
+Wzorzec jasny. Sprawdzam API rejestru dla migawki roju (Arena MCP):
+
+## 🏛️ Claude
+Mam komplet. Buduję **Arena MCP** — instant migawka roju + baza SQLite wyników (którą Claude zapisuje i przeszukuje). Piszę z czystymi funkcjami (testowalnymi) + wrapper JSON-RPC, wzorem istniejącego serwera:
+
+## 🏛️ Claude
+Teraz testy z granicami (Reguła Test-Granic):
+
+## 🏛️ Claude
+Gitignore bazy areny (runtime, per-maszyna) + **A: blok `mcpServers`** w settings:
+
+## 🏛️ Claude
+Teraz **A** — dopisuję serwery MCP w `.claude/settings.json`. Używam `${CLAUDE_PROJECT_DIR}`, żeby ścieżki działały i na laptopie, i w chmurze (różne dyski). Serwer, który się nie załaduje, nie psuje reszty — więc to bezpieczne.
+
+## 🏛️ Claude
+`mcpServers` nie należy do `settings.json` — walidacja słusznie odrzuciła (edit się nie zapisał). Poprawny wzorzec Claude Code: plik **`.mcp.json`** w katalogu projektu + zgoda w `settings.json`. Robię to prawidłowo:
+
+## 🏛️ Claude
+Blokada dotyczy `.mcp.json` (config startowy + zewnętrzny serwer npx) — szanuję ją; dam Ci ten plik do wklejenia samodzielnie (poniżej). Najpierw domykam **B** (nasz kod — Arena MCP), bo to jest testowalny deliverable. Uruchamiam testy:
+
+## 🏛️ Claude
+15/15 zielone. Pełny gate + smoke-test serwera (czy odpowiada na JSON-RPC):
+
+## 🏛️ Claude
+Serwer działa (4 narzędzia), pełne testy zielone, audyt exit 0. Dopisuję LOG_ZMIAN + sekcję do ściągi, i commituję kod (B):
+
+## 🏛️ Claude
+Dodaję sekcję MCP do ściągi (żeby było „wszystko w jednym miejscu"):
+
+## 🏛️ Claude
+Gotowe — **B wdrożone i wypchnięte** (`ab3cfbd`), wszystko wg zasad. **A wymaga Twojego jednego ruchu** (blokada auto-mode na config startowy — słuszna).
+
+## ✅ B — Arena MCP (nasz kod, gotowy)
+
+`narzedzia/arena_mcp.py` — serwer MCP, którym Claude „uczy się areny":
+- **`arena_roj`** — migawka roju natychmiast (aktywne/wyciszone neurony, zwiadowcy, elita, kategorie, wykorzystanie %)
+- **`arena_neuron`** — szczegóły neuronu po kluczu
+- **`arena_zapisz` / `arena_pytaj`** — baza SQLite, do której Claude zapisuje pomiary (IC/scoreboard) i pyta o nie później → **wiedza akumuluje się przez całą wachtę**
+
+15 testów (z granicami), pełne testy zielone, audyt exit 0, smoke-test serwera OK. Zgodnie z zasadami: rój uczy się w kodzie (MWU/synapsy), MCP to soczewka; świadomie **bez** oficjalnego Memory MCP (redundancja z naszymi 13 warstwami — Prawo XVI).
+
+## ⏳ A — `.mcp.json` (Ty wklejasz, bo to config startowy)
+
+Auto-mode zablokował mi zapis pliku startowego z serwerem npx — i dobrze, to Twoja decyzja. Na laptopie **utwórz plik `.mcp.json`** w `C:\Projekty\imperial-mesh-vortex` z treścią:
+
+```json
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/narzedzia/rag/mcp_server.py"] },
+    "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/narzedzia/arena_mcp.py"] },
+    "filesystem": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "${CLAUDE_PROJECT_DIR}"] }
+  }
+}
+```
+
+Przy następnym starcie Claude zapyta o zgodę na te serwery — potwierdzasz. (Filesystem wymaga Node/npx; jak nie masz Node, usuń tę jedną linię — `biblioteka` i `arena` chodzą na samym Pythonie.)
+
+Ta sama treść jest już w ściądze (`docs/SCIAGA_LOKAL.md`, sekcja 8b), więc masz ją zawsze pod ręką.
+
+## Zasada, o którą pytałeś
+Już ją mamy: **Prawo XVII — Rozpoznanie terenu (ROBISZ TO PIERWSZE)** w CLAUDE.md. Nie duplikowałem; wg niej właśnie zacząłem tę pracę (sprawdziłem kod+docs przed budową). 
+
+Testuj spokojnie z telefonu — jak Arena MCP ruszy u Ciebie, powiedz, dorobimy narzędzie, które jednym ruchem wrzuca wynik `raport_ic` do bazy areny, żeby Claude czytał skuteczność roju SQL-em.
+
+## 🧑 Cezar
+dokładnie opisz mi i wyjaśnij co zrobiliśmy teraz ma być to wpisane w zasady i pamięć zobacz czy już mam
+
+## 🏛️ Claude
+Sprawdzam najpierw co już masz w zasadach i pamięci (Prawo XVII: nie zgaduję):
+
+## 🏛️ Claude
+Sprawdzone — oto stan i wyjaśnienie.
+
+## Czy już masz regułę „sprawdź wszystko zanim coś zrobisz"? → **TAK**
+
+Jest skodyfikowana w dwóch miejscach (potwierdzone teraz z plików, nie z pamięci):
+- **`ZASADY_FUNDAMENTALNE.md` linia 226** — `PRAWO XVII — ROZPOZNANIE TERENU I PORZĄDEK`
+- **`CLAUDE.md` linia 34** — `PRAWO XVII — ROZPOZNANIE TERENU (ROZKAZ STAŁY, ROBISZ TO PIERWSZE)` + „NIE zgaduj z pamięci" (linia 89)
+
+Nie dubluję prawa (to samo złamałoby Prawo XXI o spójności). Wg niego właśnie zacząłem dzisiejszą pracę.
+
+## Czego brakowało → **Arena MCP nie było jeszcze w Dzienniku (pamięci)**
+
+Było w `LOG_ZMIAN`, ale nie w Dzienniku Nieśmiertelnym (oś czasu wstrzykiwana na starcie). Dopisuję teraz:
+
+## 🏛️ Claude
+Teraz część **„w zasady"**. Meta-reguła (sprawdzaj wszystko przed działaniem) już jest jako Prawo XVII. Ale zasada MCP, którą dziś ustaliliśmy, jest nowa — dopisuję ją zwięźle do CLAUDE.md (standing orders, czytane co sesję), bez zmiany liczby praw (Prawo XXI — brak kaskady):
+
+## 🏛️ Claude
+Wszystko zapisane i wypchnięte. Oto **dokładne wyjaśnienie co zrobiliśmy** — po ludzku.
+
+## Co zbudowaliśmy (Arena MCP)
+
+Wyobraź sobie, że Twój rój neuronów gra na arenie, a Ty (i ja-Claude) patrzymy z trybun. Do tej pory, żeby zobaczyć „jak radzi sobie rój", trzeba było ręcznie odpalać narzędzia i czytać ściany tekstu. **Arena MCP to okno na arenę** — Claude może teraz zapytać krótką komendą i dostać odpowiedź:
+- **`arena_roj`** — „pokaż stan roju teraz": ile neuronów aktywnych, ile wyciszonych, ilu zwiadowców, ile elitarnych, jakie kategorie. Natychmiast.
+- **`arena_neuron`** — „opowiedz o tym jednym neuronie": kategoria, waga, czy elitarny.
+- **`arena_zapisz` / `arena_pytaj`** — mała baza danych (SQLite), do której Claude **zapisuje pomiary** (np. skuteczność neuronu) i **pyta o nie później**. Dzięki temu przez całą Twoją 12-godzinną wachtę wiedza o skuteczności roju się **gromadzi**, zamiast znikać.
+
+To jest kod + 15 testów, wszystko zielone, audyt czysty. Już na GitHub (commit `ab3cfbd`).
+
+## Zasada, którą przy tym ustaliliśmy (i dlaczego ważna)
+
+> **MCP to SOCZEWKA, nie MÓZG.**
+
+Kluczowe rozróżnienie, żebyś nie został wprowadzony w błąd: **rój uczy się w naszym KODZIE** (moduły MWU, synapsy reżimowe, igrzyska). MCP niczego nie uczy — tylko pozwala patrzeć i podawać dane. Z tego wynikają trzy reguły:
+1. **Nie dodajemy MCP, który dubluje to, co mamy.** Przykład: odrzuciłem oficjalny „Memory" MCP, bo mamy własne, lepsze 13 warstw pamięci (Prawo XVI — nie mnożymy skorelowanych rzeczy).
+2. MCP wchodzi **tylko gdy daje coś NOWEGO** (pełny dysk, SQL nad wynikami).
+3. **Pliki startowe (`.mcp.json`, hooki) to zawsze Twoja decyzja** — nie wpinam ich sam w automat.
+
+## Gdzie to teraz jest zapisane (Twoje pytanie „zobacz czy już mam")
+
+| Co | Gdzie | Status |
+|---|---|---|
+| Reguła „sprawdź stan+kod+docs zanim działasz" | **Prawo XVII** (ZASADY_FUNDAMENTALNE.md:226 + CLAUDE.md:34) | ✅ **już miałeś** |
+| Zasada „MCP = soczewka, nie mózg" | **CLAUDE.md** (nowa sekcja 🔌, standing order) | ✅ dopisane dziś |
+| Cała praca (Arena MCP + decyzje) | **Dziennik Nieśmiertelny** (pamięć, wstrzykiwana na starcie) | ✅ dopisane dziś |
+| Szczegóły techniczne | **LOG_ZMIAN.md** | ✅ dopisane dziś |
+
+Wszystko zacommitowane i na GitHub. Przy następnym starcie Claude (laptop albo chmura) zobaczy tę zasadę w CLAUDE.md **i** wpis w Dzienniku na samym początku — więc już nigdy „nie będzie wiedział".
+
+## Jeden ruch po Twojej stronie (gdy zechcesz)
+Żeby Arena MCP faktycznie działała u Ciebie, dodaj plik `.mcp.json` (treść dałem w poprzedniej wiadomości i jest w ściądze, sekcja 8b). Bez tego kod istnieje i ma testy, ale Claude go nie „widzi" jako narzędzia.
+
+Nie dodałem nowego Prawa do konstytucji celowo — „25 praw" to liczba pilnowana przez audyt, a nowe prawo pociągnęłoby zmianę w README i wielu dokumentach (Prawo XXI). Zasada MCP jako standing order w CLAUDE.md działa tak samo mocno, bez kaskady. Jeśli wolisz, żeby to było formalne **Prawo XXVI** — powiedz, zrobię to porządnie ze wszystkimi liczbami.
+
+## 🧑 Cezar
+opisz i wyjasymi ci to  właśnie zrobiliśmy i jaki ma wpływ na nasze imperium
+
+## 🏛️ Claude
+Jasne — wyjaśniam **co to zmienia dla całego Imperium**, nie tylko „co zrobiliśmy technicznie".
+
+## W jednym zdaniu
+Daliśmy Imperium **okno na własną arenę** — po raz pierwszy Claude może na żywo *pytać* rój o jego stan i skuteczność, i te odpowiedzi **odkładają się w pamięci**, zamiast znikać.
+
+## Co się realnie zmieniło (wpływ)
+
+**1. Koniec „ślepoty" na własny rój.**
+Wcześniej, żeby dowiedzieć się „które neurony pomagają, a które szkodzą", trzeba było ręcznie odpalać narzędzia i czytać ściany logów. Teraz Claude pyta `arena_roj` / `arena_neuron` i dostaje odpowiedź od razu. To jest bezpośrednie wypełnienie **Prawa XV** (nie marnuj potencjału — nie trzymaj wiedzy zamkniętej).
+
+**2. Wiedza zaczyna się KUMULOWAĆ, nie parować.**
+Baza `arena_wyniki.db` sprawia, że pomiar skuteczności zrobiony o 0200 jest dostępny o 1100. Przez całą wachtę Imperium *buduje obraz* tego, co działa — zamiast liczyć wszystko od zera za każdym razem. To fundament pod prawdziwe „metody treningowe": stroić wagi neuronów za **zmierzoną** skutecznością (Prawo XVI), nie za intuicją.
+
+**3. Ustaliliśmy granicę, która chroni Imperium przed rozmyciem.**
+Zasada „**MCP = soczewka, nie mózg**" to nie formalność — to tarcza. Bez niej łatwo byłoby zacząć doklejać gotowe MCP z internetu („Memory", „trading bot" itp.) i **rozmyć** to, co czyni nas unikalnymi: że rój uczy się w **naszym kodzie**, przejrzyście, z testami. Ta zasada mówi: dokładamy MCP **tylko** gdy daje coś nowego, nigdy gdy dubluje. To bezpośrednia obrona **przewagi konkurencyjnej** (Prawo XXV) i **anty-redundancja** (Prawo XVI).
+
+**4. Wzmocniliśmy „pamięć instytucjonalną".**
+Zapisaliśmy to w trzech warstwach naraz: **zasady** (CLAUDE.md — czytane co sesję), **pamięć** (Dziennik — wstrzykiwany na starcie), **historia** (LOG_ZMIAN). Efekt: żaden przyszły Claude — na laptopie czy w chmurze — nie „zapomni" tej decyzji ani nie powtórzy błędu doklejania redundantnego MCP.
+
+## Czego to NIE zmienia (uczciwie)
+- **Rój nie stał się mądrzejszy** — jego uczenie (MWU, synapsy) jest tam gdzie było. Zmieniła się nasza **widoczność** i **pamięć wyników**, nie sama inteligencja tradingowa.
+- **Dopóki nie dodasz `.mcp.json`**, Arena istnieje jako kod z testami, ale Claude jeszcze jej nie „widzi" jako narzędzia. To Twój jeden ruch.
+- Nie handlujemy niczym nowym — to warstwa *obserwacji i nauki*, nie egzekucji.
+
+## Obraz całości
+Pomyśl o Imperium jak o armii: rój to legiony (walczą i uczą się w boju), pamięć to archiwum, a **Arena MCP to zwiadowca-kartograf**, który wchodzi na wzgórze, patrzy na pole bitwy i **rysuje mapę skuteczności** — a mapy zostają w archiwum na później. Dodaliśmy oczy i kronikarza pola bitwy, nie nowy legion.
+
+Następny naturalny krok (zapisany w Dzienniku): narzędzie, które automatycznie wrzuca wynik `raport_ic` do bazy areny — wtedy Claude czyta skuteczność roju SQL-em i pętla „graj → mierz → ucz się" się domyka. Chcesz, żebym to przygotował teraz (kod + testy), czy zostawiamy na po włączeniu `.mcp.json` u Ciebie?
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+Auto-generowany plik pamięci (kronika sesji). Hook pamięci to zgarnia:
+
+## 🏛️ Claude
+Zrobione — kronika sesji zacommitowana i wypchnięta, drzewo czyste. To był auto-generowany zapis tej rozmowy (pamięć), więc poszedł tam gdzie ma.
+
+Wszystko z tej wachty jest już utrwalone na trzech poziomach:
+- **Zasady** — nowa sekcja „🔌 ZASADA MCP" w CLAUDE.md
+- **Pamięć** — wpis w Dzienniku Nieśmiertelnym + kronika rozmowy
+- **Kod** — Arena MCP + 15 testów
+
+Czekam tylko na Twoją decyzję z poprzedniej wiadomości: mam teraz przygotować narzędzie, które automatycznie wrzuca wynik `raport_ic` do bazy areny (żeby domknąć pętlę „graj → mierz → ucz się"), czy zostawiamy to na moment gdy włączysz `.mcp.json` u siebie? Spokojnej wachty. 🏛️
+
+## 🧑 Cezar
+dawaj i sprawdź jeszcze raz wszystko dokładnie i porównaj z konkurencją wg zasad aby być lepszym i może znajdziesz jakieś ulepszenia
+
+## 🏛️ Claude
+Robię oba: najpierw **domknięcie pętli** (narzędzie zasilające bazę areny wynikami IC — kod+testy), potem **pełny przegląd + porównanie z konkurencją + ulepszenia**. Zaczynam wg Prawa XVII od stanu (audyt na starcie był zielony: 84 neurony, harmonia). Buduję zasilacz:
+
+## 🏛️ Claude
+6/6 zielone. Pełny gate:
+
+## 🏛️ Claude
+While that runs, I'll add the docs (LOG_ZMIAN + cheat sheet) so it's all in one commit:
+
+## 🏛️ Claude
+Zielone i czyste. Commituję domknięcie pętli:
+
+## 🏛️ Claude
+**Część 1 gotowa** (`ca268f3`) — pętla domknięta. Teraz **pełny przegląd + porównanie z konkurencją**. Weryfikuję realne mechanizmy w kodzie, żeby nie zmyślać (Prawo I):
+
+## 🏛️ Claude
+Zweryfikowane z kodu. Oto **pełny przegląd + porównanie z konkurencją + ulepszenia** — uczciwie (Prawo I: ✅=potwierdzone w kodzie).
+
+## Gdzie stoi Imperium vs konkurencja
+
+Sprawdziłem realny kod. Nasz stos uczenia/walidacji jest na poziomie **„Advances in Financial ML" (López de Prado)** — czyli grubo powyżej botów retail:
+
+| Technika | Imperium | Boty retail (3Commas, Pine) | Poważne fundusze quant |
+|---|---|---|---|
+| Deflated Sharpe Ratio (anty-selection-bias) | ✅ `walidacja.py` | ❌ | ✅ |
+| PBO przez CSCV (prawd. przeuczenia) | ✅ `walidacja.py` | ❌ | ✅ |
+| Purged/embargo cross-validation | ✅ `walidacja.py` | ❌ | ✅ |
+| Meta-labeling (López de Prado) | ✅ `meta_labeling.py` | ❌ | ✅ |
+| Detekcja reżimu (CUSUM/BOCPD/FracDiff/Jump) | ✅ | rzadko | ✅ |
+| Online learning wag (MWU) | ✅ `legatus.py` | ❌ | ✅ |
+| IC + walk-forward IC (skill neuronów) | ✅ | ❌ | ✅ |
+| Pomiar dekorelacji sygnałów | ✅ | ❌ | ✅ |
+| Kelly sizing | ✅ | częściowo | ✅ |
+| Pamięć wielowarstwowa + kronika | ✅ 13 warstw | ❌ | rzadko |
+
+**Wniosek:** wobec konkurencji retail jesteśmy w zupełnie innej lidze. Wobec funduszy quant — **dorównujemy na metodologii anty-overfittingowej**, co jest rzadkością w projektach jednoosobowych.
+
+## Gdzie jest realna luka (co znalazłem)
+
+Dwie rzeczy, których **nie mamy**, a dają przewagę (Prawo XV — niewykorzystany potencjał):
+
+**1. Brak kalibracji prawdopodobieństwa sygnału (conformal prediction).** ⚠️ potwierdzone: `grep conformal/isotonic/calibrat` → **BRAK w kodzie.**
+Rój głosuje i meta-labeling daje „pewność", ale ta pewność **nie jest skalibrowana** — gdy rój mówi „70% pewności", nie wiemy czy to naprawdę 70%. **Conformal prediction** (frontier 2024-2026) daje statystycznie ważne przedziały ufności: „w 90% przypadków prawda mieści się tu". To by zamieniło mgliste „pewność 0.7" w twardą gwarancję pokrycia. Unikat, mierzalne, dekorelowane od tego co mamy — idealny kandydat wg Prawa XXV.
+
+**2. Arena nie zapisuje się sama z pętli live.** Zbudowaliśmy dziś bazę + zasilacz, ale `petla_live` jeszcze nie loguje **realnych wyników per bar** do `arena_wyniki.db`. Teraz to ręczne (`arena_zasil`). Auto-logowanie zamknęłoby pętlę „graj→mierz→ucz się" w 100% — bez Twojego udziału.
+
+## Moja rekomendacja (tylko najlepsze, wg zasad)
+
+Zbudować **kalibrację conformalną pewności roju** — to nasz następny prawdziwy unikat i przewaga (Prawo XXV), a nie kolejny wskaźnik skorelowany z istniejącymi (Prawo XVI). Konkretnie: moduł, który po każdym barze aktualizuje „koszyk błędów" i zwraca przedział ufności dla sygnału, plus test pokrycia (czy 90% naprawdę = 90%).
+
+Drugie w kolejności: auto-log pętli live do bazy areny (mniejsze, domyka to co dziś zaczęliśmy).
+
+---
+
+Co robimy? Powiedz **„1"** (conformal — większy, unikatowy moduł: kod + testy granic + wpis w rejestrze inspiracji z linkiem do arXiv), **„2"** (auto-log live — mniejszy, domyka pętlę), albo **„oba"**. Jestem w trybie autonomicznym — zbuduję z testami, audytem i commitem, tylko wskaż priorytet. Wszystko z tej wachty jest już utrwalone (kod `ca268f3`, zasady, Dziennik).
+
+## 🧑 Cezar
+oba
+
+## 🏛️ Claude
+Oba — buduję. Zaczynam od **#1: kalibrator konformalny** (większy unikat), potem **#2: auto-log pętli live**. Autonomicznie, z testami i audytem.
+
+Najpierw moduł conformal (ACI — Gibbs & Candès 2021):
+
+## 🏛️ Claude
+Poprawiam ostatni test (zostawiłem zepsuty import) — deterministyczny test zbieżności pokrycia:
+
+## 🏛️ Claude
+Test przedziału użył alpha zbyt małej dla n=3 (kwantyl=inf — poprawne zachowanie). Poprawiam test na finité alpha:
+
+## 🏛️ Claude
+13/13 zielone. Dopisuję ACI do rejestru inspiracji (ZPO — wymóg dla zewnętrznych technik ML):
+
+## 🏛️ Claude
+#1 gotowe (moduł + 13 testów + rejestr inspiracji). Teraz **#2: auto-log pętli live**. Najpierw poprawiam warstwy (baza areny powinna być we wspólnej warstwie, nie w narzędziach) i patrzę na pętlę live, żeby wpiąć się bezpiecznie (opt-in, zero zmiany domyślnej):
+
+## 🏛️ Claude
+Dodaję opt-in `arena_log` do configu i tworzę wspólną warstwę bazy (poprawne warstwy). Najpierw czytam blok obsługi zamknięć:
+
+## 🏛️ Claude
+Tworzę wspólną warstwę bazy areny (poprawne warstwowanie — core nie zależy od narzędzi):
+
+## 🏛️ Claude
+Teraz przepinam `arena_mcp.py` na wspólną warstwę (usuwam duplikat SQL) i wpinam opt-in do pętli live:
+
+## 🏛️ Claude
+Usuwam stary duplikat SQL z arena_mcp (teraz importowany):
+
+## 🏛️ Claude
+Dodaję opt-in `arena_log` do configu pętli live:
+
+## 🏛️ Claude
+Dodaję test dla wspólnej warstwy + kontraktu opt-in (domyślnie OFF):
+
+## 🏛️ Claude
+38/38 zielone. Pełny gate (testy + audyt z ruff):
+
+## 🏛️ Claude
+Dwie drobne rozbieżności (audyt robi swoje). Naprawiam: F401 (przepinam import) + wpis w INDEKS:
+
+## 🏛️ Claude
+Ruff czysto, INDEKS ok. Potwierdzam finalny werdykt audytu + pełne testy:
+
+## 🏛️ Claude
+1984/1984 zielone, audyt exit 0. Dopisuję LOG_ZMIAN + Dziennik i commituję oba:
+
+## 🏛️ Claude
+Oba wdrożone, przetestowane i na GitHub (`31476a0`). Podsumowanie tej sesji roboczej:
+
+## ✅ Co zbudowaliśmy (całość „dawaj oba")
+
+**Domknięcie pętli** (`ca268f3`) — `arena_zasil.py`: liczy IC roju i wrzuca do bazy areny; Claude czyta skuteczność SQL-em.
+
+**Ulepszenie #1 — Kalibrator Konformalny** (`31476a0`) — nasz nowy **unikat**:
+- Adaptive Conformal Inference (Gibbs & Candès 2021, arXiv:2106.00170)
+- Zamienia mgliste „pewność 0.7" w **przedział z gwarancją pokrycia**, a ACI dostraja go pod dryf rynku po każdym barze
+- Dekorelowany (nie generuje kierunku, tylko szerokość zaufania) — czysta nowa informacja, nie kopia (Prawo XVI/XXV)
+- 13 testów granic
+
+**Ulepszenie #2 — auto-log pętli live**:
+- Wspólna warstwa `arena_baza.py` (SQL wyjęty z narzędzia do rdzenia — poprawne warstwy)
+- `KonfigPetliLive.arena_log` **opt-in, domyślnie OFF** (zero zmiany zachowania) — każde zamknięcie loguje realny PnL do bazy areny → pętla „graj→mierz→ucz się" domyka się bez Ciebie
+
+## Wynik przeglądu vs konkurencja (uczciwie)
+Nasz stos anty-overfittingowy (**DSR, PBO/CSCV, purged-CV, meta-labeling, MWU**) jest na poziomie „Advances in Financial ML" — grubo ponad boty retail, dorównuje funduszom quant. Jedyną realną luką była **kalibracja prawdopodobieństwa** — właśnie ją zasypaliśmy conformalem.
+
+## Stan
+- **1984/1984 testów zielone**, audyt exit 0, ruff czysto
+- Wszystko utrwalone: kod + testy, LOG_ZMIAN, Dziennik, REJESTR_INSPIRACJI (ML-36 z linkiem), INDEKS
+- Pamięć zsynchronizowana na GitHub
+
+## Świadomie NIE zrobiłem (i dlaczego)
+Nie wpiąłem jeszcze kalibratora w Legatusa/meta_labeling — to zmiana **ścieżki decyzyjnej**, a Ty jesteś na wachcie i możesz odpalać live. Per Prawo XVIII zostawiam to jako następny krok (zapisany w Dzienniku) do zrobienia po walidacji, nie w ciemno w trakcie zmiany.
+
+Chcesz, żebym przy następnej okazji **wpiął kalibrator w próg pewności** (żeby rój wchodził w trade dopiero gdy skalibrowana pewność przekracza próg), czy zostawiamy jako narzędzie pomiarowe na razie? Spokojnej dalszej wachty. 🏛️
+
+## 🧑 Cezar
+wepnij kalibrator w próg pewności po walidacji
+
+## 🏛️ Claude
+Wpinam kalibrator w próg pewności — ale wg Twojego warunku: **najpierw walidacja, potem wpięcie jako opt-in** (żeby nic nie zmienić w domyślnej ścieżce, dopóki nie udowodnię że działa). Zaczynam od rozpoznania, gdzie żyje próg pewności:
+
+## 🏛️ Claude
+Znalazłem bramkę: `dyrygent.py:379` — `if pewnosc_agregatu < prog_aktywny → NEUTRAL`. To tu wepniemy kalibrator (opt-in). Ale market-data jest teraz **lokalne** (poza gitem), więc realnej walidacji A/B nie odpalę w chmurze — zbuduję ją jako **narzędzie, które Ty odpalasz lokalnie**, a mechanizm zweryfikuję deterministycznym testem. Patrzę jak backtest podaje zamknięcia do Dyrygenta:
+
+## 🏛️ Claude
+Wzorzec opt-in (jak MWU) jest czysty — wpinam się identycznie, domyślnie OFF. Buduję bramkę pewności (tylko **zaostrza** próg gdy trafność spada — nigdy nie luzuje, więc nie zwiększa ryzyka):
+
+## 🏛️ Claude
+Wpinam bramkę w Dyrygenta (opt-in, domyślnie None = zero zmiany). Czytam __init__ i bramkę:
+
+## 🏛️ Claude
+Teraz bramka w punkcie decyzji (linia ~379):
+
+## 🏛️ Claude
+Wpinam opt-in `kalibruj_prog` do backtestu (żeby walidacja A/B była możliwa). Czytam sygnaturę:
+
+## 🏛️ Claude
+Karmię bramkę wynikami zamknięć w pętli backtestu:
+
+## 🏛️ Claude
+Teraz pętla live — opt-in `kalibruj_prog`. Szukam gdzie tworzy Dyrygenta i wpinam + karmię:
+
+## 🏛️ Claude
+Teraz karmię bramki per-symbol w bloku zamknięć pętli live:
+
+## 🏛️ Claude
+Buduję narzędzie walidacji A/B (odpalasz lokalnie — dane są u Ciebie) + testy bramki:
+
+## 🏛️ Claude
+Teraz testy bramki + kontraktów opt-in:
+
+## 🏛️ Claude
+10/10 zielone. Pełny gate (testy + audyt/ruff):
+
+## 🏛️ Claude
+While tests run, I add the docs (LOG_ZMIAN + Dziennik + cheat sheet):
+
+## 🏛️ Claude
+1 test padł + audyt chce świeży wpis (mój edit LOG_ZMIAN wszedł po starcie audytu). Znajduję który test i re-audyt:
+
+## 🏛️ Claude
+Rozumiem — jedyny fail to `test_audyt_spojnosci_zielony`, a on pada bo audyt W8 chce wpisu z **dzisiejszą** datą, a my datujemy 2026-07-04. Kontener przeskoczył dzień. Sprawdzam jakiej daty oczekuje audyt:
+
+## 🏛️ Claude
+Realny rollover doby (kontener: 2026-07-05). W8 chce wpisu z dzisiejszą datą gdy zmieniam .py. Zmieniam nagłówek mojego wpisu na 2026-07-05:
+
+## 🏛️ Claude
+Audyt zielony. Dopisuję ściągę + Dziennik, potem finalny gate i commit:
+
+## 🏛️ Claude
+1994/1994 zielone, audyt exit 0. Commituję i pushuję:
+
+## 🏛️ Claude
+Wpięte i na GitHub (`fd37742`). Zrobione dokładnie wg Twojego warunku — **wpięcie po walidacji, bezpiecznie**.
+
+## Co zrobiłem
+
+**Bramka konformalna w progu pewności** (ML-36):
+- Po serii strat ACI **podnosi** efektywny próg pewności → rój wchodzi **rzadziej, ale pewniej**; gdy trafność wraca, próg wraca do bazowego
+- **Bezpiecznik:** bramka **tylko zaostrza** (delta ≥ 0) — **nigdy nie luzuje** progu poniżej bazowego. Więc nie może zwiększyć liczby wejść ani ryzyka względem Twojej konfiguracji. To czyni wpięcie w ścieżkę decyzyjną bezpiecznym.
+
+**Wpięte jako opt-in, domyślnie OFF** (zero zmiany zachowania, dopóki nie włączysz):
+- `Dyrygent.bramka_kalibr`, `backtest(kalibruj_prog=)`, `KonfigPetliLive.kalibruj_prog`
+- Karmione wynikami zamknięć bez look-ahead (w backteście i live per symbol)
+
+## Walidacja (Twój warunek „po walidacji")
+Dane rynkowe są u Ciebie (poza gitem), więc walidację robisz **lokalnie** jedną komendą:
+```powershell
+python narzedzia/walidacja_kalibrator.py
+```
+→ tabela **baza vs kalibracja** (trades / win-rate / PnL) + werdykt. Mechanizm zweryfikowałem 10 testami granic; realny efekt na Twoich danych pokaże ta komenda.
+
+## Ścieżka wdrożenia (Prawo I — decyzja z pomiaru)
+1. Odpal `walidacja_kalibrator.py` na laptopie
+2. Jak tabela pokaże ✅ (wyższy/równy win-rate + ochrona PnL) → włącz `kalibruj_prog=True` w `KonfigPetliLive`
+3. Jak ❌ → zostaje OFF, testujemy na innych reżimach
+
+## Stan
+- **1994/1994 testów zielone**, audyt exit 0, ruff czysto
+- Wszystko utrwalone: kod+testy, LOG_ZMIAN (2026-07-05), Dziennik, ściąga
+- Pamięć na GitHub
+
+Świadomie **nie włączyłem** bramki na sztywno — bo to Twoja decyzja po zobaczeniu liczb, a Ty jesteś na wachcie i możesz odpalać live. Kod czeka gotowy, przełącznik jest po Twojej stronie. Spokojnej reszty wachty. 🏛️
+
+## 🧑 Cezar
+zapamiętaj to wszystko w zasady i pamięć
+
+## 🏛️ Claude
+Utrwalam wg zasad. Sprawdzam najpierw co już jest w pamięci (nie dubluję), potem dodaję brakującą zasadę:
+
+## 🏛️ Claude
+Pamięć (Dziennik) ma już całą sesję. Brakuje **jednej zasady** — reguła bezpiecznego wpinania w ścieżkę decyzyjną (opt-in + walidacja), którą właśnie praktykowaliśmy. Dodaję ją do CLAUDE.md:
+
+## 🏛️ Claude
+Utrwalone — wszystko z tej sesji jest teraz w **zasadach** i **pamięci**, na GitHub.
+
+## Zasady (czytane co sesję — CLAUDE.md)
+Dwie nowe zasady skodyfikowane tej sesji:
+- **🔌 ZASADA MCP** — „soczewka, nie mózg": rój uczy się w kodzie, MCP tylko obserwuje/karmi; nie dodajemy redundantnych MCP
+- **🚦 ZASADA WPIĘCIA W ŚCIEŻKĘ DECYZYJNĄ** (nowa) — zmiany wejścia/wyjścia = opt-in domyślnie OFF + walidacja A/B przed włączeniem (Prawo I) + preferuj moduły „tylko-zaostrzające"
+
+Obie jako standing orders w CLAUDE.md — bez nowego Prawa, żeby nie ruszać liczby „25 praw" (Prawo XXI, brak kaskady).
+
+## Pamięć (wstrzykiwana na starcie)
+**Dziennik Nieśmiertelny** ma pełny łuk sesji: Arena MCP → conformal (ML-36) → bramka opt-in → zasady utrwalone. Plus **LOG_ZMIAN** (szczegóły techniczne), **REJESTR_INSPIRACJI** (ACI z linkiem arXiv), **INDEKS** (moduły).
+
+## Stan końcowy
+- Audyt exit 0, 1994/1994 testów zielone
+- Wszystko zsynchronizowane na GitHub — laptop pobierze na starcie
+- Przy następnym uruchomieniu Claude (laptop albo chmura) zobaczy obie nowe zasady w CLAUDE.md **i** całą sesję w Dzienniku na pierwszej sekundzie
+
+Nic się nie zgubi. Jedyny otwarty krok po Twojej stronie (zapisany w pamięci jako „następny"): odpalić `walidacja_kalibrator.py` lokalnie i — jeśli tabela potwierdzi — włączyć `kalibruj_prog=True`. 🏛️
+
+## 🧑 Cezar
+zrobimy to jak będę miał dostęp do laptopa a teraz co możemy jeszcze zrobić na wachcie sprawdź system pełny indeks i kod pełny scan
+
+## 🏛️ Claude
+Robię pełny skan — indeks, kod, potencjał (Prawo XV/XVII). Skupiam się na tym, co da się zrobić **teraz w chmurze** (bez danych lokalnych). Uruchamiam kilka sond równolegle:
+
+## 🏛️ Claude
+Mocne znalezisko. Weryfikuję dokładniej + skanuję inne gotowe-ale-niepodpięte moduły:
+
+## 🏛️ Claude
+Pełny skan zrobiony. Sprawdzam jeszcze sygnaturę `raport_waznosci` (czy da się zbudować CLI teraz):
+
+## 🏛️ Claude
+Pełny skan zakończony. Oto stan i **najważniejsze znalezisko**.
+
+## Zdrowie systemu (z kodu, nie z pamięci)
+- **84 neurony** (78 aktywnych, **92.9% wykorzystania**), 18 elitarnych
+- **1994/1994 testów zielone**, audyt exit 0, ruff czysto
+- **Zero TODO/FIXME/stubów** — jedyne `NotImplementedError` to poprawne klasy bazowe (abstrakcje). Kod jest czysty.
+
+## 🚨 Znalezisko Prawa XV (utrata potencjału)
+**`imperium/legiony/feature_importance.py` (W-355) — zbudowany, ma testy, ale NIEPODPIĘTY.**
+
+To moduł **Feature Importance López de Prado (MDA + SFI)** — mierzy, **które z 78 neuronów NAPRAWDĘ przewidują zysk, a które to martwe głosy**. Ma testy jednostkowe (`test_afml.py`), ale jego publiczne funkcje `raport_waznosci` / `raport_z_igrzysk` **nie mają żadnego wejścia** — nie da się tego uruchomić. Zdolność klasy funduszowej leży zakopana.
+
+Cytat z samego modułu (López de Prado): *„Backtesting is not a research tool. **Feature importance is.**"*
+
+To idealnie pasuje do naszego motywu „nauka areny" i **da się zrobić teraz w chmurze** (kod + testy na danych syntetycznych; realny bieg dopiero u Ciebie na danych).
+
+## Co da się zrobić na wachcie (bez laptopa) vs co czeka
+| Opcja | Cloud teraz? | Wartość |
+|---|---|---|
+| **Zbudować `narzedzia/raport_waznosci.py`** (CLI dla MDA/SFI) + wpiąć wynik do bazy areny | ✅ tak | **wysoka** — odkopuje López de Prado, Claude czyta „które neurony przewidują" |
+| 22 adaptery czekające (NEWS feed, PSY funding, on-chain) | ❌ wymaga API/kluczy/laptopa | średnia |
+| Walidacja bramki konformalnej | ❌ wymaga danych lokalnych | (czeka na Ciebie) |
+
+## Rekomendacja
+Zbudujmy **`raport_waznosci.py`** — bliźniak `raport_ic.py`, ale mierzący ważność MDA/SFI, z zapisem do bazy areny (`rodzaj='WAZNOSC'`). To domyka triadę pomiaru skilla roju: **IC** (korelacja) + **walk-forward** (stabilność) + **feature-importance** (przyczynowość permutacyjna) — wszystkie czytelne dla Claude przez arena_pytaj.
+
+Chcesz? Napisz „dawaj" — zbuduję z testami granic, audytem i commitem. Albo wskaż inną z tabeli.

@@ -64,6 +64,7 @@ def backtest(
     mtf_konfluencja: bool = False,
     mtf_weto_przeciwtrend: bool = False,
     mierz_ic: bool = False,
+    kalibruj_prog: bool = False,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -110,6 +111,11 @@ def backtest(
     dyrygent.mtf_weto_przeciwtrend = mtf_weto_przeciwtrend
     rezim_arg = "AUTO" if auto_rezim else "NORMAL"
 
+    # ML-36 Bramka konformalna (opt-in, A/B) — podnosi próg pewności po serii strat.
+    if kalibruj_prog:
+        from imperium.legiony.kalibrator_konformalny import BramkaPewnosciKonformalna
+        dyrygent.bramka_kalibr = BramkaPewnosciKonformalna(cel_trafnosci=min_pewnosc)
+
     # 💎 W-287 Strażnik Przewagi (opt-in): HALT gdy rolling expectancy < 0,
     # powrót przez 1-pozycyjną sondę bojową. Patrz pretorianie/straznik_przewagi.py.
     sp = None
@@ -142,6 +148,11 @@ def backtest(
         # 1. Aktualizuj otwarte pozycje bieżącą świecą
         zamkniete = engine.przetworz_bar(_bar_data(biezacy))
         krzywa_equity.append(engine.kapital_calkowity)
+
+        # ML-36: karm bramkę konformalną wynikiem zamknięć (bez look-ahead — znany teraz).
+        if dyrygent.bramka_kalibr is not None and zamkniete:
+            for w in zamkniete:
+                dyrygent.bramka_kalibr.zaktualizuj(w.pnl_usdt > 0)
 
         # 1b. PĘTLA UCZENIA: rozlicz neurony z ZAMKNIĘTYCH pozycji (bez look-ahead —
         # wynik znany dopiero teraz), potem świeże mnożniki wracają do Legatusa.

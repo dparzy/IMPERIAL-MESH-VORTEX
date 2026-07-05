@@ -37,6 +37,7 @@
 | 12 | ML-33 | NautilusTrader — Rust+Python event-driven | github.com/nautechsystems/nautilus_trader | ✅ zweryfikowany | Wzorzec architektury (referencja) |
 | 13 | ML-34 | Multi-Timeframe Confluence (QuantPedia/TrendRider) | quantpedia.com/.../multi-timeframe-trend-strategy | ✅ zweryfikowany | **WDROŻONY** styl SCALP/SWING/INVEST w Namiestniku |
 | 14 | ML-35 | Systematic Trend-Following (arXiv 2602.11708) | arxiv.org/abs/2602.11708 | ✅ zweryfikowany | Wzorzec MTF bias-filter (Faza MTF) |
+| 14b | ML-36 | Adaptive Conformal Inference (ACI) — Gibbs & Candès | arxiv.org/abs/2106.00170 | ⚠️ impl. własna, pokrycie w testach | **WDROŻONY** `KalibratorKonformalny` — kalibracja pewności roju z gwarancją pokrycia pod dryfem rynku |
 | 15 | MEM-01 | FinMem — Layered Memory LLM Trading Agent | arxiv.org/abs/2311.13743 | ✅ zweryfikowany | **WDROŻONY** zanik warstwowy w centrum_pamieci (decay∝ważność) |
 | 16 | MEM-02 | FinAgent — Multimodal Foundation Agent (dual reflection) | arxiv.org/abs/2402.18485 | ✅ zweryfikowany | Wzorzec dual-level reflection (plan dla pamiec_refleksyjna) |
 | 17 | MEM-03 | Mem0 — Scalable Long-Term Memory (extract→consolidate→retrieve) | arxiv.org/abs/2504.19413 | ✅ zweryfikowany | Wzorzec scope + konsolidacja/dedup (plan centrum_pamieci) |

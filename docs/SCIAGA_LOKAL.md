@@ -111,6 +111,14 @@ python narzedzia/scoreboard_neuronow.py               # ranking kontrybucji neur
 ```
 Interpretacja IC: `|IC|<0.02` = szum · `~0.03+` = realna przewaga · `>0.05` = mocny sygnał.
 
+Walidacja bramki konformalnej (przed włączeniem `kalibruj_prog`) — A/B baza vs kalibracja:
+```powershell
+python narzedzia/walidacja_kalibrator.py
+```
+→ tabela trades/win-rate/PnL + werdykt. Bramka podnosi próg pewności po serii strat
+(rój wchodzi rzadziej/pewniej, TYLKO zaostrza). Włączasz `kalibruj_prog=True` w konfiguracji
+DOPIERO gdy walidacja to potwierdzi (Prawo I: decyzja z pomiaru).
+
 ---
 
 ## 7. Pobieranie danych rynkowych (lokalnie, poza gitem)
@@ -134,6 +142,38 @@ python -m imperium.biblioteki.dziennik_niesmiertelny ostatni   # ostatnie wpisy 
 python -m imperium.biblioteki.kronika_czatu statystyki    # ile rozmów zapamiętane
 ```
 Dziennik (oś czasu projektu) **pisze Claude sam na koniec sesji** — Ty nie musisz.
+
+---
+
+## 8b. MCP — Claude uczy się areny (soczewka na rój)
+
+Mamy dwa własne serwery MCP + opcjonalny filesystem. Żeby je włączyć, utwórz plik
+**`.mcp.json`** w katalogu projektu (raz):
+```json
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/narzedzia/rag/mcp_server.py"] },
+    "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/narzedzia/arena_mcp.py"] },
+    "filesystem": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "${CLAUDE_PROJECT_DIR}"] }
+  }
+}
+```
+Przy starcie Claude zapyta o zgodę na te serwery — potwierdź. (Filesystem wymaga Node/npx;
+jak nie masz Node, usuń tę linię — biblioteka i arena działają na samym Pythonie.)
+
+Ręczny test Areny bez Claude:
+```powershell
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | python narzedzia/arena_mcp.py
+```
+Narzędzia areny (Claude woła je sam): `arena_roj` (migawka roju), `arena_neuron` (szczegóły),
+`arena_zapisz`/`arena_pytaj` (baza wyników — akumuluje IC/scoreboard przez wachtę).
+
+Domknięcie pętli — zasil bazę areny wynikami IC (odpalasz lokalnie, ma dane CSV):
+```powershell
+python narzedzia/arena_zasil.py --nota "wachta 0000-1200"
+```
+→ liczy IC roju i zapisuje per neuron do bazy. Potem Claude pyta `arena_pytaj` (rodzaj='IC')
+i czyta skuteczność roju bez ponownego liczenia.
 
 ---
 

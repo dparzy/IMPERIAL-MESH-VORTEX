@@ -6,6 +6,93 @@
 
 ---
 
+## 2026-07-05 | UNIKAT | 🎯 Bramka konformalna w progu pewności (opt-in) + narzędzie walidacji
+
+Wpięcie KalibratorKonformalnego (ML-36) w ścieżkę decyzyjną — zgodnie z rozkazem „po walidacji".
+`BramkaPewnosciKonformalna` (kalibrator_konformalny.py): traktuje zamkniętą pozycję jako
+obserwację (zysk=pokryte, strata=miss); po serii strat ACI **PODNOSI** efektywny próg pewności
+(rój wchodzi rzadziej/pewniej). BEZPIECZNIK: bramka TYLKO zaostrza (delta≥0) — nigdy nie luzuje
+progu poniżej bazowego, więc NIE zwiększa liczby wejść ani ryzyka. To czyni wpięcie bezpiecznym.
+
+Wpięcie (wszystkie opt-in, domyślnie OFF = zero zmiany):
+- `Dyrygent.bramka_kalibr` (None) — użyta w bramce `pewnosc < prog` (dyrygent.py).
+- `backtest(kalibruj_prog=False)` — tworzy bramkę, karmi wynikami zamknięć (bez look-ahead).
+- `KonfigPetliLive.kalibruj_prog=False` — analogicznie w live, karmienie per symbol.
+
+WALIDACJA (Prawo I — decyzja z pomiaru): `narzedzia/walidacja_kalibrator.py` robi A/B
+baza vs kalibracja na LOKALNych danych (rynkowe CSV poza gitem) — trades/win-rate/PnL + werdykt.
+Cezar włącza `kalibruj_prog=True` DOPIERO gdy tabela potwierdzi korzyść. Mechanizm zweryfikowany
+10 testami granic (tylko-zaostrza, sufit 0.95, powrót do bazy, max_podniesienie, kontrakty OFF).
+
+**Pliki:** `kalibrator_konformalny.py` (+BramkaPewnosciKonformalna), `dyrygent.py`,
+`backtest.py`, `petla_live.py` (opt-in kalibruj_prog), `narzedzia/walidacja_kalibrator.py` (NEW),
+`tests/test_bramka_pewnosci.py` (NEW), `docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-07-04 | UNIKAT | 🎯 Kalibrator Konformalny (ACI) + auto-log areny w pętli live
+
+Po przeglądzie vs konkurencja (mamy DSR/PBO/purged-CV/meta-labeling na poziomie AFML;
+luka: brak kalibracji prawdopodobieństwa) — zbudowano DWA ulepszenia:
+
+**#1 KalibratorKonformalny** (`imperium/legiony/kalibrator_konformalny.py`) — Adaptive
+Conformal Inference (Gibbs & Candès 2021, arXiv:2106.00170; ZPO w REJESTR_INSPIRACJI ML-36).
+Zamienia mgliste „pewność 0.7" w przedział z GWARANCJĄ pokrycia; ACI dostraja poziom po
+każdym barze pod dryf rynku. Split-conformal kwantyl z korektą skończonej próby (n+1);
+alpha=0→inf uczciwie (Prawo I). Unikat, dekorelowany (nie generuje kierunku — szerokość
+zaufania). 13 testów granic (pusta próba, alpha 0/1, order-statistic, ACI clamp, zbieżność).
+
+**#2 Auto-log areny w pętli live** — wspólna warstwa `imperium/biblioteki/arena_baza.py`
+(SQL wyjęty z arena_mcp — Prawo XVI reuse, poprawne warstwy). `KonfigPetliLive.arena_log`
+opt-in (domyślnie False = zero zmiany): każde zamknięcie loguje realny PnL% do arena_wyniki.db
+(rodzaj='LIVE_PNL') → Claude czyta skuteczność live MCP-em arena_pytaj. Domyka pętlę
+graj→mierz→ucz się bez udziału człowieka.
+
+1984/1984 testów zielone, audyt exit 0 (ruff czysto, INDEKS zsynchronizowany).
+**Pliki:** `kalibrator_konformalny.py` (NEW), `arena_baza.py` (NEW), `arena_mcp.py`
+(przepięty na wspólną warstwę), `arena_zasil.py`, `petla_live.py` (opt-in arena_log),
+4 nowe pliki testów, `REJESTR_INSPIRACJI.md`, `INDEKS_IMPERIUM.md`, `LOG_ZMIAN.md`.
+
+---
+
+## 2026-07-04 | MCP | 🔁 Arena Zasil — domknięcie pętli graj→mierz→ucz się
+
+`narzedzia/arena_zasil.py`: liczy IC roju (raport_ic.zbierz_ic) i ZAPISUJE per neuron do
+bazy areny (arena_mcp.zapisz_pomiar). Rdzeń `zasil_z_ic(ic, interwal, ...)` czysty/testowalny,
+pomija NaN i niepoprawne typy (Prawo I: do bazy tylko realny pomiar). CLI dokłada backtest.
+Efekt: pomiar z lokalnego biegu trafia do arena_wyniki.db → Claude czyta go MCP-em `arena_pytaj`
+bez ponownego liczenia; wiedza akumuluje się między wachtami. 6 testów granic (NaN/None/typy/
+pusty/nota/rodzaj). Pełne testy zielone, audyt exit 0.
+
+**Pliki:** `narzedzia/arena_zasil.py` (NEW), `tests/test_arena_zasil.py` (NEW),
+`docs/LOG_ZMIAN.md`, `docs/SCIAGA_LOKAL.md`.
+
+---
+
+## 2026-07-04 | MCP | 🏟️ Arena MCP — Claude uczy się areny (migawka roju + baza wyników)
+
+Cezar (wachta): „opcje MCP do nauki areny — tylko najlepsze wg zasad". Zbudowany
+`narzedzia/arena_mcp.py` — serwer MCP (JSON-RPC/stdio, zero zależności, wzorzec
+`rag/mcp_server.py`). 4 narzędzia: `arena_roj` (instant migawka z rejestru — neurony
+aktywne/wyciszone, zwiadowcy, elita, kategorie, wykorzystanie %), `arena_neuron` (szczegóły
+po KLUCZU), `arena_zapisz`/`arena_pytaj` (baza SQLite `arena_wyniki.db` — Claude ZAPISUJE
+pomiary IC/scoreboard i PYTA o nie później; akumulacja przez wachtę). DB gitignore (runtime
+per-maszyna, jak `baza_wiedzy.db`).
+
+Filozofia (Prawo XVI/XXV): rój UCZY SIĘ w kodzie (MWU/synapsy/igrzyska) — MCP to soczewka,
+nie learner. Świadomie NIE dodano oficjalnego „Memory" MCP (redundancja z 13 warstwami).
+`.mcp.json` (rejestracja serwerów + npx filesystem) zostawiony Cezarowi do ręcznego wklejenia
+(config startowy — decyzja użytkownika, nie auto).
+
+Testy: `tests/test_arena_mcp.py` — 15, w tym granice (pusta baza, limit≤0, pusty rodzaj/neuron
+→ ValueError, filtry, najnowsze-pierwsze, JSON-RPC nieznana metoda/narzędzie). Pełne testy
+zielone, audyt exit 0, smoke-test serwera OK.
+
+**Pliki:** `narzedzia/arena_mcp.py` (NEW), `tests/test_arena_mcp.py` (NEW),
+`.gitignore` (arena_wyniki.db), `docs/LOG_ZMIAN.md`, `docs/SCIAGA_LOKAL.md`.
+
+---
+
 ## 2026-07-04 | RECENZJA | 🔍 Cubic PR #104 — 12 uwag naprawionych (granice + robustność)
 
 Adversarial review (cubic) na PR #104. Ważne uwagi naprawione u źródła:

@@ -10514,3 +10514,6 @@ a można pod lokal Claude w terminalu przeć MCP albo inne opcje zebypodpiac inn
 
 ## 🏛️ Claude
 You've hit your session limit · resets 2:30am (UTC)
+
+## 🏛️ Claude
+You've hit your session limit · resets 2:30am (UTC)

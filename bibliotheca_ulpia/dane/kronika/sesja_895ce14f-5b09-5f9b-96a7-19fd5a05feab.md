@@ -11577,3 +11577,45 @@ Audycik zrobiony i wypchnięty (`985a6af`). Odpoczywaj spokojnie — repo jest c
 Wszystko czeka opisane w pamięci — przy następnym starcie Claude zobaczy to na pierwszej sekundzie. 
 
 Dobra była wachta, Cezarze. Odpoczywaj. 🌙🏛️
+
+## 🧑 Cezar
+muszę chyba jeszcze zrobić MCP.jonson ręcznie wrzucić do lakala
+
+## 🏛️ Claude
+Tak, dokładnie — `.mcp.json` to config startowy, tworzysz go **raz ręcznie na laptopie** (auto-mode w chmurze mi blokuje pisanie plików startowych, i słusznie — to Twoja decyzja). Prosto:
+
+## Utwórz `.mcp.json` w folderze projektu
+
+W PowerShellu (w folderze repo) wklej **całość naraz**:
+
+```powershell
+cd C:\Projekty\imperial-mesh-vortex
+@'
+{
+  "mcpServers": {
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+    "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] }
+  }
+}
+'@ | Set-Content -Encoding utf8 .mcp.json
+```
+
+**Zostawiłem tylko dwa nasze serwery Pythonowe** (`biblioteka` + `arena`) — bo działają od ręki, bez Node. `filesystem` (npx) pominąłem, żeby Ci nie krzyczał, jak nie masz Node — dodasz później, jeśli zechcesz.
+
+## Sprawdź, że plik jest OK
+```powershell
+type .mcp.json
+python -c "import json; json.load(open('.mcp.json')); print('JSON poprawny')"
+```
+
+## Uruchom Claude i zatwierdź
+```powershell
+claude
+```
+Przy starcie Claude zapyta o zgodę na serwery `biblioteka` i `arena` — **potwierdź**. Potem sprawdź, że widzi narzędzia — poproś go np. „użyj arena_roj" albo „pokaż stan roju przez MCP".
+
+## Ważne
+- `.mcp.json` jest **lokalny per-maszyna** (ma ścieżki) — trzymaj go poza gitem (już się nie zsynchronizuje jako kod). Gdyby git go widział jako nowy plik, dodaj do `.gitignore`: `.mcp.json`.
+- Wzorzec `${CLAUDE_PROJECT_DIR:-.}` z fallbackiem `:-.` — dokładnie ta poprawka, którą cubic zalecił (bez niej ścieżka mogłaby się nie rozwinąć przy pierwszym starcie).
+
+Jak Claude odpali `arena_roj` u Ciebie — daj znać, wtedy przy laptopie dokończymy walidację i resztę backlogu. Na razie odpoczywaj. 🏛️

@@ -11663,3 +11663,121 @@ Wszystko przez ZASADĘ WPIĘCIA (opt-in + walidacja).
 **Zapamiętane:** Twój prompt („pełny audyt + konkurencja + unikaty na najlepszym modelu") zapisałem w Dzienniku jako rytuał końca wachty — przyszły Claude będzie go znał.
 
 Dobra wachta, Cezarze — zamknięta czysto. Dokończymy przy laptopie: E→A z audytu + 3 punkty backlogu. Odpoczywaj. 🌙🏛️
+
+## 🧑 Cezar
+jeszcze jedno najlepszy niech da mi na koniec super perełkę zgodnie z zasadami i naszą wizja która wyprzedzi konkurencję o lata świetlne bądź mega kreatywny zaskocz cezara
+
+## 🏛️ Claude
+Cezarze, mam ją. Perełka nie jest kolejnym wskaźnikiem — wykorzystuje coś, co **tylko my mamy**, a czego konkurencja nie może skopiować. Zapisuję wizję i wyjaśniam:
+
+## 🏛️ Claude
+Cezarze — oto perełka. Zapisana (`3e2ba23`), w Dzienniku, w INDEKS. 
+
+# 👥 LEGIONY CIENI — Kontrfaktyczne Kolosseum
+
+## Jedno zdanie
+**Za każdą decyzją Imperium maszerują równolegle widmowe roje, które zdecydowały INACZEJ — i mierzymy na żywo, ile kosztowała każda ostrożność i każda odwaga.**
+
+## Dlaczego to lata świetlne
+Każdy system na świecie zna wynik decyzji **podjętych**. Nikt nie mierzy decyzji **niepodjętych**: ile kosztowało weto Pretorianów? Ile zarobiłby próg 0.50 zamiast 0.55? Ile naprawdę uratowała bramka konformalna? Konkurencja odpowiada backtestem po fakcie. My możemy odpowiadać **przy każdym barze, na żywo** — bo cienie to zwykłe silniki papierowe z wariantem konfiguracji, a wszystko czego potrzebują (Dyrygent, paper engine, baza areny, reżimy Namiestnika) **już zbudowaliśmy**.
+
+## Sekret niekopiowalności
+Nasz rój jest **deterministyczny** — ten sam bar + ta sama konfiguracja = zawsze ta sama decyzja. Dlatego „co by było gdyby" jest u nas uczciwie odtwarzalne. Modne systemy LLM-agentowe są niedeterministyczne — ich „gdyby" to zgadywanie. **Nasza cecha inżynierska staje się bronią badawczą.** Tego nie da się dokleić — to architektura.
+
+## Fundament
+Counterfactual Regret Minimization — matematyka **żalu**, która pokonała ludzi w pokerze (Libratus, Pluribus). Rynek, jak poker, to gra z niepełną informacją. Wersja 1: pomiar żalu per mechanizm per reżim („weto pomaga w PANIC, kosztuje w TREND" — **zmierzone z życia**, nie z opinii). Faza 2, po walidacji: rój uczy się także z dróg, którymi nie poszedł.
+
+## I to jest Prawo XV w pełnej krasie
+Dziś alarmujemy o niewykorzystanych **modułach**. Cienie alarmują o niewykorzystanych **DECYZJACH**. Kronika Żyć Nieprzeżytych.
+
+Wszystko wg zasad: status **WIZJA** (Prawo XIX — zero udawania kodu), wdrożenie przez ZASADĘ WPIĘCIA (opt-in `cienie=False`, raport żalu po ≥100 barach, faza 2 tylko po Twojej decyzji). Plan 5 kroków czeka w dokumencie.
+
+> *„Prawdziwy łowca zna nie tylko ślady, którymi poszedł — zna też te, którymi nie poszedł, i wie dokładnie, ile go to kosztowało."*
+
+Wachta zamknięta: 2020/2020, audyt exit 0, wszystko na GitHub. Do zobaczenia przy laptopie — Cienie będą czekać. 🌙🏛️
+
+## 🧑 Cezar
+może jeszcze raz jak ostatnio Cezar jest zadowolony
+
+## 🏛️ Claude
+Cezar zadowolony — to dorzucam drugą perełkę, bliźniaczą ale z innego świata. Pierwsza mierzyła decyzje nieprzeżyte; ta mierzy **samowiedzę Imperium**. Zapisuję:
+
+## 🏛️ Claude
+Skoro Cezar zadowolony — oto perełka II, siostra Cieni, ale z zupełnie innego piętra. Zapisana (`6db54a5`), w Dzienniku, w INDEKS.
+
+# 🔮 KSIĘGI SYBILLIŃSKIE — Rejestr Falsyfikowalnych Proroctw
+
+## Jedno zdanie
+**Imperium spisuje o SOBIE proroctwa z prawdopodobieństwem i terminem — a przyszłe sesje bezlitośnie je rozliczają. Po roku wiemy nie tylko, czy system zarabia, ale czy system WIE, CO O SOBIE WIE.**
+
+## Rzym i my
+Rzym w kryzysie otwierał Księgi Sybillińskie — ale nikt nigdy nie sprawdził, czy Sybilla miała rację. **My będziemy pierwszym Imperium, które swoją Sybillę rozlicza z każdego proroctwa.**
+
+## Jak to działa
+Każde przekonanie staje się wpisem w git: *„P=0.70: po podpięciu RSS, NEWS-01 osiągnie |IC| ≥ 0.02 na 200 barach"*. Gdy minie horyzont, Kustosz rozstrzyga je **automatycznie z bazy areny** (zero opinii — Prawo I). Wynik: **Brier score Imperium** — gdy mówimy „70%", jak często mamy rację? Domena z najgorszym wynikiem = tam nasza intuicja kłamie = tam twardsze pomiary przed budową. **Samowiedza steruje roadmapą.**
+
+## Dlaczego lata świetlne
+1. **Nikt na rynku nie prowadzi rozliczanego rejestru przekonań systemu o sobie.** Boty raportują PnL; fundusze piszą postmortemy ludzką ręką. Samo-kalibrująca się instytucja AI — nie istnieje.
+2. **Wymaga dokładnie naszych trzech organów:** pamięci wieloletniej w git, bazy pomiarów do automatycznego rozstrzygania, kultury Prawa I. Konkurencja nie ma żadnego.
+3. **Domyka trójcę kalibracji — kompletną epistemologię Imperium:**
+   - conformal (ML-36) kalibruje **SYGNAŁY**
+   - Legiony Cieni kalibrują **DECYZJE**
+   - Sybilla kalibruje **PRZEKONANIA**
+4. I coś bezcennego dla Ciebie osobiście: **każda moja obietnica („to da przewagę") staje się proroctwem z numerem — ja też jestem rozliczany.** Koniec obietnic bez pokrycia, strukturalnie, na zawsze.
+
+Fundament: Brier 1950, proper scoring rules (Gneiting & Raftery 2007), superforecasting Tetlocka. Status: WIZJA (Prawo XIX), plan 5 kroków w dokumencie, pierwsze 3 proroctwa-kandydaci już zapisane.
+
+> *Rzym pytał Sybillę, gdy płonął Kapitol. Imperium pyta Sybillę codziennie — i codziennie sprawdza, czy mówiła prawdę.*
+
+Wachta domknięta na dobre: 2020/2020, audyt exit 0, dwie perełki w skarbcu, wszystko na GitHub. Śpij dobrze, Cezarze — Cienie i Sybilla czekają przy laptopie. 🌙🏛️
+
+## 🧑 Cezar
+Cezar jest w euforii ile jeszcze masz tych perełek najlepszy mój architekcie
+
+## 🏛️ Claude
+Cezarze, uczciwa odpowiedź architekta (Prawo I, nawet w euforii): **pomysłów mam nieskończenie wiele — perełek mało.** Perełka to nie kreatywność, tylko pomysł, który przeżyje trzy filtry: dokłada NOWĄ informację (XVI), buduje na organach, których konkurencja nie ma (XXV), i da się uczciwie zmierzyć (I). W skarbcu zostały mi **trzy ziarna** tej próby — pokazuję bez pełnych dokumentów, celowo:
+
+## 🏺 Skarbiec — trzy ziarna na przyszłe wachty
+
+**1. Szkoła Weteranów (Kampanie Historyczne).** Rój nie backtestuje kryzysów — **przeżywa je**: bessa 2018, LUNA, FTX odtworzone bar po barze z WŁĄCZONYM uczeniem (synapsy, MWU, księga wad), a lekcje zapisują się w 13 warstwach pamięci jako doświadczenie, nie statystyka. Imperium wchodzi w następny kryzys jako weteran trzech wojen. Możliwe tylko u nas: determinizm + pamięć instytucjonalna.
+
+**2. Limes Imperii (mapa granic kompetencji).** Conformal per-region przestrzeni stanów rynku: Imperium wie, **GDZIE** jest kompetentne, a gdzie zaczyna się terra incognita — i poza limes nie handluje, tylko zwiaduje w paper mode. Większość systemów nie zna własnej dziedziny ważności; my byśmy mieli jej mapę z gwarancją pokrycia.
+
+**3. Cicha Aukcja (wewnętrzny rynek predykcji).** Neurony nie głosują — **obstawiają** wewnętrzny kapitał (reguła LMSR Hansona); wagi stają się cenami rynku predykcji wewnątrz roju. ⚠️ Uczciwie: wymaga NAJPIERW pomiaru redundancji z MWU (Prawo XVI) — może być korelatem, a nie perełką.
+
+## Ale teraz słowo architekta, nie jubilera
+
+Skarbiec ma już **dwie pełne wizje** (Cienie, Sybilla) i trzy ziarna. Perełka niezbudowana to po roku tylko ładny dokument — a Sybilla nauczy nas dokładnie tego: każda wizja dostanie proroctwo z numerem i zostanie rozliczona. **Rekomenduję stop produkcji wizji do czasu, aż pierwsza z nich stanie się kodem z testami.** Prawdziwe „lata świetlne" robi się w kolejności: obudzić 22 milczące neurony (E) → track record (A) → Cienie → Sybilla. Wtedy wrócimy po ziarna ze skarbca.
+
+Zapisuję ziarna do pamięci, żeby nie zginęły:
+
+## 🏛️ Claude
+Ziarna zapisane i wypchnięte — nic nie zginie.
+
+## Stan skarbca Imperium na koniec tej wachty
+- 💎 **2 pełne wizje:** Legiony Cieni (żal decyzji) · Księgi Sybillińskie (samowiedza)
+- 🌱 **3 ziarna:** Szkoła Weteranów · Limes Imperii · Cicha Aukcja
+- 🔨 **Dyscyplina architekta:** żadnej nowej wizji, dopóki pierwsza nie stanie się kodem — a Sybilla dopilnuje, żebym z tej obietnicy też się rozliczył
+
+To była wielka wachta, Cezarze: 30+ commitów, trzy odkopane moduły klasy funduszowej, samo-lecząca się Księga Wad, Arena MCP, kalibrator konformalny, pełny audyt z mapą konkurencji — i skarbiec pełen przyszłości. Wszystko zielone, wszystko w pamięci, wszystko na GitHub.
+
+Teraz naprawdę odpoczywaj. Imperium pamięta wszystko — a przy laptopie zaczniemy zamieniać perełki w legiony. 🌙👑🏛️
+
+## 🧑 Cezar
+później musimy jak zrobić najlepsze dashbord już coś tam mamy perełkę godna cara by wszystko widział każdy ruch i wszystko każdy legion neuron ruch  wykres live i trening gradiatorow w imperium najlepsze godne cara kreatywność unikaty najlepsze technologie i wszystkie opcje wymagane
+
+## 🏛️ Claude
+Rozumiem — **Oculus Imperii**: pulpit godny Cezara, wszystko widoczne, każdy neuron, każdy ruch, live. On mówi „później", więc dziś robię to, co architekt powinien: sprawdzam co MAMY (Prawo XVII), projektuję perełkę i zapisuję do pamięci na sesję przy laptopie:
+
+## 🏛️ Claude
+Projekt zapisany w Dzienniku i wypchnięty — przy laptopie Claude otworzy sesję już z tym planem w głowie.
+
+## Plan budowy (dwa etapy, przy laptopie)
+**Etap 1:** SSE zamiast pollingu + Żywa Mapa Roju (heksy) + **wyrzucenie CDN** (naprawa zasady lokalności — znalezisko z dzisiejszego przeglądu)
+**Etap 2:** Trening Gladiatorów live + znaczniki wet z powodami + Teatr Powtórek
+
+Wszystko na istniejącym `web_dashboard.py` (W-346) i istniejących danych (arena, rejestr, Igrzyska) — zero nowych zależności, działa offline, odpali się nawet na tablecie w Twojej sieci domowej. Panel będzie soczewką Imperium, tak jak MCP — tylko że dla Twoich oczu, nie moich.
+
+Kolejka na laptop jest teraz kompletna i zapisana: **E** (obudzić 22 neurony) → **A** (track record) → backlog (walidacja bramki, archiwum KP, neutralizacja) → **Oculus Imperii** → Cienie → Sybilla → ziarna.
+
+Imperium ma mapę na tygodnie do przodu, wszystko zmierzone, wszystko w pamięci. Teraz już naprawdę — dobranoc, Cezarze. Następnym razem, gdy otworzysz oczy, Imperium będzie dokładnie tam, gdzie je zostawiłeś. 🌙👁️🏛️

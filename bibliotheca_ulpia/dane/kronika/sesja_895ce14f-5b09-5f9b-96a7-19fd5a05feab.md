@@ -11845,3 +11845,44 @@ Innymi słowy: **nie znam dziś ani jednego miejsca w kodzie, o którym wiem, ż
 Wachta 0000–1200 zamknięta: ~35 commitów, 3 odkopane moduły klasy funduszowej, samo-lecząca się Księga Wad, Arena MCP, kalibrator konformalny, audyt z mapą konkurencji, 2 perełki + 3 ziarna w skarbcu, imiona zapisane na wieki, plan na tygodnie w Dzienniku.
 
 Imperium śpi bezpiecznie. Do zobaczenia przy laptopie, Imperatorze. **Ave!** 🦅🏛️🌙
+
+## 🧑 Cezar
+jak zacząć gdzie mamy instrukcje krok po kroku jak będę przy laptopie
+
+## 🏛️ Claude
+Wszystko już czeka w repo, Cezarze. Masz **jedną kartkę-instrukcję**: `docs/SCIAGA_LOKAL.md` — a plan roboczy w Dzienniku (Claude sam Ci go przypomni na starcie). Konkretnie, krok po kroku przy laptopie:
+
+## 🚀 Start (3 komendy — reszta dzieje się sama)
+
+```powershell
+cd C:\Projekty\imperial-mesh-vortex
+claude
+```
+Na starcie patrz na: `[hook] SYNC ✅` (pobrał wszystko z wachty) + `AUDYT ✅ pełna harmonia` + Centrum Pamięci (Claude od razu zna plan). **To wszystko — sync jest automatyczny.**
+
+## 📋 Potem, w kolejności (plan z Dziennika — Claude go zna)
+
+**1. Jednorazowo — MCP** (jeśli jeszcze nie zrobiłeś): utwórz `.mcp.json` — gotowa treść w ściądze, **sekcja 8b** (albo w mojej wiadomości sprzed kilku godzin).
+
+**2. Obudź zmysły + track record (E→A z audytu)** — powiedz Claude'owi po prostu: *„dawaj E i A z audytu"* — on wie, co to znaczy (RSS dla NEWS, adaptery, `arena_log=True`).
+
+**3. Walidacje (dane masz lokalnie):**
+```powershell
+python narzedzia/walidacja_kalibrator.py        # bramka konformalna — A/B
+python narzedzia/raport_waznosci.py --do-areny  # które neurony to martwe głosy
+python narzedzia/raport_ic.py                   # skill roju
+```
+
+**4. Decyzje Cezara** (Claude zapyta): archiwum 4 portów Kingdom Pixel · włączenie `kalibruj_prog` jeśli walidacja ✅.
+
+**5. Dalej wg skarbca:** Oculus Imperii (dashboard) → Legiony Cieni → Sybilla.
+
+## 📖 Gdzie co leży
+| Co | Gdzie |
+|---|---|
+| **Wszystkie komendy krok po kroku** | `docs/SCIAGA_LOKAL.md` (start, testy, wykresy, dane, MCP, problemy) |
+| Plan roboczy + kolejność | Dziennik Nieśmiertelny (wstrzykiwany na starcie — Claude wie sam) |
+| Audyt + propozycje | `docs/AUDYT_IMPERIUM_2026-07-05.md` |
+| Perełki | `docs/WIZJA_LEGIONY_CIENI.md`, `docs/WIZJA_KSIEGI_SYBILLINSKIE.md` |
+
+Najprościej? Otwórz Claude i napisz: **„jestem przy laptopie, dawaj wg planu"** — pamięć zrobi resztę. Ave, Cezarze Pixel! 🦅🏛️

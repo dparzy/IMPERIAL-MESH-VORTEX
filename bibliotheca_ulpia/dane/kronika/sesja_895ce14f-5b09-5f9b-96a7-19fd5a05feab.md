@@ -10148,3 +10148,192 @@ Wszystko zacommitowane i na GitHub. Przy następnym starcie Claude (laptop albo 
 Żeby Arena MCP faktycznie działała u Ciebie, dodaj plik `.mcp.json` (treść dałem w poprzedniej wiadomości i jest w ściądze, sekcja 8b). Bez tego kod istnieje i ma testy, ale Claude go nie „widzi" jako narzędzia.
 
 Nie dodałem nowego Prawa do konstytucji celowo — „25 praw" to liczba pilnowana przez audyt, a nowe prawo pociągnęłoby zmianę w README i wielu dokumentach (Prawo XXI). Zasada MCP jako standing order w CLAUDE.md działa tak samo mocno, bez kaskady. Jeśli wolisz, żeby to było formalne **Prawo XXVI** — powiedz, zrobię to porządnie ze wszystkimi liczbami.
+
+## 🧑 Cezar
+opisz i wyjasymi ci to  właśnie zrobiliśmy i jaki ma wpływ na nasze imperium
+
+## 🏛️ Claude
+Jasne — wyjaśniam **co to zmienia dla całego Imperium**, nie tylko „co zrobiliśmy technicznie".
+
+## W jednym zdaniu
+Daliśmy Imperium **okno na własną arenę** — po raz pierwszy Claude może na żywo *pytać* rój o jego stan i skuteczność, i te odpowiedzi **odkładają się w pamięci**, zamiast znikać.
+
+## Co się realnie zmieniło (wpływ)
+
+**1. Koniec „ślepoty" na własny rój.**
+Wcześniej, żeby dowiedzieć się „które neurony pomagają, a które szkodzą", trzeba było ręcznie odpalać narzędzia i czytać ściany logów. Teraz Claude pyta `arena_roj` / `arena_neuron` i dostaje odpowiedź od razu. To jest bezpośrednie wypełnienie **Prawa XV** (nie marnuj potencjału — nie trzymaj wiedzy zamkniętej).
+
+**2. Wiedza zaczyna się KUMULOWAĆ, nie parować.**
+Baza `arena_wyniki.db` sprawia, że pomiar skuteczności zrobiony o 0200 jest dostępny o 1100. Przez całą wachtę Imperium *buduje obraz* tego, co działa — zamiast liczyć wszystko od zera za każdym razem. To fundament pod prawdziwe „metody treningowe": stroić wagi neuronów za **zmierzoną** skutecznością (Prawo XVI), nie za intuicją.
+
+**3. Ustaliliśmy granicę, która chroni Imperium przed rozmyciem.**
+Zasada „**MCP = soczewka, nie mózg**" to nie formalność — to tarcza. Bez niej łatwo byłoby zacząć doklejać gotowe MCP z internetu („Memory", „trading bot" itp.) i **rozmyć** to, co czyni nas unikalnymi: że rój uczy się w **naszym kodzie**, przejrzyście, z testami. Ta zasada mówi: dokładamy MCP **tylko** gdy daje coś nowego, nigdy gdy dubluje. To bezpośrednia obrona **przewagi konkurencyjnej** (Prawo XXV) i **anty-redundancja** (Prawo XVI).
+
+**4. Wzmocniliśmy „pamięć instytucjonalną".**
+Zapisaliśmy to w trzech warstwach naraz: **zasady** (CLAUDE.md — czytane co sesję), **pamięć** (Dziennik — wstrzykiwany na starcie), **historia** (LOG_ZMIAN). Efekt: żaden przyszły Claude — na laptopie czy w chmurze — nie „zapomni" tej decyzji ani nie powtórzy błędu doklejania redundantnego MCP.
+
+## Czego to NIE zmienia (uczciwie)
+- **Rój nie stał się mądrzejszy** — jego uczenie (MWU, synapsy) jest tam gdzie było. Zmieniła się nasza **widoczność** i **pamięć wyników**, nie sama inteligencja tradingowa.
+- **Dopóki nie dodasz `.mcp.json`**, Arena istnieje jako kod z testami, ale Claude jeszcze jej nie „widzi" jako narzędzia. To Twój jeden ruch.
+- Nie handlujemy niczym nowym — to warstwa *obserwacji i nauki*, nie egzekucji.
+
+## Obraz całości
+Pomyśl o Imperium jak o armii: rój to legiony (walczą i uczą się w boju), pamięć to archiwum, a **Arena MCP to zwiadowca-kartograf**, który wchodzi na wzgórze, patrzy na pole bitwy i **rysuje mapę skuteczności** — a mapy zostają w archiwum na później. Dodaliśmy oczy i kronikarza pola bitwy, nie nowy legion.
+
+Następny naturalny krok (zapisany w Dzienniku): narzędzie, które automatycznie wrzuca wynik `raport_ic` do bazy areny — wtedy Claude czyta skuteczność roju SQL-em i pętla „graj → mierz → ucz się" się domyka. Chcesz, żebym to przygotował teraz (kod + testy), czy zostawiamy na po włączeniu `.mcp.json` u Ciebie?
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+Auto-generowany plik pamięci (kronika sesji). Hook pamięci to zgarnia:
+
+## 🏛️ Claude
+Zrobione — kronika sesji zacommitowana i wypchnięta, drzewo czyste. To był auto-generowany zapis tej rozmowy (pamięć), więc poszedł tam gdzie ma.
+
+Wszystko z tej wachty jest już utrwalone na trzech poziomach:
+- **Zasady** — nowa sekcja „🔌 ZASADA MCP" w CLAUDE.md
+- **Pamięć** — wpis w Dzienniku Nieśmiertelnym + kronika rozmowy
+- **Kod** — Arena MCP + 15 testów
+
+Czekam tylko na Twoją decyzję z poprzedniej wiadomości: mam teraz przygotować narzędzie, które automatycznie wrzuca wynik `raport_ic` do bazy areny (żeby domknąć pętlę „graj → mierz → ucz się"), czy zostawiamy to na moment gdy włączysz `.mcp.json` u siebie? Spokojnej wachty. 🏛️
+
+## 🧑 Cezar
+dawaj i sprawdź jeszcze raz wszystko dokładnie i porównaj z konkurencją wg zasad aby być lepszym i może znajdziesz jakieś ulepszenia
+
+## 🏛️ Claude
+Robię oba: najpierw **domknięcie pętli** (narzędzie zasilające bazę areny wynikami IC — kod+testy), potem **pełny przegląd + porównanie z konkurencją + ulepszenia**. Zaczynam wg Prawa XVII od stanu (audyt na starcie był zielony: 84 neurony, harmonia). Buduję zasilacz:
+
+## 🏛️ Claude
+6/6 zielone. Pełny gate:
+
+## 🏛️ Claude
+While that runs, I'll add the docs (LOG_ZMIAN + cheat sheet) so it's all in one commit:
+
+## 🏛️ Claude
+Zielone i czyste. Commituję domknięcie pętli:
+
+## 🏛️ Claude
+**Część 1 gotowa** (`ca268f3`) — pętla domknięta. Teraz **pełny przegląd + porównanie z konkurencją**. Weryfikuję realne mechanizmy w kodzie, żeby nie zmyślać (Prawo I):
+
+## 🏛️ Claude
+Zweryfikowane z kodu. Oto **pełny przegląd + porównanie z konkurencją + ulepszenia** — uczciwie (Prawo I: ✅=potwierdzone w kodzie).
+
+## Gdzie stoi Imperium vs konkurencja
+
+Sprawdziłem realny kod. Nasz stos uczenia/walidacji jest na poziomie **„Advances in Financial ML" (López de Prado)** — czyli grubo powyżej botów retail:
+
+| Technika | Imperium | Boty retail (3Commas, Pine) | Poważne fundusze quant |
+|---|---|---|---|
+| Deflated Sharpe Ratio (anty-selection-bias) | ✅ `walidacja.py` | ❌ | ✅ |
+| PBO przez CSCV (prawd. przeuczenia) | ✅ `walidacja.py` | ❌ | ✅ |
+| Purged/embargo cross-validation | ✅ `walidacja.py` | ❌ | ✅ |
+| Meta-labeling (López de Prado) | ✅ `meta_labeling.py` | ❌ | ✅ |
+| Detekcja reżimu (CUSUM/BOCPD/FracDiff/Jump) | ✅ | rzadko | ✅ |
+| Online learning wag (MWU) | ✅ `legatus.py` | ❌ | ✅ |
+| IC + walk-forward IC (skill neuronów) | ✅ | ❌ | ✅ |
+| Pomiar dekorelacji sygnałów | ✅ | ❌ | ✅ |
+| Kelly sizing | ✅ | częściowo | ✅ |
+| Pamięć wielowarstwowa + kronika | ✅ 13 warstw | ❌ | rzadko |
+
+**Wniosek:** wobec konkurencji retail jesteśmy w zupełnie innej lidze. Wobec funduszy quant — **dorównujemy na metodologii anty-overfittingowej**, co jest rzadkością w projektach jednoosobowych.
+
+## Gdzie jest realna luka (co znalazłem)
+
+Dwie rzeczy, których **nie mamy**, a dają przewagę (Prawo XV — niewykorzystany potencjał):
+
+**1. Brak kalibracji prawdopodobieństwa sygnału (conformal prediction).** ⚠️ potwierdzone: `grep conformal/isotonic/calibrat` → **BRAK w kodzie.**
+Rój głosuje i meta-labeling daje „pewność", ale ta pewność **nie jest skalibrowana** — gdy rój mówi „70% pewności", nie wiemy czy to naprawdę 70%. **Conformal prediction** (frontier 2024-2026) daje statystycznie ważne przedziały ufności: „w 90% przypadków prawda mieści się tu". To by zamieniło mgliste „pewność 0.7" w twardą gwarancję pokrycia. Unikat, mierzalne, dekorelowane od tego co mamy — idealny kandydat wg Prawa XXV.
+
+**2. Arena nie zapisuje się sama z pętli live.** Zbudowaliśmy dziś bazę + zasilacz, ale `petla_live` jeszcze nie loguje **realnych wyników per bar** do `arena_wyniki.db`. Teraz to ręczne (`arena_zasil`). Auto-logowanie zamknęłoby pętlę „graj→mierz→ucz się" w 100% — bez Twojego udziału.
+
+## Moja rekomendacja (tylko najlepsze, wg zasad)
+
+Zbudować **kalibrację conformalną pewności roju** — to nasz następny prawdziwy unikat i przewaga (Prawo XXV), a nie kolejny wskaźnik skorelowany z istniejącymi (Prawo XVI). Konkretnie: moduł, który po każdym barze aktualizuje „koszyk błędów" i zwraca przedział ufności dla sygnału, plus test pokrycia (czy 90% naprawdę = 90%).
+
+Drugie w kolejności: auto-log pętli live do bazy areny (mniejsze, domyka to co dziś zaczęliśmy).
+
+---
+
+Co robimy? Powiedz **„1"** (conformal — większy, unikatowy moduł: kod + testy granic + wpis w rejestrze inspiracji z linkiem do arXiv), **„2"** (auto-log live — mniejszy, domyka pętlę), albo **„oba"**. Jestem w trybie autonomicznym — zbuduję z testami, audytem i commitem, tylko wskaż priorytet. Wszystko z tej wachty jest już utrwalone (kod `ca268f3`, zasady, Dziennik).
+
+## 🧑 Cezar
+oba
+
+## 🏛️ Claude
+Oba — buduję. Zaczynam od **#1: kalibrator konformalny** (większy unikat), potem **#2: auto-log pętli live**. Autonomicznie, z testami i audytem.
+
+Najpierw moduł conformal (ACI — Gibbs & Candès 2021):
+
+## 🏛️ Claude
+Poprawiam ostatni test (zostawiłem zepsuty import) — deterministyczny test zbieżności pokrycia:
+
+## 🏛️ Claude
+Test przedziału użył alpha zbyt małej dla n=3 (kwantyl=inf — poprawne zachowanie). Poprawiam test na finité alpha:
+
+## 🏛️ Claude
+13/13 zielone. Dopisuję ACI do rejestru inspiracji (ZPO — wymóg dla zewnętrznych technik ML):
+
+## 🏛️ Claude
+#1 gotowe (moduł + 13 testów + rejestr inspiracji). Teraz **#2: auto-log pętli live**. Najpierw poprawiam warstwy (baza areny powinna być we wspólnej warstwie, nie w narzędziach) i patrzę na pętlę live, żeby wpiąć się bezpiecznie (opt-in, zero zmiany domyślnej):
+
+## 🏛️ Claude
+Dodaję opt-in `arena_log` do configu i tworzę wspólną warstwę bazy (poprawne warstwy). Najpierw czytam blok obsługi zamknięć:
+
+## 🏛️ Claude
+Tworzę wspólną warstwę bazy areny (poprawne warstwowanie — core nie zależy od narzędzi):
+
+## 🏛️ Claude
+Teraz przepinam `arena_mcp.py` na wspólną warstwę (usuwam duplikat SQL) i wpinam opt-in do pętli live:
+
+## 🏛️ Claude
+Usuwam stary duplikat SQL z arena_mcp (teraz importowany):
+
+## 🏛️ Claude
+Dodaję opt-in `arena_log` do configu pętli live:
+
+## 🏛️ Claude
+Dodaję test dla wspólnej warstwy + kontraktu opt-in (domyślnie OFF):
+
+## 🏛️ Claude
+38/38 zielone. Pełny gate (testy + audyt z ruff):
+
+## 🏛️ Claude
+Dwie drobne rozbieżności (audyt robi swoje). Naprawiam: F401 (przepinam import) + wpis w INDEKS:
+
+## 🏛️ Claude
+Ruff czysto, INDEKS ok. Potwierdzam finalny werdykt audytu + pełne testy:
+
+## 🏛️ Claude
+1984/1984 zielone, audyt exit 0. Dopisuję LOG_ZMIAN + Dziennik i commituję oba:
+
+## 🏛️ Claude
+Oba wdrożone, przetestowane i na GitHub (`31476a0`). Podsumowanie tej sesji roboczej:
+
+## ✅ Co zbudowaliśmy (całość „dawaj oba")
+
+**Domknięcie pętli** (`ca268f3`) — `arena_zasil.py`: liczy IC roju i wrzuca do bazy areny; Claude czyta skuteczność SQL-em.
+
+**Ulepszenie #1 — Kalibrator Konformalny** (`31476a0`) — nasz nowy **unikat**:
+- Adaptive Conformal Inference (Gibbs & Candès 2021, arXiv:2106.00170)
+- Zamienia mgliste „pewność 0.7" w **przedział z gwarancją pokrycia**, a ACI dostraja go pod dryf rynku po każdym barze
+- Dekorelowany (nie generuje kierunku, tylko szerokość zaufania) — czysta nowa informacja, nie kopia (Prawo XVI/XXV)
+- 13 testów granic
+
+**Ulepszenie #2 — auto-log pętli live**:
+- Wspólna warstwa `arena_baza.py` (SQL wyjęty z narzędzia do rdzenia — poprawne warstwy)
+- `KonfigPetliLive.arena_log` **opt-in, domyślnie OFF** (zero zmiany zachowania) — każde zamknięcie loguje realny PnL do bazy areny → pętla „graj→mierz→ucz się" domyka się bez Ciebie
+
+## Wynik przeglądu vs konkurencja (uczciwie)
+Nasz stos anty-overfittingowy (**DSR, PBO/CSCV, purged-CV, meta-labeling, MWU**) jest na poziomie „Advances in Financial ML" — grubo ponad boty retail, dorównuje funduszom quant. Jedyną realną luką była **kalibracja prawdopodobieństwa** — właśnie ją zasypaliśmy conformalem.
+
+## Stan
+- **1984/1984 testów zielone**, audyt exit 0, ruff czysto
+- Wszystko utrwalone: kod + testy, LOG_ZMIAN, Dziennik, REJESTR_INSPIRACJI (ML-36 z linkiem), INDEKS
+- Pamięć zsynchronizowana na GitHub
+
+## Świadomie NIE zrobiłem (i dlaczego)
+Nie wpiąłem jeszcze kalibratora w Legatusa/meta_labeling — to zmiana **ścieżki decyzyjnej**, a Ty jesteś na wachcie i możesz odpalać live. Per Prawo XVIII zostawiam to jako następny krok (zapisany w Dzienniku) do zrobienia po walidacji, nie w ciemno w trakcie zmiany.
+
+Chcesz, żebym przy następnej okazji **wpiął kalibrator w próg pewności** (żeby rój wchodził w trade dopiero gdy skalibrowana pewność przekracza próg), czy zostawiamy jako narzędzie pomiarowe na razie? Spokojnej dalszej wachty. 🏛️

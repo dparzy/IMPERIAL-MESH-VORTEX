@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-07-05 | PRAWO XV | 🔄 Raport WFO — odkopany Walk-Forward Optimization (W-345)
+
+Odkopano `imperium/koloseum/walk_forward.py` (Pardo WFO; był gotowy+testy bez wejścia).
+`narzedzia/raport_wfo.py`: optymalizuje próg `min_pewnosc` na oknie IS (DSR-guided `optymalizuj`),
+egzaminuje na OOS, przesuwa okno. Werdykt z OOS (Prawo I): WFE=Sharpe_OOS/Sharpe_IS (>0.5=ROBUST,
+~0/<0=PRZEUCZONY). Ewaluator = backtest na wycinku barów z danym progiem (okno warmup=60 < OOS,
+by OOS produkował decyzje). Różne od walk_forward_ic (stabilność IC neuronów) — tu stroimy próg
+wejścia i badamy czy generalizuje. 3 testy (ewaluator zwraca kapitał+zwroty, formatowanie werdyktu,
+brak danych). Dane lokalne → WFO odpalasz u siebie (ciężkie: kilka minut).
+
+**Pliki:** `narzedzia/raport_wfo.py` (NEW), `tests/test_raport_wfo.py` (NEW), `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-07-05 | PRAWO XV | 🏷️ Raport Etykiet — odkopany Triple-Barrier + CUSUM (W-357)
 
 Odkopano `imperium/legiony/triple_barrier.py` (López de Prado AFML Ch.3-4; był gotowy bez

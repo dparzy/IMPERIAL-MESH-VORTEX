@@ -15,6 +15,15 @@ Testuje TYLKO moduły niewymagające TA-Lib/numpy/API (czysty Python):
 import sys, os, importlib, traceback, inspect, tempfile
 from pathlib import Path
 
+# Windows: konsola cp1250 (polski Windows) wywala się na emoji w wynikach testów.
+# Wymuszamy UTF-8 na stdout/stderr — koniec ręcznego PYTHONIOENCODING=utf-8 przy każdym
+# uruchomieniu (lekcja lokala 2026-07-05). No-op na Linux/macOS (już UTF-8).
+for _strumien in (sys.stdout, sys.stderr):
+    try:
+        _strumien.reconfigure(encoding="utf-8")   # type: ignore[union-attr]  # Py3.7+
+    except Exception:  # noqa: BLE001 — brak reconfigure / przekierowanie → zostaw
+        pass
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # AUTO-DISCOVERY (Prawo XV): każdy tests/test_*.py jest zbierany automatycznie.

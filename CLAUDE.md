@@ -302,6 +302,23 @@ modułem.** Nie mylić: dodanie MCP nie zastępuje logiki uczenia.
 **Złamanie:** dodanie MCP skorelowanego z istniejącym modułem, albo traktowanie MCP jak
 learnera zamiast soczewki.
 
+## 🚦 ZASADA WPIĘCIA W ŚCIEŻKĘ DECYZYJNĄ (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-05)
+
+**Każda zmiana logiki, która wpływa na WEJŚCIE/WYJŚCIE z pozycji (próg pewności, weto,
+sizing, filtr), wchodzi jako OPT-IN domyślnie OFF — i włącza się DOPIERO po walidacji.**
+
+- **Opt-in domyślnie OFF:** nowy mechanizm = flaga (np. `kalibruj_prog=False`, `mtf_konfluencja=False`).
+  Domyślne zachowanie systemu NIGDY się nie zmienia przez samo dodanie modułu (wzorzec MWU/MTF).
+- **Walidacja przed włączeniem (Prawo I):** zanim Cezar przełączy flagę na True — A/B na realnych
+  danych (`backtest_ab_*`, `walidacja_*`) pokazuje korzyść. Decyzja z POMIARU, nie z wiary.
+- **Preferuj monotoniczną ostrożność:** gdy się da, moduł ma tylko ZAOSTRZAĆ (mniej wejść/ryzyka),
+  nigdy luzować — wtedy wpięcie jest bezpieczne nawet przed pełną walidacją (np. bramka konformalna
+  tylko podnosi próg, ML-36).
+- **Włączenie na sztywno = decyzja Cezara** po zielonej walidacji (Prawo XVIII), nie Claude sam.
+
+**Złamanie:** zmiana domyślnego zachowania ścieżki decyzyjnej bez flagi opt-in, albo włączenie
+mechanizmu bez walidacji A/B na danych.
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`

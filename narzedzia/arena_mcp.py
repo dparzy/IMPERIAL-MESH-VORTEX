@@ -173,9 +173,12 @@ def _handle(req: dict) -> dict | None:
         return {"jsonrpc": "2.0", "id": rid, "result": {"tools": TOOLS}}
 
     if method == "tools/call":
-        name = req["params"]["name"]
-        args = req["params"].get("arguments", {})
         try:
+            # Parsowanie pól WEWNĄTRZ try — malformed request wraca jako JSON-RPC error,
+            # nie wywala procesu serwera (cubic P1).
+            params = req.get("params") or {}
+            name = params["name"]
+            args = params.get("arguments") or {}
             if name == "arena_roj":
                 result = _fmt_roj(snapshot_roj())
             elif name == "arena_neuron":
@@ -186,8 +189,8 @@ def _handle(req: dict) -> dict | None:
                                        args.get("nota", ""))
                 result = f"✅ Zapisano pomiar #{new_id}: {args['rodzaj']} {args['neuron']} = {args['wartosc']:+.4f}"
             elif name == "arena_pytaj":
-                result = _fmt_pomiary(pytaj_pomiary(args.get("rodzaj"), args.get("neuron"),
-                                                    int(args.get("limit", 20))))
+                limit = min(100, max(1, int(args.get("limit", 20))))   # clamp do kontraktu 1-100
+                result = _fmt_pomiary(pytaj_pomiary(args.get("rodzaj"), args.get("neuron"), limit))
             else:
                 raise ValueError(f"Nieznane narzędzie: {name}")
             return {"jsonrpc": "2.0", "id": rid,

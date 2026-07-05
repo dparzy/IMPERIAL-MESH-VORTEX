@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-07-05 | RECENZJA | 🔍 Cubic PR — 12 uwag naprawionych (arena/kalibrator/walidacja)
+
+Adversarial review (cubic) na PR z Areną+conformalem. Naprawione u źródła:
+- **arena_mcp**: parsowanie `params/name` WEWNĄTRZ try (malformed request → JSON-RPC error,
+  nie crash procesu, P1); `limit` clampowany do 1-100 (P2).
+- **arena_baza**: `pytaj_pomiary` sortuje `ORDER BY ts DESC, id DESC` (backfill nie udaje
+  najnowszego, P2); nowy `zapisz_pomiary` (batch, jedno połączenie — P2 latencja live).
+- **petla_live**: arena-log batchem raz/bar (nie per-trade connect, P2).
+- **paper_trading**: `WynikZamkniecia.rezim` dodane i wypełniane z `poz.rezim` — arena-log
+  przestaje kłamać „NORMAL" (P2).
+- **walidacja_kalibrator**: agreguje parę TYLKO gdy oba tryby OK (fair A/B, P1); dodane
+  maxDD do metryk i werdyktu (ochrona kapitału, P2).
+- **arena_zasil**: zły klucz łapany (ValueError→skip), batch odporny (P2).
+- **testy kalibratora**: None→TypeError, `==0.4` zamiast `in`, pokrycie ≤0.98 (P2/P3).
+- **SCIAGA**: `${CLAUDE_PROJECT_DIR:-.}` z fallbackiem (P2).
+
+Lekcja procesu: uruchomiono `/code-review` na diffie PRZED pushem (mandat CLAUDE.md,
+którego wcześniej w sesji nie dopełniłem — stąd cubic łapał to, co my sami powinniśmy).
+2000/2000 testów zielone, audyt exit 0.
+
+---
+
 ## 2026-07-05 | UNIKAT | 🎯 Bramka konformalna w progu pewności (opt-in) + narzędzie walidacji
 
 Wpięcie KalibratorKonformalnego (ML-36) w ścieżkę decyzyjną — zgodnie z rozkazem „po walidacji".

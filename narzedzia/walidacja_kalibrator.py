@@ -27,49 +27,64 @@ if str(ROOT) not in sys.path:
 def _metryki(eng) -> dict:
     st = eng.podsumowanie()
     return {"trades": len(eng.historia_zamkniec),
-            "win_rate": st.win_rate, "pnl": st.total_pnl_usdt}
+            "win_rate": st.win_rate, "pnl": st.total_pnl_usdt,
+            "dd": getattr(st, "max_drawdown_pct", 0.0)}
 
 
 def porownaj(pliki, interwal: str, okno: int = 250, max_barow=None) -> str:
     from imperium.koloseum.backtest import backtest
-    agg = {"baza": {"trades": 0, "pnl": 0.0, "win_num": 0.0, "win_den": 0},
-           "kalib": {"trades": 0, "pnl": 0.0, "win_num": 0.0, "win_den": 0}}
+    agg = {"baza": {"trades": 0, "pnl": 0.0, "win_num": 0.0, "win_den": 0, "dd": 0.0},
+           "kalib": {"trades": 0, "pnl": 0.0, "win_num": 0.0, "win_den": 0, "dd": 0.0}}
     n = len(pliki)
+    pominiete = 0
     for i, plik in enumerate(pliki, 1):
         print(f"  [{i}/{n}] {Path(plik).name}...", file=sys.stderr, flush=True)
+        # Uruchom OBA tryby; agreguj parę TYLKO gdy oba się udały — fair na tej samej próbie (cubic P1).
+        wyniki = {}
         for tryb, flaga in (("baza", False), ("kalib", True)):
             try:
                 eng = backtest(plik, interwal, okno=okno, max_barow=max_barow,
                                auto_rezim=True, kalibruj_prog=flaga)
+                wyniki[tryb] = _metryki(eng)
             except Exception as e:  # noqa: BLE001 — pojedyncza para nie wywala raportu
                 print(f"    ⚠️ {tryb} {Path(plik).name}: {e}", file=sys.stderr, flush=True)
-                continue
-            m = _metryki(eng)
+        if "baza" not in wyniki or "kalib" not in wyniki:
+            pominiete += 1
+            continue   # niesparowane — nie zaśmiecaj A/B połową danych
+        for tryb in ("baza", "kalib"):
+            m = wyniki[tryb]
             agg[tryb]["trades"] += m["trades"]
             agg[tryb]["pnl"] += m["pnl"]
             agg[tryb]["win_num"] += m["win_rate"] * m["trades"]
             agg[tryb]["win_den"] += m["trades"]
+            agg[tryb]["dd"] = max(agg[tryb]["dd"], m["dd"])   # najgorsze obsunięcie w koszyku
 
     def wr(a):
         return a["win_num"] / a["win_den"] if a["win_den"] else 0.0
     b, k = agg["baza"], agg["kalib"]
-    linie = [f"🔬 WALIDACJA KALIBRATORA — {n} par, interwał {interwal}",
-             "   (bramka konformalna TYLKO zaostrza próg — mniej wejść, celuje w wyższy win-rate)",
-             "",
-             f"   {'metryka':<14}{'BAZA':>12}{'KALIBRACJA':>14}",
-             f"   {'trades':<14}{b['trades']:>12}{k['trades']:>14}",
-             f"   {'win_rate':<14}{wr(b):>11.1%}{wr(k):>13.1%}",
-             f"   {'PnL [$]':<14}{b['pnl']:>12.0f}{k['pnl']:>14.0f}",
+    sparowane = n - pominiete
+    linie = [f"🔬 WALIDACJA KALIBRATORA — {sparowane}/{n} par sparowanych, interwał {interwal}",
+             "   (bramka konformalna TYLKO zaostrza próg — mniej wejść, celuje w wyższy win-rate + niższy DD)",
              ""]
-    # Werdykt (uczciwy, Prawo I)
+    if pominiete:
+        linie.append(f"   ⚠️ {pominiete} par pominięto (jeden z trybów padł) — poza A/B.")
+        linie.append("")
+    linie += [f"   {'metryka':<14}{'BAZA':>12}{'KALIBRACJA':>14}",
+              f"   {'trades':<14}{b['trades']:>12}{k['trades']:>14}",
+              f"   {'win_rate':<14}{wr(b):>11.1%}{wr(k):>13.1%}",
+              f"   {'PnL [$]':<14}{b['pnl']:>12.0f}{k['pnl']:>14.0f}",
+              f"   {'maxDD [%]':<14}{b['dd']:>11.1%}{k['dd']:>13.1%}",
+              ""]
+    # Werdykt (uczciwy, Prawo I): win-rate ≥, PnL chroniony ORAZ DD nie gorszy.
     lepszy_wr = wr(k) >= wr(b)
-    ochrona = k["pnl"] >= b["pnl"] or (b["pnl"] < 0 and k["pnl"] > b["pnl"])
-    if lepszy_wr and ochrona:
-        linie.append("   ✅ WALIDACJA OK — kalibracja poprawia lub chroni. Można włączyć kalibruj_prog=True.")
-    elif lepszy_wr or ochrona:
-        linie.append("   ⚠️ CZĘŚCIOWA — jedno kryterium spełnione. Rozważ dłuższą/wieloreżimową próbę.")
+    ochrona_pnl = k["pnl"] >= b["pnl"] or (b["pnl"] < 0 and k["pnl"] > b["pnl"])
+    ochrona_dd = k["dd"] <= b["dd"] + 1e-9
+    if lepszy_wr and ochrona_pnl and ochrona_dd:
+        linie.append("   ✅ WALIDACJA OK — wyższy win-rate, chroni PnL i DD. Można włączyć kalibruj_prog=True.")
+    elif (lepszy_wr or ochrona_pnl) and ochrona_dd:
+        linie.append("   ⚠️ CZĘŚCIOWA — część kryteriów spełniona (DD OK). Rozważ dłuższą/wieloreżimową próbę.")
     else:
-        linie.append("   ❌ BRAK KORZYŚCI na tej próbie — NIE włączaj; przetestuj na innych danych/reżimach.")
+        linie.append("   ❌ BRAK KORZYŚCI / gorszy DD — NIE włączaj; przetestuj na innych danych/reżimach.")
     return "\n".join(linie)
 
 

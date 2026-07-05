@@ -152,9 +152,9 @@ Mamy dwa własne serwery MCP + opcjonalny filesystem. Żeby je włączyć, utwó
 ```json
 {
   "mcpServers": {
-    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/narzedzia/rag/mcp_server.py"] },
-    "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/narzedzia/arena_mcp.py"] },
-    "filesystem": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "${CLAUDE_PROJECT_DIR}"] }
+    "biblioteka": { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/rag/mcp_server.py"] },
+    "arena":      { "command": "python", "args": ["${CLAUDE_PROJECT_DIR:-.}/narzedzia/arena_mcp.py"] },
+    "filesystem": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "${CLAUDE_PROJECT_DIR:-.}"] }
   }
 }
 ```

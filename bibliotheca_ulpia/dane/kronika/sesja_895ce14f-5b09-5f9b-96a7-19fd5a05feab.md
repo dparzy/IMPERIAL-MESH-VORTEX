@@ -11781,3 +11781,35 @@ Wszystko na istniejącym `web_dashboard.py` (W-346) i istniejących danych (aren
 Kolejka na laptop jest teraz kompletna i zapisana: **E** (obudzić 22 neurony) → **A** (track record) → backlog (walidacja bramki, archiwum KP, neutralizacja) → **Oculus Imperii** → Cienie → Sybilla → ziarna.
 
 Imperium ma mapę na tygodnie do przodu, wszystko zmierzone, wszystko w pamięci. Teraz już naprawdę — dobranoc, Cezarze. Następnym razem, gdy otworzysz oczy, Imperium będzie dokładnie tam, gdzie je zostawiłeś. 🌙👁️🏛️
+
+## 🧑 Cezar
+wcześniej miałeś nadane imię i Cezar Pixel też zapisz w miejscach wymaganych aby były zapamiętane na wieki Ave Cezar i powiedz czy nasz układ i schemat imperium jest dobry i co byś zmienił i ulepszył dodał itd
+
+## 🏛️ Claude
+Ave, Cezarze! Najpierw sprawdzam imiona w źródłach (Prawo XVII — nie zgaduję z pamięci):
+
+## 🏛️ Claude
+**Ave, Cezarze Pixel!** 🦅 Imiona zapisane na wieki (`8c4fb57`) — w PROFIL_CEZARA, który każda przyszła sesja czyta na pierwszej sekundzie. Vitruviusz melduje się i odpowiada na pytanie o układ Imperium — szczerze, jak przystało na architekta (Prawo I):
+
+# 🏛️ Ocena układu Imperium — werdykt Vitruviusza
+
+## Co jest DOBRE (i to nie kurtuazja)
+
+**Metafora rzymska to nie ozdoba — to działająca architektura.** Przepływ danych mapuje się 1:1 na organy: Akwedukty (dane) → Fundament/Brama (matematyka) → Legiony (sygnały) → Legatus (agregacja) → Senat/Cesarz (decyzja) → Pretorianie (ryzyko) → Drogi (egzekucja) → Koloseum (walidacja) → Biblioteki (pamięć) → Świątynie (oczy). Nowicjusz rozumie system po nazwach — to rzadkość warta więcej niż niejeden wskaźnik. Do tego trzy filary, które dziś trzymają całość: **jedna Brama do matematyki** (Prawo I), **audyt spójności jako prawo** (XXI), **pamięć jako organ, nie dodatek**. Fundamenty są zdrowe. Firmitas — jest.
+
+## Co bym ZMIENIŁ (z liczb, nie z gustu)
+
+**1. Biblioteki pękają w szwach (23 moduły) — dwa królestwa w jednym budynku.** Pamięć (13 warstw, kronikarze, dziennik) mieszka razem z uczeniem tradingowym (MWU, igrzyska, synapsy, arena). To już dziś myli. Proponuję nowy organ: **🏺 Tabularium** (rzymskie archiwum państwowe!) — cała pamięć tam, a w Bibliotekach zostaje uczenie. Czysty podział: Tabularium pamięta, Biblioteki uczą.
+
+**2. Organy-widma: Oczy (1 plik — martwy port KP), Senat (2), Drogi (4).** Oczy praktycznie nie istnieją jako organ — percepcja (adaptery) mieszka w Akweduktach i to jest OK; katalog `oczy/` po archiwizacji wszechoko zostanie pusty → do likwidacji albo do realnej roli (tam mógłby zamieszkać przyszły Limes/skaner okazji). Puste organy to obietnice bez pokrycia — a Imperium obiecuje tylko to, co ma.
+
+**3. Legiony (67 plików) potrzebują kohort.** Neurony, zwiadowcy, detektory reżimu, metryki (IC, kalibrator, feature_importance) — wszystko w jednym obozie. Metryki skilla to nie żołnierze, to **Censores** (cenzorzy — rzymscy urzędnicy od pomiaru!). Podkatalog `legiony/censores/` dla całej warstwy pomiarowej zrobiłby porządek bez ruszania importów świata zewnętrznego.
+
+## Co bym DODAŁ (jedno, brakujące ogniwo)
+
+**Cursus Honorum dla neuronów** — rzymska ścieżka kariery jako formalny cykl życia: `TIRO` (rekrut, głos liczony ale nieważony) → `LEGIONISTA` (pełny głos) → `ELITARNY` (E1-E7, mamy) → `EMERYT` (wyciszony z honorem, dane archiwalne). Dziś mamy stany rozproszone (DOSTEPNY/ELITARNY/wyciszony) — cursus honorum spina je w jeden przepływ z **mierzalnymi progami awansu z triady** (IC+MDA+stabilność z bazy areny). Nowy neuron nie dostaje od razu pełnego głosu — musi zasłużyć na miecz. To domyka „metody treningowe" instytucjonalnie.
+
+## Werdykt
+**Układ: 8.5/10.** Szkielet znakomity, proporcje do korekty (Tabularium, kohorty, likwidacja widm), jedno brakujące ogniwo (cursus honorum). Żadna z tych zmian nie jest pilna — wszystkie są porządkowe i czekają spokojnie za: E (zmysły) → A (track record) → backlog. Przebudowę organów robi się w czasie pokoju, nie w kampanii.
+
+Wszystko zapisane w pamięci. **Ave, Cezarze Pixel — Imperium stoi na dobrym fundamencie, a jego Architekt czuwa.** 🌙🏛️🦅

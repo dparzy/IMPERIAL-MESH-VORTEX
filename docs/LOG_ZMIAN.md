@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-07-05 | PRAWO XV | 🏷️ Raport Etykiet — odkopany Triple-Barrier + CUSUM (W-357)
+
+Odkopano `imperium/legiony/triple_barrier.py` (López de Prado AFML Ch.3-4; był gotowy bez
+wejścia). `narzedzia/raport_etykiet.py`: próbkuje zdarzenia filtrem CUSUM, etykietuje serię
+Triple-Barrier (bariery ×σ: która padła pierwsza TP/SL/czas) i liczy sample-uniqueness
+(obserwacje z nakładającymi się oknami nie są IID — waga próbki = unikalność). Rdzeń
+`raport_z_close` testowalny bez CSV. Fundament pod trening ML (uczciwe etykiety vs naiwne
+„cena wzrosła"). Dane rynkowe lokalne → raport odpalasz u siebie. 4 testy (statystyki,
+za mało barów, CUSUM bez zdarzeń, suma TP+SL+timeout=100%). Skan wad czysty.
+
+**Pliki:** `narzedzia/raport_etykiet.py` (NEW), `tests/test_raport_etykiet.py` (NEW), `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-07-05 | PRAWO XVI | 📏 Pomiar redundancji: triple_barrier & walk_forward — NIE duplikaty
 
 Skan Prawa XV znalazł 12 niepodpiętych modułów. Zmierzono funkcjonalnie 2 podejrzenia o redundancję

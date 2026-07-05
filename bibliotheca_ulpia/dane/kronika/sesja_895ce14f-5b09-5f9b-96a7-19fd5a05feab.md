@@ -10496,3 +10496,21 @@ To idealnie pasuje do naszego motywu „nauka areny" i **da się zrobić teraz w
 Zbudujmy **`raport_waznosci.py`** — bliźniak `raport_ic.py`, ale mierzący ważność MDA/SFI, z zapisem do bazy areny (`rodzaj='WAZNOSC'`). To domyka triadę pomiaru skilla roju: **IC** (korelacja) + **walk-forward** (stabilność) + **feature-importance** (przyczynowość permutacyjna) — wszystkie czytelne dla Claude przez arena_pytaj.
 
 Chcesz? Napisz „dawaj" — zbuduję z testami granic, audytem i commitem. Albo wskaż inną z tabeli.
+
+## 🧑 Cezar
+czekam aż limit się odnowi za ok 50 minut  bo mamy już 94% wtedy uruchomimy komendę dawaj
+
+## 🏛️ Claude
+Jasne — czekamy. 👍
+
+Plan jest zapisany i gotowy, nic nie przepadnie. Gdy wrócisz i napiszesz **„dawaj"**, buduję:
+
+**`narzedzia/raport_waznosci.py`** — CLI dla Feature Importance (MDA + SFI, López de Prado W-355), odkopuje niepodpięty moduł (Prawo XV). Mierzy które neurony naprawdę przewidują. Wynik → baza areny (`rodzaj='WAZNOSC'`), czytelny przez `arena_pytaj`. Z testami granic, audytem, commitem.
+
+Odpocznij — do zobaczenia za ~50 min. Repo jest czyste (audyt exit 0, 1994/1994), wszystko wypchnięte. 🏛️
+
+## 🧑 Cezar
+a można pod lokal Claude w terminalu przeć MCP albo inne opcje zebypodpiac inne narzędzia które będą pomocne dla naszego imperium
+
+## 🏛️ Claude
+You've hit your session limit · resets 2:30am (UTC)

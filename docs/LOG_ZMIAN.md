@@ -6,6 +6,30 @@
 
 ---
 
+## 2026-07-05 | UNIKAT | 🎯 Bramka konformalna w progu pewności (opt-in) + narzędzie walidacji
+
+Wpięcie KalibratorKonformalnego (ML-36) w ścieżkę decyzyjną — zgodnie z rozkazem „po walidacji".
+`BramkaPewnosciKonformalna` (kalibrator_konformalny.py): traktuje zamkniętą pozycję jako
+obserwację (zysk=pokryte, strata=miss); po serii strat ACI **PODNOSI** efektywny próg pewności
+(rój wchodzi rzadziej/pewniej). BEZPIECZNIK: bramka TYLKO zaostrza (delta≥0) — nigdy nie luzuje
+progu poniżej bazowego, więc NIE zwiększa liczby wejść ani ryzyka. To czyni wpięcie bezpiecznym.
+
+Wpięcie (wszystkie opt-in, domyślnie OFF = zero zmiany):
+- `Dyrygent.bramka_kalibr` (None) — użyta w bramce `pewnosc < prog` (dyrygent.py).
+- `backtest(kalibruj_prog=False)` — tworzy bramkę, karmi wynikami zamknięć (bez look-ahead).
+- `KonfigPetliLive.kalibruj_prog=False` — analogicznie w live, karmienie per symbol.
+
+WALIDACJA (Prawo I — decyzja z pomiaru): `narzedzia/walidacja_kalibrator.py` robi A/B
+baza vs kalibracja na LOKALNych danych (rynkowe CSV poza gitem) — trades/win-rate/PnL + werdykt.
+Cezar włącza `kalibruj_prog=True` DOPIERO gdy tabela potwierdzi korzyść. Mechanizm zweryfikowany
+10 testami granic (tylko-zaostrza, sufit 0.95, powrót do bazy, max_podniesienie, kontrakty OFF).
+
+**Pliki:** `kalibrator_konformalny.py` (+BramkaPewnosciKonformalna), `dyrygent.py`,
+`backtest.py`, `petla_live.py` (opt-in kalibruj_prog), `narzedzia/walidacja_kalibrator.py` (NEW),
+`tests/test_bramka_pewnosci.py` (NEW), `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-07-04 | UNIKAT | 🎯 Kalibrator Konformalny (ACI) + auto-log areny w pętli live
 
 Po przeglądzie vs konkurencja (mamy DSR/PBO/purged-CV/meta-labeling na poziomie AFML;

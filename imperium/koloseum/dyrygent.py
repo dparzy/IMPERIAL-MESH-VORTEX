@@ -108,6 +108,10 @@ class Dyrygent:
         self.min_pewnosc_interwalu: Dict[str, float] = min_pewnosc_interwalu or {}
         # W-288: SL = sl_atr_mult × ATR_14 (opt-in; None = stary SL z dźwigni).
         self.sl_atr_mult = sl_atr_mult
+        # ML-36: bramka pewności konformalna (opt-in; None = zero zmiany). Gdy ustawiona,
+        # PODNOSI efektywny próg pewności po serii strat (selective prediction, ACI).
+        # Karmiona z zewnątrz: bramka_kalibr.zaktualizuj(pnl>0) po każdym zamknięciu.
+        self.bramka_kalibr = None
         # W-291: kontekst zewnętrzny dolewany do wskaźników (RADAR BTC: BTC_TREND).
         self.kontekst_dodatkowy: Dict[str, Any] = {}
         # W-291 Praeda (tryb łowcy): Okazjon steruje agresją w potwierdzonych
@@ -375,6 +379,10 @@ class Dyrygent:
                                 kierunek="NEUTRAL", pewnosc=raport.pewnosc_agregatu,
                                 rezim=raport.rezim, powod="rój neutralny — brak przewagi",
                                 raport=raport)
+
+        # ML-36: bramka konformalna PODNOSI próg po serii strat (opt-in; tylko zaostrza).
+        if self.bramka_kalibr is not None:
+            prog_aktywny = self.bramka_kalibr.prog_efektywny(prog_aktywny)
 
         if raport.pewnosc_agregatu < prog_aktywny:
             return DecyzjaCyklu(symbol, "LEGATUS_SLABY", False,

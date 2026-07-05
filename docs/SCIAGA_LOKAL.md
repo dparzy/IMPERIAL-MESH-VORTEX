@@ -111,6 +111,14 @@ python narzedzia/scoreboard_neuronow.py               # ranking kontrybucji neur
 ```
 Interpretacja IC: `|IC|<0.02` = szum · `~0.03+` = realna przewaga · `>0.05` = mocny sygnał.
 
+Walidacja bramki konformalnej (przed włączeniem `kalibruj_prog`) — A/B baza vs kalibracja:
+```powershell
+python narzedzia/walidacja_kalibrator.py
+```
+→ tabela trades/win-rate/PnL + werdykt. Bramka podnosi próg pewności po serii strat
+(rój wchodzi rzadziej/pewniej, TYLKO zaostrza). Włączasz `kalibruj_prog=True` w konfiguracji
+DOPIERO gdy walidacja to potwierdzi (Prawo I: decyzja z pomiaru).
+
 ---
 
 ## 7. Pobieranie danych rynkowych (lokalnie, poza gitem)

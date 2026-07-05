@@ -107,3 +107,46 @@ class KalibratorKonformalny:
         self.krok(czy)
         self.dodaj_score(prawda - punkt)
         return czy
+
+
+class BramkaPewnosciKonformalna:
+    """
+    Bramka progu pewności sterowana konformalnie (ACI) — selective prediction.
+
+    Traktuje ZAMKNIĘTĄ pozycję jako obserwację: wygrana = „pokryte", strata = „miss".
+    Gdy realna trafność spada poniżej celu, ACI PODNOSI efektywny próg pewności
+    (rój wchodzi rzadziej, ale pewniej) — obrona kapitału pod dryf. Gdy trafność wraca,
+    próg wraca do bazowego.
+
+    ZASADA BEZPIECZEŃSTWA: bramka TYLKO zaostrza (delta ≥ 0) — nigdy nie luzuje progu
+    poniżej bazowego, więc NIE zwiększa liczby wejść ani ryzyka względem konfiguracji bazowej.
+    To czyni wpięcie w ścieżkę decyzyjną bezpiecznym (opt-in, monotoniczna ostrożność).
+    """
+
+    def __init__(self, cel_trafnosci: float = 0.55, okno: int = 100,
+                 gamma: float = 0.05, wzmocnienie: float = 1.0,
+                 max_podniesienie: float = 0.15):
+        if not 0.0 < cel_trafnosci < 1.0:
+            raise ValueError("cel_trafnosci musi być w (0,1)")
+        if max_podniesienie < 0:
+            raise ValueError("max_podniesienie musi być >= 0")
+        self._k = KalibratorKonformalny(cel_pokrycia=cel_trafnosci, okno=okno, gamma=gamma)
+        self.wzmocnienie = wzmocnienie
+        self.max_podniesienie = max_podniesienie
+        self.obserwacje = 0
+
+    def zaktualizuj(self, wygrana: bool) -> None:
+        """Rozliczenie zamkniętej pozycji (True=zysk). Aktualizuje stan ACI."""
+        self._k.krok(pokryty=bool(wygrana))
+        self.obserwacje += 1
+
+    def podniesienie(self) -> float:
+        """Bieżące podniesienie progu (delta ≥ 0). 0 gdy trafność ≥ cel."""
+        delta = self.wzmocnienie * (self._k.alpha_cel - self._k.alpha_t)
+        if delta < 0.0:
+            return 0.0
+        return min(self.max_podniesienie, delta)
+
+    def prog_efektywny(self, prog_bazowy: float) -> float:
+        """Efektywny próg pewności = bazowy + podniesienie (przycięty do ≤ 0.95)."""
+        return min(0.95, prog_bazowy + self.podniesienie())

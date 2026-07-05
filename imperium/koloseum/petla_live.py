@@ -104,6 +104,9 @@ class KonfigPetliLive:
     # (arena_wyniki.db, rodzaj='LIVE_PNL') → Claude czyta skuteczność live MCP-em arena_pytaj.
     # Domyślnie False = ZERO zmiany zachowania (wzorzec opt-in jak mwu/igrzyska).
     arena_log: bool = False
+    # ML-36: bramka konformalna progu pewności (opt-in, OFF). Po serii strat PODNOSI
+    # próg (rój wchodzi rzadziej/pewniej); tylko zaostrza — nie zwiększa liczby wejść.
+    kalibruj_prog: bool = False
 
 
 @dataclass
@@ -220,6 +223,9 @@ def _buduj_dyrygencie(
         if getattr(cfg, "senat", False):
             from imperium.senat.debata_senatu import KonsulSenatu as _KonsulSenatu
             d._senat = _KonsulSenatu()
+        if getattr(cfg, "kalibruj_prog", False):
+            from imperium.legiony.kalibrator_konformalny import BramkaPewnosciKonformalna
+            d.bramka_kalibr = BramkaPewnosciKonformalna(cel_trafnosci=cfg.min_pewnosc)
         dyrygenci[sym] = d
 
     return dyrygenci
@@ -499,6 +505,14 @@ def handluj_live(
                         )
                     except Exception as e:
                         logger.warning(f"[PętlaLive] PamięćRefleksyjna padła: {e}")
+
+                # ML-36: karm bramkę konformalną per symbol wynikiem zamknięć (opt-in).
+                if cfg.kalibruj_prog:
+                    for w in nowe:
+                        sym_w = getattr(w, "symbol", None)
+                        d = dyrygenci.get(sym_w) if sym_w else None
+                        if d is not None and getattr(d, "bramka_kalibr", None) is not None:
+                            d.bramka_kalibr.zaktualizuj(getattr(w, "pnl_usdt", 0.0) > 0)
 
                 # Arena auto-log (opt-in): realny PnL% każdego zamknięcia → baza areny.
                 if cfg.arena_log:

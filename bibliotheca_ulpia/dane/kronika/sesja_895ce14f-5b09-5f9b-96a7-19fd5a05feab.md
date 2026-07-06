@@ -13260,3 +13260,53 @@ Czekam na potwierdzenie od lokala („zapisane, wypchnięte, drzewo czyste") —
 Przypomnę tylko sedno, żebyś miał je świeże do przemyśleń: **siła Imperium (neurony) jest realna, ale gubiona w warstwie sklejania głosów i progu.** Twoje pomysły najlepiej celować właśnie tam — w to jedno wąskie gardło. 🦅🏛️
 
 Ave, Cezarze Pixel — słucham, gdy będziesz gotów.
+
+## 🧑 Cezar
+@"/root/.claude/uploads/895ce14f-5b09-5f9b-96a7-19fd5a05feab/6f72b9b5-Bonus_z_Poradnika_Claude_Code__Lista_MCP__Plugin_w__Skilli.pdf" zobacz ten plik mamy juz 808k context plus inne ciekawe mysle dla nas narzedzia mpc co o nich myslisz i putanie dlaczego jak wznawiasz sessje to uzywamy tak wiel tokenow z limitu zrob analize tego pliku i szczegolowo jak mozemy te linki do repozytorow uzuc i wykorzystac do lakala i ewentyalnie moze chmura
+
+## 🏛️ Claude
+Ave, Cezarze. Trzy pytania, trzy odpowiedzi — a **pierwsza jest najważniejsza i zaskakująco łączy się z całą naszą filozofią.** Najpierw czytam PDF, potem analiza:
+
+## 🏛️ Claude
+PDF wymaga narzędzia do renderu. Próbuję wyciągnąć tekst inaczej:
+
+## 🏛️ Claude
+Mam pełną treść PDF. Dobieram środek (pluginy/skille), żeby nie pominąć nic ważnego:
+
+## 🏛️ Claude
+Przeanalizowane, Cezarze. Trzy odpowiedzi — a **pierwsza jest najważniejsza i pięknie łączy się z całą naszą pamięcią.**
+
+## 1. 🔑 Dlaczego wznawianie sesji zjada tyle tokenów (808k!)
+
+To jest **kluczowa lekcja** i akurat PDF pośrednio ją potwierdza. Powód:
+
+**Wznowienie sesji przesyła CAŁĄ rozmowę do modelu za każdym razem.** Nasza sesja trwa cały dzień — to setki tysięcy tokenów. Do tego trzy dodatkowe pożeracze:
+- **Dwie wizje (Cienie + Sybilla) są WKLEJANE W CAŁOŚCI przy każdej turze** (widzę je w kontekście po 2-4 razy przez „Note: file modified") — to ~15k tokenów za każdym ruchem, w kółko.
+- Hook startowy drukuje pełną listę 22 adapterów (~2KB) na każdym starcie.
+- Wstrzyknięcie pamięci (centrum_pamieci) na starcie.
+
+**Rozwiązanie — i to jest sedno:** **NIE wznawiaj gigantycznej sesji. Zacznij ŚWIEŻĄ** (`/clear` albo nowy terminal). Wtedy Dziennik + centrum_pamieci nadrabiają kontekst w **~3k tokenów zamiast 808k.** 
+
+To jest **dokładnie po to zbudowaliśmy 13 warstw pamięci** — żeby wyrzucić drogi kontekst czatu i tanio odtworzyć stan z gita. Wznawianie = płacisz 808k co turę. Świeży start + pamięć = płacisz 3k. **Nasz Dziennik to Twój oszczędzacz tokenów.**
+
+## 2. 📄 Werdykt o PDF (uczciwie, wg ZASADY MCP)
+
+To ekosystem **agencji marketingowej** (Dawid Piwowarczyk/Wingrow, z linkami afiliacyjnymi). Większość jest **dla nas bezużyteczna** — Calendar, Gmail, Drive, Canva, Rize, AI-Video, pluginy Marketing/Sales/Brand-Voice to narzędzia biznesowe, **zero związku z tradingiem**. Nasza ZASADA MCP mówi: soczewka, nie redundancja — nie dokładamy narzędzi „bo fajne".
+
+**Tylko trzy pozycje mają dla nas jakąkolwiek wartość:**
+
+| Narzędzie | Repo | Dla nas? |
+|---|---|---|
+| **Firecrawl** | `github.com/firecrawl/cli` | ⚠️ **MOŻE** — scrapuje strony→markdown. Przydałby się do **E (zmysły)**: crypto-newsy bez RSS → feed dla NEWS-01..08. Ale mamy już `news_fetcher` (RSS) — Firecrawl tylko gdy trafimy na źródła bez RSS |
+| **Playwright** | `github.com/microsoft/playwright-cli` | ⚠️ **już MAMY** w chmurze (Chromium preinstalowany). Marginalne — do testu Oculus albo scrapowania stron JS |
+| **/session-handoff** | (skill w PDF) | ❌ **mamy LEPSZE** — Dziennik jest automatyczny i w gicie; ten skill to ręczne podsumowanie do `/clear` |
+
+## 3. Jak użyć linków (gdybyśmy chcieli)
+
+Instalacja jest banalnie prosta — mówisz Claude'owi na lokalu: *„zainstaluj mi Firecrawl z github.com/firecrawl/cli"* i on to robi. **Ale rekomenduję Vitruviusza: NIE instaluj nic z tego teraz.** Jedyny kandydat (Firecrawl) ma sens dopiero, gdy przy kroku E natrafimy na newsy bez RSS — wtedy z pomiarem sprawdzimy, czy dokłada informację (Prawo XVI). Reszta to pokusa, nie potrzeba.
+
+---
+
+**Sedno, Cezarze:** największą wartością z tego pliku nie jest żadne narzędzie — to **przypomnienie, że mamy problem z tokenami, którego lekiem jest nasza własna pamięć.** Następnym razem: skończ sesję (`„zamknij wg zasad"`), potem **nowy, świeży start** — Dziennik Cię nadrobi za grosze. To nasza przewaga, nie ich toolkit. 🦅🏛️
+
+Chcesz, żebym zapisał tę lekcję o tokenach do ściągi i Dziennika (żeby przyszły Claude i Ty pamiętali: świeży start > wznawianie)?

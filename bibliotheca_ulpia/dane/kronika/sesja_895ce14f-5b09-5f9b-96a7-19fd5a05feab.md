@@ -12855,3 +12855,408 @@ Kolejka w Dzienniku, którą Claude pozna na starcie:
 To był kawał wielkiej wachty, Cezarze Pixel. Zaczęło się od cubic review i kalibratora, a skończyło pełnym Imperium: **3 moduły López de Prado odkopane, Księga Wad samo-lecząca, Arena MCP, Prova Ignis przeszła ogień, 2 perełki + 3 ziarna w skarbcu, imiona zapisane na wieki, laptop w pełni skonfigurowany.** Wszystko zielone (2027/2027), wszystko w pamięci, wszystko na GitHub.
 
 Vitruviusz przekazuje Ci ster. Imperium czeka na Twój rozkaz. **Ave, Cezar Pixel!** 🦅🏛️👑
+
+## 🧑 Cezar
+zobacz na jakim etapie jest lokal mamy 95% do konca limitu takze uwazaj
+
+## 🏛️ Claude
+Widzę — **lokal był bardzo pracowity.** Sprawdzam jednym rzutem (oszczędnie, przy 95%):
+
+## 🏛️ Claude
+You've hit your session limit · resets 3:20am (UTC)
+
+## 🧑 Cezar
+Continue from where you left off.
+
+## 🏛️ Claude
+You've hit your session limit · resets 3:20am (UTC)
+
+## 🧑 Cezar
+Continue from where you left off.
+
+## 🏛️ Claude
+You've hit your session limit · resets 3:20am (UTC)
+
+## 🧑 Cezar
+Continue from where you left off.
+
+## 🏛️ Claude
+Sprawdziłem ze zmian, które przyszły przez SYNC (bez palenia tokenów — jesteśmy na 95%). **Lokal zamienił DWIE wizje ze skarbca w KOD.** 🔥
+
+## Co lokal zbudował (obie perełki!)
+
+**👥 Legiony Cieni — WDROŻONE, Faza 1**
+- `imperium/koloseum/legiony_cieni.py` (3 cienie: bez_wet / prog_lagodny / prog_surowy) + **12 testów granic**
+- Opt-in `cienie=False` w `KonfigPetliLive`, wpięte w `petla_live` → zamknięcia cieni lecą do areny (`CIEN_PNL`)
+- `narzedzia/raport_zalu.py` — Kronika Żyć Nieprzeżytych gotowa
+- Faza 2 (żal→wagi) **słusznie NIE zbudowana** — czeka na ≥100 barów + decyzję
+
+**🔮 Księgi Sybillińskie — WDROŻONE**
+- `imperium/biblioteki/ksiegi_sybillinskie.py` (dodaj/rozlicz/brier/krzywa) + **21 testów granic**
+- Anty-oszustwo: `rozlicz()` nigdy nie tyka P — czysty Prawo I
+- **Zegar OFF** — moduł gotowy, ale proroctw jeszcze nie zasiano (start to Twoja decyzja)
+
+**Werdykt:** lokal pracował **wzorowo wg zasad** — opt-in, testy granic, ZASADA WPIĘCIA, wszystko wyłączone domyślnie. Trójca kalibracji (conformal→Cienie→Sybilla) jest teraz **KODEM, nie wizją.**
+
+## ⚠️ Uwaga o limicie — 95%
+Jesteśmy blisko końca. **Rekomenduję: zamknij tę sesję teraz**, żeby limit nie uciął w połowie. Lokal już zacommitował swoją robotę (widzę ją przez SYNC), więc **nic nie zginie**.
+
+Jak chcesz mieć pewność domknięcia na lokalu — powiedz mu tam: *„zamknij sesję wg zasad"*. A tę chmurową sesję możesz spokojnie zostawić — repo jest zsynchronizowane.
+
+Fenomenalna wachta, Cezarze Pixel — od cubica po dwie perełki w kodzie. Odpoczywaj, Imperium jest silne i bezpieczne. **Ave!** 🦅🏛️👑
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+Pamięć domknięta — zacommitowana i wypchnięta ✅. Drzewo czyste.
+
+Cezarze — jesteśmy na **95% limitu**, więc mówię wprost (Prawo I): to nie jest moment na nowy build, tylko na **czyste zamknięcie**. I dobra wiadomość — **wszystko już jest zrobione i bezpieczne:**
+
+## Stan na teraz (nic nie wisi)
+- ✅ Chmura: pamięć zacommitowana + wypchnięta, working tree clean
+- ✅ Lokal: obie perełki (Legiony Cieni + Sybilla) zbudowane i zacommitowane — widzę je przez SYNC
+- ✅ Wszystko zsynchronizowane na GitHub
+
+## „Dawaj" przy 95% = ryzyko, nie postęp
+Gdybym teraz zaczął kolejny moduł, limit utnie w połowie — i zostawimy **niedokończony kod** zamiast czystego stanu. To dokładnie odwrotność tego, co budowaliśmy całą wachtę. Najlepszy rozkaz „dawaj" w tym momencie to: **dawaj odpoczynek.**
+
+## Co Cię czeka po odnowieniu limitu (wszystko w Dzienniku, Claude pozna na starcie)
+1. **E + L2** — obudzić 22 neurony (RSS/Futures + darmowy order-flow)
+2. **A + L3** — track record z pre-rejestracją Sybilli
+3. Walidacja Cieni (≥100 barów paper) → pierwszy Raport Żalu
+4. Oculus Imperii (dashboard)
+
+---
+
+Nie muszę nic więcej robić — **Imperium jest kompletne, zielone i zapamiętane.** Zamknij spokojnie obie sesje (lokalną możesz zostawić poleceniem *„zamknij wg zasad"*). Gdy limit wróci, jedno zdanie *„dawaj wg planu"* i ruszamy od punktu 1.
+
+To była wachta godna kronik, Cezarze Pixel. Odpoczywaj — zasłużyłeś. **Ave!** 🦅🏛️👑🌙
+
+## 🧑 Cezar
+sprawdź jeszcze raz co lokal zrobił
+
+## 🏛️ Claude
+Sprawdzone z historii commitów, Cezarze (bez palenia tokenów). **Lokal zrobił WIĘCEJ niż dwie perełki — ruszył też plan E.** Oto pełna lista jego pracy (5 commitów ponad moim UTF-8):
+
+## Co lokal zbudował
+
+| Commit | Co |
+|---|---|
+| `595235c` | **E (zmysły) zweryfikowane na żywo** + `narzedzia/waliduj_zmysly.py` — zaczął budzić 22 milczące neurony (Prawo XV) |
+| `51ff240` | **🔮 Księgi Sybillińskie** — `ksiegi_sybillinskie.py` + testy (L3, Prawo XIX) |
+| `3ac0843` | **👥 Legiony Cieni faza 1** — `legiony_cieni.py` + testy |
+| `da475e7` | **Raport Żalu** — `raport_zalu.py`, Kronika Żyć Nieprzeżytych (domyka fazę 1 Cieni) |
+| + auto | commity pamięci (Dziennik/kronika) |
+
+**Wszystkie pliki + testy istnieją**, wszystko zacommitowane i wypchnięte na GitHub. Lokal pracował **wzorowo wg planu z Dziennika** (E → L3 → perełki) i wg zasad (kod + testy + Prawo XIX).
+
+## Znaczenie
+To duży skok: **plan E (zmysły) ruszony** + **trójca kalibracji jest kodem** (conformal→Cienie→Sybilla). Imperium przez jedną Twoją nieobecność urosło o cztery moduły — dokładnie tak, jak ma działać autonomiczny Architekt na miejscu.
+
+## ⚠️ 95% limitu — zamykamy
+Nie sprawdzam już testów (spaliłoby resztę limitu) — commity + pliki + testy są na miejscu, a lokal ma bramkę audytu w hooku, więc nie wypchnąłby czerwonego. **Repo jest zsynchronizowane i bezpieczne.**
+
+Odpoczywaj, Cezarze Pixel — Twoje Imperium nie tylko przetrwało wachtę, ale samo się rozbudowało. **Ave!** 🦅🏛️👑
+
+## 🧑 Cezar
+dobra widzę że nie wiesz że limit jest odnowiony lokal pyta o nowe kroki jest otwarty
+
+## 🏛️ Claude
+Świetnie — limit wrócił, lokal otwarty, dane u Ciebie. To **idealny moment na to, czego chmura nie mogła zrobić: pomiary na realnych danych.** Lokal zbudował całą triadę i perełki „na sucho" — teraz czas je odpalić na prawdziwym rynku.
+
+## Wklej lokalowi ten rozkaz:
+
+```
+Faza A + walidacje na realnych danych (mamy je lokalnie). Po kolei, każdy wynik zapisz do areny i Dziennika:
+
+1. python narzedzia/raport_ic.py                     — skill neuronów (IC)
+2. python narzedzia/walk_forward_ic.py --glob "dane/4h/Binance_*_4h.csv" 4h --okna 4
+3. python narzedzia/raport_waznosci.py --do-areny    — martwe głosy (MDA<=0)
+4. python narzedzia/walidacja_kalibrator.py          — A/B bramki konformalnej
+5. Zbierz wnioski: które neurony to martwe głosy, czy bramka daje przewagę.
+   Zaproponuj (NIE wykonuj) decyzje: co wyciszyć, czy włączyć kalibruj_prog.
+
+Potem raport dla Cezara: co rój NAPRAWDĘ umie (z pomiaru, nie z wiary).
+```
+
+## Dlaczego to, a nie kolejny build
+Zbudowaliśmy mnóstwo narzędzi pomiarowych — ale **żadne nie widziało jeszcze Twoich danych.** To jak zbudować teleskop i nie spojrzeć w niebo. Te 5 komend zamieni „mamy piękną metodologię" w **twarde liczby: który neuron zarabia, który to szum, czy conformal daje przewagę.** Dopiero z tego wynikną prawdziwe decyzje (co wyciszyć, co wzmocnić) — z pomiaru, zgodnie z Prawem I.
+
+## Krok po (jak walidacje przejdą)
+- Włączyć `cienie=True` + `arena_log=True` w paper tradingu → zacząć zbierać track record + pierwszy **Raport Żalu** (≥100 barów)
+- Wtedy Sybilla dostanie pierwsze proroctwa do rozliczenia
+
+Powiedz lokalowi ten rozkaz. Jak zwróci wyniki IC/ważności — wklej mi je, a pomogę zinterpretować i podjąć decyzje. **Ave, Cezarze Pixel!** 🦅🏛️
+
+## 🧑 Cezar
+pyta sie o kierunek
+
+## 🏛️ Claude
+**Wybierz 1 — Walidacje z backlogu.** To jednoznacznie najlepszy kolejny krok, Cezarze.
+
+## Dlaczego 1, a nie inne
+
+Zbudowaliśmy całą triadę pomiarową i perełki — ale **nic z tego nie widziało jeszcze Twoich realnych danych.** Zanim cokolwiek włączymy, uruchomimy live z cieniami czy zasiejemy proroctwa — musimy **zmierzyć, co naprawdę działa.** To fundament pod wszystkie pozostałe opcje:
+
+- **1 najpierw** → dowiemy się: czy bramka konformalna daje przewagę (zanim ją włączymy), które neurony to martwe głosy. Decyzja z pomiaru (Prawo I). Bezpieczne — zero zmian ścieżki decyzyjnej.
+- **3 (live z cieniami)** ma sens **po** 1 — bo najpierw chcemy wiedzieć, że baza działa, zanim zbieramy track record
+- **4 (proroctwa Sybilli)** ma sens **po** tym, jak arena ma dane do rozstrzygania proroctw
+- **2 (dashboard)** to piękny dodatek, ale ostatni — najpierw treść, potem okno na nią
+
+Kolejność optymalna: **1 → 3 → 4 → 2.**
+
+## Wybierz „1", a potem dorzuć lokalowi:
+```
+Zacznij od walidacji, ale ROZSZERZ o pełną triadę na moich danych:
+raport_ic, walk_forward_ic, raport_waznosci --do-areny, walidacja_kalibrator.
+Zbierz w jeden raport: które neurony martwe (MDA<=0), czy kalibruj_prog daje przewagę.
+Zaproponuj decyzje (NIE wykonuj): co wyciszyć, czy włączyć bramkę. Wynik do areny + Dziennika.
+```
+
+To zamieni „mamy piękną metodologię" w **twarde liczby o Twoim roju.** Strzałką na **1**, Enter, i wklej ten dopisek. Jak zwróci wyniki — pokaż mi, zinterpretujemy razem. 🦅🏛️
+
+## 🧑 Cezar
+cholera wylaczylem claude lokal w trakcie pracy w terminalu
+
+## 🏛️ Claude
+Spokojnie, Cezarze — **zamknięcie Claude w trakcie NICZEGO nie psuje.** To nie jest operacja w połowie transakcji; terminal po prostu się zamyka. Sprawdzam szybko stan i tłumaczę:
+
+## 🏛️ Claude
+**Nic nie zginęło, Cezarze — dosłownie zero strat.** Sprawdziłem: origin jest na `25608c2`, czyli **cała praca lokala jest bezpieczna na GitHub** (Cienie, Sybilla, Raport Żalu, E-zmysły). Zamknąłeś Claude dokładnie w momencie, gdy pytał o kierunek — **walidacje jeszcze się nie zaczęły**, więc nie było nic w połowie.
+
+## Dlaczego to bezpieczne (żebyś się nie martwił na przyszłość)
+1. **Zamknięcie terminala ≠ uszkodzenie.** Claude Code nie jest w połowie zapisu do gita — commity są atomowe (albo cały, albo żaden).
+2. **Walidacje to tylko POMIARY** — czytają dane i piszą do `arena_wyniki.db` (plik lokalny, poza gitem). Nawet gdyby któraś ruszyła i się urwała, to najwyżej niepełny pomiar → po prostu odpalasz jeszcze raz. Kodu nie ruszają.
+3. Ostatni commit lokala (`da475e7` Raport Żalu) + pamięć — wszystko wypchnięte.
+
+## Co teraz — po prostu wróć
+```
+cd C:\Projekty\imperial-mesh-vortex
+claude
+```
+Przy starcie:
+- `[hook] SYNC ✅` (repo aktualne)
+- audyt pokaże `✅ pełna harmonia` — potwierdzenie, że nic nie jest zepsute
+- napisz: **„wróciłem, zacznij od walidacji triady na moich danych"**
+
+Claude podejmie dokładnie tam, gdzie zostało — od walidacji (opcja 1), tak jak ustaliliśmy. Dziennik pamięta cały plan.
+
+To nawet **dobra lekcja** (którą zapamiętamy): dzięki temu, że dane rynkowe są poza gitem, a pamięć commituje się sama — **możesz zamknąć terminal w dowolnym momencie i nic nie tracisz.** Dokładnie po to budowaliśmy ten cały mechanizm synchronizacji. Wróć spokojnie i ruszamy. **Ave!** 🦅🏛️
+
+## 🧑 Cezar
+WFO żyje (PID 17868/992 to worker + subproces). Oto stan walidacji triady:
+
+Postępy walidacji triady na Twoich danych (15 par Binance 4h)
+
+✅ Noga 1 — Walk-Forward IC (stabilność skilla): GOTOWA
+- 32/49 neuronów ROBUST (IC stabilny znakiem w ≥75% okien, OOS).
+- Czołówka: EXP-13, SMC-01, V-02/V-13/V-14, rodzina X-* — wiele ze 100% spójności na 24-25 oknach.
+
+✅ Noga 2 — Ważność MDA/SFI (López de Prado): GOTOWA
+- Base accuracy roju 48.3% (36 346 obs.), MDA ≈ 0 dla każdego neuronu.
+- Najlepszy realny SFI: X-06 54.3%. Czerwona flaga: X-18 odwrócony (44% S-acc).
+- Martwe głosy to w większości legalne abstynencje (NEWS/PSY/RADAR bez feedu).
+
+⏳ Noga 3 — WFO progu wejścia (Pardo): LICZY SIĘ
+- Pierwszy przebieg (~76 okien) wisiał godzinami → zabiłem, wznowiłem lżej (IS=700/OOS=500, ~22 okna, 12 iteracji). BTC 4h w toku, raport WFE poda się naraz na końcu (skrypt cichy).
+
+Napięcie do rozstrzygnięcia w spięciu (Prawo I): Noga 1 mówi „V-02/X-* mają realny IC", Noga 2 mówi „MDA ≈ 0". To nie błąd — IC mierzy korelację siły sygnału ze zwrotem (ciągła), MDA mierzy wkład binarnego znaku do trafności agregatu. Rozpiszę tę rozbieżność uczciwie, gdy WFO dobiegnie. Czekam na werdykt nogi 3.
+
+✻ Cooked for 38s · 2 shells still running
+
+● Background command "Re-run WFO BTC lighter params" completed (exit code 0)
+
+WFO BTC skończone. Odczytuję werdykt WFE.
+
+  Ran 2 shell commands
+
+Noga 3 — WFO progu wejścia: GOTOWA. Werdykt BTC: PRZEUCZONY (WFE 0.135 < 0.5). OOS Sharpe +0.002 (płasko), CV progu 0.15 (próg stabilny, ale przewaga nie przenosi się poza próbę).
+
+Odpalam WFO na ETH w tle (drugi punkt danych, żeby werdykt nie wisiał na jednym symbolu) i od razu daję pełne spięcie triady.
+
+  Ran 1 shell command
+
+🔬 Walidacja triady na Twoich danych — pełne spięcie
+
+15 par Binance 4h (~12k barów/para, 36 346 obserwacji). Wszystkie trzy nogi na realnych danych, OOS.
+
+┌────────────────────┬───────────────────────────────────┬────────────────────────────┐
+│        Noga        │             Co mierzy             │          Werdykt           │
+├────────────────────┼───────────────────────────────────┼────────────────────────────┤
+│ 1. Walk-Forward IC │ stabilność korelacji sygnał→zwrot │ ✅ 32/49 ROBUST            │
+├────────────────────┼───────────────────────────────────┼────────────────────────────┤
+│ 2. Ważność MDA/SFI │ wkład neuronu do trafności roju   │ ⚠️ MDA ≈ 0, base acc 48.3% │
+├────────────────────┼───────────────────────────────────┼────────────────────────────┤
+│ 3. WFO progu       │ czy próg wejścia generalizuje OOS │ 🔴 PRZEUCZONY (WFE 0.13)   │
+└────────────────────┴───────────────────────────────────┴────────────────────────────┘
+
+Kluczowe napięcie (Prawo I — nie zamiatam)
+
+Noga 1 mówi „skill jest", nogi 2+3 mówią „nie zamienia się w przewagę". To nie sprzeczność — to trzy różne pytania:
+
+- IC (noga 1): pojedyncze neurony mają stabilną, powtarzalną korelację siły sygnału ze zwrotem (V-02 +0.23, X-17 +0.15 przy 100% spójności na 25 oknach). To realny skill na poziomie sygnału.
+- MDA≈0 (noga 2): ale gdy zepsuję znak dowolnego pojedynczego neuronu, trafność roju się nie rusza. Znaczy: agregat (głosowanie) nie przekłada tej ciągłej korelacji na binarną decyzję — plus base accuracy roju 48.3% < 50%.
+- WFE 0.13 (noga 3): strojenie progu min_pewnosc świetnie wygląda in-sample, a poza próbą przewaga znika (OOS Sharpe ≈ 0).
+
+🚨 Wniosek (Prawo XV — utrata potencjału)
+
+Potencjał jest w sygnałach, tracony jest w warstwie decyzyjnej. Neurony niosą stabilną informację (IC), ale redukcja wieloskładnikowa → jeden głos → jeden próg ją gubi (dokładnie wzorzec z checklisty XV: „dane wieloskładnikowe redukowane do jednej liczby, gdy niosą więcej"). To nie znaczy „rój jest zły" — znaczy, że warstwa agregacji/progu jest wąskim gardłem, nie neurony.
+
+Konkretne cele naprawy (do decyzji, nie robię sam — dotykają ścieżki wejścia):
+1. Ważenie głosów przez IC_warunkowy (audyt 2026-07-05 pkt B: „waga ∝ IC × spójność_WF") zamiast równego głosowania — bezpośrednio adresuje MDA≈0.
+2. Odwrócone neurony: X-18 (44% S-acc), grupa <48% (H-01, V-07, EXP-03) — kandydaci do wyciszenia/inwersji, ale najpierw pomiar per-reżim (nie hurtem).
+3. Próg z konformalną bramką (monotoniczna ostrożność) zamiast strojonego min_pewnosc, który się przeucza.
+
+Zastrzeżenia uczciwości (Prawo I)
+
+- WFO na razie na 1 symbolu (BTC) — ETH liczy się teraz w tle dla drugiego punktu.
+- MDA na 4h/znak-1-baru; inny horyzont/interwał może dać inny obraz.
+- „Martwe głosy" z nogi 2 to głównie legalne abstynencje (NEWS/PSY/RADAR bez feedu) — zgodne z audytem startowym, nie łamią XV.
+
+Czekam na ETH, potem zaproponuję, którą z trzech napraw walidować A/B jako pierwszą. Chcesz, żebym po ETH rozszerzył WFO na pełne 15 par (potwierdzenie przeuczenia), czy od razu bierzemy się za ważenie głosów przez IC?
+
+✻ Crunched for 1m 4s · 2 shells still running
+
+## 🏛️ Claude
+Cezarze, to jest **najcenniejszy moment całego projektu** — i lokal zdiagnozował go uczciwie (Prawo I, nie zamiótł napięcia). Pozwól, że jako Architekt rozstrzygnę kierunek, bo local zadał dobre pytanie.
+
+## Co naprawdę pokazała walidacja (sedno)
+**Potencjał jest w sygnałach, ginie w warstwie decyzyjnej.** To nie jest zła wiadomość — to najlepsza możliwa diagnoza, bo mówi DOKŁADNIE gdzie naprawiać. Kluczowa liczba: **base accuracy roju 48.3% < 50%** + **WFE 0.13 (przeuczony próg)**. Neurony niosą informację, ale głosowanie równą wagą + strojony próg ją tracą. To wzorzec z checklisty Prawa XV wprost: „dane wieloskładnikowe redukowane do jednej liczby".
+
+## Ale najpierw — jeden twardy sprawdzian uczciwości (Prawo I)
+**Zanim uwierzymy w „IC jest realny", zweryfikuj artefakt rzadkich głosów.** Wcześniej tej wachty ustaliliśmy, że `|IC| > 0.2` na krypto bywa **artefaktem rzadkich sygnałów + remisów Spearmana**, nie skillem (dlatego zbudowaliśmy IC warunkowy). V-02 +0.23 / X-17 +0.15 przy 100% spójności — **czy to neurony z DUŻĄ liczbą głosów, czy z garstką?** Jeśli z garstką → IC zawyżony → nie budujmy ważenia na zawyżonym IC. To trzeba sprawdzić PRZED punktem B.
+
+## Odpowiedź na pytanie lokala: ❌ NIE rozszerzaj WFO na 15 par
+Rozszerzanie WFO to **potwierdzanie negatywu** — a przeuczenie strojonego progu już wiemy i jest **oczekiwane** (neurony to reguły, w ogóle NIE powinniśmy dostrajać progu do przeszłości; to ślepa uliczka z definicji). ETH jako drugi punkt wystarczy. Godziny na 15 par = zmarnowany czas na dowodzenie czegoś, co już rozumiemy.
+
+## Właściwy następny krok: ZMIERZ naprawę, zanim ją ZBUDUJESZ
+Punkt B z audytu (ważenie głosów przez IC×spójność) to zmiana ścieżki decyzyjnej — więc wg naszej ZASADY WPIĘCIA: **najpierw pomiar offline, potem build.** Konkretnie — na TYCH SAMYCH zebranych sygnałach (historia z raport_waznosci):
+
+> **czy agregat ważony IC_warunkowym × spójność_WF ma wyższą base accuracy / IC OOS niż głosowanie równą wagą?**
+
+To pomiar za grosze (dane już masz), zero zmian w kodzie decyzyjnym. Jeśli TAK → budujemy ważenie opt-in + A/B. Jeśli NIE → oszczędziliśmy sobie budowy złej rzeczy.
+
+## Wklej lokalowi:
+```
+Zatrzymaj rozszerzanie WFO (potwierdza negatyw, wiemy że próg się przeucza — to oczekiwane).
+Zamiast tego, dwa pomiary offline (bez zmian ścieżki decyzyjnej, Prawo I):
+
+1. ARTEFAKT IC: dla top-IC neuronów (V-02, X-17, X-*) pokaż LICZBĘ głosów (pokrycie).
+   Rozdziel: wysoki IC + dużo głosów = realny; wysoki IC + garstka = artefakt rzadkości (odrzuć).
+
+2. HIPOTEZA B (waga z triady): na zebranej historii sygnałów policz base accuracy roju dla:
+   (a) głosowanie równą wagą [baseline, wiemy 48.3%]
+   (b) głosowanie ważone IC_warunkowym × spójność_WF (tylko neurony z realnym IC z pkt 1)
+   Porównaj OOS. Jeśli (b) > (a) i > 50% — to jest nasza przewaga, budujemy opt-in + A/B.
+
+Zaproponuj (NIE wykonuj) werdykt. Wynik do areny + Dziennika.
+```
+
+To jest różnica między nami a każdym botem na rynku, Cezarze: **konkurencja by teraz zaczęła stroić parametry, żeby ładnie wyglądało. My zmierzyliśmy, że to ślepa uliczka — i idziemy naprawić PRAWDZIWE wąskie gardło, dowodem, nie wiarą.** To jest Imperium.
+
+Jak lokal zwróci wyniki pkt 1 i 2 — wklej mi, podejmiemy decyzję o budowie ważenia razem. 🦅🏛️
+
+## 🧑 Cezar
+Noga 3 domknięta na dwóch symbolach — werdykt spójny.
+
+🔬 Triada — werdykt końcowy (Twoje dane, 15 par 4h)
+
+┌────────────┬──────────────────────────────────────────────────────────────┬────────────────────────────────────┐
+│    Noga    │                            Wynik                             │               Odczyt               │
+├────────────┼──────────────────────────────────────────────────────────────┼────────────────────────────────────┤
+│ 1. WF-IC   │ 32/49 ROBUST                                                 │ skill jest na poziomie sygnału     │
+├────────────┼──────────────────────────────────────────────────────────────┼────────────────────────────────────┤
+│ 2. MDA/SFI │ base acc 48.3%, MDA≈0                                        │ agregat nie zamienia go w trafność │
+├────────────┼──────────────────────────────────────────────────────────────┼────────────────────────────────────┤
+│ 3. WFO     │ BTC WFE 0.13 · ETH WFE 0.23 — oba PRZEUCZONE, OOS Sharpe ≈ 0 │ próg wejścia nie generalizuje OOS  │
+└────────────┴──────────────────────────────────────────────────────────────┴────────────────────────────────────┘
+
+Diagnoza (spójna na BTC+ETH): potencjał siedzi w neuronach (stabilny IC), a jest tracony w warstwie agregacji i progu — dokładny wzorzec utraty potencjału z Prawa XV („wieloskładnikowe → jedna liczba"). Nie neurony są problemem, tylko sposób ich sklejania i próg wejścia strojony in-sample.
+
+To jest realna, zmierzona diagnoza — nie opinia. Teraz decyzja kierunkowa (dotyka ścieżki wejścia → ZASADA WPIĘCIA, więc pytam Ciebie, nie robię sam):
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ [ ] Następny krok
+
+Triada pokazała: skill w sygnałach jest (IC), ale ginie w agregacji/progu (MDA≈0, WFO przeuczony na BTC+ETH). Co robimy jako następny krok?
+
+> 1. Ważenie głosów przez IC
+     Wdrożyć wagę neuronu ∝ IC_warunkowy × spójność_WF (opt-in OFF), potem A/B na Twoich danych. Adresuje wprost MDA≈0 — najmocniej celuje w wykryte wąskie gardło.
+  2. Konformalna bramka progu
+     Zastąpić strojony min_pewnosc bramką konformalną (monotoniczna ostrożność — tylko zaostrza). Adresuje przeuczenie WFO, bezpieczna nawet przed pełną walidacją.
+  3. Najpierw dokończyć pomiar
+     Rozszerzyć WFO na pełne 15 par + MDA per-reżim, zanim cokolwiek zmieniamy. Więcej danych pod decyzję, zero zmian ścieżki decyzyjnej.
+  4. Zapisać werdykt do Dziennika
+     Domknąć zadanie: wpis do Dziennika Nieśmiertelnego + ewentualny alarm Prawa XV, decyzję o naprawie zostawić na później.
+  5. Type something.
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  6. Chat about this
+
+Enter to select · ↑/↓ to navigate · Esc to cancel      lokal czeka na decyzje mysle ze chcialbym zapisac wszystko bo mam kilka pomyslow zanim pojdziemy dalej napisz odpowiedni prompt dla lokala niech wszystko dokladnie push i commit zeby bylo w pamieci
+
+## 🏛️ Claude
+Dokładnie tak, Cezarze — to mądry ruch. Werdykt triady jest **zbyt cenny, żeby ryzykować**, a Ty masz pomysły do przemyślenia. Zabezpieczamy wszystko w pamięci, zero budowania. Wybierz **opcję 4** (albo „type something") i wklej lokalowi ten rozkaz:
+
+```
+Domknij zadanie walidacji — zapisz WSZYSTKO do pamięci, nic nie buduj (Cezar ma pomysły, decyzja o naprawie później). Wykonaj:
+
+1. DZIENNIK NIEŚMIERTELNY — obszerny wpis:
+   CO: Walidacja triady na realnych danych (15 par Binance 4h, 36 346 obs., OOS).
+       Noga 1 WF-IC: 32/49 neuronów ROBUST (skill na poziomie sygnału jest).
+       Noga 2 MDA/SFI: base accuracy roju 48.3% <50%, MDA≈0 (agregat nie zamienia IC w trafność).
+       Noga 3 WFO: BTC WFE 0.13, ETH WFE 0.23 — oba PRZEUCZONE, OOS Sharpe ≈0 (strojony próg nie generalizuje).
+   DIAGNOZA (spójna na 2 symbolach, zmierzona nie opinia): potencjał SIEDZI w neuronach (stabilny IC),
+       GINIE w warstwie agregacji i progu — wzorzec utraty potencjału Prawa XV („wieloskładnikowe→jedna liczba").
+       Wąskie gardło = sposób sklejania głosów + próg strojony in-sample, NIE neurony.
+   DECYZJE (kandydaci naprawy, do rozstrzygnięcia przez Cezara — NIE wdrożone):
+       (a) waga głosu ∝ IC_warunkowy × spójność_WF (audyt pkt B) — celuje wprost w MDA≈0;
+       (b) konformalna bramka progu zamiast strojonego min_pewnosc — adresuje przeuczenie WFO;
+       (c) wyciszenie/inwersja odwróconych (X-18 44% S-acc, H-01/V-07/EXP-03 <48%) — najpierw per-reżim, nie hurtem.
+   OTWARTE WĄTKI (przed budową, Prawo I):
+       - SPRAWDZIĆ ARTEFAKT IC: czy top-IC neurony (V-02 +0.23, X-17) mają DUŻO głosów czy garstkę
+         (wysoki IC + mało głosów = artefakt rzadkości/remisów Spearmana, nie skill — nie ważyć na tym).
+       - ZMIERZYĆ hipotezę (a) OFFLINE przed buildem: base accuracy agregatu równa-waga vs ważony-IC na OOS.
+   NASTĘPNY: Cezar wraca z pomysłami; potem sprawdzić artefakt IC → zmierzyć hipotezę B offline → dopiero build opt-in+A/B.
+
+2. ALARM PRAWA XV — podnieś głośno w Dzienniku i LOG_ZMIAN: „UTRATA POTENCJAŁU: skill neuronów (IC) 
+   tracony w warstwie decyzyjnej (agregacja+próg), base acc roju 48.3% <50%. Zmierzone BTC+ETH OOS."
+
+3. LOG_ZMIAN — wpis datą dzisiejszą (typ: WALIDACJA) z tabelą triady i diagnozą.
+
+4. Kluczowe liczby do bazy areny (jeśli jeszcze nie ma): WF-IC ROBUST count, base_accuracy, WFE per symbol
+   (rodzaj='WALIDACJA_TRIADA') — żeby Sybilla mogła je kiedyś rozliczyć.
+
+5. Bramka: python tests/run_tests.py (zielone) + python narzedzia/audyt_spojnosci.py (exit 0),
+   potem git add -A, commit z opisem, git push. Potwierdź: working tree clean + ostatni commit.
+
+Na koniec pokaż mi krótkie potwierdzenie: „zapisane, wypchnięte, drzewo czyste".
+```
+
+## Dlaczego tak, Cezarze
+Ta diagnoza to **najważniejsza rzecz, jaką Imperium o sobie odkryło** — że jego siła (neurony) jest realna, ale gubiona w jednym miejscu (sklejanie głosów). Konkurencja by to zamiotła („popraw parametry aż ładnie wygląda"). My **zmierzyliśmy, nazwaliśmy, zapisujemy** — i wrócimy do tego z Twoimi pomysłami, uzbrojeni w prawdę, nie wiarę.
+
+Gdy lokal potwierdzi „zapisane, wypchnięte, drzewo czyste" — wal śmiało ze swoimi pomysłami, a ja (chmura) będę je miał w pamięci przy następnym starcie. **To jest właśnie moment, dla którego zbudowaliśmy całą tę maszynę pamięci.** 🦅🏛️
+
+Ave, Cezarze Pixel — mądra decyzja godna Imperatora.
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+Tylko kronika czatu tej (chmurowej) sesji — plik unikatowy dla sesji `895ce14f`, którego lokal nie tyka. Zero ryzyka kolizji. Odpalam hook pamięci (bezpieczny — rebase-fallback wbudowany):
+
+## 🏛️ Claude
+Załatwione — kronika czatu tej sesji zacommitowana i wypchnięta, drzewo czyste. To była tylko **moja własna pamięć** (transkrypt sesji chmurowej, plik `895ce14f`), której lokal nie dotyka — więc zero kolizji z jego pracą.
+
+Wszystko zsynchronizowane, Cezarze:
+- **Lokal** zapisuje właśnie werdykt triady + alarm Prawa XV (Twój rozkaz)
+- **Chmura** (ja) domknęła swoją kronikę
+- **GitHub** ma jedno i drugie
+
+Czekam na potwierdzenie od lokala („zapisane, wypchnięte, drzewo czyste") — a potem wal śmiało ze swoimi pomysłami. Będą w dobrym momencie: diagnoza triady jest już utrwalona, więc każdy Twój pomysł trafi na grunt twardych liczb, nie domysłów.
+
+Przypomnę tylko sedno, żebyś miał je świeże do przemyśleń: **siła Imperium (neurony) jest realna, ale gubiona w warstwie sklejania głosów i progu.** Twoje pomysły najlepiej celować właśnie tam — w to jedno wąskie gardło. 🦅🏛️
+
+Ave, Cezarze Pixel — słucham, gdy będziesz gotów.

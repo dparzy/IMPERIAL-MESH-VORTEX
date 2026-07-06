@@ -6,6 +6,35 @@
 
 ---
 
+## 2026-07-06 | E+A+L3 | 👁️ Zmysły zweryfikowane na żywo + 🔮 Księgi Sybillińskie (kod)
+
+Sesja przy laptopie wg planu (E+L2→A+L3). Trzy rzeczy:
+
+**E — obudzenie zmysłów ZWERYFIKOWANE NA ŻYWO (Prawo XV, pomiar nie opinia).** Adaptery
+Futures/FearGreed/CVD/News RSS zwracają realne dane (funding 8e-5, F&G=23 Extreme Fear,
+30 nagłówków RSS, block height 956179). Rój oddaje głosy sensoryczne: V-03(CVD), PSY-03/04,
+NEWS-01; OC-06(S2F=180)/OC-08(inflacja 0.555%) ożywają na realnej dacie — były martwe w
+audycie (sztuczny ts z ery 1970). Wszystkie abstynencje legalne (progi/stan kroczący/pętla
+portfelowa) — zero martwych głosów. Nowe narzędzie `narzedzia/waliduj_zmysly.py`: rój
+BAZA vs ZMYSŁY, różnica głosów = wkład zmysłów, per neuron GŁOS/ABSTYNUJE+powód (6 testów).
+
+**A — arena_log track record: potwierdzono że infra JUŻ istnieje** (`petla_live.py` opt-in
+`arena_log=False`, batch LIVE_PNL→arena_baza). Nic do budowy — zegar włącza Cezar.
+
+**L3 — Księgi Sybillińskie WDROŻONE** (`imperium/biblioteki/ksiegi_sybillinskie.py`, perełka II
+z wizji→kod, Prawo XIX): rejestr falsyfikowalnych PROROCTW Imperium o sobie. `dodaj`/`rozlicz`/
+`brier`/`krzywa_kalibracji`, JSONL→git niemutowalny, rozstrzyganie AUTOMATYCZNE z bazy areny
+po horyzoncie, Brier score samowiedzy (Brier 1950). Anty-oszustwo (Prawo I): `rozlicz` NIGDY
+nie tyka P/twierdzenia — zmiana P po fakcie widoczna w git diff. **Zegar OFF (decyzja Cezara):**
+moduł istnieje, realnych proroctw nie zasiano (księgi puste) — zasiew to świadoma decyzja
+Cezara (ZASADA WPIĘCIA). Domyka trójcę kalibracji: conformal(sygnały)→Cienie(decyzje)→Sybilla(przekonania).
+21 testów granic (P∈{0,1}, horyzont==próg, nierozstrzygalne, niemutowalność, Brier znany).
+
+**Pliki:** `narzedzia/waliduj_zmysly.py` (NEW), `tests/test_waliduj_zmysly.py` (NEW),
+`imperium/biblioteki/ksiegi_sybillinskie.py` (NEW), `tests/test_ksiegi_sybillinskie.py` (NEW),
+`docs/WIZJA_KSIEGI_SYBILLINSKIE.md` (status→WDROŻONE), `docs/INDEKS_IMPERIUM.md` (+Sybilla),
+`docs/LOG_ZMIAN.md`.
+
 ## 2026-07-05 | L1 | 🔥 Prova Ignis — próba ognia egzekucji (7 kampanii chaosu, OMS zdał)
 
 Plan Domykania Luk L1 (egzekucja: pancerz zamiast szybkości). `tests/test_prova_ignis.py`:

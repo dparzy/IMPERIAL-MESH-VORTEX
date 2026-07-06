@@ -338,7 +338,15 @@ blokujący bieg.** (Lekcja: WFO wisiał godzinami na ~76 oknach synchronicznie; 
 - Dotyczy: WFO (checkpoint per okno), katalogowanie książek (jedna → zapis → łączenie), Zwiadowca
   Wiedzy, każdy raport wielo-parowy. Preferuj `arena_wyniki.db` jako magazyn cząstek (już istnieje).
 
-**Złamanie:** jeden wielogodzinny blokujący bieg bez checkpointów, który po awarii zaczyna od zera.
+**OBOWIĄZKOWY PASEK POSTĘPU (Prawo XXIV — Widoczność Operacyjna, Cezar 2026-07-06):** każda
+analiza/praca >~10 s MUSI drukować na żywo pasek postępu na stderr, żeby Cezar WIDZIAŁ postęp, a nie
+zgadywał czy wisi. Format minimum: `[i/N] <co robię> — <etap>` (flush=True, natychmiast widoczne).
+Dodatkowo, gdy się da: % ukończenia, licznik jednostek zapisanych, ETA/tempo. Cichy wielominutowy
+bieg BEZ paska = złamanie (dokładnie ból WFO: „wisiał godzinami", nie było wiadomo czy żyje).
+Przy pracach w tle: co jakiś czas raportuj stan („okno 12/76 zapisane"), nie zostawiaj Cezara w ciszy.
+
+**Złamanie:** jeden wielogodzinny blokujący bieg bez checkpointów (który po awarii zaczyna od zera)
+LUB długa praca bez widocznego paska postępu (Cezar nie wie, czy trwa, czy zawisła).
 
 ## 🧪 Testy
 

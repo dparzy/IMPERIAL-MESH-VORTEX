@@ -101,6 +101,36 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Kategoria A przeniesiona z PLANOWANE do AKTYWNE
+WAGI_REZIMU_PLANOWANE zmienione z {'A','L','V'} na {'L','V'} — kategoria A jest już w kodzie z neuronami Dywizji Straży. WAGI_REZIMU: A ×2.0 (VOLATILE) i ×3.0 (PANIC).
+
+### 2026-06-30 — kategoria na SygnalNeuronu była brakującym polem dla wag reżimowych
+WAGI_REZIMU (TREND_STRONG: T×1.5, PANIC: A×3.0) nie działały, bo SygnalNeuronu nie miał pola kategoria. Dodano pole i propagację z KATEGORIA neuronu.
+
+### 2026-06-30 — Brak *_PREV uniemożliwia detekcję crossoverów
+Brama nie dostarczała poprzednich wartości (RSI_PREV, EMA_PREV, MACD_HIST_PREV), przez co neurony crossoverowe były martwe. Naprawiono przez _second_last_valid() i rozszerzenie rejestru Bramy.
+
+### 2026-06-30 — Zombie neurons zwracają NEUTRAL gdy Brama nie dostarcza kluczy
+Neurony z DOSTEPNY=False zawsze zwracały NEUTRAL, maskując brak integracji. Wykryto przez Prawo XV. Naprawiono: Roj.zbierz_sygnaly() pomija DOSTEPNY=False, dodano POWOD_NIEDOSTEPNOSCI.
+
+### 2026-06-30 — Martwy głos ATR_MULT w TLP
+EXP-07 miał ATR_MULT=1.5 ale wartość była nieużywana. Poprawiono na 0.15 i faktycznie użyto w logice breakout.
+
+### 2026-06-30 — Martwy głos ATR w Night Turbo
+Oryginalny Night Turbo miał ATR zdefiniowany ale nieużywany. Poprawiono: PROG_ATR_MULT = 0.5 faktycznie używa ATR.
+
+### 2026-06-30 — Lookahead bias w SMC Engine
+Oryginalny SMC engine używał .shift(-1)/.shift(-2) – patrzenie w przyszłość. Poprawiono w EXP-09: tylko bary[start:n] (przeszłość).
+
+### 2026-06-30 — Cross jako EVENT, nie STATE
+EXP-11 sygnalizuje tylko przy świeżym przecięciu (fast>slow AND prev_fast<=prev_slow), a nie na każdym barze gdzie fast>slow.
+
+### 2026-06-30 — True Range: poprawna definicja
+True Range = max(H-L, |H-prevC|, |L-prevC|). Poprawiono we wszystkich adoptowanych wskaźnikach (EXP-06..12).
+
+### 2026-06-30 — HA bez repainting: rekurencyjna definicja
+Heiken Ashi Open[i] = (HA_Open[i-1] + HA_Close[i-1]) / 2, a nie (Open[-1]+Close[-1])/2. Poprawiono w BudowniczyWskaznikow._dodaj_ha().
+
 ### 2026-06-30 — Prawo I: Zero halucynacji matematycznych
 AI nigdy nie oblicza matematyki. Kod (TA-Lib, C) oblicza RSI/EMA/ATR → JSON 'answer key' → AI tylko interpretuje. Brama Kalkulatora nie uruchomi się bez TA-Lib.
 

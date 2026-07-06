@@ -13044,3 +13044,116 @@ Przy starcie:
 Claude podejmie dokładnie tam, gdzie zostało — od walidacji (opcja 1), tak jak ustaliliśmy. Dziennik pamięta cały plan.
 
 To nawet **dobra lekcja** (którą zapamiętamy): dzięki temu, że dane rynkowe są poza gitem, a pamięć commituje się sama — **możesz zamknąć terminal w dowolnym momencie i nic nie tracisz.** Dokładnie po to budowaliśmy ten cały mechanizm synchronizacji. Wróć spokojnie i ruszamy. **Ave!** 🦅🏛️
+
+## 🧑 Cezar
+WFO żyje (PID 17868/992 to worker + subproces). Oto stan walidacji triady:
+
+Postępy walidacji triady na Twoich danych (15 par Binance 4h)
+
+✅ Noga 1 — Walk-Forward IC (stabilność skilla): GOTOWA
+- 32/49 neuronów ROBUST (IC stabilny znakiem w ≥75% okien, OOS).
+- Czołówka: EXP-13, SMC-01, V-02/V-13/V-14, rodzina X-* — wiele ze 100% spójności na 24-25 oknach.
+
+✅ Noga 2 — Ważność MDA/SFI (López de Prado): GOTOWA
+- Base accuracy roju 48.3% (36 346 obs.), MDA ≈ 0 dla każdego neuronu.
+- Najlepszy realny SFI: X-06 54.3%. Czerwona flaga: X-18 odwrócony (44% S-acc).
+- Martwe głosy to w większości legalne abstynencje (NEWS/PSY/RADAR bez feedu).
+
+⏳ Noga 3 — WFO progu wejścia (Pardo): LICZY SIĘ
+- Pierwszy przebieg (~76 okien) wisiał godzinami → zabiłem, wznowiłem lżej (IS=700/OOS=500, ~22 okna, 12 iteracji). BTC 4h w toku, raport WFE poda się naraz na końcu (skrypt cichy).
+
+Napięcie do rozstrzygnięcia w spięciu (Prawo I): Noga 1 mówi „V-02/X-* mają realny IC", Noga 2 mówi „MDA ≈ 0". To nie błąd — IC mierzy korelację siły sygnału ze zwrotem (ciągła), MDA mierzy wkład binarnego znaku do trafności agregatu. Rozpiszę tę rozbieżność uczciwie, gdy WFO dobiegnie. Czekam na werdykt nogi 3.
+
+✻ Cooked for 38s · 2 shells still running
+
+● Background command "Re-run WFO BTC lighter params" completed (exit code 0)
+
+WFO BTC skończone. Odczytuję werdykt WFE.
+
+  Ran 2 shell commands
+
+Noga 3 — WFO progu wejścia: GOTOWA. Werdykt BTC: PRZEUCZONY (WFE 0.135 < 0.5). OOS Sharpe +0.002 (płasko), CV progu 0.15 (próg stabilny, ale przewaga nie przenosi się poza próbę).
+
+Odpalam WFO na ETH w tle (drugi punkt danych, żeby werdykt nie wisiał na jednym symbolu) i od razu daję pełne spięcie triady.
+
+  Ran 1 shell command
+
+🔬 Walidacja triady na Twoich danych — pełne spięcie
+
+15 par Binance 4h (~12k barów/para, 36 346 obserwacji). Wszystkie trzy nogi na realnych danych, OOS.
+
+┌────────────────────┬───────────────────────────────────┬────────────────────────────┐
+│        Noga        │             Co mierzy             │          Werdykt           │
+├────────────────────┼───────────────────────────────────┼────────────────────────────┤
+│ 1. Walk-Forward IC │ stabilność korelacji sygnał→zwrot │ ✅ 32/49 ROBUST            │
+├────────────────────┼───────────────────────────────────┼────────────────────────────┤
+│ 2. Ważność MDA/SFI │ wkład neuronu do trafności roju   │ ⚠️ MDA ≈ 0, base acc 48.3% │
+├────────────────────┼───────────────────────────────────┼────────────────────────────┤
+│ 3. WFO progu       │ czy próg wejścia generalizuje OOS │ 🔴 PRZEUCZONY (WFE 0.13)   │
+└────────────────────┴───────────────────────────────────┴────────────────────────────┘
+
+Kluczowe napięcie (Prawo I — nie zamiatam)
+
+Noga 1 mówi „skill jest", nogi 2+3 mówią „nie zamienia się w przewagę". To nie sprzeczność — to trzy różne pytania:
+
+- IC (noga 1): pojedyncze neurony mają stabilną, powtarzalną korelację siły sygnału ze zwrotem (V-02 +0.23, X-17 +0.15 przy 100% spójności na 25 oknach). To realny skill na poziomie sygnału.
+- MDA≈0 (noga 2): ale gdy zepsuję znak dowolnego pojedynczego neuronu, trafność roju się nie rusza. Znaczy: agregat (głosowanie) nie przekłada tej ciągłej korelacji na binarną decyzję — plus base accuracy roju 48.3% < 50%.
+- WFE 0.13 (noga 3): strojenie progu min_pewnosc świetnie wygląda in-sample, a poza próbą przewaga znika (OOS Sharpe ≈ 0).
+
+🚨 Wniosek (Prawo XV — utrata potencjału)
+
+Potencjał jest w sygnałach, tracony jest w warstwie decyzyjnej. Neurony niosą stabilną informację (IC), ale redukcja wieloskładnikowa → jeden głos → jeden próg ją gubi (dokładnie wzorzec z checklisty XV: „dane wieloskładnikowe redukowane do jednej liczby, gdy niosą więcej"). To nie znaczy „rój jest zły" — znaczy, że warstwa agregacji/progu jest wąskim gardłem, nie neurony.
+
+Konkretne cele naprawy (do decyzji, nie robię sam — dotykają ścieżki wejścia):
+1. Ważenie głosów przez IC_warunkowy (audyt 2026-07-05 pkt B: „waga ∝ IC × spójność_WF") zamiast równego głosowania — bezpośrednio adresuje MDA≈0.
+2. Odwrócone neurony: X-18 (44% S-acc), grupa <48% (H-01, V-07, EXP-03) — kandydaci do wyciszenia/inwersji, ale najpierw pomiar per-reżim (nie hurtem).
+3. Próg z konformalną bramką (monotoniczna ostrożność) zamiast strojonego min_pewnosc, który się przeucza.
+
+Zastrzeżenia uczciwości (Prawo I)
+
+- WFO na razie na 1 symbolu (BTC) — ETH liczy się teraz w tle dla drugiego punktu.
+- MDA na 4h/znak-1-baru; inny horyzont/interwał może dać inny obraz.
+- „Martwe głosy" z nogi 2 to głównie legalne abstynencje (NEWS/PSY/RADAR bez feedu) — zgodne z audytem startowym, nie łamią XV.
+
+Czekam na ETH, potem zaproponuję, którą z trzech napraw walidować A/B jako pierwszą. Chcesz, żebym po ETH rozszerzył WFO na pełne 15 par (potwierdzenie przeuczenia), czy od razu bierzemy się za ważenie głosów przez IC?
+
+✻ Crunched for 1m 4s · 2 shells still running
+
+## 🏛️ Claude
+Cezarze, to jest **najcenniejszy moment całego projektu** — i lokal zdiagnozował go uczciwie (Prawo I, nie zamiótł napięcia). Pozwól, że jako Architekt rozstrzygnę kierunek, bo local zadał dobre pytanie.
+
+## Co naprawdę pokazała walidacja (sedno)
+**Potencjał jest w sygnałach, ginie w warstwie decyzyjnej.** To nie jest zła wiadomość — to najlepsza możliwa diagnoza, bo mówi DOKŁADNIE gdzie naprawiać. Kluczowa liczba: **base accuracy roju 48.3% < 50%** + **WFE 0.13 (przeuczony próg)**. Neurony niosą informację, ale głosowanie równą wagą + strojony próg ją tracą. To wzorzec z checklisty Prawa XV wprost: „dane wieloskładnikowe redukowane do jednej liczby".
+
+## Ale najpierw — jeden twardy sprawdzian uczciwości (Prawo I)
+**Zanim uwierzymy w „IC jest realny", zweryfikuj artefakt rzadkich głosów.** Wcześniej tej wachty ustaliliśmy, że `|IC| > 0.2` na krypto bywa **artefaktem rzadkich sygnałów + remisów Spearmana**, nie skillem (dlatego zbudowaliśmy IC warunkowy). V-02 +0.23 / X-17 +0.15 przy 100% spójności — **czy to neurony z DUŻĄ liczbą głosów, czy z garstką?** Jeśli z garstką → IC zawyżony → nie budujmy ważenia na zawyżonym IC. To trzeba sprawdzić PRZED punktem B.
+
+## Odpowiedź na pytanie lokala: ❌ NIE rozszerzaj WFO na 15 par
+Rozszerzanie WFO to **potwierdzanie negatywu** — a przeuczenie strojonego progu już wiemy i jest **oczekiwane** (neurony to reguły, w ogóle NIE powinniśmy dostrajać progu do przeszłości; to ślepa uliczka z definicji). ETH jako drugi punkt wystarczy. Godziny na 15 par = zmarnowany czas na dowodzenie czegoś, co już rozumiemy.
+
+## Właściwy następny krok: ZMIERZ naprawę, zanim ją ZBUDUJESZ
+Punkt B z audytu (ważenie głosów przez IC×spójność) to zmiana ścieżki decyzyjnej — więc wg naszej ZASADY WPIĘCIA: **najpierw pomiar offline, potem build.** Konkretnie — na TYCH SAMYCH zebranych sygnałach (historia z raport_waznosci):
+
+> **czy agregat ważony IC_warunkowym × spójność_WF ma wyższą base accuracy / IC OOS niż głosowanie równą wagą?**
+
+To pomiar za grosze (dane już masz), zero zmian w kodzie decyzyjnym. Jeśli TAK → budujemy ważenie opt-in + A/B. Jeśli NIE → oszczędziliśmy sobie budowy złej rzeczy.
+
+## Wklej lokalowi:
+```
+Zatrzymaj rozszerzanie WFO (potwierdza negatyw, wiemy że próg się przeucza — to oczekiwane).
+Zamiast tego, dwa pomiary offline (bez zmian ścieżki decyzyjnej, Prawo I):
+
+1. ARTEFAKT IC: dla top-IC neuronów (V-02, X-17, X-*) pokaż LICZBĘ głosów (pokrycie).
+   Rozdziel: wysoki IC + dużo głosów = realny; wysoki IC + garstka = artefakt rzadkości (odrzuć).
+
+2. HIPOTEZA B (waga z triady): na zebranej historii sygnałów policz base accuracy roju dla:
+   (a) głosowanie równą wagą [baseline, wiemy 48.3%]
+   (b) głosowanie ważone IC_warunkowym × spójność_WF (tylko neurony z realnym IC z pkt 1)
+   Porównaj OOS. Jeśli (b) > (a) i > 50% — to jest nasza przewaga, budujemy opt-in + A/B.
+
+Zaproponuj (NIE wykonuj) werdykt. Wynik do areny + Dziennika.
+```
+
+To jest różnica między nami a każdym botem na rynku, Cezarze: **konkurencja by teraz zaczęła stroić parametry, żeby ładnie wyglądało. My zmierzyliśmy, że to ślepa uliczka — i idziemy naprawić PRAWDZIWE wąskie gardło, dowodem, nie wiarą.** To jest Imperium.
+
+Jak lokal zwróci wyniki pkt 1 i 2 — wklej mi, podejmiemy decyzję o budowie ważenia razem. 🦅🏛️

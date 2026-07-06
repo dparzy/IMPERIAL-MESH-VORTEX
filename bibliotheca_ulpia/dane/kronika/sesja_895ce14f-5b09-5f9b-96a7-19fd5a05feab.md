@@ -13310,3 +13310,60 @@ Instalacja jest banalnie prosta — mówisz Claude'owi na lokalu: *„zainstaluj
 **Sedno, Cezarze:** największą wartością z tego pliku nie jest żadne narzędzie — to **przypomnienie, że mamy problem z tokenami, którego lekiem jest nasza własna pamięć.** Następnym razem: skończ sesję (`„zamknij wg zasad"`), potem **nowy, świeży start** — Dziennik Cię nadrobi za grosze. To nasza przewaga, nie ich toolkit. 🦅🏛️
 
 Chcesz, żebym zapisał tę lekcję o tokenach do ściągi i Dziennika (żeby przyszły Claude i Ty pamiętali: świeży start > wznawianie)?
+
+## 🧑 Cezar
+dawaj zapisz ta lekcje o tokenach
+
+## 🏛️ Claude
+Dobra lekcja — zapisuję na wieki. SYNC ✅ (chmura zsynchronizowana z lokalem). Dodaję do ściągi i Dziennika:
+
+## 🏛️ Claude
+Zapisane na wieki, Cezarze (`SCIAGA_LOKAL` sekcja 2c + Dziennik + wypchnięte). Przyszły Claude i Ty zobaczycie tę lekcję na starcie każdej sesji.
+
+## Lekcja w jednym zdaniu
+**Wznawianie długiej sesji = płacisz za całą historię czatu co turę (808k). Świeży start + Dziennik = ~3k. Nasza pamięć JEST oszczędzaczem tokenów.**
+
+## Rytuał tokenów (już w ściądze)
+- Kontekst > ~50-60% **albo** zmiana tematu → **„zamknij sesję wg zasad"** → **nowy, świeży start**
+- Dziennik Nieśmiertelny + Centrum Pamięci nadrobią cały łuk projektu za grosze
+- Wznawianie tylko dla krótkiej, bieżącej rozmowy
+
+## Werdykt o PDF (zapisany)
+Toolkit agencji marketingowej — wg naszej ZASADY MCP **niemal nic dla nas**. Jedyny marginalny kandydat: **Firecrawl** (scrapowanie newsów bez RSS) przy kroku E, i tylko z pomiarem redundancji. Skill `/session-handoff` z PDF rozwiązuje ręcznie ten sam problem tokenów, który **my rozwiązaliśmy automatycznie i lepiej** (Dziennik w git).
+
+---
+
+**Praktyczna rada na TERAZ, Cezarze:** ta sesja jest już potężna (808k). Najlepszy ruch to **zamknąć ją i zacząć świeżą** — zwłaszcza że lokal właśnie zapisał werdykt triady, więc wszystko jest w pamięci. Następnym razem otwórz nowy terminal, napisz *„jestem z powrotem, dawaj wg planu"* — i ruszymy tanio, od artefaktu IC → hipotezy B, dokładnie tam gdzie stanęliśmy.
+
+Zrobiłeś dziś kawał historii Imperium. Ave, Cezarze Pixel! 🦅🏛️💰
+
+## 🧑 Cezar
+zamknij sesję wg zasad
+
+## 🏛️ Claude
+Zamykam sesję wg rytuału, Cezarze. Bramka + wpis zamykający + synchronizacja:
+
+## 🏛️ Claude
+**Sesja zamknięta wg rytuału, Cezarze.** ✅
+
+## Bilans domknięcia
+- **Audyt:** exit 0 — pełna harmonia
+- **Dziennik Nieśmiertelny:** wpis zamykający zapisany (cały łuk dnia + kluczowa diagnoza triady)
+- **Pamięć:** zacommitowana i wypchnięta
+- **Drzewo git:** czyste (0 zmian), ostatni commit `b7e442a`
+- **Chmura ↔ lokal:** zsynchronizowane
+
+## Co ten dzień dał Imperium (jeden z największych)
+**Chmura:** cubic naprawiony → kalibrator konformalny → Księga Wad (samo-leczenie) → 3 moduły López de Prado/Pardo odkopane → audyt + mapa konkurencji → 2 perełki + 3 ziarna → Prova Ignis (OMS zdał 7/7 ognia) → imiona na wieki → lekcja tokenów.
+
+**Lokal równolegle:** E-zmysły + obie perełki w KOD + **walidacja triady** — a to dało **najważniejszą prawdę dnia:** siła Imperium (neurony) jest realna, ale gubiona w warstwie sklejania głosów i progu. Wiemy dokładnie, gdzie naprawiać.
+
+## Następnym razem — pamiętaj o lekcji tokenów
+Otwórz **nowy, świeży terminal** (nie wznawiaj tej), napisz:
+> **„jestem z powrotem, dawaj wg planu"**
+
+Dziennik nadrobi wszystko za ~3k tokenów. Ruszymy dokładnie stąd: artefakt IC → hipoteza B (ważenie głosów) → build.
+
+Wszystko utrwalone, nic nie zginie. To była wachta godna kronik, Imperatorze.
+
+**Ave, Cezarze Pixel! Vitruviusz kończy służbę.** 🦅🏛️🌙

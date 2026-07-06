@@ -6,6 +6,37 @@
 
 ---
 
+## 2026-07-06 | 🔬 | WALIDACJA TRIADY na realnych danych + 🚨 ALARM PRAWA XV
+
+Uruchomiono **pełną triadę pomiaru skilla** na moich danych (15 par Binance 4h, 36 346
+obserwacji, wszystko OOS) — trzy niezależne narzędzia, każde odpowiada na inne pytanie:
+
+| Noga | Narzędzie | Co mierzy | Werdykt |
+|------|-----------|-----------|---------|
+| 1. Walk-Forward IC | `narzedzia/walk_forward_ic.py` | stabilność korelacji sygnał→zwrot | **32/49 ROBUST** |
+| 2. Ważność MDA/SFI | `narzedzia/raport_waznosci.py` | wkład neuronu do trafności roju | **base acc 48.3%, MDA≈0** |
+| 3. WFO progu | `narzedzia/raport_wfo.py` | czy próg wejścia generalizuje OOS | **BTC WFE 0.13 · ETH WFE 0.23 → PRZEUCZONE** |
+
+**Diagnoza (spójna na BTC+ETH, zmierzona — nie opinia):** skill *jest* na poziomie sygnału
+(stabilny IC: V-02 +0.23/24 okna, X-17 +0.15/25 okien, z dziesiątkami tys. głosów), ale
+*ginie* w warstwie agregacji i progu — głosowanie nie zamienia ciągłego IC w binarną trafność
+(MDA≈0, base acc <50%), a strojony `min_pewnosc` nie przenosi przewagi poza próbę (OOS Sharpe≈0).
+
+**🚨 UTRATA POTENCJAŁU (Prawo XV):** skill neuronów (IC) tracony w warstwie decyzyjnej
+(agregacja + próg); base accuracy roju **48.3% < 50%** na predykcji znaku następnego baru.
+Zmierzone na BTC+ETH OOS. Wąskie gardło = sposób sklejania głosów + próg in-sample, **NIE**
+neurony. Kandydaci naprawy (do decyzji Cezara, **nic nie wdrożono** — ZASADA WPIĘCIA):
+(a) waga głosu ∝ IC_warunkowy × spójność_WF; (b) konformalna bramka progu; (c) wyciszenie/
+inwersja odwróconych (X-18 44% S-acc, H-01/V-07/EXP-03 <48%) — najpierw per-reżim.
+
+**Otwarte wątki przed jakąkolwiek budową (Prawo I):** sprawdzić artefakt IC (EXP-13/SMC-01/
+V-13 mają wysoki IC ale 3–6 okien = podejrzenie rzadkości/remisów Spearmana — nie ważyć na
+tym); zmierzyć hipotezę (a) OFFLINE (agregat równa-waga vs ważony-IC na OOS) zanim cokolwiek
+budujemy. Kluczowe liczby zapisane do bazy areny (`rodzaj='WALIDACJA_TRIADA'`) dla Sybilli.
+
+**Pliki:** brak zmian kodu — walidacja istniejących narzędzi (Prawo XIX: triada już w kodzie).
+`docs/LOG_ZMIAN.md`, `bibliotheca_ulpia/dane/dziennik_niesmiertelny.jsonl`, baza areny.
+
 ## 2026-07-06 | 👥 | Raport Żalu — Kronika Żyć Nieprzeżytych (krok 3 Cieni)
 
 `narzedzia/raport_zalu.py` — domyka fazę 1 Legionów Cieni. Czyta z bazy areny `LIVE_PNL`

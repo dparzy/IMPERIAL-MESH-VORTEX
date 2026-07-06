@@ -101,6 +101,60 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Binance depth zwraca stringi
+L2 order book od Binance ma ceny i wolumeny jako stringi. Dodano float(b[1]) i float(a[1]) w exp_atmabhan.
+
+### 2026-06-30 — 12 bloków strategii miało błędne klucze
+KATALOG_STRATEGII zawierał nieistniejące klucze (np. XII-08). Zsynchronizowano z kodem + dodano audyt W9.
+
+### 2026-06-30 — Filtr nieobecny nie karze strategii
+n_akt_f==0 dawało filtr_frakcja=0.5 karząc strategię. Zmieniono na 1.0 (Prawo XV).
+
+### 2026-06-30 — HA doji neutralny i ATR=0
+HA_BULL zmieniono z >= na > (doji neutralny). Przy ATR=0 dodano jawne zera dla HA_MOMENTUM i HA_VOLATILITY_INDEX.
+
+### 2026-06-30 — Diagnostyka korelacji fałszywie martwe przy 1 próbce
+1 próbka dawała len(set)==1 uznawane za martwe. Wymóg ≥2 próbek do detekcji stałej serii.
+
+### 2026-06-30 — Pre-commit testował working tree zamiast staged
+Pre-commit hook testował cały working tree, nie tylko staged. Dodano git stash push --keep-index + trap przywracający.
+
+### 2026-06-30 — Czytnik CSV błędny symbol z nazwy pliku
+split('_')[0] dla Binance_BTCUSDT_1h dawało 'BINANCE' zamiast 'BTCUSDT'. Poprawiono na [-2].
+
+### 2026-06-30 — AC warmup off-by-one
+Accelerator Oscillator miał zbędne +1 w warmupie (slow+sma_ac+1). Usunięto nadmiar.
+
+### 2026-06-30 — Błąd warmupu Ulcer Index
+Ulcer Index wymagał period+1 zamiast period. Poprawiono na c[-period:] co wymaga tylko period próbek.
+
+### 2026-06-30 — Ustalono kanoniczną liczbę neuronów: 299
+Kanoniczna liczba neuronów to 299 (unikalne klucze z KATALOG_NEURONOW.md), a nie 261/303/306/328 (stare estymaty).
+
+### 2026-06-30 — Dead voice bug: ATR_MULT w EXP-07
+EXP-07 (TLP) miał ATR_MULT=1.5 w kodzie zamiast 0.15 z dokumentacji — martwy głos naprawiony.
+
+### 2026-06-30 — Cross jako EVENT w EXP-11
+Cross jako EVENT a nie STATE: EXP-11 sygnalizuje tylko przy świeżym przecięciu, nie na każdym barze gdzie fast>slow.
+
+### 2026-06-30 — Lookahead bias w SMC Engine (EXP-09) naprawiony
+EXP-09 (LiquiditySweep) oryginalnie używał .shift(-1)/.shift(-2) — lookahead bias. Naprawiono: tylko bary[start:n] (przeszłość).
+
+### 2026-06-30 — Poprawiona definicja True Range
+True Range = max(H-L, |H-prevC|, |L-prevC|) — poprawiono we wszystkich adoptowanych wskaźnikach.
+
+### 2026-06-30 — HA bez repainting: rekurencyjny HA_Open
+Heiken Ashi bez repainting wymaga HA_Open[i] = (HA_Open[i-1] + HA_Close[i-1]) / 2, a nie (Open[-1]+Close[-1])/2. Zaimplementowano w _dodaj_ha().
+
+### 2026-06-30 — Stop-hook git-check.sh blokuje dalszą pracę przy niepushniętym commicie
+Hook ~/.claude/stop-hook-git-check.sh uniemożliwia kontynuację sesji, dopóki commit nie zostanie wypchnięty. To wymusza rozwiązanie problemu uprawnień przed dalszą pracą.
+
+### 2026-06-30 — Plik >1MB nie może być wypchnięty przez GitHub MCP jako tekst
+Próba pusha pliku IMV v05-07 (1.5MB) przez GitHub MCP nie powiodła się z powodu limitu rozmiaru. Duże pliki wymagają pusha przez git lub osobnego uploadu.
+
+### 2026-06-30 — Push przez git blokowany 403 przy braku uprawnień zapisu
+Claude Code w środowisku web nie może wypchnąć commita do repozytorium bez nadania uprawnień Read & Write w ustawieniach GitHub. Błąd 403 jest trwały dopóki użytkownik nie zmieni uprawnień przez github.com/settings/installations.
+
 ### 2026-06-30 — Kategoria A przeniesiona z PLANOWANE do AKTYWNE
 WAGI_REZIMU_PLANOWANE zmienione z {'A','L','V'} na {'L','V'} — kategoria A jest już w kodzie z neuronami Dywizji Straży. WAGI_REZIMU: A ×2.0 (VOLATILE) i ×3.0 (PANIC).
 

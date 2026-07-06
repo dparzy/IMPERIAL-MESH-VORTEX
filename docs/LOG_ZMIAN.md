@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-07-06 | 👥 | Legiony Cieni — Kontrfaktyczne Kolosseum (faza 1, kod)
+
+Perełka z wizji→kod (Prawo XIX). `imperium/koloseum/legiony_cieni.py`: menedżer N widmowych
+wariantów roju maszerujących obok realnej decyzji na PAPIEROWYCH silnikach — mierzy „cenę
+ostrożności i cenę odwagi" NA ŻYWO (Prawo XV podniesione do potęgi: alarm o niewykorzystanych
+DECYZJACH, nie modułach). 3 startowe cienie: `bez_wet` (bezpieczniki OFF — koszt wet),
+`prog_lagodny` (próg −0.10 — wchodzi częściej), `prog_surowy` (próg +0.10 — ostrożniej).
+Zamknięcia → arena `CIEN_PNL` (neuron=nazwa cienia, per reżim). Fundament: CFR (Zinkevich,
+Johanson, Bowling, Piccione, NeurIPS 2007; rodzina pokonała ludzi w pokerze — Libratus/Pluribus).
+
+DLACZEGO TYLKO MY: rój DETERMINISTYCZNY → „co by było gdyby" odtwarzalne uczciwie (LLM-agenci
+konkurencji mają nieodtwarzalne kontrfaktyki). Determinizm = broń badawcza.
+
+Opt-in `cienie=False` w KonfigPetliLive, wpięte w `petla_live` (krok 3c) — cienie to OBSERWATORZY,
+nie dotykają realnych zleceń (ZASADA WPIĘCIA, zero zmiany domyślnego zachowania). Graceful:
+awaria cienia/bazy nie zabija realnego handlu. **Faza 2 (żal→wagi MWU) NIEZBUDOWANA** — czeka
+na walidację ≥100 barów paper (raport_zalu.py + osobna decyzja Cezara). 12 testów granic
+(przycinanie progów [0,1], watermark bez podwójnego zapisu, graceful awarii) + 2 integracyjne
+pętli (opt-in OFF + cienie=True nie crashuje). 2054+12+2 → suite zielony, audyt exit 0.
+
+**Pliki:** `imperium/koloseum/legiony_cieni.py` (NEW), `tests/test_legiony_cieni.py` (NEW),
+`imperium/koloseum/petla_live.py` (flaga `cienie` + wpięcie 3c), `tests/test_petla_live.py`
+(+2 testy), `docs/WIZJA_LEGIONY_CIENI.md` (status→WDROŻONE faza 1), `docs/INDEKS_IMPERIUM.md`,
+`docs/LOG_ZMIAN.md`.
+
 ## 2026-07-06 | E+A+L3 | 👁️ Zmysły zweryfikowane na żywo + 🔮 Księgi Sybillińskie (kod)
 
 Sesja przy laptopie wg planu (E+L2→A+L3). Trzy rzeczy:

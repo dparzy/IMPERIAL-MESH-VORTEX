@@ -107,6 +107,11 @@ class KonfigPetliLive:
     # ML-36: bramka konformalna progu pewności (opt-in, OFF). Po serii strat PODNOSI
     # próg (rój wchodzi rzadziej/pewniej); tylko zaostrza — nie zwiększa liczby wejść.
     kalibruj_prog: bool = False
+    # Legiony Cieni (Kontrfaktyczne Kolosseum, opt-in, OFF): obok realnej decyzji maszerują
+    # 3 widmowe warianty (bez_wet/prog_lagodny/prog_surowy) na papierowych silnikach; ich
+    # zamknięcia → arena (rodzaj='CIEN_PNL') = cena ostrożności i odwagi mierzona NA ŻYWO.
+    # NIE wpływają na realne zlecenia (obserwatorzy). Domyślnie False = zero zmiany zachowania.
+    cienie: bool = False
 
 
 @dataclass
@@ -319,6 +324,32 @@ def handluj_live(
     radar = RadarRynku()
     statystyki = StatystykiPetli()
 
+    # Legiony Cieni (opt-in, OFF): 3 widmowe warianty na papierowych silnikach obok realnego
+    # roju. Własne adaptery (świeże instancje — brak kontaminacji stanu realnych adapterów).
+    # Zamknięcia → arena (CIEN_PNL). NIE dotykają realnego engine (obserwatorzy — ZASADA WPIĘCIA).
+    cienie_mgr = None
+    if getattr(cfg, "cienie", False):
+        from imperium.koloseum.legiony_cieni import zbuduj_cienie_paper
+        from imperium.koloseum.namiestnik import get_namiestnik
+        from imperium.akwedukty.adaptery import (
+            AdapterFutures, AdapterFearGreed, AdapterCVD, AdapterNewsLLM,
+        )
+        from imperium.akwedukty.news_fetcher import FetcherNewsRSS
+        # Fabryka (nie lista): każdy cień dostaje ŚWIEŻE adaptery — AdapterFutures trzyma
+        # stan OI_PREV per symbol; współdzielenie psułoby dywergencję OI między cieniami.
+        def _adaptery_cieni():
+            return [AdapterFutures(), AdapterFearGreed(), AdapterCVD(),
+                    AdapterNewsLLM(fetcher=FetcherNewsRSS())]
+        cienie_mgr = zbuduj_cienie_paper(
+            cfg.symbole, bazowy_prog=cfg.min_pewnosc,
+            kapital_startowy=cfg.kapital_startowy,
+            adaptery_factory=_adaptery_cieni,
+            namiestnik=get_namiestnik() if cfg.auto_rezim else None,
+            bazowy_breaker=True, bazowy_asymetria=cfg.filtr_asymetrii,
+        )
+        logger.info(f"[PętlaLive] 👥 Legiony Cieni AKTYWNE: "
+                    f"{[c.nazwa for c in cienie_mgr.cienie]} → arena(CIEN_PNL)")
+
     # W-343 LiveMonitor (Prawo XXIV): TUI panel + TelegramAlert
     monitor = None
     telegram = None
@@ -470,6 +501,16 @@ def handluj_live(
                 except Exception as e:
                     statystyki.bledy += 1
                     logger.error(f"[PętlaLive] Błąd cyklu {sym}: {e}")
+
+            # 3c. Legiony Cieni (opt-in) — te same bary przez widmowe warianty. Reżim wykrywa
+            # własny namiestnik każdego cienia (jak realny cykl — nie narzucamy). Zamknięcia
+            # cieni lecą do areny (CIEN_PNL). Awaria cienia nie dotyka realnego handlu.
+            if cienie_mgr is not None:
+                for sym, bary in bary_per.items():
+                    try:
+                        cienie_mgr.krok(sym, bary, timestamp=bary[-1]["timestamp"])
+                    except Exception as e:
+                        logger.warning(f"[PętlaLive] 👥 Cienie krok {sym} padł: {e}")
 
             # 3b. Decay synaps (W-329, P4) — higiena pamięci: martwe pary łagodnie
             # wygasają. Bez tego silos synaps rośnie bez końca w długim live.

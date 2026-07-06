@@ -1,8 +1,12 @@
 # 🔮 KSIĘGI SYBILLIŃSKIE — Rejestr Falsyfikowalnych Proroctw (perełka II, 2026-07-05)
 
-> **Status: WIZJA/PROJEKT (Prawo XIX: to NIE jest kod).** Druga perełka końca wachty,
-> siostra Legionów Cieni: Cienie mierzą decyzje nieprzeżyte — Sybilla mierzy SAMOWIEDZĘ.
-> Zgodność: Prawo I (falsyfikowalność!), XV, XVI, XXV, ZPO, ZASADA WPIĘCIA.
+> **Status: WDROŻONE (kod, 2026-07-06).** `imperium/biblioteki/ksiegi_sybillinskie.py`
+> (dodaj/rozlicz/brier/krzywa_kalibracji) + 21 testów granic. Rejestr JSONL rozstrzygany
+> AUTOMATYCZNIE z bazy areny (arena_baza), anty-oszustwo: `rozlicz()` nigdy nie tyka P/twierdzenia.
+> **Zegar OFF (decyzja Cezara):** moduł istnieje, ale realnych proroctw jeszcze nie zasiano —
+> księgi puste; zasiew (start „badania klinicznego") to świadoma decyzja Cezara (ZASADA WPIĘCIA).
+> Druga perełka końca wachty, siostra Legionów Cieni: Cienie mierzą decyzje nieprzeżyte —
+> Sybilla mierzy SAMOWIEDZĘ. Zgodność: Prawo I (falsyfikowalność!), XV, XVI, XIX, XXV, ZPO, ZASADA WPIĘCIA.
 
 ---
 

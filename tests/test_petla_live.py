@@ -110,6 +110,28 @@ def test_petla_z_synapsy_nie_crashuje():
     assert st.bary_przetworzone >= 1
 
 
+def test_konfig_cienie_domyslnie_off():
+    """Opt-in (ZASADA WPIĘCIA): cienie domyślnie False = zero zmiany zachowania pętli."""
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"])
+    assert kfg.cienie is False
+
+
+def test_petla_z_cieniami_nie_crashuje(monkeypatch):
+    """cienie=True: menedżer Cieni wpięty, pętla działa. Offline — wymuszamy adaptery=[]
+    i no-op zapis (bez sieci, bez skażenia realnej bazy areny)."""
+    import imperium.koloseum.legiony_cieni as lc_mod
+    orig = lc_mod.zbuduj_cienie_paper
+    monkeypatch.setattr(
+        lc_mod, "zbuduj_cienie_paper",
+        lambda *a, **k: orig(*a, **{**k, "adaptery_factory": None, "arena_zapis": (lambda w: len(w))}),
+    )
+    loader = _MockLoader({"BTCUSDT": _df(80)})
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"], interwal="1H",
+                          kapital_startowy=10_000.0, paper=True, synapsy=False, cienie=True)
+    st = handluj_live(kfg, max_barow=2, _loader=loader)
+    assert st.bary_przetworzone >= 1
+
+
 def test_petla_mwu_igrzyska_wpiete_w_dyrygentow():
     """W-307: cfg.mwu/igrzyska=True → każdy Dyrygent dostaje warstwy uczenia."""
     try:

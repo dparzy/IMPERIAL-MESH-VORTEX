@@ -6,6 +6,75 @@
 
 ---
 
+## 2026-07-06 | 👥 | Raport Żalu — Kronika Żyć Nieprzeżytych (krok 3 Cieni)
+
+`narzedzia/raport_zalu.py` — domyka fazę 1 Legionów Cieni. Czyta z bazy areny `LIVE_PNL`
+(real) i `CIEN_PNL` (widmowe warianty) i liczy ŻAL każdego mechanizmu: `żal(cień) = średni
+PnL% cienia − średni PnL% realny`, per reżim (NORMAL/RANGING/TREND_STRONG/VOLATILE/PANIC).
+Interpretacja: bez_wet żal>0 → weta nas kosztują; prog_lagodny żal>0 → za ostrożni; prog_surowy
+żal>0 → za odważni. Guard próby (Prawo I): przy < min_barow zamknięć w reżimie raport mówi
+„za mało danych" — NIE zmyśla werdyktu z szumu. Ograniczenie jawne: real i cienie to osobne
+serie (nie sparowane per-trade) — zgrubny pierwszy pomiar KIERUNKU żalu. Fundament: CFR
+(Zinkevich et al. NeurIPS 2007). 10 testów granic (parsowanie reżimu z obu formatów noty,
+żal ±/0, guard próby, brak real w reżimie). Reuse arena_baza (Prawo XVI).
+
+**Pliki:** `narzedzia/raport_zalu.py` (NEW), `tests/test_raport_zalu.py` (NEW),
+`docs/WIZJA_LEGIONY_CIENI.md` (raport gotowy), `docs/LOG_ZMIAN.md`.
+
+## 2026-07-06 | 👥 | Legiony Cieni — Kontrfaktyczne Kolosseum (faza 1, kod)
+
+Perełka z wizji→kod (Prawo XIX). `imperium/koloseum/legiony_cieni.py`: menedżer N widmowych
+wariantów roju maszerujących obok realnej decyzji na PAPIEROWYCH silnikach — mierzy „cenę
+ostrożności i cenę odwagi" NA ŻYWO (Prawo XV podniesione do potęgi: alarm o niewykorzystanych
+DECYZJACH, nie modułach). 3 startowe cienie: `bez_wet` (bezpieczniki OFF — koszt wet),
+`prog_lagodny` (próg −0.10 — wchodzi częściej), `prog_surowy` (próg +0.10 — ostrożniej).
+Zamknięcia → arena `CIEN_PNL` (neuron=nazwa cienia, per reżim). Fundament: CFR (Zinkevich,
+Johanson, Bowling, Piccione, NeurIPS 2007; rodzina pokonała ludzi w pokerze — Libratus/Pluribus).
+
+DLACZEGO TYLKO MY: rój DETERMINISTYCZNY → „co by było gdyby" odtwarzalne uczciwie (LLM-agenci
+konkurencji mają nieodtwarzalne kontrfaktyki). Determinizm = broń badawcza.
+
+Opt-in `cienie=False` w KonfigPetliLive, wpięte w `petla_live` (krok 3c) — cienie to OBSERWATORZY,
+nie dotykają realnych zleceń (ZASADA WPIĘCIA, zero zmiany domyślnego zachowania). Graceful:
+awaria cienia/bazy nie zabija realnego handlu. **Faza 2 (żal→wagi MWU) NIEZBUDOWANA** — czeka
+na walidację ≥100 barów paper (raport_zalu.py + osobna decyzja Cezara). 12 testów granic
+(przycinanie progów [0,1], watermark bez podwójnego zapisu, graceful awarii) + 2 integracyjne
+pętli (opt-in OFF + cienie=True nie crashuje). 2054+12+2 → suite zielony, audyt exit 0.
+
+**Pliki:** `imperium/koloseum/legiony_cieni.py` (NEW), `tests/test_legiony_cieni.py` (NEW),
+`imperium/koloseum/petla_live.py` (flaga `cienie` + wpięcie 3c), `tests/test_petla_live.py`
+(+2 testy), `docs/WIZJA_LEGIONY_CIENI.md` (status→WDROŻONE faza 1), `docs/INDEKS_IMPERIUM.md`,
+`docs/LOG_ZMIAN.md`.
+
+## 2026-07-06 | E+A+L3 | 👁️ Zmysły zweryfikowane na żywo + 🔮 Księgi Sybillińskie (kod)
+
+Sesja przy laptopie wg planu (E+L2→A+L3). Trzy rzeczy:
+
+**E — obudzenie zmysłów ZWERYFIKOWANE NA ŻYWO (Prawo XV, pomiar nie opinia).** Adaptery
+Futures/FearGreed/CVD/News RSS zwracają realne dane (funding 8e-5, F&G=23 Extreme Fear,
+30 nagłówków RSS, block height 956179). Rój oddaje głosy sensoryczne: V-03(CVD), PSY-03/04,
+NEWS-01; OC-06(S2F=180)/OC-08(inflacja 0.555%) ożywają na realnej dacie — były martwe w
+audycie (sztuczny ts z ery 1970). Wszystkie abstynencje legalne (progi/stan kroczący/pętla
+portfelowa) — zero martwych głosów. Nowe narzędzie `narzedzia/waliduj_zmysly.py`: rój
+BAZA vs ZMYSŁY, różnica głosów = wkład zmysłów, per neuron GŁOS/ABSTYNUJE+powód (6 testów).
+
+**A — arena_log track record: potwierdzono że infra JUŻ istnieje** (`petla_live.py` opt-in
+`arena_log=False`, batch LIVE_PNL→arena_baza). Nic do budowy — zegar włącza Cezar.
+
+**L3 — Księgi Sybillińskie WDROŻONE** (`imperium/biblioteki/ksiegi_sybillinskie.py`, perełka II
+z wizji→kod, Prawo XIX): rejestr falsyfikowalnych PROROCTW Imperium o sobie. `dodaj`/`rozlicz`/
+`brier`/`krzywa_kalibracji`, JSONL→git niemutowalny, rozstrzyganie AUTOMATYCZNE z bazy areny
+po horyzoncie, Brier score samowiedzy (Brier 1950). Anty-oszustwo (Prawo I): `rozlicz` NIGDY
+nie tyka P/twierdzenia — zmiana P po fakcie widoczna w git diff. **Zegar OFF (decyzja Cezara):**
+moduł istnieje, realnych proroctw nie zasiano (księgi puste) — zasiew to świadoma decyzja
+Cezara (ZASADA WPIĘCIA). Domyka trójcę kalibracji: conformal(sygnały)→Cienie(decyzje)→Sybilla(przekonania).
+21 testów granic (P∈{0,1}, horyzont==próg, nierozstrzygalne, niemutowalność, Brier znany).
+
+**Pliki:** `narzedzia/waliduj_zmysly.py` (NEW), `tests/test_waliduj_zmysly.py` (NEW),
+`imperium/biblioteki/ksiegi_sybillinskie.py` (NEW), `tests/test_ksiegi_sybillinskie.py` (NEW),
+`docs/WIZJA_KSIEGI_SYBILLINSKIE.md` (status→WDROŻONE), `docs/INDEKS_IMPERIUM.md` (+Sybilla),
+`docs/LOG_ZMIAN.md`.
+
 ## 2026-07-05 | L1 | 🔥 Prova Ignis — próba ognia egzekucji (7 kampanii chaosu, OMS zdał)
 
 Plan Domykania Luk L1 (egzekucja: pancerz zamiast szybkości). `tests/test_prova_ignis.py`:

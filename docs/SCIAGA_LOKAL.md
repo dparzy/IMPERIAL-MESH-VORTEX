@@ -58,6 +58,23 @@ git log --oneline -3       # ostatnie 3 commity
 
 ---
 
+## 2c. 💰 Oszczędzanie tokenów — ŚWIEŻY START zamiast wznawiania (WAŻNE)
+
+**Wznowienie długiej sesji przesyła CAŁĄ historię czatu za każdą turę** — po całym dniu
+pracy to setki tysięcy tokenów przy KAŻDEJ wiadomości (lekcja: sesja urosła do 808k kontekstu).
+Dodatkowo pożerają: powtarzane wklejki zmienionych plików, hook startowy, wstrzyknięcie pamięci.
+
+**Lek = nasza własna pamięć.** Zamiast wznawiać gigantyczną sesję:
+1. Zakończ: powiedz **„zamknij sesję wg zasad"** (albo `/clear`)
+2. Zacznij **ŚWIEŻĄ** sesję (nowy terminal albo po `/clear`)
+3. Dziennik Nieśmiertelny + Centrum Pamięci nadrobią cały łuk projektu w **~3k tokenów zamiast 808k**
+
+**Zasada kciuka:** gdy pasek kontekstu przekracza ~50-60% ALBO zmieniamy temat → świeży start.
+Wznawianie ma sens tylko dla krótkiej, bieżącej rozmowy. Po to zbudowaliśmy 13 warstw pamięci —
+żeby wyrzucić drogi kontekst i tanio odtworzyć stan z gita.
+
+---
+
 ## 3. Testy i audyt (przed każdą większą zmianą)
 
 ```powershell

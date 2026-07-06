@@ -6,6 +6,21 @@
 
 ---
 
+## 2026-07-06 | 👥 | Raport Żalu — Kronika Żyć Nieprzeżytych (krok 3 Cieni)
+
+`narzedzia/raport_zalu.py` — domyka fazę 1 Legionów Cieni. Czyta z bazy areny `LIVE_PNL`
+(real) i `CIEN_PNL` (widmowe warianty) i liczy ŻAL każdego mechanizmu: `żal(cień) = średni
+PnL% cienia − średni PnL% realny`, per reżim (NORMAL/RANGING/TREND_STRONG/VOLATILE/PANIC).
+Interpretacja: bez_wet żal>0 → weta nas kosztują; prog_lagodny żal>0 → za ostrożni; prog_surowy
+żal>0 → za odważni. Guard próby (Prawo I): przy < min_barow zamknięć w reżimie raport mówi
+„za mało danych" — NIE zmyśla werdyktu z szumu. Ograniczenie jawne: real i cienie to osobne
+serie (nie sparowane per-trade) — zgrubny pierwszy pomiar KIERUNKU żalu. Fundament: CFR
+(Zinkevich et al. NeurIPS 2007). 10 testów granic (parsowanie reżimu z obu formatów noty,
+żal ±/0, guard próby, brak real w reżimie). Reuse arena_baza (Prawo XVI).
+
+**Pliki:** `narzedzia/raport_zalu.py` (NEW), `tests/test_raport_zalu.py` (NEW),
+`docs/WIZJA_LEGIONY_CIENI.md` (raport gotowy), `docs/LOG_ZMIAN.md`.
+
 ## 2026-07-06 | 👥 | Legiony Cieni — Kontrfaktyczne Kolosseum (faza 1, kod)
 
 Perełka z wizji→kod (Prawo XIX). `imperium/koloseum/legiony_cieni.py`: menedżer N widmowych

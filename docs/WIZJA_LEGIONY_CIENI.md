@@ -4,8 +4,10 @@
 > (`LegionyCieni` + `zbuduj_cienie_paper` — 3 cienie: bez_wet/prog_lagodny/prog_surowy) +
 > 12 testów granic. Opt-in `cienie=False` w `KonfigPetliLive`, wpięte w `petla_live` (3c) —
 > zamknięcia cieni → arena (rodzaj `CIEN_PNL`). Cienie to OBSERWATORZY (papierowe silniki
-> obok głównego) — NIE dotykają realnych zleceń (ZASADA WPIĘCIA). **Faza 2 (żal→wagi MWU)
-> NIEZBUDOWANA** — czeka na walidację ≥100 barów (raport_zalu.py, osobna decyzja Cezara).
+> obok głównego) — NIE dotykają realnych zleceń (ZASADA WPIĘCIA). **Raport Żalu gotowy**
+> (`narzedzia/raport_zalu.py` — Kronika Żyć Nieprzeżytych: żal per mechanizm per reżim z
+> `CIEN_PNL` vs `LIVE_PNL`, guard próby). **Faza 2 (żal→wagi MWU) NIEZBUDOWANA** — czeka na
+> walidację ≥100 barów paper z cieniami i osobną decyzję Cezara.
 > Zapisana na rozkaz Cezara jako „super perełka wyprzedzająca konkurencję o lata świetlne".
 > Zgodność: Prawo XV (potencjał), XVI (reuse silników), XIX (kod), XXV (przewaga), ZASADA WPIĘCIA.
 

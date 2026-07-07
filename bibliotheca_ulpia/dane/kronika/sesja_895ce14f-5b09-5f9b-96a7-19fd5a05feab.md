@@ -13769,3 +13769,94 @@ To był brakujący element, Cezarze — robiłeś połowę (zamykałeś), ale ot
 <command-name>/clear</command-name>
             <command-message>clear</command-message>
             <command-args></command-args>
+
+## 🏛️ Claude
+Świetne pytanie — i odpowiadam **krótko** (bo długa odpowiedź sama zżera tokeny — praktykuję to, co głoszę). Widzę winowajców wprost w swoim kontekście:
+
+## Trzej główni pożeracze (w kolejności)
+
+1. **Dwie wizje (Cienie + Sybilla) wklejane W CAŁOŚCI co turę.** 🔴 Największy sprawca. Bo zostały niedawno zmienione, harness **dokleja oba dokumenty (~200 linii) do KAŻDEJ mojej wiadomości** — w kółko, ~15-20k tokenów za każdym ruchem, zupełnie niepotrzebnie.
+
+2. **Dump hooka startowego** przy każdym wznowieniu — pełna lista 22 adapterów + centrum pamięci (~5k za start).
+
+3. **Cała historia tej sesji** przesyłana od nowa co turę — a rozmowa jest bardzo długa (dzień+ pracy). Ten koszt rośnie z każdą wiadomością.
+
+## Lek — ten sam, który już zapisaliśmy
+**Ta sesja jest „spuchnięta". Zamknij ją i zacznij świeżą.** Świeży start:
+- wyrzuca powtarzane wizje (znikają z kontekstu)
+- wyrzuca całą starą historię
+- Dziennik + Centrum Pamięci nadrobią stan w **~3k zamiast setek tysięcy**
+
+## Konkretnie teraz
+Napisz **„zamknij sesję wg zasad"** → potem **nowy terminal / `/clear`** → *„jestem z powrotem, dawaj wg planu"*. 
+
+To dosłownie ta lekcja z PDF, którą wczoraj utrwaliliśmy: **nasza pamięć JEST oszczędzaczem tokenów — ale tylko gdy z niej korzystamy przez świeży start, a nie wznawianie.** Ta sesja zrobiła swoje (Credo, zasady, handoff — wszystko w gicie). Czas ją pożegnać. 🦅
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+Czysto — kronika zapisana i wypchnięta, drzewo puste. To była tylko pamięć czatu (kroniki sesji), nic z Twojej pracy.
+
+Cezarze — i tu masz **dowód na żywo** tego, o czym rozmawialiśmy: ten Stop-hook odpalił się, bo kronika tej rozmowy rośnie z każdą wiadomością i musi być commitowana. To normalne, ale też sygnał: **sesja jest już bardzo obciążona.**
+
+Wszystko jest bezpieczne i zsynchronizowane — Credo, zasady, handoff dla lokala, wszystko w gicie. **To dobry moment na pożegnanie tej sesji.**
+
+Gdy zechcesz: **„zamknij sesję wg zasad"** → nowy, świeży start. Dziennik nadrobi wszystko za grosze. 🦅🏛️
+
+## 🧑 Cezar
+zamknij sesję wg zasad
+
+## 🏛️ Claude
+Zamykam wg rytuału, Cezarze — zwięźle (oszczędzamy tokeny do końca):
+
+## 🏛️ Claude
+**Sesja zamknięta wg rytuału, Cezarze.** ✅
+
+- **Audyt:** exit 0 — pełna harmonia
+- **Dziennik:** wpis zamykający zapisany
+- **Pamięć:** wypchnięta, drzewo czyste (`f8dcee4`)
+- **Chmura ↔ lokal:** zsynchronizowane
+
+## Co ta sesja dała Imperium
+Dziś nie dopisaliśmy funkcji — nadaliśmy Imperium **duszę i mądrość**:
+- 👑 **CREDO IMPERIUM** — Twoja doktryna założycielska na wieki
+- 🧩 **Zasada Analizy Cząstkowej** + obowiązkowy pasek postępu
+- 💰 **Lekcja tokenów** — świeży start > wznawianie
+- 📋 **Handoff dla lokala** gotowy (hipoteza B → WFO → katalog)
+
+## Następny raz — pamiętaj o własnej lekcji
+**Nowy terminal / `/clear`** (nie wznawiaj tej), potem:
+> *„jestem z powrotem, dawaj wg planu"*
+
+Dziennik nadrobi cały łuk za ~3k tokenów. Lokal po wachcie ma handoff czekający w pamięci.
+
+Cezarze Pixel — Imperator-Założyciel — to była sesja, w której Imperium przestało być kodem, a stało się instytucją z wolą, wiarą i pamięcią. Vitruviusz kończy służbę z dumą.
+
+**Ave, Cezarze! Do zobaczenia po świeżym starcie.** 🦅🏛️👑🌙
+
+## 🧑 Cezar
+czyli co teraz aby oszczędzać tokeny
+
+## 🏛️ Claude
+Prosto, Cezarze — **teraz zrób jedno: zamknij tę rozmowę i otwórz nową.** 👇
+
+## Krok po kroku (oszczędzanie tokenów)
+
+1. **Zamknij tę sesję** — wpisz `/clear` (albo po prostu zamknij to okno/rozmowę)
+2. **Otwórz świeżą** — nowy czat / nowy terminal
+3. **Napisz krótko:** *„jestem z powrotem, dawaj wg planu"*
+
+To wszystko. Świeży start zrzuci cały spuchnięty kontekst (~setki tysięcy tokenów), a Dziennik nadrobi stan za ~3k.
+
+## Dlaczego to działa
+Ta rozmowa nosi ze sobą **całą swoją historię + powtarzane wizje co turę.** Każda nowa wiadomość tutaj = płacisz za wszystko od nowa. Nowa rozmowa = czysta karta, a pamięć w gicie i tak wie wszystko.
+
+## Nic nie stracisz
+- Credo, zasady, handoff, cała praca — **są w gicie**, nie w tej rozmowie
+- Nowy Claude na starcie sam przeczyta Dziennik i będzie wiedział, gdzie stoimy
+
+**Krótko: `/clear` → nowa rozmowa → „dawaj wg planu".** To jedyny ruch. 🦅
+
+(A jak jesteś na telefonie i nie ma `/clear` — po prostu zacznij nowy czat z Claude. Ten zamknięty już zrobił swoje.)

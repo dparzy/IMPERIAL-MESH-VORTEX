@@ -323,6 +323,31 @@ sizing, filtr), wchodzi jako OPT-IN domyślnie OFF — i włącza się DOPIERO p
 **Złamanie:** zmiana domyślnego zachowania ścieżki decyzyjnej bez flagi opt-in, albo włączenie
 mechanizmu bez walidacji A/B na danych.
 
+## 🧩 ZASADA ANALIZY CZĄSTKOWEJ (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-06)
+
+**Każda długa analiza = wiele MAŁYCH, ZAPISANYCH, ŁĄCZONYCH kroków. Nigdy jeden wielki
+blokujący bieg.** (Lekcja: WFO wisiał godzinami na ~76 oknach synchronicznie; padał = tracił wszystko.)
+
+- **Jednostka → zapis → łączenie:** dziel pracę na najmniejszą sensowną jednostkę (para, okno,
+  neuron, książka), zrzucaj wynik KAŻDEJ do trwałego magazynu (arena_wyniki.db / JSONL w git)
+  ZANIM ruszysz następną. Łączenie/agregacja na końcu, z zapisanych cząstek.
+- **Wznawialność (antykruchość, Taleb):** bieg który umiera NIE traci nic — wznawiasz od pierwszej
+  niezapisanej jednostki, nie od zera. Sprawdź magazyn przed startem, pomiń już policzone.
+- **To lekcja tokenów przeniesiona na OBLICZENIA:** nie trzymaj całej analizy w jednym biegu (jak
+  nie trzymamy całej historii czatu w kontekście) — cząstkuj i odtwarzaj tanio z gita/areny.
+- Dotyczy: WFO (checkpoint per okno), katalogowanie książek (jedna → zapis → łączenie), Zwiadowca
+  Wiedzy, każdy raport wielo-parowy. Preferuj `arena_wyniki.db` jako magazyn cząstek (już istnieje).
+
+**OBOWIĄZKOWY PASEK POSTĘPU (Prawo XXIV — Widoczność Operacyjna, Cezar 2026-07-06):** każda
+analiza/praca >~10 s MUSI drukować na żywo pasek postępu na stderr, żeby Cezar WIDZIAŁ postęp, a nie
+zgadywał czy wisi. Format minimum: `[i/N] <co robię> — <etap>` (flush=True, natychmiast widoczne).
+Dodatkowo, gdy się da: % ukończenia, licznik jednostek zapisanych, ETA/tempo. Cichy wielominutowy
+bieg BEZ paska = złamanie (dokładnie ból WFO: „wisiał godzinami", nie było wiadomo czy żyje).
+Przy pracach w tle: co jakiś czas raportuj stan („okno 12/76 zapisane"), nie zostawiaj Cezara w ciszy.
+
+**Złamanie:** jeden wielogodzinny blokujący bieg bez checkpointów (który po awarii zaczyna od zera)
+LUB długa praca bez widocznego paska postępu (Cezar nie wie, czy trwa, czy zawisła).
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`

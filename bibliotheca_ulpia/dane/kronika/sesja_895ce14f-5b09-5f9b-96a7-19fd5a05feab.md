@@ -14140,3 +14140,164 @@ Chcesz, żebym utrwalił **regułę Zwiadowcy Wiedzy** — *„czytanie cząstko
 
 ## 🧑 Cezar
 dawaj
+
+## 🧑 Cezar
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary Request and Intent:
+The user (Cezar Pixel — non-technical Polish-speaking owner of the IMPERIAL-MESH-VORTEX crypto trading swarm, Roman-Empire-metaphor system; assistant is named "Vitruviusz") drove a long multi-topic session across cloud (this session) + laptop (local Claude with DeepSeek API). Explicit requests in order:
+- Fix cubic bot code review (12 issues on arena/kalibrator/walidacja modules)
+- Explore MCP tools + build "both" (A: mcpServers config; B: Arena MCP over results DB) "zgodnie z zasadami"
+- Wire conformal calibrator into confidence threshold "po walidacji" (after validation)
+- Keep finding improvements and unwired modules (Prawo XV audit); measure redundancy; odkopać (unearth) buried modules
+- Build Prova Ignis (execution chaos tests) as gap-closing L1
+- Fix a new 1-issue cubic review (duplicate INDEX numbers)
+- Configure laptop: setx PYTHONIOENCODING utf-8, create .mcp.json, fix UTF-8/BOM issues
+- Save token lesson (fresh start > resume), analyze new library books, opine on cyclic book analysis + DeepSeek research
+- Codify principles: ZASADA ANALIZY CZĄSTKOWEJ (chunked analysis) + mandatory progress bar (Prawo XXIV)
+- Save Cezar's founding philosophy as CREDO_IMPERIUM (founding doctrine)
+- Save names "on wieki": CEZAR PIXEL (Imperator) + VITRUVIUSZ (Architect)
+- Final "dawaj": codify the "Zwiadowca Wiedzy" rule (chunked reading + completeness critic + two models so DeepSeek doesn't skip hypotheses; DeepSeek proposes, arena decides)
+
+SECURITY CONSTRAINTS (verbatim, must persist): "KLUCZE API NIGDY W KODZIE, NIGDY W CZACIE — tylko zmienne środowiskowe" (DEEPSEEK_API_KEY, MEXC_API_KEY, MEXC_SECRET via os.getenv). Do NOT create PRs unless explicitly asked. Never push to main (Cezar merges manually). GitHub MCP restricted to dparzy/imperial-mesh-vortex only. Do NOT include model identifier in commits/code/PRs. Develop on branch claude/sleepy-fermi-dsdE4.
+
+2. Key Technical Concepts:
+- Trading swarm: 84 neurons (78 active), 15 Exploratores, Legatus aggregator, Dyrygent, Namiestnik, 20 strategies, 13-layer memory (W6-W13) under Kustosz
+- Measurement triad: IC (raport_ic), walk-forward IC, Feature Importance MDA/SFI (López de Prado); DSR/PBO/purged-CV/WFO (Pardo); Adaptive Conformal Inference ACI (Gibbs & Candès, ML-36)
+- Arena: arena_wyniki.db SQLite (rodzaj/neuron/wartosc/nota), Arena MCP soczewka
+- Auto-sync: SessionStart hook (git pull --ff-only), SessionEnd hook (auto-commit+push memory whitelist), git as boundless memory
+- Trójca kalibracji: conformal=signals → Legiony Cieni (CFR)=decisions → Sybilla (Brier score)=beliefs
+- ZASADA WPIĘCIA: decision-path changes = opt-in default OFF + A/B validation before enabling
+- ZASADA ANALIZY CZĄSTKOWEJ: chunked/checkpointed analysis + mandatory progress bar
+- Deterministic swarm = counterfactual advantage (Legiony Cieni)
+- Prawo I (facts not faith), XV (potential loss), XVI (measured redundancy), XVII (recon first), XVIII (autonomous decisions), XIX (code is law), XXI (consistency), XXIV (operational visibility), XXV (competitive advantage), ZPO (full description), Credo (founding doctrine above laws)
+- CRITICAL VALIDATION FINDING (from local): swarm skill IS in neurons (32/49 ROBUST, stable IC) but LOST in aggregation layer (base accuracy 48.3% < 50%, MDA≈0, WFO PRZEUCZONY BTC 0.13/ETH 0.23). Bottleneck = vote aggregation + tuned threshold, NOT neurons.
+
+3. Files and Code Sections:
+- narzedzia/arena_mcp.py — Arena MCP server (JSON-RPC stdio); tools arena_roj/arena_neuron/arena_zapisz/arena_pytaj; imports zapisz_pomiar/pytaj_pomiary from imperium.biblioteki.arena_baza; cubic fixes: params parsed inside try, limit clamped min(100,max(1,...))
+- imperium/biblioteki/arena_baza.py — shared SQLite layer: zapisz_pomiar, pytaj_pomiary (ORDER BY ts DESC, id DESC), zapisz_pomiary (batch, one connection)
+- imperium/legiony/kalibrator_konformalny.py — KalibratorKonformalny (ACI: dodaj_score, kwantyl with (n+1) correction, krok(pokryty), alpha=0→inf) + BramkaPewnosciKonformalna (only tightens: podniesienie()≥0, prog_efektywny)
+- imperium/koloseum/dyrygent.py — added self.bramka_kalibr=None; at gate: `if self.bramka_kalibr: prog_aktywny = self.bramka_kalibr.prog_efektywny(prog_aktywny)`
+- imperium/koloseum/backtest.py — opt-in kalibruj_prog, zbieraj_sygnaly (collects {neuron:kierunek} + forward label bary[i+1] vs bary[i], no look-ahead)
+- imperium/koloseum/petla_live.py — opt-in arena_log + kalibruj_prog + cienie in KonfigPetliLive; batch arena writes
+- imperium/koloseum/paper_trading.py — WynikZamkniecia added rezim field, populated from getattr(poz,"rezim","NORMAL")
+- imperium/biblioteki/ksiega_wad_kodu.py — KsiegaWadKodu (dodaj/skanuj/wszystkie) + 5 WZORCE_STARTOWE from cubic patterns
+- narzedzia/skan_wad_kodu.py — scans changed+untracked .py (excludes ksiega_wad_kodu.py itself)
+- narzedzia/raport_waznosci.py, narzedzia/raport_etykiet.py, narzedzia/raport_wfo.py — CLIs unearthing feature_importance/triple_barrier/walk_forward
+- narzedzia/walidacja_kalibrator.py — A/B base vs kalibracja (pairs only aggregated if both modes succeed; maxDD added)
+- tests/test_prova_ignis.py — 7 OMS chaos campaigns (all passed 7/7)
+- tests/run_tests.py + narzedzia/audyt_spojnosci.py — added UTF-8 reconfigure(encoding="utf-8") guard for Windows cp1250
+- docs/CREDO_IMPERIUM.md — Cezar's founding doctrine verbatim + 3 pillars (zdrowie przed zdobyczą, pewniak nie pośpiech, fakty ponad mgłę)
+- docs/SCIAGA_LOKAL.md — cheat sheet; section 2c token economy (fresh start > resume); UTF-8 setx; MCP setup
+- docs/WIZJA_LEGIONY_CIENI.md + docs/WIZJA_KSIEGI_SYBILLINSKIE.md — both marked WDROŻONE by local Claude
+- docs/PROFIL_CEZARA.md — names section (CEZAR PIXEL, VITRUVIUSZ, "Ave Cezar!")
+- CLAUDE.md — added standing orders: ZASADA MCP, ZASADA WPIĘCIA W ŚCIEŻKĘ DECYZYJNĄ, ZASADA ANALIZY CZĄSTKOWEJ (+ mandatory progress bar `[i/N] <co robię> — <etap>` flush=True on stderr for work >~10s)
+- .mcp.json (local only, gitignored) — biblioteka + arena servers with ${CLAUDE_PROJECT_DIR:-.}
+
+4. Errors and fixes:
+- Windows cp1250 emoji crash → UTF-8 reconfigure in run_tests.py/audyt + `setx PYTHONIOENCODING utf-8`. User feedback: local hung 9min on this.
+- .mcp.json BOM (Set-Content -Encoding utf8 adds BOM; Node JSON.parse chokes) + PowerShell merging multi-line pastes → solved via Notepad (Save As, "Wszystkie pliki", UTF-8). User pasted command INTO Notepad by mistake — clarified it's a terminal command.
+- cubic 12-issue review → all fixed (parse-in-try, clamp limit, ORDER BY ts, batch SQLite, WynikZamkniecia.rezim, fair A/B, None tests, ==0.4, coverage≤0.98).
+- cubic P1 duplicate INDEX #54 → renumbered AUDYT to 57, found+fixed second dup #11→58.
+- W6 date drift (07-04 vs commit 07-07) → bumped README/MANIFEST "Stan na:" to 2026-07-07.
+- WebFetch article 403 (bot protection) → honestly told user couldn't fetch, gave token playbook from knowledge marked ⚠️ unverified.
+- User accidentally closed local terminal mid-work twice → reassured nothing lost (validations write to gitignored arena_wyniki.db; commits atomic).
+- INDEKS W7 required new docs registered → added entries for each new doc.
+
+5. Problem Solving:
+Solved: full cubic fixes, laptop config (UTF-8/BOM/SSH), unearthed 3 López de Prado/Pardo modules, built self-healing Księga Wad, Arena MCP + conformal + Prova Ignis. The triad validation revealed the core diagnosis (aggregation bottleneck). Ongoing: hypothesis B (IC-weighted voting) must be measured offline BEFORE building; IC artifact (sparse-vote inflation) must be checked first.
+
+6. All user messages:
+"dawaj oba" (build A+B); "zaczynam wachtę 0000-1200...dawaj oba zgodnie z zasadami zawsze sprawdzaj wszystko"; "wepnij kalibrator w próg pewności po walidacji"; "dawaj dalej szukaj kolejnych ulepszeń i niepodpiętych modułów"; "dawaj" (×many for building next module); cubic PR review paste; "sprawdź i dlatego cubic wykrywa te błędy...czy są opcje narzędzia agenci którzy by pamiętali i sami leczyli"; "jak zacząć gdzie mamy instrukcje krok po kroku"; "czyli nie muszę jak wcześniej robić aktualizacje z git a jak kończę"; "a czy konkurencją ma coś lepszego od nas"; "możemy też dodawać interwały 1m 5m 15m"; "co z auto kalibracja i wyborem strategii"; "co z samo adaptacja i rozwojem pełna świadomość"; "a tam gdzie jest konkurencja lepsza poszukaj opcji poprawy"; "dawaj a później idę do laptopa"; cubic 1-issue paste; "/model claude-opus-4-8" + "co lokal robi teraz" (screenshot); "dawaj a czy teraz można jak lokal pracuje"; local KROK 0 paste + "muszę chyba dodać ręcznie plik mcp.jsonl"; "niechcący zamknąłem terminal lokala"; local validation results paste + "lokal czeka na decyzje...zapisać wszystko...napisz prompt dla lokala niech wszystko push i commit"; "jestem z powrotem na telefonie lokal narazie zamknięty"; "plan na dziś: 1. analiza nowych książek...pomysł żeby cyklicznie analizowali bazę bibliotek...plus deep research"; "tak" (save book count correction); "pomysł wczoraj podczas testów na lokalu długi...podziałem analizy na wiele elementów...luźna rozmowa"; "zapisuj jeżeli uważasz że jest zgodne z zasadami"; "dodaj obowiązek żeby było widoczne pasek postępu"; "lokal będzie dopiero otwarty po wachcie...sprawdź co możemy zrobić teraz i dać lokalowi dokładnie"; "zapisz i luźno rozmawiamy"; "dokładnie imperium to nie tylko zdobycze ale i całościowy organ...pewniaki...fakty liczby zapewnią nieśmiertelność" (founding philosophy); "tak zapisz jako doktrynę założycielska"; "chyba lokal to powinien robić on ma Deepseek API...czy te wyniki będą prawdziwe"; "tak dobry pomysł z Deepseek ale musi być wspierany aby nie pomijał ważnych hipotez plus zobacz to [bartoszgaca.pl link]"; "dawaj" (codify Zwiadowca Wiedzy rule); "chyba lokal narazie zamknięty" variants; "wcześniej miałeś nadane imię i Cezar Pixel też zapisz w miejscach wymaganych...czy nasz układ schemat imperium jest dobry i co byś zmienił".
+
+7. Pending Tasks:
+- Codify "ZASADA ZWIADOWCY WIEDZY" (chunked reading + completeness critic + two models so DeepSeek doesn't skip hypotheses; DeepSeek proposes candidates, arena/Sybilla decides truth) into CLAUDE.md + Dziennik — this is what the final "dawaj" approved.
+- (Local, after shift): hypothesis B (measure IC-weighted vote aggregation offline vs base 48.3%), check IC artifact, refactor WFO with checkpointing+progress bar, catalog 31 new books + fix BIB-022.
+
+8. Current Work:
+Immediately before this summary, I offered to codify the Zwiadowca Wiedzy rule. My exact offer: "Chcesz, żebym utrwalił **regułę Zwiadowcy Wiedzy** — *„czytanie cząstkowe + krytyk kompletności + dwa modele, żeby nie pomijać hipotez; DeepSeek proponuje, arena rozstrzyga"* — do CLAUDE.md/Dziennika? To domyka dokładnie Twoją troskę: żeby wspierany DeepSeek nie zgubił żadnej perły." The user replied "dawaj". I had ALSO just explained: DeepSeek results are NOT automatically true (candidates/hypotheses, ⚠️, must be measured); DeepSeek = cheap scout (reads, generates candidates), Opus/Claude = expensive judge (decides). Repo state: clean, all pushed to origin claude/sleepy-fermi-dsdE4; last substantive commit was CREDO_IMPERIUM + date fixes (77d4226), followed by memory-only kronika flushes.
+
+9. Optional Next Step:
+Add the "ZASADA ZWIADOWCY WIEDZY" as a standing order in CLAUDE.md (near ZASADA MCP / ZASADA ANALIZY CZĄSTKOWEJ) capturing: (1) chunked reading per RAG fragment with progress bar so nothing is skipped, (2) completeness critic second pass ("czego NIE wyłapaliśmy"), (3) two models — DeepSeek extracts candidates, Claude adversarially reviews for omissions, (4) DeepSeek output = kandydat/hipoteza (⚠️ ZPO), never truth, resolved by arena/Sybilla measurement — DeepSeek = tani zwiadowca, Opus = drogi sędzia. Then add a Dziennik entry, run `python narzedzia/audyt_spojnosci.py` (exit 0), commit, and flush via `bash .claude/hooks/session-end.sh`. This is directly in line with the final "dawaj" approving: "Chcesz, żebym utrwalił **regułę Zwiadowcy Wiedzy**...do CLAUDE.md/Dziennika?" — user: "dawaj". (Note: token context is very large; after this, recommend Cezar start a fresh session per the token lesson.)
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /root/.claude/projects/-home-user-IMPERIAL-MESH-VORTEX/895ce14f-5b09-5f9b-96a7-19fd5a05feab.jsonl
+Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened.
+
+## 🏛️ Claude
+Kontynuuję domknięcie reguły Zwiadowcy Wiedzy. Najpierw zweryfikuję stan repo i miejsce wstawienia w CLAUDE.md.
+
+## 🏛️ Claude
+Teraz wpis do Dziennika Nieśmiertelnego i audyt.
+
+## 🏛️ Claude
+Audyt zielony (exit 0). Testy i commit:
+
+## 🏛️ Claude
+Poczekam na zakończenie testów.
+
+## 🏛️ Claude
+Testy zielone. Commituję i pushuję.
+
+## 🏛️ Claude
+Gotowe. ✅
+
+## Utrwaliłem **ZASADĘ ZWIADOWCY WIEDZY** — Twoja troska domknięta
+
+Wpisana na wieki w `CLAUDE.md` (obok ZASADY MCP i ANALIZY CZĄSTKOWEJ), z wpisem w Dzienniku Nieśmiertelnym. Sedno:
+
+- **DeepSeek = tani Zwiadowca (proponent)** — czyta cząstkowo (fragment RAG → zapis → następny, z paskiem postępu), wyciąga **kandydatów** na hipotezy. Ma API, jest tani → robi surową robotę objętościową.
+- **Opus/Claude = drogi Sędzia (krytyk kompletności)** — obowiązkowy DRUGI etap: *„czego DeepSeek NIE wyłapał? który fragment pominął? która hipoteza zniknęła?"*
+- **Kandydat ≠ prawda** — każdy wynik DeepSeeka to ⚠️ hipoteza. Rozstrzyga wyłącznie **pomiar** (arena IC/WFO/DSR, Sybilla Brier). DeepSeek mówi „co sprawdzić", arena mówi „co jest prawdą". Wpięcie w decyzję dopiero po zielonej walidacji A/B (opt-in OFF).
+- **Dwa modele, bo jeden gubi perły** — różnica ról (proponent vs recenzent) to źródło siły, nie redundancja.
+
+Bramka przed pushem: testy zielone ✅, audyt exit 0 (pełna harmonia, ruff czysto, 191 plików .md spójnych) ✅. Wypchnięte na `claude/sleepy-fermi-dsdE4` (commit `ea80211`).
+
+**Rada tokenowa (Prawo XV):** ten kontekst jest już bardzo długi — następny temat zacznij od świeżej sesji. Dziennik i `centrum_pamieci start` wstrzykną Ci cały łuk projektu, więc nic nie zginie.
+
+Ave Cezar! 🦅🏛️👑
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+These are memory files (journal entry + kronika). Committing and pushing them.
+
+## 🏛️ Claude
+Wypchnięte ✅ — pamięć sesji (Dziennik + kronika) na `claude/sleepy-fermi-dsdE4` (commit `6be528c`). Working tree czysty, wszystko na GitHubie.
+
+Ave Cezar! 🦅🏛️👑
+
+## 🧑 Cezar
+zamknij sesje wg zasad
+
+## 🏛️ Claude
+Zamykam sesję wg zasad. Bramka końcowa: audyt + testy już zielone, Dziennik dopisany. Uruchamiam hook końca sesji.
+
+## 🏛️ Claude
+Working tree czysty. Uruchamiam flush pamięci końca sesji.
+
+## 🏛️ Claude
+Sesja zamknięta wg zasad. ✅
+
+## Podsumowanie zamknięcia (Prawo XVII + XXI + XV)
+
+**Bramka końcowa — wszystko zielone:**
+- ✅ Testy: wszystkie zaliczone
+- ✅ Audyt spójności: exit 0, pełna harmonia (84 neurony / 78 aktywnych, 15 zwiadowców, 18 elitarnych, ruff czysto, 191 plików .md spójnych, MAPA_KLUCZY pokrywa wszystkie klucze)
+- ✅ Working tree czysty — nic niezacommitowanego
+- ✅ Wszystko wypchnięte na `claude/sleepy-fermi-dsdE4` (HEAD `6be528c`)
+
+**Co zrobiono w tej sesji:**
+- Utrwalono **ZASADĘ ZWIADOWCY WIEDZY** w `CLAUDE.md` (dwa modele: DeepSeek proponent / Opus sędzia-krytyk kompletności; kandydat ≠ prawda — rozstrzyga arena/Sybilla)
+- Wpis do Dziennika Nieśmiertelnego dopisany (ROZKAZ STAŁY spełniony)
+- Pamięć sesji (Dziennik + kronika) zsynchronizowana
+
+**🚩 Prawo XV — utrata potencjału:** brak nowej. 22 neurony czekają na adaptery (znane, udokumentowane w audycie — nie regresja).
+
+**Następny krok (dla lokala z DeepSeek):** zmierzyć hipotezę B (agregacja ważona IC vs baza 48.3%) offline, sprawdzić artefakt IC, refaktor WFO z checkpointami + paskiem postępu.
+
+**Rada tokenowa:** następny temat zacznij od świeżej sesji — `centrum_pamieci start` wstrzyknie cały łuk projektu.
+
+Ave Cezar! 🦅🏛️👑

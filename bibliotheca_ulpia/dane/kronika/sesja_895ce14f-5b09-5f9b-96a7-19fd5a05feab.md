@@ -13998,3 +13998,48 @@ Wypchnięte na `claude/sleepy-fermi-dsdE4` (890bed0).
 - ⚠️ **1a artefakt IC pozostaje otwarte** — `walk_forward_ic` padł 2× na timeout przy pełnej historii (potwierdza ZASADĘ ANALIZY CZĄSTKOWEJ: trzeba cap barów + cząstkowanie). Fakt, że B>A OOS na 5/5, dowodzi że sygnał IC generalizuje (nie czysty artefakt), ale formalne sprawdzenie „top-IC = dużo głosów" jeszcze przede mną.
 
 Chcesz, żebym (a) domknął 1a artefakt cząstkowo, czy (b) przygotował szkic buildu ważenia głosów opt-in OFF do Twojej decyzji?
+
+## 🧑 Cezar
+chyba lokal to powinien to robić on ma Deepseek API wklejone co myślisz czy te wyniki będą orawdziwe
+
+## 🏛️ Claude
+Świetne pytanie, Cezarze — i dokładnie takie, jakie zadałby Imperator, który wierzy w Credo (filar III: fakty ponad mgłę). Uczciwa odpowiedź:
+
+## Krótko: NIE — wyniki DeepSeek NIE są automatycznie prawdziwe
+
+DeepSeek to **czytelnik i generator pomysłów**, nie źródło prawdy. Gdy przeanalizuje książkę i powie „ta technika wam pomoże" — to jest **hipoteza, nie fakt.** LLM-y (także DeepSeek) potrafią:
+- **halucynować techniki**, których w książce nie ma,
+- **wymyślać cytaty i linki** (dlatego mamy ZPO: „nigdy projektu bez pełnego linku, status ⚠️"),
+- **mylić się w syntezie** („to zadziała") — bo to opinia, nie pomiar.
+
+## Rozróżnienie, które trzyma nas przy prawdzie
+
+| Rodzaj wyniku | Prawdziwy? |
+|---|---|
+| **Kod liczy** (Brama, arena, IC 48.3%) | ✅ TAK — ground truth, deterministyczne |
+| **DeepSeek czyta książkę → „ta technika pomoże"** | ⚠️ KANDYDAT — hipoteza do zmierzenia |
+| **DeepSeek deep-research web → „badanie X mówi Y"** | ⚠️ do weryfikacji linku (ZPO) |
+
+## Jak zamienić to w prawdę (nasza maszyna)
+
+DeepSeek → **kandydat** → przez naszą maszynę pomiarową → **dopiero wtedy prawda:**
+1. **Grounding na RAG** (biblioteka MCP daje realne fragmenty książek, nie pamięć DeepSeek) — mniej halucynacji.
+2. **Oznaczenie ⚠️** w REJESTRZE (ZPO — niezweryfikowane).
+3. **Pomiar na danych** (arena/triada) albo **proroctwo Sybilli** (P + horyzont → rozliczenie).
+
+To jest dokładnie po to zbudowaliśmy Sybillę i arenę: **żeby żaden pomysł — czy od DeepSeek, czy od Claude, czy od Ciebie — nie stał się „prawdą" bez rozliczenia liczbami.**
+
+## Więc tak, lokal niech czyta — ale z regułą
+
+Lokal (DeepSeek + RAG + dane) to **idealny szybki zwiadowca wiedzy** do przeczesywania 57 książek. ALE jego wynik zapisujemy jako **„kandydat do zmierzenia", nigdy „prawda".** DeepSeek proponuje, Imperium sprawdza, arena rozstrzyga.
+
+Nasza pamięć zresztą już to trzyma: *„Dziennik pisze Claude SAM — bez DeepSeek"* (bo pamięć instytucji musi być prawdą, nie interpretacją). Ta sama zasada: **DeepSeek do generowania hipotez, kod/arena do rozstrzygania prawdy.**
+
+Chcesz, żebym utrwalił tę zasadę wprost — **„DeepSeek = kandydat, nie prawda; hipoteza → pomiar → dopiero fakt"** — jako regułę dla Zwiadowcy Wiedzy? Bo to chroni Credo przed mgłą, gdy wpuścimy AI do czytania biblioteki. 🦅🏛️
+
+## 🧑 Cezar
+Stop hook feedback:
+[~/.claude/stop-hook-git-check.sh]: There are uncommitted changes in the repository. Please commit and push these changes to the remote branch.
+
+## 🏛️ Claude
+You've hit your session limit · resets 8:30am (UTC)

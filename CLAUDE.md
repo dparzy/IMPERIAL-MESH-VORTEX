@@ -348,6 +348,30 @@ Przy pracach w tle: co jakiś czas raportuj stan („okno 12/76 zapisane"), nie 
 **Złamanie:** jeden wielogodzinny blokujący bieg bez checkpointów (który po awarii zaczyna od zera)
 LUB długa praca bez widocznego paska postępu (Cezar nie wie, czy trwa, czy zawisła).
 
+## 🔭 ZASADA ZWIADOWCY WIEDZY — DWA MODELE, KANDYDAT ≠ PRAWDA (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-07)
+
+**Zwiad wiedzy (książki, RAG, deep research) prowadzą DWA modele o różnych rolach — tani
+zwiadowca proponuje, drogi sędzia rozstrzyga. Nic z ust DeepSeeka nie jest prawdą, dopóki
+arena/Sybilla tego nie zmierzy.** (Lekcja: jeden model czytający hurtem gubi hipotezy;
+wynik LLM bez pomiaru to wiara, nie fakt — Prawo I.)
+
+- **DeepSeek = tani Zwiadowca (proponent):** czyta cząstkowo (jeden fragment RAG → zapis →
+  następny, z paskiem postępu — Prawo XXIV + ZASADA ANALIZY CZĄSTKOWEJ), wyciąga KANDYDATÓW
+  na hipotezy/neurony/strategie. Ma API (`DEEPSEEK_API_KEY`), jest tani — więc robi surową
+  robotę objętościową, której nie stać na Opusa.
+- **Opus/Claude = drogi Sędzia (recenzent kompletności):** drugie przejście adversarialne —
+  *„czego DeepSeek NIE wyłapał? który fragment pominął? która hipoteza zniknęła?"*. Krytyk
+  kompletności to obowiązkowy DRUGI etap, nie opcja (wzorzec Completeness-Critic).
+- **Kandydat ≠ prawda (Prawo I + ZPO):** każdy wynik DeepSeeka to ⚠️ HIPOTEZA/KANDYDAT, nigdy
+  fakt. Rozstrzyga wyłącznie POMIAR — arena (IC/WFO/DSR), Sybilla (Brier), triada. DeepSeek
+  proponuje „co sprawdzić", arena mówi „co jest prawdą". Wpięcie w ścieżkę decyzyjną dopiero
+  po zielonej walidacji A/B (ZASADA WPIĘCIA, opt-in OFF).
+- **Dwa modele, bo jeden gubi perły:** różnica ról (proponent vs recenzent) jest źródłem siły —
+  redundancja mierzona, nie zgadywana (Prawo XVI): DeepSeek szeroko i tanio, Opus wąsko i głęboko.
+
+**Złamanie:** traktowanie wyniku DeepSeeka jako prawdy bez pomiaru areny; hurtowe czytanie bez
+cząstkowania i krytyka kompletności; pominięcie drugiego modela (zwiad jednym okiem = gubione hipotezy).
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`

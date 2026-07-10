@@ -101,6 +101,27 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Golden Cross: wariant EMA, nie oryginalny SMA
+Strategia ZŁOTY ORZEŁ używa EMA50/EMA200, a nie kanonicznego SMA50/SMA200. Odnotowano w katalogu.
+
+### 2026-06-30 — Diagnostyka korelacji: 1 próbka fałszywie uznawana za martwą
+len(set)==1 dla 1 próbki dawało false positive. Wymagane ≥2 próbki do detekcji stałej serii.
+
+### 2026-06-30 — Pre-commit: testy na working tree zamiast staged
+Pre-commit testował working tree, nie staged. Dodano git stash push --keep-index i trap przywracający working tree.
+
+### 2026-06-30 — Błąd warmup Accelerator: slow+sma_ac+1
+Funkcja _py_accelerator miała zbędne +1 w warmup, co powodowało off-by-one. Usunięto.
+
+### 2026-06-30 — Błąd warmup Ulcer Index: period+1
+Funkcja _py_ulcer używała c[-period:] więc potrzebuje tylko period, a nie period+1. Poprawiono.
+
+### 2026-06-30 — pewnosc_agregatu ≈ 1.0 to root cause strat
+KalkulatorLewara używa pewnosc_agregatu do wyznaczania dźwigni, ale zawsze ≈1.0 → max leverage → ciasne stop lossy → wiele małych strat. To jest pierwotna przyczyna wszystkich strat systemu.
+
+### 2026-07-10 — Recenzent łapie granice brudnych danych i ścieżek awaryjnych
+Cubic na PR #118 znalazł kilkanaście realnych bugów w kodzie, który przeszedł mój adversarial przegląd. Wzorzec: łapie to, czego NIE testuję z góry — dane wejściowe nie-string/None/liczba (np. _skroc na co0=int), ścieżki AWARYJNE (fallback hooka gubi wydruk), martwe wzorce po round-tripie przez JSONL, daty/liczby zanieczyszczające miary podobieństwa. Lekcja: przed pushem testować BRUDNE WEJŚCIE i ŚCIEŻKĘ BŁĘDU, nie tylko happy path.
+
 ### 2026-06-30 — Prawo I: Neurony nie liczą, Brama liczy
 MikroNeurony tylko interpretują gotowe wskaźniki (metoda interpretuj()), nigdy nie obliczają. Obliczenia wykonuje Brama Kalkulatora (TA-Lib). To fundamentalna zasada architektury IMPERIUM.
 

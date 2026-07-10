@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-07-10 | 🪶 | ODCHUDZENIE STARTU SESJI — 28,5 KB → ~15 KB (bez utraty łuku)
+
+**Powód (decyzja Cezara):** hook startowy wypluwał ~28 KB przy każdym starcie — nie mieściło
+się w wyniku narzędzia. POMIAR rozkładu (nie zgadywanie): Dziennik Nieśmiertelny 81%,
+audyt 11% (z czego alarm XV 2,5 KB), kronika drukowana 3× (bug).
+
+**Trzy cięcia:**
+1. **Kronika drukowana 3×** — `centrum_pamieci start` już drukuje „X sesji, Y MB", a hook
+   wołał osobno `kronika_czatu statystyki` (ten sam wydruk, inne zaokrąglenie: 6.8 vs 6.79).
+   Usunięto zdublowane wywołanie z `session-start.sh`.
+2. **Alarm Prawa XV** — jedna linia 2 551 zn. wyliczała 22 moduły z pełnym uzasadnieniem
+   każdego. Na starcie: liczba + KLUCZE (288 zn., alarm nadal głośny i pełny co do liczby).
+   Pełne powody na żądanie: `python narzedzia/audyt_spojnosci.py --luki`.
+3. **Dziennik Nieśmiertelny** — warstwowość już istniała (`ostatnie=N`), ale (a) jednolinijkowce
+   starszych sesji brały CAŁY pierwszy punkt „co" (do 721 zn.), (b) pełnych było 12.
+   `_skroc()` tnie jednolinijkowce do 110 zn., `DOMYSLNE_PELNE=8`. 27,9 KB → 14 KB.
+   **Wszystkie 69 sesji nadal widoczne** — Prawo XV nienaruszone, znikają tylko rozwinięcia
+   (detale zostają w kronice, przeszukiwalnej po słowach).
+
+**Testy:** `tests/test_dziennik_niesmiertelny.py` (12 testów, Reguła Test-Granic: _skroc na
+granicy/o jeden dłuższy/pusty, os_czasu ostatnie=0 vs [:-0], ostatnie>liczba wpisów).
+
+**Pliki:** `.claude/hooks/session-start.sh`, `narzedzia/audyt_spojnosci.py`,
+`imperium/biblioteki/dziennik_niesmiertelny.py`, `imperium/biblioteki/centrum_pamieci.py`,
+`tests/test_dziennik_niesmiertelny.py`
+
+---
+
 ## 2026-07-10 | 🔎 | NAPRAWA 5 UWAG cubica (PR #118, drugi przebieg recenzji)
 
 Recenzent przeczytał commity dedupu i pushu-na-komendę. **Wszystkie 5 uwag potwierdzone

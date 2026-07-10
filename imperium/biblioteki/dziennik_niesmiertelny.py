@@ -46,9 +46,24 @@ PLIK_DOMYSLNY = ROOT / "bibliotheca_ulpia" / "dane" / "dziennik_niesmiertelny.js
 # Próg konsolidacji: powyżej tylu wpisów najstarsze zwijamy w epoki (na razie tylko alarm).
 PROG_KONSOLIDACJI = 400
 
+# Ile najnowszych sesji pokazać PEŁNYCH na starcie (starsze jako jednolinijkowce).
+DOMYSLNE_PELNE = 8
+# Maks. szerokość jednolinijkowca starszej sesji. POMIAR (69 wpisów): pierwsze punkty „co"
+# miały medianę 121 zn., ale ogon do 721 zn. — 57 jednolinijkowców ważyło 14 KB. Przycięcie
+# do 110 zn. tnie to do ~5 KB bez utraty rozpoznawalności wpisu (Prawo XV: oś ma być
+# ZWIĘZŁA; detale są w kronice, przeszukiwalne po słowach).
+SZER_JEDNOLINIJKI = 110
+
 
 def _dzis() -> str:
     return date.today().isoformat()
+
+
+def _skroc(tekst: str, maks: int) -> str:
+    """Przytnij do `maks` znaków z wielokropkiem. Krótkie zwraca bez zmian."""
+    maks = max(maks, 2)                       # strażnica: maks<2 dałby [:maks-1] == [:-1] (bug)
+    tekst = " ".join(tekst.split())           # zwiń białe znaki (nowe linie → spacja)
+    return tekst if len(tekst) <= maks else tekst[:maks - 1].rstrip() + "…"
 
 
 def _wczytaj(plik: Optional[Path] = None) -> List[Dict[str, Any]]:
@@ -150,18 +165,21 @@ def os_czasu(plik: Optional[Path] = None, ostatnie: Optional[int] = None) -> str
     if not wpisy:
         return "♾️ DZIENNIK NIEŚMIERTELNY — pusty (pierwsza sesja zostawi ślad)."
     linie = [f"♾️ DZIENNIK NIEŚMIERTELNY — {len(wpisy)} sesji, pełna oś projektu:"]
+
+    def jednolinijka(w: Dict[str, Any]) -> str:
+        co0 = (w.get("co") or ["—"])[0]
+        return f"   · {w.get('data','?')}: {_skroc(co0, SZER_JEDNOLINIJKI)}"
+
     if ostatnie is not None and ostatnie <= 0:
         # ostatnie=0 (lub ujemne) → wszystkie jednolinijkowe (slice [:-0] dałby PEŁNE — bug)
         for w in wpisy:
-            co0 = (w.get("co") or ["—"])[0]
-            linie.append(f"   · {w.get('data','?')}: {co0}")
+            linie.append(jednolinijka(w))
         return "\n".join(linie)
     if ostatnie is not None and len(wpisy) > ostatnie:
         # starsze: jednolinijkowe; najnowsze `ostatnie`: pełne
         starsze, nowsze = wpisy[:-ostatnie], wpisy[-ostatnie:]
         for w in starsze:
-            co0 = (w.get("co") or ["—"])[0]
-            linie.append(f"   · {w.get('data','?')}: {co0}")
+            linie.append(jednolinijka(w))
         for w in nowsze:
             linie.append(_formatuj_wpis(w, pelny=True))
     else:

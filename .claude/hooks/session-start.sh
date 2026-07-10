@@ -69,8 +69,10 @@ fi
 #    czat przetrwał kompakcję i wygaśnięcie kontenera chmury (commit niesie historię).
 if [ -f imperium/biblioteki/kronika_czatu.py ]; then
   echo "[hook] KRONIKA CZATU (W-360):"
+  # Tylko eksport tej sesji (raportuje, co dopisał). Statystyki „X sesji, Y MB" drukuje już
+  # `centrum_pamieci start` — osobne `kronika_czatu statystyki` dawało trzeci, zdublowany
+  # wydruk kroniki na starcie (z lekko innymi liczbami: 6.8 vs 6.79 MB). Usunięte.
   python -m imperium.biblioteki.kronika_czatu eksportuj || true
-  python -m imperium.biblioteki.kronika_czatu statystyki || true
 fi
 
 # 5) AUTO-LEKCJA (W-360 v5 — Opcja C) — DeepSeek ekstrahuje lekcje/wizje/decyzje

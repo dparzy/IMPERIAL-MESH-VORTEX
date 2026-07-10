@@ -519,11 +519,12 @@ def podsumowanie_startowe(k: int = 3, zapytanie: str = "") -> str:
         pass
 
     # W6 — Dziennik Nieśmiertelny: PEŁNA oś czasu projektu (każdy krok, dożywotnio).
-    # Wstrzykiwana w CAŁOŚCI (ostatnie 12 pełnych, starsze jednolinijkowe) — gwarancja,
-    # że widzę cały łuk projektu, nie tylko top-3 lekcje (ROZKAZ Cezara 2026-06-28).
+    # Wstrzykiwana w CAŁOŚCI (ostatnie N pełnych, starsze jednolinijkowe przycięte) —
+    # gwarancja, że widzę cały łuk projektu, nie tylko top-3 lekcje (ROZKAZ Cezara 2026-06-28).
+    # N i szerokość jednolinijki dobrane pomiarem — patrz dziennik_niesmiertelny.DOMYSLNE_PELNE.
     try:
         from imperium.biblioteki import dziennik_niesmiertelny as _dn
-        os_t = _dn.os_czasu(ostatnie=12)
+        os_t = _dn.os_czasu(ostatnie=_dn.DOMYSLNE_PELNE)
         if not os_t.startswith("♾️ DZIENNIK NIEŚMIERTELNY — pusty"):
             linie.append("")
             linie.append(os_t)

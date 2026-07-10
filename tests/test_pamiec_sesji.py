@@ -280,3 +280,161 @@ def test_profil_skrot_zwraca_punkty():
 
 def test_profil_brak_pliku():
     assert ps.profil_cezara(Path("/nieistnieje/p.md")) == ""
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DEDUP SEMANTYCZNY (naprawa duplikatów, recenzja cubic PR #118)
+# Reguła Test-Granic (Prawo XXI): każdy próg ma test wartości granicznej.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_sygnatura_wyciaga_identyfikatory():
+    s = ps.sygnatura_lekcji("Martwy głos ATR_MULT w EXP-07",
+                            "EXP-07 miał ATR_MULT=1.5 zamiast 0.15.")
+    assert "ATR_MULT" in s and "EXP-07" in s
+
+
+def test_sygnatura_pomija_tokeny_puste():
+    assert "NEUTRAL" not in ps.sygnatura_lekcji("Neuron zwraca NEUTRAL", "")
+
+
+def test_dedup_lapie_parafraze_dwujezyczna():
+    """Rdzeń buga: 'Martwy głos' vs 'Dead voice bug' — żaden nie jest podciągiem drugiego.
+    Treści dosłownie z docs/PAMIEC_SESJI.md sprzed scalenia (przypadek regresyjny)."""
+    assert ps.czy_duplikaty(
+        "Martwy głos ATR_MULT w EXP-07",
+        "EXP-07 miał ATR_MULT=1.5 ale ATR nie był używany w logice. "
+        "Poprawiono na ATR_MULT=0.15 i faktyczne użycie ATR.",
+        "Dead voice bug: ATR_MULT w EXP-07",
+        "EXP-07 (TLP) miał ATR_MULT=1.5 w kodzie zamiast 0.15 z dokumentacji "
+        "— martwy głos naprawiony.")
+
+
+def test_dedup_nie_scala_roznych_modulow():
+    """ATR w EXP-07 (TLP) i ATR w EXP-08 (Night Turbo) to RÓŻNE lekcje — fałszywe
+    scalenie kasuje wiedzę bezpowrotnie, więc to najważniejszy test negatywny."""
+    assert not ps.czy_duplikaty(
+        "Martwy głos ATR_MULT w EXP-07", "EXP-07 miał ATR_MULT=1.5 zamiast 0.15.",
+        "Martwy głos ATR w Night Turbo", "EXP-08 miał PROG_ATR_MULT nieużywany.")
+
+
+def test_dedup_sito_rdzeni_dla_prozy():
+    """Lekcje bez identyfikatorów (sygnatura pusta) — łapie je worek rdzeni tytułu."""
+    assert ps.czy_duplikaty("True Range - poprawna definicja", "max(H-L, |H-prevC|).",
+                            "Poprawiona definicja True Range", "max(H-L, |H-prevC|).")
+
+
+def test_dedup_rdzenie_nie_myla_roznych_tytulow():
+    assert not ps.czy_duplikaty("RSI Div threshold 2.0 zbyt wysoki", "opis",
+                                "BB Squeeze threshold 4% zbyt restrykcyjny", "opis")
+
+
+def test_granica_progu_podobienstwa_dokladnie_na_progu():
+    """Jaccard == PROG_PODOBIENSTWA musi być DUPLIKATEM (>=, nie >)."""
+    a, b = frozenset("ABC"), frozenset("ABD")   # |∩|=2, |∪|=4 → 0.5
+    assert ps._jaccard(a, b) == 0.5
+    trzy_z_piatki = ps._jaccard(frozenset("ABC"), frozenset("ABCDE"))  # 3/5 = 0.60
+    assert trzy_z_piatki == ps.PROG_PODOBIENSTWA
+    assert trzy_z_piatki >= ps.PROG_PODOBIENSTWA   # granica: włącznie
+
+
+def test_granica_min_tokenow_sygnatury():
+    """Sygnatura 1-tokenowa NIE deduplikuje (za uboga), 2-tokenowa już tak."""
+    assert not ps.czy_duplikaty("Problem z ATR", "opis", "Inny problem z ATR", "opis")
+    assert ps.czy_duplikaty("ATR_MULT w EXP-07", "x", "Bug ATR_MULT dotyczy EXP-07", "x")
+
+
+def test_jaccard_dwa_puste_zbiory():
+    assert ps._jaccard(frozenset(), frozenset()) == 0.0
+
+
+def test_duplikat_lekcji_zwraca_istniejaca_lub_none():
+    p = _plik()
+    ps.dopisz_lekcje("Martwy głos ATR_MULT w EXP-07",
+                     "EXP-07 miał ATR_MULT=1.5 ale ATR nie był używany w logice. "
+                     "Poprawiono na ATR_MULT=0.15 i faktyczne użycie ATR.", plik=p)
+    trafiona = ps.duplikat_lekcji(
+        "Dead voice bug: ATR_MULT w EXP-07",
+        "EXP-07 (TLP) miał ATR_MULT=1.5 w kodzie zamiast 0.15 z dokumentacji "
+        "— martwy głos naprawiony.", plik=p)
+    assert trafiona is not None and trafiona["tytul"] == "Martwy głos ATR_MULT w EXP-07"
+    assert ps.duplikat_lekcji("Zupełnie inna rzecz o VPIN_50", "Toxic flow rośnie.", plik=p) is None
+
+
+def test_duplikat_lekcji_pusty_plik_zwraca_none():
+    p = _plik("# Pusto\n")
+    assert ps.duplikat_lekcji("Cokolwiek ATR_MULT EXP-07", "treść", plik=p) is None
+
+
+def test_duplikat_identyczny_tytul_rozna_wielkosc_liter():
+    p = _plik()
+    assert ps.duplikat_lekcji("PIERWSZA LEKCJA", "", plik=p) is not None
+
+
+def test_sygnatura_czysto_liczbowa_nie_scala():
+    """Bug złapany w samo-recenzji przed pushem: `\d{2,}` łapie daty i progi, więc
+    sygnatura {14, 30} zlewałaby dwie zupełnie różne lekcje (Jaccard 1.0).
+    Wymagamy co najmniej jednego tokenu z literą."""
+    assert not ps.czy_duplikaty(
+        "Stop-loss 14 pipsow przy 30 barach", "Zupełnie inny temat: stop 14, okno 30.",
+        "Cooldown 14 barow po 30 stratach", "Inna rzecz: cooldown 14, limit 30.")
+    assert not ps._sygnatura_rozstrzygajaca(frozenset({"14", "30"}))
+    assert ps._sygnatura_rozstrzygajaca(frozenset({"RSI", "14"}))
+
+
+def test_sygnatura_rozstrzygajaca_granica_jednego_tokenu():
+    """Granica MIN_TOKENOW_SYGNATURY: 1 token nie wystarcza, 2 (z literą) już tak."""
+    assert not ps._sygnatura_rozstrzygajaca(frozenset({"ATR_MULT"}))
+    assert ps._sygnatura_rozstrzygajaca(frozenset({"ATR_MULT", "EXP"}))
+
+
+# ── Regresja: bugi złapane w adversarial samo-recenzji przed pushem ───────────
+
+def test_klucz_numer_jest_jednym_tokenem():
+    """Kolejność alternatyw w _WZOR_TOKENU: 'EXP-07' to JEDEN token, nie 'EXP' + '07'.
+    Inaczej osierocona liczba zawyża Jaccarda i scala różne lekcje na progu."""
+    assert "EXP-07" in ps.sygnatura_lekcji("EXP-07 ATR 14", "")
+    assert "07" not in ps.sygnatura_lekcji("EXP-07", "")
+
+
+def test_ten_sam_modul_rozne_wskazniki_nie_scala():
+    """'EXP-07 ATR 14' vs 'EXP-07 RSI 14' — ten sam moduł i okno, RÓŻNE bugi.
+    Przed naprawą regexu dawało Jaccard dokładnie 0.60 → fałszywe scalenie."""
+    assert not ps.czy_duplikaty("EXP-07 ATR 14 za niski", "opis",
+                                "EXP-07 RSI 14 dywergencja", "opis")
+
+
+def test_negacja_w_tytule_nie_jest_duplikatem():
+    """Sito 3 patrzy tylko na tytuł — 'nie' NIE może być stopwordem, bo lekcja
+    obalająca poprzednią zostałaby odrzucona jako duplikat (utrata wiedzy)."""
+    assert not ps.czy_duplikaty("Numba przyspiesza wskazniki", "ok, szybciej",
+                                "Numba NIE przyspiesza wskaznikow", "wolniej niestety")
+
+
+def test_dwa_puste_tytuly_nie_sa_duplikatem():
+    """Granica: '' == '' nie może orzekać o tożsamości lekcji."""
+    assert not ps.czy_duplikaty("", "treść a", "", "treść b")
+
+
+# ── Regresja: recenzja cubic na PR #118 (drugi przebieg) ─────────────────────
+
+def test_daty_nie_wchodza_do_sygnatury():
+    """Data mówi KIEDY, nie O CZYM. Dwie różne lekcje z tego samego dnia miały
+    wspólne tokeny {2026, 06, 30} → Jaccard 0.60 → fałszywe scalenie."""
+    s = ps.sygnatura_lekcji("X-01", "sesja 2026-06-30, 30.06.2026, rok 2026")
+    assert s == frozenset({"X-01"})
+    assert not ps.czy_duplikaty(
+        "Neuron X-01 zwraca NEUTRAL", "Wykryto 2026-06-30, naprawiono.",
+        "Zwiadowca EXP-13 milczy", "Wykryto 2026-06-30, inna sprawa.")
+
+
+def test_proza_nie_nadpisuje_rozlacznych_sygnatur():
+    """Sito 3 (worek rdzeni tytułu) nie może scalać lekcji o RÓŻNYCH modułach,
+    nawet gdy tytuły mają identyczny worek rdzeni."""
+    assert not ps.czy_duplikaty("Bug w EXP-07", "ATR_MULT zly",
+                                "Bug w EXP-13", "GARCH zly")
+
+
+def test_proza_nadal_dziala_gdy_sygnatury_slabe():
+    """Kontrola: ograniczenie sita 3 nie może zabić jego pierwotnego celu."""
+    assert ps.czy_duplikaty("True Range - poprawna definicja", "max(H-L).",
+                            "Poprawiona definicja True Range", "max(H-L).")

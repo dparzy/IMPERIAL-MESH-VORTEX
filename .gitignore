@@ -28,7 +28,15 @@ ab_mtf_metryki.json
 ab_mtf_wynik.txt
 ab_mtf_rezimy_metryki.json
 ab_mtf_rezimy_wynik.txt
-# Marker przetworzonych sesji auto-lekcji (stan runtime, per-maszyna)
+# Stary marker auto-lekcji (per-maszyna, ID sesji) — zastąpiony przez WERSJONOWANY
+# bibliotheca_ulpia/dane/auto_lekcja_przetworzone.txt (klucz = hasz treści kroniki).
+# Trzymanie go poza repo powodowało powtórną ekstrakcję tej samej kroniki na każdej
+# maszynie → parafrazy tych samych lekcji (duplikaty, recenzja cubic PR #118).
 bibliotheca_ulpia/dane/.auto_lekcja_przetworzone.txt
 # Baza wyników areny (Arena MCP — pomiary IC/scoreboard, runtime per-maszyna)
 bibliotheca_ulpia/dane/arena_wyniki.db
+
+# Config startowy MCP — per-maszyna, NIE wersjonowany (Zasada MCP: wpięcie serwerów
+# w start sesji to zawsze decyzja Cezara, nie automat). Serwery żyją w kodzie:
+# narzedzia/rag/mcp_server.py (biblioteka RAG) + narzedzia/arena_mcp.py (arena).
+.mcp.json

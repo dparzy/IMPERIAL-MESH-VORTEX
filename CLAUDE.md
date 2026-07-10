@@ -206,8 +206,14 @@ Cezar nie chce klikać przy każdej zmianie. Działasz autonomicznie wg zasad:
    (to błahostka wg Prawa XVIII, nie decyzja kierunkowa).
 3. **Auto-commit:** Po skończonym zadaniu z zielonymi testami i czystym audytem —
    **commitujesz SAM** z opisowym komunikatem. Nie pytasz o zgodę na commit.
-4. **Auto-push:** Po commicie **pushujesz SAM** na `claude/sleepy-fermi-dsdE4`.
-   Nie pytasz o zgodę na push.
+4. **PUSH NA KOMENDĘ (zmiana: Cezar zatwierdził 2026-07-10):** Po commicie **NIE pushujesz
+   sam**. Push jest świadomą decyzją Cezara — pushujesz gdy powie („wypchnij", „push")
+   albo gdy prosi o PR. Hook końca sesji też już nie pushuje (commituje pamięć lokalnie).
+   Narzędzie: `bash narzedzia/synchronizuj.sh` (podgląd) / `--push` (skleja commity pamięci
+   w jeden przed wypchnięciem; commitów merytorycznych NIGDY nie przepisuje).
+   **Powód:** push po każdej sesji zaśmiecał historię chmury dziesiątkami commitów
+   „auto: sync pamięci sesji" i wymuszał rebase przy starcie na drugiej maszynie.
+   Lokalny git JEST repozytorium — commit kosztuje zero, push to osobna decyzja.
 5. **NIE auto-PR:** Pull Request tworzysz TYLKO na wyraźną prośbę Cezara (to się nie zmienia).
 
 **Granica autonomii (kiedy MIMO TO pytasz Cezara — Prawo XVIII):**

@@ -4,10 +4,18 @@ Wrzuć tu pliki epub/pdf/azw3 — Claude Code je przeczyta i wyciągnie esencję
 (neurony, strategie, W-xxx) zgodnie z Zasadą Pełnego Opisu (ZPO).
 
 ## 🗂️ Struktura biblioteki
-- **`BIB-001..042`** — kanon źródłowy (42 książki, pliki epub/pdf/azw3/mobi/djvu)
+- **`BIB-001..069`** — kanon źródłowy (69 książek, pliki epub/pdf/azw3/mobi/djvu)
 - **`encyklopedia/`** — tematyczna biblia wiedzy operacyjnej (działy LEW/TRD/IMP/...),
   z oceną ważności i wprost wskazanym wpływem na kod. Start: [`encyklopedia/INDEX_MAIOR.md`](encyklopedia/INDEX_MAIOR.md)
 - **`vademecum/`** — szybkie ściągi (checklisty, wzory) — 1 strona na temat
+- **`dane/katalog_ksiag.json`** — strukturalny katalog książek (autor, tytuł, format;
+  z calibre także tagi/język/rok/ISBN). Buduje: `python -m narzedzia.rag.metadane_ksiag`
+
+## 📖 Katalog metadanych (calibre jako backend, nie MCP)
+`narzedzia/rag/metadane_ksiag.py` buduje `dane/katalog_ksiag.json`. Bez calibre parsuje
+nazwy plików (autor/tytuł/format). Z zainstalowanym **calibre** (`ebook-meta`) dokłada
+tagi, język, rok wydania, wydawcę, ISBN — karmiąc RAG i katalog bez redundantnego MCP
+(ZASADA MCP: własny RAG już szuka w treści; calibre dokłada tylko metadane).
 
 > Encyklopedia jest **żywa**: aktualizowana po każdej nowej książce/lekcji (Prawo XVII),
 > pamiętana przez Claude (chmura) i lokalnego Claude. Następny krok: warstwa

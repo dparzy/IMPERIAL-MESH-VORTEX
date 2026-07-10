@@ -48,9 +48,162 @@ _WZOR_LEKCJI = re.compile(
 LIMIT_ZNAKOW_LEKCJA = 1200
 LIMIT_ZNAKOW_SEKCJA = 24000
 
+# ── Dedup semantyczny (naprawa: 4 kopie tej samej lekcji, recenzja cubic PR #118) ──
+# Stary dedup porównywał DOKŁADNY PODCIĄG tytułu (`szukaj(tytul)`). DeepSeek ekstrahuje
+# lekcje z temperatura=0.3, więc za każdym przebiegiem formułuje tytuł inaczej —
+# „Martwy głos ATR_MULT w EXP-07" vs „Dead voice bug: ATR_MULT w EXP-07". Żaden nie jest
+# podciągiem drugiego → duplikat przechodził.
+#
+# POMIAR (Prawo XVI — redundancja mierzona, nie zgadywana), 71 realnych lekcji:
+#   • podobieństwo NAPISÓW nie rozdziela: prawdziwy duplikat 0.642 < różne lekcje 0.667
+#     („ATR_MULT w TLP" vs „ATR w Night Turbo" to RÓŻNE moduły: EXP-07 i EXP-08).
+#   • podobieństwo SYGNATUR TECHNICZNYCH rozdziela czysto: wszystkie pary ≥ 0.60 są
+#     duplikatami, żadna para różnych lekcji nie przekracza 0.571.
+# Stąd: dedup po zbiorze identyfikatorów (ATR_MULT, EXP-07, HA_Open, 299), miara Jaccarda.
+# Próg dobrany z marginesem 0.60 (najbliższy fałszywy kandydat: 0.571).
+PROG_PODOBIENSTWA = 0.60
+# Sygnatura z 1 tokenu jest zbyt uboga, by orzekać o tożsamości lekcji (np. samo „ATR”
+# łączyłoby lekcje o różnych modułach) → poniżej tego progu NIE deduplikujemy.
+MIN_TOKENOW_SYGNATURY = 2
+
+# Identyfikator techniczny: KLUCZ-NUMER (EXP-07, X-28), nazwa_z_podkreśleniem
+# (ATR_MULT, HA_Open), AKRONIM (ATR, RSI) albo liczba ≥ 2 cyfr (299, 14).
+#
+# KOLEJNOŚĆ ALTERNATYW JEST ISTOTNA (bug z samo-recenzji): gdyby `[A-Z]{2,}` szło pierwsze,
+# na „EXP-07" dopasowałoby samo „EXP", a „-07" zostałoby gołą liczbą. Sygnatura gubiłaby
+# tożsamość modułu, a osierocone liczby zawyżały Jaccarda: „EXP-07 ATR 14" i „EXP-07 RSI 14"
+# dawały {07,14,ATR,EXP} vs {07,14,EXP,RSI} = 0.60 → scalenie dwóch RÓŻNYCH lekcji dokładnie
+# na progu. Klucz-numer musi być łapany jako JEDEN token.
+_WZOR_TOKENU = re.compile(
+    r"\b(?:[A-Z]+-\d+|[A-Za-z]+_[A-Za-z0-9_]+|[A-Z]{2,}[A-Z0-9_]*|\d{2,})\b"
+)
+# Tokeny bez mocy rozróżniającej — występują w połowie lekcji, nic nie identyfikują.
+_TOKENY_PUSTE = frozenset({"NEUTRAL", "LONG", "SHORT", "TODO", "OHLCV"})
+
+# Daty (ISO `2026-06-30`, `30.06.2026`, samotny rok) — wycinane PRZED tokenizacją.
+# Data mówi KIEDY lekcja powstała, nigdy O CZYM jest. Zob. sygnatura_lekcji().
+_WZOR_DATY = re.compile(
+    r"\b\d{4}-\d{2}-\d{2}\b|\b\d{2}[./]\d{2}[./]\d{4}\b|\b(?:19|20)\d{2}\b"
+)
+
+# Sito 3: lekcje CZYSTO PROZATORSKIE (bez identyfikatorów) — np. „True Range - poprawna
+# definicja" vs „Poprawiona definicja True Range". Sygnatura techniczna jest tam pusta,
+# więc porównujemy worek RDZENI tytułu: prefiks 5 znaków zrównuje polską fleksję
+# („poprawna"/„poprawiona" → „popra"), a kolejność słów przestaje mieć znaczenie.
+# POMIAR na 71 lekcjach: łapie 3 kopie True Range, zero fałszywych trafień.
+_DL_RDZENIA = 5
+# UWAGA: „nie" NIE MOŻE tu być (bug z samo-recenzji). Sito 3 patrzy wyłącznie na tytuł,
+# więc pominięcie negacji zrównywałoby zdanie z jego zaprzeczeniem: „Numba przyspiesza
+# wskaźniki" i „Numba NIE przyspiesza wskaźników" miałyby ten sam worek rdzeni → lekcja
+# obalająca poprzednią byłaby odrzucona jako duplikat. Negacja jest treścią, nie szumem.
+_SLOWA_PUSTE = frozenset({"jest", "bug", "przy", "to", "sie", "gdy", "oraz"})
+
 
 def _dzis() -> str:
     return _dt.date.today().isoformat()
+
+
+def sygnatura_lekcji(tytul: str, tresc: str = "") -> frozenset:
+    """
+    Zbiór identyfikatorów technicznych z lekcji — „o czym ona właściwie jest".
+    Odporna na przeformułowanie prozy (i na zmianę języka: „martwy głos" ↔ „dead voice"),
+    bo patrzy wyłącznie na nazwy modułów, kluczy i stałych.
+
+    DATY SĄ WYCINANE PRZED tokenizacją (recenzja cubic PR #118). Każda lekcja niesie datę
+    sesji, więc „2026", „06", „30" trafiały do sygnatur wszystkich lekcji z tego samego dnia:
+    „Neuron X-01 zwraca NEUTRAL (2026-06-30)" i „Zwiadowca EXP-13 milczy (2026-06-30)"
+    dawały Jaccard 3/5 = 0.60 → scalenie dwóch NIEZWIĄZANYCH lekcji. Data mówi KIEDY,
+    nigdy O CZYM.
+    """
+    tekst = _WZOR_DATY.sub(" ", f"{tytul} {tresc}")
+    tokeny = {t.upper() for t in _WZOR_TOKENU.findall(tekst)}
+    return frozenset(tokeny - _TOKENY_PUSTE)
+
+
+def _jaccard(a: frozenset, b: frozenset) -> float:
+    """Podobieństwo zbiorów |A∩B| / |A∪B|. Zwraca 0.0 dla dwóch zbiorów pustych."""
+    suma = a | b
+    return len(a & b) / len(suma) if suma else 0.0
+
+
+def _sygnatura_rozstrzygajaca(sygn: frozenset) -> bool:
+    """
+    Czy sygnatura wystarcza, by orzec o tożsamości lekcji?
+
+    Wymaga dwóch rzeczy: dość tokenów (MIN_TOKENOW_SYGNATURY) i **co najmniej jednego
+    tokenu z literą**. Same liczby nie identyfikują lekcji — `\\d{2,}` łapie też daty
+    i wartości progów, więc „RSI 14, próg 30" i „stop 14 przy 30 barach" miałyby
+    sygnaturę {14, 30} i Jaccard 1.0. Trzy lekcje w docs/PAMIEC_SESJI.md mają dziś
+    sygnaturę czysto liczbową (np. {06, 2026} — to data z treści). Bez tego warunku
+    dedup scaliłby je z dowolną inną lekcją o tych samych liczbach.
+    """
+    if len(sygn) < MIN_TOKENOW_SYGNATURY:
+        return False
+    return any(not token.isdigit() for token in sygn)
+
+
+def _rdzenie_tytulu(tytul: str) -> frozenset:
+    """Worek rdzeni słów tytułu — odporny na fleksję i szyk (sito 3, patrz _DL_RDZENIA)."""
+    tekst = re.sub(r"[^0-9a-ząćęłńóśźż_-]+", " ", tytul.lower().replace("ł", "l"))
+    return frozenset(
+        slowo[:_DL_RDZENIA] for slowo in tekst.split()
+        if len(slowo) > 2 and slowo not in _SLOWA_PUSTE
+    )
+
+
+def duplikat_lekcji(tytul: str, tresc: str = "",
+                    plik: Path = DOMYSLNY_PLIK) -> Optional[Dict[str, str]]:
+    """
+    Zwraca ISTNIEJĄCĄ lekcję mówiącą to samo (lub None). Podstawa dedupu auto-lekcji.
+
+    Trzy sita, w kolejności:
+      1. identyczny tytuł po normalizacji (tani, pewny),
+      2. sygnatura techniczna o podobieństwie ≥ PROG_PODOBIENSTWA (odporny na parafrazę),
+      3. identyczny worek rdzeni tytułu — dla lekcji bez identyfikatorów (proza).
+
+    Świadomie ZACHOWAWCZY: przy ubogiej sygnaturze (< MIN_TOKENOW_SYGNATURY) sito 2 milczy.
+    Wolimy przepuścić duplikat niż scalić dwie różne lekcje — fałszywe scalenie kasuje
+    wiedzę bezpowrotnie, fałszywy duplikat kosztuje kilka linii pliku.
+    """
+    for lek in lekcje(plik):
+        if czy_duplikaty(tytul, tresc, lek["tytul"], lek["tresc"]):
+            return lek
+    return None
+
+
+def czy_duplikaty(tytul_a: str, tresc_a: str, tytul_b: str, tresc_b: str) -> bool:
+    """
+    Czy dwie lekcje mówią to samo? Wspólny predykat dedupu i scalania — jedno źródło
+    prawdy, żeby próg nie rozjechał się między zapisem a konsolidacją (Prawo I).
+
+    ZNANE OGRANICZENIE (świadome, udokumentowane — Prawo I: nie udajemy, że go nie ma):
+    sygnatura widzi IDENTYFIKATORY, nie kierunek wniosku. „ATR_MULT w EXP-07 za niski"
+    i „ATR_MULT w EXP-07 za wysoki" mają tę samą sygnaturę → zostaną uznane za duplikat.
+    Dlatego `auto_lekcja` LOGUJE każdy pominięty tytuł — pominięcie jest widoczne, nie ciche.
+    Lekcja obalająca poprzednią wymaga ręcznego `aktualizuj_lekcje()`, nie dopisania obok.
+    """
+    a, b = tytul_a.strip().lower(), tytul_b.strip().lower()
+    if a and a == b:
+        return True
+
+    sygn_a = sygnatura_lekcji(tytul_a, tresc_a)
+    sygn_b = sygnatura_lekcji(tytul_b, tresc_b)
+    mocna_a, mocna_b = _sygnatura_rozstrzygajaca(sygn_a), _sygnatura_rozstrzygajaca(sygn_b)
+    if mocna_a and mocna_b and _jaccard(sygn_a, sygn_b) >= PROG_PODOBIENSTWA:
+        return True
+
+    # Sito 3 (proza) NIE MOŻE nadpisywać werdyktu sygnatur (recenzja cubic PR #118).
+    # Gdy OBIE lekcje wymieniają jakiekolwiek identyfikatory i nie mają ANI JEDNEGO
+    # wspólnego — mówią o różnych rzeczach, choćby tytuły miały ten sam worek rdzeni
+    # („Bug w EXP-07" vs „Bug w EXP-13"). Warunek celowo nie wymaga MOCNYCH sygnatur:
+    # pojedynczy identyfikator jest za słaby, by ORZEC tożsamość, ale w zupełności
+    # wystarcza, by ją WYKLUCZYĆ. Lekcje prozatorskie (sygnatura pusta) sito 3 obsługuje
+    # dalej normalnie — to jego jedyne zadanie.
+    if sygn_a and sygn_b and not (sygn_a & sygn_b):
+        return False
+
+    rdzenie_a = _rdzenie_tytulu(tytul_a)
+    return bool(rdzenie_a) and rdzenie_a == _rdzenie_tytulu(tytul_b)
 
 
 def wczytaj(plik: Path = DOMYSLNY_PLIK) -> str:

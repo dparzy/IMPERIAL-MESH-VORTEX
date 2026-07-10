@@ -101,6 +101,78 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Golden Cross: wariant EMA, nie oryginalny SMA
+Strategia ZŁOTY ORZEŁ używa EMA50/EMA200, a nie kanonicznego SMA50/SMA200. Odnotowano w katalogu.
+
+### 2026-06-30 — Diagnostyka korelacji: 1 próbka fałszywie uznawana za martwą
+len(set)==1 dla 1 próbki dawało false positive. Wymagane ≥2 próbki do detekcji stałej serii.
+
+### 2026-06-30 — Pre-commit: testy na working tree zamiast staged
+Pre-commit testował working tree, nie staged. Dodano git stash push --keep-index i trap przywracający working tree.
+
+### 2026-06-30 — Błąd warmup Accelerator: slow+sma_ac+1
+Funkcja _py_accelerator miała zbędne +1 w warmup, co powodowało off-by-one. Usunięto.
+
+### 2026-06-30 — Błąd warmup Ulcer Index: period+1
+Funkcja _py_ulcer używała c[-period:] więc potrzebuje tylko period, a nie period+1. Poprawiono.
+
+### 2026-06-30 — pewnosc_agregatu ≈ 1.0 to root cause strat
+KalkulatorLewara używa pewnosc_agregatu do wyznaczania dźwigni, ale zawsze ≈1.0 → max leverage → ciasne stop lossy → wiele małych strat. To jest pierwotna przyczyna wszystkich strat systemu.
+
+### 2026-07-10 — Recenzent łapie granice brudnych danych i ścieżek awaryjnych
+Cubic na PR #118 znalazł kilkanaście realnych bugów w kodzie, który przeszedł mój adversarial przegląd. Wzorzec: łapie to, czego NIE testuję z góry — dane wejściowe nie-string/None/liczba (np. _skroc na co0=int), ścieżki AWARYJNE (fallback hooka gubi wydruk), martwe wzorce po round-tripie przez JSONL, daty/liczby zanieczyszczające miary podobieństwa. Lekcja: przed pushem testować BRUDNE WEJŚCIE i ŚCIEŻKĘ BŁĘDU, nie tylko happy path.
+
+### 2026-06-30 — Prawo I: Neurony nie liczą, Brama liczy
+MikroNeurony tylko interpretują gotowe wskaźniki (metoda interpretuj()), nigdy nie obliczają. Obliczenia wykonuje Brama Kalkulatora (TA-Lib). To fundamentalna zasada architektury IMPERIUM.
+
+### 2026-06-30 — Wolumen bazowy: Volume BTC/ETH ≠ Volume USDT
+W plikach CDD kolumna 'Volume BTC' lub 'Volume ETH' to wolumen w kryptowalucie, a nie w USDT. Czytnik CSV wykrywa kolumnę zaczynającą się od 'volume' i różną od 'volume usdt' jako bazową.
+
+### 2026-06-30 — Format CryptoDataDownload: linia URL i dane malejąco
+Pliki CSV z CryptoDataDownload mają pierwszą linię z URL-em, drugą z nagłówkami, dane są w kolejności malejącej (od najnowszych do najstarszych). Czytnik CSV automatycznie pomija URL i odwraca kolejność na rosnącą.
+
+### 2026-06-30 — Prawo XV: Utrata potencjału Klucznika
+Klucznik obliczał strategie, ale Dyrygent je ignorował. Strategie nie wpływały na decyzje. Naprawiono przez dodanie trybów: agregat (ignoruje strategie), filtr (strategia blokuje konflikt), strategia (strategia narzuca kierunek).
+
+### 2026-06-30 — DeepSeek chat zawierał wiele błędnych/przesadzonych twierdzeń
+Porównano Zbior_wskaznikow_i_strategi_03.06.2026.md z rzeczywistym repozytorium. Wiele twierdzeń DeepSeek o implementacjach było fałszywych. Zweryfikowano przez deep-research.
+
+### 2026-06-30 — Backtest nie ma lookahead-bias na 4 zbiorach Binance
+Zweryfikowano na BTC/ETH 1D (3192 bary) i 1H (76k barów) z CryptoDataDownload. Detektor potwierdza brak przecieku. Sliding window 250 barów jest czysty.
+
+### 2026-06-30 — Pewnosc_agregatu ≈1.0 to źródło strat
+Pewnosc_agregatu zawsze ≈1.0, co prowadzi do maksymalnego lewara i ciasnych stopów, generując wiele małych strat. Zidentyfikowano jako root cause wszystkich strat systemu.
+
+### 2026-06-30 — Kanoniczna liczba neuronów: 299
+299 unikalnych kluczy z KATALOG_NEURONOW.md, a nie 261/303/306/328 (stare estymaty). 27 zaimplementowanych w kodzie.
+
+### 2026-06-30 — EXP-12 +106,692% ROI to fantazja/lookahead
+Oryginalny Atmabhan ma nierealistyczne wyniki z powodu lookahead bias. Wdrożono ostrzeżenie w docstringu.
+
+### 2026-06-30 — Martwy głos ATR_MULT w EXP-07
+EXP-07 miał ATR_MULT=1.5 ale ATR nie był używany w logice. Poprawiono na ATR_MULT=0.15 i faktyczne użycie ATR.
+
+### 2026-06-30 — Bug: testy miały hardcoded 46 neuronów po dodaniu 47.
+Po dodaniu H-01 testy integracyjne zawierały stałą 46. Naprawiono na 47 w dwóch miejscach. Lekcja: używać len(rejestr.wszystkie_neurony()) zamiast stałych.
+
+### 2026-06-30 — Neuron H-01 zwraca NEUTRAL gdy brak danych
+NeuronHurstDFA zwraca NEUTRAL z 'META-BRAMA' w powodach gdy H≈0.5 lub brak danych. Nie rzuca błędem.
+
+### 2026-06-30 — Hurst-DFA vs R/S: dekorelowane na krypto trendującym
+Prawo XVI: DFA i R/S dają nieskorelowane wyniki na trendującym krypto. Potwierdzono empirycznie, że to nie redundancja.
+
+### 2026-06-30 — Yang-Zhang ~14x wydajniejszy od std(close)
+Drift-independent OHLC volatility estimator. Potwierdzono empirycznie: ~14x więcej próbek niż close-only std(close) przy tej samej długości okna.
+
+### 2026-06-30 — Yang-Zhang traci 7-14× informacji vs std(close)
+Używanie std(close) zamiast estymatora Yang-Zhang (OHLC) marnuje potencjał volatility. Narusza Prawo XV. Należy zastąpić w obliczeniach.
+
+### 2026-06-30 — CME gap edge martwy od 2026-05-29
+CME uruchomiło 24/7 kontrakty futures na BTC, co eliminuje weekendowe luki cenowe. Nie implementować jako sygnału live.
+
+### 2026-06-30 — W7 audyt fałszywie flaguje zewnętrzne URL-e z .md w domenie
+Reguła W7 w audyt_spojnosci.py błędnie oznaczała linki takie jak www.mdpi.com jako martwe, bo zawierają '.md' w domenie. Naprawiono przez pomijanie URL-i z http/https/mailto.
+
 ### 2026-06-30 — Binance depth zwraca stringi
 L2 order book od Binance ma ceny i wolumeny jako stringi. Dodano float(b[1]) i float(a[1]) w exp_atmabhan.
 
@@ -128,20 +200,8 @@ Accelerator Oscillator miał zbędne +1 w warmupie (slow+sma_ac+1). Usunięto na
 ### 2026-06-30 — Błąd warmupu Ulcer Index
 Ulcer Index wymagał period+1 zamiast period. Poprawiono na c[-period:] co wymaga tylko period próbek.
 
-### 2026-06-30 — Ustalono kanoniczną liczbę neuronów: 299
-Kanoniczna liczba neuronów to 299 (unikalne klucze z KATALOG_NEURONOW.md), a nie 261/303/306/328 (stare estymaty).
-
-### 2026-06-30 — Dead voice bug: ATR_MULT w EXP-07
-EXP-07 (TLP) miał ATR_MULT=1.5 w kodzie zamiast 0.15 z dokumentacji — martwy głos naprawiony.
-
 ### 2026-06-30 — Cross jako EVENT w EXP-11
 Cross jako EVENT a nie STATE: EXP-11 sygnalizuje tylko przy świeżym przecięciu, nie na każdym barze gdzie fast>slow.
-
-### 2026-06-30 — Lookahead bias w SMC Engine (EXP-09) naprawiony
-EXP-09 (LiquiditySweep) oryginalnie używał .shift(-1)/.shift(-2) — lookahead bias. Naprawiono: tylko bary[start:n] (przeszłość).
-
-### 2026-06-30 — Poprawiona definicja True Range
-True Range = max(H-L, |H-prevC|, |L-prevC|) — poprawiono we wszystkich adoptowanych wskaźnikach.
 
 ### 2026-06-30 — HA bez repainting: rekurencyjny HA_Open
 Heiken Ashi bez repainting wymaga HA_Open[i] = (HA_Open[i-1] + HA_Close[i-1]) / 2, a nie (Open[-1]+Close[-1])/2. Zaimplementowano w _dodaj_ha().
@@ -167,9 +227,6 @@ Brama nie dostarczała poprzednich wartości (RSI_PREV, EMA_PREV, MACD_HIST_PREV
 ### 2026-06-30 — Zombie neurons zwracają NEUTRAL gdy Brama nie dostarcza kluczy
 Neurony z DOSTEPNY=False zawsze zwracały NEUTRAL, maskując brak integracji. Wykryto przez Prawo XV. Naprawiono: Roj.zbierz_sygnaly() pomija DOSTEPNY=False, dodano POWOD_NIEDOSTEPNOSCI.
 
-### 2026-06-30 — Martwy głos ATR_MULT w TLP
-EXP-07 miał ATR_MULT=1.5 ale wartość była nieużywana. Poprawiono na 0.15 i faktycznie użyto w logice breakout.
-
 ### 2026-06-30 — Martwy głos ATR w Night Turbo
 Oryginalny Night Turbo miał ATR zdefiniowany ale nieużywany. Poprawiono: PROG_ATR_MULT = 0.5 faktycznie używa ATR.
 
@@ -181,9 +238,6 @@ EXP-11 sygnalizuje tylko przy świeżym przecięciu (fast>slow AND prev_fast<=pr
 
 ### 2026-06-30 — True Range: poprawna definicja
 True Range = max(H-L, |H-prevC|, |L-prevC|). Poprawiono we wszystkich adoptowanych wskaźnikach (EXP-06..12).
-
-### 2026-06-30 — HA bez repainting: rekurencyjna definicja
-Heiken Ashi Open[i] = (HA_Open[i-1] + HA_Close[i-1]) / 2, a nie (Open[-1]+Close[-1])/2. Poprawiono w BudowniczyWskaznikow._dodaj_ha().
 
 ### 2026-06-30 — Prawo I: Zero halucynacji matematycznych
 AI nigdy nie oblicza matematyki. Kod (TA-Lib, C) oblicza RSI/EMA/ATR → JSON 'answer key' → AI tylko interpretuje. Brama Kalkulatora nie uruchomi się bez TA-Lib.

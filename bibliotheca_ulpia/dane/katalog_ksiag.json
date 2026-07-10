@@ -1,0 +1,489 @@
+{
+  "n": 69,
+  "calibre": false,
+  "ksiegi": [
+    {
+      "bib": "BIB-001",
+      "autor": "Patel",
+      "tytul": "The Secret Wealth Advantage",
+      "format": "azw3",
+      "plik": "BIB-001_Patel_The-Secret-Wealth-Advantage.azw3"
+    },
+    {
+      "bib": "BIB-002",
+      "autor": "Murphy",
+      "tytul": "Technical Analysis of the Financial Markets",
+      "format": "azw3",
+      "plik": "BIB-002_Murphy_Technical-Analysis-of-the-Financial-Markets.azw3"
+    },
+    {
+      "bib": "BIB-003",
+      "autor": "Burniske Tatar",
+      "tytul": "Cryptoassets",
+      "format": "azw3",
+      "plik": "BIB-003_Burniske-Tatar_Cryptoassets.azw3"
+    },
+    {
+      "bib": "BIB-004",
+      "autor": "Steenbarger",
+      "tytul": "The Psychology of Trading",
+      "format": "azw3",
+      "plik": "BIB-004_Steenbarger_The-Psychology-of-Trading.azw3"
+    },
+    {
+      "bib": "BIB-005",
+      "autor": "Blum",
+      "tytul": "What Exactly Is Crypto",
+      "format": "epub",
+      "plik": "BIB-005_Blum_What-Exactly-Is-Crypto.epub"
+    },
+    {
+      "bib": "BIB-006",
+      "autor": "Carson",
+      "tytul": "High Probability Scalping Strategy Playbook",
+      "format": "epub",
+      "plik": "BIB-006_Carson_High-Probability-Scalping-Strategy-Playbook.epub"
+    },
+    {
+      "bib": "BIB-007",
+      "autor": "Lopez de Prado",
+      "tytul": "Advances in Financial Machine Learning",
+      "format": "epub",
+      "plik": "BIB-007_Lopez-de-Prado_Advances-in-Financial-Machine-Learning.epub"
+    },
+    {
+      "bib": "BIB-008",
+      "autor": "Sinclair",
+      "tytul": "Volatility Trading 2nd ed",
+      "format": "azw3",
+      "plik": "BIB-008_Sinclair_Volatility-Trading-2nd-ed.azw3"
+    },
+    {
+      "bib": "BIB-009",
+      "autor": "Mandelbrot Hudson",
+      "tytul": "The Misbehavior of Markets",
+      "format": "epub",
+      "plik": "BIB-009_Mandelbrot-Hudson_The-Misbehavior-of-Markets.epub"
+    },
+    {
+      "bib": "BIB-010",
+      "autor": "Chan",
+      "tytul": "Quantitative Trading 2nd ed",
+      "format": "epub",
+      "plik": "BIB-010_Chan_Quantitative-Trading-2nd-ed.epub"
+    },
+    {
+      "bib": "BIB-011",
+      "autor": "Chan",
+      "tytul": "Algorithmic Trading Winning Strategies",
+      "format": "pdf",
+      "plik": "BIB-011_Chan_Algorithmic-Trading-Winning-Strategies.pdf"
+    },
+    {
+      "bib": "BIB-012",
+      "autor": "Strauss van der Post",
+      "tytul": "Coding Capital",
+      "format": "epub",
+      "plik": "BIB-012_Strauss-van-der-Post_Coding-Capital.epub"
+    },
+    {
+      "bib": "BIB-013",
+      "autor": "Dalton",
+      "tytul": "Markets in Profile",
+      "format": "epub",
+      "plik": "BIB-013_Dalton_Markets-in-Profile.epub"
+    },
+    {
+      "bib": "BIB-014",
+      "autor": "Dalton",
+      "tytul": "Mind Over Markets",
+      "format": "epub",
+      "plik": "BIB-014_Dalton_Mind-Over-Markets.epub"
+    },
+    {
+      "bib": "BIB-015",
+      "autor": "Elder",
+      "tytul": "The New Trading for a Living",
+      "format": "epub",
+      "plik": "BIB-015_Elder_The-New-Trading-for-a-Living.epub"
+    },
+    {
+      "bib": "BIB-016",
+      "autor": "Douglas",
+      "tytul": "Trading in the Zone",
+      "format": "epub",
+      "plik": "BIB-016_Douglas_Trading-in-the-Zone.epub"
+    },
+    {
+      "bib": "BIB-017",
+      "autor": "Kahneman",
+      "tytul": "Thinking Fast and Slow",
+      "format": "epub",
+      "plik": "BIB-017_Kahneman_Thinking-Fast-and-Slow.epub"
+    },
+    {
+      "bib": "BIB-018",
+      "autor": "Sinclair",
+      "tytul": "Positional Option Trading",
+      "format": "epub",
+      "plik": "BIB-018_Sinclair_Positional-Option-Trading.epub"
+    },
+    {
+      "bib": "BIB-019",
+      "autor": "Harris",
+      "tytul": "Handbook for Cryptocurrencies Trading",
+      "format": "epub",
+      "plik": "BIB-019_Harris_Handbook-for-Cryptocurrencies-Trading.epub"
+    },
+    {
+      "bib": "BIB-020",
+      "autor": "Harris",
+      "tytul": "Trading and Exchanges_ Market Microstructure for Practitioners",
+      "format": "epub",
+      "plik": "BIB-020_Harris_Trading and Exchanges_ Market-Microstructure-for-Practitioners.epub"
+    },
+    {
+      "bib": "BIB-021",
+      "autor": "Anon",
+      "tytul": "High Win Rate Day Trading Setups",
+      "format": "azw3",
+      "plik": "BIB-021_Anon_High-Win-Rate-Day-Trading-Setups.azw3"
+    },
+    {
+      "bib": "BIB-022",
+      "autor": "Kissell",
+      "tytul": "Optimal trading strategies",
+      "format": "djvu",
+      "plik": "BIB-022_Kissell_Optimal-trading-strategies.djvu"
+    },
+    {
+      "bib": "BIB-023",
+      "autor": "Lopez de Prado",
+      "tytul": "Machine Learning for Asset Managers",
+      "format": "pdf",
+      "plik": "BIB-023_Lopez-de-Prado_Machine-Learning-for-Asset-Managers.pdf"
+    },
+    {
+      "bib": "BIB-024",
+      "autor": "Lowe",
+      "tytul": "Bitcoin and Cryptocurrency Trading for Beginners",
+      "format": "epub",
+      "plik": "BIB-024_Lowe_Bitcoin-and-Cryptocurrency Trading for Beginners.epub"
+    },
+    {
+      "bib": "BIB-025",
+      "autor": "Grinold & Kahn",
+      "tytul": "Active Portfolio Management",
+      "format": "epub",
+      "plik": "BIB-025_Grinold & Kahn_Active-Portfolio-Management.epub"
+    },
+    {
+      "bib": "BIB-026",
+      "autor": "Jansen",
+      "tytul": "Machine Learning for Algorithmic Trading",
+      "format": "mobi",
+      "plik": "BIB-026_Jansen_Machine-Learning-for-Algorithmic-Trading.mobi"
+    },
+    {
+      "bib": "BIB-027",
+      "autor": "Aldridge",
+      "tytul": "High Frequency Trading",
+      "format": "epub",
+      "plik": "BIB-027_Aldridge_High-Frequency-Trading.epub"
+    },
+    {
+      "bib": "BIB-028",
+      "autor": "Narang",
+      "tytul": "Inside the Black Box A Simple Guide to Systematic Investing",
+      "format": "epub",
+      "plik": "BIB-028_Narang_Inside-the-Black-Box-A-Simple-Guide-to-Systematic-Investing.epub"
+    },
+    {
+      "bib": "BIB-029",
+      "autor": "Bashir",
+      "tytul": "Mastering Blockchain",
+      "format": "epub",
+      "plik": "BIB-029_Bashir_Mastering-Blockchain.epub"
+    },
+    {
+      "bib": "BIB-030",
+      "autor": "Ammous",
+      "tytul": "The Bitcoin Standard",
+      "format": "epub",
+      "plik": "BIB-030_Ammous_The-Bitcoin-Standard.epub"
+    },
+    {
+      "bib": "BIB-031",
+      "autor": "Tsay",
+      "tytul": "Analysis of Financial Time Series",
+      "format": "pdf",
+      "plik": "BIB-031_Tsay_Analysis-of-Financial-Time-Series.pdf"
+    },
+    {
+      "bib": "BIB-032",
+      "autor": "OHara",
+      "tytul": "Market Microstructure Theory",
+      "format": "pdf",
+      "plik": "BIB-032_OHara_Market-Microstructure-Theory.pdf"
+    },
+    {
+      "bib": "BIB-033",
+      "autor": "Huyen",
+      "tytul": "AI Engineering Building Applications with Foundation Models",
+      "format": "epub",
+      "plik": "BIB-033_Huyen_AI-Engineering-Building-Applications-with-Foundation-Models.epub"
+    },
+    {
+      "bib": "BIB-034",
+      "autor": "Infante",
+      "tytul": "AI Agents and Applications LangChain LangGraph MCP",
+      "format": "epub",
+      "plik": "BIB-034_Infante_AI-Agents-and-Applications-LangChain-LangGraph-MCP.epub"
+    },
+    {
+      "bib": "BIB-035",
+      "autor": "Iusztin Labonne",
+      "tytul": "LLM Engineers Handbook",
+      "format": "azw3",
+      "plik": "BIB-035_Iusztin-Labonne_LLM-Engineers-Handbook.azw3"
+    },
+    {
+      "bib": "BIB-036",
+      "autor": "Alto",
+      "tytul": "Building LLM Powered Applications",
+      "format": "epub",
+      "plik": "BIB-036_Alto_Building-LLM-Powered-Applications.epub"
+    },
+    {
+      "bib": "BIB-037",
+      "autor": "Hull",
+      "tytul": "Options Futures and Other Derivatives",
+      "format": "epub",
+      "plik": "BIB-037_Hull_Options-Futures-and-Other-Derivatives.epub"
+    },
+    {
+      "bib": "BIB-038",
+      "autor": "Schwager",
+      "tytul": "Market Wizards Interviews with Top Traders",
+      "format": "epub",
+      "plik": "BIB-038_Schwager_Market-Wizards-Interviews-with-Top-Traders.epub"
+    },
+    {
+      "bib": "BIB-039",
+      "autor": "Lefevre",
+      "tytul": "Reminiscences of a Stock Operator",
+      "format": "epub",
+      "plik": "BIB-039_Lefevre_Reminiscences-of-a-Stock-Operator.epub"
+    },
+    {
+      "bib": "BIB-040",
+      "autor": "Bernstein",
+      "tytul": "Against the Gods The Remarkable Story of Risk",
+      "format": "epub",
+      "plik": "BIB-040_Bernstein_Against-the-Gods-The-Remarkable-Story-of-Risk.epub"
+    },
+    {
+      "bib": "BIB-041",
+      "autor": "Taleb",
+      "tytul": "Fooled by Randomness",
+      "format": "epub",
+      "plik": "BIB-041_Taleb_Fooled-by-Randomness.epub"
+    },
+    {
+      "bib": "BIB-042",
+      "autor": "Jorion",
+      "tytul": "Value at Risk The New Benchmark",
+      "format": "epub",
+      "plik": "BIB-042_Jorion_Value-at-Risk-The-New-Benchmark.epub"
+    },
+    {
+      "bib": "BIB-043",
+      "autor": "Cartea Jaimungal Penalva",
+      "tytul": "Algorithmic and High Frequency Trading",
+      "format": "pdf",
+      "plik": "BIB-043_Cartea-Jaimungal-Penalva_Algorithmic-and-High-Frequency-Trading.pdf"
+    },
+    {
+      "bib": "BIB-044",
+      "autor": "Hasbrouck",
+      "tytul": "Empirical Market Microstructure",
+      "format": "pdf",
+      "plik": "BIB-044_Hasbrouck_Empirical-Market-Microstructure.pdf"
+    },
+    {
+      "bib": "BIB-045",
+      "autor": "Hilpisch",
+      "tytul": "Python for Finance",
+      "format": "epub",
+      "plik": "BIB-045_Hilpisch_Python-for-Finance.epub"
+    },
+    {
+      "bib": "BIB-046",
+      "autor": "Chan",
+      "tytul": "Machine Trading",
+      "format": "epub",
+      "plik": "BIB-046_Chan_Machine-Trading.epub"
+    },
+    {
+      "bib": "BIB-047",
+      "autor": "Kaufman",
+      "tytul": "Trading Systems and Methods",
+      "format": "pdf",
+      "plik": "BIB-047_Kaufman_Trading-Systems-and-Methods.pdf"
+    },
+    {
+      "bib": "BIB-048",
+      "autor": "Aronson",
+      "tytul": "Evidence Based Technical Analysis",
+      "format": "djvu",
+      "plik": "BIB-048_Aronson_Evidence-Based-Technical-Analysis.djvu"
+    },
+    {
+      "bib": "BIB-049",
+      "autor": "Bulkowski",
+      "tytul": "Encyclopedia of Chart Patterns",
+      "format": "epub",
+      "plik": "BIB-049_Bulkowski_Encyclopedia-of-Chart-Patterns.epub"
+    },
+    {
+      "bib": "BIB-050",
+      "autor": "Douglas",
+      "tytul": "The Disciplined Trader",
+      "format": "pdf",
+      "plik": "BIB-050_Douglas_The-Disciplined-Trader.pdf"
+    },
+    {
+      "bib": "BIB-051",
+      "autor": "Duke",
+      "tytul": "Thinking in Bets",
+      "format": "epub",
+      "plik": "BIB-051_Duke_Thinking-in-Bets.epub"
+    },
+    {
+      "bib": "BIB-052",
+      "autor": "Steenbarger",
+      "tytul": "Trading Psychology 2.0",
+      "format": "epub",
+      "plik": "BIB-052_Steenbarger_Trading-Psychology-2.0.epub"
+    },
+    {
+      "bib": "BIB-053",
+      "autor": "Antonopoulos Harding",
+      "tytul": "Mastering Bitcoin 3rd ed",
+      "format": "mobi",
+      "plik": "BIB-053_Antonopoulos-Harding_Mastering-Bitcoin-3rd-ed.mobi"
+    },
+    {
+      "bib": "BIB-054",
+      "autor": "Antonopoulos Wood",
+      "tytul": "Mastering Ethereum",
+      "format": "epub",
+      "plik": "BIB-054_Antonopoulos-Wood_Mastering-Ethereum.epub"
+    },
+    {
+      "bib": "BIB-055",
+      "autor": "Popper",
+      "tytul": "Digital Gold",
+      "format": "epub",
+      "plik": "BIB-055_Popper_Digital-Gold.epub"
+    },
+    {
+      "bib": "BIB-056",
+      "autor": "Dalio",
+      "tytul": "Principles for Navigating Big Debt Crises",
+      "format": "epub",
+      "plik": "BIB-056_Dalio_Principles-for-Navigating-Big-Debt-Crises.epub"
+    },
+    {
+      "bib": "BIB-057",
+      "autor": "Dalio",
+      "tytul": "Principles for Dealing with the Changing World Order",
+      "format": "epub",
+      "plik": "BIB-057_Dalio_Principles-for-Dealing-with-the-Changing-World-Order.epub"
+    },
+    {
+      "bib": "BIB-058",
+      "autor": "Dalio",
+      "tytul": "How Countries Go Broke The Big Cycle",
+      "format": "epub",
+      "plik": "BIB-058_Dalio_How-Countries-Go-Broke-The-Big-Cycle.epub"
+    },
+    {
+      "bib": "BIB-059",
+      "autor": "Kindleberger Aliber",
+      "tytul": "Manias Panics and Crashes",
+      "format": "epub",
+      "plik": "BIB-059_Kindleberger-Aliber_Manias-Panics-and-Crashes.epub"
+    },
+    {
+      "bib": "BIB-060",
+      "autor": "Shiller",
+      "tytul": "Irrational Exuberance",
+      "format": "pdf",
+      "plik": "BIB-060_Shiller_Irrational-Exuberance.pdf"
+    },
+    {
+      "bib": "BIB-061",
+      "autor": "Thaler",
+      "tytul": "Misbehaving The Making of Behavioral Economics",
+      "format": "epub",
+      "plik": "BIB-061_Thaler_Misbehaving-The-Making-of-Behavioral-Economics.epub"
+    },
+    {
+      "bib": "BIB-062",
+      "autor": "Chancellor",
+      "tytul": "Devil Take the Hindmost",
+      "format": "epub",
+      "plik": "BIB-062_Chancellor_Devil-Take-the-Hindmost.epub"
+    },
+    {
+      "bib": "BIB-063",
+      "autor": "MacKay",
+      "tytul": "Extraordinary Popular Delusions and the Madness of Crowds",
+      "format": "epub",
+      "plik": "BIB-063_MacKay_Extraordinary-Popular-Delusions-and-the-Madness-of-Crowds.epub"
+    },
+    {
+      "bib": "BIB-064",
+      "autor": "Reinhart Rogoff",
+      "tytul": "This Time Is Different",
+      "format": "epub",
+      "plik": "BIB-064_Reinhart-Rogoff_This-Time-Is-Different.epub"
+    },
+    {
+      "bib": "BIB-065",
+      "autor": "Shreve",
+      "tytul": "Stochastic Calculus for Finance I Binomial Asset Pricing",
+      "format": "djvu",
+      "plik": "BIB-065_Shreve_Stochastic-Calculus-for-Finance-I-Binomial-Asset-Pricing.djvu"
+    },
+    {
+      "bib": "BIB-066",
+      "autor": "Shreve",
+      "tytul": "Stochastic Calculus for Finance II Continuous Time Models",
+      "format": "djvu",
+      "plik": "BIB-066_Shreve_Stochastic-Calculus-for-Finance-II-Continuous-Time-Models.djvu"
+    },
+    {
+      "bib": "BIB-067",
+      "autor": "Sutton Barto",
+      "tytul": "Reinforcement Learning An Introduction 2nd ed",
+      "format": "djvu",
+      "plik": "BIB-067_Sutton-Barto_Reinforcement-Learning-An-Introduction-2nd-ed.djvu"
+    },
+    {
+      "bib": "BIB-068",
+      "autor": "Goodfellow Bengio Courville",
+      "tytul": "Deep Learning",
+      "format": "pdf",
+      "plik": "BIB-068_Goodfellow-Bengio-Courville_Deep-Learning.pdf"
+    },
+    {
+      "bib": "BIB-069",
+      "autor": "Voshmgir",
+      "tytul": "Token Economy 3rd ed",
+      "format": "epub",
+      "plik": "BIB-069_Voshmgir_Token-Economy-3rd-ed.epub"
+    }
+  ]
+}

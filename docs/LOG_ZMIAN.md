@@ -6,6 +6,222 @@
 
 ---
 
+## 2026-07-11 | 📖 | KATALOG METADANYCH KSIĄG — calibre jako backend (nie MCP)
+
+Rozbudowa Bibliotheki Ulpia. Cezar wybrał: calibre jako NARZĘDZIE zaplecza karmiące istniejący
+RAG, nie serwer MCP (ZASADA MCP — MCP wchodzi tylko gdy dokłada NOWĄ zdolność; własny RAG już
+szuka w treści, dodawanie calibre MCP byłoby redundancją).
+
+**Luka (Prawo XVI, zmierzona):** RAG indeksuje TREŚĆ (FTS), ale metadane książki to dziś tylko
+`tytul` z nazwy pliku. Brak autora, tagów, języka, roku, ISBN, wydawcy, serii. `ebook-convert`
+już był fallbackiem konwersji w `ekstraktor.py` — więc konwersja pokryta; luką były METADANE.
+
+**Wdrożone:**
+- `narzedzia/rag/metadane_ksiag.py` — buduje `bibliotheca_ulpia/dane/katalog_ksiag.json`.
+  Dwa poziomy (graceful, jak abstynencja Prawa XV): (1) ZAWSZE parsowanie nazwy
+  `BIB-NNN_Autor_Tytul`; (2) GDY calibre obecny — `ebook-meta` dokłada tagi/język/rok/ISBN.
+  Bez calibre katalog nadal powstaje (uboższy). Pasek postępu na stderr (Prawo XXIV).
+- Katalog zbudowany TERAZ (fallback nazw, calibre brak w chmurze): **69 książek**
+  (epub 45, pdf 10, azw3 7, djvu 5, mobi 2). Na laptopie z calibre — wzbogaci się metadanymi.
+- `bibliotheca_ulpia/README.md` — naprawiony nieaktualny stan „42 książki" → 69 + opis katalogu.
+- `tests/test_metadane_ksiag.py` — 9 testów: parsowanie nazw (granice: niestandardowa nazwa),
+  parser `ebook-meta` (mapowanie kluczy, pomijanie „Unknown", „ : " w wartości, pusty).
+
+**Status:** działa dziś (fallback nazw). Na laptopie z calibre `python -m narzedzia.rag.metadane_ksiag`
+odświeży katalog z pełnymi metadanymi. Zero zmian w `.mcp.json` (config startowy = decyzja Cezara).
+
+**Pliki:** `narzedzia/rag/metadane_ksiag.py`, `bibliotheca_ulpia/dane/katalog_ksiag.json`,
+`bibliotheca_ulpia/README.md`, `tests/test_metadane_ksiag.py`
+
+---
+
+## 2026-07-10 | 🛡️ | FILTR EKONOMICZNY (ECON) — brama „zbyt dobre, by było prawdziwe"
+
+Pierwsza realizacja z listy nowości wrzutni (`ANALIZA_WRZUTNIA_2026-07-10.md`, poz. C1 ARTEMIS).
+Wybrana bo: realna luka (brak warstwy ograniczeń ekonomicznych), deterministyczna (filozofia
+Bramy Kalkulatora, zero zależności ML), monotonicznie ostrożna (tylko wetuje → bezpieczna).
+
+**Źródło zweryfikowane (nie halucynacja):** ARTEMIS, arXiv 2603.18107 „A Neuro-Symbolic
+Framework for Economically Constrained Market Dynamics" (marzec 2026) — istnieje realnie
+(WebSearch). Realizujemy jego karę **market price of risk** (ograniczenie chwilowego Sharpe'a)
+DETERMINISTYCZNIE, bez sieci neuronowej.
+
+**Prawo XVI (redundancja MIERZONA):** planowany wariant „ekstensja w ATR" byłby redundantny
+z X-25 (`ATR_DEVIATION`). Dlatego ECON działa na INNEJ danej — ekonomii ZAKŁADU (p, RR):
+liczy Sharpe pojedynczego zakładu `edge/√var` z (p·RR−(1−p)) i wetuje, gdy > λ_max
+(„too good to be true") lub gdy edge ≤ 0 (ujemny EV). Nic w systemie tego nie sprawdzało.
+
+**Wdrożone:**
+- `imperium/pretorianie/filtr_ekonomiczny.py` — `FiltrEkonomiczny.ocen(p, rr)` → werdykt
+  (wzorzec `FiltrAsymetrii`: abstynencja przy RR≤0, tylko wetuje, czysty Python).
+- `sizing_przekonania.kelly_frakcja(..., filtr_ekonomiczny=None)` — **opt-in, domyślnie OFF**
+  (ZASADA WPIĘCIA): bez filtra zachowanie IDENTYCZNE; z filtrem zwraca 0.0 dla zawetowanego.
+- `tests/test_filtr_ekonomiczny.py` — 12 testów, Reguła Test-Granic: edge=0, Sharpe==λ_max
+  (≥ vs >), p=0/p=1, RR≤0 abstynencja, dowód że opt-in OFF nie zmienia sizingu.
+
+**Samo-recenzja złapała bug przed pushem:** dla p=0 (pewna strata) wariancja=0 uruchamiała
+gałąź „abstynencja" przed sprawdzeniem edge≤0 → pewna strata byłaby PRZEPUSZCZONA. Naprawiono
+kolejność: brak przewagi sprawdzany pierwszy.
+
+**Status:** KANDYDAT — λ_max=2.0 zachowawczy, do KALIBRACJI areną (A/B) przed włączeniem na
+sztywno (decyzja Cezara po zielonej walidacji). To nie neuron (veto ≠ głos) — filtr Pretorianów
+jak `FiltrAsymetrii`, więc liczba neuronów bez zmian (84).
+
+**Pliki:** `imperium/pretorianie/filtr_ekonomiczny.py`, `imperium/pretorianie/sizing_przekonania.py`,
+`tests/test_filtr_ekonomiczny.py`
+
+---
+
+## 2026-07-10 | 🪶 | ODCHUDZENIE STARTU SESJI — 28,5 KB → ~15 KB (bez utraty łuku)
+
+**Powód (decyzja Cezara):** hook startowy wypluwał ~28 KB przy każdym starcie — nie mieściło
+się w wyniku narzędzia. POMIAR rozkładu (nie zgadywanie): Dziennik Nieśmiertelny 81%,
+audyt 11% (z czego alarm XV 2,5 KB), kronika drukowana 3× (bug).
+
+**Trzy cięcia:**
+1. **Kronika drukowana 3×** — `centrum_pamieci start` już drukuje „X sesji, Y MB", a hook
+   wołał osobno `kronika_czatu statystyki` (ten sam wydruk, inne zaokrąglenie: 6.8 vs 6.79).
+   Usunięto zdublowane wywołanie z `session-start.sh`.
+2. **Alarm Prawa XV** — jedna linia 2 551 zn. wyliczała 22 moduły z pełnym uzasadnieniem
+   każdego. Na starcie: liczba + KLUCZE (288 zn., alarm nadal głośny i pełny co do liczby).
+   Pełne powody na żądanie: `python narzedzia/audyt_spojnosci.py --luki`.
+3. **Dziennik Nieśmiertelny** — warstwowość już istniała (`ostatnie=N`), ale (a) jednolinijkowce
+   starszych sesji brały CAŁY pierwszy punkt „co" (do 721 zn.), (b) pełnych było 12.
+   `_skroc()` tnie jednolinijkowce do 110 zn., `DOMYSLNE_PELNE=8`. 27,9 KB → 14 KB.
+   **Wszystkie 69 sesji nadal widoczne** — Prawo XV nienaruszone, znikają tylko rozwinięcia
+   (detale zostają w kronice, przeszukiwalnej po słowach).
+
+**Testy:** `tests/test_dziennik_niesmiertelny.py` (12 testów, Reguła Test-Granic: _skroc na
+granicy/o jeden dłuższy/pusty, os_czasu ostatnie=0 vs [:-0], ostatnie>liczba wpisów).
+
+**Pliki:** `.claude/hooks/session-start.sh`, `narzedzia/audyt_spojnosci.py`,
+`imperium/biblioteki/dziennik_niesmiertelny.py`, `imperium/biblioteki/centrum_pamieci.py`,
+`tests/test_dziennik_niesmiertelny.py`
+
+---
+
+## 2026-07-10 | 🔎 | NAPRAWA 5 UWAG cubica (PR #118, drugi przebieg recenzji)
+
+Recenzent przeczytał commity dedupu i pushu-na-komendę. **Wszystkie 5 uwag potwierdzone
+wykonaniem** (nie na słowo — każda odtworzona skryptem przed naprawą):
+
+1. **Daty ISO w sygnaturze** (`pamiec_sesji.py`) — każda lekcja niesie datę sesji, więc
+   „2026", „06", „30" wchodziły do sygnatur wszystkich lekcji z tego samego dnia.
+   „Neuron X-01 zwraca NEUTRAL (2026-06-30)" vs „Zwiadowca EXP-13 milczy (2026-06-30)"
+   dawało Jaccard 3/5 = **0.60 → scalenie dwóch niezwiązanych lekcji**. Daty wycinane
+   przed tokenizacją (`_WZOR_DATY`).
+2. **Sito prozatorskie nadpisywało werdykt sygnatur** — „Bug w EXP-07" i „Bug w EXP-13"
+   mają ten sam worek rdzeni. Sito 3 nie scala, gdy obie sygnatury są mocne i ROZŁĄCZNE.
+3. **Marker: hasz i ID w jednym zbiorze** (`auto_lekcja.py`) — kronika dopisana po
+   przetworzeniu dostawała nowy hasz, ale jej stare `sesja_id` wciąż blokowało. Mechanizm
+   unieważniania był martwy od pierwszego dnia. Zbiory rozdzielone; zmigrowane ID wypadają
+   ze starego markera.
+4. **Cichy `git fetch || true`** (`synchronizuj.sh`) — przy porażce fetch `PRZED` liczyło
+   się ze starego `origin/…`, więc strażnik „zdalna wyprzedza" przepuszczał sklejanie na
+   nieaktualnym stanie. Przy `--push` fetch musi się udać, inaczej przerwanie.
+5. **Skrypt omijał bramkę Prawa XXI** — `--push` mógł wypchnąć kod bez testów i audytu.
+   Gdy w kolejce jest `.py`, `synchronizuj.sh` odpala testy + audyt + skan wad i odmawia
+   pushu przy czerwonym. Push samej pamięci bramki nie wymaga (kod nietknięty).
+
+**Regresja:** te same 5 grup / 11 duplikatów na korpusie 71 lekcji — naprawy nie osłabiły
+dedupu. 5 nowych testów + `tests/test_auto_lekcja_marker.py` (4 testy: hasz unieważnia,
+zmigrowane ID nie blokuje, komentarze pomijane, brak markerów).
+
+Klasy 1 i 3 dopisane do **Księgi Wad Kodu** (7 → 9 wzorców).
+
+**Pliki:** `imperium/biblioteki/pamiec_sesji.py`, `narzedzia/auto_lekcja.py`,
+`narzedzia/synchronizuj.sh`, `tests/test_pamiec_sesji.py`, `tests/test_auto_lekcja_marker.py`,
+`bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`
+
+---
+
+## 2026-07-10 | 🌿 | PUSH NA KOMENDĘ — hook końca sesji przestaje pushować
+
+**Powód (decyzja Cezara):** hook `SessionEnd` commitował **i pushował** pamięć po każdej
+sesji. Efekt: historia w chmurze utonęła w commitach „auto: sync pamięci sesji" (30+ na
+gałęzi), a start na drugiej maszynie wymuszał rebase. Dziś sesja wystartowała 30 commitów
+za remote i push się odbił — to był objaw tej właśnie polityki.
+
+**Wdrożone:**
+- `.claude/hooks/session-end.sh` — commituje pamięć LOKALNIE, **nie pushuje**;
+  informuje ile commitów czeka na wypchnięcie.
+- `narzedzia/synchronizuj.sh` — świadomy push. Domyślnie PODGLĄD (nic nie zmienia);
+  `--push` skleja commity pamięci w jeden i wypycha.
+- `CLAUDE.md` § Tryb autonomiczny pkt 4: „Auto-push" → „Push na komendę".
+
+**Zasada bezpieczeństwa (zweryfikowana w izolowanym repo, 4 scenariusze):**
+sklejamy **wyłącznie** gdy KAŻDY commit czekający na push jest commitem pamięci. Gdy
+w kolejce jest choć jeden commit merytoryczny — historia NIE jest przepisywana (SHA
+zachowane, potwierdzone testem). Odmowa przy brudnym drzewie i przy zdalnej wyprzedzającej
+gałąź (HEAD nietknięty).
+
+**Nie zmieniamy:** auto-commit (Prawo XVIII, zero kosztu) i auto-pull na starcie sesji.
+
+**Pliki:** `.claude/hooks/session-end.sh`, `narzedzia/synchronizuj.sh`, `CLAUDE.md`
+
+---
+
+## 2026-07-10 | 🧠 | DEDUP SEMANTYCZNY LEKCJI — koniec czterech kopii tej samej wiedzy
+
+**Powód:** recenzja cubic na PR #118 wykryła, że `docs/PAMIEC_SESJI.md` puchnie od
+duplikatów (4× „Lookahead bias w SMC Engine", 4× „HA bez repainting", 3× „ATR_MULT w EXP-07",
+3× „True Range"). Napuchnięty plik wstrzykuje się w kontekst KAŻDEJ sesji — utrata tokenów
+i fałszywy sygnał ważności (Prawo XV).
+
+**Diagnoza (dwie przyczyny, obie potwierdzone pomiarem):**
+1. Dedup w `auto_lekcja.py` porównywał **dokładny podciąg tytułu** (`szukaj(tytul)`).
+   DeepSeek ekstrahuje z `temperatura=0.3` → za każdym przebiegiem inna parafraza.
+   „Martwy głos ATR_MULT w EXP-07" vs „Dead voice bug: ATR_MULT w EXP-07" — żaden nie jest
+   podciągiem drugiego, duplikat przechodził.
+2. Marker przetworzonych kronik (`.auto_lekcja_przetworzone.txt`) był **w `.gitignore`**,
+   czyli per-maszyna: 13 z 102 kronik oznaczonych tutaj, 0 na laptopie → ta sama kronika
+   ekstrahowana wielokrotnie, za każdym razem nową parafrazą.
+
+**Pomiar (Prawo XVI — redundancja mierzona, nie zgadywana), 71 realnych lekcji:**
+podobieństwo NAPISÓW nie rozdziela klas (prawdziwy duplikat 0.642 **poniżej** pary różnych
+lekcji 0.667: „ATR_MULT w TLP" vs „ATR w Night Turbo" to EXP-07 i EXP-08). Podobieństwo
+**sygnatur technicznych** rozdziela czysto: wszystkie pary ≥ 0.60 to duplikaty, najbliższy
+fałszywy kandydat 0.571.
+
+**Wdrożone:**
+- `pamiec_sesji.czy_duplikaty()` — trzy sita: tytuł znormalizowany → Jaccard sygnatur
+  technicznych (`PROG_PODOBIENSTWA=0.60`, `MIN_TOKENOW_SYGNATURY=2`) → worek rdzeni tytułu
+  (dla lekcji prozatorskich bez identyfikatorów, np. „True Range").
+- `pamiec_sesji.duplikat_lekcji()` / `sygnatura_lekcji()` — API dedupu.
+- `auto_lekcja.py` — używa dedupu semantycznego; marker **wersjonowany**, kluczowany
+  **haszem treści kroniki** (`auto_lekcja_przetworzone.txt`), ze zgodnością wstecz.
+- Jednorazowe scalenie: **71 → 60 lekcji** (11 duplikatów), zero fałszywych scaleń.
+- 12 nowych testów, w tym Reguła Test-Granic: Jaccard dokładnie == próg, sygnatura
+  1-tokenowa, dwa puste zbiory, i test negatywny „nie scalaj EXP-07 z EXP-08".
+
+**Świadomie zachowawczy:** przy ubogiej sygnaturze dedup milczy. Fałszywe scalenie kasuje
+wiedzę bezpowrotnie; fałszywy duplikat kosztuje kilka linii pliku.
+
+**Adversarial samo-recenzja przed pushem złapała 4 bugi w pierwszej wersji tej naprawy**
+(rozkaz stały — nie czekamy, aż znajdzie je cubic):
+1. **Kolejność alternatyw w regexie:** `[A-Z]{2,}` szło przed `[A-Z]+-\d+`, więc „EXP-07"
+   tokenizowało się jako „EXP" + osierocone „07". Osierocone liczby zawyżały Jaccarda:
+   „EXP-07 ATR 14" vs „EXP-07 RSI 14" dawało dokładnie 0.60 → scalenie dwóch RÓŻNYCH bugów.
+2. **Negacja jako stopword:** „nie" było w `_SLOWA_PUSTE`, więc sito 3 uznawało „Numba
+   przyspiesza" i „Numba NIE przyspiesza" za tę samą lekcję — lekcja obalająca poprzednią
+   byłaby odrzucona. Negacja to treść, nie szum.
+3. **Sygnatura czysto liczbowa:** `\d{2,}` łapie daty i progi, więc {14, 30} vs {14, 30}
+   dawało Jaccard 1.0. Wymagany ≥ 1 token z literą (`_sygnatura_rozstrzygajaca`).
+4. **Dwa puste tytuły** były „duplikatem" (`"" == ""`).
+
+Obie klasy 1–2 dopisane do **Księgi Wad Kodu** (5 → 7 wzorców), żeby skaner łapał je sam.
+
+**Znane ograniczenie (Prawo I — nie udajemy, że go nie ma):** sygnatura widzi identyfikatory,
+nie kierunek wniosku. „ATR_MULT za niski" i „ATR_MULT za wysoki" mają tę samą sygnaturę.
+Dlatego `auto_lekcja` **loguje każdy pominięty tytuł** na stderr — pominięcie jest widoczne,
+nie ciche. Lekcja obalająca poprzednią wymaga `aktualizuj_lekcje()`, nie dopisania obok.
+
+**Pliki:** `imperium/biblioteki/pamiec_sesji.py`, `narzedzia/auto_lekcja.py`,
+`tests/test_pamiec_sesji.py`, `docs/PAMIEC_SESJI.md`, `.gitignore`,
+`bibliotheca_ulpia/dane/auto_lekcja_przetworzone.txt`
+
+---
+
 ## 2026-07-06 | 🔬 | WALIDACJA TRIADY na realnych danych + 🚨 ALARM PRAWA XV
 
 Uruchomiono **pełną triadę pomiaru skilla** na moich danych (15 par Binance 4h, 36 346

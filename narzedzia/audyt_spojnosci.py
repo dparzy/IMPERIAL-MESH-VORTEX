@@ -730,8 +730,14 @@ def _warstwa_12_zywotnosc_glosu(neurony):
                 f"scenariuszach: {sorted(regresje)}. Podłącz dane lub wycisz (DOSTEPNY=False)."
             )
         if znane:
-            powody = ", ".join(f"{k}:{NEURONY_ZALEZNE_OD_ADAPTEROW[k]}" for k in sorted(znane))
-            info.append(f"⚠️ Prawo XV — czekają na adaptery ({len(znane)}): {powody}")
+            # Na starcie: liczba + KLUCZE (zwięźle). Pełne powody (dla każdego neuronu, po co
+            # mu jaki adapter) drukuje `--luki` — powtarzanie ich co sesję ważyło 2.5 KB, a nie
+            # zmieniają się między sesjami. Alarm pozostaje głośny i pełny co do liczby i kluczy.
+            klucze = ", ".join(sorted(znane))
+            info.append(
+                f"⚠️ Prawo XV — {len(znane)} modułów czeka na adaptery: {klucze}"
+                "  (powody: python narzedzia/audyt_spojnosci.py --luki)"
+            )
 
         # DOWÓD ALLOWLISTY (Prawo I): neuron adapterowy MUSI ożyć z danymi adaptera.
         by_klucz = {n.KLUCZ: n for n in neurony}
@@ -758,6 +764,13 @@ def _warstwa_12_zywotnosc_glosu(neurony):
 
 
 def main():
+    if "--luki" in sys.argv:
+        # Pełne powody Prawa XV: dla każdego neuronu adapterowego — jaki adapter/dane go ożywią.
+        print("⚠️ Prawo XV — moduły czekające na adaptery (pełne powody):")
+        for k in sorted(NEURONY_ZALEZNE_OD_ADAPTEROW):
+            print(f"   • {k}: {NEURONY_ZALEZNE_OD_ADAPTEROW[k]}")
+        sys.exit(0)
+
     cichy = "--cichy" in sys.argv
     bledy, info = audyt()
 

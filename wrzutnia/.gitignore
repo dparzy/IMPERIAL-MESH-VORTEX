@@ -1,0 +1,7 @@
+# Wrzutnia — wszystko tu jest LOKALNE (decyzja Cezara 2026-07-10).
+# Git widzi tylko ten plik i README — reszta zostaje na Twojej maszynie, żeby
+# wrzucane pliki (PDF, zrzuty, CSV, archiwa, notatki robocze) NIGDY nie brudziły
+# drzewa i nie blokowały auto-pull (ta sama lekcja co dane/ i raporty/).
+*
+!.gitignore
+!README.md

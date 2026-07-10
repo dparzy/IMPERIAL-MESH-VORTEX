@@ -74,3 +74,46 @@ def test_wzorzec_startowy_lapie_order_by_id(tmp_path):
     zasiej_startowe(tmp_path / "k.jsonl")
     k = KsiegaWadKodu(tmp_path / "k.jsonl")
     assert any(t["kat"] == "kontrakt" for t in k.skanuj('conn.execute("... ORDER BY id DESC LIMIT ?")'))
+
+
+# ── Żywotność wzorców (recenzja cubic PR #118, P2) ───────────────────────────
+# Wzorzec, który nie trafia w żaden kod, jest gorszy niż jego brak: daje złudzenie
+# ochrony. Wpis `podobienstwo` miał nadmiernie zescapowane klamry po round-tripie przez
+# JSONL (`\d\{2,\}`) i milczał. Tu trzymamy dowód, że wzorce z tej sesji żyją.
+
+_KOD_Z_WADA_PODOBIENSTWO = (
+    'def sygnatura_lekcji(tytul, tresc):\n'
+    '    tokeny = re.findall(r"\d{2,}", tytul + tresc)   # daty wchodzą do sygnatury!\n'
+)
+_KOD_NAPRAWIONY = (
+    '_WZOR_DATY = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")\n'
+    'def sygnatura_lekcji(tytul, tresc):\n'
+    '    tekst = _WZOR_DATY.sub(" ", f"{tytul} {tresc}")\n'
+    '    tokeny = _WZOR_TOKENU.findall(tekst)\n'
+)
+_KOD_Z_WADA_CACHE = (
+    'for linia in plik.read_text().splitlines():\n'
+    '    znaczniki.update(linia.split())   # hasz i ID w jednym zbiorze\n'
+)
+
+
+def test_kazdy_wzorzec_ksiegi_sie_kompiluje():
+    import re as _re
+    for w in KsiegaWadKodu().wszystkie():
+        _re.compile(w["regex"])          # re.error => test czerwony
+
+
+def test_wzorzec_podobienstwa_zyje():
+    traf = [t for t in KsiegaWadKodu().skanuj(_KOD_Z_WADA_PODOBIENSTWO)
+            if t["kat"] == "podobienstwo"]
+    assert traf, "wzorzec 'podobienstwo' martwy — nie trafia w kod, dla którego powstał"
+
+
+def test_wzorzec_podobienstwa_milczy_gdy_daty_wycinane():
+    traf = [t for t in KsiegaWadKodu().skanuj(_KOD_NAPRAWIONY) if t["kat"] == "podobienstwo"]
+    assert not traf, "fałszywy alarm na kodzie, który wycina daty przed tokenizacją"
+
+
+def test_wzorzec_cache_zyje():
+    traf = [t for t in KsiegaWadKodu().skanuj(_KOD_Z_WADA_CACHE) if t["kat"] == "cache"]
+    assert traf, "wzorzec 'cache' martwy — nie trafia w kod, dla którego powstał"

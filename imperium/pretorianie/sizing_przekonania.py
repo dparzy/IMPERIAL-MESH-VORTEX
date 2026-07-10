@@ -45,13 +45,21 @@ class SizingPrzekonania:
         return round(self.min_mnoznik + t * (1.0 - self.min_mnoznik), 4)
 
     @staticmethod
-    def kelly_frakcja(p_wygranej: float, rr: float, frakcja: float = 0.5) -> float:
+    def kelly_frakcja(p_wygranej: float, rr: float, frakcja: float = 0.5,
+                      filtr_ekonomiczny=None) -> float:
         """
         Fractional Kelly. f* = (b·p − q)/b, gdzie b=rr (Risk:Reward), p=win, q=1−p.
         Wynik przycięty do ≥0 (nie betujemy przy ujemnej przewadze) i ×frakcja
         (half-Kelly domyślnie — ochrona przed błędem estymaty p).
+
+        filtr_ekonomiczny (OPT-IN, domyślnie None = OFF — ZASADA WPIĘCIA): gdy podany
+        FiltrEkonomiczny i zawetuje zakład jako „zbyt dobry, by był prawdziwy" (market
+        price of risk), zwraca 0.0 — Kelly nie policzy stawki z niewiarygodnych p/RR.
+        Bez filtra zachowanie IDENTYCZNE jak dawniej (domyślne zachowanie niezmienione).
         """
         if rr <= 0:
+            return 0.0
+        if filtr_ekonomiczny is not None and not filtr_ekonomiczny.ocen(p_wygranej, rr).dozwolone:
             return 0.0
         p = max(0.0, min(1.0, p_wygranej))
         q = 1.0 - p

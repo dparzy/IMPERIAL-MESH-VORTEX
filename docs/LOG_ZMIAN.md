@@ -6,6 +6,35 @@
 
 ---
 
+## 2026-07-11 | 📖 | KATALOG METADANYCH KSIĄG — calibre jako backend (nie MCP)
+
+Rozbudowa Bibliotheki Ulpia. Cezar wybrał: calibre jako NARZĘDZIE zaplecza karmiące istniejący
+RAG, nie serwer MCP (ZASADA MCP — MCP wchodzi tylko gdy dokłada NOWĄ zdolność; własny RAG już
+szuka w treści, dodawanie calibre MCP byłoby redundancją).
+
+**Luka (Prawo XVI, zmierzona):** RAG indeksuje TREŚĆ (FTS), ale metadane książki to dziś tylko
+`tytul` z nazwy pliku. Brak autora, tagów, języka, roku, ISBN, wydawcy, serii. `ebook-convert`
+już był fallbackiem konwersji w `ekstraktor.py` — więc konwersja pokryta; luką były METADANE.
+
+**Wdrożone:**
+- `narzedzia/rag/metadane_ksiag.py` — buduje `bibliotheca_ulpia/dane/katalog_ksiag.json`.
+  Dwa poziomy (graceful, jak abstynencja Prawa XV): (1) ZAWSZE parsowanie nazwy
+  `BIB-NNN_Autor_Tytul`; (2) GDY calibre obecny — `ebook-meta` dokłada tagi/język/rok/ISBN.
+  Bez calibre katalog nadal powstaje (uboższy). Pasek postępu na stderr (Prawo XXIV).
+- Katalog zbudowany TERAZ (fallback nazw, calibre brak w chmurze): **69 książek**
+  (epub 45, pdf 10, azw3 7, djvu 5, mobi 2). Na laptopie z calibre — wzbogaci się metadanymi.
+- `bibliotheca_ulpia/README.md` — naprawiony nieaktualny stan „42 książki" → 69 + opis katalogu.
+- `tests/test_metadane_ksiag.py` — 9 testów: parsowanie nazw (granice: niestandardowa nazwa),
+  parser `ebook-meta` (mapowanie kluczy, pomijanie „Unknown", „ : " w wartości, pusty).
+
+**Status:** działa dziś (fallback nazw). Na laptopie z calibre `python -m narzedzia.rag.metadane_ksiag`
+odświeży katalog z pełnymi metadanymi. Zero zmian w `.mcp.json` (config startowy = decyzja Cezara).
+
+**Pliki:** `narzedzia/rag/metadane_ksiag.py`, `bibliotheca_ulpia/dane/katalog_ksiag.json`,
+`bibliotheca_ulpia/README.md`, `tests/test_metadane_ksiag.py`
+
+---
+
 ## 2026-07-10 | 🛡️ | FILTR EKONOMICZNY (ECON) — brama „zbyt dobre, by było prawdziwe"
 
 Pierwsza realizacja z listy nowości wrzutni (`ANALIZA_WRZUTNIA_2026-07-10.md`, poz. C1 ARTEMIS).

@@ -101,3 +101,19 @@ def test_skroc_maks_ponizej_dwoch_nie_wybucha():
     assert dn._skroc("abcdef", 0).endswith("…")
     assert dn._skroc("abcdef", 1).endswith("…")
     assert len(dn._skroc("abcdef", 0)) == 2      # podniesione do minimum 2
+
+
+def test_skroc_toleruje_nie_string():
+    """Recenzja cubic PR #118: stary/uszkodzony wpis JSONL może mieć pierwszy punkt „co"
+    jako liczbę/None/listę — _skroc koercuje przez str(), nie wywala startu sesji."""
+    assert dn._skroc(123, 110) == "123"
+    assert dn._skroc(None, 110) == "None"
+    assert dn._skroc(["x"], 110) == "['x']"
+
+
+def test_os_czasu_toleruje_co_nie_string():
+    """os_czasu nie może paść, gdy pierwszy punkt „co" w jednolinijkowcu nie jest tekstem."""
+    wpisy = [{"data": "2026-06-01", "sesja": "zla", "co": [42], "nastepny": ""}]
+    wpisy += [_wpis(i) for i in range(8)]
+    out = dn.os_czasu(_plik(wpisy), ostatnie=8)
+    assert "42" in out          # liczba pokazana jako tekst, bez wyjątku

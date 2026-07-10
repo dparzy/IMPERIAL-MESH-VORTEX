@@ -53,10 +53,17 @@ fi
 
 # 3) CENTRUM PAMIĘCI (W-360 v5) — scored TOP-k lekcji (Generative Agents: recency×importance×relevance)
 #    + profil Cezara + alarm przepełnienia + cross-layer search. Zastępuje proste "ostatnie 3".
+# CENTRUM_OK=1 tylko gdy centrum_pamieci start faktycznie wydrukował podsumowanie
+# (w tym statystyki kroniki „X sesji, Y MB"). Na ścieżce awaryjnej (centrum pada → pamiec_sesji
+# start) statystyk kroniki NIE ma — dlatego niżej dodrukowuje je kronika_czatu (recenzja cubic).
+CENTRUM_OK=0
 if [ -f imperium/biblioteki/centrum_pamieci.py ]; then
   echo "[hook] CENTRUM PAMIĘCI (W-360 v5):"
-  python -m imperium.biblioteki.centrum_pamieci start || \
+  if python -m imperium.biblioteki.centrum_pamieci start; then
+    CENTRUM_OK=1
+  else
     python -m imperium.biblioteki.pamiec_sesji start || true
+  fi
 else
   # Fallback: stara warstwa W3 (gdy centrum jeszcze niedostępne)
   if [ -f imperium/biblioteki/pamiec_sesji.py ]; then
@@ -69,10 +76,12 @@ fi
 #    czat przetrwał kompakcję i wygaśnięcie kontenera chmury (commit niesie historię).
 if [ -f imperium/biblioteki/kronika_czatu.py ]; then
   echo "[hook] KRONIKA CZATU (W-360):"
-  # Tylko eksport tej sesji (raportuje, co dopisał). Statystyki „X sesji, Y MB" drukuje już
-  # `centrum_pamieci start` — osobne `kronika_czatu statystyki` dawało trzeci, zdublowany
-  # wydruk kroniki na starcie (z lekko innymi liczbami: 6.8 vs 6.79 MB). Usunięte.
+  # Eksport tej sesji (raportuje, co dopisał). Statystyki „X sesji, Y MB" drukuje już
+  # `centrum_pamieci start` na ścieżce głównej — osobne `statystyki` dawało trzeci, zdublowany
+  # wydruk. Ale gdy centrum PADŁO (CENTRUM_OK=0), statystyk nikt nie wydrukował → dodrukowujemy
+  # je TUTAJ, żeby nie zginęły na ścieżce awaryjnej (recenzja cubic PR #118).
   python -m imperium.biblioteki.kronika_czatu eksportuj || true
+  [ "$CENTRUM_OK" = "1" ] || python -m imperium.biblioteki.kronika_czatu statystyki || true
 fi
 
 # 5) AUTO-LEKCJA (W-360 v5 — Opcja C) — DeepSeek ekstrahuje lekcje/wizje/decyzje

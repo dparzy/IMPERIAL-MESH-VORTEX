@@ -59,10 +59,17 @@ def _dzis() -> str:
     return date.today().isoformat()
 
 
-def _skroc(tekst: str, maks: int) -> str:
-    """Przytnij do `maks` znaków z wielokropkiem. Krótkie zwraca bez zmian."""
+def _skroc(tekst, maks: int) -> str:
+    """
+    Przytnij do `maks` znaków z wielokropkiem. Krótkie zwraca bez zmian.
+
+    `str(tekst)` na wejściu (recenzja cubic PR #118): stare/uszkodzone wpisy JSONL mogą mieć
+    pierwszy punkt „co" jako liczbę, None lub listę zamiast tekstu — wcześniejsze
+    interpolowanie w f-string tolerowało to, `.split()` już nie. Formatowanie ma być odporne
+    na brudne dane, nie wywalać startu sesji.
+    """
     maks = max(maks, 2)                       # strażnica: maks<2 dałby [:maks-1] == [:-1] (bug)
-    tekst = " ".join(tekst.split())           # zwiń białe znaki (nowe linie → spacja)
+    tekst = " ".join(str(tekst).split())      # koercja + zwinięcie białych znaków
     return tekst if len(tekst) <= maks else tekst[:maks - 1].rstrip() + "…"
 
 

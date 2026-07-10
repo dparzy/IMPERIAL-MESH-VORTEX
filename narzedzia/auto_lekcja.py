@@ -29,6 +29,7 @@ Użycie:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -40,7 +41,15 @@ sys.path.insert(0, str(ROOT))
 
 KRONIKA_DIR = ROOT / "bibliotheca_ulpia" / "dane" / "kronika"
 WIZJE_PLIK = ROOT / "bibliotheca_ulpia" / "dane" / "wizje_i_decyzje.jsonl"
-PRZETWORZONE_PLIK = ROOT / "bibliotheca_ulpia" / "dane" / ".auto_lekcja_przetworzone.txt"
+
+# Marker przetworzonych kronik — WERSJONOWANY (był w .gitignore i per-maszyna, przez co ta
+# sama kronika była ekstrahowana ponownie na każdym komputerze: tu 14 z 102 sesji oznaczonych,
+# na laptopie 0 → DeepSeek generował kolejną parafrazę tej samej lekcji. Źródło duplikatów,
+# recenzja cubic PR #118). Klucz = HASZ TREŚCI kroniki, nie ID sesji: kronika dopisana po
+# przetworzeniu zmienia hasz i zostanie doczytana, a niezmieniona nigdy nie kosztuje tokenów.
+PRZETWORZONE_PLIK = ROOT / "bibliotheca_ulpia" / "dane" / "auto_lekcja_przetworzone.txt"
+# Stary marker (per-maszyna, ID sesji) — czytany dla zgodności wstecz, nigdy nie zapisywany.
+STARY_MARKER = ROOT / "bibliotheca_ulpia" / "dane" / ".auto_lekcja_przetworzone.txt"
 
 _SYSTEM_PROMPT = """Jesteś analitykiem pamięci dla systemu tradingowego IMPERIAL-MESH-VORTEX.
 Twoje zadanie: przeanalizuj poniższą kronikę sesji (dialog Cezara z Claude)
@@ -69,16 +78,40 @@ NIE zwracaj żadnego tekstu poza JSON. Odpowiedź = czysty JSON array."""
 _MAX_KRONIKA_ZNAKOW = 8000   # ucinamy długie kroniki by nie przepalać tokenów
 
 
+def _klucz_kroniki(plik: Path) -> str:
+    """Hasz treści kroniki (12 znaków sha1) — stabilny między maszynami i klonami repo."""
+    return hashlib.sha1(plik.read_bytes()).hexdigest()[:12]
+
+
 def _wczytaj_przetworzone() -> set:
-    if not PRZETWORZONE_PLIK.exists():
-        return set()
-    return set(PRZETWORZONE_PLIK.read_text(encoding="utf-8").splitlines())
+    """
+    Zbiór znaczników przetworzonych kronik: hasze treści ORAZ (zgodność wstecz) stare ID sesji.
+    Trzymamy oba w jednym zbiorze — sprawdzenie i tak jest po przynależności.
+    """
+    znaczniki: set = set()
+    for plik in (PRZETWORZONE_PLIK, STARY_MARKER):
+        if not plik.exists():
+            continue
+        for linia in plik.read_text(encoding="utf-8").splitlines():
+            linia = linia.strip()
+            if not linia or linia.startswith("#"):
+                continue
+            # Nowy format: "<hasz>  <sesja_id>"; stary: samo "<sesja_id>".
+            znaczniki.update(linia.split())
+    return znaczniki
 
 
-def _zapisz_przetworzona(sesja_id: str) -> None:
+def _zapisz_przetworzona(sesja_id: str, hasz: str) -> None:
     PRZETWORZONE_PLIK.parent.mkdir(parents=True, exist_ok=True)
+    if not PRZETWORZONE_PLIK.exists():
+        PRZETWORZONE_PLIK.write_text(
+            "# Kroniki przetworzone przez auto_lekcja (hasz treści + ID sesji).\n"
+            "# Wersjonowany świadomie: bez tego ta sama kronika jest ekstrahowana\n"
+            "# na każdej maszynie od nowa, produkując parafrazy tych samych lekcji.\n",
+            encoding="utf-8",
+        )
     with PRZETWORZONE_PLIK.open("a", encoding="utf-8") as f:
-        f.write(sesja_id + "\n")
+        f.write(f"{hasz}  {sesja_id}\n")
 
 
 def _czytaj_kronika(plik: Path) -> str:
@@ -123,8 +156,16 @@ def _zapisz_wyniki(wyniki: List[Dict[str, Any]], data_sesji: str) -> int:
             continue
 
         if typ == "LEKCJA":
-            # Dedup (naprawa L6): nie dopisuj lekcji o tytule, który już istnieje.
-            if _ps.szukaj(tytul):
+            # Dedup SEMANTYCZNY: DeepSeek parafrazuje tytuł przy każdym przebiegu, więc
+            # porównanie napisów przepuszczało 4 kopie tej samej lekcji (recenzja cubic
+            # PR #118). Porównujemy sygnatury techniczne — patrz pamiec_sesji.duplikat_lekcji.
+            istniejaca = _ps.duplikat_lekcji(tytul, tresc)
+            if istniejaca is not None:
+                # Pominięcie MUSI być widoczne: sygnatura nie odróżnia „za niski" od „za
+                # wysoki", więc lekcja obalająca poprzednią też trafi tutaj. Cichy `continue`
+                # kasowałby ją bez śladu (Prawo XV — utrata potencjału).
+                print(f"  [auto_lekcja] ⏭️  duplikat: {tytul!r} ≈ {istniejaca['tytul']!r}",
+                      file=sys.stderr)
                 continue
             _ps.dopisz_lekcje(tytul, tresc, data=data_sesji)
         elif typ in ("WIZJA", "DECYZJA", "POMYSŁ", "ZMIANA"):
@@ -167,8 +208,10 @@ def przetworz_sesje(sesja_id: str, podglad: bool = False) -> int:
         return len(wyniki)
 
     zapisane = _zapisz_wyniki(wyniki, data_str)
-    _zapisz_przetworzona(sesja_id)
-    print(f"  [auto_lekcja] ✅ Zapisano {zapisane} elementów z sesji {sesja_id[:12]}")
+    _zapisz_przetworzona(sesja_id, _klucz_kroniki(plik))
+    pominiete = len(wyniki) - zapisane
+    ogon = f" (pominięto {pominiete} duplikatów)" if pominiete else ""
+    print(f"  [auto_lekcja] ✅ Zapisano {zapisane} elementów z sesji {sesja_id[:12]}{ogon}")
     return zapisane
 
 
@@ -188,7 +231,8 @@ def przetworz_nowe(maks_sesji: int = 3, podglad: bool = False) -> Dict[str, int]
     wynik = {"przetworzone": 0, "lacznie_wpisow": 0}
     for plik in sesje:
         sesja_id = plik.stem.replace("sesja_", "")
-        if sesja_id in przetworzone_juz:
+        # Hasz łapie kronikę przetworzoną na INNEJ maszynie; ID — wpisy ze starego markera.
+        if _klucz_kroniki(plik) in przetworzone_juz or sesja_id in przetworzone_juz:
             continue
         n = przetworz_sesje(sesja_id, podglad=podglad)
         wynik["lacznie_wpisow"] += n

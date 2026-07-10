@@ -6,6 +6,67 @@
 
 ---
 
+## 2026-07-10 | 🧠 | DEDUP SEMANTYCZNY LEKCJI — koniec czterech kopii tej samej wiedzy
+
+**Powód:** recenzja cubic na PR #118 wykryła, że `docs/PAMIEC_SESJI.md` puchnie od
+duplikatów (4× „Lookahead bias w SMC Engine", 4× „HA bez repainting", 3× „ATR_MULT w EXP-07",
+3× „True Range"). Napuchnięty plik wstrzykuje się w kontekst KAŻDEJ sesji — utrata tokenów
+i fałszywy sygnał ważności (Prawo XV).
+
+**Diagnoza (dwie przyczyny, obie potwierdzone pomiarem):**
+1. Dedup w `auto_lekcja.py` porównywał **dokładny podciąg tytułu** (`szukaj(tytul)`).
+   DeepSeek ekstrahuje z `temperatura=0.3` → za każdym przebiegiem inna parafraza.
+   „Martwy głos ATR_MULT w EXP-07" vs „Dead voice bug: ATR_MULT w EXP-07" — żaden nie jest
+   podciągiem drugiego, duplikat przechodził.
+2. Marker przetworzonych kronik (`.auto_lekcja_przetworzone.txt`) był **w `.gitignore`**,
+   czyli per-maszyna: 13 z 102 kronik oznaczonych tutaj, 0 na laptopie → ta sama kronika
+   ekstrahowana wielokrotnie, za każdym razem nową parafrazą.
+
+**Pomiar (Prawo XVI — redundancja mierzona, nie zgadywana), 71 realnych lekcji:**
+podobieństwo NAPISÓW nie rozdziela klas (prawdziwy duplikat 0.642 **poniżej** pary różnych
+lekcji 0.667: „ATR_MULT w TLP" vs „ATR w Night Turbo" to EXP-07 i EXP-08). Podobieństwo
+**sygnatur technicznych** rozdziela czysto: wszystkie pary ≥ 0.60 to duplikaty, najbliższy
+fałszywy kandydat 0.571.
+
+**Wdrożone:**
+- `pamiec_sesji.czy_duplikaty()` — trzy sita: tytuł znormalizowany → Jaccard sygnatur
+  technicznych (`PROG_PODOBIENSTWA=0.60`, `MIN_TOKENOW_SYGNATURY=2`) → worek rdzeni tytułu
+  (dla lekcji prozatorskich bez identyfikatorów, np. „True Range").
+- `pamiec_sesji.duplikat_lekcji()` / `sygnatura_lekcji()` — API dedupu.
+- `auto_lekcja.py` — używa dedupu semantycznego; marker **wersjonowany**, kluczowany
+  **haszem treści kroniki** (`auto_lekcja_przetworzone.txt`), ze zgodnością wstecz.
+- Jednorazowe scalenie: **71 → 60 lekcji** (11 duplikatów), zero fałszywych scaleń.
+- 12 nowych testów, w tym Reguła Test-Granic: Jaccard dokładnie == próg, sygnatura
+  1-tokenowa, dwa puste zbiory, i test negatywny „nie scalaj EXP-07 z EXP-08".
+
+**Świadomie zachowawczy:** przy ubogiej sygnaturze dedup milczy. Fałszywe scalenie kasuje
+wiedzę bezpowrotnie; fałszywy duplikat kosztuje kilka linii pliku.
+
+**Adversarial samo-recenzja przed pushem złapała 4 bugi w pierwszej wersji tej naprawy**
+(rozkaz stały — nie czekamy, aż znajdzie je cubic):
+1. **Kolejność alternatyw w regexie:** `[A-Z]{2,}` szło przed `[A-Z]+-\d+`, więc „EXP-07"
+   tokenizowało się jako „EXP" + osierocone „07". Osierocone liczby zawyżały Jaccarda:
+   „EXP-07 ATR 14" vs „EXP-07 RSI 14" dawało dokładnie 0.60 → scalenie dwóch RÓŻNYCH bugów.
+2. **Negacja jako stopword:** „nie" było w `_SLOWA_PUSTE`, więc sito 3 uznawało „Numba
+   przyspiesza" i „Numba NIE przyspiesza" za tę samą lekcję — lekcja obalająca poprzednią
+   byłaby odrzucona. Negacja to treść, nie szum.
+3. **Sygnatura czysto liczbowa:** `\d{2,}` łapie daty i progi, więc {14, 30} vs {14, 30}
+   dawało Jaccard 1.0. Wymagany ≥ 1 token z literą (`_sygnatura_rozstrzygajaca`).
+4. **Dwa puste tytuły** były „duplikatem" (`"" == ""`).
+
+Obie klasy 1–2 dopisane do **Księgi Wad Kodu** (5 → 7 wzorców), żeby skaner łapał je sam.
+
+**Znane ograniczenie (Prawo I — nie udajemy, że go nie ma):** sygnatura widzi identyfikatory,
+nie kierunek wniosku. „ATR_MULT za niski" i „ATR_MULT za wysoki" mają tę samą sygnaturę.
+Dlatego `auto_lekcja` **loguje każdy pominięty tytuł** na stderr — pominięcie jest widoczne,
+nie ciche. Lekcja obalająca poprzednią wymaga `aktualizuj_lekcje()`, nie dopisania obok.
+
+**Pliki:** `imperium/biblioteki/pamiec_sesji.py`, `narzedzia/auto_lekcja.py`,
+`tests/test_pamiec_sesji.py`, `docs/PAMIEC_SESJI.md`, `.gitignore`,
+`bibliotheca_ulpia/dane/auto_lekcja_przetworzone.txt`
+
+---
+
 ## 2026-07-06 | 🔬 | WALIDACJA TRIADY na realnych danych + 🚨 ALARM PRAWA XV
 
 Uruchomiono **pełną triadę pomiaru skilla** na moich danych (15 par Binance 4h, 36 346

@@ -122,12 +122,6 @@ Zweryfikowano na BTC/ETH 1D (3192 bary) i 1H (76k barów) z CryptoDataDownload. 
 ### 2026-06-30 — Pewnosc_agregatu ≈1.0 to źródło strat
 Pewnosc_agregatu zawsze ≈1.0, co prowadzi do maksymalnego lewara i ciasnych stopów, generując wiele małych strat. Zidentyfikowano jako root cause wszystkich strat systemu.
 
-### 2026-06-30 — Lookahead bias w oryginalnym SMC Engine
-Oryginalny SMC Engine używał .shift(-1)/.shift(-2) - patched w EXP-09 przez ograniczenie do bary[start:n] (tylko przeszłość).
-
-### 2026-06-30 — Heiken Ashi bez repainting - rekurencyjna definicja
-HA_Open[i] = (HA_Open[i-1] + HA_Close[i-1]) / 2, a nie (Open[-1]+Close[-1])/2. To eliminuje lookahead bias.
-
 ### 2026-06-30 — Kanoniczna liczba neuronów: 299
 299 unikalnych kluczy z KATALOG_NEURONOW.md, a nie 261/303/306/328 (stare estymaty). 27 zaimplementowanych w kodzie.
 
@@ -136,15 +130,6 @@ Oryginalny Atmabhan ma nierealistyczne wyniki z powodu lookahead bias. Wdrożono
 
 ### 2026-06-30 — Martwy głos ATR_MULT w EXP-07
 EXP-07 miał ATR_MULT=1.5 ale ATR nie był używany w logice. Poprawiono na ATR_MULT=0.15 i faktyczne użycie ATR.
-
-### 2026-06-30 — Lookahead bias w SMC Engine - poprawiony
-Oryginalny SMC Engine używał .shift(-1)/.shift(-2) - patched w EXP-09. Używamy tylko bary[start:n] (przeszłość).
-
-### 2026-06-30 — True Range - poprawna definicja
-True Range = max(H-L, |H-prevC|, |L-prevC|). Poprawiono we wszystkich adoptowanych wskaźnikach.
-
-### 2026-06-30 — Heiken Ashi bez repainting - rekurencyjny HA_Open
-HA_Open[i] = (HA_Open[i-1] + HA_Close[i-1]) / 2, a nie (Open[-1]+Close[-1])/2. To eliminuje lookahead bias.
 
 ### 2026-06-30 — Bug: testy miały hardcoded 46 neuronów po dodaniu 47.
 Po dodaniu H-01 testy integracyjne zawierały stałą 46. Naprawiono na 47 w dwóch miejscach. Lekcja: używać len(rejestr.wszystkie_neurony()) zamiast stałych.
@@ -194,20 +179,8 @@ Accelerator Oscillator miał zbędne +1 w warmupie (slow+sma_ac+1). Usunięto na
 ### 2026-06-30 — Błąd warmupu Ulcer Index
 Ulcer Index wymagał period+1 zamiast period. Poprawiono na c[-period:] co wymaga tylko period próbek.
 
-### 2026-06-30 — Ustalono kanoniczną liczbę neuronów: 299
-Kanoniczna liczba neuronów to 299 (unikalne klucze z KATALOG_NEURONOW.md), a nie 261/303/306/328 (stare estymaty).
-
-### 2026-06-30 — Dead voice bug: ATR_MULT w EXP-07
-EXP-07 (TLP) miał ATR_MULT=1.5 w kodzie zamiast 0.15 z dokumentacji — martwy głos naprawiony.
-
 ### 2026-06-30 — Cross jako EVENT w EXP-11
 Cross jako EVENT a nie STATE: EXP-11 sygnalizuje tylko przy świeżym przecięciu, nie na każdym barze gdzie fast>slow.
-
-### 2026-06-30 — Lookahead bias w SMC Engine (EXP-09) naprawiony
-EXP-09 (LiquiditySweep) oryginalnie używał .shift(-1)/.shift(-2) — lookahead bias. Naprawiono: tylko bary[start:n] (przeszłość).
-
-### 2026-06-30 — Poprawiona definicja True Range
-True Range = max(H-L, |H-prevC|, |L-prevC|) — poprawiono we wszystkich adoptowanych wskaźnikach.
 
 ### 2026-06-30 — HA bez repainting: rekurencyjny HA_Open
 Heiken Ashi bez repainting wymaga HA_Open[i] = (HA_Open[i-1] + HA_Close[i-1]) / 2, a nie (Open[-1]+Close[-1])/2. Zaimplementowano w _dodaj_ha().
@@ -233,9 +206,6 @@ Brama nie dostarczała poprzednich wartości (RSI_PREV, EMA_PREV, MACD_HIST_PREV
 ### 2026-06-30 — Zombie neurons zwracają NEUTRAL gdy Brama nie dostarcza kluczy
 Neurony z DOSTEPNY=False zawsze zwracały NEUTRAL, maskując brak integracji. Wykryto przez Prawo XV. Naprawiono: Roj.zbierz_sygnaly() pomija DOSTEPNY=False, dodano POWOD_NIEDOSTEPNOSCI.
 
-### 2026-06-30 — Martwy głos ATR_MULT w TLP
-EXP-07 miał ATR_MULT=1.5 ale wartość była nieużywana. Poprawiono na 0.15 i faktycznie użyto w logice breakout.
-
 ### 2026-06-30 — Martwy głos ATR w Night Turbo
 Oryginalny Night Turbo miał ATR zdefiniowany ale nieużywany. Poprawiono: PROG_ATR_MULT = 0.5 faktycznie używa ATR.
 
@@ -247,9 +217,6 @@ EXP-11 sygnalizuje tylko przy świeżym przecięciu (fast>slow AND prev_fast<=pr
 
 ### 2026-06-30 — True Range: poprawna definicja
 True Range = max(H-L, |H-prevC|, |L-prevC|). Poprawiono we wszystkich adoptowanych wskaźnikach (EXP-06..12).
-
-### 2026-06-30 — HA bez repainting: rekurencyjna definicja
-Heiken Ashi Open[i] = (HA_Open[i-1] + HA_Close[i-1]) / 2, a nie (Open[-1]+Close[-1])/2. Poprawiono w BudowniczyWskaznikow._dodaj_ha().
 
 ### 2026-06-30 — Prawo I: Zero halucynacji matematycznych
 AI nigdy nie oblicza matematyki. Kod (TA-Lib, C) oblicza RSI/EMA/ATR → JSON 'answer key' → AI tylko interpretuje. Brama Kalkulatora nie uruchomi się bez TA-Lib.

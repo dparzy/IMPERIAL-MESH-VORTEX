@@ -1,0 +1,16 @@
+# Kroniki przetworzone przez auto_lekcja (hasz treści + ID sesji).
+# Wersjonowany świadomie: bez tego ta sama kronika jest ekstrahowana
+# na każdej maszynie od nowa, produkując parafrazy tych samych lekcji.
+629441d5b5e6  e88580e4-6ba0-4034-baca-0f500198f3d9
+2cff5f31ffe6  e912df43-2a0e-470e-a6ab-76b2ab161614
+99e908be6e2a  e9e0bdf6-49ef-4bcc-bceb-918cc5b57de8
+ab1c96595f48  ea782e9c-84f3-443e-8878-b8747d2a2fee
+55e859d27e3f  ee8781f8-c2a2-4d1f-bf46-ff0f88bee02a
+cb6e14c7c266  ee889bdc-7162-4578-8041-614a51516246
+ca7ddc8af087  f2f6cac6-bbc1-434d-b214-1cf07ac62d84
+58130cb50ee8  f48bef67-7908-47c0-b14d-e8927dcdfa63
+b92e1b095189  f7c8a923-9395-416f-a336-e443f01a3a87
+e060f6994660  f87b07f0-c136-4cca-9630-6abab8b1e7ac
+73343ef92372  fb81527a-2fea-49aa-9d06-d73935cd425a
+4404946de16b  fd6387a9-ec9c-4658-bfce-60df3621a5d3
+03e7a910d2be  fec79bb1-9c89-400a-8eb3-377ec9239f25

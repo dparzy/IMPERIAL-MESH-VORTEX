@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-07-10 | 🌿 | PUSH NA KOMENDĘ — hook końca sesji przestaje pushować
+
+**Powód (decyzja Cezara):** hook `SessionEnd` commitował **i pushował** pamięć po każdej
+sesji. Efekt: historia w chmurze utonęła w commitach „auto: sync pamięci sesji" (30+ na
+gałęzi), a start na drugiej maszynie wymuszał rebase. Dziś sesja wystartowała 30 commitów
+za remote i push się odbił — to był objaw tej właśnie polityki.
+
+**Wdrożone:**
+- `.claude/hooks/session-end.sh` — commituje pamięć LOKALNIE, **nie pushuje**;
+  informuje ile commitów czeka na wypchnięcie.
+- `narzedzia/synchronizuj.sh` — świadomy push. Domyślnie PODGLĄD (nic nie zmienia);
+  `--push` skleja commity pamięci w jeden i wypycha.
+- `CLAUDE.md` § Tryb autonomiczny pkt 4: „Auto-push" → „Push na komendę".
+
+**Zasada bezpieczeństwa (zweryfikowana w izolowanym repo, 4 scenariusze):**
+sklejamy **wyłącznie** gdy KAŻDY commit czekający na push jest commitem pamięci. Gdy
+w kolejce jest choć jeden commit merytoryczny — historia NIE jest przepisywana (SHA
+zachowane, potwierdzone testem). Odmowa przy brudnym drzewie i przy zdalnej wyprzedzającej
+gałąź (HEAD nietknięty).
+
+**Nie zmieniamy:** auto-commit (Prawo XVIII, zero kosztu) i auto-pull na starcie sesji.
+
+**Pliki:** `.claude/hooks/session-end.sh`, `narzedzia/synchronizuj.sh`, `CLAUDE.md`
+
+---
+
 ## 2026-07-10 | 🧠 | DEDUP SEMANTYCZNY LEKCJI — koniec czterech kopii tej samej wiedzy
 
 **Powód:** recenzja cubic na PR #118 wykryła, że `docs/PAMIEC_SESJI.md` puchnie od

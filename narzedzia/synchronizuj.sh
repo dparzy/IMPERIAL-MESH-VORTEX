@@ -101,7 +101,12 @@ if git diff --name-only '@{upstream}..HEAD' | grep -q '\.py$'; then
     exit 1
   fi
   echo "   ✓ audyt spójności exit 0"
-  python narzedzia/skan_wad_kodu.py 2>/dev/null | tail -1
+  # Skan wad jest ŚWIADOMIE NIEBLOKUJĄCY (recenzja cubic PR #118 wytknęła niespójność —
+  # wyjaśniamy ją zamiast udawać). To heurystyka: sam nazywa trafienia „NUDGE — sprawdź,
+  # nie pewnik", więc może dać fałszywy alarm i nie może wstrzymywać pushu. Testy i audyt
+  # są deterministyczne, dlatego one blokują. Wynik pokazujemy w CAŁOŚCI, nie połykamy.
+  echo "   — skan wad kodu (heurystyka, nie blokuje):"
+  if python narzedzia/skan_wad_kodu.py 2>/dev/null | sed 's/^/     /'; then :; fi
   echo "   ℹ️  Adversarial /code-review na diffie pozostaje obowiązkiem Claude (rozkaz stały)."
 fi
 

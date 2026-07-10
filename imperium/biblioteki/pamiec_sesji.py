@@ -192,10 +192,14 @@ def czy_duplikaty(tytul_a: str, tresc_a: str, tytul_b: str, tresc_b: str) -> boo
     if mocna_a and mocna_b and _jaccard(sygn_a, sygn_b) >= PROG_PODOBIENSTWA:
         return True
 
-    # Sito 3 (proza) NIE MOŻE nadpisywać werdyktu sygnatur (recenzja cubic PR #118):
-    # gdy obie lekcje mają mocne, ale ROZŁĄCZNE sygnatury, mówią o różnych modułach —
-    # nawet jeśli tytuły mają ten sam worek rdzeni („Bug w EXP-07" vs „Bug w EXP-13").
-    if mocna_a and mocna_b and not (sygn_a & sygn_b):
+    # Sito 3 (proza) NIE MOŻE nadpisywać werdyktu sygnatur (recenzja cubic PR #118).
+    # Gdy OBIE lekcje wymieniają jakiekolwiek identyfikatory i nie mają ANI JEDNEGO
+    # wspólnego — mówią o różnych rzeczach, choćby tytuły miały ten sam worek rdzeni
+    # („Bug w EXP-07" vs „Bug w EXP-13"). Warunek celowo nie wymaga MOCNYCH sygnatur:
+    # pojedynczy identyfikator jest za słaby, by ORZEC tożsamość, ale w zupełności
+    # wystarcza, by ją WYKLUCZYĆ. Lekcje prozatorskie (sygnatura pusta) sito 3 obsługuje
+    # dalej normalnie — to jego jedyne zadanie.
+    if sygn_a and sygn_b and not (sygn_a & sygn_b):
         return False
 
     rdzenie_a = _rdzenie_tytulu(tytul_a)

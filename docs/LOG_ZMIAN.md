@@ -6,6 +6,43 @@
 
 ---
 
+## 2026-07-10 | 🛡️ | FILTR EKONOMICZNY (ECON) — brama „zbyt dobre, by było prawdziwe"
+
+Pierwsza realizacja z listy nowości wrzutni (`ANALIZA_WRZUTNIA_2026-07-10.md`, poz. C1 ARTEMIS).
+Wybrana bo: realna luka (brak warstwy ograniczeń ekonomicznych), deterministyczna (filozofia
+Bramy Kalkulatora, zero zależności ML), monotonicznie ostrożna (tylko wetuje → bezpieczna).
+
+**Źródło zweryfikowane (nie halucynacja):** ARTEMIS, arXiv 2603.18107 „A Neuro-Symbolic
+Framework for Economically Constrained Market Dynamics" (marzec 2026) — istnieje realnie
+(WebSearch). Realizujemy jego karę **market price of risk** (ograniczenie chwilowego Sharpe'a)
+DETERMINISTYCZNIE, bez sieci neuronowej.
+
+**Prawo XVI (redundancja MIERZONA):** planowany wariant „ekstensja w ATR" byłby redundantny
+z X-25 (`ATR_DEVIATION`). Dlatego ECON działa na INNEJ danej — ekonomii ZAKŁADU (p, RR):
+liczy Sharpe pojedynczego zakładu `edge/√var` z (p·RR−(1−p)) i wetuje, gdy > λ_max
+(„too good to be true") lub gdy edge ≤ 0 (ujemny EV). Nic w systemie tego nie sprawdzało.
+
+**Wdrożone:**
+- `imperium/pretorianie/filtr_ekonomiczny.py` — `FiltrEkonomiczny.ocen(p, rr)` → werdykt
+  (wzorzec `FiltrAsymetrii`: abstynencja przy RR≤0, tylko wetuje, czysty Python).
+- `sizing_przekonania.kelly_frakcja(..., filtr_ekonomiczny=None)` — **opt-in, domyślnie OFF**
+  (ZASADA WPIĘCIA): bez filtra zachowanie IDENTYCZNE; z filtrem zwraca 0.0 dla zawetowanego.
+- `tests/test_filtr_ekonomiczny.py` — 12 testów, Reguła Test-Granic: edge=0, Sharpe==λ_max
+  (≥ vs >), p=0/p=1, RR≤0 abstynencja, dowód że opt-in OFF nie zmienia sizingu.
+
+**Samo-recenzja złapała bug przed pushem:** dla p=0 (pewna strata) wariancja=0 uruchamiała
+gałąź „abstynencja" przed sprawdzeniem edge≤0 → pewna strata byłaby PRZEPUSZCZONA. Naprawiono
+kolejność: brak przewagi sprawdzany pierwszy.
+
+**Status:** KANDYDAT — λ_max=2.0 zachowawczy, do KALIBRACJI areną (A/B) przed włączeniem na
+sztywno (decyzja Cezara po zielonej walidacji). To nie neuron (veto ≠ głos) — filtr Pretorianów
+jak `FiltrAsymetrii`, więc liczba neuronów bez zmian (84).
+
+**Pliki:** `imperium/pretorianie/filtr_ekonomiczny.py`, `imperium/pretorianie/sizing_przekonania.py`,
+`tests/test_filtr_ekonomiczny.py`
+
+---
+
 ## 2026-07-10 | 🪶 | ODCHUDZENIE STARTU SESJI — 28,5 KB → ~15 KB (bez utraty łuku)
 
 **Powód (decyzja Cezara):** hook startowy wypluwał ~28 KB przy każdym starcie — nie mieściło

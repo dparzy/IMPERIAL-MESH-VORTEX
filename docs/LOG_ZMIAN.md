@@ -6,6 +6,40 @@
 
 ---
 
+## 2026-07-11 | 🔗 | WPIĘCIE KATALOGU KSIĄG W RAG — wzbogacenie + filtr autor/tag
+
+Dokończenie ścieżki calibre: katalog metadanych (`katalog_ksiag.json`) jako SOCZEWKA nad RAG.
+
+**Wdrożone:**
+- `narzedzia/rag/katalog.py` — łączy katalog z wynikami RAG po nazwie pliku (`zrodlo` = `plik`).
+  `wczytaj_katalog` / `opis_metadanych` / `pasuje_filtr`. Graceful: brak/uszkodzony katalog → {}.
+- `szukaj.py` — wyniki wzbogacone o autora/rok/tagi w nagłówku; nowy OPT-IN filtr `autor`/`tag`
+  (domyślnie None → zachowanie IDENTYCZNE, dowiedzione testem). Filtr nadpobiera i post-filtruje.
+- `mcp_server.py` — `biblioteka_szukaj` dostał parametry `autor`/`tag` (Claude może filtrować
+  po autorze/tagu przez MCP); opis „42 książki" → „69".
+- `tests/test_rag_katalog.py` — 12 testów, w tym integracja end-to-end filtra na syntetycznej
+  bazie z fragmentami książek (realna baza ma dziś tylko docs).
+
+**Bug złapany w samo-recenzji przed pushem:** `from narzedzia.rag import katalog` WYWALAŁ serwer
+MCP (ma na sys.path tylko `narzedzia/rag`, nie root; robi `from szukaj import`). Testy tego nie
+łapały (runner startuje z roota). Naprawiono importem odpornym na oba konteksty (try/except).
+Dodatkowo przeniesiono parsowanie żądania MCP do `try` (Księga Wad: malformed → JSON-RPC error).
+
+**Adversarial recenzja — 2 znaleziska (ograniczenia danych, nie logiki):**
+- Filtr `tag` i wzbogacenie o rok są NIEAKTYWNE na obecnym katalogu (calibre=False → 0/69 tagów;
+  autor 69/69 działa). To pułapka UX (tag → puste = wygląda na zepsute). Dodano uczciwą
+  podpowiedź na stderr: „uruchom metadane_ksiag z calibre na laptopie". Ożyje po calibre.
+- Nadpobranie zwiększone `max(topk*10,50)` → `max(topk*20,100)` (recall dla rzadkich autorów).
+
+**Status:** autor-filtr + autor-enrichment działają OD RAZU. Tag/rok ożywają po `metadane_ksiag`
+z calibre. Uwaga: filtr działa po REINDEKSACJI z książkami — ta baza RAG ma dziś tylko docs
+(książki indeksuje `indeksuj.py --korpus biblioteka` na laptopie). Zero zmian w `.mcp.json`.
+
+**Pliki:** `narzedzia/rag/katalog.py`, `narzedzia/rag/szukaj.py`, `narzedzia/rag/mcp_server.py`,
+`tests/test_rag_katalog.py`
+
+---
+
 ## 2026-07-11 | 📖 | KATALOG METADANYCH KSIĄG — calibre jako backend (nie MCP)
 
 Rozbudowa Bibliotheki Ulpia. Cezar wybrał: calibre jako NARZĘDZIE zaplecza karmiące istniejący

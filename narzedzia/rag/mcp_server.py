@@ -42,9 +42,11 @@ def _get_model():
     return _model_cache
 
 
-def _szukaj(zapytanie: str, topk: int = 5, tryb: str = "hybrid", korpus: str | None = None) -> str:
+def _szukaj(zapytanie: str, topk: int = 5, tryb: str = "hybrid", korpus: str | None = None,
+            autor: str | None = None, tag: str | None = None) -> str:
     from szukaj import szukaj, formatuj  # type: ignore[import]
-    wyniki = szukaj(zapytanie, topk, tryb, DEFAULT_BAZA, cichy=True, korpus=korpus)
+    wyniki = szukaj(zapytanie, topk, tryb, DEFAULT_BAZA, cichy=True,
+                    korpus=korpus, autor=autor, tag=tag)
     return formatuj(wyniki, zapytanie)
 
 
@@ -76,8 +78,9 @@ TOOLS = [
     {
         "name": "biblioteka_szukaj",
         "description": (
-            "Przeszukuje Bibliothecę Ulpię — 42 książki o tradingu + encyklopedię Imperium. "
-            "Zwraca najbliższe semantycznie fragmenty z podaniem źródła (BIB-xxx, tytuł, chunk). "
+            "Przeszukuje Bibliothecę Ulpię — 69 książek o tradingu + encyklopedię Imperium. "
+            "Zwraca najbliższe semantycznie fragmenty z podaniem źródła (BIB-xxx, tytuł, chunk) "
+            "i metadanych z katalogu (autor, rok, tagi). Można filtrować po autorze/tagu. "
             "Użyj zamiast czytania całych plików epub/pdf."
         ),
         "inputSchema": {
@@ -96,6 +99,8 @@ TOOLS = [
                     "enum": ["biblioteka", "dane", "docs"],
                     "description": "Ogranicz do korpusu: biblioteka=książki+encyklopedia, dane=dane tematyczne, docs=dokumentacja Imperium. Domyślnie wszystkie.",
                 },
+                "autor": {"type": "string", "description": "Filtr: tylko książki tego autora (podciąg, np. 'Lopez de Prado'). Wg katalogu metadanych."},
+                "tag": {"type": "string", "description": "Filtr: tylko książki z tym tagiem (podciąg, np. 'Machine Learning'). Wymaga metadanych calibre."},
             },
             "required": ["zapytanie"],
         },
@@ -130,15 +135,19 @@ def _handle(req: dict) -> dict:
         return {"jsonrpc": "2.0", "id": rid, "result": {"tools": TOOLS}}
 
     if method == "tools/call":
-        name = req["params"]["name"]
-        args = req["params"].get("arguments", {})
         try:
+            # Parsowanie WEWNĄTRZ try (Księga Wad): malformed request bez "params"/"name"
+            # → JSON-RPC error, nie crash procesu serwera.
+            name = req["params"]["name"]
+            args = req["params"].get("arguments", {})
             if name == "biblioteka_szukaj":
                 result = _szukaj(
                     args["zapytanie"],
                     int(args.get("topk", 5)),
                     args.get("tryb", "hybrid"),
                     args.get("korpus"),
+                    args.get("autor"),
+                    args.get("tag"),
                 )
             elif name == "biblioteka_info":
                 result = _info()

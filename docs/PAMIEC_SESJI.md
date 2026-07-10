@@ -101,6 +101,45 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Kanoniczna liczba neuronów: 299
+299 unikalnych kluczy z KATALOG_NEURONOW.md, a nie 261/303/306/328 (stare estymaty). 27 zaimplementowanych w kodzie.
+
+### 2026-06-30 — EXP-12 +106,692% ROI to fantazja/lookahead
+Oryginalny Atmabhan ma nierealistyczne wyniki z powodu lookahead bias. Wdrożono ostrzeżenie w docstringu.
+
+### 2026-06-30 — Martwy głos ATR_MULT w EXP-07
+EXP-07 miał ATR_MULT=1.5 ale ATR nie był używany w logice. Poprawiono na ATR_MULT=0.15 i faktyczne użycie ATR.
+
+### 2026-06-30 — Lookahead bias w SMC Engine - poprawiony
+Oryginalny SMC Engine używał .shift(-1)/.shift(-2) - patched w EXP-09. Używamy tylko bary[start:n] (przeszłość).
+
+### 2026-06-30 — True Range - poprawna definicja
+True Range = max(H-L, |H-prevC|, |L-prevC|). Poprawiono we wszystkich adoptowanych wskaźnikach.
+
+### 2026-06-30 — Heiken Ashi bez repainting - rekurencyjny HA_Open
+HA_Open[i] = (HA_Open[i-1] + HA_Close[i-1]) / 2, a nie (Open[-1]+Close[-1])/2. To eliminuje lookahead bias.
+
+### 2026-06-30 — Bug: testy miały hardcoded 46 neuronów po dodaniu 47.
+Po dodaniu H-01 testy integracyjne zawierały stałą 46. Naprawiono na 47 w dwóch miejscach. Lekcja: używać len(rejestr.wszystkie_neurony()) zamiast stałych.
+
+### 2026-06-30 — Neuron H-01 zwraca NEUTRAL gdy brak danych
+NeuronHurstDFA zwraca NEUTRAL z 'META-BRAMA' w powodach gdy H≈0.5 lub brak danych. Nie rzuca błędem.
+
+### 2026-06-30 — Hurst-DFA vs R/S: dekorelowane na krypto trendującym
+Prawo XVI: DFA i R/S dają nieskorelowane wyniki na trendującym krypto. Potwierdzono empirycznie, że to nie redundancja.
+
+### 2026-06-30 — Yang-Zhang ~14x wydajniejszy od std(close)
+Drift-independent OHLC volatility estimator. Potwierdzono empirycznie: ~14x więcej próbek niż close-only std(close) przy tej samej długości okna.
+
+### 2026-06-30 — Yang-Zhang traci 7-14× informacji vs std(close)
+Używanie std(close) zamiast estymatora Yang-Zhang (OHLC) marnuje potencjał volatility. Narusza Prawo XV. Należy zastąpić w obliczeniach.
+
+### 2026-06-30 — CME gap edge martwy od 2026-05-29
+CME uruchomiło 24/7 kontrakty futures na BTC, co eliminuje weekendowe luki cenowe. Nie implementować jako sygnału live.
+
+### 2026-06-30 — W7 audyt fałszywie flaguje zewnętrzne URL-e z .md w domenie
+Reguła W7 w audyt_spojnosci.py błędnie oznaczała linki takie jak www.mdpi.com jako martwe, bo zawierają '.md' w domenie. Naprawiono przez pomijanie URL-i z http/https/mailto.
+
 ### 2026-06-30 — Binance depth zwraca stringi
 L2 order book od Binance ma ceny i wolumeny jako stringi. Dodano float(b[1]) i float(a[1]) w exp_atmabhan.
 

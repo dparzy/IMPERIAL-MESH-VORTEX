@@ -413,3 +413,28 @@ def test_negacja_w_tytule_nie_jest_duplikatem():
 def test_dwa_puste_tytuly_nie_sa_duplikatem():
     """Granica: '' == '' nie może orzekać o tożsamości lekcji."""
     assert not ps.czy_duplikaty("", "treść a", "", "treść b")
+
+
+# ── Regresja: recenzja cubic na PR #118 (drugi przebieg) ─────────────────────
+
+def test_daty_nie_wchodza_do_sygnatury():
+    """Data mówi KIEDY, nie O CZYM. Dwie różne lekcje z tego samego dnia miały
+    wspólne tokeny {2026, 06, 30} → Jaccard 0.60 → fałszywe scalenie."""
+    s = ps.sygnatura_lekcji("X-01", "sesja 2026-06-30, 30.06.2026, rok 2026")
+    assert s == frozenset({"X-01"})
+    assert not ps.czy_duplikaty(
+        "Neuron X-01 zwraca NEUTRAL", "Wykryto 2026-06-30, naprawiono.",
+        "Zwiadowca EXP-13 milczy", "Wykryto 2026-06-30, inna sprawa.")
+
+
+def test_proza_nie_nadpisuje_rozlacznych_sygnatur():
+    """Sito 3 (worek rdzeni tytułu) nie może scalać lekcji o RÓŻNYCH modułach,
+    nawet gdy tytuły mają identyczny worek rdzeni."""
+    assert not ps.czy_duplikaty("Bug w EXP-07", "ATR_MULT zly",
+                                "Bug w EXP-13", "GARCH zly")
+
+
+def test_proza_nadal_dziala_gdy_sygnatury_slabe():
+    """Kontrola: ograniczenie sita 3 nie może zabić jego pierwotnego celu."""
+    assert ps.czy_duplikaty("True Range - poprawna definicja", "max(H-L).",
+                            "Poprawiona definicja True Range", "max(H-L).")

@@ -6,6 +6,41 @@
 
 ---
 
+## 2026-07-10 | 🔎 | NAPRAWA 5 UWAG cubica (PR #118, drugi przebieg recenzji)
+
+Recenzent przeczytał commity dedupu i pushu-na-komendę. **Wszystkie 5 uwag potwierdzone
+wykonaniem** (nie na słowo — każda odtworzona skryptem przed naprawą):
+
+1. **Daty ISO w sygnaturze** (`pamiec_sesji.py`) — każda lekcja niesie datę sesji, więc
+   „2026", „06", „30" wchodziły do sygnatur wszystkich lekcji z tego samego dnia.
+   „Neuron X-01 zwraca NEUTRAL (2026-06-30)" vs „Zwiadowca EXP-13 milczy (2026-06-30)"
+   dawało Jaccard 3/5 = **0.60 → scalenie dwóch niezwiązanych lekcji**. Daty wycinane
+   przed tokenizacją (`_WZOR_DATY`).
+2. **Sito prozatorskie nadpisywało werdykt sygnatur** — „Bug w EXP-07" i „Bug w EXP-13"
+   mają ten sam worek rdzeni. Sito 3 nie scala, gdy obie sygnatury są mocne i ROZŁĄCZNE.
+3. **Marker: hasz i ID w jednym zbiorze** (`auto_lekcja.py`) — kronika dopisana po
+   przetworzeniu dostawała nowy hasz, ale jej stare `sesja_id` wciąż blokowało. Mechanizm
+   unieważniania był martwy od pierwszego dnia. Zbiory rozdzielone; zmigrowane ID wypadają
+   ze starego markera.
+4. **Cichy `git fetch || true`** (`synchronizuj.sh`) — przy porażce fetch `PRZED` liczyło
+   się ze starego `origin/…`, więc strażnik „zdalna wyprzedza" przepuszczał sklejanie na
+   nieaktualnym stanie. Przy `--push` fetch musi się udać, inaczej przerwanie.
+5. **Skrypt omijał bramkę Prawa XXI** — `--push` mógł wypchnąć kod bez testów i audytu.
+   Gdy w kolejce jest `.py`, `synchronizuj.sh` odpala testy + audyt + skan wad i odmawia
+   pushu przy czerwonym. Push samej pamięci bramki nie wymaga (kod nietknięty).
+
+**Regresja:** te same 5 grup / 11 duplikatów na korpusie 71 lekcji — naprawy nie osłabiły
+dedupu. 5 nowych testów + `tests/test_auto_lekcja_marker.py` (4 testy: hasz unieważnia,
+zmigrowane ID nie blokuje, komentarze pomijane, brak markerów).
+
+Klasy 1 i 3 dopisane do **Księgi Wad Kodu** (7 → 9 wzorców).
+
+**Pliki:** `imperium/biblioteki/pamiec_sesji.py`, `narzedzia/auto_lekcja.py`,
+`narzedzia/synchronizuj.sh`, `tests/test_pamiec_sesji.py`, `tests/test_auto_lekcja_marker.py`,
+`bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`
+
+---
+
 ## 2026-07-10 | 🌿 | PUSH NA KOMENDĘ — hook końca sesji przestaje pushować
 
 **Powód (decyzja Cezara):** hook `SessionEnd` commitował **i pushował** pamięć po każdej

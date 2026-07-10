@@ -80,6 +80,12 @@ _WZOR_TOKENU = re.compile(
 # Tokeny bez mocy rozróżniającej — występują w połowie lekcji, nic nie identyfikują.
 _TOKENY_PUSTE = frozenset({"NEUTRAL", "LONG", "SHORT", "TODO", "OHLCV"})
 
+# Daty (ISO `2026-06-30`, `30.06.2026`, samotny rok) — wycinane PRZED tokenizacją.
+# Data mówi KIEDY lekcja powstała, nigdy O CZYM jest. Zob. sygnatura_lekcji().
+_WZOR_DATY = re.compile(
+    r"\b\d{4}-\d{2}-\d{2}\b|\b\d{2}[./]\d{2}[./]\d{4}\b|\b(?:19|20)\d{2}\b"
+)
+
 # Sito 3: lekcje CZYSTO PROZATORSKIE (bez identyfikatorów) — np. „True Range - poprawna
 # definicja" vs „Poprawiona definicja True Range". Sygnatura techniczna jest tam pusta,
 # więc porównujemy worek RDZENI tytułu: prefiks 5 znaków zrównuje polską fleksję
@@ -102,8 +108,15 @@ def sygnatura_lekcji(tytul: str, tresc: str = "") -> frozenset:
     Zbiór identyfikatorów technicznych z lekcji — „o czym ona właściwie jest".
     Odporna na przeformułowanie prozy (i na zmianę języka: „martwy głos" ↔ „dead voice"),
     bo patrzy wyłącznie na nazwy modułów, kluczy i stałych.
+
+    DATY SĄ WYCINANE PRZED tokenizacją (recenzja cubic PR #118). Każda lekcja niesie datę
+    sesji, więc „2026", „06", „30" trafiały do sygnatur wszystkich lekcji z tego samego dnia:
+    „Neuron X-01 zwraca NEUTRAL (2026-06-30)" i „Zwiadowca EXP-13 milczy (2026-06-30)"
+    dawały Jaccard 3/5 = 0.60 → scalenie dwóch NIEZWIĄZANYCH lekcji. Data mówi KIEDY,
+    nigdy O CZYM.
     """
-    tokeny = {t.upper() for t in _WZOR_TOKENU.findall(f"{tytul} {tresc}")}
+    tekst = _WZOR_DATY.sub(" ", f"{tytul} {tresc}")
+    tokeny = {t.upper() for t in _WZOR_TOKENU.findall(tekst)}
     return frozenset(tokeny - _TOKENY_PUSTE)
 
 
@@ -175,9 +188,15 @@ def czy_duplikaty(tytul_a: str, tresc_a: str, tytul_b: str, tresc_b: str) -> boo
 
     sygn_a = sygnatura_lekcji(tytul_a, tresc_a)
     sygn_b = sygnatura_lekcji(tytul_b, tresc_b)
-    if (_sygnatura_rozstrzygajaca(sygn_a) and _sygnatura_rozstrzygajaca(sygn_b)
-            and _jaccard(sygn_a, sygn_b) >= PROG_PODOBIENSTWA):
+    mocna_a, mocna_b = _sygnatura_rozstrzygajaca(sygn_a), _sygnatura_rozstrzygajaca(sygn_b)
+    if mocna_a and mocna_b and _jaccard(sygn_a, sygn_b) >= PROG_PODOBIENSTWA:
         return True
+
+    # Sito 3 (proza) NIE MOŻE nadpisywać werdyktu sygnatur (recenzja cubic PR #118):
+    # gdy obie lekcje mają mocne, ale ROZŁĄCZNE sygnatury, mówią o różnych modułach —
+    # nawet jeśli tytuły mają ten sam worek rdzeni („Bug w EXP-07" vs „Bug w EXP-13").
+    if mocna_a and mocna_b and not (sygn_a & sygn_b):
+        return False
 
     rdzenie_a = _rdzenie_tytulu(tytul_a)
     return bool(rdzenie_a) and rdzenie_a == _rdzenie_tytulu(tytul_b)

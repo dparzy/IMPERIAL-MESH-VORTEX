@@ -32,7 +32,17 @@ if ! git rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
   exit 0
 fi
 
-git fetch -q origin "$GALAZ" 2>/dev/null || true
+# Fetch MUSI się udać przed jakimkolwiek reset/push (recenzja cubic PR #118): przy cichej
+# porażce `PRZED` liczyłoby się ze STAREGO origin/… → strażnik „zdalna wyprzedza" przepuściłby
+# sklejanie na nieaktualnym stanie. W podglądzie ostrzegamy, przy --push przerywamy.
+if ! git fetch -q origin "$GALAZ" 2>/dev/null; then
+  if [ "$PUSH" -eq 1 ]; then
+    echo "❌ 'git fetch origin $GALAZ' nieudany — nie znam stanu zdalnej gałęzi."
+    echo "   Nie sklejam i nie pushuję na nieaktualnych danych. Sprawdź sieć/dostęp."
+    exit 1
+  fi
+  echo "⚠️  fetch nieudany — poniższe liczby mogą być nieaktualne (podgląd)."
+fi
 
 PRZED="$(git rev-list --count 'HEAD..@{upstream}' 2>/dev/null || echo 0)"
 CZEKA="$(git rev-list --count '@{upstream}..HEAD' 2>/dev/null || echo 0)"
@@ -72,6 +82,27 @@ if [ "$PRZED" -gt 0 ]; then
   echo "❌ Zdalna gałąź wyprzedza o $PRZED commit(ów). Najpierw:"
   echo "     git pull --rebase origin $GALAZ"
   exit 1
+fi
+
+# BRAMKA PRZED PUSHEM (Prawo XXI + recenzja cubic PR #118).
+# Bez niej to narzędzie byłoby furtką omijającą testy i audyt. Bramkę odpalamy tylko gdy
+# w kolejce jest KOD (.py) — push samej pamięci niczego w kodzie nie zmienia, więc testy
+# nic by nie zweryfikowały, a kosztowałyby minuty.
+if git diff --name-only '@{upstream}..HEAD' | grep -q '\.py$'; then
+  echo
+  echo "🔒 W kolejce jest kod (.py) → bramka Prawa XXI przed pushem."
+  if ! python tests/run_tests.py >/dev/null 2>&1; then
+    echo "❌ Testy CZERWONE — nie pushuję. Uruchom: python tests/run_tests.py"
+    exit 1
+  fi
+  echo "   ✓ testy zielone"
+  if ! python narzedzia/audyt_spojnosci.py >/dev/null 2>&1; then
+    echo "❌ Audyt spójności CZERWONY — nie pushuję. Uruchom: python narzedzia/audyt_spojnosci.py"
+    exit 1
+  fi
+  echo "   ✓ audyt spójności exit 0"
+  python narzedzia/skan_wad_kodu.py 2>/dev/null | tail -1
+  echo "   ℹ️  Adversarial /code-review na diffie pozostaje obowiązkiem Claude (rozkaz stały)."
 fi
 
 if [ "$SKLEJ" -eq 1 ] && [ "$CZEKA" -gt 1 ]; then

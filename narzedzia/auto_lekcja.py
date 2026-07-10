@@ -83,22 +83,40 @@ def _klucz_kroniki(plik: Path) -> str:
     return hashlib.sha1(plik.read_bytes()).hexdigest()[:12]
 
 
-def _wczytaj_przetworzone() -> set:
+def _wczytaj_przetworzone() -> tuple[set, set]:
     """
-    Zbiór znaczników przetworzonych kronik: hasze treści ORAZ (zgodność wstecz) stare ID sesji.
-    Trzymamy oba w jednym zbiorze — sprawdzenie i tak jest po przynależności.
+    Zwraca (hasze_tresci, stare_id_sesji) — DWA ROZŁĄCZNE zbiory (recenzja cubic PR #118).
+
+    Wrzucenie obu do jednego worka niweczyło sens haszowania: kronika dopisana po
+    przetworzeniu dostawała nowy hasz, ale jej `sesja_id` (kolumna informacyjna nowego
+    markera) wciąż był w zbiorze → kronika pomijana mimo zmienionej treści.
+    Dziś ID rozstrzyga WYŁĄCZNIE gdy pochodzi ze starego markera (zgodność wstecz),
+    a nowy marker jest kluczowany samym haszem.
     """
-    znaczniki: set = set()
-    for plik in (PRZETWORZONE_PLIK, STARY_MARKER):
-        if not plik.exists():
-            continue
-        for linia in plik.read_text(encoding="utf-8").splitlines():
+    hasze: set = set()
+    zmigrowane: set = set()
+    stare_id: set = set()
+
+    if PRZETWORZONE_PLIK.exists():
+        for linia in PRZETWORZONE_PLIK.read_text(encoding="utf-8").splitlines():
             linia = linia.strip()
             if not linia or linia.startswith("#"):
                 continue
-            # Nowy format: "<hasz>  <sesja_id>"; stary: samo "<sesja_id>".
-            znaczniki.update(linia.split())
-    return znaczniki
+            czesci = linia.split()
+            hasze.add(czesci[0])                      # kolumna 1 = hasz (rozstrzyga)
+            if len(czesci) > 1:
+                zmigrowane.add(czesci[1])             # kolumna 2 = sesja_id (informacyjna)
+
+    if STARY_MARKER.exists():
+        for linia in STARY_MARKER.read_text(encoding="utf-8").splitlines():
+            linia = linia.strip()
+            if linia and not linia.startswith("#"):
+                stare_id.add(linia.split()[0])
+
+    # Sesje już zmigrowane do markera haszowego wypadają ze starego zbioru — inaczej ich
+    # ID wiecznie blokowałoby ponowne przetworzenie ZMIENIONEJ kroniki (hasz by się zmienił,
+    # ale ID pozostaje). Stary marker rozstrzyga wyłącznie o sesjach, których nie zmigrowano.
+    return hasze, stare_id - zmigrowane
 
 
 def _zapisz_przetworzona(sesja_id: str, hasz: str) -> None:
@@ -225,14 +243,15 @@ def przetworz_nowe(maks_sesji: int = 3, podglad: bool = False) -> Dict[str, int]
         print("  [auto_lekcja] Brak DEEPSEEK_API_KEY — pomijam (Prawo Bezpieczeństwa).")
         return {"przetworzone": 0, "lacznie_wpisow": 0}
 
-    przetworzone_juz = _wczytaj_przetworzone()
+    hasze_juz, stare_id_juz = _wczytaj_przetworzone()
     sesje = sorted(KRONIKA_DIR.glob("sesja_*.md"), reverse=True)  # najnowsze pierwsze
 
     wynik = {"przetworzone": 0, "lacznie_wpisow": 0}
     for plik in sesje:
         sesja_id = plik.stem.replace("sesja_", "")
-        # Hasz łapie kronikę przetworzoną na INNEJ maszynie; ID — wpisy ze starego markera.
-        if _klucz_kroniki(plik) in przetworzone_juz or sesja_id in przetworzone_juz:
+        # Hasz łapie kronikę przetworzoną na INNEJ maszynie i UNIEWAŻNIA SIĘ przy dopisaniu.
+        # Stare ID rozstrzyga tylko dla kronik sprzed migracji markera.
+        if _klucz_kroniki(plik) in hasze_juz or sesja_id in stare_id_juz:
             continue
         n = przetworz_sesje(sesja_id, podglad=podglad)
         wynik["lacznie_wpisow"] += n

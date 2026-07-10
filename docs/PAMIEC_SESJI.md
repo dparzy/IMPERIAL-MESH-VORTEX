@@ -101,6 +101,33 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Prawo I: Neurony nie liczą, Brama liczy
+MikroNeurony tylko interpretują gotowe wskaźniki (metoda interpretuj()), nigdy nie obliczają. Obliczenia wykonuje Brama Kalkulatora (TA-Lib). To fundamentalna zasada architektury IMPERIUM.
+
+### 2026-06-30 — Wolumen bazowy: Volume BTC/ETH ≠ Volume USDT
+W plikach CDD kolumna 'Volume BTC' lub 'Volume ETH' to wolumen w kryptowalucie, a nie w USDT. Czytnik CSV wykrywa kolumnę zaczynającą się od 'volume' i różną od 'volume usdt' jako bazową.
+
+### 2026-06-30 — Format CryptoDataDownload: linia URL i dane malejąco
+Pliki CSV z CryptoDataDownload mają pierwszą linię z URL-em, drugą z nagłówkami, dane są w kolejności malejącej (od najnowszych do najstarszych). Czytnik CSV automatycznie pomija URL i odwraca kolejność na rosnącą.
+
+### 2026-06-30 — Prawo XV: Utrata potencjału Klucznika
+Klucznik obliczał strategie, ale Dyrygent je ignorował. Strategie nie wpływały na decyzje. Naprawiono przez dodanie trybów: agregat (ignoruje strategie), filtr (strategia blokuje konflikt), strategia (strategia narzuca kierunek).
+
+### 2026-06-30 — DeepSeek chat zawierał wiele błędnych/przesadzonych twierdzeń
+Porównano Zbior_wskaznikow_i_strategi_03.06.2026.md z rzeczywistym repozytorium. Wiele twierdzeń DeepSeek o implementacjach było fałszywych. Zweryfikowano przez deep-research.
+
+### 2026-06-30 — Backtest nie ma lookahead-bias na 4 zbiorach Binance
+Zweryfikowano na BTC/ETH 1D (3192 bary) i 1H (76k barów) z CryptoDataDownload. Detektor potwierdza brak przecieku. Sliding window 250 barów jest czysty.
+
+### 2026-06-30 — Pewnosc_agregatu ≈1.0 to źródło strat
+Pewnosc_agregatu zawsze ≈1.0, co prowadzi do maksymalnego lewara i ciasnych stopów, generując wiele małych strat. Zidentyfikowano jako root cause wszystkich strat systemu.
+
+### 2026-06-30 — Lookahead bias w oryginalnym SMC Engine
+Oryginalny SMC Engine używał .shift(-1)/.shift(-2) - patched w EXP-09 przez ograniczenie do bary[start:n] (tylko przeszłość).
+
+### 2026-06-30 — Heiken Ashi bez repainting - rekurencyjna definicja
+HA_Open[i] = (HA_Open[i-1] + HA_Close[i-1]) / 2, a nie (Open[-1]+Close[-1])/2. To eliminuje lookahead bias.
+
 ### 2026-06-30 — Kanoniczna liczba neuronów: 299
 299 unikalnych kluczy z KATALOG_NEURONOW.md, a nie 261/303/306/328 (stare estymaty). 27 zaimplementowanych w kodzie.
 

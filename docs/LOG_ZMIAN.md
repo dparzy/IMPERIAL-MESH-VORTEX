@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-07-11 | ⛓️ | ENCYKLOPEDIA: DEF ✅ + RLA/QNT 🚧 (domknięcie serii nowych działów)
+
+Trzy ostatnie działy z serii nowych ksiąg — do granicy tego, co wykonalne w chmurze.
+
+- **DEF ✅** (BIB-069 Voshmgir + BIB-054 Antonopoulos-Wood, ekstrakcja z plików): klasy tokenów,
+  stablecoiny + Impossible Trinity, AMM/DEX, flash loans/flash-ataki, perpetuale, PoS, gas/EIP-1559,
+  oracles, composability. **Wpływ:** PSY-01/04 (funding/OI ← perpetuale), OC-05/Straż (flash-ataki).
+  **KANDYDACI ⚠️:** reżim depeg stablecoina, głębokość AMM, gas jako termometr sieci, funding-neuron.
+- **RLA 🚧** (BIB-068 Goodfellow ✅ z pliku): DL — curse of dimensionality, regularyzacja, CNN/RNN,
+  representation learning; most do hedge_mwu (MWU=online learning/regret) ugruntowany w KODZIE.
+  BIB-067 Sutton-Barto (RL) — **djvu PENDING** ekstrakcji na laptopie.
+- **QNT 🚧** (styki z kodem ✅): Feynman-Kac→ECON (z ARTEMIS), GARCH/FracDiff/BOCPD, martyngał→
+  uczciwy backtest. BIB-065/066 Shreve — **djvu PENDING** na laptopie.
+
+**Ograniczenie chmury (Prawo I):** djvu nieczytelne bez `djvutxt` (brak w chmurze) — Shreve I/II
+i Sutton-Barto oznaczone ⚠️ PENDING, esencja djvu domknie się na laptopie. Nie fabrykuję z pamięci.
+
+**Bilans encyklopedii:** wszystkie 15 działów mają treść — 13 ✅, 2 🚧 (RLA/QNT, czekają na djvu).
+INDEX_MAIOR: statusy + kanon zaktualizowane. Pliki: DEF/RLA/QNT + INDEX_MAIOR.
+
+---
+
 ## 2026-07-11 | 📊 | ENCYKLOPEDIA: dział MAK domknięty (makro, cykle długu) — Dalio + Popper
 
 Drugi dział z serii nowych ksiąg. **MAK 🚧 → ✅** (był tylko Patel; dodano 3× Dalio + Popper).

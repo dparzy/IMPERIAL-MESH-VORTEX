@@ -37,9 +37,9 @@
 | **MEM** | [Pamięć agentów AI](MEM_pamiec_agentow_ai.md) | ⭐⭐⭐⭐⭐ | centrum_pamieci, pamiec_sesji, kronika_czatu, mnemosyne, pamiec_absolutna, pamiec_refleksyjna | ✅ |
 | **MAK** | [Makroekonomia, cykle długu i pieniądz](MAK_makroekonomia_i_cykle.md) | ⭐⭐⭐⭐ | RADAR-01..05, Gubernator, Senat | ✅ |
 | **BAN** | [Bańki, krachy i finanse behawioralne](BAN_banki_krachy_behawioralne.md) | ⭐⭐⭐⭐ | Z-03/04/07, PSY-03, RADAR-04, Senat, Reguła 6% | ✅ |
-| **QNT** | [Matematyka ilościowa i procesy stochastyczne](QNT_matematyka_stochastyczna.md) | ⭐⭐⭐⭐ | GARCH, BOCPD, neurony zmienności, arena trzech bram | 🔲 |
-| **RLA** | [Uczenie ze wzmocnieniem i deep learning](RLA_uczenie_wzmocnieniem_dl.md) | ⭐⭐⭐⭐ | hedge_mwu, Legatus, MEM, przyszli agenci RL | 🔲 |
-| **DEF** | [DeFi, tokenomika i Web3](DEF_defi_tokenomika_web3.md) | ⭐⭐⭐ | OC-*, przyszłe neurony DeFi, Senat | 🔲 |
+| **QNT** | [Matematyka ilościowa i procesy stochastyczne](QNT_matematyka_stochastyczna.md) | ⭐⭐⭐⭐ | EXP-13 GARCH, BOCPD-01, N-02 FracDiff, ECON/Feynman-Kac | 🚧 |
+| **RLA** | [Uczenie ze wzmocnieniem i deep learning](RLA_uczenie_wzmocnieniem_dl.md) | ⭐⭐⭐⭐ | hedge_mwu, Legatus, MEM, przyszli agenci RL | 🚧 |
+| **DEF** | [DeFi, tokenomika i Web3](DEF_defi_tokenomika_web3.md) | ⭐⭐⭐ | PSY-01/04, OC-*, przyszłe neurony DeFi, Senat, Straż A-* | ✅ |
 
 Legenda statusu: ✅ gotowy · 🔲 zaplanowany · 🚧 w budowie
 
@@ -68,9 +68,9 @@ Mapa: która książka zasila który dział. (Pliki: `bibliotheca_ulpia/BIB-xxx_
 | MEM | BIB-033 Huyen (AI Engineering), BIB-034 Infante (AI Agents), BIB-035 Iusztin&Labonne (LLM Engineer's Handbook), BIB-036 Alto (Building LLM Powered Apps) + arXiv MEM-01..04 (FinMem/FinAgent/Mem0/A-Mem) |
 | MAK | ✅ BIB-001 Patel (18-letni cykl), BIB-056 Dalio (Big Debt Crises), BIB-057 Dalio (Changing World Order), BIB-058 Dalio (How Countries Go Broke), BIB-055 Popper (Digital Gold — makro) |
 | BAN | ✅ BIB-059 Kindleberger, BIB-060 Shiller, BIB-061 Thaler, BIB-062 Chancellor, BIB-063 MacKay, BIB-064 Reinhart-Rogoff |
-| QNT | 🔲 BIB-065 Shreve I (Binomial), BIB-066 Shreve II (Continuous-Time) |
-| RLA | 🔲 BIB-067 Sutton & Barto (RL), BIB-068 Goodfellow (Deep Learning) |
-| DEF | 🔲 BIB-069 Voshmgir (Token Economy 3rd ed) |
+| QNT | 🚧 BIB-065 Shreve I (Binomial), BIB-066 Shreve II (Continuous-Time) — djvu pending na laptopie |
+| RLA | 🚧 BIB-068 Goodfellow (Deep Learning) ✅ + BIB-067 Sutton & Barto (RL) — djvu pending na laptopie |
+| DEF | ✅ BIB-069 Voshmgir (Token Economy 3rd ed), BIB-054 Antonopoulos-Wood (Mastering Ethereum) |
 
 ---
 

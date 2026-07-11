@@ -22,10 +22,20 @@ raporty/
 # Stan uczenia cross-session (generowany w runtime — nie wersjonowany)
 logs/
 narzedzia/rag/baza_wiedzy.db
-# Cache tekstu książek (konwerter.py) — per-maszyna, jak baza RAG. Konkretne pliki djvu
-# można odblokować dla chmury świadomym `git add -f bibliotheca_ulpia/dane/tekst_cache/<plik>`
-# (decyzja Cezara — trwałe udostępnienie tekstu djvu obu maszynom, Prawo XVII).
-bibliotheca_ulpia/dane/tekst_cache/
+
+# Binaria książek — TYLKO na lokalnym Imperium, poza repo (decyzja Cezara 2026-07-11:
+# ryzyko praw autorskich komercyjnych tytułów + 504 MB w gicie; cubic PR #119 P1 + audyt R1).
+# Do RAG wersjonujemy sam WYEKSTRAHOWANY TEKST (tekst_cache/ — niżej), nie binaria. Książki
+# żyją na laptopie; `konwerter.buduj_cache` robi z nich tekst, `indeksuj` czyta cache (nie binaria).
+bibliotheca_ulpia/*.epub
+bibliotheca_ulpia/*.pdf
+bibliotheca_ulpia/*.djvu
+bibliotheca_ulpia/*.mobi
+bibliotheca_ulpia/*.azw3
+# Cache tekstu książek = ŹRÓDŁO RAG dla chmury (WERSJONOWANE od 2026-07-11). Wcześniej per-
+# maszyna z ręcznym `git add -f` wybranych djvu; teraz cały cache w repo, bo binaria go opuściły
+# i tekst jest jedynym nośnikiem wiedzy książek między laptopem a chmurą (chmura buduje pełny
+# RAG bez calibre). Dlatego NIE ignorujemy już tekst_cache/ — patrz indeksuj.py CACHE_KSIAG.
 
 # Lokalne artefakty A/B (generowane przez backtest_ab_* — nie wersjonowane, wynik w LOG_ZMIAN)
 ab_mtf_metryki.json

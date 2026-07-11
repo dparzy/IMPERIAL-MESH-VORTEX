@@ -312,6 +312,49 @@ def test_indeksacja_przyrostowa():
             indeksuj_mod._zbierz_pliki = orig
 
 
+def test_zrodlo_z_cache_z_katalogu_i_fallback():
+    """_zrodlo_z_cache: plik cache `<stem>__<hash>.txt` → nazwa binarna z katalogu (hit),
+    a bez wpisu w katalogu → sam stem (fallback). Rdzeń indeksowania z cache po usunięciu
+    binariów z repo (decyzja 2026-07-11)."""
+    import importlib
+    ix = importlib.import_module("indeksuj")
+    mapa = {"BIB-007_LdP_AFML": "BIB-007_LdP_AFML.epub"}
+    hit = Path("x/tekst_cache/BIB-007_LdP_AFML__abc1230000000000.txt")
+    miss = Path("x/tekst_cache/BIB-999_Nieznana__def4560000000000.txt")
+    assert ix._zrodlo_z_cache(hit, mapa) == "BIB-007_LdP_AFML.epub"   # katalog → nazwa binarna
+    assert ix._zrodlo_z_cache(miss, mapa) == "BIB-999_Nieznana"        # fallback: sam stem
+
+
+def test_indeks_ksiazki_z_cache_odtwarza_zrodlo():
+    """Książki indeksowane z tekst_cache/*.txt zapisują zrodlo = nazwa binarna (z katalogu),
+    NIE nazwę pliku cache. Gwarancja: filtr/wzbogacenie katalogu działają po przeniesieniu
+    binariów poza repo (cloud RAG czyta sam tekst)."""
+    import importlib
+    ix = importlib.import_module("indeksuj")
+    with tempfile.TemporaryDirectory() as tmp:
+        tmpp = Path(tmp)
+        cache = tmpp / "tekst_cache"          # nazwa katalogu MUSI być tekst_cache (warunek pętli)
+        cache.mkdir()
+        (cache / "BIB-777_Author_Some-Book__deadbeef0badf00d.txt").write_text(
+            "Kelly criterion sizing GARCH volatility regime microstructure liquidity. " * 20,
+            encoding="utf-8")
+        kat = {"BIB-777_Author_Some-Book": "BIB-777_Author_Some-Book.pdf"}
+        baza = tmpp / "t.db"
+        orig_zbierz, orig_mapa = ix._zbierz_pliki, ix._mapa_stem_plik
+        ix._zbierz_pliki = lambda korpus, tylko_enc: [(p, "biblioteka") for p in sorted(cache.glob("*.txt"))]
+        ix._mapa_stem_plik = lambda: kat
+        try:
+            ix.indeksuj(baza=baza, bez_wektorow=True)
+        finally:
+            ix._zbierz_pliki, ix._mapa_stem_plik = orig_zbierz, orig_mapa
+        conn = sqlite3.connect(str(baza))
+        zrodla = {r[0] for r in conn.execute("SELECT DISTINCT zrodlo FROM fragmenty")}
+        tytuly = {r[0] for r in conn.execute("SELECT DISTINCT tytul FROM fragmenty")}
+        conn.close()
+        assert zrodla == {"BIB-777_Author_Some-Book.pdf"}, zrodla    # nazwa binarna, nie cache
+        assert tytuly == {"Author — Some Book"}, tytuly              # tytuł z odtworzonej nazwy
+
+
 # ── mcp server ───────────────────────────────────────────────────────────────
 
 def test_mcp_initialize():

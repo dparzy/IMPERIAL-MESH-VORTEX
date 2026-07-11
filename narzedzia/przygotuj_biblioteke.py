@@ -69,8 +69,9 @@ def main() -> int:
               f"{', '.join(sorted(puste))[:200]}", file=sys.stderr)
         print("   Djvu (Shreve/Sutton-Barto/Aronson) wymaga `djvutxt` (pakiet djvulibre).",
               file=sys.stderr)
-    print("\n   💡 Aby chmura czytała djvu — zacommituj wybrane cache:\n"
-          "      git add -f bibliotheca_ulpia/dane/tekst_cache/BIB-065* BIB-066* BIB-067* BIB-048*",
+    print("\n   💡 Cache tekstu jest WERSJONOWANY (źródło RAG dla chmury). Po zbudowaniu commituj:\n"
+          "      git add bibliotheca_ulpia/dane/tekst_cache/ && git commit\n"
+          "      (binaria książek zostają lokalnie, poza repo — decyzja Cezara 2026-07-11).",
           file=sys.stderr)
     return 0
 

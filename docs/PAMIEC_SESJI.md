@@ -101,6 +101,15 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Bug: neuron zwraca NEUTRAL gdy brak danych
+W przypadku braku danych wejściowych, mikro-neuron zwraca SygnalNeuronu z wartoscia NEUTRAL zamiast rzucac wyjatkiem. To moze maskowac bledy w przeplywie danych.
+
+### 2026-06-30 — CalcResult vs float w testach HURST_DFA
+HURST_DFA zwraca obiekt CalcResult, nie float. Należy używać r.value, nie r.
+
+### 2026-06-30 — Pewność vs pewność_finalna w testach
+W teście Z-02 asercja musi być na s.pewnosc (>=0.55), a nie s.pewnosc_finalna, bo ta uwzględnia WAGĘ.
+
 ### 2026-06-30 — Format Katalogu Strategii
 ID: [LEGION]-[STYL]-[NUM] (np. X-SC-001). Style: TR/RV/BK/RG/SC/MC/LV/HY. Każda strategia ma: Neurony WEJŚCIE, FILTR, WYJŚCIE, Dźwignia, R:R, Status.
 

@@ -101,6 +101,39 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — NeuronPumpDetect Z-02: 3 warunki OHLCV
+Warunek 1: VOLUME/VOLUME_MA20 w [1.5, 4.0]; Warunek 2: (HIGH-LOW)/ATR_14 < 0.75; Warunek 3: OBV > OBV_EMA_20*(1+0.005). Siła = 0.55+0.30*(vol*0.4+zakr*0.3+obv*0.3). Kierunek LONG.
+
+### 2026-06-30 — Wash Trading: Benford chi² + round-number clustering
+Wskaźnik WASH_TRADING łączy chi² (min 1.0, chi2_obs/20.09) z round_frac (min 1.0, (round_frac-0.20)/0.20) przez sqrt(benford*rounding). OC-05 używa progów 0.35 i 0.65.
+
+### 2026-06-30 — Triple Barrier: SL wygrywa przy jednoczesnym trafieniu TP i SL
+W metodzie oznacz_bariera, jeśli TP i SL są trafione w tej samej świecy, wygrywa SL (konserwatywnie). timeliness = 1.0 - (bar_nr-1)/max(max_bary-1, 1).
+
+### 2026-06-30 — Meta-gate defensive neurons zawsze NEUTRAL kierunek
+Neurony obronne (Z-01, N-01, H-01, OC-05) ustawiają pewnosc_przeciwnika zamiast kierunku, wywołują s.policz_finalna() — to wzorzec dla wszystkich bram obronnych.
+
+### 2026-07-10 — Ważenie IC podnosi rój ponad 50% na każdej parze OOS
+Wynik B (ważony IC) = 51.8% globalnie, bije A o +3.6pp i przekracza 50% na KAŻDEJ z 5 par OOS. Potwierdza hipotezę B: wąskie gardło = agregacja.
+
+### 2026-07-10 — Równa waga = 48.2% odtwarza diagnozę triady 48.3%
+Pomiar hipotezy B na 5 parach 4h OOS daje globalnie 48.2% dla równej wagi, co odtwarza diagnozę triady 48.3% co do promila — walidacja pomiaru.
+
+### 2026-07-10 — Katalog scratchpad nie istniał — redirect padł
+Przy uruchamianiu biegów równoległych katalog scratchpad nie istniał, co spowodowało ciche niepowodzenie zapisu. Po utworzeniu katalogu bieg działa poprawnie.
+
+### 2026-07-10 — Pełny backtest 18k barów × 5 par pada na timeout
+Pełny przebieg 18k barów × 5 par jest za wolny i przekracza limit 600s. Potwierdza to ZASADĘ ANALIZY CZĄSTKOWEJ: trzeba cap barów + cząstkowanie z zapisem do areny.
+
+### 2026-06-30 — 12/17 bloków strategii miało błędne klucze w KATALOGU
+Stare klucze projektowe (np. XII-08) nie istniały w kodzie. Audyt W9 wykrywa obce klucze w blokach zaimplementowanych strategii. Wszystkie 17 zsynchronizowane.
+
+### 2026-06-30 — Binance depth zwraca stringi a nie floaty
+L2 order book od Binance ma ceny i wolumeny jako stringi. Dodano float(b[1]) i float(a[1]) w exp_atmabhan._imbalance().
+
+### 2026-06-30 — Diagnostyka fałszywie alarmowała martwe neurony
+Pary z 1 próbką były klasyfikowane jako 'martwe' (len(set)==1). Dodano wymóg >=2 próbek do detekcji stałej serii. Nowy klucz: pary_niedostateczne_dane.
+
 ### 2026-06-30 — Golden Cross: wariant EMA, nie oryginalny SMA
 Strategia ZŁOTY ORZEŁ używa EMA50/EMA200, a nie kanonicznego SMA50/SMA200. Odnotowano w katalogu.
 

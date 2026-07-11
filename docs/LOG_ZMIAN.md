@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-07-11 | 📚 | ANALIZA KSIĄG BIB-043..069 — mapowanie 27 nowych pozycji na Imperium
+
+Analiza „zgodnie z zasadami" 27 nowo dodanych książek. Ekstrakcja TOC+wstępu z KAŻDEGO pliku
+(ebooklib/pymupdf zainstalowane jednorazowo, nie do requirements) — analiza UGRUNTOWANA w
+realnej treści, nie z pamięci (Prawo I). 23/27 przeczytane; 4 djvu (Aronson, Shreve I/II,
+Sutton-Barto) czekają na `djvutxt` na laptopie — oznaczone ⚠️ PENDING.
+
+**Kluczowe odkrycie:** nowe księgi mapują się dokładnie na PLANOWANE (🔲) działy encyklopedii:
+- **BAN** (bańki/behawioralne) — 7 ksiąg: Kindleberger, Shiller, Thaler, Reinhart-Rogoff,
+  Chancellor, MacKay → Z-03/04/07, PSY-03, RADAR stres.
+- **MAK** (makro/dług) — 3× Dalio (Big Debt Cycle) + Popper → Gubernator, RADAR, reżim makro.
+- **QNT** (stochastyka) — Shreve I/II (Feynman-Kac, brak arbitrażu) → FUNDAMENT ECON/FiltrEkonomiczny.
+- **RLA** (RL/DL) — Sutton-Barto, Goodfellow → hedge_mwu, KANDYDAT GIFT (RL portfela z wrzutni).
+- **DEF** (DeFi) — Voshmgir, Antonopoulos-Ethereum → neurony DeFi, funding/perp (PSY-01).
+
+**Symbioza:** ECON (zbudowany dziś) ma teraz dwa filary w kanonie — Duke „Thinking in Bets"
+(zakład, nie pewnik) + Shreve Feynman-Kac (brak arbitrażu). Backlog wrzutni ma teorię w kanonie.
+
+**Deliverable:** `docs/ANALIZA_BIB_043-069_2026-07-11.md` (datowany snapshot) — tabela 27 ksiąg
+(dział/ważność/status) + grupowanie po działach z wpływem na kod + KANDYDACI ⚠️. To FUNDAMENT;
+wypełnienie działów prozą = follow-up (ZASADA ANALIZY CZĄSTKOWEJ: książka → esencja → zapis).
+Zaktualizowano: INDEKS_IMPERIUM (poz. 61), INDEX_MAIOR (kanon 42→69, nieaktualny — Prawo XVII).
+
+**Pliki:** `docs/ANALIZA_BIB_043-069_2026-07-11.md`, `docs/INDEKS_IMPERIUM.md`,
+`bibliotheca_ulpia/encyklopedia/INDEX_MAIOR.md`
+
+---
+
 ## 2026-07-11 | 🔗 | WPIĘCIE KATALOGU KSIĄG W RAG — wzbogacenie + filtr autor/tag
 
 Dokończenie ścieżki calibre: katalog metadanych (`katalog_ksiag.json`) jako SOCZEWKA nad RAG.

@@ -45,9 +45,15 @@ Legenda statusu: ✅ gotowy · 🔲 zaplanowany · 🚧 w budowie
 
 ---
 
-## 📕 KANON ŹRÓDŁOWY (42 książki → działy)
+## 📕 KANON ŹRÓDŁOWY (69 książek → działy)
 
 Mapa: która książka zasila który dział. (Pliki: `bibliotheca_ulpia/BIB-xxx_*`)
+
+> **BIB-043..069 (27 nowych, 2026-07-11):** zmapowane w `docs/ANALIZA_BIB_043-069_2026-07-11.md`.
+> Zasilają głównie działy planowane: **BAN** (7 ksiąg — Kindleberger/Shiller/Thaler/Reinhart-Rogoff/
+> Chancellor/MacKay), **MAK** (3× Dalio), **QNT** (Shreve I/II — fundament ECON/Feynman-Kac),
+> **RLA** (Sutton-Barto/Goodfellow), **DEF** (Voshmgir/Antonopoulos-Ethereum) + wzmocnienie
+> MKS/PSY/ALG/STR. Wypełnienie działów prozą: follow-up (ZASADA ANALIZY CZĄSTKOWEJ).
 
 | Dział | Książki źródłowe |
 |-------|------------------|

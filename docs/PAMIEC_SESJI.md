@@ -101,6 +101,36 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Format Katalogu Strategii
+ID: [LEGION]-[STYL]-[NUM] (np. X-SC-001). Style: TR/RV/BK/RG/SC/MC/LV/HY. Każda strategia ma: Neurony WEJŚCIE, FILTR, WYJŚCIE, Dźwignia, R:R, Status.
+
+### 2026-06-30 — Zasada 2% kapitału i R:R minimum 1:2
+Max ryzyko 2% kapitału na transakcję lewarowaną. Wymagany stosunek Risk:Reward minimum 1:2. Wyjątek: Druckenmiller Mode (pewnosc >0.92) pozwala na 5% kapitału i dźwignia ×1.5.
+
+### 2026-06-30 — Dynamiczna dźwignia od pewności i reżimu
+pewnosc <0.55→0x, <0.65→2x, <0.75→5x, <0.85→10x, <0.92→15x, >=0.92→20x. Mnożniki reżimu: VOLATILE×0.5, PANIC×0.1, RANGING×0.7, TREND_STRONG×1.2.
+
+### 2026-06-30 — Wzór ceny likwidacji LONG/SHORT
+LONG: Entry * (1 - 1/Leverage + 0.005). SHORT: Entry * (1 + 1/Leverage - 0.005). Stop-loss = 50% drogi do likwidacji. OPLATA_UTRZYMANIA = 0.005 (Binance/MEXC).
+
+### 2026-06-30 — ImportError w legatus.py przy uruchomieniu bezpośrednim
+Relative import from .mikro_neuron fails gdy plik uruchamiany bezpośrednio. Rozwiązanie: try/except z fallbackiem do from mikro_neuron import.
+
+### 2026-06-30 — Prawo I — neurony nie liczą wskaźników
+MikroNeuron.interpretuj() otrzymuje gotowe wskaźniki od Brama Kalkulatora (TA-Lib). Neurony tylko oceniają — to kluczowa zasada architektury.
+
+### 2026-06-30 — Format CSV CryptoDataDownload wymaga specjalnego czytnika
+Pliki CSV z CDD mają pierwszy wiersz URL, nagłówek w drugim, dane malejąco, timestamp w ms. Kolumna wolumenu bazowego to 'Volume' (nie 'Volume USDT'). Czytnik CSV musi to obsługiwać.
+
+### 2026-06-30 — Klucznik ignorowany przez Dyrygenta (Prawo XV)
+Dyrygent nie używał wyników Klucznika (strategii) — kierunek i pewność pochodziły wyłącznie z neuronów. Naprawiono: dodano logikę trybów (agregat/filtr/strategia) uwzględniającą DopasowanieStrategii.
+
+### 2026-06-30 — Bart Pattern 30% Donchian zbyt rzadki
+30% kanału Donchiana to ekstremalnie rzadkie zdarzenie. Zmieniono na 10%.
+
+### 2026-06-30 — RSI Div delta 2.0 zbyt wysoka dla daily
+Na sąsiednich daily RSI rzadko zmienia się o >2 pkt. Zmieniono próg z 2.0 na 0.3.
+
 ### 2026-06-30 — Bug: neuron zwraca NEUTRAL gdy brak danych w BramaKalkulatora
 MikroNeuron.interpretuj() zwraca SygnalNeuronu z wartoscia NEUTRAL jesli wskaznik nie istnieje w dict Brama. To powoduje ciche bledy w strategiach - nalezy dodac walidacje i warning.
 

@@ -53,16 +53,24 @@ def main() -> int:
     wynik = konwerter.buduj_cache()
     puste = [k for k, v in wynik.items() if v < konwerter.MIN_ZNAKOW_CACHE]
 
+    rc = 0
     if not tylko_cache:
         _krok("2/3 Indeks RAG (biblioteka)")
-        subprocess.run([sys.executable, str(ROOT / "narzedzia" / "rag" / "indeksuj.py"),
-                        "--korpus", "biblioteka"], check=False)
+        r_idx = subprocess.run([sys.executable, str(ROOT / "narzedzia" / "rag" / "indeksuj.py"),
+                                "--korpus", "biblioteka"])
+        if r_idx.returncode != 0:
+            # Propagujemy porażkę indeksacji (recenzja cubic PR#119): bez tego skrypt drukował
+            # GOTOWE/exit 0 nawet przy nieaktualnej/pustej bazie RAG — wołający (i CI) nie miał
+            # jak wykryć zepsutego indeksu, a to on karmi chmurę.
+            rc = r_idx.returncode
+            print(f"   ❌ Indeksacja RAG nie powiodła się (exit {rc}) — baza może być "
+                  "nieaktualna/pusta.", file=sys.stderr)
 
         _krok("3/3 Katalog metadanych książek")
-        subprocess.run([sys.executable, "-m", "narzedzia.rag.metadane_ksiag"],
-                       cwd=str(ROOT), check=False)
+        # Katalog = WZBOGACENIE (best-effort): wymaga calibre; brak = abstynencja, nie błąd krytyczny.
+        subprocess.run([sys.executable, "-m", "narzedzia.rag.metadane_ksiag"], cwd=str(ROOT))
 
-    _krok("GOTOWE")
+    _krok("GOTOWE" if rc == 0 else "ZAKOŃCZONE Z BŁĘDEM INDEKSACJI")
     print(f"   Scache'owano: {len(wynik) - len(puste)}/{len(wynik)} książek.", file=sys.stderr)
     if puste:
         print(f"   ⚠️  Nieczytelne (brak narzędzia? zainstaluj calibre/djvulibre): "
@@ -73,7 +81,7 @@ def main() -> int:
           "      git add bibliotheca_ulpia/dane/tekst_cache/ && git commit\n"
           "      (binaria książek zostają lokalnie, poza repo — decyzja Cezara 2026-07-11).",
           file=sys.stderr)
-    return 0
+    return rc
 
 
 if __name__ == "__main__":

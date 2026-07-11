@@ -3,8 +3,10 @@ Ekstraktor tekstu z formatów biblioteki (epub, pdf, azw3, mobi, djvu, md).
 Zwraca czysty tekst podzielony na akapity/strony.
 """
 from __future__ import annotations
+import os
 import re
 import subprocess
+import tempfile
 from pathlib import Path
 
 
@@ -142,11 +144,15 @@ _TIMEOUT_KONWERSJI = 300
 
 def _calibre(path: Path) -> str:
     """Fallback: ebook-convert → txt (wymaga calibre). Uniwersalny konwerter dla djvu/azw3/mobi."""
-    # Calibre wybiera format WYJŚCIA po rozszerzeniu pliku docelowego. Rozszerzenie musi więc
-    # być `.txt` — poprzednie `.txt.tmp` dawało `ValueError: No plugin to handle output format:
-    # tmp` i CICHO gubiło wszystkie djvu (Prawo XV — martwy głos przez zły kod). Plik scratcha
-    # kasujemy w finally; atomowy zapis do CACHE robi konwerter.ekstrahuj_z_cache (tmp→os.replace).
-    tmp = path.with_name(path.stem + ".calibre-tmp.txt")
+    # Calibre wybiera format WYJŚCIA po rozszerzeniu pliku docelowego — MUSI być `.txt`
+    # (poprzednie `.txt.tmp` → `ValueError: No plugin to handle output format: tmp`, ciche
+    # gubienie djvu, Prawo XV). Scratch w KATALOGU TYMCZASOWYM z UNIKALNĄ nazwą (recenzja cubic
+    # PR#119): dwie równoległe konwersje tej samej książki nie nadpisują sobie wyjścia, a plik
+    # scratcha NIGDY nie koliduje z plikiem biblioteki (dawne `<stem>.calibre-tmp.txt` obok źródła
+    # mogło skasować realny plik użytkownika o tej nazwie). Sprzątamy dokładnie ten jeden plik.
+    fd, tmp_name = tempfile.mkstemp(suffix=".txt", prefix="calibre_")
+    os.close(fd)
+    tmp = Path(tmp_name)
     try:
         subprocess.run(
             ["ebook-convert", str(path), str(tmp)],

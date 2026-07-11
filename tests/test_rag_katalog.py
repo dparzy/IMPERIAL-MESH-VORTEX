@@ -145,3 +145,18 @@ def test_szukaj_filtr_tag_ogranicza():
     finally:
         katalog.KATALOG_PLIK = stara
     assert wyniki and all(w.zrodlo == "BIB-007_LdP_AFML.epub" for w in wyniki)
+
+
+def test_szukaj_filtr_bez_katalogu_pomija_filtr_nie_zwraca_pusto():
+    """Brak katalogu + aktywny filtr autor: filtr POMIJAMY (nie predykat odrzucający wszystko)
+    i zwracamy trafienia treściowe — inaczej chmura bez metadane_ksiag dawałaby zawsze puste
+    (recenzja cubic PR#119)."""
+    baza = _baza_z_ksiazkami()
+    stara = katalog.KATALOG_PLIK
+    katalog.KATALOG_PLIK = Path("/nie/ma/takiego/katalog.json")   # wczytaj_katalog → {}
+    try:
+        wyniki = szuk.szukaj("memory", topk=5, tryb="fts", baza=baza, cichy=True, autor="Elder")
+    finally:
+        katalog.KATALOG_PLIK = stara
+    zrodla = {w.zrodlo for w in wyniki}
+    assert "BIB-007_LdP_AFML.epub" in zrodla and "BIB-015_Elder_Trading.epub" in zrodla

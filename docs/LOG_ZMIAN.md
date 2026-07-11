@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-07-11 | 📚 | JEDNA KOMENDA: przygotuj bibliotekę lokalnie (0 tokenów Claude)
+
+Odpowiedź na pytanie Cezara o beztokenową konwersję lokalną. Uczciwa ocena 3 opcji:
+- „Claude portable do folderu" — NIE istnieje (Claude Code to CLI, nie app per-folder); ale
+  SETUP jest już przenośny (CLAUDE.md+hooki+.mcp.json+pamięć jadą w repo). Nic do dodania.
+- „MCP dla lokala" — JUŻ jest (.mcp.json: biblioteka RAG + arena, lokalne, token-free).
+- „Beztokenowa konwersja djvu" — realne; brakowało jednej komendy spinającej.
+
+**Wdrożone:** `narzedzia/przygotuj_biblioteke.py` — jedna komenda, 3 kroki token-free:
+(1) `konwerter --buduj` (cache tekstu), (2) `indeksuj --korpus biblioteka` (RAG),
+(3) `metadane_ksiag` (katalog). Diagnoza narzędzi (calibre/djvutxt), graceful bez nich,
+idempotentne. Smoke-test w chmurze: **64/69 książek scache'owane** (5 djvu zgłoszone jako
+wymagające djvutxt: Kissell/Aronson/Shreve I,II/Sutton-Barto).
+
+**Filozofia tokenów (SCIAGA §2d, dopisane):** ciężka praca (konwersja+indeks) LOKALNIE = 0
+tokenów LLM; Claude potem pyta RAG chirurgicznie (płaci za fragmenty, nie za całe książki).
+
+**Pliki:** `narzedzia/przygotuj_biblioteke.py`, `tests/test_przygotuj_biblioteke.py`,
+`docs/SCIAGA_LOKAL.md` (§2d). Bramka: testy zielone, audyt exit 0, ruff czysty.
+
+---
+
 ## 2026-07-11 | 🔄 | KONWERTER/CACHE TEKSTU KSIĄG — auto-convert djvu, odblokowanie chmury
 
 Odpowiedź na pytanie Cezara o auto-convert formatów. **Prawo XVI:** calibre `ebook-convert` JUŻ jest

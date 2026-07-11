@@ -135,14 +135,19 @@ def _mobi(path: Path) -> str:
             shutil.rmtree(tempdir, ignore_errors=True)
 
 
+# Timeout konwersji: wielkie książki (Shreve, Sutton-Barto, Kaufman ~2 mln znaków) nie mieszczą
+# się w 60 s. 300 s daje margines; koszt płacony raz (potem cache — patrz konwerter.py).
+_TIMEOUT_KONWERSJI = 300
+
+
 def _calibre(path: Path) -> str:
-    """Fallback: ebook-convert → txt (wymaga calibre)."""
+    """Fallback: ebook-convert → txt (wymaga calibre). Uniwersalny konwerter dla djvu/azw3/mobi."""
     tmp = path.with_suffix(".txt.tmp")
     try:
         subprocess.run(
             ["ebook-convert", str(path), str(tmp)],
             capture_output=True,
-            timeout=60,
+            timeout=_TIMEOUT_KONWERSJI,
             check=True,
         )
         text = tmp.read_text(encoding="utf-8", errors="replace")
@@ -158,9 +163,13 @@ def _djvu(path: Path) -> str:
         r = subprocess.run(
             ["djvutxt", str(path)],
             capture_output=True,
-            timeout=60,
+            timeout=_TIMEOUT_KONWERSJI,
         )
-        return r.stdout.decode("utf-8", errors="replace")
+        # Sprawdzamy kod wyjścia (recenzja): djvutxt na uszkodzonym pliku potrafi wypluć
+        # CZĘŚCIOWY stdout i paść — bez tej kontroli ułamek trafiał do cache jako „prawda".
+        if r.returncode == 0 and r.stdout:
+            return r.stdout.decode("utf-8", errors="replace")
+        return _calibre(path)
     except Exception:
         return _calibre(path)
 

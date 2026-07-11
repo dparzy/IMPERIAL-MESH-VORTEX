@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-07-11 | 🔄 | KONWERTER/CACHE TEKSTU KSIĄG — auto-convert djvu, odblokowanie chmury
+
+Odpowiedź na pytanie Cezara o auto-convert formatów. **Prawo XVI:** calibre `ebook-convert` JUŻ jest
+fallbackiem w `ekstraktor.py` — nowy konwerter byłby redundancją. Realną luką był **cache tekstu**.
+
+**Wdrożone:**
+- `narzedzia/rag/konwerter.py` — `ekstrahuj_z_cache(path)`: cache kluczowany HASZEM TREŚCI
+  (sha1[:16]). Trafienie działa BEZ calibre → laptop konwertuje djvu RAZ, po zacommitowaniu pliku
+  cache **chmura czyta go bez calibre** (Prawo XVII — spójność między maszynami). `buduj_cache()`
+  prekonwertuje całą bibliotekę (pasek postępu, idempotentne). Demo: epub 510k zn., 2. odczyt 14× szybszy.
+- `ekstraktor.py` — timeout konwersji 60→300 s (wielkie książki: Shreve, Sutton-Barto, Kaufman).
+- `.gitignore` — cache per-maszyna domyślnie; `git add -f <plik>` odblokowuje wybrane djvu dla chmury.
+
+**Samo-recenzja złapała 3 bugi przed pushem:** (1) KRYTYCZNY — zapis cache nieatomowy → częściowy
+plik serwowany jako prawda (i, po commicie, trułby chmurę uciętą książką); fix: `.tmp`→`os.replace`.
+(2) `_djvu` ignorował kod wyjścia djvutxt → częściowy stdout jako tekst; fix: sprawdzenie returncode.
+(3) próg MIN_ZNAKOW chroni przed pustką, nie przed śmieciem — zmitygowane przez (1)+(2).
+
+**Jak odblokować djvu w chmurze (workflow):** na laptopie z calibre/djvulibre →
+`python -m narzedzia.rag.konwerter --buduj` → `git add -f bibliotheca_ulpia/dane/tekst_cache/BIB-065*.txt
+BIB-066* BIB-067* BIB-048*` → commit. Wtedy chmura domknie QNT/RLA (Shreve/Sutton-Barto) i Aronsona.
+
+Testy: `tests/test_konwerter.py` (8 — cache hit/miss, atomowość, poisoning-guard, graceful).
+Bramka: 2168 testów zielone, audyt exit 0, ruff czysty.
+
+**Pliki:** `narzedzia/rag/konwerter.py`, `narzedzia/rag/ekstraktor.py`, `.gitignore`,
+`tests/test_konwerter.py`
+
+---
+
 ## 2026-07-11 | ⛓️ | ENCYKLOPEDIA: DEF ✅ + RLA/QNT 🚧 (domknięcie serii nowych działów)
 
 Trzy ostatnie działy z serii nowych ksiąg — do granicy tego, co wykonalne w chmurze.

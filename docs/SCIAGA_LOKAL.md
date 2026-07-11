@@ -75,6 +75,30 @@ Wznawianie ma sens tylko dla krótkiej, bieżącej rozmowy. Po to zbudowaliśmy 
 
 ---
 
+## 2d. 📚 Wiedza z książek BEZ tokenów — praca lokalna, potem chirurgiczny RAG
+
+Ciężką pracę z książkami (konwersja djvu/mobi, ekstrakcja, indeks) robimy LOKALNIE narzędziami
+deterministycznymi — **0 tokenów Claude**. Dopiero potem Claude pyta RAG i płaci tylko za
+zwrócone fragmenty (~setki tokenów), nie za czytanie całych książek (setki tysięcy).
+
+**Jedna komenda (na laptopie, z calibre + djvulibre):**
+```powershell
+python -m narzedzia.przygotuj_biblioteke
+```
+Robi 3 kroki, wszystkie token-free: (1) konwersja+cache tekstu (`konwerter`), (2) indeks RAG
+(`indeksuj`), (3) katalog metadanych (`metadane_ksiag`). Idempotentne — pomija już zrobione.
+
+**Odblokowanie djvu dla chmury** (Shreve/Sutton-Barto/Aronson/Kissell — 5 plików djvu):
+```powershell
+python -m narzedzia.przygotuj_biblioteke     # najpierw skonwertuj lokalnie (djvutxt)
+git add -f bibliotheca_ulpia/dane/tekst_cache/BIB-022* BIB-048* BIB-065* BIB-066* BIB-067*
+git commit -m "cache tekstu djvu — chmura czyta bez calibre"
+```
+Cache jest kluczowany haszem treści → ten sam plik = ten sam cache na obu maszynach (Prawo XVII).
+Bez calibre/djvutxt kroki i tak działają dla epub/pdf (djvu abstynuje — Prawo XV).
+
+---
+
 ## 3. Testy i audyt (przed każdą większą zmianą)
 
 ```powershell

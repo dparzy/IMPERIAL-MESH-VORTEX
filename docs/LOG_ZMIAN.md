@@ -6,6 +6,184 @@
 
 ---
 
+## 2026-07-11 | 📚 | JEDNA KOMENDA: przygotuj bibliotekę lokalnie (0 tokenów Claude)
+
+Odpowiedź na pytanie Cezara o beztokenową konwersję lokalną. Uczciwa ocena 3 opcji:
+- „Claude portable do folderu" — NIE istnieje (Claude Code to CLI, nie app per-folder); ale
+  SETUP jest już przenośny (CLAUDE.md+hooki+.mcp.json+pamięć jadą w repo). Nic do dodania.
+- „MCP dla lokala" — JUŻ jest (.mcp.json: biblioteka RAG + arena, lokalne, token-free).
+- „Beztokenowa konwersja djvu" — realne; brakowało jednej komendy spinającej.
+
+**Wdrożone:** `narzedzia/przygotuj_biblioteke.py` — jedna komenda, 3 kroki token-free:
+(1) `konwerter --buduj` (cache tekstu), (2) `indeksuj --korpus biblioteka` (RAG),
+(3) `metadane_ksiag` (katalog). Diagnoza narzędzi (calibre/djvutxt), graceful bez nich,
+idempotentne. Smoke-test w chmurze: **64/69 książek scache'owane** (5 djvu zgłoszone jako
+wymagające djvutxt: Kissell/Aronson/Shreve I,II/Sutton-Barto).
+
+**Filozofia tokenów (SCIAGA §2d, dopisane):** ciężka praca (konwersja+indeks) LOKALNIE = 0
+tokenów LLM; Claude potem pyta RAG chirurgicznie (płaci za fragmenty, nie za całe książki).
+
+**Pliki:** `narzedzia/przygotuj_biblioteke.py`, `tests/test_przygotuj_biblioteke.py`,
+`docs/SCIAGA_LOKAL.md` (§2d). Bramka: testy zielone, audyt exit 0, ruff czysty.
+
+---
+
+## 2026-07-11 | 🔄 | KONWERTER/CACHE TEKSTU KSIĄG — auto-convert djvu, odblokowanie chmury
+
+Odpowiedź na pytanie Cezara o auto-convert formatów. **Prawo XVI:** calibre `ebook-convert` JUŻ jest
+fallbackiem w `ekstraktor.py` — nowy konwerter byłby redundancją. Realną luką był **cache tekstu**.
+
+**Wdrożone:**
+- `narzedzia/rag/konwerter.py` — `ekstrahuj_z_cache(path)`: cache kluczowany HASZEM TREŚCI
+  (sha1[:16]). Trafienie działa BEZ calibre → laptop konwertuje djvu RAZ, po zacommitowaniu pliku
+  cache **chmura czyta go bez calibre** (Prawo XVII — spójność między maszynami). `buduj_cache()`
+  prekonwertuje całą bibliotekę (pasek postępu, idempotentne). Demo: epub 510k zn., 2. odczyt 14× szybszy.
+- `ekstraktor.py` — timeout konwersji 60→300 s (wielkie książki: Shreve, Sutton-Barto, Kaufman).
+- `.gitignore` — cache per-maszyna domyślnie; `git add -f <plik>` odblokowuje wybrane djvu dla chmury.
+
+**Samo-recenzja złapała 3 bugi przed pushem:** (1) KRYTYCZNY — zapis cache nieatomowy → częściowy
+plik serwowany jako prawda (i, po commicie, trułby chmurę uciętą książką); fix: `.tmp`→`os.replace`.
+(2) `_djvu` ignorował kod wyjścia djvutxt → częściowy stdout jako tekst; fix: sprawdzenie returncode.
+(3) próg MIN_ZNAKOW chroni przed pustką, nie przed śmieciem — zmitygowane przez (1)+(2).
+
+**Jak odblokować djvu w chmurze (workflow):** na laptopie z calibre/djvulibre →
+`python -m narzedzia.rag.konwerter --buduj` → `git add -f bibliotheca_ulpia/dane/tekst_cache/BIB-065*.txt
+BIB-066* BIB-067* BIB-048*` → commit. Wtedy chmura domknie QNT/RLA (Shreve/Sutton-Barto) i Aronsona.
+
+Testy: `tests/test_konwerter.py` (8 — cache hit/miss, atomowość, poisoning-guard, graceful).
+Bramka: 2168 testów zielone, audyt exit 0, ruff czysty.
+
+**Pliki:** `narzedzia/rag/konwerter.py`, `narzedzia/rag/ekstraktor.py`, `.gitignore`,
+`tests/test_konwerter.py`
+
+---
+
+## 2026-07-11 | ⛓️ | ENCYKLOPEDIA: DEF ✅ + RLA/QNT 🚧 (domknięcie serii nowych działów)
+
+Trzy ostatnie działy z serii nowych ksiąg — do granicy tego, co wykonalne w chmurze.
+
+- **DEF ✅** (BIB-069 Voshmgir + BIB-054 Antonopoulos-Wood, ekstrakcja z plików): klasy tokenów,
+  stablecoiny + Impossible Trinity, AMM/DEX, flash loans/flash-ataki, perpetuale, PoS, gas/EIP-1559,
+  oracles, composability. **Wpływ:** PSY-01/04 (funding/OI ← perpetuale), OC-05/Straż (flash-ataki).
+  **KANDYDACI ⚠️:** reżim depeg stablecoina, głębokość AMM, gas jako termometr sieci, funding-neuron.
+- **RLA 🚧** (BIB-068 Goodfellow ✅ z pliku): DL — curse of dimensionality, regularyzacja, CNN/RNN,
+  representation learning; most do hedge_mwu (MWU=online learning/regret) ugruntowany w KODZIE.
+  BIB-067 Sutton-Barto (RL) — **djvu PENDING** ekstrakcji na laptopie.
+- **QNT 🚧** (styki z kodem ✅): Feynman-Kac→ECON (z ARTEMIS), GARCH/FracDiff/BOCPD, martyngał→
+  uczciwy backtest. BIB-065/066 Shreve — **djvu PENDING** na laptopie.
+
+**Ograniczenie chmury (Prawo I):** djvu nieczytelne bez `djvutxt` (brak w chmurze) — Shreve I/II
+i Sutton-Barto oznaczone ⚠️ PENDING, esencja djvu domknie się na laptopie. Nie fabrykuję z pamięci.
+
+**Bilans encyklopedii:** wszystkie 15 działów mają treść — 13 ✅, 2 🚧 (RLA/QNT, czekają na djvu).
+INDEX_MAIOR: statusy + kanon zaktualizowane. Pliki: DEF/RLA/QNT + INDEX_MAIOR.
+
+---
+
+## 2026-07-11 | 📊 | ENCYKLOPEDIA: dział MAK domknięty (makro, cykle długu) — Dalio + Popper
+
+Drugi dział z serii nowych ksiąg. **MAK 🚧 → ✅** (był tylko Patel; dodano 3× Dalio + Popper).
+
+Esencja UGRUNTOWANA ekstrakcją z plików (Prawo I): Dalio — archetyp Big Debt Cycle (deflacyjny/
+inflacyjny), 4 dźwignie (austerity/default/druk/transfery), „beautiful deleveraging", „pushing on
+a string", Big Cycle mocarstw (500 lat, 18 determinant, waluta rezerwowa), 5 stadiów wypłacalności;
+Popper — BTC jako store-of-value w debasementcie fiata (digital gold, ograniczona inflacja podaży).
+
+**Wpływ na kod:** Gubernator (mnożnik reżimu ← faza makro jako wolnozmienne TŁO), RADAR-01/03
+(płynność, risk-on/off), Senat (debata makro). **KANDYDACI ⚠️:** neuron kontekstu makro-reżimu
+(faza Big Debt Cycle — TŁO, NIE sygnał per-bar — Prawo XV, ryzyko martwego głosu), detektor
+„pushing on a string", reżim debasement→BTC-hedge (łączy MAK+ONC). Prawo XVI: dekorelacja z RADAR
+do zmierzenia przed budową.
+
+**Pliki:** `bibliotheca_ulpia/encyklopedia/MAK_makroekonomia_i_cykle.md` (🚧→✅),
+`bibliotheca_ulpia/encyklopedia/INDEX_MAIOR.md` (MAK 🚧→✅). Następne: DEF → QNT → RLA (djvu pending).
+
+---
+
+## 2026-07-11 | 🫧 | ENCYKLOPEDIA: dział BAN wypełniony (bańki, krachy, behawioralne)
+
+Pierwsze domknięcie działu z listy nowych ksiąg (rekomendacja z audytu pokrycia BIB-001..042 vs
+043..069: stary kanon kompletny, luka po stronie nowych działów). Dział **BAN 🔲 → ✅**.
+
+Esencja UGRUNTOWANA ekstrakcją fragmentów z plików (Prawo I, nie z pamięci): model Minsky-
+Kindleberger (displacement→overtrading→mania→critical stage→panika→contagion), Shiller (feedback
+loop = naturalny Ponzi, CAPE), Thaler (nadreakcja DeBondt-Thaler, awersja do straty ~2×),
+Reinhart-Rogoff (debt intolerance, „this time is different" jako sygnał szczytu).
+
+**Wpływ na kod (zmapowany na anatomię):** Z-03 kill-switch ← critical stage; Z-04 ← kaskada;
+Z-07 PI-Cycle ← szczyt sprzężenia; PSY-03 ← herd; RADAR-04 ← contagion; X-27 ← nadreakcja.
+**KANDYDACI ⚠️** (do walidacji areną): neuron „faza cyklu kredytowego" (Minsky classifier),
+analog CAPE dla krypto, filtr „New Era/this-time-is-different", asymetria loss-aversion w sizingu
+(spójne z ECON). Prawo XVI: kandydaci 1-2 sąsiadują z Z-03/07 → zmierzyć dekorelację przed budową.
+
+**Pliki:** `bibliotheca_ulpia/encyklopedia/BAN_banki_krachy_behawioralne.md` (szkielet → pełny),
+`bibliotheca_ulpia/encyklopedia/INDEX_MAIOR.md` (BAN 🔲→✅, Stan na 06-25→07-11).
+Następne działy do wypełnienia: MAK (domknąć 🚧) → DEF → QNT → RLA.
+
+---
+
+## 2026-07-11 | 📚 | ANALIZA KSIĄG BIB-043..069 — mapowanie 27 nowych pozycji na Imperium
+
+Analiza „zgodnie z zasadami" 27 nowo dodanych książek. Ekstrakcja TOC+wstępu z KAŻDEGO pliku
+(ebooklib/pymupdf zainstalowane jednorazowo, nie do requirements) — analiza UGRUNTOWANA w
+realnej treści, nie z pamięci (Prawo I). 23/27 przeczytane; 4 djvu (Aronson, Shreve I/II,
+Sutton-Barto) czekają na `djvutxt` na laptopie — oznaczone ⚠️ PENDING.
+
+**Kluczowe odkrycie:** nowe księgi mapują się dokładnie na PLANOWANE (🔲) działy encyklopedii:
+- **BAN** (bańki/behawioralne) — 7 ksiąg: Kindleberger, Shiller, Thaler, Reinhart-Rogoff,
+  Chancellor, MacKay → Z-03/04/07, PSY-03, RADAR stres.
+- **MAK** (makro/dług) — 3× Dalio (Big Debt Cycle) + Popper → Gubernator, RADAR, reżim makro.
+- **QNT** (stochastyka) — Shreve I/II (Feynman-Kac, brak arbitrażu) → FUNDAMENT ECON/FiltrEkonomiczny.
+- **RLA** (RL/DL) — Sutton-Barto, Goodfellow → hedge_mwu, KANDYDAT GIFT (RL portfela z wrzutni).
+- **DEF** (DeFi) — Voshmgir, Antonopoulos-Ethereum → neurony DeFi, funding/perp (PSY-01).
+
+**Symbioza:** ECON (zbudowany dziś) ma teraz dwa filary w kanonie — Duke „Thinking in Bets"
+(zakład, nie pewnik) + Shreve Feynman-Kac (brak arbitrażu). Backlog wrzutni ma teorię w kanonie.
+
+**Deliverable:** `docs/ANALIZA_BIB_043-069_2026-07-11.md` (datowany snapshot) — tabela 27 ksiąg
+(dział/ważność/status) + grupowanie po działach z wpływem na kod + KANDYDACI ⚠️. To FUNDAMENT;
+wypełnienie działów prozą = follow-up (ZASADA ANALIZY CZĄSTKOWEJ: książka → esencja → zapis).
+Zaktualizowano: INDEKS_IMPERIUM (poz. 61), INDEX_MAIOR (kanon 42→69, nieaktualny — Prawo XVII).
+
+**Pliki:** `docs/ANALIZA_BIB_043-069_2026-07-11.md`, `docs/INDEKS_IMPERIUM.md`,
+`bibliotheca_ulpia/encyklopedia/INDEX_MAIOR.md`
+
+---
+
+## 2026-07-11 | 🔗 | WPIĘCIE KATALOGU KSIĄG W RAG — wzbogacenie + filtr autor/tag
+
+Dokończenie ścieżki calibre: katalog metadanych (`katalog_ksiag.json`) jako SOCZEWKA nad RAG.
+
+**Wdrożone:**
+- `narzedzia/rag/katalog.py` — łączy katalog z wynikami RAG po nazwie pliku (`zrodlo` = `plik`).
+  `wczytaj_katalog` / `opis_metadanych` / `pasuje_filtr`. Graceful: brak/uszkodzony katalog → {}.
+- `szukaj.py` — wyniki wzbogacone o autora/rok/tagi w nagłówku; nowy OPT-IN filtr `autor`/`tag`
+  (domyślnie None → zachowanie IDENTYCZNE, dowiedzione testem). Filtr nadpobiera i post-filtruje.
+- `mcp_server.py` — `biblioteka_szukaj` dostał parametry `autor`/`tag` (Claude może filtrować
+  po autorze/tagu przez MCP); opis „42 książki" → „69".
+- `tests/test_rag_katalog.py` — 12 testów, w tym integracja end-to-end filtra na syntetycznej
+  bazie z fragmentami książek (realna baza ma dziś tylko docs).
+
+**Bug złapany w samo-recenzji przed pushem:** `from narzedzia.rag import katalog` WYWALAŁ serwer
+MCP (ma na sys.path tylko `narzedzia/rag`, nie root; robi `from szukaj import`). Testy tego nie
+łapały (runner startuje z roota). Naprawiono importem odpornym na oba konteksty (try/except).
+Dodatkowo przeniesiono parsowanie żądania MCP do `try` (Księga Wad: malformed → JSON-RPC error).
+
+**Adversarial recenzja — 2 znaleziska (ograniczenia danych, nie logiki):**
+- Filtr `tag` i wzbogacenie o rok są NIEAKTYWNE na obecnym katalogu (calibre=False → 0/69 tagów;
+  autor 69/69 działa). To pułapka UX (tag → puste = wygląda na zepsute). Dodano uczciwą
+  podpowiedź na stderr: „uruchom metadane_ksiag z calibre na laptopie". Ożyje po calibre.
+- Nadpobranie zwiększone `max(topk*10,50)` → `max(topk*20,100)` (recall dla rzadkich autorów).
+
+**Status:** autor-filtr + autor-enrichment działają OD RAZU. Tag/rok ożywają po `metadane_ksiag`
+z calibre. Uwaga: filtr działa po REINDEKSACJI z książkami — ta baza RAG ma dziś tylko docs
+(książki indeksuje `indeksuj.py --korpus biblioteka` na laptopie). Zero zmian w `.mcp.json`.
+
+**Pliki:** `narzedzia/rag/katalog.py`, `narzedzia/rag/szukaj.py`, `narzedzia/rag/mcp_server.py`,
+`tests/test_rag_katalog.py`
+
+---
+
 ## 2026-07-11 | 📖 | KATALOG METADANYCH KSIĄG — calibre jako backend (nie MCP)
 
 Rozbudowa Bibliotheki Ulpia. Cezar wybrał: calibre jako NARZĘDZIE zaplecza karmiące istniejący

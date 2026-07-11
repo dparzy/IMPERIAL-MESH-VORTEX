@@ -1,6 +1,6 @@
 # 🏛️ ALG — Algorytmy i Machine Learning | Encyklopedia Imperium
 
-> **Stan na:** 2026-06-25 | **Ważność:** ⭐⭐⭐⭐ (wysoki — mózg analityczny roju)
+> **Stan na:** 2026-07-11 | **Ważność:** ⭐⭐⭐⭐ (wysoki — mózg analityczny roju)
 > **Dla nowicjusza (ZPO):** to dział o tym, jak Imperium PRZETWARZA dane w decyzje —
 > statystyka, ML, walidacja. Kluczowa lekcja całego działu: **łatwo oszukać samego siebie**
 > (overfitting, leak, fałszywy edge). Połowa pracy to budowa modelu, druga połowa to
@@ -12,6 +12,7 @@
 3. [HRP — alokacja](#3-hrp)
 4. [Szeregi czasowe i GARCH](#4-szeregi-czasowe)
 5. [Pułapki ML w finansach](#5-pułapki-ml)
+5b. [Aronson — evidence-based TA i data-mining bias](#5b-aronson)
 6. [Walidacja: jak nie oszukać siebie](#6-walidacja)
 7. [Wpływ na Imperium](#7-wpływ-na-imperium)
 8. [Źródła](#8-źródła)
@@ -77,6 +78,32 @@ niestabilnej macierzy):
 
 ---
 
+## 5b. ARONSON — EVIDENCE-BASED TA (BIB-048): fundament pod DSR
+
+David Aronson, *Evidence-Based Technical Analysis* (2007) — filozoficzno-statystyczny fundament
+całego naszego rdzenia anty-overfittingu. ✅ **EKSTRAKT** (djvu→cache, calibre 2026-07-11; proza
+czytelna, zweryfikowana `biblioteka_szukaj`).
+
+- **TA obiektywna vs subiektywna:** tylko **obiektywne** reguły (jednoznaczny sygnał binarny
+  kup/sprzedaj) są **falsyfikowalne** i testowalne. TA subiektywna to *„illusory validity"*
+  (rozdz. 2) — interpretacja post-hoc, „nawet nie błędna". Imperium liczy tylko sygnał mierzalny
+  (IC) — to Aronson w praktyce.
+- **Data-mining bias (rozdz. 6, „The Fool's Gold of Objective TA"):** *„the past performance of a
+  rule discovered by data mining overstates its likely performance in the future"*. Błędem NIE jest
+  samo eksplorowanie reguł (to produktywna metoda), lecz **niewzięcie poprawki na skalę przeszukania**.
+  Korygując o liczbę testowanych reguł, można wyciągnąć trafny wniosek o przyszłym potencjale.
+  → To dokładnie nasze **DSR** (Deflated Sharpe koryguje o liczbę prób) i wiersz *Multiple testing*
+  w §5. Aronson = uzasadnienie empiryczne, López de Prado = narzędzie formalne.
+- **Empiria (Part Two):** test **6 402** binarnych reguł kup/sprzedaj na S&P 500, 25 lat danych,
+  z testami istotności odpornymi na data-mining bias — wzorzec dyscypliny, którą stosuje arena.
+- **Metoda naukowa (rozdz. 3):** hipoteza → test → falsyfikacja. Zbieżne z Prawem I („fakty ponad
+  mgłę") i ZASADĄ ZWIADOWCY WIEDZY (kandydat ≠ prawda — rozstrzyga pomiar).
+
+> **Konfrontacja (symbioza):** Bulkowski (BIB-049, statystyka formacji) czytamy PRZEZ Aronsona —
+> formacja bez korekty na data-mining bias to fool's gold.
+
+---
+
 ## 6. WALIDACJA (jak nie oszukać siebie)
 
 To esencja całego działu — narzędzia, które Imperium realnie używa:
@@ -111,6 +138,10 @@ To esencja całego działu — narzędzia, które Imperium realnie używa:
 - BIB-031 Tsay — *Analysis of Financial Time Series* (GARCH, ARIMA)
 - BIB-025 Grinold & Kahn — *Active Portfolio Management* (prawo fundamentalne)
 - BIB-026 Jansen — *ML for Algorithmic Trading*
+- **BIB-048 Aronson** — *Evidence-Based Technical Analysis* (Wiley 2007, ISBN 978-0-470-00874-4)
+  ✅ **EKSTRAKT** (djvu→cache, calibre; proza zweryfikowana). Data-mining bias (rozdz. 6), TA
+  obiektywna vs subiektywna (illusory validity), metoda naukowa w TA, test 6 402 reguł na S&P 500.
+  Fundament empiryczny/filozoficzny pod DSR (§5b, §6).
 - **BIB-012 Van Der Post, Strauss & Schwartz** — *Coding Capital: The Art of Algorithmic
   Trading* (Reactive Publishing 2024, 979-8-87385-994-8) ✅ web — warsztat budowy systemu
   algo w Pythonie od zera. Esencja: backtesting OBOWIĄZKOWY przed live (pyfolio tear-sheets);

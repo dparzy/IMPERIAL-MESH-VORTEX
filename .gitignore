@@ -22,6 +22,10 @@ raporty/
 # Stan uczenia cross-session (generowany w runtime — nie wersjonowany)
 logs/
 narzedzia/rag/baza_wiedzy.db
+# Cache tekstu książek (konwerter.py) — per-maszyna, jak baza RAG. Konkretne pliki djvu
+# można odblokować dla chmury świadomym `git add -f bibliotheca_ulpia/dane/tekst_cache/<plik>`
+# (decyzja Cezara — trwałe udostępnienie tekstu djvu obu maszynom, Prawo XVII).
+bibliotheca_ulpia/dane/tekst_cache/
 
 # Lokalne artefakty A/B (generowane przez backtest_ab_* — nie wersjonowane, wynik w LOG_ZMIAN)
 ab_mtf_metryki.json

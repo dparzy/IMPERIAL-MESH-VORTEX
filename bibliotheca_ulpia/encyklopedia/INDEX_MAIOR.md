@@ -1,6 +1,6 @@
 # 📖 BIBLIOTHECA ULPIA MAIOR — Master Index
 
-> **Stan na:** 2026-06-25
+> **Stan na:** 2026-07-11
 > **Co to jest:** żywa, tematyczna biblia wiedzy Imperium. Nie streszczenia książek —
 > skondensowana wiedza operacyjna podzielona na działy, z oceną ważności i wprost
 > wskazanym wpływem na kod Imperium (neurony / strategie / bezpieczniki).
@@ -35,19 +35,25 @@
 | **PSY** | [Psychologia tradingu](PSY_psychologia_tradingu.md) | ⭐⭐⭐ | PSY-01..04, Senat, Reguła 6% | ✅ |
 | **ONC** | [On-chain i krypto](ONC_onchain_i_krypto.md) | ⭐⭐⭐ | OC-01..08, RADAR-02/03, Z-07 | ✅ |
 | **MEM** | [Pamięć agentów AI](MEM_pamiec_agentow_ai.md) | ⭐⭐⭐⭐⭐ | centrum_pamieci, pamiec_sesji, kronika_czatu, mnemosyne, pamiec_absolutna, pamiec_refleksyjna | ✅ |
-| **MAK** | [Makroekonomia, cykle długu i pieniądz](MAK_makroekonomia_i_cykle.md) | ⭐⭐⭐⭐ | RADAR-01..05, Gubernator, Senat | 🚧 |
-| **BAN** | [Bańki, krachy i finanse behawioralne](BAN_banki_krachy_behawioralne.md) | ⭐⭐⭐⭐ | Z-07 PI-Cycle, PSY-03, Senat, Reguła 6% | 🔲 |
-| **QNT** | [Matematyka ilościowa i procesy stochastyczne](QNT_matematyka_stochastyczna.md) | ⭐⭐⭐⭐ | GARCH, BOCPD, neurony zmienności, arena trzech bram | 🔲 |
-| **RLA** | [Uczenie ze wzmocnieniem i deep learning](RLA_uczenie_wzmocnieniem_dl.md) | ⭐⭐⭐⭐ | hedge_mwu, Legatus, MEM, przyszli agenci RL | 🔲 |
-| **DEF** | [DeFi, tokenomika i Web3](DEF_defi_tokenomika_web3.md) | ⭐⭐⭐ | OC-*, przyszłe neurony DeFi, Senat | 🔲 |
+| **MAK** | [Makroekonomia, cykle długu i pieniądz](MAK_makroekonomia_i_cykle.md) | ⭐⭐⭐⭐ | RADAR-01..05, Gubernator, Senat | ✅ |
+| **BAN** | [Bańki, krachy i finanse behawioralne](BAN_banki_krachy_behawioralne.md) | ⭐⭐⭐⭐ | Z-03/04/07, PSY-03, RADAR-04, Senat, Reguła 6% | ✅ |
+| **QNT** | [Matematyka ilościowa i procesy stochastyczne](QNT_matematyka_stochastyczna.md) | ⭐⭐⭐⭐ | EXP-13 GARCH, BOCPD-01, N-02 FracDiff, ECON/Feynman-Kac | ✅ |
+| **RLA** | [Uczenie ze wzmocnieniem i deep learning](RLA_uczenie_wzmocnieniem_dl.md) | ⭐⭐⭐⭐ | hedge_mwu, Legatus, MEM, przyszli agenci RL | ✅ |
+| **DEF** | [DeFi, tokenomika i Web3](DEF_defi_tokenomika_web3.md) | ⭐⭐⭐ | PSY-01/04, OC-*, przyszłe neurony DeFi, Senat, Straż A-* | ✅ |
 
 Legenda statusu: ✅ gotowy · 🔲 zaplanowany · 🚧 w budowie
 
 ---
 
-## 📕 KANON ŹRÓDŁOWY (42 książki → działy)
+## 📕 KANON ŹRÓDŁOWY (69 książek → działy)
 
 Mapa: która książka zasila który dział. (Pliki: `bibliotheca_ulpia/BIB-xxx_*`)
+
+> **BIB-043..069 (27 nowych, 2026-07-11):** zmapowane w `docs/ANALIZA_BIB_043-069_2026-07-11.md`.
+> Zasilają głównie działy planowane: **BAN** (7 ksiąg — Kindleberger/Shiller/Thaler/Reinhart-Rogoff/
+> Chancellor/MacKay), **MAK** (3× Dalio), **QNT** (Shreve I/II — fundament ECON/Feynman-Kac),
+> **RLA** (Sutton-Barto/Goodfellow), **DEF** (Voshmgir/Antonopoulos-Ethereum) + wzmocnienie
+> MKS/PSY/ALG/STR. Wypełnienie działów prozą: follow-up (ZASADA ANALIZY CZĄSTKOWEJ).
 
 | Dział | Książki źródłowe |
 |-------|------------------|
@@ -57,14 +63,14 @@ Mapa: która książka zasila który dział. (Pliki: `bibliotheca_ulpia/BIB-xxx_
 | PSY | BIB-004 Steenbarger, BIB-016 Douglas, BIB-017 Kahneman, BIB-015 Elder, **BIB-038 Schwager, BIB-039 Lefèvre** |
 | MKS | BIB-020 Harris (Trading&Exchanges), BIB-032 O'Hara, BIB-022 Kissell, BIB-027 Aldridge |
 | ONC | BIB-030 Ammous (Bitcoin Standard), BIB-029 Bashir (Blockchain), BIB-003 Burniske, BIB-005 Blum (intro), BIB-024 Lowe (intro ⭐1, antywzorzec) |
-| ALG | BIB-007/023 López de Prado, BIB-026 Jansen, BIB-031 Tsay, BIB-025 Grinold&Kahn, BIB-012 Van Der Post (Coding Capital) |
+| ALG | BIB-007/023 López de Prado, BIB-026 Jansen, BIB-031 Tsay, BIB-025 Grinold&Kahn, BIB-012 Van Der Post (Coding Capital), **BIB-048 Aronson (Evidence-Based TA — data-mining bias)** |
 | STR | BIB-002 Murphy, BIB-013/014 Dalton, BIB-006/021 scalping, BIB-019 Harris (Crypto) |
 | MEM | BIB-033 Huyen (AI Engineering), BIB-034 Infante (AI Agents), BIB-035 Iusztin&Labonne (LLM Engineer's Handbook), BIB-036 Alto (Building LLM Powered Apps) + arXiv MEM-01..04 (FinMem/FinAgent/Mem0/A-Mem) |
-| MAK | **BIB-001 Patel (Secret Wealth Advantage — 18-letni cykl) ✅** + 🔲 BIB-056 Dalio (Big Debt Crises), BIB-057 Dalio (Changing World Order), BIB-058 Dalio (How Countries Go Broke) |
-| BAN | 🔲 BIB-059 Kindleberger, BIB-060 Shiller, BIB-061 Thaler, BIB-062 Chancellor, BIB-063 MacKay, BIB-064 Reinhart-Rogoff |
-| QNT | 🔲 BIB-065 Shreve I (Binomial), BIB-066 Shreve II (Continuous-Time) |
-| RLA | 🔲 BIB-067 Sutton & Barto (RL), BIB-068 Goodfellow (Deep Learning) |
-| DEF | 🔲 BIB-069 Voshmgir (Token Economy 3rd ed) |
+| MAK | ✅ BIB-001 Patel (18-letni cykl), BIB-056 Dalio (Big Debt Crises), BIB-057 Dalio (Changing World Order), BIB-058 Dalio (How Countries Go Broke), BIB-055 Popper (Digital Gold — makro) |
+| BAN | ✅ BIB-059 Kindleberger, BIB-060 Shiller, BIB-061 Thaler, BIB-062 Chancellor, BIB-063 MacKay, BIB-064 Reinhart-Rogoff |
+| QNT | ✅ BIB-065 Shreve I (Binomial), BIB-066 Shreve II (Continuous-Time) — djvu wyekstrahowane (calibre), proza w RAG (równania OCR-ograniczone) |
+| RLA | ✅ BIB-068 Goodfellow (Deep Learning) + BIB-067 Sutton & Barto (RL) — djvu wyekstrahowane (calibre), tekst czysty w RAG |
+| DEF | ✅ BIB-069 Voshmgir (Token Economy 3rd ed), BIB-054 Antonopoulos-Wood (Mastering Ethereum) |
 
 ---
 

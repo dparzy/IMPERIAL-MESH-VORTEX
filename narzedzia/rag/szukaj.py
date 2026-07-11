@@ -19,6 +19,13 @@ import sys
 from pathlib import Path
 from typing import NamedTuple
 
+# Import odporny na dwa konteksty: (a) pakiet z rootem na ścieżce (testy, `python -m`),
+# (b) mcp_server, który wrzuca na sys.path SAM katalog `narzedzia/rag` i robi `from szukaj ...`.
+try:
+    from narzedzia.rag import katalog
+except ImportError:  # pragma: no cover — ścieżka mcp_server / bezpośredni `python szukaj.py`
+    import katalog  # type: ignore[no-redef]
+
 ROOT = Path(__file__).resolve().parent.parent.parent
 DEFAULT_BAZA = ROOT / "narzedzia" / "rag" / "baza_wiedzy.db"
 DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
@@ -120,7 +127,14 @@ def szukaj(
     model_name: str = DEFAULT_MODEL,
     cichy: bool = False,
     korpus: str | None = None,
+    autor: str | None = None,
+    tag: str | None = None,
 ) -> list[Wynik]:
+    """
+    autor/tag (OPT-IN, domyślnie None): filtr po katalogu książek (metadane_ksiag.py).
+    Bez filtra zachowanie IDENTYCZNE jak dawniej. Z filtrem: nadpobieramy kandydatów
+    i zostawiamy tylko książki pasujące metadanymi (autor/tag jako podciąg, insensitive).
+    """
     if not baza.exists():
         print(f"[RAG] Baza nie istnieje: {baza}\nUruchom najpierw: python narzedzia/rag/indeksuj.py", file=sys.stderr)
         return []
@@ -144,13 +158,17 @@ def szukaj(
         if not cichy:
             print("[RAG] Brak wektorów/modelu, używam FTS", file=sys.stderr)
 
+    # Przy aktywnym filtrze katalogowym nadpobieramy — część kandydatów odpadnie po metadanych.
+    filtr_aktywny = bool(autor or tag)
+    pobierz = max(topk * 20, 100) if filtr_aktywny else topk
+
     if tryb == "fts":
-        wyniki = _fts_szukaj(conn, zapytanie, topk, korpus)[:topk]
+        wyniki = _fts_szukaj(conn, zapytanie, pobierz, korpus)[:pobierz]
     elif tryb == "wektor":
-        wyniki = _wektor_szukaj(conn, zapytanie, topk, model, korpus)[:topk]
+        wyniki = _wektor_szukaj(conn, zapytanie, pobierz, model, korpus)[:pobierz]
     else:  # hybrid
-        fts_wyniki = _fts_szukaj(conn, zapytanie, topk, korpus)
-        vec_wyniki = _wektor_szukaj(conn, zapytanie, topk, model, korpus)
+        fts_wyniki = _fts_szukaj(conn, zapytanie, pobierz, korpus)
+        vec_wyniki = _wektor_szukaj(conn, zapytanie, pobierz, model, korpus)
         # połącz po ID, preferuj te które wystąpiły w obu
         seen: dict[int, Wynik] = {}
         bonus_ids = {w.id for w in fts_wyniki} & {w.id for w in vec_wyniki}
@@ -158,20 +176,32 @@ def szukaj(
             if w.id not in seen:
                 seen[w.id] = w
         # bonus dla wyników w obu listach (reranking)
-        wyniki = sorted(seen.values(), key=lambda x: (x.id not in bonus_ids, -x.score))[:topk]
+        wyniki = sorted(seen.values(), key=lambda x: (x.id not in bonus_ids, -x.score))[:pobierz]
 
     conn.close()
-    return wyniki
+
+    if filtr_aktywny:
+        kat = katalog.wczytaj_katalog()
+        # Uczciwa podpowiedź (recenzja): filtr --tag na katalogu bez tagów zawsze zwróci puste,
+        # co wygląda na zepsute. Tagi/rok wymagają calibre (`metadane_ksiag` na laptopie).
+        if tag and not cichy and not any(m.get("tagi") for m in kat.values()):
+            print("[RAG] Filtr --tag nieaktywny: katalog nie ma tagów. Uruchom na laptopie "
+                  "z calibre: python -m narzedzia.rag.metadane_ksiag", file=sys.stderr)
+        wyniki = [w for w in wyniki if katalog.pasuje_filtr(w.zrodlo, kat, autor, tag)]
+    return wyniki[:topk]
 
 
 def formatuj(wyniki: list[Wynik], zapytanie: str = "") -> str:
     if not wyniki:
         return f"[RAG] Brak wyników dla: {zapytanie!r}"
+    kat = katalog.wczytaj_katalog()
     linie = [f"[RAG] Wyniki dla: {zapytanie!r} ({len(wyniki)})\n"]
     for i, w in enumerate(wyniki, 1):
         linie.append(f"{'='*60}")
+        meta = katalog.opis_metadanych(w.zrodlo, kat)
+        meta = f"  · {meta}" if meta else ""
         linie.append(
-            f"#{i} | [{w.korpus}] {w.tytul} ({w.zrodlo}, chunk #{w.nr_chunk}) | score={w.score:.4f}"
+            f"#{i} | [{w.korpus}] {w.tytul} ({w.zrodlo}, chunk #{w.nr_chunk}) | score={w.score:.4f}{meta}"
         )
         linie.append(f"{'-'*60}")
         preview = w.tekst[:600].replace("\n", " ")
@@ -188,9 +218,12 @@ if __name__ == "__main__":
     ap.add_argument("--tryb", choices=["hybrid", "fts", "wektor"], default="hybrid")
     ap.add_argument("--korpus", choices=["biblioteka", "dane", "docs"], default=None,
                     help="ogranicz do korpusu (domyslnie: wszystkie)")
+    ap.add_argument("--autor", default=None, help="filtr po autorze z katalogu ksiag (podciag)")
+    ap.add_argument("--tag", default=None, help="filtr po tagu z katalogu ksiag (podciag)")
     ap.add_argument("--baza", default=str(DEFAULT_BAZA))
     ap.add_argument("--model", default=DEFAULT_MODEL)
     args = ap.parse_args()
     q = " ".join(args.zapytanie)
-    wyniki = szukaj(q, args.topk, args.tryb, Path(args.baza), args.model, korpus=args.korpus)
+    wyniki = szukaj(q, args.topk, args.tryb, Path(args.baza), args.model,
+                    korpus=args.korpus, autor=args.autor, tag=args.tag)
     print(formatuj(wyniki, q))

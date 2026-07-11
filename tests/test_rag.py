@@ -214,6 +214,61 @@ def test_ekstraktor_json_uszkodzony():
         assert ekstrahuj(p) == ""
 
 
+def test_calibre_output_rozszerzenie_txt_nie_tmp():
+    """Regresja (Prawo XV + XXI TEST-GRANIC): _calibre MUSI dać ebook-convert plik wyjściowy
+    z rozszerzeniem `.txt`. Poprzednie `.txt.tmp` → calibre widziało format `tmp` i padało
+    (`ValueError: No plugin to handle output format: tmp`), CICHO gubiąc wszystkie djvu
+    (Kissell/Aronson/Shreve/Sutton-Barto). Test podmienia subprocess.run pod ekstraktorem,
+    udając udaną konwersję, i pilnuje kontraktu rozszerzenia + zwrotu tekstu + sprzątania."""
+    import importlib
+    ekstraktor = importlib.import_module("ekstraktor")
+    with tempfile.TemporaryDirectory() as tmp:
+        src = Path(tmp) / "BIB-999_Fake.djvu"
+        src.write_bytes(b"AT&TFORM")
+        zapis: dict = {}
+
+        def _fake_run(cmd, **kw):
+            out = Path(cmd[2])                       # ebook-convert <src> <out>
+            zapis["out"] = out
+            out.write_text("TRESC Z CALIBRE " * 20, encoding="utf-8")
+            return None                              # check=True nie rzuca — sukces
+
+        orig = ekstraktor.subprocess.run
+        ekstraktor.subprocess.run = _fake_run
+        try:
+            tekst = ekstraktor._calibre(src)
+        finally:
+            ekstraktor.subprocess.run = orig
+
+        out = zapis["out"]
+        assert out.suffix == ".txt"                  # granica: format wyjścia = txt
+        assert not str(out).endswith(".tmp")         # jawnie: nie regresja `.tmp`
+        assert "TRESC Z CALIBRE" in tekst            # zwraca skonwertowany tekst
+        assert not out.exists()                      # scratch posprzątany (finally)
+
+
+def test_calibre_porazka_zwraca_pusto_i_sprzata():
+    """Gdy ebook-convert padnie (brak calibre / błąd) — _calibre zwraca '' i nie zostawia śmieci."""
+    import importlib
+    ekstraktor = importlib.import_module("ekstraktor")
+    with tempfile.TemporaryDirectory() as tmp:
+        src = Path(tmp) / "BIB-999_Fake.djvu"
+        src.write_bytes(b"AT&TFORM")
+
+        def _fake_run(cmd, **kw):
+            Path(cmd[2]).write_text("polowiczne", encoding="utf-8")  # scratch powstał...
+            raise RuntimeError("ebook-convert failed")               # ...ale konwersja padła
+
+        orig = ekstraktor.subprocess.run
+        ekstraktor.subprocess.run = _fake_run
+        try:
+            assert ekstraktor._calibre(src) == ""
+        finally:
+            ekstraktor.subprocess.run = orig
+        # brak śmieci .calibre-tmp.txt w katalogu źródła (sprzątanie w finally)
+        assert list(Path(tmp).glob("*.calibre-tmp.txt")) == []
+
+
 # ── indeksacja: korpus + tryb przyrostowy ────────────────────────────────────
 
 def _mini_korpus(tmp: Path) -> Path:

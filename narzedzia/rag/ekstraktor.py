@@ -135,22 +135,30 @@ def _mobi(path: Path) -> str:
             shutil.rmtree(tempdir, ignore_errors=True)
 
 
+# Timeout konwersji: wielkie książki (Shreve, Sutton-Barto, Kaufman ~2 mln znaków) nie mieszczą
+# się w 60 s. 300 s daje margines; koszt płacony raz (potem cache — patrz konwerter.py).
+_TIMEOUT_KONWERSJI = 300
+
+
 def _calibre(path: Path) -> str:
-    """Fallback: ebook-convert → txt (wymaga calibre)."""
-    tmp = path.with_suffix(".txt.tmp")
+    """Fallback: ebook-convert → txt (wymaga calibre). Uniwersalny konwerter dla djvu/azw3/mobi."""
+    # Calibre wybiera format WYJŚCIA po rozszerzeniu pliku docelowego. Rozszerzenie musi więc
+    # być `.txt` — poprzednie `.txt.tmp` dawało `ValueError: No plugin to handle output format:
+    # tmp` i CICHO gubiło wszystkie djvu (Prawo XV — martwy głos przez zły kod). Plik scratcha
+    # kasujemy w finally; atomowy zapis do CACHE robi konwerter.ekstrahuj_z_cache (tmp→os.replace).
+    tmp = path.with_name(path.stem + ".calibre-tmp.txt")
     try:
         subprocess.run(
             ["ebook-convert", str(path), str(tmp)],
             capture_output=True,
-            timeout=60,
+            timeout=_TIMEOUT_KONWERSJI,
             check=True,
         )
-        text = tmp.read_text(encoding="utf-8", errors="replace")
-        tmp.unlink(missing_ok=True)
-        return text
+        return tmp.read_text(encoding="utf-8", errors="replace")
     except Exception:
-        tmp.unlink(missing_ok=True)
         return ""
+    finally:
+        tmp.unlink(missing_ok=True)
 
 
 def _djvu(path: Path) -> str:
@@ -158,9 +166,13 @@ def _djvu(path: Path) -> str:
         r = subprocess.run(
             ["djvutxt", str(path)],
             capture_output=True,
-            timeout=60,
+            timeout=_TIMEOUT_KONWERSJI,
         )
-        return r.stdout.decode("utf-8", errors="replace")
+        # Sprawdzamy kod wyjścia (recenzja): djvutxt na uszkodzonym pliku potrafi wypluć
+        # CZĘŚCIOWY stdout i paść — bez tej kontroli ułamek trafiał do cache jako „prawda".
+        if r.returncode == 0 and r.stdout:
+            return r.stdout.decode("utf-8", errors="replace")
+        return _calibre(path)
     except Exception:
         return _calibre(path)
 

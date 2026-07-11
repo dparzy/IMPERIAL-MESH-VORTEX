@@ -101,6 +101,69 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Bug: neuron zwraca NEUTRAL gdy brak danych w BramaKalkulatora
+MikroNeuron.interpretuj() zwraca SygnalNeuronu z wartoscia NEUTRAL jesli wskaznik nie istnieje w dict Brama. To powoduje ciche bledy w strategiach - nalezy dodac walidacje i warning.
+
+### 2026-06-30 — Slabosc: reczny parametr rezimu w strategiach
+Testy na 3 scenariuszach rynkowych wykazaly, ze reczne podawanie rezimu (NORMAL, TREND_STRONG itp.) jest slabym punktem. Nastepny krok: automatyczny klasyfikator rezimu.
+
+### 2026-06-30 — Bug: neuron zwraca NEUTRAL gdy brak danych wejściowych
+MikroNeuron.interpretuj() zwraca SygnalNeuronu z wartoscia NEUTRAL jesli wskazniki sa puste lub brak wymaganego klucza. To moze maskowac bledy konfiguracji.
+
+### 2026-06-30 — DeepSeek API klucz NIGDY w kodzie ani w czacie
+Zasada bezpieczeństwa: klucz DeepSeek API musi być tylko w zmiennych środowiskowych. W kodzie użyto [ZREDAGOWANO] jako placeholder. Dotyczy to wszystkich plików w Imperium.
+
+### 2026-06-30 — JG z GUSI Pro/Omni-Wave to ten sam JG co DNSS
+Odkryto, że 'R.G. JG' (twórca GUSI Pro, Omni-Wave w bazie wskaźników) to prawdopodobnie ta sama osoba co twórca systemu DNSS (79 agentów). Potwierdza to linię Calculator Pattern.
+
+### 2026-06-30 — Zasada symbiozy zamiast zero duplikatów
+Moduły mogą być wielofunkcyjne, jeśli każdy pokrywa INNY aspekt (np. 4 moduły wielorybów każdy na inne dane). Złe = 5 modułów czytających ten sam kanał. Test: 'Co unikalnego wnosi ten moduł?'
+
+### 2026-06-30 — OpenAlice i Hermes Agent to realne narzędzia
+Zweryfikowano, że OpenAlice (4600★ GitHub) i Hermes Agent (Nous Research, 200+ LLM backends) istnieją i są aktywnymi projektami. Wcześniejsze oznaczenie jako 'niezweryfikowane' było błędne.
+
+### 2026-06-30 — Kategoria Z już zajęta przez zagrożenie
+Kategoria Z (Zagrożenie) zarezerwowana dla VPIN meta-bramy (Z-01) i PumpDetect (Z-02). Sentiment nie może użyć Z.
+
+### 2026-06-30 — Prawo XV: Bez martwych głosów – neuron bez API zawsze NEUTRAL
+Nie dodawać neuronów wymagających niedostępnego API – będą zawsze NEUTRAL, co psuje agregację. Zweryfikowano wszystkie nowe neurony pod kątem dostępności wskaźników.
+
+### 2026-06-30 — Prawo XIX: Kod jest Prawem – klucze katalogu muszą zgadzać się z kodem
+Audyt ujawnił rozbieżności między KATALOG_NEURONOW.md a kodem. Utworzono MAPA_KLUCZY.md jako kanoniczne mapowanie. Klucznik weryfikuje DOSTEPNY=True.
+
+### 2026-06-30 — NeuronPumpDetect Z-02: 3 warunki OHLCV
+Warunek 1: VOLUME/VOLUME_MA20 w [1.5, 4.0]; Warunek 2: (HIGH-LOW)/ATR_14 < 0.75; Warunek 3: OBV > OBV_EMA_20*(1+0.005). Siła = 0.55+0.30*(vol*0.4+zakr*0.3+obv*0.3). Kierunek LONG.
+
+### 2026-06-30 — Wash Trading: Benford chi² + round-number clustering
+Wskaźnik WASH_TRADING łączy chi² (min 1.0, chi2_obs/20.09) z round_frac (min 1.0, (round_frac-0.20)/0.20) przez sqrt(benford*rounding). OC-05 używa progów 0.35 i 0.65.
+
+### 2026-06-30 — Triple Barrier: SL wygrywa przy jednoczesnym trafieniu TP i SL
+W metodzie oznacz_bariera, jeśli TP i SL są trafione w tej samej świecy, wygrywa SL (konserwatywnie). timeliness = 1.0 - (bar_nr-1)/max(max_bary-1, 1).
+
+### 2026-06-30 — Meta-gate defensive neurons zawsze NEUTRAL kierunek
+Neurony obronne (Z-01, N-01, H-01, OC-05) ustawiają pewnosc_przeciwnika zamiast kierunku, wywołują s.policz_finalna() — to wzorzec dla wszystkich bram obronnych.
+
+### 2026-07-10 — Ważenie IC podnosi rój ponad 50% na każdej parze OOS
+Wynik B (ważony IC) = 51.8% globalnie, bije A o +3.6pp i przekracza 50% na KAŻDEJ z 5 par OOS. Potwierdza hipotezę B: wąskie gardło = agregacja.
+
+### 2026-07-10 — Równa waga = 48.2% odtwarza diagnozę triady 48.3%
+Pomiar hipotezy B na 5 parach 4h OOS daje globalnie 48.2% dla równej wagi, co odtwarza diagnozę triady 48.3% co do promila — walidacja pomiaru.
+
+### 2026-07-10 — Katalog scratchpad nie istniał — redirect padł
+Przy uruchamianiu biegów równoległych katalog scratchpad nie istniał, co spowodowało ciche niepowodzenie zapisu. Po utworzeniu katalogu bieg działa poprawnie.
+
+### 2026-07-10 — Pełny backtest 18k barów × 5 par pada na timeout
+Pełny przebieg 18k barów × 5 par jest za wolny i przekracza limit 600s. Potwierdza to ZASADĘ ANALIZY CZĄSTKOWEJ: trzeba cap barów + cząstkowanie z zapisem do areny.
+
+### 2026-06-30 — 12/17 bloków strategii miało błędne klucze w KATALOGU
+Stare klucze projektowe (np. XII-08) nie istniały w kodzie. Audyt W9 wykrywa obce klucze w blokach zaimplementowanych strategii. Wszystkie 17 zsynchronizowane.
+
+### 2026-06-30 — Binance depth zwraca stringi a nie floaty
+L2 order book od Binance ma ceny i wolumeny jako stringi. Dodano float(b[1]) i float(a[1]) w exp_atmabhan._imbalance().
+
+### 2026-06-30 — Diagnostyka fałszywie alarmowała martwe neurony
+Pary z 1 próbką były klasyfikowane jako 'martwe' (len(set)==1). Dodano wymóg >=2 próbek do detekcji stałej serii. Nowy klucz: pary_niedostateczne_dane.
+
 ### 2026-06-30 — Golden Cross: wariant EMA, nie oryginalny SMA
 Strategia ZŁOTY ORZEŁ używa EMA50/EMA200, a nie kanonicznego SMA50/SMA200. Odnotowano w katalogu.
 

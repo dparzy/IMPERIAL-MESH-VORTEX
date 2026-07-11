@@ -1,489 +1,689 @@
 {
   "n": 69,
-  "calibre": false,
+  "calibre": true,
   "ksiegi": [
     {
       "bib": "BIB-001",
-      "autor": "Patel",
+      "autor": "Akhil Patel",
       "tytul": "The Secret Wealth Advantage",
       "format": "azw3",
-      "plik": "BIB-001_Patel_The-Secret-Wealth-Advantage.azw3"
+      "plik": "BIB-001_Patel_The-Secret-Wealth-Advantage.azw3",
+      "wydawca": "Harriman House",
+      "jezyk": "eng",
+      "wydano": "2023-06-18T14:06:53+00:00",
+      "identyfikatory": "mobi-asin:b30428d6-2b33-4e1e-b81e-8087436a58bb"
     },
     {
       "bib": "BIB-002",
-      "autor": "Murphy",
+      "autor": "John J. Murphy",
       "tytul": "Technical Analysis of the Financial Markets",
       "format": "azw3",
-      "plik": "BIB-002_Murphy_Technical-Analysis-of-the-Financial-Markets.azw3"
+      "plik": "BIB-002_Murphy_Technical-Analysis-of-the-Financial-Markets.azw3",
+      "wydawca": "Penguin Publishing Group",
+      "jezyk": "eng",
+      "wydano": "1999-01-02T00:00:00+00:00",
+      "identyfikatory": "mobi-asin:1f518105-39ae-4100-b022-5349d70eda77"
     },
     {
       "bib": "BIB-003",
-      "autor": "Burniske Tatar",
-      "tytul": "Cryptoassets",
+      "autor": "Chris Burniske & Jack Tatar",
+      "tytul": "Cryptoassets: The Innovative Investor's Guide to Bitcoin and Beyond",
       "format": "azw3",
-      "plik": "BIB-003_Burniske-Tatar_Cryptoassets.azw3"
+      "plik": "BIB-003_Burniske-Tatar_Cryptoassets.azw3",
+      "jezyk": "eng",
+      "wydano": "2017-09-09T18:58:17+00:00",
+      "identyfikatory": "mobi-asin:7c3cca47-859a-4593-9241-080cec4ebdc9"
     },
     {
       "bib": "BIB-004",
-      "autor": "Steenbarger",
-      "tytul": "The Psychology of Trading",
+      "autor": "Brett N. Steenbarger [Steenbarger, Brett N.]",
+      "tytul": "The Psychology of Trading (Wiley Trading)",
       "format": "azw3",
-      "plik": "BIB-004_Steenbarger_The-Psychology-of-Trading.azw3"
+      "plik": "BIB-004_Steenbarger_The-Psychology-of-Trading.azw3",
+      "wydawca": "Wiley",
+      "jezyk": "eng",
+      "wydano": "2007-08-14T22:00:00+00:00",
+      "identyfikatory": "mobi-asin:B000QEVMDO"
     },
     {
       "bib": "BIB-005",
-      "autor": "Blum",
-      "tytul": "What Exactly Is Crypto",
+      "autor": "Blum, Jonatan",
+      "tytul": "WHAT EXACTLY IS CRYPTO?",
       "format": "epub",
-      "plik": "BIB-005_Blum_What-Exactly-Is-Crypto.epub"
+      "plik": "BIB-005_Blum_What-Exactly-Is-Crypto.epub",
+      "jezyk": "eng",
+      "wydano": "2022-10-15T22:00:00+00:00"
     },
     {
       "bib": "BIB-006",
-      "autor": "Carson",
-      "tytul": "High Probability Scalping Strategy Playbook",
+      "autor": "Carson, Zachary",
+      "tytul": "High Probability Scalping Strategy Playbook: High Win Rate Scalping Strategies for Trading the Crypto, Forex and Stock Market in 2024!",
       "format": "epub",
-      "plik": "BIB-006_Carson_High-Probability-Scalping-Strategy-Playbook.epub"
+      "plik": "BIB-006_Carson_High-Probability-Scalping-Strategy-Playbook.epub",
+      "jezyk": "eng",
+      "wydano": "2024-01-02T00:00:00+00:00",
+      "identyfikatory": "asin:B0CR9QRVLD"
     },
     {
       "bib": "BIB-007",
-      "autor": "Lopez de Prado",
+      "autor": "Marcos Lopez de Prado [Marcos Lopez de Prado] & chenjin5.com [Prado, Marcos Lopez de && chenjin5.com]",
       "tytul": "Advances in Financial Machine Learning",
       "format": "epub",
-      "plik": "BIB-007_Lopez-de-Prado_Advances-in-Financial-Machine-Learning.epub"
+      "plik": "BIB-007_Lopez-de-Prado_Advances-in-Financial-Machine-Learning.epub",
+      "wydawca": "chenjin5.com 万千书友聚集地",
+      "tagi": "chenjin5.com沉金书屋",
+      "jezyk": "eng",
+      "wydano": "2018-02-01T16:00:00+00:00",
+      "identyfikatory": "asin:1c2019f1-3288-4b76-a9b2-872992df2dfd, isbn:9781119482109"
     },
     {
       "bib": "BIB-008",
-      "autor": "Sinclair",
-      "tytul": "Volatility Trading 2nd ed",
+      "autor": "Euan Sinclair [Sinclair, Euan]",
+      "tytul": "Volatility Trading (Wiley Trading)",
       "format": "azw3",
-      "plik": "BIB-008_Sinclair_Volatility-Trading-2nd-ed.azw3"
+      "plik": "BIB-008_Sinclair_Volatility-Trading-2nd-ed.azw3",
+      "wydawca": "Wiley",
+      "jezyk": "eng",
+      "wydano": "2013-04-15T22:00:00+00:00",
+      "identyfikatory": "mobi-asin:B00CGH01GI"
     },
     {
       "bib": "BIB-009",
-      "autor": "Mandelbrot Hudson",
+      "autor": "Benoit Mandelbrot, Richard L. Hudson",
       "tytul": "The Misbehavior of Markets",
       "format": "epub",
-      "plik": "BIB-009_Mandelbrot-Hudson_The-Misbehavior-of-Markets.epub"
+      "plik": "BIB-009_Mandelbrot-Hudson_The-Misbehavior-of-Markets.epub",
+      "wydawca": "Basic Books",
+      "jezyk": "eng",
+      "wydano": "2011-02-23T23:00:00+00:00"
     },
     {
       "bib": "BIB-010",
-      "autor": "Chan",
-      "tytul": "Quantitative Trading 2nd ed",
+      "autor": "Ernest P. Chan [Chan, Ernest P.]",
+      "tytul": "Quantitative Trading: How to Build Your Own Algorithmic Trading Business",
       "format": "epub",
-      "plik": "BIB-010_Chan_Quantitative-Trading-2nd-ed.epub"
+      "plik": "BIB-010_Chan_Quantitative-Trading-2nd-ed.epub",
+      "wydawca": "Wiley",
+      "jezyk": "eng",
+      "wydano": "2021-07-27T00:16:52+00:00",
+      "identyfikatory": "isbn:9781119800071"
     },
     {
       "bib": "BIB-011",
-      "autor": "Chan",
-      "tytul": "Algorithmic Trading Winning Strategies",
+      "autor": "欧内斯特·陈（Ernest P.Chan）",
+      "tytul": "算法交易：制胜策略与原理",
       "format": "pdf",
       "plik": "BIB-011_Chan_Algorithmic-Trading-Winning-Strategies.pdf"
     },
     {
       "bib": "BIB-012",
-      "autor": "Strauss van der Post",
-      "tytul": "Coding Capital",
+      "autor": "Strauss, Johann & Van Der Post, Hayden",
+      "tytul": "Coding Capital: The Art of Algorithmic Trading: A Comprehensive Guide for Algorithmic Trading with Python in 2024",
       "format": "epub",
-      "plik": "BIB-012_Strauss-van-der-Post_Coding-Capital.epub"
+      "plik": "BIB-012_Strauss-van-der-Post_Coding-Capital.epub",
+      "wydawca": "Reactive Publishing",
+      "jezyk": "eng",
+      "wydano": "2024-01-02T00:00:00+00:00",
+      "identyfikatory": "asin:B0CRF5FVG8"
     },
     {
       "bib": "BIB-013",
-      "autor": "Dalton",
-      "tytul": "Markets in Profile",
+      "autor": "James F. Dalton & Robert B. Dalton & Eric T. Jones [Dalton, James F. & Dalton, Robert B. & Jones, Eric T.]",
+      "tytul": "Markets in Profile: 278 (Wiley Trading)",
       "format": "epub",
-      "plik": "BIB-013_Dalton_Markets-in-Profile.epub"
+      "plik": "BIB-013_Dalton_Markets-in-Profile.epub",
+      "wydawca": "Wiley",
+      "jezyk": "eng",
+      "wydano": "2010-03-07T16:00:00+00:00",
+      "identyfikatory": "mobi-asin:B008L03WWE"
     },
     {
       "bib": "BIB-014",
-      "autor": "Dalton",
+      "autor": "James F. Dalton & Eric T. Jones & Robert B. Dalton",
       "tytul": "Mind Over Markets",
       "format": "epub",
-      "plik": "BIB-014_Dalton_Mind-Over-Markets.epub"
+      "plik": "BIB-014_Dalton_Mind-Over-Markets.epub",
+      "wydawca": "Wiley",
+      "jezyk": "eng",
+      "wydano": "2013-05-27T22:00:00+00:00",
+      "identyfikatory": "isbn:9781118659762"
     },
     {
       "bib": "BIB-015",
-      "autor": "Elder",
-      "tytul": "The New Trading for a Living",
+      "autor": "Elder, Alexander [Elder, Alexander]",
+      "tytul": "The New Trading for a Living · Psychology, Discipline, Trading Tools and Systems, Risk Control, Trade Management",
       "format": "epub",
-      "plik": "BIB-015_Elder_The-New-Trading-for-a-Living.epub"
+      "plik": "BIB-015_Elder_The-New-Trading-for-a-Living.epub",
+      "wydawca": "John Wiley & Sons",
+      "tagi": "General, Business & Economics, Finance, Business",
+      "jezyk": "eng",
+      "wydano": "2014-09-22T00:00:00+00:00",
+      "identyfikatory": "isbn:9781118963678, google:ydY5BAAAQBAJ, mobi-asin:418202f2-86fd-4016-9dc2-435c1ffcf384, goodreads:22337484"
     },
     {
       "bib": "BIB-016",
-      "autor": "Douglas",
+      "autor": "Mark Douglas",
       "tytul": "Trading in the Zone",
       "format": "epub",
-      "plik": "BIB-016_Douglas_Trading-in-the-Zone.epub"
+      "plik": "BIB-016_Douglas_Trading-in-the-Zone.epub",
+      "wydawca": "Penguin Group US",
+      "jezyk": "eng",
+      "wydano": "2010-02-28T23:00:00+00:00",
+      "identyfikatory": "isbn:9780735201446"
     },
     {
       "bib": "BIB-017",
-      "autor": "Kahneman",
-      "tytul": "Thinking Fast and Slow",
+      "autor": "Kahneman, Daniel [Kahneman, Daniel]",
+      "tytul": "Thinking, Fast and Slow",
       "format": "epub",
-      "plik": "BIB-017_Kahneman_Thinking-Fast-and-Slow.epub"
+      "plik": "BIB-017_Kahneman_Thinking-Fast-and-Slow.epub",
+      "wydawca": "Farrar, Straus and Giroux",
+      "jezyk": "eng",
+      "wydano": "2011-10-24T14:00:00+00:00"
     },
     {
       "bib": "BIB-018",
-      "autor": "Sinclair",
-      "tytul": "Positional Option Trading",
+      "autor": "Euan Sinclair [Sinclair, Euan]",
+      "tytul": "Positional Option Trading: An Advanced Guide",
       "format": "epub",
-      "plik": "BIB-018_Sinclair_Positional-Option-Trading.epub"
+      "plik": "BIB-018_Sinclair_Positional-Option-Trading.epub",
+      "jezyk": "eng",
+      "wydano": "2020-09-01T00:00:00+00:00",
+      "identyfikatory": "isbn:9781119583530"
     },
     {
       "bib": "BIB-019",
-      "autor": "Harris",
-      "tytul": "Handbook for Cryptocurrencies Trading",
+      "autor": "Virginia Harris",
+      "tytul": "HANDBOOK FOR CRYPTOCURRENCIES TRADING",
       "format": "epub",
-      "plik": "BIB-019_Harris_Handbook-for-Cryptocurrencies-Trading.epub"
+      "plik": "BIB-019_Harris_Handbook-for-Cryptocurrencies-Trading.epub",
+      "jezyk": "eng",
+      "wydano": "2022-03-19T23:00:00+00:00"
     },
     {
       "bib": "BIB-020",
-      "autor": "Harris",
-      "tytul": "Trading and Exchanges_ Market Microstructure for Practitioners",
+      "autor": "Larry Harris [Harris, Larry]",
+      "tytul": "Trading and Exchanges: Market Microstructure for Practitioners (Financial Management Association Survey and Synthesis)",
       "format": "epub",
-      "plik": "BIB-020_Harris_Trading and Exchanges_ Market-Microstructure-for-Practitioners.epub"
+      "plik": "BIB-020_Harris_Trading and Exchanges_ Market-Microstructure-for-Practitioners.epub",
+      "wydawca": "Oxford University Press",
+      "jezyk": "eng",
+      "wydano": "2002-10-23T23:00:00+00:00",
+      "identyfikatory": "mobi-asin:B003ZSHIPE"
     },
     {
       "bib": "BIB-021",
-      "autor": "Anon",
-      "tytul": "High Win Rate Day Trading Setups",
+      "autor": "Marcel Robbinson [Robbinson, Marcel]",
+      "tytul": "High Win Rate Day Trading Setups: High Win Rate Day Trading Strategies for Trading Crypto and Forex in 2023 (High Win Rate Trading Strategies For Scalping and Swing Trading in 2023 Book 1)",
       "format": "azw3",
-      "plik": "BIB-021_Anon_High-Win-Rate-Day-Trading-Setups.azw3"
+      "plik": "BIB-021_Anon_High-Win-Rate-Day-Trading-Setups.azw3",
+      "jezyk": "eng",
+      "wydano": "2022-12-03T23:00:00+00:00",
+      "identyfikatory": "mobi-asin:B0BP2Y6QL1"
     },
     {
       "bib": "BIB-022",
-      "autor": "Kissell",
-      "tytul": "Optimal trading strategies",
+      "autor": "Nieznany",
+      "tytul": "BIB-022 Kissell Optimal-trading-strategies",
       "format": "djvu",
       "plik": "BIB-022_Kissell_Optimal-trading-strategies.djvu"
     },
     {
       "bib": "BIB-023",
-      "autor": "Lopez de Prado",
+      "autor": "Marcos M. LŁpez de Prado",
       "tytul": "Machine Learning for Asset Managers",
       "format": "pdf",
-      "plik": "BIB-023_Lopez-de-Prado_Machine-Learning-for-Asset-Managers.pdf"
+      "plik": "BIB-023_Lopez-de-Prado_Machine-Learning-for-Asset-Managers.pdf",
+      "wydano": "2022-09-01T03:33:05+00:00"
     },
     {
       "bib": "BIB-024",
-      "autor": "Lowe",
+      "autor": "Lowe, Chris",
       "tytul": "Bitcoin and Cryptocurrency Trading for Beginners",
       "format": "epub",
-      "plik": "BIB-024_Lowe_Bitcoin-and-Cryptocurrency Trading for Beginners.epub"
+      "plik": "BIB-024_Lowe_Bitcoin-and-Cryptocurrency Trading for Beginners.epub",
+      "jezyk": "eng",
+      "wydano": "2021-07-01T22:00:00+00:00"
     },
     {
       "bib": "BIB-025",
-      "autor": "Grinold & Kahn",
-      "tytul": "Active Portfolio Management",
+      "autor": "Richard C. Grinold [Unknown]",
+      "tytul": "Advances in Active Portfolio Management",
       "format": "epub",
-      "plik": "BIB-025_Grinold & Kahn_Active-Portfolio-Management.epub"
+      "plik": "BIB-025_Grinold & Kahn_Active-Portfolio-Management.epub",
+      "wydawca": "McGraw-Hill Education",
+      "jezyk": "eng",
+      "wydano": "2020-06-15T00:00:00+00:00"
     },
     {
       "bib": "BIB-026",
-      "autor": "Jansen",
+      "autor": "Stefan Jansen",
       "tytul": "Machine Learning for Algorithmic Trading",
       "format": "mobi",
-      "plik": "BIB-026_Jansen_Machine-Learning-for-Algorithmic-Trading.mobi"
+      "plik": "BIB-026_Jansen_Machine-Learning-for-Algorithmic-Trading.mobi",
+      "wydawca": "Packt",
+      "tagi": "COM004000 - COMPUTERS / Intelligence (AI) & Semantics, COM018000 - COMPUTERS / Data Processing, COM044000 - COMPUTERS / Neural Networks",
+      "jezyk": "eng",
+      "wydano": "2020-07-30T12:45:55+00:00",
+      "identyfikatory": "mobi-asin:a4257cb6-5235-45c2-8c10-41a84148aacc"
     },
     {
       "bib": "BIB-027",
-      "autor": "Aldridge",
-      "tytul": "High Frequency Trading",
+      "autor": "Irene Aldridge [Aldridge, Irene]",
+      "tytul": "High-Frequency Trading",
       "format": "epub",
-      "plik": "BIB-027_Aldridge_High-Frequency-Trading.epub"
+      "plik": "BIB-027_Aldridge_High-Frequency-Trading.epub",
+      "wydawca": "Wiley",
+      "jezyk": "eng",
+      "wydano": "2013-03-28T05:00:00+00:00",
+      "identyfikatory": "isbn:9781118416822"
     },
     {
       "bib": "BIB-028",
-      "autor": "Narang",
-      "tytul": "Inside the Black Box A Simple Guide to Systematic Investing",
+      "autor": "Rishi K. Narang [Narang, Rishi K]",
+      "tytul": "Inside the Black Box: A Simple Guide to Systematic Investing",
       "format": "epub",
-      "plik": "BIB-028_Narang_Inside-the-Black-Box-A-Simple-Guide-to-Systematic-Investing.epub"
+      "plik": "BIB-028_Narang_Inside-the-Black-Box-A-Simple-Guide-to-Systematic-Investing.epub",
+      "wydawca": "Wiley",
+      "jezyk": "eng",
+      "wydano": "2024-07-02T00:00:00+00:00",
+      "identyfikatory": "isbn:9781119931904"
     },
     {
       "bib": "BIB-029",
-      "autor": "Bashir",
-      "tytul": "Mastering Blockchain",
+      "autor": "Imran Bashir [Unknown]",
+      "tytul": "Mastering Blockchain, Fourth Edition",
       "format": "epub",
-      "plik": "BIB-029_Bashir_Mastering-Blockchain.epub"
+      "plik": "BIB-029_Bashir_Mastering-Blockchain.epub",
+      "wydawca": "Packt",
+      "tagi": "COM083000 - COMPUTERS / Security / Cryptography, COM064000 - COMPUTERS / Electronic Commerce (see also headings underBUSINESS & ECONOMICS / E-Commerce), COM057000 - COMPUTERS / Virtual Worlds",
+      "jezyk": "eng",
+      "wydano": "2023-03-24T07:16:17+00:00"
     },
     {
       "bib": "BIB-030",
-      "autor": "Ammous",
-      "tytul": "The Bitcoin Standard",
+      "autor": "Saifedean Ammous [Ammous, Saifedean]",
+      "tytul": "The Bitcoin Standard: The Decentralized Alternative to Central Banking",
       "format": "epub",
-      "plik": "BIB-030_Ammous_The-Bitcoin-Standard.epub"
+      "plik": "BIB-030_Ammous_The-Bitcoin-Standard.epub",
+      "jezyk": "eng",
+      "wydano": "2018-04-24T00:00:00+00:00"
     },
     {
       "bib": "BIB-031",
-      "autor": "Tsay",
-      "tytul": "Analysis of Financial Time Series",
+      "autor": "Nieznany",
+      "tytul": "BIB-031 Tsay Analysis-of-Financial-Time-Series",
       "format": "pdf",
       "plik": "BIB-031_Tsay_Analysis-of-Financial-Time-Series.pdf"
     },
     {
       "bib": "BIB-032",
-      "autor": "OHara",
-      "tytul": "Market Microstructure Theory",
+      "autor": "Nieznany",
+      "tytul": "BIB-032 OHara Market-Microstructure-Theory",
       "format": "pdf",
       "plik": "BIB-032_OHara_Market-Microstructure-Theory.pdf"
     },
     {
       "bib": "BIB-033",
-      "autor": "Huyen",
-      "tytul": "AI Engineering Building Applications with Foundation Models",
+      "autor": "Chip Huyen [Chip Huyen]",
+      "tytul": "AI Engineering: Building Applications With Foundation Models",
       "format": "epub",
-      "plik": "BIB-033_Huyen_AI-Engineering-Building-Applications-with-Foundation-Models.epub"
+      "plik": "BIB-033_Huyen_AI-Engineering-Building-Applications-with-Foundation-Models.epub",
+      "wydawca": "\"O'Reilly Media, Inc.\"",
+      "tagi": "Computers, Artificial Intelligence, General, Business & Productivity Software, Business Intelligence, Machine Theory, Natural Language Processing, Data Science, Machine Learning",
+      "jezyk": "eng",
+      "wydano": "2024-12-03T23:00:00+00:00",
+      "identyfikatory": "isbn:9781098166267, google:abM1EQAAQBAJ"
     },
     {
       "bib": "BIB-034",
-      "autor": "Infante",
-      "tytul": "AI Agents and Applications LangChain LangGraph MCP",
+      "autor": "Roberto Infante [Roberto Infante]",
+      "tytul": "AI Agents and Applications",
       "format": "epub",
-      "plik": "BIB-034_Infante_AI-Agents-and-Applications-LangChain-LangGraph-MCP.epub"
+      "plik": "BIB-034_Infante_AI-Agents-and-Applications-LangChain-LangGraph-MCP.epub",
+      "wydawca": "Manning Publications Co.",
+      "jezyk": "eng",
+      "wydano": "2025-08-28T22:00:00+00:00",
+      "identyfikatory": "isbn:9781633436541"
     },
     {
       "bib": "BIB-035",
-      "autor": "Iusztin Labonne",
-      "tytul": "LLM Engineers Handbook",
+      "autor": "Paul Iusztin & Maxime Labonne & Alex Vesa",
+      "tytul": "LLM Engineer's Handbook: Master the Art of Engineering Large Language Models From Concept to Production",
       "format": "azw3",
-      "plik": "BIB-035_Iusztin-Labonne_LLM-Engineers-Handbook.azw3"
+      "plik": "BIB-035_Iusztin-Labonne_LLM-Engineers-Handbook.azw3",
+      "wydawca": "Packt Publishing",
+      "tagi": "Computers, Artificial Intelligence, Natural Language Processing, General, Data Science, Neural Networks",
+      "jezyk": "eng",
+      "wydano": "2024-10-22T00:00:00+00:00",
+      "identyfikatory": "isbn:9781836200062, mobi-asin:2e38aa48-c3e6-4f30-a5a2-5bbe4fcd9c87"
     },
     {
       "bib": "BIB-036",
-      "autor": "Alto",
+      "autor": "Valentina Alto [Unknown]",
       "tytul": "Building LLM Powered Applications",
       "format": "epub",
-      "plik": "BIB-036_Alto_Building-LLM-Powered-Applications.epub"
+      "plik": "BIB-036_Alto_Building-LLM-Powered-Applications.epub",
+      "wydawca": "Packt",
+      "tagi": "COM058000 - COMPUTERS / Desktop Applications / Word Processing, COM044000 - COMPUTERS / Neural Networks, COM042000 - COMPUTERS / Natural Language Processing",
+      "jezyk": "eng",
+      "wydano": "2024-05-15T06:02:43+00:00"
     },
     {
       "bib": "BIB-037",
-      "autor": "Hull",
-      "tytul": "Options Futures and Other Derivatives",
+      "autor": "John C. Hull [Hull, John C.]",
+      "tytul": "Options, Futures, and Other Derivatives, 11/e",
       "format": "epub",
-      "plik": "BIB-037_Hull_Options-Futures-and-Other-Derivatives.epub"
+      "plik": "BIB-037_Hull_Options-Futures-and-Other-Derivatives.epub",
+      "jezyk": "eng",
+      "wydano": "2021-02-08T12:28:01+00:00"
     },
     {
       "bib": "BIB-038",
-      "autor": "Schwager",
-      "tytul": "Market Wizards Interviews with Top Traders",
+      "autor": "Jack D. Schwager [Schwager, Jack D.]",
+      "tytul": "Market Wizards: Interviews with Top Traders",
       "format": "epub",
-      "plik": "BIB-038_Schwager_Market-Wizards-Interviews-with-Top-Traders.epub"
+      "plik": "BIB-038_Schwager_Market-Wizards-Interviews-with-Top-Traders.epub",
+      "jezyk": "eng",
+      "wydano": "2018-10-25T00:00:00+00:00",
+      "identyfikatory": "isbn:9781118282809"
     },
     {
       "bib": "BIB-039",
-      "autor": "Lefevre",
+      "autor": "Edwin Lef?vre & Markman, Jon D. & Jones, Paul Tudor",
       "tytul": "Reminiscences of a Stock Operator",
       "format": "epub",
-      "plik": "BIB-039_Lefevre_Reminiscences-of-a-Stock-Operator.epub"
+      "plik": "BIB-039_Lefevre_Reminiscences-of-a-Stock-Operator.epub",
+      "wydawca": "John Wiley & Sons, Ltd.",
+      "jezyk": "eng",
+      "wydano": "2010-05-10T22:00:00+00:00",
+      "identyfikatory": "isbn:9780470593226"
     },
     {
       "bib": "BIB-040",
-      "autor": "Bernstein",
-      "tytul": "Against the Gods The Remarkable Story of Risk",
+      "autor": "Peter L. Bernstein [Bernstein, Peter L.]",
+      "tytul": "Against the Gods: The Remarkable Story of Risk",
       "format": "epub",
-      "plik": "BIB-040_Bernstein_Against-the-Gods-The-Remarkable-Story-of-Risk.epub"
+      "plik": "BIB-040_Bernstein_Against-the-Gods-The-Remarkable-Story-of-Risk.epub",
+      "jezyk": "eng",
+      "wydano": "2011-05-23T21:50:00+00:00"
     },
     {
       "bib": "BIB-041",
-      "autor": "Taleb",
-      "tytul": "Fooled by Randomness",
+      "autor": "Nassim Nicholas Taleb [Unknown]",
+      "tytul": "Incerto 4-Book Bundle: Fooled by Randomness The Black Swan Antifragile The Bed of Procrustes",
       "format": "epub",
-      "plik": "BIB-041_Taleb_Fooled-by-Randomness.epub"
+      "plik": "BIB-041_Taleb_Fooled-by-Randomness.epub",
+      "wydawca": "Random House Publishing Group",
+      "jezyk": "eng",
+      "wydano": "2016-01-26T08:00:00+00:00",
+      "identyfikatory": "isbn:9780812997699, mobi-asin:c4e7f159-6624-4288-ba0d-1d15dfa420ac"
     },
     {
       "bib": "BIB-042",
-      "autor": "Jorion",
-      "tytul": "Value at Risk The New Benchmark",
+      "autor": "Philippe Jorion",
+      "tytul": "Value at Risk",
       "format": "epub",
-      "plik": "BIB-042_Jorion_Value-at-Risk-The-New-Benchmark.epub"
+      "plik": "BIB-042_Jorion_Value-at-Risk-The-New-Benchmark.epub",
+      "wydawca": "McGraw-Hill Education",
+      "jezyk": "eng",
+      "wydano": "2007-07-14T22:00:00+00:00",
+      "identyfikatory": "isbn:0071736921"
     },
     {
       "bib": "BIB-043",
-      "autor": "Cartea Jaimungal Penalva",
-      "tytul": "Algorithmic and High Frequency Trading",
+      "autor": "Nieznany",
+      "tytul": "BIB-043 Cartea-Jaimungal-Penalva Algorithmic-and-High-Frequency-Trading",
       "format": "pdf",
-      "plik": "BIB-043_Cartea-Jaimungal-Penalva_Algorithmic-and-High-Frequency-Trading.pdf"
+      "plik": "BIB-043_Cartea-Jaimungal-Penalva_Algorithmic-and-High-Frequency-Trading.pdf",
+      "wydano": "2016-11-05T22:36:36+00:00"
     },
     {
       "bib": "BIB-044",
-      "autor": "Hasbrouck",
-      "tytul": "Empirical Market Microstructure",
+      "autor": "Nieznany",
+      "tytul": "Untitled",
       "format": "pdf",
-      "plik": "BIB-044_Hasbrouck_Empirical-Market-Microstructure.pdf"
+      "plik": "BIB-044_Hasbrouck_Empirical-Market-Microstructure.pdf",
+      "wydano": "2007-11-05T06:53:41+00:00"
     },
     {
       "bib": "BIB-045",
-      "autor": "Hilpisch",
-      "tytul": "Python for Finance",
+      "autor": "Yves Hilpisch [Yves Hilpisch]",
+      "tytul": "Python for Finance, 2nd Edition",
       "format": "epub",
-      "plik": "BIB-045_Hilpisch_Python-for-Finance.epub"
+      "plik": "BIB-045_Hilpisch_Python-for-Finance.epub",
+      "wydawca": "O'Reilly Media, Inc.",
+      "jezyk": "eng",
+      "wydano": "2018-09-25T00:00:00+00:00"
     },
     {
       "bib": "BIB-046",
-      "autor": "Chan",
-      "tytul": "Machine Trading",
+      "autor": "Ernest P. Chan [Chan, Ernest P.]",
+      "tytul": "Machine Trading: Deploying Computer Algorithms to Conquer the Markets",
       "format": "epub",
-      "plik": "BIB-046_Chan_Machine-Trading.epub"
+      "plik": "BIB-046_Chan_Machine-Trading.epub",
+      "wydawca": "John Wiley & Sons, Inc.",
+      "jezyk": "eng",
+      "identyfikatory": "isbn:9781119219651"
     },
     {
       "bib": "BIB-047",
-      "autor": "Kaufman",
+      "autor": "Perry J. Kaufman",
       "tytul": "Trading Systems and Methods",
       "format": "pdf",
-      "plik": "BIB-047_Kaufman_Trading-Systems-and-Methods.pdf"
+      "plik": "BIB-047_Kaufman_Trading-Systems-and-Methods.pdf",
+      "wydano": "2019-12-19T17:37:09+00:00"
     },
     {
       "bib": "BIB-048",
-      "autor": "Aronson",
-      "tytul": "Evidence Based Technical Analysis",
+      "autor": "Nieznany",
+      "tytul": "BIB-048 Aronson Evidence-Based-Technical-Analysis",
       "format": "djvu",
       "plik": "BIB-048_Aronson_Evidence-Based-Technical-Analysis.djvu"
     },
     {
       "bib": "BIB-049",
-      "autor": "Bulkowski",
+      "autor": "Thomas Bulkowski [Unknown]",
       "tytul": "Encyclopedia of Chart Patterns",
       "format": "epub",
-      "plik": "BIB-049_Bulkowski_Encyclopedia-of-Chart-Patterns.epub"
+      "plik": "BIB-049_Bulkowski_Encyclopedia-of-Chart-Patterns.epub",
+      "jezyk": "eng",
+      "wydano": "2021-03-19T10:44:15+00:00"
     },
     {
       "bib": "BIB-050",
-      "autor": "Douglas",
+      "autor": "User",
       "tytul": "The Disciplined Trader",
       "format": "pdf",
-      "plik": "BIB-050_Douglas_The-Disciplined-Trader.pdf"
+      "plik": "BIB-050_Douglas_The-Disciplined-Trader.pdf",
+      "wydano": "2004-11-03T16:30:40+00:00"
     },
     {
       "bib": "BIB-051",
-      "autor": "Duke",
-      "tytul": "Thinking in Bets",
+      "autor": "Annie Duke [Duke, Annie]",
+      "tytul": "Thinking in Bets: Making Smarter Decisions When You Don't Have All the Facts",
       "format": "epub",
-      "plik": "BIB-051_Duke_Thinking-in-Bets.epub"
+      "plik": "BIB-051_Duke_Thinking-in-Bets.epub",
+      "wydawca": "Penguin Publishing Group",
+      "jezyk": "eng",
+      "wydano": "2018-02-06T00:00:00+00:00"
     },
     {
       "bib": "BIB-052",
-      "autor": "Steenbarger",
-      "tytul": "Trading Psychology 2.0",
+      "autor": "Brett N. Steenbarger [Steenbarger, Brett N.]",
+      "tytul": "Trading Psychology 2.0: From Best Practices to Best Processes",
       "format": "epub",
-      "plik": "BIB-052_Steenbarger_Trading-Psychology-2.0.epub"
+      "plik": "BIB-052_Steenbarger_Trading-Psychology-2.0.epub",
+      "wydawca": "Wiley",
+      "jezyk": "eng",
+      "wydano": "2015-09-28T00:00:00+00:00",
+      "identyfikatory": "isbn:9781118936825"
     },
     {
       "bib": "BIB-053",
-      "autor": "Antonopoulos Harding",
-      "tytul": "Mastering Bitcoin 3rd ed",
+      "autor": "Andreas M. Antonopoulos and David A. Harding",
+      "tytul": "Mastering Bitcoin, 3E",
       "format": "mobi",
-      "plik": "BIB-053_Antonopoulos-Harding_Mastering-Bitcoin-3rd-ed.mobi"
+      "plik": "BIB-053_Antonopoulos-Harding_Mastering-Bitcoin-3rd-ed.mobi",
+      "wydawca": "O'Reilly Media, Inc.",
+      "jezyk": "eng",
+      "wydano": "2023-02-22T00:00:00+00:00",
+      "identyfikatory": "mobi-asin:90fac9ca-7af6-4dc9-9145-8b29bd80cb89"
     },
     {
       "bib": "BIB-054",
-      "autor": "Antonopoulos Wood",
-      "tytul": "Mastering Ethereum",
+      "autor": "Andreas M. Antonopoulos, Gavin Wood, Carlo Parisi, Alessandro Mazza, and Niccolo Pozzolini",
+      "tytul": "Mastering Ethereum (for True Epub)",
       "format": "epub",
-      "plik": "BIB-054_Antonopoulos-Wood_Mastering-Ethereum.epub"
+      "plik": "BIB-054_Antonopoulos-Wood_Mastering-Ethereum.epub",
+      "wydawca": "O'Reilly Media, Inc.",
+      "jezyk": "eng",
+      "wydano": "2025-10-06T00:00:00+00:00"
     },
     {
       "bib": "BIB-055",
-      "autor": "Popper",
+      "autor": "Nathaniel Popper [Popper, Nathaniel]",
       "tytul": "Digital Gold",
       "format": "epub",
-      "plik": "BIB-055_Popper_Digital-Gold.epub"
+      "plik": "BIB-055_Popper_Digital-Gold.epub",
+      "wydawca": "HarperCollins",
+      "jezyk": "eng",
+      "wydano": "2015-04-08T00:00:00+00:00"
     },
     {
       "bib": "BIB-056",
-      "autor": "Dalio",
-      "tytul": "Principles for Navigating Big Debt Crises",
+      "autor": "Ray Dalio [Ray Dalio] & chenjin5.com [Dalio, Ray && chenjin5.com]",
+      "tytul": "Big Debt Crises",
       "format": "epub",
-      "plik": "BIB-056_Dalio_Principles-for-Navigating-Big-Debt-Crises.epub"
+      "plik": "BIB-056_Dalio_Principles-for-Navigating-Big-Debt-Crises.epub",
+      "wydawca": "cj5_3162",
+      "tagi": "公众号：古德猫宁李",
+      "jezyk": "eng",
+      "wydano": "2018-09-10T04:00:00+00:00",
+      "identyfikatory": "asin:9e2fef56-56e4-4479-8a07-c73a718b3b46"
     },
     {
       "bib": "BIB-057",
-      "autor": "Dalio",
-      "tytul": "Principles for Dealing with the Changing World Order",
+      "autor": "Dalio, Ray [Dalio, Ray]",
+      "tytul": "Principles for Dealing with the Changing World Order: Why Nations Succeed or Fail: Why Nations Succeed or Fail",
       "format": "epub",
-      "plik": "BIB-057_Dalio_Principles-for-Dealing-with-the-Changing-World-Order.epub"
+      "plik": "BIB-057_Dalio_Principles-for-Dealing-with-the-Changing-World-Order.epub",
+      "wydawca": "Simon & Schuster UK",
+      "jezyk": "eng",
+      "wydano": "2021-11-29T00:00:00+00:00"
     },
     {
       "bib": "BIB-058",
-      "autor": "Dalio",
-      "tytul": "How Countries Go Broke The Big Cycle",
+      "autor": "Ray Dalio [Unknown]",
+      "tytul": "How Countries Go Broke: The Big Cycle",
       "format": "epub",
-      "plik": "BIB-058_Dalio_How-Countries-Go-Broke-The-Big-Cycle.epub"
+      "plik": "BIB-058_Dalio_How-Countries-Go-Broke-The-Big-Cycle.epub",
+      "wydawca": "Avid Reader Press / Simon & Schuster",
+      "jezyk": "eng",
+      "wydano": "2025-06-03T00:00:00+00:00"
     },
     {
       "bib": "BIB-059",
-      "autor": "Kindleberger Aliber",
-      "tytul": "Manias Panics and Crashes",
+      "autor": "Robert Z. Aliber;Charles P. Kindleberger;Robert N. McCauley; & Charles P. Kindleberger & Robert N. McCauley",
+      "tytul": "Manias, Panics, and Crashes: A History of Financial Crises",
       "format": "epub",
-      "plik": "BIB-059_Kindleberger-Aliber_Manias-Panics-and-Crashes.epub"
+      "plik": "BIB-059_Kindleberger-Aliber_Manias-Panics-and-Crashes.epub",
+      "wydawca": "Springer Nature",
+      "jezyk": "eng",
+      "identyfikatory": "isbn:9783031160080"
     },
     {
       "bib": "BIB-060",
-      "autor": "Shiller",
+      "autor": "Shiller, Robert J.",
       "tytul": "Irrational Exuberance",
       "format": "pdf",
-      "plik": "BIB-060_Shiller_Irrational-Exuberance.pdf"
+      "plik": "BIB-060_Shiller_Irrational-Exuberance.pdf",
+      "wydano": "2014-11-17T20:28:23+00:00"
     },
     {
       "bib": "BIB-061",
-      "autor": "Thaler",
-      "tytul": "Misbehaving The Making of Behavioral Economics",
+      "autor": "Richard H. Thaler [Thaler, Richard H.]",
+      "tytul": "Misbehaving: The Making of Behavioral Economics",
       "format": "epub",
-      "plik": "BIB-061_Thaler_Misbehaving-The-Making-of-Behavioral-Economics.epub"
+      "plik": "BIB-061_Thaler_Misbehaving-The-Making-of-Behavioral-Economics.epub",
+      "wydawca": "W. W. Norton & Company",
+      "jezyk": "eng",
+      "wydano": "2015-05-10T22:00:00+00:00",
+      "identyfikatory": "mobi-asin:B00NUB4GFQ"
     },
     {
       "bib": "BIB-062",
-      "autor": "Chancellor",
-      "tytul": "Devil Take the Hindmost",
+      "autor": "Edward Chancellor [Chancellor, Edward]",
+      "tytul": "Devil Take the Hindmost: A History of Financial Speculation",
       "format": "epub",
-      "plik": "BIB-062_Chancellor_Devil-Take-the-Hindmost.epub"
+      "plik": "BIB-062_Chancellor_Devil-Take-the-Hindmost.epub",
+      "jezyk": "eng",
+      "wydano": "2000-06-01T03:10:09.982234+00:00",
+      "identyfikatory": "google:OqFPEAAAQBAJ, isbn:9780452281806, amazon:0452281806"
     },
     {
       "bib": "BIB-063",
-      "autor": "MacKay",
-      "tytul": "Extraordinary Popular Delusions and the Madness of Crowds",
+      "autor": "Charles Mackay [Mackay, Charles]",
+      "tytul": "Memoirs of Extraordinary Popular Delusions and the Madness of Crowds",
       "format": "epub",
-      "plik": "BIB-063_MacKay_Extraordinary-Popular-Delusions-and-the-Madness-of-Crowds.epub"
+      "plik": "BIB-063_MacKay_Extraordinary-Popular-Delusions-and-the-Madness-of-Crowds.epub",
+      "wydawca": "Global Grey ebooks",
+      "tagi": "Esoteric and Occult, History, History_Witch-Trials, Psychology",
+      "jezyk": "eng",
+      "wydano": "2023-07-24T23:00:00+00:00",
+      "identyfikatory": "url:https://www.globalgreyebooks.com/memoirs-of-extraordinary-popular-delusions-ebook.html"
     },
     {
       "bib": "BIB-064",
-      "autor": "Reinhart Rogoff",
-      "tytul": "This Time Is Different",
+      "autor": "Carmen M. Reinhart & Kenneth Rogoff [Reinhart, Carmen M. & Rogoff, Kenneth]",
+      "tytul": "This Time Is Different: Eight Centuries of Financial Folly",
       "format": "epub",
-      "plik": "BIB-064_Reinhart-Rogoff_This-Time-Is-Different.epub"
+      "plik": "BIB-064_Reinhart-Rogoff_This-Time-Is-Different.epub",
+      "wydawca": "Princeton University Press",
+      "tagi": "Economics",
+      "jezyk": "eng",
+      "wydano": "2009-01-02T00:00:00+00:00",
+      "identyfikatory": "isbn:9780691152646"
     },
     {
       "bib": "BIB-065",
-      "autor": "Shreve",
-      "tytul": "Stochastic Calculus for Finance I Binomial Asset Pricing",
+      "autor": "Nieznany",
+      "tytul": "BIB-065 Shreve Stochastic-Calculus-for-Finance-I-Binomial-Asset-Pricing",
       "format": "djvu",
       "plik": "BIB-065_Shreve_Stochastic-Calculus-for-Finance-I-Binomial-Asset-Pricing.djvu"
     },
     {
       "bib": "BIB-066",
-      "autor": "Shreve",
-      "tytul": "Stochastic Calculus for Finance II Continuous Time Models",
+      "autor": "Nieznany",
+      "tytul": "BIB-066 Shreve Stochastic-Calculus-for-Finance-II-Continuous-Time-Models",
       "format": "djvu",
       "plik": "BIB-066_Shreve_Stochastic-Calculus-for-Finance-II-Continuous-Time-Models.djvu"
     },
     {
       "bib": "BIB-067",
-      "autor": "Sutton Barto",
-      "tytul": "Reinforcement Learning An Introduction 2nd ed",
+      "autor": "Nieznany",
+      "tytul": "BIB-067 Sutton-Barto Reinforcement-Learning-An-Introduction-2nd-ed",
       "format": "djvu",
       "plik": "BIB-067_Sutton-Barto_Reinforcement-Learning-An-Introduction-2nd-ed.djvu"
     },
     {
       "bib": "BIB-068",
-      "autor": "Goodfellow Bengio Courville",
-      "tytul": "Deep Learning",
+      "autor": "Nieznany",
+      "tytul": "BIB-068 Goodfellow-Bengio-Courville Deep-Learning",
       "format": "pdf",
-      "plik": "BIB-068_Goodfellow-Bengio-Courville_Deep-Learning.pdf"
+      "plik": "BIB-068_Goodfellow-Bengio-Courville_Deep-Learning.pdf",
+      "wydano": "2017-04-07T16:29:32+00:00"
     },
     {
       "bib": "BIB-069",
-      "autor": "Voshmgir",
-      "tytul": "Token Economy 3rd ed",
+      "autor": "Shermin Voshmgir",
+      "tytul": "Token Economy",
       "format": "epub",
-      "plik": "BIB-069_Voshmgir_Token-Economy-3rd-ed.epub"
+      "plik": "BIB-069_Voshmgir_Token-Economy-3rd-ed.epub",
+      "wydawca": "Labirinto Ecletico Unipessoal LDA",
+      "tagi": "Business & Personal Finance",
+      "jezyk": "eng",
+      "wydano": "2023-04-18T00:00:00+00:00"
     }
   ]
 }

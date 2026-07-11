@@ -1,9 +1,9 @@
 # 🤖 RLA — Uczenie ze wzmocnieniem i deep learning | Encyklopedia Imperium
 
 > **Stan na:** 2026-07-11 | **Ważność:** ⭐⭐⭐⭐ (wysoki — fundament AI Imperium)
-> **Status:** 🚧 CZĘŚCIOWY — DL (BIB-068 Goodfellow, pdf) ugruntowany z pliku; RL (BIB-067
-> Sutton-Barto) w formacie **djvu — ⚠️ PENDING** ekstrakcji na laptopie (`djvutxt` niedostępny
-> w chmurze). Styk RL↔`hedge_mwu` ugruntowany w NASZYM kodzie (nie w książce — Prawo I).
+> **Status:** ✅ DOMKNIĘTY — DL (BIB-068 Goodfellow, pdf) z pliku; RL (BIB-067 Sutton-Barto)
+> **wyekstrahowany** (djvu→cache przez calibre, w RAG — **tekst czysty**, dobra jakość OCR).
+> Esencja zweryfikowana `biblioteka_szukaj`. Styk RL↔`hedge_mwu` ugruntowany w NASZYM kodzie (Prawo I).
 > **Co to jest:** dział o uczeniu, które PODEJMUJE DECYZJE w czasie — RL (agent ↔ środowisko,
 > nagroda) i sieci głębokie jako aproksymatory. Teoria za MWU (online learning), przyszłymi
 > agentami RL i wrzutniowymi kandydatami grafowymi.
@@ -12,7 +12,7 @@
 ## 📑 SPIS TREŚCI
 1. Deep learning — po co głębia (Goodfellow, ✅ z pliku)
 2. Regularyzacja i generalizacja (dlaczego DL nie musi przeuczać)
-3. Uczenie ze wzmocnieniem — szkielet (⚠️ Sutton-Barto pending djvu)
+3. Uczenie ze wzmocnieniem — szkielet (✅ Sutton-Barto ekstrakt djvu)
 4. Most do `hedge_mwu`: online learning i minimalizacja regretu (✅ z kodu)
 5. Wpływ na Imperium (co mamy / do wdrożenia)
 6. Źródła
@@ -37,12 +37,26 @@ augmentation**, **noise robustness**, wczesne zatrzymanie. **SGD (stochastic gra
 koń roboczy. Dla Imperium lekcja jest ta sama co w RSK/ALG: **głębia bez regularyzacji = przeuczenie**
 — spójne z naszym rdzeniem anty-overfittingu (DSR/PBO/purged-CV, López de Prado).
 
-## 3. UCZENIE ZE WZMOCNIENIEM — szkielet (⚠️ BIB-067 Sutton-Barto, PENDING djvu)
+## 3. UCZENIE ZE WZMOCNIENIEM — szkielet (✅ BIB-067 Sutton-Barto, EKSTRAKT djvu)
 
-> **Prawo I:** poniższe to KANONICZNY szkielet RL do WERYFIKACJI po ekstrakcji Sutton-Barto na
-> laptopie — nie cytuję z pliku (djvu nieczytelny w chmurze). Plan (do uzupełnienia esencją):
-> MDP (stan/akcja/nagroda), polityka i funkcja wartości, **eksploracja vs eksploatacja**,
-> multi-armed bandit, TD-learning, Q-learning, regret. To domknięcie na laptopie (`djvutxt`).
+> **Prawo I:** Sutton-Barto wyekstrahowane (calibre) i w RAG — **tekst czysty** (dobra jakość OCR,
+> inaczej niż math-heavy Shreve). Poniższe zweryfikowane przez `biblioteka_szukaj` (chunki #74/#99/#103).
+
+- **MDP (Markov Decision Process):** agent ↔ środowisko przez sygnał **nagrody**; stan/akcja/nagroda,
+  cel = maksymalizacja oczekiwanego **zdyskontowanego zwrotu**.
+- **Funkcja wartości i równanie Bellmana:** wartość stanu spełnia *self-consistency condition given by
+  the Bellman equation*. **Równanie optymalności Bellmana:** wartość stanu pod optymalną polityką =
+  oczekiwany zwrot za **najlepszą akcję** z tego stanu (bez odwołania do konkretnej polityki). Operator
+  `max` czyni je nieliniowym — brak formy zamkniętej, stąd metody iteracyjne. Optymalna polityka jest
+  **zachłanna** względem v*.
+- **Eksploracja vs eksploatacja:** rdzeń problemu; **contextual bandits** (associative search) —
+  korzeń w Thorndike'owym *Law of Effect* (skojarzenie stan→akcja, warunkowanie instrumentalne).
+- **TD-learning (temporal-difference):** rozwiązuje równanie optymalności Bellmana **używając
+  faktycznie doświadczonych przejść zamiast znajomości oczekiwanych** (*bootstrapping*) — most między
+  Monte Carlo (pełny epizod) a programowaniem dynamicznym. Dalej: **Sarsa** (on-policy), **Q-learning**
+  (off-policy).
+- **Praktyka uczenia:** adaptacyjne kroki (step sizes), momentum / Polyak-Ruppert averaging,
+  **weighted importance sampling** (niższa wariancja niż zwykły IS — rozdz. 5).
 
 ## 4. MOST DO `hedge_mwu` — online learning i regret (✅ z KODU Imperium)
 
@@ -68,7 +82,8 @@ Sutton-Barto dostarczy formalnej teorii regretu/banditów pod ten moduł (po eks
 2. ⭐⭐⭐ **DL jako aproksymator** (grafowe kandydaty wrzutni: RL-GNN/RHGN/FDPGNN) ⚠️ —
    Goodfellow to fundament. **UWAGA (Brama Kalkulatora):** DL = czarna skrzynka; wchodzi TYLKO
    tam, gdzie deterministyka nie wystarcza, po walidacji (nie zastępuje matematyki Bramy).
-3. ⭐⭐⭐ **Domknięcie RL na laptopie** ⚠️ — ekstrakcja Sutton-Barto (`djvutxt`) → pełna esencja §3.
+3. ✅ **Domknięcie RL** — Sutton-Barto wyekstrahowany (calibre) i w RAG; esencja §3 zweryfikowana
+   (`biblioteka_szukaj`). Pełna teoria regretu/banditów pod hedge_mwu dostępna do dalszego zwiadu.
 
 > **Prawo XVI:** RLA (decyzje sekwencyjne) ⊥ ALG (ML dla cech) ⊥ MEM (pamięć agenta). Agent RL
 > wymaga pamięci → silny styk z MEM (FinMem/A-Mem).
@@ -81,12 +96,14 @@ Sutton-Barto dostarczy formalnej teorii regretu/banditów pod ten moduł (po eks
   ISBN 978-0-262-03561-3. ✅ (ekstrakcja z pliku) — curse of dimensionality, distributed
   representation, CNN/RNN, regularyzacja (rozdz. 7), SGD, representation learning.
 - **BIB-067 Sutton, Barto** — *Reinforcement Learning: An Introduction*, 2. wyd., MIT Press 2018.
-  ⚠️ **PENDING** — plik djvu, ekstrakcja na laptopie (`djvutxt`). Kanon RL: MDP, wartość/polityka,
-  eksploracja-eksploatacja, TD/Q-learning, bandit/regret (most do hedge_mwu).
+  ✅ **EKSTRAKT** (djvu→cache, calibre; tekst czysty — zweryfikowany `biblioteka_szukaj`). Kanon RL:
+  MDP, funkcja wartości + równanie (optymalności) Bellmana, eksploracja-eksploatacja / contextual
+  bandits, TD / Sarsa / Q-learning, importance sampling (most do hedge_mwu).
 
 > **Granica (Prawo XVI):** RLA = uczenie decyzji sekwencyjnych. ML klasyczny cech → **ALG**.
 > Pamięć agenta → **MEM**. Rachunek stochastyczny pod modele → **QNT**.
 
 ---
-*Wypełniono częściowo 2026-07-11: DL (Goodfellow) z pliku + most hedge_mwu z kodu (Prawo I).
-RL (Sutton-Barto) — 🚧 do domknięcia po ekstrakcji djvu na laptopie. KANDYDACI ⚠️ → walidacja areną.*
+*Domknięto 2026-07-11: DL (Goodfellow) z pliku + RL (Sutton-Barto) wyekstrahowany (calibre, djvu→cache,
+tekst czysty) i w RAG — esencja §3 zweryfikowana `biblioteka_szukaj` (MDP, Bellman, TD/Q-learning,
+bandits). Most hedge_mwu z kodu (Prawo I). KANDYDACI wdrożeniowi ⚠️ (GIFT/RL-GNN) → walidacja areną.*

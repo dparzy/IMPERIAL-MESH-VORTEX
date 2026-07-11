@@ -49,7 +49,7 @@ n=wszystkie_neurony(); z=wszyscy_zwiadowcy(); p=raport_potencjalu(); e=raport_el
 print(f'Neurony: {len(n)} | aktywne: {p[\"neurony_aktywne\"]} | wyciszone: {p[\"neurony_wyciszone\"]}')
 print(f'Zwiadowcy: {len(z)} | aktywni: {p[\"zwiadowcy_aktywni\"]} | wyciszeni: {p[\"zwiadowcy_wyciszeni\"]}')
 print(f'Elitarne: {e[\"lacznie_elite\"]} | Kategorie: {sorted({x.KATEGORIA for x in n})}')
-bad=[x for x in n if x.KATEGORIA not in \"MTVFOLRSAKEGHmNZ\"]; print(f'Bad KAT: {[(x.KLUCZ,x.KATEGORIA) for x in bad]}')
+bad=[x for x in n if x.KATEGORIA not in \"ACDFHKLMNORSTVZ\"]; print(f'Bad KAT: {[(x.KLUCZ,x.KATEGORIA) for x in bad]}')
 "
 
 # 3. WAGI_REZIMU — martwe litery (planowane A/L/V są OK — pre-zarejestrowane)
@@ -155,7 +155,7 @@ Checklist Prawa XIX (sprawdzaj na początku sesji):
 
 **9 Nienaruszalnych Reguł (pełne: ZASADY_FUNDAMENTALNE.md § PRAWO XXI):**
 1. Klucze MANIFEST = KLUCZ w kodzie — żadnych aliasów
-2. KATEGORIA ∈ M/T/V/F/O/L/R/S/A/K/E/G — brak "?" u aktywnych
+2. KATEGORIA ∈ A/C/D/F/H/K/L/M/N/O/R/S/T/V/Z — brak "?" u aktywnych
 3. WAGI_REZIMU — tylko litery KAT faktycznie używane w kodzie
 4. WSKAZNIK aktywnego neuronu = klucz produkowany przez Budowniczego
 5. DOSTEPNY=False → neuron nie produkuje głosu (lista_niedostepnych())

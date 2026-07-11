@@ -52,7 +52,7 @@ if __name__ == "__main__":
     print("🧠  IMPERIUM — PEŁNE UCZENIE (paper + adaptacja)")
     print("=" * 60)
     print(f"   Pary:     {cfg.symbole}")
-    print(f"   Uczenie:  synapsy + mwu + igrzyska + ksiega_wad")
+    print("   Uczenie:  synapsy + mwu + igrzyska + ksiega_wad")
     print(f"   Panel:    http://localhost:{cfg.dashboard_port}")
     print("=" * 60)
     print("   Stan uczenia zapisuje się w logs/ (cross-session)")

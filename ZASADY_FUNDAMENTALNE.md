@@ -492,7 +492,7 @@ print(f'Testy README={readme_tests}')
 ### 9 Nienaruszalnych Reguł Spójności
 
 1. **Klucze MANIFEST = KLUCZ w kodzie** — żadnych aliasów, żadnych starych nazw, żadnych skrótów
-2. **KATEGORIA w kodzie ∈ legenda** — tylko M/T/V/F/O/L/R/S/A/K/E/G — brak "?" u aktywnych
+2. **KATEGORIA w kodzie ∈ legenda** — tylko A/C/D/F/H/K/L/M/N/O/R/S/T/V/Z — brak "?" u aktywnych
 3. **WAGI_REZIMU używa tylko liter KAT istniejących w kodzie** — martwa litera = martwa reguła = alarm
 4. **WSKAZNIK każdego aktywnego neuronu istnieje w Budowniczym** — weryfikuj grep lub testem `test_dead_voices`
 5. **DOSTEPNY=False nie produkuje głosu** — weryfikuj lista_niedostepnych() przy starcie Roju

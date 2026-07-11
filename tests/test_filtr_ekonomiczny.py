@@ -75,6 +75,25 @@ def test_p_zero_brak_przewagi():
     assert not FiltrEkonomiczny().ocen(0.0, 3.0).dozwolone
 
 
+def test_lambda_max_niefinite_lub_niedodatnie_odrzucone():
+    """Prawo XXI TEST-GRANIC (cubic PR #118): λ_max = NaN/±inf/0/ujemne → ValueError przy
+    KONSTRUKCJI. NaN cicho wyłączyłby weto (`sharpe > NaN == False`), +inf zdjąłby pułap —
+    bramka bezpieczeństwa musi paść głośno, nie milcząco przepuszczać zakłady."""
+    for zly in (math.nan, math.inf, -math.inf, 0.0, -1.0):
+        try:
+            FiltrEkonomiczny(lambda_max=zly)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"lambda_max={zly!r} powinno rzucić ValueError, a nie rzuciło")
+
+
+def test_lambda_max_poprawne_przechodzi():
+    """Kontrapunkt: skończone dodatnie λ_max konstruuje się normalnie (walidacja nie jest zbyt ostra)."""
+    assert FiltrEkonomiczny(lambda_max=2.0).lambda_max == 2.0
+    assert FiltrEkonomiczny().lambda_max == 2.0
+
+
 # ── Wpięcie opt-in do sizingu (ZASADA WPIĘCIA — domyślnie OFF) ────────────────
 
 def test_sizing_bez_filtra_zachowanie_niezmienione():

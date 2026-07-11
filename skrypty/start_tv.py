@@ -55,7 +55,7 @@ if __name__ == "__main__":
     print(f"   Panel:    http://localhost:{cfg.dashboard_port}")
     print(f"   Webhook:  http://localhost:{cfg.dashboard_port}/webhook/tv")
     if sekret:
-        print(f"   Sekret:   ustawiony ✅ (WEBHOOK_TV_SEKRET)")
+        print("   Sekret:   ustawiony ✅ (WEBHOOK_TV_SEKRET)")
     else:
         print("   Sekret:   ⚠️  BRAK! Ustaw WEBHOOK_TV_SEKRET w środowisku")
         print("             (bez niego każdy może wysłać fałszywy sygnał)")

@@ -481,7 +481,7 @@ def _warstwa_13_ruff():
     bledy, info = [], []
     try:
         wynik = subprocess.run(
-            [sys.executable, "-m", "ruff", "check", "imperium", "tests", "narzedzia",
+            [sys.executable, "-m", "ruff", "check", "imperium", "tests", "narzedzia", "skrypty",
              "--quiet", "--output-format", "concise"],
             cwd=ROOT, capture_output=True, text=True, timeout=120,
         )

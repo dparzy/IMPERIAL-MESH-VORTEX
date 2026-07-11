@@ -12,9 +12,9 @@ kluczowany HASZEM TREŚCI pliku:
   2. Cache pusty → `ekstraktor.ekstrahuj` (konwertuje via calibre gdy trzeba) → zapisz do cache.
 
 SPÓJNOŚĆ MIĘDZY MASZYNAMI (Prawo XVII): hasz treści = ten sam plik → ten sam cache na każdej
-maszynie. Laptop (z calibre) konwertuje djvu RAZ; po zacommitowaniu pliku cache **chmura czyta go
-bez calibre**. To trwałe odblokowanie djvu — decyzja o wersjonowaniu KONKRETNYCH plików = Cezar
-(domyślnie cache jest gitignorowany per-maszyna, jak baza RAG; `git add -f` odblokowuje wybrane).
+maszynie. Laptop (z calibre) konwertuje książki RAZ; cały cache jest WERSJONOWANY (decyzja Cezara
+2026-07-11), więc **chmura czyta tekst bez calibre i bez binariów** — binaria książek żyją tylko
+lokalnie, poza gitem (ryzyko praw autorskich). To trwałe odblokowanie CAŁEJ biblioteki, nie tylko djvu.
 
 GRACEFUL (Prawo XV): bez calibre i bez cache → zwraca "" (abstynencja), nie wysypuje pipeline.
 

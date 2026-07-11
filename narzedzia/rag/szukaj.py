@@ -182,12 +182,22 @@ def szukaj(
 
     if filtr_aktywny:
         kat = katalog.wczytaj_katalog()
-        # Uczciwa podpowiedź (recenzja): filtr --tag na katalogu bez tagów zawsze zwróci puste,
-        # co wygląda na zepsute. Tagi/rok wymagają calibre (`metadane_ksiag` na laptopie).
-        if tag and not cichy and not any(m.get("tagi") for m in kat.values()):
-            print("[RAG] Filtr --tag nieaktywny: katalog nie ma tagów. Uruchom na laptopie "
-                  "z calibre: python -m narzedzia.rag.metadane_ksiag", file=sys.stderr)
-        wyniki = [w for w in wyniki if katalog.pasuje_filtr(w.zrodlo, kat, autor, tag)]
+        if not kat:
+            # Katalog niedostępny (np. chmura bez `metadane_ksiag`) — NIE udajemy pustych wyników
+            # przez predykat odrzucający wszystko (recenzja cubic PR#119). Pomijamy filtr autor/tag
+            # i zwracamy trafienia treściowe; użytkownik wie, że filtr był nieaktywny.
+            if not cichy:
+                print("[RAG] Filtr autor/tag pominięty — brak katalogu książek. Zbuduj na laptopie: "
+                      "python -m narzedzia.rag.metadane_ksiag", file=sys.stderr)
+        else:
+            # Tagi/rok wymagają calibre; na katalogu bez tagów filtr --tag zawsze dałby puste
+            # (wygląda na zepsute). Wtedy pomijamy SAM tag, ale filtr autora zostaje aktywny.
+            ma_tagi = any(m.get("tagi") for m in kat.values())
+            tag_efektywny = tag if ma_tagi else None
+            if tag and not ma_tagi and not cichy:
+                print("[RAG] Filtr --tag nieaktywny: katalog nie ma tagów. Uruchom na laptopie "
+                      "z calibre: python -m narzedzia.rag.metadane_ksiag", file=sys.stderr)
+            wyniki = [w for w in wyniki if katalog.pasuje_filtr(w.zrodlo, kat, autor, tag_efektywny)]
     return wyniki[:topk]
 
 

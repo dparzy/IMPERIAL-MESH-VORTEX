@@ -88,11 +88,14 @@ python -m narzedzia.przygotuj_biblioteke
 Robi 3 kroki, wszystkie token-free: (1) konwersja+cache tekstu (`konwerter`), (2) indeks RAG
 (`indeksuj`), (3) katalog metadanych (`metadane_ksiag`). Idempotentne — pomija już zrobione.
 
-**Odblokowanie djvu dla chmury** (Shreve/Sutton-Barto/Aronson/Kissell — 5 plików djvu):
+**Książki tylko lokalnie, RAG w chmurze z tekstu** (decyzja Cezara 2026-07-11): binaria
+książek (epub/pdf/djvu/mobi/azw3) są **poza gitem** — żyją na tym laptopie. Do repo idzie sam
+WYEKSTRAHOWANY TEKST (`bibliotheca_ulpia/dane/tekst_cache/`, wersjonowany), więc chmura buduje
+pełny RAG bez binariów i bez calibre. Po zbudowaniu cache commituj go:
 ```powershell
-python -m narzedzia.przygotuj_biblioteke     # najpierw skonwertuj lokalnie (djvutxt)
-git add -f bibliotheca_ulpia/dane/tekst_cache/BIB-022* BIB-048* BIB-065* BIB-066* BIB-067*
-git commit -m "cache tekstu djvu — chmura czyta bez calibre"
+python -m narzedzia.przygotuj_biblioteke     # konwersja+cache+indeks (calibre lokalnie)
+git add bibliotheca_ulpia/dane/tekst_cache/  # cache = źródło RAG (nie jest już ignorowany)
+git commit -m "cache tekstu książek — chmura czyta bez binariów"
 ```
 Cache jest kluczowany haszem treści → ten sam plik = ten sam cache na obu maszynach (Prawo XVII).
 Bez calibre/djvutxt kroki i tak działają dla epub/pdf (djvu abstynuje — Prawo XV).

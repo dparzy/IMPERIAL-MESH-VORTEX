@@ -33,16 +33,23 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 BIBLIOTEKA = ROOT / "bibliotheca_ulpia"
+# Wyekstrahowany tekst książek — JEDYNE źródło RAG dla książek. Binaria (epub/pdf/djvu/…)
+# żyją tylko lokalnie, poza gitem (decyzja Cezara 2026-07-11: ryzyko praw autorskich + 504 MB);
+# repo niesie sam tekst, więc chmura buduje pełny RAG bez binariów i bez calibre.
+CACHE_KSIAG = BIBLIOTEKA / "dane" / "tekst_cache"
 DOCS = ROOT / "docs"
 DEFAULT_BAZA = ROOT / "narzedzia" / "rag" / "baza_wiedzy.db"
 DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
-# Formaty ksiazek/danych obslugiwane przez ekstraktor
-SUF_KSIAZKI = ("*.epub", "*.pdf", "*.azw3", "*.mobi", "*.djvu")
+# Dane tematyczne (nie-książki) w bibliotheca_ulpia/dane/ — indeksowane wprost przez ekstraktor.
 SUF_DANE = ("*.md", "*.txt", "*.csv", "*.json")
 
 sys.path.insert(0, str(ROOT / "narzedzia" / "rag"))
 from ekstraktor import ekstrahuj, podziel_na_chunki, wyczysc  # noqa: E402
+try:
+    from narzedzia.rag import katalog  # noqa: E402
+except ImportError:  # pragma: no cover — kontekst z narzedzia/rag na sys.path
+    import katalog  # type: ignore[no-redef]  # noqa: E402
 
 
 def _init_db(conn: sqlite3.Connection) -> None:
@@ -134,9 +141,13 @@ def _zbierz_pliki(korpus: str, tylko_enc: bool) -> list[tuple[Path, str]]:
 
     if korpus in ("biblioteka", "wszystko"):
         if not tylko_enc:
-            for suf in SUF_KSIAZKI:
-                pliki += [(p, "biblioteka") for p in sorted(BIBLIOTEKA.glob(suf))]
-            # dane tematyczne (csv/json/txt/md) w bibliotheca_ulpia/dane/
+            # KSIĄŻKI: indeksujemy z CACHE tekstu (tekst_cache/*.txt), NIE z binariów — te są
+            # tylko lokalnie (patrz CACHE_KSIAG). `zrodlo` odtwarzamy do nazwy binarnej z katalogu
+            # w pętli (_zrodlo_z_cache), by wzbogacenie/filtr autor-tag działały jak dotąd.
+            if CACHE_KSIAG.is_dir():
+                pliki += [(p, "biblioteka") for p in sorted(CACHE_KSIAG.glob("*.txt"))]
+            # dane tematyczne (csv/json/txt/md) w bibliotheca_ulpia/dane/ — glob NIE-rekurencyjny,
+            # więc podkatalog tekst_cache/ nie jest tu łapany (książki wchodzą wyżej, dokładnie raz).
             dane_dir = BIBLIOTEKA / "dane"
             if dane_dir.is_dir():
                 for suf in SUF_DANE:
@@ -151,8 +162,9 @@ def _zbierz_pliki(korpus: str, tylko_enc: bool) -> list[tuple[Path, str]]:
     return pliki
 
 
-def _tytul(p: Path) -> str:
-    n = p.stem
+def _tytul(nazwa: str) -> str:
+    """Tytuł z nazwy źródła (str). `BIB-XXX_Autor_Tytul(.ext)` → `Autor — Tytul`."""
+    n = Path(nazwa).stem
     # BIB-XXX_Autor_Tytul → Autor — Tytul
     if n.startswith("BIB-"):
         parts = n.split("_", 2)
@@ -161,6 +173,23 @@ def _tytul(p: Path) -> str:
         if len(parts) == 2:
             return parts[1].replace("-", " ")
     return n.replace("_", " ").replace("-", " ")
+
+
+def _mapa_stem_plik() -> dict[str, str]:
+    """Mapa `stem książki` → `nazwa pliku binarnego` z katalogu (katalog_ksiag.json).
+    Pozwala odtworzyć `zrodlo` = nazwa binarna (zgodna z katalogiem/filtrem) przy indeksowaniu
+    z cache tekstu, mimo że binaria nie są wersjonowane. Brak katalogu → {} (graceful)."""
+    return {Path(plik).stem: plik for plik in katalog.wczytaj_katalog()}
+
+
+def _zrodlo_z_cache(cache_path: Path, mapa: dict[str, str]) -> str:
+    """`zrodlo` książki odtworzone z pliku cache `<stem>__<hash>.txt`.
+    Preferuje nazwę binarną z katalogu (wzbogacenie/filtr działają jak dla binariów); brak
+    w katalogu → sam stem (książka i tak zindeksowana — Prawo XV: żadnego martwego głosu)."""
+    stem = cache_path.stem
+    if "__" in stem:
+        stem = stem.rsplit("__", 1)[0]
+    return mapa.get(stem, stem)
 
 
 def _zaladuj_model(model_name: str, bez_wektorow: bool):
@@ -210,12 +239,16 @@ def indeksuj(
     if tylko_nowe:
         znane_hashe = {r[0]: r[1] for r in conn.execute("SELECT zrodlo, hash FROM pliki")}
 
+    mapa_ksiag = _mapa_stem_plik()   # stem → nazwa binarna: odtworzenie zrodla książek z cache
+
     total_chunks = 0
     pominiete = 0
     przetworzone = 0
     t0 = time.time()
     for p, kor in pliki:
-        zrodlo = p.name
+        # Cache książek (tekst_cache/) → zrodlo = nazwa binarna z katalogu (zgodność z filtrem/
+        # wzbogaceniem). Pozostałe źródła (dane tematyczne, dokumenty .md) → nazwa pliku jak dotąd.
+        zrodlo = _zrodlo_z_cache(p, mapa_ksiag) if p.parent.name == "tekst_cache" else p.name
         h = _hash_pliku(p)
 
         if tylko_nowe and znane_hashe.get(zrodlo) == h:
@@ -236,7 +269,7 @@ def indeksuj(
         if tylko_nowe:
             _usun_zrodlo(conn, zrodlo)
 
-        ids = _dodaj_fragmenty(conn, zrodlo, _tytul(p), kor, chunki)
+        ids = _dodaj_fragmenty(conn, zrodlo, _tytul(zrodlo), kor, chunki)
 
         if model is not None:
             import numpy as np

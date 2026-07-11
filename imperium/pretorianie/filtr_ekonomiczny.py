@@ -71,6 +71,16 @@ class FiltrEkonomiczny:
     """
     lambda_max: float = 2.0
 
+    def __post_init__(self) -> None:
+        # Bramka bezpieczeństwa NIE może cicho się wyłączyć (recenzja cubic PR #118):
+        # λ_max = NaN dawałby `sharpe > NaN == False` → weto NIGDY nie pada; +inf zdejmowałby
+        # pułap całkiem. Wymagamy skończonego, DODATNIEGO pułapu — błędna kalibracja (np. z areny)
+        # ma paść GŁOŚNO przy konstrukcji, nie milcząco przepuszczać każdy zakład z dodatnim edge.
+        if not math.isfinite(self.lambda_max) or self.lambda_max <= 0.0:
+            raise ValueError(
+                f"lambda_max musi być skończone i > 0 (dostał {self.lambda_max!r}) — pułap "
+                "market-price-of-risk nie może być NaN/inf/≤0 (brama bezpieczeństwa ECON)")
+
     def ocen(self, p_wygranej: float, rr: float) -> WerdyktEkonomiczny:
         # Abstynencja (Prawo XV): RR niedodatnie = brak sensownego zakładu → przepuść.
         if rr <= 0:

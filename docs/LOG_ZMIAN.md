@@ -6,6 +6,28 @@
 
 ---
 
+## 2026-07-11 | 🫧 | ENCYKLOPEDIA: dział BAN wypełniony (bańki, krachy, behawioralne)
+
+Pierwsze domknięcie działu z listy nowych ksiąg (rekomendacja z audytu pokrycia BIB-001..042 vs
+043..069: stary kanon kompletny, luka po stronie nowych działów). Dział **BAN 🔲 → ✅**.
+
+Esencja UGRUNTOWANA ekstrakcją fragmentów z plików (Prawo I, nie z pamięci): model Minsky-
+Kindleberger (displacement→overtrading→mania→critical stage→panika→contagion), Shiller (feedback
+loop = naturalny Ponzi, CAPE), Thaler (nadreakcja DeBondt-Thaler, awersja do straty ~2×),
+Reinhart-Rogoff (debt intolerance, „this time is different" jako sygnał szczytu).
+
+**Wpływ na kod (zmapowany na anatomię):** Z-03 kill-switch ← critical stage; Z-04 ← kaskada;
+Z-07 PI-Cycle ← szczyt sprzężenia; PSY-03 ← herd; RADAR-04 ← contagion; X-27 ← nadreakcja.
+**KANDYDACI ⚠️** (do walidacji areną): neuron „faza cyklu kredytowego" (Minsky classifier),
+analog CAPE dla krypto, filtr „New Era/this-time-is-different", asymetria loss-aversion w sizingu
+(spójne z ECON). Prawo XVI: kandydaci 1-2 sąsiadują z Z-03/07 → zmierzyć dekorelację przed budową.
+
+**Pliki:** `bibliotheca_ulpia/encyklopedia/BAN_banki_krachy_behawioralne.md` (szkielet → pełny),
+`bibliotheca_ulpia/encyklopedia/INDEX_MAIOR.md` (BAN 🔲→✅, Stan na 06-25→07-11).
+Następne działy do wypełnienia: MAK (domknąć 🚧) → DEF → QNT → RLA.
+
+---
+
 ## 2026-07-11 | 📚 | ANALIZA KSIĄG BIB-043..069 — mapowanie 27 nowych pozycji na Imperium
 
 Analiza „zgodnie z zasadami" 27 nowo dodanych książek. Ekstrakcja TOC+wstępu z KAŻDEGO pliku

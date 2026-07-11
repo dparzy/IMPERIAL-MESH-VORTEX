@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-07-11 | 📊 | ENCYKLOPEDIA: dział MAK domknięty (makro, cykle długu) — Dalio + Popper
+
+Drugi dział z serii nowych ksiąg. **MAK 🚧 → ✅** (był tylko Patel; dodano 3× Dalio + Popper).
+
+Esencja UGRUNTOWANA ekstrakcją z plików (Prawo I): Dalio — archetyp Big Debt Cycle (deflacyjny/
+inflacyjny), 4 dźwignie (austerity/default/druk/transfery), „beautiful deleveraging", „pushing on
+a string", Big Cycle mocarstw (500 lat, 18 determinant, waluta rezerwowa), 5 stadiów wypłacalności;
+Popper — BTC jako store-of-value w debasementcie fiata (digital gold, ograniczona inflacja podaży).
+
+**Wpływ na kod:** Gubernator (mnożnik reżimu ← faza makro jako wolnozmienne TŁO), RADAR-01/03
+(płynność, risk-on/off), Senat (debata makro). **KANDYDACI ⚠️:** neuron kontekstu makro-reżimu
+(faza Big Debt Cycle — TŁO, NIE sygnał per-bar — Prawo XV, ryzyko martwego głosu), detektor
+„pushing on a string", reżim debasement→BTC-hedge (łączy MAK+ONC). Prawo XVI: dekorelacja z RADAR
+do zmierzenia przed budową.
+
+**Pliki:** `bibliotheca_ulpia/encyklopedia/MAK_makroekonomia_i_cykle.md` (🚧→✅),
+`bibliotheca_ulpia/encyklopedia/INDEX_MAIOR.md` (MAK 🚧→✅). Następne: DEF → QNT → RLA (djvu pending).
+
+---
+
 ## 2026-07-11 | 🫧 | ENCYKLOPEDIA: dział BAN wypełniony (bańki, krachy, behawioralne)
 
 Pierwsze domknięcie działu z listy nowych ksiąg (rekomendacja z audytu pokrycia BIB-001..042 vs

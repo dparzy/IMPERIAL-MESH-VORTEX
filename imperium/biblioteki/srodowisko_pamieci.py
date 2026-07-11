@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import os
 import sqlite3
+import sys
 from pathlib import Path
 from typing import Dict, Any, List
 
@@ -50,14 +51,25 @@ def wykryj_srodowisko() -> str:
     Zwraca "chmura" gdy działamy w zdalnym kontenerze Claude Code (web/CI),
     "lokal" gdy na trwałym dysku Cezara.
 
-    Sygnał główny: zmienna CLAUDE_CODE_REMOTE=true (ustawiana przez harness web).
-    Heurystyka zapasowa: brak typowych ścieżek lokalnych + obecność /workspace lub /home/user.
+    Kolejność sygnałów (od najsilniejszego):
+      1. IMPERIUM_SRODOWISKO — jawne, TRWAŁE nadpisanie Cezara (setx raz na maszynie).
+         Rozkaz stały 2026-07-11: domyślnie pracujemy na lokalu danych z dysku.
+      2. CLAUDE_CODE_REMOTE=true — twardy sygnał zdalnego harnessa (web/CI).
+      3. Windows → LOKAL. Kontenery chmury są Linux; laptop Cezara to Windows.
+         To naprawia fałszywy alarm: harness ustawia CLAUDE_ENV_FILE także w hooku
+         na lokalu, przez co baner startowy mylnie pokazywał CHMURA (2026-07-11).
+      4. CLAUDE_ENV_FILE (tylko nie-Windows) — heurystyka zapasowa dla Linux-chmury.
     """
+    override = os.getenv("IMPERIUM_SRODOWISKO", "").strip().lower()
+    if override in ("lokal", "chmura"):
+        return override
     if os.getenv("CLAUDE_CODE_REMOTE", "").lower() == "true":
         return "chmura"
-    # Heurystyka: kontenery chmury mają ścieżkę /home/user/ lub /workspace
-    # bez trwałego venv; lokalnie Cezar ma swój venv/dysk.
-    if os.getenv("CLAUDE_ENV_FILE"):  # harness web ustawia tę zmienną
+    # Windows = maszyna Cezara (kontenery chmury Claude Code są Linux) → zawsze lokal.
+    if sys.platform.startswith("win"):
+        return "lokal"
+    # Heurystyka zapasowa (Linux): harness web ustawia CLAUDE_ENV_FILE.
+    if os.getenv("CLAUDE_ENV_FILE"):
         return "chmura"
     return "lokal"
 

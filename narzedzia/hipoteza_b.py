@@ -50,18 +50,19 @@ def _glos(kier: str) -> int:
 def _ic_kierunkowy_train(sygnaly, wyniki):
     """Per-neuron IC kierunkowy na TRAIN = średnia(głos · etykieta) po barach z głosem.
 
-    Zwraca {neuron: waga_ic}. Znak niesie kierunek przewagi (ujemny → neuron myli się
-    systematycznie, jego głos zostanie ODWRÓCONY w agregacie B). |waga| ∈ [0, 1]."""
-    suma: dict = {}
+    Wagi liczy KANONICZNA imperium.legiony.legatus.oblicz_wagi_ic (jedno źródło prawdy,
+    W-361 — ta sama logika wpina się w Legatusa). Tu dokładamy licznik głosów per-neuron
+    (audyt/testy). Zwraca ({neuron: waga_ic}, {neuron: liczba_głosów}). Znak wagi niesie
+    kierunek przewagi (ujemny → neuron myli się systematycznie, głos ODWRÓCONY w B)."""
+    from imperium.legiony.legatus import oblicz_wagi_ic
+    wagi = oblicz_wagi_ic(sygnaly, wyniki)
     liczba: dict = {}
-    for mapa, etykieta in zip(sygnaly, wyniki):
+    for mapa in sygnaly:
         for nid, kier in mapa.items():
-            g = _glos(kier)
-            if g == 0:
+            if _glos(kier) == 0:
                 continue
-            suma[nid] = suma.get(nid, 0.0) + g * etykieta
             liczba[nid] = liczba.get(nid, 0) + 1
-    return {nid: suma[nid] / liczba[nid] for nid in suma if liczba[nid] > 0}, liczba
+    return wagi, liczba
 
 
 def _trafnosc_agregatu(sygnaly, wyniki, wagi=None):

@@ -6,6 +6,39 @@
 
 ---
 
+## 2026-07-12 | ⚖️ | W-361: ważenie głosów IC w Legatusie (hipoteza B, opt-in OFF)
+
+**Build P1 — wpięcie ważenia IC w agregację Legatusa (ZASADA WPIĘCIA: opt-in domyślnie OFF).**
+
+**Kontekst (Prawo I, pomiar):** diagnoza triady (2026-07-06) — skill SIEDZI w neuronach
+(stabilny IC), GINIE w agregacji przy równej wadze (base acc 48.3% < 50%). `narzedzia/hipoteza_b.py`
+zwalidował OFFLINE (OOS, 5 par 4h): agregat ważony IC = **51.8%**, bije równą wagę o **+3.6pp**
+i przekracza 50% na KAŻDEJ z 5 par. Grinold & Kahn (BIB-025): sygnał = Σ IC_i · głos_i.
+
+**Co wchodzi (`imperium/legiony/legatus.py`):**
+- `oblicz_wagi_ic(sygnaly, wyniki, min_glosow)` — kanoniczne per-neuron IC KIERUNKOWE
+  (jedno źródło prawdy; `narzedzia/hipoteza_b._ic_kierunkowy_train` teraz je REUŻYWA, nie duplikuje).
+- `Legatus.ustaw_wagi_ic(wagi, wlacz=True, domyslny_ic=0.0)` + `resetuj_wazenie_ic()` + flagi
+  `wazenie_ic`/`wagi_ic`/`_domyslny_ic`.
+- `_wklady_kierunkowe(sygnaly)` — wspólna warstwa: OFF → wkład = `pewnosc_finalna×waga`
+  (identyczne ze starym `_agreguj`); ON → ×|IC|, a przy **IC<0 kierunek ODWRÓCONY** (neuron
+  mylący się systematycznie głosuje na przeciwną stronę). Buckety long/short liczone z kierunku
+  EFEKTYWNEGO → synapsy i `zgodnych_neuronow` spójne z korektą.
+
+**Bezpieczeństwo (ZASADA WPIĘCIA):** domyślnie OFF — samo dodanie modułu NIE zmienia decyzji.
+IC=0 / brak pomiaru (`domyslny_ic=0`) → neuron nie waży (nie wpada w przeciwny kierunek przez
+pomyłkę). Puste wagi → guard traktuje jak OFF. Włączenie na żywo = decyzja Cezara po A/B (Prawo XVIII).
+
+**Testy:** `tests/test_wazenie_ic.py` (+20, Reguła Test-Granic): OFF=regresja, jednorodne IC
+nie zmienia kierunku, stałe IC znosi się w normalizacji, IC<0 flip, IC=0 wyciszenie,
+brak-pomiaru×domyslny, guardy setterów, kanoniczna `oblicz_wagi_ic` (znak/abstynencja/min_głosów/pusty).
+
+**Następny krok:** A/B na żywo (pełny pipeline Legatusa OFF vs ON na OOS) — dopiero zielony wynik
+uzasadni przełączenie flagi. Pliki: `imperium/legiony/legatus.py`, `narzedzia/hipoteza_b.py`,
+`tests/test_wazenie_ic.py`.
+
+---
+
 ## 2026-07-12 | 🪞 | Refleksja: sprzeczności tylko ze źródeł statusowych (20→0 fałszywych)
 
 Sesja lokalna, lista P0 krok po kroku. Trzy fixy tego dnia:

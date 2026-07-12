@@ -66,6 +66,7 @@ def backtest(
     mierz_ic: bool = False,
     kalibruj_prog: bool = False,
     zbieraj_sygnaly: bool = False,
+    zbieraj_pelne_sygnaly: bool = False,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -144,6 +145,9 @@ def backtest(
     # tylko do POMIARU ważności po fakcie). Zasila raport_waznosci() (MDA/SFI, López de Prado).
     hist_sygnalow: List[Dict[str, str]] = []
     hist_wynikow: List[int] = []
+    # W-361 A/B na żywo: pełne SygnalNeuronu per bar (kierunek+pewnosc_finalna+waga) —
+    # potrzebne do replayu przez realny Legatus._agreguj OFF vs ON. Opt-in (pamięciożerne).
+    hist_pelne: list = []
 
     wejscia = 0
     weta = 0
@@ -215,10 +219,15 @@ def backtest(
             hist_sygnalow.append({s.neuron_id: s.kierunek for s in decyzja.raport.sygnaly})
             nast = bary[i + 1]["close"]
             hist_wynikow.append(1 if nast > biezacy["close"] else -1)
+            # Pełne sygnały RÓWNOLEGLE do hist_wynikow (te same bary) — replay A/B (W-361).
+            if zbieraj_pelne_sygnaly:
+                hist_pelne.append(list(decyzja.raport.sygnaly))
 
     if zbieraj_sygnaly:
         engine.historia_sygnalow = hist_sygnalow
         engine.historia_wynikow = hist_wynikow
+        if zbieraj_pelne_sygnaly:
+            engine.historia_pelnych_sygnalow = hist_pelne
 
     # Pomiar IC (W-385): dołącz raport do silnika (Prawo XVI — przewaga mierzona).
     if kol_ic is not None:

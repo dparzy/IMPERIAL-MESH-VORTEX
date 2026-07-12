@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-07-12 | ⚖️ | W-361 A/B na żywo: ważenie IC potwierdzone na REALNYM Legatusie
+
+**Walidacja P1 (ZASADA WPIĘCIA — pomiar przed włączeniem flagi).** Nowy harness
+`narzedzia/ab_wazenie_ic.py` porównuje `Legatus._agreguj` OFF vs ON na OOS — na PRAWDZIWEJ
+ścieżce decyzyjnej (wagi reżimowe już wliczone w `pewnosc_finalna·waga`), nie na uproszczonym
+agregatorze jak offline `hipoteza_b`.
+
+**Metoda (OOS, zero look-ahead):** backtest z nowym opt-in `zbieraj_pelne_sygnaly=True` zbiera
+pełne `SygnalNeuronu` per bar (równolegle do etykiet forward). IC kierunkowy liczony na TRAIN
+(kanoniczna `oblicz_wagi_ic`), replay TEST-barów przez Legatus dwa razy (OFF / ON). Cząstkowanie:
+każda para → `arena_wyniki.db` (rodzaj `ab_wazenie_ic`) przed następną, restart pomija policzone,
+pasek postępu na stderr (ZASADA ANALIZY CZĄSTKOWEJ + Prawo XXIV).
+
+**Wynik (15 par 4h, frac=0.6, max 6000 barów):**
+- **GLOBALNIE (ważone barami OOS): OFF=48.6% → ON=51.8%, Δ=+3.3pp** — niemal replika offline (+3.6pp).
+- **ON > OFF na 12/15 parach.** Wszystkie 5 par z dużym OOS (2300 barów) dodatnie:
+  ETH +5.8, ADA +4.0, BTC +3.9, XRP +2.6, BNB +2.1.
+- Ujemne/płaskie (SOL −7.3, NEAR −0.3, MATIC 0.0) — wyłącznie małe próbki 300 barów (szum).
+- ✅ Werdykt harnessu: ważenie IC leczy realny Legatus (ON>OFF i ON>50% OOS).
+
+**Status flagi:** nadal **OFF** — włączenie na sztywno to decyzja Cezara (Prawo XVIII). Efekt
+realny, ale umiarkowany (ON ledwie >50%); wiarygodny sygnał niosą pary z dużym OOS.
+
+**Pliki:** `imperium/koloseum/backtest.py` (opt-in `zbieraj_pelne_sygnaly`),
+`narzedzia/ab_wazenie_ic.py`, `tests/test_ab_wazenie_ic.py` (+9), `docs/SCIAGA_LOKAL.md`.
+
+---
+
 ## 2026-07-12 | ⚖️ | W-361: ważenie głosów IC w Legatusie (hipoteza B, opt-in OFF)
 
 **Build P1 — wpięcie ważenia IC w agregację Legatusa (ZASADA WPIĘCIA: opt-in domyślnie OFF).**

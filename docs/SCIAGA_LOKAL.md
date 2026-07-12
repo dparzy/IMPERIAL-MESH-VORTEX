@@ -169,7 +169,8 @@ python narzedzia/raport_ic.py --glob "dane/dzienne/*_d.csv" --interwal 1d
 python narzedzia/walk_forward_ic.py --glob "dane/4h/Binance_*_4h.csv" 4h --okna 4
 python narzedzia/scoreboard_neuronow.py               # ranking kontrybucji neuronów
 python narzedzia/raport_waznosci.py --do-areny        # Feature Importance MDA/SFI (López de Prado)
-python narzedzia/hipoteza_b.py --max-barow 6000       # ważenie głosów IC vs równa waga (agregacja, OOS)
+python narzedzia/hipoteza_b.py --max-barow 6000       # ważenie IC vs równa waga — agregat CZYSTYCH głosów (offline, OOS)
+python narzedzia/ab_wazenie_ic.py --max-barow 6000    # W-361 A/B na ŻYWYM Legatusie: OFF vs ON (wznawialny, cząstki→arena)
 ```
 Triada pomiaru skilla: **IC** (korelacja) + **walk-forward** (stabilność) + **ważność** (MDA/SFI,
 przyczynowość permutacyjna). `--do-areny` zapisuje MDA do bazy → Claude czyta `arena_pytaj`.

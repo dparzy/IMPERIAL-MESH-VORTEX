@@ -22,9 +22,9 @@ def test_kierunek_pozytyw_negatyw():
 def test_sprzecznosc_rozstrzygniete(monkeypatch):
     monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [
         {"data": "2026-06-01", "tematy": {"numba", "viterbi"}, "kierunek": "-",
-         "opis": "Numba niezrobiona", "zrodlo": "x", "status": ""},
+         "opis": "Numba niezrobiona", "zrodlo": "wizje", "status": ""},
         {"data": "2026-06-28", "tematy": {"numba", "viterbi"}, "kierunek": "+",
-         "opis": "Numba wdrożona", "zrodlo": "x", "status": ""},
+         "opis": "Numba wdrożona", "zrodlo": "wizje", "status": ""},
     ])
     w = rp.wykryj_sprzecznosci()
     assert len(w) == 1
@@ -36,20 +36,36 @@ def test_sprzecznosc_realna(monkeypatch):
     """Wcześniej + (zrobione), później - (cofnięte) → SPRZECZNE."""
     monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [
         {"data": "2026-06-01", "tematy": {"portfel", "koszyk"}, "kierunek": "+",
-         "opis": "Portfel wdrożony", "zrodlo": "x", "status": ""},
+         "opis": "Portfel wdrożony", "zrodlo": "wizje", "status": ""},
         {"data": "2026-06-20", "tematy": {"portfel", "koszyk"}, "kierunek": "-",
-         "opis": "Portfel odrzucony", "zrodlo": "x", "status": ""},
+         "opis": "Portfel odrzucony", "zrodlo": "wizje", "status": ""},
     ])
     w = rp.wykryj_sprzecznosci()
+    assert w and w[0]["typ"] == "SPRZECZNE"
+
+
+def test_dziennik_narracja_nie_daje_falszywej_sprzecznosci(monkeypatch):
+    """Prawo I (pomiar 2026-07-12): narracja Dziennika nie jest flipem statusu.
+    Wpis wizji '+' i wpis dziennika '-' o wspólnych tematach NIE tworzą sprzeczności —
+    domyślnie liczymy tylko ze źródeł statusowych (wizje). To gasi 92 fałszywe pozytywy."""
+    monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [
+        {"data": "2026-06-01", "tematy": {"portfel", "koszyk"}, "kierunek": "+",
+         "opis": "Portfel wdrożony", "zrodlo": "wizje", "status": "WDROŻONA"},
+        {"data": "2026-06-20", "tematy": {"portfel", "koszyk"}, "kierunek": "-",
+         "opis": "decyzje: nie robimy portfela na razie", "zrodlo": "dziennik", "status": ""},
+    ])
+    assert rp.wykryj_sprzecznosci() == []                       # domyślnie: tylko wizje
+    # jawne rozszerzenie źródeł DZIAŁA (świadome włączenie dziennika)
+    w = rp.wykryj_sprzecznosci(zrodla={"wizje", "dziennik"})
     assert w and w[0]["typ"] == "SPRZECZNE"
 
 
 def test_brak_wspolnych_tematow_brak_sprzecznosci(monkeypatch):
     monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [
         {"data": "2026-06-01", "tematy": {"numba", "viterbi"}, "kierunek": "-",
-         "opis": "a", "zrodlo": "x", "status": ""},
+         "opis": "a", "zrodlo": "wizje", "status": ""},
         {"data": "2026-06-28", "tematy": {"portfel", "koszyk"}, "kierunek": "+",
-         "opis": "b", "zrodlo": "x", "status": ""},
+         "opis": "b", "zrodlo": "wizje", "status": ""},
     ])
     assert rp.wykryj_sprzecznosci() == []
 
@@ -57,9 +73,9 @@ def test_brak_wspolnych_tematow_brak_sprzecznosci(monkeypatch):
 def test_ten_sam_dzien_pomijany(monkeypatch):
     monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [
         {"data": "2026-06-01", "tematy": {"numba", "viterbi"}, "kierunek": "-",
-         "opis": "a", "zrodlo": "x", "status": ""},
+         "opis": "a", "zrodlo": "wizje", "status": ""},
         {"data": "2026-06-01", "tematy": {"numba", "viterbi"}, "kierunek": "+",
-         "opis": "b", "zrodlo": "x", "status": ""},
+         "opis": "b", "zrodlo": "wizje", "status": ""},
     ])
     assert rp.wykryj_sprzecznosci() == []
 
@@ -83,7 +99,7 @@ def test_przedawnienie_zrealizowany_nie_wisi(monkeypatch, tmp_path):
     # późniejsza realizacja na tych tematach
     monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [
         {"data": "2026-06-01", "tematy": {"alfa", "beta", "gamma"}, "kierunek": "+",
-         "opis": "zrobione", "zrodlo": "x", "status": ""},
+         "opis": "zrobione", "zrodlo": "wizje", "status": ""},
     ])
     assert rp.wykryj_przedawnienia(dni=21) == []
 

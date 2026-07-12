@@ -425,6 +425,15 @@ def test_kronika_score_nie_jest_flat(monkeypatch, tmp_path):
     plik_lekcji.write_text("# P\n\n## 📚 LEKCJE Z SESJI\n\n", encoding="utf-8")
     monkeypatch.setattr(cp._ps, "DOMYSLNY_PLIK", plik_lekcji)
 
+    # HERMETYCZNOŚĆ (Prawo XXI): izolujemy pozostałe warstwy cross-layer. Bez tego test
+    # zależał od realnych danych — gdy wizje_i_decyzje.jsonl urosło, trafienia „portfel"
+    # z wizji/RAG wypychały starą kronikę (recency≈0) poza limit=10 → fałszywy czerwony.
+    # Ten test sprawdza WYŁĄCZNIE scoring kroniki (recency: nowy > stary).
+    monkeypatch.setattr(cp, "_szukaj_w_logach", lambda *a, **k: [])
+    monkeypatch.setattr(cp, "_szukaj_w_rag", lambda *a, **k: [])
+    monkeypatch.setattr(cp, "_szukaj_w_refleksjach", lambda *a, **k: [])
+    monkeypatch.setattr(cp._rw, "szukaj_scored", lambda *a, **k: [])
+
     wyniki = cp.szukaj_wszedzie("portfel", cel_kronika=kronika_dir, limit=10)
     kroniki = [w for w in wyniki if w["warstwa"] == "kronika"]
     assert len(kroniki) == 2
@@ -438,8 +447,9 @@ def test_kronika_score_nie_jest_flat(monkeypatch, tmp_path):
 # ── W5 Most Chmura↔Lokal (srodowisko_pamieci) ────────────────────────────────
 
 def test_wykryj_srodowisko_chmura(monkeypatch):
-    """CLAUDE_CODE_REMOTE=true → 'chmura'."""
+    """CLAUDE_CODE_REMOTE=true → 'chmura' (silniejszy niż reguła Windows→lokal)."""
     from imperium.biblioteki import srodowisko_pamieci as sp
+    monkeypatch.delenv("IMPERIUM_SRODOWISKO", raising=False)
     monkeypatch.setenv("CLAUDE_CODE_REMOTE", "true")
     assert sp.wykryj_srodowisko() == "chmura"
 
@@ -447,9 +457,47 @@ def test_wykryj_srodowisko_chmura(monkeypatch):
 def test_wykryj_srodowisko_lokal(monkeypatch):
     """Brak zmiennych web → 'lokal'."""
     from imperium.biblioteki import srodowisko_pamieci as sp
+    monkeypatch.delenv("IMPERIUM_SRODOWISKO", raising=False)
     monkeypatch.delenv("CLAUDE_CODE_REMOTE", raising=False)
     monkeypatch.delenv("CLAUDE_ENV_FILE", raising=False)
     assert sp.wykryj_srodowisko() == "lokal"
+
+
+def test_wykryj_srodowisko_override_lokal(monkeypatch):
+    """IMPERIUM_SRODOWISKO=lokal wygrywa NAWET z sygnałem zdalnym (trwały rozkaz Cezara)."""
+    from imperium.biblioteki import srodowisko_pamieci as sp
+    monkeypatch.setenv("IMPERIUM_SRODOWISKO", "lokal")
+    monkeypatch.setenv("CLAUDE_CODE_REMOTE", "true")
+    monkeypatch.setenv("CLAUDE_ENV_FILE", "/tmp/env")
+    assert sp.wykryj_srodowisko() == "lokal"
+
+
+def test_wykryj_srodowisko_override_chmura(monkeypatch):
+    """IMPERIUM_SRODOWISKO=chmura wymusza chmurę nawet na Windows (jawne nadpisanie)."""
+    from imperium.biblioteki import srodowisko_pamieci as sp
+    monkeypatch.setenv("IMPERIUM_SRODOWISKO", "chmura")
+    monkeypatch.delenv("CLAUDE_CODE_REMOTE", raising=False)
+    assert sp.wykryj_srodowisko() == "chmura"
+
+
+def test_wykryj_srodowisko_windows_bez_env_file(monkeypatch):
+    """Windows z CLAUDE_ENV_FILE (hook lokalny) → nadal 'lokal', nie fałszywa chmura."""
+    from imperium.biblioteki import srodowisko_pamieci as sp
+    monkeypatch.delenv("IMPERIUM_SRODOWISKO", raising=False)
+    monkeypatch.delenv("CLAUDE_CODE_REMOTE", raising=False)
+    monkeypatch.setenv("CLAUDE_ENV_FILE", "/tmp/env")  # harness ustawia to też w hooku lokalnym
+    monkeypatch.setattr(sp.sys, "platform", "win32")
+    assert sp.wykryj_srodowisko() == "lokal"
+
+
+def test_wykryj_srodowisko_linux_env_file_chmura(monkeypatch):
+    """Linux (telefon/chmura) z CLAUDE_ENV_FILE → 'chmura' (adaptacyjność zachowana)."""
+    from imperium.biblioteki import srodowisko_pamieci as sp
+    monkeypatch.delenv("IMPERIUM_SRODOWISKO", raising=False)
+    monkeypatch.delenv("CLAUDE_CODE_REMOTE", raising=False)
+    monkeypatch.setenv("CLAUDE_ENV_FILE", "/tmp/env")
+    monkeypatch.setattr(sp.sys, "platform", "linux")
+    assert sp.wykryj_srodowisko() == "chmura"
 
 
 def test_raport_dostepnosci_ma_klucze():

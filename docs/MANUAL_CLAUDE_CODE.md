@@ -1,8 +1,11 @@
 # 🤖 MANUAL CLAUDE CODE — Instalacja i konfiguracja z Imperium
 
-> **Stan na:** 2026-06-20
+> **Stan na:** 2026-07-12
 > Dla Cezara-nowicjusza — każdy krok dokładnie.
 > Zakładamy: masz już Python 3.11.9, git i TA-Lib na laptopie.
+> **Uwaga (2026-07-12):** Cezar pracuje teraz głównie przez **aplikację desktopową
+> Claude Code** (Windows 10 Pro) — wskazujesz folder projektu, reszta (hooki, pamięć)
+> działa jak w terminalu. Wariant terminalowy (`claude`) poniżej nadal ważny.
 
 ---
 
@@ -37,7 +40,7 @@ Z Claude Code:
 - Claude **czyta pliki bezpośrednio** z folderu Imperium
 - **Edytuje kod od razu** — bez kopiowania
 - **Uruchamia testy** i widzi wyniki
-- **Commituje i pushuje** samodzielnie (za Twoją zgodą)
+- **Commituje LOKALNIE** samodzielnie; **push robisz TY ręcznie** (Claude nigdy nie pushuje)
 - Rozmowy są **ciągłe między sesjami** (pamięta kontekst)
 
 ### Czego potrzebujesz?
@@ -190,7 +193,8 @@ Dla wszystkiego innego Claude zapyta Cię o zgodę zanim wykona.
 Claude Code ma ustawiony **tryb autonomiczny** dla Imperium — oznacza to:
 
 - **Naprawia rozbieżności dokumentów samodzielnie** (np. liczby się nie zgadzają)
-- **Commituje i pushuje po zakończonym zadaniu** — sam, bez pytania
+- **Commituje LOKALNIE po zakończonym zadaniu** — sam, bez pytania; **push zostawia Tobie**
+  (Claude nigdy nie pushuje — melduje „gotowe, można push", Ty wypychasz ręcznie)
 - **Pyta Cię tylko o decyzje kierunkowe** (kasowanie plików, zmiana strategii, koszt)
 
 Jeśli nie chcesz żeby Claude coś zrobił — powiedz `stop` lub `poczekaj, zapytaj mnie`.

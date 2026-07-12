@@ -2,7 +2,7 @@
 
 > Jedna kartka ze WSZYSTKIMI komendami do obsługi Imperium na laptopie.
 > Kopiuj-wklej do PowerShella. Kolejność sekcji = kolejność, w jakiej ich zwykle używasz.
-> **Stan na:** 2026-07-04
+> **Stan na:** 2026-07-12
 
 ---
 
@@ -23,12 +23,18 @@
 
 ## 1. Codzienny start (to robisz najczęściej)
 
-Otwórz terminal i uruchom Claude w folderze projektu:
+**Sposób A — aplikacja desktopowa Claude Code (tak pracuje Cezar, Win 10 Pro):**
+Otwórz aplikację **Claude Code** (desktop, Windows) i wskaż folder projektu
+`C:\Projekty\imperial-mesh-vortex`. Hooki startowe (sync + audyt + pamięć) odpalają się
+tak samo jak w terminalu — nie musisz nic wpisywać.
+
+**Sposób B — terminal (gdy wolisz konsolę):**
 ```powershell
 cd C:\Projekty\imperial-mesh-vortex
 claude
 ```
-Na starcie zobaczysz komunikaty `[hook] ...`. Szukaj:
+
+W obu przypadkach na starcie zobaczysz komunikaty `[hook] ...`. Szukaj:
 - `[hook] SYNC ✅` — laptop sam ściągnął najnowszy stan z GitHub.
 - `AUDYT SPÓJNOŚCI ... ✅ pełna harmonia` — kod zgadza się z dokumentacją.
 - `CENTRUM PAMIĘCI` — wstrzyknięta pamięć (asystent zna cały łuk projektu).
@@ -37,12 +43,18 @@ Na starcie zobaczysz komunikaty `[hook] ...`. Szukaj:
 
 ---
 
-## 2. Synchronizacja z GitHub (już automatyczna)
+## 2. Synchronizacja z GitHub (pull automatyczny, PUSH ręczny)
 
-- **Start sesji** → auto-pull (Claude sam ściąga).
-- **Koniec sesji** → auto-commit + push pamięci (Claude sam zapisuje).
+- **Start sesji** → auto-pull (Claude sam ściąga najnowszy stan z GitHub).
+- **Koniec sesji** → auto-commit pamięci **LOKALNIE** (Claude sam zapisuje do lokalnego gita).
+- **PUSH robisz TY, ręcznie.** Claude **NIGDY nie pushuje** (ani auto, ani „na komendę") —
+  tylko melduje „gotowe, można push". Ty wypychasz w swoim terminalu, gdy uznasz:
+  ```powershell
+  git push origin claude/sleepy-fermi-dsdE4
+  ```
+  (Powód: push po każdej sesji zaśmiecał historię chmury; push = Twoja świadoma decyzja.)
 
-**Ręcznie potrzebujesz tego rzadko.** Gdyby auto-pull się pominął (bo drzewo brudne):
+**Ręczny pull potrzebny rzadko.** Gdyby auto-pull się pominął (bo drzewo brudne):
 ```powershell
 git status                                              # co jest zmienione
 git stash push -m "chwilowo"                            # schowaj zmiany
@@ -81,10 +93,14 @@ Ciężką pracę z książkami (konwersja djvu/mobi, ekstrakcja, indeks) robimy 
 deterministycznymi — **0 tokenów Claude**. Dopiero potem Claude pyta RAG i płaci tylko za
 zwrócone fragmenty (~setki tokenów), nie za czytanie całych książek (setki tysięcy).
 
-**Jedna komenda (na laptopie, z calibre + djvulibre):**
+**Jedna komenda (na laptopie, z calibre — czyta WSZYSTKIE formaty łącznie z djvu):**
 ```powershell
+# calibre jest portable w C:\Calibre Portable — dodaj go do PATH na tę sesję:
+$env:PATH = "C:\Calibre Portable\Calibre;$env:PATH"
 python -m narzedzia.przygotuj_biblioteke
 ```
+> **djvulibre/djvutxt NIE są potrzebne** — calibre 9.11+ czyta djvu samodzielnie
+> (empirycznie potwierdzone 2026-07-11: Shreve/Aronson/Kissell wyekstrahowane calibre).
 Robi 3 kroki, wszystkie token-free: (1) konwersja+cache tekstu (`konwerter`), (2) indeks RAG
 (`indeksuj`), (3) katalog metadanych (`metadane_ksiag`). Idempotentne — pomija już zrobione.
 
@@ -98,7 +114,7 @@ git add bibliotheca_ulpia/dane/tekst_cache/  # cache = źródło RAG (nie jest j
 git commit -m "cache tekstu książek — chmura czyta bez binariów"
 ```
 Cache jest kluczowany haszem treści → ten sam plik = ten sam cache na obu maszynach (Prawo XVII).
-Bez calibre/djvutxt kroki i tak działają dla epub/pdf (djvu abstynuje — Prawo XV).
+Bez calibre kroki i tak działają dla epub/pdf; djvu wymaga calibre (czyta je sam — Prawo XV).
 
 ---
 

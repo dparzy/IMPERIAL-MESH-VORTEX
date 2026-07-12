@@ -5,7 +5,7 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-07-10 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Stan na:** 2026-07-12 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 84 neuronów (zarejestrowane w roju) + 15 zwiadowców = **99 modułów w kodzie**
 **Meta-warstwy (B):** 2 moduły (`neutralizacja.py` B-02, `meta_labeling.py` B-01) — warstwa NAD Legatusem, nie neurony
 **Aktywne / wyciszone:** 78 aktywnych + 6 wyciszonych, z czego:
@@ -17,11 +17,11 @@
   • **3 deterministyczne on-chain AKTYWNE** (OC-06..08) — BTC_BLOCK_HEIGHT szacowany z timestampu baru (interpolacja po halvingach, bez sieci, W-377..379)
 **Elitarne (Prawo XX):** 18 (3 neurony + 15 zwiadowców)
 **W katalogu:** 299 neuronów + 15 zwiadowców = **314 zaplanowanych**
-**Do wdrożenia:** 240 neuronów
+**Do wdrożenia:** 215 neuronów (299 − 84)
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 76). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 84). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -308,6 +308,9 @@
 ### Pozostałe legiony (248 neuronów) — pełen skatalogowany rejestr
 
 > Szczegóły: `docs/KATALOG_NEURONOW.md`. Tu podsumowanie per legion.
+> **Uwaga (Prawo I):** rozkład „Wdrożone" per legion jest ORIENTACYJNY (mapa drogowa).
+> Autorytatywny licznik = **84** (RAZEM, z `wszystkie_neurony()` + test `== 84`); pełna
+> lista 84 wdrożonych neuronów jest w tabeli „NEURONY ZAIMPLEMENTOWANE" wyżej.
 
 | Legion | Skatalogowane | Wdrożone | Do wdrożenia |
 |--------|--------------|---------|--------------|
@@ -315,7 +318,7 @@
 | III Augusta (H1) | ~45 | 10 (XII-01..04, V-01..05, VSA-01) + PSY-01..04 ✅ (Faza B) + V-03 ✅ + SMC-01..03 ✅ | ~35 |
 | XII Fulminata (D1) | ~40 | 4 (OC-01..OC-04, wyciszone) | ~36 |
 | Pozostałe legiony | ~188 | 12 (X-01,X-03..X-06 + dalej wg schemy) | ~176 |
-| **RAZEM** | **299** | **76** | **223** |
+| **RAZEM** | **299** | **84** | **215** |
 
 ---
 

@@ -1,6 +1,6 @@
 # 🤖 RLA — Uczenie ze wzmocnieniem i deep learning | Encyklopedia Imperium
 
-> **Stan na:** 2026-07-11 | **Ważność:** ⭐⭐⭐⭐ (wysoki — fundament AI Imperium)
+> **Stan na:** 2026-07-12 | **Ważność:** ⭐⭐⭐⭐ (wysoki — fundament AI Imperium)
 > **Status:** ✅ DOMKNIĘTY — DL (BIB-068 Goodfellow, pdf) z pliku; RL (BIB-067 Sutton-Barto)
 > **wyekstrahowany** (djvu→cache przez calibre, w RAG — **tekst czysty**, dobra jakość OCR).
 > Esencja zweryfikowana `biblioteka_szukaj`. Styk RL↔`hedge_mwu` ugruntowany w NASZYM kodzie (Prawo I).
@@ -85,8 +85,11 @@ Sutton-Barto dostarczy formalnej teorii regretu/banditów pod ten moduł (po eks
 3. ✅ **Domknięcie RL** — Sutton-Barto wyekstrahowany (calibre) i w RAG; esencja §3 zweryfikowana
    (`biblioteka_szukaj`). Pełna teoria regretu/banditów pod hedge_mwu dostępna do dalszego zwiadu.
 
-> **Prawo XVI:** RLA (decyzje sekwencyjne) ⊥ ALG (ML dla cech) ⊥ MEM (pamięć agenta). Agent RL
-> wymaga pamięci → silny styk z MEM (FinMem/A-Mem).
+> **Rozdział działów (hipoteza ortogonalności do POMIARU):** RLA (decyzje sekwencyjne) vs
+> ALG (ML dla cech) vs MEM (pamięć agenta) to różne domeny — ale ich niezależność jest
+> HIPOTEZĄ do zmierzenia, nie faktem. **Prawo XVI** nie definiuje tych granic; nakazuje
+> mierzyć redundancję korelacją, nie zgadywać z pozornego podobieństwa — więc dekorelację
+> RLA↔ALG↔MEM trzeba potwierdzić areną. Agent RL wymaga pamięci → silny styk z MEM (FinMem/A-Mem).
 
 ---
 

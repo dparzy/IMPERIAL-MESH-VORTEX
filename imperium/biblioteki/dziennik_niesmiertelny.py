@@ -174,7 +174,7 @@ def os_czasu(plik: Optional[Path] = None, ostatnie: Optional[int] = None) -> str
     linie = [f"♾️ DZIENNIK NIEŚMIERTELNY — {len(wpisy)} sesji, pełna oś projektu:"]
 
     def jednolinijka(w: Dict[str, Any]) -> str:
-        co0 = (w.get("co") or ["—"])[0]
+        co0 = (w.get("co") or ["—"])[0]   # _skroc koercuje str() → odporne na nie-tekst (PR118 P2)
         return f"   · {w.get('data','?')}: {_skroc(co0, SZER_JEDNOLINIJKI)}"
 
     if ostatnie is not None and ostatnie <= 0:

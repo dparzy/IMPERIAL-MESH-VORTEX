@@ -6,6 +6,79 @@
 
 ---
 
+## 2026-07-12 | 🪞 | Refleksja: sprzeczności tylko ze źródeł statusowych (20→0 fałszywych)
+
+Sesja lokalna, lista P0 krok po kroku. Trzy fixy tego dnia:
+
+**P0-2 (ten commit) — precyzja detektora sprzeczności (`refleksja_pamieci.py`).**
+Baner startowy krzyczał „⚠️ 20 sprzeczności do przeglądu", a wszystkie były FAŁSZYWE.
+Pomiar (Prawo I): tylko-wizje=0, tylko-dziennik=1, **mieszane=92**. Źródło szumu:
+`kierunek` liczony z wolnego tekstu Dziennika („co zrobiliśmy"→+, „czego NIE robić"→−)
+parowany z wizjami — to narracja osi czasu, nie flip statusu per-przedmiot. Fix chirurgiczny:
+`wykryj_sprzecznosci` domyślnie liczy tylko ze źródeł niosących REALNY status
+(`_ZRODLA_STATUSOWE={"wizje"}`); `zrodla=` pozwala świadomie rozszerzyć. Efekt: baner pusty,
+detektor nadal odpala na realnym flipie wizji (test-granica). +1 test, 4 testy syntetyczne
+zaktualizowane (źródło→wizje).
+
+**P0-1 (commit `afe2ea7`) — higiena LEKCJE + fix nie-hermetycznego testu kroniki.**
+Sekcja LEKCJE 110→88 (bezstratny dedup 11 + retire 11 najstarszych, decyzja Cezara);
+złapany fałszywy-zielony: `test_kronika_score_nie_jest_flat` zależał od realnych danych.
+
+**Fix środowiska (commit `6dca659`) — Windows zawsze LOKAL + override IMPERIUM_SRODOWISKO.**
+Baner mylnie pokazywał CHMURA na laptopie (harness ustawia CLAUDE_ENV_FILE w hooku).
+
+**P0-3 (osobny commit) — uspójnienie liczb README/MANIFEST z kodem (Prawo XXI).**
+Stale „76" (stary licznik neuronów, dziś 84) w 3 miejscach → 84; README „15 elitarnych"
+→ 18 (kod: D-01,X-25,X-26 + 15 zwiadowców); „Do wdrożenia 240/223" → 215 (299−84);
+„Stan na" 07-10 → 07-12. Tabela per-legion opatrzona notą, że rozkład jest orientacyjny,
+a autorytatywny licznik (84) pochodzi z `wszystkie_neurony()`.
+
+**P0-4 (osobny commit) — metadane autora djvu (Prawo XV).**
+Bug: `ebook-meta` na djvu bez osadzonych metadanych zwraca Author="Nieznany" (locale PL,
+więc filtr `!= "unknown"` go przepuszczał) i Title=echo nazwy pliku ("BIB-022 Kissell…").
+Linia `wpis.update()` NADPISYWAŁA dobrego autora/tytuł z nazwy pliku tymi śmieciami →
+`autor='Nieznany'`, filtr autor= nie łapał Shreve/Aronson/Kissell. Fix: `_WARTOSCI_PUSTE`
+odsiewa „Nieznany" w parserze; `_tytul_echo_nazwy` odrzuca tytuł-echo w merge (nazwa pliku
+jest autorytatywna dla autora/tytułu, calibre wzbogaca tylko tagi/jezyk/rok/wydawca/seria).
+Katalog przebudowany: 5 djvu → Kissell/Aronson/Shreve×2/Sutton Barto, 0× Nieznany. +2 testy.
+Pliki: `narzedzia/rag/metadane_ksiag.py`, `tests/test_metadane_ksiag.py`, `katalog_ksiag.json`.
+
+**Pliki (P0-2/3):** `imperium/biblioteki/refleksja_pamieci.py`, `tests/test_refleksja_pamieci.py`,
+`README.md`, `docs/MANIFEST_KODU.md`. Bramka: 2184/2184 zielone, audyt exit 0, ruff czysty.
+
+**Sweep dokumentacji (osobny commit, na prośbę Cezara) — aktualizacja zasad po zmianach:**
+- **CLAUDE.md p.4:** „PUSH NA KOMENDĘ" → **CLAUDE NIGDY NIE PUSHUJE** (zaostrzenie 2026-07-11):
+  push wyłącznie Cezar ręcznie przez terminal; Claude melduje „gotowe". Spójnie: p.4, sekcja Git,
+  bramka auto-commit (już bez „+push").
+- **SCIAGA_LOKAL.md:** dodano wariant **aplikacja desktopowa Claude Code (Win 10 Pro)** obok
+  terminala; zasada push (auto-pull, push ręczny); calibre portable PATH + **djvulibre/djvutxt
+  zbędne** (calibre czyta djvu sam); Stan na → 07-12.
+- **MANUAL_CLAUDE_CODE.md:** poprawione 2× „commituje i pushuje" → „commit lokalny, push Cezar";
+  nota o desktop app; Stan na → 07-12.
+- **MAPA_KLUCZY.md:** „81 neuronów" → 84 (stale), data → 07-12.
+Pliki: `CLAUDE.md`, `docs/SCIAGA_LOKAL.md`, `docs/MANUAL_CLAUDE_CODE.md`, `docs/MAPA_KLUCZY.md`.
+Audyt exit 0 (W14: 208 .md, MAPA_KLUCZY 84 kluczy pokryte).
+
+**P0-5 (osobny commit) — domknięcie uwag cubic PR#118/119 (P2/P3).**
+Weryfikacja stanu (Prawo I): część już naprawiona wcześniej — PAMIEC_SESJI duplikaty (zdjął P0-1),
+session-start.sh statystyki (fallback guard jest), `_skroc` (str() już w środku funkcji), P1 katalog
+Nieznany (P0-4). Domknięte teraz:
+- **katalog autorzy (P3):** calibre gubił unicode/placeholdery (LŁpez, Lef?vre, User) — teraz
+  NAZWA PLIKU jest autorytatywna dla autora i tytułu (`_POLA_Z_NAZWY`); calibre wzbogaca tylko
+  tagi/jezyk/rok/wydawca. Regeneracja: Lopez de Prado/Lefevre/Douglas, 0× garbled.
+- **test_przygotuj (P3):** tautologia `in (True, False)` → mocna asercja `_narzedzie(sys.executable) is True`.
+- **encyklopedia (P2/P3):** RLA — miscytat „Prawo XVI: RLA⊥ALG⊥MEM" skorygowany (Prawo XVI nie
+  definiuje granic domen, nakazuje POMIAR); DEF — usunięto fałszywą zdolność Straży/OC-05 do
+  wykrywania flash-ataków (wymaga on-chain, KANDYDAT nie kod); BAN — LOLR → Lender of Last Resort.
+- **wizje (P3):** typ/status mismatch — DECYZJA „Odrzucono Mnemosyne" POMYSŁ→ZAMKNIĘTA, 2× ZMIANA
+  wdrożona POMYSŁ→WDROŻONA.
+Świadomie POMINIĘTE (Prawo I): ANALIZA_BIB (datowany snapshot), tekst_cache copyright (decyzja
+Cezara repo→private). Pliki: `narzedzia/rag/metadane_ksiag.py`, `imperium/biblioteki/dziennik_niesmiertelny.py`,
+`tests/test_przygotuj_biblioteke.py`, 3× encyklopedia, `wizje_i_decyzje.jsonl`, `katalog_ksiag.json`.
+Bramka: testy zielone, audyt exit 0, ruff czysty.
+
+---
+
 ## 2026-07-11 | 📚 | JEDNA KOMENDA: przygotuj bibliotekę lokalnie (0 tokenów Claude)
 
 Odpowiedź na pytanie Cezara o beztokenową konwersję lokalną. Uczciwa ocena 3 opcji:

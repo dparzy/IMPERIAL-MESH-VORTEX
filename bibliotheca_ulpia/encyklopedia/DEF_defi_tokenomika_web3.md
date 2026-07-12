@@ -1,6 +1,6 @@
 # ⛓️ DEF — DeFi, tokenomika i Web3 | Encyklopedia Imperium
 
-> **Stan na:** 2026-07-11 | **Ważność:** ⭐⭐⭐ (średni — mechanizmy on-chain odrębne od ONC)
+> **Stan na:** 2026-07-12 | **Ważność:** ⭐⭐⭐ (średni — mechanizmy on-chain odrębne od ONC)
 > **Status:** ✅ WYPEŁNIONY (BIB-069 Voshmgir + BIB-054 Antonopoulos-Wood, ekstrakcja z plików — Prawo I).
 > **Dla nowicjusza (ZPO):** dział o ekonomii tokenów i zdecentralizowanych finansach — smart
 > kontrakty, pule płynności (AMM), staking, lending, derywaty on-chain, projektowanie zachęt.
@@ -74,7 +74,10 @@ to zmaterializowany sentyment lewara (long-heavy → dodatni funding → ryzyko 
 ### Co mamy (styk z kodem):
 - **PSY-01 Funding Rate / PSY-04 Open Interest** ← perpetuale (§5) — gdy ożyje AdapterFutures,
   funding/OI to zmaterializowany lewar rynku (dziś czekają na adapter, Prawo XV).
-- **OC-05 WashTrading / Straż A-*** ← flash-ataki, manipulacja oracle (§4, §6).
+- **OC-05 WashTrading / Straż A-*** ← dziś działają WYŁĄCZNIE na OHLCV (wash trading przez
+  prawo Benforda, stop-hunt, wick rejection, Bart pattern). Wykrywanie **flash-ataków i
+  manipulacji oracle** (§4, §6) wymaga danych **on-chain** (pojedyncza tx z flash loanem),
+  których żaden neuron jeszcze nie przetwarza — to KANDYDAT na adapter (Prawo XV), nie zdolność kodu.
 - **OC-06/07/08** ← fundamenty on-chain (dział ONC; DEF to warstwa wyżej).
 
 ### 🚨 Do wdrożenia (Prawo XV — KANDYDACI ⚠️, walidacja areną przed włączeniem):

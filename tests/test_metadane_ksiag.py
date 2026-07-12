@@ -63,6 +63,24 @@ def test_parser_pomija_unknown():
     assert "seria" not in m
 
 
+def test_parser_pomija_nieznany_djvu():
+    """djvu bez metadanych: calibre zwraca Author='Nieznany' (locale PL) — NIE może
+    nadpisać dobrego autora z nazwy pliku (Prawo XV: filtr autora łapie Shreve/Aronson)."""
+    wy = ("Title               : BIB-022 Kissell Optimal-trading-strategies\n"
+          "Author(s)           : Nieznany")
+    m = mk.parsuj_wyjscie_ebook_meta(wy)
+    assert "autor" not in m                    # 'Nieznany' odsiane
+    assert m.get("tytul", "").startswith("BIB-")  # tytul-echo przechodzi parser...
+    assert mk._tytul_echo_nazwy(m["tytul"])       # ...ale merge go odrzuci
+
+
+def test_tytul_echo_nazwy_wykrywany():
+    assert mk._tytul_echo_nazwy("BIB-022 Kissell Optimal-trading-strategies")
+    assert mk._tytul_echo_nazwy("bib-7 cos")               # case-insensitive
+    assert not mk._tytul_echo_nazwy("Advances in Financial Machine Learning")
+    assert not mk._tytul_echo_nazwy("")
+
+
 def test_parser_zachowuje_dwukropek_w_wartosci():
     """Wartość z ' : ' w środku — partition po PIERWSZYM separatorze, reszta zachowana.
     (Comments nie jest mapowany, więc sprawdzamy na Title z dopisanym dwukropkiem.)"""

@@ -51,6 +51,11 @@ _MIN_DL = 4
 _STOP = {"prawo", "sesja", "claude", "cezar", "memory", "pamięci", "pamiec", "warstwa",
          "system", "tylko", "więcej", "robić", "który", "która", "które", "wszystko"}
 
+# Źródła niosące REALNY status per-przedmiot (wizje mają pole status: WDROŻONA/POMYSŁ/…).
+# Detekcja sprzeczności ogranicza się do nich — dziennik to narracja osi czasu, nie ledger
+# statusu (patrz docstring wykryj_sprzecznosci: mieszanie dawało 92 fałszywe pozytywy).
+_ZRODLA_STATUSOWE = {"wizje"}
+
 
 def _dzis_ord() -> int:
     return date.today().toordinal()
@@ -124,13 +129,25 @@ def _nakladanie(a: Set[str], b: Set[str], minimum: int = 2) -> bool:
 
 # ─── DETEKCJA SPRZECZNOŚCI / ROZSTRZYGNIĘĆ ─────────────────────────────────────
 
-def wykryj_sprzecznosci(limit: int = 20) -> List[Dict[str, Any]]:
+def wykryj_sprzecznosci(limit: int = 20,
+                        zrodla: Optional[Set[str]] = None) -> List[Dict[str, Any]]:
     """
     Pary wpisów o tym samym temacie z PRZECIWNYM kierunkiem statusu w czasie.
     Wcześniejszy '-' + późniejszy '+' = ROZSTRZYGNIĘTE (postęp, koniec krążenia).
     Wcześniejszy '+' + późniejszy '-' = SPRZECZNE (regres/kolizja — do przeglądu).
+
+    ŹRÓDŁA (Prawo I — pomiar 2026-07-12): sprzeczność ma sens TYLKO między wpisami
+    niosącymi REALNY status per-przedmiot (wizje: WDROŻONA/POMYSŁ/PLANOWANE/ZAMKNIĘTA).
+    Dziennik to narracja osi czasu — jego „co zrobiliśmy" prawie zawsze ma słowo
+    pozytywne (→+), a „czego NIE robić" ma „nie" (→−); parowanie takich zdań z wizjami
+    dawało 92 FAŁSZYWE pozytywy (tylko-wizje=0, tylko-dziennik=1, mieszane=92). Dlatego
+    domyślnie liczymy tylko ze źródeł statusowych. `zrodla=None` → {"wizje"}; podaj
+    jawny zbiór (np. {"wizje","dziennik"}) by rozszerzyć świadomie.
     """
-    wpisy = [w for w in _wpisy_statusowe() if w["kierunek"] and w["tematy"]]
+    if zrodla is None:
+        zrodla = _ZRODLA_STATUSOWE
+    wpisy = [w for w in _wpisy_statusowe()
+             if w["kierunek"] and w["tematy"] and w["zrodlo"] in zrodla]
     wpisy.sort(key=lambda w: w["data"])
     wyniki = []
     for i in range(len(wpisy)):

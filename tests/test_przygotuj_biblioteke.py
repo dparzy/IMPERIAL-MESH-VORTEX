@@ -3,9 +3,12 @@
 from narzedzia import przygotuj_biblioteke as pb
 
 
-def test_narzedzie_zwraca_bool():
-    # Coś, co na pewno istnieje (python) vs coś nieistniejącego.
-    assert pb._narzedzie("python") in (True, False)   # nie wybucha
+def test_narzedzie_wykrywa_istniejace_i_brak():
+    # Pozytyw MOCNY (cubic PR119 P3: `in (True, False)` było tautologią). shutil.which na
+    # PEŁNEJ ścieżce zwraca ją, gdy jest wykonywalna — sys.executable (interpreter tego testu)
+    # istnieje ZAWSZE, więc _narzedzie MUSI dać True. Regresja „zawsze False" zostałaby złapana.
+    import sys
+    assert pb._narzedzie(sys.executable) is True
     assert pb._narzedzie("na-pewno-nie-ma-tego-narzedzia-xyz") is False
 
 

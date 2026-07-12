@@ -30,7 +30,8 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | **Zwiadowcy Exploratores (EXP)** | **15** (EXP-01..15; 13 aktywnych + 2 wyciszone do feedu) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
-| **Generał Legatus** | agregacja głosów + wagi reżimowe + odpalanie zwiadowców |
+| **Generał Legatus** | agregacja głosów + wagi reżimowe + odpalanie zwiadowców + ważenie IC opt-in (W-361, domyślnie OFF) |
+| **Strategie (przepisy)** | **20 zmapowanych** na żywe klucze neuronów (`rejestr_strategii.py`; status **SZKIC** — przepisy, nie zwalidowane); Legatus dobiera TOP pasujące do sygnałów. Pełny opis: `docs/KATALOG_STRATEGII.md` |
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
 | **Status elitarny** | **18 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 (3 neurony) + 15 zwiadowców |

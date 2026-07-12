@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-07-12 | 🪞 | Refleksja: sprzeczności tylko ze źródeł statusowych (20→0 fałszywych)
+
+Sesja lokalna, lista P0 krok po kroku. Trzy fixy tego dnia:
+
+**P0-2 (ten commit) — precyzja detektora sprzeczności (`refleksja_pamieci.py`).**
+Baner startowy krzyczał „⚠️ 20 sprzeczności do przeglądu", a wszystkie były FAŁSZYWE.
+Pomiar (Prawo I): tylko-wizje=0, tylko-dziennik=1, **mieszane=92**. Źródło szumu:
+`kierunek` liczony z wolnego tekstu Dziennika („co zrobiliśmy"→+, „czego NIE robić"→−)
+parowany z wizjami — to narracja osi czasu, nie flip statusu per-przedmiot. Fix chirurgiczny:
+`wykryj_sprzecznosci` domyślnie liczy tylko ze źródeł niosących REALNY status
+(`_ZRODLA_STATUSOWE={"wizje"}`); `zrodla=` pozwala świadomie rozszerzyć. Efekt: baner pusty,
+detektor nadal odpala na realnym flipie wizji (test-granica). +1 test, 4 testy syntetyczne
+zaktualizowane (źródło→wizje).
+
+**P0-1 (commit `afe2ea7`) — higiena LEKCJE + fix nie-hermetycznego testu kroniki.**
+Sekcja LEKCJE 110→88 (bezstratny dedup 11 + retire 11 najstarszych, decyzja Cezara);
+złapany fałszywy-zielony: `test_kronika_score_nie_jest_flat` zależał od realnych danych.
+
+**Fix środowiska (commit `6dca659`) — Windows zawsze LOKAL + override IMPERIUM_SRODOWISKO.**
+Baner mylnie pokazywał CHMURA na laptopie (harness ustawia CLAUDE_ENV_FILE w hooku).
+
+**Pliki:** `imperium/biblioteki/refleksja_pamieci.py`, `tests/test_refleksja_pamieci.py`.
+Bramka: 2181/2181 zielone, audyt exit 0, ruff czysty.
+
+---
+
 ## 2026-07-11 | 📚 | JEDNA KOMENDA: przygotuj bibliotekę lokalnie (0 tokenów Claude)
 
 Odpowiedź na pytanie Cezara o beztokenową konwersję lokalną. Uczciwa ocena 3 opcji:

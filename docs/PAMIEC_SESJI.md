@@ -101,8 +101,32 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-06-30 — Bug: neuron zwraca NEUTRAL gdy brak danych
-W przypadku braku danych wejściowych, mikro-neuron zwraca SygnalNeuronu z wartoscia NEUTRAL zamiast rzucac wyjatkiem. To moze maskowac bledy w przeplywie danych.
+### 2026-06-30 — Słabość ręcznego parametru reżimu
+Przetestowano 3 scenariusze rynkowe — system wymaga automatycznego klasyfikatora reżimu, bo ręczne ustawianie jest zawodne i nie skalowalne.
+
+### 2026-06-30 — Audyt W6: brak Stan na = błąd, markdown tolerowany
+Dodano else dla braku 'Stan na:'. Regex toleruje **Stan na:** data.
+
+### 2026-06-30 — Pre-commit: stash isolation dla staged
+Dodano git stash push --keep-index --include-untracked + trap przywracający working tree. Testy działają na staged, nie na working tree.
+
+### 2026-06-30 — HA doji: strict > zamiast >=
+HA_BULL = c > o (nie >=) — doji neutralny, nie byczy.
+
+### 2026-06-30 — Diagnostyka: 1 próbka nie dowodzi martwoty
+Detekcja stałej serii wymaga len(v) >= 2. Pojedyncza próbka trafia do pary_niedostateczne_dane.
+
+### 2026-06-30 — Czytnik symbol z nazwy pliku: split('_')[-2]
+Fallback symbol z nazwy pliku Binance_BTCUSDT_1h dawał BINANCE przez split('_')[0]. Poprawiono na [-2].
+
+### 2026-06-30 — Ulcer Index warmup: period zamiast period+1
+Funkcja _py_ulcer() używa c[-period:] więc potrzebuje tylko period próbek, a nie period+1. Poprawiono warunek warmup.
+
+### 2026-06-30 — SkalowanieFrakcjaDD: ciągłe skalowanie pozycji od DD
+frakcja = max(min_frakcja, min(1.0, 1.0 - dd/prog_max)). Domyślnie prog_max=20%, min_frakcja=10%. Wpływa na rozmiar pozycji przez frakcja_dd w PlanPozycji.
+
+### 2026-06-30 — Wash Trading Detection: Benford chi² + round-number clustering
+Wash score = sqrt(benford_score * rounding_score). Benford: chi2_obs/20.09 capped 1.0. Rounding: (round_frac-0.20)/0.20 clamped [0,1]. Prog ostrzeżenia 0.35, silny 0.65.
 
 ### 2026-06-30 — CalcResult vs float w testach HURST_DFA
 HURST_DFA zwraca obiekt CalcResult, nie float. Należy używać r.value, nie r.
@@ -125,17 +149,11 @@ LONG: Entry * (1 - 1/Leverage + 0.005). SHORT: Entry * (1 + 1/Leverage - 0.005).
 ### 2026-06-30 — ImportError w legatus.py przy uruchomieniu bezpośrednim
 Relative import from .mikro_neuron fails gdy plik uruchamiany bezpośrednio. Rozwiązanie: try/except z fallbackiem do from mikro_neuron import.
 
-### 2026-06-30 — Prawo I — neurony nie liczą wskaźników
-MikroNeuron.interpretuj() otrzymuje gotowe wskaźniki od Brama Kalkulatora (TA-Lib). Neurony tylko oceniają — to kluczowa zasada architektury.
-
 ### 2026-06-30 — Format CSV CryptoDataDownload wymaga specjalnego czytnika
 Pliki CSV z CDD mają pierwszy wiersz URL, nagłówek w drugim, dane malejąco, timestamp w ms. Kolumna wolumenu bazowego to 'Volume' (nie 'Volume USDT'). Czytnik CSV musi to obsługiwać.
 
 ### 2026-06-30 — Klucznik ignorowany przez Dyrygenta (Prawo XV)
 Dyrygent nie używał wyników Klucznika (strategii) — kierunek i pewność pochodziły wyłącznie z neuronów. Naprawiono: dodano logikę trybów (agregat/filtr/strategia) uwzględniającą DopasowanieStrategii.
-
-### 2026-06-30 — Bart Pattern 30% Donchian zbyt rzadki
-30% kanału Donchiana to ekstremalnie rzadkie zdarzenie. Zmieniono na 10%.
 
 ### 2026-06-30 — RSI Div delta 2.0 zbyt wysoka dla daily
 Na sąsiednich daily RSI rzadko zmienia się o >2 pkt. Zmieniono próg z 2.0 na 0.3.
@@ -145,9 +163,6 @@ MikroNeuron.interpretuj() zwraca SygnalNeuronu z wartoscia NEUTRAL jesli wskazni
 
 ### 2026-06-30 — Slabosc: reczny parametr rezimu w strategiach
 Testy na 3 scenariuszach rynkowych wykazaly, ze reczne podawanie rezimu (NORMAL, TREND_STRONG itp.) jest slabym punktem. Nastepny krok: automatyczny klasyfikator rezimu.
-
-### 2026-06-30 — Bug: neuron zwraca NEUTRAL gdy brak danych wejściowych
-MikroNeuron.interpretuj() zwraca SygnalNeuronu z wartoscia NEUTRAL jesli wskazniki sa puste lub brak wymaganego klucza. To moze maskowac bledy konfiguracji.
 
 ### 2026-06-30 — DeepSeek API klucz NIGDY w kodzie ani w czacie
 Zasada bezpieczeństwa: klucz DeepSeek API musi być tylko w zmiennych środowiskowych. W kodzie użyto [ZREDAGOWANO] jako placeholder. Dotyczy to wszystkich plików w Imperium.
@@ -172,9 +187,6 @@ Audyt ujawnił rozbieżności między KATALOG_NEURONOW.md a kodem. Utworzono MAP
 
 ### 2026-06-30 — NeuronPumpDetect Z-02: 3 warunki OHLCV
 Warunek 1: VOLUME/VOLUME_MA20 w [1.5, 4.0]; Warunek 2: (HIGH-LOW)/ATR_14 < 0.75; Warunek 3: OBV > OBV_EMA_20*(1+0.005). Siła = 0.55+0.30*(vol*0.4+zakr*0.3+obv*0.3). Kierunek LONG.
-
-### 2026-06-30 — Wash Trading: Benford chi² + round-number clustering
-Wskaźnik WASH_TRADING łączy chi² (min 1.0, chi2_obs/20.09) z round_frac (min 1.0, (round_frac-0.20)/0.20) przez sqrt(benford*rounding). OC-05 używa progów 0.35 i 0.65.
 
 ### 2026-06-30 — Triple Barrier: SL wygrywa przy jednoczesnym trafieniu TP i SL
 W metodzie oznacz_bariera, jeśli TP i SL są trafione w tej samej świecy, wygrywa SL (konserwatywnie). timeliness = 1.0 - (bar_nr-1)/max(max_bary-1, 1).
@@ -209,14 +221,8 @@ Strategia ZŁOTY ORZEŁ używa EMA50/EMA200, a nie kanonicznego SMA50/SMA200. Od
 ### 2026-06-30 — Diagnostyka korelacji: 1 próbka fałszywie uznawana za martwą
 len(set)==1 dla 1 próbki dawało false positive. Wymagane ≥2 próbki do detekcji stałej serii.
 
-### 2026-06-30 — Pre-commit: testy na working tree zamiast staged
-Pre-commit testował working tree, nie staged. Dodano git stash push --keep-index i trap przywracający working tree.
-
 ### 2026-06-30 — Błąd warmup Accelerator: slow+sma_ac+1
 Funkcja _py_accelerator miała zbędne +1 w warmup, co powodowało off-by-one. Usunięto.
-
-### 2026-06-30 — Błąd warmup Ulcer Index: period+1
-Funkcja _py_ulcer używała c[-period:] więc potrzebuje tylko period, a nie period+1. Poprawiono.
 
 ### 2026-06-30 — pewnosc_agregatu ≈ 1.0 to root cause strat
 KalkulatorLewara używa pewnosc_agregatu do wyznaczania dźwigni, ale zawsze ≈1.0 → max leverage → ciasne stop lossy → wiele małych strat. To jest pierwotna przyczyna wszystkich strat systemu.
@@ -242,9 +248,6 @@ Porównano Zbior_wskaznikow_i_strategi_03.06.2026.md z rzeczywistym repozytorium
 ### 2026-06-30 — Backtest nie ma lookahead-bias na 4 zbiorach Binance
 Zweryfikowano na BTC/ETH 1D (3192 bary) i 1H (76k barów) z CryptoDataDownload. Detektor potwierdza brak przecieku. Sliding window 250 barów jest czysty.
 
-### 2026-06-30 — Pewnosc_agregatu ≈1.0 to źródło strat
-Pewnosc_agregatu zawsze ≈1.0, co prowadzi do maksymalnego lewara i ciasnych stopów, generując wiele małych strat. Zidentyfikowano jako root cause wszystkich strat systemu.
-
 ### 2026-06-30 — Kanoniczna liczba neuronów: 299
 299 unikalnych kluczy z KATALOG_NEURONOW.md, a nie 261/303/306/328 (stare estymaty). 27 zaimplementowanych w kodzie.
 
@@ -256,9 +259,6 @@ EXP-07 miał ATR_MULT=1.5 ale ATR nie był używany w logice. Poprawiono na ATR_
 
 ### 2026-06-30 — Bug: testy miały hardcoded 46 neuronów po dodaniu 47.
 Po dodaniu H-01 testy integracyjne zawierały stałą 46. Naprawiono na 47 w dwóch miejscach. Lekcja: używać len(rejestr.wszystkie_neurony()) zamiast stałych.
-
-### 2026-06-30 — Neuron H-01 zwraca NEUTRAL gdy brak danych
-NeuronHurstDFA zwraca NEUTRAL z 'META-BRAMA' w powodach gdy H≈0.5 lub brak danych. Nie rzuca błędem.
 
 ### 2026-06-30 — Hurst-DFA vs R/S: dekorelowane na krypto trendującym
 Prawo XVI: DFA i R/S dają nieskorelowane wyniki na trendującym krypto. Potwierdzono empirycznie, że to nie redundancja.
@@ -274,12 +274,6 @@ CME uruchomiło 24/7 kontrakty futures na BTC, co eliminuje weekendowe luki ceno
 
 ### 2026-06-30 — W7 audyt fałszywie flaguje zewnętrzne URL-e z .md w domenie
 Reguła W7 w audyt_spojnosci.py błędnie oznaczała linki takie jak www.mdpi.com jako martwe, bo zawierają '.md' w domenie. Naprawiono przez pomijanie URL-i z http/https/mailto.
-
-### 2026-06-30 — Binance depth zwraca stringi
-L2 order book od Binance ma ceny i wolumeny jako stringi. Dodano float(b[1]) i float(a[1]) w exp_atmabhan.
-
-### 2026-06-30 — 12 bloków strategii miało błędne klucze
-KATALOG_STRATEGII zawierał nieistniejące klucze (np. XII-08). Zsynchronizowano z kodem + dodano audyt W9.
 
 ### 2026-06-30 — Filtr nieobecny nie karze strategii
 n_akt_f==0 dawało filtr_frakcja=0.5 karząc strategię. Zmieniono na 1.0 (Prawo XV).
@@ -370,69 +364,6 @@ Na dziennych barach BTC typowa szerokość BB to 3-8%, próg 4% był praktycznie
 
 ### 2026-07-04 — POTRZEBA CEZARA: wizualizacja live (krytyczne)
 Cezar czuje się 'jak dziecko we mgle' — brak podglądu wykresów i wizualizacji live jak zachowuje się Imperium. PRIORYTET: dashboardy/wykresy (equity, cena+wejścia/wyjścia, IC ranking, głosy neuronów na żywo). Każde narzędzie ma mieć wyjście WIZUALNE, nie tylko tekst.
-
-### 2026-06-25 — Głęboki audyt przypisania książek: 42/42 pokryte, 4 sieroty naprawione
-Cezar zlecił audyt przypisania wszystkich książek do działów. Macierz pokrycia (plik↔dział) wykryła 3 prawdziwe sieroty + 1 brak w Kanonie INDEX. Każdą przeczytano agentem przed przypisaniem (ZPO, nie z tytułu). BIB-001 Patel (978-0-85719-857-0)→MAK (18-letni cykl nieruchomości, MAK 🔲→🚧+esencja)+BAN. BIB-012 Coding Capital (979-8-87385-994-8)→ALG+IMP. BIB-024 Lowe (self-pub ⚠️)→ONC ⭐1 z oznaczeniem ANTYWZORCA (uśrednianie w dół vs Reguła 6%). BIB-005 Blum→dopisany do Kanonu INDEX (był w ONC). Wynik: 42/42, zero sierot. Lekcja metodologiczna: „sierota wg INDEX_MAIOR" ≠ „sierota faktyczna" — sprawdzaj WSZYSTKIE pliki działów, nie tylko Kanon (BIB-005 był w ONC, fałszywie wyglądał na sierotę).
-
-### 2026-06-25 — Kanon 36→42: 6 klasyków → LEW/TRD/PSY/RSK
-Cezar wgrał BIB-037..042 (Hull, Schwager, Lefèvre, Bernstein, Taleb, Jorion). Ekstrakcja EPUB + 6 agentów → esencja do działów. ISBN zweryf. (Prawo I; Bernstein/Taleb przez web bo plik Taleba=bundel Incerto). Esencja: Hull — margin call dopłaca do INITIAL nie maintenance, Lehman 31:1, ⚠️ Hull NIE pokrywa crypto perpetual/funding. Schwager — undertrade, korelacja pozycji codziennie (Prawo XVI), proces>wynik. Lefèvre — sit tight, anty-uśrednianie, hope/fear odwrócone, anty-tip=Prawo I. Bernstein — loss aversion uzasadnia twardy HALT + 3 pułapki regresji do średniej. Taleb — magnituda>częstotliwość, survivorship bias→DSR/PBO, katastrofa nieobecna w danych→bezpieczniki ogona. Jorion — Expected Shortfall>VaR dla grubych ogonów krypto, EWMA λ=0.94, backtest VaR strefy Basel. Symbioza 36→42 w 8 plikach.
-
-### 2026-06-25 — Kanon 32→36: 4 książki LLM/agentów → dział MEM
-Cezar wgrał BIB-033..036 (Huyen *AI Engineering*, Infante *AI Agents and Applications*, Iusztin&Labonne *LLM Engineer's Handbook*, Alto *Building LLM Powered Applications*). Pełna analiza: ekstrakcja EPUB/AZW3 + 4 równoległe agenty → esencja do MEM §8 (mapa 17 konceptów→kod). Prawo I: zweryfikowano ISBN-y; BIB-034 to **Roberto** Infante (nie Michael), ISBN 978-1-63343-654-1, hedge-fund quant. Esencja: Huyen — 3-warstwowa pamięć (internal/short/long) + pułapka FIFO (uzasadnia nasz zanik warstwowy) + reranking wg świeżości („stock market") + RAG>fine-tuning dla świeżych danych + compound mistakes 0,95ⁿ. Infante — stan grafu=pamięć (checkpoint), Router vs Supervisor (Senat=Supervisor, mocniejszy model), MCP. Iusztin — FTI + hybrid search (BM25+dense łapie tickery) + reranking cross-encoderem (największy zysk RAG). Alto — taksonomia pamięci (Buffer/Summary/Entity/KG) + CONDENSE_QUESTION. 🚨 Prawo XV: gotowy blueprint domknięcia Bibliotheca-RAG (W2). UWAGA techniczna: `git checkout origin/main -- ` nadpisuje pliki lokalne — książki były na branchu roboczym, nie main; sync przez merge (nie reset --hard, blokuje auto-mode).
-
-### 2026-06-22 — FinMem layered decay wdrożony + scan rynku pamięci (MEM-01..04)
-Pytanie Cezara: czy mamy FinMem/FinAgent. Weryfikacja na żywo (WebSearch): FinMem=2311.13743 (NASZ KOD cytował błędnie 2408.14900 → naprawione, Prawo I), FinAgent=2402.18485, Mem0=2504.19413, A-Mem=2502.12110. WDROŻONE: zanik warstwowy FinMem w centrum_pamieci._decay_dla_waznosci() — tempo zaniku zależy od ważności (i=0.3→0.99 płytka, i=1.0→0.999 głęboka). Naprawia UTRATA POTENCJAŁU (Prawo XV): wcześniej lekcja krytyczna zanikała tak szybko jak rutyna (jeden 0.995). Nasz unikat: funkcja CIĄGŁA vs 3 kubełki FinMem. Rejestr: MEM-01 wdrożony, MEM-02 dual-reflection (plan), MEM-03 Mem0 auto-konsolidacja (plan), MEM-04 A-Mem auto-linki (kandydat). Unikat Imperium: pamięć rynku + pełny dialog+lekcje+profil w git (przeżywa kompakcję), brak na rynku. 4 testy granic zaniku. _DECAY martwy usunięty.
-
-### 2026-06-22 — Centrum Pamięci W-360 v3 + rynek mem0 scan
-centrum_pamieci.py: hub wszystkich 5 warstw pamięci. Scoring Generative Agents (Park et al. 2304.03442): score=recency×importance×relevance, recency=0.995^dni, importance=heurystyka słów kluczowych (0.3-1.0), relevance=Jaccard (0.5 gdy puste). top_lekcji() → sorted scored nie ostatnie-N. szukaj_wszedzie() → W3 lekcje + W3b kronika w jednym zapytaniu. lekcje_scope() → Mem0-style filtr. Rynek: FinMem (2311.13743) 3-tier short/mid/long; TradingGPT (2309.03736) per-agent recency+relevancy+importance; Memex(RL) (2603.04257) episodic+semantic; From Knowing to Doing (2605.28359) raw logs > summaries; Zep/Graphiti (2501.13956) bi-temporal invalidation; regime-stale bug: cosine retrieval traci skuteczność przy zmianie reżimu → potrzeba temporal decay + regime label metadata; kronika_czatu.py: 100 sesji 5.99MB w repo → git niesie całą historię do chmury.
-
-### 2026-06-22 — Pamięć v2: CRUD + profil Cezara + Kronika Czatu (vs Hermes/Zep/Mem0)
-- Porównanie z konkurencją (Hermes MEMORY.md/USER.md, Zep/Graphiti bi-temporal KG, Cognee ECL, Mem0 ADD/UPDATE/DELETE/NOOP, MemGPT paging, Generative Agents recency·importance·relevance)
-- Wniosek: nasza Warstwa 3 zbiegła się architektonicznie z Hermesem (markdown rdzeń + FTS5). Zaadoptowane braki:
-- (1) CRUD pamięci: usun_lekcje()/aktualizuj_lekcje() — wcześniej tylko append (UTRATA POTENCJAŁU, Prawo XV)
-- (2) limit zwięzłości LIMIT_ZNAKOW_LEKCJA=1200 (Hermes-style twardy błąd) + alarm_przepelnienia sekcji
-- (3) profil_cezara() = odpowiednik USER.md (model użytkownika ⊥ środowisko) → docs/PROFIL_CEZARA.md, wstrzykiwany na starcie
-- (4) kronika_czatu.py: destyluje 148MB transkryptów ~/.claude → 6MB czystego dialogu w repo (git niesie historię lokal↔chmura, rozwiązuje ulotność kontenera). Redakcja kluczy API. Przyrostowa. Wpięta w hook.
-- Do rozważenia później: bi-temporal invalidation (Zep), recency·importance·relevance scoring (Generative Agents), RAPTOR tree-summary
-
-### 2026-06-21 — Memory MCP natywny (pamiec_sesji.py)
-- Zamiast zewnętrznego Node Memory MCP (nietestowalny w chmurze) → natywny moduł Python (Prawo XIX: kod+testy)
-- imperium/biblioteki/pamiec_sesji.py: lekcje()/dopisz_lekcje()/szukaj()/mapa_podpiec()/podsumowanie_startowe()
-- Źródło prawdy: docs/PAMIEC_SESJI.md (markdown — czytelny dla Cezara, w git, indeksowany w RAG korpus dane)
-- Wpięte do SessionStart hook: mapa + 3 ostatnie lekcje wyświetlane na starcie KAŻDEJ sesji → koniec utraty kontekstu w kompakcji
-- Warstwa 3 pamięci (Warstwa 1=transakcje/Mnemosyne, Warstwa 2=RAG/książki, Warstwa 3=ciągłość sesji)
-- 12 testów (granice: pusty plik, brak sekcji, dopisanie do nieistniejącej sekcji, roundtrip)
-
-### 2026-06-21 — Bibliotheca-RAG v1 + v2
-- RAG zbudowany: FTS5 (BM25) + opcjonalne wektory, 7760 fragmentów, 80 źródeł
-- Korpusy: `biblioteka` (32 książki), `dane` (CSV/JSON/TXT), `docs` (dokumentacja Imperium)
-- Tryb przyrostowy (`--tylko-nowe`): 24s → 0.8s gdy brak zmian
-- Bug: infinite loop w `podziel_na_chunki` gdy `overlap == max_slow` → fix: `overlap = min(overlap, max_slow - 1)`
-- HuggingFace zablokowany w chmurze (403) → tylko FTS w cloud; wektory działają lokalnie
-- MCP server: `biblioteka_szukaj(zapytanie, topk, tryb, korpus)` + `biblioteka_info()`
-
-### 2026-06-21 — Speedup backtestu 2.9× (GARCH + BOCPD)
-- Profiler (cProfile): wąskie gardło to NIE TA-Lib (23%), lecz GJR-GARCH recursion (34.5%) i BOCPD (18.9%) — czyste Python loops
-- GARCH: scipy.signal.lfilter (IIR w C) zamiast Python for-loop → 2.6×
-- BOCPD: scipy.special.gammaln wektorowy zamiast 531K math.lgamma calls + numpy log_w
-- Numba zablokowana w chmurze (pip timeout) → numpy/scipy zamiast JIT
-- cache_wskaznikow (opt-in, multiprocessing): prekalkulacja wskaźników per symbol
-- Wynik: 30.1s → 10.5s (2 pary × 150 barów)
-
-### 2026-06-21 — Backfill sentymentu (PSY-01/02/04 mierzalne w backteście)
-- ODKRYCIE: adaptery futures/feargreed/cvd JUŻ istnieją i są wpięte do petla_live + factory Dyrygenta. Neurony PSY żyją LIVE, ale abstynują w backteście (brak historii)
-- Luka Prawa XVI: PSY-01/02/04 nigdy nie zmierzone (tylko live, niemierzalne)
-- Rozwiązanie: AdapterFutures.pobierz_historie() (Binance /fapi/v1/fundingRate pełna historia + openInterestHist/L-S ~30 dni), forward_fill_na_bary() kauzalny, narzedzia/backfill_sentyment.py (CSV cache), backtest_portfel(sentyment_per=...)
-- Funding ma PEŁNĄ historię; OI/L-S tylko ostatnie ~30 dni (limit Binance)
-- Cezar odpala backfill lokalnie (sieć), potem backtest mierzy czy PSY dodają przewagę
-
-### 2026-06-21 — MTF bear-shield finding (KROK B backtest)
-- MTF gate NIE poprawia wyników globalnie (Sharpe BULL_2021: 0.95→0.71, RANGE_2023: 0.65→0.47)
-- MTF gate = TARCZA NIEDŹWIEDZIA (BEAR_2022: Sharpe -0.31→+0.14, MaxDD -89%→-67%)
-- Wniosek: warunkowe weto niedźwiedzie przez Namiestnika (wymaga walidacji 2018/2025 najpierw)
-- EXP-13/14 backward-IC ≈ forward-IC (|Δ|<0.05) → opisują reżim, nie przewidują kierunku
-
----
 
 ## 🔄 STAN BIEŻĄCY (auto-aktualizuj każdą sesję)
 

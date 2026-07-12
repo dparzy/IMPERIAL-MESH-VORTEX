@@ -425,6 +425,15 @@ def test_kronika_score_nie_jest_flat(monkeypatch, tmp_path):
     plik_lekcji.write_text("# P\n\n## 📚 LEKCJE Z SESJI\n\n", encoding="utf-8")
     monkeypatch.setattr(cp._ps, "DOMYSLNY_PLIK", plik_lekcji)
 
+    # HERMETYCZNOŚĆ (Prawo XXI): izolujemy pozostałe warstwy cross-layer. Bez tego test
+    # zależał od realnych danych — gdy wizje_i_decyzje.jsonl urosło, trafienia „portfel"
+    # z wizji/RAG wypychały starą kronikę (recency≈0) poza limit=10 → fałszywy czerwony.
+    # Ten test sprawdza WYŁĄCZNIE scoring kroniki (recency: nowy > stary).
+    monkeypatch.setattr(cp, "_szukaj_w_logach", lambda *a, **k: [])
+    monkeypatch.setattr(cp, "_szukaj_w_rag", lambda *a, **k: [])
+    monkeypatch.setattr(cp, "_szukaj_w_refleksjach", lambda *a, **k: [])
+    monkeypatch.setattr(cp._rw, "szukaj_scored", lambda *a, **k: [])
+
     wyniki = cp.szukaj_wszedzie("portfel", cel_kronika=kronika_dir, limit=10)
     kroniki = [w for w in wyniki if w["warstwa"] == "kronika"]
     assert len(kroniki) == 2

@@ -27,8 +27,14 @@ złapany fałszywy-zielony: `test_kronika_score_nie_jest_flat` zależał od real
 **Fix środowiska (commit `6dca659`) — Windows zawsze LOKAL + override IMPERIUM_SRODOWISKO.**
 Baner mylnie pokazywał CHMURA na laptopie (harness ustawia CLAUDE_ENV_FILE w hooku).
 
-**Pliki:** `imperium/biblioteki/refleksja_pamieci.py`, `tests/test_refleksja_pamieci.py`.
-Bramka: 2181/2181 zielone, audyt exit 0, ruff czysty.
+**P0-3 (osobny commit) — uspójnienie liczb README/MANIFEST z kodem (Prawo XXI).**
+Stale „76" (stary licznik neuronów, dziś 84) w 3 miejscach → 84; README „15 elitarnych"
+→ 18 (kod: D-01,X-25,X-26 + 15 zwiadowców); „Do wdrożenia 240/223" → 215 (299−84);
+„Stan na" 07-10 → 07-12. Tabela per-legion opatrzona notą, że rozkład jest orientacyjny,
+a autorytatywny licznik (84) pochodzi z `wszystkie_neurony()`.
+
+**Pliki:** `imperium/biblioteki/refleksja_pamieci.py`, `tests/test_refleksja_pamieci.py`,
+`README.md`, `docs/MANIFEST_KODU.md`. Bramka: 2182/2182 zielone, audyt exit 0, ruff czysty.
 
 ---
 

@@ -200,4 +200,4 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 
 ---
 
-*Stan na: 2026-06-21 | Źródło prawdy: `imperium/legiony/rejestr.py` → `wszystkie_neurony()` (81 neuronów + 15 zwiadowców)*
+*Stan na: 2026-07-12 | Źródło prawdy: `imperium/legiony/rejestr.py` → `wszystkie_neurony()` (84 neuronów + 15 zwiadowców)*

@@ -46,6 +46,19 @@ Pliki: `narzedzia/rag/metadane_ksiag.py`, `tests/test_metadane_ksiag.py`, `katal
 **Pliki (P0-2/3):** `imperium/biblioteki/refleksja_pamieci.py`, `tests/test_refleksja_pamieci.py`,
 `README.md`, `docs/MANIFEST_KODU.md`. Bramka: 2184/2184 zielone, audyt exit 0, ruff czysty.
 
+**Sweep dokumentacji (osobny commit, na prośbę Cezara) — aktualizacja zasad po zmianach:**
+- **CLAUDE.md p.4:** „PUSH NA KOMENDĘ" → **CLAUDE NIGDY NIE PUSHUJE** (zaostrzenie 2026-07-11):
+  push wyłącznie Cezar ręcznie przez terminal; Claude melduje „gotowe". Spójnie: p.4, sekcja Git,
+  bramka auto-commit (już bez „+push").
+- **SCIAGA_LOKAL.md:** dodano wariant **aplikacja desktopowa Claude Code (Win 10 Pro)** obok
+  terminala; zasada push (auto-pull, push ręczny); calibre portable PATH + **djvulibre/djvutxt
+  zbędne** (calibre czyta djvu sam); Stan na → 07-12.
+- **MANUAL_CLAUDE_CODE.md:** poprawione 2× „commituje i pushuje" → „commit lokalny, push Cezar";
+  nota o desktop app; Stan na → 07-12.
+- **MAPA_KLUCZY.md:** „81 neuronów" → 84 (stale), data → 07-12.
+Pliki: `CLAUDE.md`, `docs/SCIAGA_LOKAL.md`, `docs/MANUAL_CLAUDE_CODE.md`, `docs/MAPA_KLUCZY.md`.
+Audyt exit 0 (W14: 208 .md, MAPA_KLUCZY 84 kluczy pokryte).
+
 ---
 
 ## 2026-07-11 | 📚 | JEDNA KOMENDA: przygotuj bibliotekę lokalnie (0 tokenów Claude)

@@ -206,14 +206,15 @@ Cezar nie chce klikać przy każdej zmianie. Działasz autonomicznie wg zasad:
    (to błahostka wg Prawa XVIII, nie decyzja kierunkowa).
 3. **Auto-commit:** Po skończonym zadaniu z zielonymi testami i czystym audytem —
    **commitujesz SAM** z opisowym komunikatem. Nie pytasz o zgodę na commit.
-4. **PUSH NA KOMENDĘ (zmiana: Cezar zatwierdził 2026-07-10):** Po commicie **NIE pushujesz
-   sam**. Push jest świadomą decyzją Cezara — pushujesz gdy powie („wypchnij", „push")
-   albo gdy prosi o PR. Hook końca sesji też już nie pushuje (commituje pamięć lokalnie).
-   Narzędzie: `bash narzedzia/synchronizuj.sh` (podgląd) / `--push` (skleja commity pamięci
-   w jeden przed wypchnięciem; commitów merytorycznych NIGDY nie przepisuje).
+4. **CLAUDE NIGDY NIE PUSHUJE (zaostrzenie: Cezar zatwierdził 2026-07-11):** Po commicie
+   **NIE pushujesz — ani auto, ani „na komendę".** Push wykonuje **wyłącznie Cezar RĘCZNIE
+   przez swój terminal.** Twoja rola kończy się na: commit lokalny + **meldunek „gotowe,
+   można push"**. Nawet gdy Cezar mówi „push", to sygnał, że TO ON wypchnie — nie Ty.
+   Hook końca sesji też nie pushuje (commituje pamięć lokalnie).
    **Powód:** push po każdej sesji zaśmiecał historię chmury dziesiątkami commitów
-   „auto: sync pamięci sesji" i wymuszał rebase przy starcie na drugiej maszynie.
-   Lokalny git JEST repozytorium — commit kosztuje zero, push to osobna decyzja.
+   „auto: sync pamięci sesji" i wymuszał rebase przy starcie na drugiej maszynie; dodatkowo
+   środowisko Claude nie ma pewnej autoryzacji do zdalnego repo. Lokalny git JEST
+   repozytorium — commit kosztuje zero, push to osobna, ręczna decyzja Cezara.
 5. **NIE auto-PR:** Pull Request tworzysz TYLKO na wyraźną prośbę Cezara (to się nie zmienia).
 
 **Granica autonomii (kiedy MIMO TO pytasz Cezara — Prawo XVIII):**
@@ -230,7 +231,7 @@ python narzedzia/audyt_spojnosci.py # musi: exit 0 (pełna harmonia — w tym Wa
 Audyt zawiera teraz **Warstwę 13 (ruff)** — linter łapie bugi/martwy kod (duplikaty
 klas, niezdefiniowane nazwy, martwe zmienne) — oraz **Warstwę 14 (wszystkie dokumenty)**
 — skanuje KAŻDY plik .md i egzekwuje, że MAPA_KLUCZY zawiera wszystkie klucze z kodu.
-Jeśli którakolwiek czerwona → NIE commitujesz, naprawiasz, dopiero potem commit+push.
+Jeśli którakolwiek czerwona → NIE commitujesz, naprawiasz, dopiero potem commit (lokalny; push robi Cezar).
 
 **🔍 ROZKAZ STAŁY (Cezar, 2026-06-18): AUDYT ZAWSZE SPRAWDZA WSZYSTKIE PLIKI, DOKUMENTY I KOD.**
 Audyt nie ogranicza się do README/MANIFEST/INDEKS — obejmuje CAŁĄ dokumentację (każdy plik .md
@@ -386,7 +387,8 @@ cząstkowania i krytyka kompletności; pominięcie drugiego modela (zwiad jednym
 ## 🌿 Git
 
 - Rozwój na branchu: `claude/sleepy-fermi-dsdE4`
-- Push: `git push -u origin <branch>`. PR tylko na wyraźną prośbę.
+- **Push robi WYŁĄCZNIE Cezar ręcznie** (`git push origin <branch>` w jego terminalu) —
+  Claude nigdy nie pushuje, tylko melduje gotowość (patrz TRYB AUTONOMICZNY p.4). PR tylko na wyraźną prośbę.
 
 ## 🔍 ZASADA SPÓJNOŚCI PRZY PR (ROZKAZ STAŁY — Cezar zatwierdził 2026-06-02)
 

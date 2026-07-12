@@ -36,6 +36,12 @@ KATALOG_PLIK = ROOT / "bibliotheca_ulpia" / "dane" / "katalog_ksiag.json"
 
 FORMATY_KSIAG = {".epub", ".pdf", ".azw3", ".mobi", ".djvu"}
 
+# Markery „brak danych" z ebook-meta (calibre) — po angielsku i po polsku (locale!).
+# djvu bez osadzonych metadanych: calibre zwraca Author="Nieznany" i Title=echo nazwy
+# pliku. Bez tego sita autor='Nieznany' NADPISYWAŁ dobrego autora z nazwy (Prawo XV:
+# filtr autor= nie łapał Shreve/Aronson/Kissell). Patrz test_parser_pomija_nieznany.
+_WARTOSCI_PUSTE = {"unknown", "nieznany", "nieznane", "nieznana", "unknown author"}
+
 # Mapa etykiet `ebook-meta` → nasze klucze. `ebook-meta` drukuje linie „Klucz : Wartość".
 _ETYKIETY = {
     "Title": "tytul",
@@ -92,9 +98,18 @@ def parsuj_wyjscie_ebook_meta(stdout: str) -> dict:
         etykieta, _, wartosc = linia.partition(" : ")
         klucz = _ETYKIETY.get(etykieta.strip())
         wartosc = wartosc.strip()
-        if klucz and wartosc and wartosc.lower() != "unknown":
+        if klucz and wartosc and wartosc.lower() not in _WARTOSCI_PUSTE:
             wynik[klucz] = wartosc
     return wynik
+
+
+def _tytul_echo_nazwy(tytul: str) -> bool:
+    """
+    Czy `tytul` z calibre to tylko ECHO nazwy pliku (djvu bez metadanych → Title=
+    "BIB-022 Kissell ..."). Realny tytuł książki nigdy nie zaczyna się od naszego
+    prefiksu katalogowego BIB-NNN. Chroni przed nadpisaniem dobrego tytułu z nazwy.
+    """
+    return bool(re.match(r"^BIB-\d", tytul.strip(), re.IGNORECASE))
 
 
 def metadane_calibre(path: Path) -> dict:
@@ -121,7 +136,13 @@ def zbuduj_katalog(katalog_dir: Path = BIBLIOTEKA_DIR, podglad: bool = False) ->
     for i, p in enumerate(pliki, 1):
         wpis = parsuj_nazwe(p.name)
         if calibre:
-            wpis.update({k: v for k, v in metadane_calibre(p).items() if v})
+            bogate = metadane_calibre(p)
+            # Nazwa pliku (BIB-NNN_Autor_Tytul) jest AUTORYTATYWNA dla autora i tytułu —
+            # odrzucamy echo nazwy w tytule z calibre (djvu). Autor='Nieznany' już odsiany
+            # w parserze. Pozostałe pola (tagi/jezyk/rok/wydawca/seria) calibre wzbogaca.
+            if _tytul_echo_nazwy(bogate.get("tytul", "")):
+                bogate.pop("tytul", None)
+            wpis.update({k: v for k, v in bogate.items() if v})
         katalog.append(wpis)
         print(f"\r  [metadane] {i}/{len(pliki)} {p.name[:48]:48}", end="", file=sys.stderr, flush=True)
     print("", file=sys.stderr)

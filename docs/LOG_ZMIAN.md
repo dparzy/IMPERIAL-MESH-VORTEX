@@ -33,8 +33,18 @@ Stale „76" (stary licznik neuronów, dziś 84) w 3 miejscach → 84; README �
 „Stan na" 07-10 → 07-12. Tabela per-legion opatrzona notą, że rozkład jest orientacyjny,
 a autorytatywny licznik (84) pochodzi z `wszystkie_neurony()`.
 
-**Pliki:** `imperium/biblioteki/refleksja_pamieci.py`, `tests/test_refleksja_pamieci.py`,
-`README.md`, `docs/MANIFEST_KODU.md`. Bramka: 2182/2182 zielone, audyt exit 0, ruff czysty.
+**P0-4 (osobny commit) — metadane autora djvu (Prawo XV).**
+Bug: `ebook-meta` na djvu bez osadzonych metadanych zwraca Author="Nieznany" (locale PL,
+więc filtr `!= "unknown"` go przepuszczał) i Title=echo nazwy pliku ("BIB-022 Kissell…").
+Linia `wpis.update()` NADPISYWAŁA dobrego autora/tytuł z nazwy pliku tymi śmieciami →
+`autor='Nieznany'`, filtr autor= nie łapał Shreve/Aronson/Kissell. Fix: `_WARTOSCI_PUSTE`
+odsiewa „Nieznany" w parserze; `_tytul_echo_nazwy` odrzuca tytuł-echo w merge (nazwa pliku
+jest autorytatywna dla autora/tytułu, calibre wzbogaca tylko tagi/jezyk/rok/wydawca/seria).
+Katalog przebudowany: 5 djvu → Kissell/Aronson/Shreve×2/Sutton Barto, 0× Nieznany. +2 testy.
+Pliki: `narzedzia/rag/metadane_ksiag.py`, `tests/test_metadane_ksiag.py`, `katalog_ksiag.json`.
+
+**Pliki (P0-2/3):** `imperium/biblioteki/refleksja_pamieci.py`, `tests/test_refleksja_pamieci.py`,
+`README.md`, `docs/MANIFEST_KODU.md`. Bramka: 2184/2184 zielone, audyt exit 0, ruff czysty.
 
 ---
 

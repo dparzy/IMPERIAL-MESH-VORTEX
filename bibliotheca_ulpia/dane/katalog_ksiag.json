@@ -223,8 +223,8 @@
     },
     {
       "bib": "BIB-022",
-      "autor": "Nieznany",
-      "tytul": "BIB-022 Kissell Optimal-trading-strategies",
+      "autor": "Kissell",
+      "tytul": "Optimal trading strategies",
       "format": "djvu",
       "plik": "BIB-022_Kissell_Optimal-trading-strategies.djvu"
     },
@@ -311,15 +311,15 @@
     },
     {
       "bib": "BIB-031",
-      "autor": "Nieznany",
-      "tytul": "BIB-031 Tsay Analysis-of-Financial-Time-Series",
+      "autor": "Tsay",
+      "tytul": "Analysis of Financial Time Series",
       "format": "pdf",
       "plik": "BIB-031_Tsay_Analysis-of-Financial-Time-Series.pdf"
     },
     {
       "bib": "BIB-032",
-      "autor": "Nieznany",
-      "tytul": "BIB-032 OHara Market-Microstructure-Theory",
+      "autor": "OHara",
+      "tytul": "Market Microstructure Theory",
       "format": "pdf",
       "plik": "BIB-032_OHara_Market-Microstructure-Theory.pdf"
     },
@@ -432,15 +432,15 @@
     },
     {
       "bib": "BIB-043",
-      "autor": "Nieznany",
-      "tytul": "BIB-043 Cartea-Jaimungal-Penalva Algorithmic-and-High-Frequency-Trading",
+      "autor": "Cartea Jaimungal Penalva",
+      "tytul": "Algorithmic and High Frequency Trading",
       "format": "pdf",
       "plik": "BIB-043_Cartea-Jaimungal-Penalva_Algorithmic-and-High-Frequency-Trading.pdf",
       "wydano": "2016-11-05T22:36:36+00:00"
     },
     {
       "bib": "BIB-044",
-      "autor": "Nieznany",
+      "autor": "Hasbrouck",
       "tytul": "Untitled",
       "format": "pdf",
       "plik": "BIB-044_Hasbrouck_Empirical-Market-Microstructure.pdf",
@@ -476,8 +476,8 @@
     },
     {
       "bib": "BIB-048",
-      "autor": "Nieznany",
-      "tytul": "BIB-048 Aronson Evidence-Based-Technical-Analysis",
+      "autor": "Aronson",
+      "tytul": "Evidence Based Technical Analysis",
       "format": "djvu",
       "plik": "BIB-048_Aronson_Evidence-Based-Technical-Analysis.djvu"
     },
@@ -647,29 +647,29 @@
     },
     {
       "bib": "BIB-065",
-      "autor": "Nieznany",
-      "tytul": "BIB-065 Shreve Stochastic-Calculus-for-Finance-I-Binomial-Asset-Pricing",
+      "autor": "Shreve",
+      "tytul": "Stochastic Calculus for Finance I Binomial Asset Pricing",
       "format": "djvu",
       "plik": "BIB-065_Shreve_Stochastic-Calculus-for-Finance-I-Binomial-Asset-Pricing.djvu"
     },
     {
       "bib": "BIB-066",
-      "autor": "Nieznany",
-      "tytul": "BIB-066 Shreve Stochastic-Calculus-for-Finance-II-Continuous-Time-Models",
+      "autor": "Shreve",
+      "tytul": "Stochastic Calculus for Finance II Continuous Time Models",
       "format": "djvu",
       "plik": "BIB-066_Shreve_Stochastic-Calculus-for-Finance-II-Continuous-Time-Models.djvu"
     },
     {
       "bib": "BIB-067",
-      "autor": "Nieznany",
-      "tytul": "BIB-067 Sutton-Barto Reinforcement-Learning-An-Introduction-2nd-ed",
+      "autor": "Sutton Barto",
+      "tytul": "Reinforcement Learning An Introduction 2nd ed",
       "format": "djvu",
       "plik": "BIB-067_Sutton-Barto_Reinforcement-Learning-An-Introduction-2nd-ed.djvu"
     },
     {
       "bib": "BIB-068",
-      "autor": "Nieznany",
-      "tytul": "BIB-068 Goodfellow-Bengio-Courville Deep-Learning",
+      "autor": "Goodfellow Bengio Courville",
+      "tytul": "Deep Learning",
       "format": "pdf",
       "plik": "BIB-068_Goodfellow-Bengio-Courville_Deep-Learning.pdf",
       "wydano": "2017-04-07T16:29:32+00:00"

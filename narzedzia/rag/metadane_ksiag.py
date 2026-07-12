@@ -42,6 +42,10 @@ FORMATY_KSIAG = {".epub", ".pdf", ".azw3", ".mobi", ".djvu"}
 # filtr autor= nie łapał Shreve/Aronson/Kissell). Patrz test_parser_pomija_nieznany.
 _WARTOSCI_PUSTE = {"unknown", "nieznany", "nieznane", "nieznana", "unknown author"}
 
+# Pola, dla których NAZWA PLIKU jest źródłem prawdy — calibre ich nie nadpisuje
+# (gubi unicode/dokleja współautorów/wstawia placeholdery). Wzbogaca tylko resztę.
+_POLA_Z_NAZWY = {"bib", "autor", "tytul", "format", "plik"}
+
 # Mapa etykiet `ebook-meta` → nasze klucze. `ebook-meta` drukuje linie „Klucz : Wartość".
 _ETYKIETY = {
     "Title": "tytul",
@@ -137,12 +141,14 @@ def zbuduj_katalog(katalog_dir: Path = BIBLIOTEKA_DIR, podglad: bool = False) ->
         wpis = parsuj_nazwe(p.name)
         if calibre:
             bogate = metadane_calibre(p)
-            # Nazwa pliku (BIB-NNN_Autor_Tytul) jest AUTORYTATYWNA dla autora i tytułu —
-            # odrzucamy echo nazwy w tytule z calibre (djvu). Autor='Nieznany' już odsiany
-            # w parserze. Pozostałe pola (tagi/jezyk/rok/wydawca/seria) calibre wzbogaca.
-            if _tytul_echo_nazwy(bogate.get("tytul", "")):
-                bogate.pop("tytul", None)
-            wpis.update({k: v for k, v in bogate.items() if v})
+            # Nazwa pliku (BIB-NNN_Autor_Tytul) jest AUTORYTATYWNA dla autora i tytułu.
+            # calibre gubi je na wiele sposobów: 'Nieznany'/'User' (placeholdery), echo nazwy
+            # w tytule (djvu), zniekształcony unicode ('LŁpez', 'Lef?vre'), doklejeni
+            # współautorzy ('& Markman, Jon D.'). Dla filtra autor= liczy się czyste nazwisko
+            # z nazwy pliku — więc calibre NIE nadpisuje autora ani tytułu, wzbogaca tylko
+            # pola nieautorytatywne (tagi/jezyk/rok/wydawca/seria/identyfikatory).
+            wpis.update({k: v for k, v in bogate.items()
+                         if v and k not in _POLA_Z_NAZWY})
         katalog.append(wpis)
         print(f"\r  [metadane] {i}/{len(pliki)} {p.name[:48]:48}", end="", file=sys.stderr, flush=True)
     print("", file=sys.stderr)

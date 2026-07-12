@@ -1,6 +1,6 @@
 # 🫧 BAN — Bańki, krachy i finanse behawioralne | Encyklopedia Imperium
 
-> **Stan na:** 2026-07-11 | **Ważność:** ⭐⭐⭐⭐ (wysoki — cykl krypto to seria baniek)
+> **Stan na:** 2026-07-12 | **Ważność:** ⭐⭐⭐⭐ (wysoki — cykl krypto to seria baniek)
 > **Status:** ✅ WYPEŁNIONY (esencja z BIB-059..064, ugruntowana ekstrakcją z plików — Prawo I).
 > **Dla nowicjusza (ZPO):** ten dział uczy rozpoznawać EUFORIĘ i KAPITULACJĘ jako **struktury**,
 > nie anegdoty. Bańka nie jest przypadkiem — ma powtarzalną anatomię (Minsky), napędza ją
@@ -126,7 +126,7 @@ nie historycznym: Imperium ma łapać fazę, nie wierzyć narracji.
 
 - **BIB-059 Kindleberger, Aliber, McCauley** — *Manias, Panics, and Crashes: A History of Financial
   Crises*, 8. wyd., Palgrave Macmillan 2023, ISBN 978-3-031-16007-3. ✅ (ekstrakcja z pliku) —
-  anatomia Minsky'ego, contagion, LOLR, rozdz. 14 „Bitcoin: Worse Than a Ponzi".
+  anatomia Minsky'ego, contagion, Lender of Last Resort (LOLR), rozdz. 14 „Bitcoin: Worse Than a Ponzi".
 - **BIB-060 Shiller** — *Irrational Exuberance*, 3. wyd. rozszerzone, Princeton University Press 2015,
   ISBN 978-0-691-16626-1. ✅ — feedback loop = naturalny Ponzi, CAPE, czynniki struktura/kultura/psyche.
 - **BIB-061 Thaler** — *Misbehaving: The Making of Behavioral Economics*, W.W. Norton 2015. ✅ —

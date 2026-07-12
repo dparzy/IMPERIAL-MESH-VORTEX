@@ -59,6 +59,24 @@ Pliki: `narzedzia/rag/metadane_ksiag.py`, `tests/test_metadane_ksiag.py`, `katal
 Pliki: `CLAUDE.md`, `docs/SCIAGA_LOKAL.md`, `docs/MANUAL_CLAUDE_CODE.md`, `docs/MAPA_KLUCZY.md`.
 Audyt exit 0 (W14: 208 .md, MAPA_KLUCZY 84 kluczy pokryte).
 
+**P0-5 (osobny commit) — domknięcie uwag cubic PR#118/119 (P2/P3).**
+Weryfikacja stanu (Prawo I): część już naprawiona wcześniej — PAMIEC_SESJI duplikaty (zdjął P0-1),
+session-start.sh statystyki (fallback guard jest), `_skroc` (str() już w środku funkcji), P1 katalog
+Nieznany (P0-4). Domknięte teraz:
+- **katalog autorzy (P3):** calibre gubił unicode/placeholdery (LŁpez, Lef?vre, User) — teraz
+  NAZWA PLIKU jest autorytatywna dla autora i tytułu (`_POLA_Z_NAZWY`); calibre wzbogaca tylko
+  tagi/jezyk/rok/wydawca. Regeneracja: Lopez de Prado/Lefevre/Douglas, 0× garbled.
+- **test_przygotuj (P3):** tautologia `in (True, False)` → mocna asercja `_narzedzie(sys.executable) is True`.
+- **encyklopedia (P2/P3):** RLA — miscytat „Prawo XVI: RLA⊥ALG⊥MEM" skorygowany (Prawo XVI nie
+  definiuje granic domen, nakazuje POMIAR); DEF — usunięto fałszywą zdolność Straży/OC-05 do
+  wykrywania flash-ataków (wymaga on-chain, KANDYDAT nie kod); BAN — LOLR → Lender of Last Resort.
+- **wizje (P3):** typ/status mismatch — DECYZJA „Odrzucono Mnemosyne" POMYSŁ→ZAMKNIĘTA, 2× ZMIANA
+  wdrożona POMYSŁ→WDROŻONA.
+Świadomie POMINIĘTE (Prawo I): ANALIZA_BIB (datowany snapshot), tekst_cache copyright (decyzja
+Cezara repo→private). Pliki: `narzedzia/rag/metadane_ksiag.py`, `imperium/biblioteki/dziennik_niesmiertelny.py`,
+`tests/test_przygotuj_biblioteke.py`, 3× encyklopedia, `wizje_i_decyzje.jsonl`, `katalog_ksiag.json`.
+Bramka: testy zielone, audyt exit 0, ruff czysty.
+
 ---
 
 ## 2026-07-11 | 📚 | JEDNA KOMENDA: przygotuj bibliotekę lokalnie (0 tokenów Claude)

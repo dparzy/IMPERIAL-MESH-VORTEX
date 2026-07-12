@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-07-13 | ❌ | W-361 A/B na P&L: ważenie IC NIE poprawia zysku — flaga zostaje OFF
+
+**Rozstrzygający pomiar (ZASADA WPIĘCIA — walidacja korzyści na realnych danych = P&L, nie proxy).**
+Poprzedni A/B mierzył SAM ZNAK agregatu (weto OFF): +3.3pp OOS. To metryka-proxy. Tu zmierzono
+rzecz, która NAPRAWDĘ decyduje: P&L pełnego backtestu OFF vs ON (weto 0.55 + sizing + SL aktywne).
+
+**Metoda:** nowy harness `narzedzia/ab_pnl_wazenie_ic.py` — split TRAIN/TEST, IC z TRAIN
+(kanoniczna `oblicz_wagi_ic`), pełny backtest na TEST 2× (flaga `wazenie_ic` przez nowy opt-in
+w `backtest()`: `wazenie_ic`/`wagi_ic` → `legatus.ustaw_wagi_ic`). Metryki: zwrot %/win-rate/PF.
+Cząstki → arena (`ab_pnl_ic`), wznawialne, pasek postępu (Prawo XXIV).
+
+**Wynik (15 par 4h, frac=0.6, cap 6000):**
+- **PORTFEL (suma zwrotów): OFF=+34.1% → ON=−114.9%, Δ=−149pp.** ON>OFF tylko na **3/15** par.
+- Pary z dużym OOS (te „najlepsze" w teście znaku) są w P&L KATASTROFALNE: ETH +18.0%→−16.1%,
+  XRP +14.4%→−17.7%, BNB −1.8%→−20.3%, ADA −3.8%→−12.4%.
+- **ON firuje dużo więcej transakcji (781 vs 483), win-rate ~30–40%.** Przyczyna: odwracanie
+  znaku przy SZUMOWYCH |IC| (Grinold&Kahn: |IC|<0.02 = szum) przepuszcza masę słabych,
+  przeciwtrendowych wejść przez weto 0.55. Przewaga +3.3pp na surowym znaku znika po sizingu.
+
+**Decyzja (Prawo I + XV): flaga `wazenie_ic` zostaje OFF, NIE wpinamy w runtime.** Moduł jest
+zwalidowany jako NIEkorzystny w kasie — zostaje dostępny (opt-in), ale wyłączony. Wartość tej
+sesji to NEGATYWNY wynik, który uchronił P&L przed wdrożeniem szkodliwego modułu.
+
+**Hipoteza na przyszłość (nie realizowana bez decyzji Cezara):** naiwne odwracanie znaku IC
+przeucza na szumie — wariant z SHRINKAGE/progiem |IC| (waż/odwracaj tylko przy istotnym IC)
+mógłby zachować przewagę bez firowania śmieciowych wejść. Osobna hipoteza, osobny A/B na P&L.
+
+**Pliki:** `imperium/koloseum/backtest.py` (opt-in `wazenie_ic`/`wagi_ic`),
+`narzedzia/ab_pnl_wazenie_ic.py`, `tests/test_ab_pnl_wazenie_ic.py` (+11), `docs/SCIAGA_LOKAL.md`.
+
+---
+
 ## 2026-07-12 | ⚖️ | W-361 A/B na żywo: ważenie IC potwierdzone na REALNYM Legatusie
 
 **Walidacja P1 (ZASADA WPIĘCIA — pomiar przed włączeniem flagi).** Nowy harness

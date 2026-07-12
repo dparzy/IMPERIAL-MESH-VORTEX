@@ -67,6 +67,8 @@ def backtest(
     kalibruj_prog: bool = False,
     zbieraj_sygnaly: bool = False,
     zbieraj_pelne_sygnaly: bool = False,
+    wazenie_ic: bool = False,
+    wagi_ic: "Optional[Dict[str, float]]" = None,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -96,6 +98,10 @@ def backtest(
 
     symbol = bary[0]["symbol"]
     legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
+    # W-361 A/B na P&L (opt-in, domyślnie OFF → zero zmiany zachowania). Wagi IC liczone
+    # WYŁĄCZNIE na TRAIN (poza tym backtestem) i podane z zewnątrz — zero look-ahead.
+    if wagi_ic:
+        legatus.ustaw_wagi_ic(wagi_ic, wlacz=wazenie_ic)
     budowniczy = BudowniczyWskaznikow()
     suffix = "-AUTO" if auto_rezim else ""
     engine = PaperTradingEngine(kapital_startowy=kapital_startowy,

@@ -101,6 +101,27 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Orphan key X-SC-003 (BROOKS M2B vs IMV-SC-003)
+Klucz 'BROOKS M2B' istniał w kodzie, ale katalog rejestrował go jako 'IMV-SC-003'. Wyrównano do kodu zgodnie z Prawem XIX.
+
+### 2026-06-30 — Nazwy strategii IMV-DEF niezgodne z kodem
+Kod używał 'TARCZA PRETORIANÓW' / 'MUR KONTRWYWIADU', katalog miał 'TARCZA WASH' / 'GÓRA LODOWA'. Wprowadzono dual names (rzymska + funkcja).
+
+### 2026-06-30 — Testy nieaktualne po obudzeniu neuronów
+Testy zakładały DOSTEPNY=False dla PSY i V-03. Po Fazie B/C testy failowały. Przepisano: test_futures_aktywuj_i_usypiaj, test_cvd_aktywuj_i_usypiaj, test_stan_globalny_przywrocony.
+
+### 2026-06-30 — Zbyt ostre progi w neuronach – poprawa czułości
+X-12 (BB squeeze): 4%→2.5% (BTC daily rzadko osiąga 4%). XII-07 (RSI divergence): 2.0→0.3 (sąsiadujące bary rzadko >2). A-05 (Bart pattern): 30%→10% (30% Donchiana zbyt rzadkie).
+
+### 2026-06-30 — Bezpieczeństwo klucza API DeepSeek – tylko env vars
+Klucz API DeepSeek NIGDY nie może być w kodzie ani w czacie. Powinien być przechowywany w zmiennych środowiskowych. Kod w PLAN_DEEPSEEK.md zawiera placeholder do zastąpienia.
+
+### 2026-07-10 — BIB-032 O'Hara – OCR garbage, nieindeksowany
+Książka w formacie skanowanych obrazów PDF – OCR generuje śmieci. Zgodnie z Prawem I (zero fabricacji) nie została włączona do RAG.
+
+### 2026-07-10 — Regime-stale bug – problem branżowy z pamięcią niezależną od reżimu
+Odkryto, że konkurencyjne systemy pamięci nie uwzględniają reżimu rynku, co powoduje wyciąganie nieodpowiednich lekcji (np. z hossy podczas bessy). Nasza implementacja Pamięci Reżimowej rozwiązuje to przez wymiar regime_match w scoringu.
+
 ### 2026-06-30 — Stop Hunt – wzorzec sweepu płynności
 Market makerzy pushują cenę poniżej/ponad stop lossy, zbierają płynność, a potem zawracają. Neuron StopHunt wykrywa to za pomocą Donchian channel.
 
@@ -110,23 +131,11 @@ Relatywny import z .mikro_neuron powodował błąd przy bezpośrednim uruchomien
 ### 2026-06-30 — TA-Lib wymagany przez Bramę Kalkulatora
 Brama Kalkulatora celowo odmawia startu bez TA-Lib (Prawo I). Na Windows 2026 pip install TA-Lib działa, fallback: wheels z github.com/cgohlke/talib-build.
 
-### 2026-06-30 — Mieszanie zasad Kingdom Pixel z Imperium = chaos
-Kopiowanie 79 zasad z Kingdom Pixel do Imperium powodowało konflikt. Rozwiązanie: stworzenie 14 Praw Imperium od zera, bez kontaminacji.
-
-### 2026-06-30 — Bug: loader nie działa po zmianie struktury folderów
-Po przeniesieniu modułów z płaskiej struktury do folderów rzymskich, pierwszy_zwiadowca.py szukał plików po starych nazwach. Naprawiono przez użycie względnych ścieżek do nowych lokalizacji.
-
 ### 2026-06-30 — 403 Push Permission Error
 Początkowe pushy nie działały z powodu błędnych uprawnień GitHub App. Użytkownik naprawił uprawnienia, push ostatecznie powiódł się.
 
 ### 2026-06-30 — Bug: __pycache__ śledzone w git
 Po kompilacji brama_kalkulatora.py, pliki cache zostały przypadkowo commitowane. Naprawiono przez git rm i dodanie .gitignore.
-
-### 2026-06-30 — Bug: cross-module loader po zmianie struktury folderów
-Po przeniesieniu modułów z płaskiej struktury do folderów rzymskich, loader w pierwszy_zwiadowca.py szukał starych nazw. Naprawiono przez użycie względnych ścieżek.
-
-### 2026-06-30 — OpenAlice i Hermes Agent zweryfikowane jako realne narzędzia
-OpenAlice (4600★ GitHub) i Hermes Agent (Nous Research) to rzeczywiste narzędzia AI tradingowe, a nie halucynacje. Zostały dodane do ARSENAL_IMPERIUM.md jako zweryfikowane.
 
 ### 2026-06-30 — Permutation Entropy >0.85 = chaos → NEUTRAL
 NeuronPermEntropy (N-01): PE>0.85 → NEUTRAL 'chaos', PE<0.65 → podąża za mikro-ruchem, mid → NEUTRAL niska pewność. Meta-gate nie głosuje kierunkowo przy wysokiej entropii.
@@ -140,12 +149,6 @@ BezpiecznikKrzywejKapitalu używał tylko wolnego kapitału, co fałszywie trigg
 ### 2026-06-30 — Interval normalization bug: '5m'.upper() ≠ 'M5'
 Strategie używają formatu 'M5', a interwał z backtestu po .upper() daje '5M'. Naprawiono przez _normalizuj_interwal() w baza.py konwertujące '5m'→'M5', '1h'→'H1' itd.
 
-### 2026-06-30 — CME Gap traci znaczenie od maja 2026
-CME uruchamia handel 24/7 od 29 maja 2026, co eliminuje klasyczny gap weekendowy. Strategia CME Gap staje się historyczna – należy ją oznaczyć jako IMV-EXP i przygotować archiwizację.
-
-### 2026-06-30 — TA-Lib blokerem dla 9 modułów
-Brak TA-Lib uniemożliwia uruchomienie 9 modułów systemu. Wymagane pip install TA-Lib. Zidentyfikowano jako jedyny zewnętrzny bloker.
-
 ### 2026-06-30 — TA-Lib blokerem 9 modułów
 Brak TA-Lib (pip install TA-Lib) uniemożliwia uruchomienie 9 modułów systemu. To najważniejsza zależność do odblokowania.
 
@@ -154,12 +157,6 @@ CalculatorGateway celowo odmawia startu bez TA-Lib (Prawo I - Zero halucynacji).
 
 ### 2026-06-30 — TA-Lib na Windows 10: pip install działa w 2026
 Współczesna instalacja TA-Lib na Windows jest prostsza — pip install TA-Lib często działa, fallback do wheeli z github.com/cgohlke/talib-build.
-
-### 2026-06-30 — Mieszanie zasad Kingdom Pixel z Imperium źródłem chaosu
-Root cause chaosu w poprzedniej sesji: próba kopiowania 79 zasad z Kingdom Pixel do Imperium. Rozwiązanie: stworzenie od nowa 14 Praw Imperium, zero cross-kontaminacji.
-
-### 2026-06-30 — Bug: loader szukał starych nazw po reorganizacji folderów
-Po przeniesieniu modułów do struktury rzymskich dzielnic, pierwszy_zwiadowca.py szukał plików po starych nazwach (np. CORE-006_CalculatorGateway.py) w swoim folderze. Naprawiono przez aktualizację ścieżek względnych.
 
 ### 2026-06-30 — Słabość ręcznego parametru reżimu
 Przetestowano 3 scenariusze rynkowe — system wymaga automatycznego klasyfikatora reżimu, bo ręczne ustawianie jest zawodne i nie skalowalne.

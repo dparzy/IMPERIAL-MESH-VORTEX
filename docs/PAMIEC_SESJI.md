@@ -101,6 +101,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Utrata potencjału: Klucznik ignorowany przez Dyrygenta
+Prawo XV: Klucznik obliczał strategie, ale Dyrygent ich nie używał. Naprawiono przez dodanie trybów uwzględniających strategię.
+
+### 2026-06-30 — Relative import problem solved with try/except
+Przy uruchamianiu skryptu bezpośrednio, import względny (.modul) zawodzi. Rozwiązano przez próbę względnego, a w razie błędu absolutnego.
+
+### 2026-06-30 — API key tylko w zmiennych środowiskowych
+Klucz API DeepSeek nie może być umieszczany w kodzie ani w czacie, tylko w environment variable (setx). Bezpieczeństwo.
+
+### 2026-06-30 — Prawo XV: nie dodawać neuronów z niedostępnym API
+Potwierdzono zasadę, że neurony wymagające nieistniejącego API zawsze zwracają NEUTRAL. W tej sesji dodano tylko neurony korzystające z dostępnych wskaźników (Donchian, RSI, BB).
+
 ### 2026-06-30 — Orphan key X-SC-003 (BROOKS M2B vs IMV-SC-003)
 Klucz 'BROOKS M2B' istniał w kodzie, ale katalog rejestrował go jako 'IMV-SC-003'. Wyrównano do kodu zgodnie z Prawem XIX.
 

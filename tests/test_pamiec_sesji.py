@@ -328,6 +328,35 @@ def test_dedup_rdzenie_nie_myla_roznych_tytulow():
                                 "BB Squeeze threshold 4% zbyt restrykcyjny", "opis")
 
 
+def test_dedup_lapie_parafraze_tytulu_pr122():
+    """Cubic PR #122: parafrazy tego samego tytułu (DeepSeek co przebieg formułuje inaczej)
+    scalają się dzięki progowi Jaccarda rdzeni <1.0 — bez tego rosły duplikaty w PAMIEC_SESJI."""
+    # tresc pusta izoluje Sito 3 (sam tytuł); realne lekcje dodatkowo dzielą identyfikatory.
+    assert ps.czy_duplikaty(
+        "Mieszanie zasad Kingdom Pixel z Imperium = chaos", "",
+        "Mieszanie zasad Kingdom Pixel z Imperium źródłem chaosu", "")
+    assert ps.czy_duplikaty(
+        "OpenAlice i Hermes Agent zweryfikowane jako realne narzędzia", "",
+        "OpenAlice i Hermes Agent to realne narzędzia", "")
+    assert ps.czy_duplikaty(
+        "TA-Lib blokerem dla 9 modułów", "",
+        "TA-Lib blokerem 9 modułów", "")
+
+
+def test_dedup_negacja_mimo_wysokiego_podobienstwa_tytulu():
+    """Strażnik polarności: nawet gdy Jaccard rdzeni ≥ próg, różnica na 'nie'/'bez' = lekcja
+    OBALAJĄCA, nie duplikat (relaksacja progu z PR #122 nie może scalić zaprzeczeń)."""
+    assert not ps.czy_duplikaty("Numba przyspiesza wskazniki", "szybciej",
+                                "Numba nie przyspiesza wskaznikow", "wolniej")
+    assert not ps.czy_duplikaty("Sizing bez cappingu bezpieczny", "opis",
+                                "Sizing cappingu bezpieczny", "opis")
+
+
+def test_granica_prog_rdzeni_tytulu():
+    """Próg rdzeni dobrany POMIAREM (Prawo XVI) — istnieje, w (0,1], luźniejszy niż exact-match."""
+    assert 0.0 < ps.PROG_RDZENI_TYTULU < 1.0
+
+
 def test_granica_progu_podobienstwa_dokladnie_na_progu():
     """Jaccard == PROG_PODOBIENSTWA musi być DUPLIKATEM (>=, nie >)."""
     a, b = frozenset("ABC"), frozenset("ABD")   # |∩|=2, |∪|=4 → 0.5

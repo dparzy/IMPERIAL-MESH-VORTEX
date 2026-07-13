@@ -36,10 +36,32 @@ Rehabilitacja ≠ auto-adopcja. Każda pozycja to nadal ⚠️ KANDYDAT: wpięci
 areną/A/B (ZASADA WPIĘCIA, Prawo XVIII). Zmiana jest jedna: **nie odrzucamy prawdy bez sprawdzenia.**
 Liczby wydajności z prac (np. Rank IC +18%) to twierdzenia autorów — u NAS prawdą po naszej arenie.
 
-## Do dokończenia (pozostałe pozycje do re-weryfikacji)
+## Re-weryfikacja DOKOŃCZONA (2026-07-13) — pozostałe pozycje
 
-- Fin-R1 / Agentar-Fin-R1, FinGPT (C1#2/3) — miały linki, wstępnie realne; potwierdzić aktualność.
-- RL-GNN (C1#5), agentowe: Gödel Agent, OmniAgent, Recursive Flow, Galaxy, thoughtful-agents (pip).
-- Reszta 17 propozycji wrzutni + wszelkie inne „⚠️ szukać / odrzucone jako nierealne" w docs.
+| Pozycja | Werdykt web | Źródło |
+|---|---|---|
+| **Fin-R1** (C1#2) | ✅ REALNY — 7B (Qwen2.5), 83.65% CFA | [arXiv 2503.16252](https://arxiv.org/abs/2503.16252), HF SUFE-AIFLM-Lab |
+| **FinGPT** (C1#3) | ✅ REALNY — open-source finansowy LLM | github AI4Finance-Foundation/FinGPT |
+| **Gödel Agent** | ✅ REALNY — rekurencyjna samo-poprawa (monkey-patch runtime) | [arXiv 2410.04444](https://arxiv.org/abs/2410.04444), github Arvid-pku |
+| **OmniAgent** | ✅ REALNY — 4 wymiary samoewolucji (opis DeepSeeka 1:1) | github YeQing17-2026/OmniAgent |
+| **Recursive Flow** | ✅ REALNY — serwer MCP, dekompozycja zadań | github fritzprix/recursive-flow |
+| **Galaxy** | ✅ REALNY — KoRa (proaktywny) + Kernel (meta-agent) 1:1 | [arXiv 2508.03991](https://arxiv.org/abs/2508.03991) |
+| **RL-GNN** (C1#5) | koncepcja realna (regime-aware GNN), sama nazwa niepotwierdzona | — |
+| **thoughtful-agents** (pip) | ⚠️ NIEPOTWIERDZONY jako pakiet pip — jedyny wątpliwy | — |
 
-**Zasada:** przy każdej takiej pozycji — najpierw `WebSearch` (bieżący miesiąc), potem werdykt.
+**Podsumowanie Re-Audytu:** z ~13 pozycji, które kwestionowałem — **9 potwierdzonych jako REALNE**,
+3 to realne koncepcje z niepewną nazwą (ARTEMIS/SD-FMM/RL-GNN), **1 naprawdę wątpliwa**
+(thoughtful-agents pip). Trafność DeepSeeka była WYSOKA; moja skepsa — w większości niesłuszna,
+bo nie sprawdzałem web. To dokładnie diagnoza Cezara.
+
+**Zasada stała (utrwalona w pamięci):** przy KAŻDEJ ocenie pozycji zewnętrznej — najpierw
+`WebSearch` (bieżący miesiąc), potem werdykt. Weryfikacja > pewność siebie.
+
+## Zrehabilitowani ⚠️ KANDYDACI do backlogu (nadal opt-in OFF + arena, ZASADA WPIĘCIA)
+
+Realne i wartościowe, warte rozważenia w kolejnych sesjach (NIE auto-adopcja):
+- **PandaAI** (neuro-symbolic closed-loop, Rank IC +18.2%/MDD −25.7%) — spójny z Dyrygentem+refleksją.
+- **Fin-R1 / FinGPT** — dedykowany lokalny sentyment → zdejmuje zależność NEWS-01..04 od API.
+- **Gödel Agent / OmniAgent / AgentEvolver / Galaxy / Recursive Flow** — cegiełki proaktywności/
+  samoewolucji; oceniać przez Prawo XVI (co NIE jest redundantne z tym, co mamy).
+- **ARTEMIS/ECON** (arbitrage-free) i **SD-FMM/RL-GNN** — koncepcje realne; szukać konkretnych prac.

@@ -8,6 +8,7 @@ import pytest
 
 from imperium.biblioteki.ksiega_wad_kodu import (
     WZORCE_STARTOWE,
+    CHECKLIST_STARTOWA,
     KsiegaWadKodu,
     zasiej_startowe,
 )
@@ -59,8 +60,8 @@ def test_persystencja_zapis_odczyt(tmp_path):
 def test_zasiej_startowe_idempotentne(tmp_path):
     sciezka = tmp_path / "k.jsonl"
     n1 = zasiej_startowe(sciezka)
-    assert n1 == len(WZORCE_STARTOWE)
-    n2 = zasiej_startowe(sciezka)          # drugi raz nic nie dodaje (dedup regex)
+    assert n1 == len(WZORCE_STARTOWE) + len(CHECKLIST_STARTOWA)   # wzorce + checklista
+    n2 = zasiej_startowe(sciezka)          # drugi raz nic nie dodaje (dedup regex + opis)
     assert n2 == 0
 
 
@@ -117,3 +118,62 @@ def test_wzorzec_podobienstwa_milczy_gdy_daty_wycinane():
 def test_wzorzec_cache_zyje():
     traf = [t for t in KsiegaWadKodu().skanuj(_KOD_Z_WADA_CACHE) if t["kat"] == "cache"]
     assert traf, "wzorzec 'cache' martwy — nie trafia w kod, dla którego powstał"
+
+
+# ── cubic PR#122: nowe wzorce regex (żyje + milczy) + warstwa checklisty ─────────
+
+def test_wzorzec_klucz_areny_zyje_i_milczy():
+    k = KsiegaWadKodu()
+    bug = "rek = pytaj_pomiary(rodzaj=_RODZAJ, neuron=nazwa, limit=1)"
+    fix = "rek = pytaj_pomiary(rodzaj=rodzaj, neuron=klucz, limit=1)"
+    assert any(t["kat"] == "cache" for t in k.skanuj(bug)), "wzorzec klucza areny martwy"
+    assert not any(t["kat"] == "cache" for t in k.skanuj(fix)), "fałszywy alarm na kluczu z config"
+
+
+def test_wzorzec_arg_liczbowy_zyje_i_milczy():
+    k = KsiegaWadKodu()
+    bug = 'p.add_argument("--topk", type=int, default=6)'
+    fix = 'p.add_argument("--topk", type=_topk_arg, default=6)'
+    inny = 'p.add_argument("--okno", type=int, default=250)'   # inny arg — bez walidacji OK
+    assert any(t["kat"] == "granice" for t in k.skanuj(bug)), "wzorzec --topk martwy"
+    assert not any(t["kat"] == "granice" and "kosztem" in t["lekcja"] for t in k.skanuj(fix))
+    assert not any("kosztem" in t["lekcja"] for t in k.skanuj(inny)), "nie łapiemy zwykłych argów liczbowych"
+
+
+def test_checklista_nie_auto_skanuje(tmp_path):
+    # Pozycja checklisty (pusty regex) NIE może trafiać w kod — inaczej pusty regex łapie wszystko.
+    k = KsiegaWadKodu(tmp_path / "k.jsonl")
+    assert k.dodaj_checklist("kierunek", "flip bez propagacji", "propaguj kierunek efektywny")
+    assert k.skanuj('cokolwiek = "SHORT" if x == "LONG" else "LONG"\n') == []
+    assert k.skanuj("") == []
+
+
+def test_dodaj_checklist_dedup_po_opisie(tmp_path):
+    k = KsiegaWadKodu(tmp_path / "k.jsonl")
+    assert k.dodaj_checklist("a", "ten sam opis", "l1") is True
+    assert k.dodaj_checklist("a", "ten sam opis", "l2") is False   # dedup po opisie
+    assert len(k.checklista()) == 1
+
+
+def test_dodaj_checklist_wymaga_opisu_i_lekcji(tmp_path):
+    k = KsiegaWadKodu(tmp_path / "k.jsonl")
+    with pytest.raises(ValueError):
+        k.dodaj_checklist("a", "", "lekcja")
+    with pytest.raises(ValueError):
+        k.dodaj_checklist("a", "opis", "")
+
+
+def test_zasiej_dodaje_checkliste_i_partycjonuje(tmp_path):
+    zasiej_startowe(tmp_path / "k.jsonl")
+    k = KsiegaWadKodu(tmp_path / "k.jsonl")
+    assert len(k.wzorce()) == len(WZORCE_STARTOWE)
+    assert len(k.checklista()) == len(CHECKLIST_STARTOWA)
+    assert len(k.wszystkie()) == len(WZORCE_STARTOWE) + len(CHECKLIST_STARTOWA)
+    # wzorce mają regex, checklista nie — rozłączność
+    assert all(w["regex"] for w in k.wzorce())
+    assert all(not w["regex"] for w in k.checklista())
+
+
+def test_checklist_startowa_ma_komplet_pol():
+    for c in CHECKLIST_STARTOWA:
+        assert c["opis"] and c["lekcja"] and c["kat"]

@@ -64,23 +64,36 @@ def main() -> int:
     ksiega = KsiegaWadKodu()
 
     if args.lista:
-        print(f"🐞 KSIĘGA WAD KODU — {len(ksiega.wszystkie())} wzorców:")
-        for w in ksiega.wszystkie():
+        wzorce, checklista = ksiega.wzorce(), ksiega.checklista()
+        print(f"🐞 KSIĘGA WAD KODU — {len(wzorce)} wzorców regex (auto-skan):")
+        for w in wzorce:
             print(f"   [{w['kat']}] {w['opis']}\n       → {w['lekcja']}  ({w.get('zrodlo','')})")
+        if checklista:
+            print(f"\n📋 CHECKLISTA REVIEW — {len(checklista)} klas semantycznych "
+                  "(przejrzyj ręcznie przed pushem, obok /code-review):")
+            for w in checklista:
+                print(f"   [{w['kat']}] {w['opis']}\n       → {w['lekcja']}  ({w.get('zrodlo','')})")
         return 0
 
     pliki = [ROOT / args.plik] if args.plik else _zmienione_py()
     if not pliki:
         print("🐞 Brak zmienionych plików .py do skanu.")
         return 0
+    n_check = len(ksiega.checklista())
+    przypomnienie = (f"   📋 Pamiętaj o checkliście review ({n_check} klas semantycznych): "
+                     "python narzedzia/skan_wad_kodu.py --lista" if n_check else "")
     trafienia = skanuj_pliki(pliki, ksiega)
     if not trafienia:
-        print(f"🐞 SKAN WAD KODU — czysto ✅ ({len(pliki)} plików, {len(ksiega.wszystkie())} wzorców).")
+        print(f"🐞 SKAN WAD KODU — czysto ✅ ({len(pliki)} plików, {len(ksiega.wzorce())} wzorców regex).")
+        if przypomnienie:
+            print(przypomnienie)
         return 0
     print(f"🐞 SKAN WAD KODU — {len(trafienia)} trafień (NUDGE — sprawdź, nie pewnik):")
     for p, t in trafienia:
         rel = p.relative_to(ROOT)
         print(f"   {rel}:{t['linia']}  [{t['kat']}] {t['opis']}\n       → {t['lekcja']}")
+    if przypomnienie:
+        print(przypomnienie)
     return 2
 
 

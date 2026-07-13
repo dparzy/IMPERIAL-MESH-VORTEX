@@ -66,6 +66,12 @@ def backtest(
     mierz_ic: bool = False,
     kalibruj_prog: bool = False,
     zbieraj_sygnaly: bool = False,
+    zbieraj_pelne_sygnaly: bool = False,
+    wazenie_ic: bool = False,
+    wagi_ic: "Optional[Dict[str, float]]" = None,
+    wagi_ic_prog: float = 0.0,
+    wagi_ic_skaluj: bool = True,
+    ucz_mwu_strategii: bool = False,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -95,6 +101,11 @@ def backtest(
 
     symbol = bary[0]["symbol"]
     legatus = zbuduj_legatusa(min_neuronow=5, min_przewaga=0.55, aktywuj_smc=True)
+    # W-361 A/B na P&L (opt-in, domyślnie OFF → zero zmiany zachowania). Wagi IC liczone
+    # WYŁĄCZNIE na TRAIN (poza tym backtestem) i podane z zewnątrz — zero look-ahead.
+    if wagi_ic:
+        legatus.ustaw_wagi_ic(wagi_ic, wlacz=wazenie_ic,
+                              prog_ic=wagi_ic_prog, skaluj_ic=wagi_ic_skaluj)
     budowniczy = BudowniczyWskaznikow()
     suffix = "-AUTO" if auto_rezim else ""
     engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
@@ -131,6 +142,15 @@ def backtest(
         from imperium.biblioteki.hedge_mwu import HedgeMWUzPamieciaRezimu
         mwu = HedgeMWUzPamieciaRezimu(eta=0.3, alpha_share=0.02)
 
+    # W-362 strategy-MWU (opt-in): online MWU keyed strategy_id, uczony ZREALIZOWANYM P&L
+    # zamkniętych trade'ów (atrybucja: top-strategia przy wejściu). Mnożniki wracają do
+    # Legatusa → dobór strategii waży się realnym zyskiem (naprawa luki z ANALIZA_AUTODOBOR).
+    mwu_strat = None
+    strat_pozycji: Dict[str, str] = {}
+    if ucz_mwu_strategii:
+        from imperium.biblioteki.hedge_mwu import HedgeMWU
+        mwu_strat = HedgeMWU(eta=0.3)
+
     # W-385 Pomiar IC roju (opt-in, Prawo XVI): Spearman(sygnał_neuronu_t, zwrot_{t+h}).
     # Mierzy realną przewagę predykcyjną KAŻDEGO neuronu (w tym NEWS-01..04, gdy mają feed).
     # Zero look-ahead: sygnał_t paruje z PRZYSZŁYM zwrotem; rejestr po decyzji.
@@ -144,6 +164,9 @@ def backtest(
     # tylko do POMIARU ważności po fakcie). Zasila raport_waznosci() (MDA/SFI, López de Prado).
     hist_sygnalow: List[Dict[str, str]] = []
     hist_wynikow: List[int] = []
+    # W-361 A/B na żywo: pełne SygnalNeuronu per bar (kierunek+pewnosc_finalna+waga) —
+    # potrzebne do replayu przez realny Legatus._agreguj OFF vs ON. Opt-in (pamięciożerne).
+    hist_pelne: list = []
 
     wejscia = 0
     weta = 0
@@ -171,6 +194,15 @@ def backtest(
                     mwu.zarejestruj_wynik(neuron_id, kier, zyskowny)
             legatus.ustaw_mnozniki_neuronow(mwu.mnozniki())
 
+        # 1b'. PĘTLA UCZENIA STRATEGII (W-362): rozlicz strategię, która napędziła wejście
+        # (atrybucja top-1 przy otwarciu) ZREALIZOWANYM P&L; strata binarna 0=zysk/1=strata.
+        if mwu_strat is not None and zamkniete:
+            for w in zamkniete:
+                sid = strat_pozycji.pop(w.pozycja_id, None)
+                if sid is not None:
+                    mwu_strat.aktualizuj(sid, 0.0 if w.pnl_usdt > 0 else 1.0)
+            legatus.ustaw_wagi_strategii(mwu_strat.mnozniki())
+
         # 1c. Strażnik Przewagi (W-287): tyknięcie + rozliczenie zamkniętych;
         # w HALT/sondzie-w-locie pomijamy decyzję (świadoma cisza, Prawo XV).
         if sp is not None:
@@ -194,6 +226,11 @@ def backtest(
                 glosy_pozycji[decyzja.pozycja_id] = [
                     (s.neuron_id, s.kierunek) for s in decyzja.raport.sygnaly
                     if s.kierunek in ("LONG", "SHORT")]
+            # W-362: zapamiętaj strategię, która napędziła to wejście (top-1 dopasowana)
+            if (mwu_strat is not None and decyzja.raport is not None
+                    and decyzja.raport.strategie_dopasowane):
+                strat_pozycji[decyzja.pozycja_id] = \
+                    decyzja.raport.strategie_dopasowane[0].strategia.id
         elif decyzja.etap in ("PRETORIANIE_WETO", "LEGATUS_WETO"):
             weta += 1
 
@@ -215,10 +252,15 @@ def backtest(
             hist_sygnalow.append({s.neuron_id: s.kierunek for s in decyzja.raport.sygnaly})
             nast = bary[i + 1]["close"]
             hist_wynikow.append(1 if nast > biezacy["close"] else -1)
+            # Pełne sygnały RÓWNOLEGLE do hist_wynikow (te same bary) — replay A/B (W-361).
+            if zbieraj_pelne_sygnaly:
+                hist_pelne.append(list(decyzja.raport.sygnaly))
 
     if zbieraj_sygnaly:
         engine.historia_sygnalow = hist_sygnalow
         engine.historia_wynikow = hist_wynikow
+        if zbieraj_pelne_sygnaly:
+            engine.historia_pelnych_sygnalow = hist_pelne
 
     # Pomiar IC (W-385): dołącz raport do silnika (Prawo XVI — przewaga mierzona).
     if kol_ic is not None:

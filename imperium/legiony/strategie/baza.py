@@ -230,7 +230,8 @@ def dobierz_najlepsze(strategie: List[Strategia], sygnaly: Dict[str, object],
                       rezim: str = "NORMAL", top: int = 3,
                       min_wynik: float = 0.3,
                       interwal: Optional[str] = None,
-                      stan_rynku: Optional[object] = None) -> List[DopasowanieStrategii]:
+                      stan_rynku: Optional[object] = None,
+                      wagi_strategii: Optional[Dict[str, float]] = None) -> List[DopasowanieStrategii]:
     """
     Serce wizji: z całej bazy strategii wybiera TOP najlepiej pasujące
     do bieżących sygnałów neuronów. Pomija dopasowania poniżej min_wynik.
@@ -239,9 +240,16 @@ def dobierz_najlepsze(strategie: List[Strategia], sygnaly: Dict[str, object],
                 (Timeframe-Aware: scalp M5 nie konkuruje ze swingiem 1D). Prawo XV.
     stan_rynku: opcjonalny StanRynku z RadarRynku — dynamiczny bonus/kara per styl.
                 (Opcja A: radar-aware strategy switching)
+    wagi_strategii: W-362 (opt-in) — mnożnik per strategia z online MWU uczonego
+                ZREALIZOWANYM P&L (strategy-MWU). {strategia.id: mnoznik}. Brak/1.0 =
+                zero zmiany (Prawo XV). Domyślnie None → dobór czysto strukturalny (baseline).
+                Naprawia zdiagnozowaną lukę: dobór ignorował realny zysk (ANALIZA_AUTODOBOR_STRATEGII).
     """
     kandydaci = [s for s in strategie if _interwal_pasuje(s, interwal)]
     wyniki = [dopasuj_strategie(s, sygnaly, rezim, stan_rynku) for s in kandydaci]
+    if wagi_strategii:
+        for d in wyniki:
+            d.wynik = round(d.wynik * wagi_strategii.get(d.strategia.id, 1.0), 4)
     wyniki = [d for d in wyniki if d.wynik >= min_wynik and d.kierunek != "NEUTRAL"]
     wyniki.sort(key=lambda d: d.wynik, reverse=True)
     return wyniki[:top]

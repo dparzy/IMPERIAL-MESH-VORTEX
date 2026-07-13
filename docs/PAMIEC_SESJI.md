@@ -101,6 +101,42 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — OpenAlice i Hermes Agent zweryfikowane jako realne narzędzia
+OpenAlice (4600★ GitHub) i Hermes Agent (Nous Research) to rzeczywiste narzędzia AI tradingowe, a nie halucynacje. Zostały dodane do ARSENAL_IMPERIUM.md jako zweryfikowane.
+
+### 2026-06-30 — Permutation Entropy >0.85 = chaos → NEUTRAL
+NeuronPermEntropy (N-01): PE>0.85 → NEUTRAL 'chaos', PE<0.65 → podąża za mikro-ruchem, mid → NEUTRAL niska pewność. Meta-gate nie głosuje kierunkowo przy wysokiej entropii.
+
+### 2026-06-30 — VPIN neuron nigdy nie jest kierunkowy
+NeuronToxicFlow (Z-01) zawsze zwraca NEUTRAL kierunek. Jego rola to tylko tłumienie roju przez pewnosc_przeciwnika gdy VPIN>0.7. Nigdy nie głosuje na stronę.
+
+### 2026-06-30 — kapital_calkowity = free + locked margin (true equity)
+BezpiecznikKrzywejKapitalu używał tylko wolnego kapitału, co fałszywie triggerowało REDUCED przy otwarciu pozycji (margin przechodzi free→locked). Poprawiono: kapital_calkowity = self.kapital + sum(p.kapital_zablokowany).
+
+### 2026-06-30 — Interval normalization bug: '5m'.upper() ≠ 'M5'
+Strategie używają formatu 'M5', a interwał z backtestu po .upper() daje '5M'. Naprawiono przez _normalizuj_interwal() w baza.py konwertujące '5m'→'M5', '1h'→'H1' itd.
+
+### 2026-06-30 — CME Gap traci znaczenie od maja 2026
+CME uruchamia handel 24/7 od 29 maja 2026, co eliminuje klasyczny gap weekendowy. Strategia CME Gap staje się historyczna – należy ją oznaczyć jako IMV-EXP i przygotować archiwizację.
+
+### 2026-06-30 — TA-Lib blokerem dla 9 modułów
+Brak TA-Lib uniemożliwia uruchomienie 9 modułów systemu. Wymagane pip install TA-Lib. Zidentyfikowano jako jedyny zewnętrzny bloker.
+
+### 2026-06-30 — TA-Lib blokerem 9 modułów
+Brak TA-Lib (pip install TA-Lib) uniemożliwia uruchomienie 9 modułów systemu. To najważniejsza zależność do odblokowania.
+
+### 2026-06-30 — Brama Kalkulatora wymaga TA-Lib do startu
+CalculatorGateway celowo odmawia startu bez TA-Lib (Prawo I - Zero halucynacji). Każde obliczenie logowane z SHA-256 audit stamp (Prawo XIII).
+
+### 2026-06-30 — TA-Lib na Windows 10: pip install działa w 2026
+Współczesna instalacja TA-Lib na Windows jest prostsza — pip install TA-Lib często działa, fallback do wheeli z github.com/cgohlke/talib-build.
+
+### 2026-06-30 — Mieszanie zasad Kingdom Pixel z Imperium źródłem chaosu
+Root cause chaosu w poprzedniej sesji: próba kopiowania 79 zasad z Kingdom Pixel do Imperium. Rozwiązanie: stworzenie od nowa 14 Praw Imperium, zero cross-kontaminacji.
+
+### 2026-06-30 — Bug: loader szukał starych nazw po reorganizacji folderów
+Po przeniesieniu modułów do struktury rzymskich dzielnic, pierwszy_zwiadowca.py szukał plików po starych nazwach (np. CORE-006_CalculatorGateway.py) w swoim folderze. Naprawiono przez aktualizację ścieżek względnych.
+
 ### 2026-06-30 — Słabość ręcznego parametru reżimu
 Przetestowano 3 scenariusze rynkowe — system wymaga automatycznego klasyfikatora reżimu, bo ręczne ustawianie jest zawodne i nie skalowalne.
 

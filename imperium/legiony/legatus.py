@@ -20,6 +20,35 @@ except ImportError:
 
 logger = logging.getLogger("Legatus")
 
+# W-361: kierunek neuronu → głos ∈ {+1, -1, 0} (spójne z narzedzia/hipoteza_b).
+_KIER_GLOS = {"LONG": 1, "SHORT": -1}
+
+
+def oblicz_wagi_ic(sygnaly: list, wyniki: list, min_glosow: int = 1) -> dict:
+    """
+    Kanoniczne per-neuron IC KIERUNKOWE (hipoteza B, Grinold&Kahn) — jedno źródło prawdy
+    dla ważenia w Legatusie i pomiaru offline (narzedzia/hipoteza_b reużywa tej funkcji).
+
+    sygnaly: lista barów, każdy = {neuron_id: kierunek_str ("LONG"/"SHORT"/...)}.
+    wyniki:  lista etykiet forward ∈ {+1, -1} (kierunek faktycznego ruchu) — RÓWNOLEGLE do sygnaly.
+    min_glosow: minimalna liczba głosów neuronu, by przyznać mu wagę (mniej → pomijany).
+
+    Zwraca {neuron_id: IC} gdzie IC = średnia(głos · etykieta) po barach z głosem neuronu.
+    IC ∈ [-1, 1]: znak = kierunek przewagi (ujemny → systematyczna pomyłka → głos odwracany),
+    |IC| = siła. Liczyć WYŁĄCZNIE na danych historycznych (TRAIN) — zero look-ahead.
+    """
+    suma: dict = {}
+    liczba: dict = {}
+    for mapa, etykieta in zip(sygnaly, wyniki):
+        for nid, kier in mapa.items():
+            g = _KIER_GLOS.get(kier, 0)
+            if g == 0:
+                continue
+            suma[nid] = suma.get(nid, 0.0) + g * etykieta
+            liczba[nid] = liczba.get(nid, 0) + 1
+    return {nid: suma[nid] / liczba[nid]
+            for nid in suma if liczba[nid] >= min_glosow}
+
 
 @dataclass
 class RaportLegatusa:
@@ -375,12 +404,31 @@ class Legatus:
         # Opcja A: StanRynku z RadarRynku — radar-aware strategy scoring.
         # Ustawiany przez Dyrygenta przed fokus(). None = bez radaru.
         self.stan_rynku = None
+        # W-362 strategy-MWU: mnożniki per strategia z online MWU uczonego ZREALIZOWANYM P&L.
+        # {strategia.id: mnoznik}. Puste = dobór czysto strukturalny (baseline, Prawo XV).
+        # Ustawiane przez ustaw_wagi_strategii() (z HedgeMWU keyed strategy_id). Opt-in OFF.
+        self.wagi_strategii: dict = {}
         # W-296 DriftAdapter: per-cykl override WAGI_REZIMU (antycypacyjna korekta).
         # None = bez override (używa globalnego WAGI_REZIMU). Resetować po fokus().
         self._wagi_rezimu_override: Optional[dict] = None
         # W-340 vol-gate (Jump Model zmienności): opt-in detektor persystentnej
         # turbulencji → VOLATILE. Domyślnie OFF (Prawo I: A/B na pełnym P&L pending).
         self.uzyj_vol_regime: bool = False
+        # W-361 Ważenie głosów IC (hipoteza B, Grinold&Kahn BIB-025): głos neuronu waży
+        # PROPORCJONALNIE do zmierzonego IC kierunkowego (znak koryguje — neuron mylący
+        # się systematycznie GŁOSUJE ODWROTNIE). Zwalidowane OFFLINE (+3.6pp OOS, 51.8%,
+        # narzedzia/hipoteza_b.py). Domyślnie OFF (ZASADA WPIĘCIA: opt-in, A/B na żywo
+        # zanim Cezar przełączy na sztywno). Puste wagi → zachowanie identyczne jak dziś.
+        self.wazenie_ic: bool = False
+        self.wagi_ic: dict = {}          # {neuron_id: IC_kierunkowy ∈ [-1, 1]}
+        self._domyslny_ic: float = 0.0   # IC dla neuronu bez pomiaru (0 = nie waży, jak offline)
+        # W-361b SHRINKAGE (wariant po negatywnym A/B na P&L): próg istotności |IC| —
+        # neuron z |IC| < prog zostaje na BASELINE (brak flipa, brak skalowania; szum bez
+        # wpływu, Grinold&Kahn |IC|<0.02 = szum). skaluj_ic=False → korekta TYLKO znaku
+        # (bez ×|IC|), by nie firować śmieciowych wejść przez weto. Domyślnie prog=0/skaluj=True
+        # = pierwotne zachowanie W-361 (kompatybilność wsteczna).
+        self._prog_ic: float = 0.0
+        self._skaluj_ic: bool = True
 
     def ustaw_wagi_rezimu(self, wagi: dict) -> None:
         """W-296: per-cykl override WAGI_REZIMU z DriftAdapter. Wywołaj PRZED fokus()."""
@@ -397,6 +445,77 @@ class Legatus:
         zamyka pętlę uczenia — policzone wagi faktycznie wpływają na decyzję.
         """
         self.mnozniki_neuronow = mnozniki or {}
+
+    def ustaw_wagi_strategii(self, wagi: dict) -> None:
+        """
+        W-362 strategy-MWU: aktualizuje mnożniki per strategia (z online HedgeMWU keyed
+        strategy_id, uczonego zrealizowanym P&L). Wywoływane na bieżąco po zamknięciu trade.
+        Puste/None → dobór czysto strukturalny (Prawo XV: domyślnie neutralne). Opt-in OFF.
+        """
+        self.wagi_strategii = wagi or {}
+
+    def ustaw_wagi_ic(self, wagi: dict, wlacz: bool = True,
+                      domyslny_ic: float = 0.0,
+                      prog_ic: float = 0.0, skaluj_ic: bool = True) -> None:
+        """
+        W-361: ustawia per-neuron IC kierunkowy (hipoteza B) i włącza ważenie IC.
+
+        wagi:        {neuron_id: IC_kierunkowy ∈ [-1, 1]}. Znak niesie kierunek
+                     przewagi — IC<0 → neuron myli się systematycznie, jego głos
+                     zostanie ODWRÓCONY; |IC| → siła głosu (|IC|≈0 = szum, waży ~0).
+                     Źródło: pomiar OFFLINE na TRAIN (narzedzia/hipoteza_b._ic_kierunkowy_train
+                     lub oblicz_wagi_ic() niżej) — NIGDY z bieżącego baru (zero look-ahead).
+        wlacz:       True → aktywuje ważenie (opt-in). False → tylko zapisuje wagi,
+                     zachowanie bez zmian (ZASADA WPIĘCIA: domyślnie OFF).
+        domyslny_ic: IC dla neuronu bez pomiaru. 0.0 = neuron nie waży (jak offline);
+                     >0 → nowy/niezmierzony neuron zachowuje minimalny głos.
+        prog_ic:     W-361b SHRINKAGE — próg istotności. Neuron z |IC| < prog_ic zostaje na
+                     BASELINE (bez flipa, bez skalowania). 0.0 = brak progu (stare W-361).
+                     Sensowne ~0.02–0.05 (Grinold&Kahn: |IC|<0.02 = szum).
+        skaluj_ic:   True → wkład ×|IC| (pierwotne W-361). False → korekta TYLKO znaku
+                     (zaufany neuron głosuje w kierunku IC z wagą BASELINE — nie firuje
+                     śmieciowych wejść przez weto, lek na negatywny A/B P&L).
+        """
+        self.wagi_ic = wagi or {}
+        self.wazenie_ic = bool(wlacz) and bool(self.wagi_ic)
+        self._domyslny_ic = domyslny_ic
+        self._prog_ic = prog_ic
+        self._skaluj_ic = skaluj_ic
+
+    def resetuj_wazenie_ic(self) -> None:
+        """Wyłącza ważenie IC — rój wraca do agregacji bazowej (równa waga × reżim)."""
+        self.wazenie_ic = False
+
+    def _wklady_kierunkowe(self, sygnaly: List[SygnalNeuronu]) -> list:
+        """
+        W-361: dla każdego sygnału kierunkowego zwraca (sygnal, kierunek_efektywny, wklad).
+
+        OFF (domyślnie) → kierunek_efektywny = s.kierunek, wklad = pewnosc_finalna × waga
+        (identyczne z zachowaniem sprzed W-361 — Prawo XV: brak zmiany domyślnej ścieżki).
+
+        ON → wklad przemnożony przez |IC|, a przy IC<0 kierunek ODWRÓCONY (neuron mylący
+        się systematycznie głosuje na przeciwną stronę — Grinold&Kahn, hipoteza B).
+        IC=0 lub brak pomiaru (domyslny_ic=0) → wklad 0: neuron nie wpływa na agregat.
+
+        W-361b SHRINKAGE: neuron z |IC| < prog_ic zostaje na BASELINE (bez flipa/skalowania —
+        szum nie zmienia głosu). skaluj_ic=False → korekta samego znaku, wkład bez ×|IC|.
+        """
+        wazenie = self.wazenie_ic and bool(self.wagi_ic)
+        out = []
+        for s in sygnaly:
+            if s.kierunek not in ("LONG", "SHORT"):
+                continue
+            kier = s.kierunek
+            wklad = s.pewnosc_finalna * s.waga
+            if wazenie:
+                ic = self.wagi_ic.get(s.neuron_id, self._domyslny_ic)
+                if abs(ic) >= self._prog_ic:      # istotny IC — koryguj (poniżej progu: baseline)
+                    if ic < 0:
+                        kier = "SHORT" if kier == "LONG" else "LONG"
+                    if self._skaluj_ic:
+                        wklad *= abs(ic)
+            out.append((s, kier, wklad))
+        return out
 
     # ── Tryb FOKUS ─────────────────────────────────────────────────────────────
 
@@ -521,11 +640,15 @@ class Legatus:
                  sygnaly: List[SygnalNeuronu],
                  rezim_zrodlo: str = "manual",
                  interwal: str = "") -> RaportLegatusa:
-        long_s  = [s for s in sygnaly if s.kierunek == "LONG"]
-        short_s = [s for s in sygnaly if s.kierunek == "SHORT"]
+        # W-361: wkłady kierunkowe (ważenie IC opt-in — OFF domyślnie = stare zachowanie).
+        # Kierunek EFEKTYWNY (po ew. odwróceniu znakiem IC) definiuje buckety — spójne
+        # w dół (synapsy, zgodnych_neuronow) czytają realny głos po korekcie.
+        wklady = self._wklady_kierunkowe(sygnaly)
+        long_s  = [s for s, k, _ in wklady if k == "LONG"]
+        short_s = [s for s, k, _ in wklady if k == "SHORT"]
 
-        sila_l = sum(s.pewnosc_finalna * s.waga for s in long_s)
-        sila_s = sum(s.pewnosc_finalna * s.waga for s in short_s)
+        sila_l = sum(w for _, k, w in wklady if k == "LONG")
+        sila_s = sum(w for _, k, w in wklady if k == "SHORT")
         razem  = sila_l + sila_s + 1e-9
 
         prev_l = sila_l / razem
@@ -597,7 +720,8 @@ class Legatus:
             from imperium.legiony.strategie.baza import dobierz_najlepsze
             mapa = {s.neuron_id: s for s in sygnaly}
             return dobierz_najlepsze(self.strategie, mapa, rezim=rezim, top=3,
-                                     interwal=interwal, stan_rynku=self.stan_rynku)
+                                     interwal=interwal, stan_rynku=self.stan_rynku,
+                                     wagi_strategii=self.wagi_strategii or None)
         except Exception as e:
             logger.error(f"[Legatus] Dobieranie strategii padło: {e}")
             return []

@@ -43,12 +43,16 @@ def _napraw_zepsuty_cert_env() -> None:
 class GlosImperium:
     """Most do DeepSeek. Jedyne wejście LLM w Imperium."""
 
+    # Migracja V4 (potwierdzone api-docs.deepseek.com, 2026): legacy `deepseek-chat` i
+    # `deepseek-reasoner` WYCOFANE 2026-07-24 → nowe id V4. base_url bez zmian.
+    #   deepseek-chat     → deepseek-v4-flash (non-thinking, tani ~$0.14/1M in)
+    #   deepseek-reasoner → deepseek-v4-flash thinking / deepseek-v4-pro (premium)
     MODELE = {
-        "szybki": "deepseek-chat",     # tani, do debaty Senatu
-        "mysliciel": "deepseek-reasoner",  # droższy, do decyzji Cesarza
+        "szybki": "deepseek-v4-flash",   # tani, do debaty Senatu + zwiad Bibliotekarza
+        "mysliciel": "deepseek-v4-pro",  # premium reasoning, do decyzji Cesarza
     }
 
-    def __init__(self, model: str = "deepseek-chat"):
+    def __init__(self, model: str = "deepseek-v4-flash"):
         klucz = os.getenv("DEEPSEEK_API_KEY")
         if not klucz:
             raise EnvironmentError(

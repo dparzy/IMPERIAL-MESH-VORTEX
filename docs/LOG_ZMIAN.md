@@ -6,6 +6,262 @@
 
 ---
 
+## 2026-07-13 | 🔎 | Re-Audyt weryfikacyjny — korekta błędnych odrzuceń (brak weryfikacji web)
+
+**Cezar wskazał głęboki błąd procesu:** oceniałem pomysły/opcje BEZ weryfikacji najświeższych
+informacji z internetu → **odrzucałem/wątpiłem w REALNE rzeczy** (prace 2025-2026, po moim cutoffie
+ze stycznia 2026). Skutek: audyty niekompletne, prawdziwe opcje błędnie skasowane. NAPRAWA:
+
+**Korekty potwierdzone web (`docs/RE_AUDYT_WERYFIKACYJNY_2026-07-13.md`):**
+- `deepseek-v4-flash` — ❌ „halucynacja" → ✅ REALNY (legacy retire 07-24, migracja zrobiona).
+- **PandaAI** — ⚠️ „liczby niepewne" → ✅ REALNY, [arXiv 2606.06823], Rank IC +18.2%/MDD −25.7% DOKŁADNIE.
+- **AgentEvolver** — ⚠️ „nieweryfikowalne" → ✅ REALNY, [arXiv 2511.10395], github modelscope.
+- ARTEMIS/SD-FMM — koncepcje realne (neural-SDE bez arbitrażu / GNN manipulacja), nazwy niepewne.
+
+**Zasada stała (pamięć):** ZAWSZE `WebSearch` (bieżący miesiąc) PRZED oceną — modele/API/arXiv/wersje.
+Rehabilitacja ≠ auto-adopcja: pozycje nadal ⚠️ KANDYDACI → opt-in OFF + arena (ZASADA WPIĘCIA).
+Do dokończenia: Fin-R1/FinGPT, RL-GNN, Gödel/OmniAgent/Recursive Flow/Galaxy/thoughtful-agents.
+
+**Pliki:** `docs/RE_AUDYT_WERYFIKACYJNY_2026-07-13.md` (nowy), `docs/INDEKS_IMPERIUM.md` (#63).
+
+---
+
+## 2026-07-13 | 🔧 | Migracja DeepSeek V4 — legacy deepseek-chat/reasoner wycofane 2026-07-24
+
+**Pilna naprawa (Prawo XV — antykruchość przed awarią).** Cezar wskazał, a weryfikacja web
+potwierdziła (api-docs.deepseek.com): nazwy `deepseek-chat` i `deepseek-reasoner` **wycofywane
+2026-07-24** (za 11 dni). Nasz `deepseek_glos.py` (zasila NEWS-01..04, PamięćRefleksyjną,
+auto-lekcję, Bibliotekarza W-363) używał ich → padłoby.
+
+**Mapowanie (oficjalne):** `deepseek-chat`→`deepseek-v4-flash` (non-thinking, tani ~$0.14/1M),
+`deepseek-reasoner`→`deepseek-v4-flash` thinking / `deepseek-v4-pro` (premium). base_url bez zmian.
+
+**Zmiana:** `GlosImperium.MODELE` = {szybki: deepseek-v4-flash, mysliciel: deepseek-v4-pro},
+default `deepseek-v4-flash`. Callery (auto_lekcja, bibliotekarz) na domyślny model (DRY — następna
+migracja ruszy tylko słownik). Komentarz w sentyment.py zaktualizowany.
+
+**Lekcja (pamięć):** oceniłem v4-flash jako halucynację z przeterminowanej pamięci — błąd. Zasada
+stała Cezara: ZAWSZE weryfikuj najświeższe info z web PRZED oceną (modele/wersje po cutoffie).
+
+**Pliki:** `imperium/cesarz/deepseek_glos.py`, `narzedzia/auto_lekcja.py`, `narzedzia/bibliotekarz.py`,
+`imperium/legiony/neurony/sentyment.py`.
+
+---
+
+## 2026-07-13 | ✅ | W-362 strategy-MWU A/B na P&L: ZIELONY (+63pp) — kandydat do flagi
+
+**Walidacja ① z sekwencji Cezara — POZYTYWNA (pierwsza tej sesji).** A/B na P&L (`ab_strategy_mwu.py`,
+tryb=strategia, 15 par 4h, 3000 barów): OFF = dobór strukturalny, ON = + online strategy-MWU.
+
+**Wynik: PORTFEL OFF=−64.7% → ON=−1.8%, Δ=+63.0pp. ON>OFF na 11/15 par.** Wielkie pary mocno
+dodatnie: ETH −13.3→+0.4, BNB −5.5→+7.2, BTC −18.3→−7.0, ADA −9.8→+0.8, NEAR −6.4→+4.2. Ujemne
+tylko 4 małe (AVAX −0.8, LTC −1.1, ATOM −2.6, TRX −4.4). ✅ Werdykt: ważenie strategii realnym P&L
+LECZY routing (w przeciwieństwie do W-361 IC, które padło na P&L).
+
+**Zastrzeżenie (Prawo I):** ON wciąż −1.8% (poniżej progu zysku) w tym oknie — to +63pp POPRAWA
+nad baseline strategia, nie maszyna do zysku. Ale mechanizm zwalidowany → kandydat do włączenia
+flagi `ucz_mwu_strategii` na żywo — decyzja Cezara (Prawo XVIII). Flaga nadal OFF.
+
+---
+
+## 2026-07-13 | 📚 | W-363 Bibliotekarz-Zwiadowca: DeepSeek skanuje bibliotekę (pod nadzorem Opusa)
+
+**Prośba Cezara — jeden z pomysłów z rozmowy DeepSeek (wrzutnia/Mapa-kluczy calosc plus.md):
+DeepSeek jako bibliotekarz pod nadzorem Claude.** Operacjonalizacja ZASADY ZWIADOWCY WIEDZY
+(dwa modele: tani DeepSeek proponuje, Opus rozstrzyga).
+
+**Ocena rozmowy DeepSeek (Prawo I) — SKORYGOWANA po weryfikacji web (2026-07-13):** dobra intuicja
+(proaktywność/ciekawość/bibliotekarz). Nieścisłości: `claude-3.7-sonnet` (przestarzałe), zmyślony
+format `.claude/settings.json agents/skills`, `imperium-push` z git push (łamie zasadę), wymyślony
+`czat_deepseek.py`. ⚠️ **KOREKTA MOJEGO BŁĘDU:** wstępnie nazwałem `deepseek-v4-flash` halucynacją —
+NIEPRAWDA, to REALNY model (wydany 2026-04-24, po moim cutoffie; api-docs.deepseek.com). Oceniłem
+z przeterminowanej pamięci bez sprawdzenia web. Nowa zasada stała (pamięć): ZAWSZE weryfikuj
+najświeższe info z internetu PRZED oceną. Większość „duszy" JUŻ mamy (auto-naprawa, samoewolucja,
+14-warstwowa pamięć). Cenne jądro: bibliotekarz = nasza doktryna.
+
+**Build (`narzedzia/bibliotekarz.py`, W-363):**
+- REUŻYCIE: `imperium.cesarz.deepseek_glos.GlosImperium` (deepseek-v4-flash — po migracji V4) +
+  `narzedzia/rag/szukaj.szukaj` (RAG biblioteki). Zero duplikacji (Prawo XVI).
+- Pętla: temat → RAG (fragmenty z BIB-xxx) → DeepSeek proponuje 1-4 KANDYDATÓW (nazwa/typ/
+  mechanizm/JAK ZMIERZYĆ, z cytatem źródła) → zapis cząstki do kolejki JSONL. Cząstkowane,
+  pasek postępu (Prawo XXIV), dry-run bez kosztu API.
+- **Dyscyplina (system prompt):** proponuj TYLKO z fragmentów, cytuj BIB, każdy = HIPOTEZA,
+  podaj dowód-pomiaru, nie konfabuluj. Kolejka gitignored (surowy output = artefakt runtime).
+
+**Pierwszy zwiad (temat „mean reversion") + WERDYKT SĘDZIEGO (Opus):** DeepSeek dał 4 kandydatów
+(Chan/Narang/Hull/Kaufman). Odsiane: ① Vasicek (stopy proc., Hull) = off-target dla crypto.
+Zachowane ⚠️: ② cross-sectional MR pairs (częściowo redundant z C-01), ③ MR z filtrem ekstremów
+(spójny z vol-gate/Z), ④ MR-vs-trend wg reżimu (= nasz kierunek Namiestnik/strategy-MWU). Dowód,
+po co dwa modele: zwiadowca sam przepuściłby Vasicka.
+
+**Status:** narzędzie on-demand (opt-in). Harmonogram/autonomia = decyzja Cezara (ZASADA MCP/hooki).
+Każdy kandydat ⚠️ — do kodu tylko po weryfikacji Opusa + arenie (Prawo I, ZASADA WPIĘCIA).
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py` (+4), `.gitignore`.
+
+---
+
+## 2026-07-13 | 🎯 | W-362 strategy-MWU: dobór strategii ważony realnym P&L (opt-in OFF)
+
+**Opcja 2 z sekwencji Cezara — build + tooling walidacyjne.** Poprzedzone zwiadem wiedzy
+(`docs/ANALIZA_AUTODOBOR_STRATEGII_2026-07-13.md`): 5 kandydatów metod auto-doboru; wybrany
+① strategy-MWU jako najwyższa dźwignia × najmniejsze ryzyko × reużycie kodu.
+
+**Zdiagnozowana luka:** `dobierz_najlepsze` dobierał strategie czysto STRUKTURALNIE (zgodność
+sygnałów × filtr × reżim × radar) — IGNOROWAŁ zrealizowany P&L. Smoke (BTC 1500 barów) pokazał,
+że routing przez strategie potrafi mocno szkodzić (agregat +16.5% vs strategia −7.0%).
+
+**Build ① (opt-in OFF — ZASADA WPIĘCIA):**
+- `baza.dobierz_najlepsze(..., wagi_strategii)` — mnożnik per strategia wchodzi w wynik doboru
+  (down-weight wypycha poniżej min_wynik). Brak wag = baseline (zero zmiany, Prawo XV).
+- `Legatus.ustaw_wagi_strategii()` + pole `wagi_strategii` → przekazane do `_dobierz_strategie`.
+- `backtest(ucz_mwu_strategii=True)` — online `HedgeMWU` keyed strategy_id (REUŻYCIE hedge_mwu.py,
+  nie duplikat): atrybucja top-1 strategii przy wejściu → `aktualizuj(sid, 0/1)` na zamknięciu
+  (strata binarna z P&L) → `mnozniki()` wracają do Legatusa. Domyślnie OFF (zero zmiany ścieżki).
+
+**Tooling walidacyjne:**
+- `narzedzia/ab_tryb_strategii.py` — A/B warstwy: agregat vs filtr vs strategia (P&L, cząstkowany,
+  arena `ab_tryb_strat`, pasek postępu). Cząstkowy (7/15, 6000 barów): PORTFEL agregat −33.3%
+  bije filtr −56.7% i strategia −38.4% → statyczny routing szkodzi (motywacja dla ①).
+- `narzedzia/ab_strategy_mwu.py` — A/B ①: tryb strategia OFF-mwu vs ON-mwu (P&L; MWU online →
+  bez podziału train/test, zero look-ahead; arena `ab_strat_mwu_<tryb>`). Werdykt pending.
+
+**Status flag: OFF.** Wszystkie werdykty (2a warstwa + A/B strategy-MWU na P&L) czekają na pomiar —
+flagę na sztywno przełącza Cezar po zielonym A/B (Prawo XVIII). Kandydat, nie prawda (Prawo I).
+
+**Testy:** `tests/test_strategy_mwu.py` (+7), `tests/test_ab_tryb_strategii.py` (+3) — Reguła
+Test-Granic (waga w progu doboru, opt-in OFF, round-trip areny).
+
+**Pliki:** `imperium/legiony/strategie/baza.py`, `imperium/legiony/legatus.py`,
+`imperium/koloseum/backtest.py`, `narzedzia/ab_tryb_strategii.py`, `tests/*`.
+
+---
+
+## 2026-07-13 | 🔬 | W-361b SHRINKAGE: próg |IC| ratuje 122pp, ale wciąż < baseline — OFF
+
+**Wariant naprawczy po negatywnym A/B P&L (opcja 1 z sekwencji Cezara).** Diagnoza z poprzedniego
+biegu: naiwne ON firowało 781 vs 483 transakcji (win-rate ~30–40%) przez (a) odwracanie znaku na
+SZUMOWYCH |IC| i (b) ×|IC| przepuszczające śmieciowe wejścia przez weto. Lek: **próg istotności
+|IC|** (neuron z |IC|<prog zostaje na baseline — bez flipa/skalowania) + tryb **tylko-znak**
+(korekta kierunku bez ×|IC|, by nie firować nadmiaru wejść). Grinold&Kahn: |IC|<0.02 = szum.
+
+**Implementacja:** `Legatus.ustaw_wagi_ic(..., prog_ic, skaluj_ic)` + `_wklady_kierunkowe`
+(warunek `abs(ic) >= prog_ic`); prog=0/skaluj=True = pierwotne W-361 (kompat wsteczna, testy zielone).
+Opt-in przez backtest (`wagi_ic_prog`/`wagi_ic_skaluj`) + harness `--prog-ic`/`--bez-skali`
+(osobny rodzaj areny `ab_pnl_ic_p030_s0` — nie miesza z baseline).
+
+**Wynik (15 par 4h, prog|IC|≥0.03, tylko-znak):**
+- **PORTFEL: OFF=+34.1% → ON=+7.2%, Δ=−26.8pp.** Shrinkage odzyskał ~122pp vs naiwne ON (−114.9%).
+- ON>OFF na **5/15** par (było 3/15); transakcje 396 vs 483 OFF (naiwne było 781) — over-firing naprawiony.
+- **Wzorzec warunkowy:** ON WYGRYWA tam, gdzie OFF słaby/ujemny (ADA −3.8%→+15.4%, NEAR, DOT, LTC),
+  a PRZEGRYWA gdzie OFF mocny (ETH +18→+1.6, XRP +14.4→+3.7, MATIC +10.3→−0.6).
+
+**Decyzja (Prawo I+XV): flaga zostaje OFF.** Shrinkage potwierdził diagnozę i uratował moduł
+przed katastrofą, ale UNIFORM ważenie IC nadal nie bije baseline w kasie — nie wpinamy.
+
+**Hipoteza na przyszłość (nie realizowana bez decyzji Cezara):** wzorzec „ON pomaga słabym parom,
+szkodzi mocnym" sugeruje WARUNKOWE stosowanie (per-para/per-reżim, wg jakości bazowej roju) —
+ale to ryzyko przeuczenia doboru par; osobna hipoteza, osobny A/B. Na teraz: temat ważenia IC
+zamknięty jako OFF.
+
+**Pliki:** `imperium/legiony/legatus.py` (prog_ic/skaluj_ic), `imperium/koloseum/backtest.py`
+(opt-in), `narzedzia/ab_pnl_wazenie_ic.py` (--prog-ic/--bez-skali), `tests/test_wazenie_ic.py` (+5).
+
+---
+
+## 2026-07-13 | ❌ | W-361 A/B na P&L: ważenie IC NIE poprawia zysku — flaga zostaje OFF
+
+**Rozstrzygający pomiar (ZASADA WPIĘCIA — walidacja korzyści na realnych danych = P&L, nie proxy).**
+Poprzedni A/B mierzył SAM ZNAK agregatu (weto OFF): +3.3pp OOS. To metryka-proxy. Tu zmierzono
+rzecz, która NAPRAWDĘ decyduje: P&L pełnego backtestu OFF vs ON (weto 0.55 + sizing + SL aktywne).
+
+**Metoda:** nowy harness `narzedzia/ab_pnl_wazenie_ic.py` — split TRAIN/TEST, IC z TRAIN
+(kanoniczna `oblicz_wagi_ic`), pełny backtest na TEST 2× (flaga `wazenie_ic` przez nowy opt-in
+w `backtest()`: `wazenie_ic`/`wagi_ic` → `legatus.ustaw_wagi_ic`). Metryki: zwrot %/win-rate/PF.
+Cząstki → arena (`ab_pnl_ic`), wznawialne, pasek postępu (Prawo XXIV).
+
+**Wynik (15 par 4h, frac=0.6, cap 6000):**
+- **PORTFEL (suma zwrotów): OFF=+34.1% → ON=−114.9%, Δ=−149pp.** ON>OFF tylko na **3/15** par.
+- Pary z dużym OOS (te „najlepsze" w teście znaku) są w P&L KATASTROFALNE: ETH +18.0%→−16.1%,
+  XRP +14.4%→−17.7%, BNB −1.8%→−20.3%, ADA −3.8%→−12.4%.
+- **ON firuje dużo więcej transakcji (781 vs 483), win-rate ~30–40%.** Przyczyna: odwracanie
+  znaku przy SZUMOWYCH |IC| (Grinold&Kahn: |IC|<0.02 = szum) przepuszcza masę słabych,
+  przeciwtrendowych wejść przez weto 0.55. Przewaga +3.3pp na surowym znaku znika po sizingu.
+
+**Decyzja (Prawo I + XV): flaga `wazenie_ic` zostaje OFF, NIE wpinamy w runtime.** Moduł jest
+zwalidowany jako NIEkorzystny w kasie — zostaje dostępny (opt-in), ale wyłączony. Wartość tej
+sesji to NEGATYWNY wynik, który uchronił P&L przed wdrożeniem szkodliwego modułu.
+
+**Hipoteza na przyszłość (nie realizowana bez decyzji Cezara):** naiwne odwracanie znaku IC
+przeucza na szumie — wariant z SHRINKAGE/progiem |IC| (waż/odwracaj tylko przy istotnym IC)
+mógłby zachować przewagę bez firowania śmieciowych wejść. Osobna hipoteza, osobny A/B na P&L.
+
+**Pliki:** `imperium/koloseum/backtest.py` (opt-in `wazenie_ic`/`wagi_ic`),
+`narzedzia/ab_pnl_wazenie_ic.py`, `tests/test_ab_pnl_wazenie_ic.py` (+11), `docs/SCIAGA_LOKAL.md`.
+
+---
+
+## 2026-07-12 | ⚖️ | W-361 A/B na żywo: ważenie IC potwierdzone na REALNYM Legatusie
+
+**Walidacja P1 (ZASADA WPIĘCIA — pomiar przed włączeniem flagi).** Nowy harness
+`narzedzia/ab_wazenie_ic.py` porównuje `Legatus._agreguj` OFF vs ON na OOS — na PRAWDZIWEJ
+ścieżce decyzyjnej (wagi reżimowe już wliczone w `pewnosc_finalna·waga`), nie na uproszczonym
+agregatorze jak offline `hipoteza_b`.
+
+**Metoda (OOS, zero look-ahead):** backtest z nowym opt-in `zbieraj_pelne_sygnaly=True` zbiera
+pełne `SygnalNeuronu` per bar (równolegle do etykiet forward). IC kierunkowy liczony na TRAIN
+(kanoniczna `oblicz_wagi_ic`), replay TEST-barów przez Legatus dwa razy (OFF / ON). Cząstkowanie:
+każda para → `arena_wyniki.db` (rodzaj `ab_wazenie_ic`) przed następną, restart pomija policzone,
+pasek postępu na stderr (ZASADA ANALIZY CZĄSTKOWEJ + Prawo XXIV).
+
+**Wynik (15 par 4h, frac=0.6, max 6000 barów):**
+- **GLOBALNIE (ważone barami OOS): OFF=48.6% → ON=51.8%, Δ=+3.3pp** — niemal replika offline (+3.6pp).
+- **ON > OFF na 12/15 parach.** Wszystkie 5 par z dużym OOS (2300 barów) dodatnie:
+  ETH +5.8, ADA +4.0, BTC +3.9, XRP +2.6, BNB +2.1.
+- Ujemne/płaskie (SOL −7.3, NEAR −0.3, MATIC 0.0) — wyłącznie małe próbki 300 barów (szum).
+- ✅ Werdykt harnessu: ważenie IC leczy realny Legatus (ON>OFF i ON>50% OOS).
+
+**Status flagi:** nadal **OFF** — włączenie na sztywno to decyzja Cezara (Prawo XVIII). Efekt
+realny, ale umiarkowany (ON ledwie >50%); wiarygodny sygnał niosą pary z dużym OOS.
+
+**Pliki:** `imperium/koloseum/backtest.py` (opt-in `zbieraj_pelne_sygnaly`),
+`narzedzia/ab_wazenie_ic.py`, `tests/test_ab_wazenie_ic.py` (+9), `docs/SCIAGA_LOKAL.md`.
+
+---
+
+## 2026-07-12 | ⚖️ | W-361: ważenie głosów IC w Legatusie (hipoteza B, opt-in OFF)
+
+**Build P1 — wpięcie ważenia IC w agregację Legatusa (ZASADA WPIĘCIA: opt-in domyślnie OFF).**
+
+**Kontekst (Prawo I, pomiar):** diagnoza triady (2026-07-06) — skill SIEDZI w neuronach
+(stabilny IC), GINIE w agregacji przy równej wadze (base acc 48.3% < 50%). `narzedzia/hipoteza_b.py`
+zwalidował OFFLINE (OOS, 5 par 4h): agregat ważony IC = **51.8%**, bije równą wagę o **+3.6pp**
+i przekracza 50% na KAŻDEJ z 5 par. Grinold & Kahn (BIB-025): sygnał = Σ IC_i · głos_i.
+
+**Co wchodzi (`imperium/legiony/legatus.py`):**
+- `oblicz_wagi_ic(sygnaly, wyniki, min_glosow)` — kanoniczne per-neuron IC KIERUNKOWE
+  (jedno źródło prawdy; `narzedzia/hipoteza_b._ic_kierunkowy_train` teraz je REUŻYWA, nie duplikuje).
+- `Legatus.ustaw_wagi_ic(wagi, wlacz=True, domyslny_ic=0.0)` + `resetuj_wazenie_ic()` + flagi
+  `wazenie_ic`/`wagi_ic`/`_domyslny_ic`.
+- `_wklady_kierunkowe(sygnaly)` — wspólna warstwa: OFF → wkład = `pewnosc_finalna×waga`
+  (identyczne ze starym `_agreguj`); ON → ×|IC|, a przy **IC<0 kierunek ODWRÓCONY** (neuron
+  mylący się systematycznie głosuje na przeciwną stronę). Buckety long/short liczone z kierunku
+  EFEKTYWNEGO → synapsy i `zgodnych_neuronow` spójne z korektą.
+
+**Bezpieczeństwo (ZASADA WPIĘCIA):** domyślnie OFF — samo dodanie modułu NIE zmienia decyzji.
+IC=0 / brak pomiaru (`domyslny_ic=0`) → neuron nie waży (nie wpada w przeciwny kierunek przez
+pomyłkę). Puste wagi → guard traktuje jak OFF. Włączenie na żywo = decyzja Cezara po A/B (Prawo XVIII).
+
+**Testy:** `tests/test_wazenie_ic.py` (+20, Reguła Test-Granic): OFF=regresja, jednorodne IC
+nie zmienia kierunku, stałe IC znosi się w normalizacji, IC<0 flip, IC=0 wyciszenie,
+brak-pomiaru×domyslny, guardy setterów, kanoniczna `oblicz_wagi_ic` (znak/abstynencja/min_głosów/pusty).
+
+**Następny krok:** A/B na żywo (pełny pipeline Legatusa OFF vs ON na OOS) — dopiero zielony wynik
+uzasadni przełączenie flagi. Pliki: `imperium/legiony/legatus.py`, `narzedzia/hipoteza_b.py`,
+`tests/test_wazenie_ic.py`.
+
+---
+
 ## 2026-07-12 | 🪞 | Refleksja: sprzeczności tylko ze źródeł statusowych (20→0 fałszywych)
 
 Sesja lokalna, lista P0 krok po kroku. Trzy fixy tego dnia:

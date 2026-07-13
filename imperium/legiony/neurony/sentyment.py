@@ -10,7 +10,7 @@ DOSTĘPNOŚĆ (Faza D — obudzony przez AdapterNewsLLM):
   W trybie live/paper adapter dolewa NEWS_SENTYMENT (-1..+1) → neuron głosuje.
 
 ZASADA PEŁNEGO OPISU (ZPO):
-  LLM = Large Language Model (DeepSeek deepseek-chat). NIE liczy matematyki —
+  LLM = Large Language Model (DeepSeek deepseek-v4-flash). NIE liczy matematyki —
   tylko KLASYFIKUJE wydźwięk nagłówków (Prawo I). Adapter mapuje werdykt LLM
   na liczbę NEWS_SENTYMENT, neuron ją interpretuje (kierunek + pewność).
 

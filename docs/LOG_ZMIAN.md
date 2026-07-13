@@ -6,6 +6,101 @@
 
 ---
 
+## 2026-07-13 | 🔎 | Re-Audyt weryfikacyjny — korekta błędnych odrzuceń (brak weryfikacji web)
+
+**Cezar wskazał głęboki błąd procesu:** oceniałem pomysły/opcje BEZ weryfikacji najświeższych
+informacji z internetu → **odrzucałem/wątpiłem w REALNE rzeczy** (prace 2025-2026, po moim cutoffie
+ze stycznia 2026). Skutek: audyty niekompletne, prawdziwe opcje błędnie skasowane. NAPRAWA:
+
+**Korekty potwierdzone web (`docs/RE_AUDYT_WERYFIKACYJNY_2026-07-13.md`):**
+- `deepseek-v4-flash` — ❌ „halucynacja" → ✅ REALNY (legacy retire 07-24, migracja zrobiona).
+- **PandaAI** — ⚠️ „liczby niepewne" → ✅ REALNY, [arXiv 2606.06823], Rank IC +18.2%/MDD −25.7% DOKŁADNIE.
+- **AgentEvolver** — ⚠️ „nieweryfikowalne" → ✅ REALNY, [arXiv 2511.10395], github modelscope.
+- ARTEMIS/SD-FMM — koncepcje realne (neural-SDE bez arbitrażu / GNN manipulacja), nazwy niepewne.
+
+**Zasada stała (pamięć):** ZAWSZE `WebSearch` (bieżący miesiąc) PRZED oceną — modele/API/arXiv/wersje.
+Rehabilitacja ≠ auto-adopcja: pozycje nadal ⚠️ KANDYDACI → opt-in OFF + arena (ZASADA WPIĘCIA).
+Do dokończenia: Fin-R1/FinGPT, RL-GNN, Gödel/OmniAgent/Recursive Flow/Galaxy/thoughtful-agents.
+
+**Pliki:** `docs/RE_AUDYT_WERYFIKACYJNY_2026-07-13.md` (nowy), `docs/INDEKS_IMPERIUM.md` (#63).
+
+---
+
+## 2026-07-13 | 🔧 | Migracja DeepSeek V4 — legacy deepseek-chat/reasoner wycofane 2026-07-24
+
+**Pilna naprawa (Prawo XV — antykruchość przed awarią).** Cezar wskazał, a weryfikacja web
+potwierdziła (api-docs.deepseek.com): nazwy `deepseek-chat` i `deepseek-reasoner` **wycofywane
+2026-07-24** (za 11 dni). Nasz `deepseek_glos.py` (zasila NEWS-01..04, PamięćRefleksyjną,
+auto-lekcję, Bibliotekarza W-363) używał ich → padłoby.
+
+**Mapowanie (oficjalne):** `deepseek-chat`→`deepseek-v4-flash` (non-thinking, tani ~$0.14/1M),
+`deepseek-reasoner`→`deepseek-v4-flash` thinking / `deepseek-v4-pro` (premium). base_url bez zmian.
+
+**Zmiana:** `GlosImperium.MODELE` = {szybki: deepseek-v4-flash, mysliciel: deepseek-v4-pro},
+default `deepseek-v4-flash`. Callery (auto_lekcja, bibliotekarz) na domyślny model (DRY — następna
+migracja ruszy tylko słownik). Komentarz w sentyment.py zaktualizowany.
+
+**Lekcja (pamięć):** oceniłem v4-flash jako halucynację z przeterminowanej pamięci — błąd. Zasada
+stała Cezara: ZAWSZE weryfikuj najświeższe info z web PRZED oceną (modele/wersje po cutoffie).
+
+**Pliki:** `imperium/cesarz/deepseek_glos.py`, `narzedzia/auto_lekcja.py`, `narzedzia/bibliotekarz.py`,
+`imperium/legiony/neurony/sentyment.py`.
+
+---
+
+## 2026-07-13 | ✅ | W-362 strategy-MWU A/B na P&L: ZIELONY (+63pp) — kandydat do flagi
+
+**Walidacja ① z sekwencji Cezara — POZYTYWNA (pierwsza tej sesji).** A/B na P&L (`ab_strategy_mwu.py`,
+tryb=strategia, 15 par 4h, 3000 barów): OFF = dobór strukturalny, ON = + online strategy-MWU.
+
+**Wynik: PORTFEL OFF=−64.7% → ON=−1.8%, Δ=+63.0pp. ON>OFF na 11/15 par.** Wielkie pary mocno
+dodatnie: ETH −13.3→+0.4, BNB −5.5→+7.2, BTC −18.3→−7.0, ADA −9.8→+0.8, NEAR −6.4→+4.2. Ujemne
+tylko 4 małe (AVAX −0.8, LTC −1.1, ATOM −2.6, TRX −4.4). ✅ Werdykt: ważenie strategii realnym P&L
+LECZY routing (w przeciwieństwie do W-361 IC, które padło na P&L).
+
+**Zastrzeżenie (Prawo I):** ON wciąż −1.8% (poniżej progu zysku) w tym oknie — to +63pp POPRAWA
+nad baseline strategia, nie maszyna do zysku. Ale mechanizm zwalidowany → kandydat do włączenia
+flagi `ucz_mwu_strategii` na żywo — decyzja Cezara (Prawo XVIII). Flaga nadal OFF.
+
+---
+
+## 2026-07-13 | 📚 | W-363 Bibliotekarz-Zwiadowca: DeepSeek skanuje bibliotekę (pod nadzorem Opusa)
+
+**Prośba Cezara — jeden z pomysłów z rozmowy DeepSeek (wrzutnia/Mapa-kluczy calosc plus.md):
+DeepSeek jako bibliotekarz pod nadzorem Claude.** Operacjonalizacja ZASADY ZWIADOWCY WIEDZY
+(dwa modele: tani DeepSeek proponuje, Opus rozstrzyga).
+
+**Ocena rozmowy DeepSeek (Prawo I) — SKORYGOWANA po weryfikacji web (2026-07-13):** dobra intuicja
+(proaktywność/ciekawość/bibliotekarz). Nieścisłości: `claude-3.7-sonnet` (przestarzałe), zmyślony
+format `.claude/settings.json agents/skills`, `imperium-push` z git push (łamie zasadę), wymyślony
+`czat_deepseek.py`. ⚠️ **KOREKTA MOJEGO BŁĘDU:** wstępnie nazwałem `deepseek-v4-flash` halucynacją —
+NIEPRAWDA, to REALNY model (wydany 2026-04-24, po moim cutoffie; api-docs.deepseek.com). Oceniłem
+z przeterminowanej pamięci bez sprawdzenia web. Nowa zasada stała (pamięć): ZAWSZE weryfikuj
+najświeższe info z internetu PRZED oceną. Większość „duszy" JUŻ mamy (auto-naprawa, samoewolucja,
+14-warstwowa pamięć). Cenne jądro: bibliotekarz = nasza doktryna.
+
+**Build (`narzedzia/bibliotekarz.py`, W-363):**
+- REUŻYCIE: `imperium.cesarz.deepseek_glos.GlosImperium` (deepseek-v4-flash — po migracji V4) +
+  `narzedzia/rag/szukaj.szukaj` (RAG biblioteki). Zero duplikacji (Prawo XVI).
+- Pętla: temat → RAG (fragmenty z BIB-xxx) → DeepSeek proponuje 1-4 KANDYDATÓW (nazwa/typ/
+  mechanizm/JAK ZMIERZYĆ, z cytatem źródła) → zapis cząstki do kolejki JSONL. Cząstkowane,
+  pasek postępu (Prawo XXIV), dry-run bez kosztu API.
+- **Dyscyplina (system prompt):** proponuj TYLKO z fragmentów, cytuj BIB, każdy = HIPOTEZA,
+  podaj dowód-pomiaru, nie konfabuluj. Kolejka gitignored (surowy output = artefakt runtime).
+
+**Pierwszy zwiad (temat „mean reversion") + WERDYKT SĘDZIEGO (Opus):** DeepSeek dał 4 kandydatów
+(Chan/Narang/Hull/Kaufman). Odsiane: ① Vasicek (stopy proc., Hull) = off-target dla crypto.
+Zachowane ⚠️: ② cross-sectional MR pairs (częściowo redundant z C-01), ③ MR z filtrem ekstremów
+(spójny z vol-gate/Z), ④ MR-vs-trend wg reżimu (= nasz kierunek Namiestnik/strategy-MWU). Dowód,
+po co dwa modele: zwiadowca sam przepuściłby Vasicka.
+
+**Status:** narzędzie on-demand (opt-in). Harmonogram/autonomia = decyzja Cezara (ZASADA MCP/hooki).
+Każdy kandydat ⚠️ — do kodu tylko po weryfikacji Opusa + arenie (Prawo I, ZASADA WPIĘCIA).
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py` (+4), `.gitignore`.
+
+---
+
 ## 2026-07-13 | 🎯 | W-362 strategy-MWU: dobór strategii ważony realnym P&L (opt-in OFF)
 
 **Opcja 2 z sekwencji Cezara — build + tooling walidacyjne.** Poprzedzone zwiadem wiedzy

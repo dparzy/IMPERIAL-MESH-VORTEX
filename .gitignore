@@ -50,6 +50,10 @@ bibliotheca_ulpia/dane/.auto_lekcja_przetworzone.txt
 # Baza wyników areny (Arena MCP — pomiary IC/scoreboard, runtime per-maszyna)
 bibliotheca_ulpia/dane/arena_wyniki.db
 
+# Kolejka hipotez Bibliotekarza-Zwiadowcy (W-363) — surowy output DeepSeeka, artefakt
+# runtime per-maszyna. Kandydaci ⚠️ do przeglądu Opusa; kuratorowane trafiają do docs/backlog.
+docs/KOLEJKA_HIPOTEZ_BIBLIOTEKARZ.jsonl
+
 # Config startowy MCP — per-maszyna, NIE wersjonowany (Zasada MCP: wpięcie serwerów
 # w start sesji to zawsze decyzja Cezara, nie automat). Serwery żyją w kodzie:
 # narzedzia/rag/mcp_server.py (biblioteka RAG) + narzedzia/arena_mcp.py (arena).

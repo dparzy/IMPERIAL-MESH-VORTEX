@@ -143,7 +143,7 @@ def _wywolaj_deepseek(tekst_sesji: str) -> List[Dict[str, Any]]:
     """Wywołuje DeepSeek API i zwraca sparsowane wyniki. [] przy błędzie."""
     try:
         from imperium.cesarz.deepseek_glos import GlosImperium
-        glos = GlosImperium(model="deepseek-chat")
+        glos = GlosImperium()   # domyślny = deepseek-v4-flash (migracja V4, legacy retire 2026-07-24)
         odp = glos.zapytaj(_SYSTEM_PROMPT, tekst_sesji, temperatura=0.3)
         # parsuj JSON z odpowiedzi
         odp = odp.strip()

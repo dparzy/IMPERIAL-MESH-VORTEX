@@ -101,6 +101,24 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — TA-Lib wymagany przez Bramę Kalkulatora
+Brama Kalkulatora celowo odmawia startu bez TA-Lib (Prawo I). Na Windows 2026 pip install TA-Lib działa, fallback: wheels z github.com/cgohlke/talib-build.
+
+### 2026-06-30 — Mieszanie zasad Kingdom Pixel z Imperium = chaos
+Kopiowanie 79 zasad z Kingdom Pixel do Imperium powodowało konflikt. Rozwiązanie: stworzenie 14 Praw Imperium od zera, bez kontaminacji.
+
+### 2026-06-30 — Bug: loader nie działa po zmianie struktury folderów
+Po przeniesieniu modułów z płaskiej struktury do folderów rzymskich, pierwszy_zwiadowca.py szukał plików po starych nazwach. Naprawiono przez użycie względnych ścieżek do nowych lokalizacji.
+
+### 2026-06-30 — 403 Push Permission Error
+Początkowe pushy nie działały z powodu błędnych uprawnień GitHub App. Użytkownik naprawił uprawnienia, push ostatecznie powiódł się.
+
+### 2026-06-30 — Bug: __pycache__ śledzone w git
+Po kompilacji brama_kalkulatora.py, pliki cache zostały przypadkowo commitowane. Naprawiono przez git rm i dodanie .gitignore.
+
+### 2026-06-30 — Bug: cross-module loader po zmianie struktury folderów
+Po przeniesieniu modułów z płaskiej struktury do folderów rzymskich, loader w pierwszy_zwiadowca.py szukał starych nazw. Naprawiono przez użycie względnych ścieżek.
+
 ### 2026-06-30 — OpenAlice i Hermes Agent zweryfikowane jako realne narzędzia
 OpenAlice (4600★ GitHub) i Hermes Agent (Nous Research) to rzeczywiste narzędzia AI tradingowe, a nie halucynacje. Zostały dodane do ARSENAL_IMPERIUM.md jako zweryfikowane.
 

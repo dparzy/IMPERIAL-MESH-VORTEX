@@ -6,6 +6,42 @@
 
 ---
 
+## 2026-07-13 | 🎯 | W-362 strategy-MWU: dobór strategii ważony realnym P&L (opt-in OFF)
+
+**Opcja 2 z sekwencji Cezara — build + tooling walidacyjne.** Poprzedzone zwiadem wiedzy
+(`docs/ANALIZA_AUTODOBOR_STRATEGII_2026-07-13.md`): 5 kandydatów metod auto-doboru; wybrany
+① strategy-MWU jako najwyższa dźwignia × najmniejsze ryzyko × reużycie kodu.
+
+**Zdiagnozowana luka:** `dobierz_najlepsze` dobierał strategie czysto STRUKTURALNIE (zgodność
+sygnałów × filtr × reżim × radar) — IGNOROWAŁ zrealizowany P&L. Smoke (BTC 1500 barów) pokazał,
+że routing przez strategie potrafi mocno szkodzić (agregat +16.5% vs strategia −7.0%).
+
+**Build ① (opt-in OFF — ZASADA WPIĘCIA):**
+- `baza.dobierz_najlepsze(..., wagi_strategii)` — mnożnik per strategia wchodzi w wynik doboru
+  (down-weight wypycha poniżej min_wynik). Brak wag = baseline (zero zmiany, Prawo XV).
+- `Legatus.ustaw_wagi_strategii()` + pole `wagi_strategii` → przekazane do `_dobierz_strategie`.
+- `backtest(ucz_mwu_strategii=True)` — online `HedgeMWU` keyed strategy_id (REUŻYCIE hedge_mwu.py,
+  nie duplikat): atrybucja top-1 strategii przy wejściu → `aktualizuj(sid, 0/1)` na zamknięciu
+  (strata binarna z P&L) → `mnozniki()` wracają do Legatusa. Domyślnie OFF (zero zmiany ścieżki).
+
+**Tooling walidacyjne:**
+- `narzedzia/ab_tryb_strategii.py` — A/B warstwy: agregat vs filtr vs strategia (P&L, cząstkowany,
+  arena `ab_tryb_strat`, pasek postępu). Cząstkowy (7/15, 6000 barów): PORTFEL agregat −33.3%
+  bije filtr −56.7% i strategia −38.4% → statyczny routing szkodzi (motywacja dla ①).
+- `narzedzia/ab_strategy_mwu.py` — A/B ①: tryb strategia OFF-mwu vs ON-mwu (P&L; MWU online →
+  bez podziału train/test, zero look-ahead; arena `ab_strat_mwu_<tryb>`). Werdykt pending.
+
+**Status flag: OFF.** Wszystkie werdykty (2a warstwa + A/B strategy-MWU na P&L) czekają na pomiar —
+flagę na sztywno przełącza Cezar po zielonym A/B (Prawo XVIII). Kandydat, nie prawda (Prawo I).
+
+**Testy:** `tests/test_strategy_mwu.py` (+7), `tests/test_ab_tryb_strategii.py` (+3) — Reguła
+Test-Granic (waga w progu doboru, opt-in OFF, round-trip areny).
+
+**Pliki:** `imperium/legiony/strategie/baza.py`, `imperium/legiony/legatus.py`,
+`imperium/koloseum/backtest.py`, `narzedzia/ab_tryb_strategii.py`, `tests/*`.
+
+---
+
 ## 2026-07-13 | 🔬 | W-361b SHRINKAGE: próg |IC| ratuje 122pp, ale wciąż < baseline — OFF
 
 **Wariant naprawczy po negatywnym A/B P&L (opcja 1 z sekwencji Cezara).** Diagnoza z poprzedniego

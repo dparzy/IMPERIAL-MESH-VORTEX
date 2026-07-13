@@ -404,6 +404,10 @@ class Legatus:
         # Opcja A: StanRynku z RadarRynku — radar-aware strategy scoring.
         # Ustawiany przez Dyrygenta przed fokus(). None = bez radaru.
         self.stan_rynku = None
+        # W-362 strategy-MWU: mnożniki per strategia z online MWU uczonego ZREALIZOWANYM P&L.
+        # {strategia.id: mnoznik}. Puste = dobór czysto strukturalny (baseline, Prawo XV).
+        # Ustawiane przez ustaw_wagi_strategii() (z HedgeMWU keyed strategy_id). Opt-in OFF.
+        self.wagi_strategii: dict = {}
         # W-296 DriftAdapter: per-cykl override WAGI_REZIMU (antycypacyjna korekta).
         # None = bez override (używa globalnego WAGI_REZIMU). Resetować po fokus().
         self._wagi_rezimu_override: Optional[dict] = None
@@ -441,6 +445,14 @@ class Legatus:
         zamyka pętlę uczenia — policzone wagi faktycznie wpływają na decyzję.
         """
         self.mnozniki_neuronow = mnozniki or {}
+
+    def ustaw_wagi_strategii(self, wagi: dict) -> None:
+        """
+        W-362 strategy-MWU: aktualizuje mnożniki per strategia (z online HedgeMWU keyed
+        strategy_id, uczonego zrealizowanym P&L). Wywoływane na bieżąco po zamknięciu trade.
+        Puste/None → dobór czysto strukturalny (Prawo XV: domyślnie neutralne). Opt-in OFF.
+        """
+        self.wagi_strategii = wagi or {}
 
     def ustaw_wagi_ic(self, wagi: dict, wlacz: bool = True,
                       domyslny_ic: float = 0.0,
@@ -708,7 +720,8 @@ class Legatus:
             from imperium.legiony.strategie.baza import dobierz_najlepsze
             mapa = {s.neuron_id: s for s in sygnaly}
             return dobierz_najlepsze(self.strategie, mapa, rezim=rezim, top=3,
-                                     interwal=interwal, stan_rynku=self.stan_rynku)
+                                     interwal=interwal, stan_rynku=self.stan_rynku,
+                                     wagi_strategii=self.wagi_strategii or None)
         except Exception as e:
             logger.error(f"[Legatus] Dobieranie strategii padło: {e}")
             return []

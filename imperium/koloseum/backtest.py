@@ -71,6 +71,7 @@ def backtest(
     wagi_ic: "Optional[Dict[str, float]]" = None,
     wagi_ic_prog: float = 0.0,
     wagi_ic_skaluj: bool = True,
+    ucz_mwu_strategii: bool = False,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -141,6 +142,15 @@ def backtest(
         from imperium.biblioteki.hedge_mwu import HedgeMWUzPamieciaRezimu
         mwu = HedgeMWUzPamieciaRezimu(eta=0.3, alpha_share=0.02)
 
+    # W-362 strategy-MWU (opt-in): online MWU keyed strategy_id, uczony ZREALIZOWANYM P&L
+    # zamkniętych trade'ów (atrybucja: top-strategia przy wejściu). Mnożniki wracają do
+    # Legatusa → dobór strategii waży się realnym zyskiem (naprawa luki z ANALIZA_AUTODOBOR).
+    mwu_strat = None
+    strat_pozycji: Dict[str, str] = {}
+    if ucz_mwu_strategii:
+        from imperium.biblioteki.hedge_mwu import HedgeMWU
+        mwu_strat = HedgeMWU(eta=0.3)
+
     # W-385 Pomiar IC roju (opt-in, Prawo XVI): Spearman(sygnał_neuronu_t, zwrot_{t+h}).
     # Mierzy realną przewagę predykcyjną KAŻDEGO neuronu (w tym NEWS-01..04, gdy mają feed).
     # Zero look-ahead: sygnał_t paruje z PRZYSZŁYM zwrotem; rejestr po decyzji.
@@ -184,6 +194,15 @@ def backtest(
                     mwu.zarejestruj_wynik(neuron_id, kier, zyskowny)
             legatus.ustaw_mnozniki_neuronow(mwu.mnozniki())
 
+        # 1b'. PĘTLA UCZENIA STRATEGII (W-362): rozlicz strategię, która napędziła wejście
+        # (atrybucja top-1 przy otwarciu) ZREALIZOWANYM P&L; strata binarna 0=zysk/1=strata.
+        if mwu_strat is not None and zamkniete:
+            for w in zamkniete:
+                sid = strat_pozycji.pop(w.pozycja_id, None)
+                if sid is not None:
+                    mwu_strat.aktualizuj(sid, 0.0 if w.pnl_usdt > 0 else 1.0)
+            legatus.ustaw_wagi_strategii(mwu_strat.mnozniki())
+
         # 1c. Strażnik Przewagi (W-287): tyknięcie + rozliczenie zamkniętych;
         # w HALT/sondzie-w-locie pomijamy decyzję (świadoma cisza, Prawo XV).
         if sp is not None:
@@ -207,6 +226,11 @@ def backtest(
                 glosy_pozycji[decyzja.pozycja_id] = [
                     (s.neuron_id, s.kierunek) for s in decyzja.raport.sygnaly
                     if s.kierunek in ("LONG", "SHORT")]
+            # W-362: zapamiętaj strategię, która napędziła to wejście (top-1 dopasowana)
+            if (mwu_strat is not None and decyzja.raport is not None
+                    and decyzja.raport.strategie_dopasowane):
+                strat_pozycji[decyzja.pozycja_id] = \
+                    decyzja.raport.strategie_dopasowane[0].strategia.id
         elif decyzja.etap in ("PRETORIANIE_WETO", "LEGATUS_WETO"):
             weta += 1
 

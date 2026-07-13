@@ -1,10 +1,15 @@
 """
-📚 BIBLIOTEKARZ-ZWIADOWCA — DeepSeek skanuje bibliotekę i proponuje KANDYDATÓW (pod nadzorem Opusa).
+📚 HYGINUS — BIBLIOTEKARZ-ZWIADOWCA Imperium. DeepSeek skanuje bibliotekę i proponuje KANDYDATÓW
+(pod nadzorem Vitruviusza/Opusa).
+
+Imię (Cezar Pixel, 2026-07-13): GAIUS JULIUS HYGINUS — wyzwoleniec Augusta, pierwszy prefekt
+Biblioteki Palatyńskiej (pierwszej cesarskiej biblioteki), uczony-polihistor i zarządca zbiorów.
+Symetria epoki: Vitruviusz (Architekt) + Hyginus (Bibliotekarz) — obaj ze złotego wieku Augusta.
 
 Operacjonalizacja ZASADY ZWIADOWCY WIEDZY (CLAUDE.md): DWA modele o różnych rolach.
-  • DeepSeek (deepseek-v4-flash, tani ~$0.14/1M) = ZWIADOWCA/proponent — czyta fragmenty RAG
-    biblioteki i wyciąga KANDYDATÓW na neurony/strategie/koncepcje.
-  • Opus/Claude = SĘDZIA/krytyk kompletności — czyta kolejkę kandydatów, weryfikuje, odrzuca
+  • DeepSeek (deepseek-v4-flash, tani ~$0.14/1M) = HYGINUS, ZWIADOWCA/proponent — czyta fragmenty
+    RAG biblioteki i wyciąga KANDYDATÓW na neurony/strategie/koncepcje.
+  • Opus/Vitruviusz = SĘDZIA/krytyk kompletności — czyta kolejkę kandydatów, weryfikuje, odrzuca
     halucynacje, decyduje co idzie do areny.
 
 ŻELAZNE ZASADY (Prawo I + ZASADA WPIĘCIA):
@@ -47,7 +52,7 @@ TEMATY_DOMYSLNE = [
 ]
 
 _SYSTEM = (
-    "Jesteś Bibliotekarzem-Zwiadowcą Imperium tradingowego. Dostajesz FRAGMENTY z książek "
+    "Jesteś HYGINUSEM — Bibliotekarzem-Zwiadowcą Imperium tradingowego. Dostajesz FRAGMENTY z książek "
     "(z oznaczeniem źródła BIB-xxx). Twoje zadanie: zaproponuj 1-4 KANDYDATÓW na nowy neuron/"
     "strategię/koncepcję, WYŁĄCZNIE na podstawie podanych fragmentów. ŻELAZNE ZASADY:\n"
     "1. Każdy kandydat to HIPOTEZA, nie fakt — nie twierdź, że coś działa.\n"
@@ -132,7 +137,7 @@ def raport(tematy, topk=6, tryb="fts", dry_run=False, force=False) -> str:
     zrobione = set() if force else _tematy_ukonczone()
 
     N = len(tematy)
-    linie = [f"📚 BIBLIOTEKARZ-ZWIADOWCA — {N} tematów, {'DRY-RUN' if dry_run else 'DeepSeek'} "
+    linie = [f"📚 HYGINUS (Bibliotekarz-Zwiadowca) — {N} tematów, {'DRY-RUN' if dry_run else 'DeepSeek'} "
              f"(⚠️ KANDYDACI — prawdą po arenie)"]
     for i, temat in enumerate(tematy, 1):
         if temat in zrobione:
@@ -171,7 +176,7 @@ def _topk_arg(tekst: str) -> int:
 
 if __name__ == "__main__":
     logging.disable(logging.CRITICAL)
-    p = argparse.ArgumentParser(description="Bibliotekarz-Zwiadowca — DeepSeek skanuje bibliotekę (W-363)")
+    p = argparse.ArgumentParser(description="HYGINUS — Bibliotekarz-Zwiadowca, DeepSeek skanuje bibliotekę (W-363)")
     p.add_argument("--temat", action="append", help="temat zwiadu (można wiele razy). Brak → domyślne.")
     p.add_argument("--topk", type=_topk_arg, default=6, help=f"ile fragmentów RAG na temat [1, {_TOPK_MAX}]")
     p.add_argument("--tryb", default="fts", choices=["fts", "hybrid", "wektor"])

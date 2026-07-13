@@ -379,6 +379,28 @@ wynik LLM bez pomiaru to wiara, nie fakt — Prawo I.)
 **Złamanie:** traktowanie wyniku DeepSeeka jako prawdy bez pomiaru areny; hurtowe czytanie bez
 cząstkowania i krytyka kompletności; pominięcie drugiego modela (zwiad jednym okiem = gubione hipotezy).
 
+## 🏛️ ZASADA NOMENKLATURY IMPERIALNEJ — WSZYSTKO PO RZYMSKU (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-13)
+
+**Każdy organ, moduł, funkcja, rola, kategoria i agent Imperium nosi nazwę osadzoną w klimacie
+Cesarstwa Rzymskiego — dobraną DO FUNKCJI.** To nie ozdoba, to tożsamość Imperium (rozkaz Cezara:
+„wszystko, nie tylko imiona, ale i nazwy ze względu na funkcję i kategorię").
+
+- **Rzymska nazwa OBOK technicznej, nie zamiast.** Kod pozostaje jednoznaczny (klucze, klasy, API
+  bez zmian) — rzymskie imię żyje w nazwie organu/roli, docstringu, banerach, dokumentacji. Nigdy
+  nie łamiemy spójności kluczy (Prawo XXI) dla estetyki.
+- **Dobór DO FUNKCJI (nie losowo):** nazwa ma oddawać rolę. Wzorce już żywe:
+  - **Osoby/agenci:** VITRUVIUSZ (Architekt = Claude/Opus), HYGINUS (Bibliotekarz-Zwiadowca = DeepSeek), CEZAR PIXEL (Imperator).
+  - **Organy (katalogi `imperium/`):** cesarz (rdzeń decyzji), senat (meta-decyzje), legiony (neurony/moduły bojowe),
+    pretorianie (bezpieczniki/straż), akwedukty (przepływ danych), drogi (routing/hub), świątynie (wiedza/mapy),
+    oczy (percepcja/adaptery), biblioteki (pamięć/RAG), koloseum (walidacja/kontrfaktyki), fundament (narzędzia bazowe).
+- **Przy KAŻDYM nowym module/organie/roli — nadaj rzymskie imię pasujące do funkcji** (jak Hyginus dla
+  Bibliotekarza). Brak rzymskiej nazwy nowego organu = niedokończone wdrożenie.
+- **Źródło prawdy imion:** `docs/PROFIL_CEZARA.md` § Imiona Imperium (agenci) + `docs/ARCHITEKTURA_IMPERIUM.md`
+  (organy). Nowe imię → dopisz do właściwego źródła w tym samym commicie (ZASADA PEŁNEJ SYMBIOZY).
+
+**Złamanie:** nowy organ/moduł/rola bez rzymskiej nazwy dopasowanej do funkcji, albo złamanie
+spójności kluczy kodu (Prawo XXI) w imię nazewnictwa.
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`

@@ -271,7 +271,15 @@ def backtest(
 
     # 3. Zamknij pozostałe otwarte po ostatniej cenie
     ostatnia_cena = {symbol: bary[-1]["close"]}
-    engine.zamknij_wszystkie(ostatnia_cena, powod="MANUAL")
+    zamkniete_koncowe = engine.zamknij_wszystkie(ostatnia_cena, powod="MANUAL")
+    # W-362 (Cubic P3): pozycje domknięte MANUAL na ostatnim barze też rozliczają strategy-MWU —
+    # inaczej learner gubi ostatnie zrealizowane trade'y (te same reguły atrybucji co w pętli).
+    if mwu_strat is not None and zamkniete_koncowe:
+        for w in zamkniete_koncowe:
+            sid = strat_pozycji.pop(w.pozycja_id, None)
+            if sid is not None:
+                mwu_strat.aktualizuj(sid, 0.0 if w.pnl_usdt > 0 else 1.0)
+        legatus.ustaw_wagi_strategii(mwu_strat.mnozniki())
     krzywa_equity.append(engine.kapital_calkowity)
     # Krzywa equity per bar — wejście bramki walidacji Koloseum (W-282):
     #   from imperium.koloseum.walidacja import etap_pierwszy_koloseum

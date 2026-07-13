@@ -57,7 +57,9 @@ def _ic_kierunkowy_train(sygnaly, wyniki):
     from imperium.legiony.legatus import oblicz_wagi_ic
     wagi = oblicz_wagi_ic(sygnaly, wyniki)
     liczba: dict = {}
-    for mapa in sygnaly:
+    # Cubic P3: licznik głosów musi opisywać TE SAME próbki co wagi IC — iterujemy po
+    # sparowanej historii (zip), nie po samym `sygnaly`, by audyt nie rozjechał się z wagami.
+    for mapa, _ in zip(sygnaly, wyniki):
         for nid, kier in mapa.items():
             if _glos(kier) == 0:
                 continue

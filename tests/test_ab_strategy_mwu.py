@@ -8,8 +8,8 @@ from narzedzia.ab_strategy_mwu import _metryki, _nota, _rodzaj, _wczytaj_z_areny
 
 
 class _FakeStats:
-    def __init__(self, kk, tt, wr):
-        self.kapital_koncowy, self.kapital_startowy = kk, 10_000.0
+    def __init__(self, kk, tt, wr, ks=10_000.0):
+        self.kapital_koncowy, self.kapital_startowy = kk, ks
         self.total_trades, self.win_rate = tt, wr
 
 
@@ -21,6 +21,13 @@ class _FakeEngine:
 def test_metryki_zwrot():
     m = _metryki(_FakeEngine(_FakeStats(11_500.0, 20, 0.55)))
     assert abs(m["ret"] - 0.15) < 1e-9 and m["trades"] == 20
+
+
+def test_metryki_kapital_startowy_zero():
+    # Cubic P2 / REGUŁA TEST-GRANIC: guard `if s.kapital_startowy else 0.0` — kapitał 0 → ret 0.0
+    # (bez ZeroDivisionError/NaN). Backtest, który nie wystartował, nie fałszuje zwrotu.
+    m = _metryki(_FakeEngine(_FakeStats(0.0, 0, 0.0, ks=0.0)))
+    assert m["ret"] == 0.0 and m["trades"] == 0
 
 
 def test_rodzaj_rozdziela_tryby():

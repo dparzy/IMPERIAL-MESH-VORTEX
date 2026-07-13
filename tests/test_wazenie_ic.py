@@ -185,12 +185,63 @@ def test_tryb_tylko_znak_ignoruje_magnitude():
     assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).kierunek == "LONG"    # bez skali → baseline
 
 
+def test_tryb_tylko_znak_ic_zero_wycisza():
+    # Cubic P2: sign-only (skaluj_ic=False) — neuron z IC=0 NIE dostaje pełnej wagi bazowej.
+    # A: LONG mocny ale IC=0 → milczy; B: SHORT z IC=1 → agregat SHORT (nie LONG).
+    syg = [_syg("A", "LONG", 0.5), _syg("B", "SHORT", 0.3)]
+    leg = _leg()
+    leg.ustaw_wagi_ic({"A": 0.0, "B": 1.0}, wlacz=True, skaluj_ic=False)
+    assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).kierunek == "SHORT"
+
+
 def test_shrinkage_prog_zero_zachowuje_stare_w361():
     # prog=0 + skaluj=True (domyślne) → identyczne z pierwotnym W-361 (flip przy IC<0).
     syg = [_syg("A", "LONG", 0.5), _syg("B", "SHORT", 0.2)]
     leg = _leg()
     leg.ustaw_wagi_ic({"A": -1.0, "B": 1.0}, wlacz=True)   # prog_ic=0.0, skaluj_ic=True domyślnie
     assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).kierunek == "SHORT"
+
+
+# ── Cubic P1: wyciszony neuron nie fałszuje konfluencji ani strony strategii ───
+
+def test_on_wyciszony_neuron_nie_przechodzi_weta_min_neuronow():
+    # 2 sygnały LONG, ale A wyciszony IC=0 → realnie 1 głos < min_neuronow=2 → weto (Cubic P1).
+    syg = [_syg("A", "LONG", 0.5), _syg("B", "LONG", 0.4)]
+    leg = Legatus(neurony=[], min_neuronow=2, min_przewaga=0.1)
+    assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).kierunek == "LONG"   # OFF: 2 głosy
+    leg.ustaw_wagi_ic({"A": 0.0, "B": 1.0}, wlacz=True)
+    r = leg._agreguj("SYM", "FOKUS", "NORMAL", syg)
+    assert r.kierunek == "NEUTRAL" and r.weto is True
+    assert r.zgodnych_neuronow == 1          # licznik zgodnych z REALNYCH głosów
+
+
+def test_off_wyciszony_liczy_sie_do_min_neuronow():
+    # OFF (bez ważenia) → stara ścieżka: oba sygnały liczą się, weto nie pada.
+    syg = [_syg("A", "LONG", 0.5), _syg("B", "LONG", 0.4)]
+    leg = Legatus(neurony=[], min_neuronow=2, min_przewaga=0.1)
+    assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).weto is False
+
+
+def test_sygnaly_efektywne_flip_i_wyciszenie_nie_mutuja_surowych():
+    # A: LONG z IC<0 → efektywnie SHORT; B: SHORT bez zmian; C: LONG z IC=0 → wyciszony NEUTRAL.
+    a, b, c = _syg("A", "LONG", 0.5), _syg("B", "SHORT", 0.3), _syg("C", "LONG", 0.4)
+    leg = _leg()
+    leg.ustaw_wagi_ic({"A": -1.0, "B": 1.0, "C": 0.0}, wlacz=True)
+    kw = [(s, k, w) for s, k, w in leg._wklady_kierunkowe([a, b, c]) if w > 0]
+    eff = {s.neuron_id: s.kierunek for s in leg._sygnaly_efektywne([a, b, c], kw)}
+    assert eff["A"] == "SHORT"     # odwrócony znakiem IC — strategia widzi realną stronę
+    assert eff["B"] == "SHORT"     # bez zmian
+    assert eff["C"] == "NEUTRAL"   # wyciszony IC=0 → nie głosuje kierunkowo
+    assert a.kierunek == "LONG" and c.kierunek == "LONG"   # surowe nietknięte (audyt/IC-trening)
+
+
+def test_sygnaly_efektywne_off_zwraca_te_same_obiekty():
+    # przy ważeniu OFF _agreguj podaje surowe sygnały — tu sprawdzamy sam kontrakt helpera:
+    # gdy kier_wklady puste (nic efektywnego), każdy kierunkowy sygnał → NEUTRAL, reszta bez zmian.
+    a = _syg("A", "LONG", 0.5)
+    leg = _leg()
+    out = leg._sygnaly_efektywne([a], [])
+    assert out[0].kierunek == "NEUTRAL" and a.kierunek == "LONG"
 
 
 # ── Kanoniczna oblicz_wagi_ic (jedno źródło prawdy z hipoteza_b) ───────────────
@@ -217,3 +268,10 @@ def test_oblicz_wagi_ic_min_glosow_odcina():
 
 def test_oblicz_wagi_ic_pusty_nie_wybucha():
     assert oblicz_wagi_ic([], []) == {}
+
+
+def test_oblicz_wagi_ic_niezgodne_dlugosci_rzuca():
+    # Cubic P2: rozjechana etykieta forward = błąd danych, nie cichy podzbiór.
+    import pytest
+    with pytest.raises(ValueError):
+        oblicz_wagi_ic([{"A": "LONG"}, {"A": "SHORT"}], [1])

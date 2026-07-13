@@ -9,7 +9,8 @@ from collections import namedtuple
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "narzedzia", "rag"))
 
-from narzedzia.bibliotekarz import _fragmenty_tekst, scout_temat, _SYSTEM
+import narzedzia.bibliotekarz as bib
+from narzedzia.bibliotekarz import _fragmenty_tekst, scout_temat, _SYSTEM, _topk_arg, _tematy_ukonczone
 
 _FakeWynik = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
 
@@ -40,3 +41,27 @@ def test_czastka_jest_json_serializowalna():
     czastka = {"temat": "x", "zrodla": ["BIB-001"], "kandydaci": "⚠️ kandydat", "ts": 1.0}
     odczyt = json.loads(json.dumps(czastka, ensure_ascii=False))
     assert odczyt["kandydaci"] == "⚠️ kandydat" and odczyt["zrodla"] == ["BIB-001"]
+
+
+def test_topk_arg_odrzuca_poza_zakresem():
+    # Cubic P2: --topk poza [1, _TOPK_MAX] → błąd zanim ruszy RAG/płatne API (granice).
+    import argparse
+    import pytest
+    assert _topk_arg("6") == 6 and _topk_arg("1") == 1 and _topk_arg("20") == 20
+    for zly in ("0", "-3", "21", "9999"):
+        with pytest.raises(argparse.ArgumentTypeError):
+            _topk_arg(zly)
+
+
+def test_tematy_ukonczone_pomija_dry(tmp_path, monkeypatch):
+    # Cubic P2: dedup liczy realny zwiad (ok/pusto, stare bez statusu), ale NIE dry-run.
+    kol = tmp_path / "kolejka.jsonl"
+    kol.write_text(
+        json.dumps({"temat": "realny", "status": "ok"}) + "\n"
+        + json.dumps({"temat": "podglad", "status": "dry"}) + "\n"
+        + json.dumps({"temat": "stary_bez_statusu"}) + "\n",
+        encoding="utf-8")
+    monkeypatch.setattr(bib, "KOLEJKA", kol)
+    done = _tematy_ukonczone()
+    assert "realny" in done and "stary_bez_statusu" in done
+    assert "podglad" not in done          # dry-run nie blokuje realnego zwiadu

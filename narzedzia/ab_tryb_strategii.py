@@ -71,9 +71,16 @@ def _nota(nazwa, w) -> str:
     return ";".join(czesci)
 
 
-def _wczytaj_z_areny(nazwa):
+def _klucz(nazwa, interwal, okno, min_barow, max_barow) -> str:
+    """Klucz areny = para + PODPIS KONFIGURACJI (Cubic P1). Wznawianie kluczowane samą
+    nazwą pliku cicho raportowało stary wynik po zmianie interwału/okna/capu — teraz
+    zmiana któregokolwiek parametru wymuszającego inny backtest daje inny klucz."""
+    return f"{nazwa}#i={interwal};okno={okno};min={min_barow};max={max_barow or 0}"
+
+
+def _wczytaj_z_areny(nazwa, klucz):
     from imperium.biblioteki.arena_baza import pytaj_pomiary
-    rekordy = pytaj_pomiary(rodzaj=_RODZAJ, neuron=nazwa, limit=1)
+    rekordy = pytaj_pomiary(rodzaj=_RODZAJ, neuron=klucz, limit=1)
     if not rekordy:
         return None
     pola = dict(kv.split("=", 1) for kv in rekordy[0]["nota"].split(";") if "=" in kv)
@@ -95,8 +102,9 @@ def raport(pliki, interwal, okno=250, min_barow=800, zapisz=True, max_barow=None
     N = len(pliki)
     for i, plik in enumerate(pliki, 1):
         nazwa = Path(plik).name
+        klucz = _klucz(nazwa, interwal, okno, min_barow, max_barow)
         if not force:
-            zapisana = _wczytaj_z_areny(nazwa)
+            zapisana = _wczytaj_z_areny(nazwa, klucz)
             if zapisana is not None:
                 per_para.append(zapisana)
                 print(f"[{i}/{N}] {nazwa} — z areny (pomijam): "
@@ -122,19 +130,27 @@ def raport(pliki, interwal, okno=250, min_barow=800, zapisz=True, max_barow=None
         if zapisz:
             # delta = najlepszy z routingu strategii − baseline (dodatnia = warstwa pomaga)
             delta = max(w["ret_filtr"], w["ret_strategia"]) - w["ret_agregat"]
-            zapisz_pomiar(_RODZAJ, nazwa, delta, _nota(nazwa, w))
+            zapisz_pomiar(_RODZAJ, klucz, delta, _nota(nazwa, w))
             print(f"    💾 arena: cząstka {nazwa} zapisana", file=sys.stderr, flush=True)
 
     if not per_para:
         return "🎯 A/B WARSTWY STRATEGII — brak wystarczających danych na żadnej parze."
 
-    total = {tr: sum(p[f"ret_{tr}"] for p in per_para) for tr in _TRYBY}
-    filtr_lepszy = sum(1 for p in per_para if p["ret_filtr"] > p["ret_agregat"])
-    strat_lepszy = sum(1 for p in per_para if p["ret_strategia"] > p["ret_agregat"])
-    n = len(per_para)
+    # Cubic P2: werdykt liczymy TYLKO z par o realnym samplu handlowym (≥ _MIN_TRADES łącznie
+    # w trybach routingu), inaczej para bez transakcji (ret 0/0/0) przechyla większość/portfel.
+    konkluz = [p for p in per_para
+               if (p["tr_filtr"] + p["tr_strategia"] + p["tr_agregat"]) >= _MIN_TRADES]
+    baza = konkluz or per_para
+    total = {tr: sum(p[f"ret_{tr}"] for p in baza) for tr in _TRYBY}
+    filtr_lepszy = sum(1 for p in baza if p["ret_filtr"] > p["ret_agregat"])
+    strat_lepszy = sum(1 for p in baza if p["ret_strategia"] > p["ret_agregat"])
+    n = len(baza)
 
+    pominiete = len(per_para) - len(baza) if konkluz else 0
+    sredni = {tr: total[tr] / n for tr in _TRYBY}   # średnia na parę — porównywalna niezależnie od N
     linie = [
-        f"🎯 A/B WARSTWY STRATEGII — {n} par (backtest pełny, {len(_TRYBY)} tryby)",
+        f"🎯 A/B WARSTWY STRATEGII — {n} par konkluzywnych (backtest pełny, {len(_TRYBY)} tryby)"
+        + (f" | {pominiete} par pominięto (za mało transakcji)" if pominiete else ""),
         "   agregat = baseline (strategie doradcze) | filtr = strat∧neurony | strategia = kierunek z strat",
         "",
         f"   {'PARA':<26} {'AGREGAT':>9} {'FILTR':>9} {'STRATEG':>9}  {'tr a/f/s':>12}",
@@ -144,8 +160,8 @@ def raport(pliki, interwal, okno=250, min_barow=800, zapisz=True, max_barow=None
                      f"{p['ret_strategia']:>+8.1%}  {p['tr_agregat']:>3}/{p['tr_filtr']:>3}/{p['tr_strategia']:>3}")
     linie += [
         "",
-        f"   ▸ PORTFEL (suma zwrotów): agregat={total['agregat']:+.1%}  "
-        f"filtr={total['filtr']:+.1%}  strategia={total['strategia']:+.1%}",
+        f"   ▸ PORTFEL (średni zwrot/parę): agregat={sredni['agregat']:+.1%}  "
+        f"filtr={sredni['filtr']:+.1%}  strategia={sredni['strategia']:+.1%}",
         f"   ▸ filtr > agregat na {filtr_lepszy}/{n} par | strategia > agregat na {strat_lepszy}/{n} par",
         "",
     ]

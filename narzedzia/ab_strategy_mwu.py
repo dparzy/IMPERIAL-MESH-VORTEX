@@ -68,9 +68,15 @@ def _nota(nazwa, w) -> str:
             f"trOFF={w['tr_off']};trON={w['tr_on']};wrOFF={w['wr_off']:.4f};wrON={w['wr_on']:.4f}")
 
 
-def _wczytaj_z_areny(nazwa, rodzaj):
+def _klucz(nazwa, interwal, okno, min_barow, max_barow) -> str:
+    """Klucz areny = para + PODPIS KONFIGURACJI (Cubic P2). Bez tego zmiana okna/capu/interwału
+    raportowała stary wynik pod nową etykietą — resume pomijał tylko RÓWNOWAŻNE eksperymenty."""
+    return f"{nazwa}#i={interwal};okno={okno};min={min_barow};max={max_barow or 0}"
+
+
+def _wczytaj_z_areny(nazwa, rodzaj, klucz):
     from imperium.biblioteki.arena_baza import pytaj_pomiary
-    rek = pytaj_pomiary(rodzaj=rodzaj, neuron=nazwa, limit=1)
+    rek = pytaj_pomiary(rodzaj=rodzaj, neuron=klucz, limit=1)
     if not rek:
         return None
     p = dict(kv.split("=", 1) for kv in rek[0]["nota"].split(";") if "=" in kv)
@@ -92,8 +98,9 @@ def raport(pliki, interwal, tryb="strategia", okno=250, min_barow=800,
     N = len(pliki)
     for i, plik in enumerate(pliki, 1):
         nazwa = Path(plik).name
+        klucz = _klucz(nazwa, interwal, okno, min_barow, max_barow)
         if not force:
-            z = _wczytaj_z_areny(nazwa, rodzaj)
+            z = _wczytaj_z_areny(nazwa, rodzaj, klucz)
             if z is not None:
                 per_para.append(z)
                 print(f"[{i}/{N}] {nazwa} — z areny: OFF={z['ret_off']:+.1%} ON={z['ret_on']:+.1%} "
@@ -116,7 +123,7 @@ def raport(pliki, interwal, tryb="strategia", okno=250, min_barow=800,
               f"(Δ={w['ret_on']-w['ret_off']:+.1%}, tr {w['tr_off']}/{w['tr_on']})",
               file=sys.stderr, flush=True)
         if zapisz:
-            zapisz_pomiar(rodzaj, nazwa, w["ret_on"] - w["ret_off"], _nota(nazwa, w))
+            zapisz_pomiar(rodzaj, klucz, w["ret_on"] - w["ret_off"], _nota(nazwa, w))
             print(f"    💾 arena: {nazwa} zapisana", file=sys.stderr, flush=True)
 
     if not per_para:
@@ -124,8 +131,9 @@ def raport(pliki, interwal, tryb="strategia", okno=250, min_barow=800,
 
     konkluz = [p for p in per_para if (p["tr_off"] + p["tr_on"]) >= _MIN_TRADES]
     baza = konkluz or per_para
-    toff = sum(p["ret_off"] for p in baza)
-    ton = sum(p["ret_on"] for p in baza)
+    # Cubic P2: portfel jako ŚREDNI zwrot/parę — suma % rosłaby z liczbą par (bez sensu jako P&L).
+    toff = sum(p["ret_off"] for p in baza) / len(baza)
+    ton = sum(p["ret_on"] for p in baza) / len(baza)
     lepsze = sum(1 for p in baza if p["ret_on"] > p["ret_off"])
 
     linie = [
@@ -139,8 +147,8 @@ def raport(pliki, interwal, tryb="strategia", okno=250, min_barow=800,
                      f"{p['ret_on']-p['ret_off']:>+7.1%} {p['tr_off']:>4}/{p['tr_on']:<4}")
     linie += [
         "",
-        f"   ▸ PORTFEL ({len(baza)} par ≥{_MIN_TRADES} trade): OFF={toff:+.1%}  ON={ton:+.1%}  "
-        f"Δ={ton-toff:+.1%}",
+        f"   ▸ PORTFEL (średni zwrot/parę, {len(baza)} par ≥{_MIN_TRADES} trade): "
+        f"OFF={toff:+.1%}  ON={ton:+.1%}  Δ={ton-toff:+.1%}",
         f"   ▸ ON > OFF na {lepsze}/{len(baza)} par",
         "",
     ]

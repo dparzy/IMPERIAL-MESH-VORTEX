@@ -34,6 +34,7 @@ from __future__ import annotations
 import argparse
 import glob as _glob
 import logging
+import math
 import sys
 from pathlib import Path
 
@@ -110,16 +111,22 @@ def _nota(nazwa, frac, w) -> str:
             f"aktOFF={w['akt_off']};aktON={w['akt_on']}")
 
 
-def _wczytaj_z_areny(nazwa):
+def _klucz(nazwa, interwal, frac, okno, min_glosow, max_barow) -> str:
+    """Klucz areny = para + PODPIS KONFIGURACJI (Cubic P2). Zmiana frac/okna/min_glosow/capu/
+    interwału daje inny eksperyment → inny klucz; resume nie podstawi nieświeżego wyniku."""
+    return f"{nazwa}#i={interwal};frac={frac};okno={okno};mg={min_glosow};max={max_barow or 0}"
+
+
+def _wczytaj_z_areny(klucz):
     """Wznawialność: odczytaj policzoną cząstkę z areny (nota → dict) lub None."""
     from imperium.biblioteki.arena_baza import pytaj_pomiary
-    rekordy = pytaj_pomiary(rodzaj=_RODZAJ, neuron=nazwa, limit=1)
+    rekordy = pytaj_pomiary(rodzaj=_RODZAJ, neuron=klucz, limit=1)
     if not rekordy:
         return None
     pola = dict(kv.split("=", 1) for kv in rekordy[0]["nota"].split(";") if "=" in kv)
     try:
         return {
-            "para": nazwa,
+            "para": pola.get("para", klucz),
             "bary_test": int(pola["test"]),
             "acc_off": float(pola["accOFF"]), "acc_on": float(pola["accON"]),
             "akt_off": int(pola["aktOFF"]), "akt_on": int(pola["aktON"]),
@@ -137,9 +144,10 @@ def raport(pliki, interwal, frac=0.6, okno=250, min_glosow=20,
     N = len(pliki)
     for i, plik in enumerate(pliki, 1):
         nazwa = Path(plik).name
+        klucz = _klucz(nazwa, interwal, frac, okno, min_glosow, max_barow)
         # Wznawialność — pomiń już policzone (chyba że --force). ZASADA ANALIZY CZĄSTKOWEJ.
         if not force:
-            zapisana = _wczytaj_z_areny(nazwa)
+            zapisana = _wczytaj_z_areny(klucz)
             if zapisana is not None:
                 per_para.append(zapisana)
                 d = zapisana["acc_on"] - zapisana["acc_off"]
@@ -159,13 +167,19 @@ def raport(pliki, interwal, frac=0.6, okno=250, min_glosow=20,
         if w is None:
             print(f"[{i}/{N}] {nazwa} — za mało danych, pomijam.", file=sys.stderr, flush=True)
             continue
+        # Cubic P2: para bez decyzji kierunkowych (OFF lub ON) → acc = nan. Niekonkluzywna —
+        # pomijamy (nie zapisujemy zatrutej cząstki), by kolejne pary liczyły się dalej.
+        if not (math.isfinite(w["acc_off"]) and math.isfinite(w["acc_on"])):
+            print(f"[{i}/{N}] {nazwa} — brak decyzji kierunkowych (OOS), niekonkluzywne — pomijam.",
+                  file=sys.stderr, flush=True)
+            continue
         w["para"] = nazwa
         per_para.append(w)
         d = w["acc_on"] - w["acc_off"]
         print(f"[{i}/{N}] {nazwa} — OFF={w['acc_off']:.1%} ON={w['acc_on']:.1%} "
               f"(Δ={d:+.1%}, test={w['bary_test']})", file=sys.stderr, flush=True)
         if zapisz:
-            zapisz_pomiar(_RODZAJ, nazwa, d, _nota(nazwa, frac, w))
+            zapisz_pomiar(_RODZAJ, klucz, d, _nota(nazwa, frac, w))
             print(f"    💾 arena: cząstka {nazwa} zapisana", file=sys.stderr, flush=True)
 
     if not per_para:

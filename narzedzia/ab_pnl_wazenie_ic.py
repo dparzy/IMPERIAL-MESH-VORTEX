@@ -55,7 +55,8 @@ def _metryki(eng) -> dict:
     return {"ret": ret, "trades": s.total_trades, "wr": s.win_rate, "pf": s.profit_factor}
 
 
-def analizuj_pare(bary, interwal, frac=0.6, okno=250, min_trade_barow=400, max_barow=None):
+def analizuj_pare(bary, interwal, frac=0.6, okno=250, min_trade_barow=400, max_barow=None,
+                  prog_ic=0.0, skaluj_ic=True):
     """Zwraca dict z metrykami OFF/ON na TEST (OOS) dla jednej pary lub None gdy za mało danych."""
     from imperium.koloseum.backtest import backtest
     from imperium.legiony.legatus import oblicz_wagi_ic
@@ -81,10 +82,12 @@ def analizuj_pare(bary, interwal, frac=0.6, okno=250, min_trade_barow=400, max_b
     if not wagi_ic:
         return None
 
-    # 2) Pełny backtest TEST OFF vs ON — identyczna konfiguracja, różni się tylko flaga.
+    # 2) Pełny backtest TEST OFF vs ON — identyczna konfiguracja, różni się tylko flaga
+    #    (+ W-361b: prog istotności |IC| i tryb skalowania — shrinkage).
     eng_off = backtest("x", interwal, bary=bary_test, okno=okno)
     eng_on = backtest("x", interwal, bary=bary_test, okno=okno,
-                      wazenie_ic=True, wagi_ic=wagi_ic)
+                      wazenie_ic=True, wagi_ic=wagi_ic,
+                      wagi_ic_prog=prog_ic, wagi_ic_skaluj=skaluj_ic)
     m_off, m_on = _metryki(eng_off), _metryki(eng_on)
     return {
         "bary_test": n - podzial,
@@ -120,10 +123,17 @@ def _nota(nazwa, frac, w) -> str:
             f"pfOFF={w['pf_off']:.4f};pfON={w['pf_on']:.4f}")
 
 
-def _wczytaj_z_areny(nazwa):
+def _rodzaj_dla(prog_ic, skaluj_ic) -> str:
+    """Rodzaj cząstki w arenie zależny od konfiguracji — shrinkage nie miesza się z baseline."""
+    if prog_ic == 0.0 and skaluj_ic:
+        return _RODZAJ                                    # baseline W-361 (kompat z poprzednim biegiem)
+    return f"{_RODZAJ}_p{int(round(prog_ic * 1000)):03d}_s{int(bool(skaluj_ic))}"
+
+
+def _wczytaj_z_areny(nazwa, rodzaj=_RODZAJ):
     """Wznawialność: odczytaj policzoną cząstkę z areny (nota → dict) lub None."""
     from imperium.biblioteki.arena_baza import pytaj_pomiary
-    rekordy = pytaj_pomiary(rodzaj=_RODZAJ, neuron=nazwa, limit=1)
+    rekordy = pytaj_pomiary(rodzaj=rodzaj, neuron=nazwa, limit=1)
     if not rekordy:
         return None
     pola = dict(kv.split("=", 1) for kv in rekordy[0]["nota"].split(";") if "=" in kv)
@@ -142,15 +152,16 @@ def _wczytaj_z_areny(nazwa):
 
 
 def raport(pliki, interwal, frac=0.6, okno=250, min_trade_barow=400,
-           zapisz=True, max_barow=None, force=False) -> str:
+           zapisz=True, max_barow=None, force=False, prog_ic=0.0, skaluj_ic=True) -> str:
     from imperium.akwedukty.czytnik_csv import wczytaj_csv
     from imperium.biblioteki.arena_baza import zapisz_pomiar
+    rodzaj = _rodzaj_dla(prog_ic, skaluj_ic)
     per_para = []
     N = len(pliki)
     for i, plik in enumerate(pliki, 1):
         nazwa = Path(plik).name
         if not force:
-            zapisana = _wczytaj_z_areny(nazwa)
+            zapisana = _wczytaj_z_areny(nazwa, rodzaj)
             if zapisana is not None:
                 per_para.append(zapisana)
                 d = zapisana["ret_on"] - zapisana["ret_off"]
@@ -163,7 +174,8 @@ def raport(pliki, interwal, frac=0.6, okno=250, min_trade_barow=400,
         try:
             bary = wczytaj_csv(plik, interwal)
             w = analizuj_pare(bary, interwal, frac=frac, okno=okno,
-                              min_trade_barow=min_trade_barow, max_barow=max_barow)
+                              min_trade_barow=min_trade_barow, max_barow=max_barow,
+                              prog_ic=prog_ic, skaluj_ic=skaluj_ic)
         except Exception as e:  # noqa: BLE001
             print(f"[{i}/{N}] ⚠️ {nazwa}: {e}", file=sys.stderr, flush=True)
             continue
@@ -177,7 +189,7 @@ def raport(pliki, interwal, frac=0.6, okno=250, min_trade_barow=400,
               f"(Δ={d:+.1%}, tr OFF/ON={w['trades_off']}/{w['trades_on']}, test={w['bary_test']})",
               file=sys.stderr, flush=True)
         if zapisz:
-            zapisz_pomiar(_RODZAJ, nazwa, d, _nota(nazwa, frac, w))
+            zapisz_pomiar(rodzaj, nazwa, d, _nota(nazwa, frac, w))
             print(f"    💾 arena: cząstka {nazwa} zapisana", file=sys.stderr, flush=True)
 
     if not per_para:
@@ -192,8 +204,11 @@ def raport(pliki, interwal, frac=0.6, okno=250, min_trade_barow=400,
     tr_off = sum(p["trades_off"] for p in per_para)
     tr_on = sum(p["trades_on"] for p in per_para)
 
+    tryb_ic = ("baseline ×|IC|" if (prog_ic == 0.0 and skaluj_ic)
+               else f"shrinkage prog|IC|≥{prog_ic}" + ("" if skaluj_ic else ", tylko-znak"))
     linie = [
-        f"💰 A/B P&L WAŻENIE IC — PEŁNY backtest (W-361) — {len(per_para)} par, OOS (frac={frac})",
+        f"💰 A/B P&L WAŻENIE IC — PEŁNY backtest (W-361) — {len(per_para)} par, OOS "
+        f"(frac={frac}, tryb ON: {tryb_ic})",
         "   OFF = bazowa ścieżka | ON = + ważenie IC. Metryka: zwrot % TEST (weto/sizing/SL aktywne)",
         "",
         f"   {'PARA':<26} {'OFF%':>8} {'ON%':>8} {'Δ%':>8} {'trOFF':>6} {'trON':>6} {'wrON':>6}",
@@ -225,6 +240,10 @@ if __name__ == "__main__":
     p.add_argument("--max-barow", type=int, default=6000, help="ogranicz do ostatnich N barów/parę")
     p.add_argument("--bez-zapisu", action="store_true", help="nie zapisuj cząstek do areny")
     p.add_argument("--force", action="store_true", help="przelicz nawet policzone pary")
+    p.add_argument("--prog-ic", type=float, default=0.0,
+                   help="W-361b SHRINKAGE: próg |IC| — poniżej neuron zostaje na baseline (np. 0.03)")
+    p.add_argument("--bez-skali", action="store_true",
+                   help="W-361b: korekta TYLKO znaku (bez ×|IC|) — nie firuje śmieciowych wejść")
     args = p.parse_args()
 
     pliki = sorted(_glob.glob(str(ROOT / args.glob)))
@@ -232,4 +251,5 @@ if __name__ == "__main__":
         print("Brak plików pasujących do wzorca."); sys.exit(1)
     print(raport(pliki, args.interwal, frac=args.frac, okno=args.okno,
                  min_trade_barow=args.min_trade_barow, zapisz=not args.bez_zapisu,
-                 max_barow=args.max_barow, force=args.force))
+                 max_barow=args.max_barow, force=args.force,
+                 prog_ic=args.prog_ic, skaluj_ic=not args.bez_skali))

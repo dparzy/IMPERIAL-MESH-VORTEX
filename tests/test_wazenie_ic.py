@@ -146,6 +146,53 @@ def test_pusty_guard_w_wkladach_gdy_wagi_puste():
     assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).kierunek == "LONG"
 
 
+# ── W-361b SHRINKAGE: próg istotności |IC| + tryb tylko-znak ──────────────────
+
+def test_shrinkage_ponizej_progu_neuron_zostaje_baseline():
+    # A: LONG mocny, ale IC=-0.01 (szum) < prog 0.03 → NIE odwraca, zostaje LONG na baseline.
+    # B: SHORT słaby. OFF→LONG; z shrinkage nadal LONG (szum nie flipuje).
+    syg = [_syg("A", "LONG", 0.5), _syg("B", "SHORT", 0.2)]
+    leg = _leg()
+    leg.ustaw_wagi_ic({"A": -0.01, "B": 0.5}, wlacz=True, prog_ic=0.03)
+    assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).kierunek == "LONG"
+
+
+def test_shrinkage_powyzej_progu_odwraca():
+    # A: IC=-0.1 (istotny) ≥ prog 0.03 → odwrócony na SHORT; efekt jak w pełnym W-361.
+    syg = [_syg("A", "LONG", 0.5), _syg("B", "SHORT", 0.2)]
+    leg = _leg()
+    leg.ustaw_wagi_ic({"A": -0.1, "B": 0.1}, wlacz=True, prog_ic=0.03)
+    assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).kierunek == "SHORT"
+
+
+def test_shrinkage_prog_dokladnie_na_granicy_koryguje():
+    # |IC| == prog → warunek >=, więc korekta DZIAŁA (granica inkluzywna).
+    syg = [_syg("A", "LONG", 0.5)]
+    leg = _leg()
+    leg.ustaw_wagi_ic({"A": -0.03}, wlacz=True, prog_ic=0.03, skaluj_ic=False)
+    # flip na SHORT z baseline → kierunek SHORT
+    assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).kierunek == "SHORT"
+
+
+def test_tryb_tylko_znak_ignoruje_magnitude():
+    # A bazowo mocniejszy (2.5) niż B (2.0). Ze skalą: A×0.5=1.25 < B×1.0=2.0 → SHORT.
+    # Bez skali: baseline A=2.5 > B=2.0 → LONG. Dowodzi, że skaluj_ic ignoruje magnitude |IC|.
+    syg = [_syg("A", "LONG", 0.5), _syg("B", "SHORT", 0.4)]
+    leg = _leg()
+    leg.ustaw_wagi_ic({"A": 0.5, "B": 1.0}, wlacz=True, skaluj_ic=True)
+    assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).kierunek == "SHORT"   # ze skalą magnitudy
+    leg.ustaw_wagi_ic({"A": 0.5, "B": 1.0}, wlacz=True, skaluj_ic=False)
+    assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).kierunek == "LONG"    # bez skali → baseline
+
+
+def test_shrinkage_prog_zero_zachowuje_stare_w361():
+    # prog=0 + skaluj=True (domyślne) → identyczne z pierwotnym W-361 (flip przy IC<0).
+    syg = [_syg("A", "LONG", 0.5), _syg("B", "SHORT", 0.2)]
+    leg = _leg()
+    leg.ustaw_wagi_ic({"A": -1.0, "B": 1.0}, wlacz=True)   # prog_ic=0.0, skaluj_ic=True domyślnie
+    assert leg._agreguj("SYM", "FOKUS", "NORMAL", syg).kierunek == "SHORT"
+
+
 # ── Kanoniczna oblicz_wagi_ic (jedno źródło prawdy z hipoteza_b) ───────────────
 
 def test_oblicz_wagi_ic_dodatni_gdy_trafia():

@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-07-13 | 🔬 | W-361b SHRINKAGE: próg |IC| ratuje 122pp, ale wciąż < baseline — OFF
+
+**Wariant naprawczy po negatywnym A/B P&L (opcja 1 z sekwencji Cezara).** Diagnoza z poprzedniego
+biegu: naiwne ON firowało 781 vs 483 transakcji (win-rate ~30–40%) przez (a) odwracanie znaku na
+SZUMOWYCH |IC| i (b) ×|IC| przepuszczające śmieciowe wejścia przez weto. Lek: **próg istotności
+|IC|** (neuron z |IC|<prog zostaje na baseline — bez flipa/skalowania) + tryb **tylko-znak**
+(korekta kierunku bez ×|IC|, by nie firować nadmiaru wejść). Grinold&Kahn: |IC|<0.02 = szum.
+
+**Implementacja:** `Legatus.ustaw_wagi_ic(..., prog_ic, skaluj_ic)` + `_wklady_kierunkowe`
+(warunek `abs(ic) >= prog_ic`); prog=0/skaluj=True = pierwotne W-361 (kompat wsteczna, testy zielone).
+Opt-in przez backtest (`wagi_ic_prog`/`wagi_ic_skaluj`) + harness `--prog-ic`/`--bez-skali`
+(osobny rodzaj areny `ab_pnl_ic_p030_s0` — nie miesza z baseline).
+
+**Wynik (15 par 4h, prog|IC|≥0.03, tylko-znak):**
+- **PORTFEL: OFF=+34.1% → ON=+7.2%, Δ=−26.8pp.** Shrinkage odzyskał ~122pp vs naiwne ON (−114.9%).
+- ON>OFF na **5/15** par (było 3/15); transakcje 396 vs 483 OFF (naiwne było 781) — over-firing naprawiony.
+- **Wzorzec warunkowy:** ON WYGRYWA tam, gdzie OFF słaby/ujemny (ADA −3.8%→+15.4%, NEAR, DOT, LTC),
+  a PRZEGRYWA gdzie OFF mocny (ETH +18→+1.6, XRP +14.4→+3.7, MATIC +10.3→−0.6).
+
+**Decyzja (Prawo I+XV): flaga zostaje OFF.** Shrinkage potwierdził diagnozę i uratował moduł
+przed katastrofą, ale UNIFORM ważenie IC nadal nie bije baseline w kasie — nie wpinamy.
+
+**Hipoteza na przyszłość (nie realizowana bez decyzji Cezara):** wzorzec „ON pomaga słabym parom,
+szkodzi mocnym" sugeruje WARUNKOWE stosowanie (per-para/per-reżim, wg jakości bazowej roju) —
+ale to ryzyko przeuczenia doboru par; osobna hipoteza, osobny A/B. Na teraz: temat ważenia IC
+zamknięty jako OFF.
+
+**Pliki:** `imperium/legiony/legatus.py` (prog_ic/skaluj_ic), `imperium/koloseum/backtest.py`
+(opt-in), `narzedzia/ab_pnl_wazenie_ic.py` (--prog-ic/--bez-skali), `tests/test_wazenie_ic.py` (+5).
+
+---
+
 ## 2026-07-13 | ❌ | W-361 A/B na P&L: ważenie IC NIE poprawia zysku — flaga zostaje OFF
 
 **Rozstrzygający pomiar (ZASADA WPIĘCIA — walidacja korzyści na realnych danych = P&L, nie proxy).**

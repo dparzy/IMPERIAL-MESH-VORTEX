@@ -8,7 +8,21 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from narzedzia.ab_pnl_wazenie_ic import _status_werdyktu, _metryki, _nota
+from narzedzia.ab_pnl_wazenie_ic import _status_werdyktu, _metryki, _nota, _rodzaj_dla
+
+
+# ── Rozdział cząstek areny wg konfiguracji (guard: resume nie miesza wariantów) ─
+
+def test_rodzaj_baseline_stabilny():
+    # baseline (prog=0, skaluj=True) → historyczny rodzaj (kompat z poprzednim biegiem)
+    assert _rodzaj_dla(0.0, True) == "ab_pnl_ic"
+
+
+def test_rodzaj_shrinkage_ma_wlasny_partycje():
+    # shrinkage ma OSOBNY rodzaj → resume nie zwróci baseline zamiast shrinkage
+    assert _rodzaj_dla(0.03, False) == "ab_pnl_ic_p030_s0"
+    assert _rodzaj_dla(0.03, True) == "ab_pnl_ic_p030_s1"
+    assert _rodzaj_dla(0.0, True) != _rodzaj_dla(0.03, False)
 
 
 class _FakeStats:

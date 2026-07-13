@@ -418,6 +418,13 @@ class Legatus:
         self.wazenie_ic: bool = False
         self.wagi_ic: dict = {}          # {neuron_id: IC_kierunkowy ∈ [-1, 1]}
         self._domyslny_ic: float = 0.0   # IC dla neuronu bez pomiaru (0 = nie waży, jak offline)
+        # W-361b SHRINKAGE (wariant po negatywnym A/B na P&L): próg istotności |IC| —
+        # neuron z |IC| < prog zostaje na BASELINE (brak flipa, brak skalowania; szum bez
+        # wpływu, Grinold&Kahn |IC|<0.02 = szum). skaluj_ic=False → korekta TYLKO znaku
+        # (bez ×|IC|), by nie firować śmieciowych wejść przez weto. Domyślnie prog=0/skaluj=True
+        # = pierwotne zachowanie W-361 (kompatybilność wsteczna).
+        self._prog_ic: float = 0.0
+        self._skaluj_ic: bool = True
 
     def ustaw_wagi_rezimu(self, wagi: dict) -> None:
         """W-296: per-cykl override WAGI_REZIMU z DriftAdapter. Wywołaj PRZED fokus()."""
@@ -436,7 +443,8 @@ class Legatus:
         self.mnozniki_neuronow = mnozniki or {}
 
     def ustaw_wagi_ic(self, wagi: dict, wlacz: bool = True,
-                      domyslny_ic: float = 0.0) -> None:
+                      domyslny_ic: float = 0.0,
+                      prog_ic: float = 0.0, skaluj_ic: bool = True) -> None:
         """
         W-361: ustawia per-neuron IC kierunkowy (hipoteza B) i włącza ważenie IC.
 
@@ -449,10 +457,18 @@ class Legatus:
                      zachowanie bez zmian (ZASADA WPIĘCIA: domyślnie OFF).
         domyslny_ic: IC dla neuronu bez pomiaru. 0.0 = neuron nie waży (jak offline);
                      >0 → nowy/niezmierzony neuron zachowuje minimalny głos.
+        prog_ic:     W-361b SHRINKAGE — próg istotności. Neuron z |IC| < prog_ic zostaje na
+                     BASELINE (bez flipa, bez skalowania). 0.0 = brak progu (stare W-361).
+                     Sensowne ~0.02–0.05 (Grinold&Kahn: |IC|<0.02 = szum).
+        skaluj_ic:   True → wkład ×|IC| (pierwotne W-361). False → korekta TYLKO znaku
+                     (zaufany neuron głosuje w kierunku IC z wagą BASELINE — nie firuje
+                     śmieciowych wejść przez weto, lek na negatywny A/B P&L).
         """
         self.wagi_ic = wagi or {}
         self.wazenie_ic = bool(wlacz) and bool(self.wagi_ic)
         self._domyslny_ic = domyslny_ic
+        self._prog_ic = prog_ic
+        self._skaluj_ic = skaluj_ic
 
     def resetuj_wazenie_ic(self) -> None:
         """Wyłącza ważenie IC — rój wraca do agregacji bazowej (równa waga × reżim)."""
@@ -468,6 +484,9 @@ class Legatus:
         ON → wklad przemnożony przez |IC|, a przy IC<0 kierunek ODWRÓCONY (neuron mylący
         się systematycznie głosuje na przeciwną stronę — Grinold&Kahn, hipoteza B).
         IC=0 lub brak pomiaru (domyslny_ic=0) → wklad 0: neuron nie wpływa na agregat.
+
+        W-361b SHRINKAGE: neuron z |IC| < prog_ic zostaje na BASELINE (bez flipa/skalowania —
+        szum nie zmienia głosu). skaluj_ic=False → korekta samego znaku, wkład bez ×|IC|.
         """
         wazenie = self.wazenie_ic and bool(self.wagi_ic)
         out = []
@@ -478,9 +497,11 @@ class Legatus:
             wklad = s.pewnosc_finalna * s.waga
             if wazenie:
                 ic = self.wagi_ic.get(s.neuron_id, self._domyslny_ic)
-                if ic < 0:
-                    kier = "SHORT" if kier == "LONG" else "LONG"
-                wklad *= abs(ic)
+                if abs(ic) >= self._prog_ic:      # istotny IC — koryguj (poniżej progu: baseline)
+                    if ic < 0:
+                        kier = "SHORT" if kier == "LONG" else "LONG"
+                    if self._skaluj_ic:
+                        wklad *= abs(ic)
             out.append((s, kier, wklad))
         return out
 

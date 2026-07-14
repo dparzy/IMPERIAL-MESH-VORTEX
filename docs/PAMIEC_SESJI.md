@@ -101,6 +101,24 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Złoty Orzeł nieaktywny na DOGE z powodu death cross
+Strategia long-only (EMA50/EMA200) nie aktywowała się, ponieważ EMA50 < EMA200 przez cały okres testu DOGE.
+
+### 2026-06-30 — Pojedyncza próbka nie dowodzi martwoty neuronu
+W diagnostyce korelacji wymóg len(v) >= 2 do uznania neuronu za martwy. 1 próbka klasyfikowana jako 'niedostateczne dane'.
+
+### 2026-06-30 — Brak pola kategoria na SygnalNeuronu uniemożliwiał agregację wag reżimu
+Pole 'kategoria' nie istniało w SygnalNeuronu, przez co WAGI_REZIMU były martwym kodem. Dodano pole i przekazywanie z KATEGORII neuronu – teraz wagi reżimu działają poprawnie.
+
+### 2026-06-30 — Konieczność *_PREV dla wykrywania przecięć
+Wartości z poprzedniej świecy (*_PREV) są niezbędne do poprawnego wykrywania przecięć linii (np. MACD), ale Brama początkowo ich nie dostarczała – dodano funkcję _second_last_valid.
+
+### 2026-06-30 — Brak Stan na: w W6 to błąd, nie pominięcie
+Audyt spojności W6 milcząco pomijał bloki bez 'Stan na:'. Dodano jawne else zgłaszające błąd. RegExp rozszerzony o markdown `**Stan na:**`.
+
+### 2026-06-30 — Ulcer Index warmup wymaga tylko period próbek
+Implementacja Ulcer Index w Bramie używała warunku `< period+1`, co wymuszało niepotrzebnie dłuższy warmup. Poprawiono na `< period`, ponieważ funkcja operuje na c[-period:].
+
 ### 2026-06-30 — Błąd edycji README z powodu niedopasowania tekstu
 Próba edycji pliku README przez narzędzie `edit` nie powiodła się, ponieważ szukany fragment nieznacznie różnił się od faktycznej treści. Rozwiązanie: ponowne odczytanie pliku i użycie dokładnego tekstu.
 

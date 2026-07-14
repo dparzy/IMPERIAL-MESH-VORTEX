@@ -34,6 +34,27 @@ gdy dodamy który feed"** — spina lukę Prawa XV (22 milczące moduły) z konk
 3. **TIER C** — odrzucić lub zmierzyć korelację (jeśli |r|>0.8 z OC-04/RADAR-03 → scalić/waga w dół).
 4. Żaden nie wchodzi do kodu bez pomiaru areny (IC/WFO/DSR). U3 pokazał wartość: łapie overfitting, redundancję, confirmation bias — sędzia potwierdza.
 
+## 🌐 Web-recenzja Sonnet 5 (triada: DeepSeek→Opus→web, 2026-07-14)
+
+Trzecia noga triady — Sonnet 5 z internetem, niezależnie, ze źródłami. **Wszyscy TIER A → OSTROŻNIE**
+(nikt PRZED, nikt ODRZUĆ). Recenzja OSTRZEJSZA niż mój wstępny osąd — kluczowe korekty:
+
+- **VPIN → OSTROŻNIE.** Andersen-Bondarenko (2013/2014) POWAŻNIE obalili predykcję flash-crash: VPIN
+  osiąga szczyt PO krachu, nie przed; po kontroli intensywności obrotu **gorszy niż zwykły VIX**.
+  Bucket-size arbitralny, |OI| gubi kierunek. → wdrażać tylko wersję SYGNOWANĄ (Andersen-Bondarenko) + A/B.
+  Dane: CoinAPI/Binance WS (dostępne). [Kellogg: The Trouble with VPIN]
+- **COT_SENTIMENT_INDEX → OSTROŻNIE dla CRYPTO / PRZED dla par tradycyjnych.** KRYTYCZNE: CFTC COT
+  praktycznie NIE obejmuje krypto — tylko CME BTC/ETH futures, zero altów/spot/perp. Tygodniowy, z lagiem.
+  → wartość dla bota crypto ograniczona do BTC/ETH; sensowny dla forex/commodities.
+- **Euforia Dźwigni → OSTROŻNIE.** Próg 15:1 niepotwierdzony; w realnych krachach (Luna, FTX) perp/spot
+  SPADAŁ (delewarowanie), nie rósł. **Lepsze, równie dostępne alternatywy: funding rate + Estimated
+  Leverage Ratio (ELR = OI/rezerwy giełd, CryptoQuant).** → zastąpić/uzupełnić, próg liczyć empirycznie (kwantyl).
+  Dane: CoinGlass (darmowy dashboard perp/spot), funding z API giełd.
+
+**Upshot dla bota CRYPTO (nowa wiedza z web):** najlepsza droga to **funding rate + ELR (OI/rezerwy)**
+— lepiej ugruntowane niż surowy perp/spot i **mapują się na nasze luki PSY-01..04** (funding/LS/OI).
+COT schodzi w dół (krypto minimalne). VPIN zostaje, ale wersja sygnowana + obowiązkowe A/B. Wszyscy: opt-in OFF.
+
 ## P0b — żniwo wrzutni (osobny tor, NIE trading)
 6 nieprzerobionych tur (12 lip) z `wrzutnia/Mapa-kluczy calosc plus.md` to **idee infrastrukturalne**, nie kandydaci
 tradingowi: frameworki proaktywności/samorozwoju (Thoughtful Agents, Gödel/OmniAgent/AgentEvolver/Recursive

@@ -6,6 +6,66 @@
 
 ---
 
+## 2026-07-14 | ✨ | W-361 web — feed MEXC + markery bota na wykresie (panel przeglądarki)
+
+**Co:** rozbudowa `web_dashboard.py` (drugi kanał obserwacji, po terminalowej SPECULA):
+  • **MagazynSwiec** — pętla live wpycha bary z DataLoadera (`serwer_web.podaj_swiece(sym, bary)`),
+    router serwuje je na `/wykresy/{symbol}.json` gdy webhook TV pusty → **wykres pokazuje
+    świece MEXC BEZ konfiguracji TradingView/ngrok** (dotąd wymagany był webhook TV).
+  • **Markery wejść bota** — `znaczniki_do_lwc()` konwertuje wejścia (exact `timestamp_wejscia`
+    z otwartych pozycji + ostatnich zamknięć) na markery Lightweight Charts (▲ LONG zielony /
+    ▼ SHORT czerwony); JS `setMarkers()` filtruje po aktywnym symbolu. Cezar widzi GDZIE rój wszedł.
+  • **Selektor symboli** z obu źródeł (webhook TV ∪ feed MEXC), pole `symbole_swiec` w `/stan.json`.
+
+**Bonus:** ta sama pętla karmi też terminalową SPECULA (`stan.swiece`/`swiece_symbol`) — świece
+w terminalu ożywają na realnym biegu paper/live, nie tylko w demo.
+
+**Prawo I (bez zmyślania):** markery tylko WEJŚĆ — mają exact `timestamp_wejscia`. Markery WYJŚĆ
+odłożone: `WynikZamkniecia` nie ma czasu wyjścia (tylko `czas_trwania_bar`), dodanie wymaga
+przewleczenia timestampu przez ścieżkę zamknięcia engine — osobny krok, nie fałszujemy czasu.
+
+**Testy granic:** 19 testów (znaczniki LONG/SHORT/wyjście, ms→s, sortowanie, zły pomijany,
+MagazynSwiec roundtrip/cap/symbole, router fallback MEXC, symbole_swiec, integracja serwer→router).
+
+**Pliki:** `imperium/swiatynie/web_dashboard.py`, `imperium/swiatynie/live_monitor.py`
+(pole swiece_symbol + filtr znaczników), `imperium/koloseum/petla_live.py` (markery + feed),
+`tests/test_web_dashboard_swiece.py` (nowy).
+
+---
+
+## 2026-07-14 | ✨ | SPECULA (W-361) — świece OHLC w terminalu (podgląd live jak MEXC)
+
+**Co:** nowy organ `imperium/swiatynie/specula_swiec.py` (SPECULA — rzymska wieża
+strażnicza/obserwacyjna, ZASADA NOMENKLATURY) renderujący wykres ŚWIECOWY OHLC
+bezpośrednio w terminalu (nie w przeglądarce) — Cezar widzi świece jak na MEXC, plus
+opcjonalne znaczniki wejść (▲) / wyjść (▼) bota. Wpięte jako opcjonalny panel w
+`live_monitor.py` (`StanDashboardu.swiece` / `znaczniki_swiec`) — dokładany pod ramką TUI.
+
+**Dlaczego (Prawo XVI — nie redundancja):** trzeci kanał obserwacji tego samego feedu
+OHLC. Mieliśmy świece w PRZEGLĄDARCE (`web_dashboard.py`, Lightweight Charts) i liczby
+w TERMINALU (`live_monitor.py`) — ale NIE świec w terminalu. SPECULA wypełnia lukę.
+Motyw oszczędności tokenów: podgląd idzie do OCZU Cezara (osobny proces/okno), nie do
+kontekstu Claude — obserwacja rynku = 0 tokenów modelu.
+
+**Zależność OPCJONALNA (filozofia „runner bez deps"):** renderer to `plotext` (PyPI,
+MIT, zero obowiązkowych zależności). Guarded import — gdy plotext brak, panel degraduje
+się elegancko (komunikat-podpowiedź, nigdy crash); rdzeń i testy zostają bez zależności
+(jak matplotlib w kartografie, calibre/rapidocr w bibliotece). Instalacja lokalna:
+`pip install plotext` (poza requirements — wersjonowany kod nie wymaga jej na innych maszynach).
+
+**Lekcja Windows (Prawo I, dowód z runtime):** plotext wywala się na `fromtimestamp`
+(OSError 22) przy formie daty samej "H:M" — wymaga PEŁNEJ daty ("d/m/Y H:M") + lokalnego
+`fromtimestamp`. Ustalone eksperymentem, nie zgadywaniem.
+
+**Testy granic (Reguła Test-Granic):** 12 testów — brak plotext / 0 barów / 1 bar (<MIN=2) /
+None / dokładnie MIN / zły znacznik pomijany / zły bar → string nie wyjątek / integracja
+z LiveMonitor z i bez świec. Przechodzą z plotext i bez.
+
+**Pliki:** `imperium/swiatynie/specula_swiec.py` (nowy), `imperium/swiatynie/live_monitor.py`
+(pola swiece/znaczniki_swiec + render panelu), `tests/test_specula_swiec.py` (nowy).
+
+---
+
 ## 2026-07-14 | 🐞 | FIX: petla_live nie miała entrypointu — `python -m` nic nie uruchamiał
 
 **Bug (Prawo I, złapany gdy Cezar wkleił komendę):** `imperium/koloseum/petla_live.py` NIE miał bloku

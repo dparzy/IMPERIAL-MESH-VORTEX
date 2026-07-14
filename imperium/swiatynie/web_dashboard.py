@@ -4,6 +4,9 @@
 W-346: Panel webowy (http://localhost:8777) — rój 78 neuronów widoczny w przeglądarce.
 W-354: TradingView Webhook Receiver — alerty z TV wchodzą przez POST /webhook/tv
        i trafiają do roju; wykres świecowy (Lightweight Charts) renderuje bary na żywo.
+W-361: Feed MEXC bez webhooka (MagazynSwiec) — pętla live wpycha bary, które bot i tak
+       pobiera (bary_per) → wykres pokazuje świece MEXC bez konfiguracji TradingView.
+       + Markery wejść bota (▲ LONG / ▼ SHORT) na świecach (znaczniki_do_lwc → setMarkers).
 
 FILOZOFIA: ZERO ZALEŻNOŚCI (jak cały Imperium — runner bez deps). Zamiast FastAPI
 używamy `http.server` ze stdlib + samowystarczalny HTML (inline CSS/JS, fetch).
@@ -55,6 +58,86 @@ def nazwa_rzymska(symbol: str) -> str:
     return NAZWY_RZYMSKIE.get(baza.strip(" _-/:"), "")
 
 
+class MagazynSwiec:
+    """
+    Thread-safe magazyn świec z NASZEGO feedu (DataLoader / MEXC) — W-361.
+
+    Dopełnia webhooki TradingView (Prawo XVI, nie redundancja): webhook wymaga
+    konfiguracji TV + tunelu do localhost; MagazynSwiec pozwala pętli live wprost
+    wepchnąć bary, które bot i tak pobiera (bary_per) → wykres pokazuje świece MEXC
+    BEZ webhooka. Router serwuje magazyn gdy historia webhooka pusta.
+
+    petla_live woła podaj(symbol, bary); GET /wykresy/{symbol}.json → get(symbol).
+    """
+
+    def __init__(self, max_swiec: int = 500):
+        self._d: dict = {}
+        self._lock = threading.Lock()
+        self._max = max_swiec
+
+    def podaj(self, symbol: str, bary) -> None:
+        """Wrzuca bary w formacie Imperium {timestamp,open,high,low,close,...} → LWC."""
+        sw = []
+        for b in bary or []:
+            try:
+                t = int(b["timestamp"])
+                t = t // 1000 if t > 1_000_000_000_000 else t   # ms → s (LWC)
+                sw.append({
+                    "time": t,
+                    "open": float(b["open"]), "high": float(b["high"]),
+                    "low": float(b["low"]), "close": float(b["close"]),
+                })
+            except (KeyError, ValueError, TypeError):
+                continue
+        sw.sort(key=lambda x: x["time"])
+        with self._lock:
+            self._d[symbol.upper()] = sw[-self._max:]
+
+    def get(self, symbol: str) -> list:
+        with self._lock:
+            return list(self._d.get(symbol.upper(), []))
+
+    def symbole(self) -> list:
+        with self._lock:
+            return sorted(self._d.keys())
+
+
+def znaczniki_do_lwc(znaczniki) -> list:
+    """
+    Konwertuje znaczniki wejść/wyjść bota → markery Lightweight Charts (W-361).
+
+    Wejście: [{"timestamp": ms/s, "cena": float, "kierunek": "LONG"/"SHORT",
+               "typ": "wejscie"/"wyjscie", "symbol": "BTCUSDT"}]
+    Wyjście (posortowane rosnąco po time — wymóg LWC): markery z zachowanym polem
+    "symbol" (JS filtruje po aktywnym symbolu i je usuwa przed setMarkers).
+      LONG wejście  → ▲ zielony pod świecą
+      SHORT wejście → ▼ czerwony nad świecą
+      wyjście       → ▼ pomarańczowy nad świecą
+    """
+    out = []
+    for zn in znaczniki or []:
+        try:
+            t = int(zn["timestamp"])
+            t = t // 1000 if t > 1_000_000_000_000 else t
+            kier = zn.get("kierunek")
+            typ = zn.get("typ", "wejscie")
+            sym = (zn.get("symbol") or "").upper()
+        except (KeyError, ValueError, TypeError):
+            continue
+        if typ == "wyjscie":
+            m = {"time": t, "position": "aboveBar", "color": "#e67e22",
+                 "shape": "arrowDown", "text": "wyjście"}
+        elif kier == "SHORT":
+            m = {"time": t, "position": "aboveBar", "color": "#e74c3c",
+                 "shape": "arrowDown", "text": "SHORT"}
+        else:
+            m = {"time": t, "position": "belowBar", "color": "#2ecc71",
+                 "shape": "arrowUp", "text": "LONG"}
+        m["symbol"] = sym
+        out.append(m)
+    return sorted(out, key=lambda x: x["time"])
+
+
 def stan_do_json(stan) -> dict:
     """Serializuje StanDashboardu do dict JSON (pozycje, neurony, kapitał, reżim)."""
     pozycje = [{
@@ -93,6 +176,7 @@ def stan_do_json(stan) -> dict:
         "bledy": getattr(stan, "bledy", 0),
         "pozycje": pozycje,
         "neurony_top": neurony,
+        "znaczniki": znaczniki_do_lwc(getattr(stan, "znaczniki_swiec", [])),
     }
 
 
@@ -223,8 +307,18 @@ window.addEventListener('resize', () => {
 /* ── Stan aplikacji ───────────────────────────────────────────── */
 let aktywnySymbol = '';
 let ostDaneWebhook = null;
+let ostatnieZnaczniki = [];   // W-361: markery wejść/wyjść bota (z /stan.json)
 
 function kolorPnl(v){return v>0?'zielony':v<0?'czerwony':''}
+
+/* Markery bota na świecach — filtruj po aktywnym symbolu, zdejmij pole symbol (W-361) */
+function ustawMarkery(){
+  if (!aktywnySymbol){ swiece.setMarkers([]); return; }
+  const m = (ostatnieZnaczniki||[])
+    .filter(z => !z.symbol || z.symbol === aktywnySymbol)
+    .map(({symbol, ...r}) => r);
+  swiece.setMarkers(m);
+}
 
 /* ── Ładowanie wykresu z /wykresy/{symbol}.json ──────────────── */
 async function ladujWykres() {
@@ -240,6 +334,7 @@ async function ladujWykres() {
       open: d.open, high: d.high, low: d.low, close: d.close,
     })).filter(d => d.time).sort((a,b) => a.time - b.time);
     swiece.setData(swieczeTV);
+    ustawMarkery();   // W-361: nanieś markery wejść/wyjść bota po (prze)ładowaniu świec
     chart.timeScale().fitContent();
     _wykresInfo(`${aktywnySymbol} · ${dane.length} świec`);
   } catch(e) {
@@ -281,28 +376,33 @@ async function odswiez() {
     document.getElementById('wejscia').textContent = s.decyzje_wejscia + ' / ' + s.weta;
     document.getElementById('gubernator').textContent = s.postawa_gubernatora;
 
-    /* Update webhook status */
+    /* Status źródła świec */
     if (s.webhook) {
       const w = s.webhook;
       document.getElementById('webhook-status').textContent =
         `webhook: ${w.lacznie_alertow} alertów | ${w.bledy_parsowania} błędów`;
-      /* Update symbol selector */
-      const sel = document.getElementById('sel-symbol');
-      const obecne = new Set([...sel.options].map(o => o.value));
-      for (const sym of (w.symbole || [])) {
-        if (!obecne.has(sym)) {
-          const opt = document.createElement('option');
-          opt.value = sym; opt.textContent = sym;
-          sel.appendChild(opt);
-        }
-      }
-      /* Auto-select first symbol if none selected */
-      if (!aktywnySymbol && w.symbole && w.symbole.length) {
-        aktywnySymbol = w.symbole[0];
-        sel.value = aktywnySymbol;
-        ladujWykres();
+    } else {
+      document.getElementById('webhook-status').textContent = 'feed: MEXC (bez webhooka TV)';
+    }
+    /* Selektor symboli — z webhooka TV I/LUB feedu MEXC (W-361) */
+    const symbole = s.symbole_swiec || (s.webhook && s.webhook.symbole) || [];
+    const sel = document.getElementById('sel-symbol');
+    const obecne = new Set([...sel.options].map(o => o.value));
+    for (const sym of symbole) {
+      if (!obecne.has(sym)) {
+        const opt = document.createElement('option');
+        opt.value = sym; opt.textContent = sym;
+        sel.appendChild(opt);
       }
     }
+    if (!aktywnySymbol && symbole.length) {
+      aktywnySymbol = symbole[0];
+      sel.value = aktywnySymbol;
+      ladujWykres();
+    }
+    /* Markery wejść/wyjść bota (W-361) */
+    ostatnieZnaczniki = s.znaczniki || [];
+    ustawMarkery();
 
     /* Pozycje */
     const tb = document.querySelector('#pozycje tbody'); tb.innerHTML = '';
@@ -356,22 +456,30 @@ setInterval(ladujWykres, 5000);   // wykres świeży co 5s
 </body></html>"""
 
 
-def obsluz_sciezke(path: str, stan, odbiornik=None) -> Tuple[int, str, bytes]:
+def obsluz_sciezke(path: str, stan, odbiornik=None, magazyn=None) -> Tuple[int, str, bytes]:
     """
     Czysty GET router (testowalny bez gniazda). Zwraca (status, content_type, body_bytes).
       GET /                        → HTML panelu
-      GET /stan.json               → bieżący StanDashboardu + webhook stats jako JSON
+      GET /stan.json               → StanDashboardu + webhook stats + symbole_swiec
       GET /godlo.svg               → SVG godła
-      GET /wykresy/{SYMBOL}.json   → historia świec dla symbolu (W-354)
+      GET /wykresy/{SYMBOL}.json   → świece: webhook TV (W-354) LUB feed MEXC (W-361)
       inne                         → 404
+
+    magazyn (MagazynSwiec, W-361): źródło świec z naszego DataLoadera/MEXC — serwowane
+    gdy webhook nie ma historii dla symbolu. Symbole obu źródeł łączone w selektorze.
     """
     sciezka = path.split("?", 1)[0]
     if sciezka in ("/", "/index.html"):
         return 200, "text/html; charset=utf-8", _html_strona().encode("utf-8")
     if sciezka == "/stan.json":
         dane = stan_do_json(stan)
+        symbole = set()
         if odbiornik is not None:
             dane["webhook"] = odbiornik.statystyki()
+            symbole.update(dane["webhook"].get("symbole", []))
+        if magazyn is not None:
+            symbole.update(magazyn.symbole())
+        dane["symbole_swiec"] = sorted(symbole)
         body = json.dumps(dane, ensure_ascii=False).encode("utf-8")
         return 200, "application/json; charset=utf-8", body
     if sciezka == "/godlo.svg":
@@ -382,10 +490,11 @@ def obsluz_sciezke(path: str, stan, odbiornik=None) -> Tuple[int, str, bytes]:
             return 200, "image/svg+xml", b"<svg xmlns='http://www.w3.org/2000/svg'/>"
     if sciezka.startswith("/wykresy/") and sciezka.endswith(".json"):
         symbol = sciezka[len("/wykresy/"):-len(".json")].upper()
+        swiece = []
         if odbiornik is not None:
             swiece = odbiornik.swiecze_json(symbol)
-        else:
-            swiece = []
+        if not swiece and magazyn is not None:   # W-361: fallback na feed MEXC
+            swiece = magazyn.get(symbol)
         body = json.dumps(swiece, ensure_ascii=False).encode("utf-8")
         return 200, "application/json; charset=utf-8", body
     return 404, "text/plain; charset=utf-8", "404 — nieznana ścieżka".encode("utf-8")
@@ -417,7 +526,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
     def do_GET(self):  # noqa: N802
         stan = getattr(self.server, "stan_dashboardu", None)
         odbiornik = getattr(self.server, "odbiornik_webhook", None)
-        status, ctype, body = obsluz_sciezke(self.path, stan, odbiornik)
+        magazyn = getattr(self.server, "magazyn_swiec", None)
+        status, ctype, body = obsluz_sciezke(self.path, stan, odbiornik, magazyn)
         self._odpowiedz(status, ctype, body)
 
     def do_POST(self):  # noqa: N802
@@ -455,12 +565,20 @@ class SerwerDashboard:
         self._watek: Optional[threading.Thread] = None
         self._stan = _PustyStan()
         self._odbiornik = None
+        self._magazyn = MagazynSwiec()   # W-361: feed świec z DataLoadera/MEXC
 
     def aktualizuj(self, stan) -> None:
         """Podmienia bieżącą migawkę stanu (wołane co bar z pętli live)."""
         self._stan = stan
         if self._serwer is not None:
             self._serwer.stan_dashboardu = stan
+
+    def podaj_swiece(self, symbol: str, bary) -> None:
+        """
+        W-361: wrzuca bary (format Imperium) do magazynu świec — wykres MEXC bez
+        webhooka TV. Wołane co bar z pętli live dla każdego symbolu z bary_per.
+        """
+        self._magazyn.podaj(symbol, bary)
 
     def podepnij_webhook(self, odbiornik) -> None:
         """
@@ -479,6 +597,7 @@ class SerwerDashboard:
         self._serwer = HTTPServer((self.host, self.port), DashboardHandler)
         self._serwer.stan_dashboardu = self._stan
         self._serwer.odbiornik_webhook = self._odbiornik
+        self._serwer.magazyn_swiec = self._magazyn
         self._watek = threading.Thread(target=self._serwer.serve_forever, daemon=True)
         self._watek.start()
         logger.info(

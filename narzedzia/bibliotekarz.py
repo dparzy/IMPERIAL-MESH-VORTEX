@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import re
 import sys
 import time
 from pathlib import Path
@@ -73,8 +74,44 @@ def _fragmenty_tekst(wyniki) -> str:
     return "\n\n---\n\n".join(czesci)
 
 
-def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "fts",
-                korpus: str | None = "biblioteka") -> dict:
+_RE_SLOWO = re.compile(r"[A-Za-z0-9]+")
+
+
+def _fts_bezpieczne(q: str) -> str:
+    """U2: sanityzacja do bezpiecznej składni FTS5 — tylko słowa złączone OR.
+
+    Bez tego myślniki/słowa-klucze FTS wywalają MATCH (realny bug: temat
+    'momentum trend-following breakout entry rules' → OperationalError
+    'no such column: following' → temat cicho ginął). OR poszerza recall
+    (trafienie na dowolny termin), a BM25 i tak rankuje najlepsze na górę."""
+    slowa = _RE_SLOWO.findall(q or "")
+    return " OR ".join(slowa) if slowa else q
+
+
+_SYSTEM_ROZWIN = (
+    "Jesteś asystentem wyszukiwania pełnotekstowego w anglojęzycznej bibliotece tradingowej. "
+    "Rozwiń podany TEMAT w bogate zapytanie: dodaj synonimy, terminy techniczne i pokrewne "
+    "pojęcia (trading, finance, statistics). Zwróć WYŁĄCZNIE słowa kluczowe po angielsku, "
+    "oddzielone spacjami — bez zdań, bez wyjaśnień, bez interpunkcji. Maksymalnie 30 słów."
+)
+
+
+def rozwin_zapytanie(glos, temat: str) -> str:
+    """U2: DeepSeek rozszerza temat w zapytanie bogate w synonimy → lepszy recall FTS.
+
+    Retrieval-only: NIE generuje kandydatów, więc ryzyko halucynacji ograniczone do trafień
+    RAG, które i tak filtruje sędzia (Opus) + arena. Fallback na oryginalny temat przy pustej/
+    błędnej odpowiedzi — zwiad nigdy nie ginie przez błąd rozszerzenia (Prawo XV)."""
+    try:
+        odp = glos.zapytaj(_SYSTEM_ROZWIN, f"TEMAT: {temat}", temperatura=0.3)
+    except Exception:  # noqa: BLE001 — błąd API nie może zabić zwiadu; wracamy do surowego tematu
+        return temat
+    slowa = _RE_SLOWO.findall(odp or "")
+    return " ".join(slowa[:40]) or temat
+
+
+def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
+                korpus: str | None = "biblioteka", rozwin: bool = False) -> dict:
     """Jeden temat: RAG → DeepSeek proponuje kandydatów. Zwraca dict cząstki (do kolejki).
 
     Zakłada, że indeks RAG ISTNIEJE (bramkuje raport() — Cubic P2). Status cząstki:
@@ -82,20 +119,24 @@ def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "fts",
 
     U1 (anty-echo, Prawo XVI): domyślnie czytamy TYLKO korpus 'biblioteka' (książki BIB-xxx),
     nie 'docs'/'dane' — inaczej Hyginus wyciąga NASZE własne notatki i podaje je jako
-    „odkrycie" (echo własnego głosu = redundancja). korpus=None świadomie omija filtr."""
+    „odkrycie" (echo własnego głosu = redundancja). korpus=None świadomie omija filtr.
+
+    U2 (recall): tryb domyślnie 'hybrid' (auto-fallback na FTS gdy brak wektorów). Gdy rozwin=True
+    DeepSeek rozszerza temat w synonimy PRZED RAG. Zapytanie ZAWSZE sanityzowane do bezpiecznej
+    składni FTS5 (_fts_bezpieczne) — inaczej myślniki/słowa-klucze wywalają MATCH."""
     from szukaj import szukaj  # type: ignore[import]
-    wyniki = szukaj(temat, topk=topk, tryb=tryb, cichy=True, korpus=korpus)
+    zapytanie = rozwin_zapytanie(glos, temat) if (rozwin and glos is not None) else temat
+    wyniki = szukaj(_fts_bezpieczne(zapytanie), topk=topk, tryb=tryb, cichy=True, korpus=korpus)
     zrodla = sorted({w.zrodlo for w in wyniki})
+    baza = {"temat": temat, "zapytanie": zapytanie, "ts": time.time()}
     if not wyniki:                          # indeks jest (bramka w raport), więc to REALNY brak trafień
-        return {"temat": temat, "zrodla": [], "kandydaci": "(brak fragmentów RAG)",
-                "status": "pusto", "ts": time.time()}
+        return {**baza, "zrodla": [], "kandydaci": "(brak fragmentów RAG)", "status": "pusto"}
     if glos is None:                       # dry-run: bez DeepSeeka, tylko podgląd RAG
-        return {"temat": temat, "zrodla": zrodla,
-                "kandydaci": "(dry-run — DeepSeek pominięty)", "status": "dry", "ts": time.time()}
+        return {**baza, "zrodla": zrodla,
+                "kandydaci": "(dry-run — DeepSeek pominięty)", "status": "dry"}
     tresc = f"TEMAT: {temat}\n\nFRAGMENTY:\n{_fragmenty_tekst(wyniki)}"
     odp = glos.zapytaj(_SYSTEM, tresc, temperatura=0.4)
-    return {"temat": temat, "zrodla": zrodla, "kandydaci": odp.strip(),
-            "status": "ok", "ts": time.time()}
+    return {**baza, "zrodla": zrodla, "kandydaci": odp.strip(), "status": "ok"}
 
 
 def _tematy_ukonczone() -> set:
@@ -125,7 +166,8 @@ def zapisz_czastke(czastka: dict) -> None:
         f.write(json.dumps(czastka, ensure_ascii=False) + "\n")
 
 
-def raport(tematy, topk=6, tryb="fts", dry_run=False, force=False, korpus="biblioteka") -> str:
+def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="biblioteka",
+           rozwin=False) -> str:
     # Cubic P2: bramka indeksu RAG — brak bazy to AWARIA INFRY, nie „pusty wynik". Nie skanujemy
     # i NIC nie zapisujemy do kolejki (inaczej awaria udawałaby ukończony, pusty zwiad).
     from szukaj import DEFAULT_BAZA  # type: ignore[import]
@@ -153,7 +195,7 @@ def raport(tematy, topk=6, tryb="fts", dry_run=False, force=False, korpus="bibli
         print(f"[{i}/{N}] zwiad: „{temat}” — RAG + {'(dry)' if dry_run else 'DeepSeek'}…",
               file=sys.stderr, flush=True)
         try:
-            czastka = scout_temat(glos, temat, topk=topk, tryb=tryb, korpus=korpus)
+            czastka = scout_temat(glos, temat, topk=topk, tryb=tryb, korpus=korpus, rozwin=rozwin)
         except Exception as e:  # noqa: BLE001
             print(f"[{i}/{N}] ⚠️ „{temat}”: {e}", file=sys.stderr, flush=True)
             continue
@@ -184,9 +226,12 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description="HYGINUS — Bibliotekarz-Zwiadowca, DeepSeek skanuje bibliotekę (W-363)")
     p.add_argument("--temat", action="append", help="temat zwiadu (można wiele razy). Brak → domyślne.")
     p.add_argument("--topk", type=_topk_arg, default=6, help=f"ile fragmentów RAG na temat [1, {_TOPK_MAX}]")
-    p.add_argument("--tryb", default="fts", choices=["fts", "hybrid", "wektor"])
+    p.add_argument("--tryb", default="hybrid", choices=["fts", "hybrid", "wektor"],
+                   help="U2: domyślnie 'hybrid' (semantyka+FTS; auto-fallback na FTS gdy brak wektorów)")
     p.add_argument("--korpus", default="biblioteka", choices=["biblioteka", "dane", "docs", "wszystko"],
                    help="korpus RAG do zwiadu (U1: domyślnie 'biblioteka' — tylko książki, anty-echo docs)")
+    p.add_argument("--rozwin", action="store_true",
+                   help="U2: rozszerz temat przez DeepSeek w synonimy przed RAG (lepszy recall; +1 tani call/temat)")
     p.add_argument("--dry-run", action="store_true", help="tylko RAG, bez DeepSeek (bez kosztu API)")
     p.add_argument("--force", action="store_true", help="przeskanuj też tematy już w kolejce")
     args = p.parse_args()
@@ -194,4 +239,4 @@ if __name__ == "__main__":
     tematy = args.temat or TEMATY_DOMYSLNE
     korpus = None if args.korpus == "wszystko" else args.korpus  # 'wszystko' → bez filtra (dawne zachowanie)
     print(raport(tematy, topk=args.topk, tryb=args.tryb, dry_run=args.dry_run,
-                 force=args.force, korpus=korpus))
+                 force=args.force, korpus=korpus, rozwin=args.rozwin))

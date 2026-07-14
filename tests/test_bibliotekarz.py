@@ -10,7 +10,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "narzedzia", "rag"))
 
 import narzedzia.bibliotekarz as bib
-from narzedzia.bibliotekarz import _fragmenty_tekst, scout_temat, _SYSTEM, _topk_arg, _tematy_ukonczone
+from narzedzia.bibliotekarz import (
+    _fragmenty_tekst, scout_temat, _SYSTEM, _topk_arg, _tematy_ukonczone,
+    _fts_bezpieczne, rozwin_zapytanie,
+)
 
 _FakeWynik = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
 
@@ -82,3 +85,44 @@ def test_tematy_ukonczone_pomija_dry(tmp_path, monkeypatch):
     done = _tematy_ukonczone()
     assert "realny" in done and "stary_bez_statusu" in done
     assert "podglad" not in done          # dry-run nie blokuje realnego zwiadu
+
+
+class _FakeGlos:
+    """Atrapa GlosImperium — nie dotyka API. Zwraca ustaloną odpowiedź lub rzuca błąd."""
+    def __init__(self, odp=None, blad=False):
+        self._odp, self._blad = odp, blad
+
+    def zapytaj(self, system, tresc, temperatura=0.7):
+        if self._blad:
+            raise RuntimeError("API down")
+        return self._odp
+
+
+def test_fts_bezpieczne_sanityzuje_i_nie_wywala():
+    # U2: myślniki/słowa-klucze FTS5 nie mogą wywalić MATCH — sanityzacja do słów złączonych OR.
+    assert _fts_bezpieczne("momentum trend-following breakout") == "momentum OR trend OR following OR breakout"
+    assert _fts_bezpieczne("mean reversion") == "mean OR reversion"
+    assert _fts_bezpieczne("!!!") == "!!!"      # brak słów → oryginał (nie tworzymy pustego MATCH)
+
+
+def test_rozwin_zapytanie_sanityzuje_i_fallback():
+    # U2: rozszerzenie zwraca same słowa; pusta/błędna odpowiedź → fallback na temat (Prawo XV).
+    g = _FakeGlos(odp="mean-reversion, bands! overextension zscore")
+    assert rozwin_zapytanie(g, "mean reversion") == "mean reversion bands overextension zscore"
+    assert rozwin_zapytanie(_FakeGlos(odp="   "), "temat X") == "temat X"    # pusto → temat
+    assert rozwin_zapytanie(_FakeGlos(blad=True), "temat Y") == "temat Y"    # błąd API → temat
+
+
+def test_scout_rozwin_uzywa_rozszerzonego_zapytania(monkeypatch):
+    # U2: gdy rozwin=True i jest glos — RAG idzie na ROZSZERZONYM (sanityzowanym) zapytaniu, nie surowym.
+    import szukaj as szukaj_mod
+    zebrane = {}
+
+    def fake_szukaj(q, topk=5, tryb="hybrid", cichy=False, korpus=None, **kw):
+        zebrane["q"] = q
+        return []
+
+    monkeypatch.setattr(szukaj_mod, "szukaj", fake_szukaj)
+    cz = scout_temat(_FakeGlos(odp="momentum breakout volatility"), "momentum", topk=3, rozwin=True)
+    assert cz["zapytanie"] == "momentum breakout volatility"      # rozszerzone zachowane w rekordzie
+    assert zebrane["q"] == "momentum OR breakout OR volatility"   # do FTS poszło sanityzowane OR

@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-07-14 | 🔭 | Hyginus U2 — recall: sanityzacja FTS + query-expansion + hybrid
+
+**Ulepszenie U2 (`narzedzia/bibliotekarz.py`):** trzy rzeczy dla lepszego recall zwiadu.
+
+- **Fix crash-buga FTS (Prawo XV):** temat `momentum trend-following breakout entry rules` WYWALAŁ
+  FTS5 MATCH (`OperationalError: no such column: following` — myślnik/składnia) → temat cicho ginął.
+  Nowy `_fts_bezpieczne` sanityzuje KAŻDE zapytanie do słów złączonych `OR` (poszerza recall, BM25 rankuje).
+- **Query-expansion opt-in (`--rozwin`, domyślnie OFF):** DeepSeek rozszerza temat w synonimy PRZED RAG
+  (`rozwin_zapytanie`). Retrieval-only → ryzyko halucynacji ograniczone do trafień, które filtruje
+  sędzia+arena. Fallback na surowy temat przy błędzie/pustce (zwiad nigdy nie ginie).
+- **Hybrid jako domyślny tryb (future-proof):** auto-fallback na FTS gdy brak wektorów. Uwaga (Prawo I):
+  na tej maszynie baza ma 0 wektorów i brak `sentence-transformers` → hybrid = FTS aż zbudujemy embeddingi.
+- +3 testy granic (sanitizer, rozszerzenie+fallback, scout na rozszerzonym zapytaniu).
+
+**Powód:** drugi krok planu U1+U2+U3. Opt-in, monotonicznie ostrożne. `zapytanie` zapisywane w rekordzie kolejki (transparentność).
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py`.
+
+---
+
 ## 2026-07-14 | 🔭 | Hyginus U1 — zwiad tylko z korpusu „biblioteka" (anty-echo)
 
 **Ulepszenie U1 Bibliotekarza-Zwiadowcy (`narzedzia/bibliotekarz.py`):** `scout_temat`/`raport`

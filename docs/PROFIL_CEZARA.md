@@ -31,6 +31,10 @@
 - Tryb autonomiczny: nie chce klikać przy każdej zmianie — commituj SAM po zielonych testach + czystym audycie.
   PUSH robi WYŁĄCZNIE Cezar ręcznie (zaostrzenie 2026-07-11) — Claude nigdy nie pushuje, tylko melduje gotowość.
 - Pyta tylko o decyzje kierunkowe/nieodwracalne (kasowanie, kapitał, strategia, koszt).
+- **Oszczędność tokenów — model wg trudności (ZASADA NA ZAWSZE, 2026-07-14):** nie wszystko wymaga
+  Opusa. Ciężkie/kierunkowe/osąd → Opus (Vitruviusz). Weryfikacja web/średni kod → Sonnet 5 (subagent).
+  Mechaniczne/masowe → Haiku. Proaktywnie proponuj tier przy większych zadaniach; drobiazgi inline
+  (subagent startuje na zimno). Cezar sam przełącza model sesji na lżejszy, gdy trzeba.
 - Ceni twarde dowody: kod+testy > opinie. Liczby policzone z plików, nie z pamięci.
 - Lubi porównania z konkurencją/światem zewnętrznym (np. Hermes Agent) i adopcję najlepszych pomysłów.
 - Chce pełnej ciągłości pamięci — „abyśmy pamiętali wszystkie nasze rozmowy i cały czat" — lokalnie i w chmurze.

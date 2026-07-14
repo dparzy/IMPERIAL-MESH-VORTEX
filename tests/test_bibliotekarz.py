@@ -53,6 +53,23 @@ def test_topk_arg_odrzuca_poza_zakresem():
             _topk_arg(zly)
 
 
+def test_scout_domyslnie_korpus_biblioteka(monkeypatch):
+    # U1 (anty-echo, Prawo XVI): scout domyślnie czyta TYLKO korpus 'biblioteka' (książki),
+    # nie 'dane'/'docs'. Sprawdzamy, że korpus jest forwardowany do RAG i domyślnie = biblioteka.
+    import szukaj as szukaj_mod
+    zebrane = {}
+
+    def fake_szukaj(temat, topk=5, tryb="hybrid", cichy=False, korpus=None, **kw):
+        zebrane["korpus"] = korpus
+        return []
+
+    monkeypatch.setattr(szukaj_mod, "szukaj", fake_szukaj)
+    scout_temat(None, "mean reversion", topk=3, tryb="fts")
+    assert zebrane["korpus"] == "biblioteka"          # domyślnie tylko książki
+    scout_temat(None, "mean reversion", topk=3, tryb="fts", korpus=None)
+    assert zebrane["korpus"] is None                  # override: None = bez filtra (dawne zachowanie)
+
+
 def test_tematy_ukonczone_pomija_dry(tmp_path, monkeypatch):
     # Cubic P2: dedup liczy realny zwiad (ok/pusto, stare bez statusu), ale NIE dry-run.
     kol = tmp_path / "kolejka.jsonl"

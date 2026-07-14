@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-07-14 | 🔭 | Hyginus U1 — zwiad tylko z korpusu „biblioteka" (anty-echo)
+
+**Ulepszenie U1 Bibliotekarza-Zwiadowcy (`narzedzia/bibliotekarz.py`):** `scout_temat`/`raport`
+domyślnie czytają TYLKO korpus `biblioteka` (książki BIB-xxx), a nie `dane`/`docs`. Wcześniej
+zwiad szedł po wszystkich korpusach (`korpus=None`) — mógł wyciągnąć NASZE własne fragmenty
+(`dane`: 75 frag.) i podać je jako „odkrycie" (echo własnego głosu = redundancja, Prawo XVI).
+
+- Nowa flaga CLI `--korpus` (domyślnie `biblioteka`; `wszystko` przywraca dawne zachowanie bez filtra).
+- Ustalono empirycznie: realne korpusy w bazie to `biblioteka` (27 566) i `dane` (75); `docs` NIE indeksowany.
+- +1 test granicy (`test_scout_domyslnie_korpus_biblioteka`) — forward korpusu + domyślna wartość.
+
+**Powód:** pierwszy krok planu ulepszeń Hyginusa (U1+U2+U3 → U4 → żniwo; U5 odrzucony). Opt-in,
+monotonicznie ostrożne, zero zmiany domyślnej ścieżki decyzyjnej roju.
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py`.
+
+---
+
 ## 2026-07-13 | 🔎 | Re-Audyt weryfikacyjny — korekta błędnych odrzuceń (brak weryfikacji web)
 
 **Cezar wskazał głęboki błąd procesu:** oceniałem pomysły/opcje BEZ weryfikacji najświeższych

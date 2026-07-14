@@ -73,13 +73,18 @@ def _fragmenty_tekst(wyniki) -> str:
     return "\n\n---\n\n".join(czesci)
 
 
-def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "fts") -> dict:
+def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "fts",
+                korpus: str | None = "biblioteka") -> dict:
     """Jeden temat: RAG → DeepSeek proponuje kandydatów. Zwraca dict cząstki (do kolejki).
 
     Zakłada, że indeks RAG ISTNIEJE (bramkuje raport() — Cubic P2). Status cząstki:
-    'ok' = kandydaci od DeepSeeka, 'dry' = podgląd RAG bez API, 'pusto' = brak trafień."""
+    'ok' = kandydaci od DeepSeeka, 'dry' = podgląd RAG bez API, 'pusto' = brak trafień.
+
+    U1 (anty-echo, Prawo XVI): domyślnie czytamy TYLKO korpus 'biblioteka' (książki BIB-xxx),
+    nie 'docs'/'dane' — inaczej Hyginus wyciąga NASZE własne notatki i podaje je jako
+    „odkrycie" (echo własnego głosu = redundancja). korpus=None świadomie omija filtr."""
     from szukaj import szukaj  # type: ignore[import]
-    wyniki = szukaj(temat, topk=topk, tryb=tryb, cichy=True)
+    wyniki = szukaj(temat, topk=topk, tryb=tryb, cichy=True, korpus=korpus)
     zrodla = sorted({w.zrodlo for w in wyniki})
     if not wyniki:                          # indeks jest (bramka w raport), więc to REALNY brak trafień
         return {"temat": temat, "zrodla": [], "kandydaci": "(brak fragmentów RAG)",
@@ -120,7 +125,7 @@ def zapisz_czastke(czastka: dict) -> None:
         f.write(json.dumps(czastka, ensure_ascii=False) + "\n")
 
 
-def raport(tematy, topk=6, tryb="fts", dry_run=False, force=False) -> str:
+def raport(tematy, topk=6, tryb="fts", dry_run=False, force=False, korpus="biblioteka") -> str:
     # Cubic P2: bramka indeksu RAG — brak bazy to AWARIA INFRY, nie „pusty wynik". Nie skanujemy
     # i NIC nie zapisujemy do kolejki (inaczej awaria udawałaby ukończony, pusty zwiad).
     from szukaj import DEFAULT_BAZA  # type: ignore[import]
@@ -148,7 +153,7 @@ def raport(tematy, topk=6, tryb="fts", dry_run=False, force=False) -> str:
         print(f"[{i}/{N}] zwiad: „{temat}” — RAG + {'(dry)' if dry_run else 'DeepSeek'}…",
               file=sys.stderr, flush=True)
         try:
-            czastka = scout_temat(glos, temat, topk=topk, tryb=tryb)
+            czastka = scout_temat(glos, temat, topk=topk, tryb=tryb, korpus=korpus)
         except Exception as e:  # noqa: BLE001
             print(f"[{i}/{N}] ⚠️ „{temat}”: {e}", file=sys.stderr, flush=True)
             continue
@@ -180,9 +185,13 @@ if __name__ == "__main__":
     p.add_argument("--temat", action="append", help="temat zwiadu (można wiele razy). Brak → domyślne.")
     p.add_argument("--topk", type=_topk_arg, default=6, help=f"ile fragmentów RAG na temat [1, {_TOPK_MAX}]")
     p.add_argument("--tryb", default="fts", choices=["fts", "hybrid", "wektor"])
+    p.add_argument("--korpus", default="biblioteka", choices=["biblioteka", "dane", "docs", "wszystko"],
+                   help="korpus RAG do zwiadu (U1: domyślnie 'biblioteka' — tylko książki, anty-echo docs)")
     p.add_argument("--dry-run", action="store_true", help="tylko RAG, bez DeepSeek (bez kosztu API)")
     p.add_argument("--force", action="store_true", help="przeskanuj też tematy już w kolejce")
     args = p.parse_args()
 
     tematy = args.temat or TEMATY_DOMYSLNE
-    print(raport(tematy, topk=args.topk, tryb=args.tryb, dry_run=args.dry_run, force=args.force))
+    korpus = None if args.korpus == "wszystko" else args.korpus  # 'wszystko' → bez filtra (dawne zachowanie)
+    print(raport(tematy, topk=args.topk, tryb=args.tryb, dry_run=args.dry_run,
+                 force=args.force, korpus=korpus))

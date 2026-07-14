@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-07-14 | 📖 | BIB-032 O'Hara domknięty — 69/69 książek w RAG (OCR angielskiego skanu)
+
+**Domknięcie biblioteki (Prawo XV):** BIB-032 „O'Hara — Market Microstructure Theory" był jedyną
+książką poza RAG (68/69) — chiński skan bez warstwy tekstu. Cezar dostarczył **angielskie wydanie**
+(też skan, 298 stron). OCR przez `rapidocr-onnxruntime` (render PyMuPDF, ~187 DPI) → **686 986 znaków**
+angielskiego tekstu do wersjonowanego `tekst_cache`. Reindeks: +319 fragmentów BIB-032, **69/69 książek**,
+parytet fragmenty=fts=27959, wyszukiwalny (spread/market-maker/inventory zwraca BIB-032).
+
+- Skrypt OCR wznawialny (strona→plik→sklejenie, ZASADA ANALIZY CZĄSTKOWEJ, pasek postępu — scratchpad, nie repo).
+- Stary chiński cache (pusty, inny hash) usunięty; nowy cache wersjonowany (chmura czyta bez OCR — Prawo XVII).
+- Prawo I: proza angielska czysta i użyteczna; wzory matematyczne kruszą się w OCR (jak Shreve) — esencja pojęć, nie wzory.
+
+**Pliki:** `bibliotheca_ulpia/dane/tekst_cache/BIB-032_...__bcfde4140356c035.txt` (nowy), stary cache usunięty.
+
+---
+
 ## 2026-07-14 | 🔭 | Hyginus U3 — self-critique: dowody PRZECIW (anty-confirmation-bias)
 
 **Ulepszenie U3 (`narzedzia/bibliotekarz.py`):** opcjonalne (`--krytyka`, domyślnie OFF) drugie

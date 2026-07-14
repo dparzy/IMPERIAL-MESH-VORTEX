@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-07-14 | 🐞 | FIX: petla_live nie miała entrypointu — `python -m` nic nie uruchamiał
+
+**Bug (Prawo I, złapany gdy Cezar wkleił komendę):** `imperium/koloseum/petla_live.py` NIE miał bloku
+`if __name__ == "__main__"` → `python -m imperium.koloseum.petla_live` tylko importował moduł i wychodził
+bez akcji (pętla nie startowała). Handoff dawał komendę, która nic nie robiła.
+
+**Fix:** dodany entrypoint CLI (argparse): `--symbole` (domyślnie BTC/ETH/SOL), `--interwal` (1H),
+`--kapital`, `--real` (domyślnie PAPER — zero realnych zleceń), `--arena-log`, `--monitor`, `--max-barow`
+(limit/test), `--pauza`. Baner startowy jasno mówi PAPER vs REALNE. Uwaga w help: 1H = 1 bar/godzinę
+(pętla czeka między świecami — normalne). DOWÓD: `python -m ... --max-barow 2 --pauza 1` → 2 bary, 1 wejście, 0 błędów.
+
+**Poprawna komenda paper:** `python -m imperium.koloseum.petla_live --symbole BTCUSDT ETHUSDT --arena-log`
+(szybki test: `--max-barow 3 --pauza 2`).
+
+**Pliki:** `imperium/koloseum/petla_live.py`.
+
+---
+
 ## 2026-07-14 | 🐞 | FIX krytyczny: żywa pętla nie pobierała danych ('1H'→ccxt NotSupported)
 
 **Bug znaleziony w runtime (nie zgadywany — zasada debugowania):** `KonfigPetliLive.interwal`

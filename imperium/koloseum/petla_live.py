@@ -62,6 +62,12 @@ class KonfigPetliLive:
     ksiega_wad: bool = False
     # W-314: Filtr Asymetrii Reżimu — weto na rynku bocznym (ADX) i kontr-trendzie. OFF.
     filtr_asymetrii: bool = False
+    # W-288: SL = sl_atr_mult × ATR_14 (opt-in; None = stary SL z dźwigni). Istniał w
+    # backteście/Dyrygencie/kalkulatorze, ale był NIEPODPIĘTY do pętli live (utrata
+    # potencjału, Prawo XV). Monotoniczna ostrożność: ATR-SL tylko ZACIEŚNIA stop
+    # (nigdy bliżej likwidacji niż lewarowy) — bezpieczny nawet przed pełną walidacją.
+    # Domyka rytmem RYNKU zamiast −25% z dźwigni nieosiągalnego na 1H (198/201 TIMEOUT).
+    sl_atr_mult: Optional[float] = None
     # W-327: źródło funding/OI dla PSY-01/04. True=MEXC (rodzime — funding który
     # FAKTYCZNIE płacisz na MEXC), False=Binance fapi. L/S ratio (PSY-02) zawsze z
     # Binance (MEXC nie ma łatwego public L/S; sentyment rynkowy cross-giełdowy OK).
@@ -212,6 +218,7 @@ def _buduj_dyrygencie(
             namiestnik=namiestnik,
             adaptery=adaptery_sentymentu,
             filtr_asymetrii=cfg.filtr_asymetrii,
+            sl_atr_mult=cfg.sl_atr_mult,
         )
         d.kapital_sizing = kapital_per
         if cfg.igrzyska:
@@ -745,6 +752,9 @@ def _zbuduj_parser():
                    help="Senat Debaty (KonsulSenatu per symbol weryfikuje kierunek, W-343)")
     p.add_argument("--kalibruj-prog", action="store_true",
                    help="bramka konformalna progu pewności (ML-36) — tylko ZAOSTRZA po serii strat")
+    p.add_argument("--sl-atr-mult", type=float, default=None,
+                   help="SL = k×ATR_14 (W-288, realistyczne zamknięcia; np. 2.0). None = SL z dźwigni. "
+                        "ATR-SL tylko ZACIEŚNIA stop — monotoniczna ostrożność")
     p.add_argument("--telegram", action="store_true",
                    help="alerty Telegram na wejścia/zamknięcia/weto (wymaga TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID)")
     p.add_argument("--max-barow", type=int, default=None,
@@ -763,11 +773,14 @@ def zbuduj_konfig_z_argv(argv=None):
     a = _zbuduj_parser().parse_args(argv)
     if a.webhook_tv and not a.dashboard:
         raise SystemExit("--webhook-tv wymaga --dashboard (serwer HTTP musi być uruchomiony).")
+    if a.sl_atr_mult is not None and a.sl_atr_mult <= 0:
+        raise SystemExit("--sl-atr-mult musi być > 0 (mnożnik ATR); pomiń flagę dla SL z dźwigni.")
     kfg = KonfigPetliLive(
         symbole=a.symbole, interwal=a.interwal, kapital_startowy=a.kapital,
         paper=not a.real, arena_log=a.arena_log, monitor=a.monitor, pauza_sekundy=a.pauza,
         dashboard=a.dashboard, dashboard_port=a.dashboard_port, webhook_tv=a.webhook_tv,
         senat=a.senat, kalibruj_prog=a.kalibruj_prog, telegram=a.telegram,
+        sl_atr_mult=a.sl_atr_mult,
     )
     return kfg, a.max_barow
 

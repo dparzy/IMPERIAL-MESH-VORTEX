@@ -362,3 +362,55 @@ def test_cli_webhook_z_dashboardem_ok():
     kfg, _ = zbuduj_konfig_z_argv(["--webhook-tv", "--dashboard"])
     assert kfg.webhook_tv is True
     assert kfg.dashboard is True
+
+
+# ── W-288 SL z ATR: wpięcie CLI → config → Dyrygent (dotąd niepodpięte do live) ──
+
+def test_cli_sl_atr_mult_domyslnie_none():
+    kfg, _ = zbuduj_konfig_z_argv([])
+    assert kfg.sl_atr_mult is None   # brak flagi = stary SL z dźwigni (zero zmian)
+
+
+def test_cli_sl_atr_mult_trafia_do_configu():
+    kfg, _ = zbuduj_konfig_z_argv(["--sl-atr-mult", "2.0"])
+    assert kfg.sl_atr_mult == 2.0
+
+
+def test_cli_sl_atr_mult_niedodatni_pada_glosno():
+    """mult ≤ 0 bez sensu (mnożnik ATR) → SystemExit, nie cichy no-op."""
+    import pytest
+    with pytest.raises(SystemExit):
+        zbuduj_konfig_z_argv(["--sl-atr-mult", "0"])
+    with pytest.raises(SystemExit):
+        zbuduj_konfig_z_argv(["--sl-atr-mult", "-1.5"])
+
+
+def test_sl_atr_mult_wpiety_w_dyrygenta():
+    """W-288 był w Dyrygencie/kalkulatorze/backteście ale NIE w pętli live (Prawo XV).
+    _buduj_dyrygencie musi przekazać cfg.sl_atr_mult do każdego Dyrygenta."""
+    try:
+        import talib  # noqa: F401
+    except ImportError:
+        return
+    from imperium.koloseum.petla_live import _buduj_dyrygencie
+    from imperium.koloseum.paper_trading import PaperTradingEngine
+
+    engine = PaperTradingEngine(kapital_startowy=10_000.0)
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"], interwal="1H", synapsy=False, sl_atr_mult=2.0)
+    d = _buduj_dyrygencie(["BTCUSDT"], kfg, engine)["BTCUSDT"]
+    assert d.sl_atr_mult == 2.0
+
+
+def test_sl_atr_mult_domyslnie_none_w_dyrygencie():
+    """Domyślnie None → Dyrygent na starym SL (zero regresji dla istniejących biegów)."""
+    try:
+        import talib  # noqa: F401
+    except ImportError:
+        return
+    from imperium.koloseum.petla_live import _buduj_dyrygencie
+    from imperium.koloseum.paper_trading import PaperTradingEngine
+
+    engine = PaperTradingEngine(kapital_startowy=10_000.0)
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"], interwal="1H", synapsy=False)
+    d = _buduj_dyrygencie(["BTCUSDT"], kfg, engine)["BTCUSDT"]
+    assert d.sl_atr_mult is None

@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-07-15 | 🔧 | W-288 SL z ATR wpięty w pętlę live (Prawo XV — realistyczne zamknięcia paper)
+
+**Co:** `sl_atr_mult` (SL = k×ATR_14) istniał w Dyrygencie, KalkulatorzeLewara i backteście,
+ale `KonfigPetliLive` + `_buduj_dyrygencie` go NIE przekazywały — żywy paper zamykał crude
+stopem z dźwigni (połowa drogi do likwidacji ≈ −25% na 1H, nieosiągalne → 198/201 = TIMEOUT).
+Skutek: pomiar TIER A w arenie zniekształcony sztucznymi TIMEOUTAMI zamiast rytmu rynku.
+
+**Naprawa:**
+  • pole `KonfigPetliLive.sl_atr_mult: Optional[float] = None` (opt-in; None = stary SL).
+  • `_buduj_dyrygencie` przekazuje `sl_atr_mult=cfg.sl_atr_mult` do każdego Dyrygenta.
+  • CLI `--sl-atr-mult 2.0`; walidacja: ≤ 0 → `SystemExit` (mnożnik ATR musi być dodatni).
+
+**Bezpieczeństwo (ZASADA WPIĘCIA — monotoniczna ostrożność):** ATR-SL może stop tylko
+ZACIEŚNIĆ (`max` LONG / `min` SHORT względem lewarowego) — nigdy bliżej likwidacji. Bezpieczny
+do wpięcia nawet przed pełną walidacją A/B; domyślnie OFF (None) = zero zmiany zachowania.
+
+**Dowód e2e:** bieg `--sl-atr-mult 2.0 --max-barow 1` → WEJŚCIE BTCUSDT LONG 79% TREND_STRONG,
+0 błędów. Logika zacieśniania już pokryta testami kalkulatora (ciaśniejszy/nigdy-szerszy/granice/TP).
+
+**Testy granic:** +5 (CLI domyślne None / →config / ≤0 SystemExit; wpięcie w Dyrygenta / domyślne None).
+
+**Pliki:** `imperium/koloseum/petla_live.py`, `tests/test_petla_live.py`, `docs/MANUAL_UZYTKOWNIKA.md`
+
 ## 2026-07-15 | 🔧 | CLI pętli live — flaga `--dashboard` wpięta (Prawo XV: podgląd był niepodpięty)
 
 **Co:** `KonfigPetliLive` od dawna miała pola `dashboard/dashboard_port/webhook_tv/senat/`

@@ -176,7 +176,8 @@ python -m imperium.koloseum.petla_live --dashboard --monitor --arena-log
 ```
 Podgląd w przeglądarce: **http://127.0.0.1:8777** (port zmienisz `--dashboard-port 9001`).
 Flagi: `--monitor` panel TUI w terminalu · `--arena-log` mierzy realny PnL zamknięć do areny ·
-`--senat` Debata Senatu · `--kalibruj-prog` bramka konformalna · `--max-barow 3 --pauza 2` szybki test.
+`--senat` Debata Senatu · `--kalibruj-prog` bramka konformalna · `--sl-atr-mult 2.0` realistyczny
+stop = 2×ATR (zamiast crude stopu z dźwigni) · `--max-barow 3 --pauza 2` szybki test.
 Pełna lista: `python -m imperium.koloseum.petla_live --help`.
 
 ### 4.2 — BACKTEST (test na danych historycznych)

@@ -735,8 +735,10 @@ def _warstwa_12_zywotnosc_glosu(neurony):
             # zmieniają się między sesjami. Alarm pozostaje głośny i pełny co do liczby i kluczy.
             klucze = ", ".join(sorted(znane))
             info.append(
-                f"⚠️ Prawo XV — {len(znane)} modułów czeka na adaptery: {klucze}"
-                "  (powody: python narzedzia/audyt_spojnosci.py --luki)"
+                f"ℹ️ Prawo XV — {len(znane)} modułów zależnych od adapterów: ŻYWE na realnych danych, "
+                f"ciche tylko w syntetycznych scenariuszach audytu (adaptery istnieją i wpięte w "
+                f"petla_live, zweryfikowane na żywo: Futures/FearGreed/CVD). Do ZMIERZENIA trzeba biegu "
+                f"paper/live: {klucze}  (powody: python narzedzia/audyt_spojnosci.py --luki)"
             )
 
         # DOWÓD ALLOWLISTY (Prawo I): neuron adapterowy MUSI ożyć z danymi adaptera.
@@ -766,7 +768,8 @@ def _warstwa_12_zywotnosc_glosu(neurony):
 def main():
     if "--luki" in sys.argv:
         # Pełne powody Prawa XV: dla każdego neuronu adapterowego — jaki adapter/dane go ożywią.
-        print("⚠️ Prawo XV — moduły czekające na adaptery (pełne powody):")
+        print("ℹ️ Prawo XV — moduły adapterowe: żywe na realnych danych (adaptery wpięte w petla_live),"
+              " ciche tylko w syntetycznym audycie. Jaki feed/dane je ćwiczą:")
         for k in sorted(NEURONY_ZALEZNE_OD_ADAPTEROW):
             print(f"   • {k}: {NEURONY_ZALEZNE_OD_ADAPTEROW[k]}")
         sys.exit(0)

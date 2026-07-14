@@ -11,7 +11,7 @@ Dwa tryby:
 
 import time
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import List, Optional
 try:
     from .mikro_neuron import SygnalNeuronu, MikroNeuron, Roj
@@ -37,6 +37,13 @@ def oblicz_wagi_ic(sygnaly: list, wyniki: list, min_glosow: int = 1) -> dict:
     IC ∈ [-1, 1]: znak = kierunek przewagi (ujemny → systematyczna pomyłka → głos odwracany),
     |IC| = siła. Liczyć WYŁĄCZNIE na danych historycznych (TRAIN) — zero look-ahead.
     """
+    # Cubic P2: niezgodne długości = rozjechana etykieta forward (look-ahead/uciete bary).
+    # zip cicho ucinał ogon → wagi z niezamierzonego podzbioru. Odrzucamy twardo, zanim
+    # skażone wagi trafią do żywego ważenia głosów.
+    if len(sygnaly) != len(wyniki):
+        raise ValueError(
+            f"oblicz_wagi_ic: sygnaly ({len(sygnaly)}) i wyniki ({len(wyniki)}) "
+            "muszą mieć tę samą długość (etykieta forward równolegle do sygnału)")
     suma: dict = {}
     liczba: dict = {}
     for mapa, etykieta in zip(sygnaly, wyniki):
@@ -497,8 +504,12 @@ class Legatus:
         się systematycznie głosuje na przeciwną stronę — Grinold&Kahn, hipoteza B).
         IC=0 lub brak pomiaru (domyslny_ic=0) → wklad 0: neuron nie wpływa na agregat.
 
-        W-361b SHRINKAGE: neuron z |IC| < prog_ic zostaje na BASELINE (bez flipa/skalowania —
+        W-361b SHRINKAGE: neuron z 0 < |IC| < prog_ic zostaje na BASELINE (bez flipa/skalowania —
         szum nie zmienia głosu). skaluj_ic=False → korekta samego znaku, wkład bez ×|IC|.
+
+        Cubic P2: IC dokładnie 0 (niezmierzony / domyslny_ic=0) → wkład 0 w OBU trybach magnitudy.
+        Wcześniej tryb tylko-znak (skaluj_ic=False) dawał takim neuronom PEŁNĄ wagę bazową mimo
+        kontraktu „IC=0 nie głosuje" — zero przewagi kierunkowej nie może wnosić pełnego głosu.
         """
         wazenie = self.wazenie_ic and bool(self.wagi_ic)
         out = []
@@ -509,12 +520,35 @@ class Legatus:
             wklad = s.pewnosc_finalna * s.waga
             if wazenie:
                 ic = self.wagi_ic.get(s.neuron_id, self._domyslny_ic)
-                if abs(ic) >= self._prog_ic:      # istotny IC — koryguj (poniżej progu: baseline)
+                if ic == 0:
+                    wklad = 0.0                    # brak zmierzonej przewagi → brak głosu (spójne w obu trybach)
+                elif abs(ic) >= self._prog_ic:    # istotny IC — koryguj (poniżej progu: baseline)
                     if ic < 0:
                         kier = "SHORT" if kier == "LONG" else "LONG"
                     if self._skaluj_ic:
                         wklad *= abs(ic)
             out.append((s, kier, wklad))
+        return out
+
+    def _sygnaly_efektywne(self, sygnaly: List[SygnalNeuronu], kier_wklady: list) -> list:
+        """Widok sygnałów po korekcie IC dla doboru strategii (Cubic P1 — tylko ważenie ON).
+
+        kier_wklady = [(sygnal, kierunek_efektywny, wkład>0)] — realne głosy po flipie/wyciszeniu.
+        Zwraca KOPIE: neuron odwrócony znakiem IC dostaje kierunek EFEKTYWNY; neuron wyciszony
+        (|IC|=0, poza kier_wklady) → NEUTRAL (obecny, lecz bez głosu kierunkowego, by nie
+        wchodzić na przeciwną stronę niż skorygowany agregat). Surowych obiektów NIE mutujemy —
+        raport i trening IC dostają oryginały (Prawo I: rozdział decyzji od audytu).
+        """
+        eff = {id(s): k for s, k, _ in kier_wklady}
+        out = []
+        for s in sygnaly:
+            k = eff.get(id(s))
+            if k is None:      # niekierunkowy albo wyciszony przez IC — nie głosuje na stronę
+                out.append(replace(s, kierunek="NEUTRAL") if s.kierunek in ("LONG", "SHORT") else s)
+            elif k != s.kierunek:
+                out.append(replace(s, kierunek=k))
+            else:
+                out.append(s)
         return out
 
     # ── Tryb FOKUS ─────────────────────────────────────────────────────────────
@@ -643,12 +677,17 @@ class Legatus:
         # W-361: wkłady kierunkowe (ważenie IC opt-in — OFF domyślnie = stare zachowanie).
         # Kierunek EFEKTYWNY (po ew. odwróceniu znakiem IC) definiuje buckety — spójne
         # w dół (synapsy, zgodnych_neuronow) czytają realny głos po korekcie.
+        wazenie = self.wazenie_ic and bool(self.wagi_ic)
         wklady = self._wklady_kierunkowe(sygnaly)
-        long_s  = [s for s, k, _ in wklady if k == "LONG"]
-        short_s = [s for s, k, _ in wklady if k == "SHORT"]
+        # Cubic P1: przy ważeniu IC neuron wyciszony (|IC|=0 → wkład 0) NIE jest głosem —
+        # nie może zasilać buckietów, licznika zgodnych ani przejść weta min_neuronow.
+        # OFF: żaden filtr (wkład=pewność×waga), buckety byte-identyczne ze starym zachowaniem.
+        kier_wklady = [(s, k, w) for s, k, w in wklady if w > 0] if wazenie else wklady
+        long_s  = [s for s, k, _ in kier_wklady if k == "LONG"]
+        short_s = [s for s, k, _ in kier_wklady if k == "SHORT"]
 
-        sila_l = sum(w for _, k, w in wklady if k == "LONG")
-        sila_s = sum(w for _, k, w in wklady if k == "SHORT")
+        sila_l = sum(w for _, k, w in kier_wklady if k == "LONG")
+        sila_s = sum(w for _, k, w in kier_wklady if k == "SHORT")
         razem  = sila_l + sila_s + 1e-9
 
         prev_l = sila_l / razem
@@ -672,12 +711,15 @@ class Legatus:
             zgodne_sygn = long_s if kierunek == "LONG" else short_s
             pewnosc = self.synapsy.wzmocnij_pewnosc(pewnosc, zgodne_sygn, rezim)
 
-        # Filtr minimum
+        # Filtr minimum. Cubic P1: przy ważeniu IC bramkę konfluencji liczymy z REALNYCH
+        # głosów (niezerowy wkład efektywny), inaczej wyciszone neurony przepuszczają
+        # jedno-neuronową decyzję. OFF → len(sygnaly) jak dotąd (bez zmiany domyślnej ścieżki).
+        n_glosow = (len(long_s) + len(short_s)) if wazenie else len(sygnaly)
         weto = False
         powod = ""
-        if len(sygnaly) < self.min_neuronow:
+        if n_glosow < self.min_neuronow:
             weto = True
-            powod = f"Za mało aktywnych neuronów: {len(sygnaly)} < {self.min_neuronow}"
+            powod = f"Za mało aktywnych neuronów: {n_glosow} < {self.min_neuronow}"
         elif pewnosc < self.min_przewaga and kierunek != "NEUTRAL":
             weto = True
             powod = f"Za słaba przewaga: {pewnosc:.2%} < {self.min_przewaga:.0%}"
@@ -686,8 +728,12 @@ class Legatus:
             powod = "Reżim PANIC — system w trybie obronnym"
 
         # Wizja Cezara: z bieżących sygnałów dobierz najbliższą strategię z bazy
-        # (Timeframe-Aware: filtr po interwale — scalp M5 ≠ swing 1D)
-        strategie_dopasowane = self._dobierz_strategie(sygnaly, rezim, interwal)
+        # (Timeframe-Aware: filtr po interwale — scalp M5 ≠ swing 1D).
+        # Cubic P1: przy ważeniu IC strategia musi widzieć kierunek EFEKTYWNY (po flipie),
+        # inaczej wchodzi na przeciwną stronę niż skorygowany agregat. Surowe sygnały
+        # zostają w raporcie (IC-trening/audyt); do doboru idzie widok efektywny.
+        strat_sygnaly = self._sygnaly_efektywne(sygnaly, kier_wklady) if wazenie else sygnaly
+        strategie_dopasowane = self._dobierz_strategie(strat_sygnaly, rezim, interwal)
 
         return RaportLegatusa(
             symbol=symbol,

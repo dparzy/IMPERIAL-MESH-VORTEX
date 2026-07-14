@@ -6,6 +6,155 @@
 
 ---
 
+## 2026-07-14 | 🐞 | FIX: petla_live nie miała entrypointu — `python -m` nic nie uruchamiał
+
+**Bug (Prawo I, złapany gdy Cezar wkleił komendę):** `imperium/koloseum/petla_live.py` NIE miał bloku
+`if __name__ == "__main__"` → `python -m imperium.koloseum.petla_live` tylko importował moduł i wychodził
+bez akcji (pętla nie startowała). Handoff dawał komendę, która nic nie robiła.
+
+**Fix:** dodany entrypoint CLI (argparse): `--symbole` (domyślnie BTC/ETH/SOL), `--interwal` (1H),
+`--kapital`, `--real` (domyślnie PAPER — zero realnych zleceń), `--arena-log`, `--monitor`, `--max-barow`
+(limit/test), `--pauza`. Baner startowy jasno mówi PAPER vs REALNE. Uwaga w help: 1H = 1 bar/godzinę
+(pętla czeka między świecami — normalne). DOWÓD: `python -m ... --max-barow 2 --pauza 1` → 2 bary, 1 wejście, 0 błędów.
+
+**Poprawna komenda paper:** `python -m imperium.koloseum.petla_live --symbole BTCUSDT ETHUSDT --arena-log`
+(szybki test: `--max-barow 3 --pauza 2`).
+
+**Pliki:** `imperium/koloseum/petla_live.py`.
+
+---
+
+## 2026-07-14 | 🐞 | FIX krytyczny: żywa pętla nie pobierała danych ('1H'→ccxt NotSupported)
+
+**Bug znaleziony w runtime (nie zgadywany — zasada debugowania):** `KonfigPetliLive.interwal`
+domyślnie `'1H'`, ale `DataLoader.fetch` przekazywał go wprost do ccxt (mexc), który zna tylko
+`'1h'` → `NotSupported: timeframe unit H` → pętla live logowała „Brak danych dla żadnego symbolu"
+i przetwarzała 0 barów. **To prawdopodobnie powód, czemu paper/live nigdy nie wystartował** (INDEKS #3).
+
+**Fix:** `_ccxt_timeframe()` w `kwatermistrz_danych.py` — normalizuje notację Imperium (godziny/dni
+UPPERCASE `1H`/`4H`/`1D`) do ccxt (`1h`/`4h`/`1d`); minuty (`15m`) i miesiąc ccxt (`1M`) nietknięte.
++1 test granic (`test_ccxt_timeframe_normalizuje_interwal_imperium`).
+
+**DOWÓD (Prawo I):** po fixie bieg paper 2 barów na ŻYWYCH danych BTCUSDT: **2 bary przetworzone,
+1 decyzja wejścia (paper), 0 błędów.** Cały rój działa end-to-end na realnym rynku — unlock „C paper/live".
+
+**Pliki:** `imperium/akwedukty/kwatermistrz_danych.py`, `tests/test_petla_live.py`.
+
+---
+
+## 2026-07-14 | 🔴 | REFRAME „22 luk" Prawa XV — adaptery ŻYJĄ, narracja audytu naprawiona
+
+**Odkrycie (Prawo I):** premisa „22 moduły czekają na adaptery / martwy potencjał" była MYLĄCA.
+Dowód na żywo: `AdapterFutures.pobierz('BTCUSDT')` → FUNDING_RATE=5.1e-05, LS=0.63, OI=106405;
+`AdapterFearGreed` → FEAR_GREED=22 (Extreme Fear); `AdapterCVD` → CVD=32.5. Adaptery ISTNIEJĄ,
+zwracają realne dane i są **wpięte w `petla_live`** (linie 166–177: AdapterFutures/FearGreed/CVD/NewsLLM
+→ Dyrygent). PSY-01..04 + V-03 są DOSTEPNY=True i konsumują te klucze.
+
+**Prawda:** „22 luki" to ARTEFAKT syntetycznych scenariuszy audytu (sztuczne bary bez danych
+futures/sentymentu/realnej daty/serii portfelowej → neurony NEUTRAL). NIE brak adapterów. Prawdziwe
+wąskie gardło (wspólne z odroczonym P1 strategy-MWU): brak REALNEGO BIEGU paper/live, który by je
+ćwiczył i pozwolił ZMIERZYĆ (IC/arena).
+
+**Naprawa (B):** poprawiona narracja audytu — z „czeka na adaptery" (⚠️) na „żywe na realnych danych,
+ciche tylko w syntetycznym audycie; do zmierzenia trzeba biegu paper/live" (ℹ️). Audyt już miał dowód
+`WERYFIKACJA_ADAPTEROW` (neurony ożywają z danymi). Test `test_audyt_w12_raportuje_neurony_adapterowe` zielony.
+
+**Pliki:** `narzedzia/audyt_spojnosci.py` (komunikat startowy + `--luki`).
+
+---
+
+## 2026-07-14 | 🔭 | Hyginus U4 — świadomość systemu (luki Prawa XV + anty-redundancja) — KOMPLET U1–U4
+
+**Ulepszenie U4 (`narzedzia/bibliotekarz.py`) — ostatni krok kompletu:** opcjonalne (`--swiadomosc`,
+domyślnie OFF) wstrzyknięcie DeepSeekowi **świadomości systemu** przy generacji kandydatów:
+- **LUKI (Prawo XV):** 22 moduły czekające na dane/adapter (z `NEURONY_ZALEZNE_OD_ADAPTEROW`) z opisami
+  → Hyginus PREFERUJE kandydatów, którzy je zasilają lub wnoszą NOWĄ informację.
+- **ISTNIEJĄCE moduły (Prawo XVI):** wszystkie klucze + kategorie roju → NIE proponuj duplikatów.
+- Każdy kandydat oznacza: którą lukę zasila / jaką nową informację wnosi / czy nie dubluje istniejącego.
+- Blok cache'owany (`lru_cache`), brak rejestru → '' (zwiad działa dalej, Prawo XV). +2 testy.
+
+**Flaga `--pelny`** włącza komplet U2+U3+U4 (`--rozwin --krytyka --swiadomosc`) — najlepszy zwiad.
+U4 odtwarza główną siłę ręcznego web-DeepSeeka (kontekst systemu), ale ze źródeł biblioteki, bez halucynacji.
+
+**Powód:** domknięcie planu U1+U2+U3+U4 (rozkaz Cezara). U5 (tryb otwarty) ODRZUCONY — żadnych halucynacji.
+Wszystko opt-in OFF; Hyginus nie jest w ścieżce decyzyjnej roju, wyniki ⚠️ prawdą dopiero po arenie.
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py`.
+
+---
+
+## 2026-07-14 | 📖 | BIB-032 O'Hara domknięty — 69/69 książek w RAG (OCR angielskiego skanu)
+
+**Domknięcie biblioteki (Prawo XV):** BIB-032 „O'Hara — Market Microstructure Theory" był jedyną
+książką poza RAG (68/69) — chiński skan bez warstwy tekstu. Cezar dostarczył **angielskie wydanie**
+(też skan, 298 stron). OCR przez `rapidocr-onnxruntime` (render PyMuPDF, ~187 DPI) → **686 986 znaków**
+angielskiego tekstu do wersjonowanego `tekst_cache`. Reindeks: +319 fragmentów BIB-032, **69/69 książek**,
+parytet fragmenty=fts=27959, wyszukiwalny (spread/market-maker/inventory zwraca BIB-032).
+
+- Skrypt OCR wznawialny (strona→plik→sklejenie, ZASADA ANALIZY CZĄSTKOWEJ, pasek postępu — scratchpad, nie repo).
+- Stary chiński cache (pusty, inny hash) usunięty; nowy cache wersjonowany (chmura czyta bez OCR — Prawo XVII).
+- Prawo I: proza angielska czysta i użyteczna; wzory matematyczne kruszą się w OCR (jak Shreve) — esencja pojęć, nie wzory.
+
+**Pliki:** `bibliotheca_ulpia/dane/tekst_cache/BIB-032_...__bcfde4140356c035.txt` (nowy), stary cache usunięty.
+
+---
+
+## 2026-07-14 | 🔭 | Hyginus U3 — self-critique: dowody PRZECIW (anty-confirmation-bias)
+
+**Ulepszenie U3 (`narzedzia/bibliotekarz.py`):** opcjonalne (`--krytyka`, domyślnie OFF) drugie
+przejście po wygenerowaniu kandydatów — **sędzia-sceptyk szuka DOWODÓW PRZECIW**.
+
+- Osobne retrieval na kontrargumenty (temat + `risk failure limitation assumption drawback criticism
+  overfitting`) → DeepSeek ocenia każdego kandydata: MOCNE / SŁABE / SPRZECZNE, wskazuje ukryte
+  założenia i pułapki. Wynik w polu `krytyka` cząstki — Opus-sędzia i arena widzą słabe hipotezy od razu.
+- Wzorzec agentic-RAG (disconfirming evidence) wzmacnia ZASADĘ ZWIADOWCY WIEDZY: kandydat≠prawda.
+  Gdy brak dowodów przeciw — model mówi to wprost (sygnał confirmation bias, nie dowód słuszności).
+- Błąd API krytyki nie przekreśla cząstki (kandydaci już zapisani; Prawo XV). +2 testy granic.
+
+**Powód:** trzeci krok planu U1+U2+U3. Opt-in OFF (+1 RAG +1 call/temat), monotonicznie ostrożne.
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py`.
+
+---
+
+## 2026-07-14 | 🔭 | Hyginus U2 — recall: sanityzacja FTS + query-expansion + hybrid
+
+**Ulepszenie U2 (`narzedzia/bibliotekarz.py`):** trzy rzeczy dla lepszego recall zwiadu.
+
+- **Fix crash-buga FTS (Prawo XV):** temat `momentum trend-following breakout entry rules` WYWALAŁ
+  FTS5 MATCH (`OperationalError: no such column: following` — myślnik/składnia) → temat cicho ginął.
+  Nowy `_fts_bezpieczne` sanityzuje KAŻDE zapytanie do słów złączonych `OR` (poszerza recall, BM25 rankuje).
+- **Query-expansion opt-in (`--rozwin`, domyślnie OFF):** DeepSeek rozszerza temat w synonimy PRZED RAG
+  (`rozwin_zapytanie`). Retrieval-only → ryzyko halucynacji ograniczone do trafień, które filtruje
+  sędzia+arena. Fallback na surowy temat przy błędzie/pustce (zwiad nigdy nie ginie).
+- **Hybrid jako domyślny tryb (future-proof):** auto-fallback na FTS gdy brak wektorów. Uwaga (Prawo I):
+  na tej maszynie baza ma 0 wektorów i brak `sentence-transformers` → hybrid = FTS aż zbudujemy embeddingi.
+- +3 testy granic (sanitizer, rozszerzenie+fallback, scout na rozszerzonym zapytaniu).
+
+**Powód:** drugi krok planu U1+U2+U3. Opt-in, monotonicznie ostrożne. `zapytanie` zapisywane w rekordzie kolejki (transparentność).
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py`.
+
+---
+
+## 2026-07-14 | 🔭 | Hyginus U1 — zwiad tylko z korpusu „biblioteka" (anty-echo)
+
+**Ulepszenie U1 Bibliotekarza-Zwiadowcy (`narzedzia/bibliotekarz.py`):** `scout_temat`/`raport`
+domyślnie czytają TYLKO korpus `biblioteka` (książki BIB-xxx), a nie `dane`/`docs`. Wcześniej
+zwiad szedł po wszystkich korpusach (`korpus=None`) — mógł wyciągnąć NASZE własne fragmenty
+(`dane`: 75 frag.) i podać je jako „odkrycie" (echo własnego głosu = redundancja, Prawo XVI).
+
+- Nowa flaga CLI `--korpus` (domyślnie `biblioteka`; `wszystko` przywraca dawne zachowanie bez filtra).
+- Ustalono empirycznie: realne korpusy w bazie to `biblioteka` (27 566) i `dane` (75); `docs` NIE indeksowany.
+- +1 test granicy (`test_scout_domyslnie_korpus_biblioteka`) — forward korpusu + domyślna wartość.
+
+**Powód:** pierwszy krok planu ulepszeń Hyginusa (U1+U2+U3 → U4 → żniwo; U5 odrzucony). Opt-in,
+monotonicznie ostrożne, zero zmiany domyślnej ścieżki decyzyjnej roju.
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py`.
+
+---
+
 ## 2026-07-13 | 🔎 | Re-Audyt weryfikacyjny — korekta błędnych odrzuceń (brak weryfikacji web)
 
 **Cezar wskazał głęboki błąd procesu:** oceniałem pomysły/opcje BEZ weryfikacji najświeższych

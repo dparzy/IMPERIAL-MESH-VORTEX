@@ -45,6 +45,57 @@ WZORCE_STARTOWE = [
      "opis": "Połączenie do bazy w pętli (I/O per iteracja)",
      "lekcja": "Batchuj zapisy — jedno połączenie na partię, nie per-element (latencja w pętli live).",
      "zrodlo": "cubic petla_live P2 (2026-07-05)"},
+    # ── cubic PR#122 (2026-07-13) — wzorce składniowe, które POPRAWNY kod omija ──
+    {"kat": "cache", "regex": r'pytaj_pomiary\([^)]*neuron\s*=\s*nazwa\b',
+     "opis": "Wznawianie z areny kluczowane samą nazwą pliku (bez podpisu konfiguracji)",
+     "lekcja": "Klucz areny/cache MUSI nieść podpis konfiguracji (frac/okno/cap/interwał) — inaczej "
+               "zmiana parametru cicho podstawia nieświeży wynik. Wpuść config w klucz `neuron=` "
+               "albo zwaliduj parametry z noty przed pominięciem pary.",
+     "zrodlo": "cubic PR#122 ab_* P1/P2 (2026-07-13)"},
+    {"kat": "granice",
+     "regex": r'add_argument\(\s*[\'"]--(?:topk|top-k|prog[_-]?ic)[\'"][^)]*type\s*=\s*(?:int|float)\b',
+     "opis": "Argument liczbowy sterujący kosztem API / progiem bez walidacji zakresu",
+     "lekcja": "Argument sterujący kosztem (topk → rozmiar korpusu do PŁATNEGO API) lub semantyką progu "
+               "(prog_ic) waliduj przy parsowaniu — type=funkcja z zakresem/skończonością, nie gołe int/float.",
+     "zrodlo": "cubic PR#122 bibliotekarz/ab_pnl P2/P3 (2026-07-13)"},
+]
+
+# ── CHECKLISTA REVIEW (bez regexu) — klasy SEMANTYCZNE, których forma składniowa jest
+# identyczna z poprawnym kodem (flip znaku, nan, suma%, niezgodne długości). Regex dałby
+# tu SZUM na naszym własnym poprawnym kodzie (zmierzone: „SHORT if ==LONG" = 11 trafień
+# legalnego idiomu), więc NIE auto-skanujemy — pokazujemy jako checklistę przed pushem
+# (obok /code-review). „Wszystko ma być łapane" (Prawo XV) dwiema warstwami: regex łapie
+# formę, checklista łapie znaczenie.
+CHECKLIST_STARTOWA = [
+    {"kat": "kierunek",
+     "opis": "Odwrócenie kierunku (flip znakiem) bez propagacji do WSZYSTKICH konsumentów",
+     "lekcja": "Gdy odwracasz kierunek (np. ujemny IC → LONG↔SHORT), KAŻDY konsument w dół (dobór "
+               "strategii, weto konfluencji, licznik zgodnych, synapsy) musi czytać kierunek EFEKTYWNY, "
+               "nie surowy — inaczej wejdzie na przeciwną stronę niż skorygowany agregat. Surowe znaki "
+               "zostaw wyłącznie do audytu/treningu.",
+     "zrodlo": "cubic PR#122 legatus P1 (2026-07-13)"},
+    {"kat": "granice",
+     "opis": "Wartość nan/nieskończona przed zapisem cząstki, porównaniem lub agregatem",
+     "lekcja": "Funkcja zwracająca nan (brak decyzji, pusty mianownik) — zanim wynik trafi do checkpointu "
+               "areny lub porównania (nan>x=False cicho przekłamuje werdykt), sprawdź math.isfinite i "
+               "pomiń/oznacz jako niekonkluzywne; kolejne jednostki mają liczyć się dalej.",
+     "zrodlo": "cubic PR#122 ab_wazenie_ic P2 (2026-07-13)"},
+    {"kat": "kontrakt",
+     "opis": "Suma procentowych zwrotów per-jednostka prezentowana jako wynik portfela",
+     "lekcja": "Suma % rośnie liniowo z liczbą par/jednostek — to nie P&L portfela. Uśrednij (sum/N) lub "
+               "zważ przed prezentacją; werdykt oparty na sumie zawyża się z rozmiarem próby.",
+     "zrodlo": "cubic PR#122 ab_strategy_mwu P2 (2026-07-13)"},
+    {"kat": "werdykt",
+     "opis": "Werdykt/większość liczona z jednostek bez realnego samplu",
+     "lekcja": "Jednostki bez transakcji/decyzji (ret 0, brak głosów) nie mogą przechylać większości ani "
+               "portfela — licz werdykt z par spełniających próg (np. ≥ MIN_TRADES) lub oznacz bieg niekonkluzywnym.",
+     "zrodlo": "cubic PR#122 ab_tryb_strategii P2 (2026-07-13)"},
+    {"kat": "kontrakt",
+     "opis": "Niezgodne długości sparowanych serii (sygnał ↔ etykieta forward)",
+     "lekcja": "Serie, które MUSZĄ być równoległe (sygnał i etykieta forward, cena i wynik), sprawdzaj na "
+               "równość długości i odrzucaj rozjazd zanim policzysz — zip cicho ucina ogon i liczy z "
+               "niezamierzonego podzbioru (look-ahead / skażone wagi).",
+     "zrodlo": "cubic PR#122 legatus/hipoteza_b P2/P3 (2026-07-13)"},
 ]
 
 
@@ -87,10 +138,24 @@ class KsiegaWadKodu:
                            "lekcja": lekcja, "zrodlo": zrodlo})
         return True
 
+    def dodaj_checklist(self, kat: str, opis: str, lekcja: str, zrodlo: str = "") -> bool:
+        """Dodaje pozycję CHECKLISTY review (bez regexu — klasa semantyczna, nie auto-skan).
+        Dedup po opisie (brak regexu jako klucza). Zwraca czy dodano."""
+        if not opis or not lekcja:
+            raise ValueError("opis i lekcja są wymagane")
+        if any(not w.get("regex") and w["opis"] == opis for w in self.wpisy):
+            return False
+        self.wpisy.append({"kat": kat, "regex": "", "opis": opis,
+                           "lekcja": lekcja, "zrodlo": zrodlo})
+        return True
+
     def skanuj(self, tekst: str) -> list[dict]:
-        """Zwraca trafienia: {wpis, linia} — które znane wzorce pasują do kodu (nudge)."""
+        """Zwraca trafienia: {wpis, linia} — które znane wzorce REGEX pasują do kodu (nudge).
+        Pozycje checklisty (pusty regex) są pomijane — nie auto-skanują (byłby szum)."""
         trafienia = []
         for w in self.wpisy:
+            if not w.get("regex"):        # checklista review — nie auto-skanujemy
+                continue
             try:
                 wzor = re.compile(w["regex"], re.MULTILINE)
             except re.error:
@@ -105,13 +170,24 @@ class KsiegaWadKodu:
     def wszystkie(self) -> list[dict]:
         return list(self.wpisy)
 
+    def wzorce(self) -> list[dict]:
+        """Pozycje z regexem (auto-skanowalne)."""
+        return [w for w in self.wpisy if w.get("regex")]
+
+    def checklista(self) -> list[dict]:
+        """Pozycje bez regexu — klasy semantyczne do ręcznego przeglądu przed pushem."""
+        return [w for w in self.wpisy if not w.get("regex")]
+
 
 def zasiej_startowe(sciezka: Path | str = DOMYSLNA) -> int:
-    """Tworzy księgę z wzorcami startowymi jeśli pusta. Zwraca liczbę dodanych."""
+    """Dosiewa brakujące wzorce REGEX i pozycje CHECKLISTY (idempotentnie). Zwraca liczbę dodanych."""
     k = KsiegaWadKodu(sciezka)
     dodane = 0
     for w in WZORCE_STARTOWE:
         if k.dodaj(w["kat"], w["regex"], w["opis"], w["lekcja"], w["zrodlo"]):
+            dodane += 1
+    for c in CHECKLIST_STARTOWA:
+        if k.dodaj_checklist(c["kat"], c["opis"], c["lekcja"], c["zrodlo"]):
             dodane += 1
     if dodane:
         k.zapisz()

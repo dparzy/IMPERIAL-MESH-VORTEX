@@ -36,6 +36,7 @@ normalizator sprowadza każdy plik do schematu: timestamp, open, high, low, clos
 import os
 import glob
 import logging
+import re
 from typing import List, Optional, Dict
 
 import numpy as np
@@ -51,6 +52,22 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)-7s | 
 logger = logging.getLogger("Ladowarka")
 
 COLUMNS = ["timestamp", "open", "high", "low", "close", "volume"]
+
+_TF_UNIT = re.compile(r"^(\d+)([mhdwHDW])$")
+
+
+def _ccxt_timeframe(tf: str) -> str:
+    """Normalizuje interwał Imperium ('1H','4H','1D') do formatu ccxt ('1h','4h','1d').
+
+    BUG (znaleziony 2026-07-14, runtime): `KonfigPetliLive.interwal` domyślnie '1H', a ccxt (mexc)
+    zna tylko '1h' → `NotSupported: timeframe unit H` → żywa pętla NIE pobierała żadnych danych
+    ('Brak danych dla żadnego symbolu'). Minuty ('15m') i już-poprawne ccxt zostają bez zmian;
+    miesiąc ('1M', ccxt) nie pasuje do regexu → nietknięty. Bez dopasowania → bez zmian."""
+    m = _TF_UNIT.match(tf or "")
+    if not m:
+        return tf
+    n, unit = m.group(1), m.group(2)
+    return f"{n}{unit.lower()}" if unit in "HDW" else f"{n}{unit}"
 LIBRARY_DIR = "dane"
 
 # kandydaci nazw kolumn (małymi literami) → nasze pole
@@ -77,6 +94,7 @@ class DataLoader:
     def fetch(self, symbol: str = "BTC/USDT", timeframe: str = "1h", limit: int = 500) -> pd.DataFrame:
         if self._ex is None:
             raise RuntimeError("Brak działającej giełdy CCXT.")
+        timeframe = _ccxt_timeframe(timeframe)   # '1H'→'1h' (Imperium↔ccxt); inaczej NotSupported
         return self._to_df(self._ex.fetch_ohlcv(symbol, timeframe=timeframe, limit=limit))
 
     @staticmethod

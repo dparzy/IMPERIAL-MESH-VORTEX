@@ -86,17 +86,33 @@ _WZOR_DATY = re.compile(
     r"\b\d{4}-\d{2}-\d{2}\b|\b\d{2}[./]\d{2}[./]\d{4}\b|\b(?:19|20)\d{2}\b"
 )
 
-# Sito 3: lekcje CZYSTO PROZATORSKIE (bez identyfikatorów) — np. „True Range - poprawna
-# definicja" vs „Poprawiona definicja True Range". Sygnatura techniczna jest tam pusta,
-# więc porównujemy worek RDZENI tytułu: prefiks 5 znaków zrównuje polską fleksję
-# („poprawna"/„poprawiona" → „popra"), a kolejność słów przestaje mieć znaczenie.
-# POMIAR na 71 lekcjach: łapie 3 kopie True Range, zero fałszywych trafień.
+# Sito 3: lekcje prozatorskie / o sparafrazowanym tytule — np. „True Range - poprawna
+# definicja" vs „Poprawiona definicja True Range". Porównujemy worek RDZENI tytułu (Jaccard ≥
+# PROG_RDZENI_TYTULU): prefiks 5 znaków zrównuje polską fleksję („poprawna"/„poprawiona" →
+# „popra"), a kolejność słów przestaje mieć znaczenie. Próg <1.0 łapie też parafrazy DeepSeeka
+# (patrz PROG_RDZENI_TYTULU). POMIAR na 71 lekcjach: 3 kopie True Range, zero fałszywych trafień.
 _DL_RDZENIA = 5
 # UWAGA: „nie" NIE MOŻE tu być (bug z samo-recenzji). Sito 3 patrzy wyłącznie na tytuł,
 # więc pominięcie negacji zrównywałoby zdanie z jego zaprzeczeniem: „Numba przyspiesza
 # wskaźniki" i „Numba NIE przyspiesza wskaźników" miałyby ten sam worek rdzeni → lekcja
 # obalająca poprzednią byłaby odrzucona jako duplikat. Negacja jest treścią, nie szumem.
 _SLOWA_PUSTE = frozenset({"jest", "bug", "przy", "to", "sie", "gdy", "oraz"})
+
+# Sito 3 orzeka duplikat, gdy worki rdzeni tytułów są DOŚĆ podobne (Jaccard ≥ próg) — nie
+# tylko IDENTYCZNE. DeepSeek parafrazuje tytuł co przebieg („X = chaos" / „X źródłem chaosu"),
+# więc exact-match przepuszczał parafrazy. Próg 0.70 dobrany POMIAREM (Prawo XVI) na 115 realnych
+# lekcjach: daje 5 nowych scaleń — WSZYSTKIE prawdziwe duplikaty (Kingdom Pixel ×3, OpenAlice/
+# Hermes, TA-Lib bloker; recenzja cubic PR #122), ZERO par różnych lekcji. Bramka „brak wspólnego
+# identyfikatora → różne" (wyżej w czy_duplikaty) i tak chroni lekcje o różnych modułach, więc
+# luźniejszy próg jest bezpieczny. Pary o NISKIM podobieństwie tytułu, a wspólnej sygnaturze
+# (CME gap jt=0.22, loader jt=0.20) zostają świadomie NIEscalone — złapanie ich wymagałoby progu
+# sygnatur < 0.571 (zmierzona granica fałszywych scaleń), a fałszywe scalenie kasuje wiedzę
+# bezpowrotnie (Prawo I: wolimy duplikat niż utratę wiedzy).
+PROG_RDZENI_TYTULU = 0.70
+# Rdzenie sygnalizujące ZAPRZECZENIE — różnica na nich znaczy „lekcja obalająca", nie duplikat.
+# Bez tego luźniejszy próg scaliłby „Numba przyspiesza" z „Numba NIE przyspiesza" (Jaccard 0.75).
+# Exact-match (stary próg 1.0) chronił to sam z siebie; przy 0.70 chronimy jawnie.
+_TOKENY_POLARNOSCI = frozenset({"nie", "bez"})
 
 
 def _dzis() -> str:
@@ -203,7 +219,11 @@ def czy_duplikaty(tytul_a: str, tresc_a: str, tytul_b: str, tresc_b: str) -> boo
         return False
 
     rdzenie_a = _rdzenie_tytulu(tytul_a)
-    return bool(rdzenie_a) and rdzenie_a == _rdzenie_tytulu(tytul_b)
+    rdzenie_b = _rdzenie_tytulu(tytul_b)
+    # Różnica na tokenie polarności (nie/bez) = lekcja obalająca poprzednią, nie duplikat.
+    if (rdzenie_a ^ rdzenie_b) & _TOKENY_POLARNOSCI:
+        return False
+    return bool(rdzenie_a) and bool(rdzenie_b) and _jaccard(rdzenie_a, rdzenie_b) >= PROG_RDZENI_TYTULU
 
 
 def wczytaj(plik: Path = DOMYSLNY_PLIK) -> str:

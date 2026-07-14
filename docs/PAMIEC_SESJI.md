@@ -101,8 +101,92 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-06-30 — OpenAlice i Hermes Agent zweryfikowane jako realne narzędzia
-OpenAlice (4600★ GitHub) i Hermes Agent (Nous Research) to rzeczywiste narzędzia AI tradingowe, a nie halucynacje. Zostały dodane do ARSENAL_IMPERIUM.md jako zweryfikowane.
+### 2026-06-30 — Dekorelacja V-13 i V-14 potwierdza dywersyfikację
+Korelacja między NeuronChoppiness (V-14) a poprzednim wskaźnikiem zmienności |r|=0.05–0.27, co spełnia Prawo XVI (unikamy redundancji).
+
+### 2026-06-30 — Złoty Orzeł (XII-TR-001) – wariant EMA, nie oryginalny SMA
+Strategia używa EMA 50/200 zamiast oryginalnego SMA Golden Cross. Fakt został udokumentowany jako odchylenie od kanonu.
+
+### 2026-06-30 — Niezgodność stanu MANIFEST z kodem
+7 neuronów oznaczonych jako aktywne w MANIFEST_KODU.md, ale w kodzie miały DOSTEPNY=False. Poprawiono oznakowanie na 'wyciszony'.
+
+### 2026-06-30 — Znalezione 2 neurony sieroty w mikro_neuron.py
+NeuronStochRSI i NeuronFundingRate znajdowały się poza rojem neuronów, nie były importowane przez rejestr. Zostały przeniesione do odpowiednich plików.
+
+### 2026-06-30 — Nazwy neuronów muszą być unikalne w całym systemie
+Próba dodania neuronu o nazwie NeuronOrderBlock w trend.py skończyłaby się kolizją z SMC-01. Wdrożono zasadę: każda nowa klasa neuronu musi mieć unikalną nazwę; w razie konfliktu zmienić nazwę.
+
+### 2026-06-30 — Wartości mocków muszą mieścić się w zakresach detekcji neuronów
+Podczas tworzenia testów okazało się, że mocki muszą precyzyjnie trafiać w progi neuronów (np. FUNDING_RATE > 0.001, LONG_SHORT_RATIO między 0 a 1). Niewłaściwe wartości powodują fałszywe wyniki.
+
+### 2026-06-30 — Złoty Orzeł nieaktywny na DOGE z powodu death cross
+Strategia long-only (EMA50/EMA200) nie aktywowała się, ponieważ EMA50 < EMA200 przez cały okres testu DOGE.
+
+### 2026-06-30 — Pojedyncza próbka nie dowodzi martwoty neuronu
+W diagnostyce korelacji wymóg len(v) >= 2 do uznania neuronu za martwy. 1 próbka klasyfikowana jako 'niedostateczne dane'.
+
+### 2026-06-30 — Brak pola kategoria na SygnalNeuronu uniemożliwiał agregację wag reżimu
+Pole 'kategoria' nie istniało w SygnalNeuronu, przez co WAGI_REZIMU były martwym kodem. Dodano pole i przekazywanie z KATEGORII neuronu – teraz wagi reżimu działają poprawnie.
+
+### 2026-06-30 — Konieczność *_PREV dla wykrywania przecięć
+Wartości z poprzedniej świecy (*_PREV) są niezbędne do poprawnego wykrywania przecięć linii (np. MACD), ale Brama początkowo ich nie dostarczała – dodano funkcję _second_last_valid.
+
+### 2026-06-30 — Brak Stan na: w W6 to błąd, nie pominięcie
+Audyt spojności W6 milcząco pomijał bloki bez 'Stan na:'. Dodano jawne else zgłaszające błąd. RegExp rozszerzony o markdown `**Stan na:**`.
+
+### 2026-06-30 — Ulcer Index warmup wymaga tylko period próbek
+Implementacja Ulcer Index w Bramie używała warunku `< period+1`, co wymuszało niepotrzebnie dłuższy warmup. Poprawiono na `< period`, ponieważ funkcja operuje na c[-period:].
+
+### 2026-06-30 — Błąd edycji README z powodu niedopasowania tekstu
+Próba edycji pliku README przez narzędzie `edit` nie powiodła się, ponieważ szukany fragment nieznacznie różnił się od faktycznej treści. Rozwiązanie: ponowne odczytanie pliku i użycie dokładnego tekstu.
+
+### 2026-06-30 — Utrata potencjału: Klucznik ignorowany przez Dyrygenta
+Prawo XV: Klucznik obliczał strategie, ale Dyrygent ich nie używał. Naprawiono przez dodanie trybów uwzględniających strategię.
+
+### 2026-06-30 — Relative import problem solved with try/except
+Przy uruchamianiu skryptu bezpośrednio, import względny (.modul) zawodzi. Rozwiązano przez próbę względnego, a w razie błędu absolutnego.
+
+### 2026-06-30 — API key tylko w zmiennych środowiskowych
+Klucz API DeepSeek nie może być umieszczany w kodzie ani w czacie, tylko w environment variable (setx). Bezpieczeństwo.
+
+### 2026-06-30 — Prawo XV: nie dodawać neuronów z niedostępnym API
+Potwierdzono zasadę, że neurony wymagające nieistniejącego API zawsze zwracają NEUTRAL. W tej sesji dodano tylko neurony korzystające z dostępnych wskaźników (Donchian, RSI, BB).
+
+### 2026-06-30 — Orphan key X-SC-003 (BROOKS M2B vs IMV-SC-003)
+Klucz 'BROOKS M2B' istniał w kodzie, ale katalog rejestrował go jako 'IMV-SC-003'. Wyrównano do kodu zgodnie z Prawem XIX.
+
+### 2026-06-30 — Nazwy strategii IMV-DEF niezgodne z kodem
+Kod używał 'TARCZA PRETORIANÓW' / 'MUR KONTRWYWIADU', katalog miał 'TARCZA WASH' / 'GÓRA LODOWA'. Wprowadzono dual names (rzymska + funkcja).
+
+### 2026-06-30 — Testy nieaktualne po obudzeniu neuronów
+Testy zakładały DOSTEPNY=False dla PSY i V-03. Po Fazie B/C testy failowały. Przepisano: test_futures_aktywuj_i_usypiaj, test_cvd_aktywuj_i_usypiaj, test_stan_globalny_przywrocony.
+
+### 2026-06-30 — Zbyt ostre progi w neuronach – poprawa czułości
+X-12 (BB squeeze): 4%→2.5% (BTC daily rzadko osiąga 4%). XII-07 (RSI divergence): 2.0→0.3 (sąsiadujące bary rzadko >2). A-05 (Bart pattern): 30%→10% (30% Donchiana zbyt rzadkie).
+
+### 2026-06-30 — Bezpieczeństwo klucza API DeepSeek – tylko env vars
+Klucz API DeepSeek NIGDY nie może być w kodzie ani w czacie. Powinien być przechowywany w zmiennych środowiskowych. Kod w PLAN_DEEPSEEK.md zawiera placeholder do zastąpienia.
+
+### 2026-07-10 — BIB-032 O'Hara – OCR garbage, nieindeksowany
+Książka w formacie skanowanych obrazów PDF – OCR generuje śmieci. Zgodnie z Prawem I (zero fabricacji) nie została włączona do RAG.
+
+### 2026-07-10 — Regime-stale bug – problem branżowy z pamięcią niezależną od reżimu
+Odkryto, że konkurencyjne systemy pamięci nie uwzględniają reżimu rynku, co powoduje wyciąganie nieodpowiednich lekcji (np. z hossy podczas bessy). Nasza implementacja Pamięci Reżimowej rozwiązuje to przez wymiar regime_match w scoringu.
+
+### 2026-06-30 — Stop Hunt – wzorzec sweepu płynności
+Market makerzy pushują cenę poniżej/ponad stop lossy, zbierają płynność, a potem zawracają. Neuron StopHunt wykrywa to za pomocą Donchian channel.
+
+### 2026-06-30 — Naprawiono ImportError w legatus.py przez try/except
+Relatywny import z .mikro_neuron powodował błąd przy bezpośrednim uruchomieniu. Rozwiązanie: try/except z importem absolutnym jako fallback. Wzorzec do powielenia w nowych modułach.
+
+### 2026-06-30 — TA-Lib wymagany przez Bramę Kalkulatora
+Brama Kalkulatora celowo odmawia startu bez TA-Lib (Prawo I). Na Windows 2026 pip install TA-Lib działa, fallback: wheels z github.com/cgohlke/talib-build.
+
+### 2026-06-30 — 403 Push Permission Error
+Początkowe pushy nie działały z powodu błędnych uprawnień GitHub App. Użytkownik naprawił uprawnienia, push ostatecznie powiódł się.
+
+### 2026-06-30 — Bug: __pycache__ śledzone w git
+Po kompilacji brama_kalkulatora.py, pliki cache zostały przypadkowo commitowane. Naprawiono przez git rm i dodanie .gitignore.
 
 ### 2026-06-30 — Permutation Entropy >0.85 = chaos → NEUTRAL
 NeuronPermEntropy (N-01): PE>0.85 → NEUTRAL 'chaos', PE<0.65 → podąża za mikro-ruchem, mid → NEUTRAL niska pewność. Meta-gate nie głosuje kierunkowo przy wysokiej entropii.
@@ -116,12 +200,6 @@ BezpiecznikKrzywejKapitalu używał tylko wolnego kapitału, co fałszywie trigg
 ### 2026-06-30 — Interval normalization bug: '5m'.upper() ≠ 'M5'
 Strategie używają formatu 'M5', a interwał z backtestu po .upper() daje '5M'. Naprawiono przez _normalizuj_interwal() w baza.py konwertujące '5m'→'M5', '1h'→'H1' itd.
 
-### 2026-06-30 — CME Gap traci znaczenie od maja 2026
-CME uruchamia handel 24/7 od 29 maja 2026, co eliminuje klasyczny gap weekendowy. Strategia CME Gap staje się historyczna – należy ją oznaczyć jako IMV-EXP i przygotować archiwizację.
-
-### 2026-06-30 — TA-Lib blokerem dla 9 modułów
-Brak TA-Lib uniemożliwia uruchomienie 9 modułów systemu. Wymagane pip install TA-Lib. Zidentyfikowano jako jedyny zewnętrzny bloker.
-
 ### 2026-06-30 — TA-Lib blokerem 9 modułów
 Brak TA-Lib (pip install TA-Lib) uniemożliwia uruchomienie 9 modułów systemu. To najważniejsza zależność do odblokowania.
 
@@ -130,12 +208,6 @@ CalculatorGateway celowo odmawia startu bez TA-Lib (Prawo I - Zero halucynacji).
 
 ### 2026-06-30 — TA-Lib na Windows 10: pip install działa w 2026
 Współczesna instalacja TA-Lib na Windows jest prostsza — pip install TA-Lib często działa, fallback do wheeli z github.com/cgohlke/talib-build.
-
-### 2026-06-30 — Mieszanie zasad Kingdom Pixel z Imperium źródłem chaosu
-Root cause chaosu w poprzedniej sesji: próba kopiowania 79 zasad z Kingdom Pixel do Imperium. Rozwiązanie: stworzenie od nowa 14 Praw Imperium, zero cross-kontaminacji.
-
-### 2026-06-30 — Bug: loader szukał starych nazw po reorganizacji folderów
-Po przeniesieniu modułów do struktury rzymskich dzielnic, pierwszy_zwiadowca.py szukał plików po starych nazwach (np. CORE-006_CalculatorGateway.py) w swoim folderze. Naprawiono przez aktualizację ścieżek względnych.
 
 ### 2026-06-30 — Słabość ręcznego parametru reżimu
 Przetestowano 3 scenariusze rynkowe — system wymaga automatycznego klasyfikatora reżimu, bo ręczne ustawianie jest zawodne i nie skalowalne.

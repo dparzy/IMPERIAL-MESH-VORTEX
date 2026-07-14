@@ -690,3 +690,33 @@ def uruchom(
     kfg = KonfigPetliLive(symbole=symbole, interwal=interwal,
                           kapital_startowy=kapital, paper=paper)
     handluj_live(kfg)
+
+
+if __name__ == "__main__":
+    import argparse
+    p = argparse.ArgumentParser(
+        description="Pętla Live Imperium (W-302) — paper trading domyślnie. "
+                    "Uwaga: 1H = 1 bar/godzinę (pętla czeka między świecami — to normalne, nie zawieszenie).")
+    p.add_argument("--symbole", nargs="+", default=["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+                   help="pary do handlu (domyślnie BTC/ETH/SOL)")
+    p.add_argument("--interwal", default="1H", help="interwał świec: 15m/1H/4H/1D... (domyślnie 1H)")
+    p.add_argument("--kapital", type=float, default=10_000.0, help="kapitał startowy (paper)")
+    p.add_argument("--real", action="store_true",
+                   help="REALNE zlecenia MEXC (wymaga MEXC_API_KEY; DOMYŚLNIE paper — bez realnych zleceń)")
+    p.add_argument("--arena-log", action="store_true",
+                   help="loguj realny PnL zamknięć do areny (arena_wyniki.db) — do pomiaru skuteczności")
+    p.add_argument("--monitor", action="store_true", help="panel TUI co bar (Prawo XXIV — widoczność)")
+    p.add_argument("--max-barow", type=int, default=None,
+                   help="limit barów (None = nieskończona pętla produkcyjna; np. 3 = szybki test)")
+    p.add_argument("--pauza", type=int, default=None,
+                   help="sekundy między barami (None = z interwału; np. 2 = szybki test bez czekania na świecę)")
+    a = p.parse_args()
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    kfg = KonfigPetliLive(
+        symbole=a.symbole, interwal=a.interwal, kapital_startowy=a.kapital,
+        paper=not a.real, arena_log=a.arena_log, monitor=a.monitor, pauza_sekundy=a.pauza,
+    )
+    tryb = "REALNE ZLECENIA (MEXC)" if a.real else "PAPER (symulacja, bez realnych zleceń)"
+    print(f">>> Pętla Live — {tryb} | pary={a.symbole} | interwał={a.interwal} | "
+          f"max_barow={a.max_barow or '∞'}", flush=True)
+    handluj_live(kfg, max_barow=a.max_barow)

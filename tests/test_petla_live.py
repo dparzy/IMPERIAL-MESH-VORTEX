@@ -19,6 +19,19 @@ import pandas as pd
 from imperium.koloseum.petla_live import (
     handluj_live, KonfigPetliLive, _df_do_barow,
 )
+from imperium.akwedukty.kwatermistrz_danych import _ccxt_timeframe
+
+
+def test_ccxt_timeframe_normalizuje_interwal_imperium():
+    # BUG runtime 2026-07-14: '1H' → ccxt NotSupported → pętla nie pobierała danych.
+    # Godziny/dni/tygodnie UPPERCASE → lowercase; minuty i poprawne ccxt bez zmian.
+    assert _ccxt_timeframe("1H") == "1h"
+    assert _ccxt_timeframe("4H") == "4h"
+    assert _ccxt_timeframe("1D") == "1d"
+    assert _ccxt_timeframe("15m") == "15m"      # minuta już poprawna — bez zmian
+    assert _ccxt_timeframe("1h") == "1h"        # już ccxt — bez zmian
+    assert _ccxt_timeframe("1M") == "1M"        # miesiąc ccxt (uppercase M) — nietknięty
+    assert _ccxt_timeframe("dziwne") == "dziwne"  # bez dopasowania — bez zmian (ccxt zwaliduje)
 
 
 # ── helper: syntetyczny loader ────────────────────────────────────────────────

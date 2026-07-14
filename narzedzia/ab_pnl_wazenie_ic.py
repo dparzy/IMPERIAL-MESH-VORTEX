@@ -35,6 +35,7 @@ from __future__ import annotations
 import argparse
 import glob as _glob
 import logging
+import math
 import sys
 from pathlib import Path
 
@@ -130,10 +131,17 @@ def _rodzaj_dla(prog_ic, skaluj_ic) -> str:
     return f"{_RODZAJ}_p{int(round(prog_ic * 1000)):03d}_s{int(bool(skaluj_ic))}"
 
 
-def _wczytaj_z_areny(nazwa, rodzaj=_RODZAJ):
+def _klucz(nazwa, interwal, frac, okno, min_trade_barow, max_barow) -> str:
+    """Klucz areny = para + PODPIS KONFIGURACJI (Cubic P2). prog_ic/skaluj_ic siedzą już w
+    `rodzaj` (_rodzaj_dla); tu dokładamy resztę parametrów wymuszających inny backtest, by
+    resume pomijał WYŁĄCZNIE równoważne eksperymenty."""
+    return f"{nazwa}#i={interwal};frac={frac};okno={okno};mtb={min_trade_barow};max={max_barow or 0}"
+
+
+def _wczytaj_z_areny(nazwa, rodzaj, klucz):
     """Wznawialność: odczytaj policzoną cząstkę z areny (nota → dict) lub None."""
     from imperium.biblioteki.arena_baza import pytaj_pomiary
-    rekordy = pytaj_pomiary(rodzaj=rodzaj, neuron=nazwa, limit=1)
+    rekordy = pytaj_pomiary(rodzaj=rodzaj, neuron=klucz, limit=1)
     if not rekordy:
         return None
     pola = dict(kv.split("=", 1) for kv in rekordy[0]["nota"].split(";") if "=" in kv)
@@ -160,8 +168,9 @@ def raport(pliki, interwal, frac=0.6, okno=250, min_trade_barow=400,
     N = len(pliki)
     for i, plik in enumerate(pliki, 1):
         nazwa = Path(plik).name
+        klucz = _klucz(nazwa, interwal, frac, okno, min_trade_barow, max_barow)
         if not force:
-            zapisana = _wczytaj_z_areny(nazwa, rodzaj)
+            zapisana = _wczytaj_z_areny(nazwa, rodzaj, klucz)
             if zapisana is not None:
                 per_para.append(zapisana)
                 d = zapisana["ret_on"] - zapisana["ret_off"]
@@ -189,7 +198,7 @@ def raport(pliki, interwal, frac=0.6, okno=250, min_trade_barow=400,
               f"(Δ={d:+.1%}, tr OFF/ON={w['trades_off']}/{w['trades_on']}, test={w['bary_test']})",
               file=sys.stderr, flush=True)
         if zapisz:
-            zapisz_pomiar(rodzaj, nazwa, d, _nota(nazwa, frac, w))
+            zapisz_pomiar(rodzaj, klucz, d, _nota(nazwa, frac, w))
             print(f"    💾 arena: cząstka {nazwa} zapisana", file=sys.stderr, flush=True)
 
     if not per_para:
@@ -229,6 +238,15 @@ def raport(pliki, interwal, frac=0.6, okno=250, min_trade_barow=400,
     return "\n".join(linie)
 
 
+def _prog_ic_arg(tekst: str) -> float:
+    """Cubic P3: waliduj próg |IC| przy parsowaniu — skończony i w [0,1]. nan/inf/poza zakresem
+    zamieniłyby reklamowany bieg ON w porównanie all-baseline albo wywaliłyby analizę."""
+    v = float(tekst)
+    if not math.isfinite(v) or not (0.0 <= v <= 1.0):
+        raise argparse.ArgumentTypeError(f"--prog-ic musi być skończony w [0, 1], podano: {tekst}")
+    return v
+
+
 if __name__ == "__main__":
     logging.disable(logging.CRITICAL)
     p = argparse.ArgumentParser(description="A/B P&L ważenie IC — pełny backtest (W-361, OOS)")
@@ -240,8 +258,8 @@ if __name__ == "__main__":
     p.add_argument("--max-barow", type=int, default=6000, help="ogranicz do ostatnich N barów/parę")
     p.add_argument("--bez-zapisu", action="store_true", help="nie zapisuj cząstek do areny")
     p.add_argument("--force", action="store_true", help="przelicz nawet policzone pary")
-    p.add_argument("--prog-ic", type=float, default=0.0,
-                   help="W-361b SHRINKAGE: próg |IC| — poniżej neuron zostaje na baseline (np. 0.03)")
+    p.add_argument("--prog-ic", type=_prog_ic_arg, default=0.0,
+                   help="W-361b SHRINKAGE: próg |IC| ∈ [0,1] — poniżej neuron zostaje na baseline (np. 0.03)")
     p.add_argument("--bez-skali", action="store_true",
                    help="W-361b: korekta TYLKO znaku (bez ×|IC|) — nie firuje śmieciowych wejść")
     args = p.parse_args()

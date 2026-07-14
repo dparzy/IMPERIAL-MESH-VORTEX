@@ -9,7 +9,11 @@ from collections import namedtuple
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "narzedzia", "rag"))
 
-from narzedzia.bibliotekarz import _fragmenty_tekst, scout_temat, _SYSTEM
+import narzedzia.bibliotekarz as bib
+from narzedzia.bibliotekarz import (
+    _fragmenty_tekst, scout_temat, _SYSTEM, _topk_arg, _tematy_ukonczone,
+    _fts_bezpieczne, rozwin_zapytanie, krytyka_kandydatow,
+)
 
 _FakeWynik = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
 
@@ -40,3 +44,139 @@ def test_czastka_jest_json_serializowalna():
     czastka = {"temat": "x", "zrodla": ["BIB-001"], "kandydaci": "⚠️ kandydat", "ts": 1.0}
     odczyt = json.loads(json.dumps(czastka, ensure_ascii=False))
     assert odczyt["kandydaci"] == "⚠️ kandydat" and odczyt["zrodla"] == ["BIB-001"]
+
+
+def test_topk_arg_odrzuca_poza_zakresem():
+    # Cubic P2: --topk poza [1, _TOPK_MAX] → błąd zanim ruszy RAG/płatne API (granice).
+    import argparse
+    import pytest
+    assert _topk_arg("6") == 6 and _topk_arg("1") == 1 and _topk_arg("20") == 20
+    for zly in ("0", "-3", "21", "9999"):
+        with pytest.raises(argparse.ArgumentTypeError):
+            _topk_arg(zly)
+
+
+def test_scout_domyslnie_korpus_biblioteka(monkeypatch):
+    # U1 (anty-echo, Prawo XVI): scout domyślnie czyta TYLKO korpus 'biblioteka' (książki),
+    # nie 'dane'/'docs'. Sprawdzamy, że korpus jest forwardowany do RAG i domyślnie = biblioteka.
+    import szukaj as szukaj_mod
+    zebrane = {}
+
+    def fake_szukaj(temat, topk=5, tryb="hybrid", cichy=False, korpus=None, **kw):
+        zebrane["korpus"] = korpus
+        return []
+
+    monkeypatch.setattr(szukaj_mod, "szukaj", fake_szukaj)
+    scout_temat(None, "mean reversion", topk=3, tryb="fts")
+    assert zebrane["korpus"] == "biblioteka"          # domyślnie tylko książki
+    scout_temat(None, "mean reversion", topk=3, tryb="fts", korpus=None)
+    assert zebrane["korpus"] is None                  # override: None = bez filtra (dawne zachowanie)
+
+
+def test_tematy_ukonczone_pomija_dry(tmp_path, monkeypatch):
+    # Cubic P2: dedup liczy realny zwiad (ok/pusto, stare bez statusu), ale NIE dry-run.
+    kol = tmp_path / "kolejka.jsonl"
+    kol.write_text(
+        json.dumps({"temat": "realny", "status": "ok"}) + "\n"
+        + json.dumps({"temat": "podglad", "status": "dry"}) + "\n"
+        + json.dumps({"temat": "stary_bez_statusu"}) + "\n",
+        encoding="utf-8")
+    monkeypatch.setattr(bib, "KOLEJKA", kol)
+    done = _tematy_ukonczone()
+    assert "realny" in done and "stary_bez_statusu" in done
+    assert "podglad" not in done          # dry-run nie blokuje realnego zwiadu
+
+
+class _FakeGlos:
+    """Atrapa GlosImperium — nie dotyka API. Zwraca ustaloną odpowiedź lub rzuca błąd."""
+    def __init__(self, odp=None, blad=False):
+        self._odp, self._blad = odp, blad
+
+    def zapytaj(self, system, tresc, temperatura=0.7):
+        if self._blad:
+            raise RuntimeError("API down")
+        return self._odp
+
+
+def test_fts_bezpieczne_sanityzuje_i_nie_wywala():
+    # U2: myślniki/słowa-klucze FTS5 nie mogą wywalić MATCH — sanityzacja do słów złączonych OR.
+    assert _fts_bezpieczne("momentum trend-following breakout") == "momentum OR trend OR following OR breakout"
+    assert _fts_bezpieczne("mean reversion") == "mean OR reversion"
+    assert _fts_bezpieczne("!!!") == "!!!"      # brak słów → oryginał (nie tworzymy pustego MATCH)
+
+
+def test_rozwin_zapytanie_sanityzuje_i_fallback():
+    # U2: rozszerzenie zwraca same słowa; pusta/błędna odpowiedź → fallback na temat (Prawo XV).
+    g = _FakeGlos(odp="mean-reversion, bands! overextension zscore")
+    assert rozwin_zapytanie(g, "mean reversion") == "mean reversion bands overextension zscore"
+    assert rozwin_zapytanie(_FakeGlos(odp="   "), "temat X") == "temat X"    # pusto → temat
+    assert rozwin_zapytanie(_FakeGlos(blad=True), "temat Y") == "temat Y"    # błąd API → temat
+
+
+def test_scout_rozwin_uzywa_rozszerzonego_zapytania(monkeypatch):
+    # U2: gdy rozwin=True i jest glos — RAG idzie na ROZSZERZONYM (sanityzowanym) zapytaniu, nie surowym.
+    import szukaj as szukaj_mod
+    zebrane = {}
+
+    def fake_szukaj(q, topk=5, tryb="hybrid", cichy=False, korpus=None, **kw):
+        zebrane["q"] = q
+        return []
+
+    monkeypatch.setattr(szukaj_mod, "szukaj", fake_szukaj)
+    cz = scout_temat(_FakeGlos(odp="momentum breakout volatility"), "momentum", topk=3, rozwin=True)
+    assert cz["zapytanie"] == "momentum breakout volatility"      # rozszerzone zachowane w rekordzie
+    assert zebrane["q"] == "momentum OR breakout OR volatility"   # do FTS poszło sanityzowane OR
+
+
+def test_krytyka_kandydatow_fallback_na_blad():
+    # U3: błąd API krytyki nie może przekreślić cząstki — zwraca komunikat, nie wyjątek (Prawo XV).
+    out = krytyka_kandydatow(_FakeGlos(blad=True), "jakiś kandydat", [])
+    assert "niedostępna" in out
+
+
+def test_scout_krytyka_dodaje_dowody_przeciw(monkeypatch):
+    # U3: krytyka=True → drugie retrieval (dowody PRZECIW) + pole 'krytyka' w cząstce.
+    from collections import namedtuple
+    import szukaj as szukaj_mod
+    W = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
+    zapytania = []
+
+    def fake_szukaj(q, topk=5, tryb="hybrid", cichy=False, korpus=None, **kw):
+        zapytania.append(q)
+        return [W("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")]
+
+    monkeypatch.setattr(szukaj_mod, "szukaj", fake_szukaj)
+    cz = scout_temat(_FakeGlos(odp="ocena hipotez"), "momentum", topk=3, krytyka=True)
+    assert cz["status"] == "ok"
+    assert cz.get("krytyka") == "ocena hipotez"          # pole krytyki obecne
+    assert len(zapytania) == 2                           # główne + kontra (osobne retrieval)
+    assert "risk" in zapytania[1] and "failure" in zapytania[1]   # kontra-sufiks w drugim zapytaniu
+
+
+def test_kontekst_systemu_ma_luki_i_antydup():
+    # U4: blok świadomości zawiera instrukcję anty-duplikatów (Prawo XVI) i sekcję luk —
+    # albo pusty string, gdy rejestr niedostępny (graceful, Prawo XV). Bez brittle na konkretny klucz.
+    from narzedzia.bibliotekarz import _kontekst_systemu
+    blok = _kontekst_systemu()
+    assert blok == "" or ("Prawo XVI" in blok and "LUKI" in blok and "ISTNIEJĄCE" in blok)
+
+
+def test_scout_swiadomosc_wstrzykuje_kontekst(monkeypatch):
+    # U4: swiadomosc=True dokłada blok świadomości do treści dla DeepSeeka; OFF → nie dokłada.
+    from collections import namedtuple
+    import szukaj as szukaj_mod
+    W = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda *a, **k: [W("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    monkeypatch.setattr(bib, "_kontekst_systemu", lambda: "\nSENTINEL_KTX")
+    zebrane = {}
+
+    class G:
+        def zapytaj(self, system, tresc, temperatura=0.7):
+            zebrane["tresc"] = tresc
+            return "kand"
+
+    scout_temat(G(), "momentum", topk=3, swiadomosc=True)
+    assert "SENTINEL_KTX" in zebrane["tresc"]              # ON → kontekst dołączony
+    scout_temat(G(), "momentum", topk=3, swiadomosc=False)
+    assert "SENTINEL_KTX" not in zebrane["tresc"]          # OFF → bez kontekstu

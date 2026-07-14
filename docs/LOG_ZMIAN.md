@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-07-14 | 🔴 | REFRAME „22 luk" Prawa XV — adaptery ŻYJĄ, narracja audytu naprawiona
+
+**Odkrycie (Prawo I):** premisa „22 moduły czekają na adaptery / martwy potencjał" była MYLĄCA.
+Dowód na żywo: `AdapterFutures.pobierz('BTCUSDT')` → FUNDING_RATE=5.1e-05, LS=0.63, OI=106405;
+`AdapterFearGreed` → FEAR_GREED=22 (Extreme Fear); `AdapterCVD` → CVD=32.5. Adaptery ISTNIEJĄ,
+zwracają realne dane i są **wpięte w `petla_live`** (linie 166–177: AdapterFutures/FearGreed/CVD/NewsLLM
+→ Dyrygent). PSY-01..04 + V-03 są DOSTEPNY=True i konsumują te klucze.
+
+**Prawda:** „22 luki" to ARTEFAKT syntetycznych scenariuszy audytu (sztuczne bary bez danych
+futures/sentymentu/realnej daty/serii portfelowej → neurony NEUTRAL). NIE brak adapterów. Prawdziwe
+wąskie gardło (wspólne z odroczonym P1 strategy-MWU): brak REALNEGO BIEGU paper/live, który by je
+ćwiczył i pozwolił ZMIERZYĆ (IC/arena).
+
+**Naprawa (B):** poprawiona narracja audytu — z „czeka na adaptery" (⚠️) na „żywe na realnych danych,
+ciche tylko w syntetycznym audycie; do zmierzenia trzeba biegu paper/live" (ℹ️). Audyt już miał dowód
+`WERYFIKACJA_ADAPTEROW` (neurony ożywają z danymi). Test `test_audyt_w12_raportuje_neurony_adapterowe` zielony.
+
+**Pliki:** `narzedzia/audyt_spojnosci.py` (komunikat startowy + `--luki`).
+
+---
+
 ## 2026-07-14 | 🔭 | Hyginus U4 — świadomość systemu (luki Prawa XV + anty-redundancja) — KOMPLET U1–U4
 
 **Ulepszenie U4 (`narzedzia/bibliotekarz.py`) — ostatni krok kompletu:** opcjonalne (`--swiadomosc`,

@@ -110,8 +110,37 @@ def rozwin_zapytanie(glos, temat: str) -> str:
     return " ".join(slowa[:40]) or temat
 
 
+# U3: sufiks szukania DOWODÓW PRZECIW — poszerza retrieval o kontrargumenty (ryzyka, założenia,
+# ograniczenia, sprzeczne wyniki), których „happy-path" zwiad by nie pobrał.
+_KONTRA_SUFIKS = "risk failure limitation assumption drawback criticism overfitting"
+
+_SYSTEM_KRYTYKA = (
+    "Jesteś SĘDZIĄ-SCEPTYKIEM Imperium (ZASADA ZWIADOWCY WIEDZY: kandydat≠prawda). Dostajesz "
+    "KANDYDATÓW (hipotezy Bibliotekarza) oraz FRAGMENTY z biblioteki. Dla KAŻDEGO kandydata wskaż "
+    "DOWODY PRZECIW: co w tych fragmentach go podważa, ogranicza lub mu zaprzecza (ukryte założenia, "
+    "warunki ważności, znane pułapki, sprzeczne wyniki, ryzyko overfittingu). Oceń wsparcie dowodowe "
+    "każdego: MOCNE / SŁABE / SPRZECZNE. Jeśli NIE znajdujesz dowodów przeciw — powiedz to wprost "
+    "(to sygnał możliwej stronniczości potwierdzenia, nie dowód słuszności). Surowo, zwięźle, po polsku."
+)
+
+
+def krytyka_kandydatow(glos, kandydaci: str, wyniki_kontra) -> str:
+    """U3 (self-critique): drugie przejście — sędzia-sceptyk szuka DOWODÓW PRZECIW kandydatom.
+
+    Wzorzec agentic-RAG: po hipotezie szukamy dowodów DISCONFIRMING, by ograniczyć confirmation
+    bias. Wynik ląduje w polu 'krytyka' cząstki — Opus-sędzia i arena widzą od razu słabe hipotezy.
+    Błąd API nie może zabić zwiadu (Prawo XV): zwracamy komunikat, kandydaci już są zapisani."""
+    tresc = (f"KANDYDACI:\n{kandydaci}\n\n"
+             f"FRAGMENTY (możliwe kontrargumenty):\n{_fragmenty_tekst(wyniki_kontra)}")
+    try:
+        return glos.zapytaj(_SYSTEM_KRYTYKA, tresc, temperatura=0.3).strip()
+    except Exception:  # noqa: BLE001 — krytyka to dodatek; jej brak nie przekreśla cząstki
+        return "(krytyka niedostępna — błąd API)"
+
+
 def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
-                korpus: str | None = "biblioteka", rozwin: bool = False) -> dict:
+                korpus: str | None = "biblioteka", rozwin: bool = False,
+                krytyka: bool = False) -> dict:
     """Jeden temat: RAG → DeepSeek proponuje kandydatów. Zwraca dict cząstki (do kolejki).
 
     Zakłada, że indeks RAG ISTNIEJE (bramkuje raport() — Cubic P2). Status cząstki:
@@ -136,7 +165,12 @@ def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
                 "kandydaci": "(dry-run — DeepSeek pominięty)", "status": "dry"}
     tresc = f"TEMAT: {temat}\n\nFRAGMENTY:\n{_fragmenty_tekst(wyniki)}"
     odp = glos.zapytaj(_SYSTEM, tresc, temperatura=0.4)
-    return {**baza, "zrodla": zrodla, "kandydaci": odp.strip(), "status": "ok"}
+    rec = {**baza, "zrodla": zrodla, "kandydaci": odp.strip(), "status": "ok"}
+    if krytyka:  # U3: drugie przejście — dowody PRZECIW (osobne retrieval na kontrargumenty)
+        kontra = szukaj(_fts_bezpieczne(f"{zapytanie} {_KONTRA_SUFIKS}"),
+                        topk=topk, tryb=tryb, cichy=True, korpus=korpus)
+        rec["krytyka"] = krytyka_kandydatow(glos, rec["kandydaci"], kontra)
+    return rec
 
 
 def _tematy_ukonczone() -> set:
@@ -167,7 +201,7 @@ def zapisz_czastke(czastka: dict) -> None:
 
 
 def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="biblioteka",
-           rozwin=False) -> str:
+           rozwin=False, krytyka=False) -> str:
     # Cubic P2: bramka indeksu RAG — brak bazy to AWARIA INFRY, nie „pusty wynik". Nie skanujemy
     # i NIC nie zapisujemy do kolejki (inaczej awaria udawałaby ukończony, pusty zwiad).
     from szukaj import DEFAULT_BAZA  # type: ignore[import]
@@ -195,7 +229,8 @@ def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="bi
         print(f"[{i}/{N}] zwiad: „{temat}” — RAG + {'(dry)' if dry_run else 'DeepSeek'}…",
               file=sys.stderr, flush=True)
         try:
-            czastka = scout_temat(glos, temat, topk=topk, tryb=tryb, korpus=korpus, rozwin=rozwin)
+            czastka = scout_temat(glos, temat, topk=topk, tryb=tryb, korpus=korpus,
+                                  rozwin=rozwin, krytyka=krytyka)
         except Exception as e:  # noqa: BLE001
             print(f"[{i}/{N}] ⚠️ „{temat}”: {e}", file=sys.stderr, flush=True)
             continue
@@ -232,6 +267,8 @@ if __name__ == "__main__":
                    help="korpus RAG do zwiadu (U1: domyślnie 'biblioteka' — tylko książki, anty-echo docs)")
     p.add_argument("--rozwin", action="store_true",
                    help="U2: rozszerz temat przez DeepSeek w synonimy przed RAG (lepszy recall; +1 tani call/temat)")
+    p.add_argument("--krytyka", action="store_true",
+                   help="U3: self-critique — drugie przejście szuka DOWODÓW PRZECIW kandydatom (+1 RAG +1 call/temat)")
     p.add_argument("--dry-run", action="store_true", help="tylko RAG, bez DeepSeek (bez kosztu API)")
     p.add_argument("--force", action="store_true", help="przeskanuj też tematy już w kolejce")
     args = p.parse_args()
@@ -239,4 +276,4 @@ if __name__ == "__main__":
     tematy = args.temat or TEMATY_DOMYSLNE
     korpus = None if args.korpus == "wszystko" else args.korpus  # 'wszystko' → bez filtra (dawne zachowanie)
     print(raport(tematy, topk=args.topk, tryb=args.tryb, dry_run=args.dry_run,
-                 force=args.force, korpus=korpus, rozwin=args.rozwin))
+                 force=args.force, korpus=korpus, rozwin=args.rozwin, krytyka=args.krytyka))

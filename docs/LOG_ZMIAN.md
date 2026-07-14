@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-07-14 | 🔭 | Hyginus U3 — self-critique: dowody PRZECIW (anty-confirmation-bias)
+
+**Ulepszenie U3 (`narzedzia/bibliotekarz.py`):** opcjonalne (`--krytyka`, domyślnie OFF) drugie
+przejście po wygenerowaniu kandydatów — **sędzia-sceptyk szuka DOWODÓW PRZECIW**.
+
+- Osobne retrieval na kontrargumenty (temat + `risk failure limitation assumption drawback criticism
+  overfitting`) → DeepSeek ocenia każdego kandydata: MOCNE / SŁABE / SPRZECZNE, wskazuje ukryte
+  założenia i pułapki. Wynik w polu `krytyka` cząstki — Opus-sędzia i arena widzą słabe hipotezy od razu.
+- Wzorzec agentic-RAG (disconfirming evidence) wzmacnia ZASADĘ ZWIADOWCY WIEDZY: kandydat≠prawda.
+  Gdy brak dowodów przeciw — model mówi to wprost (sygnał confirmation bias, nie dowód słuszności).
+- Błąd API krytyki nie przekreśla cząstki (kandydaci już zapisani; Prawo XV). +2 testy granic.
+
+**Powód:** trzeci krok planu U1+U2+U3. Opt-in OFF (+1 RAG +1 call/temat), monotonicznie ostrożne.
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py`.
+
+---
+
 ## 2026-07-14 | 🔭 | Hyginus U2 — recall: sanityzacja FTS + query-expansion + hybrid
 
 **Ulepszenie U2 (`narzedzia/bibliotekarz.py`):** trzy rzeczy dla lepszego recall zwiadu.

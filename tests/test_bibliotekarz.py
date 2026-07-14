@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "narzedzia", "r
 import narzedzia.bibliotekarz as bib
 from narzedzia.bibliotekarz import (
     _fragmenty_tekst, scout_temat, _SYSTEM, _topk_arg, _tematy_ukonczone,
-    _fts_bezpieczne, rozwin_zapytanie,
+    _fts_bezpieczne, rozwin_zapytanie, krytyka_kandydatow,
 )
 
 _FakeWynik = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
@@ -126,3 +126,28 @@ def test_scout_rozwin_uzywa_rozszerzonego_zapytania(monkeypatch):
     cz = scout_temat(_FakeGlos(odp="momentum breakout volatility"), "momentum", topk=3, rozwin=True)
     assert cz["zapytanie"] == "momentum breakout volatility"      # rozszerzone zachowane w rekordzie
     assert zebrane["q"] == "momentum OR breakout OR volatility"   # do FTS poszło sanityzowane OR
+
+
+def test_krytyka_kandydatow_fallback_na_blad():
+    # U3: błąd API krytyki nie może przekreślić cząstki — zwraca komunikat, nie wyjątek (Prawo XV).
+    out = krytyka_kandydatow(_FakeGlos(blad=True), "jakiś kandydat", [])
+    assert "niedostępna" in out
+
+
+def test_scout_krytyka_dodaje_dowody_przeciw(monkeypatch):
+    # U3: krytyka=True → drugie retrieval (dowody PRZECIW) + pole 'krytyka' w cząstce.
+    from collections import namedtuple
+    import szukaj as szukaj_mod
+    W = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
+    zapytania = []
+
+    def fake_szukaj(q, topk=5, tryb="hybrid", cichy=False, korpus=None, **kw):
+        zapytania.append(q)
+        return [W("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")]
+
+    monkeypatch.setattr(szukaj_mod, "szukaj", fake_szukaj)
+    cz = scout_temat(_FakeGlos(odp="ocena hipotez"), "momentum", topk=3, krytyka=True)
+    assert cz["status"] == "ok"
+    assert cz.get("krytyka") == "ocena hipotez"          # pole krytyki obecne
+    assert len(zapytania) == 2                           # główne + kontra (osobne retrieval)
+    assert "risk" in zapytania[1] and "failure" in zapytania[1]   # kontra-sufiks w drugim zapytaniu

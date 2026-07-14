@@ -6,6 +6,33 @@
 
 ---
 
+## 2026-07-14 | ✨ | W-361 web — feed MEXC + markery bota na wykresie (panel przeglądarki)
+
+**Co:** rozbudowa `web_dashboard.py` (drugi kanał obserwacji, po terminalowej SPECULA):
+  • **MagazynSwiec** — pętla live wpycha bary z DataLoadera (`serwer_web.podaj_swiece(sym, bary)`),
+    router serwuje je na `/wykresy/{symbol}.json` gdy webhook TV pusty → **wykres pokazuje
+    świece MEXC BEZ konfiguracji TradingView/ngrok** (dotąd wymagany był webhook TV).
+  • **Markery wejść bota** — `znaczniki_do_lwc()` konwertuje wejścia (exact `timestamp_wejscia`
+    z otwartych pozycji + ostatnich zamknięć) na markery Lightweight Charts (▲ LONG zielony /
+    ▼ SHORT czerwony); JS `setMarkers()` filtruje po aktywnym symbolu. Cezar widzi GDZIE rój wszedł.
+  • **Selektor symboli** z obu źródeł (webhook TV ∪ feed MEXC), pole `symbole_swiec` w `/stan.json`.
+
+**Bonus:** ta sama pętla karmi też terminalową SPECULA (`stan.swiece`/`swiece_symbol`) — świece
+w terminalu ożywają na realnym biegu paper/live, nie tylko w demo.
+
+**Prawo I (bez zmyślania):** markery tylko WEJŚĆ — mają exact `timestamp_wejscia`. Markery WYJŚĆ
+odłożone: `WynikZamkniecia` nie ma czasu wyjścia (tylko `czas_trwania_bar`), dodanie wymaga
+przewleczenia timestampu przez ścieżkę zamknięcia engine — osobny krok, nie fałszujemy czasu.
+
+**Testy granic:** 19 testów (znaczniki LONG/SHORT/wyjście, ms→s, sortowanie, zły pomijany,
+MagazynSwiec roundtrip/cap/symbole, router fallback MEXC, symbole_swiec, integracja serwer→router).
+
+**Pliki:** `imperium/swiatynie/web_dashboard.py`, `imperium/swiatynie/live_monitor.py`
+(pole swiece_symbol + filtr znaczników), `imperium/koloseum/petla_live.py` (markery + feed),
+`tests/test_web_dashboard_swiece.py` (nowy).
+
+---
+
 ## 2026-07-14 | ✨ | SPECULA (W-361) — świece OHLC w terminalu (podgląd live jak MEXC)
 
 **Co:** nowy organ `imperium/swiatynie/specula_swiec.py` (SPECULA — rzymska wieża

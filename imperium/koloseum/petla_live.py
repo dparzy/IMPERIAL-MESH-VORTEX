@@ -600,6 +600,28 @@ def handluj_live(
                         )
                         for p in engine.otwarte.values()
                     ]
+                    # W-361: markery wejść bota na świecach (exact timestamp_wejscia).
+                    # Otwarte pozycje + ostatnie zamknięcia (Prawo I — bez zmyślania czasu).
+                    znaczniki_bota = []
+                    for p in engine.otwarte.values():
+                        ts = getattr(p, "timestamp_wejscia", 0)
+                        if ts:
+                            znaczniki_bota.append({
+                                "timestamp": ts, "cena": getattr(p, "cena_wejscia", 0.0),
+                                "kierunek": getattr(p, "kierunek", "LONG"),
+                                "typ": "wejscie", "symbol": getattr(p, "symbol", ""),
+                            })
+                    for wz in getattr(engine, "historia_zamkniec", [])[-50:]:
+                        ts = getattr(wz, "timestamp_wejscia", 0)
+                        if ts:
+                            znaczniki_bota.append({
+                                "timestamp": ts, "cena": getattr(wz, "cena_wejscia", 0.0),
+                                "kierunek": getattr(wz, "kierunek", "LONG"),
+                                "typ": "wejscie", "symbol": getattr(wz, "symbol", ""),
+                            })
+                    # Świece symbolu głównego dla panelu terminalowego SPECULA (W-361)
+                    sym_glowny = cfg.symbole[0] if cfg.symbole else ""
+                    swiece_glowne = bary_per.get(sym_glowny, [])[-60:]
                     stan = StanDashboardu(
                         symbol=", ".join(cfg.symbole[:3]),
                         rezim=aktualny_rezim,
@@ -611,12 +633,18 @@ def handluj_live(
                         weta=statystyki.weta,
                         bledy=statystyki.bledy,
                         czas_ostatniego_bara=datetime.now(),
+                        swiece=swiece_glowne,
+                        swiece_symbol=sym_glowny,
+                        znaczniki_swiec=znaczniki_bota,
                     )
                     if monitor is not None:
                         monitor.aktualizuj(stan)
                         monitor.render()
                     if serwer_web is not None:
                         serwer_web.aktualizuj(stan)
+                        # W-361: feed świec MEXC do wykresu web (bez webhooka TV)
+                        for _sym, _bary in bary_per.items():
+                            serwer_web.podaj_swiece(_sym, _bary)
                 except Exception as e:
                     logger.debug(f"[PętlaLive] Monitor/dashboard render padł: {e}")
 

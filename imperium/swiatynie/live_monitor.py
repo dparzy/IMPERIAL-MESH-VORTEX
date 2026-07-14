@@ -117,6 +117,12 @@ class StanDashboardu:
     meta_bet_size: float = 0.0      # B-01 meta-labeling
     aktualny_rezim_turbo: Optional[bool] = None   # W-340 vol-gate
     dodatkowe: Dict[str, str] = field(default_factory=dict)
+    # SPECULA (W-361) — świece OHLC w terminalu (opcjonalny panel, wymaga plotext).
+    # bary: nasz format {timestamp, open, high, low, close, ...}. Puste → panel pominięty.
+    swiece: List[Dict] = field(default_factory=list)
+    # znaczniki wejść/wyjść bota na świecach: {timestamp, cena, kierunek, typ}
+    znaczniki_swiec: List[Dict] = field(default_factory=list)
+    swiece_wysokosc: int = 14       # wysokość panelu świec w liniach
 
 
 # ─── Renderer ─────────────────────────────────────────────────────────────────
@@ -228,6 +234,18 @@ class LiveMonitor:
                 linie.append(f"║  {_DIM}{k}: {v}{_RESET}")
 
         linie.append(_TEAL + "╚" + "═" * (w - 2) + "╝" + _RESET)
+
+        # ── SPECULA (W-361): panel świec OHLC w terminalu (opcjonalny) ──
+        if s.swiece:
+            from imperium.swiatynie.specula_swiec import render_swiece
+            tytul = f"{s.symbol}  ·  świece"
+            linie.append(render_swiece(
+                s.swiece,
+                wysokosc=s.swiece_wysokosc,
+                szerokosc=w,
+                tytul=tytul,
+                znaczniki=s.znaczniki_swiec or None,
+            ))
 
         print("\n".join(linie))
         sys.stdout.flush()

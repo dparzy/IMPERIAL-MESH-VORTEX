@@ -20,6 +20,7 @@
                                    war_lancer            egzekucja HF           [III]
 🎨 ŚWIĄTYNIE       swiatynie/     kartograf             wykresy PNG            [V]
                                    sala_wojenna          dashboard             [V]
+                                   specula               świece OHLC w terminalu[V, XXIV]
 📚 BIBLIOTEKI      biblioteki/    mnemosyne             pamięć transakcji      [VIII, XIII]
                                    kronikarz             logi, dziennik         [XIII]
                                    igrzyska              ranking batch + observer pattern [XV]

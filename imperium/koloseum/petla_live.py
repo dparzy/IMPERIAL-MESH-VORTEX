@@ -720,7 +720,8 @@ def uruchom(
     handluj_live(kfg)
 
 
-if __name__ == "__main__":
+def _zbuduj_parser():
+    """Parser CLI pętli live. Wyodrębniony do funkcji, by CLI był testowalny (Reguła Test-Granic)."""
     import argparse
     p = argparse.ArgumentParser(
         description="Pętla Live Imperium (W-302) — paper trading domyślnie. "
@@ -734,17 +735,48 @@ if __name__ == "__main__":
     p.add_argument("--arena-log", action="store_true",
                    help="loguj realny PnL zamknięć do areny (arena_wyniki.db) — do pomiaru skuteczności")
     p.add_argument("--monitor", action="store_true", help="panel TUI co bar (Prawo XXIV — widoczność)")
+    p.add_argument("--dashboard", action="store_true",
+                   help="serwer HTTP web (Panel Kapitolu) — podgląd live w przeglądarce (W-346/W-361)")
+    p.add_argument("--dashboard-port", type=int, default=8777,
+                   help="port web dashboardu (domyślnie 8777)")
+    p.add_argument("--webhook-tv", action="store_true",
+                   help="odbiornik POST /webhook/tv obok dashboardu (wymaga --dashboard; sekret WEBHOOK_TV_SEKRET)")
+    p.add_argument("--senat", action="store_true",
+                   help="Senat Debaty (KonsulSenatu per symbol weryfikuje kierunek, W-343)")
+    p.add_argument("--kalibruj-prog", action="store_true",
+                   help="bramka konformalna progu pewności (ML-36) — tylko ZAOSTRZA po serii strat")
+    p.add_argument("--telegram", action="store_true",
+                   help="alerty Telegram na wejścia/zamknięcia/weto (wymaga TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID)")
     p.add_argument("--max-barow", type=int, default=None,
                    help="limit barów (None = nieskończona pętla produkcyjna; np. 3 = szybki test)")
     p.add_argument("--pauza", type=int, default=None,
                    help="sekundy między barami (None = z interwału; np. 2 = szybki test bez czekania na świecę)")
-    a = p.parse_args()
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    return p
+
+
+def zbuduj_konfig_z_argv(argv=None):
+    """Parsuje argv → (KonfigPetliLive, max_barow). Testowalny punkt wejścia CLI.
+
+    --webhook-tv wymaga --dashboard (serwer HTTP musi działać) — walidacja tutaj,
+    żeby błąd konfiguracji był głośny (Prawo XVIII), nie cichy.
+    """
+    a = _zbuduj_parser().parse_args(argv)
+    if a.webhook_tv and not a.dashboard:
+        raise SystemExit("--webhook-tv wymaga --dashboard (serwer HTTP musi być uruchomiony).")
     kfg = KonfigPetliLive(
         symbole=a.symbole, interwal=a.interwal, kapital_startowy=a.kapital,
         paper=not a.real, arena_log=a.arena_log, monitor=a.monitor, pauza_sekundy=a.pauza,
+        dashboard=a.dashboard, dashboard_port=a.dashboard_port, webhook_tv=a.webhook_tv,
+        senat=a.senat, kalibruj_prog=a.kalibruj_prog, telegram=a.telegram,
     )
-    tryb = "REALNE ZLECENIA (MEXC)" if a.real else "PAPER (symulacja, bez realnych zleceń)"
-    print(f">>> Pętla Live — {tryb} | pary={a.symbole} | interwał={a.interwal} | "
-          f"max_barow={a.max_barow or '∞'}", flush=True)
-    handluj_live(kfg, max_barow=a.max_barow)
+    return kfg, a.max_barow
+
+
+if __name__ == "__main__":
+    kfg, max_barow = zbuduj_konfig_z_argv()
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    tryb = "REALNE ZLECENIA (MEXC)" if not kfg.paper else "PAPER (symulacja, bez realnych zleceń)"
+    _pod = f" | dashboard=http://127.0.0.1:{kfg.dashboard_port}" if kfg.dashboard else ""
+    print(f">>> Pętla Live — {tryb} | pary={kfg.symbole} | interwał={kfg.interwal} | "
+          f"max_barow={max_barow or '∞'}{_pod}", flush=True)
+    handluj_live(kfg, max_barow=max_barow)

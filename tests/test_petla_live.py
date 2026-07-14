@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pandas as pd
 
 from imperium.koloseum.petla_live import (
-    handluj_live, KonfigPetliLive, _df_do_barow,
+    handluj_live, KonfigPetliLive, _df_do_barow, zbuduj_konfig_z_argv,
 )
 from imperium.akwedukty.kwatermistrz_danych import _ccxt_timeframe
 
@@ -312,3 +312,53 @@ def test_auto_discover_zastepuje_liste():
     handluj_live(kfg, max_barow=1, _loader=loader)
     assert "PLACEHOLDER" not in kfg.symbole
     assert "BTC/USDT:USDT" in kfg.symbole
+
+
+# ── CLI: zbuduj_konfig_z_argv (Reguła Test-Granic — flagi opt-in muszą trafić do configu) ──
+
+def test_cli_domyslne_paper_bez_dashboardu():
+    # Brak flag → paper=True, dashboard OFF, port domyślny 8777.
+    kfg, max_barow = zbuduj_konfig_z_argv([])
+    assert kfg.paper is True
+    assert kfg.dashboard is False
+    assert kfg.dashboard_port == 8777
+    assert kfg.monitor is False
+    assert max_barow is None
+
+
+def test_cli_dashboard_wlacza_i_ustawia_port():
+    kfg, _ = zbuduj_konfig_z_argv(["--dashboard", "--dashboard-port", "9001"])
+    assert kfg.dashboard is True
+    assert kfg.dashboard_port == 9001
+
+
+def test_cli_flagi_optin_trafiaja_do_configu():
+    kfg, mb = zbuduj_konfig_z_argv([
+        "--monitor", "--arena-log", "--dashboard", "--senat",
+        "--kalibruj-prog", "--telegram", "--max-barow", "5",
+    ])
+    assert kfg.monitor is True
+    assert kfg.arena_log is True
+    assert kfg.dashboard is True
+    assert kfg.senat is True
+    assert kfg.kalibruj_prog is True
+    assert kfg.telegram is True
+    assert mb == 5
+
+
+def test_cli_real_wylacza_paper():
+    kfg, _ = zbuduj_konfig_z_argv(["--real"])
+    assert kfg.paper is False
+
+
+def test_cli_webhook_bez_dashboardu_pada_glosno():
+    # --webhook-tv wymaga --dashboard (serwer HTTP). Bez niego — SystemExit, nie ciche OFF.
+    import pytest
+    with pytest.raises(SystemExit):
+        zbuduj_konfig_z_argv(["--webhook-tv"])
+
+
+def test_cli_webhook_z_dashboardem_ok():
+    kfg, _ = zbuduj_konfig_z_argv(["--webhook-tv", "--dashboard"])
+    assert kfg.webhook_tv is True
+    assert kfg.dashboard is True

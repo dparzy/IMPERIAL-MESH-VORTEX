@@ -170,6 +170,15 @@ python start.py
 ```
 Zatrzymanie: **Ctrl+C**.
 
+**Szybciej — bez pisania skryptu (CLI):** ten sam bieg paper z podglądem live jednym poleceniem:
+```bash
+python -m imperium.koloseum.petla_live --dashboard --monitor --arena-log
+```
+Podgląd w przeglądarce: **http://127.0.0.1:8777** (port zmienisz `--dashboard-port 9001`).
+Flagi: `--monitor` panel TUI w terminalu · `--arena-log` mierzy realny PnL zamknięć do areny ·
+`--senat` Debata Senatu · `--kalibruj-prog` bramka konformalna · `--max-barow 3 --pauza 2` szybki test.
+Pełna lista: `python -m imperium.koloseum.petla_live --help`.
+
 ### 4.2 — BACKTEST (test na danych historycznych)
 
 ```python

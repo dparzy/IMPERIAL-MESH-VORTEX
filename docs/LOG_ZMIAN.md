@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-07-15 | 🔧 | CLI pętli live — flaga `--dashboard` wpięta (Prawo XV: podgląd był niepodpięty)
+
+**Co:** `KonfigPetliLive` od dawna miała pola `dashboard/dashboard_port/webhook_tv/senat/`
+`kalibruj_prog/telegram`, ale blok `__main__` CLI ich NIE eksponował — budował konfig tylko z
+`monitor/arena_log/pauza`. Skutek: cel P0 „monitorowany bieg paper (`--monitor --dashboard`)"
+był nieuruchamialny z linii poleceń — podgląd web dla oczu Cezara istniał w kodzie, ale martwy
+z CLI (utrata potencjału, Prawo XV).
+
+**Naprawa:**
+  • wyodrębniono `_zbuduj_parser()` + `zbuduj_konfig_z_argv(argv)` — testowalny punkt wejścia CLI
+    (dotąd parsowanie żyło tylko pod `if __name__`, nietestowalne — Reguła Test-Granic).
+  • dołożono flagi: `--dashboard`, `--dashboard-port` (dom. 8777), `--webhook-tv`, `--senat`,
+    `--kalibruj-prog`, `--telegram` — wszystkie opt-in OFF (ZASADA WPIĘCIA: zero zmiany domyślnego
+    zachowania; brak flag = identyczny bieg jak dotąd).
+  • walidacja głośna: `--webhook-tv` bez `--dashboard` → `SystemExit` (serwer HTTP musi działać),
+    zamiast cichego OFF (Prawo XVIII).
+
+**Dowód end-to-end:** `python -m ... --symbole BTCUSDT --dashboard --arena-log --max-barow 1`
+pobrał realne dane MEXC, policzył wskaźniki, wywołał DeepSeek (v4-flash HTTP 200), podjął decyzję
+paper (WEJŚCIE BTCUSDT LONG pewność=77% reżim=VOLATILE), zapisał stan uczenia — 0 błędów.
+
+**Testy granic:** +6 (`test_cli_*`): domyślne paper/OFF, dashboard+port, wszystkie flagi opt-in
+→ config, `--real`→paper=False, `--webhook-tv` bez dashboardu → SystemExit, webhook+dashboard OK.
+
+**Symbioza:** MANUAL_UZYTKOWNIKA §4.1 — dopisany jednolinijkowiec CLI z URL podglądu.
+
+**Pliki:** `imperium/koloseum/petla_live.py`, `tests/test_petla_live.py`, `docs/MANUAL_UZYTKOWNIKA.md`
+
 ## 2026-07-14 | ✨ | W-361 web — feed MEXC + markery bota na wykresie (panel przeglądarki)
 
 **Co:** rozbudowa `web_dashboard.py` (drugi kanał obserwacji, po terminalowej SPECULA):

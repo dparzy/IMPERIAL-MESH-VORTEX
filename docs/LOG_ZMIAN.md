@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-07-14 | 🐞 | FIX krytyczny: żywa pętla nie pobierała danych ('1H'→ccxt NotSupported)
+
+**Bug znaleziony w runtime (nie zgadywany — zasada debugowania):** `KonfigPetliLive.interwal`
+domyślnie `'1H'`, ale `DataLoader.fetch` przekazywał go wprost do ccxt (mexc), który zna tylko
+`'1h'` → `NotSupported: timeframe unit H` → pętla live logowała „Brak danych dla żadnego symbolu"
+i przetwarzała 0 barów. **To prawdopodobnie powód, czemu paper/live nigdy nie wystartował** (INDEKS #3).
+
+**Fix:** `_ccxt_timeframe()` w `kwatermistrz_danych.py` — normalizuje notację Imperium (godziny/dni
+UPPERCASE `1H`/`4H`/`1D`) do ccxt (`1h`/`4h`/`1d`); minuty (`15m`) i miesiąc ccxt (`1M`) nietknięte.
++1 test granic (`test_ccxt_timeframe_normalizuje_interwal_imperium`).
+
+**DOWÓD (Prawo I):** po fixie bieg paper 2 barów na ŻYWYCH danych BTCUSDT: **2 bary przetworzone,
+1 decyzja wejścia (paper), 0 błędów.** Cały rój działa end-to-end na realnym rynku — unlock „C paper/live".
+
+**Pliki:** `imperium/akwedukty/kwatermistrz_danych.py`, `tests/test_petla_live.py`.
+
+---
+
 ## 2026-07-14 | 🔴 | REFRAME „22 luk" Prawa XV — adaptery ŻYJĄ, narracja audytu naprawiona
 
 **Odkrycie (Prawo I):** premisa „22 moduły czekają na adaptery / martwy potencjał" była MYLĄCA.

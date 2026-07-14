@@ -29,6 +29,7 @@ Użycie:
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import logging
 import re
@@ -138,9 +139,37 @@ def krytyka_kandydatow(glos, kandydaci: str, wyniki_kontra) -> str:
         return "(krytyka niedostępna — błąd API)"
 
 
+@functools.lru_cache(maxsize=1)
+def _kontekst_systemu() -> str:
+    """U4 (świadomość systemu): zwięzły blok o LUKACH (Prawo XV) i ISTNIEJĄCYCH modułach
+    (anty-redundancja, Prawo XVI), wstrzykiwany DeepSeekowi przy generacji kandydatów.
+
+    Dzięki temu Hyginus proponuje pod REALNE braki roju i wie, co już istnieje — odtwarza
+    główną siłę ręcznego web-DeepSeeka (kontekst systemu), ale ze źródeł biblioteki. Cache 1×
+    (rejestr nie zmienia się w trakcie biegu). Brak rejestru → '' (zwiad działa dalej, Prawo XV)."""
+    try:
+        from imperium.legiony.rejestr import wszystkie_neurony
+        from narzedzia.audyt_spojnosci import NEURONY_ZALEZNE_OD_ADAPTEROW as LUKI
+    except Exception:  # noqa: BLE001 — brak rejestru/audytu nie może zabić zwiadu
+        return ""
+    neurony = wszystkie_neurony()
+    istniejace = ", ".join(sorted({n.KLUCZ for n in neurony}))
+    kategorie = ", ".join(sorted({n.KATEGORIA for n in neurony}))
+    luki = "; ".join(f"{k} ({opis})" for k, opis in sorted(LUKI.items()))
+    return (
+        "\n\nKONTEKST IMPERIUM (świadomość systemu — steruj doborem kandydatów):\n"
+        f"• ISTNIEJĄCE moduły — NIE proponuj duplikatów (Prawo XVI): {istniejace}\n"
+        f"• Kategorie w użyciu: {kategorie}\n"
+        f"• LUKI — moduły milczące, czekają na dane/adapter; PREFERUJ kandydatów, którzy je "
+        f"zasilają lub wnoszą NOWĄ informację: {luki}\n"
+        "Dla KAŻDEGO kandydata dopisz: (a) którą LUKĘ zasila LUB jaką NOWĄ informację wnosi, "
+        "(b) czy NIE dubluje istniejącego modułu."
+    )
+
+
 def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
                 korpus: str | None = "biblioteka", rozwin: bool = False,
-                krytyka: bool = False) -> dict:
+                krytyka: bool = False, swiadomosc: bool = False) -> dict:
     """Jeden temat: RAG → DeepSeek proponuje kandydatów. Zwraca dict cząstki (do kolejki).
 
     Zakłada, że indeks RAG ISTNIEJE (bramkuje raport() — Cubic P2). Status cząstki:
@@ -164,6 +193,8 @@ def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
         return {**baza, "zrodla": zrodla,
                 "kandydaci": "(dry-run — DeepSeek pominięty)", "status": "dry"}
     tresc = f"TEMAT: {temat}\n\nFRAGMENTY:\n{_fragmenty_tekst(wyniki)}"
+    if swiadomosc:  # U4: dołącz świadomość systemu (luki + istniejące moduły) do generacji kandydatów
+        tresc += _kontekst_systemu()
     odp = glos.zapytaj(_SYSTEM, tresc, temperatura=0.4)
     rec = {**baza, "zrodla": zrodla, "kandydaci": odp.strip(), "status": "ok"}
     if krytyka:  # U3: drugie przejście — dowody PRZECIW (osobne retrieval na kontrargumenty)
@@ -201,7 +232,7 @@ def zapisz_czastke(czastka: dict) -> None:
 
 
 def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="biblioteka",
-           rozwin=False, krytyka=False) -> str:
+           rozwin=False, krytyka=False, swiadomosc=False) -> str:
     # Cubic P2: bramka indeksu RAG — brak bazy to AWARIA INFRY, nie „pusty wynik". Nie skanujemy
     # i NIC nie zapisujemy do kolejki (inaczej awaria udawałaby ukończony, pusty zwiad).
     from szukaj import DEFAULT_BAZA  # type: ignore[import]
@@ -230,7 +261,7 @@ def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="bi
               file=sys.stderr, flush=True)
         try:
             czastka = scout_temat(glos, temat, topk=topk, tryb=tryb, korpus=korpus,
-                                  rozwin=rozwin, krytyka=krytyka)
+                                  rozwin=rozwin, krytyka=krytyka, swiadomosc=swiadomosc)
         except Exception as e:  # noqa: BLE001
             print(f"[{i}/{N}] ⚠️ „{temat}”: {e}", file=sys.stderr, flush=True)
             continue
@@ -269,11 +300,18 @@ if __name__ == "__main__":
                    help="U2: rozszerz temat przez DeepSeek w synonimy przed RAG (lepszy recall; +1 tani call/temat)")
     p.add_argument("--krytyka", action="store_true",
                    help="U3: self-critique — drugie przejście szuka DOWODÓW PRZECIW kandydatom (+1 RAG +1 call/temat)")
+    p.add_argument("--swiadomosc", action="store_true",
+                   help="U4: wstrzyknij świadomość systemu (luki Prawa XV + istniejące klucze) — kandydaci pod realne braki")
+    p.add_argument("--pelny", action="store_true",
+                   help="komplet U2+U3+U4: --rozwin --krytyka --swiadomosc naraz (najlepszy zwiad)")
     p.add_argument("--dry-run", action="store_true", help="tylko RAG, bez DeepSeek (bez kosztu API)")
     p.add_argument("--force", action="store_true", help="przeskanuj też tematy już w kolejce")
     args = p.parse_args()
 
     tematy = args.temat or TEMATY_DOMYSLNE
     korpus = None if args.korpus == "wszystko" else args.korpus  # 'wszystko' → bez filtra (dawne zachowanie)
+    rozwin = args.rozwin or args.pelny
+    krytyka = args.krytyka or args.pelny
+    swiadomosc = args.swiadomosc or args.pelny
     print(raport(tematy, topk=args.topk, tryb=args.tryb, dry_run=args.dry_run,
-                 force=args.force, korpus=korpus, rozwin=args.rozwin, krytyka=args.krytyka))
+                 force=args.force, korpus=korpus, rozwin=rozwin, krytyka=krytyka, swiadomosc=swiadomosc))

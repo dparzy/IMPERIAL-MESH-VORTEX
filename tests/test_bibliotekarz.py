@@ -151,3 +151,32 @@ def test_scout_krytyka_dodaje_dowody_przeciw(monkeypatch):
     assert cz.get("krytyka") == "ocena hipotez"          # pole krytyki obecne
     assert len(zapytania) == 2                           # główne + kontra (osobne retrieval)
     assert "risk" in zapytania[1] and "failure" in zapytania[1]   # kontra-sufiks w drugim zapytaniu
+
+
+def test_kontekst_systemu_ma_luki_i_antydup():
+    # U4: blok świadomości zawiera instrukcję anty-duplikatów (Prawo XVI) i sekcję luk —
+    # albo pusty string, gdy rejestr niedostępny (graceful, Prawo XV). Bez brittle na konkretny klucz.
+    from narzedzia.bibliotekarz import _kontekst_systemu
+    blok = _kontekst_systemu()
+    assert blok == "" or ("Prawo XVI" in blok and "LUKI" in blok and "ISTNIEJĄCE" in blok)
+
+
+def test_scout_swiadomosc_wstrzykuje_kontekst(monkeypatch):
+    # U4: swiadomosc=True dokłada blok świadomości do treści dla DeepSeeka; OFF → nie dokłada.
+    from collections import namedtuple
+    import szukaj as szukaj_mod
+    W = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda *a, **k: [W("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    monkeypatch.setattr(bib, "_kontekst_systemu", lambda: "\nSENTINEL_KTX")
+    zebrane = {}
+
+    class G:
+        def zapytaj(self, system, tresc, temperatura=0.7):
+            zebrane["tresc"] = tresc
+            return "kand"
+
+    scout_temat(G(), "momentum", topk=3, swiadomosc=True)
+    assert "SENTINEL_KTX" in zebrane["tresc"]              # ON → kontekst dołączony
+    scout_temat(G(), "momentum", topk=3, swiadomosc=False)
+    assert "SENTINEL_KTX" not in zebrane["tresc"]          # OFF → bez kontekstu

@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-07-14 | 🔭 | Hyginus U4 — świadomość systemu (luki Prawa XV + anty-redundancja) — KOMPLET U1–U4
+
+**Ulepszenie U4 (`narzedzia/bibliotekarz.py`) — ostatni krok kompletu:** opcjonalne (`--swiadomosc`,
+domyślnie OFF) wstrzyknięcie DeepSeekowi **świadomości systemu** przy generacji kandydatów:
+- **LUKI (Prawo XV):** 22 moduły czekające na dane/adapter (z `NEURONY_ZALEZNE_OD_ADAPTEROW`) z opisami
+  → Hyginus PREFERUJE kandydatów, którzy je zasilają lub wnoszą NOWĄ informację.
+- **ISTNIEJĄCE moduły (Prawo XVI):** wszystkie klucze + kategorie roju → NIE proponuj duplikatów.
+- Każdy kandydat oznacza: którą lukę zasila / jaką nową informację wnosi / czy nie dubluje istniejącego.
+- Blok cache'owany (`lru_cache`), brak rejestru → '' (zwiad działa dalej, Prawo XV). +2 testy.
+
+**Flaga `--pelny`** włącza komplet U2+U3+U4 (`--rozwin --krytyka --swiadomosc`) — najlepszy zwiad.
+U4 odtwarza główną siłę ręcznego web-DeepSeeka (kontekst systemu), ale ze źródeł biblioteki, bez halucynacji.
+
+**Powód:** domknięcie planu U1+U2+U3+U4 (rozkaz Cezara). U5 (tryb otwarty) ODRZUCONY — żadnych halucynacji.
+Wszystko opt-in OFF; Hyginus nie jest w ścieżce decyzyjnej roju, wyniki ⚠️ prawdą dopiero po arenie.
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py`.
+
+---
+
 ## 2026-07-14 | 📖 | BIB-032 O'Hara domknięty — 69/69 książek w RAG (OCR angielskiego skanu)
 
 **Domknięcie biblioteki (Prawo XV):** BIB-032 „O'Hara — Market Microstructure Theory" był jedyną

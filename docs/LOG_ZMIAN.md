@@ -6,6 +6,30 @@
 
 ---
 
+## 2026-07-15 | 🔧 | Domknięcie CLI pętli live — behawioralne opt-iny (Prawo XV, przegląd kompletności)
+
+**Co:** przegląd 35 pól `KonfigPetliLive` vs flagi CLI wykazał, że kilka realnych toggli
+behawioralnych żyło TYLKO w config-obiekcie (nieosiągalne z linii poleceń). Domknięto
+te istotne dla biegu obserwacyjnego P0:
+  • `--cienie` — Legiony Cieni (kontrfaktyczny pomiar 3 widmowych wariantów → arena CIEN_PNL;
+    czysty pomiar, BEZ zmiany realnej decyzji)
+  • `--funding-mexc` — funding/OI z MEXC (rodzimy, TIER A funding+ELR)
+  • `--mwu` / `--igrzyska` — warstwy uczenia (opt-in; faktyczne włączenie = decyzja Cezara)
+  • `--filtr-asymetrii` (W-314) / `--ksiega-wad` (W-309) — filtry weta
+  • `--min-pewnosc 0.6` — próg pewności wejścia (walidacja ∈ (0,1) → SystemExit)
+
+**Świadomie tylko-config (nie CLI):** ścieżki (`plik_pamieci`/`log_dir`/`sciezka_*`), strojenie
+(`limit_barow`/`radar_co_bar`/`synapsy_decay_co_bar`), trio `auto_discover*` — to parametry
+programowe obiektu konfiguracji, nie codzienne przełączniki biegu.
+
+**Weryfikacja Prawa XV:** każda nowa flaga faktycznie konsumowana w pętli (cienie→338,
+funding_mexc→178, mwu→202, igrzyska→224, ksiega_wad→232/385, filtr_asymetrii→220/355,
+min_pewnosc→217/240/351) — zero flag-atrap.
+
+**Testy granic:** +3 (domyślne OFF / włączane / --min-pewnosc poza (0,1) → SystemExit).
+
+**Pliki:** `imperium/koloseum/petla_live.py`, `tests/test_petla_live.py`, `docs/MANUAL_UZYTKOWNIKA.md`
+
 ## 2026-07-15 | 🔧 | W-288 SL z ATR wpięty w pętlę live (Prawo XV — realistyczne zamknięcia paper)
 
 **Co:** `sl_atr_mult` (SL = k×ATR_14) istniał w Dyrygencie, KalkulatorzeLewara i backteście,

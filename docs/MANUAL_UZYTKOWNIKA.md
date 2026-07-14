@@ -175,10 +175,13 @@ Zatrzymanie: **Ctrl+C**.
 python -m imperium.koloseum.petla_live --dashboard --monitor --arena-log
 ```
 Podgląd w przeglądarce: **http://127.0.0.1:8777** (port zmienisz `--dashboard-port 9001`).
-Flagi: `--monitor` panel TUI w terminalu · `--arena-log` mierzy realny PnL zamknięć do areny ·
-`--senat` Debata Senatu · `--kalibruj-prog` bramka konformalna · `--sl-atr-mult 2.0` realistyczny
-stop = 2×ATR (zamiast crude stopu z dźwigni) · `--max-barow 3 --pauza 2` szybki test.
-Pełna lista: `python -m imperium.koloseum.petla_live --help`.
+Flagi obserwacji/pomiaru: `--monitor` panel TUI w terminalu · `--arena-log` mierzy realny PnL
+zamknięć do areny · `--cienie` kontrfaktyczny pomiar Legionów Cieni · `--sl-atr-mult 2.0`
+realistyczny stop = 2×ATR (zamiast crude stopu z dźwigni).
+Flagi zachowania (opt-in OFF): `--senat` Debata Senatu · `--kalibruj-prog` bramka konformalna ·
+`--filtr-asymetrii` weto reżimu · `--ksiega-wad` filtr wad setupu · `--funding-mexc` funding MEXC ·
+`--mwu` / `--igrzyska` warstwy uczenia · `--min-pewnosc 0.6` próg wejścia.
+Test/tempo: `--max-barow 3 --pauza 2`. Pełna lista: `python -m imperium.koloseum.petla_live --help`.
 
 ### 4.2 — BACKTEST (test na danych historycznych)
 

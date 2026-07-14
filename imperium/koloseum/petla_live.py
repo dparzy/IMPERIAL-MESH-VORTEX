@@ -755,6 +755,20 @@ def _zbuduj_parser():
     p.add_argument("--sl-atr-mult", type=float, default=None,
                    help="SL = k×ATR_14 (W-288, realistyczne zamknięcia; np. 2.0). None = SL z dźwigni. "
                         "ATR-SL tylko ZACIEŚNIA stop — monotoniczna ostrożność")
+    p.add_argument("--min-pewnosc", type=float, default=0.55,
+                   help="próg pewności Legatusa do wejścia (domyślnie 0.55)")
+    p.add_argument("--cienie", action="store_true",
+                   help="Legiony Cieni — kontrfaktyczny pomiar 3 widmowych wariantów (bez zmiany decyzji)")
+    p.add_argument("--funding-mexc", action="store_true",
+                   help="funding/OI z MEXC (rodzimy, TIER A funding+ELR) zamiast Binance fapi")
+    p.add_argument("--mwu", action="store_true",
+                   help="warstwa uczenia HedgeMWU (online, po każdym trade — opt-in, decyzja Cezara)")
+    p.add_argument("--igrzyska", action="store_true",
+                   help="warstwa uczenia Igrzyska (batch ranking accuracy/stability — opt-in)")
+    p.add_argument("--filtr-asymetrii", action="store_true",
+                   help="Filtr Asymetrii Reżimu (W-314) — weto na rynku bocznym/kontr-trendzie")
+    p.add_argument("--ksiega-wad", action="store_true",
+                   help="KsięgaWad (W-309) — prewencyjny filtr wad setupu (rezim/interwal)")
     p.add_argument("--telegram", action="store_true",
                    help="alerty Telegram na wejścia/zamknięcia/weto (wymaga TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID)")
     p.add_argument("--max-barow", type=int, default=None,
@@ -775,12 +789,16 @@ def zbuduj_konfig_z_argv(argv=None):
         raise SystemExit("--webhook-tv wymaga --dashboard (serwer HTTP musi być uruchomiony).")
     if a.sl_atr_mult is not None and a.sl_atr_mult <= 0:
         raise SystemExit("--sl-atr-mult musi być > 0 (mnożnik ATR); pomiń flagę dla SL z dźwigni.")
+    if not 0.0 < a.min_pewnosc < 1.0:
+        raise SystemExit("--min-pewnosc musi być w (0, 1) — to próg prawdopodobieństwa.")
     kfg = KonfigPetliLive(
         symbole=a.symbole, interwal=a.interwal, kapital_startowy=a.kapital,
         paper=not a.real, arena_log=a.arena_log, monitor=a.monitor, pauza_sekundy=a.pauza,
         dashboard=a.dashboard, dashboard_port=a.dashboard_port, webhook_tv=a.webhook_tv,
         senat=a.senat, kalibruj_prog=a.kalibruj_prog, telegram=a.telegram,
-        sl_atr_mult=a.sl_atr_mult,
+        sl_atr_mult=a.sl_atr_mult, min_pewnosc=a.min_pewnosc, cienie=a.cienie,
+        funding_mexc=a.funding_mexc, mwu=a.mwu, igrzyska=a.igrzyska,
+        filtr_asymetrii=a.filtr_asymetrii, ksiega_wad=a.ksiega_wad,
     )
     return kfg, a.max_barow
 

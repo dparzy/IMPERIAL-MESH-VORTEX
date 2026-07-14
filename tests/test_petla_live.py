@@ -414,3 +414,38 @@ def test_sl_atr_mult_domyslnie_none_w_dyrygencie():
     kfg = KonfigPetliLive(symbole=["BTCUSDT"], interwal="1H", synapsy=False)
     d = _buduj_dyrygencie(["BTCUSDT"], kfg, engine)["BTCUSDT"]
     assert d.sl_atr_mult is None
+
+
+# ── Domknięcie CLI: behawioralne opt-iny do biegu P0 (były tylko w config-obiekcie) ──
+
+def test_cli_toggle_behawioralne_domyslnie_off():
+    kfg, _ = zbuduj_konfig_z_argv([])
+    assert kfg.cienie is False
+    assert kfg.funding_mexc is False
+    assert kfg.mwu is False
+    assert kfg.igrzyska is False
+    assert kfg.filtr_asymetrii is False
+    assert kfg.ksiega_wad is False
+    assert kfg.min_pewnosc == 0.55   # domyślny próg
+
+
+def test_cli_toggle_behawioralne_wlaczane():
+    kfg, _ = zbuduj_konfig_z_argv([
+        "--cienie", "--funding-mexc", "--mwu", "--igrzyska",
+        "--filtr-asymetrii", "--ksiega-wad", "--min-pewnosc", "0.62",
+    ])
+    assert kfg.cienie is True
+    assert kfg.funding_mexc is True
+    assert kfg.mwu is True
+    assert kfg.igrzyska is True
+    assert kfg.filtr_asymetrii is True
+    assert kfg.ksiega_wad is True
+    assert kfg.min_pewnosc == 0.62
+
+
+def test_cli_min_pewnosc_poza_zakresem_pada():
+    """Próg to prawdopodobieństwo ∈ (0,1) — granice i poza → SystemExit."""
+    import pytest
+    for zly in ["0", "1", "1.5", "-0.1"]:
+        with pytest.raises(SystemExit):
+            zbuduj_konfig_z_argv(["--min-pewnosc", zly])

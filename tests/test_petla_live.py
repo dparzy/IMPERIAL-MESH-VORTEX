@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import pandas as pd
 
 from imperium.koloseum.petla_live import (
-    handluj_live, KonfigPetliLive, _df_do_barow,
+    handluj_live, KonfigPetliLive, _df_do_barow, zbuduj_konfig_z_argv,
 )
 from imperium.akwedukty.kwatermistrz_danych import _ccxt_timeframe
 
@@ -312,3 +312,140 @@ def test_auto_discover_zastepuje_liste():
     handluj_live(kfg, max_barow=1, _loader=loader)
     assert "PLACEHOLDER" not in kfg.symbole
     assert "BTC/USDT:USDT" in kfg.symbole
+
+
+# ── CLI: zbuduj_konfig_z_argv (Reguła Test-Granic — flagi opt-in muszą trafić do configu) ──
+
+def test_cli_domyslne_paper_bez_dashboardu():
+    # Brak flag → paper=True, dashboard OFF, port domyślny 8777.
+    kfg, max_barow = zbuduj_konfig_z_argv([])
+    assert kfg.paper is True
+    assert kfg.dashboard is False
+    assert kfg.dashboard_port == 8777
+    assert kfg.monitor is False
+    assert max_barow is None
+
+
+def test_cli_dashboard_wlacza_i_ustawia_port():
+    kfg, _ = zbuduj_konfig_z_argv(["--dashboard", "--dashboard-port", "9001"])
+    assert kfg.dashboard is True
+    assert kfg.dashboard_port == 9001
+
+
+def test_cli_flagi_optin_trafiaja_do_configu():
+    kfg, mb = zbuduj_konfig_z_argv([
+        "--monitor", "--arena-log", "--dashboard", "--senat",
+        "--kalibruj-prog", "--telegram", "--max-barow", "5",
+    ])
+    assert kfg.monitor is True
+    assert kfg.arena_log is True
+    assert kfg.dashboard is True
+    assert kfg.senat is True
+    assert kfg.kalibruj_prog is True
+    assert kfg.telegram is True
+    assert mb == 5
+
+
+def test_cli_real_wylacza_paper():
+    kfg, _ = zbuduj_konfig_z_argv(["--real"])
+    assert kfg.paper is False
+
+
+def test_cli_webhook_bez_dashboardu_pada_glosno():
+    # --webhook-tv wymaga --dashboard (serwer HTTP). Bez niego — SystemExit, nie ciche OFF.
+    import pytest
+    with pytest.raises(SystemExit):
+        zbuduj_konfig_z_argv(["--webhook-tv"])
+
+
+def test_cli_webhook_z_dashboardem_ok():
+    kfg, _ = zbuduj_konfig_z_argv(["--webhook-tv", "--dashboard"])
+    assert kfg.webhook_tv is True
+    assert kfg.dashboard is True
+
+
+# ── W-288 SL z ATR: wpięcie CLI → config → Dyrygent (dotąd niepodpięte do live) ──
+
+def test_cli_sl_atr_mult_domyslnie_none():
+    kfg, _ = zbuduj_konfig_z_argv([])
+    assert kfg.sl_atr_mult is None   # brak flagi = stary SL z dźwigni (zero zmian)
+
+
+def test_cli_sl_atr_mult_trafia_do_configu():
+    kfg, _ = zbuduj_konfig_z_argv(["--sl-atr-mult", "2.0"])
+    assert kfg.sl_atr_mult == 2.0
+
+
+def test_cli_sl_atr_mult_niedodatni_pada_glosno():
+    """mult ≤ 0 bez sensu (mnożnik ATR) → SystemExit, nie cichy no-op."""
+    import pytest
+    with pytest.raises(SystemExit):
+        zbuduj_konfig_z_argv(["--sl-atr-mult", "0"])
+    with pytest.raises(SystemExit):
+        zbuduj_konfig_z_argv(["--sl-atr-mult", "-1.5"])
+
+
+def test_sl_atr_mult_wpiety_w_dyrygenta():
+    """W-288 był w Dyrygencie/kalkulatorze/backteście ale NIE w pętli live (Prawo XV).
+    _buduj_dyrygencie musi przekazać cfg.sl_atr_mult do każdego Dyrygenta."""
+    try:
+        import talib  # noqa: F401
+    except ImportError:
+        return
+    from imperium.koloseum.petla_live import _buduj_dyrygencie
+    from imperium.koloseum.paper_trading import PaperTradingEngine
+
+    engine = PaperTradingEngine(kapital_startowy=10_000.0)
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"], interwal="1H", synapsy=False, sl_atr_mult=2.0)
+    d = _buduj_dyrygencie(["BTCUSDT"], kfg, engine)["BTCUSDT"]
+    assert d.sl_atr_mult == 2.0
+
+
+def test_sl_atr_mult_domyslnie_none_w_dyrygencie():
+    """Domyślnie None → Dyrygent na starym SL (zero regresji dla istniejących biegów)."""
+    try:
+        import talib  # noqa: F401
+    except ImportError:
+        return
+    from imperium.koloseum.petla_live import _buduj_dyrygencie
+    from imperium.koloseum.paper_trading import PaperTradingEngine
+
+    engine = PaperTradingEngine(kapital_startowy=10_000.0)
+    kfg = KonfigPetliLive(symbole=["BTCUSDT"], interwal="1H", synapsy=False)
+    d = _buduj_dyrygencie(["BTCUSDT"], kfg, engine)["BTCUSDT"]
+    assert d.sl_atr_mult is None
+
+
+# ── Domknięcie CLI: behawioralne opt-iny do biegu P0 (były tylko w config-obiekcie) ──
+
+def test_cli_toggle_behawioralne_domyslnie_off():
+    kfg, _ = zbuduj_konfig_z_argv([])
+    assert kfg.cienie is False
+    assert kfg.funding_mexc is False
+    assert kfg.mwu is False
+    assert kfg.igrzyska is False
+    assert kfg.filtr_asymetrii is False
+    assert kfg.ksiega_wad is False
+    assert kfg.min_pewnosc == 0.55   # domyślny próg
+
+
+def test_cli_toggle_behawioralne_wlaczane():
+    kfg, _ = zbuduj_konfig_z_argv([
+        "--cienie", "--funding-mexc", "--mwu", "--igrzyska",
+        "--filtr-asymetrii", "--ksiega-wad", "--min-pewnosc", "0.62",
+    ])
+    assert kfg.cienie is True
+    assert kfg.funding_mexc is True
+    assert kfg.mwu is True
+    assert kfg.igrzyska is True
+    assert kfg.filtr_asymetrii is True
+    assert kfg.ksiega_wad is True
+    assert kfg.min_pewnosc == 0.62
+
+
+def test_cli_min_pewnosc_poza_zakresem_pada():
+    """Próg to prawdopodobieństwo ∈ (0,1) — granice i poza → SystemExit."""
+    import pytest
+    for zly in ["0", "1", "1.5", "-0.1"]:
+        with pytest.raises(SystemExit):
+            zbuduj_konfig_z_argv(["--min-pewnosc", zly])

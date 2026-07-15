@@ -62,6 +62,12 @@ class KonfigPetliLive:
     ksiega_wad: bool = False
     # W-314: Filtr Asymetrii Reżimu — weto na rynku bocznym (ADX) i kontr-trendzie. OFF.
     filtr_asymetrii: bool = False
+    # W-288: SL = sl_atr_mult × ATR_14 (opt-in; None = stary SL z dźwigni). Istniał w
+    # backteście/Dyrygencie/kalkulatorze, ale był NIEPODPIĘTY do pętli live (utrata
+    # potencjału, Prawo XV). Monotoniczna ostrożność: ATR-SL tylko ZACIEŚNIA stop
+    # (nigdy bliżej likwidacji niż lewarowy) — bezpieczny nawet przed pełną walidacją.
+    # Domyka rytmem RYNKU zamiast −25% z dźwigni nieosiągalnego na 1H (198/201 TIMEOUT).
+    sl_atr_mult: Optional[float] = None
     # W-327: źródło funding/OI dla PSY-01/04. True=MEXC (rodzime — funding który
     # FAKTYCZNIE płacisz na MEXC), False=Binance fapi. L/S ratio (PSY-02) zawsze z
     # Binance (MEXC nie ma łatwego public L/S; sentyment rynkowy cross-giełdowy OK).
@@ -212,6 +218,7 @@ def _buduj_dyrygencie(
             namiestnik=namiestnik,
             adaptery=adaptery_sentymentu,
             filtr_asymetrii=cfg.filtr_asymetrii,
+            sl_atr_mult=cfg.sl_atr_mult,
         )
         d.kapital_sizing = kapital_per
         if cfg.igrzyska:
@@ -720,7 +727,8 @@ def uruchom(
     handluj_live(kfg)
 
 
-if __name__ == "__main__":
+def _zbuduj_parser():
+    """Parser CLI pętli live. Wyodrębniony do funkcji, by CLI był testowalny (Reguła Test-Granic)."""
     import argparse
     p = argparse.ArgumentParser(
         description="Pętla Live Imperium (W-302) — paper trading domyślnie. "
@@ -734,17 +742,72 @@ if __name__ == "__main__":
     p.add_argument("--arena-log", action="store_true",
                    help="loguj realny PnL zamknięć do areny (arena_wyniki.db) — do pomiaru skuteczności")
     p.add_argument("--monitor", action="store_true", help="panel TUI co bar (Prawo XXIV — widoczność)")
+    p.add_argument("--dashboard", action="store_true",
+                   help="serwer HTTP web (Panel Kapitolu) — podgląd live w przeglądarce (W-346/W-361)")
+    p.add_argument("--dashboard-port", type=int, default=8777,
+                   help="port web dashboardu (domyślnie 8777)")
+    p.add_argument("--webhook-tv", action="store_true",
+                   help="odbiornik POST /webhook/tv obok dashboardu (wymaga --dashboard; sekret WEBHOOK_TV_SEKRET)")
+    p.add_argument("--senat", action="store_true",
+                   help="Senat Debaty (KonsulSenatu per symbol weryfikuje kierunek, W-343)")
+    p.add_argument("--kalibruj-prog", action="store_true",
+                   help="bramka konformalna progu pewności (ML-36) — tylko ZAOSTRZA po serii strat")
+    p.add_argument("--sl-atr-mult", type=float, default=None,
+                   help="SL = k×ATR_14 (W-288, realistyczne zamknięcia; np. 2.0). None = SL z dźwigni. "
+                        "ATR-SL tylko ZACIEŚNIA stop — monotoniczna ostrożność")
+    p.add_argument("--min-pewnosc", type=float, default=0.55,
+                   help="próg pewności Legatusa do wejścia (domyślnie 0.55)")
+    p.add_argument("--cienie", action="store_true",
+                   help="Legiony Cieni — kontrfaktyczny pomiar 3 widmowych wariantów (bez zmiany decyzji)")
+    p.add_argument("--funding-mexc", action="store_true",
+                   help="funding/OI z MEXC (rodzimy, TIER A funding+ELR) zamiast Binance fapi")
+    p.add_argument("--mwu", action="store_true",
+                   help="warstwa uczenia HedgeMWU (online, po każdym trade — opt-in, decyzja Cezara)")
+    p.add_argument("--igrzyska", action="store_true",
+                   help="warstwa uczenia Igrzyska (batch ranking accuracy/stability — opt-in)")
+    p.add_argument("--filtr-asymetrii", action="store_true",
+                   help="Filtr Asymetrii Reżimu (W-314) — weto na rynku bocznym/kontr-trendzie")
+    p.add_argument("--ksiega-wad", action="store_true",
+                   help="KsięgaWad (W-309) — prewencyjny filtr wad setupu (rezim/interwal)")
+    p.add_argument("--telegram", action="store_true",
+                   help="alerty Telegram na wejścia/zamknięcia/weto (wymaga TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID)")
     p.add_argument("--max-barow", type=int, default=None,
                    help="limit barów (None = nieskończona pętla produkcyjna; np. 3 = szybki test)")
     p.add_argument("--pauza", type=int, default=None,
                    help="sekundy między barami (None = z interwału; np. 2 = szybki test bez czekania na świecę)")
-    a = p.parse_args()
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    return p
+
+
+def zbuduj_konfig_z_argv(argv=None):
+    """Parsuje argv → (KonfigPetliLive, max_barow). Testowalny punkt wejścia CLI.
+
+    --webhook-tv wymaga --dashboard (serwer HTTP musi działać) — walidacja tutaj,
+    żeby błąd konfiguracji był głośny (Prawo XVIII), nie cichy.
+    """
+    a = _zbuduj_parser().parse_args(argv)
+    if a.webhook_tv and not a.dashboard:
+        raise SystemExit("--webhook-tv wymaga --dashboard (serwer HTTP musi być uruchomiony).")
+    if a.sl_atr_mult is not None and a.sl_atr_mult <= 0:
+        raise SystemExit("--sl-atr-mult musi być > 0 (mnożnik ATR); pomiń flagę dla SL z dźwigni.")
+    if not 0.0 < a.min_pewnosc < 1.0:
+        raise SystemExit("--min-pewnosc musi być w (0, 1) — to próg prawdopodobieństwa.")
     kfg = KonfigPetliLive(
         symbole=a.symbole, interwal=a.interwal, kapital_startowy=a.kapital,
         paper=not a.real, arena_log=a.arena_log, monitor=a.monitor, pauza_sekundy=a.pauza,
+        dashboard=a.dashboard, dashboard_port=a.dashboard_port, webhook_tv=a.webhook_tv,
+        senat=a.senat, kalibruj_prog=a.kalibruj_prog, telegram=a.telegram,
+        sl_atr_mult=a.sl_atr_mult, min_pewnosc=a.min_pewnosc, cienie=a.cienie,
+        funding_mexc=a.funding_mexc, mwu=a.mwu, igrzyska=a.igrzyska,
+        filtr_asymetrii=a.filtr_asymetrii, ksiega_wad=a.ksiega_wad,
     )
-    tryb = "REALNE ZLECENIA (MEXC)" if a.real else "PAPER (symulacja, bez realnych zleceń)"
-    print(f">>> Pętla Live — {tryb} | pary={a.symbole} | interwał={a.interwal} | "
-          f"max_barow={a.max_barow or '∞'}", flush=True)
-    handluj_live(kfg, max_barow=a.max_barow)
+    return kfg, a.max_barow
+
+
+if __name__ == "__main__":
+    kfg, max_barow = zbuduj_konfig_z_argv()
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    tryb = "REALNE ZLECENIA (MEXC)" if not kfg.paper else "PAPER (symulacja, bez realnych zleceń)"
+    _pod = f" | dashboard=http://127.0.0.1:{kfg.dashboard_port}" if kfg.dashboard else ""
+    print(f">>> Pętla Live — {tryb} | pary={kfg.symbole} | interwał={kfg.interwal} | "
+          f"max_barow={max_barow or '∞'}{_pod}", flush=True)
+    handluj_live(kfg, max_barow=max_barow)

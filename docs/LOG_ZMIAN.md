@@ -6,6 +6,125 @@
 
 ---
 
+## 2026-07-15 | 🔮 | HARUSPEX (kand. #20) — prototyp + POMIAR = FALSYFIKACJA (Prawo I, pomiar-najpierw)
+
+**Co:** prototyp kandydata #20 „predykcyjny Namiestnik" (żniwo wrzutni). Nazwa rzymska
+**HARUSPEX** (kapłan-wróżbita, dobrana do funkcji predykcji — ZASADA NOMENKLATURY). Łańcuch
+Markowa 1. rzędu na strumieniu reżimów (klasyfikuj_rezim) — przewiduje następny reżim +
+sygnał „przygotuj się na zmianę". Poza ścieżką decyzyjną (opt-in OFF, ZASADA WPIĘCIA).
+
+**POMIAR (Prawo I, `narzedzia/pomiar_haruspex.py` na realnych świecach BTC/ETH 4H):**
+Zbudowano sekwencję reżimów z rosnących okien (zero look-ahead), zmierzono trafność vs
+baseline'y. **Werdykt: FALSYFIKOWANY — brak wartości.**
+  • argmax trafność == baseline PERSYSTENCJI (BTC 97.5%=97.5%, ETH 92.5%=92.5%) → przewaga +0%
+  • sygnał ZMIANY: recall 0% (0 ostrzeżeń na 7 realnych zmian, także przy progu 0.10)
+  • przyczyna strukturalna: reżimy o wysokim P(zmiany) (NORMAL 33%, VOLATILE) są RZADKIE →
+    milczą (< min_obserwacji); częste (TREND/RANGING) 97-98% lepkie → zmiana nieprognozowana.
+
+**Decyzja (Prawo XVIII):** NIE wpinam (pomiar nie dał przewagi — dokładnie po to jest
+pomiar-najpierw). Moduł+narzędzie+testy ZOSTAJĄ jako infrastruktura pomiaru + udokumentowany
+negatyw (antykruchość: nie budować goły Markow ponownie). Werdykt w nagłówku modułu.
+Ewentualna wartość dopiero z modelem WARUNKOWYM na cechy — osobny kandydat, po pomiarze.
+
+**Testy granic:** 17 (MILCZENIE <min_obs, granica ≥min_obs, próg zmiany ==/>, bez look-ahead,
+baseline persystencji, walidacja konstruktora). Testy 2334/2334, ruff czysty.
+
+**Pliki:** `imperium/koloseum/haruspex.py`, `narzedzia/pomiar_haruspex.py`, `tests/test_haruspex.py`,
+`docs/ARCHITEKTURA_IMPERIUM.md` (organ Haruspex w KOLOSEUM)
+
+## 2026-07-15 | 📥 | Żniwo wrzutni — 6 nieprzerobionych tur 12 lip → destylat + backlog
+
+**Co:** domknięto ostatni punkt planu po U1-U4 Hyginusa — żniwo 6 tur web-DeepSeeka z 2026-07-12
+(16:06–16:32), których `ANALIZA_WRZUTNIA_2026-07-10.md` nie pokrywała.
+
+**Metoda (ZASADA ZWIADOWCY WIEDZY):** Hyginus = proponent, Vitruviusz = sędzia. Web-zweryfikowano
+KAŻDE cytowanie Tury 5 (rozkaz stały: WebSearch przed oceną post-cutoff) → **5/5 realnych prac**
+(AgenticAITA arXiv 2605.12532, FinLumen ICASSP 2026, FinDPO arXiv 2507.18417, DecoupledMarket
+ICML 2026, DC-GNN IEEE 2026). Lekcja re-audytu 2026-07-13 potwierdzona.
+
+**Sąd:** ~połowa propozycji nakłada się z rdzeniem (Senat W-343, W8, W13, triada, Legiony Cieni,
+BOCPD/CUSUM) → Sekcja A. ODRZUCONO Terminator auto-merge (łamie ład: Claude nigdy nie merguje do
+main). Wyekstrahowano 8 kandydatów #18-25 (⚠️ każdy → arena, opt-in OFF), zarejestrowano jako
+POMYSŁ w rejestrze wizji (W4). Top-3 realne: #18 FinDPO (sentyment DPO), #19 FinLumen (negocjacje
+w Senacie), #20 Nostradamus-light (predykcja reżimu, najtańszy splot).
+
+**Pliki:** `docs/ANALIZA_WRZUTNIA_2026-07-12.md` (nowy destylat), `bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl` (8 kand.)
+
+## 2026-07-15 | 🔧 | Domknięcie CLI pętli live — behawioralne opt-iny (Prawo XV, przegląd kompletności)
+
+**Co:** przegląd 35 pól `KonfigPetliLive` vs flagi CLI wykazał, że kilka realnych toggli
+behawioralnych żyło TYLKO w config-obiekcie (nieosiągalne z linii poleceń). Domknięto
+te istotne dla biegu obserwacyjnego P0:
+  • `--cienie` — Legiony Cieni (kontrfaktyczny pomiar 3 widmowych wariantów → arena CIEN_PNL;
+    czysty pomiar, BEZ zmiany realnej decyzji)
+  • `--funding-mexc` — funding/OI z MEXC (rodzimy, TIER A funding+ELR)
+  • `--mwu` / `--igrzyska` — warstwy uczenia (opt-in; faktyczne włączenie = decyzja Cezara)
+  • `--filtr-asymetrii` (W-314) / `--ksiega-wad` (W-309) — filtry weta
+  • `--min-pewnosc 0.6` — próg pewności wejścia (walidacja ∈ (0,1) → SystemExit)
+
+**Świadomie tylko-config (nie CLI):** ścieżki (`plik_pamieci`/`log_dir`/`sciezka_*`), strojenie
+(`limit_barow`/`radar_co_bar`/`synapsy_decay_co_bar`), trio `auto_discover*` — to parametry
+programowe obiektu konfiguracji, nie codzienne przełączniki biegu.
+
+**Weryfikacja Prawa XV:** każda nowa flaga faktycznie konsumowana w pętli (cienie→338,
+funding_mexc→178, mwu→202, igrzyska→224, ksiega_wad→232/385, filtr_asymetrii→220/355,
+min_pewnosc→217/240/351) — zero flag-atrap.
+
+**Testy granic:** +3 (domyślne OFF / włączane / --min-pewnosc poza (0,1) → SystemExit).
+
+**Pliki:** `imperium/koloseum/petla_live.py`, `tests/test_petla_live.py`, `docs/MANUAL_UZYTKOWNIKA.md`
+
+## 2026-07-15 | 🔧 | W-288 SL z ATR wpięty w pętlę live (Prawo XV — realistyczne zamknięcia paper)
+
+**Co:** `sl_atr_mult` (SL = k×ATR_14) istniał w Dyrygencie, KalkulatorzeLewara i backteście,
+ale `KonfigPetliLive` + `_buduj_dyrygencie` go NIE przekazywały — żywy paper zamykał crude
+stopem z dźwigni (połowa drogi do likwidacji ≈ −25% na 1H, nieosiągalne → 198/201 = TIMEOUT).
+Skutek: pomiar TIER A w arenie zniekształcony sztucznymi TIMEOUTAMI zamiast rytmu rynku.
+
+**Naprawa:**
+  • pole `KonfigPetliLive.sl_atr_mult: Optional[float] = None` (opt-in; None = stary SL).
+  • `_buduj_dyrygencie` przekazuje `sl_atr_mult=cfg.sl_atr_mult` do każdego Dyrygenta.
+  • CLI `--sl-atr-mult 2.0`; walidacja: ≤ 0 → `SystemExit` (mnożnik ATR musi być dodatni).
+
+**Bezpieczeństwo (ZASADA WPIĘCIA — monotoniczna ostrożność):** ATR-SL może stop tylko
+ZACIEŚNIĆ (`max` LONG / `min` SHORT względem lewarowego) — nigdy bliżej likwidacji. Bezpieczny
+do wpięcia nawet przed pełną walidacją A/B; domyślnie OFF (None) = zero zmiany zachowania.
+
+**Dowód e2e:** bieg `--sl-atr-mult 2.0 --max-barow 1` → WEJŚCIE BTCUSDT LONG 79% TREND_STRONG,
+0 błędów. Logika zacieśniania już pokryta testami kalkulatora (ciaśniejszy/nigdy-szerszy/granice/TP).
+
+**Testy granic:** +5 (CLI domyślne None / →config / ≤0 SystemExit; wpięcie w Dyrygenta / domyślne None).
+
+**Pliki:** `imperium/koloseum/petla_live.py`, `tests/test_petla_live.py`, `docs/MANUAL_UZYTKOWNIKA.md`
+
+## 2026-07-15 | 🔧 | CLI pętli live — flaga `--dashboard` wpięta (Prawo XV: podgląd był niepodpięty)
+
+**Co:** `KonfigPetliLive` od dawna miała pola `dashboard/dashboard_port/webhook_tv/senat/`
+`kalibruj_prog/telegram`, ale blok `__main__` CLI ich NIE eksponował — budował konfig tylko z
+`monitor/arena_log/pauza`. Skutek: cel P0 „monitorowany bieg paper (`--monitor --dashboard`)"
+był nieuruchamialny z linii poleceń — podgląd web dla oczu Cezara istniał w kodzie, ale martwy
+z CLI (utrata potencjału, Prawo XV).
+
+**Naprawa:**
+  • wyodrębniono `_zbuduj_parser()` + `zbuduj_konfig_z_argv(argv)` — testowalny punkt wejścia CLI
+    (dotąd parsowanie żyło tylko pod `if __name__`, nietestowalne — Reguła Test-Granic).
+  • dołożono flagi: `--dashboard`, `--dashboard-port` (dom. 8777), `--webhook-tv`, `--senat`,
+    `--kalibruj-prog`, `--telegram` — wszystkie opt-in OFF (ZASADA WPIĘCIA: zero zmiany domyślnego
+    zachowania; brak flag = identyczny bieg jak dotąd).
+  • walidacja głośna: `--webhook-tv` bez `--dashboard` → `SystemExit` (serwer HTTP musi działać),
+    zamiast cichego OFF (Prawo XVIII).
+
+**Dowód end-to-end:** `python -m ... --symbole BTCUSDT --dashboard --arena-log --max-barow 1`
+pobrał realne dane MEXC, policzył wskaźniki, wywołał DeepSeek (v4-flash HTTP 200), podjął decyzję
+paper (WEJŚCIE BTCUSDT LONG pewność=77% reżim=VOLATILE), zapisał stan uczenia — 0 błędów.
+
+**Testy granic:** +6 (`test_cli_*`): domyślne paper/OFF, dashboard+port, wszystkie flagi opt-in
+→ config, `--real`→paper=False, `--webhook-tv` bez dashboardu → SystemExit, webhook+dashboard OK.
+
+**Symbioza:** MANUAL_UZYTKOWNIKA §4.1 — dopisany jednolinijkowiec CLI z URL podglądu.
+
+**Pliki:** `imperium/koloseum/petla_live.py`, `tests/test_petla_live.py`, `docs/MANUAL_UZYTKOWNIKA.md`
+
 ## 2026-07-14 | ✨ | W-361 web — feed MEXC + markery bota na wykresie (panel przeglądarki)
 
 **Co:** rozbudowa `web_dashboard.py` (drugi kanał obserwacji, po terminalowej SPECULA):

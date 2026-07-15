@@ -101,6 +101,75 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Cross jako zdarzenie w EXP-11
+Sygnał tylko przy świeżym przecięciu, nie gdy fast>slow przez wiele barów – unikanie powtarzalnych sygnałów.
+
+### 2026-06-30 — Symmetric displacement w EXP-10
+Pierwotnie brano tylko |Δhigh|, teraz max(|Δhigh|,|Δlow|) dla symetrycznej detekcji strukturalnego przemieszczenia.
+
+### 2026-06-30 — Wzorzec Observer w Igrzyska umożliwia DRY
+Dodanie listy obserwatorów do Igrzyska pozwala HedgeMWU i innym modułom uczyć się na tych samych wynikach transakcji bez duplikacji logiki.
+
+### 2026-06-30 — Yang-Zhang ~14x efektywniejszy niż std(zamknięcie)
+Yang-Zhang wykorzystuje OHLC, daje dokładniejszy pomiar zmienności przy mniejszej liczbie obserwacji niż tradycyjne std(close).
+
+### 2026-06-30 — CVD dystrybucja wymaga ujemnej wartości
+Neuron V-03 sprawdza ujemne CVD dla SHORT, nie spadek względem poprzedniej wartości; poprawiono mock dystrybucji na CVD=-4000.
+
+### 2026-06-30 — Poprawne equity: kapital_calkowity
+W paper_trading dodano właściwość kapital_calkowity = kapital + suma zablokowanego marginu. Wcześniej używano tylko kapital, co powodowało fałszywe redukcje po otwarciu pozycji.
+
+### 2026-06-30 — Normalizacja interwałów w strategiach
+Błąd: 5m.upper() -> '5M' zamiast 'M5'. Dodano funkcję _normalizuj_interwal w baza.py mapującą formaty (5m->M5, 1h->H1 itd.) aby backtesty filtr/strategia działały poprawnie.
+
+### 2026-06-30 — Backtest Arena: conservative SL gdy obie bariery w jednym barze
+Jeśli w jednej świecy osiągnięto zarówno TP jak i SL, wynikiem jest SL (konserwatywnie).
+
+### 2026-06-30 — Kategoria S zarezerwowana dla SMC/Struktura
+Kategoria S jest już używana przez strukturalne neurony SMC, więc nie można jej użyć dla Sentiment.
+
+### 2026-06-30 — Metodologia Walk-Forward Validation
+Udokumentowano WF: 90 dni treningu, 30 dni testu, 7-dniowy krok. Odchodzi się od Freqtrade/QuantConnect na rzecz własnego rozwiązania.
+
+### 2026-06-30 — CME Gap – historyczna strategia
+CME Gap miał 77% wypełnień, ale od 29 maja 2026 CME przechodzi na handel 24/7, co czyni strategię gapową nieaktualną. Należy unikać implementacji.
+
+### 2026-06-30 — Regex W7 niebezpieczny dla domen z .md
+Wzorzec W7 szukał linków z '.md' w ścieżce, ale dopasowywał też domeny (jak mdpi.com) zawierające '.md'. Lekcja: regexy dla cross-doc linków muszą ignorować zewnętrzne URL-e już na etapie dopasowania lub wczesnym continue.
+
+### 2026-06-30 — Halucynacje w linkach IMV: defensywne repo i anegdoty
+Po weryfikacji ~320 linków przez 3 równoległych agentów okazało się, że core tech stack jest realny, ale część referencji do defensywnych repozytoriów i legend tradingowych była halucynacjami. Zapisano w ARSENAL_IMPERIUM.md.
+
+### 2026-06-30 — Błąd loadera po reorganizacji na strukturę rzymską
+Po przeniesieniu modułów do folderów rzymskich (fundament, legiony itp.), loader w pierwy_zwiadowca.py szukał plików po starych nazwach we własnym folderze. Naprawiono przez zmianę na ścieżki względne z importlib.util.spec_from_file_location.
+
+### 2026-06-30 — Signal Signature – struktura sygnału
+Każdy sygnał w systemie IMV ma pola: confidence, adversary_confidence, final_confidence, source, reasons. To standard dla wszystkich modułów – umożliwia filtrowanie i debatę senatorską.
+
+### 2026-06-30 — DeepSeek API – endpoint i bezpieczeństwo klucza
+DeepSeek API jest kompatybilny z OpenAI (base_url: https://api.deepseek.com/v1). Klucz API musi być wyłącznie w zmiennych środowiskowych, nigdy w kodzie ani czacie.
+
+### 2026-06-30 — Błąd cross-module loader po reorganizacji folderów
+Po przeniesieniu modułów do struktury rzymskiej, loader szukał plików po starych nazwach. Naprawiono przez aktualizację ścieżek względnych w pierwszym_zwiadowca.py.
+
+### 2026-06-30 — Separacja Kingdom Pixel od Imperium
+Mieszanie zasad Kingdom Pixel (79 Zasad) z Imperium powodowało chaos. Rozwiązanie: Imperium ma własne 14 Praw, Kingdom Pixel jest archiwizowany i nigdy nie modyfikowany.
+
+### 2026-06-30 — Weryfikacja linków ujawnia halucynacje w arsenale
+Spośród ~320 linków z IMV, znaleziono 5 błędnych URL i halucynacje w klastrze 'defensive repos' oraz anegdotach tradingowych. Rdzeń tech stacku jest realny.
+
+### 2026-06-30 — klasyfikuj_rezim() zwraca tylko 4 stany, brak TREND_WEAK/PANIC/ON-CHAIN_BULLISH/SMC_ACTIVE
+Funkcja klasyfikacji reżimu ograniczona do TREND_STRONG, RANGING, VOLATILE, NORMAL. Brakuje stanów przewidzianych w dokumentacji.
+
+### 2026-06-30 — Neurony martwe: XII-07, X-12, A-05 (100% NEUTRAL)
+Trzy neurony (RSI_14 trend, BB_UPPER, CLOSE_PREV) wykazały 100% NEUTRAL w analizie 500-barowej. Wymagają diagnostyki lub wyłączenia.
+
+### 2026-06-30 — Brak kategorii L (Leverage) w kodzie – 0 neuronów
+Kategoria L (Leverage) jest całkowicie pusta w aktywnym kodzie, brak jakichkolwiek neuronów. Zidentyfikowano jako lukę względem dokumentacji.
+
+### 2026-06-30 — Bug W7 audytu fałszywie flaguje URL z .md w domenie
+W7 audyt markerował zewnętrzne URL zawierające '.md' w domenie (np. www.mdpi.com) jako martwe linki, blokując commit. Naprawiono przez dodanie warunku pomijającego zewnętrzne protokoły (http/https/mailto/ftp) na początku href.
+
 ### 2026-06-30 — Synchronizacja liczników w testach przy dodawaniu neuronów
 W-053 dodał 47. neuron (H-01), ale testy miały zakodowane 46 – konieczność aktualizacji hardcoded wartości w test_integracja.py. Lekcja: każda zmiana liczby neuronów wymaga przeglądu testów.
 

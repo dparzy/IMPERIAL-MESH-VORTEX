@@ -101,6 +101,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — KalkulatorLewara używa pewnosc_agregatu – błąd strukturalny
+KalkulatorLewara pobiera pewnosc_agregatu z Legatusa, ale ta wartość jest zawsze ~1.0, więc leverage jest maksymalny. Należy oddzielić pewność agregatu od wielkości pozycji lub wprowadzić Namiestnika.
+
+### 2026-06-30 — pewnosc_agregatu ≈ 1.0 – główna przyczyna strat
+Stała wartość pewności bliska 1.0 prowadzi do maksymalnego lewara w KalkulatorzeLewara, co powoduje ciasne stop-lossy i wiele małych strat. To fundamentalny błąd w agregacji – nie ma zróżnicowania sygnałów.
+
+### 2026-06-30 — W6 milczące pominięcie przy braku 'Stan na:'
+Audyt W6 nie raportował błędu gdy brak 'Stan na:'. Dodano else skutkujący błędem oraz rozszerzono regex na markdown.
+
+### 2026-06-30 — Ulcer warmup period+1 błędne
+W funkcji _py_ulcer warmup używał period+1, podczas gdy poprawnie wymagany jest tylko period (c[-period:]). Naprawiono.
+
 ### 2026-06-30 — Proces deduplikacji neuronów
 Podczas skanowania agent otrzymał instrukcję deduplikacji, co pozwoliło osiągnąć ostateczną liczbę 261 unikalnych neuronów zamiast potencjalnie większej liczby powtórzeń.
 

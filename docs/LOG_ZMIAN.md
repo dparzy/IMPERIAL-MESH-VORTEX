@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-07-15 | 📥 | Żniwo wrzutni — 6 nieprzerobionych tur 12 lip → destylat + backlog
+
+**Co:** domknięto ostatni punkt planu po U1-U4 Hyginusa — żniwo 6 tur web-DeepSeeka z 2026-07-12
+(16:06–16:32), których `ANALIZA_WRZUTNIA_2026-07-10.md` nie pokrywała.
+
+**Metoda (ZASADA ZWIADOWCY WIEDZY):** Hyginus = proponent, Vitruviusz = sędzia. Web-zweryfikowano
+KAŻDE cytowanie Tury 5 (rozkaz stały: WebSearch przed oceną post-cutoff) → **5/5 realnych prac**
+(AgenticAITA arXiv 2605.12532, FinLumen ICASSP 2026, FinDPO arXiv 2507.18417, DecoupledMarket
+ICML 2026, DC-GNN IEEE 2026). Lekcja re-audytu 2026-07-13 potwierdzona.
+
+**Sąd:** ~połowa propozycji nakłada się z rdzeniem (Senat W-343, W8, W13, triada, Legiony Cieni,
+BOCPD/CUSUM) → Sekcja A. ODRZUCONO Terminator auto-merge (łamie ład: Claude nigdy nie merguje do
+main). Wyekstrahowano 8 kandydatów #18-25 (⚠️ każdy → arena, opt-in OFF), zarejestrowano jako
+POMYSŁ w rejestrze wizji (W4). Top-3 realne: #18 FinDPO (sentyment DPO), #19 FinLumen (negocjacje
+w Senacie), #20 Nostradamus-light (predykcja reżimu, najtańszy splot).
+
+**Pliki:** `docs/ANALIZA_WRZUTNIA_2026-07-12.md` (nowy destylat), `bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl` (8 kand.)
+
 ## 2026-07-15 | 🔧 | Domknięcie CLI pętli live — behawioralne opt-iny (Prawo XV, przegląd kompletności)
 
 **Co:** przegląd 35 pól `KonfigPetliLive` vs flagi CLI wykazał, że kilka realnych toggli

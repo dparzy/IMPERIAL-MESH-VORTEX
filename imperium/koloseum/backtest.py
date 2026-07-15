@@ -610,7 +610,8 @@ def backtest_portfel(
         # i neuron głosuje na nieaktualnych danych zamiast spać (stale-data, Prawo XV).
         if sentyment_per is not None:
             kontekst = dyrygenci[sym].kontekst_dodatkowy
-            for _k in ("FUNDING_RATE", "OPEN_INTEREST", "OPEN_INTEREST_PREV", "LONG_SHORT_RATIO"):
+            for _k in ("FUNDING_RATE", "OPEN_INTEREST", "OPEN_INTEREST_PREV", "LONG_SHORT_RATIO",
+                       "DVOL_INDEX"):
                 kontekst.pop(_k, None)
             sent = sentyment_per.get(sym, {}).get(int(ts))
             if sent:

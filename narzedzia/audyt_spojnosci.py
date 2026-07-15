@@ -737,8 +737,9 @@ def _warstwa_12_zywotnosc_glosu(neurony):
             info.append(
                 f"ℹ️ Prawo XV — {len(znane)} modułów zależnych od adapterów: ŻYWE na realnych danych, "
                 f"ciche tylko w syntetycznych scenariuszach audytu (adaptery istnieją i wpięte w "
-                f"petla_live, zweryfikowane na żywo: Futures/FearGreed/CVD). Do ZMIERZENIA trzeba biegu "
-                f"paper/live: {klucze}  (powody: python narzedzia/audyt_spojnosci.py --luki)"
+                f"petla_live, zweryfikowane na żywo: Futures/FearGreed/CVD). ZMIERZ na żywo: "
+                f"python narzedzia/cenzus_adapterow.py (20/22 ŻYWE 2026-07-15; AUG-01+RADAR-05 "
+                f"warunkowo — bramka zdarzenia/siły). Klucze: {klucze}  (powody: --luki)"
             )
 
         # DOWÓD ALLOWLISTY (Prawo I): neuron adapterowy MUSI ożyć z danymi adaptera.

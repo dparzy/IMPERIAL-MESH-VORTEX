@@ -101,6 +101,21 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — CVD dystrybucja wymaga ujemnego CVD dla sygnału SHORT
+Początkowo ustawiono CVD=4000, ale neuron sprawdza czy CVD jest ujemne. Poprawiono na CVD=-4000 (dystrybucja) i CVD=15000 (akumulacja).
+
+### 2026-06-30 — Poprawione wartości mock futures dla triggerów neuronów
+Początkowe wartości LONG_SHORT_RATIO=2.4 i FUNDING_RATE=0.0009 nie wywoływały sygnałów. Poprawiono: panika: FUNDING_RATE=-0.0012, LS_RATIO=0.20; chciwość: FUNDING_RATE=0.0015, LS_RATIO=0.85.
+
+### 2026-06-30 — Kolizja nazw NeuronOrderBlock z SMC-01
+Nowy neuron w trend.py nazwany NeuronOrderBlock kolidował z istniejącym SMC-01. Rozwiązano przez zmianę nazwy na NeuronOBZone.
+
+### 2026-06-30 — Push wymaga uprawnień Write w GitHub Installation
+Środowisko Claude web nie ma uprawnień do push do repozytorium dparzy/imperial-mesh-vortex. Konieczna konfiguracja w github.com/settings/installations.
+
+### 2026-06-30 — Naprawiono ImportError w legatus.py
+Przy bezpośrednim uruchomieniu legatus.py występował błąd względnego importu z .mikro_neuron. Rozwiązano przez try/except: próbuje import względny, w razie błędu przechodzi na absolutny.
+
 ### 2026-06-30 — KalkulatorLewara używa pewnosc_agregatu – błąd strukturalny
 KalkulatorLewara pobiera pewnosc_agregatu z Legatusa, ale ta wartość jest zawsze ~1.0, więc leverage jest maksymalny. Należy oddzielić pewność agregatu od wielkości pozycji lub wprowadzić Namiestnika.
 

@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-07-16 | 🏛️ | K-03 Stablecoin flow — WPIĘCIE 2. zwalidowanego sygnału (opt-in)
+
+**Co:** replikacja wzorca wpięcia (po DVOL) dla drugiego sygnału Tier-1 — **podaż
+stablecoinów** (makro-płynność, „suchy proch"). Nowy neuron **K-03 NeuronStablecoinFlow**
+(kat. K makro, waga 6, trend-following: druk stablecoinów → LONG) + **AdapterStablecoin**
+(DefiLlama, DARMOWE bez klucza). Rój: 85→86 neuronów (80 aktywnych). Nazwa pomiaru: AERARIUM.
+
+**Dlaczego (Prawo I):** 7d % zmiana podaży ma IC +0.05..+0.10 @7-30d na zwroty BTC
+(`narzedzia/pomiar_stablecoin_ic.py`, 2026-07-15, spójny nn/ov, ~3150 dni). Druk = napływ
+kapitału = bullish flow (makro, wolny). Walidacja na długiej historii (mocniejsza niż DVOL).
+
+**OPT-IN:** AdapterStablecoin za flagą `--stablecoin` (KonfigPetliLive.stablecoin=False).
+Bez flagi K-03 abstynuje → zero zmiany zachowania do A/B.
+
+**Pliki:** adaptery/stablecoin.py (nowy), neurony/makro.py (NeuronStablecoinFlow), rejestr.py,
+petla_live.py (--stablecoin), backtest.py (STABLE_FLOW clear-list), adaptery/__init__.py,
+audyt_spojnosci.py (allowlista), MANIFEST/README/INDEKS/MAPA_KLUCZY (86), tests.
+
+**Powód:** 2. z 3 zwalidowanych sygnałów wpiętych wzorcem DVOL. Zostaje USD/MONETA (z uwagą
+na pokrycie z K-01 DXYTrend — Prawo XVI).
+
 ## 2026-07-16 | 😱 | PSY-05 DVOL — WPIĘCIE zwalidowanego sygnału (opt-in, ZASADA WPIĘCIA)
 
 **Co:** wpięto pierwszy sygnał z kampanii Tier-1 alt-danych — **DVOL** (indeks strachu opcji

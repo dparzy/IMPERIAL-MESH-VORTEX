@@ -109,7 +109,7 @@ Struktura katalogów projektu — co gdzie mieszka i w jakim stanie.
 |---------|-----------------|-------|--------|
 | `imperium/akwedukty/` | Rurociąg danych — pobieranie świec z MEXC przez CCXT | Akwedukty (Data Pipeline) | ✅ Gotowy |
 | `imperium/fundament/` | Brama Kalkulatora — TA-Lib oblicza wskaźniki, SHA-256 podpisuje | Calculator Gate | ✅ Gotowy |
-| `imperium/legiony/` | Legiony — mikro-neurony (85), Legatus, zwiadowcy (15), strategie (20) | Scout Legions | ✅ Rdzeń aktywny |
+| `imperium/legiony/` | Legiony — mikro-neurony (86), Legatus, zwiadowcy (15), strategie (20) | Scout Legions | ✅ Rdzeń aktywny |
 | `imperium/pretorianie/` | Pretorianie — weto ryzyka, ochrona kapitału | Risk Praetorians | ✅ Gotowy |
 | `imperium/senat/` | Senat — debata Popularów vs Optymantów nad sygnałem | Senate Debate | 🟡 Szkielet |
 | `imperium/cesarz/` | Cesarz — DeepSeek LLM podejmuje ostateczną decyzję | Emperor (LLM) | 🟡 Szkielet |
@@ -201,7 +201,7 @@ Priorytety w kolejności. Jedno zadanie na raz (Prawo VII).
 | **E** 🔵 | Dalsze neurony z katalogu (299−72=227 backlog) + Księga Azjatycka strategii | ⏳ Partiami, z dekorelacją | +? |
 
 **Stan kategorii (2026-07-05):** A/C/D/F/H/K/L/M/N/O/R/S/T/V/Z · wyciszone: część O/S czeka na adaptery/feed
-**Neurony: 85** (79 aktywnych, 6 wyciszonych) · **Strategie: 20** · **Testy: patrz `python tests/run_tests.py`** (nie hardkodujemy)
+**Neurony: 86** (80 aktywnych, 6 wyciszonych) · **Strategie: 20** · **Testy: patrz `python tests/run_tests.py`** (nie hardkodujemy)
 
 ### Zadania bieżące (infrastruktura)
 | # | Zadanie | Moduł | Priorytet |

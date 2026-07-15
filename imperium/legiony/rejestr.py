@@ -79,7 +79,7 @@ from imperium.legiony.neurony.rezim_zmiana import (
     NeuronChangePoint, NeuronBOCPD,
 )
 from imperium.legiony.neurony.makro import (
-    NeuronDXYTrend, NeuronGoldBTC,
+    NeuronDXYTrend, NeuronGoldBTC, NeuronStablecoinFlow,
 )
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
@@ -200,6 +200,7 @@ MECHANIZMY: dict = {
     # Makro/Intermarket (K)
     "K-01": "macro",      # DXY momentum
     "K-02": "macro",      # Gold/BTC ratio
+    "K-03": "macro",      # Stablecoin supply flow (bullish druk, W-AERARIUM)
 }
 
 # Mechanizmy zwiadowców Exploratores (EXP) — wszyscy meta/struktura
@@ -290,7 +291,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         # Zmiana reżimu (R) — CUSUM change-point (CP-01, W-336) + BOCPD Bayesowski (BOCPD-01, W-338)
         NeuronChangePoint(), NeuronBOCPD(),
         # Makro/Intermarket (K) — DXY trend (K-01, W-085 Murphy) + Gold/BTC ratio (K-02, W-089)
-        NeuronDXYTrend(), NeuronGoldBTC(),
+        # + Stablecoin supply flow (K-03, opt-in --stablecoin, W-AERARIUM, IC +0.05..0.10@7-30d)
+        NeuronDXYTrend(), NeuronGoldBTC(), NeuronStablecoinFlow(),
     ])
 
 
@@ -496,7 +498,7 @@ NEURONY_STYLU: dict = {
     "CP-01": _U, "BOCPD-01": _U,
     # Makro/Intermarket (K) — DXY i Gold/BTC: dane na poziomie 1D, ożywają przy makro CSV
     # INVEST bo dane makro mają sens na dłuższych horyzontach (nie SCALP 1m)
-    "K-01": _INV, "K-02": _INV,
+    "K-01": _INV, "K-02": _INV, "K-03": _INV,
 }
 
 

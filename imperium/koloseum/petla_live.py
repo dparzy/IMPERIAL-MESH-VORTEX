@@ -122,6 +122,9 @@ class KonfigPetliLive:
     # → neuron PSY-05 głosuje (kontrariański: wysoki strach=LONG, IC +0.16@7d zwalidowany).
     # ZASADA WPIĘCIA: domyślnie OFF (zero zmiany zachowania) do walidacji A/B.
     dvol: bool = False
+    # K-03 Stablecoin flow — makro-płynność (DefiLlama, opt-in, OFF). Gdy True, wpina
+    # AdapterStablecoin → neuron K-03 głosuje (druk stablecoinów=LONG, IC +0.05..0.10@7-30d).
+    stablecoin: bool = False
 
 
 @dataclass
@@ -191,6 +194,10 @@ def _buduj_dyrygencie(
     if getattr(cfg, "dvol", False):
         from imperium.akwedukty.adaptery import AdapterDVOL
         adaptery_sentymentu.append(AdapterDVOL())
+    # K-03 Stablecoin flow (opt-in --stablecoin): wpina podaż stablecoinów DefiLlama → K-03.
+    if getattr(cfg, "stablecoin", False):
+        from imperium.akwedukty.adaptery import AdapterStablecoin
+        adaptery_sentymentu.append(AdapterStablecoin())
 
     namiestnik = get_namiestnik() if cfg.auto_rezim else None
     budowniczy = BudowniczyWskaznikow()
@@ -769,6 +776,8 @@ def _zbuduj_parser():
                    help="Legiony Cieni — kontrfaktyczny pomiar 3 widmowych wariantów (bez zmiany decyzji)")
     p.add_argument("--dvol", action="store_true",
                    help="PSY-05 DVOL — indeks strachu opcji (Deribit); kontrariański, IC +0.16@7d (opt-in, A/B)")
+    p.add_argument("--stablecoin", action="store_true",
+                   help="K-03 Stablecoin flow — podaż stablecoinów (DefiLlama); druk=LONG, IC +0.05..0.10 (opt-in)")
     p.add_argument("--funding-mexc", action="store_true",
                    help="funding/OI z MEXC (rodzimy, TIER A funding+ELR) zamiast Binance fapi")
     p.add_argument("--mwu", action="store_true",
@@ -809,6 +818,7 @@ def zbuduj_konfig_z_argv(argv=None):
         sl_atr_mult=a.sl_atr_mult, min_pewnosc=a.min_pewnosc, cienie=a.cienie,
         funding_mexc=a.funding_mexc, mwu=a.mwu, igrzyska=a.igrzyska,
         filtr_asymetrii=a.filtr_asymetrii, ksiega_wad=a.ksiega_wad, dvol=a.dvol,
+        stablecoin=a.stablecoin,
     )
     return kfg, a.max_barow
 

@@ -111,3 +111,37 @@ class NeuronGoldBTC(MikroNeuron):
                 [f"GOLD/BTC_MOM={gbm:+.2f}σ — BTC rośnie vs złoto, lekki tailwind"])
         return self._bazowy_sygnal(gbm, "NEUTRAL", 0.0,
             [f"GOLD/BTC_MOM={gbm:+.2f}σ — stosunek neutralny"])
+
+
+class NeuronStablecoinFlow(MikroNeuron):
+    """
+    K-03 | Stablecoin Supply Flow — makro-płynność krypto („suchy proch").
+
+    Druk stablecoinów (rosnąca podaż USDT/USDC) = świeży kapitał gotowy wejść =
+    napływ = bullish. Umorzenia (spadek podaży) = kapitał wychodzi = bearish.
+    Kierunek ZWALIDOWANY pomiarem: 7d % zmiana podaży ma IC +0.05..+0.10 @7-30d na
+    zwroty BTC (narzedzia/pomiar_stablecoin_ic.py, AERARIUM, 2026-07-15) — DODATNI,
+    trend-following (nie kontrariański). Sygnał wolny (tygodnie-miesiąc), makro.
+
+    STABLE_FLOW: 7-dniowa % zmiana total supply (DefiLlama). Dostarcza AdapterStablecoin
+    (opt-in --stablecoin). Bez adaptera abstynuje (Prawo XV). DOSTEPNY=True.
+    """
+    KLUCZ = "K-03"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "STABLE_FLOW"
+    KATEGORIA = "K"
+    WAGA = 6   # wstępna (walidacja jednoreżimowa)
+    DOSTEPNY = True
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        flow = wskazniki.get("STABLE_FLOW")
+        if flow is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak STABLE_FLOW"])
+
+        if flow >= 0.015:
+            return self._bazowy_sygnal(flow, "LONG", 0.70, [f"Podaż stablecoinów +{flow:.1%}/7d — silny druk, napływ kapitału"])
+        if flow >= 0.004:
+            return self._bazowy_sygnal(flow, "LONG", 0.50, [f"Podaż stablecoinów +{flow:.1%}/7d — druk, lekki napływ"])
+        if flow <= -0.008:
+            return self._bazowy_sygnal(flow, "SHORT", 0.50, [f"Podaż stablecoinów {flow:.1%}/7d — umorzenia, odpływ kapitału"])
+        return self._bazowy_sygnal(flow, "NEUTRAL", 0.15, [f"Podaż stablecoinów {flow:+.1%}/7d — stabilna"])

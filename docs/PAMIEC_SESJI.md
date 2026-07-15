@@ -101,6 +101,27 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Golden Cross w IMPERIUM to wariant EMA
+Strategia ZŁOTY ORZEŁ używa EMA 50/200, nie kanonicznego SMA. Zapisano w dokumentacji jako wariant EMA. Wyjaśniono brak aktywacji na DOGE (death cross w całym oknie backtestu).
+
+### 2026-06-30 — Ulcer warmup: wystarczy period, nie period+1
+Funkcja _py_ulcer używa c[-period:] do obliczeń, więc wymaga tylko 'period' próbek. Poprzedni warunek period+1 był błędny (off-by-one). Naprawiono w bramie kalkulatora.
+
+### 2026-06-30 — Filtr kara w baza.py: wyciszone filtry nie karzą
+Gdy n_akt_f==0 (wszystkie neurony FILTR wyciszone), strategia otrzymywała karę 0.5. Poprawiono na 1.0 – neuron FILTR nieobecny nie powinien karać (Prawo XV).
+
+### 2026-06-30 — Off-by-one warmup Ulcer i Accelerator
+Ulcer warmup wymagał period+1 zamiast period (używał c[-period:]). Accelerator miał zbędny +1 w warmup slow+sma_ac. Poprawiono w _py_ulcer() i _py_accelerator().
+
+### 2026-06-30 — Audyt źródła pure-Python w Bramie: brakowało _PURE_PYTHON_INDICATORS
+Wszystkie wskaźniki w Bramie miały źródło TA-Lib. Dodano zbiór _PURE_PYTHON_INDICATORS (11 wskaźników) i warunek SOURCE_TAG_PY w compute(). Naprawiono rozróżnienie źródła dla wskaźników własnych.
+
+### 2026-06-30 — __pycache__ nie powinien być w git
+Po kompilacji brama_kalkulatora.py przypadkowo commitowano __pycache__. Naprawiono przez git rm --cached i dodanie do .gitignore.
+
+### 2026-06-30 — Mieszanie zasad źródłem chaosu
+Poprzedni projekt popadł w chaos przez mieszanie zasad Kingdom Pixel (79) z Imperium. Rozwiązanie: całkowicie nowe zasady dla Imperium.
+
 ### 2026-06-30 — CVD dystrybucja wymaga ujemnego CVD dla sygnału SHORT
 Początkowo ustawiono CVD=4000, ale neuron sprawdza czy CVD jest ujemne. Poprawiono na CVD=-4000 (dystrybucja) i CVD=15000 (akumulacja).
 

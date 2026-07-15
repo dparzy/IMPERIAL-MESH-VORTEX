@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-07-15 | 🔮 | HARUSPEX (kand. #20) — prototyp + POMIAR = FALSYFIKACJA (Prawo I, pomiar-najpierw)
+
+**Co:** prototyp kandydata #20 „predykcyjny Namiestnik" (żniwo wrzutni). Nazwa rzymska
+**HARUSPEX** (kapłan-wróżbita, dobrana do funkcji predykcji — ZASADA NOMENKLATURY). Łańcuch
+Markowa 1. rzędu na strumieniu reżimów (klasyfikuj_rezim) — przewiduje następny reżim +
+sygnał „przygotuj się na zmianę". Poza ścieżką decyzyjną (opt-in OFF, ZASADA WPIĘCIA).
+
+**POMIAR (Prawo I, `narzedzia/pomiar_haruspex.py` na realnych świecach BTC/ETH 4H):**
+Zbudowano sekwencję reżimów z rosnących okien (zero look-ahead), zmierzono trafność vs
+baseline'y. **Werdykt: FALSYFIKOWANY — brak wartości.**
+  • argmax trafność == baseline PERSYSTENCJI (BTC 97.5%=97.5%, ETH 92.5%=92.5%) → przewaga +0%
+  • sygnał ZMIANY: recall 0% (0 ostrzeżeń na 7 realnych zmian, także przy progu 0.10)
+  • przyczyna strukturalna: reżimy o wysokim P(zmiany) (NORMAL 33%, VOLATILE) są RZADKIE →
+    milczą (< min_obserwacji); częste (TREND/RANGING) 97-98% lepkie → zmiana nieprognozowana.
+
+**Decyzja (Prawo XVIII):** NIE wpinam (pomiar nie dał przewagi — dokładnie po to jest
+pomiar-najpierw). Moduł+narzędzie+testy ZOSTAJĄ jako infrastruktura pomiaru + udokumentowany
+negatyw (antykruchość: nie budować goły Markow ponownie). Werdykt w nagłówku modułu.
+Ewentualna wartość dopiero z modelem WARUNKOWYM na cechy — osobny kandydat, po pomiarze.
+
+**Testy granic:** 17 (MILCZENIE <min_obs, granica ≥min_obs, próg zmiany ==/>, bez look-ahead,
+baseline persystencji, walidacja konstruktora). Testy 2334/2334, ruff czysty.
+
+**Pliki:** `imperium/koloseum/haruspex.py`, `narzedzia/pomiar_haruspex.py`, `tests/test_haruspex.py`,
+`docs/ARCHITEKTURA_IMPERIUM.md` (organ Haruspex w KOLOSEUM)
+
 ## 2026-07-15 | 📥 | Żniwo wrzutni — 6 nieprzerobionych tur 12 lip → destylat + backlog
 
 **Co:** domknięto ostatni punkt planu po U1-U4 Hyginusa — żniwo 6 tur web-DeepSeeka z 2026-07-12

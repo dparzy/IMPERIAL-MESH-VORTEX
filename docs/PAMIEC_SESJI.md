@@ -101,6 +101,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Cross jako zdarzenie w EXP-11
+Sygnał tylko przy świeżym przecięciu, nie gdy fast>slow przez wiele barów – unikanie powtarzalnych sygnałów.
+
+### 2026-06-30 — Symmetric displacement w EXP-10
+Pierwotnie brano tylko |Δhigh|, teraz max(|Δhigh|,|Δlow|) dla symetrycznej detekcji strukturalnego przemieszczenia.
+
+### 2026-06-30 — Wzorzec Observer w Igrzyska umożliwia DRY
+Dodanie listy obserwatorów do Igrzyska pozwala HedgeMWU i innym modułom uczyć się na tych samych wynikach transakcji bez duplikacji logiki.
+
+### 2026-06-30 — Yang-Zhang ~14x efektywniejszy niż std(zamknięcie)
+Yang-Zhang wykorzystuje OHLC, daje dokładniejszy pomiar zmienności przy mniejszej liczbie obserwacji niż tradycyjne std(close).
+
 ### 2026-06-30 — CVD dystrybucja wymaga ujemnej wartości
 Neuron V-03 sprawdza ujemne CVD dla SHORT, nie spadek względem poprzedniej wartości; poprawiono mock dystrybucji na CVD=-4000.
 

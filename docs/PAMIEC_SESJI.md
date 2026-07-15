@@ -101,6 +101,21 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — CVD dystrybucja wymaga ujemnej wartości
+Neuron V-03 sprawdza ujemne CVD dla SHORT, nie spadek względem poprzedniej wartości; poprawiono mock dystrybucji na CVD=-4000.
+
+### 2026-06-30 — Poprawne equity: kapital_calkowity
+W paper_trading dodano właściwość kapital_calkowity = kapital + suma zablokowanego marginu. Wcześniej używano tylko kapital, co powodowało fałszywe redukcje po otwarciu pozycji.
+
+### 2026-06-30 — Normalizacja interwałów w strategiach
+Błąd: 5m.upper() -> '5M' zamiast 'M5'. Dodano funkcję _normalizuj_interwal w baza.py mapującą formaty (5m->M5, 1h->H1 itd.) aby backtesty filtr/strategia działały poprawnie.
+
+### 2026-06-30 — Backtest Arena: conservative SL gdy obie bariery w jednym barze
+Jeśli w jednej świecy osiągnięto zarówno TP jak i SL, wynikiem jest SL (konserwatywnie).
+
+### 2026-06-30 — Kategoria S zarezerwowana dla SMC/Struktura
+Kategoria S jest już używana przez strukturalne neurony SMC, więc nie można jej użyć dla Sentiment.
+
 ### 2026-06-30 — Metodologia Walk-Forward Validation
 Udokumentowano WF: 90 dni treningu, 30 dni testu, 7-dniowy krok. Odchodzi się od Freqtrade/QuantConnect na rzecz własnego rozwiązania.
 

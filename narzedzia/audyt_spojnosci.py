@@ -569,6 +569,8 @@ NEURONY_ZALEZNE_OD_ADAPTEROW = {
     "PSY-02": "LONG_SHORT_RATIO (AdapterFutures)",
     "PSY-03": "FEAR_GREED_INDEX (AdapterFearGreed)",
     "PSY-04": "OPEN_INTEREST (AdapterFutures)",
+    "PSY-05": "DVOL_INDEX (AdapterDVOL — indeks strachu opcji Deribit; opt-in --dvol; "
+              "bez adaptera abstynuje, IC +0.16@7d zwalidowany)",
     "V-03":   "CVD (AdapterCVD/trade-feed)",
     "AUG-01": "EVENT_* (AdapterKronikarz — okno zdarzenia fundamentalnego)",
     "RADAR-01": "BTC_TREND (RadarRynku → Dyrygent.odswiez_kontekst_rynku — hook W-300; "
@@ -610,6 +612,7 @@ WERYFIKACJA_ADAPTEROW = {
     "PSY-01": {"FUNDING_RATE": 0.0025},                                   # crowded long → SHORT
     "PSY-02": {"LONG_SHORT_RATIO": 0.82},                                 # tłum long → SHORT
     "PSY-03": {"FEAR_GREED_INDEX": 8},                                    # ekstremalny strach → LONG
+    "PSY-05": {"DVOL_INDEX": 85.0},                                       # ekstremalny strach opcji → LONG
     "PSY-04": {"OPEN_INTEREST": 150000.0, "OPEN_INTEREST_PREV": 100000.0,
                "CLOSE": 101.0, "CLOSE_PREV": 100.0},                      # OI↑ + cena → sygnał
     "V-03":   {"CVD": 5000.0, "CVD_PREV": 1000.0,

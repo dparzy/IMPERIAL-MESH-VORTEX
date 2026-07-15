@@ -47,7 +47,7 @@ from imperium.legiony.neurony.sentyment import NeuronSentymentNews
 from imperium.legiony.neurony.zdarzenia import NeuronTaksonomiaZdarzen
 from imperium.legiony.neurony.news_dynamika import NeuronDeltaeSentymentu, NeuronSpikeUwagi
 from imperium.legiony.neurony.psychologia import (
-    NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv,
+    NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv, NeuronDVOL,
 )
 from imperium.legiony.neurony.onchain import (
     NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow, NeuronWashTrading,
@@ -158,6 +158,7 @@ MECHANIZMY: dict = {
     "PSY-02": "mean_rev", # Long/Short ratio
     "PSY-03": "mean_rev", # Fear & Greed
     "PSY-04": "mean_rev", # OI Divergence
+    "PSY-05": "mean_rev", # DVOL strach opcji (contrarian, W-DVOL)
     # Sentyment (R)
     "NEWS-01": "event",   # News sentyment
     "NEWS-02": "event",   # Taksonomia zdarzeń (kierunek per typ)
@@ -253,8 +254,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronOrderBlock(), NeuronFVG(), NeuronBOS(), NeuronVSA(),
         # Volume Profile / VPOC (S, VP-01) — S/R z wolumenu, swing OHLCV (W-322, Dalton BIB-013)
         NeuronVolumeProfile(),
-        # Psychologia (PSY)
-        NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(), NeuronOIDiv(),
+        # Psychologia (PSY) — PSY-05 DVOL strach opcji (opt-in --dvol, W-DVOL, zwalidowany IC +0.16@7d)
+        NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(), NeuronOIDiv(), NeuronDVOL(),
         # Sentyment newsów (NEWS) — LLM DeepSeek + fallback słownikowy (W-297)
         NeuronSentymentNews(),
         # Taksonomia zdarzeń (NEWS-02) — kierunek per typ; rumor=kontrariański (W-381)
@@ -481,7 +482,7 @@ NEURONY_STYLU: dict = {
     "OC-01": _INV, "OC-02": _INV, "OC-03": _INV, "OC-04": _INV, "OC-05": _U,
     "OC-06": _INV, "OC-07": _INV, "OC-08": _INV,
     # Reżim/Sentyment (R) — futures/Fear&Greed/RADAR/news/augur: kontekst na każdym TF
-    "PSY-01": _U, "PSY-02": _U, "PSY-03": _U, "PSY-04": _U,
+    "PSY-01": _U, "PSY-02": _U, "PSY-03": _U, "PSY-04": _U, "PSY-05": _U,
     "RADAR-01": _U, "RADAR-02": _U, "RADAR-03": _U, "RADAR-04": _U, "RADAR-05": _U, "AUG-01": _U, "NEWS-01": _U, "NEWS-02": _U, "NEWS-03": _U, "NEWS-04": _U,
     # Meta-bramy reżimu/chaosu (H/N/V/D/L) — klasyfikują każdy interwał
     "H-01": _U, "N-01": _U, "N-02": _U, "V-13": _U, "V-14": _U, "D-01": _U, "L-14": _U, "VI-13": _U,

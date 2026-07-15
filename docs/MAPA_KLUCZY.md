@@ -87,6 +87,7 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 | **PSY-02** | NeuronPanikaDetal | Panika drobnych graczy | Brak PSY w kat. głównym | ❌ WYCISZONY |
 | **PSY-03** | NeuronFearGreed | Fear & Greed Index | PSY-01 FOMO w kat. ≈ podobny | ❌ WYCISZONY |
 | **PSY-04** | NeuronOIDiv | OI Divergence | PSY-04 Stado w kat. ≈ podobny | ❌ WYCISZONY |
+| **PSY-05** | NeuronDVOL | DVOL strach opcji (Deribit, contrarian) | Brak — nowa warstwa opcji (IC +0.16@7d) | ✅ opt-in --dvol |
 
 *Wyciszone = wymagają API (CryptoQuant, Coinglass, etc.)*
 
@@ -200,4 +201,4 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 
 ---
 
-*Stan na: 2026-07-12 | Źródło prawdy: `imperium/legiony/rejestr.py` → `wszystkie_neurony()` (84 neuronów + 15 zwiadowców)*
+*Stan na: 2026-07-16 | Źródło prawdy: `imperium/legiony/rejestr.py` → `wszystkie_neurony()` (85 neuronów + 15 zwiadowców)*

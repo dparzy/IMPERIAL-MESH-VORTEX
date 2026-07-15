@@ -5,8 +5,8 @@
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-07-15 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
-**Zaimplementowane:** 84 neuronów (zarejestrowane w roju) + 15 zwiadowców = **99 modułów w kodzie**
+**Stan na:** 2026-07-16 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Zaimplementowane:** 85 neuronów (zarejestrowane w roju) + 15 zwiadowców = **100 modułów w kodzie**
 **Meta-warstwy (B):** 2 moduły (`neutralizacja.py` B-02, `meta_labeling.py` B-01) — warstwa NAD Legatusem, nie neurony
 **Aktywne / wyciszone:** 78 aktywnych + 6 wyciszonych, z czego:
   • **53 czyste OHLCV** (M/T/F/A/L/V/H/N/Z/O/S/C/D/R) — liczą z barów bez żadnego API (w tym V-05 Force Index Eldera, V-14 Choppiness, L-14 Ulcer, H-01 Hurst-DFA, N-01 Permutation Entropy, N-02 FracDiff, Z-01 VPIN ToxicFlow, Z-03 Bubble/Crash kill-switch, Z-04 Cascade/Dead-Cat, Z-05 Detektor Ruchu Klimaksowego, X-27 Value Convergence, X-28 KonfluencjaMultiTF, OC-05 WashTrading, D-01 PathSignature, V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top, CP-01 CUSUM, BOCPD-01 Bayesian change-point, C-01 Cross-sectional RS)
@@ -17,11 +17,11 @@
   • **3 deterministyczne on-chain AKTYWNE** (OC-06..08) — BTC_BLOCK_HEIGHT szacowany z timestampu baru (interpolacja po halvingach, bez sieci, W-377..379)
 **Elitarne (Prawo XX):** 18 (3 neurony + 15 zwiadowców)
 **W katalogu:** 299 neuronów + 15 zwiadowców = **314 zaplanowanych**
-**Do wdrożenia:** 215 neuronów (299 − 84)
+**Do wdrożenia:** 214 neuronów (299 − 85)
 
 > **Metoda liczenia (Prawo XIX):** liczba = klasy `Neuron*(MikroNeuron)` zarejestrowane
 > w `imperium/legiony/rejestr.py` (`wszystkie_neurony()`), zweryfikowane testem
-> `test_rejestr_wszystkie_neurony` (== 84). NIE liczymy klas-sierot poza rojem.
+> `test_rejestr_wszystkie_neurony` (== 85). NIE liczymy klas-sierot poza rojem.
 > **Audyt 2026-06-02:** MANIFEST używał starych kluczy (M-RSI, T-ADX, V-OBV, S-OB, P-FG, O-MVRV).
 > Naprawiono — wszystkie klucze zsynchronizowane z kodem (KLUCZ w klasie Pythona).
 
@@ -70,7 +70,7 @@
 
 ---
 
-## ⚡ NEURONY ZAIMPLEMENTOWANE (84/299)
+## ⚡ NEURONY ZAIMPLEMENTOWANE (85/299)
 
 > **Klucze = dokładnie te, które widać w `n.KLUCZ` w kodzie.** Żadnych aliasów.
 > Kolumna KAT = `n.KATEGORIA` (litera) wg legendy: M=Momentum T=Trend V=Zmienność
@@ -157,6 +157,7 @@
 | PSY-02 | NeuronPanikaDetal | R | 7 | ✅ aktywny (AdapterFutures) | LS_RATIO | — |
 | PSY-03 | NeuronFearGreed | R | 7 | ✅ aktywny (AdapterFearGreed) | FEAR_GREED | — |
 | PSY-04 | NeuronOIDiv | R | 7 | ✅ aktywny (AdapterFutures) | OI_DIVERGENCE | — |
+| PSY-05 | NeuronDVOL | R | 6 | ✅ aktywny (AdapterDVOL, opt-in --dvol) | DVOL | IC +0.16@7d, kontrariański |
 
 ### Plik: `neurony/sentyment.py` (Faza D, W-297 — Sentyment Newsów LLM)
 
@@ -309,8 +310,8 @@
 
 > Szczegóły: `docs/KATALOG_NEURONOW.md`. Tu podsumowanie per legion.
 > **Uwaga (Prawo I):** rozkład „Wdrożone" per legion jest ORIENTACYJNY (mapa drogowa).
-> Autorytatywny licznik = **84** (RAZEM, z `wszystkie_neurony()` + test `== 84`); pełna
-> lista 84 wdrożonych neuronów jest w tabeli „NEURONY ZAIMPLEMENTOWANE" wyżej.
+> Autorytatywny licznik = **85** (RAZEM, z `wszystkie_neurony()` + test `== 85`); pełna
+> lista 85 wdrożonych neuronów jest w tabeli „NEURONY ZAIMPLEMENTOWANE" wyżej.
 
 | Legion | Skatalogowane | Wdrożone | Do wdrożenia |
 |--------|--------------|---------|--------------|

@@ -6,6 +6,30 @@
 
 ---
 
+## 2026-07-16 | 😱 | PSY-05 DVOL — WPIĘCIE zwalidowanego sygnału (opt-in, ZASADA WPIĘCIA)
+
+**Co:** wpięto pierwszy sygnał z kampanii Tier-1 alt-danych — **DVOL** (indeks strachu opcji
+Deribit, „crypto VIX"). Nowy neuron **PSY-05 NeuronDVOL** (kat. R, waga 6, kontrariański:
+wysoki strach → LONG) + **AdapterDVOL** (Deribit public API, DARMOWE bez klucza). Rój: 84→85
+neuronów (79 aktywnych). Nazwa rzymska adaptera/pomiaru: PAVOR (bóstwo strachu).
+
+**Dlaczego (Prawo I — POMIAR PRZED wpięciem):** DVOL POZIOM ma IC +0.16 @7d na zwroty BTC
+(zmierzone `narzedzia/pomiar_dvol_ic.py`, 2026-07-15, spójny nienakł/nakł, rośnie z horyzontem).
+Wysoki strach opcyjny poprzedza rewersję w górę (Sinclair/VIX). Walidacja WSTĘPNA (~16-23 mies.,
+jeden reżim) — dlatego opt-in OFF do A/B.
+
+**OPT-IN (ZASADA WPIĘCIA):** AdapterDVOL wpinany TYLKO za flagą `--dvol` (KonfigPetliLive.dvol=False
+domyślnie). Bez flagi PSY-05 abstynuje (Prawo XV, brak DVOL_INDEX) → ZERO zmiany zachowania roju
+aż do walidacji A/B na realnych danych. Cezar włącza po zielonym A/B (Prawo XVIII).
+
+**Pliki:** imperium/akwedukty/adaptery/dvol.py (nowy), imperium/legiony/neurony/psychologia.py
+(NeuronDVOL), imperium/legiony/rejestr.py (rejestracja+mapy), imperium/koloseum/petla_live.py
+(opt-in --dvol), adaptery/__init__.py, tests/test_dvol_psy05.py (nowy), tests/test_integracja.py
+(84→85), narzedzia/audyt_spojnosci.py (allowlista), MANIFEST/README/INDEKS/MAPA_KLUCZY (85).
+
+**Powód:** kampania pomiar-najpierw dała 4 zwalidowane sygnały (funding/stablecoin/DVOL/USD);
+DVOL najmocniejszy IC → pierwszy pilot wpięcia jako wzorzec dla stablecoin/USD.
+
 ## 2026-07-15 | 🔮 | HARUSPEX (kand. #20) — prototyp + POMIAR = FALSYFIKACJA (Prawo I, pomiar-najpierw)
 
 **Co:** prototyp kandydata #20 „predykcyjny Namiestnik" (żniwo wrzutni). Nazwa rzymska

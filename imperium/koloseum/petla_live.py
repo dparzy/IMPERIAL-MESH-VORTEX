@@ -118,6 +118,10 @@ class KonfigPetliLive:
     # zamknięcia → arena (rodzaj='CIEN_PNL') = cena ostrożności i odwagi mierzona NA ŻYWO.
     # NIE wpływają na realne zlecenia (obserwatorzy). Domyślnie False = zero zmiany zachowania.
     cienie: bool = False
+    # PSY-05 DVOL — indeks strachu opcji (Deribit, opt-in, OFF). Gdy True, wpina AdapterDVOL
+    # → neuron PSY-05 głosuje (kontrariański: wysoki strach=LONG, IC +0.16@7d zwalidowany).
+    # ZASADA WPIĘCIA: domyślnie OFF (zero zmiany zachowania) do walidacji A/B.
+    dvol: bool = False
 
 
 @dataclass
@@ -183,6 +187,10 @@ def _buduj_dyrygencie(
                            AdapterNewsLLM(fetcher=FetcherNewsRSS())]
     if getattr(cfg, "funding_mexc", False):
         adaptery_sentymentu.insert(1, AdapterMEXCFutures())
+    # PSY-05 DVOL (opt-in --dvol): wpina indeks strachu opcji Deribit → budzi neuron PSY-05.
+    if getattr(cfg, "dvol", False):
+        from imperium.akwedukty.adaptery import AdapterDVOL
+        adaptery_sentymentu.append(AdapterDVOL())
 
     namiestnik = get_namiestnik() if cfg.auto_rezim else None
     budowniczy = BudowniczyWskaznikow()
@@ -759,6 +767,8 @@ def _zbuduj_parser():
                    help="próg pewności Legatusa do wejścia (domyślnie 0.55)")
     p.add_argument("--cienie", action="store_true",
                    help="Legiony Cieni — kontrfaktyczny pomiar 3 widmowych wariantów (bez zmiany decyzji)")
+    p.add_argument("--dvol", action="store_true",
+                   help="PSY-05 DVOL — indeks strachu opcji (Deribit); kontrariański, IC +0.16@7d (opt-in, A/B)")
     p.add_argument("--funding-mexc", action="store_true",
                    help="funding/OI z MEXC (rodzimy, TIER A funding+ELR) zamiast Binance fapi")
     p.add_argument("--mwu", action="store_true",
@@ -798,7 +808,7 @@ def zbuduj_konfig_z_argv(argv=None):
         senat=a.senat, kalibruj_prog=a.kalibruj_prog, telegram=a.telegram,
         sl_atr_mult=a.sl_atr_mult, min_pewnosc=a.min_pewnosc, cienie=a.cienie,
         funding_mexc=a.funding_mexc, mwu=a.mwu, igrzyska=a.igrzyska,
-        filtr_asymetrii=a.filtr_asymetrii, ksiega_wad=a.ksiega_wad,
+        filtr_asymetrii=a.filtr_asymetrii, ksiega_wad=a.ksiega_wad, dvol=a.dvol,
     )
     return kfg, a.max_barow
 

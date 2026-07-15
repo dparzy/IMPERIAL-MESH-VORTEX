@@ -16,6 +16,7 @@ from imperium.akwedukty.adaptery.futures import AdapterFutures
 from imperium.akwedukty.adaptery.mexc_futures import AdapterMEXCFutures
 from imperium.akwedukty.adaptery.cvd import AdapterCVD
 from imperium.akwedukty.adaptery.news_llm import AdapterNewsLLM
+from imperium.akwedukty.adaptery.dvol import AdapterDVOL
 
 __all__ = [
     "AdapterDanych",
@@ -27,4 +28,5 @@ __all__ = [
     "AdapterMEXCFutures",
     "AdapterCVD",
     "AdapterNewsLLM",
+    "AdapterDVOL",
 ]

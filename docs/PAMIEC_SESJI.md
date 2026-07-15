@@ -101,6 +101,15 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Proces deduplikacji neuronów
+Podczas skanowania agent otrzymał instrukcję deduplikacji, co pozwoliło osiągnąć ostateczną liczbę 261 unikalnych neuronów zamiast potencjalnie większej liczby powtórzeń.
+
+### 2026-06-30 — Push wymaga uprawnień Read & Write
+Błąd 403 przy push do GitHub oznacza, że sesja Claude nie ma uprawnień zapisu do repozytorium. Konieczna zmiana uprawnień w GitHub Settings/Installations.
+
+### 2026-06-30 — Push zablokowany przez 403 - brak uprawnień
+Środowisko Claude Code web nie ma uprawnień do pushowania do repozytorium IMPERIAL-MESH-VORTEX (błąd 403). Wymagane skonfigurowanie GitHub App Claude Code z dostępem Read & Write w github.com/settings/installations.
+
 ### 2026-06-30 — Bezpiecznik Kapitału W-028: AOA 30% drawdown jako circuit-breaker
 Gdy strata z AOA przekracza 30%, Scheduler blokuje wszystkie nowe sygnały i zamyka pozycje. Zintegrowany z Scheduler._bezpiecznik_ok() – sprawdzany przed każdą transakcją.
 

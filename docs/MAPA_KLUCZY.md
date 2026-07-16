@@ -178,6 +178,7 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 | K-01 | NeuronDXYTrend | K | 5 | 🔇 (dane makro) | DXY_MOM |
 | K-02 | NeuronGoldBTC | K | 4 | 🔇 (dane makro) | GOLD_BTC_MOM |
 | K-03 | NeuronStablecoinFlow | K | 6 | ✅ opt-in --stablecoin | STABLE_FLOW |
+| K-04 | NeuronUSDStrength | K | 6 | ✅ opt-in --usd | USD_ZSCORE |
 
 | OC-06 | NeuronS2F | O | 6 | ✅ (block z timestampu) | BTC_S2F |
 | OC-07 | NeuronDaysToHalving | O | 7 | ✅ (block z timestampu) | BTC_DAYS_TO_HALVING |
@@ -202,4 +203,4 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 
 ---
 
-*Stan na: 2026-07-16 | Źródło prawdy: `imperium/legiony/rejestr.py` → `wszystkie_neurony()` (86 neuronów + 15 zwiadowców)*
+*Stan na: 2026-07-16 | Źródło prawdy: `imperium/legiony/rejestr.py` → `wszystkie_neurony()` (87 neuronów + 15 zwiadowców)*

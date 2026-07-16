@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-07-16 | 🪙 | K-04 USD strength — WPIĘCIE 3. zwalidowanego sygnału (opt-in, MONETA)
+
+**Co:** trzeci i ostatni sygnał Tier-1 — **siła dolara** (makro, DXY-proxy). Nowy neuron
+**K-04 NeuronUSDStrength** (kat. K, waga 6, silny USD → SHORT) + **AdapterUSD** (Frankfurter
+FX, DARMOWE bez klucza). Rój: 86→87 neuronów (81 aktywnych). Nazwa: MONETA.
+
+**Dlaczego (Prawo I + XVI):** z-score poziomu USD na oknie 120d ma IC -0.17@14d, -0.27@30d
+na zwroty BTC (`narzedzia/pomiar_usd_ic.py` + kontrola formy 2026-07-16). KLUCZOWE
+odkrycie: forma K-01 DXYTrend (EMA20-momentum) zmierzona jako SZUM; wolny z-score 120d
+poziomu = MOCNY sygnał → K-04 to INNA informacja niż K-01 (Prawo XVI, mierzone nie zgadywane).
+Silny USD (rozciągnięty vs ~6-mies. zakres) = odpływ z ryzyka = bearish BTC (BTC-DXY inverse).
+
+**OPT-IN:** AdapterUSD za flagą `--usd` (domyślnie OFF). Bez flagi K-04 abstynuje.
+
+**Pliki:** adaptery/usd_sila.py (nowy), neurony/makro.py (NeuronUSDStrength), rejestr.py,
+petla_live.py (--usd), backtest.py (USD_ZSCORE clear-list), adaptery/__init__.py,
+audyt_spojnosci.py (allowlista), MANIFEST/README/INDEKS/MAPA_KLUCZY (87), tests.
+
+**Powód:** domknięcie kampanii Tier-1 — 3/3 zwalidowane sygnały (DVOL/stablecoin/USD)
+wpięte wzorcem, opt-in OFF. A/B USD po commicie (bieg backtest). Live: USD_z=1.30 (dolar mocny).
+
 ## 2026-07-16 | 🏛️ | K-03 Stablecoin flow — WPIĘCIE 2. zwalidowanego sygnału (opt-in)
 
 **Co:** replikacja wzorca wpięcia (po DVOL) dla drugiego sygnału Tier-1 — **podaż

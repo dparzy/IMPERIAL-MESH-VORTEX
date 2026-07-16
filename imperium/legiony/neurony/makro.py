@@ -145,3 +145,39 @@ class NeuronStablecoinFlow(MikroNeuron):
         if flow <= -0.008:
             return self._bazowy_sygnal(flow, "SHORT", 0.50, [f"Podaż stablecoinów {flow:.1%}/7d — umorzenia, odpływ kapitału"])
         return self._bazowy_sygnal(flow, "NEUTRAL", 0.15, [f"Podaż stablecoinów {flow:+.1%}/7d — stabilna"])
+
+
+class NeuronUSDStrength(MikroNeuron):
+    """
+    K-04 | USD Strength (DXY-proxy) — siła dolara vs zwroty BTC (BTC-DXY inverse).
+
+    Silny USD (rozciągnięty vs ~6-mies. zakres) = odpływ z ryzyka = bearish BTC.
+    Słaby USD = dopływ do krypto = bullish. Kierunek ZWALIDOWANY pomiarem: z-score
+    poziomu USD na oknie 120d ma IC -0.17 @14d, -0.27 @30d na zwroty BTC (MONETA,
+    narzedzia/pomiar_usd_ic.py, 2026-07-16). UWAGA (Prawo XVI): to INNA informacja niż
+    K-01 DXYTrend (forma EMA20-momentum zmierzona jako SZUM) — tu z-score poziomu 120d.
+
+    USD_ZSCORE: (USD_teraz − mean_120d)/std_120d. Dostarcza AdapterUSD (Frankfurter,
+    opt-in --usd). Bez adaptera abstynuje (Prawo XV). DOSTEPNY=True. Sygnał wolny (makro).
+    """
+    KLUCZ = "K-04"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "USD_ZSCORE"
+    KATEGORIA = "K"
+    WAGA = 6
+    DOSTEPNY = True
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        z = wskazniki.get("USD_ZSCORE")
+        if z is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak USD_ZSCORE"])
+
+        if z >= 1.5:
+            return self._bazowy_sygnal(z, "SHORT", 0.70, [f"USD_z={z:+.2f} — silny dolar rozciągnięty, presja na BTC"])
+        if z >= 0.7:
+            return self._bazowy_sygnal(z, "SHORT", 0.50, [f"USD_z={z:+.2f} — dolar podwyższony, ostrożność"])
+        if z <= -1.5:
+            return self._bazowy_sygnal(z, "LONG", 0.70, [f"USD_z={z:+.2f} — słaby dolar, dopływ do krypto"])
+        if z <= -0.7:
+            return self._bazowy_sygnal(z, "LONG", 0.50, [f"USD_z={z:+.2f} — dolar słabnie, lekki tailwind"])
+        return self._bazowy_sygnal(z, "NEUTRAL", 0.15, [f"USD_z={z:+.2f} — dolar w zakresie"])

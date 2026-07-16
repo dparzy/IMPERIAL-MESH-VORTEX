@@ -70,7 +70,15 @@ class GlosImperium:
         logger.info(f"[GlosImperium] Zainicjalizowany. Model: {self.model}")
 
     def zapytaj(self, system_prompt: str, tresc: str, temperatura: float = 0.7) -> str:
-        """Wysyła pytanie do DeepSeek. Zwraca odpowiedź jako string."""
+        """
+        Wysyła pytanie do DeepSeek. Zwraca odpowiedź jako string.
+
+        Po udanej odpowiedzi para `prompt → odpowiedź` trafia do NOTARIUSA (surowiec Szkoły
+        TIRO, Filar 2). Most jest jedynym wejściem LLM w Imperium, więc jedno wpięcie tutaj
+        łapie WSZYSTKICH wołających (newsy, auto-lekcje, zwiad) — bez zmian u nich.
+        Zapis jest czysto obserwacyjny: nie dotyka ścieżki decyzyjnej i NIGDY nie może
+        wywrócić wywołania API (patrz `notarius` — żelazna zasada).
+        """
         try:
             odp = self.client.chat.completions.create(
                 model=self.model,
@@ -80,10 +88,27 @@ class GlosImperium:
                 ],
                 temperature=temperatura,
             )
-            return odp.choices[0].message.content
+            odpowiedz = odp.choices[0].message.content
         except Exception as e:
             logger.error(f"[GlosImperium] Błąd API: {e}")
             raise
+
+        self._protokoluj(system_prompt, tresc, odpowiedz, temperatura)
+        return odpowiedz
+
+    def _protokoluj(self, system_prompt: str, tresc: str,
+                    odpowiedz: str, temperatura: float) -> None:
+        """
+        Oddaj parę pisarzowi (TIRO/E2). Świadomie łykamy KAŻDY wyjątek, łącznie z ImportError:
+        gdyby organu zabrakło albo dysk odmówił, nauczyciel ma mówić dalej. Protokół jest
+        dodatkiem do mowy, nigdy jej warunkiem.
+        """
+        try:
+            from imperium.biblioteki.notarius import zapisz_pare
+            zapisz_pare(system_prompt=system_prompt, tresc=tresc, odpowiedz=odpowiedz,
+                        model=self.model, temperatura=temperatura)
+        except Exception as e:  # noqa: BLE001 — awaria pisarza ≠ awaria mostu
+            logger.warning(f"[GlosImperium] Notarius nie zapisał pary: {e}")
 
     def test_polaczenia(self) -> bool:
         """Sprawdź czy klucz działa. Uruchom to zanim wpinasz w cykl."""

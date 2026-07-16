@@ -163,12 +163,57 @@ Czyli: rozwój **skokami po pomiarze**, nie płynny. Zgodne z ZASADĄ WPIĘCIA (
 - [x] **E0 — CENSOR sprzętu** (auto-detekcja + alarm Prawa XV). ✅ 2026-07-16
 - [x] **E1 — Pomiar twardy:** llama.cpp (nie Ollama) + `llama-bench` → REALNE tok/s zmierzone dla 1.7B i 4B na Fujitsu.
       Estymacje zastąpione tabelą pomiarową ↑. Teza Hyginusa „7B @ 10–15 t/s" obalona. ✅ 2026-07-16
-- [ ] **E2 — TIRO-uczeń cichy dubler:** adapter `llama-server` obok Hyginusa (opt-in OFF), zbieranie par nauczyciel→odpowiedź do JSONL.
-      **Zbieranie par można ruszyć NATYCHMIAST — jest niezależne od sprzętu.** Im wcześniej start, tym większy zbiór zastanie Nitro.
+- [~] **E2 — TIRO-uczeń cichy dubler:**
+  - [x] **NOTARIUS (pisarz) — ZBIERANIE PAR RUSZYŁO 2026-07-16.** `imperium/biblioteki/notarius.py`
+        wpięty w most `GlosImperium.zapytaj()` → każde wywołanie Hyginusa (newsy/auto-lekcje/zwiad)
+        zostawia parę `prompt→odpowiedź` w `bibliotheca_ulpia/dane/tiro_pary_nauczyciela.jsonl`.
+        Zweryfikowane na żywo (realne wywołanie API → para zapisana). 32 testy granic zielone.
+  - [ ] adapter `llama-server` jako cichy dubler obok Hyginusa (opt-in OFF) — uczeń liczy, nie decyduje.
 - [ ] **E3 — Pierwszy A/B:** surowy mały model vs DeepSeek na newsach (Brier) — baseline jakości ucznia.
 - [ ] **E4 — Szkoła:** trening LoRA w Colab na zebranym datasecie → GGUF → lokalna inferencja.
 - [ ] **E5 — Egzamin:** A/B ucznia-po-treningu vs nauczyciel; awans roli tylko po zielonym pomiarze.
 - [ ] **E6 — Migracja sprzętu:** gdy CENSOR wykryje GPU → odblokowanie treningu lokalnego i większych modeli.
+
+## ⚡ Przyspieszenie ucznia — zwiad web 2026-07-16 (rozkaz Cezara: „aby najszybciej się nauczył")
+
+### 📊 Ile par trzeba? (progi wpięte w pasek postępu NOTARIUSA)
+| Próg | Co daje | Źródło |
+|---|---|---|
+| **500–1 000** | adaptacja stylu/formatu | [futureagi](https://futureagi.com/blog/synthetic-data-fine-tuning-llms/) |
+| **1 000–5 000** | **specjalizacja domenowa — nasz realny cel** | j.w. |
+| 5 000–50 000 | nowe zdolności (poza horyzontem) | j.w. |
+
+**Zasada LIMA: 1 000 doskonałych > 50 000 miernych** → jakość par bije ilość. Dlatego eksport SFT
+ma filtr `min_znakow_odpowiedzi` (krótkie „nie wiem"/błędy nie uczą), a rejection sampling
+(10–30 kandydatów → sędzia na próbce 5–10%) pasuje wprost do naszego wzorca DeepSeek-proponent/Opus-sędzia
+([RLHF book](https://rlhfbook.com/c/09-rejection-sampling)).
+
+### 🔧 Dźwignie do ZMIERZENIA (kandydaci, nie prawdy — Prawo I)
+- **Speculative decoding** (`-md Qwen3-0.6B.gguf` jako szkic dla 4B): mechanizm sprzyja nam — im
+  wolniejszy target, tym lepsza amortyzacja szkicu. Zmierzone gdzie indziej: **1.7–2.0× na zadaniach
+  ustrukturyzowanych, ale 0.92× (WOLNIEJ) na swobodnym czacie**. ⚠️ **NIKT nie mierzył na 2-rdzeniowym
+  CPU** — twórcy llama.cpp sami przyznają brak danych CPU-only ([issue #21453](https://github.com/ggml-org/llama.cpp/issues/21453)).
+  **Zmierzyć samemu** przed jakimkolwiek wpięciem. Szkic ~0.5B; powyżej 1.5B zyski znikają.
+- **`-fa -ctk q8_0 -ctv q8_0`**: połowi RAM cache przy stracie perplexity <0.1. 🚨 **Tylko RAZEM** —
+  `-ctk` bez `-fa` bywa WOLNIEJSZE niż brak kwantyzacji ([dyskusja #22411](https://github.com/ggml-org/llama.cpp/discussions/22411)).
+- **DeepSeek MA logprobs** (`logprobs=true`, `top_logprobs` do 20) → otwiera *prawdziwą* distylację
+  zamiast SFT na tekście ([API docs](https://api-docs.deepseek.com/api/create-chat-completion/)).
+  ⚠️ Tryb rozumowania logprobs IGNORUJE. **Nie komplikujemy NOTARIUSA na zapas** — sprawdzony przepis
+  R1-Distill to zwykły SFT na tekście (`<think>` + odpowiedź, cross-entropy, 2–3 epoki).
+- ❌ **`-t 2` zamiast `-t 4`** — rekomendacja zwiadu **ODRZUCONA NASZYM POMIAREM**: llama-bench i tak
+  domyślnie bierze 2, a przy 4B `-t 4` jest SZYBSZE (4.86 vs 4.39 t/s). Pomiar > literatura, także
+  przeciw własnym zwiadowcom.
+
+### ❌ Co NIE zadziała na naszym sprzęcie (obalone, nie próbować)
+| Opcja | Dlaczego odpada |
+|---|---|
+| **ipex-llm / Intel Extension for PyTorch** | zoptymalizowane pod AVX-512 — Haswell 2013 go NIE MA (AVX-512 od Skylake-X 2017) |
+| **OpenVINO backend llama.cpp** | status preview, walidowany na „AI PC" (Core Ultra), zero benchmarków CPU-only na starym sprzęcie |
+| **llamafile** | jego przewaga = omijanie rdzeni efektywności; Haswell nie ma architektury hybrydowej (ta zaczęła się od Alder Lake) |
+| **BitNet.cpp** | wymaga modelu trenowanego natywnie jako 1.58-bit — Qwen3 się nie przekwantyzuje |
+| **Multi-token prediction** | wymaga głowicy MTP (jak DeepSeek V3); Qwen3 jej nie ma |
+| **Flash Attention 2 na Colab T4** | wymaga Ampere+; T4 to Turing → fallback xformers/SDPA (Unsloth ogarnia sam) |
+| **T4 + bf16** | Turing wspiera tylko fp16 — Unsloth wykrywa automatycznie |
 
 ## ⚠️ Obalone halucynacje DeepSeeka (Prawo I)
 - ❌ „aom-news-4b" — **nie istnieje**.

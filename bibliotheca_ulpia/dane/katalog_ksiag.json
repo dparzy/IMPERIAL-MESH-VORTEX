@@ -1,5 +1,5 @@
 {
-  "n": 72,
+  "n": 74,
   "calibre": true,
   "ksiegi": [
     {
@@ -708,6 +708,21 @@
       "format": "pdf",
       "plik": "BIB-072_Hyndman-Athanasopoulos_Forecasting-Principles-and-Practice-2nd-ed.pdf",
       "wydano": "2018-01-10T07:22:20+00:00"
+    },
+    {
+      "bib": "BIB-073",
+      "autor": "Boyd Vandenberghe",
+      "tytul": "Convex Optimization",
+      "format": "pdf",
+      "plik": "BIB-073_Boyd-Vandenberghe_Convex-Optimization.pdf",
+      "wydano": "2024-02-28T16:11:12+00:00"
+    },
+    {
+      "bib": "BIB-074",
+      "autor": "Boyd Vandenberghe",
+      "tytul": "Additional Exercises for Convex Optimization",
+      "format": "pdf",
+      "plik": "BIB-074_Boyd-Vandenberghe_Additional-Exercises-for-Convex-Optimization.pdf"
     }
   ]
 }

@@ -7,15 +7,19 @@
 > Legenda: 🆓 = jest plik od autora/arXiv (bierz) · 📖 = ⛔ tylko czytanie online, NIE do RAG
 > · ⚠️ = status/licencję sprawdź PRZED pobraniem · Szczegóły: `PLAN_ROZBUDOWY_BIBLIOTEKI.md`
 >
-> **Numery puste (spalone na odsyłacze do książek, które JUŻ mamy):** 074, 083, 127, 138, 165, 166,
+> **Numery puste (spalone na odsyłacze do książek, które JUŻ mamy):** 083, 127, 138, 165, 166,
 > 198, 199, 262. Nie używaj ich — zostają wolne, żeby nie przenumerowywać całości.
+> (**074 ZAJĘTY** od 2026-07-16 — przydzielony zadaniom Boyda, patrz Priorytet 0.)
+>
+> ✅ **JUŻ W BIBLIOTECE (2026-07-16):** BIB-070, 071, 072, 073, 074 — łącznie 74 książki, 29 535 frag.
 
 ## ⭐ PRIORYTET 0 — bierz najpierw (pewne, otwarte, zamykają zerowe luki)
 
 ```
-BIB-070_Vaswani-et-al_Attention-Is-All-You-Need.pdf
-BIB-071_Easley-Lopez-de-Prado-OHara_Flow-Toxicity-and-Liquidity-in-a-High-Frequency-World.pdf
-BIB-073_Boyd-Vandenberghe_Convex-Optimization.pdf
+BIB-070_Vaswani-et-al_Attention-Is-All-You-Need.pdf                                    ✅ MAMY
+BIB-071_Easley-Lopez-de-Prado-OHara_Flow-Toxicity-and-Liquidity-in-a-High-Frequency-World.pdf  ✅ MAMY
+BIB-073_Boyd-Vandenberghe_Convex-Optimization.pdf                                      ✅ MAMY
+BIB-074_Boyd-Vandenberghe_Additional-Exercises-for-Convex-Optimization.pdf             ✅ MAMY
 BIB-075_Nakamoto_Bitcoin-A-Peer-to-Peer-Electronic-Cash-System.pdf
 BIB-076_Buterin_Ethereum-Whitepaper.pdf
 BIB-077_Daian-et-al_Flash-Boys-2.0-Frontrunning-in-Decentralized-Exchanges.pdf

@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-07-16 | 🎓 | CENSOR sprzętu + plan TIRO (lokalny hybrydowy LLM-uczeń)
+
+**Co:** nowy organ **CENSOR SPRZĘTU** (`imperium/oczy/censor_sprzetu.py`) — „oczy" mierzące
+majątek maszyny (CPU/RAM/GPU, stdlib-only bez psutil), klasyfikujące ją do KLASY majątkowej
+(census→classis: PROLETARIUS→PEDES→EQUES→PRAETOR→CONSUL) i podnoszące ALARM POTENCJAŁU
+(Prawo XV) przy AWANSIE/degradacji sprzętu. Baseline w git → po `git pull` na nowej maszynie
+wykrywa migrację. + dokument **`docs/PLAN_TIRO_LOKALNY_LLM.md`** (roadmapa E0–E6).
+
+**Dlaczego (rozkaz Cezara 2026-07-16):** budowa lokalnego LLM-ucznia (nauczyciele: Hyginus/DeepSeek
++ Vitruviusz/Opus) z auto-wykrywaniem zmian sprzętu i zgłaszaniem potencjału. Sprzęt zmierzony
+(Prawo I): Fujitsu i5-4200M Haswell 2-rdz., 16 GB, brak CUDA = klasa **PEDES** (model 1–3B żywo /
+7B wsadowo). Zwiad web (Sonnet) obalił zawyżenie DeepSeeka „7B @ 10–15 tok/s" (realnie 2–5) i
+halucynację „aom-news-4b"; potwierdził że trening MUSI iść przez Colab (CPU-only nie fine-tunuje).
+
+**Pliki:** imperium/oczy/censor_sprzetu.py (nowy), tests/test_censor_sprzetu.py (16 testów granic),
+bibliotheca_ulpia/dane/censor_sprzet.json (baseline PEDES), docs/PLAN_TIRO_LOKALNY_LLM.md (nowy).
+
+**Powód:** E0 roadmapy TIRO domknięty. Następny krok E1: instal Ollama + `llama-bench` — TWARDY
+pomiar tok/s na Fujitsu (zastąpić estymacje). Wpięcie ucznia w ścieżkę decyzyjną: opt-in OFF do walidacji A/B.
+
 ## 2026-07-16 | 🪙 | K-04 USD strength — WPIĘCIE 3. zwalidowanego sygnału (opt-in, MONETA)
 
 **Co:** trzeci i ostatni sygnał Tier-1 — **siła dolara** (makro, DXY-proxy). Nowy neuron

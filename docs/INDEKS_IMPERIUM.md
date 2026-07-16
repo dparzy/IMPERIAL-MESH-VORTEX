@@ -98,6 +98,7 @@ Wszystkie dokumenty projektu w jednym miejscu. Punkt wejścia dla każdego, kto 
 | 50 | `PROFIL_CEZARA.md` | **Profil Cezara W-360** — model użytkownika (odpowiednik USER.md Hermesa): kim jest Cezar, preferencje stałe, czego unikać; rozdzielony od PAMIEC_SESJI (środowisko ≠ użytkownik); wstrzykiwany na starcie sesji przez `pamiec_sesji.profil_skrot()` | ✅ Aktywny |
 | 49 | `PAMIEC_SESJI.md` | **Pamięć Sesji W-360** — trwała mapa podpięć do lokala (MCP servers, feedy, egzekucja, monitoring), zalecana kolejność wdrożeń, lekcje z sesji; auto-aktualizowana po każdej sesji; indeksowana w RAG jako `dane/PAMIEC_SESJI.md`; CRUD lekcji + Kronika Czatu (kronika_czatu.py) | ✅ Aktywny |
 | 48 | `ANALIZA_HERMES_I_PAMIEC.md` | **Analiza Hermes Agent vs Pamięć Imperium** — prawda o „Hermes Agent" (fabrykacja INF-32 vs realny Nous Research 5-filarowy), porównanie pamięci (8 modułów/2135 linii kodu, gdzie wygrywamy: hash/MAE-MFE/synapsy, gdzie luki: semantyka/graf/auto-lekcje), status 21 książek BIB, rekomendacja kolejnej książki, plan W-360..363 (auto-lekcje/podobieństwo/skills/self-improving) | ✅ Aktywny |
+| 55 | `PLAN_TIRO_LOKALNY_LLM.md` | **Plan TIRO — lokalny hybrydowy LLM-uczeń** — projekt lokalnego modelu-ucznia (nauczyciele: Hyginus/DeepSeek + Vitruviusz/Opus), organ CENSOR sprzętu (klasy PROLETARIUS→CONSUL, auto-alarm Prawa XV przy migracji sprzętu), feasibility (PEDES: 1–3B żywo / 7B wsadowo, trening=Colab), roadmapa E0–E6, obalone halucynacje DeepSeeka | ✅ Aktywny |
 
 ---
 

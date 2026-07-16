@@ -16,6 +16,7 @@
                                    lustro_prawdy         walidacja adwersarialna[I, IX]
 🚰 AKWEDUKTY        akwedukty/     kwatermistrz_danych   dane OHLCV (CCXT/CSV)  [II]
 👁️ OCZY            oczy/          wszechoko             percepcja wielowarstwowa[XII]
+                                   censor_sprzetu        cenzus majątku maszyny → klasa+alarm[XV]
 🛤️ DROGI            drogi/         nexus_hub             multi-exchange routing [III, XIII]
                                    war_lancer            egzekucja HF           [III]
 🎨 ŚWIĄTYNIE       swiatynie/     kartograf             wykresy PNG            [V]

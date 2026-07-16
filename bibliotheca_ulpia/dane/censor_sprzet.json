@@ -1,0 +1,10 @@
+{
+  "platforma": "Windows 10",
+  "cpu_nazwa": "Intel64 Family 6 Model 60 Stepping 3, GenuineIntel",
+  "cpu_logiczne": 4,
+  "ram_gb": 15.88,
+  "gpu_cuda": false,
+  "gpu_vram_gb": 0.0,
+  "gpu_nazwa": null,
+  "znacznik": "2026-07-16T03:19:00+00:00"
+}

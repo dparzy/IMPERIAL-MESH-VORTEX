@@ -101,6 +101,15 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — DeepSeek zawyża możliwości – weryfikacja przez deep-research
+Wiele twierdzeń DeepSeek z Zbior_wskaznikow_i_strategi okazało się błędnych lub przesadzonych. Zweryfikowano zewnętrznymi źródłami – system musi opierać się na mierzonych faktach (Prawo XVI).
+
+### 2026-06-30 — pewnosc_agregatu zawsze ≈1.0 – źródło strat
+Stała wysoka pewność agregatu powoduje maksymalny dźwig, co prowadzi do tight stop-lossów i wielu małych strat. To jest zidentyfikowany defect.
+
+### 2026-06-30 — Zbyt sztywne progi powodują martwe neurony
+BB Squeeze 4%→2.5%, RSI Div delta 2.0→0.3, Bart Pattern 30%→10% – neurony zwracały 100% NEUTRAL. Po korekcie zaczęły generować sygnały.
+
 ### 2026-06-30 — Golden Cross w IMPERIUM to wariant EMA
 Strategia ZŁOTY ORZEŁ używa EMA 50/200, nie kanonicznego SMA. Zapisano w dokumentacji jako wariant EMA. Wyjaśniono brak aktywacji na DOGE (death cross w całym oknie backtestu).
 

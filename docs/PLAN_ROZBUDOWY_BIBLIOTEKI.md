@@ -45,7 +45,7 @@ dzieł uczy lepiej niż 400 modnych tytułów. Uczeń TIRO nauczy się tego, co 
 |---|---|---|---|
 | 070 | Vaswani i in. | *Attention Is All You Need* (2017) 🆓 ✅ | Fundament transformerów — **wprost pod TIRO**. arXiv:1706.03762 |
 | 071 | Easley, López de Prado, O'Hara | *Flow Toxicity and Liquidity in a High-Frequency World* (RFS 2012) 🆓 ✅ | **Źródło naszego neuronu Z-01 (VPIN)** — mamy neuron, nie mamy źródła |
-| 072 | Hyndman, Athanasopoulos | *Forecasting: Principles and Practice* (3rd ed.) 📖 ✅ | ⛔ **NIE do RAG** — darmowa do CZYTANIA (otexts.com/fpp3), ale brak pliku i brak otwartej licencji; druk płatny. Kanon prognozowania (luka u nas) — czytać u źródła, nie kopiować. Sprawdzone i **odrzucone przez Cezara 2026-07-16** |
+| 072 | Hyndman, Athanasopoulos | *Forecasting: Principles and Practice* (**2nd ed.**) ✅ **W BIBLIOTECE** | ✅ **ZAINDEKSOWANA 2026-07-16** — Cezar ma **kupiony** egzemplarz (PDF, 2. edycja) z własnego dysku. 257 fragmentów w RAG, korpus 27 959 → 28 535. Kanon prognozowania — domyka zerową lukę (mamy WFO i Sybillę z Brierem, nie mieliśmy teorii). ⚠️ Uwaga na przyszłość: **downloadowalna wersja FPP jest PŁATNA** (OTexts: „Buy a print or downloadable version"); darmowe jest tylko czytanie online — nie ściągać z serwisów typu dokumen.pub. 3. edycja różni się głównie przejściem `forecast`→`fable` (R), dla nas bez znaczenia |
 | 073 | Boyd, Vandenberghe | *Convex Optimization* 🆓 ✅ | Darmowy PDF (Stanford) — fundament sizingu/portfela |
 | 074 | Goodfellow i in. | — mamy (BIB-068) | — |
 | 075 | Daspremont i in. / Nakamoto | *Bitcoin: A Peer-to-Peer Electronic Cash System* 🆓 ✅ | Whitepaper źródłowy — 9 stron, mamy o nim książki, nie mamy jego |

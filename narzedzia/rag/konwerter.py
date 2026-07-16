@@ -46,9 +46,33 @@ def _klucz(path: Path) -> str:
     return hashlib.sha1(path.read_bytes()).hexdigest()[:16]
 
 
+# Windows: MAX_PATH = 260 znaków. Ścieżka cache to CACHE_DIR + stem + "__" + hasz16 + ".txt",
+# a przy zapisie atomowym dochodzi jeszcze ".tmp" — pod ten NAJDŁUŻSZY wariant liczymy budżet.
+# Zapas 1 znak na bezpieczeństwo. (Realny przypadek 2026-07-16: książka wrzucona bez zmiany nazwy
+# — „Market Microstructure Theory -- Maureen O'Hara, Maureen O'Hara -- 1_ publ_ in paperback…" —
+# dała ścieżkę 282 znaków i wywaliła CAŁY pipeline.)
+LIMIT_SCIEZKI = 259
+
+
 def sciezka_cache(path: Path) -> Path:
-    """`<stem>__<hasz>.txt` — czytelna nazwa + hasz gwarantujący zgodność treści."""
-    return CACHE_DIR / f"{path.stem}__{_klucz(path)}.txt"
+    """
+    `<stem>__<hasz>.txt` — czytelna nazwa + hasz gwarantujący zgodność treści.
+
+    Stem SKRACAMY **tylko gdy** pełna ścieżka nie mieści się w limicie systemu (Windows MAX_PATH).
+    Warunkowo, nie zawsze — bo bezwarunkowe skracanie zmieniłoby nazwy WSZYSTKICH istniejących
+    plików cache, osierociło je i wymusiło rekonwersję całej biblioteki (71 książek przez calibre).
+    Skrócenie jest bezpieczne: o zgodności treści decyduje HASZ, nie nazwa; stem jest tylko
+    dla czytelności człowieka.
+    """
+    h = _klucz(path)
+    kandydat = CACHE_DIR / f"{path.stem}__{h}.txt"
+    # Mierzymy wariant .tmp (najdłuższy): to on wywala się przy zapisie atomowym.
+    nadmiar = len(str(kandydat)) + len(".tmp") - LIMIT_SCIEZKI
+    if nadmiar > 0:
+        # Zostaw min. 8 znaków stemu — nazwa ma nadal coś znaczyć dla człowieka.
+        stem = path.stem[:max(8, len(path.stem) - nadmiar)]
+        kandydat = CACHE_DIR / f"{stem}__{h}.txt"
+    return kandydat
 
 
 def ekstrahuj_z_cache(path: Path, min_znakow: int = MIN_ZNAKOW_CACHE) -> str:
@@ -83,19 +107,36 @@ def buduj_cache(katalog: Path = BIBLIOTEKA) -> dict:
     """
     Prekonwertuje WSZYSTKIE książki do cache (uruchom na laptopie z calibre). Pasek postępu
     na stderr (Prawo XXIV). Zwraca {plik: liczba_znaków}. Pomija już scache'owane (idempotentne).
+
+    GRACEFUL PER KSIĄŻKA (Prawo XV — naprawione 2026-07-16): błąd JEDNEJ książki nie może zabić
+    biegu po pozostałych. Wcześniej wyjątek leciał w górę i przerywał cały pipeline — realnie
+    zdarzyło się: jedna nazwa 190 znaków (książka wrzucona bez zmiany nazwy) → ścieżka 282 znaki
+    → FileNotFoundError na 71/71 → padło `przygotuj_biblioteke` mimo 70 poprawnie przerobionych.
+    Moduł obiecywał w docstringu „nie wysypuje pipeline" — i tego nie dotrzymywał.
     """
     pliki = sorted(p for p in katalog.iterdir()
                    if p.is_file() and p.suffix.lower() in FORMATY_KSIAG)
     wynik: dict = {}
+    bledy: dict = {}
     for i, p in enumerate(pliki, 1):
         stan = "cache" if sciezka_cache(p).exists() else "konwersja"
         print(f"\r  [konwerter] {i}/{len(pliki)} [{stan}] {p.name[:44]:44}",
               end="", file=sys.stderr, flush=True)
-        wynik[p.name] = len(ekstrahuj_z_cache(p))
+        try:
+            wynik[p.name] = len(ekstrahuj_z_cache(p))
+        except Exception as e:  # noqa: BLE001 — jedna zła książka ≠ koniec biegu (Prawo XV)
+            wynik[p.name] = 0
+            bledy[p.name] = f"{type(e).__name__}: {e}"
     print("", file=sys.stderr)
     puste = [k for k, v in wynik.items() if v < MIN_ZNAKOW_CACHE]
     print(f"  [konwerter] scache'owano {len(wynik) - len(puste)}/{len(wynik)} "
           f"| nieudane (brak narzędzia?): {puste or 'brak'}", file=sys.stderr)
+    if bledy:
+        # Głośno, ale bez zabijania biegu — Cezar ma WIEDZIEĆ, że coś nie weszło do RAG.
+        print(f"  [konwerter] 🚨 BŁĘDY ({len(bledy)}) — te książki NIE weszły do RAG:",
+              file=sys.stderr)
+        for nazwa, blad in bledy.items():
+            print(f"      • {nazwa}: {blad}", file=sys.stderr)
     return wynik
 
 

@@ -22,8 +22,12 @@ BIB-077_Daian-et-al_Flash-Boys-2.0-Frontrunning-in-Decentralized-Exchanges.pdf
 BIB-078_Adams-et-al_Uniswap-v3-Core.pdf
 BIB-079_Gneiting-Raftery_Strictly-Proper-Scoring-Rules-Prediction-and-Estimation.pdf
 ```
-📖 **BIB-072 (Hyndman FPP3) — POMINIĘTA świadomie:** brak pliku i brak otwartej licencji
-(decyzja Cezara 2026-07-16). Numer zostaje zarezerwowany na wypadek legalnego egzemplarza.
+✅ **BIB-072 — JUŻ W BIBLIOTECE** (2026-07-16), Cezar odnalazł kupiony egzemplarz 2. edycji:
+```
+BIB-072_Hyndman-Athanasopoulos_Forecasting-Principles-and-Practice-2nd-ed.pdf
+```
+257 fragmentów w RAG. ⚠️ Downloadowalna wersja FPP jest **płatna** (OTexts sprzedaje) — darmowe
+jest tylko czytanie online. Nie ściągać z serwisów typu dokumen.pub.
 
 ## 🤖 Transformery / LLM / NLP — pod TIRO
 

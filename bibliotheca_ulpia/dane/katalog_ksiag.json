@@ -1,5 +1,5 @@
 {
-  "n": 69,
+  "n": 72,
   "calibre": true,
   "ksiegi": [
     {
@@ -321,7 +321,8 @@
       "autor": "OHara",
       "tytul": "Market Microstructure Theory",
       "format": "pdf",
-      "plik": "BIB-032_OHara_Market-Microstructure-Theory.pdf"
+      "plik": "BIB-032_OHara_Market-Microstructure-Theory.pdf",
+      "wydano": "0101-01-01T00:00:00+00:00"
     },
     {
       "bib": "BIB-033",
@@ -684,6 +685,29 @@
       "tagi": "Business & Personal Finance",
       "jezyk": "eng",
       "wydano": "2023-04-18T00:00:00+00:00"
+    },
+    {
+      "bib": "BIB-070",
+      "autor": "Vaswani et al",
+      "tytul": "Attention Is All You Need",
+      "format": "pdf",
+      "plik": "BIB-070_Vaswani-et-al_Attention-Is-All-You-Need.pdf"
+    },
+    {
+      "bib": "BIB-071",
+      "autor": "Easley Lopez de Prado OHara",
+      "tytul": "Flow Toxicity and Liquidity in a High Frequency World",
+      "format": "pdf",
+      "plik": "BIB-071_Easley-Lopez-de-Prado-OHara_Flow-Toxicity-and-Liquidity-in-a-High-Frequency-World.pdf",
+      "wydano": "2012-05-03T19:00:32+00:00"
+    },
+    {
+      "bib": "BIB-072",
+      "autor": "Hyndman Athanasopoulos",
+      "tytul": "Forecasting Principles and Practice 2nd ed",
+      "format": "pdf",
+      "plik": "BIB-072_Hyndman-Athanasopoulos_Forecasting-Principles-and-Practice-2nd-ed.pdf",
+      "wydano": "2018-01-10T07:22:20+00:00"
     }
   ]
 }

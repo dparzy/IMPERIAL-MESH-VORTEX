@@ -14,11 +14,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from imperium.biblioteki.notarius import (  # noqa: E402
     LIMIT_ZNAKOW,
+    LIMIT_PROBEK_NA_PYTANIE,
     ENV_WYLACZNIK,
     PROGI_DATASETU,
     czytaj_pary,
     eksportuj_sft,
     odcisk,
+    odcisk_pytania,
     postep_zbioru,
     raport,
     statystyki,
@@ -132,15 +134,74 @@ def test_identyczna_para_nie_dublowana(tmp_path):
 
 
 @_bez_wylacznika
-def test_ten_sam_prompt_inna_odpowiedz_ZAPISANY(tmp_path):
+def test_ten_sam_prompt_inna_odpowiedz_zapisany_do_limitu(tmp_path):
     """
-    Granica projektowa: dedup jest po CAŁEJ parze, nie po prompcie. Przy temperaturze >0
-    nauczyciel odpowiada różnie na to samo pytanie — ta wariancja to informacja, nie śmieć.
+    Kilka próbek tego samego wejścia MA wartość — pozwalają policzyć konsensus przy eksporcie
+    (self-consistency). Dlatego do LIMIT_PROBEK_NA_PYTANIE wpuszczamy różne odpowiedzi.
+    Powyżej limitu to już monokultura — patrz test granicy niżej.
     """
     p = tmp_path / "pary.jsonl"
     assert zapisz_pare("s", "pyt", "odpowiedź A", "m", sciezka=p) is True
     assert zapisz_pare("s", "pyt", "odpowiedź B", "m", sciezka=p) is True
     assert len(list(czytaj_pary(p))) == 2
+
+
+# ── GRANICA: limit próbek na pytanie (anty-monokultura) ───────────────────────
+
+@_bez_wylacznika
+def test_limit_probek_na_pytanie_dokladnie_na_progu(tmp_path):
+    """
+    GRANICA `>=`: dokładnie LIMIT próbek wchodzi, LIMIT+1 już NIE.
+    Dowód z realnych danych (2026-07-16): pętla live pytała o ten sam zestaw nagłówków 10×
+    i dostała 10 SPRZECZNYCH odpowiedzi (sentyment +0.8 … -0.4). Dedup po całej parze tego
+    nie łapał, bo odpowiedzi się różniły — model uczyłby się sprzecznych etykiet.
+    """
+    p = tmp_path / "pary.jsonl"
+    for i in range(LIMIT_PROBEK_NA_PYTANIE):
+        assert zapisz_pare("s", "te same nagłówki", f"odpowiedź {i}", "m", sciezka=p) is True
+    # LIMIT+1 — inna odpowiedź, więc dedup pary NIE zadziała; ratuje wyłącznie limit.
+    assert zapisz_pare("s", "te same nagłówki", "odpowiedź NADMIAROWA", "m", sciezka=p) is False
+    assert len(list(czytaj_pary(p))) == LIMIT_PROBEK_NA_PYTANIE
+
+
+@_bez_wylacznika
+def test_limit_nie_dotyka_roznych_pytan(tmp_path):
+    """Limit jest PER PYTANIE — różne wejścia nie mogą się nawzajem blokować."""
+    p = tmp_path / "pary.jsonl"
+    for i in range(LIMIT_PROBEK_NA_PYTANIE + 5):
+        assert zapisz_pare("s", f"pytanie {i}", "odp", "m", sciezka=p) is True
+    assert len(list(czytaj_pary(p))) == LIMIT_PROBEK_NA_PYTANIE + 5
+
+
+@_bez_wylacznika
+def test_limit_liczy_stare_wpisy_bez_odcisku_pytania(tmp_path):
+    """
+    Wsteczna zgodność: wpisy sprzed limitu nie mają pola `odcisk_pytania`. Limit MUSI je
+    policzyć (odtwarzając odcisk z treści) — inaczej stary zalew ominąłby bezpiecznik.
+    """
+    p = tmp_path / "pary.jsonl"
+    with p.open("w", encoding="utf-8") as f:
+        for i in range(LIMIT_PROBEK_NA_PYTANIE):
+            f.write(json.dumps({"odcisk": f"stary{i}", "system": "s", "prompt": "te same nagłówki",
+                                "odpowiedz": f"stara {i}"}, ensure_ascii=False) + "\n")
+    assert zapisz_pare("s", "te same nagłówki", "nowa odpowiedź", "m", sciezka=p) is False
+
+
+@_bez_wylacznika
+def test_odcisk_pytania_zapisany_do_grupowania(tmp_path):
+    """Eksport (E4) grupuje próbki po pytaniu — pole musi być w danych, nie liczone od nowa."""
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "pyt", "odp A", "m", sciezka=p)
+    zapisz_pare("s", "pyt", "odp B", "m", sciezka=p)
+    pary = list(czytaj_pary(p))
+    assert pary[0]["odcisk_pytania"] == pary[1]["odcisk_pytania"]   # to samo pytanie
+    assert pary[0]["odcisk"] != pary[1]["odcisk"]                    # inne pary
+
+
+def test_odcisk_pytania_ignoruje_odpowiedz():
+    assert odcisk_pytania("s", "p") == odcisk_pytania("s", "p")
+    assert odcisk_pytania("s", "p") != odcisk_pytania("s", "p2")
+    assert odcisk_pytania("s", "p") != odcisk_pytania("s2", "p")
 
 
 @_bez_wylacznika
@@ -357,6 +418,39 @@ def test_cache_izoluje_pliki(tmp_path):
     assert zapisz_pare("s", "pyt", "odp", "m", sciezka=a) is True
     assert zapisz_pare("s", "pyt", "odp", "m", sciezka=b) is True   # ten sam odcisk, inny plik
     assert len(list(czytaj_pary(a))) == 1 and len(list(czytaj_pary(b))) == 1
+
+
+@_bez_wylacznika
+def test_eksport_kolapsuje_probki_tego_samego_pytania(tmp_path):
+    """
+    🚨 Nauczyciel bywa NIESPÓJNY (zmierzone: te same nagłówki → +0.8 i -0.4). Eksport obu
+    uczy sprzecznych etykiet dla identycznego wejścia. Domyślnie: jedna próbka per pytanie.
+    """
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "te same nagłówki", '{"sentyment": 0.8}', "m", sciezka=p)
+    zapisz_pare("s", "te same nagłówki", '{"sentyment": -0.4}', "m", sciezka=p)
+    zapisz_pare("s", "inne nagłówki", '{"sentyment": 0.1}', "m", sciezka=p)
+    cel = tmp_path / "sft.jsonl"
+
+    assert eksportuj_sft(cel, sciezka=p) == 2            # 2 pytania, nie 3 próbki
+    tresci = [json.loads(w)["messages"][-1]["content"]
+              for w in cel.read_text(encoding="utf-8").splitlines()]
+    assert '{"sentyment": 0.8}' in tresci                # pierwsza próbka wygrywa (deterministycznie)
+    assert '{"sentyment": -0.4}' not in tresci           # sprzeczna NIE wchodzi
+
+    # Świadome wyłączenie (np. pod przyszły konsensus/self-consistency w E4).
+    assert eksportuj_sft(cel, sciezka=p, jedna_probka_na_pytanie=False) == 3
+
+
+@_bez_wylacznika
+def test_eksport_kolaps_dziala_na_starych_wpisach_bez_pola(tmp_path):
+    """Wsteczna zgodność: wpisy sprzed limitu nie mają `odcisk_pytania` — kolaps i tak działa."""
+    p = tmp_path / "pary.jsonl"
+    with p.open("w", encoding="utf-8") as f:
+        for i in range(3):
+            f.write(json.dumps({"odcisk": f"s{i}", "system": "s", "prompt": "to samo",
+                                "odpowiedz": f"sprzeczna {i}"}, ensure_ascii=False) + "\n")
+    assert eksportuj_sft(tmp_path / "sft.jsonl", sciezka=p) == 1
 
 
 @_bez_wylacznika

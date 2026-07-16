@@ -267,6 +267,27 @@ def _html_strona() -> str:
   <tbody></tbody>
 </table>
 
+<!-- SZKOŁA TIRO (E2) — postęp zbierania materiału treningowego przez NOTARIUSA -->
+<div class="sekcja-tytul">🎓 Szkoła TIRO — nauka lokalnego ucznia</div>
+<div class="siatka">
+  <div class="karta"><div class="etykieta">Par zebranych</div><div class="wartosc" id="tiro-par">—</div></div>
+  <div class="karta"><div class="etykieta">Materiał (tokeny)</div><div class="wartosc" id="tiro-tokeny">—</div></div>
+  <div class="karta"><div class="etykieta">Pisarz</div><div class="wartosc" id="tiro-stan" style="font-size:18px">—</div></div>
+  <div class="karta"><div class="etykieta">Nauczyciel</div><div class="wartosc" id="tiro-nauczyciel" style="font-size:16px">—</div></div>
+</div>
+<div style="margin:10px 0 4px">
+  <div style="display:flex;justify-content:space-between;font-size:12px;color:#aaa">
+    <span id="tiro-prog-opis">—</span><span id="tiro-prog-liczby">—</span>
+  </div>
+  <div style="background:#1a1a1a;border:1px solid #333;border-radius:6px;height:18px;overflow:hidden;margin-top:4px">
+    <div id="tiro-pasek" style="height:100%;width:0%;background:linear-gradient(90deg,#6b4f1d,var(--zloto));transition:width .4s"></div>
+  </div>
+</div>
+<table id="tiro-zrodla">
+  <thead><tr><th>Źródło par</th><th>Ile</th></tr></thead>
+  <tbody></tbody>
+</table>
+
 <!-- KONFIGURACJA TRADINGVIEW -->
 <details>
   <summary>📡 Konfiguracja TradingView Webhook (W-354)</summary>
@@ -450,8 +471,36 @@ document.getElementById('tv-template').textContent =
 
 /* ── Startuj ──────────────────────────────────────────────────── */
 odswiez();
+// ── Szkoła TIRO: postęp zbierania par (E2). Osobny fetch, bo /tiro.json nie zależy
+// od stanu pętli — zbiór rośnie też gdy pętla nie handluje (zwiad, auto-lekcje).
+async function odswiezTiro() {
+  try {
+    const t = await (await fetch('/tiro.json')).json();
+    const p = t.postep || {cel:0, procent:0, brakuje:0, opis:'—'};
+    document.getElementById('tiro-par').textContent = (t.par ?? 0).toLocaleString('pl-PL');
+    document.getElementById('tiro-tokeny').textContent =
+      '~' + (t.szac_tokenow_odpowiedzi ?? 0).toLocaleString('pl-PL');
+    document.getElementById('tiro-stan').textContent = t.wlaczony ? '✅ zbiera' : '⏸ wyłączony';
+    const nauczyciele = Object.keys(t.modele || {});
+    document.getElementById('tiro-nauczyciel').textContent = nauczyciele.join(', ') || '—';
+    document.getElementById('tiro-prog-opis').textContent = p.opis || '—';
+    document.getElementById('tiro-prog-liczby').textContent =
+      `${(t.par ?? 0)}/${p.cel} — ${p.procent}% (brakuje ${p.brakuje})`;
+    document.getElementById('tiro-pasek').style.width = Math.min(p.procent || 0, 100) + '%';
+    const tb = document.querySelector('#tiro-zrodla tbody');
+    tb.innerHTML = '';
+    for (const [zrodlo, ile] of Object.entries(t.zrodla || {})) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${zrodlo}</td><td>${ile}</td>`;
+      tb.appendChild(tr);
+    }
+  } catch (e) { /* panel poboczny — cisza, nie psujemy reszty dashboardu */ }
+}
+
 setInterval(odswiez, 2000);
 setInterval(ladujWykres, 5000);   // wykres świeży co 5s
+odswiezTiro();
+setInterval(odswiezTiro, 5000);   // zbiór rośnie wolno — 5s w zupełności wystarczy
 </script>
 </body></html>"""
 
@@ -461,6 +510,7 @@ def obsluz_sciezke(path: str, stan, odbiornik=None, magazyn=None) -> Tuple[int, 
     Czysty GET router (testowalny bez gniazda). Zwraca (status, content_type, body_bytes).
       GET /                        → HTML panelu
       GET /stan.json               → StanDashboardu + webhook stats + symbole_swiec
+      GET /tiro.json               → postęp Szkoły TIRO (NOTARIUS: pary nauczyciel→odpowiedź)
       GET /godlo.svg               → SVG godła
       GET /wykresy/{SYMBOL}.json   → świece: webhook TV (W-354) LUB feed MEXC (W-361)
       inne                         → 404
@@ -480,6 +530,18 @@ def obsluz_sciezke(path: str, stan, odbiornik=None, magazyn=None) -> Tuple[int, 
         if magazyn is not None:
             symbole.update(magazyn.symbole())
         dane["symbole_swiec"] = sorted(symbole)
+        body = json.dumps(dane, ensure_ascii=False).encode("utf-8")
+        return 200, "application/json; charset=utf-8", body
+    if sciezka == "/tiro.json":
+        # Panel TIRO (Szkoła — postęp zbierania par przez NOTARIUSA). Świadomie NIEZALEŻNY
+        # od `stan` pętli: zbiór rośnie od każdego wywołania Hyginusa (zwiad, auto-lekcje),
+        # nie tylko podczas handlu — panel ma pokazywać prawdę nawet gdy pętla nic nie robi.
+        try:
+            from imperium.biblioteki.notarius import statystyki
+            dane = statystyki()
+        except Exception as e:  # noqa: BLE001 — panel poboczny NIGDY nie wywraca dashboardu
+            dane = {"blad": str(e), "par": 0,
+                    "postep": {"cel": 0, "procent": 0.0, "brakuje": 0, "opis": "—"}}
         body = json.dumps(dane, ensure_ascii=False).encode("utf-8")
         return 200, "application/json; charset=utf-8", body
     if sciezka == "/godlo.svg":

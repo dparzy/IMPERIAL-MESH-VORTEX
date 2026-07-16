@@ -58,6 +58,19 @@ ENV_WYLACZNIK = "TIRO_NOTARIUS"
 # 200k znaków ≈ 50k tokenów — powyżej i tak nie zmieści się w kontekście ucznia 1-4B.
 LIMIT_ZNAKOW = 200_000
 
+# 🚨 LIMIT PRÓBEK NA PYTANIE — bezpiecznik przeciw MONOKULTURZE (zmierzone 2026-07-16).
+# POWÓD (twardy dowód z danych, nie teoria): pętla live pyta o TE SAME nagłówki co cykl.
+# Zmierzone: 17 par news_llm = tylko 4 unikalne zestawy nagłówków; jeden pytany 10× dostał
+# 10 RÓŻNYCH odpowiedzi (sentyment od +0.8 do -0.4). Dedup po całej parze tego NIE łapie,
+# bo odpowiedzi się różnią. Skutek bez limitu: ~4 pary/min z pętli live = ~5000/dobę
+# near-duplikatów, które utopiłyby wartościowe pary z bibliotekarza, a model uczyłby się
+# SPRZECZNYCH etykiet dla identycznego wejścia (najgorszy możliwy sygnał treningowy).
+#
+# Dlaczego limit, a nie dedup po samym pytaniu: kilka próbek tego samego wejścia MA wartość —
+# pozwalają policzyć KONSENSUS przy eksporcie (self-consistency: mediana kilku próbek bije
+# pojedynczy strzał nauczyciela). Kilka = sygnał, dziesięć = zalew. Stąd limit, nie zakaz.
+LIMIT_PROBEK_NA_PYTANIE = 3
+
 # Progi zbioru — ILE PAR TRZEBA, żeby trening miał sens (zwiad web 2026-07-16, badania distylacji).
 # Bez tych progów licznik „zebrano 47" nic nie mówi; z nimi Cezar widzi postęp wobec CELU (Prawo XXIV).
 # ⚠️ To orientacyjne progi z literatury, nie prawo natury — rozstrzyga egzamin w arenie (E5).
@@ -94,12 +107,16 @@ def _przytnij(tekst: str) -> tuple[str, bool]:
 
 def odcisk(system_prompt: str, tresc: str, odpowiedz: str) -> str:
     """
-    Odcisk pary (sha256, 16 znaków). Dedup po CAŁEJ parze, nie po samym prompcie:
-    ten sam prompt przy temperaturze >0 daje inną odpowiedź, a różne odpowiedzi na to samo
-    pytanie NIOSĄ informację (wariancja nauczyciela). Duplikat = identyczne pytanie ORAZ
-    identyczna odpowiedź (czyli realne powtórzenie z re-runu, bez nowej wiedzy).
+    Odcisk CAŁEJ pary (sha256, 16 znaków) — łapie dosłowne powtórzenie (re-run bez nowej wiedzy).
+    Uwaga: sam ten odcisk NIE wystarcza — patrz `odcisk_pytania` i LIMIT_PROBEK_NA_PYTANIE.
     """
     surowe = f"{system_prompt}\x00{tresc}\x00{odpowiedz}".encode("utf-8", errors="replace")
+    return hashlib.sha256(surowe).hexdigest()[:16]
+
+
+def odcisk_pytania(system_prompt: str, tresc: str) -> str:
+    """Odcisk SAMEGO pytania (bez odpowiedzi) — do limitowania próbek tego samego wejścia."""
+    surowe = f"{system_prompt}\x00{tresc}".encode("utf-8", errors="replace")
     return hashlib.sha256(surowe).hexdigest()[:16]
 
 
@@ -124,9 +141,19 @@ def _zrodlo_wywolania() -> str:
     return "nieznane"
 
 
-def _wczytaj_odciski(sciezka: Path) -> set[str]:
-    """Pełny odczyt odcisków z pliku. Zepsute linie pomijamy — plik ma być odporny."""
-    znane: set[str] = set()
+class _Stan:
+    """Stan zbioru potrzebny do decyzji o zapisie: odciski par + licznik próbek per pytanie."""
+
+    __slots__ = ("pary", "pytania")
+
+    def __init__(self) -> None:
+        self.pary: set[str] = set()               # odciski całych par (dosłowne powtórzenia)
+        self.pytania: Dict[str, int] = {}         # odcisk pytania → ile próbek już mamy
+
+
+def _wczytaj_stan(sciezka: Path) -> _Stan:
+    """Pełny odczyt stanu z pliku. Zepsute linie pomijamy — plik ma być odporny."""
+    stan = _Stan()
     try:
         with sciezka.open("r", encoding="utf-8") as f:
             for linia in f:
@@ -137,11 +164,20 @@ def _wczytaj_odciski(sciezka: Path) -> set[str]:
                     wpis = json.loads(linia)
                 except json.JSONDecodeError:
                     continue          # uszkodzona linia nie blokuje reszty
-                if isinstance(wpis, dict) and (h := wpis.get("odcisk")):
-                    znane.add(h)
+                if not isinstance(wpis, dict):
+                    continue
+                if h := wpis.get("odcisk"):
+                    stan.pary.add(h)
+                # Starsze wpisy (sprzed limitu próbek) nie mają `odcisk_pytania` — odtwarzamy
+                # go z treści, żeby limit działał też na tym, co już zebrane.
+                hp = wpis.get("odcisk_pytania")
+                if not hp and (wpis.get("prompt") is not None):
+                    hp = odcisk_pytania(wpis.get("system") or "", wpis.get("prompt") or "")
+                if hp:
+                    stan.pytania[hp] = stan.pytania.get(hp, 0) + 1
     except OSError as e:
         logger.warning(f"[Notarius] Nie mogę odczytać {sciezka.name}: {e}")
-    return znane
+    return stan
 
 
 # Cache odcisków per plik: {ścieżka: (mtime_ns, rozmiar, zbiór_odcisków)}.
@@ -150,43 +186,54 @@ def _wczytaj_odciski(sciezka: Path) -> set[str]:
 # MB) dawało to koszt kwadratowy i rosnące opóźnienie KAŻDEGO wywołania Hyginusa. To ta sama
 # klasa wady, którą Księga Wad Kodu nazywa „I/O per iteracja → batchuj".
 # Poprawność mimo cache: stat() (2 liczby) wykrywa zmianę pliku spoza procesu → przeładowanie.
-_CACHE_ODCISKOW: Dict[str, tuple[int, int, set[str]]] = {}
+_CACHE_STANU: Dict[str, tuple[int, int, _Stan]] = {}
 
 
-def _znane_odciski(sciezka: Path) -> set[str]:
+def _znany_stan(sciezka: Path) -> _Stan:
     """
-    Odciski już zapisanych par (dedup) — z cache. Zamiast czytać cały plik, robimy `stat()`:
-    gdy mtime i rozmiar się zgadzają z zapamiętanymi, plik jest ten sam → cache jest prawdą.
-    Zmiana spoza procesu (inny proces, ręczna edycja) → przeładowanie. Brak pliku → pusty zbiór.
+    Stan zbioru — z cache. Zamiast czytać cały plik, robimy `stat()`: gdy mtime i rozmiar
+    zgadzają się z zapamiętanymi, plik jest ten sam → cache jest prawdą. Zmiana spoza procesu
+    (inny proces, ręczna edycja) → przeładowanie. Brak pliku → stan pusty.
     """
     klucz = str(sciezka)
     try:
         st = sciezka.stat()
     except OSError:
-        _CACHE_ODCISKOW.pop(klucz, None)      # plik zniknął → cache bezwartościowy
-        return set()
+        _CACHE_STANU.pop(klucz, None)      # plik zniknął → cache bezwartościowy
+        return _Stan()
 
-    wpis = _CACHE_ODCISKOW.get(klucz)
+    wpis = _CACHE_STANU.get(klucz)
     if wpis and wpis[0] == st.st_mtime_ns and wpis[1] == st.st_size:
         return wpis[2]
 
-    znane = _wczytaj_odciski(sciezka)
-    _CACHE_ODCISKOW[klucz] = (st.st_mtime_ns, st.st_size, znane)
-    return znane
+    stan = _wczytaj_stan(sciezka)
+    _CACHE_STANU[klucz] = (st.st_mtime_ns, st.st_size, stan)
+    return stan
 
 
-def _dopisz_do_cache(sciezka: Path, h: str) -> None:
-    """Po własnym zapisie: dołóż odcisk i przestempluj stat — inaczej następny zapis czytałby plik od nowa."""
+def _dopisz_do_cache(sciezka: Path, h: str, hp: str) -> None:
+    """
+    Po własnym zapisie: dołóż odciski i przestempluj stat — inaczej następny zapis czytałby plik od nowa.
+
+    🚨 GRANICA (bug złapany testem 2026-07-16): inkrementujemy TYLKO gdy mamy cache sprzed zapisu.
+    Gdy cache jest zimny, `_wczytaj_stan` czyta plik JUŻ ZAWIERAJĄCY nowy wpis — policzył go więc
+    sam. Dodatkowa inkrementacja liczyłaby tę samą parę dwa razy i limit odpalałby o jeden
+    za wcześnie. (Na zbiorze `pary` niewidoczne — set jest idempotentny; widać dopiero na liczniku.)
+    """
     klucz = str(sciezka)
     try:
         st = sciezka.stat()
     except OSError:
-        _CACHE_ODCISKOW.pop(klucz, None)
+        _CACHE_STANU.pop(klucz, None)
         return
-    wpis = _CACHE_ODCISKOW.get(klucz)
-    znane = wpis[2] if wpis else _wczytaj_odciski(sciezka)
-    znane.add(h)
-    _CACHE_ODCISKOW[klucz] = (st.st_mtime_ns, st.st_size, znane)
+    wpis = _CACHE_STANU.get(klucz)
+    if wpis:
+        stan = wpis[2]                                    # stan sprzed zapisu → dolicz nowy wpis
+        stan.pary.add(h)
+        stan.pytania[hp] = stan.pytania.get(hp, 0) + 1
+    else:
+        stan = _wczytaj_stan(sciezka)                     # świeży odczyt — nowy wpis już wliczony
+    _CACHE_STANU[klucz] = (st.st_mtime_ns, st.st_size, stan)
 
 
 def zapisz_pare(system_prompt: str,
@@ -202,7 +249,8 @@ def zapisz_pare(system_prompt: str,
     NIGDY nie rzuca wyjątku (żelazna zasada: pisarz nie przerywa mówcy). Pomija zapis gdy:
       • wyłączony przez TIRO_NOTARIUS=0,
       • pusta treść lub pusta odpowiedź (nie ma czego uczyć — Prawo XV: nie karmimy śmieciem),
-      • duplikat (identyczne pytanie i odpowiedź już w zbiorze).
+      • dosłowny duplikat (identyczne pytanie ORAZ odpowiedź już w zbiorze),
+      • osiągnięty LIMIT_PROBEK_NA_PYTANIE dla tego wejścia (anty-monokultura — patrz stała).
     """
     try:
         if not wlaczony():
@@ -215,7 +263,14 @@ def zapisz_pare(system_prompt: str,
         system_prompt = system_prompt or ""
 
         h = odcisk(system_prompt, tresc, odpowiedz)
-        if h in _znane_odciski(cel):
+        hp = odcisk_pytania(system_prompt, tresc)
+        stan = _znany_stan(cel)
+
+        if h in stan.pary:
+            return False                       # dosłowne powtórzenie — zero nowej wiedzy
+        if stan.pytania.get(hp, 0) >= LIMIT_PROBEK_NA_PYTANIE:
+            # Mamy już dość próbek TEGO wejścia. Kolejne to monokultura (pętla live pyta
+            # o te same nagłówki w kółko) + sprzeczne etykiety dla identycznego promptu.
             return False
 
         prompt_t, prompt_przyciety = _przytnij(str(tresc))
@@ -224,6 +279,9 @@ def zapisz_pare(system_prompt: str,
 
         wpis: Dict[str, Any] = {
             "odcisk": h,
+            # Zapisany wprost, żeby eksport mógł grupować próbki tego samego pytania
+            # (konsensus) bez przeliczania hasha z treści.
+            "odcisk_pytania": hp,
             "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "model": model,
             "temperatura": temperatura,
@@ -241,7 +299,7 @@ def zapisz_pare(system_prompt: str,
         cel.parent.mkdir(parents=True, exist_ok=True)
         with cel.open("a", encoding="utf-8") as f:
             f.write(json.dumps(wpis, ensure_ascii=False) + "\n")
-        _dopisz_do_cache(cel, h)
+        _dopisz_do_cache(cel, h, hp)
         return True
 
     except Exception as e:  # noqa: BLE001 — ŻELAZNA ZASADA: awaria pisarza ≠ awaria nauczyciela
@@ -312,7 +370,8 @@ def statystyki(sciezka: Optional[Path] = None) -> Dict[str, Any]:
 
 def eksportuj_sft(cel: Path, sciezka: Optional[Path] = None,
                   min_znakow_odpowiedzi: int = 0,
-                  pomin_przyciete: bool = True) -> int:
+                  pomin_przyciete: bool = True,
+                  jedna_probka_na_pytanie: bool = True) -> int:
     """
     Eksport do formatu SFT (Supervised Fine-Tuning) — `{"messages": [...]}` per linia.
     To format, który łykają Unsloth / TRL / Axolotl bez konwersji (etap E4, trening w Colab).
@@ -324,11 +383,19 @@ def eksportuj_sft(cel: Path, sciezka: Optional[Path] = None,
     To trucizna wprost przeciw zasadzie LIMA (1000 doskonałych > 50000 miernych), na której
     oparliśmy progi zbioru. Wyłączaj świadomie i tylko do inspekcji (recenzja 2026-07-16).
 
+    `jedna_probka_na_pytanie` (domyślnie True) — 🚨 zbiór trzyma do LIMIT_PROBEK_NA_PYTANIE
+    próbek tego samego wejścia, a nauczyciel bywa NIESPÓJNY: zmierzone 2026-07-16 — ten sam
+    zestaw nagłówków dostał sentyment +0.8 i -0.4. Wyeksportowanie obu uczy model SPRZECZNYCH
+    etykiet dla identycznego promptu (najgorszy możliwy sygnał). Bierzemy więc PIERWSZĄ próbkę
+    per pytanie — deterministycznie. Surowe próbki zostają w zbiorze, bo pozwolą policzyć
+    KONSENSUS (self-consistency: mediana kilku strzałów > jeden strzał) — to praca na E4.
+
     Zwraca liczbę wyeksportowanych przykładów.
     """
     cel = Path(cel)
     cel.parent.mkdir(parents=True, exist_ok=True)
     n = 0
+    widziane_pytania: set[str] = set()
     with cel.open("w", encoding="utf-8") as f:
         for p in czytaj_pary(sciezka):
             if pomin_przyciete and p.get("przyciety"):
@@ -336,6 +403,14 @@ def eksportuj_sft(cel: Path, sciezka: Optional[Path] = None,
             odp = p.get("odpowiedz") or ""
             if len(odp) < min_znakow_odpowiedzi:
                 continue
+            if jedna_probka_na_pytanie:
+                # Starsze wpisy nie mają pola — odtwarzamy odcisk z treści, żeby kolaps
+                # działał też na tym, co zebrano przed wprowadzeniem limitu.
+                hp = p.get("odcisk_pytania") or odcisk_pytania(p.get("system") or "",
+                                                               p.get("prompt") or "")
+                if hp in widziane_pytania:
+                    continue
+                widziane_pytania.add(hp)
             wiadomosci: List[Dict[str, str]] = []
             if p.get("system"):
                 wiadomosci.append({"role": "system", "content": p["system"]})

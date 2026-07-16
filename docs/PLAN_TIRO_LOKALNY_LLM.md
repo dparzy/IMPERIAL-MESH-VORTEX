@@ -168,7 +168,41 @@ Czyli: rozwój **skokami po pomiarze**, nie płynny. Zgodne z ZASADĄ WPIĘCIA (
         wpięty w most `GlosImperium.zapytaj()` → każde wywołanie Hyginusa (newsy/auto-lekcje/zwiad)
         zostawia parę `prompt→odpowiedź` w `bibliotheca_ulpia/dane/tiro_pary_nauczyciela.jsonl`.
         Zweryfikowane na żywo (realne wywołanie API → para zapisana). 32 testy granic zielone.
+  - [x] **ŻNIWO Z BIBLIOTEKI — 2026-07-16, 20/20 tematów, 0 błędów.** Nie trzeba było nowego kodu:
+        `narzedzia/bibliotekarz.py` już czyta RAG i woła DeepSeeka, a NOTARIUS łapie każdą parę
+        automatycznie (bo bibliotekarz idzie przez most). **Plon: 60 par (3/temat) + 30 wpisów
+        w kolejce hipotez** — podwójny zwrot z tego samego wydatku (kandydaci do areny ORAZ materiał
+        treningowy; wcześniej te odpowiedzi po prostu znikały). Koszt: grosze.
+        **Ekstrapolacja: do progu 500 ~165 tematów, do 1000 ~330** (~5 tematów/książkę) — kilka
+        popołudni, nie 100 dni jak przy zbieraniu organicznym (newsy kapią ~10/dzień).
+  - [x] **PODGLĄD (Prawo XXIV, rozkaz Cezara „lubię widzieć postępy"):** panel **🎓 Szkoła TIRO**
+        w `imperium/swiatynie/web_dashboard.py` + endpoint `/tiro.json`. Licznik par, pasek do progu,
+        tokeny, rozbicie na źródła, stan pisarza. Świadomie NIEZALEŻNY od stanu pętli — zbiór rośnie
+        od każdego wywołania Hyginusa, nie tylko podczas handlu. Awaria NOTARIUSA nie wywraca
+        dashboardu (test). ⚠️ Wymaga restartu `petla_live` (stary proces ma stary kod w pamięci).
   - [ ] adapter `llama-server` jako cichy dubler obok Hyginusa (opt-in OFF) — uczeń liczy, nie decyduje.
+
+### 🚨 ANTY-MONOKULTURA — bezpiecznik wymuszony przez REALNE dane (2026-07-16)
+Zmierzone przy pierwszym żniwie: **17 par news_llm = tylko 4 unikalne zestawy nagłówków**; jeden
+pytany **10×** dostał **10 różnych odpowiedzi** (sentyment +0.8 … −0.4). Pierwotny projekt dedupu
+(„ten sam prompt, inna odpowiedź = wariancja = informacja") **nie przetrwał zderzenia z danymi** —
+sprzeczne etykiety dla identycznego wejścia to najgorszy możliwy sygnał treningowy.
+- **`LIMIT_PROBEK_NA_PYTANIE = 3`** — kilka próbek pozwala policzyć konsensus (self-consistency),
+  dziesięć to zalew. Limit, nie zakaz.
+- **`eksportuj_sft(jedna_probka_na_pytanie=True)`** — kolaps do jednej próbki per pytanie.
+  Zweryfikowane na realnych danych: 38 par surowych → 25 (13 sprzecznych near-duplikatów odsianych).
+- ⚠️ **Nauczyciel bywa zepsuty:** w danych `{"sentyment": -0.4, "pewnosc": 0.6"}` — niepoprawny JSON.
+  Do uwzględnienia w filtrze jakości przy E4.
+
+### 🚨 PRAWO XV — NOTARIUS wykrył, że BRAMKA PALI PIENIĄDZE (2026-07-16)
+**Zmierzone, nie zgadnięte:** sam `tests/test_petla_live.py` → **8 płatnych wywołań DeepSeeka**,
+czas **4 min 42 s** (33 testy). Przyczyna: `handluj_live` buduje `AdapterNewsLLM(fetcher=FetcherNewsRSS())`,
+a `uzyj_llm` jest **domyślnie True** + `glos=None` → lazy-init z klucza → testy ciągną PRAWDZIWY RSS
+z sieci i płacą za PRAWDZIWY LLM. Cała bramka ~17 wywołań na przebieg.
+**Trzy szkody:** testy nieszczelne (zależą od sieci i od tego, co akurat piszą o ETH → niedeterministyczne),
+kosztują przy każdym przebiegu, są przez to wolne.
+**Bez NOTARIUSA nikt by tego nie zauważył.** Do naprawy: wstrzykiwać atrapę fetchera/głosu w testach
+pętli (`uzyj_llm=False`), tak jak robi to już `test_sentyment_news.py`.
 - [ ] **E3 — Pierwszy A/B:** surowy mały model vs DeepSeek na newsach (Brier) — baseline jakości ucznia.
 - [ ] **E4 — Szkoła:** trening LoRA w Colab na zebranym datasecie → GGUF → lokalna inferencja.
 - [ ] **E5 — Egzamin:** A/B ucznia-po-treningu vs nauczyciel; awans roli tylko po zielonym pomiarze.

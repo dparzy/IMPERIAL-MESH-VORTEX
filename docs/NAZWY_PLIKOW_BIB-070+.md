@@ -11,7 +11,8 @@
 > 198, 199, 262. Nie używaj ich — zostają wolne, żeby nie przenumerowywać całości.
 > (**074 ZAJĘTY** od 2026-07-16 — przydzielony zadaniom Boyda, patrz Priorytet 0.)
 >
-> ✅ **JUŻ W BIBLIOTECE (2026-07-16):** BIB-070, 071, 072, 073, 074 — łącznie 74 książki, 29 535 frag.
+> ✅ **JUŻ W BIBLIOTECE (2026-07-16):** BIB-070..079 — **cały Priorytet 0 domknięty**.
+> Łącznie **79 książek, 29 699 fragmentów**. Treść każdej zweryfikowana CZYTANIEM, nie nazwą.
 
 ## ⭐ PRIORYTET 0 — bierz najpierw (pewne, otwarte, zamykają zerowe luki)
 
@@ -20,11 +21,11 @@ BIB-070_Vaswani-et-al_Attention-Is-All-You-Need.pdf                             
 BIB-071_Easley-Lopez-de-Prado-OHara_Flow-Toxicity-and-Liquidity-in-a-High-Frequency-World.pdf  ✅ MAMY
 BIB-073_Boyd-Vandenberghe_Convex-Optimization.pdf                                      ✅ MAMY
 BIB-074_Boyd-Vandenberghe_Additional-Exercises-for-Convex-Optimization.pdf             ✅ MAMY
-BIB-075_Nakamoto_Bitcoin-A-Peer-to-Peer-Electronic-Cash-System.pdf
-BIB-076_Buterin_Ethereum-Whitepaper.pdf
-BIB-077_Daian-et-al_Flash-Boys-2.0-Frontrunning-in-Decentralized-Exchanges.pdf
-BIB-078_Adams-et-al_Uniswap-v3-Core.pdf
-BIB-079_Gneiting-Raftery_Strictly-Proper-Scoring-Rules-Prediction-and-Estimation.pdf
+BIB-075_Nakamoto_Bitcoin-A-Peer-to-Peer-Electronic-Cash-System.epub          ✅ MAMY
+BIB-076_Buterin_Ethereum-Whitepaper.pdf  ✅ MAMY
+BIB-077_Daian-et-al_Flash-Boys-2.0-Frontrunning-in-Decentralized-Exchanges.pdf  ✅ MAMY
+BIB-078_Adams-et-al_Uniswap-v3-Core.pdf  ✅ MAMY
+BIB-079_Gneiting-Raftery_Strictly-Proper-Scoring-Rules-Prediction-and-Estimation.pdf  ✅ MAMY
 ```
 ✅ **BIB-072 — JUŻ W BIBLIOTECE** (2026-07-16), Cezar odnalazł kupiony egzemplarz 2. edycji:
 ```

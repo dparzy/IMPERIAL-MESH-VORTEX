@@ -6,6 +6,7 @@ from __future__ import annotations
 import os
 import re
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -23,13 +24,34 @@ def _epub(path: Path) -> str:
         def handle_data(self, data: str):
             self.parts.append(data)
 
-    book = epub.read_epub(str(path), options={"ignore_ncx": True})
-    chunks: list[str] = []
-    for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
-        p = _Strip()
-        p.feed(item.get_content().decode("utf-8", errors="replace"))
-        chunks.append(" ".join(p.parts))
-    return "\n\n".join(chunks)
+    # ebooklib bywa KRUCHY na POPRAWNYCH epubach — zakłada strukturę, której standard nie wymaga.
+    # Realny przypadek (2026-07-16, whitepaper Bitcoina BIB-075): ebooklib 0.20.0 robi
+    #   nav_node = html_node.xpath("//nav[@*='toc']")[0]
+    # bez zabezpieczenia — epub z nawigacją BEZ elementu oznaczonego 'toc' → IndexError
+    # („list index out of range") → ekstrakcja 0 znaków. Plik był w pełni poprawny (36 plików,
+    # komplet rozdziałów) — to bug BIBLIOTEKI, nie książki.
+    # Fallback na calibre = ten sam wzorzec, którego już używa `_djvu`. Chmura tego nie potrzebuje:
+    # laptop konwertuje RAZ, cache jest wersjonowany (patrz docstring konwertera).
+    try:
+        book = epub.read_epub(str(path), options={"ignore_ncx": True})
+        chunks: list[str] = []
+        for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
+            p = _Strip()
+            p.feed(item.get_content().decode("utf-8", errors="replace"))
+            chunks.append(" ".join(p.parts))
+        tekst = "\n\n".join(chunks)
+    except Exception as e:  # noqa: BLE001 — kruchość ebooklib ≠ zła książka
+        print(f"  [WARN] ekstraktor: {path.name} → ebooklib padł ({type(e).__name__}: {e}); "
+              "próbuję calibre", file=sys.stderr)
+        return _calibre(path)
+
+    # PUSTY wynik BEZ wyjątku też jest porażką (Prawo XV: cicha strata jest gorsza od głośnej) —
+    # np. epub, w którym ebooklib nie rozpoznał żadnego ITEM_DOCUMENT. Nie utrwalamy pustki.
+    if not tekst.strip():
+        print(f"  [WARN] ekstraktor: {path.name} → ebooklib dał 0 znaków; próbuję calibre",
+              file=sys.stderr)
+        return _calibre(path)
+    return tekst
 
 
 def _pdf(path: Path) -> str:

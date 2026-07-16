@@ -39,7 +39,12 @@ dzieł uczy lepiej niż 400 modnych tytułów. Uczeń TIRO nauczy się tego, co 
 
 ---
 
-## 🎯 Priorytet 0 — WEŹ DZIŚ (darmowe, wypełniają zerowe luki)
+## 🎯 Priorytet 0 — ✅ **DOMKNIĘTY 2026-07-16** (wszystkie w bibliotece i w RAG)
+
+> Stan: **79 książek, 29 699 fragmentów.** BIB-070..079 zaindeksowane, treść każdej
+> **zweryfikowana czytaniem tekstu**, nie nazwy pliku (BIB-073 okazał się zbiorem zadań —
+> patrz niżej). Zerowe luki zamknięte: transformery, VPIN, prognozowanie, optymalizacja,
+> MEV/DeFi u źródła, reguły punktacji pod Sybillę.
 
 | BIB | Autor | Tytuł | Dlaczego teraz |
 |---|---|---|---|
@@ -48,11 +53,19 @@ dzieł uczy lepiej niż 400 modnych tytułów. Uczeń TIRO nauczy się tego, co 
 | 072 | Hyndman, Athanasopoulos | *Forecasting: Principles and Practice* (**2nd ed.**) ✅ **W BIBLIOTECE** | ✅ **ZAINDEKSOWANA 2026-07-16** — Cezar ma **kupiony** egzemplarz (PDF, 2. edycja) z własnego dysku. 257 fragmentów w RAG, korpus 27 959 → 28 535. Kanon prognozowania — domyka zerową lukę (mamy WFO i Sybillę z Brierem, nie mieliśmy teorii). ⚠️ Uwaga na przyszłość: **downloadowalna wersja FPP jest PŁATNA** (OTexts: „Buy a print or downloadable version"); darmowe jest tylko czytanie online — nie ściągać z serwisów typu dokumen.pub. 3. edycja różni się głównie przejściem `forecast`→`fable` (R), dla nas bez znaczenia |
 | 073 | Boyd, Vandenberghe | *Convex Optimization* 🆓 ✅ **W BIBLIOTECE** | ✅ **ZAINDEKSOWANY 2026-07-16** — 734 fragmenty. Licencja czysta: *„Copyright… held by Cambridge University Press, who have kindly agreed to allow us to keep the book available on the web"* — wydawca **wprost zgodził się** na darmową dystrybucję (to realne 🆓, nie „darmowe do czytania" jak FPP). Plik: `bv_cvxbook.pdf` ze https://web.stanford.edu/~boyd/cvxbook/ |
 | 074 | Boyd, Vandenberghe | *Additional Exercises for Convex Optimization* 🆓 ✅ **W BIBLIOTECE** | ✅ **ZAINDEKSOWANY 2026-07-16** — 517 fragmentów. Numer był wolny (spalony na odsyłacz do Goodfellowa = BIB-068). ⚠️ **PUŁAPKA:** na stronie Boyda leżą OBOK SIEBIE dwa PDF-y; ten zbiór zadań pobrał się zamiast podręcznika i wpadł pod nazwą „Convex-Optimization" — wykryte dopiero czytaniem treści, nie nazwy. Wartość dla TIRO realna: **rozwiązane zadania pokazują rozumowanie krok po kroku**, nie samą teorię |
-| 075 | Daspremont i in. / Nakamoto | *Bitcoin: A Peer-to-Peer Electronic Cash System* 🆓 ✅ | Whitepaper źródłowy — 9 stron, mamy o nim książki, nie mamy jego |
-| 076 | Buterin i in. | *Ethereum Whitepaper* 🆓 ✅ | j.w. — źródło zamiast opracowań |
-| 077 | Daian i in. | *Flash Boys 2.0: Frontrunning in Decentralized Exchanges…* (2019) 🆓 ✅ | **Kanoniczne źródło o MEV** — zero u nas |
-| 078 | Adams i in. | *Uniswap v3 Core* (whitepaper) 🆓 ⚠️ | Mechanika AMM u źródła |
-| 079 | Gneiting, Raftery | *Strictly Proper Scoring Rules, Prediction, and Estimation* (JASA 2007) 🆓 ✅ | **Teoria pod Brier/Sybillę** — mamy Księgi Sybillińskie, nie mamy teorii |
+| 075 | Nakamoto | *Bitcoin: A Peer-to-Peer Electronic Cash System* 🆓 ✅ **W BIBLIOTECE** | ✅ 10 frag. (⚠️ moja pomyłka w 1. wersji listy: przypisałem współautora „Daspremont" — to **wyłącznie Nakamoto**). 🐞 Ten plik ujawnił bug ebooklib (patrz niżej) |
+| 076 | Buterin | *Ethereum Whitepaper* 🆓 ✅ **W BIBLIOTECE** | ✅ 40 frag. — źródło zamiast opracowań |
+| 077 | Daian i in. | *Flash Boys 2.0: Frontrunning in Decentralized Exchanges…* (2019) 🆓 ✅ **W BIBLIOTECE** | ✅ 42 frag. — **kanoniczne źródło o MEV**, było zero u nas |
+| 078 | Adams, Zinsmeister i in. | *Uniswap v3 Core* (2021) 🆓 ✅ **W BIBLIOTECE** | ✅ 19 frag. — mechanika AMM u źródła (autorzy potwierdzeni treścią: Hayden Adams, Noah Zinsmeister) |
+| 079 | Gneiting, Raftery | *Strictly Proper Scoring Rules, Prediction, and Estimation* (JASA 2007) 🆓 ✅ **W BIBLIOTECE** | ✅ 53 frag. — **teoria pod Brier/Sybillę**; RAG zwraca definicje regularnych reguł punktacji. Mieliśmy Księgi Sybillińskie bez teorii |
+
+### 🐞 Bug ujawniony przy BIB-075 (naprawiony 2026-07-16)
+Whitepaper Bitcoina (epub) ekstrahował **0 znaków**. Winowajcą NIE był plik (poprawny epub, 36 plików,
+komplet rozdziałów) tylko **`ebooklib` 0.20.0**: robi `html_node.xpath("//nav[@*='toc']")[0]` bez
+zabezpieczenia → `IndexError` na epubie, którego nawigacja nie ma elementu oznaczonego `toc`
+(standard tego nie wymaga). Naprawa w `narzedzia/rag/ekstraktor.py`: wyjątek **lub pusty wynik** →
+fallback na calibre (ten sam wzorzec, którego używa już `_djvu`). Po naprawie: 20 884 znaki, komplet
+fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regresji.
 
 ---
 

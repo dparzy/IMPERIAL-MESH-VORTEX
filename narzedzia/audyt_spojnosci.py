@@ -283,6 +283,67 @@ def audyt() -> tuple:
     except Exception as e:
         bledy.append(f"[W6] Błąd sprawdzania dat 'Stan na:': {e}")
 
+    # ── WARSTWA 6b: DATY WSZYSTKICH ŻYWYCH DOKUMENTÓW ────────────────────────
+    # ROZKAZ CEZARA 2026-07-16: „zapominasz o spójności dokumentów, pełna synchronizacja 1:1…
+    # straszny bałagan w tych dokumentach których przybywa. Zarządzam pełen porządek."
+    #
+    # DZIURA, KTÓRĄ TO ZATYKA (zmierzona): W6 pilnowała dat tylko w MANIFEST i README —
+    # 2 dokumenty z 64. Reszta gniła bezkarnie przy exit 0. Znalezione realne rozjazdy:
+    # ARCHITEKTURA_IMPERIUM (20 dni), MANUAL_UZYTKOWNIKA (25), REJESTR_INSPIRACJI (32).
+    #
+    # DLACZEGO PER-PLIK, NIE PER-REPO: odniesieniem jest ostatni commit TEGO dokumentu,
+    # nie całego repo. Inaczej GUBERNATOR.md („Stan na: 2026-06-16", od czerwca niezmieniony
+    # = POPRAWNY) dostawałby fałszywy alarm co dzień. Dokument ma nadążać za WŁASNĄ zmianą.
+    #
+    # POMIJAMY (Prawo I — nie falsyfikujemy historii): datowane snapshoty (data w NAZWIE pliku)
+    # oraz dokumenty akumulujące historię/generowane. Ich data to prawda ich czasu.
+    try:
+        import subprocess
+
+        POMIJANE_ZAWSZE = {"LOG_ZMIAN.md", "WIZJONER.md", "PAMIEC_SESJI.md",
+                           "MANIFEST_KODU.md", "README.md"}   # MANIFEST/README ma już W6
+
+        # Jedno przejście gita zamiast N wywołań: data ostatniego commitu per plik.
+        daty_plikow: dict = {}
+        _log = subprocess.run(
+            ["git", "log", "--format=@%cd", "--date=short", "--name-only", "--", "docs"],
+            capture_output=True, text=True, timeout=30)
+        biezaca = None
+        for linia in _log.stdout.splitlines():
+            if linia.startswith("@"):
+                biezaca = linia[1:].strip()
+            elif linia.strip() and biezaca:
+                daty_plikow.setdefault(linia.strip(), biezaca)   # pierwszy = najnowszy
+
+        przeterminowane = []
+        for sciezka_rel, data_commitu in sorted(daty_plikow.items()):
+            nazwa = os.path.basename(sciezka_rel)
+            if nazwa in POMIJANE_ZAWSZE:
+                continue
+            if re.search(r"\d{4}-\d{2}-\d{2}", nazwa):        # snapshot datowany nazwą
+                continue
+            pelna = os.path.join(ROOT, sciezka_rel)
+            if not os.path.isfile(pelna):                      # usunięty/przeniesiony
+                continue
+            with open(pelna, encoding="utf-8", errors="replace") as f:
+                tresc = f.read()
+            m = re.search(r"Stan na:\s*\**\s*(\d{4}-\d{2}-\d{2})", tresc)
+            if not m:
+                continue      # brak pola „Stan na:" NIE jest błędem — nie każdy dokument je ma
+            delta = (date.fromisoformat(data_commitu) - date.fromisoformat(m.group(1))).days
+            if delta > TOLERANCJA_DNI:
+                przeterminowane.append(f"{nazwa} ('Stan na:' {m.group(1)} vs commit "
+                                       f"{data_commitu} = {delta} dni)")
+        if przeterminowane:
+            bledy.append("[W6b] Dokumenty ze 'Stan na:' STARSZYM niż własna ostatnia zmiana "
+                         "(Prawo XXI reguła 9 — zaktualizuj datę w tym samym commicie co treść): "
+                         + "; ".join(przeterminowane))
+        else:
+            info.append(f"Daty żywych dokumentów (W6b): {len(daty_plikow)} sprawdzonych, "
+                        "wszystkie 'Stan na:' nadążają za własną zmianą ✅")
+    except Exception as e:  # noqa: BLE001 — brak gita nie może zabić audytu
+        info.append(f"Daty żywych dokumentów (W6b): pominięte ({type(e).__name__}: {e})")
+
     # ── WARSTWA 7: SIEROTY — pliki docs/ bez wpisu w INDEKS ─────────────────
     try:
         indeks_txt = _czytaj("docs/INDEKS_IMPERIUM.md")
@@ -511,6 +572,19 @@ def _warstwa_10_doc_keywords():
     """W10 — słowa kluczowe w dokumentach modułowych (spójność z kodem)."""
     bledy = []
 
+    # 🚨 LICZBA PRAW — POLICZONA z ZASADY_FUNDAMENTALNE, nie zaszyta (naprawa 2026-07-16).
+    # POWÓD: tu stało na sztywno `"21"` z komunikatem „aktualizuj z 19→21" — ktoś podbił ręcznie
+    # 19→21, a gdy praw przybyło do XXV, audyt dalej ŻĄDAŁ „21" i ODRZUCAŁ prawdziwe „25".
+    # Bramka egzekwowała KŁAMSTWO. Ironia: W10 pilnuje Prawa XXI, którego reguła 8 brzmi
+    # „liczby policzone, nie zaokrąglone" — a sama miała liczbę z pamięci. Zaszyta liczba
+    # MUSI się zestarzeć; to kwestia czasu, nie dyscypliny autora.
+    try:
+        with open(os.path.join(ROOT, "ZASADY_FUNDAMENTALNE.md"), encoding="utf-8") as f:
+            _zasady = f.read()
+        _liczba_praw = str(len(set(re.findall(r"PRAWO\s+([IVXL]+)\b", _zasady))))
+    except Exception:  # noqa: BLE001 — brak pliku praw nie może zabić audytu
+        _liczba_praw = None
+
     # Each entry: (file_path, required_keyword, error_message)
     checks = [
         ("docs/KALKULATOR_LEWARA.md", "vol_targeting",
@@ -527,9 +601,12 @@ def _warstwa_10_doc_keywords():
          "GENERAL_LEGATUS.md brak 'HedgeMWU' — online learning nie opisane"),
         ("docs/LEGIONY_ARCHITEKTURA.md", "Hurst",
          "LEGIONY_ARCHITEKTURA.md brak 'Hurst' — kategoria H nie opisana w legendzie"),
-        ("docs/ARCHITEKTURA_IMPERIUM.md", "21",
-         "ARCHITEKTURA_IMPERIUM.md brak '21' praw — aktualizuj z 19→21"),
     ]
+    if _liczba_praw:
+        checks.append((
+            "docs/ARCHITEKTURA_IMPERIUM.md", _liczba_praw,
+            f"ARCHITEKTURA_IMPERIUM.md nie podaje aktualnej liczby praw ({_liczba_praw}) — "
+            f"policzone z ZASADY_FUNDAMENTALNE.md. Zaktualizuj nagłówek."))
 
     for fpath, keyword, msg in checks:
         try:

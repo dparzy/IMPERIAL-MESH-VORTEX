@@ -1,7 +1,8 @@
 # 🏛️ ARCHITEKTURA IMPERIUM — pełna mapa
 
-> **Po co:** Jedno miejsce, które spina **21 prawami** z **realnym kodem** (75 modułów .py).
-> Pokazuje, jak Cesarstwo jest zbudowane i którędy płynie sygnał.
+> **Stan na:** 2026-07-16 · **Po co:** Jedno miejsce, które spina **25 Praw** z **realnym kodem**
+> (160 modułów .py, 87 neuronów). Pokazuje, jak Cesarstwo jest zbudowane i którędy płynie sygnał.
+> Liczby **policzone z kodu**, nie z pamięci (Prawo XXI reguła 8).
 
 ---
 
@@ -26,6 +27,9 @@
                                    kronikarz             logi, dziennik         [XIII]
                                    igrzyska              ranking batch + observer pattern [XV]
                                    hedge_mwu             MWU online learning (W-049)     [XV, XVI]
+                                   notarius              stenograf słów Nauczyciela → pary
+                                                         prompt→odpowiedź = surowiec Szkoły
+                                                         TIRO (E2)              [I, XV, XXIV]
 🧮 FUNDAMENT       fundament/     brama_kalkulatora     jedyne wejście do mat. [I, IX, XIII]
                                    kuznia_narzedzi       kanoniczne wskaźniki   [I]
 🏟️ KOLOSEUM        koloseum/      valhalla              backtest, Monte Carlo  [VI, VII]
@@ -91,8 +95,9 @@
 
 ## 📚 ŹRÓDŁA — Kanon biblioteki za architekturą (BIB)
 
-> **Stan na:** 2026-06-26 | **Po co ta architektura?** Każda warstwa Imperium ma teoretyczne
-> ugruntowanie w bibliotece (42 książki). Tu mapa: warstwa → książka. Pełna esencja: `bibliotheca_ulpia/encyklopedia/`.
+> **Po co ta architektura?** Każda warstwa Imperium ma teoretyczne ugruntowanie w bibliotece
+> (**79 książek** — policzone 2026-07-16). Tu mapa: warstwa → książka.
+> Pełna esencja: `bibliotheca_ulpia/encyklopedia/`.
 
 | Warstwa architektury | Dlaczego tak (koncept) | Źródło BIB |
 |----------------------|------------------------|-----------|

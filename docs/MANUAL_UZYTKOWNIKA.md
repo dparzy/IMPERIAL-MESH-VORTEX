@@ -1,6 +1,6 @@
 # 📖 MANUAL IMPERIUM — Pełna Instrukcja dla Nowicjusza
 
-> **Stan na:** 2026-06-20
+> **Stan na:** 2026-07-16
 > Wszystko krok po kroku, na laptopie, dla osoby która nigdy tego nie robiła.
 > Jak coś nie działa — szukaj sekcji „❓ Problemy" na końcu.
 

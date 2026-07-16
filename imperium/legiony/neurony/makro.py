@@ -111,3 +111,73 @@ class NeuronGoldBTC(MikroNeuron):
                 [f"GOLD/BTC_MOM={gbm:+.2f}σ — BTC rośnie vs złoto, lekki tailwind"])
         return self._bazowy_sygnal(gbm, "NEUTRAL", 0.0,
             [f"GOLD/BTC_MOM={gbm:+.2f}σ — stosunek neutralny"])
+
+
+class NeuronStablecoinFlow(MikroNeuron):
+    """
+    K-03 | Stablecoin Supply Flow — makro-płynność krypto („suchy proch").
+
+    Druk stablecoinów (rosnąca podaż USDT/USDC) = świeży kapitał gotowy wejść =
+    napływ = bullish. Umorzenia (spadek podaży) = kapitał wychodzi = bearish.
+    Kierunek ZWALIDOWANY pomiarem: 7d % zmiana podaży ma IC +0.05..+0.10 @7-30d na
+    zwroty BTC (narzedzia/pomiar_stablecoin_ic.py, AERARIUM, 2026-07-15) — DODATNI,
+    trend-following (nie kontrariański). Sygnał wolny (tygodnie-miesiąc), makro.
+
+    STABLE_FLOW: 7-dniowa % zmiana total supply (DefiLlama). Dostarcza AdapterStablecoin
+    (opt-in --stablecoin). Bez adaptera abstynuje (Prawo XV). DOSTEPNY=True.
+    """
+    KLUCZ = "K-03"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "STABLE_FLOW"
+    KATEGORIA = "K"
+    WAGA = 6   # wstępna (walidacja jednoreżimowa)
+    DOSTEPNY = True
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        flow = wskazniki.get("STABLE_FLOW")
+        if flow is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak STABLE_FLOW"])
+
+        if flow >= 0.015:
+            return self._bazowy_sygnal(flow, "LONG", 0.70, [f"Podaż stablecoinów +{flow:.1%}/7d — silny druk, napływ kapitału"])
+        if flow >= 0.004:
+            return self._bazowy_sygnal(flow, "LONG", 0.50, [f"Podaż stablecoinów +{flow:.1%}/7d — druk, lekki napływ"])
+        if flow <= -0.008:
+            return self._bazowy_sygnal(flow, "SHORT", 0.50, [f"Podaż stablecoinów {flow:.1%}/7d — umorzenia, odpływ kapitału"])
+        return self._bazowy_sygnal(flow, "NEUTRAL", 0.15, [f"Podaż stablecoinów {flow:+.1%}/7d — stabilna"])
+
+
+class NeuronUSDStrength(MikroNeuron):
+    """
+    K-04 | USD Strength (DXY-proxy) — siła dolara vs zwroty BTC (BTC-DXY inverse).
+
+    Silny USD (rozciągnięty vs ~6-mies. zakres) = odpływ z ryzyka = bearish BTC.
+    Słaby USD = dopływ do krypto = bullish. Kierunek ZWALIDOWANY pomiarem: z-score
+    poziomu USD na oknie 120d ma IC -0.17 @14d, -0.27 @30d na zwroty BTC (MONETA,
+    narzedzia/pomiar_usd_ic.py, 2026-07-16). UWAGA (Prawo XVI): to INNA informacja niż
+    K-01 DXYTrend (forma EMA20-momentum zmierzona jako SZUM) — tu z-score poziomu 120d.
+
+    USD_ZSCORE: (USD_teraz − mean_120d)/std_120d. Dostarcza AdapterUSD (Frankfurter,
+    opt-in --usd). Bez adaptera abstynuje (Prawo XV). DOSTEPNY=True. Sygnał wolny (makro).
+    """
+    KLUCZ = "K-04"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "USD_ZSCORE"
+    KATEGORIA = "K"
+    WAGA = 6
+    DOSTEPNY = True
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        z = wskazniki.get("USD_ZSCORE")
+        if z is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak USD_ZSCORE"])
+
+        if z >= 1.5:
+            return self._bazowy_sygnal(z, "SHORT", 0.70, [f"USD_z={z:+.2f} — silny dolar rozciągnięty, presja na BTC"])
+        if z >= 0.7:
+            return self._bazowy_sygnal(z, "SHORT", 0.50, [f"USD_z={z:+.2f} — dolar podwyższony, ostrożność"])
+        if z <= -1.5:
+            return self._bazowy_sygnal(z, "LONG", 0.70, [f"USD_z={z:+.2f} — słaby dolar, dopływ do krypto"])
+        if z <= -0.7:
+            return self._bazowy_sygnal(z, "LONG", 0.50, [f"USD_z={z:+.2f} — dolar słabnie, lekki tailwind"])
+        return self._bazowy_sygnal(z, "NEUTRAL", 0.15, [f"USD_z={z:+.2f} — dolar w zakresie"])

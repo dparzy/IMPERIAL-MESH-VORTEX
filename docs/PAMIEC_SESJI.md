@@ -101,6 +101,78 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-06-30 — Paradoks Parrondo jako filozofia Kameleon
+Sformalizowano, że dwie przegrywające osobno strategie mogą tworzyć wygrywający ensemble. To podstawa systemu Kameleon – kluczowa zasada dywersyfikacji neuronów.
+
+### 2026-06-30 — Archiwizacja bez przeczytania pliku prowadzi do utraty ważnych danych
+ARSENAL_IMPERIUM (zweryfikowany katalog ~220 narzędzi) i WZORZEC_DNSS (referencja architektury) zostały błędnie zarchiwizowane. Wymusiło to dodanie Zasady Archiwizacji do CLAUDE.md.
+
+### 2026-06-30 — DeepSeek zawyża możliwości – weryfikacja przez deep-research
+Wiele twierdzeń DeepSeek z Zbior_wskaznikow_i_strategi okazało się błędnych lub przesadzonych. Zweryfikowano zewnętrznymi źródłami – system musi opierać się na mierzonych faktach (Prawo XVI).
+
+### 2026-06-30 — pewnosc_agregatu zawsze ≈1.0 – źródło strat
+Stała wysoka pewność agregatu powoduje maksymalny dźwig, co prowadzi do tight stop-lossów i wielu małych strat. To jest zidentyfikowany defect.
+
+### 2026-06-30 — Zbyt sztywne progi powodują martwe neurony
+BB Squeeze 4%→2.5%, RSI Div delta 2.0→0.3, Bart Pattern 30%→10% – neurony zwracały 100% NEUTRAL. Po korekcie zaczęły generować sygnały.
+
+### 2026-06-30 — Golden Cross w IMPERIUM to wariant EMA
+Strategia ZŁOTY ORZEŁ używa EMA 50/200, nie kanonicznego SMA. Zapisano w dokumentacji jako wariant EMA. Wyjaśniono brak aktywacji na DOGE (death cross w całym oknie backtestu).
+
+### 2026-06-30 — Ulcer warmup: wystarczy period, nie period+1
+Funkcja _py_ulcer używa c[-period:] do obliczeń, więc wymaga tylko 'period' próbek. Poprzedni warunek period+1 był błędny (off-by-one). Naprawiono w bramie kalkulatora.
+
+### 2026-06-30 — Filtr kara w baza.py: wyciszone filtry nie karzą
+Gdy n_akt_f==0 (wszystkie neurony FILTR wyciszone), strategia otrzymywała karę 0.5. Poprawiono na 1.0 – neuron FILTR nieobecny nie powinien karać (Prawo XV).
+
+### 2026-06-30 — Off-by-one warmup Ulcer i Accelerator
+Ulcer warmup wymagał period+1 zamiast period (używał c[-period:]). Accelerator miał zbędny +1 w warmup slow+sma_ac. Poprawiono w _py_ulcer() i _py_accelerator().
+
+### 2026-06-30 — Audyt źródła pure-Python w Bramie: brakowało _PURE_PYTHON_INDICATORS
+Wszystkie wskaźniki w Bramie miały źródło TA-Lib. Dodano zbiór _PURE_PYTHON_INDICATORS (11 wskaźników) i warunek SOURCE_TAG_PY w compute(). Naprawiono rozróżnienie źródła dla wskaźników własnych.
+
+### 2026-06-30 — __pycache__ nie powinien być w git
+Po kompilacji brama_kalkulatora.py przypadkowo commitowano __pycache__. Naprawiono przez git rm --cached i dodanie do .gitignore.
+
+### 2026-06-30 — Mieszanie zasad źródłem chaosu
+Poprzedni projekt popadł w chaos przez mieszanie zasad Kingdom Pixel (79) z Imperium. Rozwiązanie: całkowicie nowe zasady dla Imperium.
+
+### 2026-06-30 — CVD dystrybucja wymaga ujemnego CVD dla sygnału SHORT
+Początkowo ustawiono CVD=4000, ale neuron sprawdza czy CVD jest ujemne. Poprawiono na CVD=-4000 (dystrybucja) i CVD=15000 (akumulacja).
+
+### 2026-06-30 — Poprawione wartości mock futures dla triggerów neuronów
+Początkowe wartości LONG_SHORT_RATIO=2.4 i FUNDING_RATE=0.0009 nie wywoływały sygnałów. Poprawiono: panika: FUNDING_RATE=-0.0012, LS_RATIO=0.20; chciwość: FUNDING_RATE=0.0015, LS_RATIO=0.85.
+
+### 2026-06-30 — Kolizja nazw NeuronOrderBlock z SMC-01
+Nowy neuron w trend.py nazwany NeuronOrderBlock kolidował z istniejącym SMC-01. Rozwiązano przez zmianę nazwy na NeuronOBZone.
+
+### 2026-06-30 — Push wymaga uprawnień Write w GitHub Installation
+Środowisko Claude web nie ma uprawnień do push do repozytorium dparzy/imperial-mesh-vortex. Konieczna konfiguracja w github.com/settings/installations.
+
+### 2026-06-30 — Naprawiono ImportError w legatus.py
+Przy bezpośrednim uruchomieniu legatus.py występował błąd względnego importu z .mikro_neuron. Rozwiązano przez try/except: próbuje import względny, w razie błędu przechodzi na absolutny.
+
+### 2026-06-30 — KalkulatorLewara używa pewnosc_agregatu – błąd strukturalny
+KalkulatorLewara pobiera pewnosc_agregatu z Legatusa, ale ta wartość jest zawsze ~1.0, więc leverage jest maksymalny. Należy oddzielić pewność agregatu od wielkości pozycji lub wprowadzić Namiestnika.
+
+### 2026-06-30 — pewnosc_agregatu ≈ 1.0 – główna przyczyna strat
+Stała wartość pewności bliska 1.0 prowadzi do maksymalnego lewara w KalkulatorzeLewara, co powoduje ciasne stop-lossy i wiele małych strat. To fundamentalny błąd w agregacji – nie ma zróżnicowania sygnałów.
+
+### 2026-06-30 — W6 milczące pominięcie przy braku 'Stan na:'
+Audyt W6 nie raportował błędu gdy brak 'Stan na:'. Dodano else skutkujący błędem oraz rozszerzono regex na markdown.
+
+### 2026-06-30 — Ulcer warmup period+1 błędne
+W funkcji _py_ulcer warmup używał period+1, podczas gdy poprawnie wymagany jest tylko period (c[-period:]). Naprawiono.
+
+### 2026-06-30 — Proces deduplikacji neuronów
+Podczas skanowania agent otrzymał instrukcję deduplikacji, co pozwoliło osiągnąć ostateczną liczbę 261 unikalnych neuronów zamiast potencjalnie większej liczby powtórzeń.
+
+### 2026-06-30 — Push wymaga uprawnień Read & Write
+Błąd 403 przy push do GitHub oznacza, że sesja Claude nie ma uprawnień zapisu do repozytorium. Konieczna zmiana uprawnień w GitHub Settings/Installations.
+
+### 2026-06-30 — Push zablokowany przez 403 - brak uprawnień
+Środowisko Claude Code web nie ma uprawnień do pushowania do repozytorium IMPERIAL-MESH-VORTEX (błąd 403). Wymagane skonfigurowanie GitHub App Claude Code z dostępem Read & Write w github.com/settings/installations.
+
 ### 2026-06-30 — Bezpiecznik Kapitału W-028: AOA 30% drawdown jako circuit-breaker
 Gdy strata z AOA przekracza 30%, Scheduler blokuje wszystkie nowe sygnały i zamyka pozycje. Zintegrowany z Scheduler._bezpiecznik_ok() – sprawdzany przed każdą transakcją.
 

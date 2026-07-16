@@ -87,6 +87,7 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 | **PSY-02** | NeuronPanikaDetal | Panika drobnych graczy | Brak PSY w kat. głównym | ❌ WYCISZONY |
 | **PSY-03** | NeuronFearGreed | Fear & Greed Index | PSY-01 FOMO w kat. ≈ podobny | ❌ WYCISZONY |
 | **PSY-04** | NeuronOIDiv | OI Divergence | PSY-04 Stado w kat. ≈ podobny | ❌ WYCISZONY |
+| **PSY-05** | NeuronDVOL | DVOL strach opcji (Deribit, contrarian) | Brak — nowa warstwa opcji (IC +0.16@7d) | ✅ opt-in --dvol |
 
 *Wyciszone = wymagają API (CryptoQuant, Coinglass, etc.)*
 
@@ -176,6 +177,8 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 | OC-05 | NeuronWashTrading | O | 8 | ✅ | WASH_SCORE_100 |
 | K-01 | NeuronDXYTrend | K | 5 | 🔇 (dane makro) | DXY_MOM |
 | K-02 | NeuronGoldBTC | K | 4 | 🔇 (dane makro) | GOLD_BTC_MOM |
+| K-03 | NeuronStablecoinFlow | K | 6 | ✅ opt-in --stablecoin | STABLE_FLOW |
+| K-04 | NeuronUSDStrength | K | 6 | ✅ opt-in --usd | USD_ZSCORE |
 
 | OC-06 | NeuronS2F | O | 6 | ✅ (block z timestampu) | BTC_S2F |
 | OC-07 | NeuronDaysToHalving | O | 7 | ✅ (block z timestampu) | BTC_DAYS_TO_HALVING |
@@ -200,4 +203,4 @@ XII-11..XII-32 — wielka lista czeka na wdrożenie
 
 ---
 
-*Stan na: 2026-07-12 | Źródło prawdy: `imperium/legiony/rejestr.py` → `wszystkie_neurony()` (84 neuronów + 15 zwiadowców)*
+*Stan na: 2026-07-16 | Źródło prawdy: `imperium/legiony/rejestr.py` → `wszystkie_neurony()` (87 neuronów + 15 zwiadowców)*

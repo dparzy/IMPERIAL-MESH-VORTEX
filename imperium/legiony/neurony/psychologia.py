@@ -53,6 +53,41 @@ class NeuronFearGreed(MikroNeuron):
         return self._bazowy_sygnal(fg, "NEUTRAL", 0.20, [f"F&G={fg:.0f} strefa neutralna"])
 
 
+class NeuronDVOL(MikroNeuron):
+    """
+    PSY-05 | DVOL — indeks strachu opcji (implikowana zmienność, „crypto VIX").
+    Wysoki DVOL = ekstremalny strach = okazja LONG (contrarian). Kierunek ZWALIDOWANY
+    pomiarem: DVOL POZIOM ma IC +0.16 @7d na zwroty BTC (narzedzia/pomiar_dvol_ic.py,
+    PAVOR, 2026-07-15) — wysoki strach opcyjny poprzedza rewersję w górę (Sinclair/VIX).
+    Strona LONG (wysoki strach) silniejsza; niski DVOL (samozadowolenie) = słaby SHORT.
+
+    DOSTĘPNOŚĆ (OPT-IN): AdapterDVOL wpinany tylko za flagą --dvol (ZASADA WPIĘCIA,
+    domyślnie OFF). Bez adaptera brak DVOL_INDEX → abstynuje (Prawo XV). DOSTEPNY=True,
+    bo adapter istnieje i budzi neuron gdy wpięty; w CSV/bez flagi → NEUTRAL bez głosu.
+    """
+    KLUCZ = "PSY-05"
+    LEGION = "WSPOLNY"
+    WSKAZNIK = "DVOL"
+    KATEGORIA = "R"
+    WAGA = 6   # wstępna (walidacja jednoreżimowa ~16-23 mies.) — niższa niż F&G(7)
+    DOSTEPNY = True
+
+    def interpretuj(self, wskazniki: dict) -> SygnalNeuronu:
+        dvol = wskazniki.get("DVOL_INDEX")
+        if dvol is None:
+            return self._bazowy_sygnal(None, "NEUTRAL", 0.0, ["Brak DVOL"])
+
+        if dvol >= 80:
+            return self._bazowy_sygnal(dvol, "LONG", 0.85, [f"DVOL={dvol:.0f} EKSTREMALNY strach opcji — contrarian LONG"])
+        if dvol >= 60:
+            return self._bazowy_sygnal(dvol, "LONG", 0.60, [f"DVOL={dvol:.0f} podwyższony strach — contrarian LONG"])
+        if dvol >= 45:
+            return self._bazowy_sygnal(dvol, "LONG", 0.40, [f"DVOL={dvol:.0f} umiarkowany strach — słaby LONG"])
+        if dvol <= 30:
+            return self._bazowy_sygnal(dvol, "SHORT", 0.35, [f"DVOL={dvol:.0f} samozadowolenie — słaby SHORT"])
+        return self._bazowy_sygnal(dvol, "NEUTRAL", 0.15, [f"DVOL={dvol:.0f} strefa neutralna"])
+
+
 class NeuronFundingExtreme(MikroNeuron):
     """
     PSY-01 | Funding Rate Extreme — ekstremalny koszt utrzymania pozycji.

@@ -6,6 +6,72 @@
 
 ---
 
+## 2026-07-16 | 🪙 | K-04 USD strength — WPIĘCIE 3. zwalidowanego sygnału (opt-in, MONETA)
+
+**Co:** trzeci i ostatni sygnał Tier-1 — **siła dolara** (makro, DXY-proxy). Nowy neuron
+**K-04 NeuronUSDStrength** (kat. K, waga 6, silny USD → SHORT) + **AdapterUSD** (Frankfurter
+FX, DARMOWE bez klucza). Rój: 86→87 neuronów (81 aktywnych). Nazwa: MONETA.
+
+**Dlaczego (Prawo I + XVI):** z-score poziomu USD na oknie 120d ma IC -0.17@14d, -0.27@30d
+na zwroty BTC (`narzedzia/pomiar_usd_ic.py` + kontrola formy 2026-07-16). KLUCZOWE
+odkrycie: forma K-01 DXYTrend (EMA20-momentum) zmierzona jako SZUM; wolny z-score 120d
+poziomu = MOCNY sygnał → K-04 to INNA informacja niż K-01 (Prawo XVI, mierzone nie zgadywane).
+Silny USD (rozciągnięty vs ~6-mies. zakres) = odpływ z ryzyka = bearish BTC (BTC-DXY inverse).
+
+**OPT-IN:** AdapterUSD za flagą `--usd` (domyślnie OFF). Bez flagi K-04 abstynuje.
+
+**Pliki:** adaptery/usd_sila.py (nowy), neurony/makro.py (NeuronUSDStrength), rejestr.py,
+petla_live.py (--usd), backtest.py (USD_ZSCORE clear-list), adaptery/__init__.py,
+audyt_spojnosci.py (allowlista), MANIFEST/README/INDEKS/MAPA_KLUCZY (87), tests.
+
+**Powód:** domknięcie kampanii Tier-1 — 3/3 zwalidowane sygnały (DVOL/stablecoin/USD)
+wpięte wzorcem, opt-in OFF. A/B USD po commicie (bieg backtest). Live: USD_z=1.30 (dolar mocny).
+
+## 2026-07-16 | 🏛️ | K-03 Stablecoin flow — WPIĘCIE 2. zwalidowanego sygnału (opt-in)
+
+**Co:** replikacja wzorca wpięcia (po DVOL) dla drugiego sygnału Tier-1 — **podaż
+stablecoinów** (makro-płynność, „suchy proch"). Nowy neuron **K-03 NeuronStablecoinFlow**
+(kat. K makro, waga 6, trend-following: druk stablecoinów → LONG) + **AdapterStablecoin**
+(DefiLlama, DARMOWE bez klucza). Rój: 85→86 neuronów (80 aktywnych). Nazwa pomiaru: AERARIUM.
+
+**Dlaczego (Prawo I):** 7d % zmiana podaży ma IC +0.05..+0.10 @7-30d na zwroty BTC
+(`narzedzia/pomiar_stablecoin_ic.py`, 2026-07-15, spójny nn/ov, ~3150 dni). Druk = napływ
+kapitału = bullish flow (makro, wolny). Walidacja na długiej historii (mocniejsza niż DVOL).
+
+**OPT-IN:** AdapterStablecoin za flagą `--stablecoin` (KonfigPetliLive.stablecoin=False).
+Bez flagi K-03 abstynuje → zero zmiany zachowania do A/B.
+
+**Pliki:** adaptery/stablecoin.py (nowy), neurony/makro.py (NeuronStablecoinFlow), rejestr.py,
+petla_live.py (--stablecoin), backtest.py (STABLE_FLOW clear-list), adaptery/__init__.py,
+audyt_spojnosci.py (allowlista), MANIFEST/README/INDEKS/MAPA_KLUCZY (86), tests.
+
+**Powód:** 2. z 3 zwalidowanych sygnałów wpiętych wzorcem DVOL. Zostaje USD/MONETA (z uwagą
+na pokrycie z K-01 DXYTrend — Prawo XVI).
+
+## 2026-07-16 | 😱 | PSY-05 DVOL — WPIĘCIE zwalidowanego sygnału (opt-in, ZASADA WPIĘCIA)
+
+**Co:** wpięto pierwszy sygnał z kampanii Tier-1 alt-danych — **DVOL** (indeks strachu opcji
+Deribit, „crypto VIX"). Nowy neuron **PSY-05 NeuronDVOL** (kat. R, waga 6, kontrariański:
+wysoki strach → LONG) + **AdapterDVOL** (Deribit public API, DARMOWE bez klucza). Rój: 84→85
+neuronów (79 aktywnych). Nazwa rzymska adaptera/pomiaru: PAVOR (bóstwo strachu).
+
+**Dlaczego (Prawo I — POMIAR PRZED wpięciem):** DVOL POZIOM ma IC +0.16 @7d na zwroty BTC
+(zmierzone `narzedzia/pomiar_dvol_ic.py`, 2026-07-15, spójny nienakł/nakł, rośnie z horyzontem).
+Wysoki strach opcyjny poprzedza rewersję w górę (Sinclair/VIX). Walidacja WSTĘPNA (~16-23 mies.,
+jeden reżim) — dlatego opt-in OFF do A/B.
+
+**OPT-IN (ZASADA WPIĘCIA):** AdapterDVOL wpinany TYLKO za flagą `--dvol` (KonfigPetliLive.dvol=False
+domyślnie). Bez flagi PSY-05 abstynuje (Prawo XV, brak DVOL_INDEX) → ZERO zmiany zachowania roju
+aż do walidacji A/B na realnych danych. Cezar włącza po zielonym A/B (Prawo XVIII).
+
+**Pliki:** imperium/akwedukty/adaptery/dvol.py (nowy), imperium/legiony/neurony/psychologia.py
+(NeuronDVOL), imperium/legiony/rejestr.py (rejestracja+mapy), imperium/koloseum/petla_live.py
+(opt-in --dvol), adaptery/__init__.py, tests/test_dvol_psy05.py (nowy), tests/test_integracja.py
+(84→85), narzedzia/audyt_spojnosci.py (allowlista), MANIFEST/README/INDEKS/MAPA_KLUCZY (85).
+
+**Powód:** kampania pomiar-najpierw dała 4 zwalidowane sygnały (funding/stablecoin/DVOL/USD);
+DVOL najmocniejszy IC → pierwszy pilot wpięcia jako wzorzec dla stablecoin/USD.
+
 ## 2026-07-15 | 🔮 | HARUSPEX (kand. #20) — prototyp + POMIAR = FALSYFIKACJA (Prawo I, pomiar-najpierw)
 
 **Co:** prototyp kandydata #20 „predykcyjny Namiestnik" (żniwo wrzutni). Nazwa rzymska

@@ -47,7 +47,7 @@ from imperium.legiony.neurony.sentyment import NeuronSentymentNews
 from imperium.legiony.neurony.zdarzenia import NeuronTaksonomiaZdarzen
 from imperium.legiony.neurony.news_dynamika import NeuronDeltaeSentymentu, NeuronSpikeUwagi
 from imperium.legiony.neurony.psychologia import (
-    NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv,
+    NeuronFearGreed, NeuronFundingExtreme, NeuronPanikaDetal, NeuronOIDiv, NeuronDVOL,
 )
 from imperium.legiony.neurony.onchain import (
     NeuronMVRV, NeuronSOPR, NeuronPuellMultiple, NeuronExchangeNetflow, NeuronWashTrading,
@@ -79,7 +79,7 @@ from imperium.legiony.neurony.rezim_zmiana import (
     NeuronChangePoint, NeuronBOCPD,
 )
 from imperium.legiony.neurony.makro import (
-    NeuronDXYTrend, NeuronGoldBTC,
+    NeuronDXYTrend, NeuronGoldBTC, NeuronStablecoinFlow, NeuronUSDStrength,
 )
 
 # ── Zwiadowcy Exploratores ─────────────────────────────────────────────────────
@@ -158,6 +158,7 @@ MECHANIZMY: dict = {
     "PSY-02": "mean_rev", # Long/Short ratio
     "PSY-03": "mean_rev", # Fear & Greed
     "PSY-04": "mean_rev", # OI Divergence
+    "PSY-05": "mean_rev", # DVOL strach opcji (contrarian, W-DVOL)
     # Sentyment (R)
     "NEWS-01": "event",   # News sentyment
     "NEWS-02": "event",   # Taksonomia zdarzeń (kierunek per typ)
@@ -199,6 +200,8 @@ MECHANIZMY: dict = {
     # Makro/Intermarket (K)
     "K-01": "macro",      # DXY momentum
     "K-02": "macro",      # Gold/BTC ratio
+    "K-03": "macro",      # Stablecoin supply flow (bullish druk, W-AERARIUM)
+    "K-04": "macro",      # USD strength z-score 120d (silny USD→SHORT, W-MONETA)
 }
 
 # Mechanizmy zwiadowców Exploratores (EXP) — wszyscy meta/struktura
@@ -253,8 +256,8 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         NeuronOrderBlock(), NeuronFVG(), NeuronBOS(), NeuronVSA(),
         # Volume Profile / VPOC (S, VP-01) — S/R z wolumenu, swing OHLCV (W-322, Dalton BIB-013)
         NeuronVolumeProfile(),
-        # Psychologia (PSY)
-        NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(), NeuronOIDiv(),
+        # Psychologia (PSY) — PSY-05 DVOL strach opcji (opt-in --dvol, W-DVOL, zwalidowany IC +0.16@7d)
+        NeuronFearGreed(), NeuronFundingExtreme(), NeuronPanikaDetal(), NeuronOIDiv(), NeuronDVOL(),
         # Sentyment newsów (NEWS) — LLM DeepSeek + fallback słownikowy (W-297)
         NeuronSentymentNews(),
         # Taksonomia zdarzeń (NEWS-02) — kierunek per typ; rumor=kontrariański (W-381)
@@ -289,7 +292,9 @@ def wszystkie_neurony() -> List[MikroNeuron]:
         # Zmiana reżimu (R) — CUSUM change-point (CP-01, W-336) + BOCPD Bayesowski (BOCPD-01, W-338)
         NeuronChangePoint(), NeuronBOCPD(),
         # Makro/Intermarket (K) — DXY trend (K-01, W-085 Murphy) + Gold/BTC ratio (K-02, W-089)
-        NeuronDXYTrend(), NeuronGoldBTC(),
+        # + Stablecoin supply flow (K-03, opt-in --stablecoin, W-AERARIUM, IC +0.05..0.10@7-30d)
+        # + USD strength z-score (K-04, opt-in --usd, W-MONETA, IC -0.17@14d/-0.27@30d)
+        NeuronDXYTrend(), NeuronGoldBTC(), NeuronStablecoinFlow(), NeuronUSDStrength(),
     ])
 
 
@@ -481,7 +486,7 @@ NEURONY_STYLU: dict = {
     "OC-01": _INV, "OC-02": _INV, "OC-03": _INV, "OC-04": _INV, "OC-05": _U,
     "OC-06": _INV, "OC-07": _INV, "OC-08": _INV,
     # Reżim/Sentyment (R) — futures/Fear&Greed/RADAR/news/augur: kontekst na każdym TF
-    "PSY-01": _U, "PSY-02": _U, "PSY-03": _U, "PSY-04": _U,
+    "PSY-01": _U, "PSY-02": _U, "PSY-03": _U, "PSY-04": _U, "PSY-05": _U,
     "RADAR-01": _U, "RADAR-02": _U, "RADAR-03": _U, "RADAR-04": _U, "RADAR-05": _U, "AUG-01": _U, "NEWS-01": _U, "NEWS-02": _U, "NEWS-03": _U, "NEWS-04": _U,
     # Meta-bramy reżimu/chaosu (H/N/V/D/L) — klasyfikują każdy interwał
     "H-01": _U, "N-01": _U, "N-02": _U, "V-13": _U, "V-14": _U, "D-01": _U, "L-14": _U, "VI-13": _U,
@@ -495,7 +500,7 @@ NEURONY_STYLU: dict = {
     "CP-01": _U, "BOCPD-01": _U,
     # Makro/Intermarket (K) — DXY i Gold/BTC: dane na poziomie 1D, ożywają przy makro CSV
     # INVEST bo dane makro mają sens na dłuższych horyzontach (nie SCALP 1m)
-    "K-01": _INV, "K-02": _INV,
+    "K-01": _INV, "K-02": _INV, "K-03": _INV, "K-04": _INV,
 }
 
 

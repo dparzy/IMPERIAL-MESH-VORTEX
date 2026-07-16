@@ -15,7 +15,21 @@ z autorem „–" i fabrykowane cytowania — patrz `docs/` + pamięć `lista-ks
 |---|---|
 | ✅ | **Kanon** — dzieło, którego istnienia jestem pewien (klasyk, wielokrotnie wydawany). Rok/wydanie **potwierdź przed zakupem**. |
 | ⚠️ | **Do weryfikacji** — pozycja prawdopodobna, ale NIE potwierdzona w tej sesji. Sprawdź przed wydaniem pieniędzy. |
-| 🆓 | **Darmowa/open-access** — legalny PDF od autora/wydawcy/arXiv. **Bierzemy pierwsze — zero kosztu.** |
+| 🆓 | **Otwarta — JEST PLIK od autora/wydawcy/arXiv.** Wolno pobrać. Bierzemy pierwsze. |
+| 📖 | **Tylko do czytania online — BRAK pliku i BRAK otwartej licencji.** ⛔ **NIE wchodzi do RAG.** |
+
+🚨 **KOREKTA 2026-07-16 (mój błąd, Prawo I):** pierwotnie miałem jeden znacznik 🆓 i **mieszałem
+dwie różne rzeczy** — „darmowe do czytania" ≠ „wolno pobrać". Przykład, na którym to wyszło:
+**Hyndman FPP3** jest darmowa do czytania na otexts.com, ale OTexts **nie daje PDF/EPUB** i strona
+**nie ma otwartej licencji** (brak CC). Zeskrobanie jej HTML-a do `tekst_cache` byłoby wrzuceniem
+pełnego tekstu chronionego dzieła **do gita** — a nasz `.gitignore` wyrzucił binaria książek
+dokładnie przez „ryzyko praw autorskich komercyjnych tytułów". Decyzja Cezara 2026-07-16: **nie ściągać.**
+
+⚠️ **Statusu 🆓 przy POZOSTAŁYCH pozycjach NIE zweryfikowałem pozycja-po-pozycji.** Pewne otwarte
+(autor/wydawca sam daje plik): **arXiv** (Attention, LoRA, QLoRA, Hinton-distylacja, LIMA, Flash Boys 2.0,
+speculative decoding), **Boyd** (Stanford), **Hastie ESL** (Stanford), **Hernán & Robins**, whitepapery
+**Bitcoin/Ethereum**, **MacKay**. Reszta 🆓 = **do sprawdzenia przed pobraniem** — może się okazać
+📖 jak FPP3. Nie zgaduj: sprawdź licencję na stronie źródła.
 
 ⚠️ **Mój cutoff wiedzy to styczeń 2026** — pozycje z 2025/2026 są z natury mniej pewne. Żadna data
 wydania na tej liście nie jest zweryfikowana w tej sesji; traktuj rok jako orientacyjny.
@@ -31,7 +45,7 @@ dzieł uczy lepiej niż 400 modnych tytułów. Uczeń TIRO nauczy się tego, co 
 |---|---|---|---|
 | 070 | Vaswani i in. | *Attention Is All You Need* (2017) 🆓 ✅ | Fundament transformerów — **wprost pod TIRO**. arXiv:1706.03762 |
 | 071 | Easley, López de Prado, O'Hara | *Flow Toxicity and Liquidity in a High-Frequency World* (RFS 2012) 🆓 ✅ | **Źródło naszego neuronu Z-01 (VPIN)** — mamy neuron, nie mamy źródła |
-| 072 | Hyndman, Athanasopoulos | *Forecasting: Principles and Practice* (3rd ed.) 🆓 ✅ | Darmowy online (OTexts) — kanon prognozowania, zero u nas |
+| 072 | Hyndman, Athanasopoulos | *Forecasting: Principles and Practice* (3rd ed.) 📖 ✅ | ⛔ **NIE do RAG** — darmowa do CZYTANIA (otexts.com/fpp3), ale brak pliku i brak otwartej licencji; druk płatny. Kanon prognozowania (luka u nas) — czytać u źródła, nie kopiować. Sprawdzone i **odrzucone przez Cezara 2026-07-16** |
 | 073 | Boyd, Vandenberghe | *Convex Optimization* 🆓 ✅ | Darmowy PDF (Stanford) — fundament sizingu/portfela |
 | 074 | Goodfellow i in. | — mamy (BIB-068) | — |
 | 075 | Daspremont i in. / Nakamoto | *Bitcoin: A Peer-to-Peer Electronic Cash System* 🆓 ✅ | Whitepaper źródłowy — 9 stron, mamy o nim książki, nie mamy jego |

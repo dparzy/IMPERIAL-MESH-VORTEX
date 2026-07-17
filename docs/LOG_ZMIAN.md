@@ -14,6 +14,45 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-17 | 🔱 | WIZJA_TRYBY_I_ROZWOJ zweryfikowana — 🚨 14,9 mln barów 1m leży nieużytych
+
+**Co (dług gnicia 13 → 12):** weryfikacja najcięższego dokumentu długu (19× `rejestr.py` od
+`stan_na`). Cztery twierdzenia o STANIE okazały się nieprawdziwe:
+
+• **„🔴 `dane/minutowe/` puste — najwyższy priorytet danych"** → realnie **14 par, ~14,9 mln
+  barów 1m**. Co gorsza: `wczytaj_csv(..., interwal="1m")` działa **bez żadnej zmiany kodu**
+  (dowód runtime: AVAXUSDT → 145 185 barów w 1,1 s, chronologia rosnąca, pełne OHLCV) — format
+  CryptoDataDownload identyczny z 1h. Mimo to **żaden moduł nie czyta `dane/minutowe/`**
+  (0 trafień w `imperium/` i `narzedzia/`). 🚨 **Prawo XV — utrata potencjału.** To POWTÓRKA
+  klasy, którą ten sam dokument opisał akapit wyżej przy 1h („dane leżały nieużyte").
+• **Niuans, który zmienia werdykt (kandydat ≠ prawda):** dane 1m kończą się **2022-07-27**
+  (luka 4 lata). Nadają się do BACKTESTU skalpu 2019–2022 (COVID/hossa/bessa), NIE do live.
+  Priorytet brzmi więc „wpiąć istniejące do backtestu + dociągnąć świeże", nie „zdobyć dane".
+• **„~76k barów 1h/parę (5 par)"** → realnie **15 par** (do 2026-06-18; MATIC urwany 2024-09-09).
+• **„Wymaga: AdapterKronikarz live"** → **ISTNIEJE** i jest wpięty (`kronikarz_zdarzen.py:217`,
+  zasila AUG-01 + `neurony/sesje.py`). Zdjęte z kolejki rozwoju.
+
+**Propozycja Praw XXII–XXV — rozstrzygnięta (Prawo XVIII):** numery zostały w międzyczasie
+nadane czemu innemu (Dekorelacja / Niezawodność warunkowa / Widoczność operacyjna / Przewaga
+konkurencyjna), więc propozycja z 2026-06-14 była martwa. Werdykt: nie nadajemy ponownie —
+„Ucieczka przed likwidacją" i „Obracanie kapitałem" już ŻYJĄ jako kod (`kalkulator_lewara`,
+compounding W-319), „Płynność ponad balastem" pokrywa Prawo XVI+XXII, a „Prześwietlenie przed
+wejściem" zostaje postulatem produktowym (AdapterKartaWaluty), nie nowym prawem. Mnożenie praw
+bez potrzeby = ten sam błąd co mnożenie dokumentów.
+
+**Tabela API prześwietlania — stan zmierzony:** GoPlus/RugCheck/GeckoTerminal 🔴 0 trafień ·
+CoinGecko 🔴 tylko wzmianka w komentarzu · DefiLlama ✅ wpięty, ale **w INNEJ roli** niż
+zakładała wizja (`adaptery/stablecoin.py` → K-03/K-04, podaż stablecoinów jako sygnał makro,
+nie karta waluty). `AdapterKartaWaluty` 🔴 nie istnieje. Dostępność darmowych API sprawdzana
+2026-06-14 i NIE weryfikowana ponownie — oznaczone ⚠️ w dokumencie (Prawo I).
+
+**Pliki:** `docs/WIZJA_TRYBY_I_ROZWOJ.md` (weryfikacja + ✅/🔴 per twierdzenie) ·
+`docs/INDEKS_IMPERIUM.md` (katalog regenerowany).
+**Bramka:** testy 2503/2503 ✅ · audyt exit 0 ✅ · gnicie 13→12 · dublet `rejestr.py`
+(KATALOG_NEURONOW ↔ WIZJA) rozstrzygnięty z powodem na widoku.
+
+---
+
 ## 2026-07-17 | 🧠 | PAMIEC_ABSOLUTNA zweryfikowana + wstrzykiwacz, który ZJADŁ HISTORIĘ
 
 **Co (dług gnicia 14 → 13):** spłata `docs/PAMIEC_ABSOLUTNA.md` przez WERYFIKACJĘ twierdzeń

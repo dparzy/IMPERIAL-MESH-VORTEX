@@ -49,6 +49,49 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
 
+## 2026-07-17 | 🛡️ | ZAPORA TESTÓW — testy przestały PALIĆ PIENIĄDZE (nawrót klasy z 07-16)
+
+**🚨 Co się stało:** po commicie porządkowym zobaczyłem w drzewie niewyjaśnioną zmianę
+`tiro_pary_nauczyciela.jsonl` — **5 nowych par NOTARIUSA ze stemplem 2026-07-17 05:41,
+źródło `news_llm`**, choć ani razu nie wołałem DeepSeeka świadomie. Śledztwo (dowód z DWÓCH
+niezależnych źródeł — kod + stemple pisarza): `handluj_live` (`petla_live.py:193`) buduje
+**bezwarunkowo** `AdapterNewsLLM(fetcher=FetcherNewsRSS())`, adapter ma `uzyj_llm=True`
+domyślnie i `glos=None` → **lazy-init z klucza w środowisku**. `tests/test_petla_live.py`
+woła `handluj_live` **pięć razy**. Klucz na maszynie Cezara jest ustawiony → **każdy bieg
+`python tests/run_tests.py` płacił.** Uruchomiłem dziś testy ~6 razy.
+
+**🔁 To NAWRÓT, nie odkrycie.** Klasa „testy palą pieniądze" była **zapisana w Księdze Wad
+2026-07-16** (zmierzone: 8 wywołań, 4 min 42 s) — i **nie naprawiona**. Wróciła tego samego
+dnia. **Księga, która tylko notuje, jest pamiętnikiem, nie systemem samo-leczenia.**
+
+**✅ NAPRAWA U ŹRÓDŁA — `tests/conftest.py` (zapora, nie łatka):** zamiast poprawiać każde
+wywołanie z osobna, **ODBIERAMY TESTOM KLUCZE** (`DEEPSEEK_API_KEY`, `MEXC_API_KEY`,
+`MEXC_SECRET`) przy imporcie — zanim pytest zaimportuje moduły testowe (import potrafi już
+zbudować adapter). Lazy-init nie znajduje klucza → deterministyczny fallback słownikowy
+(ścieżka i tak wymagana przez Prawo XV). Test, który CHCE sprawdzić LLM, wstrzykuje atrapę
+(`glos=_FakeGlos(...)` — `test_sentyment_news.py`) i działa dalej. Kod produkcyjny bez zmian.
+Zapora wpięta w OBA runnery (pytest ładuje conftest sam; `run_tests.py` woła jawnie).
+
+**Trzy szkody zabite jednym ruchem:** koszt (każdy bieg płacił) · niedeterminizm (wynik zależał
+od tego, co akurat piszą w newsach) · czas (wolna bramka = rzadziej uruchamiana).
+
+**DOWÓD (Prawo I — pomiar, nie deklaracja):** par NOTARIUSA **przed** pełnym biegiem: **162**,
+**po** biegu: **162**. Zero nowych wywołań. Testy: **2494/2494**.
+
+**Fałszywy trop po drodze (uczciwie):** najpierw podejrzałem `test_sentyment_news.py:252`
+(`uzyj_llm=True` bez `uzyj_llm=False`) — **sprawdziłem i to był fałszywy alarm**: ten test
+wstrzykuje `glos=_FakeGlos(...)`, więc nie płaci. Prawdziwym winowajcą był `handluj_live`.
+Piąty raz dziś, gdy sprawdzenie przed meldunkiem powstrzymało fałszywy alarm.
+
+**Widoczność (Prawo XXIV):** runner drukuje `🛡️ Zapora testów: odebrano klucze [...]` —
+cicha zapora byłaby zaporą, w której działanie trzeba wierzyć. Pierwsza wersja komunikatu
+milczała (conftest odbiera klucze już przy imporcie, więc drugie wywołanie nie miało czego
+odebrać) — naprawione.
+
+**Pliki:** tests/conftest.py (nowy), tests/test_zapora_testow.py (nowy, 4 testy granic),
+tests/run_tests.py (zapora + raport), imperium/biblioteki/ksiega_wad_kodu.py (wpis: NAWRÓT
++ naprawa u źródła).
+
 ## 2026-07-17 | 📖 | Dług T5 spłacony (8→0) + DWA werdykty zwiadowców OBALONE pomiarem
 
 **Co:** przeczytane W CAŁOŚCI 2 ostatnie dokumenty świecące T5. **Oba werdykty zwiadowców

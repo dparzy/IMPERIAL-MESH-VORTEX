@@ -166,8 +166,16 @@ CHECKLIST_STARTOWA = [
                "domyślnie True + `glos=None` → lazy-init z klucza. Trzy szkody naraz: wynik zależy od "
                "tego, co akurat piszą w newsach (niedeterminizm), każdy przebieg kosztuje, bramka jest "
                "wolna. Domyślne argumenty adapterów sięgające sieci to pułapka — w testach wstrzykuj "
-               "atrapę fetchera i `uzyj_llm=False`.",
-     "zrodlo": "wykryte przez NOTARIUSA (2026-07-16) — bez zbierania par nikt by nie zauważył"},
+               "atrapę fetchera i `uzyj_llm=False`. "
+               "🔁 NAWRÓT 2026-07-17: NOTARIUS złapał KOLEJNE 5 płatnych wywołań podczas zwykłego biegu "
+               "`run_tests.py` — bo wada została ZAPISANA, ale NIE NAPRAWIONA. Księga, która tylko notuje, "
+               "jest pamiętnikiem, nie systemem samo-leczenia. "
+               "✅ NAPRAWA U ŹRÓDŁA (2026-07-17): `tests/conftest.py` ODBIERA testom klucze "
+               "(DEEPSEEK_API_KEY, MEXC_API_KEY, MEXC_SECRET) przy imporcie — zamiast łatać każde "
+               "wywołanie z osobna, zabijamy całą klasę: lazy-init nie znajduje klucza → deterministyczny "
+               "fallback, zero kosztu. Dowód: par NOTARIUSA przed biegiem 162, po biegu 162. "
+               "Test `test_zapora_testow.py` pilnuje, że zapora żyje (i że faktycznie odbiera).",
+     "zrodlo": "wykryte przez NOTARIUSA (2026-07-16), NAWRÓT i naprawa u źródła (2026-07-17)"},
     {"kat": "sciezki",
      "opis": "Ścieżka pliku budowana bez limitu długości (Windows MAX_PATH = 260)",
      "lekcja": "Nazwa pliku legalna (Windows: do 255 zn./człon) NIE znaczy, że legalna jest ścieżka "

@@ -1,3 +1,10 @@
+---
+kategoria: ACTA
+typ: acta
+wlasciciel: imperium/cesarz/deepseek_glos.py, imperium/koloseum/drift_adapter.py, imperium/legiony/kalibrator_konformalny.py, imperium/legiony/meta_labeling.py, imperium/legiony/neutralizacja.py, imperium/pretorianie/filtr_ekonomiczny.py
+stan_na: 2026-07-10
+powod_istnienia: "Destylat 108 par pytanie-odpowiedź z DeepSeek Chat (`wrzutnia/Mapa-kluczy.md`) — separacja tego co już mamy (Sekcja A), rad błędnych do odrzucenia (Sekcja B), realnych nowości rank"
+---
 # 📥 ANALIZA WRZUTNI — Nowości dla Imperium z rozmów z DeepSeek Chat
 
 > **Data:** 2026-07-10 · **Autor destylatu:** Vitruviusz (Claude/Opus)

@@ -1,3 +1,11 @@
+---
+kategoria: TABULA
+typ: zywy
+wlasciciel: imperium/akwedukty/bary_zdarzeniowe.py, imperium/akwedukty/czytnik_csv.py, imperium/akwedukty/klasyfikator_zdarzen.py, imperium/akwedukty/kwatermistrz_danych.py, imperium/akwedukty/news_fetcher.py, imperium/akwedukty/sentyment_historyczny.py, imperium/drogi/nexus_hub.py
+stan_na: 2026-06-01
+powod_istnienia: "Jedyny dokument mapujący WSZYSTKIE zewnętrzne źródła danych (44 źródła w 4 warstwach: OCZY/USZY/WIESZCZOWIE/SZPIEDZY) do konkretnych neuronów i modułów — z priorytetami kluczy API "
+dlug: "🚨 opisuje nieistniejący kod: akwedukty/multi_exchange.py"
+---
 # 👁️ OBSERWATORZY IMPERIUM — Mapa Źródeł Informacji
 
 > *"Qui bene nuntiat, bene imperat."* — Kto dobrze donosi, dobrze rządzi.

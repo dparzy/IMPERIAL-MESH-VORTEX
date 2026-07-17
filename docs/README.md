@@ -1,3 +1,10 @@
+---
+kategoria: TABULA
+typ: zywy
+wlasciciel: —
+stan_na: 2026-06-09
+powod_istnienia: "Spis wszystkich dokumentów w `docs/` z jednozdaniowym opisem tematu każdego — punkt nawigacyjny do dokumentacji."
+---
 # 📚 Dokumentacja Imperium
 
 Tu trafia **uporządkowana wiedza** wyciągnięta z surowej wizji (`archiwum/`).

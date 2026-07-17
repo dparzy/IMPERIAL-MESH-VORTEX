@@ -1,3 +1,10 @@
+---
+kategoria: MENSURA
+typ: zywy
+wlasciciel: imperium/biblioteki/arena_trzech_bram.py, imperium/biblioteki/hedge_mwu.py, imperium/biblioteki/igrzyska.py, imperium/biblioteki/kronikarz.py, imperium/biblioteki/kronikarz_zdarzen.py, imperium/biblioteki/mnemosyne.py, imperium/biblioteki/pamiec_absolutna.py, imperium/biblioteki/synapsy_rezimowe.py
+stan_na: 2026-06-20
+powod_istnienia: "Odpowiedzieć Cezarowi czy Imperium ma pamięć porównywalną do 'Hermes Agent' (odkryto że to DWIE różne rzeczy — jedna to fabrykacja INF-32, druga to realny produkt Nous Research), p"
+---
 # 🧠 ANALIZA: HERMES AGENT vs PAMIĘĆ IMPERIUM + STATUS KSIĄŻEK
 
 > **Stan na:** 2026-06-20 · **Gałąź:** `claude/sleepy-fermi-dsdE4`

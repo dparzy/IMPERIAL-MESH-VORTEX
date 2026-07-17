@@ -41,6 +41,37 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
 
+## 2026-07-17 | 🏛️ | P1 — nagłówki Tabularium w 51 dokumentach: dług POLICZONY, nie zgadnięty
+
+**Co:** nagłówki metadanych wstrzyknięte do **51 dokumentów** (`51/71` zadeklarowanych; rozkład:
+FORMA 13 · ACTA 11 · CONSILIUM 9 · DISCIPLINA 7 · MENSURA 5 · TABULA 5 · LEX 1). Raport bramki
+T2 zagregowany per dokument (Prawo XXIV): **41 ostrzeżeń zamiast 86** — rozbicie na
+(dokument × właściciel) dawało ścianę tekstu, a bramka, której nikt nie czyta, to bramka,
+której nikt nie słucha.
+
+**Dług ujawniony (18 dokumentów gnije — teraz WIDAĆ, ile):** MAPA_IMPERIUM_FLOW `stan_na
+2026-05-31`, a kod zmieniony **92× w 11 plikach** · MATRYCA_KORELACJI 22× · ANALIZA_NEURONY 20× ·
+GENERAL_LEGATUS 19× (legatus.py) · LEGIONY_ARCHITEKTURA 17× · OBSERWATORZY 17×.
+
+**Dublety wskazane MASZYNOWO (Prawo XVI — odpowiedź na „co warto połączyć"):** ARCHITEKTURA_IMPERIUM
+↔ MAPA_IMPERIUM_FLOW (7 wspólnych właścicieli) · MANUAL_CLAUDE_CODE ↔ MANUAL_UZYTKOWNIKA ↔
+START_LOKAL (ten sam audyt_spojnosci.py + run_tests.py) · SCIAGA_LOKAL ↔ START_LOKAL (start.py).
+
+**Widma zapisane W NAGŁÓWKU (pole `dlug`) — dokument sam przyznaje się do kłamstwa:**
+ARCHITEKTURA_IMPERIUM i MAPA_IMPERIUM_FLOW (`war_lancer.py`, `sala_wojenna.py`, `valhalla.py`),
+SYMBIOZA_MODULOW (4 martwe ścieżki), OBSERWATORZY (`multi_exchange.py`),
+PAPER_TRADING_MEXC (`paper_trading_live.py`) — kod, którego NIE MA nigdzie w repo.
+
+**ZASADA (Prawo I): `stan_na` = data z samego dokumentu, NIGDY „dziś".** Wpisanie dzisiejszej
+daty dokumentowi, którego dziś nie zweryfikowano, to kłamstwo — i uciszyłoby bramkę gnicia,
+czyli zniszczyło jej jedyny sens. Dług ma być widoczny, nie zamalowany.
+
+**Pliki:** 51× docs/*.md (tylko nagłówek na górze — ani jeden bajt treści nie tknięty),
+narzedzia/tabularium.py (agregacja T2).
+
+**Powód:** zostaje 20 dokumentów bez nagłówka (8 molochów + 5 z paczki manuali + drobne poza
+docs/). Potem: znaczniki katalogu w INDEKS, egzekucja kłamstw liczbowych, lista scaleń do zgody Cezara.
+
 ## 2026-07-16 | 🎓 | CENSOR sprzętu + plan TIRO (lokalny hybrydowy LLM-uczeń)
 
 **Co:** nowy organ **CENSOR SPRZĘTU** (`imperium/oczy/censor_sprzetu.py`) — „oczy" mierzące

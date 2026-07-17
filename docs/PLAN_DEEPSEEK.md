@@ -1,3 +1,10 @@
+---
+kategoria: CONSILIUM
+typ: zywy
+wlasciciel: imperium/cesarz/deepseek_glos.py, imperium/cesarz/titan_mind.py, imperium/oczy/wszechoko.py, imperium/senat/meta_kora.py
+stan_na: 2026-05-31
+powod_istnienia: "Plan podłączenia DeepSeek API jako 'głosu' Cesarza i Senatu — jak wywoływać LLM, wzorzec debaty Populares vs Optimates, ocena frameworków multi-agent."
+---
 # 🧠 PLAN: DeepSeek API jako mózg Cesarza i Senatu
 
 > **Źródło:** rozmowa DeepSeek o budowie multi-bota (`archiwum/DeepSeek_API_multibot_oryginal.md`)

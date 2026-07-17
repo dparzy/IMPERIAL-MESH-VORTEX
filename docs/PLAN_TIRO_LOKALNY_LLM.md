@@ -1,3 +1,10 @@
+---
+kategoria: CONSILIUM
+typ: zywy
+wlasciciel: imperium/biblioteki/notarius.py, imperium/oczy/censor_sprzetu.py, imperium/swiatynie/web_dashboard.py
+stan_na: 2026-07-16
+powod_istnienia: "Zbudować lokalny hybrydowy LLM 'TIRO' (uczeń), trenowany metodą destylacji od nauczyciela DeepSeek (Hyginus), z docelowym celem przejęcia ról LLM w Imperium bez kosztów API."
+---
 # 🎓 PLAN TIRO — Lokalny Hybrydowy LLM-Uczeń Imperium
 
 > **Stan na:** 2026-07-16 · **Status:** projekt zatwierdzony kierunkowo przez Cezara, wdrażany etapami

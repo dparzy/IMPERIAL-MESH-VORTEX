@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/legiony/diagnostyka_korelacji.py, imperium/legiony/rejestr.py
+stan_na: 2026-06-13
+powod_istnienia: "Koncepcyjny 'szablon Kostki Rubika' — pięcioosiowy system klasyfikacji sygnałów (Wskaźnik×Interwał×Typ zagrania×Reżim×Waga) jako przyszła mapa do wypełnienia realnymi danymi w 'Faz"
+---
 # 🏛️ MATRYCA KORELACJI — IMPERIUM
 
 > *"Roma non uno die aedificata est"* — Rzym nie powstał w jeden dzień. Tak samo ta matryca.

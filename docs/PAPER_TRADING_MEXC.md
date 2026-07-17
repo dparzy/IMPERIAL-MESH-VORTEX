@@ -1,3 +1,11 @@
+---
+kategoria: DISCIPLINA
+typ: acta
+wlasciciel: imperium/koloseum/backtest.py, imperium/koloseum/paper_trading.py, imperium/koloseum/petla_live.py, imperium/koloseum/walidacja.py
+stan_na: 2026-07-05
+powod_istnienia: "Jedyne miejsce z **kryteriami zaliczenia Etapu II** (Sharpe≥1.0, MaxDD<15%, DSR≥0.95, WR≥55% lub PF>1.5, ≥100 trades) i drabiną Etapów II→IIb→III→IV. Ta bramka „kiedy wolno przejść"
+dlug: "🚨 opisuje nieistniejący kod: narzedzia/paper_trading_live.py"
+---
 # 📋 PAPER TRADING MEXC — Instrukcja Krok po Kroku (Etap II)
 
 > **Etap II Koloseum:** system przechodzi z backtestu (Etap I ✅) do symulacji live.

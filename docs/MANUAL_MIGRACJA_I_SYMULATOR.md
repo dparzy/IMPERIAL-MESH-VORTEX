@@ -1,3 +1,10 @@
+---
+kategoria: DISCIPLINA
+typ: acta
+wlasciciel: imperium/fundament/brama_kalkulatora.py, imperium/koloseum/dyrygent.py, imperium/koloseum/namiestnik.py, imperium/legiony/legatus.py, imperium/pretorianie/kalkulator_lewara.py, tests/test_doradcy.py
+stan_na: 2026-06-09
+powod_istnienia: "Dwie rzeczy, których nie ma nigdzie indziej: (1) obalenie mitu „CHIMERA/HAMACHERA' — jawny wpis Prawa I, że moduł NIE istnieje; (2) ŚCIEŻKA PIENIĘDZY — krok po kroku matematyka roz"
+---
 # 🖥️ MANUAL MIGRACJI NA LAPTOPA + SYMULATOR LIVE
 
 > **Stan na:** 2026-06-09 · **Gałąź:** `claude/sleepy-fermi-dsdE4`

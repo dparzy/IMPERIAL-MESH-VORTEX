@@ -1,3 +1,10 @@
+---
+kategoria: TABULA
+typ: zywy
+wlasciciel: imperium/legiony/rejestr.py
+stan_na: 2026-07-16
+powod_istnienia: "JEDYNY dokument, który jawnie i systematycznie rozwiązuje rozbieżności między katalogiem (planem nazw/ID) a żywym kodem — dla każdego klucza podaje: nazwę klasy w kodzie, co robi, "
+---
 # 🗺️ MAPA KLUCZY — Katalog ↔ Kod
 
 > **Cel:** Jeden plik który rozwiązuje wszelkie nieporozumienia między planami (katalog)

@@ -1,3 +1,10 @@
+---
+kategoria: MENSURA
+typ: zywy
+wlasciciel: —
+stan_na: 2026-06-01
+powod_istnienia: "Głęboki skan pliku źródłowego `archiwum/Azjatycki_skan_rynku_3100_links.md` (7106 linii) przez 'cztery legiony zwiadowców', żeby wyłowić perełki (nowe neurony/strategie/architektur"
+---
 # 🌏 SKAN AZJA — Perełki z 3100 Linków
 
 > *"Etiam in luto gemma latet."* — Nawet w błocie kryje się klejnot.

@@ -1,3 +1,10 @@
+---
+kategoria: CONSILIUM
+typ: zywy
+wlasciciel: narzedzia/bibliotekarz.py, narzedzia/przygotuj_biblioteke.py
+stan_na: 2026-07-16
+powod_istnienia: "Lista 205 pozycji (BIB-070..274) do rozbudowy biblioteki RAG Imperium, z priorytetyzacją, weryfikacją licencji i statusem dostępności każdej pozycji."
+---
 # 📚 PLAN ROZBUDOWY BIBLIOTEKI — BIB-070 … BIB-274
 
 > **Stan na:** 2026-07-16 · **Autor listy:** VITRUVIUSZ (Opus) · **Rozkaz Cezara:** „rozbuduj bibliotekę,

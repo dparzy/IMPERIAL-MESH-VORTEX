@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/biblioteki/hedge_mwu.py, imperium/biblioteki/igrzyska.py
+stan_na: 2026-06-09
+powod_istnienia: "Jedyny dokument opisujący system rywalizacji/rang dla neuronów, legionów i senatorów (Cursus Honorum Neuronalis) — mechanizm nagród/kar, automatyczną kalibrację wag, oraz (w drugie"
+---
 # 🏟️ IGRZYSKA IMPERIUM — System Rywalizacji i Rang
 
 > *"Per certamen ad gloriam."* — Przez rywalizację do chwały.

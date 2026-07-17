@@ -212,7 +212,11 @@ def sprawdz(dokumenty=None):
 
         # ── BRAMKA 2: GNICIE (właściciel ruszył się, opis nie) ───────────────
         # ACTA pomijamy świadomie: migawka to prawda swojego czasu (Prawo I).
+        # Raport AGREGOWANY per dokument (Prawo XXIV): jedna linia = jeden dokument.
+        # Powód: rozbicie na (dokument × właściciel) dało 86 linii dla 20 dokumentów —
+        # ściana tekstu, której nikt nie czyta, to bramka, której nikt nie słucha.
         if typ == "zywy" and stan_na and not zastapiony:
+            gnijace, lacznie = [], 0
             for wlasciciel in _wlasciciele(meta):
                 if not os.path.exists(os.path.join(ROOT, wlasciciel)):
                     bledy.append(f"[T2] {sciezka}: właściciel `{wlasciciel}` NIE ISTNIEJE "
@@ -220,10 +224,16 @@ def sprawdz(dokumenty=None):
                     continue
                 commity = _commity_wlasciciela_po(wlasciciel, stan_na)
                 if commity:
-                    ostrzezenia.append(
-                        f"[T2] GNICIE {sciezka} (stan_na {stan_na}): właściciel "
-                        f"`{wlasciciel}` zmieniony {len(commity)}× od tej daty "
-                        f"— ostatnio: {commity[0][:70]}")
+                    gnijace.append((len(commity), wlasciciel))
+                    lacznie += len(commity)
+            if gnijace:
+                gnijace.sort(reverse=True)
+                szczegol = ", ".join(f"{w.split('/')[-1]} {n}×" for n, w in gnijace[:3])
+                if len(gnijace) > 3:
+                    szczegol += f" (+{len(gnijace) - 3})"
+                ostrzezenia.append(
+                    f"[T2] GNICIE {sciezka} — stan_na {stan_na}, a kod zmieniony {lacznie}× "
+                    f"od tej daty w {len(gnijace)} plikach: {szczegol}")
 
     # ── BRAMKA 3: DUBLETY (ta sama kategoria + ten sam właściciel) ───────────
     wg_wlasciciela = {}

@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/cesarz/doradcy/fulmen.py, imperium/cesarz/doradcy/hermes.py, imperium/cesarz/doradcy/iustitia.py, imperium/cesarz/doradcy/oracle.py, imperium/cesarz/doradcy/pythia.py, imperium/cesarz/doradcy/rada.py
+stan_na: 2026-06-01
+powod_istnienia: "Jedyny dokument opisujący 'drugą opinię' Cesarza — niezależną radę 5 doradców wywoływaną w sytuacjach spornych/niejasnych (Senat podzielony, WETO Legatusa, szara strefa pewności, P"
+---
 # 🔮 DORADCY CARA — Niezależna Rada Cesarska
 
 > *"Audi alteram partem."* — Wysłuchaj drugiej strony.

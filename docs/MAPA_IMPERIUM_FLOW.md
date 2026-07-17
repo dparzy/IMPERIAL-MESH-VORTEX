@@ -1,3 +1,11 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/akwedukty/kwatermistrz_danych.py, imperium/biblioteki/kronikarz.py, imperium/biblioteki/mnemosyne.py, imperium/cesarz/titan_mind.py, imperium/drogi/nexus_hub.py, imperium/fundament/brama_kalkulatora.py, imperium/fundament/kuznia_narzedzi.py, imperium/koloseum/backtest.py, imperium/koloseum/monte_carlo.py, imperium/legiony/pierwszy_zwiadowca.py, imperium/legiony/roj_sygnalow.py, imperium/pretorianie/aegis_tarcza.py, imperium/pretorianie/lustro_prawdy.py, imperium/senat/meta_kora.py, imperium/swiatynie/kartograf.py, imperium/swiatynie/web_dashboard.py
+stan_na: 2026-05-31
+powod_istnienia: "Wersja narracyjna/dydaktyczna architektury — dla nowicjusza (Cezara): tłumaczy PO CO każdy organ istnieje, z przykładowym dialogiem (Zwiadowca 1 mówi 'DŁUGO...', Frakcja Byków vs N"
+dlug: "🚨 opisuje nieistniejący kod: war_lancer.py, sala_wojenna.py, koloseum/valhalla.py"
+---
 # 🏛️ MAPA PRZEPŁYWU IMPERIUM — kto z kim, co robi, jak decyduje
 
 > **Giełda docelowa:** MEXC (główna)

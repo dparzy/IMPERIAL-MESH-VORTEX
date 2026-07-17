@@ -1,3 +1,10 @@
+---
+kategoria: ACTA
+typ: acta
+wlasciciel: imperium/cesarz/deepseek_glos.py, imperium/legiony/mikro_neuron.py, imperium/senat/meta_kora.py
+stan_na: 2026-06-12
+powod_istnienia: "Pierwszy głęboki audyt stanu faktycznego systemu — co działa, co blokowane przez TA-Lib, co jest szkieletem, co brakuje całkowicie."
+---
 # 🔍 AUDYT SYSTEMU IMPERIUM — Stan Faktyczny
 
 > *"Nosce te ipsum."* — Poznaj siebie samego.

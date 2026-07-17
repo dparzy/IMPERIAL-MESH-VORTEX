@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/legiony/legatus.py
+stan_na: 2026-06-04
+powod_istnienia: "Jedyny dokument opisujący rolę koordynatora między 4 Legionami a Senatem — algorytm agregacji sygnałów (5 kroków), klasyfikację reżimu rynku, dynamiczne wagi reżimowe, i integrację"
+---
 # ⚔️ GENERAŁ LEGATUS — Koordynator Między Legionami a Senatem
 
 > **Rola:** Generał to brakujące ogniwo między 4 Legionami a Senatem.

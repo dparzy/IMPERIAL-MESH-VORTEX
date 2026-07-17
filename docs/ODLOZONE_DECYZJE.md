@@ -1,3 +1,10 @@
+---
+kategoria: CONSILIUM
+typ: zywy
+wlasciciel: narzedzia/ab_w329.py, narzedzia/ab_w334_progi.py, narzedzia/ab_w335_cross_rs.py, narzedzia/ab_w336_changepoint.py
+stan_na: 2026-06-18
+powod_istnienia: "Rejestr rzeczy ustalonych merytorycznie, ale świadomie odłożonych do czasu twardego pomiaru A/B (zasada 'nie wdrażamy bo brzmi dobrze — wdrażamy gdy A/B pokaże plus')."
+---
 # 🔖 ODŁOŻONE DECYZJE — czekają na pomiar (Prawo I)
 
 > Rzeczy ustalone, ale **świadomie odłożone** do czasu twardego pomiaru A/B.

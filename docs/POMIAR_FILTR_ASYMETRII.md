@@ -1,3 +1,10 @@
+---
+kategoria: MENSURA
+typ: acta
+wlasciciel: imperium/koloseum/dyrygent.py, imperium/pretorianie/filtr_asymetrii.py
+stan_na: 2026-06-13
+powod_istnienia: "Zmierzyć (Prawo XVI, nie zgadywać) czy Filtr Asymetrii Reżimu (W-314) faktycznie redukuje straty w rynku bocznym (ADX niski) — odkryty rozdźwięk in-sample vs OOS (in-sample +26k$ h"
+---
 # 📐 POMIAR FILTRA ASYMETRII REŻIMU (W-314) — dowód OOS (Prawo XVI)
 
 > **Stan na:** 2026-06-13 · **Metoda:** A/B backtest portfelowy na oknie OOS · **Status:** ✅ przewaga zmierzona

@@ -1,3 +1,10 @@
+---
+kategoria: DISCIPLINA
+typ: zywy
+wlasciciel: imperium/cesarz/doradcy/fulmen.py, imperium/cesarz/doradcy/hermes.py, imperium/cesarz/doradcy/iustitia.py, imperium/cesarz/doradcy/oracle.py, imperium/cesarz/doradcy/pythia.py, imperium/cesarz/doradcy/rada.py, tests/test_doradcy.py
+stan_na: 2026-06-20
+powod_istnienia: "Jedyny dokument rozróżniający DWA znaczenia „agenta' (Doradca Imperium = moduł Python w ścieżce decyzyjnej vs subagent Claude Code = plik .md) i dający wzorzec dodania każdego z ni"
+---
 # 🧩 MANUAL — Dodawanie Narzędzi i Agentów do Imperium
 
 > **Stan na:** 2026-06-20 · **Gałąź:** `claude/sleepy-fermi-dsdE4`

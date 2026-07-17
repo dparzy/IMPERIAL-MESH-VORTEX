@@ -1,3 +1,10 @@
+---
+kategoria: ACTA
+typ: acta
+wlasciciel: —
+stan_na: 2026-07-14
+powod_istnienia: "Pierwszy realny bieg Hyginusa (DeepSeek) po komplecie ulepszeń U1-U4 (query-expansion + self-critique + świadomość systemu) — Vitruviusz (Opus) jako sędzia ocenia 4 tematy/kandydat"
+---
 # 🔭 PLON HYGINUSA — osąd sędziego (Vitruviusz), 2026-07-14
 
 > **Snapshot datowany (Prawo I).** Pierwszy realny bieg Hyginusa po komplecie U1–U4 (`--pelny`:

@@ -1,3 +1,10 @@
+---
+kategoria: DISCIPLINA
+typ: zywy
+wlasciciel: imperium/akwedukty/bary_zdarzeniowe.py, imperium/koloseum/petla_live.py, imperium/legiony/feature_importance.py, imperium/legiony/meta_labeling.py, imperium/legiony/triple_barrier.py, narzedzia/audyt_spojnosci.py, tests/run_tests.py
+stan_na: 2026-07-16
+powod_istnienia: "Jedyny kompletny przewodnik „od zera do paper tradingu' dla nowicjusza — instalacja Python/TA-Lib, tryby PAPER/DRY-RUN/REAL, pełna tabela pól `KonfigPetliLive`, TradingView+ngrok k"
+---
 # 📖 MANUAL IMPERIUM — Pełna Instrukcja dla Nowicjusza
 
 > **Stan na:** 2026-07-16

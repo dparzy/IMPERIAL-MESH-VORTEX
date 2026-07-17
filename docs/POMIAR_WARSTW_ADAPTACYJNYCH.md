@@ -1,3 +1,10 @@
+---
+kategoria: MENSURA
+typ: acta
+wlasciciel: imperium/biblioteki/hedge_mwu.py, imperium/biblioteki/igrzyska.py, imperium/biblioteki/ksiega_wad_kodu.py, imperium/biblioteki/synapsy_rezimowe.py
+stan_na: 2026-06-13
+powod_istnienia: "Ablacja (Prawo XVI) czterech warstw adaptacyjnych — zmierzyć która faktycznie poprawia wynik w backteście in-sample na 5 parach, 4H."
+---
 # 📊 POMIAR WARSTW ADAPTACYJNYCH — ablacja (Prawo XVI)
 
 > **Stan na:** 2026-06-13 · **Metoda:** backtest portfelowy in-sample · **Status:** ⚠️ in-sample, wymaga OOS

@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/pretorianie/kalkulator_lewara.py
+stan_na: 2026-06-04
+powod_istnienia: "Jedyny dokument z pełną 'matematyką przeżycia' pozycji lewarowanej — od ceny likwidacji przez stop-loss, dynamiczną dźwignię, zarządzanie kapitałem (2%), take-profit, checklist Pre"
+---
 # ⚖️ KALKULATOR LEWARA — Matematyka Przeżycia
 
 > **Zasada Żelazna:** Zanim wejdziesz w pozycję lewarowaną — MUSISZ znać dokładną cenę likwidacji.

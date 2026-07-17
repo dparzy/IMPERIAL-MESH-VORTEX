@@ -1,3 +1,10 @@
+---
+kategoria: ACTA
+typ: acta
+wlasciciel: imperium/legiony/strategie/baza.py
+stan_na: 2026-07-13
+powod_istnienia: "Zwiad wiedzy (Bibliotheca Ulpia RAG 27641 fragmentów + internet) w celu ulepszenia auto-doboru strategii — zdiagnozowana luka: dobór strategii ignoruje zrealizowany P&L (czysto str"
+---
 # 🎯 ANALIZA: Auto-dobór strategii — zwiad wiedzy (biblioteka + internet)
 
 > **Stan na:** 2026-07-13 · **Typ:** datowany snapshot (Prawo I — prawda swojego czasu, audyt pomija)

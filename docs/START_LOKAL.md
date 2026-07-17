@@ -1,3 +1,10 @@
+---
+kategoria: DISCIPLINA
+typ: zywy
+wlasciciel: imperium/biblioteki/kustosz_pamieci.py, narzedzia/audyt_spojnosci.py, narzedzia/auto_lekcja.py, narzedzia/rag/indeksuj.py, skrypty/start.py, skrypty/start_lokal.py, tests/run_tests.py
+stan_na: 2026-06-30
+powod_istnienia: "Jedyne miejsce z tabelą porównawczą **chmura vs lokal** (co lokal DODAJE: wektory semantyczne, pełny dysk przez MCP, trwałe logi W1, DeepSeek) oraz jedyne, które promuje `aktualizu"
+---
 # 🖥️ START LOKALNY — pełny przewodnik (dla Cezara, nowicjusza)
 
 > **Stan na:** 2026-06-30 · Jak uruchomić Imperium na własnym komputerze z PEŁNĄ pamięcią

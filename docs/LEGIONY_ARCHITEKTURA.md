@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/legiony/mikro_neuron.py, imperium/legiony/neurony/dzwignia.py, imperium/legiony/neurony/momentum.py, imperium/legiony/neurony/onchain.py, imperium/legiony/neurony/struktura.py, imperium/legiony/neurony/trend.py, imperium/legiony/neurony/wolumen.py
+stan_na: 2026-06-04
+powod_istnienia: "Kanoniczne źródło nazewnictwa 4 Legionów (rzymskie nazwy: Legio X Equestris/Scalp, XII Fulminata/Swing, III Augusta/Invest, VI Ferrata/Leverage) + przypisanie konkretnych ID neuron"
+---
 # ⚔️ LEGIONY — Cztery Armie Imperium
 
 > **Zasada:** Każdy Legion = inny styl tradingu = inne interwały = inne wskaźniki.

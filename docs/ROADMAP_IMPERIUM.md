@@ -1,3 +1,10 @@
+---
+kategoria: CONSILIUM
+typ: zywy
+wlasciciel: —
+stan_na: 2026-06-12
+powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii."
+---
 # 🏛️ ROADMAP IMPERIUM — MAPA DRÓG SYSTEMU
 
 **Dokument:** Plan rozwoju systemu IMPERIUM — AI crypto trading z motywem Cesarstwa Rzymskiego

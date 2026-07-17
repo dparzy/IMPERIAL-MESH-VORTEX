@@ -1,3 +1,10 @@
+---
+kategoria: ACTA
+typ: acta
+wlasciciel: imperium/legiony/meta_labeling.py, imperium/legiony/neurony/przekroj.py, imperium/legiony/neutralizacja.py
+stan_na: 2026-06-17
+powod_istnienia: "Głęboki research 6-kątowy (APAC, konkursy quant, repozytoria, prace naukowe, patenty, książki) mający zidentyfikować nowe kategorie sygnałów zdekorelowane z istniejącymi 72 neurona"
+---
 # 🔬 DEEP RESEARCH — Nowe kategorie i sygnały (2026-06-17)
 
 > **STATUS: RESEARCH / PLAN — NIE KOD.** Prawo XIX: nic nie „istnieje" bez kodu+testów.

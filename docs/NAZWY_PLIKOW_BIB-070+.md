@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: —
+stan_na: 2026-07-16
+powod_istnienia: "Gotowa do skopiowania lista nazw plików (konwencja `BIB-XXX_Autor_Tytul.ext`) dla całej listy BIB-070..274, żeby Cezar mógł szybko nazwać pobrane pliki bez przepisywania z tabel PL"
+---
 # 📋 NAZWY PLIKÓW — BIB-070..274 (gotowe do wklejenia)
 
 > **Stan na:** 2026-07-16 · Konwencja: `BIB-XXX_Nazwisko(-Nazwisko)_Tytul-Z-Myslnikami.ext`

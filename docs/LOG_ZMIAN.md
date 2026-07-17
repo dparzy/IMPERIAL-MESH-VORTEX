@@ -49,6 +49,40 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
 
+## 2026-07-17 | 🧭 | Dług gnicia: KATALOG_NEURONOW + MATRYCA_KORELACJI (katalog ślepy na pół roju)
+
+**KATALOG_NEURONOW (40 zmian `rejestr.py`) — spłacony.** Weryfikacja mechaniczna 307 ID:
+
+| | |
+|---|---|
+| ✅ oznaczone „w kodzie", a nieistniejące | **0** — katalog **nigdy nie kłamie w tę stronę** |
+| **żyją w kodzie, a katalog ich NIE ZNA** | **44** (`OC-*`, `RADAR-*`, `NEWS-*`, `SMC-*`, `Z-*`, `V-*`, `C-01`, `D-01`, `H-01`, `BOCPD-01`, `CP-01`, `AUG-01`…) |
+| oznaczone ✅ | **15** przy 87 w kodzie — znaczniki zamarzły |
+
+**Diagnoza:** to ROADMAPA (CONSILIUM), nie mapa roju. Te 44 neurony **urosły POZA katalogiem**
+— z deep-researchu i pomiarów areny, nie z pierwotnego skanu wskaźników. Rój przestał rosnąć
+według tej listy. Dodany baner „czym ten dokument JEST, a czym NIE JEST" + wskazanie źródeł
+prawdy (MANIFEST_KODU / MAPA_KLUCZY, Prawo XIX).
+
+**Sprzeczność wewnętrzna NIEPOPRAWIONA — świadomie (Prawo I):** tabela mówi „RAZEM **129**",
+proza dwie linie niżej „**142** w rdzeniu + 132 w dywizjach = **274**". Trzy liczby planu,
+**żadnej nie da się zweryfikować wobec kodu** → nazwana wprost, nie zgadnięta.
+**Zgadnięta liczba byłaby halucynacją udającą naprawę.**
+
+**MATRYCA_KORELACJI (22 zmiany) — spłacona.** Zmierzone: **schemat numeracji
+`[LITERA]-[001-157]-W[WAGA]` NIGDY nie wszedł do kodu** — 0 pasujących kluczy. Realny format
+to `X-01`, a kategoria i waga to OSOBNE pola klasy (`X-01`: `KATEGORIA='M'`, `WAGA=6`) — bo
+waga w kluczu oznaczałaby, że zmiana wagi zmienia identyfikator. Sekcja **zostawiona**
+(tłumaczy intencję), ale nazwana. Legenda kategorii (6 liter z 15) → wskaźnik do jednego źródła.
+**Pomiar „46 neuronów" ZOSTAWIONY nietknięty** i oznaczony jako prawda swojego czasu — pomiar
+objął tamte 46, nie dzisiejsze 87; podmiana liczby sfalsyfikowałaby wynik (Prawo I).
+
+**Fałszywe widmo, którego NIE zgłosiłem:** mój skan ID wskazał `INF-20` jako nieistniejący
+neuron — to **odwołanie bibliograficzne** (Sinclair), nie klucz. Sprawdzenie kontekstu przed
+meldunkiem powstrzymało szósty fałszywy alarm tego dnia.
+
+**Pliki:** docs/KATALOG_NEURONOW.md, docs/MATRYCA_KORELACJI.md, docs/INDEKS_IMPERIUM.md.
+
 ## 2026-07-17 | ⚔️ | Dług gnicia: GENERAL_LEGATUS + LEGIONY_ARCHITEKTURA (86% rosteru było fikcją)
 
 **GENERAL_LEGATUS (19 zmian `legatus.py` od `stan_na`) — spłacony.** Każde twierdzenie

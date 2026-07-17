@@ -2,7 +2,7 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: imperium/legiony/rejestr.py
-stan_na: 2026-06-01
+stan_na: 2026-07-17
 powod_istnienia: "Katalog 299 zmapowanych mikro-neuronów jako roadmapa (87 zbudowanych) — zamiar, nie stan kodu; stan mówi MANIFEST"
 ---
 # 🧬 KATALOG MIKRO-NEURONÓW — Rój Imperium (299)
@@ -27,6 +27,37 @@ powod_istnienia: "Katalog 299 zmapowanych mikro-neuronów jako roadmapa (87 zbud
 > **Źródło prawdy kluczy:** `from imperium.legiony.rejestr import wszystkie_neurony`
 
 ---
+
+> # 🧭 CZYM TEN DOKUMENT JEST, A CZYM NIE JEST (zweryfikowane pomiarem 2026-07-17)
+>
+> **To ROADMAPA (CONSILIUM), nie mapa roju.** Katalog zebrał 307 pomysłów na neurony ze
+> skanu wskaźników — mówi **co MOŻNA zbudować**, nie **co JEST zbudowane**.
+>
+> **Pomiar wobec `rejestr.wszystkie_neurony()`:**
+>
+> | | |
+> |---|---|
+> | ID neuronów w tym dokumencie | **307** |
+> | oznaczone ✅ „w kodzie", a nieistniejące | **0** — katalog **nigdy nie kłamie w tę stronę** ✅ |
+> | **żyją w kodzie, a katalog ich NIE ZNA** | **44** (`OC-*` on-chain, `RADAR-*`, `NEWS-*`, `SMC-*`, `Z-*` meta-bramy, `V-*`, `C-01`, `D-01`, `H-01`, `BOCPD-01`, `CP-01`, `AUG-01` …) |
+> | oznaczone ✅ | **15** — przy <!-- LICZBA:neurony -->87<!-- /LICZBA --> w kodzie: znaczniki zamarzły |
+>
+> **Dlaczego katalog jest ślepy na połowę roju:** te 44 neurony **urosły POZA katalogiem** —
+> z deep-researchu i pomiarów areny, nie z pierwotnego skanu wskaźników. To nie jest błąd
+> katalogu; to dowód, że rój przestał rosnąć według tej listy.
+>
+> **⚠️ Sprzeczność wewnętrzna (niepoprawiona świadomie — Prawo I):** tabela PODSUMOWANIE ROJU
+> mówi „RAZEM **129**", a proza dwie linie niżej „**142** w rdzeniu legionów + 132 w dywizjach
+> = **274**". Trzy różne liczby planu; **żadnej nie da się zweryfikować wobec kodu**, więc
+> ich nie zgaduję — nazywam rozjazd i zostawiam do rozstrzygnięcia przy najbliższej rewizji
+> katalogu. (Zgadnięta liczba byłaby halucynacją udającą naprawę.)
+>
+> **Gdzie jest PRAWDA o kodzie (Prawo XIX):**
+> **stan implementacji → [`MANIFEST_KODU.md`](MANIFEST_KODU.md)** · **mapa klucz↔kod →
+> [`MAPA_KLUCZY.md`](MAPA_KLUCZY.md)** (audyt W14 wymusza pokrycie **każdego** klucza).
+> Statusy ✅ w tym dokumencie są **wskazówką historyczną**, nie źródłem prawdy — z definicji
+> zamarzają, bo rośnie kod, a nie katalog.
+
 
 ## 📊 PODSUMOWANIE ROJU
 

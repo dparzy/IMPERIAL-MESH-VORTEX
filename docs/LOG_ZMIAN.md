@@ -49,6 +49,50 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
 
+## 2026-07-17 | ⚔️ | Dług gnicia: GENERAL_LEGATUS + LEGIONY_ARCHITEKTURA (86% rosteru było fikcją)
+
+**GENERAL_LEGATUS (19 zmian `legatus.py` od `stan_na`) — spłacony.** Każde twierdzenie
+zweryfikowane wobec kodu:
+- ✅ **PRAWDA:** „min 5 neuronów, przewaga 55%" → `legatus.py:379` `min_neuronow=5, min_przewaga=0.55`
+- ❌ „Szkielet kodu — patrz plik implementacji" → `legatus.py` ma **833 linie**
+- ❌ **Legenda kategorii**: wymieniała **E** i **G**, których w kodzie NIE MA, i pomijała
+  **C, D, N, Z** — cztery całe rodziny neuronów z deep-researchu. Przepisana z docstringów
+  kodu (15 kategorii, **bez liczników** — Filar 4: ręczna liczba i tak by zgniła).
+- ❌ Tabela reżimów nie znała **SMC_ACTIVE** (`{'S': 2.0, 'F': 1.2, 'T': 1.1}` w kodzie) → dodany
+- ❌ „Faza 0 (teraz) — 2 testowe neurony" → Faza 0 i 1 **dawno wykonane**; sekcja PLAN → STAN
+
+**LEGIONY_ARCHITEKTURA (17 zmian w 6 plikach) — 🚨 86% rosteru było FIKCJĄ.** Weryfikacja
+mechaniczna **wszystkich 28 ID** wobec `rejestr.wszystkie_neurony()`:
+
+| | |
+|---|---|
+| zgodne z kodem | **4 z 28** |
+| zła nazwa | **9** — `X-01` opisany jako „Neuron EMA", w kodzie **RSI (14)**; `X-05` „OrderFlow" → **EMA Cross (9/21)** |
+| **ID nieistniejące** | **15** — w tym **CAŁY roster Legio III** (`III-01..III-07`) |
+
+**Odkrycie większe niż błędne nazwy: schemat „prefiks klucza = legion" UMARŁ.** W kodzie:
+`X-*` 17 · `XII-*` 7 · `VI-*` 1 · **`III-*` ZERO**. Pozostałe ~60 neuronów ma prefiksy
+**funkcyjne** (`OC-*`, `PSY-*`, `RADAR-*`, `NEWS-*`, `SMC-*`, `Z-*`…), które w podziale na
+cztery legiony się nie mieszczą. Rój organizuje się przez **KATEGORIA** (15 liter), nie przez
+numer legionu. **Metafora legionów żyje** (nazwa organu `imperium/legiony/`) — umarł schemat kluczy.
+
+**Rostery USUNIĘTE, nie „poprawione":** przepisanie zduplikowałoby `MAPA_KLUCZY.md` (jedyne
+źródło prawdy, audyt W14 wymusza pokrycie każdego z 87 kluczy). Dwie listy tych samych kluczy
+rozjadą się ponownie — dokładnie tak jak ta. Stara treść żyje w gicie.
+
+**Legenda kategorii SCALONA (Prawo XVI):** oba dokumenty miały własną ręczną kopię —
+**identycznie fałszywą** (te same zmyślone E/G, te same brakujące C/D/N/Z). Dowód, że
+problemem była KOPIA, nie autor. Jedno źródło: GENERAL_LEGATUS (Generał używa `KATEGORIA`
+jako klucza w `WAGI_REZIMU`).
+
+**Bramka złapała moje własne scalenie:** W10 miała **zaszyte na sztywno**, że słowo „Hurst"
+ma być w LEGIONY_ARCHITEKTURA — po przeniesieniu legendy pilnowała pustego miejsca. Audyt
+zaświecił czerwono, sprawdzenie przeniesione za treścią. To dokładnie ta kruchość, którą
+Tabularium ma zastąpić: **bramka zaszyta per-dokument nie przeżywa reorganizacji dokumentów.**
+
+**Pliki:** docs/GENERAL_LEGATUS.md, docs/LEGIONY_ARCHITEKTURA.md, narzedzia/audyt_spojnosci.py
+(W10 za treścią), docs/INDEKS_IMPERIUM.md (katalog).
+
 ## 2026-07-17 | 🛡️ | ZAPORA TESTÓW — testy przestały PALIĆ PIENIĄDZE (nawrót klasy z 07-16)
 
 **🚨 Co się stało:** po commicie porządkowym zobaczyłem w drzewie niewyjaśnioną zmianę

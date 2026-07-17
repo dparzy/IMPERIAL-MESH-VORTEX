@@ -2,7 +2,7 @@
 kategoria: FORMA
 typ: zywy
 wlasciciel: imperium/legiony/legatus.py
-stan_na: 2026-06-04
+stan_na: 2026-07-17
 powod_istnienia: "Jedyny dokument opisujący rolę koordynatora między 4 Legionami a Senatem — algorytm agregacji sygnałów (5 kroków), klasyfikację reżimu rynku, dynamiczne wagi reżimowe, i integrację"
 ---
 # ⚔️ GENERAŁ LEGATUS — Koordynator Między Legionami a Senatem
@@ -146,48 +146,48 @@ Generał dostosowuje wagi neuronów do bieżącego reżimu:
 | VOLATILE | Wszystkie ×0.7, A (Anty-manip) ×2.0 | L (Leverage) ×0.3 | Ostrożność |
 | PANIC | A (Anty-manip) ×3.0 | Wszystkie inne ×0.1 | Tylko obrona |
 | ON-CHAIN_BULLISH | O (On-chain) ×2.0 | L (Leverage) ×0.8 | Fundamenty mówią |
+| SMC_ACTIVE | S (Smart Money) ×2.0, F (Flow) ×1.2, T (Trend) ×1.1 | — | Struktury instytucjonalne prowadzą |
 | NORMAL | H (Hurst) ×1.1 | — | Lekkie wzmocnienie pamięci długiego zasięgu |
 
 ### Legenda kategorii neuronów
 
-| Litera | Kategoria | Opis |
-|--------|-----------|------|
-| M | Momentum | Wskaźniki pędu (RSI, MACD, StochRSI) |
-| T | Trend | Wskaźniki trendu (EMA, ADX, Supertrend) |
-| V | Zmienność | Wskaźniki zmienności (ATR, BB, Choppiness) |
-| F | Flow/Wolumen | Przepływ kapitału (CVD, OBV, OI) |
-| O | On-chain | Wskaźniki blockchain (MVRV, SOPR, Netflow) |
-| L | Lewarowanie | Wskaźniki ryzyka lewarowego (Funding, ATR-Lev) |
-| R | Rynki pochodne | Futures/opcje (Open Interest, Max Pain) |
-| S | Smart Money | SMC — struktury rynku (BOS, CHoCH, OB) |
-| A | Anty-manipulacja | Wykrywanie manipulacji i fałszywych wybić |
-| K | Korelacja | Korelacje i dywergencje między aktywami |
-| E | Eksploracja | Eksperymenty i nowe miary (EXP-*) |
-| G | Giełdowe | Dane z giełd (wolumeny, płynność) |
-| H | Hurst/Pamięć długiego zasięgu | Meta-brama reżimu: H>0.55 persystencja, H<0.45 antypersystencja, H≈0.5 NEUTRAL |
+> **Zweryfikowane wobec kodu 2026-07-17** (`rejestr.wszystkie_neurony()` + docstringi neuronów).
+> Poprzednia wersja tej tabeli wymieniała litery **E** i **G**, które **nie istnieją w kodzie**,
+> i pomijała **C, D, N, Z** — czyli cztery całe rodziny neuronów z deep-researchu.
+> **Bez liczników celowo** (Filar 4): ręcznie wpisana liczba zawsze się rozjedzie —
+> aktualny spis: `python -c "from imperium.legiony.rejestr import wszystkie_neurony; ..."`
+> albo `docs/MAPA_KLUCZY.md` (jedyne źródło prawdy klucz↔kod).
+
+| Litera | Kategoria | Co mierzy | Przykłady |
+|--------|-----------|-----------|-----------|
+| **M** | Momentum | pęd ceny (RSI, MACD, StochRSI) | X-01, X-02, X-03 |
+| **T** | Trend | kierunek i siła trendu (EMA, ADX, Supertrend) | X-05, X-10, X-18 |
+| **V** | Zmienność | reżim zmienności (Realized Volatility Regime) | V-13, V-14 |
+| **F** | Flow / Wolumen | przepływ kapitału (CVD, OBV, VSA) | V-01, V-02, V-03 |
+| **O** | On-chain | dane blockchain (MVRV, SOPR, Netflow) | OC-01, OC-02, OC-03 |
+| **L** | Lewarowanie | ryzyko spadkowe modulujące dźwignię (Ulcer Index) | L-14, VI-13 |
+| **R** | Rynki pochodne / reżim | futures, opcje, detektory zmiany reżimu | AUG-01, BOCPD-01, CP-01 |
+| **S** | Smart Money (SMC) | struktury rynku (Order Block, BOS, CHoCH) | SMC-01, SES-01 |
+| **A** | Anty-manipulacja | polowanie na stop-lossy, fałszywe wybicia | A-01, A-02, A-03 |
+| **K** | Korelacja / makro | powiązania międzyrynkowe (DXY Trend, stablecoiny) | K-01, K-03, K-04 |
+| **C** | Cross-sectional | siła względna w koszyku (Relative Strength) | C-01 |
+| **D** | Geometria ścieżki | Path Signature — Lévy Area (Close×Volume) | D-01 |
+| **N** | Meta-bramy: entropia/pamięć | Permutation Entropy Chaos Gate, Fractional Differentiation | N-01, N-02 |
+| **H** | Hurst / pamięć długiego zasięgu | Hurst-DFA Regime Gate (H>0.55 persystencja, H<0.45 antypersystencja) | H-01 |
+| **Z** | Meta-bramy obronne | tłumią rój przez `pewnosc_przeciwnika` (VPIN ToxicFlow, pump, bubble, cascade) | Z-01, Z-02, RADAR-04 |
 
 ---
 
-## 🏗️ PLAN IMPLEMENTACJI
+## 🏗️ STAN IMPLEMENTACJI (zweryfikowany wobec kodu 2026-07-17)
 
-### Faza 0 (teraz) — Minimalna wersja
-- Zbiera sygnały z 2 testowych neuronów (X-02 StochRSI, VI-01 FundingRate)
-- Tryb FOKUS na BTC
-- Prosty algorytm agregacji (suma ważona)
-- Bez DeepSeek — raport tekstowy
+> Ta sekcja była **planem z 2026-06-04** i twierdziła, że „teraz" Generał zbiera sygnały
+> z **2 testowych neuronów**. Zweryfikowane: Faza 0 i Faza 1 są **wykonane od dawna**.
 
-### Faza 1 — Pełna wersja
-- Wszystkie 79+ neuronów aktywnych
-- Tryb SKANER z watchlistą 20 aktywów
-- Klasyfikacja reżimu rynku
-- Raport JSON dla Senatu
-
-### Faza 2 — Inteligentna wersja
-- DeepSeek czyta RaportLegatusa i decyduje jako Senat
-- Dinamyczna selekcja neuronów (nie wszystkie zawsze aktywne)
-- Feedback loop: które neurony były trafne → ich wagi rosną
-
----
+| Faza | Zakres | Stan (dowód z kodu) |
+|---|---|---|
+| **Faza 0** — wersja minimalna | 2 testowe neurony, FOKUS na BTC, suma ważona | ✅ **dawno wykonana** |
+| **Faza 1** — wersja pełna | wszystkie neurony, SKANER z watchlistą, klasyfikacja reżimu, raport dla Senatu | ✅ **wykonana** — <!-- LICZBA:neurony_aktywne -->81<!-- /LICZBA --> aktywnych neuronów, tryby SKANER/FOKUS i 7 reżimów w `legatus.py` |
+| **Faza 2** — wersja inteligentna | LLM czyta raport, dynamiczna selekcja neuronów, feedback loop wag | 🟡 **częściowo** — feedback loop ŻYJE (HedgeMWU, § niżej); Senat LLM opt-in (`petla_live --senat`); dynamiczna selekcja neuronów **niezbudowana** |
 
 ## 💡 ZASADY GENERAŁA
 
@@ -247,4 +247,7 @@ Szczegóły algorytmu MWU → `docs/IGRZYSKA_IMPERIUM.md` § HedgeMWU.
 
 ## 📁 Plik kodu: `imperium/legiony/legatus.py`
 
-> Szkielet kodu — patrz plik implementacji.
+> **NIE jest to szkielet** (korekta 2026-07-17 — dokument twierdził tak od 2026-06-04):
+> `legatus.py` to **833 linie** żywego kodu — agregacja, 7 reżimów (`WAGI_REZIMU`),
+> tryby SKANER/FOKUS, mnożniki MWU, meta-bramy. Progi z tego dokumentu **zweryfikowane**:
+> `Legatus(min_neuronow=5, min_przewaga=0.55)` — zgadza się co do wartości (`legatus.py:379`).

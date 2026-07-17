@@ -671,8 +671,13 @@ def _warstwa_10_doc_keywords():
          "GENERAL_LEGATUS.md brak 'mnozniki_neuronow' — HedgeMWU→Legatus integracja nie opisana"),
         ("docs/GENERAL_LEGATUS.md", "HedgeMWU",
          "GENERAL_LEGATUS.md brak 'HedgeMWU' — online learning nie opisane"),
-        ("docs/LEGIONY_ARCHITEKTURA.md", "Hurst",
-         "LEGIONY_ARCHITEKTURA.md brak 'Hurst' — kategoria H nie opisana w legendzie"),
+        # Legenda kategorii przeniesiona 2026-07-17: LEGIONY_ARCHITEKTURA miała jej DRUGĄ,
+        # ręczną kopię — identycznie fałszywą (zmyślone E/G, brak C/D/N/Z). Scalona w jedno
+        # źródło u GENERAŁA, bo to on używa KATEGORIA jako klucza w WAGI_REZIMU.
+        # Bramka MUSI wędrować za treścią — inaczej pilnuje pustego miejsca (złapane przez
+        # nią samą przy tym scaleniu; to koszt sprawdzeń zaszytych na sztywno per dokument).
+        ("docs/GENERAL_LEGATUS.md", "Hurst",
+         "GENERAL_LEGATUS.md brak 'Hurst' — kategoria H nie opisana w legendzie kategorii"),
     ]
     if _liczba_praw:
         checks.append((

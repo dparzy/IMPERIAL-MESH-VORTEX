@@ -14,6 +14,27 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 📋 | Trójka instrukcji: NAMIESTNIK (nadal prawda) + INSTRUKCJA + SETUP_LOKALNY
+
+**Co (dług gnicia, 3 dokumenty):**
+• **NAMIESTNIK** — ✅ **nadal prawdziwy**. API (`get_namiestnik`/`decyduj`/`skaluj_dzwignie`/
+  `raport`) i obie tablice (reżim × parametry, styl × cap) zgadzają się z kodem co do liczby
+  (zmierzone: TREND_STRONG/1D → INVEST/filtr/cap2/SPOT/0.605; RANGING ×0.4/72%; PANIC ×0.1/90%).
+  Potwierdzenie + bump (poprawna spłata gnicia bywa „nadal prawda"). Doprecyzowano, że
+  `klasyfikuj_rezim` żyje w `legatus.py`. Tabela dowodowa = pomiar datowany, nietknięta.
+• **INSTRUKCJA_URUCHOMIENIA** — rozjazd właściciela: nagłówek wskazywał `skrypty/start.py`,
+  a dokument opisuje `pierwszy_zwiadowca.py` (Faza 0). Poprawiony właściciel + dodana wzmianka
+  o start.py (dashboard :8777) jako nowszej ścieżce. Reszta (git URL, 5 modułów, ścieżka
+  `base/dane`, wykres+raport) zweryfikowana ✅.
+• **SETUP_LOKALNY** — liczby książek „41/42"/„32"/„17" → realnie 79 (bloki LICZBA:ksiazki);
+  sekcja wydajności oznaczona jako pomiar DATOWANY (35 plików, czerwiec 2026 — dziś ~29,7k
+  fragmentów); nota, że calibre czyta djvu (osobny djvulibre zbędny). Dublet z START_LOKAL
+  (oba o `indeksuj.py`) rozstrzygnięty werdyktem: pełny setup RAG vs skrócony start.
+
+**Bramka:** audyt exit 0 ✅ · gnicie trójki → 0.
+
+---
+
 ## 2026-07-18 | 💾 | PAMIEC_SESJI — sekcja „auto-aktualizuj" utknęła na 06-22, na LICZBA
 
 **Co (dług gnicia):** dokument z mapą podpięć + ~200 lekcjami. Lekcje i mapy = zapis DATOWANY

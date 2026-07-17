@@ -2,13 +2,20 @@
 kategoria: FORMA
 typ: zywy
 wlasciciel: imperium/koloseum/namiestnik.py, tests/test_namiestnik.py
-stan_na: 2026-06-03
-powod_istnienia: "Jedyny dokument opisujący 'Gating Network' (sieć bramkującą) świadomą reżimu I interwału — meta-kontroler ustawiający parametry (tryb, lewar, próg, styl) dla reszty łańcucha decyzy"
+stan_na: 2026-07-18
+powod_istnienia: "Jedyny dokument opisujący 'Gating Network' (sieć bramkującą) świadomą reżimu I interwału — meta-kontroler ustawiający parametry (tryb, lewar, próg, styl) dla reszty łańcucha decyzyjnego"
 ---
 # 🏛️ NAMIESTNIK — Regime + Timeframe-Aware Gating Network
 
-> **Stan na:** 2026-06-03 · **Status:** ✅ aktywny w kodzie (`imperium/koloseum/namiestnik.py`)
+> **Status:** ✅ aktywny w kodzie (`imperium/koloseum/namiestnik.py`)
 > **Testy:** pokryty w `tests/test_namiestnik.py` · **Faza:** 1 (deterministyczna)
+
+> **✅ Weryfikacja wobec kodu 2026-07-18: dokument NADAL PRAWDZIWY.** API (`get_namiestnik`,
+> `decyduj`, `skaluj_dzwignie`, `raport`, pola `DecyzjaNamiestnika`) i **obie tablice**
+> (reżim × parametry, styl × cap) zgadzają się z kodem co do liczby — zmierzone: TREND_STRONG/1D
+> → INVEST/filtr/cap 2/SPOT/0.605, RANGING ×0.4/72%/stój, PANIC ×0.1/90%/stój. Tabela dowodowa
+> to pomiar DATOWANY (2026-06-03), nie odświeżany (Prawo I). Jedyne doprecyzowanie: schematowe
+> `klasyfikuj_rezim(wskazniki)` żyje w `legatus.py` (wejście do Namiestnika), nie w nim samym.
 
 ---
 

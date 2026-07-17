@@ -152,6 +152,7 @@ def _gpu_cuda() -> Dict[str, Any]:
             ["nvidia-smi", "--query-gpu=name,memory.total",
              "--format=csv,noheader,nounits"],
             capture_output=True, text=True, timeout=6,
+            encoding="utf-8", errors="replace",
         )
     except (FileNotFoundError, subprocess.SubprocessError, OSError):
         return brak

@@ -173,6 +173,22 @@ CHECKLIST_STARTOWA = [
                "owijaj w try/except + fallback (u nas: calibre) i traktuj PUSTY WYNIK bez wyjątku tak samo "
                "jak wyjątek — cicha pustka jest gorsza od głośnego błędu.",
      "zrodlo": "BIB-075 whitepaper Bitcoina (2026-07-16)"},
+
+    # ══ sesja 2026-07-17 (Tabularium) — wada ŚRODOWISKA, nie logiki ═══════════════════════
+    {"kat": "kodowanie",
+     "regex": r'subprocess\.run\((?:(?!encoding\s*=)[\s\S]){0,300}?\btext\s*=\s*True'
+              r'(?:(?!encoding\s*=)[\s\S]){0,150}?\)',
+     "opis": "🚨 subprocess.run(text=True) BEZ encoding='utf-8' — na polskim Windowsie dekoduje cp1250",
+     "lekcja": "`text=True` każe Pythonowi dekodować wyjście procesu kodowaniem KONSOLI (cp1250 na polskim "
+               "Windowsie), nie UTF-8. Nasze commity zaczynają się od emoji, komentarze mają polskie znaki, "
+               "więc każdy odczyt `git log --format=%s` / wyjścia ruffa to ruletka: albo krzaki "
+               "(`status.py`: „8f18d07 đź§ą PORZÄ„DEK…”), albo UnicodeDecodeError w wątku czytającym → "
+               "`stdout=None` → bramka CICHNIE NA GŁUCHO i zawsze przechodzi. Dokładnie tak uciszona była "
+               "bramka gnicia Tabularium w dniu powstania. Najpodlejszy przypadek: W13 (ruff) — pęka "
+               "WTEDY, GDY ZNAJDZIE buga, bo dopiero wtedy cytuje polską linię źródła. "
+               "ZAWSZE: encoding='utf-8', errors='replace'. Zmierzone: 6 trafień / 377 plików .py, "
+               "zero trafień w kodzie naprawionym (wzorzec sprawdzony w obie strony).",
+     "zrodlo": "self-review Tabularium — 2 wady aktywne + 4 utajone, w tym W6b i W13 (2026-07-17)"},
 ]
 
 

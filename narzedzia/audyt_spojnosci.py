@@ -305,9 +305,13 @@ def audyt() -> tuple:
 
         # Jedno przejście gita zamiast N wywołań: data ostatniego commitu per plik.
         daty_plikow: dict = {}
+        # encoding="utf-8" OBOWIĄZKOWE (klasa wady zmierzona 2026-07-17): `text=True` bez
+        # encoding dekoduje wyjście gita kodowaniem konsoli Windows (cp1250). Nazwy plików
+        # są dziś ASCII, więc W6b działa — ale PIERWSZY plik z polską literą w nazwie
+        # wywala wątek czytający, stdout=None i bramka dat cichnie NA GŁUCHO.
         _log = subprocess.run(
             ["git", "log", "--format=@%cd", "--date=short", "--name-only", "--", "docs"],
-            capture_output=True, text=True, timeout=30)
+            capture_output=True, text=True, timeout=30, encoding="utf-8", errors="replace")
         biezaca = None
         for linia in _log.stdout.splitlines():
             if linia.startswith("@"):
@@ -418,7 +422,8 @@ def audyt() -> tuple:
             for args in (["diff", "--name-only", "HEAD"], ["diff", "--cached", "--name-only"]):
                 try:
                     out = subprocess.run(["git", *args], cwd=ROOT, capture_output=True,
-                                         text=True, timeout=20).stdout
+                                         text=True, timeout=20,
+                                         encoding="utf-8", errors="replace").stdout
                     zmienione |= {l for l in out.splitlines()
                                   if l.startswith(("imperium/", "narzedzia/")) and l.endswith(".py")}
                 except Exception:
@@ -545,6 +550,9 @@ def _warstwa_13_ruff():
             [sys.executable, "-m", "ruff", "check", "imperium", "tests", "narzedzia", "skrypty",
              "--quiet", "--output-format", "concise"],
             cwd=ROOT, capture_output=True, text=True, timeout=120,
+            # ruff cytuje linię źródła w komunikacie — nasze komentarze są po polsku,
+            # więc bez encoding="utf-8" W13 wywala się dokładnie wtedy, gdy ZNAJDZIE bug.
+            encoding="utf-8", errors="replace",
         )
     except FileNotFoundError:
         info.append("⚠️ W13: ruff niezainstalowany — linter pominięty (pip install ruff)")

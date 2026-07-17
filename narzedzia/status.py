@@ -45,8 +45,13 @@ def _czytaj(sciezka: str) -> str:
 
 
 def _run(cmd: str) -> str:
+    # encoding="utf-8" OBOWIĄZKOWE (bug zmierzony 2026-07-17): bez tego `text=True`
+    # dekoduje wyjście gita kodowaniem konsoli Windows (cp1250 na polskim systemie),
+    # a nasze commity zaczynają się od emoji → „8f18d07 đź§ą PORZÄ„DEK…" zamiast treści.
+    # errors="replace", bo status ma RAPORTOWAĆ, nigdy nie wywracać się na znaku.
     try:
-        r = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=ROOT)
+        r = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd=ROOT,
+                           encoding="utf-8", errors="replace")
         return r.stdout.strip()
     except Exception:
         return "(błąd)"

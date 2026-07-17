@@ -6,6 +6,41 @@
 
 ---
 
+## 2026-07-17 | 🏛️ | TABULARIUM — rejestr dokumentów + naprawa klasy wad kodowania (6 wystąpień)
+
+**Co:** nowy organ **TABULARIUM** (`narzedzia/tabularium.py`, 20 testów) — rzymskie archiwum
+państwowe: każdy żywy dokument DEKLARUJE SAM SIEBIE w nagłówku metadanych (kategoria ze
+zamkniętego słownika LEX/TABULA/FORMA/DISCIPLINA/CONSILIUM/MENSURA/ACTA · typ · właściciel
+· stan_na · powód istnienia), a maszyna to weryfikuje. Trzy bramki: **T1 deklaracja**,
+**T2 gnicie** (właściciel-plik kodu zmieniony PO `stan_na` → opis nie nadąża za kodem),
+**T3 dublet** (ta sama kategoria + ten sam właściciel = kod opisany dwa razy, Prawo XVI).
+Katalog dokumentów GENEROWANY z nagłówków (`katalog --zapisz`) między znacznikami.
+
+**Dlaczego (rozkaz Cezara — porządek Imperium):** ręcznie pisany indeks kłamie z definicji.
+DOWÓD (Prawo I): `INDEKS_IMPERIUM.md:50` twierdzi „299 mikro-neuronów (72 w kodzie)" przy **87**
+w kodzie — i przechodzi audyt na ZIELONO, bo W5 czyta liczbę z innej sekcji tego samego pliku.
+Zwiad 42/56 dokumentów wykazał **pięć różnych twierdzeń** o liczbie neuronów (87/72/47/27/55/62)
+oraz pliki-widma w 4 dokumentach (`sala_wojenna.py`, `war_lancer.py`, `valhalla.py` — nigdy nie
+istniały). Zmierzone: przenoszenie żywych docs kosztuje 271 żywych odwołań + **1003 w kronice**,
+której Prawo I zabrania przepisać → **decyzja Cezara: porządek w METADANYCH, fizycznie tylko
+migawki** (1-3 odwołania każda).
+
+**Klasa wad (rozkaz stały — Księga Wad):** `subprocess.run(text=True)` BEZ `encoding="utf-8"`
+dekoduje wyjście gita kodowaniem konsoli Windows (cp1250), a nasze commity zaczynają się od emoji.
+**2 wady aktywne** (`status.py` drukował „8f18d07 đź§ą PORZÄ„DEK…"; bramka gnicia Tabularium
+CICHŁA NA GŁUCHO — stdout=None → zawsze zielona) + **4 utajone**, w tym w naszych bramkach
+**W6b** (pierwszy plik z polską literą w nazwie ucisza bramkę dat) i **W13** (ruff pęka DOKŁADNIE
+wtedy, gdy znajdzie buga — bo dopiero wtedy cytuje polski komentarz). Regex zmierzony wg nauczki
+07-16: 6 trafień / 377 plików .py, zero trafień na kodzie naprawionym (sprawdzony w obie strony).
+
+**Pliki:** narzedzia/tabularium.py (nowy), tests/test_tabularium.py (nowy, 20 testów granic),
+imperium/biblioteki/ksiega_wad_kodu.py (+klasa „kodowanie"), narzedzia/status.py,
+narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/oczy/censor_sprzetu.py.
+
+**Powód:** P0 porządku domknięte. Następny krok: nagłówki do 64 dokumentów (`stan_na` = data
+faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
+scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
+
 ## 2026-07-16 | 🎓 | CENSOR sprzętu + plan TIRO (lokalny hybrydowy LLM-uczeń)
 
 **Co:** nowy organ **CENSOR SPRZĘTU** (`imperium/oczy/censor_sprzetu.py`) — „oczy" mierzące

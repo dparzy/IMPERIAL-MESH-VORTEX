@@ -100,7 +100,7 @@ def wartosci_z_kodu():
 
     from imperium.biblioteki.pamiec_absolutna import ImperiumLog
     from imperium.legiony.rejestr import (
-        raport_elity, wszystkie_neurony, wszyscy_zwiadowcy,
+        neurony_dla_trybu, raport_elity, wszystkie_neurony, wszyscy_zwiadowcy,
     )
     from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
     neurony = wszystkie_neurony()
@@ -111,6 +111,12 @@ def wartosci_z_kodu():
         "strategie": len(wszystkie_strategie()),
         "elity": raport_elity()["lacznie_elite"],
         "pola_logu": len(dataclasses.fields(ImperiumLog)),
+        # Profile stylu (W-323) — tabela NEURONY_STYLU jest „strojona pomiarem”, więc te
+        # liczby zmieniają się przy każdym A/B. Zmierzone 2026-07-17: jeden dokument podawał
+        # je kolejno jako 41/59/35, 65/65/70 i 75/75/87 — każda prawdziwa w dniu zapisu.
+        "styl_scalp": len(neurony_dla_trybu("SCALP")),
+        "styl_swing": len(neurony_dla_trybu("SWING")),
+        "styl_invest": len(neurony_dla_trybu("INVEST")),
     }
 
 

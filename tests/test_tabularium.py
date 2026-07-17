@@ -282,9 +282,24 @@ def test_liczby_z_kodu_sa_dodatnie():
     """Liczby idą z ŻYWEGO rejestru — zero to znak, że import cicho padł."""
     from narzedzia.tabularium import wartosci_z_kodu
     w = wartosci_z_kodu()
-    for klucz in ("neurony", "zwiadowcy", "strategie", "elity", "pola_logu"):
+    for klucz in ("neurony", "zwiadowcy", "strategie", "elity", "pola_logu",
+                  "styl_scalp", "styl_swing", "styl_invest"):
         assert w[klucz] > 0, f"{klucz} = {w[klucz]} — rejestr nie odpowiada?"
     assert w["neurony_aktywne"] <= w["neurony"], "aktywnych nie może być więcej niż wszystkich"
+
+
+def test_liczby_profile_stylu_sledza_rejestr():
+    """Profile stylu są STROJONE pomiarem (A/B), więc ręczna liczba rozjedzie się co A/B.
+
+    Zmierzone 2026-07-17: ANALIZA_NEURONY podawała rozmiary profili kolejno jako 41/59/35,
+    65/65/70 i 75/75/87 — każda prawdziwa w dniu zapisu. Dlatego są wstrzykiwane.
+    """
+    from imperium.legiony.rejestr import neurony_dla_trybu
+    from narzedzia.tabularium import wartosci_z_kodu
+    w = wartosci_z_kodu()
+    for styl, klucz in (("SCALP", "styl_scalp"), ("SWING", "styl_swing"), ("INVEST", "styl_invest")):
+        assert w[klucz] == len(neurony_dla_trybu(styl))
+        assert w[klucz] <= w["neurony"], f"{styl}: profil nie może być większy niż rój"
 
 
 def test_liczby_pola_logu_sledza_dataclass():

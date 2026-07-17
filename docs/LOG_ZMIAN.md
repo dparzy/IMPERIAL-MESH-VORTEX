@@ -14,6 +14,43 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-17 | 🔬 | ANALIZA_NEURONY zweryfikowana — propozycja „odłożona" żyje jako C-01
+
+**Co (dług gnicia 12 → 11):** weryfikacja dokumentu MENSURA (17× `rejestr.py` od `stan_na`).
+Kluczowa trudność: dokument MIESZA pomiar datowany z opisem stanu — więc rozdzieliłem je jawnie
+(nagłówek „Jak czytać"), zamiast odświeżać liczby w środku pomiarów (Prawo I: A/B z czerwca na
+roju 65→70 to prawda swojego czasu, nie odświeżamy).
+
+**Sprostowania stanu (zmierzone):**
+• **„5 z 6 propozycji wdrożono (Cross-Sectional RS odłożony — wymaga cross-symbol w pętli)"** →
+  **wdrożone 6/6**. RS-X powstał 2026-06-17 jako **C-01 `NeuronRelativeStrength`**
+  (`WSKAZNIK=CROSS_RS`, DOSTEPNY=True) — i dostał **własną kategorię C „Przekrój koszyka"**
+  zamiast proponowanej R, z wagami reżimowymi pod jego naturę (silny w trendzie, słaby w PANIC,
+  gdy korelacje→1). Dokument opisywał jako „do zrobienia" coś, co żyje od miesiąca.
+• **„brama obronna Z (5)"** → Z liczy dziś **8**; kategorie C/D/H/K/N powstały po tamtym researchu.
+  Osie roju przeliczone `Counter(n.KATEGORIA)`: R 16 · M 12 · T 11 · F 9 · O 8 · Z 8 · S 6 · A 4 ·
+  K 4 · L 2 · N 2 · V 2 · C 1 · D 1 · H 1.
+• **„AI/ML 0%"** i **„EXP-12 wyciszony"** → ✅ nadal prawda (brak kat. E; Atmabhan czeka na feed L2).
+• **V-06/V-07/VP-01/Z-06/Z-07** → ✅ wszystkie istnieją, kategorie zgodne (F/F/S/Z/Z);
+  OC-01..04 `DOSTEPNY=False` ✅ zgodnie z sekcją 9b.
+
+**Warstwa 15 — trzy nowe liczby wstrzykiwane (`styl_scalp`/`styl_swing`/`styl_invest`):**
+ten jeden dokument podawał rozmiary profili kolejno jako **41/59/35**, **65/65/70** i dziś
+**75/75/87** — każda prawdziwa w dniu zapisu, każda skłamała miesiąc później. Tabela
+`NEURONY_STYLU` jest z założenia *strojona pomiarem*, więc ręczna liczba rozjeżdża się po
+KAŻDYM A/B. Liczby żyją teraz w kodzie (`neurony_dla_trybu`), nie w zdaniu.
+
+**Nowa sekcja 10 — otwarte długi tego dokumentu** (obiecane pomiary, których NIE zrobiono):
+🔴 VP-01 OOS na 5 parach (obiecany w sekcji 6 — do tego czasu VP-01 zostaje z pełną wagą,
+bo jedno okno ≠ dowód redundancji) · 🔴 A/B „SWING-szeroki vs pełnia" (obiecany w 9a) ·
+🔴 per-neuron mnożnik reżimowy (decyzja kierunkowa odłożona w 9b).
+
+**Pliki:** `docs/ANALIZA_NEURONY_SCALP_SWING_INVEST.md` · `narzedzia/tabularium.py` (+3 klucze) ·
+`tests/test_tabularium.py` (+1) · `docs/INDEKS_IMPERIUM.md`.
+**Bramka:** testy 2504/2504 ✅ · audyt exit 0 ✅ · gnicie 12→11.
+
+---
+
 ## 2026-07-17 | 🔱 | WIZJA_TRYBY_I_ROZWOJ zweryfikowana — 🚨 14,9 mln barów 1m leży nieużytych
 
 **Co (dług gnicia 13 → 12):** weryfikacja najcięższego dokumentu długu (19× `rejestr.py` od

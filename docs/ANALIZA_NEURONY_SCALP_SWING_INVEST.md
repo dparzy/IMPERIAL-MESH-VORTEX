@@ -2,31 +2,48 @@
 kategoria: MENSURA
 typ: zywy
 wlasciciel: imperium/koloseum/namiestnik.py, imperium/legiony/rejestr.py, narzedzia/ab_w322.py, narzedzia/dekorelacja_w322.py
-stan_na: 2026-06-15
-powod_istnienia: "Porównać co Imperium MA (65 neuronów w momencie pisania) z najlepszymi praktykami scalp/swing/invest z internetu, znaleźć zdekorelowane luki, i ZMIERZYĆ (nie założyć) czy nowe neur"
+stan_na: 2026-07-17
+powod_istnienia: "Porównać co Imperium MA z najlepszymi praktykami scalp/swing/invest z internetu, znaleźć zdekorelowane luki, i ZMIERZYĆ (nie założyć) czy nowe neurony realnie pomagają"
 ---
 # 🔬 ANALIZA — najlepsze neurony/strategie pod SCALP / SWING / INVEST
 
-> **Cel:** porównać to, co Imperium MA w kodzie (65 neuronów), z najlepszymi praktykami
-> z dokumentacji wewnętrznej i z internetu (research 2026-06-15) — i wskazać UNIKATOWE,
-> zdekorelowane luki warte wdrożenia, per styl gry.
+> **Cel:** porównać to, co Imperium MA w kodzie (dziś <!-- LICZBA:neurony -->87<!-- /LICZBA -->
+> neuronów), z najlepszymi praktykami z dokumentacji wewnętrznej i z internetu
+> (research 2026-06-15) — i wskazać UNIKATOWE, zdekorelowane luki warte wdrożenia, per styl gry.
 > **Metoda (Prawo I):** liczby neuronów z `rejestr.wszystkie_neurony()`; techniki zewnętrzne
 > z linkami (niżej, sekcja Źródła). **Dekorelacja (Prawo XVI):** kandydat = nowy SYGNAŁ, nie
-> nowa nazwa starego. **Stan na:** 2026-06-15.
+> nowa nazwa starego.
+
+> **⚠️ Jak czytać ten dokument (weryfikacja 2026-07-17).** Rozdziela dwie rzeczy:
+> • **Sekcje 6–9 to POMIARY DATOWANE** — A/B z czerwca 2026 na roju liczącym wtedy 65→70
+>   neuronów. To prawda swojego czasu i **nie jest odświeżana** (Prawo I: nie falsyfikujemy
+>   historii). Liczby „65"/„70" w tych sekcjach opisują **próbę pomiarową**, nie stan dzisiejszy.
+> • **Stan bieżący** (rozmiar roju, profile stylu, co wdrożono) jest **wstrzykiwany z kodu**
+>   albo oznaczony ✅/🔴 — to on musi nadążać.
+> Research zewnętrzny (sekcje 2–5) pochodzi z **2026-06-15 i nie był weryfikowany ponownie**.
 
 ---
 
 ## 1. Co MAMY dziś (per styl)
 
-| Styl | Interwał | Neurony pokrywające (wybór z 65) |
+*Tabela poniżej to WYBÓR reprezentantów, nie pełna lista — dziś rój liczy
+<!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów (spis: [`KATALOG_NEURONOW.md`](./KATALOG_NEURONOW.md)).*
+
+| Styl | Interwał | Neurony pokrywające (wybór) |
 |------|----------|----------------------------------|
 | **SCALP** | M1–M15 / 1h | X-26 HA Scalper, X-01 RSI, X-02 StochRSI, V-03 CVD, V-05 Force Index, V-04 Volume Anomaly, X-11 RVOL, Z-01 VPIN, SES-01/02 sesje |
 | **SWING** | 4h–1D | X-05 EMA Cross, XII-01 ADX, XII-02 Ichimoku, XII-03 EMA50/200, XII-04 Supertrend, X-18 Donchian, X-10 HMA, X-28 MTF Confluence, X-27 Value-Z, SMC-01/02/03 |
 | **INVEST** | 1D–1W | OC-01 MVRV-Z, OC-02 SOPR, OC-03 Puell, OC-04 Netflow, H-01 Hurst, Z-03 Bubble-Z, RADAR-01/02/03 |
 
-**Mocne osie:** momentum (12 neuronów), trend (11), wolumen/flow (7), brama obronna Z (5).
-**Słabe osie (z mapy katalogu):** Struktura/SMC w kodzie 16%, On-chain 25%, Reżim/Sentyment 22%,
-AI/ML 0%. Mikrostruktura (order-flow per poziom) — brak (czeka na feed L2, EXP-12 wyciszony).
+**Osie roju — zmierzone 2026-07-17** (`Counter(n.KATEGORIA)`, legenda: [`legatus.py`](../imperium/legiony/legatus.py)):
+Sentyment R **16** · Momentum M **12** · Trend T **11** · Flow/Wolumen F **9** + V **2** ·
+On-chain O **8** · Zagrożenie Z **8** · Struktura S **6** · Anty-manipulacja A **4** ·
+Makro K **4** · Leverage L **2** · N **2** · Przekrój koszyka C **1** · D **1** · Hurst H **1**.
+
+**Nadal brak:** AI/ML (kategoria E — 0 neuronów, Faza 2+) oraz mikrostruktura order-flow per
+poziom — czeka na feed L2 (zwiadowca EXP-12 Atmabhan istnieje i jest **wyciszony** do czasu feedu ✅).
+*Uwaga: czerwcowa wersja podawała „brama obronna Z (5)" — dziś Z liczy 8; kategorie C/D/H/K/N
+powstały już po tamtym researchu.*
 
 ---
 
@@ -103,7 +120,8 @@ zdekorelowane od istniejących (inna oś informacji — Prawo XVI), **(c)** peł
    - Dekorelacja: V-02 to VWAP kroczący; kotwica strukturalna daje inny poziom odniesienia.
    - Źródło: Highstrike/XS 2025 anchored-VWAP.
 
-5. **RS-X — Cross-Sectional Relative Strength** (kat. R, portfelowy)
+5. **RS-X — Cross-Sectional Relative Strength** (proponowano kat. R, portfelowy) — ✅ **WDROŻONY
+   2026-06-17 jako C-01** (własna kategoria C „Przekrój koszyka", `WSKAZNIK=CROSS_RS`)
    - Ranking siły każdej pary vs koszyk (zwrot względny N-barowy) → wspiera Skaner Okazji
      („kupuj najsilniejsze"). Wpina się w TRYB NAJLEPSZY (selekcja TOP-N).
    - Dekorelacja: RADAR-02 to dominacja BTC (makro); RS-X to ranking względny W koszyku.
@@ -153,7 +171,13 @@ AI/ML kat. E (Faza 2+) — wszystkie zablokowane danymi/zakresem, nie pomysłem.
 
 ## 6. POMIAR DEKORELACJI po wdrożeniu (W-322, Prawo XVI — mierzone, nie zgadywane)
 
-5 z 6 propozycji wdrożono (Cross-Sectional RS odłożony — wymaga cross-symbol w pętli).
+W dniu pomiaru wdrożono 5 z 6 propozycji (Cross-Sectional RS był wtedy odłożony — wymagał
+cross-symbol w pętli). **Sprostowanie 2026-07-17: wdrożone są WSZYSTKIE 6** — RS-X powstał
+2026-06-17 jako **C-01 `NeuronRelativeStrength`** (`WSKAZNIK=CROSS_RS`, DOSTEPNY=True), przy
+czym dostał **własną kategorię C „Przekrój koszyka"**, a nie proponowaną tu kategorię R —
+z wagami reżimowymi wprost pod jego naturę (silny w trendzie, słaby w PANIC, gdy korelacje→1).
+Poniższa tabela to pomiar 5 neuronów z czerwca i jej nie odświeżamy (Prawo I).
+
 Pomiar na 220 barach 4h BTC (`narzedzia/dekorelacja_w322.py`), sygnał = kierunek×pewność:
 
 | Neuron | Aktywny | max \|r\| | Werdykt |
@@ -240,16 +264,25 @@ prowadzimy na danym interwale. RSI/StochRSI/CVD/HA — scalp. EMA50/200, Ichimok
 swing. MVRV-Z, SOPR, Puell, Pi Cycle — invest. Bezpieczniki (VPIN, anty-manip) — wszędzie.
 
 **Implementacja (kod jest prawem, Prawo XIX):**
-- `rejestr.NEURONY_STYLU` — tabela `KLUCZ → (style...)`, JAWNIE dla wszystkich 70 (audyt W1
-  sprawdza zero sierot/braków). To „tablica do żonglowania" — strojona w czasie pomiarem.
+- `rejestr.NEURONY_STYLU` — tabela `KLUCZ → (style...)`, JAWNIE dla **każdego** neuronu roju
+  (audyt W1 sprawdza zero sierot/braków). To „tablica do żonglowania" — strojona w czasie pomiarem.
 - `rejestr.neurony_dla_trybu(styl)` — zwraca zestaw dla SCALP/SWING/INVEST.
-- `zbuduj_legatusa(styl=...)` + `backtest_portfel(styl=...)` — opt-in (domyślnie None = pełne 70,
+- `zbuduj_legatusa(styl=...)` + `backtest_portfel(styl=...)` — opt-in (domyślnie None = pełny rój,
   zero regresji na istniejących backtestach; interwał 4h NIE wymusza profilu automatycznie).
 - Spójność z `namiestnik.styl_interwalu()` (M1-15→SCALP, 30M-4H→SWING, 1D-1W→INVEST) i
   `namiestnik.ProfilStylu` (lewar cap / rynek / próg per styl — RYZYKO, komplementarne do
   doboru NEURONÓW tutaj).
 
-**Rozmiar zestawów:** SCALP 41 | SWING 59 | INVEST 35 (z 70). Bezpieczniki/reżim uniwersalne.
+**Rozmiar zestawów DZIŚ** (wstrzykiwany z `neurony_dla_trybu` — W15):
+SCALP <!-- LICZBA:styl_scalp -->75<!-- /LICZBA --> |
+SWING <!-- LICZBA:styl_swing -->75<!-- /LICZBA --> |
+INVEST <!-- LICZBA:styl_invest -->87<!-- /LICZBA -->
+z <!-- LICZBA:neurony -->87<!-- /LICZBA -->. Bezpieczniki/reżim uniwersalne.
+
+> **Dlaczego te liczby są wstrzykiwane, a nie wpisane:** tabela jest *strojona pomiarem*, więc
+> rozmiary zmieniają się po każdym A/B. Ten dokument podawał je kolejno jako **41/59/35**
+> (2026-06-15), **65/65/70** (sekcja 9b) i dziś **75/75/87** — każda była prawdziwa w dniu
+> zapisu i każda skłamała miesiąc później. Liczba żyje teraz w kodzie (Warstwa 15).
 
 **Hipoteza wstępna (Prawo I):** przypisanie stylów to domain-knowledge + sekcja 1 — NIE pomiar.
 Docelowo strojone A/B per styl.
@@ -298,8 +331,37 @@ STRUKTURALNIE NIEZDOLNY na TF (abstynuje z braku danych), nie z "wydaje się wol
 i tak nie głosują na 4h OHLCV (OC-01..04 abstynują bez feedu; Z-07 abstynuje bo <350 barów 1D).
 SCALP/SWING różnica jest tylko te 5 INVEST-only. Pełnia i SWING-65 są równoważne na tym backtescie.
 
-**Decyzja (Prawo I — stan aktualny):**
-- `NEURONY_STYLU` ustawiona na **zasadę włączności**: SCALP 65 | SWING 65 | INVEST 70.
-- Różnicowanie SCALP↔SWING jest wspólne do czasu scoreboard kontrybucji per neuron per styl.
+**Decyzja (Prawo I — obowiązuje nadal):**
+- `NEURONY_STYLU` ustawiona na **zasadę włączności**: wykluczamy tylko neurony STRUKTURALNIE
+  niezdolne na danym TF (abstynujące z braku danych), nigdy „bo wydaje się wolny/szybki".
+  W dniu pomiaru dawało to 65 | 65 | 70; **dziś (wstrzykiwane):**
+  SCALP <!-- LICZBA:styl_scalp -->75<!-- /LICZBA --> |
+  SWING <!-- LICZBA:styl_swing -->75<!-- /LICZBA --> |
+  INVEST <!-- LICZBA:styl_invest -->87<!-- /LICZBA --> — rój urósł, zasada się nie zmieniła.
+- Różnicowanie SCALP↔SWING jest wspólne do czasu scoreboard kontrybucji per neuron per styl
+  (INVEST = pełny rój, bo nic nie abstynuje na 1D).
 - Tabela jest **jawna i strojona pomiarem** — to "tablica do żonglowania" jak powiedział Cezar.
   Każde przesunięcie granicy per-neuron wymaga A/B, nie opinii.
+
+---
+
+## 10. Co z tego dokumentu jest ŻYWE (weryfikacja 2026-07-17)
+
+| Propozycja (sekcja 3) | Stan w kodzie | Uwaga |
+|---|---|---|
+| VP-01 Volume Profile / VPOC | ✅ `KAT=S`, DOSTEPNY | graniczna antykorelacja z ADX (−0.85) — **OOS na 5 parach nadal NIEZROBIONY** |
+| Z-06 Amihud Illiquidity | ✅ `KAT=Z`, DOSTEPNY | warunkowy (ożywa przy cienkiej płynności) |
+| Z-07 Pi Cycle Top | ✅ `KAT=Z`, DOSTEPNY | warunkowy (INVEST/1D — abstynuje przy <350 barach) |
+| V-06 Delta Divergence | ✅ `KAT=F`, DOSTEPNY | filar dywersyfikacji (\|r\|=0.41) |
+| V-07 Anchored VWAP | ✅ `KAT=F`, DOSTEPNY | filar dywersyfikacji (\|r\|=0.54) |
+| RS-X Cross-Sectional RS | ✅ **C-01** (kat. C, nie R) | wdrożony 2026-06-17 — dokument mylnie mówił „odłożony" |
+| OC-01..04 (on-chain) | ⏸️ `DOSTEPNY=False` | wyciszone na czystym OHLCV — zgodnie z sekcją 9b |
+| EXP-12 Atmabhan (L2) | ⏸️ zwiadowca wyciszony | czeka na feed L2 |
+| Footprint/OFI, M2/FRED, AI-ML kat. E | 🔴 brak | zablokowane danymi/zakresem, nie pomysłem |
+
+**Otwarte długi z tego dokumentu (nie „zrobione", tylko odłożone):**
+1. 🔴 **VP-01 OOS na 5 parach** — obiecane w sekcji 6, nadal niewykonane; do tego czasu VP-01
+   zostaje z pełną wagą (jedno okno ≠ dowód redundancji — Prawo XVI).
+2. 🔴 **A/B „SWING-szeroki vs pełnia"** — obiecany w sekcji 9a po sfalsyfikowaniu dedykacji.
+3. 🔴 **Per-neuron mnożnik reżimowy** — decyzja kierunkowa odłożona w 9b (WAGI_REZIMU są
+   kategoryjne, więc strojenie jednego neuronu uderza w całą kategorię).

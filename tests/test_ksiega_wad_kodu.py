@@ -177,3 +177,79 @@ def test_zasiej_dodaje_checkliste_i_partycjonuje(tmp_path):
 def test_checklist_startowa_ma_komplet_pol():
     for c in CHECKLIST_STARTOWA:
         assert c["opis"] and c["lekcja"] and c["kat"]
+
+
+def test_checklist_startowa_nie_przemyca_regexu():
+    """Wzorzec wpisany do CHECKLIST_STARTOWA nigdy nie skanuje — jest ozdobą.
+
+    Zmierzone 2026-07-17: wzorzec `subprocess text=True` przeleżał w checkliście od dnia
+    dodania, nie łapiąc niczego, bo `dodaj_checklist` nie czyta pola `regex`. Liczbowy test
+    partycji tego nie widział (wpis liczył się jako checklista i zgadzał się z długością listy).
+    """
+    for c in CHECKLIST_STARTOWA:
+        assert not c.get("regex"), (
+            f"[{c['kat']}] ma regex, a siedzi w CHECKLIST_STARTOWA → przenieś do WZORCE_STARTOWE"
+        )
+
+
+def test_zasiej_odrzuca_regex_w_checkliscie(tmp_path, monkeypatch):
+    """Pomyłka w miejscu wpisu ma być GŁOŚNA — cicha pustka to klasa wady z samej księgi."""
+    import imperium.biblioteki.ksiega_wad_kodu as kw
+    monkeypatch.setattr(kw, "CHECKLIST_STARTOWA", [
+        {"kat": "x", "regex": r"foo\(", "opis": "wzorzec w złej liście", "lekcja": "l", "zrodlo": "t"},
+    ])
+    with pytest.raises(ValueError, match="WZORCE_STARTOWE"):
+        kw.zasiej_startowe(tmp_path / "k.jsonl")
+
+
+def test_dodaj_awansuje_checkliste_do_wzorca(tmp_path):
+    """Klasa semantyczna → wzorzec w dniu, w którym zmierzymy szum. Bez dubla (Prawo XVI)."""
+    k = KsiegaWadKodu(tmp_path / "k.jsonl")
+    assert k.dodaj_checklist("bezpiecznik", "ten sam opis", "lekcja stara") is True
+    assert k.dodaj("bezpiecznik", r"eval\(", "ten sam opis", "lekcja nowa", "pomiar") is True
+    assert len(k.wszystkie()) == 1, "awans nie może dublować wpisu"
+    assert len(k.checklista()) == 0 and len(k.wzorce()) == 1
+    assert k.skanuj("x = eval('2+2')\n"), "po awansie wzorzec musi realnie skanować"
+
+
+def test_wzorzec_kodowanie_zyje_i_milczy(tmp_path):
+    """subprocess.run(text=True) bez encoding — łapany; z encoding — przepuszczany."""
+    zasiej_startowe(tmp_path / "k.jsonl")
+    k = KsiegaWadKodu(tmp_path / "k.jsonl")
+    zly = 'out = subprocess.run(["git", "log"], capture_output=True, text=True).stdout\n'
+    dobry = ('out = subprocess.run(["git", "log"], capture_output=True, text=True,\n'
+             '                     encoding="utf-8", errors="replace").stdout\n')
+    assert any(t["kat"] == "kodowanie" for t in k.skanuj(zly))
+    assert not any(t["kat"] == "kodowanie" for t in k.skanuj(dobry))
+
+
+def test_wzorzec_granica_bloku_zyje_i_milczy(tmp_path):
+    """`.*?` + DOTALL w jednym re.compile — łapane w OBU wariantach; poprawne formy przepuszczane.
+
+    Ta bomba zjadła 44 linie historii LOG_ZMIAN (2026-07-17). Baza miała dwa wystąpienia:
+    `(.*?)` w nawiasie (wstrzykiwacz liczb) i gołe `.*?` (generator katalogu) — wzorzec musi
+    łapać oba, bo pierwsza wersja widziała tylko drugie.
+    """
+    zasiej_startowe(tmp_path / "k.jsonl")
+    k = KsiegaWadKodu(tmp_path / "k.jsonl")
+    zly_w_nawiasie = "WZ = re.compile(r'<!--A:(\\w+)-->(.*?)<!--/A-->', re.DOTALL)\n"
+    zly_gole = 'w = re.compile(re.escape(A) + r".*?" + re.escape(B), re.DOTALL)\n'
+    dobry_granica = "WZ = re.compile(r'<!--A-->((?:(?!<!--)[\\s\\S])*?)<!--/A-->')\n"
+    dobry_bez_dotall = 'WZ = re.compile(r"a.*?b")\n'
+    dobry_bez_leniwego = 'WZ = re.compile(r"a[\\s\\S]+b", re.DOTALL)\n'
+    assert any(t["kat"] == "parsowanie" for t in k.skanuj(zly_w_nawiasie))
+    assert any(t["kat"] == "parsowanie" for t in k.skanuj(zly_gole))
+    for dobry in (dobry_granica, dobry_bez_dotall, dobry_bez_leniwego):
+        assert not any(t["kat"] == "parsowanie" for t in k.skanuj(dobry)), dobry
+
+
+def test_wzorzec_bezpiecznik_zyje_i_milczy(tmp_path):
+    """Bramka karmiona literałem True — łapana; realny warunek i mkdir — przepuszczane."""
+    zasiej_startowe(tmp_path / "k.jsonl")
+    k = KsiegaWadKodu(tmp_path / "k.jsonl")
+    zly = "ocena = Hermes().ocen(DaneHermes(hash_ok=True, vpin=0.3))\n"
+    dobry = "ocena = Hermes().ocen(DaneHermes(hash_ok=(log.hash_sha256 == oczekiwany), vpin=0.3))\n"
+    mkdir = "folder.mkdir(parents=True, exist_ok=True)\n"
+    assert any(t["kat"] == "bezpiecznik" for t in k.skanuj(zly))
+    assert not any(t["kat"] == "bezpiecznik" for t in k.skanuj(dobry))
+    assert not any(t["kat"] == "bezpiecznik" for t in k.skanuj(mkdir)), "idiom mkdir to nie bramka"

@@ -257,7 +257,8 @@ def audyt() -> tuple:
         ref = date.today()
         try:
             _out = subprocess.run(["git", "log", "-1", "--format=%cd", "--date=short"],
-                                  capture_output=True, text=True, timeout=5)
+                                  capture_output=True, text=True, timeout=5,
+                                  encoding="utf-8", errors="replace")
             if _out.returncode == 0 and _out.stdout.strip():
                 ref = date.fromisoformat(_out.stdout.strip())
         except Exception:  # noqa: BLE001 — brak gita → fallback na dziś

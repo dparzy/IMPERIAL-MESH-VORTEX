@@ -84,11 +84,21 @@ ZNACZNIK_KONIEC = "<!-- TABULARIUM:koniec -->"
 # ODEBRANIU dokumentom prawa do ich wpisywania: liczba żyje między znacznikami
 # i jest przepisywana z żywego kodu.
 #     Użycie w dokumencie:  <!-- LICZBA:neurony -->87<!-- /LICZBA -->
-LICZBA_WZORZEC = re.compile(r"<!--\s*LICZBA:(\w+)\s*-->(.*?)<!--\s*/LICZBA\s*-->", re.DOTALL)
+#
+# Treść bloku NIE MOŻE zawierać `<!--` — inaczej otwarcie bez własnego domknięcia sklei się
+# z domknięciem NASTĘPNEGO bloku i `sub()` skasuje wszystko pomiędzy. Zmierzone 2026-07-17:
+# jeden niedomknięty znacznik zacytowany w LOG_ZMIAN zjadł 44 linie historii (Prawo I).
+# Granica bloku, nie „najbliższy pasujący ogon” — regex bez tego ograniczenia jest nożem.
+LICZBA_WZORZEC = re.compile(
+    r"<!--\s*LICZBA:(\w+)\s*-->((?:(?!<!--)[\s\S])*?)<!--\s*/LICZBA\s*-->"
+)
 
 
 def wartosci_z_kodu():
     """Żywe liczby Imperium prosto z rejestrów. Jedyne źródło prawdy (Prawo XIX)."""
+    import dataclasses
+
+    from imperium.biblioteki.pamiec_absolutna import ImperiumLog
     from imperium.legiony.rejestr import (
         raport_elity, wszystkie_neurony, wszyscy_zwiadowcy,
     )
@@ -100,14 +110,23 @@ def wartosci_z_kodu():
         "zwiadowcy": len(wszyscy_zwiadowcy()),
         "strategie": len(wszystkie_strategie()),
         "elity": raport_elity()["lacznie_elite"],
+        "pola_logu": len(dataclasses.fields(ImperiumLog)),
     }
 
 
 def wstrzyknij_liczby(sucho=False):
-    """Przepisuje każdy blok <!-- LICZBA:x --> z żywego kodu. → (zmiany, bledy)."""
+    """Przepisuje każdy blok <!-- LICZBA:x --> z żywego kodu. → (zmiany, bledy).
+
+    Dokumenty `typ: acta` (LOG_ZMIAN, migawki) są POMIJANE: wpis datowany jest prawdą
+    swojego czasu i cytuje liczby z dnia zapisu (Prawo I — nie falsyfikujemy historii).
+    Bez tego filtra wpis z 2026-07-17 mówiący „87 neuronów" cicho stałby się „90", gdy rój
+    urośnie — kłamstwo tym groźniejsze, że wyprodukowane przez narzędzie od prawdy.
+    """
     wartosci = wartosci_z_kodu()
     zmiany, bledy = [], []
-    for sciezka, _ in zbierz_dokumenty():
+    for sciezka, meta in zbierz_dokumenty():
+        if meta.get("typ") == "acta":
+            continue
         pelna = os.path.join(ROOT, sciezka)
         with open(pelna, encoding="utf-8") as f:
             tresc = f.read()
@@ -401,8 +420,15 @@ def zapisz_katalog(sciezka_indeksu="docs/INDEKS_IMPERIUM.md"):
     if ZNACZNIK_START not in tresc or ZNACZNIK_KONIEC not in tresc:
         return False, (f"Brak znaczników w {sciezka_indeksu} — wstaw w miejscu katalogu:\n"
                        f"{ZNACZNIK_START}\n{ZNACZNIK_KONIEC}")
-    wzorzec = re.compile(re.escape(ZNACZNIK_START) + r".*?" + re.escape(ZNACZNIK_KONIEC),
-                         re.DOTALL)
+    # Treść między znacznikami nie może zawierać KOLEJNEGO otwarcia — inaczej znacznik
+    # zacytowany w tekście (a INDEKS to dokument O dokumentach, więc cytat jest naturalny)
+    # skleiłby się z domknięciem prawdziwej sekcji i `sub()` zjadłby wszystko pomiędzy.
+    # Ta sama klasa zjadła 44 linie LOG_ZMIAN przez wstrzykiwacz liczb (2026-07-17).
+    wzorzec = re.compile(
+        re.escape(ZNACZNIK_START)
+        + r"(?:(?!" + re.escape(ZNACZNIK_START) + r")[\s\S])*?"
+        + re.escape(ZNACZNIK_KONIEC)
+    )
     nowa = wzorzec.sub(lambda _: katalog_md(), tresc, count=1)
     if nowa == tresc:
         return True, f"{sciezka_indeksu}: katalog bez zmian"

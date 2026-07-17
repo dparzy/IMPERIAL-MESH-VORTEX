@@ -14,6 +14,63 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-17 | 🧠 | PAMIEC_ABSOLUTNA zweryfikowana + wstrzykiwacz, który ZJADŁ HISTORIĘ
+
+**Co (dług gnicia 14 → 13):** spłata `docs/PAMIEC_ABSOLUTNA.md` przez WERYFIKACJĘ twierdzeń
+wobec kodu, nie bump daty. Zmierzone rozbieżności: schemat `ImperiumLog` podawany jako
+„~80 pól" przy **68** w kodzie · pola `top3_neurony_long/short` nie istnieją (kod:
+`top3_long/short`) · brak `mae_pct`/`mfe_pct` i typu `DORADCY` · nazwa pliku to `_sygnał.jsonl`
+· katalogi `igrzyska/ sesje/ analizy/` i `indeks.json` **nie istnieją** (opisane jako gotowe)
+· **„Kronikarz v2 — Interrogator"** (`zapytaj`, `porownaj_okresy`, `replay_sesji`)
+prezentowany jako działające API — **0 trafień w kodzie**; Kronikarz ma wyłącznie
+`zapisz(RunReport)`. Realne API (`wczytaj`, `podsumowanie_sesji`, `log_sygnal`,
+`log_trade_open`, `IMPERIUM_LOG_DIR`) nie było opisane wcale. Usunięta sekcja WFO podawała
+progi „Sharpe > 0.6 / < 0.4" i okna „90/30 dni" — kod liczy `WFE = sharpe_oos/sharpe_is`
+z `prog_wfe=0.5` w BARACH (zweryfikowane przed usunięciem — Zasada Archiwizacji).
+Rozmiar schematu jest teraz liczbą wstrzykiwaną (klucz `pola_logu`, W15) — nie zgnije znowu.
+
+**🚨 Prawo XV — LUKA 1 (łańcuch integralności przerwany):** Brama liczy `CalcResult.sha256`
+per wskaźnik, ale `ImperiumLog.hash_sha256` **nie jest wypełniany przez NIC** (0 przypisań),
+a `dyrygent.py:911` karmi bramkę Hermesa literałem `hash_ok=True` — bezpiecznik, który nie
+może się zapalić. Prawo IX wymienia `hash_sha256` jako obowiązkowe → kod łamie własne prawo.
+Udokumentowane jako LUKA; naprawa = osobne zadanie (ZASADA WPIĘCIA: Hermes stoi na ścieżce
+decyzyjnej, więc opt-in OFF). **LUKA 2:** 6 z 9 typów `TypLogu` bez producenta.
+
+**🚨 NAJWAŻNIEJSZE — narzędzie od prawdy sfalsyfikowało historię (Prawo I):** przy tej sesji
+`wstrzyknij_liczby` **ZJADŁ 44 linie LOG_ZMIAN** — mój wpis, cały wpis TABULARIUM i początek
+Filara 4, sklejone w kaszę. Przyczyna: regex bloku liczbowego używał leniwego `.*?` z
+`re.DOTALL`, więc zacytowany w tekście znacznik BEZ domknięcia skleił się z domknięciem
+NASTĘPNEGO bloku, a `sub()` skasował całą treść pomiędzy. Wykryte przez czytanie wyjścia
+testów (historia przywrócona z gita, nic nie utracone). **Druga wada tej samej klasy:**
+wstrzykiwacz przepisywał też dokumenty `typ: acta` — wpis z 2026-07-17 cytuje „87 neuronów"
+jako prawdę swojego dnia; gdy rój urośnie, narzędzie CICHO zmieniłoby historię na nową liczbę
+(dziś no-op, bo liczba się zgadza — bomba utajona). **Trzecia:** identyczna bomba `.*?`+DOTALL
+w generatorze katalogu (`zapisz_katalog`), a INDEKS to dokument O dokumentach, więc cytat
+znacznika jest tam naturalny. Naprawa u źródła: treść bloku nie może zawierać własnego
+otwarcia (`(?:(?!<!--)[\s\S])*?`) · wstrzykiwacz omija `typ: acta` · testy granic na oba.
+
+**Wada Księgi Wad (znaleziona przy okazji):** `zasiej_startowe` CICHO ignorował pole `regex`
+w `CHECKLIST_STARTOWA` — wzorzec wpisany do złej listy stawał się **ozdobą**. Tak leżał od
+dnia dodania wzorzec `subprocess text=True`: **nigdy niczego nie przeskanował**. Liczbowy test
+partycji tego nie widział. Naprawa: bramka `ValueError` przy regexie w checkliście · `dodaj()`
+AWANSUJE checklistę do wzorca zamiast dublować (Prawo XVI). **Ożywiony wzorzec natychmiast
+złapał przeoczenie:** `audyt_spojnosci.py:259` — jedyny `subprocess.run(text=True)` bez
+`encoding` (3 pozostałe naprawiono 07-17, ten umknął). Naprawione.
+
+**Dwa nowe wzorce regex, szum zmierzony PRZED dodaniem (rozkaz stały):** `bezpiecznik`
+(bramka karmiona literałem `True`) — 1 trafienie / 377 plików = dokładnie bug, 0 fałszywek,
+idiom `mkdir(exist_ok=True)` wykluczony · `parsowanie` (`.*?` + DOTALL w jednym `re.compile`)
+— baza miała 2 wystąpienia, oba naprawione, dziś 0 trafień i 0 fałszywek; wzorzec sprawdzony
+w obie strony na obu wariantach (`.*?` gołe i w nawiasie).
+
+**Pliki:** `docs/PAMIEC_ABSOLUTNA.md` (v2.0) · `imperium/biblioteki/ksiega_wad_kodu.py` ·
+`narzedzia/tabularium.py` · `narzedzia/audyt_spojnosci.py` · `tests/test_ksiega_wad_kodu.py`
+(+6) · `tests/test_tabularium.py` (+3) · `docs/INDEKS_IMPERIUM.md`.
+**Bramka:** testy 2503/2503 ✅ · audyt exit 0 (ruff czysty) ✅ · gnicie 14→13 · dublet
+kronikarza rozstrzygnięty z powodem na widoku.
+
+---
+
 ## 2026-07-17 | 🏛️ | TABULARIUM — rejestr dokumentów + naprawa klasy wad kodowania (6 wystąpień)
 
 **Co:** nowy organ **TABULARIUM** (`narzedzia/tabularium.py`, 20 testów) — rzymskie archiwum

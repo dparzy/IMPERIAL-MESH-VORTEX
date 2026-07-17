@@ -282,9 +282,70 @@ def test_liczby_z_kodu_sa_dodatnie():
     """Liczby idą z ŻYWEGO rejestru — zero to znak, że import cicho padł."""
     from narzedzia.tabularium import wartosci_z_kodu
     w = wartosci_z_kodu()
-    for klucz in ("neurony", "zwiadowcy", "strategie", "elity"):
+    for klucz in ("neurony", "zwiadowcy", "strategie", "elity", "pola_logu"):
         assert w[klucz] > 0, f"{klucz} = {w[klucz]} — rejestr nie odpowiada?"
     assert w["neurony_aktywne"] <= w["neurony"], "aktywnych nie może być więcej niż wszystkich"
+
+
+def test_liczby_pola_logu_sledza_dataclass():
+    """PAMIEC_ABSOLUTNA podaje rozmiar schematu ImperiumLog — musi iść za kodem.
+
+    Dokument twierdził „~80 pól" przy 68 w kodzie (zmierzone 2026-07-17). Liczba
+    wpisana ręcznie rozjeżdża się z każdym dodanym polem — dlatego jest wstrzykiwana.
+    """
+    import dataclasses
+
+    from imperium.biblioteki.pamiec_absolutna import ImperiumLog
+    from narzedzia.tabularium import wartosci_z_kodu
+    assert wartosci_z_kodu()["pola_logu"] == len(dataclasses.fields(ImperiumLog))
+
+
+def test_liczby_niedomkniety_znacznik_nie_zjada_tekstu():
+    """GRANICA (realny incydent 2026-07-17): otwarcie BEZ domknięcia zjadło 44 linie historii.
+
+    Regex z DOTALL i `(.*?)` sklejał osierocone otwarcie z domknięciem NASTĘPNEGO bloku i
+    `sub()` kasował całą treść pomiędzy — w tym cudze wpisy. Blok musi kończyć się na własnej
+    granicy albo nie dopasować się wcale.
+    """
+    from narzedzia.tabularium import wartosci_z_kodu, wstrzyknij_liczby
+    prawda = wartosci_z_kodu()["neurony"]
+    miedzy = "TEKST KTORY MUSI PRZEZYC"
+    sciezka = _tymczasowy_dokument(
+        "---\nkategoria: TABULA\ntyp: zywy\nwlasciciel: —\nstan_na: 2026-07-17\n"
+        "powod_istnienia: test\n---\n\n"
+        "Cytat bez domknięcia: <!-- LICZBA:neurony -->\n\n"
+        f"{miedzy}\n\n"
+        "Prawdziwy blok: <!-- LICZBA:neurony -->999<!-- /LICZBA -->\n")
+    try:
+        wstrzyknij_liczby(sucho=False)
+        with open(sciezka, encoding="utf-8") as f:
+            tresc = f.read()
+        assert miedzy in tresc, "treść między znacznikami ZJEDZONA — regex przekroczył granicę bloku"
+        assert f"<!-- LICZBA:neurony -->{prawda}<!-- /LICZBA -->" in tresc, "domknięty blok ma się odświeżyć"
+    finally:
+        os.unlink(sciezka)
+
+
+def test_liczby_nie_dotykaja_historii_acta():
+    """Prawo I: wpis datowany cytuje liczbę z DNIA ZAPISU — narzędzie nie może jej podmienić.
+
+    LOG_ZMIAN cytuje `<!-- LICZBA:neurony -->87<!-- /LICZBA -->` w opisie z 2026-07-17. Gdy rój
+    urośnie, przepisanie zamieniłoby historyczne 87 na nową liczbę = falsyfikacja historii.
+    """
+    from narzedzia.tabularium import wstrzyknij_liczby
+    sciezka = _tymczasowy_dokument(
+        "---\nkategoria: ACTA\ntyp: acta\npowod_acta: test\nwlasciciel: —\n"
+        "stan_na: 2026-07-17\npowod_istnienia: test\n---\n\n"
+        "Wpis z przeszłości: <!-- LICZBA:neurony -->1<!-- /LICZBA --> neuron.\n")
+    try:
+        zmiany, bledy = wstrzyknij_liczby(sucho=True)
+        assert not any(os.path.basename(sciezka) in z for z in zmiany), \
+            f"ACTA nie może być przepisywana: {zmiany}"
+        wstrzyknij_liczby(sucho=False)
+        with open(sciezka, encoding="utf-8") as f:
+            assert "-->1<!-- /LICZBA -->" in f.read(), "historia sfalsyfikowana przez wstrzykiwacz"
+    finally:
+        os.unlink(sciezka)
 
 
 def test_liczby_lapie_rozjazd_i_naprawia():

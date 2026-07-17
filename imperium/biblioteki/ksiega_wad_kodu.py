@@ -66,6 +66,57 @@ WZORCE_STARTOWE = [
                "wynik bez I/O. Przy głębokim stosie w ścieżce gorącej to kilkanaście zbędnych odczytów "
                "na wywołanie.",
      "zrodlo": "self-review NOTARIUS (2026-07-16) — zmierzone: 0 fałszywek na 375 plikach"},
+    # ── sesja 2026-07-17 (Tabularium) — wada ŚRODOWISKA, nie logiki ──
+    {"kat": "kodowanie",
+     "regex": r'subprocess\.run\((?:(?!encoding\s*=)[\s\S]){0,300}?\btext\s*=\s*True'
+              r'(?:(?!encoding\s*=)[\s\S]){0,150}?\)',
+     "opis": "🚨 subprocess.run(text=True) BEZ encoding='utf-8' — na polskim Windowsie dekoduje cp1250",
+     "lekcja": "`text=True` każe Pythonowi dekodować wyjście procesu kodowaniem KONSOLI (cp1250 na polskim "
+               "Windowsie), nie UTF-8. Nasze commity zaczynają się od emoji, komentarze mają polskie znaki, "
+               "więc każdy odczyt `git log --format=%s` / wyjścia ruffa to ruletka: albo krzaki "
+               "(`status.py`: „8f18d07 đź§ą PORZÄ„DEK…”), albo UnicodeDecodeError w wątku czytającym → "
+               "`stdout=None` → bramka CICHNIE NA GŁUCHO i zawsze przechodzi. Dokładnie tak uciszona była "
+               "bramka gnicia Tabularium w dniu powstania. Najpodlejszy przypadek: W13 (ruff) — pęka "
+               "WTEDY, GDY ZNAJDZIE buga, bo dopiero wtedy cytuje polską linię źródła. "
+               "ZAWSZE: encoding='utf-8', errors='replace'. Zmierzone: 6 trafień / 377 plików .py, "
+               "zero trafień w kodzie naprawionym (wzorzec sprawdzony w obie strony).",
+     "zrodlo": "self-review Tabularium — 2 wady aktywne + 4 utajone, w tym W6b i W13 (2026-07-17)"},
+    # ── sesja 2026-07-17 (dług gnicia) — regex, który zjadł historię ──
+    {"kat": "parsowanie",
+     "regex": r"re\.compile\((?:(?!\)\s*$)[\s\S]){0,300}?\.\*\?[\s\S]{0,300}?re\.DOTALL",
+     "opis": "🚨 Regex DOTALL z leniwym `.*?` między znacznikami — osierocone otwarcie zjada cudzą treść",
+     "lekcja": "Realny incydent (2026-07-17): `<!--\\s*LICZBA:(\\w+)\\s*-->(.*?)<!--\\s*/LICZBA\\s*-->` "
+               "z re.DOTALL. Jeden ZACYTOWANY znacznik bez własnego domknięcia skleił się z domknięciem "
+               "NASTĘPNEGO bloku, a `sub()` zastąpił całość jedną liczbą — 44 linie historii LOG_ZMIAN "
+               "ZJEDZONE (Prawo I złamane przez narzędzie od prawdy). Leniwy `.*?` NIE zatrzymuje się na "
+               "granicy bloku, tylko na najbliższym pasującym OGONIE — a ten może należeć do cudzego wpisu "
+               "kilkadziesiąt linii niżej. ZAWSZE zabroń treści bloku zawierać otwarcie: "
+               "`((?:(?!<!--)[\\s\\S])*?)` — wtedy osierocony znacznik nie dopasuje się, zamiast kasować. "
+               "Klasa jest podstępna, bo przy jednym poprawnym bloku testy przechodzą — pęka dopiero, gdy "
+               "ktoś zacytuje składnię w tekście, czyli w dokumentacji O NARZĘDZIU. "
+               "Zmierzone na 379 plikach .py: baza miała DWA wystąpienia tej bomby (wstrzykiwacz liczb "
+               "`(.*?)` w nawiasie + generator katalogu z gołym `.*?`) — oba naprawione, więc wzorzec "
+               "daje dziś 0 trafień i 0 fałszywek. Sprawdzony w obie strony na obu wariantach: łapie "
+               "`.*?` i w nawiasie, i gołe; przepuszcza `.*?` bez DOTALL, DOTALL bez `.*?` oraz formę "
+               "z jawną granicą bloku.",
+     "zrodlo": "self-review Tabularium — wstrzykiwacz zjadł historię LOG_ZMIAN (2026-07-17)"},
+    # ── sesja 2026-07-17 (dług gnicia) — bezpiecznik, który nie może się zapalić ──
+    {"kat": "bezpiecznik",
+     "regex": r"\b(?!exist_ok|parents)\w*(?:hash|integr|weryf|verified|valid|sprawdz|checksum)\w*"
+              r"\s*=\s*True\b",
+     "opis": "🚨 Bramka integralności/weryfikacji karmiona literałem True — zawsze przepuszcza",
+     "lekcja": "Realny przypadek (2026-07-17): `dyrygent.py` wołał doradcę Hermesa z `hash_ok=True` NA "
+               "SZTYWNO. Hermes ma gałąź `if not dane.hash_ok → BRUDNE`, więc kod WYGLĄDA na chroniony, "
+               "a bramka nie może zapalić się NIGDY — martwy głos (Prawo XV) udający bezpiecznik. Klasa "
+               "jest podstępna, bo test „czy Hermes odrzuca zły hash” PRZECHODZI (testuje Hermesa, nie "
+               "wywołanie), a łańcuch jest przerwany gdzie indziej: Brama liczy `sha256` per wskaźnik, "
+               "ale `ImperiumLog.hash_sha256` nie jest wypełniany przez NIC (0 przypisań) — nie było czego "
+               "porównywać, więc literał `True` zabetonował lukę. Bezpiecznik, który dostaje swój werdykt "
+               "jako stałą, nie jest bezpiecznikiem: policz warunek u źródła albo przyznaj się flagą "
+               "`None/nieznany` i traktuj brak dowodu jako brak zgody. "
+               "Zmierzone: 1 trafienie / 377 plików .py w zakresie skanu (imperium/, narzedzia/) — "
+               "dokładnie ten bug, zero fałszywek; idiom `mkdir(exist_ok=True)` wykluczony z wzorca.",
+     "zrodlo": "weryfikacja PAMIEC_ABSOLUTNA wobec kodu — dług gnicia (2026-07-17)"},
 ]
 
 # ── CHECKLISTA REVIEW (bez regexu) — klasy SEMANTYCZNE, których forma składniowa jest
@@ -86,6 +137,15 @@ CHECKLIST_STARTOWA = [
                "formatu zamiast pisać drugi (Prawo XVI: jeden format = jeden parser; dwa parsery "
                "rozjadą się co do znaku).",
      "zrodlo": "self-review Tabularium — W6b omijana przez dokumenty z długim nagłówkiem (2026-07-17)"},
+    {"kat": "dane",
+     "opis": "Narzędzie „odświeżające prawdę” przepisuje też dokumenty HISTORYCZNE (datowane wpisy)",
+     "lekcja": "Realny przypadek (2026-07-17): `wstrzyknij_liczby` iterował WSZYSTKIE dokumenty, w tym "
+               "`typ: acta` (LOG_ZMIAN). Wpis z 2026-07-17 cytuje „87 neuronów” jako prawdę swojego dnia — "
+               "gdy rój urośnie do 90, narzędzie CICHO przepisze historię na 90 i wpis zacznie kłamać o "
+               "przeszłości. Utajone: dziś liczba się zgadza, więc podmiana jest no-op i nikt nie widzi "
+               "bomby. Zawsze pytaj, czy dokument OPISUJE stan (ma nadążać) czy REJESTRUJE zdarzenie "
+               "(ma zamarznąć) — automat odświeżający musi omijać drugą klasę (Prawo I).",
+     "zrodlo": "self-review Tabularium — W15 vs LOG_ZMIAN typ:acta (2026-07-17)"},
     {"kat": "kierunek",
      "opis": "Odwrócenie kierunku (flip znakiem) bez propagacji do WSZYSTKICH konsumentów",
      "lekcja": "Gdy odwracasz kierunek (np. ujemny IC → LONG↔SHORT), KAŻDY konsument w dół (dobór "
@@ -192,22 +252,6 @@ CHECKLIST_STARTOWA = [
                "owijaj w try/except + fallback (u nas: calibre) i traktuj PUSTY WYNIK bez wyjątku tak samo "
                "jak wyjątek — cicha pustka jest gorsza od głośnego błędu.",
      "zrodlo": "BIB-075 whitepaper Bitcoina (2026-07-16)"},
-
-    # ══ sesja 2026-07-17 (Tabularium) — wada ŚRODOWISKA, nie logiki ═══════════════════════
-    {"kat": "kodowanie",
-     "regex": r'subprocess\.run\((?:(?!encoding\s*=)[\s\S]){0,300}?\btext\s*=\s*True'
-              r'(?:(?!encoding\s*=)[\s\S]){0,150}?\)',
-     "opis": "🚨 subprocess.run(text=True) BEZ encoding='utf-8' — na polskim Windowsie dekoduje cp1250",
-     "lekcja": "`text=True` każe Pythonowi dekodować wyjście procesu kodowaniem KONSOLI (cp1250 na polskim "
-               "Windowsie), nie UTF-8. Nasze commity zaczynają się od emoji, komentarze mają polskie znaki, "
-               "więc każdy odczyt `git log --format=%s` / wyjścia ruffa to ruletka: albo krzaki "
-               "(`status.py`: „8f18d07 đź§ą PORZÄ„DEK…”), albo UnicodeDecodeError w wątku czytającym → "
-               "`stdout=None` → bramka CICHNIE NA GŁUCHO i zawsze przechodzi. Dokładnie tak uciszona była "
-               "bramka gnicia Tabularium w dniu powstania. Najpodlejszy przypadek: W13 (ruff) — pęka "
-               "WTEDY, GDY ZNAJDZIE buga, bo dopiero wtedy cytuje polską linię źródła. "
-               "ZAWSZE: encoding='utf-8', errors='replace'. Zmierzone: 6 trafień / 377 plików .py, "
-               "zero trafień w kodzie naprawionym (wzorzec sprawdzony w obie strony).",
-     "zrodlo": "self-review Tabularium — 2 wady aktywne + 4 utajone, w tym W6b i W13 (2026-07-17)"},
 ]
 
 
@@ -237,7 +281,12 @@ class KsiegaWadKodu:
                 f.write(json.dumps(w, ensure_ascii=False) + "\n")
 
     def dodaj(self, kat: str, regex: str, opis: str, lekcja: str, zrodlo: str = "") -> bool:
-        """Dodaje wzorzec. Odrzuca duplikat regex i błędny regex. Zwraca czy dodano."""
+        """Dodaje wzorzec. Odrzuca duplikat regex i błędny regex. Zwraca czy dodano.
+
+        Gdy ten sam OPIS istnieje już jako pozycja checklisty (bez regexu) — AWANSUJE ją
+        do wzorca zamiast dublować: klasa semantyczna zyskuje auto-skan w dniu, w którym
+        zmierzymy jej szum. Bez tego księga trzymałaby dwa wpisy o tej samej wadzie.
+        """
         if not regex or not opis:
             raise ValueError("regex i opis są wymagane")
         try:
@@ -246,8 +295,12 @@ class KsiegaWadKodu:
             raise ValueError(f"niepoprawny regex: {e}") from e
         if any(w["regex"] == regex for w in self.wpisy):
             return False   # już znany wzorzec — nie dubluj (Prawo XVI)
-        self.wpisy.append({"kat": kat, "regex": regex, "opis": opis,
-                           "lekcja": lekcja, "zrodlo": zrodlo})
+        nowy = {"kat": kat, "regex": regex, "opis": opis, "lekcja": lekcja, "zrodlo": zrodlo}
+        for i, w in enumerate(self.wpisy):
+            if not w.get("regex") and w["opis"] == opis:
+                self.wpisy[i] = nowy      # awans checklisty → wzorzec
+                return True
+        self.wpisy.append(nowy)
         return True
 
     def dodaj_checklist(self, kat: str, opis: str, lekcja: str, zrodlo: str = "") -> bool:
@@ -299,6 +352,16 @@ def zasiej_startowe(sciezka: Path | str = DOMYSLNA) -> int:
         if k.dodaj(w["kat"], w["regex"], w["opis"], w["lekcja"], w["zrodlo"]):
             dodane += 1
     for c in CHECKLIST_STARTOWA:
+        # Bramka struktury: pozycja checklisty z regexem to wzorzec wrzucony do złej listy —
+        # `dodaj_checklist` nie czyta pola `regex`, więc CICHO stałby się ozdobą (zmierzone
+        # 2026-07-17: wzorzec `subprocess text=True` przeleżał tak od dnia dodania, nie
+        # skanując niczego). Głośny błąd zamiast cichej pustki — miejsce wpisu decyduje
+        # o tym, czy wada jest łapana automatycznie, więc pomyłka nie może być milcząca.
+        if c.get("regex"):
+            raise ValueError(
+                f"CHECKLIST_STARTOWA[{c['kat']}] ma regex — przenieś wpis do WZORCE_STARTOWE "
+                f"(checklista nie auto-skanuje): {c['opis'][:60]}"
+            )
         if k.dodaj_checklist(c["kat"], c["opis"], c["lekcja"], c["zrodlo"]):
             dodane += 1
     if dodane:

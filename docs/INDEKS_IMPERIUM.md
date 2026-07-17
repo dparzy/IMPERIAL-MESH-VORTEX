@@ -95,7 +95,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | `docs/MATRYCA_KORELACJI.md` | Koncepcyjny 'szablon Kostki Rubika' — pięcioosiowy system klasyfikacji sygnałów (Wskaźnik×Interwał×Typ zagrania×Reżim×Waga) jako przyszła mapa do wypełnienia realnymi danymi w 'Faz | `imperium/legiony/diagnostyka_korelacji.py`, `imperium/legiony/rejestr.py` | 2026-07-17 |
 | `docs/NAMIESTNIK.md` | Jedyny dokument opisujący 'Gating Network' (sieć bramkującą) świadomą reżimu I interwału — meta-kontroler ustawiający parametry (tryb, lewar, próg, styl) dla reszty łańcucha decyzy | `imperium/koloseum/namiestnik.py`, `tests/test_namiestnik.py` | 2026-06-03 |
 | `docs/NAZWY_PLIKOW_BIB-070+.md` | Gotowa do skopiowania lista nazw plików (konwencja `BIB-XXX_Autor_Tytul.ext`) dla całej listy BIB-070..274, żeby Cezar mógł szybko nazwać pobrane pliki bez przepisywania z tabel PL | — | 2026-07-16 |
-| `docs/PAMIEC_ABSOLUTNA.md` | Jedyny dokument opisujący pełny schemat rekordu `ImperiumLog` (atomowa jednostka pamięci transakcyjnej) — ~80 pól pogrupowanych tematycznie (identyfikacja, kontekst rynku, neurony, | `imperium/biblioteki/kronikarz.py`, `imperium/biblioteki/pamiec_absolutna.py` | 2026-06-01 |
+| `docs/PAMIEC_ABSOLUTNA.md` | Jedyny dokument opisujący schemat rekordu `ImperiumLog` (atomowa jednostka pamięci transakcyjnej — Warstwa 1 pamięci) wraz z realnym API zapisu/odczytu i jawną listą luk wobec deklaracji Prawa IX. | `imperium/biblioteki/pamiec_absolutna.py`, `imperium/biblioteki/kronikarz.py` | 2026-07-17 |
 | `imperium/README.md` | Mapa organów rzymskich w kodzie (folder → rola → moduły) — pierwszy dokument czytany przy wejściu w imperium/ | — | 2026-05-31 |
 
 ### DISCIPLINA — manual — jak coś zrobić krok po kroku

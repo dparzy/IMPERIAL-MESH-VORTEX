@@ -49,6 +49,32 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
 
+## 2026-07-17 | 👁️ | Dług gnicia: OBSERWATORZY + naprawa MOJEJ pochopnej flagi
+
+**OBSERWATORZY (17 zmian w 7 plikach) — spłacony.** Weryfikacja wszystkich ścieżek kodu:
+
+| | |
+|---|---|
+| ✅ ścieżka poprawna | 7 |
+| ⚠️ **zła ścieżka** (plik żyje gdzie indziej) | **2** — `akwedukty/nexus_hub.py` → realnie **`imperium/drogi/nexus_hub.py`** (zły ORGAN: jest w *drogach*, nie w *akweduktach*); `akwedukty/kwatermistrz_danych.py` → brak przedrostka |
+| 🚨 widmo | **0** (patrz niżej) |
+
+**🚩 NAPRAWA MOJEJ WŁASNEJ POCHOPNEJ FLAGI:** przy wstrzykiwaniu nagłówków (P1) mój skrypt
+automatycznie wpisał temu dokumentowi `dlug: "🚨 opisuje nieistniejący kod: multi_exchange.py"`.
+**To było za pochopne.** Wiersze z `multi_exchange.py` mają status **🟠 Prowincja (faza 2)** —
+dokument NIE twierdzi, że plik istnieje, tylko go **planuje**. Mechaniczne sprawdzenie
+„czy plik istnieje" nie odróżnia **twierdzenia** od **zamiaru**. Flaga poprawiona, a ścieżka
+zamieniona na jawne *(plan fazy 2 — moduł nie istnieje)*, żeby żaden skaner (ani człowiek)
+nie wziął jej znów za deklarację.
+
+**🔑 LEGENDA STATUSÓW DODANA (ZPO):** dokument używał **czterech** znaczników (✅ / 🔑 / 🟠 / 🔴)
+i **nie definiował ANI JEDNEGO** — czytelnik musiał zgadywać, co znaczy „🟠 Prowincja".
+Znaczenia odtworzone z kontekstu i zweryfikowane wobec kodu, z jawną kolumną **„Czy moduł
+ISTNIEJE w kodzie?"**. To była realna przyczyna mojej pomyłki: **dokument bez legendy zmusza
+do zgadywania — i skaner też zgaduje.**
+
+**Pliki:** docs/OBSERWATORZY.md, docs/INDEKS_IMPERIUM.md.
+
 ## 2026-07-17 | 🖥️ | Dług gnicia: START_LOKAL + SCIAGA_LOKAL — spłata przez SPRAWDZENIE
 
 **Oba dokumenty broniły się w CAŁOŚCI — treść nie wymagała ani jednej zmiany.**

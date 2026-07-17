@@ -176,6 +176,39 @@ def test_bramka2_ten_sam_dzien_co_zmiana_kodu_nie_gnije():
         "Dokument opisujący kod ze stanem na dzień JEGO zmiany nie gnije — " + str(ostrzezenia))
 
 
+# ── BRAMKA 5: UCIECZKA W HISTORIĘ ───────────────────────────────────────────
+
+def test_bramka5_lapie_ucieczke_w_historie():
+    """Tylne drzwi: `zywy → acta` ucisza bramkę gnicia. Historia musi się wytłumaczyć."""
+    from narzedzia.tabularium import sprawdz
+    _, ostrzezenia, _ = sprawdz([("docs/BEZ_DATY.md", _meta(typ="acta", kategoria="ACTA"))])
+    assert any("[T5]" in o and "ucieczka" in o.lower() for o in ostrzezenia), ostrzezenia
+
+
+def test_bramka5_data_w_nazwie_tlumaczy_historie():
+    """GRANICA: migawka URODZONA jako migawka (data w nazwie) nie musi się tłumaczyć."""
+    from narzedzia.tabularium import sprawdz
+    _, ostrzezenia, _ = sprawdz([("docs/migawki/AUDYT_2026-06-14.md",
+                                  _meta(typ="acta", kategoria="ACTA"))])
+    assert not any("[T5]" in o for o in ostrzezenia), ostrzezenia
+
+
+def test_bramka5_nastepca_tlumaczy_degradacje():
+    """GRANICA: świadoma degradacja ze wskazanym następcą jest uzasadniona."""
+    from narzedzia.tabularium import sprawdz
+    _, ostrzezenia, _ = sprawdz([("docs/STARY.md", _meta(typ="acta", kategoria="ACTA",
+                                                         zastapiony_przez="README.md"))])
+    assert not any("[T5]" in o for o in ostrzezenia), ostrzezenia
+
+
+def test_bramka5_powod_acta_tlumaczy_dziennik():
+    """GRANICA: dziennik akumulujący (LOG_ZMIAN) to legalna historia — z podanym powodem."""
+    from narzedzia.tabularium import sprawdz
+    _, ostrzezenia, _ = sprawdz([("docs/LOG.md", _meta(typ="acta", kategoria="ACTA",
+                                                       powod_acta="dziennik akumulujący"))])
+    assert not any("[T5]" in o for o in ostrzezenia), ostrzezenia
+
+
 # ── BRAMKA 3: DUBLETY ───────────────────────────────────────────────────────
 
 def test_bramka3_lapie_dwa_dokumenty_o_tym_samym_kodzie():

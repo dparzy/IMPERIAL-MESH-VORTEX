@@ -1,6 +1,6 @@
 ---
 kategoria: CONSILIUM
-typ: acta
+typ: zywy
 wlasciciel: imperium/koloseum/namiestnik.py, narzedzia/kalibracja_1h.py, narzedzia/kalibracja_1h_v2.py, narzedzia/sym_porownanie_tf.py
 stan_na: 2026-06-14
 powod_istnienia: "Jedyne miejsce z **twardym, zmierzonym werdyktem o interwale 1H** — że rój nie ma na nim dodatniego edge'u i że zaostrzanie progów asymptotuje przy ~−2.5%, nigdy nie przekraczając "

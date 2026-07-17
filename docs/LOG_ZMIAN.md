@@ -1,6 +1,7 @@
 ---
 kategoria: ACTA
 typ: acta
+powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
 stan_na: 2026-07-17
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
@@ -47,6 +48,53 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 **Powód:** P0 porządku domknięte. Następny krok: nagłówki do 64 dokumentów (`stan_na` = data
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
+
+## 2026-07-17 | 🕳️ | Bramka T5 — zamknięcie TYLNYCH DRZWI we własnym mechanizmie
+
+**Co:** nowa bramka **T5 (ucieczka w historię)** + degradacja `MAPA_IMPERIUM_FLOW` do ACTA
++ naprawa 6 błędnych klasyfikacji (w tym MOICH WŁASNYCH, zaimportowanych hurtem od zwiadowców).
+
+**🕳️ TYLNE DRZWI, KTÓRE SAM ODKRYŁEM:** przeklasyfikowanie dokumentu `zywy → acta`
+**natychmiast ucisza bramkę gnicia** (migawka z definicji nie gnije). Czyli **każdy z 18
+gnijących dokumentów da się „naprawić" ogłaszając go historią** — a bramka z tylnymi drzwiami
+jest bramką pozorną. Zapora (ta sama zasada co `dublet_rozstrzygniety`): **historia musi UMIEĆ
+SIĘ WYTŁUMACZYĆ** — data w nazwie (urodzona jako migawka), wskazany następca (świadoma
+degradacja) albo jawne pole `powod_acta`. **Wyciszenie bramki ZAWSZE wymaga powodu na widoku.**
+
+**MAPA_IMPERIUM_FLOW → ACTA (przeczytana w całości, zweryfikowana wobec kodu):** najgorszy
+dokument Imperium — `stan_na 2026-05-31`, kod zmieniony 92× w 11 plikach. Zweryfikowane
+kłamstwa: „Oczy 🔴 Plan, do zbudowania" (a `wszechoko.py` istnieje, 145 linii) · „Koloseum
+🟡 Szkielet" (16 modułów; `valhalla.py` nigdy nie istniał) · „Senat 🟡 Szkielet" (`meta_kora.py`,
+203 linie) · „Zwiadowca 1..4" (jest 87 neuronów i 15 zwiadowców). **Dokument dydaktyczny
+uczący nowicjusza systemu, który nie istnieje, jest GORSZY niż jego brak.** Zdegradowany,
+NIE skasowany (jedyny narracyjny zapis „po co" każdy organ powstał).
+**NIE przeniesiony do migawek** — ma **17 odwołań w kronice** (migawki miały 0–1); stosujemy
+tę samą regułę co przy P4: ruszamy tylko tanie.
+**🚨 LUKA ZAPISANA JAWNIE:** Imperium NIE MA narracyjnego przewodnika po AKTUALNEJ
+architekturze dla nowicjusza — ARCHITEKTURA jest zwięzła/tabelaryczna. Degradacja tego nie załatwia.
+
+**T5 NATYCHMIAST ZŁAPAŁA MÓJ WŁASNY BŁĄD** (import klasyfikacji zwiadowców hurtem):
+- `WERSJONOWANIE` — **LEX + acta** (prawo, które jest historią?!). Dowód: akumuluje
+  post-mortemy 05-28 → 06-01 → 06-09 → **07-15**, a deklarował `stan_na 2026-06-01`.
+  **Żyje** → `typ: zywy`, `stan_na: 2026-07-15`.
+- `TRYBY_IMPERIUM` — **CONSILIUM + acta** (plan na przyszłość, który jest historią?!).
+  Dowód: SCALP/SWING/INVEST żyją w `dyrygent.py`/`namiestnik.py`/`backtest.py`, ale reszta
+  trybów niezbudowana → plan wciąż żywy → `typ: zywy`.
+- `LOG_ZMIAN`, `AUDYT_SYSTEMU`, `POMIAR_FILTR_ASYMETRII`, `POMIAR_WARSTW_ADAPTACYJNYCH` —
+  prawdziwa historia, dostały `powod_acta` (dziennik akumulujący / migawka z datą w treści /
+  pomiar z konkretnego okna: „wynik nie starzeje się — starzeje się system, którego dotyczył").
+
+**Dług WIDOCZNY, nie zamieciony:** 2 dokumenty (`MANUAL_MIGRACJA_I_SYMULATOR`,
+`PAPER_TRADING_MEXC`) nadal świecą T5 — bo NIE przeczytałem ich w całości i **nie zgaduję**
+(Prawo I). Bramka zostawia je jako widoczne zadanie.
+
+**Pliki:** narzedzia/tabularium.py (+T5), tests/test_tabularium.py (30 testów: łapie ucieczkę,
+przepuszcza datę w nazwie / następcę / powod_acta), docs/MAPA_IMPERIUM_FLOW.md (ACTA + baner),
+docs/WERSJONOWANIE.md, docs/TRYBY_IMPERIUM.md, docs/LOG_ZMIAN.md, docs/AUDYT_SYSTEMU.md,
+docs/POMIAR_*.md, docs/INDEKS_IMPERIUM.md (katalog).
+
+**Powód:** mechanizm broni się teraz także przede mną. Następne: 2 dokumenty do przeczytania
+w całości, spłata długu gnicia (17 dokumentów), twarde bramki.
 
 ## 2026-07-17 | 📦 | P4 — migawki → docs/migawki/ + naprawa DWÓCH cichych pułapek
 

@@ -270,6 +270,23 @@ def sprawdz(dokumenty=None):
             bledy.append(f"[T1] {sciezka}: zastapiony_przez wskazuje na nieistniejący "
                          f"`{zastapiony}`")
 
+        # ── BRAMKA 5: UCIECZKA W HISTORIĘ ───────────────────────────────────
+        # TYLNE DRZWI, które sam odkryłem 2026-07-17 przy MAPA_IMPERIUM_FLOW: przeklasyfikowanie
+        # `zywy → acta` NATYCHMIAST ucisza bramkę gnicia (migawka z definicji nie gnije).
+        # Czyli KAŻDY gnijący dokument da się „naprawić" ogłaszając go historią — bramka
+        # z tylnymi drzwiami to bramka pozorna. Zapora: historia musi UMIEĆ SIĘ WYTŁUMACZYĆ —
+        # data w nazwie (urodzona jako migawka), wskazany następca (zdegradowana świadomie),
+        # albo jawny `powod_acta`. Ta sama zasada co przy `dublet_rozstrzygniety`:
+        # wyciszenie bramki ZAWSZE wymaga podania powodu, który zostaje na widoku.
+        if typ == "acta":
+            data_w_nazwie = re.search(r"\d{4}-\d{2}-\d{2}", os.path.basename(sciezka))
+            if not (data_w_nazwie or zastapiony or meta.get("powod_acta")):
+                ostrzezenia.append(
+                    f"[T5] {sciezka}: deklaruje się historią (typ: acta), ale nie tłumaczy "
+                    f"CZEMU — brak daty w nazwie, następcy i pola `powod_acta`. Czy to naprawdę "
+                    f"migawka, czy ucieczka od bramki gnicia? Dopisz `powod_acta: \"…\"` "
+                    f"albo `zastapiony_przez:`")
+
         # ── BRAMKA 2: GNICIE (właściciel ruszył się, opis nie) ───────────────
         # ACTA pomijamy świadomie: migawka to prawda swojego czasu (Prawo I).
         # Raport AGREGOWANY per dokument (Prawo XXIV): jedna linia = jeden dokument.

@@ -1,8 +1,8 @@
 ---
 kategoria: LEX
-typ: acta
+typ: zywy
 wlasciciel: —
-stan_na: 2026-06-01
+stan_na: 2026-07-15
 powod_istnienia: "Jedyne miejsce definiujące **system pieczęci IMV-ORI/ADO/INS/POR/EXP** (co jest naszym oryginałem, co adopcją, co przeniesieniem z Kingdom Pixel) oraz **protokół relegacji modułu**"
 ---
 # 🏺 WERSJONOWANIE I PIECZĘĆ IMPERIUM

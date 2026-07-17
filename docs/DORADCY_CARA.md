@@ -2,26 +2,38 @@
 kategoria: FORMA
 typ: zywy
 wlasciciel: imperium/cesarz/doradcy/fulmen.py, imperium/cesarz/doradcy/hermes.py, imperium/cesarz/doradcy/iustitia.py, imperium/cesarz/doradcy/oracle.py, imperium/cesarz/doradcy/pythia.py, imperium/cesarz/doradcy/rada.py
-stan_na: 2026-06-01
-powod_istnienia: "Jedyny dokument opisujący 'drugą opinię' Cesarza — niezależną radę 5 doradców wywoływaną w sytuacjach spornych/niejasnych (Senat podzielony, WETO Legatusa, szara strefa pewności, P"
+stan_na: 2026-07-17
+powod_istnienia: "Jedyny dokument opisujący 'drugą opinię' Cesarza — radę 5 doradców (Oracle/Fulmen/Iustitia/Hermes/Pythia) oceniających każde wejście niezależnie od Legatusa i Senatu"
 ---
 # 🔮 DORADCY CARA — Niezależna Rada Cesarska
 
 > *"Audi alteram partem."* — Wysłuchaj drugiej strony.
 >
-> Gdy Senat jest podzielony, gdy sygnały się kłócą, gdy ryzyko jest wysokie —
-> Cesarz wzywa Niezależnych Doradców. Mówią prawdę. Nie zależy im na wyniku głosowania.
+> Pięcioro doradców ocenia wejście własnymi miarami. Mówią prawdę. Nie zależy im na wyniku
+> głosowania Legatusa ani Senatu.
+
+> **⚠️ Weryfikacja wobec kodu 2026-07-17.** Wzory i progi wszystkich pięciorga **zgadzają się
+> z kodem** ✅. Rozjechało się to, co je *spina*: klasa `CesarzZDoradcami` i metoda
+> `wezwij_doradcow()` **nigdy nie istniały**, a opisane niżej „warunki automatycznej aktywacji"
+> to była wizja, nie kod. Sprostowane w tej sekcji.
 
 ---
 
-## 🎯 KIEDY CESARZ WZYWA DORADCÓW
+## 🎯 KIEDY WZYWANA JEST RADA — flaga, nie warunki (sprostowanie)
 
-Doradcy aktywowani automatycznie gdy:
-1. Senat podzielony: abs(Populares - Optimates) < 0.15 (zbyt blisko, spór)
-2. Legatus WETO, ale Cesarz chce second opinion
-3. Pewność agregatu w przedziale 0.55–0.65 (szara strefa)
-4. Reżim VOLATILE lub sytuacja nadzwyczajna (PANIC)
-5. Operator manualnie wywołuje: `cesarz.wezwij_doradcow(powod)`
+**Realnie (zmierzone):** Rada to **opt-in dyrygenta** — `Dyrygent(..., rada=True)` tworzy
+`RadaDoradcow()`, a jedyny warunek w pętli to `if self.rada_doradcow is not None:`
+([`dyrygent.py:540`](../imperium/koloseum/dyrygent.py)). Gdy włączona — ocenia **każde**
+kandydujące wejście. Gdy wyłączona — nie ocenia żadnego. **Nie ma stanów pośrednich.**
+
+> 🔴 **Czego NIE MA** (poprzednia wersja podawała to jako działający mechanizm):
+> nie istnieje aktywacja przy „Senacie podzielonym `abs(Populares−Optimates) < 0.15`",
+> przy „WETO Legatusa", w „szarej strefie pewności 0.55–0.65" ani w „reżimie VOLATILE/PANIC".
+> Nie istnieje też ręczne wywołanie `cesarz.wezwij_doradcow(powod)` — **ani ta metoda, ani
+> klasa `CesarzZDoradcami`** (0 trafień w kodzie). To była lista życzeń.
+>
+> Warunkowe wzywanie (tylko w sytuacjach spornych) zostaje **postulatem** 🔵 — dziś Rada jest
+> albo dla wszystkich wejść, albo dla żadnego.
 
 ---
 
@@ -56,16 +68,38 @@ Formuła werdyktu ORACLE:
 FULMEN sprawdza z innym zestawem wskaźników.
 
 ```
-FULMEN używa zestawu ortogonalnego (innego niż Legatus):
-  - ADX (14) > 25 → trend potwierdzony
-  - VI+/VI- (Vortex 14) → kierunek trendu
-  - Choppiness Index < 38.2 → rynek trendujący (nie choppy)
-  - Efficiency Ratio Kaufmana > 0.6 → ruch efektywny
+FULMEN karmiony jest (dyrygent → DaneFulmen) — progi zgodne z kodem ✅:
+  - ADX_14 > 25          → trend potwierdzony   (ADX_TREND_PROG = 25.0)
+  - DI_PLUS / DI_MINUS   → kierunek trendu      (pola nazwane vi_plus_14/vi_minus_14)
+  - CHOPPINESS_14 < 38.2 → rynek trendujący     (CHOPPINESS_TREND = 38.2)
+  - KAUFMAN_ER_10 > 0.6  → ruch efektywny
 
 Weryfikacja krzyżowa:
-  Jeśli Legatus: TREND_STRONG, FULMEN: RANGING → KONFLIKT → Cesarz dostaje ostrzeżenie
-  Jeśli oba zgodne → Cesarz dostaje zielone światło z wagą ×1.2
+  Jeśli Legatus: TREND_STRONG, FULMEN: RANGING → KONFLIKT → ostrzeżenie
+  Jeśli oba zgodne → potwierdzenie reżimu
 ```
+
+> ⚠️ **„Vortex" nie istnieje — sprostowanie 2026-07-17.** Dokument obiecywał `VI+/VI- (Vortex 14)`.
+> W kodzie **nie ma żadnego wskaźnika Vortex** (0 trafień). Pola `DaneFulmen.vi_plus_14/vi_minus_14`
+> są karmione **`DI_PLUS`/`DI_MINUS`** (Directional Indicator Wildera) — dyrygent nazywa to wprost
+> *„DI+/DI- jako proxy VI"*. Nazwa pola została z niezrealizowanego zamiaru.
+
+> 🚨 **Ortogonalność jest CZĘŚCIOWA, nie pełna (Prawo XVI — zmierzone).** Obietnica „zestaw
+> ortogonalny (inny niż Legatus)" nie ma pokrycia w połowie przypadków: **2 z 4** wskaźników
+> FULMENA to **dokładnie te same** wskaźniki, którymi już głosują neurony Legatusa:
+>
+> | Wskaźnik FULMENA | Neuron Legatusa na tym samym wskaźniku |
+> |---|---|
+> | `ADX_14` | **XII-01** `NeuronADX` (KAT=T) |
+> | `CHOPPINESS_14` | **V-14** `NeuronChoppiness` (KAT=V) |
+> | `DI_PLUS`/`DI_MINUS` | — (brak neuronu) |
+> | `KAUFMAN_ER_10` | — (brak neuronu) |
+>
+> To **nie jest** pełna redundancja: Fulmen zadaje tym liczbom **inne pytanie** (jaki REŻIM?)
+> niż neurony (jaki KIERUNEK?). Ale „niezależna weryfikacja" czerpiąca w połowie z tego samego
+> pomiaru jest słabszą kontrolą, niż sugerował ten dokument — jeśli `ADX_14` jest przekłamany,
+> myli się i neuron, i jego „niezależny" audytor. Zmierzyć dekorelacją (Prawo XVI) przed
+> ewentualną wymianą na prawdziwie ortogonalny zestaw.
 
 ---
 
@@ -97,15 +131,25 @@ Sprawdza:
 **Zadanie:** Weryfikuje jakość i świeżość informacji zanim Cesarz podejmie decyzję.
 
 ```
-Sprawdza:
-  - Kompletność danych: kompletnosc_danych w ImperiumLog < 0.80 → ostrzeżenie
-  - Świeżość danych: czy wskaźniki oparte na danych nie starszych niż 2×interwał
-  - Spójność hashów: hash_sha256 z Bramki musi być zweryfikowany
-  - Konflikt informacji: jeśli Oczy(Newsy) dają HIGH_IMPACT event w < 30 min → hold
-  - Płynność: VPIN-01 > 0.75 → HERMES ostrzega "toksyczny order flow"
+Sprawdza (progi zgodne z kodem ✅):
+  - Kompletność danych: kompletnosc_danych < 0.80 → ostrzeżenie   (KOMPLETNOSC_MIN = 0.8)
+  - Świeżość danych: nie starsze niż 2×interwał                   (SWIEZE_MNOZNIK = 2)
+  - Spójność hashów: hash_ok                                       (⚠️ patrz alarm niżej)
+  - Konflikt informacji: HIGH_IMPACT event w < 30 min → hold      (EVENT_BUFOR_MINUT = 30)
+  - Płynność: VPIN > 0.75 → "toksyczny order flow"                (VPIN_PROG = 0.75)
 
-Wynik: "CZYSTE ŹRÓDŁA" / "ZANIECZYSZONE" / "NIEKOMPLETNE"
+Wynik: "CZYSTE" / "ZANIECZYSZONE" / "NIEKOMPLETNE"
 ```
+
+> 🚨 **Prawo XV — bramka hashów HERMESA nie może się zapalić (zmierzone 2026-07-17).**
+> Hermes ma gałąź `if not dane.hash_ok → BRUDNE`, ale [`dyrygent.py:911`](../imperium/koloseum/dyrygent.py)
+> podaje mu **`hash_ok=True` na sztywno**. Powód jest głębszy niż jedna linia: Brama liczy
+> `CalcResult.sha256` per wskaźnik, ale `ImperiumLog.hash_sha256` **nie jest wypełniany przez
+> NIC** (0 przypisań w bazie) — nie ma czego z czym porównać, więc literał `True` zabetonował
+> lukę. **„Spójność hashów" jest dziś martwą literą.** Ten sam alarm opisany w
+> [`PAMIEC_ABSOLUTNA.md`](./PAMIEC_ABSOLUTNA.md) (LUKA 1); w Księdze Wad jako klasa
+> `bezpiecznik`. Naprawa = osobne zadanie (Hermes stoi na ścieżce decyzyjnej → ZASADA WPIĘCIA,
+> opt-in OFF + A/B).
 
 ---
 
@@ -159,38 +203,58 @@ median_pnl = median([w.pnl_pct for w in wyniki])
 ╚══════════════════════════════════════════════════════════════════════╝
 ```
 
-**Reguły głosowania Rady:**
-- 5/5 pozytywnych → Cesarz może wejść pełną pozycją
-- 4/5 pozytywnych → Wejście ok, standardowa pozycja
-- 3/5 pozytywnych → Wejście ok, 50% pozycji
-- 2/5 lub mniej pozytywnych → CESARZ BLOKUJE (nawet jeśli Senat mówi LONG)
-- Każde IUSTITIA BLOKUJE = automatyczny veto bez liczenia reszty
+**Reguły głosowania Rady — `RadaDoradcow.ocen()` (zweryfikowane ✅):**
+
+| Pozytywnych | `modyfikator_pozycji` | Skutek |
+|---|---|---|
+| 5/5 | **1.0** | pełna pozycja |
+| 4/5 | **0.8** | wejście ok, pozycja ×0.8 |
+| 3/5 | **0.6** | wejście ok, pozycja ×0.6 |
+| ≤ 2/5 | **0.0** | `blokada=True` → dyrygent zwraca `RADA_WETO` |
+
+- **IUSTITIA BLOKUJE** lub **HERMES ZANIECZYSZONE** → natychmiastowe weto, `pozytywne=0`
+  (bez liczenia reszty).
+- **PYTHIA MILCZENIE** (< 10 podobnych setupów) = **neutralne, nie blokuje** ✅ — zgodnie
+  z „brak danych ≠ zły sygnał" (Prawo I).
+
+> ⚠️ **„3/5 → 50% pozycji" to nieścisłość** — realny mnożnik to **×0.6**, nie ×0.5. Ta sama
+> pomyłka siedzi w komentarzu kodu („zmniejszona pozycja 50% (×0.6)"). Liczy się `0.6`.
 
 ---
 
-## 🔗 INTEGRACJA Z CESARZEM (DeepSeek)
+## 🔗 REALNA INTEGRACJA — Dyrygent, nie „Cesarz z Doradcami"
+
+> 🔴 **Klasa `CesarzZDoradcami` NIE ISTNIEJE** (0 trafień w kodzie) — ani ona, ani
+> `podejmij_decyzje()`, ani `_wymagani_doradcy()`, ani `wezwij_doradcow()`. Poprzednia wersja
+> dokumentu prezentowała ten blok jako działającą integrację. **Nie ma też wywołania DeepSeeka
+> w ścieżce Rady** — Rada jest w 100% deterministyczna (zero LLM).
+
+Prawdziwy przepływ ([`dyrygent.py`](../imperium/koloseum/dyrygent.py)): każdy doradca jest
+wołany **osobno, własnymi danymi**, a `RadaDoradcow` tylko zlicza gotowe oceny.
 
 ```python
-class CesarzZDoradcami:
-    def __init__(self, legatus, senat, doradcy, kalkulator, pamiec):
-        self.doradcy = doradcy  # [Oracle, Fulmen, Iustitia, Hermes, Pythia]
+# 1. Włączenie (opt-in przy budowie dyrygenta)
+dyrygent = Dyrygent.zbuduj(..., rada=True)      # rada=False → Rada w ogóle nie działa
 
-    def podejmij_decyzje(self, raport_legatusa, senat_wynik, kapital):
-        # 1. Sprawdź czy wzywa doradców
-        if self._wymagani_doradcy(raport_legatusa, senat_wynik):
-            opinie = [d.ocen(raport_legatusa, self.pamiec) for d in self.doradcy]
-            pozytywne = sum(1 for o in opinie if o.wynik == "POZYTYWNY")
-            if pozytywne < 3:
-                return Decyzja(akcja="BRAK", powod="Rada Doradców odrzuciła")
-            modyfikator = pozytywne / 5  # 3/5=0.6, 4/5=0.8, 5/5=1.0
-        else:
-            modyfikator = 1.0
+# 2. W pętli, dla KAŻDEGO kandydata na wejście (dyrygent._opinia_rady):
+ocena_oracle   = Oracle().ocen(pnl_hist)                      # historia PnL sesji
+ocena_fulmen   = Fulmen().ocen(DaneFulmen(adx_14=..., ...))   # wskaźniki z Budowniczego
+ocena_iustitia = Iustitia().ocen(DaneIustitia(...))           # otwarte pozycje z engine
+ocena_hermes   = Hermes().ocen(DaneHermes(...))               # kompletność/VPIN (hash_ok=True ⚠️)
+ocena_pythia   = Pythia().ocen(odcisk, historia_pythia)       # fingerprint matching
 
-        # 2. Wywołaj DeepSeek LLM z kontekstem
-        prompt = self._buduj_prompt(raport_legatusa, senat_wynik, opinie)
-        odpowiedz = deepseek_api.call(prompt)
-        return self._parsuj_decyzje(odpowiedz, modyfikator)
+opinia = RadaDoradcow().ocen(ocena_oracle, ocena_fulmen,
+                             ocena_iustitia, ocena_hermes, ocena_pythia)
+
+# 3. Skutek w dyrygencie:
+if opinia.blokada:                       # < 3/5 lub IUSTITIA/HERMES weto
+    return DecyzjaCyklu(..., "RADA_WETO")
+if opinia.modyfikator_pozycji < 1.0:     # 3/5 lub 4/5 → przelicz plan mniejszą pozycją
+    plan = kalkulator.policz(..., mnoznik_rozmiaru=opinia.modyfikator_pozycji)
 ```
+
+**`OpinaRady`** (realne pola): `oracle` · `fulmen` · `iustitia` · `hermes` · `pythia` ·
+`pozytywne` · `modyfikator_pozycji` · `blokada` · `powod_blokady` · `decyzja`.
 
 ---
 

@@ -14,6 +14,50 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-17 | 🔮 | DORADCY_CARA — trzecie API-widmo + Fulmen tylko połowicznie ortogonalny
+
+**Co (dług gnicia 8 → 7):** weryfikacja Rady Pięciu (5× kod doradców).
+**Wzory i progi wszystkich pięciorga zgadzają się z kodem ✅** — rozjechało się to, co ich SPINA.
+
+**🔴 API-widmo #3 w tej kampanii:** klasa **`CesarzZDoradcami`**, `podejmij_decyzje()`,
+`_wymagani_doradcy()` i `cesarz.wezwij_doradcow(powod)` — **0 trafień w kodzie**. Dokument
+prezentował je jako działającą integrację (z wywołaniem DeepSeeka!). Realnie Rada jest w 100%
+DETERMINISTYCZNA (zero LLM): dyrygent woła każdego doradcę osobno własnymi danymi, a
+`RadaDoradcow.ocen()` tylko zlicza gotowe oceny. *(Poprzednie widma: `kronikarz.zapytaj`
+w PAMIEC_ABSOLUTNA, `policz_dzwignie` w KALKULATOR_LEWARA — wzorzec systematyczny.)*
+
+**🔴 „Warunki automatycznej aktywacji" nie istnieją:** dokument obiecywał wzywanie Rady przy
+Senacie podzielonym (<0.15), przy WETO Legatusa, w szarej strefie 0.55–0.65 i w VOLATILE/PANIC.
+**Realnie jedyny warunek to flaga:** `Dyrygent(rada=True)` → `if self.rada_doradcow is not None`
+(dyrygent.py:540). Włączona = ocenia KAŻDE wejście; wyłączona = żadnego. Zero stanów pośrednich.
+Warunkowe wzywanie zostaje postulatem 🔵.
+
+**🚨 Prawo XVI — ortogonalność FULMENA jest CZĘŚCIOWA (zmierzone):** doradca ma weryfikować
+reżim „zestawem ortogonalnym (innym niż Legatus)", ale **2 z 4** jego wskaźników to DOKŁADNIE
+te, którymi już głosują neurony: `ADX_14` → **XII-01 NeuronADX**, `CHOPPINESS_14` → **V-14
+NeuronChoppiness**. To nie pełna redundancja (Fulmen pyta o REŻIM, neurony o KIERUNEK), ale
+„niezależna weryfikacja" czerpiąca w połowie z tego samego pomiaru jest słabsza, niż głosił
+dokument: gdy `ADX_14` kłamie, myli się i neuron, i jego „niezależny" audytor.
+
+**🔴 „Vortex" nie istnieje:** dokument obiecywał `VI+/VI- (Vortex 14)`; w kodzie **zero**
+wskaźników Vortex. Pola `DaneFulmen.vi_plus_14/vi_minus_14` karmi `DI_PLUS`/`DI_MINUS`
+(dyrygent nazywa to wprost „DI+/DI- jako proxy VI"). Nazwa pola została po niezrealizowanym zamiarze.
+
+**🚨 Prawo XV — bramka hashów HERMESA martwa:** `dyrygent.py:911` podaje `hash_ok=True` na
+sztywno, bo `ImperiumLog.hash_sha256` nie jest wypełniany przez NIC — nie ma czego porównywać.
+Ten sam alarm co LUKA 1 w PAMIEC_ABSOLUTNA; w Księdze Wad klasa `bezpiecznik`. Dopisany wprost.
+
+**Drobne:** „3/5 → 50% pozycji" → realnie **×0.6** (ta sama nieścisłość siedzi w komentarzu kodu).
+
+**Zweryfikowane ✅:** Oracle Q=0.3·Sharpe+0.25·Sortino+0.25·Calmar+0.2·Omega, progi 1.2/0.8 ·
+Fulmen ADX>25, Chop<38.2, ER>0.6 · Iustitia HEAT_MAX 0.06, CRITICAL 0.1, CORR_MAX 0.75,
+COOLING 5 · Hermes KOMPLETNOSC 0.8, VPIN 0.75, EVENT 30min, ŚWIEŻE ×2 · Pythia MIN_SETUPOW 10,
+p 0.6/0.45 · modyfikatory 1.0/0.8/0.6/blokada · PYTHIA MILCZENIE = neutralne (brak danych ≠ zły sygnał).
+
+**Pliki:** `docs/DORADCY_CARA.md`. **Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅ · gnicie 8→7.
+
+---
+
 ## 2026-07-17 | ⚖️ | KALKULATOR_LEWARA — dokument o ryzyku nie znał połowy bezpieczników
 
 **Co (dług gnicia 9 → 8):** weryfikacja „matematyki przeżycia" (9× `kalkulator_lewara.py`).

@@ -48,6 +48,50 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
 
+## 2026-07-17 | 🏛️ | P3 — pierwsze scalenie + POMIAR OBALIŁ ZWIADOWCĘ (177 pozycji uratowanych)
+
+**🚨 NAJWAŻNIEJSZE — kandydat ≠ prawda (ZASADA ZWIADOWCY WIEDZY, Prawo I):** zwiadowca (Sonnet)
+zaraportował *„NAZWY_PLIKOW_BIB-070+.md to ~95% redundancja PLAN_ROZBUDOWY_BIBLIOTEKI.md — te same
+205 pozycji"*. **POMIAR:** 197 pozycji BIB w jednym, **27** w drugim, wspólnych **20** → **177
+pozycji istnieje TYLKO w NAZWY_PLIKOW**. Dokumenty mają tę samą STRUKTURĘ sekcji, ale inną
+FUNKCJĘ: PLAN = co i dlaczego (status weryfikacji, linki), NAZWY = 197 gotowych nazw plików +
+konwencja + rejestr spalonych numerów (083, 127, 138, 165, 166, 198, 199, 262). **Rekomendacja
+ODRZUCONA — plik zostaje.** Zaufanie zwiadowcy bez pomiaru = utrata 177 wpisów, czyli dokładnie
+to, czego Cezar zakazał („bez utraty niczego wartościowego").
+
+**SCALENIE WYKONANE — SYMBIOZA_MODULOW → archiwum** (przeczytana W CAŁOŚCI przed ruchem, ZASADA
+ARCHIWIZACJI). Uratowane: tabela **„czego NIE wolno duplikować"** (jedyny właściciel matematyki/
+LLM/egzekucji/ryzyka — żywa doktryna, nigdzie indziej niezapisana) → `ARCHITEKTURA_IMPERIUM.md`
+§ ZASADA SYMBIOZY. Zarchiwizowane: przepływ z 4 widmami (`straznik_ryzyka.py`,
+`wykonawca_rozkazow.py`, `mnemozyne.py`, `sala_wojenna.py`) + nieaktualna rola „Alchemika".
+
+**SCALENIE ODRZUCONE — START_LOKAL ↔ SCIAGA_LOKAL.** 4 z 6 komend wspólnych, ale to **dwie role**:
+START to „pełny przewodnik dla nowicjusza" (prowadzi za rękę), SCIAGA to ściąga z 24 komendami dla
+kogoś, kto już wie. Scalenie zabiłoby przewodnik, na którym stoi **ZPO** (Cezar jest nowicjuszem —
+to jedyny powód istnienia tej zasady).
+
+**NOWY MECHANIZM — `dublet_rozstrzygniety` (T3):** werdykt człowieka wycisza parę, ale **wymaga
+podania POWODU w nagłówku** — nie da się schować dubletu po cichu. Powód istnienia: bramka
+krzycząca fałszywie co sesję uczy ignorować WSZYSTKIE bramki. Test granicy pilnuje, że
+rozstrzygnięcie JEDNEJ pary nie jest wytrychem na inne.
+
+**NOMENKLATURA (rozkaz Cezara):** „Alchemik Imperium" → **VITRUVIUSZ** w KATALOG_NEURONOW
+i docs/README — źródłem prawdy imion jest PROFIL_CEZARA, a rola Alchemika umarła wraz z nadaniem
+imienia Architektowi.
+
+**DOWÓD WARTOŚCI GENEROWANEGO KATALOGU:** archiwizacja SYMBIOZY kosztowała **zero** utrzymania
+spisu — INDEKS przepisał się sam. Ręczny indeks wymagałby pamiętania o wykreśleniu (czyli nie
+zostałaby wykreślona, jak 70 innych pozycji).
+
+**Pliki:** archiwum/SYMBIOZA_MODULOW.md (git mv, historia zachowana), docs/ARCHITEKTURA_IMPERIUM.md
+(+§ ZASADA SYMBIOZY), docs/README.md, docs/KATALOG_NEURONOW.md, docs/START_LOKAL.md,
+docs/INDEKS_IMPERIUM.md (katalog), narzedzia/tabularium.py (+dublet_rozstrzygniety),
+tests/test_tabularium.py (22 testy).
+
+**Powód:** rejestr 70/70, 1 dublet rozstrzygnięty świadomie. Następne: reszta kandydatów
+(MANUAL_MIGRACJA, PAPER_TRADING_MEXC, WERSJONOWANIE, MAPA_IMPERIUM_FLOW) — każdy czytany
+w całości przed ruchem; potem migawki → docs/migawki/ z naprawą rag/indeksuj.py (glob→rglob).
+
 ## 2026-07-17 | 🏛️ | P2 — katalog GENEROWANY + W6b przekazuje pałeczkę bramce T2
 
 **Co:** (1) **71/71 dokumentów zadeklarowanych** (rozkład: FORMA 14 · ACTA 12 · CONSILIUM 12 ·

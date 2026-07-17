@@ -236,17 +236,37 @@ def sprawdz(dokumenty=None):
                     f"od tej daty w {len(gnijace)} plikach: {szczegol}")
 
     # ── BRAMKA 3: DUBLETY (ta sama kategoria + ten sam właściciel) ───────────
-    wg_wlasciciela = {}
+    # `dublet_rozstrzygniety: <plik> — <powód>` WYCISZA parę, którą człowiek już osądził
+    # jako komplementarną. Powód (lekcja 2026-07-17): START_LOKAL („pełny przewodnik dla
+    # nowicjusza") i SCIAGA_LOKAL („ściąga, 24 komendy") opisują ten sam kod, ale służą
+    # różnym momentom — scalenie zabiłoby przewodnik, na którym stoi ZPO. Bez możliwości
+    # zapisania werdyktu bramka krzyczałaby co sesję, a bramka krzycząca fałszywie uczy
+    # ignorować WSZYSTKIE bramki. Wyciszenie wymaga PODANIA POWODU — nie da się go schować
+    # po cichu, powód zostaje w nagłówku na widoku.
+    wg_wlasciciela, meta_wg = {}, {}
     for sciezka, meta in dokumenty:
         if not meta or meta.get("typ") != "zywy" or meta.get("zastapiony_przez"):
             continue
+        meta_wg[sciezka] = meta
         for wlasciciel in _wlasciciele(meta):
             wg_wlasciciela.setdefault((meta.get("kategoria", "?"), wlasciciel), []).append(sciezka)
+
+    rozstrzygniete = 0
     for (kategoria, wlasciciel), pliki in sorted(wg_wlasciciela.items()):
-        if len(pliki) > 1:
-            ostrzezenia.append(
-                f"[T3] DUBLET: {len(pliki)} dokumenty {kategoria} opisują `{wlasciciel}` "
-                f"→ {', '.join(pliki)} (kandydaci do scalenia — Prawo XVI)")
+        if len(pliki) < 2:
+            continue
+        sporne = [p for p in pliki
+                  if not any(inny.split("/")[-1] in meta_wg[p].get("dublet_rozstrzygniety", "")
+                             for inny in pliki if inny != p)]
+        if len(sporne) < 2:
+            rozstrzygniete += 1
+            continue
+        ostrzezenia.append(
+            f"[T3] DUBLET: {len(sporne)} dokumenty {kategoria} opisują `{wlasciciel}` "
+            f"→ {', '.join(sporne)} (kandydaci do scalenia — Prawo XVI; jeśli to świadomy "
+            f"podział ról, zapisz werdykt: `dublet_rozstrzygniety: <plik> — <powód>`)")
+    if rozstrzygniete:
+        info.append(f"Dublety rozstrzygnięte świadomie (z powodem w nagłówku): {rozstrzygniete}")
 
     print("\r" + " " * 72 + "\r", end="", file=sys.stderr, flush=True)
 

@@ -46,6 +46,29 @@ dlug: "🚨 opisuje nieistniejący kod: drogi/war_lancer.py, swiatynie/sala_woje
 
 ---
 
+## ⚖️ ZASADA SYMBIOZY — czego NIE wolno duplikować
+
+> *„Dwóch legionistów na tym samym posterunku to marnotrawstwo. Jeden jest odpowiedzialny — reszta słucha."*
+
+Uratowane z `SYMBIOZA_MODULOW.md` (zarchiwizowana 2026-07-17 — reszta tamtego dokumentu
+opisywała kod, który nigdy nie istniał). **To jest żywa doktryna, nie historia:** każda
+z tych reguł obowiązuje dziś i jest sprawdzalna w kodzie.
+
+| Zasób / funkcja | Wiele modułów? | JEDYNY właściciel | Dlaczego |
+|---|---|---|---|
+| Surowe dane OHLCV | ✅ każdy czyta po swojemu | `akwedukty/kwatermistrz_danych.py` (pobieranie) | Każdy Legion może interpretować te same świece inaczej |
+| Obliczanie wskaźników (RSI, EMA, ATR…) | ❌ **NIE** | `fundament/brama_kalkulatora.py` | Jeden hash SHA-256 = jeden wynik. Zero rozbieżności między Legionami |
+| Wywołania LLM | ❌ **NIE** | `cesarz/deepseek_glos.py` | Jeden punkt kosztu, rate-limitu i konfiguracji modelu. Dzięki temu NOTARIUS łapie wszystkich wołających jednym wpięciem |
+| Wykonanie zleceń | ❌ **NIE** | `drogi/` (`oms.py`, `real_order_router.py`) | Tylko jeden moduł dotyka prawdziwych środków. Zero wyścigu |
+| Zapis transakcji / historii | ❌ **NIE** | `biblioteki/` (`kronikarz.py`, `mnemosyne.py`) | Jeden schemat zapisu = możliwy backtest i audyt |
+| Dane on-chain / makro | ✅ Senat i Cesarz czytają | `oczy/` (pobieranie) | Makro to kontekst, nie sygnał — wiele warstw może go interpretować |
+| Konfiguracja ryzyka (% kapitału, SL, TP) | ❌ **NIE** | `pretorianie/` | Jeden arbiter ryzyka. Cesarz proponuje, Pretorianie zatwierdzają lub wetują |
+
+**Pytania przed każdą nową funkcją:** Kto już to robi? · Czy to łamie zasadę jedynego
+właściciela (Brama / Głos / Drogi / Kronikarz)? · Gdzie w przepływie to siedzi?
+
+---
+
 ## 🔄 Jak płynie sygnał (cykl decyzyjny)
 
 ```

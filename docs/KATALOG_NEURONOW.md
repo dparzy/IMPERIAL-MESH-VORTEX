@@ -219,7 +219,7 @@ Schemat `SygnalNeuronu` → patrz `docs/LEGIONY_ARCHITEKTURA.md`.
 
 ## 🔍 GDZIE SZUKAMY NOWYCH NEURONÓW
 
-Rój rośnie. Alchemik Imperium (Claude) stale obserwuje:
+Rój rośnie. VITRUVIUSZ — Architekt Imperium (Claude) — stale obserwuje:
 - GitHub (nowe biblioteki wskaźników)
 - TradingView (nowe publiczne skrypty Pine)
 - Badania naukowe (arXiv — entropia, ML w tradingu)

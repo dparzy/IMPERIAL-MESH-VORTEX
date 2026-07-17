@@ -52,7 +52,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 
 <!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->
 
-> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-17 (71 pozycji).
+> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-17 (70 pozycji).
 
 ### LEX — prawo i rozkazy stałe — obowiązuje, nie opisuje
 
@@ -97,7 +97,6 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | `docs/NAMIESTNIK.md` | Jedyny dokument opisujący 'Gating Network' (sieć bramkującą) świadomą reżimu I interwału — meta-kontroler ustawiający parametry (tryb, lewar, próg, styl) dla reszty łańcucha decyzy | `imperium/koloseum/namiestnik.py`, `tests/test_namiestnik.py` | 2026-06-03 |
 | `docs/NAZWY_PLIKOW_BIB-070+.md` | Gotowa do skopiowania lista nazw plików (konwencja `BIB-XXX_Autor_Tytul.ext`) dla całej listy BIB-070..274, żeby Cezar mógł szybko nazwać pobrane pliki bez przepisywania z tabel PL | — | 2026-07-16 |
 | `docs/PAMIEC_ABSOLUTNA.md` | Jedyny dokument opisujący pełny schemat rekordu `ImperiumLog` (atomowa jednostka pamięci transakcyjnej) — ~80 pól pogrupowanych tematycznie (identyfikacja, kontekst rynku, neurony, | `imperium/biblioteki/kronikarz.py`, `imperium/biblioteki/pamiec_absolutna.py` | 2026-06-01 |
-| `docs/SYMBIOZA_MODULOW.md` | Mapowanie nazw narzędzi zewnętrznych (TA-Lib, CCXT, DeepSeek SDK, OpenAlice, Hermes Agent, MetaCortex, TitanMind, Glassnode, CryptoQuant, LangFuse, CrewAI, LangGraph) na moduły Imp | `imperium/akwedukty/adaptery/cvd.py`, `imperium/akwedukty/adaptery/feargreed.py`, `imperium/akwedukty/adaptery/futures.py`, `imperium/biblioteki/mnemosyne.py`, `imperium/cesarz/deepseek_glos.py`, `imperium/drogi/nexus_hub.py`, `imperium/drogi/oms.py`, `imperium/drogi/real_order_router.py`, `imperium/drogi/scheduler.py`, `imperium/oczy/wszechoko.py`, `imperium/pretorianie/aegis_tarcza.py`, `imperium/pretorianie/lustro_prawdy.py`, `imperium/swiatynie/web_dashboard.py` | 2026-06-09 |
 | `imperium/README.md` | Mapa organów rzymskich w kodzie (folder → rola → moduły) — pierwszy dokument czytany przy wejściu w imperium/ | — | 2026-05-31 |
 
 ### DISCIPLINA — manual — jak coś zrobić krok po kroku

@@ -3,6 +3,7 @@ kategoria: DISCIPLINA
 typ: zywy
 wlasciciel: imperium/biblioteki/kustosz_pamieci.py, narzedzia/audyt_spojnosci.py, narzedzia/auto_lekcja.py, narzedzia/rag/indeksuj.py, skrypty/start.py, skrypty/start_lokal.py, tests/run_tests.py
 stan_na: 2026-06-30
+dublet_rozstrzygniety: "docs/SCIAGA_LOKAL.md — świadomy podział ról, NIE scalać (werdykt 2026-07-17): ten dokument to PEŁNY PRZEWODNIK dla nowicjusza (prowadzi za rękę, tłumaczy po co), SCIAGA to ściąga z 24 komendami dla kogoś, kto już wie. Scalenie zabiłoby przewodnik, na którym stoi ZPO (Cezar jest nowicjuszem — to jedyny powód istnienia tej zasady). Unikaty tego pliku: tabela chmura vs lokal, aktualizuj.ps1, Filesystem MCP, luka W1."
 powod_istnienia: "Jedyne miejsce z tabelą porównawczą **chmura vs lokal** (co lokal DODAJE: wektory semantyczne, pełny dysk przez MCP, trwałe logi W1, DeepSeek) oraz jedyne, które promuje `aktualizu"
 ---
 # 🖥️ START LOKALNY — pełny przewodnik (dla Cezara, nowicjusza)

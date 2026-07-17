@@ -197,6 +197,36 @@ def test_bramka3_rozne_kategorie_to_nie_dublet():
     assert not any("DUBLET" in o for o in ostrzezenia), ostrzezenia
 
 
+def test_bramka3_rozstrzygniety_dublet_milknie():
+    """Werdykt człowieka wycisza parę: START_LOKAL (przewodnik) vs SCIAGA_LOKAL (ściąga).
+
+    Bez tego bramka krzyczałaby co sesję na świadomy podział ról — a bramka krzycząca
+    fałszywie uczy ignorować WSZYSTKIE bramki (najgorszy możliwy skutek).
+    """
+    from narzedzia.tabularium import sprawdz
+    _, ostrzezenia, info = sprawdz([
+        ("docs/START_LOKAL.md", _meta(dublet_rozstrzygniety="docs/SCIAGA_LOKAL.md — przewodnik vs ściąga")),
+        ("docs/SCIAGA_LOKAL.md", _meta()),
+    ])
+    assert not any("DUBLET" in o for o in ostrzezenia), ostrzezenia
+    assert any("rozstrzygnięte" in i for i in info), info
+
+
+def test_bramka3_rozstrzygniecie_nie_wycisza_cudzej_pary():
+    """GRANICA: werdykt dotyczy KONKRETNEJ pary — nie jest wytrychem na wszystko.
+
+    Bez tego jeden `dublet_rozstrzygniety` uciszałby dokument na zawsze, także wobec
+    dubletów, których nikt nigdy nie osądził.
+    """
+    from narzedzia.tabularium import sprawdz
+    _, ostrzezenia, _ = sprawdz([
+        ("docs/A.md", _meta(dublet_rozstrzygniety="docs/NIEZWIAZANY.md — inna para")),
+        ("docs/B.md", _meta()),
+    ])
+    assert any("DUBLET" in o for o in ostrzezenia), (
+        "Rozstrzygnięcie innej pary NIE może wyciszać tej pary — " + str(ostrzezenia))
+
+
 def test_bramka3_zastapiony_nie_liczy_sie_jako_dublet():
     """GRANICA: dokument oznaczony jako zastąpiony nie może wiecznie zgłaszać dubletu."""
     from narzedzia.tabularium import sprawdz

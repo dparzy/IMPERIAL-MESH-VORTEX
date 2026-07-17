@@ -49,6 +49,45 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
 
+## 2026-07-17 | 📖 | Dług T5 spłacony (8→0) + DWA werdykty zwiadowców OBALONE pomiarem
+
+**Co:** przeczytane W CAŁOŚCI 2 ostatnie dokumenty świecące T5. **Oba werdykty zwiadowców
+okazały się BŁĘDNE** — trzeci i czwarty raz tego dnia, gdy pomiar obala kandydata.
+
+**`PAPER_TRADING_MEXC` — zwiadowca: „KANDYDAT_DO_ARCHIWUM". BŁĄD.** To jedyne miejsce
+z **kryteriami zaliczenia Etapu II** (Sharpe≥1.0, MaxDD<15%, DSR≥0.95, WR≥55% lub PF>1.5,
+≥100 trades) i drabiną Etapów II→IIb→III→IV — **żywa bramka „kiedy wolno wejść za realne
+pieniądze"**. Archiwizacja skasowałaby warunki wejścia na rynek. → `typ: zywy`.
+Naprawione (zweryfikowane wobec kodu): **KROK 4 wklejał ~80 linii źródła
+`narzedzia/paper_trading_live.py` — pliku, który NIGDY nie istniał** (instrukcja kazała
+uruchomić widmo) → zastąpione realnym CLI `python -m imperium.koloseum.petla_live`
+(**sprawdzone `--help`, działa**) · `adaptery.py` → to PAKIET `adaptery/` · „RAM ⏳ upgrade
+laptopa" → CENSOR zmierzył **15.88 GB, maszyna to ma**.
+
+**`MANUAL_MIGRACJA_I_SYMULATOR` — zwiadowca: „KANDYDAT_DO_SCALENIA", oznaczony acta. BŁĄD.**
+To **żywy przewodnik dydaktyczny**: pełny przepływ cyklu decyzyjnego, ścieżka pieniędzy,
+obalenie mitu CHIMERY (Prawo I) i **10 bramek wstrzymania**. Progi ZWERYFIKOWANE wobec kodu
+— `dyrygent.py:210`: `min_neuronow=5, min_przewaga=0.55` → **dokument mówi PRAWDĘ**.
+Gnił tylko licznik („48 aktywnych" przy **81**) → wpięty w Filar 4 + sprzęt 8 GB → 15.88 GB.
+
+**🚨 KOREKTA MOJEGO WŁASNEGO FAŁSZYWEGO TWIERDZENIA (2 commity wstecz):** zapisałem
+w banerze MAPA_IMPERIUM_FLOW „Imperium NIE MA narracyjnego przewodnika po aktualnej
+architekturze — to realny brak". **Twierdzenie bez weryfikacji. Fałszywe.** Przewodnik
+istnieje — to właśnie `MANUAL_MIGRACJA_I_SYMULATOR` § 2. Baner poprawiony, wskazuje następcę.
+**Trzeci raz dziś: ogłosiłem lukę/alarm, nie sprawdziwszy. Alarm bez pomiaru to halucynacja.**
+
+**Wynik:** T5 **8 → 0** — każda historia w Imperium umie powiedzieć, CZEMU jest historią.
+Rejestr 70/70 · ACTA 13 · CONSILIUM 12 · DISCIPLINA 10 · FORMA 12 · LEX 6 · MENSURA 6 · TABULA 11.
+
+**Bilans werdyktów zwiadowców (4 sprawdzone w całości):** 4/4 wymagały korekty —
+NAZWY_PLIKOW („95% dublet" → 177 unikatów), SYMBIOZA („archiwum" → uratowana żywa doktryna),
+PAPER_TRADING („archiwum" → żywa bramka Etapu II), MANUAL_MIGRACJA („scalenie/acta" → żywy
+przewodnik z prawdziwymi progami). **Zwiadowca czyta szeroko i myli się często — sędzia musi
+mierzyć, nie ufać** (ZASADA ZWIADOWCY WIEDZY: kandydat ≠ prawda).
+
+**Pliki:** docs/PAPER_TRADING_MEXC.md, docs/MANUAL_MIGRACJA_I_SYMULATOR.md,
+docs/MAPA_IMPERIUM_FLOW.md (korekta), docs/INDEKS_IMPERIUM.md (katalog).
+
 ## 2026-07-17 | 🕳️ | Bramka T5 — zamknięcie TYLNYCH DRZWI we własnym mechanizmie
 
 **Co:** nowa bramka **T5 (ucieczka w historię)** + degradacja `MAPA_IMPERIUM_FLOW` do ACTA

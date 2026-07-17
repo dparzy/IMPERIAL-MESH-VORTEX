@@ -28,9 +28,12 @@ dlug: "🚨 opisuje nieistniejący kod: war_lancer.py, sala_wojenna.py, koloseum
 > organ — wartość historyczna i dydaktyczna. Ale jako dokument **żywy** uczył Cezara systemu,
 > który nie istnieje, więc był gorszy niż jego brak. Zdegradowany do ACTA 2026-07-17.
 >
-> **Luka, której to nie zamyka (jawnie):** Imperium NIE MA dziś narracyjnego przewodnika po
-> AKTUALNEJ architekturze dla nowicjusza — `ARCHITEKTURA_IMPERIUM.md` jest zwięzła i tabelaryczna.
-> To realny brak, nie załatwiony tą degradacją.
+> **Następca dydaktyczny (KOREKTA 2026-07-17):** twierdziłem tu, że Imperium nie ma
+> narracyjnego przewodnika po aktualnej architekturze. **To było moje twierdzenie bez
+> weryfikacji — i było fałszywe.** Taki przewodnik istnieje:
+> [`MANUAL_MIGRACJA_I_SYMULATOR.md`](MANUAL_MIGRACJA_I_SYMULATOR.md) § 2 — pełny przepływ
+> cyklu decyzyjnego, 10 bramek wstrzymania z progami zweryfikowanymi wobec kodu, ścieżka
+> pieniędzy. Zwięzła mapa architektury → [`ARCHITEKTURA_IMPERIUM.md`](ARCHITEKTURA_IMPERIUM.md).
 
 > **Giełda docelowa:** MEXC (główna)
 > **Instrumenty:** BTC (priorytet), ETH, alts, nowe tokeny

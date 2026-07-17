@@ -1,3 +1,10 @@
+---
+kategoria: LEX
+typ: zywy
+wlasciciel: —
+stan_na: 2026-06-01
+powod_istnienia: "Zgodność z regulaminami giełd + katalog 7 manipulacji rynkowych do wykrywania — tarcza prawna Imperium"
+---
 # 🏛️ REGULAMINY I MANIPULACJE — Tarcza Imperium ⚔️
 
 > **EXCHANGE COMPLIANCE & MARKET MANIPULATION**

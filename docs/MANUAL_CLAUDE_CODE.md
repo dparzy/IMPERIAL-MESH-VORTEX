@@ -1,3 +1,10 @@
+---
+kategoria: DISCIPLINA
+typ: zywy
+wlasciciel: narzedzia/audyt_spojnosci.py, tests/run_tests.py
+stan_na: 2026-07-12
+powod_istnienia: "Jedyny dokument opisujący, jak Cezar instaluje i obsługuje samo narzędzie Claude Code (Node/npm, logowanie Pro, hooki, MCP, skróty, plan mode) — czyli warstwę „jak rozmawiać z Vitr"
+---
 # 🤖 MANUAL CLAUDE CODE — Instalacja i konfiguracja z Imperium
 
 > **Stan na:** 2026-07-12

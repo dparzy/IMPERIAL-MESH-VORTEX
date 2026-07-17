@@ -1,3 +1,10 @@
+---
+kategoria: CONSILIUM
+typ: zywy
+wlasciciel: —
+stan_na: 2026-06-26
+powod_istnienia: "Zbiór wizji i kierunków rozwoju — zamiary na przyszłość, świadomie niezrealizowane"
+---
 # 💡 WIZJONER — Brudnopis Imperium
 
 > *Miejsce gdzie rozmowa staje się wizją, wizja staje się zadaniem, zadanie staje się kodem.*

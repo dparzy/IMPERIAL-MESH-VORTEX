@@ -1,3 +1,10 @@
+---
+kategoria: CONSILIUM
+typ: zywy
+wlasciciel: imperium/koloseum/skaner_okazji.py, imperium/legiony/rejestr.py
+stan_na: 2026-06-14
+powod_istnienia: "Wizja Cezara na 3 tryby operacyjne systemu (NAJLEPSZY/BILANS/OBRONA) plus propozycja 4 nowych Praw (XXII-XXV) i katalog darmowych API do 'prześwietlania' nowych walut przed wejście"
+---
 # 🔱 WIZJA: TRYBY OPERACYJNE + ROZWÓJ POTENCJAŁU
 
 > **Stan na:** 2026-06-14 · **Status:** wizja Cezara + propozycja architektury (do decyzji, Prawo XVIII)

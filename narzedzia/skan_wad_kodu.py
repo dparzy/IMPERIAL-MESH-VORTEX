@@ -32,7 +32,8 @@ def _zmienione_py() -> list[Path]:
                  ["ls-files", "--others", "--exclude-standard"]):
         try:
             out = subprocess.run(["git", *args], cwd=ROOT, capture_output=True,
-                                 text=True, timeout=20).stdout
+                                 text=True, timeout=20,
+                                 encoding="utf-8", errors="replace").stdout
             pliki |= {l for l in out.splitlines()
                       if l.endswith(".py") and l.startswith(("imperium/", "narzedzia/"))}
         except Exception:

@@ -1,3 +1,10 @@
+---
+kategoria: DISCIPLINA
+typ: zywy
+wlasciciel: skrypty/start.py
+stan_na: 2026-06-20
+powod_istnienia: "Spis skryptów startowych i ich komend — punkt wejścia dla Cezara"
+---
 # 🚀 Skrypty Startowe Imperium
 
 Gotowe skrypty do uruchomienia. Wszystkie w trybie **paper** (symulacja, zero

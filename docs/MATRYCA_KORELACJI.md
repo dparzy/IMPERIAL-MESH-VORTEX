@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/legiony/diagnostyka_korelacji.py, imperium/legiony/rejestr.py
+stan_na: 2026-07-17
+powod_istnienia: "Koncepcyjny 'szablon Kostki Rubika' — pięcioosiowy system klasyfikacji sygnałów (Wskaźnik×Interwał×Typ zagrania×Reżim×Waga) jako przyszła mapa do wypełnienia realnymi danymi w 'Faz"
+---
 # 🏛️ MATRYCA KORELACJI — IMPERIUM
 
 > *"Roma non uno die aedificata est"* — Rzym nie powstał w jeden dzień. Tak samo ta matryca.
@@ -41,6 +48,22 @@ Pięć osi, które obracają się niezależnie i tworzą każdą konfigurację b
 ---
 
 ## 🔑 SYSTEM NUMERACJI I KLUCZY
+
+> **🚨 SCHEMAT PONIŻEJ NIGDY NIE WSZEDŁ DO KODU (zweryfikowane 2026-07-17).**
+> Zmierzone: **0 kluczy** w formacie `[LITERA]-[001-157]-W[WAGA]` (np. `M-001-W7`).
+> Realny format klucza to **`X-01`**, a kategoria i waga to **osobne pola klasy neuronu**:
+> `X-01` → `KATEGORIA='M'`, `WAGA=6`. Wtłoczenie wagi w klucz oznaczałoby, że zmiana wagi
+> zmienia identyfikator — dlatego kod poszedł inną drogą, a ta sekcja została jako zapis
+> pierwotnego pomysłu.
+>
+> **Zostawiona, nie skasowana:** tłumaczy INTENCJĘ (po co w ogóle klucze i kategorie) i
+> jest czytelnym wstępem do macierzy niżej. **Aktualne klucze → [`MAPA_KLUCZY.md`](MAPA_KLUCZY.md)**
+> (jedyne źródło prawdy, audyt W14 wymusza pokrycie każdego z <!-- LICZBA:neurony -->87<!-- /LICZBA --> kluczy).
+>
+> **Legenda kategorii poniżej jest NIEPEŁNA** — pokazuje 6 liter, w kodzie jest 15
+> (brak m.in. C, D, N, Z, H). Pełna, zweryfikowana legenda:
+> [`GENERAL_LEGATUS.md` § Legenda kategorii neuronów](GENERAL_LEGATUS.md).
+
 
 Każdy wskaźnik otrzymuje **klucz bojowy** w formacie:
 
@@ -217,6 +240,7 @@ Każde **wydarzenie historyczne** ma swój powtarzalny **wzorzec**. System ma ro
 > Źródło: `Dyrygent.raport_korelacji_neuronow()` na BTCUSDT 4H (ostatnie 1500 barów,
 > okno 200, 1301 cykli, 120 kroków korelacji). Narzędzie: `KolektorKorelacjiNeuronow`
 > (W-305) + `raport_z_kolektora()` (W-306). Pomiar obejmie 46 neuronów obecnych w głosach.
+> *(Liczba z dnia pomiaru — prawda swojego czasu, Prawo I: NIE podmieniamy jej na dzisiejsze <!-- LICZBA:neurony -->87<!-- /LICZBA -->, bo pomiar objął tamte 46, nie te.)*
 
 ### 🔴 Pary NADMIAROWE (|korelacja| > 0.80) — kandydaci do scalenia / wagi w dół
 

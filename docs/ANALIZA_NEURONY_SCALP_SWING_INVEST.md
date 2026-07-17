@@ -1,3 +1,10 @@
+---
+kategoria: MENSURA
+typ: zywy
+wlasciciel: imperium/koloseum/namiestnik.py, imperium/legiony/rejestr.py, narzedzia/ab_w322.py, narzedzia/dekorelacja_w322.py
+stan_na: 2026-06-15
+powod_istnienia: "Porównać co Imperium MA (65 neuronów w momencie pisania) z najlepszymi praktykami scalp/swing/invest z internetu, znaleźć zdekorelowane luki, i ZMIERZYĆ (nie założyć) czy nowe neur"
+---
 # 🔬 ANALIZA — najlepsze neurony/strategie pod SCALP / SWING / INVEST
 
 > **Cel:** porównać to, co Imperium MA w kodzie (65 neuronów), z najlepszymi praktykami

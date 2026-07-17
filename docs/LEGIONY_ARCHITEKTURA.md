@@ -1,4 +1,39 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/legiony/mikro_neuron.py, imperium/legiony/neurony/dzwignia.py, imperium/legiony/neurony/momentum.py, imperium/legiony/neurony/onchain.py, imperium/legiony/neurony/struktura.py, imperium/legiony/neurony/trend.py, imperium/legiony/neurony/wolumen.py
+stan_na: 2026-07-17
+powod_istnienia: "Kanoniczne źródło nazewnictwa 4 Legionów (rzymskie nazwy: Legio X Equestris/Scalp, XII Fulminata/Swing, III Augusta/Invest, VI Ferrata/Leverage) + przypisanie konkretnych ID neuron"
+---
 # ⚔️ LEGIONY — Cztery Armie Imperium
+
+> # 🚨 KOREKTA 2026-07-17 — ROSTERY NEURONÓW USUNIĘTE (były w 86% fałszywe)
+>
+> Ten dokument wymieniał **28 identyfikatorów neuronów** przypisanych do czterech legionów.
+> Zweryfikowane mechanicznie wobec `rejestr.wszystkie_neurony()`:
+>
+> | | |
+> |---|---|
+> | zgodne z kodem | **4 z 28** |
+> | zła nazwa | **9** — np. `X-01` opisany jako „Neuron EMA", a w kodzie to **RSI (14)**; `X-05` jako „OrderFlow", a to **EMA Cross (9/21)** |
+> | **ID nieistniejące w kodzie** | **15** — w tym **CAŁY roster Legio III** (`III-01..III-07`) |
+>
+> **Schemat „prefiks klucza = legion" UMARŁ.** W kodzie: `X-*` 17 neuronów, `XII-*` 7,
+> `VI-*` 1, **`III-*` ZERO**. Pozostałe ~60 neuronów ma prefiksy **funkcyjne**
+> (`OC-*` on-chain, `PSY-*`, `RADAR-*`, `NEWS-*`, `SMC-*`, `Z-*` meta-bramy …),
+> które w podziale na cztery legiony się nie mieszczą. Rój organizuje się dziś przez
+> **KATEGORIA** (15 liter) — nie przez numer legionu.
+>
+> **Rostery usunięte, nie „poprawione"** — ich przepisanie zduplikowałoby
+> [`MAPA_KLUCZY.md`](MAPA_KLUCZY.md), jedyne źródło prawdy klucz↔kod (audyt W14 wymusza
+> pokrycie **każdego** klucza). Dwie listy tych samych kluczy rozjadą się ponownie —
+> dokładnie tak, jak ta (Prawo XVI). Stara treść żyje w historii gita.
+>
+> **Co ZOSTAJE w tym dokumencie:** metafora czterech legionów (żywa w nazwie organu
+> `imperium/legiony/`), schemat sygnału neuronu, współpraca z Senatem, weto Pretorianów.
+> **Aktualny spis neuronów → [`MAPA_KLUCZY.md`](MAPA_KLUCZY.md)** ·
+> **stan kodu → [`MANIFEST_KODU.md`](MANIFEST_KODU.md)** (Prawo XIX).
+
 
 > **Zasada:** Każdy Legion = inny styl tradingu = inne interwały = inne wskaźniki.
 > Żaden Legion nie duplikuje pracy drugiego. Razem pokrywają CAŁY rynek.
@@ -25,20 +60,11 @@
 **Interwał:** M1, M5, M15
 **Kapitał:** mały, wiele trades/dzień
 
-### Mikro-neurony (wyspecjalizowane agenty)
+### Mikro-neurony
 
-| ID | Neuron | Wskaźnik | Co obserwuje |
-|----|--------|----------|--------------|
-| X-01 | Neuron EMA | EMA(9/21) cross | Kierunek trendu na M5 |
-| X-02 | Neuron StochRSI | Stochastic RSI | Szybkie sygnały w ekstremach |
-| X-03 | Neuron CVD | Cumulative Volume Delta | Kto kontroluje rynek (kupujący/sprzedający) |
-| X-04 | Neuron VWAP | VWAP Bounce | Magnes cenowy dnia |
-| X-05 | Neuron OrderFlow | Bid/Ask Imbalance | Mikrostruktura — presja natychmiastowa |
-| X-06 | Neuron ATR-Stop | ATR × 1.5 | Dynamiczny stop-loss |
+> Roster usunięty 2026-07-17 (był fałszywy — patrz baner na górze).
+> **Aktualne neurony tego legionu → [`MAPA_KLUCZY.md`](MAPA_KLUCZY.md)** (jedyne źródło prawdy klucz↔kod, pilnowane przez audyt W14).
 
-**Filtr wejścia:** ADX > 20 (jest trend) + wolumen > średnia × 1.2
-
----
 
 ## ⚖️ LEGIO XII FULMINATA — Błyskawica (Swing)
 
@@ -48,20 +74,9 @@
 
 ### Mikro-neurony
 
-| ID | Neuron | Wskaźnik | Co obserwuje |
-|----|--------|----------|--------------|
-| XII-01 | Neuron EMA | EMA(50/200) golden/death cross | Główny kierunek trendu |
-| XII-02 | Neuron MACD | MACD histogram | Zmiany momentum |
-| XII-03 | Neuron Bollinger | BB squeeze/breakout | Kompresja → wybicie |
-| XII-04 | Neuron Supertrend | Supertrend + ADX | Kierunek + siła trendu |
-| XII-05 | Neuron Fibo | Fibonacci S/R | Poziomy wsparcia/oporu |
-| XII-06 | Neuron SMC | BOS/CHoCH, Order Blocks | Ślady smart money |
-| XII-07 | Neuron RSI-Div | RSI + dywergencje | Ukryte sygnały odwrócenia |
-| XII-08 | Neuron OBV | On-Balance Volume | Potwierdzenie wolumenem |
+> Roster usunięty 2026-07-17 (był fałszywy — patrz baner na górze).
+> **Aktualne neurony tego legionu → [`MAPA_KLUCZY.md`](MAPA_KLUCZY.md)** (jedyne źródło prawdy klucz↔kod, pilnowane przez audyt W14).
 
-**Filtr wejścia:** EMA(200) jako tło + ATR-based stop-loss
-
----
 
 ## 🏰 LEGIO III AUGUSTA — Augustowski (Invest/Spot)
 
@@ -71,20 +86,9 @@
 
 ### Mikro-neurony
 
-| ID | Neuron | Wskaźnik | Co obserwuje |
-|----|--------|----------|--------------|
-| III-01 | Neuron MVRV | MVRV Ratio | Globalny szczyt/dołek (>3.7 drogo) |
-| III-02 | Neuron NUPL | NUPL | Faza cyklu (>0.75 euforia, <0 kapitulacja) |
-| III-03 | Neuron PiCycle | Pi Cycle Top/Bottom | Szczyty cyklu halvingowego |
-| III-04 | Neuron ExchangeFlow | Exchange Netflow | Presja sprzedażowa na giełdy |
-| III-05 | Neuron SOPR | SOPR | Realizacja zysków/strat |
-| III-06 | Neuron Halving | Halving Cycle | Pozycja w 4-letnim cyklu |
-| III-07 | Neuron AltSeason | Altcoin Season Index | Rotacja BTC→alts |
-| III-08 | Neuron M2 | Global M2 Liquidity | Makro (przesunięcie ~105 dni vs BTC) |
+> Roster usunięty 2026-07-17 (był fałszywy — patrz baner na górze).
+> **Aktualne neurony tego legionu → [`MAPA_KLUCZY.md`](MAPA_KLUCZY.md)** (jedyne źródło prawdy klucz↔kod, pilnowane przez audyt W14).
 
-**Filtr wejścia:** Minimum 2 wskaźniki on-chain potwierdzają strefę akumulacji
-
----
 
 ## 🔥 LEGIO VI FERRATA — Żelazny (Leverage/Futures)
 
@@ -95,22 +99,9 @@
 
 ### Mikro-neurony
 
-| ID | Neuron | Wskaźnik | Co obserwuje |
-|----|--------|----------|--------------|
-| VI-01 | Neuron FundingRate | Funding Rate | Przeważenie long/short (>0.03% = za dużo longów) |
-| VI-02 | Neuron OI | Open Interest | Potwierdzenie siły trendu futures |
-| VI-03 | Neuron LiqHeatmap | Liquidation Heatmap | Poziomy kaskadowych likwidacji |
-| VI-04 | Neuron LongShort | Long/Short Ratio | Sentyment, ekstrema = odwrócenie |
-| VI-05 | Neuron LevZScore | Leverage Z-Score | Ekstremalne lewarowanie rynku |
-| VI-06 | Neuron MaxPain | Max Pain | Magnes cenowy opcji |
+> Roster usunięty 2026-07-17 (był fałszywy — patrz baner na górze).
+> **Aktualne neurony tego legionu → [`MAPA_KLUCZY.md`](MAPA_KLUCZY.md)** (jedyne źródło prawdy klucz↔kod, pilnowane przez audyt W14).
 
-**Filtr wejścia (OBOWIĄZKOWY):**
-- Funding Rate < 0.05% (brak ekstremalnego przeważenia)
-- Pozycja ≤ 2% kapitału całkowitego
-- Stop-loss ZAWSZE ustawiony przed wejściem
-- Pretorianie MUSZĄ przepuścić (żadnego weto)
-
----
 
 ## 🧬 SCHEMAT SYGNAŁU — co każdy neuron produkuje
 
@@ -155,26 +146,16 @@ class SygnalNeuronu:
 
 ### Legenda kategorii neuronów (pole `KATEGORIA` w kodzie)
 
-| Litera | Kategoria | Przykłady |
-|--------|-----------|-----------|
-| M | Momentum | RSI, StochRSI, MACD |
-| T | Trend | EMA cross, ADX, Supertrend |
-| V | Zmienność | ATR, Bollinger Bands, Choppiness |
-| F | Flow/Wolumen | CVD, OBV, Open Interest |
-| O | On-chain | MVRV, SOPR, Exchange Netflow |
-| L | Lewarowanie | FundingRate, ATR-Lev, Ulcer |
-| R | Rynki pochodne | Futures OI, Max Pain, LS-Ratio |
-| S | Smart Money | BOS, CHoCH, Order Blocks |
-| A | Anty-manipulacja | Wykrywanie fałszywych wybić |
-| K | Korelacja | Korelacje między aktywami |
-| E | Eksploracja | EXP-* eksperymenty (Higuchi, Hurst R/S) |
-| G | Giełdowe | Wolumeny, płynność |
-| H | Hurst/Pamięć długiego zasięgu | H-01 DFA — meta-brama reżimu: H>0.55 persystencja, H<0.45 antypersystencja, H≈0.5 NEUTRAL |
-
-> **Zasada Prawa I:** `wartosc` ZAWSZE pochodzi z Bramy Kalkulatora (TA-Lib).
-> Neuron NIGDY nie liczy wskaźnika samodzielnie. Pyta Bramę → interpretuje wynik.
-
----
+> **Scalona 2026-07-17 — JEDNO ŹRÓDŁO zamiast dwóch (Prawo XVI).** Ten dokument miał własną
+> kopię legendy, identycznie fałszywą jak ta w GENERAL_LEGATUS: wymieniała litery **E** i **G**,
+> których w kodzie **nie ma**, i pomijała **C, D, N, Z**. Dwie ręczne kopie tej samej tabeli
+> rozjechały się w tę samą stronę — dowód, że problemem była kopia, nie autor.
+>
+> **Pełna legenda 15 kategorii (zweryfikowana wobec `rejestr.wszystkie_neurony()`):**
+> → [`GENERAL_LEGATUS.md` § Legenda kategorii neuronów](GENERAL_LEGATUS.md#legenda-kategorii-neuronów)
+>
+> Tam legenda ma sens — Generał używa `KATEGORIA` jako klucza w `WAGI_REZIMU` (mnożniki wag
+> per reżim rynku). Tu byłaby ozdobą do przepisywania przy każdej zmianie roju.
 
 ## 🔄 JAK LEGIONY WSPÓŁPRACUJĄ Z SENATEM
 

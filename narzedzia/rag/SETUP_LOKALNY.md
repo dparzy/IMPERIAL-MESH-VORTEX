@@ -1,3 +1,10 @@
+---
+kategoria: DISCIPLINA
+typ: zywy
+wlasciciel: narzedzia/rag/indeksuj.py
+stan_na: 2026-06-26
+powod_istnienia: "Instrukcja włączenia pełnej mocy RAG lokalnie (FTS5 od ręki, wektory opcjonalnie)"
+---
 # 🔧 Bibliotheca-RAG — Setup na maszynie lokalnej (Cezar)
 
 > **Dla nowicjusza (ZPO):** RAG = pamięć semantyczna biblioteki. Zamiast czytać całą

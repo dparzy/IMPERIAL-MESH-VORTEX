@@ -1,3 +1,11 @@
+---
+kategoria: ACTA
+typ: acta
+powod_acta: "Pierwszy głęboki audyt Imperium (2026-06-01) — migawka stanu z tamtego dnia. Data jest w treści, nie w nazwie pliku (konwencja sprzed AUDYT_*_<data>)."
+wlasciciel: imperium/cesarz/deepseek_glos.py, imperium/legiony/mikro_neuron.py, imperium/senat/meta_kora.py
+stan_na: 2026-06-12
+powod_istnienia: "Pierwszy głęboki audyt stanu faktycznego systemu — co działa, co blokowane przez TA-Lib, co jest szkieletem, co brakuje całkowicie."
+---
 # 🔍 AUDYT SYSTEMU IMPERIUM — Stan Faktyczny
 
 > *"Nosce te ipsum."* — Poznaj siebie samego.

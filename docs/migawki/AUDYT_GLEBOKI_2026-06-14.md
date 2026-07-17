@@ -1,3 +1,10 @@
+---
+kategoria: ACTA
+typ: acta
+wlasciciel: imperium/biblioteki/kronikarz_zdarzen.py, imperium/koloseum/namiestnik.py, imperium/koloseum/skaner_okazji.py, imperium/legiony/radar_rynku.py, imperium/pretorianie/praeda.py
+stan_na: 2026-06-14
+powod_istnienia: "Głęboki audyt 4-frontowy reframujący ocenę systemu jako 'łowcy okazji wielowalutowego' (nie backtestu jednej waluty) — mapuje co z tej wizji istnieje w kodzie, a czego brakuje (luk"
+---
 # 🔍 GŁĘBOKI AUDYT IMPERIUM — wizja „łowcy okazji" vs rzeczywistość kodu
 
 > **Stan na:** 2026-06-14 · **Metoda:** audyt 4-frontowy (kod skanera/tryby, kod zdarzeń/prawdopodobieństwo, dokumenty, research internetowy) + weryfikacja własna · **Autor:** sesja audytowa na rozkaz Cezara

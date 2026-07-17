@@ -1,3 +1,10 @@
+---
+kategoria: CONSILIUM
+typ: zywy
+wlasciciel: imperium/legiony/strategie/rejestr_strategii.py
+stan_na: 2026-06-26
+powod_istnienia: "Katalog zmapowanych strategii jako roadmapa (20 w kodzie) — zamiar; stan kodu mówi MANIFEST"
+---
 # 📖 KATALOG STRATEGII IMPERIUM
 
 > **Strategia = nazwana kolekcja neuronów w konkretnej konfiguracji.**

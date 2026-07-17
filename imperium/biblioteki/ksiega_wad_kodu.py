@@ -58,6 +58,14 @@ WZORCE_STARTOWE = [
      "lekcja": "Argument sterujący kosztem (topk → rozmiar korpusu do PŁATNEGO API) lub semantyką progu "
                "(prog_ic) waliduj przy parsowaniu — type=funkcja z zakresem/skończonością, nie gołe int/float.",
      "zrodlo": "cubic PR#122 bibliotekarz/ab_pnl P2/P3 (2026-07-13)"},
+    # ── sesja 2026-07-16 (TIRO/biblioteka) — wzorce ZMIERZONE na 375 plikach przed dodaniem ──
+    {"kat": "wydajnosc", "regex": r'inspect\.stack\(\s*\)',
+     "opis": "inspect.stack() bez context=0 — czyta PLIKI ŹRÓDŁOWE każdej ramki stosu",
+     "lekcja": "Domyślne inspect.stack() otwiera i czyta plik źródłowy KAŻDEJ ramki, żeby dołączyć "
+               "linię kontekstu. Gdy bierzesz sam .filename/.function — użyj inspect.stack(0): ten sam "
+               "wynik bez I/O. Przy głębokim stosie w ścieżce gorącej to kilkanaście zbędnych odczytów "
+               "na wywołanie.",
+     "zrodlo": "self-review NOTARIUS (2026-07-16) — zmierzone: 0 fałszywek na 375 plikach"},
 ]
 
 # ── CHECKLISTA REVIEW (bez regexu) — klasy SEMANTYCZNE, których forma składniowa jest
@@ -67,6 +75,17 @@ WZORCE_STARTOWE = [
 # (obok /code-review). „Wszystko ma być łapane" (Prawo XV) dwiema warstwami: regex łapie
 # formę, checklista łapie znaczenie.
 CHECKLIST_STARTOWA = [
+    {"kat": "parsowanie",
+     "opis": "Blok o ZMIENNEJ długości parsowany po STAŁYM oknie znaków/linii zamiast po granicach",
+     "lekcja": "Realny przypadek (2026-07-17): bramka W6b szukała `stan_na` w oknie `tresc[:600]` "
+               "nagłówka dokumentu. Dokumenty z wieloma właścicielami mają je na pozycji 609 i 778 — "
+               "więc CICHO omijały bramkę: im dłuższy (bogatszy) nagłówek, tym pewniej dokument "
+               "wymykał się kontroli. Klasa jest podstępna, bo testy na typowym pliku przechodzą, "
+               "a wymykają się właśnie przypadki NAJBOGATSZE, czyli najważniejsze. ZAWSZE parsuj po "
+               "granicach bloku (separator `---`, domknięcie nawiasu) i UŻYJ ISTNIEJĄCEGO parsera "
+               "formatu zamiast pisać drugi (Prawo XVI: jeden format = jeden parser; dwa parsery "
+               "rozjadą się co do znaku).",
+     "zrodlo": "self-review Tabularium — W6b omijana przez dokumenty z długim nagłówkiem (2026-07-17)"},
     {"kat": "kierunek",
      "opis": "Odwrócenie kierunku (flip znakiem) bez propagacji do WSZYSTKICH konsumentów",
      "lekcja": "Gdy odwracasz kierunek (np. ujemny IC → LONG↔SHORT), KAŻDY konsument w dół (dobór "
@@ -96,6 +115,99 @@ CHECKLIST_STARTOWA = [
                "równość długości i odrzucaj rozjazd zanim policzysz — zip cicho ucina ogon i liczy z "
                "niezamierzonego podzbioru (look-ahead / skażone wagi).",
      "zrodlo": "cubic PR#122 legatus/hipoteza_b P2/P3 (2026-07-13)"},
+
+    # ══ sesja 2026-07-16 (TIRO + biblioteka) — 7 realnych bugów jednego dnia ══════════════
+    # Wszystkie znalezione SAMI (self-review + Test-Granic + czytanie danych), nie przez cubic.
+    {"kat": "obietnica",
+     "opis": "🚨 Docstring OBIECUJE odporność, której kod NIE DOWOZI (obietnica bez pokrycia)",
+     "lekcja": "Gdy docstring mówi „graceful”, „nie wysypuje pipeline”, „abstynuje przy braku danych” — "
+               "SPRAWDŹ, czy kod to realizuje. Realny przypadek: `buduj_cache` deklarował „GRACEFUL "
+               "(Prawo XV) — nie wysypuje pipeline”, a leciał wyjątkiem z jednej książki i zabijał bieg "
+               "po 70 poprawnych. To gorsze niż brak obietnicy: czytający UFA docstringowi i nie sprawdza. "
+               "Każda deklaracja odporności = test, który ją udowadnia.",
+     "zrodlo": "self-review konwerter (2026-07-16)"},
+    {"kat": "odpornosc",
+     "opis": "Pętla po jednostkach (pliki/książki/okna/pary) BEZ try/except per jednostka",
+     "lekcja": "Jedna zła jednostka zabija cały bieg i wyrzuca do kosza całą pracę wykonaną wcześniej. "
+               "Każda pętla po zewnętrznych danych (pliki użytkownika, API, konwersje) MUSI mieć "
+               "try/except wewnątrz + GŁOŚNY raport co nie weszło. Cisza jest gorsza od błędu, ale "
+               "przerwanie biegu jest gorsze od obu. (Wzorzec: ZASADA ANALIZY CZĄSTKOWEJ — bieg który "
+               "padnie nie traci nic.)",
+     "zrodlo": "self-review konwerter/buduj_cache (2026-07-16)"},
+    {"kat": "wydajnosc",
+     "opis": "Dedup/cache czytający CAŁY zbiór przy KAŻDYM zapisie — koszt kwadratowy w ścieżce gorącej",
+     "lekcja": "Sprawdzenie „czy już mam” przez pełny odczyt pliku/tabeli przy każdym dopisie daje O(n²) "
+               "i ROSNĄCE opóźnienie im więcej zebrano — najgorzej gdy siedzi w ścieżce płatnego API. "
+               "Trzymaj zbiór w cache i wykrywaj zmianę spoza procesu tanio (stat: mtime+rozmiar). "
+               "GRANICA: po własnym zapisie NIE inkrementuj licznika, jeśli właśnie przeładowałeś plik "
+               "z dysku — on już ten wpis policzył (podwójne liczenie, niewidoczne na zbiorach/setach!).",
+     "zrodlo": "self-review NOTARIUS (2026-07-16) — bug i jego poprawka miały TEN SAM dzień"},
+    {"kat": "dane",
+     "opis": "🚨 Eksport danych treningowych/wynikowych BEZ filtra jakości (ucięte, sprzeczne, zepsute)",
+     "lekcja": "Dane, na których model się UCZY, wymagają twardszego filtra niż dane do podglądu. Trzy "
+               "realne trucizny: (1) odpowiedź ucięta na limicie — uczy urywania w pół słowa; (2) ten sam "
+               "prompt z RÓŻNYMI odpowiedziami (temperatura >0) — uczy SPRZECZNYCH etykiet dla "
+               "identycznego wejścia, najgorszy możliwy sygnał; (3) zepsuty format od nauczyciela (np. "
+               "niepoprawny JSON) — uczy produkować śmieci. Filtruj przy EKSPORCIE, nie przy zapisie "
+               "(surowe dane zostawiaj — pozwolą policzyć konsensus).",
+     "zrodlo": "self-review NOTARIUS + zmierzone dane (2026-07-16)"},
+    {"kat": "dowod",
+     "opis": "🚨 Nazwa (pliku/klucza/etykiety) traktowana jako DOWÓD zamiast treści",
+     "lekcja": "Nazwa jest deklaracją, nie dowodem. Realny przypadek: plik "
+               "`BIB-073_Boyd-Vandenberghe_Convex-Optimization.pdf` zawierał ZBIÓR ZADAŃ, nie podręcznik "
+               "(na stronie autora oba PDF-y leżą obok siebie). Bez zajrzenia do treści RAG serwowałby "
+               "zadania domowe jako teorię — sygnał cichy i FAŁSZYWY, nie do wykrycia po fakcie. "
+               "Przy przyjmowaniu danych z zewnątrz: czytaj pierwsze zdania i sprawdzaj frazy-świadki.",
+     "zrodlo": "BIB-073 Boyd (2026-07-16)"},
+    {"kat": "testy",
+     "opis": "🚨 Testy dotykające SIECI lub PŁATNEGO API (nieszczelne, kosztowne, niedeterministyczne)",
+     "lekcja": "Zmierzone: `test_petla_live.py` = 8 płatnych wywołań DeepSeek i 4 min 42 s, bo "
+               "`handluj_live` buduje `AdapterNewsLLM(fetcher=FetcherNewsRSS())`, a `uzyj_llm` jest "
+               "domyślnie True + `glos=None` → lazy-init z klucza. Trzy szkody naraz: wynik zależy od "
+               "tego, co akurat piszą w newsach (niedeterminizm), każdy przebieg kosztuje, bramka jest "
+               "wolna. Domyślne argumenty adapterów sięgające sieci to pułapka — w testach wstrzykuj "
+               "atrapę fetchera i `uzyj_llm=False`. "
+               "🔁 NAWRÓT 2026-07-17: NOTARIUS złapał KOLEJNE 5 płatnych wywołań podczas zwykłego biegu "
+               "`run_tests.py` — bo wada została ZAPISANA, ale NIE NAPRAWIONA. Księga, która tylko notuje, "
+               "jest pamiętnikiem, nie systemem samo-leczenia. "
+               "✅ NAPRAWA U ŹRÓDŁA (2026-07-17): `tests/conftest.py` ODBIERA testom klucze "
+               "(DEEPSEEK_API_KEY, MEXC_API_KEY, MEXC_SECRET) przy imporcie — zamiast łatać każde "
+               "wywołanie z osobna, zabijamy całą klasę: lazy-init nie znajduje klucza → deterministyczny "
+               "fallback, zero kosztu. Dowód: par NOTARIUSA przed biegiem 162, po biegu 162. "
+               "Test `test_zapora_testow.py` pilnuje, że zapora żyje (i że faktycznie odbiera).",
+     "zrodlo": "wykryte przez NOTARIUSA (2026-07-16), NAWRÓT i naprawa u źródła (2026-07-17)"},
+    {"kat": "sciezki",
+     "opis": "Ścieżka pliku budowana bez limitu długości (Windows MAX_PATH = 260)",
+     "lekcja": "Nazwa pliku legalna (Windows: do 255 zn./człon) NIE znaczy, że legalna jest ścieżka "
+               "pochodna (katalog + nazwa + hasz + sufiks). Realnie: książka o nazwie 190 zn. dała ścieżkę "
+               "cache 282 zn. → FileNotFoundError. Licz budżet pod NAJDŁUŻSZY wariant (np. .tmp przy "
+               "zapisie atomowym) i skracaj WARUNKOWO — bezwarunkowe skracanie unieważnia istniejący "
+               "cache i wymusza pełną rekonwersję. O zgodności decyduje HASZ, nie nazwa.",
+     "zrodlo": "self-review konwerter (2026-07-16)"},
+    {"kat": "odpornosc",
+     "opis": "Biblioteka zewnętrzna bez fallbacku — jej kruchość staje się NASZĄ cichą stratą",
+     "lekcja": "Realny przypadek: `ebooklib` 0.20.0 robi `xpath(\"//nav[@*='toc']\")[0]` bez zabezpieczenia "
+               "→ IndexError na POPRAWNYM epubie, którego nawigacja nie ma elementu `toc` (standard tego "
+               "nie wymaga). Efekt: 0 znaków, książka cicho nie weszła do RAG. Parsery cudzych formatów "
+               "owijaj w try/except + fallback (u nas: calibre) i traktuj PUSTY WYNIK bez wyjątku tak samo "
+               "jak wyjątek — cicha pustka jest gorsza od głośnego błędu.",
+     "zrodlo": "BIB-075 whitepaper Bitcoina (2026-07-16)"},
+
+    # ══ sesja 2026-07-17 (Tabularium) — wada ŚRODOWISKA, nie logiki ═══════════════════════
+    {"kat": "kodowanie",
+     "regex": r'subprocess\.run\((?:(?!encoding\s*=)[\s\S]){0,300}?\btext\s*=\s*True'
+              r'(?:(?!encoding\s*=)[\s\S]){0,150}?\)',
+     "opis": "🚨 subprocess.run(text=True) BEZ encoding='utf-8' — na polskim Windowsie dekoduje cp1250",
+     "lekcja": "`text=True` każe Pythonowi dekodować wyjście procesu kodowaniem KONSOLI (cp1250 na polskim "
+               "Windowsie), nie UTF-8. Nasze commity zaczynają się od emoji, komentarze mają polskie znaki, "
+               "więc każdy odczyt `git log --format=%s` / wyjścia ruffa to ruletka: albo krzaki "
+               "(`status.py`: „8f18d07 đź§ą PORZÄ„DEK…”), albo UnicodeDecodeError w wątku czytającym → "
+               "`stdout=None` → bramka CICHNIE NA GŁUCHO i zawsze przechodzi. Dokładnie tak uciszona była "
+               "bramka gnicia Tabularium w dniu powstania. Najpodlejszy przypadek: W13 (ruff) — pęka "
+               "WTEDY, GDY ZNAJDZIE buga, bo dopiero wtedy cytuje polską linię źródła. "
+               "ZAWSZE: encoding='utf-8', errors='replace'. Zmierzone: 6 trafień / 377 plików .py, "
+               "zero trafień w kodzie naprawionym (wzorzec sprawdzony w obie strony).",
+     "zrodlo": "self-review Tabularium — 2 wady aktywne + 4 utajone, w tym W6b i W13 (2026-07-17)"},
 ]
 
 

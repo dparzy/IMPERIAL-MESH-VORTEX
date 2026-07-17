@@ -1,3 +1,10 @@
+---
+kategoria: TABULA
+typ: zywy
+wlasciciel: imperium/biblioteki/centrum_pamieci.py, imperium/biblioteki/dziennik_niesmiertelny.py, imperium/biblioteki/graf_pamieci.py, imperium/biblioteki/kronika_czatu.py, imperium/biblioteki/kustosz_pamieci.py, imperium/biblioteki/pamiec_absolutna.py, imperium/biblioteki/pamiec_proceduralna.py, imperium/biblioteki/pamiec_proweniencji.py, imperium/biblioteki/pamiec_robocza.py, imperium/biblioteki/pamiec_sesji.py, imperium/biblioteki/refleksja_pamieci.py, imperium/biblioteki/rejestr_wizji.py, imperium/biblioteki/srodowisko_pamieci.py, imperium/biblioteki/zapominanie.py
+stan_na: 2026-07-04
+powod_istnienia: "Jedyne miejsce konsolidujące 13(+1 nadrzędny=W7) warstw pamięci Claude/Imperium w jedną taksonomię, z mapowaniem na model CoALA (arXiv:2309.02427) i na 'domknięte problemy granicy "
+---
 # 🗺️ MAPA PAMIĘCI IMPERIUM — Centrum Pamięci W-360 v13
 
 > **Stan na:** 2026-07-04 · **Jedno źródło prawdy o architekturze pamięci.**

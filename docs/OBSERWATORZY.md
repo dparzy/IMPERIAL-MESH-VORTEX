@@ -1,3 +1,11 @@
+---
+kategoria: TABULA
+typ: zywy
+wlasciciel: imperium/akwedukty/bary_zdarzeniowe.py, imperium/akwedukty/czytnik_csv.py, imperium/akwedukty/klasyfikator_zdarzen.py, imperium/akwedukty/kwatermistrz_danych.py, imperium/akwedukty/news_fetcher.py, imperium/akwedukty/sentyment_historyczny.py, imperium/drogi/nexus_hub.py
+stan_na: 2026-07-17
+powod_istnienia: "Jedyny dokument mapujący WSZYSTKIE zewnętrzne źródła danych (44 źródła w 4 warstwach: OCZY/USZY/WIESZCZOWIE/SZPIEDZY) do konkretnych neuronów i modułów — z priorytetami kluczy API "
+dlug: "⚠️ Ścieżki modułów były błędne (naprawione 2026-07-17): nexus_hub.py wskazywał akwedukty/, a żyje w drogi/. `multi_exchange.py` to CEL FAZY 2 (status 🟠), nie widmo — oznaczony jawnie jako plan."
+---
 # 👁️ OBSERWATORZY IMPERIUM — Mapa Źródeł Informacji
 
 > *"Qui bene nuntiat, bene imperat."* — Kto dobrze donosi, dobrze rządzi.
@@ -23,18 +31,36 @@
 
 ---
 
+## 🔑 LEGENDA STATUSÓW
+
+> **Dodana 2026-07-17.** Dokument używał czterech znaczników i **nie definiował żadnego** —
+> czytelnik musiał zgadywać, co znaczy „🟠 Prowincja" (złamanie ZPO: opis ma być zrozumiały
+> bez wiedzy eksperckiej). Znaczenia odtworzone z kontekstu i zweryfikowane wobec kodu.
+
+| Znacznik | Znaczenie | Czy moduł ISTNIEJE w kodzie? |
+|---|---|---|
+| ✅ **Działa** | wpięte i używane | **TAK** |
+| 🔑 **Czeka na klucz** | kod gotowy, brakuje klucza API | **TAK** |
+| 🟠 **Prowincja** | **PLAN** (faza 2) — teren jeszcze niepodbity | **NIE** — moduł do zbudowania |
+| 🔴 | zaplanowane, nierozpoczęte | **NIE** |
+
+**Ważne (Prawo XIX):** 🟠 i 🔴 to **zamiary**, nie stan. Stan kodu → [`MANIFEST_KODU.md`](MANIFEST_KODU.md).
+Ten dokument jest **rejestrem ŹRÓDEŁ danych** (co możemy obserwować) — nie rejestrem kodu.
+
+---
+
 ## 👁️ WARSTWA I — OCZY (Dane Rynkowe)
 
 ### Źródła OHLCV + Tick Data
 
 | # | Źródło | Interwały | Opóźnienie | Status | Moduł |
 |---|--------|-----------|------------|--------|-------|
-| 1 | **MEXC WebSocket** | 1m, 5m, 15m, 1H, 4H, 1D | Realtime | 🔑 Czeka na klucz | `akwedukty/nexus_hub.py` |
-| 2 | **MEXC REST API** | wszystkie | ~1s | 🔑 Czeka na klucz | `akwedukty/nexus_hub.py` |
-| 3 | **Kwatermistrz (CSV)** | dowolny | offline | ✅ Działa | `akwedukty/kwatermistrz_danych.py` |
-| 4 | **Binance** (faza 2) | wszystkie | Realtime | 🟠 Prowincja | `akwedukty/multi_exchange.py` |
-| 5 | **OKX** (faza 2) | wszystkie | Realtime | 🟠 Prowincja | `akwedukty/multi_exchange.py` |
-| 6 | **Bybit** (faza 2) | wszystkie | Realtime | 🟠 Prowincja | `akwedukty/multi_exchange.py` |
+| 1 | **MEXC WebSocket** | 1m, 5m, 15m, 1H, 4H, 1D | Realtime | 🔑 Czeka na klucz | `imperium/drogi/nexus_hub.py` |
+| 2 | **MEXC REST API** | wszystkie | ~1s | 🔑 Czeka na klucz | `imperium/drogi/nexus_hub.py` |
+| 3 | **Kwatermistrz (CSV)** | dowolny | offline | ✅ Działa | `imperium/akwedukty/kwatermistrz_danych.py` |
+| 4 | **Binance** (faza 2) | wszystkie | Realtime | 🟠 Prowincja | *(plan fazy 2 — moduł nie istnieje)* |
+| 5 | **OKX** (faza 2) | wszystkie | Realtime | 🟠 Prowincja | *(plan fazy 2 — moduł nie istnieje)* |
+| 6 | **Bybit** (faza 2) | wszystkie | Realtime | 🟠 Prowincja | *(plan fazy 2 — moduł nie istnieje)* |
 
 ### Dane Order Book
 
@@ -155,7 +181,7 @@
       ↓
 [HERMES — Data Auditor] ← hash, kompletność, VPIN, event check
       ↓
-[LEGIONY NEURONÓW]     ← neurony dają sygnały (299 katalog / 27 kod)
+[LEGIONY NEURONÓW]     ← neurony dają sygnały (299 katalog / <!-- LICZBA:neurony -->87<!-- /LICZBA --> kod)
       ↓
 [LEGATUS]              ← agregacja ważona reżimem
       ↓

@@ -1,3 +1,12 @@
+---
+kategoria: FORMA
+typ: acta
+zastapiony_przez: docs/ARCHITEKTURA_IMPERIUM.md
+wlasciciel: imperium/akwedukty/adaptery/cvd.py, imperium/akwedukty/adaptery/feargreed.py, imperium/akwedukty/adaptery/futures.py, imperium/biblioteki/mnemosyne.py, imperium/cesarz/deepseek_glos.py, imperium/drogi/nexus_hub.py, imperium/drogi/oms.py, imperium/drogi/real_order_router.py, imperium/drogi/scheduler.py, imperium/oczy/wszechoko.py, imperium/pretorianie/aegis_tarcza.py, imperium/pretorianie/lustro_prawdy.py, imperium/swiatynie/web_dashboard.py
+stan_na: 2026-06-09
+powod_istnienia: "Mapowanie nazw narzędzi zewnętrznych (TA-Lib, CCXT, DeepSeek SDK, OpenAlice, Hermes Agent, MetaCortex, TitanMind, Glassnode, CryptoQuant, LangFuse, CrewAI, LangGraph) na moduły Imp"
+dlug: "🚨 ZARCHIWIZOWANY 2026-07-17 — żywa tabela „czego NIE duplikujemy" przeniesiona do ARCHITEKTURA_IMPERIUM.md § ZASADA SYMBIOZY. Reszta opisuje nieistniejący kod: pretorianie/straznik_ryzyka.py, drogi/wykonawca_rozkazow.py, biblioteki/mnemozyne.py, swiatynie/sala_wojenna.py"
+---
 # ⚔️ SYMBIOZA MODUŁÓW IMPERIUM ⚔️
 ## Jak wszystkie części Imperium rozmawiają ze sobą
 

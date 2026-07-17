@@ -1,3 +1,10 @@
+---
+kategoria: ACTA
+typ: acta
+wlasciciel: —
+stan_na: 2026-07-13
+powod_istnienia: "Naprawa błędu procesu: Claude odrzucał/wątpił w realne, świeże (post-styczeń-2026) technologie/prace bez weryfikacji WebSearch, bo oceniał z pamięci zamiast sprawdzić internet."
+---
 # 🔎 RE-AUDYT WERYFIKACYJNY — korekta błędnych odrzuceń (brak weryfikacji web)
 
 > **Stan na:** 2026-07-13 · **Typ:** korekta procesu + rejestru (Prawo I — prawda ponad wygodę)

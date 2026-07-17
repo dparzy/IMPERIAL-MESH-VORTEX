@@ -101,6 +101,49 @@ def test_routing_godlo_svg():
     assert body.startswith(b"<svg") or b"<svg" in body
 
 
+def test_routing_tiro_json():
+    """Panel Szkoły TIRO — postęp zbierania par przez NOTARIUSA."""
+    status, ctype, body = obsluz_sciezke("/tiro.json", _stan_przyklad())
+    assert status == 200
+    assert "application/json" in ctype
+    d = json.loads(body)
+    assert "par" in d and "postep" in d
+    assert {"cel", "procent", "brakuje", "opis"} <= set(d["postep"])
+
+
+def test_routing_tiro_nie_zalezy_od_stanu_petli():
+    """
+    GRANICA: zbiór rośnie od KAŻDEGO wywołania Hyginusa (zwiad, auto-lekcje), nie tylko
+    podczas handlu — panel musi działać także z pustym stanem pętli.
+    """
+    status, _, body = obsluz_sciezke("/tiro.json", _PustyStan())
+    assert status == 200
+    assert "par" in json.loads(body)
+
+
+def test_routing_tiro_nie_wywraca_sie_gdy_notarius_pada(monkeypatch):
+    """
+    ŻELAZNA ZASADA panelu pobocznego: awaria NOTARIUSA nie może wywrócić dashboardu —
+    Cezar ma dalej widzieć pozycje i neurony, nawet gdy pisarz ma problem.
+    """
+    import imperium.biblioteki.notarius as notarius
+
+    def wybuch(*a, **kw):
+        raise RuntimeError("dysk spłonął")
+
+    monkeypatch.setattr(notarius, "statystyki", wybuch)
+    status, _, body = obsluz_sciezke("/tiro.json", _stan_przyklad())
+    assert status == 200                      # nie 500 — panel zwraca sensowną pustkę
+    d = json.loads(body)
+    assert d["par"] == 0 and "blad" in d
+
+
+def test_html_zawiera_panel_tiro():
+    _, _, body = obsluz_sciezke("/", _stan_przyklad())
+    assert "Szkoła TIRO".encode("utf-8") in body
+    assert b"tiro-pasek" in body              # pasek postępu (Prawo XXIV)
+
+
 def test_routing_404():
     status, _, _ = obsluz_sciezke("/nieznane", _stan_przyklad())
     assert status == 404

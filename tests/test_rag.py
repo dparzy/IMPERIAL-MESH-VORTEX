@@ -24,6 +24,67 @@ def test_ekstraktor_md():
         assert len(c.split()) >= 20
 
 
+# ── _epub: odporność na kruchość ebooklib (Prawo XV) ─────────────────────────
+# Realny bug 2026-07-16 (BIB-075, whitepaper Bitcoina): ebooklib 0.20.0 robi
+#   nav_node = html_node.xpath("//nav[@*='toc']")[0]
+# bez zabezpieczenia → IndexError na POPRAWNYM epubie, który ma nawigację bez elementu
+# oznaczonego 'toc'. Efekt: 0 znaków, książka cicho nie wchodzi do RAG.
+
+# `_epub` importuje ebooklib LENIWIE (wewnątrz funkcji — brak twardej zależności przy imporcie),
+# więc łatamy prawdziwy moduł `ebooklib.epub`: `from ebooklib import epub` wiąże OBIEKT modułu,
+# a `epub.read_epub` rozwiązuje się dopiero przy wywołaniu — patch zadziała.
+
+def test_epub_ebooklib_pada_fallback_na_calibre(monkeypatch):
+    """Wyjątek z ebooklib MUSI przełączyć na calibre, nie zwrócić pustki."""
+    import ekstraktor as ex
+    from ebooklib import epub as epub_mod
+
+    def wybuch(*a, **kw):
+        raise IndexError("list index out of range")   # dokładnie bug ebooklib 0.20.0
+
+    monkeypatch.setattr(epub_mod, "read_epub", wybuch)
+    monkeypatch.setattr(ex, "_calibre", lambda p: "TEKST Z CALIBRE")
+    assert ex._epub(Path("nieistotna.epub")) == "TEKST Z CALIBRE"
+
+
+def test_epub_pusty_wynik_bez_wyjatku_tez_fallback(monkeypatch):
+    """
+    GRANICA: ebooklib potrafi ZWRÓCIĆ PUSTKĘ bez rzucania wyjątku (żaden ITEM_DOCUMENT
+    nierozpoznany). Cicha strata jest gorsza od głośnej (Prawo XV) — też fallback.
+    """
+    import ekstraktor as ex
+    from ebooklib import epub as epub_mod
+
+    class _PustaKsiazka:
+        def get_items_of_type(self, _typ):
+            return []
+
+    monkeypatch.setattr(epub_mod, "read_epub", lambda *a, **kw: _PustaKsiazka())
+    monkeypatch.setattr(ex, "_calibre", lambda p: "TEKST Z CALIBRE")
+    assert ex._epub(Path("nieistotna.epub")) == "TEKST Z CALIBRE"
+
+
+def test_epub_dziala_gdy_ebooklib_ok(monkeypatch):
+    """Gdy ebooklib działa — NIE wołamy calibre (nie płacimy za konwersję bez powodu)."""
+    import ekstraktor as ex
+    from ebooklib import epub as epub_mod
+
+    class _Item:
+        def get_content(self):
+            return b"<html><body><p>Tresc ksiazki</p></body></html>"
+
+    class _Ksiazka:
+        def get_items_of_type(self, _typ):
+            return [_Item()]
+
+    def _nie_wolaj(p):
+        raise AssertionError("calibre NIE powinno być wołane, gdy ebooklib działa")
+
+    monkeypatch.setattr(epub_mod, "read_epub", lambda *a, **kw: _Ksiazka())
+    monkeypatch.setattr(ex, "_calibre", _nie_wolaj)
+    assert "Tresc ksiazki" in ex._epub(Path("nieistotna.epub"))
+
+
 def test_ekstraktor_api():
     # Sprawdza że ekstraktor ma właściwe publiczne funkcje (bez ładowania dużych plików)
     from ekstraktor import ekstrahuj, podziel_na_chunki, wyczysc

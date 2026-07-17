@@ -1,7 +1,16 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/akwedukty/kwatermistrz_danych.py, imperium/biblioteki/hedge_mwu.py, imperium/biblioteki/igrzyska.py, imperium/biblioteki/kronikarz.py, imperium/biblioteki/mnemosyne.py, imperium/biblioteki/notarius.py, imperium/cesarz/titan_mind.py, imperium/drogi/nexus_hub.py, imperium/fundament/brama_kalkulatora.py, imperium/fundament/kuznia_narzedzi.py, imperium/koloseum/backtest.py, imperium/koloseum/haruspex.py, imperium/koloseum/monte_carlo.py, imperium/koloseum/walidacja.py, imperium/koloseum/walk_forward.py, imperium/legiony/pierwszy_zwiadowca.py, imperium/legiony/roj_sygnalow.py, imperium/oczy/censor_sprzetu.py, imperium/oczy/wszechoko.py, imperium/pretorianie/aegis_tarcza.py, imperium/pretorianie/lustro_prawdy.py, imperium/senat/meta_kora.py, imperium/swiatynie/kartograf.py, imperium/swiatynie/specula_swiec.py, imperium/swiatynie/web_dashboard.py
+stan_na: 2026-07-16
+powod_istnienia: "Jedna strona spinająca 25 Praw z realnym kodem — jedyne miejsce z tabelą 'dzielnica → plik → rola → prawa' + diagram przepływu sygnału + mapowanie warstw architektury na źródła bib"
+dlug: "🚨 opisuje nieistniejący kod: drogi/war_lancer.py, swiatynie/sala_wojenna.py, koloseum/valhalla.py"
+---
 # 🏛️ ARCHITEKTURA IMPERIUM — pełna mapa
 
-> **Po co:** Jedno miejsce, które spina **21 prawami** z **realnym kodem** (75 modułów .py).
-> Pokazuje, jak Cesarstwo jest zbudowane i którędy płynie sygnał.
+> **Stan na:** 2026-07-16 · **Po co:** Jedno miejsce, które spina **25 Praw** z **realnym kodem**
+> (160 modułów .py, 87 neuronów). Pokazuje, jak Cesarstwo jest zbudowane i którędy płynie sygnał.
+> Liczby **policzone z kodu**, nie z pamięci (Prawo XXI reguła 8).
 
 ---
 
@@ -16,6 +25,7 @@
                                    lustro_prawdy         walidacja adwersarialna[I, IX]
 🚰 AKWEDUKTY        akwedukty/     kwatermistrz_danych   dane OHLCV (CCXT/CSV)  [II]
 👁️ OCZY            oczy/          wszechoko             percepcja wielowarstwowa[XII]
+                                   censor_sprzetu        cenzus majątku maszyny → klasa+alarm[XV]
 🛤️ DROGI            drogi/         nexus_hub             multi-exchange routing [III, XIII]
                                    war_lancer            egzekucja HF           [III]
 🎨 ŚWIĄTYNIE       swiatynie/     kartograf             wykresy PNG            [V]
@@ -25,11 +35,37 @@
                                    kronikarz             logi, dziennik         [XIII]
                                    igrzyska              ranking batch + observer pattern [XV]
                                    hedge_mwu             MWU online learning (W-049)     [XV, XVI]
+                                   notarius              stenograf słów Nauczyciela → pary
+                                                         prompt→odpowiedź = surowiec Szkoły
+                                                         TIRO (E2)              [I, XV, XXIV]
 🧮 FUNDAMENT       fundament/     brama_kalkulatora     jedyne wejście do mat. [I, IX, XIII]
                                    kuznia_narzedzi       kanoniczne wskaźniki   [I]
 🏟️ KOLOSEUM        koloseum/      valhalla              backtest, Monte Carlo  [VI, VII]
                                    haruspex              predykcja reżimu (Markow) — ⚠️ falsyfikowany pomiarem [I, XVI]
 ```
+
+---
+
+## ⚖️ ZASADA SYMBIOZY — czego NIE wolno duplikować
+
+> *„Dwóch legionistów na tym samym posterunku to marnotrawstwo. Jeden jest odpowiedzialny — reszta słucha."*
+
+Uratowane z `SYMBIOZA_MODULOW.md` (zarchiwizowana 2026-07-17 — reszta tamtego dokumentu
+opisywała kod, który nigdy nie istniał). **To jest żywa doktryna, nie historia:** każda
+z tych reguł obowiązuje dziś i jest sprawdzalna w kodzie.
+
+| Zasób / funkcja | Wiele modułów? | JEDYNY właściciel | Dlaczego |
+|---|---|---|---|
+| Surowe dane OHLCV | ✅ każdy czyta po swojemu | `akwedukty/kwatermistrz_danych.py` (pobieranie) | Każdy Legion może interpretować te same świece inaczej |
+| Obliczanie wskaźników (RSI, EMA, ATR…) | ❌ **NIE** | `fundament/brama_kalkulatora.py` | Jeden hash SHA-256 = jeden wynik. Zero rozbieżności między Legionami |
+| Wywołania LLM | ❌ **NIE** | `cesarz/deepseek_glos.py` | Jeden punkt kosztu, rate-limitu i konfiguracji modelu. Dzięki temu NOTARIUS łapie wszystkich wołających jednym wpięciem |
+| Wykonanie zleceń | ❌ **NIE** | `drogi/` (`oms.py`, `real_order_router.py`) | Tylko jeden moduł dotyka prawdziwych środków. Zero wyścigu |
+| Zapis transakcji / historii | ❌ **NIE** | `biblioteki/` (`kronikarz.py`, `mnemosyne.py`) | Jeden schemat zapisu = możliwy backtest i audyt |
+| Dane on-chain / makro | ✅ Senat i Cesarz czytają | `oczy/` (pobieranie) | Makro to kontekst, nie sygnał — wiele warstw może go interpretować |
+| Konfiguracja ryzyka (% kapitału, SL, TP) | ❌ **NIE** | `pretorianie/` | Jeden arbiter ryzyka. Cesarz proponuje, Pretorianie zatwierdzają lub wetują |
+
+**Pytania przed każdą nową funkcją:** Kto już to robi? · Czy to łamie zasadę jedynego
+właściciela (Brama / Głos / Drogi / Kronikarz)? · Gdzie w przepływie to siedzi?
 
 ---
 
@@ -90,8 +126,9 @@
 
 ## 📚 ŹRÓDŁA — Kanon biblioteki za architekturą (BIB)
 
-> **Stan na:** 2026-06-26 | **Po co ta architektura?** Każda warstwa Imperium ma teoretyczne
-> ugruntowanie w bibliotece (42 książki). Tu mapa: warstwa → książka. Pełna esencja: `bibliotheca_ulpia/encyklopedia/`.
+> **Po co ta architektura?** Każda warstwa Imperium ma teoretyczne ugruntowanie w bibliotece
+> (**79 książek** — policzone 2026-07-16). Tu mapa: warstwa → książka.
+> Pełna esencja: `bibliotheca_ulpia/encyklopedia/`.
 
 | Warstwa architektury | Dlaczego tak (koncept) | Źródło BIB |
 |----------------------|------------------------|-----------|

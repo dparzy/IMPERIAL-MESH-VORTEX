@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/koloseum/gubernator.py, tests/test_gubernator.py
+stan_na: 2026-06-16
+powod_istnienia: "Jedyny dokument opisujący homeostatyczny sterownik globalnej ekspozycji CAŁEGO portfela (5 par naraz) — odróżnia się od innych warstw regulacji (HedgeMWU=per-neuron, Synapsy Reżimo"
+---
 # 🧭 GUBERNATOR — Homeostatyczny Sterownik Portfela (W-325)
 
 > **Status kod-vs-plan:** ✅ KOD + TESTY na branchu `claude/sleepy-fermi-dsdE4`

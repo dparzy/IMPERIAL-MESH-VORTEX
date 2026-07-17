@@ -1,3 +1,10 @@
+---
+kategoria: LEX
+typ: zywy
+wlasciciel: —
+stan_na: 2026-07-07
+powod_istnienia: "Doktryna założycielska Cezara (verbatim) — serce, z którego wyrasta 25 Praw; źródło przy milczeniu prawa"
+---
 # 👑 CREDO IMPERIUM — Doktryna Założycielska
 
 > **Autor: CEZAR PIXEL, Imperator-Założyciel. Zapisane na wieki 2026-07-06.**

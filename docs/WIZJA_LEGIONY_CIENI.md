@@ -1,3 +1,10 @@
+---
+kategoria: CONSILIUM
+typ: zywy
+wlasciciel: imperium/koloseum/legiony_cieni.py, narzedzia/raport_zalu.py
+stan_na: 2026-07-06
+powod_istnienia: "Kontrfaktyczne Kolosseum — równolegle do realnej decyzji Imperium maszerują 'Legiony Cieni' (widmowe warianty konfiguracji: bez weta, próg łagodny, próg surowy), mierzące ile koszt"
+---
 # 👥 LEGIONY CIENI — Kontrfaktyczne Kolosseum (perełka końca wachty, 2026-07-05)
 
 > **Status: WDROŻONE — FAZA 1 (kod, 2026-07-06).** `imperium/koloseum/legiony_cieni.py`

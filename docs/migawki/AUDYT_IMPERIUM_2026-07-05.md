@@ -1,3 +1,10 @@
+---
+kategoria: ACTA
+typ: acta
+wlasciciel: imperium/cesarz/titan_mind.py, imperium/fundament/kuznia_narzedzi.py, imperium/legiony/roj_sygnalow.py, imperium/senat/meta_kora.py
+stan_na: 2026-07-05
+powod_istnienia: "Pełny audyt na prompt Cezara: stan faktyczny (liczby z kodu), ocena silnika pomiarowo-walidacyjnego, uczciwe porównanie z konkurencją, nazwane luki, i 5 propozycji unikatowych ulep"
+---
 # 🏛️ AUDYT IMPERIUM — migawka 2026-07-05 (koniec wachty 0000–1200)
 
 > **Stan na:** 2026-07-05 · datowana migawka (Prawo I: prawda swojego czasu, nie aktualizować wstecz)

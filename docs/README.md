@@ -1,3 +1,10 @@
+---
+kategoria: TABULA
+typ: zywy
+wlasciciel: —
+stan_na: 2026-06-09
+powod_istnienia: "Spis wszystkich dokumentów w `docs/` z jednozdaniowym opisem tematu każdego — punkt nawigacyjny do dokumentacji."
+---
 # 📚 Dokumentacja Imperium
 
 Tu trafia **uporządkowana wiedza** wyciągnięta z surowej wizji (`archiwum/`).
@@ -18,7 +25,7 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [PLAN_DEEPSEEK.md](PLAN_DEEPSEEK.md) | Jak podłączyć DeepSeek API jako mózg Cesarza i Senatu (Populares vs Optimates) |
 | [../archiwum/ARSENAL_AMERYKI.md](../archiwum/ARSENAL_AMERYKI.md) | 📦 Archiwum — 690 linków z 50+ krajów (Americas, Europa, Afryka, Australia, Oceania) — oceny 1-10, priorytety 1-5 |
 | [LEGIONY_ARCHITEKTURA.md](LEGIONY_ARCHITEKTURA.md) | Cztery Legiony (Equestris/Fulminata/Augusta/Ferrata) — mikro-neurony, schemat sygnału, Pretorianie |
-| [SYMBIOZA_MODULOW.md](SYMBIOZA_MODULOW.md) | Symbioza i korelacja — mapa narzędzi (oryginalne nazwy → Imperium), przepływ danych, zasada Alchemika |
+| [ARCHITEKTURA_IMPERIUM.md](ARCHITEKTURA_IMPERIUM.md) § ZASADA SYMBIOZY | Czego NIE wolno duplikować — jedyny właściciel matematyki/LLM/egzekucji/ryzyka. *(Zastąpiło `SYMBIOZA_MODULOW.md`, zarchiwizowaną 2026-07-17: opisywała kod, który nie istnieje.)* |
 | [ROADMAP_IMPERIUM.md](ROADMAP_IMPERIUM.md) | Mapa rozwoju — Fazy 0-4, wersjonowanie, zasady Areny, zgodność z regulaminami giełd |
 | [KATALOG_NEURONOW.md](KATALOG_NEURONOW.md) | Katalog **299** mikro-neuronów (55 w kodzie) — 4 legiony + 14 dywizji (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, Howard Marks, TVL, L1/L2 RS, Cross-Sectional Momentum) |
 | [MATRYCA_KORELACJI.md](MATRYCA_KORELACJI.md) | Kostka Rubika sygnałów — korelacje, konflikty, reżimy rynku, wagi dynamiczne, wpływ BTC |

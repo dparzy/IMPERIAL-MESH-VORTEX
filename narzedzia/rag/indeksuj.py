@@ -157,7 +157,13 @@ def _zbierz_pliki(korpus: str, tylko_enc: bool) -> list[tuple[Path, str]]:
             pliki += [(p, "biblioteka") for p in sorted((BIBLIOTEKA / folder).glob("*.md"))]
 
     if korpus in ("docs", "wszystko"):
-        pliki += [(p, "docs") for p in sorted(DOCS.glob("*.md"))]
+        # rglob, NIE glob (naprawa 2026-07-17): płaski `glob("*.md")` gubił każdy dokument
+        # przeniesiony do podkatalogu. Przy porządkowaniu docs/ (migawki → docs/migawki/)
+        # oznaczałoby to CICHE wypadnięcie 10 dokumentów z korpusu RAG — utrata potencjału
+        # (Prawo XV) bez jednego czerwonego światła: RAG dalej odpowiadałby, tylko bez nich.
+        # `archiwum/` świadomie poza korpusem — magazyn, nie warsztat (ZASADA ARCHIWIZACJI).
+        pliki += [(p, "docs") for p in sorted(DOCS.rglob("*.md"))
+                  if "archiwum" not in p.parts]
 
     return pliki
 

@@ -1,4 +1,39 @@
+---
+kategoria: ACTA
+typ: acta
+zastapiony_przez: docs/ARCHITEKTURA_IMPERIUM.md
+wlasciciel: imperium/akwedukty/kwatermistrz_danych.py, imperium/biblioteki/kronikarz.py, imperium/biblioteki/mnemosyne.py, imperium/cesarz/titan_mind.py, imperium/drogi/nexus_hub.py, imperium/fundament/brama_kalkulatora.py, imperium/fundament/kuznia_narzedzi.py, imperium/koloseum/backtest.py, imperium/koloseum/monte_carlo.py, imperium/legiony/pierwszy_zwiadowca.py, imperium/legiony/roj_sygnalow.py, imperium/pretorianie/aegis_tarcza.py, imperium/pretorianie/lustro_prawdy.py, imperium/senat/meta_kora.py, imperium/swiatynie/kartograf.py, imperium/swiatynie/web_dashboard.py
+stan_na: 2026-05-31
+powod_istnienia: "Wersja narracyjna/dydaktyczna architektury — dla nowicjusza (Cezara): tłumaczy PO CO każdy organ istnieje, z przykładowym dialogiem (Zwiadowca 1 mówi 'DŁUGO...', Frakcja Byków vs N"
+dlug: "🚨 opisuje nieistniejący kod: war_lancer.py, sala_wojenna.py, koloseum/valhalla.py"
+---
 # 🏛️ MAPA PRZEPŁYWU IMPERIUM — kto z kim, co robi, jak decyduje
+
+> # 📜 ACTA — WIZJA ZAŁOŻYCIELSKA z 2026-05-31. NIE OPISUJE DZISIEJSZEGO IMPERIUM.
+>
+> **Stan faktyczny → [`ARCHITEKTURA_IMPERIUM.md`](ARCHITEKTURA_IMPERIUM.md).**
+>
+> Ten dokument to **prawda swojego czasu** (Prawo I: historii nie falsyfikujemy) — zapis tego,
+> jak wyobrażaliśmy sobie Imperium na starcie. Zweryfikowane 2026-07-17 wobec kodu:
+>
+> | Twierdzi | Rzeczywistość |
+> |---|---|
+> | „Oczy (Wszechoko) — 🔴 Plan, do zbudowania" | `oczy/wszechoko.py` istnieje (145 linii) |
+> | „Koloseum (Valhalla) — 🟡 Szkielet" | koloseum ma **16 modułów**; `valhalla.py` **nigdy nie istniał** |
+> | „Senat — 🟡 Szkielet, debata do zaprojektowania" | `senat/meta_kora.py` istnieje (203 linie) |
+> | „Zwiadowca 1..4" | **87 neuronów** i **15 zwiadowców** w rejestrze |
+> | `drogi/war_lancer.py`, `swiatynie/sala_wojenna.py` | **nie istnieją** (realnie: `oms.py`/`real_order_router.py`, `web_dashboard.py`) |
+>
+> **Dlaczego zdegradowany, a nie skasowany:** to jedyny narracyjny zapis *po co* powstał każdy
+> organ — wartość historyczna i dydaktyczna. Ale jako dokument **żywy** uczył Cezara systemu,
+> który nie istnieje, więc był gorszy niż jego brak. Zdegradowany do ACTA 2026-07-17.
+>
+> **Następca dydaktyczny (KOREKTA 2026-07-17):** twierdziłem tu, że Imperium nie ma
+> narracyjnego przewodnika po aktualnej architekturze. **To było moje twierdzenie bez
+> weryfikacji — i było fałszywe.** Taki przewodnik istnieje:
+> [`MANUAL_MIGRACJA_I_SYMULATOR.md`](MANUAL_MIGRACJA_I_SYMULATOR.md) § 2 — pełny przepływ
+> cyklu decyzyjnego, 10 bramek wstrzymania z progami zweryfikowanymi wobec kodu, ścieżka
+> pieniędzy. Zwięzła mapa architektury → [`ARCHITEKTURA_IMPERIUM.md`](ARCHITEKTURA_IMPERIUM.md).
 
 > **Giełda docelowa:** MEXC (główna)
 > **Instrumenty:** BTC (priorytet), ETH, alts, nowe tokeny

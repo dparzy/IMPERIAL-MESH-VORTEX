@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/biblioteki/kronikarz.py, imperium/biblioteki/pamiec_absolutna.py
+stan_na: 2026-06-01
+powod_istnienia: "Jedyny dokument opisujący pełny schemat rekordu `ImperiumLog` (atomowa jednostka pamięci transakcyjnej) — ~80 pól pogrupowanych tematycznie (identyfikacja, kontekst rynku, neurony,"
+---
 # 🧠 PAMIĘĆ ABSOLUTNA — System Logowania Imperium
 
 > *"Quod non scribitur, non factum est."* — Co nie jest zapisane, nie zostało zrobione.

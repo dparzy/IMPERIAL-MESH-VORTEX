@@ -1,3 +1,10 @@
+---
+kategoria: CONSILIUM
+typ: zywy
+wlasciciel: imperium/biblioteki/ksiegi_sybillinskie.py
+stan_na: 2026-07-06
+powod_istnienia: "Zbudować rejestr falsyfikowalnych proroctw Imperium o samym sobie (np. 'P=0.70: neuron X osiągnie IC≥0.02'), rozliczanych automatycznie z bazy areny — mierzy nie PnL, ale samowiedz"
+---
 # 🔮 KSIĘGI SYBILLIŃSKIE — Rejestr Falsyfikowalnych Proroctw (perełka II, 2026-07-05)
 
 > **Status: WDROŻONE (kod, 2026-07-06).** `imperium/biblioteki/ksiegi_sybillinskie.py`

@@ -1,3 +1,10 @@
+---
+kategoria: LEX
+typ: zywy
+wlasciciel: —
+stan_na: 2026-07-14
+powod_istnienia: "Rozkazy stałe czytane na starcie KAŻDEJ sesji — konstytucja operacyjna Claude'a w Imperium"
+---
 # IMPERIUM — Instrukcje stałe dla Claude
 
 > Ten plik jest czytany na początku każdej sesji. Zasady tu zapisane obowiązują ZAWSZE.
@@ -150,6 +157,7 @@ Checklist Prawa XIX (sprawdzaj na początku sesji):
 - [ ] **Warstwa 3 (README):** liczba neuronów, testy, prawa = liczby z kodu (policzone, nie z pamięci)
 - [ ] **Warstwa 13 (ruff):** linter czysty — zero bugów/martwego kodu (F811 duplikaty, F821 undefined, F841/F401 martwe). Audyt uruchamia ruff automatycznie.
 - [ ] **Warstwa 14 (wszystkie docs):** MAPA_KLUCZY.md zawiera KAŻDY klucz z kodu (dodajesz neuron → dopisujesz mapę). Audyt skanuje wszystkie pliki .md.
+- [ ] **Warstwa 15 (liczby wstrzykiwane):** żadnej liczby o systemie NIE wpisujesz ręcznie — wstawiasz blok `<!-- LICZBA:neurony -->87<!-- /LICZBA -->`, a `python narzedzia/tabularium.py liczby --zapisz` przepisuje go z żywego kodu. Powód (zmierzone 2026-07-17): trzy dokumenty podawały „neuronów w kodzie" jako 47/27/55 przy 87 — każda była prawdziwa w dniu pisania. Ręczna liczba zawsze się rozjedzie, bo rośnie kod, a nie dokument.
 - [ ] **Testy granic:** każdy neuron/moduł z PROGAMI ma testy wartości granicznych (0/None/±/dokładnie-próg) — patrz Reguła Test-Granic niżej
 - [ ] **Data "Stan na:"** w MANIFEST i README = data bieżącego commitu
 

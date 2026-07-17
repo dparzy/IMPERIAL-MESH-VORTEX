@@ -1,3 +1,10 @@
+---
+kategoria: TABULA
+typ: zywy
+wlasciciel: imperium/legiony/rejestr.py
+stan_na: 2026-07-15
+powod_istnienia: "Wizytówka Imperium — podaje liczby wprost z kodu (neurony/testy/prawa), więc musi nadążać za rejestrem"
+---
 # 🏛️ IMPERIAL MESH VORTEX
 
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.

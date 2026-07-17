@@ -1,3 +1,10 @@
+---
+kategoria: TABULA
+typ: zywy
+wlasciciel: —
+stan_na: 2026-06-02
+powod_istnienia: "Zweryfikować (Prawo I: zero halucynacji) setki linków narzędzi z pliku źródłowego IMV, oddzielić realne od fabrykowanych/niepewnych, i zaproponować 'najmocniejszy zweryfikowany rdz"
+---
 # ⚔️ ARSENAŁ IMPERIUM — zweryfikowany katalog narzędzi
 
 > **Po co:** Wszystkie linki z pliku IMV przejrzane **po kolei, od pierwszej strony do końca**,

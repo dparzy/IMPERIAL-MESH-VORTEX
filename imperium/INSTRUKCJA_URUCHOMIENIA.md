@@ -1,3 +1,10 @@
+---
+kategoria: DISCIPLINA
+typ: zywy
+wlasciciel: skrypty/start.py
+stan_na: 2026-05-31
+powod_istnienia: "Instrukcja uruchomienia cyklu krok po kroku dla nowicjusza (Windows, tryb paper)"
+---
 # 🚀 JAK URUCHOMIĆ CYKL IMPERIUM — krok po kroku (Windows 10)
 
 > Komendancie — to handel **NA NIBY** (zero ryzyka, zero prawdziwych pieniędzy).

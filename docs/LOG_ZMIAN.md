@@ -1,3 +1,11 @@
+---
+kategoria: ACTA
+typ: acta
+powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
+wlasciciel: —
+stan_na: 2026-07-17
+powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
+---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
 
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
@@ -5,6 +13,481 @@
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
 
 ---
+
+## 2026-07-17 | 🏛️ | TABULARIUM — rejestr dokumentów + naprawa klasy wad kodowania (6 wystąpień)
+
+**Co:** nowy organ **TABULARIUM** (`narzedzia/tabularium.py`, 20 testów) — rzymskie archiwum
+państwowe: każdy żywy dokument DEKLARUJE SAM SIEBIE w nagłówku metadanych (kategoria ze
+zamkniętego słownika LEX/TABULA/FORMA/DISCIPLINA/CONSILIUM/MENSURA/ACTA · typ · właściciel
+· stan_na · powód istnienia), a maszyna to weryfikuje. Trzy bramki: **T1 deklaracja**,
+**T2 gnicie** (właściciel-plik kodu zmieniony PO `stan_na` → opis nie nadąża za kodem),
+**T3 dublet** (ta sama kategoria + ten sam właściciel = kod opisany dwa razy, Prawo XVI).
+Katalog dokumentów GENEROWANY z nagłówków (`katalog --zapisz`) między znacznikami.
+
+**Dlaczego (rozkaz Cezara — porządek Imperium):** ręcznie pisany indeks kłamie z definicji.
+DOWÓD (Prawo I): `INDEKS_IMPERIUM.md:50` twierdzi „299 mikro-neuronów (72 w kodzie)" przy **87**
+w kodzie — i przechodzi audyt na ZIELONO, bo W5 czyta liczbę z innej sekcji tego samego pliku.
+Zwiad 42/56 dokumentów wykazał **pięć różnych twierdzeń** o liczbie neuronów (87/72/47/27/55/62)
+oraz pliki-widma w 4 dokumentach (`sala_wojenna.py`, `war_lancer.py`, `valhalla.py` — nigdy nie
+istniały). Zmierzone: przenoszenie żywych docs kosztuje 271 żywych odwołań + **1003 w kronice**,
+której Prawo I zabrania przepisać → **decyzja Cezara: porządek w METADANYCH, fizycznie tylko
+migawki** (1-3 odwołania każda).
+
+**Klasa wad (rozkaz stały — Księga Wad):** `subprocess.run(text=True)` BEZ `encoding="utf-8"`
+dekoduje wyjście gita kodowaniem konsoli Windows (cp1250), a nasze commity zaczynają się od emoji.
+**2 wady aktywne** (`status.py` drukował „8f18d07 đź§ą PORZÄ„DEK…"; bramka gnicia Tabularium
+CICHŁA NA GŁUCHO — stdout=None → zawsze zielona) + **4 utajone**, w tym w naszych bramkach
+**W6b** (pierwszy plik z polską literą w nazwie ucisza bramkę dat) i **W13** (ruff pęka DOKŁADNIE
+wtedy, gdy znajdzie buga — bo dopiero wtedy cytuje polski komentarz). Regex zmierzony wg nauczki
+07-16: 6 trafień / 377 plików .py, zero trafień na kodzie naprawionym (sprawdzony w obie strony).
+
+**Pliki:** narzedzia/tabularium.py (nowy), tests/test_tabularium.py (nowy, 20 testów granic),
+imperium/biblioteki/ksiega_wad_kodu.py (+klasa „kodowanie"), narzedzia/status.py,
+narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/oczy/censor_sprzetu.py.
+
+**Powód:** P0 porządku domknięte. Następny krok: nagłówki do 64 dokumentów (`stan_na` = data
+faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
+scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
+
+## 2026-07-17 | 👁️ | Dług gnicia: OBSERWATORZY + naprawa MOJEJ pochopnej flagi
+
+**OBSERWATORZY (17 zmian w 7 plikach) — spłacony.** Weryfikacja wszystkich ścieżek kodu:
+
+| | |
+|---|---|
+| ✅ ścieżka poprawna | 7 |
+| ⚠️ **zła ścieżka** (plik żyje gdzie indziej) | **2** — `akwedukty/nexus_hub.py` → realnie **`imperium/drogi/nexus_hub.py`** (zły ORGAN: jest w *drogach*, nie w *akweduktach*); `akwedukty/kwatermistrz_danych.py` → brak przedrostka |
+| 🚨 widmo | **0** (patrz niżej) |
+
+**🚩 NAPRAWA MOJEJ WŁASNEJ POCHOPNEJ FLAGI:** przy wstrzykiwaniu nagłówków (P1) mój skrypt
+automatycznie wpisał temu dokumentowi `dlug: "🚨 opisuje nieistniejący kod: multi_exchange.py"`.
+**To było za pochopne.** Wiersze z `multi_exchange.py` mają status **🟠 Prowincja (faza 2)** —
+dokument NIE twierdzi, że plik istnieje, tylko go **planuje**. Mechaniczne sprawdzenie
+„czy plik istnieje" nie odróżnia **twierdzenia** od **zamiaru**. Flaga poprawiona, a ścieżka
+zamieniona na jawne *(plan fazy 2 — moduł nie istnieje)*, żeby żaden skaner (ani człowiek)
+nie wziął jej znów za deklarację.
+
+**🔑 LEGENDA STATUSÓW DODANA (ZPO):** dokument używał **czterech** znaczników (✅ / 🔑 / 🟠 / 🔴)
+i **nie definiował ANI JEDNEGO** — czytelnik musiał zgadywać, co znaczy „🟠 Prowincja".
+Znaczenia odtworzone z kontekstu i zweryfikowane wobec kodu, z jawną kolumną **„Czy moduł
+ISTNIEJE w kodzie?"**. To była realna przyczyna mojej pomyłki: **dokument bez legendy zmusza
+do zgadywania — i skaner też zgaduje.**
+
+**Pliki:** docs/OBSERWATORZY.md, docs/INDEKS_IMPERIUM.md.
+
+## 2026-07-17 | 🖥️ | Dług gnicia: START_LOKAL + SCIAGA_LOKAL — spłata przez SPRAWDZENIE
+
+**Oba dokumenty broniły się w CAŁOŚCI — treść nie wymagała ani jednej zmiany.**
+
+| Dokument | Co zmierzono | Werdykt |
+|---|---|---|
+| `START_LOKAL` (21 zmian, 14× `audyt_spojnosci.py`) | 6 komend · „13 warstw pamięci" · luka „W1 ma 0 logów" | wszystkie ✅ — **13 warstw potwierdzone** (W1–W13 + W3b w `kustosz_pamieci.py`), **luka W1 NADAL AKTUALNA** (brak plików logów) → zostaje jako żywe zadanie |
+| `SCIAGA_LOKAL` (5 zmian) | **24 komendy** | **24/24 istnieją** (moduły importowalne, skrypty na dysku) |
+
+**🔑 LEKCJA O NATURZE BRAMKI T2 (ważna na przyszłość):** T2 mówi **„kod się ruszył"**, a NIE
+**„dokument kłamie"**. `audyt_spojnosci.py` zmienił się 14×, ale START_LOKAL twierdzi o nim
+tylko „uruchom, ma być exit 0" — twierdzenie odporne na te zmiany. **Spłatą długu jest
+WERYFIKACJA, a poprawną odpowiedzią bywa „nadal prawda".** Bumpnięcie `stan_na` bez sprawdzenia
+byłoby kłamstwem (Prawo I); bumpnięcie PO sprawdzeniu jest dokładnie tym, co `stan_na` znaczy:
+**data, w której twierdzenia zostały ostatnio zweryfikowane.**
+
+**Dług gnicia: 17 → 15.** W tej wachcie spłacone: GENERAL_LEGATUS, LEGIONY_ARCHITEKTURA,
+KATALOG_NEURONOW, MATRYCA_KORELACJI, START_LOKAL, SCIAGA_LOKAL (**6 dokumentów**).
+
+**Pliki:** docs/START_LOKAL.md, docs/SCIAGA_LOKAL.md, docs/INDEKS_IMPERIUM.md.
+
+## 2026-07-17 | 🧭 | Dług gnicia: KATALOG_NEURONOW + MATRYCA_KORELACJI (katalog ślepy na pół roju)
+
+**KATALOG_NEURONOW (40 zmian `rejestr.py`) — spłacony.** Weryfikacja mechaniczna 307 ID:
+
+| | |
+|---|---|
+| ✅ oznaczone „w kodzie", a nieistniejące | **0** — katalog **nigdy nie kłamie w tę stronę** |
+| **żyją w kodzie, a katalog ich NIE ZNA** | **44** (`OC-*`, `RADAR-*`, `NEWS-*`, `SMC-*`, `Z-*`, `V-*`, `C-01`, `D-01`, `H-01`, `BOCPD-01`, `CP-01`, `AUG-01`…) |
+| oznaczone ✅ | **15** przy 87 w kodzie — znaczniki zamarzły |
+
+**Diagnoza:** to ROADMAPA (CONSILIUM), nie mapa roju. Te 44 neurony **urosły POZA katalogiem**
+— z deep-researchu i pomiarów areny, nie z pierwotnego skanu wskaźników. Rój przestał rosnąć
+według tej listy. Dodany baner „czym ten dokument JEST, a czym NIE JEST" + wskazanie źródeł
+prawdy (MANIFEST_KODU / MAPA_KLUCZY, Prawo XIX).
+
+**Sprzeczność wewnętrzna NIEPOPRAWIONA — świadomie (Prawo I):** tabela mówi „RAZEM **129**",
+proza dwie linie niżej „**142** w rdzeniu + 132 w dywizjach = **274**". Trzy liczby planu,
+**żadnej nie da się zweryfikować wobec kodu** → nazwana wprost, nie zgadnięta.
+**Zgadnięta liczba byłaby halucynacją udającą naprawę.**
+
+**MATRYCA_KORELACJI (22 zmiany) — spłacona.** Zmierzone: **schemat numeracji
+`[LITERA]-[001-157]-W[WAGA]` NIGDY nie wszedł do kodu** — 0 pasujących kluczy. Realny format
+to `X-01`, a kategoria i waga to OSOBNE pola klasy (`X-01`: `KATEGORIA='M'`, `WAGA=6`) — bo
+waga w kluczu oznaczałaby, że zmiana wagi zmienia identyfikator. Sekcja **zostawiona**
+(tłumaczy intencję), ale nazwana. Legenda kategorii (6 liter z 15) → wskaźnik do jednego źródła.
+**Pomiar „46 neuronów" ZOSTAWIONY nietknięty** i oznaczony jako prawda swojego czasu — pomiar
+objął tamte 46, nie dzisiejsze 87; podmiana liczby sfalsyfikowałaby wynik (Prawo I).
+
+**Fałszywe widmo, którego NIE zgłosiłem:** mój skan ID wskazał `INF-20` jako nieistniejący
+neuron — to **odwołanie bibliograficzne** (Sinclair), nie klucz. Sprawdzenie kontekstu przed
+meldunkiem powstrzymało szósty fałszywy alarm tego dnia.
+
+**Pliki:** docs/KATALOG_NEURONOW.md, docs/MATRYCA_KORELACJI.md, docs/INDEKS_IMPERIUM.md.
+
+## 2026-07-17 | ⚔️ | Dług gnicia: GENERAL_LEGATUS + LEGIONY_ARCHITEKTURA (86% rosteru było fikcją)
+
+**GENERAL_LEGATUS (19 zmian `legatus.py` od `stan_na`) — spłacony.** Każde twierdzenie
+zweryfikowane wobec kodu:
+- ✅ **PRAWDA:** „min 5 neuronów, przewaga 55%" → `legatus.py:379` `min_neuronow=5, min_przewaga=0.55`
+- ❌ „Szkielet kodu — patrz plik implementacji" → `legatus.py` ma **833 linie**
+- ❌ **Legenda kategorii**: wymieniała **E** i **G**, których w kodzie NIE MA, i pomijała
+  **C, D, N, Z** — cztery całe rodziny neuronów z deep-researchu. Przepisana z docstringów
+  kodu (15 kategorii, **bez liczników** — Filar 4: ręczna liczba i tak by zgniła).
+- ❌ Tabela reżimów nie znała **SMC_ACTIVE** (`{'S': 2.0, 'F': 1.2, 'T': 1.1}` w kodzie) → dodany
+- ❌ „Faza 0 (teraz) — 2 testowe neurony" → Faza 0 i 1 **dawno wykonane**; sekcja PLAN → STAN
+
+**LEGIONY_ARCHITEKTURA (17 zmian w 6 plikach) — 🚨 86% rosteru było FIKCJĄ.** Weryfikacja
+mechaniczna **wszystkich 28 ID** wobec `rejestr.wszystkie_neurony()`:
+
+| | |
+|---|---|
+| zgodne z kodem | **4 z 28** |
+| zła nazwa | **9** — `X-01` opisany jako „Neuron EMA", w kodzie **RSI (14)**; `X-05` „OrderFlow" → **EMA Cross (9/21)** |
+| **ID nieistniejące** | **15** — w tym **CAŁY roster Legio III** (`III-01..III-07`) |
+
+**Odkrycie większe niż błędne nazwy: schemat „prefiks klucza = legion" UMARŁ.** W kodzie:
+`X-*` 17 · `XII-*` 7 · `VI-*` 1 · **`III-*` ZERO**. Pozostałe ~60 neuronów ma prefiksy
+**funkcyjne** (`OC-*`, `PSY-*`, `RADAR-*`, `NEWS-*`, `SMC-*`, `Z-*`…), które w podziale na
+cztery legiony się nie mieszczą. Rój organizuje się przez **KATEGORIA** (15 liter), nie przez
+numer legionu. **Metafora legionów żyje** (nazwa organu `imperium/legiony/`) — umarł schemat kluczy.
+
+**Rostery USUNIĘTE, nie „poprawione":** przepisanie zduplikowałoby `MAPA_KLUCZY.md` (jedyne
+źródło prawdy, audyt W14 wymusza pokrycie każdego z 87 kluczy). Dwie listy tych samych kluczy
+rozjadą się ponownie — dokładnie tak jak ta. Stara treść żyje w gicie.
+
+**Legenda kategorii SCALONA (Prawo XVI):** oba dokumenty miały własną ręczną kopię —
+**identycznie fałszywą** (te same zmyślone E/G, te same brakujące C/D/N/Z). Dowód, że
+problemem była KOPIA, nie autor. Jedno źródło: GENERAL_LEGATUS (Generał używa `KATEGORIA`
+jako klucza w `WAGI_REZIMU`).
+
+**Bramka złapała moje własne scalenie:** W10 miała **zaszyte na sztywno**, że słowo „Hurst"
+ma być w LEGIONY_ARCHITEKTURA — po przeniesieniu legendy pilnowała pustego miejsca. Audyt
+zaświecił czerwono, sprawdzenie przeniesione za treścią. To dokładnie ta kruchość, którą
+Tabularium ma zastąpić: **bramka zaszyta per-dokument nie przeżywa reorganizacji dokumentów.**
+
+**Pliki:** docs/GENERAL_LEGATUS.md, docs/LEGIONY_ARCHITEKTURA.md, narzedzia/audyt_spojnosci.py
+(W10 za treścią), docs/INDEKS_IMPERIUM.md (katalog).
+
+## 2026-07-17 | 🛡️ | ZAPORA TESTÓW — testy przestały PALIĆ PIENIĄDZE (nawrót klasy z 07-16)
+
+**🚨 Co się stało:** po commicie porządkowym zobaczyłem w drzewie niewyjaśnioną zmianę
+`tiro_pary_nauczyciela.jsonl` — **5 nowych par NOTARIUSA ze stemplem 2026-07-17 05:41,
+źródło `news_llm`**, choć ani razu nie wołałem DeepSeeka świadomie. Śledztwo (dowód z DWÓCH
+niezależnych źródeł — kod + stemple pisarza): `handluj_live` (`petla_live.py:193`) buduje
+**bezwarunkowo** `AdapterNewsLLM(fetcher=FetcherNewsRSS())`, adapter ma `uzyj_llm=True`
+domyślnie i `glos=None` → **lazy-init z klucza w środowisku**. `tests/test_petla_live.py`
+woła `handluj_live` **pięć razy**. Klucz na maszynie Cezara jest ustawiony → **każdy bieg
+`python tests/run_tests.py` płacił.** Uruchomiłem dziś testy ~6 razy.
+
+**🔁 To NAWRÓT, nie odkrycie.** Klasa „testy palą pieniądze" była **zapisana w Księdze Wad
+2026-07-16** (zmierzone: 8 wywołań, 4 min 42 s) — i **nie naprawiona**. Wróciła tego samego
+dnia. **Księga, która tylko notuje, jest pamiętnikiem, nie systemem samo-leczenia.**
+
+**✅ NAPRAWA U ŹRÓDŁA — `tests/conftest.py` (zapora, nie łatka):** zamiast poprawiać każde
+wywołanie z osobna, **ODBIERAMY TESTOM KLUCZE** (`DEEPSEEK_API_KEY`, `MEXC_API_KEY`,
+`MEXC_SECRET`) przy imporcie — zanim pytest zaimportuje moduły testowe (import potrafi już
+zbudować adapter). Lazy-init nie znajduje klucza → deterministyczny fallback słownikowy
+(ścieżka i tak wymagana przez Prawo XV). Test, który CHCE sprawdzić LLM, wstrzykuje atrapę
+(`glos=_FakeGlos(...)` — `test_sentyment_news.py`) i działa dalej. Kod produkcyjny bez zmian.
+Zapora wpięta w OBA runnery (pytest ładuje conftest sam; `run_tests.py` woła jawnie).
+
+**Trzy szkody zabite jednym ruchem:** koszt (każdy bieg płacił) · niedeterminizm (wynik zależał
+od tego, co akurat piszą w newsach) · czas (wolna bramka = rzadziej uruchamiana).
+
+**DOWÓD (Prawo I — pomiar, nie deklaracja):** par NOTARIUSA **przed** pełnym biegiem: **162**,
+**po** biegu: **162**. Zero nowych wywołań. Testy: **2494/2494**.
+
+**Fałszywy trop po drodze (uczciwie):** najpierw podejrzałem `test_sentyment_news.py:252`
+(`uzyj_llm=True` bez `uzyj_llm=False`) — **sprawdziłem i to był fałszywy alarm**: ten test
+wstrzykuje `glos=_FakeGlos(...)`, więc nie płaci. Prawdziwym winowajcą był `handluj_live`.
+Piąty raz dziś, gdy sprawdzenie przed meldunkiem powstrzymało fałszywy alarm.
+
+**Widoczność (Prawo XXIV):** runner drukuje `🛡️ Zapora testów: odebrano klucze [...]` —
+cicha zapora byłaby zaporą, w której działanie trzeba wierzyć. Pierwsza wersja komunikatu
+milczała (conftest odbiera klucze już przy imporcie, więc drugie wywołanie nie miało czego
+odebrać) — naprawione.
+
+**Pliki:** tests/conftest.py (nowy), tests/test_zapora_testow.py (nowy, 4 testy granic),
+tests/run_tests.py (zapora + raport), imperium/biblioteki/ksiega_wad_kodu.py (wpis: NAWRÓT
++ naprawa u źródła).
+
+## 2026-07-17 | 📖 | Dług T5 spłacony (8→0) + DWA werdykty zwiadowców OBALONE pomiarem
+
+**Co:** przeczytane W CAŁOŚCI 2 ostatnie dokumenty świecące T5. **Oba werdykty zwiadowców
+okazały się BŁĘDNE** — trzeci i czwarty raz tego dnia, gdy pomiar obala kandydata.
+
+**`PAPER_TRADING_MEXC` — zwiadowca: „KANDYDAT_DO_ARCHIWUM". BŁĄD.** To jedyne miejsce
+z **kryteriami zaliczenia Etapu II** (Sharpe≥1.0, MaxDD<15%, DSR≥0.95, WR≥55% lub PF>1.5,
+≥100 trades) i drabiną Etapów II→IIb→III→IV — **żywa bramka „kiedy wolno wejść za realne
+pieniądze"**. Archiwizacja skasowałaby warunki wejścia na rynek. → `typ: zywy`.
+Naprawione (zweryfikowane wobec kodu): **KROK 4 wklejał ~80 linii źródła
+`narzedzia/paper_trading_live.py` — pliku, który NIGDY nie istniał** (instrukcja kazała
+uruchomić widmo) → zastąpione realnym CLI `python -m imperium.koloseum.petla_live`
+(**sprawdzone `--help`, działa**) · `adaptery.py` → to PAKIET `adaptery/` · „RAM ⏳ upgrade
+laptopa" → CENSOR zmierzył **15.88 GB, maszyna to ma**.
+
+**`MANUAL_MIGRACJA_I_SYMULATOR` — zwiadowca: „KANDYDAT_DO_SCALENIA", oznaczony acta. BŁĄD.**
+To **żywy przewodnik dydaktyczny**: pełny przepływ cyklu decyzyjnego, ścieżka pieniędzy,
+obalenie mitu CHIMERY (Prawo I) i **10 bramek wstrzymania**. Progi ZWERYFIKOWANE wobec kodu
+— `dyrygent.py:210`: `min_neuronow=5, min_przewaga=0.55` → **dokument mówi PRAWDĘ**.
+Gnił tylko licznik („48 aktywnych" przy **81**) → wpięty w Filar 4 + sprzęt 8 GB → 15.88 GB.
+
+**🚨 KOREKTA MOJEGO WŁASNEGO FAŁSZYWEGO TWIERDZENIA (2 commity wstecz):** zapisałem
+w banerze MAPA_IMPERIUM_FLOW „Imperium NIE MA narracyjnego przewodnika po aktualnej
+architekturze — to realny brak". **Twierdzenie bez weryfikacji. Fałszywe.** Przewodnik
+istnieje — to właśnie `MANUAL_MIGRACJA_I_SYMULATOR` § 2. Baner poprawiony, wskazuje następcę.
+**Trzeci raz dziś: ogłosiłem lukę/alarm, nie sprawdziwszy. Alarm bez pomiaru to halucynacja.**
+
+**Wynik:** T5 **8 → 0** — każda historia w Imperium umie powiedzieć, CZEMU jest historią.
+Rejestr 70/70 · ACTA 13 · CONSILIUM 12 · DISCIPLINA 10 · FORMA 12 · LEX 6 · MENSURA 6 · TABULA 11.
+
+**Bilans werdyktów zwiadowców (4 sprawdzone w całości):** 4/4 wymagały korekty —
+NAZWY_PLIKOW („95% dublet" → 177 unikatów), SYMBIOZA („archiwum" → uratowana żywa doktryna),
+PAPER_TRADING („archiwum" → żywa bramka Etapu II), MANUAL_MIGRACJA („scalenie/acta" → żywy
+przewodnik z prawdziwymi progami). **Zwiadowca czyta szeroko i myli się często — sędzia musi
+mierzyć, nie ufać** (ZASADA ZWIADOWCY WIEDZY: kandydat ≠ prawda).
+
+**Pliki:** docs/PAPER_TRADING_MEXC.md, docs/MANUAL_MIGRACJA_I_SYMULATOR.md,
+docs/MAPA_IMPERIUM_FLOW.md (korekta), docs/INDEKS_IMPERIUM.md (katalog).
+
+## 2026-07-17 | 🕳️ | Bramka T5 — zamknięcie TYLNYCH DRZWI we własnym mechanizmie
+
+**Co:** nowa bramka **T5 (ucieczka w historię)** + degradacja `MAPA_IMPERIUM_FLOW` do ACTA
++ naprawa 6 błędnych klasyfikacji (w tym MOICH WŁASNYCH, zaimportowanych hurtem od zwiadowców).
+
+**🕳️ TYLNE DRZWI, KTÓRE SAM ODKRYŁEM:** przeklasyfikowanie dokumentu `zywy → acta`
+**natychmiast ucisza bramkę gnicia** (migawka z definicji nie gnije). Czyli **każdy z 18
+gnijących dokumentów da się „naprawić" ogłaszając go historią** — a bramka z tylnymi drzwiami
+jest bramką pozorną. Zapora (ta sama zasada co `dublet_rozstrzygniety`): **historia musi UMIEĆ
+SIĘ WYTŁUMACZYĆ** — data w nazwie (urodzona jako migawka), wskazany następca (świadoma
+degradacja) albo jawne pole `powod_acta`. **Wyciszenie bramki ZAWSZE wymaga powodu na widoku.**
+
+**MAPA_IMPERIUM_FLOW → ACTA (przeczytana w całości, zweryfikowana wobec kodu):** najgorszy
+dokument Imperium — `stan_na 2026-05-31`, kod zmieniony 92× w 11 plikach. Zweryfikowane
+kłamstwa: „Oczy 🔴 Plan, do zbudowania" (a `wszechoko.py` istnieje, 145 linii) · „Koloseum
+🟡 Szkielet" (16 modułów; `valhalla.py` nigdy nie istniał) · „Senat 🟡 Szkielet" (`meta_kora.py`,
+203 linie) · „Zwiadowca 1..4" (jest 87 neuronów i 15 zwiadowców). **Dokument dydaktyczny
+uczący nowicjusza systemu, który nie istnieje, jest GORSZY niż jego brak.** Zdegradowany,
+NIE skasowany (jedyny narracyjny zapis „po co" każdy organ powstał).
+**NIE przeniesiony do migawek** — ma **17 odwołań w kronice** (migawki miały 0–1); stosujemy
+tę samą regułę co przy P4: ruszamy tylko tanie.
+**🚨 LUKA ZAPISANA JAWNIE:** Imperium NIE MA narracyjnego przewodnika po AKTUALNEJ
+architekturze dla nowicjusza — ARCHITEKTURA jest zwięzła/tabelaryczna. Degradacja tego nie załatwia.
+
+**T5 NATYCHMIAST ZŁAPAŁA MÓJ WŁASNY BŁĄD** (import klasyfikacji zwiadowców hurtem):
+- `WERSJONOWANIE` — **LEX + acta** (prawo, które jest historią?!). Dowód: akumuluje
+  post-mortemy 05-28 → 06-01 → 06-09 → **07-15**, a deklarował `stan_na 2026-06-01`.
+  **Żyje** → `typ: zywy`, `stan_na: 2026-07-15`.
+- `TRYBY_IMPERIUM` — **CONSILIUM + acta** (plan na przyszłość, który jest historią?!).
+  Dowód: SCALP/SWING/INVEST żyją w `dyrygent.py`/`namiestnik.py`/`backtest.py`, ale reszta
+  trybów niezbudowana → plan wciąż żywy → `typ: zywy`.
+- `LOG_ZMIAN`, `AUDYT_SYSTEMU`, `POMIAR_FILTR_ASYMETRII`, `POMIAR_WARSTW_ADAPTACYJNYCH` —
+  prawdziwa historia, dostały `powod_acta` (dziennik akumulujący / migawka z datą w treści /
+  pomiar z konkretnego okna: „wynik nie starzeje się — starzeje się system, którego dotyczył").
+
+**Dług WIDOCZNY, nie zamieciony:** 2 dokumenty (`MANUAL_MIGRACJA_I_SYMULATOR`,
+`PAPER_TRADING_MEXC`) nadal świecą T5 — bo NIE przeczytałem ich w całości i **nie zgaduję**
+(Prawo I). Bramka zostawia je jako widoczne zadanie.
+
+**Pliki:** narzedzia/tabularium.py (+T5), tests/test_tabularium.py (30 testów: łapie ucieczkę,
+przepuszcza datę w nazwie / następcę / powod_acta), docs/MAPA_IMPERIUM_FLOW.md (ACTA + baner),
+docs/WERSJONOWANIE.md, docs/TRYBY_IMPERIUM.md, docs/LOG_ZMIAN.md, docs/AUDYT_SYSTEMU.md,
+docs/POMIAR_*.md, docs/INDEKS_IMPERIUM.md (katalog).
+
+**Powód:** mechanizm broni się teraz także przede mną. Następne: 2 dokumenty do przeczytania
+w całości, spłata długu gnicia (17 dokumentów), twarde bramki.
+
+## 2026-07-17 | 📦 | P4 — migawki → docs/migawki/ + naprawa DWÓCH cichych pułapek
+
+**Co:** 10 datowanych migawek (ACTA) przeniesionych `git mv` do `docs/migawki/`.
+`docs/` z 63 płaskich plików → **53 żywe + 10 migawek w podkatalogu**. Historia plików
+zachowana (git mv, nie kopiuj-usuń).
+
+**🚨 DWIE CICHE PUŁAPKI NAPRAWIONE W TYM SAMYM RUCHU (ZASADA PEŁNEJ SYMBIOZY):**
+1. **`narzedzia/rag/indeksuj.py`** — `DOCS.glob("*.md")` (płaski!) → `rglob`. Bez tego
+   przeniesienie **wypchnęłoby 10 dokumentów z korpusu RAG** — i **nikt by nie zauważył**,
+   bo RAG dalej odpowiadałby, tylko bez nich. Utrata potencjału (Prawo XV) bez jednego
+   czerwonego światła. **Dowód po naprawie:** korpus docs = 63 pliki, w tym 10 migawek.
+2. **Audyt W7 (sieroty)** — `os.listdir(docs_dir)` (płaski!) → `os.walk`. Bez tego
+   dokument w podkatalogu **znikałby z bramki sierot dokładnie w chwili porządkowania**.
+
+To była realna pułapka wykryta POMIAREM na starcie sesji, nie teoria: gdyby przyjąć
+pierwotny plan „wszystkie docs do podkatalogów", **cały korpus dokumentacji wypadłby
+z RAG i z bramki**, a audyt dalej świeciłby na zielono.
+
+**Dlaczego tylko migawki (decyzja Cezara, poparta pomiarem):** każda ma 1–3 żywe odwołania
+i 0–1 w kronice. Żywe źródła prawdy zostają płasko: mają 8–19 żywych odwołań **+ 12–63
+w kronice sesji**, której Prawo I zabrania przepisać — przeniesienie unieważniłoby historię.
+
+**Pliki:** 10× git mv docs/*_2026-*.md → docs/migawki/, narzedzia/rag/indeksuj.py (rglob),
+narzedzia/audyt_spojnosci.py (W7 rekurencyjnie), docs/INDEKS_IMPERIUM.md (katalog
+przegenerowany — sam wychwycił nowe ścieżki, zero ręcznej pracy).
+
+**Powód:** struktura docs/ uporządkowana bez jednego martwego linku. Zostało: reszta
+kandydatów do scalenia (każdy czytany w całości), twarde bramki po spłacie długu gnicia.
+
+## 2026-07-17 | 🔢 | Filar 4 — LICZBY WSTRZYKIWANE + Warstwa 15 audytu (koniec klasy kłamstw)
+
+**Co:** `tabularium.py liczby [--zapisz]` — liczby o systemie żyją między znacznikami
+`<!-- LICZBA:neurony -->87<!-- /LICZBA -->` i są przepisywane **z żywych rejestrów**
+(neurony, neurony_aktywne, zwiadowcy, strategie, elity). **Warstwa 15 audytu** pilnuje, że
+żaden wstrzyknięty blok nie zamarzł ani nie został nadpisany ręcznie — audyt **nigdy nie
+zapisuje** (suchy bieg), naprawa jedną komendą.
+
+**Dlaczego (zmierzone, nie z raportu zwiadowcy — Prawo I):** trzy dokumenty podawały
+„neuronów w kodzie" jako **47** (`GENERAL_LEGATUS:38`), **27** (`OBSERWATORZY:166`) i **55**
+(`IGRZYSKA:29`) — przy **87** w rejestrze. **Każda z nich była prawdziwa w dniu pisania.**
+To nie jest lenistwo autorów — to nieuchronność: rośnie kod, a nie dokument. Dlatego NIE
+poprawiliśmy liczb (za miesiąc skłamałyby znowu), tylko **odebraliśmy dokumentom prawo do
+ich wpisywania**.
+
+**Zweryfikowane w obie strony (Reguła Test-Granic):** wstrzyknięte kłamstwo `999` → W15
+czerwona, exit 1 → `liczby --zapisz` → 87 → audyt zielony. Test negatywny w `test_tabularium.py`:
+literówka w kluczu (`neuronyy`) MUSI krzyczeć — cicha akceptacja dałaby martwy znacznik,
+który nigdy się nie odświeży i zamrozi liczbę na zawsze (czyli dokładnie to, co Filar 4 zabija).
+
+**Bug złapany po drodze:** `tabularium.py` nie dokładał ROOT do `sys.path` — `liczby` nie
+mogło zaimportować rejestru (`ModuleNotFoundError: imperium`). Niewidoczne dotąd, bo żadna
+wcześniejsza komenda nie sięgała do kodu Imperium.
+
+**Pliki:** narzedzia/tabularium.py (+wartosci_z_kodu, +wstrzyknij_liczby, +sys.path),
+narzedzia/audyt_spojnosci.py (+W15, +docstring), CLAUDE.md (+Warstwa 15 w Prawie XXI),
+tests/test_tabularium.py (26 testów), docs/GENERAL_LEGATUS.md, docs/OBSERWATORZY.md,
+docs/IGRZYSKA_IMPERIUM.md (znaczniki zamiast liczb z palca).
+
+**Powód:** klasa kłamstw „licznik zamrożony w prozie" zamknięta mechanicznie. Następne:
+migawki → docs/migawki/ (z naprawą rag/indeksuj.py glob→rglob), reszta kandydatów do scalenia.
+
+## 2026-07-17 | 🏛️ | P3 — pierwsze scalenie + POMIAR OBALIŁ ZWIADOWCĘ (177 pozycji uratowanych)
+
+**🚨 NAJWAŻNIEJSZE — kandydat ≠ prawda (ZASADA ZWIADOWCY WIEDZY, Prawo I):** zwiadowca (Sonnet)
+zaraportował *„NAZWY_PLIKOW_BIB-070+.md to ~95% redundancja PLAN_ROZBUDOWY_BIBLIOTEKI.md — te same
+205 pozycji"*. **POMIAR:** 197 pozycji BIB w jednym, **27** w drugim, wspólnych **20** → **177
+pozycji istnieje TYLKO w NAZWY_PLIKOW**. Dokumenty mają tę samą STRUKTURĘ sekcji, ale inną
+FUNKCJĘ: PLAN = co i dlaczego (status weryfikacji, linki), NAZWY = 197 gotowych nazw plików +
+konwencja + rejestr spalonych numerów (083, 127, 138, 165, 166, 198, 199, 262). **Rekomendacja
+ODRZUCONA — plik zostaje.** Zaufanie zwiadowcy bez pomiaru = utrata 177 wpisów, czyli dokładnie
+to, czego Cezar zakazał („bez utraty niczego wartościowego").
+
+**SCALENIE WYKONANE — SYMBIOZA_MODULOW → archiwum** (przeczytana W CAŁOŚCI przed ruchem, ZASADA
+ARCHIWIZACJI). Uratowane: tabela **„czego NIE wolno duplikować"** (jedyny właściciel matematyki/
+LLM/egzekucji/ryzyka — żywa doktryna, nigdzie indziej niezapisana) → `ARCHITEKTURA_IMPERIUM.md`
+§ ZASADA SYMBIOZY. Zarchiwizowane: przepływ z 4 widmami (`straznik_ryzyka.py`,
+`wykonawca_rozkazow.py`, `mnemozyne.py`, `sala_wojenna.py`) + nieaktualna rola „Alchemika".
+
+**SCALENIE ODRZUCONE — START_LOKAL ↔ SCIAGA_LOKAL.** 4 z 6 komend wspólnych, ale to **dwie role**:
+START to „pełny przewodnik dla nowicjusza" (prowadzi za rękę), SCIAGA to ściąga z 24 komendami dla
+kogoś, kto już wie. Scalenie zabiłoby przewodnik, na którym stoi **ZPO** (Cezar jest nowicjuszem —
+to jedyny powód istnienia tej zasady).
+
+**NOWY MECHANIZM — `dublet_rozstrzygniety` (T3):** werdykt człowieka wycisza parę, ale **wymaga
+podania POWODU w nagłówku** — nie da się schować dubletu po cichu. Powód istnienia: bramka
+krzycząca fałszywie co sesję uczy ignorować WSZYSTKIE bramki. Test granicy pilnuje, że
+rozstrzygnięcie JEDNEJ pary nie jest wytrychem na inne.
+
+**NOMENKLATURA (rozkaz Cezara):** „Alchemik Imperium" → **VITRUVIUSZ** w KATALOG_NEURONOW
+i docs/README — źródłem prawdy imion jest PROFIL_CEZARA, a rola Alchemika umarła wraz z nadaniem
+imienia Architektowi.
+
+**DOWÓD WARTOŚCI GENEROWANEGO KATALOGU:** archiwizacja SYMBIOZY kosztowała **zero** utrzymania
+spisu — INDEKS przepisał się sam. Ręczny indeks wymagałby pamiętania o wykreśleniu (czyli nie
+zostałaby wykreślona, jak 70 innych pozycji).
+
+**Pliki:** archiwum/SYMBIOZA_MODULOW.md (git mv, historia zachowana), docs/ARCHITEKTURA_IMPERIUM.md
+(+§ ZASADA SYMBIOZY), docs/README.md, docs/KATALOG_NEURONOW.md, docs/START_LOKAL.md,
+docs/INDEKS_IMPERIUM.md (katalog), narzedzia/tabularium.py (+dublet_rozstrzygniety),
+tests/test_tabularium.py (22 testy).
+
+**Powód:** rejestr 70/70, 1 dublet rozstrzygnięty świadomie. Następne: reszta kandydatów
+(MANUAL_MIGRACJA, PAPER_TRADING_MEXC, WERSJONOWANIE, MAPA_IMPERIUM_FLOW) — każdy czytany
+w całości przed ruchem; potem migawki → docs/migawki/ z naprawą rag/indeksuj.py (glob→rglob).
+
+## 2026-07-17 | 🏛️ | P2 — katalog GENEROWANY + W6b przekazuje pałeczkę bramce T2
+
+**Co:** (1) **71/71 dokumentów zadeklarowanych** (rozkład: FORMA 14 · ACTA 12 · CONSILIUM 12 ·
+TABULA 11 · DISCIPLINA 10 · MENSURA 6 · LEX 6) — żaden dokument Imperium nie jest już bezpański,
+w tym 4 spoza `docs/`, których NIE WIDZIAŁA żadna bramka (`imperium/README.md`,
+`imperium/INSTRUKCJA_URUCHOMIENIA.md`, `narzedzia/rag/SETUP_LOKALNY.md`, `skrypty/README.md`).
+(2) Ręczna „MAPA DOKUMENTÓW" w INDEKS (**17 054 znaki prozy**, w tym kłamstwo „299 neuronów,
+72 w kodzie") **zastąpiona katalogiem GENEROWANYM** z nagłówków między znacznikami.
+
+**W6b → T2 (przekazanie pałeczki, 49 dokumentów):** wstrzyknięcie nagłówków obaliło założenie,
+na którym stała W6b — *„plik ruszony ⇒ treść się zmieniła"*. Commit dodający metadane nie zmienia
+ANI JEDNEGO twierdzenia dokumentu, więc W6b zażądała ostemplowania dzisiejszą datą **16 dokumentów,
+których nikt dziś nie zweryfikował — czyli zażądała KŁAMSTWA** (Prawo I). Fałszywy alarm uczy
+ignorować bramkę, a dwie bramki mierzące tę samą datę sprzecznymi definicjami to redundancja,
+która szkodzi (Prawo XVI). Rozstrzygnięcie: dokument z nagłówkiem podlega **T2**, która pyta
+OSTRZEJ — „czy nadążasz za KODEM, który opisujesz" zamiast „czy nadążasz za samym sobą".
+
+**Wada złapana i zapisana (Księga Wad — klasa `parsowanie`, checklista):** pierwsza wersja
+przekazania szukała `stan_na` w oknie `tresc[:600]` — MAPA_PAMIECI (11 właścicieli) ma je na
+pozycji **609**, SCIAGA_LOKAL na **778**, więc CICHO omijały bramkę. Podstępne, bo wymykają się
+dokumenty NAJBOGATSZE, czyli najważniejsze. Naprawa u źródła: audyt używa **parsera Tabularium**,
+nie własnego (jeden format = jeden parser; dwa rozjadą się co do znaku).
+
+**Pliki:** docs/INDEKS_IMPERIUM.md (katalog generowany), 20× dokumenty (nagłówki),
+narzedzia/audyt_spojnosci.py (W6b→T2), imperium/biblioteki/ksiega_wad_kodu.py (+klasa parsowanie).
+
+**Powód:** rejestr kompletny. Następne: egzekucja kłamstw liczbowych (5 sprzecznych liczb neuronów:
+87 prawda vs 72/47/27/55/62), lista scaleń/archiwum do zgody Cezara, migawki → docs/migawki/
+(z naprawą rag/indeksuj.py glob→rglob — inaczej wypadną z korpusu RAG).
+
+## 2026-07-17 | 🏛️ | P1 — nagłówki Tabularium w 51 dokumentach: dług POLICZONY, nie zgadnięty
+
+**Co:** nagłówki metadanych wstrzyknięte do **51 dokumentów** (`51/71` zadeklarowanych; rozkład:
+FORMA 13 · ACTA 11 · CONSILIUM 9 · DISCIPLINA 7 · MENSURA 5 · TABULA 5 · LEX 1). Raport bramki
+T2 zagregowany per dokument (Prawo XXIV): **41 ostrzeżeń zamiast 86** — rozbicie na
+(dokument × właściciel) dawało ścianę tekstu, a bramka, której nikt nie czyta, to bramka,
+której nikt nie słucha.
+
+**Dług ujawniony (18 dokumentów gnije — teraz WIDAĆ, ile):** MAPA_IMPERIUM_FLOW `stan_na
+2026-05-31`, a kod zmieniony **92× w 11 plikach** · MATRYCA_KORELACJI 22× · ANALIZA_NEURONY 20× ·
+GENERAL_LEGATUS 19× (legatus.py) · LEGIONY_ARCHITEKTURA 17× · OBSERWATORZY 17×.
+
+**Dublety wskazane MASZYNOWO (Prawo XVI — odpowiedź na „co warto połączyć"):** ARCHITEKTURA_IMPERIUM
+↔ MAPA_IMPERIUM_FLOW (7 wspólnych właścicieli) · MANUAL_CLAUDE_CODE ↔ MANUAL_UZYTKOWNIKA ↔
+START_LOKAL (ten sam audyt_spojnosci.py + run_tests.py) · SCIAGA_LOKAL ↔ START_LOKAL (start.py).
+
+**Widma zapisane W NAGŁÓWKU (pole `dlug`) — dokument sam przyznaje się do kłamstwa:**
+ARCHITEKTURA_IMPERIUM i MAPA_IMPERIUM_FLOW (`war_lancer.py`, `sala_wojenna.py`, `valhalla.py`),
+SYMBIOZA_MODULOW (4 martwe ścieżki), OBSERWATORZY (`multi_exchange.py`),
+PAPER_TRADING_MEXC (`paper_trading_live.py`) — kod, którego NIE MA nigdzie w repo.
+
+**ZASADA (Prawo I): `stan_na` = data z samego dokumentu, NIGDY „dziś".** Wpisanie dzisiejszej
+daty dokumentowi, którego dziś nie zweryfikowano, to kłamstwo — i uciszyłoby bramkę gnicia,
+czyli zniszczyło jej jedyny sens. Dług ma być widoczny, nie zamalowany.
+
+**Pliki:** 51× docs/*.md (tylko nagłówek na górze — ani jeden bajt treści nie tknięty),
+narzedzia/tabularium.py (agregacja T2).
+
+**Powód:** zostaje 20 dokumentów bez nagłówka (8 molochów + 5 z paczki manuali + drobne poza
+docs/). Potem: znaczniki katalogu w INDEKS, egzekucja kłamstw liczbowych, lista scaleń do zgody Cezara.
+
+## 2026-07-16 | 🎓 | CENSOR sprzętu + plan TIRO (lokalny hybrydowy LLM-uczeń)
+
+**Co:** nowy organ **CENSOR SPRZĘTU** (`imperium/oczy/censor_sprzetu.py`) — „oczy" mierzące
+majątek maszyny (CPU/RAM/GPU, stdlib-only bez psutil), klasyfikujące ją do KLASY majątkowej
+(census→classis: PROLETARIUS→PEDES→EQUES→PRAETOR→CONSUL) i podnoszące ALARM POTENCJAŁU
+(Prawo XV) przy AWANSIE/degradacji sprzętu. Baseline w git → po `git pull` na nowej maszynie
+wykrywa migrację. + dokument **`docs/PLAN_TIRO_LOKALNY_LLM.md`** (roadmapa E0–E6).
+
+**Dlaczego (rozkaz Cezara 2026-07-16):** budowa lokalnego LLM-ucznia (nauczyciele: Hyginus/DeepSeek
++ Vitruviusz/Opus) z auto-wykrywaniem zmian sprzętu i zgłaszaniem potencjału. Sprzęt zmierzony
+(Prawo I): Fujitsu i5-4200M Haswell 2-rdz., 16 GB, brak CUDA = klasa **PEDES** (model 1–3B żywo /
+7B wsadowo). Zwiad web (Sonnet) obalił zawyżenie DeepSeeka „7B @ 10–15 tok/s" (realnie 2–5) i
+halucynację „aom-news-4b"; potwierdził że trening MUSI iść przez Colab (CPU-only nie fine-tunuje).
+
+**Pliki:** imperium/oczy/censor_sprzetu.py (nowy), tests/test_censor_sprzetu.py (16 testów granic),
+bibliotheca_ulpia/dane/censor_sprzet.json (baseline PEDES), docs/PLAN_TIRO_LOKALNY_LLM.md (nowy).
+
+**Powód:** E0 roadmapy TIRO domknięty. Następny krok E1: instal Ollama + `llama-bench` — TWARDY
+pomiar tok/s na Fujitsu (zastąpić estymacje). Wpięcie ucznia w ścieżkę decyzyjną: opt-in OFF do walidacji A/B.
 
 ## 2026-07-16 | 🪙 | K-04 USD strength — WPIĘCIE 3. zwalidowanego sygnału (opt-in, MONETA)
 

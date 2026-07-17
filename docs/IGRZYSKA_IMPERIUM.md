@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/biblioteki/hedge_mwu.py, imperium/biblioteki/igrzyska.py
+stan_na: 2026-06-09
+powod_istnienia: "Jedyny dokument opisujący system rywalizacji/rang dla neuronów, legionów i senatorów (Cursus Honorum Neuronalis) — mechanizm nagród/kar, automatyczną kalibrację wag, oraz (w drugie"
+---
 # 🏟️ IGRZYSKA IMPERIUM — System Rywalizacji i Rang
 
 > *"Per certamen ad gloriam."* — Przez rywalizację do chwały.
@@ -19,7 +26,7 @@
 
 | Arena | Uczestnicy | Metryki | Częstotliwość |
 |-------|-----------|---------|---------------|
-| 🧬 **Arena Neuronów** | Mikro-neurony (299 w katalogu, 55 w kodzie) | Accuracy, Precision, F1, Contribution | Co 24h rolling |
+| 🧬 **Arena Neuronów** | Mikro-neurony (299 w katalogu, <!-- LICZBA:neurony -->87<!-- /LICZBA --> w kodzie) | Accuracy, Precision, F1, Contribution | Co 24h rolling |
 | ⚔️ **Arena Legionów** | 4 Legiony + dywizje | Sharpe, WinRate, MaxDD, Calmar | Co tydzień |
 | 🏛️ **Arena Senatu** | Senatorzy (głosy LONG/SHORT) | Głosowania vs wynik, kalibracja | Po każdym trade |
 

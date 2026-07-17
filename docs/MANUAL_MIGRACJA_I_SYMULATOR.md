@@ -1,8 +1,20 @@
+---
+kategoria: DISCIPLINA
+typ: zywy
+wlasciciel: imperium/fundament/brama_kalkulatora.py, imperium/koloseum/dyrygent.py, imperium/koloseum/namiestnik.py, imperium/legiony/legatus.py, imperium/pretorianie/kalkulator_lewara.py, tests/test_doradcy.py
+stan_na: 2026-07-17
+powod_istnienia: "Dwie rzeczy, których nie ma nigdzie indziej: (1) obalenie mitu „CHIMERA/HAMACHERA' — jawny wpis Prawa I, że moduł NIE istnieje; (2) ŚCIEŻKA PIENIĘDZY — krok po kroku matematyka roz"
+---
 # 🖥️ MANUAL MIGRACJI NA LAPTOPA + SYMULATOR LIVE
 
-> **Stan na:** 2026-06-09 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+> **Stan na:** 2026-07-17 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+>
+> **Zweryfikowane wobec kodu 2026-07-17:** progi 10 bramek wstrzymania (§ 2.2) są
+> DOKŁADNE — `dyrygent.py:210` → `min_neuronow=5, min_przewaga=0.55`. Licznik neuronów
+> wpięty w Filar 4 (wstrzykiwany z rejestru), bo twierdził 48 przy 81 aktywnych.
 > Dokument dla Cezara-nowicjusza (ZPO): jak przenieść całe Imperium na laptopa
-> Fujitsu (Windows 10 Pro, 8 GB RAM) i jak NAPRAWDĘ działa pipeline w live.
+> Fujitsu (Windows 10 Pro, **15.88 GB RAM** — zmierzone przez CENSOR sprzętu
+> `imperium/oczy/censor_sprzetu.py`, nie zgadnięte) i jak NAPRAWDĘ działa pipeline w live.
 
 ---
 
@@ -59,7 +71,7 @@ ani śladu; jeśli pojawiła się w rozmowie, to była niezweryfikowana propozyc
                        └────────────────┬────────────────────────┘
                                         ▼
    ┌────────────────────────────────────────────────────────────────────┐
-   │ LEGION — 48 aktywnych mikro-neuronów głosuje równolegle             │
+   │ LEGION — <!-- LICZBA:neurony_aktywne -->81<!-- /LICZBA --> aktywnych mikro-neuronów głosuje │
    │  każdy: kierunek (LONG/SHORT/NEUTRAL) + pewnosc + pewnosc_przeciwnika│
    │  WAGI_REZIMU mnożą głosy wg reżimu (T×1.5 w trendzie, M×1.5 w range) │
    │  HedgeMWU — żywe wagi: neuron co kłamie → cichnie (biblioteki/)      │

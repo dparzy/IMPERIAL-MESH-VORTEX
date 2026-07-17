@@ -1,5 +1,5 @@
 {
-  "n": 69,
+  "n": 79,
   "calibre": true,
   "ksiegi": [
     {
@@ -321,7 +321,8 @@
       "autor": "OHara",
       "tytul": "Market Microstructure Theory",
       "format": "pdf",
-      "plik": "BIB-032_OHara_Market-Microstructure-Theory.pdf"
+      "plik": "BIB-032_OHara_Market-Microstructure-Theory.pdf",
+      "wydano": "0101-01-01T00:00:00+00:00"
     },
     {
       "bib": "BIB-033",
@@ -684,6 +685,84 @@
       "tagi": "Business & Personal Finance",
       "jezyk": "eng",
       "wydano": "2023-04-18T00:00:00+00:00"
+    },
+    {
+      "bib": "BIB-070",
+      "autor": "Vaswani et al",
+      "tytul": "Attention Is All You Need",
+      "format": "pdf",
+      "plik": "BIB-070_Vaswani-et-al_Attention-Is-All-You-Need.pdf"
+    },
+    {
+      "bib": "BIB-071",
+      "autor": "Easley Lopez de Prado OHara",
+      "tytul": "Flow Toxicity and Liquidity in a High Frequency World",
+      "format": "pdf",
+      "plik": "BIB-071_Easley-Lopez-de-Prado-OHara_Flow-Toxicity-and-Liquidity-in-a-High-Frequency-World.pdf",
+      "wydano": "2012-05-03T19:00:32+00:00"
+    },
+    {
+      "bib": "BIB-072",
+      "autor": "Hyndman Athanasopoulos",
+      "tytul": "Forecasting Principles and Practice 2nd ed",
+      "format": "pdf",
+      "plik": "BIB-072_Hyndman-Athanasopoulos_Forecasting-Principles-and-Practice-2nd-ed.pdf",
+      "wydano": "2018-01-10T07:22:20+00:00"
+    },
+    {
+      "bib": "BIB-073",
+      "autor": "Boyd Vandenberghe",
+      "tytul": "Convex Optimization",
+      "format": "pdf",
+      "plik": "BIB-073_Boyd-Vandenberghe_Convex-Optimization.pdf",
+      "wydano": "2024-02-28T16:11:12+00:00"
+    },
+    {
+      "bib": "BIB-074",
+      "autor": "Boyd Vandenberghe",
+      "tytul": "Additional Exercises for Convex Optimization",
+      "format": "pdf",
+      "plik": "BIB-074_Boyd-Vandenberghe_Additional-Exercises-for-Convex-Optimization.pdf"
+    },
+    {
+      "bib": "BIB-075",
+      "autor": "Nakamoto",
+      "tytul": "Bitcoin A Peer to Peer Electronic Cash System",
+      "format": "epub",
+      "plik": "BIB-075_Nakamoto_Bitcoin-A-Peer-to-Peer-Electronic-Cash-System.epub",
+      "jezyk": "eng",
+      "wydano": "2014-01-01T00:00:00+00:00",
+      "identyfikatory": "url:http://www.readliberty.org/books/bitcoin"
+    },
+    {
+      "bib": "BIB-076",
+      "autor": "Buterin",
+      "tytul": "Ethereum Whitepaper",
+      "format": "pdf",
+      "plik": "BIB-076_Buterin_Ethereum-Whitepaper.pdf",
+      "wydano": "0101-01-01T00:00:00+00:00"
+    },
+    {
+      "bib": "BIB-077",
+      "autor": "Daian et al",
+      "tytul": "Flash Boys 2.0 Frontrunning in Decentralized Exchanges",
+      "format": "pdf",
+      "plik": "BIB-077_Daian-et-al_Flash-Boys-2.0-Frontrunning-in-Decentralized-Exchanges.pdf",
+      "wydano": "2019-10-01T06:48:52+00:00"
+    },
+    {
+      "bib": "BIB-078",
+      "autor": "Adams et al",
+      "tytul": "Uniswap v3 Core",
+      "format": "pdf",
+      "plik": "BIB-078_Adams-et-al_Uniswap-v3-Core.pdf"
+    },
+    {
+      "bib": "BIB-079",
+      "autor": "Gneiting Raftery",
+      "tytul": "Strictly Proper Scoring Rules Prediction and Estimation",
+      "format": "pdf",
+      "plik": "BIB-079_Gneiting-Raftery_Strictly-Proper-Scoring-Rules-Prediction-and-Estimation.pdf"
     }
   ]
 }

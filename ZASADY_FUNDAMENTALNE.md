@@ -1,3 +1,10 @@
+---
+kategoria: LEX
+typ: zywy
+wlasciciel: —
+stan_na: 2026-07-11
+powod_istnienia: "25 Praw Imperium — pełna konstytucja, do której odwołuje się każda decyzja"
+---
 # 🏛️ ZASADY FUNDAMENTALNE — IMPERIUM CESARZA PIXEL
 
 > **Dokument:** Konstytucja projektu. Fundament, na którym budujemy wszystko inne.

@@ -1,3 +1,11 @@
+---
+kategoria: MENSURA
+typ: acta
+powod_acta: "Pomiar z konkretnego dnia, okna i koszyka (2026-06-13, OOS 3000 barów, 3 pary). Wynik pomiaru NIE starzeje się — starzeje się system, którego dotyczył. Werdykt i bloker wdrożenia żyją w ODLOZONE_DECYZJE.md #4."
+wlasciciel: imperium/koloseum/dyrygent.py, imperium/pretorianie/filtr_asymetrii.py
+stan_na: 2026-06-13
+powod_istnienia: "Zmierzyć (Prawo XVI, nie zgadywać) czy Filtr Asymetrii Reżimu (W-314) faktycznie redukuje straty w rynku bocznym (ADX niski) — odkryty rozdźwięk in-sample vs OOS (in-sample +26k$ h"
+---
 # 📐 POMIAR FILTRA ASYMETRII REŻIMU (W-314) — dowód OOS (Prawo XVI)
 
 > **Stan na:** 2026-06-13 · **Metoda:** A/B backtest portfelowy na oknie OOS · **Status:** ✅ przewaga zmierzona

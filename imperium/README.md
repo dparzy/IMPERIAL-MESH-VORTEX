@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: —
+stan_na: 2026-05-31
+powod_istnienia: "Mapa organów rzymskich w kodzie (folder → rola → moduły) — pierwszy dokument czytany przy wejściu w imperium/"
+---
 # 🏛️ IMPERIUM — kod projektu
 
 Działający kod aktualnego projektu, ułożony wg **metafory Cesarstwa Rzymskiego**.

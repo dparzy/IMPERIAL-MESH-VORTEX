@@ -1,3 +1,10 @@
+---
+kategoria: FORMA
+typ: zywy
+wlasciciel: imperium/koloseum/namiestnik.py, tests/test_namiestnik.py
+stan_na: 2026-06-03
+powod_istnienia: "Jedyny dokument opisujący 'Gating Network' (sieć bramkującą) świadomą reżimu I interwału — meta-kontroler ustawiający parametry (tryb, lewar, próg, styl) dla reszty łańcucha decyzy"
+---
 # 🏛️ NAMIESTNIK — Regime + Timeframe-Aware Gating Network
 
 > **Stan na:** 2026-06-03 · **Status:** ✅ aktywny w kodzie (`imperium/koloseum/namiestnik.py`)

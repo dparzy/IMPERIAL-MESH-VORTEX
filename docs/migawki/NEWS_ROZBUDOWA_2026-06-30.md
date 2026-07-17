@@ -1,3 +1,10 @@
+---
+kategoria: ACTA
+typ: acta
+wlasciciel: imperium/akwedukty/adaptery/news_llm.py, imperium/akwedukty/news_fetcher.py, imperium/legiony/neurony/news_dynamika.py
+stan_na: 2026-06-30
+powod_istnienia: "Audyt NEWS-01 + sweep światowego rynku danych newsowych + propozycje 10 nowych modułów rozszerzających system newsowy, z jawnym statusem wykonania każdego (✅ ZROBIONE / 🔵 plan) już"
+---
 # 📰 ROZBUDOWA SYSTEMU NEWS — research + plan (Stan na: 2026-06-30)
 
 > Głęboki audyt NEWS-01 + sweep światowego rynku (Azja/EU/USA/świat) + propozycje

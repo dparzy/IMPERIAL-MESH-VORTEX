@@ -21,6 +21,7 @@ Sprawdza 14 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 12 — żywotność głosu: każdy aktywny neuron głosuje (≠martwy) w ≥1 scenariuszu (Prawo XV)
   Warstwa 13 — ruff (linter):   bugi i martwy kod (F811 duplikaty, F821 undefined, F841/F401 martwe)
   Warstwa 14 — wszystkie docs:  MAPA_KLUCZY zawiera każdy klucz z kodu (skan wszystkich .md)
+  Warstwa 15 — liczby:          bloki <!-- LICZBA:x --> zgodne z żywym kodem (Tabularium, Filar 4)
 
 Exit code:
   0 = pełna spójność (Imperium gotowe)
@@ -283,20 +284,117 @@ def audyt() -> tuple:
     except Exception as e:
         bledy.append(f"[W6] Błąd sprawdzania dat 'Stan na:': {e}")
 
+    # ── WARSTWA 6b: DATY WSZYSTKICH ŻYWYCH DOKUMENTÓW ────────────────────────
+    # ROZKAZ CEZARA 2026-07-16: „zapominasz o spójności dokumentów, pełna synchronizacja 1:1…
+    # straszny bałagan w tych dokumentach których przybywa. Zarządzam pełen porządek."
+    #
+    # DZIURA, KTÓRĄ TO ZATYKA (zmierzona): W6 pilnowała dat tylko w MANIFEST i README —
+    # 2 dokumenty z 64. Reszta gniła bezkarnie przy exit 0. Znalezione realne rozjazdy:
+    # ARCHITEKTURA_IMPERIUM (20 dni), MANUAL_UZYTKOWNIKA (25), REJESTR_INSPIRACJI (32).
+    #
+    # DLACZEGO PER-PLIK, NIE PER-REPO: odniesieniem jest ostatni commit TEGO dokumentu,
+    # nie całego repo. Inaczej GUBERNATOR.md („Stan na: 2026-06-16", od czerwca niezmieniony
+    # = POPRAWNY) dostawałby fałszywy alarm co dzień. Dokument ma nadążać za WŁASNĄ zmianą.
+    #
+    # POMIJAMY (Prawo I — nie falsyfikujemy historii): datowane snapshoty (data w NAZWIE pliku)
+    # oraz dokumenty akumulujące historię/generowane. Ich data to prawda ich czasu.
+    try:
+        import subprocess
+
+        POMIJANE_ZAWSZE = {"LOG_ZMIAN.md", "WIZJONER.md", "PAMIEC_SESJI.md",
+                           "MANIFEST_KODU.md", "README.md"}   # MANIFEST/README ma już W6
+
+        # Jedno przejście gita zamiast N wywołań: data ostatniego commitu per plik.
+        daty_plikow: dict = {}
+        # encoding="utf-8" OBOWIĄZKOWE (klasa wady zmierzona 2026-07-17): `text=True` bez
+        # encoding dekoduje wyjście gita kodowaniem konsoli Windows (cp1250). Nazwy plików
+        # są dziś ASCII, więc W6b działa — ale PIERWSZY plik z polską literą w nazwie
+        # wywala wątek czytający, stdout=None i bramka dat cichnie NA GŁUCHO.
+        _log = subprocess.run(
+            ["git", "log", "--format=@%cd", "--date=short", "--name-only", "--", "docs"],
+            capture_output=True, text=True, timeout=30, encoding="utf-8", errors="replace")
+        biezaca = None
+        for linia in _log.stdout.splitlines():
+            if linia.startswith("@"):
+                biezaca = linia[1:].strip()
+            elif linia.strip() and biezaca:
+                daty_plikow.setdefault(linia.strip(), biezaca)   # pierwszy = najnowszy
+
+        przeterminowane, przekazane_tabularium = [], 0
+        for sciezka_rel, data_commitu in sorted(daty_plikow.items()):
+            nazwa = os.path.basename(sciezka_rel)
+            if nazwa in POMIJANE_ZAWSZE:
+                continue
+            if re.search(r"\d{4}-\d{2}-\d{2}", nazwa):        # snapshot datowany nazwą
+                continue
+            pelna = os.path.join(ROOT, sciezka_rel)
+            if not os.path.isfile(pelna):                      # usunięty/przeniesiony
+                continue
+            with open(pelna, encoding="utf-8", errors="replace") as f:
+                tresc = f.read()
+
+            # ── PRZEKAZANIE PAŁECZKI DO TABULARIUM (2026-07-17) ──────────────────────
+            # Dokument z nagłówkiem Tabularium podlega bramce T2, która pyta OSTRZEJ:
+            # „czy nadążasz za KODEM, który opisujesz" — zamiast W6b: „czy nadążasz za
+            # SAMYM SOBĄ". W6b stała na założeniu „plik ruszony ⇒ treść się zmieniła";
+            # nagłówki metadanych to założenie obaliły (commit dodający nagłówek nie zmienia
+            # ANI JEDNEGO twierdzenia dokumentu). Bez tego wyjątku W6b żądała stemplowania
+            # dzisiejszą datą 16 dokumentów, których nikt dziś nie zweryfikował — czyli
+            # żądała KŁAMSTWA (Prawo I), a fałszywy alarm uczy ignorować bramkę.
+            # Dwie bramki mierzące tę samą datę sprzecznymi definicjami = redundancja,
+            # która szkodzi (Prawo XVI). Sprawdź dokumenty z nagłówkiem:
+            #     python narzedzia/tabularium.py sprawdz
+            # Parser Tabularium, NIE własny (Prawo XVI: jeden format = jeden parser).
+            # Pierwsza wersja szukała `stan_na` w oknie 600 znaków — MAPA_PAMIECI (11
+            # właścicieli) ma je na pozycji 609, SCIAGA_LOKAL na 778. Magiczne okno zamiast
+            # granic bloku = bramka omijana przez dokumenty, które akurat są dłuższe.
+            from narzedzia.tabularium import czytaj_naglowek
+            if czytaj_naglowek(pelna).get("stan_na"):
+                przekazane_tabularium += 1
+                continue
+
+            m = re.search(r"Stan na:\s*\**\s*(\d{4}-\d{2}-\d{2})", tresc)
+            if not m:
+                continue      # brak pola „Stan na:" NIE jest błędem — nie każdy dokument je ma
+            delta = (date.fromisoformat(data_commitu) - date.fromisoformat(m.group(1))).days
+            if delta > TOLERANCJA_DNI:
+                przeterminowane.append(f"{nazwa} ('Stan na:' {m.group(1)} vs commit "
+                                       f"{data_commitu} = {delta} dni)")
+        if przeterminowane:
+            bledy.append("[W6b] Dokumenty ze 'Stan na:' STARSZYM niż własna ostatnia zmiana "
+                         "(Prawo XXI reguła 9 — zaktualizuj datę w tym samym commicie co treść): "
+                         + "; ".join(przeterminowane))
+        else:
+            info.append(f"Daty żywych dokumentów (W6b): {len(daty_plikow)} sprawdzonych, "
+                        "wszystkie 'Stan na:' nadążają za własną zmianą ✅"
+                        + (f" | {przekazane_tabularium} dokumentów przekazanych bramce T2 "
+                           f"Tabularium (ostrzejsze pytanie: nadąża za KODEM, nie za sobą)"
+                           if przekazane_tabularium else ""))
+    except Exception as e:  # noqa: BLE001 — brak gita nie może zabić audytu
+        info.append(f"Daty żywych dokumentów (W6b): pominięte ({type(e).__name__}: {e})")
+
     # ── WARSTWA 7: SIEROTY — pliki docs/ bez wpisu w INDEKS ─────────────────
     try:
         indeks_txt = _czytaj("docs/INDEKS_IMPERIUM.md")
         docs_dir = os.path.join(ROOT, "docs")
-        docs_files = {f for f in os.listdir(docs_dir)
-                      if f.endswith(".md") and f not in INDEKS_WHITELIST}
+
+        # REKURENCYJNIE (naprawa 2026-07-17): `os.listdir` widział TYLKO płaski docs/.
+        # Przeniesienie dokumentu do podkatalogu (docs/migawki/) po cichu wypychało go
+        # z bramki sierot — dokument znikał z kontroli dokładnie w chwili porządkowania.
+        # Ta sama pułapka siedziała w rag/indeksuj.py (glob → rglob).
+        docs_files = set()
+        for katalog, podkatalogi, pliki in os.walk(docs_dir):
+            podkatalogi[:] = [d for d in podkatalogi if d != "archiwum"]  # archiwum ma swoje zasady
+            for f in pliki:
+                if f.endswith(".md") and f not in INDEKS_WHITELIST:
+                    rel = os.path.relpath(os.path.join(katalog, f), docs_dir)
+                    docs_files.add(rel.replace("\\", "/"))
 
         sieroty = []
         for fname in sorted(docs_files):
-            # Plik w docs/archiwum/ — pomijamy (archiwum ma swoje zasady)
-            if fname.startswith("archiwum"):
-                continue
-            # Sprawdź czy nazwa pliku pojawia się w INDEKS
-            if fname not in indeks_txt:
+            # W INDEKS katalog generowany wypisuje pełną ścieżkę (docs/migawki/X.md),
+            # więc szukamy samej nazwy pliku — działa dla obu form zapisu.
+            if os.path.basename(fname) not in indeks_txt:
                 sieroty.append(fname)
 
         if sieroty:
@@ -357,7 +455,8 @@ def audyt() -> tuple:
             for args in (["diff", "--name-only", "HEAD"], ["diff", "--cached", "--name-only"]):
                 try:
                     out = subprocess.run(["git", *args], cwd=ROOT, capture_output=True,
-                                         text=True, timeout=20).stdout
+                                         text=True, timeout=20,
+                                         encoding="utf-8", errors="replace").stdout
                     zmienione |= {l for l in out.splitlines()
                                   if l.startswith(("imperium/", "narzedzia/")) and l.endswith(".py")}
                 except Exception:
@@ -422,6 +521,37 @@ def audyt() -> tuple:
     bledy += w14_bledy
     info += w14_info
 
+    # ── WARSTWA 15: LICZBY WSTRZYKIWANE (Tabularium, Filar 4) ─────────────────
+    w15_bledy, w15_info = _warstwa_15_liczby_wstrzykiwane()
+    bledy += w15_bledy
+    info += w15_info
+
+    return bledy, info
+
+
+def _warstwa_15_liczby_wstrzykiwane():
+    """Każdy blok <!-- LICZBA:x --> musi zgadzać się z żywym kodem.
+
+    Ręcznie wpisana liczba w dokumencie ZAWSZE się rozjedzie — bo rośnie kod, nie
+    dokument. Zmierzone 2026-07-17: trzy dokumenty podawały „neuronów w kodzie" jako
+    47, 27 i 55 przy 87 w rejestrze; każda była prawdziwa w dniu pisania. Ta warstwa
+    pilnuje, że raz wstrzyknięta liczba nie zamarznie ani nie zostanie nadpisana ręcznie.
+    Naprawa jedną komendą: `python narzedzia/tabularium.py liczby --zapisz`.
+    """
+    bledy, info = [], []
+    try:
+        from narzedzia.tabularium import wstrzyknij_liczby
+        zmiany, blad_kluczy = wstrzyknij_liczby(sucho=True)   # sucho: audyt NIGDY nie pisze
+    except Exception as e:  # noqa: BLE001 — brak modułu/rejestru nie może wywrócić audytu
+        info.append(f"⚠️ W15: liczby wstrzykiwane pominięte ({type(e).__name__}: {e})")
+        return bledy, info
+
+    bledy += blad_kluczy
+    if zmiany:
+        bledy.append("[W15] Wstrzyknięte liczby ROZJECHAŁY SIĘ z kodem (napraw: "
+                     "python narzedzia/tabularium.py liczby --zapisz): " + "; ".join(zmiany))
+    else:
+        info.append("Liczby wstrzykiwane (W15): wszystkie zgodne z żywym kodem ✅")
     return bledy, info
 
 
@@ -484,6 +614,9 @@ def _warstwa_13_ruff():
             [sys.executable, "-m", "ruff", "check", "imperium", "tests", "narzedzia", "skrypty",
              "--quiet", "--output-format", "concise"],
             cwd=ROOT, capture_output=True, text=True, timeout=120,
+            # ruff cytuje linię źródła w komunikacie — nasze komentarze są po polsku,
+            # więc bez encoding="utf-8" W13 wywala się dokładnie wtedy, gdy ZNAJDZIE bug.
+            encoding="utf-8", errors="replace",
         )
     except FileNotFoundError:
         info.append("⚠️ W13: ruff niezainstalowany — linter pominięty (pip install ruff)")
@@ -511,6 +644,19 @@ def _warstwa_10_doc_keywords():
     """W10 — słowa kluczowe w dokumentach modułowych (spójność z kodem)."""
     bledy = []
 
+    # 🚨 LICZBA PRAW — POLICZONA z ZASADY_FUNDAMENTALNE, nie zaszyta (naprawa 2026-07-16).
+    # POWÓD: tu stało na sztywno `"21"` z komunikatem „aktualizuj z 19→21" — ktoś podbił ręcznie
+    # 19→21, a gdy praw przybyło do XXV, audyt dalej ŻĄDAŁ „21" i ODRZUCAŁ prawdziwe „25".
+    # Bramka egzekwowała KŁAMSTWO. Ironia: W10 pilnuje Prawa XXI, którego reguła 8 brzmi
+    # „liczby policzone, nie zaokrąglone" — a sama miała liczbę z pamięci. Zaszyta liczba
+    # MUSI się zestarzeć; to kwestia czasu, nie dyscypliny autora.
+    try:
+        with open(os.path.join(ROOT, "ZASADY_FUNDAMENTALNE.md"), encoding="utf-8") as f:
+            _zasady = f.read()
+        _liczba_praw = str(len(set(re.findall(r"PRAWO\s+([IVXL]+)\b", _zasady))))
+    except Exception:  # noqa: BLE001 — brak pliku praw nie może zabić audytu
+        _liczba_praw = None
+
     # Each entry: (file_path, required_keyword, error_message)
     checks = [
         ("docs/KALKULATOR_LEWARA.md", "vol_targeting",
@@ -525,11 +671,19 @@ def _warstwa_10_doc_keywords():
          "GENERAL_LEGATUS.md brak 'mnozniki_neuronow' — HedgeMWU→Legatus integracja nie opisana"),
         ("docs/GENERAL_LEGATUS.md", "HedgeMWU",
          "GENERAL_LEGATUS.md brak 'HedgeMWU' — online learning nie opisane"),
-        ("docs/LEGIONY_ARCHITEKTURA.md", "Hurst",
-         "LEGIONY_ARCHITEKTURA.md brak 'Hurst' — kategoria H nie opisana w legendzie"),
-        ("docs/ARCHITEKTURA_IMPERIUM.md", "21",
-         "ARCHITEKTURA_IMPERIUM.md brak '21' praw — aktualizuj z 19→21"),
+        # Legenda kategorii przeniesiona 2026-07-17: LEGIONY_ARCHITEKTURA miała jej DRUGĄ,
+        # ręczną kopię — identycznie fałszywą (zmyślone E/G, brak C/D/N/Z). Scalona w jedno
+        # źródło u GENERAŁA, bo to on używa KATEGORIA jako klucza w WAGI_REZIMU.
+        # Bramka MUSI wędrować za treścią — inaczej pilnuje pustego miejsca (złapane przez
+        # nią samą przy tym scaleniu; to koszt sprawdzeń zaszytych na sztywno per dokument).
+        ("docs/GENERAL_LEGATUS.md", "Hurst",
+         "GENERAL_LEGATUS.md brak 'Hurst' — kategoria H nie opisana w legendzie kategorii"),
     ]
+    if _liczba_praw:
+        checks.append((
+            "docs/ARCHITEKTURA_IMPERIUM.md", _liczba_praw,
+            f"ARCHITEKTURA_IMPERIUM.md nie podaje aktualnej liczby praw ({_liczba_praw}) — "
+            f"policzone z ZASADY_FUNDAMENTALNE.md. Zaktualizuj nagłówek."))
 
     for fpath, keyword, msg in checks:
         try:

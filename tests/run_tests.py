@@ -26,6 +26,19 @@ for _strumien in (sys.stdout, sys.stderr):
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+# 🛡️ ZAPORA TESTÓW — PRZED odkryciem i importem modułów testowych (import potrafi już
+# zbudować adapter sięgający sieci). Testy Imperium nigdy nie płacą i nie dotykają giełdy.
+# Dowód konieczności: NOTARIUS złapał 2026-07-17 pięć płatnych wywołań DeepSeeka podczas
+# zwykłego biegu tego runnera (`handluj_live` → AdapterNewsLLM → lazy-init z klucza).
+# Pełne uzasadnienie: tests/conftest.py (pytest ładuje go sam; my wołamy jawnie).
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Import conftest SAM zakłada zaporę (jego kod modułowy) — bierzemy stamtąd raport,
+# zamiast wołać zaloz_zapore() drugi raz: drugie wywołanie nie ma już czego odebrać
+# i milczałoby, a cicha zapora łamie Prawo XXIV (Cezar ma WIDZIEĆ, że działa).
+from conftest import _ODEBRANE as _ODEBRANE_KLUCZE  # noqa: E402
+print(f"🛡️ Zapora testów: odebrano klucze [{', '.join(_ODEBRANE_KLUCZE) or 'brak w środowisku'}] "
+      f"— testy nie płacą i nie dotykają giełdy (tests/conftest.py)")
+
 # AUTO-DISCOVERY (Prawo XV): każdy tests/test_*.py jest zbierany automatycznie.
 # Sztywna lista cicho gubiła nowe pliki testów (test_walidacja, 2026-06-10) —
 # nowy moduł testowy "istniał", ale nie był uruchamiany = martwy strażnik.

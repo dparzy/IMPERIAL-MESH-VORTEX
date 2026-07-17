@@ -14,6 +14,42 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-17 | 🗺️ | MAPA_PAMIECI — „v13" było liczbą warstw, a „42 książek" ma dziś 79
+
+**Co (dług gnicia 10 → 9):** weryfikacja mapy pamięci (10× kod właścicieli, 14 plików).
+Trzy twierdzenia fałszywe, wszystkie z tej samej rodziny — **liczba wpisana zamiast liczonej**:
+
+• **Tytuł „Centrum Pamięci W-360 v13"** → kod mówi **v5** (`centrum_pamieci.py`, v5 z 2026-06-26).
+  „13" to liczba WARSTW, nie numer wersji — ktoś pomylił jedno z drugim i tytuł niósł to dalej.
+• **„wiedza z 42 książek"** → realnie **79** książek BIB-* zaindeksowanych (104 źródła łącznie:
+  79 książek + 25 plików encyklopedii, 29 699 fragmentów). Liczba była **ZASZYTA w czterech
+  miejscach kodu** (`kustosz_pamieci.WARSTWY`, `centrum_pamieci` docstring, dwa komunikaty
+  `srodowisko_pamieci`) i powielona w dokumencie. Biblioteka rośnie (BIB-070..274 w planie),
+  więc każda wpisana liczba MUSI się zestarzeć — to ta sama klasa co zaszyta liczba praw w W10.
+• **„W chmurze FTS, lokalnie wektory"** → 🚨 środowisko = **lokal**, a `wektory = 0`.
+  **Lokalnie też ich nie ma** — RAG działa wyłącznie na FTS5/BM25 (keyword), nie semantycznie;
+  `model_embeddings: False`. Dokument sugerował, że to ograniczenie chmury. Sprostowane
+  tabelą pomiaru; alarm zgłasza zresztą sam kod (`_alarmy()`: „LOKALNIE TO STRATA").
+
+**Naprawa u źródła (nie tylko w dokumencie):** nowa funkcja
+`srodowisko_pamieci.ksiazki_w_bazie()` — JEDNO źródło prawdy (Prawo XVI), liczy `COUNT(DISTINCT
+zrodlo) WHERE zrodlo LIKE 'BIB-%'`. Wołają ją: `kustosz.mapa()` (dokłada żywą liczbę do W2),
+`instrukcja_lokal()` i Tabularium (nowy klucz `ksiazki`, W15 → dokument). Stała `WARSTWY` nie
+trzyma już żadnej liczby.
+
+**Self-review złapał MOJĄ regresję:** pierwsza wersja poprawki drukowała „**14** warstw", bo
+liczyła `len(WARSTWY)` — a **W7 (Kustosz) to ORGAN, nie warstwa-dana**. Oryginalne „13" było
+poprawne; moja „poprawka" cicho przekłamałaby architekturę o jeden. Teraz liczone jako
+`[w for w in WARSTWY if w[0] != "W7"]`, z testem pilnującym obu rzeczy (13 warstw + „organ W7"
+w nagłówku) i drugim testem: `WARSTWY["W2"]` nie może zawierać żadnej cyfry.
+
+**Pliki:** `docs/MAPA_PAMIECI.md` · `imperium/biblioteki/srodowisko_pamieci.py` (+`ksiazki_w_bazie`) ·
+`imperium/biblioteki/kustosz_pamieci.py` · `imperium/biblioteki/centrum_pamieci.py` ·
+`narzedzia/tabularium.py` (klucz `ksiazki`) · `tests/test_kustosz_pamieci.py` (+2).
+**Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅ · skan wad czysto ✅ · gnicie 10→9.
+
+---
+
 ## 2026-07-17 | 🤖 | MANUAL_CLAUDE_CODE — koniec sprzeczności o pushu + jeden parser praw
 
 **Co (dług gnicia 11 → 10):** weryfikacja instrukcji obsługi (12× `audyt_spojnosci.py` — plik

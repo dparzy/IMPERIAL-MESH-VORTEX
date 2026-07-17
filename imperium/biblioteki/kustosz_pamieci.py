@@ -181,7 +181,9 @@ def census() -> Dict[str, Any]:
 # (klucz, nazwa, rola, typ CoALA). Kustosz = organ nadrzędny (W7), nie warstwa-dana.
 WARSTWY = [
     ("W1", "pamiec_absolutna", "logi transakcji (PnL/MAE/MFE/rezim)", "epizodyczna"),
-    ("W2", "RAG (bibliotheca)", "wiedza z 42 książek + encyklopedia (FTS)", "semantyczna"),
+    # Rola W2 BEZ liczby książek — biblioteka rośnie, więc liczba w stałej musi się zestarzeć
+    # (zmierzone 2026-07-17: „42" przy 79 realnych). Żywą liczbę dokłada `mapa()` z bazy RAG.
+    ("W2", "RAG (bibliotheca)", "wiedza z książek + encyklopedia (FTS)", "semantyczna"),
     ("W3", "pamiec_sesji", "lekcje z sesji + profil Cezara", "semantyczna"),
     ("W3b", "kronika_czatu", "pełny dialog (re-eksport rosnący)", "epizodyczna"),
     ("W4", "rejestr_wizji", "wizje/decyzje/pomysły/zmiany (scored)", "semantyczna"),
@@ -198,9 +200,24 @@ WARSTWY = [
 
 
 def mapa() -> str:
-    """Jednolity przegląd wszystkich 13 warstw pamięci (organ widzi architekturę)."""
-    linie = ["🗺️ MAPA PAMIĘCI IMPERIUM — 13 warstw pod Kustoszem (W-360 v13):"]
+    """Jednolity przegląd warstw pamięci (organ widzi architekturę).
+
+    Liczba warstw z `len(WARSTWY)`, liczba książek z bazy RAG — obie policzone, nie wpisane
+    (zmierzone 2026-07-17: nagłówek głosił „v13", gdy Centrum jest w v5 — numer wersji wziął
+    się z pomylenia go z liczbą warstw).
+    """
+    try:
+        from imperium.biblioteki.srodowisko_pamieci import ksiazki_w_bazie
+        n_ksiazek = ksiazki_w_bazie()
+    except Exception:  # noqa: BLE001 — brak bazy/modułu nie może wywrócić mapy
+        n_ksiazek = 0
+    # W7 (Kustosz) jest ORGANEM, nie warstwą-daną — liczymy warstwy pod nim, bez niego samego.
+    # `len(WARSTWY)` dałoby 14 i cicho przekłamało architekturę o jeden.
+    n_warstw = len([w for w in WARSTWY if w[0] != "W7"])
+    linie = [f"🗺️ MAPA PAMIĘCI IMPERIUM — {n_warstw} warstw pod Kustoszem (organ W7):"]
     for klucz, nazwa, rola, typ in WARSTWY:
+        if klucz == "W2" and n_ksiazek:
+            rola = f"{rola} — {n_ksiazek} książek zaindeksowanych"
         linie.append(f"   {klucz:4s} {nazwa:24s} [{typ:12s}] {rola}")
     return "\n".join(linie)
 

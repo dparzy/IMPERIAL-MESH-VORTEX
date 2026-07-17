@@ -2,10 +2,13 @@
 kategoria: DISCIPLINA
 typ: zywy
 wlasciciel: imperium/biblioteki/centrum_pamieci.py, imperium/biblioteki/dziennik_niesmiertelny.py, imperium/biblioteki/kronika_czatu.py, imperium/cesarz/deepseek_glos.py, narzedzia/ab_pnl_wazenie_ic.py, narzedzia/ab_wazenie_ic.py, narzedzia/arena_mcp.py, narzedzia/arena_zasil.py, narzedzia/backtest_dashboard.py, narzedzia/hipoteza_b.py, narzedzia/pobierz_4h_binance.py, narzedzia/pobierz_makro.py, narzedzia/pobierz_nowe_pary.py, narzedzia/przygotuj_biblioteke.py, narzedzia/rag/mcp_server.py, narzedzia/raport_ic.py, narzedzia/raport_waznosci.py, narzedzia/scoreboard_neuronow.py, narzedzia/status.py, narzedzia/walidacja_kalibrator.py, narzedzia/walk_forward_ic.py, narzedzia/wykres_backtestu.py, skrypty/start.py, skrypty/start_lokal.py
-stan_na: 2026-07-12
+stan_na: 2026-07-17
 powod_istnienia: "Jedyna „jedna kartka' z KOMPLETEM realnych komend lokalnych ułożonych w kolejności użycia — i jedyne miejsce z sekcjami 2c (oszczędzanie tokenów: świeży start zamiast wznawiania), "
 ---
 # 🧾 ŚCIĄGA LOKAL — wszystko krok po kroku (dla nowicjusza)
+
+> ✅ **Zweryfikowane wobec kodu 2026-07-17:** wszystkie **24 komendy** z tej ściągi istnieją (moduły `python -m ...` importowalne, skrypty `.py` na dysku). Dług gnicia spłacony **sprawdzeniem**, nie przepisaniem — treść nie wymagała zmiany.
+> Rola tego dokumentu: **ściąga dla wtajemniczonego**. Pełny przewodnik krok po kroku dla nowicjusza → [`START_LOKAL.md`](START_LOKAL.md) (świadomy podział, NIE scalamy).
 
 > Jedna kartka ze WSZYSTKIMI komendami do obsługi Imperium na laptopie.
 > Kopiuj-wklej do PowerShella. Kolejność sekcji = kolejność, w jakiej ich zwykle używasz.

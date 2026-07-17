@@ -49,6 +49,27 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
 
+## 2026-07-17 | 🖥️ | Dług gnicia: START_LOKAL + SCIAGA_LOKAL — spłata przez SPRAWDZENIE
+
+**Oba dokumenty broniły się w CAŁOŚCI — treść nie wymagała ani jednej zmiany.**
+
+| Dokument | Co zmierzono | Werdykt |
+|---|---|---|
+| `START_LOKAL` (21 zmian, 14× `audyt_spojnosci.py`) | 6 komend · „13 warstw pamięci" · luka „W1 ma 0 logów" | wszystkie ✅ — **13 warstw potwierdzone** (W1–W13 + W3b w `kustosz_pamieci.py`), **luka W1 NADAL AKTUALNA** (brak plików logów) → zostaje jako żywe zadanie |
+| `SCIAGA_LOKAL` (5 zmian) | **24 komendy** | **24/24 istnieją** (moduły importowalne, skrypty na dysku) |
+
+**🔑 LEKCJA O NATURZE BRAMKI T2 (ważna na przyszłość):** T2 mówi **„kod się ruszył"**, a NIE
+**„dokument kłamie"**. `audyt_spojnosci.py` zmienił się 14×, ale START_LOKAL twierdzi o nim
+tylko „uruchom, ma być exit 0" — twierdzenie odporne na te zmiany. **Spłatą długu jest
+WERYFIKACJA, a poprawną odpowiedzią bywa „nadal prawda".** Bumpnięcie `stan_na` bez sprawdzenia
+byłoby kłamstwem (Prawo I); bumpnięcie PO sprawdzeniu jest dokładnie tym, co `stan_na` znaczy:
+**data, w której twierdzenia zostały ostatnio zweryfikowane.**
+
+**Dług gnicia: 17 → 15.** W tej wachcie spłacone: GENERAL_LEGATUS, LEGIONY_ARCHITEKTURA,
+KATALOG_NEURONOW, MATRYCA_KORELACJI, START_LOKAL, SCIAGA_LOKAL (**6 dokumentów**).
+
+**Pliki:** docs/START_LOKAL.md, docs/SCIAGA_LOKAL.md, docs/INDEKS_IMPERIUM.md.
+
 ## 2026-07-17 | 🧭 | Dług gnicia: KATALOG_NEURONOW + MATRYCA_KORELACJI (katalog ślepy na pół roju)
 
 **KATALOG_NEURONOW (40 zmian `rejestr.py`) — spłacony.** Weryfikacja mechaniczna 307 ID:

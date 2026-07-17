@@ -2,14 +2,21 @@
 kategoria: DISCIPLINA
 typ: zywy
 wlasciciel: imperium/biblioteki/kustosz_pamieci.py, narzedzia/audyt_spojnosci.py, narzedzia/auto_lekcja.py, narzedzia/rag/indeksuj.py, skrypty/start.py, skrypty/start_lokal.py, tests/run_tests.py
-stan_na: 2026-06-30
+stan_na: 2026-07-17
 dublet_rozstrzygniety: "docs/SCIAGA_LOKAL.md — świadomy podział ról, NIE scalać (werdykt 2026-07-17): ten dokument to PEŁNY PRZEWODNIK dla nowicjusza (prowadzi za rękę, tłumaczy po co), SCIAGA to ściąga z 24 komendami dla kogoś, kto już wie. Scalenie zabiłoby przewodnik, na którym stoi ZPO (Cezar jest nowicjuszem — to jedyny powód istnienia tej zasady). Unikaty tego pliku: tabela chmura vs lokal, aktualizuj.ps1, Filesystem MCP, luka W1."
 powod_istnienia: "Jedyne miejsce z tabelą porównawczą **chmura vs lokal** (co lokal DODAJE: wektory semantyczne, pełny dysk przez MCP, trwałe logi W1, DeepSeek) oraz jedyne, które promuje `aktualizu"
 ---
 # 🖥️ START LOKALNY — pełny przewodnik (dla Cezara, nowicjusza)
 
-> **Stan na:** 2026-06-30 · Jak uruchomić Imperium na własnym komputerze z PEŁNĄ pamięcią
+> **Stan na:** 2026-07-17 · Jak uruchomić Imperium na własnym komputerze z PEŁNĄ pamięcią
 > (13 warstw) + dodatki, których chmura nie ma. Krok po kroku, bez żargonu.
+
+> ✅ **Zweryfikowane wobec kodu 2026-07-17** (dług gnicia spłacony sprawdzeniem, nie przepisaniem):
+> wszystkie 6 komend istnieje · „13 warstw pamięci" — **prawda** (W1–W13 + W3b w `kustosz_pamieci.py`) ·
+> luka „W1 ma 0 logów" — **nadal aktualna** (brak plików logów `pamiec_absolutna`), więc zostaje
+> jako żywe zadanie. Bramka T2 zgłaszała ten dokument, bo `audyt_spojnosci.py` zmienił się 14× —
+> ale dokument twierdzi o nim tylko „uruchom, ma być exit 0", co te zmiany przetrwało.
+> **T2 mówi „kod się ruszył", nie „dokument kłamie" — spłatą jest sprawdzenie.**
 
 ## 🎯 Po co lokal, skoro jest chmura?
 

@@ -2,12 +2,11 @@
 kategoria: DISCIPLINA
 typ: zywy
 wlasciciel: narzedzia/audyt_spojnosci.py, tests/run_tests.py
-stan_na: 2026-07-12
-powod_istnienia: "Jedyny dokument opisujący, jak Cezar instaluje i obsługuje samo narzędzie Claude Code (Node/npm, logowanie Pro, hooki, MCP, skróty, plan mode) — czyli warstwę „jak rozmawiać z Vitr"
+stan_na: 2026-07-17
+powod_istnienia: "Jedyny dokument opisujący, jak Cezar instaluje i obsługuje samo narzędzie Claude Code (Node/npm, logowanie Pro, hooki, MCP, skróty, plan mode) — czyli warstwę „jak rozmawiać z Vitruviuszem"
 ---
 # 🤖 MANUAL CLAUDE CODE — Instalacja i konfiguracja z Imperium
 
-> **Stan na:** 2026-07-12
 > Dla Cezara-nowicjusza — każdy krok dokładnie.
 > Zakładamy: masz już Python 3.11.9, git i TA-Lib na laptopie.
 > **Uwaga (2026-07-12):** Cezar pracuje teraz głównie przez **aplikację desktopową
@@ -144,8 +143,9 @@ claude
 ```
 
 Claude Code uruchomi się i **automatycznie przeczyta** pliki konfiguracyjne Imperium:
-- `CLAUDE.md` — instrukcje stałe dla Claude (24 Prawa Imperium, tryb autonomiczny)
+- `CLAUDE.md` — instrukcje stałe dla Claude (<!-- LICZBA:prawa -->25<!-- /LICZBA --> Praw Imperium, tryb autonomiczny)
 - `.claude/settings.json` — uprawnienia i hooki
+- `.mcp.json` — serwery MCP Imperium (patrz sekcja 5)
 
 Po chwili zobaczysz prompt i komunikat że sesja startuje. Hook `SessionStart`
 automatycznie:
@@ -160,7 +160,8 @@ W prompcie Claude Code wpisz:
 sprawdź testy
 ```
 
-Claude uruchomi `python tests/run_tests.py` i pokaże wyniki (1532 testów ✅).
+Claude uruchomi `python tests/run_tests.py` i pokaże wyniki (dziś ~2500 testów ✅ — dokładną
+liczbę zawsze podaje sam runner; nie wierz liczbie z dokumentu, wierz wynikowi biegu).
 
 ---
 
@@ -174,26 +175,38 @@ Za każdym razem gdy otworzysz Claude Code w folderze Imperium, automatycznie ur
 .claude/hooks/session-start.sh
 ```
 
-Ten skrypt:
-- Instaluje brakujące zależności pip
-- Sprawdza ile neuronów, zwiadowców, elitarnych modułów
-- Uruchamia ruff (linter)
-- Sprawdza spójność dokumentów z kodem
+Ten skrypt (kolejność realna, zweryfikowana 2026-07-17):
+1. **SYNC z GitHub** — `git pull --ff-only`, ale **tylko gdy drzewo czyste i pull jest
+   fast-forward**. Brudne drzewo lub rozjazd → nic nie rusza, tylko podpowiada (zero konfliktów,
+   zero utraty pracy). Powód: laptop i chmura to dwa osobne checkouty — bez tego Claude czyta
+   stare dokumenty i „nic nie wie" o świeżej pracy.
+2. Instaluje brakujące zależności pip (`requirements.txt`)
+3. **KROK 0 — audyt spójności** (Prawo XXI): neurony, zwiadowcy, elity, kategorie, profile stylu,
+   ruff (W13), MAPA_KLUCZY (W14), liczby wstrzykiwane (W15), daty dokumentów (W6b)
+4. **Centrum Pamięci** — wstrzykuje ciągłość między sesjami (Dziennik, profil Cezara, kronika)
+5. Skan wad kodu (informacyjnie — Księga Wad)
 
-**Nie musisz nic robić** — to dzieje się samo.
+**Nie musisz nic robić** — to dzieje się samo. Jest też hook **SessionEnd**
+(`.claude/hooks/session-end.sh`) — commituje pamięć sesji **lokalnie** (nie pushuje).
 
 ### 4.2. Uprawnienia automatyczne (bez klikania „Zezwól")
 
-W `.claude/settings.json` masz preautoryzowane komendy które Claude może wykonywać
-bez przerywania i pytania Cię:
+W `.claude/settings.json` masz preautoryzowane komendy, które Claude może wykonywać
+bez przerywania i pytania Cię (lista realna, `permissions.allow`):
 
 ```
-git add, git commit, git push, git status, git diff, git log
-python tests/run_tests.py
-python narzedzia/audyt_spojnosci.py
+Bash(git add:*)     Bash(git commit:*)   Bash(git push:*)
+Bash(git status:*)  Bash(git diff:*)     Bash(git log:*)
+Bash(python tests/run_tests.py)
+Bash(python narzedzia/audyt_spojnosci.py)  Bash(python narzedzia/audyt_spojnosci.py:*)
 ```
 
 Dla wszystkiego innego Claude zapyta Cię o zgodę zanim wykona.
+
+> **ℹ️ `git push` jest na liście, ale Claude i tak NIE pushuje.** Zakaz pushowania to ROZKAZ
+> STAŁY z `CLAUDE.md` (zaostrzenie 2026-07-11), nie blokada techniczna — `permissions.deny`
+> jest puste. **Taki układ jest świadomy i ustalony** (Cezar, 2026-07-17): push wykonuje Cezar
+> RĘCZNIE ze swojego terminala, Claude szykuje commity i melduje „gotowe, można push".
 
 ### 4.3. Tryb autonomiczny (Prawo XVIII + TRYB AUTONOMICZNY)
 
@@ -213,7 +226,10 @@ Cały kod Imperium jest rozwijany na gałęzi:
 claude/sleepy-fermi-dsdE4
 ```
 
-Claude Code zawsze pushuje tam. Do `main` pushuje tylko Cezar ręcznie (przez PR).
+**Claude nie pushuje nigdzie** — ani na tę gałąź, ani do `main`. Commituje lokalnie i melduje
+gotowość; **Ty wypychasz ręcznie** (`git push origin claude/sleepy-fermi-dsdE4`), a do `main`
+mergujesz sam przez PR. *(Do 2026-07-17 stało tu „Claude Code zawsze pushuje tam" — zdanie
+sprzeczne z sekcjami 1 i 4.3 tego samego dokumentu oraz z rozkazem z 2026-07-11.)*
 
 ---
 
@@ -222,9 +238,26 @@ Claude Code zawsze pushuje tam. Do `main` pushuje tylko Cezar ręcznie (przez PR
 **MCP** (Model Context Protocol) to sposób na podłączenie zewnętrznych narzędzi
 do Claude Code — np. GitHub, bazy danych, pliki Excel, przeglądarki.
 
-### 5.1. MCP GitHub (już skonfigurowane)
+### 5.0. Co Imperium ma NAPRAWDĘ (zweryfikowane 2026-07-17)
 
-W tej sesji online mamy MCP GitHub skonfigurowane po stronie serwera.
+Plik `.mcp.json` w repo deklaruje **dwa własne serwery** — i tylko one startują z projektem:
+
+| Serwer | Plik | Do czego |
+|---|---|---|
+| `biblioteka` | `narzedzia/rag/mcp_server.py` | przeszukiwanie Bibliotheca-RAG (książki, ~29,7k fragmentów) |
+| `arena` | `narzedzia/arena_mcp.py` | migawka roju + baza wyników `arena_wyniki.db` |
+
+> **ZASADA MCP — soczewka, nie mózg:** rój UCZY SIĘ w kodzie; MCP tylko pozwala Claude
+> *oglądać* arenę i bibliotekę. Nowy MCP wchodzi **tylko gdy dokłada NOWĄ informację**
+> (Prawo XVI) — dlatego odrzuciliśmy oficjalny „Memory" MCP (mamy własne 13 warstw pamięci).
+> **Zmiany w `.mcp.json` to zawsze decyzja Cezara.**
+
+Sekcje 5.1–5.2 poniżej to **opcje do rozważenia, NIE nasza konfiguracja** — GitHub i Filesystem
+nie są dziś wpięte.
+
+### 5.1. MCP GitHub (opcja — nie jest wpięta)
+
+Gdy pracujesz przez chmurę, MCP GitHub bywa skonfigurowane po stronie serwera.
 Na **lokalnym laptopie** możesz go dodać samodzielnie.
 
 Stwórz lub edytuj plik `~/.claude/settings.json`
@@ -249,7 +282,7 @@ Token GitHub utwórz na: https://github.com/settings/tokens
 
 Po restarcie Claude Code będzie mógł czytać PR, komentarze, CI — bezpośrednio.
 
-### 5.2. MCP Filesystem (dodatkowy dostęp do plików)
+### 5.2. MCP Filesystem (opcja — nie jest wpięta)
 
 Jeśli chcesz żeby Claude miał dostęp do konkretnych folderów poza Imperium
 (np. folder z danymi CSV, folder Downloads):
@@ -367,7 +400,8 @@ zrób backtest strategii TREND_RIDER na BTC ostatnie 30 dni
 | `/clear` | Wyczyść historię rozmowy (nowa sesja) |
 | `/help` | Pomoc — lista komend |
 | `/status` | Stan połączenia i modelu |
-| `/model` | Zmień model (opus-4-8, sonnet-4-6 itd.) |
+| `/model` | Zmień model — aktualne (2026-07-17): **Opus 4.8** (`claude-opus-4-8`, domyślny dla Imperium), **Sonnet 5** (`claude-sonnet-5`), **Haiku 4.5** (`claude-haiku-4-5`). *Wcześniej stało tu „sonnet-4-6" — to poprzednia generacja.* Dobór modelu do trudności: patrz tabela w `CLAUDE.md` § ZASADA OSZCZĘDNOŚCI TOKENÓW |
+| `/fast` | Tryb szybki (Opus 4.8/4.7) — ten sam model, szybsze wyjście; NIE schodzi na mniejszy model |
 
 ### 7.4. Jak zatrzymać Claude gdy za dużo robi
 

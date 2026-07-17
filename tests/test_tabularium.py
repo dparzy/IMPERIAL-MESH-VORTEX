@@ -283,7 +283,7 @@ def test_liczby_z_kodu_sa_dodatnie():
     from narzedzia.tabularium import wartosci_z_kodu
     w = wartosci_z_kodu()
     for klucz in ("neurony", "zwiadowcy", "strategie", "elity", "pola_logu",
-                  "styl_scalp", "styl_swing", "styl_invest"):
+                  "styl_scalp", "styl_swing", "styl_invest", "prawa"):
         assert w[klucz] > 0, f"{klucz} = {w[klucz]} — rejestr nie odpowiada?"
     assert w["neurony_aktywne"] <= w["neurony"], "aktywnych nie może być więcej niż wszystkich"
 
@@ -300,6 +300,33 @@ def test_liczby_profile_stylu_sledza_rejestr():
     for styl, klucz in (("SCALP", "styl_scalp"), ("SWING", "styl_swing"), ("INVEST", "styl_invest")):
         assert w[klucz] == len(neurony_dla_trybu(styl))
         assert w[klucz] <= w["neurony"], f"{styl}: profil nie może być większy niż rój"
+
+
+def test_prawa_jeden_parser_dla_calego_imperium():
+    """Prawo XVI: jeden format = jeden parser. Audyt (W10) MUSI liczyć praw tak samo.
+
+    Historia: bramka W10 miała liczbę praw ZASZYTĄ i żądała „21", gdy praw było 25 —
+    egzekwowała kłamstwo. Potem regex żył w dwóch plikach; dwa parsery tego samego
+    formatu rozjadą się co do znaku, a bramka pilnująca prawdy nie może zgadywać.
+    """
+    from narzedzia.tabularium import policz_prawa, wartosci_z_kodu
+    n = policz_prawa()
+    assert n > 0, "ZASADY_FUNDAMENTALNE.md nie oddaje żadnego prawa — parser padł?"
+    assert wartosci_z_kodu()["prawa"] == n
+
+    # Audyt musi używać TEJ SAMEJ funkcji, nie własnej kopii regexu.
+    import narzedzia.audyt_spojnosci as audyt
+    zrodlo_audytu = open(audyt.__file__, encoding="utf-8").read()
+    assert "policz_prawa" in zrodlo_audytu, \
+        "audyt zgubił import policz_prawa — wrócił do własnego regexu (Prawo XVI)"
+
+    # Audyt owija ten import w try/except → cykl importów CICHO wyłączyłby bramkę W10
+    # (klasa „bramka cichnie na głucho" z Księgi Wad). Tabularium nie może importować audytu.
+    import narzedzia.tabularium as tab
+    zrodlo_tabularium = open(tab.__file__, encoding="utf-8").read()
+    assert "audyt_spojnosci" not in zrodlo_tabularium, \
+        ("tabularium importuje audyt → cykl → `except` w audycie połknie ImportError "
+         "i bramka praw (W10) zamilknie bez śladu")
 
 
 def test_liczby_pola_logu_sledza_dataclass():

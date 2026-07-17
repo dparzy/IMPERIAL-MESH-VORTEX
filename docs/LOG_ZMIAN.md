@@ -14,6 +14,36 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-17 | 🤖 | MANUAL_CLAUDE_CODE — koniec sprzeczności o pushu + jeden parser praw
+
+**Co (dług gnicia 11 → 10):** weryfikacja instrukcji obsługi (12× `audyt_spojnosci.py` — plik
+zmieniany też w tej wachcie). Dokument **przeczył sam sobie**: sekcje 1 i 4.3 mówiły „push robisz
+TY", a sekcja 4.4 „Claude Code zawsze pushuje tam" — zdanie sprzeczne z rozkazem z 2026-07-11.
+Sprostowane; przy okazji dopisano, skąd bierze się granica (`permissions.deny` jest puste, więc
+zakaz trzyma CLAUDE.md, nie maszyna — **układ świadomy i ustalony**, decyzja Cezara 2026-07-17).
+
+**Pozostałe rozjazdy (zmierzone):** „24 Prawa" → **25** (teraz wstrzykiwane) · „1532 testów" →
+2505 (zastąpione odesłaniem do runnera — liczba testów rośnie co sesję, więc nie wpisujemy jej
+do dokumentu) · sekcja MCP opisywała GitHub/Filesystem jako naszą konfigurację, a `.mcp.json`
+deklaruje **`biblioteka` + `arena`** (dopisana sekcja 5.0 z prawdą + ZASADA MCP „soczewka, nie
+mózg"; 5.1–5.2 oznaczone jako opcje NIE wpięte) · hook startowy robi więcej, niż opisano (SYNC
+`git pull --ff-only`, Centrum Pamięci, skan wad) — kolejność zweryfikowana i rozpisana; dopisany
+hook **SessionEnd** (commit pamięci lokalnie) · `/model` podawał `sonnet-4-6` — poprawione na
+aktualne **Opus 4.8 / Sonnet 5 / Haiku 4.5** (+ `/fast`).
+
+**W15 — nowa liczba wstrzykiwana `prawa` + JEDEN parser (Prawo XVI):** liczba praw żyła jako
+regex w `audyt_spojnosci.py` (W10). Zamiast dopisać drugi taki sam regex do Tabularium — audyt
+**woła teraz `tabularium.policz_prawa()`**. Powód: dwa parsery tego samego formatu rozjadą się
+co do znaku, a bramka pilnująca prawdy nie może zgadywać (klasa z Księgi Wad: „jeden format =
+jeden parser"). Historia tej bramki jest ostrzeżeniem: miała kiedyś liczbę praw ZASZYTĄ i żądała
+„21", gdy praw było 25 — egzekwowała kłamstwo. Test pilnuje, że audyt nie wróci do własnej kopii.
+
+**Pliki:** `docs/MANUAL_CLAUDE_CODE.md` · `narzedzia/tabularium.py` (`policz_prawa` + klucz) ·
+`narzedzia/audyt_spojnosci.py` (import zamiast kopii regexu) · `tests/test_tabularium.py` (+1).
+**Bramka:** testy 2505/2505 ✅ · audyt exit 0 ✅ · gnicie 11→10.
+
+---
+
 ## 2026-07-17 | 🔬 | ANALIZA_NEURONY zweryfikowana — propozycja „odłożona" żyje jako C-01
 
 **Co (dług gnicia 12 → 11):** weryfikacja dokumentu MENSURA (17× `rejestr.py` od `stan_na`).

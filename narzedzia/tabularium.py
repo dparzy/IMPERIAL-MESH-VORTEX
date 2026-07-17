@@ -94,8 +94,20 @@ LICZBA_WZORZEC = re.compile(
 )
 
 
+def policz_prawa():
+    """Liczba Praw Imperium — liczona z ZASADY_FUNDAMENTALNE.md (źródło prawdy LEX).
+
+    JEDEN parser dla całego Imperium (Prawo XVI: jeden format = jeden parser; dwa
+    rozjadą się co do znaku). Audyt (W10) woła tę funkcję zamiast trzymać własny regex.
+    Historia: bramka W10 miała kiedyś liczbę praw ZASZYTĄ i żądała „21", gdy praw było 25
+    — egzekwowała kłamstwo. Zaszyta liczba MUSI się zestarzeć.
+    """
+    with open(os.path.join(ROOT, "ZASADY_FUNDAMENTALNE.md"), encoding="utf-8") as f:
+        return len(set(re.findall(r"PRAWO\s+([IVXL]+)\b", f.read())))
+
+
 def wartosci_z_kodu():
-    """Żywe liczby Imperium prosto z rejestrów. Jedyne źródło prawdy (Prawo XIX)."""
+    """Żywe liczby Imperium prosto ze źródeł prawdy: rejestry (kod) + ZASADY (LEX)."""
     import dataclasses
 
     from imperium.biblioteki.pamiec_absolutna import ImperiumLog
@@ -117,6 +129,7 @@ def wartosci_z_kodu():
         "styl_scalp": len(neurony_dla_trybu("SCALP")),
         "styl_swing": len(neurony_dla_trybu("SWING")),
         "styl_invest": len(neurony_dla_trybu("INVEST")),
+        "prawa": policz_prawa(),
     }
 
 

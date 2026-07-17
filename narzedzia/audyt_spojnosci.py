@@ -651,10 +651,12 @@ def _warstwa_10_doc_keywords():
     # Bramka egzekwowała KŁAMSTWO. Ironia: W10 pilnuje Prawa XXI, którego reguła 8 brzmi
     # „liczby policzone, nie zaokrąglone" — a sama miała liczbę z pamięci. Zaszyta liczba
     # MUSI się zestarzeć; to kwestia czasu, nie dyscypliny autora.
+    # JEDEN parser praw dla całego Imperium (Prawo XVI) — `tabularium.policz_prawa()`.
+    # Wcześniej ten sam regex żył w dwóch miejscach; dwa parsery tego samego formatu
+    # rozjeżdżają się co do znaku, a bramka pilnująca prawdy nie może sama zgadywać.
     try:
-        with open(os.path.join(ROOT, "ZASADY_FUNDAMENTALNE.md"), encoding="utf-8") as f:
-            _zasady = f.read()
-        _liczba_praw = str(len(set(re.findall(r"PRAWO\s+([IVXL]+)\b", _zasady))))
+        from narzedzia.tabularium import policz_prawa
+        _liczba_praw = str(policz_prawa())
     except Exception:  # noqa: BLE001 — brak pliku praw nie może zabić audytu
         _liczba_praw = None
 

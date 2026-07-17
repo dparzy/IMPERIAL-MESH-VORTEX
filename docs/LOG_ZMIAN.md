@@ -48,6 +48,38 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
 
+## 2026-07-17 | 🔢 | Filar 4 — LICZBY WSTRZYKIWANE + Warstwa 15 audytu (koniec klasy kłamstw)
+
+**Co:** `tabularium.py liczby [--zapisz]` — liczby o systemie żyją między znacznikami
+`<!-- LICZBA:neurony -->87<!-- /LICZBA -->` i są przepisywane **z żywych rejestrów**
+(neurony, neurony_aktywne, zwiadowcy, strategie, elity). **Warstwa 15 audytu** pilnuje, że
+żaden wstrzyknięty blok nie zamarzł ani nie został nadpisany ręcznie — audyt **nigdy nie
+zapisuje** (suchy bieg), naprawa jedną komendą.
+
+**Dlaczego (zmierzone, nie z raportu zwiadowcy — Prawo I):** trzy dokumenty podawały
+„neuronów w kodzie" jako **47** (`GENERAL_LEGATUS:38`), **27** (`OBSERWATORZY:166`) i **55**
+(`IGRZYSKA:29`) — przy **87** w rejestrze. **Każda z nich była prawdziwa w dniu pisania.**
+To nie jest lenistwo autorów — to nieuchronność: rośnie kod, a nie dokument. Dlatego NIE
+poprawiliśmy liczb (za miesiąc skłamałyby znowu), tylko **odebraliśmy dokumentom prawo do
+ich wpisywania**.
+
+**Zweryfikowane w obie strony (Reguła Test-Granic):** wstrzyknięte kłamstwo `999` → W15
+czerwona, exit 1 → `liczby --zapisz` → 87 → audyt zielony. Test negatywny w `test_tabularium.py`:
+literówka w kluczu (`neuronyy`) MUSI krzyczeć — cicha akceptacja dałaby martwy znacznik,
+który nigdy się nie odświeży i zamrozi liczbę na zawsze (czyli dokładnie to, co Filar 4 zabija).
+
+**Bug złapany po drodze:** `tabularium.py` nie dokładał ROOT do `sys.path` — `liczby` nie
+mogło zaimportować rejestru (`ModuleNotFoundError: imperium`). Niewidoczne dotąd, bo żadna
+wcześniejsza komenda nie sięgała do kodu Imperium.
+
+**Pliki:** narzedzia/tabularium.py (+wartosci_z_kodu, +wstrzyknij_liczby, +sys.path),
+narzedzia/audyt_spojnosci.py (+W15, +docstring), CLAUDE.md (+Warstwa 15 w Prawie XXI),
+tests/test_tabularium.py (26 testów), docs/GENERAL_LEGATUS.md, docs/OBSERWATORZY.md,
+docs/IGRZYSKA_IMPERIUM.md (znaczniki zamiast liczb z palca).
+
+**Powód:** klasa kłamstw „licznik zamrożony w prozie" zamknięta mechanicznie. Następne:
+migawki → docs/migawki/ (z naprawą rag/indeksuj.py glob→rglob), reszta kandydatów do scalenia.
+
 ## 2026-07-17 | 🏛️ | P3 — pierwsze scalenie + POMIAR OBALIŁ ZWIADOWCĘ (177 pozycji uratowanych)
 
 **🚨 NAJWAŻNIEJSZE — kandydat ≠ prawda (ZASADA ZWIADOWCY WIEDZY, Prawo I):** zwiadowca (Sonnet)

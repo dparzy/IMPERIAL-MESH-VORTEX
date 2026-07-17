@@ -21,6 +21,7 @@ Sprawdza 14 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 12 — żywotność głosu: każdy aktywny neuron głosuje (≠martwy) w ≥1 scenariuszu (Prawo XV)
   Warstwa 13 — ruff (linter):   bugi i martwy kod (F811 duplikaty, F821 undefined, F841/F401 martwe)
   Warstwa 14 — wszystkie docs:  MAPA_KLUCZY zawiera każdy klucz z kodu (skan wszystkich .md)
+  Warstwa 15 — liczby:          bloki <!-- LICZBA:x --> zgodne z żywym kodem (Tabularium, Filar 4)
 
 Exit code:
   0 = pełna spójność (Imperium gotowe)
@@ -512,6 +513,37 @@ def audyt() -> tuple:
     bledy += w14_bledy
     info += w14_info
 
+    # ── WARSTWA 15: LICZBY WSTRZYKIWANE (Tabularium, Filar 4) ─────────────────
+    w15_bledy, w15_info = _warstwa_15_liczby_wstrzykiwane()
+    bledy += w15_bledy
+    info += w15_info
+
+    return bledy, info
+
+
+def _warstwa_15_liczby_wstrzykiwane():
+    """Każdy blok <!-- LICZBA:x --> musi zgadzać się z żywym kodem.
+
+    Ręcznie wpisana liczba w dokumencie ZAWSZE się rozjedzie — bo rośnie kod, nie
+    dokument. Zmierzone 2026-07-17: trzy dokumenty podawały „neuronów w kodzie" jako
+    47, 27 i 55 przy 87 w rejestrze; każda była prawdziwa w dniu pisania. Ta warstwa
+    pilnuje, że raz wstrzyknięta liczba nie zamarznie ani nie zostanie nadpisana ręcznie.
+    Naprawa jedną komendą: `python narzedzia/tabularium.py liczby --zapisz`.
+    """
+    bledy, info = [], []
+    try:
+        from narzedzia.tabularium import wstrzyknij_liczby
+        zmiany, blad_kluczy = wstrzyknij_liczby(sucho=True)   # sucho: audyt NIGDY nie pisze
+    except Exception as e:  # noqa: BLE001 — brak modułu/rejestru nie może wywrócić audytu
+        info.append(f"⚠️ W15: liczby wstrzykiwane pominięte ({type(e).__name__}: {e})")
+        return bledy, info
+
+    bledy += blad_kluczy
+    if zmiany:
+        bledy.append("[W15] Wstrzyknięte liczby ROZJECHAŁY SIĘ z kodem (napraw: "
+                     "python narzedzia/tabularium.py liczby --zapisz): " + "; ".join(zmiany))
+    else:
+        info.append("Liczby wstrzykiwane (W15): wszystkie zgodne z żywym kodem ✅")
     return bledy, info
 
 

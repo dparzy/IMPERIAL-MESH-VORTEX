@@ -46,6 +46,7 @@ if _s is not None and hasattr(_s, "reconfigure"):
         pass
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)   # bez tego `liczby` nie zaimportuje rejestru (jak audyt_spojnosci)
 
 # ── SŁOWNIK ZAMKNIĘTY (rzymski, dobrany do funkcji — ZASADA NOMENKLATURY) ──────
 # Zamknięty, bo otwarty słownik zamienia się w śmietnik: każdy nowy dokument
@@ -74,6 +75,65 @@ POZA_REJESTREM = ("archiwum", "bibliotheca_ulpia", "wrzutnia", ".claude", "dane"
 
 ZNACZNIK_START = "<!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->"
 ZNACZNIK_KONIEC = "<!-- TABULARIUM:koniec -->"
+
+# ── LICZBY WSTRZYKIWANE (Filar 4) ────────────────────────────────────────────
+# Ręcznie wpisana liczba w dokumencie ZAWSZE się rozjedzie — bo rośnie kod, a nie
+# dokument. Zmierzone 2026-07-17: trzy dokumenty podawały „neuronów w kodzie" jako
+# 47, 27 i 55, przy 87 w rejestrze. Każda z nich była prawdziwa w dniu pisania.
+# Lekarstwo nie polega na poprawieniu liczb (za miesiąc znów skłamią), tylko na
+# ODEBRANIU dokumentom prawa do ich wpisywania: liczba żyje między znacznikami
+# i jest przepisywana z żywego kodu.
+#     Użycie w dokumencie:  <!-- LICZBA:neurony -->87<!-- /LICZBA -->
+LICZBA_WZORZEC = re.compile(r"<!--\s*LICZBA:(\w+)\s*-->(.*?)<!--\s*/LICZBA\s*-->", re.DOTALL)
+
+
+def wartosci_z_kodu():
+    """Żywe liczby Imperium prosto z rejestrów. Jedyne źródło prawdy (Prawo XIX)."""
+    from imperium.legiony.rejestr import (
+        raport_elity, wszystkie_neurony, wszyscy_zwiadowcy,
+    )
+    from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
+    neurony = wszystkie_neurony()
+    return {
+        "neurony": len(neurony),
+        "neurony_aktywne": len([n for n in neurony if getattr(n, "DOSTEPNY", True)]),
+        "zwiadowcy": len(wszyscy_zwiadowcy()),
+        "strategie": len(wszystkie_strategie()),
+        "elity": raport_elity()["lacznie_elite"],
+    }
+
+
+def wstrzyknij_liczby(sucho=False):
+    """Przepisuje każdy blok <!-- LICZBA:x --> z żywego kodu. → (zmiany, bledy)."""
+    wartosci = wartosci_z_kodu()
+    zmiany, bledy = [], []
+    for sciezka, _ in zbierz_dokumenty():
+        pelna = os.path.join(ROOT, sciezka)
+        with open(pelna, encoding="utf-8") as f:
+            tresc = f.read()
+        if "<!-- LICZBA:" not in tresc:
+            continue
+
+        lokalne = []
+
+        def podmien(m, _sciezka=sciezka, _lokalne=lokalne):
+            klucz, stara = m.group(1), m.group(2).strip()
+            if klucz not in wartosci:
+                bledy.append(f"[T4] {_sciezka}: nieznana liczba `{klucz}` "
+                             f"(dostępne: {', '.join(sorted(wartosci))})")
+                return m.group(0)
+            nowa = str(wartosci[klucz])
+            if stara != nowa:
+                _lokalne.append(f"{klucz}: {stara or '—'} → {nowa}")
+            return f"<!-- LICZBA:{klucz} -->{nowa}<!-- /LICZBA -->"
+
+        nowa_tresc = LICZBA_WZORZEC.sub(podmien, tresc)
+        if lokalne:
+            zmiany.append(f"{sciezka}: {'; '.join(lokalne)}")
+            if not sucho:
+                with open(pelna, "w", encoding="utf-8") as f:
+                    f.write(nowa_tresc)
+    return zmiany, bledy
 
 
 def _pasek(i, n, opis):
@@ -336,12 +396,28 @@ def zapisz_katalog(sciezka_indeksu="docs/INDEKS_IMPERIUM.md"):
 
 def main():
     parser = argparse.ArgumentParser(description="Tabularium — rejestr dokumentów Imperium")
-    parser.add_argument("komenda", choices=["sprawdz", "katalog", "dublety"])
+    parser.add_argument("komenda", choices=["sprawdz", "katalog", "dublety", "liczby"])
     parser.add_argument("--twardy", action="store_true",
                         help="exit 1 przy błędach (domyślnie miękki — ZASADA WPIĘCIA)")
     parser.add_argument("--zapisz", action="store_true",
                         help="katalog: wstaw do INDEKS_IMPERIUM zamiast drukować")
     args = parser.parse_args()
+
+    if args.komenda == "liczby":
+        zmiany, bledy = wstrzyknij_liczby(sucho=not args.zapisz)
+        print("🏛️ TABULARIUM — liczby wstrzykiwane z żywego kodu")
+        print("   • Prawda z rejestrów: "
+              + " | ".join(f"{k} {v}" for k, v in sorted(wartosci_z_kodu().items())))
+        for z in zmiany:
+            print(f"   {'✏️' if args.zapisz else '⚠️ ROZJAZD'} {z}")
+        for b in bledy:
+            print(f"   🚨 {b}")
+        if not zmiany and not bledy:
+            print("   ✅ Wszystkie wstrzyknięte liczby zgadzają się z kodem")
+        if bledy:
+            return 1
+        # Suchy bieg z rozjazdem = dokument kłamie → sygnał dla bramki audytu.
+        return 1 if (zmiany and not args.zapisz) else 0
 
     if args.komenda == "katalog":
         if args.zapisz:

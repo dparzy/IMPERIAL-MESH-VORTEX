@@ -35,7 +35,7 @@ powod_istnienia: "Jedyny dokument opisujący rolę koordynatora między 4 Legion
 
 **Kiedy:** Brak aktywnej pozycji, szukamy punktu wejścia
 **Co robi:**
-- Aktywuje WSZYSTKIE skatalogowane neurony (299 w katalogu, 47 w kodzie)
+- Aktywuje WSZYSTKIE skatalogowane neurony (299 w katalogu, <!-- LICZBA:neurony -->87<!-- /LICZBA --> w kodzie)
 - Skanuje całą watchlistę (BTC, ETH, SOL, BNB, top alts)
 - Dla każdego aktywa liczy `wynik_skaner` = suma ważona sygnałów
 - Wybiera 3 najlepszych kandydatów → przekazuje do Senatu

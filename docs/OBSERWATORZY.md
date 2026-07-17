@@ -163,7 +163,7 @@ dlug: "🚨 opisuje nieistniejący kod: akwedukty/multi_exchange.py"
       ↓
 [HERMES — Data Auditor] ← hash, kompletność, VPIN, event check
       ↓
-[LEGIONY NEURONÓW]     ← neurony dają sygnały (299 katalog / 27 kod)
+[LEGIONY NEURONÓW]     ← neurony dają sygnały (299 katalog / <!-- LICZBA:neurony -->87<!-- /LICZBA --> kod)
       ↓
 [LEGATUS]              ← agregacja ważona reżimem
       ↓

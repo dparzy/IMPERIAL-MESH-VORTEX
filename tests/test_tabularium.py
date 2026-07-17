@@ -235,6 +235,80 @@ def test_bramka3_zastapiony_nie_liczy_sie_jako_dublet():
     assert not any("DUBLET" in o for o in ostrzezenia), ostrzezenia
 
 
+# ── LICZBY WSTRZYKIWANE (Filar 4) ───────────────────────────────────────────
+
+def _tymczasowy_dokument(tresc):
+    """Dokument w drzewie repo (zbierz_dokumenty chodzi po ROOT) — sprzątany przez test."""
+    with tempfile.NamedTemporaryFile("w", suffix=".md", delete=False, encoding="utf-8",
+                                     dir=os.path.join(ROOT, "docs")) as f:
+        f.write(tresc)
+        return f.name
+
+
+def test_liczby_z_kodu_sa_dodatnie():
+    """Liczby idą z ŻYWEGO rejestru — zero to znak, że import cicho padł."""
+    from narzedzia.tabularium import wartosci_z_kodu
+    w = wartosci_z_kodu()
+    for klucz in ("neurony", "zwiadowcy", "strategie", "elity"):
+        assert w[klucz] > 0, f"{klucz} = {w[klucz]} — rejestr nie odpowiada?"
+    assert w["neurony_aktywne"] <= w["neurony"], "aktywnych nie może być więcej niż wszystkich"
+
+
+def test_liczby_lapie_rozjazd_i_naprawia():
+    """SEDNO Filara 4: kłamstwo wykryte, potem naprawione JEDNĄ komendą."""
+    from narzedzia.tabularium import wartosci_z_kodu, wstrzyknij_liczby
+    prawda = wartosci_z_kodu()["neurony"]
+    sciezka = _tymczasowy_dokument(
+        "---\nkategoria: TABULA\ntyp: zywy\nwlasciciel: —\nstan_na: 2026-07-17\n"
+        "powod_istnienia: test\n---\n\nMamy <!-- LICZBA:neurony -->999<!-- /LICZBA --> neuronów.\n")
+    try:
+        zmiany, bledy = wstrzyknij_liczby(sucho=True)
+        assert any("999" in z and str(prawda) in z for z in zmiany), zmiany
+        assert not bledy, bledy
+        with open(sciezka, encoding="utf-8") as f:
+            assert "999" in f.read(), "SUCHY bieg NIE MOŻE tknąć pliku"
+
+        wstrzyknij_liczby(sucho=False)
+        with open(sciezka, encoding="utf-8") as f:
+            tresc = f.read()
+        assert f"<!-- LICZBA:neurony -->{prawda}<!-- /LICZBA -->" in tresc, tresc
+        assert "999" not in tresc
+    finally:
+        os.unlink(sciezka)
+
+
+def test_liczby_nieznany_klucz_to_blad():
+    """GRANICA: literówka w kluczu (`neuronyy`) musi krzyczeć, a nie cicho nic nie robić.
+
+    Cicha akceptacja = dokument z martwym znacznikiem, który NIGDY się nie odświeży
+    i zamrozi liczbę na zawsze — czyli dokładnie to, co Filar 4 ma zabić.
+    """
+    from narzedzia.tabularium import wstrzyknij_liczby
+    sciezka = _tymczasowy_dokument(
+        "---\nkategoria: TABULA\ntyp: zywy\nwlasciciel: —\nstan_na: 2026-07-17\n"
+        "powod_istnienia: test\n---\n\n<!-- LICZBA:neuronyy -->5<!-- /LICZBA -->\n")
+    try:
+        _, bledy = wstrzyknij_liczby(sucho=True)
+        assert any("neuronyy" in b for b in bledy), bledy
+    finally:
+        os.unlink(sciezka)
+
+
+def test_liczby_zgodne_nie_generuja_szumu():
+    """NEGATYWNY: poprawna liczba NIE może być zgłaszana jako zmiana."""
+    from narzedzia.tabularium import wartosci_z_kodu, wstrzyknij_liczby
+    prawda = wartosci_z_kodu()["zwiadowcy"]
+    sciezka = _tymczasowy_dokument(
+        "---\nkategoria: TABULA\ntyp: zywy\nwlasciciel: —\nstan_na: 2026-07-17\n"
+        f"powod_istnienia: test\n---\n\n<!-- LICZBA:zwiadowcy -->{prawda}<!-- /LICZBA -->\n")
+    try:
+        zmiany, bledy = wstrzyknij_liczby(sucho=True)
+        assert not any(os.path.basename(sciezka) in z for z in zmiany), zmiany
+        assert not bledy, bledy
+    finally:
+        os.unlink(sciezka)
+
+
 # ── KATALOG GENEROWANY ──────────────────────────────────────────────────────
 
 def test_katalog_ma_znaczniki_i_kategorie():

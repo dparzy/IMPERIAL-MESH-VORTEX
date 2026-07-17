@@ -322,9 +322,15 @@ def test_prawa_jeden_parser_dla_calego_imperium():
 
     # Audyt owija ten import w try/except → cykl importów CICHO wyłączyłby bramkę W10
     # (klasa „bramka cichnie na głucho" z Księgi Wad). Tabularium nie może importować audytu.
+    # Szukamy realnego IMPORTU, nie samego słowa: pierwsza wersja tego testu oblała się na
+    # własnym KOMENTARZU wspominającym audyt — ta sama klasa, przez którą odrzuciliśmy
+    # kandydata `xpath(...)[0]` (wzorzec trafiał we własne komentarze o bugu).
+    import re as _re
+
     import narzedzia.tabularium as tab
     zrodlo_tabularium = open(tab.__file__, encoding="utf-8").read()
-    assert "audyt_spojnosci" not in zrodlo_tabularium, \
+    import_audytu = _re.search(r"^\s*(?:from|import)\s+\S*audyt_spojnosci", zrodlo_tabularium, _re.M)
+    assert not import_audytu, \
         ("tabularium importuje audyt → cykl → `except` w audycie połknie ImportError "
          "i bramka praw (W10) zamilknie bez śladu")
 

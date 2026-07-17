@@ -48,6 +48,35 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
 
+## 2026-07-17 | 📦 | P4 — migawki → docs/migawki/ + naprawa DWÓCH cichych pułapek
+
+**Co:** 10 datowanych migawek (ACTA) przeniesionych `git mv` do `docs/migawki/`.
+`docs/` z 63 płaskich plików → **53 żywe + 10 migawek w podkatalogu**. Historia plików
+zachowana (git mv, nie kopiuj-usuń).
+
+**🚨 DWIE CICHE PUŁAPKI NAPRAWIONE W TYM SAMYM RUCHU (ZASADA PEŁNEJ SYMBIOZY):**
+1. **`narzedzia/rag/indeksuj.py`** — `DOCS.glob("*.md")` (płaski!) → `rglob`. Bez tego
+   przeniesienie **wypchnęłoby 10 dokumentów z korpusu RAG** — i **nikt by nie zauważył**,
+   bo RAG dalej odpowiadałby, tylko bez nich. Utrata potencjału (Prawo XV) bez jednego
+   czerwonego światła. **Dowód po naprawie:** korpus docs = 63 pliki, w tym 10 migawek.
+2. **Audyt W7 (sieroty)** — `os.listdir(docs_dir)` (płaski!) → `os.walk`. Bez tego
+   dokument w podkatalogu **znikałby z bramki sierot dokładnie w chwili porządkowania**.
+
+To była realna pułapka wykryta POMIAREM na starcie sesji, nie teoria: gdyby przyjąć
+pierwotny plan „wszystkie docs do podkatalogów", **cały korpus dokumentacji wypadłby
+z RAG i z bramki**, a audyt dalej świeciłby na zielono.
+
+**Dlaczego tylko migawki (decyzja Cezara, poparta pomiarem):** każda ma 1–3 żywe odwołania
+i 0–1 w kronice. Żywe źródła prawdy zostają płasko: mają 8–19 żywych odwołań **+ 12–63
+w kronice sesji**, której Prawo I zabrania przepisać — przeniesienie unieważniłoby historię.
+
+**Pliki:** 10× git mv docs/*_2026-*.md → docs/migawki/, narzedzia/rag/indeksuj.py (rglob),
+narzedzia/audyt_spojnosci.py (W7 rekurencyjnie), docs/INDEKS_IMPERIUM.md (katalog
+przegenerowany — sam wychwycił nowe ścieżki, zero ręcznej pracy).
+
+**Powód:** struktura docs/ uporządkowana bez jednego martwego linku. Zostało: reszta
+kandydatów do scalenia (każdy czytany w całości), twarde bramki po spłacie długu gnicia.
+
 ## 2026-07-17 | 🔢 | Filar 4 — LICZBY WSTRZYKIWANE + Warstwa 15 audytu (koniec klasy kłamstw)
 
 **Co:** `tabularium.py liczby [--zapisz]` — liczby o systemie żyją między znacznikami

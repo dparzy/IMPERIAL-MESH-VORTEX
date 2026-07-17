@@ -377,16 +377,24 @@ def audyt() -> tuple:
     try:
         indeks_txt = _czytaj("docs/INDEKS_IMPERIUM.md")
         docs_dir = os.path.join(ROOT, "docs")
-        docs_files = {f for f in os.listdir(docs_dir)
-                      if f.endswith(".md") and f not in INDEKS_WHITELIST}
+
+        # REKURENCYJNIE (naprawa 2026-07-17): `os.listdir` widział TYLKO płaski docs/.
+        # Przeniesienie dokumentu do podkatalogu (docs/migawki/) po cichu wypychało go
+        # z bramki sierot — dokument znikał z kontroli dokładnie w chwili porządkowania.
+        # Ta sama pułapka siedziała w rag/indeksuj.py (glob → rglob).
+        docs_files = set()
+        for katalog, podkatalogi, pliki in os.walk(docs_dir):
+            podkatalogi[:] = [d for d in podkatalogi if d != "archiwum"]  # archiwum ma swoje zasady
+            for f in pliki:
+                if f.endswith(".md") and f not in INDEKS_WHITELIST:
+                    rel = os.path.relpath(os.path.join(katalog, f), docs_dir)
+                    docs_files.add(rel.replace("\\", "/"))
 
         sieroty = []
         for fname in sorted(docs_files):
-            # Plik w docs/archiwum/ — pomijamy (archiwum ma swoje zasady)
-            if fname.startswith("archiwum"):
-                continue
-            # Sprawdź czy nazwa pliku pojawia się w INDEKS
-            if fname not in indeks_txt:
+            # W INDEKS katalog generowany wypisuje pełną ścieżkę (docs/migawki/X.md),
+            # więc szukamy samej nazwy pliku — działa dla obu form zapisu.
+            if os.path.basename(fname) not in indeks_txt:
                 sieroty.append(fname)
 
         if sieroty:

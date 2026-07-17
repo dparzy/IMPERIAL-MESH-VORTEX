@@ -14,6 +14,26 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 💾 | PAMIEC_SESJI — sekcja „auto-aktualizuj" utknęła na 06-22, na LICZBA
+
+**Co (dług gnicia):** dokument z mapą podpięć + ~200 lekcjami. Lekcje i mapy = zapis DATOWANY
+(prawda swojego czasu, nie odświeżam — Prawo I). Sekcja **STAN BIEŻĄCY**, oznaczona „auto-
+aktualizuj każdą sesję", w praktyce zamarzła: „1720/1720 testów (2026-06-22)", „81 neuronów
+(aktywne 75)" — przy realnych 2507 testach i 87 neuronach (81 aktywnych). Ironia: sekcja
+kazała się aktualizować, a nie miała mechanizmu.
+
+**Naprawa u źródła:** STAN BIEŻĄCY → liczby WSTRZYKIWANE (neurony/aktywne/zwiadowcy/elity =
+bloki W15); testy → odesłanie do runnera (nie hardkodujemy); usunięty martwy „Ostatni commit:
+7a0dbf8". „42 książek" w mapie MCP → `<!-- LICZBA:ksiazki -->` (79). Lekcje nietknięte.
+
+**Przy okazji:** domknięta pułapka README z poprzedniego commita — README ma DWIE daty
+(frontmatter `stan_na:` czyta Tabularium, treść `**Stan na:**` czyta audyt W6); bumpnąłem
+tylko treść, frontmatter został 07-15 → Tabularium wciąż gniło. Frontmatter poprawiony na 07-18.
+
+**Pliki:** `docs/PAMIEC_SESJI.md` · `README.md` (frontmatter). **Bramka:** audyt exit 0 ✅.
+
+---
+
 ## 2026-07-18 | 🎯 | TRYBY_IMPERIUM — lista „czego brakuje" gdzie 6/6 braków już powstało
 
 **Co (dług gnicia):** weryfikacja propozycji trybów (5× kod). Dwie warstwy rozdzielone:

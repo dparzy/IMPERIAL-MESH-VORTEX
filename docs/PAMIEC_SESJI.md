@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
-stan_na: 2026-06-30
+stan_na: 2026-07-18
 powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360)"
 ---
 # PAMIĘĆ SESJI — W-360
@@ -11,7 +11,10 @@ powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość mi
 > Aktualizuj PO każdej sesji. Wczytywana przez SessionStart hook.
 > Indeksowana w RAG jako korpus `pamiec` (plik .md → `bibliotheca_ulpia/dane/`).
 
-## Ostatnia aktualizacja: 2026-06-30
+> **⚠️ Weryfikacja 2026-07-18.** Sekcje **map podpięć** (MCP/feedy/egzekucja) i **lekcje** to
+> zapis DATOWANY — prawda swojego czasu, nie odświeżana (Prawo I). Sekcja **STAN BIEŻĄCY** na
+> dole była ręczna i utknęła („1720 testów, 81 neuronów, 2026-06-22") — przeniesiona na liczby
+> WSTRZYKIWANE (W15), więc już nie zamarznie.
 
 ---
 
@@ -23,7 +26,7 @@ powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość mi
 |----|--------|--------|-----------|---------|
 | A1 | **GitHub MCP** | ✅ działa (cloud) | — | PR, issues, CI |
 | A2 | **Memory MCP** 💎 | ✅ natywny (imperium/biblioteki/pamiec_sesji.py + hook) | — | Trwała pamięć między sesjami (ROZWIĄZUJE W-360) |
-| A3 | **Bibliotheca-RAG MCP** 💎 | ✅ zbudowany (W-360 RAG v2) | — | Szukaj w 42 książkach + encyklopedii + docs (indeks do przebudowy po BIB-033..042) |
+| A3 | **Bibliotheca-RAG MCP** 💎 | ✅ zbudowany (W-360 RAG v2) | — | Szukaj w <!-- LICZBA:ksiazki -->79<!-- /LICZBA --> książkach + encyklopedii + docs (tryb FTS; wektory niezbudowane — patrz MAPA_PAMIECI) |
 | A4 | **Filesystem MCP** 🔵 | ⏳ opcjonalny | niski | Dostęp do plików lokalnych bez Read tool |
 | A5 | **Fetch/Web MCP** 🔵 | ⏳ opcjonalny | niski | WebFetch przez MCP |
 | A6 | **Sequential-Thinking MCP** 💎 | ⏳ nie skonfigurowany | średni | Ustrukturyzowane rozumowanie krok po kroku |
@@ -648,11 +651,10 @@ Na dziennych barach BTC typowa szerokość BB to 3-8%, próg 4% był praktycznie
 ### 2026-07-04 — POTRZEBA CEZARA: wizualizacja live (krytyczne)
 Cezar czuje się 'jak dziecko we mgle' — brak podglądu wykresów i wizualizacji live jak zachowuje się Imperium. PRIORYTET: dashboardy/wykresy (equity, cena+wejścia/wyjścia, IC ranking, głosy neuronów na żywo). Każde narzędzie ma mieć wyjście WIZUALNE, nie tylko tekst.
 
-## 🔄 STAN BIEŻĄCY (auto-aktualizuj każdą sesję)
+## 🔄 STAN BIEŻĄCY (liczby wstrzykiwane z kodu — W15, nie zamarzają)
 
-- **Testy:** 1720/1720 ✅ (2026-06-22)
-- **Neurony:** 81 (aktywne 75, wyciszone 6) | **Zwiadowcy:** 15 (aktywni 13)
-- **Elitarne (Prawo XX):** 18
+- **Testy:** `python tests/run_tests.py` (nie hardkodujemy — liczba rośnie co sesję)
+- **Neurony:** <!-- LICZBA:neurony -->87<!-- /LICZBA --> (aktywne <!-- LICZBA:neurony_aktywne -->81<!-- /LICZBA -->, wyciszone 6) | **Zwiadowcy:** <!-- LICZBA:zwiadowcy -->15<!-- /LICZBA -->
+- **Elitarne (Prawo XX):** <!-- LICZBA:elity -->18<!-- /LICZBA -->
 - **Branch:** `claude/sleepy-fermi-dsdE4`
-- **Ostatni commit:** 7a0dbf8 — W-360 Memory MCP natywny (pamiec_sesji.py)
-- **Pamięć v2 (2026-06-22):** CRUD lekcji + profil Cezara (USER.md-style) + Kronika Czatu (100 sesji destylatu w repo)
+- **Pamięć:** 13 warstw + organ W7 (mapa: `docs/MAPA_PAMIECI.md`); Centrum Pamięci v5

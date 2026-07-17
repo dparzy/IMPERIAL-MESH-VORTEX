@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/legiony/rejestr.py
-stan_na: 2026-07-15
+stan_na: 2026-07-18
 powod_istnienia: "Wizytówka Imperium — podaje liczby wprost z kodu (neurony/testy/prawa), więc musi nadążać za rejestrem"
 ---
 # 🏛️ IMPERIAL MESH VORTEX

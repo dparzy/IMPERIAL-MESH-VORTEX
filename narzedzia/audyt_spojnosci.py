@@ -319,7 +319,7 @@ def audyt() -> tuple:
             elif linia.strip() and biezaca:
                 daty_plikow.setdefault(linia.strip(), biezaca)   # pierwszy = najnowszy
 
-        przeterminowane = []
+        przeterminowane, przekazane_tabularium = [], 0
         for sciezka_rel, data_commitu in sorted(daty_plikow.items()):
             nazwa = os.path.basename(sciezka_rel)
             if nazwa in POMIJANE_ZAWSZE:
@@ -331,6 +331,27 @@ def audyt() -> tuple:
                 continue
             with open(pelna, encoding="utf-8", errors="replace") as f:
                 tresc = f.read()
+
+            # ── PRZEKAZANIE PAŁECZKI DO TABULARIUM (2026-07-17) ──────────────────────
+            # Dokument z nagłówkiem Tabularium podlega bramce T2, która pyta OSTRZEJ:
+            # „czy nadążasz za KODEM, który opisujesz" — zamiast W6b: „czy nadążasz za
+            # SAMYM SOBĄ". W6b stała na założeniu „plik ruszony ⇒ treść się zmieniła";
+            # nagłówki metadanych to założenie obaliły (commit dodający nagłówek nie zmienia
+            # ANI JEDNEGO twierdzenia dokumentu). Bez tego wyjątku W6b żądała stemplowania
+            # dzisiejszą datą 16 dokumentów, których nikt dziś nie zweryfikował — czyli
+            # żądała KŁAMSTWA (Prawo I), a fałszywy alarm uczy ignorować bramkę.
+            # Dwie bramki mierzące tę samą datę sprzecznymi definicjami = redundancja,
+            # która szkodzi (Prawo XVI). Sprawdź dokumenty z nagłówkiem:
+            #     python narzedzia/tabularium.py sprawdz
+            # Parser Tabularium, NIE własny (Prawo XVI: jeden format = jeden parser).
+            # Pierwsza wersja szukała `stan_na` w oknie 600 znaków — MAPA_PAMIECI (11
+            # właścicieli) ma je na pozycji 609, SCIAGA_LOKAL na 778. Magiczne okno zamiast
+            # granic bloku = bramka omijana przez dokumenty, które akurat są dłuższe.
+            from narzedzia.tabularium import czytaj_naglowek
+            if czytaj_naglowek(pelna).get("stan_na"):
+                przekazane_tabularium += 1
+                continue
+
             m = re.search(r"Stan na:\s*\**\s*(\d{4}-\d{2}-\d{2})", tresc)
             if not m:
                 continue      # brak pola „Stan na:" NIE jest błędem — nie każdy dokument je ma
@@ -344,7 +365,10 @@ def audyt() -> tuple:
                          + "; ".join(przeterminowane))
         else:
             info.append(f"Daty żywych dokumentów (W6b): {len(daty_plikow)} sprawdzonych, "
-                        "wszystkie 'Stan na:' nadążają za własną zmianą ✅")
+                        "wszystkie 'Stan na:' nadążają za własną zmianą ✅"
+                        + (f" | {przekazane_tabularium} dokumentów przekazanych bramce T2 "
+                           f"Tabularium (ostrzejsze pytanie: nadąża za KODEM, nie za sobą)"
+                           if przekazane_tabularium else ""))
     except Exception as e:  # noqa: BLE001 — brak gita nie może zabić audytu
         info.append(f"Daty żywych dokumentów (W6b): pominięte ({type(e).__name__}: {e})")
 

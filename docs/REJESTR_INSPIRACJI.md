@@ -1,3 +1,10 @@
+---
+kategoria: TABULA
+typ: zywy
+wlasciciel: —
+stan_na: 2026-07-16
+powod_istnienia: "Jedno źródło prawdy o zewnętrznych inspiracjach AI/ML (ZPO: pełna nazwa + link + status weryfikacji)"
+---
 # 🔭 REJESTR INSPIRACJI — Zewnętrzne projekty AI/ML (Faza 2+)
 
 > **Po co ten dokument:** Jedno miejsce na WSZYSTKIE zewnętrzne projekty badawcze i repozytoria,

@@ -1,3 +1,10 @@
+---
+kategoria: CONSILIUM
+typ: zywy
+wlasciciel: imperium/legiony/rejestr.py
+stan_na: 2026-06-01
+powod_istnienia: "Katalog 299 zmapowanych mikro-neuronów jako roadmapa (87 zbudowanych) — zamiar, nie stan kodu; stan mówi MANIFEST"
+---
 # 🧬 KATALOG MIKRO-NEURONÓW — Rój Imperium (299)
 
 > **Źródło:** Pełny skan bazy wskaźników krypto (v1.0–3.0) + przegląd rynku 2026-06-01

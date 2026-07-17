@@ -1,3 +1,10 @@
+---
+kategoria: MENSURA
+typ: zywy
+wlasciciel: —
+stan_na: 2026-06-02
+powod_istnienia: "Punkt odniesienia: analiza zewnętrznego roju 79 agentów (DNSS) — dowód, że wizja jest osiągalna, i poprzeczka do przebicia"
+---
 # 🧬 WZORZEC DNSS — Czego uczymy się od roju 79 agentów
 
 > **Źródło:** Wyciąg z archiwum (`archiwum/IMV_v05-07_oryginal.md`, raport "Shinsō").

@@ -75,6 +75,17 @@ WZORCE_STARTOWE = [
 # (obok /code-review). „Wszystko ma być łapane" (Prawo XV) dwiema warstwami: regex łapie
 # formę, checklista łapie znaczenie.
 CHECKLIST_STARTOWA = [
+    {"kat": "parsowanie",
+     "opis": "Blok o ZMIENNEJ długości parsowany po STAŁYM oknie znaków/linii zamiast po granicach",
+     "lekcja": "Realny przypadek (2026-07-17): bramka W6b szukała `stan_na` w oknie `tresc[:600]` "
+               "nagłówka dokumentu. Dokumenty z wieloma właścicielami mają je na pozycji 609 i 778 — "
+               "więc CICHO omijały bramkę: im dłuższy (bogatszy) nagłówek, tym pewniej dokument "
+               "wymykał się kontroli. Klasa jest podstępna, bo testy na typowym pliku przechodzą, "
+               "a wymykają się właśnie przypadki NAJBOGATSZE, czyli najważniejsze. ZAWSZE parsuj po "
+               "granicach bloku (separator `---`, domknięcie nawiasu) i UŻYJ ISTNIEJĄCEGO parsera "
+               "formatu zamiast pisać drugi (Prawo XVI: jeden format = jeden parser; dwa parsery "
+               "rozjadą się co do znaku).",
+     "zrodlo": "self-review Tabularium — W6b omijana przez dokumenty z długim nagłówkiem (2026-07-17)"},
     {"kat": "kierunek",
      "opis": "Odwrócenie kierunku (flip znakiem) bez propagacji do WSZYSTKICH konsumentów",
      "lekcja": "Gdy odwracasz kierunek (np. ujemny IC → LONG↔SHORT), KAŻDY konsument w dół (dobór "

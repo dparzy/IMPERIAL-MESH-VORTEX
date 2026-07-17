@@ -1,3 +1,10 @@
+---
+kategoria: LEX
+typ: zywy
+wlasciciel: —
+stan_na: 2026-07-14
+powod_istnienia: "Rozkazy stałe czytane na starcie KAŻDEJ sesji — konstytucja operacyjna Claude'a w Imperium"
+---
 # IMPERIUM — Instrukcje stałe dla Claude
 
 > Ten plik jest czytany na początku każdej sesji. Zasady tu zapisane obowiązują ZAWSZE.

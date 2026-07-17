@@ -1,3 +1,10 @@
+---
+kategoria: LEX
+typ: zywy
+wlasciciel: —
+stan_na: 2026-06-02
+powod_istnienia: "ROZKAZ STAŁY: Zasada Pełnego Opisu (ZPO) — szablon i wymóg opisu zrozumiałego bez wiedzy eksperckiej"
+---
 # 📐 WZORZEC PEŁNEGO OPISU — Zasada Pełnego Opisu (ZPO)
 
 > **Status:** ROZKAZ STAŁY (Cezar zatwierdził 2026-06-02)

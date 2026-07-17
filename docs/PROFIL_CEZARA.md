@@ -1,3 +1,10 @@
+---
+kategoria: TABULA
+typ: zywy
+wlasciciel: —
+stan_na: 2026-07-13
+powod_istnienia: "Trwały model Cezara (preferencje, decyzje stałe) + źródło prawdy Imion Imperium — wstrzykiwany na starcie"
+---
 # PROFIL CEZARA — model użytkownika (W-360, odpowiednik USER.md Hermesa)
 
 > **Cel:** trwały model osoby, z którą pracuję — preferencje, styl, decyzje stałe.

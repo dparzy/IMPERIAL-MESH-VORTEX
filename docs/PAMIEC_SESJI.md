@@ -1,3 +1,10 @@
+---
+kategoria: TABULA
+typ: zywy
+wlasciciel: imperium/biblioteki/pamiec_sesji.py
+stan_na: 2026-06-30
+powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360)"
+---
 # PAMIĘĆ SESJI — W-360
 
 > **Cel:** trwała pamięć między sesjami — mapa podpięć, lekcje, priorytety.

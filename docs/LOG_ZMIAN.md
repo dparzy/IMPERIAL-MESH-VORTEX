@@ -1,3 +1,10 @@
+---
+kategoria: ACTA
+typ: acta
+wlasciciel: —
+stan_na: 2026-07-17
+powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
+---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
 
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
@@ -40,6 +47,36 @@ narzedzia/audyt_spojnosci.py (W6b/W8/W13), narzedzia/skan_wad_kodu.py, imperium/
 **Powód:** P0 porządku domknięte. Następny krok: nagłówki do 64 dokumentów (`stan_na` = data
 faktycznej weryfikacji, NIGDY „dziś" — inaczej kłamstwo), katalog generowany, potem lista
 scaleń/archiwum do zgody Cezara. Bramki Tabularium: MIĘKKIE do spłaty długu (ZASADA WPIĘCIA).
+
+## 2026-07-17 | 🏛️ | P2 — katalog GENEROWANY + W6b przekazuje pałeczkę bramce T2
+
+**Co:** (1) **71/71 dokumentów zadeklarowanych** (rozkład: FORMA 14 · ACTA 12 · CONSILIUM 12 ·
+TABULA 11 · DISCIPLINA 10 · MENSURA 6 · LEX 6) — żaden dokument Imperium nie jest już bezpański,
+w tym 4 spoza `docs/`, których NIE WIDZIAŁA żadna bramka (`imperium/README.md`,
+`imperium/INSTRUKCJA_URUCHOMIENIA.md`, `narzedzia/rag/SETUP_LOKALNY.md`, `skrypty/README.md`).
+(2) Ręczna „MAPA DOKUMENTÓW" w INDEKS (**17 054 znaki prozy**, w tym kłamstwo „299 neuronów,
+72 w kodzie") **zastąpiona katalogiem GENEROWANYM** z nagłówków między znacznikami.
+
+**W6b → T2 (przekazanie pałeczki, 49 dokumentów):** wstrzyknięcie nagłówków obaliło założenie,
+na którym stała W6b — *„plik ruszony ⇒ treść się zmieniła"*. Commit dodający metadane nie zmienia
+ANI JEDNEGO twierdzenia dokumentu, więc W6b zażądała ostemplowania dzisiejszą datą **16 dokumentów,
+których nikt dziś nie zweryfikował — czyli zażądała KŁAMSTWA** (Prawo I). Fałszywy alarm uczy
+ignorować bramkę, a dwie bramki mierzące tę samą datę sprzecznymi definicjami to redundancja,
+która szkodzi (Prawo XVI). Rozstrzygnięcie: dokument z nagłówkiem podlega **T2**, która pyta
+OSTRZEJ — „czy nadążasz za KODEM, który opisujesz" zamiast „czy nadążasz za samym sobą".
+
+**Wada złapana i zapisana (Księga Wad — klasa `parsowanie`, checklista):** pierwsza wersja
+przekazania szukała `stan_na` w oknie `tresc[:600]` — MAPA_PAMIECI (11 właścicieli) ma je na
+pozycji **609**, SCIAGA_LOKAL na **778**, więc CICHO omijały bramkę. Podstępne, bo wymykają się
+dokumenty NAJBOGATSZE, czyli najważniejsze. Naprawa u źródła: audyt używa **parsera Tabularium**,
+nie własnego (jeden format = jeden parser; dwa rozjadą się co do znaku).
+
+**Pliki:** docs/INDEKS_IMPERIUM.md (katalog generowany), 20× dokumenty (nagłówki),
+narzedzia/audyt_spojnosci.py (W6b→T2), imperium/biblioteki/ksiega_wad_kodu.py (+klasa parsowanie).
+
+**Powód:** rejestr kompletny. Następne: egzekucja kłamstw liczbowych (5 sprzecznych liczb neuronów:
+87 prawda vs 72/47/27/55/62), lista scaleń/archiwum do zgody Cezara, migawki → docs/migawki/
+(z naprawą rag/indeksuj.py glob→rglob — inaczej wypadną z korpusu RAG).
 
 ## 2026-07-17 | 🏛️ | P1 — nagłówki Tabularium w 51 dokumentach: dług POLICZONY, nie zgadnięty
 

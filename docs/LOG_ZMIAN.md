@@ -14,6 +14,40 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 🧠 | PLAN_DEEPSEEK — plan zrealizowany INNĄ drogą niż zakładał
+
+**Co (dług gnicia 7 → 6):** weryfikacja planu DeepSeeka (5× kod). Werdykt: **zostaje CONSILIUM
+żywy, NIE ACTA** — adapter `GlosImperium` żyje i ma 4 realnych konsumentów, ale realizacja
+poszła zupełnie inną drogą niż plan, a to jest właśnie treść warta zapisu.
+
+**🔴 Rozjazd właścicieli:** nagłówek wskazywał `titan_mind`, `meta_kora`, `wszechoko` jako
+odbiorców DeepSeeka. **Żaden z nich go nie używa** (0 trafień). Poprawieni na realnych
+konsumentów: `deepseek_glos` (adapter) · `news_llm` (Oczy/sentyment) · `notarius` (pary dla
+TIRO) · `bibliotekarz` (zwiad Hyginusa).
+
+**Plan vs rzeczywistość (zmierzone):**
+• ✅ Adapter `GlosImperium.zapytaj()` + `test_polaczenia()` — istnieje.
+• ✅ Sentyment newsów — realny, ale przez `news_llm.py`, nie `wszechoko.py`.
+• 🔴 Debata Senatu Populares/Optimates przez LLM — NIE. `meta_kora` poszła drogą agentów ML
+  (TrendAgent/SentimentAgent/MicrostructureAgent → MetaJudge/SuperJudge). Wzorzec LLM-debaty
+  żyje TYLKO w `archiwum/kingdom_pixel_p1/meta_kora_debate.py`.
+• 🔴 Decyzja LLM Cesarza — NIE. `titan_mind` to Strategy Orchestrator, nie używa DeepSeeka.
+• ➕ Konsumenci, których plan NIE przewidział: **NOTARIUS** (zbiera pary prompt→odpowiedź dla
+  treningu lokalnego LLM — dziś najważniejszy), Bibliotekarz/Hyginus (zwiad), auto_lekcja.
+
+**Wniosek (Prawo I):** DeepSeek trafił jako narzędzie WIEDZY i TRENINGU, nie mózg decyzyjny.
+Ścieżka wejść pozostała deterministyczna (Brama + neurony + Rada) — zgodne z kierunkiem.
+
+**Model:** dokument podawał `deepseek-chat` — wycofany 2026-07-24. Realnie `deepseek-v4-flash`
+(domyślny) / `deepseek-v4-pro`. base_url bez zmian.
+
+**Dublet rozstrzygnięty:** notarius w PLAN_DEEPSEEK (konsument GlosImperium) vs PLAN_TIRO
+(element pipeline treningu) — świadomy podział ról, werdykt w nagłówku.
+
+**Pliki:** `docs/PLAN_DEEPSEEK.md`. **Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅ · gnicie 7→6.
+
+---
+
 ## 2026-07-17 | 🔮 | DORADCY_CARA — trzecie API-widmo + Fulmen tylko połowicznie ortogonalny
 
 **Co (dług gnicia 8 → 7):** weryfikacja Rady Pięciu (5× kod doradców).

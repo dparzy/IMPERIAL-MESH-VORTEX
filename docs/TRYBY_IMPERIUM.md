@@ -2,12 +2,20 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: imperium/koloseum/namiestnik.py, narzedzia/kalibracja_1h.py, narzedzia/kalibracja_1h_v2.py, narzedzia/sym_porownanie_tf.py
-stan_na: 2026-06-14
-powod_istnienia: "Jedyne miejsce z **twardym, zmierzonym werdyktem o interwale 1H** — że rój nie ma na nim dodatniego edge'u i że zaostrzanie progów asymptotuje przy ~−2.5%, nigdy nie przekraczając "
+stan_na: 2026-07-18
+powod_istnienia: "Jedyne miejsce z **twardym, zmierzonym werdyktem o interwale 1H** — że rój nie ma na nim dodatniego edge'u i że zaostrzanie progów asymptotuje przy ~−2.5%, nigdy nie przekraczając zera"
 ---
 # 🎯 TRYBY IMPERIUM + ŁOWCA OKAZJI — propozycja architektury trybów
 
-> **Stan na:** 2026-06-14 · **Status:** propozycja do decyzji Cezara (Prawo XVIII) · **Kontekst:** wizja „kilka trybów, jeden = NAJLEPSZE"
+> **Status:** propozycja do decyzji Cezara (Prawo XVIII) · **Kontekst:** wizja „kilka trybów, jeden = NAJLEPSZE"
+
+> **⚠️ Jak czytać (weryfikacja wobec kodu 2026-07-18).** Dwie warstwy:
+> • **Pomiary 1H** (sekcje W-321b/c/c-v2/c-v3) to **POMIARY DATOWANE z czerwca 2026** — prawda
+>   swojego czasu, **nie odświeżane** (Prawo I). Werdykt „1H bez robustnego edge'u" nadal stoi.
+> • **Listy „czego brakuje"** były aktualne 2026-06-14 i **zdążyły się zestarzeć** — **6 z 6
+>   braków neuronowych już powstało** (C-01, X-28, kategoria K, AUG-01+Kronikarz, X-12, PSY).
+>   Sprostowane niżej. To ten sam wzorzec co RS-X w ANALIZA_NEURONY: „brak" opisany jako
+>   otwarty, gdy neuron żył już od tygodni.
 
 ## Filozofia (rozkaz Cezara)
 
@@ -40,27 +48,32 @@ potem dopracować SKALP (wymaga danych krótkointerwałowych — Etap C, live).
 5. **Sizing**: lewar i % kapitału skalowane siłą okazji × pewnością (docelowo fractional Kelly).
 6. **Compounding**: zysk → pula łupów → większy kapitał na kolejne okazje (Etap B4, do zrobienia).
 
-## Czego brakuje (neurony) — do trybu NAJLEPSZE
+## ✅ Neurony „do trybu NAJLEPSZE" — WSZYSTKIE 6 JUŻ POWSTAŁY (sprostowanie 2026-07-18)
 
-| Brak | Po co | Priorytet |
+Ta lista była listą braków 2026-06-14. Zmierzone dziś — **żaden już nie brakuje:**
+
+| Dawny „brak" | Stan w kodzie |
+|---|---|
+| Relative Strength cross-asset | ✅ **C-01** `NeuronRelativeStrength` (kat. C, od 2026-06-17) |
+| Multi-Timeframe Confluence | ✅ **X-28** `NeuronKonfluencjaMultiTF` |
+| Breakout/Range-Expansion | ✅ **X-12** (DOSTEPNY) |
+| Katalizator (Augur) | ✅ **AUG-01** — a AdapterKronikarz jest **wpięty** (`neurony/sesje.py`), nie „martwy" |
+| Kategoria K (makro/DXY) | ✅ **K-01…K-04** — kategoria żywa (DXY, Gold/BTC, stablecoiny) |
+| Funding/OI | ✅ **PSY-01/02/04** (DOSTEPNY) |
+
+> To nie znaczy, że tryb NAJLEPSZE jest gotowy — neurony istnieją, ale **skaner wciąż nie jest
+> wpięty w pętlę decyzyjną** (niżej). Znaczy tylko, że „brakującego budulca" nie ma; brakuje spoiwa.
+
+## Czego brakuje NAPRAWDĘ (strategie/moduły — zweryfikowane 2026-07-18)
+
+| Pozycja | Stan | Uwaga |
 |---|---|---|
-| **Neuron Relative Strength cross-asset** | rdzeń skanera już to liczy, ale jako neuron głosujący wzmocniłby ranking | ŚREDNI |
-| **Neuron Multi-Timeframe Confluence** | potwierdzenie dołka/szczytu na 1h+4h+1d naraz (wyższa pewność) | WYSOKI |
-| **Neuron Breakout/Range-Expansion** | wyłapywanie startu ruchu (BB squeeze→expansion); X-12 częściowo | ŚREDNI |
-| **Neuron Katalizator (Augur)** | AUG-01 istnieje, ale AdapterKronikarz odpięty live → martwy | WYSOKI (tani) |
-| **Kategoria K (makro/DXY/intermarket)** | kontekst makro dla wejść (risk-on/off) | NISKI |
-| **Neuron Funding/OI realny** | PSY-01/02/04 czekają na feed futures live | ŚREDNI (live) |
-
-## Czego brakuje (strategie/moduły)
-
-| Brak | Po co | Priorytet |
-|---|---|---|
-| **Wpięcie skanera do pętli** (W-317) | bez tego tryb NAJLEPSZE nie istnieje w praktyce | **NAJWYŻSZY (TERAZ)** |
-| **Bayesian P(sukces) per setup** | skalibrowane prawdopodobieństwo zamiast „pewności" (Beta-Binomial) | WYSOKI |
-| **Compounding / pula łupów** | reinwestycja zysku → wzrost kapitału | WYSOKI |
-| **Backtest cross-sectional** | właściwa miara łowcy (czy skaner wybrał zwycięzców?) | WYSOKI |
-| **Realna egzekucja spot/invest** | tryby 4 i 5 dziś tylko deklaratywne | ŚREDNI |
-| **Auto-kalibracja progów na live** | self-tuning min_adx/top_n/progi pewności | ŚREDNI (live, Etap C) |
+| **Wpięcie skanera do pętli decyzyjnej** (W-317) | 🔴 **nadal brak** | `SkanerOkazji` żyje i działa **tylko w `backtest.py`** — nie ma go w `dyrygent.py` ani `petla_live.py`. To wciąż warunek istnienia trybu NAJLEPSZE na żywo. |
+| **Conviction sizing** (W-318) | ✅ **JEST** | `pretorianie/sizing_przekonania.py` — opt-in (ZASADA WPIĘCIA, domyślnie OFF) |
+| **Compounding / pula łupów** | ✅ **JEST** | dyrygent sizinguje z `engine.kapital_calkowity` (nie ze stałego startu) |
+| **Bayesian P(sukces) per setup** (Beta-Binomial) | 🔴 **brak** | Sybilla liczy Brier/kalibrację proroctw o SOBIE, ale to nie P(sukces) pojedynczego setupu |
+| **Realna egzekucja spot/invest** | 🔴 brak | tryby 4 i 5 wciąż deklaratywne |
+| **Auto-kalibracja progów na live** | 🔴 brak | self-tuning min_adx/top_n (Etap C) |
 
 ## Wynik symulacji trybu NAJLEPSZE (9 lat, 5 walut) — Prawo XVI/I
 

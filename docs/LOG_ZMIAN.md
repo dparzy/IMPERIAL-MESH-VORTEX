@@ -14,6 +14,32 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 🎯 | TRYBY_IMPERIUM — lista „czego brakuje" gdzie 6/6 braków już powstało
+
+**Co (dług gnicia):** weryfikacja propozycji trybów (5× kod). Dwie warstwy rozdzielone:
+• **Pomiary 1H** (W-321b/c/c-v2/c-v3) — POMIARY DATOWANE z czerwca 2026, **nie odświeżane**
+  (Prawo I). Werdykt „1H bez robustnego edge'u, asymptota ~−2.5%" nadal stoi.
+• **Listy „czego brakuje"** — zestarzały się. Właściciele istnieją ✅.
+
+**🔴 6 z 6 braków neuronowych JUŻ ISTNIEJE** (ten sam wzorzec co RS-X w ANALIZA_NEURONY):
+Relative Strength → **C-01** · MTF Confluence → **X-28** · Breakout/Range → **X-12** ·
+Katalizator Augur → **AUG-01** (a AdapterKronikarz **wpięty** w `neurony/sesje.py`, nie
+„martwy") · Kategoria K makro → **K-01…K-04** żywa · Funding/OI → **PSY-01/02/04**.
+Przepisane na tabelę „co powstało od czasu propozycji".
+
+**Braki modułowe — zweryfikowane, mieszane:**
+• ✅ Conviction sizing (W-318) — `sizing_przekonania.py`, opt-in · ✅ Compounding — dyrygent
+  sizinguje z `kapital_calkowity`.
+• 🔴 **Wpięcie skanera do pętli decyzyjnej (W-317)** — nadal brak: `SkanerOkazji` żyje TYLKO
+  w `backtest.py`, nie ma go w `dyrygent.py`/`petla_live.py`. To wciąż warunek istnienia
+  trybu NAJLEPSZE na żywo · 🔴 Bayesian P(sukces) per setup (Sybilla liczy Brier, nie to) ·
+  🔴 egzekucja spot, auto-kalibracja live.
+
+**Pliki:** `docs/TRYBY_IMPERIUM.md` · `docs/INDEKS_IMPERIUM.md`.
+**Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅.
+
+---
+
 ## 2026-07-18 | 🔢 | README na bloki LICZBA + naprawa W3/testów po zmianie daty
 
 **Co:** przejście dnia (07-17 → 07-18) ujawniło, że **README podawał liczby RĘCZNIE** („87

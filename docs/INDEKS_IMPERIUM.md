@@ -52,7 +52,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 
 <!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->
 
-> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-17 (70 pozycji).
+> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-18 (70 pozycji).
 
 ### LEX — prawo i rozkazy stałe — obowiązuje, nie opisuje
 
@@ -120,11 +120,11 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | `docs/KATALOG_NEURONOW.md` | Katalog 299 zmapowanych mikro-neuronów jako roadmapa (87 zbudowanych) — zamiar, nie stan kodu; stan mówi MANIFEST | `imperium/legiony/rejestr.py` | 2026-07-17 |
 | `docs/KATALOG_STRATEGII.md` | Katalog zmapowanych strategii jako roadmapa (20 w kodzie) — zamiar; stan kodu mówi MANIFEST | `imperium/legiony/strategie/rejestr_strategii.py` | 2026-06-26 |
 | `docs/ODLOZONE_DECYZJE.md` | Rejestr rzeczy ustalonych merytorycznie, ale świadomie odłożonych do czasu twardego pomiaru A/B (zasada 'nie wdrażamy bo brzmi dobrze — wdrażamy gdy A/B pokaże plus'). | `narzedzia/ab_w329.py`, `narzedzia/ab_w334_progi.py`, `narzedzia/ab_w335_cross_rs.py`, `narzedzia/ab_w336_changepoint.py` | 2026-07-17 |
-| `docs/PLAN_DEEPSEEK.md` | Plan podłączenia DeepSeek API jako 'głosu' Imperium (adapter GlosImperium) + weryfikacja, GDZIE DeepSeek naprawdę trafił — realizacja poszła inną drogą niż plan (nie Senat, lecz Oczy/newsy + zwiad wiedzy + NOTARIUS). | `imperium/cesarz/deepseek_glos.py`, `imperium/akwedukty/adaptery/news_llm.py`, `imperium/biblioteki/notarius.py`, `narzedzia/bibliotekarz.py` | 2026-07-17 |
+| `docs/PLAN_DEEPSEEK.md` | Plan podłączenia DeepSeek API jako 'głosu' Imperium (adapter GlosImperium) + weryfikacja, GDZIE DeepSeek naprawdę trafił — realizacja poszła inną drogą niż plan (nie Senat, lecz Oczy/newsy + zwiad wiedzy + NOTARIUS). | `imperium/cesarz/deepseek_glos.py`, `imperium/akwedukty/adaptery/news_llm.py`, `imperium/biblioteki/notarius.py` | 2026-07-18 |
 | `docs/PLAN_ROZBUDOWY_BIBLIOTEKI.md` | Lista 205 pozycji (BIB-070..274) do rozbudowy biblioteki RAG Imperium, z priorytetyzacją, weryfikacją licencji i statusem dostępności każdej pozycji. | `narzedzia/bibliotekarz.py`, `narzedzia/przygotuj_biblioteke.py` | 2026-07-16 |
 | `docs/PLAN_TIRO_LOKALNY_LLM.md` | Zbudować lokalny hybrydowy LLM 'TIRO' (uczeń), trenowany metodą destylacji od nauczyciela DeepSeek (Hyginus), z docelowym celem przejęcia ról LLM w Imperium bez kosztów API. | `imperium/biblioteki/notarius.py`, `imperium/oczy/censor_sprzetu.py`, `imperium/swiatynie/web_dashboard.py` | 2026-07-16 |
 | `docs/ROADMAP_IMPERIUM.md` | Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii. | — | 2026-06-12 |
-| `docs/TRYBY_IMPERIUM.md` | Jedyne miejsce z **twardym, zmierzonym werdyktem o interwale 1H** — że rój nie ma na nim dodatniego edge'u i że zaostrzanie progów asymptotuje przy ~−2.5%, nigdy nie przekraczając  | `imperium/koloseum/namiestnik.py`, `narzedzia/kalibracja_1h.py`, `narzedzia/kalibracja_1h_v2.py`, `narzedzia/sym_porownanie_tf.py` | 2026-06-14 |
+| `docs/TRYBY_IMPERIUM.md` | Jedyne miejsce z **twardym, zmierzonym werdyktem o interwale 1H** — że rój nie ma na nim dodatniego edge'u i że zaostrzanie progów asymptotuje przy ~−2.5%, nigdy nie przekraczając zera | `imperium/koloseum/namiestnik.py`, `narzedzia/kalibracja_1h.py`, `narzedzia/kalibracja_1h_v2.py`, `narzedzia/sym_porownanie_tf.py` | 2026-07-18 |
 | `docs/WIZJA_KSIEGI_SYBILLINSKIE.md` | Zbudować rejestr falsyfikowalnych proroctw Imperium o samym sobie (np. 'P=0.70: neuron X osiągnie IC≥0.02'), rozliczanych automatycznie z bazy areny — mierzy nie PnL, ale samowiedz | `imperium/biblioteki/ksiegi_sybillinskie.py` | 2026-07-06 |
 | `docs/WIZJA_LEGIONY_CIENI.md` | Kontrfaktyczne Kolosseum — równolegle do realnej decyzji Imperium maszerują 'Legiony Cieni' (widmowe warianty konfiguracji: bez weta, próg łagodny, próg surowy), mierzące ile koszt | `imperium/koloseum/legiony_cieni.py`, `narzedzia/raport_zalu.py` | 2026-07-06 |
 | `docs/WIZJA_TRYBY_I_ROZWOJ.md` | Wizja Cezara na 3 tryby operacyjne systemu (NAJLEPSZY/BILANS/OBRONA) plus katalog darmowych API do 'prześwietlania' nowych walut przed wejściem — z weryfikacją, co z wizji już stoi w kodzie | `imperium/koloseum/skaner_okazji.py`, `imperium/legiony/rejestr.py` | 2026-07-17 |

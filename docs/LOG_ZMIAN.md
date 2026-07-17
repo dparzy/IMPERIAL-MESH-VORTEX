@@ -14,6 +14,50 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-17 | ⚖️ | KALKULATOR_LEWARA — dokument o ryzyku nie znał połowy bezpieczników
+
+**Co (dług gnicia 9 → 8):** weryfikacja „matematyki przeżycia" (9× `kalkulator_lewara.py`).
+Dokument o RYZYKU, więc każde twierdzenie sprawdzone wobec kodu i pomiaru runtime.
+
+**🚨 Najgroźniejsze — dokument był MNIEJ ostrożny niż kod:**
+• **„PANIC: dźwignia = 1× maksymalnie"** sugerowało, że w panice HANDLUJEMY małą dźwignią.
+  **Nieprawda: `_checklist()` wetuje twardo — „Reżim PANIC, zero pozycji lewarowanych".**
+  Mnożnik ×0.1 nigdy nie decyduje, bo pozycja odpada wcześniej. Kod bezpieczniejszy niż opis.
+• **`policz_dzwignie(pewnosc, rezim, pretorianie_ok)` NIE ISTNIEJE** — realnie
+  `KalkulatorLewara.auto_dzwignia(pewnosc, rezim)` (staticmethod, bez `pretorianie_ok`).
+• **Granica myląca:** tabela mówi „<0.55 → 0× (nie handluj)", ale `auto_dzwignia(0.10)`
+  zwraca **1**, nie 0 (`max(...,1)`). Słaby sygnał odrzuca OSOBNE weto w checkliście
+  („Zbyt słaby sygnał: 10% < 55%"). Skutek dobry, mechanizm inny niż opisany — nikt nie może
+  polegać na zwróconym zerze, bo `auto_dzwignia` nigdy zera nie zwraca.
+
+**Checklist: lista życzeń ≠ kod.** Dokument obiecywał bramki, których nie ma: 🔴 Funding Rate,
+🔴 ATR < 2× średniej (ATR służy WYŁĄCZNIE do liczenia SL, nie wetuje), 🔴 seria strat < 3.
+Mylił też pojęcia: „rozmiar ≤ 2% kapitału" — `MAX_RYZYKO=0.02` ogranicza **ryzyko** (stratę na
+stopie), nie rozmiar; checklist wetuje dopiero **rozmiar > 50% kapitału**. „Drawdown < 10%" nie
+wetuje (to REDUCED ×0.5; weto dopiero 20% HALT, twardy stop AOA 30%). „R:R ≥ 1:2" — `MIN_RR=2.0`
+istnieje, ale checklist go NIE sprawdza (2:1 wychodzi z konstrukcji TP). Wpisano pełną tabelę
+8 realnych wet w kolejności z kodu.
+
+**§11 — pięć mechanizmów, o których „pełna matematyka przeżycia" milczała** (wszystkie opt-in):
+• **Reguła 6% Eldera** (BIB-015) — miesięczny meta-limit 6% → HALT; trzeci horyzont obok
+  W-062 (equity 10/20%) i AOA (30%). ⚠️ ma historię buga „HALT zdejmowany przy odrobieniu".
+• **SkalowanieFrakcjaDD** (W-063, Maier-Paape) — CIĄGŁY sizing; zmierzone: DD 0/5/10/20% →
+  frakcja 1.00/0.75/0.50/0.10.
+• **volatility_drag** ½·λ·(λ−1)·σ² — zmierzone przy σ=0.6: λ=1 → 0.0, λ=10 → **16.2**,
+  λ=20 → **68.4** rocznie. Przy 20× sam drag zjada wielokrotność kapitału w skali roku.
+• **skew_kelly** (Sinclair BIB-018) — Kelly z trzecim momentem, tnie przy ujemnym skosie.
+• **SL oparty na ATR** (`atr`+`sl_atr_mult`) — łączony z buforem likwidacji przez wybór
+  OSTROŻNIEJSZEGO (`max` LONG / `min` SHORT); może stop tylko zacieśnić, nigdy rozluźnić.
+
+**Reszta zweryfikowana ✅:** wzory likwidacji · `OPLATA_UTRZYMANIA=0.005` (dokument pisał
+`OPLATE_` — taka nazwa nie istnieje) · progi dźwigni 0.55/0.65/0.75/0.85/0.92 → 2/5/10/15/20 ·
+korektory reżimu · volatility targeting (0.6/0.25/1.5) · breaker W-062 (20/0.10/0.20/0.5).
+`PlanPozycji` uzupełniony o brakujące `bufor_likwidacji_pct`, `frakcja_dd`, `drag_roczny`.
+
+**Pliki:** `docs/KALKULATOR_LEWARA.md`. **Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅ · gnicie 9→8.
+
+---
+
 ## 2026-07-17 | 🗺️ | MAPA_PAMIECI — „v13" było liczbą warstw, a „42 książek" ma dziś 79
 
 **Co (dług gnicia 10 → 9):** weryfikacja mapy pamięci (10× kod właścicieli, 14 plików).

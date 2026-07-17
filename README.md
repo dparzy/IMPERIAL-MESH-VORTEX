@@ -10,7 +10,7 @@ powod_istnienia: "Wizytówka Imperium — podaje liczby wprost z kodu (neurony/t
 > **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
 > Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 
-> **Stan na:** 2026-07-15 · **Testy:** patrz `python tests/run_tests.py` · **Faza:** PętlaLive + Synapsy Reżimowe + PamięćRefleksyjna + Radar + Paper Trading Etap II + Filtr Asymetrii (W-314) + RealOrderRouter/dry-run (W-331/332) + sync pozycji (W-333) + progi adaptacyjne (W-334) + meta-warstwy B: Neutralizacja + Meta-labeling (W-337) + detektory reżimu: CUSUM/BOCPD/FracDiff (W-336/338/339) + vol-gate Jump Model opt-in (W-340) + **niezawodność warunkowa per-reżim (W-341, Prawo XXIII) + LiveMonitor/TelegramAlert (W-341, Prawo XXIV) + MECHANIZM przewagi (W-342, Prawo XXII) + godło SVG (W-342) + Debata Senatu Byk/Niedźwiedź/Cenzor (W-343)**.
+> **Stan na:** 2026-07-18 · **Testy:** patrz `python tests/run_tests.py` · **Faza:** PętlaLive + Synapsy Reżimowe + PamięćRefleksyjna + Radar + Paper Trading Etap II + Filtr Asymetrii (W-314) + RealOrderRouter/dry-run (W-331/332) + sync pozycji (W-333) + progi adaptacyjne (W-334) + meta-warstwy B: Neutralizacja + Meta-labeling (W-337) + detektory reżimu: CUSUM/BOCPD/FracDiff (W-336/338/339) + vol-gate Jump Model opt-in (W-340) + **niezawodność warunkowa per-reżim (W-341, Prawo XXIII) + LiveMonitor/TelegramAlert (W-341, Prawo XXIV) + MECHANIZM przewagi (W-342, Prawo XXII) + godło SVG (W-342) + Debata Senatu Byk/Niedźwiedź/Cenzor (W-343)**.
 
 ---
 
@@ -33,15 +33,15 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Komponent | Stan w kodzie |
 |-----------|---------------|
-| **Mikro-neurony** | **87 zaimplementowane** (81 aktywnych: OHLCV momentum/trend/wolumen + SES-01/02 + 3 SMC + 6 kat. R + NEWS-01 + V-03 CVD + Z-01..05 brama obronna + X-27 Value + X-28 MTF Confluence + OC-05 WashTrading + **W-322: V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile/VPOC, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top** + **W-329: RADAR-04 kaskada korelacyjna + RADAR-05 lead-lag BTC→alty** + **W-335: C-01 Cross-sectional Relative Strength** + **W-336: CP-01 CUSUM change-point** + **W-338: BOCPD-01 Bayesian change-point** + **W-339: N-02 Fractional Differentiation** + **PSY-05 DVOL strach opcji (opt-in --dvol, IC +0.16@7d) + K-03 Stablecoin flow (opt-in --stablecoin, IC +0.05..0.10) + K-04 USD strength (opt-in --usd, IC -0.27@30d)**; 4 czeka na on-chain API) |
-| **Zwiadowcy Exploratores (EXP)** | **15** (EXP-01..15; 13 aktywnych + 2 wyciszone do feedu) |
+| **Mikro-neurony** | **<!-- LICZBA:neurony -->87<!-- /LICZBA --> zaimplementowane** (<!-- LICZBA:neurony_aktywne -->81<!-- /LICZBA --> aktywnych: OHLCV momentum/trend/wolumen + SES-01/02 + 3 SMC + 6 kat. R + NEWS-01 + V-03 CVD + Z-01..05 brama obronna + X-27 Value + X-28 MTF Confluence + OC-05 WashTrading + **W-322: V-06 Delta Divergence, V-07 Anchored VWAP, VP-01 Volume Profile/VPOC, Z-06 Amihud Illiquidity, Z-07 Pi Cycle Top** + **W-329: RADAR-04 kaskada korelacyjna + RADAR-05 lead-lag BTC→alty** + **W-335: C-01 Cross-sectional Relative Strength** + **W-336: CP-01 CUSUM change-point** + **W-338: BOCPD-01 Bayesian change-point** + **W-339: N-02 Fractional Differentiation** + **PSY-05 DVOL strach opcji (opt-in --dvol, IC +0.16@7d) + K-03 Stablecoin flow (opt-in --stablecoin, IC +0.05..0.10) + K-04 USD strength (opt-in --usd, IC -0.27@30d)**; 4 czeka na on-chain API) |
+| **Zwiadowcy Exploratores (EXP)** | **<!-- LICZBA:zwiadowcy -->15<!-- /LICZBA -->** (EXP-01..15; 13 aktywnych + 2 wyciszone do feedu) |
 | **Brama Kalkulatora** | jedyne wejście do matematyki wskaźników (Prawo I) |
 | **Budowniczy Wskaźników** | most: surowe bary → komplet wskaźników dla neuronów (z HA, Ichimoku, MACD…) |
 | **Generał Legatus** | agregacja głosów + wagi reżimowe + odpalanie zwiadowców + ważenie IC opt-in (W-361, domyślnie OFF) |
-| **Strategie (przepisy)** | **20 zmapowanych** na żywe klucze neuronów (`rejestr_strategii.py`; status **SZKIC** — przepisy, nie zwalidowane); Legatus dobiera TOP pasujące do sygnałów. Pełny opis: `docs/KATALOG_STRATEGII.md` |
+| **Strategie (przepisy)** | **<!-- LICZBA:strategie -->20<!-- /LICZBA --> zmapowanych** na żywe klucze neuronów (`rejestr_strategii.py`; status **SZKIC** — przepisy, nie zwalidowane); Legatus dobiera TOP pasujące do sygnałów. Pełny opis: `docs/KATALOG_STRATEGII.md` |
 | **Igrzyska / Koloseum** | rywalizacja i rangowanie neuronów |
 | **Diagnostyka korelacji** | pomiar redundancji sygnałów (Prawo XVI) |
-| **Status elitarny** | **18 elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 (3 neurony) + 15 zwiadowców |
+| **Status elitarny** | **<!-- LICZBA:elity -->18<!-- /LICZBA --> elitarnych** modułów mierzonych kryterium E1–E7 (Prawo XX): X-25, X-26, D-01 (3 neurony) + 15 zwiadowców |
 | **Monte Carlo / Optymalizator / Pamięć Refleksyjna / Drift Adapter** | W-293/294/295/296 — antyoverfitting + samouczenie Brain |
 | **Testy** | `python tests/run_tests.py` (bieżąca liczba — nie hardkodujemy, by nie przeterminować) ✅ |
 

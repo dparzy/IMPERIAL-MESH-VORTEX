@@ -174,7 +174,9 @@ def audyt() -> tuple:
         manifest = _czytaj("docs/MANIFEST_KODU.md")
         claude = _czytaj("CLAUDE.md")
 
-        rn = re.search(r"(\d+) zaimplementowane", readme)
+        # Toleruj oba formaty: gołe „87 zaimplementowane" oraz blok W15
+        # „87<!-- /LICZBA --> zaimplementowane" (README przeszło na LICZBA 2026-07-18).
+        rn = re.search(r"(\d+)(?:<!-- /LICZBA -->)? zaimplementowane", readme)
         if rn and int(rn.group(1)) != n_neuronow:
             bledy.append(f"[W3] README neurony={rn.group(1)} ≠ kod={n_neuronow}")
 

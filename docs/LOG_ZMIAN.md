@@ -14,6 +14,31 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 🔢 | README na bloki LICZBA + naprawa W3/testów po zmianie daty
+
+**Co:** przejście dnia (07-17 → 07-18) ujawniło, że **README podawał liczby RĘCZNIE** („87
+zaimplementowane", „20 zmapowanych", „18 elitarnych") — mimo że jego `powod_istnienia` głosi
+„podaje liczby wprost z kodu". To bomba jak „42 książek": dziś 87 się zgadza, ale rój rośnie.
+
+**Wykryte przez bramkę W6, nie przeze mnie:** commit z 07-18 do repo + README ze „Stan na:
+2026-07-15" → W6 słusznie zażądał potwierdzenia świeżości źródła prawdy (2 testy padły na tym
+samym alarmie). To zamierzone działanie bramki, nie bug.
+
+**Naprawa u źródła (nie sam bump daty):**
+• 5 liczb README (neurony, neurony_aktywne, zwiadowcy, strategie, elity) → bloki
+  `<!-- LICZBA:x -->` (W15). Zweryfikowane: 87/81/15/20/18 zgadzają się z kodem. Bump „Stan
+  na:" → 2026-07-18 jest teraz WERYFIKACJĄ (liczby policzone), nie ślepym bumpem.
+• **Regresja złapana w tym samym ruchu:** zmiana formatu (gołe „87" → blok) złamała regex
+  warstwy **W3 audytu** (`(\d+) zaimplementowane` nie trafiał w „87<!-- /LICZBA --> zaimpl.")
+  — audyt PRZESTAŁ porównywać liczbę neuronów README z kodem. Naprawione: regex toleruje oba
+  formaty (`(\d+)(?:<!-- /LICZBA -->)? zaimplementowane`). Test `test_audyt_wykrywa_rozbieznosc`
+  zaktualizowany, by podmieniać liczbę w bloku — dwuwarstwowa ochrona (W3 + W15) znów żywa.
+
+**Pliki:** `README.md` · `narzedzia/audyt_spojnosci.py` (W3) · `tests/test_spojnosc.py`.
+**Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅.
+
+---
+
 ## 2026-07-18 | 🧠 | PLAN_DEEPSEEK — plan zrealizowany INNĄ drogą niż zakładał
 
 **Co (dług gnicia 7 → 6):** weryfikacja planu DeepSeeka (5× kod). Werdykt: **zostaje CONSILIUM

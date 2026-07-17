@@ -27,7 +27,9 @@ def test_audyt_wykrywa_rozbieznosc():
     def fake(p):
         t = orig(p)
         if p == "README.md":
-            return re.sub(r"\d+ zaimplementowane", "999 zaimplementowane", t)
+            # README podaje liczbę neuronów w bloku W15 (<!-- LICZBA:neurony -->N<!-- /LICZBA -->);
+            # podmieniamy N w bloku, by W3 (tolerujący oba formaty) wykrył rozbieżność.
+            return re.sub(r"(LICZBA:neurony -->)\d+", r"\g<1>999", t)
         return t
 
     a._czytaj = fake

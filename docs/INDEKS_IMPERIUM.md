@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/legiony/rejestr.py
-stan_na: 2026-07-16
+stan_na: 2026-07-18
 powod_istnienia: "Master Index — punkt wejścia i mapa wszystkich dokumentów; sekcja katalogu generowana przez Tabularium"
 ---
 # 👑 IMPERIUM — MASTER INDEX
@@ -281,14 +281,14 @@ echo $DEEPSEEK_API_KEY
 # Test połączenia z DeepSeek
 python imperium/cesarz/deepseek_glos.py
 
-# Test pobierania danych z MEXC
-python imperium/akwedukty/mexc_feed.py
+# Cenzus adapterów danych (MEXC/Binance/News — żywotność na żywo)
+python narzedzia/cenzus_adapterow.py
 
 # Test Bramki Kalkulatora
-python imperium/fundament/calculator_gate.py
+python imperium/fundament/brama_kalkulatora.py
 
-# Status pretorianów
-python imperium/pretorianie/veto_check.py
+# Demo pretorianina (tarcza Aegis — bezpiecznik ryzyka)
+python imperium/pretorianie/aegis_tarcza.py
 ```
 
 ---

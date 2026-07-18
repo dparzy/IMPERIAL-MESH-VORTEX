@@ -6,7 +6,7 @@ Uruchamiany automatycznie przez hooki Claude Code (SessionStart + Stop) oraz rę
     python narzedzia/audyt_spojnosci.py            # raport + exit code
     python narzedzia/audyt_spojnosci.py --cichy     # tylko gdy są błędy
 
-Sprawdza 14 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
+Sprawdza 16 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 1  — żywy rój:        liczby, kategorie, elity, klucze
   Warstwa 2  — infrastruktura:  WAGI_REZIMU vs KAT w kodzie
   Warstwa 3  — dokumentacja:    MANIFEST klucze vs kod, liczby README/MANIFEST/CLAUDE
@@ -22,6 +22,7 @@ Sprawdza 14 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 13 — ruff (linter):   bugi i martwy kod (F811 duplikaty, F821 undefined, F841/F401 martwe)
   Warstwa 14 — wszystkie docs:  MAPA_KLUCZY zawiera każdy klucz z kodu (skan wszystkich .md)
   Warstwa 15 — liczby:          bloki <!-- LICZBA:x --> zgodne z żywym kodem (Tabularium, Filar 4)
+  Warstwa 16 — API-widma:       plik kodu cytowany w żywym docu MUSI istnieć (łowca widm)
 
 Exit code:
   0 = pełna spójność (Imperium gotowe)
@@ -529,6 +530,11 @@ def audyt() -> tuple:
     bledy += w15_bledy
     info += w15_info
 
+    # ── WARSTWA 16: API-WIDMA — plik kodu opisany w docs MUSI istnieć ─────────
+    w16_bledy, w16_info = _warstwa_16_api_widma()
+    bledy += w16_bledy
+    info += w16_info
+
     return bledy, info
 
 
@@ -555,6 +561,133 @@ def _warstwa_15_liczby_wstrzykiwane():
                      "python narzedzia/tabularium.py liczby --zapisz): " + "; ".join(zmiany))
     else:
         info.append("Liczby wstrzykiwane (W15): wszystkie zgodne z żywym kodem ✅")
+    return bledy, info
+
+
+# Dokumenty POMIJANE (Prawo I — nie falsyfikujemy historii): akumulują przeszłość
+# lub rejestrują zamiary, więc ścieżka do pliku, którego dziś nie ma, to prawda ich
+# czasu, nie kłamstwo. LOG_ZMIAN/WERSJONOWANIE = changelog; WIZJONER/ODLOZONE = rejestr
+# pomysłów; PAMIEC_SESJI = kronika. Datowane-w-nazwie snapshoty lecą osobnym filtrem.
+_W16_POMIJANE = {"LOG_ZMIAN.md", "WERSJONOWANIE.md", "WIZJONER.md",
+                 "ODLOZONE_DECYZJE.md", "PAMIEC_SESJI.md"}
+
+# Markery w LINII, które zmieniają twierdzenie „ten plik istnieje" w „ma powstać /
+# nie istnieje / to przykład". Zmierzone na realnych trafieniach (2026-07-18): bez nich
+# ODLOZONE „(do zbudowania)" i PAPER_TRADING „pliku, który NIGDY nie istniał" byłyby
+# fałszywym alarmem.
+#
+# GRANICA SŁOWA OBOWIĄZKOWA dla stemów (recenzja 2026-07-18): goły podłańcuch „todo"
+# trafia WEWNĄTRZ „metodologia", a „wizja" wewnątrz „telewizja/dywizja" (a Legiony mają
+# dywizje!) → prawdziwe widmo na takiej linii byłoby po cichu zciszone (false-negative).
+# `\b` przed stemem to blokuje: „telewizja" ma literę przed „wizja", więc brak granicy.
+_W16_MARKERY_TEKST = re.compile(
+    r"\b(?:do zbudowania|do zrobienia|do powstania|planowan|nie istnia|"
+    r"todo|wizja|widmo|usunięt|usuniet|zarchiwizowan)", re.IGNORECASE)
+# Symbole/frazy z własną granicą (emoji nie jest znakiem-słowem, więc \b nie działa).
+_W16_MARKERY_SYMBOL = ("🔴", "🟠", "💭", "(plan")
+
+# Ścieżki-korzenie kodu, które muszą fizycznie istnieć, gdy dokument je cytuje jako fakt.
+_W16_KORZENIE = ("imperium", "narzedzia", "tests", "skrypty")
+
+_W16_PAT = re.compile(r"(?:" + "|".join(_W16_KORZENIE) + r")/[A-Za-z0-9_/]+\.py")
+
+
+def _w16_widma_w_tresci(tresc: str, real: set) -> list:
+    """Czysty skaner JEDNEGO dokumentu — zwraca [(sciezka, nr_linii)] dla widm.
+
+    Wydzielony z warstwy, żeby testy granic (Reguła Test-Granic) mogły podać treść
+    wprost, bez zaśmiecania docs/. Suppresje: bloki ```python/```py oraz markery
+    planu/negacji w linii. NIE decyduje o wyborze dokumentu (POMIJANE/snapshoty) —
+    to robi warstwa przy iteracji po plikach.
+    """
+    znalezione = []
+    fence_py = False
+    for nr, linia in enumerate(tresc.splitlines(), 1):
+        stripped = linia.lstrip()
+        if stripped.startswith("```"):
+            jezyk = stripped[3:].strip().lower()
+            fence_py = jezyk in ("python", "py", "python3") if not fence_py else False
+            continue
+        if fence_py:
+            continue                        # kod przykładowy — nie twierdzenie o istnieniu
+        if _W16_MARKERY_TEKST.search(linia) or any(s in linia for s in _W16_MARKERY_SYMBOL):
+            continue                        # plan / negacja / widmo oznaczone wprost
+        for m in _W16_PAT.finditer(linia):
+            if m.group(0) not in real:
+                znalezione.append((m.group(0), nr))
+    return znalezione
+
+
+def _w16_realne_pliki() -> set:
+    """Zbiór ścieżek .py fizycznie istniejących (bez .git/archiwum/cache).
+
+    archiwum/ NIE liczy się jako „istnieje" — plik przeniesiony do archiwum, a wciąż
+    cytowany w żywym docu jako `imperium/…`, to widmo (przypadek war_lancer/valhalla).
+    """
+    real = set()
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        if any(seg in dirpath for seg in (os.sep + ".git", os.sep + "archiwum",
+                                          os.sep + "__pycache__", os.sep + ".pytest_cache")):
+            continue
+        for f in filenames:
+            if f.endswith(".py"):
+                rel = os.path.relpath(os.path.join(dirpath, f), ROOT).replace(os.sep, "/")
+                real.add(rel)
+    return real
+
+
+def _warstwa_16_api_widma():
+    """W16 — API opisane w żywym dokumencie MUSI istnieć w kodzie (łowca widm).
+
+    DZIURA, KTÓRĄ TO ZATYKA (zmierzona 2026-07-18, sesja sztabowa): spłata długu gnicia
+    szła DOKUMENT-PO-DOKUMENCIE (czy nadąża za sobą / za kodem który opisuje), więc
+    NIE łapała odwołań do plików, których NIGDY nie było. Skan całego korpusu naraz
+    znalazł 3 martwe komendy w żywym INDEKS-ie (`mexc_feed.py`, `calculator_gate.py` →
+    dziś `brama_kalkulatora.py`, `veto_check.py`) — każda przechodziła audyt „pełna
+    harmonia". To ta sama klasa co war_lancer/sala_wojenna/valhalla (ARCHITEKTURA
+    twierdziła `imperium/…`, a pliki leżą w archiwum/kingdom_pixel_p1/) i Kronikarz v2
+    Interrogator (0 trafień w kodzie): API-widmo.
+
+    DLACZEGO ŚCIEŻKA-PLIK, NIE KLASA/FUNKCJA: pełna ścieżka `korzeń/…/x.py` to
+    jednoznaczne twierdzenie „ten plik istnieje TU". Nazwy klas/funkcji są zbyt
+    wieloznaczne (przykłady w prozie, cytaty, homonimy) — łapanie ich = szum, którego
+    Prawo XVI zakazuje. Ścieżka łapie 4/5 znanych wpadek przy zerowym szumie.
+
+    SUPRESJE (inaczej alarm bez pomiaru = też halucynacja — lekcja 2026-07-17):
+      • dokumenty-changelogi/rejestry-zamiarów (_W16_POMIJANE) i datowane snapshoty,
+      • bloki ```python/```py — kod przykładowy (MANUAL uczy „stwórz vulcan.py"),
+      • markery planu/negacji w linii (_W16_MARKERY_PLANU).
+    Zwalidowane: na obecnym korpusie 9 kandydatów → 6 poprawnie zciszonych, 3 realne
+    widma. Twarda bramka dopiero PO naprawie tych 3 (żeby start był czysty).
+    """
+    bledy, info = [], []
+    docs_dir = os.path.join(ROOT, "docs")
+    if not os.path.isdir(docs_dir):
+        return bledy, info
+
+    real = _w16_realne_pliki()
+    widma = {}   # sciezka -> [(plik, linia_nr)]
+    for nazwa in sorted(os.listdir(docs_dir)):
+        if not nazwa.endswith(".md"):
+            continue
+        if nazwa in _W16_POMIJANE:
+            continue
+        if re.search(r"\d{4}-\d{2}-\d{2}", nazwa):     # snapshot datowany nazwą
+            continue
+        with open(os.path.join(docs_dir, nazwa), encoding="utf-8", errors="replace") as f:
+            tresc = f.read()
+        for sciezka, nr in _w16_widma_w_tresci(tresc, real):
+            widma.setdefault(sciezka, []).append((nazwa, nr))
+
+    if widma:
+        opis = "; ".join(
+            f"{s} ({', '.join(f'{fn}:{ln}' for fn, ln in occ[:2])})"
+            for s, occ in sorted(widma.items()))
+        bledy.append("[W16] API-WIDMO — żywy dokument cytuje plik kodu, którego NIE MA "
+                     "(napraw ścieżkę, usuń martwą komendę albo oznacz jako plan/wizja): "
+                     + opis)
+    else:
+        info.append("API-widma (W16): każda ścieżka .py cytowana w żywych docs istnieje w kodzie ✅")
     return bledy, info
 
 

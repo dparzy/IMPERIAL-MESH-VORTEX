@@ -14,6 +14,28 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 🛡️ | SESJA SZTABOWA — WARSTWA 16 AUDYTU (łowca API-widm)
+
+**Co:** bramka zapobiegawcza „API opisane w żywym docu MUSI istnieć w kodzie" —
+`narzedzia/audyt_spojnosci.py` `_warstwa_16_api_widma()` + helpery `_w16_widma_w_tresci`
+(czysty skaner) i `_w16_realne_pliki`. Skanuje ścieżki `korzeń/…/x.py` w żywych docs.
+
+**Dziura zatkana (zmierzona):** spłata długu gnicia szła dokument-po-dokumencie, więc NIE
+łapała plików, których NIGDY nie było. Skan całego korpusu naraz znalazł **3 martwe komendy
+w żywym INDEKS-ie** przy „pełnej harmonii": `mexc_feed.py`→`cenzus_adapterow.py`,
+`calculator_gate.py`→`brama_kalkulatora.py` (stara ang. nazwa), `veto_check.py`→`aegis_tarcza.py`.
+To klasa war_lancer/valhalla (w archiwum, nie w `imperium/`) i Kronikarz v2 Interrogator.
+
+**Suprsje (walidacja: 9 kandydatów → 6 zciszonych, 3 realne):** bloki ```python (kod
+przykładowy), markery planu/negacji w linii (`do zbudowania`, `NIGDY nie istniał`, 🔴/🟠/💭/
+WIZJA — z GRANICĄ SŁOWA: „todo"∉„metodologia", „wizja"∉„dywizja"), changelogi/rejestry-zamiarów.
+
+**Recenzja adversarial złapała:** goły podłańcuch „todo"/„wizja" trafiał wewnątrz polskich
+słów → false-negative; naprawione `\b`. **Testy:** +8 granic (detekcja, każda suprsja osobno,
+granica-słowa). **Pliki:** audyt_spojnosci.py, tests/test_spojnosc.py, INDEKS_IMPERIUM.md, CLAUDE.md.
+
+---
+
 ## 2026-07-18 | 🏁 | DŁUG GNICIA SPŁACONY DO ZERA — IGRZYSKA + ARCHITEKTURA + MANUAL
 
 **Co:** ostatnia trójka + domknięcie całej kampanii porządkowej. **T2 gnicie: 0/70 dokumentów.**

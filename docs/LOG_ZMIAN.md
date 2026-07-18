@@ -14,6 +14,33 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 📊 | A/B TIER-1 NA 1H/4H + 🚨 Prawo XV (backtest O(n²))
+
+**Co:** rozkaz Cezara 07-16 — powtórka A/B sygnałów Tier-1 (DVOL/stablecoin/USD) na
+interwałach roboczych. Narzędzia `ab_dvol/stablecoin/usd.py` sparametryzowane opcjami
+`--interwal {1d,4h,1h}`, `--od`, `--bary N` — NIE-destrukcyjnie (domyślny `1d` reprodukuje
+dokładnie stare +2.27pp, ruff czysto).
+
+**🚨 Prawo XV (utrata potencjału) — backtest jest O(n²):** profiler wskazał `compute`
+(brama_kalkulatora:1409) = 53s/105s — wskaźniki (wma/supertrend/volume_profile) przeliczane
+od zera nad rosnącą historią KAŻDEGO baru (600 barów→9.6s, 1800→81.5s). Pełne okno 1H/4H „nigdy
+nie kończyło" nie przez sieć, lecz przez silnik. NIE naprawiane w tej sesji (inkrementalne
+wskaźniki zmieniłyby wyniki → ZASADA WPIĘCIA, osobne zadanie). Obejście: `--bary 800`.
+
+**Wyniki (800 barów/symbol, 4H≈133 dni, 1H≈33 dni — WSTĘPNE, jeden reżim):**
+| Sygnał | 4H Δ ROI | 1H Δ ROI |
+|---|---|---|
+| DVOL PSY-05 | +3.60pp ✅ | +0.00pp ⚖️ |
+| STABLECOIN K-03 | +0.79pp ✅ | +0.00pp ⚖️ |
+| USD K-04 | +0.20pp ⚖️ | +0.00pp ⚖️ |
+
+**Werdykt:** 4H potwierdza dzienne (DVOL+stablecoin pomagają; USD marginalnie <próg). 1H =
+0.00 dla WSZYSTKICH — sygnały wolne (dzienne) nie ruszają skanera na 33-dniowym oknie; to
+brak efektu na krótkim oknie (wymuszonym O(n²)), NIE odrzucenie. Flagi zostają opt-in OFF
+(decyzja Cezara). **Pliki:** ab_dvol.py, ab_stablecoin.py, ab_usd.py.
+
+---
+
 ## 2026-07-18 | 🛡️ | SESJA SZTABOWA — WARSTWA 16 AUDYTU (łowca API-widm)
 
 **Co:** bramka zapobiegawcza „API opisane w żywym docu MUSI istnieć w kodzie" —

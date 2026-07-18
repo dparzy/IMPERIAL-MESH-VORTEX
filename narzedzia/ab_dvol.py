@@ -11,6 +11,7 @@ Wyrównanie DVOL→bary KAUZALNE (reużyte z pomiar_dvol_ic / PAVOR).
 
 Uruchom: python narzedzia/ab_dvol.py
 """
+import argparse
 import logging
 import os
 import sys
@@ -23,11 +24,16 @@ from imperium.koloseum.backtest import backtest_portfel        # noqa: E402
 from imperium.akwedukty.czytnik_csv import wczytaj_csv          # noqa: E402
 from narzedzia.pomiar_dvol_ic import _pobierz_dvol, _dzien      # noqa: E402
 
-PLIKI = {
-    "BTCUSDT": "dane/dzienne/Binance_BTCUSDT_d.csv",
-    "ETHUSDT": "dane/dzienne/Binance_ETHUSDT_d.csv",
-}
+# Interwał opt-in (rozkaz Cezara 2026-07-16: A/B na 1H/4H, gdzie system routuje styl).
+# Etykieta „4H"/„1H" trafia do Namiestnika (profil SCALP/SWING/INVEST per interwał) —
+# stąd wielkość liter zgodna z resztą systemu. Domyślny „1d" = zachowanie bez zmian.
+INTERWALY = {"1d": ("dane/dzienne", "_d", "1d"),
+             "4h": ("dane/4h", "_4h", "4H"),
+             "1h": ("dane/godzinowe", "_1h", "1H")}
+SYMBOLE = ["BTCUSDT", "ETHUSDT"]     # DVOL istnieje na Deribit tylko dla BTC+ETH
 WALUTA = {"BTCUSDT": "BTC", "ETHUSDT": "ETH"}
+LABEL = "1d"                          # etykieta interwału (ustawiana w main z --interwal)
+PLIKI = {s: f"dane/dzienne/Binance_{s}_d.csv" for s in SYMBOLE}
 BAZA = dict(tryb_skaner=True, skaner_top_n=2, sizing_przekonania=True)
 
 
@@ -56,7 +62,7 @@ def _bary_era_dvol(sent):
     """Tnij bary do ery DVOL (pierwszy bar z pokryciem DVOL) — uczciwe A/B na tym samym oknie."""
     out = {}
     for sym, sc in PLIKI.items():
-        b = wczytaj_csv(sc, interwal="1d")
+        b = wczytaj_csv(sc, interwal=LABEL)
         pokryte = sent.get(sym, {})
         if pokryte:
             pierwszy = min(pokryte)
@@ -66,7 +72,7 @@ def _bary_era_dvol(sent):
 
 
 def zmierz(bary_per, sentyment_per):
-    eng = backtest_portfel(PLIKI, "1d", bary_per={k: list(v) for k, v in bary_per.items()},
+    eng = backtest_portfel(PLIKI, LABEL, bary_per={k: list(v) for k, v in bary_per.items()},
                            sentyment_per=sentyment_per, **BAZA)
     s = eng.podsumowanie()
     roi = (s.kapital_koncowy / s.kapital_startowy - 1) * 100
@@ -74,15 +80,27 @@ def zmierz(bary_per, sentyment_per):
 
 
 def main():
-    print("😱 A/B DVOL (PSY-05) — czy IC +0.16@7d daje PnL? BTC+ETH dzienny, era DVOL.\n", flush=True)
+    ap = argparse.ArgumentParser(description="A/B DVOL (PSY-05) na wybranym interwale")
+    ap.add_argument("--interwal", choices=list(INTERWALY), default="1d",
+                    help="1d (domyślny), 4h lub 1h — świece z odpowiedniego katalogu")
+    ap.add_argument("--bary", type=int, default=None,
+                    help="ogranicz do najnowszych N barów/symbol (backtest jest O(n²) — patrz Prawo XV)")
+    args = ap.parse_args()
+    global PLIKI, LABEL
+    sub, suf, LABEL = INTERWALY[args.interwal]
+    PLIKI = {s: f"{sub}/Binance_{s}{suf}.csv" for s in SYMBOLE}
+
+    print(f"😱 A/B DVOL (PSY-05) — czy IC +0.16@7d daje PnL? BTC+ETH {LABEL}, era DVOL.\n", flush=True)
     print("[1/3] pobieram DVOL + buduję sentyment...", file=sys.stderr, flush=True)
     # tymczasowe bary do zbudowania sentymentu (pełne), potem tniemy do ery DVOL
-    bary_full = {s: wczytaj_csv(sc, interwal="1d") for s, sc in PLIKI.items()}
+    bary_full = {s: wczytaj_csv(sc, interwal=LABEL) for s, sc in PLIKI.items()}
     sent = _sentyment_dvol(bary_full)
     if not sent:
         print("❌ Brak DVOL — A/B niemożliwe.")
         return 1
     bary = _bary_era_dvol(sent)
+    if args.bary:
+        bary = {s: b[-args.bary:] for s, b in bary.items()}
     n = {s: len(b) for s, b in bary.items()}
     print(f"[2/3] okno era-DVOL: {n} barów. Bieg B (DVOL OFF)...", file=sys.stderr, flush=True)
     roi_b, dd_b, tr_b = zmierz(bary, None)
@@ -90,7 +108,7 @@ def main():
     roi_a, dd_a, tr_a = zmierz(bary, sent)
 
     print("=" * 66)
-    print(" A/B DVOL — PnL w pełnym roju (BTC+ETH, dzienny, era DVOL)")
+    print(f" A/B DVOL — PnL w pełnym roju (BTC+ETH, {LABEL}, era DVOL)")
     print("=" * 66)
     print(f" {'wariant':22} {'ROI%':>8} {'maxDD%':>8} {'trades':>7}")
     print(f" {'B: DVOL OFF (baseline)':22} {roi_b:>8.2f} {dd_b:>8.2f} {tr_b:>7}")

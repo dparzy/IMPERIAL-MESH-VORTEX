@@ -14,6 +14,24 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 🎓 | PLAN_TIRO — rdzeń potwierdzony + liczba fragmentów RAG na LICZBA
+
+**Co (dług gnicia):** weryfikacja planu TIRO (priorytet #1). Gnicie było przez commit metadanych
+TABULARIUM w `censor_sprzetu.py` — **nie zmiana logiki**. Rdzeń stanu potwierdzony ✅:
+CENSOR (5 klas PROLETARIUS→CONSUL + CLI raport/migawka/klasa/zmiana/zatwierdz) · NOTARIUS
+(`tiro_pary_nauczyciela.jsonl`, `LIMIT_PROBEK_NA_PYTANIE=3`, `eksportuj_sft`) · rój 87 · kronika 102.
+Pomiary E1 (llama-bench tok/s) = prawda DATOWANA, nietknięta.
+
+**Jedyna korekta + naprawa u źródła:** RAG „27 959 fragmentów" → dziś **29 699**. Dodano publiczny
+`srodowisko_pamieci.fragmenty_w_bazie()` + klucz Tabularium `fragmenty` (W15), więc liczba w
+dokumencie już nie zamarznie (rośnie z biblioteką — jak `ksiazki`). Wstrzykiwanych liczb: 11.
+
+**Pliki:** `docs/PLAN_TIRO_LOKALNY_LLM.md` · `imperium/biblioteki/srodowisko_pamieci.py`
+(+`fragmenty_w_bazie`) · `narzedzia/tabularium.py` (klucz) · `tests/test_tabularium.py`.
+**Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅.
+
+---
+
 ## 2026-07-18 | 📋 | Trójka instrukcji: NAMIESTNIK (nadal prawda) + INSTRUKCJA + SETUP_LOKALNY
 
 **Co (dług gnicia, 3 dokumenty):**

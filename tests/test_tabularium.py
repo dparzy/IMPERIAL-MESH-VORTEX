@@ -285,6 +285,10 @@ def test_liczby_z_kodu_sa_dodatnie():
     for klucz in ("neurony", "zwiadowcy", "strategie", "elity", "pola_logu",
                   "styl_scalp", "styl_swing", "styl_invest", "prawa"):
         assert w[klucz] > 0, f"{klucz} = {w[klucz]} — rejestr nie odpowiada?"
+    # ksiazki/fragmenty mogą być 0 na świeżym klonie bez bazy RAG — sprawdzamy tylko typ i spójność
+    assert isinstance(w["ksiazki"], int) and w["ksiazki"] >= 0
+    assert isinstance(w["fragmenty"], int) and w["fragmenty"] >= 0
+    assert w["fragmenty"] >= w["ksiazki"], "fragmentów nie może być mniej niż książek"
     assert w["neurony_aktywne"] <= w["neurony"], "aktywnych nie może być więcej niż wszystkich"
 
 

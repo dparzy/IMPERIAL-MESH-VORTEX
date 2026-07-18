@@ -111,7 +111,9 @@ def wartosci_z_kodu():
     import dataclasses
 
     from imperium.biblioteki.pamiec_absolutna import ImperiumLog
-    from imperium.biblioteki.srodowisko_pamieci import ksiazki_w_bazie
+    from imperium.biblioteki.srodowisko_pamieci import (
+        fragmenty_w_bazie, ksiazki_w_bazie,
+    )
     from imperium.legiony.rejestr import (
         neurony_dla_trybu, raport_elity, wszystkie_neurony, wszyscy_zwiadowcy,
     )
@@ -134,6 +136,7 @@ def wartosci_z_kodu():
         # Biblioteka rośnie (BIB-070..274 w planie) — liczba książek wpisana w dokument
         # zestarzeje się tak samo, jak zaszyte w kodzie „42" zestarzało się przy 79.
         "ksiazki": ksiazki_w_bazie(),
+        "fragmenty": fragmenty_w_bazie(),
     }
 
 

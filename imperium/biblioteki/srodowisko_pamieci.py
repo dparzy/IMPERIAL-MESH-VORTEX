@@ -102,6 +102,14 @@ def _fragmenty_w_bazie() -> int:
         return 0
 
 
+def fragmenty_w_bazie() -> int:
+    """Ile fragmentów RAG — publiczny wrapper (Tabularium/dokumenty liczą stąd, W15).
+
+    Liczba rośnie z każdą dodaną książką/dokumentem — wpisana ręcznie zestarzeje się
+    (zmierzone 2026-07-18: PLAN_TIRO podawał „27 959" przy 29 699 realnych)."""
+    return _fragmenty_w_bazie()
+
+
 def ksiazki_w_bazie() -> int:
     """Ile KSIĄŻEK (BIB-*) jest zaindeksowanych w RAG — liczone, nigdy zaszyte.
 

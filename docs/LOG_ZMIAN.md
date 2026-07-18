@@ -14,6 +14,32 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 🪞 | CENSOR w akcji: 10 „sprzeczności" W9 = fałszywe alarmy detektora — naprawa u źródła
+
+**Co:** przegląd alarmu Refleksji W9 wiszącego od wielu sesji („10 sprzeczności do przeglądu").
+Diagnoza z kodu (nie opinia): **10/10 to FALSE POSITIVES** z dwóch wad detektora
+(`imperium/biblioteki/refleksja_pamieci.py`):
+1. `_NEGATYW` zawierał `kandydat/planowane/pomysł` → **nowy POMYSŁ liczył się jak NEGACJA**
+   wdrożonego („Dodano H-01" ↔ „Time-Morph kand. #25" = rzekomy regres).
+2. Stoplista bez słów funkcyjnych → pary spinane przez `{'jako','decyzja'}`, `{'moduł','nowy'}`
+   („Odrzucono Zig" ↔ „Budowa ważenia IC" — nic wspólnego; „jako" ma 4 znaki i przechodziło `_MIN_DL`).
+
+**Naprawa u źródła:** (a) `_NEGACJA_TWARDA` — SPRZECZNE wymaga realnego cofnięcia
+(odrzucona/porzucone/wycofana/„nie"), późniejszy „−" będący planem = nowa hipoteza, nie regres;
+(b) stoplista + słowa czynności/funkcyjne. **Wynik: Sprzeczne 10→0, Rozstrzygnięte 10→16**
+(postęp widoczny, szum zgaszony). +3 testy granic (pomysł-nie-przeczy, twarda-negacja-łapana,
+stoplista-tnie), 31/31 testów refleksji. Filozofia anty-utrwalania NIETKNIĘTA (moduł dalej
+tylko zgłasza, nic nie kasuje).
+
+**Lekcja (Księga Wad, 35 wpisów, kat. werdykt):** chroniczny fałszywy alarm uczy ignorować
+bramkę — dokładnie dlatego wisiał sesjami. Konsolidacja LEKCJI: ODŁOŻONA (decyzja Cezara).
+Pozostał 1 wiszący pomysł (Wektory semantyczne RAG, 22d) → decyzja Cezara w Backlogu CODEX.
+
+**Pliki:** refleksja_pamieci.py, test_refleksja_pamieci.py, codex_probationum.py (Backlog),
+ksiega_wad_kodu.jsonl.
+
+---
+
 ## 2026-07-18 | 🏺 | AUDYT KONSTYTUCJI + ZASADA WERYFIKACJI + ZASADA CENSORA (Fable 5)
 
 **Co:** dwa nowe ROZKAZY STAŁE Cezara skodyfikowane + pełny audyt CLAUDE.md zasada-po-zasadzie

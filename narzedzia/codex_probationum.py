@@ -410,10 +410,12 @@ def zbierz_arkusze() -> dict:
         ["A/B na pełnym oknie 1H/4H", "walidacja", "ZABLOKOWANE", "P1",
          "po naprawie O(n²) — dziś okno 800 barów (1H=33 dni, nierozstrzygające)"],
         # Alarmy hooka startowego = zadania, nie tapeta (ZASADA CENSORA, 2026-07-18)
-        ["Konsolidacja LEKCJI pamięci (39k zn. > limit 24k)", "higiena pamięci", "OCZEKUJE", "P2",
-         "alarm hooka od wielu sesji; kasowanie danych pamięci = decyzja Cezara (Prawo XVIII)"],
-        ["Przegląd 10 sprzeczności Refleksji W9 + 1 wiszący pomysł", "higiena pamięci", "OCZEKUJE", "P2",
-         "alarm hooka od wielu sesji; rozstrzygnąć każdą sprzeczność (Prawo XVIII) zamiast ignorować"],
+        ["Konsolidacja LEKCJI pamięci (39k zn. > limit 24k)", "higiena pamięci", "ODŁOŻONE", "P3",
+         "decyzja Cezara 2026-07-18: później (po przeglądzie W9)"],
+        ["Przegląd 10 sprzeczności Refleksji W9", "higiena pamięci", "ZROBIONE 2026-07-18", "—",
+         "10/10 = FP detektora (plan liczony jak negacja + stoplista bez 'jako'); naprawa u źródła, 0 sprzecznych, +3 testy granic"],
+        ["Wiszący pomysł W9: Wektory semantyczne RAG lokalnie (22d)", "decyzja Cezara", "OCZEKUJE", "P3",
+         "zrób / odrzuć / odłóż świadomie — FTS działa (29,7k frag.), wektory = koszt+zależności"],
     ]
     arkusze["Backlog"] = wiersze_b
 

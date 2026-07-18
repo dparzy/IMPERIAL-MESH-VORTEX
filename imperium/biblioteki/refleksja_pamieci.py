@@ -47,9 +47,23 @@ _NEGATYW = {"odrzucona", "odrzucone", "nie", "niezrobione", "niezrobiona", "zawi
 _POZYTYW = {"wdrożona", "wdrozona", "wdrożone", "zrobione", "zrobiona", "gotowe",
             "odhaczona", "odhaczone", "ukończone", "zamknięta", "zamknieta"}
 
+# TWARDA negacja ≠ plan. „−" w _NEGATYW obejmuje też POMYSŁ/KANDYDAT/PLANOWANE (potrzebne
+# dla ROZSTRZYGNIĘTYCH: plan→zrobione = postęp). Ale dla SPRZECZNYCH liczy się wyłącznie
+# realne cofnięcie/odrzucenie — nowy POMYSŁ na pokrewny temat NIE przeczy wdrożonemu modułowi.
+# Zmierzone 2026-07-18: 10/10 „sprzeczności" na pulpicie było FP tej klasy (np. „Dodano H-01"
+# ↔ „Time-Morph kand. #25"); chroniczny fałszywy alarm uczył ignorować bramkę.
+_NEGACJA_TWARDA = {"odrzucona", "odrzucone", "odrzucony", "porzucona", "porzucone", "porzucony",
+                   "wstrzymana", "wstrzymane", "wstrzymany", "zawieszona", "zawieszone",
+                   "zawieszony", "wycofana", "wycofane", "wycofany", "nie"}
+
 _MIN_DL = 4
+# Stoplista tematów: słowa funkcyjne i OPIS CZYNNOŚCI, nie przedmiotu. Bez nich detektor
+# spinał obce wpisy po {'jako','decyzja'} / {'moduł','nowy'} (zmierzone 2026-07-18 — „Odrzucono
+# Zig" ↔ „Budowa ważenia IC" jako para). „jako" ma 4 znaki, więc _MIN_DL go nie odsiewa.
 _STOP = {"prawo", "sesja", "claude", "cezar", "memory", "pamięci", "pamiec", "warstwa",
-         "system", "tylko", "więcej", "robić", "który", "która", "które", "wszystko"}
+         "system", "tylko", "więcej", "robić", "który", "która", "które", "wszystko",
+         "jako", "nowy", "nowa", "nowe", "moduł", "modul", "decyzja", "decyzje",
+         "dodano", "dodanie", "dodana", "budowa", "wprowadzenie", "implementacja", "integracja"}
 
 # Źródła niosące REALNY status per-przedmiot (wizje mają pole status: WDROŻONA/POMYSŁ/…).
 # Detekcja sprzeczności ogranicza się do nich — dziennik to narracja osi czasu, nie ledger
@@ -127,6 +141,13 @@ def _nakladanie(a: Set[str], b: Set[str], minimum: int = 2) -> bool:
     return len(a & b) >= minimum
 
 
+def _twarda_negacja(w: Dict[str, Any]) -> bool:
+    """Czy wpis niesie REALNE cofnięcie (odrzucona/porzucone/„nie robimy"), a nie sam plan."""
+    low = set(re.findall(r"[a-ząćęłńóśźż]+",
+                         (w.get("opis", "") + " " + w.get("status", "")).lower()))
+    return bool(low & _NEGACJA_TWARDA)
+
+
 # ─── DETEKCJA SPRZECZNOŚCI / ROZSTRZYGNIĘĆ ─────────────────────────────────────
 
 def wykryj_sprzecznosci(limit: int = 20,
@@ -160,6 +181,11 @@ def wykryj_sprzecznosci(limit: int = 20,
             if not _nakladanie(a["tematy"], b["tematy"]):
                 continue
             wczesny, pozny = (a, b) if a["data"] <= b["data"] else (b, a)
+            # SPRZECZNE wymaga TWARDEJ negacji późniejszego wpisu — późniejszy „−" będący
+            # jedynie POMYSŁEM/PLANEM to nowa hipoteza, nie regres (10/10 FP, 2026-07-18).
+            if wczesny["kierunek"] == "+" and pozny["kierunek"] == "-" \
+                    and not _twarda_negacja(pozny):
+                continue
             typ = "ROZSTRZYGNIĘTE" if (wczesny["kierunek"] == "-" and pozny["kierunek"] == "+") \
                 else "SPRZECZNE"
             wyniki.append({

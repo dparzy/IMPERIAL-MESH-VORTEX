@@ -60,6 +60,39 @@ def test_dziennik_narracja_nie_daje_falszywej_sprzecznosci(monkeypatch):
     assert w and w[0]["typ"] == "SPRZECZNE"
 
 
+def test_pomysl_nie_przeczy_wdrozonemu(monkeypatch):
+    """Granica (10/10 FP z 2026-07-18): późniejszy „−" będący POMYSŁEM/KANDYDATEM
+    nie jest regresem wobec wdrożonego — bez twardej negacji para NIE powstaje."""
+    monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [
+        {"data": "2026-06-30", "tematy": {"hurst", "h-01"}, "kierunek": "+",
+         "opis": "Dodano neuron H-01 (Hurst-DFA)", "zrodlo": "wizje", "status": "WDROŻONA"},
+        {"data": "2026-07-15", "tematy": {"hurst", "h-01"}, "kierunek": "-",
+         "opis": "Time-Morph — adaptacyjny interwal (kand. #25)", "zrodlo": "wizje",
+         "status": "POMYSŁ"},
+    ])
+    assert rp.wykryj_sprzecznosci() == []
+
+
+def test_twarda_negacja_w_statusie_nadal_sprzeczna(monkeypatch):
+    """Granica dopełniająca: realne ODRZUCENIE po wdrożeniu MUSI zostać złapane."""
+    monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [
+        {"data": "2026-06-01", "tematy": {"portfel", "koszyk"}, "kierunek": "+",
+         "opis": "Portfel wdrożony", "zrodlo": "wizje", "status": "WDROŻONA"},
+        {"data": "2026-06-20", "tematy": {"portfel", "koszyk"}, "kierunek": "-",
+         "opis": "Portfel", "zrodlo": "wizje", "status": "ODRZUCONA"},
+    ])
+    w = rp.wykryj_sprzecznosci()
+    assert w and w[0]["typ"] == "SPRZECZNE"
+
+
+def test_stoplista_tnie_slowa_funkcyjne():
+    """Granica: 'jako'/'decyzja'/'moduł'/'budowa' NIE są tematami — to one spinały
+    obce wpisy w pary („Odrzucono Zig" ↔ „Budowa ważenia IC", zmierzone 2026-07-18)."""
+    t = rp._tematy("Budowa ważenia głosów jako nowa decyzja modułu")
+    assert not ({"jako", "nowa", "decyzja", "budowa"} & t)
+    assert "ważenia" in t or "głosów" in t          # realne tematy zostają
+
+
 def test_brak_wspolnych_tematow_brak_sprzecznosci(monkeypatch):
     monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [
         {"data": "2026-06-01", "tematy": {"numba", "viterbi"}, "kierunek": "-",

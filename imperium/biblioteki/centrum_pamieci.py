@@ -11,7 +11,9 @@ centrum_pamieci as pm`.
 
 WARSTWY (każda pozostaje samodzielna, tu tylko spięta w całość):
   W1 — pamiec_absolutna.py: logi SYGNAŁÓW, TRADE, ANALIZA, TEST (JSONL / TypLogu) ✅ ŻYWA
-  W2 — bibliotheca_ulpia/ : RAG semantyczny (FTS5, 41/42 książek + encyklopedia) ✅ ZBUDOWANA
+  W2 — bibliotheca_ulpia/ : RAG (FTS5, książki + encyklopedia) ✅ ZBUDOWANA — żywą liczbę
+       książek podaje `srodowisko_pamieci.ksiazki_w_bazie()`, nie ten docstring (biblioteka
+       rośnie; „41/42" zestarzało się do 79 zanim ktokolwiek zauważył)
   W3 — pamiec_sesji.py   : LEKCJE z sesji + PROFIL Cezara (markdown → git) ✅ ŻYWA
   W3 — kronika_czatu.py  : PEŁNY DIALOG (destylat transkryptów → git) ✅ ŻYWA
   W4 — rejestr_wizji.py  : WIZJE, DECYZJE, POMYSŁY, ZMIANY (JSONL → git) ✅ ŻYWA [v4]

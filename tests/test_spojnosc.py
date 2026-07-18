@@ -27,7 +27,9 @@ def test_audyt_wykrywa_rozbieznosc():
     def fake(p):
         t = orig(p)
         if p == "README.md":
-            return re.sub(r"\d+ zaimplementowane", "999 zaimplementowane", t)
+            # README podaje liczbę neuronów w bloku W15 (<!-- LICZBA:neurony -->N<!-- /LICZBA -->);
+            # podmieniamy N w bloku, by W3 (tolerujący oba formaty) wykrył rozbieżność.
+            return re.sub(r"(LICZBA:neurony -->)\d+", r"\g<1>999", t)
         return t
 
     a._czytaj = fake
@@ -176,3 +178,69 @@ def test_audyt_w14_wykrywa_brakujacy_klucz():
     bledy, _ = a._warstwa_14_wszystkie_dokumenty([_FakeNeuron()])
     assert any("W14" in b and "ZZZ-99" in b for b in bledy), \
         "W14 nie wykrył braku klucza w MAPA_KLUCZY"
+
+
+# ── WARSTWA 16: API-WIDMA (łowca ścieżek do nieistniejących plików) ──────────
+_W16_REAL = {"imperium/istnieje.py", "narzedzia/audyt_spojnosci.py"}
+
+
+def test_audyt_w16_zielony_na_realnym_korpusie():
+    """W16 na żywym repo: każda ścieżka .py w żywych docs istnieje (po naprawie INDEKS)."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, info = a._warstwa_16_api_widma()
+    assert not bledy, f"W16 wykrył API-widma w żywych dokumentach: {bledy}"
+    assert any("W16" in i for i in info)
+
+
+def test_audyt_w16_wykrywa_widmo_w_prozie():
+    """Granica: ścieżka do NIEISTNIEJĄCEGO pliku w zwykłej linii = widmo."""
+    import narzedzia.audyt_spojnosci as a
+    tresc = "Uruchom `imperium/koloseum/valhalla.py` aby wystartować.\n"
+    w = a._w16_widma_w_tresci(tresc, _W16_REAL)
+    assert w == [("imperium/koloseum/valhalla.py", 1)], w
+
+
+def test_audyt_w16_plik_istniejacy_nie_jest_widmem():
+    """Granica: ścieżka do REALNEGO pliku = brak alarmu."""
+    import narzedzia.audyt_spojnosci as a
+    tresc = "Silnik: `imperium/istnieje.py` — działa.\n"
+    assert a._w16_widma_w_tresci(tresc, _W16_REAL) == []
+
+
+def test_audyt_w16_blok_python_jest_przykladem():
+    """Granica: ścieżka w bloku ```python (kod przykładowy) NIE jest twierdzeniem."""
+    import narzedzia.audyt_spojnosci as a
+    tresc = "```python\n# imperium/cesarz/doradcy/vulcan.py\nclass X: ...\n```\n"
+    assert a._w16_widma_w_tresci(tresc, _W16_REAL) == []
+
+
+def test_audyt_w16_blok_bash_nie_jest_przykladem():
+    """Granica dopełniająca: ta sama ścieżka w bloku ```bash = twierdzenie → widmo."""
+    import narzedzia.audyt_spojnosci as a
+    tresc = "```bash\npython imperium/koloseum/valhalla.py\n```\n"
+    w = a._w16_widma_w_tresci(tresc, _W16_REAL)
+    assert w == [("imperium/koloseum/valhalla.py", 2)], w
+
+
+def test_audyt_w16_marker_planu_cisza():
+    """Granica: 'do zbudowania' w linii → plan, nie widmo (bez fałszywego alarmu)."""
+    import narzedzia.audyt_spojnosci as a
+    tresc = "A/B: `narzedzia/ab_widmo.py` (do zbudowania).\n"
+    assert a._w16_widma_w_tresci(tresc, _W16_REAL) == []
+
+
+def test_audyt_w16_negacja_cisza():
+    """Granica: negacja 'NIGDY nie istniał' → nie widmo (przypadek paper_trading_live)."""
+    import narzedzia.audyt_spojnosci as a
+    tresc = "`narzedzia/paper_trading_live.py` — pliku, który NIGDY nie istniał.\n"
+    assert a._w16_widma_w_tresci(tresc, _W16_REAL) == []
+
+
+def test_audyt_w16_marker_nie_lapie_wewnatrz_slowa():
+    """Granica (recenzja 2026-07-18): 'todo' w 'metodologia' i 'wizja' w 'dywizja'
+    NIE mogą uciszać — inaczej prawdziwe widmo na takiej linii ginie (false-negative)."""
+    import narzedzia.audyt_spojnosci as a
+    t1 = "Metodologia w `imperium/koloseum/valhalla.py` opisana niżej.\n"
+    assert a._w16_widma_w_tresci(t1, _W16_REAL) == [("imperium/koloseum/valhalla.py", 1)], t1
+    t2 = "Dywizja III uruchamia `imperium/koloseum/valhalla.py`.\n"
+    assert a._w16_widma_w_tresci(t2, _W16_REAL) == [("imperium/koloseum/valhalla.py", 1)], t2

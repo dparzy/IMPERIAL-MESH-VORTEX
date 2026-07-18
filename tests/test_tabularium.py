@@ -282,9 +282,122 @@ def test_liczby_z_kodu_sa_dodatnie():
     """Liczby idą z ŻYWEGO rejestru — zero to znak, że import cicho padł."""
     from narzedzia.tabularium import wartosci_z_kodu
     w = wartosci_z_kodu()
-    for klucz in ("neurony", "zwiadowcy", "strategie", "elity"):
+    for klucz in ("neurony", "zwiadowcy", "strategie", "elity", "pola_logu",
+                  "styl_scalp", "styl_swing", "styl_invest", "prawa"):
         assert w[klucz] > 0, f"{klucz} = {w[klucz]} — rejestr nie odpowiada?"
+    # ksiazki/fragmenty mogą być 0 na świeżym klonie bez bazy RAG — sprawdzamy tylko typ i spójność
+    assert isinstance(w["ksiazki"], int) and w["ksiazki"] >= 0
+    assert isinstance(w["fragmenty"], int) and w["fragmenty"] >= 0
+    assert w["fragmenty"] >= w["ksiazki"], "fragmentów nie może być mniej niż książek"
     assert w["neurony_aktywne"] <= w["neurony"], "aktywnych nie może być więcej niż wszystkich"
+
+
+def test_liczby_profile_stylu_sledza_rejestr():
+    """Profile stylu są STROJONE pomiarem (A/B), więc ręczna liczba rozjedzie się co A/B.
+
+    Zmierzone 2026-07-17: ANALIZA_NEURONY podawała rozmiary profili kolejno jako 41/59/35,
+    65/65/70 i 75/75/87 — każda prawdziwa w dniu zapisu. Dlatego są wstrzykiwane.
+    """
+    from imperium.legiony.rejestr import neurony_dla_trybu
+    from narzedzia.tabularium import wartosci_z_kodu
+    w = wartosci_z_kodu()
+    for styl, klucz in (("SCALP", "styl_scalp"), ("SWING", "styl_swing"), ("INVEST", "styl_invest")):
+        assert w[klucz] == len(neurony_dla_trybu(styl))
+        assert w[klucz] <= w["neurony"], f"{styl}: profil nie może być większy niż rój"
+
+
+def test_prawa_jeden_parser_dla_calego_imperium():
+    """Prawo XVI: jeden format = jeden parser. Audyt (W10) MUSI liczyć praw tak samo.
+
+    Historia: bramka W10 miała liczbę praw ZASZYTĄ i żądała „21", gdy praw było 25 —
+    egzekwowała kłamstwo. Potem regex żył w dwóch plikach; dwa parsery tego samego
+    formatu rozjadą się co do znaku, a bramka pilnująca prawdy nie może zgadywać.
+    """
+    from narzedzia.tabularium import policz_prawa, wartosci_z_kodu
+    n = policz_prawa()
+    assert n > 0, "ZASADY_FUNDAMENTALNE.md nie oddaje żadnego prawa — parser padł?"
+    assert wartosci_z_kodu()["prawa"] == n
+
+    # Audyt musi używać TEJ SAMEJ funkcji, nie własnej kopii regexu.
+    import narzedzia.audyt_spojnosci as audyt
+    zrodlo_audytu = open(audyt.__file__, encoding="utf-8").read()
+    assert "policz_prawa" in zrodlo_audytu, \
+        "audyt zgubił import policz_prawa — wrócił do własnego regexu (Prawo XVI)"
+
+    # Audyt owija ten import w try/except → cykl importów CICHO wyłączyłby bramkę W10
+    # (klasa „bramka cichnie na głucho" z Księgi Wad). Tabularium nie może importować audytu.
+    # Szukamy realnego IMPORTU, nie samego słowa: pierwsza wersja tego testu oblała się na
+    # własnym KOMENTARZU wspominającym audyt — ta sama klasa, przez którą odrzuciliśmy
+    # kandydata `xpath(...)[0]` (wzorzec trafiał we własne komentarze o bugu).
+    import re as _re
+
+    import narzedzia.tabularium as tab
+    zrodlo_tabularium = open(tab.__file__, encoding="utf-8").read()
+    import_audytu = _re.search(r"^\s*(?:from|import)\s+\S*audyt_spojnosci", zrodlo_tabularium, _re.M)
+    assert not import_audytu, \
+        ("tabularium importuje audyt → cykl → `except` w audycie połknie ImportError "
+         "i bramka praw (W10) zamilknie bez śladu")
+
+
+def test_liczby_pola_logu_sledza_dataclass():
+    """PAMIEC_ABSOLUTNA podaje rozmiar schematu ImperiumLog — musi iść za kodem.
+
+    Dokument twierdził „~80 pól" przy 68 w kodzie (zmierzone 2026-07-17). Liczba
+    wpisana ręcznie rozjeżdża się z każdym dodanym polem — dlatego jest wstrzykiwana.
+    """
+    import dataclasses
+
+    from imperium.biblioteki.pamiec_absolutna import ImperiumLog
+    from narzedzia.tabularium import wartosci_z_kodu
+    assert wartosci_z_kodu()["pola_logu"] == len(dataclasses.fields(ImperiumLog))
+
+
+def test_liczby_niedomkniety_znacznik_nie_zjada_tekstu():
+    """GRANICA (realny incydent 2026-07-17): otwarcie BEZ domknięcia zjadło 44 linie historii.
+
+    Regex z DOTALL i `(.*?)` sklejał osierocone otwarcie z domknięciem NASTĘPNEGO bloku i
+    `sub()` kasował całą treść pomiędzy — w tym cudze wpisy. Blok musi kończyć się na własnej
+    granicy albo nie dopasować się wcale.
+    """
+    from narzedzia.tabularium import wartosci_z_kodu, wstrzyknij_liczby
+    prawda = wartosci_z_kodu()["neurony"]
+    miedzy = "TEKST KTORY MUSI PRZEZYC"
+    sciezka = _tymczasowy_dokument(
+        "---\nkategoria: TABULA\ntyp: zywy\nwlasciciel: —\nstan_na: 2026-07-17\n"
+        "powod_istnienia: test\n---\n\n"
+        "Cytat bez domknięcia: <!-- LICZBA:neurony -->\n\n"
+        f"{miedzy}\n\n"
+        "Prawdziwy blok: <!-- LICZBA:neurony -->999<!-- /LICZBA -->\n")
+    try:
+        wstrzyknij_liczby(sucho=False)
+        with open(sciezka, encoding="utf-8") as f:
+            tresc = f.read()
+        assert miedzy in tresc, "treść między znacznikami ZJEDZONA — regex przekroczył granicę bloku"
+        assert f"<!-- LICZBA:neurony -->{prawda}<!-- /LICZBA -->" in tresc, "domknięty blok ma się odświeżyć"
+    finally:
+        os.unlink(sciezka)
+
+
+def test_liczby_nie_dotykaja_historii_acta():
+    """Prawo I: wpis datowany cytuje liczbę z DNIA ZAPISU — narzędzie nie może jej podmienić.
+
+    LOG_ZMIAN cytuje `<!-- LICZBA:neurony -->87<!-- /LICZBA -->` w opisie z 2026-07-17. Gdy rój
+    urośnie, przepisanie zamieniłoby historyczne 87 na nową liczbę = falsyfikacja historii.
+    """
+    from narzedzia.tabularium import wstrzyknij_liczby
+    sciezka = _tymczasowy_dokument(
+        "---\nkategoria: ACTA\ntyp: acta\npowod_acta: test\nwlasciciel: —\n"
+        "stan_na: 2026-07-17\npowod_istnienia: test\n---\n\n"
+        "Wpis z przeszłości: <!-- LICZBA:neurony -->1<!-- /LICZBA --> neuron.\n")
+    try:
+        zmiany, bledy = wstrzyknij_liczby(sucho=True)
+        assert not any(os.path.basename(sciezka) in z for z in zmiany), \
+            f"ACTA nie może być przepisywana: {zmiany}"
+        wstrzyknij_liczby(sucho=False)
+        with open(sciezka, encoding="utf-8") as f:
+            assert "-->1<!-- /LICZBA -->" in f.read(), "historia sfalsyfikowana przez wstrzykiwacz"
+    finally:
+        os.unlink(sciezka)
 
 
 def test_liczby_lapie_rozjazd_i_naprawia():

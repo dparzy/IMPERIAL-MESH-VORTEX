@@ -2,15 +2,26 @@
 kategoria: FORMA
 typ: zywy
 wlasciciel: imperium/biblioteki/hedge_mwu.py, imperium/biblioteki/igrzyska.py
-stan_na: 2026-06-09
-powod_istnienia: "Jedyny dokument opisujący system rywalizacji/rang dla neuronów, legionów i senatorów (Cursus Honorum Neuronalis) — mechanizm nagród/kar, automatyczną kalibrację wag, oraz (w drugie"
+stan_na: 2026-07-18
+powod_istnienia: "Jedyny dokument opisujący system rywalizacji/rang dla neuronów (Cursus Honorum Neuronalis) — mechanizm nagród/kar, automatyczną kalibrację wag, oraz online-learning HedgeMWU (W-049)"
 ---
 # 🏟️ IGRZYSKA IMPERIUM — System Rywalizacji i Rang
 
 > *"Per certamen ad gloriam."* — Przez rywalizację do chwały.
 >
-> Każdy neuron, każdy legion, każdy senator walczy o pierwsze miejsce.
-> Igrzyska sprawiają, że maszyna sama siebie doskonali — bez rozkazu z zewnątrz.
+> Każdy neuron walczy o pierwsze miejsce. Igrzyska sprawiają, że maszyna sama siebie doskonali.
+
+> **⚠️ Weryfikacja wobec kodu 2026-07-18 — co REALNE, co WIZJA:**
+> • ✅ **Arena Neuronów w pełni w kodzie** (`igrzyska.py`): wzór WYNIK_NEURONU (0.30·acc +
+>   0.25·prec + 0.20·contrib + 0.15·timeliness + 0.10·stability), tablica `RANGI`
+>   (Tiro→Aquilifer, progi/mnożniki 0.93/2.0 … 0.0/0.5), `PROG_INFAMII=0.40`, `zloty_helm()`,
+>   `lista_infamii()`, `WpisInfamii`, `okresl_range()` — wszystko zgadza się co do liczby.
+> • ✅ **HedgeMWU** (sekcja na końcu) — pełne API zweryfikowane.
+> • 🔴 **Arena Legionów i Arena Senatu — NIE ISTNIEJĄ w kodzie** (0 trafień). WYNIK_LEGIONU/
+>   WYNIK_SENATORA, rangi legionów/senatorów, kary dla nich — to WIZJA, nie kod.
+> • 🔴 **Pliki panteonu** (`PANTEON_NEURONOW.md`, `TRIUMPHI.md`, `ALBUM_SENATUS.md`,
+>   `LISTA_INFAMII.jsonl`) **nie istnieją** — `zloty_helm()`/`lista_infamii()` zwracają dane
+>   w pamięci, nie zapisują do tych plików. Hall-of-Fame to plan.
 
 ---
 
@@ -24,11 +35,11 @@ powod_istnienia: "Jedyny dokument opisujący system rywalizacji/rang dla neuron�
 
 **Trzy Areny Igrzysk:**
 
-| Arena | Uczestnicy | Metryki | Częstotliwość |
-|-------|-----------|---------|---------------|
-| 🧬 **Arena Neuronów** | Mikro-neurony (299 w katalogu, <!-- LICZBA:neurony -->87<!-- /LICZBA --> w kodzie) | Accuracy, Precision, F1, Contribution | Co 24h rolling |
-| ⚔️ **Arena Legionów** | 4 Legiony + dywizje | Sharpe, WinRate, MaxDD, Calmar | Co tydzień |
-| 🏛️ **Arena Senatu** | Senatorzy (głosy LONG/SHORT) | Głosowania vs wynik, kalibracja | Po każdym trade |
+| Arena | Uczestnicy | Metryki | Stan |
+|-------|-----------|---------|------|
+| 🧬 **Arena Neuronów** | Mikro-neurony (299 w katalogu, <!-- LICZBA:neurony -->87<!-- /LICZBA --> w kodzie) | Accuracy, Precision, Contribution, Timeliness, Stability | ✅ **w kodzie** (`igrzyska.py`) |
+| ⚔️ **Arena Legionów** | 4 Legiony + dywizje | Sharpe, WinRate, MaxDD, Calmar | 🔴 **WIZJA** (brak w kodzie) |
+| 🏛️ **Arena Senatu** | Senatorzy (głosy LONG/SHORT) | Głosowania vs wynik, kalibracja | 🔴 **WIZJA** (brak w kodzie) |
 
 ---
 
@@ -86,7 +97,10 @@ Stability       = 1 - (liczba_flipow / łączne_sygnały)
 
 ---
 
-## ⚔️ ARENA LEGIONÓW
+## ⚔️ ARENA LEGIONÓW — 🔴 WIZJA (nie w kodzie)
+
+> Cała ta sekcja (WYNIK_LEGIONU, rangi legionów, nagrody/kary) to projekt — `igrzyska.py`
+> liczy dziś wyłącznie Arenę Neuronów. Zostawiamy jako zapis zamiaru.
 
 ### Metryki Oceny Legionu
 
@@ -130,7 +144,9 @@ Wartości bazowe dla oceny (per 30 dni rolling):
 
 ---
 
-## 🏛️ ARENA SENATU
+## 🏛️ ARENA SENATU — 🔴 WIZJA (nie w kodzie)
+
+> Jak Arena Legionów — WYNIK_SENATORA, rangi senatorów, Purpura Senatu to projekt, nie kod.
 
 ### Metryki Oceny Senatora
 

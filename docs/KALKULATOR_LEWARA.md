@@ -2,13 +2,22 @@
 kategoria: FORMA
 typ: zywy
 wlasciciel: imperium/pretorianie/kalkulator_lewara.py
-stan_na: 2026-06-04
-powod_istnienia: "Jedyny dokument z pełną 'matematyką przeżycia' pozycji lewarowanej — od ceny likwidacji przez stop-loss, dynamiczną dźwignię, zarządzanie kapitałem (2%), take-profit, checklist Pre"
+stan_na: 2026-07-17
+powod_istnienia: "Jedyny dokument z pełną 'matematyką przeżycia' pozycji lewarowanej — od ceny likwidacji przez stop-loss, dynamiczną dźwignię, zarządzanie kapitałem (2%), take-profit, checklist Pretorianów"
 ---
 # ⚖️ KALKULATOR LEWARA — Matematyka Przeżycia
 
 > **Zasada Żelazna:** Zanim wejdziesz w pozycję lewarowaną — MUSISZ znać dokładną cenę likwidacji.
 > Jeśli system nie policzy likwidacji → pozycja NIE wchodzi. Bezwzględnie.
+
+> **⚠️ Jak czytać (weryfikacja wobec kodu 2026-07-17).** Bloki `python` poniżej są
+> **ilustracją wzoru, nie kopią kodu** — źródłem prawdy jest zawsze
+> [`kalkulator_lewara.py`](../imperium/pretorianie/kalkulator_lewara.py). Poprzednia wersja
+> (2026-06-04) podawała funkcję `policz_dzwignie()`, której **nie ma w kodzie**, i twierdziła,
+> że w reżimie PANIC handlujemy dźwignią 1× — **realnie PANIC to ZERO pozycji** (kod jest
+> ostrożniejszy niż był ten opis). Sprostowane niżej; dopisano też sekcję §11 z mechanizmami
+> ryzyka, których dokument w ogóle nie znał (Reguła 6% Eldera, sizing frakcyjny po DD,
+> volatility drag, Kelly ze skośnością, SL oparty na ATR).
 
 ---
 
@@ -102,40 +111,40 @@ Dźwignia NIE jest stała. Generał dostosowuje ją do siły sygnału.
 | 0.85–0.92 | 10×–15× | Bardzo silny — zwiększona dźwignia |
 | > 0.92 | 15×–20× | Wyjątkowy sygnał — maksymalna dźwignia |
 
-**Korektory reżimu rynku:**
-- VOLATILE: dźwignia ÷ 2 (zawsze)
-- PANIC: dźwignia = 1× maksymalnie
-- RANGING + sygnał odwrócenia: dźwignia ×0.7
-- TREND_STRONG + kierunek zgodny: dźwignia ×1.2 (do max dla poziomu)
+**Korektory reżimu rynku (mnożniki — zgodne z kodem):**
+- VOLATILE: ×0.5 · **PANIC: ×0.1** · RANGING: ×0.7 · TREND_STRONG: ×1.2 · NORMAL: ×1.0 · ON-CHAIN_BULLISH: ×1.1
 
-### Wzór na Dźwignię Dynamiczną
+> 🚨 **Sprostowanie 2026-07-17 — PANIC.** Poprzednia wersja pisała *„PANIC: dźwignia = 1×
+> maksymalnie"*, co sugerowało, że w panice **handlujemy** małą dźwignią. **Nieprawda —
+> w PANIC nie wchodzimy wcale:** `_checklist()` wetuje twardo („Reżim PANIC — zero pozycji
+> lewarowanych"). Mnożnik ×0.1 nigdy nie decyduje, bo pozycja jest odrzucana wcześniej.
+> Kod jest **bezpieczniejszy**, niż głosił ten dokument.
+
+### Wzór na Dźwignię Dynamiczną — `KalkulatorLewara.auto_dzwignia()`
+
+Realna sygnatura (staticmethod; **nie** `policz_dzwignie(...)` i **bez** `pretorianie_ok` —
+weto żyje w checkliście, nie tutaj):
 
 ```python
-def policz_dzwignie(pewnosc: float, rezim: str, pretorianie_ok: bool) -> int:
-    if not pretorianie_ok:
-        return 0  # Veto = brak pozycji
-
-    # Baza z tabeli
-    if pewnosc < 0.55:   return 0
-    elif pewnosc < 0.65: dzwignia_baza = 2
-    elif pewnosc < 0.75: dzwignia_baza = 5
-    elif pewnosc < 0.85: dzwignia_baza = 10
-    elif pewnosc < 0.92: dzwignia_baza = 15
-    else:                dzwignia_baza = 20
-
-    # Korekta reżimu
-    korektor = {
-        "VOLATILE": 0.5,
-        "PANIC": 0.1,
-        "RANGING": 0.7,
-        "TREND_STRONG": 1.2,
-        "NORMAL": 1.0,
-        "ON-CHAIN_BULLISH": 1.1,
-    }.get(rezim, 1.0)
-
-    dzwignia = int(dzwignia_baza * korektor)
-    return min(max(dzwignia, 1), 20)  # clamp 1–20
+@staticmethod
+def auto_dzwignia(pewnosc: float, rezim: str = "NORMAL") -> int:
+    if pewnosc < 0.55:   baza = 0
+    elif pewnosc < 0.65: baza = 2
+    elif pewnosc < 0.75: baza = 5
+    elif pewnosc < 0.85: baza = 10
+    elif pewnosc < 0.92: baza = 15
+    else:                baza = 20
+    korektor = {"VOLATILE": 0.5, "PANIC": 0.1, "RANGING": 0.7,
+                "TREND_STRONG": 1.2, "NORMAL": 1.0, "ON-CHAIN_BULLISH": 1.1}.get(rezim, 1.0)
+    return min(max(int(baza * korektor), 1), MAX_DZWIGNIA)   # clamp 1–20
 ```
+
+> ⚠️ **Granica, która myli (zmierzone):** tabela mówi „< 0.55 → 0× (nie handluj)", ale
+> `auto_dzwignia(0.10)` **zwraca 1**, nie 0 — bo `max(..., 1)` przycina do jedynki.
+> Słaby sygnał NIE jest odrzucany przez dźwignię, tylko przez **osobne weto w checkliście**
+> („Zbyt słaby sygnał: 10% < 55%"). Skutek jest właściwy (pozycja nie wchodzi), ale mechanizm
+> jest inny, niż opisywał ten dokument — nie licz na to, że zwrócone `0` gdziekolwiek zablokuje
+> wejście, bo `auto_dzwignia` nigdy nie zwraca zera.
 
 ---
 
@@ -198,51 +207,82 @@ Take-Profit: 109 500 USDT (+9.5%) ← R:R = 2:1
 
 ---
 
-## ✅ CHECKLIST PRZED WEJŚCIEM (Pretorianie sprawdzają)
+## ✅ CHECKLIST PRZED WEJŚCIEM — `_checklist()` (zweryfikowana 2026-07-17)
 
-```
-□ Cena likwidacji policzona?
-□ Stop-Loss ustawiony (min 20% bufora od likwidacji)?
-□ Rozmiar pozycji ≤ 2% kapitału?
-□ R:R ≥ 1:2?
-□ Funding Rate < 0.05% (LONG) lub > -0.03% (SHORT)?
-□ ATR w normie (< 2× średniej)?
-□ Seria strat < 3 z rzędu?
-□ Drawdown < 10%?
-□ Dźwignia zgodna z pewności agregatu?
-□ WSZYSTKO ✅ → pozycja może wejść
-□ COKOLWIEK ❌ → VETO — czekaj
-```
+**To jest pełna lista wet w kodzie.** Kolejność jak w `_checklist()`; pierwsze trafienie
+wygrywa i wypełnia `powod_veto` (a `checklist_ok=False`):
+
+| # | Weto gdy… | Komunikat |
+|---|---|---|
+| 1 | Breaker krzywej w **HALT** (equity DD ≥ 20%) | `🛑 BREAKER KRZYWEJ: HALT — nowe wejścia wstrzymane` |
+| 2 | **Bezpiecznik AOA przepalony** (DD ≥ 30%) | `🛑 BEZPIECZNIK AOA przepalony` — wymaga ręcznego resetu |
+| 3 | `pretorianie_ok = False` | `Pretorianie nałożyli VETO (warunki zewnętrzne)` |
+| 4 | **`rezim == "PANIC"`** | `Reżim PANIC — zero pozycji lewarowanych` |
+| 5 | `dzwignia > 20` (`MAX_DZWIGNIA`) | `Dźwignia N× przekracza max 20×` |
+| 6 | **`pewnosc < 0.55`** | `Zbyt słaby sygnał: N% < 55%` |
+| 7 | **bufor do likwidacji < 20%** | `Bufor do likwidacji zbyt mały: N% < 20%` |
+| 8 | `rozmiar > 50% kapitału` | `Pozycja zbyt duża vs kapitał` |
+
+**Czego w checkliście NIE MA** (poprzednia wersja dokumentu obiecywała te bramki — to była
+lista życzeń, nie kod):
+- 🔴 **Funding Rate** i 🔴 **ATR < 2× średniej** — kalkulator ich nie wetuje. ATR jest używany,
+  ale wyłącznie do *wyliczenia* stop-lossa (`atr` + `sl_atr_mult`, §11), nie jako bramka.
+- 🔴 **Seria strat < 3** — nie ma w kalkulatorze (pokrewne: `RegulaSzesciuProcentEldera`, §11).
+- ⚠️ **„Rozmiar ≤ 2% kapitału"** — mieszało dwie rzeczy. `MAX_RYZYKO = 0.02` ogranicza **ryzyko**
+  (maksymalną stratę na stopie), a nie rozmiar pozycji; checklist wetuje dopiero **rozmiar > 50%
+  kapitału**. Przy stopie 4.75% pozycja 2%-ryzyka ma rozmiar ~42% kapitału — i to jest legalne.
+- ⚠️ **„Drawdown < 10%"** — 10% DD **nie wetuje**, tylko przełącza breaker w REDUCED (rozmiar ×0.5).
+  Weto zaczyna się przy 20% (HALT), a twardy stop AOA przy 30%.
+- ⚠️ **„R:R ≥ 1:2"** — `MIN_RR = 2.0` istnieje jako stała i `rr_ratio` jest liczone w planie,
+  ale **checklist tego nie wetuje**. Take-profit jest z definicji stawiany na 2×ryzyko, więc
+  R:R wychodzi 2:1 z konstrukcji — dopóki nikt nie poda własnego TP.
 
 ---
 
 ## 📁 Plik kodu: `imperium/pretorianie/kalkulator_lewara.py`
 
-```python
-from dataclasses import dataclass
+**Pełny `PlanPozycji` (16 pól — zweryfikowane `dataclasses.fields`):**
 
+```python
 @dataclass
 class PlanPozycji:
     symbol: str
-    kierunek: str          # LONG / SHORT
+    kierunek: str               # LONG / SHORT
     cena_wejscia: float
     dzwignia: int
     cena_likwidacji: float
     stop_loss: float
     take_profit: float
     rozmiar_usdt: float
-    ryzyko_usdt: float     # max strata w USDT
-    rr_ratio: float        # Risk:Reward
+    ryzyko_usdt: float          # max strata w USDT
+    rr_ratio: float             # Risk:Reward
+    bufor_likwidacji_pct: float # ← ile % drogi do likwidacji zostaje za stopem (weto <20%)
     checklist_ok: bool
-    powod_veto: str        # "" jeśli OK
+    powod_veto: str             # "" jeśli OK
+    skala_vol: float = 1.0      # volatility targeting (W-059)
+    frakcja_breaker: float = 1.0  # equity-curve breaker (W-062): 1.0/0.5/0.0
+    frakcja_dd: float = 1.0     # ← drawdown-fractional sizing (W-063)
+    drag_roczny: float | None = None   # ← koszt zmienności przy tej dźwigni (§11)
+```
 
-class KalkulatorLewara:
-    OPLATE_UTRZYMANIA = 0.005  # 0.5% — typowe dla Binance/MEXC
+**Stałe modułu (zweryfikowane):** `OPLATA_UTRZYMANIA = 0.005` *(uwaga: poprzednia wersja
+dokumentu pisała `OPLATE_UTRZYMANIA` — taka nazwa nie istnieje)* · `MAX_DZWIGNIA = 20` ·
+`MAX_RYZYKO = 0.02` · `MIN_RR = 2.0` · `MAX_DRAWDOWN_STOP = 0.3` · `VOL_TARGET_DEFAULT = 0.6` ·
+`SKALA_VOL_MIN = 0.25` · `SKALA_VOL_MAX = 1.5` · `DRAG_ROCZNY_OSTRZEZENIE = 0.5`.
 
-    def policz(self, symbol: str, kierunek: str, cena_wejscia: float,
-               dzwignia: int, kapital_usdt: float,
-               pewnosc_agregatu: float, rezim: str) -> PlanPozycji:
-        ...
+**Realna sygnatura `policz()`** — wszystkie bezpieczniki wchodzą tu jako opt-in (None = wyłączony):
+
+```python
+def policz(self, symbol, kierunek, cena_wejscia, dzwignia, kapital_usdt,
+           pewnosc=0.7, rezim="NORMAL", pretorianie_ok=True,
+           bezpiecznik=None,          # BezpiecznikKapitalu (AOA W-028, twardy stop 30%)
+           vol_realized=None, vol_target=0.6,   # volatility targeting (W-059)
+           breaker_krzywej=None,      # BezpiecznikKrzywejKapitalu (W-062)
+           skalowanie_dd=None,        # SkalowanieFrakcjaDD (W-063)
+           max_drag_roczny=None,      # próg volatility drag (§11)
+           regula_6pct=None,          # RegulaSzesciuProcentEldera (§11)
+           atr=None, sl_atr_mult=None,   # stop-loss oparty na ATR (§11)
+           mnoznik_rozmiaru=1.0) -> PlanPozycji:
 ```
 
 ---
@@ -368,3 +408,72 @@ Ten bezpiecznik siedzi **PONAD** twardym `BezpiecznikKapitalu` (reguła AOA W-02
 ### Źródło
 
 ⚠️ To ugruntowana praktyka system-tradingu (traktowanie equity curve jak instrumentu + MA filter), **nie** pojedyncza recenzowana publikacja peer-review.
+
+---
+
+## 11. Mechanizmy, których ten dokument nie znał (dopisane 2026-07-17)
+
+Poniższe **żyją w kodzie od dawna**, a dokument — mieniący się „pełną matematyką przeżycia" —
+milczał o nich. Wszystkie są **opt-in** w `policz()` (parametr `None` = wyłączony), zgodnie
+z ZASADĄ WPIĘCIA.
+
+### 11a. Reguła 6% Eldera — `RegulaSzesciuProcentEldera` (BIB-015)
+
+Miesięczny meta-limit: gdy strata **od początku miesiąca** ≥ `prog` (domyślnie **6%**) → **HALT**
+do nowego miesiąca. Elder: przy takiej stracie umysł przechodzi w tryb „muszę odrobić" i
+podejmuje złe decyzje. `aktualizuj(kapital, dzisiaj)` zwraca stan; `reset_miesiac()` startuje
+nowy okres. Trzy horyzonty ochrony są **komplementarne**, nie konkurencyjne:
+
+| Warstwa | Horyzont | Próg |
+|---|---|---|
+| `RegulaSzesciuProcentEldera` | **miesiąc** (najszerszy) | 6% straty miesięcznej → HALT |
+| `BezpiecznikKrzywejKapitalu` (W-062) | bieżąca krzywa equity | 10% → REDUCED, 20% → HALT |
+| `BezpiecznikKapitalu` (AOA, W-028) | całość kapitału | **30% → twardy stop**, ręczny reset |
+
+> ⚠️ Klasa ta ma udokumentowaną historię buga: *„HALT zdejmowany przy chwilowym odrobieniu"*
+> (Reguła Test-Granic w `CLAUDE.md`). Stan, który deklaruje „do końca miesiąca", musi
+> faktycznie trwać — stąd testy trwałości stanu.
+
+### 11b. Sizing frakcyjny po drawdownie — `SkalowanieFrakcjaDD` (W-063, Maier-Paape)
+
+**Ciągła** regulacja rozmiaru: `frakcja = max(min_frakcja, 1 − DD/prog_max)`, domyślnie
+`prog_max = 0.20`. Uzupełnia skokowy W-062 — usuwa „kliknięcia" między stanami.
+Zmierzone (kapitał szczytowy 10 000):
+
+| Drawdown | 0% | 5% | 10% | 20% |
+|---|---|---|---|---|
+| `frakcja()` | 1.000 | 0.750 | 0.500 | 0.100 |
+
+Widoczne w planie jako `PlanPozycji.frakcja_dd`.
+
+### 11c. Volatility drag — `volatility_drag()` + `DRAG_ROCZNY_OSTRZEZENIE = 0.5`
+
+Annualizowana erozja pozycji lewarowanej: **½·λ·(λ−1)·σ²**. Lewar mnoży zmienność, więc
+pozycja traci wartość, **nawet gdy cena bazowa wraca do punktu wyjścia** (ta sama erozja co
+w leveraged ETF — Sinclair, BIB-018). Zmierzone przy σ = 0.60 (60% rocznie):
+
+| Dźwignia | 1× | 5× | 10× | 20× |
+|---|---|---|---|---|
+| drag roczny | **0.0** | 3.60 | 16.2 | **68.4** |
+
+Czytaj to jako ostrzeżenie, nie ciekawostkę: **przy 20× sam drag zjada wielokrotność
+kapitału w skali roku.** `max_drag_roczny` w `policz()` pozwala odrzucić taki plan; wynik
+ląduje w `PlanPozycji.drag_roczny`. Brak `vol_realized` → `None` (brak danych = brak
+halucynacji, Prawo XV).
+
+### 11d. Kelly ze skośnością — `skew_kelly(mu, sigma, skos)` (Sinclair, BIB-018)
+
+Klasyczne Kelly (`f = μ/σ²`) zakłada rozkład symetryczny. Krypto ma **gruby lewy ogon**, więc
+przy ujemnej skośności klasyczne Kelly **zawyża** rozmiar. Ten wzór rozwija Kelly do trzeciego
+momentu i automatycznie tnie pozycję przy ujemnym skosie; przy `skos = 0` wraca dokładnie do `μ/σ²`.
+
+### 11e. Stop-loss oparty na ATR — `atr` + `sl_atr_mult`
+
+Gdy oba podane (`> 0`), stop liczony jako `cena ∓ sl_atr_mult × ATR` i łączony z buforem
+likwidacji **przez wybór ostrożniejszego** (`max` dla LONG / `min` dla SHORT) — nigdy nie
+rozluźnia stopa wynikającego z likwidacji, może go tylko zacieśnić.
+
+### 11f. `mnoznik_rozmiaru`
+
+Zewnętrzny mnożnik rozmiaru (domyślnie `1.0`) — wejście dla nadrzędnych regulatorów
+(np. Gubernator W-325, conviction sizing W-318), które skalują pozycję poza kalkulatorem.

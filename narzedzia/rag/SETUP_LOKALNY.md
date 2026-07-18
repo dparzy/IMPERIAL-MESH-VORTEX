@@ -2,10 +2,17 @@
 kategoria: DISCIPLINA
 typ: zywy
 wlasciciel: narzedzia/rag/indeksuj.py
-stan_na: 2026-06-26
+stan_na: 2026-07-18
 powod_istnienia: "Instrukcja włączenia pełnej mocy RAG lokalnie (FTS5 od ręki, wektory opcjonalnie)"
+dublet_rozstrzygniety: docs/START_LOKAL.md — SETUP_LOKALNY to PEŁNA instrukcja RAG (wektory, calibre, MCP, korpusy, formaty książek); START_LOKAL wspomina `indeksuj.py` jako JEDEN krok w ogólnym starcie lokalnym. Świadomy podział: głęboki setup RAG vs skrócony start, nie dublet treści.
 ---
 # 🔧 Bibliotheca-RAG — Setup na maszynie lokalnej (Cezar)
+
+> **⚠️ Weryfikacja 2026-07-18.** Komendy (`indeksuj.py --bez-wektorow/--tylko-nowe/--korpus`)
+> i MCP (`biblioteka_szukaj`/`biblioteka_info`) zgadzają się z kodem ✅. Zaktualizowano liczby
+> książek (było „41/42" → dziś <!-- LICZBA:ksiazki -->79<!-- /LICZBA -->) i oznaczono sekcję
+> wydajności jako pomiar DATOWANY. **Wektory nadal niezbudowane** (baza w trybie FTS) — patrz
+> `docs/MAPA_PAMIECI.md`.
 
 > **Dla nowicjusza (ZPO):** RAG = pamięć semantyczna biblioteki. Zamiast czytać całą
 > książkę (drogie w tokenach), Claude pyta bazę "co X mówi o Y?" i dostaje gotowe fragmenty
@@ -39,9 +46,10 @@ Model `all-MiniLM-L6-v2` jest darmowy, offline po pierwszym pobraniu. Tryb `hybr
 **Różnica:** FTS znajdzie "Kyle lambda" tylko gdy te słowa są w tekście. Wektor znajdzie
 też "miara wpływu zlecenia na cenę" — bo rozumie znaczenie, nie tylko słowa.
 
-### 2. Książki azw3/mobi (15 z 32 tytułów)
+### 2. Książki azw3/mobi (Kindle) — wymagają calibre
 
-Formaty Kindle (azw3/mobi) wymagają **calibre**:
+Z <!-- LICZBA:ksiazki -->79<!-- /LICZBA --> tytułów: **9 to Kindle** (7 azw3 + 2 mobi) —
+wymagają **calibre**; reszta (epub/pdf/djvu) indeksuje się od razu:
 
 ```bash
 # Linux:   sudo apt install calibre
@@ -53,8 +61,8 @@ ebook-convert --version
 python narzedzia/rag/indeksuj.py    # teraz azw3/mobi też się zindeksują
 ```
 
-Bez calibre indeksują się tylko epub/pdf/djvu (17 tytułów). djvu wymaga `djvulibre`
-(`apt install djvulibre-bin`, daje `djvutxt`).
+Bez calibre indeksują się epub/pdf/djvu (70 tytułów). *(calibre CZYTA też djvu — osobny
+`djvulibre`/`djvutxt` nie jest konieczny, gdy masz calibre.)*
 
 ## Konfiguracja MCP (Claude Code odpytuje RAG sam)
 
@@ -91,7 +99,7 @@ rozmiar+mtime), reszta pomijana. Przy 200 książkach to sekundy zamiast minut.
 
 | Korpus | Zawartość | Po co |
 |--------|-----------|-------|
-| `biblioteka` | 41/42 książek + encyklopedia + vademecum | wiedza zewnętrzna (autorzy) |
+| `biblioteka` | <!-- LICZBA:ksiazki -->79<!-- /LICZBA --> książek + encyklopedia + vademecum | wiedza zewnętrzna (autorzy) |
 | `dane` | `bibliotheca_ulpia/dane/` (CSV/JSON/notatki) | dane tematyczne, wyniki |
 | `docs` | dokumentacja Imperium (`docs/*.md`) | "co mamy w kodzie" |
 
@@ -101,8 +109,9 @@ lub `--korpus biblioteka` (tylko książki). Bez flagi → wszystkie naraz.
 **Zasada:** `biblioteka` = wiedza świata, `docs` = mapa naszego systemu. Encyklopedia
 jest mostem (mapuje wiedzę na nasze moduły, np. "Kyle's λ → EXP-14").
 
-## Wydajność (zmierzone w chmurze, FTS)
+## Wydajność (pomiar DATOWANY — chmura, 35 plików, ~czerwiec 2026)
 
+*To pomiar swojego czasu, nie dzisiejsza baza (dziś ~29,7k fragmentów / 104 źródła):*
 - Pełna indeksacja 35 plików (epub/pdf + encyklopedia): **~24 s** → 7339 fragmentów
 - Przyrostowa gdy nic nie zmienione: **~0.8 s**
 - Dodanie korpusu docs (45 plików): **~1.2 s** → +421 fragmentów
@@ -115,5 +124,5 @@ Nie commitujemy jej — każdy odtwarza lokalnie z książek + dokumentów.
 
 > **BIB-032 O'Hara** (PDF): to skan obrazowy — narzędzia OCR zwracają bełkot dla tego pliku.
 > Esencja książki jest dostępna w `encyklopedia/MKS_mikrostruktura_rynku.md`.
-> Indeks RAG: 41/42 książek + encyklopedia (FTS5). Wektory: wymagają modelu embeddingów
-> (huggingface.co) — w środowisku proxy-blocked działamy w trybie FTS-only.
+> Indeks RAG: <!-- LICZBA:ksiazki -->79<!-- /LICZBA --> książek + encyklopedia (FTS5). Wektory:
+> wymagają modelu embeddingów (huggingface.co) — nadal NIEZBUDOWANE, baza w trybie FTS-only.

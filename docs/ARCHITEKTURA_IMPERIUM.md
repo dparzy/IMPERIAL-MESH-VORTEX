@@ -2,15 +2,19 @@
 kategoria: FORMA
 typ: zywy
 wlasciciel: imperium/akwedukty/kwatermistrz_danych.py, imperium/biblioteki/hedge_mwu.py, imperium/biblioteki/igrzyska.py, imperium/biblioteki/kronikarz.py, imperium/biblioteki/mnemosyne.py, imperium/biblioteki/notarius.py, imperium/cesarz/titan_mind.py, imperium/drogi/nexus_hub.py, imperium/fundament/brama_kalkulatora.py, imperium/fundament/kuznia_narzedzi.py, imperium/koloseum/backtest.py, imperium/koloseum/haruspex.py, imperium/koloseum/monte_carlo.py, imperium/koloseum/walidacja.py, imperium/koloseum/walk_forward.py, imperium/legiony/pierwszy_zwiadowca.py, imperium/legiony/roj_sygnalow.py, imperium/oczy/censor_sprzetu.py, imperium/oczy/wszechoko.py, imperium/pretorianie/aegis_tarcza.py, imperium/pretorianie/lustro_prawdy.py, imperium/senat/meta_kora.py, imperium/swiatynie/kartograf.py, imperium/swiatynie/specula_swiec.py, imperium/swiatynie/web_dashboard.py
-stan_na: 2026-07-16
+stan_na: 2026-07-18
 powod_istnienia: "Jedna strona spinająca 25 Praw z realnym kodem — jedyne miejsce z tabelą 'dzielnica → plik → rola → prawa' + diagram przepływu sygnału + mapowanie warstw architektury na źródła bib"
-dlug: "🚨 opisuje nieistniejący kod: drogi/war_lancer.py, swiatynie/sala_wojenna.py, koloseum/valhalla.py"
 ---
 # 🏛️ ARCHITEKTURA IMPERIUM — pełna mapa
 
-> **Stan na:** 2026-07-16 · **Po co:** Jedno miejsce, które spina **25 Praw** z **realnym kodem**
-> (160 modułów .py, 87 neuronów). Pokazuje, jak Cesarstwo jest zbudowane i którędy płynie sygnał.
-> Liczby **policzone z kodu**, nie z pamięci (Prawo XXI reguła 8).
+> **Po co:** Jedno miejsce, które spina **25 Praw** z **realnym kodem**
+> (<!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów). Pokazuje, jak Cesarstwo jest zbudowane
+> i którędy płynie sygnał. Liczby **policzone z kodu**, nie z pamięci (Prawo XXI reguła 8).
+
+> **✅ Dług naprawiony 2026-07-18:** poprzednia wersja miała pole `dlug:` ostrzegające, że mapa
+> opisuje **nieistniejący kod** (`drogi/war_lancer`, `swiatynie/sala_wojenna`, `koloseum/valhalla`
+> — zweryfikowane: 0 plików). Zastąpione realnymi modułami: egzekucja → `oms.py`/`real_order_router.py`,
+> dashboard → `web_dashboard.py`, backtest → `backtest.py`/`monte_carlo.py`.
 
 ---
 
@@ -27,10 +31,10 @@ dlug: "🚨 opisuje nieistniejący kod: drogi/war_lancer.py, swiatynie/sala_woje
 👁️ OCZY            oczy/          wszechoko             percepcja wielowarstwowa[XII]
                                    censor_sprzetu        cenzus majątku maszyny → klasa+alarm[XV]
 🛤️ DROGI            drogi/         nexus_hub             multi-exchange routing [III, XIII]
-                                   war_lancer            egzekucja HF           [III]
+                                   oms + real_order_router egzekucja zleceń     [III]
 🎨 ŚWIĄTYNIE       swiatynie/     kartograf             wykresy PNG            [V]
-                                   sala_wojenna          dashboard             [V]
-                                   specula               świece OHLC w terminalu[V, XXIV]
+                                   web_dashboard         dashboard live         [V, XXIV]
+                                   specula_swiec         świece OHLC w terminalu[V, XXIV]
 📚 BIBLIOTEKI      biblioteki/    mnemosyne             pamięć transakcji      [VIII, XIII]
                                    kronikarz             logi, dziennik         [XIII]
                                    igrzyska              ranking batch + observer pattern [XV]
@@ -40,7 +44,7 @@ dlug: "🚨 opisuje nieistniejący kod: drogi/war_lancer.py, swiatynie/sala_woje
                                                          TIRO (E2)              [I, XV, XXIV]
 🧮 FUNDAMENT       fundament/     brama_kalkulatora     jedyne wejście do mat. [I, IX, XIII]
                                    kuznia_narzedzi       kanoniczne wskaźniki   [I]
-🏟️ KOLOSEUM        koloseum/      valhalla              backtest, Monte Carlo  [VI, VII]
+🏟️ KOLOSEUM        koloseum/      backtest + monte_carlo backtest, Monte Carlo [VI, VII]
                                    haruspex              predykcja reżimu (Markow) — ⚠️ falsyfikowany pomiarem [I, XVI]
 ```
 
@@ -89,7 +93,7 @@ właściciela (Brama / Głos / Drogi / Kronikarz)? · Gdzie w przepływie to sie
                                           │
                                           ▼
    🛤️ DROGI ── egzekucja ──────────► rynek
-   (nexus, war_lancer)
+   (nexus_hub, oms, real_order_router)
                                           │
                                           ▼
    📚 BIBLIOTEKI (pamięć) + 🎨 ŚWIĄTYNIE (wykres/dashboard)   [Prawo VIII, V]
@@ -127,7 +131,7 @@ właściciela (Brama / Głos / Drogi / Kronikarz)? · Gdzie w przepływie to sie
 ## 📚 ŹRÓDŁA — Kanon biblioteki za architekturą (BIB)
 
 > **Po co ta architektura?** Każda warstwa Imperium ma teoretyczne ugruntowanie w bibliotece
-> (**79 książek** — policzone 2026-07-16). Tu mapa: warstwa → książka.
+> (**<!-- LICZBA:ksiazki -->79<!-- /LICZBA --> książek**). Tu mapa: warstwa → książka.
 > Pełna esencja: `bibliotheca_ulpia/encyklopedia/`.
 
 | Warstwa architektury | Dlaczego tak (koncept) | Źródło BIB |

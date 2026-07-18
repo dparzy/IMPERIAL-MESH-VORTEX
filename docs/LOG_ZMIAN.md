@@ -14,6 +14,517 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 📊 | A/B TIER-1 NA 1H/4H + 🚨 Prawo XV (backtest O(n²))
+
+**Co:** rozkaz Cezara 07-16 — powtórka A/B sygnałów Tier-1 (DVOL/stablecoin/USD) na
+interwałach roboczych. Narzędzia `ab_dvol/stablecoin/usd.py` sparametryzowane opcjami
+`--interwal {1d,4h,1h}`, `--od`, `--bary N` — NIE-destrukcyjnie (domyślny `1d` reprodukuje
+dokładnie stare +2.27pp, ruff czysto).
+
+**🚨 Prawo XV (utrata potencjału) — backtest jest O(n²):** profiler wskazał `compute`
+(brama_kalkulatora:1409) = 53s/105s — wskaźniki (wma/supertrend/volume_profile) przeliczane
+od zera nad rosnącą historią KAŻDEGO baru (600 barów→9.6s, 1800→81.5s). Pełne okno 1H/4H „nigdy
+nie kończyło" nie przez sieć, lecz przez silnik. NIE naprawiane w tej sesji (inkrementalne
+wskaźniki zmieniłyby wyniki → ZASADA WPIĘCIA, osobne zadanie). Obejście: `--bary 800`.
+
+**Wyniki (800 barów/symbol, 4H≈133 dni, 1H≈33 dni — WSTĘPNE, jeden reżim):**
+| Sygnał | 4H Δ ROI | 1H Δ ROI |
+|---|---|---|
+| DVOL PSY-05 | +3.60pp ✅ | +0.00pp ⚖️ |
+| STABLECOIN K-03 | +0.79pp ✅ | +0.00pp ⚖️ |
+| USD K-04 | +0.20pp ⚖️ | +0.00pp ⚖️ |
+
+**Werdykt:** 4H potwierdza dzienne (DVOL+stablecoin pomagają; USD marginalnie <próg). 1H =
+0.00 dla WSZYSTKICH — sygnały wolne (dzienne) nie ruszają skanera na 33-dniowym oknie; to
+brak efektu na krótkim oknie (wymuszonym O(n²)), NIE odrzucenie. Flagi zostają opt-in OFF
+(decyzja Cezara). **Pliki:** ab_dvol.py, ab_stablecoin.py, ab_usd.py.
+
+---
+
+## 2026-07-18 | 🛡️ | SESJA SZTABOWA — WARSTWA 16 AUDYTU (łowca API-widm)
+
+**Co:** bramka zapobiegawcza „API opisane w żywym docu MUSI istnieć w kodzie" —
+`narzedzia/audyt_spojnosci.py` `_warstwa_16_api_widma()` + helpery `_w16_widma_w_tresci`
+(czysty skaner) i `_w16_realne_pliki`. Skanuje ścieżki `korzeń/…/x.py` w żywych docs.
+
+**Dziura zatkana (zmierzona):** spłata długu gnicia szła dokument-po-dokumencie, więc NIE
+łapała plików, których NIGDY nie było. Skan całego korpusu naraz znalazł **3 martwe komendy
+w żywym INDEKS-ie** przy „pełnej harmonii": `mexc_feed.py`→`cenzus_adapterow.py`,
+`calculator_gate.py`→`brama_kalkulatora.py` (stara ang. nazwa), `veto_check.py`→`aegis_tarcza.py`.
+To klasa war_lancer/valhalla (w archiwum, nie w `imperium/`) i Kronikarz v2 Interrogator.
+
+**Suprsje (walidacja: 9 kandydatów → 6 zciszonych, 3 realne):** bloki ```python (kod
+przykładowy), markery planu/negacji w linii (`do zbudowania`, `NIGDY nie istniał`, 🔴/🟠/💭/
+WIZJA — z GRANICĄ SŁOWA: „todo"∉„metodologia", „wizja"∉„dywizja"), changelogi/rejestry-zamiarów.
+
+**Recenzja adversarial złapała:** goły podłańcuch „todo"/„wizja" trafiał wewnątrz polskich
+słów → false-negative; naprawione `\b`. **Testy:** +8 granic (detekcja, każda suprsja osobno,
+granica-słowa). **Pliki:** audyt_spojnosci.py, tests/test_spojnosc.py, INDEKS_IMPERIUM.md, CLAUDE.md.
+
+---
+
+## 2026-07-18 | 🏁 | DŁUG GNICIA SPŁACONY DO ZERA — IGRZYSKA + ARCHITEKTURA + MANUAL
+
+**Co:** ostatnia trójka + domknięcie całej kampanii porządkowej. **T2 gnicie: 0/70 dokumentów.**
+
+• **IGRZYSKA_IMPERIUM** — rozdzielono kod od wizji: ✅ Arena Neuronów w pełni w kodzie (wzór
+  WYNIK_NEURONU 0.30/0.25/0.20/0.15/0.10, tablica RANGI Tiro→Aquilifer 0.0/0.5…0.93/2.0,
+  PROG_INFAMII, zloty_helm, lista_infamii, WpisInfamii) + HedgeMWU ✅; 🔴 Arena Legionów i Senatu
+  NIE ISTNIEJĄ (0 trafień) — oznaczone WIZJA; 🔴 pliki panteonu (PANTEON/TRIUMPHI/ALBUM/
+  LISTA_INFAMII) nie zapisywane (dane w pamięci).
+
+• **ARCHITEKTURA_IMPERIUM** — naprawiony dług z pola `dlug:`: mapa opisywała **nieistniejący kod**
+  `drogi/war_lancer`, `swiatynie/sala_wojenna`, `koloseum/valhalla` (0 plików). Zastąpione realnymi:
+  egzekucja → `oms`/`real_order_router`, dashboard → `web_dashboard`, backtest → `backtest`/
+  `monte_carlo`. Liczby (neurony/książki) → bloki LICZBA. Pole `dlug:` usunięte.
+
+• **MANUAL_UZYTKOWNIKA** — „78 neuronów" → 87 (blok LICZBA), „1532/1532 testów" → odesłanie do
+  runnera. KonfigPetliLive (12 pól), handluj_live, 5 modułów AFML (W-355..359) zweryfikowane ✅.
+
+**🏁 BILANS KAMPANII (dług gnicia 18 → 0):** 21 dokumentów spłaconych weryfikacją wobec kodu.
+Wzorce znalezione: **API-widmo w docs** (kronikarz.zapytaj, policz_dzwignie, CesarzZDoradcami —
+kandydat na Warstwę 16) · **liczba zaszyta w kodzie** (42 książek ×4, liczba praw) → rozwiązane
+funkcjami liczącymi + W15 (11 wstrzykiwanych liczb) · **pomiar datowany mylony z opisem stanu** ·
+**„brak/odłożone" starzeje się najszybciej** (RS-X=C-01, 6/6 braków TRYBY już istniało).
+Otwarte długi kodu (do sesji sztabowej): łańcuch SHA-256 (hash_ok=True na sztywno), 14,9 mln
+barów 1m nieużytych. Wstrzykiwanych liczb: neurony/aktywne/zwiadowcy/strategie/elity/pola_logu/
+styl_scalp/swing/invest/prawa/ksiazki/fragmenty.
+
+**Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅ · **T2 gnicie 0**.
+
+---
+
+## 2026-07-18 | 🎓 | PLAN_TIRO — rdzeń potwierdzony + liczba fragmentów RAG na LICZBA
+
+**Co (dług gnicia):** weryfikacja planu TIRO (priorytet #1). Gnicie było przez commit metadanych
+TABULARIUM w `censor_sprzetu.py` — **nie zmiana logiki**. Rdzeń stanu potwierdzony ✅:
+CENSOR (5 klas PROLETARIUS→CONSUL + CLI raport/migawka/klasa/zmiana/zatwierdz) · NOTARIUS
+(`tiro_pary_nauczyciela.jsonl`, `LIMIT_PROBEK_NA_PYTANIE=3`, `eksportuj_sft`) · rój 87 · kronika 102.
+Pomiary E1 (llama-bench tok/s) = prawda DATOWANA, nietknięta.
+
+**Jedyna korekta + naprawa u źródła:** RAG „27 959 fragmentów" → dziś **29 699**. Dodano publiczny
+`srodowisko_pamieci.fragmenty_w_bazie()` + klucz Tabularium `fragmenty` (W15), więc liczba w
+dokumencie już nie zamarznie (rośnie z biblioteką — jak `ksiazki`). Wstrzykiwanych liczb: 11.
+
+**Pliki:** `docs/PLAN_TIRO_LOKALNY_LLM.md` · `imperium/biblioteki/srodowisko_pamieci.py`
+(+`fragmenty_w_bazie`) · `narzedzia/tabularium.py` (klucz) · `tests/test_tabularium.py`.
+**Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅.
+
+---
+
+## 2026-07-18 | 📋 | Trójka instrukcji: NAMIESTNIK (nadal prawda) + INSTRUKCJA + SETUP_LOKALNY
+
+**Co (dług gnicia, 3 dokumenty):**
+• **NAMIESTNIK** — ✅ **nadal prawdziwy**. API (`get_namiestnik`/`decyduj`/`skaluj_dzwignie`/
+  `raport`) i obie tablice (reżim × parametry, styl × cap) zgadzają się z kodem co do liczby
+  (zmierzone: TREND_STRONG/1D → INVEST/filtr/cap2/SPOT/0.605; RANGING ×0.4/72%; PANIC ×0.1/90%).
+  Potwierdzenie + bump (poprawna spłata gnicia bywa „nadal prawda"). Doprecyzowano, że
+  `klasyfikuj_rezim` żyje w `legatus.py`. Tabela dowodowa = pomiar datowany, nietknięta.
+• **INSTRUKCJA_URUCHOMIENIA** — rozjazd właściciela: nagłówek wskazywał `skrypty/start.py`,
+  a dokument opisuje `pierwszy_zwiadowca.py` (Faza 0). Poprawiony właściciel + dodana wzmianka
+  o start.py (dashboard :8777) jako nowszej ścieżce. Reszta (git URL, 5 modułów, ścieżka
+  `base/dane`, wykres+raport) zweryfikowana ✅.
+• **SETUP_LOKALNY** — liczby książek „41/42"/„32"/„17" → realnie 79 (bloki LICZBA:ksiazki);
+  sekcja wydajności oznaczona jako pomiar DATOWANY (35 plików, czerwiec 2026 — dziś ~29,7k
+  fragmentów); nota, że calibre czyta djvu (osobny djvulibre zbędny). Dublet z START_LOKAL
+  (oba o `indeksuj.py`) rozstrzygnięty werdyktem: pełny setup RAG vs skrócony start.
+
+**Bramka:** audyt exit 0 ✅ · gnicie trójki → 0.
+
+---
+
+## 2026-07-18 | 💾 | PAMIEC_SESJI — sekcja „auto-aktualizuj" utknęła na 06-22, na LICZBA
+
+**Co (dług gnicia):** dokument z mapą podpięć + ~200 lekcjami. Lekcje i mapy = zapis DATOWANY
+(prawda swojego czasu, nie odświeżam — Prawo I). Sekcja **STAN BIEŻĄCY**, oznaczona „auto-
+aktualizuj każdą sesję", w praktyce zamarzła: „1720/1720 testów (2026-06-22)", „81 neuronów
+(aktywne 75)" — przy realnych 2507 testach i 87 neuronach (81 aktywnych). Ironia: sekcja
+kazała się aktualizować, a nie miała mechanizmu.
+
+**Naprawa u źródła:** STAN BIEŻĄCY → liczby WSTRZYKIWANE (neurony/aktywne/zwiadowcy/elity =
+bloki W15); testy → odesłanie do runnera (nie hardkodujemy); usunięty martwy „Ostatni commit:
+7a0dbf8". „42 książek" w mapie MCP → `<!-- LICZBA:ksiazki -->` (79). Lekcje nietknięte.
+
+**Przy okazji:** domknięta pułapka README z poprzedniego commita — README ma DWIE daty
+(frontmatter `stan_na:` czyta Tabularium, treść `**Stan na:**` czyta audyt W6); bumpnąłem
+tylko treść, frontmatter został 07-15 → Tabularium wciąż gniło. Frontmatter poprawiony na 07-18.
+
+**Pliki:** `docs/PAMIEC_SESJI.md` · `README.md` (frontmatter). **Bramka:** audyt exit 0 ✅.
+
+---
+
+## 2026-07-18 | 🎯 | TRYBY_IMPERIUM — lista „czego brakuje" gdzie 6/6 braków już powstało
+
+**Co (dług gnicia):** weryfikacja propozycji trybów (5× kod). Dwie warstwy rozdzielone:
+• **Pomiary 1H** (W-321b/c/c-v2/c-v3) — POMIARY DATOWANE z czerwca 2026, **nie odświeżane**
+  (Prawo I). Werdykt „1H bez robustnego edge'u, asymptota ~−2.5%" nadal stoi.
+• **Listy „czego brakuje"** — zestarzały się. Właściciele istnieją ✅.
+
+**🔴 6 z 6 braków neuronowych JUŻ ISTNIEJE** (ten sam wzorzec co RS-X w ANALIZA_NEURONY):
+Relative Strength → **C-01** · MTF Confluence → **X-28** · Breakout/Range → **X-12** ·
+Katalizator Augur → **AUG-01** (a AdapterKronikarz **wpięty** w `neurony/sesje.py`, nie
+„martwy") · Kategoria K makro → **K-01…K-04** żywa · Funding/OI → **PSY-01/02/04**.
+Przepisane na tabelę „co powstało od czasu propozycji".
+
+**Braki modułowe — zweryfikowane, mieszane:**
+• ✅ Conviction sizing (W-318) — `sizing_przekonania.py`, opt-in · ✅ Compounding — dyrygent
+  sizinguje z `kapital_calkowity`.
+• 🔴 **Wpięcie skanera do pętli decyzyjnej (W-317)** — nadal brak: `SkanerOkazji` żyje TYLKO
+  w `backtest.py`, nie ma go w `dyrygent.py`/`petla_live.py`. To wciąż warunek istnienia
+  trybu NAJLEPSZE na żywo · 🔴 Bayesian P(sukces) per setup (Sybilla liczy Brier, nie to) ·
+  🔴 egzekucja spot, auto-kalibracja live.
+
+**Pliki:** `docs/TRYBY_IMPERIUM.md` · `docs/INDEKS_IMPERIUM.md`.
+**Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅.
+
+---
+
+## 2026-07-18 | 🔢 | README na bloki LICZBA + naprawa W3/testów po zmianie daty
+
+**Co:** przejście dnia (07-17 → 07-18) ujawniło, że **README podawał liczby RĘCZNIE** („87
+zaimplementowane", „20 zmapowanych", „18 elitarnych") — mimo że jego `powod_istnienia` głosi
+„podaje liczby wprost z kodu". To bomba jak „42 książek": dziś 87 się zgadza, ale rój rośnie.
+
+**Wykryte przez bramkę W6, nie przeze mnie:** commit z 07-18 do repo + README ze „Stan na:
+2026-07-15" → W6 słusznie zażądał potwierdzenia świeżości źródła prawdy (2 testy padły na tym
+samym alarmie). To zamierzone działanie bramki, nie bug.
+
+**Naprawa u źródła (nie sam bump daty):**
+• 5 liczb README (neurony, neurony_aktywne, zwiadowcy, strategie, elity) → bloki
+  `<!-- LICZBA:x -->` (W15). Zweryfikowane: 87/81/15/20/18 zgadzają się z kodem. Bump „Stan
+  na:" → 2026-07-18 jest teraz WERYFIKACJĄ (liczby policzone), nie ślepym bumpem.
+• **Regresja złapana w tym samym ruchu:** zmiana formatu (gołe „87" → blok) złamała regex
+  warstwy **W3 audytu** (`(\d+) zaimplementowane` nie trafiał w „87<!-- /LICZBA --> zaimpl.")
+  — audyt PRZESTAŁ porównywać liczbę neuronów README z kodem. Naprawione: regex toleruje oba
+  formaty (`(\d+)(?:<!-- /LICZBA -->)? zaimplementowane`). Test `test_audyt_wykrywa_rozbieznosc`
+  zaktualizowany, by podmieniać liczbę w bloku — dwuwarstwowa ochrona (W3 + W15) znów żywa.
+
+**Pliki:** `README.md` · `narzedzia/audyt_spojnosci.py` (W3) · `tests/test_spojnosc.py`.
+**Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅.
+
+---
+
+## 2026-07-18 | 🧠 | PLAN_DEEPSEEK — plan zrealizowany INNĄ drogą niż zakładał
+
+**Co (dług gnicia 7 → 6):** weryfikacja planu DeepSeeka (5× kod). Werdykt: **zostaje CONSILIUM
+żywy, NIE ACTA** — adapter `GlosImperium` żyje i ma 4 realnych konsumentów, ale realizacja
+poszła zupełnie inną drogą niż plan, a to jest właśnie treść warta zapisu.
+
+**🔴 Rozjazd właścicieli:** nagłówek wskazywał `titan_mind`, `meta_kora`, `wszechoko` jako
+odbiorców DeepSeeka. **Żaden z nich go nie używa** (0 trafień). Poprawieni na realnych
+konsumentów: `deepseek_glos` (adapter) · `news_llm` (Oczy/sentyment) · `notarius` (pary dla
+TIRO) · `bibliotekarz` (zwiad Hyginusa).
+
+**Plan vs rzeczywistość (zmierzone):**
+• ✅ Adapter `GlosImperium.zapytaj()` + `test_polaczenia()` — istnieje.
+• ✅ Sentyment newsów — realny, ale przez `news_llm.py`, nie `wszechoko.py`.
+• 🔴 Debata Senatu Populares/Optimates przez LLM — NIE. `meta_kora` poszła drogą agentów ML
+  (TrendAgent/SentimentAgent/MicrostructureAgent → MetaJudge/SuperJudge). Wzorzec LLM-debaty
+  żyje TYLKO w `archiwum/kingdom_pixel_p1/meta_kora_debate.py`.
+• 🔴 Decyzja LLM Cesarza — NIE. `titan_mind` to Strategy Orchestrator, nie używa DeepSeeka.
+• ➕ Konsumenci, których plan NIE przewidział: **NOTARIUS** (zbiera pary prompt→odpowiedź dla
+  treningu lokalnego LLM — dziś najważniejszy), Bibliotekarz/Hyginus (zwiad), auto_lekcja.
+
+**Wniosek (Prawo I):** DeepSeek trafił jako narzędzie WIEDZY i TRENINGU, nie mózg decyzyjny.
+Ścieżka wejść pozostała deterministyczna (Brama + neurony + Rada) — zgodne z kierunkiem.
+
+**Model:** dokument podawał `deepseek-chat` — wycofany 2026-07-24. Realnie `deepseek-v4-flash`
+(domyślny) / `deepseek-v4-pro`. base_url bez zmian.
+
+**Dublet rozstrzygnięty:** notarius w PLAN_DEEPSEEK (konsument GlosImperium) vs PLAN_TIRO
+(element pipeline treningu) — świadomy podział ról, werdykt w nagłówku.
+
+**Pliki:** `docs/PLAN_DEEPSEEK.md`. **Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅ · gnicie 7→6.
+
+---
+
+## 2026-07-17 | 🔮 | DORADCY_CARA — trzecie API-widmo + Fulmen tylko połowicznie ortogonalny
+
+**Co (dług gnicia 8 → 7):** weryfikacja Rady Pięciu (5× kod doradców).
+**Wzory i progi wszystkich pięciorga zgadzają się z kodem ✅** — rozjechało się to, co ich SPINA.
+
+**🔴 API-widmo #3 w tej kampanii:** klasa **`CesarzZDoradcami`**, `podejmij_decyzje()`,
+`_wymagani_doradcy()` i `cesarz.wezwij_doradcow(powod)` — **0 trafień w kodzie**. Dokument
+prezentował je jako działającą integrację (z wywołaniem DeepSeeka!). Realnie Rada jest w 100%
+DETERMINISTYCZNA (zero LLM): dyrygent woła każdego doradcę osobno własnymi danymi, a
+`RadaDoradcow.ocen()` tylko zlicza gotowe oceny. *(Poprzednie widma: `kronikarz.zapytaj`
+w PAMIEC_ABSOLUTNA, `policz_dzwignie` w KALKULATOR_LEWARA — wzorzec systematyczny.)*
+
+**🔴 „Warunki automatycznej aktywacji" nie istnieją:** dokument obiecywał wzywanie Rady przy
+Senacie podzielonym (<0.15), przy WETO Legatusa, w szarej strefie 0.55–0.65 i w VOLATILE/PANIC.
+**Realnie jedyny warunek to flaga:** `Dyrygent(rada=True)` → `if self.rada_doradcow is not None`
+(dyrygent.py:540). Włączona = ocenia KAŻDE wejście; wyłączona = żadnego. Zero stanów pośrednich.
+Warunkowe wzywanie zostaje postulatem 🔵.
+
+**🚨 Prawo XVI — ortogonalność FULMENA jest CZĘŚCIOWA (zmierzone):** doradca ma weryfikować
+reżim „zestawem ortogonalnym (innym niż Legatus)", ale **2 z 4** jego wskaźników to DOKŁADNIE
+te, którymi już głosują neurony: `ADX_14` → **XII-01 NeuronADX**, `CHOPPINESS_14` → **V-14
+NeuronChoppiness**. To nie pełna redundancja (Fulmen pyta o REŻIM, neurony o KIERUNEK), ale
+„niezależna weryfikacja" czerpiąca w połowie z tego samego pomiaru jest słabsza, niż głosił
+dokument: gdy `ADX_14` kłamie, myli się i neuron, i jego „niezależny" audytor.
+
+**🔴 „Vortex" nie istnieje:** dokument obiecywał `VI+/VI- (Vortex 14)`; w kodzie **zero**
+wskaźników Vortex. Pola `DaneFulmen.vi_plus_14/vi_minus_14` karmi `DI_PLUS`/`DI_MINUS`
+(dyrygent nazywa to wprost „DI+/DI- jako proxy VI"). Nazwa pola została po niezrealizowanym zamiarze.
+
+**🚨 Prawo XV — bramka hashów HERMESA martwa:** `dyrygent.py:911` podaje `hash_ok=True` na
+sztywno, bo `ImperiumLog.hash_sha256` nie jest wypełniany przez NIC — nie ma czego porównywać.
+Ten sam alarm co LUKA 1 w PAMIEC_ABSOLUTNA; w Księdze Wad klasa `bezpiecznik`. Dopisany wprost.
+
+**Drobne:** „3/5 → 50% pozycji" → realnie **×0.6** (ta sama nieścisłość siedzi w komentarzu kodu).
+
+**Zweryfikowane ✅:** Oracle Q=0.3·Sharpe+0.25·Sortino+0.25·Calmar+0.2·Omega, progi 1.2/0.8 ·
+Fulmen ADX>25, Chop<38.2, ER>0.6 · Iustitia HEAT_MAX 0.06, CRITICAL 0.1, CORR_MAX 0.75,
+COOLING 5 · Hermes KOMPLETNOSC 0.8, VPIN 0.75, EVENT 30min, ŚWIEŻE ×2 · Pythia MIN_SETUPOW 10,
+p 0.6/0.45 · modyfikatory 1.0/0.8/0.6/blokada · PYTHIA MILCZENIE = neutralne (brak danych ≠ zły sygnał).
+
+**Pliki:** `docs/DORADCY_CARA.md`. **Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅ · gnicie 8→7.
+
+---
+
+## 2026-07-17 | ⚖️ | KALKULATOR_LEWARA — dokument o ryzyku nie znał połowy bezpieczników
+
+**Co (dług gnicia 9 → 8):** weryfikacja „matematyki przeżycia" (9× `kalkulator_lewara.py`).
+Dokument o RYZYKU, więc każde twierdzenie sprawdzone wobec kodu i pomiaru runtime.
+
+**🚨 Najgroźniejsze — dokument był MNIEJ ostrożny niż kod:**
+• **„PANIC: dźwignia = 1× maksymalnie"** sugerowało, że w panice HANDLUJEMY małą dźwignią.
+  **Nieprawda: `_checklist()` wetuje twardo — „Reżim PANIC, zero pozycji lewarowanych".**
+  Mnożnik ×0.1 nigdy nie decyduje, bo pozycja odpada wcześniej. Kod bezpieczniejszy niż opis.
+• **`policz_dzwignie(pewnosc, rezim, pretorianie_ok)` NIE ISTNIEJE** — realnie
+  `KalkulatorLewara.auto_dzwignia(pewnosc, rezim)` (staticmethod, bez `pretorianie_ok`).
+• **Granica myląca:** tabela mówi „<0.55 → 0× (nie handluj)", ale `auto_dzwignia(0.10)`
+  zwraca **1**, nie 0 (`max(...,1)`). Słaby sygnał odrzuca OSOBNE weto w checkliście
+  („Zbyt słaby sygnał: 10% < 55%"). Skutek dobry, mechanizm inny niż opisany — nikt nie może
+  polegać na zwróconym zerze, bo `auto_dzwignia` nigdy zera nie zwraca.
+
+**Checklist: lista życzeń ≠ kod.** Dokument obiecywał bramki, których nie ma: 🔴 Funding Rate,
+🔴 ATR < 2× średniej (ATR służy WYŁĄCZNIE do liczenia SL, nie wetuje), 🔴 seria strat < 3.
+Mylił też pojęcia: „rozmiar ≤ 2% kapitału" — `MAX_RYZYKO=0.02` ogranicza **ryzyko** (stratę na
+stopie), nie rozmiar; checklist wetuje dopiero **rozmiar > 50% kapitału**. „Drawdown < 10%" nie
+wetuje (to REDUCED ×0.5; weto dopiero 20% HALT, twardy stop AOA 30%). „R:R ≥ 1:2" — `MIN_RR=2.0`
+istnieje, ale checklist go NIE sprawdza (2:1 wychodzi z konstrukcji TP). Wpisano pełną tabelę
+8 realnych wet w kolejności z kodu.
+
+**§11 — pięć mechanizmów, o których „pełna matematyka przeżycia" milczała** (wszystkie opt-in):
+• **Reguła 6% Eldera** (BIB-015) — miesięczny meta-limit 6% → HALT; trzeci horyzont obok
+  W-062 (equity 10/20%) i AOA (30%). ⚠️ ma historię buga „HALT zdejmowany przy odrobieniu".
+• **SkalowanieFrakcjaDD** (W-063, Maier-Paape) — CIĄGŁY sizing; zmierzone: DD 0/5/10/20% →
+  frakcja 1.00/0.75/0.50/0.10.
+• **volatility_drag** ½·λ·(λ−1)·σ² — zmierzone przy σ=0.6: λ=1 → 0.0, λ=10 → **16.2**,
+  λ=20 → **68.4** rocznie. Przy 20× sam drag zjada wielokrotność kapitału w skali roku.
+• **skew_kelly** (Sinclair BIB-018) — Kelly z trzecim momentem, tnie przy ujemnym skosie.
+• **SL oparty na ATR** (`atr`+`sl_atr_mult`) — łączony z buforem likwidacji przez wybór
+  OSTROŻNIEJSZEGO (`max` LONG / `min` SHORT); może stop tylko zacieśnić, nigdy rozluźnić.
+
+**Reszta zweryfikowana ✅:** wzory likwidacji · `OPLATA_UTRZYMANIA=0.005` (dokument pisał
+`OPLATE_` — taka nazwa nie istnieje) · progi dźwigni 0.55/0.65/0.75/0.85/0.92 → 2/5/10/15/20 ·
+korektory reżimu · volatility targeting (0.6/0.25/1.5) · breaker W-062 (20/0.10/0.20/0.5).
+`PlanPozycji` uzupełniony o brakujące `bufor_likwidacji_pct`, `frakcja_dd`, `drag_roczny`.
+
+**Pliki:** `docs/KALKULATOR_LEWARA.md`. **Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅ · gnicie 9→8.
+
+---
+
+## 2026-07-17 | 🗺️ | MAPA_PAMIECI — „v13" było liczbą warstw, a „42 książek" ma dziś 79
+
+**Co (dług gnicia 10 → 9):** weryfikacja mapy pamięci (10× kod właścicieli, 14 plików).
+Trzy twierdzenia fałszywe, wszystkie z tej samej rodziny — **liczba wpisana zamiast liczonej**:
+
+• **Tytuł „Centrum Pamięci W-360 v13"** → kod mówi **v5** (`centrum_pamieci.py`, v5 z 2026-06-26).
+  „13" to liczba WARSTW, nie numer wersji — ktoś pomylił jedno z drugim i tytuł niósł to dalej.
+• **„wiedza z 42 książek"** → realnie **79** książek BIB-* zaindeksowanych (104 źródła łącznie:
+  79 książek + 25 plików encyklopedii, 29 699 fragmentów). Liczba była **ZASZYTA w czterech
+  miejscach kodu** (`kustosz_pamieci.WARSTWY`, `centrum_pamieci` docstring, dwa komunikaty
+  `srodowisko_pamieci`) i powielona w dokumencie. Biblioteka rośnie (BIB-070..274 w planie),
+  więc każda wpisana liczba MUSI się zestarzeć — to ta sama klasa co zaszyta liczba praw w W10.
+• **„W chmurze FTS, lokalnie wektory"** → 🚨 środowisko = **lokal**, a `wektory = 0`.
+  **Lokalnie też ich nie ma** — RAG działa wyłącznie na FTS5/BM25 (keyword), nie semantycznie;
+  `model_embeddings: False`. Dokument sugerował, że to ograniczenie chmury. Sprostowane
+  tabelą pomiaru; alarm zgłasza zresztą sam kod (`_alarmy()`: „LOKALNIE TO STRATA").
+
+**Naprawa u źródła (nie tylko w dokumencie):** nowa funkcja
+`srodowisko_pamieci.ksiazki_w_bazie()` — JEDNO źródło prawdy (Prawo XVI), liczy `COUNT(DISTINCT
+zrodlo) WHERE zrodlo LIKE 'BIB-%'`. Wołają ją: `kustosz.mapa()` (dokłada żywą liczbę do W2),
+`instrukcja_lokal()` i Tabularium (nowy klucz `ksiazki`, W15 → dokument). Stała `WARSTWY` nie
+trzyma już żadnej liczby.
+
+**Self-review złapał MOJĄ regresję:** pierwsza wersja poprawki drukowała „**14** warstw", bo
+liczyła `len(WARSTWY)` — a **W7 (Kustosz) to ORGAN, nie warstwa-dana**. Oryginalne „13" było
+poprawne; moja „poprawka" cicho przekłamałaby architekturę o jeden. Teraz liczone jako
+`[w for w in WARSTWY if w[0] != "W7"]`, z testem pilnującym obu rzeczy (13 warstw + „organ W7"
+w nagłówku) i drugim testem: `WARSTWY["W2"]` nie może zawierać żadnej cyfry.
+
+**Pliki:** `docs/MAPA_PAMIECI.md` · `imperium/biblioteki/srodowisko_pamieci.py` (+`ksiazki_w_bazie`) ·
+`imperium/biblioteki/kustosz_pamieci.py` · `imperium/biblioteki/centrum_pamieci.py` ·
+`narzedzia/tabularium.py` (klucz `ksiazki`) · `tests/test_kustosz_pamieci.py` (+2).
+**Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅ · skan wad czysto ✅ · gnicie 10→9.
+
+---
+
+## 2026-07-17 | 🤖 | MANUAL_CLAUDE_CODE — koniec sprzeczności o pushu + jeden parser praw
+
+**Co (dług gnicia 11 → 10):** weryfikacja instrukcji obsługi (12× `audyt_spojnosci.py` — plik
+zmieniany też w tej wachcie). Dokument **przeczył sam sobie**: sekcje 1 i 4.3 mówiły „push robisz
+TY", a sekcja 4.4 „Claude Code zawsze pushuje tam" — zdanie sprzeczne z rozkazem z 2026-07-11.
+Sprostowane; przy okazji dopisano, skąd bierze się granica (`permissions.deny` jest puste, więc
+zakaz trzyma CLAUDE.md, nie maszyna — **układ świadomy i ustalony**, decyzja Cezara 2026-07-17).
+
+**Pozostałe rozjazdy (zmierzone):** „24 Prawa" → **25** (teraz wstrzykiwane) · „1532 testów" →
+2505 (zastąpione odesłaniem do runnera — liczba testów rośnie co sesję, więc nie wpisujemy jej
+do dokumentu) · sekcja MCP opisywała GitHub/Filesystem jako naszą konfigurację, a `.mcp.json`
+deklaruje **`biblioteka` + `arena`** (dopisana sekcja 5.0 z prawdą + ZASADA MCP „soczewka, nie
+mózg"; 5.1–5.2 oznaczone jako opcje NIE wpięte) · hook startowy robi więcej, niż opisano (SYNC
+`git pull --ff-only`, Centrum Pamięci, skan wad) — kolejność zweryfikowana i rozpisana; dopisany
+hook **SessionEnd** (commit pamięci lokalnie) · `/model` podawał `sonnet-4-6` — poprawione na
+aktualne **Opus 4.8 / Sonnet 5 / Haiku 4.5** (+ `/fast`).
+
+**W15 — nowa liczba wstrzykiwana `prawa` + JEDEN parser (Prawo XVI):** liczba praw żyła jako
+regex w `audyt_spojnosci.py` (W10). Zamiast dopisać drugi taki sam regex do Tabularium — audyt
+**woła teraz `tabularium.policz_prawa()`**. Powód: dwa parsery tego samego formatu rozjadą się
+co do znaku, a bramka pilnująca prawdy nie może zgadywać (klasa z Księgi Wad: „jeden format =
+jeden parser"). Historia tej bramki jest ostrzeżeniem: miała kiedyś liczbę praw ZASZYTĄ i żądała
+„21", gdy praw było 25 — egzekwowała kłamstwo. Test pilnuje, że audyt nie wróci do własnej kopii.
+
+**Pliki:** `docs/MANUAL_CLAUDE_CODE.md` · `narzedzia/tabularium.py` (`policz_prawa` + klucz) ·
+`narzedzia/audyt_spojnosci.py` (import zamiast kopii regexu) · `tests/test_tabularium.py` (+1).
+**Bramka:** testy 2505/2505 ✅ · audyt exit 0 ✅ · gnicie 11→10.
+
+---
+
+## 2026-07-17 | 🔬 | ANALIZA_NEURONY zweryfikowana — propozycja „odłożona" żyje jako C-01
+
+**Co (dług gnicia 12 → 11):** weryfikacja dokumentu MENSURA (17× `rejestr.py` od `stan_na`).
+Kluczowa trudność: dokument MIESZA pomiar datowany z opisem stanu — więc rozdzieliłem je jawnie
+(nagłówek „Jak czytać"), zamiast odświeżać liczby w środku pomiarów (Prawo I: A/B z czerwca na
+roju 65→70 to prawda swojego czasu, nie odświeżamy).
+
+**Sprostowania stanu (zmierzone):**
+• **„5 z 6 propozycji wdrożono (Cross-Sectional RS odłożony — wymaga cross-symbol w pętli)"** →
+  **wdrożone 6/6**. RS-X powstał 2026-06-17 jako **C-01 `NeuronRelativeStrength`**
+  (`WSKAZNIK=CROSS_RS`, DOSTEPNY=True) — i dostał **własną kategorię C „Przekrój koszyka"**
+  zamiast proponowanej R, z wagami reżimowymi pod jego naturę (silny w trendzie, słaby w PANIC,
+  gdy korelacje→1). Dokument opisywał jako „do zrobienia" coś, co żyje od miesiąca.
+• **„brama obronna Z (5)"** → Z liczy dziś **8**; kategorie C/D/H/K/N powstały po tamtym researchu.
+  Osie roju przeliczone `Counter(n.KATEGORIA)`: R 16 · M 12 · T 11 · F 9 · O 8 · Z 8 · S 6 · A 4 ·
+  K 4 · L 2 · N 2 · V 2 · C 1 · D 1 · H 1.
+• **„AI/ML 0%"** i **„EXP-12 wyciszony"** → ✅ nadal prawda (brak kat. E; Atmabhan czeka na feed L2).
+• **V-06/V-07/VP-01/Z-06/Z-07** → ✅ wszystkie istnieją, kategorie zgodne (F/F/S/Z/Z);
+  OC-01..04 `DOSTEPNY=False` ✅ zgodnie z sekcją 9b.
+
+**Warstwa 15 — trzy nowe liczby wstrzykiwane (`styl_scalp`/`styl_swing`/`styl_invest`):**
+ten jeden dokument podawał rozmiary profili kolejno jako **41/59/35**, **65/65/70** i dziś
+**75/75/87** — każda prawdziwa w dniu zapisu, każda skłamała miesiąc później. Tabela
+`NEURONY_STYLU` jest z założenia *strojona pomiarem*, więc ręczna liczba rozjeżdża się po
+KAŻDYM A/B. Liczby żyją teraz w kodzie (`neurony_dla_trybu`), nie w zdaniu.
+
+**Nowa sekcja 10 — otwarte długi tego dokumentu** (obiecane pomiary, których NIE zrobiono):
+🔴 VP-01 OOS na 5 parach (obiecany w sekcji 6 — do tego czasu VP-01 zostaje z pełną wagą,
+bo jedno okno ≠ dowód redundancji) · 🔴 A/B „SWING-szeroki vs pełnia" (obiecany w 9a) ·
+🔴 per-neuron mnożnik reżimowy (decyzja kierunkowa odłożona w 9b).
+
+**Pliki:** `docs/ANALIZA_NEURONY_SCALP_SWING_INVEST.md` · `narzedzia/tabularium.py` (+3 klucze) ·
+`tests/test_tabularium.py` (+1) · `docs/INDEKS_IMPERIUM.md`.
+**Bramka:** testy 2504/2504 ✅ · audyt exit 0 ✅ · gnicie 12→11.
+
+---
+
+## 2026-07-17 | 🔱 | WIZJA_TRYBY_I_ROZWOJ zweryfikowana — 🚨 14,9 mln barów 1m leży nieużytych
+
+**Co (dług gnicia 13 → 12):** weryfikacja najcięższego dokumentu długu (19× `rejestr.py` od
+`stan_na`). Cztery twierdzenia o STANIE okazały się nieprawdziwe:
+
+• **„🔴 `dane/minutowe/` puste — najwyższy priorytet danych"** → realnie **14 par, ~14,9 mln
+  barów 1m**. Co gorsza: `wczytaj_csv(..., interwal="1m")` działa **bez żadnej zmiany kodu**
+  (dowód runtime: AVAXUSDT → 145 185 barów w 1,1 s, chronologia rosnąca, pełne OHLCV) — format
+  CryptoDataDownload identyczny z 1h. Mimo to **żaden moduł nie czyta `dane/minutowe/`**
+  (0 trafień w `imperium/` i `narzedzia/`). 🚨 **Prawo XV — utrata potencjału.** To POWTÓRKA
+  klasy, którą ten sam dokument opisał akapit wyżej przy 1h („dane leżały nieużyte").
+• **Niuans, który zmienia werdykt (kandydat ≠ prawda):** dane 1m kończą się **2022-07-27**
+  (luka 4 lata). Nadają się do BACKTESTU skalpu 2019–2022 (COVID/hossa/bessa), NIE do live.
+  Priorytet brzmi więc „wpiąć istniejące do backtestu + dociągnąć świeże", nie „zdobyć dane".
+• **„~76k barów 1h/parę (5 par)"** → realnie **15 par** (do 2026-06-18; MATIC urwany 2024-09-09).
+• **„Wymaga: AdapterKronikarz live"** → **ISTNIEJE** i jest wpięty (`kronikarz_zdarzen.py:217`,
+  zasila AUG-01 + `neurony/sesje.py`). Zdjęte z kolejki rozwoju.
+
+**Propozycja Praw XXII–XXV — rozstrzygnięta (Prawo XVIII):** numery zostały w międzyczasie
+nadane czemu innemu (Dekorelacja / Niezawodność warunkowa / Widoczność operacyjna / Przewaga
+konkurencyjna), więc propozycja z 2026-06-14 była martwa. Werdykt: nie nadajemy ponownie —
+„Ucieczka przed likwidacją" i „Obracanie kapitałem" już ŻYJĄ jako kod (`kalkulator_lewara`,
+compounding W-319), „Płynność ponad balastem" pokrywa Prawo XVI+XXII, a „Prześwietlenie przed
+wejściem" zostaje postulatem produktowym (AdapterKartaWaluty), nie nowym prawem. Mnożenie praw
+bez potrzeby = ten sam błąd co mnożenie dokumentów.
+
+**Tabela API prześwietlania — stan zmierzony:** GoPlus/RugCheck/GeckoTerminal 🔴 0 trafień ·
+CoinGecko 🔴 tylko wzmianka w komentarzu · DefiLlama ✅ wpięty, ale **w INNEJ roli** niż
+zakładała wizja (`adaptery/stablecoin.py` → K-03/K-04, podaż stablecoinów jako sygnał makro,
+nie karta waluty). `AdapterKartaWaluty` 🔴 nie istnieje. Dostępność darmowych API sprawdzana
+2026-06-14 i NIE weryfikowana ponownie — oznaczone ⚠️ w dokumencie (Prawo I).
+
+**Pliki:** `docs/WIZJA_TRYBY_I_ROZWOJ.md` (weryfikacja + ✅/🔴 per twierdzenie) ·
+`docs/INDEKS_IMPERIUM.md` (katalog regenerowany).
+**Bramka:** testy 2503/2503 ✅ · audyt exit 0 ✅ · gnicie 13→12 · dublet `rejestr.py`
+(KATALOG_NEURONOW ↔ WIZJA) rozstrzygnięty z powodem na widoku.
+
+---
+
+## 2026-07-17 | 🧠 | PAMIEC_ABSOLUTNA zweryfikowana + wstrzykiwacz, który ZJADŁ HISTORIĘ
+
+**Co (dług gnicia 14 → 13):** spłata `docs/PAMIEC_ABSOLUTNA.md` przez WERYFIKACJĘ twierdzeń
+wobec kodu, nie bump daty. Zmierzone rozbieżności: schemat `ImperiumLog` podawany jako
+„~80 pól" przy **68** w kodzie · pola `top3_neurony_long/short` nie istnieją (kod:
+`top3_long/short`) · brak `mae_pct`/`mfe_pct` i typu `DORADCY` · nazwa pliku to `_sygnał.jsonl`
+· katalogi `igrzyska/ sesje/ analizy/` i `indeks.json` **nie istnieją** (opisane jako gotowe)
+· **„Kronikarz v2 — Interrogator"** (`zapytaj`, `porownaj_okresy`, `replay_sesji`)
+prezentowany jako działające API — **0 trafień w kodzie**; Kronikarz ma wyłącznie
+`zapisz(RunReport)`. Realne API (`wczytaj`, `podsumowanie_sesji`, `log_sygnal`,
+`log_trade_open`, `IMPERIUM_LOG_DIR`) nie było opisane wcale. Usunięta sekcja WFO podawała
+progi „Sharpe > 0.6 / < 0.4" i okna „90/30 dni" — kod liczy `WFE = sharpe_oos/sharpe_is`
+z `prog_wfe=0.5` w BARACH (zweryfikowane przed usunięciem — Zasada Archiwizacji).
+Rozmiar schematu jest teraz liczbą wstrzykiwaną (klucz `pola_logu`, W15) — nie zgnije znowu.
+
+**🚨 Prawo XV — LUKA 1 (łańcuch integralności przerwany):** Brama liczy `CalcResult.sha256`
+per wskaźnik, ale `ImperiumLog.hash_sha256` **nie jest wypełniany przez NIC** (0 przypisań),
+a `dyrygent.py:911` karmi bramkę Hermesa literałem `hash_ok=True` — bezpiecznik, który nie
+może się zapalić. Prawo IX wymienia `hash_sha256` jako obowiązkowe → kod łamie własne prawo.
+Udokumentowane jako LUKA; naprawa = osobne zadanie (ZASADA WPIĘCIA: Hermes stoi na ścieżce
+decyzyjnej, więc opt-in OFF). **LUKA 2:** 6 z 9 typów `TypLogu` bez producenta.
+
+**🚨 NAJWAŻNIEJSZE — narzędzie od prawdy sfalsyfikowało historię (Prawo I):** przy tej sesji
+`wstrzyknij_liczby` **ZJADŁ 44 linie LOG_ZMIAN** — mój wpis, cały wpis TABULARIUM i początek
+Filara 4, sklejone w kaszę. Przyczyna: regex bloku liczbowego używał leniwego `.*?` z
+`re.DOTALL`, więc zacytowany w tekście znacznik BEZ domknięcia skleił się z domknięciem
+NASTĘPNEGO bloku, a `sub()` skasował całą treść pomiędzy. Wykryte przez czytanie wyjścia
+testów (historia przywrócona z gita, nic nie utracone). **Druga wada tej samej klasy:**
+wstrzykiwacz przepisywał też dokumenty `typ: acta` — wpis z 2026-07-17 cytuje „87 neuronów"
+jako prawdę swojego dnia; gdy rój urośnie, narzędzie CICHO zmieniłoby historię na nową liczbę
+(dziś no-op, bo liczba się zgadza — bomba utajona). **Trzecia:** identyczna bomba `.*?`+DOTALL
+w generatorze katalogu (`zapisz_katalog`), a INDEKS to dokument O dokumentach, więc cytat
+znacznika jest tam naturalny. Naprawa u źródła: treść bloku nie może zawierać własnego
+otwarcia (`(?:(?!<!--)[\s\S])*?`) · wstrzykiwacz omija `typ: acta` · testy granic na oba.
+
+**Wada Księgi Wad (znaleziona przy okazji):** `zasiej_startowe` CICHO ignorował pole `regex`
+w `CHECKLIST_STARTOWA` — wzorzec wpisany do złej listy stawał się **ozdobą**. Tak leżał od
+dnia dodania wzorzec `subprocess text=True`: **nigdy niczego nie przeskanował**. Liczbowy test
+partycji tego nie widział. Naprawa: bramka `ValueError` przy regexie w checkliście · `dodaj()`
+AWANSUJE checklistę do wzorca zamiast dublować (Prawo XVI). **Ożywiony wzorzec natychmiast
+złapał przeoczenie:** `audyt_spojnosci.py:259` — jedyny `subprocess.run(text=True)` bez
+`encoding` (3 pozostałe naprawiono 07-17, ten umknął). Naprawione.
+
+**Dwa nowe wzorce regex, szum zmierzony PRZED dodaniem (rozkaz stały):** `bezpiecznik`
+(bramka karmiona literałem `True`) — 1 trafienie / 377 plików = dokładnie bug, 0 fałszywek,
+idiom `mkdir(exist_ok=True)` wykluczony · `parsowanie` (`.*?` + DOTALL w jednym `re.compile`)
+— baza miała 2 wystąpienia, oba naprawione, dziś 0 trafień i 0 fałszywek; wzorzec sprawdzony
+w obie strony na obu wariantach (`.*?` gołe i w nawiasie).
+
+**Pliki:** `docs/PAMIEC_ABSOLUTNA.md` (v2.0) · `imperium/biblioteki/ksiega_wad_kodu.py` ·
+`narzedzia/tabularium.py` · `narzedzia/audyt_spojnosci.py` · `tests/test_ksiega_wad_kodu.py`
+(+6) · `tests/test_tabularium.py` (+3) · `docs/INDEKS_IMPERIUM.md`.
+**Bramka:** testy 2503/2503 ✅ · audyt exit 0 (ruff czysty) ✅ · gnicie 14→13 · dublet
+kronikarza rozstrzygnięty z powodem na widoku.
+
+---
+
 ## 2026-07-17 | 🏛️ | TABULARIUM — rejestr dokumentów + naprawa klasy wad kodowania (6 wystąpień)
 
 **Co:** nowy organ **TABULARIUM** (`narzedzia/tabularium.py`, 20 testów) — rzymskie archiwum

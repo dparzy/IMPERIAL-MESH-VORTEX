@@ -102,6 +102,37 @@ def _fragmenty_w_bazie() -> int:
         return 0
 
 
+def fragmenty_w_bazie() -> int:
+    """Ile fragmentów RAG — publiczny wrapper (Tabularium/dokumenty liczą stąd, W15).
+
+    Liczba rośnie z każdą dodaną książką/dokumentem — wpisana ręcznie zestarzeje się
+    (zmierzone 2026-07-18: PLAN_TIRO podawał „27 959" przy 29 699 realnych)."""
+    return _fragmenty_w_bazie()
+
+
+def ksiazki_w_bazie() -> int:
+    """Ile KSIĄŻEK (BIB-*) jest zaindeksowanych w RAG — liczone, nigdy zaszyte.
+
+    JEDNO źródło prawdy dla całego Imperium (Prawo XVI): kustosz (W2), alarmy, instrukcja
+    lokalna i dokumenty czytają stąd. Zmierzone 2026-07-17: liczba „42" była ZASZYTA w
+    czterech miejscach kodu i w MAPA_PAMIECI, przy 79 książkach realnie w bazie — biblioteka
+    rośnie (BIB-070..274 w planie), więc każda wpisana ręcznie liczba musi się zestarzeć.
+    Liczymy źródła w bazie, nie pliki na dysku: książka niezaindeksowana nie jest wiedzą W2.
+    """
+    if not RAG_BAZA.exists():
+        return 0
+    try:
+        conn = sqlite3.connect(str(RAG_BAZA))
+        try:
+            return conn.execute(
+                "SELECT COUNT(DISTINCT zrodlo) FROM fragmenty WHERE zrodlo LIKE 'BIB-%'"
+            ).fetchone()[0]
+        finally:
+            conn.close()
+    except sqlite3.Error:
+        return 0
+
+
 def _model_embeddings_dostepny() -> bool:
     """Czy sentence-transformers + model są dostępne (lokal: tak, chmura: zwykle nie)."""
     try:
@@ -153,7 +184,7 @@ def _alarmy(rap: Dict[str, Any]) -> List[str]:
         )
     if not rap["rag_baza_istnieje"]:
         alarmy.append(
-            "🚨 Brak bazy RAG — wiedza z 42 książek niedostępna. "
+            "🚨 Brak bazy RAG — CAŁA wiedza z książek niedostępna. "
             "Odbuduj: python narzedzia/rag/indeksuj.py --korpus wszystko"
         )
     if rap["srodowisko"] == "lokal" and not rap["model_embeddings"]:
@@ -204,7 +235,7 @@ def instrukcja_lokal() -> str:
         "🖥️ ODBLOKOWANIE PEŁNEJ PAMIĘCI LOKALNIE:\n"
         "   1. git pull origin claude/sleepy-fermi-dsdE4   # cała pamięć z chmury\n"
         "   2. pip install -r requirements.txt              # w tym sentence-transformers\n"
-        "   3. python narzedzia/rag/indeksuj.py --korpus wszystko  # wektory z 42 książek + kronika\n"
+        f"   3. python narzedzia/rag/indeksuj.py --korpus wszystko  # wektory z {ksiazki_w_bazie()} książek + kronika\n"
         "   4. (opcjonalnie) setx DEEPSEEK_API_KEY \"...\"   # auto-lekcja po sesjach\n"
         "   → po tym: szukaj_wszedzie() działa semantycznie (wektory), nie tylko keyword (FTS).\n"
         "   Most: git niesie dialog+lekcje+wizje; wektory budujesz lokalnie z repo."

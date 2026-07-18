@@ -11,6 +11,7 @@ Weryfikuje:
 """
 
 import os
+import re
 import time
 from pathlib import Path
 
@@ -127,3 +128,29 @@ def test_kompresuj_dni_ujemne_bezpieczne(tmp_path):
     r = ku.kompresuj_zimne(dni=-5, kronika_dir=tmp_path)
     assert r["skompresowane"] == 0
     assert (tmp_path / "sesja_teraz.md").exists()
+
+
+def test_mapa_nie_zaszywa_liczby_ksiazek():
+    """Liczba książek w W2 idzie z bazy RAG, nigdy ze stałej.
+
+    Zmierzone 2026-07-17: „42 książek" było ZASZYTE w `WARSTWY` (i w trzech innych miejscach
+    kodu) przy 79 realnych. Biblioteka rośnie — każda wpisana liczba musi się zestarzeć.
+    """
+    from imperium.biblioteki.srodowisko_pamieci import ksiazki_w_bazie
+    rola_w2 = next(rola for klucz, _n, rola, _t in ku.WARSTWY if klucz == "W2")
+    assert not re.search(r"\d", rola_w2), \
+        f"W2 ma zaszytą liczbę w stałej WARSTWY: {rola_w2!r} — ma ją dokładać mapa() z bazy"
+    n = ksiazki_w_bazie()
+    if n:  # bez bazy RAG (świeży klon) mapa po prostu nie dokłada liczby
+        assert f"{n} książek zaindeksowanych" in ku.mapa()
+
+
+def test_mapa_liczy_warstwy_bez_organu():
+    """W7 (Kustosz) to ORGAN, nie warstwa-dana — `len(WARSTWY)` przekłamałoby o jeden.
+
+    Pierwsza wersja tej poprawki drukowała „14 warstw", bo liczyła W7 razem z warstwami.
+    """
+    naglowek = ku.mapa().splitlines()[0]
+    oczekiwane = len([w for w in ku.WARSTWY if w[0] != "W7"])
+    assert f"{oczekiwane} warstw" in naglowek, naglowek
+    assert "organ W7" in naglowek, "nagłówek musi odróżniać organ od warstw"

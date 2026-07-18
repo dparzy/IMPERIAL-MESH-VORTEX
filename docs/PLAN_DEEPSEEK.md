@@ -1,30 +1,61 @@
 ---
 kategoria: CONSILIUM
 typ: zywy
-wlasciciel: imperium/cesarz/deepseek_glos.py, imperium/cesarz/titan_mind.py, imperium/oczy/wszechoko.py, imperium/senat/meta_kora.py
-stan_na: 2026-05-31
-powod_istnienia: "Plan podłączenia DeepSeek API jako 'głosu' Cesarza i Senatu — jak wywoływać LLM, wzorzec debaty Populares vs Optimates, ocena frameworków multi-agent."
+wlasciciel: imperium/cesarz/deepseek_glos.py, imperium/akwedukty/adaptery/news_llm.py, imperium/biblioteki/notarius.py
+stan_na: 2026-07-18
+powod_istnienia: "Plan podłączenia DeepSeek API jako 'głosu' Imperium (adapter GlosImperium) + weryfikacja, GDZIE DeepSeek naprawdę trafił — realizacja poszła inną drogą niż plan (nie Senat, lecz Oczy/newsy + zwiad wiedzy + NOTARIUS)."
+dublet_rozstrzygniety: docs/PLAN_TIRO_LOKALNY_LLM.md — notarius jest tu opisany jako KONSUMENT GlosImperium (skąd DeepSeek zbiera pary prompt→odpowiedź); w PLAN_TIRO ten sam notarius żyje jako element pipeline TRENINGU lokalnego LLM. Różne role tego samego modułu, świadomy podział, nie dublet treści.
 ---
-# 🧠 PLAN: DeepSeek API jako mózg Cesarza i Senatu
+# 🧠 PLAN: DeepSeek API jako głos Imperium — plan vs realizacja
 
 > **Źródło:** rozmowa DeepSeek o budowie multi-bota (`archiwum/DeepSeek_API_multibot_oryginal.md`)
-> **Po co:** Komendant ma klucz DeepSeek API. To tani, szybki LLM (~10× taniej od GPT-4).
-> Podłączamy go jako "głos" agentów — Cesarz decyduje, Senat debatuje.
+> **Po co:** Komendant ma klucz DeepSeek API. To tani, szybki LLM. Adapter `GlosImperium` jest
+> jedynym wejściem LLM w Imperium.
 >
 > **Sprzęt:** Fujitsu 8GB RAM. Dlatego ciężka praca (LLM) idzie przez API, nie lokalnie.
+> (Projekt TIRO buduje hybrydę lokalną — patrz `docs/PLAN_TIRO_LOKALNY_LLM.md`.)
+
+> **⚠️ Weryfikacja wobec kodu 2026-07-17.** Adapter `GlosImperium` **istnieje i jest żywy** ✅,
+> ale **realizacja poszła INNĄ drogą niż ten plan.** Trzy moduły, które plan wskazywał jako
+> odbiorców (titan_mind, meta_kora, wszechoko), **wcale nie wołają DeepSeeka** — a wołają go
+> cztery inne, których plan nie przewidział. Sekcja niżej rozdziela plan od rzeczywistości.
+> Dokument zostaje CONSILIUM (żywy), bo adapter żyje; nie robimy z niego ACTA.
 
 ---
 
-## 🎯 GDZIE DeepSeek pasuje w Imperium
+## ✅ CO Z PLANU ZREALIZOWANO — i JAK (zmierzone)
 
-| Dzielnica | Moduł | Rola DeepSeek |
+| Zamiar planu | Stan | Realizacja |
+|---|---|---|
+| Adapter `GlosImperium` (jedno wejście LLM) | ✅ | `imperium/cesarz/deepseek_glos.py` — `GlosImperium.zapytaj()` + `test_polaczenia()` |
+| Oczy: sentyment newsów | ✅ **inną ścieżką** | `imperium/akwedukty/adaptery/news_llm.py` (nie `wszechoko.py`) — klasyfikuje wydźwięk nagłówków → JSON, z fallbackiem |
+| Senat: debata Populares/Optimates przez LLM | 🔴 **NIE** | `meta_kora.py` poszła drogą **agentów ML/deterministycznych** (TrendAgent, SentimentAgent, MicrostructureAgent → MetaJudge/SuperJudge), nie debaty LLM. Wzorzec Populares/Optimates żyje TYLKO w `archiwum/kingdom_pixel_p1/meta_kora_debate.py` |
+| Cesarz: decyzja LONG/SHORT/CZEKAJ przez LLM | 🔴 **NIE** | `titan_mind.py` to „Strategy Orchestrator & Scheduler" — nie używa DeepSeeka |
+
+**Odbiorcy, których plan NIE przewidział, a którzy realnie używają `GlosImperium`:**
+- 🔬 **NOTARIUS** (`imperium/biblioteki/notarius.py`) — zbiera pary `prompt → odpowiedź nauczyciela`
+  do treningu lokalnego LLM (projekt TIRO). To dziś najważniejszy konsument.
+- 📚 **Bibliotekarz/Hyginus** (`narzedzia/bibliotekarz.py`) — zwiad wiedzy: rozwijanie tematów
+  i krytyka kompletności (temperatura 0.3).
+- 🎓 **auto_lekcja** (`narzedzia/auto_lekcja.py`) — automatyczna lekcja po sesji.
+
+> **Wniosek (Prawo I):** DeepSeek trafił do Imperium jako **narzędzie wiedzy i treningu**
+> (newsy, zwiad, zbieranie par dla TIRO), a **nie** jako mózg decyzyjny Cesarza/Senatu.
+> Ścieżka decyzyjna pozostała deterministyczna (Brama + neurony + Rada) — zgodnie z Prawem I
+> („DeepSeek nie liczy matematyki"), ale też szerzej: nie decyduje o wejściach.
+
+---
+
+## 🎯 GDZIE DeepSeek pasuje w Imperium (pierwotny plan — do porównania z tabelą wyżej)
+
+| Dzielnica | Moduł (plan) | Rola DeepSeek wg planu |
 |-----------|-------|---------------|
-| 👑 Cesarz | titan_mind.py | Czyta raport debaty → decyduje LONG/SHORT/CZEKAJ + uzasadnienie |
-| 🏛️ Senat | meta_kora.py | Agent Populares (LONG) i Optimates (SHORT) — każdy to wywołanie LLM |
-| 👁️ Oczy | wszechoko.py | Analiza sentymentu newsów, odszumianie kanałów |
+| 👑 Cesarz | titan_mind.py | Czyta raport debaty → decyduje LONG/SHORT/CZEKAJ *(🔴 nie zrealizowane)* |
+| 🏛️ Senat | meta_kora.py | Populares (LONG) i Optimates (SHORT) jako wywołania LLM *(🔴 inna droga)* |
+| 👁️ Oczy | wszechoko.py | Analiza sentymentu newsów *(✅ ale przez `news_llm.py`)* |
 
 > **Czego DeepSeek NIE robi:** nie liczy matematyki (to Brama/TA-Lib, Prawo I).
-> DeepSeek tylko INTERPRETUJE gotowe liczby i debatuje.
+> DeepSeek tylko INTERPRETUJE tekst (newsy, tematy wiedzy).
 
 ---
 
@@ -36,39 +67,44 @@ Klucz trzymamy w zmiennej środowiskowej (NIGDY w kodzie, NIGDY na czacie):
 setx DEEPSEEK_API_KEY "twój-klucz"
 ```
 
-Kod adaptera (wzorzec z pliku DeepSeek, dostosowany do Imperium):
+Realny adapter ([`deepseek_glos.py`](../imperium/cesarz/deepseek_glos.py)) — model **v4**, nie legacy:
+
 ```python
 # imperium/cesarz/deepseek_glos.py
 import os
-from openai import OpenAI   # DeepSeek używa biblioteki OpenAI!
+from openai import OpenAI   # DeepSeek kompatybilny z biblioteką OpenAI
 
 class GlosImperium:
     """Most do DeepSeek. Jedyne wejście LLM w Imperium."""
-    def __init__(self, model="deepseek-chat"):
-        self.client = OpenAI(
-            api_key=os.getenv("DEEPSEEK_API_KEY"),
-            base_url="https://api.deepseek.com/v1"
-        )
+    MODELE = {
+        "szybki":    "deepseek-v4-flash",   # tani (~$0.14/1M in) — debata/zwiad/newsy
+        "mysliciel": "deepseek-v4-pro",     # premium reasoning — decyzje
+    }
+    def __init__(self, model: str = "deepseek-v4-flash"):
+        self.client = OpenAI(api_key=os.getenv("DEEPSEEK_API_KEY"),
+                             base_url="https://api.deepseek.com/v1")
         self.model = model
 
-    def zapytaj(self, system_prompt: str, tresc: str, temperatura=0.7) -> str:
-        odp = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": tresc},
-            ],
-            temperature=temperatura,
-        )
-        return odp.choices[0].message.content
+    def zapytaj(self, system_prompt: str, tresc: str, temperatura: float = 0.7) -> str: ...
+    def test_polaczenia(self) -> bool: ...   # „powiedz cześć" → sprawdza klucz
 ```
+
+> ⚠️ **Migracja V4 (zweryfikowane w kodzie 2026-07-17).** Poprzednia wersja podawała model
+> `deepseek-chat` — ten (i `deepseek-reasoner`) **zostały wycofane 2026-07-24**. Nowe id:
+> `deepseek-chat → deepseek-v4-flash`, `deepseek-reasoner → deepseek-v4-flash thinking /
+> deepseek-v4-pro`. `base_url` bez zmian. Domyślny model adaptera to **`deepseek-v4-flash`**.
 
 ---
 
-## 🏛️ Wzorzec debaty Senatu (Populares vs Optimates)
+## 🏛️ Wzorzec debaty Senatu (Populares vs Optimates) — 🔴 NIEZREALIZOWANY
+
+> **Ten szkic nigdy nie wszedł do `meta_kora.py`.** Senat poszedł drogą agentów ML
+> (TrendAgent/SentimentAgent/MicrostructureAgent → MetaJudge/SuperJudge), nie debaty LLM.
+> Wzorzec Populares/Optimates z LLM żyje wyłącznie w
+> `archiwum/kingdom_pixel_p1/meta_kora_debate.py` — poniższe zostawiamy jako zapis intencji.
 
 ```python
-# imperium/senat/meta_kora.py (szkic)
+# SZKIC (nie w kodzie meta_kora.py — patrz ostrzeżenie wyżej)
 glos = GlosImperium()
 
 # Frakcja LONG — Trybun Ludu (Populares)
@@ -120,12 +156,17 @@ Plik DeepSeek polecał gotowe frameworki multi-agent. Nasza ocena dla Imperium:
 
 ---
 
-## ✅ NASTĘPNY KROK (gdy ruszamy z DeepSeek)
+## ✅ NASTĘPNY KROK — ZREALIZOWANE (historia planu)
 
-1. Komendant ustawia `DEEPSEEK_API_KEY` na swoim PC
-2. Tworzymy `imperium/cesarz/deepseek_glos.py` (kod wyżej)
-3. Test: jedno pytanie "powiedz cześć po polsku" → sprawdzamy że klucz działa
-4. Dopiero potem wpinamy w cykl
+1. ✅ Komendant ustawia `DEEPSEEK_API_KEY` (weryfikacja: `GlosImperium.test_polaczenia()`)
+2. ✅ `imperium/cesarz/deepseek_glos.py` istnieje (adapter V4)
+3. ✅ Test połączenia wbudowany (`test_polaczenia()` → „powiedz cześć")
+4. ✅ Wpięte — ale w **newsy/zwiad/NOTARIUS**, nie w cykl decyzyjny (patrz tabela realizacji)
+
+**Otwarty postulat 🔵:** debata LLM Populares/Optimates w Senacie i decyzja LLM Cesarza —
+gdyby kiedyś wracać, wzorzec czeka w `archiwum/kingdom_pixel_p1/meta_kora_debate.py`. Dziś
+ścieżka decyzyjna jest w pełni deterministyczna (Brama + neurony + Rada Doradców), co jest
+zgodne z kierunkiem (zero halucynacji LLM w wejściach — Prawo I).
 
 ---
 

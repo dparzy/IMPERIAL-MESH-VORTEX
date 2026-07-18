@@ -1,14 +1,21 @@
 ---
 kategoria: DISCIPLINA
 typ: zywy
-wlasciciel: skrypty/start.py
-stan_na: 2026-05-31
-powod_istnienia: "Instrukcja uruchomienia cyklu krok po kroku dla nowicjusza (Windows, tryb paper)"
+wlasciciel: imperium/legiony/pierwszy_zwiadowca.py
+stan_na: 2026-07-18
+powod_istnienia: "Instrukcja uruchomienia minimalnego cyklu Fazy 0 (pierwszy_zwiadowca) krok po kroku dla nowicjusza (Windows, tryb paper)"
 ---
 # 🚀 JAK URUCHOMIĆ CYKL IMPERIUM — krok po kroku (Windows 10)
 
 > Komendancie — to handel **NA NIBY** (zero ryzyka, zero prawdziwych pieniędzy).
 > Jak coś się wysypie: skopiuj czerwony tekst z okna i wyślij mi. Rozwiążemy razem.
+
+> **ℹ️ Dwa sposoby uruchomienia (weryfikacja 2026-07-18):**
+> • **Ten dokument** = minimalny cykl **Fazy 0** przez `pierwszy_zwiadowca.py` (dane → wykres →
+>   raport, jeden strzał). Zweryfikowany: ładuje 5 modułów, tworzy `wykres_biegu.png` + raport.
+> • **Nowszy, pełny** = `python skrypty/start.py` → paper trading z dashboardem na
+>   `http://localhost:8777`. Opis: [`docs/START_LOKAL.md`](../docs/START_LOKAL.md).
+> Oba żyją; zacznij od tego dokumentu dla najprostszego przebiegu.
 
 ---
 

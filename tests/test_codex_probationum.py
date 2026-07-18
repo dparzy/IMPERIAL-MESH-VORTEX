@@ -20,7 +20,7 @@ def test_zbierz_arkusze_ma_wszystkie_arkusze():
     ark = cp.zbierz_arkusze()
     oczekiwane = {"README", "Neurony", "Zwiadowcy", "Strategie", "Neurony x Strategie",
                   "Adaptery", "Waluty x Interwaly", "Interwaly -> Styl",
-                  "Wyniki A-B", "Wyniki IC", "Korelacje", "Backlog"}
+                  "Wyniki A-B", "Wyniki IC", "Korelacje", "Backlog", "Sugestie"}
     assert oczekiwane <= set(ark), f"brak arkuszy: {oczekiwane - set(ark)}"
     for nazwa, wiersze in ark.items():
         assert len(wiersze) >= 1, f"arkusz {nazwa} bez nagłówka"

@@ -412,6 +412,20 @@ def zbierz_arkusze() -> dict:
     ]
     arkusze["Backlog"] = wiersze_b
 
+    # ── 13. Sugestie / Rozbudowa (KANDYDACI — Prawo I: nie wpinamy bez weryfikacji) ──
+    # Czytane z ledgera (typ=SUGESTIA) — źródło prawdy jak reszta wyników. Każda sugestia
+    # rozbudowy CODEX (nowy arkusz/dział/kolumna) ląduje tu jako KANDYDAT do oceny zgodności
+    # z Imperium (ZASADA CODEX PROBATIONUM w CLAUDE.md).
+    wiersze_sug = [["Element / Dział", "Typ", "Uzasadnienie", "Zgodność z Imperium",
+                    "Status", "Data", "Źródło"]]
+    for r in [x for x in ledger if x.get("typ") == "SUGESTIA"]:
+        wiersze_sug.append([
+            r.get("element", ""), r.get("dzial", ""), r.get("uzasadnienie", ""),
+            r.get("zgodnosc_imperium", ""), r.get("status", ""), r.get("data", ""),
+            r.get("zrodlo", ""),
+        ])
+    arkusze["Sugestie"] = wiersze_sug
+
     return arkusze
 
 

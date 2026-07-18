@@ -449,6 +449,33 @@ pojawi się nowy powtarzalny wzorzec zadania — wpis w tym samym commicie co pi
 **Złamanie:** użycie Opusa na czysto mechanicznym zadaniu BEZ powodu, LUB — poważniejsze — pozostanie
 na tanim modelu/niskim effort mimo zaskakującego/nieoczekiwanego wyniku zamiast eskalacji.
 
+## 🗂️ ZASADA CODEX PROBATIONUM — REJESTR TESTÓW CZYTANY PRZED KAŻDYM ZADANIEM (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-18)
+
+**CODEX_PROBATIONUM (`narzedzia/codex_probationum.py` → `raporty/CODEX_PROBATIONUM.xlsx`) traktujemy
+BARDZO POWAŻNIE.** To dokładny, żywy rejestr testów Imperium — źródło prawdy „co zbadaliśmy, na czym,
+z jakim wynikiem, co żywe, co planowane". Źródła: żywy kod (rejestry) + ledger
+`bibliotheca_ulpia/dane/rejestr_testow.jsonl` (patrz [[codex-probationum-rejestr-testow]]).
+
+- **CZYTAJ PRZED KAŻDĄ zmianą i zadaniem:** zanim cokolwiek zaczniesz — regeneruj i przeczytaj CODEX
+  (`python narzedzia/codex_probationum.py`, potem sprawdź arkusze). Wiedza „co już zrobione / planowane /
+  żywe" pochodzi z CODEX, nie z pamięci.
+- **AKTUALIZUJ BEZZWŁOCZNIE, ZANIM coś wpiszesz:** jeśli zadanie wymaga aktualizacji, dodania
+  elementu/arkusza (sheet) lub rozbudowy o nowy dział — najpierw zaktualizuj CODEX (dopisz wynik do
+  `rejestr_testow.jsonl` / rozbuduj generator), DOPIERO POTEM reszta. Każdy nowy wynik testu = natychmiast
+  do ledgera.
+- **NIEZGODNOŚĆ/BRAK → POPRAW po weryfikacji:** jeśli przy czytaniu CODEX stwierdzisz niespójność z kodem
+  albo brak elementu — sprawdź DOKŁADNIE wobec żywego kodu (KANDYDAT ≠ PRAWDA), zweryfikuj i popraw/dodaj.
+  Każda liczba/fakt policzone z kodu (Prawo XXI), nie z pamięci.
+- **WSZYSTKO ZGODNE Z IMPERIUM:** każdy nowy arkusz/dział/kolumna oraz KAŻDA sugestia rozbudowy musi być
+  zgodna z zasadami Imperium (nomenklatura rzymska, ZPO, symbioza, źródło prawdy = kod+ledger). Sugestie
+  rozbudowy trzymamy w arkuszu „Sugestie" jako KANDYDATÓW do oceny (nie wpinamy bez weryfikacji).
+- **BŁĘDY KODU → NATYCHMIAST Księga Wad:** każdy błąd wykryty w kodzie (przy CODEX lub gdziekolwiek)
+  zgłaszasz od razu i zapisujesz do Księgi Wad (`ksiega_wad_kodu`) — klasa semantyczna ZAWSZE, regex po
+  pomiarze szumu (patrz [[rozkaz-porzadek-i-ksiega-wad]]).
+
+**Złamanie:** zmiana/zadanie bez uprzedniego przeczytania CODEX; wpisanie czegoś zanim CODEX zaktualizowany;
+pozostawienie w CODEX niezgodności z kodem; arkusz/dział niezgodny z Imperium; błąd kodu niezapisany do Księgi Wad.
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`

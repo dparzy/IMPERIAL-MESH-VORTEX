@@ -14,6 +14,34 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 🏺 | AUDYT KONSTYTUCJI + ZASADA WERYFIKACJI + ZASADA CENSORA (Fable 5)
+
+**Co:** dwa nowe ROZKAZY STAŁE Cezara skodyfikowane + pełny audyt CLAUDE.md zasada-po-zasadzie
+(pierwsza sesja na Fable 5).
+
+**ZASADA WERYFIKACJI PRZED WDROŻENIEM:** każda decyzja/propozycja przed wdrożeniem przechodzi
+bramkę: czy już istnieje/zbadane (CODEX+kod+kronika) · pod każdym kątem (granice/reżimy/pary) ·
+wpływ na CAŁE Imperium (symbioza) · zgodność z zasadami · dowód z POMIARU. Cel: zarabiać na
+krypto (MEXC), nic nie psuć — rozwijać.
+
+**ZASADA CENSORA (pętla samokontroli):** WYKRYJ→ZAŁATAJ→UODPORNIJ→ZAPISZ; alarmy hooka
+startowego = ZADANIA, nie tapeta (dowód luki: W9 „10 sprzeczności" + „LEKCJE 39k>24k"
+ignorowane przez wiele sesji, bo żadna zasada nie nakazywała reakcji). Oba alarmy → Backlog CODEX.
+
+**Audyt CLAUDE.md — 5 niezgodności naprawionych (każda zweryfikowana wobec kodu):**
+1. `stan_na` 07-14 → 07-18 (plik zmieniany, data nie nadążała).
+2. „9 Nienaruszalnych Reguł" przy 10 pozycjach → nagłówek bez liczby (count-proof); klasa wady
+   „ręczna liczba w nagłówku" → Księga Wad (34 wpisy).
+3. KROK 0: „planowane A/L/V" — zmierzone: `WAGI_REZIMU_PLANOWANE` dziś PUSTY → komentarz naprawiony.
+4. Sekcja OBSERWACJI PR rozcięta wklejką „Zasady debugowania" (jej zdanie wisiało za obcą sekcją)
+   → scalona; debugowanie = własna sekcja H2.
+5. „Opus" zaszyty jako najwyższy tier → dopisek „czytaj: najwyższy dostępny (dziś Fable 5)";
+   ta sama klasa co nieistniejący „sonnet-4-6" (2026-07-17).
+
+**Pliki:** CLAUDE.md, codex_probationum.py (Backlog +2 alarmy), ksiega_wad_kodu.jsonl, LOG_ZMIAN.
+
+---
+
 ## 2026-07-18 | 📜 | CODEX_PROBATIONUM — żywy rejestr testów w Excelu
 
 **Co:** generator wielo-arkuszowego .xlsx (`narzedzia/codex_probationum.py`) — nasz

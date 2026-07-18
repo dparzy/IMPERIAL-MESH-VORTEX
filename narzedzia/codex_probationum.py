@@ -409,6 +409,11 @@ def zbierz_arkusze() -> dict:
          "DVOL/STABLE pomagają na 4H; flagi opt-in OFF do decyzji"],
         ["A/B na pełnym oknie 1H/4H", "walidacja", "ZABLOKOWANE", "P1",
          "po naprawie O(n²) — dziś okno 800 barów (1H=33 dni, nierozstrzygające)"],
+        # Alarmy hooka startowego = zadania, nie tapeta (ZASADA CENSORA, 2026-07-18)
+        ["Konsolidacja LEKCJI pamięci (39k zn. > limit 24k)", "higiena pamięci", "OCZEKUJE", "P2",
+         "alarm hooka od wielu sesji; kasowanie danych pamięci = decyzja Cezara (Prawo XVIII)"],
+        ["Przegląd 10 sprzeczności Refleksji W9 + 1 wiszący pomysł", "higiena pamięci", "OCZEKUJE", "P2",
+         "alarm hooka od wielu sesji; rozstrzygnąć każdą sprzeczność (Prawo XVIII) zamiast ignorować"],
     ]
     arkusze["Backlog"] = wiersze_b
 

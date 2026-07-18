@@ -59,6 +59,63 @@ def test_lekcje_limit():
     assert len(ps.lekcje(p, limit=1)) == 1
 
 
+def test_konsoliduj_ponizej_celu_nic_nie_rusza():
+    """Granica: sekcja mniejsza niż cel → 0 zarchiwizowanych, plik nietknięty."""
+    p = _plik()
+    r = ps.konsoliduj_lekcje(cel_znakow=99999, plik=p, sucho=True)
+    assert r["zarchiwizowanych"] == 0 and r["po"] == r["przed"]
+
+
+def test_konsoliduj_sucho_nie_zapisuje(tmp_path):
+    """Granica: sucho=True liczy, ale NIE zmienia pliku ani nie tworzy archiwum."""
+    p = _plik()
+    przed = p.read_text(encoding="utf-8")
+    arch = tmp_path / "ARCH.md"
+    r = ps.konsoliduj_lekcje(cel_znakow=10, plik=p, archiwum=arch, sucho=True)
+    assert r["zarchiwizowanych"] >= 1                 # coś BY poszło do archiwum
+    assert p.read_text(encoding="utf-8") == przed     # ale plik nietknięty
+    assert not arch.exists()                          # archiwum nie powstało
+
+
+def test_konsoliduj_przenosi_nic_nie_kasuje(tmp_path):
+    """Rdzeń: aktywne + archiwum = wszystkie lekcje (nic nie ginie, Prawo I)."""
+    p = _plik()
+    arch = tmp_path / "ARCH.md"
+    n0 = len(ps.lekcje(p))
+    r = ps.konsoliduj_lekcje(cel_znakow=60, plik=p, archiwum=arch, sucho=False)
+    assert r["po"] + r["zarchiwizowanych"] == n0      # bilans się zgadza
+    assert r["po"] >= 1 and r["zarchiwizowanych"] >= 1
+    assert arch.exists()
+    tekst_arch = arch.read_text(encoding="utf-8")
+    for tytul in r["archiwum"]:
+        assert tytul in tekst_arch                    # każda schłodzona JEST w archiwum
+    # STAN BIEŻĄCY (ogon) przetrwał operację na pliku aktywnym
+    assert "🔄 STAN BIEŻĄCY" in p.read_text(encoding="utf-8")
+
+
+def test_konsoliduj_zostawia_najwartosciowsze(tmp_path, monkeypatch):
+    """Kryterium retencji: przy remisie/wartości nowsza+ważniejsza lekcja zostaje w gorącym."""
+    monkeypatch.setattr(ps, "_dzis", lambda: "2026-07-01")
+    p = _plik()
+    # dodaj świeżą, ważną lekcję — powinna zostać, a stare wypaść przy ciasnym celu
+    ps.dopisz_lekcje("KRYTYCZNA zasada Cezara najważniejsza", "Treść.", data="2026-07-01", plik=p)
+    arch = tmp_path / "ARCH.md"
+    ps.konsoliduj_lekcje(cel_znakow=70, plik=p, archiwum=arch, sucho=False)
+    aktywne_tytuly = [lek["tytul"] for lek in ps.lekcje(p)]
+    assert any("KRYTYCZNA" in t for t in aktywne_tytuly)
+
+
+def test_dopisz_archiwum_idempotentny(tmp_path):
+    """Granica: kolejne konsolidacje DOPISUJĄ do archiwum (nie nadpisują, jeden nagłówek)."""
+    arch = tmp_path / "ARCH.md"
+    ps._dopisz_archiwum([{"data": "2026-06-01", "tytul": "Pierwsza", "tresc": "T1"}], arch)
+    ps._dopisz_archiwum([{"data": "2026-06-02", "tytul": "Druga", "tresc": "T2"}], arch)
+    txt = arch.read_text(encoding="utf-8")
+    assert "Pierwsza" in txt and "Druga" in txt                 # nic nie zgubione
+    assert txt.count(ps._NAGLOWEK_ARCHIWUM) == 1                # jeden nagłówek sekcji
+    assert txt.count("kategoria: ACTA") == 1                    # jeden frontmatter
+
+
 def test_lekcje_pusty_plik():
     p = _plik("# Pusto\n\nBez sekcji lekcji.\n")
     assert ps.lekcje(p) == []

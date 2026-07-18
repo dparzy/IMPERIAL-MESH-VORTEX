@@ -14,6 +14,30 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-19 | 📦 | Konsolidacja LEKCJI — archiwizacja wg wartości retencji (Prawo XV, nic nie skasowane)
+
+**Co:** sekcja LEKCJE Z SESJI puchła do **39966 zn > limit 24000** (180 lekcji, hurtowy import).
+Alarm hooka wisiał sesjami. Rozkaz Cezara: konsolidacja.
+
+**Diagnoza (pomiar, nie opinia):** automatyczny dedup ZAWODZI — `czy_duplikaty` (zachowawczy,
+„fałszywe scalenie kasuje wiedzę bezpowrotnie") daje 0; identyczna sygnatura = 0; Mądre
+Zapominanie = 0 kandydatów (wszystko wartościowe). 32 pary Jaccard≥0.6 to duplikaty SEMANTYCZNE
+(różne tokeny), których żaden bezpieczny automat nie scali. **Wniosek: nie kasujemy — archiwizujemy.**
+
+**Mechanizm (reużywalny, CENSOR pkt 3):** `pamiec_sesji.konsoliduj_lekcje(cel_znakow)` +
+`_dopisz_archiwum` + CLI `konsoliduj [--cel --sucho]`. Schładza NAJNIŻEJ-wartościowe lekcje
+(kryterium: `zapominanie.wartosc_retencji` = łączność w grafie × świeżość × ważność) do nowego
+pliku ACTA `docs/PAMIEC_SESJI_ARCHIWUM.md` aż aktywna sekcja ≤ cel. Wynik: **180→94 aktywnych,
+86 zarchiwizowanych, sekcja 39244→21962 zn**, alarm zniknął. Bilans 94+86=180 — **nic nie zginęło**
+(archiwum przeszukiwalne grep/RAG, poza wstrzykiwanym kontekstem startowym; kontekst i tak brał Top-3).
+
+**Symbioza (CENSOR złapał audytem):** nowy plik → INDEKS (katalog Tabularium regenerowany) + W8
+LOG_ZMIAN. **Testy:** +4 granic (przenosi-nie-kasuje · sucho-nie-zapisuje · poniżej-celu-nic ·
+zostawia-najwartościowsze), 57/57 pamięci sesji. **Pliki:** pamiec_sesji.py, test_pamiec_sesji.py,
+PAMIEC_SESJI.md, PAMIEC_SESJI_ARCHIWUM.md (nowy ACTA), INDEKS_IMPERIUM.md, codex_probationum.py.
+
+---
+
 ## 2026-07-18 | 🪞 | CENSOR w akcji: 10 „sprzeczności" W9 = fałszywe alarmy detektora — naprawa u źródła
 
 **Co:** przegląd alarmu Refleksji W9 wiszącego od wielu sesji („10 sprzeczności do przeglądu").

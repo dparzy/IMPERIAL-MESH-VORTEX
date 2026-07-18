@@ -410,8 +410,8 @@ def zbierz_arkusze() -> dict:
         ["A/B na pełnym oknie 1H/4H", "walidacja", "ZABLOKOWANE", "P1",
          "po naprawie O(n²) — dziś okno 800 barów (1H=33 dni, nierozstrzygające)"],
         # Alarmy hooka startowego = zadania, nie tapeta (ZASADA CENSORA, 2026-07-18)
-        ["Konsolidacja LEKCJI pamięci (39k zn. > limit 24k)", "higiena pamięci", "ODŁOŻONE", "P3",
-         "decyzja Cezara 2026-07-18: później (po przeglądzie W9)"],
+        ["Konsolidacja LEKCJI pamięci (39k zn. > limit 24k)", "higiena pamięci", "ZROBIONE 2026-07-19", "—",
+         "archiwizacja wg wartości retencji: 180→94 aktywnych, 86 do PAMIEC_SESJI_ARCHIWUM.md; sekcja 39244→21962 zn; nic nie skasowane (konsoliduj_lekcje, +4 testy)"],
         ["Przegląd 10 sprzeczności Refleksji W9", "higiena pamięci", "ZROBIONE 2026-07-18", "—",
          "10/10 = FP detektora (plan liczony jak negacja + stoplista bez 'jako'); naprawa u źródła, 0 sprzecznych, +3 testy granic"],
         ["Wiszący pomysł W9: Wektory semantyczne RAG lokalnie (22d)", "decyzja Cezara", "OCZEKUJE", "P3",

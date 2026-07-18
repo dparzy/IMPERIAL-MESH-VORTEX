@@ -52,13 +52,13 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 
 <!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->
 
-> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-18 (70 pozycji).
+> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-19 (71 pozycji).
 
 ### LEX — prawo i rozkazy stałe — obowiązuje, nie opisuje
 
 | Dokument | Po co istnieje | Właściciel (kod) | Stan na |
 |---|---|---|---|
-| `CLAUDE.md` | Rozkazy stałe czytane na starcie KAŻDEJ sesji — konstytucja operacyjna Claude'a w Imperium | — | 2026-07-14 |
+| `CLAUDE.md` | Rozkazy stałe czytane na starcie KAŻDEJ sesji — konstytucja operacyjna Claude'a w Imperium | — | 2026-07-18 |
 | `ZASADY_FUNDAMENTALNE.md` | 25 Praw Imperium — pełna konstytucja, do której odwołuje się każda decyzja | — | 2026-07-11 |
 | `docs/CREDO_IMPERIUM.md` | Doktryna założycielska Cezara (verbatim) — serce, z którego wyrasta 25 Praw; źródło przy milczeniu prawa | — | 2026-07-07 |
 | `docs/REGULAMINY_I_MANIPULACJE.md` | Zgodność z regulaminami giełd + katalog 7 manipulacji rynkowych do wykrywania — tarcza prawna Imperium | — | 2026-06-01 |
@@ -71,7 +71,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 |---|---|---|---|
 | `README.md` | Wizytówka Imperium — podaje liczby wprost z kodu (neurony/testy/prawa), więc musi nadążać za rejestrem | `imperium/legiony/rejestr.py` | 2026-07-18 |
 | `docs/ARSENAL_IMPERIUM.md` | Zweryfikować (Prawo I: zero halucynacji) setki linków narzędzi z pliku źródłowego IMV, oddzielić realne od fabrykowanych/niepewnych, i zaproponować 'najmocniejszy zweryfikowany rdz | — | 2026-06-02 |
-| `docs/INDEKS_IMPERIUM.md` | Master Index — punkt wejścia i mapa wszystkich dokumentów; sekcja katalogu generowana przez Tabularium | `imperium/legiony/rejestr.py` | 2026-07-16 |
+| `docs/INDEKS_IMPERIUM.md` | Master Index — punkt wejścia i mapa wszystkich dokumentów; sekcja katalogu generowana przez Tabularium | `imperium/legiony/rejestr.py` | 2026-07-18 |
 | `docs/MANIFEST_KODU.md` | JEDYNE oficjalne źródło prawdy o kodzie (Prawo XIX) — tabela kluczy ze statusem, nic nie istnieje bez wpisu tutaj | `imperium/legiony/rejestr.py` | 2026-07-16 |
 | `docs/MAPA_KLUCZY.md` | JEDYNY dokument, który jawnie i systematycznie rozwiązuje rozbieżności między katalogiem (planem nazw/ID) a żywym kodem — dla każdego klucza podaje: nazwę klasy w kodzie, co robi,  | `imperium/legiony/rejestr.py` | 2026-07-16 |
 | `docs/MAPA_PAMIECI.md` | Jedyne miejsce konsolidujące 13(+1 nadrzędny=W7) warstw pamięci Claude/Imperium w jedną taksonomię, z mapowaniem na model CoALA (arXiv:2309.02427) i na 'domknięte problemy granicy 2026 | `imperium/biblioteki/centrum_pamieci.py`, `imperium/biblioteki/dziennik_niesmiertelny.py`, `imperium/biblioteki/graf_pamieci.py`, `imperium/biblioteki/kronika_czatu.py`, `imperium/biblioteki/kustosz_pamieci.py`, `imperium/biblioteki/pamiec_absolutna.py`, `imperium/biblioteki/pamiec_proceduralna.py`, `imperium/biblioteki/pamiec_proweniencji.py`, `imperium/biblioteki/pamiec_robocza.py`, `imperium/biblioteki/pamiec_sesji.py`, `imperium/biblioteki/refleksja_pamieci.py`, `imperium/biblioteki/rejestr_wizji.py`, `imperium/biblioteki/srodowisko_pamieci.py`, `imperium/biblioteki/zapominanie.py` | 2026-07-17 |
@@ -148,6 +148,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | `docs/AUDYT_SYSTEMU.md` | Pierwszy głęboki audyt stanu faktycznego systemu — co działa, co blokowane przez TA-Lib, co jest szkieletem, co brakuje całkowicie. | `imperium/cesarz/deepseek_glos.py`, `imperium/legiony/mikro_neuron.py`, `imperium/senat/meta_kora.py` | 2026-06-12 |
 | `docs/LOG_ZMIAN.md` | Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz | — | 2026-07-17 |
 | `docs/MAPA_IMPERIUM_FLOW.md` ⛔ zastąpiony przez `docs/ARCHITEKTURA_IMPERIUM.md` | Wersja narracyjna/dydaktyczna architektury — dla nowicjusza (Cezara): tłumaczy PO CO każdy organ istnieje, z przykładowym dialogiem (Zwiadowca 1 mówi 'DŁUGO...', Frakcja Byków vs N | `imperium/akwedukty/kwatermistrz_danych.py`, `imperium/biblioteki/kronikarz.py`, `imperium/biblioteki/mnemosyne.py`, `imperium/cesarz/titan_mind.py`, `imperium/drogi/nexus_hub.py`, `imperium/fundament/brama_kalkulatora.py`, `imperium/fundament/kuznia_narzedzi.py`, `imperium/koloseum/backtest.py`, `imperium/koloseum/monte_carlo.py`, `imperium/legiony/pierwszy_zwiadowca.py`, `imperium/legiony/roj_sygnalow.py`, `imperium/pretorianie/aegis_tarcza.py`, `imperium/pretorianie/lustro_prawdy.py`, `imperium/senat/meta_kora.py`, `imperium/swiatynie/kartograf.py`, `imperium/swiatynie/web_dashboard.py` | 2026-05-31 |
+| `docs/PAMIEC_SESJI_ARCHIWUM.md` | Magazyn starszych/mniej połączonych lekcji — pamięć aktywna ostra, nic nie tracimy (Prawo I). Przeszukiwalne (grep/RAG), poza wstrzykiwanym kontekstem startowym. | — | 2026-07-19 |
 | `docs/migawki/ANALIZA_AUTODOBOR_STRATEGII_2026-07-13.md` | Zwiad wiedzy (Bibliotheca Ulpia RAG 27641 fragmentów + internet) w celu ulepszenia auto-doboru strategii — zdiagnozowana luka: dobór strategii ignoruje zrealizowany P&L (czysto str | `imperium/legiony/strategie/baza.py` | 2026-07-13 |
 | `docs/migawki/ANALIZA_BIB_043-069_2026-07-11.md` | Mapowanie 27 nowych książek (BIB-043..069) na działy encyklopedii Imperium i konkretne moduły/neurony — ugruntowane w realnej treści (ekstrakcja TOC+wstęp), nie z pamięci. | `imperium/pretorianie/filtr_ekonomiczny.py` | 2026-07-11 |
 | `docs/migawki/ANALIZA_WRZUTNIA_2026-07-10.md` | Destylat 108 par pytanie-odpowiedź z DeepSeek Chat (`wrzutnia/Mapa-kluczy.md`) — separacja tego co już mamy (Sekcja A), rad błędnych do odrzucenia (Sekcja B), realnych nowości rank | `imperium/cesarz/deepseek_glos.py`, `imperium/koloseum/drift_adapter.py`, `imperium/legiony/kalibrator_konformalny.py`, `imperium/legiony/meta_labeling.py`, `imperium/legiony/neutralizacja.py`, `imperium/pretorianie/filtr_ekonomiczny.py` | 2026-07-10 |

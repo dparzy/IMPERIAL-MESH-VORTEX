@@ -22,6 +22,9 @@ openai>=1.0            # klucz: os.getenv("DEEPSEEK_API_KEY") — NIGDY w kodzie
 # ── Wizualizacja (świątynie/ — dashboard) ──
 matplotlib>=3.7
 
+# ── Raporty Excel (narzedzia/codex_probationum.py — CODEX_PROBATIONUM.xlsx) ──
+openpyxl>=3.1          # generator rejestru testów; import LENIWY (Prawo I: rdzeń zbierz_arkusze działa bez niego)
+
 # ── Przyspieszenie gorących pętli (opcjonalne — Prawo I: fallback bez numby) ──
 numba>=0.59            # JIT na Viterbi Jump Model (W-380, zmierzone 256× na rdzeniu); brak → czysty Python
 

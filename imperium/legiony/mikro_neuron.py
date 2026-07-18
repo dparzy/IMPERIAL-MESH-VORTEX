@@ -62,6 +62,7 @@ class MikroNeuron(ABC):
     #   M=Momentum  T=Trend  V=Zmienność  F=Flow/Wolumen  O=On-chain
     #   L=Leverage  R=Reżim/Sentyment  S=Struktura(SMC)  A=Anty-manipulacja
     #   K=Makro/Intermarket  E=Entropia/AI  G=Geo/Regionalne
+    #   C=Cross-sectional/Przekrój (siła względna w koszyku)  D=Geometria ścieżki (Path Signature)
     #   H=Hurst/Pamięć długiego zasięgu (meta-brama reżimu)
     #   N=Entropia/Informacja (Permutation Entropy — meta-brama chaosu)
     #   Z=Zagrożenie (VPIN toksyczny przepływ — meta-brama obronna)

@@ -14,6 +14,31 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 📜 | CODEX_PROBATIONUM — żywy rejestr testów w Excelu
+
+**Co:** generator wielo-arkuszowego .xlsx (`narzedzia/codex_probationum.py`) — nasz
+dokładny rejestr testów. **12 arkuszy:** README/Legenda, Neurony (87), Zwiadowcy (15),
+Strategie (20), Neurony×Strategie (macierz ról W/F/X), Adaptery (22 + żywotność),
+Waluty×Interwały (15 par × 1m/1h/4h/1d, pokrycie), Interwały→Styl (Namiestnik),
+Wyniki A/B, Wyniki IC, Korelacje (pomiar W-306), Backlog/Planowane.
+
+**Architektura (Prawo XXI/Filar 4):** Excel = GENEROWANY WIDOK z dwóch źródeł prawdy —
+żywy kod (rejestry) + wersjonowany `bibliotheca_ulpia/dane/rejestr_testow.jsonl` (ledger
+wyników, seed 13 rekordów A/B+IC z tej sesji). Nigdy z pamięci → nie może się rozjechać.
+Import openpyxl LENIWY + miękki fallback (Prawo I: rdzeń `zbierz_arkusze()` działa bez
+biblioteki, testy przechodzą). `raporty/` w .gitignore (regenerowalny artefakt).
+
+**🔧 Dług naprawiony (rozkaz Cezara „błędne → napraw"):** legenda kategorii w
+`mikro_neuron.py:61-67` NIE miała liter **C** (Cross-sectional, C-01) i **D** (Path
+Signature, D-01), choć kod ich używa — złamanie ZPO. Dopisane; test `test_legenda_kategorii_kompletna`
+pilnuje pokrycia KAŻDEJ żywej kategorii.
+
+**Zależność:** `openpyxl>=3.1` do requirements.txt. **Testy:** +8 (rdzeń bez openpyxl +
+zapis pod importorskip + granice: pusty/uszkodzony ledger, parser korelacji, zgodność
+liczb z rejestrem). **Pliki:** codex_probationum.py, rejestr_testow.jsonl, test_codex_probationum.py, mikro_neuron.py, requirements.txt.
+
+---
+
 ## 2026-07-18 | 📊 | A/B TIER-1 NA 1H/4H + 🚨 Prawo XV (backtest O(n²))
 
 **Co:** rozkaz Cezara 07-16 — powtórka A/B sygnałów Tier-1 (DVOL/stablecoin/USD) na

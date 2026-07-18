@@ -2,12 +2,12 @@
 kategoria: DISCIPLINA
 typ: zywy
 wlasciciel: imperium/akwedukty/bary_zdarzeniowe.py, imperium/koloseum/petla_live.py, imperium/legiony/feature_importance.py, imperium/legiony/meta_labeling.py, imperium/legiony/triple_barrier.py, narzedzia/audyt_spojnosci.py, tests/run_tests.py
-stan_na: 2026-07-16
+stan_na: 2026-07-18
 powod_istnienia: "Jedyny kompletny przewodnik „od zera do paper tradingu' dla nowicjusza — instalacja Python/TA-Lib, tryby PAPER/DRY-RUN/REAL, pełna tabela pól `KonfigPetliLive`, TradingView+ngrok k"
 ---
 # 📖 MANUAL IMPERIUM — Pełna Instrukcja dla Nowicjusza
 
-> **Stan na:** 2026-07-16
+> **Stan na:** 2026-07-18
 > Wszystko krok po kroku, na laptopie, dla osoby która nigdy tego nie robiła.
 > Jak coś nie działa — szukaj sekcji „❓ Problemy" na końcu.
 
@@ -31,7 +31,7 @@ powod_istnienia: "Jedyny kompletny przewodnik „od zera do paper tradingu' dla 
 
 ## 1. CO TO JEST <a name="1-co-to-jest"></a>
 
-Imperium to system tradingowy oparty na **roju 78 neuronów** — każdy neuron to
+Imperium to system tradingowy oparty na **roju <!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów** — każdy neuron to
 osobny „doradca" patrzący na inny aspekt rynku (RSI, wolumen, trend, psychologia,
 on-chain...). Legatus zbiera ich głosy i podejmuje decyzję LONG / SHORT / NEUTRAL.
 
@@ -137,7 +137,8 @@ openai (doradca AI), ruff (kontrola jakości).
 python tests/run_tests.py
 ```
 Powinno pokazać na końcu: `✅ Wszystkie testy zaliczone — Imperium gotowe.`
-(obecnie **1532/1532**). Jeśli tak — wszystko działa.
+(liczbę testów podaje sam runner — nie hardkodujemy jej tu, by się nie przeterminowała).
+Jeśli tak — wszystko działa.
 
 ### Krok 3.2 — Sprawdź spójność systemu
 

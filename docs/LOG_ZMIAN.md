@@ -14,6 +14,37 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-18 | 🏁 | DŁUG GNICIA SPŁACONY DO ZERA — IGRZYSKA + ARCHITEKTURA + MANUAL
+
+**Co:** ostatnia trójka + domknięcie całej kampanii porządkowej. **T2 gnicie: 0/70 dokumentów.**
+
+• **IGRZYSKA_IMPERIUM** — rozdzielono kod od wizji: ✅ Arena Neuronów w pełni w kodzie (wzór
+  WYNIK_NEURONU 0.30/0.25/0.20/0.15/0.10, tablica RANGI Tiro→Aquilifer 0.0/0.5…0.93/2.0,
+  PROG_INFAMII, zloty_helm, lista_infamii, WpisInfamii) + HedgeMWU ✅; 🔴 Arena Legionów i Senatu
+  NIE ISTNIEJĄ (0 trafień) — oznaczone WIZJA; 🔴 pliki panteonu (PANTEON/TRIUMPHI/ALBUM/
+  LISTA_INFAMII) nie zapisywane (dane w pamięci).
+
+• **ARCHITEKTURA_IMPERIUM** — naprawiony dług z pola `dlug:`: mapa opisywała **nieistniejący kod**
+  `drogi/war_lancer`, `swiatynie/sala_wojenna`, `koloseum/valhalla` (0 plików). Zastąpione realnymi:
+  egzekucja → `oms`/`real_order_router`, dashboard → `web_dashboard`, backtest → `backtest`/
+  `monte_carlo`. Liczby (neurony/książki) → bloki LICZBA. Pole `dlug:` usunięte.
+
+• **MANUAL_UZYTKOWNIKA** — „78 neuronów" → 87 (blok LICZBA), „1532/1532 testów" → odesłanie do
+  runnera. KonfigPetliLive (12 pól), handluj_live, 5 modułów AFML (W-355..359) zweryfikowane ✅.
+
+**🏁 BILANS KAMPANII (dług gnicia 18 → 0):** 21 dokumentów spłaconych weryfikacją wobec kodu.
+Wzorce znalezione: **API-widmo w docs** (kronikarz.zapytaj, policz_dzwignie, CesarzZDoradcami —
+kandydat na Warstwę 16) · **liczba zaszyta w kodzie** (42 książek ×4, liczba praw) → rozwiązane
+funkcjami liczącymi + W15 (11 wstrzykiwanych liczb) · **pomiar datowany mylony z opisem stanu** ·
+**„brak/odłożone" starzeje się najszybciej** (RS-X=C-01, 6/6 braków TRYBY już istniało).
+Otwarte długi kodu (do sesji sztabowej): łańcuch SHA-256 (hash_ok=True na sztywno), 14,9 mln
+barów 1m nieużytych. Wstrzykiwanych liczb: neurony/aktywne/zwiadowcy/strategie/elity/pola_logu/
+styl_scalp/swing/invest/prawa/ksiazki/fragmenty.
+
+**Bramka:** testy 2507/2507 ✅ · audyt exit 0 ✅ · **T2 gnicie 0**.
+
+---
+
 ## 2026-07-18 | 🎓 | PLAN_TIRO — rdzeń potwierdzony + liczba fragmentów RAG na LICZBA
 
 **Co (dług gnicia):** weryfikacja planu TIRO (priorytet #1). Gnicie było przez commit metadanych

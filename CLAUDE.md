@@ -533,6 +533,24 @@ przed budową sprawdź CODEX+kod (ZASADA WERYFIKACJI), po wpadce uodpornij (pkt 
 **Złamanie:** luka wykryta i odłożona bez łaty ani planu; łata bez mechanizmu zapobiegawczego
 (ta sama klasa wraca); alarm hooka ignorowany kolejną sesję; lekcja niezapisana.
 
+## 🏛️ ZASADA RAPORTOWANIA I PODGLĄDU KAPITOLU (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-19)
+
+**Każdy test/zadanie raportujesz z PEŁNĄ specyfikacją + ZERO-TOKENOWYM podglądem w Kapitolu z linkiem.**
+
+- **Pełna specyfikacja CO testowane:** zawsze para/waluta, interwał czasowy, okno, tryb, źródło danych —
+  wszystkie szczegóły, nigdy skrótu.
+- **Zero-tokenowy podgląd w Kapitolu** (`narzedzia/kapitol_podglad.py` — Speculum Probationis): dane
+  WYSZCZEGÓLNIONE + na WYKRESIE + klikalny LINK. „Zero tokenów" = Cezar ogląda w pliku/dashboardzie,
+  nie drukujesz wielkich tabel w czacie (druk kosztuje tokeny).
+- **Aktualizuj KOMPLET Imperium** wg zasad w tym samym ruchu (ZASADA PEŁNEJ SYMBIOZY).
+- **ZANIM cokolwiek zrobisz** — sprawdź zgodność z zasadami i czy to JUŻ istnieje (ZASADA WERYFIKACJI;
+  kandydat≠prawda).
+- **Po potwierdzeniu, że zadanie ZAKOŃCZONE** — WYŚWIETL PONOWNIE pytania decyzyjne (wg rekomendacji+
+  priorytetu), CHYBA że status planu się zmienił → pokaż zaktualizowany. Plan zawsze aktualny.
+
+**Złamanie:** raport bez pełnej specyfikacji lub bez zero-tokenowego podglądu Kapitolu z linkiem;
+brak ponownych pytań decyzyjnych po zakończeniu zadania.
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`
@@ -543,6 +561,30 @@ przed budową sprawdź CODEX+kod (ZASADA WERYFIKACJI), po wpadce uodpornij (pkt 
 - Rozwój na branchu: `claude/sleepy-fermi-dsdE4`
 - **Push robi WYŁĄCZNIE Cezar ręcznie** (`git push origin <branch>` w jego terminalu) —
   Claude nigdy nie pushuje, tylko melduje gotowość (patrz TRYB AUTONOMICZNY p.4). PR tylko na wyraźną prośbę.
+
+## 🏁 KONIEC SESJI — CHECKLISTA STAŁA (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-19)
+
+**Kroki zamknięcia były ROZPROSZONE po tym pliku — brak jednej listy o mało nie spowodował pominięcia
+`skan_wad_kodu` (2026-07-19). Tu zebrane w JEDNYM miejscu.** Na koniec KAŻDEJ sesji wykonaj w kolejności
+(pominięcie kroku = złamanie — patrz ZASADA CENSORA):
+
+1. **Bramka Prawo XXI:** `python tests/run_tests.py` (X/X zielone) + `python narzedzia/audyt_spojnosci.py`
+   (exit 0, w tym ruff W13).
+2. **CODEX PROBATIONUM** (do teraz brakowało go w zamknięciu): `python narzedzia/codex_probationum.py` —
+   regeneruj i zweryfikuj zgodność z ŻYWYM kodem; każdy nowy wynik A/B/IC dopisz do
+   `bibliotheca_ulpia/dane/rejestr_testow.jsonl` (Scriba Codex / flaga `--ledger`); Backlog/Sugestie aktualne.
+   Niezgodność → popraw po weryfikacji (ZASADA CODEX PROBATIONUM, kandydat≠prawda).
+3. **Adversarial pre-push:** `/code-review` na diffie + `python narzedzia/skan_wad_kodu.py` na zmienionych
+   plikach. Nowe wady → Księga Wad (`ksiega_wad_kodu`).
+4. **Komplet dokumentów + pamięć zsynchronizowane z kodem** (ZASADA PEŁNEJ SYMBIOZY): LOG_ZMIAN, MANIFEST,
+   INDEKS, MAPA_KLUCZY, liczby, ARCHITEKTURA (nowy organ/narzędzie z nazwą rzymską — ZASADA NOMENKLATURY),
+   pamięć. Nowa ZASADA w pamięci → skodyfikuj też w CLAUDE.md/ZASADY (nie zostawiaj tylko w pamięci prywatnej).
+5. **Prawo XV:** odpowiedz Cezarowi na pytanie o utratę potencjału — JAWNIE, nie milczeniem.
+6. **Dziennik Nieśmiertelny:** `python -m imperium.biblioteki.dziennik_niesmiertelny wpis ...` — PRZED ostatnim commitem.
+7. **Commit lokalny** z opisowym komunikatem (Claude NIGDY nie pushuje).
+8. **Push dla Cezara:** podaj pełny blok PowerShell (`cd` + `git push origin <branch>`); po JEGO pushu
+   zweryfikuj `ahead 0, behind 0` przed clear.
+9. **Alarmy hooka = ZADANIA** (ZASADA CENSORA): jawnie rozstrzygnij / zaplanuj w Backlogu CODEX / zapytaj Cezara — nigdy milczeniem.
 
 ## 🔍 ZASADA SPÓJNOŚCI PRZY PR (ROZKAZ STAŁY — Cezar zatwierdził 2026-06-02)
 

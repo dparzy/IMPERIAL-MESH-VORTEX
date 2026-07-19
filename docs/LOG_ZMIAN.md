@@ -14,6 +14,32 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-19 | 📜 | Konsolidacja zasad zamknięcia sesji (+ CODEX) + skodyfikowanie standing-orderów
+
+**Powód (zmierzone tej sesji):** kroki zamknięcia sesji były ROZPROSZONE po `CLAUDE.md` (Dziennik u góry,
+Prawo XV osobno, pre-push w linii 252) — brak jednej listy o mało nie spowodował pominięcia
+`skan_wad_kodu.py`. Dodatkowo CODEX_PROBATIONUM był tylko „przed zadaniem", NIE w zamknięciu (dryf
+łapany przypadkiem — np. fałszywy „O(n²)" w Backlogu poprawiony bo akurat dotknięty). Standing-order
+raportowania (podgląd Kapitolu) żył tylko w pamięci prywatnej, 0 w repo.
+
+**Dodane (rozkaz Cezara):**
+- `CLAUDE.md` — **🏁 KONIEC SESJI — CHECKLISTA STAŁA** (9 kroków w kolejności): bramka Prawo XXI →
+  **CODEX regen+weryfikacja+ledger** → adversarial pre-push (`/code-review` + `skan_wad_kodu`) →
+  komplet docs+pamięć → Prawo XV → Dziennik → commit → blok push → alarmy hooka.
+- `CLAUDE.md` — **🏛️ ZASADA RAPORTOWANIA I PODGLĄDU KAPITOLU**: pełna spec (para/interwał/okno/tryb/dane)
+  + zero-tokenowy podgląd Kapitolu z linkiem + re-pytania decyzyjne po zadaniu (skodyfikowany standing-order).
+- `docs/ARCHITEKTURA_IMPERIUM.md` — sekcja **🧰 Narzędzia z nazwą rzymską**: Speculum Probationis
+  (kapitol_podglad), Cursus Fenestrarum (wfo_chunked), Scriba Codex (scriba_codex) — domknięcie ZASADY
+  NOMENKLATURY (organy były tylko w docstringach). Bump `stan_na` → 2026-07-19.
+
+**Otwarte (rekomendacja do decyzji Cezara):** automatyczny backstop — warstwa audytu / hook pre-close
+egzekwująca te kroki (E/F z raportu luk). NIE dokładane przy zamknięciu (nowa warstwa audytu = kod z
+testami, ZASADA WPIĘCIA / nic nie psujemy) — osobne zadanie.
+
+**Pliki:** `CLAUDE.md`, `docs/ARCHITEKTURA_IMPERIUM.md`, `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-07-19 | 🧩 | Chunkowany wznawialny WFO (Cursus Fenestrarum) — ZASADA ANALIZY CZĄSTKOWEJ
 
 **Co:** `narzedzia/wfo_chunked.py` — walk-forward cząstkowy i WZNAWIALNY. Każde OKNO to najmniejsza

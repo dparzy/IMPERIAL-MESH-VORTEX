@@ -100,6 +100,17 @@ def uruchom():
             continue
 
         funkcje = [f for f in dir(modul) if f.startswith("test_")]
+        # UODPORNIENIE (LEX TALIONIS, 2026-07-19): plik test_*.py bez ŻADNEJ funkcji
+        # modułowej test_ to prawie zawsze omyłka — np. testy zapisane jako
+        # unittest.TestCase (metody w klasie), których runner NIE zbiera → plik cicho
+        # niczego nie chroni. Twarda porażka, nie ciche 0 (klasa błędu złapana raz).
+        if not funkcje:
+            print(f"  💥 {nazwa_modulu}: 0 funkcji modułowych test_ — plik cicho pomijany "
+                  "(TestCase/klasa? runner liczy tylko funkcje test_* na poziomie modułu).")
+            oblane += 1
+            bledy.append((nazwa_modulu, "<0 testów>",
+                          "Plik test_*.py bez funkcji modułowych test_ — silent-skip (napraw styl)."))
+            continue
         print(f"\n📋 {nazwa_modulu} ({len(funkcje)} testów)")
 
         for nazwa_f in funkcje:

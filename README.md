@@ -76,7 +76,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | 🏗️ **akwedukty/** | pipeline danych + adaptery API (Futures / F&G / CVD / News) | <!-- LICZBA:organ_akwedukty -->17<!-- /LICZBA --> |
 | 🛤️ **drogi/** | API i egzekucja (NexusHub) | <!-- LICZBA:organ_drogi -->4<!-- /LICZBA --> |
 | 🎨 **swiatynie/** | dashboard / wizualizacja / SPECULA świec | <!-- LICZBA:organ_swiatynie -->6<!-- /LICZBA --> |
-| 📚 **biblioteki/** | pamięć W-360, MWU, Synapsy Reżimowe, Kronikarz, RAG | <!-- LICZBA:organ_biblioteki -->25<!-- /LICZBA --> |
+| 📚 **biblioteki/** | pamięć W-360, MWU, Synapsy Reżimowe, Kronikarz, RAG | <!-- LICZBA:organ_biblioteki -->26<!-- /LICZBA --> |
 | 👁️ **oczy/** | obserwatorzy / źródła / Censor Sprzętu | <!-- LICZBA:organ_oczy -->2<!-- /LICZBA --> |
 | 🧮 **fundament/** | Brama Kalkulatora | <!-- LICZBA:organ_fundament -->2<!-- /LICZBA --> |
 
@@ -103,7 +103,7 @@ python tests/run_tests.py     # wszystkie zielone, bez zależności zewnętrznyc
 |------|------|
 | **CEZAR PIXEL** (Ty) | Imperator — właściciel Imperium; ostatnie słowo należy zawsze do Ciebie. |
 | **VITRUVIUSZ** | Architekt Imperium (Claude/Opus) — projektuje, buduje, porządkuje i mówi prawdę o stanie (Prawo I, XV). |
-| **HYGINUS** | Bibliotekarz-Zwiadowca (DeepSeek) — czyta bibliotekę i proponuje kandydatów; **kandydat ≠ prawda** (rozstrzyga pomiar). |
+| **HYGINUS** | DeepSeek przez API (`DEEPSEEK_API_KEY`) — Bibliotekarz-Zwiadowca (zwiad wiedzy z biblioteki) **oraz głos newsowy** Imperium; proponuje kandydatów, **kandydat ≠ prawda** (rozstrzyga pomiar). |
 | **TIRO** | Lokalny LLM (llama.cpp) — skryba-uczeń Imperium; projekt hybrydy lokalnej (E0–E2), rośnie w siłę wraz z łupem na lepszy sprzęt. |
 
 ---
@@ -122,7 +122,7 @@ To Imperium budują wspólnie:
 |---|---|---|
 | 👑 **CEZAR PIXEL** | Imperator, właściciel | wizja, doktryna, ostatnie słowo |
 | 🏛️ **VITRUVIUSZ** | Architekt (Claude / Opus) | projekt, kod, porządek, prawda o stanie |
-| 📚 **HYGINUS** | Bibliotekarz-Zwiadowca (DeepSeek) | zwiad wiedzy, kandydaci hipotez (kandydat ≠ prawda) |
+| 📚 **HYGINUS** | DeepSeek przez API | Bibliotekarz-Zwiadowca (zwiad wiedzy) + głos newsowy; kandydaci hipotez (kandydat ≠ prawda) |
 | 🖋️ **TIRO** | Lokalny LLM (llama.cpp) | skryba-uczeń, hybryda lokalna — rośnie z Imperium |
 
 > *„Ave, Cezarze Pixel — melduje Vitruviusz."*

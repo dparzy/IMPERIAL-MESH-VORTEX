@@ -14,6 +14,43 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-19 | 📜 | README naprawa (schemat + liczby organów wstrzykiwane) + CODEX NOTARUM (LEX TALIONIS)
+
+**Powód (rozkaz Cezara):** (1) główne README „kurewsko nieaktualne" — schemat/układ Imperium nie nadążał
+za kodem; (2) wprowadzić tryb kary/nagrody „oko za oko" (błąd rodzi kompensujący unikat).
+
+**Naprawa README (wstyd zdjęty, ZWERYFIKOWANE pomiarem):**
+- Mapa organów → tabela z liczbami plików `.py` **wstrzykiwanymi** z żywego kodu (`tabularium.wartosci_z_kodu`
+  → klucze `organ_*`, Warstwa 15). Rozjazd: legiony 40→67, biblioteki 8→25, akwedukty 8→17, koloseum 11→16,
+  pretorianie 5→9, swiatynie 2→6, cesarz 9→11 — nigdy więcej nie skłamie (UODPORNIJ).
+- Linia „Faza" (urywała się na W-343) → wskaźnik do MANIFEST + LOG_ZMIAN. Role → nomenklatura rzymska +
+  sekcja **TWÓRCY**: CEZAR PIXEL, VITRUVIUSZ, HYGINUS, **TIRO** (lokalny LLM). Doktryna wojenna w wizytówce.
+
+**Nowy organ CODEX NOTARUM (LEX TALIONIS, ZASADA STAŁA):** `imperium/biblioteki/codex_notarum.py` +
+ledger `bibliotheca_ulpia/dane/codex_notarum.jsonl` (append-only). NOTA CENSORIA (−) za zatwierdzony błąd,
+CORONA (+) za zatwierdzony unikat; `splaca` = spłata długu honorowego (oko za oko). Nic bez `zatwierdzenie`
+(KANDYDAT≠PRAWDA). +11 testów granic. Inauguracja e2e: NOTA (niedbałe README) → CORONA (mechanizm LEX
+TALIONIS) → dług honorowy spłacony. Skodyfikowane w CLAUDE.md + krok 5b CHECKLISTY KONIEC SESJI.
+
+**ZAKRES rozszerzony (rozkaz Cezara):** oko-za-oko obejmuje **wszelkie błędy — dokumenty I kod — w CAŁYM
+Imperium**, nie tylko README; przy wyborze co prostować najpierw — wsparcie subagentem. Skodyfikowane w ZASADZIE.
+
+**3 błędy złapane i spłacone w tej sesji (ledger, saldo +0, dług 0):**
+1. README niedbałe (brak TWÓRCÓW + brak TIRO) → CORONA: mechanizm LEX TALIONIS + organ.
+2. Opis Hyginusa niekompletny — pominięta rola **głosu newsowego** DeepSeek-przez-API (jest nie tylko
+   Bibliotekarzem-Zwiadowcą) → CORONA: rozszerzenie zakresu na całe Imperium + sweep subagentem.
+3. **`test_codex_notarum.py` napisany jako `unittest.TestCase`** — runner zbiera TYLKO funkcje modułowe
+   `test_*`, więc 11 testów było **cicho pomijanych** (liczba 2584 nie drgnęła; złapane pomiarem).
+   → CORONA/UODPORNIENIE: **strażnik silent-skip w `tests/run_tests.py`** — plik `test_*.py` z zerem
+   funkcji modułowych = twarda porażka. Zweryfikowano: 0 istniejących plików miało zero (nic nie psuje).
+   Testy przepisane w stylu funkcyjnym: **2584 → 2596** (12 realnie bramkowanych).
+
+**Pliki:** `README.md`, `narzedzia/tabularium.py`, `imperium/biblioteki/codex_notarum.py`,
+`tests/test_codex_notarum.py`, `tests/run_tests.py`, `CLAUDE.md`, `docs/ARCHITEKTURA_IMPERIUM.md`,
+`docs/INDEKS_IMPERIUM.md`, `bibliotheca_ulpia/dane/codex_notarum.jsonl`.
+
+---
+
 ## 2026-07-19 | 💰 | CODEX arkusz „Momenty modelu" — druga oś doboru modelu (zużycie/moment)
 
 **Powód (pytanie kontrolne Cezara):** dobór modelu (ZASADA OSZCZĘDNOŚCI TOKENÓW) opiera się DZIŚ

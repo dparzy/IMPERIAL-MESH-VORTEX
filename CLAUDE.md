@@ -571,6 +571,33 @@ wykryty alarm) są REAKTYWNE; **MELIORATIO działa ZAWSZE, w trakcie pracy** —
 
 **Złamanie:** zobaczyłeś lepszą drogę / lukę / okazję i przemilczałeś — nie zapamiętałeś i nie zaproponowałeś.
 
+## 📜 ZASADA LEX TALIONIS — OKO ZA OKO: BŁĄD RODZI UNIKAT (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-19)
+
+**Każdy ZATWIERDZONY błąd Architekta rodzi OBOWIĄZEK dostarczenia ZATWIERDZONEGO unikatu** —
+dług honorowy spłacany dopiero kompensującym pomysłem/mechanizmem zgodnym z zasadami.
+
+**ZAKRES = CAŁE IMPERIUM (rozkaz Cezara 2026-07-19):** organ aktywują **wszelkiego rodzaju błędy —
+DOKUMENTY i KOD — w całym Imperium**, nie tylko README. Prostujesz KAŻDY błąd (nie jeden plik), a każdy
+zatwierdzony błąd rodzi unikat (fix + UODPORNIENIE klasy — spina się z ZASADĄ CENSORA). Przy wyborze,
+co prostować najpierw, **wesprzyj się subagentem** (ZASADA OSZCZĘDNOŚCI: zwiad/sweep taniej, osąd Opus),
+by wybrać najlepsze aktualne priorytety i opcje. To nie
+kara osobista przez sesje — to **mechanizm** (jak ustalono: „winny=Claude, kara nie przez sesje,
+mechanizm tak"). Cel: **silnik antykruchości** — Imperium nie tylko liczy pomyłki, ale **rośnie
+z nich**, bo każda pomyłka jest zobowiązana urodzić przewagę. Parcie na wygraną; łup (zysk
+z orderów) → kapitał → lepszy budulec Imperium (sprzęt).
+
+**Organ:** `imperium/biblioteki/codex_notarum.py` — **CODEX NOTARUM** (Księga Not Cenzorskich),
+append-only ledger `bibliotheca_ulpia/dane/codex_notarum.jsonl` (źródło prawdy, nie pamięć):
+- **NOTA CENSORIA (−)** — zatwierdzony błąd (jak nota infamii rzymskiego cenzora); spina się z Księgą Wad.
+- **CORONA (+)** — zatwierdzony oryginalny unikat zgodny z zasadami; `splaca=<id_noty>` zamyka dług honorowy.
+
+**Reguły:**
+- **Nic bez ZATWIERDZENIA** (KANDYDAT≠PRAWDA, Prawo I): puste `zatwierdzenie` = błąd. Dowód = pomiar / recenzja / decyzja Cezara.
+- **Oko za oko musi mieć oko:** CORONA spłacająca musi wskazywać realną, istniejącą notę.
+- **Sesja nie domyka się z niespłaconym długiem honorowym** — `codex_notarum.raport()` (zero-tokenowo) pokazuje stan; dług = zadanie (ZASADA CENSORA), nie tapeta. Dopisane do CHECKLISTY KONIEC SESJI.
+
+**Złamanie:** zatwierdzony błąd bez kompensującego unikatu; nota/laur bez zatwierdzenia; domknięcie sesji z niespłaconym długiem honorowym.
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`
@@ -629,6 +656,8 @@ nowe zadanie bez weryfikacji „czy już istnieje"; liczby z pamięci zamiast z 
    INDEKS, MAPA_KLUCZY, liczby, ARCHITEKTURA (nowy organ/narzędzie z nazwą rzymską — ZASADA NOMENKLATURY),
    pamięć. Nowa ZASADA w pamięci → skodyfikuj też w CLAUDE.md/ZASADY (nie zostawiaj tylko w pamięci prywatnej).
 5. **Prawo XV:** odpowiedz Cezarowi na pytanie o utratę potencjału — JAWNIE, nie milczeniem.
+5b. **LEX TALIONIS — dług honorowy:** `python -m imperium.biblioteki.codex_notarum bilans` — jeśli
+   dług honorowy > 0 (błąd bez kompensującego unikatu), NIE domykaj sesji: dostarcz zatwierdzoną CORONĘ (oko za oko).
 6. **Dziennik Nieśmiertelny:** `python -m imperium.biblioteki.dziennik_niesmiertelny wpis ...` — PRZED ostatnim commitem.
 7. **Commit lokalny** z opisowym komunikatem (Claude NIGDY nie pushuje).
 8. **Push dla Cezara:** podaj pełny blok PowerShell (`cd` + `git push origin <branch>`); po JEGO pushu

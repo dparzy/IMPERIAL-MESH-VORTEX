@@ -551,6 +551,26 @@ przed budową sprawdź CODEX+kod (ZASADA WERYFIKACJI), po wpadce uodpornij (pkt 
 **Złamanie:** raport bez pełnej specyfikacji lub bez zero-tokenowego podglądu Kapitolu z linkiem;
 brak ponownych pytań decyzyjnych po zakończeniu zadania.
 
+## 🛠️ ZASADA MELIORATIO — ODKRYŁEŚ → ZAPAMIĘTAJ → ZAPROPONUJ (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-19)
+
+**Podczas KAŻDEGO zadania, gdy zobaczysz lub odkryjesz** lepszą praktykę, lukę, nieoptymalność,
+przestarzały wzorzec albo okazję do modernizacji/rozbudowy Imperium — **nie przemilczaj:**
+
+1. **ZAPAMIĘTAJ** natychmiast — pamięć (feedback/project), Backlog/Sugestie CODEX albo Dziennik.
+2. **ZAPROPONUJ** ulepszenie / poprawę / modernizację / rozbudowę — zgodnie z zasadami:
+   - **KANDYDAT ≠ PRAWDA** (Prawo I): propozycja to hipoteza do oceny/pomiaru, nie fakt.
+   - **ZASADA WERYFIKACJI**: sprawdź czy już istnieje + wpływ na całość, ZANIM proponujesz wdrożenie.
+   - **OPT-IN + walidacja** gdy dotyka ścieżki decyzyjnej; **nomenklatura rzymska** dla nowego organu.
+   - Gdy oceniasz nowość/wersję/praktykę — **zweryfikuj web aktualną datą** (wiedza ma cutoff).
+3. **Drobne, bezpieczne, jednoznaczne** rozstrzygasz sam (Prawo XVIII). **Kierunkowe/nieodwracalne/kosztowne**
+   — proponujesz Cezarowi, nie wdrażasz samowolnie.
+
+To PROAKTYWNE uzupełnienie: Prawo XV (koniec sesji — utrata potencjału) i ZASADA CENSORA (reakcja na
+wykryty alarm) są REAKTYWNE; **MELIORATIO działa ZAWSZE, w trakcie pracy** — aktywnie szukasz ulepszeń,
+łącząc fakty z różnych miejsc Imperium (Księga Wad, pamięć, arena, web).
+
+**Złamanie:** zobaczyłeś lepszą drogę / lukę / okazję i przemilczałeś — nie zapamiętałeś i nie zaproponowałeś.
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`

@@ -95,6 +95,8 @@ def main(argv=None):
     p.add_argument("--horyzonty", nargs="+", type=int, default=[1, 7, 14])
     p.add_argument("--arena", action="store_true",
                    help="zapisz IC do arena_wyniki.db (rodzaj=WALIDACJA_DVOL)")
+    p.add_argument("--ledger", action="store_true",
+                   help="dopisz skill-IC do rejestr_testow.jsonl (CODEX, idempotentnie)")
     a = p.parse_args(argv)
 
     os.chdir(os.path.join(os.path.dirname(__file__), ".."))
@@ -133,6 +135,7 @@ def main(argv=None):
                 for i in range(len(closes))]
 
     wiersze_arena = []
+    wiersze_ledger = []
     for nazwa, sygnal, oczek in [("DVOL_POZIOM", poziom, "+bullish"),
                                  ("DVOL_DELTA7", delta, "-bearish")]:
         print(f" {nazwa} (oczek. {oczek}) → IC zwroty BTC:")
@@ -147,6 +150,7 @@ def main(argv=None):
                 skill = " ✅ (spójny)"
                 wiersze_arena.append(("WALIDACJA_DVOL", f"{nazwa}_IC_h{h}", float(ic_nn),
                                       f"{a.waluta} 1d n={n_nn} nn"))
+                wiersze_ledger.append((nazwa, h, float(ic_nn), oczek))
             print(f"   h={h:>2}: nienakł {f(ic_nn)} (n={n_nn:>4})  nakł {f(ic_ov)} (n={n_ov:>4}){skill}")
         print()
 
@@ -155,6 +159,13 @@ def main(argv=None):
         from imperium.biblioteki.arena_baza import zapisz_pomiary
         z = zapisz_pomiary(wiersze_arena)
         print(f" 💾 Arena: zapisano {z} pomiarów (rodzaj=WALIDACJA_DVOL).")
+    if a.ledger:
+        from narzedzia.scriba_codex import zapisz_ic
+        d = sum(zapisz_ic(sygnal="DVOL", neuron="PSY-05", horyzont=f"{h}d", ic=ic,
+                          tryb="nienakladajace", prog=PROG_SKILL, werdykt="SKILL",
+                          kierunek=f"{nazwa} {oczek}", zrodlo="pomiar_dvol_ic.py",
+                          uwaga=f"{a.waluta} era DVOL") for nazwa, h, ic, oczek in wiersze_ledger)
+        print(f" 🖋️ Ledger: {d}/{len(wiersze_ledger)} skill-IC dopisanych → CODEX")
     return 0
 
 

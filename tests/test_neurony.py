@@ -1386,6 +1386,32 @@ def test_brama_accelerator_warmup_dokladny():
     assert _py_accelerator(h[:38], l[:38])[0] is None, "38 < 39 → None"
 
 
+def test_py_hma_ogon_niezmiennik():
+    """HMA_last/HMA_prev zależą WYŁĄCZNIE od ostatnich `period+root` barów.
+
+    To niezmiennik, na którym stoi optymalizacja _py_hma (przycięcie `c` do ogona
+    zamiast liczenia raw nad całym oknem — było O(okno·period)/tik). Doklejenie
+    dowolnej historii z LEWEJ nie może zmienić wyniku. Regresja tej klasy wady
+    (pętla ignoruje własny guard `potrzeba`) — patrz Księga Wad #37.
+    """
+    from imperium.fundament.brama_kalkulatora import _py_hma
+    import random
+    random.seed(11)
+    for period in (4, 16, 25, 50):
+        root = max(1, int(period ** 0.5))
+        potrzeba = period + root
+        ogon = [50000 + random.gauss(0, 400) for _ in range(potrzeba)]
+        bazowy = _py_hma(ogon, period)
+        assert bazowy[0] is not None, f"dokładnie potrzeba={potrzeba} barów wystarcza"
+        # Doklej losową historię z lewej — wynik MUSI być bit-identyczny
+        for pad in (1, 50, 300):
+            wydluzony = [50000 + random.gauss(0, 400) for _ in range(pad)] + ogon
+            assert repr(_py_hma(wydluzony, period)) == repr(bazowy), (
+                f"HMA period={period} zmienił się po doklejeniu {pad} barów historii")
+    # Boundary: potrzeba-1 barów → (None, None)
+    assert _py_hma([1.0] * (16 + 4 - 1), 16) == (None, None)
+
+
 def test_v14_choppiness_trend():
     """V-14: CHOP < 38.2 → silny trend → LONG."""
     s = NeuronChoppiness().interpretuj({"CHOPPINESS_14": 30.0})

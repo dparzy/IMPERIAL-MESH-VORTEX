@@ -100,6 +100,8 @@ def main():
     ap.add_argument("--od", default=None, help="okno OD daty YYYY-MM-DD (intraday tnij, np. 2024-08-01)")
     ap.add_argument("--bary", type=int, default=None,
                     help="ogranicz do najnowszych N barów/symbol (backtest O(n²) — Prawo XV)")
+    ap.add_argument("--ledger", action="store_true",
+                    help="dopisz wynik A/B do rejestr_testow.jsonl (CODEX, idempotentnie)")
     args = ap.parse_args()
     global PLIKI, LABEL, OD_TS
     sub, suf, LABEL = INTERWALY[args.interwal]
@@ -145,6 +147,18 @@ def main():
         werdykt = "⚖️ NEUTRALNE — zostaw OFF, więcej danych"
     print(f" WERDYKT: {werdykt}")
     print("=" * 66)
+    if args.ledger:
+        from narzedzia.scriba_codex import zapisz_ab
+        krotki = ("POMAGA" if d_roi > 0.5 and dd_a <= dd_b + 1.0
+                  else "SZKODZI" if d_roi < -0.5 else "NEUTRALNE")
+        okno_b = len(bary["BTCUSDT"])   # faktyczna liczba barów (po przycięciu --bary/--od)
+        dodano = zapisz_ab(sygnal="STABLECOIN", neuron="K-03", interwal=LABEL,
+                           okno_barow=okno_b, roi_b=roi_b, roi_a=roi_a,
+                           maxdd_delta=dd_a - dd_b, werdykt=krotki,
+                           zrodlo=f"ab_stablecoin.py --interwal {args.interwal}"
+                           + (f" --bary {args.bary}" if args.bary else ""),
+                           uwaga="5 par")
+        print(f" 🖋️ Ledger: {'dopisano' if dodano else 'bez zmian (identyczny rekord)'} → CODEX")
     return 0
 
 

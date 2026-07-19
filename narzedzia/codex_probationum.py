@@ -389,7 +389,7 @@ def zbierz_arkusze() -> dict:
                 ("DYWERSYFIKUJĄCA (|r|<0.20)" if abs(c) < 0.20 else "pośrednia")
         wiersze_k.append([a, b, c, klasa])
     wiersze_k += [["", ""],
-                  ["Świeży przelicz całego roju (87) = flaga --korelacje (blokowana backtestem O(n²) — Prawo XV)", ""]]
+                  ["Świeży przelicz całego roju (87) = flaga --korelacje (wolna: backtest LINIOWY ~52ms/tik po HMA — długie okno wolne, nie kwadratowe; 2026-07-19)", ""]]
     arkusze["Korelacje"] = wiersze_k
 
     # ── 12. Backlog / Planowane ──────────────────────────────────────────────
@@ -401,14 +401,16 @@ def zbierz_arkusze() -> dict:
                           "adapter żywy w cenzusie, brak walidacji PnL/IC"])
     # znane długi kierunkowe
     wiersze_b += [
-        ["Backtest O(n²)", "naprawa silnika", "PLANOWANE", "P1",
-         "wskaźniki przeliczane per bar; blokuje długie okna 1H/4H i WFO oraz --korelacje"],
+        ["Wydajność backtestu (LINIOWY, nie O(n²))", "naprawa silnika", "CZĘŚCIOWO 2026-07-19", "P1",
+         "ZMIERZONE: LINIOWE ~66ms/tik (nie kwadrat — premisa błędna). HMA hotspot#1 naprawiony bit-identycznie (commit 4466eda, ~25%). Pozostałe: bocpd~8%/supertrend~8%/HA~4% (path-dependent). Decyzja: chunkowany WFO vs pełna wektoryzacja"],
         ["Łańcuch SHA-256", "naprawa + walidacja", "PLANOWANE", "P2",
          "hash_ok=True na sztywno (dyrygent); Hermes na ścieżce decyzyjnej, ZASADA WPIĘCIA"],
         ["Włączenie flag Tier-1", "decyzja Cezara", "OCZEKUJE", "P2",
          "DVOL/STABLE pomagają na 4H; flagi opt-in OFF do decyzji"],
-        ["A/B na pełnym oknie 1H/4H", "walidacja", "ZABLOKOWANE", "P1",
-         "po naprawie O(n²) — dziś okno 800 barów (1H=33 dni, nierozstrzygające)"],
+        ["A/B na pełnym oknie 1H/4H", "walidacja", "WOLNE (nie zablokowane)", "P1",
+         "backtest LINIOWY (~52ms/tik po HMA) → pełne okno wykonalne ale wolne; chunkowany WFO odblokuje. Dziś testowane okno 800 barów (1H=33 dni, nierozstrzygające)"],
+        ["Chunkowany wznawialny WFO", "orkiestracja", "ZROBIONE 2026-07-19", "—",
+         "narzedzia/wfo_chunked.py: checkpoint per-okno (raporty/wfo_ckpt/*.jsonl keyed sygnaturą), wznawianie od niezapisanego okna, pasek postępu (Prawo XXIV), podgląd Kapitolu. Refaktor walk_forward (ewaluuj_okno+agreguj) zachowuje zachowanie. +8 testów (równoważność, wznowienie bez przeliczania). ZASADA ANALIZY CZĄSTKOWEJ — pad nie traci nic"],
         # Alarmy hooka startowego = zadania, nie tapeta (ZASADA CENSORA, 2026-07-18)
         ["Konsolidacja LEKCJI pamięci (39k zn. > limit 24k)", "higiena pamięci", "ZROBIONE 2026-07-19", "—",
          "archiwizacja wg wartości retencji: 180→94 aktywnych, 86 do PAMIEC_SESJI_ARCHIWUM.md; sekcja 39244→21962 zn; nic nie skasowane (konsoliduj_lekcje, +4 testy)"],
@@ -511,7 +513,7 @@ def main(argv=None) -> int:
     ap.add_argument("--wyjscie", default=str(DOMYSLNE_WYJSCIE),
                     help=f"ścieżka pliku .xlsx (domyślnie {DOMYSLNE_WYJSCIE})")
     ap.add_argument("--korelacje", action="store_true",
-                    help="[PLAN] świeży przelicz korelacji całego roju — blokowany O(n²) (Prawo XV)")
+                    help="[PLAN] świeży przelicz korelacji całego roju — wolny (backtest LINIOWY, długie okno) — dziś z MATRYCA")
     args = ap.parse_args(argv)
 
     print("📜 CODEX PROBATIONUM — zbieram żywe rejestry + ledger...", flush=True)
@@ -519,7 +521,7 @@ def main(argv=None) -> int:
     liczby = {k: max(len(v) - 1, 0) for k, v in arkusze.items()}
     print(f"   arkusze: {liczby}", flush=True)
     if args.korelacje:
-        print("   ⚠️ --korelacje: świeży przelicz zablokowany backtestem O(n²) (Prawo XV) — używam pomiaru z MATRYCA.", flush=True)
+        print("   ⚠️ --korelacje: świeży przelicz wolny (backtest LINIOWY, długie okno) — używam pomiaru z MATRYCA.", flush=True)
     try:
         zapisz_xlsx(arkusze, args.wyjscie)
     except ModuleNotFoundError as e:

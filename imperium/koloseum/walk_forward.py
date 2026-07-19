@@ -136,12 +136,88 @@ def generuj_okna(n_barow: int, rozmiar_is: int, rozmiar_oos: int,
     return okna
 
 
+def ewaluuj_okno(bary: list, okno: OknoWF, ewaluator: Ewaluator,
+                 przestrzenie: List[PrzestrzeńParam],
+                 n_iteracji: int = 50, seed: Optional[int] = 42
+                 ) -> Tuple[WynikOkna, List[float]]:
+    """
+    Liczy JEDNO okno walk-forward (najmniejsza wznawialna jednostka — ZASADA ANALIZY
+    CZĄSTKOWEJ). Optymalizuje na IS, egzaminuje na OOS, zwraca (WynikOkna, zwroty_oos).
+
+    Deterministyczne przy stałym seed (optymalizuj → np.random.default_rng(seed)) — więc
+    okno policzone na dwóch biegach daje IDENTYCZNY wynik → checkpoint/wznawianie bezpieczne.
+    Wynik OOS to egzamin na nieznanym (Prawo I: OOS zawsze PO IS, zero look-ahead).
+    """
+    bary_is = bary[okno.is_start:okno.is_end]
+    bary_oos = bary[okno.oos_start:okno.oos_end]
+
+    # 1. Optymalizuj na IS (wykorzystuje DSR-guided optymalizuj — Prawo XVI)
+    cel_is = lambda p, _b=bary_is: ewaluator(_b, p)  # noqa: E731
+    raport_opt = optymalizuj(cel_is, przestrzenie, n_iteracji=n_iteracji, seed=seed)
+    best = raport_opt.najlepsze_parametry
+
+    # 2. Egzamin: te same parametry na IS i OOS — porównywalny Sharpe
+    wynik_is, zwroty_is = ewaluator(bary_is, best)
+    wynik_oos, zwroty_oos = ewaluator(bary_oos, best)
+    sh_is = _sharpe(zwroty_is)
+    sh_oos = _sharpe(zwroty_oos)
+
+    # WFE: OOS/IS. Gdy IS ≤ 0 (nie nauczył się przewagi) → WFE = 0 (nie dziel/0).
+    if sh_is > 1e-9:
+        wfe = max(-1.0, min(2.0, sh_oos / sh_is))
+    else:
+        wfe = 0.0
+
+    wynik = WynikOkna(
+        okno=okno, parametry=best, sharpe_is=round(sh_is, 4),
+        sharpe_oos=round(sh_oos, 4), wynik_is=round(float(wynik_is), 4),
+        wynik_oos=round(float(wynik_oos), 4), efektywnosc=round(wfe, 4))
+    return wynik, list(zwroty_oos)
+
+
+def agreguj(pary: List[Tuple[WynikOkna, List[float]]],
+            przestrzenie: List[PrzestrzeńParam],
+            prog_wfe: float = 0.5) -> RaportWalkForward:
+    """
+    Agreguje wyniki okien w RaportWalkForward — wszystko z OOS (Prawo I). Czysta,
+    deterministyczna funkcja z zapisanych cząstek: te same okna (z pętli albo z
+    checkpointu) → ten sam raport. `pary`: [(WynikOkna, zwroty_oos), ...] w kolejności okien.
+    """
+    wyniki = [w for w, _ in pary]
+    if not wyniki:
+        return RaportWalkForward(werdykt="BRAK_DANYCH", n_okien=0, powod="brak okien")
+
+    oos_zwroty_zagreg: List[float] = []
+    for _, zwroty_oos in pary:
+        oos_zwroty_zagreg.extend(zwroty_oos)
+    parametry_per_okno: Dict[str, List[float]] = {p.nazwa: [] for p in przestrzenie}
+    for w in wyniki:
+        for nazwa in parametry_per_okno:
+            if nazwa in w.parametry:
+                parametry_per_okno[nazwa].append(w.parametry[nazwa])
+
+    wfe_sr = sum(w.efektywnosc for w in wyniki) / len(wyniki)
+    oos_sharpe = _sharpe(oos_zwroty_zagreg)
+    stabilnosc = {nazwa: _wsp_zmiennosci(wart) for nazwa, wart in parametry_per_okno.items()}
+    werdykt, powod = _werdykt(wfe_sr, oos_sharpe, prog_wfe, wyniki)
+
+    return RaportWalkForward(
+        okna=wyniki, wfe_srednia=round(wfe_sr, 4),
+        oos_sharpe_zagregowany=round(oos_sharpe, 4),
+        stabilnosc_parametrow=stabilnosc, werdykt=werdykt, powod=powod,
+        n_okien=len(wyniki))
+
+
 def walk_forward(bary: list, ewaluator: Ewaluator,
                  przestrzenie: List[PrzestrzeńParam],
                  rozmiar_is: int, rozmiar_oos: int,
                  n_iteracji: int = 50, krok: Optional[int] = None,
                  zakotwiczony: bool = False, seed: Optional[int] = 42,
-                 prog_wfe: float = 0.5) -> RaportWalkForward:
+                 prog_wfe: float = 0.5,
+                 checkpoint_cb: "Optional[Callable[[WynikOkna, List[float]], None]]" = None,
+                 postep_cb: "Optional[Callable[[int, int, WynikOkna], None]]" = None,
+                 wznow: "Optional[Dict[int, Tuple[WynikOkna, List[float]]]]" = None,
+                 ) -> RaportWalkForward:
     """
     Walk-forward optimization: optymalizuj na IS, egzaminuj na OOS, przesuń, powtórz.
 
@@ -152,6 +228,11 @@ def walk_forward(bary: list, ewaluator: Ewaluator,
     n_iteracji: prób hyperopt per okno IS.
     prog_wfe: próg robustności WFE (Pardo: 0.5). Powyżej → ROBUST.
 
+    Wznawialność (opt-in, ZASADA ANALIZY CZĄSTKOWEJ — domyślnie None = zachowanie bez zmian):
+      checkpoint_cb(wynik, zwroty_oos)  — wołany po KAŻDYM świeżo policzonym oknie (zapis cząstki).
+      postep_cb(i, n, wynik)            — pasek postępu (Prawo XXIV) po każdym oknie.
+      wznow {idx: (WynikOkna, zwroty_oos)} — okna JUŻ policzone: pomiń, użyj zapisanego.
+
     Zwraca RaportWalkForward. Werdykt liczony WYŁĄCZNIE z OOS (Prawo I).
     """
     okna = generuj_okna(len(bary), rozmiar_is, rozmiar_oos, krok, zakotwiczony)
@@ -160,52 +241,24 @@ def walk_forward(bary: list, ewaluator: Ewaluator,
             werdykt="BRAK_DANYCH", n_okien=0,
             powod=f"za mało barów ({len(bary)}) na okno IS={rozmiar_is}+OOS={rozmiar_oos}")
 
-    wyniki: List[WynikOkna] = []
-    oos_zwroty_zagreg: List[float] = []
-    parametry_per_okno: Dict[str, List[float]] = {p.nazwa: [] for p in przestrzenie}
-
-    for okno in okna:
-        bary_is = bary[okno.is_start:okno.is_end]
-        bary_oos = bary[okno.oos_start:okno.oos_end]
-
-        # 1. Optymalizuj na IS (wykorzystuje DSR-guided optymalizuj — Prawo XVI)
-        cel_is = lambda p, _b=bary_is: ewaluator(_b, p)  # noqa: E731
-        raport_opt = optymalizuj(cel_is, przestrzenie, n_iteracji=n_iteracji, seed=seed)
-        best = raport_opt.najlepsze_parametry
-
-        # 2. Egzamin: te same parametry na IS i OOS — porównywalny Sharpe
-        wynik_is, zwroty_is = ewaluator(bary_is, best)
-        wynik_oos, zwroty_oos = ewaluator(bary_oos, best)
-        sh_is = _sharpe(zwroty_is)
-        sh_oos = _sharpe(zwroty_oos)
-
-        # WFE: OOS/IS. Gdy IS ≤ 0 (nie nauczył się przewagi) → WFE = 0 (nie dziel/0).
-        if sh_is > 1e-9:
-            wfe = max(-1.0, min(2.0, sh_oos / sh_is))
+    wznow = wznow or {}
+    pary: List[Tuple[WynikOkna, List[float]]] = []
+    for i, okno in enumerate(okna):
+        zapis = wznow.get(okno.idx)
+        # Ufaj checkpointowi TYLKO gdy granice okna dokładnie się zgadzają — inaczej przelicz
+        # (obrona przed cichym zmieszaniem wyników z innego podziału danych; Prawo I).
+        if zapis is not None and zapis[0].okno == okno:
+            wynik, zwroty_oos = zapis                  # wznowione z checkpointu — nie licz
         else:
-            wfe = 0.0
+            wynik, zwroty_oos = ewaluuj_okno(
+                bary, okno, ewaluator, przestrzenie, n_iteracji=n_iteracji, seed=seed)
+            if checkpoint_cb is not None:
+                checkpoint_cb(wynik, zwroty_oos)       # zapis cząstki ZANIM następne okno
+        pary.append((wynik, zwroty_oos))
+        if postep_cb is not None:
+            postep_cb(i + 1, len(okna), wynik)
 
-        wyniki.append(WynikOkna(
-            okno=okno, parametry=best, sharpe_is=round(sh_is, 4),
-            sharpe_oos=round(sh_oos, 4), wynik_is=round(float(wynik_is), 4),
-            wynik_oos=round(float(wynik_oos), 4), efektywnosc=round(wfe, 4)))
-        oos_zwroty_zagreg.extend(zwroty_oos)
-        for nazwa in parametry_per_okno:
-            if nazwa in best:
-                parametry_per_okno[nazwa].append(best[nazwa])
-
-    # 3. Agregacja — wszystko z OOS (egzamin na nieznanym)
-    wfe_sr = sum(w.efektywnosc for w in wyniki) / len(wyniki)
-    oos_sharpe = _sharpe(oos_zwroty_zagreg)
-    stabilnosc = {nazwa: _wsp_zmiennosci(wart) for nazwa, wart in parametry_per_okno.items()}
-
-    werdykt, powod = _werdykt(wfe_sr, oos_sharpe, prog_wfe, wyniki)
-
-    return RaportWalkForward(
-        okna=wyniki, wfe_srednia=round(wfe_sr, 4),
-        oos_sharpe_zagregowany=round(oos_sharpe, 4),
-        stabilnosc_parametrow=stabilnosc, werdykt=werdykt, powod=powod,
-        n_okien=len(wyniki))
+    return agreguj(pary, przestrzenie, prog_wfe)
 
 
 def _wsp_zmiennosci(wartosci: List[float]) -> float:

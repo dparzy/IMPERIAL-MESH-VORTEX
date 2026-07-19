@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-17
+stan_na: 2026-07-19
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,112 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-07-19 | 📜 | Konsolidacja zasad zamknięcia sesji (+ CODEX) + skodyfikowanie standing-orderów
+
+**Powód (zmierzone tej sesji):** kroki zamknięcia sesji były ROZPROSZONE po `CLAUDE.md` (Dziennik u góry,
+Prawo XV osobno, pre-push w linii 252) — brak jednej listy o mało nie spowodował pominięcia
+`skan_wad_kodu.py`. Dodatkowo CODEX_PROBATIONUM był tylko „przed zadaniem", NIE w zamknięciu (dryf
+łapany przypadkiem — np. fałszywy „O(n²)" w Backlogu poprawiony bo akurat dotknięty). Standing-order
+raportowania (podgląd Kapitolu) żył tylko w pamięci prywatnej, 0 w repo.
+
+**Dodane (rozkaz Cezara):**
+- `CLAUDE.md` — **🏁 KONIEC SESJI — CHECKLISTA STAŁA** (9 kroków w kolejności): bramka Prawo XXI →
+  **CODEX regen+weryfikacja+ledger** → adversarial pre-push (`/code-review` + `skan_wad_kodu`) →
+  komplet docs+pamięć → Prawo XV → Dziennik → commit → blok push → alarmy hooka.
+- `CLAUDE.md` — **🏛️ ZASADA RAPORTOWANIA I PODGLĄDU KAPITOLU**: pełna spec (para/interwał/okno/tryb/dane)
+  + zero-tokenowy podgląd Kapitolu z linkiem + re-pytania decyzyjne po zadaniu (skodyfikowany standing-order).
+- `docs/ARCHITEKTURA_IMPERIUM.md` — sekcja **🧰 Narzędzia z nazwą rzymską**: Speculum Probationis
+  (kapitol_podglad), Cursus Fenestrarum (wfo_chunked), Scriba Codex (scriba_codex) — domknięcie ZASADY
+  NOMENKLATURY (organy były tylko w docstringach). Bump `stan_na` → 2026-07-19.
+
+**Otwarte (rekomendacja do decyzji Cezara):** automatyczny backstop — warstwa audytu / hook pre-close
+egzekwująca te kroki (E/F z raportu luk). NIE dokładane przy zamknięciu (nowa warstwa audytu = kod z
+testami, ZASADA WPIĘCIA / nic nie psujemy) — osobne zadanie.
+
+**Pliki:** `CLAUDE.md`, `docs/ARCHITEKTURA_IMPERIUM.md`, `docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-07-19 | 🧩 | Chunkowany wznawialny WFO (Cursus Fenestrarum) — ZASADA ANALIZY CZĄSTKOWEJ
+
+**Co:** `narzedzia/wfo_chunked.py` — walk-forward cząstkowy i WZNAWIALNY. Każde OKNO to najmniejsza
+jednostka: policz → ZAPISZ checkpoint → następne. Bieg który padnie NIE traci nic — wznawia od
+pierwszego niezapisanego okna (lekcja: WFO „wisiał godzinami synchronicznie, padał = tracił wszystko").
+Checkpoint `raporty/wfo_ckpt/<sygnatura>.jsonl` (gitignore=widok), sygnatura = hash configu
+(plik/interwał/IS/OOS/okno/iteracje/lo/hi/seed/zakotwiczony) → inny config = inny plik, zero mieszania.
+Pasek postępu per okno na stderr (Prawo XXIV). Zero-tokenowy podgląd Kapitolu (WFE + Sharpe OOS per okno).
+
+**Refaktor rdzenia (zachowuje zachowanie):** `imperium/koloseum/walk_forward.py` — wyodrębniono
+`ewaluuj_okno()` (najmniejsza wznawialna jednostka, deterministyczna przy stałym seed) + `agreguj()`
+(czysta agregacja z cząstek). `walk_forward()` zyskał opt-in haki `checkpoint_cb`/`postep_cb`/`wznow`
+(domyślnie None = zachowanie bez zmian). Determinizm `optymalizuj(seed)` → okno policzone dwa razy =
+identyczny wynik, więc wznawianie bezpieczne (zero zmiany wyniku — dowód: test równoważności).
+
+**Fail-fast:** guard `IS/OOS > okno` ZANIM policzy jakiekolwiek okno (backtest wymaga wycinka > okno) —
+złapane smoke-testem, nie marnuje pracy w środku biegu.
+
+**Dowód (smoke-test e2e, mini-CSV):** bieg 0/3→liczy 3 okna z paskiem; ponowny bieg „3/3 wznowione,
+tylko agregacja" (✓, bez przeliczania), IDENTYCZNY werdykt (PRZEUCZONY, WFE −0.177, OOS Sharpe +0.086).
++8 testów (round-trip checkpointu, wznowienie bez przeliczania, częściowe wznowienie liczy tylko brakujące,
+uszkodzony checkpoint pomijany).
+
+**Pliki:** `imperium/koloseum/walk_forward.py`, `narzedzia/wfo_chunked.py`, `tests/test_wfo_chunked.py`,
+`narzedzia/codex_probationum.py` (Backlog).
+
+---
+
+## 2026-07-19 | ⚡ | Wydajność backtestu: LINIOWY (nie O(n²)) + naprawa HMA + Speculum Probationis (podgląd Kapitolu)
+
+**Diagnoza (pomiar > pamięć, ZASADA DEBUGOWANIA):** dawna teza „backtest O(n²)" była **BŁĘDNA**.
+Zmierzone (cProfile + skalowanie na ab_dvol, BTCUSDT+ETHUSDT 1H, okno=250 stałe): 500b→36.7s,
+750b→69.1s, 1600b→179s — **ms/tik STAŁY ~66 → LINIOWE** O(n·okno). Poprzedni „profiler" mylił wysoki
+*cumulative* w `compute` (woła się ticks×~40) ze skalowaniem kwadratowym. Realny koszt: ~40 wskaźników
+liczonych od zera co tik nad oknem 251.
+
+**Naprawa hotspotu #1 (bit-identyczna, commit 4466eda):** `_py_hma` liczył `raw` nad CAŁYM oknem
+(~235 punktów), używając tylko `root+1 ≈ 5` ostatnich — guard `potrzeba=period+root` policzony (l.152)
+ale IGNOROWANY przez pętlę. Fix: `c=c[-potrzeba:]`. **BIT-IDENTYCZNE** — 4000 losowych serii 0 rozjazdów,
+ROI backtestu bez zmiany. Zysk ~25% (750b: 69→52s). Klasa wady → Księga Wad #37 + test regresyjny
+niezmiennika ogona (`test_py_hma_ogon_niezmiennik`).
+
+**Speculum Probationis (`narzedzia/kapitol_podglad.py`):** zero-tokenowy podgląd testu w Kapitolu
+(rozkaz Cezara 2026-07-19) — samowystarczalny HTML, inline-SVG, ZERO zależności (wzorzec
+`backtest_dashboard`). Pełna specyfikacja CO testowane (para/interwał/okno/tryb/dane) + wykresy + link
+`file://`. Pierwszy raport: `raporty/KAPITOL_PODGLAD_wydajnosc_hma.html`. +5 testów.
+
+**Konsekwencja (decyzja Cezara):** skoro LINIOWE, WFO nie był zablokowany — tylko wolny (~52ms/tik).
+Opcje: chunkowany wznawialny WFO (niskie ryzyko) vs pełna wektoryzacja full-series (duże/ryzykowne;
+path-dependent supertrend/HA/bocpd/viterbi). CODEX Backlog + pamięć skorygowane (O(n²)→LINIOWE).
+
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `tests/test_neurony.py`,
+`narzedzia/kapitol_podglad.py`, `tests/test_kapitol_podglad.py`, `narzedzia/codex_probationum.py`,
+`bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`.
+
+---
+
+## 2026-07-19 | 🖋️ | SCRIBA CODEX — flaga `--ledger` auto-append (rodzina Tier-1) + naprawa buga `%` w argparse
+
+**Co:** nowy organ **SCRIBA** (`narzedzia/scriba_codex.py`) — jedyny reużywalny appender do
+`bibliotheca_ulpia/dane/rejestr_testow.jsonl`. Idempotentny (identyczny rekord tego samego dnia
+= skip), append-only, schemat pól 1:1 z `codex_probationum` (Prawo XXI). Wpięto flagę `--ledger`
+w 7 narzędzi Tier-1: A/B (`ab_dvol`/`ab_stablecoin`/`ab_usd`) + IC (`pomiar_dvol`/`stablecoin`/
+`usd`/`funding_ic`). Wynik testu dopisuje się do CODEX SAM (rozkaz Cezara 2026-07-18, sugestia
+CODEX zrealizowana). Dowód end-to-end: `ab_usd --bary 400 --ledger` → ledger 20→21, ponowny bieg
+„bez zmian" (idempotencja), CODEX Wyniki A-B 9→10.
+
+**Bug złapany po drodze (ZASADA CENSORA):** `pomiar_stablecoin_ic --help` wywalał się —
+`%` w help-stringu argparse (`"okno % zmiany"`) → `ValueError` przy formatowaniu. Latentny
+(psuł tylko `--help`, nie bieg). Naprawa u źródła (`%%`) + wzorzec do Księgi Wad (36, kat.
+kontrakt, regex zmierzony szum=0) + skan całego korpusu (0 innych wystąpień, klasa domknięta).
+
+**Powód:** CODEX rośnie bez ręcznego wklejania linii JSON; klasa buga `%`-w-help uodporniona.
+
+**Pliki:** narzedzia/scriba_codex.py (nowy), narzedzia/ab_{dvol,stablecoin,usd}.py,
+narzedzia/pomiar_{dvol,stablecoin,usd,funding}_ic.py, tests/test_scriba_codex.py (nowy, 7 testów),
+imperium/biblioteki/ksiega_wad_kodu.py (dane), rejestr_testow.jsonl (sugestia ZREALIZOWANE).
 
 ---
 

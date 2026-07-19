@@ -85,6 +85,8 @@ def main():
                     help="1d (domyślny), 4h lub 1h — świece z odpowiedniego katalogu")
     ap.add_argument("--bary", type=int, default=None,
                     help="ogranicz do najnowszych N barów/symbol (backtest jest O(n²) — patrz Prawo XV)")
+    ap.add_argument("--ledger", action="store_true",
+                    help="dopisz wynik A/B do rejestr_testow.jsonl (CODEX, idempotentnie)")
     args = ap.parse_args()
     global PLIKI, LABEL
     sub, suf, LABEL = INTERWALY[args.interwal]
@@ -125,6 +127,18 @@ def main():
     print(f" WERDYKT: {werdykt}")
     print("=" * 66)
     print(" ⚠️ Walidacja WSTĘPNA: era DVOL ~2 lata (jeden reżim). IC≠PnL — to jest ten pomiar.")
+    if args.ledger:
+        from narzedzia.scriba_codex import zapisz_ab
+        krotki = ("POMAGA" if d_roi > 0.5 and dd_a <= dd_b + 1.0
+                  else "SZKODZI" if d_roi < -0.5 else "NEUTRALNE")
+        okno_b = len(bary["BTCUSDT"])   # faktyczna liczba barów (po przycięciu --bary/era)
+        dodano = zapisz_ab(sygnal="DVOL", neuron="PSY-05", interwal=LABEL,
+                           okno_barow=okno_b, roi_b=roi_b, roi_a=roi_a,
+                           maxdd_delta=dd_a - dd_b, werdykt=krotki,
+                           zrodlo=f"ab_dvol.py --interwal {args.interwal}"
+                           + (f" --bary {args.bary}" if args.bary else ""),
+                           uwaga="BTC+ETH era DVOL")
+        print(f" 🖋️ Ledger: {'dopisano' if dodano else 'bez zmian (identyczny rekord)'} → CODEX")
     return 0
 
 

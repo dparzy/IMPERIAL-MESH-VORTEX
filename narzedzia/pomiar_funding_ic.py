@@ -86,6 +86,8 @@ def main(argv=None):
                    help="horyzonty zwrotu forward w barach")
     p.add_argument("--arena", action="store_true",
                    help="zapisz IC do arena_wyniki.db (rodzaj=WALIDACJA_FUNDING)")
+    p.add_argument("--ledger", action="store_true",
+                   help="dopisz skill-IC (średnia po parach) do rejestr_testow.jsonl (CODEX)")
     a = p.parse_args(argv)
 
     os.chdir(os.path.join(os.path.dirname(__file__), ".."))
@@ -124,6 +126,7 @@ def main(argv=None):
     print("\n" + "=" * 68)
     print(" WERDYKT PROBATIO — średnie IC nienakładające (po parach)")
     print("=" * 68)
+    wiersze_ledger = []
     for h in a.horyzonty:
         vals = agg[h]
         if not vals:
@@ -135,6 +138,8 @@ def main(argv=None):
         kier = "kontrariański (funding↑→cena↓)" if sr < 0 else "podążający (funding↑→cena↑)"
         print(f"  h={h:>2}: śr IC={sr:+.4f}  [{werdykt}]  {kier}  "
               f"zgodność znaku {zgodnosc}/{len(vals)} par")
+        if abs(sr) > PROG_SKILL:
+            wiersze_ledger.append((h, sr, kier, len(vals)))
     print("=" * 68)
     print(f" Próg skill |IC|>{PROG_SKILL}. Nienakładające = uczciwe; nakładające (ov) zwykle "
           f"|IC| większe (inflacja autokorelacją).")
@@ -143,6 +148,13 @@ def main(argv=None):
         from imperium.biblioteki.arena_baza import zapisz_pomiary
         z = zapisz_pomiary(wiersze_arena)
         print(f" 💾 Arena: zapisano {z} pomiarów (rodzaj=WALIDACJA_FUNDING).")
+    if a.ledger:
+        from narzedzia.scriba_codex import zapisz_ic
+        d = sum(zapisz_ic(sygnal="FUNDING", neuron="C-01", horyzont=f"{h}b", ic=sr,
+                          tryb="nienakladajace", prog=PROG_SKILL, werdykt="SKILL",
+                          kierunek=kier, zrodlo=f"pomiar_funding_ic.py --interwal {a.interwal}",
+                          uwaga=f"śr {npar} par {a.interwal}") for h, sr, kier, npar in wiersze_ledger)
+        print(f" 🖋️ Ledger: {d}/{len(wiersze_ledger)} skill-IC dopisanych → CODEX")
     return 0
 
 

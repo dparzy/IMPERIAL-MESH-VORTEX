@@ -97,10 +97,12 @@ def main(argv=None):
     p = argparse.ArgumentParser(description="AERARIUM — IC podaży stablecoinów (Tier-1, Prawo I).")
     p.add_argument("--csv", default="dane/dzienne/Binance_BTCUSDT_d.csv",
                    help="ścieżka do dziennego CSV OHLCV (długa historia)")
-    p.add_argument("--delta", type=int, default=7, help="okno % zmiany supply w dniach")
+    p.add_argument("--delta", type=int, default=7, help="okno %% zmiany supply w dniach")
     p.add_argument("--horyzonty", nargs="+", type=int, default=[1, 7, 14, 30])
     p.add_argument("--arena", action="store_true",
                    help="zapisz IC do arena_wyniki.db (rodzaj=WALIDACJA_STABLECOIN)")
+    p.add_argument("--ledger", action="store_true",
+                   help="dopisz skill-IC do rejestr_testow.jsonl (CODEX, idempotentnie)")
     a = p.parse_args(argv)
 
     os.chdir(os.path.join(os.path.dirname(__file__), ".."))
@@ -136,6 +138,7 @@ def main(argv=None):
     print(f"{'horyzont':>9} | {'IC nienakł (n)':>18} | {'IC nakł (n)':>16} | znak")
     print("-" * 62)
     wiersze_arena = []
+    wiersze_ledger = []
     skille = 0
     for h in a.horyzonty:
         zwr = zwr_fwd(h)
@@ -147,6 +150,7 @@ def main(argv=None):
             if abs(ic_nn) > PROG_SKILL:
                 skille += 1
                 znak += " ✅"
+                wiersze_ledger.append((h, float(ic_nn), znak))
             wiersze_arena.append(("WALIDACJA_STABLECOIN", f"STABLECOIN_DELTA{a.delta}_IC_h{h}",
                                   float(ic_nn), f"BTC 1d n={n_nn} nn"))
         else:
@@ -161,6 +165,13 @@ def main(argv=None):
         from imperium.biblioteki.arena_baza import zapisz_pomiary
         z = zapisz_pomiary(wiersze_arena)
         print(f" 💾 Arena: zapisano {z} pomiarów (rodzaj=WALIDACJA_STABLECOIN).")
+    if a.ledger:
+        from narzedzia.scriba_codex import zapisz_ic
+        d = sum(zapisz_ic(sygnal="STABLECOIN", neuron="K-03", horyzont=f"{h}d", ic=ic,
+                          tryb="nienakladajace", prog=PROG_SKILL, werdykt="SKILL",
+                          kierunek=znak.replace(" ✅", ""), zrodlo="pomiar_stablecoin_ic.py",
+                          uwaga=f"delta{a.delta}d supply") for h, ic, znak in wiersze_ledger)
+        print(f" 🖋️ Ledger: {d}/{len(wiersze_ledger)} skill-IC dopisanych → CODEX")
     return 0
 
 

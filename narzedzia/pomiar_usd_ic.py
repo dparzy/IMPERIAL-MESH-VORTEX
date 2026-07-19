@@ -101,6 +101,8 @@ def main(argv=None):
     p.add_argument("--horyzonty", nargs="+", type=int, default=[7, 14, 30])
     p.add_argument("--arena", action="store_true",
                    help="zapisz IC do arena_wyniki.db (rodzaj=WALIDACJA_USD)")
+    p.add_argument("--ledger", action="store_true",
+                   help="dopisz skill-IC do rejestr_testow.jsonl (CODEX, idempotentnie)")
     a = p.parse_args(argv)
 
     os.chdir(os.path.join(os.path.dirname(__file__), ".."))
@@ -139,6 +141,7 @@ def main(argv=None):
                 for i in range(len(closes))]
 
     wiersze_arena = []
+    wiersze_ledger = []
     for nazwa, sygnal, oczek in [("USD_POZIOM", poziom, "- bearish BTC"),
                                  ("USD_DELTA7", delta, "- bearish")]:
         print(f" {nazwa} (oczek. {oczek}) → IC zwroty BTC:")
@@ -153,6 +156,7 @@ def main(argv=None):
                 skill = " ✅ (spójny)"
                 wiersze_arena.append(("WALIDACJA_USD", f"{nazwa}_IC_h{h}", float(ic_nn),
                                       f"1d n={n_nn} nn koszyk_EUR_JPY_GBP"))
+                wiersze_ledger.append((nazwa, h, float(ic_nn), oczek))
             print(f"   h={h:>2}: nienakł {f(ic_nn)} (n={n_nn:>4})  nakł {f(ic_ov)} (n={n_ov:>4}){skill}")
         print()
 
@@ -161,6 +165,13 @@ def main(argv=None):
         from imperium.biblioteki.arena_baza import zapisz_pomiary
         z = zapisz_pomiary(wiersze_arena)
         print(f" 💾 Arena: zapisano {z} pomiarów (rodzaj=WALIDACJA_USD).")
+    if a.ledger:
+        from narzedzia.scriba_codex import zapisz_ic
+        d = sum(zapisz_ic(sygnal="USD/DXY", neuron="K-04", horyzont=f"{h}d", ic=ic,
+                          tryb="nienakladajace", prog=PROG_SKILL, werdykt="SKILL",
+                          kierunek=f"{nazwa} {oczek.strip()}", zrodlo="pomiar_usd_ic.py",
+                          uwaga="Frankfurter FX z-score") for nazwa, h, ic, oczek in wiersze_ledger)
+        print(f" 🖋️ Ledger: {d}/{len(wiersze_ledger)} skill-IC dopisanych → CODEX")
     return 0
 
 

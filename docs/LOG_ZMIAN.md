@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-17
+stan_na: 2026-07-19
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,29 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-07-19 | 🖋️ | SCRIBA CODEX — flaga `--ledger` auto-append (rodzina Tier-1) + naprawa buga `%` w argparse
+
+**Co:** nowy organ **SCRIBA** (`narzedzia/scriba_codex.py`) — jedyny reużywalny appender do
+`bibliotheca_ulpia/dane/rejestr_testow.jsonl`. Idempotentny (identyczny rekord tego samego dnia
+= skip), append-only, schemat pól 1:1 z `codex_probationum` (Prawo XXI). Wpięto flagę `--ledger`
+w 7 narzędzi Tier-1: A/B (`ab_dvol`/`ab_stablecoin`/`ab_usd`) + IC (`pomiar_dvol`/`stablecoin`/
+`usd`/`funding_ic`). Wynik testu dopisuje się do CODEX SAM (rozkaz Cezara 2026-07-18, sugestia
+CODEX zrealizowana). Dowód end-to-end: `ab_usd --bary 400 --ledger` → ledger 20→21, ponowny bieg
+„bez zmian" (idempotencja), CODEX Wyniki A-B 9→10.
+
+**Bug złapany po drodze (ZASADA CENSORA):** `pomiar_stablecoin_ic --help` wywalał się —
+`%` w help-stringu argparse (`"okno % zmiany"`) → `ValueError` przy formatowaniu. Latentny
+(psuł tylko `--help`, nie bieg). Naprawa u źródła (`%%`) + wzorzec do Księgi Wad (36, kat.
+kontrakt, regex zmierzony szum=0) + skan całego korpusu (0 innych wystąpień, klasa domknięta).
+
+**Powód:** CODEX rośnie bez ręcznego wklejania linii JSON; klasa buga `%`-w-help uodporniona.
+
+**Pliki:** narzedzia/scriba_codex.py (nowy), narzedzia/ab_{dvol,stablecoin,usd}.py,
+narzedzia/pomiar_{dvol,stablecoin,usd,funding}_ic.py, tests/test_scriba_codex.py (nowy, 7 testów),
+imperium/biblioteki/ksiega_wad_kodu.py (dane), rejestr_testow.jsonl (sugestia ZREALIZOWANE).
 
 ---
 

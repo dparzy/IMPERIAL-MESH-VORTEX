@@ -20,7 +20,8 @@ def test_zbierz_arkusze_ma_wszystkie_arkusze():
     ark = cp.zbierz_arkusze()
     oczekiwane = {"README", "Neurony", "Zwiadowcy", "Strategie", "Neurony x Strategie",
                   "Adaptery", "Waluty x Interwaly", "Interwaly -> Styl",
-                  "Wyniki A-B", "Wyniki IC", "Korelacje", "Backlog", "Sugestie"}
+                  "Wyniki A-B", "Wyniki IC", "Korelacje", "Backlog", "Sugestie",
+                  "Momenty modelu"}
     assert oczekiwane <= set(ark), f"brak arkuszy: {oczekiwane - set(ark)}"
     for nazwa, wiersze in ark.items():
         assert len(wiersze) >= 1, f"arkusz {nazwa} bez nagłówka"
@@ -87,6 +88,19 @@ def test_macierz_rol_ma_kolumny_strategii():
     ark = cp.zbierz_arkusze()
     naglowek = ark["Neurony x Strategie"][0]
     assert len(naglowek) == 1 + len(wszystkie_strategie())
+
+
+def test_arkusz_momenty_modelu():
+    """Arkusz „Momenty modelu" (druga oś ZASADY OSZCZĘDNOŚCI TOKENÓW): nagłówek 5-kolumnowy
+    + wszystkie momenty ze stałej + kolumny moment/tier/dźwignia."""
+    ark = cp.zbierz_arkusze()
+    mm = ark["Momenty modelu"]
+    assert mm[0] == ["Moment sesji", "Zużycie", "Rekomendowany tier", "Dźwignia", "Uwaga"]
+    # każdy moment ze stałej jest wierszem (nagłówek + N momentów + stopka)
+    momenty_w_arkuszu = {w[0] for w in mm[1:] if w[0]}
+    for m in cp.MOMENTY_MODELU:
+        assert m[0] in momenty_w_arkuszu
+    assert any("Start sesji" in w[0] for w in mm[1:])
 
 
 def test_podsumowanie_ledger_pusty(tmp_path):

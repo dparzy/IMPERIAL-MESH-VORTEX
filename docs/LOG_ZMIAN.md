@@ -14,6 +14,31 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-19 | 💰 | CODEX arkusz „Momenty modelu" — druga oś doboru modelu (zużycie/moment)
+
+**Powód (pytanie kontrolne Cezara):** dobór modelu (ZASADA OSZCZĘDNOŚCI TOKENÓW) opiera się DZIŚ
+wyłącznie na RODZAJU/ZŁOŻONOŚCI zadania (statyczna tabela) — NIE patrzy na realne zużycie w momencie
+(start/zamknięcie/commit/intensywne fazy), brak auto-zmiany (poza jakościową eskalacją na anomalię).
+Zwiad Sonnet (drugi punkt widzenia: routing wg zużycia/kosztu) + sędzia Opus → udokumentowana DRUGA OŚ.
+
+**Dodane (TYLKO dokumentacja — decyzja Cezara „udokumentuj, mechanizm osobno"; nic nie wdrożone):**
+- `narzedzia/codex_probationum.py` — stała `MOMENTY_MODELU` + **14. arkusz „Momenty modelu"** (moment→
+  zużycie→tier→dźwignia→uwaga): referencja doktrynalna osi „w którym momencie / ile palę" obok osi task-type.
+- `bibliotheca_ulpia/dane/rejestr_testow.jsonl` — 2 rekordy SUGESTIA (KANDYDACI, Prawo I): #1 Adaptive
+  Effort, #8 strażnik budżetu sesji (CLAUDE_CODE_SUBAGENT_MODEL + OTEL → JAWNY alarm+/model). Ledger 18 Sugestii.
+
+**Werdykt sędziego (KANDYDAT≠PRAWDA):** z 8 kandydatów zwiadu tylko #8 gruntowany w REALNYCH hakach
+Claude Code; #3/#6/#7 odrzucone (własna infra/gateway poza stackiem). Twarde ograniczenia: model sesji
+głównej zmienia TYLKO `/model` Cezara; automat realny tylko dla delegacji subagentom; cicha degradacja
+ZAKAZANA (nasza transparentność — zawsze jawnie). Źródła arXiv/OSS zwiadu ⚠️ niezweryfikowane osobiście.
+
+**Testy:** +1 (`test_arkusz_momenty_modelu`). CODEX 13→14 arkuszy. Ruff czysto, skan czysto.
+
+**Pliki:** `narzedzia/codex_probationum.py`, `tests/test_codex_probationum.py`,
+`bibliotheca_ulpia/dane/rejestr_testow.jsonl`, `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-07-19 | 🏛️ | PORTITOR — nowy organ pre-flight środowiska u wrót sesji (B1)
 
 **Powód (kontynuacja uszczelniania OTWARCIA, wybór Cezara B1):** żaden istniejący organ nie robił

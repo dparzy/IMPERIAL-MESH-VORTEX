@@ -54,6 +54,28 @@ KAT_NAZWA = {
 # Interwały reprezentatywne dla arkusza „Interwały→Styl" (kolejność od najszybszego).
 INTERWALY_REPR = ["M1", "M5", "M15", "M30", "1H", "4H", "1D", "1W"]
 
+# Momenty cyklu życia sesji, gdzie zużycie/dobór modelu ma znaczenie (ZASADA OSZCZĘDNOŚCI
+# TOKENÓW). DRUGA OŚ obok tabeli task-type w CLAUDE.md: nie „jakie zadanie", lecz „w którym
+# momencie / ile teraz palę". Referencja DOKTRYNALNA (nie z pomiaru) — dobór dziś RĘCZNY;
+# auto-switch wg zużycia = KANDYDAT (arkusz Sugestie). Kolumny: moment, zużycie, tier, dźwignia, uwaga.
+MOMENTY_MODELU = [
+    ("Start sesji (hook ~25 KB: audyt+pamięć+Dziennik+PORTITOR)", "wysokie wejście",
+     "Opus (osąd stanu)", "/model", "samo czytanie taniej, ale osąd luk = Opus"),
+    ("Zamknięcie sesji (Dziennik+audyt+CODEX+skan+commit)", "wieloetapowe",
+     "mieszane", "subagent + /model", "mechaniczne→Sonnet, Dziennik/osąd→Opus"),
+    ("Commit / LOG_ZMIAN wg wzorca", "niskie", "Sonnet low", "Agent tool", "szablonowe"),
+    ("WFO / backtest wielo-okienny (bieg)", "długie mechaniczne", "Sonnet low",
+     "subagent + eskalacja", "diagnoza anomalii → Opus"),
+    ("Kompakcja / długi kontekst (>~130k)", "degradacja jakości",
+     "rozważ /model / restart", "/model", "jakość spada mimo okna nominalnego"),
+    ("Research web / książki (fan-out)", "objętościowe", "Sonnet subagent",
+     "Agent tool", "wartość w niezależności, nie głębi"),
+    ("Debug realnego buga / projekt organu / ZASADY", "krótkie ciężkie", "Opus",
+     "/model", "decyzje kompozycyjne, trwałe skutki"),
+    ("Audyt / testy / ruff (exec+odczyt)", "mechaniczne", "Haiku/Sonnet low",
+     "subagent", "zero osądu"),
+]
+
 # Katalogi danych: nazwa_interwalu → (podkatalog, sufiks_pliku).
 DANE_INTERWALY = {
     "1m": ("dane/minutowe", "_minute"),
@@ -451,6 +473,21 @@ def zbierz_arkusze() -> dict:
             r.get("zrodlo", ""),
         ])
     arkusze["Sugestie"] = wiersze_sug
+
+    # ── 14. Momenty modelu (ZASADA OSZCZĘDNOŚCI TOKENÓW — druga oś: moment/zużycie) ──
+    # Referencja doktrynalna: dobór modelu w kluczowych momentach cyklu sesji. Uzupełnia
+    # oś task-type (tabela CLAUDE.md) o oś „w którym momencie / ile palę". Dobór dziś ręczny;
+    # auto-switch wg zużycia = KANDYDAT (patrz arkusz Sugestie #Adaptive Effort / strażnik budżetu).
+    wiersze_mm = [["Moment sesji", "Zużycie", "Rekomendowany tier", "Dźwignia", "Uwaga"]]
+    wiersze_mm += [list(m) for m in MOMENTY_MODELU]
+    wiersze_mm += [
+        ["", "", "", "", ""],
+        ["OŚ 1 = rodzaj/złożoność zadania (tabela CLAUDE.md). OŚ 2 = ten arkusz "
+         "(moment/zużycie). Model sesji głównej zmienia TYLKO /model Cezara; automat "
+         "realny tylko dla delegacji subagentom (Agent model= / CLAUDE_CODE_SUBAGENT_MODEL). "
+         "Cicha degradacja zakazana — u nas zawsze JAWNIE.", "", "", "", ""],
+    ]
+    arkusze["Momenty modelu"] = wiersze_mm
 
     return arkusze
 

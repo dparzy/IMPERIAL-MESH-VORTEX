@@ -14,6 +14,35 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-19 | ⚡ | Wydajność backtestu: LINIOWY (nie O(n²)) + naprawa HMA + Speculum Probationis (podgląd Kapitolu)
+
+**Diagnoza (pomiar > pamięć, ZASADA DEBUGOWANIA):** dawna teza „backtest O(n²)" była **BŁĘDNA**.
+Zmierzone (cProfile + skalowanie na ab_dvol, BTCUSDT+ETHUSDT 1H, okno=250 stałe): 500b→36.7s,
+750b→69.1s, 1600b→179s — **ms/tik STAŁY ~66 → LINIOWE** O(n·okno). Poprzedni „profiler" mylił wysoki
+*cumulative* w `compute` (woła się ticks×~40) ze skalowaniem kwadratowym. Realny koszt: ~40 wskaźników
+liczonych od zera co tik nad oknem 251.
+
+**Naprawa hotspotu #1 (bit-identyczna, commit 4466eda):** `_py_hma` liczył `raw` nad CAŁYM oknem
+(~235 punktów), używając tylko `root+1 ≈ 5` ostatnich — guard `potrzeba=period+root` policzony (l.152)
+ale IGNOROWANY przez pętlę. Fix: `c=c[-potrzeba:]`. **BIT-IDENTYCZNE** — 4000 losowych serii 0 rozjazdów,
+ROI backtestu bez zmiany. Zysk ~25% (750b: 69→52s). Klasa wady → Księga Wad #37 + test regresyjny
+niezmiennika ogona (`test_py_hma_ogon_niezmiennik`).
+
+**Speculum Probationis (`narzedzia/kapitol_podglad.py`):** zero-tokenowy podgląd testu w Kapitolu
+(rozkaz Cezara 2026-07-19) — samowystarczalny HTML, inline-SVG, ZERO zależności (wzorzec
+`backtest_dashboard`). Pełna specyfikacja CO testowane (para/interwał/okno/tryb/dane) + wykresy + link
+`file://`. Pierwszy raport: `raporty/KAPITOL_PODGLAD_wydajnosc_hma.html`. +5 testów.
+
+**Konsekwencja (decyzja Cezara):** skoro LINIOWE, WFO nie był zablokowany — tylko wolny (~52ms/tik).
+Opcje: chunkowany wznawialny WFO (niskie ryzyko) vs pełna wektoryzacja full-series (duże/ryzykowne;
+path-dependent supertrend/HA/bocpd/viterbi). CODEX Backlog + pamięć skorygowane (O(n²)→LINIOWE).
+
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `tests/test_neurony.py`,
+`narzedzia/kapitol_podglad.py`, `tests/test_kapitol_podglad.py`, `narzedzia/codex_probationum.py`,
+`bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`.
+
+---
+
 ## 2026-07-19 | 🖋️ | SCRIBA CODEX — flaga `--ledger` auto-append (rodzina Tier-1) + naprawa buga `%` w argparse
 
 **Co:** nowy organ **SCRIBA** (`narzedzia/scriba_codex.py`) — jedyny reużywalny appender do

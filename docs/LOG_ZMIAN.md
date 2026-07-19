@@ -38,8 +38,38 @@ a wstrzykiwanie liczb SAMO poprawiło README — dokładnie po to powstało.
 **Pliki:** `imperium/swiatynie/praetorium.py`, `tests/test_praetorium.py`, `README.md`,
 `docs/ARCHITEKTURA_IMPERIUM.md`, `docs/INDEKS_IMPERIUM.md`.
 
-**Następny krok:** dopracowanie szczegółów (Cezar: „może dodamy B albo inne") → wpięcie trasy
-w `web_dashboard.py` → finalizacja.
+**Następny krok:** dopracowanie (zwiad opcji) → wpięcie trasy → finalizacja.
+
+---
+
+## 2026-07-20 | 🏛️ | PRAETORIUM — panele Grupy 1 + trasa `/praetorium` w Panelu Kapitolu
+
+**Powód:** Cezar kazał wysłać zwiadowcę po WIĘCEJ opcji przed decyzją, a potem wybrał
+„zgodnie z rekomendacją" = Grupa 1 (realne dane dziś) + wpięcie trasy.
+
+**Zwiad subagenta + werdykt sędziego (KANDYDAT≠PRAWDA — każdy kandydat zweryfikowany osobiście):**
+Zwiadowca zebrał ~13 kandydatów; **zweryfikowałem je sam** i podzieliłem na trzy grupy:
+- 🟢 **Grupa 1 — realne dane DZIŚ (WDROŻONE):** PORTITOR + Censor Sprzętu (klasa maszyny `PEDES`),
+  CODEX PROBATIONUM (`podsumowanie_ledger`), Refleksja W9 (`raport_startowy`), „następny krok"
+  z Dziennika (`banner_nastepny`), treść ostatnich NOT/CORON. **Zmierzony koszt łączny ~334 ms**, offline.
+- 🟡 **Grupa 2 — uczciwie puste dziś (odłożone):** Sybilla (`brier()` = None — brak rozliczonych proroctw),
+  Igrzyska/HedgeMWU (**pliki stanu nie istnieją** — zweryfikowane), Legiony Cieni. Wejdą, gdy live pochodzi.
+- 🔴 **Grupa 3 — ryzyko atrapy (ODRZUCONE do czasu snapshotu):** Gubernator/Haruspex/Drift. Dowód:
+  `gubernator.py:91` resetuje postawę w `__init__`, a `petla_live.py` NIE zapisuje ich stanu (zapisuje
+  MWU/synapsy/igrzyska/arenę). Pokazanie ich statycznie = fałszywe „NORMALNY ×1.0" udające pomiar (Prawo I).
+- ⛔ **Odrzucone trwale:** Kartograf (wymaga `numpy`+`matplotlib` → łamie zero-zależności),
+  diagnostyka korelacji przy każdym renderze (za droga), cenzus adapterów bez wcześniejszego refaktoru.
+
+**TRASA:** `GET /praetorium` wpięta w `web_dashboard.obsluz_sciezke` (import leniwy — koszt płacony
+tylko przy wejściu). Kokpit żyje pod `localhost:8777/praetorium`, odświeżany F5. **Żaden drugi serwer
+nie powstał** (Prawo XVI).
+
+**Odporność:** `_bezpiecznie()` — jedno padnięte źródło NIE zabija kokpitu, tylko jego panel pokazuje
+BRAK DANYCH. Bezpieczeństwo: na ekran trafia wyłącznie OBECNOŚĆ kluczy API (`DEEPSEEK✓ MEXC✗`),
+nigdy wartość. Testy 11 → **21**.
+
+**Następny krok:** ewentualnie B · MAPPA IMPERII → snapshot live (odblokuje Grupę 3) → finalizacja.
+Potem powrót do zamrożonej listy priorytetów.
 
 ---
 

@@ -34,11 +34,24 @@ def _esc(x) -> str:
     return html.escape(str(x), quote=True)
 
 
+def _bezpiecznie(fn, domyslne=None):
+    """Wywołuje źródło danych tak, by JEDNO padnięte nie zabiło całego kokpitu.
+
+    Kwatera Główna musi wstać nawet gdy któryś organ jest chory — wtedy panel
+    pokaże BRAK DANYCH zamiast wysypać cały ekran. Awaria źródła to informacja,
+    nie katastrofa (a milczący panel jest uczciwy — Prawo I).
+    """
+    try:
+        return fn()
+    except Exception:
+        return domyslne
+
+
 def zbierz_stan() -> dict:
     """Zbiera ŻYWY stan Imperium z rejestrów (bez sieci, bez giełdy).
 
+    Wszystkie źródła są TANIE (zmierzone 2026-07-19: łącznie ~334 ms) i offline.
     Rynek (pozycje/kapitał) NIE jest tu zgadywany — wypełnia go dopiero warstwa live.
-    Zwraca słownik zjadany przez `render_praetorium`.
     """
     from imperium.biblioteki import codex_notarum
     from imperium.legiony.rejestr import (
@@ -53,6 +66,7 @@ def zbierz_stan() -> dict:
     return {
         "imperator": "CEZAR PIXEL",
         "czas": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "nastepny_krok": _bezpiecznie(_nastepny_krok),
         "roj": {
             "neurony": len(neurony),
             "neurony_aktywne": len(aktywne),
@@ -65,11 +79,67 @@ def zbierz_stan() -> dict:
         "honor": {
             "noty": bilans["noty"], "korony": bilans["korony"],
             "saldo": bilans["saldo"], "dlug": len(bilans["dlug_honorowy"]),
-            "zrodlo": ZYWE,
+            "ostatnie": _ostatnie_noty(bilans), "zrodlo": ZYWE,
         },
+        "zaplecze": _bezpiecznie(_zaplecze, {"zrodlo": BRAK}),
+        "codex": _bezpiecznie(_codex, {"zrodlo": BRAK}),
+        "refleksja": _bezpiecznie(_refleksja, {"zrodlo": BRAK}),
         # Rynek: świadomie PUSTY — wypełnia pętla live po podłączeniu giełdy.
         "rynek": {"zrodlo": BRAK, "powod": "brak połączenia z giełdą (MEXC)"},
     }
+
+
+def _nastepny_krok() -> dict:
+    """Ostatni „→ następny" z Dziennika Nieśmiertelnego — odpowiedź na „co dalej"."""
+    from imperium.biblioteki.dziennik_niesmiertelny import banner_nastepny
+    tekst = (banner_nastepny() or "").strip()
+    return {"tekst": tekst, "zrodlo": ZYWE if tekst else BRAK}
+
+
+def _zaplecze() -> dict:
+    """PORTITOR (pre-flight) + Censor Sprzętu (klasa maszyny). Stdlib, bez sieci.
+
+    Klucze API: PORTITOR raportuje wyłącznie OBECNOŚĆ (✓/✗), nigdy wartość —
+    i tak samo tutaj. Sekret nie ma prawa trafić na ekran ani do pliku HTML.
+    """
+    from imperium.oczy.censor_sprzetu import rekomendowany_tier
+    from imperium.pretorianie.portitor import banner
+    tier = rekomendowany_tier() or {}
+    return {
+        "portitor": (banner() or "").strip(),
+        "klasa": tier.get("klasa", "—"),
+        "model_zakres": tier.get("model_zakres", "—"),
+        "zrodlo": ZYWE,
+    }
+
+
+def _codex() -> dict:
+    """Jednolinijkowe podsumowanie rejestru testów (CODEX PROBATIONUM)."""
+    from narzedzia.codex_probationum import podsumowanie_ledger
+    tekst = (podsumowanie_ledger() or "").strip()
+    return {"linia": tekst, "zrodlo": ZYWE if tekst else BRAK}
+
+
+def _refleksja() -> dict:
+    """Refleksja W9 — sprzeczności/przedawnienia pamięci.
+
+    Powód obecności w kokpicie (ZASADA CENSORA): ten alarm wisiał wiele sesji
+    niezauważony w logu startowym. Alarm widoczny stale = alarm, na który się reaguje.
+    """
+    from imperium.biblioteki.refleksja_pamieci import raport_startowy
+    tekst = (raport_startowy() or "").strip()
+    return {"linia": tekst, "zrodlo": ZYWE if tekst else BRAK}
+
+
+def _ostatnie_noty(bilans: dict, ile: int = 4) -> list[dict]:
+    """Ostatnie noty/laury TREŚCIĄ, nie samą cyfrą — cyfra bez kontekstu nic nie mówi."""
+    from imperium.biblioteki.codex_notarum import wczytaj
+    rek = _bezpiecznie(wczytaj, []) or []
+    return [
+        {"typ": r.get("typ", "?"), "id": r.get("id", ""),
+         "opis": r.get("opis", ""), "data": r.get("data", "")}
+        for r in rek[-ile:]
+    ][::-1]
 
 
 def _organy() -> list[tuple[str, str, int]]:
@@ -138,11 +208,68 @@ def _panel_rynek(rynek: dict) -> str:
       </div>"""
 
 
+def _panel_prosty(tytul: str, dane: dict, klucz: str, pusty: str) -> str:
+    """Karta z jedną linią tekstu ze źródła (CODEX / Refleksja). Pusto → mówi wprost."""
+    zrodlo = (dane or {}).get("zrodlo", BRAK)
+    tresc = (dane or {}).get(klucz, "") if zrodlo == ZYWE else ""
+    ciało = f'<div class="linia">{_esc(tresc)}</div>' if tresc else \
+            f'<div class="mini">{_esc(pusty)}</div>'
+    return f"""
+      <div class="karta">
+        <h3><span>{_esc(tytul)}</span>{_znacznik(zrodlo)}</h3>
+        {ciało}
+      </div>"""
+
+
+def _panel_zaplecze(z: dict) -> str:
+    """PORTITOR + klasa maszyny. Nigdy nie pokazuje WARTOŚCI kluczy API — tylko obecność."""
+    z = z or {}
+    if z.get("zrodlo") != ZYWE:
+        return f"""
+      <div class="karta">
+        <h3><span>Zaplecze</span>{_znacznik(BRAK)}</h3>
+        <div class="mini">pre-flight niedostępny</div>
+      </div>"""
+    return f"""
+      <div class="karta">
+        <h3><span>Zaplecze</span>{_znacznik(ZYWE)}</h3>
+        <div class="linia">{_esc(z.get('portitor', ''))}</div>
+        <table style="margin-top:9px">
+          <tr><td>Klasa maszyny</td><td class="num">{_esc(z.get('klasa', '—'))}</td></tr>
+          <tr><td>Zakres modeli</td><td class="num mini">{_esc(z.get('model_zakres', '—'))}</td></tr>
+        </table>
+      </div>"""
+
+
+def _panel_noty(honor: dict) -> str:
+    """Treść ostatnich NOT/CORON — bo samo „5 / 5" nie mówi, CO poszło nie tak."""
+    ostatnie = (honor or {}).get("ostatnie") or []
+    if not ostatnie:
+        return ""
+    wiersze = "".join(
+        f'<tr><td><span class="zn {"z-al" if r.get("typ") == "NOTA" else "z-ok"}">'
+        f'{_esc(r.get("typ"))}</span></td>'
+        f'<td>{_esc(r.get("opis", "")[:110])}</td>'
+        f'<td class="num mini">{_esc(r.get("data", ""))}</td></tr>'
+        for r in ostatnie
+    )
+    return f"""
+      <div class="karta">
+        <h3><span>Księga Not — ostatnie wpisy</span>{_znacznik(honor.get('zrodlo', BRAK))}</h3>
+        <table>{wiersze}</table>
+      </div>"""
+
+
 def render_praetorium(stan: dict) -> str:
     """Czysta funkcja: stan → samowystarczalny HTML (bez sieci, bez plików)."""
     roj = stan.get("roj", {})
     honor = stan.get("honor", {})
     organy = stan.get("organy", {}).get("dane", [])
+    nk = stan.get("nastepny_krok") or {}
+    pasek_nk = (
+        f'<div class="nastepny">{_esc(nk.get("tekst", ""))}</div>'
+        if nk.get("zrodlo") == ZYWE and nk.get("tekst") else ""
+    )
 
     namioty = "".join(
         f'<div class="namiot"><div class="ikona">{i}</div>'
@@ -209,6 +336,10 @@ td.num{{text-align:right;font-family:var(--mono)}}
 border:1px solid var(--linia);background:var(--panel);color:var(--tekst);font-size:.84rem;
 cursor:not-allowed;opacity:.55;text-align:left}}
 .przyc.glowny{{background:var(--purpura);border-color:var(--purpura);font-weight:600}}
+.nastepny{{background:rgba(212,161,58,.10);border:1px solid rgba(212,161,58,.35);
+border-radius:6px;padding:10px 13px;margin-bottom:16px;font-size:.87rem}}
+.linia{{font-family:var(--mono);font-size:.8rem;white-space:pre-wrap;word-break:break-word;
+background:var(--panel2);border-radius:5px;padding:9px 11px;color:var(--tekst)}}
 .stopka{{margin-top:20px;color:var(--slaby);font-size:.78rem;text-align:center;
 border-top:1px solid var(--linia);padding-top:13px}}
 @media(max-width:860px){{.siatka{{grid-template-columns:1fr}}}}
@@ -226,6 +357,8 @@ border-top:1px solid var(--linia);padding-top:13px}}
   </div>
 </div>
 
+{pasek_nk}
+
 <div class="siatka">
   <div>
     {_panel_rynek(stan.get('rynek', {}))}
@@ -234,6 +367,8 @@ border-top:1px solid var(--linia);padding-top:13px}}
       <h3><span>Castrum — organy Imperium</span>{_znacznik(stan.get('organy', {}).get('zrodlo', BRAK))}</h3>
       <div class="namioty">{namioty}</div>
     </div>
+
+    {_panel_noty(honor)}
   </div>
 
   <aside>
@@ -265,6 +400,12 @@ border-top:1px solid var(--linia);padding-top:13px}}
         <tr><td>Saldo</td><td class="num">{honor.get('saldo', '—')}</td></tr>
       </table>
     </div>
+
+    {_panel_zaplecze(stan.get('zaplecze', {}))}
+    {_panel_prosty('Rejestr prób (CODEX)', stan.get('codex', {}), 'linia',
+                   'ledger niedostępny')}
+    {_panel_prosty('Refleksja pamięci (W9)', stan.get('refleksja', {}), 'linia',
+                   'brak odczytu refleksji')}
   </aside>
 </div>
 

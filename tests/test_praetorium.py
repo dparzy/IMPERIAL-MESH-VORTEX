@@ -4,7 +4,8 @@ Reguła Test-Granic (Prawo XXI): renderer jest CZYSTĄ funkcją, więc testujemy
 bez serwera i przeglądarki. Rdzeń kontraktu = UCZCIWOŚĆ (Prawo I): gdy źródła brak,
 kokpit MUSI powiedzieć „BRAK DANYCH", a nie narysować wypełniacz wyglądający na pomiar.
 """
-from imperium.swiatynie.praetorium import (BRAK, ZYWE, render_praetorium)
+from imperium.swiatynie.praetorium import (BRAK, ZYWE, _bezpiecznie,
+                                            render_praetorium)
 
 
 def _stan_min():
@@ -104,3 +105,88 @@ def test_rozkazy_sa_nieaktywne_dopoki_front_niepodlaczony():
     h = render_praetorium(_stan_min())
     assert "disabled" in h
     assert "Wydaj order" in h
+
+
+# ── panele Grupy 1 (PORTITOR/sprzęt, CODEX, Refleksja, Dziennik, treść Not) ──
+
+def test_nastepny_krok_pokazuje_sie_gdy_zywy():
+    stan = _stan_min()
+    stan["nastepny_krok"] = {"tekst": "🎯 NASTĘPNY KROK: zrobić X", "zrodlo": ZYWE}
+    h = render_praetorium(stan)
+    assert "zrobić X" in h
+    assert "nastepny" in h
+
+
+def test_nastepny_krok_pusty_nie_rysuje_paska():
+    stan = _stan_min()
+    stan["nastepny_krok"] = {"tekst": "", "zrodlo": BRAK}
+    h = render_praetorium(stan)
+    assert 'class="nastepny"' not in h
+
+
+def test_zaplecze_nigdy_nie_pokazuje_wartosci_klucza():
+    """Bezpieczeństwo: na ekran trafia OBECNOŚĆ klucza, nigdy jego wartość."""
+    stan = _stan_min()
+    stan["zaplecze"] = {"portitor": "deps 6/6 | klucze DEEPSEEK✓ MEXC✗",
+                        "klasa": "PEDES", "model_zakres": "1–3B", "zrodlo": ZYWE}
+    h = render_praetorium(stan)
+    assert "DEEPSEEK✓" in h
+    assert "PEDES" in h
+
+
+def test_zaplecze_brak_mowi_wprost():
+    stan = _stan_min()
+    stan["zaplecze"] = {"zrodlo": BRAK}
+    h = render_praetorium(stan)
+    assert "pre-flight niedostępny" in h
+
+
+def test_codex_i_refleksja_pokazuja_linie():
+    stan = _stan_min()
+    stan["codex"] = {"linia": "CODEX: 33 rekordów", "zrodlo": ZYWE}
+    stan["refleksja"] = {"linia": "Refleksja: 1 pomysł wisi", "zrodlo": ZYWE}
+    h = render_praetorium(stan)
+    assert "33 rekordów" in h
+    assert "1 pomysł wisi" in h
+
+
+def test_codex_brak_zrodla_nie_udaje_danych():
+    stan = _stan_min()
+    stan["codex"] = {"zrodlo": BRAK}
+    h = render_praetorium(stan)
+    assert "ledger niedostępny" in h
+
+
+def test_ostatnie_noty_pokazuja_tresc():
+    stan = _stan_min()
+    stan["honor"]["ostatnie"] = [
+        {"typ": "NOTA", "id": "N-1", "opis": "martwa gałąź", "data": "2026-07-19"},
+        {"typ": "CORONA", "id": "C-1", "opis": "RUF034 w bramce", "data": "2026-07-19"},
+    ]
+    h = render_praetorium(stan)
+    assert "martwa gałąź" in h
+    assert "RUF034 w bramce" in h
+
+
+def test_brak_ostatnich_not_nie_rysuje_karty():
+    stan = _stan_min()
+    stan["honor"]["ostatnie"] = []
+    h = render_praetorium(stan)
+    assert "Księga Not — ostatnie wpisy" not in h
+
+
+def test_bezpiecznie_lapie_wyjatek_zrodla():
+    """Jedno padnięte źródło NIE może zabić kokpitu — zwraca wartość domyślną."""
+    def pada():
+        raise RuntimeError("źródło padło")
+    assert _bezpiecznie(pada, {"zrodlo": BRAK}) == {"zrodlo": BRAK}
+    assert _bezpiecznie(lambda: "ok") == "ok"
+
+
+def test_trasa_praetorium_w_web_dashboard():
+    """Prawo XVI: kokpit podaje istniejący serwer, nie drugi własny."""
+    from imperium.swiatynie.web_dashboard import obsluz_sciezke
+    status, ctype, body = obsluz_sciezke("/praetorium", stan=None)
+    assert status == 200
+    assert "text/html" in ctype
+    assert b"PRAETORIUM" in body

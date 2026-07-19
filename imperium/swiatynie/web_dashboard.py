@@ -521,6 +521,12 @@ def obsluz_sciezke(path: str, stan, odbiornik=None, magazyn=None) -> Tuple[int, 
     sciezka = path.split("?", 1)[0]
     if sciezka in ("/", "/index.html"):
         return 200, "text/html; charset=utf-8", _html_strona().encode("utf-8")
+    if sciezka == "/praetorium":
+        # PRAETORIUM (Kwatera Główna) — WIDOK, nie drugi serwer (Prawo XVI).
+        # Import leniwy: kokpit kosztuje ~330 ms odczytów, więc płacimy tylko gdy ktoś wejdzie.
+        from imperium.swiatynie.praetorium import render_praetorium, zbierz_stan
+        return (200, "text/html; charset=utf-8",
+                render_praetorium(zbierz_stan()).encode("utf-8"))
     if sciezka == "/stan.json":
         dane = stan_do_json(stan)
         symbole = set()

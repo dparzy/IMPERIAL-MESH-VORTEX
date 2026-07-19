@@ -591,10 +591,11 @@ obowiązek to PRZECZYTAĆ jego wydruk i ZAREAGOWAĆ (ZASADA CENSORA: alarm = zad
 Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
 
 1. **Przeczytaj wydruk hooka w całości** (kolejność drukowania): 🎯 **NASTĘPNY KROK** (banner na górze,
-   A2 — zawsze widoczny mimo ~25 KB) → **audyt Prawo XXI** (16 warstw) → **CODEX** (podsumowanie ledgera, C1)
-   → **Centrum Pamięci** (profil, Top-3 lekcji, aktywny cel W12, Refleksja W9) → **Dziennik Nieśmiertelny**
-   (pełna oś) → **skan wad ostatniego commitu**. Wydruk >25 KB bywa ucięty w podglądzie — pełna treść jest
-   w pliku `tool-results/hook-*.txt` (czytaj go, jeśli banner/plan zniknął z podglądu).
+   A2 — zawsze widoczny mimo ~25 KB) → **PORTITOR** (pre-flight środowiska: deps/klucze API/dryf, B1)
+   → **audyt Prawo XXI** (16 warstw) → **CODEX** (podsumowanie ledgera, C1) → **Centrum Pamięci** (profil,
+   Top-3 lekcji, aktywny cel W12, Refleksja W9) → **Dziennik Nieśmiertelny** (pełna oś) → **skan wad
+   ostatniego commitu**. Wydruk >25 KB bywa ucięty w podglądzie — pełna treść jest w pliku
+   `tool-results/hook-*.txt` (czytaj go, jeśli banner/plan zniknął z podglądu).
 2. **Audyt ≠ „pełna harmonia" → rozstrzygnij JAWNIE PRZED pierwszym zadaniem** (A3). Czerwony alarm audytu,
    Prawo XV, Refleksja W9 czy limity pamięci to ZADANIA: napraw sam (błahostka, Prawo XVIII), zaplanuj
    w Backlogu CODEX (średnie) albo spytaj Cezara (kierunkowe) — nigdy milczeniem.

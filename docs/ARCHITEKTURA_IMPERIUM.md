@@ -27,6 +27,7 @@ powod_istnienia: "Jedna strona spinająca 25 Praw z realnym kodem — jedyne mie
                                    roj_sygnalow          konsensus sygnałów     [X, IX]
 🛡️ PRETORIANIE     pretorianie/   aegis_tarcza          ryzyko, circuit breaker[IX]
                                    lustro_prawdy         walidacja adwersarialna[I, IX]
+                                   portitor              celnik u wrót: pre-flight środowiska startu[XV, XVII]
 🚰 AKWEDUKTY        akwedukty/     kwatermistrz_danych   dane OHLCV (CCXT/CSV)  [II]
 👁️ OCZY            oczy/          wszechoko             percepcja wielowarstwowa[XII]
                                    censor_sprzetu        cenzus majątku maszyny → klasa+alarm[XV]

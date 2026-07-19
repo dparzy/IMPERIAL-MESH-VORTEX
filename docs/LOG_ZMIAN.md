@@ -14,6 +14,37 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-19 | 🏛️ | PORTITOR — nowy organ pre-flight środowiska u wrót sesji (B1)
+
+**Powód (kontynuacja uszczelniania OTWARCIA, wybór Cezara B1):** żaden istniejący organ nie robił
+LEKKIEGO, BEZ-sieciowego pre-flightu startu. CENSOR SPRZĘTU (oczy) mierzy ŻELAZO; CENZUS ADAPTERÓW /
+WALIDUJ ZMYSŁY sprawdzają adaptery na ŻYWYCH danych (wymagają sieci, ręczne). Luka: nikt nie sprawdzał
+na KAŻDYM starcie software'u — wersji deps, OBECNOŚCI kluczy API, świeżości danych, dryfu środowiska.
+
+**Nowy organ `imperium/pretorianie/portitor.py`** (celnik u wrót — praetorian guard, nazwa rzymska
+dobrana do funkcji, ZASADA NOMENKLATURY). Stdlib-only, BEZ sieci, non-blocking (ZASADA WPIĘCIA):
+- **Runtime:** Python + obecność/wersje deps (numpy/TA-Lib krytyczne → alarm; pandas/ccxt/requests/openpyxl info).
+- **Klucze API:** WYŁĄCZNIE obecność env (DEEPSEEK/MEXC) — NIGDY wartość (Bezpieczeństwo NIENARUSZALNE).
+  Brak DEEPSEEK = alarm (Hyginus cichy); brak MEXC = info (faza paper).
+- **Świeżość danych:** wiek najnowszej świecy lokalnych CSV per interwał (informacyjnie — dane backtestu
+  bywają historyczne, więc bez alarmu; sonda żywego feedu = osobne, sieciowe).
+- **Dryf vs baseline:** fingerprint (Python+pakiety) w git (`bibliotheca_ulpia/dane/portitor_baseline.json`);
+  po `git pull` na innej maszynie porównanie ujawnia zmianę „pod spodem" (jak CENSOR dla sprzętu).
+- CLI: `raport` (domyślnie) / `banner` (hook) / `migawka` / `zmiana` / `zatwierdz`.
+
+**Wpięcie:** `.claude/hooks/session-start.sh` krok 0.6 — zwięzły `banner` (świadomie krótki, nie rozdymamy
+startu — ironia luki L7). Baseline zatwierdzony na żywym środowisku Cezara (Python 3.11.9, 6/6 deps).
+
+**Granica (Prawo XVI):** PORTITOR=software; CENSOR=żelazo; CENZUS/ZMYSŁY=sieć. Zero dublowania.
+Drobna wada złapana samotestem: banner drukował „MEXC✗ MEXC✗" (2 klucze MEXC) → grupowanie po prefiksie (AND).
+
+**Testy:** +17 (`tests/test_portitor.py` — granice kluczy/dryfu/alarmów/baseline). Ruff czysto, skan czysto.
+
+**Pliki:** `imperium/pretorianie/portitor.py`, `tests/test_portitor.py`, `.claude/hooks/session-start.sh`,
+`CLAUDE.md`, `docs/ARCHITEKTURA_IMPERIUM.md`, `bibliotheca_ulpia/dane/portitor_baseline.json`, `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-07-19 | 🌅 | Uszczelnienie OTWARCIA sesji — Pakiet A+C1 (symetria do zamknięcia)
 
 **Powód (rozkaz Cezara):** zamknięcie sesji miało 9-krokową egzekwowaną checklistę, ale OTWARCIE było

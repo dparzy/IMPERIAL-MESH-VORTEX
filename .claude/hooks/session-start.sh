@@ -40,6 +40,14 @@ if [ -f imperium/biblioteki/dziennik_niesmiertelny.py ]; then
   python -m imperium.biblioteki.dziennik_niesmiertelny nastepny || true
 fi
 
+# 0.6) PORTITOR — celnik u wrót: pre-flight środowiska (B1 — uszczelnienie OTWARCIA 2026-07-19).
+#      Lekki, BEZ SIECI, stdlib-only: Python + krytyczne deps (numpy/TA-Lib) + OBECNOŚĆ kluczy
+#      API (nigdy wartość) + świeżość danych + dryf vs baseline. Uzupełnia CENSOR SPRZĘTU
+#      (żelazo) i CENZUS ADAPTERÓW (sieć) — Prawo XVI. Non-blocking, zwięzły banner.
+if [ -f imperium/pretorianie/portitor.py ]; then
+  python -m imperium.pretorianie.portitor banner || true
+fi
+
 # 1) Instalacja zależności — tylko w środowisku zdalnym (lokalnie masz swoje venv)
 if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ]; then
   if [ -f requirements.txt ]; then

@@ -12,7 +12,7 @@ powod_istnienia: "JEDYNE oficjalne źródło prawdy o kodzie (Prawo XIX) — tab
 > **Aktualizacja:** w tym samym commicie co kod. Nieaktualny MANIFEST = złamanie Prawa XIX.
 > **Klucze w MANIFEST = klucze w kodzie (KLUCZ w klasie).** Żadnych aliasów ani starych nazw.
 
-**Stan na:** 2026-07-16 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
+**Stan na:** 2026-07-19 · **Gałąź:** `claude/sleepy-fermi-dsdE4`
 **Zaimplementowane:** 87 neuronów (zarejestrowane w roju) + 15 zwiadowców = **102 modułów w kodzie**
 **Meta-warstwy (B):** 2 moduły (`neutralizacja.py` B-02, `meta_labeling.py` B-01) — warstwa NAD Legatusem, nie neurony
 **Aktywne / wyciszone:** 81 aktywnych + 6 wyciszonych, z czego:

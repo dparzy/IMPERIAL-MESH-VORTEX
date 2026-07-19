@@ -14,6 +14,109 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-19 | 📦 | Konsolidacja LEKCJI — archiwizacja wg wartości retencji (Prawo XV, nic nie skasowane)
+
+**Co:** sekcja LEKCJE Z SESJI puchła do **39966 zn > limit 24000** (180 lekcji, hurtowy import).
+Alarm hooka wisiał sesjami. Rozkaz Cezara: konsolidacja.
+
+**Diagnoza (pomiar, nie opinia):** automatyczny dedup ZAWODZI — `czy_duplikaty` (zachowawczy,
+„fałszywe scalenie kasuje wiedzę bezpowrotnie") daje 0; identyczna sygnatura = 0; Mądre
+Zapominanie = 0 kandydatów (wszystko wartościowe). 32 pary Jaccard≥0.6 to duplikaty SEMANTYCZNE
+(różne tokeny), których żaden bezpieczny automat nie scali. **Wniosek: nie kasujemy — archiwizujemy.**
+
+**Mechanizm (reużywalny, CENSOR pkt 3):** `pamiec_sesji.konsoliduj_lekcje(cel_znakow)` +
+`_dopisz_archiwum` + CLI `konsoliduj [--cel --sucho]`. Schładza NAJNIŻEJ-wartościowe lekcje
+(kryterium: `zapominanie.wartosc_retencji` = łączność w grafie × świeżość × ważność) do nowego
+pliku ACTA `docs/PAMIEC_SESJI_ARCHIWUM.md` aż aktywna sekcja ≤ cel. Wynik: **180→94 aktywnych,
+86 zarchiwizowanych, sekcja 39244→21962 zn**, alarm zniknął. Bilans 94+86=180 — **nic nie zginęło**
+(archiwum przeszukiwalne grep/RAG, poza wstrzykiwanym kontekstem startowym; kontekst i tak brał Top-3).
+
+**Symbioza (CENSOR złapał audytem):** nowy plik → INDEKS (katalog Tabularium regenerowany) + W8
+LOG_ZMIAN. **Testy:** +4 granic (przenosi-nie-kasuje · sucho-nie-zapisuje · poniżej-celu-nic ·
+zostawia-najwartościowsze), 57/57 pamięci sesji. **Pliki:** pamiec_sesji.py, test_pamiec_sesji.py,
+PAMIEC_SESJI.md, PAMIEC_SESJI_ARCHIWUM.md (nowy ACTA), INDEKS_IMPERIUM.md, codex_probationum.py.
+
+---
+
+## 2026-07-18 | 🪞 | CENSOR w akcji: 10 „sprzeczności" W9 = fałszywe alarmy detektora — naprawa u źródła
+
+**Co:** przegląd alarmu Refleksji W9 wiszącego od wielu sesji („10 sprzeczności do przeglądu").
+Diagnoza z kodu (nie opinia): **10/10 to FALSE POSITIVES** z dwóch wad detektora
+(`imperium/biblioteki/refleksja_pamieci.py`):
+1. `_NEGATYW` zawierał `kandydat/planowane/pomysł` → **nowy POMYSŁ liczył się jak NEGACJA**
+   wdrożonego („Dodano H-01" ↔ „Time-Morph kand. #25" = rzekomy regres).
+2. Stoplista bez słów funkcyjnych → pary spinane przez `{'jako','decyzja'}`, `{'moduł','nowy'}`
+   („Odrzucono Zig" ↔ „Budowa ważenia IC" — nic wspólnego; „jako" ma 4 znaki i przechodziło `_MIN_DL`).
+
+**Naprawa u źródła:** (a) `_NEGACJA_TWARDA` — SPRZECZNE wymaga realnego cofnięcia
+(odrzucona/porzucone/wycofana/„nie"), późniejszy „−" będący planem = nowa hipoteza, nie regres;
+(b) stoplista + słowa czynności/funkcyjne. **Wynik: Sprzeczne 10→0, Rozstrzygnięte 10→16**
+(postęp widoczny, szum zgaszony). +3 testy granic (pomysł-nie-przeczy, twarda-negacja-łapana,
+stoplista-tnie), 31/31 testów refleksji. Filozofia anty-utrwalania NIETKNIĘTA (moduł dalej
+tylko zgłasza, nic nie kasuje).
+
+**Lekcja (Księga Wad, 35 wpisów, kat. werdykt):** chroniczny fałszywy alarm uczy ignorować
+bramkę — dokładnie dlatego wisiał sesjami. Konsolidacja LEKCJI: ODŁOŻONA (decyzja Cezara).
+Pozostał 1 wiszący pomysł (Wektory semantyczne RAG, 22d) → decyzja Cezara w Backlogu CODEX.
+
+**Pliki:** refleksja_pamieci.py, test_refleksja_pamieci.py, codex_probationum.py (Backlog),
+ksiega_wad_kodu.jsonl.
+
+---
+
+## 2026-07-18 | 🏺 | AUDYT KONSTYTUCJI + ZASADA WERYFIKACJI + ZASADA CENSORA (Fable 5)
+
+**Co:** dwa nowe ROZKAZY STAŁE Cezara skodyfikowane + pełny audyt CLAUDE.md zasada-po-zasadzie
+(pierwsza sesja na Fable 5).
+
+**ZASADA WERYFIKACJI PRZED WDROŻENIEM:** każda decyzja/propozycja przed wdrożeniem przechodzi
+bramkę: czy już istnieje/zbadane (CODEX+kod+kronika) · pod każdym kątem (granice/reżimy/pary) ·
+wpływ na CAŁE Imperium (symbioza) · zgodność z zasadami · dowód z POMIARU. Cel: zarabiać na
+krypto (MEXC), nic nie psuć — rozwijać.
+
+**ZASADA CENSORA (pętla samokontroli):** WYKRYJ→ZAŁATAJ→UODPORNIJ→ZAPISZ; alarmy hooka
+startowego = ZADANIA, nie tapeta (dowód luki: W9 „10 sprzeczności" + „LEKCJE 39k>24k"
+ignorowane przez wiele sesji, bo żadna zasada nie nakazywała reakcji). Oba alarmy → Backlog CODEX.
+
+**Audyt CLAUDE.md — 5 niezgodności naprawionych (każda zweryfikowana wobec kodu):**
+1. `stan_na` 07-14 → 07-18 (plik zmieniany, data nie nadążała).
+2. „9 Nienaruszalnych Reguł" przy 10 pozycjach → nagłówek bez liczby (count-proof); klasa wady
+   „ręczna liczba w nagłówku" → Księga Wad (34 wpisy).
+3. KROK 0: „planowane A/L/V" — zmierzone: `WAGI_REZIMU_PLANOWANE` dziś PUSTY → komentarz naprawiony.
+4. Sekcja OBSERWACJI PR rozcięta wklejką „Zasady debugowania" (jej zdanie wisiało za obcą sekcją)
+   → scalona; debugowanie = własna sekcja H2.
+5. „Opus" zaszyty jako najwyższy tier → dopisek „czytaj: najwyższy dostępny (dziś Fable 5)";
+   ta sama klasa co nieistniejący „sonnet-4-6" (2026-07-17).
+
+**Pliki:** CLAUDE.md, codex_probationum.py (Backlog +2 alarmy), ksiega_wad_kodu.jsonl, LOG_ZMIAN.
+
+---
+
+## 2026-07-18 | 📜 | CODEX_PROBATIONUM — żywy rejestr testów w Excelu
+
+**Co:** generator wielo-arkuszowego .xlsx (`narzedzia/codex_probationum.py`) — nasz
+dokładny rejestr testów. **12 arkuszy:** README/Legenda, Neurony (87), Zwiadowcy (15),
+Strategie (20), Neurony×Strategie (macierz ról W/F/X), Adaptery (22 + żywotność),
+Waluty×Interwały (15 par × 1m/1h/4h/1d, pokrycie), Interwały→Styl (Namiestnik),
+Wyniki A/B, Wyniki IC, Korelacje (pomiar W-306), Backlog/Planowane.
+
+**Architektura (Prawo XXI/Filar 4):** Excel = GENEROWANY WIDOK z dwóch źródeł prawdy —
+żywy kod (rejestry) + wersjonowany `bibliotheca_ulpia/dane/rejestr_testow.jsonl` (ledger
+wyników, seed 13 rekordów A/B+IC z tej sesji). Nigdy z pamięci → nie może się rozjechać.
+Import openpyxl LENIWY + miękki fallback (Prawo I: rdzeń `zbierz_arkusze()` działa bez
+biblioteki, testy przechodzą). `raporty/` w .gitignore (regenerowalny artefakt).
+
+**🔧 Dług naprawiony (rozkaz Cezara „błędne → napraw"):** legenda kategorii w
+`mikro_neuron.py:61-67` NIE miała liter **C** (Cross-sectional, C-01) i **D** (Path
+Signature, D-01), choć kod ich używa — złamanie ZPO. Dopisane; test `test_legenda_kategorii_kompletna`
+pilnuje pokrycia KAŻDEJ żywej kategorii.
+
+**Zależność:** `openpyxl>=3.1` do requirements.txt. **Testy:** +8 (rdzeń bez openpyxl +
+zapis pod importorskip + granice: pusty/uszkodzony ledger, parser korelacji, zgodność
+liczb z rejestrem). **Pliki:** codex_probationum.py, rejestr_testow.jsonl, test_codex_probationum.py, mikro_neuron.py, requirements.txt.
+
+---
+
 ## 2026-07-18 | 📊 | A/B TIER-1 NA 1H/4H + 🚨 Prawo XV (backtest O(n²))
 
 **Co:** rozkaz Cezara 07-16 — powtórka A/B sygnałów Tier-1 (DVOL/stablecoin/USD) na

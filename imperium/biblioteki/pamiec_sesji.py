@@ -22,13 +22,15 @@ from __future__ import annotations
 import datetime as _dt
 import re
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 DOMYSLNY_PLIK = ROOT / "docs" / "PAMIEC_SESJI.md"
 PLIK_PROFILU = ROOT / "docs" / "PROFIL_CEZARA.md"
+PLIK_ARCHIWUM = ROOT / "docs" / "PAMIEC_SESJI_ARCHIWUM.md"
 
 _NAGLOWEK_LEKCJE = "## 📚 LEKCJE Z SESJI"
+_NAGLOWEK_ARCHIWUM = "## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)"
 
 # Wspólny wzorzec lekcji (parser + przepisywanie używają TEGO SAMEGO, by były spójne —
 # inaczej _zapisz_lekcje mogło inaczej wykrywać granicę „ogona" niż lekcje(), co przy
@@ -356,6 +358,91 @@ def aktualizuj_lekcje(tytul: str, nowa_tresc: str, plik: Path = DOMYSLNY_PLIK,
     return True
 
 
+_FM_ARCHIWUM = (
+    "---\n"
+    "kategoria: ACTA\n"
+    "typ: acta\n"
+    "wlasciciel: —\n"
+    "stan_na: {data}\n"
+    "powod_acta: \"Archiwum lekcji SCHŁODZONYCH z PAMIEC_SESJI.md (konsolidacja, Prawo XV). "
+    "Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz (Prawo I).\"\n"
+    "powod_istnienia: \"Magazyn starszych/mniej połączonych lekcji — pamięć aktywna ostra, "
+    "nic nie tracimy (Prawo I). Przeszukiwalne (grep/RAG), poza wstrzykiwanym kontekstem startowym.\"\n"
+    "---\n"
+    "# 📦 PAMIĘĆ SESJI — ARCHIWUM LEKCJI\n\n"
+    "> Lekcje schłodzone z docs/PAMIEC_SESJI.md, gdy sekcja aktywna przekroczyła limit "
+    f"({LIMIT_ZNAKOW_SEKCJA} zn.). Kryterium: najniższa wartość retencji "
+    "(zapominanie.wartosc_retencji — łączność w grafie × świeżość × ważność). NIC nie skasowane.\n\n"
+)
+
+
+def _dopisz_archiwum(lekcje_lista: List[Dict[str, str]], archiwum: Path = PLIK_ARCHIWUM) -> None:
+    """Dopisuje schłodzone lekcje do pliku-archiwum (tworzy z nagłówkiem ACTA gdy brak)."""
+    if not lekcje_lista:
+        return
+    bloki = "\n".join(f"### {lek['data']} — {lek['tytul']}\n{lek['tresc']}\n"
+                      for lek in lekcje_lista)
+    if archiwum.exists():
+        tekst = archiwum.read_text(encoding="utf-8")
+        if _NAGLOWEK_ARCHIWUM in tekst:
+            przed, po = tekst.split(_NAGLOWEK_ARCHIWUM, 1)
+            nowy = f"{przed}{_NAGLOWEK_ARCHIWUM}\n\n{bloki}\n{po.lstrip(chr(10))}"
+        else:
+            nowy = f"{tekst.rstrip()}\n\n{_NAGLOWEK_ARCHIWUM}\n\n{bloki}\n"
+    else:
+        nowy = _FM_ARCHIWUM.format(data=_dzis()) + f"{_NAGLOWEK_ARCHIWUM}\n\n{bloki}\n"
+    archiwum.write_text(nowy, encoding="utf-8")
+
+
+def konsoliduj_lekcje(cel_znakow: int = 22000, plik: Path = DOMYSLNY_PLIK,
+                      archiwum: Path = PLIK_ARCHIWUM, sucho: bool = False) -> Dict[str, Any]:
+    """
+    Schładza najniżej-wartościowe lekcje do ARCHIWUM aż aktywna sekcja ≤ cel_znakow.
+
+    Prawo XV „pamięć ostra" BEZ utraty wiedzy (Prawo I): kryterium = wartość retencji
+    (`zapominanie.wartosc_retencji` — łączność w grafie × świeżość × ważność, mierzone
+    nie opiniowane). Automatyczny dedup zawodzi (czy_duplikaty zachowawczy = 0; duplikaty
+    są semantyczne), więc NIE kasujemy — PRZENOSIMY słabiej połączone/starsze do pliku-ACTA
+    (przeszukiwalny, poza kontekstem startowym). `sucho=True` = dry-run (nie zapisuje).
+
+    Zwraca {przed, po, zarchiwizowanych, znakow_przed, znakow_po, archiwum:[tytuły]}.
+    """
+    ls = lekcje(plik)
+
+    def _rozmiar(lek: Dict[str, str]) -> int:
+        return len(lek["naglowek"]) + len(lek["tresc"]) + 2
+
+    znakow_przed = sum(_rozmiar(lek) for lek in ls)
+    if znakow_przed <= cel_znakow or len(ls) <= 1:
+        return {"przed": len(ls), "po": len(ls), "zarchiwizowanych": 0,
+                "znakow_przed": znakow_przed, "znakow_po": znakow_przed, "archiwum": []}
+
+    from imperium.biblioteki.zapominanie import _stopien_w_grafie, wartosc_retencji
+    stopnie = _stopien_w_grafie()
+    wart = {id(lek): wartosc_retencji(
+        {"tytul": lek["tytul"], "tresc": lek["tresc"], "data": lek["data"], "status": ""},
+        stopnie) for lek in ls}
+
+    # najwartościowsze zostają w gorącym; przy remisie wygrywa nowsza data
+    kolejnosc = sorted(ls, key=lambda lek: (wart[id(lek)], lek["data"]), reverse=True)
+    zachowane_id, suma = set(), 0
+    for lek in kolejnosc:
+        r = _rozmiar(lek)
+        if suma + r <= cel_znakow:
+            zachowane_id.add(id(lek))
+            suma += r
+    aktywne = [lek for lek in ls if id(lek) in zachowane_id]   # zachowaj kolejność pliku
+    do_archiwum = [lek for lek in ls if id(lek) not in zachowane_id]
+
+    if not sucho:
+        _zapisz_lekcje(aktywne, plik)
+        _dopisz_archiwum(do_archiwum, archiwum)
+
+    return {"przed": len(ls), "po": len(aktywne), "zarchiwizowanych": len(do_archiwum),
+            "znakow_przed": znakow_przed, "znakow_po": suma,
+            "archiwum": [lek["tytul"] for lek in do_archiwum]}
+
+
 def alarm_przepelnienia(plik: Path = DOMYSLNY_PLIK) -> Optional[str]:
     """
     Prawo XV: gdy sekcja lekcji puchnie ponad LIMIT_ZNAKOW_SEKCJA → miękki alarm
@@ -455,6 +542,9 @@ if __name__ == "__main__":
     p_akt.add_argument("--tytul", required=True)
     p_akt.add_argument("--tresc", required=True)
     sub.add_parser("profil", help="pokaż profil Cezara (USER.md-style)")
+    p_kons = sub.add_parser("konsoliduj", help="schłodź najniżej-wartościowe lekcje do archiwum")
+    p_kons.add_argument("--cel", type=int, default=22000, help="docelowy rozmiar sekcji (zn.)")
+    p_kons.add_argument("--sucho", action="store_true", help="dry-run: pokaż plan, nie zapisuj")
     args = ap.parse_args()
 
     if args.cmd == "start":
@@ -476,5 +566,12 @@ if __name__ == "__main__":
         print(f"{'✅ Zaktualizowano' if ok else '⚠️ Nie znaleziono'}: {args.tytul}")
     elif args.cmd == "profil":
         print(profil_cezara() or "(brak docs/PROFIL_CEZARA.md)")
+    elif args.cmd == "konsoliduj":
+        r = konsoliduj_lekcje(cel_znakow=args.cel, sucho=args.sucho)
+        tryb = "SUCHO (nic nie zapisano)" if args.sucho else "ZAPISANO"
+        print(f"📦 Konsolidacja [{tryb}]: {r['przed']}→{r['po']} lekcji aktywnych, "
+              f"{r['zarchiwizowanych']} do archiwum | sekcja {r['znakow_przed']}→{r['znakow_po']} zn.")
+        for t in r["archiwum"][:60]:
+            print(f"   → archiwum: {t}")
     else:
         print(podsumowanie_startowe())

@@ -152,6 +152,13 @@ def _py_hma(close, period: int = 16):
     potrzeba = period + root  # by policzyć 2 ostatnie punkty HMA
     if len(c) < potrzeba:
         return None, None
+    # Wydajność (bit-identyczna): HMA_last/HMA_prev zależą wyłącznie od ostatnich
+    # `potrzeba` barów — licz `raw` tylko na tym ogonie, nie nad CAŁYM oknem. Dawniej
+    # pętla szła range(period-1, len(okna)) i liczyła ~okno punktów raw, z których
+    # używane były tylko 2 ostatnie: O(okno·period)/tik zamiast O(potrzeba·period).
+    # Przycięcie do tych samych barów → identyczne wartości float
+    # (dowód regresyjny: tests/test_neurony.py::test_py_hma_ogon_niezmiennik).
+    c = c[-potrzeba:]
 
     def wma(seq, p, idx):
         # ważona średnia: wagi 1..p, najnowszy bar waży najwięcej

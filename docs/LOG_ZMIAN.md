@@ -14,6 +14,35 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-19 | ⚔️ | PRAETORIUM — Kwatera Główna Imperatora (Centrum Dowodzenia, hybryda C+A)
+
+**Powód (rozkaz Cezara):** Imperium nie miało miejsca, z którego Imperator widzi CAŁOŚĆ i wydaje ordery.
+Zalążki istniały (Panel Kapitolu, Speculum, dashboard), ale — słowami Cezara — „to nie jest to".
+
+**Proces:** 4 szablony wizualne (CASTRUM / MAPPA IMPERII / HUD BOJOWY / MARMUR) → wybór Cezara:
+**hybryda C+A** (kokpit operacyjny + castrum organów). Szkice: `raporty/PRAETORIUM_SZABLONY.html` (gitignore).
+
+**Organ:** `imperium/swiatynie/praetorium.py` — **PRAETORIUM** (ZASADA NOMENKLATURY).
+- **Prawo XVI (nie duplikujemy):** NIE stawia drugiego serwera. `web_dashboard.py` (Panel Kapitolu) zostaje
+  żywym serwerem; PRAETORIUM daje **czystą funkcję** `render_praetorium(stan) -> str`, którą tamten może podać.
+  Granice spisane w docstringu wobec `kapitol_podglad.py` (jeden test) i `live_monitor.py` (alarmy).
+- **Prawo I (rdzeń organu):** każdy panel niesie znacznik **ŻYWE** (policzone z kodu przy renderze) albo
+  **BRAK DANYCH**. Bez giełdy front mówi wprost „Front milczy" — **zero wypełniacza udającego pomiar**.
+  Rozkazy egzekucji celowo `disabled` (ZASADA WPIĘCIA — wpięcie to osobna, świadoma decyzja).
+- Żywe dane: rój (87/15), strategie, elity, organy (te same liczby co README), bilans CODEX NOTARUM.
+- +11 testów granic (pusty stan, brak źródła, P&L ujemny, dług honorowy, escaping HTML, disabled).
+
+**Dowód wpięcia mechanizmu z tej samej sesji:** dodanie `praetorium.py` podbiło `organ_swiatynie` 6→7,
+a wstrzykiwanie liczb SAMO poprawiło README — dokładnie po to powstało.
+
+**Pliki:** `imperium/swiatynie/praetorium.py`, `tests/test_praetorium.py`, `README.md`,
+`docs/ARCHITEKTURA_IMPERIUM.md`, `docs/INDEKS_IMPERIUM.md`.
+
+**Następny krok:** dopracowanie szczegółów (Cezar: „może dodamy B albo inne") → wpięcie trasy
+w `web_dashboard.py` → finalizacja.
+
+---
+
 ## 2026-07-19 | 📜 | README naprawa (schemat + liczby organów wstrzykiwane) + CODEX NOTARUM (LEX TALIONIS)
 
 **Powód (rozkaz Cezara):** (1) główne README „kurewsko nieaktualne" — schemat/układ Imperium nie nadążał

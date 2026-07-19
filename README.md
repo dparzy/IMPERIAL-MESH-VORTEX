@@ -75,7 +75,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | 🛡️ **pretorianie/** | bezpieczeństwo, kalkulator lewara, Praeda, **PORTITOR** (pre-flight u wrót) | <!-- LICZBA:organ_pretorianie -->9<!-- /LICZBA --> |
 | 🏗️ **akwedukty/** | pipeline danych + adaptery API (Futures / F&G / CVD / News) | <!-- LICZBA:organ_akwedukty -->17<!-- /LICZBA --> |
 | 🛤️ **drogi/** | API i egzekucja (NexusHub) | <!-- LICZBA:organ_drogi -->4<!-- /LICZBA --> |
-| 🎨 **swiatynie/** | dashboard / wizualizacja / SPECULA świec | <!-- LICZBA:organ_swiatynie -->6<!-- /LICZBA --> |
+| 🎨 **swiatynie/** | **PRAETORIUM** (Kwatera Główna Imperatora) + dashboard / wizualizacja / SPECULA świec | <!-- LICZBA:organ_swiatynie -->7<!-- /LICZBA --> |
 | 📚 **biblioteki/** | pamięć W-360, MWU, Synapsy Reżimowe, Kronikarz, RAG | <!-- LICZBA:organ_biblioteki -->26<!-- /LICZBA --> |
 | 👁️ **oczy/** | obserwatorzy / źródła / Censor Sprzętu | <!-- LICZBA:organ_oczy -->2<!-- /LICZBA --> |
 | 🧮 **fundament/** | Brama Kalkulatora | <!-- LICZBA:organ_fundament -->2<!-- /LICZBA --> |

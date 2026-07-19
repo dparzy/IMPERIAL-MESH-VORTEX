@@ -119,7 +119,7 @@ def wartosci_z_kodu():
     )
     from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
     neurony = wszystkie_neurony()
-    return {
+    wartosci = {
         "neurony": len(neurony),
         "neurony_aktywne": len([n for n in neurony if getattr(n, "DOSTEPNY", True)]),
         "zwiadowcy": len(wszyscy_zwiadowcy()),
@@ -138,6 +138,19 @@ def wartosci_z_kodu():
         "ksiazki": ksiazki_w_bazie(),
         "fragmenty": fragmenty_w_bazie(),
     }
+    # Liczba plików .py per organ (mapa README/ARCHITEKTURA — była ręczna i rozjechała
+    # się z kodem: legiony podawane jako 40 przy 67 realnych, 2026-07-19). Wstrzykiwana,
+    # żeby schemat Imperium nigdy więcej nie kłamał o własnej wielkości (Warstwa 15).
+    organy = os.path.join(ROOT, "imperium")
+    if os.path.isdir(organy):
+        for nazwa in sorted(os.listdir(organy)):
+            folder = os.path.join(organy, nazwa)
+            if not os.path.isdir(folder):
+                continue
+            ile = sum(1 for _r, _d, pliki in os.walk(folder)
+                      for p in pliki if p.endswith(".py"))
+            wartosci[f"organ_{nazwa}"] = ile
+    return wartosci
 
 
 def wstrzyknij_liczby(sucho=False):

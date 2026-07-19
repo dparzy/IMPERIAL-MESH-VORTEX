@@ -2,15 +2,16 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/legiony/rejestr.py
-stan_na: 2026-07-18
+stan_na: 2026-07-19
 powod_istnienia: "Wizytówka Imperium — podaje liczby wprost z kodu (neurony/testy/prawa), więc musi nadążać za rejestrem"
 ---
 # 🏛️ IMPERIAL MESH VORTEX
 
-> **Imperium Cesarza Pixel** — autonomiczny system tradingowy AI.
-> Lokalny, samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
+> **Imperium Cezara Pixel** — autonomiczny, lokalny system tradingowy AI.
+> Samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
+> **Doktryna:** wojna = giełda; pierwszy front — **MEXC**; każdy order stawiany z myślą o zysku, a łup (zysk) finansuje lepszy budulec Imperium.
 
-> **Stan na:** 2026-07-19 · **Testy:** patrz `python tests/run_tests.py` · **Faza:** PętlaLive + Synapsy Reżimowe + PamięćRefleksyjna + Radar + Paper Trading Etap II + Filtr Asymetrii (W-314) + RealOrderRouter/dry-run (W-331/332) + sync pozycji (W-333) + progi adaptacyjne (W-334) + meta-warstwy B: Neutralizacja + Meta-labeling (W-337) + detektory reżimu: CUSUM/BOCPD/FracDiff (W-336/338/339) + vol-gate Jump Model opt-in (W-340) + **niezawodność warunkowa per-reżim (W-341, Prawo XXIII) + LiveMonitor/TelegramAlert (W-341, Prawo XXIV) + MECHANIZM przewagi (W-342, Prawo XXII) + godło SVG (W-342) + Debata Senatu Byk/Niedźwiedź/Cenzor (W-343)**.
+> **Stan na:** 2026-07-19 · **Testy:** `python tests/run_tests.py` (zielone) · **Rój:** <!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów / <!-- LICZBA:zwiadowcy -->15<!-- /LICZBA --> zwiadowców · **Faza bieżąca:** żywe źródło w [`docs/MANIFEST_KODU.md`](docs/MANIFEST_KODU.md) + [`docs/LOG_ZMIAN.md`](docs/LOG_ZMIAN.md) (nie duplikujemy tu rosnącej listy W-XXX — starzała się i kłamała).
 
 ---
 
@@ -63,21 +64,21 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 ---
 
-## 🗺️ Mapa Imperium (realne foldery w `imperium/`)
+## 🗺️ Mapa Imperium (realne organy w `imperium/` — liczby plików `.py` wstrzykiwane z żywego kodu)
 
-```
-👑 cesarz/       — mózg decyzyjny, 5 Doradców, PamięćRefleksyjna   (9)
-🏛️ senat/        — debata / konsensus                              (2)
-⚔️ legiony/      — 87 neuronów + 15 zwiadowców + Legatus + Radar     (40)
-🏟️ koloseum/     — Dyrygent, PętlaLive, Backtest portfela, Namiestnik (11)
-🛡️ pretorianie/  — bezpieczeństwo, kalkulator lewara, Praeda        (5)
-🏗️ akwedukty/    — pipeline danych + adaptery API (Futures/F&G/CVD/News) (8)
-🛤️ drogi/        — API i egzekucja (NexusHub)                       (3)
-🎨 swiatynie/    — dashboard / wizualizacja                         (2)
-📚 biblioteki/   — pamięć, MWU, SynapsyRezimowe, KronikarzZdarzeń   (8)
-👁️ oczy/         — obserwatorzy / źródła                            (1)
-🧮 fundament/    — Brama Kalkulatora                                (2)
-```
+| Organ | Rola | pliki `.py` |
+|---|---|---|
+| 👑 **cesarz/** | mózg decyzyjny, 5 Doradców, Pamięć Refleksyjna | <!-- LICZBA:organ_cesarz -->11<!-- /LICZBA --> |
+| 🏛️ **senat/** | debata / konsensus (Byk / Niedźwiedź / Cenzor) | <!-- LICZBA:organ_senat -->2<!-- /LICZBA --> |
+| ⚔️ **legiony/** | neurony + zwiadowcy + Generał Legatus + Radar | <!-- LICZBA:organ_legiony -->67<!-- /LICZBA --> |
+| 🏟️ **koloseum/** | Dyrygent, PętlaLive, Backtest, Namiestnik, Legiony Cieni | <!-- LICZBA:organ_koloseum -->16<!-- /LICZBA --> |
+| 🛡️ **pretorianie/** | bezpieczeństwo, kalkulator lewara, Praeda, **PORTITOR** (pre-flight u wrót) | <!-- LICZBA:organ_pretorianie -->9<!-- /LICZBA --> |
+| 🏗️ **akwedukty/** | pipeline danych + adaptery API (Futures / F&G / CVD / News) | <!-- LICZBA:organ_akwedukty -->17<!-- /LICZBA --> |
+| 🛤️ **drogi/** | API i egzekucja (NexusHub) | <!-- LICZBA:organ_drogi -->4<!-- /LICZBA --> |
+| 🎨 **swiatynie/** | dashboard / wizualizacja / SPECULA świec | <!-- LICZBA:organ_swiatynie -->6<!-- /LICZBA --> |
+| 📚 **biblioteki/** | pamięć W-360, MWU, Synapsy Reżimowe, Kronikarz, RAG | <!-- LICZBA:organ_biblioteki -->25<!-- /LICZBA --> |
+| 👁️ **oczy/** | obserwatorzy / źródła / Censor Sprzętu | <!-- LICZBA:organ_oczy -->2<!-- /LICZBA --> |
+| 🧮 **fundament/** | Brama Kalkulatora | <!-- LICZBA:organ_fundament -->2<!-- /LICZBA --> |
 
 ---
 
@@ -98,12 +99,30 @@ python tests/run_tests.py     # wszystkie zielone, bez zależności zewnętrznyc
 
 ## 👥 Role
 
-| Imię | Rola |
+| Imię (rzymskie) | Rola |
 |------|------|
-| **Komendant / Cezar** (Ty) | Ostatnie słowo należy zawsze do Ciebie. |
-| **Architekt Imperium** | Projektuje, buduje, porządkuje — i mówi prawdę o stanie (Prawo I, XV). |
+| **CEZAR PIXEL** (Ty) | Imperator — właściciel Imperium; ostatnie słowo należy zawsze do Ciebie. |
+| **VITRUVIUSZ** | Architekt Imperium (Claude/Opus) — projektuje, buduje, porządkuje i mówi prawdę o stanie (Prawo I, XV). |
+| **HYGINUS** | Bibliotekarz-Zwiadowca (DeepSeek) — czyta bibliotekę i proponuje kandydatów; **kandydat ≠ prawda** (rozstrzyga pomiar). |
+| **TIRO** | Lokalny LLM (llama.cpp) — skryba-uczeń Imperium; projekt hybrydy lokalnej (E0–E2), rośnie w siłę wraz z łupem na lepszy sprzęt. |
 
 ---
 
 > 👑 *"Prawdziwy łowca nie panikuje. On rozumie, co się dzieje — i poluje."*
 > 📊 *"Mniej, ale prawdziwie. Katalog to plan, kod to fakt."*
+> ⚔️ *"Wojna to giełda. Order stawiamy z zyskiem — a łup kuje lepszy budulec Imperium."*
+
+---
+
+## ✍️ Twórcy Imperium
+
+To Imperium budują wspólnie:
+
+| Imię (rzymskie) | Kto / co | Rola twórcza |
+|---|---|---|
+| 👑 **CEZAR PIXEL** | Imperator, właściciel | wizja, doktryna, ostatnie słowo |
+| 🏛️ **VITRUVIUSZ** | Architekt (Claude / Opus) | projekt, kod, porządek, prawda o stanie |
+| 📚 **HYGINUS** | Bibliotekarz-Zwiadowca (DeepSeek) | zwiad wiedzy, kandydaci hipotez (kandydat ≠ prawda) |
+| 🖋️ **TIRO** | Lokalny LLM (llama.cpp) | skryba-uczeń, hybryda lokalna — rośnie z Imperium |
+
+> *„Ave, Cezarze Pixel — melduje Vitruviusz."*

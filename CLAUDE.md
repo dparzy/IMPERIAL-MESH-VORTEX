@@ -582,6 +582,34 @@ wykryty alarm) są REAKTYWNE; **MELIORATIO działa ZAWSZE, w trakcie pracy** —
 - **Push robi WYŁĄCZNIE Cezar ręcznie** (`git push origin <branch>` w jego terminalu) —
   Claude nigdy nie pushuje, tylko melduje gotowość (patrz TRYB AUTONOMICZNY p.4). PR tylko na wyraźną prośbę.
 
+## 🌅 OTWARCIE SESJI — CHECKLISTA STAŁA (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-19)
+
+**Zamknięcie miało 9-krokową checklistę, otwarcie było tylko narracyjne (PRAWO XVII rozproszone) —
+ta sama klasa luki, którą złapaliśmy w zamknięciu. Tu zebrane w JEDNYM miejscu, symetrycznie.**
+Większość jest ZAUTOMATYZOWANA hookiem `SessionStart` (`.claude/hooks/session-start.sh`) — Twój
+obowiązek to PRZECZYTAĆ jego wydruk i ZAREAGOWAĆ (ZASADA CENSORA: alarm = zadanie, nie tapeta).
+Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
+
+1. **Przeczytaj wydruk hooka w całości** (kolejność drukowania): 🎯 **NASTĘPNY KROK** (banner na górze,
+   A2 — zawsze widoczny mimo ~25 KB) → **audyt Prawo XXI** (16 warstw) → **CODEX** (podsumowanie ledgera, C1)
+   → **Centrum Pamięci** (profil, Top-3 lekcji, aktywny cel W12, Refleksja W9) → **Dziennik Nieśmiertelny**
+   (pełna oś) → **skan wad ostatniego commitu**. Wydruk >25 KB bywa ucięty w podglądzie — pełna treść jest
+   w pliku `tool-results/hook-*.txt` (czytaj go, jeśli banner/plan zniknął z podglądu).
+2. **Audyt ≠ „pełna harmonia" → rozstrzygnij JAWNIE PRZED pierwszym zadaniem** (A3). Czerwony alarm audytu,
+   Prawo XV, Refleksja W9 czy limity pamięci to ZADANIA: napraw sam (błahostka, Prawo XVIII), zaplanuj
+   w Backlogu CODEX (średnie) albo spytaj Cezara (kierunkowe) — nigdy milczeniem.
+3. **SYNC:** „⚠️ nie fast-forward" dotyczy `pull` i zwykle jest normalne (lokalne commity). Realny rozjazd →
+   `git pull --rebase origin <branch>`. „SYNC ✅" = repo na najnowszym commicie.
+4. **Przed KAŻDYM nowym zadaniem — ZASADA WERYFIKACJI:** czy koncepcja już istnieje/zbadana? → CODEX +
+   żywy kod + kronika + Dziennik (kandydat≠prawda, POMIAR nie pamięć). Nie budujemy tego, co już mamy.
+5. **PRAWO XVII — rozpoznanie terenu:** liczby (neurony/zwiadowcy/testy) POLICZONE z kodu, nie z pamięci;
+   kod+testy > ZASADY > liczby z plików > pamięć.
+6. **Przedstaw się rzymsko** (Vitruviusz — Architekt) — ZASADA NOMENKLATURY.
+7. **Pokaż plan / pytania decyzyjne** wg rekomendacji+priorytetu (ZASADA RAPORTOWANIA I PODGLĄDU KAPITOLU).
+
+**Złamanie:** start bez przeczytania wydruku hooka; audyt/alarm ≠ harmonia zignorowany milczeniem;
+nowe zadanie bez weryfikacji „czy już istnieje"; liczby z pamięci zamiast z kodu.
+
 ## 🏁 KONIEC SESJI — CHECKLISTA STAŁA (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-19)
 
 **Kroki zamknięcia były ROZPROSZONE po tym pliku — brak jednej listy o mało nie spowodował pominięcia

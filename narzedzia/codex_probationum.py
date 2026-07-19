@@ -81,6 +81,23 @@ def _wczytaj_ledger(sciezka: Path = LEDGER) -> list:
     return rekordy
 
 
+def podsumowanie_ledger(sciezka: Path = LEDGER) -> str:
+    """Jednolinijkowe podsumowanie rejestru testów z ledgera JSONL — BEZ generowania
+    Excela (C1, uszczelnienie OTWARCIA 2026-07-19).
+
+    Tanie: czyta tylko rejestr_testow.jsonl, nie dotyka openpyxl ani żywych rejestrów.
+    Do wydruku na starcie sesji, żeby CODEX był widoczny w OTWARCIU tak, jak jest już
+    obecny w ZAMKNIĘCIU (ZASADA CODEX PROBATIONUM: czytany PRZED każdym zadaniem)."""
+    rek = _wczytaj_ledger(sciezka)
+    ab = sum(1 for r in rek if r.get("typ") == "AB")
+    ic = sum(1 for r in rek if r.get("typ") == "IC")
+    sug = sum(1 for r in rek if r.get("typ") == "SUGESTIA")
+    daty = [r.get("data") for r in rek if r.get("data")]
+    ost = max(daty) if daty else "—"
+    return (f"📜 CODEX PROBATIONUM (ledger): {len(rek)} rekordów — "
+            f"A/B {ab} | IC {ic} | Sugestie {sug} | ostatni wynik {ost}")
+
+
 def _zywotnosc_adapterow() -> dict:
     """{neuron: nota} z ostatniego cenzusu (arena XV_ZYWY). Brak bazy → {}."""
     try:
@@ -404,7 +421,7 @@ def zbierz_arkusze() -> dict:
         ["Wydajność backtestu (LINIOWY, nie O(n²))", "naprawa silnika", "CZĘŚCIOWO 2026-07-19", "P1",
          "ZMIERZONE: LINIOWE ~66ms/tik (nie kwadrat — premisa błędna). HMA hotspot#1 naprawiony bit-identycznie (commit 4466eda, ~25%). Pozostałe: bocpd~8%/supertrend~8%/HA~4% (path-dependent). Decyzja: chunkowany WFO vs pełna wektoryzacja"],
         ["Łańcuch SHA-256", "naprawa + walidacja", "PLANOWANE", "P2",
-         "hash_ok=True na sztywno (dyrygent); Hermes na ścieżce decyzyjnej, ZASADA WPIĘCIA"],
+         "flaga integralności ustawiona na sztywno w dyrygencie; Hermes na ścieżce decyzyjnej, ZASADA WPIĘCIA"],
         ["Włączenie flag Tier-1", "decyzja Cezara", "OCZEKUJE", "P2",
          "DVOL/STABLE pomagają na 4H; flagi opt-in OFF do decyzji"],
         ["A/B na pełnym oknie 1H/4H", "walidacja", "WOLNE (nie zablokowane)", "P1",
@@ -514,7 +531,13 @@ def main(argv=None) -> int:
                     help=f"ścieżka pliku .xlsx (domyślnie {DOMYSLNE_WYJSCIE})")
     ap.add_argument("--korelacje", action="store_true",
                     help="[PLAN] świeży przelicz korelacji całego roju — wolny (backtest LINIOWY, długie okno) — dziś z MATRYCA")
+    ap.add_argument("--podsumowanie", action="store_true",
+                    help="tylko jednolinijkowe podsumowanie ledgera (start sesji, C1) — bez Excela")
     args = ap.parse_args(argv)
+
+    if args.podsumowanie:
+        print(podsumowanie_ledger(), flush=True)
+        return 0
 
     print("📜 CODEX PROBATIONUM — zbieram żywe rejestry + ledger...", flush=True)
     arkusze = zbierz_arkusze()

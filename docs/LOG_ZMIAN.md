@@ -14,6 +14,41 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-19 | 🌅 | Uszczelnienie OTWARCIA sesji — Pakiet A+C1 (symetria do zamknięcia)
+
+**Powód (rozkaz Cezara):** zamknięcie sesji miało 9-krokową egzekwowaną checklistę, ale OTWARCIE było
+tylko narracyjne (PRAWO XVII rozproszone) — ta sama klasa luki, którą złapaliśmy w zamknięciu. Audyt
+mechanizmu startu (oba hooki + config) + subagent ekonomiczny (Sonnet, research unikatów spoza Imperium)
+dał katalog luk L1–L9 + 9 kandydatów zewnętrznych. Cezar zatwierdził **Pakiet A+C1**.
+
+**Wdrożone (A+C1, wszystko non-blocking — ZASADA WPIĘCIA):**
+- **A1+A3** `CLAUDE.md` — **🌅 OTWARCIE SESJI — CHECKLISTA STAŁA** (7 kroków, bliźniacza do zamknięcia):
+  przeczytaj wydruk hooka → audyt≠harmonia rozstrzygnij JAWNIE → SYNC → weryfikacja „czy już istnieje" →
+  rozpoznanie terenu (liczby z kodu) → przedstaw się rzymsko → pokaż plan/pytania.
+- **A2** `dziennik_niesmiertelny.py` — subkomenda `nastepny` + `banner_nastepny()`: jednolinijkowy banner
+  NASTĘPNEGO KROKU drukowany na GÓRZE hooka (luka L7: wydruk ~25 KB ucinał plan w podglądzie).
+- **A4** `skan_wad_kodu.py` — flaga `--ostatni-commit` + `_py_ostatni_commit()` + wspólny `_filtruj_py()`:
+  skan startowy zmienionych plików był no-op na czystym drzewie → teraz skanuje ostatni commit (regresje
+  po SYNC pull).
+- **C1** `codex_probationum.py` — flaga `--podsumowanie` + `podsumowanie_ledger()`: jednolinijkowe
+  podsumowanie ledgera na starcie (bez Excela) — domyka asymetrię (CODEX był tylko w zamknięciu).
+- `.claude/hooks/session-start.sh` — banner (krok 0.5), CODEX (krok 2b), skan→`--ostatni-commit` (krok 6).
+
+**Uodpornienie (ZASADA CENSORA):** skan złapał chroniczny FP w `codex_probationum.py` (regex „bezpiecznik"
+trafiał w podłańcuch `hash_ok=True` w prozie Backlogu) — przeredagowano opis, by nie wyglądał jak kod
+(Księga Wad #35: chroniczny FP uczy ignorować bramkę).
+
+**Odłożone do decyzji (katalog):** B1 PORTITOR (pre-flight środowiska/danych — nowy organ), B3 smoke-testy,
+D1 delta między sesjami, E1 auto-kompakcja pamięci, F1/F2 bramki live (przed paper→live).
+
+**Testy:** +5 banner (dziennik) +3 podsumowanie (codex) +7 skan (nowy `test_skan_wad_kodu.py`). Ruff czysto.
+
+**Pliki:** `CLAUDE.md`, `.claude/hooks/session-start.sh`, `imperium/biblioteki/dziennik_niesmiertelny.py`,
+`narzedzia/codex_probationum.py`, `narzedzia/skan_wad_kodu.py`, `tests/test_dziennik_niesmiertelny.py`,
+`tests/test_codex_probationum.py`, `tests/test_skan_wad_kodu.py`, `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-07-19 | 📜 | Konsolidacja zasad zamknięcia sesji (+ CODEX) + skodyfikowanie standing-orderów
 
 **Powód (zmierzone tej sesji):** kroki zamknięcia sesji były ROZPROSZONE po `CLAUDE.md` (Dziennik u góry,

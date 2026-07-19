@@ -203,6 +203,23 @@ def brak_wpisu_dzis(plik: Optional[Path] = None) -> bool:
     return not last or last.get("data") != _dzis()
 
 
+def banner_nastepny(plik: Optional[Path] = None) -> str:
+    """Zwięzły, JEDNOLINIJKOWY banner NASTĘPNEGO KROKU z ostatniego wpisu — do wydruku
+    na GÓRZE startu sesji (A2, uszczelnienie OTWARCIA 2026-07-19).
+
+    Powód (luka L7 zmierzona 2026-07-19): pełny wydruk hooka startowego (~25 KB) ucinał
+    podgląd w harnessie i „→ następny" z Dziennika wypadał poza pierwsze okno — trzeba było
+    czytać plik tymczasowy, żeby w ogóle zobaczyć plan. Ta jedna linia u samej góry jest
+    zawsze widoczna, niezależnie od długości reszty wydruku. `_skroc` koercuje str() →
+    odporne na brudny/nietekstowy `nastepny` (jak reszta formatowania osi)."""
+    w = ostatni_wpis(plik)
+    if not w:
+        return "🎯 NASTĘPNY KROK — Dziennik pusty (pierwsza sesja ustali kierunek)."
+    nast = _skroc(w.get("nastepny") or "", 240)
+    return (f"🎯 NASTĘPNY KROK (Dziennik, sesja {w.get('sesja', '')}, {w.get('data', '?')}): "
+            f"{nast or '(brak — ustal na starcie)'}")
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -218,6 +235,7 @@ if __name__ == "__main__":
     p_f = sub.add_parser("full", help="Cała oś czasu (do wstrzyknięcia)")
     p_f.add_argument("--ostatnie", type=int, default=None)
     sub.add_parser("ostatni", help="Ostatni wpis")
+    sub.add_parser("nastepny", help="Banner NASTĘPNEGO KROKU (jedna linia na górę startu)")
     p_s = sub.add_parser("szukaj", help="Szukaj w osi czasu")
     p_s.add_argument("zapytanie")
 
@@ -231,6 +249,8 @@ if __name__ == "__main__":
     elif args.cmd == "ostatni":
         w = ostatni_wpis()
         print(_formatuj_wpis(w) if w else "(pusty)")
+    elif args.cmd == "nastepny":
+        print(banner_nastepny())
     elif args.cmd == "szukaj":
         for w in szukaj(args.zapytanie):
             print(_formatuj_wpis(w, pelny=False))

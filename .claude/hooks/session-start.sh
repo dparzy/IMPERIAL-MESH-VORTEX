@@ -32,6 +32,14 @@ if git rev-parse --git-dir >/dev/null 2>&1; then
   fi
 fi
 
+# 0.5) NASTĘPNY KROK na GÓRZE (A2 — uszczelnienie OTWARCIA 2026-07-19).
+#      Powód (luka L7): pełny wydruk hooka (~25 KB) ucinał podgląd w harnessie i plan
+#      „→ następny" z Dziennika wypadał poza pierwsze okno. Ta jedna linia u samej góry
+#      jest zawsze widoczna, zanim audyt/pamięć zaleją ekran.
+if [ -f imperium/biblioteki/dziennik_niesmiertelny.py ]; then
+  python -m imperium.biblioteki.dziennik_niesmiertelny nastepny || true
+fi
+
 # 1) Instalacja zależności — tylko w środowisku zdalnym (lokalnie masz swoje venv)
 if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ]; then
   if [ -f requirements.txt ]; then
@@ -49,6 +57,14 @@ fi
 if [ -f narzedzia/audyt_spojnosci.py ]; then
   echo "[hook] KROK 0 — audyt spójności (Prawo XXI):"
   python narzedzia/audyt_spojnosci.py || true
+fi
+
+# 2b) CODEX PROBATIONUM — podsumowanie rejestru testów na starcie (C1 — 2026-07-19).
+#     Domyka asymetrię: CODEX był tylko w ZAMKNIĘCIU (krok 2 checklisty). Tanie — czyta
+#     ledger JSONL, NIE generuje Excela (ZASADA CODEX PROBATIONUM: czytany PRZED zadaniem).
+if [ -f narzedzia/codex_probationum.py ]; then
+  echo "[hook] CODEX PROBATIONUM (podsumowanie ledgera):"
+  python narzedzia/codex_probationum.py --podsumowanie || true
 fi
 
 # 3) CENTRUM PAMIĘCI (W-360 v5) — scored TOP-k lekcji (Generative Agents: recency×importance×relevance)
@@ -93,9 +109,10 @@ if [ -f narzedzia/auto_lekcja.py ]; then
 fi
 
 # 6) SKAN WAD KODU — heurystyczny łowca powtórek błędów z recenzji (Księga Wad Kodu).
-#    Non-blocking (|| true): pokazuje trafienia na zmienionych .py, nie wstrzymuje startu.
-#    To pamięć „co MOŻE pójść źle" — łapiemy sami to, co wcześniej łapał tylko cubic.
+#    Non-blocking (|| true). Na starcie skanuje OSTATNI COMMIT (A4 — 2026-07-19): skan
+#    zmienionych plików był no-op na czystym drzewie („brak plików"). Po SYNC pull łapie
+#    regresje w świeżo pociągniętym/zacommitowanym kodzie. Pełny skan zmian → pre-push.
 if [ -f narzedzia/skan_wad_kodu.py ]; then
-  echo "[hook] SKAN WAD KODU (Księga Wad Kodu):"
-  python narzedzia/skan_wad_kodu.py || true
+  echo "[hook] SKAN WAD KODU (ostatni commit — Księga Wad Kodu):"
+  python narzedzia/skan_wad_kodu.py --ostatni-commit || true
 fi

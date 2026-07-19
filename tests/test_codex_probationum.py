@@ -89,6 +89,34 @@ def test_macierz_rol_ma_kolumny_strategii():
     assert len(naglowek) == 1 + len(wszystkie_strategie())
 
 
+def test_podsumowanie_ledger_pusty(tmp_path):
+    """Granica: brak ledgera → 0 rekordów, ostatni wynik '—', bez wyjątku (C1)."""
+    s = cp.podsumowanie_ledger(tmp_path / "nie_ma.jsonl")
+    assert "0 rekordów" in s and "A/B 0" in s and "IC 0" in s and "—" in s
+
+
+def test_podsumowanie_ledger_liczy_typy(tmp_path):
+    """Podsumowanie zlicza A/B, IC, Sugestie i pokazuje najświeższą datę."""
+    p = tmp_path / "l.jsonl"
+    p.write_text(
+        '{"typ":"AB","neuron":"X","data":"2026-07-10"}\n'
+        '{"typ":"AB","neuron":"Y","data":"2026-07-18"}\n'
+        '{"typ":"IC","neuron":"Z","data":"2026-07-12"}\n'
+        '{"typ":"SUGESTIA","element":"nowy arkusz","data":"2026-07-15"}\n',
+        encoding="utf-8")
+    s = cp.podsumowanie_ledger(p)
+    assert "4 rekordów" in s and "A/B 2" in s and "IC 1" in s and "Sugestie 1" in s
+    assert "2026-07-18" in s          # max daty, nie ostatnia linia
+
+
+def test_podsumowanie_ledger_bez_daty(tmp_path):
+    """Granica: rekordy bez pola 'data' → nie wywalają max(); ostatni wynik '—'."""
+    p = tmp_path / "l.jsonl"
+    p.write_text('{"typ":"AB","neuron":"X"}\n', encoding="utf-8")
+    s = cp.podsumowanie_ledger(p)
+    assert "1 rekordów" in s and s.rstrip().endswith("—")
+
+
 def test_zapis_xlsx_generuje_arkusze(tmp_path):
     """Zapis .xlsx (tylko gdy openpyxl) → plik istnieje, ma 12 arkuszy, Neurony pełne."""
     load_workbook = pytest.importorskip("openpyxl").load_workbook

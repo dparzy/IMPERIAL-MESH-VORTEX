@@ -33,6 +33,8 @@ POLA_AB = ("typ", "sygnal", "neuron", "interwal", "okno_barow", "roi_b", "roi_a"
            "delta_pp", "maxdd_delta", "werdykt", "data", "zrodlo", "uwaga")
 POLA_IC = ("typ", "sygnal", "neuron", "horyzont", "ic", "tryb", "prog", "werdykt",
            "kierunek", "data", "zrodlo", "uwaga")
+POLA_SUGESTIA = ("typ", "element", "dzial", "uzasadnienie", "zgodnosc_imperium",
+                 "status", "data", "zrodlo")
 
 
 def _dzis() -> str:
@@ -100,3 +102,26 @@ def zapisz_ic(*, sygnal: str, neuron: str, horyzont: str, ic: float, tryb: str,
         "zrodlo": zrodlo, "uwaga": uwaga,
     }
     return _dopisz(rekord, sciezka)
+
+
+def zapisz_sugestia(*, element: str, dzial: str, uzasadnienie: str,
+                    zgodnosc_imperium: str, status: str = "KANDYDAT", zrodlo: str,
+                    data: str | None = None, sciezka: Path = LEDGER) -> bool:
+    """Dopisuje SUGESTIĘ rozbudowy (KANDYDAT — Prawo I) do arkusza Sugestie CODEX.
+
+    Idempotencja po ELEMENCIE (nie po całym rekordzie z datą): sugestia to UNIKAT
+    (jedna pozycja backlogu), nie szereg czasowy pomiarów — ta sama sugestia w innym
+    dniu/biegu NIE dubluje linii. Status aktualizuje się ręcznie w ledgerze/generatorze.
+    """
+    rekord = {
+        "typ": "SUGESTIA", "element": element, "dzial": dzial,
+        "uzasadnienie": uzasadnienie, "zgodnosc_imperium": zgodnosc_imperium,
+        "status": status, "data": data or _dzis(), "zrodlo": zrodlo,
+    }
+    for r in _wczytaj(sciezka):
+        if r.get("typ") == "SUGESTIA" and r.get("element") == element:
+            return False   # sugestia o tym elemencie już jest — nie dubluj
+    sciezka.parent.mkdir(parents=True, exist_ok=True)
+    with sciezka.open("a", encoding="utf-8") as f:
+        f.write(_linia(rekord) + "\n")
+    return True

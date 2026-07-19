@@ -13,7 +13,8 @@ import json
 import tempfile
 from pathlib import Path
 
-from narzedzia.scriba_codex import zapisz_ab, zapisz_ic, POLA_AB, POLA_IC
+from narzedzia.scriba_codex import (zapisz_ab, zapisz_ic, zapisz_sugestia,
+                                    POLA_AB, POLA_IC, POLA_SUGESTIA)
 
 
 def _tmp():
@@ -23,6 +24,28 @@ def _tmp():
 
 def _linie(p):
     return [json.loads(x) for x in p.read_text(encoding="utf-8").splitlines() if x.strip()]
+
+
+def test_sugestia_dopisuje_i_dedupuje_po_elemencie():
+    p = _tmp()
+    ok = zapisz_sugestia(element="Sigillum Datae", dzial="reprodukowalnosc",
+                         uzasadnienie="hash SHA-256 barow przy wpisie", zgodnosc_imperium="TAK",
+                         zrodlo="zwiadowca", sciezka=p)
+    assert ok is True
+    r = _linie(p)[0]
+    assert r["typ"] == "SUGESTIA" and r["status"] == "KANDYDAT"
+    assert set(r.keys()) == set(POLA_SUGESTIA)   # schemat 1:1 z codex (Prawo XXI)
+    # Ta sama sugestia (element) innego dnia → NIE dubluje (unikat, nie szereg czasowy)
+    ok2 = zapisz_sugestia(element="Sigillum Datae", dzial="reprodukowalnosc",
+                          uzasadnienie="inny opis", zgodnosc_imperium="TAK",
+                          zrodlo="zwiadowca", data="2099-01-01", sciezka=p)
+    assert ok2 is False
+    assert len(_linie(p)) == 1
+    # Inny element → dopisuje
+    assert zapisz_sugestia(element="Custos Arcanorum", dzial="bezpieczenstwo",
+                           uzasadnienie="skan sekretow", zgodnosc_imperium="TAK",
+                           zrodlo="zwiadowca", sciezka=p) is True
+    assert len(_linie(p)) == 2
 
 
 def test_ab_dopisuje_i_liczy_delta():

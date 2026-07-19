@@ -409,6 +409,8 @@ def zbierz_arkusze() -> dict:
          "DVOL/STABLE pomagają na 4H; flagi opt-in OFF do decyzji"],
         ["A/B na pełnym oknie 1H/4H", "walidacja", "WOLNE (nie zablokowane)", "P1",
          "backtest LINIOWY (~52ms/tik po HMA) → pełne okno wykonalne ale wolne; chunkowany WFO odblokuje. Dziś testowane okno 800 barów (1H=33 dni, nierozstrzygające)"],
+        ["Chunkowany wznawialny WFO", "orkiestracja", "ZROBIONE 2026-07-19", "—",
+         "narzedzia/wfo_chunked.py: checkpoint per-okno (raporty/wfo_ckpt/*.jsonl keyed sygnaturą), wznawianie od niezapisanego okna, pasek postępu (Prawo XXIV), podgląd Kapitolu. Refaktor walk_forward (ewaluuj_okno+agreguj) zachowuje zachowanie. +8 testów (równoważność, wznowienie bez przeliczania). ZASADA ANALIZY CZĄSTKOWEJ — pad nie traci nic"],
         # Alarmy hooka startowego = zadania, nie tapeta (ZASADA CENSORA, 2026-07-18)
         ["Konsolidacja LEKCJI pamięci (39k zn. > limit 24k)", "higiena pamięci", "ZROBIONE 2026-07-19", "—",
          "archiwizacja wg wartości retencji: 180→94 aktywnych, 86 do PAMIEC_SESJI_ARCHIWUM.md; sekcja 39244→21962 zn; nic nie skasowane (konsoliduj_lekcje, +4 testy)"],

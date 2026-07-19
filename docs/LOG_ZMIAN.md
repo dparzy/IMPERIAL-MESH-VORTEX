@@ -14,6 +14,34 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-19 | 🧩 | Chunkowany wznawialny WFO (Cursus Fenestrarum) — ZASADA ANALIZY CZĄSTKOWEJ
+
+**Co:** `narzedzia/wfo_chunked.py` — walk-forward cząstkowy i WZNAWIALNY. Każde OKNO to najmniejsza
+jednostka: policz → ZAPISZ checkpoint → następne. Bieg który padnie NIE traci nic — wznawia od
+pierwszego niezapisanego okna (lekcja: WFO „wisiał godzinami synchronicznie, padał = tracił wszystko").
+Checkpoint `raporty/wfo_ckpt/<sygnatura>.jsonl` (gitignore=widok), sygnatura = hash configu
+(plik/interwał/IS/OOS/okno/iteracje/lo/hi/seed/zakotwiczony) → inny config = inny plik, zero mieszania.
+Pasek postępu per okno na stderr (Prawo XXIV). Zero-tokenowy podgląd Kapitolu (WFE + Sharpe OOS per okno).
+
+**Refaktor rdzenia (zachowuje zachowanie):** `imperium/koloseum/walk_forward.py` — wyodrębniono
+`ewaluuj_okno()` (najmniejsza wznawialna jednostka, deterministyczna przy stałym seed) + `agreguj()`
+(czysta agregacja z cząstek). `walk_forward()` zyskał opt-in haki `checkpoint_cb`/`postep_cb`/`wznow`
+(domyślnie None = zachowanie bez zmian). Determinizm `optymalizuj(seed)` → okno policzone dwa razy =
+identyczny wynik, więc wznawianie bezpieczne (zero zmiany wyniku — dowód: test równoważności).
+
+**Fail-fast:** guard `IS/OOS > okno` ZANIM policzy jakiekolwiek okno (backtest wymaga wycinka > okno) —
+złapane smoke-testem, nie marnuje pracy w środku biegu.
+
+**Dowód (smoke-test e2e, mini-CSV):** bieg 0/3→liczy 3 okna z paskiem; ponowny bieg „3/3 wznowione,
+tylko agregacja" (✓, bez przeliczania), IDENTYCZNY werdykt (PRZEUCZONY, WFE −0.177, OOS Sharpe +0.086).
++8 testów (round-trip checkpointu, wznowienie bez przeliczania, częściowe wznowienie liczy tylko brakujące,
+uszkodzony checkpoint pomijany).
+
+**Pliki:** `imperium/koloseum/walk_forward.py`, `narzedzia/wfo_chunked.py`, `tests/test_wfo_chunked.py`,
+`narzedzia/codex_probationum.py` (Backlog).
+
+---
+
 ## 2026-07-19 | ⚡ | Wydajność backtestu: LINIOWY (nie O(n²)) + naprawa HMA + Speculum Probationis (podgląd Kapitolu)
 
 **Diagnoza (pomiar > pamięć, ZASADA DEBUGOWANIA):** dawna teza „backtest O(n²)" była **BŁĘDNA**.

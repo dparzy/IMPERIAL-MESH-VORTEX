@@ -14,6 +14,7 @@ import tempfile
 from pathlib import Path
 
 from narzedzia.scriba_codex import (zapisz_ab, zapisz_ic, zapisz_sugestia,
+                                    zamknij_sugestia,
                                     POLA_AB, POLA_IC, POLA_SUGESTIA)
 
 
@@ -122,3 +123,37 @@ def test_pusty_plik_tworzy_sie():
                      zrodlo="t", sciezka=p) is True
     assert p.exists()
     assert len(_linie(p)) == 1
+
+
+def test_zamknij_sugestia_dopisuje_rekord_zamkniecia():
+    """Zamknięcie to NOWA linia z tym samym elementem (Prawo I: historii nie kasujemy)."""
+    p = _tmp()
+    zapisz_sugestia(element="E1", dzial="Wydajnosc", uzasadnienie="u",
+                    zgodnosc_imperium="tak", zrodlo="t", data="2026-07-19", sciezka=p)
+    assert zamknij_sugestia(element="E1", powod="teza obalona pomiarem",
+                            zrodlo="t", data="2026-07-19", sciezka=p) is True
+    linie = _linie(p)
+    assert len(linie) == 2                      # oryginał ZOSTAJE
+    assert linie[0]["status"] == "KANDYDAT"
+    assert linie[1]["status"] == "ZAMKNIETE"
+    assert linie[1]["element"] == "E1"
+    assert linie[1]["dzial"] == "Wydajnosc"     # kontekst przepisany z oryginału
+
+
+def test_zamknij_sugestia_nieistniejaca_rzuca():
+    p = _tmp()
+    try:
+        zamknij_sugestia(element="NIE MA", powod="x", zrodlo="t", sciezka=p)
+        assert False, "powinien rzucić ValueError dla nieistniejącej sugestii"
+    except ValueError:
+        pass
+
+
+def test_zamknij_sugestia_idempotentne():
+    p = _tmp()
+    zapisz_sugestia(element="E2", dzial="D", uzasadnienie="u",
+                    zgodnosc_imperium="tak", zrodlo="t", data="2026-07-19", sciezka=p)
+    kw = dict(element="E2", powod="powod", zrodlo="t", data="2026-07-19", sciezka=p)
+    assert zamknij_sugestia(**kw) is True
+    assert zamknij_sugestia(**kw) is False      # identyczny rekord nie dubluje
+    assert len(_linie(p)) == 2

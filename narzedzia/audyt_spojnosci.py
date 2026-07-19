@@ -762,7 +762,8 @@ def _warstwa_13_ruff():
         return bledy, info
 
     if wynik.returncode == 0:
-        info.append("Ruff (W13): czysto ✅ (F/E9/E711-714/B006-008/B904/PLE — bez bugów/martwego kodu)")
+        info.append("Ruff (W13): czysto ✅ (F/E9/E711-714/B006-008/B904/PLE/RUF034 "
+                    "— bez bugów/martwego kodu)")
         return bledy, info
     linie = [l for l in wynik.stdout.strip().splitlines() if l.strip()]
     if not linie:

@@ -11,6 +11,11 @@
 #         współdzielonego stanu między wywołaniami).
 #   B904 = `raise` w `except` bez `from` — gubi łańcuch traceback (utrudnia debug).
 #   PLE  = błędy pylintu (realne, nie styl).
+#   RUF034 = bezużyteczny if-else (obie gałęzie zwracają to samo). Dodane 2026-07-19
+#         po realnym znalezisku: gubernator.py miał `OBRONA if <zawsze-prawda> else OBRONA`
+#         — martwy warunek karmiony zmienną liczoną wyłącznie dla niego. Testy tego NIE
+#         łapały (asercja `postawa in (OBRONA, KWARANTANNA)` przechodzi zawsze).
+#         Zmierzone: 1 trafienie w całym repo (naprawione) → sygnał >> szum.
 #
 # Każda reguła wybrana bo łapie BUG, nie styl. Mierzone, nie zgadywane (Prawo XVI):
 # pełny zestaw jest zielony na całym kodzie. Rozszerzamy dalej tylko gdy nowa reguła
@@ -20,4 +25,4 @@ line-length = 120
 target-version = "py310"
 
 [lint]
-select = ["F", "E9", "E711", "E712", "E714", "B006", "B008", "B904", "PLE"]
+select = ["F", "E9", "E711", "E712", "E714", "B006", "B008", "B904", "PLE", "RUF034"]

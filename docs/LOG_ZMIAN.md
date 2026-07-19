@@ -45,9 +45,31 @@ Imperium**, nie tylko README; przy wyborze co prostować najpierw — wsparcie s
    funkcji modułowych = twarda porażka. Zweryfikowano: 0 istniejących plików miało zero (nic nie psuje).
    Testy przepisane w stylu funkcyjnym: **2584 → 2596** (12 realnie bramkowanych).
 
-**Pliki:** `README.md`, `narzedzia/tabularium.py`, `imperium/biblioteki/codex_notarum.py`,
-`tests/test_codex_notarum.py`, `tests/run_tests.py`, `CLAUDE.md`, `docs/ARCHITEKTURA_IMPERIUM.md`,
-`docs/INDEKS_IMPERIUM.md`, `bibliotheca_ulpia/dane/codex_notarum.jsonl`.
+**SWEEP CAŁEGO IMPERIUM (subagent-zwiadowca + weryfikacja sędziego) — 2 kolejne błędy złapane:**
+
+4. **Ledger CODEX kłamał:** sugestia „Naprawa backtestu O(n^2)" wisiała ze statusem `OCZEKUJE decyzji
+   Cezara`, mimo że tego samego dnia teza została **obalona pomiarem** (backtest LINIOWY, ms/tik stały
+   ~66). LOG_ZMIAN ogłosił korektę — ledger jej NIGDY nie dostał. Źródło prawdy testów wprowadzało w błąd.
+   → CORONA: **`scriba_codex.zamknij_sugestia()`** — pierwszorzędne API zamykania/korygowania sugestii
+   (append-only, kontekst przepisany z oryginału, ValueError gdy sugestia nie istnieje) + 3 testy granic.
+   **Root cause klasy:** zamykanie nie miało własnego API, więc robiono je „w widoku" i ginęło.
+   Sugestia realnie zamknięta (Sugestie 18→19).
+
+5. **`gubernator.py:110` — martwa gałąź:** `return OBRONA if KOLEJNOSC_POSTAW.index(OBRONA) <= idx + 1
+   else OBRONA` — **obie gałęzie identyczne**, warunek zawsze prawdziwy (index(OBRONA)=1 ≤ idx+1 dla
+   idx≥0), a `idx` liczony wyłącznie dla martwego warunku. Test asertował tylko `postawa in (OBRONA,
+   KWARANTANNA)`, więc nigdy by tego nie złapał. Uproszczone **BIT-IDENTYCZNIE** (16/16 testów).
+   → CORONA/UODPORNIENIE: **RUF034 włączone na stałe w `ruff.toml`** (zmierzone: 1 trafienie w całym
+   repo, naprawione → sygnał >> szum). **OTWARTE (decyzja Cezara, dotyka sizingu → wymaga A/B):**
+   czy „co najwyżej OBRONA" ma znaczyć min(obecna, OBRONA) — dziś KWARANTANNA JEST podnoszona do OBRONY.
+
+**Bilans not:** 5 NOTA / 5 CORONA, saldo +0, **dług honorowy 0** (`codex_notarum bilans`).
+
+**Pliki:** `README.md`, `narzedzia/tabularium.py`, `narzedzia/scriba_codex.py`,
+`imperium/biblioteki/codex_notarum.py`, `imperium/koloseum/gubernator.py`, `ruff.toml`,
+`tests/test_codex_notarum.py`, `tests/test_scriba_codex.py`, `tests/run_tests.py`, `CLAUDE.md`,
+`docs/ARCHITEKTURA_IMPERIUM.md`, `docs/INDEKS_IMPERIUM.md`,
+`bibliotheca_ulpia/dane/codex_notarum.jsonl`, `bibliotheca_ulpia/dane/rejestr_testow.jsonl`.
 
 ---
 

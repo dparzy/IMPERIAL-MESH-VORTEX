@@ -125,3 +125,34 @@ def zapisz_sugestia(*, element: str, dzial: str, uzasadnienie: str,
     with sciezka.open("a", encoding="utf-8") as f:
         f.write(_linia(rekord) + "\n")
     return True
+
+
+def zamknij_sugestia(*, element: str, powod: str, zrodlo: str,
+                     status: str = "ZAMKNIETE", data: str | None = None,
+                     sciezka: Path = LEDGER) -> bool:
+    """Zamyka/koryguje istniejącą SUGESTIĘ — dopisując rekord zamknięcia (append-only).
+
+    Powód istnienia (zmierzone 2026-07-19): sugestia „Naprawa backtestu O(n^2)" została
+    obalona pomiarem (backtest jest LINIOWY), LOG_ZMIAN ogłosił korektę — ale ledger
+    NIGDY jej nie dostał i dalej pokazywał „OCZEKUJE decyzji Cezara". Przyczyna klasy:
+    zamykanie sugestii nie miało własnego API, więc robiono je „w widoku" i ginęło.
+    Teraz zamknięcie jest operacją pierwszej kategorii, tak samo jak zapis.
+
+    Historii NIE falsyfikujemy (Prawo I): pierwotny wpis zostaje, zamknięcie to NOWA
+    linia z tym samym `element`. Zamknąć można tylko sugestię, która realnie istnieje.
+    """
+    istniejace = _wczytaj(sciezka)
+    zrodlowa = next((r for r in istniejace
+                     if r.get("typ") == "SUGESTIA" and r.get("element") == element), None)
+    if zrodlowa is None:
+        raise ValueError(
+            f"zamknij_sugestia: brak SUGESTII o elemencie '{element}' — "
+            "nie zamykamy czegoś, czego nie ma (KANDYDAT≠PRAWDA)."
+        )
+    rekord = {
+        "typ": "SUGESTIA", "element": element, "dzial": zrodlowa.get("dzial", ""),
+        "uzasadnienie": powod,
+        "zgodnosc_imperium": zrodlowa.get("zgodnosc_imperium", ""),
+        "status": status, "data": data or _dzis(), "zrodlo": zrodlo,
+    }
+    return _dopisz(rekord, sciezka)

@@ -58,3 +58,8 @@ docs/KOLEJKA_HIPOTEZ_BIBLIOTEKARZ.jsonl
 # w start sesji to zawsze decyzja Cezara, nie automat). Serwery żyją w kodzie:
 # narzedzia/rag/mcp_server.py (biblioteka RAG) + narzedzia/arena_mcp.py (arena).
 .mcp.json
+
+# Kopie zapasowe danych z naprawy (narzedzia/audyt_danych.py --napraw) — 2026-07-20.
+# Setki MB surowych CSV; oryginal i tak jest poza repo (dane/**/*.csv), a kopia sluzy
+# WYLACZNIE do cofniecia naprawy na tej maszynie.
+dane/_kopie/

@@ -14,6 +14,92 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-20 | 🔬 | AUDYT DANYCH: 1H pochodziło od pośrednika — 245 barów naprawionych + hipoteza interwału
+
+### Powód (rozkaz Cezara)
+
+*„sprawdź interwały 4h, ściągnij inny sampel z netu, bo kiedyś jakiś moduł sam przerabiał z 1h na 4h,
+może coś popsuł — zrób audyt"*. Podejrzenie padło na 4h. **Pomiar odwrócił kierunek: zepsute było 1H.**
+
+### Organ: `narzedzia/audyt_danych.py` — trzy warstwy (Prawo XVI, każda pyta o co innego)
+
+| Warstwa | Pyta | Sieć |
+|---|---|---|
+| **W1 STRUKTURA** | siatka UTC, monotoniczność, duplikaty, sensowność OHLC | nie |
+| **W2 KRZYŻOWA** | czy 1h zagregowane do 4h zgadza się z plikiem 4h | nie |
+| **W3 ŹRÓDŁO** | czy zgadza się z publicznym API Binance | tak |
+
+### Trzy klasy wad — wszystkie ZMIERZONE
+
+**1. Pochodzenie danych.** `dane/godzinowe/*.csv` → **CryptoDataDownload** (pośrednik), `dane/4h/*.csv`
+→ **binance.com**. Dlatego 4h zgadzało się ze źródłem, a 1h nie.
+Dowód rozstrzygający (ETH 2021-01-11 08:00): nasz 4h `low=1049.01` = **Binance 1049.01** ✅,
+nasz 1h `low=1063.00` ❌. Świece godzinowe **gubiły knot** — dołek zawyżony o 1.3%.
+**Dlaczego to nie kosmetyka:** zawyżony dołek = stop-loss, który w rzeczywistości by poleciał,
+w backteście NIE leci → wynik obciążony **optymistycznie**.
+
+**2. Bary poza siatką UTC.** 43 kolejne bary przesunięte o 28m14s (2018-02-09 09:28 → 02-11 03:28)
+w BTC, ETH, BNB, LTC. W tych oknach **brak poprawnych godzinówek**, a Binance ma komplet — to agregaty
+INNYCH okien, więc podmiana wartości nie wystarcza: wymieniono cały odcinek (`napraw_siatke`).
+Binance sam nie ma jednego z tych barów (realna przerwa giełdy) — **luki nie dorabiamy** (Prawo I).
+
+**3. Świeca niedomknięta.** Ostatni bar KAŻDEGO z 15 plików 4h miał zaniżony wolumen (BTC 741 vs 902)
+— świeca złapana w trakcie formowania, licząca się jak pełna. Naprawa poszła **do czytnika**
+(`czytnik_csv.pomin_niedomkniety`), nie do plików: łatanie plików wracałoby przy każdym pobraniu.
+Warunek czasowy → dane historyczne NIETKNIĘTE, a chroni backtest, paper i live jednym ruchem.
+
+### Wynik naprawy
+
+**245 barów w 15 parach** (46 OHLC + wolumeny + 3 odcinki siatki po 42 bary). Kopie w `dane/_kopie/`
+(dane są poza gitem — bez kopii zmiana byłaby nieodwracalna; katalog dopisany do `.gitignore`, 127 MB).
+Weryfikacja: **BTC 75 954 barów zgodnych z Binance co do grosza**, wszystkie 15 par czyste w W1+W2.
+
+**Rozkład dat uszkodzeń jest wymowny:** 2021-01-11 (krach), 2021-04-23, 2021-10-29, 2021-12-24,
+2022-04-13 — **dni incydentów giełdowych**. Pośrednik gubił dane dokładnie wtedy, gdy działo się najwięcej.
+
+**Zero zmian po 2024-01-01** → okno testu hipotezy interwału (start 2024-01-28) **nietknięte**;
+wynik poniżej stoi na danych, których naprawa nie dotyczyła (sprawdzone przez porównanie kopii z plikiem).
+
+### Hipoteza interwału — POTWIERDZONA (`narzedzia/sym_porownanie_tf.py`, rozszerzone o 1d + CLI + pasek)
+
+BTC+ETH, **to samo okno kalendarzowe, identyczna konfiguracja**, zmienia się wyłącznie interwał:
+
+| interwał | ROI% | maxDD% | transakcje | win rate |
+|---|---|---|---|---|
+| 1d | **+9.80** | 0.04 | 22 | 50.0% |
+| 4h | **+3.93** | 0.12 | 178 | 49.4% |
+| 1h | **−4.38** | 0.14 | 647 | 48.5% |
+
+Zależność **monotoniczna**: krótszy interwał → niższy ROI, więcej transakcji (22 → 178 → 647), wyższe
+obsunięcie, spadający win rate. Mechanika przegranej: **win rate poniżej progu opłacalności × 30-krotnie
+więcej transakcji**. 1H nie ma słabego sygnału — ma za dużo okazji przy zbyt cienkiej przewadze.
+Podgląd: `raporty/KAPITOL_PODGLAD_hipoteza_interwalu.html`.
+
+**Konsekwencja operacyjna:** odłożenie powtórek Stablecoin/USD-DXY na 1H było trafne — te ~6 h poszłoby
+na szukanie przewagi w grze przegranej na poziomie interwału. Testy Tier-1 przenieść na 4h/1d.
+
+**Ranga wg SCALA FIDEI: szczebel 1–2** (EXPLORATIO + pełne okno) na jednej parze aktywów. Do statusu
+reguły brakuje TRANSLATIO (inne pary) i wyrównania okien (narzędzie tnie po LICZBIE BARÓW, więc realne
+zakresy rozjeżdżają się o ~2 miesiące — usterka wykryta w trakcie, do poprawy). **Nic nie wpięte.**
+
+### Luka odkryta przy okazji
+
+**Brak plików 5m/15m** — mamy dane 1-minutowe (14 par, ~1450 dni), ale nikt ich nie zagregował, więc
+**profil SCALP (Namiestnik W-323 mapuje M1–M15) nigdy nie był testowany**. Falsyfikowalna prognoza:
+jeśli zależność jest monotoniczna, 15m i 5m wyjdą **jeszcze gorzej** — jeśli lepiej, teza o interwale upada.
+
+### Księga Wad +3 (43)
+
+- **pochodzenie danych:** pośrednik traktowany jak giełda (błędy skupione w dniach incydentów)
+- **pochodzenie danych:** mieszane pochodzenie w jednym katalogu — plik pochodny NIE może być sędzią
+  dla swojego źródła (detektor krzyżowy milczy, gdy oba mają ten sam błąd)
+- **wnioskowanie:** wniosek z przesłanki POŚREDNIEJ zamiast pomiaru wprost — 3 własne przypadki tego dnia
+
+**Pliki:** `narzedzia/audyt_danych.py` (nowy), `narzedzia/sym_porownanie_tf.py`,
+`imperium/akwedukty/czytnik_csv.py`, `narzedzia/kapitol_podglad.py`, `tests/test_czytnik_csv.py`, `.gitignore`
+
+---
+
 ## 2026-07-20 | 📕 | P2: A/B DVOL 1H pełna era + INDEX FALSORUM + CENSOR w hooku + LIMEN FENESTRAE
 
 ### Wynik P2 (pomiar rozstrzygający)

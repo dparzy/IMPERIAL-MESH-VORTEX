@@ -24,8 +24,22 @@ Użycie:
 import csv
 import logging
 import os
+import time
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
+
+# Etykieta interwału → długość w ms. Świadomie WĄSKA mapa: nieznana etykieta zwraca None
+# i wtedy NIE odcinamy nic (Prawo I — nie zgadujemy długości okresu, którego nie znamy).
+_INTERWAL_MS = {
+    "1m": 60_000, "3m": 180_000, "5m": 300_000, "15m": 900_000, "30m": 1_800_000,
+    "1h": 3_600_000, "2h": 7_200_000, "4h": 14_400_000, "6h": 21_600_000,
+    "12h": 43_200_000, "1d": 86_400_000, "1w": 604_800_000,
+}
+
+
+def _interwal_ms(interwal: str) -> Optional[int]:
+    """Długość interwału w ms z etykiety ('1H', '4h', '1D'…). None gdy nieznana."""
+    return _INTERWAL_MS.get((interwal or "").strip().lower())
 
 logger = logging.getLogger("CzytnikCSV")
 
@@ -97,7 +111,8 @@ def _indeks_wolumenu_bazowego(kolumny: List[str]) -> Optional[int]:
 
 def wczytaj_csv(sciezka: str, interwal: str = "",
                 limit: Optional[int] = None,
-                chronologicznie: bool = True) -> List[Dict[str, Any]]:
+                chronologicznie: bool = True,
+                pomin_niedomkniety: bool = True) -> List[Dict[str, Any]]:
     """
     Wczytuje plik CSV CryptoDataDownload → lista barów OHLCV.
 
@@ -105,6 +120,7 @@ def wczytaj_csv(sciezka: str, interwal: str = "",
     interwal:       etykieta interwału dopisywana do każdego baru ("1H", "1D"...)
     limit:          jeśli podany, zwraca tylko ostatnie N barów (po sortowaniu chronologicznym)
     chronologicznie: True = bary[0] najstarszy, bary[-1] najnowszy (domyślnie)
+    pomin_niedomkniety: odetnij ostatni bar, jeśli JEGO OKRES JESZCZE TRWA (domyślnie tak)
 
     Zwraca: List[dict] z kluczami:
         timestamp (int, ms), open, high, low, close, volume (bazowy),
@@ -169,6 +185,22 @@ def wczytaj_csv(sciezka: str, interwal: str = "",
     # CryptoDataDownload jest malejąco → sortuj rosnąco po czasie
     if chronologicznie:
         bary.sort(key=lambda b: b["timestamp"])
+
+    # ŚWIECA NIEDOMKNIĘTA (2026-07-20): bar, którego okres JESZCZE TRWA, ma niepełny
+    # wolumen i tymczasowy close — a wygląda w pliku jak każdy inny. Zmierzone wobec
+    # Binance: ostatni bar KAŻDEGO z 15 plików 4h miał zaniżony wolumen (BTC: 741 vs 902).
+    # Liczenie go jako pełnego to cichy fałsz w ostatnim, najświeższym punkcie — czyli
+    # dokładnie tam, gdzie pętla live podejmuje decyzję. Odcinamy u źródła: jedna
+    # poprawka chroni backtest, paper i live naraz.
+    # Bary historyczne (okres dawno zamknięty) są NIETKNIĘTE — warunek jest czasowy.
+    if pomin_niedomkniety and bary and chronologicznie:
+        krok = _interwal_ms(interwal)
+        if krok:
+            teraz = int(time.time() * 1000)
+            if bary[-1]["timestamp"] + krok > teraz:
+                odciety = bary.pop()
+                logger.info(f"[CzytnikCSV] odcięto niedomkniętą świecę "
+                            f"{odciety['timestamp']} ({interwal}) — okres jeszcze trwa")
 
     if limit is not None and limit > 0:
         bary = bary[-limit:] if chronologicznie else bary[:limit]

@@ -272,6 +272,61 @@ def _raport_ab_dvol_1h() -> Path:
                   spec, wykresy, werdykt, otworz=False)
 
 
+def raport_interwalow(wyniki, pary, barow_1h) -> Path:
+    """Podgląd porównania interwałów (wywoływany przez sym_porownanie_tf.py --podglad).
+
+    Buduje się z ŻYWYCH wyników biegu, nie z liczb wpisanych ręcznie — dlatego przyjmuje
+    dane, zamiast trzymać je zaszyte jak raporty historyczne niżej.
+    """
+    okna = [w["okno"] for w in wyniki if w.get("okno")]
+    zakres = f"{min(o[0] for o in okna)} → {max(o[1] for o in okna)}" if okna else "n/d"
+    najlepszy = max(wyniki, key=lambda x: x["roi"])
+    najgorszy = min(wyniki, key=lambda x: x["roi"])
+    stratne = [w["interwal"] for w in wyniki if w["roi"] < 0]
+    spec = [
+        ("Co testowane", "HIPOTEZA INTERWAŁU — czy sam interwał (nie sygnał) decyduje o "
+                         "rentowności strategii; izolacja efektu interwału od efektu okna"),
+        ("Para / waluty", ", ".join(pary)),
+        ("Interwały", ", ".join(w["interwal"] for w in wyniki)),
+        ("Okno kalendarzowe", f"{zakres} — IDENTYCZNE dla każdego interwału "
+                              f"(cap {barow_1h} barów 1h, pozostałe skalowane ×1/4, ×1/24)"),
+        ("Źródło danych", "dane/{godzinowe,4h,dzienne}/Binance_*.csv"),
+        ("Konfiguracja", "identyczna dla każdego interwału: tryb_skaner top_n=3 · "
+                         "sizing_przekonania · compounding · filtr_asymetrii"),
+        ("Uwaga metodologiczna", "to NIE jest konfiguracja z ab_dvol.py (tam top_n=2, bez "
+                                 "compoundingu) — liczby porównuj MIĘDZY interwałami, nie z A/B Tier-1"),
+        ("Sprzęt", "Fujitsu: 15.88 GB RAM, 4 wątki, brak CUDA, klasa PEDES (censor_sprzetu.py)"),
+    ]
+    kolor = lambda roi: "#8fe388" if roi > 0 else "#e0794b"  # noqa: E731
+    wykresy = [
+        {"tytul": "ROI% wg interwału — to samo okno, ta sama konfiguracja",
+         "jednostka": "ROI %",
+         "opis": "Różnica między słupkami to efekt INTERWAŁU, bo okno kalendarzowe i konfiguracja "
+                 "są identyczne. Zielony = dodatni, pomarańczowy = stratny.",
+         "slupki": [(w["interwal"], round(w["roi"], 2), kolor(w["roi"])) for w in wyniki]},
+        {"tytul": "Liczba transakcji wg interwału",
+         "jednostka": "transakcje",
+         "opis": "Krótszy interwał = więcej transakcji = więcej kosztów tarcia. Jeśli ROI spada "
+                 "przy rosnącej liczbie transakcji, podejrzewaj koszt tarcia, nie brak sygnału.",
+         "slupki": [(w["interwal"], w["trades"], "#4c9be3") for w in wyniki]},
+        {"tytul": "Max drawdown wg interwału",
+         "jednostka": "maxDD %",
+         "opis": "Kontrola ryzyka: wyższy ROI kupiony wyższym obsunięciem to nie ta sama jakość.",
+         "slupki": [(w["interwal"], round(w["maxdd"], 2), "#b48ee8") for w in wyniki]},
+    ]
+    werdykt = (
+        f"Najlepszy interwał: {najlepszy['interwal']} ({najlepszy['roi']:+.2f}%), "
+        f"najgorszy: {najgorszy['interwal']} ({najgorszy['roi']:+.2f}%), "
+        f"rozpiętość {najlepszy['roi'] - najgorszy['roi']:.2f} pp.\n"
+        + (f"STRATNE interwały: {', '.join(stratne)} — testowanie kolejnych sygnałów na stratnym "
+           "interwale to szukanie przewagi w grze już przegranej. Najpierw interwał, potem sygnały.\n"
+           if stratne else "Każdy badany interwał dodatni na tym oknie.\n")
+        + "Pomiar izoluje INTERWAŁ: okno kalendarzowe i konfiguracja identyczne we wszystkich biegach.")
+    return zapisz("KAPITOL_PODGLAD_hipoteza_interwalu",
+                  "Podgląd testu — Hipoteza interwału (1d vs 4h vs 1h)",
+                  spec, wykresy, werdykt, otworz=False)
+
+
 _RAPORTY = {"hma": _raport_hma, "aequitas": _raport_aequitas, "ab_dvol_1h": _raport_ab_dvol_1h}
 
 if __name__ == "__main__":

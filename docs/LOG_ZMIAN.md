@@ -14,6 +14,65 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-20 | 🏛️ | CENSUS ORGANORUM (Warstwa 17) + typ POMIAR — dwie NOTY spłacone
+
+### Zarzut Cezara (zatwierdzony pomiarem, nie przyjęty na słowo)
+
+> „CODEX_PROBATIONUM arkusze nie zaktualizowane po ostatniej sesji, widzę braki, zapewne
+> inne dokumenty wyglądają podobnie" — **potwierdzony w całości.**
+
+| Dowód | Pomiar |
+|---|---|
+| `imperium/cesarz/dispensator.py` (152 linie + 125 testów) | w dokumentach **0 razy** — MANIFEST 0, INDEKS 0, ARCHITEKTURA 0, README 0 |
+| Conflator / Nuntius / VERITAS ANNALIUM / PORTITOR | tylko w ARCHITEKTURA, brak w INDEKS i MANIFEST |
+| Dług zmierzony | **19 modułów `imperium/` + 31 narzędzi = 50** poza INDEKS+ARCH+MANIFEST |
+| Werdykt interwałów (główny wynik wachty 07-20) | **brak w ledgerze** — schemat znał tylko AB/IC |
+| Dlaczego audyt milczał | Warstwa 11 pilnowała meldunku **wyłącznie `imperium/biblioteki/`** — 1 katalog z 11 |
+
+**Klasa błędu:** „✅ pełna harmonia" była prawdą o 1/11 organów i ciszą o reszcie.
+Bramka o zbyt wąskim zasięgu jest gorsza niż brak bramki — daje fałszywy spokój.
+
+### CORONA 1 — CENSUS ORGANORUM (`narzedzia/census_organorum.py`, Warstwa 17)
+
+Spis WSZYSTKICH modułów `imperium/` i `narzedzia/` **generowany z żywego kodu**
+(rola = pierwsza linia docstringu, czytana przez `ast`, bez importu). Audyt porównuje
+`docs/CENSUS_ORGANORUM.md` z tym, co kod wygenerowałby TERAZ — rozjazd zapala czerwień.
+**Bramka twarda** (decyzja Cezara): commit stoi. Miękkie ostrzeżenie odrzucone świadomie
+— to mechanizm, który już raz zawiódł (alarm widoczny i ignorowany przez sesje).
+
+Nie „dopisanie 50 wpisów ręcznie" — ręczny opis zgnije jak każda ręczna liczba przed
+Filarem 4. Dokument traci prawo do własnej treści. **239 modułów** zameldowanych.
+**Dowód że bramka gryzie** (nie martwa asercja): podrzucony organ-widmo → audyt exit 1,
+po usunięciu → exit 0.
+
+Efekt uboczny (Prawo XV): cenzus znalazł **jedyny moduł bez docstringu** w całym
+Imperium — `narzedzia/dekorelacja_w322.py` — moduł, który nie mówi po co istnieje.
+
+### CORONA 2 — typ POMIAR w ledgerze (`scriba_codex.zapisz_pomiar` + 15. arkusz „Pomiary")
+
+Rekord dla wyniku wielowariantowego, którego ani AB (dwa ramiona), ani IC (skill na
+horyzoncie) nie obejmuje. `warianty={nazwa: wartość}` — dowolna liczba ramion, bo
+redukcja pomiaru N-wariantowego do pary gubi informację.
+
+**Zgubiony werdykt interwałów dopisany wstecz** (4h +3.26 / 1d −3.03 / 1H −3.37 /
+15m −5.71, zweryfikowany wobec tabeli LOG_ZMIAN, nie z pamięci) — wraz z uwagą Cezara,
+że pomiar trzyma JEDNĄ konfigurację, więc profil SCALP pozostaje **nieprzetestowany**.
+Zamknięte 2 sugestie, które ta CORONA realizuje.
+
+**Najostrzejsza lekcja:** lukę schematu zgłaszałem jako SUGESTIĘ-KANDYDATA **trzy razy**
+(07-19 `ab_wXXX`, 07-20 `NIEZMIENNIK`, 07-20 ponownie) i ani razu nie zamknąłem.
+Sugestia w ledgerze to nie naprawa — to odłożenie z alibi. Klasa do Księgi Wad.
+
+### Bramki
+
+Testy +14 (`tests/test_census_organorum.py`, w tym granice: moduł bez meldunku,
+widmo w spisie, brak dokumentu, pusty zestaw wariantów, kolejność wariantów,
+ranga WSTĘPNY/ROZSTRZYGAJĄCY) · audyt exit 0 (17 warstw) · ruff czysto · skan wad czysto.
+
+**LEX TALIONIS:** N-9992ba7b → CORONA 1, N-a0b792e1 → CORONA 2. Dług honorowy 0.
+
+---
+
 ## 2026-07-20 | ⚖️ | HIPOTEZA INTERWAŁU — teza o monotoniczności OBALONA, 4h jedynym stabilnym
 
 ### Wynik (BTC+ETH, okno WYRÓWNANE PO DATACH 2025-06-18 → 2026-06-18, identyczna konfiguracja)

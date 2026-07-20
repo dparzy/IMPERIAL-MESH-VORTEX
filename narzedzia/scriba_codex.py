@@ -36,6 +36,16 @@ POLA_IC = ("typ", "sygnal", "neuron", "horyzont", "ic", "tryb", "prog", "werdykt
            "kierunek", "data", "zrodlo", "uwaga")
 POLA_SUGESTIA = ("typ", "element", "dzial", "uzasadnienie", "zgodnosc_imperium",
                  "status", "data", "zrodlo")
+# POMIAR — rekord dla wyniku, który NIE jest ani A/B jednego sygnału, ani IC.
+# Powód (NOTA N-a0b792e1, zmierzone 2026-07-20 na zarzut Cezara): schemat znał
+# wyłącznie AB i IC, więc GŁÓWNY werdykt wachty 07-20 — porównanie interwałów
+# (4h +3.26 / 1d -3.03 / 1h -3.37 / 15m -5.71) — nie miał gdzie trafić i CODEX go
+# zgubił. Lukę zgłaszałem jako SUGESTIĘ trzy razy (ab_wXXX, NIEZMIENNIK, ponownie)
+# i ani razu nie zamknąłem: sugestia w ledgerze to odłożenie z alibi, nie naprawa.
+# `warianty` = {nazwa: wartość} — dowolna liczba ramion (interwały, profile, progi),
+# bo pomiar wielowariantowy zredukowany do pary A/B traci informację (Prawo XV).
+POLA_POMIAR = ("typ", "temat", "pytanie", "warianty", "metryka", "werdykt", "ranga",
+               "pokrycie_ery", "okno_barow", "interwal", "data", "zrodlo", "uwaga")
 
 
 def _dzis() -> str:
@@ -135,6 +145,37 @@ def zapisz_ic(*, sygnal: str, neuron: str, horyzont: str, ic: float, tryb: str,
         "ic": round(float(ic), 4), "tryb": tryb, "prog": round(float(prog), 4),
         "werdykt": werdykt, "kierunek": kierunek, "data": data or _dzis(),
         "zrodlo": zrodlo, "uwaga": uwaga,
+    }
+    return _dopisz(rekord, sciezka)
+
+
+def zapisz_pomiar(*, temat: str, pytanie: str, warianty: dict, metryka: str,
+                  werdykt: str, zrodlo: str, okno_barow: int = 0, interwal: str = "",
+                  uwaga: str = "", data: str | None = None,
+                  dostepne_barow: int | None = None,
+                  sciezka: Path = LEDGER) -> bool:
+    """Dopisuje POMIAR wielowariantowy (porównanie interwałów, profili, progów…).
+
+    Dla wyników, których schemat AB (jeden sygnał ON/OFF) ani IC (skill na horyzoncie)
+    nie obejmuje. `warianty` to {nazwa: wartość} w jednostce `metryka` — np.
+    {"4h": 3.26, "1H": -3.37} przy metryce "ROI %".
+
+    Ranga werdyktu liczona tym samym LIMEN FENESTRAE co A/B: krótkie okno daje
+    werdykt WSTĘPNY, nie rozstrzygający (ta sama pułapka dotyczy każdego pomiaru,
+    nie tylko A/B).
+    """
+    if not warianty:
+        raise ValueError("POMIAR bez wariantów — nie ma czego porównać (Prawo I)")
+    ocena = ocen_pokrycie(int(okno_barow), dostepne_barow)
+    uwaga = f"{uwaga} | {ocena['nota']}" if uwaga else ocena["nota"]
+    rekord = {
+        "typ": "POMIAR", "temat": temat, "pytanie": pytanie,
+        # sort_keys w _linia i tak porządkuje — jawne sortowanie tu, żeby ten sam
+        # pomiar wpisany w innej kolejności argumentów nie zrobił drugiej linii.
+        "warianty": {k: warianty[k] for k in sorted(warianty)},
+        "metryka": metryka, "werdykt": werdykt, "ranga": ocena["ranga"],
+        "pokrycie_ery": ocena["pokrycie"], "okno_barow": int(okno_barow),
+        "interwal": interwal, "data": data or _dzis(), "zrodlo": zrodlo, "uwaga": uwaga,
     }
     return _dopisz(rekord, sciezka)
 

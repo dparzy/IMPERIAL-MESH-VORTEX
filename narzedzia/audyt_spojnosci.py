@@ -535,7 +535,40 @@ def audyt() -> tuple:
     bledy += w16_bledy
     info += w16_info
 
+    # ── WARSTWA 17: CENSUS ORGANORUM — każdy moduł kodu musi być zameldowany ──
+    w17_bledy, w17_info = _warstwa_17_census_organorum()
+    bledy += w17_bledy
+    info += w17_info
+
     return bledy, info
+
+
+def _warstwa_17_census_organorum():
+    """W17 — każdy moduł `imperium/` i `narzedzia/` musi być w CENSUS_ORGANORUM.
+
+    Powód (zmierzone 2026-07-20, zarzut Cezara): Warstwa 11 pilnowała meldunku
+    WYŁĄCZNIE dla `imperium/biblioteki/` — 1 katalog z 11. Dlatego
+    `imperium/cesarz/dispensator.py` (152 linie + testy) przeżył całą sesję nie
+    występując w ŻADNYM dokumencie, a audyt meldował „✅ pełna harmonia". Łącznie
+    19 modułów `imperium/` i 31 narzędzi milczało bezkarnie.
+
+    Bramka TWARDA (decyzja Cezara 2026-07-20): rozjazd = czerwień = commit stoi.
+    Miękkie ostrzeżenie odrzucone świadomie — to dokładnie mechanizm, który już raz
+    zawiódł (alarm widoczny i ignorowany przez sesje, ZASADA CENSORA).
+    """
+    try:
+        # Import przez pakiet `narzedzia`, NIE przez wstrzyknięcie katalogu w sys.path:
+        # `census_organorum` i `narzedzia.census_organorum` byłyby DWOMA modułami o
+        # osobnym stanie (własne DOKUMENT, własne cache). Testy patchują jedną kopię,
+        # audyt czytałby drugą — bramka mogłaby świecić na zielono na innym module niż
+        # ten, który sprawdzamy. Klasa: podwójna tożsamość modułu.
+        from narzedzia.census_organorum import spisz_moduly, sprawdz
+        bledy = sprawdz()
+        lacznie = sum(len(v) for v in spisz_moduly().values())
+        info = [f"Census organów (W17): {lacznie} modułów zameldowanych ✅"] if not bledy else []
+        return bledy, info
+    except Exception as e:  # noqa: BLE001 — awaria cenzusu nie może wywrócić audytu
+        return [f"[W17] Błąd cenzusu organów: {e}"], []
 
 
 def _warstwa_15_liczby_wstrzykiwane():

@@ -80,6 +80,8 @@ Organy pomocnicze POZA `imperium/` — dobór nazwy DO FUNKCJI (ZASADA NOMENKLAT
 | **Veritas Annalium** (Prawda Roczników) | `narzedzia/audyt_danych.py` | audyt świec w 3 warstwach: struktura · krzyżowa 1h↔4h · zgodność z giełdą; naprawa zmierzonych rozjazdów z kopią | [I, XVI, XXI] |
 | **Conflator Temporum** (Zlewacz Interwałów) | `narzedzia/agreguj_bary.py` | buduje wyższy interwał z niższego (1m→5m/15m, 1h→4h); odrzuca niepełne okna, ostrzega przy nadpisaniu danych z giełdy | [I, XVI] |
 | **Nuntius Mercatus** (Posłaniec Rynku) | `narzedzia/pobierz_binance.py` | pobiera świece dowolnego interwału z publicznego API Binance; checkpoint stronicowy = zabity bieg traci jedną stronę, nie postęp | [I, XXIV] |
+| **Census Organorum** (Spis Organów) | `narzedzia/census_organorum.py` | spis WSZYSTKICH modułów `imperium/`+`narzedzia/` generowany z żywego kodu (rola = docstring); bramka Warstwy 17 audytu — moduł bez meldunku blokuje commit | [XV, XIX, XXI] |
+| **Dispensator** (Szafarz) | `imperium/cesarz/dispensator.py` | dobór modelu DeepSeek do trudności zadania (ZASADA OSZCZĘDNOŚCI TOKENÓW) — organ rdzenia Cezara, nie narzędzie; wpisany tu po tym, jak cenzus 2026-07-20 zastał go niezameldowanym w ŻADNYM dokumencie | [XVI, XVIII] |
 
 ---
 

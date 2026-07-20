@@ -114,10 +114,11 @@ def podsumowanie_ledger(sciezka: Path = LEDGER) -> str:
     ab = sum(1 for r in rek if r.get("typ") == "AB")
     ic = sum(1 for r in rek if r.get("typ") == "IC")
     sug = sum(1 for r in rek if r.get("typ") == "SUGESTIA")
+    pom = sum(1 for r in rek if r.get("typ") == "POMIAR")
     daty = [r.get("data") for r in rek if r.get("data")]
     ost = max(daty) if daty else "—"
     return (f"📜 CODEX PROBATIONUM (ledger): {len(rek)} rekordów — "
-            f"A/B {ab} | IC {ic} | Sugestie {sug} | ostatni wynik {ost}")
+            f"A/B {ab} | IC {ic} | Pomiary {pom} | Sugestie {sug} | ostatni wynik {ost}")
 
 
 def _zywotnosc_adapterow() -> dict:
@@ -418,6 +419,24 @@ def zbierz_arkusze() -> dict:
             r.get("zrodlo", ""), r.get("uwaga", ""),
         ])
     arkusze["Wyniki IC"] = wiersze_ic
+
+    # ── 10b. Pomiary wielowariantowe (interwały, profile, progi) ─────────────
+    # Osobny arkusz, bo tych wyników nie da się uczciwie wcisnąć w kolumny A/B:
+    # A/B ma dwa ramiona, POMIAR ma N (interwały 4h/1d/1H/15m). Redukcja do pary
+    # gubiłaby informację — a to właśnie przez brak tego arkusza CODEX zgubił
+    # główny werdykt wachty 2026-07-20 (NOTA N-a0b792e1).
+    wiersze_p = [["Temat", "Pytanie", "Metryka", "Warianty (nazwa=wartość)", "Werdykt",
+                  "Ranga", "Pokrycie ery", "Okno (barów)", "Interwał", "Data", "Źródło", "Uwaga"]]
+    for r in [x for x in ledger if x.get("typ") == "POMIAR"]:
+        warianty = r.get("warianty", {}) or {}
+        wiersze_p.append([
+            r.get("temat", ""), r.get("pytanie", ""), r.get("metryka", ""),
+            ", ".join(f"{k}={v}" for k, v in warianty.items()),
+            r.get("werdykt", ""), r.get("ranga", ""), r.get("pokrycie_ery", ""),
+            r.get("okno_barow", ""), r.get("interwal", ""), r.get("data", ""),
+            r.get("zrodlo", ""), r.get("uwaga", ""),
+        ])
+    arkusze["Pomiary"] = wiersze_p
 
     # ── 11. Korelacje (z pomiaru MATRYCA_KORELACJI) ──────────────────────────
     wiersze_k = [["POMIAR", kor_meta],

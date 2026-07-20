@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import html as _html
 import os
+import sys
 import webbrowser
 from datetime import datetime, timezone
 from pathlib import Path
@@ -164,7 +165,68 @@ def _raport_hma() -> Path:
                   spec, wykresy, werdykt, otworz=False)
 
 
+# ── Dane sesji 2026-07-20: AEQUITAS SERIERUM — strażnik równej długości serii ──
+def _raport_aequitas() -> Path:
+    spec = [
+        ("Co testowane", "ZACHOWANIE Bramy Kalkulatora przy NIERÓWNYCH seriach OHLCV "
+                         "(teza zwiadowcy o zip(strict=True) — weryfikacja własna)"),
+        ("Para / waluty", "n/d — pomiar deterministyczny na serii syntetycznej "
+                          "(100 barów, cena 100→199, low=high−5, close=high−2, volume=10)"),
+        ("Interwał czasowy", "n/d — test niezmiennika Bramy, niezależny od interwału"),
+        ("Okno / tryb", "seria pełna 100 barów vs seria z volume/low obciętym do 80/60 barów"),
+        ("Źródło danych", "generator deterministyczny w skrypcie pomiarowym (bez sieci, bez CSV)"),
+        ("Silnik", "CalculatorGateway.compute (imperium/fundament/brama_kalkulatora.py)"),
+        ("Metryka", "wartość wskaźnika PEŁNA vs OBCIĘTA + czy błąd jest zgłaszany głośno"),
+        ("Naprawa", "_aequitas_serierum() — strażnik równej długości u wrót compute()"
+                    " i compute_series(); zip(strict=True) w niezmienniku _py_hma.wma"),
+        ("Zakres zweryfikowany", "23 zip w imperium/ (nie ~25): 10 w Bramie, "
+                                 "4 w diagnostyce korelacji JUŻ strzeżone (n != len(y) → None)"),
+    ]
+    wykresy = [
+        {"tytul": "VWAP — wartość PEŁNA vs po CICHYM obcięciu volume (80/100 barów)",
+         "jednostka": "VWAP",
+         "opis": "Bez strażnika zip() cicho obcinał do najkrótszej serii: wynik zaniżony "
+                 "o 10.0 (~6.8%), a pieczątka audytu raportowała input_len=100 mimo "
+                 "policzenia z 80 barów — audyt KŁAMAŁ (Prawo XIII).",
+         "slupki": [("VWAP pełny (100 barów)", 147.166667, "#8fe388"),
+                    ("VWAP cichy (volume 80)", 137.166667, "#e0794b")]},
+        {"tytul": "VWAP_STD — ta sama wada na drugim wskaźniku",
+         "jednostka": "VWAP_STD",
+         "opis": "Rozjazd 5.77 (~20%). Wada nie była jednostkowa — dotyczyła całej "
+                 "rodziny wskaźników pure-Python liczonych przez zip().",
+         "slupki": [("VWAP_STD pełny", 28.866070, "#8fe388"),
+                    ("VWAP_STD cichy", 23.092206, "#e0794b")]},
+        {"tytul": "Miejsca zip() — teza zwiadowcy vs POMIAR",
+         "jednostka": "liczba miejsc",
+         "opis": "Zwiadowca twierdził ~25 miejsc do naprawy. Pomiar: 23 zip w całym "
+                 "imperium/, z tego 10 w Bramie, a 4 w diagnostyce korelacji są JUŻ "
+                 "strzeżone — strict=True byłby tam martwą asercją (szum, nie ochrona).",
+         "slupki": [("teza zwiadowcy (~25)", 25, "#e0794b"),
+                    ("zip w imperium/ (fakt)", 23, "#4c9be3"),
+                    ("zip w Bramie (fakt)", 10, "#4c9be3"),
+                    ("już strzeżone w diagnostyce", 4, "#8fe388"),
+                    ("miejsc naprawy po korekcie", 1, "#8fe388")]},
+    ]
+    werdykt = (
+        "WERDYKT: teza zwiadowcy SŁUSZNA co do kierunku, BŁĘDNA co do liczby i lekarstwa.\n"
+        "Dowód asymetrii: TA-Lib odrzuca nierówne serie GŁOŚNO ('input array lengths are "
+        "different'), a bliźniacze wskaźniki pure-Python liczyły CICHO fałszywą wartość.\n"
+        "Lekarstwo lepsze niż ~25 rozsypanych zip(strict=True): JEDEN strażnik u wrót — "
+        "obejmuje też wskaźniki numpy (bez zip), naprawia kłamiącą pieczątkę audytu i nie "
+        "da się go pominąć przy dodawaniu nowego wskaźnika.\n"
+        "Ryzyko regresu ZERO: _serie() w budowniczy_wskaznikow.py buduje wszystkie 5 serii "
+        "z tej samej listy barów — ścieżka produkcyjna nie może potknąć się o strażnika.")
+    return zapisz("KAPITOL_PODGLAD_aequitas_serierum",
+                  "Podgląd testu — AEQUITAS SERIERUM (strażnik serii u wrót Bramy)",
+                  spec, wykresy, werdykt, otworz=False)
+
+
+_RAPORTY = {"hma": _raport_hma, "aequitas": _raport_aequitas}
+
 if __name__ == "__main__":
-    p = _raport_hma()
+    nazwa = sys.argv[1] if len(sys.argv) > 1 else "hma"
+    if nazwa not in _RAPORTY:
+        raise SystemExit(f"Nieznany raport '{nazwa}'. Dostępne: {sorted(_RAPORTY)}")
+    p = _RAPORTY[nazwa]()
     print(f"🏛️ Podgląd Kapitolu zapisany: {p}")
     print(f"   Link: {p.as_uri()}")

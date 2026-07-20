@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-19
+stan_na: 2026-07-20
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,52 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-07-20 | 🛡️ | AEQUITAS SERIERUM — strażnik równej długości serii u wrót Bramy (P1)
+
+**Powód (P1 zamrożonej listy):** teza zwiadowcy mówiła „`zip(strict=True)` w ~25 miejscach Bramy".
+Zgodnie z ZASADĄ WERYFIKACJI teza została **zmierzona, nie przyjęta na wiarę** — i okazała się
+słuszna co do kierunku, a błędna co do liczby i lekarstwa.
+
+**Pomiar (2026-07-20, seria syntetyczna 100 barów, `volume` obcięty do 80):**
+- TA-Lib przy nierównych seriach: **GŁOŚNO** — `Exception: input array lengths are different`
+- pure-Python `VWAP`: **CICHO** — 147.166667 → 137.166667 (**rozjazd 10.0**, ~6.8%)
+- pure-Python `VWAP_STD`: **CICHO** — 28.866070 → 23.092206 (rozjazd 5.774, ~20%)
+- pieczątka audytu raportowała `input_len=100` przy wyniku policzonym z **80** barów → **audyt kłamał (Prawo XIII)**
+
+**Korekty do tezy zwiadowcy (KANDYDAT ≠ PRAWDA):**
+- nie „~25 miejsc": **23** `zip` w całym `imperium/`, z tego **10** w Bramie
+- `diagnostyka_korelacji.py` — **4/4 zipy JUŻ strzeżone** (`if n < 2 or n != len(y): return None`);
+  `strict=True` byłby tam **martwą asercją** = szum udający ochronę (Prawo XVI)
+
+**Lekarstwo (unikat, lepszy niż teza):** JEDEN strażnik u wrót zamiast ~25 rozsypanych `strict=True`.
+Obejmuje **także wskaźniki numpy bez `zip`** (których 25×strict by nie złapało), naprawia kłamiącą
+pieczątkę i **nie da się go pominąć** przy dodaniu nowego wskaźnika.
+- `_aequitas_serierum()` wpięty w `compute()` **i** `compute_series()` (drugie wejście do matematyki)
+- **Dowód kompletności:** jedyne parametry seryjne całego rejestru Bramy to `open/high/low/close/volume`
+  (reszta — `period/fast/slow/k/n/dim…` — to skalary) → zero martwego pola
+- **Zero ryzyka regresu:** `_serie()` (`budowniczy_wskaznikow.py:26`) buduje wszystkie 5 serii z **tej samej
+  listy barów** — ścieżka produkcyjna nie może potknąć się o strażnika
+- dodatkowo `zip(..., strict=True)` w niezmienniku wewnętrznym `_py_hma.wma` (ujemny slice `seq[-3:2] → []`
+  dawał cichą MA = 0.0 udającą policzoną) — tam strażnik u wrót nie sięga
+
+**Bramki:** testy **2627/2627** (+7 granic; licznik 2620→2627 = dowód, że nie są cicho pomijane) ·
+audyt exit 0 · ruff czysto · skan wad czysto.
+
+**LEX TALIONIS:** NOTA `N-fd782251` (cicha nierówność serii + kłamiąca pieczątka) spłacona
+CORONĄ `C-340771af` (AEQUITAS SERIERUM). Dług honorowy: **0**.
+**Uodpornienie klasy:** Księga Wad **#38** — „kontrakt danych: łączenie serii bez sprawdzenia równej
+długości". Świadomie **bez regexu** — samo `zip(` ma za duży szum (23 wystąpienia, większość legalna),
+więc to klasa do CHECKLISTY review, nie do auto-skanu (regex dopiero po pomiarze szumu).
+
+**Podgląd (zero-tokenowy):** `raporty/KAPITOL_PODGLAD_aequitas_serierum.html`
+(`python narzedzia/kapitol_podglad.py aequitas`) — narzędzie dostało dispatch po nazwie raportu,
+dotąd miało jeden raport zaszyty na sztywno.
+
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `tests/test_neurony.py`,
+`narzedzia/kapitol_podglad.py`, `bibliotheca_ulpia/dane/{codex_notarum,ksiega_wad_kodu,rejestr_testow}.jsonl`
 
 ---
 

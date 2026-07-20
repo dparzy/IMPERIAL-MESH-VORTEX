@@ -64,6 +64,32 @@ _PURE_PYTHON_INDICATORS = {
 }
 
 
+# AEQUITAS SERIERUM — strażnik równej długości serii u wrót Bramy.
+# Serie OHLCV opisują TE SAME bary, więc muszą mieć tę samą długość. TA-Lib pilnuje
+# tego sam ("input array lengths are different"), ale wskaźniki pure-Python liczone
+# przez zip() CICHO obcinały do najkrótszej — zmierzone 2026-07-20: VWAP 147.17→137.17
+# (rozjazd 10.0) przy volume krótszym o 20 barów, a pieczątka audytu raportowała
+# input_len=100 mimo policzenia z 80 (Prawo XIII: audyt nie może kłamać).
+# Strażnik u wrót zamiast ~25 rozsypanych zip(strict=True): łapie też wskaźniki
+# numpy (bez zip) i nie da się go pominąć przy dodawaniu nowego wskaźnika.
+_SERIE_OHLCV = ("open", "high", "low", "close", "volume")
+
+
+def _aequitas_serierum(indicator: str, kwargs: Dict[str, Any]) -> None:
+    """Odrzuca wywołanie, gdy serie OHLCV mają różne długości (Prawo I + XIII)."""
+    dlugosci = {
+        k: len(v) for k, v in kwargs.items()
+        if k in _SERIE_OHLCV and v is not None and hasattr(v, "__len__")
+    }
+    if len(set(dlugosci.values())) > 1:
+        opis = ", ".join(f"{k}={n}" for k, n in sorted(dlugosci.items()))
+        raise ValueError(
+            f"Brama odrzuca '{indicator}': serie OHLCV mają różne długości ({opis}). "
+            "Serie opisują te same bary — nierówność oznacza uszkodzone dane wejściowe, "
+            "a ciche obcięcie dałoby fałszywy wskaźnik z kłamiącą pieczątką audytu."
+        )
+
+
 def _arr(x) -> np.ndarray:
     return np.asarray(x, dtype=np.float64)
 
@@ -164,7 +190,12 @@ def _py_hma(close, period: int = 16):
         # ważona średnia: wagi 1..p, najnowszy bar waży najwięcej
         okno = seq[idx - p + 1: idx + 1]
         wagi = range(1, p + 1)
-        return sum(s * w for s, w in zip(okno, wagi)) / (p * (p + 1) / 2)
+        # strict=True: niezmiennik wewnętrzny, którego strażnik u wrót nie widzi.
+        # Gdy idx-p+1 < 0, Python liczy slice od KOŃCA (seq[-3:2] → []), więc zip
+        # cicho zwróciłby 0.0 podzielone przez pełną sumę wag — fałszywa MA udająca
+        # policzoną. Dziś idx ≥ period-1 gwarantuje poprawność; strict pilnuje,
+        # by przyszła zmiana pętli zawiodła GŁOŚNO, nie po cichu.
+        return sum(s * w for s, w in zip(okno, wagi, strict=True)) / (p * (p + 1) / 2)
 
     # surowa seria raw = 2·WMA(N/2) − WMA(N) dla każdego baru, potem WMA(sqrt) z raw
     n = len(c)
@@ -1408,6 +1439,7 @@ class CalculatorGateway:
         }
         if name not in series_fns:
             raise ValueError(f"Brama (seria) odrzuca '{indicator}': dostępne {sorted(series_fns)}")
+        _aequitas_serierum(name, kwargs)
         arr = series_fns[name](**kwargs)
         n = int(len(kwargs.get("close", [])))
         logger.info(f"[Brama] {name}(seria) period={kwargs.get('period')} input_len={n}")
@@ -1420,6 +1452,7 @@ class CalculatorGateway:
             raise ValueError(
                 f"Brama odrzuca '{indicator}': nieznane obliczenie. Dostępne: {self.available()}"
             )
+        _aequitas_serierum(name, kwargs)
         value = self._registry[name](**kwargs)
         # Do audytu zapisujemy tylko skalarne parametry (bez wielkich tablic danych).
         params = {k: v for k, v in kwargs.items() if isinstance(v, (int, float, str, bool))}

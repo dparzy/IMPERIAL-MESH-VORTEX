@@ -71,6 +71,16 @@ Organy pomocnicze POZA `imperium/` — dobór nazwy DO FUNKCJI (ZASADA NOMENKLAT
 > pilnuje, by nie żyło dalej jako fakt. Klasa siostrzana Warstwy 15 (liczby) i 16 (API-widma) — tylko po
 > stronie TWIERDZEŃ. Historia (ACTA/archiwum) i sprostowania poza zasięgiem; źle dobraną frazę zdejmuje
 > `wycofaj()`. Sweep: `narzedzia/skan_wad_kodu.py --falsa`, w hooku startowym. [I, XV, XXI]
+>
+> **SIGILLARIUM** (Skarbiec Pieczęci, `imperium/biblioteki/sigillarium.py`) — **SIGLA IMPERII**:
+> hasła-skróty Cezara `/apertio` (otwarcie wachty), `/clausura` (domknięcie), `/limes` (bramka
+> Prawa XXI) uruchamiające PEŁNE procedury bez recytowania ich za każdym razem. Rdzeń: pieczęć
+> **nie przechowuje kroków** — czyta je z konstytucji (`CLAUDE.md`) w chwili wywołania, więc
+> rozjazd jest strukturalnie niemożliwy, a nie „pilnowany" (to samo lekarstwo co CENSUS ORGANORUM:
+> odebranie dokumentowi prawa do własnej treści). Karmi runbooki W11 (`synchronizuj_w11()`), więc
+> hasło działa też pisane zwykłym zdaniem; ujście w harnessie to cienkie `.claude/skills/*/SKILL.md`,
+> które wołają pieczęć zamiast kopiować kroki (Prawo XVI). Pusta pieczęć albo martwa komenda bramki
+> **krzyczy**, zamiast udawać sprawną. [I, XV, XVI, XXI]
 
 | Nazwa rzymska | Plik | Rola | Prawa |
 |---|---|---|---|

@@ -511,6 +511,17 @@ def podsumowanie_startowe(k: int = 3, zapytanie: str = "") -> str:
     except Exception:
         pass
 
+    # SIGLA IMPERII — pieczęcie procedur (liczba kroków liczona z żywej konstytucji).
+    # Cezar widzi na starcie, że hasła /apertio /clausura /limes żyją i ile kroków niosą;
+    # pieczęć, która straciła swoją sekcję w CLAUDE.md, pokaże tu 0 zamiast milczeć.
+    try:
+        from imperium.biblioteki import sigillarium as _sig
+        r_sig = _sig.raport_startowy()
+        if r_sig:
+            linie.append("   " + r_sig)
+    except Exception:
+        pass
+
     # W12 — Pamięć Robocza: aktywny cel bieżącego cyklu (CoALA working).
     try:
         from imperium.biblioteki import pamiec_robocza as _prob

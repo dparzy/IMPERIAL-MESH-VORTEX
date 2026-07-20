@@ -327,7 +327,77 @@ def raport_interwalow(wyniki, pary, barow_1h) -> Path:
                   spec, wykresy, werdykt, otworz=False)
 
 
-_RAPORTY = {"hma": _raport_hma, "aequitas": _raport_aequitas, "ab_dvol_1h": _raport_ab_dvol_1h}
+# ── Dane sesji 2026-07-20: SIGLA IMPERII (organ SIGILLARIUM) ─────────────────
+def _raport_sigla() -> Path:
+    # Ten generator jest uruchamiany z katalogu `narzedzia/`, więc korzeń repo nie leży
+    # domyślnie na ścieżce importu. Wstawiamy go na KONIEC (append, nie insert) — pakiet
+    # `imperium` ma być rozwiązywany normalnie, a nie przesłaniać niczego z przodu.
+    if str(ROOT) not in sys.path:
+        sys.path.append(str(ROOT))
+    from imperium.biblioteki import sigillarium as _sig
+
+    kroki = {s.nazwa: len(_sig.kroki(s.nazwa)) for s in _sig.wszystkie()}
+    spec = [
+        ("Co testowane", "SIGLA IMPERII — hasła-skróty uruchamiające pełne procedury "
+                         "(rozkaz Cezara 2026-07-20); organ SIGILLARIUM"),
+        ("Para / waluty", "n/d — zmiana ergonomii i pamięci proceduralnej, nie ścieżki decyzyjnej "
+                          "(żaden neuron, próg ani sizing nie tknięty)"),
+        ("Interwał czasowy", "n/d"),
+        ("Okno / tryb", "deterministyczny; kroki liczone z żywego CLAUDE.md w chwili wywołania"),
+        ("Źródło danych", "CLAUDE.md (konstytucja) + bibliotheca_ulpia/dane/procedury.jsonl (W11)"),
+        ("Silnik", "imperium/biblioteki/sigillarium.py + .claude/skills/{apertio,clausura,limes}"),
+        ("Metryka", "liczba kroków pieczęci (żywa), liczba runbooków z możliwością naprawy, "
+                    "dni gnicia nieaktualnego runbooka"),
+        ("Decyzja Cezara", "forma = skille /nazwa + aliasy słowne; zestaw = rdzeń 3 pieczęci "
+                           "(pozostali kandydaci NIE wdrożeni, czekają na decyzję)"),
+        ("Bramki", "2713/2713 testów (2694→2713, +19 nowych) · audyt exit 0 (17 warstw) · "
+                   "ruff czysto · skan wad czysto · INDEX FALSORUM czysto · dług honorowy 0"),
+    ]
+    wykresy = [
+        {"tytul": "Kroki pieczęci — liczone z żywej konstytucji, nie wpisane",
+         "jednostka": "kroków",
+         "opis": "Te liczby nie są zapisane nigdzie w kodzie ani w skillu — powstają z parsowania "
+                 "CLAUDE.md przy każdym wywołaniu. Dopisanie kroku do checklisty zmienia je same.",
+         "slupki": [("/apertio (otwarcie)", kroki.get("APERTIO", 0), "#4c9be3"),
+                    ("/clausura (zamknięcie)", kroki.get("CLAUSURA", 0), "#4c9be3"),
+                    ("/limes (bramka)", kroki.get("LIMES", 0), "#8fe388")]},
+        {"tytul": "Runbooki W11 — ile dało się NAPRAWIĆ, gdy się zdezaktualizują",
+         "jednostka": "runbooków",
+         "opis": "Przed naprawą: 4 runbooki, z czego 0 dało się zaktualizować (dodaj() dedupował po "
+                 "nazwie i cicho zwracał False). Po naprawie: 7 runbooków (3 nowe = sigla), wszystkie "
+                 "z jawną ścieżką upsert i werdyktem dodano/zaktualizowano/bez zmian.",
+         "slupki": [("przed: runbooki", 4, "#e0794b"),
+                    ("przed: możliwe do naprawy", 0, "#e0794b"),
+                    ("po: runbooki", 7, "#8fe388"),
+                    ("po: możliwe do naprawy", 7, "#8fe388")]},
+        {"tytul": "Gnicie runbooka — ZMIERZONE, nie oszacowane",
+         "jednostka": "dni",
+         "opis": "Runbook kazał Claude `git push` wbrew rozkazowi z 2026-07-11. Najpierw wpisałem "
+                 "„pół roku” BEZ POMIARU — pomiar dał 9 dni (07-11 → 07-20), przy wieku runbooka "
+                 "19 dni. Liczba poprawiona u źródła przed commitem (klasa: liczba-bez-pomiaru).",
+         "slupki": [("moja teza bez pomiaru (~180)", 180, "#e0794b"),
+                    ("gnicie po zakazie (fakt)", 9, "#8fe388"),
+                    ("wiek runbooka (fakt)", 19, "#4c9be3")]},
+    ]
+    werdykt = (
+        "WERDYKT: rozkaz wykonany w formie wybranej przez Cezara, ale realną zdobyczą jest NAPRAWA, "
+        "nie skrót.\n"
+        "Sigillum nie przechowuje kroków — czyta je z CLAUDE.md przy wywołaniu, więc rozjazd procedury "
+        "z rozkazem jest strukturalnie niemożliwy, a nie „pilnowany” (to samo lekarstwo co CENSUS "
+        "ORGANORUM: odebranie dokumentowi prawa do własnej treści).\n"
+        "Znalezione po drodze DWA cichniejsze warianty tej samej klasy: (1) pamięć proceduralna bez "
+        "ścieżki aktualizacji — runbook niezmienialny na zawsze, raport meldował „4 runbooki gotowe”; "
+        "(2) KsiegaWadKodu.dodaj_checklist() zwraca True i zwiększa licznik W PAMIĘCI, a bez osobnego "
+        "zapisz() nie zapisuje nic — mój własny wpis o wadzie przepadł i musiałem go zapisać drugi raz.\n"
+        "Zero wpływu na ścieżkę decyzyjną: żaden neuron, próg ani sizing nie tknięty — zmiana dotyczy "
+        "ergonomii Cezara i pamięci proceduralnej.")
+    return zapisz("KAPITOL_PODGLAD_sigla_imperii",
+                  "Podgląd zadania — SIGLA IMPERII (organ SIGILLARIUM)",
+                  spec, wykresy, werdykt, otworz=False)
+
+
+_RAPORTY = {"hma": _raport_hma, "aequitas": _raport_aequitas, "ab_dvol_1h": _raport_ab_dvol_1h,
+            "sigla": _raport_sigla}
 
 if __name__ == "__main__":
     nazwa = sys.argv[1] if len(sys.argv) > 1 else "hma"

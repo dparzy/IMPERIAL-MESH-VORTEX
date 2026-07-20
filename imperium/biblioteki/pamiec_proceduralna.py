@@ -88,6 +88,45 @@ def dodaj(nazwa: str, kroki: List[str], wyzwalacz: str = "",
     return True
 
 
+def zapisz(nazwa: str, kroki: List[str], wyzwalacz: str = "",
+           zrodlo: str = "", data: Optional[str] = None,
+           plik: Optional[Path] = None) -> str:
+    """Wpisuje procedurę LUB nadpisuje istniejącą o tej nazwie (upsert).
+
+    POWÓD ISTNIENIA (wada zmierzona 2026-07-20): `dodaj()` dedupuje po nazwie i cicho
+    zwraca False, więc raz zapisanego runbooka NIE DAŁO SIĘ zaktualizować — treść
+    gniła na zawsze. Dowód: runbook „Bezpieczny commit" kazał Claude `git push`,
+    mimo rozkazu z 2026-07-11, że Claude NIGDY nie pushuje.
+
+    Zwraca 'dodano' | 'zaktualizowano' | 'bez zmian' (uczciwy, sprawdzalny werdykt —
+    nie milczące True/False, po którym nie widać, czy coś się realnie stało).
+    """
+    if plik is None:
+        plik = PLIK_DOMYSLNY
+    nazwa = nazwa.strip()
+    kroki_czyste = [k.strip() for k in kroki if k.strip()]
+    wyzw = [w.strip().lower() for w in re.split(r"[,;]", wyzwalacz) if w.strip()]
+    wpisy = _wczytaj(plik)
+    for i, p in enumerate(wpisy):
+        if p.get("nazwa", "").strip().lower() == nazwa.lower():
+            if (p.get("kroki") == kroki_czyste and p.get("wyzwalacz") == wyzw
+                    and p.get("zrodlo", "") == zrodlo.strip()):
+                return "bez zmian"
+            # Nadpisujemy TYLKO znane pola — ewentualne dodatkowe (dopisane przez inną
+            # warstwę pamięci) przechodzą dalej. Aktualizacja nie może po cichu kasować.
+            nowy = dict(p)
+            nowy.update({"nazwa": nazwa, "wyzwalacz": wyzw, "kroki": kroki_czyste,
+                         "zrodlo": zrodlo.strip(), "data": data or _dzis()})
+            wpisy[i] = nowy
+            plik.parent.mkdir(parents=True, exist_ok=True)
+            plik.write_text(
+                "".join(json.dumps(w, ensure_ascii=False) + "\n" for w in wpisy),
+                encoding="utf-8")
+            return "zaktualizowano"
+    dodaj(nazwa, kroki_czyste, wyzwalacz, zrodlo, data, plik)
+    return "dodano"
+
+
 def wszystkie(plik: Optional[Path] = None) -> List[Dict[str, Any]]:
     return _wczytaj(plik)
 
@@ -154,8 +193,11 @@ _ZIARNO = [
             "python narzedzia/audyt_spojnosci.py — musi być exit 0 (w tym ruff W13)",
             "Dopisz wpis do Dziennika Nieśmiertelnego (ROZKAZ STAŁY)",
             "Zaktualizuj 'Stan na:' w MANIFEST/README na datę commitu",
+            "python narzedzia/skan_wad_kodu.py — łowca powtórek z Księgi Wad (pre-push)",
             "URUCHOM bramkę RĘCZNIE (testy+audyt powyżej) — hook pre-commit NIE jest w repo "
-            "(nie klonuje się); git add -A && git commit; git push -u origin <branch>",
+            "(nie klonuje się); git add -A && git commit — i STOP: Claude NIGDY nie pushuje "
+            "(rozkaz 2026-07-11), melduje 'gotowe, można push' i podaje blok PowerShell Cezarowi",
+            "Pełna checklista zamknięcia: /clausura (sigillum — kroki żywe z CLAUDE.md)",
         ],
         "zrodlo": "TRYB AUTONOMICZNY + Prawo XXI",
     },
@@ -175,13 +217,20 @@ _ZIARNO = [
 
 
 def zasiej(plik: Optional[Path] = None) -> int:
-    """Wpisuje ziarno procedur (jeśli brak). Zwraca ile dodano. Idempotentne (dedup)."""
-    dodano = 0
+    """Wpisuje ziarno procedur i LECZY już zapisane, gdy ziarno się zmieniło.
+
+    Idempotentne: przy niezmienionym ziarnie zwraca 0. Używa `zapisz()` (upsert),
+    bo `dodaj()` cicho pomijał istniejące nazwy — przez co poprawka w ziarnie NIGDY
+    nie docierała do zapisanego runbooka (wada zmierzona 2026-07-20).
+    Zwraca liczbę procedur realnie dodanych LUB zaktualizowanych.
+    """
+    zmienione = 0
     for z in _ZIARNO:
-        if dodaj(z["nazwa"], z["kroki"], ",".join(z["wyzwalacz"].split(",")),
-                 z.get("zrodlo", ""), plik=plik):
-            dodano += 1
-    return dodano
+        stan = zapisz(z["nazwa"], z["kroki"], z["wyzwalacz"],
+                      z.get("zrodlo", ""), plik=plik)
+        if stan != "bez zmian":
+            zmienione += 1
+    return zmienione
 
 
 def raport_startowy(plik: Optional[Path] = None) -> str:

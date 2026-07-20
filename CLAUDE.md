@@ -609,6 +609,33 @@ append-only ledger `bibliotheca_ulpia/dane/codex_notarum.jsonl` (źródło prawd
 - **Push robi WYŁĄCZNIE Cezar ręcznie** (`git push origin <branch>` w jego terminalu) —
   Claude nigdy nie pushuje, tylko melduje gotowość (patrz TRYB AUTONOMICZNY p.4). PR tylko na wyraźną prośbę.
 
+## 🔏 SIGLA IMPERII — HASŁA-SKRÓTY PROCEDUR (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-20)
+
+**Cezar nie musi opisywać procedury za każdym razem — wystarczy pieczęć.** *Sigillum* to jeden
+znak uruchamiający pełną checklistę. Organ: **SIGILLARIUM** (`imperium/biblioteki/sigillarium.py`).
+
+| Sigillum | Uruchamia | Aliasy słowne (działają też w prozie) |
+|---|---|---|
+| `/apertio` | pełną checklistę **OTWARCIA SESJI** (sekcja niżej) | otwarcie, start sesji, zaczynamy, nowa sesja |
+| `/clausura` | pełną checklistę **KOŃCA SESJI** (sekcja niżej) | zamknięcie, koniec sesji, domykamy, kończymy |
+| `/limes` | **bramkę Prawa XXI**: testy → audyt (17 warstw z ruff) → skan wad → INDEX FALSORUM → dług honorowy | bramka, przed commitem, sprawdź wszystko |
+
+**ŻELAZNA ZASADA: pieczęć NIE przechowuje kroków — czyta je z TEGO pliku w chwili wywołania.**
+Powód zmierzony (2026-07-20): runbook W11 kazał Claude `git push` przez 9 dni po zakazie (rozkaz
+2026-07-11 → naprawa 2026-07-20; sam runbook miał wtedy 19 dni), bo miał
+własną, ręcznie wpisaną treść. To ta sama klasa co CENSUS ORGANORUM — **lekarstwem na gnicie jest
+odebranie dokumentowi prawa do własnej treści.** Zmiana checklisty tutaj = natychmiastowa zmiana sigla.
+
+- Dodajesz sigillum → wpis w `SIGLA` + `.claude/skills/<nazwa>/SKILL.md`, który **woła pieczęć,
+  nie kopiuje kroków** (test pilnuje rozjazdu w obie strony).
+- `python -m imperium.biblioteki.sigillarium lista | apertio | clausura | limes | sync-w11`
+- `sync-w11` przepisuje żywe kroki do pamięci proceduralnej (W11) — sigla są **wyzwalaczami**
+  runbooków, nie ich duplikatem (Prawo XVI).
+- `🚨 PIECZĘĆ PUSTA` / `🚨 MARTWE KOMENDY` w wydruku = **alarm**, nie „brak zadań".
+
+**Złamanie:** skopiowanie kroków do skilla zamiast wołania pieczęci; sigillum bez skilla (lub skill
+bez sigillum); zignorowanie pustej pieczęci.
+
 ## 🌅 OTWARCIE SESJI — CHECKLISTA STAŁA (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-19)
 
 **Zamknięcie miało 9-krokową checklistę, otwarcie było tylko narracyjne (PRAWO XVII rozproszone) —

@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 239** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 240** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -79,6 +79,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `pamiec_sesji.py` | 🧠 Pamięć Sesji (W-360) — ciągłość między sesjami Claude Code |
 | `refleksja_pamieci.py` | 🪞 Refleksja Pamięci — W9 Centrum Pamięci W-360 v9: SPRZECZNOŚCI + PRZEDAWNIENIE (UNIKAT) |
 | `rejestr_wizji.py` | 📋 Rejestr Wizji i Decyzji — W4 Centrum Pamięci W-360 v4 |
+| `sigillarium.py` | 🔏 SIGILLARIUM — Skarbiec Pieczęci Imperium (SIGLA IMPERII) |
 | `srodowisko_pamieci.py` | 🌉 Most Chmura↔Lokal — W5 Centrum Pamięci W-360 v5 (UNIKAT IMPERIUM) |
 | `synapsy_rezimowe.py` | 🧬 IMV-ORI / Synapsy Reżimowe — Regime-Aware Decorrelated Coalition Graph (W-299) |
 | `zapominanie.py` | 🍂 Mądre Zapominanie — W10 Centrum Pamięci W-360 v10: LEARNED FORGETTING (UNIKAT) |

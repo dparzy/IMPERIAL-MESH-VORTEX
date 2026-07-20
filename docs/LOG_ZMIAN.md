@@ -14,6 +14,62 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-20 | 🔏 | SIGLA IMPERII — organ SIGILLARIUM + naprawa gnicia pamięci proceduralnej
+
+### Rozkaz Cezara (zamknięcie wachty doks20)
+
+> „ustalić SIGLA IMPERII — skróty użytkowe (hasła-komendy) uruchamiające pełne procedury bez
+> opisywania ich za każdym razem; NIE dublować runbooków W11 — skróty mają być ich WYZWALACZAMI"
+
+**Decyzja Cezara 2026-07-20:** forma = **skille harnessa `/nazwa` + polskie aliasy słowne**;
+zestaw = **rdzeń trzech pieczęci** (otwarcie / zamknięcie / bramka). Pozostali kandydaci
+(krok 9, oko za oko, cenzus, kronika, podgląd) **nie wdrożeni** — czekają na decyzję.
+
+### Wada znaleziona po drodze (POMIAR, nie podejrzenie)
+
+| Co zmierzone | Dowód |
+|---|---|
+| Runbook W11 „Bezpieczny commit" kazał Claude `git push -u origin <branch>` | krok 5 w `procedury.jsonl` vs rozkaz z **2026-07-11** („Claude NIGDY nie pushuje") — gnił **9 dni** (07-11 → 07-20; runbook zapisany 07-01, więc miał 19 dni) |
+| Runbooka **nie dało się** zaktualizować | `dodaj(dedup=True)` cicho zwracał `False` bez zapisu — brak jakiejkolwiek ścieżki UPSERT |
+| Poprawka ziarna w kodzie nie docierała do danych | `zasiej()` wołał `dodaj()`, więc istniejąca nazwa była pomijana |
+| Co widział Cezar | pogodne „🛠️ Pamięć proceduralna (W11): 4 procedur (runbooków) gotowych" |
+
+Klasa znana z poprzedniej wachty: **mechanizm, który przy awarii wygląda na sprawny.**
+
+### Wdrożone
+
+| Element | Treść |
+|---|---|
+| **SIGILLARIUM** (organ) | `imperium/biblioteki/sigillarium.py` — Skarbiec Pieczęci; rejestr `SIGLA` + parser konstytucji + CLI (`lista`/`apertio`/`clausura`/`limes`/`sync-w11`) |
+| **Rdzeń sigli** | `/apertio` (7 kroków), `/clausura` (10 kroków), `/limes` (5 komend bramki) — liczby **liczone z żywego CLAUDE.md**, nie wpisane |
+| **Zasada rdzeniowa** | pieczęć **nie przechowuje kroków** — czyta je z `CLAUDE.md` w chwili wywołania; rozjazd strukturalnie niemożliwy (to samo lekarstwo co CENSUS ORGANORUM) |
+| **Ujście w harnessie** | `.claude/skills/{apertio,clausura,limes}/SKILL.md` — cienkie, **wołają pieczęć zamiast kopiować kroki** (test pilnuje rozjazdu w obie strony) |
+| **Naprawa W11** | `pamiec_proceduralna.zapisz()` = upsert z jawnym werdyktem `dodano`/`zaktualizowano`/`bez zmian`; `zasiej()` **leczy** zgniłe ziarno (wyleczył 1, drugi bieg 0 = idempotencja); aktualizacja nie kasuje nieznanych pól |
+| **Wpięcie** | `synchronizuj_w11()` przepisuje żywe kroki do runbooków (hasło działa też pisane prozą); `raport_startowy()` w Centrum Pamięci — Cezar widzi pieczęcie na starcie |
+| **Kodyfikacja** | `CLAUDE.md` § SIGLA IMPERII (tabela pieczęci + aliasy + żelazna zasada) |
+
+### Uodpornienie klasy (ZASADA CENSORA)
+
+- **Księga Wad #52:** „stan bez ścieżki aktualizacji (zapis jednokierunkowy)" — pytanie do review:
+  *jak ta treść zostanie POPRAWIONA, gdy się zdezaktualizuje?* Odpowiedź „ręcznie"/„nijak" ⇒ nie
+  przechowuj, **generuj ze źródła prawdy**. Świadomie **bez regexu** (wzorzec semantyczny, nie składniowy).
+- **Test regresyjny:** żaden runbook nie może kazać Claude pushować.
+- **Alarmy zamiast ciszy:** `🚨 PIECZĘĆ PUSTA` (zniknęła sekcja konstytucji), `🚨 MARTWE KOMENDY`
+  (bramka woła nieistniejący skrypt), test **ciągłości numeracji** (dziura = krok zgubiony po cichu).
+
+### Bramki
+
+Testy `tests/test_sigillarium.py` **19 nowych** · audyt **exit 0** (sam złapał nowy organ w W11+W15+W17
+i wymusił meldunek) · skan wad czysto · INDEX FALSORUM czysto · **LEX TALIONIS: N-fb66738e ↔ C-ecfaecb3,
+dług honorowy 0** · sugestia SIGLA w ledgerze CODEX **zamknięta** (nie wisi jako KANDYDAT).
+
+**Pliki:** `imperium/biblioteki/sigillarium.py`, `imperium/biblioteki/pamiec_proceduralna.py`,
+`imperium/biblioteki/centrum_pamieci.py`, `.claude/skills/*/SKILL.md`, `tests/test_sigillarium.py`,
+`CLAUDE.md`, `docs/ARCHITEKTURA_IMPERIUM.md`, `docs/INDEKS_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`,
+`README.md` (liczba organów biblioteki 27→28), ledgery CODEX/NOTARUM/Księga Wad.
+
+---
+
 ## 2026-07-20 | 🏛️ | CENSUS ORGANORUM (Warstwa 17) + typ POMIAR — dwie NOTY spłacone
 
 ### Zarzut Cezara (zatwierdzony pomiarem, nie przyjęty na słowo)

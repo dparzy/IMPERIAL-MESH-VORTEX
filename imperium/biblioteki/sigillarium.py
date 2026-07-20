@@ -75,7 +75,7 @@ SIGLA: Dict[str, Sigillum] = {
         opis="Pełna checklista otwarcia sesji: czytanie wydruku hooka, rozstrzygnięcie "
              "alarmów, weryfikacja „czy już istnieje”, rozpoznanie terenu, plan.",
         wyzwalacze=["apertio", "otwarcie", "otwarcie sesji", "start sesji",
-                    "zaczynamy", "nowa sesja"],
+                    "zaczynamy", "otwieramy", "nowa sesja"],
         sekcja="## 🌅 OTWARCIE SESJI",
         zrodlo="CLAUDE.md § OTWARCIE SESJI (Cezar 2026-07-19)",
     ),
@@ -84,7 +84,7 @@ SIGLA: Dict[str, Sigillum] = {
         tytul="CLAUSURA — domknięcie wachty",
         opis="Pełna checklista końca sesji: bramka, CODEX, recenzja adversarialna, "
              "symbioza dokumentów, Prawo XV, dług honorowy, Dziennik, commit, alarmy.",
-        wyzwalacze=["clausura", "zamknięcie", "zamkniecie", "koniec sesji",
+        wyzwalacze=["clausura", "zamknięcie", "zamkniecie", "zamykamy", "koniec sesji",
                     "domykamy", "kończymy", "konczymy"],
         sekcja="## 🏁 KONIEC SESJI",
         zrodlo="CLAUDE.md § KONIEC SESJI (Cezar 2026-07-19)",
@@ -94,8 +94,8 @@ SIGLA: Dict[str, Sigillum] = {
         tytul="LIMES — bramka Prawa XXI (wał graniczny)",
         opis="Twarda bramka przed każdym commitem: testy, audyt 17 warstw (z ruff), "
              "łowca powtórek Księgi Wad, spis obalonych twierdzeń, dług honorowy.",
-        wyzwalacze=["limes", "bramka", "przed commitem", "sprawdź wszystko",
-                    "sprawdz wszystko"],
+        wyzwalacze=["limes", "bramka", "zrób bramkę", "zrob bramke", "przed commitem",
+                    "przed pushem", "sprawdź wszystko", "sprawdz wszystko"],
         komendy=[
             "python tests/run_tests.py",
             "python narzedzia/audyt_spojnosci.py",
@@ -162,16 +162,18 @@ def kroki_z_konstytucji(sekcja: str, tekst: Optional[str] = None) -> List[str]:
                 kroki.append(_splasz(" ".join(biezacy)))
             biezacy = [f"{m.group(1)}. {m.group(2)}"]
         elif biezacy:
-            # kontynuacja kroku = linia wcięta i niepusta; pusta linia kończy krok
-            if ln.strip() and ln[:1].isspace():
-                biezacy.append(ln.strip())
-            elif not ln.strip():
+            if not ln.strip():
+                # pusta linia domyka bieżący krok
                 kroki.append(_splasz(" ".join(biezacy)))
                 biezacy = []
             else:
-                # akapit bez wcięcia = koniec checklisty (proza po liście)
-                kroki.append(_splasz(" ".join(biezacy)))
-                biezacy = []
+                # KAŻDA niepusta linia w środku kroku (wcięta LUB nie) = zawinięta
+                # kontynuacja — doklejamy ją. Wcześniej niewcięta linia była CICHO
+                # gubiona jako „proza po liście", co ucinało treść kroku, zostawiając
+                # numerację ciągłą (zmierzone 2026-07-20). Zgubienie fragmentu
+                # checklisty jest groźniejsze niż doklejenie ogona (Prawo I): stop daje
+                # `**Złamanie:**` albo następny nagłówek `## ` (obsłużony w _tresc_sekcji).
+                biezacy.append(ln.strip())
     if biezacy:
         kroki.append(_splasz(" ".join(biezacy)))
     return kroki
@@ -200,8 +202,30 @@ def kroki(nazwa: str, tekst: Optional[str] = None) -> List[str]:
     return kroki_z_konstytucji(s.sekcja, tekst)
 
 
+def _cel_komendy_istnieje(kom: str) -> Optional[bool]:
+    """Czy plik/moduł, na który wskazuje komenda, istnieje?
+
+    Zwraca True/False dla komend wskazujących cel, albo None gdy komenda nie
+    odwołuje się do żadnego pliku ani modułu (nic do sprawdzenia). Rozpoznaje
+    DWA warianty, bo LIMES używa obu:
+      • ścieżka `narzedzia/x.py`             → sprawdzenie pliku,
+      • `python -m imperium.biblioteki.x`    → mapowanie kropek na ścieżkę .py.
+    Wariant `-m` był wcześniej ślepą plamą (regex `\\S+\\.py` go nie łapał), więc
+    martwa komenda LEX TALIONIS przeszłaby cicho (zmierzone 2026-07-20).
+    """
+    m_mod = re.search(r"-m\s+([\w.]+)", kom)
+    if m_mod:
+        rel = Path(m_mod.group(1).replace(".", "/") + ".py")
+        # moduł-plik `a/b/c.py` albo pakiet `a/b/c/__init__.py`
+        return (KORZEN / rel).exists() or (KORZEN / rel.with_suffix("") / "__init__.py").exists()
+    m_py = re.search(r"(\S+\.py)", kom)
+    if m_py:
+        return (KORZEN / m_py.group(1)).exists()
+    return None
+
+
 def brakujace_komendy(nazwa: str) -> List[str]:
-    """Komendy sigla wskazujące na NIEISTNIEJĄCY plik (łowca API-widm, Warstwa 16).
+    """Komendy sigla wskazujące na NIEISTNIEJĄCY plik/moduł (łowca API-widm, Warstwa 16).
 
     Pieczęć wołająca skrypt, którego nie ma, to procedura udająca sprawną —
     dokładnie klasa „mechanizm, który przy awarii wygląda na sprawny".
@@ -209,12 +233,7 @@ def brakujace_komendy(nazwa: str) -> List[str]:
     s = sigillum(nazwa)
     if s is None:
         return []
-    braki = []
-    for kom in s.komendy:
-        m = re.search(r"(\S+\.py)", kom)
-        if m and not (KORZEN / m.group(1)).exists():
-            braki.append(kom)
-    return braki
+    return [kom for kom in s.komendy if _cel_komendy_istnieje(kom) is False]
 
 
 def raport(nazwa: str) -> str:

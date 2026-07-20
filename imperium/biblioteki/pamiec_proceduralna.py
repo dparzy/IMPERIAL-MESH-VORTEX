@@ -30,6 +30,7 @@ CLI:
 from __future__ import annotations
 
 import json
+import os
 import re
 from datetime import date
 from pathlib import Path
@@ -37,6 +38,22 @@ from typing import Dict, Any, List, Optional
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 PLIK_DOMYSLNY = ROOT / "bibliotheca_ulpia" / "dane" / "procedury.jsonl"
+
+
+def _zapisz_atomowo(plik: Path, wpisy: List[Dict[str, Any]]) -> None:
+    """Przepisuje CAŁY plik JSONL atomowo: zapis do `.tmp` + `os.replace` (rename).
+
+    `write_text` nadpisujący plik w miejscu mógł go OBCIĄĆ przy przerwaniu (crash,
+    Ctrl-C, brak miejsca) i zgubić WSZYSTKIE runbooki, nie tylko aktualizowany —
+    regresja względem starego `dodaj()`, który tylko dopisywał. `os.replace` na tym
+    samym katalogu jest atomowy: albo widać stary plik w całości, albo nowy w całości.
+    """
+    plik.parent.mkdir(parents=True, exist_ok=True)
+    tmp = plik.with_name(plik.name + ".tmp")
+    tmp.write_text(
+        "".join(json.dumps(w, ensure_ascii=False) + "\n" for w in wpisy),
+        encoding="utf-8")
+    os.replace(tmp, plik)
 
 
 def _dzis() -> str:
@@ -118,10 +135,7 @@ def zapisz(nazwa: str, kroki: List[str], wyzwalacz: str = "",
             nowy.update({"nazwa": nazwa, "wyzwalacz": wyzw, "kroki": kroki_czyste,
                          "zrodlo": zrodlo.strip(), "data": data or _dzis()})
             wpisy[i] = nowy
-            plik.parent.mkdir(parents=True, exist_ok=True)
-            plik.write_text(
-                "".join(json.dumps(w, ensure_ascii=False) + "\n" for w in wpisy),
-                encoding="utf-8")
+            _zapisz_atomowo(plik, wpisy)
             return "zaktualizowano"
     dodaj(nazwa, kroki_czyste, wyzwalacz, zrodlo, data, plik)
     return "dodano"

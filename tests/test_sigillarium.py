@@ -45,6 +45,30 @@ def test_parser_lapie_numeracje_z_sufiksem():
     assert kroki[-1].startswith("5b. "), kroki[-1]
 
 
+def test_parser_nie_gubi_niewcietej_kontynuacji():
+    """Zawinięta linia bez wcięcia (typowa przy ręcznej edycji CLAUDE.md) była CICHO
+    gubiona — numeracja zostawała ciągła, a treść kroku ucięta (zmierzone 2026-07-20).
+    Test ciągłości numeracji tego NIE łapał, bo numery były w porządku."""
+    probka = ("## 🧪 S\n"
+              "1. Krok jeden.\n"
+              "2. Krok dwa z długim opisem\n"
+              "kontynuacja bez wcięcia MUSI przetrwać\n"
+              "   i wcięta też.\n"
+              "3. Krok trzeci.\n")
+    kroki = sg.kroki_z_konstytucji("## 🧪 S", probka)
+    assert len(kroki) == 3, kroki
+    assert "kontynuacja bez wcięcia MUSI przetrwać" in kroki[1]
+    assert "i wcięta też" in kroki[1]
+
+
+def test_parser_liczby_krokow_zywej_konstytucji_stabilne():
+    """Regresja na PRAWDZIWYM CLAUDE.md: naprawa parsera nie mogła zmienić liczb
+    (7/10/5). Gdyby zmieniła, znaczyłoby, że doklejam prozę, której wcześniej nie było."""
+    assert len(sg.kroki("apertio")) == 7
+    assert len(sg.kroki("clausura")) == 10
+    assert len(sg.kroki("limes")) == 5
+
+
 def test_parser_dopasowuje_naglowek_po_prefiksie():
     """Ogon nagłówka („(ROZKAZ STAŁY — Cezar zatwierdził ...)") bywa aktualizowany.
 
@@ -117,6 +141,26 @@ def test_limes_nie_wola_nieistniejacych_skryptow():
         assert sg.brakujace_komendy(s.nazwa) == []
 
 
+def test_brakujace_komendy_wykrywa_martwy_modul_dash_m():
+    """Przypadek NEGATYWNY: komenda `python -m ...` na nieistniejący moduł MUSI zostać
+    wykryta. Wcześniej regex `\\S+\\.py` jej nie widział — martwa komenda LEX TALIONIS
+    (krok 5b, forma `-m`) przeszłaby cicho (zmierzone 2026-07-20)."""
+    widmo = sg.Sigillum(nazwa="WIDMO_M", tytul="W", opis="", wyzwalacze=["widmo_m"],
+                        komendy=["python -m imperium.biblioteki.nie_ma_takiego_modulu bilans"])
+    sg.SIGLA["WIDMO_M"] = widmo
+    try:
+        assert sg.brakujace_komendy("WIDMO_M") == [widmo.komendy[0]]
+    finally:
+        sg.SIGLA.pop("WIDMO_M", None)
+
+
+def test_cel_komendy_rozpoznaje_zywy_modul_i_plik():
+    assert sg._cel_komendy_istnieje("python -m imperium.biblioteki.codex_notarum bilans") is True
+    assert sg._cel_komendy_istnieje("python narzedzia/audyt_spojnosci.py") is True
+    assert sg._cel_komendy_istnieje("python -m imperium.biblioteki.brak_xyz") is False
+    assert sg._cel_komendy_istnieje("echo bez celu") is None
+
+
 def test_raport_pustej_pieczeci_krzyczy_zamiast_milczec():
     """Bez `monkeypatch` — runner Imperium ma własny, minimalny shim (brak `setitem`).
 
@@ -158,6 +202,18 @@ def test_skille_wolaja_wlasna_pieczec_i_nie_kopiuja_krokow():
         assert f"sigillarium {s.nazwa.lower()}" in tresc, f"{s.nazwa}: skill nie woła pieczęci"
 
 
+def test_skill_nie_kopiuje_komend_bramki():
+    """Skill kopiujący komendy pieczęci = druga kopia, która zgnije (dokładnie klasa,
+    którą organ ma eliminować). LIMES trzyma komendy w kodzie — żadna nie może wystąpić
+    dosłownie w SKILL.md. Wcześniej limes/SKILL.md wypisywał wszystkie 5 (zmierzone)."""
+    for s in sg.wszystkie():
+        if not s.komendy:
+            continue
+        tresc = (SKILLE / s.nazwa.lower() / "SKILL.md").read_text(encoding="utf-8")
+        skopiowane = [k for k in s.komendy if k in tresc]
+        assert not skopiowane, f"{s.nazwa}/SKILL.md kopiuje komendy zamiast wołać pieczęć: {skopiowane}"
+
+
 # ── W11: upsert (wada zmierzona 2026-07-20) ───────────────────────────────────
 
 def test_zapisz_dodaje_aktualizuje_i_rozpoznaje_brak_zmian(tmp_path):
@@ -180,6 +236,19 @@ def test_zapisz_nie_kasuje_nieznanych_pol(tmp_path):
                     encoding="utf-8")
     assert pp.zapisz("Proba", ["a", "b"], plik=plik) == "zaktualizowano"
     assert pp.pobierz("Proba", plik)["obce_pole"] == "nie kasuj mnie"
+
+
+def test_zapisz_jest_atomowy_nie_zostawia_tmp(tmp_path):
+    """Aktualizacja przez `.tmp` + os.replace: po sukcesie nie ma pliku tymczasowego,
+    a treść jest kompletna. Chroni przed obcięciem całego pliku runbooków przy crashu."""
+    plik = tmp_path / "p.jsonl"
+    pp.zapisz("A", ["a"], plik=plik)
+    pp.zapisz("B", ["b"], plik=plik)
+    pp.zapisz("A", ["a2"], plik=plik)  # aktualizacja = pełne przepisanie
+    assert not (tmp_path / "p.jsonl.tmp").exists(), "plik tymczasowy nie został posprzątany"
+    nazwy = [w["nazwa"] for w in pp.wszystkie(plik)]
+    assert nazwy == ["A", "B"], nazwy
+    assert pp.pobierz("A", plik)["kroki"] == ["a2"]
 
 
 def test_zapisz_nie_gubi_sasiednich_procedur(tmp_path):

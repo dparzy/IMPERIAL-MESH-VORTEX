@@ -10,25 +10,23 @@ powstaje, dopóki wszystkie bramki nie są zielone.
 
 ## Wykonanie
 
-Wypisz komendy pieczęci, a potem uruchom je po kolei:
+1. **Wypisz komendy bramki i uruchom je po kolei** (kolejność ma znaczenie — pierwsza
+   czerwona zatrzymuje resztę):
 
 ```bash
 python -m imperium.biblioteki.sigillarium limes
 ```
 
-Bramki (kolejność ma znaczenie — pierwsza czerwona zatrzymuje resztę):
+Ten skill **celowo nie wypisuje komend bramki** — są jednym źródłem prawdy w rejestrze
+`SIGLA` (`imperium/biblioteki/sigillarium.py`). Kopia tutaj rozjechałaby się przy zmianie
+bramki (to samo gnicie, które SIGILLARIUM ma eliminować). Pieczęć podaje aktualną listę.
 
-1. `python tests/run_tests.py` — musi być **X/X zielone**
-2. `python narzedzia/audyt_spojnosci.py` — musi być **exit 0** (17 warstw, w tym ruff W13)
-3. `python narzedzia/skan_wad_kodu.py` — łowca powtórek znanych klas błędów
-4. `python narzedzia/skan_wad_kodu.py --falsa` — INDEX FALSORUM: żadne obalone
-   twierdzenie nie wróciło do korpusu
-5. `python -m imperium.biblioteki.codex_notarum bilans` — dług honorowy musi być **0**
+2. Po zielonej bramce, **przed pushem**, dochodzi recenzja adversarialna `/code-review`
+   na diffie (perspektywa recenzenta, nie autora) — nie jest częścią bramki LIMES, bo to
+   nie jest komenda CLI z jednoznacznym exit code.
 
 ## Zasady
 
 - Czerwona bramka → **NIE commitujesz**: naprawiasz u źródła, potem powtarzasz LIMES.
-- Przed pushem dochodzi jeszcze recenzja adversarialna `/code-review` na diffie
-  (perspektywa recenzenta, nie autora).
-- Jeśli pieczęć zgłosi `🚨 MARTWE KOMENDY`, któryś skrypt bramki zniknął lub zmienił
+- Jeśli pieczęć zgłosi `🚨 MARTWE KOMENDY`, któryś skrypt/moduł bramki zniknął lub zmienił
   nazwę — bramka udawałaby sprawną. Napraw natychmiast.

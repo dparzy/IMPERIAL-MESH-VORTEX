@@ -14,6 +14,52 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | 🔍 | Adversarialny zwiad SIGILLARIUM — 4 wady świeżego organu naprawione
+
+### Rozkaz Cezara
+
+> „wyślij podobne dla naszych nowych trzech pieczęci, cel poprawa i łatanie" — sześciu
+> subagentów-zwiadowców (Sonnet, osobne konteksty) na organ SIGILLARIUM + całe Imperium.
+
+### 4 wady MOJEGO świeżego kodu (commit e399abf), złapane przez zwiad, nie przez moje testy
+
+| # | Wada | Dowód (POMIAR) | Naprawa u źródła |
+|---|---|---|---|
+| 1 | Parser `kroki_z_konstytucji` **cicho gubił niewciętą zawiniętą kontynuację** kroku — numeracja ciągła, treść ucięta | probka z niewciętą linią → 3 kroki, treść kroku 2 ucięta | dokleja KAŻDĄ niepustą linię w środku kroku; stop daje `**Złamanie:**`/nagłówek |
+| 2 | `limes/SKILL.md` **kopiował 5 komend bramki** zamiast wołać pieczęć (naruszenie zasady organu) | czytanie pliku | skill woła pieczęć; komendy zostają jednym źródłem w `SIGLA` |
+| 3 | `brakujace_komendy` **ślepe na `python -m pakiet`** (regex `\S+\.py`) — martwa komenda LEX TALIONIS przeszłaby cicho | `brakujace_komendy(Sigillum z -m widmo)` → `[]` | `_cel_komendy_istnieje` mapuje `a.b.c` → `a/b/c.py` |
+| 4 | `zapisz()` **nieatomowy** — `write_text` w miejscu, crash mógł obciąć wszystkie runbooki | czytanie kodu (regresja vs stary `dodaj()`) | `_zapisz_atomowo`: `.tmp` + `os.replace` |
+
+### Uodpornienie klasy (każda naprawa ma test łapiący JEJ klasę)
+
+- `test_parser_nie_gubi_niewcietej_kontynuacji` + regresja liczb 7/10/5 na żywym CLAUDE.md
+- `test_skill_nie_kopiuje_komend_bramki` — pilnuje NIEOBECNOŚCI każdej komendy w SKILL.md
+- `test_brakujace_komendy_wykrywa_martwy_modul_dash_m` — przypadek NEGATYWNY (`-m` widmo MUSI być złapane)
+- `test_zapisz_jest_atomowy_nie_zostawia_tmp`
+- **Księga Wad #53:** „ślepa plama detektora na wariant składni" — detektor chroniący przed czymś
+  musi pokryć WSZYSTKIE formy zapisu celu + mieć test negatywny (nie tylko „aktualne czyste").
+
+### Ergonomia (Prawo XVIII — drobiazgi jednoznaczne)
+
+Dopisane aliasy słowne: APERTIO „otwieramy"; CLAUSURA „zamykamy"; LIMES „zrób bramkę", „przed pushem".
+
+### Bramki
+
+Testy `tests/test_sigillarium.py` 25→**33** (+8) · LEX TALIONIS: **N-d925f3dd ↔ C-a9ab5637**, dług 0.
+Pełna bramka LIMES + wpis Dziennika przed commitem.
+
+**Pliki:** `imperium/biblioteki/sigillarium.py`, `imperium/biblioteki/pamiec_proceduralna.py`,
+`.claude/skills/limes/SKILL.md`, `tests/test_sigillarium.py`, ledgery.
+
+**Fala 1 (całe Imperium, 5 zwiadowców) — synteza do decyzji Cezara, NIE łatane w tym commicie:**
+1 realny dług dokumentów (`TRYBY_IMPERIUM.md` wiersz SKALP „brak danych <1h" — fałsz po dograniu 1m);
+ryzyko kodu (`feature_importance.py` cicha obcinka jak łatany `legatus.py`; `kalkulator_lewara`/`aegis_tarcza`
+ZeroDiv poza chronioną ścieżką produkcyjną); 7/17 warstw audytu bez testu regresyjnego; census W17 pomija
+`tests/`+`skrypty/`; „38 milczących neuronów" OBALONE pomiarem → realnie ~17 (6 wyciszonych + 2 + 11 przez
+`sentyment_per=None`).
+
+---
+
 ## 2026-07-20 | 🔏 | SIGLA IMPERII — organ SIGILLARIUM + naprawa gnicia pamięci proceduralnej
 
 ### Rozkaz Cezara (zamknięcie wachty doks20)

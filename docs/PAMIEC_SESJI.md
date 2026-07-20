@@ -1,4 +1,6 @@
 ---
+
+## Ostatnia aktualizacja: 2026-07-20
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -110,6 +112,27 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 ---
 
 ## 📚 LEKCJE Z SESJI
+
+### 2026-07-20 — Tempo przetwarzania WF-IC
+~2 min/para (15 par ~30 min). BTC/ETH cięższe. Można szacować czas przyszłych uruchomień.
+
+### 2026-07-20 — Wynik WF-IC dla 15 par 4h
+32/49 neuronow ROBUST, 17 szum/niepewne. Czołówka: EXP-13, SMC-01, V-02/V-13/V-14, rodzina X-*. UWAGA: EXP-13 (6 okien), SMC-01 (5), V-13 (3) maja malo okien -> ROBUST slabiej podparty niz X-17/X-01 (25 okien).
+
+### 2026-07-20 — Buforowanie stdout w Pythonie
+Raport WF-IC jest buforowany do końca; aby widzieć postęp na żywo, należy uruchomić skrypt z flagą -u (unbuffered).
+
+### 2026-07-20 — Output hooka startowego ucięty przez harness
+Output hooka startowego (25,5 KB) został ucięty, powodując utratę kluczowej informacji (Dziennik następny krok) z pierwszego okna. Konieczna optymalizacja objętości.
+
+### 2026-07-20 — Asymetria otwarcia i zamknięcia sesji
+Otwarcie sesji nie ma egzekwowanej checklisty, w przeciwieństwie do 9-krokowej checklisty zamknięcia. Ryzyko pominięcia kluczowych kroków startu.
+
+### 2026-07-20 — Testy >2 min na starym Fujitsu – bez limitu czasowego
+Testy trwają ponad 2 minuty ze względu na słaby sprzęt. Nie dawać limitu timeoutu. Uruchamiać w tle i cyklicznie sprawdzać, czy bieg żyje. Procedura zapisana w pamięci długoterminowej.
+
+### 2026-07-20 — Testy na starym Fujitsu trwają >2 minuty — normalne
+Testy (2584) zajmują ponad 2 minuty na starym sprzęcie. Nie dawaj limitu czasu, uruchamiaj w tle i cyklicznie sprawdzaj, czy żyje. Zapamiętane na stałe, nie wracamy do tematu.
 
 ### 2026-06-30 — KROK 0 ujawnił błąd w liczeniu neuronów w MANIFEST
 MANIFEST pokazywał 45 aktywnych, podczas gdy grep wykazał ~16. Przyczyna: zwiadowcy i infrastruktura liczone jako neurony. Nauczka: ujednolicić sposób liczenia.

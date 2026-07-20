@@ -63,3 +63,6 @@ docs/KOLEJKA_HIPOTEZ_BIBLIOTEKARZ.jsonl
 # Setki MB surowych CSV; oryginal i tak jest poza repo (dane/**/*.csv), a kopia sluzy
 # WYLACZNIE do cofniecia naprawy na tej maszynie.
 dane/_kopie/
+
+# Checkpointy pobierania (narzedzia/pobierz_binance.py) - surowe strony API, odtwarzalne.
+dane/_checkpoint/

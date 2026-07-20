@@ -14,6 +14,130 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-20 | ⚖️ | HIPOTEZA INTERWAŁU — teza o monotoniczności OBALONA, 4h jedynym stabilnym
+
+### Wynik (BTC+ETH, okno WYRÓWNANE PO DATACH 2025-06-18 → 2026-06-18, identyczna konfiguracja)
+
+| interwał | ROI% | maxDD% | transakcje | win rate | barów/parę |
+|---|---|---|---|---|---|
+| **4h** | **+3.26** | 0.10 | 77 | 45.5% | 2 191 |
+| 1d | −3.03 | 0.04 | **4** ⚠️ | 25.0% | 343 |
+| 1h | −3.37 | 0.11 | 255 | **50.6%** | 7 607 |
+| 15m | **−5.71** | 0.15 | **1 109** | 43.6% | 35 041 |
+
+Podgląd: `raporty/KAPITOL_PODGLAD_hipoteza_interwalu.html`. Czas biegu: 4 363 s.
+
+### Co obalone, co potwierdzone
+
+**OBALONA — moja teza o monotoniczności.** Twierdziłem „im krótszy interwał, tym gorzej".
+Fałsz: **4h bije 1d**. Zależność ma OPTIMUM, nie gradient.
+
+**POTWIERDZONE — 4h jako jedyny stabilny.** Dwa różne okna: +3.93% (2.3 roku) i +3.26% (1 rok).
+Powtarzalność jest cenniejsza niż pojedynczy wysoki odczyt (1d skakało +9.80 → −3.03).
+
+**NIEINTERPRETOWALNE — wiersz 1d.** **Cztery transakcje**, win rate 25% (1 z 4). To anegdota,
+nie pomiar. Nie wolno z tego wyciągać wniosku w żadną stronę.
+
+**DIAGNOSTYCZNIE NAJCIEKAWSZE — 1h.** Najwyższy win rate w tabeli (**50.6%**) przy ujemnym ROI:
+wygrywa częściej, a traci — **straty większe od zysków**. To nie jest awaria sygnału, tylko
+problem zarządzania pozycją albo kosztów. Zupełnie inna diagnoza niż „sygnał nie działa".
+
+### Naprawiona usterka metodologiczna (zgłaszana dwukrotnie, wreszcie zrobiona)
+
+Narzędzie cięło po **liczbie barów**, zakładając, że pliki kończą się w tym samym momencie.
+Nie kończyły: 1D sięgało 2026-06-18, świeżo pobrane 15m 2026-07-20 — **miesiąc różnicy udający
+„to samo okno"**. Dodane `wspolne_okno()` (przecięcie zakresów dat, `--wyrownaj-daty` domyślnie ON)
+oraz skalowanie limitu przez MINUTY interwału (bez tego 15m dawało dzielnik ułamkowy → okno zerowe).
+
+### Czego wynik NIE mówi (uwaga Cezara)
+
+To jest **konfiguracja swingowa puszczona na świecach 15-minutowych**, nie scalping. Namiestnik
+(W-323) definiuje profil SCALP zupełnie inaczej: **RSI 4-7, lewar_cap=10, FUTURES, próg ×0.95**.
+Pomiar poprawnie izoluje INTERWAŁ (styl stały), ale **profil SCALP — 75 neuronów — pozostaje
+nieprzetestowany**. Wynik −5.71% znaczy „tak grać nie należy", NIE „scalping nie działa".
+Zapisane w CODEX jako kandydat wraz z wymogiem uczciwego modelu kosztów transakcyjnych.
+
+### Nowa luka wykryta przez ten wynik
+
+**Brak progu MINIMALNEJ LICZBY TRANSAKCJI.** LIMEN FENESTRAE pilnuje pokrycia okna, ale werdykt
+oparty na 4 transakcjach wychodzi z tą samą pewnością co oparty na 1109. Kandydat **LIMEN
+NEGOTIORUM** dopisany do CODEX — rozszerzenie istniejącego mechanizmu, nie nowy organ.
+
+---
+
+## 2026-07-20 | 🧱 | CONFLATOR TEMPORUM + NUNTIUS MERCATUS: 5m/15m i odporne pobieranie
+
+### Powód
+
+Profil **SCALP** (Namiestnik W-323 mapuje M1–M15) **nigdy nie był testowany** — mieliśmy dane
+1-minutowe, ale zero plików 5m/15m. Zmierzona zależność 1d +9.80% / 4h +3.93% / 1h −4.38% daje
+falsyfikowalną prognozę: krótsze interwały mają wyjść **jeszcze gorzej**. Jeśli wyjdą lepiej —
+teza o interwale upada i trzeba ją odwołać.
+
+### Dwa narzędzia z rzymskimi imionami (ZASADA NOMENKLATURY)
+
+| Organ | Plik | Rola |
+|---|---|---|
+| **CONFLATOR TEMPORUM** (Zlewacz Interwałów) | `narzedzia/agreguj_bary.py` | 1m→5m/15m, 1h→4h; odrzuca niepełne okna |
+| **NUNTIUS MERCATUS** (Posłaniec Rynku) | `narzedzia/pobierz_binance.py` | świece dowolnego interwału z publicznego API |
+| **VERITAS ANNALIUM** (Prawda Roczników) | `narzedzia/audyt_danych.py` | (nazwa nadana wstecz — organ z tej samej sesji) |
+
+Oba powstały z **uogólnienia istniejących** (`agreguj_4h.py`, `pobierz_4h_binance.py`), nie obok nich —
+nazwa pliku też jest dokumentacją i też potrafi skłamać, gdy moduł przestaje dotyczyć tylko 4h.
+Stary `agreguj_4h.py` usunięty za zgodą Cezara (przeczytany w całości, 3 importy przepięte,
+`agreguj_4h()` zachowane jako funkcja zgodności — woła je `audyt_danych.py`).
+
+### Wynik agregacji (BTC+ETH)
+
+5m: 301 993 / 279 076 barów · 15m: 100 661 / 93 023 barów · **0 barów poza siatką** ·
+**200/200 zgodnych z Binance** dla obu par i obu interwałów.
+
+### Odkrycie uboczne — ważniejsze niż sama agregacja
+
+**Dane minutowe kończą się 2022-07-27** — mają prawie 4 lata. PORTITOR meldował „1m: 1453 dni",
+co brzmiało jak świeże dane; to były dni **2019–2022**. Skutek: nie da się dołożyć 15m do tabeli
+liczonej na oknie 2024→2026, bo mieszałoby to efekt interwału z efektem innego reżimu rynku.
+Decyzja Cezara: dociągnąć świeże 1m z Binance (~1.34 mln świec/parę).
+
+### Trzy własne wpadki → trzy mechanizmy (LEX TALIONIS)
+
+**1. `N-962bc1d6` → `C-8fc89d2e` — nadpisanie bez kopii.** Testowy bieg nadpisał
+`dane/4h/Binance_LINKUSDT_4h.csv` (pobrany z Binance) wersją przeliczoną z 1h. Wyszło dobrze
+**tylko dlatego**, że 1h było już naprawione; godzinę wcześniej wgrałbym skażone dane bez cofnięcia.
+To ta sama klasa, którą **godzinę wcześniej sam wpisałem do Księgi Wad**.
+→ **STRAŻ POCHODZENIA**: kopia przed nadpisaniem + odczyt nagłówka i **głośne ostrzeżenie**,
+gdy wersja przeliczona ma zastąpić plik z giełdy. Pilnuje degradacji źródła u sprawcy, nie w audycie.
+
+**2. `N-7d5a9d47` → `C-9f8d479a` — wznawialność pozorna.** Docstring głosił „bieg przerwany w połowie
+nie zaczyna od nowa", a narzędzie trzymało wynik w pamięci i pisało plik **na końcu**. Bieg zabity
+na 10% stracił **140 000 świec**. Zasada, którą cytowałem, mówi wprost: *bieg który umiera NIE traci nic*.
+→ **CHECKPOINT STRONICOWY**: każda strona natychmiast na dysk (z flush). Zmierzone: wznowienie
+**0.7 s** wobec ~20 min pełnego pobrania; checkpoint rośnie na żywo (18 MB / 101 tys. linii po 7%).
+Uszkodzona ostatnia linia (po zabiciu w trakcie zapisu) jest pomijana, nie wywraca odczytu.
+
+**3. Licznik, który kłamał.** Raport mówił „dociągnięto 193" także wtedy, gdy drugi bieg nie wysłał
+**ani jednego** żądania (wszystko z checkpointu). Liczył długość zwróconej listy, nie przyrost.
+→ liczony **przyrost wobec stanu poprzedniego** (po − przed).
+
+### Zatrzymania sesji — hipoteza zawężona, nie potwierdzona
+
+Trzy biegi padły dziś z `KeyboardInterrupt` (sygnał z zewnątrz, nie błąd kodu). **Wykluczone pomiarem:**
+brak pamięci (10.3 GB wolne), awaria sieci na poziomie OS (zero zdarzeń w dzienniku 05:35–05:55),
+podagent jako wspólny mianownik (trzecie padnięcie było bez niego). **Zostaje** intensywny ruch
+sieciowy — hipoteza z **n=3**, nie przyczyna. Tani test: tempo zapytań zwolnione 7/s → 3/s.
+
+### Księga Wad +3 (46)
+
+- **odporność pozorna:** mechanizm zapisujący stan dopiero na końcu — działa tylko gdy niepotrzebny
+- **świeżość danych:** „plik istnieje, więc jest aktualny" — sprawdzaj ZAKRES DAT, nie liczbę wierszy
+- **licznik który kłamie:** raportowanie długości wyniku zamiast rzeczywistego przyrostu
+
+**Pliki:** `narzedzia/agreguj_bary.py` (nowy, zastępuje `agreguj_4h.py`),
+`narzedzia/pobierz_binance.py` (nowy, uogólnia `pobierz_4h_binance.py`), `narzedzia/audyt_danych.py`,
+`narzedzia/pobierz_nowe_pary.py`, `tests/test_czytnik_csv.py`, `docs/ARCHITEKTURA_IMPERIUM.md`, `.gitignore`
+
+---
+
 ## 2026-07-20 | 🔬 | AUDYT DANYCH: 1H pochodziło od pośrednika — 245 barów naprawionych + hipoteza interwału
 
 ### Powód (rozkaz Cezara)

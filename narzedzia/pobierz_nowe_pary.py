@@ -120,11 +120,11 @@ def main():
     print("\n" + "=" * 60)
     print("Agregowanie 1h -> 4h...")
     try:
-        from narzedzia.agreguj_4h import main as _agr
+        from narzedzia.agreguj_bary import main as _agr
         _agr()
     except Exception as e:
         print(f"Blad agregacji: {e}")
-        print("Uruchom recznie: python narzedzia/agreguj_4h.py")
+        print("Uruchom recznie: python narzedzia/agreguj_bary.py --z 1h --do 4h")
 
     print(f"\nGOTOWE! Pobrano {len(pobrane)} par: {', '.join(pobrane)}")
     print("\nAby testowac nowe pary:")

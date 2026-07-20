@@ -42,6 +42,10 @@ from typing import Any, Dict, List, Optional
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 BAZA_BASELINE = ROOT / "bibliotheca_ulpia" / "dane" / "portitor_baseline.json"
+# Powyżej tylu dni od ostatniej świecy dane uznajemy za STARE i mówimy o tym wprost.
+# 45 dni: nasze pliki 1H/4H/1D bywają odświeżane co ~miesiąc (norma), a 4-letnia zaległość
+# w danych 1m przeszła niezauważona przez wiele sesji — próg musi łapać drugie, nie pierwsze.
+PROG_STAROSCI_DNI = 45
 
 # Kluczowe pakiety: (nazwa_importu, nazwa_dystrybucji, krytyczny).
 # Krytyczny=True → brak podnosi alarm (pełna moc Bramy). Reszta = informacyjnie (Prawo I:
@@ -248,7 +252,16 @@ def banner() -> str:
         g = k["nazwa"].split("_")[0]
         grupy[g] = grupy.get(g, True) and k["obecny"]
     klucze = " ".join(f"{g}{'✓' if ok else '✗'}" for g, ok in grupy.items())
-    dane = " ".join(f"{d['interwal']}:{d['wiek_dni']}d" for d in mig["dane"] if d["wiek_dni"] is not None)
+    # Wiek danych z OSTRZEŻENIEM, nie samą liczbą (naprawione 2026-07-20 po własnej pomyłce
+    # Architekta): banner drukował „1m:1453.5d", co miało znaczyć „najświeższa świeca ma 1453
+    # DNI", a zostało odczytane jako „mamy 1453 dni historii" — czyli ostrzeżenie wzięto za
+    # zaletę i zbudowano agregację 5m/15m na danych sprzed 4 lat. Miernik mówił prawdę, ale
+    # nie krzyczał. Od teraz stary wiek dostaje ⚠️ i słowo „STARE".
+    def _wiek(d):
+        w = d["wiek_dni"]
+        return f"{d['interwal']}:{w}d" + (" ⚠️STARE" if w is not None and w > PROG_STAROSCI_DNI else "")
+
+    dane = " ".join(_wiek(d) for d in mig["dane"] if d["wiek_dni"] is not None)
     linie = [f"🏛️ PORTITOR: Python {mig['python']} | deps {deps_ok}/{deps_all} | "
              f"klucze {klucze}" + (f" | dane {dane}" if dane else "")]
     if not dryf["pierwszy"] and dryf["zmiany"]:

@@ -1,8 +1,8 @@
 """
-🔬 AUDYT DANYCH ŚWIECOWYCH — czy nasze OHLCV mówi prawdę?
+🔬 VERITAS ANNALIUM (Prawda Roczników) — AUDYT DANYCH ŚWIECOWYCH: czy nasze OHLCV mówi prawdę?
 
 Powód (rozkaz Cezara 2026-07-20): część `dane/4h/` powstała z PRZELICZENIA 1h
-(`narzedzia/agreguj_4h.py`), więc audyt miał sprawdzić 4h. POMIAR ODWRÓCIŁ PODEJRZENIE:
+(`narzedzia/agreguj_bary.py`), więc audyt miał sprawdzić 4h. POMIAR ODWRÓCIŁ PODEJRZENIE:
 
   • `dane/4h/*.csv`        → źródło **binance.com** — 799/800 barów co do grosza zgodne
   • `dane/godzinowe/*.csv` → źródło **CryptoDataDownload.com** (POŚREDNIK, nie giełda)
@@ -47,7 +47,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from imperium.akwedukty.czytnik_csv import wczytaj_csv  # noqa: E402
-from narzedzia.agreguj_4h import agreguj_4h  # noqa: E402
+from narzedzia.agreguj_bary import agreguj_4h  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 KATALOGI = {"1h": ("dane/godzinowe", "_1h"), "4h": ("dane/4h", "_4h")}

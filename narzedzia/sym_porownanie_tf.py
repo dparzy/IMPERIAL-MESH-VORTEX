@@ -27,11 +27,16 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from imperium.akwedukty.czytnik_csv import wczytaj_csv  # noqa: E402
 from imperium.koloseum.backtest import backtest_portfel  # noqa: E402
 
-# katalog + sufiks pliku + dzielnik barów względem 1h (ten sam zakres kalendarzowy)
+# katalog + sufiks pliku + MINUTY interwału. Liczba barów skalowana przez minuty, nie przez
+# dzielnik całkowity — inaczej interwały KRÓTSZE niż godzina (15m, 5m) dawałyby dzielnik
+# ułamkowy i dzielenie całkowite ucinałoby okno do zera (zmierzone 2026-07-20 przy dokładaniu
+# profilu SCALP, którego nigdy nie testowaliśmy, bo nie było plików 5m/15m).
 INTERWALY = {
-    "1h": ("dane/godzinowe", "_1h", 1),
-    "4h": ("dane/4h", "_4h", 4),
-    "1d": ("dane/dzienne", "_d", 24),
+    "5m":  ("dane/5m", "_5m", 5),
+    "15m": ("dane/15m", "_15m", 15),
+    "1h":  ("dane/godzinowe", "_1h", 60),
+    "4h":  ("dane/4h", "_4h", 240),
+    "1d":  ("dane/dzienne", "_d", 1440),
 }
 PARY_DOMYSLNE = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "DOGEUSDT"]
 MAX_BAROW = int(os.getenv("MAX_BAROW", "30000"))  # 1h barów/parę
@@ -48,14 +53,41 @@ def _pliki(pary, interwal):
     return {s: f"{sub}/Binance_{s}{suf}.csv" for s in pary}
 
 
-def _bieg(pary, interwal, limit, nr, ile):
+def wspolne_okno(pary, interwaly, bary_1h):
+    """Zakres dat WSPÓLNY dla wszystkich interwałów i par: [max(startów), min(końców)].
+
+    Powód (zmierzone 2026-07-20): cięcie po LICZBIE BARÓW zakłada, że każdy plik kończy się
+    w tym samym momencie — a nie kończy. Pliki 1D sięgały 2026-06-18, a świeżo pobrane 15m
+    2026-07-20, więc „to samo okno" różniło się o miesiąc i mieszało efekt interwału z efektem
+    innego wycinka rynku. Dokładnie ta wada, którą to narzędzie miało eliminować.
+    """
+    konce, starty = [], []
+    for interwal in interwaly:
+        for sym, sc in _pliki(pary, interwal).items():
+            b = wczytaj_csv(sc, interwal=interwal, limit=2)
+            if not b:
+                continue
+            konce.append(b[-1]["timestamp"])
+            pierwszy = wczytaj_csv(sc, interwal=interwal, limit=None)[0]["timestamp"]
+            starty.append(pierwszy)
+    if not konce:
+        return None, None
+    do_ms = min(konce)
+    od_ms = max(max(starty), do_ms - bary_1h * 3_600_000)
+    return od_ms, do_ms
+
+
+def _bieg(pary, interwal, limit, nr, ile, okno=None):
     pliki = _pliki(pary, interwal)
     print(f"[{nr}/{ile}] {interwal}: wczytuję {len(pary)} par (cap {limit} barów/parę)...",
           file=sys.stderr, flush=True)
     bary_per = {}
     zakresy = []
     for sym, sc in pliki.items():
-        b = wczytaj_csv(sc, interwal=interwal, limit=limit)
+        b = wczytaj_csv(sc, interwal=interwal, limit=None if okno else limit)
+        if okno:
+            od_ms, do_ms = okno
+            b = [x for x in b if od_ms <= x["timestamp"] <= do_ms]
         bary_per[sym] = b
         if b:
             zakresy.append((b[0]["timestamp"], b[-1]["timestamp"]))
@@ -88,6 +120,10 @@ def main():
                     help="które interwały porównać (domyślnie 1d,4h,1h — od najtańszego)")
     ap.add_argument("--podglad", action="store_true",
                     help="zapisz zero-tokenowy podgląd w Kapitolu (HTML + wykres + link)")
+    ap.add_argument("--wyrownaj-daty", action="store_true", default=True,
+                    help="tnij po WSPÓLNYM zakresie DAT, nie po liczbie barów (domyślnie tak)")
+    ap.add_argument("--bez-wyrownania", dest="wyrownaj_daty", action="store_false",
+                    help="stare zachowanie: cap po liczbie barów (zakresy mogą się rozjechać)")
     args = ap.parse_args()
 
     pary = [p.strip().upper() for p in args.pary.split(",") if p.strip()]
@@ -102,10 +138,17 @@ def main():
     print(f"   Konfiguracja identyczna dla każdego interwału: {BAZA}\n")
 
     t0 = time.time()
+    okno = wspolne_okno(pary, interwaly, args.bary) if args.wyrownaj_daty else None
+    if okno and okno[0]:
+        print(f"   Okno WSPÓLNE (wyrównane po datach): "
+              f"{dt.datetime.utcfromtimestamp(okno[0] / 1000):%Y-%m-%d} → "
+              f"{dt.datetime.utcfromtimestamp(okno[1] / 1000):%Y-%m-%d}\n", flush=True)
     wyniki = []
     for nr, interwal in enumerate(interwaly, 1):
-        limit = max(1, args.bary // INTERWALY[interwal][2])
-        wyniki.append(_bieg(pary, interwal, limit, nr, len(interwaly)))
+        # --bary podawane w jednostce 1h; skalujemy przez MINUTY interwału, żeby każdy
+        # bieg objął ten sam zakres kalendarzowy (15m → ×4 barów, 1d → ÷24).
+        limit = max(1, args.bary * 60 // INTERWALY[interwal][2])
+        wyniki.append(_bieg(pary, interwal, limit, nr, len(interwaly), okno))
 
     print("=" * 72)
     print(" PORÓWNANIE INTERWAŁÓW — to samo okno kalendarzowe, ta sama konfiguracja")

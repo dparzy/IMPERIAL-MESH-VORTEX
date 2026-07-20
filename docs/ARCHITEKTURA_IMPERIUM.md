@@ -77,6 +77,9 @@ Organy pomocnicze POZA `imperium/` — dobór nazwy DO FUNKCJI (ZASADA NOMENKLAT
 | **Speculum Probationis** (Zwierciadło Prób) | `narzedzia/kapitol_podglad.py` | zero-tokenowy podgląd testu w Kapitolu (HTML + inline-SVG, spec + wykres + link) | [V, XXIV] |
 | **Cursus Fenestrarum** (Bieg Okien) | `narzedzia/wfo_chunked.py` | chunkowany, wznawialny walk-forward (checkpoint per-okno) | [I, XVI, XXIV] |
 | **Scriba Codex** (Skryba Kodeksu) | `narzedzia/scriba_codex.py` | idempotentny appender wyników testów do rejestru CODEX | [I, XXI] |
+| **Veritas Annalium** (Prawda Roczników) | `narzedzia/audyt_danych.py` | audyt świec w 3 warstwach: struktura · krzyżowa 1h↔4h · zgodność z giełdą; naprawa zmierzonych rozjazdów z kopią | [I, XVI, XXI] |
+| **Conflator Temporum** (Zlewacz Interwałów) | `narzedzia/agreguj_bary.py` | buduje wyższy interwał z niższego (1m→5m/15m, 1h→4h); odrzuca niepełne okna, ostrzega przy nadpisaniu danych z giełdy | [I, XVI] |
+| **Nuntius Mercatus** (Posłaniec Rynku) | `narzedzia/pobierz_binance.py` | pobiera świece dowolnego interwału z publicznego API Binance; checkpoint stronicowy = zabity bieg traci jedną stronę, nie postęp | [I, XXIV] |
 
 ---
 

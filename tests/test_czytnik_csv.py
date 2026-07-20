@@ -182,7 +182,7 @@ def test_agregacja_4h_kompletne_okna():
     """Agregator 4H: OHLCV poprawne, niepełne okna odrzucone (Prawo I)."""
     import sys, os as _os
     sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), "..", "narzedzia"))
-    from agreguj_4h import agreguj_4h, CZTERY_H_MS
+    from agreguj_bary import agreguj_4h, CZTERY_H_MS
     h = 3600 * 1000
     # 4 pełne godziny od północy + 2 luźne (niepełne okno) → 1 bar 4H
     bary = [
@@ -236,7 +236,7 @@ def test_agregacja_4h_luka_w_srodku():
     """Luka godzinowa w środku okna → okno 3/4 odrzucone (granica kompletności)."""
     import sys, os as _os
     sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), "..", "narzedzia"))
-    from agreguj_4h import agreguj_4h
+    from agreguj_bary import agreguj_4h
     h = 3600 * 1000
     bary = [{"timestamp": t*h, "open": 1, "high": 2, "low": 0.5, "close": 1.5,
              "volume": 1} for t in (0, 1, 3)]   # brak godziny 2

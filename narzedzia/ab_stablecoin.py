@@ -99,7 +99,8 @@ def main():
     ap.add_argument("--interwal", choices=list(INTERWALY), default="1d")
     ap.add_argument("--od", default=None, help="okno OD daty YYYY-MM-DD (intraday tnij, np. 2024-08-01)")
     ap.add_argument("--bary", type=int, default=None,
-                    help="ogranicz do najnowszych N barów/symbol (backtest O(n²) — Prawo XV)")
+                    help="ogranicz do najnowszych N barów/symbol (backtest LINIOWY ~52 ms/tik — "
+                         "koszt proporcjonalny, nie kwadratowy; zmierzone 2026-07-19)")
     ap.add_argument("--ledger", action="store_true",
                     help="dopisz wynik A/B do rejestr_testow.jsonl (CODEX, idempotentnie)")
     args = ap.parse_args()
@@ -122,6 +123,7 @@ def main():
     bary = {sym: wczytaj_csv(sc, interwal=LABEL) for sym, sc in PLIKI.items()}
     if OD_TS is not None:
         bary = {sym: [b for b in bs if int(b["timestamp"]) >= OD_TS] for sym, bs in bary.items()}
+    dostepne = len(bary["BTCUSDT"])   # cała dostępna era — odniesienie dla LIMEN FENESTRAE
     if args.bary:
         bary = {sym: bs[-args.bary:] for sym, bs in bary.items()}
     sent = _sentyment(bary, delta)
@@ -157,7 +159,7 @@ def main():
                            maxdd_delta=dd_a - dd_b, werdykt=krotki,
                            zrodlo=f"ab_stablecoin.py --interwal {args.interwal}"
                            + (f" --bary {args.bary}" if args.bary else ""),
-                           uwaga="5 par")
+                           uwaga="5 par", dostepne_barow=dostepne)
         print(f" 🖋️ Ledger: {'dopisano' if dodano else 'bez zmian (identyczny rekord)'} → CODEX")
     return 0
 

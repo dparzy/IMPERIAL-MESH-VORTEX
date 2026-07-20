@@ -84,7 +84,8 @@ def main():
     ap.add_argument("--interwal", choices=list(INTERWALY), default="1d",
                     help="1d (domyślny), 4h lub 1h — świece z odpowiedniego katalogu")
     ap.add_argument("--bary", type=int, default=None,
-                    help="ogranicz do najnowszych N barów/symbol (backtest jest O(n²) — patrz Prawo XV)")
+                    help="ogranicz do najnowszych N barów/symbol (backtest jest LINIOWY ~52 ms/tik — "
+                         "dłuższe okno kosztuje proporcjonalnie, nie kwadratowo; zmierzone 2026-07-19)")
     ap.add_argument("--ledger", action="store_true",
                     help="dopisz wynik A/B do rejestr_testow.jsonl (CODEX, idempotentnie)")
     args = ap.parse_args()
@@ -101,6 +102,7 @@ def main():
         print("❌ Brak DVOL — A/B niemożliwe.")
         return 1
     bary = _bary_era_dvol(sent)
+    dostepne = len(bary["BTCUSDT"])   # cała era DVOL — odniesienie dla LIMEN FENESTRAE
     if args.bary:
         bary = {s: b[-args.bary:] for s, b in bary.items()}
     n = {s: len(b) for s, b in bary.items()}
@@ -125,6 +127,12 @@ def main():
     else:
         werdykt = "⚖️ NEUTRALNE — brak wyraźnej przewagi; zostaw OFF, więcej danych"
     print(f" WERDYKT: {werdykt}")
+    # LIMEN FENESTRAE — ranga werdyktu wg pokrycia ery (NOTA N-4f7032a6): ten sam sygnał
+    # dał „POMAGA" na 2000 barach i „NEUTRALNE" na pełnej erze. Krótki bieg NIE zamyka tematu.
+    from narzedzia.scriba_codex import ocen_pokrycie
+    ocena = ocen_pokrycie(len(bary["BTCUSDT"]), dostepne)
+    if ocena["ranga"] != "ROZSTRZYGAJACY":
+        print(f" 🔍 RANGA: {ocena['ranga']} — {ocena['nota']}")
     print("=" * 66)
     print(" ⚠️ Walidacja WSTĘPNA: era DVOL ~2 lata (jeden reżim). IC≠PnL — to jest ten pomiar.")
     if args.ledger:
@@ -137,7 +145,7 @@ def main():
                            maxdd_delta=dd_a - dd_b, werdykt=krotki,
                            zrodlo=f"ab_dvol.py --interwal {args.interwal}"
                            + (f" --bary {args.bary}" if args.bary else ""),
-                           uwaga="BTC+ETH era DVOL")
+                           uwaga="BTC+ETH era DVOL", dostepne_barow=dostepne)
         print(f" 🖋️ Ledger: {'dopisano' if dodano else 'bez zmian (identyczny rekord)'} → CODEX")
     return 0
 

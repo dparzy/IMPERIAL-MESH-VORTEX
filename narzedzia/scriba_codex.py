@@ -30,7 +30,8 @@ LEDGER = ROOT / "bibliotheca_ulpia" / "dane" / "rejestr_testow.jsonl"
 
 # Kolejność pól = schemat czytany przez codex_probationum (Prawo XXI: bez aliasów).
 POLA_AB = ("typ", "sygnal", "neuron", "interwal", "okno_barow", "roi_b", "roi_a",
-           "delta_pp", "maxdd_delta", "werdykt", "data", "zrodlo", "uwaga")
+           "delta_pp", "maxdd_delta", "werdykt", "ranga", "pokrycie_ery",
+           "data", "zrodlo", "uwaga")
 POLA_IC = ("typ", "sygnal", "neuron", "horyzont", "ic", "tryb", "prog", "werdykt",
            "kierunek", "data", "zrodlo", "uwaga")
 POLA_SUGESTIA = ("typ", "element", "dzial", "uzasadnienie", "zgodnosc_imperium",
@@ -73,19 +74,53 @@ def _dopisz(rekord: dict, sciezka: Path = LEDGER) -> bool:
     return True
 
 
+# LIMEN FENESTRAE — próg reprezentatywności okna. Poniżej niego werdykt A/B jest
+# WSTĘPNY, nie rozstrzygający. Zmierzone 2026-07-20 (NOTA N-4f7032a6): ten sam sygnał
+# na tym samym interwale dał przeciwne werdykty zależnie od okna —
+#   2 000 barów  → „POMAGA"    (Δ +1.77 pp)
+#   pełna era    → „NEUTRALNE" (Δ +0.24 pp, 649 transakcji)
+# Ledger trzymał oba jako równorzędne werdykty, więc krótki bieg mógł zamknąć temat
+# fałszywym wnioskiem. Od teraz pokrycie jedzie W REKORDZIE, nie w pamięci operatora.
+PROG_REPREZENTATYWNOSCI = 0.5
+
+
+def ocen_pokrycie(okno_barow: int, dostepne_barow: int | None) -> dict:
+    """Jaką część dostępnej ery pokrywa okno testu → czy werdykt jest rozstrzygający.
+
+    Brak wiedzy o dostępnych barach (None) → „NIEZNANE": nie udajemy, że wiemy
+    (Prawo I) — ale i nie ogłaszamy wyniku pełnowartościowym.
+    """
+    if not dostepne_barow or dostepne_barow <= 0:
+        return {"pokrycie": None, "ranga": "NIEZNANE",
+                "nota": "pokrycie ery nieznane — werdykt traktuj jako wstępny"}
+    udzial = min(1.0, okno_barow / dostepne_barow)
+    if udzial >= PROG_REPREZENTATYWNOSCI:
+        return {"pokrycie": round(udzial, 3), "ranga": "ROZSTRZYGAJACY",
+                "nota": f"okno pokrywa {udzial:.0%} dostępnej ery"}
+    return {"pokrycie": round(udzial, 3), "ranga": "WSTEPNY",
+            "nota": (f"okno pokrywa tylko {udzial:.0%} dostępnej ery — werdykt WSTĘPNY, "
+                     "nie zamykaj tematu (ten sam sygnał potrafi zmienić werdykt na pełnym oknie)")}
+
+
 def zapisz_ab(*, sygnal: str, neuron: str, interwal: str, okno_barow: int,
               roi_b: float, roi_a: float, maxdd_delta: float, werdykt: str,
               zrodlo: str, uwaga: str = "", data: str | None = None,
+              dostepne_barow: int | None = None,
               sciezka: Path = LEDGER) -> bool:
     """Dopisuje rekord A/B (Δ PnL). delta_pp liczone tu (roi_a - roi_b).
 
     werdykt: krótki token ("POMAGA"/"SZKODZI"/"NEUTRALNE"/…), NIE długi baner z emoji.
+    `dostepne_barow`: ile barów dawała cała era — pozwala oznaczyć rangę werdyktu
+    (ROZSTRZYGAJACY / WSTEPNY), żeby krótki bieg nie uchodził za pełnowartościowy.
     """
+    ocena = ocen_pokrycie(int(okno_barow), dostepne_barow)
+    uwaga = f"{uwaga} | {ocena['nota']}" if uwaga else ocena["nota"]
     rekord = {
         "typ": "AB", "sygnal": sygnal, "neuron": neuron, "interwal": interwal,
         "okno_barow": int(okno_barow), "roi_b": round(float(roi_b), 2),
         "roi_a": round(float(roi_a), 2), "delta_pp": round(float(roi_a) - float(roi_b), 2),
         "maxdd_delta": round(float(maxdd_delta), 2), "werdykt": werdykt,
+        "ranga": ocena["ranga"], "pokrycie_ery": ocena["pokrycie"],
         "data": data or _dzis(), "zrodlo": zrodlo, "uwaga": uwaga,
     }
     return _dopisz(rekord, sciezka)

@@ -178,8 +178,9 @@ powod_istnienia: "Jedno źródło prawdy o zewnętrznych inspiracjach AI/ML (ZPO
 - **Waga:** W6 (pomocniczy — predykcja ML jako jeden z wielu głosów, nie wyrocznia)
 - **Powód:** jedyny z piątki działający WYŁĄCZNIE na danych OHLCV, które już mamy — najłatwiejszy
   do podłączenia z całej grupy ML. Dobry pierwszy kandydat do Fazy 2.
-- **Ryzyko / ograniczenia:** wymaga modelu (rozmiar, RAM/GPU — Fujitsu 8GB może nie udźwignąć lokalnie,
-  rozważyć inference API), ryzyko nadmiernego zaufania predykcji (Prawo XV — to jeden głos, nie prawda).
+- **Ryzyko / ograniczenia:** wymaga modelu (rozmiar, RAM/GPU — Fujitsu ma 15.88 GB RAM, ale BRAK CUDA
+  i 4 wątki, klasa PEDES: mały model lokalnie udźwignie, duży wymaga inference API), ryzyko nadmiernego
+  zaufania predykcji (Prawo XV — to jeden głos, nie prawda).
 - **Powiązania:** A-12 (KATALOG_NEURONOW), IMV-AI-008 (KATALOG_STRATEGII), dywizja Entropii
 
 ---

@@ -12,7 +12,8 @@ dublet_rozstrzygniety: docs/PLAN_TIRO_LOKALNY_LLM.md — notarius jest tu opisan
 > **Po co:** Komendant ma klucz DeepSeek API. To tani, szybki LLM. Adapter `GlosImperium` jest
 > jedynym wejściem LLM w Imperium.
 >
-> **Sprzęt:** Fujitsu 8GB RAM. Dlatego ciężka praca (LLM) idzie przez API, nie lokalnie.
+> **Sprzęt (zmierzone, `censor_sprzetu.py`):** Fujitsu 15.88 GB RAM, 4 wątki, brak CUDA — klasa
+> PEDES. Ciężka praca LLM idzie przez API dla SZYBKOŚCI (wąskie gardło to CPU/brak GPU, nie RAM).
 > (Projekt TIRO buduje hybrydę lokalną — patrz `docs/PLAN_TIRO_LOKALNY_LLM.md`.)
 
 > **⚠️ Weryfikacja wobec kodu 2026-07-17.** Adapter `GlosImperium` **istnieje i jest żywy** ✅,

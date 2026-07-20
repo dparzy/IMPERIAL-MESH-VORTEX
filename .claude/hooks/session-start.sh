@@ -48,6 +48,19 @@ if [ -f imperium/pretorianie/portitor.py ]; then
   python -m imperium.pretorianie.portitor banner || true
 fi
 
+# 0.7) CENSOR SPRZĘTU — cenzus ŻELAZA na starcie (rozkaz Cezara 2026-07-20).
+#      Powód: Architekt twierdził w rozmowie „8 GB Fujitsu" Z PAMIĘCI, mając ten organ
+#      w kodzie — CENSOR mierzy 15.88 GB. Liczby o sprzęcie mają stać przed oczami ZANIM
+#      padnie jakakolwiek teza o wydajności (Prawo XVII: policzone, nie wspominane).
+if [ -f imperium/oczy/censor_sprzetu.py ]; then
+  python -c "from imperium.oczy.censor_sprzetu import banner; print(banner())" 2>/dev/null || true
+fi
+
+# 0.8) INDEX FALSORUM — czy obalone twierdzenie nie żyje dalej w korpusie jako fakt.
+if [ -f imperium/biblioteki/index_falsorum.py ]; then
+  python -m imperium.biblioteki.index_falsorum || true
+fi
+
 # 1) Instalacja zależności — tylko w środowisku zdalnym (lokalnie masz swoje venv)
 if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ]; then
   if [ -f requirements.txt ]; then

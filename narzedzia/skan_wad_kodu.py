@@ -86,7 +86,15 @@ def main() -> int:
     p.add_argument("--lista", action="store_true", help="pokaż całą księgę")
     p.add_argument("--ostatni-commit", action="store_true",
                    help="skanuj .py zmienione w OSTATNIM commicie (start sesji po SYNC, A4)")
+    p.add_argument("--falsa", action="store_true",
+                   help="sweep INDEX FALSORUM: gdzie obalone twierdzenie wciąż jest "
+                        "głoszone jako fakt (cały korpus .py+.md, bez historii)")
     args = p.parse_args()
+
+    if args.falsa:
+        from imperium.biblioteki.index_falsorum import przeszukaj, raport
+        print(raport())
+        return 2 if przeszukaj() else 0
 
     zasiej_startowe()                      # utwórz księgę z wzorcami jeśli pusta
     ksiega = KsiegaWadKodu()

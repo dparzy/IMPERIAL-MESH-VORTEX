@@ -221,7 +221,58 @@ def _raport_aequitas() -> Path:
                   spec, wykresy, werdykt, otworz=False)
 
 
-_RAPORTY = {"hma": _raport_hma, "aequitas": _raport_aequitas}
+# ── Dane sesji 2026-07-20: P2 — A/B DVOL na 1H, pełna era (LIMEN FENESTRAE) ──
+def _raport_ab_dvol_1h() -> Path:
+    spec = [
+        ("Co testowane", "A/B sygnału DVOL (neuron PSY-05) — czy IC +0.16@7d przekłada się na PnL"),
+        ("Para / waluty", "BTCUSDT + ETHUSDT (DVOL istnieje na Deribit tylko dla BTC i ETH)"),
+        ("Interwał czasowy", "1H (świece godzinowe)"),
+        ("Okno / era", "PEŁNA era DVOL: BTC 19 471 barów + ETH 19 380 barów (~2.2 roku); "
+                       "pokrycie ery 100% → ranga ROZSTRZYGAJĄCY"),
+        ("Źródło danych", "dane/godzinowe/Binance_{BTC,ETH}USDT_1h.csv + DVOL z Deribit "
+                          "(kauzalny forward-fill dzienny na bary)"),
+        ("Tryb", "tryb_skaner top_n=2 · sizing_przekonania · backtest_portfel"),
+        ("Ramiona", "B = DVOL OFF (baseline) vs A = DVOL ON (PSY-05)"),
+        ("Czas biegu", "~62 min (77 702 tiki × 47.7 ms — zmierzona przepustowość silnika)"),
+        ("Sprzęt", "Fujitsu: 15.88 GB RAM, 4 wątki, brak CUDA, klasa PEDES "
+                   "(ZMIERZONE censor_sprzetu.py — nie z pamięci)"),
+    ]
+    wykresy = [
+        {"tytul": "ROI% — pełna era DVOL (werdykt ROZSTRZYGAJĄCY)",
+         "jednostka": "ROI %",
+         "opis": "Δ ROI = +0.24 pp przy 649 transakcjach w obu ramionach — szum, nie przewaga. "
+                 "WERDYKT: NEUTRALNE, flaga zostaje OFF. Uwaga: OBA ramiona tracą na 1H.",
+         "slupki": [("B: DVOL OFF", -5.49, "#e0794b"), ("A: DVOL ON", -5.25, "#e0794b")]},
+        {"tytul": "Ten sam sygnał, różne okna — dlaczego powstał LIMEN FENESTRAE",
+         "jednostka": "Δ ROI (pp)",
+         "opis": "Werdykt ZMIENIAŁ SIĘ z oknem: 800 barów (4% ery) → NEUTRALNE bez transakcji; "
+                 "2000 barów (10% ery) → POMAGA +1.77 pp; pełna era → NEUTRALNE +0.24 pp. "
+                 "Konkluzja z próbki 10% była PRZEDWCZESNA (NOTA N-4f7032a6).",
+         "slupki": [("800 barów (4% ery)", 0.0, "#8a8a8a"), ("2000 barów (10% ery)", 1.77, "#e0794b"),
+                    ("pełna era (100%)", 0.24, "#8fe388")]},
+        {"tytul": "Pokrycie ery przez okno testu — ranga werdyktu",
+         "jednostka": "% ery",
+         "opis": "Próg reprezentatywności = 50%. Poniżej niego werdykt jest WSTĘPNY i nie zamyka "
+                 "tematu — od teraz zapisywane W REKORDZIE ledgera, nie w pamięci operatora.",
+         "slupki": [("800 barów", 4.1, "#e0794b"), ("2000 barów", 10.3, "#e0794b"),
+                    ("próg 50%", 50.0, "#4c9be3"), ("pełna era", 100.0, "#8fe388")]},
+    ]
+    werdykt = (
+        "WERDYKT: ⚖️ NEUTRALNE — DVOL nie daje przewagi PnL na 1H w pełnej erze (Δ +0.24 pp).\n"
+        "Flaga zostaje OPT-IN OFF. IC ≠ PnL: sygnał ma skill informacyjny (+0.16@7d), ale nie "
+        "zamienia się na wynik na tym interwale.\n"
+        "ODWOŁANIE WCZEŚNIEJSZEJ KONKLUZJI: bieg kontrolny na 2000 barach dał 'POMAGA +1.77 pp' "
+        "i został przeze mnie ogłoszony jako potwierdzenie hipotezy — pełna era to obala. "
+        "Próbka 10% ery myliła w drugą stronę niż próbka 4%.\n"
+        "HIPOTEZA DO OSOBNEGO POMIARU (nie fakt): oba ramiona tracą na 1H (-5.5%), a 4H/1D dawały "
+        "dodatnie ROI — problemem może być sam interwał 1H dla tej strategii, nie sygnał DVOL. "
+        "Porównanie szło na różnych oknach, więc NIE ogłaszam tego jako wniosku.")
+    return zapisz("KAPITOL_PODGLAD_ab_dvol_1h_pelna_era",
+                  "Podgląd testu — A/B DVOL 1H, pełna era (P2)",
+                  spec, wykresy, werdykt, otworz=False)
+
+
+_RAPORTY = {"hma": _raport_hma, "aequitas": _raport_aequitas, "ab_dvol_1h": _raport_ab_dvol_1h}
 
 if __name__ == "__main__":
     nazwa = sys.argv[1] if len(sys.argv) > 1 else "hma"

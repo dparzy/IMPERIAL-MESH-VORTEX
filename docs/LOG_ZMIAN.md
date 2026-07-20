@@ -14,6 +14,82 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-20 | 📕 | P2: A/B DVOL 1H pełna era + INDEX FALSORUM + CENSOR w hooku + LIMEN FENESTRAE
+
+### Wynik P2 (pomiar rozstrzygający)
+
+**A/B DVOL (PSY-05), BTC+ETH, 1H, PEŁNA era DVOL (19 471 + 19 380 barów, ~2.2 roku):**
+
+| wariant | ROI% | maxDD% | trades |
+|---|---|---|---|
+| B: DVOL OFF (baseline) | −5.49 | 0.14 | 649 |
+| A: DVOL ON (PSY-05) | −5.25 | 0.14 | 649 |
+
+**Δ ROI = +0.24 pp → ⚖️ NEUTRALNE.** Flaga zostaje opt-in OFF. IC ≠ PnL: sygnał ma skill
+informacyjny (+0.16@7d), ale nie zamienia się na wynik na 1H.
+Podgląd: `raporty/KAPITOL_PODGLAD_ab_dvol_1h_pelna_era.html` (`kapitol_podglad.py ab_dvol_1h`).
+
+**HIPOTEZA (nie fakt, do osobnego pomiaru):** oba ramiona tracą na 1H (−5.5%), a 4H/1D dawały
+dodatnie ROI — problemem może być sam **interwał 1H** dla tej strategii, nie sygnał DVOL.
+Porównanie szło na różnych oknach, więc NIE ogłaszamy tego jako wniosku.
+
+### Trzy błędy Architekta złapane i spłacone (LEX TALIONIS)
+
+**1. `N-7d2c4847` → `C-fb1e3b37` — obalone twierdzenie żyło w kodzie.** Trzy żywe narzędzia A/B
+głosiły w `--help` „backtest O(n²)", obalone pomiarem 2026-07-19. Skutek nie był kosmetyczny:
+operator bał się długiego okna, więc biegi 1H szły na 800 barach — **kłamstwo w help-stringu
+zafałszowało wynik badawczy**.
+→ **INDEX FALSORUM** (`imperium/biblioteki/index_falsorum.py`) — Spis Twierdzeń Obalonych:
+twierdzenie rejestruje się RAZ (fraza + poprawna teza + DOWÓD obalenia, ledger append-only),
+a sweep pilnuje całego korpusu `.py`+`.md`. Klasa siostrzana Warstwy 15 (liczby) i 16 (API-widma)
+— tylko po stronie TWIERDZEŃ. Wpięte w istniejący organ: `skan_wad_kodu.py --falsa`.
+
+**2. `N-36596e99` → `C-cd9b749a` — liczba o sprzęcie z pamięci (zarzut Cezara).** Architekt
+twierdził „8 GB Fujitsu", mając organ do zmierzenia w kodzie. CENSOR mierzy **15.88 GB RAM,
+4 wątki, brak CUDA, klasa PEDES**. Korekta była **już raz zrobiona** (LOG_ZMIAN:1208), a kłamstwo
+przeżyło w **5 miejscach 4 żywych dokumentów** — `MANUAL_MIGRACJA` przeczył sam sobie (linia 16:
+15.88 GB, linia 159: „Fujitsu 8 GB"). Sprostowane: MANUAL (×3 + mapa RAM), PLAN_DEEPSEEK, ROADMAP,
+REJESTR_INSPIRACJI. Przy okazji: „562/562 testów" w MANUAL przy realnych 2627.
+→ **Potwierdzający system przed testami:** `censor_sprzetu.banner()` w hooku (krok 0.7) obok
+PORTITORA + INDEX FALSORUM w hooku (krok 0.8). Żelazo stoi przed oczami, ZANIM padnie teza
+o wydajności. **Korekta merytoryczna:** wąskim gardłem tej maszyny jest CPU i brak GPU, **nie RAM**.
+
+**3. `N-4f7032a6` → `C-a0519dbb` — kandydat ogłoszony jako prawda.** Architekt ogłosił konkluzję
+(„NEUTRALNE było artefaktem krótkiego okna") z próbki 2 000 barów = **10% ery**. Pełna era to
+obaliła. Ten sam błąd metodologiczny, który właśnie diagnozował u poprzednika.
+→ **LIMEN FENESTRAE** (`scriba_codex.ocen_pokrycie`): ranga werdyktu liczona z pokrycia ery
+i zapisywana **W REKORDZIE** ledgera — ROZSTRZYGAJACY (≥50%) / WSTEPNY (z ostrzeżeniem
+„nie zamykaj tematu") / NIEZNANE (brak wiedzy — Prawo I). Wpięte w 3 narzędzia Tier-1.
+Retroaktywnie: biegi 800 barów = **4.1% ery**, próbka 2000 = **10.3%** — oba WSTĘPNE, a ledger
+trzymał je jak równorzędne werdykty.
+
+### Obrona przed fałszywym alarmem — zmierzona, nie założona
+
+INDEX FALSORUM złapał **trzy własne pułapki** w pierwszej godzinie życia; każda ma test regresyjny:
+- **sprostowanie zawijane przez granicę linii** (`scriba_codex.py:135` „O(n^2) została" / `:136`
+  „obalona pomiarem") → okno kontekstu ±2 linie
+- **negacja dotycząca czego innego** („przez API, **nie** lokalnie (Fujitsu, 8GB RAM)") → negacja
+  liczy się tylko PRZY frazie (≤8 zn.) lub w jej obrębie, nie w całej linii
+- **„nie" w środku słowa „lokal-nie ("** → granice słów (`\b`), nie podciąg
+- oraz: `8 GB RAM` dopasowane wewnątrz `15.**88 GB RAM**` → granica cyfry w frazie
+
+Organ dostał też **`wycofaj()`** (append-only nagrobek): źle dobrana fraza da się zdjąć ze straży,
+więc nie zostaje wiecznym FP (Księga Wad #35 — chroniczny fałszywy alarm uczy ignorować bramkę).
+**Fraza koduje TWIERDZENIE, nie token** (`backtest.*O(n²)`, nie samo `O(n²)`) — zawężone PO pomiarze
+szumu, nie z góry. Organ złapał nawet własny świeży docstring cytujący „8 GB" — dowód czułości.
+
+**Strażnik Prawa XXI zadziałał:** `set(keys) == POLA_AB` w `test_scriba_codex` złapał dryf schematu
+po dodaniu pól `ranga`/`pokrycie_ery` → POLA_AB zaktualizowane w tym samym ruchu.
+
+**Bramki:** testy 2627 → **2649** (+22) · audyt exit 0 · ruff czysto · skan wad czysto · INDEX
+FALSORUM sweep czysty · dług honorowy 0.
+
+**Pliki:** `imperium/biblioteki/index_falsorum.py` (nowy), `imperium/oczy/censor_sprzetu.py`,
+`.claude/hooks/session-start.sh`, `narzedzia/{scriba_codex,ab_dvol,ab_usd,ab_stablecoin,skan_wad_kodu,kapitol_podglad}.py`,
+`tests/{test_index_falsorum,test_scriba_codex}.py`, `docs/{MANUAL_MIGRACJA_I_SYMULATOR,PLAN_DEEPSEEK,ROADMAP_IMPERIUM,REJESTR_INSPIRACJI}.md`
+
+---
+
 ## 2026-07-20 | 🛡️ | AEQUITAS SERIERUM — strażnik równej długości serii u wrót Bramy (P1)
 
 **Powód (P1 zamrożonej listy):** teza zwiadowcy mówiła „`zip(strict=True)` w ~25 miejscach Bramy".

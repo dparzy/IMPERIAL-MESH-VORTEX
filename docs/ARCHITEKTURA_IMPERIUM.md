@@ -1,7 +1,7 @@
 ---
 kategoria: FORMA
 typ: zywy
-wlasciciel: imperium/akwedukty/kwatermistrz_danych.py, imperium/biblioteki/codex_notarum.py, imperium/swiatynie/praetorium.py, imperium/biblioteki/hedge_mwu.py, imperium/biblioteki/igrzyska.py, imperium/biblioteki/kronikarz.py, imperium/biblioteki/mnemosyne.py, imperium/biblioteki/notarius.py, imperium/cesarz/titan_mind.py, imperium/drogi/nexus_hub.py, imperium/fundament/brama_kalkulatora.py, imperium/fundament/kuznia_narzedzi.py, imperium/koloseum/backtest.py, imperium/koloseum/haruspex.py, imperium/koloseum/monte_carlo.py, imperium/koloseum/walidacja.py, imperium/koloseum/walk_forward.py, imperium/legiony/pierwszy_zwiadowca.py, imperium/legiony/roj_sygnalow.py, imperium/oczy/censor_sprzetu.py, imperium/oczy/wszechoko.py, imperium/pretorianie/aegis_tarcza.py, imperium/pretorianie/lustro_prawdy.py, imperium/senat/meta_kora.py, imperium/swiatynie/kartograf.py, imperium/swiatynie/specula_swiec.py, imperium/swiatynie/web_dashboard.py
+wlasciciel: imperium/akwedukty/kwatermistrz_danych.py, imperium/biblioteki/codex_notarum.py, imperium/biblioteki/index_falsorum.py, imperium/swiatynie/praetorium.py, imperium/biblioteki/hedge_mwu.py, imperium/biblioteki/igrzyska.py, imperium/biblioteki/kronikarz.py, imperium/biblioteki/mnemosyne.py, imperium/biblioteki/notarius.py, imperium/cesarz/titan_mind.py, imperium/drogi/nexus_hub.py, imperium/fundament/brama_kalkulatora.py, imperium/fundament/kuznia_narzedzi.py, imperium/koloseum/backtest.py, imperium/koloseum/haruspex.py, imperium/koloseum/monte_carlo.py, imperium/koloseum/walidacja.py, imperium/koloseum/walk_forward.py, imperium/legiony/pierwszy_zwiadowca.py, imperium/legiony/roj_sygnalow.py, imperium/oczy/censor_sprzetu.py, imperium/oczy/wszechoko.py, imperium/pretorianie/aegis_tarcza.py, imperium/pretorianie/lustro_prawdy.py, imperium/senat/meta_kora.py, imperium/swiatynie/kartograf.py, imperium/swiatynie/specula_swiec.py, imperium/swiatynie/web_dashboard.py
 stan_na: 2026-07-19
 powod_istnienia: "Jedna strona spinająca 25 Praw z realnym kodem — jedyne miejsce z tabelą 'dzielnica → plik → rola → prawa' + diagram przepływu sygnału + mapowanie warstw architektury na źródła bib"
 ---
@@ -65,6 +65,12 @@ Organy pomocnicze POZA `imperium/` — dobór nazwy DO FUNKCJI (ZASADA NOMENKLAT
 > **Organ governance w `imperium/biblioteki/`:** **CODEX NOTARUM** (Księga Not Cenzorskich,
 > `imperium/biblioteki/codex_notarum.py`) — ledger LEX TALIONIS „oko za oko": NOTA CENSORIA (−) za
 > zatwierdzony błąd, CORONA (+) za zatwierdzony unikat spłacający dług honorowy. [I, XV, XXI]
+>
+> **INDEX FALSORUM** (Spis Twierdzeń Obalonych, `imperium/biblioteki/index_falsorum.py`) — twierdzenie
+> obalone POMIAREM rejestruje się raz (fraza + poprawna teza + dowód), a sweep całego korpusu `.py`+`.md`
+> pilnuje, by nie żyło dalej jako fakt. Klasa siostrzana Warstwy 15 (liczby) i 16 (API-widma) — tylko po
+> stronie TWIERDZEŃ. Historia (ACTA/archiwum) i sprostowania poza zasięgiem; źle dobraną frazę zdejmuje
+> `wycofaj()`. Sweep: `narzedzia/skan_wad_kodu.py --falsa`, w hooku startowym. [I, XV, XXI]
 
 | Nazwa rzymska | Plik | Rola | Prawa |
 |---|---|---|---|

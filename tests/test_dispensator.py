@@ -123,3 +123,96 @@ def test_opis_profili_wymienia_wszystkie():
     o = opis_profili()
     for nazwa in PROFILE:
         assert nazwa in o
+
+
+# ── Most mowy: dobór głębokości per wywołanie (DISPENSATOR wpięty 2026-07-21) ────
+
+class _KlientAtrapa:
+    """Podstawiony klient OpenAI — zapamiętuje DOKŁADNIE, co poszłoby do API."""
+
+    def __init__(self):
+        self.zadania = []
+        self.chat = self
+        self.completions = self
+
+    def create(self, **kw):
+        self.zadania.append(kw)
+
+        class _Odp:
+            choices = [type("C", (), {"message": type("M", (), {"content": "ok"})()})()]
+        return _Odp()
+
+
+def _glos_z_atrapa(monkeypatch):
+    from imperium.cesarz import deepseek_glos as dg
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-nie-jest-prawdziwy")
+    monkeypatch.setattr(dg, "OpenAI", lambda **kw: _KlientAtrapa())
+    g = dg.GlosImperium()
+    monkeypatch.setattr(g, "_protokoluj", lambda *a, **k: None)   # bez zapisu do NOTARIUSA
+    return g
+
+
+def test_bez_profilu_zadanie_identyczne_jak_przed_zmiana(monkeypatch):
+    """WSTECZNA ZGODNOŚĆ: wywołanie bez nowych argumentów NIE MOŻE dołożyć extra_body
+    ani zmienić modelu — inaczej wszyscy dotychczasowi wołający zaczęliby płacić inaczej."""
+    g = _glos_z_atrapa(monkeypatch)
+    g.zapytaj("system", "treść", temperatura=0.4)
+    z = g.client.zadania[0]
+    assert z["model"] == "deepseek-v4-flash"
+    assert "extra_body" not in z
+    assert z["temperature"] == 0.4
+
+
+def test_profil_zwiad_kupuje_tanio(monkeypatch):
+    g = _glos_z_atrapa(monkeypatch)
+    g.zapytaj("s", "t", profil="zwiad")
+    z = g.client.zadania[0]
+    assert z["model"] == "deepseek-v4-flash"
+    assert z["extra_body"]["reasoning_effort"] == "low"
+
+
+def test_profil_osad_kupuje_premium(monkeypatch):
+    """Osąd o konsekwencjach → v4-pro + głębokie rozumowanie."""
+    g = _glos_z_atrapa(monkeypatch)
+    g.zapytaj("s", "t", profil="osad")
+    z = g.client.zadania[0]
+    assert z["model"] == "deepseek-v4-pro"
+    assert z["extra_body"]["reasoning_effort"] == "high"
+
+
+def test_profil_klasyfikacja_wylacza_rozumowanie(monkeypatch):
+    """Zmierzone 07-20: thinking disabled = 11.7× taniej. Etykietowanie nie wymaga rozważań."""
+    g = _glos_z_atrapa(monkeypatch)
+    g.zapytaj("s", "t", profil="klasyfikacja")
+    assert g.client.zadania[0]["extra_body"]["thinking"] == {"type": "disabled"}
+
+
+def test_jawny_argument_nadpisuje_profil(monkeypatch):
+    """Wołający wie więcej niż tabela — jawny model/effort ma pierwszeństwo przed profilem."""
+    g = _glos_z_atrapa(monkeypatch)
+    g.zapytaj("s", "t", profil="zwiad", model="deepseek-v4-pro", reasoning_effort="max")
+    z = g.client.zadania[0]
+    assert z["model"] == "deepseek-v4-pro"
+    assert z["extra_body"]["reasoning_effort"] == "max"
+
+
+def test_nieznany_profil_spada_na_domyslny_nie_wywala(monkeypatch):
+    """Literówka w nazwie profilu nie może uciszyć mostu (dobierz nie rzuca) —
+    ale test_wszystkie_profile_hyginusa_istnieja_w_dispensatorze pilnuje, że ich nie ma."""
+    g = _glos_z_atrapa(monkeypatch)
+    g.zapytaj("s", "t", profil="nie-ma-takiego")
+    assert g.client.zadania[0]["model"] == "deepseek-v4-flash"
+
+
+def test_notarius_dostaje_model_FAKTYCZNIE_uzyty(monkeypatch):
+    """Etykieta nauczyciela musi zgadzać się z tym, kto naprawdę mówił. Inaczej TIRO uczy
+    się z par opisanych cudzą nazwą (v4-pro odpowiedział, a w pliku stoi flash)."""
+    from imperium.cesarz import deepseek_glos as dg
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-nie-jest-prawdziwy")
+    monkeypatch.setattr(dg, "OpenAI", lambda **kw: _KlientAtrapa())
+    g = dg.GlosImperium()
+    zapisane = {}
+    monkeypatch.setattr(g, "_protokoluj",
+                        lambda *a, **k: zapisane.update({"model": a[4] if len(a) > 4 else None}))
+    g.zapytaj("s", "t", profil="osad")
+    assert zapisane["model"] == "deepseek-v4-pro"       # NIE flash z __init__

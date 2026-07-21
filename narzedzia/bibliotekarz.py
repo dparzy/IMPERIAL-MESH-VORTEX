@@ -89,6 +89,18 @@ def _fts_bezpieczne(q: str) -> str:
     return " OR ".join(slowa) if slowa else q
 
 
+# ── DISPENSATOR (Szafarz) — ile myślenia KUPUJEMY do której fazy zwiadu ─────────────
+# Organ istniał od sesji dane20, ale Hyginus go NIE WOŁAŁ — martwy potencjał wykryty przez
+# BREVIARIUM 2026-07-21 (Prawo XV). Fazy różnią się rodzajem pracy, więc i ceną:
+#   rozwijanie zapytania — ekstrakcja słów, zero rozważań → najtaniej (thinking off),
+#   generacja kandydatów — objętość ważniejsza od głębi → tanio (flash, effort low),
+#   krytyka adwersarialna — realne rozważanie kontrargumentów → głęboko (effort high).
+# Profil 'osad' (v4-pro) NIE jest tu używany: sędzią kandydatów jest Opus/Vitruviusz,
+# nie DeepSeek (ZASADA ZWIADOWCY WIEDZY — dwa modele o RÓŻNYCH rolach).
+_PROFIL_ROZWIN = "klasyfikacja"
+_PROFIL_ZWIAD = "zwiad"
+_PROFIL_KRYTYKA = "krytyka"
+
 _SYSTEM_ROZWIN = (
     "Jesteś asystentem wyszukiwania pełnotekstowego w anglojęzycznej bibliotece tradingowej. "
     "Rozwiń podany TEMAT w bogate zapytanie: dodaj synonimy, terminy techniczne i pokrewne "
@@ -104,7 +116,10 @@ def rozwin_zapytanie(glos, temat: str) -> str:
     RAG, które i tak filtruje sędzia (Opus) + arena. Fallback na oryginalny temat przy pustej/
     błędnej odpowiedzi — zwiad nigdy nie ginie przez błąd rozszerzenia (Prawo XV)."""
     try:
-        odp = glos.zapytaj(_SYSTEM_ROZWIN, f"TEMAT: {temat}", temperatura=0.3)
+        # Rozwinięcie tematu w synonimy to ekstrakcja, nie rozważanie — DISPENSATOR kupuje
+        # tu najtaniej (thinking off). Zmierzone 07-20: wyłączone rozumowanie = 11.7× taniej.
+        odp = glos.zapytaj(_SYSTEM_ROZWIN, f"TEMAT: {temat}", temperatura=0.3,
+                           profil=_PROFIL_ROZWIN)
     except Exception:  # noqa: BLE001 — błąd API nie może zabić zwiadu; wracamy do surowego tematu
         return temat
     slowa = _RE_SLOWO.findall(odp or "")
@@ -134,7 +149,10 @@ def krytyka_kandydatow(glos, kandydaci: str, wyniki_kontra) -> str:
     tresc = (f"KANDYDACI:\n{kandydaci}\n\n"
              f"FRAGMENTY (możliwe kontrargumenty):\n{_fragmenty_tekst(wyniki_kontra)}")
     try:
-        return glos.zapytaj(_SYSTEM_KRYTYKA, tresc, temperatura=0.3).strip()
+        # Szukanie dowodów PRZECIW własnym kandydatom to realne rozważanie — tu DISPENSATOR
+        # kupuje głębokość (profil 'krytyka'), inaczej sceptyk byłby równie płytki co proponent.
+        return glos.zapytaj(_SYSTEM_KRYTYKA, tresc, temperatura=0.3,
+                            profil=_PROFIL_KRYTYKA).strip()
     except Exception:  # noqa: BLE001 — krytyka to dodatek; jej brak nie przekreśla cząstki
         return "(krytyka niedostępna — błąd API)"
 
@@ -196,8 +214,10 @@ def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
     tresc = f"TEMAT: {temat}\n\nFRAGMENTY:\n{_fragmenty_tekst(wyniki)}"
     if swiadomosc:  # U4: dołącz świadomość systemu (luki + istniejące moduły) do generacji kandydatów
         tresc += _kontekst_systemu()
-    odp = glos.zapytaj(_SYSTEM, tresc, temperatura=0.4)
-    rec = {**baza, "zrodla": zrodla, "kandydaci": odp.strip(), "status": "ok"}
+    # Generacja kandydatów = zwiad objętościowy (dużo fragmentów, płytka analiza każdego).
+    odp = glos.zapytaj(_SYSTEM, tresc, temperatura=0.4, profil=_PROFIL_ZWIAD)
+    rec = {**baza, "zrodla": zrodla, "kandydaci": odp.strip(), "status": "ok",
+           "profil": _PROFIL_ZWIAD}
     if probator:  # WARSTWA 1 anty-halucynacyjna: cytat spoza podanych fragmentów (0 tokenów)
         from imperium.pretorianie.probator import do_slownika, sprawdz
         rec["probator"] = do_slownika(sprawdz(rec["kandydaci"], wyniki))

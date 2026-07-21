@@ -92,7 +92,11 @@ class _FakeGlos:
     def __init__(self, odp=None, blad=False):
         self._odp, self._blad = odp, blad
 
-    def zapytaj(self, system, tresc, temperatura=0.7):
+    def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+        # Sygnatura MUSI nadążać za mostem (GlosImperium.zapytaj). Atrapa węższa niż
+        # oryginał przepuszcza kod, który w produkcji poleci na TypeError — i odwrotnie:
+        # test byłby zielony na innym kontrakcie niż ten, który naprawdę biegnie.
+        # Pilnuje tego test_atrapa_glosu_zgodna_z_mostem (parytet sygnatur).
         if self._blad:
             raise RuntimeError("API down")
         return self._odp
@@ -172,7 +176,7 @@ def test_scout_swiadomosc_wstrzykuje_kontekst(monkeypatch):
     zebrane = {}
 
     class G:
-        def zapytaj(self, system, tresc, temperatura=0.7):
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
             zebrane["tresc"] = tresc
             return "kand"
 
@@ -245,3 +249,72 @@ def test_dry_run_nie_dostaje_werdyktu(monkeypatch):
     """Granica: bez odpowiedzi modelu nie ma czego badać — brak pola, nie fałszywy alarm."""
     _fake_szukaj_bib006(monkeypatch)
     assert "probator" not in scout_temat(None, "momentum", topk=3)
+
+
+# ── DISPENSATOR wpięty: która faza kupuje ile myślenia ──────────────────────────
+
+class _GlosProfilujacy:
+    """Atrapa mostu zapamiętująca profil KAŻDEGO wywołania (bez dotykania API)."""
+
+    def __init__(self, odp="odpowiedź"):
+        self.odp = odp
+        self.wywolania = []
+
+    def zapytaj(self, system_prompt, tresc, temperatura=0.7, profil=None, **kw):
+        self.wywolania.append(profil)
+        return self.odp
+
+
+def test_generacja_kandydatow_uzywa_profilu_zwiad(monkeypatch):
+    """Objętość ważniejsza od głębi — najtańszy sensowny profil."""
+    _fake_szukaj_bib006(monkeypatch)
+    g = _GlosProfilujacy("Kandydat wg BIB-006.")
+    cz = scout_temat(g, "momentum", topk=3)
+    assert g.wywolania == ["zwiad"]
+    assert cz["profil"] == "zwiad"
+
+
+def test_rozwiniecie_zapytania_kupuje_najtaniej(monkeypatch):
+    """Rozwijanie tematu w synonimy to ekstrakcja, nie rozważanie → thinking off."""
+    _fake_szukaj_bib006(monkeypatch)
+    g = _GlosProfilujacy("momentum breakout volatility")
+    scout_temat(g, "momentum", topk=3, rozwin=True)
+    assert g.wywolania[0] == "klasyfikacja"          # najpierw rozwinięcie
+    assert g.wywolania[1] == "zwiad"                 # potem generacja
+
+
+def test_krytyka_kupuje_glebokosc(monkeypatch):
+    """Sceptyk płytszy od proponenta byłby bezużyteczny — krytyka dostaje effort high."""
+    _fake_szukaj_bib006(monkeypatch)
+    g = _GlosProfilujacy("ocena")
+    scout_temat(g, "momentum", topk=3, krytyka=True)
+    assert g.wywolania == ["zwiad", "krytyka"]
+
+
+def test_profil_osad_nie_jest_uzywany_przez_hyginusa(monkeypatch):
+    """ZASADA ZWIADOWCY WIEDZY: sędzią kandydatów jest Opus, nie DeepSeek.
+    Gdyby Hyginus sam wołał 'osad', proponent oceniałby własny plon."""
+    _fake_szukaj_bib006(monkeypatch)
+    g = _GlosProfilujacy("x")
+    scout_temat(g, "momentum", topk=3, rozwin=True, krytyka=True)
+    assert "osad" not in g.wywolania
+
+
+def test_wszystkie_profile_hyginusa_istnieja_w_dispensatorze():
+    """Parytet: literówka w nazwie profilu cicho spadłaby na domyślny (dobierz nie rzuca),
+    więc płacilibyśmy inaczej niż sądzimy. Test pilnuje, że nazwy są REALNE."""
+    from imperium.cesarz.dispensator import PROFILE
+    for profil in (bib._PROFIL_ROZWIN, bib._PROFIL_ZWIAD, bib._PROFIL_KRYTYKA):
+        assert profil in PROFILE, profil
+
+
+def test_atrapa_glosu_zgodna_z_mostem():
+    """UODPORNIENIE KLASY: atrapa węższa niż prawdziwy most daje testy zielone na kontrakcie,
+    który w produkcji nie istnieje. Każdy parametr `zapytaj` musi dać się podać atrapie."""
+    import inspect
+    from imperium.cesarz.deepseek_glos import GlosImperium
+    prawdziwe = set(inspect.signature(GlosImperium.zapytaj).parameters) - {"self"}
+    atrapa = inspect.signature(_FakeGlos.zapytaj)
+    ma_kwargs = any(p.kind is inspect.Parameter.VAR_KEYWORD for p in atrapa.parameters.values())
+    brakuje = prawdziwe - set(atrapa.parameters)
+    assert ma_kwargs or not brakuje, f"atrapa nie przyjmie: {sorted(brakuje)}"

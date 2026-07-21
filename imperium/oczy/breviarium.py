@@ -93,15 +93,42 @@ def stan_hyginusa() -> Dict[str, Any]:
 
 
 def _czy_dispensator_wpiety() -> bool:
-    """Czy Hyginus FAKTYCZNIE woła DISPENSATORA (a nie tylko go ma w repo).
+    """
+    Czy Hyginus FAKTYCZNIE woła DISPENSATORA (a nie tylko go ma w repo).
 
     Rozróżnienie istotne: organ istniejący, lecz niewołany, to martwy potencjał — dokładnie
     przypadek, przez który DISPENSATOR przeżył całą erę niezameldowany (cenzus 2026-07-20).
+
+    Sprawdzamy STRUKTURĘ (AST), nie obecność napisu. Pierwsza wersja szukała `"dispensator"
+    w treści pliku i miała OBIE wady detektora naraz (zmierzone 2026-07-21, na samym sobie):
+      • fałszywy NEGATYW — realne wpięcie idzie przez `zapytaj(profil=...)`, a słowo padało
+        wyłącznie WIELKIMI literami w komentarzu, więc porównanie wielkością liter mówiło „nie"
+        DOKŁADNIE wtedy, gdy wpięcie już istniało;
+      • fałszywy POZYTYW — sam komentarz „TODO: wpiąć DISPENSATORA" liczyłby się jak kod.
+    Napis w pliku nigdy nie jest dowodem, że coś się WYKONUJE.
     """
+    import ast
+
     plik = ROOT / "narzedzia" / "bibliotekarz.py"
     if not plik.exists():
         return False
-    return "dispensator" in plik.read_text(encoding="utf-8", errors="replace")
+    try:
+        drzewo = ast.parse(plik.read_text(encoding="utf-8", errors="replace"))
+    except SyntaxError:
+        return False
+
+    for wezel in ast.walk(drzewo):
+        # (a) jawny import Szafarza
+        if isinstance(wezel, (ast.Import, ast.ImportFrom)):
+            zrodlo = getattr(wezel, "module", "") or ""
+            nazwy = " ".join(a.name for a in wezel.names)
+            if "dispensator" in f"{zrodlo} {nazwy}".lower():
+                return True
+        # (b) wywołanie z argumentem `profil=` — tak Hyginus oddaje decyzję Szafarzowi
+        if isinstance(wezel, ast.Call):
+            if any(kw.arg == "profil" for kw in wezel.keywords):
+                return True
+    return False
 
 
 def stan_tiro() -> Dict[str, Any]:
@@ -132,6 +159,76 @@ def stan_tiro() -> Dict[str, Any]:
     }
 
 
+PIECZEC_TESTOW = ROOT / "bibliotheca_ulpia" / "dane" / "sigillum_probationis.json"
+
+# Katalogi, których treść przesądza o wyniku testów. Zmiana czegokolwiek tutaj unieważnia
+# poprzedni bieg; zmiana dokumentu czy danych — nie (inaczej pieczęć gasłaby po każdym
+# wpisie do LOG_ZMIAN, a fałszywy alarm uczy ignorować organ).
+KATALOGI_ZRODEL = ("imperium", "narzedzia", "tests")
+
+
+def odcisk_zrodel(korzen: Optional[Path] = None) -> str:
+    """
+    Odcisk TREŚCI wszystkich plików .py — tożsamość kodu, dla którego zapadł wynik testów.
+
+    Dlaczego nie hash commitu: przy naturalnym rytmie (edytuj → testy na brudnym drzewie →
+    commit) porównanie z commitem NIGDY nie dałoby werdyktu „zielone" — zawsze brudne drzewo
+    albo, po commicie, inny hash. Detektor alarmujący zawsze uczy operatora ignorować siebie.
+    Odcisk treści odpowiada na pytanie, które naprawdę zadajemy: czy ktoś ruszył kod od biegu.
+
+    Zmierzone: 405 plików, 232 ms — tanio jak na jeden raz przy starcie sesji.
+    """
+    import hashlib
+
+    baza = korzen or ROOT
+    h = hashlib.sha256()
+    pliki = sorted(p for katalog in KATALOGI_ZRODEL
+                   for p in (baza / katalog).rglob("*.py")
+                   if "__pycache__" not in p.parts)
+    for p in pliki:
+        h.update(p.relative_to(baza).as_posix().encode("utf-8"))
+        try:
+            h.update(p.read_bytes())
+        except OSError:                # plik zniknął w trakcie skanu — nie przerywamy meldunku
+            h.update(b"<nieczytelny>")
+    return h.hexdigest()
+
+
+def stan_testow() -> Dict[str, Any]:
+    """
+    Czy ostatni znany wynik testów dotyczy TEGO kodu, czy już nie.
+
+    Pełny bieg trwa >5 minut, więc hook go nie powtarza — ale milczenie o testach na
+    otwarciu oznaczało, że sesja urwana przed bramką zamknięcia zostawiała czerwony kod
+    NIEWIDOCZNY dla następnej sesji (zwiad adwersarialny 2026-07-21, dwa niezależne
+    konteksty). Tu nie mierzymy testów — mierzymy AKTUALNOŚĆ ich wyniku.
+
+    „Zielone dla commitu sprzed trzech" to NIEWIEDZA, nie zgoda — i tak właśnie jest
+    raportowane (`status`: NIEZNANY), bo cichy optymizm jest gorszy niż brak informacji.
+    """
+    if not PIECZEC_TESTOW.exists():
+        return {"status": "BRAK", "opis": "🚨 testy: BRAK PIECZĘCI — nikt nie odnotował biegu"}
+    try:
+        p = json.loads(PIECZEC_TESTOW.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {"status": "BRAK", "opis": "🚨 testy: pieczęć nieczytelna"}
+
+    zal, obl = p.get("zaliczone", 0), p.get("oblane", 0)
+    if obl:
+        return {"status": "CZERWONE",
+                "opis": f"🚨 testy: {obl} OBLANYCH z {zal + obl} (bieg {p.get('kiedy', '?')})"}
+
+    odcisk = p.get("odcisk_zrodel")
+    if not odcisk:                       # pieczęć sprzed wprowadzenia odcisku — nie udajemy wiedzy
+        return {"status": "NIEZNANY",
+                "opis": f"⚠️ testy: {zal}/{zal}, ale pieczęć bez odcisku źródeł — stan NIEZNANY"}
+    if odcisk != odcisk_zrodel():
+        return {"status": "NIEZNANY",
+                "opis": (f"🚨 testy: wynik {zal}/{zal} dotyczy INNEGO KODU niż dzisiejszy "
+                         f"(bieg {p.get('kiedy', '?')}) — stan NIEZNANY, przebiegnij ponownie")}
+    return {"status": "ZIELONE", "opis": f"✅ testy: {zal}/{zal} dla DOKŁADNIE tego kodu"}
+
+
 def banner(model_architekta: Optional[str] = None) -> str:
     """
     Meldunek na otwarcie wachty. Zwięzły — ma się zmieścić obok 10 innych organów.
@@ -141,7 +238,7 @@ def banner(model_architekta: Optional[str] = None) -> str:
     prawdopodobna nazwa udająca pomiar.
     """
     h, t = stan_hyginusa(), stan_tiro()
-    wiersze = ["📋 BREVIARIUM — słudzy Imperium:"]
+    wiersze = ["📋 BREVIARIUM — słudzy Imperium:", f"   {stan_testow()['opis']}"]
 
     dysp = "wpięty" if h["dispensator_wpiety"] else "🚨 NIEWPIĘTY (martwy potencjał)"
     wiersze.append(

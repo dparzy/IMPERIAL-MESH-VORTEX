@@ -144,6 +144,8 @@ def uruchom():
           f"({zaliczone}/{zaliczone + oblane})")
     print("═" * 60)
 
+    _odcisnij_pieczec(zaliczone, oblane)
+
     if bledy:
         print("\nSzczegóły błędów:")
         for modul, test, blad in bledy:
@@ -152,6 +154,62 @@ def uruchom():
         return 1
     print("\n✅ Wszystkie testy zaliczone — Imperium gotowe.")
     return 0
+
+
+def _odcisnij_pieczec(zaliczone: int, oblane: int) -> None:
+    """
+    Odciska SIGILLUM PROBATIONIS — wynik biegu przypięty do commitu, na którym zapadł.
+
+    POWÓD (zwiad adwersarialny 2026-07-21, dwa niezależne konteksty zbiegły się na tym
+    samym): `tests/run_tests.py` NIE jest wołany ani przez hook startowy, ani przez audyt
+    (zmierzone: 0 trafień w hooku, w audycie tylko ścieżki `__pycache__`). Testy trwają
+    >5 minut, więc wołanie ich przy każdym starcie byłoby okrutne — ale skutkiem było, że
+    CZERWONY STAN TESTÓW JEST NIEWIDOCZNY NA OTWARCIU. Sesja urwana przed bramką zamknięcia
+    zostawiała złamany kod, a następna sesja widziała „pełną harmonię" audytu i budowała
+    dalej na złamanym fundamencie. Ta sama klasa co dług honorowy: bramka istniejąca
+    wyłącznie na końcu procesu, który nie musi się wydarzyć.
+
+    Lekarstwem NIE jest powtarzanie biegu, tylko WYKRYWANIE NIEAKTUALNOŚCI: pieczęć wie,
+    dla jakiego KODU zapadł wynik, więc otwarcie sesji odróżnia „zielone dla TEGO kodu"
+    od „zielone dla kodu, którego już nie ma" — a to drugie jest niewiedzą, nie zgodą.
+
+    Tożsamość kodu to ODCISK TREŚCI ŹRÓDEŁ, nie hash commitu. Porównanie z commitem
+    wyglądało sensownie, ale przy naturalnym rytmie pracy (edytuj → uruchom testy na brudnym
+    drzewie → commituj) pieczęć NIGDY nie mogłaby powiedzieć „zielone": zawsze albo brudne
+    drzewo, albo — po commicie — inny hash. Detektor, który alarmuje zawsze, uczy operatora
+    ignorować siebie, czyli psuje dokładnie to, po co powstał. Odcisk źródeł odpowiada na
+    właściwe pytanie: czy od czasu biegu ktoś ruszył kod. Zmierzone: 405 plików, 232 ms.
+    """
+    try:
+        import json
+        import subprocess
+        from datetime import datetime
+
+        korzen = Path(__file__).resolve().parent.parent
+        # encoding+errors JAWNIE (klasa z Księgi Wad): samo `text=True` dekoduje kodowaniem
+        # KONSOLI, a `git status --porcelain` potrafi zwrócić polską nazwę pliku — wtedy
+        # UnicodeDecodeError uciszyłby pieczęć akurat na brudnym drzewie, czyli w stanie,
+        # o którym pieczęć ma ostrzegać.
+        commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
+                                text=True, encoding="utf-8", errors="replace",
+                                timeout=10, cwd=korzen)
+        brudne = subprocess.run(["git", "status", "--porcelain"], capture_output=True,
+                                text=True, encoding="utf-8", errors="replace",
+                                timeout=10, cwd=korzen)
+        from imperium.oczy.breviarium import odcisk_zrodel
+        pieczec = {
+            "zaliczone": zaliczone,
+            "oblane": oblane,
+            "odcisk_zrodel": odcisk_zrodel(),          # tożsamość KODU, nie commitu
+            "commit": (commit.stdout or "").strip()[:40] or "?",   # informacyjnie
+            "drzewo_brudne": bool((brudne.stdout or "").strip()),
+            "kiedy": datetime.now().isoformat(timespec="seconds"),
+        }
+        plik = korzen / "bibliotheca_ulpia" / "dane" / "sigillum_probationis.json"
+        plik.parent.mkdir(parents=True, exist_ok=True)
+        plik.write_text(json.dumps(pieczec, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:  # noqa: BLE001 — pieczęć jest dodatkiem do biegu, nigdy jego warunkiem
+        print(f"  (pieczęć testów niezapisana: {e})")
 
 
 if __name__ == "__main__":

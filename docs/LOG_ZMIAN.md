@@ -14,6 +14,54 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | 🔭 | DISPENSATOR wpięty w Hyginusa + zwiad adwersarialny otwarcia (3 wady)
+
+**Część 1 — rozkaz o rozbudowie Hyginusa.** Most mowy (`deepseek_glos.zapytaj`) przyjmuje teraz
+`profil` / `model` / `thinking` / `reasoning_effort`; profil oddaje decyzję **DISPENSATOROWI**,
+jawne argumenty go nadpisują. **Wsteczna zgodność udowodniona testem:** wywołanie bez nowych
+argumentów wysyła DOKŁADNIE to samo żądanie co przed zmianą (zero `extra_body`, model z `__init__`).
+Hyginus kupuje głębokość per faza: rozwijanie zapytania → `klasyfikacja` (thinking off, 11.7× taniej),
+generacja → `zwiad` (effort low), **krytyka → `krytyka` (effort high)** — sceptyk płytszy od proponenta
+byłby bezużyteczny. Profil `osad` (v4-pro) świadomie NIE jest używany: sędzią kandydatów jest Opus,
+nie DeepSeek (ZASADA ZWIADOWCY WIEDZY — dwa modele o RÓŻNYCH rolach).
+**Naprawione przy okazji:** `_protokoluj` logował `self.model`, więc para nauczyciela trafiałaby do
+NOTARIUSA z CUDZĄ nazwą modelu — TIRO uczyłby się z fałszywą etykietą źródła. Teraz logowany jest
+model FAKTYCZNIE użyty.
+
+**Część 2 — zwiad adwersarialny checklisty otwarcia (2 subagenty, osobne konteksty).** Każde
+znalezisko zweryfikowane osobiście (kandydat≠prawda). Trzy potwierdzone, wszystkie w organach,
+które MIAŁY chronić:
+
+1. **Wynik testów niewidoczny na otwarciu** — oba zwiady zbiegły się niezależnie. `grep run_tests`:
+   0 trafień w hooku, w audycie tylko ścieżki `__pycache__`. Bieg trwa >5 min, więc powtarzanie go
+   przy każdym starcie odpada — lekarstwem jest **SIGILLUM PROBATIONIS**: `run_tests` odciska wynik
+   przypięty do **ODCISKU TREŚCI ŹRÓDEŁ**, a BREVIARIUM wykrywa NIEAKTUALNOŚĆ. „Zielone dla kodu,
+   którego już nie ma" raportujemy jako **NIEZNANY** — cichy optymizm jest gorszy niż brak informacji.
+   **Wada projektowa złapana na sobie, zanim ktokolwiek na niej poległ:** pierwsza wersja porównywała
+   hash HEAD i przy naturalnym rytmie (edytuj → testy na brudnym drzewie → commit) **nigdy nie mogłaby
+   dać werdyktu ZIELONE** — alarm przy każdym starcie uczy operatora ignorować organ, czyli niszczy to,
+   po co powstał. Miara zmieniona na treść źródeł (405 plików, 232 ms), z testem kontrolnym na
+   osiągalność werdyktu pozytywnego i na czułość (zmiana `.py` gasi pieczęć, wpis do LOG_ZMIAN nie).
+2. **PORTITOR miał ręcznie wpisaną listę pakietów** (6 przy 9 w `requirements.txt`) — organ powołany
+   do pilnowania Prawa XV nie sprawdzał ani `scipy` (a requirements mówi wprost: bez niego BOCPD-01
+   milczy), ani `openai` (jedyne wejście LLM). Lista jest teraz **generowana z requirements**:
+   deps 6/6 → **9/9**.
+3. **Mój własny BREVIARIUM kłamał o DISPENSATORZE** — sprawdzał wpięcie po NAPISIE w pliku, więc
+   meldował „NIEWPIĘTY" godzinę po tym, jak go wpiąłem (słowo padało tylko WIELKIMI literami
+   w komentarzu, a realne wpięcie idzie przez `zapytaj(profil=...)`). Symetrycznie: komentarz
+   „TODO: wpiąć DISPENSATORA" liczyłby się jak działający kod. Przepisane na **AST**.
+
+**LEX TALIONIS:** N-7dfb397f ↔ C-0ecb7eb8, N-b4a470ef ↔ C-cfb94b20 (dług 0).
+**Księga Wad +5:** „bramka widoczna tylko na jednym końcu procesu", „raport startowy nie widzi
+własnych sług", „detektor obecności po napisie", „lista pilnowanych rzeczy wpisana ręcznie obok
+źródła prawdy", „detektor, którego kontrakt nigdy nie dopuszcza werdyktu pozytywnego".
+**Backlog CODEX +5 kandydatów** — znaleziska zwiadu świadomie NIEłatane w tym commicie (timeout
+`auto_lekcja`, błąd W1 przerywający 16 warstw audytu, SYNC bez ahead/behind na brudnym drzewie,
+dług honorowy widoczny lecz nieegzekwowalny, wąski zasięg skanu wad). **Pliki:** `imperium/cesarz/deepseek_glos.py`, `narzedzia/bibliotekarz.py`,
+`imperium/pretorianie/portitor.py`, `imperium/oczy/breviarium.py`, `tests/run_tests.py`.
+
+---
+
 ## 2026-07-21 | 📋 | BREVIARIUM + dług honorowy na otwarciu (zarzut Cezara o luki hooka)
 
 Cezar: *„hook startowy ma luki — powinien być stan Hyginusa i TIRO, ich zadania zrobione i do

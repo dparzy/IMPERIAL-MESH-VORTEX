@@ -35,6 +35,7 @@ from __future__ import annotations
 
 import os
 import platform
+import re
 from datetime import datetime, timezone
 from importlib import metadata, util
 from pathlib import Path
@@ -50,14 +51,47 @@ PROG_STAROSCI_DNI = 45
 # Kluczowe pakiety: (nazwa_importu, nazwa_dystrybucji, krytyczny).
 # Krytyczny=True → brak podnosi alarm (pełna moc Bramy). Reszta = informacyjnie (Prawo I:
 # testy działają bez zależności; brak to ograniczenie, nie awaria).
-PAKIETY = [
-    ("numpy", "numpy", True),
-    ("talib", "TA-Lib", True),
-    ("pandas", "pandas", False),
-    ("ccxt", "ccxt", False),
-    ("requests", "requests", False),
-    ("openpyxl", "openpyxl", False),
-]
+KRYTYCZNE = {"numpy", "TA-Lib"}
+
+# Nazwa dystrybucji → nazwa importu, gdy się różnią (reszta: import == dystrybucja).
+_IMPORT_INNY_NIZ_NAZWA = {"TA-Lib": "talib", "scikit-learn": "sklearn", "Pillow": "PIL"}
+
+# Pakiety wyłączone z pre-flightu: narzędzia deweloperskie, nie zdolności Imperium.
+_NARZEDZIA_DEWELOPERA = {"pytest", "ruff"}
+
+
+def _pakiety_z_requirements() -> list:
+    """
+    Lista pilnowanych pakietów GENEROWANA z `requirements.txt`, nie wpisana ręcznie.
+
+    POWÓD (zwiad adwersarialny 2026-07-21, potwierdzone pomiarem): lista była wpisana
+    ręcznie i rozjechała się z requirements — PORTITOR meldował „deps 6/6 ✅" nie sprawdzając
+    ani `scipy`, ani `openai`. To organ powołany do pilnowania Prawa XV, a nie widział
+    DOKŁADNIE scenariusza opisanego w requirements.txt: „bez scipy BOCPD-01 milczy (martwy
+    głos)". Brak `openai` wywala z kolei jedyne wejście LLM (`deepseek_glos` importuje je
+    na poziomie modułu), a pre-flight i tak mówiłby „środowisko OK".
+
+    To ta sama choroba co ręcznie wpisana liczba (Warstwa 15) i ręcznie kopiowany runbook:
+    dokument trzymający własną treść zgnije. Lekarstwo jest zawsze to samo — odebrać mu
+    prawo do niej i wyprowadzić ją ze źródła prawdy.
+    """
+    plik = ROOT / "requirements.txt"
+    if not plik.exists():                    # brak pliku → nie zgadujemy, nic nie pilnujemy
+        return []
+    pakiety = []
+    for linia in plik.read_text(encoding="utf-8", errors="replace").splitlines():
+        linia = linia.split("#")[0].strip()
+        if not linia:
+            continue
+        nazwa = re.split(r"[>=<~!\[; ]", linia, maxsplit=1)[0].strip()
+        if not nazwa or nazwa in _NARZEDZIA_DEWELOPERA:
+            continue
+        pakiety.append((_IMPORT_INNY_NIZ_NAZWA.get(nazwa, nazwa.replace("-", "_")),
+                        nazwa, nazwa in KRYTYCZNE))
+    return pakiety
+
+
+PAKIETY = _pakiety_z_requirements()
 
 # Klucze API: (nazwa_env, opis_skutku_braku). SPRAWDZAMY TYLKO OBECNOŚĆ — nigdy wartość.
 KLUCZE_API = [

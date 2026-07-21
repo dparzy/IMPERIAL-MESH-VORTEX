@@ -114,6 +114,34 @@ def test_wykrywa_dispensator_wpiety(monkeypatch, tmp_path):
     assert bv._czy_dispensator_wpiety() is True
 
 
+def test_wykrywa_wpiecie_przez_argument_profil(monkeypatch, tmp_path):
+    """Realna droga wpięcia: Hyginus nie importuje Szafarza — oddaje mu decyzję przez
+    `zapytaj(profil=...)`. Detektor szukający napisu przegapiał DOKŁADNIE ten przypadek."""
+    (tmp_path / "narzedzia").mkdir()
+    (tmp_path / "narzedzia" / "bibliotekarz.py").write_text(
+        'odp = glos.zapytaj(SYS, tresc, temperatura=0.4, profil="zwiad")\n', encoding="utf-8")
+    monkeypatch.setattr(bv, "ROOT", tmp_path)
+    assert bv._czy_dispensator_wpiety() is True
+
+
+def test_sam_komentarz_to_NIE_wpiecie(monkeypatch, tmp_path):
+    """Fałszywy POZYTYW: „TODO: wpiąć DISPENSATORA" nie może uchodzić za wpięcie.
+    Napis w pliku nigdy nie dowodzi, że coś się WYKONUJE."""
+    (tmp_path / "narzedzia").mkdir()
+    (tmp_path / "narzedzia" / "bibliotekarz.py").write_text(
+        '# TODO: wpiąć DISPENSATORA (dispensator) — na razie nic\nx = 1\n', encoding="utf-8")
+    monkeypatch.setattr(bv, "ROOT", tmp_path)
+    assert bv._czy_dispensator_wpiety() is False
+
+
+def test_niepoprawny_skladniowo_plik_nie_wywala(monkeypatch, tmp_path):
+    """Granica: plik z błędem składni → False, nie SyntaxError w meldunku otwarcia."""
+    (tmp_path / "narzedzia").mkdir()
+    (tmp_path / "narzedzia" / "bibliotekarz.py").write_text("def (((\n", encoding="utf-8")
+    monkeypatch.setattr(bv, "ROOT", tmp_path)
+    assert bv._czy_dispensator_wpiety() is False
+
+
 def test_brak_bibliotekarza_to_nie_wpiecie(monkeypatch, tmp_path):
     """Granica: nie ma pliku → False, nie wyjątek i nie fałszywe „wpięty"."""
     monkeypatch.setattr(bv, "ROOT", tmp_path)
@@ -159,3 +187,98 @@ def test_podany_model_architekta_jest_drukowany():
 def test_banner_jest_zwiezly():
     """Meldunek dzieli hook z 10 innymi organami — nie może go zdominować."""
     assert len(bv.banner().splitlines()) <= 10
+
+
+# ── SIGILLUM PROBATIONIS: aktualność wyniku testów (zwiad adwersarialny 07-21) ──
+
+def _pieczec(monkeypatch, tmp_path, **pola):
+    dane = {"zaliczone": 100, "oblane": 0, "odcisk_zrodel": bv.odcisk_zrodel(),
+            "commit": "abc123", "drzewo_brudne": False, "kiedy": "2026-07-21T10:00:00"}
+    dane.update(pola)
+    p = tmp_path / "sigillum.json"
+    p.write_text(json.dumps(dane), encoding="utf-8")
+    monkeypatch.setattr(bv, "PIECZEC_TESTOW", p)
+    return p
+
+
+def test_brak_pieczeci_to_alarm_nie_cisza(monkeypatch, tmp_path):
+    """Nikt nie odnotował biegu → 🚨, nie milczenie. Cichy optymizm jest gorszy niż niewiedza."""
+    monkeypatch.setattr(bv, "PIECZEC_TESTOW", tmp_path / "nie_ma.json")
+    assert bv.stan_testow()["status"] == "BRAK"
+
+
+def test_pieczec_nieczytelna_to_alarm(monkeypatch, tmp_path):
+    """Granica: uszkodzony JSON → BRAK, nie wyjątek w meldunku otwarcia."""
+    p = tmp_path / "s.json"
+    p.write_text("{to nie json", encoding="utf-8")
+    monkeypatch.setattr(bv, "PIECZEC_TESTOW", p)
+    assert bv.stan_testow()["status"] == "BRAK"
+
+
+def test_oblane_testy_zawsze_czerwone(monkeypatch, tmp_path):
+    """Oblane biją wszystko — nawet gdy odcisk źródeł się zgadza."""
+    _pieczec(monkeypatch, tmp_path, oblane=3)
+    w = bv.stan_testow()
+    assert w["status"] == "CZERWONE" and "3 OBLANYCH" in w["opis"]
+
+
+def test_wynik_dla_innego_kodu_to_NIEZNANY(monkeypatch, tmp_path):
+    """RDZEŃ: zielone dla kodu, którego już nie ma, NIE jest zgodą — to niewiedza."""
+    _pieczec(monkeypatch, tmp_path, odcisk_zrodel="odcisk-zupelnie-innego-kodu")
+    w = bv.stan_testow()
+    assert w["status"] == "NIEZNANY" and "INNEGO KODU" in w["opis"]
+
+
+def test_pieczec_bez_odcisku_nie_udaje_wiedzy(monkeypatch, tmp_path):
+    """Wsteczna zgodność: stara pieczęć (sprzed odcisku) → NIEZNANY, nie fałszywe ZIELONE."""
+    dane = {"zaliczone": 100, "oblane": 0, "commit": "abc", "kiedy": "2026-07-20T10:00:00"}
+    p = tmp_path / "s.json"
+    p.write_text(json.dumps(dane), encoding="utf-8")
+    monkeypatch.setattr(bv, "PIECZEC_TESTOW", p)
+    assert bv.stan_testow()["status"] == "NIEZNANY"
+
+
+def test_zielone_dla_dokladnie_tego_kodu(monkeypatch, tmp_path):
+    """Kontrola POZYTYWNA: detektor MUSI umieć powiedzieć „ZIELONE".
+    Detektor alarmujący zawsze uczy operatora ignorować siebie — czyli psuje to, po co powstał.
+    To była realna wada pierwszej wersji (porównanie z commitem: przy rytmie
+    edytuj→testy→commit nigdy nie dałoby zielonego)."""
+    _pieczec(monkeypatch, tmp_path)
+    assert bv.stan_testow()["status"] == "ZIELONE"
+
+
+def test_brudne_drzewo_nie_uniewaznia_wyniku(monkeypatch, tmp_path):
+    """Bieg na brudnym drzewie jest NORMALNY (edytuj → testy → commit). Liczy się treść
+    kodu, nie stan indeksu gita — inaczej pieczęć alarmowałaby przy każdej pracy."""
+    _pieczec(monkeypatch, tmp_path, drzewo_brudne=True)
+    assert bv.stan_testow()["status"] == "ZIELONE"
+
+
+def test_odcisk_zrodel_jest_stabilny():
+    """Dwa odczyty bez zmiany kodu muszą dać ten sam odcisk (inaczej alarm co start)."""
+    assert bv.odcisk_zrodel() == bv.odcisk_zrodel()
+
+
+def test_odcisk_zmienia_sie_po_zmianie_kodu(tmp_path):
+    """Kontrola czułości: dopisanie linii do pliku .py MUSI zmienić odcisk."""
+    (tmp_path / "imperium").mkdir()
+    plik = tmp_path / "imperium" / "modul.py"
+    plik.write_text("x = 1", encoding="utf-8")
+    przed = bv.odcisk_zrodel(tmp_path)
+    plik.write_text("x = 2", encoding="utf-8")
+    assert bv.odcisk_zrodel(tmp_path) != przed
+
+
+def test_odcisk_nie_reaguje_na_dokumenty(tmp_path):
+    """Wpis do LOG_ZMIAN nie może gasić pieczęci — inaczej fałszywy alarm po każdej notatce."""
+    (tmp_path / "imperium").mkdir()
+    (tmp_path / "imperium" / "m.py").write_text("x = 1", encoding="utf-8")
+    przed = bv.odcisk_zrodel(tmp_path)
+    (tmp_path / "DOKUMENT.md").write_text("# zmiana dokumentu", encoding="utf-8")
+    assert bv.odcisk_zrodel(tmp_path) == przed
+
+
+def test_stan_testow_jest_pierwsza_linia_meldunku(monkeypatch, tmp_path):
+    """Czerwony stan testów nie może być schowany pod stanem sług — idzie na górę."""
+    monkeypatch.setattr(bv, "PIECZEC_TESTOW", tmp_path / "brak.json")
+    assert "testy" in bv.banner().splitlines()[1]

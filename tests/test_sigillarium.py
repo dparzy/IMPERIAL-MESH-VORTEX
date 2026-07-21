@@ -61,12 +61,43 @@ def test_parser_nie_gubi_niewcietej_kontynuacji():
     assert "i wcięta też" in kroki[1]
 
 
-def test_parser_liczby_krokow_zywej_konstytucji_stabilne():
-    """Regresja na PRAWDZIWYM CLAUDE.md: naprawa parsera nie mogła zmienić liczb
-    (7/10/5). Gdyby zmieniła, znaczyłoby, że doklejam prozę, której wcześniej nie było."""
-    assert len(sg.kroki("apertio")) == 7
-    assert len(sg.kroki("clausura")) == 10
-    assert len(sg.kroki("limes")) == 5
+def test_parser_widzi_DOKLADNIE_tyle_krokow_ile_jest_w_konstytucji():
+    """Regresja na PRAWDZIWYM CLAUDE.md — bez ręcznie wpisanej liczby.
+
+    Pierwsza wersja twierdziła `== 7 / 10 / 5`. To była RĘCZNA LICZBA o systemie, czyli
+    dokładnie klasa, którą zwalcza Warstwa 15 audytu: pierwszy rozkaz Cezara dopisany do
+    checklisty wywracał test, a „naprawa" polegałaby na podbiciu stałej — czyli na uczeniu
+    się ignorowania własnej bramki. Zdarzyło się to przy dodaniu kroku 4b (raport sług na
+    domknięciu, 2026-07-21).
+
+    Prawdziwym niezmiennikiem NIE jest liczba kroków, tylko to, że parser widzi ICH TYLE,
+    ILE NAPRAWDĘ JEST — policzone niezależnie z pliku. Konstytucja może rosnąć; parser nie
+    ma prawa gubić ani doklejać.
+    """
+    import re
+
+    sprawdzone = 0
+    for s in sg.wszystkie():
+        if not s.sekcja:
+            continue          # LIMES trzyma komendy w rejestrze, nie w sekcji konstytucji
+        sekcja = sg._tresc_sekcji(s.sekcja)
+        # Niezależny licznik: linie otwierające krok — „1. ", „4b. ", „5b. ".
+        oczekiwane = len(re.findall(r"^\d+[a-z]?\.\s", sekcja, re.M))
+        assert oczekiwane > 0, f"{s.nazwa}: sekcja w CLAUDE.md nie ma ani jednego kroku"
+        assert len(sg.kroki(s.nazwa)) == oczekiwane, (
+            f"{s.nazwa}: parser widzi {len(sg.kroki(s.nazwa))}, w CLAUDE.md jest {oczekiwane}")
+        sprawdzone += 1
+    assert sprawdzone >= 2, "test przestał cokolwiek sprawdzać — sekcje zniknęły z rejestru"
+
+
+def test_kazdy_krok_ma_niepusta_tresc():
+    """Krok policzony, ale pusty, to gorzej niż krok zgubiony — pieczęć wyglądałaby
+    na kompletną, a operator nie wiedziałby, co zrobić (klasa: mechanizm, który przy
+    awarii wygląda na sprawny)."""
+    for sigil in ("apertio", "clausura", "limes"):
+        for i, krok in enumerate(sg.kroki(sigil)):
+            assert krok.strip(), f"{sigil}: krok {i} pusty"
+            assert len(krok.strip()) > 20, f"{sigil}: krok {i} podejrzanie krótki: {krok!r}"
 
 
 def test_parser_dopasowuje_naglowek_po_prefiksie():

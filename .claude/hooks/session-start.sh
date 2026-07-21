@@ -67,7 +67,9 @@ fi
 #      byli na otwarciu niewidzialni — stan kolejki, plon czekający na sędziego, pary
 #      nauczyciela, modele na dysku trzeba było wygrzebywać ręcznie co sesję.
 if [ -f imperium/oczy/breviarium.py ]; then
-  python -m imperium.oczy.breviarium || true
+  # --migawka: drukuje meldunek I utrwala punkt odniesienia, żeby domknięcie wachty
+  # mogło pokazać RÓŻNICĘ (co ta sesja zmieniła), a nie tylko stan.
+  python -m imperium.oczy.breviarium --migawka || true
 fi
 
 # 0.10) LEX TALIONIS — dług honorowy NA OTWARCIU (zarzut Cezara 2026-07-21, potwierdzony).

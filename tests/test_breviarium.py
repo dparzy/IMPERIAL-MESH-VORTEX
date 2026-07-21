@@ -291,3 +291,61 @@ def test_pieczec_zero_testow_to_alarm_nie_zielen(monkeypatch, tmp_path):
     _pieczec(monkeypatch, tmp_path, zaliczone=0, oblane=0)
     w = bv.stan_testow()
     assert w["status"] == "BRAK" and "nic nie sprawdził" in w["opis"]
+
+
+# ── Δ wachty: raport sług na OBU końcach sesji (rozkaz Cezara 2026-07-21) ───────
+
+def test_migawka_ma_tylko_liczby_zmienne_w_czasie(monkeypatch, tmp_path):
+    """Migawka celowo NIE zawiera modeli na dysku ani klasy sprzętu — te się w trakcie
+    sesji nie zmieniają, więc ich delta byłaby szumem zagłuszającym realny dorobek."""
+    m = bv.migawka()
+    assert set(m) <= set(bv._POLA_DELTY)
+    assert "modele" not in m and "klasa_sprzetu" not in m
+
+
+def test_delta_bez_migawki_nie_zmysla_roznicy(tmp_path):
+    """Prawo I: brak punktu odniesienia → mówimy wprost, że różnicy NIE ZNAMY,
+    zamiast pokazywać zero i sugerować „nic się nie zmieniło"."""
+    assert "nie znamy" in bv.delta(tmp_path / "brak.json")
+
+
+def test_delta_uszkodzona_migawka_nie_wywala(tmp_path):
+    """Granica: zepsuty JSON → uczciwy komunikat, nie wyjątek przy domykaniu wachty."""
+    p = tmp_path / "m.json"
+    p.write_text("{to nie json", encoding="utf-8")
+    assert "nie znamy" in bv.delta(p)
+
+
+def test_delta_pokazuje_kierunek_zmiany(tmp_path, monkeypatch):
+    """Rdzeń: różnica ma nazwać, CO wachta zrobiła sługom — ze znakiem."""
+    p = tmp_path / "m.json"
+    p.write_text(json.dumps({"czastek": 34, "czeka_na_sedziego": 33,
+                             "pary_nauczyciela": 193}), encoding="utf-8")
+    monkeypatch.setattr(bv, "migawka",
+                        lambda: {"czastek": 41, "czeka_na_sedziego": 40,
+                                 "pary_nauczyciela": 193})
+    tekst = bv.delta(p)
+    assert "czastek: 34 → 41 (+7)" in tekst
+    assert "pary_nauczyciela" not in tekst          # bez zmiany → nie zaśmieca meldunku
+
+
+def test_delta_bez_zmian_mowi_to_wprost(tmp_path, monkeypatch):
+    """Kontrola pozytywna: „bez zmian" to poprawny wynik, nie brak wyniku."""
+    p = tmp_path / "m.json"
+    p.write_text(json.dumps({"czastek": 5}), encoding="utf-8")
+    monkeypatch.setattr(bv, "migawka", lambda: {"czastek": 5})
+    assert "bez zmian" in bv.delta(p)
+
+
+def test_zapisz_migawke_tworzy_odczytywalny_punkt(tmp_path, monkeypatch):
+    """Roundtrip: to, co zapisze otwarcie, musi dać się porównać przy domknięciu."""
+    p = tmp_path / "m.json"
+    monkeypatch.setattr(bv, "migawka", lambda: {"czastek": 7})
+    bv.zapisz_migawke(p)
+    assert json.loads(p.read_text(encoding="utf-8")) == {"czastek": 7}
+
+
+def test_zapisz_migawke_nie_wywala_na_zlej_sciezce():
+    """Awaria zapisu ≠ awaria meldunku — hook startowy ma działać dalej (Prawo XV)."""
+    from pathlib import Path
+    bv.zapisz_migawke(Path("/nieistniejacy\x00katalog/m.json"))

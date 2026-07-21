@@ -14,6 +14,34 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | 📋 | Raport sług na OBU końcach wachty — Δ zamiast samego stanu
+
+Pytanie Cezara: *„zawsze na początku sesji i końcu raport Hyginusa i TIRO — czy to mamy"*.
+**Odpowiedź była połowiczna i tak została powiedziana:** otwarcie ✅ (BREVIARIUM w hooku, krok 0.9),
+zamknięcie ❌ — zero wzmianek w checkliście, a hook końca sesji w ogóle nie woła Pythona.
+To ta sama klasa co dług honorowy z tego samego dnia — **rzecz widoczna tylko na jednym końcu
+procesu** — tyle że w drugą stronę.
+
+- **Na domknięciu liczy się RÓŻNICA, nie stan.** „Kolejka 34" nie mówi nic; „kolejka 34 → 41 (+7),
+  czeka na sędziego +7" mówi, że wachta wyprodukowała dług przeglądu. Stąd `--delta`.
+- Hook startowy woła `--migawka` (drukuje meldunek **i** utrwala punkt odniesienia);
+  `CLAUDE.md § KONIEC SESJI` dostał krok **4b** z `--delta`. Pieczęć `/clausura` widzi go
+  natychmiast (10 → 11 kroków), bo **czyta kroki z CLAUDE.md, nie przechowuje ich kopii**.
+- Migawka celowo obejmuje tylko liczby zmienne w czasie (kolejka, plon czekający na sędziego,
+  podejrzane cząstki, pary nauczyciela). Modele na dysku i klasa sprzętu nie zmieniają się
+  w trakcie sesji — ich delta byłaby szumem zagłuszającym realny dorobek.
+- **Brak migawki mówimy wprost** („różnicy nie znamy"), zamiast pokazać zero i sugerować
+  „nic się nie zmieniło" (Prawo I).
+- Liczby z kroku 4b **zasilają odpowiedź na Prawo XV** w kroku 5 — rosnąca kolejka bez sędziego
+  to zapłacony i niewykorzystany zwiad.
+
+**Wada złapana własnym testem granicy:** `zapisz_migawke` łapało tylko `OSError`, a ścieżka
+z bajtem NUL daje `ValueError` już na `mkdir` — utrwalenie punktu odniesienia mogło wywrócić
+meldunek, który miało tylko uzupełniać. +7 testów. **Pliki:** `imperium/oczy/breviarium.py`,
+`.claude/hooks/session-start.sh`, `CLAUDE.md`, `tests/test_breviarium.py`.
+
+---
+
 ## 2026-07-21 | 🩺 | RECENZJA: PROBATOR był MARTWY w produkcji — 7 znalezisk, 6 napraw
 
 `/code-review` zlecona przez Cezara. **Najcięższe znalezisko: organ ogłoszony tego samego dnia

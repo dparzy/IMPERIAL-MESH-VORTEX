@@ -692,6 +692,13 @@ nowe zadanie bez weryfikacji „czy już istnieje"; liczby z pamięci zamiast z 
 4. **Komplet dokumentów + pamięć zsynchronizowane z kodem** (ZASADA PEŁNEJ SYMBIOZY): LOG_ZMIAN, MANIFEST,
    INDEKS, MAPA_KLUCZY, liczby, ARCHITEKTURA (nowy organ/narzędzie z nazwą rzymską — ZASADA NOMENKLATURY),
    pamięć. Nowa ZASADA w pamięci → skodyfikuj też w CLAUDE.md/ZASADY (nie zostawiaj tylko w pamięci prywatnej).
+4b. **BREVIARIUM — meldunek SŁUG na domknięcie** (ROZKAZ STAŁY, Cezar 2026-07-21):
+   `python -m imperium.oczy.breviarium --delta` — stan HYGINUSA i TIRO **oraz RÓŻNICA wobec
+   otwarcia** (co ta wachta zmieniła: kolejka, plon czekający na sędziego, podejrzane cząstki,
+   pary nauczyciela). Raport sług należy się Cezarowi na OBU końcach sesji, nie tylko na starcie —
+   inaczej powtarzamy klasę „rzecz widoczna tylko na jednym końcu procesu", którą złapaliśmy przy
+   długu honorowym. Liczby stąd **zasilają odpowiedź na Prawo XV** w kroku 5: rosnąca kolejka bez
+   sędziego to zapłacony i niewykorzystany zwiad.
 5. **Prawo XV:** odpowiedz Cezarowi na pytanie o utratę potencjału — JAWNIE, nie milczeniem.
 5b. **LEX TALIONIS — dług honorowy:** `python -m imperium.biblioteki.codex_notarum bilans` — jeśli
    dług honorowy > 0 (błąd bez kompensującego unikatu), NIE domykaj sesji: dostarcz zatwierdzoną CORONĘ (oko za oko).

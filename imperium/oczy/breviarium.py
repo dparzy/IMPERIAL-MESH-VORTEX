@@ -278,6 +278,67 @@ def banner(model_architekta: Optional[str] = None) -> str:
     return "\n".join(wiersze)
 
 
+MIGAWKA = ROOT / "bibliotheca_ulpia" / "dane" / "breviarium_migawka.json"
+
+# Liczby, których RÓŻNICA opisuje dorobek wachty. Świadomie wąska lista: modele na dysku
+# czy klasa sprzętu nie zmieniają się w trakcie sesji, więc ich delta byłaby szumem.
+_POLA_DELTY = ("czastek", "czeka_na_sedziego", "podejrzane", "zbadane_probatorem",
+               "pary_nauczyciela")
+
+
+def migawka() -> Dict[str, Any]:
+    """Liczby sług w jednej płaskiej mapie — materiał na różnicę otwarcie↔zamknięcie."""
+    h, t = stan_hyginusa(), stan_tiro()
+    return {k: v for k, v in {**h, **t}.items() if k in _POLA_DELTY}
+
+
+def zapisz_migawke(sciezka: Optional[Path] = None) -> Dict[str, Any]:
+    """Utrwal stan na OTWARCIU wachty (wołane przez hook startowy)."""
+    m = migawka()
+    plik = sciezka or MIGAWKA
+    try:
+        plik.parent.mkdir(parents=True, exist_ok=True)
+        plik.write_text(json.dumps(m, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception:  # noqa: BLE001 — utrwalenie punktu odniesienia jest DODATKIEM do meldunku,
+        pass           # nigdy jego warunkiem. Sam OSError nie wystarczał: ścieżka z bajtem NUL
+        #                daje ValueError już na mkdir (złapane własnym testem granicy), a hook
+        #                startowy nie może paść przez nieudany zapis pliku pomocniczego.
+    return m
+
+
+def delta(sciezka: Optional[Path] = None) -> str:
+    """
+    Co ta wachta ZMIENIŁA w stanie sług — różnica wobec migawki z otwarcia.
+
+    Na domknięciu sam stan jest mniej wart niż jego zmiana: „kolejka 34" nie mówi nic,
+    „kolejka 34 → 41 (+7), czeka na sędziego +7" mówi, że wachta wyprodukowała dług
+    przeglądu. Bez migawki nie kłamiemy o różnicy — mówimy wprost, że jej nie znamy.
+    """
+    plik = sciezka or MIGAWKA
+    teraz = migawka()
+    if not plik.exists():
+        return "   (brak migawki z otwarcia — różnicy nie znamy)"
+    try:
+        przed = json.loads(plik.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return "   (migawka z otwarcia nieczytelna — różnicy nie znamy)"
+
+    zmiany = []
+    for pole in _POLA_DELTY:
+        a, b = przed.get(pole), teraz.get(pole)
+        if isinstance(a, int) and isinstance(b, int) and a != b:
+            zmiany.append(f"{pole}: {a} → {b} ({b - a:+d})")
+    return "   Δ wachty: " + ("; ".join(zmiany) if zmiany else "bez zmian w liczbach sług")
+
+
 if __name__ == "__main__":                                   # pragma: no cover
     import sys
-    print(banner(sys.argv[1] if len(sys.argv) > 1 else None))
+    argi = [a for a in sys.argv[1:]]
+    if "--migawka" in argi:                    # otwarcie: pokaż stan i utrwal punkt odniesienia
+        print(banner())
+        zapisz_migawke()
+    elif "--delta" in argi:                    # zamknięcie: stan + co wachta zmieniła
+        print(banner())
+        print(delta())
+    else:
+        print(banner(argi[0] if argi else None))

@@ -81,7 +81,12 @@ def _pakiety_z_requirements() -> list:
     pakiety = []
     for linia in plik.read_text(encoding="utf-8", errors="replace").splitlines():
         linia = linia.split("#")[0].strip()
-        if not linia:
+        # Linie opcji pip (`-r inne.txt`, `--index-url …`, `-e .`) NIE są pakietami. Bez tego
+        # filtra PORTITOR próbowałby zaimportować pakiet o nazwie „-r" i meldował brak
+        # zależności przy KAŻDYM starcie — alarm nie do wyciszenia bez zmiany kodu
+        # (zmierzone w recenzji 2026-07-21; dziś requirements takich linii nie ma, ale
+        # parser powstał właśnie po to, by nadążać za plikiem bez ingerencji w kod).
+        if not linia or linia.startswith("-"):
             continue
         nazwa = re.split(r"[>=<~!\[; ]", linia, maxsplit=1)[0].strip()
         if not nazwa or nazwa in _NARZEDZIA_DEWELOPERA:

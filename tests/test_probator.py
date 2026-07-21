@@ -205,3 +205,74 @@ def test_bib_wygrywa_z_aliasem_gdy_oba_obecne():
     """Gdy jest identyfikator BIB, alias nie może przykryć obcego źródła."""
     w = pb.sprawdz("Wg Carson, ale też wg BIB-099.", _fragmenty())
     assert w.status == pb.PODEJRZANY and w.obce_zrodla == ("BIB-099",)
+
+
+# ── PARYTET Z TYPEM PRODUKCYJNYM (recenzja 2026-07-21 — organ był MARTWY) ───────
+#
+# Organ przeszedł 20 zielonych testów, nie sprawdzając NICZEGO: produkcyjny
+# `szukaj.Wynik` to NamedTuple z polem `id` na PIERWSZEJ pozycji, a detektor rozgałęział
+# się po typie i traktował go jako gołą krotkę (zrodlo=w[0]=id). Obie atrapy rozjechały się
+# z produkcją — jedna nie była krotką, druga miała inną kolejność pól. Poniższe testy
+# używają PRAWDZIWEJ klasy z produkcji, żeby rozjazd stał się niemożliwy.
+
+def _wynik_produkcyjny(zrodlo="BIB-047_Kaufman_Trading.pdf", nr_chunk=338):
+    """Instancja DOKŁADNIE tego typu, który zwraca żywy RAG."""
+    import sys, os
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "narzedzia", "rag"))
+    from szukaj import Wynik
+    return Wynik(id=16849, zrodlo=zrodlo, tytul="Kaufman — Trading Systems",
+                 nr_chunk=nr_chunk, tekst="tekst", score=-1.0, korpus="biblioteka")
+
+
+def test_produkcyjny_namedtuple_jest_ODCZYTANY():
+    """RDZEŃ REGRESJI: NamedTuple z RAG musi dać źródło i chunk. Wcześniej zwracał {},
+    bo `id` (int) było brane za nazwę źródła."""
+    assert pb.podane_zrodla([_wynik_produkcyjny()]) == {"BIB-047": {338}}
+
+
+def test_produkcyjny_namedtuple_daje_alias_autora():
+    assert pb.aliasy_zrodel([_wynik_produkcyjny()]) == {"kaufman": "BIB-047"}
+
+
+def test_halucynacja_lapana_na_typie_produkcyjnym():
+    """Dowód, że organ ŻYJE tam, gdzie jest wpięty: cytat spoza podanych fragmentów
+    musi dać PODEJRZANY, gdy wejściem jest prawdziwy Wynik z RAG."""
+    w = pb.sprawdz("Kandydat wg BIB-999.", [_wynik_produkcyjny()])
+    assert w.status == pb.PODEJRZANY and w.obce_zrodla == ("BIB-999",)
+
+
+def test_gola_krotka_nadal_dziala():
+    """Wsteczna zgodność: goła krotka (zrodlo, nr_chunk) — umowa dla danych z JSONL."""
+    assert pb.podane_zrodla([("BIB-006_x.pdf", 3)]) == {"BIB-006": {3}}
+
+
+# ── Fałszywe oskarżenie przez chunk sąsiada ─────────────────────────────────────
+
+def test_chunk_nie_przecieka_do_poprzedniego_cytatu():
+    """„BIB-006 oraz BIB-047 chunk 8" — chunk należy WYŁĄCZNIE do BIB-047.
+    Wcześniej trafiał też do BIB-006 i produkował fałszywe oskarżenie."""
+    cytaty = pb.wyodrebnij_cytaty("Teza wg BIB-006 oraz BIB-047 chunk 8.")
+    assert cytaty[0] == pb.Cytat(bib="BIB-006", chunk=None)
+    assert cytaty[1] == pb.Cytat(bib="BIB-047", chunk=8)
+
+
+def test_ugruntowany_plon_z_dwoma_zrodlami_nie_jest_oskarzany():
+    """Skutek końcowy tamtej wady: w pełni poprawny plon dostawał PODEJRZANY."""
+    frag = [_Wynik("BIB-006_Carson.epub", 3), _Wynik("BIB-047_Kaufman.pdf", 8)]
+    assert pb.sprawdz("Teza wg BIB-006 oraz BIB-047 chunk 8.", frag).status == pb.CZYSTY
+
+
+# ── Fałszywa abstencja ──────────────────────────────────────────────────────────
+
+def test_zargon_dry_run_nie_ucisza_detektora():
+    """„dry-run" to nasze słowo z żargonu, nie odmowa. Wcześniej uciszało CAŁE
+    sprawdzanie cytatów — fałszywy negatyw, którego nikt by nie zauważył."""
+    w = pb.sprawdz("Kandydat: filtr X. Testować w trybie dry-run przed wpięciem.",
+                   [_Wynik("BIB-006_Carson.epub", 8)])
+    assert w.status == pb.BEZ_CYTATU
+
+
+def test_prawdziwa_odmowa_nadal_rozpoznana():
+    """Kontrola pozytywna: zwężenie listy nie może zabić wykrywania realnej abstencji."""
+    assert pb.sprawdz("Podane fragmenty nie niosą nic wartościowego.",
+                      [_Wynik("BIB-006_Carson.epub", 8)]).status == pb.ABSTENCJA

@@ -55,11 +55,19 @@ _RE_CHUNK = re.compile(r"\b(?:chunk|fragment)\s*[:#]?\s*(\d{1,6})(?!\d)", re.IGN
 _ZASIEG_CHUNKU = 60
 
 # Zwroty abstencji — odpowiedź świadomie odmawiająca kandydatów (poprawny wynik, nie wada).
+#
+# Lista jest CELOWO wąska i zawiera wyłącznie sformułowania ODMOWY. Pierwsza wersja miała
+# tu „dry-run" (zabłąkany placeholder pipeline'u) i przez to plon zawierający zdanie
+# „testować w trybie dry-run przed wpięciem" — sformułowanie NATURALNE u nas, bo prompt
+# każe podać JAK ZMIERZYĆ — był klasyfikowany jako odmowa. Skutek: `sprawdz` kończył się
+# przed analizą cytatów, więc halucynacja w tej samej odpowiedzi przechodziła niezauważona.
+# Fałszywy NEGATYW jest tu groźniejszy niż pozytyw, bo nikt go nie zauważy (zmierzone
+# w recenzji 2026-07-21). Każdy nowy zwrot musi być odmową, nie słowem z naszego żargonu.
 _ZWROTY_ABSTENCJI = (
     "brak fragmentów", "brak fragmentow", "nie niosą", "nie niosa", "nic wartościowego",
     "nic wartosciowego", "nie znajduję", "nie znajduje", "brak wartościowych",
     "brak wartosciowych", "nie zawierają", "nie zawieraja", "brak podstaw",
-    "dry-run", "brak trafień", "brak trafien",
+    "brak trafień", "brak trafien",
 )
 
 CZYSTY = "CZYSTY"                     # każdy cytat wskazuje na realnie podany fragment
@@ -117,21 +125,44 @@ def id_bib(tekst: str) -> Optional[str]:
     return f"BIB-{int(m.group(1)):03d}" if m else None
 
 
+def _pola(w: Any) -> tuple:
+    """
+    Wyłuskaj (zrodlo, nr_chunk) z jednego wyniku — po ZDOLNOŚCI, nie po typie.
+
+    KRYTYCZNA LEKCJA (recenzja 2026-07-21, organ był MARTWY od chwili wpięcia): pierwsza
+    wersja rozgałęziała się po typie i sprawdzała `isinstance(w, (tuple, list))` PRZED
+    dostępem po atrybucie. Produkcyjny `szukaj.Wynik` to **NamedTuple**, więc dziedziczy
+    po `tuple` i wpadał w gałąź pozycyjną — a jego pierwszym polem jest `id: int`, nie
+    `zrodlo`. Skutek zmierzony na żywym RAG: `podane_zrodla()` zwracało `{}`, więc każdy
+    plon dostawał werdykt NIC_DO_SPRAWDZENIA, łącznie z jawną halucynacją „wg BIB-999".
+    Dwadzieścia zielonych testów przy organie, który nie sprawdzał niczego — bo obie
+    atrapy rozjechały się z typem produkcyjnym (jedna nie była krotką, druga miała inną
+    kolejność pól).
+
+    Dlatego: **atrybuty mają pierwszeństwo przed pozycją.** Kolejność pól w krotce jest
+    umową, o której łatwo zapomnieć; nazwa pola nie kłamie.
+    """
+    if isinstance(w, dict):
+        return w.get("zrodlo", ""), w.get("nr_chunk")
+    zrodlo = getattr(w, "zrodlo", None)
+    if zrodlo is not None:                     # obiekt/NamedTuple z nazwanym polem
+        return zrodlo, getattr(w, "nr_chunk", None)
+    if isinstance(w, (tuple, list)):           # goła krotka: umowa (zrodlo, nr_chunk)
+        return (list(w) + [None, None])[:2]
+    return "", None
+
+
 def podane_zrodla(wyniki: Iterable[Any]) -> Dict[str, Set[int]]:
     """
     Mapa „co model FAKTYCZNIE dostał": BIB → zbiór numerów chunków.
 
-    Przyjmuje wyniki RAG (obiekty z `.zrodlo`/`.nr_chunk`) albo krotki/słowniki — żeby
-    dało się badać plon także z zapisanej cząstki, bez ponownego odpytywania RAG.
+    Przyjmuje wyniki RAG (obiekty/NamedTuple z `.zrodlo`/`.nr_chunk`) albo słowniki
+    i gołe krotki — żeby dało się badać plon także z zapisanej cząstki JSONL, bez
+    ponownego odpytywania RAG.
     """
     mapa: Dict[str, Set[int]] = {}
     for w in wyniki or ():
-        if isinstance(w, dict):
-            zrodlo, nr = w.get("zrodlo", ""), w.get("nr_chunk")
-        elif isinstance(w, (tuple, list)):
-            zrodlo, nr = (list(w) + [None, None])[:2]
-        else:
-            zrodlo, nr = getattr(w, "zrodlo", ""), getattr(w, "nr_chunk", None)
+        zrodlo, nr = _pola(w)
         bib = id_bib(str(zrodlo or ""))
         if not bib:
             continue
@@ -161,12 +192,7 @@ def aliasy_zrodel(wyniki: Iterable[Any]) -> Dict[str, str]:
     """
     mapa: Dict[str, str] = {}
     for w in wyniki or ():
-        if isinstance(w, dict):
-            zrodlo = str(w.get("zrodlo", ""))
-        elif isinstance(w, (tuple, list)):
-            zrodlo = str(w[0]) if w else ""
-        else:
-            zrodlo = str(getattr(w, "zrodlo", ""))
+        zrodlo = str(_pola(w)[0] or "")        # wspólny ekstraktor — patrz lekcja w _pola
         bib = id_bib(zrodlo)
         if not bib:
             continue
@@ -195,11 +221,17 @@ def wyodrebnij_cytaty(odpowiedz: str) -> List[Cytat]:
     i PROBATOR zgłaszałby fałszywy alarm na poprawnym plonie.
     """
     tekst = odpowiedz or ""
+    trafienia = list(_RE_BIB.finditer(tekst))
     cytaty: List[Cytat] = []
-    for m in _RE_BIB.finditer(tekst):
+    for i, m in enumerate(trafienia):
         bib = f"BIB-{int(m.group(1)):03d}"
-        ogon = tekst[m.end():m.end() + _ZASIEG_CHUNKU]
-        mc = _RE_CHUNK.search(ogon)
+        # Ogon URYWAMY na następnym identyfikatorze BIB. Bez tego „BIB-006 oraz BIB-047
+        # chunk 8" przypisywało chunk 8 RÓWNIEŻ do BIB-006 (zmierzone w recenzji) — czyli
+        # detektor produkował FAŁSZYWE OSKARŻENIE na w pełni ugruntowanym plonie. Numer
+        # chunku należy do cytatu, za którym stoi, nie do każdego cytatu w pobliżu.
+        koniec = min(m.end() + _ZASIEG_CHUNKU,
+                     trafienia[i + 1].start() if i + 1 < len(trafienia) else len(tekst))
+        mc = _RE_CHUNK.search(tekst[m.end():koniec])
         cytaty.append(Cytat(bib=bib, chunk=int(mc.group(1)) if mc else None))
     return cytaty
 

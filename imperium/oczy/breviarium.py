@@ -217,6 +217,12 @@ def stan_testow() -> Dict[str, Any]:
     if obl:
         return {"status": "CZERWONE",
                 "opis": f"🚨 testy: {obl} OBLANYCH z {zal + obl} (bieg {p.get('kiedy', '?')})"}
+    if zal <= 0:
+        # Bieg, który nie uruchomił ANI JEDNEGO testu, nie jest dowodem zdrowia — a bez tego
+        # warunku raportował „✅ 0/0 dla DOKŁADNIE tego kodu" (zmierzone w recenzji 2026-07-21).
+        # Zero zaliczonych to awaria odkrywania testów, nie zieleń.
+        return {"status": "BRAK",
+                "opis": "🚨 testy: pieczęć mówi 0 uruchomionych testów — bieg nic nie sprawdził"}
 
     odcisk = p.get("odcisk_zrodel")
     if not odcisk:                       # pieczęć sprzed wprowadzenia odcisku — nie udajemy wiedzy

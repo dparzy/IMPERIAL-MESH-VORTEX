@@ -282,3 +282,12 @@ def test_stan_testow_jest_pierwsza_linia_meldunku(monkeypatch, tmp_path):
     """Czerwony stan testów nie może być schowany pod stanem sług — idzie na górę."""
     monkeypatch.setattr(bv, "PIECZEC_TESTOW", tmp_path / "brak.json")
     assert "testy" in bv.banner().splitlines()[1]
+
+
+def test_pieczec_zero_testow_to_alarm_nie_zielen(monkeypatch, tmp_path):
+    """Bieg, który nie uruchomił ANI JEDNEGO testu, nie jest dowodem zdrowia.
+    Wcześniej raportował „✅ 0/0 dla DOKŁADNIE tego kodu" — detektor mówił
+    „wszystko dobrze" o biegu, który nic nie sprawdził (recenzja 2026-07-21)."""
+    _pieczec(monkeypatch, tmp_path, zaliczone=0, oblane=0)
+    w = bv.stan_testow()
+    assert w["status"] == "BRAK" and "nic nie sprawdził" in w["opis"]

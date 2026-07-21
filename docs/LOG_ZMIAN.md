@@ -14,6 +14,36 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | 🩺 | RECENZJA: PROBATOR był MARTWY w produkcji — 7 znalezisk, 6 napraw
+
+`/code-review` zlecona przez Cezara. **Najcięższe znalezisko: organ ogłoszony tego samego dnia
+jako działający nie sprawdzał NICZEGO.**
+
+- **Przyczyna:** PROBATOR czytał wynik RAG drabinką `isinstance`, w której gałąź `tuple` stała
+  PRZED dostępem po atrybucie. Produkcyjny `szukaj.Wynik` to **NamedTuple** (dziedziczy po `tuple`)
+  z polem `id: int` na PIERWSZEJ pozycji — więc za nazwę źródła brany był numer ID.
+  **Zmierzone przed naprawą:** `podane_zrodla()` → `{}`, `aliasy_zrodel()` → `{}`, a jawna
+  halucynacja `sprawdz("Teza wg BIB-999.", wyniki)` → `NIC_DO_SPRAWDZENIA` zamiast `PODEJRZANY`.
+- **Dlaczego 20 zielonych testów tego nie złapało:** obie atrapy rozjechały się z produkcją —
+  jedna nie była krotką, druga miała **inną kolejność pól**. W tej samej wachcie dodaliśmy test
+  parytetu sygnatur dla atrapy `GlosImperium` i **nie zastosowaliśmy tej samej ochrony** do wyniku
+  RAG. Ochrona zastosowana wybiórczo to ochrona pozorna.
+- **Naprawa u źródła:** jeden ekstraktor `_pola()` wołany przez `podane_zrodla` i `aliasy_zrodel`
+  (koniec zduplikowanej drabinki), **atrybut ma pierwszeństwo przed pozycją**. Testy używają
+  **PRAWDZIWEJ klasy `szukaj.Wynik`** importowanej z produkcji, nie kopii kształtu.
+
+**Pozostałe naprawione:** chunk sąsiedniego cytatu przyklejał się do poprzedniego BIB (fałszywe
+OSKARŻENIE ugruntowanego plonu) · fraza `dry-run` z naszego żargonu uciszała całe sprawdzanie
+cytatów (fałszywy NEGATYW) · pieczęć `0/0` raportowała ZIELONE zamiast awarii pomiaru · PORTITOR
+brał linie opcji pip (`-r`, `--index-url`) za nazwy pakietów.
+
+**INDEX FALSORUM +1:** twierdzenie „PROBATOR sprawdza cytaty w pipeline Hyginusa" obalone dla okresu
+12ce701 → naprawa. Pomiar „0 cytatów spoza fragmentów na 33 cząstkach" **pozostaje ważny** — szedł
+przez słowniki z JSONL, nie przez wpiętą ścieżkę produkcyjną.
+**LEX TALIONIS:** N-4c81a58b ↔ C-77ea034d (waga 2, dług 0). **Księga Wad +4.** +14 testów.
+
+---
+
 ## 2026-07-21 | 🧭 | U4 (świadomość systemu) DOMYŚLNIE ON — koniec płacenia za duplikaty
 
 Wniosek z sądu nad kolejką, wdrożony w tej samej sesji (rozkaz Cezara „wg planu"). Zwiad, który

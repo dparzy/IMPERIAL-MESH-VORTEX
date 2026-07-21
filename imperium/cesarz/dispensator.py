@@ -41,6 +41,33 @@ CENNIK: Dict[str, Dict[str, float]] = {
 
 POZIOMY_ROZUMOWANIA = ("low", "medium", "high", "max", "xhigh")
 
+# ── Taryfa szczytowa (peak/valley) ────────────────────────────────────────────────
+# DeepSeek liczy 2× stawkę w dwóch oknach dobowych. ZWERYFIKOWANE 2026-07-21 z trzech
+# niezależnych źródeł (notatka na panelu rozliczeniowym Cezara + doniesienia TechNode/SCMP
+# o zmianie z 2026-06-30 + zgodność godzin), bo sama strona `api-docs.deepseek.com/quick_start/pricing`
+# o taryfie MILCZY — podaje wyłącznie stawki bazowe. To jest właśnie powód, dla którego
+# CENNIK powyżej nie kłamał, a mimo to dawał zaniżony rachunek: dokument, z którego go
+# przepisaliśmy, był NIEPEŁNY, nie błędny.
+#
+# Okna w UTC (odpowiednik 09:00–12:00 i 14:00–18:00 czasu pekińskiego).
+# UWAGA PRAKTYCZNA: 06:00–10:00 UTC to 08:00–12:00 czasu Cezara — czyli typowy poranny
+# start sesji trafia w szczyt. Hook startowy woła `auto_lekcja` przez DeepSeeka.
+OKNA_SZCZYTU_UTC = ((1, 4), (6, 10))
+MNOZNIK_SZCZYTU = 2.0
+
+
+def czy_szczyt(kiedy: Any = None) -> bool:
+    """Czy podany moment (domyślnie TERAZ) wypada w oknie podwójnej stawki.
+
+    Granice: początek okna WLICZONY, koniec WYŁĄCZONY (06:00 to szczyt, 10:00 już nie) —
+    tak samo jak czyta się „06:00–10:00" w rozkładzie."""
+    from datetime import datetime, timezone
+    chwila = kiedy or datetime.now(timezone.utc)
+    if chwila.tzinfo is None:                    # naiwna data = traktujemy jako UTC
+        chwila = chwila.replace(tzinfo=timezone.utc)
+    godzina = chwila.astimezone(timezone.utc).hour
+    return any(od <= godzina < do for od, do in OKNA_SZCZYTU_UTC)
+
 # ── Profile: rodzaj zadania → co kupujemy ────────────────────────────────────────
 # Zasada doboru ta sama co w tabeli „model wg trudności" dla modeli Claude (CLAUDE.md):
 # mechaniczne — najtaniej; osąd o konsekwencjach — najdroższe. Różnica: tam wybieramy
@@ -84,11 +111,16 @@ def dobierz(zadanie: str = PROFIL_DOMYSLNY) -> Dict[str, Any]:
     return p
 
 
-def koszt_usd(usage: Any, model: str) -> float | None:
+def koszt_usd(usage: Any, model: str, kiedy: Any = None) -> float | None:
     """Koszt wywołania z FAKTYCZNEGO zużycia. None gdy brak cennika dla modelu.
 
     Tokeny rozumowania są częścią `completion_tokens` (zmierzone), więc liczą się po
     stawce wyjściowej — nie ma osobnej, tańszej taryfy za myślenie.
+
+    `kiedy` (domyślnie TERAZ) rozstrzyga taryfę: w oknie szczytu rachunek jest 2×.
+    Domyślne „teraz" jest poprawne dla wołających liczących koszt tuż po odpowiedzi
+    (tak robi LIBRA MESSIS); przeliczając HISTORYCZNY rekord, podaj jego znacznik czasu,
+    bo inaczej wynik zależy od pory, o której akurat uruchomiono raport.
     """
     c = CENNIK.get(model)
     if not c or usage is None:
@@ -103,8 +135,9 @@ def koszt_usd(usage: Any, model: str) -> float | None:
     wyjscie = _pole("completion_tokens")
     trafienia = _pole("prompt_cache_hit_tokens")
     swieze = max(0, wejscie - trafienia)
-    return (swieze * c["wejscie"] + trafienia * c["wejscie_cache"]
+    baza = (swieze * c["wejscie"] + trafienia * c["wejscie_cache"]
             + wyjscie * c["wyjscie"]) / 1_000_000
+    return baza * (MNOZNIK_SZCZYTU if czy_szczyt(kiedy) else 1.0)
 
 
 def tokeny_rozumowania(usage: Any) -> int:
@@ -140,7 +173,11 @@ def diagnoza_pustej(tresc: str | None, usage: Any = None) -> str | None:
 
 def opis_profili() -> str:
     """Zero-tokenowy przegląd: co który profil kupuje i po co."""
-    linie = [f"💰 DISPENSATOR — profile doboru (cennik z {CENNIK_DATA})"]
+    taryfa = ("🔺 TERAZ SZCZYT — rachunek ×2" if czy_szczyt()
+              else "✅ poza szczytem — stawka bazowa")
+    linie = [f"💰 DISPENSATOR — profile doboru (cennik z {CENNIK_DATA}) | {taryfa}",
+             "   okna szczytu (UTC): " +
+             ", ".join(f"{od:02d}:00–{do:02d}:00" for od, do in OKNA_SZCZYTU_UTC)]
     for nazwa, p in PROFILE.items():
         mysli = ("WYŁĄCZONE" if p.get("thinking", {}).get("type") == "disabled"
                  else f"effort={p.get('reasoning_effort', 'domyślny')}")

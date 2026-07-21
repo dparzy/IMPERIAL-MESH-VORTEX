@@ -14,6 +14,47 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | 💰 | Taryfa szczytowa DeepSeeka — rachunek platformy obalił nasz model kosztu
+
+Cezar pokazał **rzeczywisty rachunek z panelu DeepSeeka** za 2026-07-21. Zestawienie
+z pomiarem LIBRA MESSIS:
+
+| | platforma | nasz rejestr |
+|---|---|---|
+| v4-pro | 8 żądań · $0.03 | 8 wywołań · $0.0317 |
+| v4-flash | 202 żądania · $0.12 | 152 wywołania · $0.0996 |
+
+**Model kosztu wpięty tego dnia okazał się dokładny** — v4-pro zgadza się co do sztuki,
+bo tych 8 wywołań to wyłącznie ramię `osad`. Brakujące 50 żądań flash rozliczone przez
+NOTARIUSA: 21 par to `auto_lekcja` z hooków, reszta to wywołania rozbitego biegu, którego
+proces nie zdążył zapisać. **Ok. 27 żądań (13%) pozostaje nierozliczonych i tak to
+zapisujemy** — proces zabity na timeoucie z definicji nie zapisze tego, co wysłał.
+
+**ZNALEZISKO WAŻNIEJSZE NIŻ RACHUNEK:** platforma stosuje **taryfę szczytową 2×** w oknach
+**01:00–04:00 i 06:00–10:00 UTC**, a nasz `CENNIK` miał stawki płaskie. Rzecz w tym, że
+dokument, z którego go przepisaliśmy (`api-docs.deepseek.com/quick_start/pricing`), **nie
+był błędny — był NIEPEŁNY**: o taryfie milczy do dziś. Zweryfikowane w sieci przed zmianą
+stałej (Prawo I): potwierdzają to niezależnie doniesienia TechNode i SCMP o zmianie
+ogłoszonej 2026-06-30 oraz notatka na panelu rozliczeniowym; godziny zgodne co do minuty.
+
+- `dispensator.czy_szczyt()` + `koszt_usd(..., kiedy=)` — koszt liczony wg taryfy z chwili
+  WYWOŁANIA, nie z chwili raportu (inaczej ten sam rekord miałby inną cenę zależnie od pory
+  uruchomienia raportu). LIBRA MESSIS zapisuje pole `szczyt` przy każdym pomiarze.
+- **Sprawdzone wstecz: 0 ze 160 dzisiejszych pomiarów A/B padło w oknie szczytu**
+  (biegły 10:38–12:38 UTC), a ramiona szły naprzemiennie — więc raportowane krotności
+  kosztu (U4 1.46×, profile 3.46×) są **nieskażone taryfą**.
+- **`auto_lekcja` odkłada analizę w szczycie.** 06:00–10:00 UTC to 08:00–12:00 czasu Cezara,
+  czyli typowy poranny start sesji trafiał prosto w podwójną stawkę — wszystkie 22 dzisiejsze
+  wywołania w szczycie pochodziły z tego hooka. Odłożenie nie kosztuje nic, bo analizowane
+  sesje są już zakończone; zaległe domknie najbliższy start poza szczytem. Wyłączniki:
+  `--takze-w-szczycie` i `--sesja`.
+- Decyzja wydzielona z `__main__` do `powod_odlozenia()` — bramka schowana w bloku
+  uruchomieniowym jest nietestowalna, a bramka bez testu przestaje gryźć niezauważona.
+- Testy granic okien (początek wliczony, koniec wyłączony) + dowód, że stawki bazowe
+  pozostały nietknięte: naprawa **dołożyła wymiar czasu, nie podmieniła cennika**.
+
+---
+
 ## 2026-07-21 | ⚖️ | A/B jakości plonu Hyginusa — organ LIBRA MESSIS i trzy wady WŁASNEJ miary
 
 Rozkaz Cezara: *„nowa sesja zaczyna od A/B, decyzja co lepsze DOPIERO po pomiarze"*.

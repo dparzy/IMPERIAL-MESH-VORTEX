@@ -262,14 +262,24 @@ def zmierz(tekst: str, leksykon, probator: dict | None = None) -> dict:
 
 
 def _zuzycie(glos) -> dict:
-    """Koszt i tokeny OSTATNIEGO wywołania — z faktycznego `usage`, nie z szacunku."""
-    from imperium.cesarz.dispensator import koszt_usd, tokeny_rozumowania
+    """Koszt i tokeny OSTATNIEGO wywołania — z faktycznego `usage`, nie z szacunku.
+
+    Koszt liczony wg taryfy z chwili WYWOŁANIA (DeepSeek bierze 2× w oknach szczytu),
+    a nie z chwili raportu — i zapisujemy `szczyt`, żeby dało się później odtworzyć, po
+    jakiej stawce liczyliśmy. Bez tego pola ten sam rekord przeliczony innego dnia mógłby
+    dostać inną cenę i nikt by nie wiedział, która jest prawdziwa.
+    """
+    from datetime import datetime, timezone
+    from imperium.cesarz.dispensator import czy_szczyt, koszt_usd, tokeny_rozumowania
     u = getattr(glos, "ostatnie_zuzycie", None)
     model = getattr(glos, "ostatni_model", None)
+    teraz = datetime.now(timezone.utc)
     if u is None or model is None:
-        return {"koszt_usd": None, "tokeny_rozumowania": None, "model": model}
-    return {"koszt_usd": koszt_usd(u, model), "tokeny_rozumowania": tokeny_rozumowania(u),
-            "model": model}
+        return {"koszt_usd": None, "tokeny_rozumowania": None, "model": model,
+                "szczyt": czy_szczyt(teraz)}
+    return {"koszt_usd": koszt_usd(u, model, kiedy=teraz),
+            "tokeny_rozumowania": tokeny_rozumowania(u),
+            "model": model, "szczyt": czy_szczyt(teraz)}
 
 
 # ── Rejestr pomiarowy (własny, NIGDY produkcyjna kolejka) ────────────────────────

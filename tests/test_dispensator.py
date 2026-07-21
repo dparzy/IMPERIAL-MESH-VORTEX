@@ -216,3 +216,65 @@ def test_notarius_dostaje_model_FAKTYCZNIE_uzyty(monkeypatch):
                         lambda *a, **k: zapisane.update({"model": a[4] if len(a) > 4 else None}))
     g.zapytaj("s", "t", profil="osad")
     assert zapisane["model"] == "deepseek-v4-pro"       # NIE flash z __init__
+
+
+# ── Taryfa szczytowa (zweryfikowana 2026-07-21) ──────────────────────────────────
+
+def _utc(godzina, minuta=0):
+    from datetime import datetime, timezone
+    return datetime(2026, 7, 21, godzina, minuta, tzinfo=timezone.utc)
+
+
+def test_czy_szczyt_granice_okien():
+    """REGUŁA TEST-GRANIC: początek okna WLICZONY, koniec WYŁĄCZONY.
+
+    Okna UTC 01:00–04:00 i 06:00–10:00 (2× stawka). Pomyłka o jedną godzinę na krańcu
+    to dwukrotny błąd rachunku dla całej godziny ruchu."""
+    from imperium.cesarz.dispensator import czy_szczyt
+    for h in (1, 2, 3, 6, 8, 9):
+        assert czy_szczyt(_utc(h)), f"{h}:00 UTC powinno być szczytem"
+    for h in (0, 4, 5, 10, 11, 15, 23):
+        assert not czy_szczyt(_utc(h)), f"{h}:00 UTC NIE powinno być szczytem"
+    # dokładne krańce
+    assert czy_szczyt(_utc(1, 0)) and czy_szczyt(_utc(3, 59))
+    assert not czy_szczyt(_utc(4, 0))
+    assert czy_szczyt(_utc(6, 0)) and czy_szczyt(_utc(9, 59))
+    assert not czy_szczyt(_utc(10, 0))
+
+
+def test_czy_szczyt_data_naiwna_liczona_jako_utc():
+    """Granica: data bez strefy nie może cicho wpaść w lokalną — traktujemy ją jako UTC."""
+    from datetime import datetime
+    from imperium.cesarz.dispensator import czy_szczyt
+    assert czy_szczyt(datetime(2026, 7, 21, 8, 0))
+    assert not czy_szczyt(datetime(2026, 7, 21, 14, 0))
+
+
+def test_koszt_w_szczycie_jest_podwojny():
+    """Ten sam `usage` w szczycie kosztuje dokładnie 2× tego, co poza szczytem."""
+    from imperium.cesarz.dispensator import koszt_usd
+    usage = {"prompt_tokens": 10_000, "completion_tokens": 2_000,
+             "prompt_cache_hit_tokens": 0}
+    poza = koszt_usd(usage, "deepseek-v4-flash", kiedy=_utc(12))
+    w_szczycie = koszt_usd(usage, "deepseek-v4-flash", kiedy=_utc(8))
+    assert poza is not None
+    assert abs(w_szczycie - 2 * poza) < 1e-12
+
+
+def test_koszt_poza_szczytem_zgodny_z_cennikiem_bazowym():
+    """Stawka bazowa nie zmieniła się — CENNIK z dokumentacji pozostaje prawdziwy.
+
+    Ważne rozróżnienie (2026-07-21): dokument, z którego przepisaliśmy CENNIK, nie był
+    BŁĘDNY, tylko NIEPEŁNY — milczał o taryfie szczytowej. Ten test pilnuje, że naprawa
+    dołożyła wymiar czasu, a nie podmieniła stawki bazowe."""
+    from imperium.cesarz.dispensator import CENNIK, koszt_usd
+    c = CENNIK["deepseek-v4-pro"]
+    usage = {"prompt_tokens": 1_000_000, "completion_tokens": 0,
+             "prompt_cache_hit_tokens": 0}
+    assert abs(koszt_usd(usage, "deepseek-v4-pro", kiedy=_utc(13)) - c["wejscie"]) < 1e-9
+
+
+def test_brak_cennika_dalej_zwraca_none_takze_w_szczycie():
+    """Granica: nieznany model → None (nie wiemy), a nie 0.0 ani 2×0."""
+    from imperium.cesarz.dispensator import koszt_usd
+    assert koszt_usd({"prompt_tokens": 5}, "model-widmo", kiedy=_utc(8)) is None

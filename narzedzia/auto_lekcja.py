@@ -262,6 +262,34 @@ def przetworz_nowe(maks_sesji: int = 3, podglad: bool = False) -> Dict[str, int]
     return wynik
 
 
+def powod_odlozenia(wymuszona_sesja: str = "", takze_w_szczycie: bool = False,
+                    kiedy=None) -> str:
+    """Czy odłożyć analizę na później — zwraca POWÓD (pusty string = działaj).
+
+    TARYFA SZCZYTOWA (zmierzone 2026-07-21): DeepSeek liczy 2× w oknach 01:00–04:00
+    i 06:00–10:00 UTC, a 06–10 UTC to 08:00–12:00 czasu Cezara — czyli TYPOWY poranny
+    start sesji trafia prosto w szczyt. Rachunek za 2026-07-21 pokazał 22 takie wywołania
+    i WSZYSTKIE pochodziły z tego hooka.
+
+    Odłożenie nie kosztuje NIC, bo auto-lekcja analizuje sesje JUŻ ZAKOŃCZONE: nie ma czego
+    stracić przez zwłokę, a nieprzetworzona sesja zostaje w kolejce i zostanie domknięta
+    przy najbliższym starcie poza szczytem (`przetworz_nowe` bierze zaległe).
+
+    Wyjątki są świadome: `--sesja` (wymuszenie konkretnej) i `--takze-w-szczycie` —
+    kto MUSI mieć lekcję teraz, płaci podwójnie i wie za co.
+
+    Wydzielone z `__main__` UMYŚLNIE: bramka schowana w bloku uruchomieniowym jest
+    nietestowalna, a bramka bez testu prędzej czy później przestaje gryźć niezauważona.
+    """
+    if wymuszona_sesja or takze_w_szczycie:
+        return ""
+    from imperium.cesarz.dispensator import czy_szczyt
+    if czy_szczyt(kiedy):
+        return ("okno podwójnej stawki DeepSeeka — odkładam analizę (sesje czekają, "
+                "nic nie ginie). Wymuszenie: --takze-w-szczycie")
+    return ""
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -269,7 +297,16 @@ if __name__ == "__main__":
     p.add_argument("--sesja", default="", help="ID sesji do wymuszenia przetworzenia")
     p.add_argument("--podglad", action="store_true", help="Dry-run — pokaż bez zapisywania")
     p.add_argument("--maks", type=int, default=3, help="Maks sesji do przetworzenia (default 3)")
+    p.add_argument("--takze-w-szczycie", action="store_true",
+                   help="przetwarzaj nawet w oknie podwójnej stawki DeepSeeka "
+                        "(domyślnie odkładamy — patrz niżej)")
     args = p.parse_args()
+
+    powod = powod_odlozenia(wymuszona_sesja=args.sesja,
+                            takze_w_szczycie=args.takze_w_szczycie)
+    if powod:
+        print(f"  [auto_lekcja] ⏸️ {powod}")
+        raise SystemExit(0)
 
     if args.sesja:
         przetworz_sesje(args.sesja, podglad=args.podglad)

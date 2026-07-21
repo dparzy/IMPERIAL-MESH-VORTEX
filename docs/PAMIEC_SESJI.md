@@ -113,6 +113,30 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-20 — Hyginus znalazł 2 kandydatów
+Z tematu 'mean reversion' znaleziono Model Vasicka i Cross-sectional mean reversion, jeszcze bez walidacji.
+
+### 2026-07-20 — Audyt spójności pełna harmonia
+84 neurony, 15 zwiadowców, 18 elit, ruff czysto, MAPA_KLUCZY pełna – system w pełni harmonijny.
+
+### 2026-07-21 — Problem z \b w regexie dla identyfikatorów BIB z podkreślnikiem
+\b nie zamyka się przed '_', więc 'BIB-006_Carson' nie jest wykrywany jako osobne słowo. To znana klasa z Księgi Wad (#53). Naprawiono w PROBATORZE przez użycie innej granicy (np. (?:^|[\s,;.!?])).
+
+### 2026-07-21 — Archium lekcji ma inny nagłówek – szukaj() nie widzi schłodzonych
+Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł szukaj() używa własnego parsera, który go nie rozpoznaje. Luka w wyszukiwalności pamięci – wymaga ujednolicenia parsera lub wzbogacenia searcha.
+
+### 2026-07-20 — Normalny churn pamięci w plikach dokumentacji
+Dwa pliki (wizje_i_decyzje.jsonl, PAMIEC_SESJI.md) zostały zmienione przez hook startowy – to standardowe odświeżanie pamięci sesji, nie zmiana kodu.
+
+### 2026-07-20 — Stan neuronów: 84, w tym 78 aktywnych, 6 wyciszonych
+Potwierdzono liczbę neuronów oraz ich status. 22 neurony (rodziny NEWS, PSY, RADAR, OC, C, V, Z) czekają na adaptery/dane – to stan zgodny z Prawem XV.
+
+### 2026-07-21 — Podkreślnik jako znak słowny w regexie BIB
+Użycie \b w regexie dla identyfikatorów BIB nie zamyka się na podkreślniku (jest znakiem słownym). Testy złapały błąd - naprawiono wzorzec.
+
+### 2026-07-21 — Archiwum lekcji niewidoczne dla szukaj()
+Schłodzone lekcje mają inny nagłówek w pliku, więc parser modułu nie czyta archiwum. Luka powstała przy wdrażaniu chłodzenia. Wymaga poprawy parsowania.
+
 ### 2026-07-20 — API-widma – istnienie w docs ≠ istnienie w kodzie
 Błąd klasy API-widma: dokumentacja indeksu/manualu zawiera komendy do plików, które nie istnieją lub zmieniły nazwę. Zweryfikowano na 9 kandydatach – 3 prawdziwe widma. W16 precyzyjnie odróżnia widma od supresji (dydaktyka, wizje, negacje).
 
@@ -148,9 +172,6 @@ Log pokazał input_len=100, gdy wynik policzono z 80 barów (ciche obcięcie zip
 
 ### 2026-07-20 — LEX TALIONIS: błąd pieczątki = NOTA + CORONA (łata + mechanizm)
 Kłamiąca pieczątka input_len to zatwierdzony błąd Imperium (Prawo XIII). Spłacono NOTĘ 5/5 CORONĄ: strażnik + uodpornienie klasy + wpis do Księgi Wad. ZASADA CENSORA: łata nie wystarczy, trzeba mechanizm.
-
-### 2026-07-20 — Teza zwiadowcy wymaga pomiaru, nie wiary
-Subagent-zwiadowca twierdził ~25 miejsc zip w Bramie - faktycznie 10. Twierdził brak ochrony w diagnostyce korelacji - 4/4 już strzeżone. Kandydat ≠ prawda. ZASADA WERYFIKACJI obligatoryjna przed naprawą.
 
 ### 2026-07-20 — Skan klasy błędu – 0 innych wystąpień
 Po naprawie buga argparse przeskanowano cały kod – 0 innych % w help-stringach. Klasa domknięta, brak epidemii.
@@ -203,17 +224,11 @@ Plik z wrzutnia to dump rozmów z Hyginusem (DeepSeek) zawierający research hyb
 ### 2026-07-20 — Luka pokrycia 4h – tylko 10 par zamiast 15
 Pomiar wykazuje brak plików 4h dla BNB/BTC/DOGE/ETH/SOL. Wpływa na redukcję kombinacji do 40 zamiast potencjalnych 45.
 
-### 2026-07-20 — EXP-13 GARCH: niska dekorelacja + stabilny skill
-Średnie max|ρ| = 0.141 (poniżej progu 0.20), IC = 0.247/0.245/0.254 dla h=1/6/30. Potwierdza filar siły i realny sygnał predykcyjny na wszystkich parach.
-
 ### 2026-07-20 — Potrójna symbioza audit-sigilium: mechanizm wykrywa własne organy w wielu warstwach
 Audyt W11/W15/W17 złapał nowe sigilium (runbook, licznik w README, rekord w codicilu) – symbioza działa przeciw autorowi. Wymusza to ostrożność przy dodawaniu nowych elementów.
 
 ### 2026-07-20 — Winget dostępny jako narzędzie do instalacji
 Na laptopie Cezara dostępne jest winget (Windows Package Manager) – może służyć do cichej instalacji djvulibre i innych narzędzi bez uruchamiania interaktywnych instalatorów.
-
-### 2026-07-20 — djvu wymaga djvutxt (djvulibre), nie calibre
-Konwersja djvu do tekstu wymaga narzędzia 'djvutxt' z djvulibre; calibre historycznie nie czyta djvu. Wszystkie 5 ksiąg do domknięcia QNT/RLA/Aronson to djvu – calibre jest dla nich bezużyteczne.
 
 ### 2026-07-20 — Hotspoty: _py_supertrend i _py_volume_profile
 Czysto-pythonowe pętle O(okno) na wskaźnikach supertrend i volume_profile są ciężkie (okno 251, wiele symboli). Kandydaci do wektoryzacji numpy.
@@ -233,9 +248,6 @@ Pomiary profili dla 500-1600 barów wykazały stały ms/tick (~66ms), co oznacza
 ### 2026-07-20 — Output hooka startowego ucięty przez harness
 Output hooka startowego (25,5 KB) został ucięty, powodując utratę kluczowej informacji (Dziennik następny krok) z pierwszego okna. Konieczna optymalizacja objętości.
 
-### 2026-07-20 — Asymetria otwarcia i zamknięcia sesji
-Otwarcie sesji nie ma egzekwowanej checklisty, w przeciwieństwie do 9-krokowej checklisty zamknięcia. Ryzyko pominięcia kluczowych kroków startu.
-
 ### 2026-07-20 — Testy >2 min na starym Fujitsu – bez limitu czasowego
 Testy trwają ponad 2 minuty ze względu na słaby sprzęt. Nie dawać limitu timeoutu. Uruchamiać w tle i cyklicznie sprawdzać, czy bieg żyje. Procedura zapisana w pamięci długoterminowej.
 
@@ -250,9 +262,6 @@ Strategia ZŁOTY ORZEŁ używa EMA 50/200, nie kanonicznego SMA. Zapisano w doku
 
 ### 2026-06-30 — Filtr kara w baza.py: wyciszone filtry nie karzą
 Gdy n_akt_f==0 (wszystkie neurony FILTR wyciszone), strategia otrzymywała karę 0.5. Poprawiono na 1.0 – neuron FILTR nieobecny nie powinien karać (Prawo XV).
-
-### 2026-06-30 — Audyt źródła pure-Python w Bramie: brakowało _PURE_PYTHON_INDICATORS
-Wszystkie wskaźniki w Bramie miały źródło TA-Lib. Dodano zbiór _PURE_PYTHON_INDICATORS (11 wskaźników) i warunek SOURCE_TAG_PY w compute(). Naprawiono rozróżnienie źródła dla wskaźników własnych.
 
 ### 2026-06-30 — Naprawiono ImportError w legatus.py
 Przy bezpośrednim uruchomieniu legatus.py występował błąd względnego importu z .mikro_neuron. Rozwiązano przez try/except: próbuje import względny, w razie błędu przechodzi na absolutny.
@@ -317,9 +326,6 @@ Prawo XV: Klucznik obliczał strategie, ale Dyrygent ich nie używał. Naprawion
 ### 2026-06-30 — Prawo XV: nie dodawać neuronów z niedostępnym API
 Potwierdzono zasadę, że neurony wymagające nieistniejącego API zawsze zwracają NEUTRAL. W tej sesji dodano tylko neurony korzystające z dostępnych wskaźników (Donchian, RSI, BB).
 
-### 2026-07-10 — BIB-032 O'Hara – OCR garbage, nieindeksowany
-Książka w formacie skanowanych obrazów PDF – OCR generuje śmieci. Zgodnie z Prawem I (zero fabricacji) nie została włączona do RAG.
-
 ### 2026-07-10 — Regime-stale bug – problem branżowy z pamięcią niezależną od reżimu
 Odkryto, że konkurencyjne systemy pamięci nie uwzględniają reżimu rynku, co powoduje wyciąganie nieodpowiednich lekcji (np. z hossy podczas bessy). Nasza implementacja Pamięci Reżimowej rozwiązuje to przez wymiar regime_match w scoringu.
 
@@ -343,9 +349,6 @@ Przetestowano 3 scenariusze rynkowe — system wymaga automatycznego klasyfikato
 
 ### 2026-06-30 — Audyt W6: brak Stan na = błąd, markdown tolerowany
 Dodano else dla braku 'Stan na:'. Regex toleruje **Stan na:** data.
-
-### 2026-06-30 — HA doji: strict > zamiast >=
-HA_BULL = c > o (nie >=) — doji neutralny, nie byczy.
 
 ### 2026-06-30 — Dynamiczna dźwignia od pewności i reżimu
 pewnosc <0.55→0x, <0.65→2x, <0.75→5x, <0.85→10x, <0.92→15x, >=0.92→20x. Mnożniki reżimu: VOLATILE×0.5, PANIC×0.1, RANGING×0.7, TREND_STRONG×1.2.

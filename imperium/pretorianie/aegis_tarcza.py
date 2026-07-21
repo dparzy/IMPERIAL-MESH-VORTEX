@@ -20,6 +20,11 @@ class AegisShield:
     def __init__(self, initial_capital: float = 50.0, daily_loss_limit_pct: float = 0.10,
                  tier_warning: float = 0.20, tier_no_new: float = 0.30, tier_flatten: float = 0.50,
                  max_consecutive_losses: int = 3, cooldown_minutes: int = 60):
+        # Kapitał początkowy musi być dodatni — jest mianownikiem w drawdown
+        # (peak_capital) i w limicie dziennym (initial_capital). Zero/ujemny =
+        # ZeroDivisionError w update(); jawny błąd u wrót (fail-loud).
+        if initial_capital <= 0:
+            raise ValueError(f"initial_capital musi być > 0 (dostała {initial_capital})")
         self.initial_capital = initial_capital
         self.peak_capital = initial_capital
         self.current_capital = initial_capital

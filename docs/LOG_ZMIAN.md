@@ -14,6 +14,38 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | 📋 | BREVIARIUM + dług honorowy na otwarciu (zarzut Cezara o luki hooka)
+
+Cezar: *„hook startowy ma luki — powinien być stan Hyginusa i TIRO, ich zadania zrobione i do
+zrobienia, i jakiego modelu używasz Ty i oni"*. **Zarzut potwierdzony pomiarem:** hook wołał 10
+organów (audyt, PORTITOR, CENSOR, CODEX, pamięć, Dziennik, kronika, skan wad…) i **ani jeden nie
+mówił, co robią HYGINUS i TIRO ani z jakich modeli korzystamy**. Drugi brak, wskazany przez Cezara
+i potwierdzony: **`codex_notarum bilans` NIE był wołany na starcie** — dług honorowy stał wyłącznie
+w kroku 5b zamknięcia, więc sesja urwana przed domknięciem zostawiała dług, którego następne
+otwarcie nie pokazywało. Klasa znana: **bramka widoczna tylko na jednym końcu procesu.**
+
+- **Organ:** `imperium/oczy/breviarium.py` (August przekazywał Senatowi *breviarium totius imperii* —
+  zwięzły rachunek zasobów państwa). Melduje: HYGINUS — kolejka, **plon czekający na sędziego**
+  (dług przeglądu: płacimy za zwiad, którego nikt nie ocenia), ostatni zwiad, model, profile
+  DISPENSATORA, werdykty PROBATORA; TIRO — pary nauczyciela, modele `.gguf` na dysku, silnik,
+  klasa sprzętu i co ona unosi.
+- **Od razu wykryty martwy potencjał:** `DISPENSATOR: 🚨 NIEWPIĘTY` — organ jest w repo, ale
+  `bibliotekarz.py` go nie woła (to właśnie pierwsza część rozkazu o rozbudowie Hyginusa).
+- **Czego świadomie NIE zgadujemy (Prawo I):** identyfikator modelu Claude **nie istnieje
+  w środowisku** — env niesie `CLAUDE_EFFORT` i `CLAUDE_AGENT_SDK_VERSION`, żadnego `*_MODEL`.
+  BREVIARIUM drukuje więc, co wie, i **żąda deklaracji od Architekta**, zamiast wpisać
+  prawdopodobną nazwę, która zestarzeje się jak każda ręczna liczba. Skodyfikowane w CLAUDE.md
+  (krok 6 OTWARCIA: „przedstaw się rzymsko **i zadeklaruj model + effort**").
+- **Liczby GENEROWANE z żywego stanu**, nigdy przechowywane — ta sama żelazna zasada co
+  SIGILLARIUM i CENSUS ORGANORUM.
+
+Testy 2778→**2794** (+16, w tym granice: brak plików, uszkodzona linia JSONL, brak silnika TIRO,
+znacznik nieliczbowy, kontrola pozytywna I negatywna detektora wpięcia). Audyt exit 0 (W17: 242).
+**Pliki:** `imperium/oczy/breviarium.py`, `tests/test_breviarium.py`, `.claude/hooks/session-start.sh`,
+`CLAUDE.md`, `docs/ARCHITEKTURA_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`.
+
+---
+
 ## 2026-07-21 | 🛡️ | PROBATOR — Strażnik Cytatów (warstwa 1 anty-halucynacyjna Hyginusa)
 
 Rozkaz Cezara: rozbudowa Hyginusa, start od citation-checku. **Powód (web 2026-07-21):** DeepSeek

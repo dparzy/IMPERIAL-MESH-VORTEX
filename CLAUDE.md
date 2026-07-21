@@ -646,10 +646,11 @@ Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
 
 1. **Przeczytaj wydruk hooka w całości** (kolejność drukowania): 🎯 **NASTĘPNY KROK** (banner na górze,
    A2 — zawsze widoczny mimo ~25 KB) → **PORTITOR** (pre-flight środowiska: deps/klucze API/dryf, B1)
-   → **audyt Prawo XXI** (16 warstw) → **CODEX** (podsumowanie ledgera, C1) → **Centrum Pamięci** (profil,
-   Top-3 lekcji, aktywny cel W12, Refleksja W9) → **Dziennik Nieśmiertelny** (pełna oś) → **skan wad
-   ostatniego commitu**. Wydruk >25 KB bywa ucięty w podglądzie — pełna treść jest w pliku
-   `tool-results/hook-*.txt` (czytaj go, jeśli banner/plan zniknął z podglądu).
+   → **CENSOR SPRZĘTU** (żelazo zmierzone) → **INDEX FALSORUM** → **BREVIARIUM** (słudzy: Hyginus/TIRO/
+   modele) → **LEX TALIONIS** (dług honorowy) → **audyt Prawo XXI** (17 warstw) → **CODEX**
+   (podsumowanie ledgera, C1) → **Centrum Pamięci** (profil, Top-3 lekcji, aktywny cel W12, Refleksja W9)
+   → **Dziennik Nieśmiertelny** (pełna oś) → **skan wad ostatniego commitu**. Wydruk >25 KB bywa ucięty
+   w podglądzie — pełna treść jest w pliku `tool-results/hook-*.txt` (czytaj go, jeśli banner/plan zniknął).
 2. **Audyt ≠ „pełna harmonia" → rozstrzygnij JAWNIE PRZED pierwszym zadaniem** (A3). Czerwony alarm audytu,
    Prawo XV, Refleksja W9 czy limity pamięci to ZADANIA: napraw sam (błahostka, Prawo XVIII), zaplanuj
    w Backlogu CODEX (średnie) albo spytaj Cezara (kierunkowe) — nigdy milczeniem.
@@ -659,7 +660,12 @@ Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
    żywy kod + kronika + Dziennik (kandydat≠prawda, POMIAR nie pamięć). Nie budujemy tego, co już mamy.
 5. **PRAWO XVII — rozpoznanie terenu:** liczby (neurony/zwiadowcy/testy) POLICZONE z kodu, nie z pamięci;
    kod+testy > ZASADY > liczby z plików > pamięć.
-6. **Przedstaw się rzymsko** (Vitruviusz — Architekt) — ZASADA NOMENKLATURY.
+6. **Przedstaw się rzymsko** (Vitruviusz — Architekt) — ZASADA NOMENKLATURY — **i ZADEKLARUJ SWÓJ
+   MODEL + effort**. Powód (zmierzone 2026-07-21): środowisko hooka NIE niesie identyfikatora modelu
+   (jest `CLAUDE_EFFORT`, `CLAUDE_AGENT_SDK_VERSION`, nie ma żadnego `*_MODEL`), więc BREVIARIUM nie
+   może go zmierzyć i świadomie go NIE ZGADUJE (Prawo I). Jedynym źródłem prawdy jesteś Ty — mówisz
+   wprost, czym jesteś w tej wachcie, bo od tego zależy dobór zadań (ZASADA OSZCZĘDNOŚCI TOKENÓW).
+   Meldunek Hyginusa i TIRO czytasz z BREVIARIUM, nie z pamięci.
 7. **Pokaż plan / pytania decyzyjne** wg rekomendacji+priorytetu (ZASADA RAPORTOWANIA I PODGLĄDU KAPITOLU).
 
 **Złamanie:** start bez przeczytania wydruku hooka; audyt/alarm ≠ harmonia zignorowany milczeniem;

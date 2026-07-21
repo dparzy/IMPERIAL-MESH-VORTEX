@@ -77,7 +77,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | 🛤️ **drogi/** | API i egzekucja (NexusHub) | <!-- LICZBA:organ_drogi -->4<!-- /LICZBA --> |
 | 🎨 **swiatynie/** | **PRAETORIUM** (Kwatera Główna Imperatora) + dashboard / wizualizacja / SPECULA świec | <!-- LICZBA:organ_swiatynie -->7<!-- /LICZBA --> |
 | 📚 **biblioteki/** | pamięć W-360, MWU, Synapsy Reżimowe, Kronikarz, RAG | <!-- LICZBA:organ_biblioteki -->28<!-- /LICZBA --> |
-| 👁️ **oczy/** | obserwatorzy / źródła / Censor Sprzętu | <!-- LICZBA:organ_oczy -->2<!-- /LICZBA --> |
+| 👁️ **oczy/** | obserwatorzy / źródła / Censor Sprzętu | <!-- LICZBA:organ_oczy -->3<!-- /LICZBA --> |
 | 🧮 **fundament/** | Brama Kalkulatora | <!-- LICZBA:organ_fundament -->2<!-- /LICZBA --> |
 
 ---

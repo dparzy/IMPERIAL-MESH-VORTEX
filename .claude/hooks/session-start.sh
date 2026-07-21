@@ -61,6 +61,24 @@ if [ -f imperium/biblioteki/index_falsorum.py ]; then
   python -m imperium.biblioteki.index_falsorum || true
 fi
 
+# 0.9) BREVIARIUM — zwięzły spis SŁUG Imperium (zarzut Cezara 2026-07-21).
+#      Powód: hook wołał 10 organów i ani jeden nie mówił, co robią HYGINUS i TIRO ani
+#      z jakich modeli korzystamy. Dwaj słudzy z osobnymi rozkazami i osobnymi kosztami
+#      byli na otwarciu niewidzialni — stan kolejki, plon czekający na sędziego, pary
+#      nauczyciela, modele na dysku trzeba było wygrzebywać ręcznie co sesję.
+if [ -f imperium/oczy/breviarium.py ]; then
+  python -m imperium.oczy.breviarium || true
+fi
+
+# 0.10) LEX TALIONIS — dług honorowy NA OTWARCIU (zarzut Cezara 2026-07-21, potwierdzony).
+#       Powód: bilans not stał WYŁĄCZNIE w kroku 5b zamknięcia. Sesja urwana przed
+#       domknięciem zostawiała niespłacony dług, którego następne otwarcie NIE POKAZYWAŁO —
+#       czyli jedyny mechanizm pilnujący długu milkł dokładnie wtedy, gdy był potrzebny.
+#       Klasa znana: bramka widoczna tylko na jednym końcu procesu.
+if [ -f imperium/biblioteki/codex_notarum.py ]; then
+  python -m imperium.biblioteki.codex_notarum bilans || true
+fi
+
 # 1) Instalacja zależności — tylko w środowisku zdalnym (lokalnie masz swoje venv)
 if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ]; then
   if [ -f requirements.txt ]; then

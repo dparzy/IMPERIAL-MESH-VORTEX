@@ -284,20 +284,36 @@ def test_rozwiniecie_zapytania_kupuje_najtaniej(monkeypatch):
 
 
 def test_krytyka_kupuje_glebokosc(monkeypatch):
-    """Sceptyk płytszy od proponenta byłby bezużyteczny — krytyka dostaje effort high."""
+    """Sceptyk płytszy od proponenta byłby bezużyteczny — krytyka kupuje NAJWIĘCEJ myślenia.
+
+    Od 2026-07-21 (decyzja Cezara po A/B LIBRA MESSIS) krytyka idzie na profil `osad`
+    (v4-pro), nie `krytyka` (flash). Test pilnuje RELACJI, nie nazwy: faza krytyki nie może
+    być tańsza od fazy zwiadu, bo krytyk słabszy od proponenta zatwierdza własne hipotezy."""
+    from imperium.cesarz.dispensator import CENNIK, dobierz
     _fake_szukaj_bib006(monkeypatch)
     g = _GlosProfilujacy("ocena")
     scout_temat(g, "momentum", topk=3, krytyka=True)
-    assert g.wywolania == ["zwiad", "krytyka"]
+    assert g.wywolania == [bib._PROFIL_ZWIAD, bib._PROFIL_KRYTYKA]
+
+    cena = lambda profil: CENNIK[dobierz(profil)["model"]]["wyjscie"]  # noqa: E731
+    assert cena(bib._PROFIL_KRYTYKA) >= cena(bib._PROFIL_ZWIAD), \
+        "faza krytyki tańsza niż zwiad — sceptyk płytszy od proponenta"
 
 
-def test_profil_osad_nie_jest_uzywany_przez_hyginusa(monkeypatch):
+def test_hyginus_nie_sadzi_wlasnego_plonu(monkeypatch):
     """ZASADA ZWIADOWCY WIEDZY: sędzią kandydatów jest Opus, nie DeepSeek.
-    Gdyby Hyginus sam wołał 'osad', proponent oceniałby własny plon."""
+
+    NIEZMIENNIK PRZEPISANY 2026-07-21: wcześniej pilnowaliśmy go zakazem NAZWY profilu
+    („osad" nie może paść"), co myliło dwie różne rzeczy — *ile myślenia kupujemy* z *jaką
+    rolę pełnimy*. Gdy Cezar przeniósł krytykę na profil `osad`, test padł, choć rola się
+    nie zmieniła: krytyka wciąż PRODUKUJE kontrargumenty, a werdykt o wejściu do roju wydaje
+    Architekt. Teraz pilnujemy tego, o co naprawdę chodziło: Hyginus wykonuje wyłącznie fazy
+    zwiadu (rozwinięcie → generacja → krytyka) i ani jednego przejścia więcej."""
     _fake_szukaj_bib006(monkeypatch)
     g = _GlosProfilujacy("x")
     scout_temat(g, "momentum", topk=3, rozwin=True, krytyka=True)
-    assert "osad" not in g.wywolania
+    assert g.wywolania == [bib._PROFIL_ROZWIN, bib._PROFIL_ZWIAD, bib._PROFIL_KRYTYKA], \
+        "Hyginus wykonał fazę spoza zwiadu — proponent nie może sądzić własnego plonu"
 
 
 def test_wszystkie_profile_hyginusa_istnieja_w_dispensatorze():

@@ -77,6 +77,17 @@ TEMATY_RDZEN = [
     "trading psychology discipline probabilistic thinking edge",
     "mean reversion overextension bands entry",
     "backtest overfitting deflated sharpe multiple testing",
+    # ── dobite 2026-07-21 (decyzja Cezara: domknąć U4 rozstrzygnięciem) ──
+    # Celują wprost w pojęcia, które Imperium NA PEWNO posiada (leksykon + dowód w kodzie),
+    # więc szansa na duplikat jest wysoka — a to jedyny sposób, by pomiar miał moc.
+    "toxic order flow informed trading probability vpin",
+    "long memory fractal dimension persistence hurst exponent",
+    "entropy information theory market predictability",
+    "perpetual futures funding rate open interest positioning",
+    "volatility estimator range based high low efficiency",
+    "adaptive moving average trend following crossover systems",
+    "volume weighted average price execution benchmark",
+    "illiquidity measure price impact per volume",
 ]
 
 ZESTAWY = {"nowe": TEMATY_AB, "rdzen": TEMATY_RDZEN}
@@ -283,11 +294,17 @@ def zapisz(rekord: dict, sciezka: Path = REJESTR) -> None:
 
 
 def zrobione(bieg: str, sciezka: Path = REJESTR) -> set:
-    """(temat, ramię) już ZMIERZONE — wznawianie nie płaci drugi raz za to samo.
+    """(temat, ramię, runda) już ZMIERZONE — wznawianie nie płaci drugi raz za to samo.
 
     Rekord o statusie 'blad' NIE liczy się jako zrobiony: zerwane łącze ma zostać
-    ponowione przy następnym biegu, inaczej porażka utrwalałaby się jako wynik."""
-    return {(r["temat"], r["ramie"]) for r in wczytaj(sciezka)
+    ponowione przy następnym biegu, inaczej porażka utrwalałaby się jako wynik.
+
+    RUNDA jest częścią klucza, bo powtórzenie tego samego tematu to NOWE LOSOWANIE
+    (temperatura 0.4), a więc nowa obserwacja — bez tego wymiaru nie dało się zwiększyć
+    próby inaczej niż wymyślaniem kolejnych tematów. Stare rekordy bez pola `runda`
+    czytamy jako rundę 1 (wsteczna zgodność: nie unieważniamy pomiarów sprzed zmiany).
+    """
+    return {(r["temat"], r["ramie"], r.get("runda", 1)) for r in wczytaj(sciezka)
             if r.get("bieg") == bieg and r.get("status") != "blad"}
 
 
@@ -325,7 +342,7 @@ def _z_ponowieniem(wywolaj, opis: str):
 # ── Bieg 1: U4 ON vs OFF ─────────────────────────────────────────────────────────
 
 def bieg_u4(tematy=None, topk: int = 6, sciezka: Path = REJESTR,
-            etykieta: str = "u4") -> int:
+            etykieta: str = "u4", runda: int = 1) -> int:
     """Ten sam temat skanowany ze świadomością systemu i bez niej. Metryka główna: duplikaty.
 
     `etykieta` oddziela zestawy tematów w rejestrze — mieszanie poligonu „nowe" (bez szans
@@ -338,7 +355,8 @@ def bieg_u4(tematy=None, topk: int = 6, sciezka: Path = REJESTR,
     leksykon = leksykon_roju()
     glos = GlosImperium()
     gotowe = zrobione(etykieta, sciezka)
-    zadania = [(t, r) for t in tematy for r in ("on", "off") if (t, r) not in gotowe]
+    zadania = [(t, r) for t in tematy for r in ("on", "off")
+               if (t, r, runda) not in gotowe]
     print(f"⚖️ LIBRA MESSIS — bieg {etykieta.upper()}: {len(zadania)} pomiarów "
           f"({len(gotowe)} już w rejestrze, pomijam)", file=sys.stderr, flush=True)
     for i, (temat, ramie) in enumerate(zadania, 1):
@@ -350,9 +368,10 @@ def bieg_u4(tematy=None, topk: int = 6, sciezka: Path = REJESTR,
             f"zwiad U4={ramie}")
         if czastka is None:      # zapisujemy PORAŻKĘ, nie pomijamy jej po cichu (Prawo I)
             zapisz({"bieg": etykieta, "ramie": ramie, "temat": temat, "faza": "zwiad",
-                    "ts": time.time(), "status": "blad", "blad": blad}, sciezka)
+                    "runda": runda, "ts": time.time(), "status": "blad", "blad": blad}, sciezka)
             continue
         rec = {"bieg": etykieta, "ramie": ramie, "temat": temat, "faza": "zwiad",
+               "runda": runda,
                "ts": time.time(), "czas_s": round(time.time() - t0, 1),
                "status": czastka.get("status"), "zrodla": czastka.get("zrodla", []),
                "plon": czastka.get("kandydaci", ""),
@@ -386,7 +405,8 @@ def bieg_profile(tematy=None, topk: int = 6, sciezka: Path = REJESTR) -> int:
     leksykon = leksykon_roju()
     glos = GlosImperium()
     gotowe = zrobione("profile", sciezka)
-    zadania = [(t, r) for t in tematy for r in ("krytyka", "osad") if (t, r) not in gotowe]
+    zadania = [(t, r) for t in tematy for r in ("krytyka", "osad")
+               if (t, r, 1) not in gotowe]
     print(f"⚖️ LIBRA MESSIS — bieg PROFILE: {len(zadania)} pomiarów "
           f"({len(gotowe)} już w rejestrze, pomijam)", file=sys.stderr, flush=True)
     for i, (temat, ramie) in enumerate(zadania, 1):
@@ -518,6 +538,9 @@ def main(argv=None) -> int:
     p.add_argument("--topk", type=_topk_arg, default=6, help="fragmentów RAG na temat [1,20]")
     p.add_argument("--tematy", type=_tematy_arg, default=len(TEMATY_AB),
                    help=f"ile tematów z listy [1,{_TEMATY_MAX}] (mniej = taniej)")
+    p.add_argument("--runda", type=int, default=1,
+                   help="numer rundy — powtórzenie tych samych tematów to NOWE losowanie "
+                        "(temperatura 0.4), czyli dodatkowe obserwacje do tej samej próby")
     p.add_argument("--zestaw", choices=sorted(ZESTAWY), default="nowe",
                    help="'nowe' = obszary słabo pokryte; 'rdzen' = tematy o ZMIERZONEJ "
                         "zdolności produkowania duplikatów (właściwy poligon dla U4)")
@@ -535,7 +558,7 @@ def main(argv=None) -> int:
             print(raport_tekstowy(b))
         return 0
     if a.bieg == "u4":
-        bieg_u4(tematy, topk=a.topk, etykieta=etykieta)
+        bieg_u4(tematy, topk=a.topk, etykieta=etykieta, runda=a.runda)
         print(raport_tekstowy(etykieta))
     else:
         bieg_profile(tematy, topk=a.topk)

@@ -57,7 +57,41 @@ domykanie jako operację pierwszej kategorii (`scriba_codex.zamknij_sugestia`) o
 strona odczytu jej nie honorowała. Naprawa: zwijanie „ostatni wpis wygrywa" po tym SAMYM kluczu
 `element`, po którym pisze skryba, kolumna „Historia" zachowuje poprzednie statusy.
 
-Pliki: `narzedzia/ab_plon_hyginusa.py` (nowy), `tests/test_ab_plon_hyginusa.py` (nowy, 15 testów),
+**DECYZJE CEZARA po przedstawieniu wyników (2026-07-21):**
+
+1. **Domknąć U4 rozstrzygnięciem** — poligon rdzeniowy rozszerzony 8 → 16 tematów (nowe celują
+   wprost w pojęcia, które *na pewno* mamy: VPIN, Hurst, entropia, funding/OI, Yang-Zhang, VWAP,
+   Amihud, adaptacyjne średnie) + wprowadzone **rundy**: powtórzenie tematu to nowe losowanie
+   (temperatura 0.4), czyli dodatkowa obserwacja. Bez wymiaru rundy jedynym sposobem na większą
+   próbę byłoby wymyślanie kolejnych tematów, co mieszałoby moc z doborem próbki.
+
+   **WYKONANE I ROZSTRZYGNIĘTE tego samego dnia** — 64 pary temat×ramię, **372 kandydatów**:
+
+   | | U4 OFF | U4 ON |
+   |---|---|---|
+   | kandydatów | 203 | 169 |
+   | **dublujących** | 81 (**39.9%**) | 47 (**27.8%**) |
+   | **NOWYCH (niedublujących)** | **122** | **122** |
+   | koszt | $0.0314 | $0.0458 (1.46×) |
+
+   **Fisher p = 0.016 → ISTOTNE.** Efekt stabilny na trzech rozmiarach próby: −10.7 pp (n=45),
+   −10.3 pp (n=181), −12.1 pp (n=372) — nie jest artefaktem jednego biegu. Rozmiar próby
+   dobrany z PROJEKCJI wykonanej przed wydaniem pieniędzy (2× → p≈0.038; wyszło 0.016).
+
+   **Najważniejsza liczba to 122 vs 122.** U4 usuwa 34 duplikaty, **nie zabierając ani jednego
+   nowego pomysłu** — to nie jest kompromis między ilością a jakością, tylko czysty zysk minus
+   46% dopłaty. Decyzja o domyślnym ON z poprzedniej wachty, podjęta wtedy z DIAGNOZY, ma
+   wreszcie DOWÓD.
+2. **Faza krytyki przeniesiona na profil `osad` (v4-pro)** — `_PROFIL_KRYTYKA = "osad"`.
+   Podstawą jest **asymetria błędu, nie dowód statystyczny** i tak jest to zapisane w kodzie:
+   sygnał jakości był słaby (23 vs 13 kapitulacji, rozkład 4-2-2 — nieistotny), koszt pewny
+   (3.46×). Zdecydowało to, że krytyk, który pisze „nie znaleziono kontrargumentów" i **podnosi**
+   ocenę kandydata do MOCNE, zamienia całe U3 w teatr — a v4-pro na tym samym materiale wyciągnął
+   trzy zarzuty z cytatami dosłownymi. Tańsze ramię pozostaje dostępne przez `profil=`, więc A/B
+   da się powtórzyć bez cofania zmiany. Nie dotyka ścieżki decyzyjnej tradingu.
+3. **Następna wachta: sąd nad 33 cząstkami kolejki** — zwiad już opłacony, czekający na sędziego.
+
+Pliki: `narzedzia/ab_plon_hyginusa.py` (nowy), `tests/test_ab_plon_hyginusa.py` (nowy, 16 testów),
 `narzedzia/codex_probationum.py`, `narzedzia/bibliotekarz.py` (parametr `profil` w krytyce),
 `imperium/cesarz/deepseek_glos.py`, `narzedzia/kapitol_podglad.py`, `docs/ARCHITEKTURA_IMPERIUM.md`.
 

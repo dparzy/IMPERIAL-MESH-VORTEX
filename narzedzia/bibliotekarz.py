@@ -94,12 +94,25 @@ def _fts_bezpieczne(q: str) -> str:
 # BREVIARIUM 2026-07-21 (Prawo XV). Fazy różnią się rodzajem pracy, więc i ceną:
 #   rozwijanie zapytania — ekstrakcja słów, zero rozważań → najtaniej (thinking off),
 #   generacja kandydatów — objętość ważniejsza od głębi → tanio (flash, effort low),
-#   krytyka adwersarialna — realne rozważanie kontrargumentów → głęboko (effort high).
-# Profil 'osad' (v4-pro) NIE jest tu używany: sędzią kandydatów jest Opus/Vitruviusz,
-# nie DeepSeek (ZASADA ZWIADOWCY WIEDZY — dwa modele o RÓŻNYCH rolach).
+#   krytyka adwersarialna — realne rozważanie kontrargumentów → NAJDROŻEJ (v4-pro, effort high).
+#
+# KRYTYKA PRZENIESIONA NA PROFIL 'osad' (v4-pro) — decyzja Cezara 2026-07-21 po A/B LIBRA MESSIS.
+# Podstawą jest ASYMETRIA BŁĘDU, nie dowód statystyczny (Prawo I — mówimy wprost, czego nie wiemy):
+# zmierzony sygnał jakości był SŁABY (kapitulacji „brak kontrargumentów" 23 vs 13 na 8 tematach,
+# rozkład 4-2-2 — nieistotny), a koszt jest PEWNY (3.46×, 1.81× czasu). Zdecydowała obserwacja
+# jakościowa: na tym samym plonie flash napisał o kandydacie „nie znaleziono kontrargumentów"
+# i ocenił MOCNE, podczas gdy v4-pro wyciągnął Z TYCH SAMYCH fragmentów trzy zarzuty z cytatami
+# dosłownymi i ocenił SPRZECZNE. Faza krytyki istnieje wyłącznie po to, by łamać confirmation
+# bias — krytyk, który kapituluje, zamienia U3 w teatr i PODNOSI ocenę słabego kandydata.
+# Bezwzględnie mowa o centach za bieg. Ramię tańsze pozostaje dostępne przez `profil=` w
+# krytyka_kandydatow, więc A/B da się powtórzyć bez cofania tej zmiany.
+#
+# To NIE dotyka ścieżki decyzyjnej tradingu (zwiad nie ma odwołań z koloseum/ ani cesarz/),
+# więc opt-in nie jest wymagany — sędzią kandydatów pozostaje Opus/Vitruviusz, nie DeepSeek
+# (ZASADA ZWIADOWCY WIEDZY — dwa modele o RÓŻNYCH rolach).
 _PROFIL_ROZWIN = "klasyfikacja"
 _PROFIL_ZWIAD = "zwiad"
-_PROFIL_KRYTYKA = "krytyka"
+_PROFIL_KRYTYKA = "osad"
 
 _SYSTEM_ROZWIN = (
     "Jesteś asystentem wyszukiwania pełnotekstowego w anglojęzycznej bibliotece tradingowej. "

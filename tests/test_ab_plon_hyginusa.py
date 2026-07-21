@@ -133,8 +133,13 @@ def test_rejestr_zapis_odczyt_i_wznawianie(tmp_path):
     lm.zapisz({"bieg": "u4", "ramie": "on", "temat": "T1", "kandydatow": 3}, p)
     lm.zapisz({"bieg": "u4", "ramie": "off", "temat": "T1", "kandydatow": 5}, p)
     lm.zapisz({"bieg": "profile", "ramie": "osad", "temat": "T1"}, p)
-    assert lm.zrobione("u4", p) == {("T1", "on"), ("T1", "off")}
-    assert lm.zrobione("profile", p) == {("T1", "osad")}
+    # Rekordy bez pola `runda` czytamy jako rundę 1 — wsteczna zgodność z pomiarami
+    # sprzed wprowadzenia rund (nie unieważniamy ich).
+    assert lm.zrobione("u4", p) == {("T1", "on", 1), ("T1", "off", 1)}
+    assert lm.zrobione("profile", p) == {("T1", "osad", 1)}
+    # Ta sama para w NOWEJ rundzie to nowa obserwacja — nie jest „już zrobiona".
+    lm.zapisz({"bieg": "u4", "ramie": "on", "temat": "T1", "runda": 2, "kandydatow": 4}, p)
+    assert ("T1", "on", 2) in lm.zrobione("u4", p)
 
 
 def test_rejestr_pomija_uszkodzona_linie(tmp_path):

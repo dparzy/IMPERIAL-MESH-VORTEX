@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-21
+## Ostatnia aktualizacja: 2026-07-20
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,23 +113,29 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-21 — PROBATOR wykrył realny nieugruntowany plon Hyginusa mimo promptu
-2367 znaków w kolejce Hyginusa bez żadnego cytowania źródła, choć prompt wyraźnie tego wymaga. Organ wychwycił to przy pierwszym pomiarze.
+### 2026-07-20 — API-widma – istnienie w docs ≠ istnienie w kodzie
+Błąd klasy API-widma: dokumentacja indeksu/manualu zawiera komendy do plików, które nie istnieją lub zmieniły nazwę. Zweryfikowano na 9 kandydatach – 3 prawdziwe widma. W16 precyzyjnie odróżnia widma od supresji (dydaktyka, wizje, negacje).
 
-### 2026-07-21 — Archiwum lekcji ma inny nagłówek – schłodzone lekcje niewidoczne dla szukaj()
-Parser modułu LEKCJE nie obsługiwał nagłówka archiwum, przez co po schłodzeniu lekcje znikały z wyszukiwania. Luka wykryta i naprawiona.
+### 2026-07-20 — 1003 z 1301 odwolan do dokumentow to kronika sesji
+Przenoszenie zywych dokumentow tworzy martwe linki w historii (Prawa I nie wolno poprawiac). Rozklad asymetryczny: zywe maja 1-19 odwolan, kronika 58-63. Przenoszenie jest drogie.
 
-### 2026-07-21 — Znaleziono realnie nieugruntowany plon Hyginusa w kolejce
-Pierwszy bieg Probatora na realnym plonie wykrył 2367 znaków kandydatów bez żadnego powołania na źródło, mimo że prompt tego żądał. Potwierdzona potrzeba weryfikacji.
+### 2026-07-20 — Brak metadanych to źródło bałaganu
+64 dokumenty w docs/ mają zero nagłówków metadanych. Audyt nie wie, czym dokument jest, przez co bramki (np. W5, W10) opierają się na ręcznie wpisanych wyrażeniach zamiast na strukturze. To nie skaluje się do 213 plików .md.
+
+### 2026-07-20 — Audyt exit 0 nie oznacza prawdy
+INDEKS_IMPERIUM.md podaje dwie różne liczby neuronów: 299 w nagłówku (data 2026-06-09) i 87 w sekcji MAPA KODU. Audyt przepuszcza, bo W5 czyta tylko z MAPA KODU. To dowód, że dokument może kłamać obok bramki.
+
+### 2026-07-21 — Test negatywny PROBATORA wykrył błąd graniczny z '_'
+Znak '_' jest traktowany jako słowny przez \b, co powodowało fałszywe dopasowanie przy identyfikatorze BIB-006_Carson. Poprawiono test, nie organ – zastosowano inny separator.
+
+### 2026-07-21 — PROBATOR znalazł nieugruntowany plon w kolejce Hyginusa
+Pomiar na realnym plonie: 2367 znaków kandydatów i zero powołań na źródło, mimo promptu żądającego cytowań. PROBATOR działa poprawnie.
+
+### 2026-07-21 — Auto-lekcja przekracza limit znaków – potrzeba chłodzenia
+Auto-lekcja dopisała 21 wpisów z 3 sesji, limit 24000 znaków pęknięty. Konsolidacja co sesję to alarm wiecznie żywy. Lekarstwo: auto_lekcja sama egzekwuje limit przy zapisie.
 
 ### 2026-07-21 — Model cytuje nazwiskiem autora, nie identyfikatorem BIB
 Probator zgłaszał fałszywy alarm BEZ_CYTATU gdy model użył nazwiska (np. Hull) zamiast ID. Poprawiono test, nie organ – to realne użycie, a nie błąd weryfikacji.
-
-### 2026-07-21 — Znak _ jest słowny, więc \b nie zamyka się w identyfikatorach z podkreślnikiem
-Detektor cytatów używał \b, co nie oddzielało poprawnie identyfikatorów typu BIB-006_Carson. Poprawiono logikę granic w Probatorze.
-
-### 2026-07-21 — Archiwum lekcji ma inny nagłówek – szukaj() go nie widzi
-Schłodzone lekcje do archiwum mają inny nagłówek niż główna sekcja, przez co funkcja szukaj() w module nie przeszukuje archiwum. Wykryto i naprawiono.
 
 ### 2026-07-21 — Auto-lekcja nie egzekwuje limitu przy zapisie
 Dotychczas auto_lekcja dopisywała wpisy bez sprawdzania limitu, co powodowało przepełnienie i fałszywy alarm przy każdej sesji. Rozwiązanie: wpięcie konsolidacji w metodę zapisu.
@@ -197,20 +203,11 @@ Plik z wrzutnia to dump rozmów z Hyginusem (DeepSeek) zawierający research hyb
 ### 2026-07-20 — Luka pokrycia 4h – tylko 10 par zamiast 15
 Pomiar wykazuje brak plików 4h dla BNB/BTC/DOGE/ETH/SOL. Wpływa na redukcję kombinacji do 40 zamiast potencjalnych 45.
 
-### 2026-07-20 — EXP-14 Kyle: bardzo niska korelacja + wysoki IC
-Średnie max|ρ| = 0.087 (prawie ortogonalny do reszty roju), IC = 0.301/0.302/0.308. Silny wkład informacyjny bez redundancji.
-
 ### 2026-07-20 — EXP-13 GARCH: niska dekorelacja + stabilny skill
 Średnie max|ρ| = 0.141 (poniżej progu 0.20), IC = 0.247/0.245/0.254 dla h=1/6/30. Potwierdza filar siły i realny sygnał predykcyjny na wszystkich parach.
 
-### 2026-07-20 — EXP-15 PIN martwy na wszystkich parach
-Pomiar potwierdził, że EXP-15 (PIN) nie generuje sygnału na żadnej z 40 kombinacji (15 par × 3 TF). Już wcześniej wyciszony (DOSTEPNY=False), ale weryfikacja usztywnia decyzję.
-
 ### 2026-07-20 — Potrójna symbioza audit-sigilium: mechanizm wykrywa własne organy w wielu warstwach
 Audyt W11/W15/W17 złapał nowe sigilium (runbook, licznik w README, rekord w codicilu) – symbioza działa przeciw autorowi. Wymusza to ostrożność przy dodawaniu nowych elementów.
-
-### 2026-07-20 — Runbooki W11 gniją – nieaktualna treść i duplikacja CLAUDE.md
-Runbooki W11 zawierają własną, ręcznie wpisaną treść (np. 'git push -u origin') zamiast pobierać kroki z CLAUDE.md – jedynego źródła prawdy. Ponadto funkcja dodaj() dedupuje po nazwie, co uniemożliwia aktualizację istniejącego runbooku.
 
 ### 2026-07-20 — Winget dostępny jako narzędzie do instalacji
 Na laptopie Cezara dostępne jest winget (Windows Package Manager) – może służyć do cichej instalacji djvulibre i innych narzędzi bez uruchamiania interaktywnych instalatorów.
@@ -266,9 +263,6 @@ KalkulatorLewara pobiera pewnosc_agregatu z Legatusa, ale ta wartość jest zaws
 ### 2026-06-30 — pewnosc_agregatu ≈ 1.0 – główna przyczyna strat
 Stała wartość pewności bliska 1.0 prowadzi do maksymalnego lewara w KalkulatorzeLewara, co powoduje ciasne stop-lossy i wiele małych strat. To fundamentalny błąd w agregacji – nie ma zróżnicowania sygnałów.
 
-### 2026-06-30 — W6 milczące pominięcie przy braku 'Stan na:'
-Audyt W6 nie raportował błędu gdy brak 'Stan na:'. Dodano else skutkujący błędem oraz rozszerzono regex na markdown.
-
 ### 2026-06-30 — Push wymaga uprawnień Read & Write
 Błąd 403 przy push do GitHub oznacza, że sesja Claude nie ma uprawnień zapisu do repozytorium. Konieczna zmiana uprawnień w GitHub Settings/Installations.
 
@@ -301,9 +295,6 @@ W7 audyt markerował zewnętrzne URL zawierające '.md' w domenie (np. www.mdpi.
 
 ### 2026-06-30 — Synchronizacja liczników w testach przy dodawaniu neuronów
 W-053 dodał 47. neuron (H-01), ale testy miały zakodowane 46 – konieczność aktualizacji hardcoded wartości w test_integracja.py. Lekcja: każda zmiana liczby neuronów wymaga przeglądu testów.
-
-### 2026-06-30 — Audyt dokumentacji wymaga egzekwowania
-Użytkownik nakazał: przed dalszymi wdrożeniami należy zaktualizować wszystkie dokumenty z INDEKS_IMPERIUM i dodać ich sprawdzanie do audyt_spojnosci.py. Obecnie sprawdzane tylko 7 z ~32 plików.
 
 ### 2026-06-30 — Dekorelacja V-13 i V-14 potwierdza dywersyfikację
 Korelacja między NeuronChoppiness (V-14) a poprzednim wskaźnikiem zmienności |r|=0.05–0.27, co spełnia Prawo XVI (unikamy redundancji).
@@ -365,23 +356,14 @@ Dyrygent nie używał wyników Klucznika (strategii) — kierunek i pewność po
 ### 2026-06-30 — Bug: neuron zwraca NEUTRAL gdy brak danych w BramaKalkulatora
 MikroNeuron.interpretuj() zwraca SygnalNeuronu z wartoscia NEUTRAL jesli wskaznik nie istnieje w dict Brama. To powoduje ciche bledy w strategiach - nalezy dodac walidacje i warning.
 
-### 2026-06-30 — Zasada symbiozy zamiast zero duplikatów
-Moduły mogą być wielofunkcyjne, jeśli każdy pokrywa INNY aspekt (np. 4 moduły wielorybów każdy na inne dane). Złe = 5 modułów czytających ten sam kanał. Test: 'Co unikalnego wnosi ten moduł?'
-
 ### 2026-06-30 — Prawo XV: Bez martwych głosów – neuron bez API zawsze NEUTRAL
 Nie dodawać neuronów wymagających niedostępnego API – będą zawsze NEUTRAL, co psuje agregację. Zweryfikowano wszystkie nowe neurony pod kątem dostępności wskaźników.
 
 ### 2026-06-30 — Prawo XIX: Kod jest Prawem – klucze katalogu muszą zgadzać się z kodem
 Audyt ujawnił rozbieżności między KATALOG_NEURONOW.md a kodem. Utworzono MAPA_KLUCZY.md jako kanoniczne mapowanie. Klucznik weryfikuje DOSTEPNY=True.
 
-### 2026-06-30 — Meta-gate defensive neurons zawsze NEUTRAL kierunek
-Neurony obronne (Z-01, N-01, H-01, OC-05) ustawiają pewnosc_przeciwnika zamiast kierunku, wywołują s.policz_finalna() — to wzorzec dla wszystkich bram obronnych.
-
 ### 2026-07-10 — Pełny backtest 18k barów × 5 par pada na timeout
 Pełny przebieg 18k barów × 5 par jest za wolny i przekracza limit 600s. Potwierdza to ZASADĘ ANALIZY CZĄSTKOWEJ: trzeba cap barów + cząstkowanie z zapisem do areny.
-
-### 2026-06-30 — 12/17 bloków strategii miało błędne klucze w KATALOGU
-Stare klucze projektowe (np. XII-08) nie istniały w kodzie. Audyt W9 wykrywa obce klucze w blokach zaimplementowanych strategii. Wszystkie 17 zsynchronizowane.
 
 ### 2026-06-30 — Błąd warmup Accelerator: slow+sma_ac+1
 Funkcja _py_accelerator miała zbędne +1 w warmup, co powodowało off-by-one. Usunięto.

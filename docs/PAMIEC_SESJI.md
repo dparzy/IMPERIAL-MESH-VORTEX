@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-20
+## Ostatnia aktualizacja: 2026-07-21
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,6 +113,42 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-21 — Znaleziono realnie nieugruntowany plon Hyginusa w kolejce
+Pierwszy bieg Probatora na realnym plonie wykrył 2367 znaków kandydatów bez żadnego powołania na źródło, mimo że prompt tego żądał. Potwierdzona potrzeba weryfikacji.
+
+### 2026-07-21 — Model cytuje nazwiskiem autora, nie identyfikatorem BIB
+Probator zgłaszał fałszywy alarm BEZ_CYTATU gdy model użył nazwiska (np. Hull) zamiast ID. Poprawiono test, nie organ – to realne użycie, a nie błąd weryfikacji.
+
+### 2026-07-21 — Znak _ jest słowny, więc \b nie zamyka się w identyfikatorach z podkreślnikiem
+Detektor cytatów używał \b, co nie oddzielało poprawnie identyfikatorów typu BIB-006_Carson. Poprawiono logikę granic w Probatorze.
+
+### 2026-07-21 — Archiwum lekcji ma inny nagłówek – szukaj() go nie widzi
+Schłodzone lekcje do archiwum mają inny nagłówek niż główna sekcja, przez co funkcja szukaj() w module nie przeszukuje archiwum. Wykryto i naprawiono.
+
+### 2026-07-21 — Auto-lekcja nie egzekwuje limitu przy zapisie
+Dotychczas auto_lekcja dopisywała wpisy bez sprawdzania limitu, co powodowało przepełnienie i fałszywy alarm przy każdej sesji. Rozwiązanie: wpięcie konsolidacji w metodę zapisu.
+
+### 2026-07-20 — Testy wzrosły o dokładnie 7 — potwierdzenie biegnięcia
+Po dodaniu 7 testów granicznych licznik wzrósł z 2620 do 2627. To dowód, że testy naprawdę biegły (nie zostały cicho pominięte jak w poprzedniej sesji). Lekcja o zwykłych def test_* zamiast unittest.TestCase wdrożona.
+
+### 2026-07-20 — Pieczątka audytu input_len kłamała — łamanie Prawa XIII
+Log pokazał input_len=100, gdy wynik policzono z 80 barów (ciche obcięcie zip). Narusza Prawo XIII (audytowalność) i Prawo I. Zapisano NOTĘ w LEX TALIONIS, CORONA spłacona: strażnik + uodpornienie klasy z wpisem do Księgi Wad.
+
+### 2026-07-20 — LEX TALIONIS: błąd pieczątki = NOTA + CORONA (łata + mechanizm)
+Kłamiąca pieczątka input_len to zatwierdzony błąd Imperium (Prawo XIII). Spłacono NOTĘ 5/5 CORONĄ: strażnik + uodpornienie klasy + wpis do Księgi Wad. ZASADA CENSORA: łata nie wystarczy, trzeba mechanizm.
+
+### 2026-07-20 — Teza zwiadowcy wymaga pomiaru, nie wiary
+Subagent-zwiadowca twierdził ~25 miejsc zip w Bramie - faktycznie 10. Twierdził brak ochrony w diagnostyce korelacji - 4/4 już strzeżone. Kandydat ≠ prawda. ZASADA WERYFIKACJI obligatoryjna przed naprawą.
+
+### 2026-07-20 — Skan klasy błędu – 0 innych wystąpień
+Po naprawie buga argparse przeskanowano cały kod – 0 innych % w help-stringach. Klasa domknięta, brak epidemii.
+
+### 2026-07-20 — Bug argparse – % w help-stringu
+pomiar_stablecoin_ic.py: % w help-stringu (okno % zmiany supply) powoduje ValueError przy --help. Latentny, niewidoczny w normalnym biegu.
+
+### 2026-07-20 — Latentny bug: % w help-stringu argparse
+W pomiar_stablecoin_ic.py help-string zawierał % zmiany, co powoduje ValueError przy --help (argparse próbuje formatować). Naprawiono przez podwojenie %.
+
 ### 2026-07-20 — Eskalacja przy rutynowym teście złapała krytyczne bugi
 Dwa bugi (ccxt NotSupported blokujący pętlę live, brak __main__ w petla_live.py) zostały znalezione dzięki eskalacji do Opusa podczas rutynowego testu paper. Potwierdza skuteczność zasady eskalacji.
 
@@ -133,9 +169,6 @@ W sesji 56ea4ea2 zakończono implementację U1 (korpus biblioteki anty-echo), U2
 
 ### 2026-07-20 — Bug w audycie przeoczony przez martwy wzorzec
 Linia 259 audytu zawierała jedyny subprocess.run bez encoding – trzy pozostałe naprawiono w 2026-07-17, ale tę przeoczono, bo wzorzec 'kodowanie' leżał martwy w checkliście.
-
-### 2026-07-20 — Mechanizm zasiewu połyka regex z checklisty
-Funkcja 'zasiej_startowe' cicho ignoruje pole 'regex' wpisu w checkliście – wzorce w Księdze Wad nigdy nie skanowały. Przyczyna: domyślna inicjalizacja pomija nieobowiązkowe klucze.
 
 ### 2026-07-21 — Niespójność licznika memory a rzeczywista liczba wpisów na dysku
 Metoda dodaj_checklist() zwiększała licznik w pamięci (52), ale wpis nie zapisywał się do pliku (zostało 51). Zapisz() jest osobną metodą, co powoduje cichą utratę danych. Naprawiono przez jawne wywołanie zapisz() po dodaniu.
@@ -206,12 +239,6 @@ Testy trwają ponad 2 minuty ze względu na słaby sprzęt. Nie dawać limitu ti
 ### 2026-06-30 — KROK 0 ujawnił błąd w liczeniu neuronów w MANIFEST
 MANIFEST pokazywał 45 aktywnych, podczas gdy grep wykazał ~16. Przyczyna: zwiadowcy i infrastruktura liczone jako neurony. Nauczka: ujednolicić sposób liczenia.
 
-### 2026-06-30 — Podczas implementacji pomijano aktualizację dokumentacji modułowej (KALKULATOR_LEWARA.md, IGRZYSKA_IMPERIUM.md, GENERAL_LEGATUS.md)
-Użytkownik zwrócił uwagę, że dokumentacje specyficzne dla modułów nie były aktualizowane ani egzekwowane przez audyt_spojnosci.py. Nakazano audyt wszystkich dokumentów z indeksu.
-
-### 2026-06-30 — Archiwizacja bez przeczytania pliku prowadzi do utraty ważnych danych
-ARSENAL_IMPERIUM (zweryfikowany katalog ~220 narzędzi) i WZORZEC_DNSS (referencja architektury) zostały błędnie zarchiwizowane. Wymusiło to dodanie Zasady Archiwizacji do CLAUDE.md.
-
 ### 2026-06-30 — DeepSeek zawyża możliwości – weryfikacja przez deep-research
 Wiele twierdzeń DeepSeek z Zbior_wskaznikow_i_strategi okazało się błędnych lub przesadzonych. Zweryfikowano zewnętrznymi źródłami – system musi opierać się na mierzonych faktach (Prawo XVI).
 
@@ -241,9 +268,6 @@ Błąd 403 przy push do GitHub oznacza, że sesja Claude nie ma uprawnień zapis
 
 ### 2026-06-30 — Push zablokowany przez 403 - brak uprawnień
 Środowisko Claude Code web nie ma uprawnień do pushowania do repozytorium IMPERIAL-MESH-VORTEX (błąd 403). Wymagane skonfigurowanie GitHub App Claude Code z dostępem Read & Write w github.com/settings/installations.
-
-### 2026-06-30 — Konieczność audytu dokumentacji przed dalszym rozwojem
-Użytkownik zwrócił uwagę, że dokumentacja nie jest aktualizowana podczas implementacji wizji; nakazał audyt wszystkich dokumentów z INDEKS_IMPERIUM względem kodu i dodanie egzekucji w narzędziu audytu.
 
 ### 2026-06-30 — Kruchość hardcodowanych liczników neuronów w testach
 Wprowadzenie 47. neuronu złamało testy z hardcoded 46. Konieczne dynamiczne wykrywanie liczby neuronów lub automatyczne generowanie testów.
@@ -311,9 +335,6 @@ Brama Kalkulatora celowo odmawia startu bez TA-Lib (Prawo I). Na Windows 2026 pi
 ### 2026-06-30 — Bug: __pycache__ śledzone w git
 Po kompilacji brama_kalkulatora.py, pliki cache zostały przypadkowo commitowane. Naprawiono przez git rm i dodanie .gitignore.
 
-### 2026-06-30 — VPIN neuron nigdy nie jest kierunkowy
-NeuronToxicFlow (Z-01) zawsze zwraca NEUTRAL kierunek. Jego rola to tylko tłumienie roju przez pewnosc_przeciwnika gdy VPIN>0.7. Nigdy nie głosuje na stronę.
-
 ### 2026-06-30 — Interval normalization bug: '5m'.upper() ≠ 'M5'
 Strategie używają formatu 'M5', a interwał z backtestu po .upper() daje '5M'. Naprawiono przez _normalizuj_interwal() w baza.py konwertujące '5m'→'M5', '1h'→'H1' itd.
 
@@ -338,9 +359,6 @@ Dyrygent nie używał wyników Klucznika (strategii) — kierunek i pewność po
 ### 2026-06-30 — Bug: neuron zwraca NEUTRAL gdy brak danych w BramaKalkulatora
 MikroNeuron.interpretuj() zwraca SygnalNeuronu z wartoscia NEUTRAL jesli wskaznik nie istnieje w dict Brama. To powoduje ciche bledy w strategiach - nalezy dodac walidacje i warning.
 
-### 2026-06-30 — DeepSeek API klucz NIGDY w kodzie ani w czacie
-Zasada bezpieczeństwa: klucz DeepSeek API musi być tylko w zmiennych środowiskowych. W kodzie użyto [ZREDAGOWANO] jako placeholder. Dotyczy to wszystkich plików w Imperium.
-
 ### 2026-06-30 — Zasada symbiozy zamiast zero duplikatów
 Moduły mogą być wielofunkcyjne, jeśli każdy pokrywa INNY aspekt (np. 4 moduły wielorybów każdy na inne dane). Złe = 5 modułów czytających ten sam kanał. Test: 'Co unikalnego wnosi ten moduł?'
 
@@ -352,9 +370,6 @@ Audyt ujawnił rozbieżności między KATALOG_NEURONOW.md a kodem. Utworzono MAP
 
 ### 2026-06-30 — Meta-gate defensive neurons zawsze NEUTRAL kierunek
 Neurony obronne (Z-01, N-01, H-01, OC-05) ustawiają pewnosc_przeciwnika zamiast kierunku, wywołują s.policz_finalna() — to wzorzec dla wszystkich bram obronnych.
-
-### 2026-07-10 — Równa waga = 48.2% odtwarza diagnozę triady 48.3%
-Pomiar hipotezy B na 5 parach 4h OOS daje globalnie 48.2% dla równej wagi, co odtwarza diagnozę triady 48.3% co do promila — walidacja pomiaru.
 
 ### 2026-07-10 — Pełny backtest 18k barów × 5 par pada na timeout
 Pełny przebieg 18k barów × 5 par jest za wolny i przekracza limit 600s. Potwierdza to ZASADĘ ANALIZY CZĄSTKOWEJ: trzeba cap barów + cząstkowanie z zapisem do areny.

@@ -14,6 +14,76 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | 📚 | README biblioteki — koniec gnicia (zarzut Cezara + LEX TALIONIS)
+
+Cezar: „plik gnije i jest mi wstyd". Potwierdzone: `bibliotheca_ulpia/README.md` mówił **69 ksiąg**
+przy 115, a instrukcja kazała **`git add`+`git push` binariów** książek do GitHub — **wbrew decyzji
+07-11** (binaria tylko lokal, RAG czyta wersjonowany `tekst_cache`). Niewykryte, bo `bibliotheca_ulpia`
+jest w `POZA_REJESTREM` tabularium — żadna bramka nie pilnowała tego żywego drogowskazu.
+
+- **Naprawa:** README przepisany — aktualny (115, binaria TYLKO lokal + `tekst_cache` w git, pipeline
+  `przygotuj_biblioteke`, role Hyginus/Vitruviusz/NOTARIUS/TIRO, format nazwy), lepszy wygląd (tabela
+  struktury, diagram przepływu). **Usunięta groźna instrukcja push binariów.**
+- **UODPORNIENIE (klasa):** liczba ksiąg = blok `<!-- LICZBA:ksiazki -->` wpięty w tabularium przez
+  `DROGOWSKAZY_Z_LICZBAMI` (wyjątek: żywy drogowskaz spoza rejestru, TYLKO warstwa liczb — nie T1/T2
+  bez frontmatter). Dowód że gryzie: 115→99 → tabularium „ROZJAZD", audyt W15 obejmuje. +2 testy.
+- **Standing order:** README biblioteki aktualizowany przy KAŻDEJ zmianie struktury/pipeline.
+
+**LEX TALIONIS:** N-e860da78 ↔ C-5d054580 (dług 0). Księga Wad #56 „żywy dokument w strefie
+wyłączonej z audytu". **Pliki:** `bibliotheca_ulpia/README.md`, `narzedzia/tabularium.py`,
+`tests/test_tabularium.py`.
+
+---
+
+## 2026-07-21 | 📚 | Biblioteka: 36 nowych BIB skatalogowanych + plan esencji etapowy
+
+Cezar dodał **36 nowych książek** (BIB-080..116) wg `PLAN_ROZBUDOWY_BIBLIOTEKI` — materiał POD TIRO
+(LoRA/QLoRA/distillation/InstructGPT/DPO/GPTQ) + grafy + RL + przyczynowość.
+
+- **Nazwy dopasowane do wzorca** `BIB-XXX_Autor_Tytuł-z-myślnikami.ext` (36/36) — autorzy wzięci z
+  PLAN_ROZBUDOWY (źródło prawdy), nie z głowy; ASCII bez diakrytyki, zgodnie ze stylem BIB-001..079.
+- **Przetworzone lokalnie (0 tokenów Claude):** ekstrakcja → `tekst_cache` (115), reindeks RAG,
+  katalog metadanych (`katalog_ksiag.json` n=79→**115**). Pliki binarne książek poza git (decyzja 07-11),
+  wersjonowany jest `tekst_cache`.
+- **TIRO zbieranie potwierdzone** (pytanie Cezara): Hyginus woła DeepSeek przez most `deepseek_glos.py`,
+  który automatycznie woła `NOTARIUS.zapisz_pare` — jedno wpięcie łapie wszystkich wołających.
+- **Plan esencji: 4 etapy po sesji** (ZASADA ANALIZY CZĄSTKOWEJ) — LLM/TIRO · optymalizacja · grafy ·
+  RL+przyczynowość. Zapisany w `PLAN_ROZBUDOWY_BIBLIOTEKI.md`. Esencja klastrów w kolejnych sesjach,
+  by nie palić tokenów Opusa naraz (rozkaz Cezara).
+- **Rozkaz odłożony do dedykowanej sesji:** wpięcie DISPENSATORA + trybów DeepSeek (thinking/pro-weryfikator/
+  function-calling web) na stałe w Hyginusa — projekt w pamięci `rozbudowa-hyginusa-modele-tryby-deepseek`.
+  Zmierzone: DeepSeek NIE ma natywnego web search (tylko function-calling); DISPENSATOR istnieje, niewpięty.
+
+**Pliki:** `bibliotheca_ulpia/BIB-080..116` (rename), `bibliotheca_ulpia/dane/tekst_cache/`,
+`katalog_ksiag.json`, `docs/PLAN_ROZBUDOWY_BIBLIOTEKI.md`.
+
+---
+
+## 2026-07-21 | 🛡️ | P5 fali 1: guard ZeroDiv w pretorianach (kalkulator_lewara + aegis)
+
+Zwiad ryzyka kodu zreprodukował 3 × `ZeroDivisionError` na wejściach granicznych, ZANIM zadziałało
+weto/checklist:
+
+| Miejsce | Wejście graniczne | Przyczyna |
+|---|---|---|
+| `kalkulator_lewara.policz:425` | `dzwignia=200` | `1/200 == OPŁATA_UTRZYMANIA` → likwidacja == cena → `\|cena−likwidacja\|=0` |
+| `kalkulator_lewara.policz:429` | `cena_wejscia=0` | `stop_pct = \|cena−stop\|/cena` |
+| `aegis_tarcza.update:48` | `initial_capital=0` | `drawdown = (peak−cur)/peak_capital` |
+
+Produkcja **chroniona** (dyrygent capuje dźwignię ≤20, realna cena >0) — ale funkcje same się nie
+broniły (crash przy bezpośrednim/przyszłym wywołaniu). `aegis` miał **ZERO testów**.
+
+**Naprawa (monotoniczna ostrożność — produkcja bez zmian):** walidacja `cena_wejscia>0` i
+`initial_capital>0` u wrót (ValueError, fail-loud); guard mianownika `\|cena−likwidacja\|`
+(bufor=0 zamiast crash — checklist i tak odrzuca dźwignię>20). **Testy:** `aegis` 0→4 (pierwsze
+w historii), `kalkulator` +3 granice. Dźwignia=5 dalej `checklist_ok=True` (dowód braku regresji).
+
+**LEX TALIONIS:** N-9a33798d ↔ C-5ca9dbad (dług 0). Backlog: P5 **zamknięta**. Księga Wad #55
+„ZeroDiv na granicy przed zadziałaniem weta". **Pliki:** `imperium/pretorianie/kalkulator_lewara.py`,
+`imperium/pretorianie/aegis_tarcza.py`, `tests/test_kalkulator.py`, `tests/test_aegis_tarcza.py`.
+
+---
+
 ## 2026-07-21 | 📄 | P2 fali 1: TRYBY_IMPERIUM.md — realny dług dokumentów naprawiony
 
 Jedyny prawdziwie gnijący dokument z 11 podejrzanych (10/11 to fałszywe alarmy — data ruszona,

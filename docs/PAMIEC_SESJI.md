@@ -28,7 +28,7 @@ powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość mi
 |----|--------|--------|-----------|---------|
 | A1 | **GitHub MCP** | ✅ działa (cloud) | — | PR, issues, CI |
 | A2 | **Memory MCP** 💎 | ✅ natywny (imperium/biblioteki/pamiec_sesji.py + hook) | — | Trwała pamięć między sesjami (ROZWIĄZUJE W-360) |
-| A3 | **Bibliotheca-RAG MCP** 💎 | ✅ zbudowany (W-360 RAG v2) | — | Szukaj w <!-- LICZBA:ksiazki -->79<!-- /LICZBA --> książkach + encyklopedii + docs (tryb FTS; wektory niezbudowane — patrz MAPA_PAMIECI) |
+| A3 | **Bibliotheca-RAG MCP** 💎 | ✅ zbudowany (W-360 RAG v2) | — | Szukaj w <!-- LICZBA:ksiazki -->115<!-- /LICZBA --> książkach + encyklopedii + docs (tryb FTS; wektory niezbudowane — patrz MAPA_PAMIECI) |
 | A4 | **Filesystem MCP** 🔵 | ⏳ opcjonalny | niski | Dostęp do plików lokalnych bez Read tool |
 | A5 | **Fetch/Web MCP** 🔵 | ⏳ opcjonalny | niski | WebFetch przez MCP |
 | A6 | **Sequential-Thinking MCP** 💎 | ⏳ nie skonfigurowany | średni | Ustrukturyzowane rozumowanie krok po kroku |

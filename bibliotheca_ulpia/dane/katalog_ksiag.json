@@ -1,5 +1,5 @@
 {
-  "n": 79,
+  "n": 115,
   "calibre": true,
   "ksiegi": [
     {
@@ -763,6 +763,302 @@
       "tytul": "Strictly Proper Scoring Rules Prediction and Estimation",
       "format": "pdf",
       "plik": "BIB-079_Gneiting-Raftery_Strictly-Proper-Scoring-Rules-Prediction-and-Estimation.pdf"
+    },
+    {
+      "bib": "BIB-080",
+      "autor": "Jurafsky Martin",
+      "tytul": "Speech and Language Processing 3rd ed",
+      "format": "pdf",
+      "plik": "BIB-080_Jurafsky-Martin_Speech-and-Language-Processing-3rd-ed.pdf",
+      "wydano": "2023-01-07T17:20:57+00:00"
+    },
+    {
+      "bib": "BIB-081",
+      "autor": "Tunstall",
+      "tytul": "Natural Language Processing with Transformers",
+      "format": "epub",
+      "plik": "BIB-081_Tunstall_Natural-Language-Processing-with-Transformers.epub",
+      "wydawca": "O'Reilly Media",
+      "jezyk": "eng",
+      "wydano": "2022-02-02T00:00:00+00:00"
+    },
+    {
+      "bib": "BIB-082",
+      "autor": "Rothman",
+      "tytul": "Transformers for Natural Language Processing",
+      "format": "epub",
+      "plik": "BIB-082_Rothman_Transformers-for-Natural-Language-Processing.epub",
+      "wydawca": "Packt",
+      "tagi": "COM016000 - COMPUTERS / Computer Vision & Pattern Recognition, TEC015000 - TECHNOLOGY & ENGINEERING / Imaging Systems, COM072000 - COMPUTERS / Computer Simulation",
+      "jezyk": "eng",
+      "wydano": "2024-02-27T16:20:50+00:00"
+    },
+    {
+      "bib": "BIB-084",
+      "autor": "Devlin",
+      "tytul": "BERT Pre training of Deep Bidirectional Transformers",
+      "format": "pdf",
+      "plik": "BIB-084_Devlin_BERT-Pre-training-of-Deep-Bidirectional-Transformers.pdf",
+      "tagi": "N19-1 2019"
+    },
+    {
+      "bib": "BIB-085",
+      "autor": "Brown",
+      "tytul": "Language Models are Few Shot Learners GPT 3",
+      "format": "pdf",
+      "plik": "BIB-085_Brown_Language-Models-are-Few-Shot-Learners-GPT-3.pdf"
+    },
+    {
+      "bib": "BIB-086",
+      "autor": "Hu",
+      "tytul": "LoRA Low Rank Adaptation of Large Language Models",
+      "format": "pdf",
+      "plik": "BIB-086_Hu_LoRA-Low-Rank-Adaptation-of-Large-Language-Models.pdf"
+    },
+    {
+      "bib": "BIB-087",
+      "autor": "Dettmers",
+      "tytul": "QLoRA Efficient Finetuning of Quantized LLMs",
+      "format": "pdf",
+      "plik": "BIB-087_Dettmers_QLoRA-Efficient-Finetuning-of-Quantized-LLMs.pdf"
+    },
+    {
+      "bib": "BIB-088",
+      "autor": "Hinton",
+      "tytul": "Distilling the Knowledge in a Neural Network",
+      "format": "pdf",
+      "plik": "BIB-088_Hinton_Distilling-the-Knowledge-in-a-Neural-Network.pdf",
+      "wydano": "2015-03-10T00:31:59+00:00"
+    },
+    {
+      "bib": "BIB-089",
+      "autor": "Wei",
+      "tytul": "Chain of Thought Prompting Elicits Reasoning",
+      "format": "pdf",
+      "plik": "BIB-089_Wei_Chain-of-Thought-Prompting-Elicits-Reasoning.pdf"
+    },
+    {
+      "bib": "BIB-090",
+      "autor": "Wang",
+      "tytul": "Self Consistency Improves Chain of Thought Reasoning",
+      "format": "pdf",
+      "plik": "BIB-090_Wang_Self-Consistency-Improves-Chain-of-Thought-Reasoning.pdf"
+    },
+    {
+      "bib": "BIB-091",
+      "autor": "Zhou",
+      "tytul": "LIMA Less Is More for Alignment",
+      "format": "pdf",
+      "plik": "BIB-091_Zhou_LIMA-Less-Is-More-for-Alignment.pdf"
+    },
+    {
+      "bib": "BIB-092",
+      "autor": "Lewis",
+      "tytul": "Retrieval Augmented Generation",
+      "format": "pdf",
+      "plik": "BIB-092_Lewis_Retrieval-Augmented-Generation.pdf"
+    },
+    {
+      "bib": "BIB-093",
+      "autor": "Raschka",
+      "tytul": "Build a Large Language Model From Scratch",
+      "format": "epub",
+      "plik": "BIB-093_Raschka_Build-a-Large-Language-Model-From-Scratch.epub",
+      "wydawca": "Manning Publications Co.",
+      "jezyk": "eng",
+      "wydano": "2024-09-11T22:00:00+00:00",
+      "identyfikatory": "isbn:9781633437166"
+    },
+    {
+      "bib": "BIB-094",
+      "autor": "Kaplan",
+      "tytul": "Scaling Laws for Neural Language Models",
+      "format": "pdf",
+      "plik": "BIB-094_Kaplan_Scaling-Laws-for-Neural-Language-Models.pdf"
+    },
+    {
+      "bib": "BIB-095",
+      "autor": "Hoffmann",
+      "tytul": "Training Compute Optimal LLMs Chinchilla",
+      "format": "pdf",
+      "plik": "BIB-095_Hoffmann_Training-Compute-Optimal-LLMs-Chinchilla.pdf"
+    },
+    {
+      "bib": "BIB-096",
+      "autor": "Ouyang",
+      "tytul": "Training LMs to follow instructions with human feedback InstructGPT",
+      "format": "pdf",
+      "plik": "BIB-096_Ouyang_Training-LMs-to-follow-instructions-with-human-feedback-InstructGPT.pdf"
+    },
+    {
+      "bib": "BIB-097",
+      "autor": "Rafailov",
+      "tytul": "Direct Preference Optimization DPO",
+      "format": "pdf",
+      "plik": "BIB-097_Rafailov_Direct-Preference-Optimization-DPO.pdf"
+    },
+    {
+      "bib": "BIB-098",
+      "autor": "Frantar",
+      "tytul": "GPTQ Accurate Post Training Quantization",
+      "format": "pdf",
+      "plik": "BIB-098_Frantar_GPTQ-Accurate-Post-Training-Quantization.pdf"
+    },
+    {
+      "bib": "BIB-099",
+      "autor": "Leviathan",
+      "tytul": "Fast Inference from Transformers via Speculative Decoding",
+      "format": "pdf",
+      "plik": "BIB-099_Leviathan_Fast-Inference-from-Transformers-via-Speculative-Decoding.pdf"
+    },
+    {
+      "bib": "BIB-100",
+      "autor": "Hamilton",
+      "tytul": "Graph Representation Learning",
+      "format": "epub",
+      "plik": "BIB-100_Hamilton_Graph-Representation-Learning.epub",
+      "wydawca": "Morgan & Claypool Publishers",
+      "jezyk": "eng",
+      "wydano": "2021-02-15T00:00:00+00:00"
+    },
+    {
+      "bib": "BIB-101",
+      "autor": "Wu",
+      "tytul": "Graph Neural Networks Foundations Frontiers and Applications",
+      "format": "pdf",
+      "plik": "BIB-101_Wu_Graph-Neural-Networks-Foundations-Frontiers-and-Applications.pdf",
+      "wydano": "2021-12-10T15:15:51+00:00"
+    },
+    {
+      "bib": "BIB-102",
+      "autor": "Labonne",
+      "tytul": "Hands On Graph Neural Networks Using Python",
+      "format": "epub",
+      "plik": "BIB-102_Labonne_Hands-On-Graph-Neural-Networks-Using-Python.epub",
+      "wydawca": "Packt Publishing Pvt Ltd",
+      "jezyk": "eng",
+      "wydano": "2023-03-29T00:00:00+00:00"
+    },
+    {
+      "bib": "BIB-103",
+      "autor": "Kipf Welling",
+      "tytul": "Semi Supervised Classification with Graph Convolutional Networks",
+      "format": "pdf",
+      "plik": "BIB-103_Kipf-Welling_Semi-Supervised-Classification-with-Graph-Convolutional-Networks.pdf"
+    },
+    {
+      "bib": "BIB-104",
+      "autor": "Velickovic",
+      "tytul": "Graph Attention Networks",
+      "format": "pdf",
+      "plik": "BIB-104_Velickovic_Graph-Attention-Networks.pdf"
+    },
+    {
+      "bib": "BIB-105",
+      "autor": "Battaglia",
+      "tytul": "Relational inductive biases deep learning and graph networks",
+      "format": "pdf",
+      "plik": "BIB-105_Battaglia_Relational-inductive-biases-deep-learning-and-graph-networks.pdf"
+    },
+    {
+      "bib": "BIB-106",
+      "autor": "Barabasi",
+      "tytul": "Network Science",
+      "format": "pdf",
+      "plik": "BIB-106_Barabasi_Network-Science.pdf",
+      "wydano": "2012-11-26T20:05:44+00:00"
+    },
+    {
+      "bib": "BIB-107",
+      "autor": "Newman",
+      "tytul": "Networks An Introduction",
+      "format": "pdf",
+      "plik": "BIB-107_Newman_Networks-An-Introduction.pdf",
+      "wydawca": "Oxford University Press, USA",
+      "jezyk": "eng",
+      "wydano": "2010-05-19T16:00:00+00:00",
+      "identyfikatory": "mobi-asin:B004P8KK1M"
+    },
+    {
+      "bib": "BIB-108",
+      "autor": "Lapan",
+      "tytul": "Deep Reinforcement Learning Hands On 3rd ed",
+      "format": "epub",
+      "plik": "BIB-108_Lapan_Deep-Reinforcement-Learning-Hands-On-3rd-ed.epub",
+      "wydawca": "Packt",
+      "tagi": "COM037000 - COMPUTERS / Machine Theory, COM017000 - COMPUTERS / Cybernetics, COM051140 - COMPUTERS / Programming Languages / Prolog",
+      "jezyk": "eng",
+      "wydano": "2024-11-03T12:30:24+00:00"
+    },
+    {
+      "bib": "BIB-109",
+      "autor": "Graesser Keng",
+      "tytul": "Foundations of Deep Reinforcement Learning",
+      "format": "epub",
+      "plik": "BIB-109_Graesser-Keng_Foundations-of-Deep-Reinforcement-Learning.epub",
+      "wydawca": "Addison-Wesley Professional",
+      "jezyk": "eng",
+      "wydano": "2019-12-01T23:00:00+00:00",
+      "identyfikatory": "isbn:9780135172490"
+    },
+    {
+      "bib": "BIB-110",
+      "autor": "Mnih",
+      "tytul": "Human level control through deep RL",
+      "format": "pdf",
+      "plik": "BIB-110_Mnih_Human-level-control-through-deep-RL.pdf",
+      "wydawca": "Nature Publishing Group",
+      "tagi": "Nature 518, 529 (2015). doi:10.1038/nature14236",
+      "wydano": "2015-02-16T02:24:11+00:00",
+      "identyfikatory": "doi:10.1038/nature14236"
+    },
+    {
+      "bib": "BIB-111",
+      "autor": "Schulman",
+      "tytul": "Proximal Policy Optimization Algorithms",
+      "format": "pdf",
+      "plik": "BIB-111_Schulman_Proximal-Policy-Optimization-Algorithms.pdf"
+    },
+    {
+      "bib": "BIB-112",
+      "autor": "Silver",
+      "tytul": "Deterministic Policy Gradient Algorithms",
+      "format": "pdf",
+      "plik": "BIB-112_Silver_Deterministic-Policy-Gradient-Algorithms.pdf",
+      "tagi": "Proceedings of the International Conference on Machine Learning 2014, boring formatting information, machine learning, ICML"
+    },
+    {
+      "bib": "BIB-113",
+      "autor": "Szepesvari",
+      "tytul": "Algorithms for Reinforcement Learning",
+      "format": "pdf",
+      "plik": "BIB-113_Szepesvari_Algorithms-for-Reinforcement-Learning.pdf",
+      "wydano": "2022-03-01T11:18:03+00:00"
+    },
+    {
+      "bib": "BIB-114",
+      "autor": "Bertsekas",
+      "tytul": "Reinforcement Learning and Optimal Control",
+      "format": "pdf",
+      "plik": "BIB-114_Bertsekas_Reinforcement-Learning-and-Optimal-Control.pdf",
+      "wydano": "2019-03-03T23:39:40+00:00"
+    },
+    {
+      "bib": "BIB-115",
+      "autor": "Powell",
+      "tytul": "Approximate Dynamic Programming",
+      "format": "pdf",
+      "plik": "BIB-115_Powell_Approximate-Dynamic-Programming.pdf"
+    },
+    {
+      "bib": "BIB-116",
+      "autor": "Pearl",
+      "tytul": "Causality Models Reasoning and Inference",
+      "format": "epub",
+      "plik": "BIB-116_Pearl_Causality-Models-Reasoning-and-Inference.epub",
+      "jezyk": "eng",
+      "wydano": "0101-01-01T00:00:00+00:00",
+      "identyfikatory": "mobi-asin:B00AKE1VYK"
     }
   ]
 }

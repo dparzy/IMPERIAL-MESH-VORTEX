@@ -7,6 +7,30 @@ powod_istnienia: "Lista 205 pozycji (BIB-070..274) do rozbudowy biblioteki RAG I
 ---
 # 📚 PLAN ROZBUDOWY BIBLIOTEKI — BIB-070 … BIB-274
 
+## 🗂️ STAN PRZETWORZENIA + PLAN KATALOGOWANIA ESENCJI (aktualizacja 2026-07-21)
+
+**Zmierzone 2026-07-21:** **115 plików BIB** na dysku, wszystkie **wyekstraktowane + w RAG +
+skatalogowane** (`tekst_cache` 115, `katalog_ksiag.json` n=115). 36 nowych (BIB-080..116) dodanych
+przez Cezara — nazwy dopasowane do wzorca `BIB-XXX_Autor_Tytuł` (autorzy z tej listy). TIRO zbiera
+pary automatycznie (most `deepseek_glos`→NOTARIUS).
+
+**Charakter 36 nowych: materiał POD TIRO i zaawansowane ML** (nie sygnały tradingowe).
+
+**Plan katalogowania esencji — 4 etapy, po jednej sesji (ZASADA ANALIZY CZĄSTKOWEJ — cząstkowo,
+zapisywalnie, wznawialnie; Hyginus=DeepSeek tani zwiad → kolejka JSONL, Opus=sędzia całej partii):**
+
+| Etap | Klaster | Książki | Esencja czego |
+|---|---|---|---|
+| **1** | LLM/TIRO fundamenty | BIB-080–093 (14) | jak trenować TIRO: transformer→distillation→LoRA/QLoRA→RAG |
+| **2** | LLM optymalizacja/alignment | BIB-094–099 (6) | scaling, Chinchilla, InstructGPT, DPO, GPTQ, spec-decoding |
+| **3** | Graph Neural Networks | BIB-100–107 (8) | kandydaci dla grafu pamięci W8 / synaps reżimowych |
+| **4** | RL + przyczynowość | BIB-108–116 (9) | kandydaci sizing / decyzje sekwencyjne |
+
+Każdy etap kończy się zapisem kandydatów do kolejki (JSONL w git) — bieg, który padnie, wznawia się
+od pierwszej niezapisanej książki. Wpięcie kandydata w kod dopiero po pomiarze areny (KANDYDAT≠PRAWDA).
+
+
+
 > **Stan na:** 2026-07-16 · **Autor listy:** VITRUVIUSZ (Opus) · **Rozkaz Cezara:** „rozbuduj bibliotekę,
 > dawaj do 200 pozycji lub więcej, niech nasz LLM się uczy"
 > **Mamy dziś:** 69 książek (BIB-001..069) · **Ta lista:** 205 pozycji (BIB-070..274)

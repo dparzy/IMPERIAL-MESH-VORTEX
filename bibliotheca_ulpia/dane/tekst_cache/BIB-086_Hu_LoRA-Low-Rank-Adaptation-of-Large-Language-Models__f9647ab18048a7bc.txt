@@ -1,0 +1,5333 @@
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+egeneiaey,
+Contents lists available at ScienceDirect
+RO
+Computerized
+Roh
+Ne
+.
+;
+.
+.
+peru
+Se
+Computerized Medical Imaging and Graphics
+av
+ol
+CI
+i
+ay
+ELSEVIER
+journal homepage: www.elsevier.com/locate/compmedimag
+—————a
+SS
+ss =.
+ees
+®
+LoRA-Enhanced RT-DETR: First Low-Rank Adaptation based DETR for
+eae
+real-time full body anatomical structures identification in
+musculoskeletal ultrasound
+Jyun-Ping Kao*®, Yu-Ching Chung*, Hao-Yu Hung*, Chun-Ping Chen*, Wen-Shiang Chen”
+* Graduate Institute of Biomedical Electronics and Bioinformatics, National Taiwan University, Taipei 106, Taiwan
+» Department of Physical Medicine and Rehabilitation, National Taiwan University Hospital and National Taiwan University College of Medicine, Taipei 100, Taiwan
+ARTICLE INFO
+ABSTRACT
+Keywords:
+Medical imaging models for object identification often rely on extensive pretraining data, which is difficult to
+Deep Learning
+obtain due to data scarcity and privacy constraints. In practice, hospitals typically have access only to pretrained
+‘Transformer
+model weights without the original training data limiting their ability to tailor models to specific patient pop-
+peneAdaptation
+ulations and imaging devices. We address this challenge with the first Low-Rank Adaptation (LoRA)-enhanced
+Object Detection
+Real-Time Detection Transformer (RT-DETR) model for full body musculoskeletal (MSK) ultrasound (US). By
+Musculoskeletal Ultrasound
+injecting LoRA modules into select encoder and decoder layers of RT-DETR, we achieved a 99.45 % (RT-DETR-L)
+and 99.68 % (RT-DETR-X) reduction in trainable parameters while preserving the model's representational
+power. This extreme reduction enables efficient fine-tuning using only minimal institution-specific data and
+maintains robust performance even on anatomical structures absent from the fine-tuning set. In extensive 5-fold
+cross-validation, our LoRA-enhanced model outperformed traditional full-model fine-tuning and maintained or
+improved detection accuracy across a wide range of MSK structures while demonstrating strong resilience to
+domain shifts. The proposed LoRA-enhanced RT-DETR significantly lowers the barrier for deploying transformer-
+based detection in clinics, offering a privacy-conscious, computationally lightweight solution for real-time, full-
+body MSK US identification.
+1. Introduction
+that
+limit
+its broader clinical
+utility. The image quality
+is often
+compromised by artifacts and speckle noise, particularly when visual-
+Musculoskeletal (MSK) ultrasound (US) is an imaging modality for
+izing complex anatomical structures, which can obscure critical details
+diagnosing and managing a broad spectrum of conditions involving
+and complicate interpretation even with advances in transducer reso-
+bones, ligaments, tendons, cartilage, and muscles, enabling clinicians to
+_lution (Patil
+and Bhaskar, 2012; Baloch et al., 2018; Hung et al., 2014).
+identify issues such as muscle strains, tendon injuries, fractures, and
+Accurate interpretation also heavily depends on the operator’s experi-
+nerve compressions (Patil and Bhaskar, 2012). Unlike Magnetic Reso- _ ence and suffers from poor repeatability (Patil and Bhaskar, 2012).
+nance Imaging (MRI), Computed Tomography (CT), US is radiation-free,
+Acquiring US
+proficiency
+is
+time-consuming
+and
+requires
+strong
+cost-effective, portable, and provides real-time visualization without
+hand-eye coordination, contributing to a steep learning curve for new
+metal artifacts. The ability to visualize needles and anatomical struc-
+practitioners. The variability in tissue textures and a lack of compre-
+tures in real-time further enhances its utility in guided procedures for
+hensive training materials exacerbate
+these difficulties,
+potentially
+both diagnosis and treatment (del and Jose, 2008; Lento and Scott,
+affecting diagnostic accuracy.
+2008). Moreover, the US can cover extensive anatomical regions with
+Recent advances in deep learning have revolutionized medical image
+extended field-of-view imaging, allowing clinicians to interact dynam- _ analysis, delivering performance superior to conventional computer
+ically with patients and orient examinations directly toward symptom- _ aided diagnosis (CAD) approaches (Litjens et al., 2017). Since the
+atic areas (Lento and Scott, 2008).
+introduction of AlexNet (Krizhevsky et al.,
+2012), convolutional neural
+Despite these advantages, US imaging faces significant challenges
+networks (CNNs) have been
+successfully deployed
+in medical US
+* Corresponding author.
+E-mail address: wenshiang@gmail.com (W.-S. Chen).
+https:
+//doi.org/10.1016/j.compmedimag.2025.102583
+Received 4 February 2025; Received in revised form 3 April 2025; Accepted 27 May 2025
+Available online 18 June 2025,
+0895-6111/© 2025 Elsevier Ltd. All rights are reserved, including those for text and data mining, AI training, and similar technologies.
+
+
+J-P. Kao et al.
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+analysis, achieving reliable accuracy for clinical use. CNN-based models
+et
+al.,
+2024). Our LoRA-enhanced RT-DETR can be fine-tuned with
+have been applied to classify benign and malignant breast tumors —_minimal medical data, achieving superior performance on specialized
+(Zhang et
+al.,
+2016), detect hip dysplasia (Golan
+et
+al.,
+2016), and
+populations or data types while maintaining high accuracy on un-
+identify supraspinatus calcification (Chiu et
+al.,
+2022). With the advent
+changed domains. By introducing low-rank updates to the model’s pa-
+of the You Only Look Once (YOLO) series of models (Jegham
+et
+al.,
+rameters, we substantially reduce the number of trainable parameters
+2024), object detection and segmentation tasks can now be performed _ during fine-tuning, thereby lowering computational costs and mitigating
+rapidly and accurately, extending to the identification of forearm or
+_overfitting risks. In this way, fine-tuning can be achieved with only
+shoulder anatomical structures (Chu et al., 2024) and segmentation of __ around 0.5 % of the original model's parameters being adjusted. This
+the median nerve (Yeh et
+al.,
+2023). Concurrently, the introduction of __ dramatically lowers the computational burden and reduces overfitting
+attention mechanisms (Vaswani, 2017) has enabled global context
+__risk when adapting the model to
+a limited dataset. Furthermore, since no
+modeling, catalyzing the rise of transformer-based architectures that
+_retraining of the full model is needed and only institution-specific data
+excel in tasks including image classification, segmentation, and object _ are used for the lightweight fine-tuning, this strategy is inherently
+detection (Shamshad
+et
+al.,
+2023). Vision Transformers (ViTs) _ privacy-conscious. This approach aligns with federated learning prin-
+(Dosovitskiy, 2020) and DEtection TRansformer (DETR) (Carion et al., __ ciples, enabling decentralized model updates without sharing sensitive
+2020) have demonstrated that global context modeling significantly
+_patient data. It also facilitates fine-tuning by individual institutions or
+benefits medical image interpretation, allowing models to capture subtle _ hospitals, accelerating the deployment of custom solutions.
+spatial relationships and thus improving performance in challenging
+We demonstrate our framework on real-time MSK US imaging for
+scenarios. For instance, these transformer-based models have been __ simultaneous identification of multiple anatomical structures, thereby
+investigated for detecting COVID-19 in point-of-care (POC) chest US _ enhancing diagnostic capabilities and clinical decision-making. By
+(Perera et al., 2021) and for breast cancer classification in US imaging _ effectively adapting to data scarcity and limiting reliance on large-scale
+(Gheflati and Hassan, 2022), though applications in MSK US remain _ annotated datasets, our method advances the state of the art in deep
+limited.
+learning for medical imaging. Furthermore, this paradigm can be
+As deep learning becomes increasingly integrated into medical im- _extended to other imaging modalities, ultimately broadening the utility
+aging, preventing overfitting, ensuring robust validation, and main-
+_and accessibility of Al-driven diagnostics in healthcare.
+taining generalizability are paramount concerns. Model performance
+must be rigorously evaluated on data independent from the training sets
+2. Methodology
+to avoid being misled by overfitted parameters (Bradshaw et
+al.,
+2023).
+Moreover, most deep learning solutions rely on large, diverse training
+2.1.
+Background
+datasets (Litjens et al., 2017;
+Shamshad et al., 2023). A key shortcoming
+is the limited out-of-distribution detection capability of current models
+2.1.1.
+Introduction of RT-DETR
+@aloch
+et
+al.,
+2018; Shamshad et
+al., 2023). While large-scale pre-
+RT-DETR (Zhao
+et
+al., 2024) is a major advancement in object
+trained ViTs have shown potential in improving out-of-distribution tasks
+detection, combining the feature extraction power of CNNs with the
+(fort et
+al.,
+2021), most validations have been performed on simple _ global context of Transformers. Instead of using proposal generation or
+datasets like CIFAR-10 and CIFAR-100, which may not reflect the
+non-maximum suppression, it offers an end-to-end design with stream-
+complexities of medical images (Shamshad et
+al.,
+2023). Consequently,
+lined
+attention
+modules and
+efficient
+training,
+which
+speeds up
+reliable fine-tuning methods tailored to medical settings are urgently _convergence and supports real-time inference. This makes RT-DETR
+needed (Tajbakhsh et al., 2016). In practice,
+a medical AI model may _ well suited to clinical tasks where quick, reliable responses are crucial.
+need to be adapted to a new hospital’s data or a novel imaging device
+Aconvolutional backbone, often
+a ResNet (Ie et al., 2016), processes
+with only a small sample of local training images available. Developing
+_the US image into feature maps that capture key details in complex MSK
+techniques to fine-tune models efficiently on such limited, shifting
+environments. The Transformer encoder then applies attention to inte-
+datasets is crucial for real-world deployment.
+grate information across the image, vital for detecting closely situated
+Recently, a fine-tuning method Low-Rank Adaptation (LoRA) (Hu
+structures such as nerves, tendons, and muscles. The decoder uses
+et al., 2021) was introduced. LoRA freezes the pretrained model weights _ learnable object queries and cross-attention to refine embeddings, pro-
+and injects trainable rank decomposition matrices into each layer of the
+ducing final predictions without post-processing. Although RT-DETR’s
+Transformer architecture. This approach greatly reduces the number of
+dynamic attention and parameter-efficient design improve detection
+trainable parameters for downstream tasks and was successfully applied
+accuracy, fine-tuning the entire model for small, specialized datasets can
+in GPT-3, reducing the number of trainable parameters by 10,000 times
+_be costly and may lead to overfitting.
+and the GPU memory requirement by threefold when focusing on a
+specific task. Although it has been widely used in Large Language
+2.1.2.
+Introduction of convolution layer with LORA
+Models, it has been rarely utilized in computer vision models. Recently,
+Consider a pre-trained neural network layer parameterized by a
+it was adapted to the Segment Anything Model (SAM) (Zhong et al., _weight matrix W < R*4= where d.,, and dj, denote the dimensionality
+2024),
+but there
+is
+still
+a lack of research on using LoRA with
+of the output and input features, respectively. Let
+X be the input feature
+DETR-based object detection model, especially in medical imaging.
+matrix andb be the bias vector. In a standard linear or convolutional
+Due to privacy regulations and the sensitive nature of medical data,
+_layer, the output ¥ is computed as:
+sharing such datasets across institutions is often restricted (Price et al.,
+Y=xw' +b
+w
+2019). This limitation poses a significant challenge for fine-tuning
+~
+pre-trained models to specific clinical environments or patient pop-
+LoRA introduces a low-rank update AW to W during fine-tuning,
+ulations. Traditional fine-tuning approaches require access to the entire _ allowing efficient specialization of the layer to new tasks or datasets.
+model and all its parameters, leading to high computational costs and
+_—_Instead of adjusting all elements of W, LoRA decomposes this update
+potential overfitting, especially when the available data is limited
+nto two low-rank matrices A ¢ R'™and B ¢ R&*" where remin(din,
+(Tajbakhsh et al., 2016).
+da.) controls the rank of the factorization and thus the adaptation ca-
+To overcome these challenges, we propose a novel deep learning —_ pacity. A scaling factors= ¢ modulates the magnitudeof these updates,
+framework
+and fine-tuning strategy that enables efficient, privacy-
+where a is a hyperparameter that adjusts the magnitude of the update.
+preserving
+adaptation of object detection models to new clinical set-
+The low-rank update AW is defined as:
+tings. To our knowledge, this is the first application integrating LoRA
+into the Real-Time Detection Transformer (RT-DETR) model (Zhao
+ AW=seBA
+@Q)
+2
+
+
+JeP. Kao et al.
+‘Computerized Medical Imaging and Graphics 124 (2025) 102583
+Incorporating this update into the original weight matrix yields:
+:
+Q=xXWy
+.
+K=XWy,
+V=XWy
+(6)
+W=W+AW=W+s
+eBA
+(3)
+The attention output is then given by:
+‘The updated output ¥ of the layer with LoRA-enhanced weights is
+KT
+then:
+Attention(Q, K, V) = Softmax(%)Vv
+”
+hc
+Y =Xw" +b=XW'+XAW' +b
+(4)
+By substituting AW, we obtain the final output with LoRA:
+where dy is the dimensionality of the key vectors,
+.
+Incorporating LoRA into the attention layers modifies these linear
+Y =XW" +seXA'B' +b
+(5) _ projections by adding low-rank updates:
+By limiting adaptation to the low-rank matrices matrices A and B,
+Wa =WetseBg
+°Ag,
+We=Wg+seBe
+eAx,
+Wy
+LoRA drastically reduces the number of trainable parameters from di,©
+= Wy+seBy eAy
+(8)
+dowe tO 7 (dix +doue). When r is much smaller than min(din, dou), this
+reduction can be orders of magnitude. Such parameter efficiency is
+Here, Ag, Bg, Ax, Bx, Ay, and By are low-rank matrices learned
+especially beneficial in medical imaging, where annotated data is scarce _during fine-tuning, and s is a scaling factor as defined previously. With
+and computational resources may be limited.
+these updated weight matrices, the projections become:
+2.1.3. Introduction of attention layer with LORA
+Q=XWQ
+.
+K=XWy,V=XWy
+2)
+__In Transformer-based models, the core of the attention mechanism
+By focusing the adaptation on the low-rank factors rather than the
+involves computing Query (Q), Key (K) and Value (V) representations
+—_fy]]-weight matrices, LoRA allows the attention mechanism to specialize
+from the input features. These representations are obtained by projec-
+tp new data distributions with minimal parameter overhead efficiently.
+ting the input X through linear transformations parameterized by the
+weight matrices Wo, Wx and Wy and are computed as:
+.
+.
+LoRA
+Input
+Efficient Hybrid Encoder
+Decoder and Head
+1
+din
+«
+.
+“
+Leet
+2
+z
+=—
+|
+i
+3
+la
+g
+a
+Deformable Transformer LoRA
+B \ Réow?
+ATF
+Lora
+A
+e
+nee)
+‘
+t
+,
+q
+2
+Output
+p
+3
+5
+Backbone
+2
+Fy
+Score heads
+Bbox heads
+iS)
+=
+AIFI Module
+|
+Deformable Transformer
+Multi-head Attention
+rr
+|
+Layer Norm
+7
+Multi-head Attention
+i
++
+Layer
+Norm
+GELU
+,
+Cross-Attention
+Multi-head Attention
+Layer Norm
+A
+¥
+Layer Norm
+TENT
+FC
+a
+Layer Norm
+GELU
+J
+Fig. 1. Model Architecture of LoRA-Enhanced RT-DETR. Our model integrates LoRA with rank r = 16 into the AIFI module and deformable transformer to enable
+efficient fine-tuning. The backbone first extracts multiscale features from the input ultrasound image, which are then processed by the Attention-based Intra-scale
+Feature Interaction (AIFI) module (left box) to perform cross-scale feature fusion and IoU-aware query selection. Next, the Deformable Transformer (right box)
+refines these query features before producing final object predictions via score and bounding-box heads. LoRA components (shown in yellow) are inserted into critical
+linear layers of both the AIFI and Deformable Transformer, enabling a low-rank, parameter-efficient adaptation without retraining the entire model. The bottom
+panels detail how LoRA is injected into feed-forward and cross-attention layers, freezing the original weights while learning small low-rank updates.
+3
+
+
+JoP, Kao et al
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+2.2, Model framework
+these values. This is crucial for accurately preserving and interpret-
+ing subtle differences in tissue textures.
+Incorporating LoRA into the specified layers of the RT-DETR model's
+4. Output Projection in the Attention Module:
+transformer architecture allows for efficient fine-tuning with a reduced
+After the attention computation, the output projection maps the
+computational footprint. By updating only the low-rank matrices A and
+attended features back to the model's hidden dimension. By applying
+B in critical linear layers, you maintain the model's expressive power
+LoRA to these output projections, we maintain compatibility with
+while minimizing the number of trainable parameters. This approach is
+subsequent layers while enabling quick adaptation to new clinical
+particularly advantageous for adapting large models to specific tasks or
+contexts, thus refining the model's interpretive capabilities without
+datasets without the overhead of retraining the entire network.
+excessive parameter tuning.
+In our LoRA-enhanced RT-DETR architecture (Fig.
+1), we selectively
+5. Decoder FFN Layers:
+integrate LoRA parameters into both the encoder and decoder stages to
+Similar to the encoder, we add LoRA parameters to the FFNs
+enable efficient and targeted fine-tuning. Specifically, we incorporate
+within the decoder. This further enhances the model's flexibility,
+LoRA into the Fully Connected layers (FC) of the Attention-based Intra-
+allowing it to incorporate newly emphasized features discovered by
+scale Feature Interaction (AIFI) module and into the decoder module of
+the
+updated
+attention
+mechanisms
+into
+its
+final
+object
+the model, focusing on Feed-Forward Network (FEN) layers and cross-
+representations.
+attention components within the Deformable Transformer blocks (Ap-
+pendix Table 11, Appendix Table 12). These layers are crucial for rep-
+By employing a low-rank factorization (r = 16) for all adaptations,
+resenting and refining the global context in MSK US images, as well as _we significantly reduce the number of trainable parameters while
+for adapting to new clinical settings without retraining the entire model. _maintaining strong expressive power. Such a rank selection strikes a
+We chose a LoRA rank r = 16 throughout our integration. This rank
+balance between parameter efficiency and the capacity to model com-
+represents
+a strategic balance: it is small enough to drastically reduce the _ plex anatomical variability. This approach directly addresses the com-
+number of trainable parameters during fine-tuning, yet large enough to
+_—mon challenges in medical imaging, including limited annotated data
+preserve sufficient model capacity for adapting to complex anatomical
+_and strict privacy concerns, by making it feasible to fine-tune large,
+structures. The original RT-DETR-L model (“Large” variant) includes
+pretrained RT-DETR models in decentralized clinical environments
+32,853,341 trainable parameters, whereas our LoRA-enhanced model _ without massive retraining or extensive computational resources.
+adds only 181,248 trainable parameters (about 0.55 % of the original),
+To evaluate if our method extends seamlessly to larger variants of
+achieving roughly a 99.45 % reduction. For clarity, throughout this
+RT-DETR, we also conducted experiments on RT-DETR-X, which nearly
+work we use the RT-DETR-L model (Large) as the base architecture. We
+doubles the number of parameters relative to RT-DETR-L. As shown in
+also consider an “Extra-Large” variant, RT-DETR-X, which has approx-
+Table
+1, RT-DETR-X has substantially higher GPU memory usage
+imately 67.35 million parameters (about twice the size of RT-DETR-L),
+_(18.14 GB) and floating-point operations (232.7 GFLOPs) compared to
+to evaluate the scalability of our approach.
+RT-DETRLL, reflecting its larger capacity. Even with LoRA, GPU memory
+Our approach integrates LoRA at carefully selected layers within the
+usage remains relatively high (14.93 GB) because the entire model,
+RT-DETR model, specifically at the 12th (encoder) and 29th (decoder) _though frozen, is still loaded into memory during fine-tuning. However,
+layers, to achieve efficient, domain-specific adaptation with minimal
+__only the low-rank matrices are updated, enabling a 99.68 % reduction in
+overhead.
+the number of trainable parameters for RT-DETR-X. Moreover, during
+In the 12th encoder layer, we introduce LoRA parameters into the _ inference, the additional LoRA parameters contribute only a minor in-
+FCs. The first FC expands the feature representations into a higher-
+_crease in computational cost; specifically, LoORA GFLOPs amount to 0.17
+dimensional space, facilitating richer pattern extraction and enhancing
+_versus the 232.7 GFLOPs of the full RT-DETR-X. This demonstrates that
+the model's representational capacity. The second FC then contracts this
+our LoRA-based approach scales efficiently even as the backbone grows,
+expanded feature space back, completing the transformation cycle and __ preserving privacy-conscious fine-tuning capabilities without incurring
+enabling non-linear feature extraction, especially critical for capturing _ prohibitively large resource demands.
+subtle MSK anatomical structures in US images. By only fine-tuning
+these FC layers through low-rank adaptations, we preserve the en-
+2.3.
+Dataset
+coder’s general learned representations while efficiently tailoring them
+to new, limited clinical datasets.
+In this study, a total of 19,765 images were collected from 25 healthy
+In the 29th decoder layer, we insert LoRA parameters into key
+volunteers with no significant MSK complaints in the past year. The
+components of the cross-attention module and the FFNs, allowing the _ participants, aged 21-60 years (average 33.5), had a male-to-female
+model to refine its object-level representations more effectively during
+ratio of 3:2 and were recruited from the Musculoskeletal Ultrasound
+decoding. Our modifications focus on several sub-layers:
+Center of the Department of Physical Medicine and Rehabilitation at
+National Taiwan University Hospital (NTUH). US images were acquired
+1. Sampling Offsets of Deformable Attention:
+using a Toshiba TUS-A500 machine with a PLT-1204BT linear trans-
+We enhance the sampling offsets to let the model attend to specific
+ducer. The frequency was set to 14 MHz and the penetration depth to
+spatial locations of interest in the feature maps. By adapting these
+3.5 cm. The scanning assessment was recorded at 37 fps with a dynamic
+offsets with LoRA, the model can quickly recalibrate its attention to
+_range of 75 dB, and each frame was subsequently split into individual
+distinctive MSK anatomical features, even with minimal additional
+images. Each image is
+a 960 x 720 pixel RGB image. A physician
+training data.
+specialized in MSK US (W.S. Chen) conducted the US scanning and video
+2. Attention Weights of Deformable Attention:
+recording, manually labelled the target anatomical structures in YOLO
+We also integrate LoRA into the attention weight parameters. This _format for training, and verified the ground truth annotations to ensure
+determines how strongly the model should focus on particular re-
+accuracy and consistency.
+gions, enabling more nuanced discrimination among closely situated
+‘The target anatomical structures included 10 parts in the forearm, 5
+anatomical structures that often appear in MSK US images.
+parts in the shoulder, and 8 parts in the leg, encompassing crucial
+3. Value Projection in the Attention Module:
+structures such as bones, arteries, nerves, and muscles (ig.
+2). For the
+The value projection step maps input features into the value space __forearm, we selected the median nerve (MN), Humerus, Brachial Artery
+for attention computation. Introducing LoRA here ensures that the
+(BA), Radius, Ulna, Brachialis muscle (BR), Radial Nerve (RN), Ulna
+model can efficiently adapt how it encodes the semantic content of
+Nerve (UN), Brachioradialis (Brad) and Supinator (SUP) muscles. We
+collected images of the forearm structures from four different scanning
+4
+
+
+JeP. Kao et al.
+‘Computerized Medical Imaging and Graphics 124 (2025) 102583
+Table 1
+Efficiency Comparison of RT-DETR-L and RT-DETR-X With LoRA (r = 16). Model Parameters (without LoRA) denotes the number of trainable parameters in RT-DETR
+during the pretraining stage. GFLOPS (without LoRA) and GPU Memory (Pretraining) represent the computational cost and memory usage of the base RT-DETR. LoRA
+Parameters specifies the additional trainable parameters introduced by LoRA, and Parameters Reduction indicates the percentage decrease in overall trainable pa-
+rameters when LoRA is applied. LoRA GFLOPs reflects the extra computational load, while LORA GPU Memory shows the memory consumption required for LoRA-
+based fine-tuning.
+Model Variant
+Model Parameters
+GFLOPS
+GPU Memory
+LoRA
+Parameters
+LoRA
+LoRA
+(without LoRA)
+(without LoRA)
+(Pretraining)
+Parameters
+Reduction
+GFLOPs
+GPU
+Memmory
+RT-DETRL
+32,853,341
+108.3
+13.25 GB
+181,248
+99.45 %
+0.15,
+10.48 GB
+RT-DETR-X
+67,350,717
+232.7
+18.14 GB
+218,112
+99.68 %
+0.17
+14.93 GB
+Table 2
+The overall performance comparison crossing 5 folds using RT-DETR-L.
+Fold-1
+Fold-2
+Fold-3
+Fold-4
+Fold-5.
+mAP5O
+mAP50:95
+—_mAPS5O
+mAP50:95
+APSO‘
+mAP50:95
+APSO
+mAP50:95 — mAPSO——_-mAPS50:95
+RT-DETR
+0.76
+0.43
+0.739
+0.418
+0.809
+0.447
+0.767
+0.413
+0.795
+0.422
+(Baseline)
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+RT-DETR w/
+0.661
+0.361
+0.559
+0.321
+0.746
+0.403
+0.639
+0.343
+0.744
+0.338
+External Data
+(-14.82%) — (—16.05%)
+ (—24.36%)
+(—24.01%)
+(—7.79%)
+(—9.84%)
+(—16.69%)
+(—16.95%)
+(—6.42%)
+(—19.91 %)
+RT-DETR w/
+0.764
+0.428
+0.733
+0.404
+0.848
+0.453
+0.78
+0.453
+0.761
+04
+Pretraining and
+(-1.55 %)
+(-0.47 %)
+(0.81 %)
+(-3.35 %)
+(44.82 %)
+(41.34 %)
+(41.43 %)
+(49.69 %)
+(-4.28 %)
+(-5.21 %)
+External Data
+Our Model w/
+0.781
+0.436
+(0.757
+0.418
+0.833
+0.449
+0.767
+0.426
+0.789
+0.413,
+External Data
+(40.64 %)
+41.4%)
+(42.44 %)
+(0%)
+(42.87%)
+(40.45%) — (+0 %)
+(43.15 %)
+(-0.75%) — (—2.13 %)
+Our Model w/
+0.752
+0.412
+0.723
+0.406
+0.842
+0.455,
+0.766
+0.412
+0.793
+0.418
+Pretraining and
+(-3.09 %)
+(-4.19 %)
+(-2.17 %)
+(-2.87 %)
+(44.08%)
+(41.79%) — (-0.13. %)
+(-0.24 %)
+(-0.63%) — (—0.95 %)
+External Data
+The amount of annotations in each target class
+7605
+forearm
+shoulder
+7000
+leg
+6005
+w» 6000
+2
+6
+g
+$B 5000
+ro2
+€
+< 4000
+5
+3512
+G
+2875
+3000
+E
+5
+2010
+2084
+= 2000
+1677 1791 1681
+1718
+984
+1027
+1228
+1000
+704
+633
+829
+592
+640
+351
+414
+82
+131
+90
+oO
+>
+SF FF CS FES OE SL ee
+GS
+CS EF SE &
+&
+Ss
+e&
+SF
+F
+x
+oo
+3
+Classes
+Fig. 2. Distribution of annotations across the 23 target MSK classes. Light blue bars denote forearm classes, light green denotes shoulder classes, and light orange
+denotes leg classes. The numeric labels above each bar specify the exact annotation count for each class.
+views (anterior, posterior, lateral, and medial from elbow to wrist) to
+tendon (Infm). We collected shoulder in five different views including
+cover the entire surface of the forearm. Detailed visualization of these
+short-axis and long-axis views of the biceps brachii tendon, short-axis
+forearm structures facilitates the diagnosis of nerve entrapments (e.g., _and long-axis views of the supraspinatus tendon, and the posterior gle-
+carpal tunnel syndrome) and vascular anomalies, as well as guiding
+nohumeral joint view. High-resolution US imaging of these shoulder
+ultrasound-assisted interventions such as nerve hydrodissection and
+structures enables early identification and management of rotator cuff
+injections, improving both diagnostic accuracy and therapeutic out- _ pathologies, tendon tears, bursitis, and glenohumeral joint abnormal-
+comes (Litjens et al.,
+2017; Krizhevsky et al., 2012; Zhang et al.,
+2016).
+ities. Furthermore, US guidance can assist in accurate needle placement
+For the shoulder, we selected the Biceps tendon (Bicep), Deltoid (Del),
+_for therapeutic injections, improving treatment efficacy and patient's
+Humerus (SH-Humerus), Supraspinatus tendon (SS), and Infraspinatus _ safety (Litjens et al., 2017; Golan et al., 2016). For the Leg, we selected
+5
+
+
+JeP. Kao et al.
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+Soleus, Gastrocnemius muscle (Gas), Tibial Nerve (TN), Flexor Dig- __ respective weights are as follows:
+itorum Longus muscle (FDL), Flexor Hallucis Longus muscle (FHL),
+_
+;
+Tibialis Posterior muscle (TP), Tibialis Posterior Tendon (TPT) and
+Mota! = MeassLetass + Atorlvox +
+—Asioukgion
+(0)
+Flexor Digitorum Longus Tendon (FDL). The whole dataset primarily
+Where gu — 1, Anon = 5, and Dyou = 2
+consists of forearm structures, which make up around 70 % of the im-
+"The
+clessification
+lose
+L
+the
+di
+b
+th
+followed by
+shoulder structures at approximately
+20 %,
+and le
+© classification
+loss
+Telass Measures
+the
+discrepancy
+between
+the
+ages,
+to
+y
+ig
+PP
+'¥
+20%,
+‘8
+predicted class probabilities and the ground truth classes. It is computed
+structures at about 10 %. In addition, we collected an extra set of leg
+‘
+;
+Wcoe
+:
+:
+.
+using the cross-entropy loss between the predicted probabilities 6, and
+images (equivalent to ~10 % of the main dataset) to serve as an external
+;
+aaeae
+:
+:
+,
+the ground truth labels y,,. Let N denotes the number of matched pre-
+fine-tuning dataset for simulating domain adaptation. Evaluating these"
+ie
+lower-limb structures helps in diagnosing tendonopathies, muscle in-___‘icted and ground truth boxes, and C denotes as the number of
+classes.
+juries, and peripheral nerve entrapments, US imaging can also guide
+THe ground truth indicator
+yi. € {0,1} is 1 if
+class C is the correct class
+interventions, such as targeted injections or aspirations, and monitor the
+__f0F sample i, and 0 otherwise. The classification loss is given by:
+progress of rehabilitation and therapy, contributing to more personal-
+ake
+ized patient care (Litjens et al., 2017; Krizhevsky et al., 2012; Zhang
+Leas = 4 D> Do YicloBlBie)
+an
+et
+al.,
+2016; Chiu et
+al.,
+2022).
+e1oet
+In total, our dataset encompasses 38,663 annotations across 23
+The bounding box regression loss Lye, (Function 12) measures the
+distinct MSK classes. As illustrated in Fig.
+2, Radius and Ulna have
+error between the predicted bounding box coordinates b, € R* and the
+substantially higher annotation counts, whereas structures like BA OF
+sound truth b, € R using the Ll (Mean Absolute Error) loss:
+‘TPT have fewer samples. Such imbalance closely reflects real-world MSK
+scanning, where certain structures are targeted more frequently. Despite
+Lat
+N
+6
+-b
+2
+this uneven distribution, the dataset’s diversity benefits robust model
+Lex = y»
+1 —
+Bills
+(12)
+training and evaluation, enabling our framework to capture a broad
+-
+spectrum of anatomical features. Moreover, the LoRA-enhanced RT-
+The Generalized Intersection over Union loss Leio, evaluates the
+DETR approach described in this paper demonstrates strong resilience to _overlap between predicted and ground truth bounding boxes, offering a
+these imbalances, retaining reliable detection accuracy on both high- _more effective gradient signal when boxes do not intersect. The standard
+and low-frequency classes. This combination of large-scale, multi-
+Intersection over Union (IU) between two bounding boxes B andB is
+regional coverage and realistic data imbalance provides a solid foun-
+_defined as:
+dation for exploring domain adaptation and other advanced techniques
+~
+.
+=
+BoB
+in MSK ultrasound.
+1oU(8,B) = 28!
+(3)
+BUB|
+2.4. Training process
+GloU extends IoU to cases where the boxes do not overlap by
+To rigorously evaluate our model's adaptability and reliability in
+*8€0"Porating the smallest enclosing box C that contains both B and B.
+MSK US applications, we employed a 5-fold cross-validation strategy
+The GloU is defined as:
+using a total of 19,765 images. Specifically, we divided the dataset into 5
+-
+~
+Log
+subsets of approximately equal size, each preserving the class distribu
+ GIOU(B,B) = IoU(B,B)—
+| \(BUB) ha
+(14)
+tion of the full collection. In each fold, four of these subsets (80 % of the
+entire dataset, 14,380 images) were used for training, and the remaining
+where |c \(B
+UB)
+| denotes the area of the enclosing box excluding the
+subset (20 %, 3595 images) was used for validation and testing. Addi-
+aie
+tionally, 1790 leg images (about 10 % of the overall dataset) were set
+union of B and B.
+aside as an external fine-tuning dataset to assess domain adaptability.
+At last, GIOU loss is computed as:
+Under this design, every image in the main dataset appears in exactly
+1a
+.
+one test set over the 5 folds, thereby mitigating overfitting and providing
+Lyios = 5; ) (1 ~ GIoU(B,B,))
+(as)
+a robust estimate of model generalization.
+cr
+All experiments used the same 5-fold cross-validation approach with
+.
+;
+,
+consistent hyperparameters. We adopted recognized defaults from the | Where Bj and B; are the predicted and ground truth bounding boxes for
+Ultralytics library to avoid arbitrary parameter tuning. For each fold, we _sample i, respectively. When B perfectly matches B, GIoU = 1 and Liu =
+trained the proposed model for up to 200 epochs, with training halted
+9, When B and B do not overlap, GIoU can be negative, and Igo > 1.
+early if no improvement was observed in the validation set for 50
+When B perfectly matches B, the GIoU is maximized at 1, and the GIoU
+consecutive epochs (early stopping patience of 50). A fixed batch size of
+ae
+a
+"
+;
+|
+loss Lyiou becomes zero, indicating a perfect prediction. Conversely,
+16 was chosen to balance computational efficiency and gradient sta-
+7
+A
+‘
+Lith
+‘
+ive,
+and th
+bility. We employed a Stochastic Gradient Descent (SGD) optimizer with
+When B and B
+do not overlap at all,
+the GloU can
+be negative, and
+the
+an initial learning rate of 0.01 and momentum of 0.9, following
+1055 Hgou exceeds 1, penalizing the model more heavily for poor pre-
+commonly accepted default configurations to maintain consistency _ ‘ictions. This characteristic ofthe GloU loss provides
+a more informative
+across
+all experiments.
+Input images were uniformly resized to
+$tadient signal for the model to lear from, particularly in challenging
+640 x 640 pixels, a resolution sufficient to capture key MSK anatomical
+48S where the predicted and ground truth boxes are significantly
+structures while providing computational tractability. All experiments
+#Saligned.
+were performed on a system equipped with an Intel Xeon W-3223 CPU
+and an NVIDIA RTX 3090 GPU (24 GB), running Python 3.12 on Ubuntu
+2.6.
+Evaluation method
+22.04.
+In our evaluation, we employed several key metrics to assess the
+2.5. Loss function
+performance of the object detection models: Precision, Recall, mean
+Average Precision (mAP), and the F1 score. For mAP, we considered
+The total loss Lipa) (Function. 10) of our model is a weighted sum of
+both mAP at an IoU threshold of 0.5 (mAPSO) and the comprehensive
+the individual loss component, with each component addressing a spe.
+mAP
+over
+multiple
+IoU
+thresholds
+ranging
+from
+0.50
+to
+0.95
+cific aspect of the object detection task. The loss components and their __ (mAPS50:95). These metrics provide a multifaceted view of the models’
+6
+
+
+JeP. Kao et al.
+‘Computerized Medical Imaging and Graphics 124 (2025) 102583
+abilities to accurately detect and localize objects within images. Preci-
+_abilities to not only detect objects accurately but also to localize them
+sion, also known as positive predictive value, quantifies the proportion _ precisely within images. This comprehensive evaluation is essential for
+of correct positive identifications among all positive predictions made __developing robust models that perform effectivelyacross
+a wide range of
+by the model. It is calculated using the formula:
+real-world scenarios.
+woe
+TP
+Precision =5pp
+(16)
+2.7. Ablation studies
+where TP (True Positives) represents the number of correctly
+To thoroughly evaluate our proposed LoRA-enhanced RT-DETR
+detected objects, and FP (False Positives) denotes the number of incor- _model, we conducted a series of ablation experiments with multiple
+rect detections made by the model.
+training configurations. First, we established a baseline by training RT-
+Recall, or sensitivity, measures the proportion of actual positive
+DETR on the full dataset under a 5-fold cross-validation framework,
+cases that were correctly identified by the model. It is computed as:
+providing a benchmark for subsequent comparisons. Second, we fine-
+TP
+tuned this baseline model using only an external leg dataset. Third, we
+Recall = 75 ay
+(7)
+combined the training set from the 5-fold cross-validation with the
+external leg dataset and fine-tuned the baseline model baseline to
+where
+FN (False Negatives) indicates the number of true objects that
+explore the need for full dataset during pretraining to prevent weight’s
+the model failed to detect. Together, Precision and Recall provide in-
+potential domain shift.
+sights into the model’s performance in terms of both accuracy and
+Next, we introduced LoRA into the model to assess its parameter-
+completeness.
+efficient fine-tuning capabilities. In the fourth configuration, we fine-
+mAP is a crucial metric for evaluating object detection models, as it
+tuned the baseline RT-DETR only with LoRA parameters with the
+combines both Precision and Recall across different thresholds. It is
+external Jeg dataset examining the model's adaptability to sparse,
+based on the IoU, which measures the overlap between the predicted
+domain-specific data. Finally, we fine-tuned LoRA with training set from
+bounding boxes and the ground truth boxes. The IoU is defined as:
+the 5-fold cross-validation. This fifth configuration measured the cu-
+|AnB|
+mulative effect of LoRA and baseline training when exposed to both
+IoU(A,B) = TAuB|
+(18)
+internal and external data sources. Across all fine-tuning tasks, we
+trained for an additional 20 epochs, selecting the best performance for
+where A is the predicted bounding box, B is the ground truth bounding _ evaluation. Through these ablation studies, we systematically analyzed
+box, |A NB] represents the area of overlap between the two boxes, and
+how additional data, LoRA integration, and the combination of both
+|AUB| represents the total area covered by both boxes. Average Preci- _impact object detection performance. The results illustrate the interplay
+sion (AP) is computed by calculating the area under the Precision-Recall
+between data diversity and low-rank adaptation, offering insights into
+curve for a specific IoU threshold. It effectively summarizes the model's _ optimal strategies for clinical MSK US imaging where data scarcity and
+Precision across all levels of Recall. The AP can be approximated using _ privacy constraints are prevalent.
+the formula:
+3.
+Results
+AP = (Recall, + Recall,1) # Precision,
+(9)
+"
+3.1.
+Comparison of overall performance
+where n indexes the points in the Precision-Recall curve. For mAP50, we
+;
+a
+;
+calculate the AP at a single IoU threshold of 0.50. This means that a
+Table
+1 summarizes 5-fold cross-validation outcomes comparing a
+detection is considered correct if the IoU between the predicted and _baseline RT-DETR with various fine-tuning setups using external leg
+ground truth bounding boxes is at least 0.50.
+mAP5O serves asa standard
+_‘ata or combined data. Results show that the baseline model often ex-
+benchmark, providing a straightforward measure of the model's per-
+_Periences a marked decline in performance when fine-tuned solely on
+formance in detecting objects with reasonable overlap.
+external leg data. For example, in Fold 2, mAP50 falls from 0.739 to
+To obtain a more comprehensive assessment, we also compute
+0.559 (about 24.4 % lower), while mAP50:95 drops from 0.418 to 0.321
+mAPS50:95, which averages the AP across multiple IoU thresholds
+(23.2 % decrease). Across all folds, these decreases range from approx-
+ranging from 0.50 to 0.95 in increments of 0.05. This metric is defined
+imately —6.4% to —24.4% in mAPS5O and —9.8% to —23.2% in
+as:
+mAPS50:95, indicating that narrowing the fine-tuning data to a specific
+region can significantly affect overall model accuracy—even if that re-
+ig
+gion was part of the original pretraining.
+maP=
+2 APiou-0.50-005(-1)
+@0)
+In contrast, our LoRA-enhanced method retains strong identification
+~
+ability despite being fine-tuned only on external leg data, and it still
+where k is the number of IoU thresholds considered (in this case,
+k =
+correctly identifies forearm or shoulder structures that do not appear in
+10). mAP50:95 provides a detailed evaluation of the model's perfor
+_the new training set. For instance, in Fold 2, when fine-tuned exclusively
+mance, requiring it not only to detect objects but also to localize them _ on leg data, our model achieves an mAPS50 of 0.757 (a 2.4% improve-
+with higher precision across various levels of overlap. This compre-
+Ment over the baseline’s original 0.739), keeping mAP50:95 at 0.418
+hensive evaluation is crucial for assessing how well a model performs in
+__and thus demonstrating resilience against domain shifts. This stability,
+diverse scenarios, ensuring both accurate detection and precise locali-
+ranging from a 2.44 % improvement to a minimal —0.75 % change in
+zation of objects.
+mAPS0, suggests that LoRA-based fine-tuning avoids imbalances in the
+A higher mAP score, whether for mAP5SO or mAP50:95, indicates
+model's identification capabilities.
+superior model performance. It signifies that the model maintains high
+Moreover, blending both pretraining and external data generally
+Precision and Recall across different IoU thresholds,
+reflecting
+its
+boosts performance further. In Fold 3, the baseline model improved
+robustness and reliability in accurately identifying andlocalizing objects.
+from 0.809 to 0.848 mAP50 when external data was also included.
+within images.
+However, our LoRA method, using the same combined data, reached
+By utilizing the evaluation metrics Precision, Recall, andmAP enable
+_0.842 mAP50, indicating comparable or even better outcomes with far
+to comprehensively assess the performance of our object detection
+fewer parameters. Because LoRA focuses on low-rank parameter up-
+models. These metrics provide valuable insights into the models’
+dates, it can adapt efficiently without needing exposure to the entire
+training corpus, thereby complying with strict data-sharing policies.
+7
+
+
+JeP. Kao et al.
+‘Computerized Medical Imaging and Graphics 124 (2025) 102583
+Notably, conventional full-model retraining can harm performance
+Figs. 3 and 4 illustrate the real-time annotation outcomes for Fold-1.
+on classes not found in the new training set. LORA overcomes this by
+_Notably, in Fig. 3(b), the baseline model fails to detect the TP structure,
+selectively adjusting critical layers, preserving knowledge of forearm
+and in Fig.
+4(b),
+it does not localize the TN. In contrast, our LoRA-
+and shoulder structures while still assimilating leg data. Thus, it main-
+enhanced model accurately identifies both TP and TN in their correct
+tains or even enhances accuracy across forearm, shoulder, and leg scans,
+anatomical positions, which aligns with the quantitative improvements
+which is a key asset for real-time clinical workflows with limited data
+observed in Table 3.
+availability.
+Fold-2’s results show similar trends , in class-level results further
+Overall, these findings confirm that LoRA-based fine-tuning consis- __ illustrate the benefits as shown in Table 4. For instance, BA drops a
+tently surpasses both standard and fully retrained baselines, sustaining _ staggering 100 % in mAPSO when the baseline is fine-tuned on external
+robust multi-region performance. By requiring fewer training examples
+_data alone, becoming essentially undetectable. However, our model’s
+and fewer parameters, it offers a practical, scalable approach to real
+_parameter-efficient adaptation reduces this deficit significantly, limiting
+time MSK US identification in diverse clinical settings.
+the BA decline to —8.75% (and even —9.9% with pretraining and
+external data), a major recovery compared to the baseline.
+For nerve classes like TN, baseline fine-tuning with external data
+3.2. Performance of 5-fold cross-validation using RT-DETR-L
+reduces performance by 83.7 %. In sharp contrast, our model elevates
+TIN’s performance by + 56.33 % using only external data, illustrating a
+Tables 3-7 provide a focused comparison of selected classes that
+dramatic improvement in a class that benefits from precise adaptation.
+exhibited more than a 5 % change in mAPSO under different fine-tuning —_ similarly, classes like RN, SS, TP, and TPT all show substantial positive
+strategies, while the full performance results are provided in Appendix
+shifts under our approach. For example, $$ experiences a —6.74 % drop
+Tables 1-5, In real-time annotation, only performance improvements or _with our model after external-only fine-tuning, a comparatively mild
+decreases exceeding 5% lead to significantly noticeable differences
+degradation compared to the baseline’s catastrophic outcomes in certain
+during inference. Figs.
+3-10 show selected US frames of the leg fromthe
+scenarios. Meanwhile, TPT sees a + 34.17 % improvement, showcasing
+validation set, crossing 5 folds. The bounding boxes are removed, and
+how targeted low-rank updates can reinforce performance in classes
+the class names are labelled in the middle of the bounding boxes for
+susceptible to data distribution shifts.
+better identification during clinical assessment.
+Overall, Fold-2 confirms that LoRA-based fine-tuning excels at
+The numerical results of Fold-1 are shown in Table 3. TN displays
+maintaining
+or improving performance
+across diverse anatomical
+remarkable gains under our LoRA-based adaptation due to low baseline
+structures, mitigating the severe performance degradation that plagues
+performance (mAPS50 of 0.133). While fine-tuning solely with external
+conventional full-model adaptation strategies.
+data in the baseline model had minimal impact on TN and even nega-
+Figs, 5 and 6 showcase the real-time annotation results for Fold-2
+tively affected other classes, our approach more than doubled TN’s
+under more challenging imaging conditions. In Fig.
+5(b), the baseline
+mAP50 from 0.133 to 0.279. This substantial improvement underscores
+model fails to detect both TN and FHL. Meanwhile, Fig.
+6 illustrates a
+LoRA’s ability to incorporate new domain knowledge without sacri-
+_pjurred frame captured during transducer movement, which makes ac-
+ficing identification quality for classes of previously low performance.
+_curate identification more difficult. As seen in Fig. 6(b), the baseline
+Other structures like FDL, which suffer a drastic —43.6% mAP50 —_model overlooks TPT and FDLT, whereas our model correctly identifies
+drop under baseline external data fine-tuning, retain a much more stable
+and localizes both structures. These visual improvements strongly align
+performance (-10.74 %) under our model. Similarly, FHL and TP, which
+—_with the numerical gains detailed in Table 4, reaffirming our model's
+show severe performance degradations in the fully fine-tuned baseline
+robustness and accuracy in demanding, real-time US scenarios.
+model, either partially recover or even surpass baseline accuracy with
+Fold-3’s class-level inspection reveals dramatic positive shifts for
+our approach. For instance, TP’s performance not only avoids large —_ challenging structures as shown in Table 5. TN’s low-performing at
+negative shifts but gains a modest + 8.95% under our external data
+0,177
+mAPS50.
+sees
+improvements
+ranging
+from
++ 89.83%
+to
+fine-tuning, indicating effective adaptation.
++ 199.44 % under various LoRA-based configurations. Such gains un-
+In summary, the LoRA-enhanced model demonstrates clear advan-
+_erscore the model’s capacity to learn nuanced features that were pre-
+tages: it prevents drastic performance losses encountered by conven-
+viously elusive.
+tional fine-tuning and can substantially improve low-performing classes.
+For FHL, which had a particularly low baseline of 0.0936, our
+This robust stability and adaptability are crucial in real-time clinical
+external-data adaptation method yields over 400 % improvement to
+scenarios where the model must generalize to multiple anatomical
+mAPSO as 0.506 in multiple scenarios. This shows that even hard-to-
+structures despite being fine-tuned on a narrow subset of data.
+detect, subtle structures can be significantly enhanced by selective
+fine-tuning.
+Table 3
+Deformable attention modules guided by LoRA appear instrumental
+Numerical results (mAPSO) of selected classes in Fold-1 which enhanced or
+_in stabilizing or improving performance in classes like Ulna, RN, and
+decreased over 5 % in our model with fine-tuning with external data.
+Brad, where
+the baseline fine-tuned with external data scenarios
+IN
+FDL
+FHL
+1?
+frequently show large negative shifts. Our model limits these losses or
+TWEpeR
+agg
+ogy
+oe
+:SC*«RVN.:«eneerates gains, confirming that fine-grained, low-rank updates
+(Baseline)
+enable precise recalibration of attention and representation layers for
+RT-DETRw/
+0.214
+0.483
+0.195
+0.66
+better generalization.
+External
+(+60.9 %)
+(-43.46 %)
+(—60.2 %)
+(—13.16 %)
+In essence, Fold-3 validates that our model can unlock large per-
+Renews
+0285
+0702
+0.368
+0.708
+formance gains for the most challenging classes while retaining or
+Pretraining
+—(+76.69%)
+ (-7.58%)
+ (-25.51%)
+(6.84%)
+improving performance in already well-performing classes. This dem-
+and Extemal
+onstrates a balanced,
+data-efficient, and widely generalizable fine-
+Data
+tuning capability.
+Our Model w/ = 0.279
+0.765
+0.534
+0.625
+Fig. 7 presents the real-time annotation results for Fold-3. In Fig. 7
+External
+209.7796)
+(40.74%)
+48.98%)
+(48.95%)
+(b), the baseline model struggles to detect most of the key structures of
+Our Model w/
+0.0931
+osi4
+0377
+0.672
+the leg including the TP, FDL, TN and FHL. In contrast, Fig.
+7(c) illus-
+retraining — (~30%)
+(5.02%)
+(-23.06%)
+(11.58 %)
+trates our model correctly identifies and localizes these tissues that
+and External
+closely match the ground truth in Fig.
+7(a). These visual findings also
+Data
+strongly correlate with the numerical improvements detailed in Table 5,
+8
+
+
+JeP. Kao et al.
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+Table 4
+Numerical results (mAPSO) of selected classes in Fold-2 which enhanced or decreased over 5 % in our model with fine-tuning with external data.
+BA
+RN
+Del
+ss
+TN
+TP
+TPT
+RT-DETR (Baseline)
+0.96
+0.468
+0.748
+0.816
+0.371
+0.408
+0.319
+RT-DETR w/ External Data
+0(—100.00%)
+0.57
+0.698
+0.898
+0.0606
+0.42 (42.94%)
+0.527
+(421.79 %)
+(6.82 %)
+(410.15 %)
+(83.67 %)
+(465.2%)
+RT-DETR w/ Pretraining and
+0.629
+0.462 (1.28%)
+0.962
+0.947
+0514
+0.584
+0.339 (+6.27 %)
+External Data
+(34.38 %)
+(428.61 %)
+(416.05 %)
+(438.54 %)
+(443.14 %)
+Our Model w/ External Data
+(0.876 (-8.75%)
+0.573
+0.67
+0.761
+0.58 (+56.33%)
+0.471
+0.427
+(4-22.44 %)
+(—9.36 %)
+(6.74 %)
+(415.44 %)
+(434.17 %)
+Our Model w/ Pretraining and
+0.865 (-9.9%)
+0.418,
+0.619
+0.68 (16.67%)
+0.429
+0.437 (47.11%)
+0.432
+External Data
+(10.68 %)
+(17.25 %)
+(415.63 %)
+(435.42. %)
+Table 5
+Numerical results (mAP5O) of selected classes in Fold-3 which enhanced or decreased over 5 % in our model with fine-tuning with external data.
+Ulna
+RN
+UN
+Brad
+Sup
+Soleus
+TN
+FDL
+FHL
+FDLT
+RT-DETR
+0.842
+0.82
+0.698
+0.83
+0.805
+0.78
+0.177
+0.912
+0.0936
+0.69
+(Baseline)
+RI-DETR w/
+0.67
+0.82
+0.504
+0.587
+0.701
+0.873
+0.219
+0.765
+0.562
+0.719
+External
+(-20.43%) _— (+0.%)
+(27.79%)
+(—29.28%) — (—12.92%) —_ (+11.92.%) — (+23.73%) — (—16.12%) — (+500.43%) — (+4.2 %)
+Data
+RT-DETRw/
+0.823
+0.787
+0.703
+0.838
+0.803
+0.85
+0.53
+0.891
+0.469
+0.747
+Pretraining
+(—2.26%)
+(4.02%)
+(40.72%)
+(40.96%)
+(0.25%)
+(48.97%)
+—(+199.44%)
+(2.3%)
+(4401.07%)
+(48.26 %)
+and
+External
+Data
+Our Model
+0.79
+0.878
+0.651
+0.694
+0.761
+0.879
+0.336
+0.974
+0.506
+0.726
+w/
+(6.18%) — (+7.07%)
+(6.73%)
+(-16.39.%)
+(5.47%)
+(+12.69%)
+(+ 89.83%)
+(46.8%)
+(+ 440.6%)
+(+ 5.22 %)
+External
+Data
+Our Model
+(0.843
+0.84
+0.72
+0.822
+0.821
+0.823
+0.395
+0.941
+0.498
+0.702
+w/
+(40.12%)
+(42.44%)
+(43.15%)
+(0.96%)
+_——(+1.99%)
+(45.51%)
+(123.16 %)
+(43.18%)
+——(+432.05%)
+(41.74%)
+Pretraining
+and
+External
+Data
+Table 6
+Numerical results (mAPSO) of selected classes in Fold-4 which enhanced or decreased over 5 % in our model with fine-tuning with external data.
+BA
+BR
+Soleus
+Gas
+TN
+FDL
+FDLT
+RT-DETR (Baseline)
+0.783
+0.958
+0.806
+0.87
+0.0074
+0.00559
+0.354
+RT-DETR w/ External Data
+0.726
+0.61
+0.718
+0.791
+0.00056
+0.00962
+0.0871
+(7.28 %)
+(—36.33 %)
+(10.92 %)
+(9.08 %)
+(—92.08 %)
+(82.79 %)
+(75.4%)
+RT-DETR w/ Pretraining and
+0.878
+0.941 (-1.77%)
+0.774(-3.97%)
+0.862
+0.0006
+0.103 (+84.26%)
+0.25 (~29.38 %)
+External Data
+(412.13 %)
+(0.92 %)
+(91.63%)
+Our Model w/ External Data
+(0.824
+0.788
+0.934
+0.921
+0.0185,
+0.102
+0.293
+(45.24 %)
+(17.75%)
+(415.88 %)
+(45.86 %)
+(4160.2 %)
+(482.47 %)
+(17.23 %)
+Our Model w/ Pretraining and
+0.865
+0.995 (+3.86%)
+ 0.832(+3.23%)
+0.855,
+0.0132
+0.0527 (-5.72%)
+0.262
+External Data
+(410.47 %)
+(1.72%)
+(485.65 %)
+(25.99 %)
+Table 7
+Numerical results (mAPSO) of selected classes in Fold-5 which enhanced or decreased over 5 % in our model with fine-tuning with external data.
+Humerus
+BA
+BR
+UN
+Bicep
+TN
+FHL
+TPT
+FDLT
+RT-DETR
+0.869
+0.646
+0.746
+0.621
+0.804
+0.228
+0.25
+0.821
+0.813
+(Baseline)
+RI-DETR w/
+0.705
+0.518
+0.253
+0.355
+0.607
+0.31
+0.245
+0.855
+0.802
+External Data
+(-18.87%) — (—19.81%)
+(66.09%)
+(42.83%) — (—24.55%)
+—(+35.96%) — (-2.%)
+(44.14%)
+(1.35 %)
+RT-DETR w/
+0.765
+0.62
+0.509
+0.936
+0.669
+0.247
+0.405
+0.868
+0.86
+Pretraining and
+= (11.97%)
+(4.02%)
+(31.77%)
+(450.72%)
+——(-16.79%)
+(48.33 %)
+(462%)
+(45.72%)
+(45.78 %)
+External Data
+Our Model w/
+0.823
+0.468
+0.666
+0.572
+0.742
+0.311
+0.299
+0.901
+0.897
+External Data
+(5.29%)
+ (—27.55%) — (—10.72%) — (—7.89%)
+—(—7.71%)
+(436.4%)
+(419.6%)
+(49.74%)
+—(+10.33 %)
+Our Model w/
+0.859
+0.578
+0.651
+0.559
+0.728
+0.337
+0.376
+0.882
+0.77
+Pretraining and
+(1.15%)
+(10.53%) — (-12.73%)
+(9.98 %)
+(9.45 %)
+(44781%)
+(450.4%)
+(47.43%)
+(5.29%)
+External Data
+9
+
+
+JeP. Kao et al.
+‘Computerized Medical Imaging and Graphics 124 (2025) 102583
+a
+b
+c
+1?
+1?
+|
+‘
+D
+.
+FDL
+*
+*
+Soleus:
+os
+Soleus
+TP
+Fig. 3. Real-time annotation results for Fold-1. (a) Ground truth with annotations for FDL, Soleus, and TP. (b) Baseline model after fine-tuning, detecting FDL and
+Soleus but missing TP. (c) Proposed model after fine-tuning, correctly identifying all structures: FDL, Soleus, and TP.
+a
+b
+c
+|
+1?
+|
+FDL
+=
+y
+=
+7
+=
+=
+Soleus
+15
+2
+f
+™
+-:
+TP
+:
+Fig. 4. Real-time annotation results for Fold-1.
+(a) Ground truth with annotations for FDL, Soleus, TP, and TN. (b) Baseline model after fine-tuning, detecting FDL,
+Soleus, and TP, but missing TN.
+(c) Proposed model after fine-tuning, correctly identifying all structures: FDL, Soleus, TP, and TN.
+a
+c
+FDL — Soleus
+7
+5:
+S
+:
+TN
+TN
+TP
+FHL
+Fig. 5. Real-time annotation results for Fold-2. (a) Ground truth with annotations for FDL, Soleus, TP, FHL, and TN. (b) Baseline model after fine-tuning, detecting
+FDL, Soleus, and TP, missing FHL and TN. (c) Proposed model after fine-tuning, correctly identifying all structures: FDL, Soleus, TP, FHL, and TN.
+a
+c
+TPT rout
+>
+Fig. 6. Real-time annotation results for Fold-2. (a) Ground truth with annotation for TPT and FDLT. (b) Baseline model after fine-tuning failing to detect any
+structures. (c) Proposed model after fine-tuning, correctly identifying all structures: TPT and FDLT.
+10
+
+
+JeP. Kao et al.
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+a
+[)
+c
+FDL ty
+.
+DL
+Sele
+:
+1P
+.
+:
+FHL
+J
+Fig. 7. Real-time annotation results for Fold-3. (a) Ground truth with annotations for TP, FDL, TN, Soleus, and FHL. (b) Baseline model after fine-tuning, detecting
+Soleus only, missing TP, FDL, TN, and FHL. (c) Proposed model after fine-tuning, correctly identifying all structures: TP, FDL, TN, Soleus, and FHL.
+a
+ic
+FDL__
+soleus
+:
+i
+:
+1
+E
+N
+:
+TP)
+FHL
+:
+Fig. 8. Real-time annotation results for Fold-4. (a) Ground truth with annotations for FDL, TN, Soleus, TP, and FHL. (b) Baseline model after fine-tuning, detecting
+FHL and Soleus, missing FDL, TN, and TP. (c) Proposed model successfully identifying all structures: FDL, TN, Soleus, TP, and FHL.
+a
+b
+c
+NE
+Soleus
+leus
+oi
+1N
+me.
+Lid
+FHL
+Fig. 9. Real-time annotation results for Fold-5. (a) Ground truth with annotations for FDL, Soleus, TN, TP, and FHL. (b) Baseline model after fine-tuning, detecting
+FDL, Soleus, and TP, missing TN and FHL. (c) Proposed model successfully identifying all structures: FDL, Soleus, TN, TP, and FHL.
+a
+b
+c
+i
+1!
+i
+=
+Fem
+=
+rT
+es
+FDL
+TN
+soleus
+‘
+a
+2s
+FHL
+Fig. 10. Real-time annotation results for Fold-5. (a) Ground truth with annotations for TPT, FDLT, FDL, TN, FHL, and Soleus. (b) Baseline model after fine-tuning,
+detecting TPT, FDL, and Soleus, missing FDLT, TN, and FHL. (c) Proposed model after fine-tuning, successfully identifying all structures: TPT, FDLT, FDL, TN, FHL,
+and Soleus.
+nu
+
+
+JeP. Kao et al.
+‘Computerized Medical Imaging and Graphics 124 (2025) 102583
+where TN and FHL both show significant gains in mAP50 (> +5 %)
+In essence, the improvements and controlled degradations recorded
+under LoRA-based fine-tuning.
+across all 5 folds underscore the model's clinical applicability and the
+In Fold-4 (Table
+6), BR shows a steep 36.33% decline when the _ success ofLow-Rank Adaptation in enabling versatile, data-efficient, and
+baseline model is fine-tuned with only external data. By contrast, our
+_privacy-conscious fine-tuning for MSK US imaging.
+model not only eliminates
+this drop but
+also achieves a 3.86%
+improvement over the baseline when supplemented with pretraining
+3.3.
+Comparative analysis of LoRA-enhanced RT-DETR variants
+data. Similar gains appear in Soleus (+15.88 %) and Gas (+5.86 %),
+indicating that lower-extremity muscle classes with subtle textural dif-
+To further validate the generalizability and scalability of our LoRA-
+ferences can be enhanced through LoRA without sacrificing previously
+_based fine-tuning strategy, we applied it to two RT-DETR model vari-
+learned representations.
+ants: RT-DETR-L (the original “Large” model) and RT-DETR-X (an
+Overall, Fold-4 underscores how our model consistently delivers
+“Extra-Large” model with roughly double the layers and parameters).
+stable and frequently improved detection metrics, even under difficult _ Table 8 summarizes their overall performance (mAP5O) of RT-DETR-L
+fine-tuning conditions. By focusing on selective low-rank updates, our
+and _RT-DETR-X across 5
+folds under the same fine-tuning setups
+method maintains performance on previously mastered domains while _ described in Section 2.7. Additionally, Table 9 highlights selected class-
+boosting accuracy on newly emphasized classes.
+level results in Fold 3 for RT-DETR-X, focusing on classes that exhibit
+Fig.
+8 presents the real-time annotation outcomes for Fold-4.InFig.8
+performance changes exceeding +5 % under the various fine-tuning
+(b), the baseline model struggles to delineate critical structures such as.
+approaches and the full, while the full performance results are pro-
+‘TN and EDL, reflecting the severe performance drops recorded in
+Table6
+_vided in Appendix Table 6-10.
+(e.g., TN at —92.08 % and FDL at 82.79 % when fine-tuned on external
+Despite RT-DETR-X havinga larger capacity, the overall trends align
+data only). By contrast, Fig.
+8(c) shows that our model successfully re-__closely with those observed in the RT-DETR-L experiments. Fine-tuning
+stores these identifications: the TN and FDL are clearly identified and
+_the entire RT-DETR-X model solely on external leg data often induces
+more precisely localized, matching the ground-truth markings in Fig.
+8
+moderate or severe performance drops on forearm or shoulder classes
+(a).
+not represented in the new dataset mirroring the performance drop
+In Fold-5 (Table 7), the Humerus drops only 5.29% under our _phenomenon seen in RT-DETR-L. For example, in fold-1, full-model fine-
+model, whereas the baseline fine-tuned externally loses 18.87%. BR _ tuning ofRT-DETR-X on external data reduces the mAPSO from 0.776 to
+also avoids the sharp decline seen with the baseline, indicating that
+0.633 (-20.08 %), similar in scale to the drop from 0.776 to 0.661
+LoRA’s parameter updates help preserve previously learned features.
+_(-14.82 %) observed with RT-DETR-L. However, when applying our
+Meanwhile, TPT and FDLT either show substantial gains or smaller
+LoRA-enhancement to RT-DETR-X and fine-tuning only with external
+losses under LoRA. TPT, for instance, improves by 9.74 % with external
+_data, the model demonstrates strong resilience, similar to the RT-DETR-
+data, demonstrating LoRA’s capacity to further boost already solid
+LL findings. For instance, in Fold 3, the LoRA-enhanced RT-DETR-X
+classes. Taken together, these results also echo earlier folds, LORA-based __ achieves an mAP50 of 0.858, a + 3 % improvement over the RT-DETR-X
+adaptation not only prevents severe performance drops but can also
+_baseline’s 0.833. Across the folds, the performance changes for the
+deliver meaningful improvements, confirming its strong suitability for
+LoRA-enhanced RT-DETR-X fine-tuned with external data range from
+real-time MSK US applications.
+2.02 % (Fold-1) to + 3% (Fold-3) compared to the respective RT-
+Fig.
+9 and Fig.
+10 illustrate the real-time annotation outcomes for
+DETR-X baseline, indicating stable adaptation. When fine-tuned with
+Fold-5. In
+Fig.
+9(b), the baseline model struggles to detect FDL and TN.
+_both pretraining and external data, the LoRA-enhanced RT-DETR-X
+By contrast,
+Fig.
+9(c) demonstrates that our model recovers these
+model generally maintains performance close to or slightly better than
+structures with higher accuracy and align more closely with the ground
+_the RT-DETR-X baseline, achieving gains up to + 4.38 % (Fold-5).
+truth in Fig.
+9(a), reflecting the positive performance shifts seen in
+A closer look at class-level results for Fold 3 (Table 9) further con-
+Table 7 (e.g., TN shows sizable improvement in mAPSO). In Fig.
+10(b),
+_firms that RT-DETR-X follows the same stability and adaptability pat-
+the baseline also reveals misclassification, particularly for TN. However, _ terns documented for RT-DETR-L. Notably, challenging leg-muscle
+Fig.
+10 (c) clearly shows that our model succeeds in identifying these
+_classes such as Soleus and TN still show large positive gains when LoRA
+smaller or more subtle structures despite potentially adverse imaging
+_is used. Soleus's mAPSO improves from 0.859 in the baseline to 0.927
+conditions. This visual validation also aligns with the numerical data in
+_(+7.92 %) with LoRA-based external-data fine-tuning, while TN sees an
+Table 7, where TPT and EDLT record appreciable gains under LoRA fine-
+_even more striking jump (from 0.252 to 0.612, +142.86 %). As with RT-
+tuning.
+DETR-L, LoRA helps prevent severe degradation on previously learned
+Across all 5 folds, the selective results presented consistently confirm
+classes: for example, RN maintains competitive accuracy (0.778 vs.
+that large parameter shifts induced by conventional full-model fine-
+_0.736 baseline) with LoRA, whereas the fully fine-tuned baseline had
+tuning can severely diminish performance on classes not represented in _dropped RN to 0.725These improvements confirm that increasing the
+the new
+training
+data.
+In
+contrast,
+the LoRA-enhanced RT-DETR
+model size does not negate the benefits of parameter-efficient fine-tun-
+approach focusing on low-rank updates within carefully chosen layers
+__ing. In fact, the larger RT-DETR-X provides higher absolute mAP for
+enables the model to incorporate new information efficiently while
+many classes, and LoRA effectively preserves those gains under domain
+safeguarding previously learned features. This is evident from the ca-
+_shift.
+pacity
+to improve or
+at
+least maintain performance
+for multiple
+Overall, our LoRA-enhanced approach scales effectively to both RT-
+anatomical structures, including nerves, bones, arteries, and tendons,
+ DETR-L and RT-DETR-X, providing robust performance across varied
+even when the fine-tuning data are limited to a single anatomical region
+_anatomical structures and dataset shifts. Larger backbones naturally
+(ie., leg data) and do not cover forearm or shoulder structures.
+start with higher baseline accuracy, but they can be more susceptible to
+The
+classes highlighted
+in
+these
+tables exhibited performance
+domain shifts when fully retrained on sparse or narrow data. By isolating
+changes above 5 %, signifying meaningful differences in a clinical, real-__
+fine-tuning to low-rank parameters, LoRA preserves prior knowledge
+time inference setting. By improving challenging structures (such as _ while efficiently assimilating new anatomical information. This consis-
+nerves with low baseline scores) and preserving robust identification for
+tency across both “Large” and “Extra-Large” variants reinforces the
+well established classes, our LoRA-enhanced approach demonstrates the
+practical viability of our method and underscores
+its potential to
+crucial balance needed for practical deployment: it can adapt to new
+_generalize broadly, even as model sizes continue to grow in future
+patient
+populations
+or
+imaging
+protocols
+without
+requiring
+full
+transformer-based architectures.
+retraining, extensive data sharing, or losing accuracy on previously
+mastered domains.
+12
+
+
+J-P. Kao et al.
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+Table 8
+Numerical results (mAP5O) of ther comparison of overall performance in RT-DETR-L and RT-DETR-X.
+Fold-1
+Fold-2
+Fold-3
+Fold-4
+Fold-5
+Model Size
+L
+x
+L
+x
+L
+x
+L
+x
+L
+x
+RT-DETRX
+0.776
+0.792
+0.739
+0.782
+0.809
+0.833
+0.767
+0.78
+0.795
+0.754
+(Baseline)
+-
+-
+-
+-
+-
+-
+-
+-
+-
+-
+RT-DETR-X w/
+0.661
+0.633,
+0.559
+0.684
+0.746
+0.783
+0.639
+0.679
+0.744
+0.747
+External Data
+(-14.82%)
+ (—20.08%)
+(—24.36%)
+(—12.53%)
+(—7.79%)
+(6%)
+(-16.69%)
+(—12.95%)
+(—6.42%)
+(—0.93 %)
+RT-DETRX w/
+0.764
+0.801
+0.733
+078
+0.848
+0.845
+0.778
+0.773
+0.761
+0.775
+Pretraining and
+(1.55%)
+(2.14%)
+(0.81%) — (—0.26 %)
+(44.82%)
+(41.44%)
+(41.43 %)
+(0.9%)
+(4.28%)
+(42.79%)
+External Data
+Our Model w/
+0.781
+0.776
+0.757
+0.783
+0.833
+0.858
+0.767
+0.773
+0.789
+0.765
+External Data
+(40.64%) — (—2.02%)
+(42.44%) — (40.13%)
+(42.87%)
+(+3 %)
+(40%)
+(0.9%)
+(-0.75%) — (+1.46 %)
+Our Model w/
+0.752
+0.8
+0.723
+0.52
+0.842
+0.84
+0.766
+0.774
+0.793
+0.787
+Pretraining and
+(3.09 9%)
+(2.01 %)
+(2.17%)
+(-3.84%)
+(44.08%)
+(44.08%)
+(-0.13 %)
+(0.77 %)
+(0.63%) — (44.38%)
+External Data
+Table 9
+Numerical results (mAP50) of selected classes in Fold-3 of RT-DETR-X model which enhanced or decreased over 5 % in our model with fine-tuning with external data.
+RN
+Soleus
+™N
+FHL
+TPT
+RT-DETR-X (Baseline)
+0.736
+0.859
+0.252
+0.478
+0.752
+RT-DETR-X w/ External Data
+0.725 (+1.49 %)
+0.903 (+5.12)
+0.436 (+73.02 %)
+0.258 (—46.03 %)
+0.876 (+16.19 %)
+RT-DETR-X w/ Pretraining and External Data
+0.815 (+10.73 %)
+0.871 (+1.4 %)
+0.341 (+35.32 %)
+0.571 (+8.16 %)
+0.882 (+17.29 %)
+Our Model w/ External Data
+0.778 (+5.71 %)
+0.927 (+-7.92 %)
+0.612 (+142.86 %)
+0.68 (+42.26 %)
+0.794 (+5.59 %)
+Our Model w/ Pretraining and External Data
+0.736 (0%)
+0.893 (+3.96 %)
+0.523 (+107.54 %)
+0.369 (22.8 %)
+0.765 (+1.73 %)
+4. Discussion
+annotated bones including the Humerus, Ulna, and Radius. However, we
+have not annotated the tibia in our leg dataset. Consequently, the Tibia
+Our LoRA-enhanced RT-DETR model
+addresses
+several
+critical
+is sometimes misdetected as another bone class, as observed in some
+challenges in medical imaging-based object detection, particularly the __ frames in Appendix Video 2. To address these issues, one simple solution
+difficulties associated with fine-tuning large transformer-based archi- _ is to add annotations for the tibia in the leg dataset so that the trans-
+tectures in environments characterized by limited training data, strict
+former model can better learn the relationships among the anatomical
+privacy requirements, and diverse imaging protocols. By focusing on _ structures. An alternative approach is to enhance our post-processing
+low-rank parameter updates during fine-tuning, our approach signifi- _ algorithm by incorporating conditional logic (for example, preventing
+cantly reduces computational overhead, mitigates catastrophic forget- _ the detection of forearm anatomical structures when most structures in
+ting, and preserves performance on previously learned classes, even
+_the current frame belong to the leg) or by applying an algorithm similar
+when fine-tuned on narrow, specialized datasets.
+to Relation of Frame (Chu
+et
+al.,
+2024) that takes into account the results
+In our study, we enrolled 25 healthy volunteers as an initial feasi-_
+from previous frames.
+bility cohort. However, this relatively small group of healthy individuals
+Supplementary material related to this article can be found online at
+may not fully capture the range of anatomical and pathological varia-
+—_doi:10.1016/j.addma.2020.101681.
+tions encountered in clinical practice. In addition, the distribution of
+To emulate real-world conditions where external datasets are used
+images among the forearm, shoulder, and leg was not balanced, with the
+for model adaptation, we introduced a subset of leg images as an
+leg region comprising the smallest proportion of the dataset. This
+external dataset. Although this strategy allowed us to assess adaptation
+distributional skew is a key reason why the overall performance gains
+_to an unfamiliar domain, larger and more heterogeneous datasets would
+were modest during fine-tuning (mAPSO changes ranging only from _ offer a more realistic evaluation. Such datasets should ideally include a
+-0.75
+% to+2.87
+% in RT-DETR-L). Despite these constraints, our 5-fold
+wider demographic range, different ultrasound devices with varied
+evaluations
+revealed significant improvements in some leg-specific __ resolutions, and more pathological cases. In clinical practice, MSK US
+classes, indicating that the model can still adapt effectively even when _ examinations are highly time-sensitive, with clinicians depending on
+data from a particular anatomical region are limited. From a clinical
+immediate and accurate feedback during procedures. Unlike traditional
+standpoint, it is notable that structures such as tendons and nerves,
+object detection models that display bounding boxes with labels, we
+which often demand meticulous scanning techniques and exhibit subtle
+adopted a simpler annotation strategy in our system: class names are
+sonographic features required a longer training period during pre-
+displayed at the center of each detected structure during real-time
+training to reach acceptable accuracy. However, once domain-specific __ inference. MSK structures often lack clear rectangular boundaries, so
+leg images were introduced in the fine-tuning phase, these classes
+_relying on standard bounding boxes may not accurately reflect the true
+converged more rapidly, sometimes within just one to three epochs. This.
+anatomical region and could interfere with procedures (e.g., ultrasound-
+observation suggests that after an initial period of broad feature learning
+guided injections). Our text-only labeling approach removes bulky
+on more abundant forearm and shoulder images, the model becomes _ boxes, reducing visual clutter and allowing the operator to concentrate
+more agile at assimilating data from an underrepresented category.
+on the area of clinical interest. From a broader perspective, our model
+Notably, there remain some cases that often lead to misdetections in
+_contributes to the growing body of research on parameter-efficient fine-
+real-time identification of MSK US images. During probe movement, the
+__tuning strategies in healthcare.
+image may appear blurred due to the angle of the skin. In addition,
+Beyond RT-DETR, our fine-tuning strategy could be applied to other
+bones create a significant acoustic impedance mismatch, which causes
+_transformer-based object detectors with similar architectures, including
+them to appear highly reflective and display as hyperechoic (bright
+Deformable DETR (Zhu et al., 2020), DN-DETR (Li et al., 2022), and
+white) regions on the image. Because no sound waves can pass through
+DINO (Zhang et
+al.,
+2022). These recently developed DETR variants
+bone, the area deep to the bone is always dark, and the boundaries of
+introduce
+innovations
+like
+multi-scale
+deformable
+attention
+and
+bones remain consistent in ultrasound images. In our dataset, we have
+denoising-based
+training,
+but
+all
+retain
+the
+core
+transformer
+13
+
+
+JoP, Kao et al
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+encoder-decoder
+structure,
+making
+LoRA
+integration
+technically
+by imbalanced datasets, particularly benefiting anatomically complex or
+feasible.
+LoRA modules can be inserted
+into
+their attention and
+underrepresented structures (e.g., nerves). Thirdly, extending the LoRA
+feed-forward layers in the same manner
+as we did for RT-DETR, enabling _ fine-tuning framework to multimodal imaging applications by inte-
+parameter-efficient adaptation of even the latest detectors. For example, __ grating complementary modalities like MRI, CT, or clinical exam data
+Deformable DETR’s multi-scale attention heads could be enhanced with
+alongside ultrasound holds substantial potential. Transformer architec-
+low-rank updates to quickly adapt the model to ultrasound images
+tures specifically designed for multimodal data fusion, with LoRA
+without retraining the entire network. Similarly, high-accuracy models
+modules applied across modality-specific attention layers, may yield
+such as DN-DETR and DINO could be fine-tuned on specialized medical
+models with superior generalization and richer diagnostic insights.
+datasets using LoRA, combining their advanced detection capabilities
+Finally, comprehensive clinical validation involving diverse patholog-
+with the efficiency and privacy benefits of our approach. We anticipate
+_ical conditions and multi-institutional datasets remains crucial. Con-
+that extending our LoRA strategy to these DETR-based frameworks
+ducting multi-center evaluations and employing federated learning
+would allow practitioners to leverage cutting-edge object detection _ techniques would robustly assess our model's clinical performance and
+performance in new domains (e.g., other anatomies or imaging modal- __compatibility with privacy-preserving workflows. These research di-
+ities) with minimal data and computational burden. This broader
+rections collectively aim to strengthen the real-world applicability,
+applicability underscores the
+flexibility of low-rank adaptation for
+robustness, and interpretability of our LoRA-enhanced transformer
+transformer models and could accelerate adoption of transformer-based
+models in medical imaging.
+detectors in medical imaging settings.
+Despite the positive outcomes, there remain several methodological
+5. Conclusion
+challenges and limitations. First, our LoRA integration was confined to
+specific encoder and decoder layers of the RT-DETR architecture. While
+In this study, we introduced a novel LoRA-enhanced RT-DETR model
+this targeted design was effective, it introduces an architectural de- _ that significantly advances real-time, full-body MSK US object detection.
+pendency that the optimal choice of layers for LoRA insertion may vary
+_By integrating low-rank adaptation into carefully selected layers of RT-
+for different model designs or tasks. We did not explore adapting earlier
+| DETR, we reduced trainable parameters by 94.45 % (RT-DETR-L) and
+transformer layers or the CNN backbone; such alternatives might cap-
+99.68 % (RT-DETR-X) without sacrificing detection accuracy, even
+ture different feature refinements but could also risk more catastrophic
+when fine-tuning on small, specialized datasets.
+forgetting. Second, we fixed the LoRA rank at 16 for all experiments,
+Our extensive experiments including 5-fold cross-validation and
+without fully investigating if this rank is optimal for every class or model __ detailed class-level analyses, confirmed that this parameter-efficiency
+size. Notably,
+r
+= 16 worked well even for the much larger RT-DETR-X,
+_not only avoids the catastrophic forgetting seen with conventional
+suggesting it provided sufficient adaptation capacity for that model.
+_full-model retraining but also benefits previously underserved, complex
+However, a higher rank might benefit certain complex patterns in a __ structures such as nerves, flexor muscles, and smaller tendons. More-
+larger architecture, or conversely, some simpler structures might be _ over, fine-tuning with specific dataset using our model can achieve same
+adequately tuned with a smaller rank. In principle, the rank hyper-
+_or even better performance with finetuning with pretrained dataset and
+parameter could be adjusted in a class-specific way or determined
+_external dataset. Hence, the use of LoRA which do not requires pre-
+adaptively via validation, which might further improve fine-tuning ef
+_trained dataset aligns with privacy-preserving, federated learning par-
+ficiency and stability. Third, our fine-tuning performance still showed
+_adigms by requiring only updated low-rank factors to be shared, thus
+sensitivity to dataset composition. For instance, the overall mAP gains __ mitigating data-sharing barriers often encountered in clinical settings.
+were muted by the scarcity of leg images, implying that severe class or
+Beyond achieving robust performance across forearm, shoulder, and
+region imbalance can blunt the benefits of LoRA-based fine-tuning.
+_leg US scans, and even onalarger RT-DETR-X variant, our LoRA-based
+Underrepresented classes may receive less relative improvement, even __ strategy demonstrates that high-capacity transformer models can be
+though our approach preserved their baseline performance. Addressing _ tuned for new clinical domains with minimal computational overhead.
+this might require data augmentation or class-conditioned adaptation to
+—_The approach effectively adapts the model to diverse anatomical regions
+ensure
+equitable
+performance
+gains.
+The
+LoRA-enhanced
+model
+without requiring extensive data collection or infrastructure, while still
+demonstrated robustness to the domain shift we introduced, but more
+maintaining real-time inference speeds. This balance of efficiency and
+extreme shifts in image resolution or noise could still degrade perfor-
+accuracy underscores the practicality of our method in day-to-day
+mance. In real-world deployment across multiple sites, variations in
+_clinical workflows. By integrating LoRA into additional imaging mo-
+imaging protocols and equipment might necessitate additional fine-
+_dalities, we anticipate accelerated adoption of Al-assisted diagnostics
+tuning or complementary techniques. For example, combining LoRA _ across healthcare institutions. This will ultimately improve patient care
+with knowledge distillation has been proposed as a way to maintain __ through faster, more accurate, and more widely accessible MSK imaging
+performance
+across devices with varying image
+quality. Extensive
+solutions.
+testing on diverse patient populations with pathological findings is also
+essential to confirm that our fine-tuning approach
+generalizes
+to
+CRediT authorship contribution statement
+detecting abnormal conditions (e.g., tendon tears, nerve swelling, or
+masses) not present in the training data. If the model struggles with
+Wen-Shiang Chen: Writing — review & editing, Writing — original
+certain pathologies, further adaptation or targeted retraining would be
+_draft,
+Supervision,
+Resources,
+Project administration, Methodology,
+required before clinical deployment.
+Investigation, Funding acquisition, Data curation, Conceptualization.
+To further improve and validate our LoRA-enhanced RT-DETR
+—_ Jyun-Ping Kao: Writing - review & editing, Writing — original draft,
+approach, several promising research directions emerge. Firstly, devel-
+_Visualization, Validation, Software, Resources, Project administration,
+oping adaptive strategies for automatically selecting the optimal low- __ Methodology, Investigation, Formal analysis, Data curation, Conceptu-
+rank dimensionality across different model layers or classes can signif _ alization. Yu-Ching Chung: Writing — review & editing, Writing —
+icantly enhance model performance. An adaptive rank selection mech- _ original draft, Visualization, Formal analysis, Data curation. Hao-Yu
+anism, tuned dynamically through validation or training progress,
+Hung: Software, Data curation. Chun-Ping Chen: Writing
+- review &
+would ensure adequate adaptation capacity where it is most needed, _ editing, Supervision, Resources.
+thereby balancing
+fine-tuning
+stability,
+model
+generalization,
+and
+parameter
+efficiency.
+Secondly,
+exploring
+class-conditional
+tuning
+Declaration of Competing Interest
+strategies such as dedicated low-rank updates or class-specific scaling
+factors that could effectively mitigate performance degradation caused
+The authors declare that they have no known competing financial
+4
+
+
+JeP. Kao et al.
+‘Computerized Medical Imaging and Graphics 124 (2025) 102583
+interests or personal relationships that could have appeared to influence
+Data statement
+the work reported in this paper.
+The dataset used in this study was approved by the Institutional
+Acknowledgments
+Review Board (IRB) of National Taiwan University Hospital (NTUH)
+with
+Case Number
+No.
+202012007RINA
+for human
+research.
+The
+This study was approved by the Institutional Review Board ofNTUH _ dataset is available upon reasonable request from the IRB ofNTUH after
+No. 202012007RINA for human research. This work was also supported
+_the dataset is anonymized.
+by the National Science and Technology Council, Republic of China
+(Taiwan) under Grant 111-2314-B-002-167.
+Appendix
+A.1 Full Numerical Performance (mAP50) of RT-DETR-L Evaluated Using 5-Fold Cross-Validation
+Appendix Table 1
+Numerical performance (mAP50) for all classes of RT-DETR-L in Fold-1
+All
+MN
+Radius
+Ulna
+RN
+UN
+Brad
+sup
+Baseline
+0.776
+0.718
+0.498
+0.518
+0.704
+0.692
+0.560
+0.803
+RT-DETR with External Data
+0.661
+0.462
+0.524
+0.405
+0.707
+0.213
+0.485
+0.809
+(14.82%)
+(35.65%)
+(45.22%)
+(21.81%)
+(40.43%)
+(69.22%)
+(13.39%)
+(40.75%)
+RT-DETR with Pretraining
+0.764
+0.683
+0.531
+0.532
+0.751
+0.626
+0.543
+0.819
+and External Data
+(-1.55 %)
+(-4.87 %)
+(46.63 %)
+(42.70 %)
+(+6.68 %)
+(-9.54 %)
+(-3.04 %)
+(4+1.99 %)
+Our Model with External
+0.781
+0.709
+0.536
+0.534
+0.676
+0.686
+0.525
+0.816
+Data
+(40.64 %)
+(-1.25 %)
+(47.63 %)
+(43.47 %)
+(-3.98 %)
+(-0.87 %)
+(-1.43 %)
+G4+1.56 %)
+Our Model with Pretraining
+0.752
+0.704
+0.472
+0.470
+0.655
+0.724
+0.533
+0.779
+and External Data
+(3.09 %)
+(1.95%)
+(5.22%)
+(9.27%)
+(6.96%)
+(+4.62.%)
+(3.75%)
+(2.99%)
+Bicep
+Del
+Humerus (Sh.)
+SS
+Infm
+Soleus
+Gas
+1N
+Baseline
+0.970
+0.994
+0.995,
+0.995,
+0.967
+0.982
+0.922
+0.133
+RT-DETR with External Data
+0.664
+0.994
+0.995,
+0.986
+0.967
+0.807
+0.882
+0.214
+(31.55%)
+(0.00 %)
+(0.00 %)
+(0.90%)
+(0.00 %)
+(17.82%)
+(8.68 %)
+(4-60.90 %)
+RT-DETR with Pretraining
+0.977
+0.994
+0.995
+0.995
+0.969
+0.886
+0.937
+0.235
+and External Data
+(40.72 %)
+(0.00 %)
+(0.00 %)
+(0.00 %)
+(40.31 %)
+(-9.76 %)
+(4+1.63 %)
+(476.69 %)
+Our Model with External
+0.966
+0.994
+0.995,
+0.995,
+0.995,
+0.967
+0.916
+0.279
+Data
+(-0.41 %)
+(0.00 %)
+(0.00 %)
+(0.00 %)
+(42.89 %)
+(-1.53 %)
+(-0.65 %)
+(4109.77 %)
+Our Model with Pretraining
+0.978
+0.994
+0.995
+0.995
+0.948
+0.948
+0.946
+0.093
+and External Data
+(40.21 %)
+(0.00 %)
+(0.00 %)
+(0.00 %)
+(-1.96 %)
+(-1.12 %)
+(42.60 %)
+(—30.00 %)
+Model
+FDL
+FHL
+TP
+TPT
+FDLT
+Baseline
+0.857
+0.490
+0.760
+0.974
+0.991
+RT-DETR with External Data
+0.483
+0.195,
+0.660
+0.905.
+0.905
+(-43.64 %)
+(-60.2 %)
+(-13.16 %)
+(-7.08 %)
+(-8.68 %)
+RT-DETR with Pretraining
+0.792
+0.365
+0.708
+0.939
+0.905
+and Extemal Data
+(7.58%)
+(25.51%)
+(6.84 %)
+(3.59%)
+(0.20%)
+Our Model with External
+0.765
+0.534
+0.828
+0.973
+0.990
+Data
+(10.74%)
+(48.98 %)
+(48.95%)
+(0.10 %)
+(0.10%)
+Our Model with Pretraining
+0.814
+0.377
+0.672
+0.941
+0.991
+and External Data
+(5.02 %)
+(23.06%)
+(11.58%)
+(3.39%)
+(0.00 %)
+Appendix Table 2
+Numerical performance (mAP50) for all classes of RT-DETR-L in Fold-2
+All
+MN
+Humerus
+BA
+Radius
+Ulna
+BR
+RN
+Baseline
+0.739
+0.955
+0.995,
+0.960
+0.843
+0.782
+0.995,
+0.468
+RT-DETR with External
+0.559
+0.900
+0.995
+0. (-100 %)
+0.725
+0.604
+0.995 (0.00 %)
+0.57
+Data
+(-24.36 %)
+(—100.00 %)
+(0.00 %)
+(-14.00 %)
+(-22.76 %)
+(421.79 %)
+RT-DETR with Pretraining
+0.733
+0.955 (0.00%)
+0.995.
+0.629
+0.872
+0.807
+0.995 (0.00%)
+0.462
+and External Data
+(-0.81 %)
+(0.00 %)
+(-34.48%)
+(43.44 %)
+(43.19 %)
+(-1.28 %)
+Our Model with External
+0.757
+0.944
+0.995,
+0.876
+0.819
+0.808
+0.995 (0.00 %)
+0.573
+Data
+(42.44%)
+(-1.15 %)
+(0.00 %)
+(8.75 %)
+(-2.85 %)
+(43.32 %)
+(-22.44 %)
+Our Model with Pretraining
+0.723
+0.960
+0.993
+0.865
+0.812
+0.808
+0.995 (0.00%)
+0.418
+and External Data
+(-2.17 %)
+(40.52 %)
+(-0.20 %)
+(-9.90 %)
+(-3.68 %)
+(43.32 %)
+(-10.68 %)
+UN
+Brad
+‘Sup
+Bicep
+Del
+Humerus (Sh.)
+SS.
+Infm
+Baseline
+0.322
+0.710
+0.642
+0.870
+0.748
+0.993
+0.816
+0.991
+RT-DETR with External
+0.034
+0.357
+0.508
+0.620
+0.697
+0.992
+0.898
+0.972
+Data
+(-89.60 %)
+(-49.72 %)
+(-20.87 %)
+(-28.74 %)
+(6.82 %)
+(-0.10 %)
+(410.05 %)
+(-1.92 %)
+RT-DETR with Pretraining
+0.301
+0.462
+0.701
+0.863
+0.962
+0.994
+0.974
+0.992
+and External Data
+(-6.52 %)
+(-34.93 %)
+(49.20 %)
+(-0.80 %)
+(+28.61 %)
+(40.10 %)
+(416.05 %)
+(40.10 %)
+Our Model with External
+0.369
+0.694
+0.702
+0.863
+0.678
+0.994
+0.761
+0.989
+Data
+(414.60 %)
+(-2.25 %)
+(49.35 %)
+(-0.80 %)
+(-9.36 %)
+(40.10 %)
+(6.74%)
+(0.20 %)
+(continued on next page)
+15
+
+
+JoP, Kao et al
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+Appendix Table 2 (continued)
+All
+MN
+‘Humerus
+BA
+Radius
+Ulna
+BR
+RN
+Our Model with Pretraining
+0.340
+0.704
+0.637
+0.779
+0.619
+0.993
+0.68 (-16.67%)
+0.989
+and External Data
+(45.59%)
+(0.85 %)
+(0.78 %)
+(-10.46%)
+—(-17.25 %)
+(0.00 %)
+(0.20 %)
+Soleus
+Gas
+™N
+FDL
+FHL
+1P
+Ter
+FDLT
+Baseline
+0.876
+0.944
+0.371
+0.910
+0.634
+0.408
+0.319
+0.435
+RT-DETR with External
+0.680
+0.964
+0.061
+0.680
+0.632
+0.42
+0.527
+0.404
+Data
+(22.38%)
+(42.1296)
+(83.67%)
+(25.27%)
+(0.32%)
+42.94 %)
+(465.20 %)
+(-53.10 %)
+RT-DETR with Pretraining
+0.922
+0.950
+0.514
+0.863
+0.594
+0.584
+0.471
+0.483
+and External Data
+(45.25 %)
+(40.64 %)
+(38.54%)
+(-5.16 96)
+(6.31%)
+(443.14%)
+—(4154.44%)
+(411.03 %)
+Our Model with External
+0.879
+0.973
+0.580
+0.903
+0.641
+0.471
+0.428
+0.426
+Data
+(40.34 %)
+(43.07 %)
+(+56.33%) — (-0.77 %)
+1.10%)
+15.44%)
+434.17 96)
+(2.07 %)
+Our Model with Pretraining
+0.895
+0.994
+0.429
+0.945
+0.597
+0.437
+0.432
+0.313
+and External Data
+42.17 %)
+(45.30%)
+(15.63%)
+(+3.85 96)
+(5.84 %)
+7.11%)
+(435.42 %)
+(—28.05 %)
+Appendix Table 3
+Numerical performance (mAPS50) for all classes of RT-DETR-L in Fold-3
+All
+MN
+Humerus
+Radius
+Ulna
+BR
+RN
+UN
+Baseline
+0.809
+0.884
+0.968
+0.906
+0.842
+0.828
+0.820
+0.698
+RT-DETR with External Data
+0.746
+0.800
+0.992
+0.868
+0.670
+0.862
+0.82(+0%)
+0.504
+(7.79%)
+(-10.00 %)
+(42.48 %)
+(4.14%)
+(20.43%)
+(44.11 %)
+(27.79%)
+RT-DETR with Pretraining
+0.848
+0.899
+0.984
+0.884
+0.823,
+0.887
+0.787
+0.703
+and External Data
+(44.82%)
+(41.36%)
+(41.65%)
+(2.43%)
+(2.26 %)
+(47.14%)
+(4.02%)
+(+0.72)
+Our Model with External
+0.833
+0.868
+0.986
+0.883
+0.79
+0.850
+0.878
+0.651
+Data
+42.97 %)
+(1.81%)
+1.81%)
+(2.54%)
+(6.18 %)
+(42.66%)
+(47.07%)
+(6.73 %)
+Our Model with Pretraining
+0.842
+0.897
+0.988
+0.908
+0.843
+0.838
+0.840
+0.720
+and External Data
+(44.08 %)
+(41.47 %)
+(42.07 %)
+(40.22 %)
+(40.12%)
+41.21 %)
+42.44%)
+(43.15.96)
+Brad
+Sup
+Bicep
+Del
+Humerus (Sh)
+SS
+Infm
+Soleus
+Baseline
+0.830
+0.805
+0.977
+0.988
+0.990
+0.995
+0.989
+0.78
+RT-DETR with External Data
+0.587
+0.701
+0.959
+0.970
+0.990
+0.995
+0.989
+0.873
+(29.28%)
+(-12.92.%)
+(1.84%)
+(1.82%)
+(0.00 %)
+(0.00 %)
+(0.00 %)
+411.92.%)
+RT-DETR with Pretraining
+0.838
+0.803 (-0.25%)
+0.989
+0.989
+0.990
+0.995
+0.995
+0.850
+and External Data
+(40.96 %)
+(41.23 %)
+(40.10%)
+(0.00 %)
+(0.00 %)
+40.40%)
+(+9.87 96)
+Our Model with External
+0.694
+0.761
+0.983
+0.978
+0.990
+0.995
+0.989
+0.879
+Data
+(16.39%)
+(-8.47 %)
+(40.61 %)
+1.01 %)
+(0.00 %)
+(0.00 %)
+(0.00 %)
+412.69. %)
+Our Model with Pretraining
+0.822
+0.821
+0.979
+0.988 (0.00%)
+0.988
+0.995
+0.948
+0.823
+and External Data
+(0.96 %)
+(41.99%)
+(40.20%)
+(0.00 %)
+(0.00 %)
+(1.00%)
+(45.51.96)
+Gas
+™N
+FDL
+FHL
+1P
+TPT
+FDLT
+Baseline
+0.900
+0.177
+0.912
+0.094
+0.955
+0.72
+0.690
+RT-DETR with External Data
+0.851
+0.219
+0.765
+0.562
+on2
+0.905
+o.719
+(5.44%)
+(423.73 %)
+(16.12%)
+4500.43%)
+(25.45%)
+(417.19%)
+(44.20%)
+RT-DETR with Pretraining
+0.905
+0.530
+0.891
+0.469
+0.708
+0.939
+0.747
+and External Data
+(40.56 %)
+(199.44%) — (-2.3.96)
+(4+-401.07%)
+(6.84 96)
+G4-21.63%)
+——(+8.26 96)
+Our Model with External
+0.926
+0.336
+0.947 (+6.8%)
+0.506
+0.926
+0.769
+0.726
+Data
+42.89 %)
+(489.83 %)
+4-440.60%)
+(3.0496)
+(0.39 %)
+(45.22%)
+Our Model with Pretraining
+0.893
+0.395
+0.941
+0.498
+0.943,
+0.710
+0.702
+and External Data
+(0.78 %)
+4123.16 %)
+(43.18 %)
+(4-432.05%)
+__(-1.26 96)
+(-8.03 %)
+(41.74%)
+Appendix Table 4
+Numerical performance (mAPS50) for all classes of RT-DETR-L in Fold-4
+All
+MN
+Humerus
+BA
+Radius
+ulna
+BR
+RN
+Baseline
+0.767
+0.789
+0.955
+0.783
+0.844
+0.797
+0.958
+0.686
+RT-DETR with External Data
+0.639
+0.574
+0.956
+0.726
+0.76
+0.670
+0.61
+0.641
+(16.69%)
+(27.25%)
+——(+0.10 %)
+(7.28%)
+(8.05 %)
+(15.97%)
+(36.33%)
+(6.56 %)
+RT-DETR with Pretraining
+0.848
+0.896
+0.986
+0.884
+0.823
+0.824
+0.941
+0.703
+and External Data
+(410.56%)
+—(413.56%)
+(43.25%)
+(412.93 %)
+(2.49%)
+(43.39%)
+(1.77%)
+(42.48-%)
+Our Model with External
+0.778
+0.861
+0.986
+0.824
+0.831
+0.788
+0.788
+0.686
+Data
+(41.43 %)
+49.12%)
+(43.25 %)
+(45.24%)
+(1.54%)
+1.13%)
+(-17.75%)
+(0.00%)
+Our Model with Pretraining
+0.766
+0.781
+0.955 (0.00%)
+0.865
+0.864
+0.834
+0.995
+0.694
+and External Data
+(0.13 %)
+1.01%)
+410.47 %)
+(42.37 %)
+(44.64%)
+(43.86 %)
+1.17%)
+UN
+Brad
+Sup
+Bicep
+Del
+Humerus (Sh)
+$$
+Infm
+Baseline
+0.809
+0.910
+0.693
+0.814
+0.974
+0.993
+0.992
+0.994
+RT-DETR with External Data
+0.206
+0.530
+0.735
+0.761
+0.983
+0.985
+0.994
+0.993
+(74.54%)
+(41.76%)
+(6.60%)
+(6.51%)
+(40.92 %)
+(0.81 %)
+(40.20 %)
+(0.10 %)
+RT-DETR with Pretraining
+0.838
+0.569
+0.769
+0.806
+0.994
+0.994
+0.994
+0.995
+and External Data
+(43.58.%)
+(37.47%)
+(+3.39.%)
+(0.98 %)
+(42.05 %)
+40.10%)
+(40.10 %)
+(40.10 %)
+Our Model with External
+0.845
+0.910
+0.706
+0.834
+0.994
+0.994
+0.984
+0.995
+Data
+(44.45 %)
+(0.00 %)
+41.88 %)
+42.46%)
+(42.05 %)
+40.10%)
+(0.81 %)
+(40.10%)
+(continued on next page)
+16
+
+
+JoP, Kao et al
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+Appendix Table 4 (continued)
+All
+MN
+Humerus
+BA
+Radius
+Ulna
+BR
+RN
+Our Model with Pretraining
+0.834
+0.892
+0.701
+0.834
+0.988
+0.991
+0.991
+0.995
+and External Data
+1.17%)
+(1.98 %)
+G1.15%)
+42.46 %)
+(1.95 %)
+(0.10%)
+(0.10 %)
+(40.10%)
+Soleus
+Gas
+™N
+FDL
+FHL
+TPT
+FDLT
+Baseline
+0.806
+0.870
+0.007
+0.056
+0.806
+0.995
+0.354
+RT-DETR with External Data
+0.718
+0.791
+0.001
+0.010
+0.683
+0.947
+0.087
+(10.92%)
+(9.08%)
+(92.08 %)
+(82.79 %)
+15.29%)
+(4.82%)
+(75.43%)
+RT-DETR with Pretraining
+0.744
+0.862
+0.000563
+0.469
+0.844
+0.992
+0.25
+and External Data
+(3.97%)
+(0.92%)
+(491.63 %)
+(+739.00%)
+(44.22%)
+(0.30%)
+(29.38 %)
+Our Model with External
+0.934
+0.921
+0.0185
+0.103
+0.709
+0.250
+0.293
+Data
+15.88%)
+(+5.86 96)
+(160.2%)
+(484.26 %)
+(12.03%)
+(29.38%)
+(+17.23 %)
+Our Model with Pretraining
+0.832
+0.855
+0.013
+0.053
+0.644
+0.995
+0.262
+and External Data
+(43.23 %)
+(1.72%)
+(485.65 %)
+(5.72%)
+(20.10%)
+(0.00%)
+(25.99 %)
+Appendix Table 5
+Numerical performance (mAPS50) for all classes of RT-DETR-L in Fold-5
+All
+MN
+Humerus
+BA
+Radius
+Ulna
+BR
+RN
+Baseline
+0.795
+0.875
+0.869
+0.646
+0.795
+0.75
+0.746
+0.775
+RT-DETR with External Data
+0.692
+0.683
+0.705
+0.518
+0.761
+0.832
+0.253
+0.734
+(12.96%)
+(21.94%)
+(18.87 %)
+(-19.81 %)
+(4.28 %)
+(47.35 %)
+(42.83%) — (~5.29.%)
+RT-DETR with Pretraining
+0.761
+0.749
+0.765
+0.620
+0.849
+0.807
+0.509
+0.748
+and External Data
+(4.28 %)
+(14.40%)
+(11.91 %)
+(4.02%),
+(46.78 %)
+(44.13 %)
+(31.77%)
+(3.48 %)
+Our Model with External
+0.78
+0.817
+0.859
+0.4618
+0.840
+0.806
+0.666
+0.748
+Data
+(2.14%)
+(6.63 %)
+(1.15 %)
+(27.55 %)
+(45.66 %)
+(44.00 %)
+(10.72%)
+(3.48 %)
+Our Model with Pretraining
+0.793
+0.817
+0.859
+0.578
+0.882
+0.806
+0.651
+0.748
+and External Data
+(0.25 %)
+(6.63 %)
+(1.15 %)
+(-10.53 %)
+(410.88 %)
+(44.00%)
+(12.73%)
+(-3.48.%)
+UN
+Brad
+Sup
+Bicep
+Del
+Humerus (Sh)
+SS
+Inf
+Baseline
+0.621
+0.934
+0.939
+0.804
+0.994
+0.994
+0.981
+0.995
+RT-DETR with External Data
+0.355
+0.472
+0.823
+0.607
+0.859
+0.982
+0.960
+0.995
+(42.83%)
+(49.46%)
+(“12.35 %)
+(24.50%)
+(13.58 %)
+(1.21%)
+(2.14%)
+(0.00 %)
+RI-DETR with Pretraining
+(0.936
+0.531
+0.946
+0.669
+0.994 (0.00%)
+0.994(0.00%)
+0.948
+0.995
+and External Data
+(50.72%)
+(43.15%)
+(40.75%)
+(16.79%)
+(3.36 %)
+(0.00 %)
+Our Model with External
+0.572
+0.931
+0.946
+0.742
+0.994(0.00%)
+ 0.994(0.00%)
+0.991
+0.995
+Data
+(-7.89.%)
+(0.32%)
+40.75 %)
+(47.71%)
+(40.41 %)
+(0.00 %)
+Our Model with Pretraining
+0.559
+0.919
+0.916
+0.728
+0.988
+0.991
+0.988
+0.995
+and External Data
+(9.98 %)
+(1.61%)
+(2.45 %)
+(9.45%),
+(0.60 %)
+(0.30%)
+40.71 %)
+(0.00 %)
+Soleus
+Gas
+™
+FDL
+FHL
+TP
+TPT
+FDLT
+Baseline
+0.885
+0.845
+0.228
+0.957
+0.250
+0.738
+0.821
+0.813,
+RT-DETR with External Data
+0.770
+0.735
+0.310
+0.765
+0.245
+0.640
+0.855
+0.802
+(12.99%)
+(13.02%)
+——_(+35.96%)
+(16.12%)
+(2.00 %)
+(-13.28 %)
+(44.14 %)
+(1.35 %)
+RT-DETR with Pretraining
+0.925
+0.850
+0.247
+0.963
+0.405
+0.510
+0.866
+0.860
+and External Data
+(44.52.%)
+(40.59%)
+(48.33 %)
+(40.63 %)
+(462.00 %)
+(-30.89 %)
+(45.48-%)
+45.78 %)
+Our Model with External
+0.902
+0.880
+0.311
+0.765
+0.299
+0.926
+0.901
+0.897
+Data
+(41.92%)
+44.14%)
+(436.40 %)
+(10.74 %)
+(419.60 %)
+(425.41 %)
+49.74%)
+(+10.33%)
+Our Model with Pretraining
+0.927
+0.830
+0.337
+0.955
+0.376
+0.882
+0.882
+0.770
+and External Data
+(44.75 %)
+(1.78%)
+(447.81 %)
+(0.21 %)
+(450.40 %)
+(419.57 %)
+(47.43. %)
+(5.29 %)
+A.2 Full Numerical Performance (mAPS5O) of RT-DETR-X Evaluated Using 5-Fold Cross-Validation
+Appendix Table 6
+Numerical performance (mAPS50) for all classes of RT-DETR-X in Fold-1
+All
+MN
+Radius
+ulna
+RN
+UN
+Brad
+sup
+Baseline
+0.792
+0.794
+0.553
+0.570
+0.796
+0.634
+0.642
+0.749
+RT-DETR with External Data
+0.633
+0.451
+0.556
+0.392
+0.802
+0.001
+0.538
+0.745
+(20.08%)
+(43.20%)
+(40.54%)
+(-31.23%)
+(40.75 %)
+(99.79%)
+(-16.20%)
+(0.53 %)
+RT-DETR with Pretraining
+0.801
+0.739
+0.556
+0.462
+0.656
+0.815
+0.644
+0.837
+and External Data
+1.14%)
+(6.93 %)
+(40.54%)
+(18.95%) — (-17.59%)
+-—(+28.55%)
+——(+0.31 %)
+(411.75 %)
+Our Model with External
+0.76
+0.760
+0.583
+0.452
+0.756
+0.591
+0.605
+0.838
+Data
+(2.02%)
+(4.28%)
+45.42%)
+(20.70%)
+(5.03 %)
+(6.78 %)
+(5.76 %)
+(411.88 %)
+Our Model with Pretraining
+0.800
+0.762
+0.559
+0.502
+0.748
+0.664
+0.646
+0.807
+and External Data
+1.01 %)
+(4.03 %)
+41.08 %)
+(11.93%)
+(6.03 %)
+44.73%)
+(40.62%)
+47.74%),
+Bicep
+Del
+Humerus (Sh)
+SS
+Infm
+Soleus
+Gas
+1™N
+Baseline
+0.949
+0.995
+0.995
+0.986
+0.988
+0.967
+0.854
+0.261
+RT-DETR with External Data
+0.799
+0.994
+0.994
+0.979
+0.987
+0.468
+0.75
+0.095
+(-15.81%)
+(0.10%)
+(0.10%)
+(0.71 %)
+(0.10 %)
+(-81.60%) — (-9.25%)
+(63.56 %)
+RT-DETR with Pretraining
+0.976
+0.994
+0.994
+0.984
+0.966
+0.982
+0.923
+0.287
+and External Data
+42.85 %)
+(0.10%)
+(0.10%)
+(0.20 %)
+(2.23%)
+G1.55 %)
+(48.08 %)
+(49.96%)
+Our Model with External
+0.870
+0.993
+0.994
+0.994
+0.987
+0.921
+0.874
+0.379
+Data
+(8.32%)
+(0.20%)
+(0.10%)
+40.81 %)
+(0.10 %)
+(4.76 %)
+42.34%)
+(445.21 %)
+(continued on next page)
+7
+
+
+JoP, Kao et al
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+Appendix Table 6 (continued)
+All
+MN
+Radius
+Ulna
+RN
+UN
+Brad
+Sup
+Our Model with Pretraining
+0.913
+0.995
+0.994
+0.987
+0.980
+0.987
+0.899
+0.236
+and External Data
+(3.79%)
+(40.00%)
+(0.10%)
+(40.10 %)
+(0.81 %)
+(42.07 %)
+(45.27%)
+(9.58%)
+Model
+FDL
+FHL
+1P
+TPT
+FDLT
+Baseline
+0.747
+0.763
+0.673
+0.939
+0.992
+RT-DETR with External Data
+0.444
+0.414
+0.335
+0.915
+0.968
+(40.56%)
+(45.74%)
+(50.22%)
+(2.56 9)
+(2.42%)
+RT-DETR with Pretraining
+0.791
+0.727
+0.753
+0.942
+0.989
+and External Data
+(45.89 %)
+(4.72%)
+11.89%)
+(40.32%)
+(0.30 %)
+Our Model with External
+0.703
+0.694
+0.954
+0.605
+0.960
+Data
+(5.89 %)
+(9.04%)
+(441.75%) — (-35.57%) —— (-3.23 %)
+Our Model with Pretraining
+0.764
+0.75
+0.845
+0.950
+0.994
+and External Data
+(42.28 %)
+41.57%)
+25.56%)
+(41.17%)
+(40.20 %)
+Appendix Table 7
+Numerical performance (mAPS50) for all classes of RT-DETR-X in Fold-2
+All
+MN
+Humerus
+BA
+Radius
+ulna
+BR
+RN
+Baseline
+0.782
+0.968
+0.995
+0.897
+0.869
+0.738
+0.955
+0.288
+RT-DETR with External Data
+0.684
+0.747
+0.990
+0.423
+0.848
+0.756
+0.557
+0.382
+(12.53%)
+(-22.83%) —— (-0.50%)
+(82.84%)
+(-2.42.%)
+42.44%)
+(41.68 %)
+(432.64 %)
+RT-DETR with Pretraining
+0.780
+0.965
+0.976
+0.817
+0.905
+0.822
+0.932
+0.372
+and External Data
+(0.26 %)
+(0.31 %)
+1.91%)
+(8.92 %)
+4.14%)
+(11.38%)
+(-2.41 %)
+(429.17 %)
+Our Model with External
+0.783
+0.968
+0.995
+0.805
+0.874
+0.735
+0.993
+0.389
+Data
+(40.13 %)
+(40.00%)
+(40.00%)
+(10.26%)
+(+0.58.%)
+(0.41 %)
+(43.98 %)
+(435.07 %)
+Our Model with Pretraining
+0.752
+0.966
+0.993
+0.832
+0.856
+0.739
+0.978
+0.321
+and External Data
+(3.84%)
+(0.21 %)
+(0.20%)
+(7.25 %)
+(1.50%)
+40.14 %)
+2.41%)
+(411.46 %)
+UN
+Brad
+Sup
+Bicep
+Del
+Humerus (Sh)
+SS
+Infm
+Baseline
+0.499
+0.815
+0.674
+0.927
+0.810
+0.991
+0.907
+0.988
+RT-DETR with External Data
+0.257
+0.727
+0.726
+0.887
+0.914
+0.993
+0.926
+0.959
+(48.50%)
+(10.80%)
+(47.72%)
+(431%)
+(12.84%)
+(40.20 %)
+42.09 %)
+(2.94%),
+RT-DETR with Pretraining
+(0.236
+0.724
+0.673
+0.920
+0.939
+0.994
+0.967
+0.971
+and External Data
+(52.71%)
+(11.17%)
+(0.15%)
+(0.76 %)
+(15.93%)
+(+0.30 %)
+(46.62%)
+(1.72%)
+Our Model with External
+0.500
+0.816
+0.708
+0.916
+0.806
+0.993
+0.910
+0.982
+Data
+(40.20 %)
+(40.12%)
+(45.04%)
+(1.19%)
+(0.49 %)
+(40.20 %)
+(40.33 %)
+(0.61 %)
+Our Model with Pretraining
+0.395
+0.75
+0.681
+0.864
+0.760
+0.994
+0.762
+0.975
+and External Data
+(-20.84%)
+(4.91%)
+(41.04%)
+(6.80 %)
+(6.17%)
+(40.30 %)
+(15.99 %)
+(1.32%)
+Soleus
+Gas
+™N
+FDL
+FHL
+P
+TPT
+FDLT
+Baseline
+0.905
+0.995
+0.526
+0.903
+0.623
+0.546
+0.525
+0.649
+RT-DETR with External Data
+0.850
+0.988
+0.285
+0.932
+0.335
+0.375
+0.444
+0.423
+(6.08 %)
+(0.70%)
+(45.82%)
+(+3.21 %)
+(46.23%)
+(31.32%)
+(15.43 %)
+(-34.82.%)
+RT-DETR with Pretraining
+0.893
+0.994
+0.556
+0.920
+0.555
+0.519
+0.578
+o71s
+and External Data
+(1.33 %)
+(0.10%)
+45.70%)
+41.88 %)
+(-10.91%)
+—(~4.95 %)
+(410.10 %)
+(410.17 %)
+Our Model with External
+0.905
+0.995
+0.592
+0.916
+0.629
+0.488
+0.514
+0.576
+Data
+(40.00 %)
+(40.00%)
+12.55%)
+(41.44%)
+(40.96 %)
+(-10.62%) — (-2.10%)
+(-11.25 %)
+Our Model with Pretraining
+0.895
+0.995
+0.421
+0.959
+0.647
+0.468
+0.428
+0.590
+and External Data
+(1.10%)
+(40.00 %)
+(£19.96 %)
+(46.20%)
+(43.85 %)
+(14.29%)
+(18.48%)
+(9.09 %)
+Appendix Table 8
+Numerical performance (mAPS50) for all classes of RT-DETR-X in Fold-3
+All
+MN
+Humerus
+Radius
+ulna
+BR
+RN
+UN
+Baseline
+0.833,
+0.845
+0.965
+0.919
+0.849
+0.785
+0.736
+0.706
+RT-DETR with External Data
+0.783
+0.462
+0.975
+0.886
+0.701
+0.696
+0.725
+0.547
+(6.00 %)
+(45.33 %)
+41.04%)
+(3.59%)
+(17.43%)
+(11.34%)
+(1.49%)
+(-22.52%)
+RT-DETR with Pretraining
+0.845
+0.897
+0.992
+0.875
+0.829
+0.821
+0.815
+0.689
+and External Data
+41.44%)
+(46.15%)
+42.80%)
+(4.79 %)
+(2.36 %)
+(44.59%)
+(410.73 %)
+(2.41%)
+Our Model with External
+0.858
+0.827
+0.961
+0.908
+0.831
+0.788
+0.78
+0.704
+Data
+(43.00 %)
+(-2.13.%)
+(0.41%)
+(1.20 %)
+(2.12%)
+(40.38 %)
+5.71%)
+(0.28 %)
+Our Model with Pretraining
+0.840
+0.886
+0.979
+0.891
+0.837
+0.760
+0.736
+0.666
+and External Data
+(40.84 %)
+(44.85%)
+41.45%)
+(3.05 %)
+(1.41%)
+(3.18 %)
+(40.00 %)
+(-5.67 %)
+Brad
+Sup
+Bicep
+Del
+Humerus (Sh.)
+SS
+Infm
+Soleus
+Baseline
+0.845,
+0.800
+0.976
+0.986
+0.992
+0.994
+0.987
+0.859
+RT-DETR with External Data
+0.800
+o.715
+0.936
+0.963
+0.991
+0.995
+0.982
+0.903
+(5.33 %)
+(-10.63 %)
+(4.10%)
+(2.33 %)
+(0.10 %)
+(40.10 %)
+(0.51%)
+(45.12%),
+RT-DETR with Pretraining
+0.843
+0.778
+0.974
+0.980
+0.987
+0.994
+0.989
+0.871
+and External Data
+(0.24 %)
+(-2.75.%)
+(0.20%)
+(0.61 %)
+(0.50 %)
+(40.00 %)
+(40.20 %)
+(41.40%),
+Our Model with External
+0.831
+0.787
+0.939
+0.980
+0.991
+0.994
+0.978
+0.927
+Data
+(1.66 %)
+(1.63 %)
+(3.79%)
+(0.61%)
+(0.10%)
+(40.00 %)
+(0.91 %)
+(47.92%),
+(continued on next page)
+18
+
+
+JoP, Kao et al
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+Appendix Table 8 (continued)
+All
+MN
+Humerus
+Radius
+ulna
+BR
+RN
+UN
+Our Model with Pretraining
+0.864
+0.823
+0.978
+0.974
+0.990
+0.994
+0.986
+0.893
+and External Data
+(42.25 %)
+(42.87 %)
+(+0.20 %)
+(1.22%)
+(0.20 %)
+(40.00 %)
+(0.10 %)
+(43.96%)
+Gas
+1™N
+FDL
+FHL
+TP
+TPT
+FDLT
+Baseline
+0.906
+0.252
+0.982
+0.478
+0.922
+0.752
+0.790
+RT-DETR with External Data
+0.846
+0.436
+0.852
+0.258
+0.844
+0.876
+0.846
+(6.62%)
+(473.02 %)
+(13.24%)
+(46.03%)
+(8.46%)
+(16.49%)
+(+7.09 %)
+RT-DETR with Pretraining
+0.944
+0.341
+0.884
+0.517
+0.915
+0.882
+0.776
+and External Data
+44.19 %)
+(435.32 %)
+9.98 %)
+48.16 %)
+(0.76 %)
+(17.29%)
+(-1.77%)
+Our Model with External
+0.870
+0.612
+0.971
+0.680
+0.909
+0.794
+0.824
+Data
+(3.97 %)
+(4142.86%) — (-1.12.%)
+(42.26%)
+(-1.41.%)
+45.59%)
+(44.30 %)
+Our Model with Pretraining
+0.890
+0.523
+0.964
+0.369
+0.870
+0.765
+0.849
+and External Data
+(1.77%)
+107.54%) —_ (-1.83 %)
+(-22.80%)
+(5.64%)
+1.73%)
+(47.47 %)
+Appendix Table 9
+Numerical performance (mAPS50) for all classes of RT-DETR-X in Fold-4
+All
+MN
+Humerus
+BA
+Radius
+Ulna
+BR
+RN
+Baseline
+0.780
+0.75
+0.955
+0.802
+0.912
+0.854
+0.995
+0.631
+RT-DETR with External Data
+0.679
+0.465
+0.955 (+0.00%)
+0.878
+0.880
+0.717
+0.989
+0.592
+(12.95%)
+(40.00 %)
+49.48 %)
+(351%)
+(16.04%)
+(0.60%)
+(6.18 %)
+RT-DETR with Pretraining
+0.773
+0.833,
+0.955 (+0.00%)
+0.878
+0.925
+0.859
+0.995
+0.614
+and External Data
+(0.90 %)
+(47.48%)
+(49.48 %)
+(41.43 %)
+(40.59 %)
+(40.00 %)
+(2.69%)
+Our Model with External
+0.73
+0.780
+0.955 (+0.00%)
+0.895
+0.917
+0.798
+0.993
+0.647
+Data
+(0.90 %)
+(40.65 %)
+(11.60%)
+(40.55 %)
+(6.56%)
+(0.20%)
+(42.54%),
+Our Model with Pretraining
+0.774
+0.764
+0.955 (+0.00%)
+0.771
+0.911
+0.837
+0.995
+0.639
+and External Data
+(0.77 %)
+(1.42%)
+(3.87 %)
+(0.11 %)
+(1.99%)
+(40.00 %)
+(41.27 %)
+UN
+Brad
+Sup
+Bicep
+Del
+Humerus (Sh.)
+$$
+Infm
+Baseline
+0.880
+0.914
+0.667
+0.822
+0.994
+0.993
+0.988
+0.995
+RT-DETR with External Data
+0.524
+0.74
+0.650 (-2.55%)
+0.764
+0.991
+0.989
+0.97
+0.995
+(40.45%)
+(-15.32.%)
+(7.06 %)
+(0.30 %)
+(0.40%)
+1.11%)
+(+0.00.%)
+RT-DETR with Pretraining
+0.831
+0.919
+0.610 (-8.55%)
+0.805
+0.993
+0.994
+0.983
+0.992
+and External Data
+(5.57 %)
+(40.55 %)
+(2.07 %)
+(0.10%)
+(40.10 %)
+(0.51 %)
+(0.30%)
+Our Model with External
+0.731
+0.906
+0.662 (-0.75%)
+0.819
+0.984
+0.992
+0.981
+0.995
+Data
+(-16.93%)
+(0.88%)
+(0.36 %)
+1.01 %)
+(0.10 %)
+(0.71 %)
+(40.00 %)
+Our Model with Pretraining
+0.832
+0.931
+0.700 (+4.95%)
+0.772
+0.973
+0.991
+0.990
+0.994
+and External Data
+(5.45 %)
+(41.86%)
+(6.08 %)
+(2.11%)
+(0.20%)
+(40.20 %)
+(0.10 %)
+Soleus
+Gas
+™N
+FDL
+FHL
+TPT
+FDLT
+Baseline
+0.927
+0.990
+0.001
+0.085
+0.764
+0.995
+0.220
+RT-DETR with External Data
+0.618
+0.789
+0.003
+0.007
+0.488
+0.753
+0.141
+(33.33%)
+(20.30%)
+(4435.00 %)
+(-91.67%)
+ (-36.13%)
+(24.32%)
+(35.91 %)
+RT-DETR with Pretraining
+0.895
+0.959
+0.001
+0.096
+0.626
+0.995
+0.257
+and External Data
+(3.45 %)
+(-3.13.%)
+(446.83 %)
+(12.06%)
+(-18.06%)
+——_(+0.00.%)
+(416.82 %)
+Our Model with External
+0.927
+0.982
+0.008
+0.140
+0.683
+0.995
+0.218
+Data
+(40.00 %)
+(0.81 %)
+(+1310.00%)
+—(+63.93%)
+(10.60%)
+(0.00 %)
+(0.91 %)
+Our Model with Pretraining
+0.903
+0.970
+0.006
+0.085
+0.671
+0.995
+0.344
+and External Data
+(2.59%)
+(2.02 %)
+(966.67 %)
+(0.94 %)
+(12.17%)
+__(+0.00.%)
+(456.36 %)
+Appendix Table 10
+Numerical performance (mAPS50) for all classes of RT-DETR-X in Fold-5
+All
+MN
+Humerus
+BA
+Radius
+Ulna
+BR
+RN
+Baseline
+0.754
+0.766
+0.768
+0.737
+0.812
+0.7
+0.757
+0.709
+RT-DETR with External Data
+0.747
+0.754
+0.625
+0.618
+0.849
+0.823
+0.320
+0.753
+(0.93 %)
+(1.57 %)
+(18.62%)
+(16.15%)
+(44.56 9%)
+(46.88 %)
+(57.73%)
+(+6.21.96)
+RT-DETR with Pretraining
+0.775
+0.759
+0.918
+0.804
+0.864
+0.732
+0.828
+0.806
+and External Data
+42.79%)
+(0.91 %)
+(419.53 %)
+49.09 %)
+(+6.40.%)
+(4.94%)
+(49.38 %)
+(413.68 %)
+Our Model with External
+0.765
+0.817
+0.700
+0.565
+0.863
+0.840
+0.523
+0.759
+Data
+41.46 %)
+(46.66%)
+(8.85 %)
+(23.34%)
+(+6.28.%)
+49.09 %)
+(30.91%)
+(+7.05 9)
+Our Model with Pretraining
+0.787
+0.813
+0.780
+0.685
+0.875
+0.842
+0.828
+0.741
+and External Data
+(44.38. %)
+(46.14%)
+41.56 %)
+(7.06 %)
+(47.76%)
+(49.35 %)
+(49.38 %)
+44.51%)
+UN
+Brad
+Sup
+Bicep
+Del
+Humerus (Sh)
+SS
+Infm
+Baseline
+0.608
+0.922
+0.936
+0.901
+0.995
+0.994
+0.99
+0.995
+RT-DETR with External Data
+0.577
+0.922
+0.927
+0.673
+0.990
+0.993
+0.988
+0.995
+(5.10%)
+(40.00 %)
+(0.96 %)
+(-25.31%)
+(0.50%)
+(0.10%)
+(0.20 %)
+(40.00 %)
+RT-DETR with Pretraining
+0.431
+0.949
+0.955
+0.796
+0.995
+0.994
+0.955
+0.995
+and External Data
+(29.11%)
+(42.93 %)
+42.03 %)
+(-11.65%)
+—_(+0.00.%)
+(40.00 %)
+(3.54%)
+(40.00 %)
+Our Model with External
+0.549
+0.939
+0.952
+0.830
+0.994
+0.992
+0.989
+0.995
+Data
+(9.70%)
+(41.84%)
+171%)
+(7.88 %)
+(0.10 %)
+(0.20 %)
+(0.10 %)
+(40.00 %)
+(continued on next page)
+19
+
+
+JoP, Kao et al
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+Appendix Table 10 (continued)
+All
+MN
+Humerus
+BA
+Radius
+Uina
+BR
+RN
+Our Model with Pretraining
+0.619
+0.945
+0.954
+0.825
+0.995
+0.993
+0.991
+0.995
+and External Data
+1.81%)
+(42.49 %)
+41.92%)
+(8.44%)
+(+0.00.%)
+(0.10 %)
+(40.10 %)
+(40.00 %)
+Soleus
+Gas
+TN
+FDL
+FHL
+1?
+TPT
+FDLT
+Baseline
+0.751
+0.66
+0.237
+0.946
+0.079
+0.674
+0.587
+0.752
+RT-DETR with External Data
+0.844
+O74
+0.505
+0.949
+0.043
+0.504
+0.882
+0.938
+(412.38%)
+(48.18 %)
+(4113.08%)
+(40.32%)
+(45.57%)
+(25.22%)
+(+50.26%)
+(424.73 %)
+RT-DETR with Pretraining
+0.767
+0.795
+0.246
+0.947
+0.026
+0.486
+0.963
+0.813
+and External Data
+42.13 %)
+4-20.45 %)
+——(+3.80 96)
+(40.11 %)
+(67.09%)
+(—27.89%)
+—(+64.05%)
+——(+8.11 %)
+Our Model with External
+0.916
+O77.
+0.437
+0.936
+0.041
+0.536
+0.885
+0.774
+Data
+(421.97%)
+ (+16.82%)
+(484.39 %)
+(1.06 %)
+(-48.10%)
+(20.47%)
+(50.77%)
+(42.93 %4)
+Our Model with Pretraining
+0.879
+0.674
+0.500
+0.965
+0.058
+0.591
+0.830
+oni2
+and External Data
+17.04%)
+(42.12%)
+(+110.97%)
+(42.01%)
+(26.58%)
+(-12.31%)
+(41.40%)
+(5.32%)
+A.3 Layer added with LoRA in RT-DETR
+Appendix Table 11
+The layer of RT-DETR-L which was added with the LoRA module with rankr = 16. The layer shape [output, input] is the original weight matrix denoting the numberof
+output dimension and input dimension. LoRA matrix
+A shape is the size ofLORA matrix A with output dimension as the rank r = 16 and input dimension as the layer’s
+input size. LoRA matrix B shape is the size of LRA matrix B with iuput dimension as the rank r= 16 and output dimension as the layer’s output size
+Module
+Layer Added with LoRA
+Layer Shape
+LoRA matrix A Shape
+LoRA matrix B Shape
+AIFL
+Fully Connect Layer—1
+(1024, 256]
+(16, 256]
+[1024, 16]
+AIL
+Fully Connect Layer—2
+[256, 1024]
+(16, 1024]
+[256, 16]
+RT-DETR Decoder
+Gross-Attention Offsets Layer—1
+[192, 256]
+(16, 256]
+[192, 16)
+RT-DETR Decoder
+Gross-Attention Weights Layer—1
+[96, 256]
+(16, 256]
+[16,96]
+RT-DETR Decoder
+Gross-Attention Value Layer—1
+[256, 256]
+(16, 256]
+[256, 16]
+RT-DETR Decoder
+Gross-Atention Output Layer—1
+[256, 256]
+(16, 256]
+[256, 16]
+RT-DETR Decoder
+Feed-Forward Network~1 Layer—1
+[1024, 256]
+(16, 256]
+(1024, 16]
+RT-DETR Decoder
+Feed-Forward Network~2 Layer—1
+[256, 1024]
+[16, 1024]
+[256, 16]
+RT-DETR Decoder
+Gross-Attention Offsets Layer—2
+[192, 256]
+(16, 256]
+[192, 16]
+RT-DETR Decoder
+Gross-Attention Weights Layer—2
+[96, 256]
+(16, 256]
+[16,96]
+RT-DETR Decoder
+Gross-Atention Value Layer—2
+[256, 256]
+(16, 256]
+[256, 16]
+RT-DETR Decoder
+Gross-Atention Output Layer—2
+[256, 256]
+(16, 256]
+[256, 16]
+RT-DETR Decoder
+Feed-Forward Network~1 Layer~2
+[1024, 256]
+(16, 256]
+(1024, 16]
+RT-DETR Decoder
+Feed-Forward Network~2 Layer—2
+[256, 1024]
+[16, 1024]
+[256, 16]
+Appendix Table 12
+The layer of RT-DETR-X which was added with the LoRA module with rank r = 16. The layer shape [output, input] is the original weight matrix denoting the number of
+output dimension and input dimension. LoRA matrix
+A shape is the size ofLORA matrix A with output dimension as the rank r = 16 and input dimension as the layer’s
+input size. LoRA matrix B shape is the size of LRA matrix B with iuput dimension as the rank r= 16 and output dimension as the layer’s output size
+Module
+Layer Added with LoRA
+Layer Shape
+LoRA matrix A Shape
+LoRA matrix B Shape
+AIL
+Fully Connect Layer—1
+[2048, 384]
+(16, 384]
+[2048, 16]
+AIL
+Fully Connect Layer~2
+[384, 2048]
+[16, 2048]
+[384, 16]
+RT-DETR Decoder
+Gross-Attention Offsets Layer—1
+[192, 256]
+(16, 256]
+[192, 16)
+RT-DETR Decoder
+Gross-Attention Weights Layer—1
+[96, 256]
+(16, 256]
+[16,96]
+RT-DETR Decoder
+Gross-Attention Value Layer—1
+[256, 256]
+(16, 256]
+[256, 16]
+RT-DETR Decoder
+Gross-Atention Output Layer—1
+[256, 256]
+(16, 256]
+[256, 16]
+RT-DETR Decoder
+Feed-Forward Network~1 Layer—1
+[1024, 256]
+(16, 256]
+(1024, 16]
+RT-DETR Decoder
+Feed-Forward Network~2 Layer—1
+[256, 1024]
+(16, 1024]
+[256, 16]
+RT-DETR Decoder
+Gross-Attention Offsets Layer—2
+[192, 256]
+(16, 256]
+[192, 16)
+RT-DETR Decoder
+Gross-Attention Weights Layer—2
+[96, 256]
+(16, 256]
+[16,96]
+RT-DETR Decoder
+Gross-Atention Value Layer—2
+[256, 256]
+(16, 256]
+[256, 16]
+RT-DETR Decoder
+Gross-Atention Output Layer—2
+[256, 256]
+(16, 256]
+[256, 16]
+RT-DETR Decoder
+Feed-Forward Network~1 Layer—2
+[1024, 256]
+(16, 256]
+(1024, 16]
+RI-DETR Decoder
+Feed-Forward Network~2 Layer~2
+[256, 1024]
+[16, 1024]
+[256, 16]
+Appendix A. Supporting information
+Supplementary data associated with this article can be found in the online version at doi:10.1016/j.compmedimag.2025.102583.
+Data Availability
+References
+Data will be made available on request.
+Baloch,
+N.,
+Hasan,
+0.
+Jetsar, MM HattorS, Yamada
+S, 2018. “Sports
+Ultrasound
+advantages,
+indications
+and
+limitations
+in
+upper
+and
+lower
+limbs musculoskeletal
+disorders.
+Review
+article.
+Int.
+J.
+Surg.
+54,
+333-340,
+20
+
+
+JeP. Kao et al.
+Computerized Medical Imaging and Graphics 124 (2025) 102583
+Bradshaw, TylerJ., et al., 2023.
+"A guide to cross-validation for artificial intelligence in
+Lento, PaulH., Scott, Primack, 2008. Advances and utility of diagnostic ultrasound in
+medical imaging.".
+Radiol,
+Artif.
+Intell.
+5 (4), €220232.
+musculoskeletal medicine.
+Curr.
+Rev.
+Musculoskelet. Med.
+1,
+24-31.
+Carion, Nicolas, et al., 2020. "End-to-end object detection with transformers.".
+European
+Li,
+F., Zhang, H., Liu, S., Guo, J.,Ni, LM., Zhang,
+L., 2022. Dn-detr: accelerate detr
+Conference On Computer Vision. Springer International Publishing, Cham,
+training by introducing query denoising. Proc. IEEE/CVF Conf.Comput. Vis. Pattern
+Chiu, Pei-Hsin, et al., 2022. Deep learning for detecting supraspinatus calcific
+Recognit. 13619-13627.
+tendinopathy on ultrasound images.".
+J.
+Med. Ultrasound 30 (3), 196-202.
+Litjens, Geert,
+et
+al.,
+2017. A survey on deep learning in medical image analysis.
+Med,
+Chu, Hsin-Yuan, et al., 2024. Enhancing multi-object detection in ultrasound images
+Image Anal. 42, 60-88.
+through semi-supervised learning, focal loss and relation of frame. Ultrasound Med.
+Patil,
+Pravin,
+Bhaskar, Dasgupta, 2012.
+Role of diagnostic ultrasound in the assessment
+Biol. 50 (12), 1868-1878,
+of musculoskeletal diseases. Ther. Adv. Musculoskelet. Dis. 4 (5), 341-355.
+del, Cura, Jose,
+Luis,
+2008. Ultrasound-guided therapeutic procedures in the
+Perera, Shehan,
+Srikar, Adhikari, Alper, Yilmaz, 2021.
+"Pocformer: A lightweight
+musculoskeletal system.
+Curr.
+Probl.
+Diagn.
+Radiol. 37 (5), 203-218.
+transformer architecture for detection of covid-19 using point of care ultrasound
+Dosovitskiy, Alexey. "An image is worth 16x16 words: Transformers for image
+2021 IEEE international conference on image processing (ICIP).
+IEEE.
+recognition at scale.” arXiv preprint arXiv:2010.11929 (2020).
+Price, W., Nicholson, Glenn Cohen, 1, 2019. Privacy in the age of medical big data. Nat.
+Fort,
+Stanislav,
+Jie, Ren,
+Balaji, Lakshminarayanan, 2021. Exploring the limits of out-of
+Med. 25 (1), 37-43.
+distribution detection. Adv. Neural Inf. Process. Syst. 34, 7068-7081.
+Shamshad, Fahad, et al., 2023. Transformers in medical imaging: a survey. Med. Image
+Gheflati, Behnaz,
+Hassan,
+Rivaz,
+2022. Vision transformers for classification of breast
+Anal.
+88,
+102802.
+ultrasound images. 2022 44th Annual International Conference of the IEEE
+‘Tajbakhsh,
+Nima,
+et al.,
+2016. Convolutional neural networks for medical image
+Engineering in Medicine & Biology Society (EMBC).
+IEEE,
+analysis:
+Full training or fine tuning? IEEE Trans. Med. Imaging 35 (5), 1299-1312.
+Golan, David, et al. 'Fully automating Graf's method for DDH diagnosis using deep
+Vaswani, A., 2017. Attention is all you need. Adv. Neural Inf. Process. Syst.
+convolutional neural networks.” Deep Learning and Data Labeling for Medical
+Yeh, Cheng-Liang,
+et al.,
+2023. Real-time automated segmentation of median nerve in
+Applications: First International Workshop, LABELS 2016, and Second International
+dynamic ultrasonography using deep learning.
+Ultrasound Med.
+Biol. 49 (5),
+Workshop, DLMIA 2016, Held in Conjunction with MICCAI 2016, Athens, Greece,
+1129-1136,
+October 21, 2016, Proceedings 1. Springer International Publishing, 2016.
+Zhang, H., Li, F., Liu, S., Zhang, L., Su, H., Zhu, J., ...& Shum, H.Y. (2022). Dino: Detr
+He, Kaiming, et al. "Deep residual learning for image recognition.” Proceedings of the
+with improved denoising anchor boxes for end-to-end object detection. arXiv
+IEEE conference on computer vision and pattern recognition. 2016.
+preprint arXiv:2203.03605.
+Hu, Edward
+J., etal. "Lora: Low-rank adaptation oflarge language models." arXiv preprint
+Zhang, Qi, et al., 2016.
+"Deep learning based classification of breast tumors with shear-
+‘arXiv:2106.09685 (2021).
+wave elastography.”.
+Ultrasonics 72, 150-157.
+Hung, Esther Hiu Yee, et al., 2014. Ultrasound of musculoskeletal soft-tissue tumors
+Zhao, Yian, et al. "Detrs beat yolos on real-time object detection." Proceedings of the IEEE/
+superficial to the investing fascia.
+Am.
+J. Roentgenol. 202 (6), W532-W540.
+CVF Conference on Computer Vision
+and Pattern Recognition. 2024.
+Jegham, Nidhal, et al. "Evaluating the Evolution ofYOLO (You Only Look Once) Models:
+Zhong, Zihan, et al. "Convolution meets lora: Parameter efficient finetuning for segment
+‘A Comprehensive Benchmark Study of YOLO11 and Its Predecessor.” arXiv preprint
+anything model.” arXiv preprint arXiv:2401.17868 (2024).
+‘arXiv:2411.00201 (2024).
+Zhu, X., Su, W., Lu, L., Li, B., Wang, X., & Dai, J. (2020). Deformable detr: Deformable
+Krizhevsky,
+Alex,
+Ilya, Sutskever, Geoffrey,
+E.Hinton, 2012. Imagenet classification with
+transformers for end-to-end object detection. arXiv preprint arXiv:2010.04159.
+deep convolutional neural networks.
+Adv.
+Neural Inf. Process.
+Syst.
+25.
+21

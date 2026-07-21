@@ -176,7 +176,7 @@ właściciela (Brama / Głos / Drogi / Kronikarz)? · Gdzie w przepływie to sie
 ## 📚 ŹRÓDŁA — Kanon biblioteki za architekturą (BIB)
 
 > **Po co ta architektura?** Każda warstwa Imperium ma teoretyczne ugruntowanie w bibliotece
-> (**<!-- LICZBA:ksiazki -->79<!-- /LICZBA --> książek**). Tu mapa: warstwa → książka.
+> (**<!-- LICZBA:ksiazki -->115<!-- /LICZBA --> książek**). Tu mapa: warstwa → książka.
 > Pełna esencja: `bibliotheca_ulpia/encyklopedia/`.
 
 | Warstwa architektury | Dlaczego tak (koncept) | Źródło BIB |

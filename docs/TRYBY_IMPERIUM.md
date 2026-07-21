@@ -2,7 +2,7 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: imperium/koloseum/namiestnik.py, narzedzia/kalibracja_1h.py, narzedzia/kalibracja_1h_v2.py, narzedzia/sym_porownanie_tf.py
-stan_na: 2026-07-18
+stan_na: 2026-07-21
 powod_istnienia: "Jedyne miejsce z **twardym, zmierzonym werdyktem o interwale 1H** — że rój nie ma na nim dodatniego edge'u i że zaostrzanie progów asymptotuje przy ~−2.5%, nigdy nie przekraczając zera"
 ---
 # 🎯 TRYBY IMPERIUM + ŁOWCA OKAZJI — propozycja architektury trybów
@@ -29,13 +29,18 @@ unikatowy, niepowtarzalny system w tym kierunku.
 | # | Tryb | Co robi | Interwały | Lewar/Rynek | Częstotliwość | Status kodu |
 |---|------|---------|-----------|-------------|---------------|-------------|
 | 1 | **NAJLEPSZE** 🏆 (Łowca Okazji) | Skanuje cały koszyk, ranking okazji, bierze TOP-N najmocniejszych górek/dołków | dowolne (skan cross-asset) | lewar + spot, dobierany do siły | **kilka/tydzień**, wysoka pewność | 🟡 skaner gotowy (W-316), wpięcie W-317 (TERAZ) |
-| 2 | **SKALP** ⚡ | Szybkie wejścia na krótkich interwałach, wiele małych trade'ów | 1m/5m/15m | futures, lewar ≤10× | wiele/dzień | 🟡 styl SCALP w Namiestniku; brak danych <1h w backteście |
+| 2 | **SKALP** ⚡ | Szybkie wejścia na krótkich interwałach, wiele małych trade'ów | 1m/5m/15m | futures, lewar ≤10× | wiele/dzień | 🟡 styl SCALP w Namiestniku; dane <1h SĄ (1m: 10+ par, 5m/15m: BTC+ETH), ale profil SCALP (RSI 4–7, lewar 10×) NIEPRZETESTOWANY — pomiar interwałów trzymał konfigurację swing, nie scalping |
 | 3 | **SWING** 🌊 | Klasyczne swingi, trend + korekta | 4H/1D | oba, lewar ≤5× | kilka/tydzień | ✅ rdzeń (Namiestnik SWING) |
 | 4 | **POZYCJA/INVEST** 🏛️ | Akumulacja długoterminowa, składanie kapitału | 1D/1W | spot, lewar ≤2× | kilka/miesiąc | 🟡 styl INVEST; brak realnej egzekucji spot |
 | 5 | **OBRONA** 🛡️ (Risk-off) | W kaskadzie/krachu: spot, minimalna ekspozycja, czeka na okazję | dowolne | spot, lewar 1× | rzadko, defensywnie | 🟡 rygiel_ryzyka + breaker krzywej (częściowo) |
 
 **Rekomendacja:** zacząć od trybu **NAJLEPSZE** (serce wizji, najwyższa wartość),
-potem dopracować SKALP (wymaga danych krótkointerwałowych — Etap C, live).
+potem dopracować SKALP. Dane krótkointerwałowe **już są na dysku** (`dane/minutowe/` 10+ par,
+`dane/5m` + `dane/15m` dla BTC/ETH) — brakuje nie danych, lecz **testu profilu SCALP na
+własnych warunkach** (RSI 4–7, lewar ≤10×, model kosztów futures). Uwaga (Prawo I,
+kandydat≠prawda): dotychczasowy pomiar interwałów (4h/1d/1h/15m) trzymał JEDNĄ konfigurację
+— mierzył swing na krótkim interwale, **nie** scalping; wniosek „interwał X stratny" dotyczy
+tamtej konfiguracji, nie profilu SCALP, który pozostaje niezmierzony.
 
 ## Tryb NAJLEPSZE — mechanika (W-316 + W-317)
 

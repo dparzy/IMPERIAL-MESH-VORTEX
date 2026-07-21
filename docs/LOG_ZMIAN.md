@@ -14,6 +14,25 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | 📄 | P2 fali 1: TRYBY_IMPERIUM.md — realny dług dokumentów naprawiony
+
+Jedyny prawdziwie gnijący dokument z 11 podejrzanych (10/11 to fałszywe alarmy — data ruszona,
+treść nie). Żywy wiersz SKALP twierdził **„brak danych <1h w backteście"** + rekomendacja „wymaga
+danych krótkointerwałowych — Etap C, live" — FAŁSZ po dograniu danych (commit 705370f):
+
+- **POMIAR (weryfikacja osobista, kandydat≠prawda):** `dane/minutowe/` 10+ par (BTC ~1.34M barów
+  ≈2.5 roku), `dane/5m`+`dane/15m` dla BTC/ETH (~268k barów).
+- **Naprawa bez odwrotnego fałszu:** dane <1h SĄ, ale profil SCALP (RSI 4–7, lewar 10×) pozostaje
+  **NIEPRZETESTOWANY** — dotychczasowy pomiar interwałów trzymał konfigurację swing, nie scalping.
+  Brakuje nie danych, lecz testu profilu. `stan_na` 07-18 → 07-21.
+- **UODPORNIENIE:** fraza „brak danych <1h w backteście" → INDEX FALSORUM (poprawna teza + dowód);
+  sweep całego korpusu pilnuje, by nie wróciła jako fakt (lekcja: korekta jednorazowa nie wystarcza).
+
+**LEX TALIONIS:** N-0447ca78 ↔ C-f69e9368 (dług 0). Backlog: sugestia P2 **zamknięta**.
+Audyt exit 0 · sweep --falsa czysty (3 twierdzenia). **Pliki:** `docs/TRYBY_IMPERIUM.md`, ledgery.
+
+---
+
 ## 2026-07-21 | 🛡️ | P1 fali 1: feature_importance strażnik serii + konsolidacja LEKCJE
 
 ### P1 — cicha obcinka niezrównanych serii (rozkaz Cezara po zwiadzie)

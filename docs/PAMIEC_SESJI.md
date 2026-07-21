@@ -113,6 +113,39 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-20 — Błędy krytyczne złapane przez eskalację modelu
+Dwa bugi w petla_live.py ('1H'→ccxt NotSupported, brak __main__) wykryte podczas eskalacji przy rutynowym teście paper. Potwierdza skuteczność płynnego wyboru modelu.
+
+### 2026-07-20 — Stos Hyginusa U1–U4 gotowy, U5 odrzucony
+W sesji 56ea4ea2 zakończono implementację U1 (korpus biblioteki anty-echo), U2 (FTS fix crash-buga na myślnikach + query-expansion + hybrid), U3 (self-critique), U4 (świadomość systemu z 22 lukami). U5 (otwarta wiedza modelu) odrzucony na stałe – Prawo I zakazuje halucynacji.
+
+### 2026-07-20 — Bug w audycie przeoczony przez martwy wzorzec
+Linia 259 audytu zawierała jedyny subprocess.run bez encoding – trzy pozostałe naprawiono w 2026-07-17, ale tę przeoczono, bo wzorzec 'kodowanie' leżał martwy w checkliście.
+
+### 2026-07-20 — Mechanizm zasiewu połyka regex z checklisty
+Funkcja 'zasiej_startowe' cicho ignoruje pole 'regex' wpisu w checkliście – wzorce w Księdze Wad nigdy nie skanowały. Przyczyna: domyślna inicjalizacja pomija nieobowiązkowe klucze.
+
+### 2026-07-21 — Niespójność licznika memory a rzeczywista liczba wpisów na dysku
+Metoda dodaj_checklist() zwiększała licznik w pamięci (52), ale wpis nie zapisywał się do pliku (zostało 51). Zapisz() jest osobną metodą, co powoduje cichą utratę danych. Naprawiono przez jawne wywołanie zapisz() po dodaniu.
+
+### 2026-07-21 — Ukryta zależność od monkeypatch w runnerze Imperium
+Testy PEDES przechodzą pod pytest, ale padają pod własnym runnerem Imperium, którego shim monkeypatch nie ma metody setitem. Naprawiono bez zależności od shimu.
+
+### 2026-07-21 — dodaj_checklist() zwraca True, ale wpis nie zapisuje się na dysku
+dodaj_checklist() inkrementuje licznik w pamięci, ale zapis na dysk wymaga osobnego wywołania zapisz(). To pułapka – stan pamięci może być niezgodny z dyskiem.
+
+### 2026-07-21 — Błędny wpis o czasie gnicia runbooka – 9 dni zamiast 'pół roku'
+W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokładnie: 9 dni. Sprostowano u źródła (ledgery, pamięć).
+
+### 2026-07-21 — Testy padają pod runnerem Imperium przez brak setitem w shimie monkeypatch
+Testy zielone pod pytest, ale padają pod własnym runnerem – shim monkeypatch nie ma setitem. Naprawiono bez zależności od shimu.
+
+### 2026-07-21 — zapisz() gubi nieznane pola istniejącego wpisu – cicha utrata danych
+Metoda zapisz() w pamięci proceduralnej nadpisywała tylko znane pola, gubiąc nieznane. Odkryto podczas adversarialnego przeglądu kodu. Naprawiono.
+
+### 2026-07-21 — Cichy audyt – hook nie drukował wyniku przy uruchomieniu
+Audyt złapał nowy organ w trzech warstwach naraz (W11, W15, W17), ale hook nie wyświetlił wyniku. To klasa 'mechanizm, który przy awarii wygląda na sprawny' – naprawiono.
+
 ### 2026-07-20 — Zawartość pliku w wrzutni
 Plik z wrzutnia to dump rozmów z Hyginusem (DeepSeek) zawierający research hybrydy LLM: modele 3B, LoRA, LARSA/AlphaQuanter, Fin-R1, Unsloth/QLoRA, fine-tuning na chmurze. Wątek hybrydy-ucznia od linii 2163.
 

@@ -237,7 +237,17 @@ def raport_waznosci(
 
     Zwraca RaportWaznosci z rankingiem, martwymi głosami, redundantnymi.
     """
-    n = min(len(historia_sygnalow), len(historia_wynikow))
+    # Niezgodne długości = rozjechana etykieta forward (look-ahead / ucięte bary).
+    # `min()` cicho ucinał do krótszej serii — a przy przesunięciu w ŚRODKU serii
+    # snap[i] i wyk[i] przestają opisywać ten sam bar → skażone MDA/SFI, czyli fałszywy
+    # osąd „martwy głos"/„redundantny" (Prawo XVI/XX). Bliźniaczy `legatus.oblicz_wagi_ic`
+    # odrzuca to twardo (cubic P2) — przenosimy ten sam strażnik tu, zamiast ucinać w ciszy.
+    if len(historia_sygnalow) != len(historia_wynikow):
+        raise ValueError(
+            f"raport_waznosci: historia_sygnalow ({len(historia_sygnalow)}) i "
+            f"historia_wynikow ({len(historia_wynikow)}) muszą mieć tę samą długość "
+            "(etykieta forward równolegle do sygnału na tym samym barze)")
+    n = len(historia_sygnalow)
     if n < MIN_OBS:
         logger.warning(
             "[FeatureImportance] Za mało obserwacji (%d < %d) — raport pustynny.", n, MIN_OBS

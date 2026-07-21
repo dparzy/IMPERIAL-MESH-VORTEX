@@ -14,6 +14,33 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | 🛡️ | P1 fali 1: feature_importance strażnik serii + konsolidacja LEKCJE
+
+### P1 — cicha obcinka niezrównanych serii (rozkaz Cezara po zwiadzie)
+
+`feature_importance.raport_waznosci` (linia 240) cicho ucinał niezrównane serie `min()`+`[:n]`,
+ostrzegając TYLKO gdy `n < MIN_OBS` — nie przy rozjeździe długości. Przy przesunięciu w ŚRODKU
+serii `snap[i]`≠`wyk[i]` → skażone MDA/SFI → fałszywy osąd „martwy głos"/„redundantny" (Prawo XVI/XX).
+Bliźniak `legatus.oblicz_wagi_ic:43-46` miał JUŻ twardy strażnik za tę samą klasę (cubic P2) —
+**poprawka nie została przeniesiona**. Naprawa: `raise ValueError` przed liczeniem (fail-loud, wzór
+bliźniaka) + test negatywny `test_raport_waznosci_odrzuca_niezrownane_serie`.
+
+- **LEX TALIONIS:** N-247e4ac7 ↔ C-5ccba4f8 (dług 0). Backlog: sugestia P1 **zamknięta**.
+- **Klasa (Księga Wad):** „poprawka nieprzeniesiona między bliźniakami" — ten sam kontrakt danych
+  (`sygnaly` ‖ `wyniki`) musi mieć strażnik w OBU modułach; nieprzeniesiona poprawka to dług ukryty.
+
+### Konsolidacja LEKCJE (alarm Prawa XV z hooka — decyzja Cezara „skonsoliduj teraz")
+
+Sekcja LEKCJE 27526 zn > limit 24000. Usunięto **16 najstarszych** lekcji (119→103, **23820 zn**,
+zapas 180) — kryterium: jednorazowy bug / nieaktualna infrastruktura POKRYTA źródłem prawdy
+(kod+testy+Księga Wad+ZASADY); kod > pamięć. Doktryna (Prawo I ×2, martwe głosy/zombie) i Top-3
+zachowane — zweryfikowane po usunięciu.
+
+**Pliki:** `imperium/legiony/feature_importance.py`, `tests/test_raport_waznosci.py`,
+`bibliotheca_ulpia/dane/pamiec_sesji*` (lekcje), ledgery.
+
+---
+
 ## 2026-07-21 | 🔍 | Adversarialny zwiad SIGILLARIUM — 4 wady świeżego organu naprawione
 
 ### Rozkaz Cezara

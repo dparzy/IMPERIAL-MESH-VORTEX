@@ -407,68 +407,20 @@ MikroNeurony tylko interpretują gotowe wskaźniki (metoda interpretuj()), nigdy
 ### 2026-06-30 — Prawo XV: Utrata potencjału Klucznika
 Klucznik obliczał strategie, ale Dyrygent je ignorował. Strategie nie wpływały na decyzje. Naprawiono przez dodanie trybów: agregat (ignoruje strategie), filtr (strategia blokuje konflikt), strategia (strategia narzuca kierunek).
 
-### 2026-06-30 — DeepSeek chat zawierał wiele błędnych/przesadzonych twierdzeń
-Porównano Zbior_wskaznikow_i_strategi_03.06.2026.md z rzeczywistym repozytorium. Wiele twierdzeń DeepSeek o implementacjach było fałszywych. Zweryfikowano przez deep-research.
-
-### 2026-06-30 — Backtest nie ma lookahead-bias na 4 zbiorach Binance
-Zweryfikowano na BTC/ETH 1D (3192 bary) i 1H (76k barów) z CryptoDataDownload. Detektor potwierdza brak przecieku. Sliding window 250 barów jest czysty.
-
-### 2026-06-30 — Bug: testy miały hardcoded 46 neuronów po dodaniu 47.
-Po dodaniu H-01 testy integracyjne zawierały stałą 46. Naprawiono na 47 w dwóch miejscach. Lekcja: używać len(rejestr.wszystkie_neurony()) zamiast stałych.
-
 ### 2026-06-30 — Hurst-DFA vs R/S: dekorelowane na krypto trendującym
 Prawo XVI: DFA i R/S dają nieskorelowane wyniki na trendującym krypto. Potwierdzono empirycznie, że to nie redundancja.
 
 ### 2026-06-30 — Yang-Zhang traci 7-14× informacji vs std(close)
 Używanie std(close) zamiast estymatora Yang-Zhang (OHLC) marnuje potencjał volatility. Narusza Prawo XV. Należy zastąpić w obliczeniach.
 
-### 2026-06-30 — W7 audyt fałszywie flaguje zewnętrzne URL-e z .md w domenie
-Reguła W7 w audyt_spojnosci.py błędnie oznaczała linki takie jak www.mdpi.com jako martwe, bo zawierają '.md' w domenie. Naprawiono przez pomijanie URL-i z http/https/mailto.
-
 ### 2026-06-30 — Filtr nieobecny nie karze strategii
 n_akt_f==0 dawało filtr_frakcja=0.5 karząc strategię. Zmieniono na 1.0 (Prawo XV).
-
-### 2026-06-30 — Pre-commit testował working tree zamiast staged
-Pre-commit hook testował cały working tree, nie tylko staged. Dodano git stash push --keep-index + trap przywracający.
-
-### 2026-06-30 — Czytnik CSV błędny symbol z nazwy pliku
-split('_')[0] dla Binance_BTCUSDT_1h dawało 'BINANCE' zamiast 'BTCUSDT'. Poprawiono na [-2].
-
-### 2026-06-30 — Błąd warmupu Ulcer Index
-Ulcer Index wymagał period+1 zamiast period. Poprawiono na c[-period:] co wymaga tylko period próbek.
-
-### 2026-06-30 — Stop-hook git-check.sh blokuje dalszą pracę przy niepushniętym commicie
-Hook ~/.claude/stop-hook-git-check.sh uniemożliwia kontynuację sesji, dopóki commit nie zostanie wypchnięty. To wymusza rozwiązanie problemu uprawnień przed dalszą pracą.
-
-### 2026-06-30 — Plik >1MB nie może być wypchnięty przez GitHub MCP jako tekst
-Próba pusha pliku IMV v05-07 (1.5MB) przez GitHub MCP nie powiodła się z powodu limitu rozmiaru. Duże pliki wymagają pusha przez git lub osobnego uploadu.
-
-### 2026-06-30 — Push przez git blokowany 403 przy braku uprawnień zapisu
-Claude Code w środowisku web nie może wypchnąć commita do repozytorium bez nadania uprawnień Read & Write w ustawieniach GitHub. Błąd 403 jest trwały dopóki użytkownik nie zmieni uprawnień przez github.com/settings/installations.
-
-### 2026-06-30 — kategoria na SygnalNeuronu była brakującym polem dla wag reżimowych
-WAGI_REZIMU (TREND_STRONG: T×1.5, PANIC: A×3.0) nie działały, bo SygnalNeuronu nie miał pola kategoria. Dodano pole i propagację z KATEGORIA neuronu.
 
 ### 2026-06-30 — Zombie neurons zwracają NEUTRAL gdy Brama nie dostarcza kluczy
 Neurony z DOSTEPNY=False zawsze zwracały NEUTRAL, maskując brak integracji. Wykryto przez Prawo XV. Naprawiono: Roj.zbierz_sygnaly() pomija DOSTEPNY=False, dodano POWOD_NIEDOSTEPNOSCI.
 
 ### 2026-06-30 — Prawo I: Zero halucynacji matematycznych
 AI nigdy nie oblicza matematyki. Kod (TA-Lib, C) oblicza RSI/EMA/ATR → JSON 'answer key' → AI tylko interpretuje. Brama Kalkulatora nie uruchomi się bez TA-Lib.
-
-### 2026-06-30 — Halucynacje w ARSENAL: defensywne repo i anegdoty
-Weryfikacja ~320 linków z IMV wykazała halucynacje w klastrze 'defensywnych repozytoriów GitHub' i anegdot tradingowych. Główny stack technologiczny jest prawdziwy.
-
-### 2026-06-30 — Bug: __pycache__ śledzone w gicie
-Po kompilacji brama_kalkulatora.py, pliki __pycache__ zostały przypadkowo commitowane. Naprawiono przez git rm --cached i dodanie .gitignore.
-
-### 2026-06-30 — Bug: loader modułów po reorganizacji folderów
-Po przeniesieniu modułów z płaskiej struktury do folderów rzymskich, pierwszy_zwiadowca.py szukał plików po starych nazwach. Naprawiono przez użycie względnych ścieżek (../fundament/brama_kalkulatora.py).
-
-### 2026-06-30 — Bug: mieszanie zasad Kingdom Pixel z Imperium
-Mieszanie zasad Kingdom Pixel (79 Zasad) z Imperium powodowało chaos. Rozwiązanie: stworzenie 14 Praw Imperium od zera, bez kopiowania. Kingdom Pixel = archiwum, Imperium = aktywne.
-
-### 2026-07-04 — POTRZEBA CEZARA: wizualizacja live (krytyczne)
-Cezar czuje się 'jak dziecko we mgle' — brak podglądu wykresów i wizualizacji live jak zachowuje się Imperium. PRIORYTET: dashboardy/wykresy (equity, cena+wejścia/wyjścia, IC ranking, głosy neuronów na żywo). Każde narzędzie ma mieć wyjście WIZUALNE, nie tylko tekst.
 
 ## 🔄 STAN BIEŻĄCY (liczby wstrzykiwane z kodu — W15, nie zamarzają)
 

@@ -12,6 +12,87 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-21 — Aktualizuj_lekcje to bliźniaczy kanał wzrostu objętości
+Funkcja aktualizuj_lekcje również powiększa sekcję LEKCJE, ale nie była objęta ogranicznikiem. Wprowadzono parę miar dla obu funkcji, by egzekwować limit także przy aktualizacji.
+
+### 2026-07-20 — Statystyki zwiadowców i strategii
+15 zwiadowców (13 aktywnych, 2 wyciszonych), 18 neuronów elitarnych, 20 strategii z 34 kluczami – Klucznik spójny.
+
+### 2026-07-20 — Background task może dać pusty output
+Zadanie uruchomione w tle (z &) nie zwróciło żadnego outputu (0 bajtów). W praktyce lepiej uruchamiać w foreground, aby uzyskać wynik.
+
+### 2026-07-20 — Teza zwiadowcy wymaga pomiaru, nie wiary
+Subagent-zwiadowca twierdził ~25 miejsc zip w Bramie - faktycznie 10. Twierdził brak ochrony w diagnostyce korelacji - 4/4 już strzeżone. Kandydat ≠ prawda. ZASADA WERYFIKACJI obligatoryjna przed naprawą.
+
+### 2026-07-20 — EXP-13 GARCH: niska dekorelacja + stabilny skill
+Średnie max|ρ| = 0.141 (poniżej progu 0.20), IC = 0.247/0.245/0.254 dla h=1/6/30. Potwierdza filar siły i realny sygnał predykcyjny na wszystkich parach.
+
+### 2026-07-20 — djvu wymaga djvutxt (djvulibre), nie calibre
+Konwersja djvu do tekstu wymaga narzędzia 'djvutxt' z djvulibre; calibre historycznie nie czyta djvu. Wszystkie 5 ksiąg do domknięcia QNT/RLA/Aronson to djvu – calibre jest dla nich bezużyteczne.
+
+### 2026-07-20 — Asymetria otwarcia i zamknięcia sesji
+Otwarcie sesji nie ma egzekwowanej checklisty, w przeciwieństwie do 9-krokowej checklisty zamknięcia. Ryzyko pominięcia kluczowych kroków startu.
+
+### 2026-06-30 — Audyt źródła pure-Python w Bramie: brakowało _PURE_PYTHON_INDICATORS
+Wszystkie wskaźniki w Bramie miały źródło TA-Lib. Dodano zbiór _PURE_PYTHON_INDICATORS (11 wskaźników) i warunek SOURCE_TAG_PY w compute(). Naprawiono rozróżnienie źródła dla wskaźników własnych.
+
+### 2026-07-10 — BIB-032 O'Hara – OCR garbage, nieindeksowany
+Książka w formacie skanowanych obrazów PDF – OCR generuje śmieci. Zgodnie z Prawem I (zero fabricacji) nie została włączona do RAG.
+
+### 2026-06-30 — HA doji: strict > zamiast >=
+HA_BULL = c > o (nie >=) — doji neutralny, nie byczy.
+
+### 2026-07-20 — API-widma to osobna klasa błędu od dokumentacyjnego gnicia
+Spłata długu gnicia nie wykrywa widm API (pliki istnieją w kodzie, ale w innym miejscu lub są martwymi komendami). Warstwa 16 wykryła 3 widma: mexc_feed.py, calculator_gate.py, veto_check.py. Różnica między gnicie a widmem kluczowa dla architektury audytu.
+
+### 2026-07-21 — _ jest znakiem słownym –  nie zamyka BIB-006_Carson
+Wzorzec regex  nie zamykał się na identyfikatorze BIB z podkreśleniem. Złapane przez test negatywny. Wpis do Księgi Wad.
+
+### 2026-07-21 — Archiwum LEKCJI z innym nagłówkiem – niewidoczne dla szukaj()
+Schłodzone lekcje (27) w archiwum były niewidoczne dla funkcji szukaj(), bo parser modułu używał innego nagłówka. Naprawiono.
+
+### 2026-07-21 — Archiwum lekcji ma inny nagłówek – schłodzone lekcje niewidoczne dla szukaj()
+Parser modułu LEKCJE nie obsługiwał nagłówka archiwum, przez co po schłodzeniu lekcje znikały z wyszukiwania. Luka wykryta i naprawiona.
+
+### 2026-07-21 — Archiwum lekcji ma inny nagłówek – szukaj() go nie widzi
+Schłodzone lekcje do archiwum mają inny nagłówek niż główna sekcja, przez co funkcja szukaj() w module nie przeszukuje archiwum. Wykryto i naprawiono.
+
+### 2026-07-20 — Runbooki W11 gniją – nieaktualna treść i duplikacja CLAUDE.md
+Runbooki W11 zawierają własną, ręcznie wpisaną treść (np. 'git push -u origin') zamiast pobierać kroki z CLAUDE.md – jedynego źródła prawdy. Ponadto funkcja dodaj() dedupuje po nazwie, co uniemożliwia aktualizację istniejącego runbooku.
+
+### 2026-06-30 — W6 milczące pominięcie przy braku 'Stan na:'
+Audyt W6 nie raportował błędu gdy brak 'Stan na:'. Dodano else skutkujący błędem oraz rozszerzono regex na markdown.
+
+### 2026-06-30 — Zasada symbiozy zamiast zero duplikatów
+Moduły mogą być wielofunkcyjne, jeśli każdy pokrywa INNY aspekt (np. 4 moduły wielorybów każdy na inne dane). Złe = 5 modułów czytających ten sam kanał. Test: 'Co unikalnego wnosi ten moduł?'
+
+### 2026-07-21 — Alarm i konsolidacja liczyły niezależne progi – sprzężenie
+Próg alarmu (24000) i cel chłodzenia (22000) były niezależne – obniżenie progu cicho psułoby chłodzenie. Naprawiono ujednolicając źródło.
+
+### 2026-07-21 — PROBATOR wykrył realny nieugruntowany plon Hyginusa mimo promptu
+2367 znaków w kolejce Hyginusa bez żadnego cytowania źródła, choć prompt wyraźnie tego wymaga. Organ wychwycił to przy pierwszym pomiarze.
+
+### 2026-07-21 — Znaleziono realnie nieugruntowany plon Hyginusa w kolejce
+Pierwszy bieg Probatora na realnym plonie wykrył 2367 znaków kandydatów bez żadnego powołania na źródło, mimo że prompt tego żądał. Potwierdzona potrzeba weryfikacji.
+
+### 2026-07-21 — Znak _ jest słowny, więc \b nie zamyka się w identyfikatorach z podkreślnikiem
+Detektor cytatów używał \b, co nie oddzielało poprawnie identyfikatorów typu BIB-006_Carson. Poprawiono logikę granic w Probatorze.
+
+### 2026-07-20 — EXP-14 Kyle: bardzo niska korelacja + wysoki IC
+Średnie max|ρ| = 0.087 (prawie ortogonalny do reszty roju), IC = 0.301/0.302/0.308. Silny wkład informacyjny bez redundancji.
+
+### 2026-07-20 — EXP-15 PIN martwy na wszystkich parach
+Pomiar potwierdził, że EXP-15 (PIN) nie generuje sygnału na żadnej z 40 kombinacji (15 par × 3 TF). Już wcześniej wyciszony (DOSTEPNY=False), ale weryfikacja usztywnia decyzję.
+
+### 2026-06-30 — Audyt dokumentacji wymaga egzekwowania
+Użytkownik nakazał: przed dalszymi wdrożeniami należy zaktualizować wszystkie dokumenty z INDEKS_IMPERIUM i dodać ich sprawdzanie do audyt_spojnosci.py. Obecnie sprawdzane tylko 7 z ~32 plików.
+
+### 2026-06-30 — Meta-gate defensive neurons zawsze NEUTRAL kierunek
+Neurony obronne (Z-01, N-01, H-01, OC-05) ustawiają pewnosc_przeciwnika zamiast kierunku, wywołują s.policz_finalna() — to wzorzec dla wszystkich bram obronnych.
+
+### 2026-06-30 — 12/17 bloków strategii miało błędne klucze w KATALOGU
+Stare klucze projektowe (np. XII-08) nie istniały w kodzie. Audyt W9 wykrywa obce klucze w blokach zaimplementowanych strategii. Wszystkie 17 zsynchronizowane.
+
 ### 2026-07-20 — Pure-Python funkcje cicho produkują błędne wyniki przy nierównych seriach
 TA-Lib głośno rzuca Exception, ale VWAP i VWAP_STD milcząco dają błędne wyniki (różnica 10.0, ~7%). Pieczątka audytu kłamie: input_len=100 przy rzeczywistych 80 barach. Złamanie Praw XIII i I.
 

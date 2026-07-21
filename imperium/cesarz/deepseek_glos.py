@@ -69,6 +69,10 @@ class GlosImperium:
             base_url="https://api.deepseek.com/v1",
         )
         self.model = model
+        # Ustawiane po KAŻDYM udanym wywołaniu (patrz zapytaj). None = jeszcze nie pytano
+        # albo API nie podało zużycia — mierzący ma odróżnić „brak danych" od „zero kosztu".
+        self.ostatnie_zuzycie = None
+        self.ostatni_model: Optional[str] = None
         logger.info(f"[GlosImperium] Zainicjalizowany. Model: {self.model}")
 
     def zapytaj(self, system_prompt: str, tresc: str, temperatura: float = 0.7,
@@ -123,6 +127,13 @@ class GlosImperium:
                 **({"extra_body": extra} if extra else {}),
             )
             odpowiedz = odp.choices[0].message.content
+            # ZUŻYCIE OSTATNIEGO WYWOŁANIA — bez tego DISPENSATOR.koszt_usd nie miał czym
+            # liczyć: cennik i wzór istniały, a FAKTYCZNE `usage` szło do kosza, więc koszt
+            # profilu dało się wyłącznie oszacować (Prawo XV: zdolność zbudowana, niekarmiona).
+            # Świadomie jako STAN INSTANCJI, nie zmiana typu zwracanego: żaden z dotychczasowych
+            # wołających nie widzi różnicy (wsteczna zgodność), a mierzący ma dostęp do prawdy.
+            self.ostatnie_zuzycie = getattr(odp, "usage", None)
+            self.ostatni_model = uzyty_model
         except Exception as e:
             logger.error(f"[GlosImperium] Błąd API (model={uzyty_model}, tryb={extra}): {e}")
             raise

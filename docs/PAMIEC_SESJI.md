@@ -113,6 +113,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-20 — Zwiad bibliotekarza tylko 1/5 tematów
+Hyginus przeskanował tylko 1 z 5 domyślnych tematów (mean reversion). Pozostałe 4 (momentum, regime detection, order flow, position sizing) nie ruszane. Kandydaci nie mają pomiaru redundancji ani walidacji areną.
+
+### 2026-07-20 — Hook startowy powoduje brudny working tree w dwóch plikach
+Pliki bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl oraz docs/PAMIEC_SESJI.md są modyfikowane przez hook startowy, co powoduje, że git working tree nie jest w 100% czysty. To normalny churn pamięci, a nie zmiana kodu.
+
+### 2026-07-20 — 22 neurony czekają na adaptery/dane (Prawo XV)
+Rodziny NEWS-*, PSY-*, RADAR-*, OC-06/07/08, C-01, V-03, Z-06/Z-07 nie mają jeszcze feedów i abstynują świadomie zgodnie z Prawem XV. To znany, udokumentowany stan, a nie regresja.
+
+### 2026-07-20 — Windows cp1250 wymaga PYTHONIOENCODING=utf-8
+Konsola Windows w cp1250 wywala się na emoji. Aby testy i audyt działały poprawnie, należy ustawić zmienną środowiskową PYTHONIOENCODING=utf-8 przed każdą komendą.
+
 ### 2026-07-20 — Hyginus znalazł 2 kandydatów
 Z tematu 'mean reversion' znaleziono Model Vasicka i Cross-sectional mean reversion, jeszcze bez walidacji.
 

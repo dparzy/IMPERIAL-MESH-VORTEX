@@ -14,6 +14,55 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | ⚖️ | A/B jakości plonu Hyginusa — organ LIBRA MESSIS i trzy wady WŁASNEJ miary
+
+Rozkaz Cezara: *„nowa sesja zaczyna od A/B, decyzja co lepsze DOPIERO po pomiarze"*.
+Zbudowany organ **LIBRA MESSIS** (Waga Plonu, `narzedzia/ab_plon_hyginusa.py`) — waży dwa
+ramiona zwiadu na tej samej liście tematów. **Nie dotyka produkcyjnej kolejki hipotez**
+(woła `scout_temat` z pominięciem `raport()`), bo narzędzie mierzące nie ma prawa zmieniać
+mierzonego stanu — dokładnie ta wada zaśmieciła kolejkę dzień wcześniej.
+
+**WYNIK U4 (świadomość systemu) — NIEROZSTRZYGNIĘTY, i tak został zaraportowany.**
+Poligon „rdzeń" (8 tematów o *zmierzonej* zdolności produkowania duplikatów):
+OFF 11/26 (42.3%) vs ON 6/19 (31.6%) → −10.7 pp przy **Fisher p = 0.543**. Kierunek zgodny
+z hipotezą, dowodu brak. Plon NOWYCH kandydatów płaski (13 vs 15). **Koszt jest pewny tam,
+gdzie korzyść nie jest:** 1.84× ceny, 1.66× czasu, 2.2× tokenów rozumowania — liczone z
+FAKTYCZNEGO `usage`, bo most wreszcie je wystawia (`GlosImperium.ostatnie_zuzycie`;
+`DISPENSATOR.koszt_usd` miał wzór i cennik, ale nikt go nie karmił — Prawo XV).
+
+**Trzy wady mojej własnej miary, wszystkie złapane POMIAREM, żadna testem:**
+
+1. **Leksykon potwierdzał sam siebie.** Weryfikacja „czy pojęcie istnieje w kodzie" skanowała
+   korpus RAZEM z plikiem deklarującym listę — każdy wpis znajdował dowód we własnej linijce
+   i przechodziła ZAWSZE. Zielony test też, bo testował tę samą zatrutą funkcję. Skutkiem był
+   wpis `order flow imbalance`, który oskarżał zwiad o duplikat rzeczy, **której rój nie ma**
+   (mamy *imbalance bars* W-356 — inne pojęcie). Miara myliła się, model miał rację.
+   Naprawa: korpus wyklucza własny plik + **test negatywny** (wpis-widmo musi zostać zgłoszony).
+2. **Miara karała ramię za wykonanie instrukcji.** U4 każe dopisać „czy kandydat NIE dubluje
+   istniejącego modułu", więc ramię ON z definicji wymienia nasze moduły w ZAPRZECZENIACH.
+   Licząc wzmianki w całym bloku, dostałem wynik ODWROTNY do prawdy (ON 31% vs OFF 14%).
+   Naprawa: liczymy NAZWĘ kandydata, nie uzasadnienie.
+3. **Poligon bez możliwości zdarzenia.** Pierwszy bieg dał 0 duplikatów w OBU ramionach —
+   to **brak mocy, nie remis**. Tematy pochodziły z obszarów słabo pokrytych przez rój.
+
+Rejestr trzyma **surowy plon**, więc poprawki definicji miary przeliczyły się bez ani jednego
+płatnego wywołania (`przelicz`). Pomiar stał się odwracalny. Bieg jest wznawialny i przeżywa
+zryw łącza (ponowienia 5/15/45 s; pierwszy bieg padł na `APITimeoutError` przy 11 z 16 —
+cząstki ocalały). Księga Wad 74 → 77.
+
+**Przy okazji naprawione w CODEX:** arkusz Sugestie wypisywał KAŻDĄ linię append-only ledgera,
+więc domknięta sugestia stała obok swojego starego KANDYDATA — backlog czytał się na 49 pozycji
+przy realnych 41, a **7 zadań już zrobionych wyglądało na otwarte**. Strona zapisu miała
+domykanie jako operację pierwszej kategorii (`scriba_codex.zamknij_sugestia`) od 2026-07-19;
+strona odczytu jej nie honorowała. Naprawa: zwijanie „ostatni wpis wygrywa" po tym SAMYM kluczu
+`element`, po którym pisze skryba, kolumna „Historia" zachowuje poprzednie statusy.
+
+Pliki: `narzedzia/ab_plon_hyginusa.py` (nowy), `tests/test_ab_plon_hyginusa.py` (nowy, 15 testów),
+`narzedzia/codex_probationum.py`, `narzedzia/bibliotekarz.py` (parametr `profil` w krytyce),
+`imperium/cesarz/deepseek_glos.py`, `narzedzia/kapitol_podglad.py`, `docs/ARCHITEKTURA_IMPERIUM.md`.
+
+---
+
 ## 2026-07-21 | 📋 | Raport sług na OBU końcach wachty — Δ zamiast samego stanu
 
 Pytanie Cezara: *„zawsze na początku sesji i końcu raport Hyginusa i TIRO — czy to mamy"*.

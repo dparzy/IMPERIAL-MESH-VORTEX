@@ -140,19 +140,23 @@ _SYSTEM_KRYTYKA = (
 )
 
 
-def krytyka_kandydatow(glos, kandydaci: str, wyniki_kontra) -> str:
+def krytyka_kandydatow(glos, kandydaci: str, wyniki_kontra, profil: str | None = None) -> str:
     """U3 (self-critique): drugie przejście — sędzia-sceptyk szuka DOWODÓW PRZECIW kandydatom.
 
     Wzorzec agentic-RAG: po hipotezie szukamy dowodów DISCONFIRMING, by ograniczyć confirmation
     bias. Wynik ląduje w polu 'krytyka' cząstki — Opus-sędzia i arena widzą od razu słabe hipotezy.
-    Błąd API nie może zabić zwiadu (Prawo XV): zwracamy komunikat, kandydaci już są zapisani."""
+    Błąd API nie może zabić zwiadu (Prawo XV): zwracamy komunikat, kandydaci już są zapisani.
+
+    `profil` (domyślnie None → `_PROFIL_KRYTYKA`, czyli zachowanie NIEZMIENIONE) pozwala
+    zmierzyć inny profil DISPENSATORA na tej samej fazie — bez tego A/B „flash vs v4-pro na
+    krytyce" wymagałby duplikatu tej funkcji, a duplikat rozjechałby się z oryginałem."""
     tresc = (f"KANDYDACI:\n{kandydaci}\n\n"
              f"FRAGMENTY (możliwe kontrargumenty):\n{_fragmenty_tekst(wyniki_kontra)}")
     try:
         # Szukanie dowodów PRZECIW własnym kandydatom to realne rozważanie — tu DISPENSATOR
         # kupuje głębokość (profil 'krytyka'), inaczej sceptyk byłby równie płytki co proponent.
         return glos.zapytaj(_SYSTEM_KRYTYKA, tresc, temperatura=0.3,
-                            profil=_PROFIL_KRYTYKA).strip()
+                            profil=profil or _PROFIL_KRYTYKA).strip()
     except Exception:  # noqa: BLE001 — krytyka to dodatek; jej brak nie przekreśla cząstki
         return "(krytyka niedostępna — błąd API)"
 

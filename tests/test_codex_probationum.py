@@ -131,6 +131,70 @@ def test_podsumowanie_ledger_bez_daty(tmp_path):
     assert "1 rekordów" in s and s.rstrip().endswith("—")
 
 
+def _sug(element, status, data, uzasadnienie=""):
+    return {"typ": "SUGESTIA", "element": element, "dzial": "d", "status": status,
+            "data": data, "uzasadnienie": uzasadnienie, "zrodlo": "test"}
+
+
+def test_sugestie_biezace_zwijaja_domkniecie():
+    """Domknięcie (nowa linia o tym samym `element`) zastępuje KANDYDATA, nie stoi obok.
+
+    Klasa wady zmierzona 2026-07-21: arkusz wypisywał obie linie płasko, więc zrobione
+    zadanie dalej wyglądało na otwarte."""
+    ledger = [_sug("A", "KANDYDAT", "2026-07-01"),
+              _sug("A", "ZAMKNIETE", "2026-07-21", "wdrożone"),
+              _sug("B", "KANDYDAT", "2026-07-05")]
+    biezace = cp._sugestie_biezace(ledger)
+    assert [r["element"] for r in biezace] == ["A", "B"]      # kolejność pierwszego wpisu
+    assert biezace[0]["status"] == "ZAMKNIETE"
+    assert biezace[0]["uzasadnienie"] == "wdrożone"           # treść z wpisu domykającego
+    assert "KANDYDAT 2026-07-01" in biezace[0]["historia"]    # historia nie ginie (Prawo I)
+    assert biezace[1]["historia"] == ""                       # jeden wpis → brak historii
+
+
+def test_sugestie_biezace_rowna_data_wygrywa_pozniejsza_linia():
+    """Granica: ten sam dzień → rozstrzyga kolejność dopisania (append-only)."""
+    ledger = [_sug("A", "KANDYDAT", "2026-07-21"), _sug("A", "ZAMKNIETE", "2026-07-21")]
+    assert cp._sugestie_biezace(ledger)[0]["status"] == "ZAMKNIETE"
+
+
+def test_sugestie_biezace_granice_puste_i_bez_elementu():
+    """Granica: pusty ledger → []; rekord bez `element` nie wywala (grupuje pod '')."""
+    assert cp._sugestie_biezace([]) == []
+    assert cp._sugestie_biezace([{"typ": "AB", "neuron": "X"}]) == []
+    kaleki = [{"typ": "SUGESTIA", "status": "KANDYDAT", "data": "2026-07-21"}]
+    assert len(cp._sugestie_biezace(kaleki)) == 1
+
+
+def test_otwarta_rozroznia_statusy():
+    """STALE/ZABLOKOWANE/OCZEKUJE nadal wymagają uwagi; ZAMKNIETE/ZREALIZOWANE nie."""
+    for status in ("KANDYDAT", "OCZEKUJE decyzji Cezara", "ZABLOKOWANE", "STALE", "CZESCIOWO"):
+        assert cp._otwarta({"status": status}), status
+    for status in ("ZAMKNIETE", "zamkniete", " ZREALIZOWANE ", "ODRZUCONE", "WDROZONE"):
+        assert not cp._otwarta({"status": status}), status
+
+
+def test_podsumowanie_ledger_nie_liczy_domknietych_jako_otwartych(tmp_path):
+    """Backlog w podsumowaniu startowym nie może rosnąć od samych domknięć."""
+    p = tmp_path / "l.jsonl"
+    p.write_text(
+        '{"typ":"SUGESTIA","element":"A","status":"KANDYDAT","data":"2026-07-01"}\n'
+        '{"typ":"SUGESTIA","element":"A","status":"ZAMKNIETE","data":"2026-07-21"}\n'
+        '{"typ":"SUGESTIA","element":"B","status":"KANDYDAT","data":"2026-07-05"}\n',
+        encoding="utf-8")
+    s = cp.podsumowanie_ledger(p)
+    assert "3 rekordów" in s and "Sugestie 2 (otwartych 1)" in s
+
+
+def test_arkusz_sugestie_bez_duplikatow_na_zywym_ledgerze():
+    """Regresja na PRAWDZIWYM ledgerze: każdy `element` dokładnie raz w arkuszu."""
+    wiersze = cp.zbierz_arkusze()["Sugestie"]
+    assert wiersze[0][-1] == "Historia"
+    elementy = [w[0] for w in wiersze[1:]]
+    duble = {e for e in elementy if elementy.count(e) > 1}
+    assert not duble, f"element powtórzony w arkuszu Sugestie: {duble}"
+
+
 def test_zapis_xlsx_generuje_arkusze(tmp_path):
     """Zapis .xlsx (tylko gdy openpyxl) → plik istnieje, ma 12 arkuszy, Neurony pełne."""
     load_workbook = pytest.importorskip("openpyxl").load_workbook

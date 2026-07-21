@@ -103,6 +103,57 @@ def _wczytaj_ledger(sciezka: Path = LEDGER) -> list:
     return rekordy
 
 
+# Statusy oznaczające sugestię DOMKNIĘTĄ — pozycja znika z backlogu do zrobienia.
+# Reszta (KANDYDAT, OCZEKUJE…, ZABLOKOWANE, CZESCIOWO, STALE) to pozycje ŻYWE: czekają
+# na decyzję, są wstrzymane albo trwają — wszystkie nadal wymagają uwagi.
+STATUSY_DOMKNIETE = {"ZAMKNIETE", "ZAMKNIETA", "ZREALIZOWANE", "ODRZUCONE",
+                     "ODRZUCONA", "WDROZONE", "WDROZONA"}
+
+
+def _sugestie_biezace(ledger: list) -> list[dict]:
+    """Zwija SUGESTIE do stanu BIEŻĄCEGO: jedna pozycja backlogu = jeden wiersz.
+
+    Powód istnienia (zmierzone 2026-07-21, przy weryfikacji przed zadaniem): ledger jest
+    append-only, więc domknięcie sugestii to NOWA linia z tym samym `element`
+    (scriba_codex.zamknij_sugestia). Strona ZAPISU miała domykanie jako operację pierwszej
+    kategorii — strona ODCZYTU wysypywała wszystkie linie płasko, więc zamknięta pozycja
+    („Hyginus: uczynić --swiadomosc domyślnym", ZAMKNIETE 2026-07-21) stała w arkuszu obok
+    swojego starego KANDYDATA. Backlog czytał się na 49 pozycji przy realnych 40, a zadanie
+    już zrobione mogło zostać wzięte drugi raz. To klasa „mechanizm, który przy awarii
+    wygląda na sprawny": arkusz był kompletny i dlatego wyglądał poprawnie.
+
+    Klucz zwijania = `element`, DOKŁADNIE ten sam, po którym skryba dedupuje i zamyka
+    (Prawo XXI: żadnego drugiego, własnego klucza po stronie czytnika).
+
+    Historii NIE gubimy (Prawo I): wiersz niesie `historia` — poprzednie statusy z datami.
+    Wygrywa wpis PÓŹNIEJSZY: po dacie, a przy równej dacie po kolejności dopisania w pliku.
+    """
+    kolejnosc: list[str] = []
+    grupy: dict[str, list[tuple[int, dict]]] = {}
+    for i, r in enumerate(ledger):
+        if r.get("typ") != "SUGESTIA":
+            continue
+        klucz = r.get("element", "")
+        if klucz not in grupy:
+            grupy[klucz] = []
+            kolejnosc.append(klucz)
+        grupy[klucz].append((i, r))
+
+    biezace = []
+    for klucz in kolejnosc:
+        wpisy = sorted(grupy[klucz], key=lambda para: (str(para[1].get("data", "")), para[0]))
+        _, aktualny = wpisy[-1]
+        historia = "; ".join(f"{w.get('status', '?')} {w.get('data', '?')}"
+                             for _, w in wpisy[:-1])
+        biezace.append({**aktualny, "historia": historia})
+    return biezace
+
+
+def _otwarta(rekord: dict) -> bool:
+    """Czy sugestia nadal wymaga uwagi (nie jest domknięta)."""
+    return str(rekord.get("status", "")).strip().upper() not in STATUSY_DOMKNIETE
+
+
 def podsumowanie_ledger(sciezka: Path = LEDGER) -> str:
     """Jednolinijkowe podsumowanie rejestru testów z ledgera JSONL — BEZ generowania
     Excela (C1, uszczelnienie OTWARCIA 2026-07-19).
@@ -113,12 +164,16 @@ def podsumowanie_ledger(sciezka: Path = LEDGER) -> str:
     rek = _wczytaj_ledger(sciezka)
     ab = sum(1 for r in rek if r.get("typ") == "AB")
     ic = sum(1 for r in rek if r.get("typ") == "IC")
-    sug = sum(1 for r in rek if r.get("typ") == "SUGESTIA")
     pom = sum(1 for r in rek if r.get("typ") == "POMIAR")
+    # Sugestie liczone po ZWINIĘCIU (jedna pozycja backlogu = jedna sugestia), bo linia
+    # zamknięcia ma ten sam `element` — liczenie linii zawyżałoby backlog o domknięcia.
+    biezace = _sugestie_biezace(rek)
+    otwarte = sum(1 for r in biezace if _otwarta(r))
     daty = [r.get("data") for r in rek if r.get("data")]
     ost = max(daty) if daty else "—"
     return (f"📜 CODEX PROBATIONUM (ledger): {len(rek)} rekordów — "
-            f"A/B {ab} | IC {ic} | Pomiary {pom} | Sugestie {sug} | ostatni wynik {ost}")
+            f"A/B {ab} | IC {ic} | Pomiary {pom} | "
+            f"Sugestie {len(biezace)} (otwartych {otwarte}) | ostatni wynik {ost}")
 
 
 def _zywotnosc_adapterow() -> dict:
@@ -483,13 +538,16 @@ def zbierz_arkusze() -> dict:
     # Czytane z ledgera (typ=SUGESTIA) — źródło prawdy jak reszta wyników. Każda sugestia
     # rozbudowy CODEX (nowy arkusz/dział/kolumna) ląduje tu jako KANDYDAT do oceny zgodności
     # z Imperium (ZASADA CODEX PROBATIONUM w CLAUDE.md).
+    # Wiersze ZWINIĘTE do stanu bieżącego (ostatni wpis o danym `element` wygrywa) —
+    # inaczej domknięta sugestia stoi w arkuszu obok swojego starego KANDYDATA i backlog
+    # kłamie w górę. Kolumna „Historia" zachowuje poprzednie statusy (Prawo I).
     wiersze_sug = [["Element / Dział", "Typ", "Uzasadnienie", "Zgodność z Imperium",
-                    "Status", "Data", "Źródło"]]
-    for r in [x for x in ledger if x.get("typ") == "SUGESTIA"]:
+                    "Status", "Data", "Źródło", "Historia"]]
+    for r in _sugestie_biezace(ledger):
         wiersze_sug.append([
             r.get("element", ""), r.get("dzial", ""), r.get("uzasadnienie", ""),
             r.get("zgodnosc_imperium", ""), r.get("status", ""), r.get("data", ""),
-            r.get("zrodlo", ""),
+            r.get("zrodlo", ""), r.get("historia", ""),
         ])
     arkusze["Sugestie"] = wiersze_sug
 

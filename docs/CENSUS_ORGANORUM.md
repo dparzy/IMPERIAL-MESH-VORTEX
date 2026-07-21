@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 242** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 243** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -273,6 +273,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | Moduł | Rola (docstring modułu) |
 |-------|--------------------------|
 | `ab_dvol.py` | 😱 A/B DVOL (PSY-05) — czy zwalidowany IC +0.16@7d przekłada się na realny PnL? (Prawo I) |
+| `ab_plon_hyginusa.py` | ⚖️ LIBRA MESSIS — Waga Plonu: A/B jakości zwiadu Hyginusa |
 | `ab_pnl_wazenie_ic.py` | 💰 A/B NA P&L — ważenie głosów IC w PEŁNEJ ścieżce decyzyjnej (W-361, hipoteza B) |
 | `ab_stablecoin.py` | 🏛️ A/B STABLECOIN (K-03) — czy IC +0.05..0.10 przekłada się na PnL? (Prawo I) |
 | `ab_strategy_mwu.py` | 🎯 A/B strategy-MWU (W-362) — czy ważenie strategii realnym P&L poprawia P&L routingu |

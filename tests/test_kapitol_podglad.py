@@ -41,3 +41,23 @@ def test_render_escapuje_html():
 def test_svg_kolor_domyslny_gdy_brak():
     out = _svg_slupki([("a", 5.0)], "j")   # bez koloru → domyślny
     assert "#4c9be3" in out
+
+
+def test_kazdy_raport_daje_sie_wygenerowac(tmp_path, monkeypatch):
+    """Każdy zarejestrowany raport musi się zbudować — także uruchamiany JAKO SKRYPT.
+
+    Zmierzone 2026-07-21: raport `plon_hyginusa` czytający liczby z żywego rejestru padał
+    na `ModuleNotFoundError: narzedzia` przy wywołaniu `python narzedzia/kapitol_podglad.py`,
+    bo korzeń repo nie jest wtedy na sys.path. Pod pytestem był zielony — czyli test
+    sprawdzał tryb, którego Cezar NIE używa."""
+    import subprocess
+    from narzedzia.kapitol_podglad import _RAPORTY
+
+    korzen = os.path.join(os.path.dirname(__file__), "..")
+    for nazwa in _RAPORTY:
+        r = subprocess.run(
+            [sys.executable, os.path.join("narzedzia", "kapitol_podglad.py"), nazwa],
+            cwd=korzen, capture_output=True, text=True, encoding="utf-8", errors="replace",
+            env={**os.environ, "KAPITOL_NOOPEN": "1"},
+        )
+        assert r.returncode == 0, f"raport '{nazwa}' padł jako skrypt:\n{r.stderr[-600:]}"

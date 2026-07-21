@@ -396,8 +396,91 @@ def _raport_sigla() -> Path:
                   spec, wykresy, werdykt, otworz=False)
 
 
+def _raport_plon_hyginusa() -> Path:
+    """A/B jakości plonu Hyginusa — liczby CZYTANE Z REJESTRU pomiarów, nie wpisane ręcznie.
+
+    Świadomie inaczej niż raporty historyczne wyżej: ten podgląd generuje się z żywego
+    `ab_plon_hyginusa.jsonl`, więc każdy kolejny bieg (albo `przelicz` po poprawce miary)
+    aktualizuje wykres bez dotykania tego pliku. Ręczna liczba w dokumencie zawsze się
+    rozjeżdża — Warstwa 15 audytu istnieje właśnie po tej lekcji.
+    """
+    # Import przez ścieżkę pliku, nie przez pakiet: kapitol_podglad bywa uruchamiany
+    # BEZPOŚREDNIO (python narzedzia/kapitol_podglad.py), a wtedy korzeń repo nie jest
+    # na sys.path i `import narzedzia.…` pada — zależność musi działać w obu trybach.
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from narzedzia.ab_plon_hyginusa import agreguj, wczytaj
+
+    nowe, rdzen = agreguj("u4"), agreguj("u4_rdzen")
+    rek = wczytaj()
+    tematy_rdzen = sorted({r["temat"] for r in rek if r.get("bieg") == "u4_rdzen"})
+
+    def _pole(a, ramie, pole, dom=0):
+        return (a.get(ramie) or {}).get(pole) or dom
+
+    spec = [
+        ("Co testowane", "JAKOŚĆ PLONU zwiadu Hyginusa — U4 (blok świadomości systemu) ON vs OFF"),
+        ("Sługa / model", "HYGINUS (Bibliotekarz-Zwiadowca) · deepseek-v4-flash · profil 'zwiad' "
+                          "(reasoning_effort=low) w OBU ramionach"),
+        ("Korpus / źródło", "RAG 'biblioteka' — wyłącznie książki BIB-xxx (U1 anty-echo), "
+                            "115 pozycji / 37 331 fragmentów, tryb hybrid, topk=6"),
+        ("Poligon A (nowe)", f"{_pole(nowe, 'on', 'tematow')} tematów z obszarów SŁABO pokrytych "
+                             "przez rój (order flow, market making, sezonowość)"),
+        ("Poligon B (rdzeń)", f"{_pole(rdzen, 'on', 'tematow')} tematów o ZMIERZONEJ zdolności "
+                              "produkowania duplikatów (historycznie 12/24 = 50% bez U4): "
+                              + "; ".join(t[:34] for t in tematy_rdzen[:4]) + " …"),
+        ("Metryka główna", "% kandydatów, których NAZWA wskazuje moduł już istniejący w roju "
+                           "(leksykon 32 pojęć, każde z dowodem w żywym kodzie)"),
+        ("Metryki wtórne", "cytaty BIB · werdykty PROBATORA · objętość · czas · KOSZT z faktycznego "
+                           "`usage` API (nie z szacunku)"),
+        ("Czym to NIE jest", "nie jest pomiarem trafności hipotez — mierzy duplikowanie i koszt, "
+                             "nie wartość predykcyjną kandydatów (to rozstrzyga arena)"),
+    ]
+    wykresy = [
+        {"tytul": "Poligon B (rdzeń) — % kandydatów dublujących istniejące moduły",
+         "jednostka": "% kandydatów",
+         "opis": "Jedyny poligon, na którym zdarzenie mierzone MOŻE wystąpić. "
+                 "Niżej = lepiej (mniej propozycji tego, co rój już ma).",
+         "slupki": [("U4 OFF", _pole(rdzen, "off", "duplikaty_pct"), "#e0794b"),
+                    ("U4 ON", _pole(rdzen, "on", "duplikaty_pct"), "#8fe388")]},
+        {"tytul": "Poligon A (nowe tematy) — BRAK MOCY, nie remis",
+         "jednostka": "% kandydatów",
+         "opis": "Zero w OBU ramionach nie znaczy 'U4 nie działa' — znaczy, że na tych tematach "
+                 "duplikat nie mógł powstać. Wynik raportowany jako brak mocy (Prawo I).",
+         "slupki": [("U4 OFF", _pole(nowe, "off", "duplikaty_pct"), "#8a8a8a"),
+                    ("U4 ON", _pole(nowe, "on", "duplikaty_pct"), "#8a8a8a")]},
+        {"tytul": "Koszt biegu — cena świadomości systemu (oba poligony razem)",
+         "jednostka": "USD",
+         "opis": "U4 dokleja do promptu listę kluczy roju i luk Prawa XV — płacimy za nią "
+                 "tokenami wejścia przy KAŻDYM temacie.",
+         "slupki": [("U4 OFF", round(_pole(nowe, "off", "koszt_usd") +
+                                     _pole(rdzen, "off", "koszt_usd"), 4), "#4c9be3"),
+                    ("U4 ON", round(_pole(nowe, "on", "koszt_usd") +
+                                    _pole(rdzen, "on", "koszt_usd"), 4), "#e0794b")]},
+        {"tytul": "Cytaty ze źródeł BIB — czy plon jest osadzony w książkach",
+         "jednostka": "cytatów",
+         "opis": "Więcej cytatów = kandydaci mocniej zakotwiczeni w korpusie (PROBATOR "
+                 "weryfikuje deterministycznie, czy cytowane źródło NAPRAWDĘ było podane).",
+         "slupki": [("U4 OFF", _pole(nowe, "off", "cytatow_bib") +
+                     _pole(rdzen, "off", "cytatow_bib"), "#4c9be3"),
+                    ("U4 ON", _pole(nowe, "on", "cytatow_bib") +
+                     _pole(rdzen, "on", "cytatow_bib"), "#8fe388")]},
+    ]
+    werdykt = (
+        "Liczby na wykresach są CZYTANE Z REJESTRU pomiarów przy każdym generowaniu tej strony — "
+        "nie są wpisane w kod raportu.\n"
+        "Werdykt słowny wydaje Architekt w Dzienniku i w ledgerze CODEX; ten podgląd dostarcza "
+        "surowe liczby do obejrzenia bez palenia tokenów w czacie.\n"
+        "UWAGA METODOLOGICZNA: miara duplikatów liczy NAZWĘ kandydata, nie wzmianki w uzasadnieniu — "
+        "ramię U4=ON z definicji wymienia nasze moduły w zaprzeczeniach ('wnosi nowość; istnieje "
+        "V-03 CVD, ale…'), więc liczenie całego bloku karałoby je za wykonanie instrukcji "
+        "i dawało wynik odwrotny do prawdy.")
+    return zapisz("KAPITOL_PODGLAD_ab_plon_hyginusa",
+                  "Podgląd testu — A/B jakości plonu Hyginusa (U4 ON vs OFF)",
+                  spec, wykresy, werdykt, otworz=False)
+
+
 _RAPORTY = {"hma": _raport_hma, "aequitas": _raport_aequitas, "ab_dvol_1h": _raport_ab_dvol_1h,
-            "sigla": _raport_sigla}
+            "sigla": _raport_sigla, "plon_hyginusa": _raport_plon_hyginusa}
 
 if __name__ == "__main__":
     nazwa = sys.argv[1] if len(sys.argv) > 1 else "hma"

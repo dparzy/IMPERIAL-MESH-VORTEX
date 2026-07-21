@@ -169,7 +169,8 @@ def _kontekst_systemu() -> str:
 
 def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
                 korpus: str | None = "biblioteka", rozwin: bool = False,
-                krytyka: bool = False, swiadomosc: bool = False) -> dict:
+                krytyka: bool = False, swiadomosc: bool = False,
+                probator: bool = True) -> dict:
     """Jeden temat: RAG → DeepSeek proponuje kandydatów. Zwraca dict cząstki (do kolejki).
 
     Zakłada, że indeks RAG ISTNIEJE (bramkuje raport() — Cubic P2). Status cząstki:
@@ -197,10 +198,16 @@ def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
         tresc += _kontekst_systemu()
     odp = glos.zapytaj(_SYSTEM, tresc, temperatura=0.4)
     rec = {**baza, "zrodla": zrodla, "kandydaci": odp.strip(), "status": "ok"}
+    if probator:  # WARSTWA 1 anty-halucynacyjna: cytat spoza podanych fragmentów (0 tokenów)
+        from imperium.pretorianie.probator import do_slownika, sprawdz
+        rec["probator"] = do_slownika(sprawdz(rec["kandydaci"], wyniki))
     if krytyka:  # U3: drugie przejście — dowody PRZECIW (osobne retrieval na kontrargumenty)
         kontra = szukaj(_fts_bezpieczne(f"{zapytanie} {_KONTRA_SUFIKS}"),
                         topk=topk, tryb=tryb, cichy=True, korpus=korpus)
         rec["krytyka"] = krytyka_kandydatow(glos, rec["kandydaci"], kontra)
+        if probator:  # krytyka to też plon modelu — bada się ją wobec WŁASNYCH fragmentów
+            from imperium.pretorianie.probator import do_slownika, sprawdz
+            rec["probator_krytyka"] = do_slownika(sprawdz(rec["krytyka"], kontra))
     return rec
 
 
@@ -232,7 +239,7 @@ def zapisz_czastke(czastka: dict) -> None:
 
 
 def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="biblioteka",
-           rozwin=False, krytyka=False, swiadomosc=False) -> str:
+           rozwin=False, krytyka=False, swiadomosc=False, probator=True) -> str:
     # Cubic P2: bramka indeksu RAG — brak bazy to AWARIA INFRY, nie „pusty wynik". Nie skanujemy
     # i NIC nie zapisujemy do kolejki (inaczej awaria udawałaby ukończony, pusty zwiad).
     from szukaj import DEFAULT_BAZA  # type: ignore[import]
@@ -249,6 +256,7 @@ def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="bi
     zrobione = set() if force else _tematy_ukonczone()
 
     N = len(tematy)
+    podejrzane: list[str] = []      # tematy, w których PROBATOR złapał cytat spoza fragmentów
     linie = [f"📚 HYGINUS (Bibliotekarz-Zwiadowca) — {N} tematów, {'DRY-RUN' if dry_run else 'DeepSeek'} "
              f"(⚠️ KANDYDACI — prawdą po arenie)"]
     for i, temat in enumerate(tematy, 1):
@@ -261,15 +269,27 @@ def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="bi
               file=sys.stderr, flush=True)
         try:
             czastka = scout_temat(glos, temat, topk=topk, tryb=tryb, korpus=korpus,
-                                  rozwin=rozwin, krytyka=krytyka, swiadomosc=swiadomosc)
+                                  rozwin=rozwin, krytyka=krytyka, swiadomosc=swiadomosc,
+                                  probator=probator)
         except Exception as e:  # noqa: BLE001
             print(f"[{i}/{N}] ⚠️ „{temat}”: {e}", file=sys.stderr, flush=True)
             continue
         zapisz_czastke(czastka)
         zr = ", ".join(czastka["zrodla"][:5]) or "—"
         print(f"[{i}/{N}] ✅ „{temat}” → źródła: {zr} | 💾 kolejka", file=sys.stderr, flush=True)
+        # PROBATOR mówi tylko wtedy, gdy ma co zarzucić — cisza znaczy „cytaty się zgadzają".
+        pro = czastka.get("probator") or {}
+        if pro and not pro.get("czysty", True):
+            print(f"[{i}/{N}] {pro['opis']}", file=sys.stderr, flush=True)
+            podejrzane.append(f"{temat} → {pro['opis']}")
         linie.append(f"\n── [{i}/{N}] {temat} (źródła: {zr}) ──\n{czastka['kandydaci']}")
+        if pro:
+            linie.append(pro["opis"])
 
+    if podejrzane:
+        linie.append(f"\n🚨 PROBATOR — {len(podejrzane)}/{N} tematów z cytatem spoza podanych "
+                     f"fragmentów (halucynacja citation; sędzia niech czyta je najostrożniej):")
+        linie.extend(f"   • {x}" for x in podejrzane)
     linie.append(f"\n💾 Kolejka: {KOLEJKA.relative_to(ROOT)} — do PRZEGLĄDU Opusa (sędzia). "
                  f"Nic nie wchodzi do kodu bez weryfikacji + areny (Prawo I, ZASADA WPIĘCIA).")
     return "\n".join(linie)
@@ -304,6 +324,8 @@ if __name__ == "__main__":
                    help="U4: wstrzyknij świadomość systemu (luki Prawa XV + istniejące klucze) — kandydaci pod realne braki")
     p.add_argument("--pelny", action="store_true",
                    help="komplet U2+U3+U4: --rozwin --krytyka --swiadomosc naraz (najlepszy zwiad)")
+    p.add_argument("--bez-probatora", action="store_true",
+                   help="wyłącz PROBATORA (strażnik cytatów, 0 tokenów) — domyślnie WŁĄCZONY")
     p.add_argument("--dry-run", action="store_true", help="tylko RAG, bez DeepSeek (bez kosztu API)")
     p.add_argument("--force", action="store_true", help="przeskanuj też tematy już w kolejce")
     args = p.parse_args()
@@ -314,4 +336,5 @@ if __name__ == "__main__":
     krytyka = args.krytyka or args.pelny
     swiadomosc = args.swiadomosc or args.pelny
     print(raport(tematy, topk=args.topk, tryb=args.tryb, dry_run=args.dry_run,
-                 force=args.force, korpus=korpus, rozwin=rozwin, krytyka=krytyka, swiadomosc=swiadomosc))
+                 force=args.force, korpus=korpus, rozwin=rozwin, krytyka=krytyka,
+                 swiadomosc=swiadomosc, probator=not args.bez_probatora))

@@ -28,6 +28,7 @@ powod_istnienia: "Jedna strona spinająca 25 Praw z realnym kodem — jedyne mie
 🛡️ PRETORIANIE     pretorianie/   aegis_tarcza          ryzyko, circuit breaker[IX]
                                    lustro_prawdy         walidacja adwersarialna[I, IX]
                                    portitor              celnik u wrót: pre-flight środowiska startu[XV, XVII]
+                                   probator              strażnik cytatów: plon Hyginusa vs podane fragmenty[I, XVI]
 🚰 AKWEDUKTY        akwedukty/     kwatermistrz_danych   dane OHLCV (CCXT/CSV)  [II]
 👁️ OCZY            oczy/          wszechoko             percepcja wielowarstwowa[XII]
                                    censor_sprzetu        cenzus majątku maszyny → klasa+alarm[XV]
@@ -91,6 +92,7 @@ Organy pomocnicze POZA `imperium/` — dobór nazwy DO FUNKCJI (ZASADA NOMENKLAT
 | **Conflator Temporum** (Zlewacz Interwałów) | `narzedzia/agreguj_bary.py` | buduje wyższy interwał z niższego (1m→5m/15m, 1h→4h); odrzuca niepełne okna, ostrzega przy nadpisaniu danych z giełdy | [I, XVI] |
 | **Nuntius Mercatus** (Posłaniec Rynku) | `narzedzia/pobierz_binance.py` | pobiera świece dowolnego interwału z publicznego API Binance; checkpoint stronicowy = zabity bieg traci jedną stronę, nie postęp | [I, XXIV] |
 | **Census Organorum** (Spis Organów) | `narzedzia/census_organorum.py` | spis WSZYSTKICH modułów `imperium/`+`narzedzia/` generowany z żywego kodu (rola = docstring); bramka Warstwy 17 audytu — moduł bez meldunku blokuje commit | [XV, XIX, XXI] |
+| **Probator** (Strażnik Cytatów) | `imperium/pretorianie/probator.py` | warstwa 1 anty-halucynacyjna Hyginusa: deterministycznie (0 tokenów) sprawdza, czy każde cytowane źródło NAPRAWDĘ było modelowi podane — grounding wobec promptu, nie wobec korpusu. Abstencja = wynik poprawny. Monotonicznie ostrożny: dokłada werdykt do cząstki, nic nie odrzuca | [I, XVI, XXI] |
 | **Dispensator** (Szafarz) | `imperium/cesarz/dispensator.py` | dobór modelu DeepSeek do trudności zadania (ZASADA OSZCZĘDNOŚCI TOKENÓW) — organ rdzenia Cezara, nie narzędzie; wpisany tu po tym, jak cenzus 2026-07-20 zastał go niezameldowanym w ŻADNYM dokumencie | [XVI, XVIII] |
 
 ---

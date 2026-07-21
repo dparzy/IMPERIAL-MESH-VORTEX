@@ -113,6 +113,12 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-21 — PROBATOR wykrył realny nieugruntowany plon Hyginusa mimo promptu
+2367 znaków w kolejce Hyginusa bez żadnego cytowania źródła, choć prompt wyraźnie tego wymaga. Organ wychwycił to przy pierwszym pomiarze.
+
+### 2026-07-21 — Archiwum lekcji ma inny nagłówek – schłodzone lekcje niewidoczne dla szukaj()
+Parser modułu LEKCJE nie obsługiwał nagłówka archiwum, przez co po schłodzeniu lekcje znikały z wyszukiwania. Luka wykryta i naprawiona.
+
 ### 2026-07-21 — Znaleziono realnie nieugruntowany plon Hyginusa w kolejce
 Pierwszy bieg Probatora na realnym plonie wykrył 2367 znaków kandydatów bez żadnego powołania na źródło, mimo że prompt tego żądał. Potwierdzona potrzeba weryfikacji.
 

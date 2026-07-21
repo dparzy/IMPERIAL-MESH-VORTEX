@@ -180,3 +180,68 @@ def test_scout_swiadomosc_wstrzykuje_kontekst(monkeypatch):
     assert "SENTINEL_KTX" in zebrane["tresc"]              # ON → kontekst dołączony
     scout_temat(G(), "momentum", topk=3, swiadomosc=False)
     assert "SENTINEL_KTX" not in zebrane["tresc"]          # OFF → bez kontekstu
+
+
+# ── PROBATOR wpięty w plon (warstwa 1 anty-halucynacyjna, 0 tokenów) ────────────
+
+def _fake_szukaj_bib006(monkeypatch, zrodlo="BIB-006_Carson_Scalping.epub", chunk=8):
+    """Podstawia RAG zwracający JEDEN znany fragment — wiemy dokładnie, co model 'dostał'."""
+    import szukaj as szukaj_mod
+
+    def fake_szukaj(q, topk=5, tryb="hybrid", cichy=False, korpus=None, **kw):
+        return [_FakeWynik(zrodlo, "Carson — Scalping", chunk, "tekst", -1.0, "biblioteka")]
+
+    monkeypatch.setattr(szukaj_mod, "szukaj", fake_szukaj)
+
+
+def test_probator_czysty_gdy_model_cytuje_podane_zrodlo(monkeypatch):
+    """Cytat zgodny z tym, co podano → werdykt CZYSTY, cząstka bez alarmu."""
+    _fake_szukaj_bib006(monkeypatch)
+    cz = scout_temat(_FakeGlos(odp="Kandydat 1 wg BIB-006 chunk 8."), "momentum", topk=3)
+    assert cz["probator"]["status"] == "CZYSTY" and cz["probator"]["czysty"] is True
+
+
+def test_probator_lapie_zrodlo_ktorego_nie_podano(monkeypatch):
+    """RDZEŃ: model powołuje się na książkę, której NIE dostał → halucynacja citation.
+    Cząstka niesie ostrzeżenie do kolejki, którą czyta sędzia-Opus."""
+    _fake_szukaj_bib006(monkeypatch)
+    cz = scout_temat(_FakeGlos(odp="Kandydat wg BIB-047 Kaufman."), "momentum", topk=3)
+    assert cz["probator"]["status"] == "PODEJRZANY"
+    assert cz["probator"]["obce_zrodla"] == ["BIB-047"]
+
+
+def test_probator_domyslnie_wlaczony_i_wylaczalny(monkeypatch):
+    """Domyślnie ON (deterministyczny, bez kosztu); da się wyłączyć bez zmiany reszty plonu."""
+    _fake_szukaj_bib006(monkeypatch)
+    zap = scout_temat(_FakeGlos(odp="Kandydat wg BIB-006."), "momentum", topk=3)
+    bez = scout_temat(_FakeGlos(odp="Kandydat wg BIB-006."), "momentum", topk=3, probator=False)
+    assert "probator" in zap and "probator" not in bez
+    assert zap["kandydaci"] == bez["kandydaci"]         # plon identyczny — organ tylko OPISUJE
+
+
+def test_probator_nie_zmienia_kandydatow_ani_statusu(monkeypatch):
+    """ZASADA WPIĘCIA: organ jest monotonicznie ostrożny — dokłada werdykt, nic nie odrzuca."""
+    _fake_szukaj_bib006(monkeypatch)
+    cz = scout_temat(_FakeGlos(odp="Kandydat wg BIB-999 (wymyślony)."), "momentum", topk=3)
+    assert cz["status"] == "ok"                         # cząstka NADAL trafia do kolejki
+    assert cz["kandydaci"] == "Kandydat wg BIB-999 (wymyślony)."
+
+
+def test_probator_bada_takze_krytyke(monkeypatch):
+    """Krytyka to też plon modelu — bada się ją wobec WŁASNYCH fragmentów kontra."""
+    _fake_szukaj_bib006(monkeypatch)
+    cz = scout_temat(_FakeGlos(odp="Ocena wg BIB-777."), "momentum", topk=3, krytyka=True)
+    assert cz["probator_krytyka"]["obce_zrodla"] == ["BIB-777"]
+
+
+def test_czastka_z_probatorem_jest_json_serializowalna(monkeypatch):
+    """Cząstka idzie do JSONL — werdykt nie może wnieść obiektu nieserializowalnego."""
+    _fake_szukaj_bib006(monkeypatch)
+    cz = scout_temat(_FakeGlos(odp="Kandydat wg BIB-006 chunk 8."), "momentum", topk=3)
+    assert json.loads(json.dumps(cz, ensure_ascii=False))["probator"]["status"] == "CZYSTY"
+
+
+def test_dry_run_nie_dostaje_werdyktu(monkeypatch):
+    """Granica: bez odpowiedzi modelu nie ma czego badać — brak pola, nie fałszywy alarm."""
+    _fake_szukaj_bib006(monkeypatch)
+    assert "probator" not in scout_temat(None, "momentum", topk=3)

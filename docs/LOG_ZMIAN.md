@@ -14,6 +14,39 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | 🛡️ | PROBATOR — Strażnik Cytatów (warstwa 1 anty-halucynacyjna Hyginusa)
+
+Rozkaz Cezara: rozbudowa Hyginusa, start od citation-checku. **Powód (web 2026-07-21):** DeepSeek
+V4-Pro halucynuje **94%**, V4-Flash **96%** na pytaniach wiedzy. Z czterech typów halucynacji
+(factual, grounding, **citation**, reasoning) **citation jako jedyny da się złapać
+DETERMINISTYCZNIE — bez modelu, bez tokenów, bez kosztu**, więc idzie pierwszy.
+
+- **Organ:** `imperium/pretorianie/probator.py` (rzym. *probator* — ten, kto bada i dopuszcza).
+  Sprawdza, czy cytowane BIB-xxx/chunk **było modelowi PODANE w tym prompcie** — nie „czy istnieje
+  w bibliotece". To rozróżnienie jest sednem: powołanie się na realną książkę, której się nie
+  dostało, jest konfabulacją tak samo jak wymyślony tytuł.
+- **Abstencja = wynik POPRAWNY:** „fragmenty nic nie wnoszą" nie ma cytatów i nie jest wadą —
+  karanie milczenia uczyłoby model konfabulować.
+- **Wpięcie:** pole `probator` (i `probator_krytyka`) w cząstce kolejki + alarm na stderr.
+  **Monotonicznie ostrożne** — dokłada werdykt, nic nie odrzuca; `--bez-probatora` wyłącza.
+- **POMIAR na 33 realnych cząstkach kolejki:** **0 cytatów spoza podanych fragmentów** — prompt RAG
+  Hyginusa trzyma. Jeden prawdziwy alarm: temat *volatility surface…* ma **2367 znaków kandydatów
+  i zero powołań na źródło** mimo żądania promptu. Zapisane w ledgerze CODEX (Pomiary).
+- **Dwie ślepe plamy własnego detektora, obie znalezione zanim uznałem go za gotowy:** (1) `\b`
+  **nie domyka się na podkreśleniu**, więc regex nie widział cytatu w formie `BIB-006_Autor_Tytul.pdf`
+  — czyli w tej, którą model dostaje (złapane własnymi testami: 13/20 czerwonych); (2) brak wariantu
+  **cytowania NAZWISKIEM autora** („Źródła: Hull chunk 560") dał **2 fałszywe alarmy z 4** przy
+  pierwszym biegu na realnym plonie. Aliasy nazwisk działają **wyłącznie na korzyść modelu** —
+  nigdy nie tworzą nowego alarmu, więc nie mogą wyprodukować fałszywego oskarżenia.
+
+Testy 2744→**2778** (+34), audyt exit 0 (W17: 241 modułów). **LEX TALIONIS:** N-7dfb397f ↔
+C-0ecb7eb8 (dług 0). **Księga Wad +2:** „granica słowa `\b` nie domyka się na podkreśleniu",
+„detektor uznany za gotowy po testach autora, bez biegu na realnych danych".
+**Pliki:** `imperium/pretorianie/probator.py`, `narzedzia/bibliotekarz.py`, `tests/test_probator.py`,
+`tests/test_bibliotekarz.py`, `docs/ARCHITEKTURA_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`.
+
+---
+
 ## 2026-07-21 | 🧠 | TEMPERATOR MEMORIAE — pamięć chłodzi się sama (alarm Prawa XV przestał wracać)
 
 Alarm hooka „sekcja LEKCJE > 24000 zn." wracał **po każdym ręcznym sprzątaniu**: 07-19 skonsolidowano

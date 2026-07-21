@@ -12,6 +12,30 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-20 — Pure-Python funkcje cicho produkują błędne wyniki przy nierównych seriach
+TA-Lib głośno rzuca Exception, ale VWAP i VWAP_STD milcząco dają błędne wyniki (różnica 10.0, ~7%). Pieczątka audytu kłamie: input_len=100 przy rzeczywistych 80 barach. Złamanie Praw XIII i I.
+
+### 2026-07-20 — Mechanizm zasiewu połyka regex z checklisty
+Funkcja 'zasiej_startowe' cicho ignoruje pole 'regex' wpisu w checkliście – wzorce w Księdze Wad nigdy nie skanowały. Przyczyna: domyślna inicjalizacja pomija nieobowiązkowe klucze.
+
+### 2026-06-30 — Podczas implementacji pomijano aktualizację dokumentacji modułowej (KALKULATOR_LEWARA.md, IGRZYSKA_IMPERIUM.md, GENERAL_LEGATUS.md)
+Użytkownik zwrócił uwagę, że dokumentacje specyficzne dla modułów nie były aktualizowane ani egzekwowane przez audyt_spojnosci.py. Nakazano audyt wszystkich dokumentów z indeksu.
+
+### 2026-06-30 — Archiwizacja bez przeczytania pliku prowadzi do utraty ważnych danych
+ARSENAL_IMPERIUM (zweryfikowany katalog ~220 narzędzi) i WZORZEC_DNSS (referencja architektury) zostały błędnie zarchiwizowane. Wymusiło to dodanie Zasady Archiwizacji do CLAUDE.md.
+
+### 2026-06-30 — Konieczność audytu dokumentacji przed dalszym rozwojem
+Użytkownik zwrócił uwagę, że dokumentacja nie jest aktualizowana podczas implementacji wizji; nakazał audyt wszystkich dokumentów z INDEKS_IMPERIUM względem kodu i dodanie egzekucji w narzędziu audytu.
+
+### 2026-06-30 — VPIN neuron nigdy nie jest kierunkowy
+NeuronToxicFlow (Z-01) zawsze zwraca NEUTRAL kierunek. Jego rola to tylko tłumienie roju przez pewnosc_przeciwnika gdy VPIN>0.7. Nigdy nie głosuje na stronę.
+
+### 2026-06-30 — DeepSeek API klucz NIGDY w kodzie ani w czacie
+Zasada bezpieczeństwa: klucz DeepSeek API musi być tylko w zmiennych środowiskowych. W kodzie użyto [ZREDAGOWANO] jako placeholder. Dotyczy to wszystkich plików w Imperium.
+
+### 2026-07-10 — Równa waga = 48.2% odtwarza diagnozę triady 48.3%
+Pomiar hipotezy B na 5 parach 4h OOS daje globalnie 48.2% dla równej wagi, co odtwarza diagnozę triady 48.3% co do promila — walidacja pomiaru.
+
 ### 2026-07-20 — zasiej_startowe cicho zjada regex z checklisty
 Mechanizm zasiewu wzorców nie przenosi regexu z checklisty do wzorców startowych, bo lista WZORCE_STARTOWE kończy się wcześniej. Wzorce leżą martwe w checkliście.
 

@@ -73,6 +73,13 @@ POLA_WYMAGANE = ("kategoria", "typ", "wlasciciel", "stan_na", "powod_istnienia")
 POZA_REJESTREM = ("archiwum", "bibliotheca_ulpia", "wrzutnia", ".claude", "dane",
                   ".git", ".pytest_cache", "node_modules", "__pycache__")
 
+# Żywe DROGOWSKAZY spoza rejestru organów, których LICZBY mają jednak nadążać za kodem.
+# `bibliotheca_ulpia/README.md` jest w POZA_REJESTREM (historia — nie tykamy T1/T2 bez
+# frontmatter), ALE podaje liczbę ksiąg, która gniła niezauważona (69 przy 115, wstyd
+# Cezara 2026-07-21 — żadna bramka jej nie pilnowała). Wpinamy TYLKO w warstwę liczb (T4),
+# nie w T1/T2 — blok `<!-- LICZBA:ksiazki -->` jest teraz przepisywany i audytowany.
+DROGOWSKAZY_Z_LICZBAMI = ("bibliotheca_ulpia/README.md",)
+
 ZNACZNIK_START = "<!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->"
 ZNACZNIK_KONIEC = "<!-- TABULARIUM:koniec -->"
 
@@ -163,7 +170,12 @@ def wstrzyknij_liczby(sucho=False):
     """
     wartosci = wartosci_z_kodu()
     zmiany, bledy = [], []
-    for sciezka, meta in zbierz_dokumenty():
+    dokumenty = list(zbierz_dokumenty())
+    # Dołącz żywe drogowskazy spoza rejestru (np. README biblioteki) — tylko warstwa liczb.
+    for wzgl in DROGOWSKAZY_Z_LICZBAMI:
+        if os.path.exists(os.path.join(ROOT, wzgl)):
+            dokumenty.append((wzgl, {}))
+    for sciezka, meta in dokumenty:
         if meta.get("typ") == "acta":
             continue
         pelna = os.path.join(ROOT, sciezka)

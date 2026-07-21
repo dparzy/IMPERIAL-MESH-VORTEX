@@ -318,3 +318,52 @@ def test_atrapa_glosu_zgodna_z_mostem():
     ma_kwargs = any(p.kind is inspect.Parameter.VAR_KEYWORD for p in atrapa.parameters.values())
     brakuje = prawdziwe - set(atrapa.parameters)
     assert ma_kwargs or not brakuje, f"atrapa nie przyjmie: {sorted(brakuje)}"
+
+
+def test_swiadomosc_jest_DOMYSLNIE_wlaczona(monkeypatch):
+    """U4 domyślnie ON od 2026-07-21 (rozkaz Cezara po sądzie nad kolejką).
+
+    POWÓD, dla którego to jest test, a nie tylko wartość domyślna: pomiar na 33 cząstkach
+    pokazał, że bez tego bloku zwiad proponuje moduły, które JUŻ ISTNIEJĄ w kodzie —
+    VPIN (WSKAZNIK VPIN_50), Value Area (VP-01), Kelly (IUSTITIA), CVD, Kalman, triple_barrier,
+    DSR/PBO. Cichy powrót do opt-in oznaczałby powrót do płacenia za duplikaty."""
+    import szukaj as szukaj_mod
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda *a, **k: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    monkeypatch.setattr(bib, "_kontekst_systemu", lambda: "\nSENTINEL_KTX")
+    zebrane = {}
+
+    class G:
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+            zebrane["tresc"] = tresc
+            return "kand"
+
+    scout_temat(G(), "momentum", topk=3)          # BEZ jawnego swiadomosc=
+    assert "SENTINEL_KTX" in zebrane["tresc"]
+
+
+def test_blok_swiadomosci_zawiera_zakaz_duplikatow():
+    """Sedno U4: blok musi NAZWAĆ istniejące klucze i zakazać ich powielania.
+    Sam fakt wstrzyknięcia czegokolwiek nie wystarczy — treść jest tu mechanizmem."""
+    blok = bib._kontekst_systemu()
+    if not blok:
+        return                                     # brak rejestru → zwiad działa dalej (Prawo XV)
+    assert "NIE proponuj duplikatów" in blok
+    assert "LUKI" in blok
+
+
+def test_bez_swiadomosci_da_sie_wylaczyc(monkeypatch):
+    """Wyłącznik musi zostać: bieg porównawczy (A/B jakości plonu) wymaga obu ramion."""
+    import szukaj as szukaj_mod
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda *a, **k: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    monkeypatch.setattr(bib, "_kontekst_systemu", lambda: "\nSENTINEL_KTX")
+    zebrane = {}
+
+    class G:
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+            zebrane["tresc"] = tresc
+            return "kand"
+
+    scout_temat(G(), "momentum", topk=3, swiadomosc=False)
+    assert "SENTINEL_KTX" not in zebrane["tresc"]

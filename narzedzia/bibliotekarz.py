@@ -157,6 +157,16 @@ def krytyka_kandydatow(glos, kandydaci: str, wyniki_kontra) -> str:
         return "(krytyka niedostępna — błąd API)"
 
 
+# U4 jest DOMYŚLNIE WŁĄCZONE od 2026-07-21 (sąd nad kolejką, rozkaz Cezara).
+# POWÓD — POMIAR na 33 zebranych cząstkach: sztandarowi kandydaci JUŻ ISTNIELI w kodzie
+# (VPIN → WSKAZNIK „VPIN_50" + doradca HERMES; Value Area → neuron VP-01; Kelly → IUSTITIA;
+# CVD i FUNDING_EXTREME → wskaźniki; Kalman → exp_kalman; triple_barrier → W-357;
+# DSR/PBO/meta-labeling → koloseum). Wina NIE leżała po stronie modelu: blok świadomości
+# systemu — jedyne miejsce, gdzie pada „NIE proponuj duplikatów, oto istniejące klucze" —
+# był opt-in, a te biegi go nie miały. Zwiad nieznający roju z definicji proponuje to,
+# co rój już posiada (Prawo XVI: redundancja mierzona, nie zgadywana).
+# Koszt zmierzony: 3914 znaków ≈ 978 tokenów na temat, ~$0.005 za 33 tematy na flashu —
+# wobec kosztu produkowania duplikatów i czasu sędziego to zaokrąglenie do zera.
 @functools.lru_cache(maxsize=1)
 def _kontekst_systemu() -> str:
     """U4 (świadomość systemu): zwięzły blok o LUKACH (Prawo XV) i ISTNIEJĄCYCH modułach
@@ -187,7 +197,7 @@ def _kontekst_systemu() -> str:
 
 def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
                 korpus: str | None = "biblioteka", rozwin: bool = False,
-                krytyka: bool = False, swiadomosc: bool = False,
+                krytyka: bool = False, swiadomosc: bool = True,
                 probator: bool = True) -> dict:
     """Jeden temat: RAG → DeepSeek proponuje kandydatów. Zwraca dict cząstki (do kolejki).
 
@@ -259,7 +269,7 @@ def zapisz_czastke(czastka: dict) -> None:
 
 
 def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="biblioteka",
-           rozwin=False, krytyka=False, swiadomosc=False, probator=True) -> str:
+           rozwin=False, krytyka=False, swiadomosc=True, probator=True) -> str:
     # Cubic P2: bramka indeksu RAG — brak bazy to AWARIA INFRY, nie „pusty wynik". Nie skanujemy
     # i NIC nie zapisujemy do kolejki (inaczej awaria udawałaby ukończony, pusty zwiad).
     from szukaj import DEFAULT_BAZA  # type: ignore[import]
@@ -341,9 +351,14 @@ if __name__ == "__main__":
     p.add_argument("--krytyka", action="store_true",
                    help="U3: self-critique — drugie przejście szuka DOWODÓW PRZECIW kandydatom (+1 RAG +1 call/temat)")
     p.add_argument("--swiadomosc", action="store_true",
-                   help="U4: wstrzyknij świadomość systemu (luki Prawa XV + istniejące klucze) — kandydaci pod realne braki")
+                   help="(bez efektu — U4 jest domyślnie WŁĄCZONE od 2026-07-21; flaga zostawiona, "
+                        "żeby stare polecenia i skrypty nie padały)")
+    p.add_argument("--bez-swiadomosci", action="store_true",
+                   help="wyłącz U4 (świadomość systemu: istniejące klucze + luki Prawa XV). "
+                        "UWAGA: bez tego bloku zwiad proponuje moduły, które JUŻ MAMY — zmierzone "
+                        "na 33 cząstkach, gdzie VPIN/Value Area/Kelly/CVD/Kalman już istniały")
     p.add_argument("--pelny", action="store_true",
-                   help="komplet U2+U3+U4: --rozwin --krytyka --swiadomosc naraz (najlepszy zwiad)")
+                   help="komplet U2+U3: --rozwin --krytyka naraz (U4 i tak domyślnie ON)")
     p.add_argument("--bez-probatora", action="store_true",
                    help="wyłącz PROBATORA (strażnik cytatów, 0 tokenów) — domyślnie WŁĄCZONY")
     p.add_argument("--dry-run", action="store_true", help="tylko RAG, bez DeepSeek (bez kosztu API)")
@@ -354,7 +369,7 @@ if __name__ == "__main__":
     korpus = None if args.korpus == "wszystko" else args.korpus  # 'wszystko' → bez filtra (dawne zachowanie)
     rozwin = args.rozwin or args.pelny
     krytyka = args.krytyka or args.pelny
-    swiadomosc = args.swiadomosc or args.pelny
+    swiadomosc = not args.bez_swiadomosci        # domyślnie ON — patrz komentarz przy _kontekst_systemu
     print(raport(tematy, topk=args.topk, tryb=args.tryb, dry_run=args.dry_run,
                  force=args.force, korpus=korpus, rozwin=rozwin, krytyka=krytyka,
                  swiadomosc=swiadomosc, probator=not args.bez_probatora))

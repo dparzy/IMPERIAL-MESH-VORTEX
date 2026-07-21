@@ -14,6 +14,31 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | 🧭 | U4 (świadomość systemu) DOMYŚLNIE ON — koniec płacenia za duplikaty
+
+Wniosek z sądu nad kolejką, wdrożony w tej samej sesji (rozkaz Cezara „wg planu"). Zwiad, który
+nie wie, co Imperium już posiada, z definicji proponuje to, co posiada — i dokładnie to zmierzyliśmy
+na 33 cząstkach: VPIN, Value Area, Kelly, CVD, funding, Kalman, triple-barrier, DSR/PBO **już były
+w kodzie**. Blok `_kontekst_systemu` (jedyne miejsce, gdzie pada „**NIE proponuj duplikatów**, oto
+istniejące klucze" + luki Prawa XV) był opt-in.
+
+- `scout_temat`/`raport`: `swiadomosc=True`. CLI: nowe `--bez-swiadomosci`; stare `--swiadomosc`
+  zostawione jako bezefektowe, żeby cudze polecenia i skrypty nie padały.
+- **Weryfikacja przed wdrożeniem (ZASADA WPIĘCIA):** zwiad **nie dotyka ścieżki decyzyjnej** —
+  zero odwołań do `bibliotekarz` z `koloseum/` i `cesarz/`. Żaden próg, sizing ani filtr nie tknięty,
+  więc opt-in nie jest wymagany.
+- **Koszt zmierzony:** 3914 znaków ≈ 978 tokenów na temat (~$0.005 za 33 tematy na flashu) — wobec
+  kosztu duplikatów i czasu sędziego to zaokrąglenie do zera.
+- **Wyłącznik zostaje** — A/B jakości plonu (z blokiem vs bez) wymaga obu ramion.
+- +3 testy, w tym jeden pilnujący, że U4 jest **domyślnie ON** (cichy powrót do opt-in = powrót do
+  płacenia za powtórki) i jeden sprawdzający TREŚĆ bloku, nie sam fakt wstrzyknięcia.
+
+Sugestia w ledgerze CODEX **ZAMKNIĘTA**, nie zostaje wiszącym kandydatem (lekcja z 07-20: sugestia
+zgłoszona po raz drugi = naprawa TERAZ). **Pliki:** `narzedzia/bibliotekarz.py`,
+`tests/test_bibliotekarz.py`.
+
+---
+
 ## 2026-07-21 | ⚖️ | WARSTWA 18 — dług honorowy LEX TALIONIS zatrzymuje commit (bramka TWARDA)
 
 Znalezisko zwiadu, **decyzja Cezara**: bilans not był najpierw sprawdzany tylko w kroku 5b

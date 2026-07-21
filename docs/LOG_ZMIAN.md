@@ -14,6 +14,34 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-21 | ⚖️ | WARSTWA 18 — dług honorowy LEX TALIONIS zatrzymuje commit (bramka TWARDA)
+
+Znalezisko zwiadu, **decyzja Cezara**: bilans not był najpierw sprawdzany tylko w kroku 5b
+zamknięcia, potem — po pierwszej naprawie tego dnia — również *drukowany* na otwarciu. Ale
+drukowanie to **widoczność, nie egzekwowalność**: `codex_notarum bilans` nie zwracał niezerowego
+kodu, a hook wołał go z `|| true`. Dług otwarty w sesji N mógł przeżyć N+1 i N+2, mimo że zasada
+mówi wprost „sesja nie domyka się z niespłaconym długiem honorowym".
+
+- **Bramka TWARDA jak W17:** dług > 0 → audyt exit 1 → commit stoi. Miękki alarm odrzucony
+  świadomie — to ten sam mechanizm, który zawiódł już dwa razy (wąska Warstwa 11 przy „pełnej
+  harmonii", alarm W9 wiszący przez sesje). **Alarm, którego wolno nie posłuchać, prędzej czy
+  później nie zostaje posłuchany.**
+- **Zakleszczenia brak:** dług spłaca się dopisaniem CORONY do ledgera, co nie wymaga commitu.
+- **DOWÓD, ŻE GRYZIE** (nie sama deklaracja): sztuczny dług → CZERWIEŃ, po CORONIE → zieleń.
+  Dodatkowo test granicy LEX TALIONIS: **CORONA bez pola `splaca` NIE zamyka długu** — inaczej
+  dowolny laur kasowałby dowolny błąd.
+- **Wada złapana przy pisaniu samego dowodu:** pierwsza wersja podmieniała stałą modułu i po cichu
+  czytała PRAWDZIWY ledger (`bilans(sciezka=LEDGER)` wiąże domyślny argument w chwili definicji),
+  więc meldowała zieleń dla sztucznie utworzonego długu. **Sam dowód był mechanizmem, który przy
+  awarii wygląda na sprawny.** Stąd jawna ścieżka w sygnaturze warstwy — organ bramkujący bez
+  wstrzykiwalnego źródła jest z definicji niesprawdzalny.
+
+**LEX TALIONIS:** N-02f2b752 ↔ C-562b21ef (dług 0). **Księga Wad +1:** „dowód »czy bramka gryzie«
+mierzący inny obiekt, niż deklaruje". **Pliki:** `narzedzia/audyt_spojnosci.py`,
+`tests/test_spojnosc.py`, `CLAUDE.md` (17→18 warstw, checklista Prawa XXI).
+
+---
+
 ## 2026-07-21 | 🔭 | DISPENSATOR wpięty w Hyginusa + zwiad adwersarialny otwarcia (3 wady)
 
 **Część 1 — rozkaz o rozbudowie Hyginusa.** Most mowy (`deepseek_glos.zapytaj`) przyjmuje teraz

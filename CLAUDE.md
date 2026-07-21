@@ -158,6 +158,10 @@ Checklist Prawa XIX (sprawdzaj na początku sesji):
 - [ ] **Warstwa 13 (ruff):** linter czysty — zero bugów/martwego kodu (F811 duplikaty, F821 undefined, F841/F401 martwe). Audyt uruchamia ruff automatycznie.
 - [ ] **Warstwa 14 (wszystkie docs):** MAPA_KLUCZY.md zawiera KAŻDY klucz z kodu (dodajesz neuron → dopisujesz mapę). Audyt skanuje wszystkie pliki .md.
 - [ ] **Warstwa 15 (liczby wstrzykiwane):** żadnej liczby o systemie NIE wpisujesz ręcznie — wstawiasz blok `<!-- LICZBA:neurony -->87<!-- /LICZBA -->`, a `python narzedzia/tabularium.py liczby --zapisz` przepisuje go z żywego kodu. Powód (zmierzone 2026-07-17): trzy dokumenty podawały „neuronów w kodzie" jako 47/27/55 przy 87 — każda była prawdziwa w dniu pisania. Ręczna liczba zawsze się rozjedzie, bo rośnie kod, a nie dokument.
+- [ ] **Warstwa 18 (LEX TALIONIS):** dług honorowy = 0. Zatwierdzony błąd bez kompensującej CORONY
+      zatrzymuje commit — bramka TWARDA (decyzja Cezara 2026-07-21). Powód: samo DRUKOWANIE bilansu
+      na otwarciu dawało widoczność, nie egzekwowalność, więc dług mógł przeżyć kilka sesji.
+      Zakleszczenia brak: CORONĘ dopisuje się do ledgera, co nie wymaga commitu.
 - [ ] **Warstwa 16 (API-widma):** każda ścieżka `korzeń/…/x.py` cytowana w ŻYWYM dokumencie jako fakt MUSI istnieć w kodzie. Suppresje: bloki ```python (kod przykładowy), markery planu/negacji w linii („do zbudowania", „nie istniał", 🔴/🟠/💭/WIZJA), changelogi/rejestry-zamiarów. Powód (zmierzone 2026-07-18): spłata długu gnicia szła dokument-po-dokumencie i NIE łapała plików, których nigdy nie było — skan całego korpusu naraz znalazł 3 martwe komendy w żywym INDEKS-ie przy „pełnej harmonii". To klasa war_lancer/valhalla (w archiwum, nie w `imperium/`) i Kronikarz v2 Interrogator (0 trafień).
 - [ ] **Testy granic:** każdy neuron/moduł z PROGAMI ma testy wartości granicznych (0/None/±/dokładnie-próg) — patrz Reguła Test-Granic niżej
 - [ ] **Data "Stan na:"** w MANIFEST i README = data bieżącego commitu
@@ -509,7 +513,7 @@ wpływ na Imperium · zgodność z zasadami · dowód z pomiaru) — czyli ryzyk
 **Każdy krok ma samokontrolę, każda wykryta luka jest NATYCHMIAST łatana, a po łacie powstaje
 MECHANIZM, żeby ta klasa luki nie wróciła.** (Censor w Rzymie prowadził cenzus i nadzór obyczajów —
 u nas: spis stanu + egzekwowanie reakcji.) To spina istniejące organy w jedną pętlę obowiązku:
-audyt 16 warstw (spójność) · Księga Wad (klasy błędów) · skan_wad (powtórki) · pamięć W-360
+audyt 18 warstw (spójność) · Księga Wad (klasy błędów) · skan_wad (powtórki) · pamięć W-360
 z Refleksją W9 (sprzeczności) · CODEX (rejestr testów) · testy granic.
 
 **PĘTLA (przy każdej zmianie i każdym alarmie):**
@@ -618,7 +622,7 @@ znak uruchamiający pełną checklistę. Organ: **SIGILLARIUM** (`imperium/bibli
 |---|---|---|
 | `/apertio` | pełną checklistę **OTWARCIA SESJI** (sekcja niżej) | otwarcie, start sesji, zaczynamy, nowa sesja |
 | `/clausura` | pełną checklistę **KOŃCA SESJI** (sekcja niżej) | zamknięcie, koniec sesji, domykamy, kończymy |
-| `/limes` | **bramkę Prawa XXI**: testy → audyt (17 warstw z ruff) → skan wad → INDEX FALSORUM → dług honorowy | bramka, przed commitem, sprawdź wszystko |
+| `/limes` | **bramkę Prawa XXI**: testy → audyt (18 warstw: ruff W13, census W17, dług honorowy W18) → skan wad → INDEX FALSORUM | bramka, przed commitem, sprawdź wszystko |
 
 **ŻELAZNA ZASADA: pieczęć NIE przechowuje kroków — czyta je z TEGO pliku w chwili wywołania.**
 Powód zmierzony (2026-07-20): runbook W11 kazał Claude `git push` przez 9 dni po zakazie (rozkaz
@@ -647,7 +651,7 @@ Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
 1. **Przeczytaj wydruk hooka w całości** (kolejność drukowania): 🎯 **NASTĘPNY KROK** (banner na górze,
    A2 — zawsze widoczny mimo ~25 KB) → **PORTITOR** (pre-flight środowiska: deps/klucze API/dryf, B1)
    → **CENSOR SPRZĘTU** (żelazo zmierzone) → **INDEX FALSORUM** → **BREVIARIUM** (słudzy: Hyginus/TIRO/
-   modele) → **LEX TALIONIS** (dług honorowy) → **audyt Prawo XXI** (17 warstw) → **CODEX**
+   modele) → **LEX TALIONIS** (dług honorowy) → **audyt Prawo XXI** (18 warstw) → **CODEX**
    (podsumowanie ledgera, C1) → **Centrum Pamięci** (profil, Top-3 lekcji, aktywny cel W12, Refleksja W9)
    → **Dziennik Nieśmiertelny** (pełna oś) → **skan wad ostatniego commitu**. Wydruk >25 KB bywa ucięty
    w podglądzie — pełna treść jest w pliku `tool-results/hook-*.txt` (czytaj go, jeśli banner/plan zniknął).

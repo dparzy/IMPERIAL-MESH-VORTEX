@@ -12,6 +12,87 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-20 — zasiej_startowe cicho zjada regex z checklisty
+Mechanizm zasiewu wzorców nie przenosi regexu z checklisty do wzorców startowych, bo lista WZORCE_STARTOWE kończy się wcześniej. Wzorce leżą martwe w checkliście.
+
+### 2026-07-21 — Ukryta zależność od monkeypatch w runnerze Imperium
+Testy PEDES przechodzą pod pytest, ale padają pod własnym runnerem Imperium, którego shim monkeypatch nie ma metody setitem. Naprawiono bez zależności od shimu.
+
+### 2026-07-21 — Testy padają pod runnerem Imperium przez brak setitem w shimie monkeypatch
+Testy zielone pod pytest, ale padają pod własnym runnerem – shim monkeypatch nie ma setitem. Naprawiono bez zależności od shimu.
+
+### 2026-07-20 — Parametry Fujitsu Lifebook E754
+CPU i5-4200M Haswell 2013, 2 rdzenie/4 wątki, 2.5 GHz. RAM 16 GB (9 GB wolne). GPU Intel HD 4600 1 GB – bezużyteczne do LLM. Inferencja tylko CPU, maksymalny model 3-8B mocno skwantyzowany.
+
+### 2026-07-20 — Testy 1648/1648 zielone – kod stabilny
+Po wymuszeniu UTF-8 testy przechodzą w 100%. Fałszywy alarm w aktualizuj.ps1 wynikał z kodowania konsoli (cp1250 nie obsługuje emoji).
+
+### 2026-07-20 — IC EXP-13/14 podejrzanie wysoki – możliwy artefakt autokorelacji
+IC ~0.25-0.30, podczas gdy typowe IC >0.05 jest rzadkie. Wskazuje to na możliwość łapania autokorelacji zmienności, a nie czystego forward-return. Wymaga kontroli na nienakładających się zwrotach.
+
+### 2026-07-20 — CODEX: 30 sugestii na 46 rekordów - dominacja sugestii
+Z 46 rekordów CODEX-u 30 to sugestie (A/B 11, IC 4, pomiary 1). Proporcja sugeruje, że system gromadzi głównie nierozstrzygnięte pomysły, a nie faktyczne pomiary czy decyzje. Może to wskazywać na potrzebę przeglądu i priorytetyzacji.
+
+### 2026-07-20 — Runbooki W11 gniją przez deduplikację po nazwie
+Runbook 'Bezpieczny commit' zawiera nieaktualny krok 'git push -u', a funkcja dodaj() uniemożliwia aktualizację przez deduplikację po nazwie. Każda procedura raz zapisana pozostaje niezmienna, co prowadzi do gnicia treści.
+
+### 2026-07-20 — Tempo przetwarzania WF-IC
+~2 min/para (15 par ~30 min). BTC/ETH cięższe. Można szacować czas przyszłych uruchomień.
+
+### 2026-07-20 — Buforowanie stdout w Pythonie
+Raport WF-IC jest buforowany do końca; aby widzieć postęp na żywo, należy uruchomić skrypt z flagą -u (unbuffered).
+
+### 2026-07-20 — Testy na starym Fujitsu trwają >2 minuty — normalne
+Testy (2584) zajmują ponad 2 minuty na starym sprzęcie. Nie dawaj limitu czasu, uruchamiaj w tle i cyklicznie sprawdzaj, czy żyje. Zapamiętane na stałe, nie wracamy do tematu.
+
+### 2026-06-30 — Zbyt sztywne progi powodują martwe neurony
+BB Squeeze 4%→2.5%, RSI Div delta 2.0→0.3, Bart Pattern 30%→10% – neurony zwracały 100% NEUTRAL. Po korekcie zaczęły generować sygnały.
+
+### 2026-06-30 — Proces deduplikacji neuronów
+Podczas skanowania agent otrzymał instrukcję deduplikacji, co pozwoliło osiągnąć ostateczną liczbę 261 unikalnych neuronów zamiast potencjalnie większej liczby powtórzeń.
+
+### 2026-06-30 — Higuchi Fractal Dimension wymaga pełnej serii – niemożliwy w Brama
+D≈1.0 = trending, D≈2.0 = ranging/chaotic, D≈1.5 = random walk. Wymaga min. 50 świec do obliczenia – nie da się zredukować do pojedynczej wartości Brama. Uzasadnia wyjątek Prawa I dla Exploratores.
+
+### 2026-06-30 — Kategoria S zarezerwowana dla SMC/Struktura
+Kategoria S jest już używana przez strukturalne neurony SMC, więc nie można jej użyć dla Sentiment.
+
+### 2026-06-30 — Halucynacje w linkach IMV: defensywne repo i anegdoty
+Po weryfikacji ~320 linków przez 3 równoległych agentów okazało się, że core tech stack jest realny, ale część referencji do defensywnych repozytoriów i legend tradingowych była halucynacjami. Zapisano w ARSENAL_IMPERIUM.md.
+
+### 2026-06-30 — DeepSeek API – endpoint i bezpieczeństwo klucza
+DeepSeek API jest kompatybilny z OpenAI (base_url: https://api.deepseek.com/v1). Klucz API musi być wyłącznie w zmiennych środowiskowych, nigdy w kodzie ani czacie.
+
+### 2026-06-30 — Separacja Kingdom Pixel od Imperium
+Mieszanie zasad Kingdom Pixel (79 Zasad) z Imperium powodowało chaos. Rozwiązanie: Imperium ma własne 14 Praw, Kingdom Pixel jest archiwizowany i nigdy nie modyfikowany.
+
+### 2026-06-30 — Neurony martwe: XII-07, X-12, A-05 (100% NEUTRAL)
+Trzy neurony (RSI_14 trend, BB_UPPER, CLOSE_PREV) wykazały 100% NEUTRAL w analizie 500-barowej. Wymagają diagnostyki lub wyłączenia.
+
+### 2026-06-30 — Niezgodność stanu MANIFEST z kodem
+7 neuronów oznaczonych jako aktywne w MANIFEST_KODU.md, ale w kodzie miały DOSTEPNY=False. Poprawiono oznakowanie na 'wyciszony'.
+
+### 2026-06-30 — Znalezione 2 neurony sieroty w mikro_neuron.py
+NeuronStochRSI i NeuronFundingRate znajdowały się poza rojem neuronów, nie były importowane przez rejestr. Zostały przeniesione do odpowiednich plików.
+
+### 2026-06-30 — API key tylko w zmiennych środowiskowych
+Klucz API DeepSeek nie może być umieszczany w kodzie ani w czacie, tylko w environment variable (setx). Bezpieczeństwo.
+
+### 2026-06-30 — Bezpieczeństwo klucza API DeepSeek – tylko env vars
+Klucz API DeepSeek NIGDY nie może być w kodzie ani w czacie. Powinien być przechowywany w zmiennych środowiskowych. Kod w PLAN_DEEPSEEK.md zawiera placeholder do zastąpienia.
+
+### 2026-06-30 — Format Katalogu Strategii
+ID: [LEGION]-[STYL]-[NUM] (np. X-SC-001). Style: TR/RV/BK/RG/SC/MC/LV/HY. Każda strategia ma: Neurony WEJŚCIE, FILTR, WYJŚCIE, Dźwignia, R:R, Status.
+
+### 2026-06-30 — OpenAlice i Hermes Agent to realne narzędzia
+Zweryfikowano, że OpenAlice (4600★ GitHub) i Hermes Agent (Nous Research, 200+ LLM backends) istnieją i są aktywnymi projektami. Wcześniejsze oznaczenie jako 'niezweryfikowane' było błędne.
+
+### 2026-06-30 — NeuronPumpDetect Z-02: 3 warunki OHLCV
+Warunek 1: VOLUME/VOLUME_MA20 w [1.5, 4.0]; Warunek 2: (HIGH-LOW)/ATR_14 < 0.75; Warunek 3: OBV > OBV_EMA_20*(1+0.005). Siła = 0.55+0.30*(vol*0.4+zakr*0.3+obv*0.3). Kierunek LONG.
+
+### 2026-07-10 — Ważenie IC podnosi rój ponad 50% na każdej parze OOS
+Wynik B (ważony IC) = 51.8% globalnie, bije A o +3.6pp i przekracza 50% na KAŻDEJ z 5 par OOS. Potwierdza hipotezę B: wąskie gardło = agregacja.
+
 ### 2026-06-30 — Paradoks Parrondo jako filozofia Kameleon
 Sformalizowano, że dwie przegrywające osobno strategie mogą tworzyć wygrywający ensemble. To podstawa systemu Kameleon – kluczowa zasada dywersyfikacji neuronów.
 

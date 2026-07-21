@@ -50,6 +50,12 @@ _WZOR_LEKCJI = re.compile(
 LIMIT_ZNAKOW_LEKCJA = 1200
 LIMIT_ZNAKOW_SEKCJA = 24000
 
+# Cel chłodzenia = próg alarmu × UDZIAL (histereza ~8%): schładzamy PONIŻEJ progu, żeby
+# kilka kolejnych zapisów nie odpalało konsolidacji za każdym razem. Liczony Z PROGU, nie
+# wpisany osobno — dwie niezależne liczby (24000 alarmu vs 22000 chłodzenia) rozjechałyby
+# się przy pierwszej zmianie progu i chłodzenie stałoby się cichym no-opem.
+UDZIAL_CELU_SEKCJA = 0.92
+
 # ── Dedup semantyczny (naprawa: 4 kopie tej samej lekcji, recenzja cubic PR #118) ──
 # Stary dedup porównywał DOKŁADNY PODCIĄG tytułu (`szukaj(tytul)`). DeepSeek ekstrahuje
 # lekcje z temperatura=0.3, więc za każdym przebiegiem formułuje tytuł inaczej —
@@ -240,9 +246,16 @@ def lekcje(plik: Path = DOMYSLNY_PLIK, limit: Optional[int] = None) -> List[Dict
              "tresc": "..."}]. limit=N → tylko N pierwszych.
     """
     tekst = wczytaj(plik)
-    if _NAGLOWEK_LEKCJE not in tekst:
+    # Czytamy TAKŻE plik-ACTA (inny nagłówek sekcji). Bez tego schłodzona lekcja
+    # znikała z zasięgu własnego czytnika modułu: `konsoliduj_lekcje` meldowała sukces,
+    # archiwum rosło, a `szukaj()` zwracało 0 — wiedza „nie skasowana, tylko
+    # nieosiągalna" (zmierzone 2026-07-21: 113 bloków w ACTA, parser widział 0).
+    if _NAGLOWEK_LEKCJE in tekst:
+        sekcja = tekst.split(_NAGLOWEK_LEKCJE, 1)[1]
+    elif _NAGLOWEK_ARCHIWUM in tekst:
+        sekcja = tekst.split(_NAGLOWEK_ARCHIWUM, 1)[1]
+    else:
         return []
-    sekcja = tekst.split(_NAGLOWEK_LEKCJE, 1)[1]
 
     # Parser i przepisywanie współdzielą _WZOR_LEKCJI (patrz komentarz przy definicji).
     wzor = _WZOR_LEKCJI
@@ -257,11 +270,14 @@ def lekcje(plik: Path = DOMYSLNY_PLIK, limit: Optional[int] = None) -> List[Dict
 
 
 def dopisz_lekcje(tytul: str, tresc: str, data: Optional[str] = None,
-                  plik: Path = DOMYSLNY_PLIK) -> None:
+                  plik: Path = DOMYSLNY_PLIK, chlodz: bool = True) -> None:
     """
     Dopisuje nową lekcję na GÓRZE sekcji „LEKCJE Z SESJI" (najnowsza pierwsza).
     Tworzy sekcję, gdy nie istnieje. Aktualizuje też „Ostatnia aktualizacja".
     tresc: markdown (może mieć wiele linii, listy itd.).
+
+    `chlodz=True` (domyślnie): po zapisie pilnuje LIMIT_ZNAKOW_SEKCJA — przyrost
+    automatyczny musi mieć automatyczne chłodzenie (patrz `egzekwuj_limit_sekcji`).
     """
     data = data or _dzis()
     # Limit zwięzłości pojedynczej lekcji (Hermes-style: twardy błąd, nie ciche ucięcie).
@@ -294,6 +310,8 @@ def dopisz_lekcje(tytul: str, tresc: str, data: Optional[str] = None,
         nowy = f"{naglowek_pliku}\n\n## Ostatnia aktualizacja: {data}\n{reszta_pliku}"
 
     plik.write_text(nowy, encoding="utf-8")
+    if chlodz:
+        egzekwuj_limit_sekcji(plik)
 
 
 def _zapisz_lekcje(lekcje_lista: List[Dict[str, str]], plik: Path) -> None:
@@ -336,10 +354,13 @@ def usun_lekcje(tytul: str, plik: Path = DOMYSLNY_PLIK) -> bool:
 
 
 def aktualizuj_lekcje(tytul: str, nowa_tresc: str, plik: Path = DOMYSLNY_PLIK,
-                      nowy_tytul: Optional[str] = None) -> bool:
+                      nowy_tytul: Optional[str] = None, chlodz: bool = True) -> bool:
     """
     Zastępuje treść (i opcjonalnie tytuł) istniejącej lekcji (Hermes: akcja `replace`).
     Zwraca True gdy podmieniono, False gdy nie znaleziono. Limit zwięzłości jak w dopisz.
+
+    Chłodzi sekcję jak `dopisz_lekcje` — podmiana też potrafi ją powiększyć (parytet
+    bliźniaków: poprawka wpięta w jedno z dwóch wejść zostawia drugie otwarte).
     """
     docelowy = nowy_tytul or tytul
     if len(docelowy) + len(nowa_tresc.strip()) > LIMIT_ZNAKOW_LEKCJA:
@@ -355,6 +376,8 @@ def aktualizuj_lekcje(tytul: str, nowa_tresc: str, plik: Path = DOMYSLNY_PLIK,
     if not znaleziono:
         return False
     _zapisz_lekcje(lst, plik)
+    if chlodz:
+        egzekwuj_limit_sekcji(plik)
     return True
 
 
@@ -394,8 +417,46 @@ def _dopisz_archiwum(lekcje_lista: List[Dict[str, str]], archiwum: Path = PLIK_A
     archiwum.write_text(nowy, encoding="utf-8")
 
 
-def konsoliduj_lekcje(cel_znakow: int = 22000, plik: Path = DOMYSLNY_PLIK,
-                      archiwum: Path = PLIK_ARCHIWUM, sucho: bool = False) -> Dict[str, Any]:
+def _rozmiar_lekcji(lek: Dict[str, str]) -> int:
+    """Rozmiar JEDNEGO wyrenderowanego bloku lekcji: nagłówek + \\n + treść + \\n."""
+    return len(lek["naglowek"]) + len(lek["tresc"]) + 2
+
+
+def _rozmiar_sekcji(lekcje_lista: List[Dict[str, str]]) -> int:
+    """
+    Dokładny rozmiar sekcji LEKCJE, jaki wyprodukuje `_zapisz_lekcje` dla tej listy.
+
+    JEDNA MIARA dla alarmu i dla konsolidacji (klasa wady „mechanizm, który przy awarii
+    wygląda na sprawny"): dotąd alarm liczył TEKST sekcji, a konsolidacja SUMĘ lekcji —
+    dwie różne liczby, więc chłodzenie do celu mogło zameldować sukces przy wciąż
+    krzyczącym alarmie. Renderowanie to `"\\n\\n" + "\\n".join(bloki)`, czyli
+    suma bloków + (n-1) separatorów + 2 znaki wiodące = suma + n + 1.
+    Zweryfikowane pomiarem na żywym pliku (28012 + 119 + 1 == 28132).
+    """
+    if not lekcje_lista:
+        return 0
+    return sum(_rozmiar_lekcji(lek) for lek in lekcje_lista) + len(lekcje_lista) + 1
+
+
+def rozmiar_sekcji_lekcji(plik: Path = DOMYSLNY_PLIK) -> int:
+    """Rozmiar aktywnej sekcji LEKCJE w znakach (źródło prawdy dla Prawa XV)."""
+    return _rozmiar_sekcji(lekcje(plik))
+
+
+def _archiwum_dla(plik: Path) -> Path:
+    """
+    Plik-ACTA odpowiadający podanej pamięci. Dla domyślnej — PLIK_ARCHIWUM; dla każdej
+    innej (testy, kopie robocze) — obok niej. Bez tego automatyczne chłodzenie pliku
+    tymczasowego dopisywałoby do PRAWDZIWEGO archiwum Imperium (mechanizm wychodzący
+    poza własną piaskownicę).
+    """
+    if plik == DOMYSLNY_PLIK:
+        return PLIK_ARCHIWUM
+    return plik.with_name(f"{plik.stem}_ARCHIWUM{plik.suffix or '.md'}")
+
+
+def konsoliduj_lekcje(cel_znakow: Optional[int] = None, plik: Path = DOMYSLNY_PLIK,
+                      archiwum: Optional[Path] = None, sucho: bool = False) -> Dict[str, Any]:
     """
     Schładza najniżej-wartościowe lekcje do ARCHIWUM aż aktywna sekcja ≤ cel_znakow.
 
@@ -407,12 +468,13 @@ def konsoliduj_lekcje(cel_znakow: int = 22000, plik: Path = DOMYSLNY_PLIK,
 
     Zwraca {przed, po, zarchiwizowanych, znakow_przed, znakow_po, archiwum:[tytuły]}.
     """
+    if cel_znakow is None:
+        cel_znakow = int(LIMIT_ZNAKOW_SEKCJA * UDZIAL_CELU_SEKCJA)
+    archiwum = archiwum if archiwum is not None else _archiwum_dla(plik)
     ls = lekcje(plik)
+    _rozmiar = _rozmiar_lekcji
 
-    def _rozmiar(lek: Dict[str, str]) -> int:
-        return len(lek["naglowek"]) + len(lek["tresc"]) + 2
-
-    znakow_przed = sum(_rozmiar(lek) for lek in ls)
+    znakow_przed = _rozmiar_sekcji(ls)
     if znakow_przed <= cel_znakow or len(ls) <= 1:
         return {"przed": len(ls), "po": len(ls), "zarchiwizowanych": 0,
                 "znakow_przed": znakow_przed, "znakow_po": znakow_przed, "archiwum": []}
@@ -425,12 +487,15 @@ def konsoliduj_lekcje(cel_znakow: int = 22000, plik: Path = DOMYSLNY_PLIK,
 
     # najwartościowsze zostają w gorącym; przy remisie wygrywa nowsza data
     kolejnosc = sorted(ls, key=lambda lek: (wart[id(lek)], lek["data"]), reverse=True)
-    zachowane_id, suma = set(), 0
+    zachowane_id, suma_blokow, ile = set(), 0, 0
     for lek in kolejnosc:
         r = _rozmiar(lek)
-        if suma + r <= cel_znakow:
+        # Miara DOKŁADNIE ta sama co alarmu: bloki + separatory + wiodące "\n\n".
+        if suma_blokow + r + (ile + 1) + 1 <= cel_znakow:
             zachowane_id.add(id(lek))
-            suma += r
+            suma_blokow += r
+            ile += 1
+    suma = _rozmiar_sekcji([lek for lek in ls if id(lek) in zachowane_id])
     aktywne = [lek for lek in ls if id(lek) in zachowane_id]   # zachowaj kolejność pliku
     do_archiwum = [lek for lek in ls if id(lek) not in zachowane_id]
 
@@ -443,28 +508,64 @@ def konsoliduj_lekcje(cel_znakow: int = 22000, plik: Path = DOMYSLNY_PLIK,
             "archiwum": [lek["tytul"] for lek in do_archiwum]}
 
 
+def egzekwuj_limit_sekcji(plik: Path = DOMYSLNY_PLIK,
+                          archiwum: Optional[Path] = None) -> Dict[str, Any]:
+    """
+    Chłodzi sekcję LEKCJE automatycznie, gdy przekroczy LIMIT_ZNAKOW_SEKCJA.
+
+    POWÓD (zmierzone 2026-07-21): konsolidacja była WYŁĄCZNIE ręczna, a przyrost
+    automatyczny — auto_lekcja dopisała 21 wpisów jednego dnia i alarm Prawa XV wrócił
+    nazajutrz po ręcznym schłodzeniu (23820 → 28132). Ręczna naprawa przeciw
+    automatycznemu przyrostowi zawsze przegrywa: to ta sama klasa co ręcznie wpisywana
+    liczba (Warstwa 15) i ręcznie kopiowany runbook — lekarstwem jest odebranie
+    człowiekowi obowiązku, nie pilniejsze przypominanie.
+
+    Bez utraty wiedzy (Prawo I): schłodzone lekcje idą do pliku-ACTA, przeszukiwalnego.
+    Histereza: alarm przy >24000, chłodzenie do 22000 — nie chłodzi przy każdym zapisie.
+    """
+    if rozmiar_sekcji_lekcji(plik) <= LIMIT_ZNAKOW_SEKCJA:
+        return {"chlodzenie": False, "zarchiwizowanych": 0}
+    cel = int(LIMIT_ZNAKOW_SEKCJA * UDZIAL_CELU_SEKCJA)
+    wynik = konsoliduj_lekcje(cel_znakow=cel, plik=plik, archiwum=archiwum)
+    wynik["chlodzenie"] = True
+    return wynik
+
+
 def alarm_przepelnienia(plik: Path = DOMYSLNY_PLIK) -> Optional[str]:
     """
     Prawo XV: gdy sekcja lekcji puchnie ponad LIMIT_ZNAKOW_SEKCJA → miękki alarm
     (czas skonsolidować/usunąć stare lekcje). Zwraca komunikat lub None gdy OK.
+
+    Miara pochodzi z `_rozmiar_sekcji` (ta sama, którą pakuje konsolidacja) — dawne
+    liczenie surowego tekstu ucinało sekcję na pierwszej linii `## ` w TREŚCI lekcji,
+    więc alarm mógł milczeć przy przepełnionej pamięci (fałszywy negatyw).
     """
-    tekst = wczytaj(plik)
-    if _NAGLOWEK_LEKCJE not in tekst:
-        return None
-    sekcja = tekst.split(_NAGLOWEK_LEKCJE, 1)[1]
-    nast = re.search(r"\n## ", sekcja)
-    sekcja = sekcja[:nast.start()] if nast else sekcja
-    if len(sekcja) > LIMIT_ZNAKOW_SEKCJA:
-        return (f"🚨 Prawo XV — sekcja LEKCJE ma {len(sekcja)} zn. > {LIMIT_ZNAKOW_SEKCJA}. "
+    rozmiar = rozmiar_sekcji_lekcji(plik)
+    if rozmiar > LIMIT_ZNAKOW_SEKCJA:
+        return (f"🚨 Prawo XV — sekcja LEKCJE ma {rozmiar} zn. > {LIMIT_ZNAKOW_SEKCJA}. "
                 "Skonsoliduj/usuń najstarsze (usun_lekcje) — pamięć ma być ostra.")
     return None
 
 
-def szukaj(zapytanie: str, plik: Path = DOMYSLNY_PLIK) -> List[Dict[str, str]]:
-    """Lekcje zawierające zapytanie (case-insensitive) w tytule lub treści."""
+def szukaj(zapytanie: str, plik: Path = DOMYSLNY_PLIK,
+           z_archiwum: bool = False) -> List[Dict[str, str]]:
+    """
+    Lekcje zawierające zapytanie (case-insensitive) w tytule lub treści.
+
+    `z_archiwum=True` przeszukuje też plik-ACTA — chłodzenie przenosi lekcje POZA
+    kontekst startowy, ale nie mają być nieznajdywalne (Prawo I: nic nie ginie).
+    """
     q = zapytanie.lower()
-    return [lek for lek in lekcje(plik)
-            if q in lek["tytul"].lower() or q in lek["tresc"].lower()]
+
+    def _pasuje(lek: Dict[str, str]) -> bool:
+        return q in lek["tytul"].lower() or q in lek["tresc"].lower()
+
+    wyniki = [lek for lek in lekcje(plik) if _pasuje(lek)]
+    if z_archiwum:
+        acta = _archiwum_dla(plik)
+        if acta.exists():
+            wyniki += [dict(lek, zrodlo="ACTA") for lek in lekcje(acta) if _pasuje(lek)]
+    return wyniki
 
 
 def mapa_podpiec(plik: Path = DOMYSLNY_PLIK) -> str:

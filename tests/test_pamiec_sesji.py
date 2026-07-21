@@ -309,13 +309,29 @@ def test_alarm_przepelnienia_gdy_male_ok():
 
 
 def test_alarm_przepelnienia_gdy_duze():
-    """Sekcja ponad limit → alarm Prawa XV (string z 🚨)."""
+    """Sekcja ponad limit → alarm Prawa XV (string z 🚨).
+
+    `chlodz=False` świadomie: od 2026-07-21 zapis SAM chłodzi sekcję, więc przy
+    domyślnym zapisie ten stan jest nieosiągalny. Test bada DETEKTOR, nie chłodzenie —
+    mieszanie obu dawałoby zielone światło mechanizmowi, którego nikt nie sprawdził.
+    """
+    p = _plik("# P\n\n## 📚 LEKCJE Z SESJI\n\n## 🔄 STAN\nx\n")
+    for i in range(40):
+        ps.dopisz_lekcje(f"L{i}", "t" * (ps.LIMIT_ZNAKOW_LEKCJA - 50),
+                         data=f"2026-01-{(i % 28) + 1:02d}", plik=p, chlodz=False)
+    alarm = ps.alarm_przepelnienia(p)
+    assert alarm is not None and "🚨" in alarm
+
+
+def test_zapis_domyslny_nie_dopuszcza_do_przepelnienia():
+    """Bliźniak powyższego: przy DOMYŚLNYM zapisie 40 długich lekcji sekcja nigdy
+    nie przekracza progu — alarm nie ma jak wrócić w kolejnej sesji."""
     p = _plik("# P\n\n## 📚 LEKCJE Z SESJI\n\n## 🔄 STAN\nx\n")
     for i in range(40):
         ps.dopisz_lekcje(f"L{i}", "t" * (ps.LIMIT_ZNAKOW_LEKCJA - 50),
                          data=f"2026-01-{(i % 28) + 1:02d}", plik=p)
-    alarm = ps.alarm_przepelnienia(p)
-    assert alarm is not None and "🚨" in alarm
+    assert ps.alarm_przepelnienia(p) is None
+    assert ps.rozmiar_sekcji_lekcji(p) <= ps.LIMIT_ZNAKOW_SEKCJA
 
 
 # ── Profil Cezara (odpowiednik USER.md Hermesa) ──────────────────────────────
@@ -524,3 +540,166 @@ def test_proza_nadal_dziala_gdy_sygnatury_slabe():
     """Kontrola: ograniczenie sita 3 nie może zabić jego pierwotnego celu."""
     assert ps.czy_duplikaty("True Range - poprawna definicja", "max(H-L).",
                             "Poprawiona definicja True Range", "max(H-L).")
+
+
+# ── Automatyczne chłodzenie sekcji (Prawo XV: przyrost automatyczny = chłodzenie
+#    automatyczne). Klasa wady: ręczna konsolidacja przeciw automatycznemu przyrostowi —
+#    alarm wracał nazajutrz po każdym ręcznym schłodzeniu (zmierzone 2026-07-21). ──
+
+def _plik_z_lekcjami(n: int, dlugosc: int = 400) -> Path:
+    """Plik pamięci z n lekcjami po ~dlugosc znaków treści (do testów limitu)."""
+    bloki = "\n".join(
+        f"### 2026-06-{(i % 28) + 1:02d} — Lekcja numer {i}\n{'x' * dlugosc}\n"
+        for i in range(n)
+    )
+    return _plik(f"# PAMIĘĆ\n\n## Ostatnia aktualizacja: 2026-01-01\n\n"
+                 f"{ps._NAGLOWEK_LEKCJE}\n\n{bloki}\n## 🔄 STAN BIEŻĄCY\nStan.\n")
+
+
+def test_rozmiar_sekcji_zgodny_z_faktycznym_zapisem():
+    """Rdzeń: `_rozmiar_sekcji` musi zwracać DOKŁADNIE tyle, ile renderuje zapis.
+    Rozjazd tej miary z miarą alarmu był źródłem 'schłodzone, a alarm dalej krzyczy'."""
+    p = _plik_z_lekcjami(5)
+    ls = ps.lekcje(p)
+    ps._zapisz_lekcje(ls, p)
+    tekst = p.read_text(encoding="utf-8")
+    sekcja = tekst.split(ps._NAGLOWEK_LEKCJE, 1)[1]
+    sekcja = sekcja[:sekcja.index("\n## 🔄")]
+    assert ps._rozmiar_sekcji(ls) == len(sekcja)
+
+
+def test_alarm_nie_ucina_sekcji_na_naglowku_w_tresci():
+    """Fałszywy NEGATYW: lekcja z linią `## ` w treści ucinała pomiar surowego tekstu,
+    więc alarm mógł MILCZEĆ przy przepełnionej pamięci."""
+    p = _plik(f"# PAMIĘĆ\n\n{ps._NAGLOWEK_LEKCJE}\n\n"
+              "### 2026-06-01 — Z nagłówkiem w środku\n"
+              "## To jest linia w TREŚCI, nie nowa sekcja\n" + "y" * 200 + "\n")
+    assert ps.rozmiar_sekcji_lekcji(p) > 200        # cała treść policzona, nie ucięta
+
+
+def test_egzekwuj_limit_ponizej_progu_nic_nie_rusza(monkeypatch):
+    """Granica: rozmiar < próg → zero chłodzenia, plik bit-w-bit ten sam."""
+    p = _plik_z_lekcjami(3)
+    monkeypatch.setattr(ps, "LIMIT_ZNAKOW_SEKCJA", 99999)
+    przed = p.read_text(encoding="utf-8")
+    r = ps.egzekwuj_limit_sekcji(p)
+    assert r["chlodzenie"] is False and r["zarchiwizowanych"] == 0
+    assert p.read_text(encoding="utf-8") == przed
+
+
+def test_egzekwuj_limit_dokladnie_na_progu_nie_chlodzi(monkeypatch):
+    """Granica DOKŁADNIE == próg: alarm łapie dopiero `>`, więc chłodzenie też nie rusza."""
+    p = _plik_z_lekcjami(3)
+    monkeypatch.setattr(ps, "LIMIT_ZNAKOW_SEKCJA", ps.rozmiar_sekcji_lekcji(p))
+    assert ps.alarm_przepelnienia(p) is None
+    assert ps.egzekwuj_limit_sekcji(p)["chlodzenie"] is False
+
+
+def test_egzekwuj_limit_o_jeden_znak_ponad_prog_chlodzi(monkeypatch):
+    """Granica próg+1: minimalne przekroczenie MUSI odpalić chłodzenie."""
+    p = _plik_z_lekcjami(6)
+    monkeypatch.setattr(ps, "LIMIT_ZNAKOW_SEKCJA", ps.rozmiar_sekcji_lekcji(p) - 1)
+    assert ps.egzekwuj_limit_sekcji(p)["chlodzenie"] is True
+
+
+def test_dopisz_chlodzi_i_alarm_milknie(monkeypatch):
+    """Rdzeń mechanizmu: po zapisie sekcja wraca pod próg, a alarm Prawa XV milczy.
+    Regresja na klasę 'schłodzone wg jednej miary, alarm liczy drugą'."""
+    p = _plik_z_lekcjami(20)
+    monkeypatch.setattr(ps, "LIMIT_ZNAKOW_SEKCJA", 4000)
+    assert ps.alarm_przepelnienia(p) is not None          # przed: alarm krzyczy
+    ps.dopisz_lekcje("Nowa lekcja", "Treść nowej lekcji.", data="2026-07-21", plik=p)
+    assert ps.rozmiar_sekcji_lekcji(p) <= 4000
+    assert ps.alarm_przepelnienia(p) is None              # po: milczy BEZ ręcznej ręki
+
+
+def test_dopisz_chlodzenie_nic_nie_kasuje(monkeypatch):
+    """Prawo I: schłodzone lekcje MUSZĄ być w archiwum — bilans aktywne+ACTA bez ubytku."""
+    p = _plik_z_lekcjami(20)
+    monkeypatch.setattr(ps, "LIMIT_ZNAKOW_SEKCJA", 4000)
+    tytuly_przed = {lek["tytul"] for lek in ps.lekcje(p)}
+    ps.dopisz_lekcje("Nowa lekcja", "Treść.", data="2026-07-21", plik=p)
+    arch = ps._archiwum_dla(p)
+    tekst_arch = arch.read_text(encoding="utf-8") if arch.exists() else ""
+    aktywne = {lek["tytul"] for lek in ps.lekcje(p)}
+    for tytul in tytuly_przed:
+        assert tytul in aktywne or tytul in tekst_arch
+
+
+def test_dopisz_chlodz_false_zostawia_przepelnienie(monkeypatch):
+    """Opt-out działa: chlodz=False → sekcja zostaje ponad progiem (świadomy wybór)."""
+    p = _plik_z_lekcjami(20)
+    monkeypatch.setattr(ps, "LIMIT_ZNAKOW_SEKCJA", 4000)
+    ps.dopisz_lekcje("Nowa", "Treść.", data="2026-07-21", plik=p, chlodz=False)
+    assert ps.alarm_przepelnienia(p) is not None
+
+
+def test_aktualizuj_tez_chlodzi(monkeypatch):
+    """Parytet bliźniaków: podmiana treści też powiększa sekcję, więc też chłodzi."""
+    p = _plik_z_lekcjami(20)
+    monkeypatch.setattr(ps, "LIMIT_ZNAKOW_SEKCJA", 4000)
+    tytul = ps.lekcje(p)[0]["tytul"]
+    assert ps.aktualizuj_lekcje(tytul, "Nowa treść.", plik=p) is True
+    assert ps.alarm_przepelnienia(p) is None
+
+
+def test_chlodzenie_nie_tyka_prawdziwego_archiwum_imperium(monkeypatch):
+    """Piaskownica: chłodzenie pliku tymczasowego pisze OBOK niego, nigdy do
+    docs/PAMIEC_SESJI_ARCHIWUM.md (mechanizm wychodzący poza własny zasięg)."""
+    p = _plik_z_lekcjami(20)
+    monkeypatch.setattr(ps, "LIMIT_ZNAKOW_SEKCJA", 4000)
+    assert ps._archiwum_dla(p) != ps.PLIK_ARCHIWUM
+    assert ps._archiwum_dla(p).parent == p.parent
+    ps.dopisz_lekcje("Nowa", "Treść.", data="2026-07-21", plik=p)
+    assert ps._archiwum_dla(p).exists()
+
+
+def test_cel_chlodzenia_liczony_z_progu(monkeypatch):
+    """Sprzężenie: obniżenie progu MUSI obniżyć cel chłodzenia. Dwie niezależne
+    liczby (24000 vs 22000) zamieniłyby chłodzenie w cichy no-op."""
+    p = _plik_z_lekcjami(20)
+    monkeypatch.setattr(ps, "LIMIT_ZNAKOW_SEKCJA", 3000)
+    ps.egzekwuj_limit_sekcji(p)
+    assert ps.rozmiar_sekcji_lekcji(p) <= 3000
+
+
+def test_lekcje_czyta_takze_plik_acta(tmp_path):
+    """Schłodzona lekcja NIE może być nieosiągalna dla własnego czytnika modułu.
+    Archiwum ma inny nagłówek sekcji — parser musi go rozpoznać (zmierzone:
+    113 bloków w ACTA, `lekcje()` widziało 0)."""
+    arch = tmp_path / "ACTA.md"
+    ps._dopisz_archiwum([{"naglowek": "### 2026-01-01 — Schłodzona",
+                          "data": "2026-01-01", "tytul": "Schłodzona",
+                          "tresc": "Treść o VWAP."}], arch)
+    lek = ps.lekcje(arch)
+    assert len(lek) == 1 and lek[0]["tytul"] == "Schłodzona"
+
+
+def test_szukaj_z_archiwum_znajduje_schlodzona(monkeypatch):
+    """Prawo I: po chłodzeniu wiedza dalej znajdywalna, tylko poza kontekstem startowym."""
+    p = _plik_z_lekcjami(20)
+    monkeypatch.setattr(ps, "LIMIT_ZNAKOW_SEKCJA", 4000)
+    ps.dopisz_lekcje("Nowa", "Treść.", data="2026-07-21", plik=p)
+    schlodzone = [lek["tytul"] for lek in ps.lekcje(ps._archiwum_dla(p))]
+    assert schlodzone, "chłodzenie miało coś przenieść"
+    cel = schlodzone[0]
+    assert ps.szukaj(cel, p) == []                        # w gorącej pamięci już nie ma
+    trafienia = ps.szukaj(cel, p, z_archiwum=True)
+    assert trafienia and trafienia[0]["zrodlo"] == "ACTA"  # ale w ACTA jest
+
+
+def test_szukaj_bez_archiwum_zachowuje_stary_kontrakt():
+    """Wsteczna zgodność: domyślnie szukaj czyta TYLKO pamięć aktywną (bez klucza zrodlo)."""
+    p = _plik()
+    wyniki = ps.szukaj("GARCH", p)
+    assert len(wyniki) == 1 and "zrodlo" not in wyniki[0]
+
+
+def test_konsoliduj_cel_none_bierze_cel_z_progu(monkeypatch):
+    """Granica None: cel_znakow=None (domyślny) MUSI wyliczyć cel z progu, nie
+    wywalić się ani nie potraktować None jak zera/nieskończoności."""
+    p = _plik_z_lekcjami(20)
+    monkeypatch.setattr(ps, "LIMIT_ZNAKOW_SEKCJA", 3000)
+    r = ps.konsoliduj_lekcje(cel_znakow=None, plik=p, archiwum=None, sucho=True)
+    assert r["znakow_po"] <= int(3000 * ps.UDZIAL_CELU_SEKCJA)
+    assert r["zarchiwizowanych"] >= 1

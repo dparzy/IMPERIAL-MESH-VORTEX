@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-20
+stan_na: 2026-07-21
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,35 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-07-21 | 🧠 | TEMPERATOR MEMORIAE — pamięć chłodzi się sama (alarm Prawa XV przestał wracać)
+
+Alarm hooka „sekcja LEKCJE > 24000 zn." wracał **po każdym ręcznym sprzątaniu**: 07-19 skonsolidowano
+do 23820, nazajutrz `auto_lekcja` dopisała 21 wpisów → **28132**. Klasa: stan rośnie automatycznie,
+kurczy się tylko ręcznie — ręka zawsze przegra z pętlą.
+
+- **Mechanizm:** `egzekwuj_limit_sekcji` wpięty w **ścieżkę zapisu** (`dopisz_lekcje` **i**
+  `aktualizuj_lekcje` — parytet bliźniaków), histereza `UDZIAL_CELU_SEKCJA=0.92`. Opt-out `chlodz=False`.
+- **Trzy wady znalezione po drodze (pomiar, nie opinia):** (1) alarm liczył SUROWY TEKST sekcji, a
+  konsolidacja SUMĘ bloków — dwie miary tej samej wielkości; teraz jedna `_rozmiar_sekcji`, zweryfikowana
+  algebraicznie (`suma+n+1` = 28132 co do znaku). (2) próg 24000 i cel 22000 były **niezależnymi
+  stałymi** — cel liczony jest teraz Z PROGU, więc zmiana progu nie zamienia naprawy w cichy no-op.
+  (3) **archiwum ACTA było nieczytelne dla własnego parsera** (113 bloków, `lekcje()` widziało 0) —
+  „nic nie skasowane" było prawdą bezużyteczną; `lekcje()` czyta oba nagłówki, `szukaj(z_archiwum=True)`.
+- **Efekt na żywej pamięci:** 119→92 lekcji aktywnych, 28132→**22062 zn.**, alarm MILCZY, 27 lekcji
+  schłodzonych do ACTA i **znajdywalnych przez API**. Testy 2729→**2744** (+15 granic: próg dokładny,
+  próg+1, `None`, opt-out, piaskownica archiwum, sprzężenie celu z progiem).
+- **Alarm W9** (20 przedawnionych pomysłów) zbadany i zaplanowany w Backlogu CODEX: wszystkie z
+  **jednego dnia** (2026-06-30), `sprzeczne=0`, w próbce same duplikaty semantyczne i pozycje **już
+  zrealizowane** (auto-lekcja żyje, HMM w Viterbi, RAG FTS, Prawo XIX skodyfikowane) — to dług
+  deduplikacji, nie dług decyzyjny.
+
+**LEX TALIONIS:** N-532d1ba9 ↔ C-1e85257a (dług 0). **Księga Wad +3:** „ręczna naprawa przeciw
+automatycznemu przyrostowi", „dwie miary tej samej wielkości", „archiwum nieosiągalne dla własnego
+czytnika". **Pliki:** `imperium/biblioteki/pamiec_sesji.py`, `tests/test_pamiec_sesji.py`,
+`docs/PAMIEC_SESJI.md`, `docs/PAMIEC_SESJI_ARCHIWUM.md`.
 
 ---
 

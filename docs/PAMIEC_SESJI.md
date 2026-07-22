@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-20
+## Ostatnia aktualizacja: 2026-07-22
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,14 +113,29 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-22 — Leksykon potwierdzał samego siebie – fałszywe wpisy
+Leksykon zbudowany tylko z nazw plików generował fałszywe dowody (np. 'order_flow' – jedyne wystąpienie w WPISIE leksykonu). Naprawiono u źródła: weryfikacja czyta rzeczywisty kod, nie własne deklaracje.
+
+### 2026-07-22 — LIBRA MESSIS – metryka nasyca się przez wadliwy dzielnik
+Dzielnik kandydatów nie radzi sobie z formatem `### 1. **Nazwa**` – łączy 21/33 cząstek w jeden blok, przez co metryka nasyca się (95%) i nie odróżnia ramion. Naprawiono parser.
+
+### 2026-07-22 — tail w rurze testów fałszuje kod wyjścia
+Komenda `python tests/run_tests.py | tail` zwraca kod wyjścia `tail`, nie testów – maskuje oblane testy (exit 0 mimo 1 porażki). Należy unikać `tail` w rurze lub używać oddzielnej obsługi.
+
+### 2026-07-22 — Backticki w powłoce podmieniają tekst
+Prozy z backtickami (np. `element`) przekazywane przez `python -c` w bashu ulegają podmianie – wnioskiem dyscyplina: unikać tej konstrukcji, używać plików tymczasowych.
+
+### 2026-07-20 — Audyt spojnosci i skan wad przed pushem – pelna harmonia
+Przeprowadzono audyt spojnosci (ruff W13 + dokumenty W14) oraz heurystyczny skan wad. Oba zakonczone exit 0 – stan kodu spojny przed commitem.
+
+### 2026-07-20 — Błąd cache/resume kluczowany tylko nazwą pliku w harnessach A/B
+Harnessy A/B (ab_tryb_strategii, ab_strategy_mwu, ab_wazenie_ic, ab_pnl_wazenie_ic) używają tylko nazwy pliku jako klucza cache, ignorując parametry konfiguracji.
+
 ### 2026-07-20 — Brak flagi --dashboard w CLI – utrata potencjału
 Konfig pętli live posiada pola dashboard, ale CLI __main__ nie eksponowało odpowiedniej flagi. Cel P0 (obserwacja live) nie był osiągalny przez CLI. Naprawiono przez refaktoryzację i dodanie flagi.
 
 ### 2026-07-20 — Wniosek per-reżim: BEAR=tarcza, reszta szkodzi
 W reżimie BEAR stosowanie tarczy (zabezpieczenia) jest korzystne; w pozostałych reżimach tarcza przynosi straty.
-
-### 2026-07-20 — Regresja danych w katalogu ksiąg – enrichment nadpisał poprawne wartości
-10 wpisów straciło autora/tytuł (Kissell → Nieznany, garble LŁpez). Przyczyna: calibre placeholder nadpisał dane z plików.
 
 ### 2026-07-20 — Ekstraktor – kolizja plików scratcha przy równoległej konwersji
 ekstraktor.py:149 – kasowanie istniejącego pliku biblioteki przez równoczesne zapisy .calibre-tmp.txt. Fix edc657f nie domknięty.
@@ -148,9 +163,6 @@ Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł sz
 
 ### 2026-07-20 — Normalny churn pamięci w plikach dokumentacji
 Dwa pliki (wizje_i_decyzje.jsonl, PAMIEC_SESJI.md) zostały zmienione przez hook startowy – to standardowe odświeżanie pamięci sesji, nie zmiana kodu.
-
-### 2026-07-20 — Stan neuronów: 84, w tym 78 aktywnych, 6 wyciszonych
-Potwierdzono liczbę neuronów oraz ich status. 22 neurony (rodziny NEWS, PSY, RADAR, OC, C, V, Z) czekają na adaptery/dane – to stan zgodny z Prawem XV.
 
 ### 2026-07-21 — Podkreślnik jako znak słowny w regexie BIB
 Użycie \b w regexie dla identyfikatorów BIB nie zamyka się na podkreślniku (jest znakiem słownym). Testy złapały błąd - naprawiono wzorzec.
@@ -236,9 +248,6 @@ Audyt złapał nowy organ w trzech warstwach naraz (W11, W15, W17), ale hook nie
 ### 2026-07-20 — Zawartość pliku w wrzutni
 Plik z wrzutnia to dump rozmów z Hyginusem (DeepSeek) zawierający research hybrydy LLM: modele 3B, LoRA, LARSA/AlphaQuanter, Fin-R1, Unsloth/QLoRA, fine-tuning na chmurze. Wątek hybrydy-ucznia od linii 2163.
 
-### 2026-07-20 — Potrójna symbioza audit-sigilium: mechanizm wykrywa własne organy w wielu warstwach
-Audyt W11/W15/W17 złapał nowe sigilium (runbook, licznik w README, rekord w codicilu) – symbioza działa przeciw autorowi. Wymusza to ostrożność przy dodawaniu nowych elementów.
-
 ### 2026-07-20 — Winget dostępny jako narzędzie do instalacji
 Na laptopie Cezara dostępne jest winget (Windows Package Manager) – może służyć do cichej instalacji djvulibre i innych narzędzi bez uruchamiania interaktywnych instalatorów.
 
@@ -287,9 +296,6 @@ Błąd 403 przy push do GitHub oznacza, że sesja Claude nie ma uprawnień zapis
 ### 2026-06-30 — Push zablokowany przez 403 - brak uprawnień
 Środowisko Claude Code web nie ma uprawnień do pushowania do repozytorium IMPERIAL-MESH-VORTEX (błąd 403). Wymagane skonfigurowanie GitHub App Claude Code z dostępem Read & Write w github.com/settings/installations.
 
-### 2026-06-30 — Kruchość hardcodowanych liczników neuronów w testach
-Wprowadzenie 47. neuronu złamało testy z hardcoded 46. Konieczne dynamiczne wykrywanie liczby neuronów lub automatyczne generowanie testów.
-
 ### 2026-06-30 — Normalizacja interwałów w strategiach
 Błąd: 5m.upper() -> '5M' zamiast 'M5'. Dodano funkcję _normalizuj_interwal w baza.py mapującą formaty (5m->M5, 1h->H1 itd.) aby backtesty filtr/strategia działały poprawnie.
 
@@ -298,9 +304,6 @@ Jeśli w jednej świecy osiągnięto zarówno TP jak i SL, wynikiem jest SL (kon
 
 ### 2026-06-30 — Błąd loadera po reorganizacji na strukturę rzymską
 Po przeniesieniu modułów do folderów rzymskich (fundament, legiony itp.), loader w pierwy_zwiadowca.py szukał plików po starych nazwach we własnym folderze. Naprawiono przez zmianę na ścieżki względne z importlib.util.spec_from_file_location.
-
-### 2026-06-30 — Signal Signature – struktura sygnału
-Każdy sygnał w systemie IMV ma pola: confidence, adversary_confidence, final_confidence, source, reasons. To standard dla wszystkich modułów – umożliwia filtrowanie i debatę senatorską.
 
 ### 2026-06-30 — Błąd cross-module loader po reorganizacji folderów
 Po przeniesieniu modułów do struktury rzymskiej, loader szukał plików po starych nazwach. Naprawiono przez aktualizację ścieżek względnych w pierwszym_zwiadowca.py.
@@ -311,14 +314,8 @@ Funkcja klasyfikacji reżimu ograniczona do TREND_STRONG, RANGING, VOLATILE, NOR
 ### 2026-06-30 — Bug W7 audytu fałszywie flaguje URL z .md w domenie
 W7 audyt markerował zewnętrzne URL zawierające '.md' w domenie (np. www.mdpi.com) jako martwe linki, blokując commit. Naprawiono przez dodanie warunku pomijającego zewnętrzne protokoły (http/https/mailto/ftp) na początku href.
 
-### 2026-06-30 — Synchronizacja liczników w testach przy dodawaniu neuronów
-W-053 dodał 47. neuron (H-01), ale testy miały zakodowane 46 – konieczność aktualizacji hardcoded wartości w test_integracja.py. Lekcja: każda zmiana liczby neuronów wymaga przeglądu testów.
-
 ### 2026-06-30 — Dekorelacja V-13 i V-14 potwierdza dywersyfikację
 Korelacja między NeuronChoppiness (V-14) a poprzednim wskaźnikiem zmienności |r|=0.05–0.27, co spełnia Prawo XVI (unikamy redundancji).
-
-### 2026-06-30 — Wartości mocków muszą mieścić się w zakresach detekcji neuronów
-Podczas tworzenia testów okazało się, że mocki muszą precyzyjnie trafiać w progi neuronów (np. FUNDING_RATE > 0.001, LONG_SHORT_RATIO między 0 a 1). Niewłaściwe wartości powodują fałszywe wyniki.
 
 ### 2026-06-30 — Brak pola kategoria na SygnalNeuronu uniemożliwiał agregację wag reżimu
 Pole 'kategoria' nie istniało w SygnalNeuronu, przez co WAGI_REZIMU były martwym kodem. Dodano pole i przekazywanie z KATEGORII neuronu – teraz wagi reżimu działają poprawnie.

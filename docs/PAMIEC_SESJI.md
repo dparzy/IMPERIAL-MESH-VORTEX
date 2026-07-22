@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-22
+## Ostatnia aktualizacja: 2026-07-20
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,17 +113,29 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-22 — Leksykon potwierdzał samego siebie – fałszywe wpisy
-Leksykon zbudowany tylko z nazw plików generował fałszywe dowody (np. 'order_flow' – jedyne wystąpienie w WPISIE leksykonu). Naprawiono u źródła: weryfikacja czyta rzeczywisty kod, nie własne deklaracje.
+### 2026-07-20 — Hook startowy pominął auto-pull przy brudnym drzewie
+Gałąź była o 30 commitów za remote, bo hook pominął pull, gdy drzewo było brudne. Wymusiło to rebase z remote i rozstrzygnięcie konfliktu tylko w liniach daty.
 
-### 2026-07-22 — LIBRA MESSIS – metryka nasyca się przez wadliwy dzielnik
-Dzielnik kandydatów nie radzi sobie z formatem `### 1. **Nazwa**` – łączy 21/33 cząstek w jeden blok, przez co metryka nasyca się (95%) i nie odróżnia ramion. Naprawiono parser.
+### 2026-07-20 — Testy W6 czerwone – data w README/MANIFEST starsza niż commit
+Dwa testy w Warstwie 6 oblały, bo README.md i docs/MANIFEST_KODU.md deklarowały datę starszą niż ostatni commit. Zgodnie z Prawem XVIII to błahostka – naprawiono samodzielnie.
+
+### 2026-07-20 — Legalne abstynencje zmysłów zidentyfikowane
+Niektóre neurony legalnie nie głosują: PSY-01 (funding=8e-5, brak ekstremum), PSY-04 (OI_PREV==OI, 1. odczyt), NEWS-02/03/04 (stan kroczący ≥2 bary), RADAR/N/CP (potrzebują serii cen – nie podano w teście). Zero martwych głosów.
+
+### 2026-07-20 — Petla live karmi RADAR i RS
+Sprawdzono, że pętla live (petla_live.py) karmi RADAR (skanuj linia 422) oraz cross-sectional RS (C-01, linia 437), więc w trybie multi-symbol RADAR też ożywa. Infrastruktura E kompletna.
+
+### 2026-07-20 — Cztery zmysły działają na żywych danych
+Potwierdzono, że adaptery FearGreed (23), RSS (30 nagłówków), PSY (funding, CVD) i V (CVD) generują głosy. V-03 (CVD)→LONG, PSY-03 (FearGreed=23)→LONG kontrariańsko, NEWS-01→LONG. Abstynencje legalne (Prawo XV).
+
+### 2026-07-20 — Brudne drzewo – auto_lekcja_przetworzone.txt
+Audyt startowy wykazał 3 dopisane linie przez automat w pliku bibliotheca_ulpia/dane/auto_lekcja_przetworzone.txt. Nie jest to zmiana ręczna – wymaga decyzji Cezara.
+
+### 2026-07-20 — MoE niewykonalne na 6GB VRAM
+Mixture of Experts wymaga trzymania wszystkich ekspertów w pamięci jednocześnie. 4 eksperty po 7B wymagają ~28B RAM – na RTX 4050 (6GB) to niemożliwe.
 
 ### 2026-07-22 — tail w rurze testów fałszuje kod wyjścia
 Komenda `python tests/run_tests.py | tail` zwraca kod wyjścia `tail`, nie testów – maskuje oblane testy (exit 0 mimo 1 porażki). Należy unikać `tail` w rurze lub używać oddzielnej obsługi.
-
-### 2026-07-22 — Backticki w powłoce podmieniają tekst
-Prozy z backtickami (np. `element`) przekazywane przez `python -c` w bashu ulegają podmianie – wnioskiem dyscyplina: unikać tej konstrukcji, używać plików tymczasowych.
 
 ### 2026-07-20 — Audyt spojnosci i skan wad przed pushem – pelna harmonia
 Przeprowadzono audyt spojnosci (ruff W13 + dokumenty W14) oraz heurystyczny skan wad. Oba zakonczone exit 0 – stan kodu spojny przed commitem.
@@ -142,9 +154,6 @@ ekstraktor.py:149 – kasowanie istniejącego pliku biblioteki przez równoczesn
 
 ### 2026-07-20 — Cache djvu nie podpięty do RAG – utrata potencjału (Prawo XV)
 konwerter.py:70 – cache djvu zbudowany poprzednio nie jest używany przy indeksowaniu. Chmura nadal woła djvutxt/calibre i gubi djvu.
-
-### 2026-07-20 — Audyt spójności ma ślepe plamy – whitelist bez C/D, ruff pomija skrypty
-CLAUDE.md KROK 0 whitelist nie zawiera kategorii C i D (fałszywy alarm), a `audyt_spojnosci.py` nie skanuje `skrypty/` – dwa F541 przechodzą jako 'czysto'.
 
 ### 2026-07-20 — Hook startowy powoduje brudny working tree w dwóch plikach
 Pliki bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl oraz docs/PAMIEC_SESJI.md są modyfikowane przez hook startowy, co powoduje, że git working tree nie jest w 100% czysty. To normalny churn pamięci, a nie zmiana kodu.
@@ -167,9 +176,6 @@ Dwa pliki (wizje_i_decyzje.jsonl, PAMIEC_SESJI.md) zostały zmienione przez hook
 ### 2026-07-21 — Podkreślnik jako znak słowny w regexie BIB
 Użycie \b w regexie dla identyfikatorów BIB nie zamyka się na podkreślniku (jest znakiem słownym). Testy złapały błąd - naprawiono wzorzec.
 
-### 2026-07-21 — Archiwum lekcji niewidoczne dla szukaj()
-Schłodzone lekcje mają inny nagłówek w pliku, więc parser modułu nie czyta archiwum. Luka powstała przy wdrażaniu chłodzenia. Wymaga poprawy parsowania.
-
 ### 2026-07-20 — API-widma – istnienie w docs ≠ istnienie w kodzie
 Błąd klasy API-widma: dokumentacja indeksu/manualu zawiera komendy do plików, które nie istnieją lub zmieniły nazwę. Zweryfikowano na 9 kandydatach – 3 prawdziwe widma. W16 precyzyjnie odróżnia widma od supresji (dydaktyka, wizje, negacje).
 
@@ -184,9 +190,6 @@ INDEKS_IMPERIUM.md podaje dwie różne liczby neuronów: 299 w nagłówku (data 
 
 ### 2026-07-21 — Test negatywny PROBATORA wykrył błąd graniczny z '_'
 Znak '_' jest traktowany jako słowny przez \b, co powodowało fałszywe dopasowanie przy identyfikatorze BIB-006_Carson. Poprawiono test, nie organ – zastosowano inny separator.
-
-### 2026-07-21 — PROBATOR znalazł nieugruntowany plon w kolejce Hyginusa
-Pomiar na realnym plonie: 2367 znaków kandydatów i zero powołań na źródło, mimo promptu żądającego cytowań. PROBATOR działa poprawnie.
 
 ### 2026-07-21 — Model cytuje nazwiskiem autora, nie identyfikatorem BIB
 Probator zgłaszał fałszywy alarm BEZ_CYTATU gdy model użył nazwiska (np. Hull) zamiast ID. Poprawiono test, nie organ – to realne użycie, a nie błąd weryfikacji.

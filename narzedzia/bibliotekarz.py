@@ -89,6 +89,31 @@ def _fts_bezpieczne(q: str) -> str:
     return " OR ".join(slowa) if slowa else q
 
 
+# ── DISPENSATOR (Szafarz) — ile myślenia KUPUJEMY do której fazy zwiadu ─────────────
+# Organ istniał od sesji dane20, ale Hyginus go NIE WOŁAŁ — martwy potencjał wykryty przez
+# BREVIARIUM 2026-07-21 (Prawo XV). Fazy różnią się rodzajem pracy, więc i ceną:
+#   rozwijanie zapytania — ekstrakcja słów, zero rozważań → najtaniej (thinking off),
+#   generacja kandydatów — objętość ważniejsza od głębi → tanio (flash, effort low),
+#   krytyka adwersarialna — realne rozważanie kontrargumentów → NAJDROŻEJ (v4-pro, effort high).
+#
+# KRYTYKA PRZENIESIONA NA PROFIL 'osad' (v4-pro) — decyzja Cezara 2026-07-21 po A/B LIBRA MESSIS.
+# Podstawą jest ASYMETRIA BŁĘDU, nie dowód statystyczny (Prawo I — mówimy wprost, czego nie wiemy):
+# zmierzony sygnał jakości był SŁABY (kapitulacji „brak kontrargumentów" 23 vs 13 na 8 tematach,
+# rozkład 4-2-2 — nieistotny), a koszt jest PEWNY (3.46×, 1.81× czasu). Zdecydowała obserwacja
+# jakościowa: na tym samym plonie flash napisał o kandydacie „nie znaleziono kontrargumentów"
+# i ocenił MOCNE, podczas gdy v4-pro wyciągnął Z TYCH SAMYCH fragmentów trzy zarzuty z cytatami
+# dosłownymi i ocenił SPRZECZNE. Faza krytyki istnieje wyłącznie po to, by łamać confirmation
+# bias — krytyk, który kapituluje, zamienia U3 w teatr i PODNOSI ocenę słabego kandydata.
+# Bezwzględnie mowa o centach za bieg. Ramię tańsze pozostaje dostępne przez `profil=` w
+# krytyka_kandydatow, więc A/B da się powtórzyć bez cofania tej zmiany.
+#
+# To NIE dotyka ścieżki decyzyjnej tradingu (zwiad nie ma odwołań z koloseum/ ani cesarz/),
+# więc opt-in nie jest wymagany — sędzią kandydatów pozostaje Opus/Vitruviusz, nie DeepSeek
+# (ZASADA ZWIADOWCY WIEDZY — dwa modele o RÓŻNYCH rolach).
+_PROFIL_ROZWIN = "klasyfikacja"
+_PROFIL_ZWIAD = "zwiad"
+_PROFIL_KRYTYKA = "osad"
+
 _SYSTEM_ROZWIN = (
     "Jesteś asystentem wyszukiwania pełnotekstowego w anglojęzycznej bibliotece tradingowej. "
     "Rozwiń podany TEMAT w bogate zapytanie: dodaj synonimy, terminy techniczne i pokrewne "
@@ -104,7 +129,10 @@ def rozwin_zapytanie(glos, temat: str) -> str:
     RAG, które i tak filtruje sędzia (Opus) + arena. Fallback na oryginalny temat przy pustej/
     błędnej odpowiedzi — zwiad nigdy nie ginie przez błąd rozszerzenia (Prawo XV)."""
     try:
-        odp = glos.zapytaj(_SYSTEM_ROZWIN, f"TEMAT: {temat}", temperatura=0.3)
+        # Rozwinięcie tematu w synonimy to ekstrakcja, nie rozważanie — DISPENSATOR kupuje
+        # tu najtaniej (thinking off). Zmierzone 07-20: wyłączone rozumowanie = 11.7× taniej.
+        odp = glos.zapytaj(_SYSTEM_ROZWIN, f"TEMAT: {temat}", temperatura=0.3,
+                           profil=_PROFIL_ROZWIN)
     except Exception:  # noqa: BLE001 — błąd API nie może zabić zwiadu; wracamy do surowego tematu
         return temat
     slowa = _RE_SLOWO.findall(odp or "")
@@ -125,20 +153,37 @@ _SYSTEM_KRYTYKA = (
 )
 
 
-def krytyka_kandydatow(glos, kandydaci: str, wyniki_kontra) -> str:
+def krytyka_kandydatow(glos, kandydaci: str, wyniki_kontra, profil: str | None = None) -> str:
     """U3 (self-critique): drugie przejście — sędzia-sceptyk szuka DOWODÓW PRZECIW kandydatom.
 
     Wzorzec agentic-RAG: po hipotezie szukamy dowodów DISCONFIRMING, by ograniczyć confirmation
     bias. Wynik ląduje w polu 'krytyka' cząstki — Opus-sędzia i arena widzą od razu słabe hipotezy.
-    Błąd API nie może zabić zwiadu (Prawo XV): zwracamy komunikat, kandydaci już są zapisani."""
+    Błąd API nie może zabić zwiadu (Prawo XV): zwracamy komunikat, kandydaci już są zapisani.
+
+    `profil` (domyślnie None → `_PROFIL_KRYTYKA`, czyli zachowanie NIEZMIENIONE) pozwala
+    zmierzyć inny profil DISPENSATORA na tej samej fazie — bez tego A/B „flash vs v4-pro na
+    krytyce" wymagałby duplikatu tej funkcji, a duplikat rozjechałby się z oryginałem."""
     tresc = (f"KANDYDACI:\n{kandydaci}\n\n"
              f"FRAGMENTY (możliwe kontrargumenty):\n{_fragmenty_tekst(wyniki_kontra)}")
     try:
-        return glos.zapytaj(_SYSTEM_KRYTYKA, tresc, temperatura=0.3).strip()
+        # Szukanie dowodów PRZECIW własnym kandydatom to realne rozważanie — tu DISPENSATOR
+        # kupuje głębokość (profil 'krytyka'), inaczej sceptyk byłby równie płytki co proponent.
+        return glos.zapytaj(_SYSTEM_KRYTYKA, tresc, temperatura=0.3,
+                            profil=profil or _PROFIL_KRYTYKA).strip()
     except Exception:  # noqa: BLE001 — krytyka to dodatek; jej brak nie przekreśla cząstki
         return "(krytyka niedostępna — błąd API)"
 
 
+# U4 jest DOMYŚLNIE WŁĄCZONE od 2026-07-21 (sąd nad kolejką, rozkaz Cezara).
+# POWÓD — POMIAR na 33 zebranych cząstkach: sztandarowi kandydaci JUŻ ISTNIELI w kodzie
+# (VPIN → WSKAZNIK „VPIN_50" + doradca HERMES; Value Area → neuron VP-01; Kelly → IUSTITIA;
+# CVD i FUNDING_EXTREME → wskaźniki; Kalman → exp_kalman; triple_barrier → W-357;
+# DSR/PBO/meta-labeling → koloseum). Wina NIE leżała po stronie modelu: blok świadomości
+# systemu — jedyne miejsce, gdzie pada „NIE proponuj duplikatów, oto istniejące klucze" —
+# był opt-in, a te biegi go nie miały. Zwiad nieznający roju z definicji proponuje to,
+# co rój już posiada (Prawo XVI: redundancja mierzona, nie zgadywana).
+# Koszt zmierzony: 3914 znaków ≈ 978 tokenów na temat, ~$0.005 za 33 tematy na flashu —
+# wobec kosztu produkowania duplikatów i czasu sędziego to zaokrąglenie do zera.
 @functools.lru_cache(maxsize=1)
 def _kontekst_systemu() -> str:
     """U4 (świadomość systemu): zwięzły blok o LUKACH (Prawo XV) i ISTNIEJĄCYCH modułach
@@ -169,7 +214,8 @@ def _kontekst_systemu() -> str:
 
 def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
                 korpus: str | None = "biblioteka", rozwin: bool = False,
-                krytyka: bool = False, swiadomosc: bool = False) -> dict:
+                krytyka: bool = False, swiadomosc: bool = True,
+                probator: bool = True) -> dict:
     """Jeden temat: RAG → DeepSeek proponuje kandydatów. Zwraca dict cząstki (do kolejki).
 
     Zakłada, że indeks RAG ISTNIEJE (bramkuje raport() — Cubic P2). Status cząstki:
@@ -195,12 +241,20 @@ def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
     tresc = f"TEMAT: {temat}\n\nFRAGMENTY:\n{_fragmenty_tekst(wyniki)}"
     if swiadomosc:  # U4: dołącz świadomość systemu (luki + istniejące moduły) do generacji kandydatów
         tresc += _kontekst_systemu()
-    odp = glos.zapytaj(_SYSTEM, tresc, temperatura=0.4)
-    rec = {**baza, "zrodla": zrodla, "kandydaci": odp.strip(), "status": "ok"}
+    # Generacja kandydatów = zwiad objętościowy (dużo fragmentów, płytka analiza każdego).
+    odp = glos.zapytaj(_SYSTEM, tresc, temperatura=0.4, profil=_PROFIL_ZWIAD)
+    rec = {**baza, "zrodla": zrodla, "kandydaci": odp.strip(), "status": "ok",
+           "profil": _PROFIL_ZWIAD}
+    if probator:  # WARSTWA 1 anty-halucynacyjna: cytat spoza podanych fragmentów (0 tokenów)
+        from imperium.pretorianie.probator import do_slownika, sprawdz
+        rec["probator"] = do_slownika(sprawdz(rec["kandydaci"], wyniki))
     if krytyka:  # U3: drugie przejście — dowody PRZECIW (osobne retrieval na kontrargumenty)
         kontra = szukaj(_fts_bezpieczne(f"{zapytanie} {_KONTRA_SUFIKS}"),
                         topk=topk, tryb=tryb, cichy=True, korpus=korpus)
         rec["krytyka"] = krytyka_kandydatow(glos, rec["kandydaci"], kontra)
+        if probator:  # krytyka to też plon modelu — bada się ją wobec WŁASNYCH fragmentów
+            from imperium.pretorianie.probator import do_slownika, sprawdz
+            rec["probator_krytyka"] = do_slownika(sprawdz(rec["krytyka"], kontra))
     return rec
 
 
@@ -232,7 +286,7 @@ def zapisz_czastke(czastka: dict) -> None:
 
 
 def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="biblioteka",
-           rozwin=False, krytyka=False, swiadomosc=False) -> str:
+           rozwin=False, krytyka=False, swiadomosc=True, probator=True) -> str:
     # Cubic P2: bramka indeksu RAG — brak bazy to AWARIA INFRY, nie „pusty wynik". Nie skanujemy
     # i NIC nie zapisujemy do kolejki (inaczej awaria udawałaby ukończony, pusty zwiad).
     from szukaj import DEFAULT_BAZA  # type: ignore[import]
@@ -249,6 +303,7 @@ def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="bi
     zrobione = set() if force else _tematy_ukonczone()
 
     N = len(tematy)
+    podejrzane: list[str] = []      # tematy, w których PROBATOR złapał cytat spoza fragmentów
     linie = [f"📚 HYGINUS (Bibliotekarz-Zwiadowca) — {N} tematów, {'DRY-RUN' if dry_run else 'DeepSeek'} "
              f"(⚠️ KANDYDACI — prawdą po arenie)"]
     for i, temat in enumerate(tematy, 1):
@@ -261,15 +316,27 @@ def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="bi
               file=sys.stderr, flush=True)
         try:
             czastka = scout_temat(glos, temat, topk=topk, tryb=tryb, korpus=korpus,
-                                  rozwin=rozwin, krytyka=krytyka, swiadomosc=swiadomosc)
+                                  rozwin=rozwin, krytyka=krytyka, swiadomosc=swiadomosc,
+                                  probator=probator)
         except Exception as e:  # noqa: BLE001
             print(f"[{i}/{N}] ⚠️ „{temat}”: {e}", file=sys.stderr, flush=True)
             continue
         zapisz_czastke(czastka)
         zr = ", ".join(czastka["zrodla"][:5]) or "—"
         print(f"[{i}/{N}] ✅ „{temat}” → źródła: {zr} | 💾 kolejka", file=sys.stderr, flush=True)
+        # PROBATOR mówi tylko wtedy, gdy ma co zarzucić — cisza znaczy „cytaty się zgadzają".
+        pro = czastka.get("probator") or {}
+        if pro and not pro.get("czysty", True):
+            print(f"[{i}/{N}] {pro['opis']}", file=sys.stderr, flush=True)
+            podejrzane.append(f"{temat} → {pro['opis']}")
         linie.append(f"\n── [{i}/{N}] {temat} (źródła: {zr}) ──\n{czastka['kandydaci']}")
+        if pro:
+            linie.append(pro["opis"])
 
+    if podejrzane:
+        linie.append(f"\n🚨 PROBATOR — {len(podejrzane)}/{N} tematów z cytatem spoza podanych "
+                     f"fragmentów (halucynacja citation; sędzia niech czyta je najostrożniej):")
+        linie.extend(f"   • {x}" for x in podejrzane)
     linie.append(f"\n💾 Kolejka: {KOLEJKA.relative_to(ROOT)} — do PRZEGLĄDU Opusa (sędzia). "
                  f"Nic nie wchodzi do kodu bez weryfikacji + areny (Prawo I, ZASADA WPIĘCIA).")
     return "\n".join(linie)
@@ -301,9 +368,16 @@ if __name__ == "__main__":
     p.add_argument("--krytyka", action="store_true",
                    help="U3: self-critique — drugie przejście szuka DOWODÓW PRZECIW kandydatom (+1 RAG +1 call/temat)")
     p.add_argument("--swiadomosc", action="store_true",
-                   help="U4: wstrzyknij świadomość systemu (luki Prawa XV + istniejące klucze) — kandydaci pod realne braki")
+                   help="(bez efektu — U4 jest domyślnie WŁĄCZONE od 2026-07-21; flaga zostawiona, "
+                        "żeby stare polecenia i skrypty nie padały)")
+    p.add_argument("--bez-swiadomosci", action="store_true",
+                   help="wyłącz U4 (świadomość systemu: istniejące klucze + luki Prawa XV). "
+                        "UWAGA: bez tego bloku zwiad proponuje moduły, które JUŻ MAMY — zmierzone "
+                        "na 33 cząstkach, gdzie VPIN/Value Area/Kelly/CVD/Kalman już istniały")
     p.add_argument("--pelny", action="store_true",
-                   help="komplet U2+U3+U4: --rozwin --krytyka --swiadomosc naraz (najlepszy zwiad)")
+                   help="komplet U2+U3: --rozwin --krytyka naraz (U4 i tak domyślnie ON)")
+    p.add_argument("--bez-probatora", action="store_true",
+                   help="wyłącz PROBATORA (strażnik cytatów, 0 tokenów) — domyślnie WŁĄCZONY")
     p.add_argument("--dry-run", action="store_true", help="tylko RAG, bez DeepSeek (bez kosztu API)")
     p.add_argument("--force", action="store_true", help="przeskanuj też tematy już w kolejce")
     args = p.parse_args()
@@ -312,6 +386,7 @@ if __name__ == "__main__":
     korpus = None if args.korpus == "wszystko" else args.korpus  # 'wszystko' → bez filtra (dawne zachowanie)
     rozwin = args.rozwin or args.pelny
     krytyka = args.krytyka or args.pelny
-    swiadomosc = args.swiadomosc or args.pelny
+    swiadomosc = not args.bez_swiadomosci        # domyślnie ON — patrz komentarz przy _kontekst_systemu
     print(raport(tematy, topk=args.topk, tryb=args.tryb, dry_run=args.dry_run,
-                 force=args.force, korpus=korpus, rozwin=rozwin, krytyka=krytyka, swiadomosc=swiadomosc))
+                 force=args.force, korpus=korpus, rozwin=rozwin, krytyka=krytyka,
+                 swiadomosc=swiadomosc, probator=not args.bez_probatora))

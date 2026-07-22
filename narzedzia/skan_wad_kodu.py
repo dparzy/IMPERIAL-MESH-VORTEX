@@ -25,6 +25,15 @@ if str(ROOT) not in sys.path:
 from imperium.biblioteki.ksiega_wad_kodu import KsiegaWadKodu, zasiej_startowe  # noqa: E402
 
 
+def _filtruj_py(linie) -> set[str]:
+    """Filtr wspólny: z listy nazw plików zostaw .py w imperium/ i narzedzia/, bez samego
+    modułu wzorców (trzyma regexy jako dane — trafiałby w siebie)."""
+    pliki = {l for l in linie
+             if l.endswith(".py") and l.startswith(("imperium/", "narzedzia/"))}
+    pliki.discard("imperium/biblioteki/ksiega_wad_kodu.py")
+    return pliki
+
+
 def _zmienione_py() -> list[Path]:
     pliki: set[str] = set()
     # diff (zmienione/staged) + untracked (nowe pliki — inaczej świeży moduł umyka skanowi).
@@ -34,13 +43,29 @@ def _zmienione_py() -> list[Path]:
             out = subprocess.run(["git", *args], cwd=ROOT, capture_output=True,
                                  text=True, timeout=20,
                                  encoding="utf-8", errors="replace").stdout
-            pliki |= {l for l in out.splitlines()
-                      if l.endswith(".py") and l.startswith(("imperium/", "narzedzia/"))}
+            pliki |= _filtruj_py(out.splitlines())
         except Exception:
             pass
-    # Wyklucz sam moduł z definicjami wzorców (trzyma regexy jako dane — trafiałby w siebie).
-    pliki.discard("imperium/biblioteki/ksiega_wad_kodu.py")
     return [ROOT / p for p in sorted(pliki) if (ROOT / p).exists()]
+
+
+def _py_ostatni_commit() -> list[Path]:
+    """Pliki .py zmienione w OSTATNIM commicie (HEAD~1..HEAD) — do skanu na starcie sesji
+    po SYNC pull (A4, uszczelnienie OTWARCIA 2026-07-19).
+
+    Powód: skan zmienionych plików na starcie był no-op (czyste drzewo → „brak plików").
+    Skan ostatniego commitu łapie regresje w świeżo pociągniętym/zacommitowanym kodzie.
+    Pierwszy commit repo (brak HEAD~1) lub brak gita → [] (start się nie wywala, Prawo I)."""
+    try:
+        out = subprocess.run(["git", "diff", "--name-only", "HEAD~1", "HEAD"],
+                             cwd=ROOT, capture_output=True, text=True, timeout=20,
+                             encoding="utf-8", errors="replace")
+    except Exception:
+        return []
+    if out.returncode != 0:
+        return []
+    return [ROOT / p for p in sorted(_filtruj_py(out.stdout.splitlines()))
+            if (ROOT / p).exists()]
 
 
 def skanuj_pliki(pliki: list[Path], ksiega: KsiegaWadKodu) -> list[tuple[Path, dict]]:
@@ -59,7 +84,17 @@ def main() -> int:
     p = argparse.ArgumentParser(description="Skan wad kodu (Księga Wad Kodu)")
     p.add_argument("plik", nargs="?", help="konkretny plik (domyślnie: zmienione w git)")
     p.add_argument("--lista", action="store_true", help="pokaż całą księgę")
+    p.add_argument("--ostatni-commit", action="store_true",
+                   help="skanuj .py zmienione w OSTATNIM commicie (start sesji po SYNC, A4)")
+    p.add_argument("--falsa", action="store_true",
+                   help="sweep INDEX FALSORUM: gdzie obalone twierdzenie wciąż jest "
+                        "głoszone jako fakt (cały korpus .py+.md, bez historii)")
     args = p.parse_args()
+
+    if args.falsa:
+        from imperium.biblioteki.index_falsorum import przeszukaj, raport
+        print(raport())
+        return 2 if przeszukaj() else 0
 
     zasiej_startowe()                      # utwórz księgę z wzorcami jeśli pusta
     ksiega = KsiegaWadKodu()
@@ -76,9 +111,15 @@ def main() -> int:
                 print(f"   [{w['kat']}] {w['opis']}\n       → {w['lekcja']}  ({w.get('zrodlo','')})")
         return 0
 
-    pliki = [ROOT / args.plik] if args.plik else _zmienione_py()
+    if args.plik:
+        pliki = [ROOT / args.plik]
+    elif args.ostatni_commit:
+        pliki = _py_ostatni_commit()
+    else:
+        pliki = _zmienione_py()
     if not pliki:
-        print("🐞 Brak zmienionych plików .py do skanu.")
+        zrodlo = "w ostatnim commicie" if args.ostatni_commit else "zmienionych"
+        print(f"🐞 Brak plików .py {zrodlo} do skanu.")
         return 0
     n_check = len(ksiega.checklista())
     przypomnienie = (f"   📋 Pamiętaj o checkliście review ({n_check} klas semantycznych): "

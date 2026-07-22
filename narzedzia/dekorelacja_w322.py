@@ -1,3 +1,12 @@
+"""Pomiar dekorelacji neuronów W-322 (V-06/V-07/VP-01/Z-06/Z-07) na BTCUSDT 4h.
+
+Skrypt jednorazowego pomiaru (Prawo XVI: redundancja MIERZONA, nie zgadywana):
+liczy sygnał każdego neuronu na 600 barach i raportuje korelacje nowych modułów
+z resztą roju — |r|>0.80 to kandydat do scalenia, |r|<0.20 to filar dywersyfikacji.
+
+Znaleziony jako JEDYNY moduł bez docstringu w cenzusie organów 2026-07-20
+(Prawo XV: moduł, który nie mówi po co istnieje, jest nieodróżnialny od śmiecia).
+"""
 import logging; logging.disable(logging.CRITICAL)
 from imperium.akwedukty.czytnik_csv import wczytaj_csv
 from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow

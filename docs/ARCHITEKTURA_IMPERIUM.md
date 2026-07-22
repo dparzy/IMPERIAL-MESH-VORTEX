@@ -1,7 +1,7 @@
 ---
 kategoria: FORMA
 typ: zywy
-wlasciciel: imperium/akwedukty/kwatermistrz_danych.py, imperium/biblioteki/hedge_mwu.py, imperium/biblioteki/igrzyska.py, imperium/biblioteki/kronikarz.py, imperium/biblioteki/mnemosyne.py, imperium/biblioteki/notarius.py, imperium/cesarz/titan_mind.py, imperium/drogi/nexus_hub.py, imperium/fundament/brama_kalkulatora.py, imperium/fundament/kuznia_narzedzi.py, imperium/koloseum/backtest.py, imperium/koloseum/haruspex.py, imperium/koloseum/monte_carlo.py, imperium/koloseum/walidacja.py, imperium/koloseum/walk_forward.py, imperium/legiony/pierwszy_zwiadowca.py, imperium/legiony/roj_sygnalow.py, imperium/oczy/censor_sprzetu.py, imperium/oczy/wszechoko.py, imperium/pretorianie/aegis_tarcza.py, imperium/pretorianie/lustro_prawdy.py, imperium/senat/meta_kora.py, imperium/swiatynie/kartograf.py, imperium/swiatynie/specula_swiec.py, imperium/swiatynie/web_dashboard.py
+wlasciciel: imperium/akwedukty/kwatermistrz_danych.py, imperium/biblioteki/codex_notarum.py, imperium/biblioteki/index_falsorum.py, imperium/swiatynie/praetorium.py, imperium/biblioteki/hedge_mwu.py, imperium/biblioteki/igrzyska.py, imperium/biblioteki/kronikarz.py, imperium/biblioteki/mnemosyne.py, imperium/biblioteki/notarius.py, imperium/cesarz/titan_mind.py, imperium/drogi/nexus_hub.py, imperium/fundament/brama_kalkulatora.py, imperium/fundament/kuznia_narzedzi.py, imperium/koloseum/backtest.py, imperium/koloseum/haruspex.py, imperium/koloseum/monte_carlo.py, imperium/koloseum/walidacja.py, imperium/koloseum/walk_forward.py, imperium/legiony/pierwszy_zwiadowca.py, imperium/legiony/roj_sygnalow.py, imperium/oczy/censor_sprzetu.py, imperium/oczy/wszechoko.py, imperium/pretorianie/aegis_tarcza.py, imperium/pretorianie/lustro_prawdy.py, imperium/senat/meta_kora.py, imperium/swiatynie/kartograf.py, imperium/swiatynie/specula_swiec.py, imperium/swiatynie/web_dashboard.py
 stan_na: 2026-07-19
 powod_istnienia: "Jedna strona spinająca 25 Praw z realnym kodem — jedyne miejsce z tabelą 'dzielnica → plik → rola → prawa' + diagram przepływu sygnału + mapowanie warstw architektury na źródła bib"
 ---
@@ -27,9 +27,12 @@ powod_istnienia: "Jedna strona spinająca 25 Praw z realnym kodem — jedyne mie
                                    roj_sygnalow          konsensus sygnałów     [X, IX]
 🛡️ PRETORIANIE     pretorianie/   aegis_tarcza          ryzyko, circuit breaker[IX]
                                    lustro_prawdy         walidacja adwersarialna[I, IX]
+                                   portitor              celnik u wrót: pre-flight środowiska startu[XV, XVII]
+                                   probator              strażnik cytatów: plon Hyginusa vs podane fragmenty[I, XVI]
 🚰 AKWEDUKTY        akwedukty/     kwatermistrz_danych   dane OHLCV (CCXT/CSV)  [II]
 👁️ OCZY            oczy/          wszechoko             percepcja wielowarstwowa[XII]
                                    censor_sprzetu        cenzus majątku maszyny → klasa+alarm[XV]
+                                   breviarium            spis sług: Hyginus/TIRO/modele na otwarciu[XV, XVII]
 🛤️ DROGI            drogi/         nexus_hub             multi-exchange routing [III, XIII]
                                    oms + real_order_router egzekucja zleceń     [III]
 🎨 ŚWIĄTYNIE       swiatynie/     kartograf             wykresy PNG            [V]
@@ -55,11 +58,45 @@ powod_istnienia: "Jedna strona spinająca 25 Praw z realnym kodem — jedyne mie
 Organy pomocnicze POZA `imperium/` — dobór nazwy DO FUNKCJI (ZASADA NOMENKLATURY IMPERIALNEJ).
 Źródło prawdy imion narzędzi (organy `imperium/` są w mapie dzielnic wyżej; agenci w `docs/PROFIL_CEZARA.md`).
 
+> **Kwatera Główna w `imperium/swiatynie/`:** **PRAETORIUM** (`imperium/swiatynie/praetorium.py`) —
+> Centrum Dowodzenia Imperatora: hybryda kwatery bojowej (kokpit) i castrum (kondycja organów).
+> Renderer jest CZYSTĄ funkcją (`render_praetorium(stan) -> str`), więc `web_dashboard.py` może go
+> podać bez stawiania drugiego serwera (Prawo XVI). Każdy panel niesie znacznik **ŻYWE / BRAK DANYCH**
+> — kokpit nigdy nie maluje wypełniacza jako pomiaru (Prawo I). [I, XV, XVI]
+>
+> **Organ governance w `imperium/biblioteki/`:** **CODEX NOTARUM** (Księga Not Cenzorskich,
+> `imperium/biblioteki/codex_notarum.py`) — ledger LEX TALIONIS „oko za oko": NOTA CENSORIA (−) za
+> zatwierdzony błąd, CORONA (+) za zatwierdzony unikat spłacający dług honorowy. [I, XV, XXI]
+>
+> **INDEX FALSORUM** (Spis Twierdzeń Obalonych, `imperium/biblioteki/index_falsorum.py`) — twierdzenie
+> obalone POMIAREM rejestruje się raz (fraza + poprawna teza + dowód), a sweep całego korpusu `.py`+`.md`
+> pilnuje, by nie żyło dalej jako fakt. Klasa siostrzana Warstwy 15 (liczby) i 16 (API-widma) — tylko po
+> stronie TWIERDZEŃ. Historia (ACTA/archiwum) i sprostowania poza zasięgiem; źle dobraną frazę zdejmuje
+> `wycofaj()`. Sweep: `narzedzia/skan_wad_kodu.py --falsa`, w hooku startowym. [I, XV, XXI]
+>
+> **SIGILLARIUM** (Skarbiec Pieczęci, `imperium/biblioteki/sigillarium.py`) — **SIGLA IMPERII**:
+> hasła-skróty Cezara `/apertio` (otwarcie wachty), `/clausura` (domknięcie), `/limes` (bramka
+> Prawa XXI) uruchamiające PEŁNE procedury bez recytowania ich za każdym razem. Rdzeń: pieczęć
+> **nie przechowuje kroków** — czyta je z konstytucji (`CLAUDE.md`) w chwili wywołania, więc
+> rozjazd jest strukturalnie niemożliwy, a nie „pilnowany" (to samo lekarstwo co CENSUS ORGANORUM:
+> odebranie dokumentowi prawa do własnej treści). Karmi runbooki W11 (`synchronizuj_w11()`), więc
+> hasło działa też pisane zwykłym zdaniem; ujście w harnessie to cienkie `.claude/skills/*/SKILL.md`,
+> które wołają pieczęć zamiast kopiować kroki (Prawo XVI). Pusta pieczęć albo martwa komenda bramki
+> **krzyczy**, zamiast udawać sprawną. [I, XV, XVI, XXI]
+
 | Nazwa rzymska | Plik | Rola | Prawa |
 |---|---|---|---|
 | **Speculum Probationis** (Zwierciadło Prób) | `narzedzia/kapitol_podglad.py` | zero-tokenowy podgląd testu w Kapitolu (HTML + inline-SVG, spec + wykres + link) | [V, XXIV] |
 | **Cursus Fenestrarum** (Bieg Okien) | `narzedzia/wfo_chunked.py` | chunkowany, wznawialny walk-forward (checkpoint per-okno) | [I, XVI, XXIV] |
 | **Scriba Codex** (Skryba Kodeksu) | `narzedzia/scriba_codex.py` | idempotentny appender wyników testów do rejestru CODEX | [I, XXI] |
+| **Veritas Annalium** (Prawda Roczników) | `narzedzia/audyt_danych.py` | audyt świec w 3 warstwach: struktura · krzyżowa 1h↔4h · zgodność z giełdą; naprawa zmierzonych rozjazdów z kopią | [I, XVI, XXI] |
+| **Conflator Temporum** (Zlewacz Interwałów) | `narzedzia/agreguj_bary.py` | buduje wyższy interwał z niższego (1m→5m/15m, 1h→4h); odrzuca niepełne okna, ostrzega przy nadpisaniu danych z giełdy | [I, XVI] |
+| **Nuntius Mercatus** (Posłaniec Rynku) | `narzedzia/pobierz_binance.py` | pobiera świece dowolnego interwału z publicznego API Binance; checkpoint stronicowy = zabity bieg traci jedną stronę, nie postęp | [I, XXIV] |
+| **Census Organorum** (Spis Organów) | `narzedzia/census_organorum.py` | spis WSZYSTKICH modułów `imperium/`+`narzedzia/` generowany z żywego kodu (rola = docstring); bramka Warstwy 17 audytu — moduł bez meldunku blokuje commit | [XV, XIX, XXI] |
+| **Breviarium** (Spis Sług) | `imperium/oczy/breviarium.py` | meldunek otwarcia: **aktualność wyniku testów** (SIGILLUM PROBATIONIS — pieczęć przypięta do commitu; „zielone dla innego commitu" = NIEZNANY, nie zgoda), stan HYGINUSA (kolejka, plon czekający na sędziego, model, profile Dispensatora) i TIRO (pary nauczyciela, modele na dysku, klasa sprzętu). Liczby GENEROWANE z żywego stanu. Modelu Architekta świadomie NIE zgaduje — środowisko go nie niesie, więc żąda deklaracji (Prawo I) | [XV, XVII, XXI] |
+| **Probator** (Strażnik Cytatów) | `imperium/pretorianie/probator.py` | warstwa 1 anty-halucynacyjna Hyginusa: deterministycznie (0 tokenów) sprawdza, czy każde cytowane źródło NAPRAWDĘ było modelowi podane — grounding wobec promptu, nie wobec korpusu. Abstencja = wynik poprawny. Monotonicznie ostrożny: dokłada werdykt do cząstki, nic nie odrzuca | [I, XVI, XXI] |
+| **Dispensator** (Szafarz) | `imperium/cesarz/dispensator.py` | dobór modelu DeepSeek do trudności zadania (ZASADA OSZCZĘDNOŚCI TOKENÓW) — organ rdzenia Cezara, nie narzędzie; wpisany tu po tym, jak cenzus 2026-07-20 zastał go niezameldowanym w ŻADNYM dokumencie | [XVI, XVIII] |
+| **Libra Messis** (Waga Plonu) | `narzedzia/ab_plon_hyginusa.py` | A/B jakości zwiadu Hyginusa: świadomość systemu U4 ON/OFF oraz profile Dispensatora na krytyce. Metryki deterministyczne (0 tokenów) + koszt z FAKTYCZNEGO `usage`. Nie dotyka produkcyjnej kolejki hipotez — mierzący nie zmienia mierzonego. Trzyma surowy plon, więc poprawka definicji miary nie wymaga płatnego powtórzenia biegu (`przelicz`) | [I, XVI, XXIV] |
 
 ---
 
@@ -144,7 +181,7 @@ właściciela (Brama / Głos / Drogi / Kronikarz)? · Gdzie w przepływie to sie
 ## 📚 ŹRÓDŁA — Kanon biblioteki za architekturą (BIB)
 
 > **Po co ta architektura?** Każda warstwa Imperium ma teoretyczne ugruntowanie w bibliotece
-> (**<!-- LICZBA:ksiazki -->79<!-- /LICZBA --> książek**). Tu mapa: warstwa → książka.
+> (**<!-- LICZBA:ksiazki -->115<!-- /LICZBA --> książek**). Tu mapa: warstwa → książka.
 > Pełna esencja: `bibliotheca_ulpia/encyklopedia/`.
 
 | Warstwa architektury | Dlaczego tak (koncept) | Źródło BIB |

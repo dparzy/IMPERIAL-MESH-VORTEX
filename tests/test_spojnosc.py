@@ -244,3 +244,57 @@ def test_audyt_w16_marker_nie_lapie_wewnatrz_slowa():
     assert a._w16_widma_w_tresci(t1, _W16_REAL) == [("imperium/koloseum/valhalla.py", 1)], t1
     t2 = "Dywizja III uruchamia `imperium/koloseum/valhalla.py`.\n"
     assert a._w16_widma_w_tresci(t2, _W16_REAL) == [("imperium/koloseum/valhalla.py", 1)], t2
+
+
+# ── Warstwa 18: LEX TALIONIS — dług honorowy zatrzymuje commit (bramka TWARDA) ──
+
+def test_w18_dlug_honorowy_gryzie(tmp_path):
+    """DOWÓD, ŻE BRAMKA GRYZIE: sztuczny dług → czerwień, po CORONIE → zieleń.
+
+    Bez tego testu Warstwa 18 byłaby deklaracją. Pierwsza wersja dowodu podmieniała
+    stałą `codex_notarum.LEDGER` i po cichu czytała PRAWDZIWY ledger — bo `bilans(sciezka=LEDGER)`
+    wiąże domyślny argument w chwili definicji. Meldowała zieleń dla sztucznego długu,
+    czyli sam dowód był mechanizmem, który przy awarii wygląda na sprawny. Stąd jawna ścieżka.
+    """
+    from imperium.biblioteki import codex_notarum as cn
+    from narzedzia.audyt_spojnosci import _warstwa_18_dlug_honorowy as w18
+
+    ledger = tmp_path / "notarum.jsonl"
+
+    assert w18(ledger)[0] == []                      # pusty ledger — brak długu
+
+    nota = cn.dodaj_nota(opis="Sztuczny błąd", kategoria="test",
+                         zatwierdzenie="dowód, że bramka gryzie", sesja="test",
+                         sciezka=ledger)
+    bledy, info = w18(ledger)
+    assert len(bledy) == 1 and "DŁUG HONOROWY" in bledy[0]   # NOTA bez CORONY → czerwień
+    assert info == []
+
+    cn.dodaj_corona(opis="Sztuczny unikat", kategoria="test",
+                    zatwierdzenie="dowód spłaty", sesja="test",
+                    splaca=nota, sciezka=ledger)
+    bledy, info = w18(ledger)
+    assert bledy == [] and info                       # spłacone → zieleń
+
+
+def test_w18_corona_nie_splacajaca_nie_zamyka_dlugu(tmp_path):
+    """Granica LEX TALIONIS: „oko za oko musi mieć oko" — CORONA bez `splaca`
+    NIE zamyka długu, inaczej dowolny laur kasowałby dowolny błąd."""
+    from imperium.biblioteki import codex_notarum as cn
+    from narzedzia.audyt_spojnosci import _warstwa_18_dlug_honorowy as w18
+
+    ledger = tmp_path / "notarum.jsonl"
+    cn.dodaj_nota(opis="Błąd nierozliczony", kategoria="test",
+                  zatwierdzenie="dowód", sesja="test", sciezka=ledger)
+    cn.dodaj_corona(opis="Laur nie wskazujący noty", kategoria="test",
+                    zatwierdzenie="dowód", sesja="test", sciezka=ledger)
+    assert len(w18(ledger)[0]) == 1                   # dług NADAL otwarty
+
+
+def test_w18_awaria_ledgera_nie_wywraca_audytu(tmp_path):
+    """Uszkodzony ledger → błąd warstwy, nie wyjątek walący cały audyt."""
+    from narzedzia.audyt_spojnosci import _warstwa_18_dlug_honorowy as w18
+    zly = tmp_path / "zepsuty.jsonl"
+    zly.write_text("{to nie json\n", encoding="utf-8")
+    bledy, _ = w18(zly)
+    assert isinstance(bledy, list)                    # kontrakt zachowany, brak wyjątku

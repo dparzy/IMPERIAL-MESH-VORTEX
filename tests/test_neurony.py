@@ -1981,3 +1981,97 @@ def test_ses02_granice():
     g = n.interpretuj({"CLOSE": 105.0, "ASIA_HIGH": 105.0, "ASIA_LOW": 100.0,
                        "ASIA_GOTOWA": True})
     assert g.kierunek == "NEUTRAL"
+
+
+# ── AEQUITAS SERIERUM — strażnik równej długości serii u wrót Bramy (P1, 2026-07-20) ──
+
+def _serie_rowne(n=100):
+    h = [100.0 + i for i in range(n)]
+    return {"high": h, "low": [x - 5 for x in h], "close": [x - 2 for x in h],
+            "volume": [10.0] * n}
+
+
+def test_aequitas_odrzuca_krotszy_volume():
+    """Nierówne serie OHLCV → GŁOŚNY ValueError, nie cichy fałszywy VWAP.
+
+    Zmierzone 2026-07-20: bez strażnika VWAP dawał 137.17 zamiast 147.17
+    (rozjazd 10.0) i stemplował audyt input_len=100 licząc z 80 barów.
+    """
+    from imperium.fundament.brama_kalkulatora import CalculatorGateway
+    g = CalculatorGateway()
+    s = _serie_rowne()
+    s["volume"] = s["volume"][:80]
+    try:
+        g.compute("VWAP", **s)
+        assert False, "nierówne serie MUSZĄ być odrzucone (ciche obcięcie = fałszywy wskaźnik)"
+    except ValueError as e:
+        assert "różne długości" in str(e), f"komunikat musi nazwać przyczynę, jest: {e}"
+        assert "volume=80" in str(e) and "high=100" in str(e), "komunikat podaje zmierzone długości"
+
+
+def test_aequitas_rowne_serie_przechodza():
+    """Granica: serie równej długości przechodzą bez zmiany zachowania (nic nie psujemy)."""
+    from imperium.fundament.brama_kalkulatora import CalculatorGateway
+    g = CalculatorGateway()
+    assert g.compute("VWAP", **_serie_rowne()).value is not None
+
+
+def test_aequitas_pojedyncza_seria_i_brak_serii():
+    """Granica: jedna seria (close) i wskaźnik bez serii — strażnik nie może fałszywie alarmować."""
+    from imperium.fundament.brama_kalkulatora import CalculatorGateway
+    g = CalculatorGateway()
+    c = [100.0 + i for i in range(60)]
+    assert g.compute("RSI", close=c, period=14).value is not None
+    assert g.compute("EMA", close=c, period=20).value is not None
+
+
+def test_aequitas_roznica_jednego_baru():
+    """Granica dokładna: różnica JEDNEGO baru też jest odrzucana (nie tylko duże rozjazdy)."""
+    from imperium.fundament.brama_kalkulatora import CalculatorGateway
+    g = CalculatorGateway()
+    s = _serie_rowne()
+    s["low"] = s["low"][:-1]
+    try:
+        g.compute("AO", high=s["high"], low=s["low"])
+        assert False, "różnica 1 baru = uszkodzone dane, musi być odrzucona"
+    except ValueError as e:
+        assert "różne długości" in str(e)
+
+
+def test_aequitas_chroni_takze_talib():
+    """TA-Lib też przechodzi przez strażnika — spójny komunikat Bramy, nie surowy wyjątek C."""
+    from imperium.fundament.brama_kalkulatora import CalculatorGateway
+    g = CalculatorGateway()
+    s = _serie_rowne()
+    try:
+        g.compute("ATR", high=s["high"], low=s["low"][:80], close=s["close"], period=14)
+        assert False, "ATR z nierównymi seriami musi być odrzucony przez Bramę"
+    except ValueError as e:
+        assert "Brama odrzuca" in str(e), "komunikat Bramy, nie surowy wyjątek TA-Lib"
+
+
+def test_aequitas_compute_series_tez_strzezone():
+    """compute_series() to drugie wejście do matematyki — też musi mieć strażnika."""
+    from imperium.fundament.brama_kalkulatora import CalculatorGateway
+    g = CalculatorGateway()
+    c = [100.0 + i for i in range(60)]
+    assert g.compute_series("RSI", close=c, period=14) is not None
+    try:
+        g.compute_series("RSI", close=c, volume=[1.0] * 30, period=14)
+        assert False, "compute_series z nierównymi seriami musi być odrzucone"
+    except ValueError as e:
+        assert "różne długości" in str(e)
+
+
+def test_hma_wma_strict_niezmiennik():
+    """HMA liczy się poprawnie po dodaniu strict=True (bit-identyczność zachowana)."""
+    from imperium.fundament.brama_kalkulatora import CalculatorGateway
+    import random
+    random.seed(7)
+    c = [100.0]
+    for _ in range(200):
+        c.append(c[-1] * (1 + random.gauss(0, 0.01)))
+    g = CalculatorGateway()
+    hma = g.compute("HMA", close=c).value
+    prev = g.compute("HMA_PREV", close=c).value
+    assert hma is not None and prev is not None, "strict nie może wywrócić poprawnego HMA"

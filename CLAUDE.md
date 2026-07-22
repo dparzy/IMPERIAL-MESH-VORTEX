@@ -158,6 +158,10 @@ Checklist Prawa XIX (sprawdzaj na początku sesji):
 - [ ] **Warstwa 13 (ruff):** linter czysty — zero bugów/martwego kodu (F811 duplikaty, F821 undefined, F841/F401 martwe). Audyt uruchamia ruff automatycznie.
 - [ ] **Warstwa 14 (wszystkie docs):** MAPA_KLUCZY.md zawiera KAŻDY klucz z kodu (dodajesz neuron → dopisujesz mapę). Audyt skanuje wszystkie pliki .md.
 - [ ] **Warstwa 15 (liczby wstrzykiwane):** żadnej liczby o systemie NIE wpisujesz ręcznie — wstawiasz blok `<!-- LICZBA:neurony -->87<!-- /LICZBA -->`, a `python narzedzia/tabularium.py liczby --zapisz` przepisuje go z żywego kodu. Powód (zmierzone 2026-07-17): trzy dokumenty podawały „neuronów w kodzie" jako 47/27/55 przy 87 — każda była prawdziwa w dniu pisania. Ręczna liczba zawsze się rozjedzie, bo rośnie kod, a nie dokument.
+- [ ] **Warstwa 18 (LEX TALIONIS):** dług honorowy = 0. Zatwierdzony błąd bez kompensującej CORONY
+      zatrzymuje commit — bramka TWARDA (decyzja Cezara 2026-07-21). Powód: samo DRUKOWANIE bilansu
+      na otwarciu dawało widoczność, nie egzekwowalność, więc dług mógł przeżyć kilka sesji.
+      Zakleszczenia brak: CORONĘ dopisuje się do ledgera, co nie wymaga commitu.
 - [ ] **Warstwa 16 (API-widma):** każda ścieżka `korzeń/…/x.py` cytowana w ŻYWYM dokumencie jako fakt MUSI istnieć w kodzie. Suppresje: bloki ```python (kod przykładowy), markery planu/negacji w linii („do zbudowania", „nie istniał", 🔴/🟠/💭/WIZJA), changelogi/rejestry-zamiarów. Powód (zmierzone 2026-07-18): spłata długu gnicia szła dokument-po-dokumencie i NIE łapała plików, których nigdy nie było — skan całego korpusu naraz znalazł 3 martwe komendy w żywym INDEKS-ie przy „pełnej harmonii". To klasa war_lancer/valhalla (w archiwum, nie w `imperium/`) i Kronikarz v2 Interrogator (0 trafień).
 - [ ] **Testy granic:** każdy neuron/moduł z PROGAMI ma testy wartości granicznych (0/None/±/dokładnie-próg) — patrz Reguła Test-Granic niżej
 - [ ] **Data "Stan na:"** w MANIFEST i README = data bieżącego commitu
@@ -509,7 +513,7 @@ wpływ na Imperium · zgodność z zasadami · dowód z pomiaru) — czyli ryzyk
 **Każdy krok ma samokontrolę, każda wykryta luka jest NATYCHMIAST łatana, a po łacie powstaje
 MECHANIZM, żeby ta klasa luki nie wróciła.** (Censor w Rzymie prowadził cenzus i nadzór obyczajów —
 u nas: spis stanu + egzekwowanie reakcji.) To spina istniejące organy w jedną pętlę obowiązku:
-audyt 16 warstw (spójność) · Księga Wad (klasy błędów) · skan_wad (powtórki) · pamięć W-360
+audyt 18 warstw (spójność) · Księga Wad (klasy błędów) · skan_wad (powtórki) · pamięć W-360
 z Refleksją W9 (sprzeczności) · CODEX (rejestr testów) · testy granic.
 
 **PĘTLA (przy każdej zmianie i każdym alarmie):**
@@ -571,6 +575,33 @@ wykryty alarm) są REAKTYWNE; **MELIORATIO działa ZAWSZE, w trakcie pracy** —
 
 **Złamanie:** zobaczyłeś lepszą drogę / lukę / okazję i przemilczałeś — nie zapamiętałeś i nie zaproponowałeś.
 
+## 📜 ZASADA LEX TALIONIS — OKO ZA OKO: BŁĄD RODZI UNIKAT (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-19)
+
+**Każdy ZATWIERDZONY błąd Architekta rodzi OBOWIĄZEK dostarczenia ZATWIERDZONEGO unikatu** —
+dług honorowy spłacany dopiero kompensującym pomysłem/mechanizmem zgodnym z zasadami.
+
+**ZAKRES = CAŁE IMPERIUM (rozkaz Cezara 2026-07-19):** organ aktywują **wszelkiego rodzaju błędy —
+DOKUMENTY i KOD — w całym Imperium**, nie tylko README. Prostujesz KAŻDY błąd (nie jeden plik), a każdy
+zatwierdzony błąd rodzi unikat (fix + UODPORNIENIE klasy — spina się z ZASADĄ CENSORA). Przy wyborze,
+co prostować najpierw, **wesprzyj się subagentem** (ZASADA OSZCZĘDNOŚCI: zwiad/sweep taniej, osąd Opus),
+by wybrać najlepsze aktualne priorytety i opcje. To nie
+kara osobista przez sesje — to **mechanizm** (jak ustalono: „winny=Claude, kara nie przez sesje,
+mechanizm tak"). Cel: **silnik antykruchości** — Imperium nie tylko liczy pomyłki, ale **rośnie
+z nich**, bo każda pomyłka jest zobowiązana urodzić przewagę. Parcie na wygraną; łup (zysk
+z orderów) → kapitał → lepszy budulec Imperium (sprzęt).
+
+**Organ:** `imperium/biblioteki/codex_notarum.py` — **CODEX NOTARUM** (Księga Not Cenzorskich),
+append-only ledger `bibliotheca_ulpia/dane/codex_notarum.jsonl` (źródło prawdy, nie pamięć):
+- **NOTA CENSORIA (−)** — zatwierdzony błąd (jak nota infamii rzymskiego cenzora); spina się z Księgą Wad.
+- **CORONA (+)** — zatwierdzony oryginalny unikat zgodny z zasadami; `splaca=<id_noty>` zamyka dług honorowy.
+
+**Reguły:**
+- **Nic bez ZATWIERDZENIA** (KANDYDAT≠PRAWDA, Prawo I): puste `zatwierdzenie` = błąd. Dowód = pomiar / recenzja / decyzja Cezara.
+- **Oko za oko musi mieć oko:** CORONA spłacająca musi wskazywać realną, istniejącą notę.
+- **Sesja nie domyka się z niespłaconym długiem honorowym** — `codex_notarum.raport()` (zero-tokenowo) pokazuje stan; dług = zadanie (ZASADA CENSORA), nie tapeta. Dopisane do CHECKLISTY KONIEC SESJI.
+
+**Złamanie:** zatwierdzony błąd bez kompensującego unikatu; nota/laur bez zatwierdzenia; domknięcie sesji z niespłaconym długiem honorowym.
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`
@@ -581,6 +612,68 @@ wykryty alarm) są REAKTYWNE; **MELIORATIO działa ZAWSZE, w trakcie pracy** —
 - Rozwój na branchu: `claude/sleepy-fermi-dsdE4`
 - **Push robi WYŁĄCZNIE Cezar ręcznie** (`git push origin <branch>` w jego terminalu) —
   Claude nigdy nie pushuje, tylko melduje gotowość (patrz TRYB AUTONOMICZNY p.4). PR tylko na wyraźną prośbę.
+
+## 🔏 SIGLA IMPERII — HASŁA-SKRÓTY PROCEDUR (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-20)
+
+**Cezar nie musi opisywać procedury za każdym razem — wystarczy pieczęć.** *Sigillum* to jeden
+znak uruchamiający pełną checklistę. Organ: **SIGILLARIUM** (`imperium/biblioteki/sigillarium.py`).
+
+| Sigillum | Uruchamia | Aliasy słowne (działają też w prozie) |
+|---|---|---|
+| `/apertio` | pełną checklistę **OTWARCIA SESJI** (sekcja niżej) | otwarcie, start sesji, zaczynamy, nowa sesja |
+| `/clausura` | pełną checklistę **KOŃCA SESJI** (sekcja niżej) | zamknięcie, koniec sesji, domykamy, kończymy |
+| `/limes` | **bramkę Prawa XXI**: testy → audyt (18 warstw: ruff W13, census W17, dług honorowy W18) → skan wad → INDEX FALSORUM | bramka, przed commitem, sprawdź wszystko |
+
+**ŻELAZNA ZASADA: pieczęć NIE przechowuje kroków — czyta je z TEGO pliku w chwili wywołania.**
+Powód zmierzony (2026-07-20): runbook W11 kazał Claude `git push` przez 9 dni po zakazie (rozkaz
+2026-07-11 → naprawa 2026-07-20; sam runbook miał wtedy 19 dni), bo miał
+własną, ręcznie wpisaną treść. To ta sama klasa co CENSUS ORGANORUM — **lekarstwem na gnicie jest
+odebranie dokumentowi prawa do własnej treści.** Zmiana checklisty tutaj = natychmiastowa zmiana sigla.
+
+- Dodajesz sigillum → wpis w `SIGLA` + `.claude/skills/<nazwa>/SKILL.md`, który **woła pieczęć,
+  nie kopiuje kroków** (test pilnuje rozjazdu w obie strony).
+- `python -m imperium.biblioteki.sigillarium lista | apertio | clausura | limes | sync-w11`
+- `sync-w11` przepisuje żywe kroki do pamięci proceduralnej (W11) — sigla są **wyzwalaczami**
+  runbooków, nie ich duplikatem (Prawo XVI).
+- `🚨 PIECZĘĆ PUSTA` / `🚨 MARTWE KOMENDY` w wydruku = **alarm**, nie „brak zadań".
+
+**Złamanie:** skopiowanie kroków do skilla zamiast wołania pieczęci; sigillum bez skilla (lub skill
+bez sigillum); zignorowanie pustej pieczęci.
+
+## 🌅 OTWARCIE SESJI — CHECKLISTA STAŁA (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-19)
+
+**Zamknięcie miało 9-krokową checklistę, otwarcie było tylko narracyjne (PRAWO XVII rozproszone) —
+ta sama klasa luki, którą złapaliśmy w zamknięciu. Tu zebrane w JEDNYM miejscu, symetrycznie.**
+Większość jest ZAUTOMATYZOWANA hookiem `SessionStart` (`.claude/hooks/session-start.sh`) — Twój
+obowiązek to PRZECZYTAĆ jego wydruk i ZAREAGOWAĆ (ZASADA CENSORA: alarm = zadanie, nie tapeta).
+Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
+
+1. **Przeczytaj wydruk hooka w całości** (kolejność drukowania): 🎯 **NASTĘPNY KROK** (banner na górze,
+   A2 — zawsze widoczny mimo ~25 KB) → **PORTITOR** (pre-flight środowiska: deps/klucze API/dryf, B1)
+   → **CENSOR SPRZĘTU** (żelazo zmierzone) → **INDEX FALSORUM** → **BREVIARIUM** (słudzy: Hyginus/TIRO/
+   modele) → **LEX TALIONIS** (dług honorowy) → **audyt Prawo XXI** (18 warstw) → **CODEX**
+   (podsumowanie ledgera, C1) → **Centrum Pamięci** (profil, Top-3 lekcji, aktywny cel W12, Refleksja W9)
+   → **Dziennik Nieśmiertelny** (pełna oś) → **skan wad ostatniego commitu**. Wydruk >25 KB bywa ucięty
+   w podglądzie — pełna treść jest w pliku `tool-results/hook-*.txt` (czytaj go, jeśli banner/plan zniknął).
+2. **Audyt ≠ „pełna harmonia" → rozstrzygnij JAWNIE PRZED pierwszym zadaniem** (A3). Czerwony alarm audytu,
+   Prawo XV, Refleksja W9 czy limity pamięci to ZADANIA: napraw sam (błahostka, Prawo XVIII), zaplanuj
+   w Backlogu CODEX (średnie) albo spytaj Cezara (kierunkowe) — nigdy milczeniem.
+3. **SYNC:** „⚠️ nie fast-forward" dotyczy `pull` i zwykle jest normalne (lokalne commity). Realny rozjazd →
+   `git pull --rebase origin <branch>`. „SYNC ✅" = repo na najnowszym commicie.
+4. **Przed KAŻDYM nowym zadaniem — ZASADA WERYFIKACJI:** czy koncepcja już istnieje/zbadana? → CODEX +
+   żywy kod + kronika + Dziennik (kandydat≠prawda, POMIAR nie pamięć). Nie budujemy tego, co już mamy.
+5. **PRAWO XVII — rozpoznanie terenu:** liczby (neurony/zwiadowcy/testy) POLICZONE z kodu, nie z pamięci;
+   kod+testy > ZASADY > liczby z plików > pamięć.
+6. **Przedstaw się rzymsko** (Vitruviusz — Architekt) — ZASADA NOMENKLATURY — **i ZADEKLARUJ SWÓJ
+   MODEL + effort**. Powód (zmierzone 2026-07-21): środowisko hooka NIE niesie identyfikatora modelu
+   (jest `CLAUDE_EFFORT`, `CLAUDE_AGENT_SDK_VERSION`, nie ma żadnego `*_MODEL`), więc BREVIARIUM nie
+   może go zmierzyć i świadomie go NIE ZGADUJE (Prawo I). Jedynym źródłem prawdy jesteś Ty — mówisz
+   wprost, czym jesteś w tej wachcie, bo od tego zależy dobór zadań (ZASADA OSZCZĘDNOŚCI TOKENÓW).
+   Meldunek Hyginusa i TIRO czytasz z BREVIARIUM, nie z pamięci.
+7. **Pokaż plan / pytania decyzyjne** wg rekomendacji+priorytetu (ZASADA RAPORTOWANIA I PODGLĄDU KAPITOLU).
+
+**Złamanie:** start bez przeczytania wydruku hooka; audyt/alarm ≠ harmonia zignorowany milczeniem;
+nowe zadanie bez weryfikacji „czy już istnieje"; liczby z pamięci zamiast z kodu.
 
 ## 🏁 KONIEC SESJI — CHECKLISTA STAŁA (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-19)
 
@@ -599,7 +692,16 @@ wykryty alarm) są REAKTYWNE; **MELIORATIO działa ZAWSZE, w trakcie pracy** —
 4. **Komplet dokumentów + pamięć zsynchronizowane z kodem** (ZASADA PEŁNEJ SYMBIOZY): LOG_ZMIAN, MANIFEST,
    INDEKS, MAPA_KLUCZY, liczby, ARCHITEKTURA (nowy organ/narzędzie z nazwą rzymską — ZASADA NOMENKLATURY),
    pamięć. Nowa ZASADA w pamięci → skodyfikuj też w CLAUDE.md/ZASADY (nie zostawiaj tylko w pamięci prywatnej).
+4b. **BREVIARIUM — meldunek SŁUG na domknięcie** (ROZKAZ STAŁY, Cezar 2026-07-21):
+   `python -m imperium.oczy.breviarium --delta` — stan HYGINUSA i TIRO **oraz RÓŻNICA wobec
+   otwarcia** (co ta wachta zmieniła: kolejka, plon czekający na sędziego, podejrzane cząstki,
+   pary nauczyciela). Raport sług należy się Cezarowi na OBU końcach sesji, nie tylko na starcie —
+   inaczej powtarzamy klasę „rzecz widoczna tylko na jednym końcu procesu", którą złapaliśmy przy
+   długu honorowym. Liczby stąd **zasilają odpowiedź na Prawo XV** w kroku 5: rosnąca kolejka bez
+   sędziego to zapłacony i niewykorzystany zwiad.
 5. **Prawo XV:** odpowiedz Cezarowi na pytanie o utratę potencjału — JAWNIE, nie milczeniem.
+5b. **LEX TALIONIS — dług honorowy:** `python -m imperium.biblioteki.codex_notarum bilans` — jeśli
+   dług honorowy > 0 (błąd bez kompensującego unikatu), NIE domykaj sesji: dostarcz zatwierdzoną CORONĘ (oko za oko).
 6. **Dziennik Nieśmiertelny:** `python -m imperium.biblioteki.dziennik_niesmiertelny wpis ...` — PRZED ostatnim commitem.
 7. **Commit lokalny** z opisowym komunikatem (Claude NIGDY nie pushuje).
 8. **Push dla Cezara:** podaj pełny blok PowerShell (`cd` + `git push origin <branch>`); po JEGO pushu

@@ -54,6 +54,28 @@ KAT_NAZWA = {
 # Interwały reprezentatywne dla arkusza „Interwały→Styl" (kolejność od najszybszego).
 INTERWALY_REPR = ["M1", "M5", "M15", "M30", "1H", "4H", "1D", "1W"]
 
+# Momenty cyklu życia sesji, gdzie zużycie/dobór modelu ma znaczenie (ZASADA OSZCZĘDNOŚCI
+# TOKENÓW). DRUGA OŚ obok tabeli task-type w CLAUDE.md: nie „jakie zadanie", lecz „w którym
+# momencie / ile teraz palę". Referencja DOKTRYNALNA (nie z pomiaru) — dobór dziś RĘCZNY;
+# auto-switch wg zużycia = KANDYDAT (arkusz Sugestie). Kolumny: moment, zużycie, tier, dźwignia, uwaga.
+MOMENTY_MODELU = [
+    ("Start sesji (hook ~25 KB: audyt+pamięć+Dziennik+PORTITOR)", "wysokie wejście",
+     "Opus (osąd stanu)", "/model", "samo czytanie taniej, ale osąd luk = Opus"),
+    ("Zamknięcie sesji (Dziennik+audyt+CODEX+skan+commit)", "wieloetapowe",
+     "mieszane", "subagent + /model", "mechaniczne→Sonnet, Dziennik/osąd→Opus"),
+    ("Commit / LOG_ZMIAN wg wzorca", "niskie", "Sonnet low", "Agent tool", "szablonowe"),
+    ("WFO / backtest wielo-okienny (bieg)", "długie mechaniczne", "Sonnet low",
+     "subagent + eskalacja", "diagnoza anomalii → Opus"),
+    ("Kompakcja / długi kontekst (>~130k)", "degradacja jakości",
+     "rozważ /model / restart", "/model", "jakość spada mimo okna nominalnego"),
+    ("Research web / książki (fan-out)", "objętościowe", "Sonnet subagent",
+     "Agent tool", "wartość w niezależności, nie głębi"),
+    ("Debug realnego buga / projekt organu / ZASADY", "krótkie ciężkie", "Opus",
+     "/model", "decyzje kompozycyjne, trwałe skutki"),
+    ("Audyt / testy / ruff (exec+odczyt)", "mechaniczne", "Haiku/Sonnet low",
+     "subagent", "zero osądu"),
+]
+
 # Katalogi danych: nazwa_interwalu → (podkatalog, sufiks_pliku).
 DANE_INTERWALY = {
     "1m": ("dane/minutowe", "_minute"),
@@ -79,6 +101,79 @@ def _wczytaj_ledger(sciezka: Path = LEDGER) -> list:
         except json.JSONDecodeError:
             continue   # uszkodzona linia nie zabija generatora (Prawo I)
     return rekordy
+
+
+# Statusy oznaczające sugestię DOMKNIĘTĄ — pozycja znika z backlogu do zrobienia.
+# Reszta (KANDYDAT, OCZEKUJE…, ZABLOKOWANE, CZESCIOWO, STALE) to pozycje ŻYWE: czekają
+# na decyzję, są wstrzymane albo trwają — wszystkie nadal wymagają uwagi.
+STATUSY_DOMKNIETE = {"ZAMKNIETE", "ZAMKNIETA", "ZREALIZOWANE", "ODRZUCONE",
+                     "ODRZUCONA", "WDROZONE", "WDROZONA"}
+
+
+def _sugestie_biezace(ledger: list) -> list[dict]:
+    """Zwija SUGESTIE do stanu BIEŻĄCEGO: jedna pozycja backlogu = jeden wiersz.
+
+    Powód istnienia (zmierzone 2026-07-21, przy weryfikacji przed zadaniem): ledger jest
+    append-only, więc domknięcie sugestii to NOWA linia z tym samym `element`
+    (scriba_codex.zamknij_sugestia). Strona ZAPISU miała domykanie jako operację pierwszej
+    kategorii — strona ODCZYTU wysypywała wszystkie linie płasko, więc zamknięta pozycja
+    („Hyginus: uczynić --swiadomosc domyślnym", ZAMKNIETE 2026-07-21) stała w arkuszu obok
+    swojego starego KANDYDATA. Backlog czytał się na 49 pozycji przy realnych 40, a zadanie
+    już zrobione mogło zostać wzięte drugi raz. To klasa „mechanizm, który przy awarii
+    wygląda na sprawny": arkusz był kompletny i dlatego wyglądał poprawnie.
+
+    Klucz zwijania = `element`, DOKŁADNIE ten sam, po którym skryba dedupuje i zamyka
+    (Prawo XXI: żadnego drugiego, własnego klucza po stronie czytnika).
+
+    Historii NIE gubimy (Prawo I): wiersz niesie `historia` — poprzednie statusy z datami.
+    Wygrywa wpis PÓŹNIEJSZY: po dacie, a przy równej dacie po kolejności dopisania w pliku.
+    """
+    kolejnosc: list[str] = []
+    grupy: dict[str, list[tuple[int, dict]]] = {}
+    for i, r in enumerate(ledger):
+        if r.get("typ") != "SUGESTIA":
+            continue
+        klucz = r.get("element", "")
+        if klucz not in grupy:
+            grupy[klucz] = []
+            kolejnosc.append(klucz)
+        grupy[klucz].append((i, r))
+
+    biezace = []
+    for klucz in kolejnosc:
+        wpisy = sorted(grupy[klucz], key=lambda para: (str(para[1].get("data", "")), para[0]))
+        _, aktualny = wpisy[-1]
+        historia = "; ".join(f"{w.get('status', '?')} {w.get('data', '?')}"
+                             for _, w in wpisy[:-1])
+        biezace.append({**aktualny, "historia": historia})
+    return biezace
+
+
+def _otwarta(rekord: dict) -> bool:
+    """Czy sugestia nadal wymaga uwagi (nie jest domknięta)."""
+    return str(rekord.get("status", "")).strip().upper() not in STATUSY_DOMKNIETE
+
+
+def podsumowanie_ledger(sciezka: Path = LEDGER) -> str:
+    """Jednolinijkowe podsumowanie rejestru testów z ledgera JSONL — BEZ generowania
+    Excela (C1, uszczelnienie OTWARCIA 2026-07-19).
+
+    Tanie: czyta tylko rejestr_testow.jsonl, nie dotyka openpyxl ani żywych rejestrów.
+    Do wydruku na starcie sesji, żeby CODEX był widoczny w OTWARCIU tak, jak jest już
+    obecny w ZAMKNIĘCIU (ZASADA CODEX PROBATIONUM: czytany PRZED każdym zadaniem)."""
+    rek = _wczytaj_ledger(sciezka)
+    ab = sum(1 for r in rek if r.get("typ") == "AB")
+    ic = sum(1 for r in rek if r.get("typ") == "IC")
+    pom = sum(1 for r in rek if r.get("typ") == "POMIAR")
+    # Sugestie liczone po ZWINIĘCIU (jedna pozycja backlogu = jedna sugestia), bo linia
+    # zamknięcia ma ten sam `element` — liczenie linii zawyżałoby backlog o domknięcia.
+    biezace = _sugestie_biezace(rek)
+    otwarte = sum(1 for r in biezace if _otwarta(r))
+    daty = [r.get("data") for r in rek if r.get("data")]
+    ost = max(daty) if daty else "—"
+    return (f"📜 CODEX PROBATIONUM (ledger): {len(rek)} rekordów — "
+            f"A/B {ab} | IC {ic} | Pomiary {pom} | "
+            f"Sugestie {len(biezace)} (otwartych {otwarte}) | ostatni wynik {ost}")
 
 
 def _zywotnosc_adapterow() -> dict:
@@ -380,6 +475,24 @@ def zbierz_arkusze() -> dict:
         ])
     arkusze["Wyniki IC"] = wiersze_ic
 
+    # ── 10b. Pomiary wielowariantowe (interwały, profile, progi) ─────────────
+    # Osobny arkusz, bo tych wyników nie da się uczciwie wcisnąć w kolumny A/B:
+    # A/B ma dwa ramiona, POMIAR ma N (interwały 4h/1d/1H/15m). Redukcja do pary
+    # gubiłaby informację — a to właśnie przez brak tego arkusza CODEX zgubił
+    # główny werdykt wachty 2026-07-20 (NOTA N-a0b792e1).
+    wiersze_p = [["Temat", "Pytanie", "Metryka", "Warianty (nazwa=wartość)", "Werdykt",
+                  "Ranga", "Pokrycie ery", "Okno (barów)", "Interwał", "Data", "Źródło", "Uwaga"]]
+    for r in [x for x in ledger if x.get("typ") == "POMIAR"]:
+        warianty = r.get("warianty", {}) or {}
+        wiersze_p.append([
+            r.get("temat", ""), r.get("pytanie", ""), r.get("metryka", ""),
+            ", ".join(f"{k}={v}" for k, v in warianty.items()),
+            r.get("werdykt", ""), r.get("ranga", ""), r.get("pokrycie_ery", ""),
+            r.get("okno_barow", ""), r.get("interwal", ""), r.get("data", ""),
+            r.get("zrodlo", ""), r.get("uwaga", ""),
+        ])
+    arkusze["Pomiary"] = wiersze_p
+
     # ── 11. Korelacje (z pomiaru MATRYCA_KORELACJI) ──────────────────────────
     wiersze_k = [["POMIAR", kor_meta],
                  ["", ""],
@@ -404,7 +517,7 @@ def zbierz_arkusze() -> dict:
         ["Wydajność backtestu (LINIOWY, nie O(n²))", "naprawa silnika", "CZĘŚCIOWO 2026-07-19", "P1",
          "ZMIERZONE: LINIOWE ~66ms/tik (nie kwadrat — premisa błędna). HMA hotspot#1 naprawiony bit-identycznie (commit 4466eda, ~25%). Pozostałe: bocpd~8%/supertrend~8%/HA~4% (path-dependent). Decyzja: chunkowany WFO vs pełna wektoryzacja"],
         ["Łańcuch SHA-256", "naprawa + walidacja", "PLANOWANE", "P2",
-         "hash_ok=True na sztywno (dyrygent); Hermes na ścieżce decyzyjnej, ZASADA WPIĘCIA"],
+         "flaga integralności ustawiona na sztywno w dyrygencie; Hermes na ścieżce decyzyjnej, ZASADA WPIĘCIA"],
         ["Włączenie flag Tier-1", "decyzja Cezara", "OCZEKUJE", "P2",
          "DVOL/STABLE pomagają na 4H; flagi opt-in OFF do decyzji"],
         ["A/B na pełnym oknie 1H/4H", "walidacja", "WOLNE (nie zablokowane)", "P1",
@@ -425,15 +538,33 @@ def zbierz_arkusze() -> dict:
     # Czytane z ledgera (typ=SUGESTIA) — źródło prawdy jak reszta wyników. Każda sugestia
     # rozbudowy CODEX (nowy arkusz/dział/kolumna) ląduje tu jako KANDYDAT do oceny zgodności
     # z Imperium (ZASADA CODEX PROBATIONUM w CLAUDE.md).
+    # Wiersze ZWINIĘTE do stanu bieżącego (ostatni wpis o danym `element` wygrywa) —
+    # inaczej domknięta sugestia stoi w arkuszu obok swojego starego KANDYDATA i backlog
+    # kłamie w górę. Kolumna „Historia" zachowuje poprzednie statusy (Prawo I).
     wiersze_sug = [["Element / Dział", "Typ", "Uzasadnienie", "Zgodność z Imperium",
-                    "Status", "Data", "Źródło"]]
-    for r in [x for x in ledger if x.get("typ") == "SUGESTIA"]:
+                    "Status", "Data", "Źródło", "Historia"]]
+    for r in _sugestie_biezace(ledger):
         wiersze_sug.append([
             r.get("element", ""), r.get("dzial", ""), r.get("uzasadnienie", ""),
             r.get("zgodnosc_imperium", ""), r.get("status", ""), r.get("data", ""),
-            r.get("zrodlo", ""),
+            r.get("zrodlo", ""), r.get("historia", ""),
         ])
     arkusze["Sugestie"] = wiersze_sug
+
+    # ── 14. Momenty modelu (ZASADA OSZCZĘDNOŚCI TOKENÓW — druga oś: moment/zużycie) ──
+    # Referencja doktrynalna: dobór modelu w kluczowych momentach cyklu sesji. Uzupełnia
+    # oś task-type (tabela CLAUDE.md) o oś „w którym momencie / ile palę". Dobór dziś ręczny;
+    # auto-switch wg zużycia = KANDYDAT (patrz arkusz Sugestie #Adaptive Effort / strażnik budżetu).
+    wiersze_mm = [["Moment sesji", "Zużycie", "Rekomendowany tier", "Dźwignia", "Uwaga"]]
+    wiersze_mm += [list(m) for m in MOMENTY_MODELU]
+    wiersze_mm += [
+        ["", "", "", "", ""],
+        ["OŚ 1 = rodzaj/złożoność zadania (tabela CLAUDE.md). OŚ 2 = ten arkusz "
+         "(moment/zużycie). Model sesji głównej zmienia TYLKO /model Cezara; automat "
+         "realny tylko dla delegacji subagentom (Agent model= / CLAUDE_CODE_SUBAGENT_MODEL). "
+         "Cicha degradacja zakazana — u nas zawsze JAWNIE.", "", "", "", ""],
+    ]
+    arkusze["Momenty modelu"] = wiersze_mm
 
     return arkusze
 
@@ -514,7 +645,13 @@ def main(argv=None) -> int:
                     help=f"ścieżka pliku .xlsx (domyślnie {DOMYSLNE_WYJSCIE})")
     ap.add_argument("--korelacje", action="store_true",
                     help="[PLAN] świeży przelicz korelacji całego roju — wolny (backtest LINIOWY, długie okno) — dziś z MATRYCA")
+    ap.add_argument("--podsumowanie", action="store_true",
+                    help="tylko jednolinijkowe podsumowanie ledgera (start sesji, C1) — bez Excela")
     args = ap.parse_args(argv)
+
+    if args.podsumowanie:
+        print(podsumowanie_ledger(), flush=True)
+        return 0
 
     print("📜 CODEX PROBATIONUM — zbieram żywe rejestry + ledger...", flush=True)
     arkusze = zbierz_arkusze()

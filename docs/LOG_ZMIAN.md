@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-19
+stan_na: 2026-07-21
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,1201 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-07-21 | 💰 | Taryfa szczytowa DeepSeeka — rachunek platformy obalił nasz model kosztu
+
+Cezar pokazał **rzeczywisty rachunek z panelu DeepSeeka** za 2026-07-21. Zestawienie
+z pomiarem LIBRA MESSIS:
+
+| | platforma | nasz rejestr |
+|---|---|---|
+| v4-pro | 8 żądań · $0.03 | 8 wywołań · $0.0317 |
+| v4-flash | 202 żądania · $0.12 | 152 wywołania · $0.0996 |
+
+**Model kosztu wpięty tego dnia okazał się dokładny** — v4-pro zgadza się co do sztuki,
+bo tych 8 wywołań to wyłącznie ramię `osad`. Brakujące 50 żądań flash rozliczone przez
+NOTARIUSA: 21 par to `auto_lekcja` z hooków, reszta to wywołania rozbitego biegu, którego
+proces nie zdążył zapisać. **Ok. 27 żądań (13%) pozostaje nierozliczonych i tak to
+zapisujemy** — proces zabity na timeoucie z definicji nie zapisze tego, co wysłał.
+
+**ZNALEZISKO WAŻNIEJSZE NIŻ RACHUNEK:** platforma stosuje **taryfę szczytową 2×** w oknach
+**01:00–04:00 i 06:00–10:00 UTC**, a nasz `CENNIK` miał stawki płaskie. Rzecz w tym, że
+dokument, z którego go przepisaliśmy (`api-docs.deepseek.com/quick_start/pricing`), **nie
+był błędny — był NIEPEŁNY**: o taryfie milczy do dziś. Zweryfikowane w sieci przed zmianą
+stałej (Prawo I): potwierdzają to niezależnie doniesienia TechNode i SCMP o zmianie
+ogłoszonej 2026-06-30 oraz notatka na panelu rozliczeniowym; godziny zgodne co do minuty.
+
+- `dispensator.czy_szczyt()` + `koszt_usd(..., kiedy=)` — koszt liczony wg taryfy z chwili
+  WYWOŁANIA, nie z chwili raportu (inaczej ten sam rekord miałby inną cenę zależnie od pory
+  uruchomienia raportu). LIBRA MESSIS zapisuje pole `szczyt` przy każdym pomiarze.
+- **Sprawdzone wstecz: 0 ze 160 dzisiejszych pomiarów A/B padło w oknie szczytu**
+  (biegły 10:38–12:38 UTC), a ramiona szły naprzemiennie — więc raportowane krotności
+  kosztu (U4 1.46×, profile 3.46×) są **nieskażone taryfą**.
+- **`auto_lekcja` odkłada analizę w szczycie.** 06:00–10:00 UTC to 08:00–12:00 czasu Cezara,
+  czyli typowy poranny start sesji trafiał prosto w podwójną stawkę — wszystkie 22 dzisiejsze
+  wywołania w szczycie pochodziły z tego hooka. Odłożenie nie kosztuje nic, bo analizowane
+  sesje są już zakończone; zaległe domknie najbliższy start poza szczytem. Wyłączniki:
+  `--takze-w-szczycie` i `--sesja`.
+- Decyzja wydzielona z `__main__` do `powod_odlozenia()` — bramka schowana w bloku
+  uruchomieniowym jest nietestowalna, a bramka bez testu przestaje gryźć niezauważona.
+- Testy granic okien (początek wliczony, koniec wyłączony) + dowód, że stawki bazowe
+  pozostały nietknięte: naprawa **dołożyła wymiar czasu, nie podmieniła cennika**.
+
+---
+
+## 2026-07-21 | ⚖️ | A/B jakości plonu Hyginusa — organ LIBRA MESSIS i trzy wady WŁASNEJ miary
+
+Rozkaz Cezara: *„nowa sesja zaczyna od A/B, decyzja co lepsze DOPIERO po pomiarze"*.
+Zbudowany organ **LIBRA MESSIS** (Waga Plonu, `narzedzia/ab_plon_hyginusa.py`) — waży dwa
+ramiona zwiadu na tej samej liście tematów. **Nie dotyka produkcyjnej kolejki hipotez**
+(woła `scout_temat` z pominięciem `raport()`), bo narzędzie mierzące nie ma prawa zmieniać
+mierzonego stanu — dokładnie ta wada zaśmieciła kolejkę dzień wcześniej.
+
+**WYNIK U4 (świadomość systemu) — NIEROZSTRZYGNIĘTY, i tak został zaraportowany.**
+Poligon „rdzeń" (8 tematów o *zmierzonej* zdolności produkowania duplikatów):
+OFF 11/26 (42.3%) vs ON 6/19 (31.6%) → −10.7 pp przy **Fisher p = 0.543**. Kierunek zgodny
+z hipotezą, dowodu brak. Plon NOWYCH kandydatów płaski (13 vs 15). **Koszt jest pewny tam,
+gdzie korzyść nie jest:** 1.84× ceny, 1.66× czasu, 2.2× tokenów rozumowania — liczone z
+FAKTYCZNEGO `usage`, bo most wreszcie je wystawia (`GlosImperium.ostatnie_zuzycie`;
+`DISPENSATOR.koszt_usd` miał wzór i cennik, ale nikt go nie karmił — Prawo XV).
+
+**Trzy wady mojej własnej miary, wszystkie złapane POMIAREM, żadna testem:**
+
+1. **Leksykon potwierdzał sam siebie.** Weryfikacja „czy pojęcie istnieje w kodzie" skanowała
+   korpus RAZEM z plikiem deklarującym listę — każdy wpis znajdował dowód we własnej linijce
+   i przechodziła ZAWSZE. Zielony test też, bo testował tę samą zatrutą funkcję. Skutkiem był
+   wpis `order flow imbalance`, który oskarżał zwiad o duplikat rzeczy, **której rój nie ma**
+   (mamy *imbalance bars* W-356 — inne pojęcie). Miara myliła się, model miał rację.
+   Naprawa: korpus wyklucza własny plik + **test negatywny** (wpis-widmo musi zostać zgłoszony).
+2. **Miara karała ramię za wykonanie instrukcji.** U4 każe dopisać „czy kandydat NIE dubluje
+   istniejącego modułu", więc ramię ON z definicji wymienia nasze moduły w ZAPRZECZENIACH.
+   Licząc wzmianki w całym bloku, dostałem wynik ODWROTNY do prawdy (ON 31% vs OFF 14%).
+   Naprawa: liczymy NAZWĘ kandydata, nie uzasadnienie.
+3. **Poligon bez możliwości zdarzenia.** Pierwszy bieg dał 0 duplikatów w OBU ramionach —
+   to **brak mocy, nie remis**. Tematy pochodziły z obszarów słabo pokrytych przez rój.
+
+Rejestr trzyma **surowy plon**, więc poprawki definicji miary przeliczyły się bez ani jednego
+płatnego wywołania (`przelicz`). Pomiar stał się odwracalny. Bieg jest wznawialny i przeżywa
+zryw łącza (ponowienia 5/15/45 s; pierwszy bieg padł na `APITimeoutError` przy 11 z 16 —
+cząstki ocalały). Księga Wad 74 → 77.
+
+**Przy okazji naprawione w CODEX:** arkusz Sugestie wypisywał KAŻDĄ linię append-only ledgera,
+więc domknięta sugestia stała obok swojego starego KANDYDATA — backlog czytał się na 49 pozycji
+przy realnych 41, a **7 zadań już zrobionych wyglądało na otwarte**. Strona zapisu miała
+domykanie jako operację pierwszej kategorii (`scriba_codex.zamknij_sugestia`) od 2026-07-19;
+strona odczytu jej nie honorowała. Naprawa: zwijanie „ostatni wpis wygrywa" po tym SAMYM kluczu
+`element`, po którym pisze skryba, kolumna „Historia" zachowuje poprzednie statusy.
+
+**DECYZJE CEZARA po przedstawieniu wyników (2026-07-21):**
+
+1. **Domknąć U4 rozstrzygnięciem** — poligon rdzeniowy rozszerzony 8 → 16 tematów (nowe celują
+   wprost w pojęcia, które *na pewno* mamy: VPIN, Hurst, entropia, funding/OI, Yang-Zhang, VWAP,
+   Amihud, adaptacyjne średnie) + wprowadzone **rundy**: powtórzenie tematu to nowe losowanie
+   (temperatura 0.4), czyli dodatkowa obserwacja. Bez wymiaru rundy jedynym sposobem na większą
+   próbę byłoby wymyślanie kolejnych tematów, co mieszałoby moc z doborem próbki.
+
+   **WYKONANE I ROZSTRZYGNIĘTE tego samego dnia** — 64 pary temat×ramię, **372 kandydatów**:
+
+   | | U4 OFF | U4 ON |
+   |---|---|---|
+   | kandydatów | 203 | 169 |
+   | **dublujących** | 81 (**39.9%**) | 47 (**27.8%**) |
+   | **NOWYCH (niedublujących)** | **122** | **122** |
+   | koszt | $0.0314 | $0.0458 (1.46×) |
+
+   **Fisher p = 0.016 → ISTOTNE.** Efekt stabilny na trzech rozmiarach próby: −10.7 pp (n=45),
+   −10.3 pp (n=181), −12.1 pp (n=372) — nie jest artefaktem jednego biegu. Rozmiar próby
+   dobrany z PROJEKCJI wykonanej przed wydaniem pieniędzy (2× → p≈0.038; wyszło 0.016).
+
+   **Najważniejsza liczba to 122 vs 122.** U4 usuwa 34 duplikaty, **nie zabierając ani jednego
+   nowego pomysłu** — to nie jest kompromis między ilością a jakością, tylko czysty zysk minus
+   46% dopłaty. Decyzja o domyślnym ON z poprzedniej wachty, podjęta wtedy z DIAGNOZY, ma
+   wreszcie DOWÓD.
+2. **Faza krytyki przeniesiona na profil `osad` (v4-pro)** — `_PROFIL_KRYTYKA = "osad"`.
+   Podstawą jest **asymetria błędu, nie dowód statystyczny** i tak jest to zapisane w kodzie:
+   sygnał jakości był słaby (23 vs 13 kapitulacji, rozkład 4-2-2 — nieistotny), koszt pewny
+   (3.46×). Zdecydowało to, że krytyk, który pisze „nie znaleziono kontrargumentów" i **podnosi**
+   ocenę kandydata do MOCNE, zamienia całe U3 w teatr — a v4-pro na tym samym materiale wyciągnął
+   trzy zarzuty z cytatami dosłownymi. Tańsze ramię pozostaje dostępne przez `profil=`, więc A/B
+   da się powtórzyć bez cofania zmiany. Nie dotyka ścieżki decyzyjnej tradingu.
+3. **Następna wachta: sąd nad 33 cząstkami kolejki** — zwiad już opłacony, czekający na sędziego.
+
+Pliki: `narzedzia/ab_plon_hyginusa.py` (nowy), `tests/test_ab_plon_hyginusa.py` (nowy, 16 testów),
+`narzedzia/codex_probationum.py`, `narzedzia/bibliotekarz.py` (parametr `profil` w krytyce),
+`imperium/cesarz/deepseek_glos.py`, `narzedzia/kapitol_podglad.py`, `docs/ARCHITEKTURA_IMPERIUM.md`.
+
+---
+
+## 2026-07-21 | 📋 | Raport sług na OBU końcach wachty — Δ zamiast samego stanu
+
+Pytanie Cezara: *„zawsze na początku sesji i końcu raport Hyginusa i TIRO — czy to mamy"*.
+**Odpowiedź była połowiczna i tak została powiedziana:** otwarcie ✅ (BREVIARIUM w hooku, krok 0.9),
+zamknięcie ❌ — zero wzmianek w checkliście, a hook końca sesji w ogóle nie woła Pythona.
+To ta sama klasa co dług honorowy z tego samego dnia — **rzecz widoczna tylko na jednym końcu
+procesu** — tyle że w drugą stronę.
+
+- **Na domknięciu liczy się RÓŻNICA, nie stan.** „Kolejka 34" nie mówi nic; „kolejka 34 → 41 (+7),
+  czeka na sędziego +7" mówi, że wachta wyprodukowała dług przeglądu. Stąd `--delta`.
+- Hook startowy woła `--migawka` (drukuje meldunek **i** utrwala punkt odniesienia);
+  `CLAUDE.md § KONIEC SESJI` dostał krok **4b** z `--delta`. Pieczęć `/clausura` widzi go
+  natychmiast (10 → 11 kroków), bo **czyta kroki z CLAUDE.md, nie przechowuje ich kopii**.
+- Migawka celowo obejmuje tylko liczby zmienne w czasie (kolejka, plon czekający na sędziego,
+  podejrzane cząstki, pary nauczyciela). Modele na dysku i klasa sprzętu nie zmieniają się
+  w trakcie sesji — ich delta byłaby szumem zagłuszającym realny dorobek.
+- **Brak migawki mówimy wprost** („różnicy nie znamy"), zamiast pokazać zero i sugerować
+  „nic się nie zmieniło" (Prawo I).
+- Liczby z kroku 4b **zasilają odpowiedź na Prawo XV** w kroku 5 — rosnąca kolejka bez sędziego
+  to zapłacony i niewykorzystany zwiad.
+
+**Wada złapana własnym testem granicy:** `zapisz_migawke` łapało tylko `OSError`, a ścieżka
+z bajtem NUL daje `ValueError` już na `mkdir` — utrwalenie punktu odniesienia mogło wywrócić
+meldunek, który miało tylko uzupełniać. +7 testów. **Pliki:** `imperium/oczy/breviarium.py`,
+`.claude/hooks/session-start.sh`, `CLAUDE.md`, `tests/test_breviarium.py`.
+
+---
+
+## 2026-07-21 | 🩺 | RECENZJA: PROBATOR był MARTWY w produkcji — 7 znalezisk, 6 napraw
+
+`/code-review` zlecona przez Cezara. **Najcięższe znalezisko: organ ogłoszony tego samego dnia
+jako działający nie sprawdzał NICZEGO.**
+
+- **Przyczyna:** PROBATOR czytał wynik RAG drabinką `isinstance`, w której gałąź `tuple` stała
+  PRZED dostępem po atrybucie. Produkcyjny `szukaj.Wynik` to **NamedTuple** (dziedziczy po `tuple`)
+  z polem `id: int` na PIERWSZEJ pozycji — więc za nazwę źródła brany był numer ID.
+  **Zmierzone przed naprawą:** `podane_zrodla()` → `{}`, `aliasy_zrodel()` → `{}`, a jawna
+  halucynacja `sprawdz("Teza wg BIB-999.", wyniki)` → `NIC_DO_SPRAWDZENIA` zamiast `PODEJRZANY`.
+- **Dlaczego 20 zielonych testów tego nie złapało:** obie atrapy rozjechały się z produkcją —
+  jedna nie była krotką, druga miała **inną kolejność pól**. W tej samej wachcie dodaliśmy test
+  parytetu sygnatur dla atrapy `GlosImperium` i **nie zastosowaliśmy tej samej ochrony** do wyniku
+  RAG. Ochrona zastosowana wybiórczo to ochrona pozorna.
+- **Naprawa u źródła:** jeden ekstraktor `_pola()` wołany przez `podane_zrodla` i `aliasy_zrodel`
+  (koniec zduplikowanej drabinki), **atrybut ma pierwszeństwo przed pozycją**. Testy używają
+  **PRAWDZIWEJ klasy `szukaj.Wynik`** importowanej z produkcji, nie kopii kształtu.
+
+**Pozostałe naprawione:** chunk sąsiedniego cytatu przyklejał się do poprzedniego BIB (fałszywe
+OSKARŻENIE ugruntowanego plonu) · fraza `dry-run` z naszego żargonu uciszała całe sprawdzanie
+cytatów (fałszywy NEGATYW) · pieczęć `0/0` raportowała ZIELONE zamiast awarii pomiaru · PORTITOR
+brał linie opcji pip (`-r`, `--index-url`) za nazwy pakietów.
+
+**INDEX FALSORUM +1:** twierdzenie „PROBATOR sprawdza cytaty w pipeline Hyginusa" obalone dla okresu
+12ce701 → naprawa. Pomiar „0 cytatów spoza fragmentów na 33 cząstkach" **pozostaje ważny** — szedł
+przez słowniki z JSONL, nie przez wpiętą ścieżkę produkcyjną.
+**LEX TALIONIS:** N-4c81a58b ↔ C-77ea034d (waga 2, dług 0). **Księga Wad +4.** +14 testów.
+
+---
+
+## 2026-07-21 | 🧭 | U4 (świadomość systemu) DOMYŚLNIE ON — koniec płacenia za duplikaty
+
+Wniosek z sądu nad kolejką, wdrożony w tej samej sesji (rozkaz Cezara „wg planu"). Zwiad, który
+nie wie, co Imperium już posiada, z definicji proponuje to, co posiada — i dokładnie to zmierzyliśmy
+na 33 cząstkach: VPIN, Value Area, Kelly, CVD, funding, Kalman, triple-barrier, DSR/PBO **już były
+w kodzie**. Blok `_kontekst_systemu` (jedyne miejsce, gdzie pada „**NIE proponuj duplikatów**, oto
+istniejące klucze" + luki Prawa XV) był opt-in.
+
+- `scout_temat`/`raport`: `swiadomosc=True`. CLI: nowe `--bez-swiadomosci`; stare `--swiadomosc`
+  zostawione jako bezefektowe, żeby cudze polecenia i skrypty nie padały.
+- **Weryfikacja przed wdrożeniem (ZASADA WPIĘCIA):** zwiad **nie dotyka ścieżki decyzyjnej** —
+  zero odwołań do `bibliotekarz` z `koloseum/` i `cesarz/`. Żaden próg, sizing ani filtr nie tknięty,
+  więc opt-in nie jest wymagany.
+- **Koszt zmierzony:** 3914 znaków ≈ 978 tokenów na temat (~$0.005 za 33 tematy na flashu) — wobec
+  kosztu duplikatów i czasu sędziego to zaokrąglenie do zera.
+- **Wyłącznik zostaje** — A/B jakości plonu (z blokiem vs bez) wymaga obu ramion.
+- +3 testy, w tym jeden pilnujący, że U4 jest **domyślnie ON** (cichy powrót do opt-in = powrót do
+  płacenia za powtórki) i jeden sprawdzający TREŚĆ bloku, nie sam fakt wstrzyknięcia.
+
+Sugestia w ledgerze CODEX **ZAMKNIĘTA**, nie zostaje wiszącym kandydatem (lekcja z 07-20: sugestia
+zgłoszona po raz drugi = naprawa TERAZ). **Pliki:** `narzedzia/bibliotekarz.py`,
+`tests/test_bibliotekarz.py`.
+
+---
+
+## 2026-07-21 | ⚖️ | WARSTWA 18 — dług honorowy LEX TALIONIS zatrzymuje commit (bramka TWARDA)
+
+Znalezisko zwiadu, **decyzja Cezara**: bilans not był najpierw sprawdzany tylko w kroku 5b
+zamknięcia, potem — po pierwszej naprawie tego dnia — również *drukowany* na otwarciu. Ale
+drukowanie to **widoczność, nie egzekwowalność**: `codex_notarum bilans` nie zwracał niezerowego
+kodu, a hook wołał go z `|| true`. Dług otwarty w sesji N mógł przeżyć N+1 i N+2, mimo że zasada
+mówi wprost „sesja nie domyka się z niespłaconym długiem honorowym".
+
+- **Bramka TWARDA jak W17:** dług > 0 → audyt exit 1 → commit stoi. Miękki alarm odrzucony
+  świadomie — to ten sam mechanizm, który zawiódł już dwa razy (wąska Warstwa 11 przy „pełnej
+  harmonii", alarm W9 wiszący przez sesje). **Alarm, którego wolno nie posłuchać, prędzej czy
+  później nie zostaje posłuchany.**
+- **Zakleszczenia brak:** dług spłaca się dopisaniem CORONY do ledgera, co nie wymaga commitu.
+- **DOWÓD, ŻE GRYZIE** (nie sama deklaracja): sztuczny dług → CZERWIEŃ, po CORONIE → zieleń.
+  Dodatkowo test granicy LEX TALIONIS: **CORONA bez pola `splaca` NIE zamyka długu** — inaczej
+  dowolny laur kasowałby dowolny błąd.
+- **Wada złapana przy pisaniu samego dowodu:** pierwsza wersja podmieniała stałą modułu i po cichu
+  czytała PRAWDZIWY ledger (`bilans(sciezka=LEDGER)` wiąże domyślny argument w chwili definicji),
+  więc meldowała zieleń dla sztucznie utworzonego długu. **Sam dowód był mechanizmem, który przy
+  awarii wygląda na sprawny.** Stąd jawna ścieżka w sygnaturze warstwy — organ bramkujący bez
+  wstrzykiwalnego źródła jest z definicji niesprawdzalny.
+
+**LEX TALIONIS:** N-02f2b752 ↔ C-562b21ef (dług 0). **Księga Wad +1:** „dowód »czy bramka gryzie«
+mierzący inny obiekt, niż deklaruje". **Pliki:** `narzedzia/audyt_spojnosci.py`,
+`tests/test_spojnosc.py`, `CLAUDE.md` (17→18 warstw, checklista Prawa XXI).
+
+---
+
+## 2026-07-21 | 🔭 | DISPENSATOR wpięty w Hyginusa + zwiad adwersarialny otwarcia (3 wady)
+
+**Część 1 — rozkaz o rozbudowie Hyginusa.** Most mowy (`deepseek_glos.zapytaj`) przyjmuje teraz
+`profil` / `model` / `thinking` / `reasoning_effort`; profil oddaje decyzję **DISPENSATOROWI**,
+jawne argumenty go nadpisują. **Wsteczna zgodność udowodniona testem:** wywołanie bez nowych
+argumentów wysyła DOKŁADNIE to samo żądanie co przed zmianą (zero `extra_body`, model z `__init__`).
+Hyginus kupuje głębokość per faza: rozwijanie zapytania → `klasyfikacja` (thinking off, 11.7× taniej),
+generacja → `zwiad` (effort low), **krytyka → `krytyka` (effort high)** — sceptyk płytszy od proponenta
+byłby bezużyteczny. Profil `osad` (v4-pro) świadomie NIE jest używany: sędzią kandydatów jest Opus,
+nie DeepSeek (ZASADA ZWIADOWCY WIEDZY — dwa modele o RÓŻNYCH rolach).
+**Naprawione przy okazji:** `_protokoluj` logował `self.model`, więc para nauczyciela trafiałaby do
+NOTARIUSA z CUDZĄ nazwą modelu — TIRO uczyłby się z fałszywą etykietą źródła. Teraz logowany jest
+model FAKTYCZNIE użyty.
+
+**Część 2 — zwiad adwersarialny checklisty otwarcia (2 subagenty, osobne konteksty).** Każde
+znalezisko zweryfikowane osobiście (kandydat≠prawda). Trzy potwierdzone, wszystkie w organach,
+które MIAŁY chronić:
+
+1. **Wynik testów niewidoczny na otwarciu** — oba zwiady zbiegły się niezależnie. `grep run_tests`:
+   0 trafień w hooku, w audycie tylko ścieżki `__pycache__`. Bieg trwa >5 min, więc powtarzanie go
+   przy każdym starcie odpada — lekarstwem jest **SIGILLUM PROBATIONIS**: `run_tests` odciska wynik
+   przypięty do **ODCISKU TREŚCI ŹRÓDEŁ**, a BREVIARIUM wykrywa NIEAKTUALNOŚĆ. „Zielone dla kodu,
+   którego już nie ma" raportujemy jako **NIEZNANY** — cichy optymizm jest gorszy niż brak informacji.
+   **Wada projektowa złapana na sobie, zanim ktokolwiek na niej poległ:** pierwsza wersja porównywała
+   hash HEAD i przy naturalnym rytmie (edytuj → testy na brudnym drzewie → commit) **nigdy nie mogłaby
+   dać werdyktu ZIELONE** — alarm przy każdym starcie uczy operatora ignorować organ, czyli niszczy to,
+   po co powstał. Miara zmieniona na treść źródeł (405 plików, 232 ms), z testem kontrolnym na
+   osiągalność werdyktu pozytywnego i na czułość (zmiana `.py` gasi pieczęć, wpis do LOG_ZMIAN nie).
+2. **PORTITOR miał ręcznie wpisaną listę pakietów** (6 przy 9 w `requirements.txt`) — organ powołany
+   do pilnowania Prawa XV nie sprawdzał ani `scipy` (a requirements mówi wprost: bez niego BOCPD-01
+   milczy), ani `openai` (jedyne wejście LLM). Lista jest teraz **generowana z requirements**:
+   deps 6/6 → **9/9**.
+3. **Mój własny BREVIARIUM kłamał o DISPENSATORZE** — sprawdzał wpięcie po NAPISIE w pliku, więc
+   meldował „NIEWPIĘTY" godzinę po tym, jak go wpiąłem (słowo padało tylko WIELKIMI literami
+   w komentarzu, a realne wpięcie idzie przez `zapytaj(profil=...)`). Symetrycznie: komentarz
+   „TODO: wpiąć DISPENSATORA" liczyłby się jak działający kod. Przepisane na **AST**.
+
+**LEX TALIONIS:** N-7dfb397f ↔ C-0ecb7eb8, N-b4a470ef ↔ C-cfb94b20 (dług 0).
+**Księga Wad +5:** „bramka widoczna tylko na jednym końcu procesu", „raport startowy nie widzi
+własnych sług", „detektor obecności po napisie", „lista pilnowanych rzeczy wpisana ręcznie obok
+źródła prawdy", „detektor, którego kontrakt nigdy nie dopuszcza werdyktu pozytywnego".
+**Backlog CODEX +5 kandydatów** — znaleziska zwiadu świadomie NIEłatane w tym commicie (timeout
+`auto_lekcja`, błąd W1 przerywający 16 warstw audytu, SYNC bez ahead/behind na brudnym drzewie,
+dług honorowy widoczny lecz nieegzekwowalny, wąski zasięg skanu wad). **Pliki:** `imperium/cesarz/deepseek_glos.py`, `narzedzia/bibliotekarz.py`,
+`imperium/pretorianie/portitor.py`, `imperium/oczy/breviarium.py`, `tests/run_tests.py`.
+
+---
+
+## 2026-07-21 | 📋 | BREVIARIUM + dług honorowy na otwarciu (zarzut Cezara o luki hooka)
+
+Cezar: *„hook startowy ma luki — powinien być stan Hyginusa i TIRO, ich zadania zrobione i do
+zrobienia, i jakiego modelu używasz Ty i oni"*. **Zarzut potwierdzony pomiarem:** hook wołał 10
+organów (audyt, PORTITOR, CENSOR, CODEX, pamięć, Dziennik, kronika, skan wad…) i **ani jeden nie
+mówił, co robią HYGINUS i TIRO ani z jakich modeli korzystamy**. Drugi brak, wskazany przez Cezara
+i potwierdzony: **`codex_notarum bilans` NIE był wołany na starcie** — dług honorowy stał wyłącznie
+w kroku 5b zamknięcia, więc sesja urwana przed domknięciem zostawiała dług, którego następne
+otwarcie nie pokazywało. Klasa znana: **bramka widoczna tylko na jednym końcu procesu.**
+
+- **Organ:** `imperium/oczy/breviarium.py` (August przekazywał Senatowi *breviarium totius imperii* —
+  zwięzły rachunek zasobów państwa). Melduje: HYGINUS — kolejka, **plon czekający na sędziego**
+  (dług przeglądu: płacimy za zwiad, którego nikt nie ocenia), ostatni zwiad, model, profile
+  DISPENSATORA, werdykty PROBATORA; TIRO — pary nauczyciela, modele `.gguf` na dysku, silnik,
+  klasa sprzętu i co ona unosi.
+- **Od razu wykryty martwy potencjał:** `DISPENSATOR: 🚨 NIEWPIĘTY` — organ jest w repo, ale
+  `bibliotekarz.py` go nie woła (to właśnie pierwsza część rozkazu o rozbudowie Hyginusa).
+- **Czego świadomie NIE zgadujemy (Prawo I):** identyfikator modelu Claude **nie istnieje
+  w środowisku** — env niesie `CLAUDE_EFFORT` i `CLAUDE_AGENT_SDK_VERSION`, żadnego `*_MODEL`.
+  BREVIARIUM drukuje więc, co wie, i **żąda deklaracji od Architekta**, zamiast wpisać
+  prawdopodobną nazwę, która zestarzeje się jak każda ręczna liczba. Skodyfikowane w CLAUDE.md
+  (krok 6 OTWARCIA: „przedstaw się rzymsko **i zadeklaruj model + effort**").
+- **Liczby GENEROWANE z żywego stanu**, nigdy przechowywane — ta sama żelazna zasada co
+  SIGILLARIUM i CENSUS ORGANORUM.
+
+Testy 2778→**2794** (+16, w tym granice: brak plików, uszkodzona linia JSONL, brak silnika TIRO,
+znacznik nieliczbowy, kontrola pozytywna I negatywna detektora wpięcia). Audyt exit 0 (W17: 242).
+**Pliki:** `imperium/oczy/breviarium.py`, `tests/test_breviarium.py`, `.claude/hooks/session-start.sh`,
+`CLAUDE.md`, `docs/ARCHITEKTURA_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`.
+
+---
+
+## 2026-07-21 | 🛡️ | PROBATOR — Strażnik Cytatów (warstwa 1 anty-halucynacyjna Hyginusa)
+
+Rozkaz Cezara: rozbudowa Hyginusa, start od citation-checku. **Powód (web 2026-07-21):** DeepSeek
+V4-Pro halucynuje **94%**, V4-Flash **96%** na pytaniach wiedzy. Z czterech typów halucynacji
+(factual, grounding, **citation**, reasoning) **citation jako jedyny da się złapać
+DETERMINISTYCZNIE — bez modelu, bez tokenów, bez kosztu**, więc idzie pierwszy.
+
+- **Organ:** `imperium/pretorianie/probator.py` (rzym. *probator* — ten, kto bada i dopuszcza).
+  Sprawdza, czy cytowane BIB-xxx/chunk **było modelowi PODANE w tym prompcie** — nie „czy istnieje
+  w bibliotece". To rozróżnienie jest sednem: powołanie się na realną książkę, której się nie
+  dostało, jest konfabulacją tak samo jak wymyślony tytuł.
+- **Abstencja = wynik POPRAWNY:** „fragmenty nic nie wnoszą" nie ma cytatów i nie jest wadą —
+  karanie milczenia uczyłoby model konfabulować.
+- **Wpięcie:** pole `probator` (i `probator_krytyka`) w cząstce kolejki + alarm na stderr.
+  **Monotonicznie ostrożne** — dokłada werdykt, nic nie odrzuca; `--bez-probatora` wyłącza.
+- **POMIAR na 33 realnych cząstkach kolejki:** **0 cytatów spoza podanych fragmentów** — prompt RAG
+  Hyginusa trzyma. Jeden prawdziwy alarm: temat *volatility surface…* ma **2367 znaków kandydatów
+  i zero powołań na źródło** mimo żądania promptu. Zapisane w ledgerze CODEX (Pomiary).
+- **Dwie ślepe plamy własnego detektora, obie znalezione zanim uznałem go za gotowy:** (1) `\b`
+  **nie domyka się na podkreśleniu**, więc regex nie widział cytatu w formie `BIB-006_Autor_Tytul.pdf`
+  — czyli w tej, którą model dostaje (złapane własnymi testami: 13/20 czerwonych); (2) brak wariantu
+  **cytowania NAZWISKIEM autora** („Źródła: Hull chunk 560") dał **2 fałszywe alarmy z 4** przy
+  pierwszym biegu na realnym plonie. Aliasy nazwisk działają **wyłącznie na korzyść modelu** —
+  nigdy nie tworzą nowego alarmu, więc nie mogą wyprodukować fałszywego oskarżenia.
+
+Testy 2744→**2778** (+34), audyt exit 0 (W17: 241 modułów). **LEX TALIONIS:** N-7dfb397f ↔
+C-0ecb7eb8 (dług 0). **Księga Wad +2:** „granica słowa `\b` nie domyka się na podkreśleniu",
+„detektor uznany za gotowy po testach autora, bez biegu na realnych danych".
+**Pliki:** `imperium/pretorianie/probator.py`, `narzedzia/bibliotekarz.py`, `tests/test_probator.py`,
+`tests/test_bibliotekarz.py`, `docs/ARCHITEKTURA_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`.
+
+---
+
+## 2026-07-21 | 🧠 | TEMPERATOR MEMORIAE — pamięć chłodzi się sama (alarm Prawa XV przestał wracać)
+
+Alarm hooka „sekcja LEKCJE > 24000 zn." wracał **po każdym ręcznym sprzątaniu**: 07-19 skonsolidowano
+do 23820, nazajutrz `auto_lekcja` dopisała 21 wpisów → **28132**. Klasa: stan rośnie automatycznie,
+kurczy się tylko ręcznie — ręka zawsze przegra z pętlą.
+
+- **Mechanizm:** `egzekwuj_limit_sekcji` wpięty w **ścieżkę zapisu** (`dopisz_lekcje` **i**
+  `aktualizuj_lekcje` — parytet bliźniaków), histereza `UDZIAL_CELU_SEKCJA=0.92`. Opt-out `chlodz=False`.
+- **Trzy wady znalezione po drodze (pomiar, nie opinia):** (1) alarm liczył SUROWY TEKST sekcji, a
+  konsolidacja SUMĘ bloków — dwie miary tej samej wielkości; teraz jedna `_rozmiar_sekcji`, zweryfikowana
+  algebraicznie (`suma+n+1` = 28132 co do znaku). (2) próg 24000 i cel 22000 były **niezależnymi
+  stałymi** — cel liczony jest teraz Z PROGU, więc zmiana progu nie zamienia naprawy w cichy no-op.
+  (3) **archiwum ACTA było nieczytelne dla własnego parsera** (113 bloków, `lekcje()` widziało 0) —
+  „nic nie skasowane" było prawdą bezużyteczną; `lekcje()` czyta oba nagłówki, `szukaj(z_archiwum=True)`.
+- **Efekt na żywej pamięci:** 119→92 lekcji aktywnych, 28132→**22062 zn.**, alarm MILCZY, 27 lekcji
+  schłodzonych do ACTA i **znajdywalnych przez API**. Testy 2729→**2744** (+15 granic: próg dokładny,
+  próg+1, `None`, opt-out, piaskownica archiwum, sprzężenie celu z progiem).
+- **Alarm W9** (20 przedawnionych pomysłów) zbadany i zaplanowany w Backlogu CODEX: wszystkie z
+  **jednego dnia** (2026-06-30), `sprzeczne=0`, w próbce same duplikaty semantyczne i pozycje **już
+  zrealizowane** (auto-lekcja żyje, HMM w Viterbi, RAG FTS, Prawo XIX skodyfikowane) — to dług
+  deduplikacji, nie dług decyzyjny.
+
+**LEX TALIONIS:** N-532d1ba9 ↔ C-1e85257a (dług 0). **Księga Wad +3:** „ręczna naprawa przeciw
+automatycznemu przyrostowi", „dwie miary tej samej wielkości", „archiwum nieosiągalne dla własnego
+czytnika". **Pliki:** `imperium/biblioteki/pamiec_sesji.py`, `tests/test_pamiec_sesji.py`,
+`docs/PAMIEC_SESJI.md`, `docs/PAMIEC_SESJI_ARCHIWUM.md`.
+
+---
+
+## 2026-07-21 | 📚 | README biblioteki — koniec gnicia (zarzut Cezara + LEX TALIONIS)
+
+Cezar: „plik gnije i jest mi wstyd". Potwierdzone: `bibliotheca_ulpia/README.md` mówił **69 ksiąg**
+przy 115, a instrukcja kazała **`git add`+`git push` binariów** książek do GitHub — **wbrew decyzji
+07-11** (binaria tylko lokal, RAG czyta wersjonowany `tekst_cache`). Niewykryte, bo `bibliotheca_ulpia`
+jest w `POZA_REJESTREM` tabularium — żadna bramka nie pilnowała tego żywego drogowskazu.
+
+- **Naprawa:** README przepisany — aktualny (115, binaria TYLKO lokal + `tekst_cache` w git, pipeline
+  `przygotuj_biblioteke`, role Hyginus/Vitruviusz/NOTARIUS/TIRO, format nazwy), lepszy wygląd (tabela
+  struktury, diagram przepływu). **Usunięta groźna instrukcja push binariów.**
+- **UODPORNIENIE (klasa):** liczba ksiąg = blok `<!-- LICZBA:ksiazki -->` wpięty w tabularium przez
+  `DROGOWSKAZY_Z_LICZBAMI` (wyjątek: żywy drogowskaz spoza rejestru, TYLKO warstwa liczb — nie T1/T2
+  bez frontmatter). Dowód że gryzie: 115→99 → tabularium „ROZJAZD", audyt W15 obejmuje. +2 testy.
+- **Standing order:** README biblioteki aktualizowany przy KAŻDEJ zmianie struktury/pipeline.
+
+**LEX TALIONIS:** N-e860da78 ↔ C-5d054580 (dług 0). Księga Wad #56 „żywy dokument w strefie
+wyłączonej z audytu". **Pliki:** `bibliotheca_ulpia/README.md`, `narzedzia/tabularium.py`,
+`tests/test_tabularium.py`.
+
+---
+
+## 2026-07-21 | 📚 | Biblioteka: 36 nowych BIB skatalogowanych + plan esencji etapowy
+
+Cezar dodał **36 nowych książek** (BIB-080..116) wg `PLAN_ROZBUDOWY_BIBLIOTEKI` — materiał POD TIRO
+(LoRA/QLoRA/distillation/InstructGPT/DPO/GPTQ) + grafy + RL + przyczynowość.
+
+- **Nazwy dopasowane do wzorca** `BIB-XXX_Autor_Tytuł-z-myślnikami.ext` (36/36) — autorzy wzięci z
+  PLAN_ROZBUDOWY (źródło prawdy), nie z głowy; ASCII bez diakrytyki, zgodnie ze stylem BIB-001..079.
+- **Przetworzone lokalnie (0 tokenów Claude):** ekstrakcja → `tekst_cache` (115), reindeks RAG,
+  katalog metadanych (`katalog_ksiag.json` n=79→**115**). Pliki binarne książek poza git (decyzja 07-11),
+  wersjonowany jest `tekst_cache`.
+- **TIRO zbieranie potwierdzone** (pytanie Cezara): Hyginus woła DeepSeek przez most `deepseek_glos.py`,
+  który automatycznie woła `NOTARIUS.zapisz_pare` — jedno wpięcie łapie wszystkich wołających.
+- **Plan esencji: 4 etapy po sesji** (ZASADA ANALIZY CZĄSTKOWEJ) — LLM/TIRO · optymalizacja · grafy ·
+  RL+przyczynowość. Zapisany w `PLAN_ROZBUDOWY_BIBLIOTEKI.md`. Esencja klastrów w kolejnych sesjach,
+  by nie palić tokenów Opusa naraz (rozkaz Cezara).
+- **Rozkaz odłożony do dedykowanej sesji:** wpięcie DISPENSATORA + trybów DeepSeek (thinking/pro-weryfikator/
+  function-calling web) na stałe w Hyginusa — projekt w pamięci `rozbudowa-hyginusa-modele-tryby-deepseek`.
+  Zmierzone: DeepSeek NIE ma natywnego web search (tylko function-calling); DISPENSATOR istnieje, niewpięty.
+
+**Pliki:** `bibliotheca_ulpia/BIB-080..116` (rename), `bibliotheca_ulpia/dane/tekst_cache/`,
+`katalog_ksiag.json`, `docs/PLAN_ROZBUDOWY_BIBLIOTEKI.md`.
+
+---
+
+## 2026-07-21 | 🛡️ | P5 fali 1: guard ZeroDiv w pretorianach (kalkulator_lewara + aegis)
+
+Zwiad ryzyka kodu zreprodukował 3 × `ZeroDivisionError` na wejściach granicznych, ZANIM zadziałało
+weto/checklist:
+
+| Miejsce | Wejście graniczne | Przyczyna |
+|---|---|---|
+| `kalkulator_lewara.policz:425` | `dzwignia=200` | `1/200 == OPŁATA_UTRZYMANIA` → likwidacja == cena → `\|cena−likwidacja\|=0` |
+| `kalkulator_lewara.policz:429` | `cena_wejscia=0` | `stop_pct = \|cena−stop\|/cena` |
+| `aegis_tarcza.update:48` | `initial_capital=0` | `drawdown = (peak−cur)/peak_capital` |
+
+Produkcja **chroniona** (dyrygent capuje dźwignię ≤20, realna cena >0) — ale funkcje same się nie
+broniły (crash przy bezpośrednim/przyszłym wywołaniu). `aegis` miał **ZERO testów**.
+
+**Naprawa (monotoniczna ostrożność — produkcja bez zmian):** walidacja `cena_wejscia>0` i
+`initial_capital>0` u wrót (ValueError, fail-loud); guard mianownika `\|cena−likwidacja\|`
+(bufor=0 zamiast crash — checklist i tak odrzuca dźwignię>20). **Testy:** `aegis` 0→4 (pierwsze
+w historii), `kalkulator` +3 granice. Dźwignia=5 dalej `checklist_ok=True` (dowód braku regresji).
+
+**LEX TALIONIS:** N-9a33798d ↔ C-5ca9dbad (dług 0). Backlog: P5 **zamknięta**. Księga Wad #55
+„ZeroDiv na granicy przed zadziałaniem weta". **Pliki:** `imperium/pretorianie/kalkulator_lewara.py`,
+`imperium/pretorianie/aegis_tarcza.py`, `tests/test_kalkulator.py`, `tests/test_aegis_tarcza.py`.
+
+---
+
+## 2026-07-21 | 📄 | P2 fali 1: TRYBY_IMPERIUM.md — realny dług dokumentów naprawiony
+
+Jedyny prawdziwie gnijący dokument z 11 podejrzanych (10/11 to fałszywe alarmy — data ruszona,
+treść nie). Żywy wiersz SKALP twierdził **„brak danych <1h w backteście"** + rekomendacja „wymaga
+danych krótkointerwałowych — Etap C, live" — FAŁSZ po dograniu danych (commit 705370f):
+
+- **POMIAR (weryfikacja osobista, kandydat≠prawda):** `dane/minutowe/` 10+ par (BTC ~1.34M barów
+  ≈2.5 roku), `dane/5m`+`dane/15m` dla BTC/ETH (~268k barów).
+- **Naprawa bez odwrotnego fałszu:** dane <1h SĄ, ale profil SCALP (RSI 4–7, lewar 10×) pozostaje
+  **NIEPRZETESTOWANY** — dotychczasowy pomiar interwałów trzymał konfigurację swing, nie scalping.
+  Brakuje nie danych, lecz testu profilu. `stan_na` 07-18 → 07-21.
+- **UODPORNIENIE:** fraza „brak danych <1h w backteście" → INDEX FALSORUM (poprawna teza + dowód);
+  sweep całego korpusu pilnuje, by nie wróciła jako fakt (lekcja: korekta jednorazowa nie wystarcza).
+
+**LEX TALIONIS:** N-0447ca78 ↔ C-f69e9368 (dług 0). Backlog: sugestia P2 **zamknięta**.
+Audyt exit 0 · sweep --falsa czysty (3 twierdzenia). **Pliki:** `docs/TRYBY_IMPERIUM.md`, ledgery.
+
+---
+
+## 2026-07-21 | 🛡️ | P1 fali 1: feature_importance strażnik serii + konsolidacja LEKCJE
+
+### P1 — cicha obcinka niezrównanych serii (rozkaz Cezara po zwiadzie)
+
+`feature_importance.raport_waznosci` (linia 240) cicho ucinał niezrównane serie `min()`+`[:n]`,
+ostrzegając TYLKO gdy `n < MIN_OBS` — nie przy rozjeździe długości. Przy przesunięciu w ŚRODKU
+serii `snap[i]`≠`wyk[i]` → skażone MDA/SFI → fałszywy osąd „martwy głos"/„redundantny" (Prawo XVI/XX).
+Bliźniak `legatus.oblicz_wagi_ic:43-46` miał JUŻ twardy strażnik za tę samą klasę (cubic P2) —
+**poprawka nie została przeniesiona**. Naprawa: `raise ValueError` przed liczeniem (fail-loud, wzór
+bliźniaka) + test negatywny `test_raport_waznosci_odrzuca_niezrownane_serie`.
+
+- **LEX TALIONIS:** N-247e4ac7 ↔ C-5ccba4f8 (dług 0). Backlog: sugestia P1 **zamknięta**.
+- **Klasa (Księga Wad):** „poprawka nieprzeniesiona między bliźniakami" — ten sam kontrakt danych
+  (`sygnaly` ‖ `wyniki`) musi mieć strażnik w OBU modułach; nieprzeniesiona poprawka to dług ukryty.
+
+### Konsolidacja LEKCJE (alarm Prawa XV z hooka — decyzja Cezara „skonsoliduj teraz")
+
+Sekcja LEKCJE 27526 zn > limit 24000. Usunięto **16 najstarszych** lekcji (119→103, **23820 zn**,
+zapas 180) — kryterium: jednorazowy bug / nieaktualna infrastruktura POKRYTA źródłem prawdy
+(kod+testy+Księga Wad+ZASADY); kod > pamięć. Doktryna (Prawo I ×2, martwe głosy/zombie) i Top-3
+zachowane — zweryfikowane po usunięciu.
+
+**Pliki:** `imperium/legiony/feature_importance.py`, `tests/test_raport_waznosci.py`,
+`bibliotheca_ulpia/dane/pamiec_sesji*` (lekcje), ledgery.
+
+---
+
+## 2026-07-21 | 🔍 | Adversarialny zwiad SIGILLARIUM — 4 wady świeżego organu naprawione
+
+### Rozkaz Cezara
+
+> „wyślij podobne dla naszych nowych trzech pieczęci, cel poprawa i łatanie" — sześciu
+> subagentów-zwiadowców (Sonnet, osobne konteksty) na organ SIGILLARIUM + całe Imperium.
+
+### 4 wady MOJEGO świeżego kodu (commit e399abf), złapane przez zwiad, nie przez moje testy
+
+| # | Wada | Dowód (POMIAR) | Naprawa u źródła |
+|---|---|---|---|
+| 1 | Parser `kroki_z_konstytucji` **cicho gubił niewciętą zawiniętą kontynuację** kroku — numeracja ciągła, treść ucięta | probka z niewciętą linią → 3 kroki, treść kroku 2 ucięta | dokleja KAŻDĄ niepustą linię w środku kroku; stop daje `**Złamanie:**`/nagłówek |
+| 2 | `limes/SKILL.md` **kopiował 5 komend bramki** zamiast wołać pieczęć (naruszenie zasady organu) | czytanie pliku | skill woła pieczęć; komendy zostają jednym źródłem w `SIGLA` |
+| 3 | `brakujace_komendy` **ślepe na `python -m pakiet`** (regex `\S+\.py`) — martwa komenda LEX TALIONIS przeszłaby cicho | `brakujace_komendy(Sigillum z -m widmo)` → `[]` | `_cel_komendy_istnieje` mapuje `a.b.c` → `a/b/c.py` |
+| 4 | `zapisz()` **nieatomowy** — `write_text` w miejscu, crash mógł obciąć wszystkie runbooki | czytanie kodu (regresja vs stary `dodaj()`) | `_zapisz_atomowo`: `.tmp` + `os.replace` |
+
+### Uodpornienie klasy (każda naprawa ma test łapiący JEJ klasę)
+
+- `test_parser_nie_gubi_niewcietej_kontynuacji` + regresja liczb 7/10/5 na żywym CLAUDE.md
+- `test_skill_nie_kopiuje_komend_bramki` — pilnuje NIEOBECNOŚCI każdej komendy w SKILL.md
+- `test_brakujace_komendy_wykrywa_martwy_modul_dash_m` — przypadek NEGATYWNY (`-m` widmo MUSI być złapane)
+- `test_zapisz_jest_atomowy_nie_zostawia_tmp`
+- **Księga Wad #53:** „ślepa plama detektora na wariant składni" — detektor chroniący przed czymś
+  musi pokryć WSZYSTKIE formy zapisu celu + mieć test negatywny (nie tylko „aktualne czyste").
+
+### Ergonomia (Prawo XVIII — drobiazgi jednoznaczne)
+
+Dopisane aliasy słowne: APERTIO „otwieramy"; CLAUSURA „zamykamy"; LIMES „zrób bramkę", „przed pushem".
+
+### Bramki
+
+Testy `tests/test_sigillarium.py` 25→**33** (+8) · LEX TALIONIS: **N-d925f3dd ↔ C-a9ab5637**, dług 0.
+Pełna bramka LIMES + wpis Dziennika przed commitem.
+
+**Pliki:** `imperium/biblioteki/sigillarium.py`, `imperium/biblioteki/pamiec_proceduralna.py`,
+`.claude/skills/limes/SKILL.md`, `tests/test_sigillarium.py`, ledgery.
+
+**Fala 1 (całe Imperium, 5 zwiadowców) — synteza do decyzji Cezara, NIE łatane w tym commicie:**
+1 realny dług dokumentów (`TRYBY_IMPERIUM.md` wiersz SKALP „brak danych <1h" — fałsz po dograniu 1m);
+ryzyko kodu (`feature_importance.py` cicha obcinka jak łatany `legatus.py`; `kalkulator_lewara`/`aegis_tarcza`
+ZeroDiv poza chronioną ścieżką produkcyjną); 7/17 warstw audytu bez testu regresyjnego; census W17 pomija
+`tests/`+`skrypty/`; „38 milczących neuronów" OBALONE pomiarem → realnie ~17 (6 wyciszonych + 2 + 11 przez
+`sentyment_per=None`).
+
+---
+
+## 2026-07-20 | 🔏 | SIGLA IMPERII — organ SIGILLARIUM + naprawa gnicia pamięci proceduralnej
+
+### Rozkaz Cezara (zamknięcie wachty doks20)
+
+> „ustalić SIGLA IMPERII — skróty użytkowe (hasła-komendy) uruchamiające pełne procedury bez
+> opisywania ich za każdym razem; NIE dublować runbooków W11 — skróty mają być ich WYZWALACZAMI"
+
+**Decyzja Cezara 2026-07-20:** forma = **skille harnessa `/nazwa` + polskie aliasy słowne**;
+zestaw = **rdzeń trzech pieczęci** (otwarcie / zamknięcie / bramka). Pozostali kandydaci
+(krok 9, oko za oko, cenzus, kronika, podgląd) **nie wdrożeni** — czekają na decyzję.
+
+### Wada znaleziona po drodze (POMIAR, nie podejrzenie)
+
+| Co zmierzone | Dowód |
+|---|---|
+| Runbook W11 „Bezpieczny commit" kazał Claude `git push -u origin <branch>` | krok 5 w `procedury.jsonl` vs rozkaz z **2026-07-11** („Claude NIGDY nie pushuje") — gnił **9 dni** (07-11 → 07-20; runbook zapisany 07-01, więc miał 19 dni) |
+| Runbooka **nie dało się** zaktualizować | `dodaj(dedup=True)` cicho zwracał `False` bez zapisu — brak jakiejkolwiek ścieżki UPSERT |
+| Poprawka ziarna w kodzie nie docierała do danych | `zasiej()` wołał `dodaj()`, więc istniejąca nazwa była pomijana |
+| Co widział Cezar | pogodne „🛠️ Pamięć proceduralna (W11): 4 procedur (runbooków) gotowych" |
+
+Klasa znana z poprzedniej wachty: **mechanizm, który przy awarii wygląda na sprawny.**
+
+### Wdrożone
+
+| Element | Treść |
+|---|---|
+| **SIGILLARIUM** (organ) | `imperium/biblioteki/sigillarium.py` — Skarbiec Pieczęci; rejestr `SIGLA` + parser konstytucji + CLI (`lista`/`apertio`/`clausura`/`limes`/`sync-w11`) |
+| **Rdzeń sigli** | `/apertio` (7 kroków), `/clausura` (10 kroków), `/limes` (5 komend bramki) — liczby **liczone z żywego CLAUDE.md**, nie wpisane |
+| **Zasada rdzeniowa** | pieczęć **nie przechowuje kroków** — czyta je z `CLAUDE.md` w chwili wywołania; rozjazd strukturalnie niemożliwy (to samo lekarstwo co CENSUS ORGANORUM) |
+| **Ujście w harnessie** | `.claude/skills/{apertio,clausura,limes}/SKILL.md` — cienkie, **wołają pieczęć zamiast kopiować kroki** (test pilnuje rozjazdu w obie strony) |
+| **Naprawa W11** | `pamiec_proceduralna.zapisz()` = upsert z jawnym werdyktem `dodano`/`zaktualizowano`/`bez zmian`; `zasiej()` **leczy** zgniłe ziarno (wyleczył 1, drugi bieg 0 = idempotencja); aktualizacja nie kasuje nieznanych pól |
+| **Wpięcie** | `synchronizuj_w11()` przepisuje żywe kroki do runbooków (hasło działa też pisane prozą); `raport_startowy()` w Centrum Pamięci — Cezar widzi pieczęcie na starcie |
+| **Kodyfikacja** | `CLAUDE.md` § SIGLA IMPERII (tabela pieczęci + aliasy + żelazna zasada) |
+
+### Uodpornienie klasy (ZASADA CENSORA)
+
+- **Księga Wad #52:** „stan bez ścieżki aktualizacji (zapis jednokierunkowy)" — pytanie do review:
+  *jak ta treść zostanie POPRAWIONA, gdy się zdezaktualizuje?* Odpowiedź „ręcznie"/„nijak" ⇒ nie
+  przechowuj, **generuj ze źródła prawdy**. Świadomie **bez regexu** (wzorzec semantyczny, nie składniowy).
+- **Test regresyjny:** żaden runbook nie może kazać Claude pushować.
+- **Alarmy zamiast ciszy:** `🚨 PIECZĘĆ PUSTA` (zniknęła sekcja konstytucji), `🚨 MARTWE KOMENDY`
+  (bramka woła nieistniejący skrypt), test **ciągłości numeracji** (dziura = krok zgubiony po cichu).
+
+### Bramki
+
+Testy `tests/test_sigillarium.py` **19 nowych** · audyt **exit 0** (sam złapał nowy organ w W11+W15+W17
+i wymusił meldunek) · skan wad czysto · INDEX FALSORUM czysto · **LEX TALIONIS: N-fb66738e ↔ C-ecfaecb3,
+dług honorowy 0** · sugestia SIGLA w ledgerze CODEX **zamknięta** (nie wisi jako KANDYDAT).
+
+**Pliki:** `imperium/biblioteki/sigillarium.py`, `imperium/biblioteki/pamiec_proceduralna.py`,
+`imperium/biblioteki/centrum_pamieci.py`, `.claude/skills/*/SKILL.md`, `tests/test_sigillarium.py`,
+`CLAUDE.md`, `docs/ARCHITEKTURA_IMPERIUM.md`, `docs/INDEKS_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`,
+`README.md` (liczba organów biblioteki 27→28), ledgery CODEX/NOTARUM/Księga Wad.
+
+---
+
+## 2026-07-20 | 🏛️ | CENSUS ORGANORUM (Warstwa 17) + typ POMIAR — dwie NOTY spłacone
+
+### Zarzut Cezara (zatwierdzony pomiarem, nie przyjęty na słowo)
+
+> „CODEX_PROBATIONUM arkusze nie zaktualizowane po ostatniej sesji, widzę braki, zapewne
+> inne dokumenty wyglądają podobnie" — **potwierdzony w całości.**
+
+| Dowód | Pomiar |
+|---|---|
+| `imperium/cesarz/dispensator.py` (152 linie + 125 testów) | w dokumentach **0 razy** — MANIFEST 0, INDEKS 0, ARCHITEKTURA 0, README 0 |
+| Conflator / Nuntius / VERITAS ANNALIUM / PORTITOR | tylko w ARCHITEKTURA, brak w INDEKS i MANIFEST |
+| Dług zmierzony | **19 modułów `imperium/` + 31 narzędzi = 50** poza INDEKS+ARCH+MANIFEST |
+| Werdykt interwałów (główny wynik wachty 07-20) | **brak w ledgerze** — schemat znał tylko AB/IC |
+| Dlaczego audyt milczał | Warstwa 11 pilnowała meldunku **wyłącznie `imperium/biblioteki/`** — 1 katalog z 11 |
+
+**Klasa błędu:** „✅ pełna harmonia" była prawdą o 1/11 organów i ciszą o reszcie.
+Bramka o zbyt wąskim zasięgu jest gorsza niż brak bramki — daje fałszywy spokój.
+
+### CORONA 1 — CENSUS ORGANORUM (`narzedzia/census_organorum.py`, Warstwa 17)
+
+Spis WSZYSTKICH modułów `imperium/` i `narzedzia/` **generowany z żywego kodu**
+(rola = pierwsza linia docstringu, czytana przez `ast`, bez importu). Audyt porównuje
+`docs/CENSUS_ORGANORUM.md` z tym, co kod wygenerowałby TERAZ — rozjazd zapala czerwień.
+**Bramka twarda** (decyzja Cezara): commit stoi. Miękkie ostrzeżenie odrzucone świadomie
+— to mechanizm, który już raz zawiódł (alarm widoczny i ignorowany przez sesje).
+
+Nie „dopisanie 50 wpisów ręcznie" — ręczny opis zgnije jak każda ręczna liczba przed
+Filarem 4. Dokument traci prawo do własnej treści. **239 modułów** zameldowanych.
+**Dowód że bramka gryzie** (nie martwa asercja): podrzucony organ-widmo → audyt exit 1,
+po usunięciu → exit 0.
+
+Efekt uboczny (Prawo XV): cenzus znalazł **jedyny moduł bez docstringu** w całym
+Imperium — `narzedzia/dekorelacja_w322.py` — moduł, który nie mówi po co istnieje.
+
+### CORONA 2 — typ POMIAR w ledgerze (`scriba_codex.zapisz_pomiar` + 15. arkusz „Pomiary")
+
+Rekord dla wyniku wielowariantowego, którego ani AB (dwa ramiona), ani IC (skill na
+horyzoncie) nie obejmuje. `warianty={nazwa: wartość}` — dowolna liczba ramion, bo
+redukcja pomiaru N-wariantowego do pary gubi informację.
+
+**Zgubiony werdykt interwałów dopisany wstecz** (4h +3.26 / 1d −3.03 / 1H −3.37 /
+15m −5.71, zweryfikowany wobec tabeli LOG_ZMIAN, nie z pamięci) — wraz z uwagą Cezara,
+że pomiar trzyma JEDNĄ konfigurację, więc profil SCALP pozostaje **nieprzetestowany**.
+Zamknięte 2 sugestie, które ta CORONA realizuje.
+
+**Najostrzejsza lekcja:** lukę schematu zgłaszałem jako SUGESTIĘ-KANDYDATA **trzy razy**
+(07-19 `ab_wXXX`, 07-20 `NIEZMIENNIK`, 07-20 ponownie) i ani razu nie zamknąłem.
+Sugestia w ledgerze to nie naprawa — to odłożenie z alibi. Klasa do Księgi Wad.
+
+### Bramki
+
+Testy +14 (`tests/test_census_organorum.py`, w tym granice: moduł bez meldunku,
+widmo w spisie, brak dokumentu, pusty zestaw wariantów, kolejność wariantów,
+ranga WSTĘPNY/ROZSTRZYGAJĄCY) · audyt exit 0 (17 warstw) · ruff czysto · skan wad czysto.
+
+**LEX TALIONIS:** N-9992ba7b → CORONA 1, N-a0b792e1 → CORONA 2. Dług honorowy 0.
+
+---
+
+## 2026-07-20 | ⚖️ | HIPOTEZA INTERWAŁU — teza o monotoniczności OBALONA, 4h jedynym stabilnym
+
+### Wynik (BTC+ETH, okno WYRÓWNANE PO DATACH 2025-06-18 → 2026-06-18, identyczna konfiguracja)
+
+| interwał | ROI% | maxDD% | transakcje | win rate | barów/parę |
+|---|---|---|---|---|---|
+| **4h** | **+3.26** | 0.10 | 77 | 45.5% | 2 191 |
+| 1d | −3.03 | 0.04 | **4** ⚠️ | 25.0% | 343 |
+| 1h | −3.37 | 0.11 | 255 | **50.6%** | 7 607 |
+| 15m | **−5.71** | 0.15 | **1 109** | 43.6% | 35 041 |
+
+Podgląd: `raporty/KAPITOL_PODGLAD_hipoteza_interwalu.html`. Czas biegu: 4 363 s.
+
+### Co obalone, co potwierdzone
+
+**OBALONA — moja teza o monotoniczności.** Twierdziłem „im krótszy interwał, tym gorzej".
+Fałsz: **4h bije 1d**. Zależność ma OPTIMUM, nie gradient.
+
+**POTWIERDZONE — 4h jako jedyny stabilny.** Dwa różne okna: +3.93% (2.3 roku) i +3.26% (1 rok).
+Powtarzalność jest cenniejsza niż pojedynczy wysoki odczyt (1d skakało +9.80 → −3.03).
+
+**NIEINTERPRETOWALNE — wiersz 1d.** **Cztery transakcje**, win rate 25% (1 z 4). To anegdota,
+nie pomiar. Nie wolno z tego wyciągać wniosku w żadną stronę.
+
+**DIAGNOSTYCZNIE NAJCIEKAWSZE — 1h.** Najwyższy win rate w tabeli (**50.6%**) przy ujemnym ROI:
+wygrywa częściej, a traci — **straty większe od zysków**. To nie jest awaria sygnału, tylko
+problem zarządzania pozycją albo kosztów. Zupełnie inna diagnoza niż „sygnał nie działa".
+
+### Naprawiona usterka metodologiczna (zgłaszana dwukrotnie, wreszcie zrobiona)
+
+Narzędzie cięło po **liczbie barów**, zakładając, że pliki kończą się w tym samym momencie.
+Nie kończyły: 1D sięgało 2026-06-18, świeżo pobrane 15m 2026-07-20 — **miesiąc różnicy udający
+„to samo okno"**. Dodane `wspolne_okno()` (przecięcie zakresów dat, `--wyrownaj-daty` domyślnie ON)
+oraz skalowanie limitu przez MINUTY interwału (bez tego 15m dawało dzielnik ułamkowy → okno zerowe).
+
+### Czego wynik NIE mówi (uwaga Cezara)
+
+To jest **konfiguracja swingowa puszczona na świecach 15-minutowych**, nie scalping. Namiestnik
+(W-323) definiuje profil SCALP zupełnie inaczej: **RSI 4-7, lewar_cap=10, FUTURES, próg ×0.95**.
+Pomiar poprawnie izoluje INTERWAŁ (styl stały), ale **profil SCALP — 75 neuronów — pozostaje
+nieprzetestowany**. Wynik −5.71% znaczy „tak grać nie należy", NIE „scalping nie działa".
+Zapisane w CODEX jako kandydat wraz z wymogiem uczciwego modelu kosztów transakcyjnych.
+
+### Nowa luka wykryta przez ten wynik
+
+**Brak progu MINIMALNEJ LICZBY TRANSAKCJI.** LIMEN FENESTRAE pilnuje pokrycia okna, ale werdykt
+oparty na 4 transakcjach wychodzi z tą samą pewnością co oparty na 1109. Kandydat **LIMEN
+NEGOTIORUM** dopisany do CODEX — rozszerzenie istniejącego mechanizmu, nie nowy organ.
+
+---
+
+## 2026-07-20 | 🧱 | CONFLATOR TEMPORUM + NUNTIUS MERCATUS: 5m/15m i odporne pobieranie
+
+### Powód
+
+Profil **SCALP** (Namiestnik W-323 mapuje M1–M15) **nigdy nie był testowany** — mieliśmy dane
+1-minutowe, ale zero plików 5m/15m. Zmierzona zależność 1d +9.80% / 4h +3.93% / 1h −4.38% daje
+falsyfikowalną prognozę: krótsze interwały mają wyjść **jeszcze gorzej**. Jeśli wyjdą lepiej —
+teza o interwale upada i trzeba ją odwołać.
+
+### Dwa narzędzia z rzymskimi imionami (ZASADA NOMENKLATURY)
+
+| Organ | Plik | Rola |
+|---|---|---|
+| **CONFLATOR TEMPORUM** (Zlewacz Interwałów) | `narzedzia/agreguj_bary.py` | 1m→5m/15m, 1h→4h; odrzuca niepełne okna |
+| **NUNTIUS MERCATUS** (Posłaniec Rynku) | `narzedzia/pobierz_binance.py` | świece dowolnego interwału z publicznego API |
+| **VERITAS ANNALIUM** (Prawda Roczników) | `narzedzia/audyt_danych.py` | (nazwa nadana wstecz — organ z tej samej sesji) |
+
+Oba powstały z **uogólnienia istniejących** (`agreguj_4h.py`, `pobierz_4h_binance.py`), nie obok nich —
+nazwa pliku też jest dokumentacją i też potrafi skłamać, gdy moduł przestaje dotyczyć tylko 4h.
+Stary `agreguj_4h.py` usunięty za zgodą Cezara (przeczytany w całości, 3 importy przepięte,
+`agreguj_4h()` zachowane jako funkcja zgodności — woła je `audyt_danych.py`).
+
+### Wynik agregacji (BTC+ETH)
+
+5m: 301 993 / 279 076 barów · 15m: 100 661 / 93 023 barów · **0 barów poza siatką** ·
+**200/200 zgodnych z Binance** dla obu par i obu interwałów.
+
+### Odkrycie uboczne — ważniejsze niż sama agregacja
+
+**Dane minutowe kończą się 2022-07-27** — mają prawie 4 lata. PORTITOR meldował „1m: 1453 dni",
+co brzmiało jak świeże dane; to były dni **2019–2022**. Skutek: nie da się dołożyć 15m do tabeli
+liczonej na oknie 2024→2026, bo mieszałoby to efekt interwału z efektem innego reżimu rynku.
+Decyzja Cezara: dociągnąć świeże 1m z Binance (~1.34 mln świec/parę).
+
+### Trzy własne wpadki → trzy mechanizmy (LEX TALIONIS)
+
+**1. `N-962bc1d6` → `C-8fc89d2e` — nadpisanie bez kopii.** Testowy bieg nadpisał
+`dane/4h/Binance_LINKUSDT_4h.csv` (pobrany z Binance) wersją przeliczoną z 1h. Wyszło dobrze
+**tylko dlatego**, że 1h było już naprawione; godzinę wcześniej wgrałbym skażone dane bez cofnięcia.
+To ta sama klasa, którą **godzinę wcześniej sam wpisałem do Księgi Wad**.
+→ **STRAŻ POCHODZENIA**: kopia przed nadpisaniem + odczyt nagłówka i **głośne ostrzeżenie**,
+gdy wersja przeliczona ma zastąpić plik z giełdy. Pilnuje degradacji źródła u sprawcy, nie w audycie.
+
+**2. `N-7d5a9d47` → `C-9f8d479a` — wznawialność pozorna.** Docstring głosił „bieg przerwany w połowie
+nie zaczyna od nowa", a narzędzie trzymało wynik w pamięci i pisało plik **na końcu**. Bieg zabity
+na 10% stracił **140 000 świec**. Zasada, którą cytowałem, mówi wprost: *bieg który umiera NIE traci nic*.
+→ **CHECKPOINT STRONICOWY**: każda strona natychmiast na dysk (z flush). Zmierzone: wznowienie
+**0.7 s** wobec ~20 min pełnego pobrania; checkpoint rośnie na żywo (18 MB / 101 tys. linii po 7%).
+Uszkodzona ostatnia linia (po zabiciu w trakcie zapisu) jest pomijana, nie wywraca odczytu.
+
+**3. Licznik, który kłamał.** Raport mówił „dociągnięto 193" także wtedy, gdy drugi bieg nie wysłał
+**ani jednego** żądania (wszystko z checkpointu). Liczył długość zwróconej listy, nie przyrost.
+→ liczony **przyrost wobec stanu poprzedniego** (po − przed).
+
+### Zatrzymania sesji — hipoteza zawężona, nie potwierdzona
+
+Trzy biegi padły dziś z `KeyboardInterrupt` (sygnał z zewnątrz, nie błąd kodu). **Wykluczone pomiarem:**
+brak pamięci (10.3 GB wolne), awaria sieci na poziomie OS (zero zdarzeń w dzienniku 05:35–05:55),
+podagent jako wspólny mianownik (trzecie padnięcie było bez niego). **Zostaje** intensywny ruch
+sieciowy — hipoteza z **n=3**, nie przyczyna. Tani test: tempo zapytań zwolnione 7/s → 3/s.
+
+### Księga Wad +3 (46)
+
+- **odporność pozorna:** mechanizm zapisujący stan dopiero na końcu — działa tylko gdy niepotrzebny
+- **świeżość danych:** „plik istnieje, więc jest aktualny" — sprawdzaj ZAKRES DAT, nie liczbę wierszy
+- **licznik który kłamie:** raportowanie długości wyniku zamiast rzeczywistego przyrostu
+
+**Pliki:** `narzedzia/agreguj_bary.py` (nowy, zastępuje `agreguj_4h.py`),
+`narzedzia/pobierz_binance.py` (nowy, uogólnia `pobierz_4h_binance.py`), `narzedzia/audyt_danych.py`,
+`narzedzia/pobierz_nowe_pary.py`, `tests/test_czytnik_csv.py`, `docs/ARCHITEKTURA_IMPERIUM.md`, `.gitignore`
+
+---
+
+## 2026-07-20 | 🔬 | AUDYT DANYCH: 1H pochodziło od pośrednika — 245 barów naprawionych + hipoteza interwału
+
+### Powód (rozkaz Cezara)
+
+*„sprawdź interwały 4h, ściągnij inny sampel z netu, bo kiedyś jakiś moduł sam przerabiał z 1h na 4h,
+może coś popsuł — zrób audyt"*. Podejrzenie padło na 4h. **Pomiar odwrócił kierunek: zepsute było 1H.**
+
+### Organ: `narzedzia/audyt_danych.py` — trzy warstwy (Prawo XVI, każda pyta o co innego)
+
+| Warstwa | Pyta | Sieć |
+|---|---|---|
+| **W1 STRUKTURA** | siatka UTC, monotoniczność, duplikaty, sensowność OHLC | nie |
+| **W2 KRZYŻOWA** | czy 1h zagregowane do 4h zgadza się z plikiem 4h | nie |
+| **W3 ŹRÓDŁO** | czy zgadza się z publicznym API Binance | tak |
+
+### Trzy klasy wad — wszystkie ZMIERZONE
+
+**1. Pochodzenie danych.** `dane/godzinowe/*.csv` → **CryptoDataDownload** (pośrednik), `dane/4h/*.csv`
+→ **binance.com**. Dlatego 4h zgadzało się ze źródłem, a 1h nie.
+Dowód rozstrzygający (ETH 2021-01-11 08:00): nasz 4h `low=1049.01` = **Binance 1049.01** ✅,
+nasz 1h `low=1063.00` ❌. Świece godzinowe **gubiły knot** — dołek zawyżony o 1.3%.
+**Dlaczego to nie kosmetyka:** zawyżony dołek = stop-loss, który w rzeczywistości by poleciał,
+w backteście NIE leci → wynik obciążony **optymistycznie**.
+
+**2. Bary poza siatką UTC.** 43 kolejne bary przesunięte o 28m14s (2018-02-09 09:28 → 02-11 03:28)
+w BTC, ETH, BNB, LTC. W tych oknach **brak poprawnych godzinówek**, a Binance ma komplet — to agregaty
+INNYCH okien, więc podmiana wartości nie wystarcza: wymieniono cały odcinek (`napraw_siatke`).
+Binance sam nie ma jednego z tych barów (realna przerwa giełdy) — **luki nie dorabiamy** (Prawo I).
+
+**3. Świeca niedomknięta.** Ostatni bar KAŻDEGO z 15 plików 4h miał zaniżony wolumen (BTC 741 vs 902)
+— świeca złapana w trakcie formowania, licząca się jak pełna. Naprawa poszła **do czytnika**
+(`czytnik_csv.pomin_niedomkniety`), nie do plików: łatanie plików wracałoby przy każdym pobraniu.
+Warunek czasowy → dane historyczne NIETKNIĘTE, a chroni backtest, paper i live jednym ruchem.
+
+### Wynik naprawy
+
+**245 barów w 15 parach** (46 OHLC + wolumeny + 3 odcinki siatki po 42 bary). Kopie w `dane/_kopie/`
+(dane są poza gitem — bez kopii zmiana byłaby nieodwracalna; katalog dopisany do `.gitignore`, 127 MB).
+Weryfikacja: **BTC 75 954 barów zgodnych z Binance co do grosza**, wszystkie 15 par czyste w W1+W2.
+
+**Rozkład dat uszkodzeń jest wymowny:** 2021-01-11 (krach), 2021-04-23, 2021-10-29, 2021-12-24,
+2022-04-13 — **dni incydentów giełdowych**. Pośrednik gubił dane dokładnie wtedy, gdy działo się najwięcej.
+
+**Zero zmian po 2024-01-01** → okno testu hipotezy interwału (start 2024-01-28) **nietknięte**;
+wynik poniżej stoi na danych, których naprawa nie dotyczyła (sprawdzone przez porównanie kopii z plikiem).
+
+### Hipoteza interwału — POTWIERDZONA (`narzedzia/sym_porownanie_tf.py`, rozszerzone o 1d + CLI + pasek)
+
+BTC+ETH, **to samo okno kalendarzowe, identyczna konfiguracja**, zmienia się wyłącznie interwał:
+
+| interwał | ROI% | maxDD% | transakcje | win rate |
+|---|---|---|---|---|
+| 1d | **+9.80** | 0.04 | 22 | 50.0% |
+| 4h | **+3.93** | 0.12 | 178 | 49.4% |
+| 1h | **−4.38** | 0.14 | 647 | 48.5% |
+
+Zależność **monotoniczna**: krótszy interwał → niższy ROI, więcej transakcji (22 → 178 → 647), wyższe
+obsunięcie, spadający win rate. Mechanika przegranej: **win rate poniżej progu opłacalności × 30-krotnie
+więcej transakcji**. 1H nie ma słabego sygnału — ma za dużo okazji przy zbyt cienkiej przewadze.
+Podgląd: `raporty/KAPITOL_PODGLAD_hipoteza_interwalu.html`.
+
+**Konsekwencja operacyjna:** odłożenie powtórek Stablecoin/USD-DXY na 1H było trafne — te ~6 h poszłoby
+na szukanie przewagi w grze przegranej na poziomie interwału. Testy Tier-1 przenieść na 4h/1d.
+
+**Ranga wg SCALA FIDEI: szczebel 1–2** (EXPLORATIO + pełne okno) na jednej parze aktywów. Do statusu
+reguły brakuje TRANSLATIO (inne pary) i wyrównania okien (narzędzie tnie po LICZBIE BARÓW, więc realne
+zakresy rozjeżdżają się o ~2 miesiące — usterka wykryta w trakcie, do poprawy). **Nic nie wpięte.**
+
+### Luka odkryta przy okazji
+
+**Brak plików 5m/15m** — mamy dane 1-minutowe (14 par, ~1450 dni), ale nikt ich nie zagregował, więc
+**profil SCALP (Namiestnik W-323 mapuje M1–M15) nigdy nie był testowany**. Falsyfikowalna prognoza:
+jeśli zależność jest monotoniczna, 15m i 5m wyjdą **jeszcze gorzej** — jeśli lepiej, teza o interwale upada.
+
+### Księga Wad +3 (43)
+
+- **pochodzenie danych:** pośrednik traktowany jak giełda (błędy skupione w dniach incydentów)
+- **pochodzenie danych:** mieszane pochodzenie w jednym katalogu — plik pochodny NIE może być sędzią
+  dla swojego źródła (detektor krzyżowy milczy, gdy oba mają ten sam błąd)
+- **wnioskowanie:** wniosek z przesłanki POŚREDNIEJ zamiast pomiaru wprost — 3 własne przypadki tego dnia
+
+**Pliki:** `narzedzia/audyt_danych.py` (nowy), `narzedzia/sym_porownanie_tf.py`,
+`imperium/akwedukty/czytnik_csv.py`, `narzedzia/kapitol_podglad.py`, `tests/test_czytnik_csv.py`, `.gitignore`
+
+---
+
+## 2026-07-20 | 📕 | P2: A/B DVOL 1H pełna era + INDEX FALSORUM + CENSOR w hooku + LIMEN FENESTRAE
+
+### Wynik P2 (pomiar rozstrzygający)
+
+**A/B DVOL (PSY-05), BTC+ETH, 1H, PEŁNA era DVOL (19 471 + 19 380 barów, ~2.2 roku):**
+
+| wariant | ROI% | maxDD% | trades |
+|---|---|---|---|
+| B: DVOL OFF (baseline) | −5.49 | 0.14 | 649 |
+| A: DVOL ON (PSY-05) | −5.25 | 0.14 | 649 |
+
+**Δ ROI = +0.24 pp → ⚖️ NEUTRALNE.** Flaga zostaje opt-in OFF. IC ≠ PnL: sygnał ma skill
+informacyjny (+0.16@7d), ale nie zamienia się na wynik na 1H.
+Podgląd: `raporty/KAPITOL_PODGLAD_ab_dvol_1h_pelna_era.html` (`kapitol_podglad.py ab_dvol_1h`).
+
+**HIPOTEZA (nie fakt, do osobnego pomiaru):** oba ramiona tracą na 1H (−5.5%), a 4H/1D dawały
+dodatnie ROI — problemem może być sam **interwał 1H** dla tej strategii, nie sygnał DVOL.
+Porównanie szło na różnych oknach, więc NIE ogłaszamy tego jako wniosku.
+
+### Trzy błędy Architekta złapane i spłacone (LEX TALIONIS)
+
+**1. `N-7d2c4847` → `C-fb1e3b37` — obalone twierdzenie żyło w kodzie.** Trzy żywe narzędzia A/B
+głosiły w `--help` „backtest O(n²)", obalone pomiarem 2026-07-19. Skutek nie był kosmetyczny:
+operator bał się długiego okna, więc biegi 1H szły na 800 barach — **kłamstwo w help-stringu
+zafałszowało wynik badawczy**.
+→ **INDEX FALSORUM** (`imperium/biblioteki/index_falsorum.py`) — Spis Twierdzeń Obalonych:
+twierdzenie rejestruje się RAZ (fraza + poprawna teza + DOWÓD obalenia, ledger append-only),
+a sweep pilnuje całego korpusu `.py`+`.md`. Klasa siostrzana Warstwy 15 (liczby) i 16 (API-widma)
+— tylko po stronie TWIERDZEŃ. Wpięte w istniejący organ: `skan_wad_kodu.py --falsa`.
+
+**2. `N-36596e99` → `C-cd9b749a` — liczba o sprzęcie z pamięci (zarzut Cezara).** Architekt
+twierdził „8 GB Fujitsu", mając organ do zmierzenia w kodzie. CENSOR mierzy **15.88 GB RAM,
+4 wątki, brak CUDA, klasa PEDES**. Korekta była **już raz zrobiona** (LOG_ZMIAN:1208), a kłamstwo
+przeżyło w **5 miejscach 4 żywych dokumentów** — `MANUAL_MIGRACJA` przeczył sam sobie (linia 16:
+15.88 GB, linia 159: „Fujitsu 8 GB"). Sprostowane: MANUAL (×3 + mapa RAM), PLAN_DEEPSEEK, ROADMAP,
+REJESTR_INSPIRACJI. Przy okazji: „562/562 testów" w MANUAL przy realnych 2627.
+→ **Potwierdzający system przed testami:** `censor_sprzetu.banner()` w hooku (krok 0.7) obok
+PORTITORA + INDEX FALSORUM w hooku (krok 0.8). Żelazo stoi przed oczami, ZANIM padnie teza
+o wydajności. **Korekta merytoryczna:** wąskim gardłem tej maszyny jest CPU i brak GPU, **nie RAM**.
+
+**3. `N-4f7032a6` → `C-a0519dbb` — kandydat ogłoszony jako prawda.** Architekt ogłosił konkluzję
+(„NEUTRALNE było artefaktem krótkiego okna") z próbki 2 000 barów = **10% ery**. Pełna era to
+obaliła. Ten sam błąd metodologiczny, który właśnie diagnozował u poprzednika.
+→ **LIMEN FENESTRAE** (`scriba_codex.ocen_pokrycie`): ranga werdyktu liczona z pokrycia ery
+i zapisywana **W REKORDZIE** ledgera — ROZSTRZYGAJACY (≥50%) / WSTEPNY (z ostrzeżeniem
+„nie zamykaj tematu") / NIEZNANE (brak wiedzy — Prawo I). Wpięte w 3 narzędzia Tier-1.
+Retroaktywnie: biegi 800 barów = **4.1% ery**, próbka 2000 = **10.3%** — oba WSTĘPNE, a ledger
+trzymał je jak równorzędne werdykty.
+
+### Obrona przed fałszywym alarmem — zmierzona, nie założona
+
+INDEX FALSORUM złapał **trzy własne pułapki** w pierwszej godzinie życia; każda ma test regresyjny:
+- **sprostowanie zawijane przez granicę linii** (`scriba_codex.py:135` „O(n^2) została" / `:136`
+  „obalona pomiarem") → okno kontekstu ±2 linie
+- **negacja dotycząca czego innego** („przez API, **nie** lokalnie (Fujitsu, 8GB RAM)") → negacja
+  liczy się tylko PRZY frazie (≤8 zn.) lub w jej obrębie, nie w całej linii
+- **„nie" w środku słowa „lokal-nie ("** → granice słów (`\b`), nie podciąg
+- oraz: `8 GB RAM` dopasowane wewnątrz `15.**88 GB RAM**` → granica cyfry w frazie
+
+Organ dostał też **`wycofaj()`** (append-only nagrobek): źle dobrana fraza da się zdjąć ze straży,
+więc nie zostaje wiecznym FP (Księga Wad #35 — chroniczny fałszywy alarm uczy ignorować bramkę).
+**Fraza koduje TWIERDZENIE, nie token** (`backtest.*O(n²)`, nie samo `O(n²)`) — zawężone PO pomiarze
+szumu, nie z góry. Organ złapał nawet własny świeży docstring cytujący „8 GB" — dowód czułości.
+
+**Strażnik Prawa XXI zadziałał:** `set(keys) == POLA_AB` w `test_scriba_codex` złapał dryf schematu
+po dodaniu pól `ranga`/`pokrycie_ery` → POLA_AB zaktualizowane w tym samym ruchu.
+
+**Bramki:** testy 2627 → **2649** (+22) · audyt exit 0 · ruff czysto · skan wad czysto · INDEX
+FALSORUM sweep czysty · dług honorowy 0.
+
+**Pliki:** `imperium/biblioteki/index_falsorum.py` (nowy), `imperium/oczy/censor_sprzetu.py`,
+`.claude/hooks/session-start.sh`, `narzedzia/{scriba_codex,ab_dvol,ab_usd,ab_stablecoin,skan_wad_kodu,kapitol_podglad}.py`,
+`tests/{test_index_falsorum,test_scriba_codex}.py`, `docs/{MANUAL_MIGRACJA_I_SYMULATOR,PLAN_DEEPSEEK,ROADMAP_IMPERIUM,REJESTR_INSPIRACJI}.md`
+
+---
+
+## 2026-07-20 | 🛡️ | AEQUITAS SERIERUM — strażnik równej długości serii u wrót Bramy (P1)
+
+**Powód (P1 zamrożonej listy):** teza zwiadowcy mówiła „`zip(strict=True)` w ~25 miejscach Bramy".
+Zgodnie z ZASADĄ WERYFIKACJI teza została **zmierzona, nie przyjęta na wiarę** — i okazała się
+słuszna co do kierunku, a błędna co do liczby i lekarstwa.
+
+**Pomiar (2026-07-20, seria syntetyczna 100 barów, `volume` obcięty do 80):**
+- TA-Lib przy nierównych seriach: **GŁOŚNO** — `Exception: input array lengths are different`
+- pure-Python `VWAP`: **CICHO** — 147.166667 → 137.166667 (**rozjazd 10.0**, ~6.8%)
+- pure-Python `VWAP_STD`: **CICHO** — 28.866070 → 23.092206 (rozjazd 5.774, ~20%)
+- pieczątka audytu raportowała `input_len=100` przy wyniku policzonym z **80** barów → **audyt kłamał (Prawo XIII)**
+
+**Korekty do tezy zwiadowcy (KANDYDAT ≠ PRAWDA):**
+- nie „~25 miejsc": **23** `zip` w całym `imperium/`, z tego **10** w Bramie
+- `diagnostyka_korelacji.py` — **4/4 zipy JUŻ strzeżone** (`if n < 2 or n != len(y): return None`);
+  `strict=True` byłby tam **martwą asercją** = szum udający ochronę (Prawo XVI)
+
+**Lekarstwo (unikat, lepszy niż teza):** JEDEN strażnik u wrót zamiast ~25 rozsypanych `strict=True`.
+Obejmuje **także wskaźniki numpy bez `zip`** (których 25×strict by nie złapało), naprawia kłamiącą
+pieczątkę i **nie da się go pominąć** przy dodaniu nowego wskaźnika.
+- `_aequitas_serierum()` wpięty w `compute()` **i** `compute_series()` (drugie wejście do matematyki)
+- **Dowód kompletności:** jedyne parametry seryjne całego rejestru Bramy to `open/high/low/close/volume`
+  (reszta — `period/fast/slow/k/n/dim…` — to skalary) → zero martwego pola
+- **Zero ryzyka regresu:** `_serie()` (`budowniczy_wskaznikow.py:26`) buduje wszystkie 5 serii z **tej samej
+  listy barów** — ścieżka produkcyjna nie może potknąć się o strażnika
+- dodatkowo `zip(..., strict=True)` w niezmienniku wewnętrznym `_py_hma.wma` (ujemny slice `seq[-3:2] → []`
+  dawał cichą MA = 0.0 udającą policzoną) — tam strażnik u wrót nie sięga
+
+**Bramki:** testy **2627/2627** (+7 granic; licznik 2620→2627 = dowód, że nie są cicho pomijane) ·
+audyt exit 0 · ruff czysto · skan wad czysto.
+
+**LEX TALIONIS:** NOTA `N-fd782251` (cicha nierówność serii + kłamiąca pieczątka) spłacona
+CORONĄ `C-340771af` (AEQUITAS SERIERUM). Dług honorowy: **0**.
+**Uodpornienie klasy:** Księga Wad **#38** — „kontrakt danych: łączenie serii bez sprawdzenia równej
+długości". Świadomie **bez regexu** — samo `zip(` ma za duży szum (23 wystąpienia, większość legalna),
+więc to klasa do CHECKLISTY review, nie do auto-skanu (regex dopiero po pomiarze szumu).
+
+**Podgląd (zero-tokenowy):** `raporty/KAPITOL_PODGLAD_aequitas_serierum.html`
+(`python narzedzia/kapitol_podglad.py aequitas`) — narzędzie dostało dispatch po nazwie raportu,
+dotąd miało jeden raport zaszyty na sztywno.
+
+**Pliki:** `imperium/fundament/brama_kalkulatora.py`, `tests/test_neurony.py`,
+`narzedzia/kapitol_podglad.py`, `bibliotheca_ulpia/dane/{codex_notarum,ksiega_wad_kodu,rejestr_testow}.jsonl`
+
+---
+
+## 2026-07-19 | ⚔️ | PRAETORIUM — Kwatera Główna Imperatora (Centrum Dowodzenia, hybryda C+A)
+
+**Powód (rozkaz Cezara):** Imperium nie miało miejsca, z którego Imperator widzi CAŁOŚĆ i wydaje ordery.
+Zalążki istniały (Panel Kapitolu, Speculum, dashboard), ale — słowami Cezara — „to nie jest to".
+
+**Proces:** 4 szablony wizualne (CASTRUM / MAPPA IMPERII / HUD BOJOWY / MARMUR) → wybór Cezara:
+**hybryda C+A** (kokpit operacyjny + castrum organów). Szkice: `raporty/PRAETORIUM_SZABLONY.html` (gitignore).
+
+**Organ:** `imperium/swiatynie/praetorium.py` — **PRAETORIUM** (ZASADA NOMENKLATURY).
+- **Prawo XVI (nie duplikujemy):** NIE stawia drugiego serwera. `web_dashboard.py` (Panel Kapitolu) zostaje
+  żywym serwerem; PRAETORIUM daje **czystą funkcję** `render_praetorium(stan) -> str`, którą tamten może podać.
+  Granice spisane w docstringu wobec `kapitol_podglad.py` (jeden test) i `live_monitor.py` (alarmy).
+- **Prawo I (rdzeń organu):** każdy panel niesie znacznik **ŻYWE** (policzone z kodu przy renderze) albo
+  **BRAK DANYCH**. Bez giełdy front mówi wprost „Front milczy" — **zero wypełniacza udającego pomiar**.
+  Rozkazy egzekucji celowo `disabled` (ZASADA WPIĘCIA — wpięcie to osobna, świadoma decyzja).
+- Żywe dane: rój (87/15), strategie, elity, organy (te same liczby co README), bilans CODEX NOTARUM.
+- +11 testów granic (pusty stan, brak źródła, P&L ujemny, dług honorowy, escaping HTML, disabled).
+
+**Dowód wpięcia mechanizmu z tej samej sesji:** dodanie `praetorium.py` podbiło `organ_swiatynie` 6→7,
+a wstrzykiwanie liczb SAMO poprawiło README — dokładnie po to powstało.
+
+**Pliki:** `imperium/swiatynie/praetorium.py`, `tests/test_praetorium.py`, `README.md`,
+`docs/ARCHITEKTURA_IMPERIUM.md`, `docs/INDEKS_IMPERIUM.md`.
+
+**Następny krok:** dopracowanie (zwiad opcji) → wpięcie trasy → finalizacja.
+
+---
+
+## 2026-07-20 | 🏛️ | PRAETORIUM — panele Grupy 1 + trasa `/praetorium` w Panelu Kapitolu
+
+**Powód:** Cezar kazał wysłać zwiadowcę po WIĘCEJ opcji przed decyzją, a potem wybrał
+„zgodnie z rekomendacją" = Grupa 1 (realne dane dziś) + wpięcie trasy.
+
+**Zwiad subagenta + werdykt sędziego (KANDYDAT≠PRAWDA — każdy kandydat zweryfikowany osobiście):**
+Zwiadowca zebrał ~13 kandydatów; **zweryfikowałem je sam** i podzieliłem na trzy grupy:
+- 🟢 **Grupa 1 — realne dane DZIŚ (WDROŻONE):** PORTITOR + Censor Sprzętu (klasa maszyny `PEDES`),
+  CODEX PROBATIONUM (`podsumowanie_ledger`), Refleksja W9 (`raport_startowy`), „następny krok"
+  z Dziennika (`banner_nastepny`), treść ostatnich NOT/CORON. **Zmierzony koszt łączny ~334 ms**, offline.
+- 🟡 **Grupa 2 — uczciwie puste dziś (odłożone):** Sybilla (`brier()` = None — brak rozliczonych proroctw),
+  Igrzyska/HedgeMWU (**pliki stanu nie istnieją** — zweryfikowane), Legiony Cieni. Wejdą, gdy live pochodzi.
+- 🔴 **Grupa 3 — ryzyko atrapy (ODRZUCONE do czasu snapshotu):** Gubernator/Haruspex/Drift. Dowód:
+  `gubernator.py:91` resetuje postawę w `__init__`, a `petla_live.py` NIE zapisuje ich stanu (zapisuje
+  MWU/synapsy/igrzyska/arenę). Pokazanie ich statycznie = fałszywe „NORMALNY ×1.0" udające pomiar (Prawo I).
+- ⛔ **Odrzucone trwale:** Kartograf (wymaga `numpy`+`matplotlib` → łamie zero-zależności),
+  diagnostyka korelacji przy każdym renderze (za droga), cenzus adapterów bez wcześniejszego refaktoru.
+
+**TRASA:** `GET /praetorium` wpięta w `web_dashboard.obsluz_sciezke` (import leniwy — koszt płacony
+tylko przy wejściu). Kokpit żyje pod `localhost:8777/praetorium`, odświeżany F5. **Żaden drugi serwer
+nie powstał** (Prawo XVI).
+
+**Odporność:** `_bezpiecznie()` — jedno padnięte źródło NIE zabija kokpitu, tylko jego panel pokazuje
+BRAK DANYCH. Bezpieczeństwo: na ekran trafia wyłącznie OBECNOŚĆ kluczy API (`DEEPSEEK✓ MEXC✗`),
+nigdy wartość. Testy 11 → **21**.
+
+**Następny krok:** ewentualnie B · MAPPA IMPERII → snapshot live (odblokuje Grupę 3) → finalizacja.
+Potem powrót do zamrożonej listy priorytetów.
+
+---
+
+## 2026-07-19 | 📜 | README naprawa (schemat + liczby organów wstrzykiwane) + CODEX NOTARUM (LEX TALIONIS)
+
+**Powód (rozkaz Cezara):** (1) główne README „kurewsko nieaktualne" — schemat/układ Imperium nie nadążał
+za kodem; (2) wprowadzić tryb kary/nagrody „oko za oko" (błąd rodzi kompensujący unikat).
+
+**Naprawa README (wstyd zdjęty, ZWERYFIKOWANE pomiarem):**
+- Mapa organów → tabela z liczbami plików `.py` **wstrzykiwanymi** z żywego kodu (`tabularium.wartosci_z_kodu`
+  → klucze `organ_*`, Warstwa 15). Rozjazd: legiony 40→67, biblioteki 8→25, akwedukty 8→17, koloseum 11→16,
+  pretorianie 5→9, swiatynie 2→6, cesarz 9→11 — nigdy więcej nie skłamie (UODPORNIJ).
+- Linia „Faza" (urywała się na W-343) → wskaźnik do MANIFEST + LOG_ZMIAN. Role → nomenklatura rzymska +
+  sekcja **TWÓRCY**: CEZAR PIXEL, VITRUVIUSZ, HYGINUS, **TIRO** (lokalny LLM). Doktryna wojenna w wizytówce.
+
+**Nowy organ CODEX NOTARUM (LEX TALIONIS, ZASADA STAŁA):** `imperium/biblioteki/codex_notarum.py` +
+ledger `bibliotheca_ulpia/dane/codex_notarum.jsonl` (append-only). NOTA CENSORIA (−) za zatwierdzony błąd,
+CORONA (+) za zatwierdzony unikat; `splaca` = spłata długu honorowego (oko za oko). Nic bez `zatwierdzenie`
+(KANDYDAT≠PRAWDA). +11 testów granic. Inauguracja e2e: NOTA (niedbałe README) → CORONA (mechanizm LEX
+TALIONIS) → dług honorowy spłacony. Skodyfikowane w CLAUDE.md + krok 5b CHECKLISTY KONIEC SESJI.
+
+**ZAKRES rozszerzony (rozkaz Cezara):** oko-za-oko obejmuje **wszelkie błędy — dokumenty I kod — w CAŁYM
+Imperium**, nie tylko README; przy wyborze co prostować najpierw — wsparcie subagentem. Skodyfikowane w ZASADZIE.
+
+**3 błędy złapane i spłacone w tej sesji (ledger, saldo +0, dług 0):**
+1. README niedbałe (brak TWÓRCÓW + brak TIRO) → CORONA: mechanizm LEX TALIONIS + organ.
+2. Opis Hyginusa niekompletny — pominięta rola **głosu newsowego** DeepSeek-przez-API (jest nie tylko
+   Bibliotekarzem-Zwiadowcą) → CORONA: rozszerzenie zakresu na całe Imperium + sweep subagentem.
+3. **`test_codex_notarum.py` napisany jako `unittest.TestCase`** — runner zbiera TYLKO funkcje modułowe
+   `test_*`, więc 11 testów było **cicho pomijanych** (liczba 2584 nie drgnęła; złapane pomiarem).
+   → CORONA/UODPORNIENIE: **strażnik silent-skip w `tests/run_tests.py`** — plik `test_*.py` z zerem
+   funkcji modułowych = twarda porażka. Zweryfikowano: 0 istniejących plików miało zero (nic nie psuje).
+   Testy przepisane w stylu funkcyjnym: **2584 → 2596** (12 realnie bramkowanych).
+
+**SWEEP CAŁEGO IMPERIUM (subagent-zwiadowca + weryfikacja sędziego) — 2 kolejne błędy złapane:**
+
+4. **Ledger CODEX kłamał:** sugestia „Naprawa backtestu O(n^2)" wisiała ze statusem `OCZEKUJE decyzji
+   Cezara`, mimo że tego samego dnia teza została **obalona pomiarem** (backtest LINIOWY, ms/tik stały
+   ~66). LOG_ZMIAN ogłosił korektę — ledger jej NIGDY nie dostał. Źródło prawdy testów wprowadzało w błąd.
+   → CORONA: **`scriba_codex.zamknij_sugestia()`** — pierwszorzędne API zamykania/korygowania sugestii
+   (append-only, kontekst przepisany z oryginału, ValueError gdy sugestia nie istnieje) + 3 testy granic.
+   **Root cause klasy:** zamykanie nie miało własnego API, więc robiono je „w widoku" i ginęło.
+   Sugestia realnie zamknięta (Sugestie 18→19).
+
+5. **`gubernator.py:110` — martwa gałąź:** `return OBRONA if KOLEJNOSC_POSTAW.index(OBRONA) <= idx + 1
+   else OBRONA` — **obie gałęzie identyczne**, warunek zawsze prawdziwy (index(OBRONA)=1 ≤ idx+1 dla
+   idx≥0), a `idx` liczony wyłącznie dla martwego warunku. Test asertował tylko `postawa in (OBRONA,
+   KWARANTANNA)`, więc nigdy by tego nie złapał. Uproszczone **BIT-IDENTYCZNIE** (16/16 testów).
+   → CORONA/UODPORNIENIE: **RUF034 włączone na stałe w `ruff.toml`** (zmierzone: 1 trafienie w całym
+   repo, naprawione → sygnał >> szum). **OTWARTE (decyzja Cezara, dotyka sizingu → wymaga A/B):**
+   czy „co najwyżej OBRONA" ma znaczyć min(obecna, OBRONA) — dziś KWARANTANNA JEST podnoszona do OBRONY.
+
+**Bilans not:** 5 NOTA / 5 CORONA, saldo +0, **dług honorowy 0** (`codex_notarum bilans`).
+
+**Pliki:** `README.md`, `narzedzia/tabularium.py`, `narzedzia/scriba_codex.py`,
+`imperium/biblioteki/codex_notarum.py`, `imperium/koloseum/gubernator.py`, `ruff.toml`,
+`tests/test_codex_notarum.py`, `tests/test_scriba_codex.py`, `tests/run_tests.py`, `CLAUDE.md`,
+`docs/ARCHITEKTURA_IMPERIUM.md`, `docs/INDEKS_IMPERIUM.md`,
+`bibliotheca_ulpia/dane/codex_notarum.jsonl`, `bibliotheca_ulpia/dane/rejestr_testow.jsonl`.
+
+---
+
+## 2026-07-19 | 💰 | CODEX arkusz „Momenty modelu" — druga oś doboru modelu (zużycie/moment)
+
+**Powód (pytanie kontrolne Cezara):** dobór modelu (ZASADA OSZCZĘDNOŚCI TOKENÓW) opiera się DZIŚ
+wyłącznie na RODZAJU/ZŁOŻONOŚCI zadania (statyczna tabela) — NIE patrzy na realne zużycie w momencie
+(start/zamknięcie/commit/intensywne fazy), brak auto-zmiany (poza jakościową eskalacją na anomalię).
+Zwiad Sonnet (drugi punkt widzenia: routing wg zużycia/kosztu) + sędzia Opus → udokumentowana DRUGA OŚ.
+
+**Dodane (TYLKO dokumentacja — decyzja Cezara „udokumentuj, mechanizm osobno"; nic nie wdrożone):**
+- `narzedzia/codex_probationum.py` — stała `MOMENTY_MODELU` + **14. arkusz „Momenty modelu"** (moment→
+  zużycie→tier→dźwignia→uwaga): referencja doktrynalna osi „w którym momencie / ile palę" obok osi task-type.
+- `bibliotheca_ulpia/dane/rejestr_testow.jsonl` — 2 rekordy SUGESTIA (KANDYDACI, Prawo I): #1 Adaptive
+  Effort, #8 strażnik budżetu sesji (CLAUDE_CODE_SUBAGENT_MODEL + OTEL → JAWNY alarm+/model). Ledger 18 Sugestii.
+
+**Werdykt sędziego (KANDYDAT≠PRAWDA):** z 8 kandydatów zwiadu tylko #8 gruntowany w REALNYCH hakach
+Claude Code; #3/#6/#7 odrzucone (własna infra/gateway poza stackiem). Twarde ograniczenia: model sesji
+głównej zmienia TYLKO `/model` Cezara; automat realny tylko dla delegacji subagentom; cicha degradacja
+ZAKAZANA (nasza transparentność — zawsze jawnie). Źródła arXiv/OSS zwiadu ⚠️ niezweryfikowane osobiście.
+
+**Testy:** +1 (`test_arkusz_momenty_modelu`). CODEX 13→14 arkuszy. Ruff czysto, skan czysto.
+
+**Pliki:** `narzedzia/codex_probationum.py`, `tests/test_codex_probationum.py`,
+`bibliotheca_ulpia/dane/rejestr_testow.jsonl`, `docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-07-19 | 🏛️ | PORTITOR — nowy organ pre-flight środowiska u wrót sesji (B1)
+
+**Powód (kontynuacja uszczelniania OTWARCIA, wybór Cezara B1):** żaden istniejący organ nie robił
+LEKKIEGO, BEZ-sieciowego pre-flightu startu. CENSOR SPRZĘTU (oczy) mierzy ŻELAZO; CENZUS ADAPTERÓW /
+WALIDUJ ZMYSŁY sprawdzają adaptery na ŻYWYCH danych (wymagają sieci, ręczne). Luka: nikt nie sprawdzał
+na KAŻDYM starcie software'u — wersji deps, OBECNOŚCI kluczy API, świeżości danych, dryfu środowiska.
+
+**Nowy organ `imperium/pretorianie/portitor.py`** (celnik u wrót — praetorian guard, nazwa rzymska
+dobrana do funkcji, ZASADA NOMENKLATURY). Stdlib-only, BEZ sieci, non-blocking (ZASADA WPIĘCIA):
+- **Runtime:** Python + obecność/wersje deps (numpy/TA-Lib krytyczne → alarm; pandas/ccxt/requests/openpyxl info).
+- **Klucze API:** WYŁĄCZNIE obecność env (DEEPSEEK/MEXC) — NIGDY wartość (Bezpieczeństwo NIENARUSZALNE).
+  Brak DEEPSEEK = alarm (Hyginus cichy); brak MEXC = info (faza paper).
+- **Świeżość danych:** wiek najnowszej świecy lokalnych CSV per interwał (informacyjnie — dane backtestu
+  bywają historyczne, więc bez alarmu; sonda żywego feedu = osobne, sieciowe).
+- **Dryf vs baseline:** fingerprint (Python+pakiety) w git (`bibliotheca_ulpia/dane/portitor_baseline.json`);
+  po `git pull` na innej maszynie porównanie ujawnia zmianę „pod spodem" (jak CENSOR dla sprzętu).
+- CLI: `raport` (domyślnie) / `banner` (hook) / `migawka` / `zmiana` / `zatwierdz`.
+
+**Wpięcie:** `.claude/hooks/session-start.sh` krok 0.6 — zwięzły `banner` (świadomie krótki, nie rozdymamy
+startu — ironia luki L7). Baseline zatwierdzony na żywym środowisku Cezara (Python 3.11.9, 6/6 deps).
+
+**Granica (Prawo XVI):** PORTITOR=software; CENSOR=żelazo; CENZUS/ZMYSŁY=sieć. Zero dublowania.
+Drobna wada złapana samotestem: banner drukował „MEXC✗ MEXC✗" (2 klucze MEXC) → grupowanie po prefiksie (AND).
+
+**Testy:** +17 (`tests/test_portitor.py` — granice kluczy/dryfu/alarmów/baseline). Ruff czysto, skan czysto.
+
+**Pliki:** `imperium/pretorianie/portitor.py`, `tests/test_portitor.py`, `.claude/hooks/session-start.sh`,
+`CLAUDE.md`, `docs/ARCHITEKTURA_IMPERIUM.md`, `bibliotheca_ulpia/dane/portitor_baseline.json`, `docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-07-19 | 🌅 | Uszczelnienie OTWARCIA sesji — Pakiet A+C1 (symetria do zamknięcia)
+
+**Powód (rozkaz Cezara):** zamknięcie sesji miało 9-krokową egzekwowaną checklistę, ale OTWARCIE było
+tylko narracyjne (PRAWO XVII rozproszone) — ta sama klasa luki, którą złapaliśmy w zamknięciu. Audyt
+mechanizmu startu (oba hooki + config) + subagent ekonomiczny (Sonnet, research unikatów spoza Imperium)
+dał katalog luk L1–L9 + 9 kandydatów zewnętrznych. Cezar zatwierdził **Pakiet A+C1**.
+
+**Wdrożone (A+C1, wszystko non-blocking — ZASADA WPIĘCIA):**
+- **A1+A3** `CLAUDE.md` — **🌅 OTWARCIE SESJI — CHECKLISTA STAŁA** (7 kroków, bliźniacza do zamknięcia):
+  przeczytaj wydruk hooka → audyt≠harmonia rozstrzygnij JAWNIE → SYNC → weryfikacja „czy już istnieje" →
+  rozpoznanie terenu (liczby z kodu) → przedstaw się rzymsko → pokaż plan/pytania.
+- **A2** `dziennik_niesmiertelny.py` — subkomenda `nastepny` + `banner_nastepny()`: jednolinijkowy banner
+  NASTĘPNEGO KROKU drukowany na GÓRZE hooka (luka L7: wydruk ~25 KB ucinał plan w podglądzie).
+- **A4** `skan_wad_kodu.py` — flaga `--ostatni-commit` + `_py_ostatni_commit()` + wspólny `_filtruj_py()`:
+  skan startowy zmienionych plików był no-op na czystym drzewie → teraz skanuje ostatni commit (regresje
+  po SYNC pull).
+- **C1** `codex_probationum.py` — flaga `--podsumowanie` + `podsumowanie_ledger()`: jednolinijkowe
+  podsumowanie ledgera na starcie (bez Excela) — domyka asymetrię (CODEX był tylko w zamknięciu).
+- `.claude/hooks/session-start.sh` — banner (krok 0.5), CODEX (krok 2b), skan→`--ostatni-commit` (krok 6).
+
+**Uodpornienie (ZASADA CENSORA):** skan złapał chroniczny FP w `codex_probationum.py` (regex „bezpiecznik"
+trafiał w podłańcuch `hash_ok=True` w prozie Backlogu) — przeredagowano opis, by nie wyglądał jak kod
+(Księga Wad #35: chroniczny FP uczy ignorować bramkę).
+
+**Odłożone do decyzji (katalog):** B1 PORTITOR (pre-flight środowiska/danych — nowy organ), B3 smoke-testy,
+D1 delta między sesjami, E1 auto-kompakcja pamięci, F1/F2 bramki live (przed paper→live).
+
+**Testy:** +5 banner (dziennik) +3 podsumowanie (codex) +7 skan (nowy `test_skan_wad_kodu.py`). Ruff czysto.
+
+**Pliki:** `CLAUDE.md`, `.claude/hooks/session-start.sh`, `imperium/biblioteki/dziennik_niesmiertelny.py`,
+`narzedzia/codex_probationum.py`, `narzedzia/skan_wad_kodu.py`, `tests/test_dziennik_niesmiertelny.py`,
+`tests/test_codex_probationum.py`, `tests/test_skan_wad_kodu.py`, `docs/LOG_ZMIAN.md`.
 
 ---
 

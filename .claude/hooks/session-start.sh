@@ -32,6 +32,55 @@ if git rev-parse --git-dir >/dev/null 2>&1; then
   fi
 fi
 
+# 0.5) NASTĘPNY KROK na GÓRZE (A2 — uszczelnienie OTWARCIA 2026-07-19).
+#      Powód (luka L7): pełny wydruk hooka (~25 KB) ucinał podgląd w harnessie i plan
+#      „→ następny" z Dziennika wypadał poza pierwsze okno. Ta jedna linia u samej góry
+#      jest zawsze widoczna, zanim audyt/pamięć zaleją ekran.
+if [ -f imperium/biblioteki/dziennik_niesmiertelny.py ]; then
+  python -m imperium.biblioteki.dziennik_niesmiertelny nastepny || true
+fi
+
+# 0.6) PORTITOR — celnik u wrót: pre-flight środowiska (B1 — uszczelnienie OTWARCIA 2026-07-19).
+#      Lekki, BEZ SIECI, stdlib-only: Python + krytyczne deps (numpy/TA-Lib) + OBECNOŚĆ kluczy
+#      API (nigdy wartość) + świeżość danych + dryf vs baseline. Uzupełnia CENSOR SPRZĘTU
+#      (żelazo) i CENZUS ADAPTERÓW (sieć) — Prawo XVI. Non-blocking, zwięzły banner.
+if [ -f imperium/pretorianie/portitor.py ]; then
+  python -m imperium.pretorianie.portitor banner || true
+fi
+
+# 0.7) CENSOR SPRZĘTU — cenzus ŻELAZA na starcie (rozkaz Cezara 2026-07-20).
+#      Powód: Architekt twierdził w rozmowie „8 GB Fujitsu" Z PAMIĘCI, mając ten organ
+#      w kodzie — CENSOR mierzy 15.88 GB. Liczby o sprzęcie mają stać przed oczami ZANIM
+#      padnie jakakolwiek teza o wydajności (Prawo XVII: policzone, nie wspominane).
+if [ -f imperium/oczy/censor_sprzetu.py ]; then
+  python -c "from imperium.oczy.censor_sprzetu import banner; print(banner())" 2>/dev/null || true
+fi
+
+# 0.8) INDEX FALSORUM — czy obalone twierdzenie nie żyje dalej w korpusie jako fakt.
+if [ -f imperium/biblioteki/index_falsorum.py ]; then
+  python -m imperium.biblioteki.index_falsorum || true
+fi
+
+# 0.9) BREVIARIUM — zwięzły spis SŁUG Imperium (zarzut Cezara 2026-07-21).
+#      Powód: hook wołał 10 organów i ani jeden nie mówił, co robią HYGINUS i TIRO ani
+#      z jakich modeli korzystamy. Dwaj słudzy z osobnymi rozkazami i osobnymi kosztami
+#      byli na otwarciu niewidzialni — stan kolejki, plon czekający na sędziego, pary
+#      nauczyciela, modele na dysku trzeba było wygrzebywać ręcznie co sesję.
+if [ -f imperium/oczy/breviarium.py ]; then
+  # --migawka: drukuje meldunek I utrwala punkt odniesienia, żeby domknięcie wachty
+  # mogło pokazać RÓŻNICĘ (co ta sesja zmieniła), a nie tylko stan.
+  python -m imperium.oczy.breviarium --migawka || true
+fi
+
+# 0.10) LEX TALIONIS — dług honorowy NA OTWARCIU (zarzut Cezara 2026-07-21, potwierdzony).
+#       Powód: bilans not stał WYŁĄCZNIE w kroku 5b zamknięcia. Sesja urwana przed
+#       domknięciem zostawiała niespłacony dług, którego następne otwarcie NIE POKAZYWAŁO —
+#       czyli jedyny mechanizm pilnujący długu milkł dokładnie wtedy, gdy był potrzebny.
+#       Klasa znana: bramka widoczna tylko na jednym końcu procesu.
+if [ -f imperium/biblioteki/codex_notarum.py ]; then
+  python -m imperium.biblioteki.codex_notarum bilans || true
+fi
+
 # 1) Instalacja zależności — tylko w środowisku zdalnym (lokalnie masz swoje venv)
 if [ "${CLAUDE_CODE_REMOTE:-}" = "true" ]; then
   if [ -f requirements.txt ]; then
@@ -49,6 +98,14 @@ fi
 if [ -f narzedzia/audyt_spojnosci.py ]; then
   echo "[hook] KROK 0 — audyt spójności (Prawo XXI):"
   python narzedzia/audyt_spojnosci.py || true
+fi
+
+# 2b) CODEX PROBATIONUM — podsumowanie rejestru testów na starcie (C1 — 2026-07-19).
+#     Domyka asymetrię: CODEX był tylko w ZAMKNIĘCIU (krok 2 checklisty). Tanie — czyta
+#     ledger JSONL, NIE generuje Excela (ZASADA CODEX PROBATIONUM: czytany PRZED zadaniem).
+if [ -f narzedzia/codex_probationum.py ]; then
+  echo "[hook] CODEX PROBATIONUM (podsumowanie ledgera):"
+  python narzedzia/codex_probationum.py --podsumowanie || true
 fi
 
 # 3) CENTRUM PAMIĘCI (W-360 v5) — scored TOP-k lekcji (Generative Agents: recency×importance×relevance)
@@ -93,9 +150,10 @@ if [ -f narzedzia/auto_lekcja.py ]; then
 fi
 
 # 6) SKAN WAD KODU — heurystyczny łowca powtórek błędów z recenzji (Księga Wad Kodu).
-#    Non-blocking (|| true): pokazuje trafienia na zmienionych .py, nie wstrzymuje startu.
-#    To pamięć „co MOŻE pójść źle" — łapiemy sami to, co wcześniej łapał tylko cubic.
+#    Non-blocking (|| true). Na starcie skanuje OSTATNI COMMIT (A4 — 2026-07-19): skan
+#    zmienionych plików był no-op na czystym drzewie („brak plików"). Po SYNC pull łapie
+#    regresje w świeżo pociągniętym/zacommitowanym kodzie. Pełny skan zmian → pre-push.
 if [ -f narzedzia/skan_wad_kodu.py ]; then
-  echo "[hook] SKAN WAD KODU (Księga Wad Kodu):"
-  python narzedzia/skan_wad_kodu.py || true
+  echo "[hook] SKAN WAD KODU (ostatni commit — Księga Wad Kodu):"
+  python narzedzia/skan_wad_kodu.py --ostatni-commit || true
 fi

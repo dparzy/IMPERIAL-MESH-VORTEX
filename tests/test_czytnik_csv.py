@@ -182,7 +182,7 @@ def test_agregacja_4h_kompletne_okna():
     """Agregator 4H: OHLCV poprawne, niepełne okna odrzucone (Prawo I)."""
     import sys, os as _os
     sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), "..", "narzedzia"))
-    from agreguj_4h import agreguj_4h, CZTERY_H_MS
+    from agreguj_bary import agreguj_4h, CZTERY_H_MS
     h = 3600 * 1000
     # 4 pełne godziny od północy + 2 luźne (niepełne okno) → 1 bar 4H
     bary = [
@@ -236,8 +236,87 @@ def test_agregacja_4h_luka_w_srodku():
     """Luka godzinowa w środku okna → okno 3/4 odrzucone (granica kompletności)."""
     import sys, os as _os
     sys.path.insert(0, _os.path.join(_os.path.dirname(__file__), "..", "narzedzia"))
-    from agreguj_4h import agreguj_4h
+    from agreguj_bary import agreguj_4h
     h = 3600 * 1000
     bary = [{"timestamp": t*h, "open": 1, "high": 2, "low": 0.5, "close": 1.5,
              "volume": 1} for t in (0, 1, 3)]   # brak godziny 2
     assert agreguj_4h(bary) == []
+
+
+# ── ŚWIECA NIEDOMKNIĘTA — odcinanie u źródła (2026-07-20) ─────────────────────────
+
+def _plik_z_barami(tmpdir, znaczniki, interwal_kol="1h"):
+    """Buduje mini-CSV w formacie CryptoDataDownload z podanymi znacznikami (ms)."""
+    import os
+    p = os.path.join(tmpdir, f"Binance_TESTUSDT_{interwal_kol}.csv")
+    with open(p, "w", encoding="utf-8") as f:
+        f.write("https://test\n")
+        f.write("Unix,Date,Symbol,Open,High,Low,Close,Volume TEST,Volume USDT,tradecount\n")
+        for ts in sorted(znaczniki, reverse=True):      # CDD zapisuje MALEJĄCO
+            f.write(f"{ts},2026-01-01 00:00:00,TESTUSDT,100,110,90,105,10,1000,5\n")
+    return p
+
+
+def test_niedomknieta_swieca_odcieta():
+    """Bar, którego okres JESZCZE TRWA, ma niepełny wolumen — nie wolno go liczyć."""
+    import tempfile, time
+    from imperium.akwedukty.czytnik_csv import wczytaj_csv
+    teraz = int(time.time() * 1000)
+    biezacy = (teraz // 3_600_000) * 3_600_000      # świeca tej godziny — wciąż się formuje
+    poprzedni = biezacy - 3_600_000
+    p = _plik_z_barami(tempfile.mkdtemp(), [poprzedni, biezacy])
+    bary = wczytaj_csv(p, interwal="1h")
+    assert len(bary) == 1, "bieżąca (niedomknięta) świeca musi zostać odcięta"
+    assert bary[-1]["timestamp"] == poprzedni
+
+
+def test_domknieta_swieca_zostaje():
+    """Granica: bar, którego okres SIĘ SKOŃCZYŁ, zostaje nietknięty (nie tniemy historii)."""
+    import tempfile, time
+    from imperium.akwedukty.czytnik_csv import wczytaj_csv
+    teraz = int(time.time() * 1000)
+    zamkniety = (teraz // 3_600_000) * 3_600_000 - 3_600_000
+    p = _plik_z_barami(tempfile.mkdtemp(), [zamkniety - 3_600_000, zamkniety])
+    bary = wczytaj_csv(p, interwal="1h")
+    assert len(bary) == 2, "zamknięte bary muszą zostać"
+    assert bary[-1]["timestamp"] == zamkniety
+
+
+def test_dane_historyczne_nietkniete():
+    """Pliki historyczne (okres dawno zamknięty) — ZERO zmian zachowania."""
+    import tempfile
+    from imperium.akwedukty.czytnik_csv import wczytaj_csv
+    stare = [1_600_000_000_000, 1_600_003_600_000, 1_600_007_200_000]
+    p = _plik_z_barami(tempfile.mkdtemp(), stare)
+    assert len(wczytaj_csv(p, interwal="1h")) == 3
+
+
+def test_nieznany_interwal_nie_tnie():
+    """Prawo I: nie znamy długości okresu → NIE zgadujemy i niczego nie odcinamy."""
+    import tempfile, time
+    from imperium.akwedukty.czytnik_csv import wczytaj_csv
+    teraz = int(time.time() * 1000)
+    biezacy = (teraz // 3_600_000) * 3_600_000
+    p = _plik_z_barami(tempfile.mkdtemp(), [biezacy - 3_600_000, biezacy])
+    assert len(wczytaj_csv(p, interwal="")) == 2, "bez etykiety interwału nie tniemy"
+    assert len(wczytaj_csv(p, interwal="7h")) == 2, "nieznana etykieta nie tnie"
+
+
+def test_flaga_wylacza_odcinanie():
+    """Dźwignia ucieczki: pomin_niedomkniety=False przywraca stare zachowanie."""
+    import tempfile, time
+    from imperium.akwedukty.czytnik_csv import wczytaj_csv
+    teraz = int(time.time() * 1000)
+    biezacy = (teraz // 3_600_000) * 3_600_000
+    p = _plik_z_barami(tempfile.mkdtemp(), [biezacy - 3_600_000, biezacy])
+    assert len(wczytaj_csv(p, interwal="1h", pomin_niedomkniety=False)) == 2
+
+
+def test_etykieta_wielkosc_liter():
+    """Granica: '1H' i '1h' to ten sam interwał (mapa jest case-insensitive)."""
+    import tempfile, time
+    from imperium.akwedukty.czytnik_csv import wczytaj_csv
+    teraz = int(time.time() * 1000)
+    biezacy = (teraz // 3_600_000) * 3_600_000
+    p = _plik_z_barami(tempfile.mkdtemp(), [biezacy - 3_600_000, biezacy])
+    assert len(wczytaj_csv(p, interwal="1H")) == 1, "'1H' musi działać jak '1h'"

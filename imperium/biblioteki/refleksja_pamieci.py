@@ -203,8 +203,17 @@ def wykryj_sprzecznosci(limit: int = 20,
 
 def wykryj_przedawnienia(dni: int = 21, limit: int = 20) -> List[Dict[str, Any]]:
     """
-    Otwarte pomysły/plany (POMYSŁ/PLANOWANE) starsze niż `dni` bez późniejszego
-    śladu realizacji na tych samych tematach → „wisi, zdecyduj" (rób/odrzuć/odłóż).
+    Otwarte pomysły/plany (POMYSŁ/PLANOWANE/ZAWIESZONA) starsze niż `dni` bez
+    późniejszego śladu realizacji na tych samych tematach → „wisi, zdecyduj".
+
+    ZAWIESZONA liczy wiek od DATY DECYZJI (`data_statusu`), nie od utworzenia wpisu.
+    Powód (zmierzone 2026-07-20): wpis odłożony świadomie wracał jako „⏳ wisi,
+    zdecyduj" natychmiast po zapadnięciu decyzji, bo jego `data` była sprzed tygodni.
+    Alarmu nie dało się wyciszyć decyzją — jedynie wdrożeniem albo skasowaniem wpisu.
+    Alarm, którego nie można wyciszyć, uczy ignorowania alarmów; to ta sama klasa co
+    bramka o zbyt wąskim zasięgu. Odłożenie jest teraz respektowane przez pełne okno
+    `dni`, po czym pomysł wraca do przeglądu — parkowanie, nie kasowanie (ZASADA
+    anty-utrwalania: Refleksja tylko zgłasza, decyduje Cezar).
     """
     try:
         from imperium.biblioteki import rejestr_wizji as _rw
@@ -218,8 +227,11 @@ def wykryj_przedawnienia(dni: int = 21, limit: int = 20) -> List[Dict[str, Any]]
         if status not in ("POMYSŁ", "POMYSL", "PLANOWANE", "ZAWIESZONA"):
             continue
         data = w.get("data", "")
+        # Odłożenie liczymy od decyzji; pomysł/plan — od powstania (brak pola u
+        # starych wpisów → fallback na `data`, czyli zachowanie sprzed zmiany).
+        data_odniesienia = w.get("data_statusu") if status == "ZAWIESZONA" else None
         try:
-            wiek = _dzis_ord() - date.fromisoformat(data).toordinal()
+            wiek = _dzis_ord() - date.fromisoformat(data_odniesienia or data).toordinal()
         except (ValueError, TypeError):
             continue
         if wiek < dni:

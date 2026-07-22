@@ -13,6 +13,8 @@ Zasady:
 
 import os
 import logging
+from typing import Optional
+
 from openai import OpenAI  # DeepSeek kompatybilny z OpenAI
 
 logger = logging.getLogger("GlosImperium")
@@ -67,9 +69,16 @@ class GlosImperium:
             base_url="https://api.deepseek.com/v1",
         )
         self.model = model
+        # Ustawiane po KAŻDYM udanym wywołaniu (patrz zapytaj). None = jeszcze nie pytano
+        # albo API nie podało zużycia — mierzący ma odróżnić „brak danych" od „zero kosztu".
+        self.ostatnie_zuzycie = None
+        self.ostatni_model: Optional[str] = None
         logger.info(f"[GlosImperium] Zainicjalizowany. Model: {self.model}")
 
-    def zapytaj(self, system_prompt: str, tresc: str, temperatura: float = 0.7) -> str:
+    def zapytaj(self, system_prompt: str, tresc: str, temperatura: float = 0.7,
+                profil: Optional[str] = None, model: Optional[str] = None,
+                thinking: Optional[dict] = None,
+                reasoning_effort: Optional[str] = None) -> str:
         """
         Wysyła pytanie do DeepSeek. Zwraca odpowiedź jako string.
 
@@ -78,35 +87,75 @@ class GlosImperium:
         łapie WSZYSTKICH wołających (newsy, auto-lekcje, zwiad) — bez zmian u nich.
         Zapis jest czysto obserwacyjny: nie dotyka ścieżki decyzyjnej i NIGDY nie może
         wywrócić wywołania API (patrz `notarius` — żelazna zasada).
+
+        DOBÓR GŁĘBOKOŚCI PER WYWOŁANIE (2026-07-21, rozkaz o rozbudowie Hyginusa):
+        `profil` oddaje decyzję DISPENSATOROWI (Szafarzowi) — „zwiad" kupuje objętość tanio,
+        „osad" kupuje premium reasoning. Jawne `model`/`thinking`/`reasoning_effort`
+        NADPISUJĄ profil, bo wołający wie więcej niż tabela. Bez żadnego z tych argumentów
+        zachowanie jest IDENTYCZNE jak przed zmianą — model z `__init__`, zero dodatkowych
+        pól w żądaniu (wsteczna zgodność: wszyscy dotychczasowi wołający nie widzą różnicy).
+
+        Parametry niestandardowe idą przez `extra_body`, bo `thinking` nie należy do
+        schematu OpenAI. Błąd API celowo NIE jest łykany: cicho zignorowany tryb oznaczałby
+        płacenie za rozumowanie, którego nie dostajemy (albo odwrotnie) — a to dokładnie
+        klasa „mechanizm, który przy awarii wygląda na sprawny".
         """
+        param: dict = {}
+        if profil is not None:
+            from imperium.cesarz.dispensator import dobierz
+            param.update(dobierz(profil))
+        if model is not None:
+            param["model"] = model
+        if thinking is not None:
+            param["thinking"] = thinking
+        if reasoning_effort is not None:
+            param["reasoning_effort"] = reasoning_effort
+
+        # Model FAKTYCZNIE użyty — nie ten z __init__. Bez tego NOTARIUS opisywałby pary
+        # nauczyciela cudzą nazwą, a TIRO uczyłby się z metryką wskazującą inny model.
+        uzyty_model = param.pop("model", self.model)
+        extra = {k: v for k, v in param.items() if v is not None}
+
         try:
             odp = self.client.chat.completions.create(
-                model=self.model,
+                model=uzyty_model,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": tresc},
                 ],
                 temperature=temperatura,
+                **({"extra_body": extra} if extra else {}),
             )
             odpowiedz = odp.choices[0].message.content
+            # ZUŻYCIE OSTATNIEGO WYWOŁANIA — bez tego DISPENSATOR.koszt_usd nie miał czym
+            # liczyć: cennik i wzór istniały, a FAKTYCZNE `usage` szło do kosza, więc koszt
+            # profilu dało się wyłącznie oszacować (Prawo XV: zdolność zbudowana, niekarmiona).
+            # Świadomie jako STAN INSTANCJI, nie zmiana typu zwracanego: żaden z dotychczasowych
+            # wołających nie widzi różnicy (wsteczna zgodność), a mierzący ma dostęp do prawdy.
+            self.ostatnie_zuzycie = getattr(odp, "usage", None)
+            self.ostatni_model = uzyty_model
         except Exception as e:
-            logger.error(f"[GlosImperium] Błąd API: {e}")
+            logger.error(f"[GlosImperium] Błąd API (model={uzyty_model}, tryb={extra}): {e}")
             raise
 
-        self._protokoluj(system_prompt, tresc, odpowiedz, temperatura)
+        self._protokoluj(system_prompt, tresc, odpowiedz, temperatura, uzyty_model)
         return odpowiedz
 
-    def _protokoluj(self, system_prompt: str, tresc: str,
-                    odpowiedz: str, temperatura: float) -> None:
+    def _protokoluj(self, system_prompt: str, tresc: str, odpowiedz: str,
+                    temperatura: float, model: Optional[str] = None) -> None:
         """
         Oddaj parę pisarzowi (TIRO/E2). Świadomie łykamy KAŻDY wyjątek, łącznie z ImportError:
         gdyby organu zabrakło albo dysk odmówił, nauczyciel ma mówić dalej. Protokół jest
         dodatkiem do mowy, nigdy jej warunkiem.
+
+        `model` to model FAKTYCZNIE użyty w tym wywołaniu (może różnić się od `self.model`,
+        odkąd DISPENSATOR dobiera go per zadanie). Etykieta nauczyciela musi zgadzać się
+        z tym, kto naprawdę mówił — inaczej TIRO uczy się z fałszywym opisem źródła.
         """
         try:
             from imperium.biblioteki.notarius import zapisz_pare
             zapisz_pare(system_prompt=system_prompt, tresc=tresc, odpowiedz=odpowiedz,
-                        model=self.model, temperatura=temperatura)
+                        model=model or self.model, temperatura=temperatura)
         except Exception as e:  # noqa: BLE001 — awaria pisarza ≠ awaria mostu
             logger.warning(f"[GlosImperium] Notarius nie zapisał pary: {e}")
 

@@ -156,6 +156,12 @@ def zmien_status(tytul: str, nowy_status: str,
     for w in wpisy:
         if w.get("tytul", "").lower() == tytul.lower():
             w["status"] = nowy_status
+            # KIEDY zapadła decyzja — bez tego Refleksja (W9) liczyła wiek wpisu
+            # ZAWIESZONEGO od jego UTWORZENIA, więc świeżo podjęta decyzja „odłóż"
+            # natychmiast wracała jako „⏳ wisi, zdecyduj". Alarmu nie dawało się
+            # wyciszyć decyzją — a alarm, którego nie można wyciszyć, uczy ignorowania
+            # alarmów (zmierzone 2026-07-20: wpis zamknięty rano nadal nagabywał).
+            w["data_statusu"] = date.today().isoformat()
             zmieniono = True
             break
     if zmieniono:

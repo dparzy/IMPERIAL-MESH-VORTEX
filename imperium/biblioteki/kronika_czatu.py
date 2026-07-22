@@ -32,8 +32,24 @@ from typing import List, Dict, Iterator
 ROOT = Path(__file__).resolve().parent.parent.parent
 CEL_DOMYSLNY = ROOT / "bibliotheca_ulpia" / "dane" / "kronika"
 
-# Katalog transkryptów Claude Code dla TEGO projektu (ścieżka = repo z '/' → '-').
-_SLUG = str(ROOT).replace("/", "-")
+# Katalog transkryptów Claude Code dla TEGO projektu: ścieżka repo, w której KAŻDY
+# separator i dwukropek dysku staje się '-' (np. C:\Projekty\x → 'C--Projekty-x').
+#
+# BUG NAPRAWIONY 2026-07-20 (pytanie Cezara „czemu hook nie odpalił"): było
+# `str(ROOT).replace("/", "-")` — na Windowsie ROOT ma BACKSLASHE i dwukropek dysku,
+# więc podmiana '/' nie robiła NIC, a `_SLUG` zostawał ścieżką ABSOLUTNĄ. `pathlib`
+# przy sklejaniu ze ścieżką absolutną kasuje wszystko przed nią, więc źródło
+# transkryptów wskazywało… katalog projektu. Katalog istniał, więc nie było wyjątku —
+# była pogodna informacja „0 sesji". Kronika czatu (W3b) była ŚLEPA przez całą erę
+# lokalną: 26 transkryptów nigdy nie trafiło do archiwum (Prawo IX: nic nie ginie).
+# W chmurze (Linux, separator '/') slug wychodził poprawnie PRZYPADKIEM — dlatego
+# 102 sesje w kronice pochodzą sprzed przeprowadzki na lokal.
+def _slug_projektu(sciezka: Path) -> str:
+    """Ścieżka repo → nazwa katalogu transkryptów Claude Code (POSIX i Windows)."""
+    return str(sciezka).replace(":", "-").replace("\\", "-").replace("/", "-")
+
+
+_SLUG = _slug_projektu(ROOT)
 ZRODLO_DOMYSLNE = Path.home() / ".claude" / "projects" / _SLUG
 
 # Redakcja sekretów (Prawo Bezpieczeństwa: klucze NIGDY w repo). Wzorce typowych kluczy.
@@ -98,6 +114,31 @@ def _na_markdown(dialog: List[Dict[str, str]], id_sesji: str) -> str:
 def _pliki_zrodlowe(zrodlo: Path) -> Iterator[Path]:
     if zrodlo.exists():
         yield from sorted(zrodlo.glob("*.jsonl"))
+
+
+def diagnoza_zrodla(zrodlo: Path = ZRODLO_DOMYSLNE) -> str:
+    """Pusty wynik = ŹRÓDŁO ZDROWE. Niepusty = opis awarii do wydrukowania GŁOŚNO.
+
+    UODPORNIENIE KLASY (2026-07-20): sam bug ścieżki był banalny — groźna była CISZA.
+    Zły katalog istniał, więc eksport meldował pogodne „0 sesji" zamiast alarmu i
+    kronika była ślepa przez całą erę lokalną. Licznik, który przy awarii pokazuje
+    zero zamiast krzyczeć, jest gorszy niż wyjątek: wygląda jak spokój.
+
+    Dlatego pytamy WPROST o dwie rzeczy, których zero-w-liczniku nie odróżnia:
+    czy katalog źródłowy w ogóle wygląda na katalog transkryptów, i czy są w nim
+    jakiekolwiek transkrypty.
+    """
+    if not zrodlo.exists():
+        return (f"🚨 KRONIKA ŚLEPA: katalog transkryptów nie istnieje: {zrodlo}\n"
+                f"   Oczekiwany układ: ~/.claude/projects/{_SLUG}/*.jsonl")
+    if not any(zrodlo.glob("*.jsonl")):
+        oczekiwany = Path.home() / ".claude" / "projects" / _SLUG
+        wsk = ""
+        if zrodlo.resolve() != oczekiwany.resolve() and any(oczekiwany.glob("*.jsonl")):
+            wsk = f"\n   Transkrypty leżą w: {oczekiwany} — źródło wskazuje gdzie indziej."
+        return (f"🚨 KRONIKA ŚLEPA: zero transkryptów .jsonl w {zrodlo}{wsk}\n"
+                "   Dialog sesji NIE jest archiwizowany (Prawo IX: nic nie ginie).")
+    return ""
 
 
 def eksportuj(zrodlo: Path = ZRODLO_DOMYSLNE, cel: Path = CEL_DOMYSLNY,
@@ -240,6 +281,9 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     if args.cmd == "eksportuj":
+        awaria = diagnoza_zrodla()
+        if awaria:
+            print(awaria)   # GŁOŚNO przed statystyką — zero w liczniku to nie spokój
         s = eksportuj(tylko_nowe=not args.wszystko)
         print(f"📜 Kronika: {s['zapisane']} zapisane, {s.get('zaktualizowane', 0)} zaktualizowane, "
               f"{s['pominiete']} pominięte, {s['wiadomosci']} wiadomości z {s['sesje']} sesji.")

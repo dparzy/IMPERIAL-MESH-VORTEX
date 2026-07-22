@@ -137,6 +137,64 @@ def test_przedawnienie_zrealizowany_nie_wisi(monkeypatch, tmp_path):
     assert rp.wykryj_przedawnienia(dni=21) == []
 
 
+def test_zawieszenie_wycisza_alarm_od_daty_decyzji(monkeypatch, tmp_path):
+    """GRANICA: świeżo ZAWIESZONY stary wpis NIE wisi — alarm da się wyciszyć decyzją.
+
+    Bug (2026-07-20): wiek liczono od `data` (utworzenia), więc wpis odłożony DZIŚ,
+    a założony 24 dni temu, natychmiast wracał jako „⏳ wisi, zdecyduj". Alarmu nie
+    dało się wyciszyć decyzją — a taki alarm uczy ignorowania alarmów.
+    """
+    from datetime import date
+
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    rw.dodaj("POMYSŁ", "Wektory semantyczne delta epsilon", "opis", plik=plik,
+             data="2026-01-01")
+    monkeypatch.setattr(rw, "PLIK_DOMYSLNY", plik)
+    monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [])
+
+    assert rp.wykryj_przedawnienia(dni=21), "przed decyzją wpis MA wisieć"
+
+    rw.zmien_status("Wektory semantyczne delta epsilon", "ZAWIESZONA", plik=plik)
+    wpis = rw.wszystkie(plik=plik)[0]
+    assert wpis["data_statusu"] == date.today().isoformat(), "decyzja musi być datowana"
+    assert rp.wykryj_przedawnienia(dni=21) == [], "po decyzji alarm milknie"
+
+
+def test_zawieszenie_wraca_do_przegladu_po_oknie(monkeypatch, tmp_path):
+    """GRANICA druga: odłożenie to PARKOWANIE, nie kasowanie — po oknie wraca.
+
+    Bez tego naprawa zamieniłaby jeden błąd (nie da się wyciszyć) na gorszy
+    (wyciszenie na zawsze — pomysł ginie po cichu, złamanie Prawa XV).
+    """
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    rw.dodaj("POMYSŁ", "Parkowany pomysł zeta eta", "opis", plik=plik, data="2026-01-01")
+    monkeypatch.setattr(rw, "PLIK_DOMYSLNY", plik)
+    monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [])
+    rw.zmien_status("Parkowany pomysł zeta eta", "ZAWIESZONA", plik=plik)
+
+    # Decyzja sprzed 40 dni → okno 21 dni minęło, pomysł wraca do przeglądu.
+    wpisy = rw.wszystkie(plik=plik)
+    wpisy[0]["data_statusu"] = "2026-06-01"
+    rw._nadpisz(wpisy, plik)
+    assert rp.wykryj_przedawnienia(dni=21), "zaparkowany pomysł musi wrócić po oknie"
+
+
+def test_stary_wpis_bez_daty_statusu_zachowuje_sie_jak_dawniej(monkeypatch, tmp_path):
+    """Wsteczna zgodność: wpisy sprzed zmiany nie mają `data_statusu` → fallback na `data`."""
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    rw.dodaj("POMYSŁ", "Wpis archaiczny theta jota", "opis", plik=plik, data="2026-01-01")
+    wpisy = rw.wszystkie(plik=plik)
+    wpisy[0]["status"] = "ZAWIESZONA"      # zawieszony PRZED wprowadzeniem pola
+    wpisy[0].pop("data_statusu", None)
+    rw._nadpisz(wpisy, plik)
+    monkeypatch.setattr(rw, "PLIK_DOMYSLNY", plik)
+    monkeypatch.setattr(rp, "_wpisy_statusowe", lambda: [])
+    assert rp.wykryj_przedawnienia(dni=21), "brak pola → wiek od utworzenia (jak dawniej)"
+
+
 def test_anti_utrwalanie_brak_metod_kasujacych():
     """Trustworthy reflection: moduł NIE ma metod kasujących/nadpisujących pamięć."""
     for nazwa in dir(rp):

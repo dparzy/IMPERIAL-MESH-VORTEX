@@ -66,7 +66,8 @@ python imperium/legiony/pierwszy_zwiadowca.py
 - **Instrumenty:** BTC/USDT *(tylko)*
 - **Tryb:** Paper trading ONLY — żadnego prawdziwego kapitału
 - **Giełda:** MEXC (primary, verified)
-- **Obliczenia ciężkie:** przez API, nie lokalnie (Fujitsu, 8GB RAM)
+- **Obliczenia ciężkie:** przez API, nie lokalnie (Fujitsu 15.88 GB RAM / 4 wątki / brak CUDA —
+  klasa PEDES, zmierzone `censor_sprzetu.py`; ogranicza CPU i brak GPU, nie pamięć)
 
 ---
 

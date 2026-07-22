@@ -46,6 +46,18 @@ def test_raport_za_malo_obserwacji():
     assert "za mało" in out.lower() or "RAPORT WAŻNOŚCI" in out
 
 
+def test_raport_waznosci_odrzuca_niezrownane_serie():
+    """Niezgodne długości sygnały/wyniki = rozjechana etykieta forward → skażone MDA/SFI.
+    Ma krzyczeć (jak bliźniak legatus.oblicz_wagi_ic, cubic P2), nie cicho ucinać min().
+    Wcześniej `min()` obcinał do krótszej serii bez ostrzeżenia."""
+    import pytest
+    from imperium.legiony.feature_importance import raport_waznosci
+    sygnaly = [{"X-01": "LONG"}] * 40
+    wyniki = [1] * 30  # o 10 krótsze — rozjazd
+    with pytest.raises(ValueError, match="tę samą długość"):
+        raport_waznosci(sygnaly, wyniki)
+
+
 def test_do_areny_zapisuje_mda(tmp_path, monkeypatch):
     """--do-areny zapisuje MDA per neuron do bazy (na sztucznym raporcie)."""
     import narzedzia.raport_waznosci as rw

@@ -61,3 +61,29 @@ def test_komentarze_i_puste_linie_pomijane():
 def test_brak_obu_markerow_daje_puste_zbiory():
     _srodowisko()
     assert al._wczytaj_przetworzone() == (set(), set())
+
+
+# ── Bramka taryfy szczytowej (2026-07-21) ────────────────────────────────────────
+
+def _utc(godzina):
+    from datetime import datetime, timezone
+    return datetime(2026, 7, 21, godzina, 0, tzinfo=timezone.utc)
+
+
+def test_odklada_analize_w_oknie_podwojnej_stawki():
+    """W szczycie hook NIE płaci 2× za analizę zakończonych sesji — odkłada ją.
+
+    Zmierzone 2026-07-21 na rachunku DeepSeeka: 22 wywołania w oknach szczytu, wszystkie
+    z hooka startowego (06:00–10:00 UTC = 08:00–12:00 u Cezara, czyli typowy poranek)."""
+    from narzedzia.auto_lekcja import powod_odlozenia
+    for h in (2, 7, 9):
+        assert powod_odlozenia(kiedy=_utc(h)), f"{h}:00 UTC — powinno odłożyć"
+    for h in (0, 5, 11, 16, 22):
+        assert powod_odlozenia(kiedy=_utc(h)) == "", f"{h}:00 UTC — nie ma powodu odkładać"
+
+
+def test_wymuszenia_omijaja_bramke_szczytu():
+    """Kto MUSI mieć lekcję teraz, płaci świadomie — obie furtki działają w szczycie."""
+    from narzedzia.auto_lekcja import powod_odlozenia
+    assert powod_odlozenia(takze_w_szczycie=True, kiedy=_utc(8)) == ""
+    assert powod_odlozenia(wymuszona_sesja="abc123", kiedy=_utc(8)) == ""

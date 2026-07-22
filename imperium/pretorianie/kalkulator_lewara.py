@@ -389,6 +389,13 @@ class KalkulatorLewara:
         kierunek = kierunek.upper()
         assert kierunek in ("LONG", "SHORT"), "kierunek musi być LONG lub SHORT"
 
+        # Cena wejścia musi być dodatnia — inaczej stop_pct = |cena−stop|/cena dzieli przez
+        # zero głęboko w środku (krok 5). Jawny błąd u wrót > kryptyczny ZeroDivisionError
+        # 4 linie niżej (fail-loud). Produkcja podaje realną cenę >0; guard chroni przed
+        # bezpośrednim/przyszłym wywołaniem z pominięciem dyrygenta.
+        if cena_wejscia <= 0:
+            raise ValueError(f"cena_wejscia musi być > 0 (dostała {cena_wejscia})")
+
         # 1. Dźwignia dynamiczna (jeśli nie podana = auto)
         if dzwignia <= 0:
             dzwignia = self.auto_dzwignia(pewnosc, rezim)
@@ -421,8 +428,12 @@ class KalkulatorLewara:
                 sl_atr = cena_wejscia + sl_atr_mult * atr
                 stop_loss = min(stop_loss, sl_atr)
 
-        # 4. Bufor bezpieczeństwa
-        odl_sl_od_lik = abs(likwidacja - stop_loss) / abs(cena_wejscia - likwidacja)
+        # 4. Bufor bezpieczeństwa. Mianownik |cena−likwidacja| zbiega do zera przy skrajnej
+        # dźwigni (np. 200×: 1/dźwignia == OPŁATA_UTRZYMANIA, likwidacja == cena wejścia).
+        # Guard: brak odległości do likwidacji = zerowy bufor (pozycja natychmiast likwidowalna),
+        # a nie ZeroDivisionError. Checklist i tak odrzuci dźwignię > 20 (plan.checklist_ok=False).
+        odl_do_likwidacji = abs(cena_wejscia - likwidacja)
+        odl_sl_od_lik = abs(likwidacja - stop_loss) / odl_do_likwidacji if odl_do_likwidacji > 0 else 0.0
         bufor_pct = round(odl_sl_od_lik * 100, 1)
 
         # 5. Rozmiar pozycji (max ryzyko)

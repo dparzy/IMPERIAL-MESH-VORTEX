@@ -117,3 +117,39 @@ def test_os_czasu_toleruje_co_nie_string():
     wpisy += [_wpis(i) for i in range(8)]
     out = dn.os_czasu(_plik(wpisy), ostatnie=8)
     assert "42" in out          # liczba pokazana jako tekst, bez wyjątku
+
+
+# ── banner_nastepny (A2 — banner NASTĘPNEGO KROKU na górze startu) ─────────────
+
+def test_banner_pusty_dziennik():
+    """Granica: brak wpisów → komunikat o pustym Dzienniku, nie wyjątek."""
+    b = dn.banner_nastepny(_plik([]))
+    assert "NASTĘPNY KROK" in b and "pusty" in b
+
+
+def test_banner_z_nastepnym():
+    """Banner pokazuje treść „nastepny" ostatniego wpisu + jego sesję."""
+    wpisy = [_wpis(0), {"data": "2026-07-19", "sesja": "abc123",
+                        "co": ["x"], "nastepny": "uruchomić realny WFO na BTCUSDT 4h"}]
+    b = dn.banner_nastepny(_plik(wpisy))
+    assert "uruchomić realny WFO na BTCUSDT 4h" in b and "abc123" in b
+
+
+def test_banner_brak_pola_nastepny():
+    """Granica: ostatni wpis bez „nastepny" (albo puste) → jawny znacznik, nie crash."""
+    b = dn.banner_nastepny(_plik([{"data": "2026-07-19", "sesja": "s", "co": ["x"]}]))
+    assert "brak" in b.lower()
+
+
+def test_banner_toleruje_nastepny_nie_string():
+    """Odporność jak reszta osi: „nastepny" nie-tekst (liczba/None) nie wywala startu."""
+    b = dn.banner_nastepny(_plik([{"data": "2026-07-19", "sesja": "s",
+                                   "co": ["x"], "nastepny": 42}]))
+    assert "42" in b
+
+
+def test_banner_jednolinijkowy():
+    """Banner MUSI być jedną linią (idzie na górę startu) — długi „nastepny" przycięty."""
+    b = dn.banner_nastepny(_plik([{"data": "2026-07-19", "sesja": "s",
+                                   "co": ["x"], "nastepny": "Z" * 500}]))
+    assert "\n" not in b and "…" in b

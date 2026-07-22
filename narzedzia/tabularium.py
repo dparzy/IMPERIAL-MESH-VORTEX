@@ -73,6 +73,13 @@ POLA_WYMAGANE = ("kategoria", "typ", "wlasciciel", "stan_na", "powod_istnienia")
 POZA_REJESTREM = ("archiwum", "bibliotheca_ulpia", "wrzutnia", ".claude", "dane",
                   ".git", ".pytest_cache", "node_modules", "__pycache__")
 
+# Żywe DROGOWSKAZY spoza rejestru organów, których LICZBY mają jednak nadążać za kodem.
+# `bibliotheca_ulpia/README.md` jest w POZA_REJESTREM (historia — nie tykamy T1/T2 bez
+# frontmatter), ALE podaje liczbę ksiąg, która gniła niezauważona (69 przy 115, wstyd
+# Cezara 2026-07-21 — żadna bramka jej nie pilnowała). Wpinamy TYLKO w warstwę liczb (T4),
+# nie w T1/T2 — blok `<!-- LICZBA:ksiazki -->` jest teraz przepisywany i audytowany.
+DROGOWSKAZY_Z_LICZBAMI = ("bibliotheca_ulpia/README.md",)
+
 ZNACZNIK_START = "<!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->"
 ZNACZNIK_KONIEC = "<!-- TABULARIUM:koniec -->"
 
@@ -119,7 +126,7 @@ def wartosci_z_kodu():
     )
     from imperium.legiony.strategie.rejestr_strategii import wszystkie_strategie
     neurony = wszystkie_neurony()
-    return {
+    wartosci = {
         "neurony": len(neurony),
         "neurony_aktywne": len([n for n in neurony if getattr(n, "DOSTEPNY", True)]),
         "zwiadowcy": len(wszyscy_zwiadowcy()),
@@ -138,6 +145,19 @@ def wartosci_z_kodu():
         "ksiazki": ksiazki_w_bazie(),
         "fragmenty": fragmenty_w_bazie(),
     }
+    # Liczba plików .py per organ (mapa README/ARCHITEKTURA — była ręczna i rozjechała
+    # się z kodem: legiony podawane jako 40 przy 67 realnych, 2026-07-19). Wstrzykiwana,
+    # żeby schemat Imperium nigdy więcej nie kłamał o własnej wielkości (Warstwa 15).
+    organy = os.path.join(ROOT, "imperium")
+    if os.path.isdir(organy):
+        for nazwa in sorted(os.listdir(organy)):
+            folder = os.path.join(organy, nazwa)
+            if not os.path.isdir(folder):
+                continue
+            ile = sum(1 for _r, _d, pliki in os.walk(folder)
+                      for p in pliki if p.endswith(".py"))
+            wartosci[f"organ_{nazwa}"] = ile
+    return wartosci
 
 
 def wstrzyknij_liczby(sucho=False):
@@ -150,7 +170,12 @@ def wstrzyknij_liczby(sucho=False):
     """
     wartosci = wartosci_z_kodu()
     zmiany, bledy = [], []
-    for sciezka, meta in zbierz_dokumenty():
+    dokumenty = list(zbierz_dokumenty())
+    # Dołącz żywe drogowskazy spoza rejestru (np. README biblioteki) — tylko warstwa liczb.
+    for wzgl in DROGOWSKAZY_Z_LICZBAMI:
+        if os.path.exists(os.path.join(ROOT, wzgl)):
+            dokumenty.append((wzgl, {}))
+    for sciezka, meta in dokumenty:
         if meta.get("typ") == "acta":
             continue
         pelna = os.path.join(ROOT, sciezka)

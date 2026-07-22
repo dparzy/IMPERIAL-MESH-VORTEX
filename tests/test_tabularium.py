@@ -503,3 +503,31 @@ def test_zapisz_katalog_podmienia_tylko_sekcje():
         assert "stara treść" not in nowa, "Sekcja generowana musi zostać podmieniona"
     finally:
         os.unlink(sciezka)
+
+
+# ── DROGOWSKAZY_Z_LICZBAMI: README biblioteki wpięty w warstwę liczb (2026-07-21) ──
+
+def test_readme_biblioteki_objety_liczbami_mimo_poza_rejestrem():
+    """bibliotheca_ulpia jest w POZA_REJESTREM (T1/T2), ale README biblioteki podaje liczbę
+    ksiąg, która gniła niezauważona (69 przy 115, wstyd Cezara). DROGOWSKAZY_Z_LICZBAMI
+    wpina go w warstwę liczb — tabularium MUSI wykryć rozjazd bloku LICZBA:ksiazki."""
+    import narzedzia.tabularium as tab
+    assert "bibliotheca_ulpia/README.md" in tab.DROGOWSKAZY_Z_LICZBAMI
+    # README biblioteki realnie ma blok LICZBA:ksiazki i jest zgodny (audyt W15 zielony).
+    zmiany, bledy = tab.wstrzyknij_liczby(sucho=True)
+    # sucho=True nie zapisuje; brak zmian = zgodność, ale README MUSI być w polu widzenia:
+    dokumenty = list(tab.zbierz_dokumenty())
+    for wzgl in tab.DROGOWSKAZY_Z_LICZBAMI:
+        if __import__("os").path.exists(__import__("os").path.join(tab.ROOT, wzgl)):
+            dokumenty.append((wzgl, {}))
+    assert any(s == "bibliotheca_ulpia/README.md" for s, _ in dokumenty)
+    assert not bledy, f"nieznane klucze liczb: {bledy}"
+
+
+def test_drogowskaz_nie_wchodzi_do_t1_t2():
+    """Drogowskaz bez frontmatter NIE może trafić do T1/T2 (wymagają nagłówka) — tylko liczby.
+    zbierz_dokumenty (baza T1/T2) pomija bibliotheca_ulpia całkowicie."""
+    import narzedzia.tabularium as tab
+    bazowe = [s for s, _ in tab.zbierz_dokumenty()]
+    assert not any(s.startswith("bibliotheca_ulpia/") for s in bazowe), \
+        "bibliotheca_ulpia nie może wejść do bazy T1/T2 (POZA_REJESTREM)"

@@ -535,7 +535,83 @@ def audyt() -> tuple:
     bledy += w16_bledy
     info += w16_info
 
+    # ── WARSTWA 17: CENSUS ORGANORUM — każdy moduł kodu musi być zameldowany ──
+    w17_bledy, w17_info = _warstwa_17_census_organorum()
+    bledy += w17_bledy
+    info += w17_info
+
+    # ── WARSTWA 18: LEX TALIONIS — zatwierdzony błąd musi mieć kompensujący unikat ──
+    w18_bledy, w18_info = _warstwa_18_dlug_honorowy()
+    bledy += w18_bledy
+    info += w18_info
+
     return bledy, info
+
+
+def _warstwa_18_dlug_honorowy(sciezka=None):
+    """W18 — niespłacony dług honorowy (LEX TALIONIS) zatrzymuje commit.
+
+    Powód (zwiad adwersarialny 2026-07-21, decyzja Cezara): bilans not był najpierw
+    sprawdzany WYŁĄCZNIE w kroku 5b zamknięcia sesji, potem — po pierwszej naprawie —
+    również drukowany na otwarciu. Ale drukowanie to WIDOCZNOŚĆ, nie EGZEKWOWALNOŚĆ:
+    `codex_notarum bilans` nie zwracał niezerowego kodu, a hook wołał go z `|| true`.
+    Dług otwarty w sesji N mógł więc przeżyć N+1 i N+2, mimo że zasada mówi wprost:
+    „sesja nie domyka się z niespłaconym długiem honorowym".
+
+    Bramka TWARDA (decyzja Cezara), tak jak W17. Miękki alarm odrzucony świadomie —
+    to ten sam mechanizm, który u nas zawiódł już dwa razy (wąska Warstwa 11 przy
+    „pełnej harmonii", alarm W9 wiszący przez sesje). Alarm, którego wolno nie
+    posłuchać, prędzej czy później nie zostaje posłuchany.
+
+    Zakleszczenia nie ma: dług spłaca się dopisaniem CORONY do ledgera, co nie wymaga
+    commitu — więc bramka nigdy nie blokuje własnej naprawy.
+
+    `sciezka` istnieje, żeby bramkę dało się SPRAWDZIĆ na sztucznym ledgerze. Bez tego
+    dowód „czy gryzie" był niewykonalny: `bilans(sciezka=LEDGER)` wiąże domyślny argument
+    w chwili definicji, więc podmiana stałej modułu NIE ma wpływu — pierwsza wersja mojego
+    dowodu po cichu czytała prawdziwy ledger i meldowała zieleń dla sztucznego długu.
+    Klasa: skrypt weryfikujący, który mierzy co innego, niż deklaruje.
+    """
+    try:
+        from imperium.biblioteki.codex_notarum import bilans
+        b = bilans(sciezka) if sciezka is not None else bilans()
+        dlug = b.get("dlug_honorowy") or []
+        if not dlug:
+            return [], [f"LEX TALIONIS (W18): dług honorowy 0 — {b['noty']} not, "
+                        f"{b['korony']} koron ✅"]
+        opisy = "; ".join(str(n.get("opis", "?"))[:80] for n in dlug[:3])
+        return [f"[W18] DŁUG HONOROWY: {len(dlug)} zatwierdzonych błędów bez kompensującego "
+                f"unikatu (LEX TALIONIS). Dostarcz CORONĘ zanim commitujesz: {opisy}"], []
+    except Exception as e:  # noqa: BLE001 — awaria ledgera nie może wywrócić audytu
+        return [f"[W18] Błąd odczytu CODEX NOTARUM: {e}"], []
+
+
+def _warstwa_17_census_organorum():
+    """W17 — każdy moduł `imperium/` i `narzedzia/` musi być w CENSUS_ORGANORUM.
+
+    Powód (zmierzone 2026-07-20, zarzut Cezara): Warstwa 11 pilnowała meldunku
+    WYŁĄCZNIE dla `imperium/biblioteki/` — 1 katalog z 11. Dlatego
+    `imperium/cesarz/dispensator.py` (152 linie + testy) przeżył całą sesję nie
+    występując w ŻADNYM dokumencie, a audyt meldował „✅ pełna harmonia". Łącznie
+    19 modułów `imperium/` i 31 narzędzi milczało bezkarnie.
+
+    Bramka TWARDA (decyzja Cezara 2026-07-20): rozjazd = czerwień = commit stoi.
+    Miękkie ostrzeżenie odrzucone świadomie — to dokładnie mechanizm, który już raz
+    zawiódł (alarm widoczny i ignorowany przez sesje, ZASADA CENSORA).
+    """
+    try:
+        # Import przez pakiet `narzedzia`, NIE przez wstrzyknięcie katalogu w sys.path:
+        # `census_organorum` i `narzedzia.census_organorum` byłyby DWOMA modułami o
+        # osobnym stanie (własne DOKUMENT, własne cache). Testy patchują jedną kopię,
+        # audyt czytałby drugą — bramka mogłaby świecić na zielono na innym module niż
+        # ten, który sprawdzamy. Klasa: podwójna tożsamość modułu.
+        from narzedzia.census_organorum import spisz_moduly, sprawdz
+        bledy = sprawdz()
+        lacznie = sum(len(v) for v in spisz_moduly().values())
+        info = [f"Census organów (W17): {lacznie} modułów zameldowanych ✅"] if not bledy else []
+        return bledy, info
+    except Exception as e:  # noqa: BLE001 — awaria cenzusu nie może wywrócić audytu
+        return [f"[W17] Błąd cenzusu organów: {e}"], []
 
 
 def _warstwa_15_liczby_wstrzykiwane():
@@ -762,7 +838,8 @@ def _warstwa_13_ruff():
         return bledy, info
 
     if wynik.returncode == 0:
-        info.append("Ruff (W13): czysto ✅ (F/E9/E711-714/B006-008/B904/PLE — bez bugów/martwego kodu)")
+        info.append("Ruff (W13): czysto ✅ (F/E9/E711-714/B006-008/B904/PLE/RUF034 "
+                    "— bez bugów/martwego kodu)")
         return bledy, info
     linie = [l for l in wynik.stdout.strip().splitlines() if l.strip()]
     if not linie:

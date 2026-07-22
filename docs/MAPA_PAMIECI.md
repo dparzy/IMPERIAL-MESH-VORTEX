@@ -13,7 +13,7 @@ powod_istnienia: "Jedyne miejsce konsolidujące 13(+1 nadrzędny=W7) warstw pami
 > **⚠️ Sprostowanie 2026-07-17 (weryfikacja wobec kodu).** Poprzednia wersja tytułowała się
 > „**v13**" — to była pomyłka: **13 to liczba WARSTW, nie numer wersji.** Centrum Pamięci jest
 > w **v5** (`centrum_pamieci.py`: „W-360 v5", ostatnie v5 z 2026-06-26 — Pełna Symbioza + Most
-> Chmura↔Lokal). Sprostowano też „42 książek" → realnie <!-- LICZBA:ksiazki -->79<!-- /LICZBA -->
+> Chmura↔Lokal). Sprostowano też „42 książek" → realnie <!-- LICZBA:ksiazki -->115<!-- /LICZBA -->
 > (liczba była ZASZYTA w czterech miejscach kodu i tu; teraz liczy ją
 > `srodowisko_pamieci.ksiazki_w_bazie()` i wstrzykuje W15).
 
@@ -29,7 +29,7 @@ przeżywa przez **git** (storage bezgraniczny), z **bounded context** na starcie
 | Klucz | Moduł | Rola | Typ CoALA | Źródło/Unikat |
 |-------|-------|------|-----------|---------------|
 | **W1** | `pamiec_absolutna` | logi transakcji (PnL/MAE/MFE/reżim) | epizodyczna | ImperiumLog |
-| **W2** | RAG (`narzedzia/rag`) | wiedza z <!-- LICZBA:ksiazki -->79<!-- /LICZBA --> książek + encyklopedia (FTS — ⚠️ wektory **niezbudowane**, patrz niżej) | semantyczna | FTS5 BM25 |
+| **W2** | RAG (`narzedzia/rag`) | wiedza z <!-- LICZBA:ksiazki -->115<!-- /LICZBA --> książek + encyklopedia (FTS — ⚠️ wektory **niezbudowane**, patrz niżej) | semantyczna | FTS5 BM25 |
 | **W3** | `pamiec_sesji` | lekcje z sesji + profil Cezara | semantyczna | scoring GA |
 | **W3b** | `kronika_czatu` | pełny dialog (re-eksport rosnący, szukaj po słowach) | epizodyczna | git-persisted |
 | **W4** | `rejestr_wizji` | wizje/decyzje/pomysły/zmiany (scored + dedup) | semantyczna | reżim + GA |
@@ -90,7 +90,7 @@ Poprzednia wersja sugerowała, że tryb FTS to ograniczenie *chmury* („lokalni
 | Miara (zmierzone) | Wartość |
 |---|---|
 | Fragmenty w RAG | 29 699 |
-| Źródła łącznie | 104 (<!-- LICZBA:ksiazki -->79<!-- /LICZBA --> książek BIB-* + 25 plików encyklopedii) |
+| Źródła łącznie | 104 (<!-- LICZBA:ksiazki -->115<!-- /LICZBA --> książek BIB-* + 25 plików encyklopedii) |
 | **Wektory** | **0** ← semantyka nieaktywna |
 | `model_embeddings` (sentence-transformers) | **False** ← brak pakietu |
 

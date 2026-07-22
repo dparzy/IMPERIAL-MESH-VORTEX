@@ -92,7 +92,11 @@ class _FakeGlos:
     def __init__(self, odp=None, blad=False):
         self._odp, self._blad = odp, blad
 
-    def zapytaj(self, system, tresc, temperatura=0.7):
+    def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+        # Sygnatura MUSI nadążać za mostem (GlosImperium.zapytaj). Atrapa węższa niż
+        # oryginał przepuszcza kod, który w produkcji poleci na TypeError — i odwrotnie:
+        # test byłby zielony na innym kontrakcie niż ten, który naprawdę biegnie.
+        # Pilnuje tego test_atrapa_glosu_zgodna_z_mostem (parytet sygnatur).
         if self._blad:
             raise RuntimeError("API down")
         return self._odp
@@ -172,7 +176,7 @@ def test_scout_swiadomosc_wstrzykuje_kontekst(monkeypatch):
     zebrane = {}
 
     class G:
-        def zapytaj(self, system, tresc, temperatura=0.7):
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
             zebrane["tresc"] = tresc
             return "kand"
 
@@ -180,3 +184,202 @@ def test_scout_swiadomosc_wstrzykuje_kontekst(monkeypatch):
     assert "SENTINEL_KTX" in zebrane["tresc"]              # ON → kontekst dołączony
     scout_temat(G(), "momentum", topk=3, swiadomosc=False)
     assert "SENTINEL_KTX" not in zebrane["tresc"]          # OFF → bez kontekstu
+
+
+# ── PROBATOR wpięty w plon (warstwa 1 anty-halucynacyjna, 0 tokenów) ────────────
+
+def _fake_szukaj_bib006(monkeypatch, zrodlo="BIB-006_Carson_Scalping.epub", chunk=8):
+    """Podstawia RAG zwracający JEDEN znany fragment — wiemy dokładnie, co model 'dostał'."""
+    import szukaj as szukaj_mod
+
+    def fake_szukaj(q, topk=5, tryb="hybrid", cichy=False, korpus=None, **kw):
+        return [_FakeWynik(zrodlo, "Carson — Scalping", chunk, "tekst", -1.0, "biblioteka")]
+
+    monkeypatch.setattr(szukaj_mod, "szukaj", fake_szukaj)
+
+
+def test_probator_czysty_gdy_model_cytuje_podane_zrodlo(monkeypatch):
+    """Cytat zgodny z tym, co podano → werdykt CZYSTY, cząstka bez alarmu."""
+    _fake_szukaj_bib006(monkeypatch)
+    cz = scout_temat(_FakeGlos(odp="Kandydat 1 wg BIB-006 chunk 8."), "momentum", topk=3)
+    assert cz["probator"]["status"] == "CZYSTY" and cz["probator"]["czysty"] is True
+
+
+def test_probator_lapie_zrodlo_ktorego_nie_podano(monkeypatch):
+    """RDZEŃ: model powołuje się na książkę, której NIE dostał → halucynacja citation.
+    Cząstka niesie ostrzeżenie do kolejki, którą czyta sędzia-Opus."""
+    _fake_szukaj_bib006(monkeypatch)
+    cz = scout_temat(_FakeGlos(odp="Kandydat wg BIB-047 Kaufman."), "momentum", topk=3)
+    assert cz["probator"]["status"] == "PODEJRZANY"
+    assert cz["probator"]["obce_zrodla"] == ["BIB-047"]
+
+
+def test_probator_domyslnie_wlaczony_i_wylaczalny(monkeypatch):
+    """Domyślnie ON (deterministyczny, bez kosztu); da się wyłączyć bez zmiany reszty plonu."""
+    _fake_szukaj_bib006(monkeypatch)
+    zap = scout_temat(_FakeGlos(odp="Kandydat wg BIB-006."), "momentum", topk=3)
+    bez = scout_temat(_FakeGlos(odp="Kandydat wg BIB-006."), "momentum", topk=3, probator=False)
+    assert "probator" in zap and "probator" not in bez
+    assert zap["kandydaci"] == bez["kandydaci"]         # plon identyczny — organ tylko OPISUJE
+
+
+def test_probator_nie_zmienia_kandydatow_ani_statusu(monkeypatch):
+    """ZASADA WPIĘCIA: organ jest monotonicznie ostrożny — dokłada werdykt, nic nie odrzuca."""
+    _fake_szukaj_bib006(monkeypatch)
+    cz = scout_temat(_FakeGlos(odp="Kandydat wg BIB-999 (wymyślony)."), "momentum", topk=3)
+    assert cz["status"] == "ok"                         # cząstka NADAL trafia do kolejki
+    assert cz["kandydaci"] == "Kandydat wg BIB-999 (wymyślony)."
+
+
+def test_probator_bada_takze_krytyke(monkeypatch):
+    """Krytyka to też plon modelu — bada się ją wobec WŁASNYCH fragmentów kontra."""
+    _fake_szukaj_bib006(monkeypatch)
+    cz = scout_temat(_FakeGlos(odp="Ocena wg BIB-777."), "momentum", topk=3, krytyka=True)
+    assert cz["probator_krytyka"]["obce_zrodla"] == ["BIB-777"]
+
+
+def test_czastka_z_probatorem_jest_json_serializowalna(monkeypatch):
+    """Cząstka idzie do JSONL — werdykt nie może wnieść obiektu nieserializowalnego."""
+    _fake_szukaj_bib006(monkeypatch)
+    cz = scout_temat(_FakeGlos(odp="Kandydat wg BIB-006 chunk 8."), "momentum", topk=3)
+    assert json.loads(json.dumps(cz, ensure_ascii=False))["probator"]["status"] == "CZYSTY"
+
+
+def test_dry_run_nie_dostaje_werdyktu(monkeypatch):
+    """Granica: bez odpowiedzi modelu nie ma czego badać — brak pola, nie fałszywy alarm."""
+    _fake_szukaj_bib006(monkeypatch)
+    assert "probator" not in scout_temat(None, "momentum", topk=3)
+
+
+# ── DISPENSATOR wpięty: która faza kupuje ile myślenia ──────────────────────────
+
+class _GlosProfilujacy:
+    """Atrapa mostu zapamiętująca profil KAŻDEGO wywołania (bez dotykania API)."""
+
+    def __init__(self, odp="odpowiedź"):
+        self.odp = odp
+        self.wywolania = []
+
+    def zapytaj(self, system_prompt, tresc, temperatura=0.7, profil=None, **kw):
+        self.wywolania.append(profil)
+        return self.odp
+
+
+def test_generacja_kandydatow_uzywa_profilu_zwiad(monkeypatch):
+    """Objętość ważniejsza od głębi — najtańszy sensowny profil."""
+    _fake_szukaj_bib006(monkeypatch)
+    g = _GlosProfilujacy("Kandydat wg BIB-006.")
+    cz = scout_temat(g, "momentum", topk=3)
+    assert g.wywolania == ["zwiad"]
+    assert cz["profil"] == "zwiad"
+
+
+def test_rozwiniecie_zapytania_kupuje_najtaniej(monkeypatch):
+    """Rozwijanie tematu w synonimy to ekstrakcja, nie rozważanie → thinking off."""
+    _fake_szukaj_bib006(monkeypatch)
+    g = _GlosProfilujacy("momentum breakout volatility")
+    scout_temat(g, "momentum", topk=3, rozwin=True)
+    assert g.wywolania[0] == "klasyfikacja"          # najpierw rozwinięcie
+    assert g.wywolania[1] == "zwiad"                 # potem generacja
+
+
+def test_krytyka_kupuje_glebokosc(monkeypatch):
+    """Sceptyk płytszy od proponenta byłby bezużyteczny — krytyka kupuje NAJWIĘCEJ myślenia.
+
+    Od 2026-07-21 (decyzja Cezara po A/B LIBRA MESSIS) krytyka idzie na profil `osad`
+    (v4-pro), nie `krytyka` (flash). Test pilnuje RELACJI, nie nazwy: faza krytyki nie może
+    być tańsza od fazy zwiadu, bo krytyk słabszy od proponenta zatwierdza własne hipotezy."""
+    from imperium.cesarz.dispensator import CENNIK, dobierz
+    _fake_szukaj_bib006(monkeypatch)
+    g = _GlosProfilujacy("ocena")
+    scout_temat(g, "momentum", topk=3, krytyka=True)
+    assert g.wywolania == [bib._PROFIL_ZWIAD, bib._PROFIL_KRYTYKA]
+
+    cena = lambda profil: CENNIK[dobierz(profil)["model"]]["wyjscie"]  # noqa: E731
+    assert cena(bib._PROFIL_KRYTYKA) >= cena(bib._PROFIL_ZWIAD), \
+        "faza krytyki tańsza niż zwiad — sceptyk płytszy od proponenta"
+
+
+def test_hyginus_nie_sadzi_wlasnego_plonu(monkeypatch):
+    """ZASADA ZWIADOWCY WIEDZY: sędzią kandydatów jest Opus, nie DeepSeek.
+
+    NIEZMIENNIK PRZEPISANY 2026-07-21: wcześniej pilnowaliśmy go zakazem NAZWY profilu
+    („osad" nie może paść"), co myliło dwie różne rzeczy — *ile myślenia kupujemy* z *jaką
+    rolę pełnimy*. Gdy Cezar przeniósł krytykę na profil `osad`, test padł, choć rola się
+    nie zmieniła: krytyka wciąż PRODUKUJE kontrargumenty, a werdykt o wejściu do roju wydaje
+    Architekt. Teraz pilnujemy tego, o co naprawdę chodziło: Hyginus wykonuje wyłącznie fazy
+    zwiadu (rozwinięcie → generacja → krytyka) i ani jednego przejścia więcej."""
+    _fake_szukaj_bib006(monkeypatch)
+    g = _GlosProfilujacy("x")
+    scout_temat(g, "momentum", topk=3, rozwin=True, krytyka=True)
+    assert g.wywolania == [bib._PROFIL_ROZWIN, bib._PROFIL_ZWIAD, bib._PROFIL_KRYTYKA], \
+        "Hyginus wykonał fazę spoza zwiadu — proponent nie może sądzić własnego plonu"
+
+
+def test_wszystkie_profile_hyginusa_istnieja_w_dispensatorze():
+    """Parytet: literówka w nazwie profilu cicho spadłaby na domyślny (dobierz nie rzuca),
+    więc płacilibyśmy inaczej niż sądzimy. Test pilnuje, że nazwy są REALNE."""
+    from imperium.cesarz.dispensator import PROFILE
+    for profil in (bib._PROFIL_ROZWIN, bib._PROFIL_ZWIAD, bib._PROFIL_KRYTYKA):
+        assert profil in PROFILE, profil
+
+
+def test_atrapa_glosu_zgodna_z_mostem():
+    """UODPORNIENIE KLASY: atrapa węższa niż prawdziwy most daje testy zielone na kontrakcie,
+    który w produkcji nie istnieje. Każdy parametr `zapytaj` musi dać się podać atrapie."""
+    import inspect
+    from imperium.cesarz.deepseek_glos import GlosImperium
+    prawdziwe = set(inspect.signature(GlosImperium.zapytaj).parameters) - {"self"}
+    atrapa = inspect.signature(_FakeGlos.zapytaj)
+    ma_kwargs = any(p.kind is inspect.Parameter.VAR_KEYWORD for p in atrapa.parameters.values())
+    brakuje = prawdziwe - set(atrapa.parameters)
+    assert ma_kwargs or not brakuje, f"atrapa nie przyjmie: {sorted(brakuje)}"
+
+
+def test_swiadomosc_jest_DOMYSLNIE_wlaczona(monkeypatch):
+    """U4 domyślnie ON od 2026-07-21 (rozkaz Cezara po sądzie nad kolejką).
+
+    POWÓD, dla którego to jest test, a nie tylko wartość domyślna: pomiar na 33 cząstkach
+    pokazał, że bez tego bloku zwiad proponuje moduły, które JUŻ ISTNIEJĄ w kodzie —
+    VPIN (WSKAZNIK VPIN_50), Value Area (VP-01), Kelly (IUSTITIA), CVD, Kalman, triple_barrier,
+    DSR/PBO. Cichy powrót do opt-in oznaczałby powrót do płacenia za duplikaty."""
+    import szukaj as szukaj_mod
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda *a, **k: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    monkeypatch.setattr(bib, "_kontekst_systemu", lambda: "\nSENTINEL_KTX")
+    zebrane = {}
+
+    class G:
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+            zebrane["tresc"] = tresc
+            return "kand"
+
+    scout_temat(G(), "momentum", topk=3)          # BEZ jawnego swiadomosc=
+    assert "SENTINEL_KTX" in zebrane["tresc"]
+
+
+def test_blok_swiadomosci_zawiera_zakaz_duplikatow():
+    """Sedno U4: blok musi NAZWAĆ istniejące klucze i zakazać ich powielania.
+    Sam fakt wstrzyknięcia czegokolwiek nie wystarczy — treść jest tu mechanizmem."""
+    blok = bib._kontekst_systemu()
+    if not blok:
+        return                                     # brak rejestru → zwiad działa dalej (Prawo XV)
+    assert "NIE proponuj duplikatów" in blok
+    assert "LUKI" in blok
+
+
+def test_bez_swiadomosci_da_sie_wylaczyc(monkeypatch):
+    """Wyłącznik musi zostać: bieg porównawczy (A/B jakości plonu) wymaga obu ramion."""
+    import szukaj as szukaj_mod
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda *a, **k: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    monkeypatch.setattr(bib, "_kontekst_systemu", lambda: "\nSENTINEL_KTX")
+    zebrane = {}
+
+    class G:
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+            zebrane["tresc"] = tresc
+            return "kand"
+
+    scout_temat(G(), "momentum", topk=3, swiadomosc=False)
+    assert "SENTINEL_KTX" not in zebrane["tresc"]

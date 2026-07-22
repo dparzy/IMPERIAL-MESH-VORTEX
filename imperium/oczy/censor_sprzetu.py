@@ -330,6 +330,22 @@ def wykryj_zmiane() -> Dict[str, Any]:
 
 
 # ── RAPORT CZYTELNY ──────────────────────────────────────────────────────────
+def banner() -> str:
+    """Jedna linia dla hooka startowego — żelazo ZMIERZONE, nie wspominane.
+
+    Powód istnienia (rozkaz Cezara 2026-07-20): Architekt BŁĘDNIE twierdził w rozmowie
+    „8 GB Fujitsu" z pamięci, mając ten organ w kodzie — CENSOR mierzy 15.88 GB.
+    Fałszywa liczba o sprzęcie zniekształca każdą decyzję o oknie backtestu i modelu
+    TIRO, więc musi stać przed oczami na starcie, obok PORTITORA (Prawo XVII).
+    """
+    mig = migawka_sprzetu()
+    kl = sklasyfikuj(mig)
+    ram = f"{mig['ram_gb']} GB" if mig["ram_gb"] is not None else "?"
+    gpu = f"GPU {mig['gpu_vram_gb']} GB CUDA" if mig["gpu_cuda"] else "brak CUDA"
+    return (f"🏛️ CENSOR SPRZĘTU: RAM {ram} | {mig['cpu_logiczne']} wątków | {gpu} "
+            f"| klasa {kl['klasa']} (TIRO: {kl['model_zakres']})")
+
+
 def raport() -> str:
     """Pełny raport CENSORA — sprzęt, klasa, model, alarmy Prawa XV."""
     wynik = wykryj_zmiane()

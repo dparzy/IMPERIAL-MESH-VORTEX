@@ -12,6 +12,192 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-21 — Aktualizuj_lekcje to bliźniaczy kanał wzrostu objętości
+Funkcja aktualizuj_lekcje również powiększa sekcję LEKCJE, ale nie była objęta ogranicznikiem. Wprowadzono parę miar dla obu funkcji, by egzekwować limit także przy aktualizacji.
+
+### 2026-07-20 — Statystyki zwiadowców i strategii
+15 zwiadowców (13 aktywnych, 2 wyciszonych), 18 neuronów elitarnych, 20 strategii z 34 kluczami – Klucznik spójny.
+
+### 2026-07-20 — Background task może dać pusty output
+Zadanie uruchomione w tle (z &) nie zwróciło żadnego outputu (0 bajtów). W praktyce lepiej uruchamiać w foreground, aby uzyskać wynik.
+
+### 2026-07-20 — Teza zwiadowcy wymaga pomiaru, nie wiary
+Subagent-zwiadowca twierdził ~25 miejsc zip w Bramie - faktycznie 10. Twierdził brak ochrony w diagnostyce korelacji - 4/4 już strzeżone. Kandydat ≠ prawda. ZASADA WERYFIKACJI obligatoryjna przed naprawą.
+
+### 2026-07-20 — EXP-13 GARCH: niska dekorelacja + stabilny skill
+Średnie max|ρ| = 0.141 (poniżej progu 0.20), IC = 0.247/0.245/0.254 dla h=1/6/30. Potwierdza filar siły i realny sygnał predykcyjny na wszystkich parach.
+
+### 2026-07-20 — djvu wymaga djvutxt (djvulibre), nie calibre
+Konwersja djvu do tekstu wymaga narzędzia 'djvutxt' z djvulibre; calibre historycznie nie czyta djvu. Wszystkie 5 ksiąg do domknięcia QNT/RLA/Aronson to djvu – calibre jest dla nich bezużyteczne.
+
+### 2026-07-20 — Asymetria otwarcia i zamknięcia sesji
+Otwarcie sesji nie ma egzekwowanej checklisty, w przeciwieństwie do 9-krokowej checklisty zamknięcia. Ryzyko pominięcia kluczowych kroków startu.
+
+### 2026-06-30 — Audyt źródła pure-Python w Bramie: brakowało _PURE_PYTHON_INDICATORS
+Wszystkie wskaźniki w Bramie miały źródło TA-Lib. Dodano zbiór _PURE_PYTHON_INDICATORS (11 wskaźników) i warunek SOURCE_TAG_PY w compute(). Naprawiono rozróżnienie źródła dla wskaźników własnych.
+
+### 2026-07-10 — BIB-032 O'Hara – OCR garbage, nieindeksowany
+Książka w formacie skanowanych obrazów PDF – OCR generuje śmieci. Zgodnie z Prawem I (zero fabricacji) nie została włączona do RAG.
+
+### 2026-06-30 — HA doji: strict > zamiast >=
+HA_BULL = c > o (nie >=) — doji neutralny, nie byczy.
+
+### 2026-07-20 — API-widma to osobna klasa błędu od dokumentacyjnego gnicia
+Spłata długu gnicia nie wykrywa widm API (pliki istnieją w kodzie, ale w innym miejscu lub są martwymi komendami). Warstwa 16 wykryła 3 widma: mexc_feed.py, calculator_gate.py, veto_check.py. Różnica między gnicie a widmem kluczowa dla architektury audytu.
+
+### 2026-07-21 — _ jest znakiem słownym –  nie zamyka BIB-006_Carson
+Wzorzec regex  nie zamykał się na identyfikatorze BIB z podkreśleniem. Złapane przez test negatywny. Wpis do Księgi Wad.
+
+### 2026-07-21 — Archiwum LEKCJI z innym nagłówkiem – niewidoczne dla szukaj()
+Schłodzone lekcje (27) w archiwum były niewidoczne dla funkcji szukaj(), bo parser modułu używał innego nagłówka. Naprawiono.
+
+### 2026-07-21 — Archiwum lekcji ma inny nagłówek – schłodzone lekcje niewidoczne dla szukaj()
+Parser modułu LEKCJE nie obsługiwał nagłówka archiwum, przez co po schłodzeniu lekcje znikały z wyszukiwania. Luka wykryta i naprawiona.
+
+### 2026-07-21 — Archiwum lekcji ma inny nagłówek – szukaj() go nie widzi
+Schłodzone lekcje do archiwum mają inny nagłówek niż główna sekcja, przez co funkcja szukaj() w module nie przeszukuje archiwum. Wykryto i naprawiono.
+
+### 2026-07-20 — Runbooki W11 gniją – nieaktualna treść i duplikacja CLAUDE.md
+Runbooki W11 zawierają własną, ręcznie wpisaną treść (np. 'git push -u origin') zamiast pobierać kroki z CLAUDE.md – jedynego źródła prawdy. Ponadto funkcja dodaj() dedupuje po nazwie, co uniemożliwia aktualizację istniejącego runbooku.
+
+### 2026-06-30 — W6 milczące pominięcie przy braku 'Stan na:'
+Audyt W6 nie raportował błędu gdy brak 'Stan na:'. Dodano else skutkujący błędem oraz rozszerzono regex na markdown.
+
+### 2026-06-30 — Zasada symbiozy zamiast zero duplikatów
+Moduły mogą być wielofunkcyjne, jeśli każdy pokrywa INNY aspekt (np. 4 moduły wielorybów każdy na inne dane). Złe = 5 modułów czytających ten sam kanał. Test: 'Co unikalnego wnosi ten moduł?'
+
+### 2026-07-21 — Alarm i konsolidacja liczyły niezależne progi – sprzężenie
+Próg alarmu (24000) i cel chłodzenia (22000) były niezależne – obniżenie progu cicho psułoby chłodzenie. Naprawiono ujednolicając źródło.
+
+### 2026-07-21 — PROBATOR wykrył realny nieugruntowany plon Hyginusa mimo promptu
+2367 znaków w kolejce Hyginusa bez żadnego cytowania źródła, choć prompt wyraźnie tego wymaga. Organ wychwycił to przy pierwszym pomiarze.
+
+### 2026-07-21 — Znaleziono realnie nieugruntowany plon Hyginusa w kolejce
+Pierwszy bieg Probatora na realnym plonie wykrył 2367 znaków kandydatów bez żadnego powołania na źródło, mimo że prompt tego żądał. Potwierdzona potrzeba weryfikacji.
+
+### 2026-07-21 — Znak _ jest słowny, więc \b nie zamyka się w identyfikatorach z podkreślnikiem
+Detektor cytatów używał \b, co nie oddzielało poprawnie identyfikatorów typu BIB-006_Carson. Poprawiono logikę granic w Probatorze.
+
+### 2026-07-20 — EXP-14 Kyle: bardzo niska korelacja + wysoki IC
+Średnie max|ρ| = 0.087 (prawie ortogonalny do reszty roju), IC = 0.301/0.302/0.308. Silny wkład informacyjny bez redundancji.
+
+### 2026-07-20 — EXP-15 PIN martwy na wszystkich parach
+Pomiar potwierdził, że EXP-15 (PIN) nie generuje sygnału na żadnej z 40 kombinacji (15 par × 3 TF). Już wcześniej wyciszony (DOSTEPNY=False), ale weryfikacja usztywnia decyzję.
+
+### 2026-06-30 — Audyt dokumentacji wymaga egzekwowania
+Użytkownik nakazał: przed dalszymi wdrożeniami należy zaktualizować wszystkie dokumenty z INDEKS_IMPERIUM i dodać ich sprawdzanie do audyt_spojnosci.py. Obecnie sprawdzane tylko 7 z ~32 plików.
+
+### 2026-06-30 — Meta-gate defensive neurons zawsze NEUTRAL kierunek
+Neurony obronne (Z-01, N-01, H-01, OC-05) ustawiają pewnosc_przeciwnika zamiast kierunku, wywołują s.policz_finalna() — to wzorzec dla wszystkich bram obronnych.
+
+### 2026-06-30 — 12/17 bloków strategii miało błędne klucze w KATALOGU
+Stare klucze projektowe (np. XII-08) nie istniały w kodzie. Audyt W9 wykrywa obce klucze w blokach zaimplementowanych strategii. Wszystkie 17 zsynchronizowane.
+
+### 2026-07-20 — Pure-Python funkcje cicho produkują błędne wyniki przy nierównych seriach
+TA-Lib głośno rzuca Exception, ale VWAP i VWAP_STD milcząco dają błędne wyniki (różnica 10.0, ~7%). Pieczątka audytu kłamie: input_len=100 przy rzeczywistych 80 barach. Złamanie Praw XIII i I.
+
+### 2026-07-20 — Mechanizm zasiewu połyka regex z checklisty
+Funkcja 'zasiej_startowe' cicho ignoruje pole 'regex' wpisu w checkliście – wzorce w Księdze Wad nigdy nie skanowały. Przyczyna: domyślna inicjalizacja pomija nieobowiązkowe klucze.
+
+### 2026-06-30 — Podczas implementacji pomijano aktualizację dokumentacji modułowej (KALKULATOR_LEWARA.md, IGRZYSKA_IMPERIUM.md, GENERAL_LEGATUS.md)
+Użytkownik zwrócił uwagę, że dokumentacje specyficzne dla modułów nie były aktualizowane ani egzekwowane przez audyt_spojnosci.py. Nakazano audyt wszystkich dokumentów z indeksu.
+
+### 2026-06-30 — Archiwizacja bez przeczytania pliku prowadzi do utraty ważnych danych
+ARSENAL_IMPERIUM (zweryfikowany katalog ~220 narzędzi) i WZORZEC_DNSS (referencja architektury) zostały błędnie zarchiwizowane. Wymusiło to dodanie Zasady Archiwizacji do CLAUDE.md.
+
+### 2026-06-30 — Konieczność audytu dokumentacji przed dalszym rozwojem
+Użytkownik zwrócił uwagę, że dokumentacja nie jest aktualizowana podczas implementacji wizji; nakazał audyt wszystkich dokumentów z INDEKS_IMPERIUM względem kodu i dodanie egzekucji w narzędziu audytu.
+
+### 2026-06-30 — VPIN neuron nigdy nie jest kierunkowy
+NeuronToxicFlow (Z-01) zawsze zwraca NEUTRAL kierunek. Jego rola to tylko tłumienie roju przez pewnosc_przeciwnika gdy VPIN>0.7. Nigdy nie głosuje na stronę.
+
+### 2026-06-30 — DeepSeek API klucz NIGDY w kodzie ani w czacie
+Zasada bezpieczeństwa: klucz DeepSeek API musi być tylko w zmiennych środowiskowych. W kodzie użyto [ZREDAGOWANO] jako placeholder. Dotyczy to wszystkich plików w Imperium.
+
+### 2026-07-10 — Równa waga = 48.2% odtwarza diagnozę triady 48.3%
+Pomiar hipotezy B na 5 parach 4h OOS daje globalnie 48.2% dla równej wagi, co odtwarza diagnozę triady 48.3% co do promila — walidacja pomiaru.
+
+### 2026-07-20 — zasiej_startowe cicho zjada regex z checklisty
+Mechanizm zasiewu wzorców nie przenosi regexu z checklisty do wzorców startowych, bo lista WZORCE_STARTOWE kończy się wcześniej. Wzorce leżą martwe w checkliście.
+
+### 2026-07-21 — Ukryta zależność od monkeypatch w runnerze Imperium
+Testy PEDES przechodzą pod pytest, ale padają pod własnym runnerem Imperium, którego shim monkeypatch nie ma metody setitem. Naprawiono bez zależności od shimu.
+
+### 2026-07-21 — Testy padają pod runnerem Imperium przez brak setitem w shimie monkeypatch
+Testy zielone pod pytest, ale padają pod własnym runnerem – shim monkeypatch nie ma setitem. Naprawiono bez zależności od shimu.
+
+### 2026-07-20 — Parametry Fujitsu Lifebook E754
+CPU i5-4200M Haswell 2013, 2 rdzenie/4 wątki, 2.5 GHz. RAM 16 GB (9 GB wolne). GPU Intel HD 4600 1 GB – bezużyteczne do LLM. Inferencja tylko CPU, maksymalny model 3-8B mocno skwantyzowany.
+
+### 2026-07-20 — Testy 1648/1648 zielone – kod stabilny
+Po wymuszeniu UTF-8 testy przechodzą w 100%. Fałszywy alarm w aktualizuj.ps1 wynikał z kodowania konsoli (cp1250 nie obsługuje emoji).
+
+### 2026-07-20 — IC EXP-13/14 podejrzanie wysoki – możliwy artefakt autokorelacji
+IC ~0.25-0.30, podczas gdy typowe IC >0.05 jest rzadkie. Wskazuje to na możliwość łapania autokorelacji zmienności, a nie czystego forward-return. Wymaga kontroli na nienakładających się zwrotach.
+
+### 2026-07-20 — CODEX: 30 sugestii na 46 rekordów - dominacja sugestii
+Z 46 rekordów CODEX-u 30 to sugestie (A/B 11, IC 4, pomiary 1). Proporcja sugeruje, że system gromadzi głównie nierozstrzygnięte pomysły, a nie faktyczne pomiary czy decyzje. Może to wskazywać na potrzebę przeglądu i priorytetyzacji.
+
+### 2026-07-20 — Runbooki W11 gniją przez deduplikację po nazwie
+Runbook 'Bezpieczny commit' zawiera nieaktualny krok 'git push -u', a funkcja dodaj() uniemożliwia aktualizację przez deduplikację po nazwie. Każda procedura raz zapisana pozostaje niezmienna, co prowadzi do gnicia treści.
+
+### 2026-07-20 — Tempo przetwarzania WF-IC
+~2 min/para (15 par ~30 min). BTC/ETH cięższe. Można szacować czas przyszłych uruchomień.
+
+### 2026-07-20 — Buforowanie stdout w Pythonie
+Raport WF-IC jest buforowany do końca; aby widzieć postęp na żywo, należy uruchomić skrypt z flagą -u (unbuffered).
+
+### 2026-07-20 — Testy na starym Fujitsu trwają >2 minuty — normalne
+Testy (2584) zajmują ponad 2 minuty na starym sprzęcie. Nie dawaj limitu czasu, uruchamiaj w tle i cyklicznie sprawdzaj, czy żyje. Zapamiętane na stałe, nie wracamy do tematu.
+
+### 2026-06-30 — Zbyt sztywne progi powodują martwe neurony
+BB Squeeze 4%→2.5%, RSI Div delta 2.0→0.3, Bart Pattern 30%→10% – neurony zwracały 100% NEUTRAL. Po korekcie zaczęły generować sygnały.
+
+### 2026-06-30 — Proces deduplikacji neuronów
+Podczas skanowania agent otrzymał instrukcję deduplikacji, co pozwoliło osiągnąć ostateczną liczbę 261 unikalnych neuronów zamiast potencjalnie większej liczby powtórzeń.
+
+### 2026-06-30 — Higuchi Fractal Dimension wymaga pełnej serii – niemożliwy w Brama
+D≈1.0 = trending, D≈2.0 = ranging/chaotic, D≈1.5 = random walk. Wymaga min. 50 świec do obliczenia – nie da się zredukować do pojedynczej wartości Brama. Uzasadnia wyjątek Prawa I dla Exploratores.
+
+### 2026-06-30 — Kategoria S zarezerwowana dla SMC/Struktura
+Kategoria S jest już używana przez strukturalne neurony SMC, więc nie można jej użyć dla Sentiment.
+
+### 2026-06-30 — Halucynacje w linkach IMV: defensywne repo i anegdoty
+Po weryfikacji ~320 linków przez 3 równoległych agentów okazało się, że core tech stack jest realny, ale część referencji do defensywnych repozytoriów i legend tradingowych była halucynacjami. Zapisano w ARSENAL_IMPERIUM.md.
+
+### 2026-06-30 — DeepSeek API – endpoint i bezpieczeństwo klucza
+DeepSeek API jest kompatybilny z OpenAI (base_url: https://api.deepseek.com/v1). Klucz API musi być wyłącznie w zmiennych środowiskowych, nigdy w kodzie ani czacie.
+
+### 2026-06-30 — Separacja Kingdom Pixel od Imperium
+Mieszanie zasad Kingdom Pixel (79 Zasad) z Imperium powodowało chaos. Rozwiązanie: Imperium ma własne 14 Praw, Kingdom Pixel jest archiwizowany i nigdy nie modyfikowany.
+
+### 2026-06-30 — Neurony martwe: XII-07, X-12, A-05 (100% NEUTRAL)
+Trzy neurony (RSI_14 trend, BB_UPPER, CLOSE_PREV) wykazały 100% NEUTRAL w analizie 500-barowej. Wymagają diagnostyki lub wyłączenia.
+
+### 2026-06-30 — Niezgodność stanu MANIFEST z kodem
+7 neuronów oznaczonych jako aktywne w MANIFEST_KODU.md, ale w kodzie miały DOSTEPNY=False. Poprawiono oznakowanie na 'wyciszony'.
+
+### 2026-06-30 — Znalezione 2 neurony sieroty w mikro_neuron.py
+NeuronStochRSI i NeuronFundingRate znajdowały się poza rojem neuronów, nie były importowane przez rejestr. Zostały przeniesione do odpowiednich plików.
+
+### 2026-06-30 — API key tylko w zmiennych środowiskowych
+Klucz API DeepSeek nie może być umieszczany w kodzie ani w czacie, tylko w environment variable (setx). Bezpieczeństwo.
+
+### 2026-06-30 — Bezpieczeństwo klucza API DeepSeek – tylko env vars
+Klucz API DeepSeek NIGDY nie może być w kodzie ani w czacie. Powinien być przechowywany w zmiennych środowiskowych. Kod w PLAN_DEEPSEEK.md zawiera placeholder do zastąpienia.
+
+### 2026-06-30 — Format Katalogu Strategii
+ID: [LEGION]-[STYL]-[NUM] (np. X-SC-001). Style: TR/RV/BK/RG/SC/MC/LV/HY. Każda strategia ma: Neurony WEJŚCIE, FILTR, WYJŚCIE, Dźwignia, R:R, Status.
+
+### 2026-06-30 — OpenAlice i Hermes Agent to realne narzędzia
+Zweryfikowano, że OpenAlice (4600★ GitHub) i Hermes Agent (Nous Research, 200+ LLM backends) istnieją i są aktywnymi projektami. Wcześniejsze oznaczenie jako 'niezweryfikowane' było błędne.
+
+### 2026-06-30 — NeuronPumpDetect Z-02: 3 warunki OHLCV
+Warunek 1: VOLUME/VOLUME_MA20 w [1.5, 4.0]; Warunek 2: (HIGH-LOW)/ATR_14 < 0.75; Warunek 3: OBV > OBV_EMA_20*(1+0.005). Siła = 0.55+0.30*(vol*0.4+zakr*0.3+obv*0.3). Kierunek LONG.
+
+### 2026-07-10 — Ważenie IC podnosi rój ponad 50% na każdej parze OOS
+Wynik B (ważony IC) = 51.8% globalnie, bije A o +3.6pp i przekracza 50% na KAŻDEJ z 5 par OOS. Potwierdza hipotezę B: wąskie gardło = agregacja.
+
 ### 2026-06-30 — Paradoks Parrondo jako filozofia Kameleon
 Sformalizowano, że dwie przegrywające osobno strategie mogą tworzyć wygrywający ensemble. To podstawa systemu Kameleon – kluczowa zasada dywersyfikacji neuronów.
 

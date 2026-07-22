@@ -45,37 +45,77 @@ print(f"🛡️ Zapora testów: odebrano klucze [{', '.join(_ODEBRANE_KLUCZE) or
 import glob as _glob
 
 class _MonkeyPatch:
-    """Minimal monkeypatch — wystarczy do setattr."""
+    """Namiastka `monkeypatch` pytesta — setattr / setenv / delenv / setitem / delitem.
+
+    DLACZEGO PEŁNIEJSZA, A NIE „minimal" (zmierzone 2026-07-21, drugi raz ta sama klasa):
+    ten runner JEST bramką Imperium, a pytest nie. Test używający metody, której shim nie ma,
+    jest ZIELONY pod pytest i CZERWONY pod bramką — czyli autor dostaje fałszywy spokój
+    dokładnie w narzędziu, któremu ufa. Pierwszy raz złapane 2026-07-20 (brak `setitem`
+    przy pieczęciach), drugi raz 2026-07-21 przy leksykonie LIBRA MESSIS — więc lekarstwem
+    nie jest omijanie shimu w testach, tylko uzupełnienie shimu.
+
+    Cofanie trzyma się listy WYWOŁAŃ, nie krotek (obj, name, old): stan słownika ma inną
+    logikę przywracania niż atrybut (klucz mógł nie istnieć wcale) i mieszanie obu w jednej
+    krotce było źródłem gałęzi `if obj is os.environ`.
+    """
+    _BRAK = object()          # znacznik „klucza/atrybutu nie było" — None jest legalną wartością
+
     def __init__(self):
         self._undo = []
 
     def setattr(self, obj, name, value):
-        self._undo.append((obj, name, getattr(obj, name, None)))
-        object.__setattr__(obj, name, value) if isinstance(obj, type) else setattr(obj, name, value)
+        stary = getattr(obj, name, self._BRAK)
 
-    def setenv(self, name, value):
-        self._undo.append((os.environ, name, os.environ.get(name)))
-        os.environ[name] = value
-
-    def delenv(self, name, raising=True):
-        self._undo.append((os.environ, name, os.environ.get(name)))
-        os.environ.pop(name, None)
-
-    def undo(self):
-        for obj, name, old in reversed(self._undo):
-            if obj is os.environ:
-                # env: słownikowo (None → usuń klucz)
-                if old is None:
-                    os.environ.pop(name, None)
-                else:
-                    os.environ[name] = old
-            elif old is None:
+        def cofnij():
+            if stary is self._BRAK:
                 try:
                     delattr(obj, name)
                 except AttributeError:
                     pass
             else:
-                object.__setattr__(obj, name, old) if isinstance(obj, type) else setattr(obj, name, old)
+                setattr(obj, name, stary)
+
+        self._undo.append(cofnij)
+        # Zwykłe setattr — również dla KLAS. Poprzednia wersja szła dla klas przez
+        # `object.__setattr__(klasa, ...)`, co ZAWSZE rzuca TypeError („can't apply this
+        # __setattr__ to type object"); gałąź napisana specjalnie dla klas była więc martwa
+        # od początku i nie ujawniła się tylko dlatego, że żaden test nie podmieniał
+        # atrybutu klasy. Ujawnił ją dopiero test samego shimu (2026-07-21).
+        setattr(obj, name, value)
+
+    def _podmien_klucz(self, mapa, klucz, wartosc, usun=False):
+        byl = klucz in mapa
+        stary = mapa.get(klucz)
+
+        def cofnij():
+            if byl:
+                mapa[klucz] = stary
+            else:
+                mapa.pop(klucz, None)
+
+        self._undo.append(cofnij)
+        if usun:
+            mapa.pop(klucz, None)
+        else:
+            mapa[klucz] = wartosc
+
+    def setitem(self, mapa, klucz, wartosc):
+        self._podmien_klucz(mapa, klucz, wartosc)
+
+    def delitem(self, mapa, klucz, raising=True):
+        if raising and klucz not in mapa:
+            raise KeyError(klucz)
+        self._podmien_klucz(mapa, klucz, None, usun=True)
+
+    def setenv(self, name, value):
+        self._podmien_klucz(os.environ, name, str(value))
+
+    def delenv(self, name, raising=False):
+        self._podmien_klucz(os.environ, name, None, usun=True)
+
+    def undo(self):
+        for cofnij in reversed(self._undo):
+            cofnij()
         self._undo.clear()
 
 
@@ -100,6 +140,17 @@ def uruchom():
             continue
 
         funkcje = [f for f in dir(modul) if f.startswith("test_")]
+        # UODPORNIENIE (LEX TALIONIS, 2026-07-19): plik test_*.py bez ŻADNEJ funkcji
+        # modułowej test_ to prawie zawsze omyłka — np. testy zapisane jako
+        # unittest.TestCase (metody w klasie), których runner NIE zbiera → plik cicho
+        # niczego nie chroni. Twarda porażka, nie ciche 0 (klasa błędu złapana raz).
+        if not funkcje:
+            print(f"  💥 {nazwa_modulu}: 0 funkcji modułowych test_ — plik cicho pomijany "
+                  "(TestCase/klasa? runner liczy tylko funkcje test_* na poziomie modułu).")
+            oblane += 1
+            bledy.append((nazwa_modulu, "<0 testów>",
+                          "Plik test_*.py bez funkcji modułowych test_ — silent-skip (napraw styl)."))
+            continue
         print(f"\n📋 {nazwa_modulu} ({len(funkcje)} testów)")
 
         for nazwa_f in funkcje:
@@ -133,6 +184,8 @@ def uruchom():
           f"({zaliczone}/{zaliczone + oblane})")
     print("═" * 60)
 
+    _odcisnij_pieczec(zaliczone, oblane)
+
     if bledy:
         print("\nSzczegóły błędów:")
         for modul, test, blad in bledy:
@@ -141,6 +194,62 @@ def uruchom():
         return 1
     print("\n✅ Wszystkie testy zaliczone — Imperium gotowe.")
     return 0
+
+
+def _odcisnij_pieczec(zaliczone: int, oblane: int) -> None:
+    """
+    Odciska SIGILLUM PROBATIONIS — wynik biegu przypięty do commitu, na którym zapadł.
+
+    POWÓD (zwiad adwersarialny 2026-07-21, dwa niezależne konteksty zbiegły się na tym
+    samym): `tests/run_tests.py` NIE jest wołany ani przez hook startowy, ani przez audyt
+    (zmierzone: 0 trafień w hooku, w audycie tylko ścieżki `__pycache__`). Testy trwają
+    >5 minut, więc wołanie ich przy każdym starcie byłoby okrutne — ale skutkiem było, że
+    CZERWONY STAN TESTÓW JEST NIEWIDOCZNY NA OTWARCIU. Sesja urwana przed bramką zamknięcia
+    zostawiała złamany kod, a następna sesja widziała „pełną harmonię" audytu i budowała
+    dalej na złamanym fundamencie. Ta sama klasa co dług honorowy: bramka istniejąca
+    wyłącznie na końcu procesu, który nie musi się wydarzyć.
+
+    Lekarstwem NIE jest powtarzanie biegu, tylko WYKRYWANIE NIEAKTUALNOŚCI: pieczęć wie,
+    dla jakiego KODU zapadł wynik, więc otwarcie sesji odróżnia „zielone dla TEGO kodu"
+    od „zielone dla kodu, którego już nie ma" — a to drugie jest niewiedzą, nie zgodą.
+
+    Tożsamość kodu to ODCISK TREŚCI ŹRÓDEŁ, nie hash commitu. Porównanie z commitem
+    wyglądało sensownie, ale przy naturalnym rytmie pracy (edytuj → uruchom testy na brudnym
+    drzewie → commituj) pieczęć NIGDY nie mogłaby powiedzieć „zielone": zawsze albo brudne
+    drzewo, albo — po commicie — inny hash. Detektor, który alarmuje zawsze, uczy operatora
+    ignorować siebie, czyli psuje dokładnie to, po co powstał. Odcisk źródeł odpowiada na
+    właściwe pytanie: czy od czasu biegu ktoś ruszył kod. Zmierzone: 405 plików, 232 ms.
+    """
+    try:
+        import json
+        import subprocess
+        from datetime import datetime
+
+        korzen = Path(__file__).resolve().parent.parent
+        # encoding+errors JAWNIE (klasa z Księgi Wad): samo `text=True` dekoduje kodowaniem
+        # KONSOLI, a `git status --porcelain` potrafi zwrócić polską nazwę pliku — wtedy
+        # UnicodeDecodeError uciszyłby pieczęć akurat na brudnym drzewie, czyli w stanie,
+        # o którym pieczęć ma ostrzegać.
+        commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
+                                text=True, encoding="utf-8", errors="replace",
+                                timeout=10, cwd=korzen)
+        brudne = subprocess.run(["git", "status", "--porcelain"], capture_output=True,
+                                text=True, encoding="utf-8", errors="replace",
+                                timeout=10, cwd=korzen)
+        from imperium.oczy.breviarium import odcisk_zrodel
+        pieczec = {
+            "zaliczone": zaliczone,
+            "oblane": oblane,
+            "odcisk_zrodel": odcisk_zrodel(),          # tożsamość KODU, nie commitu
+            "commit": (commit.stdout or "").strip()[:40] or "?",   # informacyjnie
+            "drzewo_brudne": bool((brudne.stdout or "").strip()),
+            "kiedy": datetime.now().isoformat(timespec="seconds"),
+        }
+        plik = korzen / "bibliotheca_ulpia" / "dane" / "sigillum_probationis.json"
+        plik.parent.mkdir(parents=True, exist_ok=True)
+        plik.write_text(json.dumps(pieczec, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:  # noqa: BLE001 — pieczęć jest dodatkiem do biegu, nigdy jego warunkiem
+        print(f"  (pieczęć testów niezapisana: {e})")
 
 
 if __name__ == "__main__":

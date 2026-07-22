@@ -13,7 +13,7 @@ powod_istnienia: "Zbudować lokalny hybrydowy LLM 'TIRO' (uczeń), trenowany met
 > PROLETARIUS→CONSUL, CLI raport/migawka/klasa/zmiana/zatwierdz) ✅ · NOTARIUS
 > (`tiro_pary_nauczyciela.jsonl`, `LIMIT_PROBEK_NA_PYTANIE=3`, `eksportuj_sft`) ✅ · rój 87 ·
 > kronika 102 sesji. Pomiary E1 (llama-bench, tok/s) to prawda DATOWANA (2026-07-16), nietknięta.
-> Jedyna korekta: liczba fragmentów RAG „27 959" → dziś <!-- LICZBA:fragmenty -->29699<!-- /LICZBA -->
+> Jedyna korekta: liczba fragmentów RAG „27 959" → dziś <!-- LICZBA:fragmenty -->37331<!-- /LICZBA -->
 > (przeniesiona na blok W15, by nie zamarzła — rośnie z biblioteką).
 > **Architekt:** VITRUVIUSZ (Opus) · **Zwiad:** Sonnet (web) + Hyginus (DeepSeek, plik `wrzutnia/zrodla danych i inne.md`)
 > **Rzymskie imię:** **TIRO** (łac. *tiro* — rekrut/uczeń w szkoleniu; docelowo awansuje przez stopnie)
@@ -139,7 +139,7 @@ techniczne** — tylko jedno jest dla nas dobre:
 
 Scalanie wag daje to samo, co ma każdy inny na Hugging Face. **Unikalność TIRO nie weźmie się z techniki
 łączenia — weźmie się z DANYCH, KTÓRYCH NIKT INNY NIE MA:** wyniki areny, decyzje 87 neuronów, biblioteka
-RAG (<!-- LICZBA:fragmenty -->29699<!-- /LICZBA --> fragmentów), werdykty Hyginusa, kronika 102 sesji. Uczeń wytrenowany na *tym* będzie jedynym
+RAG (<!-- LICZBA:fragmenty -->37331<!-- /LICZBA --> fragmentów), werdykty Hyginusa, kronika 102 sesji. Uczeń wytrenowany na *tym* będzie jedynym
 modelem na świecie rozumiejącym Imperium. Frankenmerge z trzech modeli z HF nie da tego nigdy.
 
 **→ Hybryda = wspólny szkielet z HF (rodzina Qwen) + distylacja na danych Imperium.** Scalanie wag = opcjonalny

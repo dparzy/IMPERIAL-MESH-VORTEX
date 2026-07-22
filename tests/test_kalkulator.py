@@ -523,3 +523,31 @@ def test_sl_atr_tp_skaluje_sie_z_sl():
     p = kalk.policz("BTC", "LONG", 100.0, 2, 10_000, pewnosc=0.9,
                     atr=1.0, sl_atr_mult=2.0)
     assert abs(p.take_profit - 104.0) < 1e-6, f"TP ma być 100+2×2={104}, jest {p.take_profit}"
+
+
+# ── Granice: guard dzielenia przez zero (P5 fali 1, 2026-07-21) ──────────────
+
+def test_policz_odrzuca_cene_niedodatnia():
+    """cena_wejscia <= 0 → ValueError u wrót, nie ZeroDivisionError w kroku 5
+    (stop_pct = |cena−stop|/cena). Fail-loud."""
+    import pytest
+    kalk = KalkulatorLewara()
+    for zla_cena in (0.0, -100.0):
+        with pytest.raises(ValueError, match="cena_wejscia"):
+            kalk.policz("BTCUSDT", "LONG", zla_cena, 5, 5000, pewnosc=0.9)
+
+
+def test_policz_skrajna_dzwignia_nie_dzieli_przez_zero():
+    """dźwignia 200× → likwidacja == cena wejścia (1/200 == OPŁATA_UTRZYMANIA),
+    więc |cena−likwidacja| == 0. Ma zwrócić plan odrzucony przez checklist,
+    a NIE ZeroDivisionError (bufor bezpieczeństwa = 0)."""
+    kalk = KalkulatorLewara()
+    p = kalk.policz("BTCUSDT", "LONG", 100000.0, 200, 5000, pewnosc=0.9, rezim="NORMAL")
+    assert p.checklist_ok is False, "dźwignia 200× musi być odrzucona przez checklist"
+
+
+def test_policz_dzwignia_normalna_bez_regresji():
+    """Sanity: guardy nie zmieniają zachowania dla poprawnych wejść produkcyjnych."""
+    kalk = KalkulatorLewara()
+    p = kalk.policz("BTCUSDT", "LONG", 100000.0, 5, 5000, pewnosc=0.7, rezim="NORMAL")
+    assert p.checklist_ok is True

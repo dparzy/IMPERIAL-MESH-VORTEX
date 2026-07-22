@@ -99,7 +99,6 @@ class Gubernator:
         inaczej zostajemy w obecnej (gasi trzepotanie na granicy).
         """
         h = self.histereza
-        idx = KOLEJNOSC_POSTAW.index(self.postawa)
 
         # 1) Twarde nadrzędne: głębokie obsunięcie → KWARANTANNA (ochrona kapitału > wszystko).
         if dd_frakcja <= self.prog_kwarantanna_dd:
@@ -107,7 +106,14 @@ class Gubernator:
         # 2) Obsunięcie umiarkowane → co najwyżej OBRONA (nie pozwól na ekspansję w DD).
         if dd_frakcja < self.prog_obrona_dd:
             # wyjście z OBRONY w górę wymaga ustąpienia DD — tu DD wciąż trwa.
-            return OBRONA if KOLEJNOSC_POSTAW.index(OBRONA) <= idx + 1 else OBRONA
+            # Uproszczone 2026-07-19 BIT-IDENTYCZNIE: był tu `OBRONA if
+            # KOLEJNOSC_POSTAW.index(OBRONA) <= idx + 1 else OBRONA` — obie gałęzie
+            # zwracały OBRONA, a warunek był zawsze prawdziwy (index(OBRONA)=1 ≤ idx+1
+            # dla każdego idx≥0), więc `idx` istniał wyłącznie dla martwego warunku.
+            # OTWARTE PYTANIE SEMANTYCZNE (decyzja Cezara, dotyka sizingu → wymaga A/B):
+            # „co najwyżej OBRONA" może znaczyć min(obecna, OBRONA) — wtedy KWARANTANNA
+            # NIE powinna być podnoszona do OBRONY. Zachowania NIE zmieniam bez walidacji.
+            return OBRONA
 
         # 3) Kapitał zdrowy → postawa z poziomu „zdrowia" koszyka, z histerezą.
         #    Wejście w wyższą postawę: próg + h. Spadek w niższą: próg - h.

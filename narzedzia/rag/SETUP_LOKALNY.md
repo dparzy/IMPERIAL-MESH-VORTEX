@@ -10,7 +10,7 @@ dublet_rozstrzygniety: docs/START_LOKAL.md — SETUP_LOKALNY to PEŁNA instrukcj
 
 > **⚠️ Weryfikacja 2026-07-18.** Komendy (`indeksuj.py --bez-wektorow/--tylko-nowe/--korpus`)
 > i MCP (`biblioteka_szukaj`/`biblioteka_info`) zgadzają się z kodem ✅. Zaktualizowano liczby
-> książek (było „41/42" → dziś <!-- LICZBA:ksiazki -->79<!-- /LICZBA -->) i oznaczono sekcję
+> książek (było „41/42" → dziś <!-- LICZBA:ksiazki -->115<!-- /LICZBA -->) i oznaczono sekcję
 > wydajności jako pomiar DATOWANY. **Wektory nadal niezbudowane** (baza w trybie FTS) — patrz
 > `docs/MAPA_PAMIECI.md`.
 
@@ -48,7 +48,7 @@ też "miara wpływu zlecenia na cenę" — bo rozumie znaczenie, nie tylko słow
 
 ### 2. Książki azw3/mobi (Kindle) — wymagają calibre
 
-Z <!-- LICZBA:ksiazki -->79<!-- /LICZBA --> tytułów: **9 to Kindle** (7 azw3 + 2 mobi) —
+Z <!-- LICZBA:ksiazki -->115<!-- /LICZBA --> tytułów: **9 to Kindle** (7 azw3 + 2 mobi) —
 wymagają **calibre**; reszta (epub/pdf/djvu) indeksuje się od razu:
 
 ```bash
@@ -99,7 +99,7 @@ rozmiar+mtime), reszta pomijana. Przy 200 książkach to sekundy zamiast minut.
 
 | Korpus | Zawartość | Po co |
 |--------|-----------|-------|
-| `biblioteka` | <!-- LICZBA:ksiazki -->79<!-- /LICZBA --> książek + encyklopedia + vademecum | wiedza zewnętrzna (autorzy) |
+| `biblioteka` | <!-- LICZBA:ksiazki -->115<!-- /LICZBA --> książek + encyklopedia + vademecum | wiedza zewnętrzna (autorzy) |
 | `dane` | `bibliotheca_ulpia/dane/` (CSV/JSON/notatki) | dane tematyczne, wyniki |
 | `docs` | dokumentacja Imperium (`docs/*.md`) | "co mamy w kodzie" |
 
@@ -124,5 +124,5 @@ Nie commitujemy jej — każdy odtwarza lokalnie z książek + dokumentów.
 
 > **BIB-032 O'Hara** (PDF): to skan obrazowy — narzędzia OCR zwracają bełkot dla tego pliku.
 > Esencja książki jest dostępna w `encyklopedia/MKS_mikrostruktura_rynku.md`.
-> Indeks RAG: <!-- LICZBA:ksiazki -->79<!-- /LICZBA --> książek + encyklopedia (FTS5). Wektory:
+> Indeks RAG: <!-- LICZBA:ksiazki -->115<!-- /LICZBA --> książek + encyklopedia (FTS5). Wektory:
 > wymagają modelu embeddingów (huggingface.co) — nadal NIEZBUDOWANE, baza w trybie FTS-only.

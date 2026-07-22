@@ -156,7 +156,7 @@ PSY-01 funding ekstremalny → SHORT 0.85 (jeśli adapter live).
 
 ---
 
-## 3. 🛠️ MANUAL INSTALACJI NA LAPTOPIE (Windows 10 Pro, Fujitsu 8 GB)
+## 3. 🛠️ MANUAL INSTALACJI NA LAPTOPIE (Windows 10 Pro, Fujitsu 15.88 GB RAM)
 
 ### Krok 0 — Co przenosisz
 Całe repozytorium ma **24 MB** (bez `.git`). To czysty Python — działa wszędzie.
@@ -177,7 +177,7 @@ git checkout claude/sleepy-fermi-dsdE4
 
 ### Krok 3 — Testy DZIAŁAJĄ BEZ instalacji zależności (Prawo I)
 ```powershell
-python tests\run_tests.py        # powinno: 562/562 zielone
+python tests\run_tests.py        # powinno: X/X zielone (liczba rośnie z kodem — patrz LOG_ZMIAN)
 python narzedzia\audyt_spojnosci.py   # powinno: exit 0, pełna harmonia
 ```
 > Runner testów nie wymaga numpy/TA-Lib — graceful fallback. To pierwszy dowód, że migracja się udała.
@@ -186,7 +186,7 @@ python narzedzia\audyt_spojnosci.py   # powinno: exit 0, pełna harmonia
 ```powershell
 pip install -r requirements.txt
 ```
-- **numpy, pandas** — instalują się czysto na 8 GB.
+- **numpy, pandas** — instalują się czysto (15.88 GB RAM to zapas z nawiązką).
 - **TA-Lib** — na Windows najłatwiej z gotowego wheela (pip install ta-lib lub wheel z unofficial binaries). Bez TA-Lib Brama używa czystego Pythona — system działa, tylko wolniej.
 - **ccxt** — adaptery giełd (MEXC).
 - **matplotlib** — dashboard.
@@ -200,23 +200,32 @@ setx MEXC_SECRET "twoj_sekret"
 ```
 > Po `setx` zamknij i otwórz nowy terminal. Klucze czytane przez `os.getenv(...)`.
 
-### Krok 6 — DeepSeek (doradca AI) — gdy dokupisz RAM/podłączysz API
+### Krok 6 — DeepSeek (doradca AI)
 - Klient zgodny z OpenAI: `openai>=1.0`, `api_key=os.getenv("DEEPSEEK_API_KEY")`.
-- 8 GB wystarczy do uruchomienia klienta API (DeepSeek liczy w chmurze, nie lokalnie).
-- Lokalny LLM (gdyby kiedyś) wymagałby dużo więcej RAM — API to właściwa droga na Fujitsu.
+- Klient API waży < 0.5 GB — DeepSeek liczy w chmurze, nie lokalnie.
+- Lokalny LLM **jest wykonalny** na tej maszynie: klasa **PEDES** (15.88 GB RAM, brak CUDA)
+  udźwignie 1–3B szybko (Q4) i 7–8B wsadowo — patrz projekt TIRO (`docs/PLAN_TIRO_LOKALNY_LLM.md`).
 
 ### Krok 7 — Claude Code na Windows (gdy chcesz mnie lokalnie)
 - Claude Code działa jako CLI w terminalu + rozszerzenia VS Code / JetBrains.
 - Na Windows 10 Pro: przez terminal (PowerShell/WSL). Hook `SessionStart` uruchomi audyt automatycznie.
 
-### Mapa pamięci RAM (8 GB → +8 GB)
-| Zadanie | RAM | Na 8 GB? |
+### Mapa pamięci RAM (zmierzone: 15.88 GB, klasa PEDES)
+> Liczba z `python -m imperium.oczy.censor_sprzetu` — **nie z pamięci**. Ten dokument
+> podawał kiedyś 8 GB; CENSOR zmierzył 15.88 GB (Prawo XVII: liczby policzone, nie wspominane).
+
+| Zadanie | RAM | Na 15.88 GB? |
 |---|---|---|
-| Testy + audyt | < 0.5 GB | ✅ z zapasem |
+| Testy + audyt | < 0.5 GB | ✅ z ogromnym zapasem |
 | Backtest OHLCV (CSV) | ~1–2 GB | ✅ |
 | Live z adapterami + dashboard | ~2–3 GB | ✅ |
 | DeepSeek API (klient) | < 0.5 GB | ✅ (liczy chmura) |
-| Po dokupieniu 16 GB | — | komfort + większe backtesty równolegle |
+| Lokalny LLM 1–3B Q4 (TIRO) | ~2–4 GB | ✅ szybko (~9.6 t/s zmierzone) |
+| Lokalny LLM 7–8B Q4 (TIRO) | ~6–8 GB | ✅ wsadowo w tle (wolno) |
+
+**Wąskie gardło tej maszyny to CPU (4 wątki) i brak CUDA, nie RAM.** Dlatego długie biegi
+(WFO, A/B na pełnym oknie) trwają godzinami mimo liniowego silnika — i dlatego lecą w tle
+z checkpointami (ZASADA ANALIZY CZĄSTKOWEJ), a nie jako jeden blokujący bieg.
 
 ---
 

@@ -113,8 +113,23 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-20 — Zwiad bibliotekarza tylko 1/5 tematów
-Hyginus przeskanował tylko 1 z 5 domyślnych tematów (mean reversion). Pozostałe 4 (momentum, regime detection, order flow, position sizing) nie ruszane. Kandydaci nie mają pomiaru redundancji ani walidacji areną.
+### 2026-07-20 — Brak flagi --dashboard w CLI – utrata potencjału
+Konfig pętli live posiada pola dashboard, ale CLI __main__ nie eksponowało odpowiedniej flagi. Cel P0 (obserwacja live) nie był osiągalny przez CLI. Naprawiono przez refaktoryzację i dodanie flagi.
+
+### 2026-07-20 — Wniosek per-reżim: BEAR=tarcza, reszta szkodzi
+W reżimie BEAR stosowanie tarczy (zabezpieczenia) jest korzystne; w pozostałych reżimach tarcza przynosi straty.
+
+### 2026-07-20 — Regresja danych w katalogu ksiąg – enrichment nadpisał poprawne wartości
+10 wpisów straciło autora/tytuł (Kissell → Nieznany, garble LŁpez). Przyczyna: calibre placeholder nadpisał dane z plików.
+
+### 2026-07-20 — Ekstraktor – kolizja plików scratcha przy równoległej konwersji
+ekstraktor.py:149 – kasowanie istniejącego pliku biblioteki przez równoczesne zapisy .calibre-tmp.txt. Fix edc657f nie domknięty.
+
+### 2026-07-20 — Cache djvu nie podpięty do RAG – utrata potencjału (Prawo XV)
+konwerter.py:70 – cache djvu zbudowany poprzednio nie jest używany przy indeksowaniu. Chmura nadal woła djvutxt/calibre i gubi djvu.
+
+### 2026-07-20 — Audyt spójności ma ślepe plamy – whitelist bez C/D, ruff pomija skrypty
+CLAUDE.md KROK 0 whitelist nie zawiera kategorii C i D (fałszywy alarm), a `audyt_spojnosci.py` nie skanuje `skrypty/` – dwa F541 przechodzą jako 'czysto'.
 
 ### 2026-07-20 — Hook startowy powoduje brudny working tree w dwóch plikach
 Pliki bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl oraz docs/PAMIEC_SESJI.md są modyfikowane przez hook startowy, co powoduje, że git working tree nie jest w 100% czysty. To normalny churn pamięci, a nie zmiana kodu.
@@ -125,14 +140,8 @@ Rodziny NEWS-*, PSY-*, RADAR-*, OC-06/07/08, C-01, V-03, Z-06/Z-07 nie mają jes
 ### 2026-07-20 — Windows cp1250 wymaga PYTHONIOENCODING=utf-8
 Konsola Windows w cp1250 wywala się na emoji. Aby testy i audyt działały poprawnie, należy ustawić zmienną środowiskową PYTHONIOENCODING=utf-8 przed każdą komendą.
 
-### 2026-07-20 — Hyginus znalazł 2 kandydatów
-Z tematu 'mean reversion' znaleziono Model Vasicka i Cross-sectional mean reversion, jeszcze bez walidacji.
-
 ### 2026-07-20 — Audyt spójności pełna harmonia
 84 neurony, 15 zwiadowców, 18 elit, ruff czysto, MAPA_KLUCZY pełna – system w pełni harmonijny.
-
-### 2026-07-21 — Problem z \b w regexie dla identyfikatorów BIB z podkreślnikiem
-\b nie zamyka się przed '_', więc 'BIB-006_Carson' nie jest wykrywany jako osobne słowo. To znana klasa z Księgi Wad (#53). Naprawiono w PROBATORZE przez użycie innej granicy (np. (?:^|[\s,;.!?])).
 
 ### 2026-07-21 — Archium lekcji ma inny nagłówek – szukaj() nie widzi schłodzonych
 Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł szukaj() używa własnego parsera, który go nie rozpoznaje. Luka w wyszukiwalności pamięci – wymaga ujednolicenia parsera lub wzbogacenia searcha.
@@ -167,14 +176,8 @@ Znak '_' jest traktowany jako słowny przez \b, co powodowało fałszywe dopasow
 ### 2026-07-21 — PROBATOR znalazł nieugruntowany plon w kolejce Hyginusa
 Pomiar na realnym plonie: 2367 znaków kandydatów i zero powołań na źródło, mimo promptu żądającego cytowań. PROBATOR działa poprawnie.
 
-### 2026-07-21 — Auto-lekcja przekracza limit znaków – potrzeba chłodzenia
-Auto-lekcja dopisała 21 wpisów z 3 sesji, limit 24000 znaków pęknięty. Konsolidacja co sesję to alarm wiecznie żywy. Lekarstwo: auto_lekcja sama egzekwuje limit przy zapisie.
-
 ### 2026-07-21 — Model cytuje nazwiskiem autora, nie identyfikatorem BIB
 Probator zgłaszał fałszywy alarm BEZ_CYTATU gdy model użył nazwiska (np. Hull) zamiast ID. Poprawiono test, nie organ – to realne użycie, a nie błąd weryfikacji.
-
-### 2026-07-21 — Auto-lekcja nie egzekwuje limitu przy zapisie
-Dotychczas auto_lekcja dopisywała wpisy bez sprawdzania limitu, co powodowało przepełnienie i fałszywy alarm przy każdej sesji. Rozwiązanie: wpięcie konsolidacji w metodę zapisu.
 
 ### 2026-07-20 — Testy wzrosły o dokładnie 7 — potwierdzenie biegnięcia
 Po dodaniu 7 testów granicznych licznik wzrósł z 2620 do 2627. To dowód, że testy naprawdę biegły (nie zostały cicho pominięte jak w poprzedniej sesji). Lekcja o zwykłych def test_* zamiast unittest.TestCase wdrożona.
@@ -233,9 +236,6 @@ Audyt złapał nowy organ w trzech warstwach naraz (W11, W15, W17), ale hook nie
 ### 2026-07-20 — Zawartość pliku w wrzutni
 Plik z wrzutnia to dump rozmów z Hyginusem (DeepSeek) zawierający research hybrydy LLM: modele 3B, LoRA, LARSA/AlphaQuanter, Fin-R1, Unsloth/QLoRA, fine-tuning na chmurze. Wątek hybrydy-ucznia od linii 2163.
 
-### 2026-07-20 — Luka pokrycia 4h – tylko 10 par zamiast 15
-Pomiar wykazuje brak plików 4h dla BNB/BTC/DOGE/ETH/SOL. Wpływa na redukcję kombinacji do 40 zamiast potencjalnych 45.
-
 ### 2026-07-20 — Potrójna symbioza audit-sigilium: mechanizm wykrywa własne organy w wielu warstwach
 Audyt W11/W15/W17 złapał nowe sigilium (runbook, licznik w README, rekord w codicilu) – symbioza działa przeciw autorowi. Wymusza to ostrożność przy dodawaniu nowych elementów.
 
@@ -253,9 +253,6 @@ Wewnętrzna pętla _py_hma wywołuje wma wielokrotnie (4.5M wywołań, 65.5s cum
 
 ### 2026-07-20 — Backtest liniowy, nie O(n²)
 Pomiary profili dla 500-1600 barów wykazały stały ms/tick (~66ms), co oznacza skalowanie O(n·okno), nie kwadratowe. Premisa planu naprawy była błędna.
-
-### 2026-07-20 — Wynik WF-IC dla 15 par 4h
-32/49 neuronow ROBUST, 17 szum/niepewne. Czołówka: EXP-13, SMC-01, V-02/V-13/V-14, rodzina X-*. UWAGA: EXP-13 (6 okien), SMC-01 (5), V-13 (3) maja malo okien -> ROBUST slabiej podparty niz X-17/X-01 (25 okien).
 
 ### 2026-07-20 — Output hooka startowego ucięty przez harness
 Output hooka startowego (25,5 KB) został ucięty, powodując utratę kluczowej informacji (Dziennik następny krok) z pierwszego okna. Konieczna optymalizacja objętości.

@@ -113,6 +113,24 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-26 — Aerarium – filtrować obce projekty Claude
+Obecność jednego obcego katalogu projektu Claude powoduje, że aerarium raportuje jego pamięć i koszty jako własne, zamiast zwrócić no match. Należy filtrować, aby uniknąć fałszywych danych.
+
+### 2026-07-26 — Kronika sesji – zakaz bezwzględnych ścieżek z nazwą użytkownika
+Linie z absolutnymi ścieżkami desktopu (C:\Users\Ian\Desktop\) ujawniają PII i strukturę katalogów. Używać zmiennych środowiskowych lub przechowywać referencje wewnątrz repozytorium dla przenośności.
+
+### 2026-07-26 — Średnie śledzie w 1L za długie
+Medium tracks w pierwszej lidze datasetu ZENITH mają średnio 10K linii, co znacznie przekracza limit 2K. Obniża to jakość danych treningowych i wymaga kryteriów kwalifikacji.
+
+### 2026-07-26 — Commitowanie desktop paths łamie przenośność i PII
+W kronice znaleziono bezwzględne ścieżki typu C:\Users\Ian\Desktop. Należy używać zmiennych środowiskowych lub przechowywać referencje wewnątrz repozytorium. To narusza bezpieczeństwo i przenośność.
+
+### 2026-07-26 — Bezpośrednia edycja sigillum_probationis.json narusza zasadę
+Plik sigillum_probationis.json jest magazynem (ledger) i musi być aktualizowany wyłącznie przez narzędzia sigillarium lub codex_probationum.py. Ręczna edycja jest złamaniem reguły CLAUDE.md i README.md.
+
+### 2026-07-26 — cubic-dev-ai trafny w 22/22, ale 3 fałszywe alarmy
+cubic-dev-ai w PR #133 zgłosił 22 zastrzeżenia. Wszystkie autentyczne błędy zostały potwierdzone, ale 3 uwagi (fake sigillum, nadużycie integracji, auth_hook) okazały się fałszywe. Wymaga weryfikacji przed działaniem.
+
 ### 2026-07-26 — Regime-stale bug: pamięć branżowa ślepa na reżim rynku
 Wszystkie istniejące systemy pamięci (Mem0/Zep/Letta/A-Mem) są domenowo-ślepe – wydobywają lekcje z bull marketu podczas bessy. Nasza poprawka: × regime_match w scoringu.
 

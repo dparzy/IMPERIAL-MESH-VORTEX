@@ -123,9 +123,10 @@ Wyjdź z Claude Code na razie:
 
 W terminalu:
 ```
-cd Desktop\imperial-mesh-vortex
+cd C:\Projekty\imperial-mesh-vortex
 ```
-(lub gdziekolwiek masz sklonowane Imperium — zmień ścieżkę)
+(sprostowane 2026-07-26 — wcześniej stało tu `Desktop\imperial-mesh-vortex`, gdzie
+Imperium NIE leży; źródło prawdy o ścieżce: `docs/SCIAGA_LOKAL.md`)
 
 ### Krok 3.2 — Przełącz na właściwą gałąź
 
@@ -287,6 +288,12 @@ Po restarcie Claude Code będzie mógł czytać PR, komentarze, CI — bezpośre
 Jeśli chcesz żeby Claude miał dostęp do konkretnych folderów poza Imperium
 (np. folder z danymi CSV, folder Downloads):
 
+> **Ścieżka projektu to `C:\Projekty\imperial-mesh-vortex`** — sprostowane 2026-07-26.
+> Wcześniej stało tu `C:\Users\TwojeImie\Desktop\imperial-mesh-vortex`, czyli miejsce,
+> w którym Imperium NIE leży: wklejenie tego bloku dałoby serwer MCP wskazujący w próżnię.
+> Źródło prawdy o ścieżce: `docs/SCIAGA_LOKAL.md`. Podmieniaj wyłącznie `TwojeImie`
+> w ścieżce Downloads — nazwa katalogu projektu jest znana i stała, nie jest wypełniaczem.
+
 ```json
 {
   "mcpServers": {
@@ -295,7 +302,7 @@ Jeśli chcesz żeby Claude miał dostęp do konkretnych folderów poza Imperium
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "C:\\Users\\TwojeImie\\Desktop\\imperial-mesh-vortex",
+        "C:\\Projekty\\imperial-mesh-vortex",
         "C:\\Users\\TwojeImie\\Downloads"
       ]
     }

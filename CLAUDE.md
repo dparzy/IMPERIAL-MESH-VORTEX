@@ -450,9 +450,22 @@ hipotezy, czego niski-effort/tańszy model by nie zrobił rzetelnie.
 **How to apply:** przy większym zadaniu — jedno zdanie: jaki tier i dlaczego, zanim ruszysz. Nie
 spawnuj subagenta do drobiazgu (koszt zimnego startu przewyższa oszczędność). Tabelę rozszerzaj, gdy
 pojawi się nowy powtarzalny wzorzec zadania — wpis w tym samym commicie co pierwsze użycie.
-**„Opus" w tabeli = skrót na NAJWYŻSZY dostępny tier** (od 2026-07-18 sesje bywają na Fable 5 >
-Opus — wtedy „Opus" czytaj „Fable 5"). Nazwa modelu zaszyta na sztywno starzeje się jak każda
-ręczna liczba (klasa wady: MANUAL podawał nieistniejący „sonnet-4-6", złapane 2026-07-17).
+**„Opus" w tabeli = skrót na NAJWYŻSZY dostępny tier** — REGUŁA, nie nazwa. Nazwa modelu
+zaszyta na sztywno starzeje się jak każda ręczna liczba (klasa wady: MANUAL podawał
+nieistniejący „sonnet-4-6", złapane 2026-07-17), więc tier czytamy z tego, co Cezar
+faktycznie ustawił (`/model`), nie z tego, co pamiętamy.
+
+**Stan modeli na 2026-07-26 (decyzja Cezara):** model główny Imperium to **OPUS 5**
+(`claude-opus-5`) — wg rankingów zdecydowanie mocniejszy od poprzednika. **Opus 4.8
+przechodzi na emeryturę.** Wcześniej rolę najwyższego tieru pełniły kolejno Opus 4.8
+i Fable 5 — ta lista JEST datowana i z założenia się zestarzeje; wiążąca jest reguła
+powyżej, a nie ten akapit.
+
+**ARCHITEKT NIE MIERZY WŁASNEGO MODELU** (zmierzone 2026-07-21, potwierdzone 07-26):
+środowisko hooka nie niesie identyfikatora modelu, więc BREVIARIUM świadomie go nie
+zgaduje, a Vitruviusz DEKLARUJE go na otwarciu z konfiguracji sesji. Gdy deklaracja
+Architekta rozjedzie się z tym, co ustawił Cezar — **źródłem prawdy jest ustawienie
+Cezara**, nie deklaracja (Prawo I: kto nie mierzy, ten nie rozstrzyga).
 
 **Złamanie:** użycie Opusa na czysto mechanicznym zadaniu BEZ powodu, LUB — poważniejsze — pozostanie
 na tanim modelu/niskim effort mimo zaskakującego/nieoczekiwanego wyniku zamiast eskalacji.

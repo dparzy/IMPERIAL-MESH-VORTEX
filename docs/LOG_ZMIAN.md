@@ -14,6 +14,37 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-26 | 🗺️ | Ścieżka lokalna sprostowana + OPUS 5 modelem głównym
+
+**Poprawka Cezara (dwie sprawy naraz).**
+
+**1. Ścieżka podana z WYGLĄDU nazwy, nie ze źródła.** Podałem blok push z
+`cd C:\IMPERIAL-MESH-VORTEX` — przepisałem wersaliki z nagłówka README i nazwy repo na
+GitHubie, gubiąc nadrzędny folder. Realnie: **`C:\Projekty\imperial-mesh-vortex`**
+(`docs/SCIAGA_LOKAL.md`, potwierdzone niezależnie ścieżką temp Windows w kronice:
+`C--Projekty-imperial-mesh-vortex`).
+
+**Skan całego korpusu (decyzja Cezara) pokazał, że ta sama klasa GNIŁA w żywym manualu:**
+`docs/MANUAL_CLAUDE_CODE.md` kazał w dwóch miejscach użyć `Desktop\imperial-mesh-vortex`
+— raz jako `cd`, raz jako ścieżka serwera **MCP filesystem**. Cezar-nowicjusz wkleiłby ten
+blok i dostał serwer wskazujący w próżnię. Oba miejsca poprawione + nota o sprostowaniu.
+Reszta korpusu spójna (5 wystąpień poprawnej ścieżki). Kronika NIETKNIĘTA (Prawo I).
+
+**2. OPUS 5 modelem głównym Imperium, Opus 4.8 na emeryturze** (decyzja Cezara — wg
+rankingów Opus 5 jest zdecydowanie mocniejszy). Zapis w `CLAUDE.md` §ZASADA OSZCZĘDNOŚCI
+TOKENÓW rozdzielony na **regułę** („Opus" = najwyższy dostępny tier — wiążąca, nie starzeje
+się) i **datowany stan** (dziś: Opus 5; wcześniej kolejno 4.8 i Fable 5 — z założenia się
+zestarzeje). Dopisana zasada rozstrzygania sporu: Architekt NIE MIERZY własnego modelu
+(środowisko nie niesie identyfikatora), więc gdy jego deklaracja rozjedzie się z tym, co
+ustawił Cezar — **wiąże ustawienie Cezara**, nie deklaracja (kto nie mierzy, ten nie rozstrzyga).
+
+**Księga Wad +1 klasa:** „ścieżka/nazwa podana z wyglądu nazwy repo zamiast ze źródła prawdy"
+— wypełniacz typu `TwojeImie` stosuj TYLKO tam, gdzie wartość jest naprawdę nieznana.
+
+**Pliki:** `CLAUDE.md`, `docs/MANUAL_CLAUDE_CODE.md`, `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`.
+
+---
+
 ## 2026-07-26 | 🔇 | ABSTYNENCJA ZAMIAST ZERA — narzędzie od prawdy żądało skasowania prawdy
 
 **Alarm otwarcia wachty (audyt W15) okazał się fałszywy W SPOSÓB GROŹNY:** Warstwa 15

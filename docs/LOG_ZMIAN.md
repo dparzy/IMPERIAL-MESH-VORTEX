@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-26
+stan_na: 2026-07-27
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,61 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-07-27 | 🔬 | Sąd nad recenzją cubic PR #133 — 20/22 słuszne, dwie nowe warstwy audytu
+
+**Cezar kazał sprawdzić, czy recenzent ma rację. Osądziłem każde z 22 znalezisk wobec
+żywego kodu: 20 słusznych, 2 fałszywe — w tym jedyne P1 okazało się halucynacją.**
+
+**Obalone:** (1) zarzut „ręcznej edycji `sigillum_probationis.json`" cytował DWIE
+nieistniejące reguły — `grep` po całym korpusie `.md` nie znajduje tego pliku poza
+diffstatem kroniki, a zapisuje go automatycznie `tests/run_tests.py` po każdym biegu.
+(2) „katalog `wrzutnia/consilium/` nie istnieje" — istnieje, jest gitignorowany;
+recenzent pomylił *niewidoczne w repo* z *nie ma*, czyli dokładnie tę klasę abstynencji,
+przed którą Imperium się broni.
+
+**Naprawione u źródła (kod):** filtr zbioru SFT wydzielony do jednego generatora
+(`notarius.pary_sft`) — eksport i licznik nie mogą się już rozjechać; licznik par TIRO
+przestał serializować cały zbiór do pliku tymczasowego dla jednej liczby i dostał jawny
+ledger; `aerarium` przestał padać na poprawnym JSON-ie o złym kształcie i przestał
+podawać CUDZĄ pamięć jako nasz pomiar.
+
+**Testy, które nic nie broniły:** skasowana TAUTOLOGIA (`korpus_ksiazek_obecny() ==
+(ksiazki_w_bazie() > 0)` — porównanie wyrażenia z własną definicją, przechodziło zawsze),
+parytet GRADUS pilnuje teraz także KLUCZY wysiłku, a niezmiennik sesyjności objął
+`ultracode`. Każda poprawka udowodniona MUTACJĄ: pod zepsutym kodem nowy test oblewa.
+
+**Przyczyna źródłowa duplikatów — ZMIERZONA:** dedup lekcji przeglądał 91 wpisów
+aktywnych i nie widział 207 zarchiwizowanych (69% korpusu poza zasięgiem bramki).
+Chłodzenie wyprowadzało bliźniaka poza pole widzenia, więc auto-lekcja zapisywała tę
+samą treść ponownie. To POWTÓRKA wady z cubic PR #118 — naprawiono wtedy PREDYKAT, ale
+nie ZASIĘG. Ironia potwierdza diagnozę: najczęściej powielona lekcja (4×) mówi „archiwum
+niewidoczne dla `szukaj()`". Rejestr wizji dedupował po samym napisie, więc parafrazy
+DeepSeeka wchodziły podwójnie; teraz oba rejestry dzielą JEDEN predykat, a pominięcie
+jest głośne (Prawo XV). Sprzątanie: ACTA 207→188, pamięć aktywna 91→89, ledger 827→803 —
+wariant bogatszy zostaje, dwie pary świadomie NIE scalone (różne strategie / obserwacja
+wraz z jej rozstrzygnięciem).
+
+**Dwie nowe warstwy audytu (CORONY):**
+- **W19 — parytet dat:** `stan_na` we frontmatterze musi równać się „Stan na:" w nagłówku.
+  Cubic znalazł jeden taki rozjazd, mechanizm znalazł pięć kolejnych. Warstwa złapała też
+  własny fałszywy alarm (cytat „Stan na:" w prozie changelogu i daty SEKCJI) — zasięg
+  zawężony do nagłówka dokumentu, bo warstwa pilnująca prawdy nie może produkować nieprawdy.
+- **W20 — katalog nietknięty:** sekcja generowana w INDEKS musi być tym, co wypluwa
+  Tabularium. Ręczny wiersz siedział w sekcji CONSILIUM przy `kategoria: DISCIPLINA`;
+  regeneracja ujawniła dodatkowo trzy nieaktualne daty. Porównujemy strukturę, świadomie
+  pomijając linię „Ostatni spis" — inaczej audyt żądałby przepisania katalogu codziennie.
+
+Przy okazji: docstring audytu deklarował „16 warstw" przy 18 w kodzie — usunięta ręczna
+liczba, została sama lista (klasa wady W15).
+
+**Pliki:** `imperium/biblioteki/notarius.py`, `imperium/oczy/breviarium.py`,
+`imperium/cesarz/aerarium.py`, `imperium/biblioteki/pamiec_sesji.py`,
+`imperium/biblioteki/rejestr_wizji.py`, `narzedzia/audyt_spojnosci.py`,
+`narzedzia/auto_lekcja.py`, `tests/*`, `README.md`, `docs/README.md`,
+`docs/INDEKS_IMPERIUM.md`, `docs/MANIFEST_KODU.md`, `docs/SCIAGA_LOKAL.md`.
 
 ---
 

@@ -552,7 +552,7 @@ wpływ na Imperium · zgodność z zasadami · dowód z pomiaru) — czyli ryzyk
 **Każdy krok ma samokontrolę, każda wykryta luka jest NATYCHMIAST łatana, a po łacie powstaje
 MECHANIZM, żeby ta klasa luki nie wróciła.** (Censor w Rzymie prowadził cenzus i nadzór obyczajów —
 u nas: spis stanu + egzekwowanie reakcji.) To spina istniejące organy w jedną pętlę obowiązku:
-audyt 18 warstw (spójność) · Księga Wad (klasy błędów) · skan_wad (powtórki) · pamięć W-360
+audyt spójności (wszystkie warstwy) · Księga Wad (klasy błędów) · skan_wad (powtórki) · pamięć W-360
 z Refleksją W9 (sprzeczności) · CODEX (rejestr testów) · testy granic.
 
 **PĘTLA (przy każdej zmianie i każdym alarmie):**
@@ -661,7 +661,7 @@ znak uruchamiający pełną checklistę. Organ: **SIGILLARIUM** (`imperium/bibli
 |---|---|---|
 | `/apertio` | pełną checklistę **OTWARCIA SESJI** (sekcja niżej) | otwarcie, start sesji, zaczynamy, nowa sesja |
 | `/clausura` | pełną checklistę **KOŃCA SESJI** (sekcja niżej) | zamknięcie, koniec sesji, domykamy, kończymy |
-| `/limes` | **bramkę Prawa XXI**: testy → audyt (18 warstw: ruff W13, census W17, dług honorowy W18) → skan wad → INDEX FALSORUM | bramka, przed commitem, sprawdź wszystko |
+| `/limes` | **bramkę Prawa XXI**: testy → audyt (pełny — m.in. ruff W13, census W17, dług honorowy W18, parytet dat W19, katalog W20) → skan wad → INDEX FALSORUM | bramka, przed commitem, sprawdź wszystko |
 
 **ŻELAZNA ZASADA: pieczęć NIE przechowuje kroków — czyta je z TEGO pliku w chwili wywołania.**
 Powód zmierzony (2026-07-20): runbook W11 kazał Claude `git push` przez 9 dni po zakazie (rozkaz
@@ -691,7 +691,7 @@ Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
    A2 — zawsze widoczny mimo ~25 KB) → **PORTITOR** (pre-flight środowiska: deps/klucze API/dryf, B1)
    → **CENSOR SPRZĘTU** (żelazo zmierzone) → **AERARIUM** (waga kontekstu startowego, stopnie GRADUS,
    nadzór nad kosztem samego wydruku hooka) → **INDEX FALSORUM** → **BREVIARIUM** (słudzy: Hyginus/TIRO/
-   modele) → **LEX TALIONIS** (dług honorowy) → **audyt Prawo XXI** (18 warstw) → **CODEX**
+   modele) → **LEX TALIONIS** (dług honorowy) → **audyt Prawo XXI** (pełny) → **CODEX**
    (podsumowanie ledgera, C1) → **Centrum Pamięci** (profil, Top-3 lekcji, aktywny cel W12, Refleksja W9)
    → **Dziennik Nieśmiertelny** (pełna oś) → **skan wad ostatniego commitu**. Wydruk >25 KB bywa ucięty
    w podglądzie — pełna treść jest w pliku `tool-results/hook-*.txt` (czytaj go, jeśli banner/plan zniknął).

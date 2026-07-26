@@ -1,6 +1,6 @@
 ---
 name: limes
-description: SIGILLUM LIMES — wał graniczny, twarda bramka Prawa XXI przed każdym commitem. Użyj przed commitem oraz gdy Cezar pisze „bramka", „sprawdź wszystko", „limes". Uruchamia testy, audyt spójności (17 warstw z ruff), łowcę powtórek z Księgi Wad, spis obalonych twierdzeń (INDEX FALSORUM) i bilans długu honorowego.
+description: SIGILLUM LIMES — wał graniczny, twarda bramka Prawa XXI przed każdym commitem. Użyj przed commitem oraz gdy Cezar pisze „bramka", „sprawdź wszystko", „limes". Uruchamia testy, pełny audyt spójności (z ruff W13), łowcę powtórek z Księgi Wad, spis obalonych twierdzeń (INDEX FALSORUM) i bilans długu honorowego.
 ---
 
 # 🔏 SIGILLUM LIMES — bramka Prawa XXI

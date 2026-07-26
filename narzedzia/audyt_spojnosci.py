@@ -6,7 +6,10 @@ Uruchamiany automatycznie przez hooki Claude Code (SessionStart + Stop) oraz rę
     python narzedzia/audyt_spojnosci.py            # raport + exit code
     python narzedzia/audyt_spojnosci.py --cichy     # tylko gdy są błędy
 
-Sprawdza 16 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
+Sprawdza warstwy 1–20 spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI).
+Lista poniżej JEST spisem — nie podajemy tu osobnej liczby, bo ręczna liczba zawsze się
+rozjedzie z listą (zmierzone 2026-07-26: nagłówek mówił „16 warstw", gdy kod miał 18 —
+Warstwy 17 i 18 dopisano do kodu, ale nie do tego spisu. Dokładnie klasa wady W15):
   Warstwa 1  — żywy rój:        liczby, kategorie, elity, klucze
   Warstwa 2  — infrastruktura:  WAGI_REZIMU vs KAT w kodzie
   Warstwa 3  — dokumentacja:    MANIFEST klucze vs kod, liczby README/MANIFEST/CLAUDE
@@ -23,6 +26,10 @@ Sprawdza 16 warstw spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI):
   Warstwa 14 — wszystkie docs:  MAPA_KLUCZY zawiera każdy klucz z kodu (skan wszystkich .md)
   Warstwa 15 — liczby:          bloki <!-- LICZBA:x --> zgodne z żywym kodem (Tabularium, Filar 4)
   Warstwa 16 — API-widma:       plik kodu cytowany w żywym docu MUSI istnieć (łowca widm)
+  Warstwa 17 — census organów:  każdy moduł imperium/ i narzedzia/ zameldowany w CENSUS
+  Warstwa 18 — LEX TALIONIS:    dług honorowy = 0 (zatwierdzony błąd ma kompensujący unikat)
+  Warstwa 19 — parytet dat:     frontmatter `stan_na` = nagłówek "Stan na:" w tym samym pliku
+  Warstwa 20 — katalog INDEKS:  sekcja generowana = to, co wypluwa Tabularium (zero ręcznych edycji)
 
 Exit code:
   0 = pełna spójność (Imperium gotowe)
@@ -545,7 +552,125 @@ def audyt() -> tuple:
     bledy += w18_bledy
     info += w18_info
 
+    # ── WARSTWA 19: PARYTET DAT — jedna data, dwa miejsca, jedna prawda ───────
+    w19_bledy, w19_info = _warstwa_19_parytet_dat()
+    bledy += w19_bledy
+    info += w19_info
+
+    # ── WARSTWA 20: KATALOG INDEKS — sekcja generowana nietknięta ręką ────────
+    w20_bledy, w20_info = _warstwa_20_katalog_nietkniety()
+    bledy += w20_bledy
+    info += w20_info
+
     return bledy, info
+
+
+def _warstwa_19_parytet_dat():
+    """W19 — dwa pola deklarujące „stan na" muszą mówić to samo.
+
+    Powód (recenzja zewnętrzna 2026-07-26): README miał `stan_na: 2026-07-19` we
+    frontmatterze i „Stan na: 2026-07-26" w nagłówku. Audyt meldował „86 dokumentów,
+    wszystkie nadążają ✅", bo Warstwa 6 czyta WYŁĄCZNIE nagłówek, a Tabularium czyta
+    WYŁĄCZNIE frontmatter. Dwa organy pilnowały dwóch pól i żaden nie porównał ich ze
+    sobą — klasa „dwa liczniki rozjadą się co do sztuki".
+
+    Sprawdzamy tylko dokumenty mające OBA pola: brak któregokolwiek nie jest błędem
+    (nie każdy dokument deklaruje datę), rozjazd między nimi — jest.
+
+    ZASIĘG = NAGŁÓWEK DOKUMENTU (pierwsze `LINIE_NAGLOWKA` wierszy). Pierwsza wersja tej
+    warstwy skanowała CAŁY plik i sama dała trzy fałszywe alarmy, złapane przed commitem:
+      • LOG_ZMIAN — dopasowała frazę „Stan na:" CYTOWANĄ w treści wpisu changelogu,
+      • KATALOG_NEURONOW i ROADMAP — datę SEKCJI w środku dokumentu, która opisuje tę
+        sekcję, a nie cały plik, więc porównywanie jej z frontmatterem jest bez sensu.
+    Warstwa pilnująca prawdy nie ma prawa produkować nieprawdy o cudzych dokumentach.
+    """
+    LINIE_NAGLOWKA = 30
+    try:
+        from narzedzia.tabularium import ROOT as T_ROOT
+        from narzedzia.tabularium import zbierz_dokumenty
+    except Exception as e:  # noqa: BLE001 — awaria warstwy nie może wywrócić audytu
+        return [f"[W19] Błąd parytetu dat: {e}"], []
+
+    bledy, sprawdzone = [], 0
+    for wzgledna, meta in zbierz_dokumenty():
+        fm = (meta or {}).get("stan_na")
+        if not fm:
+            continue
+        try:
+            with open(os.path.join(T_ROOT, wzgledna), encoding="utf-8") as f:
+                tresc = f.read()
+        except OSError:
+            continue
+        naglowek = "\n".join(tresc.splitlines()[:LINIE_NAGLOWKA])
+        m = re.search(r"Stan na:\s*\**\s*(\d{4}-\d{2}-\d{2})", naglowek)
+        if not m:
+            continue
+        sprawdzone += 1
+        if str(fm).strip() != m.group(1):
+            bledy.append(
+                f"[W19] {wzgledna}: frontmatter `stan_na: {fm}` ≠ nagłówek "
+                f"'Stan na: {m.group(1)}' — jedna data, dwa miejsca, jedna prawda")
+    info = ([f"Parytet dat (W19): {sprawdzone} dokumentów z obiema datami — zgodne ✅"]
+            if not bledy else [])
+    return bledy, info
+
+
+def _warstwa_20_katalog_nietkniety():
+    """W20 — sekcja katalogu w INDEKS musi być tym, co generuje Tabularium.
+
+    Powód (recenzja zewnętrzna 2026-07-26): do sekcji opisanej „NIE edytuj ręcznie"
+    dopisano wiersz `docs/ZADANIE_TIRO_E3_ZNIWO.md` — w sekcji CONSILIUM, choć dokument
+    deklaruje `kategoria: DISCIPLINA`. Audyt przepuścił, bo pilnował wyłącznie OBECNOŚCI
+    dokumentu w INDEKS (Warstwa 7), nigdy jego MIEJSCA. Regeneracja katalogu ujawniła
+    przy okazji trzy dodatkowe nieaktualne daty — ręczna edycja artefaktu generowanego
+    kłamie do pierwszego `--zapisz`.
+
+    Lekarstwo jak w CENSUS ORGANORUM (W17): odebrać dokumentowi prawo do własnej treści.
+
+    Porównujemy STRUKTURĘ (nagłówki sekcji + wiersze tabel), świadomie POMIJAJĄC linię
+    „Ostatni spis: <data>" — ta zmienia się każdego dnia, więc dosłowne porównanie
+    żądałoby przepisywania katalogu codziennie. To ten sam fałszywy alarm, który
+    naprawiliśmy w Warstwie 6 (data porównywana z commitem, nie z `date.today()`).
+    """
+    try:
+        from narzedzia.tabularium import ROOT as T_ROOT
+        from narzedzia.tabularium import (ZNACZNIK_KONIEC, ZNACZNIK_START, katalog_md)
+    except Exception as e:  # noqa: BLE001 — awaria warstwy nie może wywrócić audytu
+        return [f"[W20] Błąd kontroli katalogu: {e}"], []
+
+    indeks = os.path.join(T_ROOT, "docs", "INDEKS_IMPERIUM.md")
+    try:
+        with open(indeks, encoding="utf-8") as f:
+            tresc = f.read()
+    except OSError as e:
+        return [f"[W20] Nie mogę odczytać INDEKS_IMPERIUM.md: {e}"], []
+
+    if ZNACZNIK_START not in tresc or ZNACZNIK_KONIEC not in tresc:
+        return [("[W20] INDEKS_IMPERIUM.md nie ma znaczników sekcji generowanej — "
+                 "katalog przestał być pod kontrolą Tabularium")], []
+
+    def istotne(tekst):
+        """Wiersze niosące treść katalogu: nagłówki sekcji i wiersze tabeli."""
+        return [w.strip() for w in tekst.splitlines()
+                if w.startswith("### ") or (w.startswith("|") and "Ostatni spis" not in w)]
+
+    w_pliku = istotne(tresc.split(ZNACZNIK_START, 1)[1].split(ZNACZNIK_KONIEC, 1)[0])
+    z_kodu = istotne(katalog_md())
+    if w_pliku == z_kodu:
+        return [], [f"Katalog INDEKS (W20): {len(z_kodu)} wierszy zgodnych z generatorem ✅"]
+
+    nadmiar = [w for w in w_pliku if w not in z_kodu]
+    brak = [w for w in z_kodu if w not in w_pliku]
+    szczegol = []
+    if nadmiar:
+        szczegol.append(f"dopisane ręcznie ({len(nadmiar)}): {nadmiar[0][:90]}")
+    if brak:
+        szczegol.append(f"brakujące ({len(brak)}): {brak[0][:90]}")
+    if not szczegol:          # te same wiersze, inna KOLEJNOŚĆ (zła sekcja / złe sortowanie)
+        szczegol.append("te same wiersze w innej kolejności lub sekcji")
+    return [("[W20] Katalog w INDEKS_IMPERIUM.md rozjechał się z generatorem — "
+             + "; ".join(szczegol)
+             + ". Napraw: python narzedzia/tabularium.py katalog --zapisz")], []
 
 
 def _warstwa_18_dlug_honorowy(sciezka=None):

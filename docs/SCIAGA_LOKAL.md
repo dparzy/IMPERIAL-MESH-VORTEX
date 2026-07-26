@@ -12,7 +12,7 @@ powod_istnienia: "Jedyna „jedna kartka' z KOMPLETEM realnych komend lokalnych 
 
 > Jedna kartka ze WSZYSTKIMI komendami do obsługi Imperium na laptopie.
 > Kopiuj-wklej do PowerShella. Kolejność sekcji = kolejność, w jakiej ich zwykle używasz.
-> **Stan na:** 2026-07-12
+> **Stan na:** 2026-07-17
 
 ---
 

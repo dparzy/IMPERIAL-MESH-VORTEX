@@ -298,3 +298,95 @@ def test_w18_awaria_ledgera_nie_wywraca_audytu(tmp_path):
     zly.write_text("{to nie json\n", encoding="utf-8")
     bledy, _ = w18(zly)
     assert isinstance(bledy, list)                    # kontrakt zachowany, brak wyjątku
+
+
+# ── WARSTWA 19: PARYTET DAT (frontmatter vs nagłówek) ────────────────────────
+
+def test_audyt_w19_zielony_na_realnym_korpusie():
+    """W19 na żywym repo: żaden dokument nie deklaruje dwóch różnych dat 'stan na'."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, info = a._warstwa_19_parytet_dat()
+    assert not bledy, f"W19 wykrył rozjazd dat: {bledy}"
+    assert any("W19" in i for i in info)
+
+
+def test_audyt_w19_lapie_rozjazd_dwoch_dat(monkeypatch, tmp_path):
+    """GRANICA: frontmatter mówi jedno, nagłówek drugie → alarm.
+
+    Dokładnie przypadek z recenzji 2026-07-26: README miał `stan_na: 2026-07-19`
+    i „Stan na: 2026-07-26". Warstwa 6 czytała tylko nagłówek, Tabularium tylko
+    frontmatter, więc audyt meldował harmonię przy jawnej sprzeczności.
+    """
+    import narzedzia.audyt_spojnosci as a
+    from narzedzia import tabularium as tab
+    plik = tmp_path / "DOK.md"
+    plik.write_text("---\nstan_na: 2026-07-19\n---\n> **Stan na:** 2026-07-26\ntreść\n",
+                    encoding="utf-8")
+    monkeypatch.setattr(tab, "ROOT", str(tmp_path))
+    monkeypatch.setattr(tab, "zbierz_dokumenty", lambda: [("DOK.md", {"stan_na": "2026-07-19"})])
+    bledy, _ = a._warstwa_19_parytet_dat()
+    assert len(bledy) == 1 and "DOK.md" in bledy[0]
+
+
+def test_audyt_w19_data_w_prozie_nie_jest_deklaracja(monkeypatch, tmp_path):
+    """GRANICA (fałszywy alarm złapany w samo-recenzji przed commitem): fraza „Stan na:"
+    zacytowana GŁĘBOKO w treści to nie deklaracja dokumentu.
+
+    Pierwsza wersja W19 skanowała cały plik i oskarżyła LOG_ZMIAN o rozjazd, bo w jednym
+    wpisie changelogu cytowano cudzą datę. Warstwa pilnująca prawdy nie ma prawa
+    produkować nieprawdy — zasięg to nagłówek dokumentu.
+    """
+    import narzedzia.audyt_spojnosci as a
+    from narzedzia import tabularium as tab
+    plik = tmp_path / "LOG.md"
+    plik.write_text("---\nstan_na: 2026-07-26\n---\n"
+                    + "wypełniacz\n" * 40
+                    + "Naprawiono: README ze „Stan na: 2026-07-15\" było nieaktualne.\n",
+                    encoding="utf-8")
+    monkeypatch.setattr(tab, "ROOT", str(tmp_path))
+    monkeypatch.setattr(tab, "zbierz_dokumenty", lambda: [("LOG.md", {"stan_na": "2026-07-26"})])
+    bledy, _ = a._warstwa_19_parytet_dat()
+    assert bledy == [], f"cytat w prozie nie może być alarmem: {bledy}"
+
+
+# ── WARSTWA 20: KATALOG INDEKS NIETKNIĘTY RĘKĄ ───────────────────────────────
+
+def test_audyt_w20_zielony_na_realnym_indeksie():
+    """W20 na żywym repo: katalog w INDEKS = to, co wypluwa Tabularium."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, info = a._warstwa_20_katalog_nietkniety()
+    assert not bledy, f"W20 wykrył ręczną edycję katalogu: {bledy}"
+    assert any("W20" in i for i in info)
+
+
+def test_audyt_w20_lapie_wiersz_dopisany_recznie(monkeypatch):
+    """GRANICA: jeden wiersz dopisany ręcznie do sekcji generowanej → alarm.
+
+    Przypadek z recenzji 2026-07-26: wpis o kategorii DISCIPLINA wstawiono do sekcji
+    CONSILIUM. Warstwa 7 pilnowała samej OBECNOŚCI dokumentu w INDEKS, nigdy MIEJSCA,
+    więc ręczna edycja żyła aż do pierwszej regeneracji.
+    """
+    import narzedzia.audyt_spojnosci as a
+    from narzedzia import tabularium as tab
+    prawdziwy = tab.katalog_md()
+    monkeypatch.setattr(tab, "katalog_md",
+                        lambda: prawdziwy.replace("### DISCIPLINA",
+                                                  "| `docs/PODRZUCONY.md` | widmo | — | 2026-01-01 |\n### DISCIPLINA",
+                                                  1))
+    bledy, _ = a._warstwa_20_katalog_nietkniety()
+    assert len(bledy) == 1 and "rozjechał się z generatorem" in bledy[0]
+
+
+def test_audyt_w20_data_spisu_nie_wywoluje_alarmu(monkeypatch):
+    """GRANICA: linia „Ostatni spis: <data>" zmienia się CODZIENNIE i musi być pomijana.
+
+    Bez tego wyłączenia audyt żądałby przepisania katalogu każdego dnia — dokładnie
+    ten fałszywy alarm naprawiliśmy już raz w Warstwie 6 (porównanie z `date.today()`).
+    """
+    import narzedzia.audyt_spojnosci as a
+    from narzedzia import tabularium as tab
+    prawdziwy = tab.katalog_md()
+    monkeypatch.setattr(tab, "katalog_md",
+                        lambda: prawdziwy.replace("Ostatni spis: ", "Ostatni spis: 1999-01-01 zamiast "))
+    bledy, _ = a._warstwa_20_katalog_nietkniety()
+    assert bledy == [], "zmiana samej daty spisu nie jest rozjazdem katalogu"

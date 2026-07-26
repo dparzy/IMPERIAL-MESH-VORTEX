@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-20
+## Ostatnia aktualizacja: 2026-07-26
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,17 +113,32 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-20 — Hook startowy pominął auto-pull przy brudnym drzewie
-Gałąź była o 30 commitów za remote, bo hook pominął pull, gdy drzewo było brudne. Wymusiło to rebase z remote i rozstrzygnięcie konfliktu tylko w liniach daty.
+### 2026-07-26 — BIB-032 O'Hara – PDF skanowany, OCR niedziałający
+Książka BIB-032 (O'Hara) to skanowany obraz PDF. OCR generuje śmieci. Zgodnie z Prawem I (zero fabrykacji) nie została zindeksowana w RAG. Status: pominięta.
 
-### 2026-07-20 — Testy W6 czerwone – data w README/MANIFEST starsza niż commit
-Dwa testy w Warstwie 6 oblały, bo README.md i docs/MANIFEST_KODU.md deklarowały datę starszą niż ostatni commit. Zgodnie z Prawem XVIII to błahostka – naprawiono samodzielnie.
+### 2026-07-20 — Rozbieżność baneru startowego: pokazuje CHMURA zamiast LOKAL
+Baner z hooka centrum_pamieci głosi 'Środowisko: CHMURA', ale żywy detektor wykryj_srodowisko() zwraca 'lokal'. Źródło baneru jest nieaktualne. Do naprawy w ramach higieny.
+
+### 2026-07-20 — Środowisko lokalne z pełnym dostępem do książek i cache
+Empirycznie potwierdzono: Claude działa na laptopie Pixel (Windows 10) w katalogu /c/Projekty/imperial-mesh-vortex. Dostępne wszystkie 69 książek (559 MB) w bibliotheca_ulpia/ oraz RAG tekst_cache (59 MB). Ciężka robota z książkami jest teraz możliwa.
+
+### 2026-07-20 — 20 sprzeczności w Refleksji, 3 pilne
+Audyt startowy wykrył 20 sprzeczności, w tym 3 pilne: audytu/nowy, chmura/lokal/naprawa, false/faza – wymagają przeglądu.
+
+### 2026-07-20 — Przekroczenie limitu sekcji LEKCJE
+Sekcja LEKCJE ma 27 234 znaki przy limicie 24 000 – wymaga konsolidacji najstarszych wpisów (P0).
+
+### 2026-07-20 — Hipoteza B potwierdzona OOS
+Ważenie głosów IC (Legatus) daje +3.6pp na 5/5 parach poza próbą – czeka na zgodę Cezara na wpięcie do kodu.
+
+### 2026-07-20 — Błąd replikacji wiedzy – Claude sam nie stosuje własnych procedur
+W poprzednich sesjach wielokrotnie brakowało aktualizacji dokumentów i ledgera, mimo że Claude tworzył procedury (np. ALMA, OBSERWATORY). To klasyczny błąd replikacji wiedzy – Claude tworzy narzędzia, ale sam ich nie używa.
+
+### 2026-07-20 — Audyt dotyczy tylko imperium/biblioteki/, inne katalogi pomijane
+Warstwa 11 audytu sprawdza meldunek tylko w imperium/biblioteki/. Organy w imperium/cesarz/ i narzedzia/ są poza zasięgiem – exit 0 może kłamać. Rozszerzono na wszystkie organy + narzedzia/ (nowa warstwa 17).
 
 ### 2026-07-20 — Legalne abstynencje zmysłów zidentyfikowane
 Niektóre neurony legalnie nie głosują: PSY-01 (funding=8e-5, brak ekstremum), PSY-04 (OI_PREV==OI, 1. odczyt), NEWS-02/03/04 (stan kroczący ≥2 bary), RADAR/N/CP (potrzebują serii cen – nie podano w teście). Zero martwych głosów.
-
-### 2026-07-20 — Petla live karmi RADAR i RS
-Sprawdzono, że pętla live (petla_live.py) karmi RADAR (skanuj linia 422) oraz cross-sectional RS (C-01, linia 437), więc w trybie multi-symbol RADAR też ożywa. Infrastruktura E kompletna.
 
 ### 2026-07-20 — Cztery zmysły działają na żywych danych
 Potwierdzono, że adaptery FearGreed (23), RSS (30 nagłówków), PSY (funding, CVD) i V (CVD) generują głosy. V-03 (CVD)→LONG, PSY-03 (FearGreed=23)→LONG kontrariańsko, NEWS-01→LONG. Abstynencje legalne (Prawo XV).
@@ -136,9 +151,6 @@ Mixture of Experts wymaga trzymania wszystkich ekspertów w pamięci jednocześn
 
 ### 2026-07-22 — tail w rurze testów fałszuje kod wyjścia
 Komenda `python tests/run_tests.py | tail` zwraca kod wyjścia `tail`, nie testów – maskuje oblane testy (exit 0 mimo 1 porażki). Należy unikać `tail` w rurze lub używać oddzielnej obsługi.
-
-### 2026-07-20 — Audyt spojnosci i skan wad przed pushem – pelna harmonia
-Przeprowadzono audyt spojnosci (ruff W13 + dokumenty W14) oraz heurystyczny skan wad. Oba zakonczone exit 0 – stan kodu spojny przed commitem.
 
 ### 2026-07-20 — Błąd cache/resume kluczowany tylko nazwą pliku w harnessach A/B
 Harnessy A/B (ab_tryb_strategii, ab_strategy_mwu, ab_wazenie_ic, ab_pnl_wazenie_ic) używają tylko nazwy pliku jako klucza cache, ignorując parametry konfiguracji.
@@ -160,9 +172,6 @@ Pliki bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl oraz docs/PAMIEC_SESJI.md są
 
 ### 2026-07-20 — 22 neurony czekają na adaptery/dane (Prawo XV)
 Rodziny NEWS-*, PSY-*, RADAR-*, OC-06/07/08, C-01, V-03, Z-06/Z-07 nie mają jeszcze feedów i abstynują świadomie zgodnie z Prawem XV. To znany, udokumentowany stan, a nie regresja.
-
-### 2026-07-20 — Windows cp1250 wymaga PYTHONIOENCODING=utf-8
-Konsola Windows w cp1250 wywala się na emoji. Aby testy i audyt działały poprawnie, należy ustawić zmienną środowiskową PYTHONIOENCODING=utf-8 przed każdą komendą.
 
 ### 2026-07-20 — Audyt spójności pełna harmonia
 84 neurony, 15 zwiadowców, 18 elit, ruff czysto, MAPA_KLUCZY pełna – system w pełni harmonijny.
@@ -244,15 +253,6 @@ W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokł
 
 ### 2026-07-21 — zapisz() gubi nieznane pola istniejącego wpisu – cicha utrata danych
 Metoda zapisz() w pamięci proceduralnej nadpisywała tylko znane pola, gubiąc nieznane. Odkryto podczas adversarialnego przeglądu kodu. Naprawiono.
-
-### 2026-07-21 — Cichy audyt – hook nie drukował wyniku przy uruchomieniu
-Audyt złapał nowy organ w trzech warstwach naraz (W11, W15, W17), ale hook nie wyświetlił wyniku. To klasa 'mechanizm, który przy awarii wygląda na sprawny' – naprawiono.
-
-### 2026-07-20 — Zawartość pliku w wrzutni
-Plik z wrzutnia to dump rozmów z Hyginusem (DeepSeek) zawierający research hybrydy LLM: modele 3B, LoRA, LARSA/AlphaQuanter, Fin-R1, Unsloth/QLoRA, fine-tuning na chmurze. Wątek hybrydy-ucznia od linii 2163.
-
-### 2026-07-20 — Winget dostępny jako narzędzie do instalacji
-Na laptopie Cezara dostępne jest winget (Windows Package Manager) – może służyć do cichej instalacji djvulibre i innych narzędzi bez uruchamiania interaktywnych instalatorów.
 
 ### 2026-07-20 — Hotspoty: _py_supertrend i _py_volume_profile
 Czysto-pythonowe pętle O(okno) na wskaźnikach supertrend i volume_profile są ciężkie (okno 251, wiele symboli). Kandydaci do wektoryzacji numpy.

@@ -375,13 +375,34 @@ def test_liczby_niedomkniety_znacznik_nie_zjada_tekstu():
         f"{miedzy}\n\n"
         "Prawdziwy blok: <!-- LICZBA:neurony -->999<!-- /LICZBA -->\n")
     try:
-        wstrzyknij_liczby(sucho=False)
+        # ZASIĘG OBOWIĄZKOWY: bez `tylko` ten zapis szedł po CAŁYM korpusie i realnie
+        # przepisywał produkcyjne README (złapane 2026-07-26 przez strażnika czystości).
+        wstrzyknij_liczby(sucho=False, tylko=[sciezka])
         with open(sciezka, encoding="utf-8") as f:
             tresc = f.read()
         assert miedzy in tresc, "treść między znacznikami ZJEDZONA — regex przekroczył granicę bloku"
         assert f"<!-- LICZBA:neurony -->{prawda}<!-- /LICZBA -->" in tresc, "domknięty blok ma się odświeżyć"
     finally:
         os.unlink(sciezka)
+
+
+def test_zasieg_pusty_nie_znaczy_wszystko():
+    """GRANICA pustej kolekcji: `tylko=[]` musi znaczyć „nic", nie „cały korpus".
+
+    Klasyczna pułapka: `if not tylko:` potraktowałoby pustą listę jak brak zasięgu i
+    otworzyło zapis na całe repo — dokładnie to, przed czym zasięg ma chronić.
+    """
+    from narzedzia.tabularium import wstrzyknij_liczby
+    zmiany, bledy = wstrzyknij_liczby(sucho=True, tylko=[])
+    assert zmiany == [] and bledy == [], "pusty zasięg nie ma prawa dotknąć ŻADNEGO dokumentu"
+
+
+def test_zasieg_none_to_pelny_korpus():
+    """Domyślne zachowanie bez zmian: `tylko=None` widzi produkcyjne dokumenty (na sucho)."""
+    from narzedzia.tabularium import wstrzyknij_liczby
+    zmiany_pelne, _ = wstrzyknij_liczby(sucho=True, tylko=None)
+    zmiany_puste, _ = wstrzyknij_liczby(sucho=True, tylko=[])
+    assert len(zmiany_pelne) >= len(zmiany_puste), "brak zasięgu musi obejmować co najmniej tyle, co pusty"
 
 
 def test_liczby_nie_dotykaja_historii_acta():

@@ -167,13 +167,21 @@ def wartosci_z_kodu():
     return wartosci
 
 
-def wstrzyknij_liczby(sucho=False):
+def wstrzyknij_liczby(sucho=False, tylko=None):
     """Przepisuje każdy blok <!-- LICZBA:x --> z żywego kodu. → (zmiany, bledy).
 
     Dokumenty `typ: acta` (LOG_ZMIAN, migawki) są POMIJANE: wpis datowany jest prawdą
     swojego czasu i cytuje liczby z dnia zapisu (Prawo I — nie falsyfikujemy historii).
     Bez tego filtra wpis z 2026-07-17 mówiący „87 neuronów" cicho stałby się „90", gdy rój
     urośnie — kłamstwo tym groźniejsze, że wyprodukowane przez narzędzie od prawdy.
+
+    `tylko` = lista ścieżek (bezwzględnych lub względnych wobec ROOT), do których wolno
+    pisać. ZASIĘG ISTNIEJE DLA TESTÓW (zmierzone 2026-07-26): test granicy wołał
+    `sucho=False` na CAŁYM korpusie i realnie przepisywał produkcyjne README — wada
+    UTAJONA, bo dopóki liczby się nie zmieniały, plik po zapisie wyglądał identycznie.
+    Ujawniła się dopiero, gdy `organ_cesarz` wzrósł 12→13, czyli w najgorszym możliwym
+    momencie: przy zmianie kodu. Zasięg zamyka całą klasę — test nie ma jak dotknąć
+    dokumentu, którego nie wymienił. `tylko=[]` NIE znaczy „wszystko": znaczy „nic".
     """
     wartosci = wartosci_z_kodu()
     zmiany, bledy = [], []
@@ -182,6 +190,10 @@ def wstrzyknij_liczby(sucho=False):
     for wzgl in DROGOWSKAZY_Z_LICZBAMI:
         if os.path.exists(os.path.join(ROOT, wzgl)):
             dokumenty.append((wzgl, {}))
+    if tylko is not None:
+        dozwolone = {os.path.abspath(os.path.join(ROOT, p)) for p in tylko}
+        dokumenty = [(s, m) for s, m in dokumenty
+                     if os.path.abspath(os.path.join(ROOT, s)) in dozwolone]
     for sciezka, meta in dokumenty:
         if meta.get("typ") == "acta":
             continue

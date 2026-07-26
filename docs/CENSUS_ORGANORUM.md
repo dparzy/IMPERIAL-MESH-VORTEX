@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: narzedzia/census_organorum.py
-stan_na: 2026-07-21
+stan_na: 2026-07-26
 powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem"
 ---
 # 🏛️ CENSUS ORGANORUM — spis organów i narzędzi Imperium
@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 243** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 244** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -88,6 +88,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 | Moduł | Rola (docstring modułu) |
 |-------|--------------------------|
+| `aerarium.py` | 🏦 AERARIUM — skarbiec Imperium: waga kontekstu startowego i stopnie wysiłku |
 | `deepseek_glos.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
 | `dispensator.py` | DISPENSATOR — Szafarz Imperium: ile myślenia KUPUJEMY do danego zadania |
 | `ksiega_wad.py` | 📕 KSIĘGA WAD — prewencyjny filtr powtarzalnych błędów (W-309) |

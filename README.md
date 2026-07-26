@@ -68,7 +68,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Organ | Rola | pliki `.py` |
 |---|---|---|
-| 👑 **cesarz/** | mózg decyzyjny, 5 Doradców, Pamięć Refleksyjna | <!-- LICZBA:organ_cesarz -->12<!-- /LICZBA --> |
+| 👑 **cesarz/** | mózg decyzyjny, 5 Doradców, Pamięć Refleksyjna | <!-- LICZBA:organ_cesarz -->13<!-- /LICZBA --> |
 | 🏛️ **senat/** | debata / konsensus (Byk / Niedźwiedź / Cenzor) | <!-- LICZBA:organ_senat -->2<!-- /LICZBA --> |
 | ⚔️ **legiony/** | neurony + zwiadowcy + Generał Legatus + Radar | <!-- LICZBA:organ_legiony -->67<!-- /LICZBA --> |
 | 🏟️ **koloseum/** | Dyrygent, PętlaLive, Backtest, Namiestnik, Legiony Cieni | <!-- LICZBA:organ_koloseum -->16<!-- /LICZBA --> |

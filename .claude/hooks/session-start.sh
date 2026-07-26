@@ -5,6 +5,27 @@
 #
 # Testy działają bez zależności (Prawo I), ale pełna moc Imperium (Brama TA-Lib,
 # numpy, dashboard, AI) wymaga pakietów z requirements.txt.
+#
+# ── ZASADA WYDRUKU (rozkaz Cezara 2026-07-26: „hook musi zawierać wszystko, żeby nie było
+#    luk — zgodnie z zasadami oszczędzania tokenów i pod nadzorem") ────────────────────────
+# KOMPLETNOŚĆ JEST TANIA, ROZWLEKŁOŚĆ NIE. Zmierzone na biegu 2026-07-26 (35,5 KB wydruku):
+# DZIENNIK 84% · audyt 5% · Centrum Pamięci 4% · BREVIARIUM 2% · WSZYSTKIE POZOSTAŁE ORGANY
+# RAZEM ~4% (1,3 KB, każdy po jednej linii). Dokładanie organu kosztuje ~100 zn. — dokładanie
+# rozwiniętych narracji kosztuje ~2 000 zn. każda. Stąd reguły:
+#   1. Każdy nowy organ w hooku drukuje JEDNĄ linię, a pełny raport ma pod osobną komendą.
+#   2. Cisza gdy zielone, krzyk gdy czerwone — banery nie opisują stanu normalnego.
+#   3. Liczby GENEROWANE z żywego kodu, nigdy wpisane w ten plik (klasa wady W15).
+#   4. AERARIUM (krok 0.75) mierzy koszt POPRZEDNIEGO wydruku i wskazuje blok dominujący,
+#      więc każde dołożenie meldunku jest widoczne w rachunku, a nie na wiarę.
+#
+# ŚWIADOMIE POMINIĘTE (to nie luki — to decyzje z podanym powodem):
+#   • cenzus adapterów (narzedzia/cenzus_adapterow.py) — wymaga SIECI i realnych feedów;
+#     na starcie byłby wolny i kruchy. Uruchamiany na żądanie przy pracy z adapterami.
+#   • pełny raport CODEX PROBATIONUM (Excel, 12 arkuszy) — na starcie idzie tylko
+#     jednolinijkowe podsumowanie ledgera; generowanie arkusza to zadanie, nie meldunek.
+#   • pełny skan wad całego repo — na starcie tylko ostatni commit; pełny skan przed push.
+#   • `/usage` — komenda interaktywna bez API; zużycia planu NIE da się odczytać skryptem,
+#     dlatego AERARIUM świadomie tego nie udaje (Prawo I), a liczbę podaje Cezar.
 set -euo pipefail
 
 cd "${CLAUDE_PROJECT_DIR:-.}"
@@ -54,6 +75,14 @@ fi
 #      padnie jakakolwiek teza o wydajności (Prawo XVII: policzone, nie wspominane).
 if [ -f imperium/oczy/censor_sprzetu.py ]; then
   python -c "from imperium.oczy.censor_sprzetu import banner; print(banner())" 2>/dev/null || true
+fi
+
+# 0.75) AERARIUM — skarbiec: ile kontekstu kosztuje SAM START sesji + stopnie wysiłku.
+#       Stoi obok CENSORA świadomie: tam waga ŻELAZA, tu waga KONTEKSTU. Powód (zmierzone
+#       2026-07-26): CLAUDE.md urósł do 760 linii przy zalecanych 200, a koszt startu nie
+#       był nigdzie widoczny, więc rósł niezauważony (klasa wady „rzecz niemierzona rośnie").
+if [ -f imperium/cesarz/aerarium.py ]; then
+  python -c "from imperium.cesarz.aerarium import banner; print(banner())" 2>/dev/null || true
 fi
 
 # 0.8) INDEX FALSORUM — czy obalone twierdzenie nie żyje dalej w korpusie jako fakt.

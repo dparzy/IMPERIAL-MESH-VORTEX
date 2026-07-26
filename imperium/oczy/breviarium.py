@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -155,6 +156,36 @@ def _czy_dispensator_wpiety() -> bool:
     return False
 
 
+def _sciezka_z_innego_systemu(sciezka: Path) -> bool:
+    """Czy ta ścieżka pochodzi z INNEGO systemu plików niż ten, na którym biegniemy?
+
+    `C:\\TIRO` na Linuksie nigdy nie zaistnieje — jego brak nie jest pomiarem, tylko
+    niewidocznością. Rozpoznajemy literę dysku Windows (`C:`) na nie-Windows i odwrotnie:
+    ścieżkę POSIX-ową (`/home/...`) na Windows. Bez tego meldunek myli „nie widzę" z „nie ma".
+    """
+    tekst = str(sciezka)
+    windowsowa = len(tekst) > 1 and tekst[1] == ":" and tekst[0].isalpha()
+    if sys.platform.startswith("win"):
+        return tekst.startswith("/")
+    return windowsowa
+
+
+def _pary_uzyteczne() -> Optional[int]:
+    """Ile par PRZEŻYJE eksport SFT — liczba operacyjna postępu Szkoły TIRO.
+
+    Liczymy tym samym kodem, który buduje zbiór treningowy (Prawo XVI: jedno źródło prawdy,
+    dwa liczniki rozjadą się co do sztuki). None, gdy nie da się policzyć — nie zgadujemy.
+    """
+    try:
+        import tempfile
+        from imperium.biblioteki.notarius import eksportuj_sft
+        with tempfile.TemporaryDirectory() as kat:
+            return eksportuj_sft(Path(kat) / "sft.jsonl",
+                                 jedna_probka_na_pytanie=True, min_znakow_odpowiedzi=200)
+    except Exception:                                        # noqa: BLE001 — meldunek nie może paść
+        return None
+
+
 def stan_tiro() -> Dict[str, Any]:
     """
     Stan TIRO (rekruta — lokalny LLM): ile par nauczyciela zebrano, jakie modele na dysku.
@@ -163,6 +194,19 @@ def stan_tiro() -> Dict[str, Any]:
     od nauczyciela (DeepSeek), pod nadzorem Imperium.
     """
     pary = len(_linie_jsonl(PARY_TIRO))
+    # PARY UŻYTECZNE ≠ PARY SUROWE (2026-07-26). Meldunek podawał wyłącznie liczbę surową,
+    # a to nie jest liczba operacyjna: eksport SFT zwija wiele próbek tego samego pytania do
+    # jednej (anty-monokultura) i odsiewa krótkie odpowiedzi, które niczego nie uczą.
+    # Zmierzone: 329 surowych → 140 użytecznych, czyli meldunek zawyżał gotowość 2,35× —
+    # 14% progu 1000, nie 66% progu 500. Postęp liczymy tym, co pojedzie na trening.
+    uzyteczne = _pary_uzyteczne()
+    # ABSTYNENCJA ŚRODOWISKOWA (ta sama klasa co kolejka Hyginusa i książki). TIRO_HOME to
+    # domyślnie `C:\TIRO` — ścieżka WINDOWS, która w kontenerze Linuksa nie ma prawa istnieć.
+    # Meldunek drukował wtedy „🚨 brak silnika | 🚨 brak modeli", choć silnik llama.cpp stoi
+    # na laptopie od 2026-07-16 (zmierzone: Qwen3-1.7B 9.64 t/s, Qwen3-4B 4.86 t/s).
+    # Fałszywy alarm wprowadził w błąd samego Architekta, który podał go Cezarowi jako
+    # „największa utrata potencjału". Środowisko, które nie widzi dysku TIRO, NIE MA O NIM GŁOSU.
+    obce_srodowisko = _sciezka_z_innego_systemu(KATALOG_TIRO)
     modele: List[str] = []
     katalog = KATALOG_TIRO / "modele"
     if katalog.exists():
@@ -176,8 +220,11 @@ def stan_tiro() -> Dict[str, Any]:
         pass
     return {
         "pary_nauczyciela": pary,
+        "pary_uzyteczne": uzyteczne,
         "modele": modele,
-        "silnik": (KATALOG_TIRO / "silnik").exists(),
+        # None = „nie wiem" (obcy system plików), False = zmierzony brak na TYM dysku.
+        "silnik": None if obce_srodowisko else (KATALOG_TIRO / "silnik").exists(),
+        "dysk_tiro_widoczny": not obce_srodowisko,
         "klasa_sprzetu": klasa,
         "zakres_modelu": zakres,
     }
@@ -290,11 +337,22 @@ def banner(model_architekta: Optional[str] = None) -> str:
         wiersze.append(f"      PROBATOR: zbadanych {h['zbadane_probatorem']}, "
                        f"podejrzanych {h['podejrzane']}")
 
-    silnik = "llama.cpp ✓" if t["silnik"] else "🚨 brak silnika"
-    modele = ", ".join(m.replace(".gguf", "") for m in t["modele"]) or "🚨 brak modeli"
+    if t["silnik"] is None:
+        silnik = "⚠️ dysk TIRO niewidoczny stąd"       # nie wiem ≠ brak (Prawo I)
+    else:
+        silnik = "llama.cpp ✓" if t["silnik"] else "🚨 brak silnika"
+    if t["modele"]:
+        modele = ", ".join(m.replace(".gguf", "") for m in t["modele"])
+    elif t["silnik"] is None:
+        modele = "⚠️ nieznane (stan zna wyłącznie lokal)"
+    else:
+        modele = "🚨 brak modeli"
     wiersze.append(
-        f"   🎓 TIRO (rekrut — lokalny LLM): pary nauczyciela {t['pary_nauczyciela']} | "
-        f"{silnik} | klasa {t['klasa_sprzetu']}"
+        f"   🎓 TIRO (rekrut — lokalny LLM): pary {t['pary_nauczyciela']} surowych"
+        + (f" / {t['pary_uzyteczne']} użytecznych" if t["pary_uzyteczne"] is not None else "")
+        + (f" ({round(100 * t['pary_uzyteczne'] / 1000)}% progu 1000)"
+           if t["pary_uzyteczne"] is not None else "")
+        + f" | {silnik} | klasa {t['klasa_sprzetu']}"
     )
     wiersze.append(f"      modele na dysku: {modele}"
                    + (f" | sprzęt unosi: {t['zakres_modelu']}" if t["zakres_modelu"] else ""))

@@ -14,6 +14,42 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-26 | 🎓 | TIRO: fałszywy alarm o silniku ODWOŁANY + korekta planowania par
+
+**Cezar kazał sprawdzić, ZANIM podejmie decyzję — i miał rację.** Meldowałem „TIRO ma zero
+silnika i zero modeli, największa utrata potencjału". **To był fałszywy alarm.**
+
+**Przyczyna:** `KATALOG_TIRO = Path(os.getenv("TIRO_HOME", r"C:\TIRO"))` — ścieżka WINDOWS,
+która w kontenerze Linuksa nie ma prawa istnieć. `.exists()` → False → 🚨. Tymczasem dziennik
+z 07-16 dokumentuje: llama.cpp b10041 stoi w `C:\TIRO\silnik`, modele zmierzone `llama-bench`
+(Qwen3-1.7B **9.64 t/s**, Qwen3-4B **4.86 t/s**). **E0 i E1 są zamknięte.**
+
+To **czwarte** wystąpienie klasy „milczenie udaje wynik" tego samego dnia — i najgorsze,
+bo tym razem fałszywy alarm nie tylko istniał, ale **został przekazany Cezarowi jako podstawa
+decyzji o wydaniu pracy**. Uodpornienie: `_sciezka_z_innego_systemu()` rozpoznaje literę dysku
+Windows na Linuksie (i ścieżkę POSIX na Windows) → `silnik: None` i meldunek „⚠️ dysk TIRO
+niewidoczny stąd". Granica pilnowana testem: brak silnika na **widocznym** dysku nadal krzyczy.
+
+**KOREKTA PLANOWANIA (zmierzona):** postęp Szkoły liczyliśmy parami SUROWYMI, a trening jedzie
+na tych, które przeżyją eksport SFT (kolaps anty-monokultury + filtr jakości):
+
+```
+329 par surowych → 140 użytecznych   (przeżywa ~43%)
+```
+
+Meldunek zawyżał gotowość **2,35×**: „329/500 = 66%" zamiast prawdziwego **140/1000 = 14%**
+(1000 = minimum sensownego LoRA). Droga do progu jest ~2× dłuższa, niż mówiła ekstrapolacja
+z 07-16, bo tamta liczyła surowe. BREVIARIUM podaje teraz OBIE liczby i procent progu.
+
+**Decyzje Cezara:** (1) lokalnie — E3 (egzamin wstępny ucznia) NAJPIERW, bo tani i mówi czy
+warto zbierać, potem partia POMIAROWA żniwa; (2) licznik pokazuje obie liczby; (3) abstynencja
+środowiskowa wpięta. Pakiet zadań: **`docs/ZADANIE_TIRO_E3_ZNIWO.md`** (wpisany do INDEKSU).
+
+**Pliki:** `imperium/oczy/breviarium.py`, `tests/test_breviarium.py`,
+`docs/ZADANIE_TIRO_E3_ZNIWO.md`, `docs/INDEKS_IMPERIUM.md`.
+
+---
+
 ## 2026-07-26 | 🗺️ | Ścieżka lokalna sprostowana + OPUS 5 modelem głównym
 
 **Poprawka Cezara (dwie sprawy naraz).**

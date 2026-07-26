@@ -36,9 +36,14 @@ def test_brak_plikow_nie_wywala_meldunku(monkeypatch, tmp_path):
     assert stan["profile_dispensatora"], \
         "konfiguracja mowy jest w KODZIE — abstynencja o kolejce nie może jej wygaszać"
     assert "NIEZNANA" in bv.banner(), "meldunek ma nazwać brak wiedzy wprost (Prawo I)"
-    assert bv.stan_tiro() == {"pary_nauczyciela": 0, "modele": [], "silnik": False,
-                              "klasa_sprzetu": bv.stan_tiro()["klasa_sprzetu"],
-                              "zakres_modelu": bv.stan_tiro()["zakres_modelu"]}
+    # Sprawdzamy POLA, nie równość całego słownika: porównanie 1:1 pękało przy KAŻDYM
+    # nowym wskaźniku meldunku (2026-07-26: doszły `pary_uzyteczne` i `dysk_tiro_widoczny`),
+    # czyli test karał ROZBUDOWĘ organu zamiast pilnować jego zachowania.
+    tiro = bv.stan_tiro()
+    assert tiro["pary_nauczyciela"] == 0
+    assert tiro["modele"] == []
+    assert tiro["silnik"] is False, "tmp_path to widoczny dysk — brak silnika jest ZMIERZONY"
+    assert tiro["dysk_tiro_widoczny"] is True
     assert "BREVIARIUM" in bv.banner()
 
 
@@ -391,3 +396,51 @@ def test_profile_pokazuja_faze_a_nie_katalog():
     for faza, stala in (("klasyfikacja", bib._PROFIL_ROZWIN), ("zwiad", bib._PROFIL_ZWIAD)):
         wpis = [p for p in profile if p.startswith(f"{faza}→")]
         assert len(wpis) == 1 and f"[{stala}]" in wpis[0], (faza, wpis)
+
+
+# ── TIRO: „nie widzę" ≠ „nie ma"; pary surowe ≠ pary użyteczne (2026-07-26) ──────
+
+def test_dysk_tiro_z_innego_systemu_abstynuje(monkeypatch):
+    """`C:\\TIRO` na Linuksie to NIEWIDOCZNOŚĆ, nie zmierzony brak silnika.
+
+    Ten fałszywy alarm wprowadził w błąd samego Architekta (2026-07-26), który podał go
+    Cezarowi jako „największa utrata potencjału" — podczas gdy llama.cpp stoi na laptopie
+    od 07-16 (zmierzone: Qwen3-1.7B 9.64 t/s). Meldunek MUSI odróżniać jedno od drugiego.
+    """
+    import sys as _sys
+    from pathlib import Path
+
+    obca = Path("C:\\TIRO") if not _sys.platform.startswith("win") else Path("/home/tiro")
+    monkeypatch.setattr(bv, "KATALOG_TIRO", obca)
+    stan = bv.stan_tiro()
+    assert stan["silnik"] is None, "obcy system plików → None (nie wiem), nigdy False"
+    assert stan["dysk_tiro_widoczny"] is False
+    baner = bv.banner()
+    assert "niewidoczny stąd" in baner
+    assert "brak silnika" not in baner, "nie wolno oskarżać o brak tego, czego nie widać"
+
+
+def test_zmierzony_brak_silnika_nadal_krzyczy(monkeypatch, tmp_path):
+    """GRANICA: katalog TEGO systemu, w którym silnika NIE MA → to pomiar, alarm zostaje.
+
+    Abstynencja nie może uciszyć prawdziwego braku — inaczej wyciszylibyśmy organ zamiast
+    go naprawić (dokładnie odwrotność celu).
+    """
+    monkeypatch.setattr(bv, "KATALOG_TIRO", tmp_path / "TIRO")
+    stan = bv.stan_tiro()
+    assert stan["silnik"] is False, "brak na widocznym dysku to zmierzony fakt, nie None"
+    assert "brak silnika" in bv.banner()
+
+
+def test_pary_uzyteczne_nie_przekraczaja_surowych():
+    """Postęp Szkoły liczymy parami, które PRZEŻYJĄ eksport SFT (kolaps + filtr jakości).
+
+    Zmierzone 2026-07-26: 329 surowych → 140 użytecznych. Meldunek podający wyłącznie
+    liczbę surową zawyżał gotowość 2,35× (14% progu 1000 wyglądało jak 66% progu 500).
+    """
+    stan = bv.stan_tiro()
+    assert stan["pary_uzyteczne"] is None or (
+        0 <= stan["pary_uzyteczne"] <= stan["pary_nauczyciela"]), stan
+    if stan["pary_uzyteczne"] is not None:
+        assert f"{stan['pary_nauczyciela']} surowych" in bv.banner()
+        assert f"{stan['pary_uzyteczne']} użytecznych" in bv.banner()

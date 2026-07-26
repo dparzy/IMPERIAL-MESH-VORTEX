@@ -113,6 +113,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-26 — TIRO: 153 uzyteczne pary = 15% progu 1000
+Zbior treningowy TIRO to 348 surowych/153 uzytecznych par, co stanowi 15% docelowego progu 1000. Wymaga kontynuacji sniwa (zadanie E3) przed uruchomieniem pelnego treningu.
+
+### 2026-07-26 — Brak kluczy MEXC uniemozliwia live trading
+MEXC_API_KEY i MEXC_SECRET nie sa ustawione w srodowisku. Zero realnych orderow pomimo gotowego kodu (ccxt 4.5.59). Niezbedne do przejscia na live.
+
+### 2026-07-26 — Testy 2882/2885 - 3 obalone, w tym jedna nowa wada
+Dwie porazki wynikaja z niesledzonego consilium (znane), trzecia to osobna wada wymagajaca analizy. Pelny bieg testow wciaz leci w tle, stan oficjalnie nieznany.
+
+### 2026-07-26 — Audyt spójności ukrywa czerwony wynik (stderr zamiast stdout)
+W narzedziu audyt_spojnosci.py alarmy sa wypisywane na stderr (linie 1160-1163), podczas gdy hook zbiera tylko stdout. W efekcie czerwony audyt jest niewidoczny w wydruku startowym - sesja wyglada ciszej niz zdrowa. To odwrocona wersja wady klasy 'milczenie udajace wynik' z apert26.
+
 ### 2026-07-26 — Audyt spójności kończy się exit 1 i hook milczy
 Podczas audytu środowiska komenda zakończyła się kodem błędu (exit 1), a hook w kroku 0 nie wyświetlił żadnej treści – to klasyczna wada 'milczenie udające wynik'.
 

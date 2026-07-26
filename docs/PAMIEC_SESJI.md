@@ -200,9 +200,6 @@ Kłamiąca pieczątka input_len to zatwierdzony błąd Imperium (Prawo XIII). Sp
 ### 2026-07-20 — Skan klasy błędu – 0 innych wystąpień
 Po naprawie buga argparse przeskanowano cały kod – 0 innych % w help-stringach. Klasa domknięta, brak epidemii.
 
-### 2026-07-20 — Bug argparse – % w help-stringu
-pomiar_stablecoin_ic.py: % w help-stringu (okno % zmiany supply) powoduje ValueError przy --help. Latentny, niewidoczny w normalnym biegu.
-
 ### 2026-07-20 — Latentny bug: % w help-stringu argparse
 W pomiar_stablecoin_ic.py help-string zawierał % zmiany, co powoduje ValueError przy --help (argparse próbuje formatować). Naprawiono przez podwojenie %.
 
@@ -326,9 +323,6 @@ Relatywny import z .mikro_neuron powodował błąd przy bezpośrednim uruchomien
 ### 2026-06-30 — TA-Lib wymagany przez Bramę Kalkulatora
 Brama Kalkulatora celowo odmawia startu bez TA-Lib (Prawo I). Na Windows 2026 pip install TA-Lib działa, fallback: wheels z github.com/cgohlke/talib-build.
 
-### 2026-06-30 — Bug: __pycache__ śledzone w git
-Po kompilacji brama_kalkulatora.py, pliki cache zostały przypadkowo commitowane. Naprawiono przez git rm i dodanie .gitignore.
-
 ### 2026-06-30 — Interval normalization bug: '5m'.upper() ≠ 'M5'
 Strategie używają formatu 'M5', a interwał z backtestu po .upper() daje '5M'. Naprawiono przez _normalizuj_interwal() w baza.py konwertujące '5m'→'M5', '1h'→'H1' itd.
 
@@ -385,6 +379,7 @@ Neurony z DOSTEPNY=False zawsze zwracały NEUTRAL, maskując brak integracji. Wy
 
 ### 2026-06-30 — Prawo I: Zero halucynacji matematycznych
 AI nigdy nie oblicza matematyki. Kod (TA-Lib, C) oblicza RSI/EMA/ATR → JSON 'answer key' → AI tylko interpretuje. Brama Kalkulatora nie uruchomi się bez TA-Lib.
+
 
 ## 🔄 STAN BIEŻĄCY (liczby wstrzykiwane z kodu — W15, nie zamarzają)
 

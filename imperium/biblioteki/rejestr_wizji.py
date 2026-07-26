@@ -109,8 +109,18 @@ def dodaj(typ: str, tytul: str, tresc: str,
     """
     Dodaje nowy wpis do rejestru. Zwraca True gdy dopisano, False gdy pominięto (duplikat).
 
-    dedup=True (domyślnie): pomija wpis, jeśli istnieje już wpis o TYM SAMYM (typ, tytuł).
+    dedup=True (domyślnie): pomija wpis, jeśli istnieje już wpis mówiący TO SAMO.
     Naprawa L6 (audyt 2026-06-26): auto_lekcja co sesję mogła dublować te same wizje.
+
+    🚨 DEDUP SEMANTYCZNY, NIE PO NAPISIE (naprawa 2026-07-26). Wcześniej porównywaliśmy
+    wyłącznie (typ, tytuł) znak w znak, a wpisy pisze DeepSeek, który parafrazuje przy
+    każdym przebiegu: „Zsynchronizowac repo z chmura (rozjazd 2⇄2)" i „Rozwiązanie rozjazdu
+    repo przez stash/rebase" to jeden pomysł i dwa wpisy. Zmierzone w dniu naprawy:
+    11 zduplikowanych tytułów na 827 wpisów przeszło przez bramkę po dokładnym tytule.
+
+    Używamy TEGO SAMEGO predykatu, co pamięć lekcji (`pamiec_sesji.czy_duplikaty`) —
+    jeden predykat, dwa rejestry (Prawo XVI). Dwa osobne progi podobieństwa rozjechałyby
+    się i ten sam pomysł byłby duplikatem w jednym rejestrze, a nowością w drugim.
     """
     if plik is None:
         plik = PLIK_DOMYSLNY
@@ -123,10 +133,21 @@ def dodaj(typ: str, tytul: str, tresc: str,
 
     tytul = tytul.strip()
     if dedup:
+        # Import lokalny: rejestr wizji jest warstwą niżej niż pamięć lekcji, więc import
+        # na szczycie modułu zawiązałby cykl. Awaria predykatu nie może zablokować zapisu —
+        # wtedy schodzimy do porównania napisów (gorsze, ale nigdy nie gubi wpisu).
+        try:
+            from imperium.biblioteki.pamiec_sesji import czy_duplikaty
+        except Exception:                       # noqa: BLE001 — zapis ważniejszy niż dedup
+            czy_duplikaty = None
         for istn in _wczytaj(plik):
-            if (istn.get("typ", "").upper() == typ
-                    and istn.get("tytul", "").strip().lower() == tytul.lower()):
-                return False   # duplikat — nie dopisujemy
+            if istn.get("typ", "").upper() != typ:
+                continue                        # różne typy to różne byty (WIZJA ≠ ZMIANA)
+            if istn.get("tytul", "").strip().lower() == tytul.lower():
+                return False                    # sito 1: identyczny tytuł
+            if czy_duplikaty is not None and czy_duplikaty(
+                    tytul, tresc, istn.get("tytul", ""), istn.get("tresc", "")):
+                return False                    # sito 2: ta sama treść, inna parafraza
 
     wpis = {
         "data": data or _dzis(),

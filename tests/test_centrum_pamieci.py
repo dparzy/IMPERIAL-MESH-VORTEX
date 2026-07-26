@@ -660,3 +660,45 @@ def test_dziennik_brak_wpisu_dzis(tmp_path):
     assert dn.brak_wpisu_dzis(plik=plik) is True   # pusty
     dn.dopisz(["x"], plik=plik)                      # dziś
     assert dn.brak_wpisu_dzis(plik=plik) is False
+
+
+# ── DEDUP REJESTRU WIZJI: PREDYKAT WSPÓLNY Z PAMIĘCIĄ (naprawa 2026-07-26) ────
+
+def test_rejestr_wizji_lapie_parafraze_nie_tylko_napis(tmp_path):
+    """Wpisy pisze DeepSeek, który parafrazuje — dedup po napisie ich nie widzi.
+
+    Wcześniej bramka porównywała (typ, tytuł) znak w znak, więc ten sam fakt zapisany
+    dwoma zdaniami wchodził dwa razy. Od naprawy używamy TEGO SAMEGO predykatu, co pamięć
+    lekcji (Prawo XVI: jeden predykat, dwa rejestry) — inaczej ten sam wpis byłby duplikatem
+    w jednym rejestrze, a nowością w drugim.
+    """
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    assert rw.dodaj("ZMIANA", "Obudzono neurony PSY-01/02 i V-03",
+                    "Adaptery Futures i CVD dolewają dane, neurony PSY-01, PSY-02 i V-03 głosują.",
+                    plik=plik) is True
+    assert rw.dodaj("ZMIANA", "Przebudzenie neuronów PSY-01/PSY-02 oraz V-03",
+                    "Neurony PSY-01, PSY-02, V-03 zaczęły głosować po dolaniu danych z adapterów.",
+                    plik=plik) is False, "parafraza tego samego faktu nie może wejść drugi raz"
+
+
+def test_rejestr_wizji_rozne_typy_to_rozne_byty(tmp_path):
+    """GRANICA: ta sama treść jako WIZJA i jako ZMIANA to dwa różne byty, nie duplikat.
+
+    Bez tego rozróżnienia zrealizowana ZMIANA zjadałaby WIZJĘ, z której powstała — czyli
+    dedup kasowałby historię zamiaru. Fałszywe scalenie kosztuje wiedzę bezpowrotnie.
+    """
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    assert rw.dodaj("WIZJA", "Portfel 20+ par", "Rozszerzyć portfel do 20+ par krypto.",
+                    plik=plik) is True
+    assert rw.dodaj("ZMIANA", "Portfel 20+ par", "Rozszerzyć portfel do 20+ par krypto.",
+                    plik=plik) is True, "inny typ = inny byt, nawet przy tym samym tytule"
+
+
+def test_rejestr_wizji_dedup_wylaczalny(tmp_path):
+    """`dedup=False` musi nadal wpuszczać wszystko — import historii nie jest cenzurowany."""
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    rw.dodaj("POMYSŁ", "Ten sam", "Treść.", plik=plik)
+    assert rw.dodaj("POMYSŁ", "Ten sam", "Treść.", plik=plik, dedup=False) is True

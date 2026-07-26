@@ -390,3 +390,45 @@ def test_audyt_w20_data_spisu_nie_wywoluje_alarmu(monkeypatch):
                         lambda: prawdziwy.replace("Ostatni spis: ", "Ostatni spis: 1999-01-01 zamiast "))
     bledy, _ = a._warstwa_20_katalog_nietkniety()
     assert bledy == [], "zmiana samej daty spisu nie jest rozjazdem katalogu"
+
+
+# ── WARSTWA 21: WYZWALACZE ROZKAZOW OSIAGALNE ────────────────────────────────
+
+def test_audyt_w21_zielony_na_realnej_konstytucji():
+    """W21 na żywym repo: każdy `/skill` cytowany w CLAUDE.md istnieje na dysku."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, info = a._warstwa_21_wyzwalacze_rozkazow()
+    assert not bledy, f"W21 wykrył nieosiągalne rozkazy: {bledy}"
+    assert any("W21" in i for i in info)
+
+
+def test_audyt_w21_lapie_rozkaz_bez_skilla(monkeypatch, tmp_path):
+    """GRANICA: konstytucja obiecuje `/widmo`, katalog skilli go nie ma → alarm.
+
+    Po odchudzeniu konstytucji (787→253 linie) rozkaz odesłany do nieistniejącego skilla
+    jest NIEOSIĄGALNY — gorzej niż gruby CLAUDE.md, bo Architekt nie wie, że go zgubił.
+    """
+    import narzedzia.audyt_spojnosci as a
+    (tmp_path / ".claude" / "skills" / "realny").mkdir(parents=True)
+    (tmp_path / ".claude" / "skills" / "realny" / "SKILL.md").write_text("x", encoding="utf-8")
+    (tmp_path / "CLAUDE.md").write_text(
+        "- rozkaz A: **`/realny`**\n- rozkaz B: **`/widmo`**\n", encoding="utf-8")
+    monkeypatch.setattr(a, "ROOT", str(tmp_path))
+    bledy, _ = a._warstwa_21_wyzwalacze_rozkazow()
+    assert len(bledy) == 1 and "widmo" in bledy[0] and "realny" not in bledy[0]
+
+
+def test_audyt_w21_ukosnik_w_prozie_nie_jest_obietnica(monkeypatch, tmp_path):
+    """GRANICA (ta sama pułapka co w W19): `/cos` w zwykłym zdaniu to nie wyzwalacz.
+
+    Konstytucja pisze m.in. „wejście/wyjście z pozycji" i ścieżki plików. Gdyby warstwa
+    liczyła każdy ukośnik, produkowałaby własne fałszywe alarmy.
+    """
+    import narzedzia.audyt_spojnosci as a
+    (tmp_path / ".claude" / "skills").mkdir(parents=True)
+    (tmp_path / "CLAUDE.md").write_text(
+        "zmiana wejścia/wyjścia z pozycji; plik narzedzia/audyt_spojnosci.py; `/goly`\n",
+        encoding="utf-8")
+    monkeypatch.setattr(a, "ROOT", str(tmp_path))
+    bledy, _ = a._warstwa_21_wyzwalacze_rozkazow()
+    assert bledy == [], f"proza nie może być alarmem: {bledy}"

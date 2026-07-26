@@ -6,7 +6,7 @@ Uruchamiany automatycznie przez hooki Claude Code (SessionStart + Stop) oraz rę
     python narzedzia/audyt_spojnosci.py            # raport + exit code
     python narzedzia/audyt_spojnosci.py --cichy     # tylko gdy są błędy
 
-Sprawdza warstwy 1–20 spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI).
+Sprawdza warstwy 1–21 spójności (zgodnie z ZASADY_FUNDAMENTALNE.md § PRAWO XXI).
 Lista poniżej JEST spisem — nie podajemy tu osobnej liczby, bo ręczna liczba zawsze się
 rozjedzie z listą (zmierzone 2026-07-26: nagłówek mówił „16 warstw", gdy kod miał 18 —
 Warstwy 17 i 18 dopisano do kodu, ale nie do tego spisu. Dokładnie klasa wady W15):
@@ -30,6 +30,7 @@ Warstwy 17 i 18 dopisano do kodu, ale nie do tego spisu. Dokładnie klasa wady W
   Warstwa 18 — LEX TALIONIS:    dług honorowy = 0 (zatwierdzony błąd ma kompensujący unikat)
   Warstwa 19 — parytet dat:     frontmatter `stan_na` = nagłówek "Stan na:" w tym samym pliku
   Warstwa 20 — katalog INDEKS:  sekcja generowana = to, co wypluwa Tabularium (zero ręcznych edycji)
+  Warstwa 21 — wyzwalacze:      każdy `/skill` cytowany w konstytucji istnieje na dysku
 
 Exit code:
   0 = pełna spójność (Imperium gotowe)
@@ -562,7 +563,53 @@ def audyt() -> tuple:
     bledy += w20_bledy
     info += w20_info
 
+    # ── WARSTWA 21: WYZWALACZE — rozkaz odesłany do skilla MUSI być osiągalny ─
+    w21_bledy, w21_info = _warstwa_21_wyzwalacze_rozkazow()
+    bledy += w21_bledy
+    info += w21_info
+
     return bledy, info
+
+
+def _warstwa_21_wyzwalacze_rozkazow():
+    """W21 — każdy `/skill` cytowany w konstytucji musi istnieć na dysku.
+
+    Powód (odchudzanie konstytucji 2026-07-27): CLAUDE.md schudł z 787 do 253 linii, bo
+    treść 20 rozkazów stałych przeniesiono do sześciu skilli ładowanych NA ŻĄDANIE, a w
+    konstytucji została linia-wyzwalacz z esencją. To oszczędza ~10 tys. tokenów na każdej
+    sesji, ale tworzy NOWĄ klasę wady: rozkaz odesłany do skilla, którego nie ma, jest
+    gorszy niż gruby CLAUDE.md — staje się NIEOSIĄGALNY, a Architekt nawet nie wie, że go
+    zgubił. Jedno zmienione imię katalogu wystarczy.
+
+    Bramka TWARDA, dokładnie jak W16 (API-widma) i W17 (census): dokument nie ma prawa
+    obiecywać treści, której nie da się wczytać.
+
+    Osobno — DŁUG DŁUGOŚCI konstytucji zostaje ALARMEM AERARIUM, nie bramką: 253 linie to
+    wciąż więcej niż doktrynalne 200, a droga do 200 wiedzie przez przeniesienie checklist
+    otwarcia/zamknięcia, co wymaga przebudowy SIGILLARIUM (dziś pieczęć czyta je wprost z
+    CLAUDE.md). Twarde blokowanie commitów za dług, którego naprawa jest ryzykowna,
+    wymusiłoby pośpiech na najwrażliwszym organie — dlatego widoczność tak, przymus nie.
+    """
+    import glob as _glob
+    try:
+        with open(os.path.join(ROOT, "CLAUDE.md"), encoding="utf-8") as f:
+            konst = f.read()
+    except OSError as e:
+        return [f"[W21] Nie mogę odczytać CLAUDE.md: {e}"], []
+
+    katalog = os.path.join(ROOT, ".claude", "skills")
+    istniejace = {os.path.basename(os.path.dirname(p))
+                  for p in _glob.glob(os.path.join(katalog, "*", "SKILL.md"))}
+    # Bierzemy WYŁĄCZNIE zapis `**`/nazwa`**` — tak wygląda wyzwalacz rozkazu. Goły `/slowo`
+    # w prozie (np. ścieżka, „wejście/wyjście") nie jest obietnicą skilla i nie ma prawa
+    # generować alarmu — warstwa pilnująca prawdy nie może produkować nieprawdy (lekcja W19).
+    cytowane = set(re.findall(r"\*\*`/([a-z][a-z0-9_-]*)`\*\*", konst))
+    widma = sorted(cytowane - istniejace)
+    if widma:
+        return [(f"[W21] Konstytucja odsyła do NIEISTNIEJĄCYCH skilli: {widma}. "
+                 f"Rozkaz nieosiągalny — dodaj skill albo usuń wyzwalacz")], []
+    return [], [f"Wyzwalacze rozkazów (W21): {len(cytowane)} skilli cytowanych w konstytucji, "
+                f"wszystkie osiągalne ✅"]
 
 
 def _warstwa_19_parytet_dat():

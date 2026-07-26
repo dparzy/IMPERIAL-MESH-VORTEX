@@ -154,12 +154,19 @@ def test_kazde_imie_gradus_jest_w_konstytucji():
     sesyjnych opis w rodzaju „ultracode (ustawienie Claude Code)", którego dokument nie
     cytuje dosłownie — parytet ma pilnować treści, nie interpunkcji.
     """
-    tekst = ae.KONSTYTUCJA.read_text(encoding="utf-8")
+    ŹRÓDŁO = ae.DOKUMENT_GRADUS          # od 2026-07-27 tabela żyje w skillu na żądanie
+    assert ŹRÓDŁO.exists(), (
+        "skill /gradus zniknął — konstytucja odsyła do dokumentu, którego nie ma. "
+        "To gorsze niż gruby CLAUDE.md: rozkaz stałby się nieosiągalny")
+    tekst = ŹRÓDŁO.read_text(encoding="utf-8")
     brak_imion = [g["imie"] for g in ae.GRADUS if g["imie"] not in tekst]
-    assert not brak_imion, f"stopnie w kodzie, ale nie w CLAUDE.md: {brak_imion}"
+    assert not brak_imion, f"stopnie w kodzie, ale nie w /gradus: {brak_imion}"
     brak_kluczy = [g["effort"].split()[0] for g in ae.GRADUS
                    if g["effort"].split()[0] not in tekst]
-    assert not brak_kluczy, f"poziomy wysiłku w kodzie, ale nie w CLAUDE.md: {brak_kluczy}"
+    assert not brak_kluczy, f"poziomy wysiłku w kodzie, ale nie w /gradus: {brak_kluczy}"
+    # Konstytucja musi ZOSTAWIĆ ślad: bez linii-wyzwalacza nikt nie trafi do skilla.
+    konst = ae.KONSTYTUCJA.read_text(encoding="utf-8")
+    assert "/gradus" in konst, "konstytucja zgubiła wyzwalacz do tabeli stopni"
 
 
 def test_poziomy_trwale_sa_podzbiorem_gradus():

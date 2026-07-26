@@ -219,11 +219,34 @@ def test_raport_startowy_podaje_liczby_kroków():
 
 # ── UJŚCIE W HARNESSIE: skille ────────────────────────────────────────────────
 
-def test_kazde_sigillum_ma_skill_a_kazdy_skill_sigillum():
-    """Rozjazd w obie strony: pieczęć bez ukośnika i ukośnik bez pieczęci."""
+def test_kazde_sigillum_ma_skill():
+    """Pieczęć bez ukośnika = hasło, którego Cezar nie moze wywolac. Kierunek TWARDY."""
     z_kodu = {s.nazwa.lower() for s in sg.wszystkie()}
     z_dysku = {p.parent.name for p in SKILLE.glob("*/SKILL.md")}
-    assert z_kodu == z_dysku, f"brak skilli: {z_kodu - z_dysku}; osierocone: {z_dysku - z_kodu}"
+    assert not (z_kodu - z_dysku), f"pieczęcie bez skilla: {z_kodu - z_dysku}"
+
+
+def test_skill_bez_pieczeci_jest_skillem_ROZKAZU_nie_sierota():
+    """Drugi kierunek — POLUZOWANY ŚWIADOMIE 2026-07-27, ale NIE zniesiony.
+
+    Do odchudzenia konstytucji istniały wyłącznie skille-pieczęcie, więc równość zbiorów
+    była poprawnym niezmiennikiem. Od przeniesienia rozkazów stałych (787 → 253 linie)
+    istnieje DRUGA, legalna klasa: skille niosące TREŚĆ rozkazu, ładowane na żądanie.
+    Zamiast skasować test, zaostrzamy pytanie: skill bez pieczęci MUSI być rozkazem —
+    czyli nieść treść przeniesioną z CLAUDE.md — a nie osieroconym śmieciem.
+
+    Bez tego rozróżnienia każdy przypadkowy katalog w `.claude/skills/` przechodziłby
+    jako „no przecież to rozkaz".
+    """
+    z_kodu = {s.nazwa.lower() for s in sg.wszystkie()}
+    for p in SKILLE.glob("*/SKILL.md"):
+        if p.parent.name in z_kodu:
+            continue
+        tresc = p.read_text(encoding="utf-8")
+        assert "przeniesione z CLAUDE.md" in tresc, (
+            f"{p.parent.name}: skill bez pieczęci i bez treści rozkazu — sierota")
+        assert "ROZKAZ STAŁY" in tresc, (
+            f"{p.parent.name}: skill-rozkaz musi cytować rozkaz stały, nie streszczać go")
 
 
 def test_skille_wolaja_wlasna_pieczec_i_nie_kopiuja_krokow():

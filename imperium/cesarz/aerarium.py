@@ -44,6 +44,11 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 KONSTYTUCJA = ROOT / "CLAUDE.md"
 USTAWIENIA = ROOT / ".claude" / "settings.json"
 KATALOG_SKILLI = ROOT / ".claude" / "skills"
+# Tabela stopni GRADUS mieszka od 2026-07-27 w skillu ładowanym NA ŻĄDANIE — konstytucja
+# trzyma już tylko linię-wyzwalacz z esencją (odchudzanie 787 → 253 linie). Parytet
+# kod↔dokument obowiązuje dalej, tyle że wskazuje na nowe źródło prawdy: przeniesienie
+# treści nie może znosić bramki, która jej pilnuje (inaczej odchudzanie byłoby cofnięciem).
+DOKUMENT_GRADUS = ROOT / ".claude" / "skills" / "gradus" / "SKILL.md"
 
 # Limit doktrynalny długości konstytucji. Nie nasza opinia — oficjalna rekomendacja
 # Anthropic („aim to keep CLAUDE.md under 200 lines"), bo plik wchodzi w KAŻDĄ sesję.

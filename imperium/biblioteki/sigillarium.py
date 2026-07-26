@@ -92,7 +92,7 @@ SIGLA: Dict[str, Sigillum] = {
     "LIMES": Sigillum(
         nazwa="LIMES",
         tytul="LIMES — bramka Prawa XXI (wał graniczny)",
-        opis="Twarda bramka przed każdym commitem: testy, audyt 17 warstw (z ruff), "
+        opis="Twarda bramka przed każdym commitem: testy, pełny audyt (z ruff W13), "
              "łowca powtórek Księgi Wad, spis obalonych twierdzeń, dług honorowy.",
         wyzwalacze=["limes", "bramka", "zrób bramkę", "zrob bramke", "przed commitem",
                     "przed pushem", "sprawdź wszystko", "sprawdz wszystko"],

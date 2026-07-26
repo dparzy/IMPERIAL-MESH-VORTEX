@@ -140,23 +140,50 @@ def test_pamiec_niewidoczna_abstynuje(monkeypatch, tmp_path):
 
 
 def test_kazde_imie_gradus_jest_w_konstytucji():
-    """PARYTET kod↔dokument: tabela stopni w CLAUDE.md musi wymieniać KAŻDY stopień z kodu.
+    """PARYTET kod↔dokument: tabela stopni w CLAUDE.md musi wymieniać każdy stopień z kodu —
+    IMIENIEM **oraz** KLUCZEM WYSIŁKU.
 
-    Sprawdzamy NIEZMIENNIK (obecność każdego imienia i poziomu), nie liczbę wierszy —
-    ręczna liczba w teście rozjechała się już raz (test_sigillarium, 07-21). Tabela może
-    rosnąć; dokument nie ma prawa gubić stopnia.
+    Sprawdzamy NIEZMIENNIK (obecność), nie liczbę wierszy — ręczna liczba w teście rozjechała
+    się już raz (test_sigillarium, 07-21). Tabela może rosnąć; dokument nie ma prawa gubić
+    stopnia.
+
+    KLUCZ DOPISANY PO RECENZJI 2026-07-26: wcześniej test pilnował wyłącznie rzymskich imion,
+    więc dokument mógł przypisać CENTURIO zły poziom (`medium` zamiast `high`) i parytet
+    nadal świeciłby zielono — a to właśnie poziom, nie imię, decyduje o doborze zadań i
+    koszcie wachty. Porównujemy sam klucz (pierwszy człon), bo `GRADUS` trzyma dla stopni
+    sesyjnych opis w rodzaju „ultracode (ustawienie Claude Code)", którego dokument nie
+    cytuje dosłownie — parytet ma pilnować treści, nie interpunkcji.
     """
     tekst = ae.KONSTYTUCJA.read_text(encoding="utf-8")
-    brakujace = [g["imie"] for g in ae.GRADUS if g["imie"] not in tekst]
-    assert not brakujace, f"stopnie w kodzie, ale nie w CLAUDE.md: {brakujace}"
+    brak_imion = [g["imie"] for g in ae.GRADUS if g["imie"] not in tekst]
+    assert not brak_imion, f"stopnie w kodzie, ale nie w CLAUDE.md: {brak_imion}"
+    brak_kluczy = [g["effort"].split()[0] for g in ae.GRADUS
+                   if g["effort"].split()[0] not in tekst]
+    assert not brak_kluczy, f"poziomy wysiłku w kodzie, ale nie w CLAUDE.md: {brak_kluczy}"
 
 
 def test_poziomy_trwale_sa_podzbiorem_gradus():
     """Spójność wewnętrzna: nie wolno deklarować jako trwałego stopnia, którego nie znamy."""
     znane = {g["effort"] for g in ae.GRADUS}
     assert set(ae.POZIOMY_TRWALE) <= znane
-    for sesyjny in ("max",):
-        assert sesyjny not in ae.POZIOMY_TRWALE, "stopień sesyjny nie może być trwały"
+
+
+def test_zaden_stopien_sesyjny_nie_jest_trwaly():
+    """Stopień SESYJNY (wygasa z wachtą) nie ma prawa trafić do settings.json.
+
+    Wcześniej niezmiennik obejmował wyłącznie `max`, choć dokumentacja modułu od początku
+    klasyfikuje jako nietrwałe OBA: `max` (DICTATOR — władza nadzwyczajna, wygasała z czasem)
+    i `ultracode` (PRAEFECTUS FABRUM — ustawienie sesji Claude Code). Ochrona zastosowana
+    wybiórczo jest ochroną pozorną — to nasza własna lekcja z 07-21, tu powtórzona przez
+    recenzenta zewnętrznego. Lista sesyjnych czytana z KODU, nie wypisana ręcznie, żeby
+    kolejny dodany stopień nie wypadł z niej po cichu.
+    """
+    sesyjne = [g["effort"].split()[0] for g in ae.GRADUS
+               if g["effort"].split()[0] not in ae.POZIOMY_TRWALE]
+    assert "max" in sesyjne and "ultracode" in sesyjne, (
+        "oba stopnie nietrwałe muszą być rozpoznane jako sesyjne — inaczej test niczego nie broni")
+    for stopien in sesyjne:
+        assert stopien not in ae.POZIOMY_TRWALE, f"stopień sesyjny {stopien} nie może być trwały"
 
 
 def test_nadzor_bez_zapisanego_wydruku_abstynuje(monkeypatch, tmp_path):

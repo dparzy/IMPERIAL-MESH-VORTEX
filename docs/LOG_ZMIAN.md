@@ -14,6 +14,56 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | 💰 | Odchudzanie konstytucji 787→253 linie — −11k tokenów na każdej sesji
+
+**Rozkaz Cezara: „rób wg rekomendacji i pamiętaj, że mamy postępować, a nie cofać się".**
+
+**Krok 0 obalił własny fundament planu.** Teza ze zwiadu Sonneta (env26), że reguły można
+ładować wg ścieżek przez `rules: paths:`, **nie ma pokrycia** — schemat ustawień Claude Code
+nie definiuje właściwości `rules`. Przetrwała dwie wachty jako „fakt zweryfikowany cytatem".
+Trafiła do INDEX FALSORUM. Ten sam schemat **potwierdził** za to naprawę z recenzji cubica:
+`effortLevel` przyjmuje wyłącznie `low/medium/high/xhigh`, a *max i ultracode są sesyjne* —
+nasze `POZIOMY_TRWALE` zgadzają się co do joty. Sprawdzenie zwróciło się podwójnie.
+
+**Przebudowa oparta na SKILLACH** — mechanizmie dowiedzionym w tym repo. Treść 20 rozkazów
+stałych **przeniesiona dosłownie** (streszczenie rozkazu byłoby cofnięciem) do sześciu
+skilli ładowanych na żądanie: `/gradus`, `/spojnosc`, `/autonomia`, `/praca`, `/ledgery`,
+`/wiedza`. W konstytucji została linia-wyzwalacz niosąca **esencję**, żeby zachowanie nie
+cofnęło się, gdy skill nie jest wczytany.
+
+**Zmierzone przez AERARIUM (nie oszacowane): stały koszt startu 20 639 → 9 640 tokenów.**
+CLAUDE.md: 53 200 → 17 769 znaków.
+
+**Najryzykowniejszy krok planu okazał się zbędny.** Plan zakładał przebudowę SIGILLARIUM,
+bo „pieczęć czyta kroki z CLAUDE.md". Pomiar kodu: `LIMES` trzyma komendy w kodzie i ma
+pustą sekcję, a konstytucję parsują wyłącznie `APERTIO` i `CLAUSURA`. Zostawiając obie
+checklisty na miejscu, nie dotknąłem najwrażliwszego organu — ryzyko było w planie, nie w kodzie.
+
+**Dwa testy parytetu oblały i miały oblać** (obie asercje zakładały, że treść żyje w
+CLAUDE.md). Nie osłabione — przekierowane: parytet GRADUS sprawdza `/gradus` **oraz** żąda,
+by konstytucja zachowała wyzwalacz; równość „każdy skill = pieczęć" poluzowana świadomie,
+ale skill bez pieczęci musi nieść cytat rozkazu, inaczej każdy przypadkowy katalog
+przechodziłby jako „no przecież to rozkaz".
+
+**Warstwa 21 (twarda):** każdy `/skill` cytowany w konstytucji musi istnieć na dysku.
+Odchudzanie samo stworzyło tę klasę wady — rozkaz odesłany do nieistniejącego skilla jest
+**gorszy** niż gruby CLAUDE.md, bo staje się nieosiągalny, a Architekt nie wie, że go zgubił.
+Warstwa liczy wyłącznie zapis ``**`/nazwa`**``, więc goły ukośnik w prozie nie produkuje
+fałszywego alarmu — lekcja z W19 zastosowana od razu, nie po fakcie.
+
+**Dług długości został ALARMEM, nie bramką** (253 > 200 doktrynalnych). Progu nie
+podniesiono, żeby plik „przeszedł". Droga do 200 wiedzie przez przeniesienie checklist
+otwarcia/zamknięcia, co dopiero **wymagałoby** przebudowy pieczęci — twarde blokowanie
+commitów za dług, którego naprawa jest ryzykowna, wymuszałoby pośpiech na najwrażliwszym
+organie. Przy okazji: opis `LIMES` w kodzie mówił „audyt 17 warstw" — czwarte miejsce
+z ręczną liczbą warstw w tej wachcie.
+
+**Pliki:** `CLAUDE.md`, `.claude/skills/{gradus,spojnosc,autonomia,praca,ledgery,wiedza}/`,
+`narzedzia/audyt_spojnosci.py`, `imperium/cesarz/aerarium.py`,
+`imperium/biblioteki/sigillarium.py`, `tests/{test_spojnosc,test_aerarium,test_sigillarium}.py`.
+
+---
+
 ## 2026-07-27 | 🔬 | Sąd nad recenzją cubic PR #133 — 20/22 słuszne, dwie nowe warstwy audytu
 
 **Cezar kazał sprawdzić, czy recenzent ma rację. Osądziłem każde z 22 znalezisk wobec

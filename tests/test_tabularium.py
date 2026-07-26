@@ -285,10 +285,16 @@ def test_liczby_z_kodu_sa_dodatnie():
     for klucz in ("neurony", "zwiadowcy", "strategie", "elity", "pola_logu",
                   "styl_scalp", "styl_swing", "styl_invest", "prawa"):
         assert w[klucz] > 0, f"{klucz} = {w[klucz]} — rejestr nie odpowiada?"
-    # ksiazki/fragmenty mogą być 0 na świeżym klonie bez bazy RAG — sprawdzamy tylko typ i spójność
-    assert isinstance(w["ksiazki"], int) and w["ksiazki"] >= 0
-    assert isinstance(w["fragmenty"], int) and w["fragmenty"] >= 0
-    assert w["fragmenty"] >= w["ksiazki"], "fragmentów nie może być mniej niż książek"
+    # ksiazki/fragmenty ABSTYNUJĄ (None) tam, gdzie korpusu nie ma (chmura — książki poza
+    # gitem). Poprzednia wersja tego testu dopuszczała `0` „na świeżym klonie bez bazy RAG"
+    # i tym samym uznawała MILCZENIE za pomiar — to właśnie ta zgoda pozwoliła W15 zażądać
+    # przepisania „115 → 0" (2026-07-26). Albo oba mierzą, albo oba milczą; nigdy pół na pół.
+    assert (w["ksiazki"] is None) == (w["fragmenty"] is None), \
+        "korpus mierzy się w całości albo wcale — nie pół na pół"
+    if w["ksiazki"] is not None:
+        assert isinstance(w["ksiazki"], int) and w["ksiazki"] > 0
+        assert isinstance(w["fragmenty"], int) and w["fragmenty"] > 0
+        assert w["fragmenty"] >= w["ksiazki"], "fragmentów nie może być mniej niż książek"
     assert w["neurony_aktywne"] <= w["neurony"], "aktywnych nie może być więcej niż wszystkich"
 
 
@@ -531,3 +537,66 @@ def test_drogowskaz_nie_wchodzi_do_t1_t2():
     bazowe = [s for s, _ in tab.zbierz_dokumenty()]
     assert not any(s.startswith("bibliotheca_ulpia/") for s in bazowe), \
         "bibliotheca_ulpia nie może wejść do bazy T1/T2 (POZA_REJESTREM)"
+
+
+# ── ABSTYNENCJA ZAMIAST ZERA: środowisko bez korpusu nie ma głosu (2026-07-26) ──
+
+def test_klucz_abstynujacy_nie_nadpisuje_dokumentu():
+    """Klucz o wartości None (środowisko nie mierzy zasobu) MUSI zostawić blok nietknięty.
+
+    Klasa wady zmierzona 2026-07-26 w chmurze: książki są świadomie poza gitem, więc
+    `ksiazki_w_bazie()` zwracało 0 nieodróżnialne od zmierzonego zera, a Warstwa 15
+    żądała przepisania „115 → 0" w sześciu dokumentach — narzędzie OD PRAWDY namawiało
+    do skasowania prawdziwej liczby lokalnej. Granica: None ≠ 0.
+    """
+    import os
+    import tempfile
+
+    import narzedzia.tabularium as tab
+
+    with tempfile.NamedTemporaryFile("w", suffix=".md", dir=tab.ROOT,
+                                     delete=False, encoding="utf-8") as f:
+        f.write("# Próba\n\nKsiąg: <!-- LICZBA:ksiazki -->115<!-- /LICZBA -->\n")
+        sciezka = f.name
+    wzgledna = os.path.relpath(sciezka, tab.ROOT)
+    oryginal_wartosci = tab.wartosci_z_kodu
+    oryginal_drogowskazy = tab.DROGOWSKAZY_Z_LICZBAMI
+    oryginal_zbierz = tab.zbierz_dokumenty
+    try:
+        # IZOLACJA OD PRODUKCJI (naprawa mojego własnego błędu, 2026-07-26): pierwsza
+        # wersja tego testu DOPISYWAŁA plik tymczasowy do prawdziwej listy i wołała
+        # `wstrzyknij_liczby(sucho=False)`, więc faza „zmierzone zero" przepisała ZERAMI
+        # sześć produkcyjnych dokumentów (MAPA_PAMIECI, ARCHITEKTURA, README biblioteki…).
+        # Dokładnie klasa złapana 07-21 („tryb testowy mutujący trwały rejestr") — test
+        # pisze WYŁĄCZNIE do swojego pliku, nigdy do repozytorium.
+        tab.zbierz_dokumenty = lambda: []
+        tab.DROGOWSKAZY_Z_LICZBAMI = [wzgledna]
+
+        # 1) ABSTYNENCJA (None) — dokument nietknięty, zero zgłoszonych zmian.
+        tab.wartosci_z_kodu = lambda: {**oryginal_wartosci(), "ksiazki": None}
+        zmiany, bledy = tab.wstrzyknij_liczby(sucho=False)
+        with open(sciezka, encoding="utf-8") as f:
+            assert "-->115<!--" in f.read(), "abstynencja skasowała zmierzoną liczbę"
+        assert not any(wzgledna in z for z in zmiany), "abstynencja zgłoszona jako rozjazd"
+        assert not bledy
+
+        # 2) ZMIERZONE ZERO (0) — nadal MUSI nadpisać: to prawdziwy pomiar, nie milczenie.
+        tab.wartosci_z_kodu = lambda: {**oryginal_wartosci(), "ksiazki": 0}
+        zmiany, _ = tab.wstrzyknij_liczby(sucho=False)
+        with open(sciezka, encoding="utf-8") as f:
+            assert "-->0<!--" in f.read(), "zmierzone 0 musi nadpisać (to pomiar)"
+        assert any(wzgledna in z for z in zmiany)
+    finally:
+        tab.wartosci_z_kodu = oryginal_wartosci
+        tab.DROGOWSKAZY_Z_LICZBAMI = oryginal_drogowskazy
+        tab.zbierz_dokumenty = oryginal_zbierz
+        os.unlink(sciezka)
+
+
+def test_korpus_ksiazek_obecny_zgodny_z_liczba():
+    """`korpus_ksiazek_obecny()` musi być spójny z `ksiazki_w_bazie()` w KAŻDYM środowisku
+    (chmura: brak korpusu → False; lokal: 115 ksiąg → True). Jedno źródło prawdy."""
+    from imperium.biblioteki.srodowisko_pamieci import (
+        korpus_ksiazek_obecny, ksiazki_w_bazie,
+    )
+    assert korpus_ksiazek_obecny() == (ksiazki_w_bazie() > 0)

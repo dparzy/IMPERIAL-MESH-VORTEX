@@ -13,6 +13,7 @@ Testuje TYLKO moduły niewymagające TA-Lib/numpy/API (czysty Python):
 """
 
 import sys, os, importlib, traceback, inspect, tempfile
+import unittest   # SkipTest — jedyne pojęcie abstynencji w stdlib (honoruje je też pytest)
 from pathlib import Path
 
 # Windows: konsola cp1250 (polski Windows) wywala się na emoji w wynikach testów.
@@ -126,9 +127,46 @@ MODULY_TESTOWE = sorted(
 )
 
 
+# ── STRAŻNIK CZYSTOŚCI REPOZYTORIUM (2026-07-26) ────────────────────────────────
+# Test ma sprawdzać kod, nie ZMIENIAĆ repozytorium. Klasa złapana dwa razy:
+#   07-21 — `--dry-run` reklamowany jako „bez kosztu" dopisywał do produkcyjnej kolejki;
+#   07-26 — nowy test Tabularium wołał `wstrzyknij_liczby(sucho=False)` na PRAWDZIWEJ
+#           liście dokumentów i przepisał ZERAMI sześć produkcyjnych plików (115 → 0).
+# Za drugim razem to samo przeoczenie oznacza, że lekcja bez MECHANIZMU nie działa:
+# skutek uboczny testu jest niewidoczny, bo pakiet świeci na zielono, a szkoda leży
+# w plikach, na które nikt wtedy nie patrzy. Strażnik czyni ją głośną natychmiast.
+KORZEN = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+_PLIKI_WOLNO_ZMIENIAC = {
+    # Pieczęć odciska SAM runner na końcu biegu — to jego zadanie, nie skutek uboczny.
+    "bibliotheca_ulpia/dane/sigillum_probationis.json",
+}
+
+
+def _stan_repo():
+    """Zbiór zmienionych plików śledzonych przez git ({} gdy git niedostępny)."""
+    import subprocess
+    try:
+        wynik = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"],
+                               cwd=KORZEN, capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return None                      # brak gita = brak pomiaru; NIE udajemy czystości
+    if wynik.returncode != 0:
+        return None
+    return {ln[3:].strip() for ln in wynik.stdout.splitlines() if ln.strip()}
+
+
 def uruchom():
+    repo_przed = _stan_repo()
     zaliczone = 0
     oblane = 0
+    # ABSTYNENCJA TESTU (2026-07-26). Runner znał wyłącznie „zaliczony/oblany", więc test
+    # wymagający zależności OPCJONALNEJ (ebooklib, plotext) padał wszędzie tam, gdzie jej
+    # nie ma — 3 testy EPUB oblewały pakiet w chmurze, choć nie ma tam czego naprawiać.
+    # Brak zasobu to nie porażka i nie zieleń: to POMINIĘCIE, GŁOŚNO policzone. Ciche
+    # pominięcie byłoby gorsze od obu (udawałoby pokrycie), więc liczymy je i drukujemy.
+    pominiete = 0
+    powody_pominiec = []
     bledy = []
 
     for nazwa_modulu in MODULY_TESTOWE:
@@ -167,6 +205,10 @@ def uruchom():
                 funkcja(**kwargs)
                 print(f"  ✅ {nazwa_f}")
                 zaliczone += 1
+            except unittest.SkipTest as e:
+                print(f"  ⏭️ {nazwa_f}: POMINIĘTY — {e}")
+                pominiete += 1
+                powody_pominiec.append((nazwa_modulu, nazwa_f, str(e)))
             except AssertionError as e:
                 print(f"  ❌ {nazwa_f}: {e}")
                 oblane += 1
@@ -181,8 +223,32 @@ def uruchom():
 
     print("\n" + "═" * 60)
     print(f"  WYNIK: {zaliczone} zaliczone, {oblane} oblane "
-          f"({zaliczone}/{zaliczone + oblane})")
+          f"({zaliczone}/{zaliczone + oblane})"
+          + (f", {pominiete} pominięte" if pominiete else ""))
     print("═" * 60)
+
+    # POMINIĘCIA WIDOCZNE ZAWSZE — cicha abstynencja udawałaby pokrycie (Prawo XV).
+    if powody_pominiec:
+        print("\nPominięte (brak zasobu w TYM środowisku — nie porażka, ale i nie pokrycie):")
+        for modul, test, powod in powody_pominiec:
+            print(f"  ⏭️ {modul}::{test} — {powod}")
+
+    # STRAŻNIK CZYSTOŚCI — sprawdzany PRZED odciśnięciem pieczęci, żeby jej własny zapis
+    # nie liczył się jako brud (i żeby czerwony wynik nie został przypieczętowany jako OK).
+    repo_po = _stan_repo()
+    if repo_przed is not None and repo_po is not None:
+        zabrudzone = sorted((repo_po - repo_przed) - _PLIKI_WOLNO_ZMIENIAC)
+        if zabrudzone:
+            print("\n🚨 REPOZYTORIUM ZMIENIŁO SIĘ W TRAKCIE BIEGU:")
+            for plik in zabrudzone:
+                print(f"     ✏️ {plik}")
+            print("   Dwie możliwe przyczyny — rozstrzygnij, NIE zgaduj:")
+            print("   (a) test pisze do plików Imperium zamiast do swojego tmp_path;")
+            print("   (b) bieg szedł RÓWNOLEGLE z procesem zmieniającym repo (edycja, hook,")
+            print("       wpis do ledgera) — wtedy to fałszywe oskarżenie, powtórz bieg sam.")
+            oblane += 1
+            bledy.append(("<strażnik czystości>", "repozytorium zabrudzone przez testy",
+                          "Zmienione pliki: " + ", ".join(zabrudzone)))
 
     _odcisnij_pieczec(zaliczone, oblane)
 

@@ -62,7 +62,14 @@ def stan_hyginusa() -> Dict[str, Any]:
     nie przerobił na decyzje. To jest DŁUG PRZEGLĄDU: kolejka rosnąca bez sędziego znaczy,
     że płacimy za zwiad, z którego nikt nie korzysta (Prawo XV — utrata potencjału).
     """
-    rek = _linie_jsonl(KOLEJKA_HIPOTEZ)
+    # ABSTYNENCJA ZAMIAST ZERA (Prawo I, zmierzone 2026-07-26). Kolejka jest gitignorowana
+    # (.gitignore:55), więc w chmurze pliku NIE MA — a `_linie_jsonl` zwracał wtedy `[]`
+    # i meldunek ogłaszał „kolejka 0 | czeka na sędziego 0", czyli DŁUG PRZEGLĄDU ZERO,
+    # podczas gdy na lokalu leżały 34 cząstki. Fałszywy spokój jest gorszy od braku
+    # meldunku: krok 4b domknięcia liczy DELTĘ, więc „34 → 0" wyglądałoby na wykonaną
+    # pracę. Środowisko bez rejestru nie ma o nim głosu (ta sama klasa co `ksiazki 115→0`).
+    rejestr_nieobecny = not KOLEJKA_HIPOTEZ.exists()
+    rek = [] if rejestr_nieobecny else _linie_jsonl(KOLEJKA_HIPOTEZ)
     ok = [r for r in rek if r.get("status") == "ok"]
     znaczniki = [r["ts"] for r in rek if isinstance(r.get("ts"), (int, float))]
     zbadane = [r for r in ok if "probator" in r]
@@ -73,21 +80,38 @@ def stan_hyginusa() -> Dict[str, Any]:
         from imperium.cesarz import dispensator as dsp
         from imperium.cesarz.deepseek_glos import GlosImperium
         model = GlosImperium.__init__.__defaults__[0]        # domyślny model mowy
-        profile = [f"{k}→{v['model'].replace('deepseek-', '')}"
-                   f"{'/think-off' if v.get('thinking') else '/' + str(v.get('reasoning_effort', ''))}"
-                   for k, v in dsp.PROFILE.items()]
+        # FAZA→PROFIL→MODEL, nie sam katalog profili (naprawa 2026-07-26). Poprzednio
+        # meldunek listował klucze słownika PROFILE, co CZYTA SIĘ jak mapowanie fazy na
+        # model — i tak zostało odczytane na otwarciu wachty: „krytyka→v4-flash" wyglądało
+        # na sprzeczność z decyzją z 07-21 o przeniesieniu KRYTYKI na profil `osad`
+        # (v4-pro). Kod był poprawny (`_PROFIL_KRYTYKA = "osad"`), kłamał WIDOK. Katalog
+        # możliwości pokazany w miejscu stanu faktycznego jest fałszywym meldunkiem.
+        from narzedzia import bibliotekarz as bib
+        fazy = [("klasyfikacja", bib._PROFIL_ROZWIN), ("zwiad", bib._PROFIL_ZWIAD),
+                ("krytyka", bib._PROFIL_KRYTYKA)]
+        for faza, nazwa_profilu in fazy:
+            p = dsp.PROFILE.get(nazwa_profilu, {})
+            opis_modelu = str(p.get("model", "?")).replace("deepseek-", "")
+            wysilek = ("think-off" if p.get("thinking")
+                       else str(p.get("reasoning_effort", "")))
+            profile.append(f"{faza}→[{nazwa_profilu}] {opis_modelu}/{wysilek}")
     except Exception:                                        # noqa: BLE001 — meldunek nie może paść
         pass
 
+    # Abstynencja dotyczy WYŁĄCZNIE liczb z nieobecnego rejestru. Konfiguracja mowy
+    # (model, profile faz) jest w KODZIE, więc znamy ją w każdym środowisku — wygaszenie
+    # jej razem z kolejką było moją własną nadgorliwością: abstynencja ma milczeć o tym,
+    # czego nie zmierzono, a nie zaciemniać tego, co wiadomo na pewno.
     return {
-        "czastek": len(rek),
-        "czeka_na_sedziego": len(ok),
+        "rejestr_nieobecny": rejestr_nieobecny,
+        "czastek": None if rejestr_nieobecny else len(rek),
+        "czeka_na_sedziego": None if rejestr_nieobecny else len(ok),
         "ostatni_zwiad": (datetime.fromtimestamp(max(znaczniki)).strftime("%Y-%m-%d %H:%M")
                           if znaczniki else "—"),
         "model": model,
         "profile_dispensatora": profile,
-        "zbadane_probatorem": len(zbadane),
-        "podejrzane": len(podejrzane),
+        "zbadane_probatorem": None if rejestr_nieobecny else len(zbadane),
+        "podejrzane": None if rejestr_nieobecny else len(podejrzane),
         "dispensator_wpiety": _czy_dispensator_wpiety(),
     }
 
@@ -247,10 +271,18 @@ def banner(model_architekta: Optional[str] = None) -> str:
     wiersze = ["📋 BREVIARIUM — słudzy Imperium:", f"   {stan_testow()['opis']}"]
 
     dysp = "wpięty" if h["dispensator_wpiety"] else "🚨 NIEWPIĘTY (martwy potencjał)"
-    wiersze.append(
-        f"   📚 HYGINUS (Bibliotekarz-Zwiadowca): kolejka {h['czastek']} cząstek | "
-        f"czeka na sędziego {h['czeka_na_sedziego']} | ostatni zwiad {h['ostatni_zwiad']}"
-    )
+    if h.get("rejestr_nieobecny"):
+        # Brak wiedzy nazwany WPROST (Prawo I) — „0 cząstek" byłoby fałszywym spokojem:
+        # kolejka jest gitignorowana, więc w chmurze jej po prostu nie widać.
+        wiersze.append(
+            "   📚 HYGINUS (Bibliotekarz-Zwiadowca): ⚠️ kolejka NIEZNANA w tym środowisku "
+            "(rejestr poza gitem — stan zna wyłącznie lokal)"
+        )
+    else:
+        wiersze.append(
+            f"   📚 HYGINUS (Bibliotekarz-Zwiadowca): kolejka {h['czastek']} cząstek | "
+            f"czeka na sędziego {h['czeka_na_sedziego']} | ostatni zwiad {h['ostatni_zwiad']}"
+        )
     wiersze.append(f"      model: {h['model']} | DISPENSATOR: {dysp}")
     if h["profile_dispensatora"]:
         wiersze.append(f"      profile: {', '.join(h['profile_dispensatora'])}")

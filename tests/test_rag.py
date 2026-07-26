@@ -34,10 +34,27 @@ def test_ekstraktor_md():
 # więc łatamy prawdziwy moduł `ebooklib.epub`: `from ebooklib import epub` wiąże OBIEKT modułu,
 # a `epub.read_epub` rozwiązuje się dopiero przy wywołaniu — patch zadziała.
 
+def _ebooklib_epub_albo_pomin():
+    """Zwraca `ebooklib.epub` albo POMIJA test — `ebooklib` to zależność OPCJONALNA.
+
+    Zmierzone 2026-07-26: te trzy testy oblewały pakiet w chmurze (`ModuleNotFoundError`),
+    choć nie było czego naprawiać — `ekstraktor._epub` importuje ebooklib LENIWIE i nie ma
+    go w requirements. Test podmienia PRAWDZIWY moduł, więc gałęzi nie da się wymusić bez
+    niego (inaczej niż przy `plotext`). Brak zasobu to POMINIĘCIE, nie porażka i nie zieleń
+    — `SkipTest` jest głośno liczony przez runner Imperium i honorowany przez pytest.
+    """
+    try:
+        from ebooklib import epub as epub_mod
+    except ImportError as e:
+        import unittest
+        raise unittest.SkipTest(f"ebooklib nieobecny (zależność opcjonalna): {e}") from e
+    return epub_mod
+
+
 def test_epub_ebooklib_pada_fallback_na_calibre(monkeypatch):
     """Wyjątek z ebooklib MUSI przełączyć na calibre, nie zwrócić pustki."""
     import ekstraktor as ex
-    from ebooklib import epub as epub_mod
+    epub_mod = _ebooklib_epub_albo_pomin()
 
     def wybuch(*a, **kw):
         raise IndexError("list index out of range")   # dokładnie bug ebooklib 0.20.0
@@ -53,7 +70,7 @@ def test_epub_pusty_wynik_bez_wyjatku_tez_fallback(monkeypatch):
     nierozpoznany). Cicha strata jest gorsza od głośnej (Prawo XV) — też fallback.
     """
     import ekstraktor as ex
-    from ebooklib import epub as epub_mod
+    epub_mod = _ebooklib_epub_albo_pomin()
 
     class _PustaKsiazka:
         def get_items_of_type(self, _typ):
@@ -67,7 +84,7 @@ def test_epub_pusty_wynik_bez_wyjatku_tez_fallback(monkeypatch):
 def test_epub_dziala_gdy_ebooklib_ok(monkeypatch):
     """Gdy ebooklib działa — NIE wołamy calibre (nie płacimy za konwersję bez powodu)."""
     import ekstraktor as ex
-    from ebooklib import epub as epub_mod
+    epub_mod = _ebooklib_epub_albo_pomin()
 
     class _Item:
         def get_content(self):

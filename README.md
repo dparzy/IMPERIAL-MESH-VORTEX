@@ -11,7 +11,7 @@ powod_istnienia: "Wizytówka Imperium — podaje liczby wprost z kodu (neurony/t
 > Samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 > **Doktryna:** wojna = giełda; pierwszy front — **MEXC**; każdy order stawiany z myślą o zysku, a łup (zysk) finansuje lepszy budulec Imperium.
 
-> **Stan na:** 2026-07-19 · **Testy:** `python tests/run_tests.py` (zielone) · **Rój:** <!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów / <!-- LICZBA:zwiadowcy -->15<!-- /LICZBA --> zwiadowców · **Faza bieżąca:** żywe źródło w [`docs/MANIFEST_KODU.md`](docs/MANIFEST_KODU.md) + [`docs/LOG_ZMIAN.md`](docs/LOG_ZMIAN.md) (nie duplikujemy tu rosnącej listy W-XXX — starzała się i kłamała).
+> **Stan na:** 2026-07-26 · **Testy:** `python tests/run_tests.py` (zielone) · **Rój:** <!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów / <!-- LICZBA:zwiadowcy -->15<!-- /LICZBA --> zwiadowców · **Faza bieżąca:** żywe źródło w [`docs/MANIFEST_KODU.md`](docs/MANIFEST_KODU.md) + [`docs/LOG_ZMIAN.md`](docs/LOG_ZMIAN.md) (nie duplikujemy tu rosnącej listy W-XXX — starzała się i kłamała).
 
 ---
 

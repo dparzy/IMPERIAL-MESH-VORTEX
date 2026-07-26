@@ -119,7 +119,7 @@ def wartosci_z_kodu():
 
     from imperium.biblioteki.pamiec_absolutna import ImperiumLog
     from imperium.biblioteki.srodowisko_pamieci import (
-        fragmenty_w_bazie, ksiazki_w_bazie,
+        fragmenty_w_bazie, korpus_ksiazek_obecny, ksiazki_w_bazie,
     )
     from imperium.legiony.rejestr import (
         neurony_dla_trybu, raport_elity, wszystkie_neurony, wszyscy_zwiadowcy,
@@ -145,6 +145,13 @@ def wartosci_z_kodu():
         "ksiazki": ksiazki_w_bazie(),
         "fragmenty": fragmenty_w_bazie(),
     }
+    # ABSTYNENCJA ZAMIAST ZERA (Prawo XV, zmierzone 2026-07-26). Książki są świadomie poza
+    # gitem, więc chmura mierzy 0 książek i 551 fragmentów tam, gdzie lokal ma 115/37331.
+    # Bez tej bramki W15 kazała przepisać „115 → 0" w sześciu dokumentach — narzędzie od
+    # prawdy namawiało do skasowania prawdy. Środowisko bez korpusu NIE MA GŁOSU o korpusie.
+    if not korpus_ksiazek_obecny():
+        wartosci["ksiazki"] = None
+        wartosci["fragmenty"] = None
     # Liczba plików .py per organ (mapa README/ARCHITEKTURA — była ręczna i rozjechała
     # się z kodem: legiony podawane jako 40 przy 67 realnych, 2026-07-19). Wstrzykiwana,
     # żeby schemat Imperium nigdy więcej nie kłamał o własnej wielkości (Warstwa 15).
@@ -191,6 +198,11 @@ def wstrzyknij_liczby(sucho=False):
             if klucz not in wartosci:
                 bledy.append(f"[T4] {_sciezka}: nieznana liczba `{klucz}` "
                              f"(dostępne: {', '.join(sorted(wartosci))})")
+                return m.group(0)
+            if wartosci[klucz] is None:
+                # Klucz abstynuje w TYM środowisku (brak korpusu) — zostawiamy dokument
+                # nietknięty. Milczenie nie jest pomiarem: nie kasujemy liczby zmierzonej
+                # tam, gdzie zasób istnieje (Prawo I + XV).
                 return m.group(0)
             nowa = str(wartosci[klucz])
             if stara != nowa:

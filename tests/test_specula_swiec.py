@@ -60,8 +60,26 @@ def test_komunikat_braku_zawiera_instrukcje():
 
 # ── Granica: za mało danych (0 i 1 bar) ────────────────────────────────────────
 
+def _z_plotextem(f, *a, **kw):
+    """Wymusza gałąź „plotext obecny", żeby granica LICZBY BARÓW była mierzona wszędzie.
+
+    Zmierzone 2026-07-26: te dwa testy padały w chmurze (`plotext` to zależność
+    OPCJONALNA, w chmurze nieobecna). `render_swiece` sprawdza bibliotekę PRZED liczbą
+    barów, więc bez niej zwracał komunikat o bibliotece i asercja „za mało" nie miała
+    prawa przejść — a docstring tego pliku twierdził, że granice działają BEZ plotext.
+    Brak opcjonalnego zasobu nie może udawać ani porażki, ani zieleni: wymuszamy gałąź,
+    zamiast pomijać test (pominięty test milczałby o granicy dokładnie tam, gdzie CI żyje).
+    """
+    stary = sp.PLOTEXT_DOSTEPNY
+    try:
+        sp.PLOTEXT_DOSTEPNY = True
+        return f(*a, **kw)
+    finally:
+        sp.PLOTEXT_DOSTEPNY = stary
+
+
 def test_zero_barow_nie_crashuje():
-    wynik = render_swiece([])
+    wynik = _z_plotextem(render_swiece, [])
     assert wynik.startswith("🗼")
     assert "za mało" in wynik
 
@@ -69,7 +87,7 @@ def test_zero_barow_nie_crashuje():
 def test_jeden_bar_ponizej_minimum():
     """1 bar < MIN_BARY (2) → komunikat, nie crash."""
     assert MIN_BARY == 2
-    wynik = render_swiece(_bary(1))
+    wynik = _z_plotextem(render_swiece, _bary(1))
     assert "za mało" in wynik
 
 

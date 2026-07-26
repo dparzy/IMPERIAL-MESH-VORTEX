@@ -113,32 +113,17 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-26 — BIB-032 O'Hara – PDF skanowany, OCR niedziałający
-Książka BIB-032 (O'Hara) to skanowany obraz PDF. OCR generuje śmieci. Zgodnie z Prawem I (zero fabrykacji) nie została zindeksowana w RAG. Status: pominięta.
-
-### 2026-07-20 — Rozbieżność baneru startowego: pokazuje CHMURA zamiast LOKAL
-Baner z hooka centrum_pamieci głosi 'Środowisko: CHMURA', ale żywy detektor wykryj_srodowisko() zwraca 'lokal'. Źródło baneru jest nieaktualne. Do naprawy w ramach higieny.
-
-### 2026-07-20 — Środowisko lokalne z pełnym dostępem do książek i cache
-Empirycznie potwierdzono: Claude działa na laptopie Pixel (Windows 10) w katalogu /c/Projekty/imperial-mesh-vortex. Dostępne wszystkie 69 książek (559 MB) w bibliotheca_ulpia/ oraz RAG tekst_cache (59 MB). Ciężka robota z książkami jest teraz możliwa.
+### 2026-07-26 — Audyt spójności kończy się exit 1 i hook milczy
+Podczas audytu środowiska komenda zakończyła się kodem błędu (exit 1), a hook w kroku 0 nie wyświetlił żadnej treści – to klasyczna wada 'milczenie udające wynik'.
 
 ### 2026-07-20 — 20 sprzeczności w Refleksji, 3 pilne
 Audyt startowy wykrył 20 sprzeczności, w tym 3 pilne: audytu/nowy, chmura/lokal/naprawa, false/faza – wymagają przeglądu.
-
-### 2026-07-20 — Przekroczenie limitu sekcji LEKCJE
-Sekcja LEKCJE ma 27 234 znaki przy limicie 24 000 – wymaga konsolidacji najstarszych wpisów (P0).
 
 ### 2026-07-20 — Hipoteza B potwierdzona OOS
 Ważenie głosów IC (Legatus) daje +3.6pp na 5/5 parach poza próbą – czeka na zgodę Cezara na wpięcie do kodu.
 
 ### 2026-07-20 — Błąd replikacji wiedzy – Claude sam nie stosuje własnych procedur
 W poprzednich sesjach wielokrotnie brakowało aktualizacji dokumentów i ledgera, mimo że Claude tworzył procedury (np. ALMA, OBSERWATORY). To klasyczny błąd replikacji wiedzy – Claude tworzy narzędzia, ale sam ich nie używa.
-
-### 2026-07-20 — Audyt dotyczy tylko imperium/biblioteki/, inne katalogi pomijane
-Warstwa 11 audytu sprawdza meldunek tylko w imperium/biblioteki/. Organy w imperium/cesarz/ i narzedzia/ są poza zasięgiem – exit 0 może kłamać. Rozszerzono na wszystkie organy + narzedzia/ (nowa warstwa 17).
-
-### 2026-07-20 — Legalne abstynencje zmysłów zidentyfikowane
-Niektóre neurony legalnie nie głosują: PSY-01 (funding=8e-5, brak ekstremum), PSY-04 (OI_PREV==OI, 1. odczyt), NEWS-02/03/04 (stan kroczący ≥2 bary), RADAR/N/CP (potrzebują serii cen – nie podano w teście). Zero martwych głosów.
 
 ### 2026-07-20 — Cztery zmysły działają na żywych danych
 Potwierdzono, że adaptery FearGreed (23), RSS (30 nagłówków), PSY (funding, CVD) i V (CVD) generują głosy. V-03 (CVD)→LONG, PSY-03 (FearGreed=23)→LONG kontrariańsko, NEWS-01→LONG. Abstynencje legalne (Prawo XV).

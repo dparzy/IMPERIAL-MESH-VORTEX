@@ -368,6 +368,58 @@ def statystyki(sciezka: Optional[Path] = None) -> Dict[str, Any]:
     }
 
 
+def pary_sft(sciezka: Optional[Path] = None,
+             min_znakow_odpowiedzi: int = 0,
+             pomin_przyciete: bool = True,
+             jedna_probka_na_pytanie: bool = True) -> Iterator[Dict[str, Any]]:
+    """
+    JEDYNE miejsce, gdzie żyje filtr zbioru treningowego — strumień gotowych przykładów SFT.
+
+    Wydzielone z `eksportuj_sft` (recenzja 2026-07-26): meldunek BREVIARIUM potrzebuje samej
+    LICZBY par użytecznych, a żeby ją poznać, serializował cały zbiór do pliku tymczasowego —
+    czyli płacił zapisem dysku za policzenie. Konsumenci (eksport i licznik) muszą jednak
+    dzielić DOKŁADNIE ten sam filtr: dwa niezależne filtry rozjadą się co do sztuki i meldunek
+    zacznie opisywać inny zbiór niż ten, który pojedzie na trening (Prawo XVI).
+
+    Znaczenie filtrów opisuje `eksportuj_sft` — tam została pełna argumentacja każdego progu.
+    """
+    widziane_pytania: set[str] = set()
+    for p in czytaj_pary(sciezka):
+        if pomin_przyciete and p.get("przyciety"):
+            continue
+        odp = p.get("odpowiedz") or ""
+        if len(odp) < min_znakow_odpowiedzi:
+            continue
+        if jedna_probka_na_pytanie:
+            # Starsze wpisy nie mają pola — odtwarzamy odcisk z treści, żeby kolaps
+            # działał też na tym, co zebrano przed wprowadzeniem limitu.
+            hp = p.get("odcisk_pytania") or odcisk_pytania(p.get("system") or "",
+                                                           p.get("prompt") or "")
+            if hp in widziane_pytania:
+                continue
+            widziane_pytania.add(hp)
+        wiadomosci: List[Dict[str, str]] = []
+        if p.get("system"):
+            wiadomosci.append({"role": "system", "content": p["system"]})
+        wiadomosci.append({"role": "user", "content": p.get("prompt", "")})
+        wiadomosci.append({"role": "assistant", "content": odp})
+        yield {"messages": wiadomosci}
+
+
+def policz_sft(sciezka: Optional[Path] = None,
+               min_znakow_odpowiedzi: int = 0,
+               pomin_przyciete: bool = True,
+               jedna_probka_na_pytanie: bool = True) -> int:
+    """Ile par PRZEŻYJE eksport — bez zapisywania czegokolwiek na dysk.
+
+    Meldunek o postępie Szkoły TIRO biegnie na OBU końcach każdej sesji, więc nie ma prawa
+    kosztować zapisu całego zbioru (koszt rósłby z każdą zebraną parą). Liczy ten sam filtr,
+    co eksport — `pary_sft`.
+    """
+    return sum(1 for _ in pary_sft(sciezka, min_znakow_odpowiedzi,
+                                   pomin_przyciete, jedna_probka_na_pytanie))
+
+
 def eksportuj_sft(cel: Path, sciezka: Optional[Path] = None,
                   min_znakow_odpowiedzi: int = 0,
                   pomin_przyciete: bool = True,
@@ -395,28 +447,10 @@ def eksportuj_sft(cel: Path, sciezka: Optional[Path] = None,
     cel = Path(cel)
     cel.parent.mkdir(parents=True, exist_ok=True)
     n = 0
-    widziane_pytania: set[str] = set()
     with cel.open("w", encoding="utf-8") as f:
-        for p in czytaj_pary(sciezka):
-            if pomin_przyciete and p.get("przyciety"):
-                continue
-            odp = p.get("odpowiedz") or ""
-            if len(odp) < min_znakow_odpowiedzi:
-                continue
-            if jedna_probka_na_pytanie:
-                # Starsze wpisy nie mają pola — odtwarzamy odcisk z treści, żeby kolaps
-                # działał też na tym, co zebrano przed wprowadzeniem limitu.
-                hp = p.get("odcisk_pytania") or odcisk_pytania(p.get("system") or "",
-                                                               p.get("prompt") or "")
-                if hp in widziane_pytania:
-                    continue
-                widziane_pytania.add(hp)
-            wiadomosci: List[Dict[str, str]] = []
-            if p.get("system"):
-                wiadomosci.append({"role": "system", "content": p["system"]})
-            wiadomosci.append({"role": "user", "content": p.get("prompt", "")})
-            wiadomosci.append({"role": "assistant", "content": odp})
-            f.write(json.dumps({"messages": wiadomosci}, ensure_ascii=False) + "\n")
+        for przyklad in pary_sft(sciezka, min_znakow_odpowiedzi,
+                                 pomin_przyciete, jedna_probka_na_pytanie):
+            f.write(json.dumps(przyklad, ensure_ascii=False) + "\n")
             n += 1
     return n
 

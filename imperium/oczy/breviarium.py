@@ -185,13 +185,21 @@ def _pary_uzyteczne() -> Optional[int]:
 
     Liczymy tym samym kodem, który buduje zbiór treningowy (Prawo XVI: jedno źródło prawdy,
     dwa liczniki rozjadą się co do sztuki). None, gdy nie da się policzyć — nie zgadujemy.
+
+    DWIE POPRAWKI Z RECENZJI 2026-07-26 (obie tej samej klasy — „licznik opisuje coś innego
+    niż myślisz"):
+    1. Liczymy STRUMIENIEM (`policz_sft`), nie eksportem do pliku tymczasowego. Meldunek
+       biegnie na OBU końcach każdej sesji, więc nie ma prawa płacić zapisem całego zbioru;
+       koszt rósłby z każdą zebraną parą, a licznik ma być tani jak spojrzenie.
+    2. Podajemy `PARY_TIRO` JAWNIE. Wcześniej licznik użytecznych szedł domyślną ścieżką
+       Notariusa, a licznik surowych — stałą tego modułu. Dziś wskazują ten sam plik, więc
+       wada była UTAJONA: rozjazd ujawniłby się dopiero, gdy któraś stała się zmieni, i wtedy
+       procent gotowości Szkoły opisywałby dwa różne ledgery naraz. Jedno źródło, jawnie.
     """
     try:
-        import tempfile
-        from imperium.biblioteki.notarius import eksportuj_sft
-        with tempfile.TemporaryDirectory() as kat:
-            return eksportuj_sft(Path(kat) / "sft.jsonl",
-                                 jedna_probka_na_pytanie=True, min_znakow_odpowiedzi=200)
+        from imperium.biblioteki.notarius import policz_sft
+        return policz_sft(PARY_TIRO, min_znakow_odpowiedzi=200,
+                          jedna_probka_na_pytanie=True)
     except Exception:                                        # noqa: BLE001 — meldunek nie może paść
         return None
 

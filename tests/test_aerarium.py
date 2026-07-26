@@ -87,6 +87,35 @@ def test_zepsuty_json_nie_wywraca_organu(monkeypatch, tmp_path):
     assert ae.stopien_domyslny()["poziom"] is None
 
 
+def test_poprawny_json_o_zlym_ksztalcie_abstynuje(monkeypatch, tmp_path):
+    """GRANICA: JSON POPRAWNY, ale nie-obiekt (lista/napis/liczba) → abstynencja, nie wyjątek.
+
+    Wada znaleziona recenzją 2026-07-26: łapaliśmy wyłącznie `JSONDecodeError`, więc `[]`
+    przechodziło parsowanie i dopiero `.get` wywalało AttributeError — kładąc CAŁY baner
+    startowy przez literówkę w lokalnej konfiguracji. Zły kształt = ten sam werdykt co zły
+    JSON: nie wiem, jaki stopień, ale hook żyje dalej.
+    """
+    monkeypatch.delenv("CLAUDE_CODE_EFFORT_LEVEL", raising=False)
+    for tresc in ("[]", '"high"', "42", "null"):
+        plik = tmp_path / "settings.json"
+        plik.write_text(tresc, encoding="utf-8")
+        monkeypatch.setattr(ae, "USTAWIENIA", plik)
+        assert ae.stopien_domyslny()["poziom"] is None, f"zły kształt {tresc} ma abstynować"
+
+
+def test_obcy_katalog_projektu_nie_udaje_naszego(monkeypatch, tmp_path):
+    """GRANICA: JEDEN katalog w ~/.claude/projects, ale CUDZY → pusto, nie „pewnie ten".
+
+    Wcześniejszy fallback („jeden = nasz") podawał cudzą pamięć i cudzy koszt hooka jako
+    pomiar TEGO projektu. Fałszywa liczba jest gorsza od jej braku — nie da się jej odróżnić
+    od prawdziwej (Prawo I).
+    """
+    (tmp_path / "projects" / "C--Gdzies-inny-projekt" / "sesja" / "tool-results").mkdir(parents=True)
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path))
+    assert ae._katalogi_projektu() == []
+    assert ae.koszt_hooka() is None, "cudzy wydruk hooka nie jest naszym pomiarem"
+
+
 def test_zmienna_srodowiskowa_bije_settings(monkeypatch, tmp_path):
     """Kolejność wg dokumentacji Claude Code: zmienna środowiskowa nadpisuje ustawienia."""
     plik = tmp_path / "settings.json"

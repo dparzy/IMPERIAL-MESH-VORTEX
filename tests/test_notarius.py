@@ -539,3 +539,52 @@ def test_most_zwraca_odpowiedz_gdy_pisarz_pada(monkeypatch):
     glos = GlosImperium.__new__(GlosImperium)      # bez __init__ → bez potrzeby klucza API
     glos.model = "deepseek-v4-flash"
     glos._protokoluj("s", "p", "o", 0.7)           # nie może rzucić
+
+
+# ── JEDEN FILTR, DWÓCH KONSUMENTÓW (recenzja 2026-07-26) ─────────────────────
+
+@_bez_wylacznika
+def test_licznik_i_eksport_zawsze_zgodne(tmp_path):
+    """`policz_sft` MUSI dać dokładnie tyle, ile `eksportuj_sft` zapisze — co do sztuki.
+
+    To niezmiennik, dla którego filtr został wydzielony do `pary_sft`. Meldunek BREVIARIUM
+    podaje Cezarowi postęp Szkoły TIRO właśnie z licznika; gdyby liczył innym filtrem niż
+    eksport, procent gotowości opisywałby zbiór, który nigdy nie pojedzie na trening.
+    """
+    from imperium.biblioteki.notarius import policz_sft
+
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "pytanie A", "x" * 300, "m", sciezka=p)
+    zapisz_pare("s", "pytanie A", "y" * 300, "m", sciezka=p)   # duplikat pytania → kolaps
+    zapisz_pare("s", "pytanie B", "krotka", "m", sciezka=p)    # za krótka → odsiew
+    zapisz_pare("s", "pytanie C", "z" * 300, "m", sciezka=p)
+
+    cel = tmp_path / "sft.jsonl"
+    zapisane = eksportuj_sft(cel, p, min_znakow_odpowiedzi=200)
+    policzone = policz_sft(p, min_znakow_odpowiedzi=200)
+    linie = [l for l in cel.read_text(encoding="utf-8").splitlines() if l.strip()]
+
+    assert policzone == zapisane == len(linie) == 2
+
+
+@_bez_wylacznika
+def test_licznik_nie_dotyka_dysku(tmp_path, monkeypatch):
+    """Licznik biegnie na OBU końcach każdej sesji — nie ma prawa nic zapisywać.
+
+    Wcześniej BREVIARIUM serializował cały zbiór do pliku tymczasowego tylko po to, by
+    poznać liczbę; koszt rósł z każdą zebraną parą (recenzja 2026-07-26).
+    """
+    from imperium.biblioteki import notarius
+
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "pytanie", "x" * 300, "m", sciezka=p)
+
+    prawdziwe_open = notarius.Path.open
+
+    def tylko_do_odczytu(self, mode="r", *a, **kw):
+        if any(z in mode for z in ("w", "a", "x", "+")):
+            raise AssertionError(f"licznik otworzył {self} w trybie zapisu ({mode})")
+        return prawdziwe_open(self, mode, *a, **kw)
+
+    monkeypatch.setattr(notarius.Path, "open", tylko_do_odczytu)
+    assert notarius.policz_sft(p, min_znakow_odpowiedzi=200) == 1

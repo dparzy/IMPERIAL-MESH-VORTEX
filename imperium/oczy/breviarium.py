@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -62,7 +63,14 @@ def stan_hyginusa() -> Dict[str, Any]:
     nie przerobił na decyzje. To jest DŁUG PRZEGLĄDU: kolejka rosnąca bez sędziego znaczy,
     że płacimy za zwiad, z którego nikt nie korzysta (Prawo XV — utrata potencjału).
     """
-    rek = _linie_jsonl(KOLEJKA_HIPOTEZ)
+    # ABSTYNENCJA ZAMIAST ZERA (Prawo I, zmierzone 2026-07-26). Kolejka jest gitignorowana
+    # (.gitignore:55), więc w chmurze pliku NIE MA — a `_linie_jsonl` zwracał wtedy `[]`
+    # i meldunek ogłaszał „kolejka 0 | czeka na sędziego 0", czyli DŁUG PRZEGLĄDU ZERO,
+    # podczas gdy na lokalu leżały 34 cząstki. Fałszywy spokój jest gorszy od braku
+    # meldunku: krok 4b domknięcia liczy DELTĘ, więc „34 → 0" wyglądałoby na wykonaną
+    # pracę. Środowisko bez rejestru nie ma o nim głosu (ta sama klasa co `ksiazki 115→0`).
+    rejestr_nieobecny = not KOLEJKA_HIPOTEZ.exists()
+    rek = [] if rejestr_nieobecny else _linie_jsonl(KOLEJKA_HIPOTEZ)
     ok = [r for r in rek if r.get("status") == "ok"]
     znaczniki = [r["ts"] for r in rek if isinstance(r.get("ts"), (int, float))]
     zbadane = [r for r in ok if "probator" in r]
@@ -73,21 +81,38 @@ def stan_hyginusa() -> Dict[str, Any]:
         from imperium.cesarz import dispensator as dsp
         from imperium.cesarz.deepseek_glos import GlosImperium
         model = GlosImperium.__init__.__defaults__[0]        # domyślny model mowy
-        profile = [f"{k}→{v['model'].replace('deepseek-', '')}"
-                   f"{'/think-off' if v.get('thinking') else '/' + str(v.get('reasoning_effort', ''))}"
-                   for k, v in dsp.PROFILE.items()]
+        # FAZA→PROFIL→MODEL, nie sam katalog profili (naprawa 2026-07-26). Poprzednio
+        # meldunek listował klucze słownika PROFILE, co CZYTA SIĘ jak mapowanie fazy na
+        # model — i tak zostało odczytane na otwarciu wachty: „krytyka→v4-flash" wyglądało
+        # na sprzeczność z decyzją z 07-21 o przeniesieniu KRYTYKI na profil `osad`
+        # (v4-pro). Kod był poprawny (`_PROFIL_KRYTYKA = "osad"`), kłamał WIDOK. Katalog
+        # możliwości pokazany w miejscu stanu faktycznego jest fałszywym meldunkiem.
+        from narzedzia import bibliotekarz as bib
+        fazy = [("klasyfikacja", bib._PROFIL_ROZWIN), ("zwiad", bib._PROFIL_ZWIAD),
+                ("krytyka", bib._PROFIL_KRYTYKA)]
+        for faza, nazwa_profilu in fazy:
+            p = dsp.PROFILE.get(nazwa_profilu, {})
+            opis_modelu = str(p.get("model", "?")).replace("deepseek-", "")
+            wysilek = ("think-off" if p.get("thinking")
+                       else str(p.get("reasoning_effort", "")))
+            profile.append(f"{faza}→[{nazwa_profilu}] {opis_modelu}/{wysilek}")
     except Exception:                                        # noqa: BLE001 — meldunek nie może paść
         pass
 
+    # Abstynencja dotyczy WYŁĄCZNIE liczb z nieobecnego rejestru. Konfiguracja mowy
+    # (model, profile faz) jest w KODZIE, więc znamy ją w każdym środowisku — wygaszenie
+    # jej razem z kolejką było moją własną nadgorliwością: abstynencja ma milczeć o tym,
+    # czego nie zmierzono, a nie zaciemniać tego, co wiadomo na pewno.
     return {
-        "czastek": len(rek),
-        "czeka_na_sedziego": len(ok),
+        "rejestr_nieobecny": rejestr_nieobecny,
+        "czastek": None if rejestr_nieobecny else len(rek),
+        "czeka_na_sedziego": None if rejestr_nieobecny else len(ok),
         "ostatni_zwiad": (datetime.fromtimestamp(max(znaczniki)).strftime("%Y-%m-%d %H:%M")
                           if znaczniki else "—"),
         "model": model,
         "profile_dispensatora": profile,
-        "zbadane_probatorem": len(zbadane),
-        "podejrzane": len(podejrzane),
+        "zbadane_probatorem": None if rejestr_nieobecny else len(zbadane),
+        "podejrzane": None if rejestr_nieobecny else len(podejrzane),
         "dispensator_wpiety": _czy_dispensator_wpiety(),
     }
 
@@ -131,6 +156,46 @@ def _czy_dispensator_wpiety() -> bool:
     return False
 
 
+def _sciezka_z_innego_systemu(sciezka: Path, platforma: Optional[str] = None) -> bool:
+    """Czy ta ścieżka pochodzi z INNEGO systemu plików niż ten, na którym biegniemy?
+
+    `C:\\TIRO` na Linuksie nigdy nie zaistnieje — jego brak nie jest pomiarem, tylko
+    niewidocznością. Rozpoznajemy literę dysku Windows (`C:`) na nie-Windows i odwrotnie:
+    ścieżkę POSIX-ową (`/home/...`) na Windows. Bez tego meldunek myli „nie widzę" z „nie ma".
+
+    CZYTAMY `as_posix()`, NIE `str()` (zmierzone 2026-07-26 na laptopie Cezara): na Windows
+    `Path("/home/tiro")` normalizuje się do `\\home\\tiro`, więc `str().startswith("/")`
+    NIE TRAFIAŁ NIGDY — abstynencja broniła wyłącznie kierunku „ścieżka Windows na Linuksie",
+    a kierunek „ścieżka POSIX na Windows" przepuszczała jako ZMIERZONY brak silnika. To ta
+    sama wada, co 07-21: ochrona zastosowana wybiórczo jest ochroną pozorną.
+
+    `platforma` jest WSTRZYKIWANA, bo inaczej każdy host sprawdza tylko swoją połowę logiki —
+    pakiet świecił zielono w chmurze (Linux testował drugą połowę) i oblewał się na laptopie.
+    """
+    tekst = sciezka.as_posix()
+    plat = platforma if platforma is not None else sys.platform
+    windowsowa = len(tekst) > 1 and tekst[1] == ":" and tekst[0].isalpha()
+    if plat.startswith("win"):
+        return tekst.startswith("/")
+    return windowsowa
+
+
+def _pary_uzyteczne() -> Optional[int]:
+    """Ile par PRZEŻYJE eksport SFT — liczba operacyjna postępu Szkoły TIRO.
+
+    Liczymy tym samym kodem, który buduje zbiór treningowy (Prawo XVI: jedno źródło prawdy,
+    dwa liczniki rozjadą się co do sztuki). None, gdy nie da się policzyć — nie zgadujemy.
+    """
+    try:
+        import tempfile
+        from imperium.biblioteki.notarius import eksportuj_sft
+        with tempfile.TemporaryDirectory() as kat:
+            return eksportuj_sft(Path(kat) / "sft.jsonl",
+                                 jedna_probka_na_pytanie=True, min_znakow_odpowiedzi=200)
+    except Exception:                                        # noqa: BLE001 — meldunek nie może paść
+        return None
+
+
 def stan_tiro() -> Dict[str, Any]:
     """
     Stan TIRO (rekruta — lokalny LLM): ile par nauczyciela zebrano, jakie modele na dysku.
@@ -139,6 +204,19 @@ def stan_tiro() -> Dict[str, Any]:
     od nauczyciela (DeepSeek), pod nadzorem Imperium.
     """
     pary = len(_linie_jsonl(PARY_TIRO))
+    # PARY UŻYTECZNE ≠ PARY SUROWE (2026-07-26). Meldunek podawał wyłącznie liczbę surową,
+    # a to nie jest liczba operacyjna: eksport SFT zwija wiele próbek tego samego pytania do
+    # jednej (anty-monokultura) i odsiewa krótkie odpowiedzi, które niczego nie uczą.
+    # Zmierzone: 329 surowych → 140 użytecznych, czyli meldunek zawyżał gotowość 2,35× —
+    # 14% progu 1000, nie 66% progu 500. Postęp liczymy tym, co pojedzie na trening.
+    uzyteczne = _pary_uzyteczne()
+    # ABSTYNENCJA ŚRODOWISKOWA (ta sama klasa co kolejka Hyginusa i książki). TIRO_HOME to
+    # domyślnie `C:\TIRO` — ścieżka WINDOWS, która w kontenerze Linuksa nie ma prawa istnieć.
+    # Meldunek drukował wtedy „🚨 brak silnika | 🚨 brak modeli", choć silnik llama.cpp stoi
+    # na laptopie od 2026-07-16 (zmierzone: Qwen3-1.7B 9.64 t/s, Qwen3-4B 4.86 t/s).
+    # Fałszywy alarm wprowadził w błąd samego Architekta, który podał go Cezarowi jako
+    # „największa utrata potencjału". Środowisko, które nie widzi dysku TIRO, NIE MA O NIM GŁOSU.
+    obce_srodowisko = _sciezka_z_innego_systemu(KATALOG_TIRO)
     modele: List[str] = []
     katalog = KATALOG_TIRO / "modele"
     if katalog.exists():
@@ -152,8 +230,11 @@ def stan_tiro() -> Dict[str, Any]:
         pass
     return {
         "pary_nauczyciela": pary,
+        "pary_uzyteczne": uzyteczne,
         "modele": modele,
-        "silnik": (KATALOG_TIRO / "silnik").exists(),
+        # None = „nie wiem" (obcy system plików), False = zmierzony brak na TYM dysku.
+        "silnik": None if obce_srodowisko else (KATALOG_TIRO / "silnik").exists(),
+        "dysk_tiro_widoczny": not obce_srodowisko,
         "klasa_sprzetu": klasa,
         "zakres_modelu": zakres,
     }
@@ -247,10 +328,18 @@ def banner(model_architekta: Optional[str] = None) -> str:
     wiersze = ["📋 BREVIARIUM — słudzy Imperium:", f"   {stan_testow()['opis']}"]
 
     dysp = "wpięty" if h["dispensator_wpiety"] else "🚨 NIEWPIĘTY (martwy potencjał)"
-    wiersze.append(
-        f"   📚 HYGINUS (Bibliotekarz-Zwiadowca): kolejka {h['czastek']} cząstek | "
-        f"czeka na sędziego {h['czeka_na_sedziego']} | ostatni zwiad {h['ostatni_zwiad']}"
-    )
+    if h.get("rejestr_nieobecny"):
+        # Brak wiedzy nazwany WPROST (Prawo I) — „0 cząstek" byłoby fałszywym spokojem:
+        # kolejka jest gitignorowana, więc w chmurze jej po prostu nie widać.
+        wiersze.append(
+            "   📚 HYGINUS (Bibliotekarz-Zwiadowca): ⚠️ kolejka NIEZNANA w tym środowisku "
+            "(rejestr poza gitem — stan zna wyłącznie lokal)"
+        )
+    else:
+        wiersze.append(
+            f"   📚 HYGINUS (Bibliotekarz-Zwiadowca): kolejka {h['czastek']} cząstek | "
+            f"czeka na sędziego {h['czeka_na_sedziego']} | ostatni zwiad {h['ostatni_zwiad']}"
+        )
     wiersze.append(f"      model: {h['model']} | DISPENSATOR: {dysp}")
     if h["profile_dispensatora"]:
         wiersze.append(f"      profile: {', '.join(h['profile_dispensatora'])}")
@@ -258,11 +347,22 @@ def banner(model_architekta: Optional[str] = None) -> str:
         wiersze.append(f"      PROBATOR: zbadanych {h['zbadane_probatorem']}, "
                        f"podejrzanych {h['podejrzane']}")
 
-    silnik = "llama.cpp ✓" if t["silnik"] else "🚨 brak silnika"
-    modele = ", ".join(m.replace(".gguf", "") for m in t["modele"]) or "🚨 brak modeli"
+    if t["silnik"] is None:
+        silnik = "⚠️ dysk TIRO niewidoczny stąd"       # nie wiem ≠ brak (Prawo I)
+    else:
+        silnik = "llama.cpp ✓" if t["silnik"] else "🚨 brak silnika"
+    if t["modele"]:
+        modele = ", ".join(m.replace(".gguf", "") for m in t["modele"])
+    elif t["silnik"] is None:
+        modele = "⚠️ nieznane (stan zna wyłącznie lokal)"
+    else:
+        modele = "🚨 brak modeli"
     wiersze.append(
-        f"   🎓 TIRO (rekrut — lokalny LLM): pary nauczyciela {t['pary_nauczyciela']} | "
-        f"{silnik} | klasa {t['klasa_sprzetu']}"
+        f"   🎓 TIRO (rekrut — lokalny LLM): pary {t['pary_nauczyciela']} surowych"
+        + (f" / {t['pary_uzyteczne']} użytecznych" if t["pary_uzyteczne"] is not None else "")
+        + (f" ({round(100 * t['pary_uzyteczne'] / 1000)}% progu 1000)"
+           if t["pary_uzyteczne"] is not None else "")
+        + f" | {silnik} | klasa {t['klasa_sprzetu']}"
     )
     wiersze.append(f"      modele na dysku: {modele}"
                    + (f" | sprzęt unosi: {t['zakres_modelu']}" if t["zakres_modelu"] else ""))

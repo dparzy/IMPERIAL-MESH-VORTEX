@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-20
+## Ostatnia aktualizacja: 2026-07-26
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,8 +113,65 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-20 — Zwiad bibliotekarza tylko 1/5 tematów
-Hyginus przeskanował tylko 1 z 5 domyślnych tematów (mean reversion). Pozostałe 4 (momentum, regime detection, order flow, position sizing) nie ruszane. Kandydaci nie mają pomiaru redundancji ani walidacji areną.
+### 2026-07-26 — Rozjazd repo z chmurą przez hooki po obu stronach
+Od wspólnego punktu e2cb846 chmura dorobiła 2 commity (sync+migawka), lokalnie 2 (auto: sync pamięci). Hooki commitują same po obu stronach – dwa ciągi wyrosły z tego samego pnia.
+
+### 2026-07-26 — Path('/home/tiro') na Windows nie działa z startswith('/')
+Path('/home/tiro') na Windows normalizuje się do \home\tiro, więc startswith('/') zwraca False. Abstynencja działała tylko w jedną stronę. Naprawa mechanizmem, nie łatką.
+
+### 2026-07-26 — Audyt czerwony niewidoczny przez hook stdout
+Hook utrwala tylko stdout, alarmy audytu lecą na stderr. Przy czerwonym wyniku stdout jest pusty – wygląda ciszej niż zielony. Klasa wady z apert26: milczenie udające spokój.
+
+### 2026-07-26 — TIRO: 153 uzyteczne pary = 15% progu 1000
+Zbior treningowy TIRO to 348 surowych/153 uzytecznych par, co stanowi 15% docelowego progu 1000. Wymaga kontynuacji sniwa (zadanie E3) przed uruchomieniem pelnego treningu.
+
+### 2026-07-26 — Brak kluczy MEXC uniemozliwia live trading
+MEXC_API_KEY i MEXC_SECRET nie sa ustawione w srodowisku. Zero realnych orderow pomimo gotowego kodu (ccxt 4.5.59). Niezbedne do przejscia na live.
+
+### 2026-07-26 — Testy 2882/2885 - 3 obalone, w tym jedna nowa wada
+Dwie porazki wynikaja z niesledzonego consilium (znane), trzecia to osobna wada wymagajaca analizy. Pelny bieg testow wciaz leci w tle, stan oficjalnie nieznany.
+
+### 2026-07-26 — Audyt spójności ukrywa czerwony wynik (stderr zamiast stdout)
+W narzedziu audyt_spojnosci.py alarmy sa wypisywane na stderr (linie 1160-1163), podczas gdy hook zbiera tylko stdout. W efekcie czerwony audyt jest niewidoczny w wydruku startowym - sesja wyglada ciszej niz zdrowa. To odwrocona wersja wady klasy 'milczenie udajace wynik' z apert26.
+
+### 2026-07-26 — Audyt spójności kończy się exit 1 i hook milczy
+Podczas audytu środowiska komenda zakończyła się kodem błędu (exit 1), a hook w kroku 0 nie wyświetlił żadnej treści – to klasyczna wada 'milczenie udające wynik'.
+
+### 2026-07-20 — 20 sprzeczności w Refleksji, 3 pilne
+Audyt startowy wykrył 20 sprzeczności, w tym 3 pilne: audytu/nowy, chmura/lokal/naprawa, false/faza – wymagają przeglądu.
+
+### 2026-07-20 — Hipoteza B potwierdzona OOS
+Ważenie głosów IC (Legatus) daje +3.6pp na 5/5 parach poza próbą – czeka na zgodę Cezara na wpięcie do kodu.
+
+### 2026-07-20 — Błąd replikacji wiedzy – Claude sam nie stosuje własnych procedur
+W poprzednich sesjach wielokrotnie brakowało aktualizacji dokumentów i ledgera, mimo że Claude tworzył procedury (np. ALMA, OBSERWATORY). To klasyczny błąd replikacji wiedzy – Claude tworzy narzędzia, ale sam ich nie używa.
+
+### 2026-07-20 — Cztery zmysły działają na żywych danych
+Potwierdzono, że adaptery FearGreed (23), RSS (30 nagłówków), PSY (funding, CVD) i V (CVD) generują głosy. V-03 (CVD)→LONG, PSY-03 (FearGreed=23)→LONG kontrariańsko, NEWS-01→LONG. Abstynencje legalne (Prawo XV).
+
+### 2026-07-20 — Brudne drzewo – auto_lekcja_przetworzone.txt
+Audyt startowy wykazał 3 dopisane linie przez automat w pliku bibliotheca_ulpia/dane/auto_lekcja_przetworzone.txt. Nie jest to zmiana ręczna – wymaga decyzji Cezara.
+
+### 2026-07-20 — MoE niewykonalne na 6GB VRAM
+Mixture of Experts wymaga trzymania wszystkich ekspertów w pamięci jednocześnie. 4 eksperty po 7B wymagają ~28B RAM – na RTX 4050 (6GB) to niemożliwe.
+
+### 2026-07-22 — tail w rurze testów fałszuje kod wyjścia
+Komenda `python tests/run_tests.py | tail` zwraca kod wyjścia `tail`, nie testów – maskuje oblane testy (exit 0 mimo 1 porażki). Należy unikać `tail` w rurze lub używać oddzielnej obsługi.
+
+### 2026-07-20 — Błąd cache/resume kluczowany tylko nazwą pliku w harnessach A/B
+Harnessy A/B (ab_tryb_strategii, ab_strategy_mwu, ab_wazenie_ic, ab_pnl_wazenie_ic) używają tylko nazwy pliku jako klucza cache, ignorując parametry konfiguracji.
+
+### 2026-07-20 — Brak flagi --dashboard w CLI – utrata potencjału
+Konfig pętli live posiada pola dashboard, ale CLI __main__ nie eksponowało odpowiedniej flagi. Cel P0 (obserwacja live) nie był osiągalny przez CLI. Naprawiono przez refaktoryzację i dodanie flagi.
+
+### 2026-07-20 — Wniosek per-reżim: BEAR=tarcza, reszta szkodzi
+W reżimie BEAR stosowanie tarczy (zabezpieczenia) jest korzystne; w pozostałych reżimach tarcza przynosi straty.
+
+### 2026-07-20 — Ekstraktor – kolizja plików scratcha przy równoległej konwersji
+ekstraktor.py:149 – kasowanie istniejącego pliku biblioteki przez równoczesne zapisy .calibre-tmp.txt. Fix edc657f nie domknięty.
+
+### 2026-07-20 — Cache djvu nie podpięty do RAG – utrata potencjału (Prawo XV)
+konwerter.py:70 – cache djvu zbudowany poprzednio nie jest używany przy indeksowaniu. Chmura nadal woła djvutxt/calibre i gubi djvu.
 
 ### 2026-07-20 — Hook startowy powoduje brudny working tree w dwóch plikach
 Pliki bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl oraz docs/PAMIEC_SESJI.md są modyfikowane przez hook startowy, co powoduje, że git working tree nie jest w 100% czysty. To normalny churn pamięci, a nie zmiana kodu.
@@ -122,17 +179,8 @@ Pliki bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl oraz docs/PAMIEC_SESJI.md są
 ### 2026-07-20 — 22 neurony czekają na adaptery/dane (Prawo XV)
 Rodziny NEWS-*, PSY-*, RADAR-*, OC-06/07/08, C-01, V-03, Z-06/Z-07 nie mają jeszcze feedów i abstynują świadomie zgodnie z Prawem XV. To znany, udokumentowany stan, a nie regresja.
 
-### 2026-07-20 — Windows cp1250 wymaga PYTHONIOENCODING=utf-8
-Konsola Windows w cp1250 wywala się na emoji. Aby testy i audyt działały poprawnie, należy ustawić zmienną środowiskową PYTHONIOENCODING=utf-8 przed każdą komendą.
-
-### 2026-07-20 — Hyginus znalazł 2 kandydatów
-Z tematu 'mean reversion' znaleziono Model Vasicka i Cross-sectional mean reversion, jeszcze bez walidacji.
-
 ### 2026-07-20 — Audyt spójności pełna harmonia
 84 neurony, 15 zwiadowców, 18 elit, ruff czysto, MAPA_KLUCZY pełna – system w pełni harmonijny.
-
-### 2026-07-21 — Problem z \b w regexie dla identyfikatorów BIB z podkreślnikiem
-\b nie zamyka się przed '_', więc 'BIB-006_Carson' nie jest wykrywany jako osobne słowo. To znana klasa z Księgi Wad (#53). Naprawiono w PROBATORZE przez użycie innej granicy (np. (?:^|[\s,;.!?])).
 
 ### 2026-07-21 — Archium lekcji ma inny nagłówek – szukaj() nie widzi schłodzonych
 Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł szukaj() używa własnego parsera, który go nie rozpoznaje. Luka w wyszukiwalności pamięci – wymaga ujednolicenia parsera lub wzbogacenia searcha.
@@ -140,14 +188,8 @@ Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł sz
 ### 2026-07-20 — Normalny churn pamięci w plikach dokumentacji
 Dwa pliki (wizje_i_decyzje.jsonl, PAMIEC_SESJI.md) zostały zmienione przez hook startowy – to standardowe odświeżanie pamięci sesji, nie zmiana kodu.
 
-### 2026-07-20 — Stan neuronów: 84, w tym 78 aktywnych, 6 wyciszonych
-Potwierdzono liczbę neuronów oraz ich status. 22 neurony (rodziny NEWS, PSY, RADAR, OC, C, V, Z) czekają na adaptery/dane – to stan zgodny z Prawem XV.
-
 ### 2026-07-21 — Podkreślnik jako znak słowny w regexie BIB
 Użycie \b w regexie dla identyfikatorów BIB nie zamyka się na podkreślniku (jest znakiem słownym). Testy złapały błąd - naprawiono wzorzec.
-
-### 2026-07-21 — Archiwum lekcji niewidoczne dla szukaj()
-Schłodzone lekcje mają inny nagłówek w pliku, więc parser modułu nie czyta archiwum. Luka powstała przy wdrażaniu chłodzenia. Wymaga poprawy parsowania.
 
 ### 2026-07-20 — API-widma – istnienie w docs ≠ istnienie w kodzie
 Błąd klasy API-widma: dokumentacja indeksu/manualu zawiera komendy do plików, które nie istnieją lub zmieniły nazwę. Zweryfikowano na 9 kandydatach – 3 prawdziwe widma. W16 precyzyjnie odróżnia widma od supresji (dydaktyka, wizje, negacje).
@@ -164,17 +206,8 @@ INDEKS_IMPERIUM.md podaje dwie różne liczby neuronów: 299 w nagłówku (data 
 ### 2026-07-21 — Test negatywny PROBATORA wykrył błąd graniczny z '_'
 Znak '_' jest traktowany jako słowny przez \b, co powodowało fałszywe dopasowanie przy identyfikatorze BIB-006_Carson. Poprawiono test, nie organ – zastosowano inny separator.
 
-### 2026-07-21 — PROBATOR znalazł nieugruntowany plon w kolejce Hyginusa
-Pomiar na realnym plonie: 2367 znaków kandydatów i zero powołań na źródło, mimo promptu żądającego cytowań. PROBATOR działa poprawnie.
-
-### 2026-07-21 — Auto-lekcja przekracza limit znaków – potrzeba chłodzenia
-Auto-lekcja dopisała 21 wpisów z 3 sesji, limit 24000 znaków pęknięty. Konsolidacja co sesję to alarm wiecznie żywy. Lekarstwo: auto_lekcja sama egzekwuje limit przy zapisie.
-
 ### 2026-07-21 — Model cytuje nazwiskiem autora, nie identyfikatorem BIB
 Probator zgłaszał fałszywy alarm BEZ_CYTATU gdy model użył nazwiska (np. Hull) zamiast ID. Poprawiono test, nie organ – to realne użycie, a nie błąd weryfikacji.
-
-### 2026-07-21 — Auto-lekcja nie egzekwuje limitu przy zapisie
-Dotychczas auto_lekcja dopisywała wpisy bez sprawdzania limitu, co powodowało przepełnienie i fałszywy alarm przy każdej sesji. Rozwiązanie: wpięcie konsolidacji w metodę zapisu.
 
 ### 2026-07-20 — Testy wzrosły o dokładnie 7 — potwierdzenie biegnięcia
 Po dodaniu 7 testów granicznych licznik wzrósł z 2620 do 2627. To dowód, że testy naprawdę biegły (nie zostały cicho pominięte jak w poprzedniej sesji). Lekcja o zwykłych def test_* zamiast unittest.TestCase wdrożona.
@@ -227,21 +260,6 @@ W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokł
 ### 2026-07-21 — zapisz() gubi nieznane pola istniejącego wpisu – cicha utrata danych
 Metoda zapisz() w pamięci proceduralnej nadpisywała tylko znane pola, gubiąc nieznane. Odkryto podczas adversarialnego przeglądu kodu. Naprawiono.
 
-### 2026-07-21 — Cichy audyt – hook nie drukował wyniku przy uruchomieniu
-Audyt złapał nowy organ w trzech warstwach naraz (W11, W15, W17), ale hook nie wyświetlił wyniku. To klasa 'mechanizm, który przy awarii wygląda na sprawny' – naprawiono.
-
-### 2026-07-20 — Zawartość pliku w wrzutni
-Plik z wrzutnia to dump rozmów z Hyginusem (DeepSeek) zawierający research hybrydy LLM: modele 3B, LoRA, LARSA/AlphaQuanter, Fin-R1, Unsloth/QLoRA, fine-tuning na chmurze. Wątek hybrydy-ucznia od linii 2163.
-
-### 2026-07-20 — Luka pokrycia 4h – tylko 10 par zamiast 15
-Pomiar wykazuje brak plików 4h dla BNB/BTC/DOGE/ETH/SOL. Wpływa na redukcję kombinacji do 40 zamiast potencjalnych 45.
-
-### 2026-07-20 — Potrójna symbioza audit-sigilium: mechanizm wykrywa własne organy w wielu warstwach
-Audyt W11/W15/W17 złapał nowe sigilium (runbook, licznik w README, rekord w codicilu) – symbioza działa przeciw autorowi. Wymusza to ostrożność przy dodawaniu nowych elementów.
-
-### 2026-07-20 — Winget dostępny jako narzędzie do instalacji
-Na laptopie Cezara dostępne jest winget (Windows Package Manager) – może służyć do cichej instalacji djvulibre i innych narzędzi bez uruchamiania interaktywnych instalatorów.
-
 ### 2026-07-20 — Hotspoty: _py_supertrend i _py_volume_profile
 Czysto-pythonowe pętle O(okno) na wskaźnikach supertrend i volume_profile są ciężkie (okno 251, wiele symboli). Kandydaci do wektoryzacji numpy.
 
@@ -253,9 +271,6 @@ Wewnętrzna pętla _py_hma wywołuje wma wielokrotnie (4.5M wywołań, 65.5s cum
 
 ### 2026-07-20 — Backtest liniowy, nie O(n²)
 Pomiary profili dla 500-1600 barów wykazały stały ms/tick (~66ms), co oznacza skalowanie O(n·okno), nie kwadratowe. Premisa planu naprawy była błędna.
-
-### 2026-07-20 — Wynik WF-IC dla 15 par 4h
-32/49 neuronow ROBUST, 17 szum/niepewne. Czołówka: EXP-13, SMC-01, V-02/V-13/V-14, rodzina X-*. UWAGA: EXP-13 (6 okien), SMC-01 (5), V-13 (3) maja malo okien -> ROBUST slabiej podparty niz X-17/X-01 (25 okien).
 
 ### 2026-07-20 — Output hooka startowego ucięty przez harness
 Output hooka startowego (25,5 KB) został ucięty, powodując utratę kluczowej informacji (Dziennik następny krok) z pierwszego okna. Konieczna optymalizacja objętości.
@@ -290,9 +305,6 @@ Błąd 403 przy push do GitHub oznacza, że sesja Claude nie ma uprawnień zapis
 ### 2026-06-30 — Push zablokowany przez 403 - brak uprawnień
 Środowisko Claude Code web nie ma uprawnień do pushowania do repozytorium IMPERIAL-MESH-VORTEX (błąd 403). Wymagane skonfigurowanie GitHub App Claude Code z dostępem Read & Write w github.com/settings/installations.
 
-### 2026-06-30 — Kruchość hardcodowanych liczników neuronów w testach
-Wprowadzenie 47. neuronu złamało testy z hardcoded 46. Konieczne dynamiczne wykrywanie liczby neuronów lub automatyczne generowanie testów.
-
 ### 2026-06-30 — Normalizacja interwałów w strategiach
 Błąd: 5m.upper() -> '5M' zamiast 'M5'. Dodano funkcję _normalizuj_interwal w baza.py mapującą formaty (5m->M5, 1h->H1 itd.) aby backtesty filtr/strategia działały poprawnie.
 
@@ -301,9 +313,6 @@ Jeśli w jednej świecy osiągnięto zarówno TP jak i SL, wynikiem jest SL (kon
 
 ### 2026-06-30 — Błąd loadera po reorganizacji na strukturę rzymską
 Po przeniesieniu modułów do folderów rzymskich (fundament, legiony itp.), loader w pierwy_zwiadowca.py szukał plików po starych nazwach we własnym folderze. Naprawiono przez zmianę na ścieżki względne z importlib.util.spec_from_file_location.
-
-### 2026-06-30 — Signal Signature – struktura sygnału
-Każdy sygnał w systemie IMV ma pola: confidence, adversary_confidence, final_confidence, source, reasons. To standard dla wszystkich modułów – umożliwia filtrowanie i debatę senatorską.
 
 ### 2026-06-30 — Błąd cross-module loader po reorganizacji folderów
 Po przeniesieniu modułów do struktury rzymskiej, loader szukał plików po starych nazwach. Naprawiono przez aktualizację ścieżek względnych w pierwszym_zwiadowca.py.
@@ -314,14 +323,8 @@ Funkcja klasyfikacji reżimu ograniczona do TREND_STRONG, RANGING, VOLATILE, NOR
 ### 2026-06-30 — Bug W7 audytu fałszywie flaguje URL z .md w domenie
 W7 audyt markerował zewnętrzne URL zawierające '.md' w domenie (np. www.mdpi.com) jako martwe linki, blokując commit. Naprawiono przez dodanie warunku pomijającego zewnętrzne protokoły (http/https/mailto/ftp) na początku href.
 
-### 2026-06-30 — Synchronizacja liczników w testach przy dodawaniu neuronów
-W-053 dodał 47. neuron (H-01), ale testy miały zakodowane 46 – konieczność aktualizacji hardcoded wartości w test_integracja.py. Lekcja: każda zmiana liczby neuronów wymaga przeglądu testów.
-
 ### 2026-06-30 — Dekorelacja V-13 i V-14 potwierdza dywersyfikację
 Korelacja między NeuronChoppiness (V-14) a poprzednim wskaźnikiem zmienności |r|=0.05–0.27, co spełnia Prawo XVI (unikamy redundancji).
-
-### 2026-06-30 — Wartości mocków muszą mieścić się w zakresach detekcji neuronów
-Podczas tworzenia testów okazało się, że mocki muszą precyzyjnie trafiać w progi neuronów (np. FUNDING_RATE > 0.001, LONG_SHORT_RATIO między 0 a 1). Niewłaściwe wartości powodują fałszywe wyniki.
 
 ### 2026-06-30 — Brak pola kategoria na SygnalNeuronu uniemożliwiał agregację wag reżimu
 Pole 'kategoria' nie istniało w SygnalNeuronu, przez co WAGI_REZIMU były martwym kodem. Dodano pole i przekazywanie z KATEGORII neuronu – teraz wagi reżimu działają poprawnie.

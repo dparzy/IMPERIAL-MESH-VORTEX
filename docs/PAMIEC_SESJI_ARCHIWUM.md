@@ -12,6 +12,156 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-26 — Wynik BREVIARIUM 2882/2882 dotyczy innego kodu
+Testy uruchomione w tle (BREVIARIUM) zwróciły wynik 2882/2882, ale ten wynik pochodzi z innej wersji kodu niż dzisiejsza – nie można go używać do oceny bieżącego stanu.
+
+### 2026-07-26 — Klasa wady apert26: milczenie udające poprawne działanie
+Wada polegająca na tym, że hook nie drukuje nic, choć powinien raportować stan. Wymaga wyczulenia przy interpretacji wyników audytu.
+
+### 2026-07-26 — BIB-032 O'Hara – PDF skanowany, OCR niedziałający
+Książka BIB-032 (O'Hara) to skanowany obraz PDF. OCR generuje śmieci. Zgodnie z Prawem I (zero fabrykacji) nie została zindeksowana w RAG. Status: pominięta.
+
+### 2026-07-20 — Rozbieżność baneru startowego: pokazuje CHMURA zamiast LOKAL
+Baner z hooka centrum_pamieci głosi 'Środowisko: CHMURA', ale żywy detektor wykryj_srodowisko() zwraca 'lokal'. Źródło baneru jest nieaktualne. Do naprawy w ramach higieny.
+
+### 2026-07-20 — Środowisko lokalne z pełnym dostępem do książek i cache
+Empirycznie potwierdzono: Claude działa na laptopie Pixel (Windows 10) w katalogu /c/Projekty/imperial-mesh-vortex. Dostępne wszystkie 69 książek (559 MB) w bibliotheca_ulpia/ oraz RAG tekst_cache (59 MB). Ciężka robota z książkami jest teraz możliwa.
+
+### 2026-07-20 — Przekroczenie limitu sekcji LEKCJE
+Sekcja LEKCJE ma 27 234 znaki przy limicie 24 000 – wymaga konsolidacji najstarszych wpisów (P0).
+
+### 2026-07-20 — Audyt dotyczy tylko imperium/biblioteki/, inne katalogi pomijane
+Warstwa 11 audytu sprawdza meldunek tylko w imperium/biblioteki/. Organy w imperium/cesarz/ i narzedzia/ są poza zasięgiem – exit 0 może kłamać. Rozszerzono na wszystkie organy + narzedzia/ (nowa warstwa 17).
+
+### 2026-07-20 — Legalne abstynencje zmysłów zidentyfikowane
+Niektóre neurony legalnie nie głosują: PSY-01 (funding=8e-5, brak ekstremum), PSY-04 (OI_PREV==OI, 1. odczyt), NEWS-02/03/04 (stan kroczący ≥2 bary), RADAR/N/CP (potrzebują serii cen – nie podano w teście). Zero martwych głosów.
+
+### 2026-07-20 — Pełny dostęp do danych lokalnych
+Claude ma dostęp do 69 książek (559 MB) i 59 MB tekst_cache RAG na laptopie – ciężka robota analityczna jest teraz możliwa.
+
+### 2026-07-20 — Rozbieżność banera środowiska
+Baner startowy centrum_pamieci wskazuje 'CHMURA', ale żywy detektor wykryj_srodowisko() zwraca 'lokal' – źródło banera jest nieaktualne.
+
+### 2026-07-20 — 20/22 moduły żywe na realnych danych, 2 warunkowo ciche
+Sonda diagnostyczna wykazała, że AUG-01 milczy z powodu braku aktywnego zdarzenia, a RADAR-05 z powodu słabej korelacji lead-lag (<0.20). NEWS-03/04 ożywają po rozgrzewce. Stan faktyczny: 20/22 ŻYWE po rozgrzewce, pozostałe 2 to poprawna abstynencja.
+
+### 2026-07-20 — NEWS-03/04 wymagają min. 2 barów rozgrzewki
+Moduły NEWS-03 (sentyment delta) i NEWS-04 (attention spike) mają stan kroczący i potrzebują ≥2 barów z feedem, by wygenerować sygnał. Po jednym barze rozgrzewki ożywają.
+
+### 2026-07-20 — Warunkowe milczenie AUG-01 i RADAR-05
+AUG-01 milczy gdy brak aktywnego zdarzenia (bramka EVENT_*). RADAR-05 (LEAD_BTC) abstynuje gdy |korelacja lead-lag| < 0.20 – celowa bramka projektowa, nie defekt.
+
+### 2026-07-20 — Tabularium w trybie miękkim nie blokuje commita
+Tabularium wykryło 10 dokumentów z przestarzałymi metadanymi (stan_na), ale działa w trybie miękkim – nie blokuje commita. Może to być celowe, aby nie hamować prac, ale wymaga świadomości, że dokumenty nie są w pełni aktualne.
+
+### 2026-07-20 — CODEX gubi wyniki spoza schematu AB/IC
+Ledger zna tylko typy AB i IC, porównanie interwałów było trzykrotnie zgłaszane jako luka, ale nigdy nie naprawione. Dodano typ POMIAR/INTERWAŁ i arkusz 'Pomiary'. Główny werdykt poprzedniej sesji odzyskany i dopisany wstecz.
+
+### 2026-07-20 — Zawartość pliku w wrzutni
+Plik z wrzutnia to dump rozmów z Hyginusem (DeepSeek) zawierający research hybrydy LLM: modele 3B, LoRA, LARSA/AlphaQuanter, Fin-R1, Unsloth/QLoRA, fine-tuning na chmurze. Wątek hybrydy-ucznia od linii 2163.
+
+### 2026-07-20 — CODEX gubił wyniki spoza AB/IC – luka 3x zgłoszona
+Pomiar interwałów (4h +3.26 / 1d -3.03 / 1h -3.37 / 15m -5.71) nie mieścił się w schemacie ledgera. Sugestie z 07-19, 07-20 i 07-20 nie zostały naprawione aż do tej sesji – brak mechanizmu, nie tylko wpisu.
+
+### 2026-07-20 — Dispensator był organem-widmem
+Kod imperium/cesarz/dispensator.py (152 linie) nie był zameldowany w żadnym dokumencie. Dotychczasowy audyt sprawdzał tylko imperium/biblioteki/, pozostawiając luki w innych katalogach.
+
+### 2026-07-20 — Hook startowy pominął auto-pull przy brudnym drzewie
+Gałąź była o 30 commitów za remote, bo hook pominął pull, gdy drzewo było brudne. Wymusiło to rebase z remote i rozstrzygnięcie konfliktu tylko w liniach daty.
+
+### 2026-07-20 — Testy W6 czerwone – data w README/MANIFEST starsza niż commit
+Dwa testy w Warstwie 6 oblały, bo README.md i docs/MANIFEST_KODU.md deklarowały datę starszą niż ostatni commit. Zgodnie z Prawem XVIII to błahostka – naprawiono samodzielnie.
+
+### 2026-07-20 — Petla live karmi RADAR i RS
+Sprawdzono, że pętla live (petla_live.py) karmi RADAR (skanuj linia 422) oraz cross-sectional RS (C-01, linia 437), więc w trybie multi-symbol RADAR też ożywa. Infrastruktura E kompletna.
+
+### 2026-07-20 — Audyt spojnosci i skan wad przed pushem – pelna harmonia
+Przeprowadzono audyt spojnosci (ruff W13 + dokumenty W14) oraz heurystyczny skan wad. Oba zakonczone exit 0 – stan kodu spojny przed commitem.
+
+### 2026-07-20 — Windows cp1250 wymaga PYTHONIOENCODING=utf-8
+Konsola Windows w cp1250 wywala się na emoji. Aby testy i audyt działały poprawnie, należy ustawić zmienną środowiskową PYTHONIOENCODING=utf-8 przed każdą komendą.
+
+### 2026-07-21 — Cichy audyt – hook nie drukował wyniku przy uruchomieniu
+Audyt złapał nowy organ w trzech warstwach naraz (W11, W15, W17), ale hook nie wyświetlił wyniku. To klasa 'mechanizm, który przy awarii wygląda na sprawny' – naprawiono.
+
+### 2026-07-20 — Winget dostępny jako narzędzie do instalacji
+Na laptopie Cezara dostępne jest winget (Windows Package Manager) – może służyć do cichej instalacji djvulibre i innych narzędzi bez uruchamiania interaktywnych instalatorów.
+
+### 2026-07-20 — Neurony on-chain ożywają na realnej dacie
+Neurony OC-06 (S2F) i OC-08 (inflacja) były martwe w audycie z powodu sztucznego timestamp 1970. Na realnej dacie (block height 956179, S2F=180, inflacja 0.555%) oddają głos. OC-07/Z-06/Z-07 legalnie NEUTRAL.
+
+### 2026-07-20 — Ograniczenie model merging – ta sama architektura
+Scalanie wag (SLERP/TIES) działa tylko w modelach o identycznej architekturze i tokenizerze. Nie da się zlać Gemmy z Llamą – to ograniczenie fizyczne, a nie narzędziowe.
+
+### 2026-07-22 — Leksykon potwierdzał samego siebie – fałszywe wpisy
+Leksykon zbudowany tylko z nazw plików generował fałszywe dowody (np. 'order_flow' – jedyne wystąpienie w WPISIE leksykonu). Naprawiono u źródła: weryfikacja czyta rzeczywisty kod, nie własne deklaracje.
+
+### 2026-07-22 — LIBRA MESSIS – metryka nasyca się przez wadliwy dzielnik
+Dzielnik kandydatów nie radzi sobie z formatem `### 1. **Nazwa**` – łączy 21/33 cząstek w jeden blok, przez co metryka nasyca się (95%) i nie odróżnia ramion. Naprawiono parser.
+
+### 2026-07-22 — Backticki w powłoce podmieniają tekst
+Prozy z backtickami (np. `element`) przekazywane przez `python -c` w bashu ulegają podmianie – wnioskiem dyscyplina: unikać tej konstrukcji, używać plików tymczasowych.
+
+### 2026-07-20 — Audyt spójności ma ślepe plamy – whitelist bez C/D, ruff pomija skrypty
+CLAUDE.md KROK 0 whitelist nie zawiera kategorii C i D (fałszywy alarm), a `audyt_spojnosci.py` nie skanuje `skrypty/` – dwa F541 przechodzą jako 'czysto'.
+
+### 2026-07-21 — Archiwum lekcji niewidoczne dla szukaj()
+Schłodzone lekcje mają inny nagłówek w pliku, więc parser modułu nie czyta archiwum. Luka powstała przy wdrażaniu chłodzenia. Wymaga poprawy parsowania.
+
+### 2026-07-21 — PROBATOR znalazł nieugruntowany plon w kolejce Hyginusa
+Pomiar na realnym plonie: 2367 znaków kandydatów i zero powołań na źródło, mimo promptu żądającego cytowań. PROBATOR działa poprawnie.
+
+### 2026-07-20 — Samo-recenzja przed pushem – wymog procesu
+Cezar zadal samo-recenzji z uzyciem wzorca high-effort recall-biased przed pushem. Zastosowano metode 'review target --diff' – potwierdzono, ze jest to wymagane przed kazdym commitem.
+
+### 2026-07-20 — Regresja danych w katalogu ksiąg – enrichment nadpisał poprawne wartości
+10 wpisów straciło autora/tytuł (Kissell → Nieznany, garble LŁpez). Przyczyna: calibre placeholder nadpisał dane z plików.
+
+### 2026-07-20 — Stan neuronów: 84, w tym 78 aktywnych, 6 wyciszonych
+Potwierdzono liczbę neuronów oraz ich status. 22 neurony (rodziny NEWS, PSY, RADAR, OC, C, V, Z) czekają na adaptery/dane – to stan zgodny z Prawem XV.
+
+### 2026-07-20 — Potrójna symbioza audit-sigilium: mechanizm wykrywa własne organy w wielu warstwach
+Audyt W11/W15/W17 złapał nowe sigilium (runbook, licznik w README, rekord w codicilu) – symbioza działa przeciw autorowi. Wymusza to ostrożność przy dodawaniu nowych elementów.
+
+### 2026-06-30 — Kruchość hardcodowanych liczników neuronów w testach
+Wprowadzenie 47. neuronu złamało testy z hardcoded 46. Konieczne dynamiczne wykrywanie liczby neuronów lub automatyczne generowanie testów.
+
+### 2026-06-30 — Signal Signature – struktura sygnału
+Każdy sygnał w systemie IMV ma pola: confidence, adversary_confidence, final_confidence, source, reasons. To standard dla wszystkich modułów – umożliwia filtrowanie i debatę senatorską.
+
+### 2026-06-30 — Synchronizacja liczników w testach przy dodawaniu neuronów
+W-053 dodał 47. neuron (H-01), ale testy miały zakodowane 46 – konieczność aktualizacji hardcoded wartości w test_integracja.py. Lekcja: każda zmiana liczby neuronów wymaga przeglądu testów.
+
+### 2026-06-30 — Wartości mocków muszą mieścić się w zakresach detekcji neuronów
+Podczas tworzenia testów okazało się, że mocki muszą precyzyjnie trafiać w progi neuronów (np. FUNDING_RATE > 0.001, LONG_SHORT_RATIO między 0 a 1). Niewłaściwe wartości powodują fałszywe wyniki.
+
+### 2026-07-20 — README/requirements kłamią – testy wymagają TA-Lib mimo deklaracji
+Brama celowo rzuca RuntimeError bez TA-Lib, a dokumentacja twierdzi 'testy bez zależności'. Fałszywa obietnica dla użytkownika.
+
+### 2026-07-20 — Test K1 czerwony – martwy assert na 5 przy gitignorowanym CSV
+test_realne_dane_1h twardo assertuje `==5`, ale CSV jest gitignorowane od 4 lipca 2026. Test zawsze pada na świeżym klonie – wymaga zmiany (skip albo dynamiczna detekcja).
+
+### 2026-07-20 — Zwiad bibliotekarza tylko 1/5 tematów
+Hyginus przeskanował tylko 1 z 5 domyślnych tematów (mean reversion). Pozostałe 4 (momentum, regime detection, order flow, position sizing) nie ruszane. Kandydaci nie mają pomiaru redundancji ani walidacji areną.
+
+### 2026-07-20 — Hyginus znalazł 2 kandydatów
+Z tematu 'mean reversion' znaleziono Model Vasicka i Cross-sectional mean reversion, jeszcze bez walidacji.
+
+### 2026-07-21 — Problem z \b w regexie dla identyfikatorów BIB z podkreślnikiem
+\b nie zamyka się przed '_', więc 'BIB-006_Carson' nie jest wykrywany jako osobne słowo. To znana klasa z Księgi Wad (#53). Naprawiono w PROBATORZE przez użycie innej granicy (np. (?:^|[\s,;.!?])).
+
+### 2026-07-21 — Auto-lekcja przekracza limit znaków – potrzeba chłodzenia
+Auto-lekcja dopisała 21 wpisów z 3 sesji, limit 24000 znaków pęknięty. Konsolidacja co sesję to alarm wiecznie żywy. Lekarstwo: auto_lekcja sama egzekwuje limit przy zapisie.
+
+### 2026-07-21 — Auto-lekcja nie egzekwuje limitu przy zapisie
+Dotychczas auto_lekcja dopisywała wpisy bez sprawdzania limitu, co powodowało przepełnienie i fałszywy alarm przy każdej sesji. Rozwiązanie: wpięcie konsolidacji w metodę zapisu.
+
+### 2026-07-20 — Luka pokrycia 4h – tylko 10 par zamiast 15
+Pomiar wykazuje brak plików 4h dla BNB/BTC/DOGE/ETH/SOL. Wpływa na redukcję kombinacji do 40 zamiast potencjalnych 45.
+
+### 2026-07-20 — Wynik WF-IC dla 15 par 4h
+32/49 neuronow ROBUST, 17 szum/niepewne. Czołówka: EXP-13, SMC-01, V-02/V-13/V-14, rodzina X-*. UWAGA: EXP-13 (6 okien), SMC-01 (5), V-13 (3) maja malo okien -> ROBUST slabiej podparty niz X-17/X-01 (25 okien).
+
 ### 2026-07-21 — Aktualizuj_lekcje to bliźniaczy kanał wzrostu objętości
 Funkcja aktualizuj_lekcje również powiększa sekcję LEKCJE, ale nie była objęta ogranicznikiem. Wprowadzono parę miar dla obu funkcji, by egzekwować limit także przy aktualizacji.
 

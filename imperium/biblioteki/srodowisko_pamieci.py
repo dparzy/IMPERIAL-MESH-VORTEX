@@ -133,6 +133,20 @@ def ksiazki_w_bazie() -> int:
         return 0
 
 
+def korpus_ksiazek_obecny() -> bool:
+    """Czy TO środowisko w ogóle MOŻE zmierzyć bibliotekę? (abstynencja, nie zero).
+
+    Książki komercyjne są ŚWIADOMIE poza gitem (rozkaz Cezara 2026-07-11), więc chmura
+    ma pełny kod i zero książek — a `ksiazki_w_bazie()` zwraca wtedy `0` nieodróżnialne
+    od zmierzonego zera. Zmierzone 2026-07-26: Warstwa 15 audytu zażądała na tej podstawie
+    przepisania „115 → 0" w sześciu dokumentach, czyli narzędzie OD PRAWDY namawiało do
+    skasowania prawdziwej liczby lokalnej. To ta sama klasa co martwy głos neuronu z
+    Prawa XV: **brak danych to abstynencja, nie wynik** — moduł bez karmy milczy, nie
+    głosuje NEUTRAL. Rozstrzyga obecność choćby jednego źródła BIB-* w indeksie.
+    """
+    return ksiazki_w_bazie() > 0
+
+
 def _model_embeddings_dostepny() -> bool:
     """Czy sentence-transformers + model są dostępne (lokal: tak, chmura: zwykle nie)."""
     try:

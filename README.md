@@ -11,7 +11,7 @@ powod_istnienia: "Wizytówka Imperium — podaje liczby wprost z kodu (neurony/t
 > Samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 > **Doktryna:** wojna = giełda; pierwszy front — **MEXC**; każdy order stawiany z myślą o zysku, a łup (zysk) finansuje lepszy budulec Imperium.
 
-> **Stan na:** 2026-07-19 · **Testy:** `python tests/run_tests.py` (zielone) · **Rój:** <!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów / <!-- LICZBA:zwiadowcy -->15<!-- /LICZBA --> zwiadowców · **Faza bieżąca:** żywe źródło w [`docs/MANIFEST_KODU.md`](docs/MANIFEST_KODU.md) + [`docs/LOG_ZMIAN.md`](docs/LOG_ZMIAN.md) (nie duplikujemy tu rosnącej listy W-XXX — starzała się i kłamała).
+> **Stan na:** 2026-07-26 · **Testy:** `python tests/run_tests.py` (zielone) · **Rój:** <!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów / <!-- LICZBA:zwiadowcy -->15<!-- /LICZBA --> zwiadowców · **Faza bieżąca:** żywe źródło w [`docs/MANIFEST_KODU.md`](docs/MANIFEST_KODU.md) + [`docs/LOG_ZMIAN.md`](docs/LOG_ZMIAN.md) (nie duplikujemy tu rosnącej listy W-XXX — starzała się i kłamała).
 
 ---
 
@@ -68,7 +68,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 
 | Organ | Rola | pliki `.py` |
 |---|---|---|
-| 👑 **cesarz/** | mózg decyzyjny, 5 Doradców, Pamięć Refleksyjna | <!-- LICZBA:organ_cesarz -->12<!-- /LICZBA --> |
+| 👑 **cesarz/** | mózg decyzyjny, 5 Doradców, Pamięć Refleksyjna | <!-- LICZBA:organ_cesarz -->13<!-- /LICZBA --> |
 | 🏛️ **senat/** | debata / konsensus (Byk / Niedźwiedź / Cenzor) | <!-- LICZBA:organ_senat -->2<!-- /LICZBA --> |
 | ⚔️ **legiony/** | neurony + zwiadowcy + Generał Legatus + Radar | <!-- LICZBA:organ_legiony -->67<!-- /LICZBA --> |
 | 🏟️ **koloseum/** | Dyrygent, PętlaLive, Backtest, Namiestnik, Legiony Cieni | <!-- LICZBA:organ_koloseum -->16<!-- /LICZBA --> |

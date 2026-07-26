@@ -119,7 +119,7 @@ def wartosci_z_kodu():
 
     from imperium.biblioteki.pamiec_absolutna import ImperiumLog
     from imperium.biblioteki.srodowisko_pamieci import (
-        fragmenty_w_bazie, ksiazki_w_bazie,
+        fragmenty_w_bazie, korpus_ksiazek_obecny, ksiazki_w_bazie,
     )
     from imperium.legiony.rejestr import (
         neurony_dla_trybu, raport_elity, wszystkie_neurony, wszyscy_zwiadowcy,
@@ -145,6 +145,13 @@ def wartosci_z_kodu():
         "ksiazki": ksiazki_w_bazie(),
         "fragmenty": fragmenty_w_bazie(),
     }
+    # ABSTYNENCJA ZAMIAST ZERA (Prawo XV, zmierzone 2026-07-26). Książki są świadomie poza
+    # gitem, więc chmura mierzy 0 książek i 551 fragmentów tam, gdzie lokal ma 115/37331.
+    # Bez tej bramki W15 kazała przepisać „115 → 0" w sześciu dokumentach — narzędzie od
+    # prawdy namawiało do skasowania prawdy. Środowisko bez korpusu NIE MA GŁOSU o korpusie.
+    if not korpus_ksiazek_obecny():
+        wartosci["ksiazki"] = None
+        wartosci["fragmenty"] = None
     # Liczba plików .py per organ (mapa README/ARCHITEKTURA — była ręczna i rozjechała
     # się z kodem: legiony podawane jako 40 przy 67 realnych, 2026-07-19). Wstrzykiwana,
     # żeby schemat Imperium nigdy więcej nie kłamał o własnej wielkości (Warstwa 15).
@@ -160,13 +167,21 @@ def wartosci_z_kodu():
     return wartosci
 
 
-def wstrzyknij_liczby(sucho=False):
+def wstrzyknij_liczby(sucho=False, tylko=None):
     """Przepisuje każdy blok <!-- LICZBA:x --> z żywego kodu. → (zmiany, bledy).
 
     Dokumenty `typ: acta` (LOG_ZMIAN, migawki) są POMIJANE: wpis datowany jest prawdą
     swojego czasu i cytuje liczby z dnia zapisu (Prawo I — nie falsyfikujemy historii).
     Bez tego filtra wpis z 2026-07-17 mówiący „87 neuronów" cicho stałby się „90", gdy rój
     urośnie — kłamstwo tym groźniejsze, że wyprodukowane przez narzędzie od prawdy.
+
+    `tylko` = lista ścieżek (bezwzględnych lub względnych wobec ROOT), do których wolno
+    pisać. ZASIĘG ISTNIEJE DLA TESTÓW (zmierzone 2026-07-26): test granicy wołał
+    `sucho=False` na CAŁYM korpusie i realnie przepisywał produkcyjne README — wada
+    UTAJONA, bo dopóki liczby się nie zmieniały, plik po zapisie wyglądał identycznie.
+    Ujawniła się dopiero, gdy `organ_cesarz` wzrósł 12→13, czyli w najgorszym możliwym
+    momencie: przy zmianie kodu. Zasięg zamyka całą klasę — test nie ma jak dotknąć
+    dokumentu, którego nie wymienił. `tylko=[]` NIE znaczy „wszystko": znaczy „nic".
     """
     wartosci = wartosci_z_kodu()
     zmiany, bledy = [], []
@@ -175,6 +190,10 @@ def wstrzyknij_liczby(sucho=False):
     for wzgl in DROGOWSKAZY_Z_LICZBAMI:
         if os.path.exists(os.path.join(ROOT, wzgl)):
             dokumenty.append((wzgl, {}))
+    if tylko is not None:
+        dozwolone = {os.path.abspath(os.path.join(ROOT, p)) for p in tylko}
+        dokumenty = [(s, m) for s, m in dokumenty
+                     if os.path.abspath(os.path.join(ROOT, s)) in dozwolone]
     for sciezka, meta in dokumenty:
         if meta.get("typ") == "acta":
             continue
@@ -191,6 +210,11 @@ def wstrzyknij_liczby(sucho=False):
             if klucz not in wartosci:
                 bledy.append(f"[T4] {_sciezka}: nieznana liczba `{klucz}` "
                              f"(dostępne: {', '.join(sorted(wartosci))})")
+                return m.group(0)
+            if wartosci[klucz] is None:
+                # Klucz abstynuje w TYM środowisku (brak korpusu) — zostawiamy dokument
+                # nietknięty. Milczenie nie jest pomiarem: nie kasujemy liczby zmierzonej
+                # tam, gdzie zasób istnieje (Prawo I + XV).
                 return m.group(0)
             nowa = str(wartosci[klucz])
             if stara != nowa:

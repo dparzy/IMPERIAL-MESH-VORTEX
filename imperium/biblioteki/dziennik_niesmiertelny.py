@@ -47,7 +47,16 @@ PLIK_DOMYSLNY = ROOT / "bibliotheca_ulpia" / "dane" / "dziennik_niesmiertelny.js
 PROG_KONSOLIDACJI = 400
 
 # Ile najnowszych sesji pokazać PEŁNYCH na starcie (starsze jako jednolinijkowce).
-DOMYSLNE_PELNE = 8
+# POMIAR I DECYZJA CEZARA 2026-07-26 (8 → 3). Rozbiór wydruku hooka (35,5 KB) pokazał, że
+# DZIENNIK to 84% całości, a w nim rozwinięte wpisy to 15 434 zn. za osiem sesji (średnio
+# 1 929 zn. na wpis) — 43% CAŁEGO wydruku startowego. Zmierzone warianty:
+#   ostatnie=8 → 29 788 zn. (~9 309 tok.)   ostatnie=3 → 20 036 zn. (~6 261 tok.)
+# czyli 9 752 zn. ≈ 3 048 tokenów mniej na KAŻDEJ sesji.
+# ROZKAZ O CAŁEJ OSI NIENARUSZONY — dowód policzony, nie założony: przy obu wartościach
+# wydruk zawiera 124 pozycje ze 124 w pliku (8 → 116 jednolinijkowców + 8 pełnych;
+# 3 → 121 + 3). Zwinięcie zmienia FORMĘ, nie zawartość: plik (166 KB, 124 wpisy) zostaje
+# nietknięty, a pełna treść jest w nim i w kronice (`centrum_pamieci szukaj`).
+DOMYSLNE_PELNE = 3
 # Maks. szerokość jednolinijkowca starszej sesji. POMIAR (69 wpisów): pierwsze punkty „co"
 # miały medianę 121 zn., ale ogon do 721 zn. — 57 jednolinijkowców ważyło 14 KB. Przycięcie
 # do 110 zn. tnie to do ~5 KB bez utraty rozpoznawalności wpisu (Prawo XV: oś ma być

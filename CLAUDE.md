@@ -450,9 +450,48 @@ hipotezy, czego niski-effort/tańszy model by nie zrobił rzetelnie.
 **How to apply:** przy większym zadaniu — jedno zdanie: jaki tier i dlaczego, zanim ruszysz. Nie
 spawnuj subagenta do drobiazgu (koszt zimnego startu przewyższa oszczędność). Tabelę rozszerzaj, gdy
 pojawi się nowy powtarzalny wzorzec zadania — wpis w tym samym commicie co pierwsze użycie.
-**„Opus" w tabeli = skrót na NAJWYŻSZY dostępny tier** (od 2026-07-18 sesje bywają na Fable 5 >
-Opus — wtedy „Opus" czytaj „Fable 5"). Nazwa modelu zaszyta na sztywno starzeje się jak każda
-ręczna liczba (klasa wady: MANUAL podawał nieistniejący „sonnet-4-6", złapane 2026-07-17).
+**„Opus" w tabeli = skrót na NAJWYŻSZY dostępny tier** — REGUŁA, nie nazwa. Nazwa modelu
+zaszyta na sztywno starzeje się jak każda ręczna liczba (klasa wady: MANUAL podawał
+nieistniejący „sonnet-4-6", złapane 2026-07-17), więc tier czytamy z tego, co Cezar
+faktycznie ustawił (`/model`), nie z tego, co pamiętamy.
+
+### 🏦 GRADUS OPERIS — stopnie wysiłku (organ: `imperium/cesarz/aerarium.py`)
+
+**Model to jedna dźwignia, stopień wysiłku (`effort`) to druga — i tańsza.** Źródło prawdy
+tabeli jest w kodzie (`aerarium.GRADUS`), test parytetu pilnuje zgodności z tym dokumentem.
+
+| Stopień | Imię (funkcja) | Kiedy | Trwałość |
+|---|---|---|---|
+| `low` | **VELES** — lekka piechota bez zbroi | mechaniczne, zero osądu: uruchom testy, regeneruj CODEX, licz pliki | trwały |
+| `medium` | **MILES** — szeregowy legionista | rutyna wg wzorca: commity, LOG_ZMIAN, naprawa liczb, wpisy do ledgerów | trwały |
+| `high` | **CENTURIO** — dowódca centurii | **domyślny Opusa 5**: implementacja wg spec, recenzja, raporty | trwały |
+| `xhigh` | **TRIBUNUS** — decyzje operacyjne legionu | trudne: debug realnego buga, projekt organu, osąd kandydatów, A/B | trwały |
+| `max` | **DICTATOR** — władza nadzwyczajna, wygasała z czasem | nieodwracalne: konstytucja, kierunek, kapitał | **tylko ta sesja** |
+| `ultrathink` (słowo w prompcie) | **AUSPICIUM** — wróżba przed czynem | jedna tura głębiej bez podnoszenia wachty | jedna tura |
+| `ultracode` (ustawienie CC) | **PRAEFECTUS FABRUM** — oficer od robót | xhigh + orkiestracja workflow, wiele frontów | **tylko ta sesja** |
+
+**ZASADA DOBORU:** stopień podnosisz za **KONSEKWENCJE, nie za rozmiar**. Duże ale mechaniczne
+= VELES. Małe ale nieodwracalne = DICTATOR. Zaskoczenie na niskim stopniu = eskalacja
+natychmiast (ta sama reguła co dla modeli, wyżej).
+
+**OBALONE (INDEX FALSORUM, 2026-07-26):** „think", „think hard", „think more" **NIE są
+słowami kluczowymi** — idą do modelu jako zwykły tekst promptu. W dół schodzi się `/effort`,
+nie zaklęciem. Jedyne działające słowo to `ultrathink`.
+
+**Skille i subagenci mogą mieć własny `effort` we frontmatterze** — mechaniczna bramka biegnie
+taniej, osąd drożej, bez ręcznego przełączania przez Cezara.
+
+**Stan modeli na 2026-07-26 (decyzja Cezara):** model główny Imperium to **OPUS 5**
+(`claude-opus-5`) — wg rankingów zdecydowanie mocniejszy od poprzednika. **Opus 4.8
+przechodzi na emeryturę.** Wcześniej rolę najwyższego tieru pełniły kolejno Opus 4.8
+i Fable 5 — ta lista JEST datowana i z założenia się zestarzeje; wiążąca jest reguła
+powyżej, a nie ten akapit.
+
+**ARCHITEKT NIE MIERZY WŁASNEGO MODELU** (zmierzone 2026-07-21, potwierdzone 07-26):
+środowisko hooka nie niesie identyfikatora modelu, więc BREVIARIUM świadomie go nie
+zgaduje, a Vitruviusz DEKLARUJE go na otwarciu z konfiguracji sesji. Gdy deklaracja
+Architekta rozjedzie się z tym, co ustawił Cezar — **źródłem prawdy jest ustawienie
+Cezara**, nie deklaracja (Prawo I: kto nie mierzy, ten nie rozstrzyga).
 
 **Złamanie:** użycie Opusa na czysto mechanicznym zadaniu BEZ powodu, LUB — poważniejsze — pozostanie
 na tanim modelu/niskim effort mimo zaskakującego/nieoczekiwanego wyniku zamiast eskalacji.
@@ -650,7 +689,8 @@ Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
 
 1. **Przeczytaj wydruk hooka w całości** (kolejność drukowania): 🎯 **NASTĘPNY KROK** (banner na górze,
    A2 — zawsze widoczny mimo ~25 KB) → **PORTITOR** (pre-flight środowiska: deps/klucze API/dryf, B1)
-   → **CENSOR SPRZĘTU** (żelazo zmierzone) → **INDEX FALSORUM** → **BREVIARIUM** (słudzy: Hyginus/TIRO/
+   → **CENSOR SPRZĘTU** (żelazo zmierzone) → **AERARIUM** (waga kontekstu startowego, stopnie GRADUS,
+   nadzór nad kosztem samego wydruku hooka) → **INDEX FALSORUM** → **BREVIARIUM** (słudzy: Hyginus/TIRO/
    modele) → **LEX TALIONIS** (dług honorowy) → **audyt Prawo XXI** (18 warstw) → **CODEX**
    (podsumowanie ledgera, C1) → **Centrum Pamięci** (profil, Top-3 lekcji, aktywny cel W12, Refleksja W9)
    → **Dziennik Nieśmiertelny** (pełna oś) → **skan wad ostatniego commitu**. Wydruk >25 KB bywa ucięty

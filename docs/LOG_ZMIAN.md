@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-21
+stan_na: 2026-07-26
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,140 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-07-26 | 🎓 | TIRO: fałszywy alarm o silniku ODWOŁANY + korekta planowania par
+
+**Cezar kazał sprawdzić, ZANIM podejmie decyzję — i miał rację.** Meldowałem „TIRO ma zero
+silnika i zero modeli, największa utrata potencjału". **To był fałszywy alarm.**
+
+**Przyczyna:** `KATALOG_TIRO = Path(os.getenv("TIRO_HOME", r"C:\TIRO"))` — ścieżka WINDOWS,
+która w kontenerze Linuksa nie ma prawa istnieć. `.exists()` → False → 🚨. Tymczasem dziennik
+z 07-16 dokumentuje: llama.cpp b10041 stoi w `C:\TIRO\silnik`, modele zmierzone `llama-bench`
+(Qwen3-1.7B **9.64 t/s**, Qwen3-4B **4.86 t/s**). **E0 i E1 są zamknięte.**
+
+To **czwarte** wystąpienie klasy „milczenie udaje wynik" tego samego dnia — i najgorsze,
+bo tym razem fałszywy alarm nie tylko istniał, ale **został przekazany Cezarowi jako podstawa
+decyzji o wydaniu pracy**. Uodpornienie: `_sciezka_z_innego_systemu()` rozpoznaje literę dysku
+Windows na Linuksie (i ścieżkę POSIX na Windows) → `silnik: None` i meldunek „⚠️ dysk TIRO
+niewidoczny stąd". Granica pilnowana testem: brak silnika na **widocznym** dysku nadal krzyczy.
+
+**KOREKTA PLANOWANIA (zmierzona):** postęp Szkoły liczyliśmy parami SUROWYMI, a trening jedzie
+na tych, które przeżyją eksport SFT (kolaps anty-monokultury + filtr jakości):
+
+```
+329 par surowych → 140 użytecznych   (przeżywa ~43%)
+```
+
+Meldunek zawyżał gotowość **2,35×**: „329/500 = 66%" zamiast prawdziwego **140/1000 = 14%**
+(1000 = minimum sensownego LoRA). Droga do progu jest ~2× dłuższa, niż mówiła ekstrapolacja
+z 07-16, bo tamta liczyła surowe. BREVIARIUM podaje teraz OBIE liczby i procent progu.
+
+**Decyzje Cezara:** (1) lokalnie — E3 (egzamin wstępny ucznia) NAJPIERW, bo tani i mówi czy
+warto zbierać, potem partia POMIAROWA żniwa; (2) licznik pokazuje obie liczby; (3) abstynencja
+środowiskowa wpięta. Pakiet zadań: **`docs/ZADANIE_TIRO_E3_ZNIWO.md`** (wpisany do INDEKSU).
+
+**Pliki:** `imperium/oczy/breviarium.py`, `tests/test_breviarium.py`,
+`docs/ZADANIE_TIRO_E3_ZNIWO.md`, `docs/INDEKS_IMPERIUM.md`.
+
+---
+
+## 2026-07-26 | 🗺️ | Ścieżka lokalna sprostowana + OPUS 5 modelem głównym
+
+**Poprawka Cezara (dwie sprawy naraz).**
+
+**1. Ścieżka podana z WYGLĄDU nazwy, nie ze źródła.** Podałem blok push z
+`cd C:\IMPERIAL-MESH-VORTEX` — przepisałem wersaliki z nagłówka README i nazwy repo na
+GitHubie, gubiąc nadrzędny folder. Realnie: **`C:\Projekty\imperial-mesh-vortex`**
+(`docs/SCIAGA_LOKAL.md`, potwierdzone niezależnie ścieżką temp Windows w kronice:
+`C--Projekty-imperial-mesh-vortex`).
+
+**Skan całego korpusu (decyzja Cezara) pokazał, że ta sama klasa GNIŁA w żywym manualu:**
+`docs/MANUAL_CLAUDE_CODE.md` kazał w dwóch miejscach użyć `Desktop\imperial-mesh-vortex`
+— raz jako `cd`, raz jako ścieżka serwera **MCP filesystem**. Cezar-nowicjusz wkleiłby ten
+blok i dostał serwer wskazujący w próżnię. Oba miejsca poprawione + nota o sprostowaniu.
+Reszta korpusu spójna (5 wystąpień poprawnej ścieżki). Kronika NIETKNIĘTA (Prawo I).
+
+**2. OPUS 5 modelem głównym Imperium, Opus 4.8 na emeryturze** (decyzja Cezara — wg
+rankingów Opus 5 jest zdecydowanie mocniejszy). Zapis w `CLAUDE.md` §ZASADA OSZCZĘDNOŚCI
+TOKENÓW rozdzielony na **regułę** („Opus" = najwyższy dostępny tier — wiążąca, nie starzeje
+się) i **datowany stan** (dziś: Opus 5; wcześniej kolejno 4.8 i Fable 5 — z założenia się
+zestarzeje). Dopisana zasada rozstrzygania sporu: Architekt NIE MIERZY własnego modelu
+(środowisko nie niesie identyfikatora), więc gdy jego deklaracja rozjedzie się z tym, co
+ustawił Cezar — **wiąże ustawienie Cezara**, nie deklaracja (kto nie mierzy, ten nie rozstrzyga).
+
+**Księga Wad +1 klasa:** „ścieżka/nazwa podana z wyglądu nazwy repo zamiast ze źródła prawdy"
+— wypełniacz typu `TwojeImie` stosuj TYLKO tam, gdzie wartość jest naprawdę nieznana.
+
+**Pliki:** `CLAUDE.md`, `docs/MANUAL_CLAUDE_CODE.md`, `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`.
+
+---
+
+## 2026-07-26 | 🔇 | ABSTYNENCJA ZAMIAST ZERA — narzędzie od prawdy żądało skasowania prawdy
+
+**Alarm otwarcia wachty (audyt W15) okazał się fałszywy W SPOSÓB GROŹNY:** Warstwa 15
+zażądała przepisania `ksiazki: 115 → 0` i `fragmenty: 37331 → 551` w sześciu dokumentach.
+Wykonanie `tabularium.py liczby --zapisz` w chmurze **skasowałoby prawdziwe liczby lokalne**.
+
+**Przyczyna (zmierzona, nie zgadnięta):** książki komercyjne są ŚWIADOMIE poza gitem
+(rozkaz Cezara 2026-07-11), więc chmura ma pełny kod i zero książek. `ksiazki_w_bazie()`
+zwracało wtedy `0` — **nieodróżnialne od zmierzonego zera** — a mechanizm W15 traktuje
+każdą wartość jako pomiar. Dowód: `ls bibliotheca_ulpia/ksiazki` = 0 plików przy 551
+fragmentach RAG w gicie.
+
+**Naprawa u źródła + UODPORNIENIE KLASY (ZASADA CENSORA):**
+- `srodowisko_pamieci.korpus_ksiazek_obecny()` — czy TO środowisko w ogóle MOŻE zmierzyć.
+- `tabularium.wartosci_z_kodu()` → `ksiazki`/`fragmenty` = **None** (abstynencja) bez korpusu.
+- `wstrzyknij_liczby()` — klucz abstynujący **zostawia blok nietknięty** i nie liczy się
+  jako rozjazd. Milczenie nie jest pomiarem.
+- 2 testy granic (`None` ≠ `0`: abstynencja NIE nadpisuje, zmierzone zero NADAL nadpisuje;
+  spójność `korpus_ksiazek_obecny()` z `ksiazki_w_bazie()`).
+
+**Najgorsze w tej wadzie:** istniejący test `test_liczby_z_kodu_sa_dodatnie` **przewidział
+ten przypadek i rozstrzygnął go ŹLE** — komentarz „ksiazki/fragmenty mogą być 0 na świeżym
+klonie bez bazy RAG" uznawał milczenie za wynik i tym samym **legalizował** żądanie W15.
+Test poprawiony na niezmiennik: albo oba mierzą, albo oba milczą — nigdy pół na pół.
+
+To ta sama klasa co martwy głos neuronu z Prawa XV: **brak danych to abstynencja, nie wynik**.
+
+**Pliki:** `imperium/biblioteki/srodowisko_pamieci.py`, `narzedzia/tabularium.py`,
+`tests/test_tabularium.py`. Dodatkowo W6: `Stan na:` w README/MANIFEST 07-19 → 07-26.
+
+### Ta sama klasa wróciła jeszcze trzy razy tego samego dnia
+
+Szukanie „gdzie indziej milczenie udaje wynik" dało trzy dalsze trafienia — zmierzone,
+nie zgadnięte:
+
+1. **BREVIARIUM meldował „kolejka 0 cząstek | czeka na sędziego 0"** w chmurze, choć
+   kolejka jest gitignorowana (`.gitignore:55`) i pliku tam NIE MA (na lokalu leżały 34
+   cząstki). Fałszywy spokój groźniejszy niż brak meldunku: krok 4b domknięcia liczy
+   DELTĘ, więc „34 → 0" wyglądałoby na wykonaną pracę. Teraz: *„⚠️ kolejka NIEZNANA w tym
+   środowisku"*, a delta ten wskaźnik pomija. Konfiguracja mowy (profile faz) NIE abstynuje
+   — jest w kodzie, więc znamy ją wszędzie (moja pierwsza łata wygaszała ją razem z kolejką).
+2. **Testy zależne od ZEGARA** (`test_dispensator`, 3 szt.): od taryfy szczytowej (07-21)
+   `koszt_usd` liczy wg chwili wywołania (2× w oknach 01–04 i 06–10 UTC), ale trzy stare
+   testy kosztu nie dostały `kiedy=`. **Przez ~7 godzin na dobę cały pakiet był czerwony**
+   — złapane o 01:57 UTC (oczekiwane 0.14, policzone 0.28). Nowe testy taryfy miały helper
+   `_utc`, starych nikt nie przeniósł.
+3. **Runner nie znał POMINIĘCIA** — `tests/run_tests.py` znał wyłącznie „zaliczony/oblany",
+   więc test wymagający zależności OPCJONALNEJ padał tam, gdzie jej nie ma (3× EPUB
+   `ebooklib`, 2× SPECULA `plotext`). Dodane `unittest.SkipTest` (stdlib, honorowany też
+   przez pytest) + licznik i GŁOŚNY wydruk powodów — ciche pominięcie udawałoby pokrycie.
+   Gdzie gałąź da się wymusić flagą (`PLOTEXT_DOSTEPNY`), wymuszamy zamiast pomijać.
+
+**Naprawiony przy okazji fałszywy WIDOK:** BREVIARIUM listował klucze słownika
+`dispensator.PROFILE`, więc drukował `krytyka→v4-flash` i czytało się to jak mapowanie
+fazy na model — na otwarciu odczytałem to jako sprzeczność z decyzją z 07-21 (krytyka na
+profilu `osad`, v4-pro). Kod był poprawny, kłamał WIDOK. Teraz `krytyka→[osad] v4-pro/high`
++ test parytetu widok↔kod.
+
+**Wynik bramki:** testy **2879/2879 zielone, 3 pominięte jawnie**, audyt exit 0 (18 warstw),
+skan wad czysto. Księga Wad: +4 klasy semantyczne.
+
+**Pliki dodatkowo:** `imperium/oczy/breviarium.py`, `tests/test_breviarium.py`,
+`tests/test_dispensator.py`, `tests/test_rag.py`, `tests/test_specula_swiec.py`,
+`tests/run_tests.py`.
 
 ---
 

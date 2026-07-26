@@ -15,6 +15,16 @@ from imperium.cesarz.dispensator import (  # noqa: E402
 )
 
 
+# CHWILA PRZYPIĘTA W KAŻDYM TEŚCIE KOSZTU (naprawa 2026-07-26). Od wprowadzenia taryfy
+# szczytowej (07-21) `koszt_usd` liczy wg CHWILI WYWOŁANIA: w oknach 01–04 i 06–10 UTC
+# stawka jest podwójna. Trzy testy kosztu przypięcia nie dostały i przez ~7 godzin na dobę
+# oblewały cały pakiet (złapane 2026-07-26 o 01:57 UTC: oczekiwane 0.14, policzone 0.28).
+# Test mierzący wielkość zależną od zegara MUSI zegar przypiąć — inaczej mierzy porę dnia.
+def _utc(godzina, minuta=0):
+    from datetime import datetime, timezone
+    return datetime(2026, 7, 21, godzina, minuta, tzinfo=timezone.utc)
+
+
 def test_profil_klasyfikacji_wylacza_rozumowanie():
     """Klasyfikacja to wybór etykiety — rozumowanie jest czystym kosztem (zmierzone 11.7×)."""
     p = dobierz("klasyfikacja")
@@ -56,14 +66,15 @@ def test_dobierz_nie_przekazuje_opisu_do_api():
 def test_koszt_liczony_z_faktycznego_zuzycia():
     """1M tokenów wejścia + 1M wyjścia na flashu = 0.14 + 0.28 USD."""
     u = {"prompt_tokens": 1_000_000, "completion_tokens": 1_000_000}
-    assert abs(koszt_usd(u, "deepseek-v4-flash") - 0.42) < 1e-9
+    assert abs(koszt_usd(u, "deepseek-v4-flash", kiedy=_utc(12)) - 0.42) < 1e-9
 
 
 def test_koszt_uwzglednia_cache():
     """Trafienie w cache jest 50× tańsze — bez tego oszczędność byłaby niewidoczna."""
-    bez = koszt_usd({"prompt_tokens": 1_000_000, "completion_tokens": 0}, "deepseek-v4-flash")
+    bez = koszt_usd({"prompt_tokens": 1_000_000, "completion_tokens": 0},
+                    "deepseek-v4-flash", kiedy=_utc(12))
     z_cache = koszt_usd({"prompt_tokens": 1_000_000, "prompt_cache_hit_tokens": 1_000_000,
-                         "completion_tokens": 0}, "deepseek-v4-flash")
+                         "completion_tokens": 0}, "deepseek-v4-flash", kiedy=_utc(12))
     assert abs(bez - 0.14) < 1e-9
     assert abs(z_cache - 0.0028) < 1e-9
     assert z_cache < bez / 40, "cache musi być wyraźnie tańszy"
@@ -72,7 +83,8 @@ def test_koszt_uwzglednia_cache():
 def test_koszt_pro_drozszy_od_flash():
     """Granica kierunku: ten sam rachunek na pro musi kosztować więcej niż na flashu."""
     u = {"prompt_tokens": 10_000, "completion_tokens": 10_000}
-    assert koszt_usd(u, "deepseek-v4-pro") > koszt_usd(u, "deepseek-v4-flash")
+    assert (koszt_usd(u, "deepseek-v4-pro", kiedy=_utc(12))
+            > koszt_usd(u, "deepseek-v4-flash", kiedy=_utc(12)))
 
 
 def test_koszt_nieznanego_modelu_to_none_nie_zero():
@@ -86,7 +98,7 @@ def test_koszt_przyjmuje_obiekt_usage_nie_tylko_slownik():
     class U:
         prompt_tokens = 1_000_000
         completion_tokens = 0
-    assert abs(koszt_usd(U(), "deepseek-v4-flash") - 0.14) < 1e-9
+    assert abs(koszt_usd(U(), "deepseek-v4-flash", kiedy=_utc(12)) - 0.14) < 1e-9
 
 
 # ── Pułapka pustej odpowiedzi ────────────────────────────────────────────────────
@@ -219,11 +231,6 @@ def test_notarius_dostaje_model_FAKTYCZNIE_uzyty(monkeypatch):
 
 
 # ── Taryfa szczytowa (zweryfikowana 2026-07-21) ──────────────────────────────────
-
-def _utc(godzina, minuta=0):
-    from datetime import datetime, timezone
-    return datetime(2026, 7, 21, godzina, minuta, tzinfo=timezone.utc)
-
 
 def test_czy_szczyt_granice_okien():
     """REGUŁA TEST-GRANIC: początek okna WLICZONY, koniec WYŁĄCZONY.

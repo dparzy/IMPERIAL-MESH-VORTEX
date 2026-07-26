@@ -25,10 +25,25 @@ def test_brak_plikow_nie_wywala_meldunku(monkeypatch, tmp_path):
     monkeypatch.setattr(bv, "KOLEJKA_HIPOTEZ", tmp_path / "nie_ma.jsonl")
     monkeypatch.setattr(bv, "PARY_TIRO", tmp_path / "tez_nie.jsonl")
     monkeypatch.setattr(bv, "KATALOG_TIRO", tmp_path / "brak_tiro")
-    assert bv.stan_hyginusa()["czastek"] == 0
-    assert bv.stan_tiro() == {"pary_nauczyciela": 0, "modele": [], "silnik": False,
-                              "klasa_sprzetu": bv.stan_tiro()["klasa_sprzetu"],
-                              "zakres_modelu": bv.stan_tiro()["zakres_modelu"]}
+    # KONTRAKT ZMIENIONY 2026-07-26: brak rejestru to NIE „zero cząstek", tylko „nie wiem".
+    # Kolejka jest gitignorowana, więc w chmurze pliku nie ma, a meldunek ogłaszał wtedy
+    # „kolejka 0 | czeka na sędziego 0" — dług przeglądu wyglądał na spłacony, choć na
+    # lokalu leżały 34 cząstki. Poprzednia wersja tego testu WYMUSZAŁA to kłamstwo (`== 0`).
+    stan = bv.stan_hyginusa()
+    assert stan["rejestr_nieobecny"] is True
+    assert stan["czastek"] is None and stan["czeka_na_sedziego"] is None, \
+        "brak rejestru musi milczeć (None), nie meldować zera"
+    assert stan["profile_dispensatora"], \
+        "konfiguracja mowy jest w KODZIE — abstynencja o kolejce nie może jej wygaszać"
+    assert "NIEZNANA" in bv.banner(), "meldunek ma nazwać brak wiedzy wprost (Prawo I)"
+    # Sprawdzamy POLA, nie równość całego słownika: porównanie 1:1 pękało przy KAŻDYM
+    # nowym wskaźniku meldunku (2026-07-26: doszły `pary_uzyteczne` i `dysk_tiro_widoczny`),
+    # czyli test karał ROZBUDOWĘ organu zamiast pilnować jego zachowania.
+    tiro = bv.stan_tiro()
+    assert tiro["pary_nauczyciela"] == 0
+    assert tiro["modele"] == []
+    assert tiro["silnik"] is False, "tmp_path to widoczny dysk — brak silnika jest ZMIERZONY"
+    assert tiro["dysk_tiro_widoczny"] is True
     assert "BREVIARIUM" in bv.banner()
 
 
@@ -349,3 +364,100 @@ def test_zapisz_migawke_nie_wywala_na_zlej_sciezce():
     """Awaria zapisu ≠ awaria meldunku — hook startowy ma działać dalej (Prawo XV)."""
     from pathlib import Path
     bv.zapisz_migawke(Path("/nieistniejacy\x00katalog/m.json"))
+
+
+# ── WIDOK NIE MOŻE KŁAMAĆ O FAZACH (2026-07-26) ──────────────────────────────
+
+def test_profile_pokazuja_faze_a_nie_katalog():
+    """Meldunek MUSI pokazywać FAZA→PROFIL faktycznie użyty, nie katalog możliwości.
+
+    Zmierzone 2026-07-26 na otwarciu wachty: meldunek listował klucze słownika
+    `dispensator.PROFILE`, więc drukował „krytyka→v4-flash" i czytało się to jako
+    sprzeczność z decyzją z 07-21 (KRYTYKA przeniesiona na profil `osad`, v4-pro).
+    Kod był poprawny — kłamał WIDOK. Katalog możliwości pokazany w miejscu stanu
+    faktycznego jest fałszywym meldunkiem, a meldunek istnieje po to, żeby na nim polegać.
+    """
+    from imperium.cesarz import dispensator as dsp
+    from imperium.oczy.breviarium import stan_hyginusa
+    from narzedzia import bibliotekarz as bib
+
+    profile = stan_hyginusa()["profile_dispensatora"]
+    assert profile, "meldunek bez profili — awaria importu ukryta przez except"
+
+    wpis_krytyki = [p for p in profile if p.startswith("krytyka→")]
+    assert len(wpis_krytyki) == 1, profile
+    # Nazwa profilu MUSI być tą, której naprawdę używa faza krytyki (dziś: `osad`).
+    assert f"[{bib._PROFIL_KRYTYKA}]" in wpis_krytyki[0], (
+        f"widok pokazuje inny profil niż _PROFIL_KRYTYKA={bib._PROFIL_KRYTYKA}: {wpis_krytyki[0]}")
+    # ...a model MUSI być modelem TEGO profilu, policzonym z rejestru, nie wpisanym.
+    oczekiwany = str(dsp.PROFILE[bib._PROFIL_KRYTYKA]["model"]).replace("deepseek-", "")
+    assert oczekiwany in wpis_krytyki[0], wpis_krytyki[0]
+
+    for faza, stala in (("klasyfikacja", bib._PROFIL_ROZWIN), ("zwiad", bib._PROFIL_ZWIAD)):
+        wpis = [p for p in profile if p.startswith(f"{faza}→")]
+        assert len(wpis) == 1 and f"[{stala}]" in wpis[0], (faza, wpis)
+
+
+# ── TIRO: „nie widzę" ≠ „nie ma"; pary surowe ≠ pary użyteczne (2026-07-26) ──────
+
+def test_dysk_tiro_z_innego_systemu_abstynuje(monkeypatch):
+    """`C:\\TIRO` na Linuksie to NIEWIDOCZNOŚĆ, nie zmierzony brak silnika.
+
+    Ten fałszywy alarm wprowadził w błąd samego Architekta (2026-07-26), który podał go
+    Cezarowi jako „największa utrata potencjału" — podczas gdy llama.cpp stoi na laptopie
+    od 07-16 (zmierzone: Qwen3-1.7B 9.64 t/s). Meldunek MUSI odróżniać jedno od drugiego.
+    """
+    import sys as _sys
+    from pathlib import Path
+
+    obca = Path("C:\\TIRO") if not _sys.platform.startswith("win") else Path("/home/tiro")
+    monkeypatch.setattr(bv, "KATALOG_TIRO", obca)
+    stan = bv.stan_tiro()
+    assert stan["silnik"] is None, "obcy system plików → None (nie wiem), nigdy False"
+    assert stan["dysk_tiro_widoczny"] is False
+    baner = bv.banner()
+    assert "niewidoczny stąd" in baner
+    assert "brak silnika" not in baner, "nie wolno oskarżać o brak tego, czego nie widać"
+
+
+def test_zmierzony_brak_silnika_nadal_krzyczy(monkeypatch, tmp_path):
+    """GRANICA: katalog TEGO systemu, w którym silnika NIE MA → to pomiar, alarm zostaje.
+
+    Abstynencja nie może uciszyć prawdziwego braku — inaczej wyciszylibyśmy organ zamiast
+    go naprawić (dokładnie odwrotność celu).
+    """
+    monkeypatch.setattr(bv, "KATALOG_TIRO", tmp_path / "TIRO")
+    stan = bv.stan_tiro()
+    assert stan["silnik"] is False, "brak na widocznym dysku to zmierzony fakt, nie None"
+    assert "brak silnika" in bv.banner()
+
+
+def test_obcosc_sciezki_mierzona_w_OBU_kierunkach():
+    """KAŻDY host sprawdza OBIE połowy logiki, nie tylko swoją.
+
+    Bug zmierzony 2026-07-26: `str(Path("/home/tiro"))` na Windows daje `\\home\\tiro`, więc
+    kierunek „POSIX na Windows" był MARTWY — a pakiet i tak świecił zielono w chmurze, bo
+    Linux testował wyłącznie kierunek przeciwny. Platforma wstrzykiwana zamiast czytanej
+    z `sys.platform` odbiera hostowi prawo do decydowania, co zostanie sprawdzone.
+    """
+    from pathlib import Path as _P
+    # Na Windows: ścieżka POSIX-owa jest OBCA, natywna z literą dysku — swoja.
+    assert bv._sciezka_z_innego_systemu(_P("/home/tiro"), "win32") is True
+    assert bv._sciezka_z_innego_systemu(_P("C:/TIRO"), "win32") is False
+    # Na Linuksie: dokładnie odwrotnie.
+    assert bv._sciezka_z_innego_systemu(_P("C:\\TIRO"), "linux") is True
+    assert bv._sciezka_z_innego_systemu(_P("/home/tiro"), "linux") is False
+
+
+def test_pary_uzyteczne_nie_przekraczaja_surowych():
+    """Postęp Szkoły liczymy parami, które PRZEŻYJĄ eksport SFT (kolaps + filtr jakości).
+
+    Zmierzone 2026-07-26: 329 surowych → 140 użytecznych. Meldunek podający wyłącznie
+    liczbę surową zawyżał gotowość 2,35× (14% progu 1000 wyglądało jak 66% progu 500).
+    """
+    stan = bv.stan_tiro()
+    assert stan["pary_uzyteczne"] is None or (
+        0 <= stan["pary_uzyteczne"] <= stan["pary_nauczyciela"]), stan
+    if stan["pary_uzyteczne"] is not None:
+        assert f"{stan['pary_nauczyciela']} surowych" in bv.banner()
+        assert f"{stan['pary_uzyteczne']} użytecznych" in bv.banner()

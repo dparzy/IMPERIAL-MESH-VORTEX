@@ -1157,10 +1157,17 @@ def main():
     bledy, info = audyt()
 
     if bledy:
-        print("🚨 AUDYT SPÓJNOŚCI — WYKRYTO ROZBIEŻNOŚCI (złamanie Prawa XXI):", file=sys.stderr)
+        # ALARM IDZIE NA STDOUT, NIE NA STDERR (zmierzone 2026-07-26 — realna luka).
+        # Powód: hook startowy woła ten audyt, a środowisko utrwala z hooka WYŁĄCZNIE
+        # stdout. Przy czerwonym audycie stdout miał 0 bajtów, więc otwarcie sesji
+        # pokazywało pod nagłówkiem „KROK 0" PUSTĄ LINIĘ. Gałąź „pełna harmonia" pisała
+        # na stdout, więc sesja ZDROWA wyglądała GŁOŚNIEJ niż sesja z alarmem — milczenie
+        # udające spokój, najgroźniejsza odmiana klasy „milczenie udające wynik".
+        # Kod wyjścia 1 nadal bramkuje commit; zmienia się tylko widoczność.
+        print("🚨 AUDYT SPÓJNOŚCI — WYKRYTO ROZBIEŻNOŚCI (złamanie Prawa XXI):")
         for b in bledy:
-            print(f"  ❌ {b}", file=sys.stderr)
-        print("\n→ STOP. Napraw spójność zanim zaczniesz/zakończysz zadanie.", file=sys.stderr)
+            print(f"  ❌ {b}")
+        print("\n→ STOP. Napraw spójność zanim zaczniesz/zakończysz zadanie.")
         sys.exit(1)
 
     if not cichy:

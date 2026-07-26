@@ -156,16 +156,26 @@ def _czy_dispensator_wpiety() -> bool:
     return False
 
 
-def _sciezka_z_innego_systemu(sciezka: Path) -> bool:
+def _sciezka_z_innego_systemu(sciezka: Path, platforma: Optional[str] = None) -> bool:
     """Czy ta ścieżka pochodzi z INNEGO systemu plików niż ten, na którym biegniemy?
 
     `C:\\TIRO` na Linuksie nigdy nie zaistnieje — jego brak nie jest pomiarem, tylko
     niewidocznością. Rozpoznajemy literę dysku Windows (`C:`) na nie-Windows i odwrotnie:
     ścieżkę POSIX-ową (`/home/...`) na Windows. Bez tego meldunek myli „nie widzę" z „nie ma".
+
+    CZYTAMY `as_posix()`, NIE `str()` (zmierzone 2026-07-26 na laptopie Cezara): na Windows
+    `Path("/home/tiro")` normalizuje się do `\\home\\tiro`, więc `str().startswith("/")`
+    NIE TRAFIAŁ NIGDY — abstynencja broniła wyłącznie kierunku „ścieżka Windows na Linuksie",
+    a kierunek „ścieżka POSIX na Windows" przepuszczała jako ZMIERZONY brak silnika. To ta
+    sama wada, co 07-21: ochrona zastosowana wybiórczo jest ochroną pozorną.
+
+    `platforma` jest WSTRZYKIWANA, bo inaczej każdy host sprawdza tylko swoją połowę logiki —
+    pakiet świecił zielono w chmurze (Linux testował drugą połowę) i oblewał się na laptopie.
     """
-    tekst = str(sciezka)
+    tekst = sciezka.as_posix()
+    plat = platforma if platforma is not None else sys.platform
     windowsowa = len(tekst) > 1 and tekst[1] == ":" and tekst[0].isalpha()
-    if sys.platform.startswith("win"):
+    if plat.startswith("win"):
         return tekst.startswith("/")
     return windowsowa
 

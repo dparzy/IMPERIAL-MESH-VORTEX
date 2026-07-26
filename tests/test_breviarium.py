@@ -432,6 +432,23 @@ def test_zmierzony_brak_silnika_nadal_krzyczy(monkeypatch, tmp_path):
     assert "brak silnika" in bv.banner()
 
 
+def test_obcosc_sciezki_mierzona_w_OBU_kierunkach():
+    """KAŻDY host sprawdza OBIE połowy logiki, nie tylko swoją.
+
+    Bug zmierzony 2026-07-26: `str(Path("/home/tiro"))` na Windows daje `\\home\\tiro`, więc
+    kierunek „POSIX na Windows" był MARTWY — a pakiet i tak świecił zielono w chmurze, bo
+    Linux testował wyłącznie kierunek przeciwny. Platforma wstrzykiwana zamiast czytanej
+    z `sys.platform` odbiera hostowi prawo do decydowania, co zostanie sprawdzone.
+    """
+    from pathlib import Path as _P
+    # Na Windows: ścieżka POSIX-owa jest OBCA, natywna z literą dysku — swoja.
+    assert bv._sciezka_z_innego_systemu(_P("/home/tiro"), "win32") is True
+    assert bv._sciezka_z_innego_systemu(_P("C:/TIRO"), "win32") is False
+    # Na Linuksie: dokładnie odwrotnie.
+    assert bv._sciezka_z_innego_systemu(_P("C:\\TIRO"), "linux") is True
+    assert bv._sciezka_z_innego_systemu(_P("/home/tiro"), "linux") is False
+
+
 def test_pary_uzyteczne_nie_przekraczaja_surowych():
     """Postęp Szkoły liczymy parami, które PRZEŻYJĄ eksport SFT (kolaps + filtr jakości).
 

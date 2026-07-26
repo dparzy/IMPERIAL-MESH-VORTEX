@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: —
-stan_na: 2026-06-09
+stan_na: 2026-07-27
 powod_istnienia: "Spis wszystkich dokumentów w `docs/` z jednozdaniowym opisem tematu każdego — punkt nawigacyjny do dokumentacji."
 ---
 # 📚 Dokumentacja Imperium
@@ -40,5 +40,13 @@ Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 | [AUDYT_SYSTEMU.md](AUDYT_SYSTEMU.md) | 🔍 **Audyt systemu** — co działa, co blokowane (TA-Lib), co brakuje, mapa przepływu, priorytety wdrożenia |
 | [WERSJONOWANIE.md](WERSJONOWANIE.md) | 🏺 **Wersjonowanie + Pieczęć Imperium** — IMV-ORI/ADO/INS/POR/EXP, CHANGELOG, post-mortem relegowanych |
 | [SKAN_AZJA.md](SKAN_AZJA.md) | 🌏 **Skan 3100 linków Azji** — perełki: +13 neuronów, +5 strategii, 12 idei architektury (Parrondo, Hurst, Outlines, Reflexion) |
+| [ZADANIE_TIRO_E3_ZNIWO.md](ZADANIE_TIRO_E3_ZNIWO.md) | 🎓 **Zadanie lokalne TIRO** — E3 (egzamin wstępny ucznia) + żniwo par nauczyciela; pracy nie da się wykonać w chmurze (brak książek i klucza DeepSeek) |
 
 > Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.
+
+> ⚠️ **Ten spis jest RĘCZNY i dubluje generowany katalog** w
+> [`INDEKS_IMPERIUM.md`](INDEKS_IMPERIUM.md) (Tabularium przepisuje go z nagłówków
+> dokumentów, więc nie umie się zestarzeć). Recenzja 2026-07-26 wykazała, że nowy
+> dokument trafił do INDEKSU, a tutaj nie — dokładnie tak, jak zawodzi każde drugie
+> źródło prawdy (Prawo XVI). **Kandydat do rozstrzygnięcia przez Cezara:** zdegradować
+> ten plik do wskaźnika na INDEKS albo generować go z Tabularium.

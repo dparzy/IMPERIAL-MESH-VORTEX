@@ -113,35 +113,17 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-26 — Regime-stale bug: pamięć branżowa ślepa na reżim rynku
+Wszystkie istniejące systemy pamięci (Mem0/Zep/Letta/A-Mem) są domenowo-ślepe – wydobywają lekcje z bull marketu podczas bessy. Nasza poprawka: × regime_match w scoringu.
+
 ### 2026-07-26 — Rozjazd repo z chmurą przez hooki po obu stronach
 Od wspólnego punktu e2cb846 chmura dorobiła 2 commity (sync+migawka), lokalnie 2 (auto: sync pamięci). Hooki commitują same po obu stronach – dwa ciągi wyrosły z tego samego pnia.
-
-### 2026-07-26 — Path('/home/tiro') na Windows nie działa z startswith('/')
-Path('/home/tiro') na Windows normalizuje się do \home\tiro, więc startswith('/') zwraca False. Abstynencja działała tylko w jedną stronę. Naprawa mechanizmem, nie łatką.
-
-### 2026-07-26 — Audyt czerwony niewidoczny przez hook stdout
-Hook utrwala tylko stdout, alarmy audytu lecą na stderr. Przy czerwonym wyniku stdout jest pusty – wygląda ciszej niż zielony. Klasa wady z apert26: milczenie udające spokój.
-
-### 2026-07-26 — TIRO: 153 uzyteczne pary = 15% progu 1000
-Zbior treningowy TIRO to 348 surowych/153 uzytecznych par, co stanowi 15% docelowego progu 1000. Wymaga kontynuacji sniwa (zadanie E3) przed uruchomieniem pelnego treningu.
-
-### 2026-07-26 — Brak kluczy MEXC uniemozliwia live trading
-MEXC_API_KEY i MEXC_SECRET nie sa ustawione w srodowisku. Zero realnych orderow pomimo gotowego kodu (ccxt 4.5.59). Niezbedne do przejscia na live.
-
-### 2026-07-26 — Testy 2882/2885 - 3 obalone, w tym jedna nowa wada
-Dwie porazki wynikaja z niesledzonego consilium (znane), trzecia to osobna wada wymagajaca analizy. Pelny bieg testow wciaz leci w tle, stan oficjalnie nieznany.
 
 ### 2026-07-26 — Audyt spójności ukrywa czerwony wynik (stderr zamiast stdout)
 W narzedziu audyt_spojnosci.py alarmy sa wypisywane na stderr (linie 1160-1163), podczas gdy hook zbiera tylko stdout. W efekcie czerwony audyt jest niewidoczny w wydruku startowym - sesja wyglada ciszej niz zdrowa. To odwrocona wersja wady klasy 'milczenie udajace wynik' z apert26.
 
-### 2026-07-26 — Audyt spójności kończy się exit 1 i hook milczy
-Podczas audytu środowiska komenda zakończyła się kodem błędu (exit 1), a hook w kroku 0 nie wyświetlił żadnej treści – to klasyczna wada 'milczenie udające wynik'.
-
 ### 2026-07-20 — 20 sprzeczności w Refleksji, 3 pilne
 Audyt startowy wykrył 20 sprzeczności, w tym 3 pilne: audytu/nowy, chmura/lokal/naprawa, false/faza – wymagają przeglądu.
-
-### 2026-07-20 — Hipoteza B potwierdzona OOS
-Ważenie głosów IC (Legatus) daje +3.6pp na 5/5 parach poza próbą – czeka na zgodę Cezara na wpięcie do kodu.
 
 ### 2026-07-20 — Błąd replikacji wiedzy – Claude sam nie stosuje własnych procedur
 W poprzednich sesjach wielokrotnie brakowało aktualizacji dokumentów i ledgera, mimo że Claude tworzył procedury (np. ALMA, OBSERWATORY). To klasyczny błąd replikacji wiedzy – Claude tworzy narzędzia, ale sam ich nie używa.
@@ -200,9 +182,6 @@ Przenoszenie zywych dokumentow tworzy martwe linki w historii (Prawa I nie wolno
 ### 2026-07-20 — Brak metadanych to źródło bałaganu
 64 dokumenty w docs/ mają zero nagłówków metadanych. Audyt nie wie, czym dokument jest, przez co bramki (np. W5, W10) opierają się na ręcznie wpisanych wyrażeniach zamiast na strukturze. To nie skaluje się do 213 plików .md.
 
-### 2026-07-20 — Audyt exit 0 nie oznacza prawdy
-INDEKS_IMPERIUM.md podaje dwie różne liczby neuronów: 299 w nagłówku (data 2026-06-09) i 87 w sekcji MAPA KODU. Audyt przepuszcza, bo W5 czyta tylko z MAPA KODU. To dowód, że dokument może kłamać obok bramki.
-
 ### 2026-07-21 — Test negatywny PROBATORA wykrył błąd graniczny z '_'
 Znak '_' jest traktowany jako słowny przez \b, co powodowało fałszywe dopasowanie przy identyfikatorze BIB-006_Carson. Poprawiono test, nie organ – zastosowano inny separator.
 
@@ -259,9 +238,6 @@ W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokł
 
 ### 2026-07-21 — zapisz() gubi nieznane pola istniejącego wpisu – cicha utrata danych
 Metoda zapisz() w pamięci proceduralnej nadpisywała tylko znane pola, gubiąc nieznane. Odkryto podczas adversarialnego przeglądu kodu. Naprawiono.
-
-### 2026-07-20 — Hotspoty: _py_supertrend i _py_volume_profile
-Czysto-pythonowe pętle O(okno) na wskaźnikach supertrend i volume_profile są ciężkie (okno 251, wiele symboli). Kandydaci do wektoryzacji numpy.
 
 ### 2026-07-20 — prekalkuluj_portfel – brak zysku algorytmicznego
 Funkcja wykonuje tę samą pracę per-bar co backtest pojedynczy, tylko równolegle (1.4× przyspieszenia). Nie zmniejsza złożoności, tylko maskuje problem.

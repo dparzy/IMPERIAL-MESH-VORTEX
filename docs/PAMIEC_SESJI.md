@@ -113,6 +113,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Detektor duplikatów Hyginusa
+W systemie istnieje gotowy detektor duplikatów oparty na Jaccardzie bi-gramów, ale nie jest używany. Stanowi darmowe narzędzie do filtracji kandydatów.
+
+### 2026-07-27 — Brak embeddingów w RAG
+sentence-transformers nie jest zainstalowany. RAG działa wyłącznie na czystym FTS – bez semantycznego podobieństwa.
+
+### 2026-07-27 — Nowa klasa wady w meldunkach
+Sekcja niepewności obok twierdzenia pewnego nie koryguje tezy głównej – twierdzenie wygrywa, bo czyta się pierwsze. Zgłoszono do Księgi Wad.
+
+### 2026-07-27 — Priorytet zwiadów zewnętrznych FRUMENTARIUS
+Kosztują ~74k tokenów i potwierdzają znane problemy – powinny być P1, nie P0. Sąd nad kolejką Hyginusa (35 cząstek) to realna produkcja etykiet i ma pierwszeństwo.
+
 ### 2026-07-27 — dodaj_checklist nie zapisuje na dysk
 dodaj_checklist() zwraca True i inkrementuje licznik w pamięci, ale nie wywołuje zapisz() – wpis nie trafia na dysk. Naprawiono przez dodanie zapisu.
 

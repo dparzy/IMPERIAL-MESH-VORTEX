@@ -14,6 +14,52 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-28 | 📕 | Dziennik przestał wstrzykiwać obalone twierdzenia jako fakty
+
+> *Wachta rozpoczęta 2026-07-27 przeszła przez północ — znalezisko i pomiary pochodzą z 07-27,
+> wdrożenie domknięte 07-28. Datujemy po dacie wdrożenia, bo to ona wiąże się z kodem.*
+
+**Znalezisko strukturalne, wykryte przy pytaniu Cezara „co znaczy 4 z 9".** Dziennik
+Nieśmiertelny jest wstrzykiwany **w całości** do kontekstu Architekta na starcie każdej sesji.
+INDEX FALSORUM — organ, którego jedynym zadaniem jest pilnowanie, by obalone twierdzenie nie
+żyło dalej jako fakt — ma katalogi `bibliotheca_ulpia` i `dane` na liście **pomijanych**.
+
+**Jedyny korpus czytany na pewno co rano był jedynym, którego strażnik fałszów nie skanował.**
+Dlatego liczba „Imperium używa 2 z ~9 zdarzeń hooka" przeżyła obalenie i została przeze mnie
+powtórzona Cezarowi jako fakt.
+
+**SKALA ZMIERZONA, nie oszacowana: 5 wpisów ze 130** głosiło twierdzenia już obalone —
+3× „backtest kwadratowy", 1× nieistniejąca właściwość `rules` w schemacie ustawień,
+1× liczba zdarzeń hooka. Wszystkie wracały co rano bez sprostowania.
+
+**MECHANIZM (bez nowego organu — Prawo XVI):** `index_falsorum.trafienia_w_tekscie()` bada
+TEKST zamiast pliku, a `dziennik_niesmiertelny._formatuj_wpis()` dokleja `⚠️ OBALONE (INDEX
+FALSORUM): <poprawna teza>` do wpisu, który niesie obaloną frazę. **Historii nie przepisujemy**
+(Prawo I) — wpis zostaje słowo w słowo, zmienia się wyłącznie to, co mu **towarzyszy**.
+Awaria strażnika nie może zabić Dziennika: bez osi czasu Architekt traci ciągłość projektu,
+więc przy błędzie strażnik milknie, a Dziennik idzie dalej.
+
+**WADA ZŁAPANA PRZY BUDOWIE — pierwsza wersja nie wykryła NICZEGO.** Heurystyka „okna
+prostującego" (jeśli w ±kilku liniach stoi jawna korekta, to nie alarm) sprawdza się w prozie,
+gdzie linia niesie jedno zdanie. Wpis Dziennika jest odwrotnością: **jedna „linia" to cały
+akapit o wielu tematach naraz**. We wpisie `nomen27` słowo „OBALON" dotyczyło U4 — twierdzenia
+zupełnie innego — i uciszało fałszywą liczbę zdarzeń stojącą linię wyżej. Strażnik milczał
+dokładnie tam, gdzie go budowałem. Okno jest teraz domyślnie wyłączone dla tekstu; sprostowanie
+musi stać **przy frazie**, nie gdziekolwiek w sąsiedztwie tematu.
+
+**DOWÓD MUTACYJNY — i lekcja o atrapach.** Z 3 mutacji jedna przeżyła **dwa** podejścia:
+mój test negacji był atrapą, bo fraza dosłowna `ziemia jest plaska` do zdania „ziemia NIE jest
+plaska" **nie pasuje** — test przechodził, bo regex nie trafiał, a nie dlatego, że negacja go
+uciszała. Druga próba (`\W{0,12}`) była atrapą z tego samego powodu: `\W` nie obejmuje liter,
+więc wstawione „NIE" znów rozrywało wzorzec. Dopiero `.{0,12}` — fraza **przekraczająca**
+negację — dotknęła sprawdzanej ścieżki. Ostatecznie **3 z 3 mutacji zabite**.
+
+**Bramka:** audyt exit 0, ruff czysto, skan wad czysto. **Pliki:**
+`imperium/biblioteki/index_falsorum.py`, `imperium/biblioteki/dziennik_niesmiertelny.py`,
+`tests/test_dziennik_prostuje.py` (nowy).
+
+---
+
 ## 2026-07-27 | 🚧 | Hooki PreToolUse/PostToolUse — CUSTOS LIMINIS i VIGIL (priorytet #1 Cezara)
 
 **Imperium używało 2 z 31 zdarzeń hooka (6.5%).** Rozkaz: domknąć wąsko — bariera przed

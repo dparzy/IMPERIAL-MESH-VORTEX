@@ -113,6 +113,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — dodaj_checklist nie zapisuje na dysk
+dodaj_checklist() zwraca True i inkrementuje licznik w pamięci, ale nie wywołuje zapisz() – wpis nie trafia na dysk. Naprawiono przez dodanie zapisu.
+
+### 2026-07-27 — Niezgodność testów: pytest vs runner Imperium
+Testy zielone pod pytest, ale padły pod runnerem Imperium z powodu braku setitem w shim monkeypatch. Naprawiono bez zależności od shimu.
+
+### 2026-07-27 — Błąd w ocenie czasu gnicia – 9 dni zamiast pół roku
+W LOG_ZMIAN i pamięci napisano 'pół roku', a faktyczny czas od utworzenia runbooka wynosił 9 dni. Błąd wykryty przy liczeniu dla podglądu Kapitolu – poprawiono we wszystkich miejscach.
+
+### 2026-07-27 — Asymetria testów: pytest vs runner Imperium
+Test przeszedł pod pytest, ale padł pod własnym runnerem Imperium przez brak `monkeypatch.setitem` w shimie. Wykryto rozjazd narzędzi – naprawiono przez uniezależnienie od shimu.
+
 ### 2026-07-27 — Bieg testów #1 nieważny – równoległość z mutacjami
 Testy startowały przed zmianą W22 i biegły w tle podczas sed-owania mutacji. Wynik '55 z 73' i exit 0 od tail, nie od testów. Ważny tylko bieg #2 wystartowany po wszystkich zapisach.
 
@@ -131,20 +143,11 @@ Wszystkie istniejące systemy pamięci (Mem0/Zep/Letta/A-Mem) są domenowo-ślep
 ### 2026-07-26 — Rozjazd repo z chmurą przez hooki po obu stronach
 Od wspólnego punktu e2cb846 chmura dorobiła 2 commity (sync+migawka), lokalnie 2 (auto: sync pamięci). Hooki commitują same po obu stronach – dwa ciągi wyrosły z tego samego pnia.
 
-### 2026-07-20 — 20 sprzeczności w Refleksji, 3 pilne
-Audyt startowy wykrył 20 sprzeczności, w tym 3 pilne: audytu/nowy, chmura/lokal/naprawa, false/faza – wymagają przeglądu.
-
 ### 2026-07-20 — Błąd replikacji wiedzy – Claude sam nie stosuje własnych procedur
 W poprzednich sesjach wielokrotnie brakowało aktualizacji dokumentów i ledgera, mimo że Claude tworzył procedury (np. ALMA, OBSERWATORY). To klasyczny błąd replikacji wiedzy – Claude tworzy narzędzia, ale sam ich nie używa.
 
 ### 2026-07-20 — Cztery zmysły działają na żywych danych
 Potwierdzono, że adaptery FearGreed (23), RSS (30 nagłówków), PSY (funding, CVD) i V (CVD) generują głosy. V-03 (CVD)→LONG, PSY-03 (FearGreed=23)→LONG kontrariańsko, NEWS-01→LONG. Abstynencje legalne (Prawo XV).
-
-### 2026-07-20 — Brudne drzewo – auto_lekcja_przetworzone.txt
-Audyt startowy wykazał 3 dopisane linie przez automat w pliku bibliotheca_ulpia/dane/auto_lekcja_przetworzone.txt. Nie jest to zmiana ręczna – wymaga decyzji Cezara.
-
-### 2026-07-20 — MoE niewykonalne na 6GB VRAM
-Mixture of Experts wymaga trzymania wszystkich ekspertów w pamięci jednocześnie. 4 eksperty po 7B wymagają ~28B RAM – na RTX 4050 (6GB) to niemożliwe.
 
 ### 2026-07-20 — Błąd cache/resume kluczowany tylko nazwą pliku w harnessach A/B
 Harnessy A/B (ab_tryb_strategii, ab_strategy_mwu, ab_wazenie_ic, ab_pnl_wazenie_ic) używają tylko nazwy pliku jako klucza cache, ignorując parametry konfiguracji.
@@ -181,9 +184,6 @@ Błąd klasy API-widma: dokumentacja indeksu/manualu zawiera komendy do plików,
 
 ### 2026-07-20 — 1003 z 1301 odwolan do dokumentow to kronika sesji
 Przenoszenie zywych dokumentow tworzy martwe linki w historii (Prawa I nie wolno poprawiac). Rozklad asymetryczny: zywe maja 1-19 odwolan, kronika 58-63. Przenoszenie jest drogie.
-
-### 2026-07-20 — Brak metadanych to źródło bałaganu
-64 dokumenty w docs/ mają zero nagłówków metadanych. Audyt nie wie, czym dokument jest, przez co bramki (np. W5, W10) opierają się na ręcznie wpisanych wyrażeniach zamiast na strukturze. To nie skaluje się do 213 plików .md.
 
 ### 2026-07-21 — Test negatywny PROBATORA wykrył błąd graniczny z '_'
 Znak '_' jest traktowany jako słowny przez \b, co powodowało fałszywe dopasowanie przy identyfikatorze BIB-006_Carson. Poprawiono test, nie organ – zastosowano inny separator.

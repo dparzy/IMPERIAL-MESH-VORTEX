@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/legiony/rejestr.py
-stan_na: 2026-07-16
+stan_na: 2026-07-26
 powod_istnienia: "JEDYNE oficjalne źródło prawdy o kodzie (Prawo XIX) — tabela kluczy ze statusem, nic nie istnieje bez wpisu tutaj"
 ---
 # 🔱 MANIFEST KODU IMPERIUM — Kontrola Prawa XIX

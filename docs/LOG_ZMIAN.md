@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-26
+stan_na: 2026-07-27
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,594 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-07-27 | 🔐 | Zakaz pushu przestał zależeć od pamięci Architekta — `permissions.deny`
+
+**Cenzus narzędzi sterowania (pytanie Cezara) znalazł sprzeczność między konstytucją
+a harnessem.** Rozkaz stały z 2026-07-11 brzmi: *„Claude NIGDY nie pushuje — push wykonuje
+wyłącznie Cezar ręcznie (nienaruszalny)"*. Tymczasem `.claude/settings.json` trzymał
+**`Bash(git push:*)` w `allow`**, a sekcji `deny` **nie było w ogóle** — czyli push był nie
+tylko dozwolony, ale **wstępnie zatwierdzony**, więc poszedłby bez pytania.
+
+**Jedyną barierą była dyscyplina Architekta. Zero mechanizmu.** I mamy zmierzony dowód,
+że to nie teoria: runbook W11 kazał Claude `git push` **przez 9 dni po zakazie** (naprawa
+2026-07-20). Najostrzejszy rozkaz Imperium miał najsłabsze egzekwowanie.
+
+**Lekarstwo (decyzja Cezara 2026-07-27):** sekcja `permissions.deny` z `Bash(git push:*)`,
+a dodatkowo reguła **usunięta z `allow`** — pas i szelki, żeby nie polegać wyłącznie na tym,
+że deny wygrywa pierwszeństwem. Efekt uboczny jest **pożądany**: przyszły wyjątek (jak
+jednorazowe odstępstwo z 2026-07-26) wymaga świadomej zmiany konfiguracji, a nie zgody
+Architekta w rozmowie.
+
+**Klasa:** ta sama, która przewija się przez całą wachtę — *dokument zamiast mechanizmu
+gnije, to tylko kwestia czasu*. Zmierzona symetria: Księga Wad ma **14.5%** automatycznego
+zasięgu (16 wzorców regex ze 115 wpisów), a warstwa uprawnień miała **0%** egzekwowania
+rozkazu nienaruszalnego.
+
+**Odłożone jako priorytet następnej sesji (rozkaz Cezara):** hooki `PreToolUse`/`PostToolUse`
+— Imperium używa **2 z ~9** dostępnych zdarzeń hooka, więc większość checklist pozostaje
+bez automatu.
+
+**Pliki:** `.claude/settings.json`.
+
+---
+
+## 2026-07-27 | 🛡️ | Recenzja cubic PR #134 — dwie ciche straty danych zamknięte
+
+**Werdykt nad 15 zgłoszeniami: najcięższe znowu nietrafione** (powtórka wzorca z PR #133).
+Zarzut P1, że `sigillum_probationis.json` wskazuje wiszący commit `a72fb23`, jest **FAŁSZYWY**
+— commit leży w gałęzi, w `origin` i jest przodkiem HEAD. Reszta trzyma poziom: dwa realne
+zgłoszenia opisywały mechanizmy, które **po cichu tracą dane**, i te zamknięto tą wachtą.
+
+### P0 — 277 wystąpień katalogu domowego w repo (PII + brak przenośności)
+
+Zmierzone: **30 plików, 277 wystąpień** nazwy konta w ścieżkach narzędziowych. To **NAWRÓT**:
+klasa została nazwana **dzień wcześniej** (archiwum lekcji 2026-07-26, „Commitowanie desktop
+paths łamie przenośność i PII"), ale została **lekcją, nie mechanizmem** — więc wróciła w skali.
+
+Organ redakcji `kronika_czatu._redaguj` **istniał i działał** — pilnował kluczy API — i właśnie
+dlatego nikt nie sprawdził, czy widzi ścieżki. Istnienie organu uspokaja mocniej niż jego brak.
+
+**Lekarstwo:** zasięg rozszerzony o katalog domowy, wyprowadzany z `Path.home()` — **nigdy
+z wpisanej nazwy konta**, bo utrwalałoby to w kodzie dokładnie tę daną, którą usuwamy.
+Wzorzec toleruje **trzy formy zapisu**, w których ta sama ścieżka żyje w transkrypcie naraz:
+proza (`C:\…`), ucieczka JSON (`C:\\…`) i POSIX (`C:/…`) — wzorzec łapiący jedną meldowałby
+sukces przy dwóch dalej wyciekających. Ścieżki repo zostają nietknięte (są użyteczne i nie
+niosą danych osobowych). Istniejące pliki oczyszczone tą samą funkcją: **30 plików, 281
+wystąpień**. Historii gita NIE ruszano — to decyzja Cezara, nie Architekta.
+
+### P1 — decyzja odwracająca poprzednią ginęła bez śladu
+
+`pamiec_sesji.czy_duplikaty` **we własnym docstringu** przyznaje, że widzi IDENTYFIKATORY,
+a nie KIERUNEK wniosku, i nazywa łagodzenie: „auto_lekcja LOGUJE każdy pominięty tytuł".
+`rejestr_wizji.dodaj()` zaimportował predykat **bez tego łagodzenia** — więc `return False`
+czytało się jak „duplikat, nic się nie stało". W rejestrze DECYZJI i ZMIAN, które **są
+historią**, cicha strata waży więcej niż w lekcjach.
+
+**Zreprodukowane** na przykładzie z tamtego docstringu: „ATR_MULT w EXP-07 za niski" kontra
+„…za wysoki" → drugi wpis przepadał. (Dzisiejsza para U4 ON/OFF **przeżyła** — tytuły różniły
+się dość mocno; wada jest węższa, niż twierdził recenzent, ale realna.)
+
+**POMIAR OBALIŁ MOJĄ PIERWSZĄ POPRAWKĘ, ZANIM JĄ WDROŻYŁEM.** Chciałem wyłączyć sito
+semantyczne dla „typów-historii". Pomiar na żywym rejestrze 820 wpisów pokazał, że sito robi
+realną robotę w KAŻDYM typie — ZMIANA 161 par, WIZJA 57, DECYZJA 19, POMYSŁ 15, i są to
+autentyczne parafrazy, nie odwrócenia. Wyłączenie wpuściłoby ~180 duplikatów. Lekarstwem na
+predykat bez kierunku nie jest jego usunięcie, tylko **uwidocznienie jego decyzji**.
+
+### Naprawione przy okazji
+Regex nagłówka kandydata (`kandydat\w*` łapało polską odmianę — „Kandydatura:" jako kandydat;
+**pierwsza poprawka była za słaba i złapał ją własny test**, dopiero wymóg separatora zamknął
+klasę; `przelicz` przed i po: **zero dryfu** opublikowanych liczb) · duplikat wycofania
+w INDEX FALSORUM (16→15) · literówka „uodporij" w skillu `/praca` · wpis archiwum lekcji
+mówiący „22/22" wbrew własnej treści → poprawiony wobec ŹRÓDŁA na **20/22, 2 fałszywe**.
+
+**Odłożone świadomie** (decyzja Cezara „reszta później"): 7 zgłoszeń niezweryfikowanych —
+W20 zdublowane znaczniki, walidacja `dot_ts` przy wyroku, przeliczanie tematów PROBATORA,
+3× notarius, backticki w kronice.
+
+**Dowód:** 3 mutacje na sanityzatorze + 2 na rejestrze wizji, **wszystkie zabite**, każda
+z kontrolą negatywną przyrządu i sprawdzeniem `ast.parse` — bo mutacja zabijająca przez
+`SyntaxError` wygląda identycznie jak „test broni" (złapane 3× w tej wachcie).
+Księga Wad 110 → 114.
+
+---
+
+## 2026-07-27 | 🚨 | NOMENCLATOR — detektor dubletów istniał, działał i NIE BYŁ WPIĘTY (Prawo XV)
+
+**Znalezione przez FRUMENTARIUSA, ale nie w tym, co przywiózł.** Zwiad zewnętrzny (rozkaz
+Cezara po decyzji o U4) wrócił z 3 realnymi pracami i **jedną zmyśloną liczbą** — cytował
+„F1 75% vs 81%" z arXiv 2506.22026, gdzie tabela ablacji **nie zawiera żadnego F1**
+(accuracy 89.66% dla pełnego systemu), a wariantu ze statyczną listą w promptcie ta praca
+w ogóle nie testuje. Twierdzenie „bezpośrednio potwierdza nasz wynik" było fałszywe.
+
+**Wartość zwiadu leżała w kierunku, nie w treści:** „przenieś anty-redundancję z promptu do
+sprawdzenia PER KANDYDAT". Trop poprowadził do własnego kodu i tam czekała utrata potencjału:
+
+> `policz_duplikaty` + `leksykon_roju` — deterministyczny detektor za **0 tokenów**, hartowany
+> dwiema naprawami (ślepota na `WIELKIE_Z_PODKRESLENIEM`; 4 z 7 formatów nagłówka sklejające
+> plon) — żył **wyłącznie w stanowisku pomiarowym**. Produkcyjny zwiad go nie wołał.
+
+Czyli: płaciliśmy modelowi 1.49× za deklarację „nie dubluje" o zmierzonej **zerowej wartości**
+(100% trafień), mając obok darmowy grep, który działa. **Mierzący miał przyrząd, mierzony nie.**
+
+**Lekarstwo:** organ `imperium/pretorianie/nomenclator.py` (Strażnik Imion — rzymski
+*nomenclator* szeptał panu imiona mijanych osób). Kod **PRZENIESIONY, nie skopiowany**:
+`ab_plon_hyginusa` re-eksportuje z organu, a test żąda **TOŻSAMOŚCI OBIEKTÓW** — dwie kopie
+rozjechałyby się przy pierwszej naprawie leksykonu, a rozjazd byłby cichy, bo obie
+przechodziłyby własne testy. Wpięcie w `scout_temat` jako **opt-in OFF** (ZASADA WPIĘCIA).
+
+**Samo-dowód musiał się przeprowadzić razem z kodem:** dawniej wystarczyło wykluczyć
+`__file__`, bo leksykon i pomiar były jednym plikiem. Po wyodrębnieniu `ab_plon_hyginusa.py`
+wpadłby do korpusu dowodowego — a jest pełen prozy o mierzonych pojęciach. Wykluczenie jest
+teraz jawnym zbiorem `_POZA_KORPUSEM` z testem żądającym RÓWNOŚCI z liczbą policzoną z dysku
+(nie luźnego progu — ta klasa przeżyła mutację 07-27).
+
+**Pomiar po wdrożeniu:** leksykon 32/32 zweryfikowane, **0 widm** — zachowanie bit-identyczne
+mimo szerszego wykluczenia, co dowodzi, że żadne pojęcie nie było udowadniane prozą pomiaru.
+Na żywej kolejce: **20 ze 112** kandydatów nieosądzonych (17.9%) nosi znane imię, przy
+zmierzonej redundancji ~39.3% — organ łapie **około połowy**, zgodnie z własną deklaracją
+(głos mocny, milczenie słabe). **3 mutacje, 3 zabite**, każda z dowodem zmiany pliku
+i z kontrolą negatywną przyrządu (bez mutacji rc=0 — inaczej „ZABITA" znaczyłoby tylko,
+że harness zawsze zwraca błąd).
+
+**Czego NIE zrobiono i dlaczego:** walidacja per kandydat na 8 osądzonych cząstkach **nie
+wyszła** — etykieta „dublet" żyje w prozie uzasadnienia **per cząstka**, nie per kandydat,
+więc liczby TP/FP/FN byłyby artefaktem ziarna. Precyzja i recall **nieznane**; policzymy je
+po sądzie nad 35 cząstkami, bo sąd jest pracą etykietującą. Do tego czasu organ zostaje OFF.
+
+**Pliki:** `imperium/pretorianie/nomenclator.py` (nowy), `tests/test_nomenclator.py` (12 testów),
+`narzedzia/ab_plon_hyginusa.py` (re-eksport), `narzedzia/bibliotekarz.py` (wpięcie + `--nomenclator`),
+`tests/test_bibliotekarz.py` (+2), `docs/ARCHITEKTURA_IMPERIUM.md`, CENSUS 244 → 245.
+
+---
+
+## 2026-07-27 | ⚖️ | U4 (świadomość systemu) → domyślnie OFF — DECYZJA CEZARA po replikacji
+
+**Zamknięcie sprawy otwartej od poprzedniej wachty.** Rozkaz z 07-21 („U4 domyślnie ON")
+opierał się na tezie *−12.1 pp duplikatów, p=0.016*. Ta teza padła: przeliczenie tego samego
+zapisanego plonu detektorem bez ślepych plam dało OFF 39.3% vs ON 41.0%, p=0.766, a replikacja
+na **128 świeżych pomiarach** (łącznie 256 biegów) dała **−0.7 pp, CI [−7.3, +6.0], p=0.888**.
+
+**Rachunek, który rozstrzygnął:** koszt **1.49× jest ZMIERZONY i pewny**, korzyść mieści się
+w szumie. Moc testu na efekt 12 pp = 94.2% (taki efekt wykluczony); na 5 pp = 31% — małego
+efektu **nie wykluczamy i nie udajemy, że wykluczyliśmy**.
+
+**Co zostaje prawdą mimo OFF** (celowo zachowane w kodzie i dokumentach): zwiad bez tego bloku
+proponuje moduły, które już mamy — **39.3%** kandydatów nazywa pojęcie obecne w kodzie.
+Zmierzone jest tylko to, że **ten blok tego nie naprawia**. Ciężar anty-redundancji przechodzi
+więc na **sędziego z `grep`em**, bo deklaracja modelu „nie dubluje" padała przy 100% kandydatów
+— także przy VPIN, który stoi w kodzie jako `VPIN_50`.
+
+**Mechanika przełącznika:** `--swiadomosc` włącza z powrotem (A/B wymaga obu ramion);
+`--bez-swiadomosci` zostaje jako zgodność wsteczna bez mocy sprawczej — stare polecenie
+z tą flagą dostaje dokładnie to, o co prosiło. Domyślne `False` **na obu poziomach**
+(`scout_temat` i `raport`), bo CLI widzi ten drugi — test parytetu pilnuje obu sygnatur,
+żeby decyzja nie obowiązywała w połowie ścieżek wywołania.
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py` (test domyślności odwrócony
+wraz z powodem + nowy test parytetu sygnatur), `docs/ZADANIE_TIRO_E3_ZNIWO.md`.
+INDEX FALSORUM pilnuje obalonej tezy od 07-27 — bez nowego wpisu (Prawo XVI).
+
+---
+
+## 2026-07-27 | 🚨 | Δ wachty kłamała zerem — punkt odniesienia kasowany przez wznowienie sesji
+
+**Złapane WŁASNYM krokiem domknięcia (4b), nie przez alarm.** BREVIARIUM zameldowało
+`Δ wachty: bez zmian w liczbach sług` — podczas gdy ta sama wachta osądziła **8 cząstek**
+(kolejka 43 → 35) i dołożyła **5 par TIRO** (212 → 217). Miara dorobku pokazywała zero.
+
+**Przyczyna z pomiaru, nie z domysłu:** hook `SessionStart` woła `--migawka` przy **KAŻDYM**
+zdarzeniu — także `resume`, a wznowień bywa w wachcie kilka (ta miała trzy). Każde zapisywało
+stan **bieżący** jako „stan z otwarcia", więc różnica z definicji wychodziła zerowa. Plik
+migawki miał znacznik czasu z ostatniego wznowienia, nie z otwarcia — to był dowód.
+
+To **dokładnie ta klasa, przeciw której delta powstała** („rzecz widoczna tylko na jednym końcu
+procesu") — i piąty nawrót rodziny „miara mierzy siebie zamiast rzeczy".
+
+**Lekarstwo — cykl zamknięty:** `zapisz_migawke` ma teraz strażnika **pierwszy zapis wygrywa**
+(kolejne wywołania nie ruszają punktu), a `delta()` **ZUŻYWA** migawkę po odczycie. Otwarcie
+stawia punkt, domknięcie go konsumuje. Gdy wachta nie domknie się porządnie, stary punkt
+przetrwa i różnica obejmie obie — to jest UCZCIWE („od ostatniego domknięcia"), w przeciwieństwie
+do wyzerowanej. **2 mutacje, 2 zabite.**
+
+Klasa w Księdze Wad: *każdy „stan początkowy" zapisywany przez hook wołany wielokrotnie musi
+mieć straż przed nadpisaniem.*
+
+**Pliki:** `imperium/oczy/breviarium.py`, `tests/test_breviarium.py` (+2 testy granic).
+
+---
+
+## 2026-07-27 | 🔬 | REPLIKACJA A/B U4 — efekt nie istnieje + FRUMENTARIUS (trzeci zwiad)
+
+**Decyzja Cezara: „(c) powtórzyć A/B naprawionym przyrządem".** Wykonane tego samego dnia:
+128 nowych pomiarów (16 tematów rdzenia × 4 rundy × 2 ramiona), rundy **5–8**, żeby świeża próba
+nie zlała się w raporcie ze skompromitowaną kampanią 07-21 (rundy 1–4).
+
+| | kandydatów | dublety | dubl % |
+|---|---|---|---|
+| ŚWIEŻA 07-27 — OFF | 212 | 90 | 42.5% |
+| ŚWIEŻA 07-27 — ON | 201 | 79 | **39.3%** |
+| **ŁĄCZNIE 256 biegów** — OFF | 436 | 178 | 40.8% |
+| **ŁĄCZNIE 256 biegów** — ON | 401 | 161 | **40.1%** |
+
+Świeża próba: **−3.1 pp, Fisher p=0.549**. Łącznie 837 kandydatów: **−0.7 pp, 95% CI [−7.3, +6.0],
+p=0.888**. Liczba NOWYCH kandydatów w świeżej próbie **identyczna: 122 vs 122**.
+
+**MOC TESTU, nie samo p** (bez tego „brak efektu" znaczy tyle co nic): na publikowane **−12 pp moc
+wynosi 94.2%** — gdyby efekt tej wielkości istniał, zobaczylibyśmy go. Nie zobaczyliśmy.
+**GRANICA UCZCIWOŚCI:** przy 5 pp moc spada do 31%, więc **mały efekt NIE jest wykluczony** —
+wykluczony jest efekt WIELKOŚCI PUBLIKOWANEJ. Koszt zmierzony na tej samej próbie: **1.49× pieniędzy,
+1.46× czasu**.
+
+**DO DECYZJI CEZARA:** blok U4 pełni DWIE funkcje — anty-duplikat (zmierzony, nie działa) oraz
+świadomość luk Prawa XV (**NIEZMIERZONA**). Wyłączenie traci obie; to samo pytanie wraca więc jako
+„czy odchudzić blok do części o lukach".
+
+### 🐎 FRUMENTARIUS — trzeci zwiad Imperium (ROZKAZ CEZARA)
+
+Cezar: *„zawsze jak jest problem z rozstrzygnięciem możemy wysłać szybkiego ultra ekonomicznego
+subagenta z docelowym precyzującym metapromptem"*. Luka nazwana trafnie: Imperium miało zwiad
+WEWNĘTRZNY (Hyginus) i SĘDZIEGO (Opus), a zero kanału na pytanie **„jak rozwiązali to inni"**.
+Skodyfikowane w `/wiedza` (pełne rozkazy), `/gradus` (wiersz tabeli), CLAUDE.md (wyzwalacz).
+Barierki: próg opłacalności (zimny start ~50–66k tokenów → tylko gdy odpowiedzi NIE MA w repo),
+5 obowiązkowych części metapromptu, meldunek = KANDYDAT.
+
+**Pierwszy zwiad wysłany na realne utknięcie i barierka od razu zarobiła** — trzy jego przesłanki
+o naszym systemie okazały się fałszywe po sprawdzeniu u nas: (1) „macie indeks wektorowy" —
+tabela `wektory` ma **0 wierszy**; (2) propozycje na `rapidfuzz`/`sentence-transformers`/
+`datasketch`/`sklearn` — **żadnej z tych bibliotek nie mamy**; (3) „weźcie te ~150 kandydatów, które
+już macie oznaczone" — mamy **8 wyroków / 21 kandydatów**.
+
+**Najcenniejsze przyszło z tej trzeciej pomyłki:** każda z pięciu metod potrzebuje do kalibracji
+progu OZNACZONEGO ZBIORU ODNIESIENIA, którego nie ma. Ale on właśnie powstaje — **sąd nad kolejką
+JEST pracą etykietującą**. Wniosek zmienia kolejność prac: najpierw dokończyć sąd (137 oznaczonych
+kandydatów), potem kalibrować detektor. Odwrotnie znaczyłoby dobierać próg z powietrza, czyli
+powtórzyć dzisiejszy błąd innym narzędziem.
+
+### 🚨 Wada złapana na sobie: INDEX FALSORUM gubił wycofane frazy
+
+Poprawiając zapis o U4 (`wycofaj` → `dodaj` z lepszą treścią) dostałem `False` i **strażnik spadł
+z 7 pozycji na 6, meldując „korpus czysty"** — choć właśnie przestał pilnować obalonej tezy.
+Przyczyna: `dodaj` liczyło duplikat wobec `wczytaj()` (CAŁA historia), a ledger jest append-only,
+więc wycofany rekord zostaje w pliku na zawsze — **raz wycofanej frazy nie dało się zarejestrować
+ponownie**. Naprawa: dedup wobec `aktywne()`. To milczenie udające wynik: `False` czyta się jak
+nieszkodliwe „już jest". **2 mutacje, 2 zabite.** Klasa w Księdze Wad: *w ledgerze append-only
+każdy predykat „czy już mam" musi pytać o STAN BIEŻĄCY, nie o historię.*
+
+**Pliki:** `imperium/biblioteki/index_falsorum.py`, `tests/test_index_falsorum.py` (+1 test),
+`.claude/skills/wiedza/SKILL.md` (+FRUMENTARIUS), `.claude/skills/gradus/SKILL.md`, `CLAUDE.md`,
+`narzedzia/bibliotekarz.py` (sprostowane liczby), `docs/LOG_ZMIAN.md`, ledgery CODEX/INDEX/Księga Wad.
+
+---
+
+## 2026-07-27 | ⚖️ | SĄD NAD KOLEJKĄ — mechanizm WYROKU + partia 1 (8 cząstek osądzonych)
+
+**Dlaczego kolejka rosła od 07-14 do 43 cząstek — POMIAR, nie domysł.** Zanim wydałem pierwszy
+wyrok, sprawdziłem, gdzie go zapisać. **Nigdzie.** Zwiadowca umiał dopisać plon (`zapisz_czastke`),
+nikt nie umiał go domknąć. To nie było zaniedbanie sędziego, tylko **brakujący krok procesu** — a
+brakujący krok wygląda w meldunku identycznie jak lenistwo i tak był raportowany („dług przeglądu").
+
+**Mechanizm (bez nowego organu — Prawo XVI):** `zapisz_wyrok()` dopisuje do **tego samego pliku
+kolejki** osobny rekord `status="wyrok"` wskazujący cząstkę przez `dot_ts`. Plon zwiadowcy zostaje
+**nietknięty** (Prawo I — nie przepisujemy cudzego meldunku po fakcie); życie cząstki czyta się
+jako łańcuch zwiad → wyrok. BREVIARIUM odejmuje osądzone z OBU liczników — inaczej sąd
+**podnosiłby** meldowany dług zamiast go spłacać, a każdy wyrok liczyłby się jako nowy plon.
+Werdykty: `PRZYJETY` / `ODRZUCONY` / `CZESCIOWO`, uzasadnienie obowiązkowe (wyrok bez powodu to
+nie wyrok), idempotencja po `dot_ts`. **6 mutacji, 6 zabitych.**
+
+**PARTIA 1 — 8 cząstek, 21 kandydatów. Przyjęte 3, odrzucone 18.** Wyrok opierał się na
+**sprawdzeniu w kodzie**, nie na deklaracji zwiadowcy „nie dubluje" (która padała przy KAŻDYM
+kandydacie, także przy VPIN):
+
+| # | temat | wyrok | powód w jednym zdaniu |
+|---|---|---|---|
+| 1 | VPIN / toxicity | ODRZUCONY | VPIN = Z-01, PIN = W-381, OI-persistencja bez danych tickowych |
+| 2 | news sentiment | ODRZUCONY | NEWS-01 już zwraca wartość ciągłą; PCA na 15 parach to szum |
+| 3 | COT / put-call | ODRZUCONY | brak adaptera COT i opcji akcyjnych — mierzalne tylko na cudzym rynku |
+| 4 | on-chain | **CZĘŚCIOWO** | 2 przyjęte (perp:spot, szerokość ekstremum), 2 dublety (K-03, OC-04) |
+| 5 | momentum/breakout | ODRZUCONY | OBV = V-01, dywergencje = XII-07 i V-06, filtr MA to budulec strategii |
+| 6 | mean reversion | ODRZUCONY | RSI+BBANDS+ATR już liczone; to kombinacja klocków, nie informacja |
+| 7 | reżim zmienności | **CZĘŚCIOWO** | MS-GARCH warunkowo do pomiaru dekorelacji; Kalman/VIX/DCC odpadają |
+| 8 | order flow / absorpcja | ODRZUCONY | wymaga L2; „absorpcja" to Z-06 Amihud innymi słowami |
+
+**NAJCIEKAWSZE ZNALEZISKO SĄDU — przeterminowana przesłanka zwiadowcy.** Cząstka 8 proponowała
+Bulk Volume Classification jako *zamiennik* dla V-03 (CVD), bo „V-03 czeka na dane". Cenzus
+adapterów uruchomiony w tej wachcie pokazuje **V-03 ŻYWY** (BTCUSDT=−6.91 [SHORT], 15 głosów).
+Zwiad zebrany 07-15 sądzi Imperium sprzed miesiąca — **im dłużej cząstka czeka na sędziego, tym
+bardziej jej przesłanki gniją.** To argument za sądzeniem na bieżąco, nie za zbieraniem zapasu.
+
+**Wzorzec odrzuceń:** z 18 odrzuconych **11 to dublety zweryfikowane w kodzie**, 5 odpada na braku
+danych (COT, opcje akcyjne, L2), 2 to kombinacje istniejących klocków. Krytyka (v4-pro) w 3 z 8
+cząstek sama meldowała „NIE znaleziono dowodów przeciw" i **sama nazywała to sygnałem stronniczości
+potwierdzenia** — to działa dokładnie tak, jak miało działać po przeniesieniu krytyki na `osad`.
+
+**Pliki:** `narzedzia/bibliotekarz.py` (+`zapisz_wyrok`, `osadzone_ts`), `imperium/oczy/breviarium.py`
+(odejmowanie osądzonych + licznik `osądzonych`), `tests/test_bibliotekarz.py` (+5 testów granic),
+`docs/KOLEJKA_HIPOTEZ_BIBLIOTEKARZ.jsonl` (8 wyroków), CODEX (+3 sugestie-kandydaci).
+
+---
+
+## 2026-07-27 | 🚨 | WERDYKT A/B U4 OBALONY — kłamał przyrząd, nie system
+
+**Znalezione przy P1 (sąd nad 43 cząstkami Hyginusa), zanim padł pierwszy wyrok.** Triaż kolejki
+oparłem na istniejącym przyrządzie LIBRA MESSIS (`podziel_kandydatow` + `policz_duplikaty`) —
+i pierwszy wynik był podejrzany: cząstka proponująca wprost `VPIN_TOKSYCZNOŚĆ` **nie została
+uznana za dublet**, choć VPIN stoi w kodzie jako Z-01 (`NeuronToxicFlow`, wskaźnik `VPIN_50`).
+
+**DWIE ŚLEPE PLAMY, obie zmierzone:**
+1. **`\b` nie przekracza podkreślenia.** `\bvpin\b` NIE trafia w `VPIN_TOKSYCZNOSC` — podkreślenie
+   jest znakiem słowa. Nazwy modułów piszemy właśnie WIELKIMI_Z_PODKREŚLENIEM, więc miara dubli
+   była ślepa na naszą własną konwencję.
+2. **4 z 7 formatów nagłówka** (`### Kandydat A:`, `### Kandydat 1:`, `1:`, `- **Kandydat:**`)
+   sklejały cały plon w jeden blok — licznik kandydatów kłamał w dół, a sklejka ma jeden nagłówek,
+   więc dublety widziano tylko dla PIERWSZEGO kandydata z każdej sklejki.
+
+To **nawrót klasy już raz naprawionej w tej samej funkcji**: poprzednim razem dołożono jeden
+brakujący wariant składni zamiast domknąć klasę „ślepa plama detektora na wariant składni".
+
+**SKUTEK — WERDYKT A/B U4 UPADA.** Przeliczenie **tego samego zapisanego surowego plonu**
+(kampania 07-21, 72+72 biegi; zapisane liczby dubli 81/47 zgadzają się z publikacją co do sztuki):
+
+| kampania `u4_rdzen` (64+64) | kandydatów | dublety | dubl % |
+|---|---|---|---|
+| U4 OFF — publikacja 07-21 | 203 | 81 | 39.9% |
+| U4 ON — publikacja 07-21 | 169 | 47 | **27.8%** |
+| U4 OFF — **naprawiony przyrząd** | 224 | 88 | 39.3% |
+| U4 ON — **naprawiony przyrząd** | 200 | 82 | **41.0%** |
+
+Publikowane „−12 pp, Fisher p=0.016, ISTOTNE" zamienia się w **+1.7 pp na NIEKORZYŚĆ ON,
+Fisher p=0.766 — efektu nie ma.** Ramię OFF wychodzi niemal identycznie jak w publikacji
+(39.3% vs 39.9%), całe przesunięcie siedzi w ramieniu ON (27.8% → 41.0%) — dokładnie tam,
+gdzie detektor był ślepy.
+
+**SPROSTOWANIE W TEJ SAMEJ WACHCIE (moje).** Pierwszy raport z tego biegu podawał 35.5% vs
+36.4%, bo napisałem WŁASNY skrypt przeliczający, który grupował plon tylko po ramieniu i
+wmieszał pilotaż (bieg `u4`, 8+8 tematów) do kampanii głównej. Tymczasem
+`ab_plon_hyginusa.py przelicz` **już istniał** i partycjonuje po polu `bieg`. Werdykt się nie
+zmienił, liczby tak. Lekcja jest ostrzejsza niż „pomyliłem się": własny skrypt obok
+istniejącego organu powiela nie tylko pracę, ale i **ryzyko błędu** — a ja sprawdzam CLI
+cudzych narzędzi przed użyciem, nie po.
+
+**MECHANIZM, nie sama liczba** — i to on przesądza, że to artefakt, a nie pech próby:
+
+| ramię | kandydatów | nazwanych `WIELKIE_Z_PODKREŚLENIEM` |
+|---|---|---|
+| U4 OFF | 248 | **0 (0.0%)** |
+| U4 ON | 225 | **78 (34.7%)** |
+
+Blok U4 pokazuje modelowi NASZE klucze, więc ramię ON zaczyna nazywać kandydatów naszą
+konwencją — **dokładnie tą, na którą detektor był ślepy**. Przyrząd nie widział dubli tam, gdzie
+zabieg działał. Klasyczny confounding: mierzyliśmy skuteczność zabiegu narzędziem, które sam
+zabieg oślepiał.
+
+**CO ZOSTAJE PRAWDĄ:** diagnoza, która U4 zrodziła — zwiad nieznający roju proponuje to, co rój
+ma. 35.5% kandydatów ramienia OFF nazywa istniejące pojęcie. **CO UPADŁO:** że U4 to naprawia.
+
+**MOJA WŁASNA POPRAWKA TEŻ BYŁA WADLIWA — i to zmierzone, nie przemilczane.** Pierwsza wersja
+wzorca dopisała swobodne `\s*`, co zniosło limit wcięcia `^\s{0,3}` i zaczęło uznawać za
+kandydatów **zagnieżdżone kroki instrukcji** (+12 widm w jednym rekordzie). Wychwycone kontrolą
+„czy nowy podział tworzy kandydatów z niczego", zanim policzyłem cokolwiek na serio.
+
+**Dowód odporności: 5 mutacji, 5 zabitych** — i osobna lekcja: pierwsze podejście do mutacji przez
+`sed`/`re.sub` **nie wgrało 3 z 4 zmian** (złe escapowanie) i raportowało „22 passed", czyli
+fałszywy dowód. Mutacja musi najpierw UDOWODNIĆ, że plik się zmienił.
+
+**DO DECYZJI CEZARA (kierunkowa — nie przełączam sam):** U4 jest domyślnie ON i kosztuje **1.46×**.
+Koszt jest pewny, korzyść — nieudowodniona. Opcje: (a) zostawić ON (blok niesie też luki Prawa XV,
+nie tylko anty-duplikat), (b) przełączyć na OFF do czasu rzetelnego A/B, (c) powtórzyć A/B
+naprawionym przyrządem na świeżej próbie.
+
+**Pliki:** `narzedzia/ab_plon_hyginusa.py` (wzorzec + normalizacja `_`), `tests/test_ab_plon_hyginusa.py`
+(+6 testów granic), `narzedzia/bibliotekarz.py` (komentarz U4 sprostowany), INDEX FALSORUM (+1),
+CODEX (+1 pomiar), Księga Wad (+4 klasy).
+
+---
+
+## 2026-07-27 | 📚 | DECYZJA C: `docs/README` zdegradowany do wskaźnika + Warstwa 22 (jeden katalog)
+
+**Rozkaz Cezara: „P0 dawaj"** — rozstrzygnięcie pytania decyzyjnego wiszącego od 07-26
+(SUGESTIA #77 w CODEX, zgłoszona przy sądzie nad recenzją cubic PR #133).
+
+**POMIAR PRZED DECYZJĄ.** `docs/README.md` trzymał **ręczny** spis dokumentów obok katalogu
+**generowanego** przez Tabularium do `INDEKS_IMPERIUM.md`. Policzone wobec żywego korpusu:
+ręczny spis wymieniał **22 z 56** plików `docs/*.md` — **33 dokumenty (59% korpusu) były dla
+niego niewidzialne**, w tym `MANIFEST_KODU`, `LOG_ZMIAN`, `PROFIL_CEZARA`, `START_LOKAL` i
+wszystkie trzy `WIZJA_*`. Katalog generowany widział 100%. Drugie źródło prawdy nie „może"
+zgnić — **zgniło**, a nikt tego nie zauważył przez wiele wacht, bo drugi spis nie boli od razu.
+
+**WERDYKT: opcja (a) — wskaźnik.** Opcja (b) („generować `docs/README` z Tabularium") odrzucona
+po rozważeniu: dawałaby **dwie generowane kopie tej samej tabeli** — redundancja bez nowej
+informacji (Prawo XVI), dwa artefakty do regeneracji i dwie bramki zamiast jednej. Wskaźnik
+kosztuje zero i jest zgodny z doktryną powtórzoną już trzy razy (CENSUS ORGANORUM W17, SIGLA
+IMPERII, katalog W20): **lekarstwem na gnicie jest odebranie dokumentowi prawa do własnej treści.**
+
+**MECHANIZM, NIE ŁATKA — WARSTWA 22 (twarda).** Samo skasowanie tabeli byłoby łatką; spis odrodzi
+się przy pierwszym „dopiszę tu tylko jeden link". W22 broni KLASY: żaden dokument w `docs/` poza
+`INDEKS_IMPERIUM.md` nie ma prawa urosnąć do rozmiaru katalogu. **Próg zamiast zera — po pomiarze,
+nie z opinii:** skan całego `docs/` dał INDEKS 73 wiersze (generowany, zwolniony), README 26
+(usunięte), `MANUAL_DODAWANIE_AGENTOW` 2, `WIZJONER` 1 — **nic pomiędzy**. Próg **5** leży w tej
+pustce, z zapasem nad zmierzonym maksimum przypadkowym. Zero byłoby fałszywym alarmem: dokument
+ma pełne prawo wskazać kilka innych. Liczone są wyłącznie **pierwsze kolumny** wierszy tabeli —
+wzmianka o pliku w kolumnie opisu to opis, nie pozycja spisu (ta sama pułapka zasięgu, którą W19
+złapała na sobie samej).
+
+**ZASIĘG — PYTANIE ZADANE OSOBNO OD LOGIKI.** Pierwsza wersja W22 skanowała sam katalog `docs/` —
+i byłaby kolejnym nawrotem klasy „bramka o wąskim zasięgu daje fałszywy spokój" (W11 pilnowała 1
+katalogu z 11; dedup lekcji widział 91 z 298). Zmierzone: Tabularium deklaruje **74 żywe dokumenty,
+w tym 8 spoza `docs/`** (`CLAUDE.md`, `README.md`, `ZASADY_FUNDAMENTALNE.md`, `imperium/README.md`
+i in.) — katalog może odrodzić się tam równie dobrze. Zasięg poszerzony na wszystkie zadeklarowane
+dokumenty przed commitem, nie po incydencie.
+
+**DOWÓD, ŻE BRAMKA BRONI — 6 MUTACJI, 6 ZABITYCH** (próg→999, zwolnienie INDEKSU→puste, skan całego
+wiersza zamiast kolumny 1, pusta lista plików, zawężenie zasięgu do `docs/`, pominięcie pierwszego
+dokumentu). **Jedna mutacja PRZEŻYŁA pierwsze podejście** i to jest tu najważniejsze: test zasięgu
+miał asercję `zbadane >= len(poza) + 40`, więc zawężenie do `docs/` (65 zamiast 73 dokumentów)
+spokojnie ją spełniało. Luźny próg nie mierzy zasięgu — mierzy własną wygodę. Asercja zamieniona na
+**równość z liczbą policzoną ze źródła** (`zbierz_dokumenty()` minus zwolnione). Zgodnie z lekcją
+z wachty tiro27: gdy mutacja przeżyje, nie dopisuj kolejnego testu na ślepo — ustal, czego stary
+NIE mierzył. Obie klasy dopisane do Księgi Wad (99 wpisów).
+
+**Efekt uboczny (spodziewany):** W20 natychmiast wykryła zmianę opisu README w katalogu INDEKSU —
+regeneracja `tabularium.py katalog --zapisz`. Bramka złapała własną zmianę, zanim złapał ją człowiek.
+
+**Pliki:** `docs/README.md` (spis → wskaźnik), `narzedzia/audyt_spojnosci.py` (+W22),
+`tests/test_spojnosc.py` (+5 testów granic), `docs/INDEKS_IMPERIUM.md` (katalog zregenerowany),
+`bibliotheca_ulpia/dane/rejestr_testow.jsonl` (SUGESTIA #77 zamknięta + pomiar).
+
+---
+
+## 2026-07-27 | 🎓 | Szkoła TIRO: filtr wg RODZAJU zadania + konsensus — 178→212 par użytecznych
+
+**Rozkaz Cezara: „wg rekomendacji".** Punktem wyjścia była jego własna partia pomiarowa
+z 07-26 (10 tematów Hyginusa, `--pelny`), która dała pierwszy twardy **współczynnik przeżycia**:
+2,2 użytecznej pary na temat → ~374 tematy do progu 1000.
+
+**WADA GŁÓWNA (Prawo XV).** Rozbicie ledgera par na źródła pokazało: `news_llm` **102 pary → 0
+użytecznych**. Przyczyna: JEDEN próg długości (200 znaków) dla DWÓCH różnych rodzajów zadania.
+Próg powstał dla prozy, gdzie krótka odpowiedź znaczy „nie wiem"; dla klasyfikacji poprawny
+werdykt `{"sentyment":…, "pewnosc":…}` ma 34–41 znaków **z definicji**. 27% ledgera było
+niewidzialne dla treningu, a meldunek nazywał ten martwy strumień postępem Szkoły.
+
+**Naprawa mechanizmem, nie obniżeniem progu** (obniżenie byłoby naginaniem miary pod wynik):
+`rodzaj_pary` rozdziela prozę od klasyfikacji, a każdy rodzaj dostaje test **właściwy sobie** —
+proza długość, klasyfikacja poprawność struktury. Notarius bada strukturę, nigdy semantykę
+dziedziny (inaczej ledger treningowy zacząłby się znać na sentymencie rynku).
+
+**KONSENSUS — dług spłacony, nie nowy pomysł.** Pole `odcisk_pytania` istniało wprost po to,
+„żeby eksport mógł grupować próbki tego samego pytania (konsensus)", a eksport odkładał to
+na E4 i brał **pierwszą z brzegu**. Zmierzone: w 3 z 32 wielopróbkowych pytań pierwsza próbka
+ma **znak przeciwny** do mediany — 9% etykiet uczyło byka zamiast niedźwiedzia.
+
+**PROBATOR — zasięg, nie predykat (czwarty nawrót klasy).** Warstwa badała DWA plony
+(kandydatów i krytykę), a czytaliśmy jeden. Zmierzone na partii 07-26: kandydaci 10/10 czyści,
+**krytyka 1 PODEJRZANY + 1 BEZ_CYTATU** — meldunek ogłaszał „podejrzanych 0". Skażona krytyka
+to broń wytrącona sędziemu, bo krytyka jest OBRONĄ przed złym kandydatem. Tej samej klasy było
+`pary_uzyteczne` nieobecne w delcie: domknięcie raportowałoby „+2 surowe" zamiast „+35 użytecznych".
+
+**Dowód mutacją — i trzy fałszywe obrony.** Z sześciu mutacji **trzy przeżyły** pierwsze
+podejście: bramka poprawności JSON (broni jej konsensus, nie test), raport bibliotekarza (×2 —
+broniono wyłącznie BREVIARIUM). Każda dostała test ścieżki, która nie ma innego obrońcy.
+Przy okazji własny test odsłonił, że `KOLEJKA.relative_to(ROOT)` wywracało **cały raport już po
+opłaceniu skanu DeepSeekiem** — kosmetyka niszczyła pracę zapłaconą.
+
+**Decyzja B Cezara wykonana:** 70 linii obcego materiału Consilium/KUN wyjęte z
+`docs/PLAN_ROZBUDOWY_BIBLIOTEKI.md` do kwarantanny `wrzutnia/consilium/` (gitignorowana),
+z dowodem: plik po wycięciu bloku jest bit-w-bit wersją z HEAD.
+
+**Wycofane:** filtr tematów już odpytanych — `_tematy_ukonczone()` istnieje od poprawki Cubic P2.
+72 „duplikaty" to celowe wielopróbkowanie z kampanii A/B LIBRA MESSIS, nie brak filtra.
+
+**Pliki:** `imperium/biblioteki/notarius.py`, `imperium/oczy/breviarium.py`,
+`narzedzia/bibliotekarz.py`, `tests/test_notarius.py`, `tests/test_breviarium.py`,
+`tests/test_bibliotekarz.py`, Księga Wad (+5 klas), CODEX (+3 pomiary).
+**Bramka:** testy 2946/2946, audyt exit 0, skan wad czysto.
+
+---
+
+## 2026-07-27 | 💰 | Odchudzanie konstytucji 787→253 linie — −11k tokenów na każdej sesji
+
+**Rozkaz Cezara: „rób wg rekomendacji i pamiętaj, że mamy postępować, a nie cofać się".**
+
+**Krok 0 obalił własny fundament planu.** Teza ze zwiadu Sonneta (env26), że reguły można
+ładować wg ścieżek przez `rules: paths:`, **nie ma pokrycia** — schemat ustawień Claude Code
+nie definiuje właściwości `rules`. Przetrwała dwie wachty jako „fakt zweryfikowany cytatem".
+Trafiła do INDEX FALSORUM. Ten sam schemat **potwierdził** za to naprawę z recenzji cubica:
+`effortLevel` przyjmuje wyłącznie `low/medium/high/xhigh`, a *max i ultracode są sesyjne* —
+nasze `POZIOMY_TRWALE` zgadzają się co do joty. Sprawdzenie zwróciło się podwójnie.
+
+**Przebudowa oparta na SKILLACH** — mechanizmie dowiedzionym w tym repo. Treść 20 rozkazów
+stałych **przeniesiona dosłownie** (streszczenie rozkazu byłoby cofnięciem) do sześciu
+skilli ładowanych na żądanie: `/gradus`, `/spojnosc`, `/autonomia`, `/praca`, `/ledgery`,
+`/wiedza`. W konstytucji została linia-wyzwalacz niosąca **esencję**, żeby zachowanie nie
+cofnęło się, gdy skill nie jest wczytany.
+
+**Zmierzone przez AERARIUM (nie oszacowane): stały koszt startu 20 639 → 9 640 tokenów.**
+CLAUDE.md: 53 200 → 17 769 znaków.
+
+**Najryzykowniejszy krok planu okazał się zbędny.** Plan zakładał przebudowę SIGILLARIUM,
+bo „pieczęć czyta kroki z CLAUDE.md". Pomiar kodu: `LIMES` trzyma komendy w kodzie i ma
+pustą sekcję, a konstytucję parsują wyłącznie `APERTIO` i `CLAUSURA`. Zostawiając obie
+checklisty na miejscu, nie dotknąłem najwrażliwszego organu — ryzyko było w planie, nie w kodzie.
+
+**Dwa testy parytetu oblały i miały oblać** (obie asercje zakładały, że treść żyje w
+CLAUDE.md). Nie osłabione — przekierowane: parytet GRADUS sprawdza `/gradus` **oraz** żąda,
+by konstytucja zachowała wyzwalacz; równość „każdy skill = pieczęć" poluzowana świadomie,
+ale skill bez pieczęci musi nieść cytat rozkazu, inaczej każdy przypadkowy katalog
+przechodziłby jako „no przecież to rozkaz".
+
+**Warstwa 21 (twarda):** każdy `/skill` cytowany w konstytucji musi istnieć na dysku.
+Odchudzanie samo stworzyło tę klasę wady — rozkaz odesłany do nieistniejącego skilla jest
+**gorszy** niż gruby CLAUDE.md, bo staje się nieosiągalny, a Architekt nie wie, że go zgubił.
+Warstwa liczy wyłącznie zapis ``**`/nazwa`**``, więc goły ukośnik w prozie nie produkuje
+fałszywego alarmu — lekcja z W19 zastosowana od razu, nie po fakcie.
+
+**Dług długości został ALARMEM, nie bramką** (253 > 200 doktrynalnych). Progu nie
+podniesiono, żeby plik „przeszedł". Droga do 200 wiedzie przez przeniesienie checklist
+otwarcia/zamknięcia, co dopiero **wymagałoby** przebudowy pieczęci — twarde blokowanie
+commitów za dług, którego naprawa jest ryzykowna, wymuszałoby pośpiech na najwrażliwszym
+organie. Przy okazji: opis `LIMES` w kodzie mówił „audyt 17 warstw" — czwarte miejsce
+z ręczną liczbą warstw w tej wachcie.
+
+**Pliki:** `CLAUDE.md`, `.claude/skills/{gradus,spojnosc,autonomia,praca,ledgery,wiedza}/`,
+`narzedzia/audyt_spojnosci.py`, `imperium/cesarz/aerarium.py`,
+`imperium/biblioteki/sigillarium.py`, `tests/{test_spojnosc,test_aerarium,test_sigillarium}.py`.
+
+---
+
+## 2026-07-27 | 🔬 | Sąd nad recenzją cubic PR #133 — 20/22 słuszne, dwie nowe warstwy audytu
+
+**Cezar kazał sprawdzić, czy recenzent ma rację. Osądziłem każde z 22 znalezisk wobec
+żywego kodu: 20 słusznych, 2 fałszywe — w tym jedyne P1 okazało się halucynacją.**
+
+**Obalone:** (1) zarzut „ręcznej edycji `sigillum_probationis.json`" cytował DWIE
+nieistniejące reguły — `grep` po całym korpusie `.md` nie znajduje tego pliku poza
+diffstatem kroniki, a zapisuje go automatycznie `tests/run_tests.py` po każdym biegu.
+(2) „katalog `wrzutnia/consilium/` nie istnieje" — istnieje, jest gitignorowany;
+recenzent pomylił *niewidoczne w repo* z *nie ma*, czyli dokładnie tę klasę abstynencji,
+przed którą Imperium się broni.
+
+**Naprawione u źródła (kod):** filtr zbioru SFT wydzielony do jednego generatora
+(`notarius.pary_sft`) — eksport i licznik nie mogą się już rozjechać; licznik par TIRO
+przestał serializować cały zbiór do pliku tymczasowego dla jednej liczby i dostał jawny
+ledger; `aerarium` przestał padać na poprawnym JSON-ie o złym kształcie i przestał
+podawać CUDZĄ pamięć jako nasz pomiar.
+
+**Testy, które nic nie broniły:** skasowana TAUTOLOGIA (`korpus_ksiazek_obecny() ==
+(ksiazki_w_bazie() > 0)` — porównanie wyrażenia z własną definicją, przechodziło zawsze),
+parytet GRADUS pilnuje teraz także KLUCZY wysiłku, a niezmiennik sesyjności objął
+`ultracode`. Każda poprawka udowodniona MUTACJĄ: pod zepsutym kodem nowy test oblewa.
+
+**Przyczyna źródłowa duplikatów — ZMIERZONA:** dedup lekcji przeglądał 91 wpisów
+aktywnych i nie widział 207 zarchiwizowanych (69% korpusu poza zasięgiem bramki).
+Chłodzenie wyprowadzało bliźniaka poza pole widzenia, więc auto-lekcja zapisywała tę
+samą treść ponownie. To POWTÓRKA wady z cubic PR #118 — naprawiono wtedy PREDYKAT, ale
+nie ZASIĘG. Ironia potwierdza diagnozę: najczęściej powielona lekcja (4×) mówi „archiwum
+niewidoczne dla `szukaj()`". Rejestr wizji dedupował po samym napisie, więc parafrazy
+DeepSeeka wchodziły podwójnie; teraz oba rejestry dzielą JEDEN predykat, a pominięcie
+jest głośne (Prawo XV). Sprzątanie: ACTA 207→188, pamięć aktywna 91→89, ledger 827→803 —
+wariant bogatszy zostaje, dwie pary świadomie NIE scalone (różne strategie / obserwacja
+wraz z jej rozstrzygnięciem).
+
+**Dwie nowe warstwy audytu (CORONY):**
+- **W19 — parytet dat:** `stan_na` we frontmatterze musi równać się „Stan na:" w nagłówku.
+  Cubic znalazł jeden taki rozjazd, mechanizm znalazł pięć kolejnych. Warstwa złapała też
+  własny fałszywy alarm (cytat „Stan na:" w prozie changelogu i daty SEKCJI) — zasięg
+  zawężony do nagłówka dokumentu, bo warstwa pilnująca prawdy nie może produkować nieprawdy.
+- **W20 — katalog nietknięty:** sekcja generowana w INDEKS musi być tym, co wypluwa
+  Tabularium. Ręczny wiersz siedział w sekcji CONSILIUM przy `kategoria: DISCIPLINA`;
+  regeneracja ujawniła dodatkowo trzy nieaktualne daty. Porównujemy strukturę, świadomie
+  pomijając linię „Ostatni spis" — inaczej audyt żądałby przepisania katalogu codziennie.
+
+Przy okazji: docstring audytu deklarował „16 warstw" przy 18 w kodzie — usunięta ręczna
+liczba, została sama lista (klasa wady W15).
+
+**Pliki:** `imperium/biblioteki/notarius.py`, `imperium/oczy/breviarium.py`,
+`imperium/cesarz/aerarium.py`, `imperium/biblioteki/pamiec_sesji.py`,
+`imperium/biblioteki/rejestr_wizji.py`, `narzedzia/audyt_spojnosci.py`,
+`narzedzia/auto_lekcja.py`, `tests/*`, `README.md`, `docs/README.md`,
+`docs/INDEKS_IMPERIUM.md`, `docs/MANIFEST_KODU.md`, `docs/SCIAGA_LOKAL.md`.
 
 ---
 

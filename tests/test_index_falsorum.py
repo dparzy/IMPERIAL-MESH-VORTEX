@@ -163,3 +163,27 @@ def test_wycofanie_wymaga_powodu_i_istniejacej_frazy():
             assert False, f"musi odrzucic: {kwargs}"
         except ValueError as e:
             assert oczekiwane in str(e)
+
+
+# ── PONOWNA REJESTRACJA PO WYCOFANIU (naprawa 2026-07-27) ────────────────────
+
+def test_fraza_wraca_pod_straz_po_wycofaniu(tmp_path):
+    """Wycofaną frazę MUSI dać się zarejestrować ponownie — inaczej poprawianie wpisu
+    (wycofaj → dodaj lepszą treść) cicho GUBI twierdzenie.
+
+    Zmierzone na żywym organie 2026-07-27: dedup szedł wobec CAŁEGO ledgera (append-only,
+    więc wycofany rekord zostaje w pliku na zawsze), przez co `dodaj` zwracało False —
+    co czyta się jak nieszkodliwe „już jest" — a INDEX spadł z 7 pozycji na 6 i zameldował
+    „korpus czysty", choć właśnie przestał pilnować obalonej tezy.
+    """
+    from imperium.biblioteki.index_falsorum import aktywne, dodaj, wycofaj
+    p = tmp_path / "falsa.jsonl"
+    assert dodaj(fraza="teza X", poprawna_teza="stara", obalone_przez="pomiar", sciezka=p)
+    assert dodaj(fraza="teza X", poprawna_teza="druga", obalone_przez="pomiar",
+                 sciezka=p) is False, "duplikat AKTYWNEJ frazy nadal musi być odrzucany"
+    assert wycofaj(fraza="teza X", powod="zastąpione lepszą treścią", sciezka=p)
+    assert [r["fraza"] for r in aktywne(p)] == []
+    assert dodaj(fraza="teza X", poprawna_teza="nowa, mocniejsza", obalone_przez="replikacja",
+                 sciezka=p) is True, "po wycofaniu fraza musi móc wrócić pod straż"
+    wroc = aktywne(p)
+    assert len(wroc) == 1 and wroc[0]["poprawna_teza"] == "nowa, mocniejsza"

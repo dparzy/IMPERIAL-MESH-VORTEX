@@ -176,7 +176,8 @@ def _rdzenie_tytulu(tytul: str) -> frozenset:
 
 
 def duplikat_lekcji(tytul: str, tresc: str = "",
-                    plik: Path = DOMYSLNY_PLIK) -> Optional[Dict[str, str]]:
+                    plik: Path = DOMYSLNY_PLIK,
+                    z_archiwum: bool = True) -> Optional[Dict[str, str]]:
     """
     Zwraca ISTNIEJĄCĄ lekcję mówiącą to samo (lub None). Podstawa dedupu auto-lekcji.
 
@@ -188,10 +189,30 @@ def duplikat_lekcji(tytul: str, tresc: str = "",
     Świadomie ZACHOWAWCZY: przy ubogiej sygnaturze (< MIN_TOKENOW_SYGNATURY) sito 2 milczy.
     Wolimy przepuścić duplikat niż scalić dwie różne lekcje — fałszywe scalenie kasuje
     wiedzę bezpowrotnie, fałszywy duplikat kosztuje kilka linii pliku.
+
+    🚨 ZASIĘG OBEJMUJE ARCHIWUM (`z_archiwum=True`, naprawa 2026-07-26) — bez tego bramka
+    pilnowała mniejszości korpusu. Zmierzone w dniu naprawy: 91 lekcji aktywnych WIDZIANYCH
+    wobec 207 zarchiwizowanych NIEWIDZIANYCH, czyli 69% poza zasięgiem. Mechanizm wady:
+    `konsoliduj_lekcje` schładza lekcję do ACTA, jej bliźniak znika z pola widzenia, a
+    auto-lekcja przy następnej sesji zapisuje tę samą treść jako „nową".
+
+    To POWTÓRKA wady naprawianej po recenzji cubic PR #118 („4 kopie tej samej lekcji").
+    Naprawiono wtedy PREDYKAT (dedup semantyczny zamiast porównania napisów), ale nie
+    ZASIĘG — więc ta sama wada wróciła innymi drzwiami. Klasa: „naprawa predykatu bez
+    naprawy zasięgu"; siostra wady W11 pilnującej 1 katalogu z 11 (2026-07-20).
+
+    Ironia potwierdzająca diagnozę: najczęściej powielona lekcja (4×) mówi „archiwum lekcji
+    niewidoczne dla `szukaj()`". Archiwum było niewidoczne również dla DEDUPU.
     """
     for lek in lekcje(plik):
         if czy_duplikaty(tytul, tresc, lek["tytul"], lek["tresc"]):
             return lek
+    if z_archiwum:
+        archiwum = _archiwum_dla(plik)
+        if archiwum.exists():
+            for lek in lekcje(archiwum):
+                if czy_duplikaty(tytul, tresc, lek["tytul"], lek["tresc"]):
+                    return {**lek, "schlodzona": True}
     return None
 
 

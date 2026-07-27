@@ -614,10 +614,51 @@ def test_klucz_abstynujacy_nie_nadpisuje_dokumentu():
         os.unlink(sciezka)
 
 
-def test_korpus_ksiazek_obecny_zgodny_z_liczba():
-    """`korpus_ksiazek_obecny()` musi być spójny z `ksiazki_w_bazie()` w KAŻDYM środowisku
-    (chmura: brak korpusu → False; lokal: 115 ksiąg → True). Jedno źródło prawdy."""
-    from imperium.biblioteki.srodowisko_pamieci import (
-        korpus_ksiazek_obecny, ksiazki_w_bazie,
-    )
-    assert korpus_ksiazek_obecny() == (ksiazki_w_bazie() > 0)
+def test_brak_korpusu_daje_none_a_nie_zero(monkeypatch):
+    """KONTRAKT ABSTYNENCJI: bez korpusu `ksiazki` = None (nie wiem), NIGDY 0 (zmierzone zero).
+
+    Poprzednia wersja tego testu była TAUTOLOGIĄ i została skasowana świadomie (recenzja
+    zewnętrzna 2026-07-26): porównywała `korpus_ksiazek_obecny()` z `(ksiazki_w_bazie() > 0)`,
+    czyli wyrażenie z jego własną definicją — `bool == ten sam bool`. Przechodziła zawsze,
+    w każdym stanie świata, nie broniąc niczego, a świeciła na zielono jak prawdziwa bramka.
+    To najgroźniejsza odmiana wady „kłamie przyrząd, nie system": milczący test daje spokój
+    bez pokrycia.
+
+    Testujemy więc niezmiennik, który NAPRAWDĘ chroni dokumenty: gdy środowisko nie widzi
+    korpusu, Tabularium ma ABSTYNOWAĆ, bo inaczej Warstwa 15 każe przepisać w dokumentach
+    prawdziwe „115" na fałszywe „0" (to się wydarzyło 2026-07-26 w sześciu plikach).
+    Podstawiamy OBIE odpowiedzi środowiska, więc test mówi to samo w chmurze i na lokalu.
+    """
+    import narzedzia.tabularium as tab
+
+    from imperium.biblioteki import srodowisko_pamieci as sp
+
+    monkeypatch.setattr(sp, "korpus_ksiazek_obecny", lambda: False)
+    monkeypatch.setattr(sp, "ksiazki_w_bazie", lambda: 0)
+    monkeypatch.setattr(sp, "fragmenty_w_bazie", lambda: 551)
+    bez_korpusu = tab.wartosci_z_kodu()
+    assert bez_korpusu["ksiazki"] is None, "brak korpusu to abstynencja, nie zmierzone zero"
+    assert bez_korpusu["fragmenty"] is None, "fragmenty bez korpusu też są niewiadomą"
+
+    monkeypatch.setattr(sp, "korpus_ksiazek_obecny", lambda: True)
+    monkeypatch.setattr(sp, "ksiazki_w_bazie", lambda: 115)
+    monkeypatch.setattr(sp, "fragmenty_w_bazie", lambda: 37331)
+    z_korpusem = tab.wartosci_z_kodu()
+    assert z_korpusem["ksiazki"] == 115, "widoczny korpus MUSI dać liczbę, nie None"
+    assert z_korpusem["fragmenty"] == 37331
+
+
+def test_korpus_obecny_znaczy_niezerowa_liczba(monkeypatch):
+    """GRANICA odwrotna: deklaracja „korpus jest" przy ZEROWEJ liczbie to sprzeczność.
+
+    Gdyby te dwie funkcje kiedykolwiek się rozjechały (dziś jedna jest zbudowana na drugiej,
+    jutro mogą mieć osobne źródła), dokumenty dostałyby „0 książek" podane jako POMIAR.
+    Test pilnuje relacji między nimi przez PODSTAWIENIE, a nie przez porównanie funkcji
+    z samą sobą — inaczej wracamy do tautologii.
+    """
+    from imperium.biblioteki import srodowisko_pamieci as sp
+
+    monkeypatch.setattr(sp, "ksiazki_w_bazie", lambda: 0)
+    assert sp.korpus_ksiazek_obecny() is False, "zero książek ≠ obecny korpus"
+    monkeypatch.setattr(sp, "ksiazki_w_bazie", lambda: 1)
+    assert sp.korpus_ksiazek_obecny() is True, "jedna książka wystarcza — korpus JEST"

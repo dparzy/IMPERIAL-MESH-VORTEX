@@ -115,8 +115,11 @@ do kolejki. Z tego liczymy plan reszty (a nie z ekstrapolacji sprzed korekty).
 
 ### Zasady tej kampanii (wszystkie już egzekwowane przez kod)
 
-- **U4 (świadomość systemu) domyślnie ON** — nie proponuje modułów, które już mamy.
-  Zmierzone: −12 pp duplikatów przy identycznej liczbie nowych pomysłów (p=0.016).
+- **U4 (świadomość systemu) domyślnie OFF** od 2026-07-27 (decyzja Cezara). Teza „−12 pp
+  duplikatów, p=0.016" została **OBALONA** — stary detektor nie widział dubletów pisanych
+  WIELKIE_Z_PODKRESLENIEM, a właśnie tę konwencję blok U4 podpowiadał. Replikacja na 256
+  biegach: −0.7 pp, CI [−7.3, +6.0], p=0.888, przy zmierzonym koszcie **1.49×**. Anty-duplikat
+  egzekwuje **sędzia grepem przy wyroku**, nie prompt. Włącznik: `--swiadomosc`.
 - **PROBATOR** sprawdza cytaty BIB deterministycznie, 0 tokenów. Działa naprawdę
   dopiero od naprawy 07-21 — to pierwsze kampanie z **prawdziwymi** werdyktami cytatów.
 - **Faza krytyki idzie na profil `osad` (v4-pro)** — droższa 3,46×, wybrana z asymetrii
@@ -131,7 +134,10 @@ do kolejki. Z tego liczymy plan reszty (a nie z ekstrapolacji sprzed korekty).
 Kandydaci z kolejki to ⚠️ **HIPOTEZY, nie fakty** (ZASADA ZWIADOWCY WIEDZY). Rozstrzyga
 pomiar areny, nie zdanie DeepSeeka. Poprzedni sąd (07-21, 33 cząstki) wykazał, że kolejka
 była **w dużej mierze redundantna** — VPIN, Value Area, Kelly, CVD, Kalman już istniały.
-Dlatego U4 jest teraz domyślnie włączone; ta kampania jest pierwszym testem, czy pomogło.
+Ta redundancja jest **realna i dalej aktualna** (39.3% kandydatów nazywa pojęcie obecne
+w kodzie), ale lekarstwem NIE okazał się blok U4 — zmierzono, że go nie zmniejsza. Dlatego
+ciężar anty-redundancji spoczywa na **sądzie**: każdy kandydat sprawdzany `grep`em, bo
+deklaracja modelu „nie dubluje" padała przy 100% kandydatów, także przy VPIN.
 
 ---
 

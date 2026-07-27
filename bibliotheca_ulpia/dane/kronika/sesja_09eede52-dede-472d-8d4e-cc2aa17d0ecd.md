@@ -269,7 +269,7 @@ Ekipa wyruszyła (subagent Sonnet) — czyta `wrzutnia/MCP opcje.md` w całości
 <task-notification>
 <task-id>a238a88043a52fe9b</task-id>
 <tool-use-id>toolu_01GCfmdsGLWuAvzRUFFj2RLr</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\a238a88043a52fe9b.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\a238a88043a52fe9b.output</output-file>
 <status>completed</status>
 <summary>Agent "Sprawdź MCP opcje.md we wrzutni" finished</summary>
 <note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
@@ -541,7 +541,7 @@ W tle wciąż domyka się bramka commita funding (`pomiar_funding_ic.py`) — sp
 <task-notification>
 <task-id>b0mt7quzy</task-id>
 <tool-use-id>toolu_01RzAtWdrzdwHp8LSePtuCCP</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\b0mt7quzy.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\b0mt7quzy.output</output-file>
 <status>completed</status>
 <summary>Background command "Pełny suite świeżo" completed (exit code 0)</summary>
 </task-notification>
@@ -859,7 +859,7 @@ Daj znać jak przejdziesz rejestrację, albo jeśli utknie na którymś kroku.
 <task-notification>
 <task-id>bsxhjn7ix</task-id>
 <tool-use-id>toolu_01RuWCtZZxNGC1TT7bU6qUiq</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\bsxhjn7ix.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\bsxhjn7ix.output</output-file>
 <status>completed</status>
 <summary>Background command "Bramka: testy + audyt jeden łańcuch" completed (exit code 0)</summary>
 </task-notification>
@@ -960,7 +960,7 @@ You've hit your session limit · resets 5:30pm (Europe/Warsaw)
 <task-notification>
 <task-id>b5iiwlnbn</task-id>
 <tool-use-id>toolu_01YUodgeFmHdJQijnzzZQa2j</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\b5iiwlnbn.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\b5iiwlnbn.output</output-file>
 <status>completed</status>
 <summary>Background command "Ruff + bramka DVOL" completed (exit code 0)</summary>
 </task-notification>
@@ -1046,7 +1046,7 @@ Pracuje w tle. Gdy wróci, dam Ci: tabelę endpointów Coinalyze z wyróżnienie
 <task-notification>
 <task-id>af78bc7f6a7514ba8</task-id>
 <tool-use-id>toolu_011YHJpsVwVraLYQL7Do1nFw</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\af78bc7f6a7514ba8.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\af78bc7f6a7514ba8.output</output-file>
 <status>completed</status>
 <summary>Agent "Prześwietl Coinalyze + plik źródeł" finished</summary>
 <note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
@@ -1220,7 +1220,7 @@ Runner w końcowej fazie (widać logi backtestów). Dam mu skończyć — powiad
 <task-notification>
 <task-id>bpnx5h45n</task-id>
 <tool-use-id>toolu_01U3rVHVwyT4hmPUz4HhC7F3</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\bpnx5h45n.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\bpnx5h45n.output</output-file>
 <status>completed</status>
 <summary>Background command "Bramka MONETA (testy+audyt)" completed (exit code 0)</summary>
 </task-notification>
@@ -1271,7 +1271,7 @@ Co wybierasz: **wpiąć DVOL jako pilot**, czy jeszcze dokończyć zwiad (Deribi
 <task-notification>
 <task-id>b3uuug370</task-id>
 <tool-use-id>toolu_01P6Y17YntXXkk3sCGzvHjRX</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\b3uuug370.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\b3uuug370.output</output-file>
 <status>completed</status>
 <summary>Background command "Bramka MONETA relaunch" completed (exit code 0)</summary>
 </task-notification>
@@ -1477,7 +1477,7 @@ Oba backtesty wciąż liczą (851 barów × 2 symbole × 2 biegi). Czekam na pow
 <task-notification>
 <task-id>bblu8vekk</task-id>
 <tool-use-id>toolu_01MqTY1dCWKFVJyU1xoMv7UV</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\bblu8vekk.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\bblu8vekk.output</output-file>
 <status>completed</status>
 <summary>Background command "Ruff + uruchom A/B DVOL" completed (exit code 0)</summary>
 </task-notification>
@@ -1620,7 +1620,7 @@ Bieg B/A wciąż liczy (3205 barów × 5 par to duży backtest). Poczekam na pow
 <task-notification>
 <task-id>b0ybxk5pq</task-id>
 <tool-use-id>toolu_01P5kxoqJQ55Bej6NVwGqcBC</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\b0ybxk5pq.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\b0ybxk5pq.output</output-file>
 <status>completed</status>
 <summary>Background command "Ruff + uruchom A/B stablecoin" completed (exit code 0)</summary>
 </task-notification>
@@ -1689,7 +1689,7 @@ You've hit your session limit · resets 4:10am (Europe/Warsaw)
 <task-notification>
 <task-id>bg6pn9kla</task-id>
 <tool-use-id>toolu_018X4kQxuvuVVoSAeDVWvcvM</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\bg6pn9kla.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\bg6pn9kla.output</output-file>
 <status>completed</status>
 <summary>Background command "Pełny suite dla K-03" completed (exit code 0)</summary>
 </task-notification>
@@ -1743,7 +1743,7 @@ A/B USD wciąż liczy dwa biegi po 3205 barów (to trwa kilka minut). Czekam na 
 <task-notification>
 <task-id>bdltryl43</task-id>
 <tool-use-id>toolu_01FtucGJ8ARQcf12JKYLj8nm</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\bdltryl43.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\09eede52-dede-472d-8d4e-cc2aa17d0ecd\tasks\bdltryl43.output</output-file>
 <status>completed</status>
 <summary>Background command "Ruff + A/B USD" completed (exit code 0)</summary>
 </task-notification>

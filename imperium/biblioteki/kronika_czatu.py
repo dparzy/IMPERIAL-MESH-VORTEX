@@ -60,11 +60,43 @@ _WZORY_SEKRETOW = [
 ]
 
 
+# Redakcja KATALOGU DOMOWEGO (recenzja cubic PR #134, P0 — potwierdzona pomiarem 2026-07-27:
+# 277 wystąpień w 30 plikach kroniki). Transkrypty niosą ścieżki narzędziowe w rodzaju
+# `C:\Users\<user>\AppData\Local\Temp\claude\...`, więc do repo trafiała NAZWA KONTA Cezara
+# i lokalizacje specyficzne dla maszyny — dane osobowe plus referencje nieprzenośne.
+#
+# TO BYŁ NAWRÓT, NIE NOWOŚĆ. Klasa została nazwana dzień wcześniej (archiwum lekcji
+# 2026-07-26: „Commitowanie desktop paths łamie przenośność i PII"), ale została LEKCJĄ,
+# a nie MECHANIZMEM — i wróciła w 277 egzemplarzach. Organ redakcji ISTNIAŁ; miał tylko
+# za wąski zasięg: pilnował kluczy API i nie wiedział nic o ścieżkach. To ta sama klasa
+# co bramka pilnująca jednego katalogu z jedenastu.
+#
+# DOM BIERZEMY Z `Path.home()`, NIGDY z wpisanej nazwy konta: mechanizm ma działać na
+# maszynie każdego, kto uruchomi Imperium, a wpisanie „Ian" na sztywno utrwaliłoby w kodzie
+# dokładnie tę daną, którą usuwamy.
+def _wzorzec_domu(dom: str):
+    """Katalog domowy → wzorzec tolerujący WSZYSTKIE formy zapisu separatora.
+
+    Ta sama ścieżka żyje w transkrypcie w trzech postaciach naraz: `C:\\Users\\X` (proza),
+    `C:\\\\Users\\\\X` (po ucieczce w JSON) i `C:/Users/X` (narzędzia POSIX-owe). Wzorzec
+    dopasowujący tylko jedną z nich zostawiłby dwie — czyli redakcja meldowałaby sukces,
+    a dane dalej by wyciekały (klasa „milczenie udające wynik")."""
+    czesci = [c for c in re.split(r"[\\/]+", dom) if c]
+    return re.compile(r"[\\/]{1,2}".join(re.escape(c) for c in czesci), re.IGNORECASE)
+
+
+_WZORZEC_DOMU = _wzorzec_domu(str(Path.home()))
+
+
 def _redaguj(tekst: str) -> str:
-    """Zamienia ciągi wyglądające na klucz API na [ZREDAGOWANO] — bezpieczeństwo."""
+    """Zamienia klucze API na [ZREDAGOWANO], a katalog domowy na `~` — bezpieczeństwo.
+
+    Kolejność jest istotna: sekrety redagujemy PRZED ścieżkami, bo klucz może wystąpić
+    wewnątrz ścieżki, a `~` skróciłoby kontekst, w którym wzorzec klucza jeszcze pasował.
+    """
     for wzor in _WZORY_SEKRETOW:
         tekst = wzor.sub("[ZREDAGOWANO]", tekst)
-    return tekst
+    return _WZORZEC_DOMU.sub("~", tekst)
 
 
 def _tekst_z_tresci(c) -> str:

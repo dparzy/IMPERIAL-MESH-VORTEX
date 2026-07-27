@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-26
+## Ostatnia aktualizacja: 2026-07-27
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,35 +113,26 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Bieg testów #1 nieważny – równoległość z mutacjami
+Testy startowały przed zmianą W22 i biegły w tle podczas sed-owania mutacji. Wynik '55 z 73' i exit 0 od tail, nie od testów. Ważny tylko bieg #2 wystartowany po wszystkich zapisach.
+
+### 2026-07-27 — Mutacja przeżyła przez luźny próg asercji
+Test zasięgu miał asercję 'zbadane >= 8+40', co przepuściło zawężenie z 73 do 65 dokumentów. Wymieniono na równość z liczbą policzoną ze źródła. Obie klasy do Księgi Wad. Nota nie wystawiona (błąd nie dostarczony).
+
+### 2026-07-26 — Aerarium – filtrować obce projekty Claude
+Obecność jednego obcego katalogu projektu Claude powoduje, że aerarium raportuje jego pamięć i koszty jako własne, zamiast zwrócić no match. Należy filtrować, aby uniknąć fałszywych danych.
+
+### 2026-07-26 — Kronika sesji – zakaz bezwzględnych ścieżek z nazwą użytkownika
+Linie z absolutnymi ścieżkami desktopu (~\Desktop\) ujawniają PII i strukturę katalogów. Używać zmiennych środowiskowych lub przechowywać referencje wewnątrz repozytorium dla przenośności.
+
+### 2026-07-26 — Regime-stale bug: pamięć branżowa ślepa na reżim rynku
+Wszystkie istniejące systemy pamięci (Mem0/Zep/Letta/A-Mem) są domenowo-ślepe – wydobywają lekcje z bull marketu podczas bessy. Nasza poprawka: × regime_match w scoringu.
+
 ### 2026-07-26 — Rozjazd repo z chmurą przez hooki po obu stronach
 Od wspólnego punktu e2cb846 chmura dorobiła 2 commity (sync+migawka), lokalnie 2 (auto: sync pamięci). Hooki commitują same po obu stronach – dwa ciągi wyrosły z tego samego pnia.
 
-### 2026-07-26 — Path('/home/tiro') na Windows nie działa z startswith('/')
-Path('/home/tiro') na Windows normalizuje się do \home\tiro, więc startswith('/') zwraca False. Abstynencja działała tylko w jedną stronę. Naprawa mechanizmem, nie łatką.
-
-### 2026-07-26 — Audyt czerwony niewidoczny przez hook stdout
-Hook utrwala tylko stdout, alarmy audytu lecą na stderr. Przy czerwonym wyniku stdout jest pusty – wygląda ciszej niż zielony. Klasa wady z apert26: milczenie udające spokój.
-
-### 2026-07-26 — TIRO: 153 uzyteczne pary = 15% progu 1000
-Zbior treningowy TIRO to 348 surowych/153 uzytecznych par, co stanowi 15% docelowego progu 1000. Wymaga kontynuacji sniwa (zadanie E3) przed uruchomieniem pelnego treningu.
-
-### 2026-07-26 — Brak kluczy MEXC uniemozliwia live trading
-MEXC_API_KEY i MEXC_SECRET nie sa ustawione w srodowisku. Zero realnych orderow pomimo gotowego kodu (ccxt 4.5.59). Niezbedne do przejscia na live.
-
-### 2026-07-26 — Testy 2882/2885 - 3 obalone, w tym jedna nowa wada
-Dwie porazki wynikaja z niesledzonego consilium (znane), trzecia to osobna wada wymagajaca analizy. Pelny bieg testow wciaz leci w tle, stan oficjalnie nieznany.
-
-### 2026-07-26 — Audyt spójności ukrywa czerwony wynik (stderr zamiast stdout)
-W narzedziu audyt_spojnosci.py alarmy sa wypisywane na stderr (linie 1160-1163), podczas gdy hook zbiera tylko stdout. W efekcie czerwony audyt jest niewidoczny w wydruku startowym - sesja wyglada ciszej niz zdrowa. To odwrocona wersja wady klasy 'milczenie udajace wynik' z apert26.
-
-### 2026-07-26 — Audyt spójności kończy się exit 1 i hook milczy
-Podczas audytu środowiska komenda zakończyła się kodem błędu (exit 1), a hook w kroku 0 nie wyświetlił żadnej treści – to klasyczna wada 'milczenie udające wynik'.
-
 ### 2026-07-20 — 20 sprzeczności w Refleksji, 3 pilne
 Audyt startowy wykrył 20 sprzeczności, w tym 3 pilne: audytu/nowy, chmura/lokal/naprawa, false/faza – wymagają przeglądu.
-
-### 2026-07-20 — Hipoteza B potwierdzona OOS
-Ważenie głosów IC (Legatus) daje +3.6pp na 5/5 parach poza próbą – czeka na zgodę Cezara na wpięcie do kodu.
 
 ### 2026-07-20 — Błąd replikacji wiedzy – Claude sam nie stosuje własnych procedur
 W poprzednich sesjach wielokrotnie brakowało aktualizacji dokumentów i ledgera, mimo że Claude tworzył procedury (np. ALMA, OBSERWATORY). To klasyczny błąd replikacji wiedzy – Claude tworzy narzędzia, ale sam ich nie używa.
@@ -154,9 +145,6 @@ Audyt startowy wykazał 3 dopisane linie przez automat w pliku bibliotheca_ulpia
 
 ### 2026-07-20 — MoE niewykonalne na 6GB VRAM
 Mixture of Experts wymaga trzymania wszystkich ekspertów w pamięci jednocześnie. 4 eksperty po 7B wymagają ~28B RAM – na RTX 4050 (6GB) to niemożliwe.
-
-### 2026-07-22 — tail w rurze testów fałszuje kod wyjścia
-Komenda `python tests/run_tests.py | tail` zwraca kod wyjścia `tail`, nie testów – maskuje oblane testy (exit 0 mimo 1 porażki). Należy unikać `tail` w rurze lub używać oddzielnej obsługi.
 
 ### 2026-07-20 — Błąd cache/resume kluczowany tylko nazwą pliku w harnessach A/B
 Harnessy A/B (ab_tryb_strategii, ab_strategy_mwu, ab_wazenie_ic, ab_pnl_wazenie_ic) używają tylko nazwy pliku jako klucza cache, ignorując parametry konfiguracji.
@@ -179,9 +167,6 @@ Pliki bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl oraz docs/PAMIEC_SESJI.md są
 ### 2026-07-20 — 22 neurony czekają na adaptery/dane (Prawo XV)
 Rodziny NEWS-*, PSY-*, RADAR-*, OC-06/07/08, C-01, V-03, Z-06/Z-07 nie mają jeszcze feedów i abstynują świadomie zgodnie z Prawem XV. To znany, udokumentowany stan, a nie regresja.
 
-### 2026-07-20 — Audyt spójności pełna harmonia
-84 neurony, 15 zwiadowców, 18 elit, ruff czysto, MAPA_KLUCZY pełna – system w pełni harmonijny.
-
 ### 2026-07-21 — Archium lekcji ma inny nagłówek – szukaj() nie widzi schłodzonych
 Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł szukaj() używa własnego parsera, który go nie rozpoznaje. Luka w wyszukiwalności pamięci – wymaga ujednolicenia parsera lub wzbogacenia searcha.
 
@@ -200,9 +185,6 @@ Przenoszenie zywych dokumentow tworzy martwe linki w historii (Prawa I nie wolno
 ### 2026-07-20 — Brak metadanych to źródło bałaganu
 64 dokumenty w docs/ mają zero nagłówków metadanych. Audyt nie wie, czym dokument jest, przez co bramki (np. W5, W10) opierają się na ręcznie wpisanych wyrażeniach zamiast na strukturze. To nie skaluje się do 213 plików .md.
 
-### 2026-07-20 — Audyt exit 0 nie oznacza prawdy
-INDEKS_IMPERIUM.md podaje dwie różne liczby neuronów: 299 w nagłówku (data 2026-06-09) i 87 w sekcji MAPA KODU. Audyt przepuszcza, bo W5 czyta tylko z MAPA KODU. To dowód, że dokument może kłamać obok bramki.
-
 ### 2026-07-21 — Test negatywny PROBATORA wykrył błąd graniczny z '_'
 Znak '_' jest traktowany jako słowny przez \b, co powodowało fałszywe dopasowanie przy identyfikatorze BIB-006_Carson. Poprawiono test, nie organ – zastosowano inny separator.
 
@@ -220,9 +202,6 @@ Kłamiąca pieczątka input_len to zatwierdzony błąd Imperium (Prawo XIII). Sp
 
 ### 2026-07-20 — Skan klasy błędu – 0 innych wystąpień
 Po naprawie buga argparse przeskanowano cały kod – 0 innych % w help-stringach. Klasa domknięta, brak epidemii.
-
-### 2026-07-20 — Bug argparse – % w help-stringu
-pomiar_stablecoin_ic.py: % w help-stringu (okno % zmiany supply) powoduje ValueError przy --help. Latentny, niewidoczny w normalnym biegu.
 
 ### 2026-07-20 — Latentny bug: % w help-stringu argparse
 W pomiar_stablecoin_ic.py help-string zawierał % zmiany, co powoduje ValueError przy --help (argparse próbuje formatować). Naprawiono przez podwojenie %.
@@ -259,9 +238,6 @@ W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokł
 
 ### 2026-07-21 — zapisz() gubi nieznane pola istniejącego wpisu – cicha utrata danych
 Metoda zapisz() w pamięci proceduralnej nadpisywała tylko znane pola, gubiąc nieznane. Odkryto podczas adversarialnego przeglądu kodu. Naprawiono.
-
-### 2026-07-20 — Hotspoty: _py_supertrend i _py_volume_profile
-Czysto-pythonowe pętle O(okno) na wskaźnikach supertrend i volume_profile są ciężkie (okno 251, wiele symboli). Kandydaci do wektoryzacji numpy.
 
 ### 2026-07-20 — prekalkuluj_portfel – brak zysku algorytmicznego
 Funkcja wykonuje tę samą pracę per-bar co backtest pojedynczy, tylko równolegle (1.4× przyspieszenia). Nie zmniejsza złożoności, tylko maskuje problem.
@@ -349,9 +325,6 @@ Relatywny import z .mikro_neuron powodował błąd przy bezpośrednim uruchomien
 
 ### 2026-06-30 — TA-Lib wymagany przez Bramę Kalkulatora
 Brama Kalkulatora celowo odmawia startu bez TA-Lib (Prawo I). Na Windows 2026 pip install TA-Lib działa, fallback: wheels z github.com/cgohlke/talib-build.
-
-### 2026-06-30 — Bug: __pycache__ śledzone w git
-Po kompilacji brama_kalkulatora.py, pliki cache zostały przypadkowo commitowane. Naprawiono przez git rm i dodanie .gitignore.
 
 ### 2026-06-30 — Interval normalization bug: '5m'.upper() ≠ 'M5'
 Strategie używają formatu 'M5', a interwał z backtestu po .upper() daje '5M'. Naprawiono przez _normalizuj_interwal() w baza.py konwertujące '5m'→'M5', '1h'→'H1' itd.

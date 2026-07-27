@@ -4,6 +4,7 @@ Silnik audytu (narzedzia/audyt_spojnosci.py) MUSI być zielony w każdej sesji.
 """
 
 import os
+import pathlib
 import re
 import sys
 
@@ -298,3 +299,215 @@ def test_w18_awaria_ledgera_nie_wywraca_audytu(tmp_path):
     zly.write_text("{to nie json\n", encoding="utf-8")
     bledy, _ = w18(zly)
     assert isinstance(bledy, list)                    # kontrakt zachowany, brak wyjątku
+
+
+# ── WARSTWA 19: PARYTET DAT (frontmatter vs nagłówek) ────────────────────────
+
+def test_audyt_w19_zielony_na_realnym_korpusie():
+    """W19 na żywym repo: żaden dokument nie deklaruje dwóch różnych dat 'stan na'."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, info = a._warstwa_19_parytet_dat()
+    assert not bledy, f"W19 wykrył rozjazd dat: {bledy}"
+    assert any("W19" in i for i in info)
+
+
+def test_audyt_w19_lapie_rozjazd_dwoch_dat(monkeypatch, tmp_path):
+    """GRANICA: frontmatter mówi jedno, nagłówek drugie → alarm.
+
+    Dokładnie przypadek z recenzji 2026-07-26: README miał `stan_na: 2026-07-19`
+    i „Stan na: 2026-07-26". Warstwa 6 czytała tylko nagłówek, Tabularium tylko
+    frontmatter, więc audyt meldował harmonię przy jawnej sprzeczności.
+    """
+    import narzedzia.audyt_spojnosci as a
+    from narzedzia import tabularium as tab
+    plik = tmp_path / "DOK.md"
+    plik.write_text("---\nstan_na: 2026-07-19\n---\n> **Stan na:** 2026-07-26\ntreść\n",
+                    encoding="utf-8")
+    monkeypatch.setattr(tab, "ROOT", str(tmp_path))
+    monkeypatch.setattr(tab, "zbierz_dokumenty", lambda: [("DOK.md", {"stan_na": "2026-07-19"})])
+    bledy, _ = a._warstwa_19_parytet_dat()
+    assert len(bledy) == 1 and "DOK.md" in bledy[0]
+
+
+def test_audyt_w19_data_w_prozie_nie_jest_deklaracja(monkeypatch, tmp_path):
+    """GRANICA (fałszywy alarm złapany w samo-recenzji przed commitem): fraza „Stan na:"
+    zacytowana GŁĘBOKO w treści to nie deklaracja dokumentu.
+
+    Pierwsza wersja W19 skanowała cały plik i oskarżyła LOG_ZMIAN o rozjazd, bo w jednym
+    wpisie changelogu cytowano cudzą datę. Warstwa pilnująca prawdy nie ma prawa
+    produkować nieprawdy — zasięg to nagłówek dokumentu.
+    """
+    import narzedzia.audyt_spojnosci as a
+    from narzedzia import tabularium as tab
+    plik = tmp_path / "LOG.md"
+    plik.write_text("---\nstan_na: 2026-07-26\n---\n"
+                    + "wypełniacz\n" * 40
+                    + "Naprawiono: README ze „Stan na: 2026-07-15\" było nieaktualne.\n",
+                    encoding="utf-8")
+    monkeypatch.setattr(tab, "ROOT", str(tmp_path))
+    monkeypatch.setattr(tab, "zbierz_dokumenty", lambda: [("LOG.md", {"stan_na": "2026-07-26"})])
+    bledy, _ = a._warstwa_19_parytet_dat()
+    assert bledy == [], f"cytat w prozie nie może być alarmem: {bledy}"
+
+
+# ── WARSTWA 20: KATALOG INDEKS NIETKNIĘTY RĘKĄ ───────────────────────────────
+
+def test_audyt_w20_zielony_na_realnym_indeksie():
+    """W20 na żywym repo: katalog w INDEKS = to, co wypluwa Tabularium."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, info = a._warstwa_20_katalog_nietkniety()
+    assert not bledy, f"W20 wykrył ręczną edycję katalogu: {bledy}"
+    assert any("W20" in i for i in info)
+
+
+def test_audyt_w20_lapie_wiersz_dopisany_recznie(monkeypatch):
+    """GRANICA: jeden wiersz dopisany ręcznie do sekcji generowanej → alarm.
+
+    Przypadek z recenzji 2026-07-26: wpis o kategorii DISCIPLINA wstawiono do sekcji
+    CONSILIUM. Warstwa 7 pilnowała samej OBECNOŚCI dokumentu w INDEKS, nigdy MIEJSCA,
+    więc ręczna edycja żyła aż do pierwszej regeneracji.
+    """
+    import narzedzia.audyt_spojnosci as a
+    from narzedzia import tabularium as tab
+    prawdziwy = tab.katalog_md()
+    monkeypatch.setattr(tab, "katalog_md",
+                        lambda: prawdziwy.replace("### DISCIPLINA",
+                                                  "| `docs/PODRZUCONY.md` | widmo | — | 2026-01-01 |\n### DISCIPLINA",
+                                                  1))
+    bledy, _ = a._warstwa_20_katalog_nietkniety()
+    assert len(bledy) == 1 and "rozjechał się z generatorem" in bledy[0]
+
+
+def test_audyt_w20_data_spisu_nie_wywoluje_alarmu(monkeypatch):
+    """GRANICA: linia „Ostatni spis: <data>" zmienia się CODZIENNIE i musi być pomijana.
+
+    Bez tego wyłączenia audyt żądałby przepisania katalogu każdego dnia — dokładnie
+    ten fałszywy alarm naprawiliśmy już raz w Warstwie 6 (porównanie z `date.today()`).
+    """
+    import narzedzia.audyt_spojnosci as a
+    from narzedzia import tabularium as tab
+    prawdziwy = tab.katalog_md()
+    monkeypatch.setattr(tab, "katalog_md",
+                        lambda: prawdziwy.replace("Ostatni spis: ", "Ostatni spis: 1999-01-01 zamiast "))
+    bledy, _ = a._warstwa_20_katalog_nietkniety()
+    assert bledy == [], "zmiana samej daty spisu nie jest rozjazdem katalogu"
+
+
+# ── WARSTWA 21: WYZWALACZE ROZKAZOW OSIAGALNE ────────────────────────────────
+
+def test_audyt_w21_zielony_na_realnej_konstytucji():
+    """W21 na żywym repo: każdy `/skill` cytowany w CLAUDE.md istnieje na dysku."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, info = a._warstwa_21_wyzwalacze_rozkazow()
+    assert not bledy, f"W21 wykrył nieosiągalne rozkazy: {bledy}"
+    assert any("W21" in i for i in info)
+
+
+def test_audyt_w21_lapie_rozkaz_bez_skilla(monkeypatch, tmp_path):
+    """GRANICA: konstytucja obiecuje `/widmo`, katalog skilli go nie ma → alarm.
+
+    Po odchudzeniu konstytucji (787→253 linie) rozkaz odesłany do nieistniejącego skilla
+    jest NIEOSIĄGALNY — gorzej niż gruby CLAUDE.md, bo Architekt nie wie, że go zgubił.
+    """
+    import narzedzia.audyt_spojnosci as a
+    (tmp_path / ".claude" / "skills" / "realny").mkdir(parents=True)
+    (tmp_path / ".claude" / "skills" / "realny" / "SKILL.md").write_text("x", encoding="utf-8")
+    (tmp_path / "CLAUDE.md").write_text(
+        "- rozkaz A: **`/realny`**\n- rozkaz B: **`/widmo`**\n", encoding="utf-8")
+    monkeypatch.setattr(a, "ROOT", str(tmp_path))
+    bledy, _ = a._warstwa_21_wyzwalacze_rozkazow()
+    assert len(bledy) == 1 and "widmo" in bledy[0] and "realny" not in bledy[0]
+
+
+def test_audyt_w21_ukosnik_w_prozie_nie_jest_obietnica(monkeypatch, tmp_path):
+    """GRANICA (ta sama pułapka co w W19): `/cos` w zwykłym zdaniu to nie wyzwalacz.
+
+    Konstytucja pisze m.in. „wejście/wyjście z pozycji" i ścieżki plików. Gdyby warstwa
+    liczyła każdy ukośnik, produkowałaby własne fałszywe alarmy.
+    """
+    import narzedzia.audyt_spojnosci as a
+    (tmp_path / ".claude" / "skills").mkdir(parents=True)
+    (tmp_path / "CLAUDE.md").write_text(
+        "zmiana wejścia/wyjścia z pozycji; plik narzedzia/audyt_spojnosci.py; `/goly`\n",
+        encoding="utf-8")
+    monkeypatch.setattr(a, "ROOT", str(tmp_path))
+    bledy, _ = a._warstwa_21_wyzwalacze_rozkazow()
+    assert bledy == [], f"proza nie może być alarmem: {bledy}"
+
+
+# ── WARSTWA 22: JEDEN KATALOG DOKUMENTOW ─────────────────────────────────────
+
+def _dok(katalog, nazwa, ile_wierszy):
+    """Dokument z tabelą o `ile_wierszy` pozycjach wskazujących na inne dokumenty."""
+    wiersze = ["| Plik | Temat |", "|---|---|"]
+    wiersze += [f"| [D{i}.md](D{i}.md) | opis {i} |" for i in range(ile_wierszy)]
+    (katalog / nazwa).write_text("\n".join(wiersze) + "\n", encoding="utf-8")
+
+
+def test_audyt_w22_zielony_na_realnym_korpusie():
+    """W22 na żywym repo: po decyzji C żaden dokument nie konkuruje z INDEKSEM."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, info = a._warstwa_22_jeden_katalog()
+    assert not bledy, f"W22 wykrył drugi katalog: {bledy}"
+    assert any("W22" in i or "Jeden katalog" in i for i in info)
+
+
+def test_audyt_w22_lapie_odrodzony_reczny_spis(tmp_path):
+    """GRANICA: dokument urósł do 5 wierszy katalogu → alarm (próg zmierzony)."""
+    import narzedzia.audyt_spojnosci as a
+    _dok(tmp_path, "README.md", 5)
+    bledy, _ = a._warstwa_22_jeden_katalog(katalog_docs=str(tmp_path))
+    assert len(bledy) == 1 and "README.md" in bledy[0] and "W22" in bledy[0]
+
+
+def test_audyt_w22_kilka_odnosnikow_to_nie_katalog(tmp_path):
+    """GRANICA DRUGA STRONA: 4 wiersze (tuż pod progiem) to nawigacja, nie spis.
+
+    Zero byłoby fałszywym alarmem — README ma prawo wskazać INDEKS, konstytucję i ZASADY.
+    """
+    import narzedzia.audyt_spojnosci as a
+    _dok(tmp_path, "README.md", 4)
+    bledy, _ = a._warstwa_22_jeden_katalog(katalog_docs=str(tmp_path))
+    assert bledy == [], f"kilka odnośników nie może być alarmem: {bledy}"
+
+
+def test_audyt_w22_indeks_jest_zwolniony(tmp_path):
+    """INDEKS_IMPERIUM to JEDYNY prawowity katalog — pilnuje go W20, nie W22."""
+    import narzedzia.audyt_spojnosci as a
+    _dok(tmp_path, "INDEKS_IMPERIUM.md", 73)
+    bledy, _ = a._warstwa_22_jeden_katalog(katalog_docs=str(tmp_path))
+    assert bledy == [], f"generowany katalog nie może wywoływać alarmu: {bledy}"
+
+
+def test_audyt_w22_wzmianka_w_dalszej_kolumnie_to_opis(tmp_path):
+    """GRANICA: `.md` w kolumnie OPISU nie czyni z wiersza pozycji spisu.
+
+    Ta sama pułapka co w W19 (zasięg): warstwa pilnująca cudzej prawdy nie ma prawa
+    liczyć każdej wzmianki o pliku jako wpisu katalogowego.
+    """
+    import narzedzia.audyt_spojnosci as a
+    wiersze = ["| Warstwa | Co robi |", "|---|---|"]
+    wiersze += [f"| W{i} | porównuje z `INDEKS_IMPERIUM.md` |" for i in range(9)]
+    (tmp_path / "OPIS.md").write_text("\n".join(wiersze) + "\n", encoding="utf-8")
+    bledy, _ = a._warstwa_22_jeden_katalog(katalog_docs=str(tmp_path))
+    assert bledy == [], f"opis w drugiej kolumnie to nie katalog: {bledy}"
+
+
+def test_audyt_w22_zasieg_obejmuje_dokumenty_spoza_docs():
+    """ZASIĘG (pytanie osobne od logiki): warstwa widzi też żywe dokumenty spoza `docs/`.
+
+    Nawracająca klasa Imperium: bramka o wąskim zasięgu daje fałszywy spokój (W11 pilnowała
+    1 katalogu z 11). Katalog może odrodzić się w `imperium/README.md` tak samo jak w `docs/`.
+    """
+    import narzedzia.audyt_spojnosci as a
+    from narzedzia.tabularium import zbierz_dokumenty
+    zadeklarowane = [w for w, _ in zbierz_dokumenty()]
+    poza = [w for w in zadeklarowane if pathlib.PurePath(w).parts[0] != "docs"]
+    assert poza, "Tabularium przestało widzieć dokumenty spoza docs/ — zasięg W22 by się zawęził"
+    oczekiwane = len([w for w in zadeklarowane
+                      if os.path.basename(w) != "INDEKS_IMPERIUM.md"])
+    _, info = a._warstwa_22_jeden_katalog()
+    zbadane = int(re.search(r"\(W22\): (\d+) dokument", info[0]).group(1))
+    assert zbadane == oczekiwane, (
+        f"W22 zbadała {zbadane} z {oczekiwane} zadeklarowanych dokumentów — zasięg zawężony "
+        f"(pierwsza wersja tego testu miała luźny próg i PRZEŻYŁA mutację zawężenia do docs/)")

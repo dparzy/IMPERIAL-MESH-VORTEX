@@ -17,12 +17,16 @@ from imperium.biblioteki.notarius import (  # noqa: E402
     LIMIT_PROBEK_NA_PYTANIE,
     ENV_WYLACZNIK,
     PROGI_DATASETU,
+    RODZAJ_KLASYFIKACJI,
+    RODZAJ_PROZA,
     czytaj_pary,
     eksportuj_sft,
     odcisk,
     odcisk_pytania,
+    policz_sft,
     postep_zbioru,
     raport,
+    rodzaj_pary,
     statystyki,
     wlaczony,
     zapisz_pare,
@@ -463,6 +467,146 @@ def test_eksport_bez_system_promptu_pomija_role_system(tmp_path):
     assert [m["role"] for m in wiersz["messages"]] == ["user", "assistant"]
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# RODZAJ ZADANIA: proza vs klasyfikacja (2026-07-27)
+# Wada, którą te testy zamrażają: jeden próg długości dla dwóch różnych rodzajów zadań
+# skasował 100% par klasyfikacji (102 pary `news_llm` → 0 użytecznych), a meldunek
+# nazywał ten martwy strumień postępem Szkoły.
+# ─────────────────────────────────────────────────────────────────────────────
+
+def test_rodzaj_pary_odtwarza_ze_zrodla_gdy_brak_pola():
+    """Wpisy sprzed wprowadzenia pola `rodzaj` — rodzaj odtwarzamy ze źródła."""
+    assert rodzaj_pary({"zrodlo": "news_llm"}) == RODZAJ_KLASYFIKACJI
+    assert rodzaj_pary({"zrodlo": "bibliotekarz"}) == RODZAJ_PROZA
+    assert rodzaj_pary({}) == RODZAJ_PROZA            # brak wiedzy → proza (próg obowiązuje)
+
+
+def test_rodzaj_jawny_wygrywa_ze_zrodlem():
+    """Pole `rodzaj` to deklaracja wołającego — ma pierwszeństwo nad zgadywaniem ze źródła."""
+    assert rodzaj_pary({"rodzaj": "proza", "zrodlo": "news_llm"}) == RODZAJ_PROZA
+    assert rodzaj_pary({"rodzaj": "KLASYFIKACJA", "zrodlo": "bibliotekarz"}) == RODZAJ_KLASYFIKACJI
+    assert rodzaj_pary({"rodzaj": "bzdura", "zrodlo": "news_llm"}) == RODZAJ_KLASYFIKACJI
+
+
+@_bez_wylacznika
+def test_prog_dlugosci_nie_obowiazuje_klasyfikacji(tmp_path):
+    """
+    🚨 GRANICA GŁÓWNA: poprawny werdykt klasyfikatora ma ~35 znaków, próg prozy to 200.
+    Przed naprawą ta para NIE ISTNIAŁA dla treningu; po naprawie decyduje struktura.
+    """
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "nagłówki", '{"sentyment": 0.6, "pewnosc": 0.7}', "m",
+                zrodlo="news_llm", sciezka=p)
+    zapisz_pare("s", "rozwiń temat", "krótka proza", "m", zrodlo="bibliotekarz", sciezka=p)
+
+    assert policz_sft(p, min_znakow_odpowiedzi=200) == 1     # klasyfikacja przechodzi…
+    assert policz_sft(p, min_znakow_odpowiedzi=0) == 2       # …a proza dopiero bez progu
+
+
+@_bez_wylacznika
+def test_konsensus_bierze_mediane_a_nie_pierwsza_probke(tmp_path):
+    """
+    🚨 NAJOSTRZEJSZY PRZYPADEK (zmierzony na żywym ledgerze 2026-07-27, 3 z 32 pytań):
+    pierwsza próbka ma ZNAK PRZECIWNY do mediany — reguła „pierwsza wygrywa" uczyłaby
+    ucznia byka tam, gdzie nauczyciel przeważnie widział niedźwiedzia.
+    """
+    p = tmp_path / "pary.jsonl"
+    for s in (0.2, -0.3, -0.2):
+        zapisz_pare("s", "te same nagłówki", json.dumps({"sentyment": s, "pewnosc": 0.5}),
+                    "m", zrodlo="news_llm", sciezka=p)
+    cel = tmp_path / "sft.jsonl"
+
+    assert eksportuj_sft(cel, sciezka=p) == 1                # trzy próbki → jeden przykład
+    odp = json.loads(json.loads(cel.read_text(encoding="utf-8").strip())["messages"][-1]["content"])
+    assert odp["sentyment"] == -0.2                          # mediana, NIE pierwsza (+0.2)
+    assert odp["pewnosc"] == 0.5                             # zgodne próbki → wartość bez zmian
+
+
+@_bez_wylacznika
+def test_konsensus_parzysta_liczba_probek_usrednia_srodek(tmp_path):
+    """Granica mediany: przy parzystej liczbie próbek `statistics.median` uśrednia dwie środkowe."""
+    p = tmp_path / "pary.jsonl"
+    for s in (0.1, 0.3):
+        zapisz_pare("s", "pytanie", json.dumps({"sentyment": s}), "m",
+                    zrodlo="news_llm", sciezka=p)
+    cel = tmp_path / "sft.jsonl"
+    eksportuj_sft(cel, sciezka=p)
+    odp = json.loads(json.loads(cel.read_text(encoding="utf-8").strip())["messages"][-1]["content"])
+    assert abs(odp["sentyment"] - 0.2) < 1e-9
+
+
+@_bez_wylacznika
+def test_zepsuty_json_odsiany_przed_zwijaniem(tmp_path):
+    """
+    🚨 KOLEJNOŚĆ ≠ JAKOŚĆ: gdyby walidacja szła PO zwinięciu, wadliwa pierwsza próbka
+    wygrałaby z poprawnymi i uczeń uczyłby się produkować wyjście nie do sparsowania.
+    """
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "pytanie", "{sentyment: 0.9", "m", zrodlo="news_llm", sciezka=p)
+    for s in (-0.4, -0.6):
+        zapisz_pare("s", "pytanie", json.dumps({"sentyment": s}), "m",
+                    zrodlo="news_llm", sciezka=p)
+    cel = tmp_path / "sft.jsonl"
+
+    assert eksportuj_sft(cel, sciezka=p) == 1
+    odp = json.loads(json.loads(cel.read_text(encoding="utf-8").strip())["messages"][-1]["content"])
+    assert abs(odp["sentyment"] - (-0.5)) < 1e-9             # mediana z DWÓCH poprawnych
+
+
+@_bez_wylacznika
+def test_same_zepsute_probki_nie_daja_przykladu(tmp_path):
+    """Granica pustki: pytanie bez ANI JEDNEJ poprawnej próbki nie ma czego uczyć."""
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "pytanie", "nie wiem", "m", zrodlo="news_llm", sciezka=p)
+    zapisz_pare("s", "pytanie", "[1, 2, 3]", "m", zrodlo="news_llm", sciezka=p)  # JSON, ale nie obiekt
+    assert eksportuj_sft(tmp_path / "sft.jsonl", sciezka=p) == 0
+
+
+@_bez_wylacznika
+def test_jedna_probka_klasyfikacji_zostaje_kanonicznie(tmp_path):
+    """Granica jednej próbki: konsensus z jednego strzału = ten strzał, w formacie kanonicznym."""
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "pytanie", '{\n  "sentyment": -0.2,\n  "pewnosc": 0.6\n}', "m",
+                zrodlo="news_llm", sciezka=p)
+    cel = tmp_path / "sft.jsonl"
+    assert eksportuj_sft(cel, sciezka=p) == 1
+    tresc = json.loads(cel.read_text(encoding="utf-8").strip())["messages"][-1]["content"]
+    assert tresc == '{"sentyment": -0.2, "pewnosc": 0.6}'    # jeden format wyjścia dla ucznia
+
+
+@_bez_wylacznika
+def test_wylaczony_kolaps_daje_klasyfikacje_bez_konsensusu(tmp_path):
+    """`jedna_probka_na_pytanie=False` — próbki surowe, bez zwijania (tryb inspekcji)."""
+    p = tmp_path / "pary.jsonl"
+    for s in (0.2, -0.3):
+        zapisz_pare("s", "pytanie", json.dumps({"sentyment": s}), "m",
+                    zrodlo="news_llm", sciezka=p)
+    assert eksportuj_sft(tmp_path / "sft.jsonl", sciezka=p, jedna_probka_na_pytanie=False) == 2
+
+
+@_bez_wylacznika
+def test_zepsuty_json_nie_wychodzi_takze_bez_zwijania(tmp_path):
+    """
+    🚨 LUKA ZŁAPANA MUTACJĄ (2026-07-27): usunięcie bramki poprawności z `pary_sft` NIE
+    wywracało żadnego testu, bo na ścieżce zwijania broni jeszcze konsensus. Broniona jest
+    dopiero ścieżka BEZ zwijania — i to ona potrzebuje własnego testu, inaczej wadliwe
+    wyjście trafiłoby na trening w trybie inspekcji.
+    """
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "pytanie", "{sentyment: 0.9", "m", zrodlo="news_llm", sciezka=p)
+    zapisz_pare("s", "pytanie", '{"sentyment": 0.9}', "m", zrodlo="news_llm", sciezka=p)
+    assert eksportuj_sft(tmp_path / "sft.jsonl", sciezka=p, jedna_probka_na_pytanie=False) == 1
+
+
+@_bez_wylacznika
+def test_prog_dlugosci_nadal_dziala_na_prozie(tmp_path):
+    """REGRESJA: naprawa klasyfikacji nie ma prawa rozbroić progu tam, gdzie ma sens."""
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "pytanie A", "nie wiem", "m", zrodlo="bibliotekarz", sciezka=p)
+    zapisz_pare("s", "pytanie B", "x" * 250, "m", zrodlo="bibliotekarz", sciezka=p)
+    assert policz_sft(p, min_znakow_odpowiedzi=200) == 1
+
+
 def test_eksport_pustego_zbioru_daje_zero(tmp_path):
     assert eksportuj_sft(tmp_path / "sft.jsonl", sciezka=tmp_path / "brak.jsonl") == 0
 
@@ -539,3 +683,52 @@ def test_most_zwraca_odpowiedz_gdy_pisarz_pada(monkeypatch):
     glos = GlosImperium.__new__(GlosImperium)      # bez __init__ → bez potrzeby klucza API
     glos.model = "deepseek-v4-flash"
     glos._protokoluj("s", "p", "o", 0.7)           # nie może rzucić
+
+
+# ── JEDEN FILTR, DWÓCH KONSUMENTÓW (recenzja 2026-07-26) ─────────────────────
+
+@_bez_wylacznika
+def test_licznik_i_eksport_zawsze_zgodne(tmp_path):
+    """`policz_sft` MUSI dać dokładnie tyle, ile `eksportuj_sft` zapisze — co do sztuki.
+
+    To niezmiennik, dla którego filtr został wydzielony do `pary_sft`. Meldunek BREVIARIUM
+    podaje Cezarowi postęp Szkoły TIRO właśnie z licznika; gdyby liczył innym filtrem niż
+    eksport, procent gotowości opisywałby zbiór, który nigdy nie pojedzie na trening.
+    """
+    from imperium.biblioteki.notarius import policz_sft
+
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "pytanie A", "x" * 300, "m", sciezka=p)
+    zapisz_pare("s", "pytanie A", "y" * 300, "m", sciezka=p)   # duplikat pytania → kolaps
+    zapisz_pare("s", "pytanie B", "krotka", "m", sciezka=p)    # za krótka → odsiew
+    zapisz_pare("s", "pytanie C", "z" * 300, "m", sciezka=p)
+
+    cel = tmp_path / "sft.jsonl"
+    zapisane = eksportuj_sft(cel, p, min_znakow_odpowiedzi=200)
+    policzone = policz_sft(p, min_znakow_odpowiedzi=200)
+    linie = [l for l in cel.read_text(encoding="utf-8").splitlines() if l.strip()]
+
+    assert policzone == zapisane == len(linie) == 2
+
+
+@_bez_wylacznika
+def test_licznik_nie_dotyka_dysku(tmp_path, monkeypatch):
+    """Licznik biegnie na OBU końcach każdej sesji — nie ma prawa nic zapisywać.
+
+    Wcześniej BREVIARIUM serializował cały zbiór do pliku tymczasowego tylko po to, by
+    poznać liczbę; koszt rósł z każdą zebraną parą (recenzja 2026-07-26).
+    """
+    from imperium.biblioteki import notarius
+
+    p = tmp_path / "pary.jsonl"
+    zapisz_pare("s", "pytanie", "x" * 300, "m", sciezka=p)
+
+    prawdziwe_open = notarius.Path.open
+
+    def tylko_do_odczytu(self, mode="r", *a, **kw):
+        if any(z in mode for z in ("w", "a", "x", "+")):
+            raise AssertionError(f"licznik otworzył {self} w trybie zapisu ({mode})")
+        return prawdziwe_open(self, mode, *a, **kw)
+
+    monkeypatch.setattr(notarius.Path, "open", tylko_do_odczytu)
+    assert notarius.policz_sft(p, min_znakow_odpowiedzi=200) == 1

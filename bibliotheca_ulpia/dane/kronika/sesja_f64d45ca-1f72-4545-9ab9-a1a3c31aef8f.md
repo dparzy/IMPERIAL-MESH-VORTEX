@@ -114,7 +114,7 @@ Propozycja: lekki ping w pre-flight L3. Koszt: **niski**. Rekomendacja: **OPCJON
 <task-notification>
 <task-id>a14583b83f0665576</task-id>
 <tool-use-id>toolu_01P4rie6ssMWczeVvYNztbN8</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\f64d45ca-1f72-4545-9ab9-a1a3c31aef8f\tasks\a14583b83f0665576.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\f64d45ca-1f72-4545-9ab9-a1a3c31aef8f\tasks\a14583b83f0665576.output</output-file>
 <status>completed</status>
 <summary>Agent "Research luk startu sesji AI" finished</summary>
 <note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
@@ -337,7 +337,7 @@ Czekam na notyfikację testów.
 <task-notification>
 <task-id>byv0s2th5</task-id>
 <tool-use-id>toolu_015KpJyrZD9LozBweW49f6bs</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\f64d45ca-1f72-4545-9ab9-a1a3c31aef8f\tasks\byv0s2th5.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\f64d45ca-1f72-4545-9ab9-a1a3c31aef8f\tasks\byv0s2th5.output</output-file>
 <status>completed</status>
 <summary>Background command "Pełny bieg testów" completed (exit code 0)</summary>
 </task-notification>
@@ -440,7 +440,7 @@ Audyt **exit 0 — pełna harmonia** (W16 API-widma ✅ mimo nowego organu + edy
 <task-notification>
 <task-id>bq1cvi9bc</task-id>
 <tool-use-id>toolu_01MpZdYxuui3zuGWqUR1CvEp</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\f64d45ca-1f72-4545-9ab9-a1a3c31aef8f\tasks\bq1cvi9bc.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\f64d45ca-1f72-4545-9ab9-a1a3c31aef8f\tasks\bq1cvi9bc.output</output-file>
 <status>completed</status>
 <summary>Background command "Pełny bieg testów po PORTITOR" completed (exit code 0)</summary>
 </task-notification>
@@ -553,7 +553,7 @@ Czekam na zwiadowcę, potem złożę komplet do Twojej decyzji. **Nic nie zmieni
 <task-notification>
 <task-id>aa9dd31dfd7dc1605</task-id>
 <tool-use-id>toolu_017fBTgqJ3ytLWc9jYmacNq1</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\f64d45ca-1f72-4545-9ab9-a1a3c31aef8f\tasks\aa9dd31dfd7dc1605.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\f64d45ca-1f72-4545-9ab9-a1a3c31aef8f\tasks\aa9dd31dfd7dc1605.output</output-file>
 <status>completed</status>
 <summary>Agent "Research usage-aware model routing" finished</summary>
 <note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
@@ -694,7 +694,7 @@ Audyt **exit 0 — pełna harmonia** (ruff/W14/W16 ✅). Czekam na testy w tle, 
 <task-notification>
 <task-id>bobu71bm6</task-id>
 <tool-use-id>toolu_019Mzj6BaZBct7G6akRBbd3m</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\f64d45ca-1f72-4545-9ab9-a1a3c31aef8f\tasks\bobu71bm6.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\f64d45ca-1f72-4545-9ab9-a1a3c31aef8f\tasks\bobu71bm6.output</output-file>
 <status>completed</status>
 <summary>Background command "Pełny bieg testów po arkuszu Momenty modelu" completed (exit code 0)</summary>
 </task-notification>

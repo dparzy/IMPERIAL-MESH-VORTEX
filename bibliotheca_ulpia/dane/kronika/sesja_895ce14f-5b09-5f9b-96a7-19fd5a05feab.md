@@ -2442,7 +2442,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> .\aktualizuj.ps1
 
 [1] Sprawdzam galaz...
@@ -4211,7 +4211,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> .\aktualizuj.ps1
 
 [1] Sprawdzam galaz...
@@ -4390,7 +4390,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> .\aktualizuj.ps1
 
 [1] Sprawdzam galaz...
@@ -4894,7 +4894,7 @@ Uruchom najpierw: python narzedzia/rag/indeksuj.py
 
 📋 test_dyrygent (16 testów)
   ✅ test_cykl_bez_wskaznikow_konczy_na_budowniczym
-C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\site-packages\numpy\lib\_function_base_impl.py:3023: RuntimeWarning: invalid value encountered in divide
+~\AppData\Local\Programs\Python\Python311\Lib\site-packages\numpy\lib\_function_base_impl.py:3023: RuntimeWarning: invalid value encountered in divide
   c /= stddev[:, None]
   ✅ test_cykl_neutralny_nie_wchodzi
   ✅ test_cykl_silny_long_otwiera_pozycje
@@ -6232,14 +6232,14 @@ C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\site-packages\numpy\lib
 [RAG] Korpus=biblioteka | plików: 1 | tryb=pełny
   → a.txt [dane] ... 1 chunków
 
-[RAG] Gotowe: +1 fragmentów, 1 plików, 0 bez zmian, 0.0s → C:\Users\Ian\AppData\Local\Temp\tmpnq9q6wy2\test.db
+[RAG] Gotowe: +1 fragmentów, 1 plików, 0 bez zmian, 0.0s → ~\AppData\Local\Temp\tmpnq9q6wy2\test.db
 [RAG] Korpus=biblioteka | plików: 1 | tryb=przyrostowy
 
-[RAG] Gotowe: +0 fragmentów, 0 plików, 1 bez zmian, 0.0s → C:\Users\Ian\AppData\Local\Temp\tmpnq9q6wy2\test.db
+[RAG] Gotowe: +0 fragmentów, 0 plików, 1 bez zmian, 0.0s → ~\AppData\Local\Temp\tmpnq9q6wy2\test.db
 [RAG] Korpus=biblioteka | plików: 2 | tryb=przyrostowy
   → b.txt [dane] ... 1 chunków
 
-[RAG] Gotowe: +1 fragmentów, 1 plików, 1 bez zmian, 0.0s → C:\Users\Ian\AppData\Local\Temp\tmpnq9q6wy2\test.db
+[RAG] Gotowe: +1 fragmentów, 1 plików, 1 bez zmian, 0.0s → ~\AppData\Local\Temp\tmpnq9q6wy2\test.db
   ✅ test_indeksacja_przyrostowa
   ✅ test_korpus_w_wyniku
   ✅ test_mcp_initialize
@@ -6247,7 +6247,7 @@ C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\site-packages\numpy\lib
   ✅ test_mcp_tools_list
   ✅ test_podzial_overlap
   ✅ test_podzial_overlap_rowny_max
-[RAG] Baza nie istnieje: C:\Users\Ian\AppData\Local\Temp\tmpdsetruz5\ghost.db
+[RAG] Baza nie istnieje: ~\AppData\Local\Temp\tmpdsetruz5\ghost.db
 Uruchom najpierw: python narzedzia/rag/indeksuj.py
   ✅ test_szukaj_bez_bazy
 
@@ -6892,33 +6892,33 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> python -c "from imperium.cesarz.deepseek_glos import GlosImperium; print('OK' if GlosImperium().test_polaczenia() else 'BLAD')"
 Traceback (most recent call last):
   File "<string>", line 1, in <module>
   File "C:\Projekty\imperial-mesh-vortex\imperium\cesarz\deepseek_glos.py", line 38, in __init__
     self.client = OpenAI(
                   ^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\site-packages\openai\_client.py", line 226, in __init__
+  File "~\AppData\Local\Programs\Python\Python311\Lib\site-packages\openai\_client.py", line 226, in __init__
     super().__init__(
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\site-packages\openai\_base_client.py", line 909, in __init__
+  File "~\AppData\Local\Programs\Python\Python311\Lib\site-packages\openai\_base_client.py", line 909, in __init__
     self._client = http_client or SyncHttpxClientWrapper(
                                   ^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\site-packages\openai\_base_client.py", line 839, in __init__
+  File "~\AppData\Local\Programs\Python\Python311\Lib\site-packages\openai\_base_client.py", line 839, in __init__
     super().__init__(**kwargs)
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\site-packages\httpx\_client.py", line 688, in __init__
+  File "~\AppData\Local\Programs\Python\Python311\Lib\site-packages\httpx\_client.py", line 688, in __init__
     self._transport = self._init_transport(
                       ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\site-packages\httpx\_client.py", line 731, in _init_transport
+  File "~\AppData\Local\Programs\Python\Python311\Lib\site-packages\httpx\_client.py", line 731, in _init_transport
     return HTTPTransport(
            ^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\site-packages\httpx\_transports\default.py", line 153, in __init__
+  File "~\AppData\Local\Programs\Python\Python311\Lib\site-packages\httpx\_transports\default.py", line 153, in __init__
     ssl_context = create_ssl_context(verify=verify, cert=cert, trust_env=trust_env)
                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\site-packages\httpx\_config.py", line 35, in create_ssl_context
+  File "~\AppData\Local\Programs\Python\Python311\Lib\site-packages\httpx\_config.py", line 35, in create_ssl_context
     ctx = ssl.create_default_context(cafile=os.environ["SSL_CERT_FILE"])
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\ssl.py", line 770, in create_default_context
+  File "~\AppData\Local\Programs\Python\Python311\Lib\ssl.py", line 770, in create_default_context
     context.load_verify_locations(cafile, capath, cadata)
 FileNotFoundError: [Errno 2] No such file or directory
 PS C:\Projekty\imperial-mesh-vortex>
@@ -6966,7 +6966,7 @@ Wklej mi wynik po kroku 3 — jak będzie `OK`, ruszamy z raportem IC i newsami.
 
 ## 🧑 Cezar
 PS C:\Projekty\imperial-mesh-vortex> echo $env:SSL_CERT_FILE
-C:\Users\Ian\AppData\Local\Temp\cacert.pem
+~\AppData\Local\Temp\cacert.pem
 PS C:\Projekty\imperial-mesh-vortex> Remove-Item Env:SSL_CERT_FILE
 PS C:\Projekty\imperial-mesh-vortex> Remove-Item Env:SSL_CERT_DIR -ErrorAction SilentlyContinue
 PS C:\Projekty\imperial-mesh-vortex> python -c "from imperium.cesarz.deepseek_glos import GlosImperium; print('OK' if GlosImperium().test_polaczenia() else 'BLAD')"
@@ -7050,10 +7050,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> echo $env:SSL_CERT_FILE
-PS C:\Users\Ian> python narzedzia/raport_ic.py --glob "dane/dzienne/*_d.csv" --interwal 1d
-C:\Users\Ian\AppData\Local\Programs\Python\Python311\python.exe: can't open file 'C:\\Users\\Ian\\narzedzia\\raport_ic.py': [Errno 2] No such file or directory
-PS C:\Users\Ian>
+PS ~> echo $env:SSL_CERT_FILE
+PS ~> python narzedzia/raport_ic.py --glob "dane/dzienne/*_d.csv" --interwal 1d
+~\AppData\Local\Programs\Python\Python311\python.exe: can't open file '~\\narzedzia\\raport_ic.py': [Errno 2] No such file or directory
+PS ~>
 
 ## 🏛️ Claude
 Dwie rzeczy:
@@ -7062,7 +7062,7 @@ Dwie rzeczy:
 `echo $env:SSL_CERT_FILE` w nowym oknie jest **puste** — martwa zmienna zniknęła permanentnie. Świetnie.
 
 ## 🔧 Drobiazg — jesteś w złym folderze
-Otworzyłeś nowe okno i wylądowałeś w `C:\Users\Ian` (dom), a skrypt jest w folderze projektu. Trzeba najpierw **wejść do projektu**:
+Otworzyłeś nowe okno i wylądowałeś w `~` (dom), a skrypt jest w folderze projektu. Trzeba najpierw **wejść do projektu**:
 
 ```powershell
 cd C:\Projekty\imperial-mesh-vortex
@@ -7085,10 +7085,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> echo $env:SSL_CERT_FILE
-PS C:\Users\Ian> python narzedzia/raport_ic.py --glob "dane/dzienne/*_d.csv" --interwal 1d
-C:\Users\Ian\AppData\Local\Programs\Python\Python311\python.exe: can't open file 'C:\\Users\\Ian\\narzedzia\\raport_ic.py': [Errno 2] No such file or directory
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> echo $env:SSL_CERT_FILE
+PS ~> python narzedzia/raport_ic.py --glob "dane/dzienne/*_d.csv" --interwal 1d
+~\AppData\Local\Programs\Python\Python311\python.exe: can't open file '~\\narzedzia\\raport_ic.py': [Errno 2] No such file or directory
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> python narzedzia/raport_ic.py --glob "dane/dzienne/*_d.csv" --interwal 1d
 
 ## 🏛️ Claude
@@ -8572,7 +8572,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> git pull --rebase origin claude/sleepy-fermi-dsdE4
 error: cannot pull with rebase: You have unstaged changes.
 error: Please commit or stash them.
@@ -8625,7 +8625,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> git pull --rebase origin claude/sleepy-fermi-dsdE4
 error: cannot pull with rebase: You have unstaged changes.
 error: Please commit or stash them.
@@ -9333,12 +9333,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> git reset
+PS ~> git reset
 fatal: not a git repository (or any of the parent directories): .git
-PS C:\Users\Ian>
+PS ~>
 
 ## 🏛️ Claude
-Jesteś w złym katalogu — nowy PowerShell otworzył się w `C:\Users\Ian`, a repo jest gdzie indziej. Najpierw wejdź do repo:
+Jesteś w złym katalogu — nowy PowerShell otworzył się w `~`, a repo jest gdzie indziej. Najpierw wejdź do repo:
 
 ```powershell
 cd C:\Projekty\imperial-mesh-vortex
@@ -9363,7 +9363,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> git reset
 Unstaged changes after reset:
 M       bibliotheca_ulpia/dane/graf_pamieci.json
@@ -9445,7 +9445,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> git reset
 Unstaged changes after reset:
 M       bibliotheca_ulpia/dane/graf_pamieci.json
@@ -9612,7 +9612,7 @@ Pokaż `dir dane\4h`, to podejmę decyzję za Ciebie.
 Na marginesie: ten stash i tak **niczego nie psuje** — drzewo jest czyste, automatyka działa. Kasujemy go tylko dla porządku, nie z konieczności.
 
 ## 🧑 Cezar
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> dir dane\4h
 
 
@@ -12397,10 +12397,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> setx PYTHONIOENCODING utf-8
+PS ~> setx PYTHONIOENCODING utf-8
 
 SUCCESS: Specified value was saved.
-PS C:\Users\Ian>
+PS ~>
 
 ## 🏛️ Claude
 ✅ **UTF-8 ustawione na stałe** — od teraz każde narzędzie Pythona (testy, audyt, raporty) będzie dławić się emoji **nigdy więcej**.
@@ -12444,7 +12444,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> @'
 >> {
 >>   "mcpServers": {
@@ -12456,16 +12456,16 @@ PS C:\Projekty\imperial-mesh-vortex> @'
 PS C:\Projekty\imperial-mesh-vortex> python -c "import json; json.load(open('.mcp.json')); print('JSON OK')"
 Traceback (most recent call last):
   File "<string>", line 1, in <module>
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
     return loads(fp.read(),
            ^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
     return _default_decoder.decode(s)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
     obj, end = self.raw_decode(s, idx=_w(s, 0).end())
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
     raise JSONDecodeError("Expecting value", s, err.value) from None
 json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 PS C:\Projekty\imperial-mesh-vortex>
@@ -12511,7 +12511,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> @'
 >> {
 >>   "mcpServers": {
@@ -12523,16 +12523,16 @@ PS C:\Projekty\imperial-mesh-vortex> @'
 PS C:\Projekty\imperial-mesh-vortex> python -c "import json; json.load(open('.mcp.json')); print('JSON OK')"
 Traceback (most recent call last):
   File "<string>", line 1, in <module>
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
     return loads(fp.read(),
            ^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
     return _default_decoder.decode(s)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
     obj, end = self.raw_decode(s, idx=_w(s, 0).end())
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
     raise JSONDecodeError("Expecting value", s, err.value) from None
 json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 PS C:\Projekty\imperial-mesh-vortex> python -c "import json; json.load(open('.mcp.json', encoding='utf-8-sig')); print('JSON OK')"
@@ -12576,7 +12576,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> @'
 >> {
 >>   "mcpServers": {
@@ -12588,31 +12588,31 @@ PS C:\Projekty\imperial-mesh-vortex> @'
 PS C:\Projekty\imperial-mesh-vortex> python -c "import json; json.load(open('.mcp.json')); print('JSON OK')"
 Traceback (most recent call last):
   File "<string>", line 1, in <module>
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
     return loads(fp.read(),
            ^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
     return _default_decoder.decode(s)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
     obj, end = self.raw_decode(s, idx=_w(s, 0).end())
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
     raise JSONDecodeError("Expecting value", s, err.value) from None
 json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 PS C:\Projekty\imperial-mesh-vortex> python -c "import json; json.load(open('.mcp.json', encoding='utf-8-sig')); print('JSON OK')"$txt = Get-Content -Raw .mcp.json
 Traceback (most recent call last):
   File "<string>", line 1, in <module>
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 293, in load
     return loads(fp.read(),
            ^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 346, in loads
     return _default_decoder.decode(s)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 337, in decode
     obj, end = self.raw_decode(s, idx=_w(s, 0).end())
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Ian\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
+  File "~\AppData\Local\Programs\Python\Python311\Lib\json\decoder.py", line 355, in raw_decode
     raise JSONDecodeError("Expecting value", s, err.value) from None
 json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 PS C:\Projekty\imperial-mesh-vortex> [System.IO.File]::WriteAllText((Join-Path $PWD '.mcp.json'), $txt, (New-Object System.Text.UTF8Encoding($false)))python -c "print('BOM obecny' if open('.mcp.json','rb').read(3)==b'\xef\xbb\xbf' else 'no-BOM OK')"
@@ -12774,7 +12774,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> type .mcp.json
 {
   "mcpServers": {
@@ -12815,7 +12815,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> type .mcp.json
 {
   "mcpServers": {
@@ -14908,7 +14908,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> git pull --rebase origin claude/sleepy-fermi-dsdE4
 error: cannot pull with rebase: You have unstaged changes.
 error: Please commit or stash them.
@@ -15038,7 +15038,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> git stash
 Saved working directory and index state WIP on claude/sleepy-fermi-dsdE4: 5260e00 auto: sync pamięci sesji (hook końca sesji)
 PS C:\Projekty\imperial-mesh-vortex> git pull origin claude/sleepy-fermi-dsdE4
@@ -15164,23 +15164,23 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> git status --short
+PS ~> git status --short
 fatal: not a git repository (or any of the parent directories): .git
-PS C:\Users\Ian> dir imperium\consilium
-dir : Cannot find path 'C:\Users\Ian\imperium\consilium' because it does not exist.
+PS ~> dir imperium\consilium
+dir : Cannot find path '~\imperium\consilium' because it does not exist.
 At line:1 char:1
 + dir imperium\consilium
 + ~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : ObjectNotFound: (C:\Users\Ian\imperium\consilium:String) [Get-ChildItem], ItemNotFoundEx
+    + CategoryInfo          : ObjectNotFound: (~\imperium\consilium:String) [Get-ChildItem], ItemNotFoundEx
    ception
     + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetChildItemCommand
 
-PS C:\Users\Ian> git check-ignore -v "bibliotheca_ulpia\BIB-143 Statistical Rethinking"
+PS ~> git check-ignore -v "bibliotheca_ulpia\BIB-143 Statistical Rethinking"
 fatal: not a git repository (or any of the parent directories): .git
-PS C:\Users\Ian> python -m imperium.oczy.breviarium to sie pojawilo
+PS ~> python -m imperium.oczy.breviarium to sie pojawilo
 
 ## 🏛️ Claude
-To moja wina — nie dołączyłem `cd` na początku bloku, więc PowerShell wykonał wszystko w `C:\Users\Ian`, gdzie nie ma repozytorium. Stąd „not a git repository".
+To moja wina — nie dołączyłem `cd` na początku bloku, więc PowerShell wykonał wszystko w `~`, gdzie nie ma repozytorium. Stąd „not a git repository".
 
 Wklej ten blok w całości:
 
@@ -15204,7 +15204,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 Try the new cross-platform PowerShell https://aka.ms/pscore6
 
-PS C:\Users\Ian> cd C:\Projekty\imperial-mesh-vortex
+PS ~> cd C:\Projekty\imperial-mesh-vortex
 PS C:\Projekty\imperial-mesh-vortex> git status --short
  M bibliotheca_ulpia/dane/auto_lekcja_przetworzone.txt
  M bibliotheca_ulpia/dane/breviarium_migawka.json

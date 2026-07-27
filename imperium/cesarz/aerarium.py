@@ -44,6 +44,11 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 KONSTYTUCJA = ROOT / "CLAUDE.md"
 USTAWIENIA = ROOT / ".claude" / "settings.json"
 KATALOG_SKILLI = ROOT / ".claude" / "skills"
+# Tabela stopni GRADUS mieszka od 2026-07-27 w skillu ładowanym NA ŻĄDANIE — konstytucja
+# trzyma już tylko linię-wyzwalacz z esencją (odchudzanie 787 → 253 linie). Parytet
+# kod↔dokument obowiązuje dalej, tyle że wskazuje na nowe źródło prawdy: przeniesienie
+# treści nie może znosić bramki, która jej pilnuje (inaczej odchudzanie byłoby cofnięciem).
+DOKUMENT_GRADUS = ROOT / ".claude" / "skills" / "gradus" / "SKILL.md"
 
 # Limit doktrynalny długości konstytucji. Nie nasza opinia — oficjalna rekomendacja
 # Anthropic („aim to keep CLAUDE.md under 200 lines"), bo plik wchodzi w KAŻDĄ sesję.
@@ -136,16 +141,18 @@ def _katalogi_projektu() -> List[Path]:
 
     Leżą POZA repo (per maszyna), więc w kontenerze chmury mogą nie istnieć: pusta lista
     znaczy „nie wiem z tego środowiska", nigdy „nie ma".
+
+    DOPASOWANIE PO NAZWIE JEST JEDYNYM KRYTERIUM (recenzja 2026-07-26). Wcześniej istniał
+    fallback „jeśli katalog jest dokładnie jeden, to pewnie nasz" — i to była cicha zdrada
+    własnego kontraktu: przy jednym obcym albo porzuconym katalogu skarbiec podawał CUDZĄ
+    pamięć i CUDZY koszt hooka jako pomiar TEGO projektu. Fałszywa liczba jest gorsza od
+    braku liczby, bo nie da się jej odróżnić od prawdziwej (Prawo I).
     """
     baza = Path(os.getenv("CLAUDE_CONFIG_DIR") or str(Path.home() / ".claude")) / "projects"
     if not baza.exists():
         return []
     znacznik = ROOT.name.lower()
-    trafione = [d for d in baza.iterdir() if d.is_dir() and znacznik in d.name.lower()]
-    if trafione:
-        return trafione
-    wszystkie = [d for d in baza.iterdir() if d.is_dir()]
-    return wszystkie if len(wszystkie) == 1 else []
+    return [d for d in baza.iterdir() if d.is_dir() and znacznik in d.name.lower()]
 
 
 def _indeks_pamieci() -> Optional[Path]:
@@ -252,9 +259,15 @@ def stopien_domyslny() -> Dict[str, Optional[str]]:
     if env:
         return {"poziom": env, "zrodlo": "CLAUDE_CODE_EFFORT_LEVEL", "imie": _imie_stopnia(env)}
     if USTAWIENIA.exists():
+        # `settings.json` bywa POPRAWNYM JSON-em o złym KSZTAŁCIE (lista, liczba, napis) —
+        # wtedy `json.loads` przechodzi, a `.get` wywala AttributeError i kładzie CAŁY baner
+        # startowy (recenzja 2026-07-26). Lokalna literówka w konfiguracji nie ma prawa
+        # zatrzymać hooka: zły kształt traktujemy jak zły JSON — nieznany stopień, nie awaria.
         try:
             dane = json.loads(USTAWIENIA.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, OSError):
+            dane = {}
+        if not isinstance(dane, dict):
             dane = {}
         poziom = dane.get("effortLevel")
         if poziom:

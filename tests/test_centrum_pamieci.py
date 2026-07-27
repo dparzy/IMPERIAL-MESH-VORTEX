@@ -585,6 +585,42 @@ def test_rejestr_wizji_dedup_pomija_duplikat(tmp_path):
     assert len(rw.wszystkie(plik=plik)) == 1
 
 
+def test_rejestr_wizji_pominiecie_semantyczne_jest_WIDOCZNE(tmp_path):
+    """Wpis ODWRACAJĄCY poprzedni nie może zniknąć po cichu (cubic PR #134, P1).
+
+    `czy_duplikaty` we własnym docstringu przyznaje, że widzi IDENTYFIKATORY, nie KIERUNEK
+    wniosku, i wskazuje łagodzenie: logowanie każdego pominięcia. `auto_lekcja` je ma,
+    rejestr wizji zaimportował predykat BEZ niego — więc decyzja odwracająca wcześniejszą
+    przepadała, a `False` czytało się jak „duplikat, nic się nie stało".
+
+    Przypadek wzięty WPROST z docstringu predykatu — ten, który sam deklaruje jako kolidujący.
+    Testujemy WIDOCZNOŚĆ, nie dopisanie: sito 2 zostaje (pomiar na żywym rejestrze 820 wpisów
+    pokazał, że łapie ~250 realnych parafraz), więc lekarstwem jest jawność, nie usunięcie.
+    """
+    import contextlib
+    import io
+
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    assert rw.dodaj("DECYZJA", "ATR_MULT w EXP-07 za niski",
+                    "Parametr ATR_MULT w strategii EXP-07 jest za niski, podnies.",
+                    plik=plik) is True
+    # Przechwytujemy stderr RĘCZNIE, nie fixture'em `capsys`: runner Imperium
+    # (tests/run_tests.py) jest bezzależnościowy i zna tylko `tmp_path`, więc test
+    # z `capsys` przechodzi pod pytestem, a pod bramką pada na brakującym argumencie.
+    # Test ma bronić w OBU biegach — inaczej broni tylko tam, gdzie i tak patrzę.
+    bufor = io.StringIO()
+    with contextlib.redirect_stderr(bufor):   # mierzymy TYLKO drugi zapis
+        odwrotna = rw.dodaj("DECYZJA", "ATR_MULT w EXP-07 za wysoki",
+                            "Parametr ATR_MULT w strategii EXP-07 jest za wysoki, obniz.",
+                            plik=plik)
+    komunikat = bufor.getvalue()
+    assert odwrotna is False, "test stracił sens — predykat przestał uznawać to za duplikat"
+    assert "POMINIĘTY" in komunikat, "pominięcie nadal jest CICHE"
+    assert "ATR_MULT w EXP-07 za wysoki" in komunikat, "nie widać, CO pominięto"
+    assert "ATR_MULT w EXP-07 za niski" in komunikat, "nie widać, CO to zablokowało"
+
+
 def test_rejestr_wizji_dedup_rozne_typy_ok(tmp_path):
     """Ten sam tytuł ale różny typ → nie duplikat (dopisywane oba)."""
     from imperium.biblioteki import rejestr_wizji as rw
@@ -660,3 +696,45 @@ def test_dziennik_brak_wpisu_dzis(tmp_path):
     assert dn.brak_wpisu_dzis(plik=plik) is True   # pusty
     dn.dopisz(["x"], plik=plik)                      # dziś
     assert dn.brak_wpisu_dzis(plik=plik) is False
+
+
+# ── DEDUP REJESTRU WIZJI: PREDYKAT WSPÓLNY Z PAMIĘCIĄ (naprawa 2026-07-26) ────
+
+def test_rejestr_wizji_lapie_parafraze_nie_tylko_napis(tmp_path):
+    """Wpisy pisze DeepSeek, który parafrazuje — dedup po napisie ich nie widzi.
+
+    Wcześniej bramka porównywała (typ, tytuł) znak w znak, więc ten sam fakt zapisany
+    dwoma zdaniami wchodził dwa razy. Od naprawy używamy TEGO SAMEGO predykatu, co pamięć
+    lekcji (Prawo XVI: jeden predykat, dwa rejestry) — inaczej ten sam wpis byłby duplikatem
+    w jednym rejestrze, a nowością w drugim.
+    """
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    assert rw.dodaj("ZMIANA", "Obudzono neurony PSY-01/02 i V-03",
+                    "Adaptery Futures i CVD dolewają dane, neurony PSY-01, PSY-02 i V-03 głosują.",
+                    plik=plik) is True
+    assert rw.dodaj("ZMIANA", "Przebudzenie neuronów PSY-01/PSY-02 oraz V-03",
+                    "Neurony PSY-01, PSY-02, V-03 zaczęły głosować po dolaniu danych z adapterów.",
+                    plik=plik) is False, "parafraza tego samego faktu nie może wejść drugi raz"
+
+
+def test_rejestr_wizji_rozne_typy_to_rozne_byty(tmp_path):
+    """GRANICA: ta sama treść jako WIZJA i jako ZMIANA to dwa różne byty, nie duplikat.
+
+    Bez tego rozróżnienia zrealizowana ZMIANA zjadałaby WIZJĘ, z której powstała — czyli
+    dedup kasowałby historię zamiaru. Fałszywe scalenie kosztuje wiedzę bezpowrotnie.
+    """
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    assert rw.dodaj("WIZJA", "Portfel 20+ par", "Rozszerzyć portfel do 20+ par krypto.",
+                    plik=plik) is True
+    assert rw.dodaj("ZMIANA", "Portfel 20+ par", "Rozszerzyć portfel do 20+ par krypto.",
+                    plik=plik) is True, "inny typ = inny byt, nawet przy tym samym tytule"
+
+
+def test_rejestr_wizji_dedup_wylaczalny(tmp_path):
+    """`dedup=False` musi nadal wpuszczać wszystko — import historii nie jest cenzurowany."""
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    rw.dodaj("POMYSŁ", "Ten sam", "Treść.", plik=plik)
+    assert rw.dodaj("POMYSŁ", "Ten sam", "Treść.", plik=plik, dedup=False) is True

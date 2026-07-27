@@ -223,3 +223,83 @@ def test_argumenty_kosztu_maja_granice():
 def test_raport_bez_danych_mowi_wprost(tmp_path):
     """Pusty rejestr → komunikat, nie tabela zer."""
     assert "brak pomiarów" in lm.raport_tekstowy("u4", tmp_path / "nie_ma.jsonl")
+
+
+# ── ŚLEPA PLAMA DETEKTORA (nawrót klasy, 2026-07-27) ─────────────────────────
+
+def test_naglowek_lapie_wszystkie_zmierzone_warianty():
+    """GRANICA: 7 formatów nagłówka ZMIERZONYCH w kolejce musi dzielić plon.
+
+    Poprzednia naprawa dołożyła JEDEN wariant zamiast domknąć klasę — 4 z 7 nadal
+    sklejały cały plon w jeden blok, więc licznik kandydatów kłamał w dół.
+    """
+    from narzedzia.ab_plon_hyginusa import podziel_kandydatow
+    warianty = [
+        "1. **Kandydat: X**\n- opis\n2. **Kandydat: Y**\n- opis",
+        "### 1. **X**\n- opis\n### 2. **Y**\n- opis",
+        "### Kandydat A: X\n- opis\n### Kandydat B: Y\n- opis",
+        "### Kandydat 1: X\n- opis\n### Kandydat 2: Y\n- opis",
+        "1: X\n- opis\n2: Y\n- opis",
+        "**1. Kandydat: X**\n- opis\n**2. Kandydat: Y**\n- opis",
+        "- **Kandydat: X**\n- opis\n- **Kandydat: Y**\n- opis",
+    ]
+    for tekst in warianty:
+        assert len(podziel_kandydatow(tekst)) == 2, f"nie rozdzielone: {tekst[:24]!r}"
+
+
+def test_naglowek_nie_lapie_zagniezdzonych_krokow():
+    """GRANICA DRUGA STRONA: wcięta lista kroków to TREŚĆ kandydata, nie kandydaci.
+
+    Pierwsza wersja tej naprawy dopisała swobodne `\s*`, co zniosło limit wcięcia
+    `^[ \t]{0,3}` i dołożyło 12 widmowych „kandydatów" w jednym rekordzie.
+    """
+    from narzedzia.ab_plon_hyginusa import podziel_kandydatow
+    tekst = ("1. **Kandydat: DSR**\n"
+             "   - **Jak zmierzyć**:\n"
+             "     1. Oblicz surowy SR.\n"
+             "     2. Zastosuj DSR.\n"
+             "     3. Porównaj wyniki.\n"
+             "2. **Kandydat: PBO**\n"
+             "     1. Zbuduj foldy.\n")
+    assert len(podziel_kandydatow(tekst)) == 2
+
+
+def test_naglowek_nie_lapie_liczby_dziesietnej():
+    """GRANICA: „2.5" nie jest nagłówkiem — po numerze wymagana spacja."""
+    from narzedzia.ab_plon_hyginusa import podziel_kandydatow
+    assert len(podziel_kandydatow("1. **Kandydat: X**\n2.5 raza wieksza wartosc\n")) == 1
+
+
+def test_duplikat_wykryty_gdy_nazwa_ma_podkreslenie():
+    """GRANICA: `VPIN_TOKSYCZNOSC` dubluje Z-01, choć `\bvpin\b` nie trafia w `_`.
+
+    ZMIERZONE 2026-07-27: ramię U4 ON nazywało 34.7% kandydatów naszą konwencją
+    WIELKIE_Z_PODKRESLENIEM, ramię OFF 0% — detektor był ślepy dokładnie tam, gdzie
+    działał badany zabieg, i cały werdykt A/B U4 był artefaktem tej ślepoty.
+    """
+    import re
+
+    from narzedzia.ab_plon_hyginusa import policz_duplikaty
+    lek = ((r"\bvpin\b", re.compile(r"\bvpin\b", re.IGNORECASE)),)
+    dubel, bloki, trafione = policz_duplikaty("1. **Kandydat: VPIN_TOKSYCZNOSC**\n- opis\n", lek)
+    assert (dubel, bloki) == (1, 1) and trafione == [r"\bvpin\b"]
+
+
+def test_duplikat_nadal_wykrywany_bez_podkreslenia():
+    """Normalizacja `_`→spacja nie może zepsuć zwykłego dopasowania."""
+    import re
+
+    from narzedzia.ab_plon_hyginusa import policz_duplikaty
+    lek = ((r"\bvpin\b", re.compile(r"\bvpin\b", re.IGNORECASE)),)
+    dubel, _, _ = policz_duplikaty("1. **Kandydat: VPIN toksycznosc**\n- opis\n", lek)
+    assert dubel == 1
+
+
+def test_nazwa_bez_dubletu_nie_jest_oskarzana():
+    """GRANICA: normalizacja nie może produkować trafień z niczego."""
+    import re
+
+    from narzedzia.ab_plon_hyginusa import policz_duplikaty
+    lek = ((r"\bvpin\b", re.compile(r"\bvpin\b", re.IGNORECASE)),)
+    dubel, _, _ = policz_duplikaty("1. **Kandydat: SKEW_PREMIA**\n- opis\n", lek)
+    assert dubel == 0

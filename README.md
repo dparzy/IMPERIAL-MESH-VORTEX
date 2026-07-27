@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/legiony/rejestr.py
-stan_na: 2026-07-19
+stan_na: 2026-07-27
 powod_istnienia: "Wizytówka Imperium — podaje liczby wprost z kodu (neurony/testy/prawa), więc musi nadążać za rejestrem"
 ---
 # 🏛️ IMPERIAL MESH VORTEX
@@ -11,7 +11,7 @@ powod_istnienia: "Wizytówka Imperium — podaje liczby wprost z kodu (neurony/t
 > Samouczący się rój neuronów, który poluje na rynku jak armia z jasnym łańcuchem dowodzenia.
 > **Doktryna:** wojna = giełda; pierwszy front — **MEXC**; każdy order stawiany z myślą o zysku, a łup (zysk) finansuje lepszy budulec Imperium.
 
-> **Stan na:** 2026-07-26 · **Testy:** `python tests/run_tests.py` (zielone) · **Rój:** <!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów / <!-- LICZBA:zwiadowcy -->15<!-- /LICZBA --> zwiadowców · **Faza bieżąca:** żywe źródło w [`docs/MANIFEST_KODU.md`](docs/MANIFEST_KODU.md) + [`docs/LOG_ZMIAN.md`](docs/LOG_ZMIAN.md) (nie duplikujemy tu rosnącej listy W-XXX — starzała się i kłamała).
+> **Stan na:** 2026-07-27 · **Testy:** `python tests/run_tests.py` (zielone) · **Rój:** <!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów / <!-- LICZBA:zwiadowcy -->15<!-- /LICZBA --> zwiadowców · **Faza bieżąca:** żywe źródło w [`docs/MANIFEST_KODU.md`](docs/MANIFEST_KODU.md) + [`docs/LOG_ZMIAN.md`](docs/LOG_ZMIAN.md) (nie duplikujemy tu rosnącej listy W-XXX — starzała się i kłamała).
 
 ---
 
@@ -72,7 +72,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | 🏛️ **senat/** | debata / konsensus (Byk / Niedźwiedź / Cenzor) | <!-- LICZBA:organ_senat -->2<!-- /LICZBA --> |
 | ⚔️ **legiony/** | neurony + zwiadowcy + Generał Legatus + Radar | <!-- LICZBA:organ_legiony -->67<!-- /LICZBA --> |
 | 🏟️ **koloseum/** | Dyrygent, PętlaLive, Backtest, Namiestnik, Legiony Cieni | <!-- LICZBA:organ_koloseum -->16<!-- /LICZBA --> |
-| 🛡️ **pretorianie/** | bezpieczeństwo, kalkulator lewara, Praeda, **PORTITOR** (pre-flight u wrót) | <!-- LICZBA:organ_pretorianie -->10<!-- /LICZBA --> |
+| 🛡️ **pretorianie/** | bezpieczeństwo, kalkulator lewara, Praeda, **PORTITOR** (pre-flight u wrót) | <!-- LICZBA:organ_pretorianie -->11<!-- /LICZBA --> |
 | 🏗️ **akwedukty/** | pipeline danych + adaptery API (Futures / F&G / CVD / News) | <!-- LICZBA:organ_akwedukty -->17<!-- /LICZBA --> |
 | 🛤️ **drogi/** | API i egzekucja (NexusHub) | <!-- LICZBA:organ_drogi -->4<!-- /LICZBA --> |
 | 🎨 **swiatynie/** | **PRAETORIUM** (Kwatera Główna Imperatora) + dashboard / wizualizacja / SPECULA świec | <!-- LICZBA:organ_swiatynie -->7<!-- /LICZBA --> |

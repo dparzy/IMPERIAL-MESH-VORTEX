@@ -703,3 +703,43 @@ def test_konsoliduj_cel_none_bierze_cel_z_progu(monkeypatch):
     r = ps.konsoliduj_lekcje(cel_znakow=None, plik=p, archiwum=None, sucho=True)
     assert r["znakow_po"] <= int(3000 * ps.UDZIAL_CELU_SEKCJA)
     assert r["zarchiwizowanych"] >= 1
+
+
+# ── ZASIĘG DEDUPU OBEJMUJE ARCHIWUM (naprawa 2026-07-26) ─────────────────────
+
+def test_dedup_widzi_lekcje_schlodzona_do_archiwum(monkeypatch):
+    """🚨 GRANICA ZASIĘGU: bliźniak w ACTA to NADAL duplikat.
+
+    Wada (zmierzona 2026-07-26): `duplikat_lekcji` przeglądał wyłącznie plik aktywny —
+    91 lekcji widzianych wobec 207 schłodzonych niewidzianych, czyli bramka pilnowała 31%
+    korpusu. Mechanizm: chłodzenie przenosi lekcję do ACTA, jej bliźniak znika z pola
+    widzenia i auto-lekcja zapisuje tę samą treść jako „nową". Tak powstały 4 kopie jednej
+    lekcji — powtórka wady naprawianej po cubic PR #118, gdzie poprawiono PREDYKAT, ale
+    nie ZASIĘG.
+    """
+    p = _plik()
+    ps.dopisz_lekcje("Wskaźnik VWAP liczony na złym oknie",
+                     "Okno VWAP było dobowe zamiast sesyjnego.",
+                     data="2026-07-20", plik=p, chlodz=False)
+    # Bliźniak leży WYŁĄCZNIE w ACTA — dokładnie stan po schłodzeniu. Treść musi być
+    # rozłączna z lekcją aktywną, inaczej test mierzyłby czułość predykatu, nie zasięg.
+    ps._dopisz_archiwum([{"naglowek": "### 2026-07-01 — Model GARCH nie zbiega na krótkiej próbce",
+                          "data": "2026-07-01",
+                          "tytul": "Model GARCH nie zbiega na krótkiej próbce",
+                          "tresc": "Estymacja GARCH poniżej 500 obserwacji nie zbiega."}],
+                        ps._archiwum_dla(p))
+
+    tytul = "Model GARCH nie zbiega na krótkiej próbce"
+    tresc = "Estymacja GARCH poniżej 500 obserwacji nie zbiega."
+    assert ps.duplikat_lekcji(tytul, tresc, plik=p, z_archiwum=False) is None, (
+        "to jest STARE zachowanie — gdyby łapało, test nie dowodziłby naprawy")
+    znaleziona = ps.duplikat_lekcji(tytul, tresc, plik=p)
+    assert znaleziona is not None, "bliźniak w archiwum MUSI zostać rozpoznany"
+    assert znaleziona.get("schlodzona") is True, "wołający ma wiedzieć, że bliźniak jest w ACTA"
+
+
+def test_dedup_bez_archiwum_nie_wywala_sie_gdy_acta_nie_istnieje():
+    """GRANICA: brak pliku ACTA to normalny stan (świeża pamięć), nie awaria."""
+    p = _plik()
+    assert not ps._archiwum_dla(p).exists()
+    assert ps.duplikat_lekcji("Zupełnie nowa lekcja o czymś innym", "Treść.", plik=p) is None

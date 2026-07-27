@@ -12,6 +12,66 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-27 — Mutacja przeżyła przez luźną asercję testu zasięgu
+Test zasięgu miał asercję 'zbadane ≥ 8+40' zamiast 'równość z policzonym zasięgiem'. Luźny próg przepuszczał zawężenie bramki z 73 do 65. Poprawiono na ścisłą równość; mutacja padła.
+
+### 2026-07-26 — Średnie śledzie w 1L za długie
+Medium tracks w pierwszej lidze datasetu ZENITH mają średnio 10K linii, co znacznie przekracza limit 2K. Obniża to jakość danych treningowych i wymaga kryteriów kwalifikacji.
+
+### 2026-07-26 — Commitowanie desktop paths łamie przenośność i PII
+W kronice znaleziono bezwzględne ścieżki typu ~\Desktop. Należy używać zmiennych środowiskowych lub przechowywać referencje wewnątrz repozytorium. To narusza bezpieczeństwo i przenośność.
+
+### 2026-07-26 — Bezpośrednia edycja sigillum_probationis.json narusza zasadę
+Plik sigillum_probationis.json jest magazynem (ledger) i musi być aktualizowany wyłącznie przez narzędzia sigillarium lub codex_probationum.py. Ręczna edycja jest złamaniem reguły CLAUDE.md i README.md.
+
+### 2026-07-26 — cubic-dev-ai trafny w 20/22, 2 fałszywe alarmy (w tym jedyne P1)
+cubic-dev-ai w PR #133 zgłosił 22 zastrzeżenia: **20 słusznych, 2 fałszywe**. Fałszywe to
+(1) jedyne **P1** — halucynacja cytująca dwie NIEISTNIEJĄCE reguły o zakazie edycji
+`sigillum_probationis.json`; (2) „wrzutnia/consilium nie istnieje" — istnieje, jest
+gitignorowany, recenzent pomylił NIEWIDOCZNE z NIEISTNIEJĄCYM. Lekcja: cytat z reguły
+sprawdzaj `grep`em, zanim uznasz zarzut.
+
+*Korekta 2026-07-27:* wpis głosił „trafny w 22/22, ale 3 fałszywe alarmy" — liczba przeczyła
+sama sobie, licznik fałszywek był zawyżony, a ich nazwy zmyślone. Poprawione wobec ŹRÓDŁA
+(Dziennik Nieśmiertelny, wpis `cubic133` pisany w chwili pomiaru). Zgłoszone przez cubic
+w PR #134 jako P3 — recenzent miał rację, choć o skali pomylił się w drugą stronę.
+
+### 2026-07-26 — Audyt spójności ukrywa czerwony wynik (stderr zamiast stdout)
+W narzedziu audyt_spojnosci.py alarmy sa wypisywane na stderr (linie 1160-1163), podczas gdy hook zbiera tylko stdout. W efekcie czerwony audyt jest niewidoczny w wydruku startowym - sesja wyglada ciszej niz zdrowa. To odwrocona wersja wady klasy 'milczenie udajace wynik' z apert26.
+
+### 2026-07-22 — tail w rurze testów fałszuje kod wyjścia
+Komenda `python tests/run_tests.py | tail` zwraca kod wyjścia `tail`, nie testów – maskuje oblane testy (exit 0 mimo 1 porażki). Należy unikać `tail` w rurze lub używać oddzielnej obsługi.
+
+### 2026-07-20 — Audyt spójności pełna harmonia
+84 neurony, 15 zwiadowców, 18 elit, ruff czysto, MAPA_KLUCZY pełna – system w pełni harmonijny.
+
+### 2026-07-26 — Path('/home/tiro') na Windows nie działa z startswith('/')
+Path('/home/tiro') na Windows normalizuje się do \home\tiro, więc startswith('/') zwraca False. Abstynencja działała tylko w jedną stronę. Naprawa mechanizmem, nie łatką.
+
+### 2026-07-26 — Audyt czerwony niewidoczny przez hook stdout
+Hook utrwala tylko stdout, alarmy audytu lecą na stderr. Przy czerwonym wyniku stdout jest pusty – wygląda ciszej niż zielony. Klasa wady z apert26: milczenie udające spokój.
+
+### 2026-07-26 — TIRO: 153 uzyteczne pary = 15% progu 1000
+Zbior treningowy TIRO to 348 surowych/153 uzytecznych par, co stanowi 15% docelowego progu 1000. Wymaga kontynuacji sniwa (zadanie E3) przed uruchomieniem pelnego treningu.
+
+### 2026-07-26 — Brak kluczy MEXC uniemozliwia live trading
+MEXC_API_KEY i MEXC_SECRET nie sa ustawione w srodowisku. Zero realnych orderow pomimo gotowego kodu (ccxt 4.5.59). Niezbedne do przejscia na live.
+
+### 2026-07-26 — Testy 2882/2885 - 3 obalone, w tym jedna nowa wada
+Dwie porazki wynikaja z niesledzonego consilium (znane), trzecia to osobna wada wymagajaca analizy. Pelny bieg testow wciaz leci w tle, stan oficjalnie nieznany.
+
+### 2026-07-26 — Audyt spójności kończy się exit 1 i hook milczy
+Podczas audytu środowiska komenda zakończyła się kodem błędu (exit 1), a hook w kroku 0 nie wyświetlił żadnej treści – to klasyczna wada 'milczenie udające wynik'.
+
+### 2026-07-20 — Hipoteza B potwierdzona OOS
+Ważenie głosów IC (Legatus) daje +3.6pp na 5/5 parach poza próbą – czeka na zgodę Cezara na wpięcie do kodu.
+
+### 2026-07-20 — Audyt exit 0 nie oznacza prawdy
+INDEKS_IMPERIUM.md podaje dwie różne liczby neuronów: 299 w nagłówku (data 2026-06-09) i 87 w sekcji MAPA KODU. Audyt przepuszcza, bo W5 czyta tylko z MAPA KODU. To dowód, że dokument może kłamać obok bramki.
+
+### 2026-07-20 — Hotspoty: _py_supertrend i _py_volume_profile
+Czysto-pythonowe pętle O(okno) na wskaźnikach supertrend i volume_profile są ciężkie (okno 251, wiele symboli). Kandydaci do wektoryzacji numpy.
+
 ### 2026-07-26 — Wynik BREVIARIUM 2882/2882 dotyczy innego kodu
 Testy uruchomione w tle (BREVIARIUM) zwróciły wynik 2882/2882, ale ten wynik pochodzi z innej wersji kodu niż dzisiejsza – nie można go używać do oceny bieżącego stanu.
 
@@ -35,12 +95,6 @@ Warstwa 11 audytu sprawdza meldunek tylko w imperium/biblioteki/. Organy w imper
 
 ### 2026-07-20 — Legalne abstynencje zmysłów zidentyfikowane
 Niektóre neurony legalnie nie głosują: PSY-01 (funding=8e-5, brak ekstremum), PSY-04 (OI_PREV==OI, 1. odczyt), NEWS-02/03/04 (stan kroczący ≥2 bary), RADAR/N/CP (potrzebują serii cen – nie podano w teście). Zero martwych głosów.
-
-### 2026-07-20 — Pełny dostęp do danych lokalnych
-Claude ma dostęp do 69 książek (559 MB) i 59 MB tekst_cache RAG na laptopie – ciężka robota analityczna jest teraz możliwa.
-
-### 2026-07-20 — Rozbieżność banera środowiska
-Baner startowy centrum_pamieci wskazuje 'CHMURA', ale żywy detektor wykryj_srodowisko() zwraca 'lokal' – źródło banera jest nieaktualne.
 
 ### 2026-07-20 — 20/22 moduły żywe na realnych danych, 2 warunkowo ciche
 Sonda diagnostyczna wykazała, że AUG-01 milczy z powodu braku aktywnego zdarzenia, a RADAR-05 z powodu słabej korelacji lead-lag (<0.20). NEWS-03/04 ożywają po rozgrzewce. Stan faktyczny: 20/22 ŻYWE po rozgrzewce, pozostałe 2 to poprawna abstynencja.
@@ -107,9 +161,6 @@ CLAUDE.md KROK 0 whitelist nie zawiera kategorii C i D (fałszywy alarm), a `aud
 
 ### 2026-07-21 — Archiwum lekcji niewidoczne dla szukaj()
 Schłodzone lekcje mają inny nagłówek w pliku, więc parser modułu nie czyta archiwum. Luka powstała przy wdrażaniu chłodzenia. Wymaga poprawy parsowania.
-
-### 2026-07-21 — PROBATOR znalazł nieugruntowany plon w kolejce Hyginusa
-Pomiar na realnym plonie: 2367 znaków kandydatów i zero powołań na źródło, mimo promptu żądającego cytowań. PROBATOR działa poprawnie.
 
 ### 2026-07-20 — Samo-recenzja przed pushem – wymog procesu
 Cezar zadal samo-recenzji z uzyciem wzorca high-effort recall-biased przed pushem. Zastosowano metode 'review target --diff' – potwierdzono, ze jest to wymagane przed kazdym commitem.
@@ -186,9 +237,6 @@ Otwarcie sesji nie ma egzekwowanej checklisty, w przeciwieństwie do 9-krokowej 
 ### 2026-06-30 — Audyt źródła pure-Python w Bramie: brakowało _PURE_PYTHON_INDICATORS
 Wszystkie wskaźniki w Bramie miały źródło TA-Lib. Dodano zbiór _PURE_PYTHON_INDICATORS (11 wskaźników) i warunek SOURCE_TAG_PY w compute(). Naprawiono rozróżnienie źródła dla wskaźników własnych.
 
-### 2026-07-10 — BIB-032 O'Hara – OCR garbage, nieindeksowany
-Książka w formacie skanowanych obrazów PDF – OCR generuje śmieci. Zgodnie z Prawem I (zero fabricacji) nie została włączona do RAG.
-
 ### 2026-06-30 — HA doji: strict > zamiast >=
 HA_BULL = c > o (nie >=) — doji neutralny, nie byczy.
 
@@ -197,9 +245,6 @@ Spłata długu gnicia nie wykrywa widm API (pliki istnieją w kodzie, ale w inny
 
 ### 2026-07-21 — _ jest znakiem słownym –  nie zamyka BIB-006_Carson
 Wzorzec regex  nie zamykał się na identyfikatorze BIB z podkreśleniem. Złapane przez test negatywny. Wpis do Księgi Wad.
-
-### 2026-07-21 — Archiwum LEKCJI z innym nagłówkiem – niewidoczne dla szukaj()
-Schłodzone lekcje (27) w archiwum były niewidoczne dla funkcji szukaj(), bo parser modułu używał innego nagłówka. Naprawiono.
 
 ### 2026-07-21 — Archiwum lekcji ma inny nagłówek – schłodzone lekcje niewidoczne dla szukaj()
 Parser modułu LEKCJE nie obsługiwał nagłówka archiwum, przez co po schłodzeniu lekcje znikały z wyszukiwania. Luka wykryta i naprawiona.
@@ -272,9 +317,6 @@ Mechanizm zasiewu wzorców nie przenosi regexu z checklisty do wzorców startowy
 
 ### 2026-07-21 — Ukryta zależność od monkeypatch w runnerze Imperium
 Testy PEDES przechodzą pod pytest, ale padają pod własnym runnerem Imperium, którego shim monkeypatch nie ma metody setitem. Naprawiono bez zależności od shimu.
-
-### 2026-07-21 — Testy padają pod runnerem Imperium przez brak setitem w shimie monkeypatch
-Testy zielone pod pytest, ale padają pod własnym runnerem – shim monkeypatch nie ma setitem. Naprawiono bez zależności od shimu.
 
 ### 2026-07-20 — Parametry Fujitsu Lifebook E754
 CPU i5-4200M Haswell 2013, 2 rdzenie/4 wątki, 2.5 GHz. RAM 16 GB (9 GB wolne). GPU Intel HD 4600 1 GB – bezużyteczne do LLM. Inferencja tylko CPU, maksymalny model 3-8B mocno skwantyzowany.
@@ -360,9 +402,6 @@ Funkcja _py_ulcer używa c[-period:] do obliczeń, więc wymaga tylko 'period' p
 ### 2026-06-30 — Off-by-one warmup Ulcer i Accelerator
 Ulcer warmup wymagał period+1 zamiast period (używał c[-period:]). Accelerator miał zbędny +1 w warmup slow+sma_ac. Poprawiono w _py_ulcer() i _py_accelerator().
 
-### 2026-06-30 — __pycache__ nie powinien być w git
-Po kompilacji brama_kalkulatora.py przypadkowo commitowano __pycache__. Naprawiono przez git rm --cached i dodanie do .gitignore.
-
 ### 2026-06-30 — Mieszanie zasad źródłem chaosu
 Poprzedni projekt popadł w chaos przez mieszanie zasad Kingdom Pixel (79) z Imperium. Rozwiązanie: całkowicie nowe zasady dla Imperium.
 
@@ -375,20 +414,11 @@ Początkowe wartości LONG_SHORT_RATIO=2.4 i FUNDING_RATE=0.0009 nie wywoływał
 ### 2026-06-30 — Kolizja nazw NeuronOrderBlock z SMC-01
 Nowy neuron w trend.py nazwany NeuronOrderBlock kolidował z istniejącym SMC-01. Rozwiązano przez zmianę nazwy na NeuronOBZone.
 
-### 2026-06-30 — Push wymaga uprawnień Write w GitHub Installation
-Środowisko Claude web nie ma uprawnień do push do repozytorium dparzy/imperial-mesh-vortex. Konieczna konfiguracja w github.com/settings/installations.
-
-### 2026-06-30 — Ulcer warmup period+1 błędne
-W funkcji _py_ulcer warmup używał period+1, podczas gdy poprawnie wymagany jest tylko period (c[-period:]). Naprawiono.
-
 ### 2026-06-30 — Bezpiecznik Kapitału W-028: AOA 30% drawdown jako circuit-breaker
 Gdy strata z AOA przekracza 30%, Scheduler blokuje wszystkie nowe sygnały i zamyka pozycje. Zintegrowany z Scheduler._bezpiecznik_ok() – sprawdzany przed każdą transakcją.
 
 ### 2026-06-30 — __pycache__ w git - usunięty i dodany do .gitignore
 Po kompilacji brama_kalkulatora.py pliki cache Pythona zostały przypadkowo skomitowane. Naprawa: git rm -r --cached i dodanie __pycache__ do .gitignore.
-
-### 2026-06-30 — Cross jako zdarzenie w EXP-11
-Sygnał tylko przy świeżym przecięciu, nie gdy fast>slow przez wiele barów – unikanie powtarzalnych sygnałów.
 
 ### 2026-06-30 — Symmetric displacement w EXP-10
 Pierwotnie brano tylko |Δhigh|, teraz max(|Δhigh|,|Δlow|) dla symetrycznej detekcji strukturalnego przemieszczenia.
@@ -428,9 +458,6 @@ Próba dodania neuronu o nazwie NeuronOrderBlock w trend.py skończyłaby się k
 
 ### 2026-06-30 — Złoty Orzeł nieaktywny na DOGE z powodu death cross
 Strategia long-only (EMA50/EMA200) nie aktywowała się, ponieważ EMA50 < EMA200 przez cały okres testu DOGE.
-
-### 2026-06-30 — Pojedyncza próbka nie dowodzi martwoty neuronu
-W diagnostyce korelacji wymóg len(v) >= 2 do uznania neuronu za martwy. 1 próbka klasyfikowana jako 'niedostateczne dane'.
 
 ### 2026-06-30 — Konieczność *_PREV dla wykrywania przecięć
 Wartości z poprzedniej świecy (*_PREV) są niezbędne do poprawnego wykrywania przecięć linii (np. MACD), ale Brama początkowo ich nie dostarczała – dodano funkcję _second_last_valid.
@@ -474,14 +501,8 @@ Współczesna instalacja TA-Lib na Windows jest prostsza — pip install TA-Lib 
 ### 2026-06-30 — Pre-commit: stash isolation dla staged
 Dodano git stash push --keep-index --include-untracked + trap przywracający working tree. Testy działają na staged, nie na working tree.
 
-### 2026-06-30 — Diagnostyka: 1 próbka nie dowodzi martwoty
-Detekcja stałej serii wymaga len(v) >= 2. Pojedyncza próbka trafia do pary_niedostateczne_dane.
-
 ### 2026-06-30 — Czytnik symbol z nazwy pliku: split('_')[-2]
 Fallback symbol z nazwy pliku Binance_BTCUSDT_1h dawał BINANCE przez split('_')[0]. Poprawiono na [-2].
-
-### 2026-06-30 — Ulcer Index warmup: period zamiast period+1
-Funkcja _py_ulcer() używa c[-period:] więc potrzebuje tylko period próbek, a nie period+1. Poprawiono warunek warmup.
 
 ### 2026-06-30 — SkalowanieFrakcjaDD: ciągłe skalowanie pozycji od DD
 frakcja = max(min_frakcja, min(1.0, 1.0 - dd/prog_max)). Domyślnie prog_max=20%, min_frakcja=10%. Wpływa na rozmiar pozycji przez frakcja_dd w PlanPozycji.
@@ -507,9 +528,6 @@ Relative import from .mikro_neuron fails gdy plik uruchamiany bezpośrednio. Roz
 ### 2026-06-30 — Format CSV CryptoDataDownload wymaga specjalnego czytnika
 Pliki CSV z CDD mają pierwszy wiersz URL, nagłówek w drugim, dane malejąco, timestamp w ms. Kolumna wolumenu bazowego to 'Volume' (nie 'Volume USDT'). Czytnik CSV musi to obsługiwać.
 
-### 2026-06-30 — RSI Div delta 2.0 zbyt wysoka dla daily
-Na sąsiednich daily RSI rzadko zmienia się o >2 pkt. Zmieniono próg z 2.0 na 0.3.
-
 ### 2026-06-30 — Slabosc: reczny parametr rezimu w strategiach
 Testy na 3 scenariuszach rynkowych wykazaly, ze reczne podawanie rezimu (NORMAL, TREND_STRONG itp.) jest slabym punktem. Nastepny krok: automatyczny klasyfikator rezimu.
 
@@ -530,12 +548,6 @@ L2 order book od Binance ma ceny i wolumeny jako stringi. Dodano float(b[1]) i f
 
 ### 2026-06-30 — Diagnostyka fałszywie alarmowała martwe neurony
 Pary z 1 próbką były klasyfikowane jako 'martwe' (len(set)==1). Dodano wymóg >=2 próbek do detekcji stałej serii. Nowy klucz: pary_niedostateczne_dane.
-
-### 2026-06-30 — Golden Cross: wariant EMA, nie oryginalny SMA
-Strategia ZŁOTY ORZEŁ używa EMA50/EMA200, a nie kanonicznego SMA50/SMA200. Odnotowano w katalogu.
-
-### 2026-06-30 — Diagnostyka korelacji: 1 próbka fałszywie uznawana za martwą
-len(set)==1 dla 1 próbki dawało false positive. Wymagane ≥2 próbki do detekcji stałej serii.
 
 ### 2026-06-30 — pewnosc_agregatu ≈ 1.0 to root cause strat
 KalkulatorLewara używa pewnosc_agregatu do wyznaczania dźwigni, ale zawsze ≈1.0 → max leverage → ciasne stop lossy → wiele małych strat. To jest pierwotna przyczyna wszystkich strat systemu.
@@ -563,15 +575,6 @@ CME uruchomiło 24/7 kontrakty futures na BTC, co eliminuje weekendowe luki ceno
 
 ### 2026-06-30 — HA doji neutralny i ATR=0
 HA_BULL zmieniono z >= na > (doji neutralny). Przy ATR=0 dodano jawne zera dla HA_MOMENTUM i HA_VOLATILITY_INDEX.
-
-### 2026-06-30 — Diagnostyka korelacji fałszywie martwe przy 1 próbce
-1 próbka dawała len(set)==1 uznawane za martwe. Wymóg ≥2 próbek do detekcji stałej serii.
-
-### 2026-06-30 — AC warmup off-by-one
-Accelerator Oscillator miał zbędne +1 w warmupie (slow+sma_ac+1). Usunięto nadmiar.
-
-### 2026-06-30 — Cross jako EVENT w EXP-11
-Cross jako EVENT a nie STATE: EXP-11 sygnalizuje tylko przy świeżym przecięciu, nie na każdym barze gdzie fast>slow.
 
 ### 2026-06-30 — HA bez repainting: rekurencyjny HA_Open
 Heiken Ashi bez repainting wymaga HA_Open[i] = (HA_Open[i-1] + HA_Close[i-1]) / 2, a nie (Open[-1]+Close[-1])/2. Zaimplementowano w _dodaj_ha().

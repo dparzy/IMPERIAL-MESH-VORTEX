@@ -71,10 +71,29 @@ def stan_hyginusa() -> Dict[str, Any]:
     # pracę. Środowisko bez rejestru nie ma o nim głosu (ta sama klasa co `ksiazki 115→0`).
     rejestr_nieobecny = not KOLEJKA_HIPOTEZ.exists()
     rek = [] if rejestr_nieobecny else _linie_jsonl(KOLEJKA_HIPOTEZ)
-    ok = [r for r in rek if r.get("status") == "ok"]
+    # WYROKI mieszkają w tym samym pliku (osobny `status="wyrok"`, wskaźnik `dot_ts`), więc
+    # muszą wypaść i z licznika cząstek, i z długu przeglądu — inaczej sąd nad kolejką
+    # PODNOSIŁBY meldowany dług zamiast go spłacać, a każdy wyrok liczyłby się jako nowy plon.
+    wyroki = [r for r in rek if r.get("status") == "wyrok"]
+    osadzone = {r.get("dot_ts") for r in wyroki}
+    rek = [r for r in rek if r.get("status") != "wyrok"]
+    ok = [r for r in rek if r.get("status") == "ok" and r.get("ts") not in osadzone]
     znaczniki = [r["ts"] for r in rek if isinstance(r.get("ts"), (int, float))]
-    zbadane = [r for r in ok if "probator" in r]
-    podejrzane = [r for r in zbadane if not (r.get("probator") or {}).get("czysty", True)]
+    # 🚨 ZASIĘG, NIE PREDYKAT (zmierzone 2026-07-27 — trzeci nawrót tej samej klasy po PR #118
+    # i cubic133). PROBATOR bada DWA plony modelu: kandydatów i krytykę. Meldunek czytał
+    # wyłącznie `probator`, a `probator_krytyka` zapisywaliśmy i nigdy nie oglądali. Zmierzone
+    # na partii z 07-26: kandydaci 10/10 CZYSTY, ale krytyka 8 CZYSTY / 1 PODEJRZANY /
+    # 1 BEZ_CYTATU — meldunek ogłaszał „podejrzanych 0". To milczenie udające wynik, a przy
+    # tym broń wytrącona sędziemu: krytyka jest OBRONĄ przed złym kandydatem, więc skażona
+    # krytyka musi być widoczna PRZED sądem nad kolejką, nie po.
+    PLONY = ("probator", "probator_krytyka")
+    def nieczysty(r: Dict[str, Any], plon: str) -> bool:
+        """Brak plonu = brak zarzutu (domyślnie czysty) — nie zamieniamy niewiedzy w alarm."""
+        return not (r.get(plon) or {}).get("czysty", True)
+
+    zbadane = [r for r in ok if any(k in r for k in PLONY)]
+    podejrzane = [r for r in zbadane if any(nieczysty(r, k) for k in PLONY)]
+    podejrzane_wg_plonu = {k: sum(1 for r in zbadane if nieczysty(r, k)) for k in PLONY}
 
     model, profile = "?", []
     try:
@@ -107,12 +126,14 @@ def stan_hyginusa() -> Dict[str, Any]:
         "rejestr_nieobecny": rejestr_nieobecny,
         "czastek": None if rejestr_nieobecny else len(rek),
         "czeka_na_sedziego": None if rejestr_nieobecny else len(ok),
+        "osadzonych": None if rejestr_nieobecny else len(wyroki),
         "ostatni_zwiad": (datetime.fromtimestamp(max(znaczniki)).strftime("%Y-%m-%d %H:%M")
                           if znaczniki else "—"),
         "model": model,
         "profile_dispensatora": profile,
         "zbadane_probatorem": None if rejestr_nieobecny else len(zbadane),
         "podejrzane": None if rejestr_nieobecny else len(podejrzane),
+        "podejrzane_wg_plonu": None if rejestr_nieobecny else podejrzane_wg_plonu,
         "dispensator_wpiety": _czy_dispensator_wpiety(),
     }
 
@@ -185,13 +206,21 @@ def _pary_uzyteczne() -> Optional[int]:
 
     Liczymy tym samym kodem, który buduje zbiór treningowy (Prawo XVI: jedno źródło prawdy,
     dwa liczniki rozjadą się co do sztuki). None, gdy nie da się policzyć — nie zgadujemy.
+
+    DWIE POPRAWKI Z RECENZJI 2026-07-26 (obie tej samej klasy — „licznik opisuje coś innego
+    niż myślisz"):
+    1. Liczymy STRUMIENIEM (`policz_sft`), nie eksportem do pliku tymczasowego. Meldunek
+       biegnie na OBU końcach każdej sesji, więc nie ma prawa płacić zapisem całego zbioru;
+       koszt rósłby z każdą zebraną parą, a licznik ma być tani jak spojrzenie.
+    2. Podajemy `PARY_TIRO` JAWNIE. Wcześniej licznik użytecznych szedł domyślną ścieżką
+       Notariusa, a licznik surowych — stałą tego modułu. Dziś wskazują ten sam plik, więc
+       wada była UTAJONA: rozjazd ujawniłby się dopiero, gdy któraś stała się zmieni, i wtedy
+       procent gotowości Szkoły opisywałby dwa różne ledgery naraz. Jedno źródło, jawnie.
     """
     try:
-        import tempfile
-        from imperium.biblioteki.notarius import eksportuj_sft
-        with tempfile.TemporaryDirectory() as kat:
-            return eksportuj_sft(Path(kat) / "sft.jsonl",
-                                 jedna_probka_na_pytanie=True, min_znakow_odpowiedzi=200)
+        from imperium.biblioteki.notarius import policz_sft
+        return policz_sft(PARY_TIRO, min_znakow_odpowiedzi=200,
+                          jedna_probka_na_pytanie=True)
     except Exception:                                        # noqa: BLE001 — meldunek nie może paść
         return None
 
@@ -338,14 +367,20 @@ def banner(model_architekta: Optional[str] = None) -> str:
     else:
         wiersze.append(
             f"   📚 HYGINUS (Bibliotekarz-Zwiadowca): kolejka {h['czastek']} cząstek | "
-            f"czeka na sędziego {h['czeka_na_sedziego']} | ostatni zwiad {h['ostatni_zwiad']}"
+            f"czeka na sędziego {h['czeka_na_sedziego']} | osądzonych {h['osadzonych']} | "
+            f"ostatni zwiad {h['ostatni_zwiad']}"
         )
     wiersze.append(f"      model: {h['model']} | DISPENSATOR: {dysp}")
     if h["profile_dispensatora"]:
         wiersze.append(f"      profile: {', '.join(h['profile_dispensatora'])}")
     if h["zbadane_probatorem"]:
+        # Rozbicie pokazujemy TYLKO gdy jest co pokazać — sędzia musi wiedzieć, czy skażony
+        # jest kandydat (propozycja), czy krytyka (obrona przed nią). To dwie różne wiadomości.
+        wg = h.get("podejrzane_wg_plonu") or {}
+        rozbicie = (f" (kandydaci {wg.get('probator', 0)}, krytyka {wg.get('probator_krytyka', 0)})"
+                    if h["podejrzane"] else "")
         wiersze.append(f"      PROBATOR: zbadanych {h['zbadane_probatorem']}, "
-                       f"podejrzanych {h['podejrzane']}")
+                       f"podejrzanych {h['podejrzane']}{rozbicie}")
 
     if t["silnik"] is None:
         silnik = "⚠️ dysk TIRO niewidoczny stąd"       # nie wiem ≠ brak (Prawo I)
@@ -382,8 +417,14 @@ MIGAWKA = ROOT / "bibliotheca_ulpia" / "dane" / "breviarium_migawka.json"
 
 # Liczby, których RÓŻNICA opisuje dorobek wachty. Świadomie wąska lista: modele na dysku
 # czy klasa sprzętu nie zmieniają się w trakcie sesji, więc ich delta byłaby szumem.
+# 🚨 `pary_uzyteczne` DOPISANE 2026-07-27 — czwarty nawrót klasy „naprawiono widok, nie zasięg".
+# 07-26 uznaliśmy `pary_nauczyciela` (surowe) za liczbę MYLĄCĄ i wprowadziliśmy `pary_uzyteczne`
+# jako operacyjną — ale poprawka objęła sam meldunek, a delta dalej śledziła wyłącznie tę
+# odrzuconą. Skutek zmierzony na tym domknięciu: wachta podniosła użyteczne 177 → 212 (+35,
+# największy realny ruch dnia), a delta zaraportowała „+2 pary surowe". Różnica ma pokazywać
+# to, czym MIERZYMY postęp, inaczej opisuje wachtę wielkością, której świadomie nie ufamy.
 _POLA_DELTY = ("czastek", "czeka_na_sedziego", "podejrzane", "zbadane_probatorem",
-               "pary_nauczyciela")
+               "pary_nauczyciela", "pary_uzyteczne")
 
 
 def migawka() -> Dict[str, Any]:
@@ -392,10 +433,26 @@ def migawka() -> Dict[str, Any]:
     return {k: v for k, v in {**h, **t}.items() if k in _POLA_DELTY}
 
 
-def zapisz_migawke(sciezka: Optional[Path] = None) -> Dict[str, Any]:
-    """Utrwal stan na OTWARCIU wachty (wołane przez hook startowy)."""
+def zapisz_migawke(sciezka: Optional[Path] = None, nadpisz: bool = False) -> Dict[str, Any]:
+    """Utrwal stan na OTWARCIU wachty — TYLKO jeśli punktu odniesienia jeszcze nie ma.
+
+    🚨 PUNKT ODNIESIENIA NADPISYWANY PRZEZ WZNOWIENIE (zmierzone 2026-07-27 na własnym
+    domknięciu). Hook `SessionStart` woła `--migawka` przy KAŻDYM zdarzeniu — także
+    `resume`, a wznowień bywa w wachcie kilka. Każde z nich zapisywało stan BIEŻĄCY jako
+    „stan z otwarcia", więc krok 4b zamknięcia meldował `bez zmian w liczbach sług`,
+    podczas gdy ta sama wachta osądziła 8 cząstek (kolejka 43 → 35) i dołożyła 5 par TIRO.
+    Miara dorobku pokazywała zero — to milczenie udające wynik, dokładnie ta klasa, przeciw
+    której delta została zbudowana („rzecz widoczna tylko na jednym końcu procesu").
+
+    Lekarstwo: **pierwszy zapis wygrywa**. Migawka jest ZUŻYWANA przez `delta()` na
+    domknięciu, więc następna wachta i tak zaczyna od czystego punktu. Gdy wachta nie
+    domknie się porządnie, stary punkt przetrwa i różnica obejmie obie — to jest UCZCIWE
+    („od ostatniego domknięcia"), w przeciwieństwie do wyzerowanej.
+    """
     m = migawka()
     plik = sciezka or MIGAWKA
+    if plik.exists() and not nadpisz:
+        return m
     try:
         plik.parent.mkdir(parents=True, exist_ok=True)
         plik.write_text(json.dumps(m, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -428,6 +485,13 @@ def delta(sciezka: Optional[Path] = None) -> str:
         a, b = przed.get(pole), teraz.get(pole)
         if isinstance(a, int) and isinstance(b, int) and a != b:
             zmiany.append(f"{pole}: {a} → {b} ({b - a:+d})")
+    # MIGAWKA JEST ZUŻYWANA (2026-07-27). Bez tego „pierwszy zapis wygrywa" zamroziłoby
+    # punkt odniesienia na zawsze i każda kolejna wachta liczyłaby różnicę od prehistorii.
+    # Skasowanie po odczycie zamyka cykl: otwarcie stawia punkt, domknięcie go konsumuje.
+    try:
+        plik.unlink()
+    except OSError:            # brak prawa/pliku nie może wywrócić meldunku domknięcia
+        pass
     return "   Δ wachty: " + ("; ".join(zmiany) if zmiany else "bez zmian w liczbach sług")
 
 

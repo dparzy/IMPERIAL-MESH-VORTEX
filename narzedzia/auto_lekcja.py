@@ -193,6 +193,12 @@ def _zapisz_wyniki(wyniki: List[Dict[str, Any]], data_sesji: str) -> int:
             except ValueError:
                 dopisano = _rw.dodaj(typ, tytul, tresc, status="POMYSŁ", data=data_sesji)
             if not dopisano:
+                # POMINIĘCIE MUSI BYĆ WIDOCZNE (Prawo XV), tak samo jak dla lekcji wyżej.
+                # Od 2026-07-26 rejestr wizji dedupuje SEMANTYCZNIE, nie po napisie —
+                # zmierzone: predykat wiąże 326 par na 827 wpisów, więc jest czuły. Cichy
+                # `continue` przy tej czułości mógłby zjeść pomysł RÓŻNY od istniejącego,
+                # a wyrzucona wiedza nie zostawia śladu. Głośne pominięcie zostawia.
+                print(f"  [auto_lekcja] ⏭️  duplikat {typ}: {tytul!r}", file=sys.stderr)
                 continue
         else:
             continue

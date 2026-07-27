@@ -106,7 +106,7 @@ API Error: Server error mid-response. The response above may be incomplete.
 <task-notification>
 <task-id>bdpjuae0p</task-id>
 <tool-use-id>toolu_01AHrSVSdrNxSy1ccKe48rsj</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\bdpjuae0p.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\bdpjuae0p.output</output-file>
 <status>completed</status>
 <summary>Background command "Pełny bieg testów" completed (exit code 0)</summary>
 </task-notification>
@@ -133,7 +133,7 @@ API Error: Server error mid-response. The response above may be incomplete.
 <task-notification>
 <task-id>b08dsa5gd</task-id>
 <tool-use-id>toolu_013hx66VezGdCUUmpcwLKmAS</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\b08dsa5gd.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\b08dsa5gd.output</output-file>
 <status>completed</status>
 <summary>Background command "Pełny bieg testów runnerem Imperium" completed (exit code 0)</summary>
 </task-notification>
@@ -313,7 +313,7 @@ Zbieram wszystkie sześć raportów, przekładam na **zweryfikowany** plan łata
 <task-notification>
 <task-id>af2f98409a27b6314</task-id>
 <tool-use-id>toolu_01HUxwHTCMdEZPKBL6QNSfgM</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\af2f98409a27b6314.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\af2f98409a27b6314.output</output-file>
 <status>completed</status>
 <summary>Agent "Zwiad: bramki i procesy" finished</summary>
 <note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
@@ -358,7 +358,7 @@ Czekam na pozostałych pięciu. Zgłoszę się z pełną, zweryfikowaną syntez�
 <task-notification>
 <task-id>a99a4e9ece577f3f6</task-id>
 <tool-use-id>toolu_019rgnstFF9bXmQ8ghMA7b1Y</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\a99a4e9ece577f3f6.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\a99a4e9ece577f3f6.output</output-file>
 <status>completed</status>
 <summary>Agent "Zwiad: ergonomia i braki sigli" finished</summary>
 <note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
@@ -418,7 +418,7 @@ Nadal czekam na czterech zwiadowców: parser SIGILLARIUM (najważniejszy dla ryz
 <task-notification>
 <task-id>aeed797784dad52be</task-id>
 <tool-use-id>toolu_0155rhukFzTa8AZLuGYJUMti</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\aeed797784dad52be.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\aeed797784dad52be.output</output-file>
 <status>completed</status>
 <summary>Agent "Zwiad: ryzyko organu SIGILLARIUM" finished</summary>
 <note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
@@ -567,7 +567,7 @@ Gdy testy się skończą — pełny bieg + commit lokalny, potem podam Ci blok p
 <task-notification>
 <task-id>b9agpzrnd</task-id>
 <tool-use-id>toolu_015q33mrJph1L6LTVCP8epkm</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\b9agpzrnd.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\b9agpzrnd.output</output-file>
 <status>completed</status>
 <summary>Background command "Pełny bieg testów" completed (exit code 0)</summary>
 </task-notification>
@@ -686,7 +686,7 @@ Gdy testy się skończą zielono → commit lokalny P1 → podam Ci **drugi** bl
 <task-notification>
 <task-id>btkdt453o</task-id>
 <tool-use-id>toolu_014oVWKZFAtRemdnNQkvSBvs</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\btkdt453o.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\btkdt453o.output</output-file>
 <status>completed</status>
 <summary>Background command "Pełny bieg testów po P1" completed (exit code 0)</summary>
 </task-notification>
@@ -1189,7 +1189,7 @@ Zgłoszę się z wynikiem biegu i blokiem push.
 <task-notification>
 <task-id>bvccouhdv</task-id>
 <tool-use-id>toolu_01JQH9UsQYYLoqfNgqkPEozd</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\bvccouhdv.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\fdb35887-7ffd-41ff-8788-00fcaf9975db\tasks\bvccouhdv.output</output-file>
 <status>completed</status>
 <summary>Background command "Finalny bieg testów (sam, po wszystkich zmianach)" completed (exit code 0)</summary>
 </task-notification>

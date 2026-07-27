@@ -157,6 +157,68 @@ def test_scout_krytyka_dodaje_dowody_przeciw(monkeypatch):
     assert "risk" in zapytania[1] and "failure" in zapytania[1]   # kontra-sufiks w drugim zapytaniu
 
 
+def test_czastka_zapisuje_profil_krytyki_ktory_naprawde_biegl(monkeypatch):
+    """
+    🚨 DECYZJA, KTÓRA KOSZTUJE, MA BYĆ WIDOCZNA W POMIARZE (2026-07-27).
+    Cezar przeniósł KRYTYKĘ na droższy profil `osad` (v4-pro) 07-21, ale cząstka niosła
+    wyłącznie `profil` GENERACJI — z ledgera nie dało się udowodnić, czym biegła krytyka;
+    wiedzieliśmy to tylko z kodu (pamięć zamiast pomiaru). Test pilnuje, że zapisany profil
+    to DOKŁADNIE ten, który poszedł do mostu — inaczej zapis byłby deklaracją, nie dowodem.
+    """
+    from collections import namedtuple
+    import szukaj as szukaj_mod
+    from narzedzia.bibliotekarz import _PROFIL_KRYTYKA, _PROFIL_ZWIAD
+    W = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda q, **kw: [W("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+
+    uzyte = []
+
+    class _Szpieg(_FakeGlos):
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+            uzyte.append(profil)
+            return "ocena"
+
+    cz = scout_temat(_Szpieg(odp="ocena"), "momentum", topk=3, krytyka=True)
+    assert uzyte == [_PROFIL_ZWIAD, _PROFIL_KRYTYKA]      # generacja tania, krytyka droga
+    assert cz["profil"] == _PROFIL_ZWIAD
+    assert cz["profil_krytyki"] == uzyte[1], "ledger opisuje inny profil niż ten, który biegł"
+
+
+def test_raport_alarmuje_o_skazonej_krytyce(tmp_path, monkeypatch):
+    """
+    🚨 LUKA ZŁAPANA MUTACJĄ (2026-07-27): zawężenie raportu z powrotem do samych kandydatów
+    NIE wywracało żadnego testu — bronione było wyłącznie BREVIARIUM. Raport bibliotekarza
+    to jednak pierwsze miejsce, gdzie sędzia widzi plon, więc musi krzyczeć o skażonej
+    KRYTYCE tak samo jak o skażonym kandydacie (obrona bywa skażona częściej niż propozycja:
+    zmierzone 07-26 — kandydaci 0/10 skażonych, krytyka 2/10).
+    """
+    import szukaj as szukaj_mod
+    monkeypatch.setattr(bib, "KOLEJKA", tmp_path / "kolejka.jsonl")
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda q, **kw: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    monkeypatch.setattr(bib, "scout_temat", lambda *a, **kw: {
+        "temat": "momentum", "zrodla": ["BIB-001"], "kandydaci": "kandydat wg BIB-001 chunk 1",
+        "status": "ok", "krytyka": "zarzut wg BIB-999 chunk 7",
+        "probator": {"czysty": True, "opis": "🛡️ PROBATOR: CZYSTY"},
+        "probator_krytyka": {"czysty": False, "opis": "🚨 PROBATOR: obce źródło BIB-999"},
+    })
+    tekst = bib.raport(["momentum"], topk=3, dry_run=True, krytyka=True)
+    assert "BIB-999" in tekst, "skażona krytyka przemilczana w raporcie"
+    assert "1/1 tematów" in tekst          # sekcja alarmowa PROBATORA odpalona
+
+
+def test_bez_krytyki_nie_ma_profilu_krytyki(monkeypatch):
+    """Granica: bieg bez `--krytyka` nie ma prawa zapisać profilu fazy, która się nie odbyła."""
+    from collections import namedtuple
+    import szukaj as szukaj_mod
+    W = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda q, **kw: [W("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    cz = scout_temat(_FakeGlos(odp="kandydaci"), "momentum", topk=3, krytyka=False)
+    assert "profil_krytyki" not in cz
+
+
 def test_kontekst_systemu_ma_luki_i_antydup():
     # U4: blok świadomości zawiera instrukcję anty-duplikatów (Prawo XVI) i sekcję luk —
     # albo pusty string, gdy rejestr niedostępny (graceful, Prawo XV). Bez brittle na konkretny klucz.
@@ -336,13 +398,19 @@ def test_atrapa_glosu_zgodna_z_mostem():
     assert ma_kwargs or not brakuje, f"atrapa nie przyjmie: {sorted(brakuje)}"
 
 
-def test_swiadomosc_jest_DOMYSLNIE_wlaczona(monkeypatch):
-    """U4 domyślnie ON od 2026-07-21 (rozkaz Cezara po sądzie nad kolejką).
+def test_swiadomosc_jest_DOMYSLNIE_wylaczona(monkeypatch):
+    """U4 domyślnie OFF od 2026-07-27 (DECYZJA CEZARA po replikacji A/B).
 
-    POWÓD, dla którego to jest test, a nie tylko wartość domyślna: pomiar na 33 cząstkach
-    pokazał, że bez tego bloku zwiad proponuje moduły, które JUŻ ISTNIEJĄ w kodzie —
-    VPIN (WSKAZNIK VPIN_50), Value Area (VP-01), Kelly (IUSTITIA), CVD, Kalman, triple_barrier,
-    DSR/PBO. Cichy powrót do opt-in oznaczałby powrót do płacenia za duplikaty."""
+    POWÓD, dla którego to jest test, a nie tylko wartość domyślna: domyślna wartość sama
+    z siebie nie broni się przed cichym powrotem. Rozkaz z 07-21 („ON") opierał się na
+    tezie −12.1 pp p=0.016, którą przeliczenie naprawionym detektorem OBALIŁO (OFF 39.3%
+    vs ON 41.0%, p=0.766 — stary detektor nie widział dubletów WIELKIE_Z_PODKRESLENIEM).
+    Replikacja na 256 biegach: −0.7 pp, CI [−7.3, +6.0], p=0.888, moc na −12 pp = 94.2%.
+    Koszt zmierzony 1.49×. Powrót do ON bez NOWEGO pomiaru byłby powrotem do płacenia
+    połowy więcej za efekt nieodróżnialny od zera.
+
+    Test celowo NIE twierdzi, że U4 szkodzi — moc na 5 pp to tylko 31%, więc małego
+    efektu nie wykluczyliśmy. Broniona jest DOMYŚLNOŚĆ, nie teza o szkodliwości."""
     import szukaj as szukaj_mod
     monkeypatch.setattr(szukaj_mod, "szukaj",
                         lambda *a, **k: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
@@ -355,7 +423,59 @@ def test_swiadomosc_jest_DOMYSLNIE_wlaczona(monkeypatch):
             return "kand"
 
     scout_temat(G(), "momentum", topk=3)          # BEZ jawnego swiadomosc=
-    assert "SENTINEL_KTX" in zebrane["tresc"]
+    assert "SENTINEL_KTX" not in zebrane["tresc"]
+
+
+def test_raport_nie_wstrzykuje_swiadomosci_domyslnie():
+    """GRANICA DOMYŚLNOŚCI NA DRUGIM POZIOMIE: `raport()` ma własny parametr `swiadomosc`
+    i to ON, a nie `scout_temat`, jest tym, co widzi CLI. Gdyby ktoś przełączył tylko
+    jedną z dwóch wartości, decyzja Cezara obowiązywałaby w połowie ścieżek wywołania —
+    dokładnie ta klasa wady, którą złapaliśmy przy deprecjonowaniu miary (07-26: objęliśmy
+    meldunek, nie deltę). Pytamy sygnatury, więc test nie kosztuje ani jednego calla API."""
+    import inspect
+    assert inspect.signature(bib.raport).parameters["swiadomosc"].default is False
+    assert inspect.signature(scout_temat).parameters["swiadomosc"].default is False
+
+
+def test_nomenclator_jest_OPT_IN_wylaczony(monkeypatch):
+    """ZASADA WPIĘCIA: NOMENCLATOR wchodzi w ścieżkę zwiadu jako opt-in OFF i włącza się
+    dopiero po zielonym A/B. Domyślność sprawdzana na OBU poziomach — `raport()` ma własny
+    parametr i to JEGO widzi CLI, więc przełączenie jednego z dwóch dałoby decyzję
+    obowiązującą w połowie ścieżek wywołania (klasa złapana 07-26 przy delcie BREVIARIUM)."""
+    import inspect
+    assert inspect.signature(scout_temat).parameters["nomenclator"].default is False
+    assert inspect.signature(bib.raport).parameters["nomenclator"].default is False
+
+    import szukaj as szukaj_mod
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda *a, **k: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+
+    class G:
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+            return "1. Kandydat: VPIN_TOKSYCZNOSC\n- opis\n"
+
+    rec = scout_temat(G(), "momentum", topk=3, probator=False)   # BEZ jawnego nomenclator=
+    assert "nomenclator" not in rec, "organ dołożył się do cząstki mimo opt-in OFF"
+
+
+def test_nomenclator_wlaczony_oznacza_znane_imie(monkeypatch):
+    """Gdy WŁĄCZONY — dokłada adnotację, ale wyłącznie DOKŁADA (monotonicznie ostrożny):
+    kandydaci w cząstce zostają nietknięci, więc nic, co przeszłoby bez organu, nie ginie."""
+    import szukaj as szukaj_mod
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda *a, **k: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    plon = "1. Kandydat: VPIN_TOKSYCZNOSC\n- opis\n2. Kandydat: NOWE_POJECIE_XYZ\n- opis\n"
+
+    class G:
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+            return plon
+
+    rec = scout_temat(G(), "momentum", topk=3, probator=False, nomenclator=True)
+    assert rec["nomenclator"]["status"] == "podejrzany"
+    assert rec["nomenclator"]["podejrzanych"] == 1
+    assert rec["nomenclator"]["kandydatow"] == 2
+    # `.strip()` robi sam scout_temat od zawsze — porównujemy z tym, co bez organu też by wyszło.
+    assert rec["kandydaci"] == plon.strip(), "organ zmienił plon — ma tylko adnotować"
 
 
 def test_blok_swiadomosci_zawiera_zakaz_duplikatow():
@@ -383,3 +503,77 @@ def test_bez_swiadomosci_da_sie_wylaczyc(monkeypatch):
 
     scout_temat(G(), "momentum", topk=3, swiadomosc=False)
     assert "SENTINEL_KTX" not in zebrane["tresc"]
+
+
+# ── WYROK SĘDZIEGO — domknięcie cząstki (2026-07-27) ─────────────────────────
+
+def _kolejka_tymczasowa(monkeypatch, tmp_path):
+    import narzedzia.bibliotekarz as b
+    plik = tmp_path / "KOLEJKA.jsonl"
+    monkeypatch.setattr(b, "KOLEJKA", plik)
+    b.osadzone_ts.cache_clear()
+    return b, plik
+
+
+def test_wyrok_domyka_czastke(monkeypatch, tmp_path):
+    """Cząstka po wyroku przestaje czekać na sędziego — inaczej kolejka rośnie w nieskończoność.
+
+    Powód powstania mechanizmu: kolejka rosła od 2026-07-14 do 43 cząstek NIE dlatego, że
+    sędzia zwlekał, tylko dlatego, że nie miał gdzie orzec (brakujący krok procesu wygląda
+    identycznie jak zaniedbanie).
+    """
+    b, _ = _kolejka_tymczasowa(monkeypatch, tmp_path)
+    b.zapisz_czastke({"temat": "t", "ts": 111.0, "status": "ok", "kandydaci": "x"})
+    assert b.osadzone_ts() == frozenset()
+    assert b.zapisz_wyrok(dot_ts=111.0, temat="t", werdykt="ODRZUCONY",
+                          uzasadnienie="dubluje Z-01") is True
+    assert b.osadzone_ts() == frozenset({111.0})
+
+
+def test_wyrok_jest_idempotentny(monkeypatch, tmp_path):
+    """Drugi wyrok na tę samą cząstkę nie zapada — ledger nie może mnożyć orzeczeń."""
+    b, plik = _kolejka_tymczasowa(monkeypatch, tmp_path)
+    b.zapisz_czastke({"temat": "t", "ts": 222.0, "status": "ok", "kandydaci": "x"})
+    assert b.zapisz_wyrok(dot_ts=222.0, temat="t", werdykt="PRZYJETY", uzasadnienie="nowe") is True
+    assert b.zapisz_wyrok(dot_ts=222.0, temat="t", werdykt="ODRZUCONY", uzasadnienie="inne") is False
+    linie = [x for x in plik.read_text(encoding="utf-8").splitlines() if x.strip()]
+    assert sum(1 for x in linie if '"status": "wyrok"' in x) == 1
+
+
+def test_wyrok_nie_nadpisuje_plonu_zwiadowcy(monkeypatch, tmp_path):
+    """Prawo I: meldunek zwiadowcy zostaje nietknięty; wyrok to OSOBNY rekord."""
+    import json
+    b, plik = _kolejka_tymczasowa(monkeypatch, tmp_path)
+    b.zapisz_czastke({"temat": "t", "ts": 333.0, "status": "ok", "kandydaci": "PLON"})
+    b.zapisz_wyrok(dot_ts=333.0, temat="t", werdykt="CZESCIOWO", uzasadnienie="1 z 3")
+    rek = [json.loads(x) for x in plik.read_text(encoding="utf-8").splitlines() if x.strip()]
+    plon = [r for r in rek if r.get("status") == "ok"]
+    assert len(plon) == 1 and plon[0]["kandydaci"] == "PLON" and "werdykt" not in plon[0]
+
+
+def test_wyrok_odrzuca_nieznany_werdykt_i_puste_uzasadnienie(monkeypatch, tmp_path):
+    """GRANICA: wyrok bez powodu albo z wymyśloną etykietą to nie wyrok."""
+    import pytest
+    b, _ = _kolejka_tymczasowa(monkeypatch, tmp_path)
+    with pytest.raises(ValueError):
+        b.zapisz_wyrok(dot_ts=1.0, temat="t", werdykt="MOZE", uzasadnienie="bo tak")
+    with pytest.raises(ValueError):
+        b.zapisz_wyrok(dot_ts=1.0, temat="t", werdykt="PRZYJETY", uzasadnienie="   ")
+
+
+def test_breviarium_odejmuje_osadzone(monkeypatch, tmp_path):
+    """Sąd ma SPŁACAĆ dług przeglądu, nie podnosić go: wyrok wypada z obu liczników."""
+    import imperium.oczy.breviarium as br
+    plik = tmp_path / "KOLEJKA.jsonl"
+    import json
+    with plik.open("w", encoding="utf-8") as f:
+        for r in ({"temat": "a", "ts": 1.0, "status": "ok"},
+                  {"temat": "b", "ts": 2.0, "status": "ok"},
+                  {"status": "wyrok", "dot_ts": 1.0, "temat": "a", "werdykt": "ODRZUCONY",
+                   "uzasadnienie": "dublet", "ts": 9.0}):
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    monkeypatch.setattr(br, "KOLEJKA_HIPOTEZ", plik)
+    s = br.stan_hyginusa()
+    assert s["czeka_na_sedziego"] == 1, "osądzona cząstka nadal liczona jako dług"
+    assert s["czastek"] == 2, "wyrok policzony jako nowa cząstka plonu"
+    assert s["osadzonych"] == 1

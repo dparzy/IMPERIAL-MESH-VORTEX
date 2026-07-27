@@ -137,7 +137,15 @@ def dodaj(*, fraza: str, poprawna_teza: str, obalone_przez: str, zrodlo: str = "
         re.compile(fraza)
     except re.error as e:
         raise ValueError(f"fraza musi być poprawnym wyrażeniem regularnym: {e}") from e
-    if any(r.get("fraza") == fraza for r in wczytaj(sciezka)):
+    # DEDUP WOBEC AKTYWNYCH, NIE WOBEC HISTORII (naprawa 2026-07-27, złapana na sobie).
+    # Poprzednio porównywaliśmy z `wczytaj()`, czyli z CAŁYM ledgerem razem z rekordami
+    # wycofanymi — a ledger jest append-only, więc wycofany wpis zostaje w pliku na zawsze.
+    # Efekt: raz wycofanej frazy NIE DAŁO SIĘ ponownie zarejestrować. Normalna ścieżka
+    # poprawiania wpisu (wycofaj → dodaj z lepszą treścią) cicho gubiła twierdzenie: strażnik
+    # tracił frazę, a `dodaj` zwracał False, co czyta się jak nieszkodliwe „już jest".
+    # Zmierzone na żywym organie: INDEX spadł z 7 pozycji na 6 i zameldował „korpus czysty",
+    # choć właśnie przestał pilnować obalonej tezy o U4. Milczenie udające wynik.
+    if any(r.get("fraza") == fraza for r in aktywne(sciezka)):
         return False
     rekord = {"data": data or _dzis(), "fraza": fraza, "poprawna_teza": poprawna_teza,
               "obalone_przez": obalone_przez, "zrodlo": zrodlo}

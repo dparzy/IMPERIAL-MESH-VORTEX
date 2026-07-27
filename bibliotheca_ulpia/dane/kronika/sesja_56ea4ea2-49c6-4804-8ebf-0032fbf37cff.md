@@ -443,7 +443,7 @@ U1 kod + test + LOG_ZMIAN + audyt (exit 0) gotowe. Pełny pakiet 2172 testów je
 <task-notification>
 <task-id>bu5rif4fx</task-id>
 <tool-use-id>toolu_01X1Ui73twJatPY1oy3Ztuns</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bu5rif4fx.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bu5rif4fx.output</output-file>
 <status>completed</status>
 <summary>Background command "Run full test suite for U1" completed (exit code 0)</summary>
 </task-notification>
@@ -733,7 +733,7 @@ Czekam na dwa powiadomienia (testy U3 + koniec OCR). Gdy OCR skończy: sklejam s
 <task-notification>
 <task-id>b313lu5l3</task-id>
 <tool-use-id>toolu_01UzJT2Eu5KiRvmRNCjHzLsB</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\b313lu5l3.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\b313lu5l3.output</output-file>
 <status>completed</status>
 <summary>Background command "Run full test suite for U3" completed (exit code 0)</summary>
 </task-notification>
@@ -774,7 +774,7 @@ Praktycznie koniec, Cezarze — **291/298 stron**, zostało tylko **7**. Sam OCR
 <task-notification>
 <task-id>bib4d09tl</task-id>
 <tool-use-id>toolu_01RwCNTuhtRFjkYjcdTS4BGS</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bib4d09tl.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bib4d09tl.output</output-file>
 <status>completed</status>
 <summary>Background command "Run full OCR of BIB-032 in background" completed (exit code 0)</summary>
 </task-notification>
@@ -871,7 +871,7 @@ Czekam na testy do commitu U4. 🦅
 <task-notification>
 <task-id>bans5b8yd</task-id>
 <tool-use-id>toolu_01CEq8VY3ngMrELxEU3kHKpV</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bans5b8yd.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bans5b8yd.output</output-file>
 <status>completed</status>
 <summary>Background command "Run full test suite for U4" completed (exit code 0)</summary>
 </task-notification>
@@ -1017,7 +1017,7 @@ Czekam na powiadomienie o końcu Hyginusa. 🦅
 <task-notification>
 <task-id>bngz6w1mb</task-id>
 <tool-use-id>toolu_01UDMkoPaqohoEE82PMuzo5Z</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bngz6w1mb.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bngz6w1mb.output</output-file>
 <status>completed</status>
 <summary>Background command "Run Hyginus --pelny on 4 gap-focused topics" completed (exit code 0)</summary>
 </task-notification>
@@ -1137,7 +1137,7 @@ Teraz czekam na web-recenzję Sonnet 5 — gdy wróci, integruję i lecę do P1.
 <task-notification>
 <task-id>a4d97d010d941f61f</task-id>
 <tool-use-id>toolu_012oVJtRxMwxn4ykne4Mf9vp</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\a4d97d010d941f61f.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\a4d97d010d941f61f.output</output-file>
 <status>completed</status>
 <summary>Agent "Web-recenzja kandydatów Hyginusa" finished</summary>
 <note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
@@ -1344,7 +1344,7 @@ Czekam tylko na zielony pakiet (bramka commitu), potem lecę. 🦅
 <task-notification>
 <task-id>bopu75p64</task-id>
 <tool-use-id>toolu_011a5HAFzVUokzr9cTd6Hg82</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bopu75p64.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bopu75p64.output</output-file>
 <status>completed</status>
 <summary>Background command "Full suite and audit for reframe" completed (exit code 0)</summary>
 </task-notification>
@@ -1403,7 +1403,7 @@ petla_live testy: **exit 0** (z ruff). Czekam na pełny pakiet → commit fixa.
 <task-notification>
 <task-id>bvnl2x21o</task-id>
 <tool-use-id>toolu_01ViKqygaBX2UqQcf1HUeF7w</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bvnl2x21o.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bvnl2x21o.output</output-file>
 <status>completed</status>
 <summary>Background command "Full suite for interval fix" completed (exit code 0)</summary>
 </task-notification>
@@ -1531,7 +1531,7 @@ Testy jeszcze liczą (2172) — commit entrypointu po zielonym (choć Twój scre
 <task-notification>
 <task-id>bil8ke27m</task-id>
 <tool-use-id>toolu_01AVC9eyDnZ6RPfeQnJdUxzA</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bil8ke27m.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bil8ke27m.output</output-file>
 <status>completed</status>
 <summary>Background command "Ruff, audit, full suite for entrypoint fix" completed (exit code 0)</summary>
 </task-notification>
@@ -1693,7 +1693,7 @@ Wszystko poza pełnym pakietem sprawdzone i **czyste**. Pakiet 2172 jeszcze licz
 <task-notification>
 <task-id>buw6t5xni</task-id>
 <tool-use-id>toolu_01YTLkGgFiBKhh4e6bUvwg3p</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\buw6t5xni.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\buw6t5xni.output</output-file>
 <status>completed</status>
 <summary>Background command "Full test suite (background)" completed (exit code 0)</summary>
 </task-notification>
@@ -1979,7 +1979,7 @@ Testy jeszcze liczą (2172 przypadków, długi pakiet). Czekam na powiadomienie 
 <task-notification>
 <task-id>bgn797d6a</task-id>
 <tool-use-id>toolu_01TraLfhWbVX3f2GewcmGSsA</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bgn797d6a.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\56ea4ea2-49c6-4804-8ebf-0032fbf37cff\tasks\bgn797d6a.output</output-file>
 <status>completed</status>
 <summary>Background command "Audit and full suite before commit" completed (exit code 0)</summary>
 </task-notification>

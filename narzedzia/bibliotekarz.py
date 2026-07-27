@@ -305,6 +305,56 @@ def zapisz_czastke(czastka: dict) -> None:
         f.write(json.dumps(czastka, ensure_ascii=False) + "\n")
 
 
+WERDYKTY = ("PRZYJETY", "ODRZUCONY", "CZESCIOWO")
+
+
+def zapisz_wyrok(*, dot_ts: float, temat: str, werdykt: str, uzasadnienie: str,
+                 przyjete=(), sedzia: str = "Vitruviusz") -> bool:
+    """Zamyka cząstkę WYROKIEM sędziego. Zwraca czy dopisano (idempotencja po `dot_ts`).
+
+    DLACZEGO TO W OGÓLE POWSTAŁO (zmierzone 2026-07-27): kolejka rosła nieprzerwanie od
+    2026-07-14 do 43 cząstek czekających na sędziego — nie dlatego, że sędzia był leniwy,
+    ale dlatego, że NIE MIAŁ GDZIE ORZEC. Zwiadowca umiał dopisać plon, nikt nie umiał go
+    domknąć, więc każda wachta zaczynała od zera i „dług przeglądu" mógł tylko rosnąć.
+    Brakujący krok procesu wygląda identycznie jak zaniedbanie — i tak był raportowany.
+
+    WYROK IDZIE DO TEGO SAMEGO PLIKU co plon (Prawo XVI — bez drugiego rejestru), jako
+    osobny rekord `status="wyrok"` wskazujący cząstkę przez `dot_ts`. Plon zwiadowcy
+    zostaje NIETKNIĘTY (Prawo I: nie przepisujemy cudzego meldunku po fakcie) — życie
+    cząstki czyta się jako łańcuch: zwiad → wyrok.
+    """
+    if werdykt not in WERDYKTY:
+        raise ValueError(f"werdykt musi być jednym z {WERDYKTY}, jest: {werdykt!r}")
+    if not uzasadnienie or not uzasadnienie.strip():
+        raise ValueError("uzasadnienie jest wymagane — wyrok bez powodu to nie wyrok")
+    if dot_ts in osadzone_ts():
+        return False
+    zapisz_czastke({"status": "wyrok", "dot_ts": dot_ts, "temat": temat,
+                    "werdykt": werdykt, "uzasadnienie": uzasadnienie.strip(),
+                    "przyjete": list(przyjete), "sedzia": sedzia, "ts": time.time()})
+    osadzone_ts.cache_clear()
+    return True
+
+
+@functools.lru_cache(maxsize=1)
+def osadzone_ts() -> frozenset:
+    """Znaczniki cząstek, nad którymi ZAPADŁ już wyrok."""
+    if not KOLEJKA.exists():
+        return frozenset()
+    ts = set()
+    with open(KOLEJKA, encoding="utf-8") as f:
+        for linia in f:
+            if not linia.strip():
+                continue
+            try:
+                rec = json.loads(linia)
+            except json.JSONDecodeError:
+                continue
+            if rec.get("status") == "wyrok" and rec.get("dot_ts") is not None:
+                ts.add(rec["dot_ts"])
+    return frozenset(ts)
+
+
 def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="biblioteka",
            rozwin=False, krytyka=False, swiadomosc=True, probator=True) -> str:
     # Cubic P2: bramka indeksu RAG — brak bazy to AWARIA INFRY, nie „pusty wynik". Nie skanujemy

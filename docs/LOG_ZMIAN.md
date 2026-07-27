@@ -14,6 +14,53 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | ⚖️ | SĄD NAD KOLEJKĄ — mechanizm WYROKU + partia 1 (8 cząstek osądzonych)
+
+**Dlaczego kolejka rosła od 07-14 do 43 cząstek — POMIAR, nie domysł.** Zanim wydałem pierwszy
+wyrok, sprawdziłem, gdzie go zapisać. **Nigdzie.** Zwiadowca umiał dopisać plon (`zapisz_czastke`),
+nikt nie umiał go domknąć. To nie było zaniedbanie sędziego, tylko **brakujący krok procesu** — a
+brakujący krok wygląda w meldunku identycznie jak lenistwo i tak był raportowany („dług przeglądu").
+
+**Mechanizm (bez nowego organu — Prawo XVI):** `zapisz_wyrok()` dopisuje do **tego samego pliku
+kolejki** osobny rekord `status="wyrok"` wskazujący cząstkę przez `dot_ts`. Plon zwiadowcy zostaje
+**nietknięty** (Prawo I — nie przepisujemy cudzego meldunku po fakcie); życie cząstki czyta się
+jako łańcuch zwiad → wyrok. BREVIARIUM odejmuje osądzone z OBU liczników — inaczej sąd
+**podnosiłby** meldowany dług zamiast go spłacać, a każdy wyrok liczyłby się jako nowy plon.
+Werdykty: `PRZYJETY` / `ODRZUCONY` / `CZESCIOWO`, uzasadnienie obowiązkowe (wyrok bez powodu to
+nie wyrok), idempotencja po `dot_ts`. **6 mutacji, 6 zabitych.**
+
+**PARTIA 1 — 8 cząstek, 21 kandydatów. Przyjęte 3, odrzucone 18.** Wyrok opierał się na
+**sprawdzeniu w kodzie**, nie na deklaracji zwiadowcy „nie dubluje" (która padała przy KAŻDYM
+kandydacie, także przy VPIN):
+
+| # | temat | wyrok | powód w jednym zdaniu |
+|---|---|---|---|
+| 1 | VPIN / toxicity | ODRZUCONY | VPIN = Z-01, PIN = W-381, OI-persistencja bez danych tickowych |
+| 2 | news sentiment | ODRZUCONY | NEWS-01 już zwraca wartość ciągłą; PCA na 15 parach to szum |
+| 3 | COT / put-call | ODRZUCONY | brak adaptera COT i opcji akcyjnych — mierzalne tylko na cudzym rynku |
+| 4 | on-chain | **CZĘŚCIOWO** | 2 przyjęte (perp:spot, szerokość ekstremum), 2 dublety (K-03, OC-04) |
+| 5 | momentum/breakout | ODRZUCONY | OBV = V-01, dywergencje = XII-07 i V-06, filtr MA to budulec strategii |
+| 6 | mean reversion | ODRZUCONY | RSI+BBANDS+ATR już liczone; to kombinacja klocków, nie informacja |
+| 7 | reżim zmienności | **CZĘŚCIOWO** | MS-GARCH warunkowo do pomiaru dekorelacji; Kalman/VIX/DCC odpadają |
+| 8 | order flow / absorpcja | ODRZUCONY | wymaga L2; „absorpcja" to Z-06 Amihud innymi słowami |
+
+**NAJCIEKAWSZE ZNALEZISKO SĄDU — przeterminowana przesłanka zwiadowcy.** Cząstka 8 proponowała
+Bulk Volume Classification jako *zamiennik* dla V-03 (CVD), bo „V-03 czeka na dane". Cenzus
+adapterów uruchomiony w tej wachcie pokazuje **V-03 ŻYWY** (BTCUSDT=−6.91 [SHORT], 15 głosów).
+Zwiad zebrany 07-15 sądzi Imperium sprzed miesiąca — **im dłużej cząstka czeka na sędziego, tym
+bardziej jej przesłanki gniją.** To argument za sądzeniem na bieżąco, nie za zbieraniem zapasu.
+
+**Wzorzec odrzuceń:** z 18 odrzuconych **11 to dublety zweryfikowane w kodzie**, 5 odpada na braku
+danych (COT, opcje akcyjne, L2), 2 to kombinacje istniejących klocków. Krytyka (v4-pro) w 3 z 8
+cząstek sama meldowała „NIE znaleziono dowodów przeciw" i **sama nazywała to sygnałem stronniczości
+potwierdzenia** — to działa dokładnie tak, jak miało działać po przeniesieniu krytyki na `osad`.
+
+**Pliki:** `narzedzia/bibliotekarz.py` (+`zapisz_wyrok`, `osadzone_ts`), `imperium/oczy/breviarium.py`
+(odejmowanie osądzonych + licznik `osądzonych`), `tests/test_bibliotekarz.py` (+5 testów granic),
+`docs/KOLEJKA_HIPOTEZ_BIBLIOTEKARZ.jsonl` (8 wyroków), CODEX (+3 sugestie-kandydaci).
+
+---
+
 ## 2026-07-27 | 🚨 | WERDYKT A/B U4 OBALONY — kłamał przyrząd, nie system
 
 **Znalezione przy P1 (sąd nad 43 cząstkami Hyginusa), zanim padł pierwszy wyrok.** Triaż kolejki

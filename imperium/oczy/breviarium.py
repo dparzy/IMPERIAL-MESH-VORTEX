@@ -71,7 +71,13 @@ def stan_hyginusa() -> Dict[str, Any]:
     # pracę. Środowisko bez rejestru nie ma o nim głosu (ta sama klasa co `ksiazki 115→0`).
     rejestr_nieobecny = not KOLEJKA_HIPOTEZ.exists()
     rek = [] if rejestr_nieobecny else _linie_jsonl(KOLEJKA_HIPOTEZ)
-    ok = [r for r in rek if r.get("status") == "ok"]
+    # WYROKI mieszkają w tym samym pliku (osobny `status="wyrok"`, wskaźnik `dot_ts`), więc
+    # muszą wypaść i z licznika cząstek, i z długu przeglądu — inaczej sąd nad kolejką
+    # PODNOSIŁBY meldowany dług zamiast go spłacać, a każdy wyrok liczyłby się jako nowy plon.
+    wyroki = [r for r in rek if r.get("status") == "wyrok"]
+    osadzone = {r.get("dot_ts") for r in wyroki}
+    rek = [r for r in rek if r.get("status") != "wyrok"]
+    ok = [r for r in rek if r.get("status") == "ok" and r.get("ts") not in osadzone]
     znaczniki = [r["ts"] for r in rek if isinstance(r.get("ts"), (int, float))]
     # 🚨 ZASIĘG, NIE PREDYKAT (zmierzone 2026-07-27 — trzeci nawrót tej samej klasy po PR #118
     # i cubic133). PROBATOR bada DWA plony modelu: kandydatów i krytykę. Meldunek czytał
@@ -120,6 +126,7 @@ def stan_hyginusa() -> Dict[str, Any]:
         "rejestr_nieobecny": rejestr_nieobecny,
         "czastek": None if rejestr_nieobecny else len(rek),
         "czeka_na_sedziego": None if rejestr_nieobecny else len(ok),
+        "osadzonych": None if rejestr_nieobecny else len(wyroki),
         "ostatni_zwiad": (datetime.fromtimestamp(max(znaczniki)).strftime("%Y-%m-%d %H:%M")
                           if znaczniki else "—"),
         "model": model,
@@ -360,7 +367,8 @@ def banner(model_architekta: Optional[str] = None) -> str:
     else:
         wiersze.append(
             f"   📚 HYGINUS (Bibliotekarz-Zwiadowca): kolejka {h['czastek']} cząstek | "
-            f"czeka na sędziego {h['czeka_na_sedziego']} | ostatni zwiad {h['ostatni_zwiad']}"
+            f"czeka na sędziego {h['czeka_na_sedziego']} | osądzonych {h['osadzonych']} | "
+            f"ostatni zwiad {h['ostatni_zwiad']}"
         )
     wiersze.append(f"      model: {h['model']} | DISPENSATOR: {dysp}")
     if h["profile_dispensatora"]:

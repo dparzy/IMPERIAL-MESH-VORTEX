@@ -73,8 +73,21 @@ def stan_hyginusa() -> Dict[str, Any]:
     rek = [] if rejestr_nieobecny else _linie_jsonl(KOLEJKA_HIPOTEZ)
     ok = [r for r in rek if r.get("status") == "ok"]
     znaczniki = [r["ts"] for r in rek if isinstance(r.get("ts"), (int, float))]
-    zbadane = [r for r in ok if "probator" in r]
-    podejrzane = [r for r in zbadane if not (r.get("probator") or {}).get("czysty", True)]
+    # 🚨 ZASIĘG, NIE PREDYKAT (zmierzone 2026-07-27 — trzeci nawrót tej samej klasy po PR #118
+    # i cubic133). PROBATOR bada DWA plony modelu: kandydatów i krytykę. Meldunek czytał
+    # wyłącznie `probator`, a `probator_krytyka` zapisywaliśmy i nigdy nie oglądali. Zmierzone
+    # na partii z 07-26: kandydaci 10/10 CZYSTY, ale krytyka 8 CZYSTY / 1 PODEJRZANY /
+    # 1 BEZ_CYTATU — meldunek ogłaszał „podejrzanych 0". To milczenie udające wynik, a przy
+    # tym broń wytrącona sędziemu: krytyka jest OBRONĄ przed złym kandydatem, więc skażona
+    # krytyka musi być widoczna PRZED sądem nad kolejką, nie po.
+    PLONY = ("probator", "probator_krytyka")
+    def nieczysty(r: Dict[str, Any], plon: str) -> bool:
+        """Brak plonu = brak zarzutu (domyślnie czysty) — nie zamieniamy niewiedzy w alarm."""
+        return not (r.get(plon) or {}).get("czysty", True)
+
+    zbadane = [r for r in ok if any(k in r for k in PLONY)]
+    podejrzane = [r for r in zbadane if any(nieczysty(r, k) for k in PLONY)]
+    podejrzane_wg_plonu = {k: sum(1 for r in zbadane if nieczysty(r, k)) for k in PLONY}
 
     model, profile = "?", []
     try:
@@ -113,6 +126,7 @@ def stan_hyginusa() -> Dict[str, Any]:
         "profile_dispensatora": profile,
         "zbadane_probatorem": None if rejestr_nieobecny else len(zbadane),
         "podejrzane": None if rejestr_nieobecny else len(podejrzane),
+        "podejrzane_wg_plonu": None if rejestr_nieobecny else podejrzane_wg_plonu,
         "dispensator_wpiety": _czy_dispensator_wpiety(),
     }
 
@@ -352,8 +366,13 @@ def banner(model_architekta: Optional[str] = None) -> str:
     if h["profile_dispensatora"]:
         wiersze.append(f"      profile: {', '.join(h['profile_dispensatora'])}")
     if h["zbadane_probatorem"]:
+        # Rozbicie pokazujemy TYLKO gdy jest co pokazać — sędzia musi wiedzieć, czy skażony
+        # jest kandydat (propozycja), czy krytyka (obrona przed nią). To dwie różne wiadomości.
+        wg = h.get("podejrzane_wg_plonu") or {}
+        rozbicie = (f" (kandydaci {wg.get('probator', 0)}, krytyka {wg.get('probator_krytyka', 0)})"
+                    if h["podejrzane"] else "")
         wiersze.append(f"      PROBATOR: zbadanych {h['zbadane_probatorem']}, "
-                       f"podejrzanych {h['podejrzane']}")
+                       f"podejrzanych {h['podejrzane']}{rozbicie}")
 
     if t["silnik"] is None:
         silnik = "⚠️ dysk TIRO niewidoczny stąd"       # nie wiem ≠ brak (Prawo I)

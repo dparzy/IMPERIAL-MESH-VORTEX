@@ -449,6 +449,72 @@ def test_obcosc_sciezki_mierzona_w_OBU_kierunkach():
     assert bv._sciezka_z_innego_systemu(_P("/home/tiro"), "linux") is False
 
 
+# ── PROBATOR: ZASIĘG, nie predykat (2026-07-27) ─────────────────────────────────
+# Trzeci nawrót tej samej klasy (PR #118, cubic133, teraz): mechanizm poprawny, ale
+# patrzył na część pola. PROBATOR bada kandydatów I krytykę — meldunek widział jednych.
+
+def _kolejka(tmp_path, monkeypatch, rekordy):
+    """Podstaw rejestr kolejki (gitignorowany, więc w testach zawsze budujemy własny)."""
+    plik = tmp_path / "kolejka.jsonl"
+    with plik.open("w", encoding="utf-8") as f:
+        for r in rekordy:
+            f.write(json.dumps({"status": "ok", **r}, ensure_ascii=False) + "\n")
+    monkeypatch.setattr(bv, "KOLEJKA_HIPOTEZ", plik)
+    return plik
+
+
+def test_skazona_krytyka_jest_widoczna_w_meldunku(tmp_path, monkeypatch):
+    """
+    🚨 GRANICA GŁÓWNA: kandydaci czyści, krytyka skażona → meldunek NIE MA prawa mówić „0".
+    Zmierzone na partii 07-26: kandydaci 10/10 CZYSTY, krytyka 1 PODEJRZANY + 1 BEZ_CYTATU,
+    a meldunek ogłaszał „podejrzanych 0" — milczenie udające wynik.
+    """
+    _kolejka(tmp_path, monkeypatch, [
+        {"probator": {"czysty": True}, "probator_krytyka": {"czysty": True}},
+        {"probator": {"czysty": True}, "probator_krytyka": {"czysty": False}},
+    ])
+    h = bv.stan_hyginusa()
+    assert h["zbadane_probatorem"] == 2
+    assert h["podejrzane"] == 1, "skażona krytyka niewidoczna — wada zasięgu wróciła"
+    assert h["podejrzane_wg_plonu"] == {"probator": 0, "probator_krytyka": 1}
+
+
+def test_skazony_kandydat_nadal_liczony(tmp_path, monkeypatch):
+    """REGRESJA: rozszerzenie zasięgu nie ma prawa zgubić plonu, który liczyliśmy dotąd."""
+    _kolejka(tmp_path, monkeypatch, [{"probator": {"czysty": False}}])
+    h = bv.stan_hyginusa()
+    assert h["podejrzane"] == 1
+    assert h["podejrzane_wg_plonu"] == {"probator": 1, "probator_krytyka": 0}
+
+
+def test_jeden_temat_skazony_w_obu_plonach_liczy_sie_raz(tmp_path, monkeypatch):
+    """Granica podwójnego liczenia: `podejrzane` to liczba CZĄSTEK, nie zarzutów."""
+    _kolejka(tmp_path, monkeypatch, [
+        {"probator": {"czysty": False}, "probator_krytyka": {"czysty": False}},
+    ])
+    h = bv.stan_hyginusa()
+    assert h["podejrzane"] == 1
+    assert h["podejrzane_wg_plonu"] == {"probator": 1, "probator_krytyka": 1}
+
+
+def test_brak_plonu_nie_jest_zarzutem(tmp_path, monkeypatch):
+    """Granica niewiedzy: cząstka bez krytyki (bieg bez `--krytyka`) NIE jest podejrzana."""
+    _kolejka(tmp_path, monkeypatch, [{"probator": {"czysty": True}}, {"kandydaci": "bez probatora"}])
+    h = bv.stan_hyginusa()
+    assert h["zbadane_probatorem"] == 1        # druga cząstka w ogóle nie była badana
+    assert h["podejrzane"] == 0
+
+
+def test_rozbicie_plonow_widoczne_w_wydruku(tmp_path, monkeypatch):
+    """Sędzia musi widzieć, CO jest skażone: propozycja czy obrona przed nią."""
+    _kolejka(tmp_path, monkeypatch, [
+        {"probator": {"czysty": True}, "probator_krytyka": {"czysty": False}},
+    ])
+    tekst = bv.banner()
+    assert "podejrzanych 1" in tekst
+    assert "krytyka 1" in tekst and "kandydaci 0" in tekst
+
+
 def test_pary_uzyteczne_nie_przekraczaja_surowych():
     """Postęp Szkoły liczymy parami, które PRZEŻYJĄ eksport SFT (kolaps + filtr jakości).
 

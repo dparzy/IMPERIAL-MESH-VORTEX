@@ -251,7 +251,15 @@ def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
     if krytyka:  # U3: drugie przejście — dowody PRZECIW (osobne retrieval na kontrargumenty)
         kontra = szukaj(_fts_bezpieczne(f"{zapytanie} {_KONTRA_SUFIKS}"),
                         topk=topk, tryb=tryb, cichy=True, korpus=korpus)
-        rec["krytyka"] = krytyka_kandydatow(glos, rec["kandydaci"], kontra)
+        # Profil KRYTYKI zapisany wprost (2026-07-27). Cząstka niosła tylko `profil` generacji,
+        # więc z samego ledgera NIE DAŁO SIĘ udowodnić, że krytyka poszła na droższy `osad`
+        # (v4-pro) — wiedzieliśmy to wyłącznie z kodu. Decyzja Cezara z 07-21 kosztuje pieniądze,
+        # więc ma być WIDOCZNA W POMIARZE, nie tylko w źródle (pomiar > pamięć).
+        # Jedna zmienna do WYWOŁANIA i do ZAPISU — inaczej zapis byłby deklaracją, nie dowodem
+        # (gdy ktoś kiedyś poda `profil=` z zewnątrz, ledger mówiłby o profilu, który nie biegł).
+        profil_krytyki = _PROFIL_KRYTYKA
+        rec["krytyka"] = krytyka_kandydatow(glos, rec["kandydaci"], kontra, profil=profil_krytyki)
+        rec["profil_krytyki"] = profil_krytyki
         if probator:  # krytyka to też plon modelu — bada się ją wobec WŁASNYCH fragmentów
             from imperium.pretorianie.probator import do_slownika, sprawdz
             rec["probator_krytyka"] = do_slownika(sprawdz(rec["krytyka"], kontra))
@@ -325,19 +333,31 @@ def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="bi
         zr = ", ".join(czastka["zrodla"][:5]) or "—"
         print(f"[{i}/{N}] ✅ „{temat}” → źródła: {zr} | 💾 kolejka", file=sys.stderr, flush=True)
         # PROBATOR mówi tylko wtedy, gdy ma co zarzucić — cisza znaczy „cytaty się zgadzają".
-        pro = czastka.get("probator") or {}
-        if pro and not pro.get("czysty", True):
-            print(f"[{i}/{N}] {pro['opis']}", file=sys.stderr, flush=True)
-            podejrzane.append(f"{temat} → {pro['opis']}")
+        # 🚨 OBA PLONY, nie sam kandydat (2026-07-27): krytyka też jest wypowiedzią modelu i też
+        # bywa skażona. Zmierzone na partii 07-26: kandydaci 10/10 czyste, krytyka 2/10 nie —
+        # a raport milczał, bo czytał wyłącznie `probator`. Sędzia dostawał obronę bez ostrzeżenia.
         linie.append(f"\n── [{i}/{N}] {temat} (źródła: {zr}) ──\n{czastka['kandydaci']}")
-        if pro:
-            linie.append(pro["opis"])
+        for pole, etykieta in (("probator", "kandydaci"), ("probator_krytyka", "krytyka")):
+            pro = czastka.get(pole) or {}
+            if not pro:
+                continue
+            if not pro.get("czysty", True):
+                print(f"[{i}/{N}] [{etykieta}] {pro['opis']}", file=sys.stderr, flush=True)
+                podejrzane.append(f"{temat} [{etykieta}] → {pro['opis']}")
+            linie.append(f"[{etykieta}] {pro['opis']}")
 
     if podejrzane:
         linie.append(f"\n🚨 PROBATOR — {len(podejrzane)}/{N} tematów z cytatem spoza podanych "
                      f"fragmentów (halucynacja citation; sędzia niech czyta je najostrożniej):")
         linie.extend(f"   • {x}" for x in podejrzane)
-    linie.append(f"\n💾 Kolejka: {KOLEJKA.relative_to(ROOT)} — do PRZEGLĄDU Opusa (sędzia). "
+    # Ścieżka WZGLĘDNA jest tylko wygodą czytania. `relative_to` rzuca ValueError, gdy kolejka
+    # leży poza drzewem repo (inny dysk, katalog tymczasowy) — i wywalałaby CAŁY raport już PO
+    # zapłaceniu za skan DeepSeekiem. Kosmetyka nie ma prawa niszczyć opłaconej pracy.
+    try:
+        gdzie = KOLEJKA.relative_to(ROOT)
+    except ValueError:
+        gdzie = KOLEJKA
+    linie.append(f"\n💾 Kolejka: {gdzie} — do PRZEGLĄDU Opusa (sędzia). "
                  f"Nic nie wchodzi do kodu bez weryfikacji + areny (Prawo I, ZASADA WPIĘCIA).")
     return "\n".join(linie)
 

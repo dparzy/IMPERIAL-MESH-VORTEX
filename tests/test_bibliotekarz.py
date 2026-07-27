@@ -157,6 +157,68 @@ def test_scout_krytyka_dodaje_dowody_przeciw(monkeypatch):
     assert "risk" in zapytania[1] and "failure" in zapytania[1]   # kontra-sufiks w drugim zapytaniu
 
 
+def test_czastka_zapisuje_profil_krytyki_ktory_naprawde_biegl(monkeypatch):
+    """
+    🚨 DECYZJA, KTÓRA KOSZTUJE, MA BYĆ WIDOCZNA W POMIARZE (2026-07-27).
+    Cezar przeniósł KRYTYKĘ na droższy profil `osad` (v4-pro) 07-21, ale cząstka niosła
+    wyłącznie `profil` GENERACJI — z ledgera nie dało się udowodnić, czym biegła krytyka;
+    wiedzieliśmy to tylko z kodu (pamięć zamiast pomiaru). Test pilnuje, że zapisany profil
+    to DOKŁADNIE ten, który poszedł do mostu — inaczej zapis byłby deklaracją, nie dowodem.
+    """
+    from collections import namedtuple
+    import szukaj as szukaj_mod
+    from narzedzia.bibliotekarz import _PROFIL_KRYTYKA, _PROFIL_ZWIAD
+    W = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda q, **kw: [W("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+
+    uzyte = []
+
+    class _Szpieg(_FakeGlos):
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+            uzyte.append(profil)
+            return "ocena"
+
+    cz = scout_temat(_Szpieg(odp="ocena"), "momentum", topk=3, krytyka=True)
+    assert uzyte == [_PROFIL_ZWIAD, _PROFIL_KRYTYKA]      # generacja tania, krytyka droga
+    assert cz["profil"] == _PROFIL_ZWIAD
+    assert cz["profil_krytyki"] == uzyte[1], "ledger opisuje inny profil niż ten, który biegł"
+
+
+def test_raport_alarmuje_o_skazonej_krytyce(tmp_path, monkeypatch):
+    """
+    🚨 LUKA ZŁAPANA MUTACJĄ (2026-07-27): zawężenie raportu z powrotem do samych kandydatów
+    NIE wywracało żadnego testu — bronione było wyłącznie BREVIARIUM. Raport bibliotekarza
+    to jednak pierwsze miejsce, gdzie sędzia widzi plon, więc musi krzyczeć o skażonej
+    KRYTYCE tak samo jak o skażonym kandydacie (obrona bywa skażona częściej niż propozycja:
+    zmierzone 07-26 — kandydaci 0/10 skażonych, krytyka 2/10).
+    """
+    import szukaj as szukaj_mod
+    monkeypatch.setattr(bib, "KOLEJKA", tmp_path / "kolejka.jsonl")
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda q, **kw: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    monkeypatch.setattr(bib, "scout_temat", lambda *a, **kw: {
+        "temat": "momentum", "zrodla": ["BIB-001"], "kandydaci": "kandydat wg BIB-001 chunk 1",
+        "status": "ok", "krytyka": "zarzut wg BIB-999 chunk 7",
+        "probator": {"czysty": True, "opis": "🛡️ PROBATOR: CZYSTY"},
+        "probator_krytyka": {"czysty": False, "opis": "🚨 PROBATOR: obce źródło BIB-999"},
+    })
+    tekst = bib.raport(["momentum"], topk=3, dry_run=True, krytyka=True)
+    assert "BIB-999" in tekst, "skażona krytyka przemilczana w raporcie"
+    assert "1/1 tematów" in tekst          # sekcja alarmowa PROBATORA odpalona
+
+
+def test_bez_krytyki_nie_ma_profilu_krytyki(monkeypatch):
+    """Granica: bieg bez `--krytyka` nie ma prawa zapisać profilu fazy, która się nie odbyła."""
+    from collections import namedtuple
+    import szukaj as szukaj_mod
+    W = namedtuple("W", "zrodlo tytul nr_chunk tekst score korpus")
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda q, **kw: [W("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    cz = scout_temat(_FakeGlos(odp="kandydaci"), "momentum", topk=3, krytyka=False)
+    assert "profil_krytyki" not in cz
+
+
 def test_kontekst_systemu_ma_luki_i_antydup():
     # U4: blok świadomości zawiera instrukcję anty-duplikatów (Prawo XVI) i sekcję luk —
     # albo pusty string, gdy rejestr niedostępny (graceful, Prawo XV). Bez brittle na konkretny klucz.

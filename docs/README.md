@@ -3,50 +3,49 @@ kategoria: TABULA
 typ: zywy
 wlasciciel: —
 stan_na: 2026-07-27
-powod_istnienia: "Spis wszystkich dokumentów w `docs/` z jednozdaniowym opisem tematu każdego — punkt nawigacyjny do dokumentacji."
+powod_istnienia: "Wskaźnik na katalog dokumentów — sam spisu NIE trzyma; kieruje do generowanego katalogu w INDEKS_IMPERIUM (jedno źródło prawdy, Prawo XVI)."
 ---
 # 📚 Dokumentacja Imperium
 
 Tu trafia **uporządkowana wiedza** wyciągnięta z surowej wizji (`archiwum/`).
-
 Każdy temat = osobny, czytelny plik. To jest trwała pamięć projektu.
 
-## Spis dokumentów
+## 🧭 Spis dokumentów → [`INDEKS_IMPERIUM.md`](INDEKS_IMPERIUM.md)
 
-| Plik | Temat |
-|------|-------|
-| [INDEKS_IMPERIUM.md](INDEKS_IMPERIUM.md) | 🧭 GŁÓWNY SPIS — punkt wejścia: mapa dokumentów, mapa kodu, Prawa Imperium, następne kroki |
-| [WZORZEC_DNSS.md](WZORZEC_DNSS.md) | Wzorzec DNSS — czego uczymy się od roju 79 agentów (Calculator Pattern, TA-Lib, Python/Rust/Zig) |
-| [../archiwum/AUDYT_ADOPCJI.md](../archiwum/AUDYT_ADOPCJI.md) | 📦 Archiwum — Audyt adopcji 17 modułów Kingdom Pixel → Imperium (mapowanie, prawa, ostrzeżenia) |
-| [ARCHITEKTURA_IMPERIUM.md](ARCHITEKTURA_IMPERIUM.md) | Pełna mapa Imperium — dzielnice, moduły, przepływ sygnału, cykl Fazy 1 |
-| [ARSENAL_IMPERIUM.md](ARSENAL_IMPERIUM.md) | Zweryfikowany katalog ~320 narzędzi z pliku IMV (✅ realne / ⚠️ niepewne / ❌ halucynacje) |
-| [MAPA_IMPERIUM_FLOW.md](MAPA_IMPERIUM_FLOW.md) | Przepływ sygnału krok po kroku — kto z kim gada, frakcje Senatu, zasada zero duplikatów |
-| [../archiwum/ARSENAL_WSKAZNIKOW.md](../archiwum/ARSENAL_WSKAZNIKOW.md) | 📦 Archiwum — 157 wskaźników/strategii (stary paradygmat) — superseded przez KATALOG_NEURONOW |
-| [PLAN_DEEPSEEK.md](PLAN_DEEPSEEK.md) | Jak podłączyć DeepSeek API jako mózg Cesarza i Senatu (Populares vs Optimates) |
-| [../archiwum/ARSENAL_AMERYKI.md](../archiwum/ARSENAL_AMERYKI.md) | 📦 Archiwum — 690 linków z 50+ krajów (Americas, Europa, Afryka, Australia, Oceania) — oceny 1-10, priorytety 1-5 |
-| [LEGIONY_ARCHITEKTURA.md](LEGIONY_ARCHITEKTURA.md) | Cztery Legiony (Equestris/Fulminata/Augusta/Ferrata) — mikro-neurony, schemat sygnału, Pretorianie |
-| [ARCHITEKTURA_IMPERIUM.md](ARCHITEKTURA_IMPERIUM.md) § ZASADA SYMBIOZY | Czego NIE wolno duplikować — jedyny właściciel matematyki/LLM/egzekucji/ryzyka. *(Zastąpiło `SYMBIOZA_MODULOW.md`, zarchiwizowaną 2026-07-17: opisywała kod, który nie istnieje.)* |
-| [ROADMAP_IMPERIUM.md](ROADMAP_IMPERIUM.md) | Mapa rozwoju — Fazy 0-4, wersjonowanie, zasady Areny, zgodność z regulaminami giełd |
-| [KATALOG_NEURONOW.md](KATALOG_NEURONOW.md) | Katalog **299** mikro-neuronów (55 w kodzie) — 4 legiony + 14 dywizji (+16 Skan IV: VSA, VPIN, GEX, Skew, PCR, DXY, Howard Marks, TVL, L1/L2 RS, Cross-Sectional Momentum) |
-| [MATRYCA_KORELACJI.md](MATRYCA_KORELACJI.md) | Kostka Rubika sygnałów — korelacje, konflikty, reżimy rynku, wagi dynamiczne, wpływ BTC |
-| [REGULAMINY_I_MANIPULACJE.md](REGULAMINY_I_MANIPULACJE.md) | Zgodność z regulaminami giełd + 7 manipulacji do wykrywania (obrona, nie atak) |
-| [GENERAL_LEGATUS.md](GENERAL_LEGATUS.md) | Generał Legatus — koordynator Legionów i Senatu, Tryb SKANER vs FOKUS, agregacja sygnałów |
-| [KALKULATOR_LEWARA.md](KALKULATOR_LEWARA.md) | Matematyka przeżycia — likwidacja, stop-loss, dynamiczna dźwignia, zarządzanie kapitałem |
-| [KATALOG_STRATEGII.md](KATALOG_STRATEGII.md) | Katalog **~97+** strategii — Księga Azjatycka, Mistrzowie Świata, VSA/GEX/DeFi/Makro/Opcje/Sektory |
-| [IGRZYSKA_IMPERIUM.md](IGRZYSKA_IMPERIUM.md) | System Rywalizacji — rankingi neuronów / 4 legionów / senatorów. Złoty Hełm, Złota Zbroja, Purpura Senatu |
-| [PAMIEC_ABSOLUTNA.md](PAMIEC_ABSOLUTNA.md) | System Logowania — ImperiumLog (40+ pól), MAE/MFE, walk-forward, replay sesji, Prawo Memoriae |
-| [DORADCY_CARA.md](DORADCY_CARA.md) | Rada Doradców Cesarskich — Oracle/Fulmen/Iustitia/Hermes/Pythia, second opinion w spornych decyzjach |
-| [WIZJONER.md](WIZJONER.md) | 💡 **Brudnopis** — surowe idee, analiza wpływu, symulacje "co jeśli", przypomnienia o niezrealizowanych wizjach |
-| [AUDYT_SYSTEMU.md](AUDYT_SYSTEMU.md) | 🔍 **Audyt systemu** — co działa, co blokowane (TA-Lib), co brakuje, mapa przepływu, priorytety wdrożenia |
-| [WERSJONOWANIE.md](WERSJONOWANIE.md) | 🏺 **Wersjonowanie + Pieczęć Imperium** — IMV-ORI/ADO/INS/POR/EXP, CHANGELOG, post-mortem relegowanych |
-| [SKAN_AZJA.md](SKAN_AZJA.md) | 🌏 **Skan 3100 linków Azji** — perełki: +13 neuronów, +5 strategii, 12 idei architektury (Parrondo, Hurst, Outlines, Reflexion) |
-| [ZADANIE_TIRO_E3_ZNIWO.md](ZADANIE_TIRO_E3_ZNIWO.md) | 🎓 **Zadanie lokalne TIRO** — E3 (egzamin wstępny ucznia) + żniwo par nauczyciela; pracy nie da się wykonać w chmurze (brak książek i klucza DeepSeek) |
+**Pełny katalog wszystkich dokumentów** (plik → temat → opisywany kod → data stanu)
+mieszka w jednym miejscu: sekcja `TABULARIUM` w
+[`INDEKS_IMPERIUM.md`](INDEKS_IMPERIUM.md). Jest **generowana z nagłówków samych
+dokumentów**:
 
-> Dokumenty dodajemy stopniowo, w miarę porządkowania wizji z archiwum.
+```bash
+python narzedzia/tabularium.py katalog --zapisz
+```
 
-> ⚠️ **Ten spis jest RĘCZNY i dubluje generowany katalog** w
-> [`INDEKS_IMPERIUM.md`](INDEKS_IMPERIUM.md) (Tabularium przepisuje go z nagłówków
-> dokumentów, więc nie umie się zestarzeć). Recenzja 2026-07-26 wykazała, że nowy
-> dokument trafił do INDEKSU, a tutaj nie — dokładnie tak, jak zawodzi każde drugie
-> źródło prawdy (Prawo XVI). **Kandydat do rozstrzygnięcia przez Cezara:** zdegradować
-> ten plik do wskaźnika na INDEKS albo generować go z Tabularium.
+Dzięki temu nie umie się zestarzeć: nowy dokument z poprawnym nagłówkiem wchodzi do
+katalogu sam, a Warstwa 20 audytu pilnuje, żeby nikt nie dopisał tam wiersza ręką.
+
+## ❌ Dlaczego tego spisu tu NIE MA (decyzja 2026-07-27)
+
+Ten plik trzymał **drugi, ręczny spis** tych samych dokumentów. Zmierzone przed
+usunięciem: wymieniał **22 z 56** plików `docs/*.md` — **33 dokumenty (59% korpusu)
+były dla niego niewidzialne**, w tym `MANIFEST_KODU`, `LOG_ZMIAN`, `PROFIL_CEZARA`,
+`START_LOKAL` i wszystkie trzy `WIZJA_*`. Katalog generowany widział je wszystkie.
+
+To klasyczne **drugie źródło prawdy** (Prawo XVI): dwa spisy tej samej rzeczy rozjadą
+się co do sztuki, a gnije zawsze ten pisany ręką. Lekarstwem — jak w CENSUS ORGANORUM
+(W17) i w SIGLA IMPERII — jest **odebranie dokumentowi prawa do własnej treści**.
+
+Rozważaliśmy też *generowanie* tego spisu z Tabularium. Odrzucone: dawałoby dwie
+generowane kopie tej samej tabeli, czyli redundancję bez nowej informacji (Prawo XVI) —
+dwa artefakty do regeneracji i dwie bramki zamiast jednej. Wskaźnik kosztuje zero.
+
+**Bramka:** Warstwa 22 audytu (`narzedzia/audyt_spojnosci.py`) blokuje odrodzenie się
+ręcznego katalogu w jakimkolwiek dokumencie poza `INDEKS_IMPERIUM.md`.
+
+## Pozostałe punkty wejścia
+
+| Dokąd | Po co |
+|-------|-------|
+| [`../README.md`](../README.md) | Wizytówka Imperium — liczby wprost z kodu (neurony, testy, prawa) |
+| [`../CLAUDE.md`](../CLAUDE.md) | Konstytucja — rozkazy stałe dla Architekta |
+| [`../ZASADY_FUNDAMENTALNE.md`](../ZASADY_FUNDAMENTALNE.md) | 25 Praw Imperium |

@@ -14,6 +14,59 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | 📚 | DECYZJA C: `docs/README` zdegradowany do wskaźnika + Warstwa 22 (jeden katalog)
+
+**Rozkaz Cezara: „P0 dawaj"** — rozstrzygnięcie pytania decyzyjnego wiszącego od 07-26
+(SUGESTIA #77 w CODEX, zgłoszona przy sądzie nad recenzją cubic PR #133).
+
+**POMIAR PRZED DECYZJĄ.** `docs/README.md` trzymał **ręczny** spis dokumentów obok katalogu
+**generowanego** przez Tabularium do `INDEKS_IMPERIUM.md`. Policzone wobec żywego korpusu:
+ręczny spis wymieniał **22 z 56** plików `docs/*.md` — **33 dokumenty (59% korpusu) były dla
+niego niewidzialne**, w tym `MANIFEST_KODU`, `LOG_ZMIAN`, `PROFIL_CEZARA`, `START_LOKAL` i
+wszystkie trzy `WIZJA_*`. Katalog generowany widział 100%. Drugie źródło prawdy nie „może"
+zgnić — **zgniło**, a nikt tego nie zauważył przez wiele wacht, bo drugi spis nie boli od razu.
+
+**WERDYKT: opcja (a) — wskaźnik.** Opcja (b) („generować `docs/README` z Tabularium") odrzucona
+po rozważeniu: dawałaby **dwie generowane kopie tej samej tabeli** — redundancja bez nowej
+informacji (Prawo XVI), dwa artefakty do regeneracji i dwie bramki zamiast jednej. Wskaźnik
+kosztuje zero i jest zgodny z doktryną powtórzoną już trzy razy (CENSUS ORGANORUM W17, SIGLA
+IMPERII, katalog W20): **lekarstwem na gnicie jest odebranie dokumentowi prawa do własnej treści.**
+
+**MECHANIZM, NIE ŁATKA — WARSTWA 22 (twarda).** Samo skasowanie tabeli byłoby łatką; spis odrodzi
+się przy pierwszym „dopiszę tu tylko jeden link". W22 broni KLASY: żaden dokument w `docs/` poza
+`INDEKS_IMPERIUM.md` nie ma prawa urosnąć do rozmiaru katalogu. **Próg zamiast zera — po pomiarze,
+nie z opinii:** skan całego `docs/` dał INDEKS 73 wiersze (generowany, zwolniony), README 26
+(usunięte), `MANUAL_DODAWANIE_AGENTOW` 2, `WIZJONER` 1 — **nic pomiędzy**. Próg **5** leży w tej
+pustce, z zapasem nad zmierzonym maksimum przypadkowym. Zero byłoby fałszywym alarmem: dokument
+ma pełne prawo wskazać kilka innych. Liczone są wyłącznie **pierwsze kolumny** wierszy tabeli —
+wzmianka o pliku w kolumnie opisu to opis, nie pozycja spisu (ta sama pułapka zasięgu, którą W19
+złapała na sobie samej).
+
+**ZASIĘG — PYTANIE ZADANE OSOBNO OD LOGIKI.** Pierwsza wersja W22 skanowała sam katalog `docs/` —
+i byłaby kolejnym nawrotem klasy „bramka o wąskim zasięgu daje fałszywy spokój" (W11 pilnowała 1
+katalogu z 11; dedup lekcji widział 91 z 298). Zmierzone: Tabularium deklaruje **74 żywe dokumenty,
+w tym 8 spoza `docs/`** (`CLAUDE.md`, `README.md`, `ZASADY_FUNDAMENTALNE.md`, `imperium/README.md`
+i in.) — katalog może odrodzić się tam równie dobrze. Zasięg poszerzony na wszystkie zadeklarowane
+dokumenty przed commitem, nie po incydencie.
+
+**DOWÓD, ŻE BRAMKA BRONI — 6 MUTACJI, 6 ZABITYCH** (próg→999, zwolnienie INDEKSU→puste, skan całego
+wiersza zamiast kolumny 1, pusta lista plików, zawężenie zasięgu do `docs/`, pominięcie pierwszego
+dokumentu). **Jedna mutacja PRZEŻYŁA pierwsze podejście** i to jest tu najważniejsze: test zasięgu
+miał asercję `zbadane >= len(poza) + 40`, więc zawężenie do `docs/` (65 zamiast 73 dokumentów)
+spokojnie ją spełniało. Luźny próg nie mierzy zasięgu — mierzy własną wygodę. Asercja zamieniona na
+**równość z liczbą policzoną ze źródła** (`zbierz_dokumenty()` minus zwolnione). Zgodnie z lekcją
+z wachty tiro27: gdy mutacja przeżyje, nie dopisuj kolejnego testu na ślepo — ustal, czego stary
+NIE mierzył. Obie klasy dopisane do Księgi Wad (99 wpisów).
+
+**Efekt uboczny (spodziewany):** W20 natychmiast wykryła zmianę opisu README w katalogu INDEKSU —
+regeneracja `tabularium.py katalog --zapisz`. Bramka złapała własną zmianę, zanim złapał ją człowiek.
+
+**Pliki:** `docs/README.md` (spis → wskaźnik), `narzedzia/audyt_spojnosci.py` (+W22),
+`tests/test_spojnosc.py` (+5 testów granic), `docs/INDEKS_IMPERIUM.md` (katalog zregenerowany),
+`bibliotheca_ulpia/dane/rejestr_testow.jsonl` (SUGESTIA #77 zamknięta + pomiar).
+
+---
+
 ## 2026-07-27 | 🎓 | Szkoła TIRO: filtr wg RODZAJU zadania + konsensus — 178→212 par użytecznych
 
 **Rozkaz Cezara: „wg rekomendacji".** Punktem wyjścia była jego własna partia pomiarowa

@@ -79,7 +79,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | `docs/OBSERWATORZY.md` | Jedyny dokument mapujący WSZYSTKIE zewnętrzne źródła danych (44 źródła w 4 warstwach: OCZY/USZY/WIESZCZOWIE/SZPIEDZY) do konkretnych neuronów i modułów — z priorytetami kluczy API  | `imperium/akwedukty/bary_zdarzeniowe.py`, `imperium/akwedukty/czytnik_csv.py`, `imperium/akwedukty/klasyfikator_zdarzen.py`, `imperium/akwedukty/kwatermistrz_danych.py`, `imperium/akwedukty/news_fetcher.py`, `imperium/akwedukty/sentyment_historyczny.py`, `imperium/drogi/nexus_hub.py` | 2026-07-17 |
 | `docs/PAMIEC_SESJI.md` | Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360) | `imperium/biblioteki/pamiec_sesji.py` | 2026-07-18 |
 | `docs/PROFIL_CEZARA.md` | Trwały model Cezara (preferencje, decyzje stałe) + źródło prawdy Imion Imperium — wstrzykiwany na starcie | — | 2026-07-13 |
-| `docs/README.md` | Spis wszystkich dokumentów w `docs/` z jednozdaniowym opisem tematu każdego — punkt nawigacyjny do dokumentacji. | — | 2026-07-27 |
+| `docs/README.md` | Wskaźnik na katalog dokumentów — sam spisu NIE trzyma; kieruje do generowanego katalogu w INDEKS_IMPERIUM (jedno źródło prawdy, Prawo XVI). | — | 2026-07-27 |
 | `docs/REJESTR_INSPIRACJI.md` | Jedno źródło prawdy o zewnętrznych inspiracjach AI/ML (ZPO: pełna nazwa + link + status weryfikacji) | — | 2026-07-16 |
 
 ### FORMA — opis budowy organu — jak moduł jest zbudowany

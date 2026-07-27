@@ -568,6 +568,11 @@ def audyt() -> tuple:
     bledy += w21_bledy
     info += w21_info
 
+    # ── WARSTWA 22: JEDEN KATALOG DOKUMENTÓW — żadnych ręcznych spisów obok ───
+    w22_bledy, w22_info = _warstwa_22_jeden_katalog()
+    bledy += w22_bledy
+    info += w22_info
+
     return bledy, info
 
 
@@ -610,6 +615,85 @@ def _warstwa_21_wyzwalacze_rozkazow():
                  f"Rozkaz nieosiągalny — dodaj skill albo usuń wyzwalacz")], []
     return [], [f"Wyzwalacze rozkazów (W21): {len(cytowane)} skilli cytowanych w konstytucji, "
                 f"wszystkie osiągalne ✅"]
+
+
+def _warstwa_22_jeden_katalog(katalog_docs=None):
+    """W22 — spis dokumentów wolno trzymać JEDNEMU dokumentowi: INDEKS_IMPERIUM.
+
+    Powód (decyzja C Cezara 2026-07-27, zgłoszenie z recenzji cubic PR #133): `docs/README.md`
+    trzymał ręczny spis tych samych dokumentów, które Tabularium generuje z nagłówków do
+    INDEKSU. ZMIERZONE przed usunięciem: ręczny spis wymieniał 22 z 56 plików `docs/*.md`,
+    czyli 33 dokumenty (59% korpusu) były dla niego niewidzialne — a nikt tego nie zauważył
+    przez wiele wacht, bo gnicie drugiego spisu nie boli od razu. Klasyczne drugie źródło
+    prawdy (Prawo XVI): gnije zawsze ten pisany ręką.
+
+    Usunięcie samego spisu byłoby ŁATKĄ — spis odrodzi się przy pierwszym „dopiszę tu tylko
+    jeden link". Ta warstwa broni KLASY: żaden żywy dokument poza INDEKSEM nie ma prawa
+    urosnąć do rozmiaru katalogu.
+
+    PRÓG zamiast zera — świadomie i po pomiarze. Zero byłoby fałszywym alarmem: dokument ma
+    pełne prawo linkować do kilku innych (README wskazuje na INDEKS, konstytucję i ZASADY;
+    MANUAL_DODAWANIE_AGENTOW cytuje dwa wzorce). Pomiar całego korpusu w chwili budowy
+    warstwy: INDEKS 73 wiersze (generowane, wyłączone), docs/README 26 (usunięte tą decyzją),
+    MANUAL_DODAWANIE_AGENTOW 2, WIZJONER 1, README repo 2 — nic pomiędzy. Próg 5 leży w pustce
+    między „kilka odnośników" a „katalog", z zapasem nad zmierzonym maksimum przypadkowym (2).
+    Warstwa pilnująca cudzej prawdy nie ma prawa produkować własnej nieprawdy (lekcja W19).
+
+    ZASIĘG = WSZYSTKIE żywe dokumenty zadeklarowane w Tabularium (74, w tym 8 spoza `docs/`),
+    nie sam katalog `docs/`. Pytanie o zasięg zadane OSOBNO od pytania o logikę — to nawracająca
+    klasa wady Imperium (W11 pilnowała 1 katalogu z 11; dedup lekcji widział 91 z 298; PROBATOR
+    badał dwa plony, czytaliśmy jeden). Katalog może odrodzić się w `imperium/README.md` równie
+    dobrze jak w `docs/`, a bramka o wąskim zasięgu daje fałszywy spokój.
+    """
+    PROG_WIERSZY = 5
+    ZWOLNIONE = {"INDEKS_IMPERIUM.md"}   # jedyny katalog — generowany, pilnowany przez W20
+
+    # Wiersz katalogu = wiersz tabeli, którego PIERWSZA komórka wskazuje na dokument .md
+    # (link `[X](Y.md)` albo `` `Y.md` ``). Wzmianka o .md w dalszych kolumnach to opis,
+    # nie pozycja spisu — dlatego patrzymy wyłącznie na kolumnę pierwszą.
+    komorka_md = re.compile(r"\]\([^)]+\.md[^)]*\)|`[^`]+\.md`")
+
+    def policz(tresc):
+        ile = 0
+        for w in tresc.splitlines():
+            if not w.startswith("|"):
+                continue
+            kolumny = w.split("|")
+            if len(kolumny) > 1 and komorka_md.search(kolumny[1]):
+                ile += 1
+        return ile
+
+    if katalog_docs:          # tryb testowy: płaski katalog na dysku
+        korzen = katalog_docs
+        pliki = [n for n in sorted(os.listdir(katalog_docs)) if n.endswith(".md")]
+    else:                     # produkcja: żywe dokumenty zadeklarowane w Tabularium
+        try:
+            from narzedzia.tabularium import ROOT as T_ROOT
+            from narzedzia.tabularium import zbierz_dokumenty
+        except Exception as e:  # noqa: BLE001 — awaria warstwy nie może wywrócić audytu
+            return [f"[W22] Błąd kontroli katalogów: {e}"], []
+        korzen = T_ROOT
+        pliki = [wzgledna for wzgledna, _ in zbierz_dokumenty()]
+
+    bledy, zbadane = [], 0
+    for wzgledna in pliki:
+        if os.path.basename(wzgledna) in ZWOLNIONE:
+            continue
+        try:
+            with open(os.path.join(korzen, wzgledna), encoding="utf-8") as f:
+                tresc = f.read()
+        except OSError:
+            continue
+        zbadane += 1
+        ile = policz(tresc)
+        if ile >= PROG_WIERSZY:
+            bledy.append(
+                f"[W22] {wzgledna}: {ile} wierszy wskazujących na dokumenty — to drugi "
+                f"katalog obok INDEKS_IMPERIUM.md (próg {PROG_WIERSZY}). Spis dokumentów "
+                f"generuje Tabularium; zostaw tu wskaźnik, nie kopię (Prawo XVI)")
+    info = ([f"Jeden katalog (W22): {zbadane} dokumentów bez konkurencyjnego spisu ✅"]
+            if not bledy else [])
+    return bledy, info
 
 
 def _warstwa_19_parytet_dat():

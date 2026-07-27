@@ -4,6 +4,7 @@ Silnik audytu (narzedzia/audyt_spojnosci.py) MUSI być zielony w każdej sesji.
 """
 
 import os
+import pathlib
 import re
 import sys
 
@@ -432,3 +433,81 @@ def test_audyt_w21_ukosnik_w_prozie_nie_jest_obietnica(monkeypatch, tmp_path):
     monkeypatch.setattr(a, "ROOT", str(tmp_path))
     bledy, _ = a._warstwa_21_wyzwalacze_rozkazow()
     assert bledy == [], f"proza nie może być alarmem: {bledy}"
+
+
+# ── WARSTWA 22: JEDEN KATALOG DOKUMENTOW ─────────────────────────────────────
+
+def _dok(katalog, nazwa, ile_wierszy):
+    """Dokument z tabelą o `ile_wierszy` pozycjach wskazujących na inne dokumenty."""
+    wiersze = ["| Plik | Temat |", "|---|---|"]
+    wiersze += [f"| [D{i}.md](D{i}.md) | opis {i} |" for i in range(ile_wierszy)]
+    (katalog / nazwa).write_text("\n".join(wiersze) + "\n", encoding="utf-8")
+
+
+def test_audyt_w22_zielony_na_realnym_korpusie():
+    """W22 na żywym repo: po decyzji C żaden dokument nie konkuruje z INDEKSEM."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, info = a._warstwa_22_jeden_katalog()
+    assert not bledy, f"W22 wykrył drugi katalog: {bledy}"
+    assert any("W22" in i or "Jeden katalog" in i for i in info)
+
+
+def test_audyt_w22_lapie_odrodzony_reczny_spis(tmp_path):
+    """GRANICA: dokument urósł do 5 wierszy katalogu → alarm (próg zmierzony)."""
+    import narzedzia.audyt_spojnosci as a
+    _dok(tmp_path, "README.md", 5)
+    bledy, _ = a._warstwa_22_jeden_katalog(katalog_docs=str(tmp_path))
+    assert len(bledy) == 1 and "README.md" in bledy[0] and "W22" in bledy[0]
+
+
+def test_audyt_w22_kilka_odnosnikow_to_nie_katalog(tmp_path):
+    """GRANICA DRUGA STRONA: 4 wiersze (tuż pod progiem) to nawigacja, nie spis.
+
+    Zero byłoby fałszywym alarmem — README ma prawo wskazać INDEKS, konstytucję i ZASADY.
+    """
+    import narzedzia.audyt_spojnosci as a
+    _dok(tmp_path, "README.md", 4)
+    bledy, _ = a._warstwa_22_jeden_katalog(katalog_docs=str(tmp_path))
+    assert bledy == [], f"kilka odnośników nie może być alarmem: {bledy}"
+
+
+def test_audyt_w22_indeks_jest_zwolniony(tmp_path):
+    """INDEKS_IMPERIUM to JEDYNY prawowity katalog — pilnuje go W20, nie W22."""
+    import narzedzia.audyt_spojnosci as a
+    _dok(tmp_path, "INDEKS_IMPERIUM.md", 73)
+    bledy, _ = a._warstwa_22_jeden_katalog(katalog_docs=str(tmp_path))
+    assert bledy == [], f"generowany katalog nie może wywoływać alarmu: {bledy}"
+
+
+def test_audyt_w22_wzmianka_w_dalszej_kolumnie_to_opis(tmp_path):
+    """GRANICA: `.md` w kolumnie OPISU nie czyni z wiersza pozycji spisu.
+
+    Ta sama pułapka co w W19 (zasięg): warstwa pilnująca cudzej prawdy nie ma prawa
+    liczyć każdej wzmianki o pliku jako wpisu katalogowego.
+    """
+    import narzedzia.audyt_spojnosci as a
+    wiersze = ["| Warstwa | Co robi |", "|---|---|"]
+    wiersze += [f"| W{i} | porównuje z `INDEKS_IMPERIUM.md` |" for i in range(9)]
+    (tmp_path / "OPIS.md").write_text("\n".join(wiersze) + "\n", encoding="utf-8")
+    bledy, _ = a._warstwa_22_jeden_katalog(katalog_docs=str(tmp_path))
+    assert bledy == [], f"opis w drugiej kolumnie to nie katalog: {bledy}"
+
+
+def test_audyt_w22_zasieg_obejmuje_dokumenty_spoza_docs():
+    """ZASIĘG (pytanie osobne od logiki): warstwa widzi też żywe dokumenty spoza `docs/`.
+
+    Nawracająca klasa Imperium: bramka o wąskim zasięgu daje fałszywy spokój (W11 pilnowała
+    1 katalogu z 11). Katalog może odrodzić się w `imperium/README.md` tak samo jak w `docs/`.
+    """
+    import narzedzia.audyt_spojnosci as a
+    from narzedzia.tabularium import zbierz_dokumenty
+    zadeklarowane = [w for w, _ in zbierz_dokumenty()]
+    poza = [w for w in zadeklarowane if pathlib.PurePath(w).parts[0] != "docs"]
+    assert poza, "Tabularium przestało widzieć dokumenty spoza docs/ — zasięg W22 by się zawęził"
+    oczekiwane = len([w for w in zadeklarowane
+                      if os.path.basename(w) != "INDEKS_IMPERIUM.md"])
+    _, info = a._warstwa_22_jeden_katalog()
+    zbadane = int(re.search(r"\(W22\): (\d+) dokument", info[0]).group(1))
+    assert zbadane == oczekiwane, (
+        f"W22 zbadała {zbadane} z {oczekiwane} zadeklarowanych dokumentów — zasięg zawężony "
+        f"(pierwsza wersja tego testu miała luźny próg i PRZEŻYŁA mutację zawężenia do docs/)")

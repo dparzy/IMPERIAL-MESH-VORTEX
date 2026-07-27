@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 245** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 246** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -248,6 +248,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `portitor.py` | 🏛️ PORTITOR — celnik u wrót: pre-flight gotowości środowiska na starcie sesji (Prawo XV/XVII) |
 | `praeda.py` | 🗡️💎 PRAEDA (Łupieżca) — TRYB ŁOWCY: kontrolowana, AUTO-skalowana chciwość (W-291) |
 | `probator.py` | 🛡️ PROBATOR — Strażnik Cytatów Imperium (warstwa 1 anty-halucynacyjna Hyginusa) |
+| `recognitor.py` | 🔎 RECOGNITOR — poświadcza, czy RECENZJA POKRYWA DZISIEJSZY STAN kodu |
 | `sizing_przekonania.py` | Sizing Przekonania (W-318) — większa stawka na mocniejszej okazji |
 | `straznik_przewagi.py` | 🛡️💎 STRAŻNIK PRZEWAGI — unikat Imperium (W-287, Faza C) |
 

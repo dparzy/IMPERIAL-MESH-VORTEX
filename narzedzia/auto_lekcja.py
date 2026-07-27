@@ -153,7 +153,11 @@ def _wywolaj_deepseek(tekst_sesji: str) -> List[Dict[str, Any]]:
             odp = "\n".join(odp.splitlines()[:-1])
         return json.loads(odp)
     except Exception as e:
-        print(f"  [auto_lekcja] Błąd DeepSeek: {e}", file=sys.stderr)
+        # STDOUT — hook zachowuje tylko ten strumień. Do 2026-07-27 powód szedł na stderr,
+        # więc w wydruku startowym zostawała WYŁĄCZNIE dwuznaczna linia „Brak wyników (lub
+        # błąd DeepSeek)": nie dało się odróżnić „model nie znalazł lekcji" od „zapytanie
+        # padło", choć za to zapytanie płacimy. Diagnoza niewidoczna = diagnoza nieistniejąca.
+        print(f"  [auto_lekcja] Błąd DeepSeek: {type(e).__name__}: {e}")
         return []
 
 
@@ -182,8 +186,9 @@ def _zapisz_wyniki(wyniki: List[Dict[str, Any]], data_sesji: str) -> int:
                 # Pominięcie MUSI być widoczne: sygnatura nie odróżnia „za niski" od „za
                 # wysoki", więc lekcja obalająca poprzednią też trafi tutaj. Cichy `continue`
                 # kasowałby ją bez śladu (Prawo XV — utrata potencjału).
-                print(f"  [auto_lekcja] ⏭️  duplikat: {tytul!r} ≈ {istniejaca['tytul']!r}",
-                      file=sys.stderr)
+                # STDOUT, nie stderr — hook startowy zachowuje tylko stdout, więc ten alarm
+                # był niewidzialny dokładnie tam, gdzie jedyny raz się odzywa (2026-07-27).
+                print(f"  [auto_lekcja] ⏭️  duplikat: {tytul!r} ≈ {istniejaca['tytul']!r}")
                 continue
             _ps.dopisz_lekcje(tytul, tresc, data=data_sesji)
         elif typ in ("WIZJA", "DECYZJA", "POMYSŁ", "ZMIANA"):
@@ -198,7 +203,10 @@ def _zapisz_wyniki(wyniki: List[Dict[str, Any]], data_sesji: str) -> int:
                 # zmierzone: predykat wiąże 326 par na 827 wpisów, więc jest czuły. Cichy
                 # `continue` przy tej czułości mógłby zjeść pomysł RÓŻNY od istniejącego,
                 # a wyrzucona wiedza nie zostawia śladu. Głośne pominięcie zostawia.
-                print(f"  [auto_lekcja] ⏭️  duplikat {typ}: {tytul!r}", file=sys.stderr)
+                #
+                # SAM MELDUNEK ROBI JUŻ `rejestr_wizji.dodaj` (na stdout) i robi to LEPIEJ:
+                # pokazuje, z KTÓRYM wpisem skojarzył duplikat. Druga linia o tym samym
+                # zdarzeniu byłaby powtórzeniem bez nowej informacji (Prawo XVI).
                 continue
         else:
             continue

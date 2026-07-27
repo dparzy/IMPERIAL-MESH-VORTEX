@@ -113,6 +113,9 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Mała liczba okien a wynik ROBUST w WF-IC
+Neurony EXP-13 (6 okien), SMC-01 (5), V-13 (3) otrzymały status ROBUST, ale są słabiej podparte niż X-17 (25 okien). Wymaga adnotacji o liczbie okien w werdykcie.
+
 ### 2026-07-27 — Detektor duplikatów Hyginusa
 W systemie istnieje gotowy detektor duplikatów oparty na Jaccardzie bi-gramów, ale nie jest używany. Stanowi darmowe narzędzie do filtracji kandydatów.
 

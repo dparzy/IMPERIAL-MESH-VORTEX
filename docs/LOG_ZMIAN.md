@@ -14,6 +14,63 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | 🔎 | RECOGNITOR — cisza recenzenta przestała się liczyć jako zgoda
+
+**Pytanie Cezara:** *„czy cubic znalazł jakieś nowe błędy na branchu roboczym?"*.
+Odpowiedź „nie" była prawdziwa w literze i myląca w treści — i to jest cała lekcja tej zmiany.
+
+**POMIAR (GitHub API, nie pamięć):** na PR #134 recenzent wykonał **dokładnie jeden przebieg**
+(`review-run=2242666a`, 2026-07-27 10:34:58 UTC), a wszystkie 15 uwag napisał wobec commita
+`bfb5e26`. Potem na gałąź weszły **3 commity** — w tym `bc4913c`, który naprawiał *jego własne*
+uwagi i dokładał nowy organ (NOMENCLATOR, 295 linii) — po czym PR **zmergowano o 12:25 UTC bez
+drugiego przebiegu**. Do `main` trafiło **756 linii `.py` bez recenzji zewnętrznej**, a ponieważ
+gałąź jest już zmergowana, nowy PR pokazałby zero różnicy: **luka jest nieodwracalna**.
+
+**KLASA WADY:** „brak nowych uwag" wyglądał identycznie jak „brak wad", bo **nic nie pytało,
+czy recenzent nadążył**. Siostra klasy z tego samego dnia (zakaz pushu bez mechanizmu) i klasy
+„alarm na stderr = cisza udająca spokój". Rzecz niezmierzona nie jest zielona — jest niezmierzona.
+
+**MECHANIZM:** `imperium/pretorianie/recognitor.py` (11 testów) — porównuje commit ostatniej
+recenzji z HEAD gałęzi. Pyta endpoint `reviews` (przebieg istnieje także bez ani jednej uwagi,
+więc komentarze inline nie odróżniłyby „przeczytał i nie miał uwag" od „nie przyszedł").
+Rozróżnia lukę **naprawialną** pushem od **nieodwracalnej** po mergu. Braku sieci NIGDY nie
+melduje jako zieleni: kod 2 = niewiedza. Wpięty w **krok 3 domknięcia** (CLAUDE.md), świadomie
+POZA hookiem startowym — wymaga sieci, a start ma być szybki i offline.
+
+**Recenzja adversarialna tych 756 linii — 3 realne wady w kodzie, który już był w `main`:**
+1. **P0 — cicha korupcja wersjonowanej pamięci.** Redakcja katalogu domowego budowała wzorzec
+   ze sklejonych segmentów `Path.home()`. Na **płytkim domu degenerowała się**: `/root`
+   (klasyczny kontener, czyli nasza chmura) dawał gołe słowo `root` z `IGNORECASE`, więc cytat
+   kodu `ROOT = Path(__file__)` zapisywał się do kroniki jako `~ = Path(__file__)`; dom `/`
+   dawał wzorzec **pusty**, a `re.sub` wstawiał `~` **między każdy znak**. Niewidoczne na
+   `C:\Users\Ian` (trzy segmenty) — dlatego przeszło. Naprawa: wymóg separatora i granicy słowa
+   + odmowa redakcji domu, którego nie da się bezpiecznie związać, **głośna** w meldunku kroniki.
+2. **P1 — alarm w strumieniu, którego nikt nie czyta.** Hook `SessionStart` zachowuje wyłącznie
+   `stdout`. Ostrzeżenia o pominiętych wpisach pamięci (i **powód błędu DeepSeeka**, za którego
+   zapytanie płacimy) szły na `stderr`. Dowód z wydruku tego samego dnia: stoi
+   „(pominięto 2 duplikatów)" i **ani jednej linii, co pominięto**. Naprawa: alarmy na `stdout`,
+   duplikat meldunku usunięty (Prawo XVI), a test przestał przypinać `stderr` — bo zielony test
+   certyfikował mechanizm, który w produkcji milczał.
+3. **P3 — licznik i mianownik z dwóch przebiegów.** NOMENCLATOR dzielił plon na kandydatów
+   dwukrotnie; raport „2/5" mógł kiedyś opisywać dwa różne podziały tego samego tekstu.
+
+**Dowód mutacyjny** (bo „testy zielone" bez niego nic nie znaczy): 2 mutacje naprawy — usunięcie
+straży i usunięcie granic wzorca — **obie zabite**, każda z dowodem, że plik faktycznie się
+zmienił (hash przed/po). Przy okazji własny błąd: skrypt mutacyjny padł na kodowaniu **po**
+nałożeniu mutacji i **przed** przywróceniem, zostawiając w drzewie kod bez straży. Naprawione
+przywracaniem w `finally` + weryfikacją hashu po przywróceniu; klasa dopisana do Księgi Wad.
+
+**Bramka:** 3006/3006 testów (+19), audyt exit 0, ruff czysto, skan wad czysto.
+**Księga Wad:** 115 → 121 (6 nowych klas). **Census:** 245 → 246 organów.
+
+**Pliki:** `imperium/pretorianie/recognitor.py` (nowy), `tests/test_recognitor.py` (nowy),
+`tests/test_redakcja_domu.py` (nowy), `imperium/biblioteki/kronika_czatu.py`,
+`imperium/biblioteki/rejestr_wizji.py`, `narzedzia/auto_lekcja.py`,
+`imperium/pretorianie/nomenclator.py`, `tests/test_centrum_pamieci.py`, `CLAUDE.md`,
+`docs/ARCHITEKTURA_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`, `README.md`.
+
+---
+
 ## 2026-07-27 | 🔐 | Zakaz pushu przestał zależeć od pamięci Architekta — `permissions.deny`
 
 **Cenzus narzędzi sterowania (pytanie Cezara) znalazł sprzeczność między konstytucją

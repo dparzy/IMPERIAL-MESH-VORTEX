@@ -12,6 +12,36 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-27 — Gnicie runbooków W11 - własna treść zamiast referencji
+Runbooki gniły, bo zawierały własną, nieaktualną treść, a deduplikacja po nazwie blokowała aktualizację. Rozwiązanie: skille pobierają kroki z CLAUDE.md jako jedyne źródło prawdy.
+
+### 2026-07-27 — Cicha utrata danych przy zapisie runbooka
+Metoda `zapisz()` gubiła nieznane pola istniejącego wpisu, nadpisując całość. To klasa cichej utraty danych przy aktualizacji. Naprawiono przez scalanie pól.
+
+### 2026-07-27 — Brak funkcji aktualizacji runbooka
+W systemie _ZIARNO nie istniała funkcja aktualizacji istniejącego runbooka, a deduplikacja po nazwie blokowała poprawę. Dziś dodano, ale wada architektoniczna: każda procedura po zapisie gnije.
+
+### 2026-07-27 — Gnicie runbooków przez własną treść
+Runbooki W11 zgniły, bo zawierały własną treść zamiast pobierać z CLAUDE.md. Rozwiązanie: skille muszą pobierać kroki z jedynego źródła prawdy, a nie duplikować.
+
+### 2026-07-27 — Testy na starym Fujitsu >2 min to normalne
+Stary komputer Fujitsu powoduje, że 2584 testy trwają ponad 2 minuty. Ustalono nie dawać limitu czasu, tylko cyklicznie sprawdzać, czy proces żyje.
+
+### 2026-07-27 — Order zawsze z zyskiem zakończony
+Podstawowe motto: każdy order musi być postawiony i zamknięty z zyskiem. To fundament wiarygodności i spójności systemu.
+
+### 2026-07-20 — 20 sprzeczności w Refleksji, 3 pilne
+Audyt startowy wykrył 20 sprzeczności, w tym 3 pilne: audytu/nowy, chmura/lokal/naprawa, false/faza – wymagają przeglądu.
+
+### 2026-07-20 — Brudne drzewo – auto_lekcja_przetworzone.txt
+Audyt startowy wykazał 3 dopisane linie przez automat w pliku bibliotheca_ulpia/dane/auto_lekcja_przetworzone.txt. Nie jest to zmiana ręczna – wymaga decyzji Cezara.
+
+### 2026-07-20 — MoE niewykonalne na 6GB VRAM
+Mixture of Experts wymaga trzymania wszystkich ekspertów w pamięci jednocześnie. 4 eksperty po 7B wymagają ~28B RAM – na RTX 4050 (6GB) to niemożliwe.
+
+### 2026-07-20 — Brak metadanych to źródło bałaganu
+64 dokumenty w docs/ mają zero nagłówków metadanych. Audyt nie wie, czym dokument jest, przez co bramki (np. W5, W10) opierają się na ręcznie wpisanych wyrażeniach zamiast na strukturze. To nie skaluje się do 213 plików .md.
+
 ### 2026-07-27 — Mutacja przeżyła przez luźną asercję testu zasięgu
 Test zasięgu miał asercję 'zbadane ≥ 8+40' zamiast 'równość z policzonym zasięgiem'. Luźny próg przepuszczał zawężenie bramki z 73 do 65. Poprawiono na ścisłą równość; mutacja padła.
 

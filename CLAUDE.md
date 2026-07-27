@@ -222,7 +222,9 @@ nowe zadanie bez weryfikacji „czy już istnieje"; liczby z pamięci zamiast z 
    `bibliotheca_ulpia/dane/rejestr_testow.jsonl` (Scriba Codex / flaga `--ledger`); Backlog/Sugestie aktualne.
    Niezgodność → popraw po weryfikacji (ZASADA CODEX PROBATIONUM, kandydat≠prawda).
 3. **Adversarial pre-push:** `/code-review` na diffie + `python narzedzia/skan_wad_kodu.py` na zmienionych
-   plikach. Nowe wady → Księga Wad (`ksiega_wad_kodu`).
+   plikach + `python -m imperium.pretorianie.recognitor --bramka` (RECOGNITOR: czy recenzja zewnętrzna
+   pokrywa HEAD — **cisza recenzenta ≠ zgoda**; zmierzone na PR #134: 756 linii .py weszło do `main`
+   bez spojrzenia, bo nic nie pytało, czy recenzent nadążył). Nowe wady → Księga Wad (`ksiega_wad_kodu`).
 4. **Komplet dokumentów + pamięć zsynchronizowane z kodem** (ZASADA PEŁNEJ SYMBIOZY): LOG_ZMIAN, MANIFEST,
    INDEKS, MAPA_KLUCZY, liczby, ARCHITEKTURA (nowy organ/narzędzie z nazwą rzymską — ZASADA NOMENKLATURY),
    pamięć. Nowa ZASADA w pamięci → skodyfikuj też w CLAUDE.md/ZASADY (nie zostawiaj tylko w pamięci prywatnej).

@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 246** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 248** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -240,6 +240,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | Moduł | Rola (docstring modułu) |
 |-------|--------------------------|
 | `aegis_tarcza.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
+| `custos_liminis.py` | 🚧 CUSTOS LIMINIS — Strażnik Progu: bariera PRZED zadziałaniem narzędzia (PreToolUse) |
 | `filtr_asymetrii.py` | Filtr Asymetrii Reżimu (W-314) — brama wejścia oparta na trendzie i jego sile |
 | `filtr_ekonomiczny.py` | Filtr Ekonomiczny (ECON — market price of risk) — brama „zbyt dobre, by było prawdziwe" |
 | `kalkulator_lewara.py` | Kalkulator Lewara — matematyka przeżycia |
@@ -251,6 +252,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `recognitor.py` | 🔎 RECOGNITOR — poświadcza, czy RECENZJA POKRYWA DZISIEJSZY STAN kodu |
 | `sizing_przekonania.py` | Sizing Przekonania (W-318) — większa stawka na mocniejszej okazji |
 | `straznik_przewagi.py` | 🛡️💎 STRAŻNIK PRZEWAGI — unikat Imperium (W-287, Faza C) |
+| `vigil.py` | 🔦 VIGIL — Straż Nocna: skan KAŻDEGO zapisanego pliku .py natychmiast (PostToolUse) |
 
 ### `imperium/senat/` — SENATUS — meta-decyzje, debata
 

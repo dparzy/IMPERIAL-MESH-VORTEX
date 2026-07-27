@@ -14,6 +14,70 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | 🚧 | Hooki PreToolUse/PostToolUse — CUSTOS LIMINIS i VIGIL (priorytet #1 Cezara)
+
+**Imperium używało 2 z 31 zdarzeń hooka (6.5%).** Rozkaz: domknąć wąsko — bariera przed
+narzędziem i automat Księgi Wad po zapisie. Teraz **4 z 31 = 12.9%**.
+
+**⚠️ KOREKTA LICZBY (na pytanie Cezara, w tej samej wachcie):** wcześniej wszędzie — w Dzienniku,
+w pamięci i w moich meldunkach — stało „~9 zdarzeń". To była liczba POWTARZANA, nie mierzona.
+Źródło rozstrzygające: schemat konfiguracji `json.schemastore.org/claude-code-settings.json`
+(maszynowy) wylicza **31** kluczy `hooks`. Dokumentacja narracyjna dała 30 i sama sobie przeczyła
+w nagłówku („32"), więc wzięliśmy z niej listę, a nie liczbę. Skutek: utrata potencjału jest
+**ponad trzykrotnie większa**, niż głosiła teza — pokrycie 12.9%, nie 44%. Wpis w INDEX FALSORUM.
+
+**🚨 ZMIERZONA LUKA, KTÓREJ SZUKALIŚMY GDZIE INDZIEJ.** Wczorajsza łata („`permissions.deny`
+z `Bash(git push:*)`") zapinała **jedną powłokę z dwóch**. Dokumentacja uprawnień mówi wprost:
+*„PowerShell permission rules use the same shape as Bash rules"* — to **osobna przestrzeń nazw**,
+a PowerShell jest w tym środowisku powłoką **podstawową**. Reguła `Bash(...)` nie ma prawa
+zatrzymać wywołania narzędzia `PowerShell`. Rozkaz oznaczony jako NIENARUSZALNY był więc nadal
+egzekwowany połowicznie — 16 dni bez mechanizmu, potem 1 dzień z mechanizmem na połowę powierzchni.
+Naprawa dwutorowa: reguła `PowerShell(git push:*)` **oraz** strażnik hooka.
+
+**PREMISA, KTÓRĄ OBALIŁ POMIAR (Prawo I dotyczy też własnych tez).** Zacząłem od tezy: *„deny
+dopasowuje prefiks, więc nie złapie `cd x && git push`"*. Dokumentacja tę tezę **obaliła** —
+Claude Code zna operatory powłoki i rozbija polecenia złożone na podpolecenia (`&&`, `||`, `;`,
+`|`, `|&`, `&`, nowa linia), a reguła musi pasować do każdego z osobna. Gdybym nie sprawdził,
+zbudowałbym barierę uzasadnioną fałszywą przesłanką — dokładnie to, co zrobił FRUMENTARIUS,
+cytując zmyśloną liczbę. Prawdziwe szczeliny okazały się dwie: inna **powłoka** i inna
+**składnia** tego samego polecenia (`git -C /repo push` nie ma prefiksu `git push`).
+
+**CUSTOS LIMINIS** (`imperium/pretorianie/custos_liminis.py`) — PreToolUse:
+- `git push` w dowolnej formie → **deny**; asymetria kosztów jest jawna: fałszywe zatrzymanie
+  kosztuje jedno zdanie Cezara, przepuszczenie kosztuje złamany rozkaz.
+- zapis do `archiwum/` → **ask**, nie deny. Konstytucja mówi „archiwum otwierasz TYLKO na rozkaz
+  Cezara", więc decyzja należy do niego; `deny` by mu ją zabrało, cisza oddałaby ją mnie.
+- wszystko inne → **cisza**. Strażnik zabierający głos przy każdym poleceniu przestaje być słyszany.
+- Fałszywe alarmy trzymane w ryzach: czytamy PODPOLECENIE gita, więc `git log --grep push`
+  przechodzi bez słowa.
+
+**VIGIL** (`imperium/pretorianie/vigil.py`) — PostToolUse: po każdym zapisie `.py` uruchamia
+`ruff` + `skan_wad_kodu` i wstrzykuje zarzuty **od razu**, zamiast czekać na bramkę. Powód
+zmierzony: Księga Wad ma **126 klas i 16 wzorców regex (~13% automatu)**, a klasa nazwana 07-26
+wróciła 07-27 w 277 egzemplarzach. Cisza gdy zielone. Koszt zmierzony: ~0.35 s na plik,
+narzut strażnika progu ~143 ms na wywołanie.
+
+**Dwie wady złapane w trakcie budowy (obie przez własne testy i pomiar, nie przez recenzję):**
+1. **Cytowana ścieżka ze spacją omijała barierę** — `"C:\Program Files\Git\bin\git.exe" push`
+   rozbijało się gołym `split()` na `"C:\Program`, więc pierwszy token nie wyglądał na gita.
+   Na Windowsie to forma codzienna. Naprawione tokenizacją `shlex(posix=False)` — tryb POSIX
+   zjadłby backslashe ścieżek.
+2. **Kodowanie mogło unieważnić całą barierę** — protokół wypisywał emoji i polskie znaki,
+   a strumień wyjściowy na Windowsie potrafi mieć stronę kodową cp1250, w której ich nie ma.
+   Bariera zniknęłaby przez **kosmetykę**. Naprawione: JSON w czystym ASCII (`\uXXXX`), odbiorca
+   dekoduje z powrotem.
+
+**Uwaga operacyjna:** hooki wczytywane są przy starcie sesji, więc **działają od następnej wachty**,
+nie w tej. Weryfikacja end-to-end wykonana ręcznie przez wrapper (deny na push w obu powłokach,
+cisza na `git status`).
+
+**Pliki:** `imperium/pretorianie/custos_liminis.py` (nowy), `imperium/pretorianie/vigil.py` (nowy),
+`.claude/hooks/pre-tool-use.sh` (nowy), `.claude/hooks/post-tool-use.sh` (nowy),
+`tests/test_straznicy_hookow.py` (nowy), `.claude/settings.json`, `docs/ARCHITEKTURA_IMPERIUM.md`,
+`docs/CENSUS_ORGANORUM.md`, `README.md`.
+
+---
+
 ## 2026-07-27 | ⚖️ | Sąd nad odłożonymi uwagami cubica — 5 przyjętych, 3 odłożone z powodem
 
 **Siedem uwag z PR #134 leżało odłożonych świadomie.** Osądzone wobec ŻYWEGO kodu (kandydat ≠
@@ -149,6 +213,11 @@ rozkazu nienaruszalnego.
 
 **Odłożone jako priorytet następnej sesji (rozkaz Cezara):** hooki `PreToolUse`/`PostToolUse`
 — Imperium używa **2 z ~9** dostępnych zdarzeń hooka, więc większość checklist pozostaje
+  <!-- ⚠️ SPROSTOWANIE 2026-07-27: liczba „~9" jest BŁĘDNA i została OBALONA tego samego dnia.
+  Zdarzeń hooka jest 31 (zmierzone schematem konfiguracji), więc pokrycie wynosiło 6.5%, nie 22%.
+  Zdania wyżej NIE przepisujemy — wpis ACTA jest prawdą swojego czasu (Prawo I). Patrz INDEX
+  FALSORUM i wpis „Hooki PreToolUse/PostToolUse" z 2026-07-27. -->
+
 bez automatu.
 
 **Pliki:** `.claude/settings.json`.

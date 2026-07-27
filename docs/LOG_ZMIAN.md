@@ -14,6 +14,37 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | 🔐 | Zakaz pushu przestał zależeć od pamięci Architekta — `permissions.deny`
+
+**Cenzus narzędzi sterowania (pytanie Cezara) znalazł sprzeczność między konstytucją
+a harnessem.** Rozkaz stały z 2026-07-11 brzmi: *„Claude NIGDY nie pushuje — push wykonuje
+wyłącznie Cezar ręcznie (nienaruszalny)"*. Tymczasem `.claude/settings.json` trzymał
+**`Bash(git push:*)` w `allow`**, a sekcji `deny` **nie było w ogóle** — czyli push był nie
+tylko dozwolony, ale **wstępnie zatwierdzony**, więc poszedłby bez pytania.
+
+**Jedyną barierą była dyscyplina Architekta. Zero mechanizmu.** I mamy zmierzony dowód,
+że to nie teoria: runbook W11 kazał Claude `git push` **przez 9 dni po zakazie** (naprawa
+2026-07-20). Najostrzejszy rozkaz Imperium miał najsłabsze egzekwowanie.
+
+**Lekarstwo (decyzja Cezara 2026-07-27):** sekcja `permissions.deny` z `Bash(git push:*)`,
+a dodatkowo reguła **usunięta z `allow`** — pas i szelki, żeby nie polegać wyłącznie na tym,
+że deny wygrywa pierwszeństwem. Efekt uboczny jest **pożądany**: przyszły wyjątek (jak
+jednorazowe odstępstwo z 2026-07-26) wymaga świadomej zmiany konfiguracji, a nie zgody
+Architekta w rozmowie.
+
+**Klasa:** ta sama, która przewija się przez całą wachtę — *dokument zamiast mechanizmu
+gnije, to tylko kwestia czasu*. Zmierzona symetria: Księga Wad ma **14.5%** automatycznego
+zasięgu (16 wzorców regex ze 115 wpisów), a warstwa uprawnień miała **0%** egzekwowania
+rozkazu nienaruszalnego.
+
+**Odłożone jako priorytet następnej sesji (rozkaz Cezara):** hooki `PreToolUse`/`PostToolUse`
+— Imperium używa **2 z ~9** dostępnych zdarzeń hooka, więc większość checklist pozostaje
+bez automatu.
+
+**Pliki:** `.claude/settings.json`.
+
+---
+
 ## 2026-07-27 | 🛡️ | Recenzja cubic PR #134 — dwie ciche straty danych zamknięte
 
 **Werdykt nad 15 zgłoszeniami: najcięższe znowu nietrafione** (powtórka wzorca z PR #133).

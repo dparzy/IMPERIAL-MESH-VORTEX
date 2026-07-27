@@ -117,7 +117,7 @@ Checklist Prawa XX (sprawdzaj po każdej sesji z nowymi modułami):
 
 - **🧩 ANALIZA CZĄSTKOWA + PASEK POSTĘPU (Prawo XXIV)** — długa praca = małe, ZAPISYWANE, wznawialne kroki; nigdy jeden wielki blokujący bieg. Każda praca >~10 s drukuje na żywo `[i/N] co robię`. Wzorce: **`/praca`**.
 
-- **🔭 ZWIADOWCA WIEDZY — dwa modele** — DeepSeek (Hyginus) proponuje tanio i szeroko, Opus sądzi wąsko i głęboko. **Nic z ust DeepSeeka nie jest prawdą, dopóki arena tego nie zmierzy.** Procedura: **`/wiedza`**.
+- **🔭 ZWIADOWCA WIEDZY — trzy zwiady** — DeepSeek (Hyginus) proponuje tanio i szeroko, Opus sądzi wąsko i głęboko, a przy **utkniętym rozstrzygnięciu** rusza FRUMENTARIUS: szybki tani subagent po **prior art u innych** (konkurencja, biblioteki, publikacje) — z pytaniem rozstrzygającym, listą „co już mamy" i naszymi ograniczeniami w metaprompcie. **Nic z ust żadnego zwiadowcy nie jest prawdą, dopóki pomiar tego nie potwierdzi** (zmierzone: 39.3% kandydatów Hyginusa pisało „nie dubluje" o rzeczy stojącej w kodzie). Procedura: **`/wiedza`**.
 
 - **🏛️ NOMENKLATURA RZYMSKA** — każdy organ, moduł, rola i kategoria dostaje rzymskie imię **dobrane do funkcji**, obok nazwy technicznej (klucze kodu nietknięte). Brak imienia dla nowego organu = niedokończone wdrożenie. Wzorce: **`/wiedza`**.
 

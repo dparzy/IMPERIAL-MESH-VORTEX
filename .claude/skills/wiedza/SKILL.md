@@ -32,6 +32,46 @@ wynik LLM bez pomiaru to wiara, nie fakt — Prawo I.)
 **Złamanie:** traktowanie wyniku DeepSeeka jako prawdy bez pomiaru areny; hurtowe czytanie bez
 cząstkowania i krytyka kompletności; pominięcie drugiego modela (zwiad jednym okiem = gubione hipotezy).
 
+### 🐎 FRUMENTARIUS — ZWIAD ZEWNĘTRZNY NA UTKNIĘCIE (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-27)
+
+*Frumentarii* byli agentami cesarskimi wysyłanymi POZA Imperium: jechali szybko, tanio, po jedną
+rzecz i wracali z meldunkiem — nie z decyzją. Trzeci zwiadowca obok Hyginusa (korpus wewnętrzny)
+i Sędziego (osąd) to **szybki, tani subagent wysyłany na ZEWNĄTRZ**, gdy rozstrzygnięcie utknęło.
+
+**WYZWALACZ (kiedy wysyłasz):** utknąłeś na rozstrzygnięciu — nie wiesz, którą drogą pójść, albo
+podejrzewasz, że problem jest już rozwiązany u innych (konkurencja, biblioteki, dedykowane skrypty,
+publikacje). Zamiast wymyślać od zera albo zgadywać — **wyślij po prior art**.
+
+**WARUNEK OPŁACALNOŚCI (bez niego nie wysyłasz):** subagent startuje ZIMNO (~50–66 tys. tokenów),
+więc opłaca się **wyłącznie**, gdy CZYTA DUŻO, a ZWRACA MAŁO — czyli gdy odpowiedzi **nie ma w
+naszym repo**. Pytanie wewnętrzne („czy mamy już moduł X") rozstrzygasz `grep`em szybciej i taniej
+niż trwa jego zimny start. Wysyłka na drobiazg to złamanie ZASADY OSZCZĘDNOŚCI TOKENÓW (`/gradus`).
+
+**METAPROMPT MUSI ZAWIERAĆ (inaczej wraca ogólnik, czyli zero):**
+1. **Jedno pytanie rozstrzygające** — nie temat, tylko pytanie, na które da się odpowiedzieć.
+2. **Co JUŻ MAMY** — żeby nie wrócił z tym, co stoi w kodzie (ta sama choroba, którą U4 miał
+   leczyć u Hyginusa).
+3. **Nasze twarde ograniczenia** — sprzęt (klasa PEDES: 4 wątki, 16 GB, brak CUDA), domena
+   (MEXC/krypto), zależności (stdlib-first), dane (bary 1m+, brak L2/tick).
+4. **Format meldunku:** teza → ŹRÓDŁO (link/nazwa) → **jak to zmierzyć u nas** → koszt.
+5. **Jawny nakaz przyznania się do niewiedzy:** „czego NIE udało się potwierdzić" jest częścią
+   meldunku, nie wstydem.
+
+**BARIERKA — MELDUNEK FRUMENTARIUSA TO KANDYDAT, NIGDY PRAWDA.** Zewnętrzność nie daje
+nieomylności; daje niezależność. Zmierzone dowody Imperium, wszystkie własne:
+- recenzent zewnętrzny (cubic PR #133) miał rację w 20/22 punktach, ale **jedyne P1 cytowało dwie
+  NIEISTNIEJĄCE reguły** — cytat z reguły sprawdzaj `grep`em, zanim uznasz zarzut;
+- 4/4 werdykty zwiadowców w kampanii porządkowej okazały się błędne po weryfikacji;
+- Hyginus przy **39.3%** kandydatów pisał „nie dubluje", gdy pojęcie stało w kodzie (pomiar
+  2026-07-27) — deklaracja modelu o nowości jest bezwartościowa bez sprawdzenia.
+
+**CZEGO FRUMENTARIUS NIE ROBI:** nie rozstrzyga decyzji kierunkowych (Prawo XVIII — to Cezar),
+nie wpina niczego w ścieżkę decyzyjną (ZASADA WPIĘCIA), nie zastępuje pomiaru areny. Przywozi
+materiał; wyrok zapada w domu.
+
+**Złamanie:** wysłanie po coś, co jest w naszym repo (spalony zimny start); przyjęcie meldunku
+bez weryfikacji jako faktu; metaprompt bez pytania rozstrzygającego i bez „co już mamy".
+
 ---
 
 ## 🔌 ZASADA MCP — SOCZEWKA, NIE MÓZG (ROZKAZ STAŁY — Cezar zatwierdził 2026-07-04)

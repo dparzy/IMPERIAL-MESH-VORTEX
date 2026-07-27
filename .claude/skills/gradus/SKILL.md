@@ -31,6 +31,7 @@ hipotezy, czego niski-effort/tańszy model by nie zrobił rzetelnie.
 | Uruchamianie testów/audytu/ruff (exec + odczyt exit code) | Haiku lub Sonnet low | mechaniczne, brak osądu |
 | Pisanie commitów/LOG_ZMIAN wg wzorca | Sonnet low | szablonowe, niska stawka błędu |
 | Web-research / weryfikacja faktów w internecie | Sonnet 5 (subagent) | dobre z narzędziami web, tańsze niż Opus |
+| **Utknięte rozstrzygnięcie — szukaj prior art u innych** (FRUMENTARIUS) | Sonnet 5 (subagent, tani) | pełne rozkazy: `/wiedza`. Warunek: odpowiedzi NIE MA w naszym repo (czyta dużo, zwraca mało); meldunek = KANDYDAT, nie prawda |
 | Recenzja niezależna „drugie oko" (np. web-recenzja plonu Hyginusa) | Sonnet 5 (subagent, osobny kontekst) | wartość w niezależności, nie w głębi Opusa |
 | Pisanie kodu wg gotowej, precyzyjnej specyfikacji | Sonnet (medium/high effort) | wykonanie, nie projektowanie |
 | Projektowanie architektury / nowego modułu / API | **Opus** | decyzje kompozycyjne, konsekwencje długoterminowe |

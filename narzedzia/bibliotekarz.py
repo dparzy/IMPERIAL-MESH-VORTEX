@@ -185,11 +185,12 @@ def krytyka_kandydatow(glos, kandydaci: str, wyniki_kontra, profil: str | None =
 # Koszt zmierzony: 3914 znaków ≈ 978 tokenów na temat, ~$0.005 za 33 tematy na flashu —
 # wobec kosztu produkowania duplikatów i czasu sędziego to zaokrąglenie do zera.
 #
-# 🚨 PODSTAWA DOWODOWA CZĘŚCIOWO UPADŁA (2026-07-27, przeliczenie A/B naprawionym przyrządem).
-# Co ZOSTAJE prawdą: zwiad BEZ tego bloku proponuje moduły, które już mamy — 35.5% kandydatów
+# 🚨 PODSTAWA DOWODOWA CZĘŚCIOWO OBALONA (2026-07-27, przeliczenie A/B naprawionym przyrządem).
+# Co ZOSTAJE prawdą: zwiad BEZ tego bloku proponuje moduły, które już mamy — 39.3% kandydatów
 # ramienia OFF nazywa pojęcie obecne w kodzie. Diagnoza powyżej stoi.
-# Co UPADŁO: teza „U4 obniża duplikaty o 12 pp (p=0.016)". Ten sam zapisany plon przeliczony
-# detektorem bez ślepych plam daje OFF 35.5% vs ON 36.4%, p=0.85 — RÓŻNICY NIE MA. Stary
+# Co OBALONE: teza „U4 obniża duplikaty o 12 pp (p=0.016)". Ten sam zapisany plon (kampania
+# `u4_rdzen`, 64+64) przeliczony detektorem bez ślepych plam daje OFF 88/224 = 39.3% wobec
+# ON 82/200 = 41.0%, czyli +1.7 pp NA NIEKORZYŚĆ ON przy Fisher p=0.766 — RÓŻNICY NIE MA. Stary
 # detektor był ślepy asymetrycznie: 34.7% kandydatów ramienia ON nosiło nazwy
 # WIELKIE_Z_PODKRESLENIEM (bo ten blok pokazuje modelowi NASZE klucze), a wzorce typu
 # `\bvpin\b` nie przekraczają podkreślenia — więc dublet ON-a był niewidzialny z definicji.

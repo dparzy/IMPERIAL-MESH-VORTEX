@@ -12,6 +12,30 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-27 — Mutacja przeżyła przez luźną asercję testu zasięgu
+Test zasięgu miał asercję 'zbadane ≥ 8+40' zamiast 'równość z policzonym zasięgiem'. Luźny próg przepuszczał zawężenie bramki z 73 do 65. Poprawiono na ścisłą równość; mutacja padła.
+
+### 2026-07-26 — Średnie śledzie w 1L za długie
+Medium tracks w pierwszej lidze datasetu ZENITH mają średnio 10K linii, co znacznie przekracza limit 2K. Obniża to jakość danych treningowych i wymaga kryteriów kwalifikacji.
+
+### 2026-07-26 — Commitowanie desktop paths łamie przenośność i PII
+W kronice znaleziono bezwzględne ścieżki typu C:\Users\Ian\Desktop. Należy używać zmiennych środowiskowych lub przechowywać referencje wewnątrz repozytorium. To narusza bezpieczeństwo i przenośność.
+
+### 2026-07-26 — Bezpośrednia edycja sigillum_probationis.json narusza zasadę
+Plik sigillum_probationis.json jest magazynem (ledger) i musi być aktualizowany wyłącznie przez narzędzia sigillarium lub codex_probationum.py. Ręczna edycja jest złamaniem reguły CLAUDE.md i README.md.
+
+### 2026-07-26 — cubic-dev-ai trafny w 22/22, ale 3 fałszywe alarmy
+cubic-dev-ai w PR #133 zgłosił 22 zastrzeżenia. Wszystkie autentyczne błędy zostały potwierdzone, ale 3 uwagi (fake sigillum, nadużycie integracji, auth_hook) okazały się fałszywe. Wymaga weryfikacji przed działaniem.
+
+### 2026-07-26 — Audyt spójności ukrywa czerwony wynik (stderr zamiast stdout)
+W narzedziu audyt_spojnosci.py alarmy sa wypisywane na stderr (linie 1160-1163), podczas gdy hook zbiera tylko stdout. W efekcie czerwony audyt jest niewidoczny w wydruku startowym - sesja wyglada ciszej niz zdrowa. To odwrocona wersja wady klasy 'milczenie udajace wynik' z apert26.
+
+### 2026-07-22 — tail w rurze testów fałszuje kod wyjścia
+Komenda `python tests/run_tests.py | tail` zwraca kod wyjścia `tail`, nie testów – maskuje oblane testy (exit 0 mimo 1 porażki). Należy unikać `tail` w rurze lub używać oddzielnej obsługi.
+
+### 2026-07-20 — Audyt spójności pełna harmonia
+84 neurony, 15 zwiadowców, 18 elit, ruff czysto, MAPA_KLUCZY pełna – system w pełni harmonijny.
+
 ### 2026-07-26 — Path('/home/tiro') na Windows nie działa z startswith('/')
 Path('/home/tiro') na Windows normalizuje się do \home\tiro, więc startswith('/') zwraca False. Abstynencja działała tylko w jedną stronę. Naprawa mechanizmem, nie łatką.
 

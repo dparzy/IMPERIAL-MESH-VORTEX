@@ -14,6 +14,69 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | 🔬 | REPLIKACJA A/B U4 — efekt nie istnieje + FRUMENTARIUS (trzeci zwiad)
+
+**Decyzja Cezara: „(c) powtórzyć A/B naprawionym przyrządem".** Wykonane tego samego dnia:
+128 nowych pomiarów (16 tematów rdzenia × 4 rundy × 2 ramiona), rundy **5–8**, żeby świeża próba
+nie zlała się w raporcie ze skompromitowaną kampanią 07-21 (rundy 1–4).
+
+| | kandydatów | dublety | dubl % |
+|---|---|---|---|
+| ŚWIEŻA 07-27 — OFF | 212 | 90 | 42.5% |
+| ŚWIEŻA 07-27 — ON | 201 | 79 | **39.3%** |
+| **ŁĄCZNIE 256 biegów** — OFF | 436 | 178 | 40.8% |
+| **ŁĄCZNIE 256 biegów** — ON | 401 | 161 | **40.1%** |
+
+Świeża próba: **−3.1 pp, Fisher p=0.549**. Łącznie 837 kandydatów: **−0.7 pp, 95% CI [−7.3, +6.0],
+p=0.888**. Liczba NOWYCH kandydatów w świeżej próbie **identyczna: 122 vs 122**.
+
+**MOC TESTU, nie samo p** (bez tego „brak efektu" znaczy tyle co nic): na publikowane **−12 pp moc
+wynosi 94.2%** — gdyby efekt tej wielkości istniał, zobaczylibyśmy go. Nie zobaczyliśmy.
+**GRANICA UCZCIWOŚCI:** przy 5 pp moc spada do 31%, więc **mały efekt NIE jest wykluczony** —
+wykluczony jest efekt WIELKOŚCI PUBLIKOWANEJ. Koszt zmierzony na tej samej próbie: **1.49× pieniędzy,
+1.46× czasu**.
+
+**DO DECYZJI CEZARA:** blok U4 pełni DWIE funkcje — anty-duplikat (zmierzony, nie działa) oraz
+świadomość luk Prawa XV (**NIEZMIERZONA**). Wyłączenie traci obie; to samo pytanie wraca więc jako
+„czy odchudzić blok do części o lukach".
+
+### 🐎 FRUMENTARIUS — trzeci zwiad Imperium (ROZKAZ CEZARA)
+
+Cezar: *„zawsze jak jest problem z rozstrzygnięciem możemy wysłać szybkiego ultra ekonomicznego
+subagenta z docelowym precyzującym metapromptem"*. Luka nazwana trafnie: Imperium miało zwiad
+WEWNĘTRZNY (Hyginus) i SĘDZIEGO (Opus), a zero kanału na pytanie **„jak rozwiązali to inni"**.
+Skodyfikowane w `/wiedza` (pełne rozkazy), `/gradus` (wiersz tabeli), CLAUDE.md (wyzwalacz).
+Barierki: próg opłacalności (zimny start ~50–66k tokenów → tylko gdy odpowiedzi NIE MA w repo),
+5 obowiązkowych części metapromptu, meldunek = KANDYDAT.
+
+**Pierwszy zwiad wysłany na realne utknięcie i barierka od razu zarobiła** — trzy jego przesłanki
+o naszym systemie okazały się fałszywe po sprawdzeniu u nas: (1) „macie indeks wektorowy" —
+tabela `wektory` ma **0 wierszy**; (2) propozycje na `rapidfuzz`/`sentence-transformers`/
+`datasketch`/`sklearn` — **żadnej z tych bibliotek nie mamy**; (3) „weźcie te ~150 kandydatów, które
+już macie oznaczone" — mamy **8 wyroków / 21 kandydatów**.
+
+**Najcenniejsze przyszło z tej trzeciej pomyłki:** każda z pięciu metod potrzebuje do kalibracji
+progu OZNACZONEGO ZBIORU ODNIESIENIA, którego nie ma. Ale on właśnie powstaje — **sąd nad kolejką
+JEST pracą etykietującą**. Wniosek zmienia kolejność prac: najpierw dokończyć sąd (137 oznaczonych
+kandydatów), potem kalibrować detektor. Odwrotnie znaczyłoby dobierać próg z powietrza, czyli
+powtórzyć dzisiejszy błąd innym narzędziem.
+
+### 🚨 Wada złapana na sobie: INDEX FALSORUM gubił wycofane frazy
+
+Poprawiając zapis o U4 (`wycofaj` → `dodaj` z lepszą treścią) dostałem `False` i **strażnik spadł
+z 7 pozycji na 6, meldując „korpus czysty"** — choć właśnie przestał pilnować obalonej tezy.
+Przyczyna: `dodaj` liczyło duplikat wobec `wczytaj()` (CAŁA historia), a ledger jest append-only,
+więc wycofany rekord zostaje w pliku na zawsze — **raz wycofanej frazy nie dało się zarejestrować
+ponownie**. Naprawa: dedup wobec `aktywne()`. To milczenie udające wynik: `False` czyta się jak
+nieszkodliwe „już jest". **2 mutacje, 2 zabite.** Klasa w Księdze Wad: *w ledgerze append-only
+każdy predykat „czy już mam" musi pytać o STAN BIEŻĄCY, nie o historię.*
+
+**Pliki:** `imperium/biblioteki/index_falsorum.py`, `tests/test_index_falsorum.py` (+1 test),
+`.claude/skills/wiedza/SKILL.md` (+FRUMENTARIUS), `.claude/skills/gradus/SKILL.md`, `CLAUDE.md`,
+`narzedzia/bibliotekarz.py` (sprostowane liczby), `docs/LOG_ZMIAN.md`, ledgery CODEX/INDEX/Księga Wad.
+
+---
+
 ## 2026-07-27 | ⚖️ | SĄD NAD KOLEJKĄ — mechanizm WYROKU + partia 1 (8 cząstek osądzonych)
 
 **Dlaczego kolejka rosła od 07-14 do 43 cząstek — POMIAR, nie domysł.** Zanim wydałem pierwszy
@@ -82,15 +145,25 @@ brakujący wariant składni zamiast domknąć klasę „ślepa plama detektora n
 **SKUTEK — WERDYKT A/B U4 UPADA.** Przeliczenie **tego samego zapisanego surowego plonu**
 (kampania 07-21, 72+72 biegi; zapisane liczby dubli 81/47 zgadzają się z publikacją co do sztuki):
 
-| | kandydatów | dublety | dubl % | NOWYCH |
-|---|---|---|---|---|
-| U4 OFF — stary przyrząd | 224 | 81 | 36.2% | 143 |
-| U4 ON — stary przyrząd | 192 | 47 | **24.5%** | 145 |
-| U4 OFF — **naprawiony** | 248 | 88 | 35.5% | 160 |
-| U4 ON — **naprawiony** | 225 | 82 | **36.4%** | 143 |
+| kampania `u4_rdzen` (64+64) | kandydatów | dublety | dubl % |
+|---|---|---|---|
+| U4 OFF — publikacja 07-21 | 203 | 81 | 39.9% |
+| U4 ON — publikacja 07-21 | 169 | 47 | **27.8%** |
+| U4 OFF — **naprawiony przyrząd** | 224 | 88 | 39.3% |
+| U4 ON — **naprawiony przyrząd** | 200 | 82 | **41.0%** |
 
-Publikowane „−12 pp, Fisher p=0.016, ISTOTNE" zamienia się w **+0.9 pp na NIEKORZYŚĆ ON,
-p=0.85 — efektu nie ma.**
+Publikowane „−12 pp, Fisher p=0.016, ISTOTNE" zamienia się w **+1.7 pp na NIEKORZYŚĆ ON,
+Fisher p=0.766 — efektu nie ma.** Ramię OFF wychodzi niemal identycznie jak w publikacji
+(39.3% vs 39.9%), całe przesunięcie siedzi w ramieniu ON (27.8% → 41.0%) — dokładnie tam,
+gdzie detektor był ślepy.
+
+**SPROSTOWANIE W TEJ SAMEJ WACHCIE (moje).** Pierwszy raport z tego biegu podawał 35.5% vs
+36.4%, bo napisałem WŁASNY skrypt przeliczający, który grupował plon tylko po ramieniu i
+wmieszał pilotaż (bieg `u4`, 8+8 tematów) do kampanii głównej. Tymczasem
+`ab_plon_hyginusa.py przelicz` **już istniał** i partycjonuje po polu `bieg`. Werdykt się nie
+zmienił, liczby tak. Lekcja jest ostrzejsza niż „pomyliłem się": własny skrypt obok
+istniejącego organu powiela nie tylko pracę, ale i **ryzyko błędu** — a ja sprawdzam CLI
+cudzych narzędzi przed użyciem, nie po.
 
 **MECHANIZM, nie sama liczba** — i to on przesądza, że to artefakt, a nie pech próby:
 

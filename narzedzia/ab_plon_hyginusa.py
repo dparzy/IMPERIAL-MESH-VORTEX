@@ -187,12 +187,36 @@ def leksykon_roju() -> tuple:
                  for wzor in KONCEPTY_IMPERIUM if wzor not in zle)
 
 
-# Nagłówek kandydata: opcjonalne '###', opcjonalne '**', numer, kropka/nawias.
-# Wzorzec ZMIERZONY na 33 realnych cząstkach, nie wymyślony: model formatuje raz jako
-# '1. **Kandydat:**', raz jako '### 1. **Nazwa**'. Pierwsza wersja znała tylko pierwszy
-# wariant i sklejała 21 z 33 cząstek w jeden blok — licznik kandydatów kłamał w dół
-# (klasa z Księgi Wad: ślepa plama detektora na wariant składni).
-_NAGLOWEK = re.compile(r"(?m)^\s{0,3}(?:#{1,6}\s*)?(?:\*\*)?\d{1,2}[.)](?:\*\*)?\s")
+# Nagłówek kandydata: opcjonalne '###'/'-', opcjonalne '**', a potem ALBO numer z
+# separatorem ('1.', '1)', '1:'), ALBO samo słowo „Kandydat" z etykietą ('Kandydat A:',
+# 'Kandydat 1:').
+#
+# NAWRÓT KLASY, nie nowa wada (zmierzone 2026-07-27 przy sądzie nad kolejką). Wzorzec był
+# już raz poprawiany — wtedy dołożono JEDEN brakujący wariant składni zamiast domknąć klasę
+# „ślepa plama detektora na wariant składni" (Księga Wad). Pomiar siedmiu formatów realnie
+# występujących w kolejce pokazał, że 4 z 7 nadal sklejały cały plon w jeden blok:
+#   ### Kandydat A: X · ### Kandydat 1: X · 1: X · - **Kandydat: X**
+# Skutek: licznik kandydatów kłamał W DÓŁ, a sklejony blok ma jeden nagłówek, więc miara
+# duplikatów widziała nazwę wyłącznie PIERWSZEGO kandydata z każdej sklejki.
+# WCIĘCIE JEST CZĘŚCIĄ DEFINICJI, NIE OZDOBĄ (zmierzone przy tej samej naprawie). Pierwsza
+# wersja poprawki dopisała swobodne `\s*` w środku wzorca, co zniosło limit `^\s{0,3}` — i
+# wzorzec zaczął uznawać za kandydatów ZAGNIEŻDŻONE KROKI instrukcji („1. Oblicz surowy SR",
+# wcięte 5 spacjami), dokładając 12 widm w jednym rekordzie. Kandydat stoi przy lewej
+# krawędzi; to, co wcięte pod nim, jest jego treścią. Dlatego wszystkie odstępy wewnątrz są
+# ograniczone, a po numerze wymagana jest spacja (inaczej „2.5" byłoby nagłówkiem).
+_NAGLOWEK = re.compile(
+    r"(?m)^[ \t]{0,3}(?:[-*+][ \t])?(?:#{1,6}[ \t]?)?(?:\*\*)?"
+    r"(?:\d{1,2}[.):](?:\*\*)?[ \t]|kandydat\w*[ \t]?[A-Za-z0-9]{0,3}[ \t]?[:.])",
+    re.IGNORECASE)
+
+# Miara duplikatów porównuje NAZWĘ kandydata z leksykonem roju, a nazwy modułów piszemy
+# WIELKIMI_Z_PODKREŚLENIEM. Podkreślenie jest w regexie znakiem SŁOWA, więc `\bvpin\b` NIE
+# trafia w `VPIN_TOKSYCZNOSC` — dokładnie ten kandydat dublował Z-01 (NeuronToxicFlow,
+# VPIN_50) i przeszedł jako „nowy". Normalizujemy podkreślenia do spacji przed dopasowaniem:
+# to naprawia miarę, nie ruszając kuratorowanych wzorców (myślnik działał od zawsze, bo nie
+# jest znakiem słowa — stąd `Half-Kelly` trafiał, a `KELLY_FRACTION` nie).
+def _do_dopasowania(naglowek: str) -> str:
+    return naglowek.replace("_", " ")
 
 
 def podziel_kandydatow(tekst: str) -> list:
@@ -238,7 +262,7 @@ def policz_duplikaty(tekst: str, leksykon) -> tuple:
     trafione: set = set()
     dubel = 0
     for blok in bloki:
-        naglowek = _naglowek_bloku(blok)
+        naglowek = _do_dopasowania(_naglowek_bloku(blok))
         trafienia = {wzor for wzor, rx in leksykon if rx.search(naglowek)}
         if trafienia:
             dubel += 1

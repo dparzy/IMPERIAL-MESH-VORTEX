@@ -14,6 +14,72 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | 🚨 | WERDYKT A/B U4 OBALONY — kłamał przyrząd, nie system
+
+**Znalezione przy P1 (sąd nad 43 cząstkami Hyginusa), zanim padł pierwszy wyrok.** Triaż kolejki
+oparłem na istniejącym przyrządzie LIBRA MESSIS (`podziel_kandydatow` + `policz_duplikaty`) —
+i pierwszy wynik był podejrzany: cząstka proponująca wprost `VPIN_TOKSYCZNOŚĆ` **nie została
+uznana za dublet**, choć VPIN stoi w kodzie jako Z-01 (`NeuronToxicFlow`, wskaźnik `VPIN_50`).
+
+**DWIE ŚLEPE PLAMY, obie zmierzone:**
+1. **`\b` nie przekracza podkreślenia.** `\bvpin\b` NIE trafia w `VPIN_TOKSYCZNOSC` — podkreślenie
+   jest znakiem słowa. Nazwy modułów piszemy właśnie WIELKIMI_Z_PODKREŚLENIEM, więc miara dubli
+   była ślepa na naszą własną konwencję.
+2. **4 z 7 formatów nagłówka** (`### Kandydat A:`, `### Kandydat 1:`, `1:`, `- **Kandydat:**`)
+   sklejały cały plon w jeden blok — licznik kandydatów kłamał w dół, a sklejka ma jeden nagłówek,
+   więc dublety widziano tylko dla PIERWSZEGO kandydata z każdej sklejki.
+
+To **nawrót klasy już raz naprawionej w tej samej funkcji**: poprzednim razem dołożono jeden
+brakujący wariant składni zamiast domknąć klasę „ślepa plama detektora na wariant składni".
+
+**SKUTEK — WERDYKT A/B U4 UPADA.** Przeliczenie **tego samego zapisanego surowego plonu**
+(kampania 07-21, 72+72 biegi; zapisane liczby dubli 81/47 zgadzają się z publikacją co do sztuki):
+
+| | kandydatów | dublety | dubl % | NOWYCH |
+|---|---|---|---|---|
+| U4 OFF — stary przyrząd | 224 | 81 | 36.2% | 143 |
+| U4 ON — stary przyrząd | 192 | 47 | **24.5%** | 145 |
+| U4 OFF — **naprawiony** | 248 | 88 | 35.5% | 160 |
+| U4 ON — **naprawiony** | 225 | 82 | **36.4%** | 143 |
+
+Publikowane „−12 pp, Fisher p=0.016, ISTOTNE" zamienia się w **+0.9 pp na NIEKORZYŚĆ ON,
+p=0.85 — efektu nie ma.**
+
+**MECHANIZM, nie sama liczba** — i to on przesądza, że to artefakt, a nie pech próby:
+
+| ramię | kandydatów | nazwanych `WIELKIE_Z_PODKREŚLENIEM` |
+|---|---|---|
+| U4 OFF | 248 | **0 (0.0%)** |
+| U4 ON | 225 | **78 (34.7%)** |
+
+Blok U4 pokazuje modelowi NASZE klucze, więc ramię ON zaczyna nazywać kandydatów naszą
+konwencją — **dokładnie tą, na którą detektor był ślepy**. Przyrząd nie widział dubli tam, gdzie
+zabieg działał. Klasyczny confounding: mierzyliśmy skuteczność zabiegu narzędziem, które sam
+zabieg oślepiał.
+
+**CO ZOSTAJE PRAWDĄ:** diagnoza, która U4 zrodziła — zwiad nieznający roju proponuje to, co rój
+ma. 35.5% kandydatów ramienia OFF nazywa istniejące pojęcie. **CO UPADŁO:** że U4 to naprawia.
+
+**MOJA WŁASNA POPRAWKA TEŻ BYŁA WADLIWA — i to zmierzone, nie przemilczane.** Pierwsza wersja
+wzorca dopisała swobodne `\s*`, co zniosło limit wcięcia `^\s{0,3}` i zaczęło uznawać za
+kandydatów **zagnieżdżone kroki instrukcji** (+12 widm w jednym rekordzie). Wychwycone kontrolą
+„czy nowy podział tworzy kandydatów z niczego", zanim policzyłem cokolwiek na serio.
+
+**Dowód odporności: 5 mutacji, 5 zabitych** — i osobna lekcja: pierwsze podejście do mutacji przez
+`sed`/`re.sub` **nie wgrało 3 z 4 zmian** (złe escapowanie) i raportowało „22 passed", czyli
+fałszywy dowód. Mutacja musi najpierw UDOWODNIĆ, że plik się zmienił.
+
+**DO DECYZJI CEZARA (kierunkowa — nie przełączam sam):** U4 jest domyślnie ON i kosztuje **1.46×**.
+Koszt jest pewny, korzyść — nieudowodniona. Opcje: (a) zostawić ON (blok niesie też luki Prawa XV,
+nie tylko anty-duplikat), (b) przełączyć na OFF do czasu rzetelnego A/B, (c) powtórzyć A/B
+naprawionym przyrządem na świeżej próbie.
+
+**Pliki:** `narzedzia/ab_plon_hyginusa.py` (wzorzec + normalizacja `_`), `tests/test_ab_plon_hyginusa.py`
+(+6 testów granic), `narzedzia/bibliotekarz.py` (komentarz U4 sprostowany), INDEX FALSORUM (+1),
+CODEX (+1 pomiar), Księga Wad (+4 klasy).
+
+---
+
 ## 2026-07-27 | 📚 | DECYZJA C: `docs/README` zdegradowany do wskaźnika + Warstwa 22 (jeden katalog)
 
 **Rozkaz Cezara: „P0 dawaj"** — rozstrzygnięcie pytania decyzyjnego wiszącego od 07-26

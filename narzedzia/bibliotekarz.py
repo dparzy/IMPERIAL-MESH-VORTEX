@@ -184,6 +184,18 @@ def krytyka_kandydatow(glos, kandydaci: str, wyniki_kontra, profil: str | None =
 # co rój już posiada (Prawo XVI: redundancja mierzona, nie zgadywana).
 # Koszt zmierzony: 3914 znaków ≈ 978 tokenów na temat, ~$0.005 za 33 tematy na flashu —
 # wobec kosztu produkowania duplikatów i czasu sędziego to zaokrąglenie do zera.
+#
+# 🚨 PODSTAWA DOWODOWA CZĘŚCIOWO UPADŁA (2026-07-27, przeliczenie A/B naprawionym przyrządem).
+# Co ZOSTAJE prawdą: zwiad BEZ tego bloku proponuje moduły, które już mamy — 35.5% kandydatów
+# ramienia OFF nazywa pojęcie obecne w kodzie. Diagnoza powyżej stoi.
+# Co UPADŁO: teza „U4 obniża duplikaty o 12 pp (p=0.016)". Ten sam zapisany plon przeliczony
+# detektorem bez ślepych plam daje OFF 35.5% vs ON 36.4%, p=0.85 — RÓŻNICY NIE MA. Stary
+# detektor był ślepy asymetrycznie: 34.7% kandydatów ramienia ON nosiło nazwy
+# WIELKIE_Z_PODKRESLENIEM (bo ten blok pokazuje modelowi NASZE klucze), a wzorce typu
+# `\bvpin\b` nie przekraczają podkreślenia — więc dublet ON-a był niewidzialny z definicji.
+# Szczegóły: INDEX FALSORUM + CODEX (pomiar 2026-07-27). Domyślne ON zostaje do DECYZJI
+# CEZARA (kierunkowa: koszt 1.46× jest pewny, korzyść nieudowodniona) — Architekt nie
+# przełącza tego sam, bo to zmiana wydatku, nie błahostka (Prawo XVIII).
 @functools.lru_cache(maxsize=1)
 def _kontekst_systemu() -> str:
     """U4 (świadomość systemu): zwięzły blok o LUKACH (Prawo XV) i ISTNIEJĄCYCH modułach

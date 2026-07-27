@@ -14,6 +14,33 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | 🚨 | Δ wachty kłamała zerem — punkt odniesienia kasowany przez wznowienie sesji
+
+**Złapane WŁASNYM krokiem domknięcia (4b), nie przez alarm.** BREVIARIUM zameldowało
+`Δ wachty: bez zmian w liczbach sług` — podczas gdy ta sama wachta osądziła **8 cząstek**
+(kolejka 43 → 35) i dołożyła **5 par TIRO** (212 → 217). Miara dorobku pokazywała zero.
+
+**Przyczyna z pomiaru, nie z domysłu:** hook `SessionStart` woła `--migawka` przy **KAŻDYM**
+zdarzeniu — także `resume`, a wznowień bywa w wachcie kilka (ta miała trzy). Każde zapisywało
+stan **bieżący** jako „stan z otwarcia", więc różnica z definicji wychodziła zerowa. Plik
+migawki miał znacznik czasu z ostatniego wznowienia, nie z otwarcia — to był dowód.
+
+To **dokładnie ta klasa, przeciw której delta powstała** („rzecz widoczna tylko na jednym końcu
+procesu") — i piąty nawrót rodziny „miara mierzy siebie zamiast rzeczy".
+
+**Lekarstwo — cykl zamknięty:** `zapisz_migawke` ma teraz strażnika **pierwszy zapis wygrywa**
+(kolejne wywołania nie ruszają punktu), a `delta()` **ZUŻYWA** migawkę po odczycie. Otwarcie
+stawia punkt, domknięcie go konsumuje. Gdy wachta nie domknie się porządnie, stary punkt
+przetrwa i różnica obejmie obie — to jest UCZCIWE („od ostatniego domknięcia"), w przeciwieństwie
+do wyzerowanej. **2 mutacje, 2 zabite.**
+
+Klasa w Księdze Wad: *każdy „stan początkowy" zapisywany przez hook wołany wielokrotnie musi
+mieć straż przed nadpisaniem.*
+
+**Pliki:** `imperium/oczy/breviarium.py`, `tests/test_breviarium.py` (+2 testy granic).
+
+---
+
 ## 2026-07-27 | 🔬 | REPLIKACJA A/B U4 — efekt nie istnieje + FRUMENTARIUS (trzeci zwiad)
 
 **Decyzja Cezara: „(c) powtórzyć A/B naprawionym przyrządem".** Wykonane tego samego dnia:

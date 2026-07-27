@@ -433,10 +433,26 @@ def migawka() -> Dict[str, Any]:
     return {k: v for k, v in {**h, **t}.items() if k in _POLA_DELTY}
 
 
-def zapisz_migawke(sciezka: Optional[Path] = None) -> Dict[str, Any]:
-    """Utrwal stan na OTWARCIU wachty (wołane przez hook startowy)."""
+def zapisz_migawke(sciezka: Optional[Path] = None, nadpisz: bool = False) -> Dict[str, Any]:
+    """Utrwal stan na OTWARCIU wachty — TYLKO jeśli punktu odniesienia jeszcze nie ma.
+
+    🚨 PUNKT ODNIESIENIA NADPISYWANY PRZEZ WZNOWIENIE (zmierzone 2026-07-27 na własnym
+    domknięciu). Hook `SessionStart` woła `--migawka` przy KAŻDYM zdarzeniu — także
+    `resume`, a wznowień bywa w wachcie kilka. Każde z nich zapisywało stan BIEŻĄCY jako
+    „stan z otwarcia", więc krok 4b zamknięcia meldował `bez zmian w liczbach sług`,
+    podczas gdy ta sama wachta osądziła 8 cząstek (kolejka 43 → 35) i dołożyła 5 par TIRO.
+    Miara dorobku pokazywała zero — to milczenie udające wynik, dokładnie ta klasa, przeciw
+    której delta została zbudowana („rzecz widoczna tylko na jednym końcu procesu").
+
+    Lekarstwo: **pierwszy zapis wygrywa**. Migawka jest ZUŻYWANA przez `delta()` na
+    domknięciu, więc następna wachta i tak zaczyna od czystego punktu. Gdy wachta nie
+    domknie się porządnie, stary punkt przetrwa i różnica obejmie obie — to jest UCZCIWE
+    („od ostatniego domknięcia"), w przeciwieństwie do wyzerowanej.
+    """
     m = migawka()
     plik = sciezka or MIGAWKA
+    if plik.exists() and not nadpisz:
+        return m
     try:
         plik.parent.mkdir(parents=True, exist_ok=True)
         plik.write_text(json.dumps(m, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -469,6 +485,13 @@ def delta(sciezka: Optional[Path] = None) -> str:
         a, b = przed.get(pole), teraz.get(pole)
         if isinstance(a, int) and isinstance(b, int) and a != b:
             zmiany.append(f"{pole}: {a} → {b} ({b - a:+d})")
+    # MIGAWKA JEST ZUŻYWANA (2026-07-27). Bez tego „pierwszy zapis wygrywa" zamroziłoby
+    # punkt odniesienia na zawsze i każda kolejna wachta liczyłaby różnicę od prehistorii.
+    # Skasowanie po odczycie zamyka cykl: otwarcie stawia punkt, domknięcie go konsumuje.
+    try:
+        plik.unlink()
+    except OSError:            # brak prawa/pliku nie może wywrócić meldunku domknięcia
+        pass
     return "   Δ wachty: " + ("; ".join(zmiany) if zmiany else "bez zmian w liczbach sług")
 
 

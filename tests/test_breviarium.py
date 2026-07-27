@@ -547,3 +547,40 @@ def test_pary_uzyteczne_nie_przekraczaja_surowych():
     if stan["pary_uzyteczne"] is not None:
         assert f"{stan['pary_nauczyciela']} surowych" in bv.banner()
         assert f"{stan['pary_uzyteczne']} użytecznych" in bv.banner()
+
+
+# ── PUNKT ODNIESIENIA PRZEŻYWA WZNOWIENIE SESJI (naprawa 2026-07-27) ─────────
+
+def test_migawka_nie_jest_nadpisywana_przez_wznowienie(tmp_path):
+    """Drugie wywołanie `--migawka` w tej samej wachcie NIE może skasować punktu odniesienia.
+
+    Zmierzone na własnym domknięciu 2026-07-27: hook SessionStart woła `--migawka` przy
+    KAŻDYM zdarzeniu, także `resume`. Każde wznowienie zapisywało stan BIEŻĄCY jako „stan
+    z otwarcia", więc krok 4b meldował „bez zmian w liczbach sług", choć wachta osądziła
+    8 cząstek i dołożyła 5 par TIRO. Miara dorobku pokazywała zero.
+    """
+    import json
+
+    import imperium.oczy.breviarium as br
+    plik = tmp_path / "migawka.json"
+    plik.write_text(json.dumps({"czeka_na_sedziego": 43, "pary_uzyteczne": 212}),
+                    encoding="utf-8")
+    br.zapisz_migawke(plik)                      # wznowienie sesji w środku wachty
+    przed = json.loads(plik.read_text(encoding="utf-8"))
+    assert przed["czeka_na_sedziego"] == 43, "wznowienie skasowało punkt odniesienia"
+    assert br.zapisz_migawke(plik, nadpisz=True) is not None   # jawne nadpisanie wolno
+
+
+def test_delta_zuzywa_migawke(tmp_path, monkeypatch):
+    """Domknięcie KONSUMUJE punkt odniesienia — inaczej 'pierwszy zapis wygrywa' zamroziłby
+    go na zawsze i następna wachta liczyłaby różnicę od prehistorii."""
+    import json
+
+    import imperium.oczy.breviarium as br
+    plik = tmp_path / "migawka.json"
+    plik.write_text(json.dumps({"czeka_na_sedziego": 43}), encoding="utf-8")
+    monkeypatch.setattr(br, "migawka", lambda: {"czeka_na_sedziego": 35})
+    tekst = br.delta(plik)
+    assert "43 → 35 (-8)" in tekst
+    assert not plik.exists(), "migawka nie została zużyta — następna wachta zobaczy stary punkt"
+    assert "różnicy nie znamy" in br.delta(plik), "po zużyciu musimy JAWNIE nie znać różnicy"

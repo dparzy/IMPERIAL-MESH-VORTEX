@@ -360,6 +360,29 @@ def test_audyt_w20_zielony_na_realnym_indeksie():
     assert any("W20" in i for i in info)
 
 
+def test_audyt_w20_lapie_ZDUBLOWANY_znacznik(monkeypatch, tmp_path):
+    """Zdublowany znacznik START zostawia sekcję poza kontrolą, a bramka mówiła „zgodne ✅".
+
+    Zarzut cubica (PR #134, P2) potwierdzony na kodzie: sprawdzana była OBECNOŚĆ znaczników,
+    a porównanie bierze treść między PIERWSZĄ parą (`split(..., 1)[1]`). Drugi blok był
+    niewidzialny — klasa „wąski zasięg bramki produkujący fałszywy spokój".
+    """
+    import narzedzia.audyt_spojnosci as a
+    from narzedzia.tabularium import ZNACZNIK_KONIEC, ZNACZNIK_START
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    (docs / "INDEKS_IMPERIUM.md").write_text(
+        f"# Indeks\n{ZNACZNIK_START}\n| a |\n{ZNACZNIK_KONIEC}\n"
+        f"{ZNACZNIK_START}\n| duplikat poza kontrolą |\n{ZNACZNIK_KONIEC}\n",
+        encoding="utf-8")
+    # W20 bierze korzeń z `tabularium.ROOT` w chwili wywołania — podmieniamy źródło, nie kopię.
+    import narzedzia.tabularium as t
+    monkeypatch.setattr(t, "ROOT", str(tmp_path))
+    bledy, _ = a._warstwa_20_katalog_nietkniety()
+    assert bledy, "zdublowany znacznik przeszedł bez alarmu"
+    assert "2×" in bledy[0] and "W20" in bledy[0]
+
+
 def test_audyt_w20_lapie_wiersz_dopisany_recznie(monkeypatch):
     """GRANICA: jeden wiersz dopisany ręcznie do sekcji generowanej → alarm.
 

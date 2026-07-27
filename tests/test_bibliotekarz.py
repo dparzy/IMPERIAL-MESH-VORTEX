@@ -512,7 +512,50 @@ def _kolejka_tymczasowa(monkeypatch, tmp_path):
     plik = tmp_path / "KOLEJKA.jsonl"
     monkeypatch.setattr(b, "KOLEJKA", plik)
     b.osadzone_ts.cache_clear()
+    b._znaczniki.cache_clear()   # migawka kolejki jest wspólna dla obu zbiorów znaczników
     return b, plik
+
+
+def test_wyrok_bez_adresata_jest_ODRZUCONY(monkeypatch, tmp_path):
+    """Literówka w `dot_ts` nie może wyglądać jak wydany wyrok (cubic PR #134, P2).
+
+    Sądzona cząstka zostawałaby wtedy w kolejce, a ledger niósłby orzeczenie wskazujące
+    w próżnię. Przy 35 cząstkach na wachtę to jedno przestawienie cyfry, nie hipoteza.
+    """
+    import pytest
+    b, _ = _kolejka_tymczasowa(monkeypatch, tmp_path)
+    b.zapisz_czastke({"temat": "t", "ts": 100.0, "status": "ok", "kandydaci": "x"})
+    with pytest.raises(ValueError, match="nie wskazuje"):
+        b.zapisz_wyrok(dot_ts=100.1, temat="t", werdykt="PRZYJETY", uzasadnienie="literówka")
+    # GRANICA DRUGIEJ STRONY: poprawny znacznik nadal przechodzi — zawężanie na oślep
+    # byłoby równie złe jak brak walidacji (sędzia straciłby możliwość orzekania).
+    assert b.zapisz_wyrok(dot_ts=100.0, temat="t", werdykt="PRZYJETY",
+                          uzasadnienie="właściwy znacznik") is True
+
+
+def test_swiezo_zapisana_czastka_jest_od_razu_sadzalna(monkeypatch, tmp_path):
+    """Błąd własny 2026-07-27: cache znaczników bez unieważnienia przy zapisie sprawiał,
+    że sędzia nie mógł osądzić cząstki, którą sam przed chwilą zapisał."""
+    b, _ = _kolejka_tymczasowa(monkeypatch, tmp_path)
+    b.osadzone_ts()                      # rozgrzewamy cache PRZED zapisem
+    b.zapisz_czastke({"temat": "swieza", "ts": 777.0, "status": "ok", "kandydaci": "x"})
+    assert b.zapisz_wyrok(dot_ts=777.0, temat="swieza", werdykt="ODRZUCONY",
+                          uzasadnienie="dublet") is True
+
+
+def test_probator_liczy_TEMATY_nie_plony(monkeypatch, tmp_path):
+    """Nagłówek mówi „X/N tematów", więc X musi liczyć TEMATY (cubic PR #134, P3).
+
+    PROBATOR bada oba plony (kandydaci + krytyka), więc jeden temat dokłada do listy dwa
+    wpisy. Przy obu skażonych licznik potrafił ogłosić więcej tematów skażonych, niż
+    w ogóle skanowano — klasa „licznik, który kłamie".
+    """
+    import narzedzia.bibliotekarz as b
+    oba_plony_jednego_tematu = ["temat A [kandydaci] → cytat spoza",
+                                "temat A [krytyka] → cytat spoza"]
+    assert b.ile_tematow(oba_plony_jednego_tematu) == 1, "jeden temat policzony dwa razy"
+    assert b.ile_tematow(["A [kandydaci] → x", "B [krytyka] → y"]) == 2, "różne tematy sklejone"
+    assert b.ile_tematow([]) == 0
 
 
 def test_wyrok_domyka_czastke(monkeypatch, tmp_path):

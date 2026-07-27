@@ -320,6 +320,21 @@ def zapisz_czastke(czastka: dict) -> None:
     KOLEJKA.parent.mkdir(parents=True, exist_ok=True)
     with open(KOLEJKA, "a", encoding="utf-8") as f:
         f.write(json.dumps(czastka, ensure_ascii=False) + "\n")
+    # KAŻDY ZAPIS UNIEWAŻNIA MIGAWKĘ (błąd własny 2026-07-27, złapany przez istniejące testy):
+    # `_znaczniki` cache'uje TAKŻE znaczniki zwiadu, więc bez tego świeżo dopisana cząstka
+    # była niewidzialna dla walidacji wyroku — sędzia dostawałby „wyrok bez adresata" na
+    # cząstkę, którą sam przed chwilą zapisał. Cache stanu wymaga ścieżki unieważnienia
+    # przy KAŻDYM zapisie, nie tylko przy tym, o którym pamiętał autor.
+    _znaczniki.cache_clear()
+
+
+def ile_tematow(wpisy) -> int:
+    """Ile RÓŻNYCH tematów stoi za listą wpisów „temat [plon] → opis".
+
+    Osobna funkcja, żeby dało się ją przetestować bez płatnego zwiadu — inline'owe
+    wyrażenie w raporcie testowałoby się wyłącznie przez powtórzenie samego siebie.
+    """
+    return len({str(x).split(" [", 1)[0] for x in wpisy})
 
 
 WERDYKTY = ("PRZYJETY", "ODRZUCONY", "CZESCIOWO")
@@ -344,21 +359,44 @@ def zapisz_wyrok(*, dot_ts: float, temat: str, werdykt: str, uzasadnienie: str,
         raise ValueError(f"werdykt musi być jednym z {WERDYKTY}, jest: {werdykt!r}")
     if not uzasadnienie or not uzasadnienie.strip():
         raise ValueError("uzasadnienie jest wymagane — wyrok bez powodu to nie wyrok")
-    if dot_ts in osadzone_ts():
+    # WYROK MUSI MIEĆ ADRESATA (recenzja cubic PR #134, P2 — przyjęta 2026-07-27).
+    # Literówka w `dot_ts` tworzyła rekord wskazujący na nieistniejącą cząstkę: wyrok
+    # wyglądał na wydany, a sądzona cząstka dalej czekała w kolejce. Przy 35 cząstkach do
+    # osądzenia w jednej wachcie to nie jest przypadek teoretyczny — to jedno przestawienie
+    # cyfry. Cichy `False` byłby tu gorszy niż wyjątek: „już osądzone" i „nie ma czego sądzić"
+    # to dwa różne stany, a tylko drugi jest błędem sędziego (Prawo I).
+    zwiad, wyroki = _znaczniki()
+    if dot_ts in wyroki:
         return False
+    if dot_ts not in zwiad:
+        raise ValueError(
+            f"dot_ts={dot_ts!r} nie wskazuje ŻADNEJ cząstki zwiadu w {KOLEJKA.name} — "
+            "wyrok bez adresata zostawiłby sądzoną cząstkę w kolejce. Sprawdź znacznik.")
     zapisz_czastke({"status": "wyrok", "dot_ts": dot_ts, "temat": temat,
                     "werdykt": werdykt, "uzasadnienie": uzasadnienie.strip(),
                     "przyjete": list(przyjete), "sedzia": sedzia, "ts": time.time()})
     osadzone_ts.cache_clear()
+    _znaczniki.cache_clear()
     return True
 
 
 @functools.lru_cache(maxsize=1)
 def osadzone_ts() -> frozenset:
     """Znaczniki cząstek, nad którymi ZAPADŁ już wyrok."""
+    return _znaczniki()[1]
+
+
+@functools.lru_cache(maxsize=1)
+def _znaczniki() -> tuple:
+    """(znaczniki cząstek ZWIADU, znaczniki OSĄDZONE) — jeden przebieg po kolejce.
+
+    Dwa zbiory z JEDNEGO odczytu, bo mają zawsze opisywać ten sam stan pliku: gdyby
+    każdy czytał kolejkę osobno, mogłyby kiedyś pochodzić z dwóch różnych migawek
+    (ta sama klasa co licznik i mianownik z osobnych przebiegów, Księga Wad 2026-07-27).
+    """
     if not KOLEJKA.exists():
-        return frozenset()
-    ts = set()
+        return frozenset(), frozenset()
+    zwiad, wyroki = set(), set()
     with open(KOLEJKA, encoding="utf-8") as f:
         for linia in f:
             if not linia.strip():
@@ -367,9 +405,12 @@ def osadzone_ts() -> frozenset:
                 rec = json.loads(linia)
             except json.JSONDecodeError:
                 continue
-            if rec.get("status") == "wyrok" and rec.get("dot_ts") is not None:
-                ts.add(rec["dot_ts"])
-    return frozenset(ts)
+            if rec.get("status") == "wyrok":
+                if rec.get("dot_ts") is not None:
+                    wyroki.add(rec["dot_ts"])
+            elif rec.get("ts") is not None:
+                zwiad.add(rec["ts"])
+    return frozenset(zwiad), frozenset(wyroki)
 
 
 def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="biblioteka",
@@ -444,8 +485,14 @@ def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="bi
                      f"trafienie ≠ wyrok — to samo słowo bywa innym pojęciem):")
         linie.extend(f"   • {x}" for x in znane_imiona)
     if podejrzane:
-        linie.append(f"\n🚨 PROBATOR — {len(podejrzane)}/{N} tematów z cytatem spoza podanych "
-                     f"fragmentów (halucynacja citation; sędzia niech czyta je najostrożniej):")
+        # LICZYMY TEMATY, NIE WPISY (recenzja cubic PR #134, P3 — przyjęta 2026-07-27).
+        # PROBATOR bada OBA plony (kandydaci + krytyka), więc jeden temat potrafi dołożyć
+        # DWA wpisy — a nagłówek mówił „X/N tematów". Przy obu skażonych plonach licznik
+        # mógł przekroczyć N i ogłosić więcej tematów skażonych, niż w ogóle skanowano.
+        # Klasa znana: licznik, który kłamie. Lista zostaje pełna (wpisy per plon).
+        linie.append(f"\n🚨 PROBATOR — {ile_tematow(podejrzane)}/{N} tematów ({len(podejrzane)} plonów) "
+                     f"z cytatem spoza podanych fragmentów "
+                     f"(halucynacja citation; sędzia niech czyta je najostrożniej):")
         linie.extend(f"   • {x}" for x in podejrzane)
     # Ścieżka WZGLĘDNA jest tylko wygodą czytania. `relative_to` rzuca ValueError, gdy kolejka
     # leży poza drzewem repo (inny dysk, katalog tymczasowy) — i wywalałaby CAŁY raport już PO

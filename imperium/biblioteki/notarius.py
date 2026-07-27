@@ -92,12 +92,63 @@ ZRODLA_KLASYFIKACJI = frozenset({"news_llm"})
 
 
 def rodzaj_pary(para: Dict[str, Any]) -> str:
-    """Jakiego RODZAJU zadania uczy ta para? Pole `rodzaj` > odtworzenie ze źródła."""
-    jawny = (para.get("rodzaj") or "").strip().lower()
+    """Jakiego RODZAJU zadania uczy ta para? Pole `rodzaj` > odtworzenie ze źródła.
+
+    NIE-NAPIS TRAKTUJEMY JAK BRAK POLA (recenzja cubic PR #134, P3 — przyjęta 2026-07-27).
+    `(para.get("rodzaj") or "")` łapie None i pusty napis, ale NIE liczbę: `rodzaj: 5`
+    przechodzi jako wartość prawdziwa i wywala `.strip()` na `int`. Jeden zniekształcony
+    (choć poprawny składniowo) rekord JSONL przerywał wtedy CAŁY eksport SFT i licznik
+    par użytecznych — awaria jednego wiersza kasowała plon całej sesji. Nieznany kształt
+    pola znaczy „nie wiem", a od „nie wiem" jest ścieżka odtworzenia ze źródła.
+    """
+    surowy = para.get("rodzaj")
+    jawny = surowy.strip().lower() if isinstance(surowy, str) else ""
     if jawny in (RODZAJ_PROZA, RODZAJ_KLASYFIKACJI):
         return jawny
     return (RODZAJ_KLASYFIKACJI if para.get("zrodlo") in ZRODLA_KLASYFIKACJI
             else RODZAJ_PROZA)
+
+
+# KONTRAKT ODPOWIEDZI KLASYFIKATORA — minimalny, per ŹRÓDŁO (recenzja cubic PR #134, P2,
+# osądzona i przyjęta 2026-07-27 jako wada REALNA, ale wtedy jeszcze UTAJONA).
+#
+# Zarzut: sama „struktura JSON" nie odróżnia werdyktu od komunikatu o awarii. `{"error":
+# "rate limited"}` jest poprawnym obiektem, więc przechodziło bramkę `_obiekt_json`, a próg
+# długości odpowiedzi klasyfikacji NIE DOTYCZY (werdykt ma z definicji 34-41 znaków) — czyli
+# awaria API mogła wejść do zbioru treningowego TIRO jako ETYKIETA. Adapter, który tę samą
+# odpowiedź czyta w produkcji (`AdapterNewsLLM._parsuj_json_llm`), odrzuca ją — dwa różne
+# progi na tę samą treść to definicja rozjazdu.
+#
+# POMIAR PRZED NAPRAWĄ (bo kandydat ≠ prawda): 108 par klasyfikacji w ledgerze, 102 o
+# kształcie {pewnosc, sentyment}, 6 z zepsutym JSON-em (już odrzucanych), **0 z obiektem
+# bez liczbowego `sentyment`**. Wada się jeszcze nie zmaterializowała — naprawiamy ją mimo
+# to, bo koszt jest zerowy, a skutkiem byłoby ciche zatrucie zbioru, którego cały sens polega
+# na tym, że etykiety są prawdziwe (TIRO: 219 par użytecznych, próg 1000).
+#
+# ŚWIADOMIE WĄSKO: to NIE jest wiedza o dziedzinie (Notarius nie ma znać się na sentymencie
+# rynku — patrz komentarz wyżej). Sprawdzamy wyłącznie, czy odpowiedź NIESIE POLE, dla którego
+# istnieje. Źródło bez zadeklarowanego kontraktu przechodzi jak dotąd — brak wpisu znaczy
+# „nie wiemy, jak wygląda poprawna odpowiedź", a zgadywanie kontraktu byłoby gorsze niż jego brak.
+KONTRAKTY_KLASYFIKACJI = {
+    "news_llm": ("sentyment",),
+}
+
+
+def _kontrakt_dotrzymany(para: Dict[str, Any], obiekt: Dict[str, Any]) -> bool:
+    """Czy odpowiedź klasyfikatora niesie pola, bez których nie jest werdyktem.
+
+    Wymagane pole musi być LICZBĄ SKOŃCZONĄ. `bool` jest w Pythonie podklasą `int`, więc
+    odrzucamy go jawnie — `{"sentyment": true}` to nie ocena, tylko inny kontrakt.
+    """
+    wymagane = KONTRAKTY_KLASYFIKACJI.get(para.get("zrodlo") or "")
+    if not wymagane:
+        return True
+    for pole in wymagane:
+        w = obiekt.get(pole)
+        if isinstance(w, bool) or not isinstance(w, (int, float)) or w != w or w in (
+                float("inf"), float("-inf")):
+            return False
+    return True
 
 # Progi zbioru — ILE PAR TRZEBA, żeby trening miał sens (zwiad web 2026-07-16, badania distylacji).
 # Bez tych progów licznik „zebrano 47" nic nie mówi; z nimi Cezar widzi postęp wobec CELU (Prawo XXIV).
@@ -483,7 +534,13 @@ def pary_sft(sciezka: Optional[Path] = None,
         hp = p.get("odcisk_pytania") or odcisk_pytania(p.get("system") or "",
                                                        p.get("prompt") or "")
         if rodzaj_pary(p) == RODZAJ_KLASYFIKACJI:
-            if _obiekt_json(odp) is None:
+            _obj = _obiekt_json(odp)
+            if _obj is not None and not _kontrakt_dotrzymany(p, _obj):
+                # Poprawny JSON, który NIE JEST werdyktem (np. {"error": "rate limited"}).
+                # Patrz KONTRAKTY_KLASYFIKACJI — próg długości tu nie broni, bo werdykt
+                # z definicji jest krótki, więc bez tej bramki awaria API stałaby się etykietą.
+                continue
+            if _obj is None:
                 # Zepsuty JSON nie wchodzi do zbioru W ŻADNYM TRYBIE. Sam konsensus by tu nie
                 # wystarczył — on pomija wadliwe próbki, ale tylko na ścieżce zwijania; przy
                 # `jedna_probka_na_pytanie=False` wadliwa próbka poszłaby prosto na eksport.

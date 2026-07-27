@@ -14,6 +14,59 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | ⚖️ | Sąd nad odłożonymi uwagami cubica — 5 przyjętych, 3 odłożone z powodem
+
+**Siedem uwag z PR #134 leżało odłożonych świadomie.** Osądzone wobec ŻYWEGO kodu (kandydat ≠
+prawda — zmierzone wcześniej: najcięższe uwagi cubica bywają nietrafione). Wynik: **5 realnych,
+3 odłożone z podanym powodem, nie z lenistwa**.
+
+**PRZYJĘTE I NAPRAWIONE:**
+
+1. **Kontrakt odpowiedzi klasyfikatora** (`notarius.py`) — bramka sprawdzała, czy odpowiedź jest
+   *obiektem JSON*, a nie czy jest *werdyktem*. `{"error": "rate limited"}` spełniało pierwsze,
+   a próg długości odpowiedzi klasyfikacji nie obowiązuje (werdykt ma z definicji 34–41 znaków) —
+   więc **awaria API mogła wejść do zbioru treningowego TIRO jako etykieta**. Adapter czytający tę
+   samą treść w produkcji ją odrzuca: dwa różne progi na tę samą treść to definicja rozjazdu.
+   **Pomiar przed naprawą: 108 par klasyfikacji, 102 poprawne, 6 z zepsutym JSON-em (już
+   odrzucanych), 0 z tym kształtem** — wada realna, ale utajona. Naprawiona mimo to: koszt zerowy,
+   a skutkiem byłoby ciche zatrucie zbioru, którego cała wartość polega na prawdziwości etykiet.
+2. **Nie-napis w polu `rodzaj` wywracał CAŁY eksport** (`notarius.py`) — `(x or "").strip()` łapie
+   `None` i pusty napis, ale nie liczbę: `rodzaj: 5` jest prawdziwe i wywala `.strip()` na `int`.
+   Jeden zniekształcony (składniowo poprawny) rekord JSONL kasował plon całej sesji.
+3. **Wyrok bez adresata** (`bibliotekarz.py`) — `zapisz_wyrok` przyjmował dowolny `dot_ts`.
+   Literówka tworzyła orzeczenie wskazujące w próżnię, a sądzona cząstka **dalej czekała w
+   kolejce**. Przy 35 cząstkach na wachtę to jedno przestawienie cyfry. Cichy `False` byłby gorszy
+   niż wyjątek: „już osądzone" i „nie ma czego sądzić" to dwa różne stany.
+4. **Licznik, który kłamie** (`bibliotekarz.py`) — PROBATOR bada OBA plony (kandydaci + krytyka),
+   więc jeden temat dokładał dwa wpisy, a nagłówek głosił „X/N **tematów**". Przy obu skażonych
+   licznik mógł ogłosić więcej tematów skażonych, niż w ogóle skanowano.
+5. **Bramka sprawdzała OBECNOŚĆ znacznika, nie jego LICZBĘ** (`audyt_spojnosci.py`, W20) —
+   porównanie bierze treść między *pierwszą* parą znaczników, więc zdublowany `START` zostawiał
+   drugi blok poza kontrolą Tabularium, a audyt meldował „katalog zgodny ✅". Ta sama klasa co
+   bramka pilnująca jednego katalogu z jedenastu.
+
+**ODŁOŻONE — z powodem, nie milczeniem:**
+
+- **Zużycie pamięci przy eksporcie** (`notarius.py`): zarzut poprawny kierunkowo, ale **zmierzony
+  ledger to 3.59 MB / 398 par** przy 15.88 GB RAM. Wraca do rozważenia przy ~50 000 par; cel
+  bieżący to 1 000.
+- **Blokada pliku przy równoległych sędziach** (`bibliotekarz.py`): **równoległych sędziów nie ma** —
+  sąd jest sekwencyjnym poleceniem jednego operatora. Wraca, gdy pojawi się drugi piszący.
+- **Backticki w tekście narracyjnym** (log sesji): to nie wada modułu, tylko zagrożenie praktyki
+  pisania (podstawianie poleceń w powłoce). Praktyka już obowiązuje: heredoc cytowany (`<<'PY'`).
+
+**Błąd własny złapany po drodze:** dodając cache znaczników kolejki unieważniłem go przy zapisie
+wyroku, ale nie przy zapisie cząstki — świeżo zapisana cząstka była niewidzialna dla walidacji.
+Złapały to **istniejące testy**, nie recenzja.
+
+**Bramka:** testy zielone, audyt exit 0, ruff czysto. **Księga Wad:** 121 → 126.
+
+**Pliki:** `imperium/biblioteki/notarius.py`, `narzedzia/bibliotekarz.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_kontrakt_klasyfikacji.py` (nowy),
+`tests/test_bibliotekarz.py`, `tests/test_spojnosc.py`.
+
+---
+
 ## 2026-07-27 | 🔎 | RECOGNITOR — cisza recenzenta przestała się liczyć jako zgoda
 
 **Pytanie Cezara:** *„czy cubic znalazł jakieś nowe błędy na branchu roboczym?"*.

@@ -515,6 +515,26 @@ def test_rozbicie_plonow_widoczne_w_wydruku(tmp_path, monkeypatch):
     assert "krytyka 1" in tekst and "kandydaci 0" in tekst
 
 
+def test_delta_sledzi_liczbe_operacyjna_nie_tylko_surowa():
+    """
+    🚨 Delta MUSI śledzić `pary_uzyteczne` — liczbę, którą sami uznaliśmy za operacyjną
+    (07-26), a nie tylko `pary_nauczyciela`, którą wtedy uznaliśmy za MYLĄCĄ. Zmierzone
+    2026-07-27: wachta podniosła użyteczne 177 → 212, a delta raportowała „+2 surowe".
+    Różnica opisująca wachtę wielkością, której nie ufamy, jest gorsza niż jej brak.
+    """
+    assert "pary_uzyteczne" in bv._POLA_DELTY
+    assert "pary_uzyteczne" in bv.migawka(), "migawka nie niesie liczby operacyjnej"
+
+
+def test_delta_milczy_o_polu_ktorego_stara_migawka_nie_ma(tmp_path):
+    """Granica wstecznej zgodności: migawka sprzed dodania pola NIE MOŻE wywalić delty
+    ani zmyślić różnicy — brak liczby to brak wiedzy, nie zero."""
+    stara = tmp_path / "migawka.json"
+    stara.write_text(json.dumps({"pary_nauczyciela": 10}), encoding="utf-8")
+    tekst = bv.delta(stara)
+    assert "pary_uzyteczne" not in tekst
+
+
 def test_pary_uzyteczne_nie_przekraczaja_surowych():
     """Postęp Szkoły liczymy parami, które PRZEŻYJĄ eksport SFT (kolaps + filtr jakości).
 

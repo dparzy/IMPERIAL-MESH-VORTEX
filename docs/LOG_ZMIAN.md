@@ -14,6 +14,54 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | 🎓 | Szkoła TIRO: filtr wg RODZAJU zadania + konsensus — 178→212 par użytecznych
+
+**Rozkaz Cezara: „wg rekomendacji".** Punktem wyjścia była jego własna partia pomiarowa
+z 07-26 (10 tematów Hyginusa, `--pelny`), która dała pierwszy twardy **współczynnik przeżycia**:
+2,2 użytecznej pary na temat → ~374 tematy do progu 1000.
+
+**WADA GŁÓWNA (Prawo XV).** Rozbicie ledgera par na źródła pokazało: `news_llm` **102 pary → 0
+użytecznych**. Przyczyna: JEDEN próg długości (200 znaków) dla DWÓCH różnych rodzajów zadania.
+Próg powstał dla prozy, gdzie krótka odpowiedź znaczy „nie wiem"; dla klasyfikacji poprawny
+werdykt `{"sentyment":…, "pewnosc":…}` ma 34–41 znaków **z definicji**. 27% ledgera było
+niewidzialne dla treningu, a meldunek nazywał ten martwy strumień postępem Szkoły.
+
+**Naprawa mechanizmem, nie obniżeniem progu** (obniżenie byłoby naginaniem miary pod wynik):
+`rodzaj_pary` rozdziela prozę od klasyfikacji, a każdy rodzaj dostaje test **właściwy sobie** —
+proza długość, klasyfikacja poprawność struktury. Notarius bada strukturę, nigdy semantykę
+dziedziny (inaczej ledger treningowy zacząłby się znać na sentymencie rynku).
+
+**KONSENSUS — dług spłacony, nie nowy pomysł.** Pole `odcisk_pytania` istniało wprost po to,
+„żeby eksport mógł grupować próbki tego samego pytania (konsensus)", a eksport odkładał to
+na E4 i brał **pierwszą z brzegu**. Zmierzone: w 3 z 32 wielopróbkowych pytań pierwsza próbka
+ma **znak przeciwny** do mediany — 9% etykiet uczyło byka zamiast niedźwiedzia.
+
+**PROBATOR — zasięg, nie predykat (czwarty nawrót klasy).** Warstwa badała DWA plony
+(kandydatów i krytykę), a czytaliśmy jeden. Zmierzone na partii 07-26: kandydaci 10/10 czyści,
+**krytyka 1 PODEJRZANY + 1 BEZ_CYTATU** — meldunek ogłaszał „podejrzanych 0". Skażona krytyka
+to broń wytrącona sędziemu, bo krytyka jest OBRONĄ przed złym kandydatem. Tej samej klasy było
+`pary_uzyteczne` nieobecne w delcie: domknięcie raportowałoby „+2 surowe" zamiast „+35 użytecznych".
+
+**Dowód mutacją — i trzy fałszywe obrony.** Z sześciu mutacji **trzy przeżyły** pierwsze
+podejście: bramka poprawności JSON (broni jej konsensus, nie test), raport bibliotekarza (×2 —
+broniono wyłącznie BREVIARIUM). Każda dostała test ścieżki, która nie ma innego obrońcy.
+Przy okazji własny test odsłonił, że `KOLEJKA.relative_to(ROOT)` wywracało **cały raport już po
+opłaceniu skanu DeepSeekiem** — kosmetyka niszczyła pracę zapłaconą.
+
+**Decyzja B Cezara wykonana:** 70 linii obcego materiału Consilium/KUN wyjęte z
+`docs/PLAN_ROZBUDOWY_BIBLIOTEKI.md` do kwarantanny `wrzutnia/consilium/` (gitignorowana),
+z dowodem: plik po wycięciu bloku jest bit-w-bit wersją z HEAD.
+
+**Wycofane:** filtr tematów już odpytanych — `_tematy_ukonczone()` istnieje od poprawki Cubic P2.
+72 „duplikaty" to celowe wielopróbkowanie z kampanii A/B LIBRA MESSIS, nie brak filtra.
+
+**Pliki:** `imperium/biblioteki/notarius.py`, `imperium/oczy/breviarium.py`,
+`narzedzia/bibliotekarz.py`, `tests/test_notarius.py`, `tests/test_breviarium.py`,
+`tests/test_bibliotekarz.py`, Księga Wad (+5 klas), CODEX (+3 pomiary).
+**Bramka:** testy 2946/2946, audyt exit 0, skan wad czysto.
+
+---
+
 ## 2026-07-27 | 💰 | Odchudzanie konstytucji 787→253 linie — −11k tokenów na każdej sesji
 
 **Rozkaz Cezara: „rób wg rekomendacji i pamiętaj, że mamy postępować, a nie cofać się".**

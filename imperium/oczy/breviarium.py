@@ -409,8 +409,14 @@ MIGAWKA = ROOT / "bibliotheca_ulpia" / "dane" / "breviarium_migawka.json"
 
 # Liczby, których RÓŻNICA opisuje dorobek wachty. Świadomie wąska lista: modele na dysku
 # czy klasa sprzętu nie zmieniają się w trakcie sesji, więc ich delta byłaby szumem.
+# 🚨 `pary_uzyteczne` DOPISANE 2026-07-27 — czwarty nawrót klasy „naprawiono widok, nie zasięg".
+# 07-26 uznaliśmy `pary_nauczyciela` (surowe) za liczbę MYLĄCĄ i wprowadziliśmy `pary_uzyteczne`
+# jako operacyjną — ale poprawka objęła sam meldunek, a delta dalej śledziła wyłącznie tę
+# odrzuconą. Skutek zmierzony na tym domknięciu: wachta podniosła użyteczne 177 → 212 (+35,
+# największy realny ruch dnia), a delta zaraportowała „+2 pary surowe". Różnica ma pokazywać
+# to, czym MIERZYMY postęp, inaczej opisuje wachtę wielkością, której świadomie nie ufamy.
 _POLA_DELTY = ("czastek", "czeka_na_sedziego", "podejrzane", "zbadane_probatorem",
-               "pary_nauczyciela")
+               "pary_nauczyciela", "pary_uzyteczne")
 
 
 def migawka() -> Dict[str, Any]:

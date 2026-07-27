@@ -191,3 +191,49 @@ def test_szukaj_ranking_wiecej_slow_wyzej():
         encoding="utf-8")
     wyniki = kc.szukaj("numba wydajność wskaźniki", cel=cel)
     assert wyniki[0]["trafienia"] >= wyniki[-1]["trafienia"]
+
+
+# ── Redakcja katalogu domowego (cubic PR #134, P0) ────────────────────────────
+
+def test_redaguje_katalog_domowy_we_wszystkich_zapisach():
+    """PII i przenośność: transkrypty niosą ścieżki narzędziowe z NAZWĄ KONTA.
+
+    Zmierzone 2026-07-27: 277 wystąpień w 30 plikach kroniki trafiło do repo. Organ
+    redakcji ISTNIAŁ, ale pilnował wyłącznie kluczy API — klasa „bramka o wąskim zasięgu".
+
+    Ta sama ścieżka żyje w transkrypcie w TRZECH postaciach naraz (proza, ucieczka JSON,
+    separator POSIX). Test trzyma wszystkie trzy, bo wzorzec łapiący jedną meldowałby
+    sukces przy dwóch dalej wyciekających — „milczenie udające wynik"."""
+    B = chr(92)
+    dom = str(Path.home())
+    for wariant in (dom + B + "AppData" + B + "Local",
+                    dom.replace(B, B + B) + B + B + "AppData",
+                    dom.replace(B, "/") + "/AppData/Local"):
+        wynik = kc._redaguj(wariant)
+        assert dom.lower() not in wynik.lower(), f"wyciek katalogu domowego: {wariant!r}"
+        assert dom.replace(B, "/").lower() not in wynik.lower(), f"wyciek POSIX: {wariant!r}"
+        assert "~" in wynik, f"brak podstawienia w {wariant!r}"
+
+
+def test_redakcja_nie_rusza_sciezek_repo():
+    """Zawężenie w drugą stronę byłoby równie złe: ścieżki repo są UŻYTECZNE w kronice
+    (mówią, którego pliku dotyczy rozmowa) i nie zawierają danych osobowych."""
+    B = chr(92)
+    sciezka = "C:" + B + "Projekty" + B + "imperial-mesh-vortex" + B + "narzedzia" + B + "x.py"
+    assert kc._redaguj(sciezka) == sciezka
+
+
+def test_redakcja_sekretow_dziala_dalej():
+    """Rozszerzenie zasięgu nie ma prawa osłabić tego, co organ pilnował wcześniej."""
+    assert "[ZREDAGOWANO]" in kc._redaguj("api_key=sk-abcdefghijklmnopqrstuvwx")
+
+
+def test_wzorzec_domu_znosi_dom_bez_nazwy_konta_w_kodzie():
+    """Mechanizm wyprowadza dom z `Path.home()`, NIGDY z wpisanej nazwy konta — inaczej
+    utrwalilibyśmy w kodzie dokładnie tę daną, którą usuwamy. Test dowodzi, że wzorzec
+    działa dla DOWOLNEGO domu, nie tylko dla maszyny, na której powstał."""
+    B = chr(92)
+    wz = kc._wzorzec_domu("D:" + B + "Users" + B + "ktos-inny")
+    assert wz.search("D:" + B + "Users" + B + "ktos-inny" + B + "plik.txt")
+    assert wz.search("D:/Users/ktos-inny/plik.txt")
+    assert not wz.search("D:" + B + "Users" + B + "kto-inny")

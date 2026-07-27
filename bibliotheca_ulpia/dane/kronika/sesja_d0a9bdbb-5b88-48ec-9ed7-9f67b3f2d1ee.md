@@ -215,7 +215,7 @@ In bibliotheca_ulpia/dane/kronika/sesja_2d00b102-79a8-412e-a2b5-0db8a00c8e74.md:
 +<local-command-stdout>Set model to claude-opus-4-8</local-command-stdout>
 +
 +## 🧑 Cezar
-+@"C:\Users\Ian\Desktop\platform deepseek usage.txt"
++@"~\Desktop\platform deepseek usage.txt"
 P2: Two lines commit absolute desktop paths that expose your real Windows username (Ian) and filesystem structure to version control. These paths will never resolve on any other machine. Consider using environment variables like %USERPROFILE%\Desktop\... or storing referenced desktop data inside the repo so the kronika file remains portable and PII-free.
 Prompt for AI agents
 Check if this issue is valid — if so, understand the root cause and fix it. At bibliotheca_ulpia/dane/kronika/sesja_2d00b102-79a8-412e-a2b5-0db8a00c8e74.md, line 361:
@@ -225,7 +225,7 @@ Check if this issue is valid — if so, understand the root cause and fix it. At
 +<local-command-stdout>Set model to claude-opus-4-8</local-command-stdout>
 +
 +## 🧑 Cezar
-+@"C:\Users\Ian\Desktop\platform deepseek usage.txt"
++@"~\Desktop\platform deepseek usage.txt"
 +zobacz statystyki z platformy deepsik za dzien 21.07.2026
 +
 </file context>
@@ -796,7 +796,7 @@ Jedno sprostowanie własnego pomiaru: pierwszy przelot po duplikatach w archiwum
 | P2 | BREVIARIUM nie przekazuje `PARY_TIRO` jawnie | **Dziś nie jest bugiem** — `notarius.DOMYSLNA` wskazuje ten sam plik. Ale to dwie stałe na jedno źródło: klasa „dwa liczniki rozjadą się co do sztuki", którą sami opisaliśmy w docstringu tej funkcji. Naprawa 1 linią. |
 | P3 | `aerarium:148` — fallback „jeden katalog = nasz" | SŁUSZNE: przeczy własnemu docstringowi („pusta lista = nie wiem, nigdy nie ma"). |
 | P2 | `ZADANIE_TIRO_E3_ZNIWO.md` nie w `docs/README.md` | Fakt prawdziwy, **ale zalecana naprawa wątpliwa**: ręczny spis obok generowanego INDEKSU to mnożenie źródeł (Prawo XVI). Właściwe pytanie: czy `docs/README.md` (stan na 2026-06-09) ma jeszcze rację bytu. |
-| P2 | ścieżka `C:\Users\Ian\Desktop\…` w kronice | Fakt prawdziwy. Repo prywatne; kronika to zapis dosłowny (Prawo I zabrania przepisywania historii). **Decyzja Twoja.** |
+| P2 | ścieżka `~\Desktop\…` w kronice | Fakt prawdziwy. Repo prywatne; kronika to zapis dosłowny (Prawo I zabrania przepisywania historii). **Decyzja Twoja.** |
 
 ## 🚨 Wniosek ważniejszy niż same 22 punkty
 
@@ -904,7 +904,7 @@ W międzyczasie mam gotowy szkic Etapu 5 (poza repo) z jednym niebanalnym rozstr
 <task-notification>
 <task-id>bku81y6s8</task-id>
 <tool-use-id>toolu_01UTbuuu8H9P8115mP5MDCTi</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\d0a9bdbb-5b88-48ec-9ed7-9f67b3f2d1ee\tasks\bku81y6s8.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\d0a9bdbb-5b88-48ec-9ed7-9f67b3f2d1ee\tasks\bku81y6s8.output</output-file>
 <status>completed</status>
 <summary>Background command "Run full test suite (stage 1 gate)" completed (exit code 0)</summary>
 </task-notification>
@@ -1080,7 +1080,7 @@ Jedna rzecz warta Twojej uwagi, bo dotyczy mojej własnej roboty: **nowa Warstwa
 <task-notification>
 <task-id>bl7l6vhx3</task-id>
 <tool-use-id>toolu_01V4Wn3W5hEZ86kHnF2kWG5t</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\d0a9bdbb-5b88-48ec-9ed7-9f67b3f2d1ee\tasks\bl7l6vhx3.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\d0a9bdbb-5b88-48ec-9ed7-9f67b3f2d1ee\tasks\bl7l6vhx3.output</output-file>
 <status>completed</status>
 <summary>Background command "Run final full gate: tests, audit, defect scan" completed (exit code 0)</summary>
 </task-notification>
@@ -1340,7 +1340,7 @@ Po zielonej bramce commit + blok push dla Ciebie.
 <task-notification>
 <task-id>bamvcv6y5</task-id>
 <tool-use-id>toolu_01MbPub6QsWt4syKFnJ1uaEc</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\d0a9bdbb-5b88-48ec-9ed7-9f67b3f2d1ee\tasks\bamvcv6y5.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\d0a9bdbb-5b88-48ec-9ed7-9f67b3f2d1ee\tasks\bamvcv6y5.output</output-file>
 <status>completed</status>
 <summary>Background command "Run full gate after constitution slimming" completed (exit code 0)</summary>
 </task-notification>

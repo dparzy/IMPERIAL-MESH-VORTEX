@@ -219,7 +219,7 @@ Czekam na wynik testów.
 <task-notification>
 <task-id>bushqygxc</task-id>
 <tool-use-id>toolu_01NV8g3cTGykgWiv56cD9qhV</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\d4c1edd7-e6cb-46ff-a633-881728bdb8a0\tasks\bushqygxc.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\d4c1edd7-e6cb-46ff-a633-881728bdb8a0\tasks\bushqygxc.output</output-file>
 <status>completed</status>
 <summary>Background command "Uruchom pełny zestaw testów" completed (exit code 0)</summary>
 </task-notification>
@@ -420,7 +420,7 @@ Push w toku (sieć do GitHub). Watcher uzbrojony — zgłoszę wynik, gdy `synch
 <task-notification>
 <task-id>b39bee2io</task-id>
 <tool-use-id>toolu_0152dPQSGuBgJj8Crqd7DfPs</tool-use-id>
-<output-file>C:\Users\Ian\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\d4c1edd7-e6cb-46ff-a633-881728bdb8a0\tasks\b39bee2io.output</output-file>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\d4c1edd7-e6cb-46ff-a633-881728bdb8a0\tasks\b39bee2io.output</output-file>
 <status>completed</status>
 <summary>Background command "Push brancha wg narzędzia synchronizacji" completed (exit code 0)</summary>
 </task-notification>

@@ -14,6 +14,144 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-27 | 🛡️ | Recenzja cubic PR #134 — dwie ciche straty danych zamknięte
+
+**Werdykt nad 15 zgłoszeniami: najcięższe znowu nietrafione** (powtórka wzorca z PR #133).
+Zarzut P1, że `sigillum_probationis.json` wskazuje wiszący commit `a72fb23`, jest **FAŁSZYWY**
+— commit leży w gałęzi, w `origin` i jest przodkiem HEAD. Reszta trzyma poziom: dwa realne
+zgłoszenia opisywały mechanizmy, które **po cichu tracą dane**, i te zamknięto tą wachtą.
+
+### P0 — 277 wystąpień katalogu domowego w repo (PII + brak przenośności)
+
+Zmierzone: **30 plików, 277 wystąpień** nazwy konta w ścieżkach narzędziowych. To **NAWRÓT**:
+klasa została nazwana **dzień wcześniej** (archiwum lekcji 2026-07-26, „Commitowanie desktop
+paths łamie przenośność i PII"), ale została **lekcją, nie mechanizmem** — więc wróciła w skali.
+
+Organ redakcji `kronika_czatu._redaguj` **istniał i działał** — pilnował kluczy API — i właśnie
+dlatego nikt nie sprawdził, czy widzi ścieżki. Istnienie organu uspokaja mocniej niż jego brak.
+
+**Lekarstwo:** zasięg rozszerzony o katalog domowy, wyprowadzany z `Path.home()` — **nigdy
+z wpisanej nazwy konta**, bo utrwalałoby to w kodzie dokładnie tę daną, którą usuwamy.
+Wzorzec toleruje **trzy formy zapisu**, w których ta sama ścieżka żyje w transkrypcie naraz:
+proza (`C:\…`), ucieczka JSON (`C:\\…`) i POSIX (`C:/…`) — wzorzec łapiący jedną meldowałby
+sukces przy dwóch dalej wyciekających. Ścieżki repo zostają nietknięte (są użyteczne i nie
+niosą danych osobowych). Istniejące pliki oczyszczone tą samą funkcją: **30 plików, 281
+wystąpień**. Historii gita NIE ruszano — to decyzja Cezara, nie Architekta.
+
+### P1 — decyzja odwracająca poprzednią ginęła bez śladu
+
+`pamiec_sesji.czy_duplikaty` **we własnym docstringu** przyznaje, że widzi IDENTYFIKATORY,
+a nie KIERUNEK wniosku, i nazywa łagodzenie: „auto_lekcja LOGUJE każdy pominięty tytuł".
+`rejestr_wizji.dodaj()` zaimportował predykat **bez tego łagodzenia** — więc `return False`
+czytało się jak „duplikat, nic się nie stało". W rejestrze DECYZJI i ZMIAN, które **są
+historią**, cicha strata waży więcej niż w lekcjach.
+
+**Zreprodukowane** na przykładzie z tamtego docstringu: „ATR_MULT w EXP-07 za niski" kontra
+„…za wysoki" → drugi wpis przepadał. (Dzisiejsza para U4 ON/OFF **przeżyła** — tytuły różniły
+się dość mocno; wada jest węższa, niż twierdził recenzent, ale realna.)
+
+**POMIAR OBALIŁ MOJĄ PIERWSZĄ POPRAWKĘ, ZANIM JĄ WDROŻYŁEM.** Chciałem wyłączyć sito
+semantyczne dla „typów-historii". Pomiar na żywym rejestrze 820 wpisów pokazał, że sito robi
+realną robotę w KAŻDYM typie — ZMIANA 161 par, WIZJA 57, DECYZJA 19, POMYSŁ 15, i są to
+autentyczne parafrazy, nie odwrócenia. Wyłączenie wpuściłoby ~180 duplikatów. Lekarstwem na
+predykat bez kierunku nie jest jego usunięcie, tylko **uwidocznienie jego decyzji**.
+
+### Naprawione przy okazji
+Regex nagłówka kandydata (`kandydat\w*` łapało polską odmianę — „Kandydatura:" jako kandydat;
+**pierwsza poprawka była za słaba i złapał ją własny test**, dopiero wymóg separatora zamknął
+klasę; `przelicz` przed i po: **zero dryfu** opublikowanych liczb) · duplikat wycofania
+w INDEX FALSORUM (16→15) · literówka „uodporij" w skillu `/praca` · wpis archiwum lekcji
+mówiący „22/22" wbrew własnej treści → poprawiony wobec ŹRÓDŁA na **20/22, 2 fałszywe**.
+
+**Odłożone świadomie** (decyzja Cezara „reszta później"): 7 zgłoszeń niezweryfikowanych —
+W20 zdublowane znaczniki, walidacja `dot_ts` przy wyroku, przeliczanie tematów PROBATORA,
+3× notarius, backticki w kronice.
+
+**Dowód:** 3 mutacje na sanityzatorze + 2 na rejestrze wizji, **wszystkie zabite**, każda
+z kontrolą negatywną przyrządu i sprawdzeniem `ast.parse` — bo mutacja zabijająca przez
+`SyntaxError` wygląda identycznie jak „test broni" (złapane 3× w tej wachcie).
+Księga Wad 110 → 114.
+
+---
+
+## 2026-07-27 | 🚨 | NOMENCLATOR — detektor dubletów istniał, działał i NIE BYŁ WPIĘTY (Prawo XV)
+
+**Znalezione przez FRUMENTARIUSA, ale nie w tym, co przywiózł.** Zwiad zewnętrzny (rozkaz
+Cezara po decyzji o U4) wrócił z 3 realnymi pracami i **jedną zmyśloną liczbą** — cytował
+„F1 75% vs 81%" z arXiv 2506.22026, gdzie tabela ablacji **nie zawiera żadnego F1**
+(accuracy 89.66% dla pełnego systemu), a wariantu ze statyczną listą w promptcie ta praca
+w ogóle nie testuje. Twierdzenie „bezpośrednio potwierdza nasz wynik" było fałszywe.
+
+**Wartość zwiadu leżała w kierunku, nie w treści:** „przenieś anty-redundancję z promptu do
+sprawdzenia PER KANDYDAT". Trop poprowadził do własnego kodu i tam czekała utrata potencjału:
+
+> `policz_duplikaty` + `leksykon_roju` — deterministyczny detektor za **0 tokenów**, hartowany
+> dwiema naprawami (ślepota na `WIELKIE_Z_PODKRESLENIEM`; 4 z 7 formatów nagłówka sklejające
+> plon) — żył **wyłącznie w stanowisku pomiarowym**. Produkcyjny zwiad go nie wołał.
+
+Czyli: płaciliśmy modelowi 1.49× za deklarację „nie dubluje" o zmierzonej **zerowej wartości**
+(100% trafień), mając obok darmowy grep, który działa. **Mierzący miał przyrząd, mierzony nie.**
+
+**Lekarstwo:** organ `imperium/pretorianie/nomenclator.py` (Strażnik Imion — rzymski
+*nomenclator* szeptał panu imiona mijanych osób). Kod **PRZENIESIONY, nie skopiowany**:
+`ab_plon_hyginusa` re-eksportuje z organu, a test żąda **TOŻSAMOŚCI OBIEKTÓW** — dwie kopie
+rozjechałyby się przy pierwszej naprawie leksykonu, a rozjazd byłby cichy, bo obie
+przechodziłyby własne testy. Wpięcie w `scout_temat` jako **opt-in OFF** (ZASADA WPIĘCIA).
+
+**Samo-dowód musiał się przeprowadzić razem z kodem:** dawniej wystarczyło wykluczyć
+`__file__`, bo leksykon i pomiar były jednym plikiem. Po wyodrębnieniu `ab_plon_hyginusa.py`
+wpadłby do korpusu dowodowego — a jest pełen prozy o mierzonych pojęciach. Wykluczenie jest
+teraz jawnym zbiorem `_POZA_KORPUSEM` z testem żądającym RÓWNOŚCI z liczbą policzoną z dysku
+(nie luźnego progu — ta klasa przeżyła mutację 07-27).
+
+**Pomiar po wdrożeniu:** leksykon 32/32 zweryfikowane, **0 widm** — zachowanie bit-identyczne
+mimo szerszego wykluczenia, co dowodzi, że żadne pojęcie nie było udowadniane prozą pomiaru.
+Na żywej kolejce: **20 ze 112** kandydatów nieosądzonych (17.9%) nosi znane imię, przy
+zmierzonej redundancji ~39.3% — organ łapie **około połowy**, zgodnie z własną deklaracją
+(głos mocny, milczenie słabe). **3 mutacje, 3 zabite**, każda z dowodem zmiany pliku
+i z kontrolą negatywną przyrządu (bez mutacji rc=0 — inaczej „ZABITA" znaczyłoby tylko,
+że harness zawsze zwraca błąd).
+
+**Czego NIE zrobiono i dlaczego:** walidacja per kandydat na 8 osądzonych cząstkach **nie
+wyszła** — etykieta „dublet" żyje w prozie uzasadnienia **per cząstka**, nie per kandydat,
+więc liczby TP/FP/FN byłyby artefaktem ziarna. Precyzja i recall **nieznane**; policzymy je
+po sądzie nad 35 cząstkami, bo sąd jest pracą etykietującą. Do tego czasu organ zostaje OFF.
+
+**Pliki:** `imperium/pretorianie/nomenclator.py` (nowy), `tests/test_nomenclator.py` (12 testów),
+`narzedzia/ab_plon_hyginusa.py` (re-eksport), `narzedzia/bibliotekarz.py` (wpięcie + `--nomenclator`),
+`tests/test_bibliotekarz.py` (+2), `docs/ARCHITEKTURA_IMPERIUM.md`, CENSUS 244 → 245.
+
+---
+
+## 2026-07-27 | ⚖️ | U4 (świadomość systemu) → domyślnie OFF — DECYZJA CEZARA po replikacji
+
+**Zamknięcie sprawy otwartej od poprzedniej wachty.** Rozkaz z 07-21 („U4 domyślnie ON")
+opierał się na tezie *−12.1 pp duplikatów, p=0.016*. Ta teza padła: przeliczenie tego samego
+zapisanego plonu detektorem bez ślepych plam dało OFF 39.3% vs ON 41.0%, p=0.766, a replikacja
+na **128 świeżych pomiarach** (łącznie 256 biegów) dała **−0.7 pp, CI [−7.3, +6.0], p=0.888**.
+
+**Rachunek, który rozstrzygnął:** koszt **1.49× jest ZMIERZONY i pewny**, korzyść mieści się
+w szumie. Moc testu na efekt 12 pp = 94.2% (taki efekt wykluczony); na 5 pp = 31% — małego
+efektu **nie wykluczamy i nie udajemy, że wykluczyliśmy**.
+
+**Co zostaje prawdą mimo OFF** (celowo zachowane w kodzie i dokumentach): zwiad bez tego bloku
+proponuje moduły, które już mamy — **39.3%** kandydatów nazywa pojęcie obecne w kodzie.
+Zmierzone jest tylko to, że **ten blok tego nie naprawia**. Ciężar anty-redundancji przechodzi
+więc na **sędziego z `grep`em**, bo deklaracja modelu „nie dubluje" padała przy 100% kandydatów
+— także przy VPIN, który stoi w kodzie jako `VPIN_50`.
+
+**Mechanika przełącznika:** `--swiadomosc` włącza z powrotem (A/B wymaga obu ramion);
+`--bez-swiadomosci` zostaje jako zgodność wsteczna bez mocy sprawczej — stare polecenie
+z tą flagą dostaje dokładnie to, o co prosiło. Domyślne `False` **na obu poziomach**
+(`scout_temat` i `raport`), bo CLI widzi ten drugi — test parytetu pilnuje obu sygnatur,
+żeby decyzja nie obowiązywała w połowie ścieżek wywołania.
+
+**Pliki:** `narzedzia/bibliotekarz.py`, `tests/test_bibliotekarz.py` (test domyślności odwrócony
+wraz z powodem + nowy test parytetu sygnatur), `docs/ZADANIE_TIRO_E3_ZNIWO.md`.
+INDEX FALSORUM pilnuje obalonej tezy od 07-27 — bez nowego wpisu (Prawo XVI).
+
+---
+
 ## 2026-07-27 | 🚨 | Δ wachty kłamała zerem — punkt odniesienia kasowany przez wznowienie sesji
 
 **Złapane WŁASNYM krokiem domknięcia (4b), nie przez alarm.** BREVIARIUM zameldowało

@@ -72,7 +72,7 @@ Inspirowany realnym projektem **DNSS** (rój 79 agentów AI), ale celuje wyżej:
 | 🏛️ **senat/** | debata / konsensus (Byk / Niedźwiedź / Cenzor) | <!-- LICZBA:organ_senat -->2<!-- /LICZBA --> |
 | ⚔️ **legiony/** | neurony + zwiadowcy + Generał Legatus + Radar | <!-- LICZBA:organ_legiony -->67<!-- /LICZBA --> |
 | 🏟️ **koloseum/** | Dyrygent, PętlaLive, Backtest, Namiestnik, Legiony Cieni | <!-- LICZBA:organ_koloseum -->16<!-- /LICZBA --> |
-| 🛡️ **pretorianie/** | bezpieczeństwo, kalkulator lewara, Praeda, **PORTITOR** (pre-flight u wrót) | <!-- LICZBA:organ_pretorianie -->10<!-- /LICZBA --> |
+| 🛡️ **pretorianie/** | bezpieczeństwo, kalkulator lewara, Praeda, **PORTITOR** (pre-flight u wrót) | <!-- LICZBA:organ_pretorianie -->11<!-- /LICZBA --> |
 | 🏗️ **akwedukty/** | pipeline danych + adaptery API (Futures / F&G / CVD / News) | <!-- LICZBA:organ_akwedukty -->17<!-- /LICZBA --> |
 | 🛤️ **drogi/** | API i egzekucja (NexusHub) | <!-- LICZBA:organ_drogi -->4<!-- /LICZBA --> |
 | 🎨 **swiatynie/** | **PRAETORIUM** (Kwatera Główna Imperatora) + dashboard / wizualizacja / SPECULA świec | <!-- LICZBA:organ_swiatynie -->7<!-- /LICZBA --> |

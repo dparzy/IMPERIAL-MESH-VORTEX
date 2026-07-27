@@ -398,13 +398,19 @@ def test_atrapa_glosu_zgodna_z_mostem():
     assert ma_kwargs or not brakuje, f"atrapa nie przyjmie: {sorted(brakuje)}"
 
 
-def test_swiadomosc_jest_DOMYSLNIE_wlaczona(monkeypatch):
-    """U4 domyślnie ON od 2026-07-21 (rozkaz Cezara po sądzie nad kolejką).
+def test_swiadomosc_jest_DOMYSLNIE_wylaczona(monkeypatch):
+    """U4 domyślnie OFF od 2026-07-27 (DECYZJA CEZARA po replikacji A/B).
 
-    POWÓD, dla którego to jest test, a nie tylko wartość domyślna: pomiar na 33 cząstkach
-    pokazał, że bez tego bloku zwiad proponuje moduły, które JUŻ ISTNIEJĄ w kodzie —
-    VPIN (WSKAZNIK VPIN_50), Value Area (VP-01), Kelly (IUSTITIA), CVD, Kalman, triple_barrier,
-    DSR/PBO. Cichy powrót do opt-in oznaczałby powrót do płacenia za duplikaty."""
+    POWÓD, dla którego to jest test, a nie tylko wartość domyślna: domyślna wartość sama
+    z siebie nie broni się przed cichym powrotem. Rozkaz z 07-21 („ON") opierał się na
+    tezie −12.1 pp p=0.016, którą przeliczenie naprawionym detektorem OBALIŁO (OFF 39.3%
+    vs ON 41.0%, p=0.766 — stary detektor nie widział dubletów WIELKIE_Z_PODKRESLENIEM).
+    Replikacja na 256 biegach: −0.7 pp, CI [−7.3, +6.0], p=0.888, moc na −12 pp = 94.2%.
+    Koszt zmierzony 1.49×. Powrót do ON bez NOWEGO pomiaru byłby powrotem do płacenia
+    połowy więcej za efekt nieodróżnialny od zera.
+
+    Test celowo NIE twierdzi, że U4 szkodzi — moc na 5 pp to tylko 31%, więc małego
+    efektu nie wykluczyliśmy. Broniona jest DOMYŚLNOŚĆ, nie teza o szkodliwości."""
     import szukaj as szukaj_mod
     monkeypatch.setattr(szukaj_mod, "szukaj",
                         lambda *a, **k: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
@@ -417,7 +423,59 @@ def test_swiadomosc_jest_DOMYSLNIE_wlaczona(monkeypatch):
             return "kand"
 
     scout_temat(G(), "momentum", topk=3)          # BEZ jawnego swiadomosc=
-    assert "SENTINEL_KTX" in zebrane["tresc"]
+    assert "SENTINEL_KTX" not in zebrane["tresc"]
+
+
+def test_raport_nie_wstrzykuje_swiadomosci_domyslnie():
+    """GRANICA DOMYŚLNOŚCI NA DRUGIM POZIOMIE: `raport()` ma własny parametr `swiadomosc`
+    i to ON, a nie `scout_temat`, jest tym, co widzi CLI. Gdyby ktoś przełączył tylko
+    jedną z dwóch wartości, decyzja Cezara obowiązywałaby w połowie ścieżek wywołania —
+    dokładnie ta klasa wady, którą złapaliśmy przy deprecjonowaniu miary (07-26: objęliśmy
+    meldunek, nie deltę). Pytamy sygnatury, więc test nie kosztuje ani jednego calla API."""
+    import inspect
+    assert inspect.signature(bib.raport).parameters["swiadomosc"].default is False
+    assert inspect.signature(scout_temat).parameters["swiadomosc"].default is False
+
+
+def test_nomenclator_jest_OPT_IN_wylaczony(monkeypatch):
+    """ZASADA WPIĘCIA: NOMENCLATOR wchodzi w ścieżkę zwiadu jako opt-in OFF i włącza się
+    dopiero po zielonym A/B. Domyślność sprawdzana na OBU poziomach — `raport()` ma własny
+    parametr i to JEGO widzi CLI, więc przełączenie jednego z dwóch dałoby decyzję
+    obowiązującą w połowie ścieżek wywołania (klasa złapana 07-26 przy delcie BREVIARIUM)."""
+    import inspect
+    assert inspect.signature(scout_temat).parameters["nomenclator"].default is False
+    assert inspect.signature(bib.raport).parameters["nomenclator"].default is False
+
+    import szukaj as szukaj_mod
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda *a, **k: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+
+    class G:
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+            return "1. Kandydat: VPIN_TOKSYCZNOSC\n- opis\n"
+
+    rec = scout_temat(G(), "momentum", topk=3, probator=False)   # BEZ jawnego nomenclator=
+    assert "nomenclator" not in rec, "organ dołożył się do cząstki mimo opt-in OFF"
+
+
+def test_nomenclator_wlaczony_oznacza_znane_imie(monkeypatch):
+    """Gdy WŁĄCZONY — dokłada adnotację, ale wyłącznie DOKŁADA (monotonicznie ostrożny):
+    kandydaci w cząstce zostają nietknięci, więc nic, co przeszłoby bez organu, nie ginie."""
+    import szukaj as szukaj_mod
+    monkeypatch.setattr(szukaj_mod, "szukaj",
+                        lambda *a, **k: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])
+    plon = "1. Kandydat: VPIN_TOKSYCZNOSC\n- opis\n2. Kandydat: NOWE_POJECIE_XYZ\n- opis\n"
+
+    class G:
+        def zapytaj(self, system, tresc, temperatura=0.7, profil=None, **kw):
+            return plon
+
+    rec = scout_temat(G(), "momentum", topk=3, probator=False, nomenclator=True)
+    assert rec["nomenclator"]["status"] == "podejrzany"
+    assert rec["nomenclator"]["podejrzanych"] == 1
+    assert rec["nomenclator"]["kandydatow"] == 2
+    # `.strip()` robi sam scout_temat od zawsze — porównujemy z tym, co bez organu też by wyszło.
+    assert rec["kandydaci"] == plon.strip(), "organ zmienił plon — ma tylko adnotować"
 
 
 def test_blok_swiadomosci_zawiera_zakaz_duplikatow():

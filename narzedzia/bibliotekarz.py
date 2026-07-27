@@ -174,29 +174,38 @@ def krytyka_kandydatow(glos, kandydaci: str, wyniki_kontra, profil: str | None =
         return "(krytyka niedostępna — błąd API)"
 
 
-# U4 jest DOMYŚLNIE WŁĄCZONE od 2026-07-21 (sąd nad kolejką, rozkaz Cezara).
-# POWÓD — POMIAR na 33 zebranych cząstkach: sztandarowi kandydaci JUŻ ISTNIELI w kodzie
-# (VPIN → WSKAZNIK „VPIN_50" + doradca HERMES; Value Area → neuron VP-01; Kelly → IUSTITIA;
-# CVD i FUNDING_EXTREME → wskaźniki; Kalman → exp_kalman; triple_barrier → W-357;
-# DSR/PBO/meta-labeling → koloseum). Wina NIE leżała po stronie modelu: blok świadomości
-# systemu — jedyne miejsce, gdzie pada „NIE proponuj duplikatów, oto istniejące klucze" —
-# był opt-in, a te biegi go nie miały. Zwiad nieznający roju z definicji proponuje to,
-# co rój już posiada (Prawo XVI: redundancja mierzona, nie zgadywana).
-# Koszt zmierzony: 3914 znaków ≈ 978 tokenów na temat, ~$0.005 za 33 tematy na flashu —
-# wobec kosztu produkowania duplikatów i czasu sędziego to zaokrąglenie do zera.
+# U4 jest DOMYŚLNIE WYŁĄCZONE od 2026-07-27 (DECYZJA CEZARA, wachta otwarta po replikacji).
 #
-# 🚨 PODSTAWA DOWODOWA CZĘŚCIOWO OBALONA (2026-07-27, przeliczenie A/B naprawionym przyrządem).
-# Co ZOSTAJE prawdą: zwiad BEZ tego bloku proponuje moduły, które już mamy — 39.3% kandydatów
-# ramienia OFF nazywa pojęcie obecne w kodzie. Diagnoza powyżej stoi.
-# Co OBALONE: teza „U4 obniża duplikaty o 12 pp (p=0.016)". Ten sam zapisany plon (kampania
-# `u4_rdzen`, 64+64) przeliczony detektorem bez ślepych plam daje OFF 88/224 = 39.3% wobec
-# ON 82/200 = 41.0%, czyli +1.7 pp NA NIEKORZYŚĆ ON przy Fisher p=0.766 — RÓŻNICY NIE MA. Stary
-# detektor był ślepy asymetrycznie: 34.7% kandydatów ramienia ON nosiło nazwy
-# WIELKIE_Z_PODKRESLENIEM (bo ten blok pokazuje modelowi NASZE klucze), a wzorce typu
-# `\bvpin\b` nie przekraczają podkreślenia — więc dublet ON-a był niewidzialny z definicji.
-# Szczegóły: INDEX FALSORUM + CODEX (pomiar 2026-07-27). Domyślne ON zostaje do DECYZJI
-# CEZARA (kierunkowa: koszt 1.46× jest pewny, korzyść nieudowodniona) — Architekt nie
-# przełącza tego sam, bo to zmiana wydatku, nie błahostka (Prawo XVIII).
+# HISTORIA W TRZECH KROKACH — zostaje w całości, bo sama zmiana domyślnej wartości bez powodu
+# byłaby cichym cofnięciem rozkazu z 07-21, a rozkaz padł na podstawie, która później upadła:
+#
+# 1) 07-21 → ON. Podstawa: A/B na kampanii `u4_rdzen` (64+64) dał „−12.1 pp duplikatów,
+#    p=0.016". Rozkaz Cezara po sądzie nad kolejką.
+# 2) 07-27 → teza OBALONA. Ten sam zapisany plon przeliczony detektorem BEZ ślepych plam:
+#    OFF 88/224 = 39.3% wobec ON 82/200 = 41.0%, Fisher p=0.766 — różnicy nie ma. Stary
+#    detektor był ślepy ASYMETRYCZNIE: 34.7% kandydatów ramienia ON nosiło nazwy
+#    WIELKIE_Z_PODKRESLENIEM (bo ten blok pokazuje modelowi NASZE klucze, więc podpowiada
+#    konwencję), a wzorce typu `\bvpin\b` nie przekraczają podkreślenia — dublet ON-a był
+#    niewidzialny z definicji. Do tego 4 z 7 formatów nagłówka sklejały plon.
+# 3) 07-27 → REPLIKACJA na 128 świeżych pomiarach (rundy 5-8): świeża −3.1 pp p=0.549;
+#    łącznie 256 biegów −0.7 pp, CI [−7.3, +6.0], p=0.888. MOC na publikowane −12 pp = 94.2%,
+#    więc efekt tej wielkości jest WYKLUCZONY. Przy 5 pp moc to tylko 31% — małego efektu
+#    NIE wykluczamy i nie udajemy, że wykluczyliśmy.
+#
+# DECYZJA (Cezar, 2026-07-27): OFF. Rachunek jest asymetryczny — koszt 1.49× jest ZMIERZONY
+# i pewny, korzyść mieści się w szumie. Płacenie połowy więcej za efekt nieodróżnialny od zera
+# to utrata potencjału w drugą stronę (Prawo XV liczy też wydatek bez zwrotu).
+#
+# CO ZOSTAJE PRAWDĄ mimo OFF (nie kasować tej obserwacji): zwiad BEZ tego bloku proponuje
+# moduły, które JUŻ MAMY — 39.3% kandydatów ramienia OFF nazywa pojęcie obecne w kodzie
+# (VPIN → WSKAZNIK „VPIN_50"; Value Area → VP-01; Kelly → IUSTITIA; CVD/FUNDING_EXTREME →
+# wskaźniki; Kalman → exp_kalman; triple_barrier → W-357; DSR/PBO → koloseum). Zmierzone
+# jest tylko to, że TEN blok tego NIE NAPRAWIA. Anty-redundancję egzekwuje więc SĘDZIA
+# (grep przy wyroku), nie prompt — deklaracja modelu „nie dubluje" padała przy KAŻDYM
+# kandydacie, także przy VPIN (Prawo XVI: redundancja mierzona, nie zgadywana).
+#
+# Wyłącznik zostaje obustronny: `--swiadomosc` włącza z powrotem, A/B wymaga obu ramion.
+# Szczegóły pomiarów: INDEX FALSORUM + CODEX PROBATIONUM (2026-07-27).
 @functools.lru_cache(maxsize=1)
 def _kontekst_systemu() -> str:
     """U4 (świadomość systemu): zwięzły blok o LUKACH (Prawo XV) i ISTNIEJĄCYCH modułach
@@ -227,8 +236,8 @@ def _kontekst_systemu() -> str:
 
 def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
                 korpus: str | None = "biblioteka", rozwin: bool = False,
-                krytyka: bool = False, swiadomosc: bool = True,
-                probator: bool = True) -> dict:
+                krytyka: bool = False, swiadomosc: bool = False,
+                probator: bool = True, nomenclator: bool = False) -> dict:
     """Jeden temat: RAG → DeepSeek proponuje kandydatów. Zwraca dict cząstki (do kolejki).
 
     Zakłada, że indeks RAG ISTNIEJE (bramkuje raport() — Cubic P2). Status cząstki:
@@ -261,6 +270,13 @@ def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
     if probator:  # WARSTWA 1 anty-halucynacyjna: cytat spoza podanych fragmentów (0 tokenów)
         from imperium.pretorianie.probator import do_slownika, sprawdz
         rec["probator"] = do_slownika(sprawdz(rec["kandydaci"], wyniki))
+    if nomenclator:  # WARSTWA 2 anty-redundancyjna: nazwa kandydata vs leksykon roju (0 tokenów)
+        # OPT-IN, DOMYŚLNIE OFF (ZASADA WPIĘCIA — włącza się po zielonym A/B). Organ jest
+        # monotonicznie ostrożny: DOKŁADA adnotację dla sędziego, nie usuwa kandydatów
+        # i nie zmienia niczego, co bez niego trafiłoby do kolejki.
+        from imperium.pretorianie.nomenclator import do_slownika as _nom_slownik
+        from imperium.pretorianie.nomenclator import sprawdz as _nom_sprawdz
+        rec["nomenclator"] = _nom_slownik(_nom_sprawdz(rec["kandydaci"]))
     if krytyka:  # U3: drugie przejście — dowody PRZECIW (osobne retrieval na kontrargumenty)
         kontra = szukaj(_fts_bezpieczne(f"{zapytanie} {_KONTRA_SUFIKS}"),
                         topk=topk, tryb=tryb, cichy=True, korpus=korpus)
@@ -357,7 +373,8 @@ def osadzone_ts() -> frozenset:
 
 
 def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="biblioteka",
-           rozwin=False, krytyka=False, swiadomosc=True, probator=True) -> str:
+           rozwin=False, krytyka=False, swiadomosc=False, probator=True,
+           nomenclator=False) -> str:
     # Cubic P2: bramka indeksu RAG — brak bazy to AWARIA INFRY, nie „pusty wynik". Nie skanujemy
     # i NIC nie zapisujemy do kolejki (inaczej awaria udawałaby ukończony, pusty zwiad).
     from szukaj import DEFAULT_BAZA  # type: ignore[import]
@@ -375,6 +392,7 @@ def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="bi
 
     N = len(tematy)
     podejrzane: list[str] = []      # tematy, w których PROBATOR złapał cytat spoza fragmentów
+    znane_imiona: list[str] = []    # tematy, w których NOMENCLATOR rozpoznał imię z leksykonu roju
     linie = [f"📚 HYGINUS (Bibliotekarz-Zwiadowca) — {N} tematów, {'DRY-RUN' if dry_run else 'DeepSeek'} "
              f"(⚠️ KANDYDACI — prawdą po arenie)"]
     for i, temat in enumerate(tematy, 1):
@@ -388,7 +406,7 @@ def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="bi
         try:
             czastka = scout_temat(glos, temat, topk=topk, tryb=tryb, korpus=korpus,
                                   rozwin=rozwin, krytyka=krytyka, swiadomosc=swiadomosc,
-                                  probator=probator)
+                                  probator=probator, nomenclator=nomenclator)
         except Exception as e:  # noqa: BLE001
             print(f"[{i}/{N}] ⚠️ „{temat}”: {e}", file=sys.stderr, flush=True)
             continue
@@ -408,7 +426,23 @@ def raport(tematy, topk=6, tryb="hybrid", dry_run=False, force=False, korpus="bi
                 print(f"[{i}/{N}] [{etykieta}] {pro['opis']}", file=sys.stderr, flush=True)
                 podejrzane.append(f"{temat} [{etykieta}] → {pro['opis']}")
             linie.append(f"[{etykieta}] {pro['opis']}")
+        # NOMENCLATOR mówi tylko GŁOSEM POZYTYWNYM (patrz docstring organu): milczenie znaczy
+        # „żadna nazwa nie trafiła w 32 pojęcia leksykonu", co jest słabym dowodem nowości.
+        # Dlatego raportujemy trafienia, a nie „czystość" — inaczej powtórzylibyśmy dokładnie
+        # tę bezwartościową deklarację „nie dubluje", którą zmierzyliśmy przy U4.
+        nom = czastka.get("nomenclator") or {}
+        if nom.get("podejrzanych"):
+            opis = (f"{nom['podejrzanych']}/{nom['kandydatow']} nosi znane imię: "
+                    f"{', '.join(nom['pojecia'])}")
+            print(f"[{i}/{N}] [nomenclator] {opis}", file=sys.stderr, flush=True)
+            znane_imiona.append(f"{temat} → {opis}")
+            linie.append(f"[nomenclator] {opis}")
 
+    if znane_imiona:
+        linie.append(f"\n🏷️ NOMENCLATOR — {len(znane_imiona)}/{N} tematów z kandydatem, którego "
+                     f"NAZWA trafia w pojęcie żywe w kodzie (sprawdź grepem przed przyjęciem; "
+                     f"trafienie ≠ wyrok — to samo słowo bywa innym pojęciem):")
+        linie.extend(f"   • {x}" for x in znane_imiona)
     if podejrzane:
         linie.append(f"\n🚨 PROBATOR — {len(podejrzane)}/{N} tematów z cytatem spoza podanych "
                      f"fragmentów (halucynacja citation; sędzia niech czyta je najostrożniej):")
@@ -451,16 +485,20 @@ if __name__ == "__main__":
     p.add_argument("--krytyka", action="store_true",
                    help="U3: self-critique — drugie przejście szuka DOWODÓW PRZECIW kandydatom (+1 RAG +1 call/temat)")
     p.add_argument("--swiadomosc", action="store_true",
-                   help="(bez efektu — U4 jest domyślnie WŁĄCZONE od 2026-07-21; flaga zostawiona, "
-                        "żeby stare polecenia i skrypty nie padały)")
+                   help="włącz U4 (świadomość systemu: istniejące klucze + luki Prawa XV). "
+                        "DOMYŚLNIE OFF od 2026-07-27 — replikacja na 256 biegach dała −0.7 pp "
+                        "CI [−7.3,+6.0] p=0.888 przy zmierzonym koszcie 1.49×")
     p.add_argument("--bez-swiadomosci", action="store_true",
-                   help="wyłącz U4 (świadomość systemu: istniejące klucze + luki Prawa XV). "
-                        "UWAGA: bez tego bloku zwiad proponuje moduły, które JUŻ MAMY — zmierzone "
-                        "na 33 cząstkach, gdzie VPIN/Value Area/Kelly/CVD/Kalman już istniały")
+                   help="(bez efektu — U4 jest domyślnie WYŁĄCZONE od 2026-07-27; flaga zostawiona, "
+                        "żeby stare polecenia i skrypty nie padały)")
     p.add_argument("--pelny", action="store_true",
-                   help="komplet U2+U3: --rozwin --krytyka naraz (U4 i tak domyślnie ON)")
+                   help="komplet U2+U3: --rozwin --krytyka naraz (U4 zostaje OFF — włącz --swiadomosc)")
     p.add_argument("--bez-probatora", action="store_true",
                    help="wyłącz PROBATORA (strażnik cytatów, 0 tokenów) — domyślnie WŁĄCZONY")
+    p.add_argument("--nomenclator", action="store_true",
+                   help="włącz NOMENCLATORA (strażnik imion, 0 tokenów): oznacza kandydatów, "
+                        "których NAZWA trafia w pojęcie żywe w kodzie. OPT-IN, domyślnie OFF "
+                        "do czasu zielonego A/B (ZASADA WPIĘCIA)")
     p.add_argument("--dry-run", action="store_true", help="tylko RAG, bez DeepSeek (bez kosztu API)")
     p.add_argument("--force", action="store_true", help="przeskanuj też tematy już w kolejce")
     args = p.parse_args()
@@ -469,7 +507,11 @@ if __name__ == "__main__":
     korpus = None if args.korpus == "wszystko" else args.korpus  # 'wszystko' → bez filtra (dawne zachowanie)
     rozwin = args.rozwin or args.pelny
     krytyka = args.krytyka or args.pelny
-    swiadomosc = not args.bez_swiadomosci        # domyślnie ON — patrz komentarz przy _kontekst_systemu
+    # Domyślnie OFF (decyzja Cezara 07-27) — patrz komentarz przy _kontekst_systemu.
+    # `--bez-swiadomosci` celowo NIE ma już mocy wyłączania: jest zgodnością wsteczną, a nie
+    # przełącznikiem, więc stare polecenie z tą flagą daje dokładnie to, o co prosiło (brak U4).
+    swiadomosc = args.swiadomosc and not args.bez_swiadomosci
     print(raport(tematy, topk=args.topk, tryb=args.tryb, dry_run=args.dry_run,
                  force=args.force, korpus=korpus, rozwin=rozwin, krytyka=krytyka,
-                 swiadomosc=swiadomosc, probator=not args.bez_probatora))
+                 swiadomosc=swiadomosc, probator=not args.bez_probatora,
+                 nomenclator=args.nomenclator))

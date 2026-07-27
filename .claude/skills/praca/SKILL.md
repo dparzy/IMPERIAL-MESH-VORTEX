@@ -1,6 +1,6 @@
 ---
 name: praca
-description: ZASADY PRACY — pętla CENSORA (wykryj→załataj→uodporij→zapisz), weryfikacja przed wdrożeniem, MELIORATIO, analiza cząstkowa z paskiem postępu i zasady raportowania. Użyj przy planowaniu zadania, po wykryciu luki i przy raportowaniu wyników.
+description: ZASADY PRACY — pętla CENSORA (wykryj→załataj→uodpornij→zapisz), weryfikacja przed wdrożeniem, MELIORATIO, analiza cząstkowa z paskiem postępu i zasady raportowania. Użyj przy planowaniu zadania, po wykryciu luki i przy raportowaniu wyników.
 ---
 
 > 🏛️ **Rozkazy stałe Imperium przeniesione z CLAUDE.md** (odchudzanie konstytucji,

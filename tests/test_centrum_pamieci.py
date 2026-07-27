@@ -585,6 +585,42 @@ def test_rejestr_wizji_dedup_pomija_duplikat(tmp_path):
     assert len(rw.wszystkie(plik=plik)) == 1
 
 
+def test_rejestr_wizji_pominiecie_semantyczne_jest_WIDOCZNE(tmp_path):
+    """Wpis ODWRACAJĄCY poprzedni nie może zniknąć po cichu (cubic PR #134, P1).
+
+    `czy_duplikaty` we własnym docstringu przyznaje, że widzi IDENTYFIKATORY, nie KIERUNEK
+    wniosku, i wskazuje łagodzenie: logowanie każdego pominięcia. `auto_lekcja` je ma,
+    rejestr wizji zaimportował predykat BEZ niego — więc decyzja odwracająca wcześniejszą
+    przepadała, a `False` czytało się jak „duplikat, nic się nie stało".
+
+    Przypadek wzięty WPROST z docstringu predykatu — ten, który sam deklaruje jako kolidujący.
+    Testujemy WIDOCZNOŚĆ, nie dopisanie: sito 2 zostaje (pomiar na żywym rejestrze 820 wpisów
+    pokazał, że łapie ~250 realnych parafraz), więc lekarstwem jest jawność, nie usunięcie.
+    """
+    import contextlib
+    import io
+
+    from imperium.biblioteki import rejestr_wizji as rw
+    plik = tmp_path / "w.jsonl"
+    assert rw.dodaj("DECYZJA", "ATR_MULT w EXP-07 za niski",
+                    "Parametr ATR_MULT w strategii EXP-07 jest za niski, podnies.",
+                    plik=plik) is True
+    # Przechwytujemy stderr RĘCZNIE, nie fixture'em `capsys`: runner Imperium
+    # (tests/run_tests.py) jest bezzależnościowy i zna tylko `tmp_path`, więc test
+    # z `capsys` przechodzi pod pytestem, a pod bramką pada na brakującym argumencie.
+    # Test ma bronić w OBU biegach — inaczej broni tylko tam, gdzie i tak patrzę.
+    bufor = io.StringIO()
+    with contextlib.redirect_stderr(bufor):   # mierzymy TYLKO drugi zapis
+        odwrotna = rw.dodaj("DECYZJA", "ATR_MULT w EXP-07 za wysoki",
+                            "Parametr ATR_MULT w strategii EXP-07 jest za wysoki, obniz.",
+                            plik=plik)
+    komunikat = bufor.getvalue()
+    assert odwrotna is False, "test stracił sens — predykat przestał uznawać to za duplikat"
+    assert "POMINIĘTY" in komunikat, "pominięcie nadal jest CICHE"
+    assert "ATR_MULT w EXP-07 za wysoki" in komunikat, "nie widać, CO pominięto"
+    assert "ATR_MULT w EXP-07 za niski" in komunikat, "nie widać, CO to zablokowało"
+
+
 def test_rejestr_wizji_dedup_rozne_typy_ok(tmp_path):
     """Ten sam tytuł ale różny typ → nie duplikat (dopisywane oba)."""
     from imperium.biblioteki import rejestr_wizji as rw

@@ -123,7 +123,7 @@ Test zasięgu miał asercję 'zbadane >= 8+40', co przepuściło zawężenie z 7
 Obecność jednego obcego katalogu projektu Claude powoduje, że aerarium raportuje jego pamięć i koszty jako własne, zamiast zwrócić no match. Należy filtrować, aby uniknąć fałszywych danych.
 
 ### 2026-07-26 — Kronika sesji – zakaz bezwzględnych ścieżek z nazwą użytkownika
-Linie z absolutnymi ścieżkami desktopu (C:\Users\Ian\Desktop\) ujawniają PII i strukturę katalogów. Używać zmiennych środowiskowych lub przechowywać referencje wewnątrz repozytorium dla przenośności.
+Linie z absolutnymi ścieżkami desktopu (~\Desktop\) ujawniają PII i strukturę katalogów. Używać zmiennych środowiskowych lub przechowywać referencje wewnątrz repozytorium dla przenośności.
 
 ### 2026-07-26 — Regime-stale bug: pamięć branżowa ślepa na reżim rynku
 Wszystkie istniejące systemy pamięci (Mem0/Zep/Letta/A-Mem) są domenowo-ślepe – wydobywają lekcje z bull marketu podczas bessy. Nasza poprawka: × regime_match w scoringu.

@@ -19,13 +19,22 @@ Test zasięgu miał asercję 'zbadane ≥ 8+40' zamiast 'równość z policzonym
 Medium tracks w pierwszej lidze datasetu ZENITH mają średnio 10K linii, co znacznie przekracza limit 2K. Obniża to jakość danych treningowych i wymaga kryteriów kwalifikacji.
 
 ### 2026-07-26 — Commitowanie desktop paths łamie przenośność i PII
-W kronice znaleziono bezwzględne ścieżki typu C:\Users\Ian\Desktop. Należy używać zmiennych środowiskowych lub przechowywać referencje wewnątrz repozytorium. To narusza bezpieczeństwo i przenośność.
+W kronice znaleziono bezwzględne ścieżki typu ~\Desktop. Należy używać zmiennych środowiskowych lub przechowywać referencje wewnątrz repozytorium. To narusza bezpieczeństwo i przenośność.
 
 ### 2026-07-26 — Bezpośrednia edycja sigillum_probationis.json narusza zasadę
 Plik sigillum_probationis.json jest magazynem (ledger) i musi być aktualizowany wyłącznie przez narzędzia sigillarium lub codex_probationum.py. Ręczna edycja jest złamaniem reguły CLAUDE.md i README.md.
 
-### 2026-07-26 — cubic-dev-ai trafny w 22/22, ale 3 fałszywe alarmy
-cubic-dev-ai w PR #133 zgłosił 22 zastrzeżenia. Wszystkie autentyczne błędy zostały potwierdzone, ale 3 uwagi (fake sigillum, nadużycie integracji, auth_hook) okazały się fałszywe. Wymaga weryfikacji przed działaniem.
+### 2026-07-26 — cubic-dev-ai trafny w 20/22, 2 fałszywe alarmy (w tym jedyne P1)
+cubic-dev-ai w PR #133 zgłosił 22 zastrzeżenia: **20 słusznych, 2 fałszywe**. Fałszywe to
+(1) jedyne **P1** — halucynacja cytująca dwie NIEISTNIEJĄCE reguły o zakazie edycji
+`sigillum_probationis.json`; (2) „wrzutnia/consilium nie istnieje" — istnieje, jest
+gitignorowany, recenzent pomylił NIEWIDOCZNE z NIEISTNIEJĄCYM. Lekcja: cytat z reguły
+sprawdzaj `grep`em, zanim uznasz zarzut.
+
+*Korekta 2026-07-27:* wpis głosił „trafny w 22/22, ale 3 fałszywe alarmy" — liczba przeczyła
+sama sobie, licznik fałszywek był zawyżony, a ich nazwy zmyślone. Poprawione wobec ŹRÓDŁA
+(Dziennik Nieśmiertelny, wpis `cubic133` pisany w chwili pomiaru). Zgłoszone przez cubic
+w PR #134 jako P3 — recenzent miał rację, choć o skali pomylił się w drugą stronę.
 
 ### 2026-07-26 — Audyt spójności ukrywa czerwony wynik (stderr zamiast stdout)
 W narzedziu audyt_spojnosci.py alarmy sa wypisywane na stderr (linie 1160-1163), podczas gdy hook zbiera tylko stdout. W efekcie czerwony audyt jest niewidoczny w wydruku startowym - sesja wyglada ciszej niz zdrowa. To odwrocona wersja wady klasy 'milczenie udajace wynik' z apert26.

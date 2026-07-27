@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-26
+## Ostatnia aktualizacja: 2026-07-27
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,32 +113,23 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Bieg testów #1 nieważny – równoległość z mutacjami
+Testy startowały przed zmianą W22 i biegły w tle podczas sed-owania mutacji. Wynik '55 z 73' i exit 0 od tail, nie od testów. Ważny tylko bieg #2 wystartowany po wszystkich zapisach.
+
+### 2026-07-27 — Mutacja przeżyła przez luźny próg asercji
+Test zasięgu miał asercję 'zbadane >= 8+40', co przepuściło zawężenie z 73 do 65 dokumentów. Wymieniono na równość z liczbą policzoną ze źródła. Obie klasy do Księgi Wad. Nota nie wystawiona (błąd nie dostarczony).
+
 ### 2026-07-26 — Aerarium – filtrować obce projekty Claude
 Obecność jednego obcego katalogu projektu Claude powoduje, że aerarium raportuje jego pamięć i koszty jako własne, zamiast zwrócić no match. Należy filtrować, aby uniknąć fałszywych danych.
 
 ### 2026-07-26 — Kronika sesji – zakaz bezwzględnych ścieżek z nazwą użytkownika
 Linie z absolutnymi ścieżkami desktopu (C:\Users\Ian\Desktop\) ujawniają PII i strukturę katalogów. Używać zmiennych środowiskowych lub przechowywać referencje wewnątrz repozytorium dla przenośności.
 
-### 2026-07-26 — Średnie śledzie w 1L za długie
-Medium tracks w pierwszej lidze datasetu ZENITH mają średnio 10K linii, co znacznie przekracza limit 2K. Obniża to jakość danych treningowych i wymaga kryteriów kwalifikacji.
-
-### 2026-07-26 — Commitowanie desktop paths łamie przenośność i PII
-W kronice znaleziono bezwzględne ścieżki typu C:\Users\Ian\Desktop. Należy używać zmiennych środowiskowych lub przechowywać referencje wewnątrz repozytorium. To narusza bezpieczeństwo i przenośność.
-
-### 2026-07-26 — Bezpośrednia edycja sigillum_probationis.json narusza zasadę
-Plik sigillum_probationis.json jest magazynem (ledger) i musi być aktualizowany wyłącznie przez narzędzia sigillarium lub codex_probationum.py. Ręczna edycja jest złamaniem reguły CLAUDE.md i README.md.
-
-### 2026-07-26 — cubic-dev-ai trafny w 22/22, ale 3 fałszywe alarmy
-cubic-dev-ai w PR #133 zgłosił 22 zastrzeżenia. Wszystkie autentyczne błędy zostały potwierdzone, ale 3 uwagi (fake sigillum, nadużycie integracji, auth_hook) okazały się fałszywe. Wymaga weryfikacji przed działaniem.
-
 ### 2026-07-26 — Regime-stale bug: pamięć branżowa ślepa na reżim rynku
 Wszystkie istniejące systemy pamięci (Mem0/Zep/Letta/A-Mem) są domenowo-ślepe – wydobywają lekcje z bull marketu podczas bessy. Nasza poprawka: × regime_match w scoringu.
 
 ### 2026-07-26 — Rozjazd repo z chmurą przez hooki po obu stronach
 Od wspólnego punktu e2cb846 chmura dorobiła 2 commity (sync+migawka), lokalnie 2 (auto: sync pamięci). Hooki commitują same po obu stronach – dwa ciągi wyrosły z tego samego pnia.
-
-### 2026-07-26 — Audyt spójności ukrywa czerwony wynik (stderr zamiast stdout)
-W narzedziu audyt_spojnosci.py alarmy sa wypisywane na stderr (linie 1160-1163), podczas gdy hook zbiera tylko stdout. W efekcie czerwony audyt jest niewidoczny w wydruku startowym - sesja wyglada ciszej niz zdrowa. To odwrocona wersja wady klasy 'milczenie udajace wynik' z apert26.
 
 ### 2026-07-20 — 20 sprzeczności w Refleksji, 3 pilne
 Audyt startowy wykrył 20 sprzeczności, w tym 3 pilne: audytu/nowy, chmura/lokal/naprawa, false/faza – wymagają przeglądu.
@@ -154,9 +145,6 @@ Audyt startowy wykazał 3 dopisane linie przez automat w pliku bibliotheca_ulpia
 
 ### 2026-07-20 — MoE niewykonalne na 6GB VRAM
 Mixture of Experts wymaga trzymania wszystkich ekspertów w pamięci jednocześnie. 4 eksperty po 7B wymagają ~28B RAM – na RTX 4050 (6GB) to niemożliwe.
-
-### 2026-07-22 — tail w rurze testów fałszuje kod wyjścia
-Komenda `python tests/run_tests.py | tail` zwraca kod wyjścia `tail`, nie testów – maskuje oblane testy (exit 0 mimo 1 porażki). Należy unikać `tail` w rurze lub używać oddzielnej obsługi.
 
 ### 2026-07-20 — Błąd cache/resume kluczowany tylko nazwą pliku w harnessach A/B
 Harnessy A/B (ab_tryb_strategii, ab_strategy_mwu, ab_wazenie_ic, ab_pnl_wazenie_ic) używają tylko nazwy pliku jako klucza cache, ignorując parametry konfiguracji.
@@ -178,9 +166,6 @@ Pliki bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl oraz docs/PAMIEC_SESJI.md są
 
 ### 2026-07-20 — 22 neurony czekają na adaptery/dane (Prawo XV)
 Rodziny NEWS-*, PSY-*, RADAR-*, OC-06/07/08, C-01, V-03, Z-06/Z-07 nie mają jeszcze feedów i abstynują świadomie zgodnie z Prawem XV. To znany, udokumentowany stan, a nie regresja.
-
-### 2026-07-20 — Audyt spójności pełna harmonia
-84 neurony, 15 zwiadowców, 18 elit, ruff czysto, MAPA_KLUCZY pełna – system w pełni harmonijny.
 
 ### 2026-07-21 — Archium lekcji ma inny nagłówek – szukaj() nie widzi schłodzonych
 Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł szukaj() używa własnego parsera, który go nie rozpoznaje. Luka w wyszukiwalności pamięci – wymaga ujednolicenia parsera lub wzbogacenia searcha.
@@ -397,7 +382,6 @@ Neurony z DOSTEPNY=False zawsze zwracały NEUTRAL, maskując brak integracji. Wy
 
 ### 2026-06-30 — Prawo I: Zero halucynacji matematycznych
 AI nigdy nie oblicza matematyki. Kod (TA-Lib, C) oblicza RSI/EMA/ATR → JSON 'answer key' → AI tylko interpretuje. Brama Kalkulatora nie uruchomi się bez TA-Lib.
-
 
 ## 🔄 STAN BIEŻĄCY (liczby wstrzykiwane z kodu — W15, nie zamarzają)
 

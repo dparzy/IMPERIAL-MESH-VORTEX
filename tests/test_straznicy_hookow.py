@@ -79,6 +79,20 @@ def test_slowo_push_w_argumencie_NIE_jest_pushem():
     assert _cmd("echo git push") is None
 
 
+def test_PROZA_cytujaca_push_po_separatorze_nie_jest_rozkazem():
+    """WADA ZŁAPANA NA ŻYWO przy pierwszym zadziałaniu strażnika (2026-07-28).
+
+    Wpis do Dziennika CYTOWAŁ obaloną tezę („deny nie złapie `cd x && git push`") w treści
+    argumentu. Pierwsza wersja cięła surowy napis po separatorach PRZED uwzględnieniem
+    cudzysłowów, więc proza stawała się „podpoleceniem" — strażnik zablokował opis własnej
+    naprawy. Fałszywe zatrzymanie nie jest bezpieczną stroną błędu: uczy obchodzić strażnika.
+    """
+    assert _cmd("python -m dziennik wpis --co 'teza: cd x && git push nie zadziala'") is None
+    assert _cmd('echo "przyklad: git status && git push origin main"') is None
+    # GRANICA DRUGIEJ STRONY: prawdziwy `&&` POZA cudzysłowem nadal musi być widziany.
+    assert _cmd("cd /repo && git push origin main"), "zawężenie zabiło prawdziwe wykrycie"
+
+
 def test_niepowloke_narzedzia_ignorowane():
     assert cl.ocen("Read", {"file_path": "x.py"}) is None
 

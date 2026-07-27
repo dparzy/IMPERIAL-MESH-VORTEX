@@ -48,6 +48,7 @@ from __future__ import annotations
 
 import json
 import re
+import shlex
 import sys
 from typing import Any, Dict, Optional
 
@@ -65,7 +66,38 @@ NARZEDZIA_ZAPISU = ("Write", "Edit", "NotebookEdit", "MultiEdit")
 
 
 def _podpolecenia(cmd: str):
-    return [c.strip() for c in _SEPARATORY.split(cmd or "") if c.strip()]
+    """Polecenie → lista podpoleceń, każde jako lista TOKENÓW.
+
+    NAJPIERW TOKENIZUJEMY, POTEM DZIELIMY — i to jest naprawa realnej wady, nie estetyka
+    (2026-07-28, pierwsze zadziałanie strażnika na żywo). Pierwsza wersja cięła surowy napis
+    po separatorach, więc PROZA zawierająca `&&` i `git push` stawała się „podpoleceniem".
+    Ofiarą padł wpis do Dziennika Nieśmiertelnego, który CYTOWAŁ obaloną tezę
+    („deny nie złapie `cd x && git push`") — strażnik zablokował opis własnej naprawy.
+
+    Fałszywe zatrzymanie nie jest bezpieczną stroną błędu: uczy operatora obchodzić strażnika,
+    a strażnik obchodzony nie broni już niczego. Treść w cudzysłowie jest DANYMI, nie składnią —
+    tokeny zaczynające się cudzysłowem nie są dzielone. Tokeny bez cudzysłowu wolno ciąć, bo
+    `a&&b` bez spacji też jest poprawną powłoką.
+    """
+    try:
+        tokeny = shlex.split(cmd or "", posix=False)
+    except ValueError:
+        tokeny = (cmd or "").split()
+    grupy: list = []
+    biezaca: list = []
+    for t in tokeny:
+        if t[:1] in ("'", '"'):
+            biezaca.append(t.strip("'\""))     # cudzysłów = treść, nigdy separator
+            continue
+        czesci = _SEPARATORY.split(t)
+        for i, cz in enumerate(czesci):
+            if i:
+                grupy.append(biezaca)
+                biezaca = []
+            if cz:
+                biezaca.append(cz)
+    grupy.append(biezaca)
+    return [g for g in grupy if g]
 
 
 def _tokeny(fragment: str):
@@ -79,7 +111,6 @@ def _tokeny(fragment: str):
     ucieczki i zjadłby separatory ścieżek Windows. Gdy i to zawiedzie (niedomknięty cudzysłów),
     wracamy do `split()` — strażnik ma wtedy widzieć MNIEJ, ale nigdy nie wywalić się z wyjątkiem.
     """
-    import shlex
     try:
         surowe = shlex.split(fragment, posix=False)
     except ValueError:
@@ -135,8 +166,8 @@ def ocen(tool_name: str, tool_input: Dict[str, Any]) -> Optional[Dict[str, str]]
     """
     if tool_name in NARZEDZIA_POWLOKI:
         cmd = tool_input.get("command") or ""
-        for pod in _podpolecenia(cmd):
-            if _polecenie_gita(_tokeny(pod)) == "push":
+        for tokeny in _podpolecenia(cmd):
+            if _polecenie_gita(tokeny) == "push":
                 return {
                     "permissionDecision": "deny",
                     "permissionDecisionReason": (

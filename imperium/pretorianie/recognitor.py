@@ -112,7 +112,8 @@ def _interesujacy(login: str) -> bool:
 # ── RDZEŃ — czysty, bez sieci, w pełni testowalny ────────────────────────────────
 
 def ocen_pokrycie(*, head: str, recenzje: list, commity_po, stan_pr: str,
-                  pr_numer=None, gh_ok: bool = True, powod_bledu: str = "") -> dict:
+                  pr_numer=None, gh_ok: bool = True, powod_bledu: str = "",
+                  head_pr: str = "") -> dict:
     """Werdykt: czy ostatnia recenzja pokrywa HEAD gałęzi.
 
     Argumenty są DANYMI, nie źródłami — dzięki temu każdy stan (luka, merge, force-push,
@@ -154,14 +155,26 @@ def ocen_pokrycie(*, head: str, recenzje: list, commity_po, stan_pr: str,
                 "opis": f"Recenzowany commit {recenzowany[:7]} nie istnieje w tym repo "
                         "(force-push albo niepobrana gałąź) — pokrycia NIE DA SIĘ policzyć."}
 
+    # „ZMERGOWANY" NIE ZNACZY JESZCZE „NIEODWRACALNY" (naprawa 2026-07-28, wykryta przez UŻYCIE
+    # tego organu w checkliście domknięcia — pierwszy dzień jego życia). Pierwsza wersja pisała
+    # przy każdym zmergowanym PR: „nowy PR z tej gałęzi pokaże zero różnicy". To prawda TYLKO
+    # dopóki HEAD stoi na commicie, który wszedł do mergu. Gdy gałąź poszła dalej, nowe commity
+    # da się objąć NOWYM PR-em — a mój werdykt odradzał wtedy jedyną skuteczną drogę. Strażnik
+    # mówiący „nie da się" tam, gdzie się da, jest gorszy od milczenia: zniechęca do naprawy.
     zmergowany = (stan_pr or "").upper() == "MERGED"
+    poza_mergem = bool(head_pr) and head != head_pr
+    nieodwracalna = zmergowany and not poza_mergem
     baza.update({"ile_po": len(commity_po), "commity_po": commity_po,
-                 "naprawialne": not zmergowany})
-    ogon = ("PR jest ZMERGOWANY — luka NIEODWRACALNA: nowy PR z tej gałęzi pokaże zero różnicy. "
-            "Jedyna droga to własna recenzja adversarialna tego zakresu."
-            if zmergowany else
-            "PR otwarty — po pushu recenzent zobaczy te commity.")
-    return {**baza, "status": "luka_zamknieta" if zmergowany else "luka_otwarta",
+                 "naprawialne": not nieodwracalna})
+    if nieodwracalna:
+        ogon = ("PR ZMERGOWANY, a gałąź stoi na commicie mergu — luka NIEODWRACALNA: nowy PR "
+                "pokaże zero różnicy. Jedyna droga to własna recenzja adversarialna tego zakresu.")
+    elif zmergowany:
+        ogon = ("PR zmergowany, ale gałąź poszła DALEJ — te commity obejmie NOWY PR "
+                "(po pushu Cezara). Commity sprzed mergu pozostają nieodwracalnie nieprzejrzane.")
+    else:
+        ogon = "PR otwarty — po pushu recenzent zobaczy te commity."
+    return {**baza, "status": "luka_zamknieta" if nieodwracalna else "luka_otwarta",
             "ikona": "🚨", "exit": 1,
             "opis": f"LUKA: recenzja stoi na {recenzowany[:7]}, a HEAD to {head[:7]} — "
                     f"{len(commity_po)} commit(ów) NIKT nie zrecenzował. {ogon}"}
@@ -198,8 +211,8 @@ def zbadaj(galaz: str = "") -> dict:
                 for r in surowe]
     istotne = [r for r in recenzje if _interesujacy(r["recenzent"])]
     po = _commity_po(max(istotne, key=lambda r: r["kiedy"])["commit"]) if istotne else []
-    return ocen_pokrycie(head=head, recenzje=recenzje, commity_po=po,
-                         stan_pr=stan, pr_numer=numer)
+    return ocen_pokrycie(head=head, recenzje=recenzje, commity_po=po, stan_pr=stan,
+                         pr_numer=numer, head_pr=pr[0].get("headRefOid") or "")
 
 
 def banner(w=None) -> str:

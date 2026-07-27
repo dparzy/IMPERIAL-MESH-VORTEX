@@ -14,6 +14,23 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-28 | 🔎 | RECOGNITOR poprawiony przez WŁASNE użycie: „zmergowany" ≠ „nieodwracalny"
+
+**Organ znalazł wadę w sobie pierwszego dnia życia — przy pierwszym przebiegu checklisty
+domknięcia, do której go wpiąłem.** Werdykt brzmiał: *„PR jest ZMERGOWANY — luka NIEODWRACALNA:
+nowy PR z tej gałęzi pokaże zero różnicy"*. To prawda **tylko** dopóki HEAD stoi na commicie,
+który wszedł do mergu. Gałąź poszła tymczasem o 5 commitów dalej, więc nowe commity **obejmie
+nowy PR** — a organ odradzał wtedy jedyną skuteczną drogę.
+
+**Strażnik mówiący „nie da się" tam, gdzie się da, jest gorszy od milczenia: zniechęca do
+naprawy.** Rozróżnienie jest teraz jawne — luka nieodwracalna (HEAD == head zmergowanego PR)
+kontra luka naprawialna nowym PR-em (gałąź poszła dalej). Obie strony granicy trzymają testy,
+bo zawężanie na oślep skasowałoby prawdziwe ostrzeżenie z PR #134.
+
+**Pliki:** `imperium/pretorianie/recognitor.py`, `tests/test_recognitor.py` (13 testów).
+
+---
+
 ## 2026-07-28 | 📕 | Dziennik przestał wstrzykiwać obalone twierdzenia jako fakty
 
 > *Wachta rozpoczęta 2026-07-27 przeszła przez północ — znalezisko i pomiary pochodzą z 07-27,

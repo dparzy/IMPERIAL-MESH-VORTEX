@@ -43,6 +43,30 @@ def test_luka_zamknieta_odtwarza_przypadek_PR_134():
     assert w["recenzowany"] == BFB
 
 
+def test_zmergowany_PR_ale_galaz_poszla_dalej_JEST_naprawialna():
+    """Wada znaleziona przez UŻYCIE organu w domknięciu, pierwszego dnia jego życia.
+
+    Werdykt „nowy PR pokaże zero różnicy" jest prawdziwy TYLKO gdy HEAD stoi na commicie,
+    który wszedł do mergu. Gdy gałąź poszła dalej, nowe commity obejmie NOWY PR — a organ
+    odradzał wtedy jedyną skuteczną drogę. Strażnik mówiący „nie da się" tam, gdzie się da,
+    zniechęca do naprawy, więc jest gorszy od milczenia."""
+    w = rec.ocen_pokrycie(head="9999999", recenzje=CUBIC, stan_pr="MERGED", pr_numer=134,
+                          head_pr=OB8, commity_po=["9999999 nowa praca po mergu"])
+    assert w["status"] == "luka_otwarta"
+    assert w["naprawialne"] is True
+    assert "NOWY PR" in w["opis"]
+
+
+def test_zmergowany_PR_na_commicie_mergu_JEST_nieodwracalny():
+    """GRANICA DRUGIEJ STRONY: gdy HEAD == head PR-a, luka naprawdę jest nie do odrobienia —
+    zawężanie na oślep skasowałoby prawdziwe ostrzeżenie z PR #134."""
+    w = rec.ocen_pokrycie(head=OB8, recenzje=CUBIC, stan_pr="MERGED", pr_numer=134,
+                          head_pr=OB8, commity_po=["0b85b81 domkniecie", "bc4913c organ"])
+    assert w["status"] == "luka_zamknieta"
+    assert w["naprawialne"] is False
+    assert "NIEODWRACALNA" in w["opis"]
+
+
 def test_luka_otwarta_jest_naprawialna_pushem():
     w = rec.ocen_pokrycie(head=OB8, recenzje=CUBIC, stan_pr="OPEN", pr_numer=134,
                           commity_po=["bc4913c NOMENCLATOR"])

@@ -442,7 +442,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 202 | Angeris, Chitra | *Improved Price Oracles: Constant Function Market Makers* ✅ | **Matematyka AMM** |
 | 203 | Angeris i in. | *An Analysis of Uniswap Markets* ✅ | |
 | 204 | Qin, Zhou, Gervais | *Quantifying Blockchain Extractable Value* ✅ | MEV mierzalnie |
-| 205 | Buterin i in. | *Ethereum Yellow Paper* (Wood) ✅ | Specyfikacja EVM |
+| 205 | Wood | *Ethereum: A Secure Decentralised Generalised Transaction Ledger* — **Yellow Paper** ✅ | ✏️ **AUTOR POPRAWIONY 2026-07-28** (pytanie Cezara o duplikaty): było „Buterin i in.", a Yellow Paper napisał **Gavin Wood** — Buterin jest autorem *Whitepapera* (BIB-076), to **dwa różne dokumenty**: koncepcja vs formalna specyfikacja EVM. Nie duplikat, ale błędna atrybucja |
 | 206 | Di Maggio | *Blockchain, Crypto and DeFi* ⚠️ | |
 | 207 | Schär | *Decentralized Finance: On Blockchain- and Smart Contract-Based Financial Markets* ✅ | St. Louis Fed |
 | 208 | Makarov, Schoar | *Trading and Arbitrage in Cryptocurrency Markets* ✅ | **Arbitraż krypto empirycznie** |

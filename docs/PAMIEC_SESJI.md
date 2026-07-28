@@ -113,6 +113,12 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — prekalkuluj_portfel nie poprawia złożoności algorytmicznej
+prekalkuluj_portfel robi tę samą pracę per-bar (zbuduj na oknie), tylko równolegle per-symbol. Mimo cache daje zysk marne 1.4×, nie zmienia O(n·okno).
+
+### 2026-07-27 — Prawdziwy sprawca kwadratu: _py_hma (pętla w pętli wma)
+Wewnętrzna pętla w _py_hma wywołuje wma wielokrotnie (4,5 mln wywołań na 2700 ticków), dając O(period²) dla tego jednego wskaźnika. Reszta backtestu jest liniowa.
+
 ### 2026-07-27 — Ograniczenia skanera lokalnego (14.5% pokrycia)
 Łowca wad ma tylko 16 regexów na 115 klas (14.5%). Wynik 'czysto' na 5 plikach oznacza brak trafień w tych wzorcach, a nie brak wad w kodzie – narzędzie wymaga rozbudowy.
 

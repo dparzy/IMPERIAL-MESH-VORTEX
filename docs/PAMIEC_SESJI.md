@@ -113,6 +113,12 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Calibre nie czyta djvu
+Calibre (ebook-convert) historycznie nie obsługuje djvu jako formatu wejściowego. Nawet po instalacji calibre potrzebny będzie osobny djvutxt.exe z djvulibre.
+
+### 2026-07-27 — Brak narzędzi do konwersji djvu
+Skrypt konwertera wymaga djvutxt (djvulibre) lub ebook-convert (calibre) dla formatu djvu. W systemie nie ma żadnego z nich – twardy blocker dla konwersji 5 ksiąg (Kissell, Aronson, Shreve I/II, Sutton-Barto).
+
 ### 2026-07-27 — Hooki ograniczone wyłącznie do SessionStart i SessionEnd
 Zweryfikowano, że nie istnieją hooki PreToolUse/PostToolUse, co eliminuje ryzyko dublowania rozkazów. Settings.json niesie tylko wskazane hooki.
 

@@ -421,7 +421,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | BIB | Autor | Tytuł | Uwagi |
 |---|---|---|---|
 | 188 | von Neumann, Morgenstern | *Theory of Games and Economic Behavior* ✅ | **Kanon absolutny** |
-| 189 | Fudenberg, Tirole | *Game Theory* ✅ | Standard akademicki |
+| 189 | Fudenberg, Tirole | *Game Theory* (MIT Press) ✅ 📁 **MAMY PLIK** | ✅ **POTWIERDZONE 2026-07-28** — *GAME THEORY · Drew Fudenberg · Jean Tirole · The MIT Press, Cambridge Massachusetts*. **1 477 759 zn.** — rekord biblioteki. Format **DJVU** (wymaga Calibre). ⚠️ **OCR wyraźnie słabszy niż przy BIB-128** — zmierzona czystość terminów: `information` 99.2% · `equilibrium` 96.5% · `beliefs` 95.5% · **`subgame` 88.9%** (34 z 305 wystąpień zepsute na „subgamc"). Znaczy to, że ~11% zapytań o gry podgrywkowe **nie trafi** w FTS. Proza główna czyta się dobrze, gorzej przypisy i drobny druk ⏳ poza RAG |
 | 190 | Osborne, Rubinstein | *A Course in Game Theory* ✅ | Darmowy PDF |
 | 191 | Myerson | *Game Theory: Analysis of Conflict* ✅ | |
 | 192 | Binmore | *Game Theory: A Very Short Introduction* ✅ | ⚠️ **DeepSeek zmyślił tytuł „An Introduction" — to jest właściwy** |
@@ -660,7 +660,7 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
 | ~~**154**~~ | ~~Kyle — *Continuous Auctions…*~~ | 23 | ✅ **55 676 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — ten sam skan, ale **z warstwą OCR**; jakość na tekście merytorycznym dobra |
 | ~~**175**~~ | ~~Thorp — *The Kelly Criterion…*~~ | 40 | ✅ **80 230 zn.** | ✔️✔️ **DOMKNIĘTE 2026-07-28 za drugim podejściem.** (1) wymiana 40 s. → 11 s., ale nowy plik też był czystym obrazem — **krótszy ≠ lepszy, liczy się warstwa tekstowa**; (2) wersja z OCR, 0 stron pustych. Wzory pokiereszowane, proza czysta |
 | ~~**128**~~ | ~~Campbell, Lo, MacKinlay~~ | — | ✅ **1 380 803 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — Cezar podmienił **skan PDF na DJVU**. Nowa klasa rozwiązania: nie inny skan tej samej postaci, tylko **inny format**, który niesie tekst. Wymaga Calibre do ekstrakcji |
-| **189** | Fudenberg, Tirole — *Game Theory* | 579 | **0 zn.** | Standard akademicki teorii gier |
+| ~~**189**~~ | ~~Fudenberg, Tirole — *Game Theory*~~ | — | ✅ **1 477 759 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — znowu podmiana **PDF → DJVU**, druga tego dnia. ⚠️ OCR gorszy niż w BIB-128 (`subgame` czyste w 88.9%) — używalne, ale nie bezbłędne |
 | **159** | Johnson — *Algorithmic Trading and DMA* | 595 | **731 zn.** | 🔴 **PLIK USZKODZONY** — `non-page object in page tree`, ekstrakcja pada na stronie 155 |
 | **083** | Svensén, Bishop — PRML | — | ✅ | To **zbiór rozwiązań**, nie podręcznik (patrz wyżej) |
 

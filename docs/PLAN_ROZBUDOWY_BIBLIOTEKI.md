@@ -371,7 +371,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 |---|---|---|---|
 | 152 | Bouchaud, Bonart, Donier, Gould | *Trades, Quotes and Prices* ✅ | **Kanon mikrostruktury XXI w.** |
 | 153 | Almgren, Chriss | *Optimal Execution of Portfolio Transactions* ✅ | Fundament egzekucji |
-| 154 | Kyle | *Continuous Auctions and Insider Trading* ✅ | Model Kyle'a u źródła |
+| 154 | Kyle | *Continuous Auctions and Insider Trading* (Econometrica 1985, 53(6), 1315–1336) ✅ 📁 **MAMY PLIK** | ✅ **ORYGINAŁ POTWIERDZONY 2026-07-28** — strona tytułowa: *Albert S. Kyle · Econometrica, Vol. 53, No. 6 (Nov., 1985), pp. 1315-1336*. 23 s., **55 676 zn.** To skan, ale **z dobrym OCR**: proza czyta się czysto (żywa pagina *1322 ALBERT S. KYLE*), zniekształcenia tylko na okładce JSTOR. Terminy modelu obecne: market maker, informed trader, noise trader, liquidity, equilibrium. **Model Kyle'a u źródła — fundament mikrostruktury** ⏳ poza RAG |
 | 155 | Glosten, Milgrom | *Bid, Ask and Transaction Prices…* ✅ | |
 | 156 | Avellaneda, Stoikov | *High-frequency trading in a limit order book* ✅ | **Kanon market makingu** |
 | 157 | Lehalle, Laruelle | *Market Microstructure in Practice* ✅ | |
@@ -397,7 +397,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 172 | Ilmanen | *Expected Returns* ✅ | |
 | 173 | Ilmanen | *Investing Amid Low Expected Returns* ⚠️ | |
 | 174 | Kelly | *A New Interpretation of Information Rate* (1956) ✅ | **Kryterium Kelly'ego u źródła — pod sizing** |
-| 175 | Thorp | *The Kelly Criterion in Blackjack, Sports Betting, and the Stock Market* ✅ | Kelly w praktyce |
+| 175 | Thorp | *The Kelly Criterion in Blackjack, Sports Betting, and the Stock Market* ✅ 📁 plik jest, ale **BEZ WARSTWY TEKSTOWEJ** | 🔴 **NADAL DO WYMIANY** — 11 s., każda strona to jeden obraz, **0 zn.** (poprzedni plik: 40 s., też 0). Kelly w praktyce, pod sizing. Trop: PDF ze strony własnej Edwarda Thorpa albo z *Handbook of Asset and Liability Management* vol. 1 (2008) |
 | 176 | MacLean, Thorp, Ziemba | *The Kelly Capital Growth Investment Criterion* ⚠️ | |
 | 177 | Carver | *Systematic Trading* ✅ | Kompletna metodologia — realna luka |
 
@@ -657,8 +657,8 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
 | ~~**130**~~ | ~~Engle — *ARCH*~~ | 22 | ✅ **51 142 zn.** | ✔️✔️ **DOMKNIĘTE 2026-07-28 przez Cezara, w dwóch krokach.** Krok 1 (04:44): plik z warstwą tekstową, ale to były **notatki wykładowe** Chingnun Lee — złapane czytaniem treści, nie nazwy. Krok 2 (04:54): **prawdziwy Engle 1982 z Econometriki**. Notatki nie poszły do kosza — dostały własny numer **BIB-304** |
 | ~~**132**~~ | ~~Hamilton — *Nonstationary Time Series*~~ | 29 | ✅ **67 915 zn.** | ✔️✔️✔️ **DOMKNIĘTE 2026-07-28 za trzecim podejściem.** (1) skan bez OCR, 0 zn.; (2) plik z warstwą tekstową, ale to była **druga kopia Engle 1982** — ten sam artykuł co BIB-130, różnica wyłącznie w znaku wodnym JSTOR (IP + godzina pobrania), 99.35% tekstu identyczne; (3) prawdziwy **Hamilton 1989** |
 | ~~**137**~~ | ~~Rabiner — *Tutorial on HMM*~~ | 30 | ✅ **150 305 zn.** | ✔️ **DOMKNIĘTE 2026-07-28 za pierwszym podejściem** — oryginał z *Proceedings of the IEEE*, z kompletną sekcją V o implementacji. Przy okazji tego polowania przyszły 4 dodatkowe pliki: 2 duplikaty skasowane, 2 dostały numery **305** i **306** |
-| **154** | Kyle — *Continuous Auctions and Insider Trading* | 23 | **0 zn.** | **Model Kyle'a** — fundament mikrostruktury |
-| **175** | Thorp — *The Kelly Criterion…* | 40 | **0 zn.** | **Kelly w praktyce** — pod sizing |
+| ~~**154**~~ | ~~Kyle — *Continuous Auctions…*~~ | 23 | ✅ **55 676 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — ten sam skan, ale **z warstwą OCR**; jakość na tekście merytorycznym dobra |
+| **175** | Thorp — *The Kelly Criterion…* | 11 | **0 zn.** 🔴 | **NADAL SKAN** — plik wymieniony 2026-07-28 (40 s. → 11 s.), ale nowy też jest czystym obrazem. **Kelly w praktyce** — pod sizing |
 | **128** | Campbell, Lo, MacKinlay — *Econometrics of Financial Markets* | 314 | **0 zn.** | Kanon ekonometrii finansowej |
 | **189** | Fudenberg, Tirole — *Game Theory* | 579 | **0 zn.** | Standard akademicki teorii gier |
 | **159** | Johnson — *Algorithmic Trading and DMA* | 595 | **731 zn.** | 🔴 **PLIK USZKODZONY** — `non-page object in page tree`, ekstrakcja pada na stronie 155 |

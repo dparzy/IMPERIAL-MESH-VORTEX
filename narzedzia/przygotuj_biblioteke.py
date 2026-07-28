@@ -19,21 +19,20 @@ Bez nich: kroki działają dla formatów czytelnych bez narzędzi (epub/pdf), dj
 Użycie:
   python -m narzedzia.przygotuj_biblioteke            # pełne: cache + indeks + katalog
   python -m narzedzia.przygotuj_biblioteke --tylko-cache   # sam cache (bez indeksu RAG)
+  python -m narzedzia.przygotuj_biblioteke --ocr           # + OCR skanów (5.2 s/stronę!)
+
+Narzędzia zewnętrzne (calibre/tesseract) odnajduje organ FABER — ręczne dopisywanie
+do PATH nie jest już potrzebne. Exit 3 = posiadany format nie ma czym wejść do RAG.
 """
 
 from __future__ import annotations
 
-import shutil
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-
-
-def _narzedzie(nazwa: str) -> bool:
-    return shutil.which(nazwa) is not None
 
 
 def _krok(opis: str) -> None:
@@ -44,13 +43,21 @@ def main() -> int:
     tylko_cache = "--tylko-cache" in sys.argv
 
     print("🏛️  PRZYGOTUJ BIBLIOTEKĘ — praca lokalna, 0 tokenów Claude", file=sys.stderr)
-    # Diagnoza narzędzi (informacyjnie — Prawo XV: brak narzędzia = abstynencja, nie błąd).
-    for n in ("ebook-convert", "ebook-meta", "djvutxt"):
-        print(f"   {'✅' if _narzedzie(n) else '⚠️  brak'} {n}", file=sys.stderr)
+
+    # DIAGNOZA NARZĘDZI PRZEZ FABERA (2026-07-28). Dawniej: `shutil.which(nazwa)` i lista
+    # wpisana ręcznie w kodzie. Zmierzone tego dnia: which() zwracał None dla calibre
+    # I tesseracta, choć OBA były zainstalowane — po prostu poza PATH sesji. Diagnoza mówiła
+    # „⚠️ brak", potok mimo to ruszał i cicho gubił każdy plik wymagający konwersji.
+    from imperium.fundament import faber
+    faber.zapewnij_path()
+    print(faber.raport(ROOT / "bibliotheca_ulpia"), file=sys.stderr)
+    alarmy_narzedzi = faber.alarmy(ROOT / "bibliotheca_ulpia")
 
     _krok("1/3 Konwersja + cache tekstu książek")
     from narzedzia.rag import konwerter
-    wynik = konwerter.buduj_cache()
+    # --ocr opt-in (domyślnie OFF): 5.2 s/stronę na PEDES. Bez flagi skany trafiają
+    # na listę KANDYDATÓW, więc nic nie ginie po cichu, a bieg nie trwa godzinami.
+    wynik = konwerter.buduj_cache(ocr="--ocr" in sys.argv)
     puste = [k for k, v in wynik.items() if v < konwerter.MIN_ZNAKOW_CACHE]
 
     rc = 0
@@ -70,13 +77,20 @@ def main() -> int:
         # Katalog = WZBOGACENIE (best-effort): wymaga calibre; brak = abstynencja, nie błąd krytyczny.
         subprocess.run([sys.executable, "-m", "narzedzia.rag.metadane_ksiag"], cwd=str(ROOT))
 
-    _krok("GOTOWE" if rc == 0 else "ZAKOŃCZONE Z BŁĘDEM INDEKSACJI")
+    # Brak narzędzia dla POSIADANYCH formatów to porażka biegu, nie „informacja" (Prawo XV):
+    # bez tego skrypt kończył exit 0, gdy część księgozbioru w ogóle nie miała jak wejść
+    # do RAG — dokładnie ta klasa, którą naprawiono już dla indeksacji (PR#119).
+    if alarmy_narzedzi and rc == 0:
+        rc = 3
+
+    _krok("GOTOWE" if rc == 0 else "ZAKOŃCZONE Z BŁĘDEM")
     print(f"   Scache'owano: {len(wynik) - len(puste)}/{len(wynik)} książek.", file=sys.stderr)
     if puste:
-        print(f"   ⚠️  Nieczytelne (brak narzędzia? zainstaluj calibre/djvulibre): "
-              f"{', '.join(sorted(puste))[:200]}", file=sys.stderr)
-        print("   Djvu (Shreve/Sutton-Barto/Aronson) wymaga `djvutxt` (pakiet djvulibre).",
+        # Nie zgadujemy już „brak narzędzia?" — FABER wie to na pewno i powiedział wyżej.
+        print(f"   ⚠️  Nieczytelne ({len(puste)}): {', '.join(sorted(puste))[:200]}",
               file=sys.stderr)
+    for a in alarmy_narzedzi:
+        print(f"   {a}", file=sys.stderr)
     print("\n   💡 Cache tekstu jest WERSJONOWANY (źródło RAG dla chmury). Po zbudowaniu commituj:\n"
           "      git add bibliotheca_ulpia/dane/tekst_cache/ && git commit\n"
           "      (binaria książek zostają lokalnie, poza repo — decyzja Cezara 2026-07-11).",

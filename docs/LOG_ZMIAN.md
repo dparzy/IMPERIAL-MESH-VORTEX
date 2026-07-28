@@ -14,6 +14,55 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-28 | 🔨 | FABER — narzędzie zainstalowane, ale niewidoczne, kosztowało cały format
+
+**Pomiar otwarcia wachty:** `shutil.which("ebook-convert")` → `None`, `shutil.which("tesseract")`
+→ `None` — przy OBU narzędziach zainstalowanych (`C:\Calibre Portable\Calibre`,
+`C:\Program Files\Tesseract-OCR`). Potok ekstrakcji sprawdzał dokładnie `which()`, więc widział
+„brak", stosował doktrynalną *abstynencję* i zwracał pusty tekst. Pusty tekst jest
+**nieodróżnialny od „książka nie zawiera treści"** — a to znaczy, że 13 plików `.djvu`
+(w tym trzy rekordy odzyskane dzień wcześniej: BIB-128/159/189) wypadłoby z RAG bez jednego
+słowa skargi. Klasa: MILCZENIE UDAJĄCE WYNIK.
+
+**Organ FABER** (`imperium/fundament/faber.py`) robi dwie rzeczy, z których każda osobno
+byłaby za mało: (1) ZNAJDUJE — PATH, potem znane miejsca instalacji per platforma, potem
+katalogi z `IMPERIUM_NARZEDZIA_PATH` (nietypowa instalacja nie wymaga commita); (2) KRZYCZY —
+`BrakNarzedzia` zamiast `""`, a `alarmy()` podnosi czerwień **tylko gdy brak realnie kosztuje
+pliki** (0 dotkniętych = cisza, bo alarm-tapeta uczy przewijać alarmy).
+
+**Wpięcie:** `ekstraktor` woła binarki przez FABERA i przepuszcza `BrakNarzedzia` przez swój
+szeroki `except` (brak narzędzia dotyczy CAŁEGO biegu, nie jednej książki); `konwerter` liczy
+braki narzędzi ODDZIELNIE od zepsutych książek (inaczej podsumowanie mówiłoby „208 uszkodzonych
+książek" o jednej brakującej binarce); `przygotuj_biblioteke` kończy **exit 3**, gdy posiadany
+format nie ma jak wejść do RAG — dotąd w tej sytuacji drukował „GOTOWE" i exit 0.
+
+**Dowód, nie deklaracja:** BIB-161 (Madhavan, `.djvu`, dotąd bez cache) — **160 315 znaków,
+4828 unikalnych słów, 1.2 s**. Mechanizm zweryfikowany MUTACJĄ: przywrócenie cichego fallbacku
+czerwieni 2 testy (lekcja: test bez mutacji bywa atrapą).
+
+**TESSERACT WPIĘTY, NIE TYLKO ZNALEZIONY.** Samo odnalezienie binarki byłoby utratą potencjału
+(Prawo XV: „gotowy, ale niepodpięty"), więc doszła ścieżka OCR dla PDF-a **bez** warstwy
+tekstowej — **opt-in `--ocr`, domyślnie OFF** (ZASADA WPIĘCIA). Powód wyłączenia jest
+mierzalny: 1.3–5.2 s/stronę zależnie od gęstości strony, więc automat na 98 plikach `.pdf`
+zamieniłby bieg w wielogodzinny. Bez flagi skany trafiają na jawną listę **KANDYDATÓW DO OCR**
+— nic nie ginie po cichu, a Cezar decyduje, kiedy zapłacić czasem.
+
+**Dwie rzeczy złapane pomiarem, nie rozumowaniem:** (1) `len(doc)` po `doc.close()` w moim
+własnym kodzie OCR — PyMuPDF rzuca „document closed"; ujawnił to dopiero pierwszy żywy
+przebieg. (2) Szybka sonda „5 pierwszych stron bez tekstu = skan" dała **dwa fałszywe alarmy**:
+BIB-138 ma na stronie 261 pełne 1957 znaków, BIB-170 na stronie 91 — 744. Warstwy tekstowej
+brakuje tylko na stronach tytułowych. Właściwym progiem jest ekstrakcja z CAŁEGO dokumentu
+(< `MIN_ZNAKOW_CACHE`) — i tak działa wyzwalacz w kodzie.
+
+**Granica (Prawo XVI):** CENSOR SPRZĘTU = żelazo, PORTITOR = pakiety Pythona i klucze,
+FABER = binaria spoza Pythona. Żaden z dwóch pierwszych ich nie widział — stąd cicha strata.
+
+**Pliki:** `imperium/fundament/faber.py`, `narzedzia/rag/ekstraktor.py`,
+`narzedzia/rag/konwerter.py`, `narzedzia/przygotuj_biblioteke.py`, `tests/test_faber.py` (12),
+`tests/test_konwerter.py` (+3).
+
+---
+
 ## 2026-07-28 | 🔎 | RECOGNITOR poprawiony przez WŁASNE użycie: „zmergowany" ≠ „nieodwracalny"
 
 **Organ znalazł wadę w sobie pierwszego dnia życia — przy pierwszym przebiegu checklisty

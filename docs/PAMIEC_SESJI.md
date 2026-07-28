@@ -113,6 +113,15 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Wysoki IC może być artefaktem autokorelacji
+IC 0.25-0.30 podejrzanie wysoki w finansach. Sugeruje łapanie komponentu współbieżnego. Konieczna kontrola na nienakładających się zwrotach.
+
+### 2026-07-27 — EXP-14 Kyle ma dekorelację i skill
+max|ρ|=0.087 (prawie ortogonalny), IC~0.30. Potwierdzona wartość predykcyjna.
+
+### 2026-07-27 — EXP-13 GARCH ma dekorelację i skill
+max|ρ|=0.141, IC~0.25-0.254. Niesie nową informację (poniżej progu 0.20) i ma IC 8-10× powyżej 0.03. Wymaga kontroli autokorelacji.
+
 ### 2026-07-27 — EXP-13 GARCH i EXP-14 Kyle niosą nową informację i mają skill
 Średnie max|ρ|: GARCH 0.141, Kyle 0.087 – poniżej progu 0.20, czyli zdekorelowane. IC ~0.25-0.30 stabilny na wszystkich horyzontach. Werdykt: filar siły + skill.
 

@@ -74,18 +74,50 @@ _WZORY_SEKRETOW = [
 # DOM BIERZEMY Z `Path.home()`, NIGDY z wpisanej nazwy konta: mechanizm ma działać na
 # maszynie każdego, kto uruchomi Imperium, a wpisanie „Ian" na sztywno utrwaliłoby w kodzie
 # dokładnie tę daną, którą usuwamy.
+_NIGDY = re.compile(r"(?!x)x")  # wzorzec, który z definicji nie pasuje do niczego
+
+
 def _wzorzec_domu(dom: str):
     """Katalog domowy → wzorzec tolerujący WSZYSTKIE formy zapisu separatora.
 
     Ta sama ścieżka żyje w transkrypcie w trzech postaciach naraz: `C:\\Users\\X` (proza),
     `C:\\\\Users\\\\X` (po ucieczce w JSON) i `C:/Users/X` (narzędzia POSIX-owe). Wzorzec
     dopasowujący tylko jedną z nich zostawiłby dwie — czyli redakcja meldowałaby sukces,
-    a dane dalej by wyciekały (klasa „milczenie udające wynik")."""
+    a dane dalej by wyciekały (klasa „milczenie udające wynik").
+
+    GRANICE SĄ CZĘŚCIĄ DEFINICJI, NIE OZDOBĄ (zmierzone 2026-07-27, recenzja adversarialna
+    kodu, który wszedł do `main` bez spojrzenia recenzenta). Pierwsza wersja sklejała same
+    segmenty ścieżki, więc na PŁYTKIM katalogu domowym wzorzec degenerował się do gołego
+    słowa — a redakcja z `IGNORECASE` przestawała być redakcją i stawała się CICHĄ KORUPCJĄ
+    wersjonowanej pamięci. Zmierzone na trzech domach:
+      • `/root` (klasyczny kontener, czyli nasze środowisko chmurowe) → wzorzec `root`;
+        cytat kodu `ROOT = Path(__file__)` zapisywał się do repo jako `~ = Path(__file__)`.
+      • `/` → wzorzec PUSTY; `re.sub` wstawiał `~` między KAŻDY ZNAK transkryptu.
+      • `C:\\Users\\Ian` → działał poprawnie, dlatego wada była niewidoczna na laptopie.
+    Kronika jest pamięcią wersjonowaną w git, więc uszkodzenie byłoby trwałe i ciche.
+    Stąd dwie granice: dopasowanie musi zaczynać się separatorem (gdy dom jest ścieżką
+    bezwzględną) i nie może kończyć się w środku dłuższego słowa (`/rootkit` ≠ dom).
+    Dom niedający się bezpiecznie związać (np. `/`) NIE JEST redagowany po cichu —
+    `redakcja_domu_dziala()` mówi o tym wprost, a meldunek kroniki to drukuje.
+    """
     czesci = [c for c in re.split(r"[\\/]+", dom) if c]
-    return re.compile(r"[\\/]{1,2}".join(re.escape(c) for c in czesci), re.IGNORECASE)
+    zakotwiczony = bool(re.match(r"^[\\/]", dom))
+    if not czesci or (len(czesci) == 1 and not zakotwiczony):
+        return _NIGDY
+    rdzen = r"[\\/]{1,2}".join(re.escape(c) for c in czesci)
+    prefiks = r"[\\/]{1,2}" if zakotwiczony else ""
+    return re.compile(prefiks + rdzen + r"(?![A-Za-z0-9_])", re.IGNORECASE)
 
 
 _WZORZEC_DOMU = _wzorzec_domu(str(Path.home()))
+
+
+def redakcja_domu_dziala() -> bool:
+    """False = katalogu domowego NIE da się bezpiecznie związać, więc ścieżek nie redagujemy.
+
+    Milczenie byłoby tu gorsze niż brak redakcji: operator musi wiedzieć, że transkrypt
+    idzie do repo z pełnymi ścieżkami (Prawo I — niezmierzone to nie to samo co czyste)."""
+    return _WZORZEC_DOMU is not _NIGDY
 
 
 def _redaguj(tekst: str) -> str:
@@ -317,6 +349,9 @@ if __name__ == "__main__":
         if awaria:
             print(awaria)   # GŁOŚNO przed statystyką — zero w liczniku to nie spokój
         s = eksportuj(tylko_nowe=not args.wszystko)
+        if not redakcja_domu_dziala():
+            print(f"⚠️ Kronika: redakcja KATALOGU DOMOWEGO wyłączona (dom `{Path.home()}` jest "
+                  "zbyt płytki, by związać go bezpiecznie) — transkrypty idą do repo z pełnymi ścieżkami.")
         print(f"📜 Kronika: {s['zapisane']} zapisane, {s.get('zaktualizowane', 0)} zaktualizowane, "
               f"{s['pominiete']} pominięte, {s['wiadomosci']} wiadomości z {s['sesje']} sesji.")
     elif args.cmd == "szukaj":

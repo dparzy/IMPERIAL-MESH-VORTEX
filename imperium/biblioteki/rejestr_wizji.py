@@ -164,10 +164,17 @@ def dodaj(typ: str, tytul: str, tresc: str,
                 # DECYZJA 19, POMYSŁ 15, i są to autentyczne parafrazy, nie odwrócenia.
                 # Wyłączenie wpuściłoby ~180 duplikatów z powrotem. Lekarstwem na predykat
                 # bez kierunku nie jest jego usunięcie, tylko UWIDOCZNIENIE jego decyzji.
+                # ALARM IDZIE NA STDOUT, NIE NA STDERR — i to jest naprawa, nie detal
+                # (zmierzone 2026-07-27). Pierwsza wersja tego ostrzeżenia pisała na stderr,
+                # a hook startowy zachowuje WYŁĄCZNIE stdout: w wydruku z tego samego dnia
+                # stoi „(pominięto 2 duplikatów)" i ANI JEDNEJ linii o tym, co pominięto.
+                # Mechanizm uwidaczniający cichą stratę sam był niewidoczny — dokładnie ta
+                # klasa, którą Imperium nazwało wcześniej („alarm na stderr = cisza udająca
+                # spokój"). Ostrzeżenie w strumieniu, którego nikt nie czyta, nie istnieje.
                 print(f"[rejestr_wizji] ⚠️ {typ} POMINIĘTY jako duplikat semantyczny: "
                       f"„{tytul[:70]}” ≈ „{istn.get('tytul', '')[:70]}”. Jeśli to wpis "
                       f"ODWRACAJĄCY poprzedni, predykat tego NIE ODRÓŻNIA — użyj "
-                      f"dedup=False albo zaktualizuj wpis istniejący.", file=sys.stderr)
+                      f"dedup=False albo zaktualizuj wpis istniejący.")
                 return False                    # sito 2: ta sama treść, inna parafraza
 
     wpis = {

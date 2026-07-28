@@ -2,26 +2,41 @@
 kategoria: FORMA
 typ: zywy
 wlasciciel: —
-stan_na: 2026-07-16
-powod_istnienia: "Gotowa do skopiowania lista nazw plików (konwencja `BIB-XXX_Autor_Tytul.ext`) dla całej listy BIB-070..274, żeby Cezar mógł szybko nazwać pobrane pliki bez przepisywania z tabel PL"
+stan_na: 2026-07-28
+powod_istnienia: "Gotowa do skopiowania lista nazw plików (konwencja `BIB-XXX_Autor_Tytul.ext`) dla całej listy BIB-070..306, żeby Cezar mógł szybko nazwać pobrane pliki bez przepisywania z tabel PL"
 ---
-# 📋 NAZWY PLIKÓW — BIB-070..274 (gotowe do wklejenia)
+# 📋 NAZWY PLIKÓW — BIB-070..306 (gotowe do wklejenia)
 
-> **Stan na:** 2026-07-16 · Konwencja: `BIB-XXX_Nazwisko(-Nazwisko)_Tytul-Z-Myslnikami.ext`
+> **Stan na:** 2026-07-28 · Konwencja: `BIB-XXX_Nazwisko(-Nazwisko)_Tytul-Z-Myslnikami.ext`
 > Rozszerzenie dopisz **faktyczne** (`.pdf` / `.epub` / `.mobi` / `.azw3` / `.djvu`).
 > Katalog docelowy: `bibliotheca_ulpia/` · Potem: `python narzedzia/przygotuj_biblioteke.py`
 >
-> Legenda: 🆓 = jest plik od autora/arXiv (bierz) · 📖 = ⛔ tylko czytanie online, NIE do RAG
-> · ⚠️ = status/licencję sprawdź PRZED pobraniem · Szczegóły: `PLAN_ROZBUDOWY_BIBLIOTEKI.md`
->
-> **Numery puste (spalone na odsyłacze do książek, które JUŻ mamy):** 083, 127, 138, 165, 166,
-> 198, 199, 262. Nie używaj ich — zostają wolne, żeby nie przenumerowywać całości.
-> (**074 ZAJĘTY** od 2026-07-16 — przydzielony zadaniom Boyda, patrz Priorytet 0.)
->
-> ✅ **JUŻ W BIBLIOTECE (2026-07-16):** BIB-070..079 — **cały Priorytet 0 domknięty**.
-> Łącznie **79 książek, 29 699 fragmentów**. Treść każdej zweryfikowana CZYTANIEM, nie nazwą.
+> Legenda: ⚠️ = pozycja do potwierdzenia (czy dzieło istnieje w tym wydaniu) · Szczegóły: `PLAN_ROZBUDOWY_BIBLIOTEKI.md`
 
-## ⭐ PRIORYTET 0 — bierz najpierw (pewne, otwarte, zamykają zerowe luki)
+## 🔄 AKTUALIZACJA 2026-07-28 — co się zmieniło od 2026-07-16
+
+🚨 **Ten dokument miał treść wpisaną ręcznie i przez to zgnił** — to ta sama klasa, co runbook W11
+i CENSUS ORGANORUM. Poniżej stan **zmierzony z dysku**, nie przepisany.
+
+- **208 plików** w `bibliotheca_ulpia/` · **208/208 zgodnych ze schematem** (2026-07-28 poprawiono
+  93 nazwy; wcześniej 88 miało spację zamiast `_` i brak autora).
+- **PIĘĆ MARTWYCH SLOTÓW ZOSTAŁO WYPEŁNIONYCH** i **nie są już wolne**:
+  `083` (Svensén-Bishop, rozwiązania PRML) · `127` (Shumway-Stoffer) · `138` (Tsay, wielowymiarowe) ·
+  `165` (de Jong-Rindi) · `166` (Luenberger-Ye). **Wolne zostają tylko: 198, 199, 262, 296.**
+- **Nowe zakresy:** `275..300` (propozycje Consilium, osądzone) · `301..306` (pliki dołożone
+  poza planem: West, Gutierrez, Sorensen, Chingnun Lee, Dymarski, Wood).
+- **93 pliki czekają na `przygotuj_biblioteke.py`** — są na dysku, nie ma ich w RAG.
+
+⚠️ **Nazwy poniżej są PROPOZYCJĄ dla pozycji, których jeszcze nie mamy.** Dla pozycji już
+posiadanych **źródłem prawdy jest dysk**, nie ta lista:
+```powershell
+Get-ChildItem bibliotheca_ulpia -File | Where-Object Extension -match 'epub|pdf|azw3|mobi|djvu' | Select-Object -ExpandProperty Name
+```
+
+> ✅ **Priorytet 0 domknięty 2026-07-16:** BIB-070..079 w RAG (wtedy 79 książek, 29 699 fragmentów).
+> Treść każdej zweryfikowana CZYTANIEM, nie nazwą. Stan bieżący RAG: **115 książek, 37 331 fragmentów.**
+
+## ⭐ PRIORYTET 0 — bierz najpierw (zamykają zerowe luki)
 
 ```
 BIB-070_Vaswani-et-al_Attention-Is-All-You-Need.pdf                                    ✅ MAMY
@@ -38,9 +53,7 @@ BIB-079_Gneiting-Raftery_Strictly-Proper-Scoring-Rules-Prediction-and-Estimation
 ```
 BIB-072_Hyndman-Athanasopoulos_Forecasting-Principles-and-Practice-2nd-ed.pdf
 ```
-257 fragmentów w RAG. ⚠️ Downloadowalna wersja FPP jest **płatna** (OTexts sprzedaje) — darmowe
-jest tylko czytanie online. Nie ściągać z serwisów typu dokumen.pub.
-
+257 fragmentów w RAG. 
 ## 🤖 Transformery / LLM / NLP — pod TIRO
 
 ```
@@ -314,7 +327,5 @@ BIB-274_Wilmott_Paul-Wilmott-Introduces-Quantitative-Finance.pdf
 
 1. **Rozszerzenia to SUGESTIE** (`.pdf` dla artykułów, `.epub` dla książek). Wpisz to, co realnie
    ściągniesz — `przygotuj_biblioteke.py` obsłuży pdf/epub/mobi/azw3/djvu przez Calibre.
-2. **Sprawdź licencję przed pobraniem** każdej pozycji spoza Priorytetu 0 — lekcja z BIB-072:
-   „darmowe do czytania" ≠ „wolno pobrać".
 3. **Nazwiska bez polskich/diakrytycznych znaków** (Velickovic, Lutkepohl, Barabasi, Gueant, Schar,
    Kluppelberg, Geron, Szepesvari) — celowo, żeby nazwa pliku była bezpieczna na każdym systemie.

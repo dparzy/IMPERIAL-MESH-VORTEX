@@ -609,12 +609,21 @@ def test_rejestr_wizji_pominiecie_semantyczne_jest_WIDOCZNE(tmp_path):
     # (tests/run_tests.py) jest bezzależnościowy i zna tylko `tmp_path`, więc test
     # z `capsys` przechodzi pod pytestem, a pod bramką pada na brakującym argumencie.
     # Test ma bronić w OBU biegach — inaczej broni tylko tam, gdzie i tak patrzę.
-    bufor = io.StringIO()
-    with contextlib.redirect_stderr(bufor):   # mierzymy TYLKO drugi zapis
+    # STRUMIEŃ JEST CZĘŚCIĄ WIDOCZNOŚCI, NIE DETALEM TECHNICZNYM (naprawa 2026-07-27).
+    # Pierwsza wersja testu przechwytywała WYŁĄCZNIE stderr i przechodziła — a hook
+    # startowy zachowuje tylko stdout, więc broniony przez nią alarm był w praktyce
+    # niewidzialny. Dowód z tego samego dnia: w wydruku hooka stoi „(pominięto 2
+    # duplikatów)" i ANI JEDNEJ linii mówiącej, co pominięto. Test pilnujący alarmu
+    # w strumieniu, którego nikt nie czyta, broni pozoru. Łapiemy OBA strumienie, więc
+    # test nie przypina implementacji — ale asercja niżej wymaga, by trafiło na stdout.
+    buf_out, buf_err = io.StringIO(), io.StringIO()
+    with contextlib.redirect_stdout(buf_out), contextlib.redirect_stderr(buf_err):
         odwrotna = rw.dodaj("DECYZJA", "ATR_MULT w EXP-07 za wysoki",
                             "Parametr ATR_MULT w strategii EXP-07 jest za wysoki, obniz.",
                             plik=plik)
-    komunikat = bufor.getvalue()
+    komunikat = buf_out.getvalue() + buf_err.getvalue()
+    assert "POMINIĘTY" in buf_out.getvalue(), (
+        "alarm poszedł na stderr — hook startowy zachowuje TYLKO stdout, więc tam nie istnieje")
     assert odwrotna is False, "test stracił sens — predykat przestał uznawać to za duplikat"
     assert "POMINIĘTY" in komunikat, "pominięcie nadal jest CICHE"
     assert "ATR_MULT w EXP-07 za wysoki" in komunikat, "nie widać, CO pominięto"

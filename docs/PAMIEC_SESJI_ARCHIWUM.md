@@ -12,6 +12,87 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-27 — NOMENCLATOR wyłączony z braku etykiet; Hyginus ma 35 cząstek bez sędziego
+NOMENCLATOR (kalibracja etykiet neuronów) stoi OFF bo brakuje osądzonych przykładów. Hyginus posiada 35 cząstek czekających na sędziego – ich osądzenie odblokuje NOMENCLATOR.
+
+### 2026-07-27 — Źródłem prawdy procedury otwarcia jest CLAUDE.md, a nie checklista
+Runbook W11 zawierał przestarzałe polecenia (git push). Od teraz kroki otwarcia pobierane są wyłącznie z CLAUDE.md przez sigillum apertio.
+
+### 2026-07-27 — `prekalkuluj_portfel` nie daje zysku algorytmicznego
+Robią tę samą pracę per-bar (zbuduj na oknie) tylko równolegle per-symbol, marne 1,4× przyspieszenia bez zmiany złożoności.
+
+### 2026-07-27 — Główny koszt to redundancje w pure-python wskaźnikach
+Hotspot to szeroki podatek rozłożony na wiele wskaźników. Kluczowa anomalia: `wma` wołane ~930 razy na tick (4,5 mln wywołań, 65,5s cumtime) z powodu pętli w `_py_hma` i redundantnego przeliczania `wma`.
+
+### 2026-07-27 — Ograniczenia skanera lokalnego (14.5% pokrycia)
+Łowca wad ma tylko 16 regexów na 115 klas (14.5%). Wynik 'czysto' na 5 plikach oznacza brak trafień w tych wzorcach, a nie brak wad w kodzie – narzędzie wymaga rozbudowy.
+
+### 2026-07-20 — Audyt startowy: 22 neurony ŻYWE ale NIEZMIERZONE
+Audyt ujawnił 22 neurony zależne od adapterów (AUG-01, NEWS-01..04, PSY-01..04, RADAR-01..05, OC-06..08, V-03, X-28, Z-06/07) wpięte w pętlę live, ale bez pomiaru w paper. Stanowią największą utratę potencjału.
+
+### 2026-07-21 — dodaj_checklist() zwraca True, ale wpis nie zapisuje się na dysku
+dodaj_checklist() inkrementuje licznik w pamięci, ale zapis na dysk wymaga osobnego wywołania zapisz(). To pułapka – stan pamięci może być niezgodny z dyskiem.
+
+### 2026-07-20 — Testy >2 min na starym Fujitsu – bez limitu czasowego
+Testy trwają ponad 2 minuty ze względu na słaby sprzęt. Nie dawać limitu timeoutu. Uruchamiać w tle i cyklicznie sprawdzać, czy bieg żyje. Procedura zapisana w pamięci długoterminowej.
+
+### 2026-07-27 — PR #134 cubic nie sprawdzał kodu po poprawkach
+Cubic wykonał tylko jeden przegląd PR #134, a po wprowadzeniu 3 commitów (756 linii w 9 plikach, w tym nomenclator.py) nie przeprowadził drugiego przebiegu. Kod wszedł do main bez weryfikacji naprawionych uwag.
+
+### 2026-07-27 — Fałszywe alarmy w Refleksji W9
+Trzy zgłoszone sprzeczności to fałszywe alarmy – wynikają z nakładania się słów kluczowych, a nie rzeczywistej sprzeczności treści. Detektor wymaga naprawy, aby odróżniać kolizje leksykalne od merytorycznych.
+
+### 2026-07-27 — Luka w automacie – tylko 14.5% zasięgu wykrywania wad
+Obecny łowca wad ma tylko 16 regexów na 115 klas (14.5%). Zakaz pushu nie był egzekwowany przez 16 dni z powodu braku hooków PreToolUse/PostToolUse – to jest źródłem luki.
+
+### 2026-07-27 — Fałszywe alarmy sprzeczności W9
+Trzy sprzeczności w refleksji W9 to fałszywe alarmy spowodowane nakładaniem się słów kluczowych (jeden świeży wpis auto-lekcji sparowany z niepowiązanymi starymi). To nie sprzeczność treści, tylko wada detektora – kandydat do naprawy.
+
+### 2026-07-27 — Mała liczba okien a wynik ROBUST w WF-IC
+Neurony EXP-13 (6 okien), SMC-01 (5), V-13 (3) otrzymały status ROBUST, ale są słabiej podparte niż X-17 (25 okien). Wymaga adnotacji o liczbie okien w werdykcie.
+
+### 2026-07-27 — Detektor duplikatów Hyginusa
+W systemie istnieje gotowy detektor duplikatów oparty na Jaccardzie bi-gramów, ale nie jest używany. Stanowi darmowe narzędzie do filtracji kandydatów.
+
+### 2026-07-27 — Brak embeddingów w RAG
+sentence-transformers nie jest zainstalowany. RAG działa wyłącznie na czystym FTS – bez semantycznego podobieństwa.
+
+### 2026-07-27 — Nowa klasa wady w meldunkach
+Sekcja niepewności obok twierdzenia pewnego nie koryguje tezy głównej – twierdzenie wygrywa, bo czyta się pierwsze. Zgłoszono do Księgi Wad.
+
+### 2026-07-27 — Priorytet zwiadów zewnętrznych FRUMENTARIUS
+Kosztują ~74k tokenów i potwierdzają znane problemy – powinny być P1, nie P0. Sąd nad kolejką Hyginusa (35 cząstek) to realna produkcja etykiet i ma pierwszeństwo.
+
+### 2026-07-27 — Gnicie runbooków W11 - własna treść zamiast referencji
+Runbooki gniły, bo zawierały własną, nieaktualną treść, a deduplikacja po nazwie blokowała aktualizację. Rozwiązanie: skille pobierają kroki z CLAUDE.md jako jedyne źródło prawdy.
+
+### 2026-07-27 — Cicha utrata danych przy zapisie runbooka
+Metoda `zapisz()` gubiła nieznane pola istniejącego wpisu, nadpisując całość. To klasa cichej utraty danych przy aktualizacji. Naprawiono przez scalanie pól.
+
+### 2026-07-27 — Brak funkcji aktualizacji runbooka
+W systemie _ZIARNO nie istniała funkcja aktualizacji istniejącego runbooka, a deduplikacja po nazwie blokowała poprawę. Dziś dodano, ale wada architektoniczna: każda procedura po zapisie gnije.
+
+### 2026-07-27 — Gnicie runbooków przez własną treść
+Runbooki W11 zgniły, bo zawierały własną treść zamiast pobierać z CLAUDE.md. Rozwiązanie: skille muszą pobierać kroki z jedynego źródła prawdy, a nie duplikować.
+
+### 2026-07-27 — Testy na starym Fujitsu >2 min to normalne
+Stary komputer Fujitsu powoduje, że 2584 testy trwają ponad 2 minuty. Ustalono nie dawać limitu czasu, tylko cyklicznie sprawdzać, czy proces żyje.
+
+### 2026-07-27 — Order zawsze z zyskiem zakończony
+Podstawowe motto: każdy order musi być postawiony i zamknięty z zyskiem. To fundament wiarygodności i spójności systemu.
+
+### 2026-07-20 — 20 sprzeczności w Refleksji, 3 pilne
+Audyt startowy wykrył 20 sprzeczności, w tym 3 pilne: audytu/nowy, chmura/lokal/naprawa, false/faza – wymagają przeglądu.
+
+### 2026-07-20 — Brudne drzewo – auto_lekcja_przetworzone.txt
+Audyt startowy wykazał 3 dopisane linie przez automat w pliku bibliotheca_ulpia/dane/auto_lekcja_przetworzone.txt. Nie jest to zmiana ręczna – wymaga decyzji Cezara.
+
+### 2026-07-20 — MoE niewykonalne na 6GB VRAM
+Mixture of Experts wymaga trzymania wszystkich ekspertów w pamięci jednocześnie. 4 eksperty po 7B wymagają ~28B RAM – na RTX 4050 (6GB) to niemożliwe.
+
+### 2026-07-20 — Brak metadanych to źródło bałaganu
+64 dokumenty w docs/ mają zero nagłówków metadanych. Audyt nie wie, czym dokument jest, przez co bramki (np. W5, W10) opierają się na ręcznie wpisanych wyrażeniach zamiast na strukturze. To nie skaluje się do 213 plików .md.
+
 ### 2026-07-27 — Mutacja przeżyła przez luźną asercję testu zasięgu
 Test zasięgu miał asercję 'zbadane ≥ 8+40' zamiast 'równość z policzonym zasięgiem'. Luźny próg przepuszczał zawężenie bramki z 73 do 65. Poprawiono na ścisłą równość; mutacja padła.
 

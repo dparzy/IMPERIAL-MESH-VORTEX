@@ -118,6 +118,18 @@ def test_marker_korekty_rozpoznawany():
     assert not _linia_prostuje("to jest LINIOWE, nie kwadratowe")
 
 
+def test_odmiana_rzeczownikowa_obalenia_prostuje():
+    """REGRESJA 2026-07-28: marker łapał imiesłów, nie rzeczownik → FP na własnej dokumentacji.
+
+    `dziennik_niesmiertelny.py:167` cytuje obalone twierdzenie, a zdanie prostujące
+    linię niżej brzmi „przeżyło tam OBALENIE". Stem „obalon" tego nie obejmuje.
+    """
+    assert _linia_prostuje("przezylo tam obalenie i wrocilo jako fakt")
+    assert _linia_prostuje("po obaleniu twierdzenia zostalo tylko echo")
+    okno = ["Twierdzenie „backtest O(n²)”", "przezylo tam obalenie"]
+    assert _okno_prostuje(okno, 0), "cytat + obalenie linie nizej = NIE trafienie"
+
+
 # ── Pułapki zmierzone 2026-07-20 przy pierwszym sweepie (regresje) ─────────────────
 
 def test_negacja_musi_dotyczyc_frazy_nie_calej_linii():

@@ -265,14 +265,19 @@ def sprawdz(tekst: str, leksykon=None) -> dict:
     z nazwanym powodem, który sędzia sprawdzi `grep`em w sekundę.
     """
     lex = leksykon_roju() if leksykon is None else leksykon
+    # JEDEN PODZIAŁ, NIE DWA (recenzja adversarialna 2026-07-27). Pierwsza wersja dzieliła
+    # plon dwa razy: raz do szukania podejrzanych, raz do policzenia kandydatów. Poza kosztem
+    # (regex po całym plonie ×2) była to możliwość CICHEGO ROZJAZDU — licznik i lista mogłyby
+    # kiedyś opisywać dwa różne podziały tego samego tekstu, a raport pokazywałby „2/5"
+    # policzone z osobnych przebiegów. Miara i jej mianownik muszą pochodzić z jednego pomiaru.
+    bloki = podziel_kandydatow(tekst)
     podejrzani = []
-    for blok in podziel_kandydatow(tekst):
+    for blok in bloki:
         naglowek = _naglowek_bloku(blok)
         trafienia = sorted({wzor for wzor, rx in lex
                             if rx.search(_do_dopasowania(naglowek))})
         if trafienia:
             podejrzani.append({"nazwa": naglowek.strip()[:120], "pojecia": trafienia})
-    bloki = podziel_kandydatow(tekst)
     return {
         "czysty": not podejrzani,
         "kandydatow": len(bloki),

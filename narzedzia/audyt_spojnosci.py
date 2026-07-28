@@ -780,6 +780,18 @@ def _warstwa_20_katalog_nietkniety():
         return [("[W20] INDEKS_IMPERIUM.md nie ma znaczników sekcji generowanej — "
                  "katalog przestał być pod kontrolą Tabularium")], []
 
+    # ZNACZNIK MUSI BYĆ DOKŁADNIE JEDEN (recenzja cubic PR #134, P2 — przyjęta 2026-07-27).
+    # Bramka sprawdzała OBECNOŚĆ, a porównanie bierze `split(...)[1]`, czyli treść między
+    # PIERWSZĄ parą znaczników. Przy zdublowanym `start` drugi blok zostaje poza kontrolą:
+    # generator ma dwie kandydujące sekcje, audyt ogląda jedną i melduje „zgodne ✅".
+    # To ta sama klasa co bramka pilnująca jednego katalogu z jedenastu — wąski zasięg
+    # produkujący fałszywy spokój, więc liczba znaczników jest częścią kontraktu, nie detalem.
+    ile_s, ile_k = tresc.count(ZNACZNIK_START), tresc.count(ZNACZNIK_KONIEC)
+    if ile_s != 1 or ile_k != 1:
+        return [(f"[W20] INDEKS_IMPERIUM.md ma {ile_s}× znacznik START i {ile_k}× KONIEC "
+                 "(ma być po jednym) — sekcja poza pierwszą parą jest niezarządzana przez "
+                 "Tabularium, a porównanie treści widziałoby tylko pierwszą")], []
+
     def istotne(tekst):
         """Wiersze niosące treść katalogu: nagłówki sekcji i wiersze tabeli."""
         return [w.strip() for w in tekst.splitlines()

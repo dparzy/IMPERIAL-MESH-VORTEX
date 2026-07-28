@@ -158,8 +158,31 @@ def szukaj(zapytanie: str, limit: int = 10,
     return [w for _, w in wyniki[:limit]]
 
 
+def _sprostowania(blok: str) -> List[str]:
+    """Linie ⚠️ dla twierdzeń OBALONYCH, które ten blok wciąż głosi jako fakt.
+
+    SEDNO (zmierzone 2026-07-27, pytanie Cezara „co znaczy 4 z 9"): Dziennik jest
+    wstrzykiwany W CAŁOŚCI na starcie każdej sesji, a INDEX FALSORUM świadomie pomija
+    katalogi kronik — więc jedyny korpus czytany na pewno co rano był jedynym, którego
+    strażnik fałszów nie skanował. Twierdzenie „Imperium używa 2 z ~9 zdarzeń hooka"
+    przeżyło tam obalenie i wróciło do kontekstu jako fakt; powtórzyłem je Cezarowi.
+
+    HISTORII NIE RUSZAMY (Prawo I) — wpis zostaje słowo w słowo. Zmienia się wyłącznie to,
+    co mu TOWARZYSZY przy odczycie: obalone twierdzenie nigdy nie dociera samo.
+
+    Awaria strażnika nie może wywalić Dziennika: bez osi czasu Architekt traci ciągłość
+    całego projektu, a to koszt nieporównanie większy niż brak jednej adnotacji.
+    """
+    try:
+        from imperium.biblioteki.index_falsorum import trafienia_w_tekscie
+        traf = trafienia_w_tekscie(blok)
+    except Exception:  # noqa: BLE001
+        return []
+    return [f"   ⚠️ OBALONE (INDEX FALSORUM): {t['poprawna_teza']}" for t in traf]
+
+
 def _formatuj_wpis(w: Dict[str, Any], pelny: bool = True) -> str:
-    """Jedna sesja → zwięzły blok tekstu."""
+    """Jedna sesja → zwięzły blok tekstu (z adnotacją, jeśli głosi obalone twierdzenie)."""
     linie = [f"📅 {w.get('data','?')} [{w.get('sesja','')}]"]
     for c in w.get("co", []):
         linie.append(f"   ✓ {c}")
@@ -168,6 +191,7 @@ def _formatuj_wpis(w: Dict[str, Any], pelny: bool = True) -> str:
             linie.append(f"   ⚖️ {d}")
     if w.get("nastepny"):
         linie.append(f"   → następny: {w['nastepny']}")
+    linie += _sprostowania("\n".join(linie))
     return "\n".join(linie)
 
 

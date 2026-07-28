@@ -45,7 +45,15 @@ Legenda statusu: ✅ gotowy · 🔲 zaplanowany · 🚧 w budowie
 
 ---
 
-## 📕 KANON ŹRÓDŁOWY (69 książek → działy)
+## 📕 KANON ŹRÓDŁOWY (mapa dział → książki)
+
+> 🚨 **ZASIĘG TEJ MAPY ≠ ZASIĘG BIBLIOTEKI (zmierzone 2026-07-28).** Mapa opisuje **69 książek**
+> (BIB-001..069) — stan z 2026-07-11. Na dysku jest **205 plików**, w RAG **115**. Czyli
+> **136 książek nie ma tu przypisanego działu**, w tym cały kanon przyczynowości (Pearl, Angrist),
+> szeregów czasowych (Hamilton, Box-Jenkins), mikrostruktury u źródła (Kyle, Glosten-Milgrom)
+> i teorii gier. Esencje tych działów są **niepełne o tę różnicę** — nie dlatego, że treść jest zła,
+> tylko dlatego, że powstawała, gdy tych źródeł jeszcze nie było.
+> Domknięcie: `docs/PLAN_ROZBUDOWY_BIBLIOTEKI.md` § plan katalogowania esencji.
 
 Mapa: która książka zasila który dział. (Pliki: `bibliotheca_ulpia/BIB-xxx_*`)
 

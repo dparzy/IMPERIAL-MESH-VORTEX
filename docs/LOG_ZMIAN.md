@@ -14,6 +14,243 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-28 | 🔎 | RECOGNITOR poprawiony przez WŁASNE użycie: „zmergowany" ≠ „nieodwracalny"
+
+**Organ znalazł wadę w sobie pierwszego dnia życia — przy pierwszym przebiegu checklisty
+domknięcia, do której go wpiąłem.** Werdykt brzmiał: *„PR jest ZMERGOWANY — luka NIEODWRACALNA:
+nowy PR z tej gałęzi pokaże zero różnicy"*. To prawda **tylko** dopóki HEAD stoi na commicie,
+który wszedł do mergu. Gałąź poszła tymczasem o 5 commitów dalej, więc nowe commity **obejmie
+nowy PR** — a organ odradzał wtedy jedyną skuteczną drogę.
+
+**Strażnik mówiący „nie da się" tam, gdzie się da, jest gorszy od milczenia: zniechęca do
+naprawy.** Rozróżnienie jest teraz jawne — luka nieodwracalna (HEAD == head zmergowanego PR)
+kontra luka naprawialna nowym PR-em (gałąź poszła dalej). Obie strony granicy trzymają testy,
+bo zawężanie na oślep skasowałoby prawdziwe ostrzeżenie z PR #134.
+
+**Pliki:** `imperium/pretorianie/recognitor.py`, `tests/test_recognitor.py` (13 testów).
+
+---
+
+## 2026-07-28 | 📕 | Dziennik przestał wstrzykiwać obalone twierdzenia jako fakty
+
+> *Wachta rozpoczęta 2026-07-27 przeszła przez północ — znalezisko i pomiary pochodzą z 07-27,
+> wdrożenie domknięte 07-28. Datujemy po dacie wdrożenia, bo to ona wiąże się z kodem.*
+
+**Znalezisko strukturalne, wykryte przy pytaniu Cezara „co znaczy 4 z 9".** Dziennik
+Nieśmiertelny jest wstrzykiwany **w całości** do kontekstu Architekta na starcie każdej sesji.
+INDEX FALSORUM — organ, którego jedynym zadaniem jest pilnowanie, by obalone twierdzenie nie
+żyło dalej jako fakt — ma katalogi `bibliotheca_ulpia` i `dane` na liście **pomijanych**.
+
+**Jedyny korpus czytany na pewno co rano był jedynym, którego strażnik fałszów nie skanował.**
+Dlatego liczba „Imperium używa 2 z ~9 zdarzeń hooka" przeżyła obalenie i została przeze mnie
+powtórzona Cezarowi jako fakt.
+
+**SKALA ZMIERZONA, nie oszacowana: 5 wpisów ze 130** głosiło twierdzenia już obalone —
+3× „backtest kwadratowy", 1× nieistniejąca właściwość `rules` w schemacie ustawień,
+1× liczba zdarzeń hooka. Wszystkie wracały co rano bez sprostowania.
+
+**MECHANIZM (bez nowego organu — Prawo XVI):** `index_falsorum.trafienia_w_tekscie()` bada
+TEKST zamiast pliku, a `dziennik_niesmiertelny._formatuj_wpis()` dokleja `⚠️ OBALONE (INDEX
+FALSORUM): <poprawna teza>` do wpisu, który niesie obaloną frazę. **Historii nie przepisujemy**
+(Prawo I) — wpis zostaje słowo w słowo, zmienia się wyłącznie to, co mu **towarzyszy**.
+Awaria strażnika nie może zabić Dziennika: bez osi czasu Architekt traci ciągłość projektu,
+więc przy błędzie strażnik milknie, a Dziennik idzie dalej.
+
+**WADA ZŁAPANA PRZY BUDOWIE — pierwsza wersja nie wykryła NICZEGO.** Heurystyka „okna
+prostującego" (jeśli w ±kilku liniach stoi jawna korekta, to nie alarm) sprawdza się w prozie,
+gdzie linia niesie jedno zdanie. Wpis Dziennika jest odwrotnością: **jedna „linia" to cały
+akapit o wielu tematach naraz**. We wpisie `nomen27` słowo „OBALON" dotyczyło U4 — twierdzenia
+zupełnie innego — i uciszało fałszywą liczbę zdarzeń stojącą linię wyżej. Strażnik milczał
+dokładnie tam, gdzie go budowałem. Okno jest teraz domyślnie wyłączone dla tekstu; sprostowanie
+musi stać **przy frazie**, nie gdziekolwiek w sąsiedztwie tematu.
+
+**DOWÓD MUTACYJNY — i lekcja o atrapach.** Z 3 mutacji jedna przeżyła **dwa** podejścia:
+mój test negacji był atrapą, bo fraza dosłowna `ziemia jest plaska` do zdania „ziemia NIE jest
+plaska" **nie pasuje** — test przechodził, bo regex nie trafiał, a nie dlatego, że negacja go
+uciszała. Druga próba (`\W{0,12}`) była atrapą z tego samego powodu: `\W` nie obejmuje liter,
+więc wstawione „NIE" znów rozrywało wzorzec. Dopiero `.{0,12}` — fraza **przekraczająca**
+negację — dotknęła sprawdzanej ścieżki. Ostatecznie **3 z 3 mutacji zabite**.
+
+**Bramka:** audyt exit 0, ruff czysto, skan wad czysto. **Pliki:**
+`imperium/biblioteki/index_falsorum.py`, `imperium/biblioteki/dziennik_niesmiertelny.py`,
+`tests/test_dziennik_prostuje.py` (nowy).
+
+---
+
+## 2026-07-27 | 🚧 | Hooki PreToolUse/PostToolUse — CUSTOS LIMINIS i VIGIL (priorytet #1 Cezara)
+
+**Imperium używało 2 z 31 zdarzeń hooka (6.5%).** Rozkaz: domknąć wąsko — bariera przed
+narzędziem i automat Księgi Wad po zapisie. Teraz **4 z 31 = 12.9%**.
+
+**⚠️ KOREKTA LICZBY (na pytanie Cezara, w tej samej wachcie):** wcześniej wszędzie — w Dzienniku,
+w pamięci i w moich meldunkach — stało „~9 zdarzeń". To była liczba POWTARZANA, nie mierzona.
+Źródło rozstrzygające: schemat konfiguracji `json.schemastore.org/claude-code-settings.json`
+(maszynowy) wylicza **31** kluczy `hooks`. Dokumentacja narracyjna dała 30 i sama sobie przeczyła
+w nagłówku („32"), więc wzięliśmy z niej listę, a nie liczbę. Skutek: utrata potencjału jest
+**ponad trzykrotnie większa**, niż głosiła teza — pokrycie 12.9%, nie 44%. Wpis w INDEX FALSORUM.
+
+**🚨 ZMIERZONA LUKA, KTÓREJ SZUKALIŚMY GDZIE INDZIEJ.** Wczorajsza łata („`permissions.deny`
+z `Bash(git push:*)`") zapinała **jedną powłokę z dwóch**. Dokumentacja uprawnień mówi wprost:
+*„PowerShell permission rules use the same shape as Bash rules"* — to **osobna przestrzeń nazw**,
+a PowerShell jest w tym środowisku powłoką **podstawową**. Reguła `Bash(...)` nie ma prawa
+zatrzymać wywołania narzędzia `PowerShell`. Rozkaz oznaczony jako NIENARUSZALNY był więc nadal
+egzekwowany połowicznie — 16 dni bez mechanizmu, potem 1 dzień z mechanizmem na połowę powierzchni.
+Naprawa dwutorowa: reguła `PowerShell(git push:*)` **oraz** strażnik hooka.
+
+**PREMISA, KTÓRĄ OBALIŁ POMIAR (Prawo I dotyczy też własnych tez).** Zacząłem od tezy: *„deny
+dopasowuje prefiks, więc nie złapie `cd x && git push`"*. Dokumentacja tę tezę **obaliła** —
+Claude Code zna operatory powłoki i rozbija polecenia złożone na podpolecenia (`&&`, `||`, `;`,
+`|`, `|&`, `&`, nowa linia), a reguła musi pasować do każdego z osobna. Gdybym nie sprawdził,
+zbudowałbym barierę uzasadnioną fałszywą przesłanką — dokładnie to, co zrobił FRUMENTARIUS,
+cytując zmyśloną liczbę. Prawdziwe szczeliny okazały się dwie: inna **powłoka** i inna
+**składnia** tego samego polecenia (`git -C /repo push` nie ma prefiksu `git push`).
+
+**CUSTOS LIMINIS** (`imperium/pretorianie/custos_liminis.py`) — PreToolUse:
+- `git push` w dowolnej formie → **deny**; asymetria kosztów jest jawna: fałszywe zatrzymanie
+  kosztuje jedno zdanie Cezara, przepuszczenie kosztuje złamany rozkaz.
+- zapis do `archiwum/` → **ask**, nie deny. Konstytucja mówi „archiwum otwierasz TYLKO na rozkaz
+  Cezara", więc decyzja należy do niego; `deny` by mu ją zabrało, cisza oddałaby ją mnie.
+- wszystko inne → **cisza**. Strażnik zabierający głos przy każdym poleceniu przestaje być słyszany.
+- Fałszywe alarmy trzymane w ryzach: czytamy PODPOLECENIE gita, więc `git log --grep push`
+  przechodzi bez słowa.
+
+**VIGIL** (`imperium/pretorianie/vigil.py`) — PostToolUse: po każdym zapisie `.py` uruchamia
+`ruff` + `skan_wad_kodu` i wstrzykuje zarzuty **od razu**, zamiast czekać na bramkę. Powód
+zmierzony: Księga Wad ma **126 klas i 16 wzorców regex (~13% automatu)**, a klasa nazwana 07-26
+wróciła 07-27 w 277 egzemplarzach. Cisza gdy zielone. Koszt zmierzony: ~0.35 s na plik,
+narzut strażnika progu ~143 ms na wywołanie.
+
+**Dwie wady złapane w trakcie budowy (obie przez własne testy i pomiar, nie przez recenzję):**
+1. **Cytowana ścieżka ze spacją omijała barierę** — `"C:\Program Files\Git\bin\git.exe" push`
+   rozbijało się gołym `split()` na `"C:\Program`, więc pierwszy token nie wyglądał na gita.
+   Na Windowsie to forma codzienna. Naprawione tokenizacją `shlex(posix=False)` — tryb POSIX
+   zjadłby backslashe ścieżek.
+2. **Kodowanie mogło unieważnić całą barierę** — protokół wypisywał emoji i polskie znaki,
+   a strumień wyjściowy na Windowsie potrafi mieć stronę kodową cp1250, w której ich nie ma.
+   Bariera zniknęłaby przez **kosmetykę**. Naprawione: JSON w czystym ASCII (`\uXXXX`), odbiorca
+   dekoduje z powrotem.
+
+**Uwaga operacyjna:** hooki wczytywane są przy starcie sesji, więc **działają od następnej wachty**,
+nie w tej. Weryfikacja end-to-end wykonana ręcznie przez wrapper (deny na push w obu powłokach,
+cisza na `git status`).
+
+**Pliki:** `imperium/pretorianie/custos_liminis.py` (nowy), `imperium/pretorianie/vigil.py` (nowy),
+`.claude/hooks/pre-tool-use.sh` (nowy), `.claude/hooks/post-tool-use.sh` (nowy),
+`tests/test_straznicy_hookow.py` (nowy), `.claude/settings.json`, `docs/ARCHITEKTURA_IMPERIUM.md`,
+`docs/CENSUS_ORGANORUM.md`, `README.md`.
+
+---
+
+## 2026-07-27 | ⚖️ | Sąd nad odłożonymi uwagami cubica — 5 przyjętych, 3 odłożone z powodem
+
+**Siedem uwag z PR #134 leżało odłożonych świadomie.** Osądzone wobec ŻYWEGO kodu (kandydat ≠
+prawda — zmierzone wcześniej: najcięższe uwagi cubica bywają nietrafione). Wynik: **5 realnych,
+3 odłożone z podanym powodem, nie z lenistwa**.
+
+**PRZYJĘTE I NAPRAWIONE:**
+
+1. **Kontrakt odpowiedzi klasyfikatora** (`notarius.py`) — bramka sprawdzała, czy odpowiedź jest
+   *obiektem JSON*, a nie czy jest *werdyktem*. `{"error": "rate limited"}` spełniało pierwsze,
+   a próg długości odpowiedzi klasyfikacji nie obowiązuje (werdykt ma z definicji 34–41 znaków) —
+   więc **awaria API mogła wejść do zbioru treningowego TIRO jako etykieta**. Adapter czytający tę
+   samą treść w produkcji ją odrzuca: dwa różne progi na tę samą treść to definicja rozjazdu.
+   **Pomiar przed naprawą: 108 par klasyfikacji, 102 poprawne, 6 z zepsutym JSON-em (już
+   odrzucanych), 0 z tym kształtem** — wada realna, ale utajona. Naprawiona mimo to: koszt zerowy,
+   a skutkiem byłoby ciche zatrucie zbioru, którego cała wartość polega na prawdziwości etykiet.
+2. **Nie-napis w polu `rodzaj` wywracał CAŁY eksport** (`notarius.py`) — `(x or "").strip()` łapie
+   `None` i pusty napis, ale nie liczbę: `rodzaj: 5` jest prawdziwe i wywala `.strip()` na `int`.
+   Jeden zniekształcony (składniowo poprawny) rekord JSONL kasował plon całej sesji.
+3. **Wyrok bez adresata** (`bibliotekarz.py`) — `zapisz_wyrok` przyjmował dowolny `dot_ts`.
+   Literówka tworzyła orzeczenie wskazujące w próżnię, a sądzona cząstka **dalej czekała w
+   kolejce**. Przy 35 cząstkach na wachtę to jedno przestawienie cyfry. Cichy `False` byłby gorszy
+   niż wyjątek: „już osądzone" i „nie ma czego sądzić" to dwa różne stany.
+4. **Licznik, który kłamie** (`bibliotekarz.py`) — PROBATOR bada OBA plony (kandydaci + krytyka),
+   więc jeden temat dokładał dwa wpisy, a nagłówek głosił „X/N **tematów**". Przy obu skażonych
+   licznik mógł ogłosić więcej tematów skażonych, niż w ogóle skanowano.
+5. **Bramka sprawdzała OBECNOŚĆ znacznika, nie jego LICZBĘ** (`audyt_spojnosci.py`, W20) —
+   porównanie bierze treść między *pierwszą* parą znaczników, więc zdublowany `START` zostawiał
+   drugi blok poza kontrolą Tabularium, a audyt meldował „katalog zgodny ✅". Ta sama klasa co
+   bramka pilnująca jednego katalogu z jedenastu.
+
+**ODŁOŻONE — z powodem, nie milczeniem:**
+
+- **Zużycie pamięci przy eksporcie** (`notarius.py`): zarzut poprawny kierunkowo, ale **zmierzony
+  ledger to 3.59 MB / 398 par** przy 15.88 GB RAM. Wraca do rozważenia przy ~50 000 par; cel
+  bieżący to 1 000.
+- **Blokada pliku przy równoległych sędziach** (`bibliotekarz.py`): **równoległych sędziów nie ma** —
+  sąd jest sekwencyjnym poleceniem jednego operatora. Wraca, gdy pojawi się drugi piszący.
+- **Backticki w tekście narracyjnym** (log sesji): to nie wada modułu, tylko zagrożenie praktyki
+  pisania (podstawianie poleceń w powłoce). Praktyka już obowiązuje: heredoc cytowany (`<<'PY'`).
+
+**Błąd własny złapany po drodze:** dodając cache znaczników kolejki unieważniłem go przy zapisie
+wyroku, ale nie przy zapisie cząstki — świeżo zapisana cząstka była niewidzialna dla walidacji.
+Złapały to **istniejące testy**, nie recenzja.
+
+**Bramka:** testy zielone, audyt exit 0, ruff czysto. **Księga Wad:** 121 → 126.
+
+**Pliki:** `imperium/biblioteki/notarius.py`, `narzedzia/bibliotekarz.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_kontrakt_klasyfikacji.py` (nowy),
+`tests/test_bibliotekarz.py`, `tests/test_spojnosc.py`.
+
+---
+
+## 2026-07-27 | 🔎 | RECOGNITOR — cisza recenzenta przestała się liczyć jako zgoda
+
+**Pytanie Cezara:** *„czy cubic znalazł jakieś nowe błędy na branchu roboczym?"*.
+Odpowiedź „nie" była prawdziwa w literze i myląca w treści — i to jest cała lekcja tej zmiany.
+
+**POMIAR (GitHub API, nie pamięć):** na PR #134 recenzent wykonał **dokładnie jeden przebieg**
+(`review-run=2242666a`, 2026-07-27 10:34:58 UTC), a wszystkie 15 uwag napisał wobec commita
+`bfb5e26`. Potem na gałąź weszły **3 commity** — w tym `bc4913c`, który naprawiał *jego własne*
+uwagi i dokładał nowy organ (NOMENCLATOR, 295 linii) — po czym PR **zmergowano o 12:25 UTC bez
+drugiego przebiegu**. Do `main` trafiło **756 linii `.py` bez recenzji zewnętrznej**, a ponieważ
+gałąź jest już zmergowana, nowy PR pokazałby zero różnicy: **luka jest nieodwracalna**.
+
+**KLASA WADY:** „brak nowych uwag" wyglądał identycznie jak „brak wad", bo **nic nie pytało,
+czy recenzent nadążył**. Siostra klasy z tego samego dnia (zakaz pushu bez mechanizmu) i klasy
+„alarm na stderr = cisza udająca spokój". Rzecz niezmierzona nie jest zielona — jest niezmierzona.
+
+**MECHANIZM:** `imperium/pretorianie/recognitor.py` (11 testów) — porównuje commit ostatniej
+recenzji z HEAD gałęzi. Pyta endpoint `reviews` (przebieg istnieje także bez ani jednej uwagi,
+więc komentarze inline nie odróżniłyby „przeczytał i nie miał uwag" od „nie przyszedł").
+Rozróżnia lukę **naprawialną** pushem od **nieodwracalnej** po mergu. Braku sieci NIGDY nie
+melduje jako zieleni: kod 2 = niewiedza. Wpięty w **krok 3 domknięcia** (CLAUDE.md), świadomie
+POZA hookiem startowym — wymaga sieci, a start ma być szybki i offline.
+
+**Recenzja adversarialna tych 756 linii — 3 realne wady w kodzie, który już był w `main`:**
+1. **P0 — cicha korupcja wersjonowanej pamięci.** Redakcja katalogu domowego budowała wzorzec
+   ze sklejonych segmentów `Path.home()`. Na **płytkim domu degenerowała się**: `/root`
+   (klasyczny kontener, czyli nasza chmura) dawał gołe słowo `root` z `IGNORECASE`, więc cytat
+   kodu `ROOT = Path(__file__)` zapisywał się do kroniki jako `~ = Path(__file__)`; dom `/`
+   dawał wzorzec **pusty**, a `re.sub` wstawiał `~` **między każdy znak**. Niewidoczne na
+   `C:\Users\Ian` (trzy segmenty) — dlatego przeszło. Naprawa: wymóg separatora i granicy słowa
+   + odmowa redakcji domu, którego nie da się bezpiecznie związać, **głośna** w meldunku kroniki.
+2. **P1 — alarm w strumieniu, którego nikt nie czyta.** Hook `SessionStart` zachowuje wyłącznie
+   `stdout`. Ostrzeżenia o pominiętych wpisach pamięci (i **powód błędu DeepSeeka**, za którego
+   zapytanie płacimy) szły na `stderr`. Dowód z wydruku tego samego dnia: stoi
+   „(pominięto 2 duplikatów)" i **ani jednej linii, co pominięto**. Naprawa: alarmy na `stdout`,
+   duplikat meldunku usunięty (Prawo XVI), a test przestał przypinać `stderr` — bo zielony test
+   certyfikował mechanizm, który w produkcji milczał.
+3. **P3 — licznik i mianownik z dwóch przebiegów.** NOMENCLATOR dzielił plon na kandydatów
+   dwukrotnie; raport „2/5" mógł kiedyś opisywać dwa różne podziały tego samego tekstu.
+
+**Dowód mutacyjny** (bo „testy zielone" bez niego nic nie znaczy): 2 mutacje naprawy — usunięcie
+straży i usunięcie granic wzorca — **obie zabite**, każda z dowodem, że plik faktycznie się
+zmienił (hash przed/po). Przy okazji własny błąd: skrypt mutacyjny padł na kodowaniu **po**
+nałożeniu mutacji i **przed** przywróceniem, zostawiając w drzewie kod bez straży. Naprawione
+przywracaniem w `finally` + weryfikacją hashu po przywróceniu; klasa dopisana do Księgi Wad.
+
+**Bramka:** 3006/3006 testów (+19), audyt exit 0, ruff czysto, skan wad czysto.
+**Księga Wad:** 115 → 121 (6 nowych klas). **Census:** 245 → 246 organów.
+
+**Pliki:** `imperium/pretorianie/recognitor.py` (nowy), `tests/test_recognitor.py` (nowy),
+`tests/test_redakcja_domu.py` (nowy), `imperium/biblioteki/kronika_czatu.py`,
+`imperium/biblioteki/rejestr_wizji.py`, `narzedzia/auto_lekcja.py`,
+`imperium/pretorianie/nomenclator.py`, `tests/test_centrum_pamieci.py`, `CLAUDE.md`,
+`docs/ARCHITEKTURA_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`, `README.md`.
+
+---
+
 ## 2026-07-27 | 🔐 | Zakaz pushu przestał zależeć od pamięci Architekta — `permissions.deny`
 
 **Cenzus narzędzi sterowania (pytanie Cezara) znalazł sprzeczność między konstytucją
@@ -39,6 +276,11 @@ rozkazu nienaruszalnego.
 
 **Odłożone jako priorytet następnej sesji (rozkaz Cezara):** hooki `PreToolUse`/`PostToolUse`
 — Imperium używa **2 z ~9** dostępnych zdarzeń hooka, więc większość checklist pozostaje
+  <!-- ⚠️ SPROSTOWANIE 2026-07-27: liczba „~9" jest BŁĘDNA i została OBALONA tego samego dnia.
+  Zdarzeń hooka jest 31 (zmierzone schematem konfiguracji), więc pokrycie wynosiło 6.5%, nie 22%.
+  Zdania wyżej NIE przepisujemy — wpis ACTA jest prawdą swojego czasu (Prawo I). Patrz INDEX
+  FALSORUM i wpis „Hooki PreToolUse/PostToolUse" z 2026-07-27. -->
+
 bez automatu.
 
 **Pliki:** `.claude/settings.json`.

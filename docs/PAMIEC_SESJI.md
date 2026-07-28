@@ -113,6 +113,33 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Hooki ograniczone wyłącznie do SessionStart i SessionEnd
+Zweryfikowano, że nie istnieją hooki PreToolUse/PostToolUse, co eliminuje ryzyko dublowania rozkazów. Settings.json niesie tylko wskazane hooki.
+
+### 2026-07-27 — System w harmonii – testy 2987/2987 zielone, audyt Prawa XXI exit 0
+Pełna pochwała: wszystkie testy przechodzą, 22 warstwy czystości kodu, ruff bez błędów. Spójność Klucznika potwierdzona.
+
+### 2026-07-27 — Backtest liniowy O(n·okno), nie O(n²)
+Pomiar cProfile wykazał stały ~66 ms/tick dla okna 251 barów. Skalowanie liniowe, nie kwadratowe. Poprzednia diagnoza o O(n²) była błędna.
+
+### 2026-07-27 — prekalkuluj_portfel nie poprawia złożoności algorytmicznej
+prekalkuluj_portfel robi tę samą pracę per-bar (zbuduj na oknie), tylko równolegle per-symbol. Mimo cache daje zysk marne 1.4×, nie zmienia O(n·okno).
+
+### 2026-07-27 — Prawdziwy sprawca kwadratu: _py_hma (pętla w pętli wma)
+Wewnętrzna pętla w _py_hma wywołuje wma wielokrotnie (4,5 mln wywołań na 2700 ticków), dając O(period²) dla tego jednego wskaźnika. Reszta backtestu jest liniowa.
+
+### 2026-07-27 — dodaj_checklist nie zapisuje na dysk
+dodaj_checklist() zwraca True i inkrementuje licznik w pamięci, ale nie wywołuje zapisz() – wpis nie trafia na dysk. Naprawiono przez dodanie zapisu.
+
+### 2026-07-27 — Niezgodność testów: pytest vs runner Imperium
+Testy zielone pod pytest, ale padły pod runnerem Imperium z powodu braku setitem w shim monkeypatch. Naprawiono bez zależności od shimu.
+
+### 2026-07-27 — Błąd w ocenie czasu gnicia – 9 dni zamiast pół roku
+W LOG_ZMIAN i pamięci napisano 'pół roku', a faktyczny czas od utworzenia runbooka wynosił 9 dni. Błąd wykryty przy liczeniu dla podglądu Kapitolu – poprawiono we wszystkich miejscach.
+
+### 2026-07-27 — Asymetria testów: pytest vs runner Imperium
+Test przeszedł pod pytest, ale padł pod własnym runnerem Imperium przez brak `monkeypatch.setitem` w shimie. Wykryto rozjazd narzędzi – naprawiono przez uniezależnienie od shimu.
+
 ### 2026-07-27 — Bieg testów #1 nieważny – równoległość z mutacjami
 Testy startowały przed zmianą W22 i biegły w tle podczas sed-owania mutacji. Wynik '55 z 73' i exit 0 od tail, nie od testów. Ważny tylko bieg #2 wystartowany po wszystkich zapisach.
 
@@ -131,20 +158,11 @@ Wszystkie istniejące systemy pamięci (Mem0/Zep/Letta/A-Mem) są domenowo-ślep
 ### 2026-07-26 — Rozjazd repo z chmurą przez hooki po obu stronach
 Od wspólnego punktu e2cb846 chmura dorobiła 2 commity (sync+migawka), lokalnie 2 (auto: sync pamięci). Hooki commitują same po obu stronach – dwa ciągi wyrosły z tego samego pnia.
 
-### 2026-07-20 — 20 sprzeczności w Refleksji, 3 pilne
-Audyt startowy wykrył 20 sprzeczności, w tym 3 pilne: audytu/nowy, chmura/lokal/naprawa, false/faza – wymagają przeglądu.
-
 ### 2026-07-20 — Błąd replikacji wiedzy – Claude sam nie stosuje własnych procedur
 W poprzednich sesjach wielokrotnie brakowało aktualizacji dokumentów i ledgera, mimo że Claude tworzył procedury (np. ALMA, OBSERWATORY). To klasyczny błąd replikacji wiedzy – Claude tworzy narzędzia, ale sam ich nie używa.
 
 ### 2026-07-20 — Cztery zmysły działają na żywych danych
 Potwierdzono, że adaptery FearGreed (23), RSS (30 nagłówków), PSY (funding, CVD) i V (CVD) generują głosy. V-03 (CVD)→LONG, PSY-03 (FearGreed=23)→LONG kontrariańsko, NEWS-01→LONG. Abstynencje legalne (Prawo XV).
-
-### 2026-07-20 — Brudne drzewo – auto_lekcja_przetworzone.txt
-Audyt startowy wykazał 3 dopisane linie przez automat w pliku bibliotheca_ulpia/dane/auto_lekcja_przetworzone.txt. Nie jest to zmiana ręczna – wymaga decyzji Cezara.
-
-### 2026-07-20 — MoE niewykonalne na 6GB VRAM
-Mixture of Experts wymaga trzymania wszystkich ekspertów w pamięci jednocześnie. 4 eksperty po 7B wymagają ~28B RAM – na RTX 4050 (6GB) to niemożliwe.
 
 ### 2026-07-20 — Błąd cache/resume kluczowany tylko nazwą pliku w harnessach A/B
 Harnessy A/B (ab_tryb_strategii, ab_strategy_mwu, ab_wazenie_ic, ab_pnl_wazenie_ic) używają tylko nazwy pliku jako klucza cache, ignorując parametry konfiguracji.
@@ -182,9 +200,6 @@ Błąd klasy API-widma: dokumentacja indeksu/manualu zawiera komendy do plików,
 ### 2026-07-20 — 1003 z 1301 odwolan do dokumentow to kronika sesji
 Przenoszenie zywych dokumentow tworzy martwe linki w historii (Prawa I nie wolno poprawiac). Rozklad asymetryczny: zywe maja 1-19 odwolan, kronika 58-63. Przenoszenie jest drogie.
 
-### 2026-07-20 — Brak metadanych to źródło bałaganu
-64 dokumenty w docs/ mają zero nagłówków metadanych. Audyt nie wie, czym dokument jest, przez co bramki (np. W5, W10) opierają się na ręcznie wpisanych wyrażeniach zamiast na strukturze. To nie skaluje się do 213 plików .md.
-
 ### 2026-07-21 — Test negatywny PROBATORA wykrył błąd graniczny z '_'
 Znak '_' jest traktowany jako słowny przez \b, co powodowało fałszywe dopasowanie przy identyfikatorze BIB-006_Carson. Poprawiono test, nie organ – zastosowano inny separator.
 
@@ -209,9 +224,6 @@ W pomiar_stablecoin_ic.py help-string zawierał % zmiany, co powoduje ValueError
 ### 2026-07-20 — Eskalacja przy rutynowym teście złapała krytyczne bugi
 Dwa bugi (ccxt NotSupported blokujący pętlę live, brak __main__ w petla_live.py) zostały znalezione dzięki eskalacji do Opusa podczas rutynowego testu paper. Potwierdza skuteczność zasady eskalacji.
 
-### 2026-07-20 — Audyt startowy: 22 neurony ŻYWE ale NIEZMIERZONE
-Audyt ujawnił 22 neurony zależne od adapterów (AUG-01, NEWS-01..04, PSY-01..04, RADAR-01..05, OC-06..08, V-03, X-28, Z-06/07) wpięte w pętlę live, ale bez pomiaru w paper. Stanowią największą utratę potencjału.
-
 ### 2026-07-20 — Wzorzec kodowania nie skanował przez rok
 Regex na subprocess text=True bez encoding istniał od sesji 2026-07-17, ale leżał martwy w checkliście. Po przeniesieniu do listy wzorców od razu złapał realny bug w audycie.
 
@@ -230,9 +242,6 @@ Linia 259 audytu zawierała jedyny subprocess.run bez encoding – trzy pozosta�
 ### 2026-07-21 — Niespójność licznika memory a rzeczywista liczba wpisów na dysku
 Metoda dodaj_checklist() zwiększała licznik w pamięci (52), ale wpis nie zapisywał się do pliku (zostało 51). Zapisz() jest osobną metodą, co powoduje cichą utratę danych. Naprawiono przez jawne wywołanie zapisz() po dodaniu.
 
-### 2026-07-21 — dodaj_checklist() zwraca True, ale wpis nie zapisuje się na dysku
-dodaj_checklist() inkrementuje licznik w pamięci, ale zapis na dysk wymaga osobnego wywołania zapisz(). To pułapka – stan pamięci może być niezgodny z dyskiem.
-
 ### 2026-07-21 — Błędny wpis o czasie gnicia runbooka – 9 dni zamiast 'pół roku'
 W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokładnie: 9 dni. Sprostowano u źródła (ledgery, pamięć).
 
@@ -250,9 +259,6 @@ Pomiary profili dla 500-1600 barów wykazały stały ms/tick (~66ms), co oznacza
 
 ### 2026-07-20 — Output hooka startowego ucięty przez harness
 Output hooka startowego (25,5 KB) został ucięty, powodując utratę kluczowej informacji (Dziennik następny krok) z pierwszego okna. Konieczna optymalizacja objętości.
-
-### 2026-07-20 — Testy >2 min na starym Fujitsu – bez limitu czasowego
-Testy trwają ponad 2 minuty ze względu na słaby sprzęt. Nie dawać limitu timeoutu. Uruchamiać w tle i cyklicznie sprawdzać, czy bieg żyje. Procedura zapisana w pamięci długoterminowej.
 
 ### 2026-06-30 — KROK 0 ujawnił błąd w liczeniu neuronów w MANIFEST
 MANIFEST pokazywał 45 aktywnych, podczas gdy grep wykazał ~16. Przyczyna: zwiadowcy i infrastruktura liczone jako neurony. Nauczka: ujednolicić sposób liczenia.

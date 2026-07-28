@@ -68,8 +68,16 @@ ZASIEG_NEGACJI = 8
 
 # KOREKTA JAWNA jest jednoznaczna (mówi wprost „to było błędne"), więc wolno jej stać
 # gdziekolwiek w oknie — także gdy zdanie zawija się przez granicę linii.
-KOREKTA_JAWNA = ("obalon", "OBALON", "błędn", "BŁĘDN", "bledn", "dawn", "DAWN", "mylon",
-                 "premisa", "korekt", "KOREKT", "sprostow", "historyczn")
+#
+# ODMIANA RZECZOWNIKOWA DOPISANA PO POMIARZE 2026-07-28 (fałszywy alarm na otwarciu wachty):
+# `dziennik_niesmiertelny.py:167` CYTUJE obalone twierdzenie, żeby wyjaśnić, po co powstał
+# organ, a zdanie prostujące stoi linię niżej: „przeżyło tam **obalenie**". Marker „obalon"
+# łapie imiesłów (obalone/obalony/obalona) i NIE łapie rzeczownika (obalenie/obalenia) —
+# strażnik zgłosił własną dokumentację jako kłamstwo. To ta sama klasa co Księga Wad #35:
+# chroniczny FP uczy obchodzić bramkę, a obchodzona nie broni niczego.
+KOREKTA_JAWNA = ("obalon", "OBALON", "obalen", "OBALEN", "błędn", "BŁĘDN", "bledn",
+                 "dawn", "DAWN", "mylon", "premisa", "korekt", "KOREKT", "sprostow",
+                 "historyczn")
 
 
 def _dzis() -> str:
@@ -187,6 +195,55 @@ def _pomijany(sciezka: Path, korzen: Path) -> bool:
     if sciezka.name in PLIKI_POMIJANE:
         return True
     return any(cz in KATALOGI_POMIJANE for cz in sciezka.relative_to(korzen).parts[:-1])
+
+
+def trafienia_w_tekscie(tekst: str, wpisy: list[dict] | None = None,
+                        okno_prostujace: bool = False) -> list[dict]:
+    """Które obalone twierdzenia dany TEKST głosi jako fakt (bez czytania plików).
+
+    POWSTAŁO Z DZIURY ZMIERZONEJ 2026-07-27 (pytanie Cezara „co znaczy 4 z 9"):
+    `przeszukaj` chodzi po PLIKACH i świadomie pomija katalogi kronik — w tym
+    `bibliotheca_ulpia/dane`, gdzie leży **Dziennik Nieśmiertelny**. A Dziennik jest
+    wstrzykiwany W CAŁOŚCI do kontekstu Architekta na starcie KAŻDEJ sesji. Wychodziło
+    z tego najgorsze możliwe ustawienie: jedyny korpus czytany na pewno co rano był
+    jedynym, którego strażnik fałszów nie skanował. Twierdzenie „Imperium używa 2 z ~9
+    zdarzeń hooka" przeżyło tam obalenie i zostało przeze mnie powtórzone Cezarowi jako fakt.
+
+    LEKARSTWEM NIE JEST PRZEPISYWANIE KRONIKI (Prawo I: nie falsyfikujemy historii), tylko
+    OZNACZANIE wpisu w chwili, gdy trafia do kontekstu. Dlatego ta funkcja działa na tekście,
+    a nie na pliku — kronika zostaje nietknięta, zmienia się to, co jej TOWARZYSZY.
+
+    OKNO PROSTUJĄCE DOMYŚLNIE WYŁĄCZONE — i to nie jest drobiazg (zmierzone na pierwszej
+    wersji tej funkcji, która NIC nie wykryła). W plikach prozy heurystyka „jeśli w ±kilku
+    liniach stoi jawna korekta, to nie alarm" działa, bo linia niesie jedno zdanie. Wpis
+    Dziennika jest odwrotnością: jedna „linia" to cały akapit o WIELU tematach naraz.
+    W testowanym wpisie `nomen27` linia 4 zawierała słowo „OBALON" — o U4, twierdzeniu
+    zupełnie innym — i uciszała fałszywą liczbę zdarzeń hooka stojącą linię wyżej.
+    Strażnik milczał dokładnie tam, gdzie go zbudowałem. Zostaje więc sama `_negacja_przy`,
+    czyli sprostowanie musi stać PRZY frazie, nie gdziekolwiek w sąsiedztwie tematu.
+
+    Ta sama logika co w `przeszukaj` (negacja przy frazie), bo to jedna reguła w dwóch
+    zastosowaniach — kopia rozjechałaby się cicho.
+    """
+    wpisy = aktywne() if wpisy is None else wpisy
+    if not wpisy or not tekst:
+        return []
+    linie = tekst.splitlines()
+    znalezione: list[dict] = []
+    widziane: set = set()
+    for i, linia in enumerate(linie):
+        if okno_prostujace and _okno_prostuje(linie, i):
+            continue
+        for wpis in wpisy:
+            if wpis["fraza"] in widziane:
+                continue        # jedno ostrzeżenie na twierdzenie, nie na wystąpienie
+            m = re.search(wpis["fraza"], linia)
+            if m and not _negacja_przy(linia, m.start(), m.group()):
+                widziane.add(wpis["fraza"])
+                znalezione.append({"fraza": wpis["fraza"],
+                                   "poprawna_teza": wpis.get("poprawna_teza", ""),
+                                   "linia": linia.strip()[:160]})
+    return znalezione
 
 
 def przeszukaj(korzen: Path | None = None, wpisy: list[dict] | None = None,

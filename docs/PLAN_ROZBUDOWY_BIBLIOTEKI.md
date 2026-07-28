@@ -3,7 +3,7 @@ kategoria: CONSILIUM
 typ: zywy
 wlasciciel: narzedzia/bibliotekarz.py, narzedzia/przygotuj_biblioteke.py
 stan_na: 2026-07-28
-powod_istnienia: "PEŁNY spis biblioteki Imperium: 306 pozycji (BIB-001..306) — 69 posiadanych fundamentów, 234 pozycje rozbudowy, każda ze statusem posiadania, licencji i obecności w RAG."
+powod_istnienia: "PEŁNY spis biblioteki Imperium: 306 pozycji (BIB-001..306) — 69 posiadanych fundamentów, 234 pozycje rozbudowy, każda ze statusem posiadania i obecności w RAG."
 ---
 # 📚 BIBLIOTHECA ULPIA — PEŁNY SPIS: BIB-001 … BIB-306
 
@@ -77,21 +77,6 @@ z autorem „–" i fabrykowane cytowania — patrz `docs/` + pamięć `lista-ks
 |---|---|
 | ✅ | **Kanon** — dzieło, którego istnienia jestem pewien (klasyk, wielokrotnie wydawany). Rok/wydanie **potwierdź przed zakupem**. |
 | ⚠️ | **Do weryfikacji** — pozycja prawdopodobna, ale NIE potwierdzona w tej sesji. Sprawdź przed wydaniem pieniędzy. |
-| 🆓 | **Otwarta — JEST PLIK od autora/wydawcy/arXiv.** Wolno pobrać. Bierzemy pierwsze. |
-| 📖 | **Tylko do czytania online — BRAK pliku i BRAK otwartej licencji.** ⛔ **NIE wchodzi do RAG.** |
-
-🚨 **KOREKTA 2026-07-16 (mój błąd, Prawo I):** pierwotnie miałem jeden znacznik 🆓 i **mieszałem
-dwie różne rzeczy** — „darmowe do czytania" ≠ „wolno pobrać". Przykład, na którym to wyszło:
-**Hyndman FPP3** jest darmowa do czytania na otexts.com, ale OTexts **nie daje PDF/EPUB** i strona
-**nie ma otwartej licencji** (brak CC). Zeskrobanie jej HTML-a do `tekst_cache` byłoby wrzuceniem
-pełnego tekstu chronionego dzieła **do gita** — a nasz `.gitignore` wyrzucił binaria książek
-dokładnie przez „ryzyko praw autorskich komercyjnych tytułów". Decyzja Cezara 2026-07-16: **nie ściągać.**
-
-⚠️ **Statusu 🆓 przy POZOSTAŁYCH pozycjach NIE zweryfikowałem pozycja-po-pozycji.** Pewne otwarte
-(autor/wydawca sam daje plik): **arXiv** (Attention, LoRA, QLoRA, Hinton-distylacja, LIMA, Flash Boys 2.0,
-speculative decoding), **Boyd** (Stanford), **Hastie ESL** (Stanford), **Hernán & Robins**, whitepapery
-**Bitcoin/Ethereum**, **MacKay**. Reszta 🆓 = **do sprawdzenia przed pobraniem** — może się okazać
-📖 jak FPP3. Nie zgaduj: sprawdź licencję na stronie źródła.
 
 ⚠️ **Mój cutoff wiedzy to styczeń 2026** — pozycje z 2025/2026 są z natury mniej pewne. Żadna data
 wydania na tej liście nie jest zweryfikowana w tej sesji; traktuj rok jako orientacyjny.
@@ -242,7 +227,7 @@ Autor i tytuł **odczytane z nazw plików** (zgodnych ze schematem), rok i wydaw
 | 012 | Strauss van der Post | *Coding Capital* (2024) | epub | 225 |
 
 > ⚖️ **Uczciwie:** ten blok jest **inwentarzem**, nie rekomendacją — te książki już mamy,
-> więc znacznik pewności (✅/⚠️/🆓) nie ma tu zastosowania. Przydział do działów encyklopedii
+> więc znacznik pewności (✅/⚠️/) nie ma tu zastosowania. Przydział do działów encyklopedii
 > opisuje `bibliotheca_ulpia/encyklopedia/INDEX_MAIOR.md`. ⚠️ Ta mapa pokrywa **tylko ten blok**
 > — 136 nowszych książek nie ma jeszcze przypisanego działu.
 
@@ -257,16 +242,16 @@ Autor i tytuł **odczytane z nazw plików** (zgodnych ze schematem), rok i wydaw
 
 | BIB | Autor | Tytuł | Dlaczego teraz |
 |---|---|---|---|
-| 070 | Vaswani i in. | *Attention Is All You Need* (2017) 🆓 ✅ | Fundament transformerów — **wprost pod TIRO**. arXiv:1706.03762 |
-| 071 | Easley, López de Prado, O'Hara | *Flow Toxicity and Liquidity in a High-Frequency World* (RFS 2012) 🆓 ✅ | **Źródło naszego neuronu Z-01 (VPIN)** — mamy neuron, nie mamy źródła |
-| 072 | Hyndman, Athanasopoulos | *Forecasting: Principles and Practice* (**2nd ed.**) ✅ **W BIBLIOTECE** | ✅ **ZAINDEKSOWANA 2026-07-16** — Cezar ma **kupiony** egzemplarz (PDF, 2. edycja) z własnego dysku. 257 fragmentów w RAG, korpus 27 959 → 28 535. Kanon prognozowania — domyka zerową lukę (mamy WFO i Sybillę z Brierem, nie mieliśmy teorii). ⚠️ Uwaga na przyszłość: **downloadowalna wersja FPP jest PŁATNA** (OTexts: „Buy a print or downloadable version"); darmowe jest tylko czytanie online — nie ściągać z serwisów typu dokumen.pub. 3. edycja różni się głównie przejściem `forecast`→`fable` (R), dla nas bez znaczenia |
-| 073 | Boyd, Vandenberghe | *Convex Optimization* 🆓 ✅ **W BIBLIOTECE** | ✅ **ZAINDEKSOWANY 2026-07-16** — 734 fragmenty. Licencja czysta: *„Copyright… held by Cambridge University Press, who have kindly agreed to allow us to keep the book available on the web"* — wydawca **wprost zgodził się** na darmową dystrybucję (to realne 🆓, nie „darmowe do czytania" jak FPP). Plik: `bv_cvxbook.pdf` ze https://web.stanford.edu/~boyd/cvxbook/ |
-| 074 | Boyd, Vandenberghe | *Additional Exercises for Convex Optimization* 🆓 ✅ **W BIBLIOTECE** | ✅ **ZAINDEKSOWANY 2026-07-16** — 517 fragmentów. Numer był wolny (spalony na odsyłacz do Goodfellowa = BIB-068). ⚠️ **PUŁAPKA:** na stronie Boyda leżą OBOK SIEBIE dwa PDF-y; ten zbiór zadań pobrał się zamiast podręcznika i wpadł pod nazwą „Convex-Optimization" — wykryte dopiero czytaniem treści, nie nazwy. Wartość dla TIRO realna: **rozwiązane zadania pokazują rozumowanie krok po kroku**, nie samą teorię |
-| 075 | Nakamoto | *Bitcoin: A Peer-to-Peer Electronic Cash System* 🆓 ✅ **W BIBLIOTECE** | ✅ 10 frag. (⚠️ moja pomyłka w 1. wersji listy: przypisałem współautora „Daspremont" — to **wyłącznie Nakamoto**). 🐞 Ten plik ujawnił bug ebooklib (patrz niżej) |
-| 076 | Buterin | *Ethereum Whitepaper* 🆓 ✅ **W BIBLIOTECE** | ✅ 40 frag. — źródło zamiast opracowań |
-| 077 | Daian i in. | *Flash Boys 2.0: Frontrunning in Decentralized Exchanges…* (2019) 🆓 ✅ **W BIBLIOTECE** | ✅ 42 frag. — **kanoniczne źródło o MEV**, było zero u nas |
-| 078 | Adams, Zinsmeister i in. | *Uniswap v3 Core* (2021) 🆓 ✅ **W BIBLIOTECE** | ✅ 19 frag. — mechanika AMM u źródła (autorzy potwierdzeni treścią: Hayden Adams, Noah Zinsmeister) |
-| 079 | Gneiting, Raftery | *Strictly Proper Scoring Rules, Prediction, and Estimation* (JASA 2007) 🆓 ✅ **W BIBLIOTECE** | ✅ 53 frag. — **teoria pod Brier/Sybillę**; RAG zwraca definicje regularnych reguł punktacji. Mieliśmy Księgi Sybillińskie bez teorii |
+| 070 | Vaswani i in. | *Attention Is All You Need* (2017) ✅ | Fundament transformerów — **wprost pod TIRO**. arXiv:1706.03762 |
+| 071 | Easley, López de Prado, O'Hara | *Flow Toxicity and Liquidity in a High-Frequency World* (RFS 2012) ✅ | **Źródło naszego neuronu Z-01 (VPIN)** — mamy neuron, nie mamy źródła |
+| 072 | Hyndman, Athanasopoulos | *Forecasting: Principles and Practice* (**2nd ed.**) ✅ **W BIBLIOTECE** | ✅ **ZAINDEKSOWANA 2026-07-16** — Cezar ma **kupiony** egzemplarz (PDF, 2. edycja) z własnego dysku. 257 fragmentów w RAG, korpus 27 959 → 28 535. Kanon prognozowania — domyka zerową lukę (mamy WFO i Sybillę z Brierem, nie mieliśmy teorii). 3. edycja różni się głównie przejściem `forecast`→`fable` (R), dla nas bez znaczenia |
+| 073 | Boyd, Vandenberghe | *Convex Optimization* ✅ **W BIBLIOTECE** | ✅ **ZAINDEKSOWANY 2026-07-16** — 734 fragmenty. Plik: `bv_cvxbook.pdf` ze https://web.stanford.edu/~boyd/cvxbook/ |
+| 074 | Boyd, Vandenberghe | *Additional Exercises for Convex Optimization* ✅ **W BIBLIOTECE** | ✅ **ZAINDEKSOWANY 2026-07-16** — 517 fragmentów. Numer był wolny (spalony na odsyłacz do Goodfellowa = BIB-068). ⚠️ **PUŁAPKA:** na stronie Boyda leżą OBOK SIEBIE dwa PDF-y; ten zbiór zadań pobrał się zamiast podręcznika i wpadł pod nazwą „Convex-Optimization" — wykryte dopiero czytaniem treści, nie nazwy. Wartość dla TIRO realna: **rozwiązane zadania pokazują rozumowanie krok po kroku**, nie samą teorię |
+| 075 | Nakamoto | *Bitcoin: A Peer-to-Peer Electronic Cash System* ✅ **W BIBLIOTECE** | ✅ 10 frag. (⚠️ moja pomyłka w 1. wersji listy: przypisałem współautora „Daspremont" — to **wyłącznie Nakamoto**). 🐞 Ten plik ujawnił bug ebooklib (patrz niżej) |
+| 076 | Buterin | *Ethereum Whitepaper* ✅ **W BIBLIOTECE** | ✅ 40 frag. — źródło zamiast opracowań |
+| 077 | Daian i in. | *Flash Boys 2.0: Frontrunning in Decentralized Exchanges…* (2019) ✅ **W BIBLIOTECE** | ✅ 42 frag. — **kanoniczne źródło o MEV**, było zero u nas |
+| 078 | Adams, Zinsmeister i in. | *Uniswap v3 Core* (2021) ✅ **W BIBLIOTECE** | ✅ 19 frag. — mechanika AMM u źródła (autorzy potwierdzeni treścią: Hayden Adams, Noah Zinsmeister) |
+| 079 | Gneiting, Raftery | *Strictly Proper Scoring Rules, Prediction, and Estimation* (JASA 2007) ✅ **W BIBLIOTECE** | ✅ 53 frag. — **teoria pod Brier/Sybillę**; RAG zwraca definicje regularnych reguł punktacji. Mieliśmy Księgi Sybillińskie bez teorii |
 
 ### 🐞 Bug ujawniony przy BIB-075 (naprawiony 2026-07-16)
 Whitepaper Bitcoina (epub) ekstrahował **0 znaków**. Winowajcą NIE był plik (poprawny epub, 36 plików,
@@ -282,38 +267,38 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 
 | BIB | Autor | Tytuł | Uwagi |
 |---|---|---|---|
-| 080 | Jurafsky, Martin | *Speech and Language Processing* (3rd ed.) 🆓 ✅ | Darmowy draft — biblia NLP |
+| 080 | Jurafsky, Martin | *Speech and Language Processing* (3rd ed.) ✅ | Darmowy draft — biblia NLP |
 | 081 | Tunstall, von Werra, Wolf | *Natural Language Processing with Transformers* ✅ | Praktyka HuggingFace |
 | 082 | Rothman | *Transformers for Natural Language Processing* ⚠️ | |
-| 083 | Svensén, Bishop | *Pattern Recognition and Machine Learning* — **Solutions to the Exercises (web-edition)** ✅ 📁 **MAMY PLIK** | 🚨 **NIE JEST TO PODRĘCZNIK.** Consilium proponowało tu Bishopa PRML (2006); plik, który wszedł, to **zbiór rozwiązań zadań** (Svensén & Bishop, wyd. web 2009, 1.4 MB). Wykryte **czytaniem treści**, nie nazwy — dokładnie ten sam błąd co przy BIB-074 (Boyd: „Additional Exercises" zamiast podręcznika), **druga powtórka tej klasy**. Wartość dla TIRO realna (rozwiązania pokazują rozumowanie krok po kroku), ale **właściwy PRML wciąż mamy do zdobycia** — 🆓 darmowy PDF od Microsoft Research |
-| 084 | Devlin i in. | *BERT: Pre-training of Deep Bidirectional Transformers* 🆓 ✅ | arXiv |
-| 085 | Brown i in. | *Language Models are Few-Shot Learners* (GPT-3) 🆓 ✅ | arXiv |
-| 086 | Hu i in. | *LoRA: Low-Rank Adaptation of Large Language Models* 🆓 ✅ | **Wprost nasza metoda treningu (E4)** |
-| 087 | Dettmers i in. | *QLoRA: Efficient Finetuning of Quantized LLMs* 🆓 ✅ | **Nasza ścieżka na RTX 4050** |
-| 088 | Hinton i in. | *Distilling the Knowledge in a Neural Network* 🆓 ✅ | **Fundament distylacji = Filar 2 TIRO** |
-| 089 | Wei i in. | *Chain-of-Thought Prompting…* 🆓 ✅ | arXiv |
-| 090 | Wang i in. | *Self-Consistency Improves Chain of Thought Reasoning* 🆓 ✅ | **Teoria pod nasz konsensus próbek** |
-| 091 | Zhou i in. | *LIMA: Less Is More for Alignment* 🆓 ✅ | **Źródło naszej zasady „1000 doskonałych > 50000 miernych"** |
-| 092 | Lewis i in. | *Retrieval-Augmented Generation…* 🆓 ✅ | Fundament naszego RAG |
+| 083 | Svensén, Bishop | *Pattern Recognition and Machine Learning* — **Solutions to the Exercises (web-edition)** ✅ 📁 **MAMY PLIK** | 🚨 **NIE JEST TO PODRĘCZNIK.** Consilium proponowało tu Bishopa PRML (2006); plik, który wszedł, to **zbiór rozwiązań zadań** (Svensén & Bishop, wyd. web 2009, 1.4 MB). Wykryte **czytaniem treści**, nie nazwy — dokładnie ten sam błąd co przy BIB-074 (Boyd: „Additional Exercises" zamiast podręcznika), **druga powtórka tej klasy**. Wartość dla TIRO realna (rozwiązania pokazują rozumowanie krok po kroku), ale **właściwy PRML wciąż mamy do zdobycia** — PDF z Microsoft Research |
+| 084 | Devlin i in. | *BERT: Pre-training of Deep Bidirectional Transformers* ✅ | arXiv |
+| 085 | Brown i in. | *Language Models are Few-Shot Learners* (GPT-3) ✅ | arXiv |
+| 086 | Hu i in. | *LoRA: Low-Rank Adaptation of Large Language Models* ✅ | **Wprost nasza metoda treningu (E4)** |
+| 087 | Dettmers i in. | *QLoRA: Efficient Finetuning of Quantized LLMs* ✅ | **Nasza ścieżka na RTX 4050** |
+| 088 | Hinton i in. | *Distilling the Knowledge in a Neural Network* ✅ | **Fundament distylacji = Filar 2 TIRO** |
+| 089 | Wei i in. | *Chain-of-Thought Prompting…* ✅ | arXiv |
+| 090 | Wang i in. | *Self-Consistency Improves Chain of Thought Reasoning* ✅ | **Teoria pod nasz konsensus próbek** |
+| 091 | Zhou i in. | *LIMA: Less Is More for Alignment* ✅ | **Źródło naszej zasady „1000 doskonałych > 50000 miernych"** |
+| 092 | Lewis i in. | *Retrieval-Augmented Generation…* ✅ | Fundament naszego RAG |
 | 093 | Raschka | *Build a Large Language Model (From Scratch)* ⚠️ | |
-| 094 | Kaplan i in. | *Scaling Laws for Neural Language Models* 🆓 ✅ | Dlaczego mały model ma sufit |
-| 095 | Hoffmann i in. | *Training Compute-Optimal LLMs* (Chinchilla) 🆓 ✅ | |
-| 096 | Ouyang i in. | *Training LMs to follow instructions with human feedback* (InstructGPT) 🆓 ✅ | |
-| 097 | Rafailov i in. | *Direct Preference Optimization (DPO)* 🆓 ✅ | Alternatywa dla RLHF |
-| 098 | Frantar i in. | *GPTQ: Accurate Post-Training Quantization* 🆓 ✅ | Kwantyzacja — nasz Q4_K_M |
-| 099 | Leviathan i in. | *Fast Inference from Transformers via Speculative Decoding* 🆓 ✅ | **Źródło dźwigni, którą chcemy zmierzyć** |
+| 094 | Kaplan i in. | *Scaling Laws for Neural Language Models* ✅ | Dlaczego mały model ma sufit |
+| 095 | Hoffmann i in. | *Training Compute-Optimal LLMs* (Chinchilla) ✅ | |
+| 096 | Ouyang i in. | *Training LMs to follow instructions with human feedback* (InstructGPT) ✅ | |
+| 097 | Rafailov i in. | *Direct Preference Optimization (DPO)* ✅ | Alternatywa dla RLHF |
+| 098 | Frantar i in. | *GPTQ: Accurate Post-Training Quantization* ✅ | Kwantyzacja — nasz Q4_K_M |
+| 099 | Leviathan i in. | *Fast Inference from Transformers via Speculative Decoding* ✅ | **Źródło dźwigni, którą chcemy zmierzyć** |
 
 ## 🕸️ Graph Neural Networks — **luka zerowa** (BIB-100..107)
 
 | BIB | Autor | Tytuł | Uwagi |
 |---|---|---|---|
-| 100 | Hamilton | *Graph Representation Learning* 🆓 ✅ | Darmowy PDF autora |
+| 100 | Hamilton | *Graph Representation Learning* ✅ | Darmowy PDF autora |
 | 101 | Wu, Cui, Pei, Zhao | *Graph Neural Networks: Foundations, Frontiers, and Applications* ⚠️ | |
 | 102 | Labonne | *Hands-On Graph Neural Networks Using Python* ⚠️ | Praktyka |
-| 103 | Kipf, Welling | *Semi-Supervised Classification with Graph Convolutional Networks* 🆓 ✅ | Fundament GCN |
-| 104 | Veličković i in. | *Graph Attention Networks* 🆓 ✅ | |
-| 105 | Battaglia i in. | *Relational inductive biases, deep learning, and graph networks* 🆓 ✅ | |
-| 106 | Barabási | *Network Science* 🆓 ✅ | Darmowy online — sieci jako zjawisko |
+| 103 | Kipf, Welling | *Semi-Supervised Classification with Graph Convolutional Networks* ✅ | Fundament GCN |
+| 104 | Veličković i in. | *Graph Attention Networks* ✅ | |
+| 105 | Battaglia i in. | *Relational inductive biases, deep learning, and graph networks* ✅ | |
+| 106 | Barabási | *Network Science* ✅ | Darmowy online — sieci jako zjawisko |
 | 107 | Newman | *Networks: An Introduction* ✅ | Kanon |
 
 ## 🎮 Reinforcement Learning praktyczny — mamy tylko teorię (BIB-108..115)
@@ -323,9 +308,9 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 108 | Lapan | *Deep Reinforcement Learning Hands-On* (3rd ed.) ⚠️ | Praktyka: DQN/PPO/RLHF |
 | 109 | Graesser, Keng | *Foundations of Deep Reinforcement Learning* ⚠️ | |
 | 110 | Mnih i in. | *Human-level control through deep RL* (DQN, Nature 2015) ✅ | |
-| 111 | Schulman i in. | *Proximal Policy Optimization Algorithms* 🆓 ✅ | PPO |
+| 111 | Schulman i in. | *Proximal Policy Optimization Algorithms* ✅ | PPO |
 | 112 | Silver i in. | *Deterministic Policy Gradient Algorithms* ⚠️ | |
-| 113 | Szepesvári | *Algorithms for Reinforcement Learning* 🆓 ✅ | Zwięzły kanon |
+| 113 | Szepesvári | *Algorithms for Reinforcement Learning* ✅ | Zwięzły kanon |
 | 114 | Bertsekas | *Reinforcement Learning and Optimal Control* ⚠️ | |
 | 115 | Powell | *Approximate Dynamic Programming* ⚠️ | |
 
@@ -336,11 +321,11 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 116 | Pearl | *Causality: Models, Reasoning, and Inference* (2nd ed.) ✅ | **Kanon absolutny** |
 | 117 | Pearl, Glymour, Jewell | *Causal Inference in Statistics: A Primer* ✅ | Łagodniejsze wejście |
 | 118 | Pearl, Mackenzie | *The Book of Why* ✅ | Popularne, dobre na start |
-| 119 | Peters, Janzing, Schölkopf | *Elements of Causal Inference* 🆓 ✅ | Darmowy PDF (MIT Press) |
+| 119 | Peters, Janzing, Schölkopf | *Elements of Causal Inference* ✅ | Darmowy PDF (MIT Press) |
 | 120 | Angrist, Pischke | *Mostly Harmless Econometrics* ✅ | Przyczynowość empiryczna |
-| 121 | Hernán, Robins | *Causal Inference: What If* 🆓 ✅ | Darmowy PDF autorów |
+| 121 | Hernán, Robins | *Causal Inference: What If* ✅ | Darmowy PDF autorów |
 | 122 | Imbens, Rubin | *Causal Inference for Statistics…* ✅ | |
-| 123 | Cunningham | *Causal Inference: The Mixtape* 🆓 ✅ | Darmowy online |
+| 123 | Cunningham | *Causal Inference: The Mixtape* ✅ | Darmowy online |
 
 ## 📊 Ekonometria, szeregi czasowe, prognozowanie (BIB-124..141)
 
@@ -359,41 +344,41 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 134 | Lütkepohl | *New Introduction to Multiple Time Series Analysis* ✅ | VAR |
 | 135 | Enders | *Applied Econometric Time Series* ✅ | |
 | 136 | Diebold, Mariano | *Comparing Predictive Accuracy* ✅ | **Test przewagi prognoz — pod nasze A/B** |
-| 137 | Rabiner | *A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition* (Proc. IEEE 77(2), 1989, 257–286) 🆓 ✅ 📁 **MAMY PLIK** | ✅ **ORYGINAŁ POTWIERDZONY 2026-07-28** — nagłówek *„LAWRENCE R. RABINER, FELLOW, IEEE"*, metadane `author=IEEE`. 30 s., **150 305 zn.** Sprawdzone, że niesie **sekcję V „Implementation Issues"**, której brak streszczeniom: skalowanie, wiele sekwencji obserwacji, estymaty początkowe, niedobór danych treningowych. **HMM u źródła → Viterbi Jump Model** ⏳ poza RAG |
+| 137 | Rabiner | *A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition* (Proc. IEEE 77(2), 1989, 257–286) ✅ 📁 **MAMY PLIK** | ✅ **ORYGINAŁ POTWIERDZONY 2026-07-28** — nagłówek *„LAWRENCE R. RABINER, FELLOW, IEEE"*, metadane `author=IEEE`. 30 s., **150 305 zn.** Sprawdzone, że niesie **sekcję V „Implementation Issues"**, której brak streszczeniom: skalowanie, wiele sekwencji obserwacji, estymaty początkowe, niedobór danych treningowych. **HMM u źródła → Viterbi Jump Model** ⏳ poza RAG |
 | 138 | Tsay | *Multivariate Time Series Analysis: With R and Financial Applications* (2014) ✅ 📁 **MAMY PLIK** | ✅ **TREŚĆ POTWIERDZONA** (Wiley 2014, Booth School, 5.8 MB). Slot był odsyłaczem „Tsay → mamy BIB-031"; to **inna książka tego samego autora** — VAR/VECM/modele czynnikowe, czyli wielowymiarowość, której BIB-031 nie obejmuje. ⏳ poza RAG |
-| 139 | Hastie, Tibshirani, Friedman | *The Elements of Statistical Learning* 🆓 ✅ | Darmowy PDF — kanon ML |
-| 140 | James i in. | *An Introduction to Statistical Learning* 🆓 ✅ | Darmowy PDF |
-| 141 | Murphy | *Probabilistic Machine Learning: An Introduction* / *Advanced Topics* ⚠️ | Drafty bywają darmowe |
+| 139 | Hastie, Tibshirani, Friedman | *The Elements of Statistical Learning* ✅ | Darmowy PDF — kanon ML |
+| 140 | James i in. | *An Introduction to Statistical Learning* ✅ | Darmowy PDF |
+| 141 | Murphy | *Probabilistic Machine Learning: An Introduction* / *Advanced Topics* ⚠️ | Dwa tomy — wejście i tematy zaawansowane |
 
 ## 🎲 Statystyka bayesowska i niepewność (BIB-142..151)
 
 | BIB | Autor | Tytuł | Uwagi |
 |---|---|---|---|
-| 142 | Gelman i in. | *Bayesian Data Analysis* (3rd ed.) 🆓 ✅ | Darmowy PDF — kanon |
+| 142 | Gelman i in. | *Bayesian Data Analysis* (3rd ed.) ✅ | Darmowy PDF — kanon |
 | 143 | McElreath | *Statistical Rethinking* (2nd ed.) ✅ | Najlepsze wejście w Bayesa |
 | 144 | Kruschke | *Doing Bayesian Data Analysis* ✅ | |
 | 145 | Sivia, Skilling | *Data Analysis: A Bayesian Tutorial* ⚠️ | |
 | 146 | Jaynes | *Probability Theory: The Logic of Science* ✅ | Filozofia + matematyka |
-| 147 | MacKay | *Information Theory, Inference, and Learning Algorithms* 🆓 ✅ | Darmowy PDF — **teoria informacji + ML w jednym** |
+| 147 | MacKay | *Information Theory, Inference, and Learning Algorithms* ✅ | Darmowy PDF — **teoria informacji + ML w jednym** |
 | 148 | Cover, Thomas | *Elements of Information Theory* ✅ | Kanon teorii informacji |
 | 149 | Efron, Tibshirani | *An Introduction to the Bootstrap* ✅ | **Pod nasze testy istotności** |
 | 150 | Shafer, Vovk | *Algorithmic Learning in a Random World* ⚠️ | **Predykcja konformalna — mamy bramkę ML-36!** |
-| 151 | Angelopoulos, Bates | *A Gentle Introduction to Conformal Prediction* 🆓 ✅ | arXiv — nowsze wejście |
+| 151 | Angelopoulos, Bates | *A Gentle Introduction to Conformal Prediction* ✅ | arXiv — nowsze wejście |
 
 ## 🏛️ Mikrostruktura i egzekucja (BIB-152..165)
 
 | BIB | Autor | Tytuł | Uwagi |
 |---|---|---|---|
 | 152 | Bouchaud, Bonart, Donier, Gould | *Trades, Quotes and Prices* ✅ | **Kanon mikrostruktury XXI w.** |
-| 153 | Almgren, Chriss | *Optimal Execution of Portfolio Transactions* 🆓 ✅ | Fundament egzekucji |
+| 153 | Almgren, Chriss | *Optimal Execution of Portfolio Transactions* ✅ | Fundament egzekucji |
 | 154 | Kyle | *Continuous Auctions and Insider Trading* ✅ | Model Kyle'a u źródła |
 | 155 | Glosten, Milgrom | *Bid, Ask and Transaction Prices…* ✅ | |
-| 156 | Avellaneda, Stoikov | *High-frequency trading in a limit order book* 🆓 ✅ | **Kanon market makingu** |
+| 156 | Avellaneda, Stoikov | *High-frequency trading in a limit order book* ✅ | **Kanon market makingu** |
 | 157 | Lehalle, Laruelle | *Market Microstructure in Practice* ✅ | |
 | 158 | Guéant | *The Financial Mathematics of Market Liquidity* ⚠️ | |
 | 159 | Johnson | *Algorithmic Trading and DMA* ✅ | |
 | 160 | Foucault, Pagano, Röell | *Market Liquidity: Theory, Evidence, Policy* ✅ | |
-| 161 | Madhavan | *Market Microstructure: A Survey* 🆓 ⚠️ | |
+| 161 | Madhavan | *Market Microstructure: A Survey* ⚠️ | |
 | 162 | Easley i in. | *The Microstructure of the Flash Crash* ⚠️ | |
 | 163 | Menkveld | *High-Frequency Trading and the New Market Makers* ⚠️ | |
 | 164 | Budish, Cramton, Shim | *The High-Frequency Trading Arms Race* ✅ | Batch auctions |
@@ -411,8 +396,8 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 171 | Ang | *Asset Management: A Systematic Approach to Factor Investing* ✅ | |
 | 172 | Ilmanen | *Expected Returns* ✅ | |
 | 173 | Ilmanen | *Investing Amid Low Expected Returns* ⚠️ | |
-| 174 | Kelly | *A New Interpretation of Information Rate* (1956) 🆓 ✅ | **Kryterium Kelly'ego u źródła — pod sizing** |
-| 175 | Thorp | *The Kelly Criterion in Blackjack, Sports Betting, and the Stock Market* 🆓 ✅ | Kelly w praktyce |
+| 174 | Kelly | *A New Interpretation of Information Rate* (1956) ✅ | **Kryterium Kelly'ego u źródła — pod sizing** |
+| 175 | Thorp | *The Kelly Criterion in Blackjack, Sports Betting, and the Stock Market* ✅ | Kelly w praktyce |
 | 176 | MacLean, Thorp, Ziemba | *The Kelly Capital Growth Investment Criterion* ⚠️ | |
 | 177 | Carver | *Systematic Trading* ✅ | Kompletna metodologia — realna luka |
 
@@ -427,7 +412,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 182 | Taleb | *Antifragile* ✅ | **Nasza doktryna wznawialności wprost stąd** |
 | 183 | Taleb | *Skin in the Game* ✅ | |
 | 184 | Taleb | *Dynamic Hedging* ✅ | Techniczny Taleb |
-| 185 | Taleb | *Statistical Consequences of Fat Tails* 🆓 ✅ | Darmowy — techniczny |
+| 185 | Taleb | *Statistical Consequences of Fat Tails* ✅ | Darmowy — techniczny |
 | 186 | Sornette | *Why Stock Markets Crash* ✅ | Ekonofizyka krachów |
 | 187 | Rebonato | *Plight of the Fortune Tellers* ⚠️ | |
 
@@ -437,12 +422,12 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 |---|---|---|---|
 | 188 | von Neumann, Morgenstern | *Theory of Games and Economic Behavior* ✅ | **Kanon absolutny** |
 | 189 | Fudenberg, Tirole | *Game Theory* ✅ | Standard akademicki |
-| 190 | Osborne, Rubinstein | *A Course in Game Theory* 🆓 ✅ | Darmowy PDF |
+| 190 | Osborne, Rubinstein | *A Course in Game Theory* ✅ | Darmowy PDF |
 | 191 | Myerson | *Game Theory: Analysis of Conflict* ✅ | |
 | 192 | Binmore | *Game Theory: A Very Short Introduction* ✅ | ⚠️ **DeepSeek zmyślił tytuł „An Introduction" — to jest właściwy** |
 | 193 | Krishna | *Auction Theory* ✅ | Pod aukcje/MEV |
 | 194 | Milgrom | *Putting Auction Theory to Work* ✅ | |
-| 195 | Nisan i in. | *Algorithmic Game Theory* 🆓 ✅ | Darmowy PDF |
+| 195 | Nisan i in. | *Algorithmic Game Theory* ✅ | Darmowy PDF |
 | 196 | Roth | *Who Gets What — and Why* ✅ | Projektowanie rynków |
 | 197 | Schelling | *The Strategy of Conflict* ✅ | |
 
@@ -452,18 +437,18 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 |---|---|---|---|
 | 198 | Nakamoto → BIB-075 | — | |
 | 199 | Daian i in. → BIB-077 | — | |
-| 200 | Narayanan i in. | *Bitcoin and Cryptocurrency Technologies* 🆓 ✅ | Darmowy — Princeton |
-| 201 | Werner i in. | *SoK: Decentralized Finance (DeFi)* 🆓 ✅ | Systematyzacja DeFi |
-| 202 | Angeris, Chitra | *Improved Price Oracles: Constant Function Market Makers* 🆓 ✅ | **Matematyka AMM** |
-| 203 | Angeris i in. | *An Analysis of Uniswap Markets* 🆓 ✅ | |
-| 204 | Qin, Zhou, Gervais | *Quantifying Blockchain Extractable Value* 🆓 ✅ | MEV mierzalnie |
-| 205 | Buterin i in. | *Ethereum Yellow Paper* (Wood) 🆓 ✅ | Specyfikacja EVM |
+| 200 | Narayanan i in. | *Bitcoin and Cryptocurrency Technologies* ✅ | Darmowy — Princeton |
+| 201 | Werner i in. | *SoK: Decentralized Finance (DeFi)* ✅ | Systematyzacja DeFi |
+| 202 | Angeris, Chitra | *Improved Price Oracles: Constant Function Market Makers* ✅ | **Matematyka AMM** |
+| 203 | Angeris i in. | *An Analysis of Uniswap Markets* ✅ | |
+| 204 | Qin, Zhou, Gervais | *Quantifying Blockchain Extractable Value* ✅ | MEV mierzalnie |
+| 205 | Buterin i in. | *Ethereum Yellow Paper* (Wood) ✅ | Specyfikacja EVM |
 | 206 | Di Maggio | *Blockchain, Crypto and DeFi* ⚠️ | |
-| 207 | Schär | *Decentralized Finance: On Blockchain- and Smart Contract-Based Financial Markets* 🆓 ✅ | St. Louis Fed |
-| 208 | Makarov, Schoar | *Trading and Arbitrage in Cryptocurrency Markets* 🆓 ✅ | **Arbitraż krypto empirycznie** |
-| 209 | Gudgeon i in. | *DeFi Protocols for Loanable Funds* 🆓 ⚠️ | |
-| 210 | Xu i in. | *SoK: Decentralized Exchanges with Automated Market Maker Protocols* 🆓 ✅ | |
-| 211 | Eskandari i in. | *SoK: Transparent Dishonesty: Front-Running Attacks on Blockchain* 🆓 ⚠️ | |
+| 207 | Schär | *Decentralized Finance: On Blockchain- and Smart Contract-Based Financial Markets* ✅ | St. Louis Fed |
+| 208 | Makarov, Schoar | *Trading and Arbitrage in Cryptocurrency Markets* ✅ | **Arbitraż krypto empirycznie** |
+| 209 | Gudgeon i in. | *DeFi Protocols for Loanable Funds* ⚠️ | |
+| 210 | Xu i in. | *SoK: Decentralized Exchanges with Automated Market Maker Protocols* ✅ | |
+| 211 | Eskandari i in. | *SoK: Transparent Dishonesty: Front-Running Attacks on Blockchain* ⚠️ | |
 
 ## 🧠 Decyzje, kalibracja, osąd (BIB-212..221)
 
@@ -476,7 +461,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 216 | Gigerenzer | *Risk Savvy* ✅ | |
 | 217 | Klein | *Sources of Power* ⚠️ | Decyzje eksperckie |
 | 218 | Savage | *The Foundations of Statistics* ✅ | Teoria decyzji u źródła |
-| 219 | Brier | *Verification of Forecasts Expressed in Terms of Probability* (1950) 🆓 ✅ | **Źródło naszego Brier score** |
+| 219 | Brier | *Verification of Forecasts Expressed in Terms of Probability* (1950) ✅ | **Źródło naszego Brier score** |
 | 220 | Mauboussin | *More Than You Know* ⚠️ | |
 | 221 | Mauboussin | *The Success Equation* ✅ | Szczęście vs umiejętność |
 
@@ -507,11 +492,11 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 237 | Raschka i in. | *Machine Learning with PyTorch and Scikit-Learn* ✅ | |
 | 238 | McKinney | *Python for Data Analysis* ✅ | pandas u źródła |
 | 239 | Ramalho | *Fluent Python* ✅ | Jakość naszego kodu |
-| 240 | Percival, Gregory | *Architecture Patterns with Python* 🆓 ✅ | Darmowy online |
+| 240 | Percival, Gregory | *Architecture Patterns with Python* ✅ | Darmowy online |
 | 241 | Beazley, Jones | *Python Cookbook* ✅ | |
 | 242 | Gorelick, Ozsvald | *High Performance Python* ✅ | **Pod nasze wąskie gardła CPU** |
 | 243 | Nygard | *Release It!* ✅ | Odporność systemów produkcyjnych |
-| 244 | Beyer i in. | *Site Reliability Engineering* 🆓 ✅ | Darmowy — Google |
+| 244 | Beyer i in. | *Site Reliability Engineering* ✅ | Darmowy — Google |
 | 245 | Fowler | *Refactoring* (2nd ed.) ✅ | |
 
 ## 📰 Dane alternatywne i sentyment (BIB-246..253)
@@ -519,13 +504,13 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | BIB | Autor | Tytuł | Uwagi |
 |---|---|---|---|
 | 246 | Denev, Amen | *The Book of Alternative Data* ✅ | Kanon alt-danych |
-| 247 | Kolanovic, Krishnamachari | *Big Data and AI Strategies* (JPM 2017) 🆓 ✅ | Legendarny raport |
-| 248 | Tetlock (Paul C.) | *Giving Content to Investor Sentiment* 🆓 ✅ | **Sentyment newsów u źródła — pod NEWS-01** |
-| 249 | Loughran, McDonald | *When Is a Liability Not a Liability?* 🆓 ✅ | **Słownik sentymentu finansowego** |
-| 250 | Baker, Wurgler | *Investor Sentiment in the Stock Market* 🆓 ✅ | |
-| 251 | Bollen, Mao, Zeng | *Twitter mood predicts the stock market* 🆓 ✅ | Klasyk (i ostrzeżenie o replikacji) |
-| 252 | Araci | *FinBERT: Financial Sentiment Analysis with Pre-trained Language Models* 🆓 ✅ | |
-| 253 | Ke, Kelly, Xiu | *Predicting Returns with Text Data* 🆓 ⚠️ | |
+| 247 | Kolanovic, Krishnamachari | *Big Data and AI Strategies* (JPM 2017) ✅ | Legendarny raport |
+| 248 | Tetlock (Paul C.) | *Giving Content to Investor Sentiment* ✅ | **Sentyment newsów u źródła — pod NEWS-01** |
+| 249 | Loughran, McDonald | *When Is a Liability Not a Liability?* ✅ | **Słownik sentymentu finansowego** |
+| 250 | Baker, Wurgler | *Investor Sentiment in the Stock Market* ✅ | |
+| 251 | Bollen, Mao, Zeng | *Twitter mood predicts the stock market* ✅ | Klasyk (i ostrzeżenie o replikacji) |
+| 252 | Araci | *FinBERT: Financial Sentiment Analysis with Pre-trained Language Models* ✅ | |
+| 253 | Ke, Kelly, Xiu | *Predicting Returns with Text Data* ⚠️ | |
 
 ## 📈 Uzupełnienia tradingowe i klasyka (BIB-254..274)
 
@@ -541,13 +526,13 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 261 | Clenow | *Trading Evolved* ⚠️ | Python + backtesting |
 | 262 | Chan | *Quantitative Trading* → mamy (BIB-010) | — |
 | 263 | Pardo | *The Evaluation and Optimization of Trading Strategies* ✅ | **WFO u źródła — mamy WFO!** |
-| 264 | Bailey, López de Prado | *The Deflated Sharpe Ratio* 🆓 ✅ | **Mamy DSR w kodzie, nie mamy źródła** |
-| 265 | Bailey i in. | *Pseudo-Mathematics and Financial Charlatanism* 🆓 ✅ | Backtest overfitting |
-| 266 | Harvey, Liu, Zhu | *…and the Cross-Section of Expected Returns* 🆓 ✅ | Multiple testing w finansach |
+| 264 | Bailey, López de Prado | *The Deflated Sharpe Ratio* ✅ | **Mamy DSR w kodzie, nie mamy źródła** |
+| 265 | Bailey i in. | *Pseudo-Mathematics and Financial Charlatanism* ✅ | Backtest overfitting |
+| 266 | Harvey, Liu, Zhu | *…and the Cross-Section of Expected Returns* ✅ | Multiple testing w finansach |
 | 267 | Fama, French | *Common Risk Factors in the Returns on Stocks and Bonds* ✅ | Faktory u źródła |
 | 268 | Jegadeesh, Titman | *Returns to Buying Winners and Selling Losers* ✅ | **Momentum u źródła** |
-| 269 | Asness, Moskowitz, Pedersen | *Value and Momentum Everywhere* 🆓 ✅ | |
-| 270 | Moskowitz, Ooi, Pedersen | *Time Series Momentum* 🆓 ✅ | |
+| 269 | Asness, Moskowitz, Pedersen | *Value and Momentum Everywhere* ✅ | |
+| 270 | Moskowitz, Ooi, Pedersen | *Time Series Momentum* ✅ | |
 | 271 | Lo | *Adaptive Markets* ✅ | **Rynki adaptacyjne — nasza doktryna reżimów** |
 | 272 | Lo, MacKinlay | *A Non-Random Walk Down Wall Street* ✅ | |
 | 273 | Malkiel | *A Random Walk Down Wall Street* ✅ | Kontrargument (Prawo XVI: słuchaj drugiej strony) |
@@ -578,7 +563,7 @@ Kwarantanna sama wskazała drogę powrotną: **pojedynczo, po weryfikacji**. To 
 | BIB | Pozycja | Korekta |
 |---|---|---|
 | **277** | *Active Inference* (MIT Press 2022) | Autor **NIE „Friston"** — pierwszym autorem jest **Thomas Parr** (Parr, Pezzulo, Friston). Poprawione |
-| **289** | Bennett — *Demons, Engines, and the Second Law* (1987) | To **artykuł w Scientific American**, nie książka i **nie jest darmowy** — znacznik 🆓 zdjęty, zostaje ⚠️ |
+| **289** | Bennett — *Demons, Engines, and the Second Law* (1987) | To **artykuł w *Scientific American***, nie osobna książka — sprostowany gatunek, zostaje ⚠️ |
 
 ### ✅ PRZYJĘTE (kanon, istnienie pewne — wydania NIEZWERYFIKOWANE)
 
@@ -610,7 +595,7 @@ Kwarantanna sama wskazała drogę powrotną: **pojedynczo, po weryfikacji**. To 
 | 286 | Prigogine, Stengers | *Order Out of Chaos* (1984) ✅ | Struktury dyssypatywne (Nobel 1977) |
 | 287 | Wiener | *Cybernetics* (1948) ✅ | Sprzężenie zwrotne i homeostaza u źródła |
 | 288 | von Bertalanffy | *General System Theory* (1968) ✅ | Teoria systemów u źródła |
-| 289 | Bennett | *Demons, Engines, and the Second Law* (1987) ⚠️ | ✏️ **🆓 zdjęte** — to artykuł *Scientific American*, płatny |
+| 289 | Bennett | *Demons, Engines, and the Second Law* (1987) ⚠️ | ✏️ **korekta gatunku** — to artykuł w *Scientific American*, nie osobna książka |
 
 **📐 Matematyka i algorytmy (BIB-290..294)**
 
@@ -619,7 +604,7 @@ Kwarantanna sama wskazała drogę powrotną: **pojedynczo, po weryfikacji**. To 
 | 290 | Knuth | *The Art of Computer Programming, vol. 1* ✅ | Kanon algorytmiki — priorytet niski dla naszej domeny |
 | 291 | Press i in. | *Numerical Recipes* (3rd ed.) ✅ | Algorytmy numeryczne (C++) |
 | 292 | Golub, Van Loan | *Matrix Computations* (4th ed.) ✅ | Kanon algebry liniowej |
-| 293 | Rasmussen, Williams | *Gaussian Processes for Machine Learning* (2006) 🆓 ✅ | ⭐ **niepewność wbudowana — pod bramkę konformalną ML-36** |
+| 293 | Rasmussen, Williams | *Gaussian Processes for Machine Learning* (2006) ✅ | ⭐ **niepewność wbudowana — pod bramkę konformalną ML-36** |
 | 294 | Mohri, Rostamizadeh, Talwalkar | *Foundations of Machine Learning* (2nd ed.) ✅ | ⭐ **granice generalizacji — pod walkę z overfittingiem** |
 
 **🏛️ Ekonomia i rynki (BIB-295..300)**
@@ -630,18 +615,18 @@ Kwarantanna sama wskazała drogę powrotną: **pojedynczo, po weryfikacji**. To 
 | 296 | — | *(slot wolny)* | 🔴 odrzucone jako dublet BIB-227 |
 | 297 | Akerlof, Shiller | *Animal Spirits* (2009) ✅ | Psychologia makro — pod PSY-01..05 |
 | 298 | Shleifer | *Inefficient Markets* (2000) ✅ | Behawioryzm u źródła — pod neurony kontrariańskie |
-| 299 | Barberis, Thaler | *A Survey of Behavioral Finance* (2003) 🆓 ✅ | ⭐ Systematyczne obciążenia — darmowy working paper NBER |
+| 299 | Barberis, Thaler | *A Survey of Behavioral Finance* (2003) ✅ | ⭐ Systematyczne obciążenia — wersja robocza NBER |
 | 300 | Graham, Dodd | *Security Analysis* (1934) ✅ | Kanon analizy fundamentalnej |
 
 ### ⚠️ Uczciwe zastrzeżenie do całego bloku (Prawo I)
 
 Sprawdziłem **istnienie dzieł i dublety wobec naszego planu** — to zmierzone. **NIE sprawdzałem
-wydań, lat ani licencji pozycja-po-pozycji.** Osobno: **priorytet tego bloku jest NISKI**.
+wydań ani lat pozycja-po-pozycji.** Osobno: **priorytet tego bloku jest NISKI**.
 Mamy 69 nieodebranych pozycji z rdzenia (BIB-205..274: Tetlock, Pardo, DSR, Kleppmann, alt-dane),
 a blok Consilium to w większości **filozofia systemów, nie źródła naszych neuronów**. Trzy pozycje
 mają realną wartość operacyjną i tylko one zasługują na priorytet: **293 Rasmussen-Williams**
 (niepewność wbudowana — pod bramkę konformalną ML-36), **294 Mohri** (granice generalizacji — pod
-walkę z overfittingiem), **299 Barberis-Thaler** 🆓 (obciążenia — pod PSY-01..05).
+walkę z overfittingiem), **299 Barberis-Thaler** (obciążenia — pod PSY-01..05).
 
 ---
 
@@ -656,7 +641,7 @@ Numery nadane **poza rezerwacją 205..274** (żeby nie zająć slotu przewidzian
 | 302 | Gutierrez | *Machine Learning and Data Science: An Introduction with R* 📁 | 🟡 **NISKI PRIORYTET** — wstęp do ML w R, w całości pokryty przez BIB-139 (ESL) i BIB-140 (ISL), które są mocniejsze. Bez szkody, ale i bez nowej informacji (Prawo XVI) |
 | 303 | Sorensen | *Statistical Learning in Genetics* (2nd ed., Springer) 📁 | 🔴 **POZA DOMENĄ** — statystyka w **genetyce**. Metody bayesowskie owszem, ale przykłady i słownictwo są biologiczne; w RAG będzie szumem przy zapytaniach rynkowych |
 | 304 | Chingnun Lee | *Autoregressive Conditional Heteroscedasticity* — Ch. 26, notatki wykładowe (2009) 📁 | 🟢 **PRZYJĘTE — przesunięte tu z BIB-130.** Trafiło pod numer źródła, ale źródłem nie jest: mówi o ARCH w trzeciej osobie („introduced by Engle (1982)"), stopka *„Copy Right by Chingnun Lee ® 2009"*. **Wartość realna dla TIRO**: 25 s. wyprowadzeń ARCH→GARCH→wielowymiarowe, krok po kroku — ten sam argument, którym obroniliśmy BIB-074 (zadania Boyda). 32 444 zn. |
-| 305 | Dymarski (red.) | *Hidden Markov Models, Theory and Applications* (InTech 2011, DOI 10.5772/601) ⚠️ 📁 | 🟢 **PRZYJĘTE — plon uboczny polowania na BIB-137.** 327 s., **864 360 zn.**, zero stron bez tekstu. Praca zbiorowa: HMM **poza rozpoznawaniem mowy** — to jest nowa informacja wobec Rabinera (BIB-137) i Jurafsky'ego (BIB-080). ⚠️ **Licencja CC BY-**NC**-SA 3.0 — klauzula NIEKOMERCYJNA**, a Imperium ma zarabiać. Repo prywatne, nie redystrybuujemy — ale to **decyzja Cezara**, nie moja. Przyszły dwie kopie; wybrana z repozytorium PW, bo druga miała **8 stron bez warstwy tekstowej** |
+| 305 | Dymarski (red.) | *Hidden Markov Models, Theory and Applications* (InTech 2011, DOI 10.5772/601) ✅ 📁 | 🟢 **PRZYJĘTE — plon uboczny polowania na BIB-137.** 327 s., **864 360 zn.**, zero stron bez tekstu. Praca zbiorowa: HMM **poza rozpoznawaniem mowy** — to jest nowa informacja wobec Rabinera (BIB-137) i Jurafsky'ego (BIB-080). Przyszły dwie kopie; wybrana z repozytorium PW, bo druga miała **8 stron bez warstwy tekstowej** |
 | 306 | Wood (Columbia) | *Hidden Markov Models: from the Beginning to the State of the Art* (slajdy wykładowe, 2011) 📁 | 🟡 **PRZYJĘTE WARUNKOWO.** 47 slajdów, tylko **17 456 zn.** (371 zn./slajd — slajdy to hasła, nie proza, więc słaby materiał dla RAG). Broni się **zmierzoną zerową luką**: `hierarchical Dirichlet` 0 · `HDP` 0 · `beam sampling` 0 · `explicit duration` 0 · `nonparametric Bayes` 0 fragmentów w całym RAG. **EDHMM (explicit-duration HMM) dotyka wprost trwałości reżimu** — czyli tego, co robi nasz Namiestnik. Traktować jako **listę lektur**, nie źródło |
 
 ---
@@ -682,7 +667,7 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
 **Dwie drogi (decyzja Cezara):**
 1. **Cezar dostarcza inne wersje plików** (zaproponowane 2026-07-28) — najtańsze, zero ryzyka OCR.
    Potrzebne: **wersje z warstwą tekstową** dla 130, 132, 137, 154, 175, 128, 189; **niepopsuty plik**
-   dla 159; **właściwy podręcznik PRML** dla 083 (🆓 darmowy PDF Microsoft Research).
+   dla 159; **właściwy podręcznik PRML** dla 083 (PDF z Microsoft Research).
 2. **OCR u nas** — precedens istnieje: **BIB-032 O'Hara** to też był skan bez warstwy tekstowej
    i przeszedł OCR 2026-07-14 (319 fragmentów w RAG). Działa, ale kosztuje czas na klasie PEDES.
 
@@ -702,7 +687,7 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
    ```
    Spina: konwersja→`tekst_cache` (wersjonowany, więc chmura czyta bez binariów) → indeks FTS
    → katalog metadanych. **Zero tokenów LLM.**
-3. **Binaria książek NIE wchodzą do gita** (`.gitignore` — prawa autorskie + rozmiar). Wersjonujemy
+3. **Binaria książek NIE wchodzą do gita** (`.gitignore` — rozmiar: 614 MB). Wersjonujemy
    sam wyekstrahowany tekst.
 4. **Potem żniwo:** `python narzedzia/bibliotekarz.py --pelny --temat "..."` → NOTARIUS zbiera pary
    automatycznie (3/temat). Postęp widać w panelu 🎓 Szkoła TIRO na dashboardzie.
@@ -712,8 +697,6 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
 - **Rok/wydawca żadnej pozycji nie jest zweryfikowany w tej sesji.** ✅ = pewny, że dzieło istnieje;
   NIE = pewny szczegółów bibliograficznych. Sprawdź przed zakupem.
 - **⚠️ = sprawdź, zanim wydasz pieniądze.** Nie udaję, że wiem.
-- **Darmowe (🆓) bierz pierwsze** — jest ich tu ~60 i obejmują wszystkie zerowe luki
-  (transformery, GNN, przyczynowość, teoria gier, MEV, konformalna).
 - **Nie ma tu ani jednej pozycji Reactive Publishing** (Van Der Post/Preston/Munrow) — świadomie.
   ⚠️ **Wyjątek do rozstrzygnięcia:** BIB-301 (West 2025) należy do tego samego gatunku i wszedł na
   dysk — rekomendacja: nie wpinać do RAG (patrz sekcja BIB-301..303).

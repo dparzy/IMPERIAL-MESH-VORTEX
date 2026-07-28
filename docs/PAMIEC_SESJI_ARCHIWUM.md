@@ -12,6 +12,30 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-27 — NOMENCLATOR wyłączony z braku etykiet; Hyginus ma 35 cząstek bez sędziego
+NOMENCLATOR (kalibracja etykiet neuronów) stoi OFF bo brakuje osądzonych przykładów. Hyginus posiada 35 cząstek czekających na sędziego – ich osądzenie odblokuje NOMENCLATOR.
+
+### 2026-07-27 — Źródłem prawdy procedury otwarcia jest CLAUDE.md, a nie checklista
+Runbook W11 zawierał przestarzałe polecenia (git push). Od teraz kroki otwarcia pobierane są wyłącznie z CLAUDE.md przez sigillum apertio.
+
+### 2026-07-27 — `prekalkuluj_portfel` nie daje zysku algorytmicznego
+Robią tę samą pracę per-bar (zbuduj na oknie) tylko równolegle per-symbol, marne 1,4× przyspieszenia bez zmiany złożoności.
+
+### 2026-07-27 — Główny koszt to redundancje w pure-python wskaźnikach
+Hotspot to szeroki podatek rozłożony na wiele wskaźników. Kluczowa anomalia: `wma` wołane ~930 razy na tick (4,5 mln wywołań, 65,5s cumtime) z powodu pętli w `_py_hma` i redundantnego przeliczania `wma`.
+
+### 2026-07-27 — Ograniczenia skanera lokalnego (14.5% pokrycia)
+Łowca wad ma tylko 16 regexów na 115 klas (14.5%). Wynik 'czysto' na 5 plikach oznacza brak trafień w tych wzorcach, a nie brak wad w kodzie – narzędzie wymaga rozbudowy.
+
+### 2026-07-20 — Audyt startowy: 22 neurony ŻYWE ale NIEZMIERZONE
+Audyt ujawnił 22 neurony zależne od adapterów (AUG-01, NEWS-01..04, PSY-01..04, RADAR-01..05, OC-06..08, V-03, X-28, Z-06/07) wpięte w pętlę live, ale bez pomiaru w paper. Stanowią największą utratę potencjału.
+
+### 2026-07-21 — dodaj_checklist() zwraca True, ale wpis nie zapisuje się na dysku
+dodaj_checklist() inkrementuje licznik w pamięci, ale zapis na dysk wymaga osobnego wywołania zapisz(). To pułapka – stan pamięci może być niezgodny z dyskiem.
+
+### 2026-07-20 — Testy >2 min na starym Fujitsu – bez limitu czasowego
+Testy trwają ponad 2 minuty ze względu na słaby sprzęt. Nie dawać limitu timeoutu. Uruchamiać w tle i cyklicznie sprawdzać, czy bieg żyje. Procedura zapisana w pamięci długoterminowej.
+
 ### 2026-07-27 — PR #134 cubic nie sprawdzał kodu po poprawkach
 Cubic wykonał tylko jeden przegląd PR #134, a po wprowadzeniu 3 commitów (756 linii w 9 plikach, w tym nomenclator.py) nie przeprowadził drugiego przebiegu. Kod wszedł do main bez weryfikacji naprawionych uwag.
 

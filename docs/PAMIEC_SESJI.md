@@ -113,11 +113,11 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-27 — `prekalkuluj_portfel` nie daje zysku algorytmicznego
-Robią tę samą pracę per-bar (zbuduj na oknie) tylko równolegle per-symbol, marne 1,4× przyspieszenia bez zmiany złożoności.
+### 2026-07-27 — Hooki ograniczone wyłącznie do SessionStart i SessionEnd
+Zweryfikowano, że nie istnieją hooki PreToolUse/PostToolUse, co eliminuje ryzyko dublowania rozkazów. Settings.json niesie tylko wskazane hooki.
 
-### 2026-07-27 — Główny koszt to redundancje w pure-python wskaźnikach
-Hotspot to szeroki podatek rozłożony na wiele wskaźników. Kluczowa anomalia: `wma` wołane ~930 razy na tick (4,5 mln wywołań, 65,5s cumtime) z powodu pętli w `_py_hma` i redundantnego przeliczania `wma`.
+### 2026-07-27 — System w harmonii – testy 2987/2987 zielone, audyt Prawa XXI exit 0
+Pełna pochwała: wszystkie testy przechodzą, 22 warstwy czystości kodu, ruff bez błędów. Spójność Klucznika potwierdzona.
 
 ### 2026-07-27 — Backtest liniowy O(n·okno), nie O(n²)
 Pomiar cProfile wykazał stały ~66 ms/tick dla okna 251 barów. Skalowanie liniowe, nie kwadratowe. Poprzednia diagnoza o O(n²) była błędna.
@@ -127,9 +127,6 @@ prekalkuluj_portfel robi tę samą pracę per-bar (zbuduj na oknie), tylko równ
 
 ### 2026-07-27 — Prawdziwy sprawca kwadratu: _py_hma (pętla w pętli wma)
 Wewnętrzna pętla w _py_hma wywołuje wma wielokrotnie (4,5 mln wywołań na 2700 ticków), dając O(period²) dla tego jednego wskaźnika. Reszta backtestu jest liniowa.
-
-### 2026-07-27 — Ograniczenia skanera lokalnego (14.5% pokrycia)
-Łowca wad ma tylko 16 regexów na 115 klas (14.5%). Wynik 'czysto' na 5 plikach oznacza brak trafień w tych wzorcach, a nie brak wad w kodzie – narzędzie wymaga rozbudowy.
 
 ### 2026-07-27 — dodaj_checklist nie zapisuje na dysk
 dodaj_checklist() zwraca True i inkrementuje licznik w pamięci, ale nie wywołuje zapisz() – wpis nie trafia na dysk. Naprawiono przez dodanie zapisu.
@@ -227,9 +224,6 @@ W pomiar_stablecoin_ic.py help-string zawierał % zmiany, co powoduje ValueError
 ### 2026-07-20 — Eskalacja przy rutynowym teście złapała krytyczne bugi
 Dwa bugi (ccxt NotSupported blokujący pętlę live, brak __main__ w petla_live.py) zostały znalezione dzięki eskalacji do Opusa podczas rutynowego testu paper. Potwierdza skuteczność zasady eskalacji.
 
-### 2026-07-20 — Audyt startowy: 22 neurony ŻYWE ale NIEZMIERZONE
-Audyt ujawnił 22 neurony zależne od adapterów (AUG-01, NEWS-01..04, PSY-01..04, RADAR-01..05, OC-06..08, V-03, X-28, Z-06/07) wpięte w pętlę live, ale bez pomiaru w paper. Stanowią największą utratę potencjału.
-
 ### 2026-07-20 — Wzorzec kodowania nie skanował przez rok
 Regex na subprocess text=True bez encoding istniał od sesji 2026-07-17, ale leżał martwy w checkliście. Po przeniesieniu do listy wzorców od razu złapał realny bug w audycie.
 
@@ -248,9 +242,6 @@ Linia 259 audytu zawierała jedyny subprocess.run bez encoding – trzy pozosta�
 ### 2026-07-21 — Niespójność licznika memory a rzeczywista liczba wpisów na dysku
 Metoda dodaj_checklist() zwiększała licznik w pamięci (52), ale wpis nie zapisywał się do pliku (zostało 51). Zapisz() jest osobną metodą, co powoduje cichą utratę danych. Naprawiono przez jawne wywołanie zapisz() po dodaniu.
 
-### 2026-07-21 — dodaj_checklist() zwraca True, ale wpis nie zapisuje się na dysku
-dodaj_checklist() inkrementuje licznik w pamięci, ale zapis na dysk wymaga osobnego wywołania zapisz(). To pułapka – stan pamięci może być niezgodny z dyskiem.
-
 ### 2026-07-21 — Błędny wpis o czasie gnicia runbooka – 9 dni zamiast 'pół roku'
 W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokładnie: 9 dni. Sprostowano u źródła (ledgery, pamięć).
 
@@ -268,9 +259,6 @@ Pomiary profili dla 500-1600 barów wykazały stały ms/tick (~66ms), co oznacza
 
 ### 2026-07-20 — Output hooka startowego ucięty przez harness
 Output hooka startowego (25,5 KB) został ucięty, powodując utratę kluczowej informacji (Dziennik następny krok) z pierwszego okna. Konieczna optymalizacja objętości.
-
-### 2026-07-20 — Testy >2 min na starym Fujitsu – bez limitu czasowego
-Testy trwają ponad 2 minuty ze względu na słaby sprzęt. Nie dawać limitu timeoutu. Uruchamiać w tle i cyklicznie sprawdzać, czy bieg żyje. Procedura zapisana w pamięci długoterminowej.
 
 ### 2026-06-30 — KROK 0 ujawnił błąd w liczeniu neuronów w MANIFEST
 MANIFEST pokazywał 45 aktywnych, podczas gdy grep wykazał ~16. Przyczyna: zwiadowcy i infrastruktura liczone jako neurony. Nauczka: ujednolicić sposób liczenia.

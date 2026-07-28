@@ -12,6 +12,33 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-27 — PR #134 cubic nie sprawdzał kodu po poprawkach
+Cubic wykonał tylko jeden przegląd PR #134, a po wprowadzeniu 3 commitów (756 linii w 9 plikach, w tym nomenclator.py) nie przeprowadził drugiego przebiegu. Kod wszedł do main bez weryfikacji naprawionych uwag.
+
+### 2026-07-27 — Fałszywe alarmy w Refleksji W9
+Trzy zgłoszone sprzeczności to fałszywe alarmy – wynikają z nakładania się słów kluczowych, a nie rzeczywistej sprzeczności treści. Detektor wymaga naprawy, aby odróżniać kolizje leksykalne od merytorycznych.
+
+### 2026-07-27 — Luka w automacie – tylko 14.5% zasięgu wykrywania wad
+Obecny łowca wad ma tylko 16 regexów na 115 klas (14.5%). Zakaz pushu nie był egzekwowany przez 16 dni z powodu braku hooków PreToolUse/PostToolUse – to jest źródłem luki.
+
+### 2026-07-27 — Fałszywe alarmy sprzeczności W9
+Trzy sprzeczności w refleksji W9 to fałszywe alarmy spowodowane nakładaniem się słów kluczowych (jeden świeży wpis auto-lekcji sparowany z niepowiązanymi starymi). To nie sprzeczność treści, tylko wada detektora – kandydat do naprawy.
+
+### 2026-07-27 — Mała liczba okien a wynik ROBUST w WF-IC
+Neurony EXP-13 (6 okien), SMC-01 (5), V-13 (3) otrzymały status ROBUST, ale są słabiej podparte niż X-17 (25 okien). Wymaga adnotacji o liczbie okien w werdykcie.
+
+### 2026-07-27 — Detektor duplikatów Hyginusa
+W systemie istnieje gotowy detektor duplikatów oparty na Jaccardzie bi-gramów, ale nie jest używany. Stanowi darmowe narzędzie do filtracji kandydatów.
+
+### 2026-07-27 — Brak embeddingów w RAG
+sentence-transformers nie jest zainstalowany. RAG działa wyłącznie na czystym FTS – bez semantycznego podobieństwa.
+
+### 2026-07-27 — Nowa klasa wady w meldunkach
+Sekcja niepewności obok twierdzenia pewnego nie koryguje tezy głównej – twierdzenie wygrywa, bo czyta się pierwsze. Zgłoszono do Księgi Wad.
+
+### 2026-07-27 — Priorytet zwiadów zewnętrznych FRUMENTARIUS
+Kosztują ~74k tokenów i potwierdzają znane problemy – powinny być P1, nie P0. Sąd nad kolejką Hyginusa (35 cząstek) to realna produkcja etykiet i ma pierwszeństwo.
+
 ### 2026-07-27 — Gnicie runbooków W11 - własna treść zamiast referencji
 Runbooki gniły, bo zawierały własną, nieaktualną treść, a deduplikacja po nazwie blokowała aktualizację. Rozwiązanie: skille pobierają kroki z CLAUDE.md jako jedyne źródło prawdy.
 

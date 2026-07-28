@@ -3,9 +3,9 @@ kategoria: CONSILIUM
 typ: zywy
 wlasciciel: narzedzia/bibliotekarz.py, narzedzia/przygotuj_biblioteke.py
 stan_na: 2026-07-28
-powod_istnienia: "PEŁNY spis biblioteki Imperium: 303 pozycje (BIB-001..303) — 69 posiadanych fundamentów, 234 pozycje rozbudowy, każda ze statusem posiadania, licencji i obecności w RAG."
+powod_istnienia: "PEŁNY spis biblioteki Imperium: 304 pozycje (BIB-001..304) — 69 posiadanych fundamentów, 234 pozycje rozbudowy, każda ze statusem posiadania, licencji i obecności w RAG."
 ---
-# 📚 BIBLIOTHECA ULPIA — PEŁNY SPIS: BIB-001 … BIB-303
+# 📚 BIBLIOTHECA ULPIA — PEŁNY SPIS: BIB-001 … BIB-304
 
 ## 🗂️ STAN PRZETWORZENIA — ZMIERZONY 2026-07-28 (nie z pamięci)
 
@@ -17,23 +17,23 @@ modułów kodu, nie ksiąg). Audyt drukował „pełna harmonia" przy 43% biblio
 
 | Warstwa | Ile | Skąd zmierzone |
 |---|---|---|
-| Pliki książek na dysku | **205** | `bibliotheca_ulpia/*.{epub,pdf,azw3,mobi,djvu}` |
-| Zgodne ze schematem nazw | **205 / 205** ✅ | naprawione 2026-07-28 (było 114) |
-| **Opisane w tym dokumencie** | **205 / 205** ✅ | naprawione 2026-07-28 (było 133 — brakowało całego fundamentu BIB-001..069) |
+| Pliki książek na dysku | **206** | `bibliotheca_ulpia/*.{epub,pdf,azw3,mobi,djvu}` |
+| Zgodne ze schematem nazw | **206 / 206** ✅ | naprawione 2026-07-28 (było 114) |
+| **Opisane w tym dokumencie** | **206 / 206** ✅ | naprawione 2026-07-28 (było 133 — brakowało całego fundamentu BIB-001..069) |
 | W katalogu metadanych | **115** | `katalog_ksiag.json` |
 | W cache tekstu | **115** | `tekst_cache/*.txt` |
 | **Wyszukiwalne w RAG** | **115** | `baza_wiedzy.db` → 37 331 fragmentów |
-| **POZA RAG (dograne, nieprzetworzone)** | **90** | 614 MB — czekają na `przygotuj_biblioteke.py` |
+| **POZA RAG (dograne, nieprzetworzone)** | **91** | 614 MB — czekają na `przygotuj_biblioteke.py` |
 
-**Podział 303 pozycji spisu:**
+**Podział 304 pozycji spisu:**
 
 | Blok | Pozycji | Mamy plik | W RAG | Fragmentów |
 |---|---|---|---|---|
 | **BIB-001..069** — fundament | 69 | **69** ✅ | **69** ✅ | 27 829 |
 | **BIB-070..274** — rozbudowa | 205 | 133 | 46 | 9 368 |
 | **BIB-275..300** — Consilium (osądzone) | 26 | 0 | 0 | — |
-| **BIB-301..303** — dołożone poza planem | 3 | **3** | 0 | — |
-| **RAZEM** | **303** | **205** | **115** | **37 197** |
+| **BIB-301..304** — dołożone poza planem | 4 | **4** | 0 | — |
+| **RAZEM** | **304** | **206** | **115** | **37 197** |
 
 *(37 197 to fragmenty samych książek; korpus `biblioteka` w RAG ma 37 253 — różnicę 56 dają
 pliki encyklopedii i vademecum.)*
@@ -63,8 +63,8 @@ od pierwszej niezapisanej książki. Wpięcie kandydata w kod dopiero po pomiarz
 > **Stan na:** 2026-07-16 · **Autor listy:** VITRUVIUSZ (Opus) · **Rozkaz Cezara:** „rozbuduj bibliotekę,
 > dawaj do 200 pozycji lub więcej, niech nasz LLM się uczy"
 > **Stan w chwili pisania listy (2026-07-16):** 69 książek (BIB-001..069) · **Ta lista:** 205 pozycji (BIB-070..274)
-> **Stan ZMIERZONY 2026-07-28:** 205 plików na dysku · 115 w RAG · 90 czeka na ekstrakcję · +26 pozycji
-> Consilium (BIB-275..300) i 3 dołożone (BIB-301..303) — razem **234 pozycje planu (BIB-070..303)**.
+> **Stan ZMIERZONY 2026-07-28:** 206 plików na dysku · 115 w RAG · 90 czeka na ekstrakcję · +26 pozycji
+> Consilium (BIB-275..300) i 4 dołożone (BIB-301..304) — razem **235 pozycji planu (BIB-070..304)**.
 
 ## 🔴 CZYTAJ NAJPIERW — status weryfikacji (Prawo I, ZPO)
 
@@ -352,7 +352,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 127 | Shumway, Stoffer | *Time Series Analysis and Its Applications: With R Examples* (**4th ed.**) ✅ 📁 **MAMY PLIK** | ✅ **TREŚĆ POTWIERDZONA** (Springer Texts in Statistics, 4. edycja, 6.0 MB). Slot był martwym odsyłaczem „Hyndman → BIB-072"; Consilium wypełniło go sensownie — dokłada **przestrzeń stanów i analizę spektralną**, których Hyndman (BIB-072) nie ma. ⏳ poza RAG |
 | 128 | Campbell, Lo, MacKinlay | *The Econometrics of Financial Markets* ✅ | Kanon |
 | 129 | Cochrane | *Asset Pricing* ✅ | |
-| 130 | Engle | *Autoregressive Conditional Heteroscedasticity…* (ARCH) ✅ | Źródło GARCH |
+| 130 | Engle | *Autoregressive Conditional Heteroscedasticity with Estimates of the Variance of United Kingdom Inflation* (Econometrica 1982, 50(4), 987–1007) ✅ 📁 **MAMY PLIK** | ✅ **ORYGINAŁ POTWIERDZONY 2026-07-28** — strona tytułowa: *„Author(s): Robert F. Engle · Source: Econometrica, Jul., 1982, Vol. 50, No. 4"*, JSTOR `stable/1912773`. 22 s., **51 142 zn.** warstwy tekstowej. **Źródło ARCH → nasz EXP-13 GARCH**. Para ze źródłem BIB-131 (Bollerslev 1986) domknięta ⏳ poza RAG |
 | 131 | Bollerslev | *Generalized ARCH* ✅ | |
 | 132 | Hamilton | *A New Approach to the Economic Analysis of Nonstationary Time Series…* ✅ | **Regime-switching u źródła** |
 | 133 | Zivot, Wang | *Modeling Financial Time Series with S-PLUS* ⚠️ | |
@@ -655,6 +655,7 @@ Numery nadane **poza rezerwacją 205..274** (żeby nie zająć slotu przewidzian
 | 301 | West, Thomas | *Winning Algorithmic Trading Strategies* (2025) 📁 | 🔴 **REKOMENDUJĘ NIE WŁĄCZAĆ DO RAG.** Treść zweryfikowana czytaniem: książka **odsyła do cudzych skryptów w TradingView Community** („search for … by the TradingView user millerrh"), a podtytuł brzmi *„…Systems that Work For Trading the Markets In 2026!"*. To gatunek, który ta lista **świadomie wyklucza** (patrz zastrzeżenie o Reactive Publishing). Ryzyko dla TIRO: uczeń nauczy się tego, co mu damy |
 | 302 | Gutierrez | *Machine Learning and Data Science: An Introduction with R* 📁 | 🟡 **NISKI PRIORYTET** — wstęp do ML w R, w całości pokryty przez BIB-139 (ESL) i BIB-140 (ISL), które są mocniejsze. Bez szkody, ale i bez nowej informacji (Prawo XVI) |
 | 303 | Sorensen | *Statistical Learning in Genetics* (2nd ed., Springer) 📁 | 🔴 **POZA DOMENĄ** — statystyka w **genetyce**. Metody bayesowskie owszem, ale przykłady i słownictwo są biologiczne; w RAG będzie szumem przy zapytaniach rynkowych |
+| 304 | Chingnun Lee | *Autoregressive Conditional Heteroscedasticity* — Ch. 26, notatki wykładowe (2009) 📁 | 🟢 **PRZYJĘTE — przesunięte tu z BIB-130.** Trafiło pod numer źródła, ale źródłem nie jest: mówi o ARCH w trzeciej osobie („introduced by Engle (1982)"), stopka *„Copy Right by Chingnun Lee ® 2009"*. **Wartość realna dla TIRO**: 25 s. wyprowadzeń ARCH→GARCH→wielowymiarowe, krok po kroku — ten sam argument, którym obroniliśmy BIB-074 (zadania Boyda). 32 444 zn. |
 
 ---
 
@@ -666,7 +667,7 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
 
 | BIB | Pozycja | Stron | Tekst | Dlaczego boli |
 |---|---|---|---|---|
-| **130** | Engle — *ARCH* | 23 | **0 zn.** | **Źródło naszego GARCH (EXP-13)** |
+| ~~**130**~~ | ~~Engle — *ARCH*~~ | 22 | ✅ **51 142 zn.** | ✔️✔️ **DOMKNIĘTE 2026-07-28 przez Cezara, w dwóch krokach.** Krok 1 (04:44): plik z warstwą tekstową, ale to były **notatki wykładowe** Chingnun Lee — złapane czytaniem treści, nie nazwy. Krok 2 (04:54): **prawdziwy Engle 1982 z Econometriki**. Notatki nie poszły do kosza — dostały własny numer **BIB-304** |
 | **132** | Hamilton — *Nonstationary Time Series* | 28 | **0 zn.** | **Regime-switching u źródła** — fundament Namiestnika |
 | **137** | Rabiner — *Tutorial on HMM* | 30 | **0 zn.** | **HMM u źródła** — pod Viterbi Jump Model |
 | **154** | Kyle — *Continuous Auctions and Insider Trading* | 23 | **0 zn.** | **Model Kyle'a** — fundament mikrostruktury |

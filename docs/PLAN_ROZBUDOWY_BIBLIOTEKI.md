@@ -3,9 +3,9 @@ kategoria: CONSILIUM
 typ: zywy
 wlasciciel: narzedzia/bibliotekarz.py, narzedzia/przygotuj_biblioteke.py
 stan_na: 2026-07-28
-powod_istnienia: "PEŁNY spis biblioteki Imperium: 306 pozycji (BIB-001..306) — 69 posiadanych fundamentów, 234 pozycje rozbudowy, każda ze statusem posiadania i obecności w RAG."
+powod_istnienia: "PEŁNY spis biblioteki Imperium: 307 pozycji (BIB-001..307) — 69 posiadanych fundamentów, 234 pozycje rozbudowy, każda ze statusem posiadania i obecności w RAG."
 ---
-# 📚 BIBLIOTHECA ULPIA — PEŁNY SPIS: BIB-001 … BIB-306
+# 📚 BIBLIOTHECA ULPIA — PEŁNY SPIS: BIB-001 … BIB-307
 
 ## 🗂️ STAN PRZETWORZENIA — ZMIERZONY 2026-07-28 (nie z pamięci)
 
@@ -17,23 +17,23 @@ modułów kodu, nie ksiąg). Audyt drukował „pełna harmonia" przy 43% biblio
 
 | Warstwa | Ile | Skąd zmierzone |
 |---|---|---|
-| Pliki książek na dysku | **208** | `bibliotheca_ulpia/*.{epub,pdf,azw3,mobi,djvu}` |
-| Zgodne ze schematem nazw | **208 / 208** ✅ | naprawione 2026-07-28 (było 114) |
-| **Opisane w tym dokumencie** | **208 / 208** ✅ | naprawione 2026-07-28 (było 133 — brakowało całego fundamentu BIB-001..069) |
+| Pliki książek na dysku | **209** | `bibliotheca_ulpia/*.{epub,pdf,azw3,mobi,djvu}` |
+| Zgodne ze schematem nazw | **209 / 209** ✅ | naprawione 2026-07-28 (było 114) |
+| **Opisane w tym dokumencie** | **209 / 209** ✅ | naprawione 2026-07-28 (było 133 — brakowało całego fundamentu BIB-001..069) |
 | W katalogu metadanych | **115** | `katalog_ksiag.json` |
-| W cache tekstu | **115** | `tekst_cache/*.txt` |
+| W cache tekstu | **117** | `tekst_cache/*.txt` — +2 z naszego OCR (BIB-136, BIB-155) | `tekst_cache/*.txt` |
 | **Wyszukiwalne w RAG** | **115** | `baza_wiedzy.db` → 37 331 fragmentów |
-| **POZA RAG (dograne, nieprzetworzone)** | **93** | 614 MB — czekają na `przygotuj_biblioteke.py` |
+| **POZA RAG (dograne, nieprzetworzone)** | **94** | 614 MB — czekają na `przygotuj_biblioteke.py` |
 
-**Podział 306 pozycji spisu:**
+**Podział 307 pozycji spisu:**
 
 | Blok | Pozycji | Mamy plik | W RAG | Fragmentów |
 |---|---|---|---|---|
 | **BIB-001..069** — fundament | 69 | **69** ✅ | **69** ✅ | 27 829 |
 | **BIB-070..274** — rozbudowa | 205 | 133 | 46 | 9 368 |
 | **BIB-275..300** — Consilium (osądzone) | 26 | 0 | 0 | — |
-| **BIB-301..306** — dołożone poza planem | 6 | **6** | 0 | — |
-| **RAZEM** | **306** | **208** | **115** | **37 197** |
+| **BIB-301..307** — dołożone poza planem | 7 | **7** | 0 | — |
+| **RAZEM** | **307** | **209** | **115** | **37 197** |
 
 *(37 197 to fragmenty samych książek; korpus `biblioteka` w RAG ma 37 253 — różnicę 56 dają
 pliki encyklopedii i vademecum.)*
@@ -63,8 +63,8 @@ od pierwszej niezapisanej książki. Wpięcie kandydata w kod dopiero po pomiarz
 > **Stan na:** 2026-07-16 · **Autor listy:** VITRUVIUSZ (Opus) · **Rozkaz Cezara:** „rozbuduj bibliotekę,
 > dawaj do 200 pozycji lub więcej, niech nasz LLM się uczy"
 > **Stan w chwili pisania listy (2026-07-16):** 69 książek (BIB-001..069) · **Ta lista:** 205 pozycji (BIB-070..274)
-> **Stan ZMIERZONY 2026-07-28:** 208 plików na dysku · 115 w RAG · 90 czeka na ekstrakcję · +26 pozycji
-> Consilium (BIB-275..300) i 6 dołożonych (BIB-301..306) — razem **237 pozycji planu (BIB-070..306)**.
+> **Stan ZMIERZONY 2026-07-28:** 209 plików na dysku · 115 w RAG · 90 czeka na ekstrakcję · +26 pozycji
+> Consilium (BIB-275..300) i 7 dołożonych (BIB-301..307) — razem **238 pozycji planu (BIB-070..307)**.
 
 ## 🔴 CZYTAJ NAJPIERW — status weryfikacji (Prawo I, ZPO)
 
@@ -270,7 +270,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 080 | Jurafsky, Martin | *Speech and Language Processing* (3rd ed.) ✅ | Darmowy draft — biblia NLP |
 | 081 | Tunstall, von Werra, Wolf | *Natural Language Processing with Transformers* ✅ | Praktyka HuggingFace |
 | 082 | Rothman | *Transformers for Natural Language Processing* ⚠️ | |
-| 083 | Svensén, Bishop | *Pattern Recognition and Machine Learning* — **Solutions to the Exercises (web-edition)** ✅ 📁 **MAMY PLIK** | 🚨 **NIE JEST TO PODRĘCZNIK.** Consilium proponowało tu Bishopa PRML (2006); plik, który wszedł, to **zbiór rozwiązań zadań** (Svensén & Bishop, wyd. web 2009, 1.4 MB). Wykryte **czytaniem treści**, nie nazwy — dokładnie ten sam błąd co przy BIB-074 (Boyd: „Additional Exercises" zamiast podręcznika), **druga powtórka tej klasy**. Wartość dla TIRO realna (rozwiązania pokazują rozumowanie krok po kroku), ale **właściwy PRML wciąż mamy do zdobycia** — PDF z Microsoft Research |
+| 083 | Bishop | *Pattern Recognition and Machine Learning* (Springer, Information Science and Statistics) ✅ 📁 **MAMY PLIK** | ✅ **PODRĘCZNIK POTWIERDZONY 2026-07-28** — strona tytułowa *Christopher M. Bishop · Pattern Recognition and Machine Learning*, seria pod redakcją M. Jordana, J. Kleinberga i B. Schölkopfa. **703 s., 1 592 260 zn., 24 602 unikalne słowa.** Kontrola rozstrzygająca: fraza *Solutions to the Exercises* **NIEOBECNA** — czyli to naprawdę podręcznik, nie zbiór rozwiązań. Nazwisko *Svensén* pada wyłącznie w podziękowaniach (pomoc przy rysunkach i składzie LaTeX), nie w autorstwie. **Kanon ML — drugi filar obok Hastie-ESL (BIB-139)** ⏳ poza RAG |
 | 084 | Devlin i in. | *BERT: Pre-training of Deep Bidirectional Transformers* ✅ | arXiv |
 | 085 | Brown i in. | *Language Models are Few-Shot Learners* (GPT-3) ✅ | arXiv |
 | 086 | Hu i in. | *LoRA: Low-Rank Adaptation of Large Language Models* ✅ | **Wprost nasza metoda treningu (E4)** |
@@ -343,7 +343,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 133 | Zivot, Wang | *Modeling Financial Time Series with S-PLUS* ⚠️ | |
 | 134 | Lütkepohl | *New Introduction to Multiple Time Series Analysis* ✅ | VAR |
 | 135 | Enders | *Applied Econometric Time Series* ✅ | |
-| 136 | Diebold, Mariano | *Comparing Predictive Accuracy* ✅ | **Test przewagi prognoz — pod nasze A/B** |
+| 136 | Diebold, Mariano | *Comparing Predictive Accuracy* (JBES 1995, 13(3), 253–263) ✅ 📁 **MAMY PLIK** | ✅ **POTWIERDZONE 2026-07-28, ale dopiero PO OCR U NAS.** Plik był skanem ProQuest: 11 stron, **1 298 zn. = stopka *„Reproduced with permission of the copyright owner"* × 11, 32 unikalne słowa**. Po naszym OCR: **49 912 zn. / 3 141 unikalnych słów**. Abstrakt potwierdza treść (*„null hypothesis of no difference in the accuracy of two competing forecasts… loss function need not be quadratic"*). **Test przewagi prognoz — wprost pod nasze A/B** ✅ **w cache, czeka na reindeks** |
 | 137 | Rabiner | *A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition* (Proc. IEEE 77(2), 1989, 257–286) ✅ 📁 **MAMY PLIK** | ✅ **ORYGINAŁ POTWIERDZONY 2026-07-28** — nagłówek *„LAWRENCE R. RABINER, FELLOW, IEEE"*, metadane `author=IEEE`. 30 s., **150 305 zn.** Sprawdzone, że niesie **sekcję V „Implementation Issues"**, której brak streszczeniom: skalowanie, wiele sekwencji obserwacji, estymaty początkowe, niedobór danych treningowych. **HMM u źródła → Viterbi Jump Model** ⏳ poza RAG |
 | 138 | Tsay | *Multivariate Time Series Analysis: With R and Financial Applications* (2014) ✅ 📁 **MAMY PLIK** | ✅ **TREŚĆ POTWIERDZONA** (Wiley 2014, Booth School, 5.8 MB). Slot był odsyłaczem „Tsay → mamy BIB-031"; to **inna książka tego samego autora** — VAR/VECM/modele czynnikowe, czyli wielowymiarowość, której BIB-031 nie obejmuje. ⏳ poza RAG |
 | 139 | Hastie, Tibshirani, Friedman | *The Elements of Statistical Learning* ✅ | Darmowy PDF — kanon ML |
@@ -372,7 +372,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 152 | Bouchaud, Bonart, Donier, Gould | *Trades, Quotes and Prices* ✅ | **Kanon mikrostruktury XXI w.** |
 | 153 | Almgren, Chriss | *Optimal Execution of Portfolio Transactions* ✅ | Fundament egzekucji |
 | 154 | Kyle | *Continuous Auctions and Insider Trading* (Econometrica 1985, 53(6), 1315–1336) ✅ 📁 **MAMY PLIK** | ✅ **ORYGINAŁ POTWIERDZONY 2026-07-28** — strona tytułowa: *Albert S. Kyle · Econometrica, Vol. 53, No. 6 (Nov., 1985), pp. 1315-1336*. 23 s., **55 676 zn.** To skan, ale **z dobrym OCR**: proza czyta się czysto (żywa pagina *1322 ALBERT S. KYLE*), zniekształcenia tylko na okładce JSTOR. Terminy modelu obecne: market maker, informed trader, noise trader, liquidity, equilibrium. **Model Kyle'a u źródła — fundament mikrostruktury** ⏳ poza RAG |
-| 155 | Glosten, Milgrom | *Bid, Ask and Transaction Prices…* ✅ | |
+| 155 | Glosten, Milgrom | *Bid, Ask and Transaction Prices in a Specialist Market with Heterogeneously Informed Traders* (JFE 1985) ✅ 📁 **MAMY PLIK** | ✅ **POTWIERDZONE 2026-07-28, ale dopiero PO OCR U NAS.** Plik był skanem Columbia Business School: 30 stron, 560 obrazów, **876 zn. = pieczątka *„COLUMBIA BUSINESS SCHOOL"* × 30, 31 unikalnych słów**. Po naszym OCR: **72 027 zn. / 3 007 unikalnych słów**. Treść potwierdzona (*„proportion of the spread due to adverse selection"*). **Fundament mikrostruktury obok Kyle'a (BIB-154)** ✅ **w cache, czeka na reindeks** |
 | 156 | Avellaneda, Stoikov | *High-frequency trading in a limit order book* ✅ | **Kanon market makingu** |
 | 157 | Lehalle, Laruelle | *Market Microstructure in Practice* ✅ | |
 | 158 | Guéant | *The Financial Mathematics of Market Liquidity* ⚠️ | |
@@ -643,6 +643,7 @@ Numery nadane **poza rezerwacją 205..274** (żeby nie zająć slotu przewidzian
 | 304 | Chingnun Lee | *Autoregressive Conditional Heteroscedasticity* — Ch. 26, notatki wykładowe (2009) 📁 | 🟢 **PRZYJĘTE — przesunięte tu z BIB-130.** Trafiło pod numer źródła, ale źródłem nie jest: mówi o ARCH w trzeciej osobie („introduced by Engle (1982)"), stopka *„Copy Right by Chingnun Lee ® 2009"*. **Wartość realna dla TIRO**: 25 s. wyprowadzeń ARCH→GARCH→wielowymiarowe, krok po kroku — ten sam argument, którym obroniliśmy BIB-074 (zadania Boyda). 32 444 zn. |
 | 305 | Dymarski (red.) | *Hidden Markov Models, Theory and Applications* (InTech 2011, DOI 10.5772/601) ✅ 📁 | 🟢 **PRZYJĘTE — plon uboczny polowania na BIB-137.** 327 s., **864 360 zn.**, zero stron bez tekstu. Praca zbiorowa: HMM **poza rozpoznawaniem mowy** — to jest nowa informacja wobec Rabinera (BIB-137) i Jurafsky'ego (BIB-080). Przyszły dwie kopie; wybrana z repozytorium PW, bo druga miała **8 stron bez warstwy tekstowej** |
 | 306 | Wood (Columbia) | *Hidden Markov Models: from the Beginning to the State of the Art* (slajdy wykładowe, 2011) 📁 | 🟡 **PRZYJĘTE WARUNKOWO.** 47 slajdów, tylko **17 456 zn.** (371 zn./slajd — slajdy to hasła, nie proza, więc słaby materiał dla RAG). Broni się **zmierzoną zerową luką**: `hierarchical Dirichlet` 0 · `HDP` 0 · `beam sampling` 0 · `explicit duration` 0 · `nonparametric Bayes` 0 fragmentów w całym RAG. **EDHMM (explicit-duration HMM) dotyka wprost trwałości reżimu** — czyli tego, co robi nasz Namiestnik. Traktować jako **listę lektur**, nie źródło |
+| 307 | Svensén, Bishop | *Pattern Recognition and Machine Learning* — **Solutions to the Exercises** (wyd. web 2009) 📁 | 🟢 **PRZYJĘTE — przesunięte tu z BIB-083**, gdy przyszedł właściwy podręcznik. Trafiło pod numer podręcznika, ale jest zbiorem rozwiązań zadań (1.4 MB). **Wartość realna dla TIRO**: rozwiązania pokazują rozumowanie krok po kroku — ten sam argument co przy BIB-074 (zadania Boyda) i BIB-304 (notatki o ARCH) |
 
 ---
 
@@ -662,7 +663,7 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
 | ~~**128**~~ | ~~Campbell, Lo, MacKinlay~~ | — | ✅ **1 380 803 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — Cezar podmienił **skan PDF na DJVU**. Nowa klasa rozwiązania: nie inny skan tej samej postaci, tylko **inny format**, który niesie tekst. Wymaga Calibre do ekstrakcji |
 | ~~**189**~~ | ~~Fudenberg, Tirole — *Game Theory*~~ | — | ✅ **1 477 759 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — znowu podmiana **PDF → DJVU**, druga tego dnia. ⚠️ OCR gorszy niż w BIB-128 (`subgame` czyste w 88.9%) — używalne, ale nie bezbłędne |
 | ~~**159**~~ | ~~Johnson — *Algorithmic Trading and DMA*~~ | — | ✅ **1 591 009 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — trzecia podmiana **PDF → DJVU** tego dnia i najlepszy plon: 26 602 unikalnych słów, OCR niemal bezbłędny. Stary plik miał **dwie wady naraz**: zepsutą strukturę (225 z 595 stron nieczytelnych) oraz — ✏️ **korekta mojego pomiaru** — raportowane „731 zn." **nie było treścią**, tylko słowem `ForexFinest` powtórzonym 61 razy (znak wodny). Cały stary plik miał **jedno unikalne słowo** |
-| **083** | Svensén, Bishop — PRML | — | ✅ | To **zbiór rozwiązań**, nie podręcznik (patrz wyżej) |
+| ~~**083**~~ | ~~Svensén, Bishop — PRML~~ | 703 | ✅ **1 592 260 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — Cezar dostarczył **właściwy podręcznik** Bishopa. To jedyna z dziewięciu pozycji, której nie dało się naprawić ani OCR-em, ani zmianą formatu: plik był technicznie bez zarzutu, tylko **był inną książką**. Rozwiązania zadań przeniesione na **BIB-307** |
 
 **Dwie drogi (decyzja Cezara):**
 1. **Cezar dostarcza inne wersje plików** (zaproponowane 2026-07-28) — najtańsze, zero ryzyka OCR.

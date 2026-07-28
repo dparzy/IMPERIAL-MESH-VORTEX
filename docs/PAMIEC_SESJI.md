@@ -113,6 +113,15 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — `prekalkuluj_portfel` nie daje zysku algorytmicznego
+Robią tę samą pracę per-bar (zbuduj na oknie) tylko równolegle per-symbol, marne 1,4× przyspieszenia bez zmiany złożoności.
+
+### 2026-07-27 — Główny koszt to redundancje w pure-python wskaźnikach
+Hotspot to szeroki podatek rozłożony na wiele wskaźników. Kluczowa anomalia: `wma` wołane ~930 razy na tick (4,5 mln wywołań, 65,5s cumtime) z powodu pętli w `_py_hma` i redundantnego przeliczania `wma`.
+
+### 2026-07-27 — Backtest liniowy O(n·okno), nie O(n²)
+Pomiar cProfile wykazał stały ~66 ms/tick dla okna 251 barów. Skalowanie liniowe, nie kwadratowe. Poprzednia diagnoza o O(n²) była błędna.
+
 ### 2026-07-27 — prekalkuluj_portfel nie poprawia złożoności algorytmicznej
 prekalkuluj_portfel robi tę samą pracę per-bar (zbuduj na oknie), tylko równolegle per-symbol. Mimo cache daje zysk marne 1.4×, nie zmienia O(n·okno).
 

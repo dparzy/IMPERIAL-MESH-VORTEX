@@ -153,11 +153,20 @@ class PamiecAbsolutna:
         self.katalog = Path(katalog)
         self._sekwencja: Dict[str, int] = {}
 
+    # Znaki, których symbol NIE MOŻE wnieść do nazwy pliku. Notacja ccxt dla kontraktów
+    # to `BTC/USDT:USDT` — ukośnik robi z tego PODKATALOG, a dwukropek jest na Windows
+    # nielegalny w nazwie. Zmierzone 2026-07-29: `logs/2026/07/2026-07-28_BTC/USDT:USDT_…`
+    # → FileNotFoundError. Wada spała, bo do W1 pisała dotąd tylko jedna ścieżka i nikt
+    # nie podawał `log_dir` w backteście; ujawniła się przy PIERWSZYM realnym zapisie.
+    # W żywym paper-tradingu na adapterze giełdowym wywróciłaby domykanie pozycji.
+    _ZNAKI_NIELEGALNE = str.maketrans({z: "-" for z in '/\\:*?"<>|'})
+
     def _sciezka(self, symbol: str, typ: str, data: str) -> Path:
         rok, mies = data[:4], data[5:7]
         folder = self.katalog / rok / mies
         folder.mkdir(parents=True, exist_ok=True)
-        return folder / f"{data}_{symbol}_{typ.lower()}.jsonl"
+        bezpieczny = symbol.translate(self._ZNAKI_NIELEGALNE)
+        return folder / f"{data}_{bezpieczny}_{typ.lower()}.jsonl"
 
     def _nastepna_sekwencja(self, sesja_id: str) -> int:
         self._sekwencja[sesja_id] = self._sekwencja.get(sesja_id, 0) + 1
@@ -192,7 +201,10 @@ class PamiecAbsolutna:
         return wyniki
 
     def _pasuje(self, nazwa: str, symbol: str, data: str, log_typ: str) -> bool:
-        if symbol and symbol.lower() not in nazwa.lower():
+        # Symbol pytania sanityzujemy TAK SAMO jak przy zapisie — inaczej `wczytaj`
+        # po „BTC/USDT:USDT" nie znalazłoby własnego pliku „…_BTC-USDT-USDT_…".
+        # Sanityzacja po jednej stronie to gorszy stan niż jej brak: dane są, a nie widać ich.
+        if symbol and symbol.translate(self._ZNAKI_NIELEGALNE).lower() not in nazwa.lower():
             return False
         if data and data not in nazwa:
             return False

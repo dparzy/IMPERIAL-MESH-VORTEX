@@ -52,7 +52,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 
 <!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->
 
-> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-28 (73 pozycji).
+> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-29 (73 pozycji).
 
 ### LEX — prawo i rozkazy stałe — obowiązuje, nie opisuje
 
@@ -73,7 +73,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | `docs/ARSENAL_IMPERIUM.md` | Zweryfikować (Prawo I: zero halucynacji) setki linków narzędzi z pliku źródłowego IMV, oddzielić realne od fabrykowanych/niepewnych, i zaproponować 'najmocniejszy zweryfikowany rdz | — | 2026-06-02 |
 | `docs/CENSUS_ORGANORUM.md` | Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem | `narzedzia/census_organorum.py` | 2026-07-28 |
 | `docs/INDEKS_IMPERIUM.md` | Master Index — punkt wejścia i mapa wszystkich dokumentów; sekcja katalogu generowana przez Tabularium | `imperium/legiony/rejestr.py` | 2026-07-18 |
-| `docs/MANIFEST_KODU.md` | JEDYNE oficjalne źródło prawdy o kodzie (Prawo XIX) — tabela kluczy ze statusem, nic nie istnieje bez wpisu tutaj | `imperium/legiony/rejestr.py` | 2026-07-26 |
+| `docs/MANIFEST_KODU.md` | JEDYNE oficjalne źródło prawdy o kodzie (Prawo XIX) — tabela kluczy ze statusem, nic nie istnieje bez wpisu tutaj | `imperium/legiony/rejestr.py` | 2026-07-29 |
 | `docs/MAPA_KLUCZY.md` | JEDYNY dokument, który jawnie i systematycznie rozwiązuje rozbieżności między katalogiem (planem nazw/ID) a żywym kodem — dla każdego klucza podaje: nazwę klasy w kodzie, co robi,  | `imperium/legiony/rejestr.py` | 2026-07-16 |
 | `docs/MAPA_PAMIECI.md` | Jedyne miejsce konsolidujące 13(+1 nadrzędny=W7) warstw pamięci Claude/Imperium w jedną taksonomię, z mapowaniem na model CoALA (arXiv:2309.02427) i na 'domknięte problemy granicy 2026 | `imperium/biblioteki/centrum_pamieci.py`, `imperium/biblioteki/dziennik_niesmiertelny.py`, `imperium/biblioteki/graf_pamieci.py`, `imperium/biblioteki/kronika_czatu.py`, `imperium/biblioteki/kustosz_pamieci.py`, `imperium/biblioteki/pamiec_absolutna.py`, `imperium/biblioteki/pamiec_proceduralna.py`, `imperium/biblioteki/pamiec_proweniencji.py`, `imperium/biblioteki/pamiec_robocza.py`, `imperium/biblioteki/pamiec_sesji.py`, `imperium/biblioteki/refleksja_pamieci.py`, `imperium/biblioteki/rejestr_wizji.py`, `imperium/biblioteki/srodowisko_pamieci.py`, `imperium/biblioteki/zapominanie.py` | 2026-07-17 |
 | `docs/OBSERWATORZY.md` | Jedyny dokument mapujący WSZYSTKIE zewnętrzne źródła danych (44 źródła w 4 warstwach: OCZY/USZY/WIESZCZOWIE/SZPIEDZY) do konkretnych neuronów i modułów — z priorytetami kluczy API  | `imperium/akwedukty/bary_zdarzeniowe.py`, `imperium/akwedukty/czytnik_csv.py`, `imperium/akwedukty/klasyfikator_zdarzen.py`, `imperium/akwedukty/kwatermistrz_danych.py`, `imperium/akwedukty/news_fetcher.py`, `imperium/akwedukty/sentyment_historyczny.py`, `imperium/drogi/nexus_hub.py` | 2026-07-17 |

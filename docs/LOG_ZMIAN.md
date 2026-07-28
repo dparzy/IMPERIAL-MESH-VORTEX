@@ -14,6 +14,61 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-29 | 🔁 | PIERWSZY ZAMKNIĘTY OBIEG: W1 zapisana, bo nie było ZAPISU — nie czytelników
+
+**Rozkaz Cezara:** punkt 1 z audytu Consilium (najpierw dane, potem mosty) + świeże bary z Binance.
+
+**ŚWIEŻE BARY.** 4H: 15/15 par do `2026-07-28 20:00`. 1H: 14/14 par. Świeżość wg PORTITORA
+spadła z **~40 dni do 0.0–0.1 dnia**.
+
+**BUG, KTÓRY BLOKOWAŁ 1H OD 40 DNI.** Pliki CDD mieszają dwie jednostki czasu — zmierzone
+**672–936 wierszy na parę** (okno 2025-02-12→03-11) ma Unix w **mikrosekundach**. `czytnik_csv`
+wiedział o tym od 2026-06-10 (`if liczba > 1e14`), ale `pobierz_binance` czytał ten sam plik
+własnym `int(float(...))`: brał 16 cyfr za milisekundy, wychodził rok ~57000 i wywracał się na
+`OSError [Errno 22]` — najpierw przy wznawianiu, a po pierwszej łatce **drugi raz** przy zapisie.
+Klasa: **ta sama wiedza w dwóch parserach tego samego formatu, utwardzona tylko w jednym**.
+Lekarstwo nie polega na łataniu każdego miejsca użycia, tylko na jednym źródle prawdy —
+publiczne `czytnik_csv.parsuj_znacznik`, normalizacja przy WEJŚCIU. Efekt uboczny: przepisanie
+plików **wyleczyło dane** (14 plików z brudem µs → **0**; duplikaty zlały się po znaczniku).
+
+**W1 ZAPISANA PIERWSZY RAZ.** Przyczyna pustki była odwrotna do tezy audytu zewnętrznego
+(„nic nie czyta W1"): czytelnicy są (Kustosz, Centrum, Igrzyska, MWU) — **nikt nie PISAŁ**.
+Zapis jest opt-in przez `log_dir`, a backtest go nie podawał. Dodane: `log_dir` w `backtest()`
+(domyślnie None = zero regresji) oraz etykieta pochodzenia `zrodlo` w silniku (`BACKTEST` vs
+`PAPER`) — bez niej wynik backtestu byłby w W1 **nieodróżnialny od rzeczywistości**.
+
+**PIERWSZY UDOKUMENTOWANY P&L** (BTCUSDT 4H, 1000 barów świeżych danych, rój 87, próg 0.55):
+23 wejścia, 70 wet Pretorianów, kapitał **10 000 → 9 136,11 (−8,6%)**, win rate **27,3%**,
+suma PnL **−844,88 USDT**, MAE/MFE zapisane 22/22. Strata — meldowana wprost, jedna para
+i jedno okno, więc to nie jest wyrok na rój, tylko pierwsza liczba, która w ogóle istnieje.
+
+**OBIEG ZŁAPAŁ WŁASNĄ WADĘ W PIERWSZYM BIEGU.** Silnik miał 23 zamknięcia, W1 zapisała **22**:
+logowała wyłącznie ścieżka `przetworz_bar`, a `zamknij_wszystkie` i `zamknij_manualnie` — nie.
+Pozycja domykana na końcu biegu ginęła bez śladu w warstwie, która ma być źródłem prawdy
+o wynikach. Naprawione (`_log_zamkniecie` z opcjonalnym barem), zweryfikowane: **11 = 11**.
+
+**NAJWAŻNIEJSZE ODKRYCIE — druga połowa obiegu wciąż nie istnieje.** Nakarmione konsumenty:
+Igrzyska przetworzyły logi, ale **MWU zbudował 0 wag**. Powód zmierzony: W1 ma wyłącznie
+`TRADE_CLOSE`, ani jednego `SYGNAŁ` — a `pamiec_absolutna.log_sygnal` **nie ma ani jednego
+wywołania w całym kodzie**. Wiemy ILE zarobiliśmy, nie wiemy KTO głosował, więc atrybucja per
+neuron jest niemożliwa. To jest korzeń głębszy niż PL1–PL5 z audytu Consilium.
+
+**TRZECIA WADA — odsłonięta przez naprawę drugiej.** Gdy `zamknij_wszystkie` zaczęło pisać
+do W1, bramka wywaliła `FileNotFoundError` na ścieżce
+`logs/2026/07/2026-07-28_BTC/USDT:USDT_trade_close.jsonl`: symbol w notacji ccxt
+(`BTC/USDT:USDT` — tej używają adaptery giełdowe) wchodził **wprost do nazwy pliku**, więc
+ukośnik robił podkatalog, a dwukropek jest na Windows nielegalny. Wada spała, bo do W1 pisała
+dotąd jedna ścieżka i nikt nie podawał `log_dir`; **w żywym paper-tradingu wywróciłaby
+domykanie pozycji**. Sanityzacja po OBU stronach (zapis i filtr odczytu — inaczej `wczytaj`
+nie znalazłoby własnego pliku, a to gorsze niż brak sanityzacji: dane są, tylko niewidoczne).
+
+**Pliki:** `imperium/akwedukty/czytnik_csv.py`, `narzedzia/pobierz_binance.py`,
+`imperium/koloseum/paper_trading.py`, `imperium/koloseum/backtest.py`,
+`imperium/biblioteki/pamiec_absolutna.py`, `tests/test_czytnik_csv.py` (+2),
+`tests/test_paper_trading.py` (+3), `tests/test_pamiec_absolutna.py` (+2).
+
+---
+
 ## 2026-07-28 | 🔨 | FABER — narzędzie zainstalowane, ale niewidoczne, kosztowało cały format
 
 **Pomiar otwarcia wachty:** `shutil.which("ebook-convert")` → `None`, `shutil.which("tesseract")`

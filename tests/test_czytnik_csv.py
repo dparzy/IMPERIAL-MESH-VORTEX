@@ -320,3 +320,43 @@ def test_etykieta_wielkosc_liter():
     biezacy = (teraz // 3_600_000) * 3_600_000
     p = _plik_z_barami(tempfile.mkdtemp(), [biezacy - 3_600_000, biezacy])
     assert len(wczytaj_csv(p, interwal="1H")) == 1, "'1H' musi działać jak '1h'"
+
+
+# ── PARSER ZNACZNIKA: jedno źródło prawdy dla imperium I narzędzi (2026-07-29) ──
+
+def test_parsuj_znacznik_publiczny_normalizuje_jednostki():
+    """
+    GRANICE trzech jednostek naraz. Powód istnienia publicznego wejścia: pobieracz
+    `narzedzia/pobierz_binance.py` miał WŁASNY `int(float(...))`, brał 16-cyfrowy
+    znacznik CDD za milisekundy i wywracał się na OSError — 1H nie dało się dociągnąć
+    przez 40 dni. Ta sama wiedza w dwóch parserach = wiedza utwardzona tylko w jednym.
+    """
+    from imperium.akwedukty.czytnik_csv import parsuj_znacznik
+
+    assert parsuj_znacznik("1741734000000000") == 1741734000000   # µs (brud CDD) → ms
+    assert parsuj_znacznik("1781823600000") == 1781823600000      # ms → bez zmian
+    assert parsuj_znacznik("1781823600") == 1781823600000         # sekundy → ms
+
+
+def test_ostatni_ts_pobieracza_odporny_na_mikrosekundy(tmp_path=None):
+    """Pobieracz MUSI dawać ten sam wynik co czytnik — inaczej wraca crash na wznowieniu."""
+    import csv as _csv
+    import importlib.util
+    import tempfile
+    from pathlib import Path
+
+    spec = importlib.util.spec_from_file_location("_pb", "narzedzia/pobierz_binance.py")
+    pb = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(pb)
+
+    plik = Path(tempfile.mkdtemp()) / "Binance_TESTUSDT_1h.csv"
+    with plik.open("w", encoding="utf-8", newline="") as f:
+        w = _csv.writer(f)
+        w.writerow(["https://www.CryptoDataDownload.com"])
+        w.writerow(["Unix", "Date", "Symbol", "Open", "High", "Low", "Close",
+                    "Volume TEST", "Volume USDT", "tradecount"])
+        # wiersz w µs (brud) STARSZY niż wiersz w ms — bez normalizacji wygrałby max()
+        w.writerow(["1741734000000000", "2025-03-11 23:00:00", "TESTUSDT", 1, 1, 1, 1, 1, 1, 1])
+        w.writerow(["1781823600000", "2026-06-18 23:00:00", "TESTUSDT", 1, 1, 1, 1, 1, 1, 1])
+
+    assert pb._ostatni_ts(plik) == 1781823600000

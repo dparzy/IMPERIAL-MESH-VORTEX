@@ -335,3 +335,57 @@ def test_trailing_cena_zamkniecia_na_poziomie_stopu():
     assert zamkniete[0].powod_zamkniecia == "TRAIL_HIT"
     oczekiwana = round(stop * (1 - SLIPPAGE_PCT), 6)
     assert abs(zamkniete[0].cena_zamkniecia - oczekiwana) < 1e-6
+
+
+# ── W1: KAŻDE zamknięcie musi zostawić ślad (naprawa 2026-07-29) ─────────────
+
+def _engine_z_pamiecia(tmpdir):
+    from imperium.koloseum.paper_trading import PaperTradingEngine
+    return PaperTradingEngine(kapital_startowy=10_000.0, sesja_id="TEST-W1",
+                              log_dir=tmpdir, zrodlo="TEST")
+
+
+def test_zamkniecie_na_koniec_biegu_trafia_do_w1():
+    """
+    Zmierzone przy pierwszym biegu zapisującym W1: silnik miał 23 zamknięcia, pamięć 22.
+    Pozycja domknięta przez `zamknij_wszystkie` ginęła — logowała tylko ścieżka bara.
+    """
+    import tempfile
+    from pathlib import Path
+
+    from imperium.biblioteki.pamiec_absolutna import PamiecAbsolutna
+    from imperium.koloseum.paper_trading import SygnalWejscia
+
+    kat = Path(tempfile.mkdtemp())
+    eng = _engine_z_pamiecia(kat)
+    eng.wejdz(SygnalWejscia("BTCUSDT", "4H", "LONG", 0.8, 60000.0, 58000.0, 65000.0, 5, 1000.0))
+    wyniki = eng.zamknij_wszystkie({"BTCUSDT": 61000.0}, powod="KONIEC_BIEGU")
+
+    assert len(wyniki) == 1
+    logi = PamiecAbsolutna(katalog=kat).wczytaj()
+    assert len(logi) == len(eng.historia_zamkniec) == 1     # zero cichych strat
+    assert logi[0].powod_zamkniecia == "KONIEC_BIEGU"
+
+
+def test_zrodlo_wpisu_odroznia_backtest_od_paper():
+    """Etykieta pochodzenia jedzie RAZEM z danymi — inaczej backtest udaje rzeczywistość."""
+    import tempfile
+    from pathlib import Path
+
+    from imperium.biblioteki.pamiec_absolutna import PamiecAbsolutna
+    from imperium.koloseum.paper_trading import SygnalWejscia
+
+    kat = Path(tempfile.mkdtemp())
+    eng = _engine_z_pamiecia(kat)
+    eng.wejdz(SygnalWejscia("ETHUSDT", "4H", "LONG", 0.8, 3000.0, 2900.0, 3300.0, 5, 500.0))
+    eng.zamknij_wszystkie({"ETHUSDT": 3100.0})
+    assert PamiecAbsolutna(katalog=kat).wczytaj()[0].trade_status == "TEST"
+
+
+def test_brak_log_dir_nie_pisze_do_w1():
+    """GRANICA: bez `log_dir` silnik NIE dotyka W1 (domyślne zachowanie bez regresji)."""
+    from imperium.koloseum.paper_trading import PaperTradingEngine, SygnalWejscia
+
+    eng = PaperTradingEngine(kapital_startowy=1000.0, sesja_id="BEZ-W1")
+    eng.wejdz(SygnalWejscia("BTCUSDT", "4H", "LONG", 0.8, 60000.0, 58000.0, 65000.0, 5, 100.0))
+    assert eng.zamknij_wszystkie({"BTCUSDT": 61000.0}) and eng._pamiec is None

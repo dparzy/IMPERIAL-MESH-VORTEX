@@ -397,7 +397,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 172 | Ilmanen | *Expected Returns* ✅ | |
 | 173 | Ilmanen | *Investing Amid Low Expected Returns* ⚠️ | |
 | 174 | Kelly | *A New Interpretation of Information Rate* (1956) ✅ | **Kryterium Kelly'ego u źródła — pod sizing** |
-| 175 | Thorp | *The Kelly Criterion in Blackjack, Sports Betting, and the Stock Market* ✅ 📁 plik jest, ale **BEZ WARSTWY TEKSTOWEJ** | 🔴 **NADAL DO WYMIANY** — 11 s., każda strona to jeden obraz, **0 zn.** (poprzedni plik: 40 s., też 0). Kelly w praktyce, pod sizing. Trop: PDF ze strony własnej Edwarda Thorpa albo z *Handbook of Asset and Liability Management* vol. 1 (2008) |
+| 175 | Thorp | *The Kelly Criterion in Blackjack, Sports Betting, and the Stock Market* (1997) ✅ 📁 **MAMY PLIK** | ✅ **ORYGINAŁ POTWIERDZONY 2026-07-28** — *Edward O. Thorp, Edward O. Thorp and Associates, Newport Beach CA · ©1997 · referat na 10th International Conference on Gambling and Risk Taking, Montreal, czerwiec 1997*. 40 s., **80 230 zn.**, zero stron bez tekstu, mediana 2116 zn./s. Kontrola: Kelly, Blackjack, Sports Betting, capital growth, logarithm, Shannon, Bernoulli — wszystko obecne. ⚠️ OCR **kaleczy wzory** (`P(¥, =-lh)=q`), ale **proza czyta się poprawnie** — a to proza wraca z RAG. **Kelly w praktyce → sizing** ⏳ poza RAG |
 | 176 | MacLean, Thorp, Ziemba | *The Kelly Capital Growth Investment Criterion* ⚠️ | |
 | 177 | Carver | *Systematic Trading* ✅ | Kompletna metodologia — realna luka |
 
@@ -658,7 +658,7 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
 | ~~**132**~~ | ~~Hamilton — *Nonstationary Time Series*~~ | 29 | ✅ **67 915 zn.** | ✔️✔️✔️ **DOMKNIĘTE 2026-07-28 za trzecim podejściem.** (1) skan bez OCR, 0 zn.; (2) plik z warstwą tekstową, ale to była **druga kopia Engle 1982** — ten sam artykuł co BIB-130, różnica wyłącznie w znaku wodnym JSTOR (IP + godzina pobrania), 99.35% tekstu identyczne; (3) prawdziwy **Hamilton 1989** |
 | ~~**137**~~ | ~~Rabiner — *Tutorial on HMM*~~ | 30 | ✅ **150 305 zn.** | ✔️ **DOMKNIĘTE 2026-07-28 za pierwszym podejściem** — oryginał z *Proceedings of the IEEE*, z kompletną sekcją V o implementacji. Przy okazji tego polowania przyszły 4 dodatkowe pliki: 2 duplikaty skasowane, 2 dostały numery **305** i **306** |
 | ~~**154**~~ | ~~Kyle — *Continuous Auctions…*~~ | 23 | ✅ **55 676 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — ten sam skan, ale **z warstwą OCR**; jakość na tekście merytorycznym dobra |
-| **175** | Thorp — *The Kelly Criterion…* | 11 | **0 zn.** 🔴 | **NADAL SKAN** — plik wymieniony 2026-07-28 (40 s. → 11 s.), ale nowy też jest czystym obrazem. **Kelly w praktyce** — pod sizing |
+| ~~**175**~~ | ~~Thorp — *The Kelly Criterion…*~~ | 40 | ✅ **80 230 zn.** | ✔️✔️ **DOMKNIĘTE 2026-07-28 za drugim podejściem.** (1) wymiana 40 s. → 11 s., ale nowy plik też był czystym obrazem — **krótszy ≠ lepszy, liczy się warstwa tekstowa**; (2) wersja z OCR, 0 stron pustych. Wzory pokiereszowane, proza czysta |
 | **128** | Campbell, Lo, MacKinlay — *Econometrics of Financial Markets* | 314 | **0 zn.** | Kanon ekonometrii finansowej |
 | **189** | Fudenberg, Tirole — *Game Theory* | 579 | **0 zn.** | Standard akademicki teorii gier |
 | **159** | Johnson — *Algorithmic Trading and DMA* | 595 | **731 zn.** | 🔴 **PLIK USZKODZONY** — `non-page object in page tree`, ekstrakcja pada na stronie 155 |

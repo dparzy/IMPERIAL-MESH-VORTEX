@@ -113,6 +113,9 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — EXP-13 GARCH i EXP-14 Kyle niosą nową informację i mają skill
+Średnie max|ρ|: GARCH 0.141, Kyle 0.087 – poniżej progu 0.20, czyli zdekorelowane. IC ~0.25-0.30 stabilny na wszystkich horyzontach. Werdykt: filar siły + skill.
+
 ### 2026-07-27 — Calibre nie czyta djvu
 Calibre (ebook-convert) historycznie nie obsługuje djvu jako formatu wejściowego. Nawet po instalacji calibre potrzebny będzie osobny djvutxt.exe z djvulibre.
 

@@ -2,19 +2,35 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: narzedzia/bibliotekarz.py, narzedzia/przygotuj_biblioteke.py
-stan_na: 2026-07-16
-powod_istnienia: "Lista 205 pozycji (BIB-070..274) do rozbudowy biblioteki RAG Imperium, z priorytetyzacją, weryfikacją licencji i statusem dostępności każdej pozycji."
+stan_na: 2026-07-28
+powod_istnienia: "Lista 234 pozycji (BIB-070..303) do rozbudowy biblioteki RAG Imperium, z priorytetyzacją, weryfikacją licencji i statusem dostępności każdej pozycji."
 ---
-# 📚 PLAN ROZBUDOWY BIBLIOTEKI — BIB-070 … BIB-274
+# 📚 PLAN ROZBUDOWY BIBLIOTEKI — BIB-070 … BIB-303
 
-## 🗂️ STAN PRZETWORZENIA + PLAN KATALOGOWANIA ESENCJI (aktualizacja 2026-07-21)
+## 🗂️ STAN PRZETWORZENIA — ZMIERZONY 2026-07-28 (nie z pamięci)
 
-**Zmierzone 2026-07-21:** **115 plików BIB** na dysku, wszystkie **wyekstraktowane + w RAG +
-skatalogowane** (`tekst_cache` 115, `katalog_ksiag.json` n=115). 36 nowych (BIB-080..116) dodanych
-przez Cezara — nazwy dopasowane do wzorca `BIB-XXX_Autor_Tytuł` (autorzy z tej listy). TIRO zbiera
-pary automatycznie (most `deepseek_glos`→NOTARIUS).
+🚨 **POPRZEDNI WPIS TEGO ROZDZIAŁU BYŁ NIEAKTUALNY O 90 KSIĄŻEK.** Głosił „115 plików BIB, wszystkie
+wyekstraktowane + w RAG + skatalogowane" — i to była prawda **2026-07-21**. Od tego czasu Cezar dograł
+90 tytułów, a `przygotuj_biblioteke.py` **nie był ani razu uruchomiony**. Dokument o tym milczał, bo
+**żadna warstwa audytu nie pilnuje księgozbioru** (Warstwa 11 dotyczy `imperium/biblioteki/`, czyli
+modułów kodu, nie ksiąg). Audyt drukował „pełna harmonia" przy 43% biblioteki poza zasięgiem RAG.
 
-**Charakter 36 nowych: materiał POD TIRO i zaawansowane ML** (nie sygnały tradingowe).
+| Warstwa | Ile | Skąd zmierzone |
+|---|---|---|
+| Pliki książek na dysku | **205** | `bibliotheca_ulpia/*.{epub,pdf,azw3,mobi,djvu}` |
+| Zgodne ze schematem nazw | **205 / 205** ✅ | naprawione 2026-07-28 (było 114) |
+| W katalogu metadanych | **115** | `katalog_ksiag.json` |
+| W cache tekstu | **115** | `tekst_cache/*.txt` |
+| **Wyszukiwalne w RAG** | **115** | `baza_wiedzy.db` → 37 331 fragmentów |
+| **POZA RAG (dograne, nieprzetworzone)** | **90** | 614 MB — czekają na `przygotuj_biblioteke.py` |
+
+**Z tej listy (BIB-070..274, 205 pozycji):** mamy plik dla **133**, z czego w RAG jest **46**,
+a **87 czeka na ekstrakcję**. Brakuje **69 pozycji** do kupienia/pobrania (BIB-205..274 bez
+martwego slotu 262) — plus 3 martwe sloty odsyłaczowe (198, 199, 262), które pliku nie wymagają.
+
+**Charakter 90 nowych: kanon przyczynowości, szeregów czasowych, mikrostruktury, teorii gier i
+ryzyka ekstremalnego** — czyli źródła, na których stoją nasze neurony (Kyle, Engle-ARCH,
+Hamilton-reżimy, Rabiner-HMM, Kelly-Thorp).
 
 **Plan katalogowania esencji — 4 etapy, po jednej sesji (ZASADA ANALIZY CZĄSTKOWEJ — cząstkowo,
 zapisywalnie, wznawialnie; Hyginus=DeepSeek tani zwiad → kolejka JSONL, Opus=sędzia całej partii):**
@@ -33,7 +49,9 @@ od pierwszej niezapisanej książki. Wpięcie kandydata w kod dopiero po pomiarz
 
 > **Stan na:** 2026-07-16 · **Autor listy:** VITRUVIUSZ (Opus) · **Rozkaz Cezara:** „rozbuduj bibliotekę,
 > dawaj do 200 pozycji lub więcej, niech nasz LLM się uczy"
-> **Mamy dziś:** 69 książek (BIB-001..069) · **Ta lista:** 205 pozycji (BIB-070..274)
+> **Stan w chwili pisania listy (2026-07-16):** 69 książek (BIB-001..069) · **Ta lista:** 205 pozycji (BIB-070..274)
+> **Stan ZMIERZONY 2026-07-28:** 205 plików na dysku · 115 w RAG · 90 czeka na ekstrakcję · +26 pozycji
+> Consilium (BIB-275..300) i 3 dołożone (BIB-301..303) — razem **234 pozycje planu (BIB-070..303)**.
 
 ## 🔴 CZYTAJ NAJPIERW — status weryfikacji (Prawo I, ZPO)
 
@@ -107,7 +125,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 080 | Jurafsky, Martin | *Speech and Language Processing* (3rd ed.) 🆓 ✅ | Darmowy draft — biblia NLP |
 | 081 | Tunstall, von Werra, Wolf | *Natural Language Processing with Transformers* ✅ | Praktyka HuggingFace |
 | 082 | Rothman | *Transformers for Natural Language Processing* ⚠️ | |
-| 083 | Vaswani → patrz BIB-070 | — | |
+| 083 | Svensén, Bishop | *Pattern Recognition and Machine Learning* — **Solutions to the Exercises (web-edition)** ✅ 📁 **MAMY PLIK** | 🚨 **NIE JEST TO PODRĘCZNIK.** Consilium proponowało tu Bishopa PRML (2006); plik, który wszedł, to **zbiór rozwiązań zadań** (Svensén & Bishop, wyd. web 2009, 1.4 MB). Wykryte **czytaniem treści**, nie nazwy — dokładnie ten sam błąd co przy BIB-074 (Boyd: „Additional Exercises" zamiast podręcznika), **druga powtórka tej klasy**. Wartość dla TIRO realna (rozwiązania pokazują rozumowanie krok po kroku), ale **właściwy PRML wciąż mamy do zdobycia** — 🆓 darmowy PDF od Microsoft Research |
 | 084 | Devlin i in. | *BERT: Pre-training of Deep Bidirectional Transformers* 🆓 ✅ | arXiv |
 | 085 | Brown i in. | *Language Models are Few-Shot Learners* (GPT-3) 🆓 ✅ | arXiv |
 | 086 | Hu i in. | *LoRA: Low-Rank Adaptation of Large Language Models* 🆓 ✅ | **Wprost nasza metoda treningu (E4)** |
@@ -171,7 +189,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 124 | Hamilton | *Time Series Analysis* ✅ | Kanon (nie mylić z GNN-Hamiltonem) |
 | 125 | Box, Jenkins, Reinsel | *Time Series Analysis: Forecasting and Control* ✅ | |
 | 126 | Brockwell, Davis | *Introduction to Time Series and Forecasting* ✅ | |
-| 127 | Hyndman → BIB-072 | — | |
+| 127 | Shumway, Stoffer | *Time Series Analysis and Its Applications: With R Examples* (**4th ed.**) ✅ 📁 **MAMY PLIK** | ✅ **TREŚĆ POTWIERDZONA** (Springer Texts in Statistics, 4. edycja, 6.0 MB). Slot był martwym odsyłaczem „Hyndman → BIB-072"; Consilium wypełniło go sensownie — dokłada **przestrzeń stanów i analizę spektralną**, których Hyndman (BIB-072) nie ma. ⏳ poza RAG |
 | 128 | Campbell, Lo, MacKinlay | *The Econometrics of Financial Markets* ✅ | Kanon |
 | 129 | Cochrane | *Asset Pricing* ✅ | |
 | 130 | Engle | *Autoregressive Conditional Heteroscedasticity…* (ARCH) ✅ | Źródło GARCH |
@@ -182,7 +200,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 135 | Enders | *Applied Econometric Time Series* ✅ | |
 | 136 | Diebold, Mariano | *Comparing Predictive Accuracy* ✅ | **Test przewagi prognoz — pod nasze A/B** |
 | 137 | Rabiner | *A Tutorial on Hidden Markov Models…* 🆓 ✅ | HMM u źródła |
-| 138 | Tsay → mamy (BIB-031) | — | |
+| 138 | Tsay | *Multivariate Time Series Analysis: With R and Financial Applications* (2014) ✅ 📁 **MAMY PLIK** | ✅ **TREŚĆ POTWIERDZONA** (Wiley 2014, Booth School, 5.8 MB). Slot był odsyłaczem „Tsay → mamy BIB-031"; to **inna książka tego samego autora** — VAR/VECM/modele czynnikowe, czyli wielowymiarowość, której BIB-031 nie obejmuje. ⏳ poza RAG |
 | 139 | Hastie, Tibshirani, Friedman | *The Elements of Statistical Learning* 🆓 ✅ | Darmowy PDF — kanon ML |
 | 140 | James i in. | *An Introduction to Statistical Learning* 🆓 ✅ | Darmowy PDF |
 | 141 | Murphy | *Probabilistic Machine Learning: An Introduction* / *Advanced Topics* ⚠️ | Drafty bywają darmowe |
@@ -219,13 +237,13 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 162 | Easley i in. | *The Microstructure of the Flash Crash* ⚠️ | |
 | 163 | Menkveld | *High-Frequency Trading and the New Market Makers* ⚠️ | |
 | 164 | Budish, Cramton, Shim | *The High-Frequency Trading Arms Race* ✅ | Batch auctions |
-| 165 | Hasbrouck → mamy (BIB-044) | — | |
+| 165 | de Jong, Rindi | *The Microstructure of Financial Markets* (2009) ✅ 📁 **MAMY PLIK** | ✅ **TREŚĆ POTWIERDZONA** (Cambridge UP, metadane autorskie zgodne, 1.1 MB). Slot był odsyłaczem „Hasbrouck → BIB-044"; ta pozycja to **podręcznik graduate** łączący teorię z empirią — inny gatunek niż monografia Hasbroucka. ⏳ poza RAG |
 
 ## 📐 Optymalizacja i portfel (BIB-166..177)
 
 | BIB | Autor | Tytuł | Uwagi |
 |---|---|---|---|
-| 166 | Boyd → BIB-073 | — | |
+| 166 | Luenberger, Ye | *Linear and Nonlinear Programming* (**4th ed.**, 2016) ✅ 📁 **MAMY PLIK** | ✅ **TREŚĆ POTWIERDZONA** (Springer ISOR vol. 228, 4. edycja, 6.2 MB). Slot był odsyłaczem „Boyd → BIB-073"; dokłada **stronę algorytmiczną** (simplex, metody wnętrza, dualność), której Boyd — skupiony na wypukłości — nie pokrywa. ⏳ poza RAG |
 | 167 | Nocedal, Wright | *Numerical Optimization* ✅ | Kanon |
 | 168 | Markowitz | *Portfolio Selection* (1952) ✅ | Źródło teorii portfela |
 | 169 | Meucci | *Risk and Asset Allocation* ✅ | |
@@ -377,10 +395,143 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 
 ---
 
+## ⚖️ SĄD NAD PROPOZYCJAMI CONSILIUM — BIB-275..300 (rozstrzygnięte 2026-07-28)
+
+**Pochodzenie:** blok dopisał cudzy agent (Kun GUI, Consilium), **podpisując się imieniem Architekta**.
+2026-07-27 trafił do kwarantanny `wrzutnia/consilium/PLAN_BIBLIOTEKI_propozycje_2026-07-22.md`, bo
+`docs/` jest objęte bramkami audytu — 31 niezweryfikowanych pozycji to 31 twierdzeń pod strażą.
+Kwarantanna sama wskazała drogę powrotną: **pojedynczo, po weryfikacji**. To jest ta weryfikacja.
+
+> **Plik `wrzutnia/consilium/PLAN_ROZBUDOWY_BIBLIOTEKI_wersja_Hyginusa.md` to NIE nowa praca** —
+> to nasz dokument w stanie z **2026-07-26**, czyli SPRZED decyzji o kwarantannie, z tym samym
+> blokiem w środku. Diff: 70 linii, treść **znak w znak** identyczna z plikiem kwarantanny.
+> Nie ma tam ani jednej pozycji, której nie byłoby w kwarantannie.
+
+### 🔴 ODRZUCONE (pomiar, nie opinia)
+
+| BIB | Pozycja | Powód odrzucenia |
+|---|---|---|
+| **296** | Farmer — *Making Sense of Chaos* (2024) | **DUBLET — ta sama książka stoi już w planie jako BIB-227.** Wykryte porównaniem autor+tytuł wszystkich 205 pozycji planu z 31 propozycjami. Slot 296 zostaje **wolny** |
+
+### 🟡 PRZYJĘTE Z KOREKTĄ
+
+| BIB | Pozycja | Korekta |
+|---|---|---|
+| **277** | *Active Inference* (MIT Press 2022) | Autor **NIE „Friston"** — pierwszym autorem jest **Thomas Parr** (Parr, Pezzulo, Friston). Poprawione |
+| **289** | Bennett — *Demons, Engines, and the Second Law* (1987) | To **artykuł w Scientific American**, nie książka i **nie jest darmowy** — znacznik 🆓 zdjęty, zostaje ⚠️ |
+
+### ✅ PRZYJĘTE (kanon, istnienie pewne — wydania NIEZWERYFIKOWANE)
+
+**🧠 Neurobiologia decyzji i uczenia (BIB-275..279)**
+
+| BIB | Autor | Tytuł | Uwagi |
+|---|---|---|---|
+| 275 | Damasio | *Descartes' Error: Emotion, Reason, and the Human Brain* (1994) ✅ | Emocje jako składnik racjonalnej decyzji — pod doktrynę Senatu |
+| 276 | LeDoux | *The Emotional Brain* (1996) ✅ | Mechanizmy strachu i ryzyka — pod Pretorian (bezpieczniki) |
+| 277 | Parr, Pezzulo, Friston | *Active Inference: The Free Energy Principle…* (MIT Press 2022) ⚠️ | ✏️ **autor poprawiony** — Consilium pisało samo „Friston" |
+| 278 | Hawkins, Blakeslee | *On Intelligence* (2004) ✅ | Memory-prediction framework — kora jako hierarchia predykcyjna |
+| 279 | Eagleman | *Incognito: The Secret Lives of the Brain* (2011) ✅ | Procesy nieświadome — analogia do warstw pamięci |
+
+**🧬 Ewolucja, emergencja i samoorganizacja (BIB-280..284)**
+
+| BIB | Autor | Tytuł | Uwagi |
+|---|---|---|---|
+| 280 | Kauffman | *At Home in the Universe* (1995) ✅ | „Order for free" na granicy chaosu — teoria pod rój |
+| 281 | Kauffman | *The Origins of Order* (1993) ✅ | Fitness landscapes — pod Igrzyska i ranking neuronów |
+| 282 | Dawkins | *The Selfish Gene* (1976) ✅ | Memetyka u źródła — replikatory |
+| 283 | Wolfram | *A New Kind of Science* (2002) ✅ | Proste reguły → złożone zachowanie |
+| 284 | Holland | *Emergence: From Chaos to Order* (1998) ✅ | Uzupełnia BIB-230 (*Hidden Order*) od strony teorii |
+
+**⚛️ Fizyka i informacja (BIB-285..289)**
+
+| BIB | Autor | Tytuł | Uwagi |
+|---|---|---|---|
+| 285 | Schrödinger | *What Is Life?* (1944) ✅ | Negentropia — inspiracja pod miary entropii |
+| 286 | Prigogine, Stengers | *Order Out of Chaos* (1984) ✅ | Struktury dyssypatywne (Nobel 1977) |
+| 287 | Wiener | *Cybernetics* (1948) ✅ | Sprzężenie zwrotne i homeostaza u źródła |
+| 288 | von Bertalanffy | *General System Theory* (1968) ✅ | Teoria systemów u źródła |
+| 289 | Bennett | *Demons, Engines, and the Second Law* (1987) ⚠️ | ✏️ **🆓 zdjęte** — to artykuł *Scientific American*, płatny |
+
+**📐 Matematyka i algorytmy (BIB-290..294)**
+
+| BIB | Autor | Tytuł | Uwagi |
+|---|---|---|---|
+| 290 | Knuth | *The Art of Computer Programming, vol. 1* ✅ | Kanon algorytmiki — priorytet niski dla naszej domeny |
+| 291 | Press i in. | *Numerical Recipes* (3rd ed.) ✅ | Algorytmy numeryczne (C++) |
+| 292 | Golub, Van Loan | *Matrix Computations* (4th ed.) ✅ | Kanon algebry liniowej |
+| 293 | Rasmussen, Williams | *Gaussian Processes for Machine Learning* (2006) 🆓 ✅ | ⭐ **niepewność wbudowana — pod bramkę konformalną ML-36** |
+| 294 | Mohri, Rostamizadeh, Talwalkar | *Foundations of Machine Learning* (2nd ed.) ✅ | ⭐ **granice generalizacji — pod walkę z overfittingiem** |
+
+**🏛️ Ekonomia i rynki (BIB-295..300)**
+
+| BIB | Autor | Tytuł | Uwagi |
+|---|---|---|---|
+| 295 | Shiller | *Narrative Economics* (2019) ✅ | Narracje napędzają rynki — pod NEWS-01..04 |
+| 296 | — | *(slot wolny)* | 🔴 odrzucone jako dublet BIB-227 |
+| 297 | Akerlof, Shiller | *Animal Spirits* (2009) ✅ | Psychologia makro — pod PSY-01..05 |
+| 298 | Shleifer | *Inefficient Markets* (2000) ✅ | Behawioryzm u źródła — pod neurony kontrariańskie |
+| 299 | Barberis, Thaler | *A Survey of Behavioral Finance* (2003) 🆓 ✅ | ⭐ Systematyczne obciążenia — darmowy working paper NBER |
+| 300 | Graham, Dodd | *Security Analysis* (1934) ✅ | Kanon analizy fundamentalnej |
+
+### ⚠️ Uczciwe zastrzeżenie do całego bloku (Prawo I)
+
+Sprawdziłem **istnienie dzieł i dublety wobec naszego planu** — to zmierzone. **NIE sprawdzałem
+wydań, lat ani licencji pozycja-po-pozycji.** Osobno: **priorytet tego bloku jest NISKI**.
+Mamy 69 nieodebranych pozycji z rdzenia (BIB-205..274: Tetlock, Pardo, DSR, Kleppmann, alt-dane),
+a blok Consilium to w większości **filozofia systemów, nie źródła naszych neuronów**. Trzy pozycje
+mają realną wartość operacyjną i tylko one zasługują na priorytet: **293 Rasmussen-Williams**
+(niepewność wbudowana — pod bramkę konformalną ML-36), **294 Mohri** (granice generalizacji — pod
+walkę z overfittingiem), **299 Barberis-Thaler** 🆓 (obciążenia — pod PSY-01..05).
+
+---
+
+## 📁 POZYCJE DOŁOŻONE POZA PLANEM — BIB-301..303 (2026-07-28)
+
+Pliki leżały w bibliotece **bez numeru i bez wpisu**, więc były niewidzialne dla katalogu i RAG.
+Numery nadane **poza rezerwacją 205..274** (żeby nie zająć slotu przewidzianego na inną książkę).
+
+| BIB | Autor | Tytuł | Werdykt |
+|---|---|---|---|
+| 301 | West, Thomas | *Winning Algorithmic Trading Strategies* (2025) 📁 | 🔴 **REKOMENDUJĘ NIE WŁĄCZAĆ DO RAG.** Treść zweryfikowana czytaniem: książka **odsyła do cudzych skryptów w TradingView Community** („search for … by the TradingView user millerrh"), a podtytuł brzmi *„…Systems that Work For Trading the Markets In 2026!"*. To gatunek, który ta lista **świadomie wyklucza** (patrz zastrzeżenie o Reactive Publishing). Ryzyko dla TIRO: uczeń nauczy się tego, co mu damy |
+| 302 | Gutierrez | *Machine Learning and Data Science: An Introduction with R* 📁 | 🟡 **NISKI PRIORYTET** — wstęp do ML w R, w całości pokryty przez BIB-139 (ESL) i BIB-140 (ISL), które są mocniejsze. Bez szkody, ale i bez nowej informacji (Prawo XVI) |
+| 303 | Sorensen | *Statistical Learning in Genetics* (2nd ed., Springer) 📁 | 🔴 **POZA DOMENĄ** — statystyka w **genetyce**. Metody bayesowskie owszem, ale przykłady i słownictwo są biologiczne; w RAG będzie szumem przy zapytaniach rynkowych |
+
+---
+
+## 🚨 POZYCJE PROBLEMATYCZNE — pliki, które NIE wejdą do RAG bez interwencji
+
+Zmierzone 2026-07-28 na wszystkich 97 plikach PDF (`fitz`, cały dokument, nie pierwsze strony).
+**To są skany obrazowe bez warstwy tekstowej — ekstrakcja zwraca 0 znaków**, więc pipeline je
+pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic tego nie sprawdza.
+
+| BIB | Pozycja | Stron | Tekst | Dlaczego boli |
+|---|---|---|---|---|
+| **130** | Engle — *ARCH* | 23 | **0 zn.** | **Źródło naszego GARCH (EXP-13)** |
+| **132** | Hamilton — *Nonstationary Time Series* | 28 | **0 zn.** | **Regime-switching u źródła** — fundament Namiestnika |
+| **137** | Rabiner — *Tutorial on HMM* | 30 | **0 zn.** | **HMM u źródła** — pod Viterbi Jump Model |
+| **154** | Kyle — *Continuous Auctions and Insider Trading* | 23 | **0 zn.** | **Model Kyle'a** — fundament mikrostruktury |
+| **175** | Thorp — *The Kelly Criterion…* | 40 | **0 zn.** | **Kelly w praktyce** — pod sizing |
+| **128** | Campbell, Lo, MacKinlay — *Econometrics of Financial Markets* | 314 | **0 zn.** | Kanon ekonometrii finansowej |
+| **189** | Fudenberg, Tirole — *Game Theory* | 579 | **0 zn.** | Standard akademicki teorii gier |
+| **159** | Johnson — *Algorithmic Trading and DMA* | 595 | **731 zn.** | 🔴 **PLIK USZKODZONY** — `non-page object in page tree`, ekstrakcja pada na stronie 155 |
+| **083** | Svensén, Bishop — PRML | — | ✅ | To **zbiór rozwiązań**, nie podręcznik (patrz wyżej) |
+
+**Dwie drogi (decyzja Cezara):**
+1. **Cezar dostarcza inne wersje plików** (zaproponowane 2026-07-28) — najtańsze, zero ryzyka OCR.
+   Potrzebne: **wersje z warstwą tekstową** dla 130, 132, 137, 154, 175, 128, 189; **niepopsuty plik**
+   dla 159; **właściwy podręcznik PRML** dla 083 (🆓 darmowy PDF Microsoft Research).
+2. **OCR u nas** — precedens istnieje: **BIB-032 O'Hara** to też był skan bez warstwy tekstowej
+   i przeszedł OCR 2026-07-14 (319 fragmentów w RAG). Działa, ale kosztuje czas na klasie PEDES.
+
+---
+
 ## 🔌 Jak wpiąć do RAG (nie wymaga kodu — wszystko już jest)
 
 1. **Nazwij plik dokładnie:** `BIB-XXX_Autor_Tytul-Z-Myslnikami.ext` (ext: epub/pdf/mobi/azw3/djvu).
-   Numer z tej listy. Katalog: `bibliotheca_ulpia/`.
+   Numer z tej listy. Katalog: `bibliotheca_ulpia/`. **Separatorem jest `_`, nie spacja** — 2026-07-28
+   doprowadzone do porządku 93 pliki (205/205 zgodnych). ⚠️ Zmiana nazwy binarium **musi iść razem**
+   ze zmianą nazwy jego pliku w `tekst_cache/` (`<stem>__<hasz>.txt`) — hasz liczy się z TREŚCI,
+   więc zostaje, ale stem osieroci cache i wymusi rekonwersję.
 2. **Jedna komenda** (Calibre Portable w PATH — patrz pamięć `calibre-portable-djvu`):
    ```powershell
    $env:PATH = "C:\Calibre Portable\Calibre;$env:PATH"
@@ -401,4 +552,10 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 - **Darmowe (🆓) bierz pierwsze** — jest ich tu ~60 i obejmują wszystkie zerowe luki
   (transformery, GNN, przyczynowość, teoria gier, MEV, konformalna).
 - **Nie ma tu ani jednej pozycji Reactive Publishing** (Van Der Post/Preston/Munrow) — świadomie.
+  ⚠️ **Wyjątek do rozstrzygnięcia:** BIB-301 (West 2025) należy do tego samego gatunku i wszedł na
+  dysk — rekomendacja: nie wpinać do RAG (patrz sekcja BIB-301..303).
 - Lista celowo **kanon-ciężka**: uczeń TIRO nauczy się tego, co mu damy. LIMA działa też na książki.
+- **Nazwa pliku nie jest dowodem treści** — 2026-07-28 przeczytałem pierwsze strony **wszystkich
+  205 plików**. Złapane tym: BIB-011 (było chińskie wydanie, Cezar wymienił na angielskie ✅),
+  BIB-083 (zbiór rozwiązań zamiast podręcznika), 8 skanów bez OCR, 1 plik uszkodzony.
+  To **trzecia** powtórka klasy „nazwa ≠ treść" (BIB-073 → BIB-011 → BIB-083).

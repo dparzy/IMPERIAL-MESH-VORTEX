@@ -2,24 +2,40 @@
 kategoria: FORMA
 typ: zywy
 wlasciciel: —
-stan_na: 2026-07-16
-powod_istnienia: "Gotowa do skopiowania lista nazw plików (konwencja `BIB-XXX_Autor_Tytul.ext`) dla całej listy BIB-070..274, żeby Cezar mógł szybko nazwać pobrane pliki bez przepisywania z tabel PL"
+stan_na: 2026-07-28
+powod_istnienia: "Gotowa do skopiowania lista nazw plików (konwencja `BIB-XXX_Autor_Tytul.ext`) dla całej listy BIB-070..303, żeby Cezar mógł szybko nazwać pobrane pliki bez przepisywania z tabel PL"
 ---
-# 📋 NAZWY PLIKÓW — BIB-070..274 (gotowe do wklejenia)
+# 📋 NAZWY PLIKÓW — BIB-070..303 (gotowe do wklejenia)
 
-> **Stan na:** 2026-07-16 · Konwencja: `BIB-XXX_Nazwisko(-Nazwisko)_Tytul-Z-Myslnikami.ext`
+> **Stan na:** 2026-07-28 · Konwencja: `BIB-XXX_Nazwisko(-Nazwisko)_Tytul-Z-Myslnikami.ext`
 > Rozszerzenie dopisz **faktyczne** (`.pdf` / `.epub` / `.mobi` / `.azw3` / `.djvu`).
 > Katalog docelowy: `bibliotheca_ulpia/` · Potem: `python narzedzia/przygotuj_biblioteke.py`
 >
 > Legenda: 🆓 = jest plik od autora/arXiv (bierz) · 📖 = ⛔ tylko czytanie online, NIE do RAG
 > · ⚠️ = status/licencję sprawdź PRZED pobraniem · Szczegóły: `PLAN_ROZBUDOWY_BIBLIOTEKI.md`
->
-> **Numery puste (spalone na odsyłacze do książek, które JUŻ mamy):** 083, 127, 138, 165, 166,
-> 198, 199, 262. Nie używaj ich — zostają wolne, żeby nie przenumerowywać całości.
-> (**074 ZAJĘTY** od 2026-07-16 — przydzielony zadaniom Boyda, patrz Priorytet 0.)
->
-> ✅ **JUŻ W BIBLIOTECE (2026-07-16):** BIB-070..079 — **cały Priorytet 0 domknięty**.
-> Łącznie **79 książek, 29 699 fragmentów**. Treść każdej zweryfikowana CZYTANIEM, nie nazwą.
+
+## 🔄 AKTUALIZACJA 2026-07-28 — co się zmieniło od 2026-07-16
+
+🚨 **Ten dokument miał treść wpisaną ręcznie i przez to zgnił** — to ta sama klasa, co runbook W11
+i CENSUS ORGANORUM. Poniżej stan **zmierzony z dysku**, nie przepisany.
+
+- **205 plików** w `bibliotheca_ulpia/` · **205/205 zgodnych ze schematem** (2026-07-28 poprawiono
+  93 nazwy; wcześniej 88 miało spację zamiast `_` i brak autora).
+- **PIĘĆ MARTWYCH SLOTÓW ZOSTAŁO WYPEŁNIONYCH** i **nie są już wolne**:
+  `083` (Svensén-Bishop, rozwiązania PRML) · `127` (Shumway-Stoffer) · `138` (Tsay, wielowymiarowe) ·
+  `165` (de Jong-Rindi) · `166` (Luenberger-Ye). **Wolne zostają tylko: 198, 199, 262, 296.**
+- **Nowe zakresy:** `275..300` (propozycje Consilium, osądzone) · `301..303` (pliki dołożone
+  poza planem: West, Gutierrez, Sorensen).
+- **90 plików czeka na `przygotuj_biblioteke.py`** — są na dysku, nie ma ich w RAG.
+
+⚠️ **Nazwy poniżej są PROPOZYCJĄ dla pozycji, których jeszcze nie mamy.** Dla pozycji już
+posiadanych **źródłem prawdy jest dysk**, nie ta lista:
+```powershell
+Get-ChildItem bibliotheca_ulpia -File | Where-Object Extension -match 'epub|pdf|azw3|mobi|djvu' | Select-Object -ExpandProperty Name
+```
+
+> ✅ **Priorytet 0 domknięty 2026-07-16:** BIB-070..079 w RAG (wtedy 79 książek, 29 699 fragmentów).
+> Treść każdej zweryfikowana CZYTANIEM, nie nazwą. Stan bieżący RAG: **115 książek, 37 331 fragmentów.**
 
 ## ⭐ PRIORYTET 0 — bierz najpierw (pewne, otwarte, zamykają zerowe luki)
 

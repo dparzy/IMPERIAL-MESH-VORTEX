@@ -52,7 +52,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 
 <!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->
 
-> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-27 (73 pozycji).
+> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-28 (73 pozycji).
 
 ### LEX — prawo i rozkazy stałe — obowiązuje, nie opisuje
 
@@ -95,7 +95,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | `docs/LEGIONY_ARCHITEKTURA.md` | Kanoniczne źródło nazewnictwa 4 Legionów (rzymskie nazwy: Legio X Equestris/Scalp, XII Fulminata/Swing, III Augusta/Invest, VI Ferrata/Leverage) + przypisanie konkretnych ID neuron | `imperium/legiony/mikro_neuron.py`, `imperium/legiony/neurony/dzwignia.py`, `imperium/legiony/neurony/momentum.py`, `imperium/legiony/neurony/onchain.py`, `imperium/legiony/neurony/struktura.py`, `imperium/legiony/neurony/trend.py`, `imperium/legiony/neurony/wolumen.py` | 2026-07-17 |
 | `docs/MATRYCA_KORELACJI.md` | Koncepcyjny 'szablon Kostki Rubika' — pięcioosiowy system klasyfikacji sygnałów (Wskaźnik×Interwał×Typ zagrania×Reżim×Waga) jako przyszła mapa do wypełnienia realnymi danymi w 'Faz | `imperium/legiony/diagnostyka_korelacji.py`, `imperium/legiony/rejestr.py` | 2026-07-17 |
 | `docs/NAMIESTNIK.md` | Jedyny dokument opisujący 'Gating Network' (sieć bramkującą) świadomą reżimu I interwału — meta-kontroler ustawiający parametry (tryb, lewar, próg, styl) dla reszty łańcucha decyzyjnego | `imperium/koloseum/namiestnik.py`, `tests/test_namiestnik.py` | 2026-07-18 |
-| `docs/NAZWY_PLIKOW_BIB-070+.md` | Gotowa do skopiowania lista nazw plików (konwencja `BIB-XXX_Autor_Tytul.ext`) dla całej listy BIB-070..274, żeby Cezar mógł szybko nazwać pobrane pliki bez przepisywania z tabel PL | — | 2026-07-16 |
+| `docs/NAZWY_PLIKOW_BIB-070+.md` | Gotowa do skopiowania lista nazw plików (konwencja `BIB-XXX_Autor_Tytul.ext`) dla całej listy BIB-070..303, żeby Cezar mógł szybko nazwać pobrane pliki bez przepisywania z tabel PL | — | 2026-07-28 |
 | `docs/PAMIEC_ABSOLUTNA.md` | Jedyny dokument opisujący schemat rekordu `ImperiumLog` (atomowa jednostka pamięci transakcyjnej — Warstwa 1 pamięci) wraz z realnym API zapisu/odczytu i jawną listą luk wobec deklaracji Prawa IX. | `imperium/biblioteki/pamiec_absolutna.py`, `imperium/biblioteki/kronikarz.py` | 2026-07-17 |
 | `imperium/README.md` | Mapa organów rzymskich w kodzie (folder → rola → moduły) — pierwszy dokument czytany przy wejściu w imperium/ | — | 2026-05-31 |
 
@@ -123,7 +123,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | `docs/KATALOG_STRATEGII.md` | Katalog zmapowanych strategii jako roadmapa (20 w kodzie) — zamiar; stan kodu mówi MANIFEST | `imperium/legiony/strategie/rejestr_strategii.py` | 2026-06-26 |
 | `docs/ODLOZONE_DECYZJE.md` | Rejestr rzeczy ustalonych merytorycznie, ale świadomie odłożonych do czasu twardego pomiaru A/B (zasada 'nie wdrażamy bo brzmi dobrze — wdrażamy gdy A/B pokaże plus'). | `narzedzia/ab_w329.py`, `narzedzia/ab_w334_progi.py`, `narzedzia/ab_w335_cross_rs.py`, `narzedzia/ab_w336_changepoint.py` | 2026-07-17 |
 | `docs/PLAN_DEEPSEEK.md` | Plan podłączenia DeepSeek API jako 'głosu' Imperium (adapter GlosImperium) + weryfikacja, GDZIE DeepSeek naprawdę trafił — realizacja poszła inną drogą niż plan (nie Senat, lecz Oczy/newsy + zwiad wiedzy + NOTARIUS). | `imperium/cesarz/deepseek_glos.py`, `imperium/akwedukty/adaptery/news_llm.py`, `imperium/biblioteki/notarius.py` | 2026-07-18 |
-| `docs/PLAN_ROZBUDOWY_BIBLIOTEKI.md` | Lista 205 pozycji (BIB-070..274) do rozbudowy biblioteki RAG Imperium, z priorytetyzacją, weryfikacją licencji i statusem dostępności każdej pozycji. | `narzedzia/bibliotekarz.py`, `narzedzia/przygotuj_biblioteke.py` | 2026-07-16 |
+| `docs/PLAN_ROZBUDOWY_BIBLIOTEKI.md` | Lista 234 pozycji (BIB-070..303) do rozbudowy biblioteki RAG Imperium, z priorytetyzacją, weryfikacją licencji i statusem dostępności każdej pozycji. | `narzedzia/bibliotekarz.py`, `narzedzia/przygotuj_biblioteke.py` | 2026-07-28 |
 | `docs/PLAN_TIRO_LOKALNY_LLM.md` | Zbudować lokalny hybrydowy LLM 'TIRO' (uczeń), trenowany metodą destylacji od nauczyciela DeepSeek (Hyginus), z docelowym celem przejęcia ról LLM w Imperium bez kosztów API. | `imperium/biblioteki/notarius.py`, `imperium/oczy/censor_sprzetu.py`, `imperium/swiatynie/web_dashboard.py` | 2026-07-18 |
 | `docs/ROADMAP_IMPERIUM.md` | Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii. | — | 2026-06-12 |
 | `docs/TRYBY_IMPERIUM.md` | Jedyne miejsce z **twardym, zmierzonym werdyktem o interwale 1H** — że rój nie ma na nim dodatniego edge'u i że zaostrzanie progów asymptotuje przy ~−2.5%, nigdy nie przekraczając zera | `imperium/koloseum/namiestnik.py`, `narzedzia/kalibracja_1h.py`, `narzedzia/kalibracja_1h_v2.py`, `narzedzia/sym_porownanie_tf.py` | 2026-07-21 |

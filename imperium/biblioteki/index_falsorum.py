@@ -68,8 +68,16 @@ ZASIEG_NEGACJI = 8
 
 # KOREKTA JAWNA jest jednoznaczna (mówi wprost „to było błędne"), więc wolno jej stać
 # gdziekolwiek w oknie — także gdy zdanie zawija się przez granicę linii.
-KOREKTA_JAWNA = ("obalon", "OBALON", "błędn", "BŁĘDN", "bledn", "dawn", "DAWN", "mylon",
-                 "premisa", "korekt", "KOREKT", "sprostow", "historyczn")
+#
+# ODMIANA RZECZOWNIKOWA DOPISANA PO POMIARZE 2026-07-28 (fałszywy alarm na otwarciu wachty):
+# `dziennik_niesmiertelny.py:167` CYTUJE obalone twierdzenie, żeby wyjaśnić, po co powstał
+# organ, a zdanie prostujące stoi linię niżej: „przeżyło tam **obalenie**". Marker „obalon"
+# łapie imiesłów (obalone/obalony/obalona) i NIE łapie rzeczownika (obalenie/obalenia) —
+# strażnik zgłosił własną dokumentację jako kłamstwo. To ta sama klasa co Księga Wad #35:
+# chroniczny FP uczy obchodzić bramkę, a obchodzona nie broni niczego.
+KOREKTA_JAWNA = ("obalon", "OBALON", "obalen", "OBALEN", "błędn", "BŁĘDN", "bledn",
+                 "dawn", "DAWN", "mylon", "premisa", "korekt", "KOREKT", "sprostow",
+                 "historyczn")
 
 
 def _dzis() -> str:

@@ -237,11 +237,24 @@ class PamiecAbsolutna:
 
 # ─── Fabryki logów (pomocnicze) ───────────────────────────────────────────────
 
+def _klucz_neuronu(s) -> str:
+    """
+    Identyfikator neuronu z sygnału. `SygnalNeuronu` ma pole `neuron_id` — NIE `klucz`.
+
+    Zmierzone 2026-07-29: ta fabryka odwoływała się do `s.klucz`, czyli do nazwy,
+    której w kodzie nie ma. Nie rzucało to wyjątku przez cały czas życia modułu,
+    bo funkcja **nie miała ani jednego wywołania** — martwy kod gnije w ciszy i mści
+    się dopiero przy pierwszym użyciu. `klucz` zostaje jako fallback dla ewentualnych
+    innych kształtów wejścia (np. atrap w testach).
+    """
+    return getattr(s, "neuron_id", None) or getattr(s, "klucz", "?")
+
+
 def log_sygnal(sesja_id: str, symbol: str, interwal: str,
                raport, rezim: str = "NORMAL") -> ImperiumLog:
     """Tworzy log z RaportLegatusa."""
-    sygnaly = [{"k": s.klucz, "d": s.kierunek, "p": round(s.pewnosc_finalna, 3),
-                "w": s.waga} for s in raport.sygnaly]
+    sygnaly = [{"k": _klucz_neuronu(s), "d": s.kierunek,
+                "p": round(s.pewnosc_finalna, 3), "w": s.waga} for s in raport.sygnaly]
     top_long = sorted([s for s in raport.sygnaly if s.kierunek == "LONG"],
                       key=lambda x: x.pewnosc_finalna * x.waga, reverse=True)[:3]
     top_short = sorted([s for s in raport.sygnaly if s.kierunek == "SHORT"],
@@ -257,8 +270,8 @@ def log_sygnal(sesja_id: str, symbol: str, interwal: str,
         neurony_short=len([s for s in raport.sygnaly if s.kierunek == "SHORT"]),
         neurony_neutral=len([s for s in raport.sygnaly if s.kierunek == "NEUTRAL"]),
         sygnaly_json=json.dumps(sygnaly),
-        top3_long=",".join(s.klucz for s in top_long),
-        top3_short=",".join(s.klucz for s in top_short),
+        top3_long=",".join(_klucz_neuronu(s) for s in top_long),
+        top3_short=",".join(_klucz_neuronu(s) for s in top_short),
         legatus_kierunek=raport.kierunek,
         legatus_pewnosc=raport.pewnosc_agregatu,
         legatus_sila_long=raport.sila_long,

@@ -498,6 +498,17 @@ class PaperTradingEngine:
         self.historia_zamkniec.append(wynik)
         return wynik
 
+    def zapisz_log(self, log) -> None:
+        """
+        Wpis do W1 z zewnątrz (Dyrygent loguje SYGNAŁ) — cichy no-op bez `log_dir`.
+
+        Silnik jest JEDYNYM posiadaczem uchwytu do Pamięci Absolutnej, więc to on
+        przyjmuje wpisy. Dzięki temu opt-in `log_dir` steruje CAŁYM zapisem do W1
+        z jednego miejsca — a nie każdy wołający osobno decyduje, czy pisać.
+        """
+        if self._pamiec:
+            self._pamiec.zapisz(log)
+
     def _log_zamkniecie(self, wynik: WynikZamkniecia, bar: "Optional[BarData]" = None) -> None:
         """
         Wpis TRADE_CLOSE do W1. `bar` opcjonalny (naprawa 2026-07-29).

@@ -534,3 +534,83 @@ def test_audyt_w22_zasieg_obejmuje_dokumenty_spoza_docs():
     assert zbadane == oczekiwane, (
         f"W22 zbadała {zbadane} z {oczekiwane} zadeklarowanych dokumentów — zasięg zawężony "
         f"(pierwsza wersja tego testu miała luźny próg i PRZEŻYŁA mutację zawężenia do docs/)")
+
+
+# ── W23: liczba o CAŁOŚCI roju pisana prozą (luka znaleziona mutacją 2026-07-29) ──
+
+def test_w23_zywe_repo_bez_falszywych_sum():
+    """W23 na żywym repo: żaden żywy dokument nie twierdzi prozą nieprawdy o rozmiarze roju."""
+    from narzedzia.audyt_spojnosci import _warstwa_23_liczby_w_prozie
+
+    bledy, info = _warstwa_23_liczby_w_prozie()
+    assert not bledy, f"W23 wykrył fałszywe sumy w prozie: {bledy}"
+    assert any("W23" in i or "prozie" in i for i in info)
+
+
+def test_w23_lapie_falszywa_sume_w_prozie(monkeypatch, tmp_path=None):
+    """
+    MUTACJA — dowód, że warstwa broni. Przed jej dodaniem to samo zdanie dawało exit 0,
+    a identyczna liczba w znaczniku LICZBA zapalała czerwień: W15 broniła POLA, nie prawdy.
+    """
+    import narzedzia.audyt_spojnosci as a
+    import narzedzia.tabularium as t
+
+    tresc = "kategoria: TABULA\n\nImperium ma 421 neuronow.\n"
+    # Podmieniamy źródła: jeden dokument o znanej treści + znana prawda z kodu.
+    monkeypatch.setattr(t, "zbierz_dokumenty", lambda: [("fikcja.md", {})])
+    monkeypatch.setattr(t, "wartosci_z_kodu", lambda: {"neurony": 87, "zwiadowcy": 15})
+    monkeypatch.setattr(a.os.path, "join", lambda *cz: "fikcja.md")
+
+    import builtins
+    prawdziwy_open = builtins.open
+
+    def fake_open(plik, *a_, **kw):
+        if plik == "fikcja.md":
+            import io
+            return io.StringIO(tresc)
+        return prawdziwy_open(plik, *a_, **kw)
+
+    monkeypatch.setattr(builtins, "open", fake_open)
+    bledy, info = a._warstwa_23_liczby_w_prozie()
+    assert len(bledy) == 1 and "421" in bledy[0] and "87" in bledy[0]
+    assert not info
+
+
+def test_w23_milczy_na_liczbach_czastkowych(monkeypatch):
+    """GRANICA: „11 neuronów kategorii M" to PRAWDA cząstkowa — alarm byłby tapetą."""
+    import builtins
+    import io
+
+    import narzedzia.audyt_spojnosci as a
+    import narzedzia.tabularium as t
+
+    tresc = "kategoria: TABULA\n\nW kategorii M pracuje 11 neuronow, a w R — 5 zwiadowcow.\n"
+    monkeypatch.setattr(t, "zbierz_dokumenty", lambda: [("fikcja.md", {})])
+    monkeypatch.setattr(t, "wartosci_z_kodu", lambda: {"neurony": 87, "zwiadowcy": 15})
+    monkeypatch.setattr(a.os.path, "join", lambda *cz: "fikcja.md")
+    prawdziwy_open = builtins.open
+    monkeypatch.setattr(builtins, "open",
+                        lambda p, *a_, **kw: io.StringIO(tresc) if p == "fikcja.md"
+                        else prawdziwy_open(p, *a_, **kw))
+    bledy, _ = a._warstwa_23_liczby_w_prozie()
+    assert bledy == []
+
+
+def test_w23_pomija_dokumenty_acta(monkeypatch):
+    """Historii NIE przepisujemy (Prawo I): ACTA mają prawo do liczb swojego czasu."""
+    import builtins
+    import io
+
+    import narzedzia.audyt_spojnosci as a
+    import narzedzia.tabularium as t
+
+    tresc = "kategoria: ACTA\ntyp: acta\n\nImperium ma 421 neuronow.\n"
+    monkeypatch.setattr(t, "zbierz_dokumenty", lambda: [("kronika.md", {})])
+    monkeypatch.setattr(t, "wartosci_z_kodu", lambda: {"neurony": 87})
+    monkeypatch.setattr(a.os.path, "join", lambda *cz: "kronika.md")
+    prawdziwy_open = builtins.open
+    monkeypatch.setattr(builtins, "open",
+                        lambda p, *a_, **kw: io.StringIO(tresc) if p == "kronika.md"
+                        else prawdziwy_open(p, *a_, **kw))
+    bledy, _ = a._warstwa_23_liczby_w_prozie()
+    assert bledy == []

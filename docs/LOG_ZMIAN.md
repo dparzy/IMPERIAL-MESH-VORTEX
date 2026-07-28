@@ -14,6 +14,43 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-29 | 🎯 | PĘTLA UCZENIA DOMKNIĘTA + audyt SAMEJ BRAMKI (mutacją)
+
+**KROK 2 OBIEGU.** `pamiec_absolutna.log_sygnal` nie miała **ani jednego wywołania** w kodzie,
+więc W1 znała wynik trade'u, ale nie autorów: MWU budował **0 wag**, a atrybucja per neuron
+była fizycznie niemożliwa. Dyrygent loguje teraz SYGNAŁ przy każdym wejściu, przez silnik
+(czyli pod tym samym opt-inem `log_dir`). **Zmierzone: W1 23 → 46 wpisów (23 SYGNAŁ + 23
+TRADE_CLOSE, 1:1), 46/46 z `trade_id`, MWU 0 → 37 wag.** Pierwsze wagi per neuron z realnych
+danych: SMC-01 0,0525 · EXP-01 0,0438 · VI-13 0,0426 · A-03 0,0424.
+
+**DWIE PUŁAPKI ZŁAPANE PRZED WPIĘCIEM, NIE PO.** (1) `igrzyska.przetworz_logi` parowało po
+`sesja_id`, więc każde zamknięcie „uczyłoby" o WSZYSTKICH sygnałach sesji — przy 23 wejściach
+to **529 fałszywych atrybucji zamiast 23**; mechanizm mieliłby liczby bez znaczenia. Parowanie
+jest teraz per-`trade_id`, ze starą ścieżką jako fallbackiem dla logów sprzed zmiany.
+(2) `log_sygnal` czytała pole `s.klucz`, którego w kodzie **nie ma** (jest `neuron_id`) — nigdy
+nie wybuchło, bo funkcja była martwa. **Martwy kod nie jest neutralny: gnije w ciszy i mści się
+przy pierwszym użyciu.**
+
+**AUDYT SAMEJ BRAMKI (pytanie Cezara „czy bramka właściwie działa").** Osiem podłożonych wad,
+każda cofana natychmiast. Złapane: W13 (ruff), W15 (liczba w znaczniku), W16 (ścieżka-widmo),
+W17 (moduł bez meldunku), W20 (ręczny wiersz w generowanym katalogu), W8 (kod bez wpisu
+w LOG_ZMIAN). **JEDNA REALNA DZIURA:** liczba o całości roju napisana PROZĄ przechodziła
+(`Imperium ma 421 neuronów` → exit 0), gdy ta sama liczba w znaczniku zapalała czerwień —
+**Warstwa 15 broniła POLA, nie PRAWDY**.
+
+**WARSTWA 23** łata to, ale dopiero **po pomiarze szumu** (rozkaz: regex wyłącznie po pomiarze):
+naiwny wzorzec „<liczba> neuronów" dał **107 trafień**, prawie wyłącznie liczb CZĄSTKOWYCH
+(„11 neuronów kategorii M") — byłaby to alarm-tapeta. Wzorzec zawężony do zdań twierdzących
+o CAŁOŚCI ma na tym samym korpusie **0 fałszywych trafień**. Warstwa broniona z trzech stron
+(łapie fałsz / milczy na cząstkowych / milczy na prawdziwej sumie); dokumenty ACTA wyłączone,
+bo historii nie przepisujemy (Prawo I).
+
+**Pliki:** `imperium/koloseum/dyrygent.py`, `imperium/koloseum/paper_trading.py`,
+`imperium/biblioteki/pamiec_absolutna.py`, `imperium/biblioteki/igrzyska.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_spojnosc.py` (+4).
+
+---
+
 ## 2026-07-29 | 🔁 | PIERWSZY ZAMKNIĘTY OBIEG: W1 zapisana, bo nie było ZAPISU — nie czytelników
 
 **Rozkaz Cezara:** punkt 1 z audytu Consilium (najpierw dane, potem mosty) + świeże bary z Binance.

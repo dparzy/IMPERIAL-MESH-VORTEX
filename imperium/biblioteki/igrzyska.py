@@ -245,10 +245,18 @@ class Igrzyska:
             sygnaly = sygnaly_po_sesji.get(sid, [])
             if not sygnaly:
                 continue
+            # PAROWANIE PO trade_id, gdy jest (2026-07-29). Parowanie po samej sesji
+            # przypisuje KAŻDE zamknięcie do WSZYSTKICH sygnałów sesji — przy 23 wejściach
+            # to 529 atrybucji zamiast 23, więc neuron dostaje nagrody i kary za trade'y,
+            # w których nie brał udziału. Mechanizm działałby, a liczby byłyby bez znaczenia.
+            # Fallback na stare zachowanie zostaje dla logów sprzed tej zmiany (bez trade_id).
+            po_trade = {getattr(s, "trade_id", ""): s for s in sygnaly
+                        if getattr(s, "trade_id", "")}
             for tc in zamkniecia:
                 pnl = getattr(tc, "pnl_pct", 0.0)
+                dopasowany = po_trade.get(getattr(tc, "trade_id", ""))
                 # kierunek wejścia bierzemy z sygnału
-                for sig in sygnaly:
+                for sig in ([dopasowany] if dopasowany else sygnaly):
                     kier_wejscia = getattr(sig, "legatus_kierunek", "")
                     if kier_wejscia not in ("LONG", "SHORT"):
                         continue

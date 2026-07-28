@@ -376,7 +376,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 156 | Avellaneda, Stoikov | *High-frequency trading in a limit order book* ✅ | **Kanon market makingu** |
 | 157 | Lehalle, Laruelle | *Market Microstructure in Practice* ✅ | |
 | 158 | Guéant | *The Financial Mathematics of Market Liquidity* ⚠️ | |
-| 159 | Johnson | *Algorithmic Trading and DMA* ✅ | |
+| 159 | Johnson | *Algorithmic Trading & DMA: An Introduction to Direct Access Trading Strategies* (4Myeloma Press 2010) ✅ 📁 **MAMY PLIK** | ✅ **POTWIERDZONE 2026-07-28** — *By Barry Johnson · Copyright © 2010 · Published by 4Myeloma Press, London*. **1 591 009 zn., 26 602 unikalnych słów — nowy rekord biblioteki.** Format **DJVU** (wymaga Calibre). OCR bardzo czysty: `execution` 100% · `order` 100% · `algorithm` 100% · `liquidity` 99.7%. Znak wodny `ForexFinest` ze starego pliku **zniknął** ⏳ poza RAG |
 | 160 | Foucault, Pagano, Röell | *Market Liquidity: Theory, Evidence, Policy* ✅ | |
 | 161 | Madhavan | *Market Microstructure: A Survey* ⚠️ | |
 | 162 | Easley i in. | *The Microstructure of the Flash Crash* ⚠️ | |
@@ -661,7 +661,7 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
 | ~~**175**~~ | ~~Thorp — *The Kelly Criterion…*~~ | 40 | ✅ **80 230 zn.** | ✔️✔️ **DOMKNIĘTE 2026-07-28 za drugim podejściem.** (1) wymiana 40 s. → 11 s., ale nowy plik też był czystym obrazem — **krótszy ≠ lepszy, liczy się warstwa tekstowa**; (2) wersja z OCR, 0 stron pustych. Wzory pokiereszowane, proza czysta |
 | ~~**128**~~ | ~~Campbell, Lo, MacKinlay~~ | — | ✅ **1 380 803 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — Cezar podmienił **skan PDF na DJVU**. Nowa klasa rozwiązania: nie inny skan tej samej postaci, tylko **inny format**, który niesie tekst. Wymaga Calibre do ekstrakcji |
 | ~~**189**~~ | ~~Fudenberg, Tirole — *Game Theory*~~ | — | ✅ **1 477 759 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — znowu podmiana **PDF → DJVU**, druga tego dnia. ⚠️ OCR gorszy niż w BIB-128 (`subgame` czyste w 88.9%) — używalne, ale nie bezbłędne |
-| **159** | Johnson — *Algorithmic Trading and DMA* | 595 | **0 zn. treści** 🔴 | 🔴 **DWIE WADY NARAZ, druga wykryta 2026-07-28 przy próbie naprawy.** (1) struktura: `non-page object in page tree`, **225 z 595 stron nieczytelnych**. (2) ✏️ **KOREKTA własnego pomiaru:** raportowane wcześniej „731 zn." to **NIE treść** — to słowo **`ForexFinest` powtórzone 61 razy**, czyli znak wodny piractwa. Cały plik ma **jedno unikalne słowo**. Naprawa strukturalna PyMuPDF powiodła się (370 stron przepisanych do czystego pliku), ale **nie było czego odzyskiwać**. Potrzebny inny egzemplarz |
+| ~~**159**~~ | ~~Johnson — *Algorithmic Trading and DMA*~~ | — | ✅ **1 591 009 zn.** | ✔️ **DOMKNIĘTE 2026-07-28** — trzecia podmiana **PDF → DJVU** tego dnia i najlepszy plon: 26 602 unikalnych słów, OCR niemal bezbłędny. Stary plik miał **dwie wady naraz**: zepsutą strukturę (225 z 595 stron nieczytelnych) oraz — ✏️ **korekta mojego pomiaru** — raportowane „731 zn." **nie było treścią**, tylko słowem `ForexFinest` powtórzonym 61 razy (znak wodny). Cały stary plik miał **jedno unikalne słowo** |
 | **083** | Svensén, Bishop — PRML | — | ✅ | To **zbiór rozwiązań**, nie podręcznik (patrz wyżej) |
 
 **Dwie drogi (decyzja Cezara):**

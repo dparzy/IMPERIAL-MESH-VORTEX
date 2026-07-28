@@ -3,9 +3,9 @@ kategoria: CONSILIUM
 typ: zywy
 wlasciciel: narzedzia/bibliotekarz.py, narzedzia/przygotuj_biblioteke.py
 stan_na: 2026-07-28
-powod_istnienia: "Lista 234 pozycji (BIB-070..303) do rozbudowy biblioteki RAG Imperium, z priorytetyzacją, weryfikacją licencji i statusem dostępności każdej pozycji."
+powod_istnienia: "PEŁNY spis biblioteki Imperium: 303 pozycje (BIB-001..303) — 69 posiadanych fundamentów, 234 pozycje rozbudowy, każda ze statusem posiadania, licencji i obecności w RAG."
 ---
-# 📚 PLAN ROZBUDOWY BIBLIOTEKI — BIB-070 … BIB-303
+# 📚 BIBLIOTHECA ULPIA — PEŁNY SPIS: BIB-001 … BIB-303
 
 ## 🗂️ STAN PRZETWORZENIA — ZMIERZONY 2026-07-28 (nie z pamięci)
 
@@ -19,14 +19,27 @@ modułów kodu, nie ksiąg). Audyt drukował „pełna harmonia" przy 43% biblio
 |---|---|---|
 | Pliki książek na dysku | **205** | `bibliotheca_ulpia/*.{epub,pdf,azw3,mobi,djvu}` |
 | Zgodne ze schematem nazw | **205 / 205** ✅ | naprawione 2026-07-28 (było 114) |
+| **Opisane w tym dokumencie** | **205 / 205** ✅ | naprawione 2026-07-28 (było 133 — brakowało całego fundamentu BIB-001..069) |
 | W katalogu metadanych | **115** | `katalog_ksiag.json` |
 | W cache tekstu | **115** | `tekst_cache/*.txt` |
 | **Wyszukiwalne w RAG** | **115** | `baza_wiedzy.db` → 37 331 fragmentów |
 | **POZA RAG (dograne, nieprzetworzone)** | **90** | 614 MB — czekają na `przygotuj_biblioteke.py` |
 
-**Z tej listy (BIB-070..274, 205 pozycji):** mamy plik dla **133**, z czego w RAG jest **46**,
-a **87 czeka na ekstrakcję**. Brakuje **69 pozycji** do kupienia/pobrania (BIB-205..274 bez
-martwego slotu 262) — plus 3 martwe sloty odsyłaczowe (198, 199, 262), które pliku nie wymagają.
+**Podział 303 pozycji spisu:**
+
+| Blok | Pozycji | Mamy plik | W RAG | Fragmentów |
+|---|---|---|---|---|
+| **BIB-001..069** — fundament | 69 | **69** ✅ | **69** ✅ | 27 829 |
+| **BIB-070..274** — rozbudowa | 205 | 133 | 46 | 9 368 |
+| **BIB-275..300** — Consilium (osądzone) | 26 | 0 | 0 | — |
+| **BIB-301..303** — dołożone poza planem | 3 | **3** | 0 | — |
+| **RAZEM** | **303** | **205** | **115** | **37 197** |
+
+*(37 197 to fragmenty samych książek; korpus `biblioteka` w RAG ma 37 253 — różnicę 56 dają
+pliki encyklopedii i vademecum.)*
+
+Do zdobycia zostaje **69 pozycji** rdzenia (BIB-205..274 bez martwego slotu 262) + 26 pozycji
+Consilium. Martwe sloty odsyłaczowe, które pliku nie wymagają: **198, 199, 262, 296**.
 
 **Charakter 90 nowych: kanon przyczynowości, szeregów czasowych, mikrostruktury, teorii gier i
 ryzyka ekstremalnego** — czyli źródła, na których stoją nasze neurony (Kyle, Engle-ARCH,
@@ -85,6 +98,153 @@ wydania na tej liście nie jest zweryfikowana w tej sesji; traktuj rok jako orie
 
 **Zasada doboru (LIMA dla książek):** preferuję **kanon nad nowość** — 200 prawdziwych, cytowanych
 dzieł uczy lepiej niż 400 modnych tytułów. Uczeń TIRO nauczy się tego, co mu damy.
+
+---
+
+## 📚 FUNDAMENT — BIB-001..069 (biblioteka sprzed tej listy)
+
+🚨 **DOPISANE 2026-07-28 NA ROZKAZ CEZARA — dokument przez 12 dni opisywał tylko przyrost.**
+Plan powstał 2026-07-16 jako lista **rozbudowy** (BIB-070+) i milcząco zakładał, że fundament
+„wszyscy znają". Efekt: żaden dokument nie zawierał **pełnej listy biblioteki** — 69 książek
+istniało wyłącznie jako pliki na dysku i wiersze w `katalog_ksiag.json`. Kto pytał „co mamy?",
+dostawał odpowiedź o 234 pozycjach planu, nie o 303 pozycjach Imperium.
+
+**Stan zmierzony 2026-07-28:** 69 plików · **69 w RAG** · **27 829 fragmentów** (74.6% całego
+korpusu książkowego). To jedyny blok biblioteki, który jest **w 100% przetworzony** — nowsze
+BIB-070+ mają 87 pozycji czekających na ekstrakcję.
+
+Autor i tytuł **odczytane z nazw plików** (zgodnych ze schematem), rok i wydawca z
+`katalog_ksiag.json` (calibre), liczba fragmentów z `baza_wiedzy.db`. Nic z pamięci.
+
+### 📈 Analiza techniczna, price action, klasyka tradingu
+
+> Karmi: wskaźniki, EMA/HMA, profil rynku, formacje
+
+| BIB | Autor | Tytuł | Format | Fragm. w RAG |
+|---|---|---|---|---|
+| 002 | Murphy | *Technical Analysis of the Financial Markets* (1999) | azw3 | 337 |
+| 013 | Dalton | *Markets in Profile* (2010) | epub | 174 |
+| 014 | Dalton | *Mind Over Markets* (2013) | epub | 229 |
+| 015 | Elder | *The New Trading for a Living* (2014) | epub | 342 |
+| 021 | Anon | *High Win Rate Day Trading Setups* (2022) | azw3 | 17 |
+| 047 | Kaufman | *Trading Systems and Methods* (2019) | pdf | 1125 |
+| 049 | Bulkowski | *Encyclopedia of Chart Patterns* (2021) | epub | 1294 |
+| 006 | Carson | *High Probability Scalping Strategy Playbook* (2024) | epub | 36 |
+| 001 | Patel | *The Secret Wealth Advantage* (2023) | azw3 | 313 |
+
+### 🧠 Psychologia i dyscyplina tradera
+
+> Karmi: PSY-01..05, Senat, Reguła 6%
+
+| BIB | Autor | Tytuł | Format | Fragm. w RAG |
+|---|---|---|---|---|
+| 004 | Steenbarger | *The Psychology of Trading* (2007) | azw3 | 386 |
+| 016 | Douglas | *Trading in the Zone* (2010) | epub | 212 |
+| 017 | Kahneman | *Thinking Fast and Slow* (2011) | epub | 547 |
+| 050 | Douglas | *The Disciplined Trader* (2004) | pdf | 237 |
+| 051 | Duke | *Thinking in Bets* (2018) | epub | 235 |
+| 052 | Steenbarger | *Trading Psychology 2.0* (2015) | epub | 475 |
+| 038 | Schwager | *Market Wizards Interviews with Top Traders* (2018) | epub | 423 |
+| 039 | Lefevre | *Reminiscences of a Stock Operator* (2010) | epub | 583 |
+
+### 🔬 Quant, ML i badania ilościowe
+
+> Karmi: rdzeń metodologii: DSR/PBO/purged-CV, meta-labeling, IC
+
+| BIB | Autor | Tytuł | Format | Fragm. w RAG |
+|---|---|---|---|---|
+| 007 | Lopez de Prado | *Advances in Financial Machine Learning* (2018) | epub | 293 |
+| 010 | Chan | *Quantitative Trading 2nd ed* (2021) | epub | 192 |
+| 011 | Chan | *Algorithmic Trading Winning Strategies* | pdf | 17 |
+| 023 | Lopez de Prado | *Machine Learning for Asset Managers* (2022) | pdf | 133 |
+| 026 | Jansen | *Machine Learning for Algorithmic Trading* (2020) | mobi | 707 |
+| 028 | Narang | *Inside the Black Box A Simple Guide to Systematic Investing* (2024) | epub | 392 |
+| 031 | Tsay | *Analysis of Financial Time Series* | pdf | 593 |
+| 045 | Hilpisch | *Python for Finance* (2018) | epub | 220 |
+| 046 | Chan | *Machine Trading* | epub | 222 |
+| 048 | Aronson | *Evidence Based Technical Analysis* | djvu | 534 |
+| 068 | Goodfellow Bengio Courville | *Deep Learning* (2017) | pdf | 854 |
+| 067 | Sutton Barto | *Reinforcement Learning An Introduction 2nd ed* | djvu | 695 |
+
+### 🏛️ Mikrostruktura, HFT i egzekucja
+
+> Karmi: Z-01 VPIN, V-03 CVD, EXP-12/14/15, OMS
+
+| BIB | Autor | Tytuł | Format | Fragm. w RAG |
+|---|---|---|---|---|
+| 020 | Harris | *Trading and Exchanges Market Microstructure for Practitioners* (2002) | epub | 885 |
+| 022 | Kissell | *Optimal trading strategies* | djvu | 367 |
+| 027 | Aldridge | *High Frequency Trading* (2013) | epub | 299 |
+| 032 | OHara | *Market Microstructure Theory* (0101) | pdf | 319 |
+| 043 | Cartea Jaimungal Penalva | *Algorithmic and High Frequency Trading* (2016) | pdf | 378 |
+| 044 | Hasbrouck | *Empirical Market Microstructure* (2007) | pdf | 220 |
+
+### ⚠️ Ryzyko, zmienność, grube ogony
+
+> Karmi: Z-01..07, HALT, ECON/Feynman-Kac
+
+| BIB | Autor | Tytuł | Format | Fragm. w RAG |
+|---|---|---|---|---|
+| 008 | Sinclair | *Volatility Trading 2nd ed* (2013) | azw3 | 240 |
+| 009 | Mandelbrot Hudson | *The Misbehavior of Markets* (2011) | epub | 289 |
+| 018 | Sinclair | *Positional Option Trading* (2020) | epub | 187 |
+| 037 | Hull | *Options Futures and Other Derivatives* (2021) | epub | 1165 |
+| 041 | Taleb | *Fooled by Randomness* (2016) | epub | 1351 |
+| 042 | Jorion | *Value at Risk The New Benchmark* (2007) | epub | 492 |
+| 065 | Shreve | *Stochastic Calculus for Finance I Binomial Asset Pricing* | djvu | 172 |
+| 066 | Shreve | *Stochastic Calculus for Finance II Continuous Time Models* | djvu | 200 |
+
+### 🌍 Makro, cykle długu, bańki i behawioryzm
+
+> Karmi: RADAR-01..05, Gubernator, Z-03/04/07
+
+| BIB | Autor | Tytuł | Format | Fragm. w RAG |
+|---|---|---|---|---|
+| 025 | Grinold Kahn | *Active Portfolio Management* (2020) | epub | 555 |
+| 040 | Bernstein | *Against the Gods The Remarkable Story of Risk* (2011) | epub | 354 |
+| 056 | Dalio | *Principles for Navigating Big Debt Crises* (2018) | epub | 532 |
+| 057 | Dalio | *Principles for Dealing with the Changing World Order* (2021) | epub | 474 |
+| 058 | Dalio | *How Countries Go Broke The Big Cycle* (2025) | epub | 338 |
+| 059 | Kindleberger Aliber | *Manias Panics and Crashes* | epub | 502 |
+| 060 | Shiller | *Irrational Exuberance* (2014) | pdf | 474 |
+| 061 | Thaler | *Misbehaving The Making of Behavioral Economics* (2015) | epub | 414 |
+| 062 | Chancellor | *Devil Take the Hindmost* (2000) | epub | 422 |
+| 063 | MacKay | *Extraordinary Popular Delusions and the Madness of Crowds* (2023) | epub | 848 |
+| 064 | Reinhart Rogoff | *This Time Is Different* (2009) | epub | 325 |
+
+### ₿ Krypto, blockchain i tokenomika
+
+> Karmi: OC-01..08, RADAR-02/03, Straż A-*
+
+| BIB | Autor | Tytuł | Format | Fragm. w RAG |
+|---|---|---|---|---|
+| 003 | Burniske Tatar | *Cryptoassets* (2017) | azw3 | 330 |
+| 005 | Blum | *What Exactly Is Crypto* (2022) | epub | 96 |
+| 019 | Harris | *Handbook for Cryptocurrencies Trading* (2022) | epub | 87 |
+| 024 | Lowe | *Bitcoin and Cryptocurrency Trading for Beginners* (2021) | epub | 91 |
+| 029 | Bashir | *Mastering Blockchain* (2023) | epub | 765 |
+| 030 | Ammous | *The Bitcoin Standard* (2018) | epub | 304 |
+| 053 | Antonopoulos Harding | *Mastering Bitcoin 3rd ed* (2023) | mobi | 86 |
+| 054 | Antonopoulos Wood | *Mastering Ethereum* (2025) | epub | 487 |
+| 055 | Popper | *Digital Gold* (2015) | epub | 322 |
+| 069 | Voshmgir | *Token Economy 3rd ed* (2023) | epub | 274 |
+
+### 🤖 AI, LLM i agenci
+
+> Karmi: TIRO, RAG, warstwy pamięci W1..W22
+
+| BIB | Autor | Tytuł | Format | Fragm. w RAG |
+|---|---|---|---|---|
+| 033 | Huyen | *AI Engineering Building Applications with Foundation Models* (2024) | epub | 496 |
+| 034 | Infante | *AI Agents and Applications LangChain LangGraph MCP* (2025) | epub | 312 |
+| 035 | Iusztin Labonne | *LLM Engineers Handbook* (2024) | azw3 | 86 |
+| 036 | Alto | *Building LLM Powered Applications* (2024) | epub | 249 |
+| 012 | Strauss van der Post | *Coding Capital* (2024) | epub | 225 |
+
+> ⚖️ **Uczciwie:** ten blok jest **inwentarzem**, nie rekomendacją — te książki już mamy,
+> więc znacznik pewności (✅/⚠️/🆓) nie ma tu zastosowania. Przydział do działów encyklopedii
+> opisuje `bibliotheca_ulpia/encyklopedia/INDEX_MAIOR.md`. ⚠️ Ta mapa pokrywa **tylko ten blok**
+> — 136 nowszych książek nie ma jeszcze przypisanego działu.
 
 ---
 

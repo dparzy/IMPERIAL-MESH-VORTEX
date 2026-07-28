@@ -3,9 +3,9 @@ kategoria: CONSILIUM
 typ: zywy
 wlasciciel: narzedzia/bibliotekarz.py, narzedzia/przygotuj_biblioteke.py
 stan_na: 2026-07-28
-powod_istnienia: "PEŁNY spis biblioteki Imperium: 304 pozycje (BIB-001..304) — 69 posiadanych fundamentów, 234 pozycje rozbudowy, każda ze statusem posiadania, licencji i obecności w RAG."
+powod_istnienia: "PEŁNY spis biblioteki Imperium: 306 pozycji (BIB-001..306) — 69 posiadanych fundamentów, 234 pozycje rozbudowy, każda ze statusem posiadania, licencji i obecności w RAG."
 ---
-# 📚 BIBLIOTHECA ULPIA — PEŁNY SPIS: BIB-001 … BIB-304
+# 📚 BIBLIOTHECA ULPIA — PEŁNY SPIS: BIB-001 … BIB-306
 
 ## 🗂️ STAN PRZETWORZENIA — ZMIERZONY 2026-07-28 (nie z pamięci)
 
@@ -17,23 +17,23 @@ modułów kodu, nie ksiąg). Audyt drukował „pełna harmonia" przy 43% biblio
 
 | Warstwa | Ile | Skąd zmierzone |
 |---|---|---|
-| Pliki książek na dysku | **206** | `bibliotheca_ulpia/*.{epub,pdf,azw3,mobi,djvu}` |
-| Zgodne ze schematem nazw | **206 / 206** ✅ | naprawione 2026-07-28 (było 114) |
-| **Opisane w tym dokumencie** | **206 / 206** ✅ | naprawione 2026-07-28 (było 133 — brakowało całego fundamentu BIB-001..069) |
+| Pliki książek na dysku | **208** | `bibliotheca_ulpia/*.{epub,pdf,azw3,mobi,djvu}` |
+| Zgodne ze schematem nazw | **208 / 208** ✅ | naprawione 2026-07-28 (było 114) |
+| **Opisane w tym dokumencie** | **208 / 208** ✅ | naprawione 2026-07-28 (było 133 — brakowało całego fundamentu BIB-001..069) |
 | W katalogu metadanych | **115** | `katalog_ksiag.json` |
 | W cache tekstu | **115** | `tekst_cache/*.txt` |
 | **Wyszukiwalne w RAG** | **115** | `baza_wiedzy.db` → 37 331 fragmentów |
-| **POZA RAG (dograne, nieprzetworzone)** | **91** | 614 MB — czekają na `przygotuj_biblioteke.py` |
+| **POZA RAG (dograne, nieprzetworzone)** | **93** | 614 MB — czekają na `przygotuj_biblioteke.py` |
 
-**Podział 304 pozycji spisu:**
+**Podział 306 pozycji spisu:**
 
 | Blok | Pozycji | Mamy plik | W RAG | Fragmentów |
 |---|---|---|---|---|
 | **BIB-001..069** — fundament | 69 | **69** ✅ | **69** ✅ | 27 829 |
 | **BIB-070..274** — rozbudowa | 205 | 133 | 46 | 9 368 |
 | **BIB-275..300** — Consilium (osądzone) | 26 | 0 | 0 | — |
-| **BIB-301..304** — dołożone poza planem | 4 | **4** | 0 | — |
-| **RAZEM** | **304** | **206** | **115** | **37 197** |
+| **BIB-301..306** — dołożone poza planem | 6 | **6** | 0 | — |
+| **RAZEM** | **306** | **208** | **115** | **37 197** |
 
 *(37 197 to fragmenty samych książek; korpus `biblioteka` w RAG ma 37 253 — różnicę 56 dają
 pliki encyklopedii i vademecum.)*
@@ -63,8 +63,8 @@ od pierwszej niezapisanej książki. Wpięcie kandydata w kod dopiero po pomiarz
 > **Stan na:** 2026-07-16 · **Autor listy:** VITRUVIUSZ (Opus) · **Rozkaz Cezara:** „rozbuduj bibliotekę,
 > dawaj do 200 pozycji lub więcej, niech nasz LLM się uczy"
 > **Stan w chwili pisania listy (2026-07-16):** 69 książek (BIB-001..069) · **Ta lista:** 205 pozycji (BIB-070..274)
-> **Stan ZMIERZONY 2026-07-28:** 206 plików na dysku · 115 w RAG · 90 czeka na ekstrakcję · +26 pozycji
-> Consilium (BIB-275..300) i 4 dołożone (BIB-301..304) — razem **235 pozycji planu (BIB-070..304)**.
+> **Stan ZMIERZONY 2026-07-28:** 208 plików na dysku · 115 w RAG · 90 czeka na ekstrakcję · +26 pozycji
+> Consilium (BIB-275..300) i 6 dołożonych (BIB-301..306) — razem **237 pozycji planu (BIB-070..306)**.
 
 ## 🔴 CZYTAJ NAJPIERW — status weryfikacji (Prawo I, ZPO)
 
@@ -359,7 +359,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 134 | Lütkepohl | *New Introduction to Multiple Time Series Analysis* ✅ | VAR |
 | 135 | Enders | *Applied Econometric Time Series* ✅ | |
 | 136 | Diebold, Mariano | *Comparing Predictive Accuracy* ✅ | **Test przewagi prognoz — pod nasze A/B** |
-| 137 | Rabiner | *A Tutorial on Hidden Markov Models…* 🆓 ✅ | HMM u źródła |
+| 137 | Rabiner | *A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition* (Proc. IEEE 77(2), 1989, 257–286) 🆓 ✅ 📁 **MAMY PLIK** | ✅ **ORYGINAŁ POTWIERDZONY 2026-07-28** — nagłówek *„LAWRENCE R. RABINER, FELLOW, IEEE"*, metadane `author=IEEE`. 30 s., **150 305 zn.** Sprawdzone, że niesie **sekcję V „Implementation Issues"**, której brak streszczeniom: skalowanie, wiele sekwencji obserwacji, estymaty początkowe, niedobór danych treningowych. **HMM u źródła → Viterbi Jump Model** ⏳ poza RAG |
 | 138 | Tsay | *Multivariate Time Series Analysis: With R and Financial Applications* (2014) ✅ 📁 **MAMY PLIK** | ✅ **TREŚĆ POTWIERDZONA** (Wiley 2014, Booth School, 5.8 MB). Slot był odsyłaczem „Tsay → mamy BIB-031"; to **inna książka tego samego autora** — VAR/VECM/modele czynnikowe, czyli wielowymiarowość, której BIB-031 nie obejmuje. ⏳ poza RAG |
 | 139 | Hastie, Tibshirani, Friedman | *The Elements of Statistical Learning* 🆓 ✅ | Darmowy PDF — kanon ML |
 | 140 | James i in. | *An Introduction to Statistical Learning* 🆓 ✅ | Darmowy PDF |
@@ -656,6 +656,8 @@ Numery nadane **poza rezerwacją 205..274** (żeby nie zająć slotu przewidzian
 | 302 | Gutierrez | *Machine Learning and Data Science: An Introduction with R* 📁 | 🟡 **NISKI PRIORYTET** — wstęp do ML w R, w całości pokryty przez BIB-139 (ESL) i BIB-140 (ISL), które są mocniejsze. Bez szkody, ale i bez nowej informacji (Prawo XVI) |
 | 303 | Sorensen | *Statistical Learning in Genetics* (2nd ed., Springer) 📁 | 🔴 **POZA DOMENĄ** — statystyka w **genetyce**. Metody bayesowskie owszem, ale przykłady i słownictwo są biologiczne; w RAG będzie szumem przy zapytaniach rynkowych |
 | 304 | Chingnun Lee | *Autoregressive Conditional Heteroscedasticity* — Ch. 26, notatki wykładowe (2009) 📁 | 🟢 **PRZYJĘTE — przesunięte tu z BIB-130.** Trafiło pod numer źródła, ale źródłem nie jest: mówi o ARCH w trzeciej osobie („introduced by Engle (1982)"), stopka *„Copy Right by Chingnun Lee ® 2009"*. **Wartość realna dla TIRO**: 25 s. wyprowadzeń ARCH→GARCH→wielowymiarowe, krok po kroku — ten sam argument, którym obroniliśmy BIB-074 (zadania Boyda). 32 444 zn. |
+| 305 | Dymarski (red.) | *Hidden Markov Models, Theory and Applications* (InTech 2011, DOI 10.5772/601) ⚠️ 📁 | 🟢 **PRZYJĘTE — plon uboczny polowania na BIB-137.** 327 s., **864 360 zn.**, zero stron bez tekstu. Praca zbiorowa: HMM **poza rozpoznawaniem mowy** — to jest nowa informacja wobec Rabinera (BIB-137) i Jurafsky'ego (BIB-080). ⚠️ **Licencja CC BY-**NC**-SA 3.0 — klauzula NIEKOMERCYJNA**, a Imperium ma zarabiać. Repo prywatne, nie redystrybuujemy — ale to **decyzja Cezara**, nie moja. Przyszły dwie kopie; wybrana z repozytorium PW, bo druga miała **8 stron bez warstwy tekstowej** |
+| 306 | Wood (Columbia) | *Hidden Markov Models: from the Beginning to the State of the Art* (slajdy wykładowe, 2011) 📁 | 🟡 **PRZYJĘTE WARUNKOWO.** 47 slajdów, tylko **17 456 zn.** (371 zn./slajd — slajdy to hasła, nie proza, więc słaby materiał dla RAG). Broni się **zmierzoną zerową luką**: `hierarchical Dirichlet` 0 · `HDP` 0 · `beam sampling` 0 · `explicit duration` 0 · `nonparametric Bayes` 0 fragmentów w całym RAG. **EDHMM (explicit-duration HMM) dotyka wprost trwałości reżimu** — czyli tego, co robi nasz Namiestnik. Traktować jako **listę lektur**, nie źródło |
 
 ---
 
@@ -669,7 +671,7 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
 |---|---|---|---|---|
 | ~~**130**~~ | ~~Engle — *ARCH*~~ | 22 | ✅ **51 142 zn.** | ✔️✔️ **DOMKNIĘTE 2026-07-28 przez Cezara, w dwóch krokach.** Krok 1 (04:44): plik z warstwą tekstową, ale to były **notatki wykładowe** Chingnun Lee — złapane czytaniem treści, nie nazwy. Krok 2 (04:54): **prawdziwy Engle 1982 z Econometriki**. Notatki nie poszły do kosza — dostały własny numer **BIB-304** |
 | ~~**132**~~ | ~~Hamilton — *Nonstationary Time Series*~~ | 29 | ✅ **67 915 zn.** | ✔️✔️✔️ **DOMKNIĘTE 2026-07-28 za trzecim podejściem.** (1) skan bez OCR, 0 zn.; (2) plik z warstwą tekstową, ale to była **druga kopia Engle 1982** — ten sam artykuł co BIB-130, różnica wyłącznie w znaku wodnym JSTOR (IP + godzina pobrania), 99.35% tekstu identyczne; (3) prawdziwy **Hamilton 1989** |
-| **137** | Rabiner — *Tutorial on HMM* | 30 | **0 zn.** | **HMM u źródła** — pod Viterbi Jump Model |
+| ~~**137**~~ | ~~Rabiner — *Tutorial on HMM*~~ | 30 | ✅ **150 305 zn.** | ✔️ **DOMKNIĘTE 2026-07-28 za pierwszym podejściem** — oryginał z *Proceedings of the IEEE*, z kompletną sekcją V o implementacji. Przy okazji tego polowania przyszły 4 dodatkowe pliki: 2 duplikaty skasowane, 2 dostały numery **305** i **306** |
 | **154** | Kyle — *Continuous Auctions and Insider Trading* | 23 | **0 zn.** | **Model Kyle'a** — fundament mikrostruktury |
 | **175** | Thorp — *The Kelly Criterion…* | 40 | **0 zn.** | **Kelly w praktyce** — pod sizing |
 | **128** | Campbell, Lo, MacKinlay — *Econometrics of Financial Markets* | 314 | **0 zn.** | Kanon ekonometrii finansowej |

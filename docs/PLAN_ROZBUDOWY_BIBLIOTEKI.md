@@ -17,13 +17,13 @@ modułów kodu, nie ksiąg). Audyt drukował „pełna harmonia" przy 43% biblio
 
 | Warstwa | Ile | Skąd zmierzone |
 |---|---|---|
-| Pliki książek na dysku | **209** | `bibliotheca_ulpia/*.{epub,pdf,azw3,mobi,djvu}` |
+| Pliki książek na dysku | **207 w korpusie** + 2 poza | `bibliotheca_ulpia/*.{epub,pdf,azw3,mobi,djvu}` |
 | Zgodne ze schematem nazw | **209 / 209** ✅ | naprawione 2026-07-28 (było 114) |
 | **Opisane w tym dokumencie** | **209 / 209** ✅ | naprawione 2026-07-28 (było 133 — brakowało całego fundamentu BIB-001..069) |
 | W katalogu metadanych | **115** | `katalog_ksiag.json` |
 | W cache tekstu | **117** | `tekst_cache/*.txt` — +2 z naszego OCR (BIB-136, BIB-155) | `tekst_cache/*.txt` |
 | **Wyszukiwalne w RAG** | **115** | `baza_wiedzy.db` → 37 331 fragmentów |
-| **POZA RAG (dograne, nieprzetworzone)** | **94** | 614 MB — czekają na `przygotuj_biblioteke.py` |
+| **POZA RAG (dograne, nieprzetworzone)** | **92** | 614 MB — czekają na `przygotuj_biblioteke.py` (+2 świadomie wyłączone) | 614 MB — czekają na `przygotuj_biblioteke.py` |
 
 **Podział 307 pozycji spisu:**
 
@@ -32,7 +32,7 @@ modułów kodu, nie ksiąg). Audyt drukował „pełna harmonia" przy 43% biblio
 | **BIB-001..069** — fundament | 69 | **69** ✅ | **69** ✅ | 27 829 |
 | **BIB-070..274** — rozbudowa | 205 | 133 | 46 | 9 368 |
 | **BIB-275..300** — Consilium (osądzone) | 26 | 0 | 0 | — |
-| **BIB-301..307** — dołożone poza planem | 7 | **7** | 0 | — |
+| **BIB-301..307** — dołożone poza planem | 7 | **7** (2 poza korpusem) | 0 | — |
 | **RAZEM** | **307** | **209** | **115** | **37 197** |
 
 *(37 197 to fragmenty samych książek; korpus `biblioteka` w RAG ma 37 253 — różnicę 56 dają
@@ -63,7 +63,7 @@ od pierwszej niezapisanej książki. Wpięcie kandydata w kod dopiero po pomiarz
 > **Stan na:** 2026-07-16 · **Autor listy:** VITRUVIUSZ (Opus) · **Rozkaz Cezara:** „rozbuduj bibliotekę,
 > dawaj do 200 pozycji lub więcej, niech nasz LLM się uczy"
 > **Stan w chwili pisania listy (2026-07-16):** 69 książek (BIB-001..069) · **Ta lista:** 205 pozycji (BIB-070..274)
-> **Stan ZMIERZONY 2026-07-28:** 209 plików na dysku · 115 w RAG · 90 czeka na ekstrakcję · +26 pozycji
+> **Stan ZMIERZONY 2026-07-28:** 209 plików na dysku (207 w korpusie + 2 świadomie poza) · 115 w RAG · 90 czeka na ekstrakcję · +26 pozycji
 > Consilium (BIB-275..300) i 7 dołożonych (BIB-301..307) — razem **238 pozycji planu (BIB-070..307)**.
 
 ## 🔴 CZYTAJ NAJPIERW — status weryfikacji (Prawo I, ZPO)
@@ -637,9 +637,9 @@ Numery nadane **poza rezerwacją 205..274** (żeby nie zająć slotu przewidzian
 
 | BIB | Autor | Tytuł | Werdykt |
 |---|---|---|---|
-| 301 | West, Thomas | *Winning Algorithmic Trading Strategies* (2025) 📁 | 🔴 **REKOMENDUJĘ NIE WŁĄCZAĆ DO RAG.** Treść zweryfikowana czytaniem: książka **odsyła do cudzych skryptów w TradingView Community** („search for … by the TradingView user millerrh"), a podtytuł brzmi *„…Systems that Work For Trading the Markets In 2026!"*. To gatunek, który ta lista **świadomie wyklucza** (patrz zastrzeżenie o Reactive Publishing). Ryzyko dla TIRO: uczeń nauczy się tego, co mu damy |
+| 301 | West, Thomas | *Winning Algorithmic Trading Strategies* (2025) 📤 **POZA KORPUSEM** | 🔴 **WYŁĄCZONE decyzją Cezara 2026-07-28** → `bibliotheca_ulpia/poza_korpusem/`. Treść zweryfikowana czytaniem: książka **odsyła do cudzych skryptów w TradingView Community** („search for … by the TradingView user millerrh"), a podtytuł brzmi *„…Systems that Work For Trading the Markets In 2026!"*. To gatunek, który ta lista **świadomie wyklucza** (patrz zastrzeżenie o Reactive Publishing). Ryzyko dla TIRO: uczeń nauczy się tego, co mu damy |
 | 302 | Gutierrez | *Machine Learning and Data Science: An Introduction with R* 📁 | 🟡 **NISKI PRIORYTET** — wstęp do ML w R, w całości pokryty przez BIB-139 (ESL) i BIB-140 (ISL), które są mocniejsze. Bez szkody, ale i bez nowej informacji (Prawo XVI) |
-| 303 | Sorensen | *Statistical Learning in Genetics* (2nd ed., Springer) 📁 | 🔴 **POZA DOMENĄ** — statystyka w **genetyce**. Metody bayesowskie owszem, ale przykłady i słownictwo są biologiczne; w RAG będzie szumem przy zapytaniach rynkowych |
+| 303 | Sorensen | *Statistical Learning in Genetics* (2nd ed., Springer) 📤 **POZA KORPUSEM** | 🔴 **WYŁĄCZONE decyzją Cezara 2026-07-28** → `bibliotheca_ulpia/poza_korpusem/`. **Poza domeną** — statystyka w **genetyce**. Metody bayesowskie owszem, ale przykłady i słownictwo są biologiczne; w RAG będzie szumem przy zapytaniach rynkowych |
 | 304 | Chingnun Lee | *Autoregressive Conditional Heteroscedasticity* — Ch. 26, notatki wykładowe (2009) 📁 | 🟢 **PRZYJĘTE — przesunięte tu z BIB-130.** Trafiło pod numer źródła, ale źródłem nie jest: mówi o ARCH w trzeciej osobie („introduced by Engle (1982)"), stopka *„Copy Right by Chingnun Lee ® 2009"*. **Wartość realna dla TIRO**: 25 s. wyprowadzeń ARCH→GARCH→wielowymiarowe, krok po kroku — ten sam argument, którym obroniliśmy BIB-074 (zadania Boyda). 32 444 zn. |
 | 305 | Dymarski (red.) | *Hidden Markov Models, Theory and Applications* (InTech 2011, DOI 10.5772/601) ✅ 📁 | 🟢 **PRZYJĘTE — plon uboczny polowania na BIB-137.** 327 s., **864 360 zn.**, zero stron bez tekstu. Praca zbiorowa: HMM **poza rozpoznawaniem mowy** — to jest nowa informacja wobec Rabinera (BIB-137) i Jurafsky'ego (BIB-080). Przyszły dwie kopie; wybrana z repozytorium PW, bo druga miała **8 stron bez warstwy tekstowej** |
 | 306 | Wood (Columbia) | *Hidden Markov Models: from the Beginning to the State of the Art* (slajdy wykładowe, 2011) 📁 | 🟡 **PRZYJĘTE WARUNKOWO.** 47 slajdów, tylko **17 456 zn.** (371 zn./slajd — slajdy to hasła, nie proza, więc słaby materiał dla RAG). Broni się **zmierzoną zerową luką**: `hierarchical Dirichlet` 0 · `HDP` 0 · `beam sampling` 0 · `explicit duration` 0 · `nonparametric Bayes` 0 fragmentów w całym RAG. **EDHMM (explicit-duration HMM) dotyka wprost trwałości reżimu** — czyli tego, co robi nasz Namiestnik. Traktować jako **listę lektur**, nie źródło |

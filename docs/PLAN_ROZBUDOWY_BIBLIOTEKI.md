@@ -354,7 +354,7 @@ fraz (peer-to-peer, proof-of-work, double-spend, merkle). 3 testy pilnują regre
 | 129 | Cochrane | *Asset Pricing* ✅ | |
 | 130 | Engle | *Autoregressive Conditional Heteroscedasticity with Estimates of the Variance of United Kingdom Inflation* (Econometrica 1982, 50(4), 987–1007) ✅ 📁 **MAMY PLIK** | ✅ **ORYGINAŁ POTWIERDZONY 2026-07-28** — strona tytułowa: *„Author(s): Robert F. Engle · Source: Econometrica, Jul., 1982, Vol. 50, No. 4"*, JSTOR `stable/1912773`. 22 s., **51 142 zn.** warstwy tekstowej. **Źródło ARCH → nasz EXP-13 GARCH**. Para ze źródłem BIB-131 (Bollerslev 1986) domknięta ⏳ poza RAG |
 | 131 | Bollerslev | *Generalized ARCH* ✅ | |
-| 132 | Hamilton | *A New Approach to the Economic Analysis of Nonstationary Time Series…* ✅ | **Regime-switching u źródła** |
+| 132 | Hamilton | *A New Approach to the Economic Analysis of Nonstationary Time Series and the Business Cycle* (Econometrica 1989, 57(2), 357–384) ✅ 📁 **MAMY PLIK** | ✅ **ORYGINAŁ POTWIERDZONY 2026-07-28** — *„Author(s): James D. Hamilton · Econometrica, Mar., 1989, Vol. 57, No. 2"*, JSTOR `stable/1912559`. 29 s., **67 915 zn.** Streszczenie potwierdza treść: *„parameters of an autoregression are viewed as the outcome of a discrete-state **Markov** process"*. **Regime-switching u źródła → Namiestnik + Viterbi Jump Model** ⏳ poza RAG |
 | 133 | Zivot, Wang | *Modeling Financial Time Series with S-PLUS* ⚠️ | |
 | 134 | Lütkepohl | *New Introduction to Multiple Time Series Analysis* ✅ | VAR |
 | 135 | Enders | *Applied Econometric Time Series* ✅ | |
@@ -668,7 +668,7 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
 | BIB | Pozycja | Stron | Tekst | Dlaczego boli |
 |---|---|---|---|---|
 | ~~**130**~~ | ~~Engle — *ARCH*~~ | 22 | ✅ **51 142 zn.** | ✔️✔️ **DOMKNIĘTE 2026-07-28 przez Cezara, w dwóch krokach.** Krok 1 (04:44): plik z warstwą tekstową, ale to były **notatki wykładowe** Chingnun Lee — złapane czytaniem treści, nie nazwy. Krok 2 (04:54): **prawdziwy Engle 1982 z Econometriki**. Notatki nie poszły do kosza — dostały własny numer **BIB-304** |
-| **132** | Hamilton — *Nonstationary Time Series* | 28 | **0 zn.** | **Regime-switching u źródła** — fundament Namiestnika |
+| ~~**132**~~ | ~~Hamilton — *Nonstationary Time Series*~~ | 29 | ✅ **67 915 zn.** | ✔️✔️✔️ **DOMKNIĘTE 2026-07-28 za trzecim podejściem.** (1) skan bez OCR, 0 zn.; (2) plik z warstwą tekstową, ale to była **druga kopia Engle 1982** — ten sam artykuł co BIB-130, różnica wyłącznie w znaku wodnym JSTOR (IP + godzina pobrania), 99.35% tekstu identyczne; (3) prawdziwy **Hamilton 1989** |
 | **137** | Rabiner — *Tutorial on HMM* | 30 | **0 zn.** | **HMM u źródła** — pod Viterbi Jump Model |
 | **154** | Kyle — *Continuous Auctions and Insider Trading* | 23 | **0 zn.** | **Model Kyle'a** — fundament mikrostruktury |
 | **175** | Thorp — *The Kelly Criterion…* | 40 | **0 zn.** | **Kelly w praktyce** — pod sizing |
@@ -720,3 +720,9 @@ pominie (`MIN_ZNAKOW_CACHE = 200`) i **nikt się o tym nie dowie**, bo dziś nic
   205 plików**. Złapane tym: BIB-011 (było chińskie wydanie, Cezar wymienił na angielskie ✅),
   BIB-083 (zbiór rozwiązań zamiast podręcznika), 8 skanów bez OCR, 1 plik uszkodzony.
   To **trzecia** powtórka klasy „nazwa ≠ treść" (BIB-073 → BIB-011 → BIB-083).
+- **⚠️ CYTAT TO NIE AUTORSTWO — pułapka złapana 2026-07-28 przy BIB-132.** Naiwny test „czy plik
+  zawiera frazę z tytułu innej pracy" **daje fałszywy alarm**, bo uczciwa praca cytuje inne prace
+  w bibliografii: Hamilton 1989 zawiera frazę *„United Kingdom Inflation"* i nazwisko *ENGLE* —
+  ale w spisie literatury, nie w nagłówku. **Rozstrzyga pole `Author(s)` na stronie tytułowej
+  i streszczenie**, nie samo występowanie frazy. Dwa razy z rzędu (130 i 132) plik z poprawną
+  warstwą tekstową okazywał się inną pracą — **obecność tekstu to warunek konieczny, nie wystarczający**.

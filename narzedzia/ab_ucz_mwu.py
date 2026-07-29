@@ -52,7 +52,10 @@ if str(ROOT) not in sys.path:
 
 CACHE = ROOT / "raporty" / "ab_ucz_mwu_cache.json"
 
-# Para z garstką trade'ów niesie szum, nie werdykt — ten sam próg co w ab_strategy_mwu.
+# Para z garstką trade'ów niesie szum, nie werdykt. Próg liczony PER RAMIĘ, nie z sumy:
+# `tr_off + tr_on >= 10` przepuszczałoby parę 5/5, a `walidacja.MIN_TRADES` mówi wprost
+# „mniej niż 10 = anegdota, nie statystyka" — o KAŻDEJ mierzonej serii z osobna (recenzja
+# 2026-07-29). Suma dwóch anegdot nie staje się statystyką.
 _MIN_TRADES = 10
 # Minimum par z niezerową różnicą, żeby test znaku w ogóle coś znaczył.
 _MIN_PAR_KONKLUZYWNYCH = 5
@@ -172,8 +175,14 @@ def portfel_zwrotow(wyniki: list) -> "tuple[list, list, int]":
 
 
 def statystyki_zbiorcze(wyniki: list, n_prob: int, s_blokow: int = 10) -> dict:
-    """Δ portfela + test znaku + DSR(ON/OFF) + PBO. Wejście: pary konkluzywne."""
+    """Δ portfela + test znaku + DSR(ON/OFF) + PBO. Wejście: pary konkluzywne.
+
+    Pusta lista to BŁĄD WOŁAJĄCEGO, nie wynik — głośny ValueError zamiast
+    ZeroDivisionError z wnętrza średniej (recenzja 2026-07-29).
+    """
     from imperium.koloseum.walidacja import deflated_sharpe, pbo_cscv
+    if not wyniki:
+        raise ValueError("brak par do policzenia statystyk — nie ma czego uśredniać")
     n = len(wyniki)
     sr_off = sum(w["ret_off"] for w in wyniki) / n
     sr_on = sum(w["ret_on"] for w in wyniki) / n
@@ -201,18 +210,27 @@ def statystyki_zbiorcze(wyniki: list, n_prob: int, s_blokow: int = 10) -> dict:
 def werdykt(st: dict) -> "tuple[str, str]":
     """(token, zdanie). Token krótki — trafia do ledgera; zdanie dla Cezara.
 
-    Kolejność bramek jest celowa: najpierw „czy w ogóle jest różnica", potem
-    „czy różnica jest dodatnia", dopiero na końcu „czy przetrwa korektę o liczbę
-    prób i o podział IS/OOS". Mechanizm bez wpływu to alarm Prawa XV, nie remis.
+    Kolejność bramek: najpierw „czy próba w ogóle uprawnia do sądu", potem „czy jest
+    różnica", potem „czy dodatnia", na końcu „czy przetrwa korektę o liczbę prób i
+    podział IS/OOS". WIELKOŚĆ PRÓBY IDZIE PIERWSZA (recenzja 2026-07-29): alarm
+    „mechanizm martwy" wypowiedziany z jednej pary byłby tym samym grzechem, co
+    werdykt POMAGA z jednej pary.
     """
+    if not st.get("baza_pelna", True):
+        return ("NIEKONKLUZYWNE",
+                f"⚠️ NIEKONKLUZYWNE: ŻADNA para nie ma ≥{_MIN_TRADES} trade'ów na ramię — "
+                f"liczby niżej policzono na wszystkich parach, ale to anegdota, nie wyrok.")
+    if st["par"] < _MIN_PAR_KONKLUZYWNYCH:
+        ogon = (" W tej próbce mechanizm nie zmienił ani jednej decyzji — za mało par, "
+                "by orzec, czy jest martwy." if st["rozne"] == 0 else "")
+        return ("NIEKONKLUZYWNE", f"⚠️ NIEKONKLUZYWNE: tylko {st['par']} par konkluzywnych "
+                                  f"(< {_MIN_PAR_KONKLUZYWNYCH}) — za wąska podstawa na wyrok."
+                                  + ogon)
     if st["rozne"] == 0:
         return ("BEZ_WPLYWU", "🚨 BEZ WPŁYWU: ON == OFF na każdej parze — pętla uczenia "
                               "nie zmienia ANI JEDNEJ decyzji. To utrata potencjału "
                               "(Prawo XV), nie remis: sprawdź, czy mnożniki docierają "
                               "do Legatusa.")
-    if st["par"] < _MIN_PAR_KONKLUZYWNYCH:
-        return ("NIEKONKLUZYWNE", f"⚠️ NIEKONKLUZYWNE: tylko {st['par']} par konkluzywnych "
-                                  f"(< {_MIN_PAR_KONKLUZYWNYCH}) — za wąska podstawa na wyrok.")
     if st["delta"] <= 0:
         return ("SZKODZI", "❌ SZKODZI: pętla uczenia obniża zwrot portfela. Flaga zostaje "
                            "OFF (ZASADA WPIĘCIA — nic nie wchodzi w ścieżkę decyzyjną "
@@ -302,22 +320,32 @@ def raport(pliki, interwal, okna_testu, okno=250, min_barow=400, tryb="agregat",
         wyniki = zbierz_okno(pliki, interwal, okno, min_barow, max_barow, tryb=tryb,
                              force=force, zapisz=zapisz, cache=cache)
         linie += ["", f"── OKNO {max_barow} barów ─────────────────────────────",
-                  f"   {'PARA':<26} {'OFF':>8} {'ON':>8} {'Δ':>8} {'tr o/n':>9}"]
+                  f"   {'PARA':<26} {'BARY':>6} {'OFF':>8} {'ON':>8} {'Δ':>8} {'tr o/n':>9}"]
         if not wyniki:
             linie.append("   (brak danych)")
             continue
         for w in sorted(wyniki, key=lambda x: x["ret_on"] - x["ret_off"], reverse=True):
-            linie.append(f"   {w['para']:<26} {w['ret_off']:>+7.1%} {w['ret_on']:>+7.1%} "
+            # BARY drukowane jawnie: para krótsza od okna wchodziła do tabeli pod etykietą
+            # pełnego okna i mieszała horyzonty bez śladu (recenzja 2026-07-29).
+            skrot = "*" if w["bary"] < (max_barow or w["bary"]) else " "
+            linie.append(f"   {w['para']:<26} {w['bary']:>5}{skrot} "
+                         f"{w['ret_off']:>+7.1%} {w['ret_on']:>+7.1%} "
                          f"{w['ret_on'] - w['ret_off']:>+7.1%} {w['tr_off']:>4}/{w['tr_on']:<4}")
-        konkluz = [w for w in wyniki if (w["tr_off"] + w["tr_on"]) >= _MIN_TRADES]
+        if any(w["bary"] < (max_barow or w["bary"]) for w in wyniki):
+            linie.append("   * para krótsza niż okno — mierzona na tym, co ma")
+        # Próg PER RAMIĘ: suma dwóch anegdot nie jest statystyką (recenzja 2026-07-29).
+        konkluz = [w for w in wyniki if min(w["tr_off"], w["tr_on"]) >= _MIN_TRADES]
         baza = konkluz or wyniki
         st = statystyki_zbiorcze(baza, n_prob=n_prob, s_blokow=s_blokow)
+        st["baza_pelna"] = bool(konkluz)
         tok, zdanie = werdykt(st)
         st["werdykt"] = tok
         statystyki[max_barow] = st
+        opis_bazy = (f"{st['par']} par ≥{_MIN_TRADES} trade na ramię" if konkluz
+                     else f"WSZYSTKIE {st['par']} par — żadna nie ma ≥{_MIN_TRADES} na ramię")
         linie += [
             "",
-            f"   ▸ PORTFEL (średni zwrot/parę, {st['par']} par ≥{_MIN_TRADES} trade): "
+            f"   ▸ PORTFEL (średni zwrot/parę, {opis_bazy}): "
             f"OFF={st['sr_off']:+.1%}  ON={st['sr_on']:+.1%}  Δ={st['delta']:+.1%}",
             f"   ▸ ON > OFF na {st['lepsze']}/{st['rozne']} par z różnicą "
             f"→ test znaku p={st['p_znak']:.4f}",
@@ -351,6 +379,7 @@ if __name__ == "__main__":
     p.add_argument("--bez-zapisu", action="store_true")
     p.add_argument("--force", action="store_true")
     p.add_argument("--ledger", action="store_true", help="dopisz POMIAR do CODEX PROBATIONUM")
+    p.add_argument("--uwaga", default="", help="dopisek do noty w ledgerze (np. powód korekty)")
     args = p.parse_args()
 
     pliki = sorted(_glob.glob(str(ROOT / args.glob)))
@@ -380,7 +409,9 @@ if __name__ == "__main__":
                           "PBO": st["pbo"].get("pbo")},
                 metryka="zwrot % / p / DSR / PBO", werdykt=st["werdykt"],
                 zrodlo="narzedzia/ab_ucz_mwu.py", okno_barow=maxb, interwal=args.interwal,
-                uwaga=f"{len(pliki)} par, tryb={args.tryb}, okno roju={args.okno}, "
-                      f"n_prob={st['n_prob']}, portfel równoważony "
-                      f"{st['barow_portfela']} barów")
+                uwaga=f"{len(pliki)} par wejściowych, podstawa werdyktu {st['par']} par"
+                      f"{'' if st.get('baza_pelna', True) else ' (ŻADNA bez progu — anegdota)'}, "
+                      f"tryb={args.tryb}, okno roju={args.okno}, n_prob={st['n_prob']}, "
+                      f"portfel równoważony {st['barow_portfela']} barów"
+                      + (f". {args.uwaga}" if args.uwaga else ""))
         print("\n📜 CODEX PROBATIONUM: pomiary dopisane.")

@@ -14,6 +14,63 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-29 | 🔍 | RECENZJA KROKU 3: próg z sumy ramion zawyżał podstawę werdyktu
+
+**`/code-review` na własnym diffie — 7 znalezisk, wszystkie naprawione.** Dwa zmieniły LICZBY,
+nie tylko kod.
+
+**Najcięższe: próg konkluzywności liczony z SUMY ramion** (`tr_off + tr_on >= 10`) przepuszczał
+parę z 5 trade'ami na ramię, a raport opisywał ją jako „≥10 trade". `walidacja.MIN_TRADES = 10`
+mówi o KAŻDEJ serii z osobna („mniej = anegdota"). Suma dwóch anegdot nie jest statystyką.
+Po korekcie na próg PER RAMIĘ **werdykty się przesunęły**:
+
+| Interwał / okno | Podstawa (było → jest) | Δ | Werdykt (było → jest) |
+|---|---|---|---|
+| 4H / 600 | 14 → **8 par** | −0.6 → **−0.8 pp** | SZKODZI → SZKODZI |
+| 4H / 1000 | 14 → 14 par | −0.5 pp | SZKODZI (bez zmian) |
+| 1H / 600 | 15 → **1 para** | — | SZKODZI → **NIEKONKLUZYWNE** |
+| 1H / 1000 | 15 → 15 par | +0.6 pp | SŁABE (bez zmian) |
+
+**1H/600 przestał być wyrokiem** — miał jedną parę spełniającą próg. Wniosek końcowy się nie
+zmienia (flaga `ucz_mwu` zostaje OFF), ale opierał się częściowo na próbie, która nie miała
+prawa orzekać. Skorygowane rekordy dopisane do ledgera z jawnym powodem korekty.
+
+**Druga zmiana liczb: fallback `konkluz or wyniki`** cicho przełączał podstawę na wszystkie pary,
+zostawiając nagłówek „N par ≥10 trade" — zdanie fałszywe. Teraz fallback ustawia flagę
+`baza_pelna=False`, raport mówi wprost „ŻADNA para nie ma progu", a werdykt jest wymuszony na
+NIEKONKLUZYWNY. To ta sama klasa co lekcja z rana: **fallback włączony po cichu odtwarza wadę,
+którą próg miał wykluczyć.**
+
+Pozostałe pięć: alarm BEZ_WPŁYWU (Prawo XV) mógł paść z jednej pary — bramka wielkości próby idzie
+teraz PIERWSZA; para krótsza niż okno wchodziła do tabeli pod etykietą pełnego okna — kolumna BARY
+z gwiazdką; `statystyki_zbiorcze([])` dawało ZeroDivisionError zamiast nazwać problem;
+`Dyrygent._progi_interwalu_kanon` był kopią pola PUBLICZNEGO i rozjechałby się po zmianie progu w
+locie — kopia usunięta, czytamy żywy słownik (+ test mutacji po konstrukcji).
+
+**Zasięg naprawy etykiety ZMIERZONY (decyzja Cezara: mierzyć, nie betonować).**
+**4 z 4 zbadanych par zmieniły wynik**, przy NIEZMIENIONEJ liczbie trade'ów (8) — zmienił się
+SKŁAD roju, nie częstotliwość wejść:
+
+| Para | PRZED (pełny rój) | PO (legion SCALP) | Δ |
+|---|---|---|---|
+| BTC 15m | 10008.26 | 9974.84 | −0.33 pp |
+| ETH 15m | 9967.71 | 9908.03 | −0.60 pp |
+| BTC 5m | 9982.21 | 9987.64 | +0.05 pp |
+| ETH 5m | 9914.22 | 9960.70 | +0.46 pp |
+
+Metoda: „PRZED" to emulacja stanu sprzed naprawy (normalizator podmieniony na identyczność =
+surowy klucz), „PO" to kod bieżący; te same bary, to samo okno. Próbka celowana (2 pary/TF), nie
+pełna era. Konsekwencja dla historii: wnioski interwałowe mierzone przez `sym_porownanie_tf.py`
+(etykiety `5m`/`15m`/`1h`/`4h`/`1d` małą literą) pochodzą z roju **bez formacji legionów** —
+czyli mierzyły SWING na 15m, dokładnie jak podejrzewał wpis „profil SCALP nieprzetestowany".
+Kierunek Δ nie jest jednolity (15m gorzej, 5m lepiej), więc to NIE jest poprawa ani pogorszenie
+wyniku — to zmiana tego, CO mierzymy.
+
+**Pliki:** `narzedzia/ab_ucz_mwu.py`, `imperium/koloseum/dyrygent.py`, `tests/test_ab_ucz_mwu.py`
+(+3), `tests/test_dyrygent.py` (+1).
+
+---
+
 ## 2026-07-29 | 🎓 | KROK 3 OBIEGU: A/B pętli uczenia — MECHANIZM SZKODZI, a przyrząd kłamał
 
 **Organ DISCIPULUS (`narzedzia/ab_ucz_mwu.py`) — A/B `ucz_mwu` nie istniał.** `ab_strategy_mwu.py`

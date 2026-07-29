@@ -116,11 +116,6 @@ class Dyrygent:
         # FAZA B (W-286): progi pewności per interwał (np. {"4H": 0.65}) —
         # nadpisują min_pewnosc dla danego interwału; brak wpisu → próg globalny.
         self.min_pewnosc_interwalu: Dict[str, float] = min_pewnosc_interwalu or {}
-        # Kopia po kluczu KANONICZNYM — wołający pisze '4H', bar niesie '4h' (albo
-        # odwrotnie); bez tego konfiguracja trafiała w próżnię i nikt tego nie widział.
-        self._progi_interwalu_kanon: Dict[str, float] = {}
-        for _k, _v in self.min_pewnosc_interwalu.items():
-            self._progi_interwalu_kanon[_kanon_interwal(_k)] = _v
         # W-288: SL = sl_atr_mult × ATR_14 (opt-in; None = stary SL z dźwigni).
         self.sl_atr_mult = sl_atr_mult
         # ML-36: bramka pewności konformalna (opt-in; None = zero zmiany). Gdy ustawiona,
@@ -298,10 +293,21 @@ class Dyrygent:
     def _prog_interwalu(self, interwal: str) -> float:
         """Próg pewności dla interwału (FAZA B, W-286) — dopasowanie po kluczu
         KANONICZNYM, więc {'4H': 0.65} działa też na barach oznaczonych '4h'.
-        Brak wpisu → próg globalny (stare zachowanie)."""
-        if not self._progi_interwalu_kanon:
+        Brak wpisu → próg globalny (stare zachowanie).
+
+        Czytamy ŻYWY słownik przy każdym wywołaniu, bez kopii budowanej w `__init__`
+        (recenzja 2026-07-29): `min_pewnosc_interwalu` jest polem publicznym, więc
+        kopia rozjechałaby się po pierwszej zmianie progu w locie — a cichy rozjazd
+        konfiguracji to dokładnie ta wada, którą ta zmiana usuwa gdzie indziej.
+        Słownik ma jednostki wpisów, więc pętla per bar jest tańsza niż ryzyko.
+        """
+        if not self.min_pewnosc_interwalu:
             return self.min_pewnosc
-        return self._progi_interwalu_kanon.get(_kanon_interwal(interwal), self.min_pewnosc)
+        cel = _kanon_interwal(interwal)
+        for klucz, prog in self.min_pewnosc_interwalu.items():
+            if _kanon_interwal(klucz) == cel:
+                return prog
+        return self.min_pewnosc
 
     # ── Jeden cykl decyzyjny ─────────────────────────────────────────────────
     def cykl(self, symbol: str, bary: List[Dict[str, Any]],

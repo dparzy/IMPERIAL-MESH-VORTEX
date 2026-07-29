@@ -19,6 +19,7 @@ from narzedzia.ab_ucz_mwu import (  # noqa: E402
     klucz_biegu,
     p_dwumianowy,
     portfel_zwrotow,
+    statystyki_zbiorcze,
     wczytaj_cache,
     werdykt,
     zapisz_cache,
@@ -97,6 +98,17 @@ def test_portfel_bez_serii_zwraca_pustke():
     assert portfel_zwrotow([{"zwroty_off": [], "zwroty_on": []}]) == ([], [], 0)
 
 
+def test_statystyki_pustej_listy_krzycza_zamiast_dzielic_przez_zero():
+    """GRANICA (recenzja 2026-07-29): brak par to błąd wołającego, nie wynik —
+    ValueError z nazwą problemu bije ZeroDivisionError z wnętrza średniej."""
+    try:
+        statystyki_zbiorcze([], n_prob=4)
+    except ValueError as e:
+        assert "brak par" in str(e)
+        return
+    raise AssertionError("pusta lista powinna podnieść ValueError")
+
+
 # ── klucz cache (podpis konfiguracji) ─────────────────────────────────────────
 
 def test_klucz_rozroznia_kazdy_wymiar_konfiguracji():
@@ -144,6 +156,7 @@ def test_brak_pliku_cache_to_pusty_slownik():
 
 def _st(**kw):
     baza = {"par": 10, "rozne": 10, "lepsze": 9, "delta": 0.05, "p_znak": 0.01,
+            "baza_pelna": True,
             "dsr_on": {"ok": True, "dsr": 0.97}, "pbo": {"ok": True, "pbo": 0.05}}
     baza.update(kw)
     return baza
@@ -153,6 +166,22 @@ def test_werdykt_bez_wplywu_to_alarm_nie_remis():
     tok, zdanie = werdykt(_st(rozne=0))
     assert tok == "BEZ_WPLYWU"
     assert "Prawo XV" in zdanie
+
+
+def test_werdykt_bez_wplywu_nie_pada_z_malej_proby():
+    """GRANICA (recenzja 2026-07-29): alarm o martwym mechanizmie wymaga PRÓBY.
+    Jedna para bez różnicy to brak dowodu, nie dowód martwoty."""
+    tok, zdanie = werdykt(_st(par=1, rozne=0, lepsze=0))
+    assert tok == "NIEKONKLUZYWNE"
+    assert "nie zmienił ani jednej decyzji" in zdanie   # informacja zostaje, alarm nie
+
+
+def test_werdykt_niepelna_baza_zawsze_niekonkluzywna():
+    """Gdy ŻADNA para nie ma progu trade'ów, liczby wolno pokazać — ale nie wolno
+    z nich orzekać; inaczej fallback odtwarza wadę, którą próg miał wykluczyć."""
+    tok, zdanie = werdykt(_st(baza_pelna=False))
+    assert tok == "NIEKONKLUZYWNE"
+    assert "anegdota" in zdanie
 
 
 def test_werdykt_granica_minimum_par():

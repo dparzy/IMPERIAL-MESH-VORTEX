@@ -219,6 +219,21 @@ def test_prog_interwalu_niewrazliwy_na_zapis():
     assert d._prog_interwalu("") == 0.1       # brak etykiety → próg globalny
 
 
+def test_prog_interwalu_widzi_zmiane_po_konstrukcji():
+    """GRANICA (recenzja 2026-07-29): `min_pewnosc_interwalu` jest polem PUBLICZNYM,
+    więc próg zmieniony w locie musi obowiązywać. Kopia budowana w __init__ rozjechałaby
+    się po pierwszej takiej zmianie — cichy rozjazd konfiguracji, ta sama klasa wady."""
+    legatus = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    d = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(),
+                 engine=PaperTradingEngine(kapital_startowy=10_000, sesja_id="T4"),
+                 min_pewnosc=0.1)
+    assert d._prog_interwalu("4H") == 0.1
+    d.min_pewnosc_interwalu["4h"] = 0.88          # zapis MAŁĄ literą, po konstrukcji
+    assert d._prog_interwalu("4H") == 0.88
+    d.min_pewnosc_interwalu.clear()
+    assert d._prog_interwalu("4H") == 0.1
+
+
 # ════════════════════════════════════════════════════════════════════════════
 #  W-298 — DriftAdapter + Rada Doradców (Prawo XV: ożywione moduły)
 # ════════════════════════════════════════════════════════════════════════════

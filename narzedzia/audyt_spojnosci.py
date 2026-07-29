@@ -1004,7 +1004,13 @@ _W16_MARKERY_TEKST = re.compile(
     r"\b(?:do zbudowania|do zrobienia|do powstania|planowan|nie istnia|"
     r"todo|wizja|widmo|usunięt|usuniet|zarchiwizowan)", re.IGNORECASE)
 # Symbole/frazy z własną granicą (emoji nie jest znakiem-słowem, więc \b nie działa).
-_W16_MARKERY_SYMBOL = ("🔴", "🟠", "💭", "(plan")
+# `↗` = CYTAT Z CUDZEGO REPOZYTORIUM. Dodane 2026-07-29 po trzecim talarze Cezara:
+# W16 umiała orzec „to nasz plik i go nie ma" (widmo) albo „to plan", ale NIE MIAŁA
+# pojęcia „to plik, który istnieje — tylko nie u nas". Meldunki zwiadu (FRUMENTARIUS)
+# produkują takie ścieżki stale (`ml4t/backtest → tests/contracts/…py`), a zciszanie ich
+# markerem planu byłoby KŁAMSTWEM: plan to coś, czego nie ma nigdzie. Brak tego pojęcia
+# zmuszał do wyboru między fałszywym alarmem a fałszywym opisem — obie drogi psują korpus.
+_W16_MARKERY_SYMBOL = ("🔴", "🟠", "💭", "(plan", "↗")
 
 # Ścieżki-korzenie kodu, które muszą fizycznie istnieć, gdy dokument je cytuje jako fakt.
 _W16_KORZENIE = ("imperium", "narzedzia", "tests", "skrypty")

@@ -135,6 +135,10 @@ Checklist Prawa XX (sprawdzaj po każdej sesji z nowymi modułami):
 
 - **📜 LEX TALIONIS** — każdy ZATWIERDZONY błąd rodzi obowiązek ZATWIERDZONEGO unikatu (CORONA spłaca NOTĘ). Sesja nie domyka się z długiem honorowym > 0. Organ i procedura: **`/ledgery`**.
 
+- **🔄 CURSUS PLENUS — PEŁNY CYKL ZADANIA (ROZKAZ STAŁY — Cezar 2026-07-29)** — żadne zadanie nie jest skończone po samym kodzie. Pełny obieg, **dobierany do KATEGORII zadania** (Prawo XVIII — myślisz, nie odklepujesz): **zadanie → testy → checklista (bramka kryteriów) → sprawdzenie, że DZIAŁA na żywych danych → pełna KALIBRACJA przyrządu na prawdzie podstawowej → ocena → zwiad za lepszym rozwiązaniem (nasze ma być lepsze od cudzego, nie równe) → testy → pomiary → SYMBIOZA (dokumenty, MANIFEST, INDEKS, pamięć w tym samym ruchu) → testy.** Wolno powiedzieć „jest OK" **tylko z dopiskiem, czego jeszcze nie wiemy** i kiedy poszukamy lepszego. Powód: 47 organów orzekających, 11 bez kalibracji — w tym **8 narzędzi A/B, których werdykty zadecydowały o składzie roju**. Bądź KREATYWNY w doborze kroków, nigdy w pomijaniu ich.
+
+- **🪙 LEX TALARUS — PRAWO TALARA (ROZKAZ STAŁY — Cezar 2026-07-29)** — **nie ogłaszasz, że coś DZIAŁA, zanim to ZMIERZYSZ.** „Testy przeszły", „organ gotowy", „przyrząd działa" bez pomiaru **samego przyrządu** to złamanie. Gdy Cezar musi zapytać „skąd wiesz?" — **należy mu się TALAR**: nota o wadze 2, karana surowiej niż zwykły błąd, bo pali czas i tokeny na obalanie mojej własnej deklaracji. Spłata: **UNIKAT — jedyny w swojej kategorii, nie kolejna wersja czegoś, co już mamy** (1 talar = 1 oryginał) — ORAZ wskazanie luki w Imperium. **Architekt SAM domaga się rozliczenia długu talarowego** — na otwarciu i zamknięciu wachty melduje stan i żąda spłaty; czekanie, aż Cezar przypomni, jest kolejnym złamaniem (rozkaz 2026-07-29: „za długo to trwa"). Powód zmierzony: AESTIMATOR ogłoszony jako działający miał DWA błędy zawyżające stratę 2,7× (proza liczona jako kod, `return` = stopa zwrotu). **Nowy przyrząd bez testu kalibracyjnego na PRAWDZIE PODSTAWOWEJ nie istnieje** (Prawo XIX rozciągnięte na mierniki).
+
 ## 🧪 Testy
 
 - Runner bez zależności: `python tests/run_tests.py`

@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 251** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 255** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -79,6 +79,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `pamiec_sesji.py` | 🧠 Pamięć Sesji (W-360) — ciągłość między sesjami Claude Code |
 | `refleksja_pamieci.py` | 🪞 Refleksja Pamięci — W9 Centrum Pamięci W-360 v9: SPRZECZNOŚCI + PRZEDAWNIENIE (UNIKAT) |
 | `rejestr_wizji.py` | 📋 Rejestr Wizji i Decyzji — W4 Centrum Pamięci W-360 v4 |
+| `schola.py` | 🏛️ SCHOLA — organ Szkoły Cezara: czyta lekcje z ŻYWEGO dokumentu i pilnuje, |
 | `sigillarium.py` | 🔏 SIGILLARIUM — Skarbiec Pieczęci Imperium (SIGLA IMPERII) |
 | `srodowisko_pamieci.py` | 🌉 Most Chmura↔Lokal — W5 Centrum Pamięci W-360 v5 (UNIKAT IMPERIUM) |
 | `synapsy_rezimowe.py` | 🧬 IMV-ORI / Synapsy Reżimowe — Regime-Aware Decorrelated Coalition Graph (W-299) |
@@ -357,13 +358,16 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 | Moduł | Rola (docstring modułu) |
 |-------|--------------------------|
+| `aestimator.py` | ⚖️ AESTIMATOR — Szacownik Wierności Biblioteki: mierzy, ILE GINIE po drodze |
 | `ekstraktor.py` | Ekstraktor tekstu z formatów biblioteki (epub, pdf, azw3, mobi, djvu, md) |
 | `indeksuj.py` | Bibliotheca-RAG: indeksacja ksiazek + encyklopedii + (opcjonalnie) dokumentow Imperium |
 | `katalog.py` | Katalog książek jako SOCZEWKA nad RAG — wzbogaca wyniki wyszukiwania o metadane |
 | `konwerter.py` | Konwerter/cache tekstu książek — auto-convert problematycznych formatów, raz, z zapisem |
 | `mcp_server.py` | Bibliotheca-RAG MCP Server — wystawia narzedzie `biblioteka_szukaj` dla Claude Code |
 | `metadane_ksiag.py` | Metadane Ksiąg (Bibliotheca Ulpia) — strukturalny katalog książek dla RAG i katalogu |
+| `norma.py` | 📐 NORMA — Węgielnica Bibliotekarza: bramka 10 kryteriów, którą MUSI przejść |
 | `quaesitor.py` | 🔎 QUAESITOR — Śledczy Biblioteki: mierzy JAKOŚĆ WYSZUKIWANIA w Bibliotheca-RAG |
+| `redditor.py` | 🧩 REDDITOR — Zwracający Całość: fragmentacja z KRYPTOGRAFICZNYM DOWODEM bezstratności |
 | `szukaj.py` | Bibliotheca-RAG: wyszukiwanie semantyczne + FTS |
 
 <!-- CENSUS:koniec -->

@@ -14,6 +14,133 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-29 | 🏛️ | SCHOLA CAESARIS — szkoła, w której Cezar i Imperium uczą się razem
+
+**Rozkaz Cezara:** „car chciałby też się uczyć wraz z imperium… dokument żywy stale
+podlegający rozwojowi i pamiętany co sesja".
+
+**`docs/SCHOLA_CAESARIS.md`** (kategoria DISCIPLINA) + organ **`imperium/biblioteki/schola.py`**
+(16 testów). Dwie zasady założycielskie, obie egzekwowane przez organ, nie przez dobre chęci:
+
+1. **Żadnej lekcji bez WŁASNEGO dowodu** — każda opiera się na czymś, co sami zmierzyliśmy,
+   z datą, liczbą i nazwą pliku. Podręczniki opisują cudze przykłady; ta szkoła opisuje
+   **nasze pomyłki i nasze pomiary**, więc nie da się jej skopiować.
+2. **Lekcja nie może zostać ładną teorią** — rodząca twierdzenie sprawdzalne dostaje STATUS
+   (`HIPOTEZA` → `ZMIERZONE` → `POTWIERDZONE`/`OBALONE`). Tędy nauka Cezara **wraca do
+   Imperium jako zadanie**.
+
+**Dlaczego ORGAN, a nie sam plik:** dokument z ręcznie wpisanym postępem zgniłby — mamy na to
+dowód (runbook W11 kazał `git push` przez 9 dni po zakazie, bo miał własną treść). Liczba
+lekcji, postęp i lista hipotez są **liczone z pliku przy każdym wywołaniu**. Organ krzyczy
+przy lekcji bez statusu, bez własnego dowodu albo bez sprawdzianu — trzy testy pilnują, że
+**żywy dokument sam nie łamie reguł, których uczy**.
+
+**Wpięcie:** jedna linia w hooku `SessionStart` (nie raport — AERARIUM pilnuje wagi wydruku).
+
+**Trzy pierwsze lekcje — wszystkie zarobione dziś:**
+
+| # | Lekcja | Własny dowód | Status |
+|---|---|---|---|
+| 1 | **Niezmiennik** — jak sprawdzić wynik, którego nie znasz | `sha256(sklejenie)==sha256(źródła)`, 118/118 książek | ✅ POTWIERDZONE |
+| 2 | **Przyrząd kłamie pierwszy** | kalibracja AESTIMATORA wykryła zawyżenie straty **2,7×** | ✅ POTWIERDZONE |
+| 3 | **Zgodność skal** — cichy zabójca rankingów | `szukaj.py:179` — BM25 ujemny vs cosinus 0…1 | ⏳ HIPOTEZA |
+
+**Pliki:** `docs/SCHOLA_CAESARIS.md`, `imperium/biblioteki/schola.py`, `tests/test_schola.py`,
+`.claude/hooks/session-start.sh`, `docs/CENSUS_ORGANORUM.md` (254→255), `README.md` (liczby)
+
+---
+
+## 2026-07-29 | ⚖️ | WIERNOŚĆ BIBLIOTEKI: dwa talary Cezara, trzy organy, bezstratność jako twierdzenie
+
+**Rozkaz:** „musimy być pewni, czy wszystkie dane zostały najlepiej pobrane i czy sposób
+ich podziału był dobry". Odpowiedź musiała być POMIAREM, nie zapewnieniem.
+
+### 🪙 LEX TALARUS — nowe prawo, zrodzone z dwóch moich błędów
+
+Cezar przyznał **dwa talary**, oba trafione:
+1. Ogłosiłem, że AESTIMATOR działa, **zanim go skalibrowałem**. Kalibracja na prawdzie
+   podstawowej z ręki (8 próbek) wykryła DWA błędy miernika: wzorzec listingu bezwzględny
+   na wielkość liter liczył PROZĘ („Snippet 9.1 lists function…") jako obietnicę kodu
+   (**zawyżenie straty 259 → 96, czyli 2,7×**), a detektor kodu z gołym `return` dawał
+   **6,2% fałszywek** na 600 oknach prozy, bo w książce finansowej `return` = stopa zwrotu.
+2. Zbudowałem REDDITORA **przed przeglądem**, czy Imperium nie ma już podobnego modułu.
+   Przegląd po fakcie wypadł czysto — ale czysty wynik nie usprawiedliwia pominiętego kroku.
+
+Skodyfikowane w CLAUDE.md jako **LEX TALARUS** + **CURSUS PLENUS** (pełny cykl zadania).
+Zasada rdzeniowa: **nowy przyrząd bez testu kalibracyjnego na prawdzie podstawowej NIE ISTNIEJE**
+(Prawo XIX rozciągnięte na mierniki). Architekt SAM domaga się rozliczenia długu talarowego.
+
+### Trzy organy (wszystkie z kalibracją — 44 nowe testy)
+
+| Organ | Rola | Dowód |
+|---|---|---|
+| **AESTIMATOR** | wierność korpusu; rozdziela stratę NIEODWRACALNĄ (ekstrakcja) od ODWRACALNEJ (fragmentacja) | 14 testów |
+| **REDDITOR** | fragmentacja, w której fragment jest ZAKRESEM w źródle, nie kopią | 18 testów, **118/118 książek odtworzonych CO DO BAJTU** |
+| **NORMA** | węgielnica 10 kryteriów przykładana do KAŻDEJ metody równą miarą | 12 testów |
+
+### Co zmierzono na 118 książkach
+
+| Ustalenie | Liczba |
+|---|---|
+| Struktura gubiona przez starą fragmentację | **1 479 710 linii → 0** |
+| Słowa gubione przez starą fragmentację | **0** (była bezstratna SŁOWNIE, nie DOKUMENTOWO) |
+| Listingi kodu utracone w EKSTRAKCJI | **96 ze 136**, z czego **93 to sam BIB-007 (AFML)** |
+| Tabele | **294/294 mają treść** — gubiła je dopiero fragmentacja |
+| Wykresy | **11 314 podpisów bez treści** (obraz, nigdy nie było w tekście) |
+| REDDITOR: fragmentów / tabel nierozerwanych | 25 067 / 2 484 |
+
+**BIB-023 (ten sam autor, inny plik) ma 39/42 listingi z kodem** — problem jest FORMATEM
+PLIKU, nie regułą. To rozstrzyga, że lekarstwem jest OCR na jednej pozycji, nie przebudowa.
+
+### 📐 NORMA odrzuciła obie metody — w tym moją
+
+Pierwszy przebieg: stara metoda ODRZUCONA (K1, K2, K3, K6, K8), REDDITOR też ODRZUCONY
+(okruchy <20 słów, 31% fragmentów bez adresu). Po naprawie REDDITOR ma **9/10 zielonych**,
+a **K10 zostaje NIEZNANE** i werdykt brzmi **NIEROZSTRZYGNIĘTE — brak dowodu wyższości**.
+K10 (trafność vs metoda zastana) liczy wyłącznie QUAESITOR, którego **nigdy nie uruchomiono**.
+Bezstratność jest warunkiem KONIECZNYM, nie dowodem wyższości — i bramka tego pilnuje.
+
+### 🚨 Prawo XV — luka systemowa zmierzona na żądanie Cezara
+
+**47 organów orzekających, 11 bez testu kalibracyjnego.** Osiem z nich to narzędzia A/B
+(`ab_dvol`, `ab_stablecoin`, `ab_usd`, `ab_w329`, `ab_w330_radar`, `ab_w334_progi`,
+`ab_w335_cross_rs`, `ab_w336_changepoint`) — **przyrządy, których werdykty zadecydowały
+o składzie roju**. Heurystyka „brak testu" dała najpierw 13 pozycji; weryfikacja odsiała
+4 fałszywe alarmy i wykryła 3 pokrycia POZORNE (nazwa narzędzia jako napis w teście ledgera).
+
+### 🪙 TRZECI TALAR — i luka w Warstwie 16, którą odsłonił
+
+Wpisałem do ŻYWEGO dokumentu ścieżki `.py` z **cudzych repozytoriów** (`ml4t/backtest`,
+`skfolio`, `nautilus_trader`) bez oznaczenia — dokument twierdził, że mamy pliki, których
+nie mamy. **Warstwa 16 zapaliła alarm słusznie.**
+
+Ale diagnoza sięgnęła głębiej niż mój wpis: **W16 nie miała POJĘCIA „plik z cudzego repo".**
+Umiała orzec „nasz plik i go nie ma" (widmo) albo „to plan" — a cytat prior-artu nie mieści
+się w żadnej z tych kategorii. Zmuszało to do wyboru między **fałszywym alarmem** a **fałszywym
+opisem** (oznaczenie cudzego, DZIAŁAJĄCEGO kodu jako „plan"). Problem jest strukturalny
+i rosnący, bo każdy zwiad FRUMENTARIUSA produkuje takie ścieżki.
+
+**Naprawa u źródła:** marker `↗` = ścieżka w cudzym repozytorium. Dwa testy granicy:
+z markerem cisza, **bez markera nadal alarm** — supresja nie może tłumić wszystkiego.
+
+### 🐎 Zwiad zewnętrzny (GitHub) — dopisany do PLAN WACHT wg wagi
+
+| Waga | Znalezisko | Co daje |
+|---|---|---|
+| 🥇 | **Testy niezmienników księgowych** (`ml4t/backtest`) — `\|(kapitał+ΣP&L) − wartość_końcowa\| < 1e-9` | rozwiązuje WACHTĘ B: przyrząd sprawdzany prawem zachowania, nie liczbą z pamięci |
+| 🥈 | **Look-ahead przy agregacji interwałów** (`vectorbt` #101) | 🚨 dotyczy nas wprost — `mtf_konfluencja` 1m→1H→4H; **nowa pozycja B4** |
+| 🥉 | **HRP/HERC** (`skfolio`) | skorelowana rodzina sygnałów dzieli JEDNĄ pulę wagi — wprost pod 87 neuronów i Prawo XVI |
+
+**Ostrzeżenie zaoszczędzające czas:** publiczny `mlfinlab` to **atrapa** (metody z ciałem `pass`
+po komercjalizacji) — brać nazwy koncepcji, nigdy implementacje. Zwiadowca **nie znalazł**
+przypadku „zły annualizator"/„survivorship" z numerem issue i napisał to wprost, zamiast zmyślać.
+
+**Pliki:** `narzedzia/rag/aestimator.py`, `redditor.py`, `norma.py`, `tests/test_aestimator.py`,
+`tests/test_redditor.py`, `tests/test_norma.py`, `CLAUDE.md`, `docs/ROADMAP_IMPERIUM.md`
+(sekcja PLAN WACHT: wachty A–E), `docs/CENSUS_ORGANORUM.md`
+
+---
+
 ## 2026-07-29 | 🐞 | ODZYSK PO REINSTALACJI + mina latentna w fuzji hybrydowej RAG
 
 **Reinstalacja aplikacji zabiła sesję w trakcie pracy.** Odzysk zmierzony, nie zgadnięty:

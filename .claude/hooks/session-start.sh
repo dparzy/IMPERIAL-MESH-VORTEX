@@ -101,6 +101,15 @@ if [ -f imperium/oczy/breviarium.py ]; then
   python -m imperium.oczy.breviarium --migawka || true
 fi
 
+# 0.9b) SCHOLA CAESARIS — jedna linia nauki (rozkaz Cezara 2026-07-29: „dokument żywy
+#       stale podlegający rozwojowi i pamiętany co sesja"). JEDNA linia, nie raport —
+#       AERARIUM pilnuje wagi wydruku, a szkoła ma przypominać o sobie, nie zajmować
+#       ekranu. Postęp i lista hipotez są LICZONE z dokumentu przy każdym wywołaniu,
+#       więc spis nie może zgnić (klasa wady: runbook W11 z własną, ręczną treścią).
+if [ -f imperium/biblioteki/schola.py ]; then
+  python -m imperium.biblioteki.schola linia || true
+fi
+
 # 0.10) LEX TALIONIS — dług honorowy NA OTWARCIU (zarzut Cezara 2026-07-21, potwierdzony).
 #       Powód: bilans not stał WYŁĄCZNIE w kroku 5b zamknięcia. Sesja urwana przed
 #       domknięciem zostawiała niespłacony dług, którego następne otwarcie NIE POKAZYWAŁO —

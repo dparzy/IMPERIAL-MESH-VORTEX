@@ -208,6 +208,28 @@ def test_audyt_w16_plik_istniejacy_nie_jest_widmem():
     assert a._w16_widma_w_tresci(tresc, _W16_REAL) == []
 
 
+def test_audyt_w16_cudze_repo_nie_jest_widmem():
+    """Granica: `↗` oznacza plik z CUDZEGO repozytorium — istnieje, tylko nie u nas.
+
+    Dodane po trzecim talarze Cezara (2026-07-29). Meldunki zwiadu cytują ścieżki
+    obcych projektów; bez tego pojęcia audyt zmuszał do wyboru między fałszywym
+    alarmem a oznaczeniem cudzego KODU jako „plan", czyli fałszywym opisem.
+    """
+    import narzedzia.audyt_spojnosci as a
+    tresc = "↗ `ml4t/backtest` → `tests/contracts/test_ledger_invariants.py` `[KOD]`\n"
+    assert a._w16_widma_w_tresci(tresc, _W16_REAL) == []
+
+
+def test_audyt_w16_bez_markera_cudze_repo_JEST_widmem():
+    """Kontrola negatywna: ta sama ścieżka BEZ `↗` musi nadal zapalić alarm.
+
+    Gdyby marker był zbędny, supresja tłumiłaby wszystko i W16 przestałaby chronić.
+    """
+    import narzedzia.audyt_spojnosci as a
+    tresc = "`ml4t/backtest` → `tests/contracts/test_ledger_invariants.py`\n"
+    assert a._w16_widma_w_tresci(tresc, _W16_REAL) != []
+
+
 def test_audyt_w16_blok_python_jest_przykladem():
     """Granica: ścieżka w bloku ```python (kod przykładowy) NIE jest twierdzeniem."""
     import narzedzia.audyt_spojnosci as a

@@ -128,9 +128,16 @@ def zbadaj_metode(nazwa: str, tnij, teksty: dict[str, str]) -> dict:
         k["K2"] = PORAZKA
         szczegoly["K2"] = "brak zakresów → brak pojęcia pokrycia"
 
-    zach = linie_po / linie_zrodlo if linie_zrodlo else 0.0
-    k["K3"] = ZALICZONE if zach >= 0.999 else PORAZKA
-    szczegoly["K3"] = f"linie struktury zachowane: {linie_po}/{linie_zrodlo} ({zach:.1%})"
+    # Korpus BEZ znaków nowej linii nie mówi nic o metodzie — mówi o korpusie.
+    # Poprzednio 0/0 dawało 0.0 i PORAŻKĘ, więc bramka odrzucała poprawną metodę
+    # (rekonstrukcja bajt-w-bajt) za właściwość danych. Brakujący pomiar to NIEZNANE.
+    if not linie_zrodlo:
+        k["K3"] = NIEZNANE
+        szczegoly["K3"] = "źródło nie ma znaków nowej linii — nie ma czego zachowywać"
+    else:
+        zach = linie_po / linie_zrodlo
+        k["K3"] = ZALICZONE if zach >= 0.999 else PORAZKA
+        szczegoly["K3"] = f"linie struktury zachowane: {linie_po}/{linie_zrodlo} ({zach:.1%})"
 
     # ── UŻYTECZNOŚĆ ──
     k["K4"] = ZALICZONE if gigantow == 0 else PORAZKA

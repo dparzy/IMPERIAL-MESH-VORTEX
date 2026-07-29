@@ -121,6 +121,18 @@ def test_ksiazka_bez_pustych_linii_nie_daje_giganta():
     assert max(z.slowa(t) for z in kan) <= R.DOMYSLNY_MAX
 
 
+def test_rzadkie_kropki_tez_nie_lamia_sufitu():
+    """Wada zmierzona recenzją 2026-07-29: podział zdaniowy kończył pracę, gdy dał
+    więcej niż jeden kawałek, NIE sprawdzając sufitu — cztery zdania po 1500 słów
+    dawały fragmenty po 1501 słów przy sufcie 900.
+    """
+    t = (("slowo " * 1500) + ". ") * 4
+    kan = R.kanon(t)
+    naj = max(z.slowa(t) for z in kan)
+    assert naj <= R.DOMYSLNY_MAX, f"największy fragment ma {naj} słów przy sufcie {R.DOMYSLNY_MAX}"
+    assert R.zrekonstruuj(t, kan) == t, "zejście na niższy poziom cięcia zgubiło tekst"
+
+
 def test_ksiazka_bez_pustych_linii_pozostaje_bezstratna():
     t = " ".join(f"zdanie numer {i} z pewna trescia." for i in range(3000))
     assert R.dowod_bezstratnosci(t, R.podziel(t))["bezstratny"] is True
@@ -161,6 +173,21 @@ def test_okna_nie_psuja_dowodu():
     p = R.podziel(t)
     assert len(p.okna) == len(p.kanon)
     assert R.dowod_bezstratnosci(t, p)["bezstratny"] is True
+
+
+def test_okna_NIGDY_nie_zaczynaja_sie_w_pol_slowa():
+    """Wada zmierzona recenzją 2026-07-29: 1581 z 2492 okien (63,4%) startowało w środku
+    wyrazu, bo cofnięcie liczono z tekstu po normalizacji białych znaków.
+
+    NORMA K7 tego nie łapała, bo bada wyłącznie kanon — dlatego granica siedzi tutaj.
+    Tekst poniżej ma NIEJEDNOLITE odstępy (nowe linie, podwójne spacje), czyli dokładnie
+    to, co obalało poprzednią arytmetykę.
+    """
+    t = "\n\n".join("  ".join(f"slowo{i}_{j}" for j in range(80)) for i in range(12)) + "\n"
+    p = R.podziel(t)
+    zle = [z for z in p.okna
+           if z.start > 0 and t[z.start - 1].isalnum() and t[z.start].isalnum()]
+    assert zle == [], f"{len(zle)} okien zaczyna się w pół słowa"
 
 
 def test_okna_maja_zakladke_wstecz():

@@ -110,6 +110,31 @@ def _ma_tresc_po(tekst: str, poz: int, okno: int = 500, min_slow: int = 12) -> b
     return len(ogon.split()) >= min_slow
 
 
+def slowa_utracone(slowa: list[str], chunki: list[str]) -> int:
+    """Ile RÓŻNYCH słów źródła nie występuje w żadnym fragmencie.
+
+    HISTORIA TEJ MIARY jest ważniejsza niż ona sama (recenzja własna 2026-07-29):
+    zarzuciłem jej, że jako różnica ZBIORÓW nie wykryje utraty całego fragmentu, gdy
+    słowa powtarzają się gdzie indziej. Zarzut brzmiał sensownie i był BŁĘDNY — pomiar
+    kontrolny go obalił, a dwie „naprawy" (krotności, potem pokrycie pozycji) okazały
+    się GORSZE od oryginału: krotności tonęły w nadmiarze kopii z zakładki, a pokrycie
+    dawało 599 fałszywych strat na tekście ze zwielokrotnionym tym samym słowem.
+
+    POWÓD, DLA KTÓREGO PROSTA MIARA WYSTARCZA — dowód konstrukcyjny, nie nadzieja:
+    `podziel_na_chunki` ma zakładkę 50 słów, a odrzuca fragmenty krótsze niż 20 słów.
+    Ostatni fragment startuje 350 słów po poprzednim, który sięga 400 — więc gdy ostatni
+    ma mniej niż 20 słów, mieści się W CAŁOŚCI w ogonie poprzednika. **Zakładka jest
+    większa od progu odrzutu, zatem kanał utraty nie istnieje.** Sprawdzone na sześciu
+    długościach granicznych (366/405/1009/1209/1360/1401 słów): 0 niepokrytych pozycji.
+
+    Gdyby kiedyś zmieniono próg odrzutu POWYŻEJ zakładki, ten dowód przestaje działać —
+    i wtedy trzeba wrócić do pomiaru pokrycia pozycji. Test granicy pilnuje tej relacji.
+    """
+    if not slowa:
+        return 0
+    return len(set(slowa) - (set(" ".join(chunki).split()) if chunki else set()))
+
+
 def zmierz_ksiazke(sciezka: Path) -> dict:
     """Wycena jednej książki. Zwraca surowe liczby — werdykt osobno (Prawo I)."""
     t = sciezka.read_text(encoding="utf-8", errors="replace")
@@ -118,10 +143,7 @@ def zmierz_ksiazke(sciezka: Path) -> dict:
     unikalne = len({w.lower() for w in slowa})
 
     chunki = podziel_na_chunki(t)
-    # BEZSTRATNOŚĆ (2): czy każde słowo oryginału przeżyło fragmentację?
-    zbior_zrodla = set(slowa)
-    zbior_chunkow = set(" ".join(chunki).split()) if chunki else set()
-    zgubione = zbior_zrodla - zbior_chunkow
+    utracone = slowa_utracone(slowa, chunki)
 
     sn = _po_front_matter(t, RE_SNIPPET)
     sn_z_kodem = sum(1 for p in sn if _ma_kod_po(t, p))
@@ -137,7 +159,7 @@ def zmierz_ksiazke(sciezka: Path) -> dict:
         "linie_w_cache": t.count("\n"),
         "linie_po_fragmentacji": sum(c.count("\n") for c in chunki),
         "chunkow": len(chunki),
-        "slow_zgubionych_przy_cieciu": len(zgubione),
+        "slow_zgubionych_przy_cieciu": utracone,
         "listingi_zapowiedziane": len(sn),
         "listingi_z_kodem": sn_z_kodem,
         "tabele_zapowiedziane": len(tab),

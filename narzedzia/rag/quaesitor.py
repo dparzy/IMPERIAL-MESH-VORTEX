@@ -197,29 +197,45 @@ def ocen(tryb: str = "fts", topk: int = 10, skladnia: str = "and",
             wyniki = szukaj(q, topk=topk, tryb=tryb, baza=baza, cichy=True)
         except sqlite3.OperationalError as e:
             # Składnia AND na pytaniu z myślnikiem potrafi wywalić MATCH — to WYNIK
-            # (tak zachowa się produkcja), nie powód do przerwania pomiaru.
+            # (tak zachowa się produkcja), nie powód do przerwania pomiaru. ALE musi być
+            # WIDOCZNY: przedtem przy `postep=False` awaria zapytania wchodziła do metryk
+            # jako zwykły brak trafienia i raport nie mówił o niej ani słowa, więc werdykt
+            # „BM25 słabo radzi sobie z pytaniami opisowymi" mógł w całości pochodzić
+            # z zapytań, które się wysypały składniowo (recenzja 2026-07-29).
             wyniki = []
+            blad = str(e)
             if postep:
                 print(f"   [{i}/{n}] {c['id']}: błąd FTS ({e})", flush=True)
+        else:
+            blad = ""
         ms = (time.perf_counter() - t0) * 1000
         poz = _pozycja_trafienia(wyniki, osiagalne)
         przypadki.append({
             "id": c["id"], "klasa": c["klasa"], "pytanie": c["pytanie"],
-            "cele": osiagalne, "pozycja": poz, "ms": ms,
+            "cele": osiagalne, "pozycja": poz, "ms": ms, "blad": blad,
             "zwrocone": [_bib(getattr(w, "zrodlo", "")) or "(nie-BIB)" for w in wyniki[:5]],
         })
         if postep:
             znak = f"#{poz}" if poz else "—"
             print(f"   [{i}/{n}] {c['id']} {c['klasa']:9s} {znak:>4s}  {ms:5.0f} ms", flush=True)
 
+    # PROGI RECALL LICZONE Z topk, a nie wpisane na sztywno (naprawione po recenzji
+    # 2026-07-29). Poprzednio klucz „recall@10" trzymał `rec(min(10, topk))`, a raport
+    # drukował stałe etykiety 1/5/10 — więc bieg z `--topk 3` pokazywał recall@3 w dwóch
+    # kolumnach podpisanych „@5" i „@10". Liczba szła do rejestru testów i do decyzji
+    # o wektorach jako recall@10, choć nigdy nie oglądano dziesięciu wyników. To ta sama
+    # klasa, którą ten organ ma tropić: przyrząd twierdzi coś, czego nie zmierzył.
+    progi = sorted({1, min(5, topk), min(10, topk)})
+
     def _metryki(grupa: list[dict]) -> dict:
         if not grupa:
-            return {"n": 0, "recall@1": None, "recall@5": None, "recall@10": None, "mrr": None}
+            return {"n": 0, "progi": progi, "recall": {k: None for k in progi}, "mrr": None}
+
         def rec(k: int) -> float:
             return sum(1 for p in grupa if p["pozycja"] and p["pozycja"] <= k) / len(grupa)
         mrr = sum((1.0 / p["pozycja"]) if p["pozycja"] else 0.0 for p in grupa) / len(grupa)
-        return {"n": len(grupa), "recall@1": rec(1), "recall@5": rec(5),
-                "recall@10": rec(min(10, topk)), "mrr": mrr}
+        return {"n": len(grupa), "progi": progi,
+                "recall": {k: rec(k) for k in progi}, "mrr": mrr}
 
     dosl = [p for p in przypadki if p["klasa"] == "doslowna"]
     opis = [p for p in przypadki if p["klasa"] == "opisowa"]
@@ -230,6 +246,7 @@ def ocen(tryb: str = "fts", topk: int = 10, skladnia: str = "and",
         "opisowa": _metryki(opis),
         "przypadki": przypadki,
         "pominiete": pominiete,
+        "bledy": [p for p in przypadki if p["blad"]],
         "ms_srednio": (sum(p["ms"] for p in przypadki) / len(przypadki)) if przypadki else 0.0,
     }
 
@@ -245,18 +262,27 @@ def raport(w: dict, szczegoly: bool = False) -> str:
         f"   pytań ocenionych: {g['n']} | pominiętych (cel poza indeksem): {len(w['pominiete'])}"
         f" | średni czas zapytania: {w['ms_srednio']:.0f} ms",
         "",
-        "   klasa         n   recall@1  recall@5  recall@10     MRR",
+        # Nagłówek generowany z FAKTYCZNYCH progów — etykieta nie może obiecywać @10,
+        # gdy oglądaliśmy 3 wyniki (recenzja 2026-07-29).
+        "   klasa         n " + "".join(f"  recall@{k:<3}" for k in g["progi"]) + "     MRR",
     ]
+    prog_luki = g["progi"][-1] if len(g["progi"]) < 2 else g["progi"][1]
     for nazwa, m in (("DOSŁOWNA", d), ("OPISOWA", o), ("RAZEM", g)):
         mrr = "—" if m["mrr"] is None else f"{m['mrr']:.3f}"
-        L.append(f"   {nazwa:<10}{m['n']:>4}    {_proc(m['recall@1'])}    {_proc(m['recall@5'])}"
-                 f"     {_proc(m['recall@10'])}   {mrr:>5}")
+        kolumny = "".join(f"    {_proc(m['recall'][k])}" for k in m["progi"])
+        L.append(f"   {nazwa:<10}{m['n']:>4}{kolumny}   {mrr:>5}")
 
-    if d["recall@5"] is not None and o["recall@5"] is not None:
-        luka = (d["recall@5"] - o["recall@5"]) * 100
-        L += ["", f"   📐 LUKA SŁOWNIKOWA (dosłowna − opisowa @5): {luka:+.1f} pp",
+    if d["recall"].get(prog_luki) is not None and o["recall"].get(prog_luki) is not None:
+        luka = (d["recall"][prog_luki] - o["recall"][prog_luki]) * 100
+        L += ["", f"   📐 LUKA SŁOWNIKOWA (dosłowna − opisowa @{prog_luki}): {luka:+.1f} pp",
               "      To ZMIERZONY SUFIT zysku z embeddingów: tyle trafień gubimy, gdy pytanie",
               "      niesie sens bez wspólnych słów. Luka mała → wektory kupią mało (R5 pada)."]
+
+    if w.get("bledy"):
+        L += ["", f"   🚨 ZAPYTANIA, KTÓRE SIĘ WYSYPAŁY: {len(w['bledy'])} — liczone jako BRAK",
+              "      trafienia, więc zaniżają recall. To wynik przyrządu, nie wyszukiwarki:"]
+        for p in w["bledy"][:5]:
+            L.append(f"      • {p['id']}: {p['blad'][:70]}")
 
     if w["pominiete"]:
         L += ["", f"   ⏭️ pominięte ({len(w['pominiete'])}): " +
@@ -308,15 +334,19 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.ledger:
         from narzedzia import scriba_codex
+        # Próg bierzemy z FAKTYCZNIE użytego topk i wpisujemy go do nazwy wariantu —
+        # ledger jest append-only, więc etykieta musi mówić prawdę o tym, co zmierzono
+        # (przedtem zawsze pisała „@5", także przy `--topk 3`).
         warianty = {}
+        prog = min(5, args.topk)
         for s, w in wyniki.items():
-            warianty[f"{args.tryb}/{s} recall@5"] = round((w["globalne"]["recall@5"] or 0) * 100, 1)
-            warianty[f"{args.tryb}/{s} opisowa@5"] = round((w["opisowa"]["recall@5"] or 0) * 100, 1)
-        najlepsza = max(wyniki.items(), key=lambda kv: kv[1]["globalne"]["recall@5"] or 0)
+            warianty[f"{args.tryb}/{s} recall@{prog}"] = round((w["globalne"]["recall"][prog] or 0) * 100, 1)
+            warianty[f"{args.tryb}/{s} opisowa@{prog}"] = round((w["opisowa"]["recall"][prog] or 0) * 100, 1)
+        najlepsza = max(wyniki.items(), key=lambda kv: kv[1]["globalne"]["recall"][prog] or 0)
         scriba_codex.zapisz_pomiar(
             temat="RAG — jakość wyszukiwania (QUAESITOR)",
             pytanie="Jaki recall@k ma dzisiejsze wyszukiwanie i ile trafień gubi na pytaniach opisowych?",
-            warianty=warianty, metryka="recall@5 [%]",
+            warianty=warianty, metryka=f"recall@{prog} [%]",
             werdykt=f"najlepsza składnia: {najlepsza[0]}",
             zrodlo="narzedzia/rag/quaesitor.py",
             uwaga=f"zbiór {len(ZBIOR)} pytań known-item, {len(najlepsza[1]['pominiete'])} pominiętych (cel poza indeksem)",

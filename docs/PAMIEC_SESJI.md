@@ -113,26 +113,26 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-27 — Jednolita miara dla alarmu i chłodzenia lekcji
-Alarm przekroczenia limitu znaków lekcji i konsolidacja liczyły dwie różne rzeczy; połączono w jedną miarę, aby obniżenie progu nie psuło chłodzenia.
+### 2026-07-27 — 14,9 mln barów 1m nieużytych od 2022
+Czytnik odbiera 14,9 mln świec 1-minutowych, ale dane kończą się 2022-07-27 – backtest działa, live nie używa tych danych.
+
+### 2026-07-27 — War_lancer/sala_wojenna/valhalla w archiwum
+Trzy porty (war_lancer, sala_wojenna, valhalla) znajdują się w archiwum/kingdom_pixel_p1/, a nie w imperium/ – klasyczne widmo wynikające z fałszywego przypisania lokalizacji.
+
+### 2026-07-27 — Zidentyfikowano 3 prawdziwe widma w INDEKS-ie
+W dokumencie SZYBKA DIAGNOSTYKA wykryto 3 martwe komendy: mexc_feed.py (powinno mexc_futures.py), calculator_gate.py (powinno brama_kalkulatora.py), veto_check.py (brak w pretorianinie).
+
+### 2026-07-27 — Potrzeba suprsji kontekstowej w bramkach
+Mechaniczne 'czy plik istnieje' nie odróżnia twierdzenia od zamiaru – konieczne suprsje dla przykładów, wizji, planów, negacji i snapshotów, aby uniknąć fałszywych alarmów.
+
+### 2026-07-27 — Spłata długu gnicia nie łapie widm API
+Spłata długu gnicia per-dokument (W13–W15) szuka gnicia w istniejących plikach, nie weryfikuje istnienia API opisanego w dokumentach – dlatego 3 widma przetrwały audyt dokumentacyjny.
+
+### 2026-07-27 — Większość odwołań do dokumentów to kronika sesji (historia)
+1003 z 1301 odwołań do docs/*.md to historia, której nie wolno przepisywać (Prawo I). Przenoszenie żywych dokumentów tworzy martwe linki; przenoszenie migawek jest tanie.
 
 ### 2026-07-27 — Mnemosyne.py wycofany – błędnie oznaczony jako aktywny W1
 Plik mnemosyne.py był oznaczony w dokumentacji jako warstwa W1, ale w rzeczywistości jest wycofany (Prawo XVI) – zastąpiony przez pamiec_refleksyjna i ksiega_wad. Poprawiono.
-
-### 2026-07-27 — Błędna lokalizacja pamiec_refleksyjna – dokumentacja niezgodna z kodem
-Moduł pamiec_refleksyjna znajdował się w imperium/cesarz/ ale dokumentacja wskazywała na biblioteki/. Poprawiono zgodnie z Prawem XXI (doc↔code coherence).
-
-### 2026-07-27 — Strażnik AEQUITAS nie ma martwego pola — zweryfikowano rejestr Bramy
-W całym rejestrze Bramy jedyne parametry seryjne to open/high/low/close/volume. Reszta (period, fast, slow, k, n, dim…) to skalary. Strażnik u wrót pokrywa wszystkie możliwe serie — zero martwego pola.
-
-### 2026-07-27 — Teza zwiadowcy błędna co do liczby i lekarstwa
-Zwiadowca sądził ~25 miejsc zip i potrzebę strict=True w diagnostyce korelacji. Fakty: 10 zipów w Bramie, diagnostyka już strzeżona (4× if n<2). Wnioski: każdą tezę agenta mierzyć samemu przed działaniem — kandydat ≠ prawda.
-
-### 2026-07-29 — Zero modułów tradingu odczytuje RAG w runtime
-Z 124 modułów w koloseum/cesarz/legiony/pretorianie/drogi żaden nie sięga do bazy wiedzy RAG podczas decyzji. Wiedza nie jest wpięta w pętlę decyzyjną.
-
-### 2026-07-29 — RAG używa tylko FTS5 BM25, wektory puste
-Indeks RAG opiera się wyłącznie na FTS5/BM25 (37 331 fragmentów), wektory embeddingów mają 0 wierszy – brak semantic search.
 
 ### 2026-07-27 — Brak __main__ w petla_live.py – bug live
 W petla_live.py brakowało bloku __main__, co blokowało pętlę live przy rutynowym teście. Wykryte dzięki eskalacji przy anomalii.
@@ -203,9 +203,6 @@ ekstraktor.py:149 – kasowanie istniejącego pliku biblioteki przez równoczesn
 ### 2026-07-20 — Cache djvu nie podpięty do RAG – utrata potencjału (Prawo XV)
 konwerter.py:70 – cache djvu zbudowany poprzednio nie jest używany przy indeksowaniu. Chmura nadal woła djvutxt/calibre i gubi djvu.
 
-### 2026-07-20 — Hook startowy powoduje brudny working tree w dwóch plikach
-Pliki bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl oraz docs/PAMIEC_SESJI.md są modyfikowane przez hook startowy, co powoduje, że git working tree nie jest w 100% czysty. To normalny churn pamięci, a nie zmiana kodu.
-
 ### 2026-07-20 — 22 neurony czekają na adaptery/dane (Prawo XV)
 Rodziny NEWS-*, PSY-*, RADAR-*, OC-06/07/08, C-01, V-03, Z-06/Z-07 nie mają jeszcze feedów i abstynują świadomie zgodnie z Prawem XV. To znany, udokumentowany stan, a nie regresja.
 
@@ -262,9 +259,6 @@ Metoda dodaj_checklist() zwiększała licznik w pamięci (52), ale wpis nie zapi
 
 ### 2026-07-21 — Błędny wpis o czasie gnicia runbooka – 9 dni zamiast 'pół roku'
 W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokładnie: 9 dni. Sprostowano u źródła (ledgery, pamięć).
-
-### 2026-07-21 — zapisz() gubi nieznane pola istniejącego wpisu – cicha utrata danych
-Metoda zapisz() w pamięci proceduralnej nadpisywała tylko znane pola, gubiąc nieznane. Odkryto podczas adversarialnego przeglądu kodu. Naprawiono.
 
 ### 2026-07-20 — prekalkuluj_portfel – brak zysku algorytmicznego
 Funkcja wykonuje tę samą pracę per-bar co backtest pojedynczy, tylko równolegle (1.4× przyspieszenia). Nie zmniejsza złożoności, tylko maskuje problem.

@@ -12,6 +12,30 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-27 — Jednolita miara dla alarmu i chłodzenia lekcji
+Alarm przekroczenia limitu znaków lekcji i konsolidacja liczyły dwie różne rzeczy; połączono w jedną miarę, aby obniżenie progu nie psuło chłodzenia.
+
+### 2026-07-27 — Błędna lokalizacja pamiec_refleksyjna – dokumentacja niezgodna z kodem
+Moduł pamiec_refleksyjna znajdował się w imperium/cesarz/ ale dokumentacja wskazywała na biblioteki/. Poprawiono zgodnie z Prawem XXI (doc↔code coherence).
+
+### 2026-07-27 — Strażnik AEQUITAS nie ma martwego pola — zweryfikowano rejestr Bramy
+W całym rejestrze Bramy jedyne parametry seryjne to open/high/low/close/volume. Reszta (period, fast, slow, k, n, dim…) to skalary. Strażnik u wrót pokrywa wszystkie możliwe serie — zero martwego pola.
+
+### 2026-07-27 — Teza zwiadowcy błędna co do liczby i lekarstwa
+Zwiadowca sądził ~25 miejsc zip i potrzebę strict=True w diagnostyce korelacji. Fakty: 10 zipów w Bramie, diagnostyka już strzeżona (4× if n<2). Wnioski: każdą tezę agenta mierzyć samemu przed działaniem — kandydat ≠ prawda.
+
+### 2026-07-29 — Zero modułów tradingu odczytuje RAG w runtime
+Z 124 modułów w koloseum/cesarz/legiony/pretorianie/drogi żaden nie sięga do bazy wiedzy RAG podczas decyzji. Wiedza nie jest wpięta w pętlę decyzyjną.
+
+### 2026-07-29 — RAG używa tylko FTS5 BM25, wektory puste
+Indeks RAG opiera się wyłącznie na FTS5/BM25 (37 331 fragmentów), wektory embeddingów mają 0 wierszy – brak semantic search.
+
+### 2026-07-20 — Hook startowy powoduje brudny working tree w dwóch plikach
+Pliki bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl oraz docs/PAMIEC_SESJI.md są modyfikowane przez hook startowy, co powoduje, że git working tree nie jest w 100% czysty. To normalny churn pamięci, a nie zmiana kodu.
+
+### 2026-07-21 — zapisz() gubi nieznane pola istniejącego wpisu – cicha utrata danych
+Metoda zapisz() w pamięci proceduralnej nadpisywała tylko znane pola, gubiąc nieznane. Odkryto podczas adversarialnego przeglądu kodu. Naprawiono.
+
 ### 2026-07-27 — 22 neurony żywe ale niezmierzone
 Audyt startowy wykazał 22 neurony zależne od adapterów (AUG, NEWS, PSY, RADAR, OC, V, X, Z) istniejące i wpięte w petla_live, ale bez biegu paper nie znany jest ich realny głos. Wymóg monitorowanego biegu z arena_log.
 

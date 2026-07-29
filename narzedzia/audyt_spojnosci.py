@@ -1010,7 +1010,14 @@ _W16_MARKERY_TEKST = re.compile(
 # produkują takie ścieżki stale (`ml4t/backtest → tests/contracts/…py`), a zciszanie ich
 # markerem planu byłoby KŁAMSTWEM: plan to coś, czego nie ma nigdzie. Brak tego pojęcia
 # zmuszał do wyboru między fałszywym alarmem a fałszywym opisem — obie drogi psują korpus.
-_W16_MARKERY_SYMBOL = ("🔴", "🟠", "💭", "(plan", "↗")
+_W16_MARKERY_SYMBOL = ("🔴", "🟠", "💭", "(plan")
+# `↗` działa INACZEJ niż markery wyżej: cichnie tylko SWÓJ segment (komórkę tabeli albo
+# człon zdania), nie całą linię. Powód zmierzony przy recenzji tego samego dnia: wersja
+# liniowa ukrywała realne widmo NASZEGO pliku stojące w tym samym wierszu co ścieżka obca
+# („↗ `skfolio/_hrp.py` — a u nas robi to `imperium/nie_istnieje.py`"), a porównanie
+# „u nich vs u nas" w jednym wierszu to naturalny styl meldunków zwiadu.
+_W16_MARKER_ZEWN = "↗"
+_W16_SEGMENTY = re.compile(r"[|—]")
 
 # Ścieżki-korzenie kodu, które muszą fizycznie istnieć, gdy dokument je cytuje jako fakt.
 _W16_KORZENIE = ("imperium", "narzedzia", "tests", "skrypty")
@@ -1038,9 +1045,16 @@ def _w16_widma_w_tresci(tresc: str, real: set) -> list:
             continue                        # kod przykładowy — nie twierdzenie o istnieniu
         if _W16_MARKERY_TEKST.search(linia) or any(s in linia for s in _W16_MARKERY_SYMBOL):
             continue                        # plan / negacja / widmo oznaczone wprost
-        for m in _W16_PAT.finditer(linia):
-            if m.group(0) not in real:
-                znalezione.append((m.group(0), nr))
+        # `↗` zacisza tylko SWÓJ segment (komórka tabeli `|` albo człon zdania `—`).
+        # Reszta linii jest nadal sprawdzana, więc nasze widmo obok cudzej ścieżki
+        # NIE przechodzi niezauważone.
+        segmenty = (_W16_SEGMENTY.split(linia) if _W16_MARKER_ZEWN in linia else [linia])
+        for seg in segmenty:
+            if _W16_MARKER_ZEWN in seg:
+                continue
+            for m in _W16_PAT.finditer(seg):
+                if m.group(0) not in real:
+                    znalezione.append((m.group(0), nr))
     return znalezione
 
 

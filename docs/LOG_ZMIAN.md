@@ -14,6 +14,62 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-30 | 🔍 | RECENZJA WŁASNEJ WACHTY: 7 wad naprawionych, 1 ZNALEZISKO OBALONE
+
+**`/code-review` na diffie wachty apert29 — 8 zgłoszonych, 7 realnych, 1 własne BŁĘDNE.**
+Wszystkie potwierdzane pomiarem przed zgłoszeniem i po naprawie (LEX TALARUS).
+
+### Dwie najcięższe — w organie, którym spłacałem talar
+
+| Wada | Zmierzone przed | Po naprawie |
+|---|---|---|
+| **63,4% okien wyszukiwania startowało w PÓŁ SŁOWA** — cofnięcie liczone z tekstu po normalizacji białych znaków, a w źródle stoją tam nowe linie i podwójne spacje | 1581 / 2492 okien | **0 / 2493** |
+| **`_rozbij_wielki` cicho łamał sufit, dla którego istnieje** — kończył pracę, gdy poziom dał >1 kawałek, bez sprawdzenia rozmiaru | 4 fragmenty po **1501** słów przy sufcie 900 | 15 fragmentów, max **404** |
+
+Wniosek dnia: **dowód SHA-256 trzymał się bez zarzutu, a organ i tak był wadliwy** —
+bezstratność nigdy nie była tym samym co poprawność. To dokładnie zdanie, które NORMA
+mówi przez K10, tylko zastosowałem je do wyszukiwania, a nie do samego organu.
+
+### ❌ ZNALEZISKO NR 3 OBALONE WŁASNYM POMIAREM
+
+Zarzuciłem AESTIMATOROWI, że miara straty jako różnica ZBIORÓW słów nie wykryje utraty
+fragmentu. Zarzut brzmiał sensownie i **był błędny**. Dwie „naprawy" okazały się GORSZE
+od oryginału: krotności tonęły w nadmiarze kopii z zakładki, a pokrycie pozycji dawało
+**599 fałszywych strat** na tekście ze zwielokrotnionym tym samym słowem.
+
+**Dowód konstrukcyjny, dla którego prosta miara wystarcza:** `podziel_na_chunki` ma
+zakładkę **50** słów i odrzuca fragmenty krótsze niż **20** słów. Ostatni fragment startuje
+350 słów po poprzednim, który sięga 400 — więc gdy ma mniej niż 20 słów, mieści się
+W CAŁOŚCI w ogonie poprzednika. **Zakładka > próg odrzutu, zatem kanał utraty nie istnieje.**
+Sprawdzone na sześciu długościach granicznych (366/405/1009/1209/1360/1401): 0 niepokrytych.
+Miara przywrócona, dowód zapisany w kodzie wraz z warunkiem, kiedy przestaje obowiązywać.
+
+### Pozostałe pięć
+
+- **`quaesitor` — kolumna `recall@10` pokazywała recall@topk pod fałszywą nazwą.** Progi
+  liczone teraz z `topk`, nagłówek i etykieta w ledgerze generowane z faktycznych progów.
+- **`quaesitor` — awaria zapytania FTS nieodróżnialna od braku trafień.** Przy `postep=False`
+  wysypane `MATCH` wchodziło do metryk jako miss bez śladu w raporcie: werdykt „BM25 słabo
+  radzi sobie z pytaniami opisowymi" mógł w całości pochodzić z zapytań, które nie wystartowały.
+  Teraz liczone i raportowane osobno.
+- **Warstwa 16 — marker `↗` wyciszał CAŁĄ LINIĘ**, chowając realne widmo NASZEGO pliku obok
+  ścieżki obcej (zmierzone). Zacisza teraz tylko swój segment (komórka tabeli `|` / człon `—`).
+- **NORMA K3 oblewała korpus bez znaków nowej linii** mimo zera strat (0/0 → 0.0 → PORAŻKA).
+  Brakujący pomiar to NIEZNANE, nie porażka.
+- **`quaesitor` bez ani jednego testu** wbrew LEX TALARUS z tej samej wachty → **19 testów**;
+  dwa z nich przypinają wady z tej recenzji.
+
+### Luka w samej bramce
+
+**NORMA K7 bada wyłącznie kanon, nie okna** — dlatego wada 63,4% przeszła. Granica siedzi
+teraz w `tests/test_redditor.py` na tekście o niejednolitych odstępach. Testów: 3176 → **3199**.
+
+**Pliki:** `narzedzia/rag/redditor.py`, `aestimator.py`, `norma.py`, `quaesitor.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_quaesitor.py` (nowy), `tests/test_redditor.py`,
+`tests/test_spojnosc.py`
+
+---
+
 ## 2026-07-29 | 🏛️ | SCHOLA CAESARIS — szkoła, w której Cezar i Imperium uczą się razem
 
 **Rozkaz Cezara:** „car chciałby też się uczyć wraz z imperium… dokument żywy stale

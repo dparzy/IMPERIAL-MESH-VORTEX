@@ -220,6 +220,26 @@ def test_audyt_w16_cudze_repo_nie_jest_widmem():
     assert a._w16_widma_w_tresci(tresc, _W16_REAL) == []
 
 
+def test_audyt_w16_marker_cudzego_repo_NIE_zacisza_calej_linii():
+    """Granica: `↗` cichnie SWÓJ segment, nie cały wiersz.
+
+    Wada znaleziona recenzją tego samego dnia: wersja liniowa ukrywała realne widmo
+    NASZEGO pliku stojące obok ścieżki obcej, a porównanie „u nich vs u nas"
+    w jednym wierszu to naturalny styl meldunków zwiadu.
+    """
+    import narzedzia.audyt_spojnosci as a
+    tresc = "↗ `skfolio/_hrp.py` — a u nas robi to `imperium/nie_istnieje_wcale.py`\n"
+    znalezione = a._w16_widma_w_tresci(tresc, _W16_REAL)
+    assert [s for s, _ in znalezione] == ["imperium/nie_istnieje_wcale.py"], znalezione
+
+
+def test_audyt_w16_marker_w_komorce_tabeli_zacisza_tylko_ja():
+    """Granica: cudza ścieżka w komórce tabeli cichnie, wiersz nie zapala alarmu."""
+    import narzedzia.audyt_spojnosci as a
+    tresc = "| 🥇 | testy | ↗ `ml4t/backtest` → `tests/contracts/x.py` `[KOD]` | daje |\n"
+    assert a._w16_widma_w_tresci(tresc, _W16_REAL) == []
+
+
 def test_audyt_w16_bez_markera_cudze_repo_JEST_widmem():
     """Kontrola negatywna: ta sama ścieżka BEZ `↗` musi nadal zapalić alarm.
 

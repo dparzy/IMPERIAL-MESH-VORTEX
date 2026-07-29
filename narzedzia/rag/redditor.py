@@ -117,7 +117,8 @@ def _bloki(tekst: str) -> list[tuple[int, int]]:
     return [g for g in granice if g[0] < g[1]]
 
 
-def _rozbij_wielki(tekst: str, b0: int, b1: int, cel: int) -> list[tuple[int, int]]:
+def _rozbij_wielki(tekst: str, b0: int, b1: int, cel: int,
+                   maks: int = 900) -> list[tuple[int, int]]:
     """Dzieli NADMIAROWY blok na mniejsze, schodząc po coraz słabszych granicach.
 
     POWÓD (zmierzony 2026-07-29, przed jakąkolwiek deklaracją, że organ działa):
@@ -141,7 +142,13 @@ def _rozbij_wielki(tekst: str, b0: int, b1: int, cel: int) -> list[tuple[int, in
                 start, slow = punkty[i], 0
         if start < b1:
             wynik.append((start, b1))
-        if len(wynik) > 1:
+        # WARUNEK NAPRAWIONY po recenzji 2026-07-29: poprzednio wystarczyło „więcej niż
+        # jeden kawałek", więc tekst o rzadkich kropkach (4 zdania po 1500 słów) kończył
+        # pracę na poziomie zdaniowym i zwracał fragmenty po 1501 słów przy sufcie 900 —
+        # czyli funkcja istniejąca WYŁĄCZNIE po to, by pilnować sufitu, cicho go łamała.
+        # Teraz poziom musi dodatkowo ZMIEŚCIĆ każdy kawałek pod sufitem; inaczej schodzimy
+        # niżej, aż do twardego cięcia po słowach, które nie może zawieść.
+        if len(wynik) > 1 and all(len(tekst[a:b].split()) <= maks for a, b in wynik):
             return wynik
 
     # Ostatnia deska: tekst bez zdań i bez linii (np. jednolita sieczka OCR).
@@ -206,7 +213,7 @@ def kanon(tekst: str, cel: int = DOMYSLNY_CEL, maks: int = DOMYSLNY_MAX) -> list
     surowe: list[tuple[int, int]] = []
     for b0, b1 in _bloki(tekst):
         if len(tekst[b0:b1].split()) > maks:
-            surowe.extend(_rozbij_wielki(tekst, b0, b1, cel))
+            surowe.extend(_rozbij_wielki(tekst, b0, b1, cel, maks))
         else:
             surowe.append((b0, b1))
 
@@ -251,15 +258,22 @@ def okna(tekst: str, kan: list[Zakres], overlap: int = DOMYSLNY_OVERLAP) -> list
 
     Zakładka ratuje odpowiedzi leżące NA GRANICY fragmentów (klasa błędu, którą
     literatura testuje osobno). Nie dotyka kanonu, więc nie dotyka dowodu.
+
+    NAPRAWIONE po recenzji 2026-07-29 (zmierzone: 1581 z 2492 okien, czyli 63,4%,
+    zaczynało się w PÓŁ SŁOWA). Poprzednia wersja liczyła cofnięcie jako długość
+    `" ".join(ogon[-overlap:])` — czyli tekstu po NORMALIZACJI białych znaków. W źródle
+    stoją tam znaki nowej linii i wielokrotne spacje, więc offset był za mały i okno
+    startowało w środku wyrazu, wpychając do indeksu śmieciowy token. Teraz cofamy się
+    po REALNYCH pozycjach słów w oryginale, więc start ZAWSZE ląduje na granicy wyrazu.
     """
     if not kan:
         return []
     wynik = [kan[0]]
     for i in range(1, len(kan)):
         poprz, biez = kan[i - 1], kan[i]
-        ogon = tekst[poprz.start:poprz.koniec].split()
-        cofnij = len(" ".join(ogon[-overlap:])) if len(ogon) > overlap else 0
-        nowy_start = max(poprz.start, biez.start - cofnij)
+        slowa = list(re.finditer(r"\S+", tekst[poprz.start:poprz.koniec]))
+        nowy_start = (poprz.start + slowa[-overlap].start()
+                      if len(slowa) > overlap else poprz.start)
         wynik.append(Zakres(nowy_start, biez.koniec, biez.adres, biez.tabelaryczny))
     return wynik
 

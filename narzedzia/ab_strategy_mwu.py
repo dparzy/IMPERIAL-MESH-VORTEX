@@ -169,7 +169,10 @@ if __name__ == "__main__":
     logging.disable(logging.CRITICAL)
     p = argparse.ArgumentParser(description="A/B strategy-MWU — dobór strategii ważony P&L (W-362)")
     p.add_argument("--glob", default="dane/4h/Binance_*_4h.csv")
-    p.add_argument("--interwal", default="4h")
+    # '4H' nie '4h' (2026-07-29): mała litera nie trafiała w klucze słowników Imperium
+    # (m.in. formacja legionów Legatusa) i mierzyła rój w konfiguracji, którą produkcja
+    # nigdy nie gra. Wyniki tego narzędzia sprzed tej daty pochodzą z etykiety '4h'.
+    p.add_argument("--interwal", default="4H")
     p.add_argument("--tryb", default="strategia", choices=["strategia", "filtr"])
     p.add_argument("--okno", type=int, default=250)
     p.add_argument("--min-barow", type=int, default=800)

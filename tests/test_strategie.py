@@ -11,7 +11,7 @@ sys.path.insert(0, ROOT)
 
 from imperium.legiony.mikro_neuron import SygnalNeuronu
 from imperium.legiony.strategie.baza import (
-    Strategia, dopasuj_strategie, dobierz_najlepsze,
+    Strategia, dopasuj_strategie, dobierz_najlepsze, normalizuj_interwal,
 )
 from imperium.legiony.strategie.rejestr_strategii import (
     wszystkie_strategie, klucze_uzyte_w_strategiach,
@@ -284,3 +284,35 @@ def test_legatus_bez_strategii_pusta_lista():
     leg = Legatus([NeuronRSI()], min_neuronow=1, min_przewaga=0.1)
     raport = leg.fokus("BTCUSDT", {"RSI_14": 25.0, "RSI_PREV": 24.0})
     assert raport.strategie_dopasowane == []
+
+
+# ── normalizuj_interwal — JEDNO ŹRÓDŁO PRAWDY dla kluczy interwałowych ────────
+
+def test_normalizuj_daje_postac_kanoniczna():
+    """Kanon = klucze słowników Imperium: 'M15' dla minut, '4H'/'1D' dla reszty."""
+    assert normalizuj_interwal("4h") == "4H"
+    assert normalizuj_interwal("4H") == "4H"
+    assert normalizuj_interwal("H4") == "4H"
+    assert normalizuj_interwal("15m") == "M15"
+    assert normalizuj_interwal("M15") == "M15"
+    assert normalizuj_interwal("1d") == "1D"
+    assert normalizuj_interwal("D1") == "1D"
+
+
+def test_normalizuj_nie_zmysla_przy_nieznanym():
+    """GRANICA: czego nie rozumiemy, tego nie przerabiamy (Prawo I)."""
+    assert normalizuj_interwal("") == ""
+    assert normalizuj_interwal("TICK") == "TICK"
+    assert normalizuj_interwal("4X") == "4X"
+    assert normalizuj_interwal("  4h ") == "4H"
+
+
+def test_normalizuj_zachowuje_klasy_rownowaznosci():
+    """Zmiana etykiety reprezentanta nie może zmienić DOPASOWANIA strategii —
+    inaczej „porządek w kluczach" po cichu przestawiłby dobór strategii."""
+    from imperium.legiony.strategie.baza import _interwal_pasuje
+    s = Strategia(id="X", nazwa="X", legion="X", styl="TR", warunki="",
+                  neurony_wejscie=["A"], interwaly=["4H", "1D"])
+    for zapis in ("4h", "4H", "H4"):
+        assert _interwal_pasuje(s, zapis), f"'{zapis}' to ten sam interwał co '4H'"
+    assert not _interwal_pasuje(s, "M15")

@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-27
+stan_na: 2026-07-29
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,64 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-07-29 | 🎓 | KROK 3 OBIEGU: A/B pętli uczenia — MECHANIZM SZKODZI, a przyrząd kłamał
+
+**Organ DISCIPULUS (`narzedzia/ab_ucz_mwu.py`) — A/B `ucz_mwu` nie istniał.** `ab_strategy_mwu.py`
+mierzy INNY mechanizm (`ucz_mwu_strategii`, W-362 — wagi 20 STRATEGII); wagi NEURONÓW nie miały
+żadnego harnessu, więc „krok 3" zaczął się od zbudowania przyrządu: 15 par × 2 okna, portfel
+równoważony (średnia po parach, nie suma), test znaku dwumianowy dokładny, DSR z uczciwym `n_prob`
+i PBO/CSCV. Cząstkowanie + cache `raporty/` + arena; 22 testy, w tym granice każdego progu.
+
+**WYNIK (15 par × 2 interwały × 2 okna = 4 konfiguracje, świeże bary Binance, tryb=agregat,
+okno roju 250):**
+
+| Interwał | Okno | OFF | ON | Δ | ON>OFF | p (test znaku) | DSR ON | PBO | Werdykt |
+|---|---|---|---|---|---|---|---|---|---|
+| 4H | 600 | +1.5% | +0.9% | **−0.6 pp** | 6/13 | 1.000 | 0.27 | 0.579 | ❌ SZKODZI |
+| 4H | 1000 | −0.2% | −0.7% | **−0.5 pp** | 4/14 | 0.180 | 0.07 | 0.595 | ❌ SZKODZI |
+| 1H | 600 | −0.6% | −0.8% | **−0.2 pp** | 4/11 | 0.549 | 0.02 | 0.818 | ❌ SZKODZI |
+| 1H | 1000 | −0.7% | −0.0% | **+0.6 pp** | 9/15 | 0.607 | 0.10 | 0.421 | ⚠️ SŁABE |
+
+**Flaga `ucz_mwu` zostaje OFF.** Trzy konfiguracje na minusie, czwarta dodatnia, ale nie
+przechodzi ŻADNEJ bramki (p=0.607, DSR 0.10, PBO 0.42) — czyli dokładnie ten przypadek, przed
+którym PBO ostrzega. PBO 0.42–0.82 mówi wprost: zwycięzca in-sample bywa przegranym
+out-of-sample częściej niż nie. Średnia 4H jest przy tym ciągnięta W GÓRĘ przez odstający wynik
+(MATIC +13.2/+23.6 pp) i mimo to ON przegrywa.
+
+**PRZYCZYNA, nie tylko werdykt:** MWU uczy się WYŁĄCZNIE z zamkniętych transakcji, a tych jest
+**8–30 na parę na okno** (1H/600: aż 8 z 15 par ma Δ dokładnie 0.0 — mechanizm bezwładny, bo
+8 lekcji nie starcza, by cokolwiek przestawić). Przy 87 neuronach to kilkanaście zaszumionych
+dowodów na neuron. Wniosek: nie stroić η/alpha (to dobieranie parametru do szumu), tylko
+zwiększyć liczbę lekcji — kandydat: uczenie WSPÓLNE na wszystkich parach naraz (~400 zamiast 30),
+po uprzednim sprawdzeniu założenia, że wagi neuronów mają być wspólne dla par.
+
+**PRZYRZĄD KŁAMAŁ — etykieta interwału.** Pierwszy bieg (domyślne `--interwal 4h`, odziedziczone
+po `ab_strategy_mwu.py`) dał INNE liczby niż bieg na produkcyjnym `4H` (ADA/600: Δ=+1.7 pp vs
+−7.4 pp). Powód: `.get(interwal, …)` po SUROWEJ etykiecie nie chybia głośno — spada na fallback.
+Zmierzone skutki małej litery:
+- `Legatus._formacja_interwalu` → **cała formacja legionów wyłączona** (SCALP głosował na 4H),
+- `Dyrygent` → Hermes dostawał 60 min zamiast 240 (wiek danych oceniany 4× za surowo),
+- `Dyrygent` próg per interwał → `{"4H": 0.65}` nie obowiązywał bara `4h` (konfiguracja w próżnię),
+- `walidacja.etap_pierwszy_koloseum` → Sharpe annualizowany jak świece dzienne (~2.4× za nisko).
+
+Naprawa u ŹRÓDŁA: `strategie.baza.normalizuj_interwal` jako jedno źródło prawdy (przy okazji
+poprawiony — zwracał `'4H' → 'H4'`, więc nie nadawał się na klucz; klasy równoważności bez zmian,
+alias `_normalizuj_interwal` zostaje). Klasa wady w Księdze Wad jako REGEX po pomiarze szumu:
+`.get(interwal` = **2 trafienia / 255 plików, obydwa prawdziwe**. Pozostałe dwa miejsca
+(`mtf_konfluencja`, `budowniczy_wskaznikow`) mają dziś plaster w postaci dublowanych kluczy
+`'4h'`+`'4H'` — działa dla naszych interwałów, ale to plaster, nie lek (Backlog).
+
+**Konsekwencja dla historii:** wyniki `ab_strategy_mwu.py` sprzed dziś pochodzą z etykiety `4h`,
+czyli z roju bez formacji legionów. Domyślne `--interwal` obu narzędzi = `4H`.
+
+**Pliki:** `narzedzia/ab_ucz_mwu.py` (nowy), `tests/test_ab_ucz_mwu.py` (nowy, 22),
+`imperium/legiony/strategie/baza.py`, `imperium/legiony/legatus.py`, `imperium/koloseum/dyrygent.py`,
+`imperium/koloseum/walidacja.py`, `imperium/biblioteki/ksiega_wad_kodu.py`,
+`narzedzia/ab_strategy_mwu.py`, `docs/CENSUS_ORGANORUM.md`, `tests/test_strategie.py`,
+`tests/test_integracja.py`, `tests/test_dyrygent.py`, `tests/test_walidacja.py`.
 
 ---
 

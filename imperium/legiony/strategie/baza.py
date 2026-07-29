@@ -197,20 +197,37 @@ def dopasuj_strategie(strategia: Strategia, sygnaly: Dict[str, object],
     )
 
 
-def _normalizuj_interwal(s: str) -> str:
+def normalizuj_interwal(s: str) -> str:
     """Normalizuje format interwału: '5m'→'M5', '1h'→'1H', 'M5'→'M5' itp.
     Obsługuje oba konwencje: 'M5'/'M15' (strategie) i '5m'/'15m' (czytnik CSV).
+
+    JEDNO ŹRÓDŁO PRAWDY (2026-07-29): każdy słownik keyed interwałem woła TĘ funkcję,
+    zamiast dublować klucze w obu wielkościach liter. Powód zmierzony: `Legatus`
+    czytał `_FORMACJE_INTERWALU` po surowym kluczu, więc etykieta '4h' (zamiast '4H')
+    cicho WYŁĄCZAŁA formację legionów — pełny rój głosował na 4H, a nikt tego nie
+    zgłaszał, bo brak klucza to u nas „nieznany interwał → bez filtra".
+
+    Postać kanoniczna = ta, którą mają KLUCZE słowników Imperium: minuty 'M5'/'M15',
+    wyższe TF '1H'/'4H'/'1D'/'1W'. Wcześniej funkcja zwracała 'H4' dla '4H' — było to
+    spójne wewnętrznie (porównywała znormalizowane z znormalizowanym), ale bezużyteczne
+    jako klucz, więc każdy słownik dublował warianty zapisu zamiast wołać normalizator.
+    Klasy równoważności są identyczne jak przedtem, więc `_interwal_pasuje` nie zmienia
+    werdyktów — zmienia się tylko ETYKIETA reprezentanta klasy.
     """
     s = s.strip().upper()
-    # Już w formacie 'M5', '4H', '1D' — zostawiamy
-    if s and not s[0].isdigit():
+    if not s:
         return s
-    # Format liczbowy '5M' → 'M5', '15M' → 'M15', '4H' → '4H'
-    for suffix in ('M', 'H', 'D', 'W'):
-        if s.endswith(suffix):
-            num = s[:-1]
-            return suffix + num
-    return s
+    if s[0].isdigit():          # '4H', '15M', '1D' → liczba + jednostka
+        num, jed = s[:-1], s[-1]
+    else:                       # 'H4', 'M15', 'D1' → jednostka + liczba
+        jed, num = s[0], s[1:]
+    if jed not in ("M", "H", "D", "W") or not num.isdigit():
+        return s                # nieznany format — oddajemy bez zmyślania (Prawo I)
+    return f"M{num}" if jed == "M" else f"{num}{jed}"
+
+
+# Alias wstecznej zgodności — nazwa prywatna żyła w kodzie i testach.
+_normalizuj_interwal = normalizuj_interwal
 
 
 def _interwal_pasuje(strategia: Strategia, interwal: Optional[str]) -> bool:

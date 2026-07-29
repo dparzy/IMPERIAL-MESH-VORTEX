@@ -389,3 +389,20 @@ def test_brak_log_dir_nie_pisze_do_w1():
     eng = PaperTradingEngine(kapital_startowy=1000.0, sesja_id="BEZ-W1")
     eng.wejdz(SygnalWejscia("BTCUSDT", "4H", "LONG", 0.8, 60000.0, 58000.0, 65000.0, 5, 100.0))
     assert eng.zamknij_wszystkie({"BTCUSDT": 61000.0}) and eng._pamiec is None
+
+
+def test_zamkniecie_bez_bara_zachowuje_interwal():
+    """Recenzja 2026-07-29: `zamknij_wszystkie` zapisywało do W1 pusty interwał, choć zna go
+    z otwartej pozycji — a to systematycznie ostatnie trade'y biegu, więc analiza per
+    interwał dostawała obciążenie nielosowe."""
+    import tempfile
+    from pathlib import Path as _P
+
+    from imperium.biblioteki.pamiec_absolutna import PamiecAbsolutna
+    from imperium.koloseum.paper_trading import SygnalWejscia
+
+    kat = _P(tempfile.mkdtemp())
+    eng = _engine_z_pamiecia(kat)
+    eng.wejdz(SygnalWejscia("BTCUSDT", "4H", "LONG", 0.8, 60000.0, 58000.0, 65000.0, 5, 1000.0))
+    eng.zamknij_wszystkie({"BTCUSDT": 61000.0}, powod="KONIEC_BIEGU")
+    assert PamiecAbsolutna(katalog=kat).wczytaj()[0].interwal == "4H"

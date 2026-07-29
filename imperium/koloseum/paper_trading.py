@@ -118,6 +118,11 @@ class WynikZamkniecia:
     timestamp_wejscia: int = 0
     # Reżim rynku w chwili wejścia (z Pozycji) — dla arena-logu i analizy per-reżim.
     rezim: str = "NORMAL"
+    # Interwał pozycji (z Pozycji). Potrzebny, bo zamknięcia spoza ścieżki bara nie mają
+    # `BarData`, a bez tego pola trafiały do W1 z pustym interwałem — i to systematycznie
+    # te same trade'y (ostatnie w biegu), więc analiza per interwał dostawała obciążenie
+    # nielosowe (recenzja 2026-07-29).
+    interwal: str = ""
 
 
 @dataclass
@@ -494,6 +499,7 @@ class PaperTradingEngine:
             kapital_po=round(self.kapital, 4),
             timestamp_wejscia=poz.timestamp_wejscia,
             rezim=getattr(poz, "rezim", "NORMAL"),
+            interwal=getattr(poz, "interwal", ""),
         )
         self.historia_zamkniec.append(wynik)
         return wynik
@@ -525,7 +531,7 @@ class PaperTradingEngine:
             log_typ=TypLogu.TRADE_CLOSE,
             sesja_id=self.sesja_id,
             symbol=wynik.symbol,
-            interwal=bar.interwal if bar is not None else "",
+            interwal=bar.interwal if bar is not None else wynik.interwal,
             cena_close=bar.close if bar is not None else wynik.cena_zamkniecia,
             cena_wejscia=wynik.cena_wejscia,
             pnl_usdt=wynik.pnl_usdt,

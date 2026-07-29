@@ -14,6 +14,38 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-29 | 🔍 | RECENZJA WŁASNEJ WACHTY: fallback przywracał wadę, którą miał usunąć
+
+**`/code-review` na diffie całej wachty — 5 znalezisk, 3 naprawione od razu (wszystkie moje).**
+
+**P0 — najcięższe i najbardziej pouczające.** Parowanie sygnał↔zamknięcie po `trade_id`
+naprawiłem tego samego dnia, ale fallback („brak dopasowania → ucz na WSZYSTKICH sygnałach
+sesji") zdefiniowałem **per zamknięcie**. To przywraca iloczyn kartezjański, gdy tylko JEDNO
+zamknięcie nie ma pary — a wystarczy powtórny bieg tego samego backtestu, bo `sesja_id` jest
+**deterministyczne** (`BT-BTCUSDT-4H-agregat`) i katalog W1 akumuluje wpisy między biegami.
+Zmierzone na atrapach: **12 atrybucji zamiast 3**. Poprawka: fallback włącza się na poziomie
+CAŁEJ sesji (tylko gdy ŻADEN sygnał nie ma `trade_id` = dane sprzed zmiany), a zamknięcie bez
+swojego sygnału jest pomijane — nie zgadujemy autorów. Trzy testy regresji.
+
+**P1 — wzorzec bramki bez podmiotu.** Czwarty wzorzec W23 (`razem|łącznie N neuronów`) łapał
+poprawne zdania o PODZBIORZE („razem 12 neuronów kategorii T"). Zawężony do zdań z podmiotem
+całości (`w roju` / `w Imperium`). **Pomiar 0 trafień na dzisiejszym korpusie nie dowodził
+bezpieczeństwa wzorca — dowodził tylko, że nikt jeszcze takiego zdania nie napisał.**
+
+**P2 — pusty interwał w W1.** Zamknięcia spoza ścieżki bara (`zamknij_wszystkie`,
+`PETLA_STOP`) zapisywały `interwal=""`, choć silnik zna go z otwartej pozycji. To
+systematycznie te same trade'y (ostatnie w biegu), więc analiza per interwał dostawała
+obciążenie **nielosowe**. `WynikZamkniecia` niesie teraz `interwal`.
+
+**Odłożone świadomie (udokumentowane, nie naprawione):** `_klucz_neuronu` zwraca `"?"` przy
+sygnale bez identyfikatora (głosy zlewają się w byt-zlepek); `backtest_portfel`/`_arena` nie
+ustawiają `zrodlo`, więc pierwszy dodany tam zapis do W1 oznaczy backtest jako `PAPER`.
+
+**Pliki:** `imperium/biblioteki/igrzyska.py`, `imperium/koloseum/paper_trading.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_igrzyska.py` (+3), `tests/test_paper_trading.py` (+1).
+
+---
+
 ## 2026-07-29 | 🎯 | PĘTLA UCZENIA DOMKNIĘTA + audyt SAMEJ BRAMKI (mutacją)
 
 **KROK 2 OBIEGU.** `pamiec_absolutna.log_sygnal` nie miała **ani jednego wywołania** w kodzie,

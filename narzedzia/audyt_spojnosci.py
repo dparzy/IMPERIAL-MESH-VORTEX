@@ -707,7 +707,10 @@ _W23_WZORCE = [
     (re.compile(r"(?:Imperium|rój|Rój|roj)\s+(?:ma|liczy|posiada)\s+(\d+)\s+neuron", re.I), "neurony"),
     (re.compile(r"\b(?:mamy|Mamy)\s+(\d+)\s+neuron", re.I), "neurony"),
     (re.compile(r"(?:Imperium|rój|Rój|roj)\s+(?:ma|liczy|posiada)\s+(\d+)\s+zwiadowc", re.I), "zwiadowcy"),
-    (re.compile(r"(?:łącznie|lacznie|razem)\s+(\d+)\s+neuron", re.I), "neurony"),
+    # „razem/łącznie N neuronów" MUSI mieć podmiot mówiący o całości (rój/Imperium) —
+    # bez tego wzorzec łapał poprawne zdania o podzbiorze („razem 12 neuronów kategorii T")
+    # i zapaliłby fałszywy alarm (recenzja 2026-07-29). Alarm-tapeta to koszt, nie ostrożność.
+    (re.compile(r"(?:łącznie|lacznie|razem)\s+(\d+)\s+neuron\w*\s+(?:w\s+)?(?:roju|Imperium|imperium)", re.I), "neurony"),
 ]
 _W23_ZNACZNIK = re.compile(r"<!-- LICZBA:.*?-->.*?<!-- /LICZBA -->", re.S)
 

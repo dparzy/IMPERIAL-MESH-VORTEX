@@ -113,6 +113,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Strażnik AEQUITAS nie ma martwego pola — zweryfikowano rejestr Bramy
+W całym rejestrze Bramy jedyne parametry seryjne to open/high/low/close/volume. Reszta (period, fast, slow, k, n, dim…) to skalary. Strażnik u wrót pokrywa wszystkie możliwe serie — zero martwego pola.
+
+### 2026-07-27 — Teza zwiadowcy błędna co do liczby i lekarstwa
+Zwiadowca sądził ~25 miejsc zip i potrzebę strict=True w diagnostyce korelacji. Fakty: 10 zipów w Bramie, diagnostyka już strzeżona (4× if n<2). Wnioski: każdą tezę agenta mierzyć samemu przed działaniem — kandydat ≠ prawda.
+
+### 2026-07-29 — Zero modułów tradingu odczytuje RAG w runtime
+Z 124 modułów w koloseum/cesarz/legiony/pretorianie/drogi żaden nie sięga do bazy wiedzy RAG podczas decyzji. Wiedza nie jest wpięta w pętlę decyzyjną.
+
+### 2026-07-29 — RAG używa tylko FTS5 BM25, wektory puste
+Indeks RAG opiera się wyłącznie na FTS5/BM25 (37 331 fragmentów), wektory embeddingów mają 0 wierszy – brak semantic search.
+
 ### 2026-07-27 — Brak __main__ w petla_live.py – bug live
 W petla_live.py brakowało bloku __main__, co blokowało pętlę live przy rutynowym teście. Wykryte dzięki eskalacji przy anomalii.
 

@@ -113,6 +113,15 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Jednolita miara dla alarmu i chłodzenia lekcji
+Alarm przekroczenia limitu znaków lekcji i konsolidacja liczyły dwie różne rzeczy; połączono w jedną miarę, aby obniżenie progu nie psuło chłodzenia.
+
+### 2026-07-27 — Mnemosyne.py wycofany – błędnie oznaczony jako aktywny W1
+Plik mnemosyne.py był oznaczony w dokumentacji jako warstwa W1, ale w rzeczywistości jest wycofany (Prawo XVI) – zastąpiony przez pamiec_refleksyjna i ksiega_wad. Poprawiono.
+
+### 2026-07-27 — Błędna lokalizacja pamiec_refleksyjna – dokumentacja niezgodna z kodem
+Moduł pamiec_refleksyjna znajdował się w imperium/cesarz/ ale dokumentacja wskazywała na biblioteki/. Poprawiono zgodnie z Prawem XXI (doc↔code coherence).
+
 ### 2026-07-27 — Strażnik AEQUITAS nie ma martwego pola — zweryfikowano rejestr Bramy
 W całym rejestrze Bramy jedyne parametry seryjne to open/high/low/close/volume. Reszta (period, fast, slow, k, n, dim…) to skalary. Strażnik u wrót pokrywa wszystkie możliwe serie — zero martwego pola.
 

@@ -14,6 +14,54 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-29 | 🐞 | ODZYSK PO REINSTALACJI + mina latentna w fuzji hybrydowej RAG
+
+**Reinstalacja aplikacji zabiła sesję w trakcie pracy.** Odzysk zmierzony, nie zgadnięty:
+kod `narzedzia/rag/quaesitor.py` (330 linii, organ R1) przetrwał na dysku jako plik
+nieśledzony, a **cały transkrypt zabitej sesji (637 KB, 184 wpisy) dał się odczytać** —
+więc odzyskaliśmy też rozumowanie, nie tylko pliki. Stracone zostało wyłącznie okno czatu.
+
+**QUAESITOR (R1) wchodzi do repo jako KOD BEZ BRAMKI** — świadomie i z nazwaniem długu:
+zero testów, nigdy nie uruchomiony, żadnego pomiaru. Wg **Prawa XIX ten organ NIE ISTNIEJE**
+i nie wolno się na niego powoływać. Commit ma jeden cel: nie stracić go przy kolejnej
+reinstalacji. Domknięcie (testy + pierwszy bieg) odłożone decyzją Cezara.
+
+**Wada #2 audytu RAG → Księga Wad — i POMIAR OBALIŁ MÓJ WŁASNY OPIS tej wady.**
+`szukaj.py:179` scala BM25 (ujemny, mniej=lepiej) z cosinusem (0..1, więcej=lepiej)
+jednym kluczem `-score`. W meldunku z zabitej sesji napisałem, że wyniki wektorowe wylądują
+**na końcu** listy. Symulacja na danych sztucznych pokazała **odwrotny kierunek i drugi skutek**:
+
+| Co twierdziłem | Co pokazał pomiar |
+|---|---|
+| wektory lądują na KOŃCU | wektory lądują na POCZĄTKU i wypychają BM25 |
+| (nie zauważone) | w obrębie BM25 kolejność ODWRÓCONA — najlepsze trafienie (−8.4) ostatnie, najgorsze (−2.0) pierwsze |
+
+Mina jest **latentna**: dziś tryb `hybrid` cicho degraduje do `fts` (wektorów 0), więc linia
+nigdy się nie wykonuje. Wybuchłaby w dniu włączenia wektorów — i wyglądałaby na **winę
+embeddingów**, a byłby to błąd sortowania. Lek: fuzja po **RANDZE** (RRF, k=60), nie po
+surowym wyniku — rangi są porównywalne między skalami. To jest krok R2 planu.
+
+**Forma wpisu wyszła z pomiaru szumu, nie z wygody:** kandydujący regex
+`key=lambda.*-\w+\.score` daje 2 trafienia / 432 pliki, ale **jedno jest POPRAWNE**
+(`szukaj.py:118` sortuje czysty cosinus) = **50% fałszywek**. Zgodnie z zasadą „regex tylko
+po pomiarze szumu" wada weszła jako **pozycja checklisty** (125), nie jako auto-skan —
+klasa jest semantyczna (zgodność SKAL), nie składniowa.
+
+**LEX TALIONIS:** Cezar zatwierdził NOTĘ `N-09bca019` (cicha wada etykiety interwału)
+i spłacającą ją CORONĘ `C-03dbbd37` (`normalizuj_interwal` jako jedno źródło prawdy).
+Bilans: 49 not / 50 koron, dług honorowy **0**.
+
+**Fałszywy alarm strażnika czystości — rozstrzygnięty, nie zgadnięty.** Pierwszy bieg dał
+3113/3114 i oskarżenie „repozytorium zabrudzone przez testy". Przyczyna to wariant (b)
+z komunikatu: bieg szedł RÓWNOLEGLE z moimi zapisami do `codex_notarum.jsonl` i
+`CENSUS_ORGANORUM.md`. Czysta powtórka: **3114/3114, exit 0**. Lekcja własna: nie pisać
+do repo w trakcie bramki.
+
+**Pliki:** `narzedzia/rag/quaesitor.py` (nowy, bez bramki), `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`,
+`bibliotheca_ulpia/dane/codex_notarum.jsonl`, `docs/CENSUS_ORGANORUM.md` (250→251), `docs/LOG_ZMIAN.md`
+
+---
+
 ## 2026-07-29 | 🔍 | RECENZJA KROKU 3: próg z sumy ramion zawyżał podstawę werdyktu
 
 **`/code-review` na własnym diffie — 7 znalezisk, wszystkie naprawione.** Dwa zmieniły LICZBY,

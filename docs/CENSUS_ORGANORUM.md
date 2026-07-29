@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 250** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 251** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -363,6 +363,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `konwerter.py` | Konwerter/cache tekstu książek — auto-convert problematycznych formatów, raz, z zapisem |
 | `mcp_server.py` | Bibliotheca-RAG MCP Server — wystawia narzedzie `biblioteka_szukaj` dla Claude Code |
 | `metadane_ksiag.py` | Metadane Ksiąg (Bibliotheca Ulpia) — strukturalny katalog książek dla RAG i katalogu |
+| `quaesitor.py` | 🔎 QUAESITOR — Śledczy Biblioteki: mierzy JAKOŚĆ WYSZUKIWANIA w Bibliotheca-RAG |
 | `szukaj.py` | Bibliotheca-RAG: wyszukiwanie semantyczne + FTS |
 
 <!-- CENSUS:koniec -->

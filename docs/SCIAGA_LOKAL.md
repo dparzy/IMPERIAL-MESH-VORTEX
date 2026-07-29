@@ -105,10 +105,18 @@ zwrócone fragmenty (~setki tokenów), nie za czytanie całych książek (setki 
 
 **Jedna komenda (na laptopie, z calibre — czyta WSZYSTKIE formaty łącznie z djvu):**
 ```powershell
-# calibre jest portable w C:\Calibre Portable — dodaj go do PATH na tę sesję:
-$env:PATH = "C:\Calibre Portable\Calibre;$env:PATH"
 python -m narzedzia.przygotuj_biblioteke
 ```
+> **Ręczne dopisywanie calibre do PATH NIE jest już potrzebne** (od 2026-07-28): robi to organ
+> **FABER** (`imperium/fundament/faber.py`) — szuka w PATH, potem w znanych miejscach instalacji
+> (`C:\Calibre Portable\Calibre`, `C:\Program Files\Tesseract-OCR`, …), a nietypową instalację
+> wskażesz przez `$env:IMPERIUM_NARZEDZIA_PATH`. Powód naprawy: `shutil.which()` zwracał `None`
+> przy OBU narzędziach zainstalowanych, a potok odpowiadał na to pustym tekstem — cichą stratą
+> 13 plików `.djvu`. Sprawdź stan: `python -m imperium.fundament.faber`.
+> **Exit 3** = posiadany format nie ma czym wejść do RAG (dawniej: „GOTOWE" i exit 0).
+> **`--ocr`** (opt-in, domyślnie OFF) ratuje PDF-y BEZ warstwy tekstowej tesseractem —
+> 1.3–5.2 s/stronę, sufit 120 stron/książkę. Bez flagi takie pozycje są wypisywane jako
+> „KANDYDACI DO OCR", więc nie giną po cichu.
 > **djvulibre/djvutxt NIE są potrzebne** — calibre 9.11+ czyta djvu samodzielnie
 > (empirycznie potwierdzone 2026-07-11: Shreve/Aronson/Kissell wyekstrahowane calibre).
 Robi 3 kroki, wszystkie token-free: (1) konwersja+cache tekstu (`konwerter`), (2) indeks RAG

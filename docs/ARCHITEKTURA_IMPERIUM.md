@@ -47,6 +47,9 @@ powod_istnienia: "Jedna strona spinająca 25 Praw z realnym kodem — jedyne mie
                                                          TIRO (E2)              [I, XV, XXIV]
 🧮 FUNDAMENT       fundament/     brama_kalkulatora     jedyne wejście do mat. [I, IX, XIII]
                                    kuznia_narzedzi       kanoniczne wskaźniki   [I]
+                                   faber                 KOWAL: binaria spoza Pythona
+                                                         (calibre/djvutxt/tesseract) — znajduje
+                                                         poza PATH i KRZYCZY zamiast milczeć [XV]
 🏟️ KOLOSEUM        koloseum/      backtest + monte_carlo backtest, Monte Carlo [VI, VII]
                                    haruspex              predykcja reżimu (Markow) — ⚠️ falsyfikowany pomiarem [I, XVI]
 ```

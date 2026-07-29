@@ -573,6 +573,11 @@ def audyt() -> tuple:
     bledy += w22_bledy
     info += w22_info
 
+    # ── WARSTWA 23: LICZBY W PROZIE — znacznik nie jest warunkiem prawdy ──────
+    w23_bledy, w23_info = _warstwa_23_liczby_w_prozie()
+    bledy += w23_bledy
+    info += w23_info
+
     return bledy, info
 
 
@@ -692,6 +697,77 @@ def _warstwa_22_jeden_katalog(katalog_docs=None):
                 f"katalog obok INDEKS_IMPERIUM.md (próg {PROG_WIERSZY}). Spis dokumentów "
                 f"generuje Tabularium; zostaw tu wskaźnik, nie kopię (Prawo XVI)")
     info = ([f"Jeden katalog (W22): {zbadane} dokumentów bez konkurencyjnego spisu ✅"]
+            if not bledy else [])
+    return bledy, info
+
+
+# Twierdzenia o CAŁOŚCI roju pisane prozą: „Imperium ma N neuronów", „mamy N neuronów".
+# ŚWIADOMIE WĄSKIE — patrz docstring W23 (pomiar szumu przed regexem, ROZKAZ Cezara).
+_W23_WZORCE = [
+    (re.compile(r"(?:Imperium|rój|Rój|roj)\s+(?:ma|liczy|posiada)\s+(\d+)\s+neuron", re.I), "neurony"),
+    (re.compile(r"\b(?:mamy|Mamy)\s+(\d+)\s+neuron", re.I), "neurony"),
+    (re.compile(r"(?:Imperium|rój|Rój|roj)\s+(?:ma|liczy|posiada)\s+(\d+)\s+zwiadowc", re.I), "zwiadowcy"),
+    # „razem/łącznie N neuronów" MUSI mieć podmiot mówiący o całości (rój/Imperium) —
+    # bez tego wzorzec łapał poprawne zdania o podzbiorze („razem 12 neuronów kategorii T")
+    # i zapaliłby fałszywy alarm (recenzja 2026-07-29). Alarm-tapeta to koszt, nie ostrożność.
+    (re.compile(r"(?:łącznie|lacznie|razem)\s+(\d+)\s+neuron\w*\s+(?:w\s+)?(?:roju|Imperium|imperium)", re.I), "neurony"),
+]
+_W23_ZNACZNIK = re.compile(r"<!-- LICZBA:.*?-->.*?<!-- /LICZBA -->", re.S)
+
+
+def _warstwa_23_liczby_w_prozie(katalog_docs=None):
+    """W23 — liczba o CAŁOŚCI roju napisana prozą też musi zgadzać się z kodem.
+
+    LUKA ZMIERZONA MUTACJĄ 2026-07-29 (pytanie Cezara „czy sama bramka właściwie działa"):
+    to samo fałszywe zdanie bramka łapie w znaczniku i **przepuszcza w prozie**. Dopisanie
+    „Imperium ma 421 neuronów" do żywego dokumentu dawało audyt exit 0; ta sama liczba
+    wstawiona między `<!-- LICZBA:zwiadowcy -->` zapalała czerwień. Warstwa 15 broni tylko
+    tego, co ktoś wcześniej opakował — czyli broni pola, nie prawdy.
+
+    DLACZEGO TAK WĄSKO (regex dopiero PO pomiarze szumu — ROZKAZ Cezara po Księdze Wad):
+    naiwny wzorzec „<liczba> neuronów" dał **107 trafień** w żywych dokumentach, z czego
+    praktycznie wszystkie to liczby CZĄSTKOWE („11 neuronów kategorii M", „5 zwiadowców
+    kategorii R") — poprawne zdania, które warstwa nazwałaby kłamstwem. Taka warstwa byłaby
+    alarm-tapetą i nauczyłaby przewijać czerwień. Wzorzec zawężony do zdań TWIERDZĄCYCH
+    O CAŁOŚCI ma na tym samym korpusie **0 trafień** — czyli zero fałszywych alarmów dziś
+    i wychwycone pierwsze takie zdanie, które ktoś napisze jutro.
+
+    ZASIĘG: żywe dokumenty z Tabularium. Dokumenty ACTA (LOG_ZMIAN, Dziennik, kronika) są
+    WYŁĄCZONE świadomie — ich treść to prawda swojego czasu, a historii nie przepisujemy
+    (Prawo I). Fragmenty w znacznikach LICZBA pomijamy: tam rządzi W15.
+    """
+    try:
+        from narzedzia.tabularium import ROOT as T_ROOT
+        from narzedzia.tabularium import wartosci_z_kodu, zbierz_dokumenty
+    except Exception as e:  # noqa: BLE001 — awaria warstwy nie może wywrócić audytu
+        return [f"[W23] Błąd kontroli liczb w prozie: {e}"], []
+
+    prawda = {k: str(v) for k, v in (wartosci_z_kodu() or {}).items()}
+    if not prawda:
+        return ["[W23] Brak liczb z rejestru — nie ma z czym porównywać (Prawo I)"], []
+
+    bledy, zbadane = [], 0
+    for wzgledna, _ in zbierz_dokumenty():
+        sciezka = os.path.join(T_ROOT, wzgledna)
+        try:
+            with open(sciezka, encoding="utf-8") as f:
+                tresc = f.read()
+        except OSError:
+            continue
+        if re.search(r"^(kategoria:\s*ACTA|typ:\s*acta)", tresc, re.M):
+            continue                      # historia — nie przepisujemy (Prawo I)
+        zbadane += 1
+        bez_znacznikow = _W23_ZNACZNIK.sub("", tresc)
+        for wzorzec, klucz in _W23_WZORCE:
+            if klucz not in prawda:
+                continue
+            for m in wzorzec.finditer(bez_znacznikow):
+                if m.group(1) != prawda[klucz]:
+                    bledy.append(
+                        f"[W23] {wzgledna}: proza twierdzi '{m.group(0).strip()}', a kod "
+                        f"mówi {klucz} = {prawda[klucz]}. Użyj znacznika "
+                        f"<!-- LICZBA:{klucz} --> albo popraw liczbę")
+    info = ([f"Liczby w prozie (W23): {zbadane} żywych dokumentów bez fałszywych sum ✅"]
             if not bledy else [])
     return bledy, info
 

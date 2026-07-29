@@ -602,6 +602,21 @@ class Dyrygent:
                                 powod="silnik odrzucił (limit pozycji / brak kapitału / duplikat)",
                                 raport=raport, plan=plan, sygnal=sygnal)
 
+        # W1: KTO GŁOSOWAŁ za tym wejściem (2026-07-29 — druga połowa obiegu uczenia).
+        # Dotąd `pamiec_absolutna.log_sygnal` nie miała ANI JEDNEGO wywołania w kodzie:
+        # W1 znała wynik (TRADE_CLOSE), nie znała autorów, więc MWU dostawał 0 wag,
+        # a atrybucja per neuron była fizycznie niemożliwa.
+        # `trade_id` = id pozycji — to ON wiąże głosy z KONKRETNYM trade'em. Bez tego
+        # parowanie idzie po sesji i każde zamknięcie „uczy" o WSZYSTKICH sygnałach
+        # sesji (zmierzone: 23 wejścia × 23 zamknięcia = 529 fałszywych atrybucji).
+        # Zapis przechodzi przez silnik → sterowany tym samym opt-inem `log_dir`.
+        if raport.sygnaly:
+            from imperium.biblioteki.pamiec_absolutna import log_sygnal
+            log = log_sygnal(self.engine.sesja_id, symbol, interwal, raport,
+                             rezim=raport.rezim)
+            log.trade_id = pozycja.pozycja_id
+            self.engine.zapisz_log(log)
+
         # W-299/303/309: zapamiętaj sygnały tej pozycji dla warstw uczących się
         # z zamknięć (Synapsy/MWU/Igrzyska/KsięgaWad). 4. element = interwał (W-309).
         if (self.legatus.synapsy is not None or self.legatus.mwu is not None

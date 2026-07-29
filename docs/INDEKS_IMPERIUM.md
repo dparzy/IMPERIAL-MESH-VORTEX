@@ -52,7 +52,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 
 <!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->
 
-> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-28 (73 pozycji).
+> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-29 (74 pozycji).
 
 ### LEX — prawo i rozkazy stałe — obowiązuje, nie opisuje
 
@@ -71,9 +71,9 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 |---|---|---|---|
 | `README.md` | Wizytówka Imperium — podaje liczby wprost z kodu (neurony/testy/prawa), więc musi nadążać za rejestrem | `imperium/legiony/rejestr.py` | 2026-07-27 |
 | `docs/ARSENAL_IMPERIUM.md` | Zweryfikować (Prawo I: zero halucynacji) setki linków narzędzi z pliku źródłowego IMV, oddzielić realne od fabrykowanych/niepewnych, i zaproponować 'najmocniejszy zweryfikowany rdz | — | 2026-06-02 |
-| `docs/CENSUS_ORGANORUM.md` | Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem | `narzedzia/census_organorum.py` | 2026-07-27 |
+| `docs/CENSUS_ORGANORUM.md` | Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem | `narzedzia/census_organorum.py` | 2026-07-29 |
 | `docs/INDEKS_IMPERIUM.md` | Master Index — punkt wejścia i mapa wszystkich dokumentów; sekcja katalogu generowana przez Tabularium | `imperium/legiony/rejestr.py` | 2026-07-18 |
-| `docs/MANIFEST_KODU.md` | JEDYNE oficjalne źródło prawdy o kodzie (Prawo XIX) — tabela kluczy ze statusem, nic nie istnieje bez wpisu tutaj | `imperium/legiony/rejestr.py` | 2026-07-26 |
+| `docs/MANIFEST_KODU.md` | JEDYNE oficjalne źródło prawdy o kodzie (Prawo XIX) — tabela kluczy ze statusem, nic nie istnieje bez wpisu tutaj | `imperium/legiony/rejestr.py` | 2026-07-29 |
 | `docs/MAPA_KLUCZY.md` | JEDYNY dokument, który jawnie i systematycznie rozwiązuje rozbieżności między katalogiem (planem nazw/ID) a żywym kodem — dla każdego klucza podaje: nazwę klasy w kodzie, co robi,  | `imperium/legiony/rejestr.py` | 2026-07-16 |
 | `docs/MAPA_PAMIECI.md` | Jedyne miejsce konsolidujące 13(+1 nadrzędny=W7) warstw pamięci Claude/Imperium w jedną taksonomię, z mapowaniem na model CoALA (arXiv:2309.02427) i na 'domknięte problemy granicy 2026 | `imperium/biblioteki/centrum_pamieci.py`, `imperium/biblioteki/dziennik_niesmiertelny.py`, `imperium/biblioteki/graf_pamieci.py`, `imperium/biblioteki/kronika_czatu.py`, `imperium/biblioteki/kustosz_pamieci.py`, `imperium/biblioteki/pamiec_absolutna.py`, `imperium/biblioteki/pamiec_proceduralna.py`, `imperium/biblioteki/pamiec_proweniencji.py`, `imperium/biblioteki/pamiec_robocza.py`, `imperium/biblioteki/pamiec_sesji.py`, `imperium/biblioteki/refleksja_pamieci.py`, `imperium/biblioteki/rejestr_wizji.py`, `imperium/biblioteki/srodowisko_pamieci.py`, `imperium/biblioteki/zapominanie.py` | 2026-07-17 |
 | `docs/OBSERWATORZY.md` | Jedyny dokument mapujący WSZYSTKIE zewnętrzne źródła danych (44 źródła w 4 warstwach: OCZY/USZY/WIESZCZOWIE/SZPIEDZY) do konkretnych neuronów i modułów — z priorytetami kluczy API  | `imperium/akwedukty/bary_zdarzeniowe.py`, `imperium/akwedukty/czytnik_csv.py`, `imperium/akwedukty/klasyfikator_zdarzen.py`, `imperium/akwedukty/kwatermistrz_danych.py`, `imperium/akwedukty/news_fetcher.py`, `imperium/akwedukty/sentyment_historyczny.py`, `imperium/drogi/nexus_hub.py` | 2026-07-17 |
@@ -119,6 +119,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 
 | Dokument | Po co istnieje | Właściciel (kod) | Stan na |
 |---|---|---|---|
+| `docs/INGENIUM_IQ_IMPERII.md` | Projekt organu INGENIUM — mierzalny wskaźnik rozwoju Imperium (IQ IMPERII): 7 kategorii liczonych z kodu i ledgerów, nie z deklaracji. Zamiar Cezara z 2026-07-29, nie fakt — kod jeszcze nie istnieje | `imperium/oczy/censor_sprzetu.py` | 2026-07-29 |
 | `docs/KATALOG_NEURONOW.md` | Katalog 299 zmapowanych mikro-neuronów jako roadmapa (87 zbudowanych) — zamiar, nie stan kodu; stan mówi MANIFEST | `imperium/legiony/rejestr.py` | 2026-07-17 |
 | `docs/KATALOG_STRATEGII.md` | Katalog zmapowanych strategii jako roadmapa (20 w kodzie) — zamiar; stan kodu mówi MANIFEST | `imperium/legiony/strategie/rejestr_strategii.py` | 2026-06-26 |
 | `docs/ODLOZONE_DECYZJE.md` | Rejestr rzeczy ustalonych merytorycznie, ale świadomie odłożonych do czasu twardego pomiaru A/B (zasada 'nie wdrażamy bo brzmi dobrze — wdrażamy gdy A/B pokaże plus'). | `narzedzia/ab_w329.py`, `narzedzia/ab_w334_progi.py`, `narzedzia/ab_w335_cross_rs.py`, `narzedzia/ab_w336_changepoint.py` | 2026-07-17 |

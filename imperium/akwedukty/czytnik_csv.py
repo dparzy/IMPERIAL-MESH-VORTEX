@@ -90,12 +90,29 @@ def _parse_ts(surowy: str) -> int:
         return int(liczba) if liczba > 1e12 else int(liczba * 1000)
     except ValueError:
         pass
+    # (funkcja publiczna `parsuj_znacznik` niżej — ta sama wiedza dla narzędzi spoza imperium)
     # ISO-data → epoch ms (UTC). 'Z' normalizujemy do +00:00.
     iso = surowy.replace("Z", "+00:00")
     dt = datetime.fromisoformat(iso)
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
     return int(dt.timestamp() * 1000)
+
+
+def parsuj_znacznik(surowy: str) -> int:
+    """
+    PUBLICZNE wejście do parsera znaczników czasu — dla narzędzi spoza `imperium/`.
+
+    POWÓD (zmierzone 2026-07-29): wiedza o brudzie CDD (wiersze w µs zamiast ms) żyła
+    WYŁĄCZNIE tutaj, w prywatnym `_parse_ts`. `narzedzia/pobierz_binance.py` czytał ten
+    sam plik własnym `int(float(...))` — i wywracał się na `OSError [Errno 22]`, bo brał
+    znacznik 16-cyfrowy za milisekundy. Skutek: **1H nie dało się dociągnąć przez 40 dni**,
+    a nikt tego nie widział, bo pobieracz padał dopiero na wydruku daty.
+
+    Klasa wady: ta sama wiedza w DWÓCH parserach tego samego formatu, utwardzona tylko
+    w jednym. Lekarstwo jest zawsze to samo — jedno źródło prawdy, nie druga kopia.
+    """
+    return _parse_ts(surowy)
 
 
 def _indeks_wolumenu_bazowego(kolumny: List[str]) -> Optional[int]:

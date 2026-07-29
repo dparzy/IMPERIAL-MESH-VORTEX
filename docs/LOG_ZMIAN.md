@@ -14,6 +14,179 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-29 | 🔍 | RECENZJA WŁASNEJ WACHTY: fallback przywracał wadę, którą miał usunąć
+
+**`/code-review` na diffie całej wachty — 5 znalezisk, 3 naprawione od razu (wszystkie moje).**
+
+**P0 — najcięższe i najbardziej pouczające.** Parowanie sygnał↔zamknięcie po `trade_id`
+naprawiłem tego samego dnia, ale fallback („brak dopasowania → ucz na WSZYSTKICH sygnałach
+sesji") zdefiniowałem **per zamknięcie**. To przywraca iloczyn kartezjański, gdy tylko JEDNO
+zamknięcie nie ma pary — a wystarczy powtórny bieg tego samego backtestu, bo `sesja_id` jest
+**deterministyczne** (`BT-BTCUSDT-4H-agregat`) i katalog W1 akumuluje wpisy między biegami.
+Zmierzone na atrapach: **12 atrybucji zamiast 3**. Poprawka: fallback włącza się na poziomie
+CAŁEJ sesji (tylko gdy ŻADEN sygnał nie ma `trade_id` = dane sprzed zmiany), a zamknięcie bez
+swojego sygnału jest pomijane — nie zgadujemy autorów. Trzy testy regresji.
+
+**P1 — wzorzec bramki bez podmiotu.** Czwarty wzorzec W23 (`razem|łącznie N neuronów`) łapał
+poprawne zdania o PODZBIORZE („razem 12 neuronów kategorii T"). Zawężony do zdań z podmiotem
+całości (`w roju` / `w Imperium`). **Pomiar 0 trafień na dzisiejszym korpusie nie dowodził
+bezpieczeństwa wzorca — dowodził tylko, że nikt jeszcze takiego zdania nie napisał.**
+
+**P2 — pusty interwał w W1.** Zamknięcia spoza ścieżki bara (`zamknij_wszystkie`,
+`PETLA_STOP`) zapisywały `interwal=""`, choć silnik zna go z otwartej pozycji. To
+systematycznie te same trade'y (ostatnie w biegu), więc analiza per interwał dostawała
+obciążenie **nielosowe**. `WynikZamkniecia` niesie teraz `interwal`.
+
+**Odłożone świadomie (udokumentowane, nie naprawione):** `_klucz_neuronu` zwraca `"?"` przy
+sygnale bez identyfikatora (głosy zlewają się w byt-zlepek); `backtest_portfel`/`_arena` nie
+ustawiają `zrodlo`, więc pierwszy dodany tam zapis do W1 oznaczy backtest jako `PAPER`.
+
+**Pliki:** `imperium/biblioteki/igrzyska.py`, `imperium/koloseum/paper_trading.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_igrzyska.py` (+3), `tests/test_paper_trading.py` (+1).
+
+---
+
+## 2026-07-29 | 🎯 | PĘTLA UCZENIA DOMKNIĘTA + audyt SAMEJ BRAMKI (mutacją)
+
+**KROK 2 OBIEGU.** `pamiec_absolutna.log_sygnal` nie miała **ani jednego wywołania** w kodzie,
+więc W1 znała wynik trade'u, ale nie autorów: MWU budował **0 wag**, a atrybucja per neuron
+była fizycznie niemożliwa. Dyrygent loguje teraz SYGNAŁ przy każdym wejściu, przez silnik
+(czyli pod tym samym opt-inem `log_dir`). **Zmierzone: W1 23 → 46 wpisów (23 SYGNAŁ + 23
+TRADE_CLOSE, 1:1), 46/46 z `trade_id`, MWU 0 → 37 wag.** Pierwsze wagi per neuron z realnych
+danych: SMC-01 0,0525 · EXP-01 0,0438 · VI-13 0,0426 · A-03 0,0424.
+
+**DWIE PUŁAPKI ZŁAPANE PRZED WPIĘCIEM, NIE PO.** (1) `igrzyska.przetworz_logi` parowało po
+`sesja_id`, więc każde zamknięcie „uczyłoby" o WSZYSTKICH sygnałach sesji — przy 23 wejściach
+to **529 fałszywych atrybucji zamiast 23**; mechanizm mieliłby liczby bez znaczenia. Parowanie
+jest teraz per-`trade_id`, ze starą ścieżką jako fallbackiem dla logów sprzed zmiany.
+(2) `log_sygnal` czytała pole `s.klucz`, którego w kodzie **nie ma** (jest `neuron_id`) — nigdy
+nie wybuchło, bo funkcja była martwa. **Martwy kod nie jest neutralny: gnije w ciszy i mści się
+przy pierwszym użyciu.**
+
+**AUDYT SAMEJ BRAMKI (pytanie Cezara „czy bramka właściwie działa").** Osiem podłożonych wad,
+każda cofana natychmiast. Złapane: W13 (ruff), W15 (liczba w znaczniku), W16 (ścieżka-widmo),
+W17 (moduł bez meldunku), W20 (ręczny wiersz w generowanym katalogu), W8 (kod bez wpisu
+w LOG_ZMIAN). **JEDNA REALNA DZIURA:** liczba o całości roju napisana PROZĄ przechodziła
+(`Imperium ma 421 neuronów` → exit 0), gdy ta sama liczba w znaczniku zapalała czerwień —
+**Warstwa 15 broniła POLA, nie PRAWDY**.
+
+**WARSTWA 23** łata to, ale dopiero **po pomiarze szumu** (rozkaz: regex wyłącznie po pomiarze):
+naiwny wzorzec „<liczba> neuronów" dał **107 trafień**, prawie wyłącznie liczb CZĄSTKOWYCH
+(„11 neuronów kategorii M") — byłaby to alarm-tapeta. Wzorzec zawężony do zdań twierdzących
+o CAŁOŚCI ma na tym samym korpusie **0 fałszywych trafień**. Warstwa broniona z trzech stron
+(łapie fałsz / milczy na cząstkowych / milczy na prawdziwej sumie); dokumenty ACTA wyłączone,
+bo historii nie przepisujemy (Prawo I).
+
+**Pliki:** `imperium/koloseum/dyrygent.py`, `imperium/koloseum/paper_trading.py`,
+`imperium/biblioteki/pamiec_absolutna.py`, `imperium/biblioteki/igrzyska.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_spojnosc.py` (+4).
+
+---
+
+## 2026-07-29 | 🔁 | PIERWSZY ZAMKNIĘTY OBIEG: W1 zapisana, bo nie było ZAPISU — nie czytelników
+
+**Rozkaz Cezara:** punkt 1 z audytu Consilium (najpierw dane, potem mosty) + świeże bary z Binance.
+
+**ŚWIEŻE BARY.** 4H: 15/15 par do `2026-07-28 20:00`. 1H: 14/14 par. Świeżość wg PORTITORA
+spadła z **~40 dni do 0.0–0.1 dnia**.
+
+**BUG, KTÓRY BLOKOWAŁ 1H OD 40 DNI.** Pliki CDD mieszają dwie jednostki czasu — zmierzone
+**672–936 wierszy na parę** (okno 2025-02-12→03-11) ma Unix w **mikrosekundach**. `czytnik_csv`
+wiedział o tym od 2026-06-10 (`if liczba > 1e14`), ale `pobierz_binance` czytał ten sam plik
+własnym `int(float(...))`: brał 16 cyfr za milisekundy, wychodził rok ~57000 i wywracał się na
+`OSError [Errno 22]` — najpierw przy wznawianiu, a po pierwszej łatce **drugi raz** przy zapisie.
+Klasa: **ta sama wiedza w dwóch parserach tego samego formatu, utwardzona tylko w jednym**.
+Lekarstwo nie polega na łataniu każdego miejsca użycia, tylko na jednym źródle prawdy —
+publiczne `czytnik_csv.parsuj_znacznik`, normalizacja przy WEJŚCIU. Efekt uboczny: przepisanie
+plików **wyleczyło dane** (14 plików z brudem µs → **0**; duplikaty zlały się po znaczniku).
+
+**W1 ZAPISANA PIERWSZY RAZ.** Przyczyna pustki była odwrotna do tezy audytu zewnętrznego
+(„nic nie czyta W1"): czytelnicy są (Kustosz, Centrum, Igrzyska, MWU) — **nikt nie PISAŁ**.
+Zapis jest opt-in przez `log_dir`, a backtest go nie podawał. Dodane: `log_dir` w `backtest()`
+(domyślnie None = zero regresji) oraz etykieta pochodzenia `zrodlo` w silniku (`BACKTEST` vs
+`PAPER`) — bez niej wynik backtestu byłby w W1 **nieodróżnialny od rzeczywistości**.
+
+**PIERWSZY UDOKUMENTOWANY P&L** (BTCUSDT 4H, 1000 barów świeżych danych, rój 87, próg 0.55):
+23 wejścia, 70 wet Pretorianów, kapitał **10 000 → 9 136,11 (−8,6%)**, win rate **27,3%**,
+suma PnL **−844,88 USDT**, MAE/MFE zapisane 22/22. Strata — meldowana wprost, jedna para
+i jedno okno, więc to nie jest wyrok na rój, tylko pierwsza liczba, która w ogóle istnieje.
+
+**OBIEG ZŁAPAŁ WŁASNĄ WADĘ W PIERWSZYM BIEGU.** Silnik miał 23 zamknięcia, W1 zapisała **22**:
+logowała wyłącznie ścieżka `przetworz_bar`, a `zamknij_wszystkie` i `zamknij_manualnie` — nie.
+Pozycja domykana na końcu biegu ginęła bez śladu w warstwie, która ma być źródłem prawdy
+o wynikach. Naprawione (`_log_zamkniecie` z opcjonalnym barem), zweryfikowane: **11 = 11**.
+
+**NAJWAŻNIEJSZE ODKRYCIE — druga połowa obiegu wciąż nie istnieje.** Nakarmione konsumenty:
+Igrzyska przetworzyły logi, ale **MWU zbudował 0 wag**. Powód zmierzony: W1 ma wyłącznie
+`TRADE_CLOSE`, ani jednego `SYGNAŁ` — a `pamiec_absolutna.log_sygnal` **nie ma ani jednego
+wywołania w całym kodzie**. Wiemy ILE zarobiliśmy, nie wiemy KTO głosował, więc atrybucja per
+neuron jest niemożliwa. To jest korzeń głębszy niż PL1–PL5 z audytu Consilium.
+
+**TRZECIA WADA — odsłonięta przez naprawę drugiej.** Gdy `zamknij_wszystkie` zaczęło pisać
+do W1, bramka wywaliła `FileNotFoundError` na ścieżce
+`logs/2026/07/2026-07-28_BTC/USDT:USDT_trade_close.jsonl`: symbol w notacji ccxt
+(`BTC/USDT:USDT` — tej używają adaptery giełdowe) wchodził **wprost do nazwy pliku**, więc
+ukośnik robił podkatalog, a dwukropek jest na Windows nielegalny. Wada spała, bo do W1 pisała
+dotąd jedna ścieżka i nikt nie podawał `log_dir`; **w żywym paper-tradingu wywróciłaby
+domykanie pozycji**. Sanityzacja po OBU stronach (zapis i filtr odczytu — inaczej `wczytaj`
+nie znalazłoby własnego pliku, a to gorsze niż brak sanityzacji: dane są, tylko niewidoczne).
+
+**Pliki:** `imperium/akwedukty/czytnik_csv.py`, `narzedzia/pobierz_binance.py`,
+`imperium/koloseum/paper_trading.py`, `imperium/koloseum/backtest.py`,
+`imperium/biblioteki/pamiec_absolutna.py`, `tests/test_czytnik_csv.py` (+2),
+`tests/test_paper_trading.py` (+3), `tests/test_pamiec_absolutna.py` (+2).
+
+---
+
+## 2026-07-28 | 🔨 | FABER — narzędzie zainstalowane, ale niewidoczne, kosztowało cały format
+
+**Pomiar otwarcia wachty:** `shutil.which("ebook-convert")` → `None`, `shutil.which("tesseract")`
+→ `None` — przy OBU narzędziach zainstalowanych (`C:\Calibre Portable\Calibre`,
+`C:\Program Files\Tesseract-OCR`). Potok ekstrakcji sprawdzał dokładnie `which()`, więc widział
+„brak", stosował doktrynalną *abstynencję* i zwracał pusty tekst. Pusty tekst jest
+**nieodróżnialny od „książka nie zawiera treści"** — a to znaczy, że 13 plików `.djvu`
+(w tym trzy rekordy odzyskane dzień wcześniej: BIB-128/159/189) wypadłoby z RAG bez jednego
+słowa skargi. Klasa: MILCZENIE UDAJĄCE WYNIK.
+
+**Organ FABER** (`imperium/fundament/faber.py`) robi dwie rzeczy, z których każda osobno
+byłaby za mało: (1) ZNAJDUJE — PATH, potem znane miejsca instalacji per platforma, potem
+katalogi z `IMPERIUM_NARZEDZIA_PATH` (nietypowa instalacja nie wymaga commita); (2) KRZYCZY —
+`BrakNarzedzia` zamiast `""`, a `alarmy()` podnosi czerwień **tylko gdy brak realnie kosztuje
+pliki** (0 dotkniętych = cisza, bo alarm-tapeta uczy przewijać alarmy).
+
+**Wpięcie:** `ekstraktor` woła binarki przez FABERA i przepuszcza `BrakNarzedzia` przez swój
+szeroki `except` (brak narzędzia dotyczy CAŁEGO biegu, nie jednej książki); `konwerter` liczy
+braki narzędzi ODDZIELNIE od zepsutych książek (inaczej podsumowanie mówiłoby „208 uszkodzonych
+książek" o jednej brakującej binarce); `przygotuj_biblioteke` kończy **exit 3**, gdy posiadany
+format nie ma jak wejść do RAG — dotąd w tej sytuacji drukował „GOTOWE" i exit 0.
+
+**Dowód, nie deklaracja:** BIB-161 (Madhavan, `.djvu`, dotąd bez cache) — **160 315 znaków,
+4828 unikalnych słów, 1.2 s**. Mechanizm zweryfikowany MUTACJĄ: przywrócenie cichego fallbacku
+czerwieni 2 testy (lekcja: test bez mutacji bywa atrapą).
+
+**TESSERACT WPIĘTY, NIE TYLKO ZNALEZIONY.** Samo odnalezienie binarki byłoby utratą potencjału
+(Prawo XV: „gotowy, ale niepodpięty"), więc doszła ścieżka OCR dla PDF-a **bez** warstwy
+tekstowej — **opt-in `--ocr`, domyślnie OFF** (ZASADA WPIĘCIA). Powód wyłączenia jest
+mierzalny: 1.3–5.2 s/stronę zależnie od gęstości strony, więc automat na 98 plikach `.pdf`
+zamieniłby bieg w wielogodzinny. Bez flagi skany trafiają na jawną listę **KANDYDATÓW DO OCR**
+— nic nie ginie po cichu, a Cezar decyduje, kiedy zapłacić czasem.
+
+**Dwie rzeczy złapane pomiarem, nie rozumowaniem:** (1) `len(doc)` po `doc.close()` w moim
+własnym kodzie OCR — PyMuPDF rzuca „document closed"; ujawnił to dopiero pierwszy żywy
+przebieg. (2) Szybka sonda „5 pierwszych stron bez tekstu = skan" dała **dwa fałszywe alarmy**:
+BIB-138 ma na stronie 261 pełne 1957 znaków, BIB-170 na stronie 91 — 744. Warstwy tekstowej
+brakuje tylko na stronach tytułowych. Właściwym progiem jest ekstrakcja z CAŁEGO dokumentu
+(< `MIN_ZNAKOW_CACHE`) — i tak działa wyzwalacz w kodzie.
+
+**Granica (Prawo XVI):** CENSOR SPRZĘTU = żelazo, PORTITOR = pakiety Pythona i klucze,
+FABER = binaria spoza Pythona. Żaden z dwóch pierwszych ich nie widział — stąd cicha strata.
+
+**Pliki:** `imperium/fundament/faber.py`, `narzedzia/rag/ekstraktor.py`,
+`narzedzia/rag/konwerter.py`, `narzedzia/przygotuj_biblioteke.py`, `tests/test_faber.py` (12),
+`tests/test_konwerter.py` (+3).
+
+---
+
 ## 2026-07-28 | 🔎 | RECOGNITOR poprawiony przez WŁASNE użycie: „zmergowany" ≠ „nieodwracalny"
 
 **Organ znalazł wadę w sobie pierwszego dnia życia — przy pierwszym przebiegu checklisty

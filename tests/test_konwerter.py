@@ -158,9 +158,18 @@ def test_pusta_ekstrakcja_nie_jest_cache():
     assert not kv.sciezka_cache(p).exists()
 
 
-def test_format_bez_narzedzia_zwraca_pusto_i_nie_cache():
-    """djvu bez djvutxt/calibre → '' (abstynencja), bez utrwalania braku."""
+def test_zly_plik_przy_OBECNYM_narzedziu_zwraca_pusto_i_nie_cache(monkeypatch):
+    """
+    Abstynencja należy się ZŁEMU PLIKOWI, nie brakującemu narzędziu (rozróżnienie z 2026-07-28).
+
+    Test jawnie udaje, że narzędzie JEST — wcześniej wynik zależał od tego, czy maszyna ma
+    calibre: zielony na laptopie Cezara, czerwony w chmurze. Test, którego werdykt zmienia
+    środowisko, nie broni niczego.
+    """
+    from narzedzia.rag import ekstraktor
+
     _srodowisko()
+    monkeypatch.setattr(ekstraktor, "_calibre", lambda p: "")   # narzędzie jest, plik zły
     p = Path(tempfile.mkdtemp()) / "BIB-999_Fake.djvu"
     p.write_bytes(b"AT&TFORM....niby-djvu")   # nie jest realnym djvu
     tekst = kv.ekstrahuj_z_cache(p)
@@ -176,3 +185,129 @@ def test_zapis_atomowy_bez_smieci_tmp():
     assert cache.exists() and len(cache.read_text(encoding="utf-8")) >= 1000
     assert not cache.with_suffix(".txt.tmp").exists()          # brak śmiecia tmp
     assert list(kv.CACHE_DIR.glob("*.tmp")) == []              # w ogóle brak .tmp
+
+
+# ── FABER W POTOKU: brak narzędzia jest GŁOŚNY, nie pusty (Prawo XV, 2026-07-28) ──
+
+def test_calibre_rzuca_gdy_brak_binarki(monkeypatch):
+    """
+    Sedno naprawy: dawniej `_calibre` zwracał "" na KAŻDY wyjątek, więc „nie ma calibre"
+    wyglądało identycznie jak „książka bez tekstu". Zmierzone tego dnia: which() nie widział
+    calibre'a mimo instalacji → 13 plików .djvu wypadłoby po cichu z RAG.
+    """
+    from imperium.fundament import faber
+    from narzedzia.rag import ekstraktor
+
+    monkeypatch.setattr(faber, "sciezka", lambda n, odswiez=False: None)
+    p = _plik_txt("x")
+    try:
+        ekstraktor._calibre(p)
+    except faber.BrakNarzedzia:
+        return
+    raise AssertionError("brak calibre MUSI być słyszalny, a nie zwracać pusty tekst")
+
+
+def test_ekstrahuj_nie_zjada_braku_narzedzia(monkeypatch):
+    """Szeroki `except` w `ekstrahuj` nie może uciszyć braku narzędzia (dotyczy CAŁEGO biegu)."""
+    from imperium.fundament import faber
+    from narzedzia.rag import ekstraktor
+
+    monkeypatch.setattr(faber, "sciezka", lambda n, odswiez=False: None)
+    udawany_djvu = Path(tempfile.mkdtemp()) / "BIB-900_Test.djvu"
+    udawany_djvu.write_bytes(b"AT&TFORM")
+    try:
+        ekstraktor.ekstrahuj(udawany_djvu)
+    except faber.BrakNarzedzia:
+        return
+    raise AssertionError("BrakNarzedzia musi lecieć w górę, nie kończyć się pustym stringiem")
+
+
+def test_buduj_cache_liczy_brak_narzedzia_osobno(monkeypatch):
+    """Brak binarki nie może być raportowany jako „208 uszkodzonych książek"."""
+    from imperium.fundament import faber
+
+    d = _srodowisko()
+    biblioteka = d / "biblioteka2"
+    biblioteka.mkdir(parents=True)
+    for nazwa in ("BIB-911_A.txt", "BIB-912_B.txt"):
+        (biblioteka / nazwa).write_text("A" * 500, encoding="utf-8")
+    monkeypatch.setattr(kv, "FORMATY_KSIAG", {".txt"})
+
+    def bez_narzedzia(path, *a, **kw):
+        raise faber.BrakNarzedzia("symulacja: brak ebook-convert")
+
+    monkeypatch.setattr(kv, "ekstrahuj_z_cache", bez_narzedzia)
+    wynik = kv.buduj_cache(biblioteka)          # NIE MOŻE rzucić
+    assert wynik == {"BIB-911_A.txt": 0, "BIB-912_B.txt": 0}
+
+
+# ── OCR jako opt-in OFF (ZASADA WPIĘCIA) — 5.2 s/stronę na PEDES ─────────────
+
+def _pdf_udawany() -> Path:
+    p = Path(tempfile.mkdtemp()) / "BIB-970_Skan.pdf"
+    p.write_bytes(b"%PDF-1.4 nie-prawdziwy")
+    return p
+
+
+def test_ocr_domyslnie_wylaczony(monkeypatch):
+    """Bez flagi tesseract NIE rusza: 98 plików .pdf × 5.2 s/stronę zamieniłoby bieg w godziny."""
+    from narzedzia.rag import ekstraktor
+
+    _srodowisko()
+
+    def wybuch(*a, **kw):
+        raise AssertionError("OCR ruszył mimo ocr=False — opt-in przestał być opt-in")
+
+    monkeypatch.setattr(ekstraktor, "_pdf_ocr", wybuch)
+    assert kv.ekstrahuj_z_cache(_pdf_udawany()) == ""
+
+
+def test_ocr_wlaczony_ratuje_skan(monkeypatch):
+    """Z flagą: PDF poniżej progu idzie na OCR, a odzyskany tekst trafia do cache."""
+    from narzedzia.rag import ekstraktor
+
+    _srodowisko()
+    monkeypatch.setattr(ekstraktor, "_pdf_ocr", lambda p, *a, **kw: "T" * 500)
+    p = _pdf_udawany()
+    assert kv.ekstrahuj_z_cache(p, ocr=True) == "T" * 500
+    assert kv.sciezka_cache(p).exists()          # odzyskany skan zostaje utrwalony
+
+
+def test_ocr_nie_rusza_na_progu(monkeypatch):
+    """GRANICA: dokładnie MIN_ZNAKOW_CACHE znaków to SUKCES — OCR byłby marnotrawstwem."""
+    from narzedzia.rag import ekstraktor
+
+    _srodowisko()
+    monkeypatch.setattr(ekstraktor, "ekstrahuj", lambda p: "x" * kv.MIN_ZNAKOW_CACHE)
+
+    def wybuch(*a, **kw):
+        raise AssertionError("OCR ruszył przy tekście DOKŁADNIE na progu (to nie jest porażka)")
+
+    monkeypatch.setattr(ekstraktor, "_pdf_ocr", wybuch)
+    assert len(kv.ekstrahuj_z_cache(_pdf_udawany(), ocr=True)) == kv.MIN_ZNAKOW_CACHE
+
+
+def test_ocr_rusza_ponizej_progu(monkeypatch):
+    """GRANICA: o jeden znak za mało → OCR (druga strona tego samego progu)."""
+    from narzedzia.rag import ekstraktor
+
+    _srodowisko()
+    monkeypatch.setattr(ekstraktor, "ekstrahuj", lambda p: "x" * (kv.MIN_ZNAKOW_CACHE - 1))
+    monkeypatch.setattr(ekstraktor, "_pdf_ocr", lambda p, *a, **kw: "O" * 500)
+    assert kv.ekstrahuj_z_cache(_pdf_udawany(), ocr=True) == "O" * 500
+
+
+def test_ocr_tylko_dla_pdf(monkeypatch):
+    """Skan to problem PDF-a; .epub poniżej progu ma inną przyczynę i OCR jej nie naprawi."""
+    from narzedzia.rag import ekstraktor
+
+    _srodowisko()
+    monkeypatch.setattr(ekstraktor, "ekstrahuj", lambda p: "")
+
+    def wybuch(*a, **kw):
+        raise AssertionError("OCR ruszył na formacie innym niż PDF")
+
+    monkeypatch.setattr(ekstraktor, "_pdf_ocr", wybuch)
+    epub = Path(tempfile.mkdtemp()) / "BIB-971_X.epub"
+    epub.write_bytes(b"PK")
+    assert kv.ekstrahuj_z_cache(epub, ocr=True) == ""

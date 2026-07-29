@@ -247,3 +247,64 @@ def test_igrzyska_akumuluje_po_wczytaniu():
         assert ig2.statystyki["X-03"].sygnaly == 7
     finally:
         os.unlink(sciezka)
+
+
+# ── Parowanie po trade_id: fallback tylko dla danych sprzed zmiany (recenzja 2026-07-29) ──
+
+class _LogAtrapa:
+    def __init__(self, typ, sid, tid, kier="LONG", pnl=0.0, sygnaly=None):
+        import json
+        self.log_typ, self.sesja_id, self.trade_id = typ, sid, tid
+        self.legatus_kierunek, self.pnl_pct, self.rezim = kier, pnl, "NORMAL"
+        self.sygnaly_json = json.dumps(sygnaly or [])
+
+
+def _policz_atrybucje(logi):
+    from imperium.biblioteki.igrzyska import Igrzyska
+
+    ig = Igrzyska()
+    licznik = {"n": 0}
+    oryginal = ig._przetworz_sygnaly_json
+
+    def zliczaj(sig, zyskowny_kierunek, rezim=None):
+        licznik["n"] += 1
+        return oryginal(sig, zyskowny_kierunek, rezim=rezim)
+
+    ig._przetworz_sygnaly_json = zliczaj
+    ig.przetworz_logi(logi)
+    return licznik["n"]
+
+
+def _para(i, sid="BT-BTCUSDT-4H-agregat"):
+    sig = _LogAtrapa("SYGNAŁ", sid, f"PT-{i}",
+                     sygnaly=[{"k": f"N-{i}", "d": "LONG", "p": 0.9, "w": 5}])
+    tc = _LogAtrapa("TRADE_CLOSE", sid, f"PT-{i}", pnl=1.0)
+    return sig, tc
+
+
+def test_parowanie_per_trade_bez_inflacji():
+    """3 pary = 3 atrybucje, nie 9 (parowanie po sesji dawało iloczyn kartezjański)."""
+    sygnaly, zamkniecia = zip(*(_para(i) for i in range(3)))
+    assert _policz_atrybucje(list(sygnaly) + list(zamkniecia)) == 3
+
+
+def test_stare_zamkniecia_bez_sygnalow_nie_zatruwaja_nowych():
+    """
+    REGRESJA z recenzji: `sesja_id` backtestu jest deterministyczne, więc drugi bieg do tego
+    samego katalogu W1 kładzie obok siebie stare zamknięcia (bez sygnałów) i nowe pary.
+    Fallback per-zamknięcie dawał wtedy 12 atrybucji zamiast 3 — neurony uczyły się
+    z trade'ów, w których nie głosowały.
+    """
+    sygnaly, zamkniecia = zip(*(_para(i) for i in range(3)))
+    stare = [_LogAtrapa("TRADE_CLOSE", "BT-BTCUSDT-4H-agregat", f"PT-STARE-{i}", pnl=1.0)
+             for i in range(3)]
+    assert _policz_atrybucje(list(sygnaly) + list(zamkniecia) + stare) == 3
+
+
+def test_dane_sprzed_zmiany_nadal_uczą_po_sesji():
+    """GRANICA: gdy ŻADEN sygnał nie ma trade_id (logi sprzed zmiany), stare parowanie zostaje."""
+    sid = "STARA-SESJA"
+    sygnaly = [_LogAtrapa("SYGNAŁ", sid, "", sygnaly=[{"k": "N-1", "d": "LONG", "p": 0.9, "w": 5}]),
+               _LogAtrapa("SYGNAŁ", sid, "", sygnaly=[{"k": "N-2", "d": "LONG", "p": 0.9, "w": 5}])]
+    zamkniecia = [_LogAtrapa("TRADE_CLOSE", sid, "", pnl=1.0)]
+    assert _policz_atrybucje(sygnaly + zamkniecia) == 2      # 1 zamknięcie × 2 sygnały

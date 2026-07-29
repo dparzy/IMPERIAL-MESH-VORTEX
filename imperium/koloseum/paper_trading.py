@@ -118,6 +118,11 @@ class WynikZamkniecia:
     timestamp_wejscia: int = 0
     # Reżim rynku w chwili wejścia (z Pozycji) — dla arena-logu i analizy per-reżim.
     rezim: str = "NORMAL"
+    # Interwał pozycji (z Pozycji). Potrzebny, bo zamknięcia spoza ścieżki bara nie mają
+    # `BarData`, a bez tego pola trafiały do W1 z pustym interwałem — i to systematycznie
+    # te same trade'y (ostatnie w biegu), więc analiza per interwał dostawała obciążenie
+    # nielosowe (recenzja 2026-07-29).
+    interwal: str = ""
 
 
 @dataclass
@@ -198,6 +203,7 @@ class PaperTradingEngine:
         max_otwartych: int = 3,
         max_bars_otwarcia: "int | None" = None,
         trailing: bool = False,
+        zrodlo: str = "PAPER",
     ) -> None:
         self.kapital = kapital_startowy
         self.kapital_startowy = kapital_startowy
@@ -213,6 +219,11 @@ class PaperTradingEngine:
         self.otwarte: Dict[str, OtwartaPozycja] = {}   # pozycja_id → pozycja
         self.historia_zamkniec: List[WynikZamkniecia] = []
 
+        # POCHODZENIE WPISU W1 (2026-07-29): dotąd KAŻDY log szedł jako "PAPER", więc
+        # gdyby backtest zaczął pisać do W1, jego wyniki byłyby NIEODRÓŻNIALNE od paper-live.
+        # Uczenie się na własnym backteście jak na rzeczywistości to falsyfikacja przez
+        # pomieszanie źródeł — etykieta musi jechać razem z danymi, nie obok nich.
+        self.zrodlo = zrodlo
         self._pamiec = PamiecAbsolutna(katalog=log_dir) if log_dir else None
 
     @property
@@ -330,7 +341,10 @@ class PaperTradingEngine:
     def zamknij_manualnie(self, pozycja_id: str, cena: float, powod: str = "MANUAL") -> Optional[WynikZamkniecia]:
         if pozycja_id not in self.otwarte:
             return None
-        return self._zamknij(pozycja_id, cena, powod)
+        wynik = self._zamknij(pozycja_id, cena, powod)
+        if wynik:                       # W1 musi znać KAŻDE zamknięcie, nie tylko te z bara
+            self._log_zamkniecie(wynik)
+        return wynik
 
     def zamknij_wszystkie(self, cena_ostatnia: Dict[str, float], powod: str = "MANUAL") -> List[WynikZamkniecia]:
         wyniki = []
@@ -339,6 +353,7 @@ class PaperTradingEngine:
             cena = cena_ostatnia.get(poz.symbol, poz.cena_wejscia)
             w = self._zamknij(pid, cena, powod)
             if w:
+                self._log_zamkniecie(w)  # domknięcie biegu też jest wynikiem (było gubione)
                 wyniki.append(w)
         return wyniki
 
@@ -484,19 +499,40 @@ class PaperTradingEngine:
             kapital_po=round(self.kapital, 4),
             timestamp_wejscia=poz.timestamp_wejscia,
             rezim=getattr(poz, "rezim", "NORMAL"),
+            interwal=getattr(poz, "interwal", ""),
         )
         self.historia_zamkniec.append(wynik)
         return wynik
 
-    def _log_zamkniecie(self, wynik: WynikZamkniecia, bar: BarData) -> None:
+    def zapisz_log(self, log) -> None:
+        """
+        Wpis do W1 z zewnątrz (Dyrygent loguje SYGNAŁ) — cichy no-op bez `log_dir`.
+
+        Silnik jest JEDYNYM posiadaczem uchwytu do Pamięci Absolutnej, więc to on
+        przyjmuje wpisy. Dzięki temu opt-in `log_dir` steruje CAŁYM zapisem do W1
+        z jednego miejsca — a nie każdy wołający osobno decyduje, czy pisać.
+        """
+        if self._pamiec:
+            self._pamiec.zapisz(log)
+
+    def _log_zamkniecie(self, wynik: WynikZamkniecia, bar: "Optional[BarData]" = None) -> None:
+        """
+        Wpis TRADE_CLOSE do W1. `bar` opcjonalny (naprawa 2026-07-29).
+
+        POWÓD ZMIERZONY: logowała WYŁĄCZNIE ścieżka `przetworz_bar`, a `zamknij_wszystkie`
+        i `zamknij_manualnie` — nie. Pierwszy bieg zapisujący W1 dał 23 zamknięcia w silniku
+        i **22 w pamięci**: pozycja domknięta na końcu biegu znikała bez śladu. Cicha strata
+        w warstwie, która ma być źródłem prawdy o wynikach, jest gorsza niż brak warstwy.
+        Bez bara bierzemy cenę i interwał z samego wyniku — dane są, tylko innym wejściem.
+        """
         if not self._pamiec:
             return
         log = ImperiumLog(
             log_typ=TypLogu.TRADE_CLOSE,
             sesja_id=self.sesja_id,
             symbol=wynik.symbol,
-            interwal=bar.interwal,
-            cena_close=bar.close,
+            interwal=bar.interwal if bar is not None else wynik.interwal,
+            cena_close=bar.close if bar is not None else wynik.cena_zamkniecia,
             cena_wejscia=wynik.cena_wejscia,
             pnl_usdt=wynik.pnl_usdt,
             pnl_pct=wynik.pnl_pct,
@@ -508,7 +544,7 @@ class PaperTradingEngine:
             kapital_po=wynik.kapital_po,
             prowizja_usdt=wynik.prowizja_usdt,
             trade_id=wynik.pozycja_id,
-            trade_status="PAPER",
+            trade_status=self.zrodlo,
         )
         self._pamiec.zapisz(log)
 

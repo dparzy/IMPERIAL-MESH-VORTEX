@@ -72,6 +72,7 @@ def backtest(
     wagi_ic_prog: float = 0.0,
     wagi_ic_skaluj: bool = True,
     ucz_mwu_strategii: bool = False,
+    log_dir: "Optional[str]" = None,
 ) -> PaperTradingEngine:
     """
     Przejeżdża Dyrygentem po historii. Zwraca silnik z pełną historią zamknięć.
@@ -108,9 +109,14 @@ def backtest(
                               prog_ic=wagi_ic_prog, skaluj_ic=wagi_ic_skaluj)
     budowniczy = BudowniczyWskaznikow()
     suffix = "-AUTO" if auto_rezim else ""
+    # log_dir OPT-IN (2026-07-29, domyślnie None = zero zmiany zachowania): dopiero on
+    # otwiera zapis do W1 (Pamięć Absolutna). Dotąd NIKT go nie podawał w backteście, więc
+    # katalog logów miał 0 plików — a zewnętrzny audyt czytał to jako „nic nie czyta W1".
+    # Prawda zmierzona jest odwrotna: czytelnicy są (Igrzyska, MWU, Kustosz), nie było ZAPISU.
     engine = PaperTradingEngine(kapital_startowy=kapital_startowy,
                                 sesja_id=f"BT-{symbol}-{interwal}-{tryb}{suffix}",
-                                max_bars_otwarcia=max_bars_otwarcia)
+                                max_bars_otwarcia=max_bars_otwarcia,
+                                log_dir=log_dir, zrodlo="BACKTEST")
     # auto_rezim → wstrzyknij Namiestnika (Regime-Aware Gating); inaczej tryb statyczny.
     namiestnik = get_namiestnik() if auto_rezim else None
     dyrygent = Dyrygent(legatus=legatus, kalkulator=KalkulatorLewara(),

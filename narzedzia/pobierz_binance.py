@@ -155,9 +155,23 @@ def pobierz_klines_od(symbol: str, interval: str, start_ms: int) -> list:
 
 
 def _ostatni_ts(sciezka: Path) -> int | None:
-    """Znacznik NAJNOWSZEGO bara w istniejącym pliku (format CDD: malejąco)."""
+    """
+    Znacznik NAJNOWSZEGO bara w istniejącym pliku (format CDD: malejąco), zawsze w ms.
+
+    NORMALIZACJA JEDNOSTEK przez `czytnik_csv.parsuj_znacznik` (naprawa 2026-07-29):
+    pliki CDD 1h mieszają wiersze w µs i ms (zmierzone: 672–936 wierszy na parę, okno
+    2025-02-12→03-11). Własny `int(float(...))` brał 16-cyfrowy znacznik za milisekundy,
+    dawał rok ~57000 i wywracał wydruk daty na `OSError [Errno 22]` — przez co
+    **1H nie dało się dociągnąć przez 40 dni**. Czytnik znał ten brud od 2026-06-10;
+    pobieracz nie. Teraz obaj pytają TEN SAM parser (Prawo XVI: jedno źródło prawdy).
+    """
     if not sciezka.exists():
         return None
+    try:
+        from imperium.akwedukty.czytnik_csv import parsuj_znacznik
+    except ImportError:  # pragma: no cover — uruchomienie spoza korzenia repo
+        sys.path.insert(0, str(ROOT))
+        from imperium.akwedukty.czytnik_csv import parsuj_znacznik
     try:
         with open(sciezka, encoding="utf-8", newline="") as f:
             w = list(csv.reader(f))
@@ -165,7 +179,7 @@ def _ostatni_ts(sciezka: Path) -> int | None:
         tsy = []
         for r in w[i + 1:]:
             try:
-                tsy.append(int(float(r[0])))
+                tsy.append(parsuj_znacznik(r[0]))
             except (ValueError, IndexError):
                 continue
         return max(tsy) if tsy else None
@@ -205,9 +219,22 @@ def zapisz_csv(symbol: str, klines: list, sciezka: Path) -> None:
 
 
 def _wczytaj_surowe(sciezka: Path) -> list:
-    """Istniejące świece z pliku → format klines (do scalenia z dociągniętymi)."""
+    """
+    Istniejące świece z pliku → format klines (do scalenia z dociągniętymi).
+
+    Znacznik NORMALIZOWANY do ms już TUTAJ (naprawa 2026-07-29, druga odsłona tej samej
+    wady): dalej w potoku `zapisz_csv` formatuje z niego datę, a 16-cyfrowy brud CDD
+    wywracał go na `OSError [Errno 22]`. Normalizacja u WEJŚCIA sprawia, że reszta
+    potoku widzi jedną jednostkę — łatanie każdego miejsca użycia z osobna to ta sama
+    choroba (wiedza rozsypana po parserach), której właśnie się pozbywamy.
+    """
     if not sciezka.exists():
         return []
+    try:
+        from imperium.akwedukty.czytnik_csv import parsuj_znacznik
+    except ImportError:  # pragma: no cover — uruchomienie spoza korzenia repo
+        sys.path.insert(0, str(ROOT))
+        from imperium.akwedukty.czytnik_csv import parsuj_znacznik
     with open(sciezka, encoding="utf-8", newline="") as f:
         w = list(csv.reader(f))
     try:
@@ -217,7 +244,7 @@ def _wczytaj_surowe(sciezka: Path) -> list:
     out = []
     for r in w[i + 1:]:
         try:
-            out.append([int(float(r[0])), r[3], r[4], r[5], r[6], r[7], 0, r[8], int(float(r[9]))])
+            out.append([parsuj_znacznik(r[0]), r[3], r[4], r[5], r[6], r[7], 0, r[8], int(float(r[9]))])
         except (ValueError, IndexError):
             continue
     return sorted(out, key=lambda k: k[0])

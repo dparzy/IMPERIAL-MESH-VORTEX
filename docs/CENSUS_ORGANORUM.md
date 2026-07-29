@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: narzedzia/census_organorum.py
-stan_na: 2026-07-27
+stan_na: 2026-07-29
 powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem"
 ---
 # 🏛️ CENSUS ORGANORUM — spis organów i narzędzi Imperium
@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 248** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 249** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -120,6 +120,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | Moduł | Rola (docstring modułu) |
 |-------|--------------------------|
 | `brama_kalkulatora.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
+| `faber.py` | 🔨 FABER — Kowal Imperium: odnajduje zewnętrzne narzędzia i głośno melduje ich brak |
 | `kuznia_narzedzi.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
 
 ### `imperium/koloseum/` — COLOSSEUM — walidacja, backtest, kontrfaktyki

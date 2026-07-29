@@ -113,6 +113,24 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Wysoki IC może być artefaktem autokorelacji
+IC 0.25-0.30 podejrzanie wysoki w finansach. Sugeruje łapanie komponentu współbieżnego. Konieczna kontrola na nienakładających się zwrotach.
+
+### 2026-07-27 — EXP-14 Kyle ma dekorelację i skill
+max|ρ|=0.087 (prawie ortogonalny), IC~0.30. Potwierdzona wartość predykcyjna.
+
+### 2026-07-27 — EXP-13 GARCH ma dekorelację i skill
+max|ρ|=0.141, IC~0.25-0.254. Niesie nową informację (poniżej progu 0.20) i ma IC 8-10× powyżej 0.03. Wymaga kontroli autokorelacji.
+
+### 2026-07-27 — EXP-13 GARCH i EXP-14 Kyle niosą nową informację i mają skill
+Średnie max|ρ|: GARCH 0.141, Kyle 0.087 – poniżej progu 0.20, czyli zdekorelowane. IC ~0.25-0.30 stabilny na wszystkich horyzontach. Werdykt: filar siły + skill.
+
+### 2026-07-27 — Calibre nie czyta djvu
+Calibre (ebook-convert) historycznie nie obsługuje djvu jako formatu wejściowego. Nawet po instalacji calibre potrzebny będzie osobny djvutxt.exe z djvulibre.
+
+### 2026-07-27 — Brak narzędzi do konwersji djvu
+Skrypt konwertera wymaga djvutxt (djvulibre) lub ebook-convert (calibre) dla formatu djvu. W systemie nie ma żadnego z nich – twardy blocker dla konwersji 5 ksiąg (Kissell, Aronson, Shreve I/II, Sutton-Barto).
+
 ### 2026-07-27 — Hooki ograniczone wyłącznie do SessionStart i SessionEnd
 Zweryfikowano, że nie istnieją hooki PreToolUse/PostToolUse, co eliminuje ryzyko dublowania rozkazów. Settings.json niesie tylko wskazane hooki.
 

@@ -245,10 +245,29 @@ class Igrzyska:
             sygnaly = sygnaly_po_sesji.get(sid, [])
             if not sygnaly:
                 continue
+            # PAROWANIE PO trade_id, gdy jest (2026-07-29). Parowanie po samej sesji
+            # przypisuje KAŻDE zamknięcie do WSZYSTKICH sygnałów sesji — przy 23 wejściach
+            # to 529 atrybucji zamiast 23, więc neuron dostaje nagrody i kary za trade'y,
+            # w których nie brał udziału. Mechanizm działałby, a liczby byłyby bez znaczenia.
+            # Fallback na stare zachowanie zostaje dla logów sprzed tej zmiany (bez trade_id).
+            po_trade = {getattr(s, "trade_id", ""): s for s in sygnaly
+                        if getattr(s, "trade_id", "")}
+            # FALLBACK NA POZIOMIE SESJI, NIE ZAMKNIĘCIA (naprawa z recenzji 2026-07-29).
+            # Wersja per-zamknięcie przywracała dokładnie tę wadę, którą miała usunąć:
+            # `sesja_id` backtestu jest DETERMINISTYCZNE, więc drugi bieg do tego samego
+            # katalogu W1 kładzie obok siebie stare zamknięcia (bez sygnałów — log_sygnal
+            # wtedy nie istniał) i nowe pary. Każde niedopasowane zamknięcie uczyło wtedy
+            # o WSZYSTKICH sygnałach sesji. ZMIERZONE na atrapach: 12 atrybucji zamiast 3.
+            # Stare zachowanie należy się WYŁĄCZNIE danym sprzed zmiany — czyli sesji,
+            # w której ŻADEN sygnał nie ma trade_id.
+            tryb_legacy = not po_trade
             for tc in zamkniecia:
                 pnl = getattr(tc, "pnl_pct", 0.0)
+                dopasowany = po_trade.get(getattr(tc, "trade_id", ""))
+                if not tryb_legacy and dopasowany is None:
+                    continue          # zamknięcie bez swojego sygnału — nie zgadujemy autorów
                 # kierunek wejścia bierzemy z sygnału
-                for sig in sygnaly:
+                for sig in (sygnaly if tryb_legacy else [dopasowany]):
                     kier_wejscia = getattr(sig, "legatus_kierunek", "")
                     if kier_wejscia not in ("LONG", "SHORT"):
                         continue

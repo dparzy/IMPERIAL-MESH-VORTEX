@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-29
+## Ostatnia aktualizacja: 2026-07-27
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,38 +113,32 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Mutacja przeżyła przez zbyt luźną asercję
+Test zasięgu miał próg +40, co przepuszczało zawężenie z 73 do 65 dokumentów. Luźny próg nie mierzył zasięgu, tylko wygodę. Wymieniono na równość z liczbą policzoną ze źródła – dopiero wtedy mutacja padła. Obie klasy do Księgi Wad.
+
+### 2026-07-27 — MEXC✗ – brak klucza API, największa luka systemu
+Portier wykrywa brak klucza MEXC. System nie ma dostępu do realnych danych rynkowych i nie może składać orderów. To największa luka Imperium, otwarta od dawna.
+
+### 2026-07-27 — Brudne drzewo: 6 plików, w tym konsylium z innej sesji
+Sześć plików zmodyfikowanych: artefakty hooków (normalne) plus docs/PLAN_ROZBUDOWY_BIBLIOTEKI.md z +70 liniami z sesji Consilium (Kun GUI). To obcy materiał klasy kwarantanny, nie może być skomitowany bez decyzji.
+
+### 2026-07-27 — 43 cząstki Hyginusa bez sędziego (zapłacony zwiad niewykorzystany)
+Kolejka Hyginusa zawiera 43 cząstki czekające na sąd (poprzednio 33). To zapłacony, ale niewykorzystany zwiad, co narusza Prawo XV. Priorytet najniższy (ostatnie w kolejce).
+
+### 2026-07-27 — CLAUDE.md przekracza limit 200 linii (787 linii, 51 KB)
+Plik konstytucji ma 787 linii, co znacznie przekracza doktrynalny limit 200 linii. Odchudzenie jest zaplanowanym zadaniem P0, ale wymaga decyzji Cezara ze względu na dotyk konstytucji i SIGILLARIUM.
+
+### 2026-07-26 — Brakujące reżimy w systemie narracyjnym
+Zidentyfikowano, że reżim SPOT_CASH i FUTURES nie są zdefiniowane w systemie narracyjnym (missing regime definitions). Występują tylko w sygnaturze systemu.
+
 ### 2026-07-29 — Wrażliwość interwału na wielkość liter zmienia decyzje
 Etykieta interwału (np. '4h' vs '4H') jest case-sensitive w Legatus._formacja_interwalu - cicho zmienia wyniki backtestu. Przyczyna: słownik mapujący interwały. Naprawiono przez dodanie aliasów i normalizację.
-
-### 2026-07-27 — Wysoki IC może być artefaktem autokorelacji
-IC 0.25-0.30 podejrzanie wysoki w finansach. Sugeruje łapanie komponentu współbieżnego. Konieczna kontrola na nienakładających się zwrotach.
-
-### 2026-07-27 — EXP-14 Kyle ma dekorelację i skill
-max|ρ|=0.087 (prawie ortogonalny), IC~0.30. Potwierdzona wartość predykcyjna.
-
-### 2026-07-27 — EXP-13 GARCH ma dekorelację i skill
-max|ρ|=0.141, IC~0.25-0.254. Niesie nową informację (poniżej progu 0.20) i ma IC 8-10× powyżej 0.03. Wymaga kontroli autokorelacji.
-
-### 2026-07-27 — EXP-13 GARCH i EXP-14 Kyle niosą nową informację i mają skill
-Średnie max|ρ|: GARCH 0.141, Kyle 0.087 – poniżej progu 0.20, czyli zdekorelowane. IC ~0.25-0.30 stabilny na wszystkich horyzontach. Werdykt: filar siły + skill.
-
-### 2026-07-27 — Calibre nie czyta djvu
-Calibre (ebook-convert) historycznie nie obsługuje djvu jako formatu wejściowego. Nawet po instalacji calibre potrzebny będzie osobny djvutxt.exe z djvulibre.
-
-### 2026-07-27 — Brak narzędzi do konwersji djvu
-Skrypt konwertera wymaga djvutxt (djvulibre) lub ebook-convert (calibre) dla formatu djvu. W systemie nie ma żadnego z nich – twardy blocker dla konwersji 5 ksiąg (Kissell, Aronson, Shreve I/II, Sutton-Barto).
-
-### 2026-07-27 — Hooki ograniczone wyłącznie do SessionStart i SessionEnd
-Zweryfikowano, że nie istnieją hooki PreToolUse/PostToolUse, co eliminuje ryzyko dublowania rozkazów. Settings.json niesie tylko wskazane hooki.
 
 ### 2026-07-27 — System w harmonii – testy 2987/2987 zielone, audyt Prawa XXI exit 0
 Pełna pochwała: wszystkie testy przechodzą, 22 warstwy czystości kodu, ruff bez błędów. Spójność Klucznika potwierdzona.
 
 ### 2026-07-27 — Backtest liniowy O(n·okno), nie O(n²)
 Pomiar cProfile wykazał stały ~66 ms/tick dla okna 251 barów. Skalowanie liniowe, nie kwadratowe. Poprzednia diagnoza o O(n²) była błędna.
-
-### 2026-07-27 — prekalkuluj_portfel nie poprawia złożoności algorytmicznej
-prekalkuluj_portfel robi tę samą pracę per-bar (zbuduj na oknie), tylko równolegle per-symbol. Mimo cache daje zysk marne 1.4×, nie zmienia O(n·okno).
 
 ### 2026-07-27 — Prawdziwy sprawca kwadratu: _py_hma (pętla w pętli wma)
 Wewnętrzna pętla w _py_hma wywołuje wma wielokrotnie (4,5 mln wywołań na 2700 ticków), dając O(period²) dla tego jednego wskaźnika. Reszta backtestu jest liniowa.
@@ -226,9 +220,6 @@ Znak '_' jest traktowany jako słowny przez \b, co powodowało fałszywe dopasow
 
 ### 2026-07-21 — Model cytuje nazwiskiem autora, nie identyfikatorem BIB
 Probator zgłaszał fałszywy alarm BEZ_CYTATU gdy model użył nazwiska (np. Hull) zamiast ID. Poprawiono test, nie organ – to realne użycie, a nie błąd weryfikacji.
-
-### 2026-07-20 — Testy wzrosły o dokładnie 7 — potwierdzenie biegnięcia
-Po dodaniu 7 testów granicznych licznik wzrósł z 2620 do 2627. To dowód, że testy naprawdę biegły (nie zostały cicho pominięte jak w poprzedniej sesji). Lekcja o zwykłych def test_* zamiast unittest.TestCase wdrożona.
 
 ### 2026-07-20 — Pieczątka audytu input_len kłamała — łamanie Prawa XIII
 Log pokazał input_len=100, gdy wynik policzono z 80 barów (ciche obcięcie zip). Narusza Prawo XIII (audytowalność) i Prawo I. Zapisano NOTĘ w LEX TALIONIS, CORONA spłacona: strażnik + uodpornienie klasy z wpisem do Księgi Wad.

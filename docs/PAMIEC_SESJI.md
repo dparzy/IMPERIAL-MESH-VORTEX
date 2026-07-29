@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-27
+## Ostatnia aktualizacja: 2026-07-29
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -112,6 +112,9 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 ---
 
 ## 📚 LEKCJE Z SESJI
+
+### 2026-07-29 — Wrażliwość interwału na wielkość liter zmienia decyzje
+Etykieta interwału (np. '4h' vs '4H') jest case-sensitive w Legatus._formacja_interwalu - cicho zmienia wyniki backtestu. Przyczyna: słownik mapujący interwały. Naprawiono przez dodanie aliasów i normalizację.
 
 ### 2026-07-27 — Wysoki IC może być artefaktem autokorelacji
 IC 0.25-0.30 podejrzanie wysoki w finansach. Sugeruje łapanie komponentu współbieżnego. Konieczna kontrola na nienakładających się zwrotach.

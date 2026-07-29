@@ -141,15 +141,15 @@ def _bib(zrodlo: str) -> str:
 
 
 def _fts_or(zapytanie: str) -> str:
-    """Składnia OR — ta, której używa HYGINUS (`bibliotekarz._fts_bezpieczne`).
+    """Składnia OR — DELEGUJE do `szukaj.sanityzuj_fts` (naprawa u źródła 2026-07-30).
 
-    Domyślny MATCH FTS5 łączy słowa niejawnym AND: długie pytanie opisowe wymaga
-    WSZYSTKICH słów w jednym fragmencie i zwykle nie zwraca nic. Mierzymy obie
-    składnie, bo to realna różnica między ścieżką MCP a ścieżką Bibliotekarza —
-    i nikt jej dotąd nie porównał.
+    Ta funkcja była TRZECIĄ kopią tej samej logiki (obok `bibliotekarz._fts_bezpieczne`
+    i braku w `mcp_server`). Pomiar z pierwszego biegu pokazał, ile kosztowało
+    rozproszenie: ścieżka bez sanityzacji miała recall@5 16,7% zamiast 66,7%.
+    Zostaje jako nazwa, implementacja jest już w jednym miejscu.
     """
-    slowa = _RE_SLOWO.findall(zapytanie or "")
-    return " OR ".join(slowa) if slowa else zapytanie
+    from szukaj import sanityzuj_fts  # type: ignore[import]
+    return sanityzuj_fts(zapytanie, "or")
 
 
 def zaindeksowane(baza: Path = DOMYSLNA_BAZA) -> set[str]:
@@ -191,10 +191,14 @@ def ocen(tryb: str = "fts", topk: int = 10, skladnia: str = "and",
         if not osiagalne:
             pominiete.append({**c, "powod": "żaden cel nie jest zaindeksowany"})
             continue
-        q = _fts_or(c["pytanie"]) if skladnia == "or" else c["pytanie"]
         t0 = time.perf_counter()
         try:
-            wyniki = szukaj(q, topk=topk, tryb=tryb, baza=baza, cichy=True)
+            # Składnię przekazujemy DO `szukaj` (jedno źródło prawdy) zamiast budować
+            # zapytanie tutaj — inaczej organ mierzyłby własną kopię logiki, a nie tę,
+            # której faktycznie używa produkcja. `and` mierzy surowy MATCH — czyli stan
+            # ścieżki MCP przed naprawą — i dlatego zostaje jako ramię porównania.
+            wyniki = szukaj(c["pytanie"], topk=topk, tryb=tryb, baza=baza, cichy=True,
+                            skladnia=("or" if skladnia == "or" else "surowa"))
         except sqlite3.OperationalError as e:
             # Składnia AND na pytaniu z myślnikiem potrafi wywalić MATCH — to WYNIK
             # (tak zachowa się produkcja), nie powód do przerwania pomiaru. ALE musi być

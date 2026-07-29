@@ -89,7 +89,7 @@ def _ocen_na_atrapie(monkeypatch, trafienia: list[int | None], topk: int) -> dic
     )
     kolejka = list(trafienia)
 
-    def fake_szukaj(q, topk, tryb, baza, cichy):
+    def fake_szukaj(q, topk, tryb, baza, cichy, skladnia="or"):
         poz = kolejka.pop(0)
         wyniki = [_W(f"BIB-{900 + j}__x.epub") for j in range(topk)]
         if poz is not None and poz <= topk:
@@ -149,7 +149,7 @@ def test_blad_fts_jest_LICZONY_i_widoczny_w_raporcie(monkeypatch):
     zbior = ({"id": "P0", "klasa": "doslowna", "pytanie": "a-b",
               "zrodla_ok": ("BIB-001",)},)
 
-    def wybuchowy(q, topk, tryb, baza, cichy):
+    def wybuchowy(q, topk, tryb, baza, cichy, skladnia="or"):
         raise sqlite3.OperationalError('fts5: syntax error near "-"')
 
     import szukaj as modul_szukaj

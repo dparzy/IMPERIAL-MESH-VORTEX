@@ -14,6 +14,81 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-30 | 🔎 | PIERWSZY POMIAR TRAFNOŚCI RAG — moja ścieżka była 4× gorsza od Hyginusowej
+
+**QUAESITOR uruchomiony PIERWSZY RAZ w historii Imperium** (organ leżał gotowy od sesji
+zabitej reinstalacją). 30 pytań known-item, 118 książek, 37 331 fragmentów.
+
+### Wynik, który jest alarmem
+
+| Składnia | recall@1 | recall@5 | recall@10 | MRR |
+|---|---|---|---|---|
+| **AND** — surowy MATCH, ścieżka **MCP** (moja) | 16,7% | **16,7%** | 20,0% | 0,172 |
+| **OR** — ścieżka HYGINUSA | 46,7% | **66,7%** | 83,3% | 0,564 |
+
+Na pytaniach **OPISOWYCH** (opisują pojęcie, nie nazywają go) surowy AND dał **0,0% na 15** —
+zero, nie „mało". Domyślny MATCH FTS5 łączy słowa niejawnym AND, więc długie pytanie wymaga
+WSZYSTKICH słów w jednym fragmencie.
+
+### 🚨 Przyczyna: sanityzacja w TRZECH kopiach i dziura w czwartym miejscu
+
+`bibliotekarz._fts_bezpieczne` (stosowana) · `quaesitor._fts_or` (kopia) · **`mcp_server` — BRAK**.
+Każdy wołający składał zapytanie u siebie, więc jeden został pominięty — ta sama klasa, którą
+naprawialiśmy przy `normalizuj_interwal`. **Za każdym razem, gdy Architekt czytał bibliotekę
+przez MCP, używał gorszej z dwóch dostępnych ścieżek.**
+
+### Naprawa U ŹRÓDŁA + ulepszenie z pomiaru
+
+`szukaj.sanityzuj_fts` jako **jedyne źródło prawdy**, parametr `skladnia` (`or` domyślnie /
+`and` / `surowa`); kopie u wołających **delegują**, wywołania przestały składać zapytanie
+samodzielnie (podwójne złożenie dałoby „a OR OR OR b").
+
+Przy okazji zmierzony i wdrożony **odsiew słów pustych** — bo `how`, `to`, `the`, `me`
+występują w każdym fragmencie i rozcieńczają ranking BM25:
+
+| Wariant | RAZEM @5 | OPISOWE @5 | czas |
+|---|---|---|---|
+| OR ze słowami pustymi | 66,7% | 33,3% | 323 ms |
+| **OR bez słów pustych (wdrożone)** | **80,0%** | **60,0%** | **143 ms** |
+
+**+26,7 pp na pytaniach opisowych i 2,3× szybciej.** Uczciwie: na @10 wariant bez słów
+pustych wypadł o 3,3 pp gorzej (jedno pytanie z trzydziestu) — przy tej próbce szum.
+Rozstrzyga @5, bo tyle bierze `mcp_server`.
+
+**Efekt na żywym zapytaniu opisowym:** 0 → 5 trafień.
+
+### Co ten bieg jeszcze rozstrzygnął
+
+- **Luka słownikowa +40,0 pp** (dosłowne 100% vs opisowe 60% @5) — to ZMIERZONY sufit zysku
+  z wektorów i jest duży. Przypuszczenie „wektory kupią mało" upadło.
+- **Naprawa z recenzji zadziałała na żywym biegu:** jedno zapytanie wysypało się składniowo
+  (`D02: no such column: labeling`) i **zostało zaraportowane osobno**. Przed naprawą
+  policzyłoby się cicho jako brak trafienia.
+- **Próba jest za mała, by to zamknąć** (15 pytań na klasę) → pozycja **A10** (zbiór
+  z indeksów książek, 13 729 haseł) staje się ważniejsza, nie mniej ważna.
+
+**K10 nadal NIEZNANE:** ten bieg to linia bazowa na STARYM chunkerze. K10 wymaga tej samej
+miary na indeksie zbudowanym REDDITOREM.
+
+**Testy:** 3199 → 3218 (+19, w tym regresja pilnująca, że ścieżka MCP nie wróci do surowego
+MATCH-u, oraz granice `--topk`).
+
+**Dwie rzeczy dorzucone z pętli CENSORA:** skan wad wskazał `--topk` z gołym `type=int`
+(przyjmował `0`, czyli zapytanie zwracające nic BEZ wyjaśnienia, a przy filtrze katalogowym
+`szukaj` nadpobiera ×20, więc duże topk robiło pełny skan korpusu) → walidacja 1..100
+z testem granicy. Oraz `--skladnia` **wystawiona w CLI** — parametr istniał w `szukaj()`
+i był niedostępny z terminala, czyli zdolność zapłacona i niepodpięta (Prawo XV).
+
+**Dowód na żywym zapytaniu:** `szukaj.py "adverse selection informed traders" --topk 3 --tryb fts`
+zwraca **Harrisa, rozdz. 13.7.2 „Adverse Selection Risk"**. To samo pytanie przez MCP
+dawało wcześniej ZERO trafień.
+
+**Pliki:** `narzedzia/rag/szukaj.py`, `quaesitor.py`, `narzedzia/bibliotekarz.py`,
+`narzedzia/ab_plon_hyginusa.py`, `tests/test_sanityzacja_fts.py` (nowy),
+`tests/test_quaesitor.py`, `tests/test_bibliotekarz.py`, `docs/ROADMAP_IMPERIUM.md` (A10–A13)
+
+---
+
 ## 2026-07-30 | 🔍 | RECENZJA WŁASNEJ WACHTY: 7 wad naprawionych, 1 ZNALEZISKO OBALONE
 
 **`/code-review` na diffie wachty apert29 — 8 zgłoszonych, 7 realnych, 1 własne BŁĘDNE.**

@@ -118,7 +118,15 @@ def test_rozwin_zapytanie_sanityzuje_i_fallback():
 
 
 def test_scout_rozwin_uzywa_rozszerzonego_zapytania(monkeypatch):
-    # U2: gdy rozwin=True i jest glos — RAG idzie na ROZSZERZONYM (sanityzowanym) zapytaniu, nie surowym.
+    """U2: gdy rozwin=True i jest glos — RAG idzie na ROZSZERZONYM zapytaniu, nie surowym.
+
+    KONTRAKT ZMIENIONY 2026-07-30 (naprawa u źródła): sanityzacja do składni FTS
+    NIE jest już robiona przez wołającego, tylko wewnątrz `szukaj`. Wcześniej każdy
+    wołający składał OR u siebie — i `mcp_server` został pominięty, płacąc za to
+    recallem 16,7% zamiast 80,0% (QUAESITOR, 30 pytań). Dlatego tutaj sprawdzamy,
+    że do `szukaj` idzie ROZSZERZONE, ale JESZCZE NIE złożone zapytanie; podwójne
+    złożenie dałoby „a OR OR OR b", czyli błąd składni FTS.
+    """
     import szukaj as szukaj_mod
     zebrane = {}
 
@@ -128,8 +136,9 @@ def test_scout_rozwin_uzywa_rozszerzonego_zapytania(monkeypatch):
 
     monkeypatch.setattr(szukaj_mod, "szukaj", fake_szukaj)
     cz = scout_temat(_FakeGlos(odp="momentum breakout volatility"), "momentum", topk=3, rozwin=True)
-    assert cz["zapytanie"] == "momentum breakout volatility"      # rozszerzone zachowane w rekordzie
-    assert zebrane["q"] == "momentum OR breakout OR volatility"   # do FTS poszło sanityzowane OR
+    assert cz["zapytanie"] == "momentum breakout volatility"   # rozszerzone zachowane w rekordzie
+    assert zebrane["q"] == "momentum breakout volatility"      # surowe — OR składa `szukaj`
+    assert "OR" not in zebrane["q"], "wołający znów sanityzuje — grozi podwójne złożenie"
 
 
 def test_krytyka_kandydatow_fallback_na_blad():

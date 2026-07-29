@@ -32,11 +32,15 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 | A2 | **REDDITOR** — fragmentacja z dowodem SHA-256 | ✅ 18 testów, 118/118 bajt-w-bajt | struktura 1 479 710 linii → **zachowana** (było 0) |
 | A3 | **NORMA** — węgielnica 10 kryteriów | ✅ 12 testów, 9/10 zielonych | K10 celowo NIEZNANE — blokuje słowo „najlepsza" |
 | A4 | **QUAESITOR — pierwszy bieg, domknięcie K10** | 🟡 kod jest, **nigdy nie uruchomiony** | **jedyne**, co rozstrzyga, czy REDDITOR jest lepszy, a nie tylko wierniejszy |
-| A5 | **OCR na BIB-007 (AFML)** — 93 listingi kodu jako obrazy | 🔴 | najbardziej wykonalna treść w najważniejszej książce ilościowej; ~30–40 min przy 5,2 s/stronę |
+| A5 | **OCR na BIB-007 (AFML)** — 93 listingi kodu jako obrazy | ⏸️ WARUNKOWE (po A11) | najbardziej wykonalna treść w najważniejszej książce ilościowej; ~30–40 min przy 5,2 s/stronę |
 | A6 | **Przepięcie indeksu na REDDITORA** + reindeksacja | 🔴 | **dopiero po zielonym K10** (ZASADA WPIĘCIA: opt-in, po dowodzie) |
 | A7 | **91 książek poza indeksem** → ekstrakcja → cache → indeks | 🔴 | rozkaz Cezara, pozycja 2 w jego kolejności |
 | A8 | **R2 — fuzja RRF** zamiast sortowania po mieszanych skalach | 🔴 | mina latentna w Księdze Wad; wybuchnie w dniu włączenia wektorów |
 | A9 | **R3 — 3 gotowe książki + korpus `docs` (305 plików)** | 🔴 | dwa polecenia, zero ryzyka |
+| A10 | **Zbiór ewaluacyjny z INDEKSÓW książek** — 13 729 haseł wyliczonych przez samych autorów | 🔴 | zmierzone: zbiór QUAESITORA to 30 pytań = **0,22%** zawołań zadeklarowanych w indeksach (42/118 książek ma użyteczny indeks, ~326 haseł na książkę). K10 na takiej próbce jest liczbą bez mocy. Prawda podstawowa **napisana przez autora**: zero tokenów, zero halucynacji |
+| A11 | **Podmiana BIB-007 (AFML)** na wydanie z TEKSTOWYM kodem | 🔴 Cezar podmienia | 93/94 listingi to obrazy + wstrzyknięte stopki watermarku w indeksie. Próg przyjęcia: `listingi_z_kodem` > 1/94 (mierzy AESTIMATOR). **Udana podmiana usuwa A5 z planu** — OCR kodu jest podstępny (`l`/`1`, `O`/`0` cicho zmieniają znaczenie) |
+| A12 | **Podmiana BIB-011 (Chan)** na wydanie angielskie | 🔴 Cezar podmienia | **85,6% znaków to CJK** — chińskie tłumaczenie. Nie uszkodzone, lecz NIEOSIĄGALNE naszymi zapytaniami: 152 tys. znaków martwego balastu w indeksie. Jedyna taka pozycja na 118 (przeskanowano cały korpus) |
+| A13 | **AESTIMATOR: kryterium JĘZYKA** (siódmy wymiar) | 🔴 | luka odsłonięta pytaniem Cezara: BIB-011 przeszedł jako „OKROJONA", choć strata użyteczności wynosi 100%. Przyrząd mierzy sześć wymiarów i nie mierzy tego, w jakim języku jest tekst. ~20 linii + test granicy |
 
 ### 🐎 ZWIAD ZEWNĘTRZNY (GitHub, 2026-07-29) — znaleziska wg WAGI
 

@@ -113,29 +113,23 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-27 — Mutacja przeżyła przez zbyt luźną asercję
-Test zasięgu miał próg +40, co przepuszczało zawężenie z 73 do 65 dokumentów. Luźny próg nie mierzył zasięgu, tylko wygodę. Wymieniono na równość z liczbą policzoną ze źródła – dopiero wtedy mutacja padła. Obie klasy do Księgi Wad.
+### 2026-07-27 — Brak __main__ w petla_live.py – bug live
+W petla_live.py brakowało bloku __main__, co blokowało pętlę live przy rutynowym teście. Wykryte dzięki eskalacji przy anomalii.
 
-### 2026-07-27 — MEXC✗ – brak klucza API, największa luka systemu
-Portier wykrywa brak klucza MEXC. System nie ma dostępu do realnych danych rynkowych i nie może składać orderów. To największa luka Imperium, otwarta od dawna.
+### 2026-07-27 — Bug FTS na myślnikach – ciche ginięcie tematów
+W FTS bibliotekarza bug crash na myślnikach powodował ciche giniecie tematów (np. 'momentum trend-following'). Naprawiony przez _fts_bezpieczne.
 
-### 2026-07-27 — Brudne drzewo: 6 plików, w tym konsylium z innej sesji
-Sześć plików zmodyfikowanych: artefakty hooków (normalne) plus docs/PLAN_ROZBUDOWY_BIBLIOTEKI.md z +70 liniami z sesji Consilium (Kun GUI). To obcy materiał klasy kwarantanny, nie może być skomitowany bez decyzji.
+### 2026-07-27 — PAMIEC_ABSOLUTNA.md kłamie o API
+Dokument deklaruje nieistniejące metody kronikarz.zapytaj, porownaj_okresy, replay_sesji — kod ma tylko zapisz(RunReport). Lekcja: każda deklaracja API w dokumencie musi być zweryfikowana z kodem.
 
 ### 2026-07-27 — 43 cząstki Hyginusa bez sędziego (zapłacony zwiad niewykorzystany)
 Kolejka Hyginusa zawiera 43 cząstki czekające na sąd (poprzednio 33). To zapłacony, ale niewykorzystany zwiad, co narusza Prawo XV. Priorytet najniższy (ostatnie w kolejce).
-
-### 2026-07-27 — CLAUDE.md przekracza limit 200 linii (787 linii, 51 KB)
-Plik konstytucji ma 787 linii, co znacznie przekracza doktrynalny limit 200 linii. Odchudzenie jest zaplanowanym zadaniem P0, ale wymaga decyzji Cezara ze względu na dotyk konstytucji i SIGILLARIUM.
 
 ### 2026-07-26 — Brakujące reżimy w systemie narracyjnym
 Zidentyfikowano, że reżim SPOT_CASH i FUTURES nie są zdefiniowane w systemie narracyjnym (missing regime definitions). Występują tylko w sygnaturze systemu.
 
 ### 2026-07-29 — Wrażliwość interwału na wielkość liter zmienia decyzje
 Etykieta interwału (np. '4h' vs '4H') jest case-sensitive w Legatus._formacja_interwalu - cicho zmienia wyniki backtestu. Przyczyna: słownik mapujący interwały. Naprawiono przez dodanie aliasów i normalizację.
-
-### 2026-07-27 — System w harmonii – testy 2987/2987 zielone, audyt Prawa XXI exit 0
-Pełna pochwała: wszystkie testy przechodzą, 22 warstwy czystości kodu, ruff bez błędów. Spójność Klucznika potwierdzona.
 
 ### 2026-07-27 — Backtest liniowy O(n·okno), nie O(n²)
 Pomiar cProfile wykazał stały ~66 ms/tick dla okna 251 barów. Skalowanie liniowe, nie kwadratowe. Poprzednia diagnoza o O(n²) była błędna.
@@ -146,14 +140,8 @@ Wewnętrzna pętla w _py_hma wywołuje wma wielokrotnie (4,5 mln wywołań na 27
 ### 2026-07-27 — dodaj_checklist nie zapisuje na dysk
 dodaj_checklist() zwraca True i inkrementuje licznik w pamięci, ale nie wywołuje zapisz() – wpis nie trafia na dysk. Naprawiono przez dodanie zapisu.
 
-### 2026-07-27 — Niezgodność testów: pytest vs runner Imperium
-Testy zielone pod pytest, ale padły pod runnerem Imperium z powodu braku setitem w shim monkeypatch. Naprawiono bez zależności od shimu.
-
 ### 2026-07-27 — Błąd w ocenie czasu gnicia – 9 dni zamiast pół roku
 W LOG_ZMIAN i pamięci napisano 'pół roku', a faktyczny czas od utworzenia runbooka wynosił 9 dni. Błąd wykryty przy liczeniu dla podglądu Kapitolu – poprawiono we wszystkich miejscach.
-
-### 2026-07-27 — Asymetria testów: pytest vs runner Imperium
-Test przeszedł pod pytest, ale padł pod własnym runnerem Imperium przez brak `monkeypatch.setitem` w shimie. Wykryto rozjazd narzędzi – naprawiono przez uniezależnienie od shimu.
 
 ### 2026-07-27 — Bieg testów #1 nieważny – równoległość z mutacjami
 Testy startowały przed zmianą W22 i biegły w tle podczas sed-owania mutacji. Wynik '55 z 73' i exit 0 od tail, nie od testów. Ważny tylko bieg #2 wystartowany po wszystkich zapisach.
@@ -202,9 +190,6 @@ Rodziny NEWS-*, PSY-*, RADAR-*, OC-06/07/08, C-01, V-03, Z-06/Z-07 nie mają jes
 
 ### 2026-07-21 — Archium lekcji ma inny nagłówek – szukaj() nie widzi schłodzonych
 Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł szukaj() używa własnego parsera, który go nie rozpoznaje. Luka w wyszukiwalności pamięci – wymaga ujednolicenia parsera lub wzbogacenia searcha.
-
-### 2026-07-20 — Normalny churn pamięci w plikach dokumentacji
-Dwa pliki (wizje_i_decyzje.jsonl, PAMIEC_SESJI.md) zostały zmienione przez hook startowy – to standardowe odświeżanie pamięci sesji, nie zmiana kodu.
 
 ### 2026-07-21 — Podkreślnik jako znak słowny w regexie BIB
 Użycie \b w regexie dla identyfikatorów BIB nie zamyka się na podkreślniku (jest znakiem słownym). Testy złapały błąd - naprawiono wzorzec.

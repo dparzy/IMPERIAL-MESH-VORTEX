@@ -113,6 +113,9 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Zastosowane zasady projektowe: SYMBIOZA, Prawo XVI, Test-Granic
+Wdrożenie respektowało ZASADĘ SYMBIOZY (zmiana nie izolowana), Prawo XVI (jedno źródło prawdy dla wag IC), Regułę Test-Granic (testowanie co może pójść źle).
+
 ### 2026-07-27 — Bug: tryb sign-only daje pełną wagę niezmierzonym neuronom mimo IC=0
 W legatus.py:515 w trybie sign-only neurony z domyślnym IC=0 nie są wyciszane – otrzymują pełną wagę bazową, co wypacza decyzję.
 
@@ -127,9 +130,6 @@ Cubic PR#119 P1: cache djvu zbudowany wcześniej nie jest używany przez indekso
 
 ### 2026-07-30 — Kod QUAESITORA przetrwał reinstalację, ale bez testów i poza gitem
 330 linii, CLI działa, ale brak testów i nieśledzony. Formalnie organ nie istnieje (Prawo XIX). Wymaga domknięcia testami i commitem.
-
-### 2026-07-26 — Czyszczenie historii
-Sesja została wyczyszczona przed analizą, brak danych do ekstrakcji.
 
 ### 2026-07-27 — 14,9 mln barów 1m nieużytych od 2022
 Czytnik odbiera 14,9 mln świec 1-minutowych, ale dane kończą się 2022-07-27 – backtest działa, live nie używa tych danych.
@@ -346,9 +346,6 @@ Przetestowano 3 scenariusze rynkowe — system wymaga automatycznego klasyfikato
 
 ### 2026-06-30 — Audyt W6: brak Stan na = błąd, markdown tolerowany
 Dodano else dla braku 'Stan na:'. Regex toleruje **Stan na:** data.
-
-### 2026-06-30 — Dynamiczna dźwignia od pewności i reżimu
-pewnosc <0.55→0x, <0.65→2x, <0.75→5x, <0.85→10x, <0.92→15x, >=0.92→20x. Mnożniki reżimu: VOLATILE×0.5, PANIC×0.1, RANGING×0.7, TREND_STRONG×1.2.
 
 ### 2026-06-30 — Klucznik ignorowany przez Dyrygenta (Prawo XV)
 Dyrygent nie używał wyników Klucznika (strategii) — kierunek i pewność pochodziły wyłącznie z neuronów. Naprawiono: dodano logikę trybów (agregat/filtr/strategia) uwzględniającą DopasowanieStrategii.

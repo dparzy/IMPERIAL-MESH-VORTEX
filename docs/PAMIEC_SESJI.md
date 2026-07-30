@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-30
+## Ostatnia aktualizacja: 2026-07-27
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,6 +113,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Bug: tryb sign-only daje pełną wagę niezmierzonym neuronom mimo IC=0
+W legatus.py:515 w trybie sign-only neurony z domyślnym IC=0 nie są wyciszane – otrzymują pełną wagę bazową, co wypacza decyzję.
+
+### 2026-07-27 — 43 cząstki Hyginusa bez sędziego
+Największa czynna utrata potencjału – zapłacony zwiad leży odłogiem. Priorytet P0 na następne wachty.
+
+### 2026-07-27 — Kolizja plików scratcha przy równoległej konwersji
+Cubic PR#119 P1: ekstraktor.py nadpisuje plik .calibre-tmp.txt z fixu edc657f – kasowanie istniejącego pliku biblioteki przy równoległej konwersji.
+
+### 2026-07-27 — Cache djvu niepodpięty do RAG
+Cubic PR#119 P1: cache djvu zbudowany wcześniej nie jest używany przez indeksowanie RAG – chmura dalej woła djvutxt/calibre i gubi djvu. Prawo XV – utrata potencjału.
+
 ### 2026-07-30 — Kod QUAESITORA przetrwał reinstalację, ale bez testów i poza gitem
 330 linii, CLI działa, ale brak testów i nieśledzony. Formalnie organ nie istnieje (Prawo XIX). Wymaga domknięcia testami i commitem.
 
@@ -152,9 +164,6 @@ Pomiar cProfile wykazał stały ~66 ms/tick dla okna 251 barów. Skalowanie lini
 ### 2026-07-27 — Prawdziwy sprawca kwadratu: _py_hma (pętla w pętli wma)
 Wewnętrzna pętla w _py_hma wywołuje wma wielokrotnie (4,5 mln wywołań na 2700 ticków), dając O(period²) dla tego jednego wskaźnika. Reszta backtestu jest liniowa.
 
-### 2026-07-27 — dodaj_checklist nie zapisuje na dysk
-dodaj_checklist() zwraca True i inkrementuje licznik w pamięci, ale nie wywołuje zapisz() – wpis nie trafia na dysk. Naprawiono przez dodanie zapisu.
-
 ### 2026-07-27 — Błąd w ocenie czasu gnicia – 9 dni zamiast pół roku
 W LOG_ZMIAN i pamięci napisano 'pół roku', a faktyczny czas od utworzenia runbooka wynosił 9 dni. Błąd wykryty przy liczeniu dla podglądu Kapitolu – poprawiono we wszystkich miejscach.
 
@@ -169,9 +178,6 @@ Linie z absolutnymi ścieżkami desktopu (~\Desktop\) ujawniają PII i struktur�
 
 ### 2026-07-26 — Regime-stale bug: pamięć branżowa ślepa na reżim rynku
 Wszystkie istniejące systemy pamięci (Mem0/Zep/Letta/A-Mem) są domenowo-ślepe – wydobywają lekcje z bull marketu podczas bessy. Nasza poprawka: × regime_match w scoringu.
-
-### 2026-07-26 — Rozjazd repo z chmurą przez hooki po obu stronach
-Od wspólnego punktu e2cb846 chmura dorobiła 2 commity (sync+migawka), lokalnie 2 (auto: sync pamięci). Hooki commitują same po obu stronach – dwa ciągi wyrosły z tego samego pnia.
 
 ### 2026-07-20 — Błąd replikacji wiedzy – Claude sam nie stosuje własnych procedur
 W poprzednich sesjach wielokrotnie brakowało aktualizacji dokumentów i ledgera, mimo że Claude tworzył procedury (np. ALMA, OBSERWATORY). To klasyczny błąd replikacji wiedzy – Claude tworzy narzędzia, ale sam ich nie używa.
@@ -241,9 +247,6 @@ W sesji 56ea4ea2 zakończono implementację U1 (korpus biblioteki anty-echo), U2
 
 ### 2026-07-20 — Bug w audycie przeoczony przez martwy wzorzec
 Linia 259 audytu zawierała jedyny subprocess.run bez encoding – trzy pozostałe naprawiono w 2026-07-17, ale tę przeoczono, bo wzorzec 'kodowanie' leżał martwy w checkliście.
-
-### 2026-07-21 — Niespójność licznika memory a rzeczywista liczba wpisów na dysku
-Metoda dodaj_checklist() zwiększała licznik w pamięci (52), ale wpis nie zapisywał się do pliku (zostało 51). Zapisz() jest osobną metodą, co powoduje cichą utratę danych. Naprawiono przez jawne wywołanie zapisz() po dodaniu.
 
 ### 2026-07-21 — Błędny wpis o czasie gnicia runbooka – 9 dni zamiast 'pół roku'
 W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokładnie: 9 dni. Sprostowano u źródła (ledgery, pamięć).

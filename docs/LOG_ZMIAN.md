@@ -14,6 +14,54 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-31 | 🔒 | Hook `Stop` — EXACTOR sprawdza meldunek BEZ UDZIAŁU MOJEJ PAMIĘCI
+
+Decyzja Cezara: *„hook stop jeżeli rekomendujesz"*. Zarekomendowałem — z zastrzeżeniem zakresu.
+
+**Dlaczego hook, skoro organ był już wpięty w skill CLAUSURA:** skill działa, gdy pamiętam
+go wywołać. Nota `N-b74ce133` powstała dlatego, że pamięć zawiodła **mimo** wydrukowanego
+rozkazu. Wpięcie opierające się na tym samym zawodnym ogniwie nie domyka klasy wady.
+
+### Sonda PRZED logiką — kolejność, nie ozdobnik
+
+Żaden z 4 hooków Imperium nie czytał transkryptu, więc to, czy zdarzenie `Stop` w ogóle
+niesie tekst meldunku, było **niezmierzone**. Krok 1 to była sonda zapisująca surowe
+zdarzenie (poza repo, żeby nie brudzić drzewa w trakcie bramki). Pomiar:
+
+| pole | zawartość |
+|---|---|
+| `last_assistant_message` | **pełny tekst meldunku** — parsowanie transkryptu zbędne |
+| `stop_hook_active` | bezpiecznik przeciw pętli |
+| `transcript_path`, `session_id`, `cwd` | dostępne, niepotrzebne |
+
+Budowa strażnika przed tym pomiarem byłaby dokładnie tym, za co powstał TALAR.
+
+### Zasięg świadomie wąski
+
+Hook bada **wyłącznie krok 8** (`tryb="tylko_push"`) — jedyną powinność ze zmierzonym
+**zerem fałszywych alarmów** na 156 przekazaniach. Poziom „domkniecie" nie jest
+skalibrowany, a automat odpalany po KAŻDEJ turze zamieniłby go w tapetę. Nowy tryb odcina
+poziom domknięcia nawet wtedy, gdy meldunek sam je deklaruje (test granicy pilnuje).
+
+**Bezpieczniki:** `stop_hook_active` → cisza (bez pętli) · brak pola meldunku → cisza (nie
+zgadujemy z transkryptu) · awaria → kod 0 i krzyk na stderr, praca Imperium nietknięta ·
+blokada wyrażona protokołem (`decision: block`), nie kodem wyjścia.
+
+**Dowód na ŻYWYM zdarzeniu** (nie na atrapie): prawdziwe zdarzenie z sondy z podmienionym
+meldunkiem na dosłowny grzech z noty → hook blokuje i podaje gotowy blok wygenerowany
+z żywego repo.
+
+**Pliki:** `imperium/pretorianie/exactor.py` (+`ocen_zdarzenie_hooka`, `hook_stop`, tryb
+`tylko_push`, CLI `--hook`), `.claude/hooks/stop.sh` (nowy, wrapper cienki jak CUSTOS
+LIMINIS), `.claude/settings.json` (rejestracja), `tests/test_exactor.py` (26→36 testów),
+`docs/ARCHITEKTURA_IMPERIUM.md`.
+
+**Osobno — PR #137:** plik z wrzutni to *Summary by cubic*, czyli opis MOICH zmian, nie
+recenzja: zero uwag, w dodatku napisany dla commita `ffb796d`, gdy HEAD stoi na `ea9fe90`.
+Potwierdza werdykt RECOGNITORA („brak recenzji"): **podsumowanie nie jest spojrzeniem**.
+
+---
+
 ## 2026-07-30 | 🪙 | EXACTOR RENUNTIATIONIS — spłata TALARA `N-b74ce133` (CORONA)
 
 **Powód:** krok 8 CLAUSURY nakazuje podać PEŁNY blok PowerShell (`cd` + `git push origin

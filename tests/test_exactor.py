@@ -4,6 +4,7 @@ Prawda podstawowa pochodzi z KRONIKI (190 historycznych meldunków, 144 sesje) �
 utrwalone są przypadki GRANICZNE, w tym dosłowne bloki z noty N-b74ce133, która zrodziła
 ten organ, oraz dwie fałszywki, na których wyłożyła się pierwsza (fence'owa) reguła.
 """
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -236,6 +237,103 @@ def test_cli_bramka_zwraca_kod_wyjscia(tmp_path):
                        encoding="utf-8", errors="replace", timeout=90)
     assert p.returncode == 1, p.stdout + p.stderr
     assert "EXACTOR" in p.stdout
+
+
+# ── GRANICA 7: hook Stop (kształt zdarzenia potwierdzony SONDĄ 2026-07-31) ──────
+
+def _zdarzenie(**kw):
+    """Zdarzenie w kształcie ZMIERZONYM sondą, nie wymyślonym."""
+    baza = {"session_id": "214cc8b4", "hook_event_name": "Stop",
+            "stop_hook_active": False, "last_assistant_message": ""}
+    return {**baza, **kw}
+
+
+def _hook(zdarzenie):
+    return exactor.ocen_zdarzenie_hooka(zdarzenie, kroki=KROKI, galaz=GALAZ)
+
+
+def test_hook_blokuje_niepelny_blok_push():
+    w = _hook(_zdarzenie(last_assistant_message="Gotowe:\n\n```powershell\ngit push\n```"))
+    assert w["blokuj"] is True
+    assert "cd " in w["powod"] and f"git push origin {GALAZ}" in w["powod"]
+
+
+def test_hook_przepuszcza_pelny_blok():
+    tekst = f"```powershell\ncd C:\\Projekty\\imperial-mesh-vortex; git push origin {GALAZ}\n```"
+    assert _hook(_zdarzenie(last_assistant_message=tekst))["blokuj"] is False
+
+
+def test_hook_milczy_gdy_meldunek_nie_dotyczy_pushu():
+    """Hook chodzi po KAŻDEJ turze — musi milczeć na zwykłej pracy, inaczej jest tapetą."""
+    w = _hook(_zdarzenie(last_assistant_message="Naprawiłem test i policzyłem korelacje."))
+    assert w["blokuj"] is False
+    assert w["status"] == "nie_dotyczy"
+
+
+def test_hook_nie_robi_petli_przy_powtornym_wejsciu():
+    """`stop_hook_active` to bezpiecznik protokołu — ważniejszy niż kolejne przypomnienie."""
+    w = _hook(_zdarzenie(stop_hook_active=True,
+                         last_assistant_message="```powershell\ngit push\n```"))
+    assert w["blokuj"] is False
+    assert w["status"] == "powtorne_wejscie"
+
+
+def test_hook_milczy_gdy_brak_pola_meldunku():
+    """Gdyby protokół kiedyś przestał podawać meldunek — cisza, nie zgadywanie z transkryptu."""
+    assert _hook(_zdarzenie())["blokuj"] is False
+    assert _hook({"stop_hook_active": False})["blokuj"] is False
+
+
+def test_hook_nie_siega_po_poziom_nieskalibrowany():
+    """Nawet gdy meldunek DEKLARUJE domknięcie, hook bada wyłącznie krok 8.
+
+    Poziom „domkniecie" nie ma zmierzonej liczby fałszywych alarmów, więc w automacie
+    odpalanym po każdej turze nie ma prawa się pojawić.
+    """
+    tekst = ("Wachta domknięta.\n\n```powershell\n"
+             f"cd C:\\Projekty\\imperial-mesh-vortex; git push origin {GALAZ}\n```")
+    w = _hook(_zdarzenie(last_assistant_message=tekst))
+    assert w["blokuj"] is False, w
+    assert w["werdykt"]["poziom"] == "push"
+    assert w["werdykt"]["spelnione"] == ["push_pelny_blok"]
+
+
+def test_tryb_tylko_push_odcina_powinnosci_domknieciowe():
+    w = _zbadaj("Wachta domknięta — bez Prawa XV i bez sług.", tryb="tylko_push")
+    assert w["poziom"] == "brak"
+    assert w["braki"] == []
+
+
+def test_cli_hook_nie_wywraca_sie_na_smieciu():
+    """Awaria strażnika nie może zatrzymać pracy Imperium — kod 0 i krzyk na stderr."""
+    p = subprocess.run([sys.executable, "-m", "imperium.pretorianie.exactor", "--hook"],
+                       input="to nie jest JSON", cwd=KORZEN, capture_output=True,
+                       text=True, encoding="utf-8", errors="replace", timeout=90)
+    assert p.returncode == 0
+    assert "exactor" in p.stderr.lower()
+
+
+def test_cli_hook_wypisuje_blokade_jako_json():
+    zdarzenie = json.dumps(_zdarzenie(
+        last_assistant_message="```powershell\ngit push\n```"), ensure_ascii=False)
+    p = subprocess.run([sys.executable, "-m", "imperium.pretorianie.exactor", "--hook"],
+                       input=zdarzenie, cwd=KORZEN, capture_output=True,
+                       text=True, encoding="utf-8", errors="replace", timeout=90)
+    assert p.returncode == 0
+    odp = json.loads(p.stdout)
+    assert odp["decision"] == "block"
+    assert "git push origin" in odp["reason"]
+
+
+def test_cli_hook_milczy_gdy_meldunek_poprawny():
+    galaz = exactor.galaz_biezaca() or GALAZ
+    zdarzenie = json.dumps(_zdarzenie(
+        last_assistant_message=f"```powershell\ncd {KORZEN}; git push origin {galaz}\n```"))
+    p = subprocess.run([sys.executable, "-m", "imperium.pretorianie.exactor", "--hook"],
+                       input=zdarzenie, cwd=KORZEN, capture_output=True,
+                       text=True, encoding="utf-8", errors="replace", timeout=90)
+    assert p.returncode == 0
+    assert p.stdout.strip() == "", p.stdout
 
 
 def test_cli_bez_zrodla_nie_zgaduje():

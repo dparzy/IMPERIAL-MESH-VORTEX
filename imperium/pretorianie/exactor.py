@@ -231,8 +231,13 @@ def zbadaj_meldunek(tekst: str, *, kroki: List[str], galaz: str = "",
     tekst = bez_cytatow_inline(tekst)
 
     ma_push = bool(WZ_LINIA_PUSH.search(tekst))
-    domkniecie = tryb == "domkniecie" or bool(WZ_DOMKNIECIE.search(tekst))
-    poziom = "domkniecie" if domkniecie else ("push" if ma_push else "brak")
+    # `tylko_push` ODCINA poziom domknięcia nawet wtedy, gdy tekst sam deklaruje domknięcie —
+    # używa go hook, któremu wolno sięgać wyłącznie po powinność SKALIBROWANĄ (krok 8).
+    if tryb == "tylko_push":
+        poziom = "push" if ma_push else "brak"
+    else:
+        domkniecie = tryb == "domkniecie" or bool(WZ_DOMKNIECIE.search(tekst))
+        poziom = "domkniecie" if domkniecie else ("push" if ma_push else "brak")
 
     braki, spelnione, osierocone, nieaktywne = [], [], [], []
     for p in REJESTR:
@@ -332,6 +337,56 @@ def zbadaj(tekst: str, tryb: str = "auto") -> dict:
     return zbadaj_meldunek(tekst, kroki=kroki_clausury(), galaz=galaz_biezaca(), tryb=tryb)
 
 
+# ── HOOK `Stop` — sprawdzenie BEZ UDZIAŁU MOJEJ PAMIĘCI ─────────────────────────
+#
+# Sonda pomiarowa (2026-07-31) rozstrzygnęła to, czego nie wolno było zakładać:
+# zdarzenie `Stop` niesie GOTOWE pole `last_assistant_message` z pełnym tekstem
+# meldunku (a także `transcript_path` i `stop_hook_active`). Dopiero ten pomiar
+# uprawnił do zbudowania strażnika — kolejność odwrotna byłaby powtórzeniem błędu,
+# za który powstał cały ten organ.
+#
+# ZASIĘG ŚWIADOMIE WĄSKI: hook bada WYŁĄCZNIE krok 8 (`tryb="tylko_push"`), bo tylko
+# ten ma zmierzone ZERO fałszywych alarmów na 156 przekazaniach. Poziom „domkniecie"
+# nie jest skalibrowany — w automacie, który odpala się po KAŻDEJ turze, zamieniłby
+# się w tapetę, a tapeta uczy ignorowania strażnika (lekcja: „alarm to zadanie, nie tło").
+
+def ocen_zdarzenie_hooka(zdarzenie: dict, *, kroki: List[str], galaz: str = "") -> dict:
+    """Werdykt hooka `Stop`. Czysty — zdarzenie jest DANYMI, nie źródłem.
+
+    Milczy zawsze, gdy nie ma pewności: brak meldunku, powtórne wejście
+    (`stop_hook_active`), albo meldunek nieprzekazujący pushu. Blokuje wyłącznie
+    wtedy, gdy KROK 8 jest naprawdę niespełniony — i wtedy od razu podaje gotowy blok,
+    żeby naprawa nie zależała od tej samej pamięci, która zawiodła.
+    """
+    if zdarzenie.get("stop_hook_active"):
+        # Powtórne wejście: gdybyśmy blokowali znowu, powstałaby pętla. Bezpiecznik
+        # protokołu jest ważniejszy niż jeszcze jedno przypomnienie.
+        return {"blokuj": False, "powod": "", "status": "powtorne_wejscie"}
+
+    tekst = (zdarzenie.get("last_assistant_message") or "").strip()
+    if not tekst:
+        return {"blokuj": False, "powod": "", "status": "brak_meldunku"}
+
+    w = zbadaj_meldunek(tekst, kroki=kroki, galaz=galaz, tryb="tylko_push")
+    if w["status"] != "niespelniony":
+        return {"blokuj": False, "powod": "", "status": w["status"], "werdykt": w}
+
+    braki = "; ".join(b["powod"] for b in w["braki"])
+    return {
+        "blokuj": True, "status": "niespelniony", "werdykt": w,
+        "powod": (
+            "EXACTOR (krok 8 CLAUSURY): przekazujesz Cezarowi komendę push, ale blok nie jest "
+            f"gotowy do wklejenia — {braki}. Rozkaz stały każe podać PEŁNY blok PowerShell. "
+            f"Popraw meldunek, wklejając dokładnie to:\n\n    {blok_push(galaz=galaz)}\n\n"
+            "Nie przepisuj go z pamięci — to ona zawiodła przy nocie N-b74ce133."
+        ),
+    }
+
+
+def hook_stop(zdarzenie: dict) -> dict:
+    return ocen_zdarzenie_hooka(zdarzenie, kroki=kroki_clausury(), galaz=galaz_biezaca())
+
+
 # ── WYDRUK ───────────────────────────────────────────────────────────────────────
 
 def banner(w: dict) -> str:
@@ -365,6 +420,8 @@ if __name__ == "__main__":
     ap.add_argument("--stdin", action="store_true", help="czytaj meldunek ze stdin")
     ap.add_argument("--blok-push", action="store_true",
                     help="wypisz gotowy blok kroku 8 i zakończ")
+    ap.add_argument("--hook", action="store_true",
+                    help="tryb hooka Stop: czytaj zdarzenie z stdin, badaj WYŁĄCZNIE krok 8")
     ap.add_argument("--domkniecie", action="store_true",
                     help="to jest meldunek ZAMYKAJĄCY wachtę — sprawdź pełną checklistę "
                          "(organ tego nie zgaduje)")
@@ -374,6 +431,21 @@ if __name__ == "__main__":
 
     if args.blok_push:
         print(blok_push())
+        sys.exit(0)
+
+    if args.hook:
+        # Awaria strażnika NIE MOŻE zatrzymać pracy — ale też nie milczy (stderr).
+        try:
+            wynik = hook_stop(json.load(sys.stdin))
+        except Exception as e:  # noqa: BLE001
+            print(f"[exactor] nie odczytałem zdarzenia hooka: {type(e).__name__}: {e}",
+                  file=sys.stderr)
+            sys.exit(0)
+        if wynik["blokuj"]:
+            # ensure_ascii=True z rozmysłu: na Windowsie strumień bywa cp1250, w której
+            # polskie znaki nie istnieją — strażnik nie ma prawa paść przez KOSMETYKĘ
+            # (ta sama decyzja co w CUSTOS LIMINIS).
+            print(json.dumps({"decision": "block", "reason": wynik["powod"]}))
         sys.exit(0)
 
     if args.plik:

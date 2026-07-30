@@ -2,7 +2,7 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
-stan_na: 2026-07-29
+stan_na: 2026-07-30
 powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii."
 ---
 # 🏛️ ROADMAP IMPERIUM — MAPA DRÓG SYSTEMU
@@ -14,7 +14,7 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 ---
 
-## 🗓️ PLAN WACHT — operacyjna kolejka zadań (stan 2026-07-29)
+## 🗓️ PLAN WACHT — operacyjna kolejka zadań (stan 2026-07-30)
 
 > **Czym to jest, a czym nie:** FAZY 0–4 niżej to mapa STRATEGICZNA (dokąd zmierzamy).
 > Ta sekcja to kolejka OPERACYJNA — co robimy w najbliższych wachtach, w kolejności.
@@ -31,11 +31,11 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 | A1 | **AESTIMATOR** — pomiar wierności korpusu + kalibracja | ✅ 14 testów | dał liczby, na których stoi cała reszta wachty |
 | A2 | **REDDITOR** — fragmentacja z dowodem SHA-256 | ✅ 18 testów, 118/118 bajt-w-bajt | struktura 1 479 710 linii → **zachowana** (było 0) |
 | A3 | **NORMA** — węgielnica 10 kryteriów | ✅ 12 testów, 9/10 zielonych | K10 celowo NIEZNANE — blokuje słowo „najlepsza" |
-| A4 | **QUAESITOR — pierwszy bieg, domknięcie K10** | 🟡 kod jest, **nigdy nie uruchomiony** | **jedyne**, co rozstrzyga, czy REDDITOR jest lepszy, a nie tylko wierniejszy |
+| A4 | **QUAESITOR — pierwszy bieg, domknięcie K10** | 🟡 **uruchomiony 2026-07-30, 19 testów** — K10 nadal NIEZNANE | pierwszy bieg dał naprawę u źródła (sanityzacja FTS w `szukaj.sanityzuj_fts`, ścieżka MCP recall@5 **16,7% → 80,0%**), ale K10 wymaga zbioru z A10 — 30 pytań to 0,22% zawołań |
 | A5 | **OCR na BIB-007 (AFML)** — 93 listingi kodu jako obrazy | ⏸️ WARUNKOWE (po A11) | najbardziej wykonalna treść w najważniejszej książce ilościowej; ~30–40 min przy 5,2 s/stronę |
 | A6 | **Przepięcie indeksu na REDDITORA** + reindeksacja | 🔴 | **dopiero po zielonym K10** (ZASADA WPIĘCIA: opt-in, po dowodzie) |
 | A7 | **91 książek poza indeksem** → ekstrakcja → cache → indeks | 🔴 | rozkaz Cezara, pozycja 2 w jego kolejności |
-| A8 | **R2 — fuzja RRF** zamiast sortowania po mieszanych skalach | 🔴 | mina latentna w Księdze Wad; wybuchnie w dniu włączenia wektorów |
+| A8 | **R2 — fuzja RRF** zamiast sortowania po mieszanych skalach | 🔴 | mina latentna w Księdze Wad; wybuchnie w dniu włączenia wektorów. **Potwierdzone niezależnie z zewnątrz** (sąd 07-30, poz. F2) — RRF+cross-encoder jest standardem produkcyjnym, nie naszym wynalazkiem |
 | A9 | **R3 — 3 gotowe książki + korpus `docs` (305 plików)** | 🔴 | dwa polecenia, zero ryzyka |
 | A10 | **Zbiór ewaluacyjny z INDEKSÓW książek** — 13 729 haseł wyliczonych przez samych autorów | 🔴 | zmierzone: zbiór QUAESITORA to 30 pytań = **0,22%** zawołań zadeklarowanych w indeksach (42/118 książek ma użyteczny indeks, ~326 haseł na książkę). K10 na takiej próbce jest liczbą bez mocy. Prawda podstawowa **napisana przez autora**: zero tokenów, zero halucynacji |
 | A11 | **Podmiana BIB-007 (AFML)** na wydanie z TEKSTOWYM kodem | 🔴 Cezar podmienia | 93/94 listingi to obrazy + wstrzyknięte stopki watermarku w indeksie. Próg przyjęcia: `listingi_z_kodem` > 1/94 (mierzy AESTIMATOR). **Udana podmiana usuwa A5 z planu** — OCR kodu jest podstępny (`l`/`1`, `O`/`0` cicho zmieniają znaczenie) |
@@ -65,6 +65,83 @@ annualizator" ani „survivorship bias" z numerem issue — i napisał to wprost
 **Nowa pozycja z tego zwiadu:** → **B4. Sprawdzić `mtf_konfluencja` na przeciek przyszłości**
 (klasa z `vectorbt` #101) — pomiarem, nie przeglądem kodu. Waga: wysoka, bo dotyczy ŻYWEJ
 ścieżki decyzyjnej, a nie narzędzia pomocniczego.
+
+---
+
+### 🔎 SĄD NAD MATERIAŁEM ZEWNĘTRZNYM (DeepSeek web-czat, 2026-07-30)
+
+> **Materiał:** `wrzutnia/Imperium-Botów-Tradingowych.md` — 7 267 linii / 452 KB, rozmowa
+> Cezara z web-czatem DeepSeeka 02:24–11:09. Przeczytany w całości blokami, każde nośne
+> twierdzenie zderzone z KODEM albo z SIECIĄ.
+
+**⚠️ OSTRZEŻENIE METODOLOGICZNE — czytaj przed użyciem czegokolwiek z tego materiału.**
+Ten dokument **nie jest audytem zewnętrznym, lecz echem**. Dowody:
+1. Model oświadczył „czytam wprost z repozytorium — bez wymyślania" (l. 1797), a **5 minut
+   później** napisał „nie mam bezpośredniego dostępu do Internetu" (l. 1932).
+2. Jego „stan faktyczny Z KODU" to **przepisanie naszego `README.md`** — podane liczby plików
+   per organ zgadzają się co do jednego z wstrzykiwanymi `<!-- LICZBA:organ_* -->`, w tym
+   `biblioteki`=28 z chwili odczytu (dziś 29).
+3. Reszta „stanu Imperium" to **nasza własna kronika**, wklejona do czatu (l. 2057–2957).
+
+**Zgodność liczb NIE jest tu dowodem weryfikacji.** Wszystko, co pasuje, pochodzi od nas.
+
+#### ✅ ZWERYFIKOWANE ZEWNĘTRZNIE — istnieje (sprawdzone 2026-07-30)
+
+| Byt | Co realnie mówi źródło | Wartość dla nas |
+|---|---|---|
+| **OCC-RAG-1.7B** — [HF](https://huggingface.co/occ-ai/OCC-RAG-1.7B), [GGUF](https://huggingface.co/occ-ai/OCC-RAG-1.7B-GGUF), [arXiv 2606.00683](https://arxiv.org/abs/2606.00683) | mid-trenowany z **Qwen3-1.7B-Base**; cytuje dosłownymi cytatami; **wstrzymuje się, gdy kontekst nie wspiera odpowiedzi**. Licencja **MIT**, Q4_K_M **1,11 GB**, CPU-only na llama.cpp | 🥇 **najmocniejsze trafienie materiału** — ta sama rodzina i rozmiar co TIRO, mieści się na PEDES **bez Acera**. Wnosi zdolność, której nie mamy: abstynencję wypaloną w wagach, nie w prompcie |
+| **HDRR** — [arXiv 2603.26815v3](https://arxiv.org/abs/2603.26815) | „Sustainable Hybrid Document-Routed Retrieval for Financial RAG"; routing **dokument → fragment**; benchmark FinDER; ~5–15K tokenów/zapytanie | 🥈 celuje w naszą zmierzoną **lukę słownikową +40,0 pp** (dosłowne 100% vs opisowe 60% @5) — **bez modelu i bez GB RAM-u**; `szukaj` ma już filtr katalogowy (nadpobiera ×20) |
+| **MRC** — [arXiv 2605.24490](https://arxiv.org/abs/2605.24490) | kredyty **Shapleya** per reżim dla agentów; Sharpe **1,51**, 440,1% skumulowane, **1 037 dni, 13 kryptoaktywów** | 🥉 jedyna pozycja dotykająca ROJU. Nasze MWU przypisuje zasługę globalnie; `ucz_mwu` **zmierzone jako szkodliwe** (Δ −0,6 pp, PBO ~0,6, flaga OFF) → kandydat na następcę |
+| **RAG-Anything** — [arXiv 2510.12323](https://arxiv.org/abs/2510.12323) | dual-graph, obrazy/tabele/wzory jako powiązane byty, X 2025 | celuje w **11 314 ślepych podpisów wykresów**, ale wymaga MinerU/Docling + modelu wizyjnego → **nie unosimy na PEDES** |
+| **Fin-Analyst** — [arXiv 2607.12233](https://arxiv.org/abs/2607.12233) | 88% WR **na jednej spółce (TSLA)**, Sharpe 4,10, konkurs FinMMEval | ⚠️ **wyłącznie jako dowód, że liczba 88% nie dotyczy nas** — patrz INDEX FALSORUM niżej |
+| **zembed-1 / zerank-2** — [ZeroEntropy](https://huggingface.co/zeroentropy/zembed-1-embedding) | `zembed-1-embedding`: **4B**, Apache-2.0, Matryoshka 2560→40, ~8 GB VRAM | ❌ **nie na PEDES** (brak CUDA); na Acerze 6 GB nie zmieści się razem z LLM-em — materiał sam to przyznaje i nie wycofuje rekomendacji |
+
+#### ❌ ZWERYFIKOWANE — NIE ISTNIEJE / niesprawdzone
+
+| Byt | Werdykt |
+|---|---|
+| **`fin-mini-v1`** („33,4M, +35% na parach finansowych") | **NIE ZNALEZIONY.** A była to jego rekomendacja **numer jeden** dla naszej warstwy embeddingów. Realne odpowiedniki, których **nie wymienił**: [FinE5](https://huggingface.co/FinanceMTEB/FinE5), benchmark [FinMTEB](https://huggingface.co/spaces/FinanceMTEB/FinMTEB) |
+| `mist-reranker-22.7M`, `Merino-Nano/Small`, `Tarka-Embedding-250M`, `Harrier-Embedding-270M`, `MoonFinance v3.1`, `Amsi-fin-o1.5`, `Qwen3.5-4B`, InKH, FinanceComplexQA, RIDGE, NextRAG, TwinMarket, AlphaQuanter, QFinZero | **NIESPRAWDZONE** — ani „są", ani „nie ma". Żadnego z nich nie wolno użyć jako argumentu przed weryfikacją |
+
+**Zmierzona trafność na próbce sprawdzonej: 6 z 7 nośnych bytów prawdziwych — a tym jednym
+fałszywym była rekomendacja numer jeden.** To ta sama klasa co zmierzone 39,3% cząstek
+Hyginusa pisanych jako „nie dubluje" o rzeczy stojącej w kodzie.
+
+#### 🚫 ODRZUCONE — z powodem
+
+| Odrzucone | Powód |
+|---|---|
+| **Cała wieża „MEMOR-AGENT" 1.0→ULTIMA** ze szkicami patentu i tabelami Sharpe/WR | Stoi na (a) błędnym rozumieniu naszych 17 warstw (uznał je za hierarchię rynkową L1=tick…L17=meta; to pamięć SESJI W1–W13), (b) **sfabrykowanej bazie odniesienia**, (c) cudzych wynikach z jednej spółki przypisanych naszemu BTC 4H. Ani jednej liczby nie wolno zacytować |
+| **„PRAWO XXVI — Porządek Kategorii"** + `docs/REJESTR_KATEGORII.md` + nowy audyt kategorii | **Mamy to poczwórnie:** CENSUS ORGANORUM (W17, 255 modułów zameldowanych) · TABULARIUM (katalog nadrzędny) · MANIFEST_KODU (Prawo XIX) · W20/W22 (jeden katalog) · NOMENCLATOR (strażnik imion). Piąty spis = złamanie Prawa XVI |
+| **Nagłówki `WERSJA: 1.2.3 / HISTORIA:` w każdym pliku** | Duplikuje git i **gnije z definicji**. Dokładnie klasa wady, za którą zapłaciliśmy: runbook W11 kazał Architektowi `git push` 9 dni po zakazie, bo miał własną ręczną treść. Lek brzmi „odebrać dokumentowi prawo do własnej treści" — ta propozycja robi odwrotnie |
+| Wzorce agentowe: TradingAgents, moon-dev, Fractal Debate, LangGraph, ChromaDB, Ollama | Mamy Senat, Legatusa, Bramę, arenę i llama.cpp. **Ollama odrzucona pomiarem 2026-07-16** |
+| Kod z bloków I i V (szkielety bramy, senatu, „Lagustrata", organu pamięci) | Ciała `pass` rzeczy będących u nas w produkcji. „Lagustrat" to przekręcony **Legatus** |
+| „7-dniowy plan zakończenia projektu, dzień 7 = wejście kapitałem" | Doradza kapitał systemowi, którego trafności retrievalu nie znał i którego P&L nigdy nie widział. **D1 nie znika przez terminarz** |
+
+---
+
+### 🚨 WACHTA F — adopcje i alarmy z sądu nad materiałem *(otwarta 2026-07-30)*
+
+| # | Zadanie | Stan | Waga / warunek |
+|---|---|---|---|
+| **F0** | 🚨 **`skupiska_redundancji` — wskaźnik LICZONY, ale przez NIKOGO nie czytany** (Prawo XV, pkt 2 checklisty) | 🔴 **alarm** | `raport_mechanizmow()` w `imperium/legiony/rejestr.py` grupuje neurony po `(KATEGORIA, MECHANIZM)` i zwraca `skupiska_redundancji`. **Zmierzone teraz: 17 skupisk** — m.in. `Z/risk_filter` **7 neuronów**, `T/trend` **8**, `R/regime` **6**, `R/mean_rev` **5 (całe PSY)**, `M/trend` **6**. `grep` po repozytorium: jedyne wystąpienia to własna definicja i test na obecność klucza. **Żaden audyt ani hook tego nie czyta.** Ironia: materiał proponował zbudować od zera organ, który u nas **stoi gotowy i milczy**. To właściwa odpowiedź na „PRAWO XXVI" — nie nowy rejestr, a wypuszczenie na wierzch tego, co już liczymy |
+| **F1** | **OCC-RAG-1.7B jako baza TIRO** — A/B vs obecny Qwen3-1.7B | 🔴 czeka na decyzję Cezara o pobraniu pliku | **po A10** (bez zbioru nie ma na czym mierzyć). Opt-in **OFF**, wchodzi po zielonym A/B (ZASADA WPIĘCIA). Zysk celowany: abstynencja przy braku podstawy = Prawo I w wagach. ⚠️ **nie wiemy**, czy jest lepszy na polskich pytaniach o krypto — jego benchmarki są angielskie i ogólne |
+| **F2** | **HDRR — routing dokument → fragment** (dwustopniowy retrieval) | 🔴 | **po A10**, mierzone QUAESITOREM. Tanie: bez modelu, bez RAM-u, filtr katalogowy już istnieje. ⚠️ **nie wiemy**, czy działa na 118 heterogenicznych książkach — publikacja mierzyła jednorodne zgłoszenia regulacyjne |
+| **F3** | **MRC — kredyty Shapleya per reżim** jako następca `ucz_mwu` | 🔴 | dotyczy ŻYWEJ ścieżki decyzyjnej → opt-in OFF, walidacja A/B jak każda zmiana wag. ⚠️ Shapley na 87 głosach jest kombinatoryczny — **na 4 wątkach wymaga aproksymacji**, do zmierzenia przed obietnicą |
+| **F4** | **3 obalone twierdzenia → INDEX FALSORUM** | 🔴 | (1) „Sharpe 0,52 / WR 48% / MaxDD −18,4% / halucynacje 7,2% to baza Imperium" — **nigdy nie zmierzone**; 0,52 to dosłownie baseline z cudzej pracy. (2) „2 484 tabele nierozerwane" — zmierzone **294/294**, zawyżone **8,4×**. (3) „17 warstw pamięci = hierarchia rynkowa L1 tick → L17 meta" — to pamięć sesji, nie rynku |
+| **F5** | **RAG-Anything — multimodalność na 11 314 ślepych podpisów** | ⏸️ **odłożone, nie odrzucone** | wymaga MinerU/Docling + modelu wizyjnego; wraca przy GPU albo przy decyzji o przetwarzaniu przez API |
+| **F6** | **Rozliczyć obietnicę „RAG 53/100 → 85/100 po zmianie laptopa"** | 🔴 do policzenia | Materiał twierdzi, że sprzęt podnosi trafność RAG. **To nieprawda** — trafność zmienia RRF (A8), zbiór ewaluacyjny (A10) i routing (F2), nie VRAM. Acer realnie odblokowuje **QLoRA na TIRO** — ale blokada uczenia TIRO **nigdy nie była sprzętowa**: nauczycielem może być wyłącznie DeepSeek, nie Architekt (ToS). Do policzenia: co dokładnie daje 6 GB VRAM przy tej blokadzie w mocy |
+
+**Kolejność wobec planu:** **A10 → K10 bez zmian.** F1/F2/F3 to kandydaci DO ZMIERZENIA, a mierzyć
+ich nie ma czym, dopóki zbiór ewaluacyjny liczy 30 pytań (**0,22%** z 13 729 haseł indeksowych) —
+każdy A/B dałby liczbę z zastrzeżeniem większym niż sama liczba (LEX TALARUS). Wyjątek: **F0 jest
+niezależne od A10** i zamyka alarm Prawa XV, więc może iść przodem.
+
+**Uwaga o wycieku kontekstu:** w bloku II materiału (l. 2057–2957) leży pełny transkrypt naszych
+wacht wklejony do web-czatu — z architekturą, nazwami organów i **naszymi jeszcze niezałatanymi
+minami** (mieszane skale w sortowaniu, lista 11 organów bez kalibracji). Kluczy API tam nie ma
+(sprawdzone). To nie zarzut, lecz warunek oceny: jego „audyt" mógł wyglądać trafnie **wyłącznie
+dlatego, że czytał nasze notatki**.
 
 ### WACHTA B — dług kalibracyjny przyrządów *(najcięższy dług Imperium)*
 
@@ -101,7 +178,7 @@ Zmierzone 2026-07-29: **47 organów orzekających, 11 bez testu kalibracyjnego.*
 | E1 | `zip(strict=)` w Bramie · RUF012 · strażnik budżetu | 🔴 |
 | E2 | WFO chunkowany (backtest liniowy ~66 ms/tik — premisa „kwadratowy" była błędna) | 🟡 |
 | E3 | Strażnik obcych plików → wrzutnia/kwarantanna zamiast kasowania | 🔴 pomysł Cezara 07-28 |
-| E4 | Dług kontekstu: CLAUDE.md **258 linii > 200** | 🔴 rośnie z każdym rozkazem |
+| E4 | Dług kontekstu: CLAUDE.md **259 linii > 200** | 🔴 rośnie z każdym rozkazem (253 po odchudzeniu 07-27 → 259 dziś) |
 
 ---
 

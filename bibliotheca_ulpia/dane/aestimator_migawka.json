@@ -1,0 +1,2360 @@
+{
+ "zbadanych": 118,
+ "ksiazki": [
+  {
+   "ksiazka": "BIB-001_Patel_The-Secret-Wealth-Advantage",
+   "slowa": 109472,
+   "unikalne": 15909,
+   "udzial_unikalnych": 0.1453,
+   "linie_w_cache": 3903,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 313,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 3,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-002_Murphy_Technical-Analysis-of-the-Financial-Markets",
+   "slowa": 117745,
+   "unikalne": 10960,
+   "udzial_unikalnych": 0.0931,
+   "linie_w_cache": 4895,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 337,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 503,
+   "znaki_matematyczne": 7,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-003_Burniske-Tatar_Cryptoassets",
+   "slowa": 115479,
+   "unikalne": 16946,
+   "udzial_unikalnych": 0.1467,
+   "linie_w_cache": 14771,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 330,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 162,
+   "znaki_matematyczne": 16,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-004_Steenbarger_The-Psychology-of-Trading",
+   "slowa": 134940,
+   "unikalne": 17042,
+   "udzial_unikalnych": 0.1263,
+   "linie_w_cache": 4515,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 386,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-005_Blum_What-Exactly-Is-Crypto",
+   "slowa": 33539,
+   "unikalne": 6309,
+   "udzial_unikalnych": 0.1881,
+   "linie_w_cache": 2071,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 96,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-006_Carson_High-Probability-Scalping-Strategy-Playbook",
+   "slowa": 12557,
+   "unikalne": 2215,
+   "udzial_unikalnych": 0.1764,
+   "linie_w_cache": 1047,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 36,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-007_Lopez-de-Prado_Advances-in-Financial-Machine-Learning",
+   "slowa": 102379,
+   "unikalne": 13082,
+   "udzial_unikalnych": 0.1278,
+   "linie_w_cache": 66430,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 293,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 94,
+   "listingi_z_kodem": 1,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 189,
+   "znaki_matematyczne": 282,
+   "werdykt": "USZKODZONA",
+   "powody": [
+    "listingi kodu ZGUBIONE w ekstrakcji (1/94 ma kod)",
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-008_Sinclair_Volatility-Trading-2nd-ed",
+   "slowa": 83833,
+   "unikalne": 10719,
+   "udzial_unikalnych": 0.1279,
+   "linie_w_cache": 8799,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 240,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 185,
+   "znaki_matematyczne": 122,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-009_Mandelbrot-Hudson_The-Misbehavior-of-Markets",
+   "slowa": 101070,
+   "unikalne": 17247,
+   "udzial_unikalnych": 0.1706,
+   "linie_w_cache": 3338,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 289,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 78,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-010_Chan_Quantitative-Trading-2nd-ed",
+   "slowa": 67018,
+   "unikalne": 11027,
+   "udzial_unikalnych": 0.1645,
+   "linie_w_cache": 12974,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 192,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 4,
+   "tabele_z_trescia": 4,
+   "rysunki_zapowiedziane": 23,
+   "znaki_matematyczne": 26,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-011_Chan_Algorithmic-Trading-Winning-Strategies",
+   "slowa": 5802,
+   "unikalne": 5576,
+   "udzial_unikalnych": 0.961,
+   "linie_w_cache": 5975,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 17,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 143,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-012_Strauss-van-der-Post_Coding-Capital",
+   "slowa": 78683,
+   "unikalne": 13330,
+   "udzial_unikalnych": 0.1694,
+   "linie_w_cache": 4116,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 225,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-013_Dalton_Markets-in-Profile",
+   "slowa": 60626,
+   "unikalne": 8620,
+   "udzial_unikalnych": 0.1422,
+   "linie_w_cache": 2720,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 174,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 223,
+   "znaki_matematyczne": 2,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-014_Dalton_Mind-Over-Markets",
+   "slowa": 80063,
+   "unikalne": 8518,
+   "udzial_unikalnych": 0.1064,
+   "linie_w_cache": 5522,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 229,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 353,
+   "znaki_matematyczne": 6,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-015_Elder_The-New-Trading-for-a-Living",
+   "slowa": 119610,
+   "unikalne": 13230,
+   "udzial_unikalnych": 0.1106,
+   "linie_w_cache": 1230,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 342,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 145,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-016_Douglas_Trading-in-the-Zone",
+   "slowa": 73913,
+   "unikalne": 7262,
+   "udzial_unikalnych": 0.0983,
+   "linie_w_cache": 2778,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 212,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-017_Kahneman_Thinking-Fast-and-Slow",
+   "slowa": 191124,
+   "unikalne": 21768,
+   "udzial_unikalnych": 0.1139,
+   "linie_w_cache": 5391,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 547,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 29,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-018_Sinclair_Positional-Option-Trading",
+   "slowa": 65268,
+   "unikalne": 10355,
+   "udzial_unikalnych": 0.1587,
+   "linie_w_cache": 12068,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 187,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 54,
+   "tabele_z_trescia": 54,
+   "rysunki_zapowiedziane": 115,
+   "znaki_matematyczne": 40,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-019_Harris_Handbook-for-Cryptocurrencies-Trading",
+   "slowa": 30458,
+   "unikalne": 5306,
+   "udzial_unikalnych": 0.1742,
+   "linie_w_cache": 750,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 87,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-020_Harris_Trading-and-Exchanges-Market-Microstructure-for-Practitioners",
+   "slowa": 309571,
+   "unikalne": 19488,
+   "udzial_unikalnych": 0.063,
+   "linie_w_cache": 10434,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 885,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 40,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-021_Anon_High-Win-Rate-Day-Trading-Setups",
+   "slowa": 5820,
+   "unikalne": 1022,
+   "udzial_unikalnych": 0.1756,
+   "linie_w_cache": 1472,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 17,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-022_Kissell_Optimal-trading-strategies",
+   "slowa": 128213,
+   "unikalne": 13848,
+   "udzial_unikalnych": 0.108,
+   "linie_w_cache": 784,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 367,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 192,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-023_Lopez-de-Prado_Machine-Learning-for-Asset-Managers",
+   "slowa": 46253,
+   "unikalne": 8730,
+   "udzial_unikalnych": 0.1887,
+   "linie_w_cache": 7192,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 133,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 42,
+   "listingi_z_kodem": 39,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 68,
+   "znaki_matematyczne": 480,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-024_Lowe_Bitcoin-and-Cryptocurrency-Trading-for-Beginners",
+   "slowa": 31827,
+   "unikalne": 5807,
+   "udzial_unikalnych": 0.1825,
+   "linie_w_cache": 1119,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 91,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-025_Grinold-Kahn_Active-Portfolio-Management",
+   "slowa": 194149,
+   "unikalne": 16158,
+   "udzial_unikalnych": 0.0832,
+   "linie_w_cache": 9161,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 555,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 655,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-026_Jansen_Machine-Learning-for-Algorithmic-Trading",
+   "slowa": 247154,
+   "unikalne": 25195,
+   "udzial_unikalnych": 0.1019,
+   "linie_w_cache": 0,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 707,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 491,
+   "znaki_matematyczne": 26,
+   "werdykt": "CZYSTA",
+   "powody": []
+  },
+  {
+   "ksiazka": "BIB-027_Aldridge_High-Frequency-Trading",
+   "slowa": 104527,
+   "unikalne": 12757,
+   "udzial_unikalnych": 0.122,
+   "linie_w_cache": 8910,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 299,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 245,
+   "znaki_matematyczne": 138,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-028_Narang_Inside-the-Black-Box-A-Simple-Guide-to-Systematic-Investing",
+   "slowa": 136979,
+   "unikalne": 15056,
+   "udzial_unikalnych": 0.1099,
+   "linie_w_cache": 9726,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 392,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 7,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-029_Bashir_Mastering-Blockchain",
+   "slowa": 267504,
+   "unikalne": 20435,
+   "udzial_unikalnych": 0.0764,
+   "linie_w_cache": 19314,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 765,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 275,
+   "znaki_matematyczne": 5,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-030_Ammous_The-Bitcoin-Standard",
+   "slowa": 106291,
+   "unikalne": 13126,
+   "udzial_unikalnych": 0.1235,
+   "linie_w_cache": 2897,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 304,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-031_Tsay_Analysis-of-Financial-Time-Series",
+   "slowa": 207414,
+   "unikalne": 23341,
+   "udzial_unikalnych": 0.1125,
+   "linie_w_cache": 44809,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 593,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 42,
+   "tabele_z_trescia": 42,
+   "rysunki_zapowiedziane": 305,
+   "znaki_matematyczne": 5192,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-032_OHara_Market-Microstructure-Theory",
+   "slowa": 111653,
+   "unikalne": 11934,
+   "udzial_unikalnych": 0.1069,
+   "linie_w_cache": 12793,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 319,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 13,
+   "znaki_matematyczne": 272,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-033_Huyen_AI-Engineering-Building-Applications-with-Foundation-Models",
+   "slowa": 173615,
+   "unikalne": 16662,
+   "udzial_unikalnych": 0.096,
+   "linie_w_cache": 10325,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 496,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 109,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-034_Infante_AI-Agents-and-Applications-LangChain-LangGraph-MCP",
+   "slowa": 109015,
+   "unikalne": 15298,
+   "udzial_unikalnych": 0.1403,
+   "linie_w_cache": 36632,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 312,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 171,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-035_Iusztin-Labonne_LLM-Engineers-Handbook",
+   "slowa": 30102,
+   "unikalne": 5737,
+   "udzial_unikalnych": 0.1906,
+   "linie_w_cache": 2393,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 86,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 60,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-036_Alto_Building-LLM-Powered-Applications",
+   "slowa": 87055,
+   "unikalne": 11299,
+   "udzial_unikalnych": 0.1298,
+   "linie_w_cache": 7212,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 249,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 89,
+   "znaki_matematyczne": 1,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-037_Hull_Options-Futures-and-Other-Derivatives",
+   "slowa": 407711,
+   "unikalne": 26235,
+   "udzial_unikalnych": 0.0643,
+   "linie_w_cache": 36327,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 1165,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 482,
+   "znaki_matematyczne": 33,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-038_Schwager_Market-Wizards-Interviews-with-Top-Traders",
+   "slowa": 147865,
+   "unikalne": 15031,
+   "udzial_unikalnych": 0.1017,
+   "linie_w_cache": 22007,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 423,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-039_Lefevre_Reminiscences-of-a-Stock-Operator",
+   "slowa": 203879,
+   "unikalne": 23039,
+   "udzial_unikalnych": 0.113,
+   "linie_w_cache": 7238,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 583,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-040_Bernstein_Against-the-Gods-The-Remarkable-Story-of-Risk",
+   "slowa": 123903,
+   "unikalne": 18593,
+   "udzial_unikalnych": 0.1501,
+   "linie_w_cache": 7790,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 354,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-041_Taleb_Fooled-by-Randomness",
+   "slowa": 472698,
+   "unikalne": 50500,
+   "udzial_unikalnych": 0.1068,
+   "linie_w_cache": 8831,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 1351,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 4,
+   "znaki_matematyczne": 71,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-042_Jorion_Value-at-Risk-The-New-Benchmark",
+   "slowa": 171927,
+   "unikalne": 16084,
+   "udzial_unikalnych": 0.0936,
+   "linie_w_cache": 16048,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 492,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 399,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-043_Cartea-Jaimungal-Penalva_Algorithmic-and-High-Frequency-Trading",
+   "slowa": 132221,
+   "unikalne": 17536,
+   "udzial_unikalnych": 0.1326,
+   "linie_w_cache": 19728,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 378,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 207,
+   "znaki_matematyczne": 127,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-044_Hasbrouck_Empirical-Market-Microstructure",
+   "slowa": 76670,
+   "unikalne": 12731,
+   "udzial_unikalnych": 0.166,
+   "linie_w_cache": 9943,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 220,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 41,
+   "znaki_matematyczne": 1174,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-045_Hilpisch_Python-for-Finance",
+   "slowa": 76964,
+   "unikalne": 9107,
+   "udzial_unikalnych": 0.1183,
+   "linie_w_cache": 15958,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 220,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 39,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-046_Chan_Machine-Trading",
+   "slowa": 77454,
+   "unikalne": 11327,
+   "udzial_unikalnych": 0.1462,
+   "linie_w_cache": 6677,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 222,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 89,
+   "znaki_matematyczne": 20,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-047_Kaufman_Trading-Systems-and-Methods",
+   "slowa": 393428,
+   "unikalne": 28201,
+   "udzial_unikalnych": 0.0717,
+   "linie_w_cache": 62890,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 1125,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 146,
+   "tabele_z_trescia": 146,
+   "rysunki_zapowiedziane": 1333,
+   "znaki_matematyczne": 111,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-048_Aronson_Evidence-Based-Technical-Analysis",
+   "slowa": 186735,
+   "unikalne": 21506,
+   "udzial_unikalnych": 0.1152,
+   "linie_w_cache": 1068,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 534,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 7,
+   "tabele_z_trescia": 7,
+   "rysunki_zapowiedziane": 264,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-049_Bulkowski_Encyclopedia-of-Chart-Patterns",
+   "slowa": 452759,
+   "unikalne": 23332,
+   "udzial_unikalnych": 0.0515,
+   "linie_w_cache": 58623,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 1294,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 956,
+   "znaki_matematyczne": 118,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-050_Douglas_The-Disciplined-Trader",
+   "slowa": 82774,
+   "unikalne": 7472,
+   "udzial_unikalnych": 0.0903,
+   "linie_w_cache": 7749,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 237,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-051_Duke_Thinking-in-Bets",
+   "slowa": 82214,
+   "unikalne": 13721,
+   "udzial_unikalnych": 0.1669,
+   "linie_w_cache": 4880,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 235,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 5,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-052_Steenbarger_Trading-Psychology-2.0",
+   "slowa": 166125,
+   "unikalne": 17897,
+   "udzial_unikalnych": 0.1077,
+   "linie_w_cache": 10232,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 475,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-053_Antonopoulos-Harding_Mastering-Bitcoin-3rd-ed",
+   "slowa": 29963,
+   "unikalne": 5411,
+   "udzial_unikalnych": 0.1806,
+   "linie_w_cache": 0,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 86,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "CZYSTA",
+   "powody": []
+  },
+  {
+   "ksiazka": "BIB-054_Antonopoulos-Wood_Mastering-Ethereum",
+   "slowa": 170286,
+   "unikalne": 17060,
+   "udzial_unikalnych": 0.1002,
+   "linie_w_cache": 12779,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 487,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 53,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-055_Popper_Digital-Gold",
+   "slowa": 112568,
+   "unikalne": 15670,
+   "udzial_unikalnych": 0.1392,
+   "linie_w_cache": 6842,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 322,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-056_Dalio_Principles-for-Navigating-Big-Debt-Crises",
+   "slowa": 186103,
+   "unikalne": 17923,
+   "udzial_unikalnych": 0.0963,
+   "linie_w_cache": 75117,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 532,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-057_Dalio_Principles-for-Dealing-with-the-Changing-World-Order",
+   "slowa": 165680,
+   "unikalne": 16034,
+   "udzial_unikalnych": 0.0968,
+   "linie_w_cache": 17980,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 474,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 3,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-058_Dalio_How-Countries-Go-Broke-The-Big-Cycle",
+   "slowa": 118041,
+   "unikalne": 11689,
+   "udzial_unikalnych": 0.099,
+   "linie_w_cache": 8241,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 338,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-059_Kindleberger-Aliber_Manias-Panics-and-Crashes",
+   "slowa": 175469,
+   "unikalne": 21064,
+   "udzial_unikalnych": 0.12,
+   "linie_w_cache": 5616,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 502,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 1,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-060_Shiller_Irrational-Exuberance",
+   "slowa": 165671,
+   "unikalne": 21877,
+   "udzial_unikalnych": 0.1321,
+   "linie_w_cache": 18019,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 474,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 72,
+   "znaki_matematyczne": 1,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-061_Thaler_Misbehaving-The-Making-of-Behavioral-Economics",
+   "slowa": 144902,
+   "unikalne": 19523,
+   "udzial_unikalnych": 0.1347,
+   "linie_w_cache": 3964,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 414,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 2,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-062_Chancellor_Devil-Take-the-Hindmost",
+   "slowa": 147464,
+   "unikalne": 24845,
+   "udzial_unikalnych": 0.1685,
+   "linie_w_cache": 3462,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 422,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-063_MacKay_Extraordinary-Popular-Delusions-and-the-Madness-of-Crowds",
+   "slowa": 296564,
+   "unikalne": 32395,
+   "udzial_unikalnych": 0.1092,
+   "linie_w_cache": 3441,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 848,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-064_Reinhart-Rogoff_This-Time-Is-Different",
+   "slowa": 113627,
+   "unikalne": 14280,
+   "udzial_unikalnych": 0.1257,
+   "linie_w_cache": 10732,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 325,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 41,
+   "tabele_z_trescia": 41,
+   "rysunki_zapowiedziane": 165,
+   "znaki_matematyczne": 1,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-065_Shreve_Stochastic-Calculus-for-Finance-I-Binomial-Asset-Pricing",
+   "slowa": 60173,
+   "unikalne": 9016,
+   "udzial_unikalnych": 0.1498,
+   "linie_w_cache": 410,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 172,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 65,
+   "znaki_matematyczne": 17,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-066_Shreve_Stochastic-Calculus-for-Finance-II-Continuous-Time-Models",
+   "slowa": 69808,
+   "unikalne": 12971,
+   "udzial_unikalnych": 0.1858,
+   "linie_w_cache": 700,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 200,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 52,
+   "znaki_matematyczne": 77,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-067_Sutton-Barto_Reinforcement-Learning-An-Introduction-2nd-ed",
+   "slowa": 243059,
+   "unikalne": 23513,
+   "udzial_unikalnych": 0.0967,
+   "linie_w_cache": 1080,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 695,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 359,
+   "znaki_matematyczne": 4,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-068_Goodfellow-Bengio-Courville_Deep-Learning",
+   "slowa": 298682,
+   "unikalne": 22761,
+   "udzial_unikalnych": 0.0762,
+   "linie_w_cache": 49813,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 854,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 158,
+   "znaki_matematyczne": 1818,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-069_Voshmgir_Token-Economy-3rd-ed",
+   "slowa": 95884,
+   "unikalne": 9828,
+   "udzial_unikalnych": 0.1025,
+   "linie_w_cache": 6355,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 274,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-070_Vaswani-et-al_Attention-Is-All-You-Need",
+   "slowa": 6095,
+   "unikalne": 2096,
+   "udzial_unikalnych": 0.3439,
+   "linie_w_cache": 1076,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 18,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 15,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-071_Easley-Lopez-de-Prado-OHara_Flow-Toxicity-and-Liquidity-in-a-High-Frequency-World",
+   "slowa": 17051,
+   "unikalne": 4220,
+   "udzial_unikalnych": 0.2475,
+   "linie_w_cache": 4055,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 49,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 57,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-072_Hyndman-Athanasopoulos_Forecasting-Principles-and-Practice-2nd-ed",
+   "slowa": 89937,
+   "unikalne": 11729,
+   "udzial_unikalnych": 0.1304,
+   "linie_w_cache": 14648,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 257,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 261,
+   "znaki_matematyczne": 654,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-073_Boyd-Vandenberghe_Convex-Optimization",
+   "slowa": 256849,
+   "unikalne": 22925,
+   "udzial_unikalnych": 0.0893,
+   "linie_w_cache": 40401,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 734,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 213,
+   "znaki_matematyczne": 6344,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-074_Boyd-Vandenberghe_Additional-Exercises-for-Convex-Optimization",
+   "slowa": 180680,
+   "unikalne": 24518,
+   "udzial_unikalnych": 0.1357,
+   "linie_w_cache": 37295,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 517,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 4118,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-075_Nakamoto_Bitcoin-A-Peer-to-Peer-Electronic-Cash-System",
+   "slowa": 3324,
+   "unikalne": 1166,
+   "udzial_unikalnych": 0.3508,
+   "linie_w_cache": 293,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 10,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-076_Buterin_Ethereum-Whitepaper",
+   "slowa": 13820,
+   "unikalne": 3184,
+   "udzial_unikalnych": 0.2304,
+   "linie_w_cache": 12390,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 40,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-077_Daian-et-al_Flash-Boys-2.0-Frontrunning-in-Decentralized-Exchanges",
+   "slowa": 14634,
+   "unikalne": 3982,
+   "udzial_unikalnych": 0.2721,
+   "linie_w_cache": 2098,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 42,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 46,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-078_Adams-et-al_Uniswap-v3-Core",
+   "slowa": 6631,
+   "unikalne": 1854,
+   "udzial_unikalnych": 0.2796,
+   "linie_w_cache": 1056,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 19,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 91,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-079_Gneiting-Raftery_Strictly-Proper-Scoring-Rules-Prediction-and-Estimation",
+   "slowa": 18242,
+   "unikalne": 4667,
+   "udzial_unikalnych": 0.2558,
+   "linie_w_cache": 2532,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 53,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 358,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-080_Jurafsky-Martin_Speech-and-Language-Processing-3rd-ed",
+   "slowa": 306145,
+   "unikalne": 38153,
+   "udzial_unikalnych": 0.1246,
+   "linie_w_cache": 50008,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 875,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 376,
+   "znaki_matematyczne": 856,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-081_Tunstall_Natural-Language-Processing-with-Transformers",
+   "slowa": 129664,
+   "unikalne": 14232,
+   "udzial_unikalnych": 0.1098,
+   "linie_w_cache": 50574,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 371,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 64,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-082_Rothman_Transformers-for-Natural-Language-Processing",
+   "slowa": 181223,
+   "unikalne": 20588,
+   "udzial_unikalnych": 0.1136,
+   "linie_w_cache": 18551,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 518,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 321,
+   "znaki_matematyczne": 4,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-084_Devlin_BERT-Pre-training-of-Deep-Bidirectional-Transformers",
+   "slowa": 10169,
+   "unikalne": 3107,
+   "udzial_unikalnych": 0.3055,
+   "linie_w_cache": 2103,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 29,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 6,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-085_Brown_Language-Models-are-Few-Shot-Learners-GPT-3",
+   "slowa": 38073,
+   "unikalne": 9128,
+   "udzial_unikalnych": 0.2397,
+   "linie_w_cache": 5540,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 109,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 42,
+   "znaki_matematyczne": 19,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-086_Hu_LoRA-Low-Rank-Adaptation-of-Large-Language-Models",
+   "slowa": 17227,
+   "unikalne": 5277,
+   "udzial_unikalnych": 0.3063,
+   "linie_w_cache": 5333,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 50,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-087_Dettmers_QLoRA-Efficient-Finetuning-of-Quantized-LLMs",
+   "slowa": 14023,
+   "unikalne": 3972,
+   "udzial_unikalnych": 0.2832,
+   "linie_w_cache": 2143,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 41,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 35,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-088_Hinton_Distilling-the-Knowledge-in-a-Neural-Network",
+   "slowa": 5710,
+   "unikalne": 1531,
+   "udzial_unikalnych": 0.2681,
+   "linie_w_cache": 560,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 17,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 14,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-089_Wei_Chain-of-Thought-Prompting-Elicits-Reasoning",
+   "slowa": 22641,
+   "unikalne": 5024,
+   "udzial_unikalnych": 0.2219,
+   "linie_w_cache": 2834,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 65,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 87,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-090_Wang_Self-Consistency-Improves-Chain-of-Thought-Reasoning",
+   "slowa": 14444,
+   "unikalne": 3957,
+   "udzial_unikalnych": 0.274,
+   "linie_w_cache": 2187,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 42,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 68,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-091_Zhou_LIMA-Less-Is-More-for-Alignment",
+   "slowa": 10441,
+   "unikalne": 3581,
+   "udzial_unikalnych": 0.343,
+   "linie_w_cache": 1314,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 30,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 3,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-092_Lewis_Retrieval-Augmented-Generation",
+   "slowa": 9886,
+   "unikalne": 3332,
+   "udzial_unikalnych": 0.337,
+   "linie_w_cache": 1359,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 29,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 19,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-093_Raschka_Build-a-Large-Language-Model-From-Scratch",
+   "slowa": 85432,
+   "unikalne": 11553,
+   "udzial_unikalnych": 0.1352,
+   "linie_w_cache": 30304,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 245,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 304,
+   "znaki_matematyczne": 31,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-094_Kaplan_Scaling-Laws-for-Neural-Language-Models",
+   "slowa": 15274,
+   "unikalne": 3462,
+   "udzial_unikalnych": 0.2267,
+   "linie_w_cache": 2424,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 44,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 219,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-095_Hoffmann_Training-Compute-Optimal-LLMs-Chinchilla",
+   "slowa": 15196,
+   "unikalne": 4273,
+   "udzial_unikalnych": 0.2812,
+   "linie_w_cache": 3109,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 44,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 72,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-096_Ouyang_Training-LMs-to-follow-instructions-with-human-feedback-InstructGPT",
+   "slowa": 29491,
+   "unikalne": 6856,
+   "udzial_unikalnych": 0.2325,
+   "linie_w_cache": 4455,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 85,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 36,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-097_Rafailov_Direct-Preference-Optimization-DPO",
+   "slowa": 15073,
+   "unikalne": 4088,
+   "udzial_unikalnych": 0.2712,
+   "linie_w_cache": 1973,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 44,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 167,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-098_Frantar_GPTQ-Accurate-Post-Training-Quantization",
+   "slowa": 8890,
+   "unikalne": 3208,
+   "udzial_unikalnych": 0.3609,
+   "linie_w_cache": 1948,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 26,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 29,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-099_Leviathan_Fast-Inference-from-Transformers-via-Speculative-Decoding",
+   "slowa": 7850,
+   "unikalne": 2310,
+   "udzial_unikalnych": 0.2943,
+   "linie_w_cache": 1417,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 23,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 156,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-100_Hamilton_Graph-Representation-Learning",
+   "slowa": 50588,
+   "unikalne": 6621,
+   "udzial_unikalnych": 0.1309,
+   "linie_w_cache": 7104,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 145,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 34,
+   "znaki_matematyczne": 153,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-101_Wu_Graph-Neural-Networks-Foundations-Frontiers-and-Applications",
+   "slowa": 295356,
+   "unikalne": 31111,
+   "udzial_unikalnych": 0.1053,
+   "linie_w_cache": 38014,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 844,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 110,
+   "znaki_matematyczne": 1393,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-102_Labonne_Hands-On-Graph-Neural-Networks-Using-Python",
+   "slowa": 73951,
+   "unikalne": 10385,
+   "udzial_unikalnych": 0.1404,
+   "linie_w_cache": 10525,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 212,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 109,
+   "znaki_matematyczne": 25,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-103_Kipf-Welling_Semi-Supervised-Classification-with-Graph-Convolutional-Networks",
+   "slowa": 6938,
+   "unikalne": 2188,
+   "udzial_unikalnych": 0.3154,
+   "linie_w_cache": 985,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 20,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 55,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-104_Velickovic_Graph-Attention-Networks",
+   "slowa": 6495,
+   "unikalne": 2358,
+   "udzial_unikalnych": 0.363,
+   "linie_w_cache": 810,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 19,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 35,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-105_Battaglia_Relational-inductive-biases-deep-learning-and-graph-networks",
+   "slowa": 18244,
+   "unikalne": 4496,
+   "udzial_unikalnych": 0.2464,
+   "linie_w_cache": 2244,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 53,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 36,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-106_Barabasi_Network-Science",
+   "slowa": 33898,
+   "unikalne": 6856,
+   "udzial_unikalnych": 0.2023,
+   "linie_w_cache": 6988,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 97,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 94,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-107_Newman_Networks-An-Introduction",
+   "slowa": 280748,
+   "unikalne": 19916,
+   "udzial_unikalnych": 0.0709,
+   "linie_w_cache": 27331,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 803,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 187,
+   "znaki_matematyczne": 1018,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-108_Lapan_Deep-Reinforcement-Learning-Hands-On-3rd-ed",
+   "slowa": 190011,
+   "unikalne": 20486,
+   "udzial_unikalnych": 0.1078,
+   "linie_w_cache": 120191,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 543,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 398,
+   "znaki_matematyczne": 297,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-109_Graesser-Keng_Foundations-of-Deep-Reinforcement-Learning",
+   "slowa": 141966,
+   "unikalne": 13802,
+   "udzial_unikalnych": 0.0972,
+   "linie_w_cache": 20852,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 406,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 145,
+   "znaki_matematyczne": 1051,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-110_Mnih_Human-level-control-through-deep-RL",
+   "slowa": 7168,
+   "unikalne": 2401,
+   "udzial_unikalnych": 0.335,
+   "linie_w_cache": 1023,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 21,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-111_Schulman_Proximal-Policy-Optimization-Algorithms",
+   "slowa": 4392,
+   "unikalne": 1621,
+   "udzial_unikalnych": 0.3691,
+   "linie_w_cache": 1064,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 13,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 108,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-112_Silver_Deterministic-Policy-Gradient-Algorithms",
+   "slowa": 6749,
+   "unikalne": 1980,
+   "udzial_unikalnych": 0.2934,
+   "linie_w_cache": 1121,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 20,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 340,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-113_Szepesvari_Algorithms-for-Reinforcement-Learning",
+   "slowa": 40695,
+   "unikalne": 7552,
+   "udzial_unikalnych": 0.1856,
+   "linie_w_cache": 4555,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 117,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 11,
+   "znaki_matematyczne": 1034,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-114_Bertsekas_Reinforcement-Learning-and-Optimal-Control",
+   "slowa": 96605,
+   "unikalne": 10449,
+   "udzial_unikalnych": 0.1082,
+   "linie_w_cache": 15325,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 276,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 65,
+   "znaki_matematyczne": 996,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-115_Powell_Approximate-Dynamic-Programming",
+   "slowa": 247556,
+   "unikalne": 21631,
+   "udzial_unikalnych": 0.0874,
+   "linie_w_cache": 38629,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 708,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 272,
+   "znaki_matematyczne": 3937,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-116_Pearl_Causality-Models-Reasoning-and-Inference",
+   "slowa": 225495,
+   "unikalne": 19414,
+   "udzial_unikalnych": 0.0861,
+   "linie_w_cache": 7152,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 645,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 408,
+   "znaki_matematyczne": 81,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-136_Diebold-Mariano_Comparing-Predictive-Accuracy",
+   "slowa": 7991,
+   "unikalne": 3022,
+   "udzial_unikalnych": 0.3782,
+   "linie_w_cache": 1289,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 23,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-155_Glosten-Milgrom_Bid-Ask-and-Transaction-Prices",
+   "slowa": 12130,
+   "unikalne": 2942,
+   "udzial_unikalnych": 0.2425,
+   "linie_w_cache": 1410,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 35,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 0,
+   "werdykt": "OKROJONA",
+   "powody": [
+    "100% struktury linii skasowane przez fragmentację"
+   ]
+  },
+  {
+   "ksiazka": "BIB-161_Madhavan_Market-Microstructure-A-Survey",
+   "slowa": 24747,
+   "unikalne": 4828,
+   "udzial_unikalnych": 0.1951,
+   "linie_w_cache": 112,
+   "linie_po_fragmentacji": 0,
+   "chunkow": 71,
+   "slow_zgubionych_przy_cieciu": 0,
+   "listingi_zapowiedziane": 0,
+   "listingi_z_kodem": 0,
+   "tabele_zapowiedziane": 0,
+   "tabele_z_trescia": 0,
+   "rysunki_zapowiedziane": 0,
+   "znaki_matematyczne": 1,
+   "werdykt": "CZYSTA",
+   "powody": []
+  }
+ ]
+}

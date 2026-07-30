@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-27
+stan_na: 2026-07-29
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,427 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-07-30 | 🔎 | PIERWSZY POMIAR TRAFNOŚCI RAG — moja ścieżka była 4× gorsza od Hyginusowej
+
+**QUAESITOR uruchomiony PIERWSZY RAZ w historii Imperium** (organ leżał gotowy od sesji
+zabitej reinstalacją). 30 pytań known-item, 118 książek, 37 331 fragmentów.
+
+### Wynik, który jest alarmem
+
+| Składnia | recall@1 | recall@5 | recall@10 | MRR |
+|---|---|---|---|---|
+| **AND** — surowy MATCH, ścieżka **MCP** (moja) | 16,7% | **16,7%** | 20,0% | 0,172 |
+| **OR** — ścieżka HYGINUSA | 46,7% | **66,7%** | 83,3% | 0,564 |
+
+Na pytaniach **OPISOWYCH** (opisują pojęcie, nie nazywają go) surowy AND dał **0,0% na 15** —
+zero, nie „mało". Domyślny MATCH FTS5 łączy słowa niejawnym AND, więc długie pytanie wymaga
+WSZYSTKICH słów w jednym fragmencie.
+
+### 🚨 Przyczyna: sanityzacja w TRZECH kopiach i dziura w czwartym miejscu
+
+`bibliotekarz._fts_bezpieczne` (stosowana) · `quaesitor._fts_or` (kopia) · **`mcp_server` — BRAK**.
+Każdy wołający składał zapytanie u siebie, więc jeden został pominięty — ta sama klasa, którą
+naprawialiśmy przy `normalizuj_interwal`. **Za każdym razem, gdy Architekt czytał bibliotekę
+przez MCP, używał gorszej z dwóch dostępnych ścieżek.**
+
+### Naprawa U ŹRÓDŁA + ulepszenie z pomiaru
+
+`szukaj.sanityzuj_fts` jako **jedyne źródło prawdy**, parametr `skladnia` (`or` domyślnie /
+`and` / `surowa`); kopie u wołających **delegują**, wywołania przestały składać zapytanie
+samodzielnie (podwójne złożenie dałoby „a OR OR OR b").
+
+Przy okazji zmierzony i wdrożony **odsiew słów pustych** — bo `how`, `to`, `the`, `me`
+występują w każdym fragmencie i rozcieńczają ranking BM25:
+
+| Wariant | RAZEM @5 | OPISOWE @5 | czas |
+|---|---|---|---|
+| OR ze słowami pustymi | 66,7% | 33,3% | 323 ms |
+| **OR bez słów pustych (wdrożone)** | **80,0%** | **60,0%** | **143 ms** |
+
+**+26,7 pp na pytaniach opisowych i 2,3× szybciej.** Uczciwie: na @10 wariant bez słów
+pustych wypadł o 3,3 pp gorzej (jedno pytanie z trzydziestu) — przy tej próbce szum.
+Rozstrzyga @5, bo tyle bierze `mcp_server`.
+
+**Efekt na żywym zapytaniu opisowym:** 0 → 5 trafień.
+
+### Co ten bieg jeszcze rozstrzygnął
+
+- **Luka słownikowa +40,0 pp** (dosłowne 100% vs opisowe 60% @5) — to ZMIERZONY sufit zysku
+  z wektorów i jest duży. Przypuszczenie „wektory kupią mało" upadło.
+- **Naprawa z recenzji zadziałała na żywym biegu:** jedno zapytanie wysypało się składniowo
+  (`D02: no such column: labeling`) i **zostało zaraportowane osobno**. Przed naprawą
+  policzyłoby się cicho jako brak trafienia.
+- **Próba jest za mała, by to zamknąć** (15 pytań na klasę) → pozycja **A10** (zbiór
+  z indeksów książek, 13 729 haseł) staje się ważniejsza, nie mniej ważna.
+
+**K10 nadal NIEZNANE:** ten bieg to linia bazowa na STARYM chunkerze. K10 wymaga tej samej
+miary na indeksie zbudowanym REDDITOREM.
+
+**Testy:** 3199 → 3218 (+19, w tym regresja pilnująca, że ścieżka MCP nie wróci do surowego
+MATCH-u, oraz granice `--topk`).
+
+**Dwie rzeczy dorzucone z pętli CENSORA:** skan wad wskazał `--topk` z gołym `type=int`
+(przyjmował `0`, czyli zapytanie zwracające nic BEZ wyjaśnienia, a przy filtrze katalogowym
+`szukaj` nadpobiera ×20, więc duże topk robiło pełny skan korpusu) → walidacja 1..100
+z testem granicy. Oraz `--skladnia` **wystawiona w CLI** — parametr istniał w `szukaj()`
+i był niedostępny z terminala, czyli zdolność zapłacona i niepodpięta (Prawo XV).
+
+**Dowód na żywym zapytaniu:** `szukaj.py "adverse selection informed traders" --topk 3 --tryb fts`
+zwraca **Harrisa, rozdz. 13.7.2 „Adverse Selection Risk"**. To samo pytanie przez MCP
+dawało wcześniej ZERO trafień.
+
+**Pliki:** `narzedzia/rag/szukaj.py`, `quaesitor.py`, `narzedzia/bibliotekarz.py`,
+`narzedzia/ab_plon_hyginusa.py`, `tests/test_sanityzacja_fts.py` (nowy),
+`tests/test_quaesitor.py`, `tests/test_bibliotekarz.py`, `docs/ROADMAP_IMPERIUM.md` (A10–A13)
+
+---
+
+## 2026-07-30 | 🔍 | RECENZJA WŁASNEJ WACHTY: 7 wad naprawionych, 1 ZNALEZISKO OBALONE
+
+**`/code-review` na diffie wachty apert29 — 8 zgłoszonych, 7 realnych, 1 własne BŁĘDNE.**
+Wszystkie potwierdzane pomiarem przed zgłoszeniem i po naprawie (LEX TALARUS).
+
+### Dwie najcięższe — w organie, którym spłacałem talar
+
+| Wada | Zmierzone przed | Po naprawie |
+|---|---|---|
+| **63,4% okien wyszukiwania startowało w PÓŁ SŁOWA** — cofnięcie liczone z tekstu po normalizacji białych znaków, a w źródle stoją tam nowe linie i podwójne spacje | 1581 / 2492 okien | **0 / 2493** |
+| **`_rozbij_wielki` cicho łamał sufit, dla którego istnieje** — kończył pracę, gdy poziom dał >1 kawałek, bez sprawdzenia rozmiaru | 4 fragmenty po **1501** słów przy sufcie 900 | 15 fragmentów, max **404** |
+
+Wniosek dnia: **dowód SHA-256 trzymał się bez zarzutu, a organ i tak był wadliwy** —
+bezstratność nigdy nie była tym samym co poprawność. To dokładnie zdanie, które NORMA
+mówi przez K10, tylko zastosowałem je do wyszukiwania, a nie do samego organu.
+
+### ❌ ZNALEZISKO NR 3 OBALONE WŁASNYM POMIAREM
+
+Zarzuciłem AESTIMATOROWI, że miara straty jako różnica ZBIORÓW słów nie wykryje utraty
+fragmentu. Zarzut brzmiał sensownie i **był błędny**. Dwie „naprawy" okazały się GORSZE
+od oryginału: krotności tonęły w nadmiarze kopii z zakładki, a pokrycie pozycji dawało
+**599 fałszywych strat** na tekście ze zwielokrotnionym tym samym słowem.
+
+**Dowód konstrukcyjny, dla którego prosta miara wystarcza:** `podziel_na_chunki` ma
+zakładkę **50** słów i odrzuca fragmenty krótsze niż **20** słów. Ostatni fragment startuje
+350 słów po poprzednim, który sięga 400 — więc gdy ma mniej niż 20 słów, mieści się
+W CAŁOŚCI w ogonie poprzednika. **Zakładka > próg odrzutu, zatem kanał utraty nie istnieje.**
+Sprawdzone na sześciu długościach granicznych (366/405/1009/1209/1360/1401): 0 niepokrytych.
+Miara przywrócona, dowód zapisany w kodzie wraz z warunkiem, kiedy przestaje obowiązywać.
+
+### Pozostałe pięć
+
+- **`quaesitor` — kolumna `recall@10` pokazywała recall@topk pod fałszywą nazwą.** Progi
+  liczone teraz z `topk`, nagłówek i etykieta w ledgerze generowane z faktycznych progów.
+- **`quaesitor` — awaria zapytania FTS nieodróżnialna od braku trafień.** Przy `postep=False`
+  wysypane `MATCH` wchodziło do metryk jako miss bez śladu w raporcie: werdykt „BM25 słabo
+  radzi sobie z pytaniami opisowymi" mógł w całości pochodzić z zapytań, które nie wystartowały.
+  Teraz liczone i raportowane osobno.
+- **Warstwa 16 — marker `↗` wyciszał CAŁĄ LINIĘ**, chowając realne widmo NASZEGO pliku obok
+  ścieżki obcej (zmierzone). Zacisza teraz tylko swój segment (komórka tabeli `|` / człon `—`).
+- **NORMA K3 oblewała korpus bez znaków nowej linii** mimo zera strat (0/0 → 0.0 → PORAŻKA).
+  Brakujący pomiar to NIEZNANE, nie porażka.
+- **`quaesitor` bez ani jednego testu** wbrew LEX TALARUS z tej samej wachty → **19 testów**;
+  dwa z nich przypinają wady z tej recenzji.
+
+### Luka w samej bramce
+
+**NORMA K7 bada wyłącznie kanon, nie okna** — dlatego wada 63,4% przeszła. Granica siedzi
+teraz w `tests/test_redditor.py` na tekście o niejednolitych odstępach. Testów: 3176 → **3199**.
+
+**Pliki:** `narzedzia/rag/redditor.py`, `aestimator.py`, `norma.py`, `quaesitor.py`,
+`narzedzia/audyt_spojnosci.py`, `tests/test_quaesitor.py` (nowy), `tests/test_redditor.py`,
+`tests/test_spojnosc.py`
+
+---
+
+## 2026-07-29 | 🏛️ | SCHOLA CAESARIS — szkoła, w której Cezar i Imperium uczą się razem
+
+**Rozkaz Cezara:** „car chciałby też się uczyć wraz z imperium… dokument żywy stale
+podlegający rozwojowi i pamiętany co sesja".
+
+**`docs/SCHOLA_CAESARIS.md`** (kategoria DISCIPLINA) + organ **`imperium/biblioteki/schola.py`**
+(16 testów). Dwie zasady założycielskie, obie egzekwowane przez organ, nie przez dobre chęci:
+
+1. **Żadnej lekcji bez WŁASNEGO dowodu** — każda opiera się na czymś, co sami zmierzyliśmy,
+   z datą, liczbą i nazwą pliku. Podręczniki opisują cudze przykłady; ta szkoła opisuje
+   **nasze pomyłki i nasze pomiary**, więc nie da się jej skopiować.
+2. **Lekcja nie może zostać ładną teorią** — rodząca twierdzenie sprawdzalne dostaje STATUS
+   (`HIPOTEZA` → `ZMIERZONE` → `POTWIERDZONE`/`OBALONE`). Tędy nauka Cezara **wraca do
+   Imperium jako zadanie**.
+
+**Dlaczego ORGAN, a nie sam plik:** dokument z ręcznie wpisanym postępem zgniłby — mamy na to
+dowód (runbook W11 kazał `git push` przez 9 dni po zakazie, bo miał własną treść). Liczba
+lekcji, postęp i lista hipotez są **liczone z pliku przy każdym wywołaniu**. Organ krzyczy
+przy lekcji bez statusu, bez własnego dowodu albo bez sprawdzianu — trzy testy pilnują, że
+**żywy dokument sam nie łamie reguł, których uczy**.
+
+**Wpięcie:** jedna linia w hooku `SessionStart` (nie raport — AERARIUM pilnuje wagi wydruku).
+
+**Trzy pierwsze lekcje — wszystkie zarobione dziś:**
+
+| # | Lekcja | Własny dowód | Status |
+|---|---|---|---|
+| 1 | **Niezmiennik** — jak sprawdzić wynik, którego nie znasz | `sha256(sklejenie)==sha256(źródła)`, 118/118 książek | ✅ POTWIERDZONE |
+| 2 | **Przyrząd kłamie pierwszy** | kalibracja AESTIMATORA wykryła zawyżenie straty **2,7×** | ✅ POTWIERDZONE |
+| 3 | **Zgodność skal** — cichy zabójca rankingów | `szukaj.py:179` — BM25 ujemny vs cosinus 0…1 | ⏳ HIPOTEZA |
+
+**Pliki:** `docs/SCHOLA_CAESARIS.md`, `imperium/biblioteki/schola.py`, `tests/test_schola.py`,
+`.claude/hooks/session-start.sh`, `docs/CENSUS_ORGANORUM.md` (254→255), `README.md` (liczby)
+
+---
+
+## 2026-07-29 | ⚖️ | WIERNOŚĆ BIBLIOTEKI: dwa talary Cezara, trzy organy, bezstratność jako twierdzenie
+
+**Rozkaz:** „musimy być pewni, czy wszystkie dane zostały najlepiej pobrane i czy sposób
+ich podziału był dobry". Odpowiedź musiała być POMIAREM, nie zapewnieniem.
+
+### 🪙 LEX TALARUS — nowe prawo, zrodzone z dwóch moich błędów
+
+Cezar przyznał **dwa talary**, oba trafione:
+1. Ogłosiłem, że AESTIMATOR działa, **zanim go skalibrowałem**. Kalibracja na prawdzie
+   podstawowej z ręki (8 próbek) wykryła DWA błędy miernika: wzorzec listingu bezwzględny
+   na wielkość liter liczył PROZĘ („Snippet 9.1 lists function…") jako obietnicę kodu
+   (**zawyżenie straty 259 → 96, czyli 2,7×**), a detektor kodu z gołym `return` dawał
+   **6,2% fałszywek** na 600 oknach prozy, bo w książce finansowej `return` = stopa zwrotu.
+2. Zbudowałem REDDITORA **przed przeglądem**, czy Imperium nie ma już podobnego modułu.
+   Przegląd po fakcie wypadł czysto — ale czysty wynik nie usprawiedliwia pominiętego kroku.
+
+Skodyfikowane w CLAUDE.md jako **LEX TALARUS** + **CURSUS PLENUS** (pełny cykl zadania).
+Zasada rdzeniowa: **nowy przyrząd bez testu kalibracyjnego na prawdzie podstawowej NIE ISTNIEJE**
+(Prawo XIX rozciągnięte na mierniki). Architekt SAM domaga się rozliczenia długu talarowego.
+
+### Trzy organy (wszystkie z kalibracją — 44 nowe testy)
+
+| Organ | Rola | Dowód |
+|---|---|---|
+| **AESTIMATOR** | wierność korpusu; rozdziela stratę NIEODWRACALNĄ (ekstrakcja) od ODWRACALNEJ (fragmentacja) | 14 testów |
+| **REDDITOR** | fragmentacja, w której fragment jest ZAKRESEM w źródle, nie kopią | 18 testów, **118/118 książek odtworzonych CO DO BAJTU** |
+| **NORMA** | węgielnica 10 kryteriów przykładana do KAŻDEJ metody równą miarą | 12 testów |
+
+### Co zmierzono na 118 książkach
+
+| Ustalenie | Liczba |
+|---|---|
+| Struktura gubiona przez starą fragmentację | **1 479 710 linii → 0** |
+| Słowa gubione przez starą fragmentację | **0** (była bezstratna SŁOWNIE, nie DOKUMENTOWO) |
+| Listingi kodu utracone w EKSTRAKCJI | **96 ze 136**, z czego **93 to sam BIB-007 (AFML)** |
+| Tabele | **294/294 mają treść** — gubiła je dopiero fragmentacja |
+| Wykresy | **11 314 podpisów bez treści** (obraz, nigdy nie było w tekście) |
+| REDDITOR: fragmentów / tabel nierozerwanych | 25 067 / 2 484 |
+
+**BIB-023 (ten sam autor, inny plik) ma 39/42 listingi z kodem** — problem jest FORMATEM
+PLIKU, nie regułą. To rozstrzyga, że lekarstwem jest OCR na jednej pozycji, nie przebudowa.
+
+### 📐 NORMA odrzuciła obie metody — w tym moją
+
+Pierwszy przebieg: stara metoda ODRZUCONA (K1, K2, K3, K6, K8), REDDITOR też ODRZUCONY
+(okruchy <20 słów, 31% fragmentów bez adresu). Po naprawie REDDITOR ma **9/10 zielonych**,
+a **K10 zostaje NIEZNANE** i werdykt brzmi **NIEROZSTRZYGNIĘTE — brak dowodu wyższości**.
+K10 (trafność vs metoda zastana) liczy wyłącznie QUAESITOR, którego **nigdy nie uruchomiono**.
+Bezstratność jest warunkiem KONIECZNYM, nie dowodem wyższości — i bramka tego pilnuje.
+
+### 🚨 Prawo XV — luka systemowa zmierzona na żądanie Cezara
+
+**47 organów orzekających, 11 bez testu kalibracyjnego.** Osiem z nich to narzędzia A/B
+(`ab_dvol`, `ab_stablecoin`, `ab_usd`, `ab_w329`, `ab_w330_radar`, `ab_w334_progi`,
+`ab_w335_cross_rs`, `ab_w336_changepoint`) — **przyrządy, których werdykty zadecydowały
+o składzie roju**. Heurystyka „brak testu" dała najpierw 13 pozycji; weryfikacja odsiała
+4 fałszywe alarmy i wykryła 3 pokrycia POZORNE (nazwa narzędzia jako napis w teście ledgera).
+
+### 🪙 TRZECI TALAR — i luka w Warstwie 16, którą odsłonił
+
+Wpisałem do ŻYWEGO dokumentu ścieżki `.py` z **cudzych repozytoriów** (`ml4t/backtest`,
+`skfolio`, `nautilus_trader`) bez oznaczenia — dokument twierdził, że mamy pliki, których
+nie mamy. **Warstwa 16 zapaliła alarm słusznie.**
+
+Ale diagnoza sięgnęła głębiej niż mój wpis: **W16 nie miała POJĘCIA „plik z cudzego repo".**
+Umiała orzec „nasz plik i go nie ma" (widmo) albo „to plan" — a cytat prior-artu nie mieści
+się w żadnej z tych kategorii. Zmuszało to do wyboru między **fałszywym alarmem** a **fałszywym
+opisem** (oznaczenie cudzego, DZIAŁAJĄCEGO kodu jako „plan"). Problem jest strukturalny
+i rosnący, bo każdy zwiad FRUMENTARIUSA produkuje takie ścieżki.
+
+**Naprawa u źródła:** marker `↗` = ścieżka w cudzym repozytorium. Dwa testy granicy:
+z markerem cisza, **bez markera nadal alarm** — supresja nie może tłumić wszystkiego.
+
+### 🐎 Zwiad zewnętrzny (GitHub) — dopisany do PLAN WACHT wg wagi
+
+| Waga | Znalezisko | Co daje |
+|---|---|---|
+| 🥇 | **Testy niezmienników księgowych** (`ml4t/backtest`) — `\|(kapitał+ΣP&L) − wartość_końcowa\| < 1e-9` | rozwiązuje WACHTĘ B: przyrząd sprawdzany prawem zachowania, nie liczbą z pamięci |
+| 🥈 | **Look-ahead przy agregacji interwałów** (`vectorbt` #101) | 🚨 dotyczy nas wprost — `mtf_konfluencja` 1m→1H→4H; **nowa pozycja B4** |
+| 🥉 | **HRP/HERC** (`skfolio`) | skorelowana rodzina sygnałów dzieli JEDNĄ pulę wagi — wprost pod 87 neuronów i Prawo XVI |
+
+**Ostrzeżenie zaoszczędzające czas:** publiczny `mlfinlab` to **atrapa** (metody z ciałem `pass`
+po komercjalizacji) — brać nazwy koncepcji, nigdy implementacje. Zwiadowca **nie znalazł**
+przypadku „zły annualizator"/„survivorship" z numerem issue i napisał to wprost, zamiast zmyślać.
+
+**Pliki:** `narzedzia/rag/aestimator.py`, `redditor.py`, `norma.py`, `tests/test_aestimator.py`,
+`tests/test_redditor.py`, `tests/test_norma.py`, `CLAUDE.md`, `docs/ROADMAP_IMPERIUM.md`
+(sekcja PLAN WACHT: wachty A–E), `docs/CENSUS_ORGANORUM.md`
+
+---
+
+## 2026-07-29 | 🐞 | ODZYSK PO REINSTALACJI + mina latentna w fuzji hybrydowej RAG
+
+**Reinstalacja aplikacji zabiła sesję w trakcie pracy.** Odzysk zmierzony, nie zgadnięty:
+kod `narzedzia/rag/quaesitor.py` (330 linii, organ R1) przetrwał na dysku jako plik
+nieśledzony, a **cały transkrypt zabitej sesji (637 KB, 184 wpisy) dał się odczytać** —
+więc odzyskaliśmy też rozumowanie, nie tylko pliki. Stracone zostało wyłącznie okno czatu.
+
+**QUAESITOR (R1) wchodzi do repo jako KOD BEZ BRAMKI** — świadomie i z nazwaniem długu:
+zero testów, nigdy nie uruchomiony, żadnego pomiaru. Wg **Prawa XIX ten organ NIE ISTNIEJE**
+i nie wolno się na niego powoływać. Commit ma jeden cel: nie stracić go przy kolejnej
+reinstalacji. Domknięcie (testy + pierwszy bieg) odłożone decyzją Cezara.
+
+**Wada #2 audytu RAG → Księga Wad — i POMIAR OBALIŁ MÓJ WŁASNY OPIS tej wady.**
+`szukaj.py:179` scala BM25 (ujemny, mniej=lepiej) z cosinusem (0..1, więcej=lepiej)
+jednym kluczem `-score`. W meldunku z zabitej sesji napisałem, że wyniki wektorowe wylądują
+**na końcu** listy. Symulacja na danych sztucznych pokazała **odwrotny kierunek i drugi skutek**:
+
+| Co twierdziłem | Co pokazał pomiar |
+|---|---|
+| wektory lądują na KOŃCU | wektory lądują na POCZĄTKU i wypychają BM25 |
+| (nie zauważone) | w obrębie BM25 kolejność ODWRÓCONA — najlepsze trafienie (−8.4) ostatnie, najgorsze (−2.0) pierwsze |
+
+Mina jest **latentna**: dziś tryb `hybrid` cicho degraduje do `fts` (wektorów 0), więc linia
+nigdy się nie wykonuje. Wybuchłaby w dniu włączenia wektorów — i wyglądałaby na **winę
+embeddingów**, a byłby to błąd sortowania. Lek: fuzja po **RANDZE** (RRF, k=60), nie po
+surowym wyniku — rangi są porównywalne między skalami. To jest krok R2 planu.
+
+**Forma wpisu wyszła z pomiaru szumu, nie z wygody:** kandydujący regex
+`key=lambda.*-\w+\.score` daje 2 trafienia / 432 pliki, ale **jedno jest POPRAWNE**
+(`szukaj.py:118` sortuje czysty cosinus) = **50% fałszywek**. Zgodnie z zasadą „regex tylko
+po pomiarze szumu" wada weszła jako **pozycja checklisty** (125), nie jako auto-skan —
+klasa jest semantyczna (zgodność SKAL), nie składniowa.
+
+**LEX TALIONIS:** Cezar zatwierdził NOTĘ `N-09bca019` (cicha wada etykiety interwału)
+i spłacającą ją CORONĘ `C-03dbbd37` (`normalizuj_interwal` jako jedno źródło prawdy).
+Bilans: 49 not / 50 koron, dług honorowy **0**.
+
+**Fałszywy alarm strażnika czystości — rozstrzygnięty, nie zgadnięty.** Pierwszy bieg dał
+3113/3114 i oskarżenie „repozytorium zabrudzone przez testy". Przyczyna to wariant (b)
+z komunikatu: bieg szedł RÓWNOLEGLE z moimi zapisami do `codex_notarum.jsonl` i
+`CENSUS_ORGANORUM.md`. Czysta powtórka: **3114/3114, exit 0**. Lekcja własna: nie pisać
+do repo w trakcie bramki.
+
+**Pliki:** `narzedzia/rag/quaesitor.py` (nowy, bez bramki), `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`,
+`bibliotheca_ulpia/dane/codex_notarum.jsonl`, `docs/CENSUS_ORGANORUM.md` (250→251), `docs/LOG_ZMIAN.md`
+
+---
+
+## 2026-07-29 | 🔍 | RECENZJA KROKU 3: próg z sumy ramion zawyżał podstawę werdyktu
+
+**`/code-review` na własnym diffie — 7 znalezisk, wszystkie naprawione.** Dwa zmieniły LICZBY,
+nie tylko kod.
+
+**Najcięższe: próg konkluzywności liczony z SUMY ramion** (`tr_off + tr_on >= 10`) przepuszczał
+parę z 5 trade'ami na ramię, a raport opisywał ją jako „≥10 trade". `walidacja.MIN_TRADES = 10`
+mówi o KAŻDEJ serii z osobna („mniej = anegdota"). Suma dwóch anegdot nie jest statystyką.
+Po korekcie na próg PER RAMIĘ **werdykty się przesunęły**:
+
+| Interwał / okno | Podstawa (było → jest) | Δ | Werdykt (było → jest) |
+|---|---|---|---|
+| 4H / 600 | 14 → **8 par** | −0.6 → **−0.8 pp** | SZKODZI → SZKODZI |
+| 4H / 1000 | 14 → 14 par | −0.5 pp | SZKODZI (bez zmian) |
+| 1H / 600 | 15 → **1 para** | — | SZKODZI → **NIEKONKLUZYWNE** |
+| 1H / 1000 | 15 → 15 par | +0.6 pp | SŁABE (bez zmian) |
+
+**1H/600 przestał być wyrokiem** — miał jedną parę spełniającą próg. Wniosek końcowy się nie
+zmienia (flaga `ucz_mwu` zostaje OFF), ale opierał się częściowo na próbie, która nie miała
+prawa orzekać. Skorygowane rekordy dopisane do ledgera z jawnym powodem korekty.
+
+**Druga zmiana liczb: fallback `konkluz or wyniki`** cicho przełączał podstawę na wszystkie pary,
+zostawiając nagłówek „N par ≥10 trade" — zdanie fałszywe. Teraz fallback ustawia flagę
+`baza_pelna=False`, raport mówi wprost „ŻADNA para nie ma progu", a werdykt jest wymuszony na
+NIEKONKLUZYWNY. To ta sama klasa co lekcja z rana: **fallback włączony po cichu odtwarza wadę,
+którą próg miał wykluczyć.**
+
+Pozostałe pięć: alarm BEZ_WPŁYWU (Prawo XV) mógł paść z jednej pary — bramka wielkości próby idzie
+teraz PIERWSZA; para krótsza niż okno wchodziła do tabeli pod etykietą pełnego okna — kolumna BARY
+z gwiazdką; `statystyki_zbiorcze([])` dawało ZeroDivisionError zamiast nazwać problem;
+`Dyrygent._progi_interwalu_kanon` był kopią pola PUBLICZNEGO i rozjechałby się po zmianie progu w
+locie — kopia usunięta, czytamy żywy słownik (+ test mutacji po konstrukcji).
+
+**Zasięg naprawy etykiety ZMIERZONY (decyzja Cezara: mierzyć, nie betonować).**
+**4 z 4 zbadanych par zmieniły wynik**, przy NIEZMIENIONEJ liczbie trade'ów (8) — zmienił się
+SKŁAD roju, nie częstotliwość wejść:
+
+| Para | PRZED (pełny rój) | PO (legion SCALP) | Δ |
+|---|---|---|---|
+| BTC 15m | 10008.26 | 9974.84 | −0.33 pp |
+| ETH 15m | 9967.71 | 9908.03 | −0.60 pp |
+| BTC 5m | 9982.21 | 9987.64 | +0.05 pp |
+| ETH 5m | 9914.22 | 9960.70 | +0.46 pp |
+
+Metoda: „PRZED" to emulacja stanu sprzed naprawy (normalizator podmieniony na identyczność =
+surowy klucz), „PO" to kod bieżący; te same bary, to samo okno. Próbka celowana (2 pary/TF), nie
+pełna era. Konsekwencja dla historii: wnioski interwałowe mierzone przez `sym_porownanie_tf.py`
+(etykiety `5m`/`15m`/`1h`/`4h`/`1d` małą literą) pochodzą z roju **bez formacji legionów** —
+czyli mierzyły SWING na 15m, dokładnie jak podejrzewał wpis „profil SCALP nieprzetestowany".
+Kierunek Δ nie jest jednolity (15m gorzej, 5m lepiej), więc to NIE jest poprawa ani pogorszenie
+wyniku — to zmiana tego, CO mierzymy.
+
+**Pliki:** `narzedzia/ab_ucz_mwu.py`, `imperium/koloseum/dyrygent.py`, `tests/test_ab_ucz_mwu.py`
+(+3), `tests/test_dyrygent.py` (+1).
+
+---
+
+## 2026-07-29 | 🎓 | KROK 3 OBIEGU: A/B pętli uczenia — MECHANIZM SZKODZI, a przyrząd kłamał
+
+**Organ DISCIPULUS (`narzedzia/ab_ucz_mwu.py`) — A/B `ucz_mwu` nie istniał.** `ab_strategy_mwu.py`
+mierzy INNY mechanizm (`ucz_mwu_strategii`, W-362 — wagi 20 STRATEGII); wagi NEURONÓW nie miały
+żadnego harnessu, więc „krok 3" zaczął się od zbudowania przyrządu: 15 par × 2 okna, portfel
+równoważony (średnia po parach, nie suma), test znaku dwumianowy dokładny, DSR z uczciwym `n_prob`
+i PBO/CSCV. Cząstkowanie + cache `raporty/` + arena; 22 testy, w tym granice każdego progu.
+
+**WYNIK (15 par × 2 interwały × 2 okna = 4 konfiguracje, świeże bary Binance, tryb=agregat,
+okno roju 250):**
+
+| Interwał | Okno | OFF | ON | Δ | ON>OFF | p (test znaku) | DSR ON | PBO | Werdykt |
+|---|---|---|---|---|---|---|---|---|---|
+| 4H | 600 | +1.5% | +0.9% | **−0.6 pp** | 6/13 | 1.000 | 0.27 | 0.579 | ❌ SZKODZI |
+| 4H | 1000 | −0.2% | −0.7% | **−0.5 pp** | 4/14 | 0.180 | 0.07 | 0.595 | ❌ SZKODZI |
+| 1H | 600 | −0.6% | −0.8% | **−0.2 pp** | 4/11 | 0.549 | 0.02 | 0.818 | ❌ SZKODZI |
+| 1H | 1000 | −0.7% | −0.0% | **+0.6 pp** | 9/15 | 0.607 | 0.10 | 0.421 | ⚠️ SŁABE |
+
+**Flaga `ucz_mwu` zostaje OFF.** Trzy konfiguracje na minusie, czwarta dodatnia, ale nie
+przechodzi ŻADNEJ bramki (p=0.607, DSR 0.10, PBO 0.42) — czyli dokładnie ten przypadek, przed
+którym PBO ostrzega. PBO 0.42–0.82 mówi wprost: zwycięzca in-sample bywa przegranym
+out-of-sample częściej niż nie. Średnia 4H jest przy tym ciągnięta W GÓRĘ przez odstający wynik
+(MATIC +13.2/+23.6 pp) i mimo to ON przegrywa.
+
+**PRZYCZYNA, nie tylko werdykt:** MWU uczy się WYŁĄCZNIE z zamkniętych transakcji, a tych jest
+**8–30 na parę na okno** (1H/600: aż 8 z 15 par ma Δ dokładnie 0.0 — mechanizm bezwładny, bo
+8 lekcji nie starcza, by cokolwiek przestawić). Przy 87 neuronach to kilkanaście zaszumionych
+dowodów na neuron. Wniosek: nie stroić η/alpha (to dobieranie parametru do szumu), tylko
+zwiększyć liczbę lekcji — kandydat: uczenie WSPÓLNE na wszystkich parach naraz (~400 zamiast 30),
+po uprzednim sprawdzeniu założenia, że wagi neuronów mają być wspólne dla par.
+
+**PRZYRZĄD KŁAMAŁ — etykieta interwału.** Pierwszy bieg (domyślne `--interwal 4h`, odziedziczone
+po `ab_strategy_mwu.py`) dał INNE liczby niż bieg na produkcyjnym `4H` (ADA/600: Δ=+1.7 pp vs
+−7.4 pp). Powód: `.get(interwal, …)` po SUROWEJ etykiecie nie chybia głośno — spada na fallback.
+Zmierzone skutki małej litery:
+- `Legatus._formacja_interwalu` → **cała formacja legionów wyłączona** (SCALP głosował na 4H),
+- `Dyrygent` → Hermes dostawał 60 min zamiast 240 (wiek danych oceniany 4× za surowo),
+- `Dyrygent` próg per interwał → `{"4H": 0.65}` nie obowiązywał bara `4h` (konfiguracja w próżnię),
+- `walidacja.etap_pierwszy_koloseum` → Sharpe annualizowany jak świece dzienne (~2.4× za nisko).
+
+Naprawa u ŹRÓDŁA: `strategie.baza.normalizuj_interwal` jako jedno źródło prawdy (przy okazji
+poprawiony — zwracał `'4H' → 'H4'`, więc nie nadawał się na klucz; klasy równoważności bez zmian,
+alias `_normalizuj_interwal` zostaje). Klasa wady w Księdze Wad jako REGEX po pomiarze szumu:
+`.get(interwal` = **2 trafienia / 255 plików, obydwa prawdziwe**. Pozostałe dwa miejsca
+(`mtf_konfluencja`, `budowniczy_wskaznikow`) mają dziś plaster w postaci dublowanych kluczy
+`'4h'`+`'4H'` — działa dla naszych interwałów, ale to plaster, nie lek (Backlog).
+
+**Konsekwencja dla historii:** wyniki `ab_strategy_mwu.py` sprzed dziś pochodzą z etykiety `4h`,
+czyli z roju bez formacji legionów. Domyślne `--interwal` obu narzędzi = `4H`.
+
+**Pliki:** `narzedzia/ab_ucz_mwu.py` (nowy), `tests/test_ab_ucz_mwu.py` (nowy, 22),
+`imperium/legiony/strategie/baza.py`, `imperium/legiony/legatus.py`, `imperium/koloseum/dyrygent.py`,
+`imperium/koloseum/walidacja.py`, `imperium/biblioteki/ksiega_wad_kodu.py`,
+`narzedzia/ab_strategy_mwu.py`, `docs/CENSUS_ORGANORUM.md`, `tests/test_strategie.py`,
+`tests/test_integracja.py`, `tests/test_dyrygent.py`, `tests/test_walidacja.py`.
 
 ---
 

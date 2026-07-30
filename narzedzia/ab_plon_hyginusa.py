@@ -269,7 +269,8 @@ def bieg_profile(tematy=None, topk: int = 6, sciezka: Path = REJESTR) -> int:
     nie profil. Zwiad bierzemy z biegu U4 (ramię ON = dzisiejsze domyślne zachowanie),
     żeby nie płacić drugi raz za tę samą generację.
     """
-    from narzedzia.bibliotekarz import krytyka_kandydatow, _fts_bezpieczne, _KONTRA_SUFIKS
+    # `_fts_bezpieczne` już nie jest tu potrzebne — sanityzację robi `szukaj` (2026-07-30).
+    from narzedzia.bibliotekarz import krytyka_kandydatow, _KONTRA_SUFIKS
     from imperium.cesarz.deepseek_glos import GlosImperium
     from imperium.pretorianie.probator import do_slownika, sprawdz
     from szukaj import szukaj  # type: ignore[import]
@@ -291,7 +292,7 @@ def bieg_profile(tematy=None, topk: int = 6, sciezka: Path = REJESTR) -> int:
     for i, (temat, ramie) in enumerate(zadania, 1):
         _postep(i, len(zadania), f"profil={ramie:8} — {temat[:48]}")
         t0 = time.time()
-        kontra = szukaj(_fts_bezpieczne(f"{temat} {_KONTRA_SUFIKS}"), topk=topk,
+        kontra = szukaj(f"{temat} {_KONTRA_SUFIKS}", topk=topk,
                         tryb="hybrid", cichy=True, korpus="biblioteka")
         tekst, blad = _z_ponowieniem(
             lambda t=temat, r=ramie: krytyka_kandydatow(glos, zrodlowe[t]["plon"],

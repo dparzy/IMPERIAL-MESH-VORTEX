@@ -113,35 +113,47 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-27 — Wysoki IC może być artefaktem autokorelacji
-IC 0.25-0.30 podejrzanie wysoki w finansach. Sugeruje łapanie komponentu współbieżnego. Konieczna kontrola na nienakładających się zwrotach.
+### 2026-07-27 — 14,9 mln barów 1m nieużytych od 2022
+Czytnik odbiera 14,9 mln świec 1-minutowych, ale dane kończą się 2022-07-27 – backtest działa, live nie używa tych danych.
 
-### 2026-07-27 — EXP-14 Kyle ma dekorelację i skill
-max|ρ|=0.087 (prawie ortogonalny), IC~0.30. Potwierdzona wartość predykcyjna.
+### 2026-07-27 — War_lancer/sala_wojenna/valhalla w archiwum
+Trzy porty (war_lancer, sala_wojenna, valhalla) znajdują się w archiwum/kingdom_pixel_p1/, a nie w imperium/ – klasyczne widmo wynikające z fałszywego przypisania lokalizacji.
 
-### 2026-07-27 — EXP-13 GARCH ma dekorelację i skill
-max|ρ|=0.141, IC~0.25-0.254. Niesie nową informację (poniżej progu 0.20) i ma IC 8-10× powyżej 0.03. Wymaga kontroli autokorelacji.
+### 2026-07-27 — Zidentyfikowano 3 prawdziwe widma w INDEKS-ie
+W dokumencie SZYBKA DIAGNOSTYKA wykryto 3 martwe komendy: mexc_feed.py (powinno mexc_futures.py), calculator_gate.py (powinno brama_kalkulatora.py), veto_check.py (brak w pretorianinie).
 
-### 2026-07-27 — EXP-13 GARCH i EXP-14 Kyle niosą nową informację i mają skill
-Średnie max|ρ|: GARCH 0.141, Kyle 0.087 – poniżej progu 0.20, czyli zdekorelowane. IC ~0.25-0.30 stabilny na wszystkich horyzontach. Werdykt: filar siły + skill.
+### 2026-07-27 — Potrzeba suprsji kontekstowej w bramkach
+Mechaniczne 'czy plik istnieje' nie odróżnia twierdzenia od zamiaru – konieczne suprsje dla przykładów, wizji, planów, negacji i snapshotów, aby uniknąć fałszywych alarmów.
 
-### 2026-07-27 — Calibre nie czyta djvu
-Calibre (ebook-convert) historycznie nie obsługuje djvu jako formatu wejściowego. Nawet po instalacji calibre potrzebny będzie osobny djvutxt.exe z djvulibre.
+### 2026-07-27 — Spłata długu gnicia nie łapie widm API
+Spłata długu gnicia per-dokument (W13–W15) szuka gnicia w istniejących plikach, nie weryfikuje istnienia API opisanego w dokumentach – dlatego 3 widma przetrwały audyt dokumentacyjny.
 
-### 2026-07-27 — Brak narzędzi do konwersji djvu
-Skrypt konwertera wymaga djvutxt (djvulibre) lub ebook-convert (calibre) dla formatu djvu. W systemie nie ma żadnego z nich – twardy blocker dla konwersji 5 ksiąg (Kissell, Aronson, Shreve I/II, Sutton-Barto).
+### 2026-07-27 — Większość odwołań do dokumentów to kronika sesji (historia)
+1003 z 1301 odwołań do docs/*.md to historia, której nie wolno przepisywać (Prawo I). Przenoszenie żywych dokumentów tworzy martwe linki; przenoszenie migawek jest tanie.
 
-### 2026-07-27 — Hooki ograniczone wyłącznie do SessionStart i SessionEnd
-Zweryfikowano, że nie istnieją hooki PreToolUse/PostToolUse, co eliminuje ryzyko dublowania rozkazów. Settings.json niesie tylko wskazane hooki.
+### 2026-07-27 — Mnemosyne.py wycofany – błędnie oznaczony jako aktywny W1
+Plik mnemosyne.py był oznaczony w dokumentacji jako warstwa W1, ale w rzeczywistości jest wycofany (Prawo XVI) – zastąpiony przez pamiec_refleksyjna i ksiega_wad. Poprawiono.
 
-### 2026-07-27 — System w harmonii – testy 2987/2987 zielone, audyt Prawa XXI exit 0
-Pełna pochwała: wszystkie testy przechodzą, 22 warstwy czystości kodu, ruff bez błędów. Spójność Klucznika potwierdzona.
+### 2026-07-27 — Brak __main__ w petla_live.py – bug live
+W petla_live.py brakowało bloku __main__, co blokowało pętlę live przy rutynowym teście. Wykryte dzięki eskalacji przy anomalii.
+
+### 2026-07-27 — Bug FTS na myślnikach – ciche ginięcie tematów
+W FTS bibliotekarza bug crash na myślnikach powodował ciche giniecie tematów (np. 'momentum trend-following'). Naprawiony przez _fts_bezpieczne.
+
+### 2026-07-27 — PAMIEC_ABSOLUTNA.md kłamie o API
+Dokument deklaruje nieistniejące metody kronikarz.zapytaj, porownaj_okresy, replay_sesji — kod ma tylko zapisz(RunReport). Lekcja: każda deklaracja API w dokumencie musi być zweryfikowana z kodem.
+
+### 2026-07-27 — 43 cząstki Hyginusa bez sędziego (zapłacony zwiad niewykorzystany)
+Kolejka Hyginusa zawiera 43 cząstki czekające na sąd (poprzednio 33). To zapłacony, ale niewykorzystany zwiad, co narusza Prawo XV. Priorytet najniższy (ostatnie w kolejce).
+
+### 2026-07-26 — Brakujące reżimy w systemie narracyjnym
+Zidentyfikowano, że reżim SPOT_CASH i FUTURES nie są zdefiniowane w systemie narracyjnym (missing regime definitions). Występują tylko w sygnaturze systemu.
+
+### 2026-07-29 — Wrażliwość interwału na wielkość liter zmienia decyzje
+Etykieta interwału (np. '4h' vs '4H') jest case-sensitive w Legatus._formacja_interwalu - cicho zmienia wyniki backtestu. Przyczyna: słownik mapujący interwały. Naprawiono przez dodanie aliasów i normalizację.
 
 ### 2026-07-27 — Backtest liniowy O(n·okno), nie O(n²)
 Pomiar cProfile wykazał stały ~66 ms/tick dla okna 251 barów. Skalowanie liniowe, nie kwadratowe. Poprzednia diagnoza o O(n²) była błędna.
-
-### 2026-07-27 — prekalkuluj_portfel nie poprawia złożoności algorytmicznej
-prekalkuluj_portfel robi tę samą pracę per-bar (zbuduj na oknie), tylko równolegle per-symbol. Mimo cache daje zysk marne 1.4×, nie zmienia O(n·okno).
 
 ### 2026-07-27 — Prawdziwy sprawca kwadratu: _py_hma (pętla w pętli wma)
 Wewnętrzna pętla w _py_hma wywołuje wma wielokrotnie (4,5 mln wywołań na 2700 ticków), dając O(period²) dla tego jednego wskaźnika. Reszta backtestu jest liniowa.
@@ -149,14 +161,8 @@ Wewnętrzna pętla w _py_hma wywołuje wma wielokrotnie (4,5 mln wywołań na 27
 ### 2026-07-27 — dodaj_checklist nie zapisuje na dysk
 dodaj_checklist() zwraca True i inkrementuje licznik w pamięci, ale nie wywołuje zapisz() – wpis nie trafia na dysk. Naprawiono przez dodanie zapisu.
 
-### 2026-07-27 — Niezgodność testów: pytest vs runner Imperium
-Testy zielone pod pytest, ale padły pod runnerem Imperium z powodu braku setitem w shim monkeypatch. Naprawiono bez zależności od shimu.
-
 ### 2026-07-27 — Błąd w ocenie czasu gnicia – 9 dni zamiast pół roku
 W LOG_ZMIAN i pamięci napisano 'pół roku', a faktyczny czas od utworzenia runbooka wynosił 9 dni. Błąd wykryty przy liczeniu dla podglądu Kapitolu – poprawiono we wszystkich miejscach.
-
-### 2026-07-27 — Asymetria testów: pytest vs runner Imperium
-Test przeszedł pod pytest, ale padł pod własnym runnerem Imperium przez brak `monkeypatch.setitem` w shimie. Wykryto rozjazd narzędzi – naprawiono przez uniezależnienie od shimu.
 
 ### 2026-07-27 — Bieg testów #1 nieważny – równoległość z mutacjami
 Testy startowały przed zmianą W22 i biegły w tle podczas sed-owania mutacji. Wynik '55 z 73' i exit 0 od tail, nie od testów. Ważny tylko bieg #2 wystartowany po wszystkich zapisach.
@@ -197,17 +203,11 @@ ekstraktor.py:149 – kasowanie istniejącego pliku biblioteki przez równoczesn
 ### 2026-07-20 — Cache djvu nie podpięty do RAG – utrata potencjału (Prawo XV)
 konwerter.py:70 – cache djvu zbudowany poprzednio nie jest używany przy indeksowaniu. Chmura nadal woła djvutxt/calibre i gubi djvu.
 
-### 2026-07-20 — Hook startowy powoduje brudny working tree w dwóch plikach
-Pliki bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl oraz docs/PAMIEC_SESJI.md są modyfikowane przez hook startowy, co powoduje, że git working tree nie jest w 100% czysty. To normalny churn pamięci, a nie zmiana kodu.
-
 ### 2026-07-20 — 22 neurony czekają na adaptery/dane (Prawo XV)
 Rodziny NEWS-*, PSY-*, RADAR-*, OC-06/07/08, C-01, V-03, Z-06/Z-07 nie mają jeszcze feedów i abstynują świadomie zgodnie z Prawem XV. To znany, udokumentowany stan, a nie regresja.
 
 ### 2026-07-21 — Archium lekcji ma inny nagłówek – szukaj() nie widzi schłodzonych
 Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł szukaj() używa własnego parsera, który go nie rozpoznaje. Luka w wyszukiwalności pamięci – wymaga ujednolicenia parsera lub wzbogacenia searcha.
-
-### 2026-07-20 — Normalny churn pamięci w plikach dokumentacji
-Dwa pliki (wizje_i_decyzje.jsonl, PAMIEC_SESJI.md) zostały zmienione przez hook startowy – to standardowe odświeżanie pamięci sesji, nie zmiana kodu.
 
 ### 2026-07-21 — Podkreślnik jako znak słowny w regexie BIB
 Użycie \b w regexie dla identyfikatorów BIB nie zamyka się na podkreślniku (jest znakiem słownym). Testy złapały błąd - naprawiono wzorzec.
@@ -223,9 +223,6 @@ Znak '_' jest traktowany jako słowny przez \b, co powodowało fałszywe dopasow
 
 ### 2026-07-21 — Model cytuje nazwiskiem autora, nie identyfikatorem BIB
 Probator zgłaszał fałszywy alarm BEZ_CYTATU gdy model użył nazwiska (np. Hull) zamiast ID. Poprawiono test, nie organ – to realne użycie, a nie błąd weryfikacji.
-
-### 2026-07-20 — Testy wzrosły o dokładnie 7 — potwierdzenie biegnięcia
-Po dodaniu 7 testów granicznych licznik wzrósł z 2620 do 2627. To dowód, że testy naprawdę biegły (nie zostały cicho pominięte jak w poprzedniej sesji). Lekcja o zwykłych def test_* zamiast unittest.TestCase wdrożona.
 
 ### 2026-07-20 — Pieczątka audytu input_len kłamała — łamanie Prawa XIII
 Log pokazał input_len=100, gdy wynik policzono z 80 barów (ciche obcięcie zip). Narusza Prawo XIII (audytowalność) i Prawo I. Zapisano NOTĘ w LEX TALIONIS, CORONA spłacona: strażnik + uodpornienie klasy z wpisem do Księgi Wad.
@@ -262,9 +259,6 @@ Metoda dodaj_checklist() zwiększała licznik w pamięci (52), ale wpis nie zapi
 
 ### 2026-07-21 — Błędny wpis o czasie gnicia runbooka – 9 dni zamiast 'pół roku'
 W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokładnie: 9 dni. Sprostowano u źródła (ledgery, pamięć).
-
-### 2026-07-21 — zapisz() gubi nieznane pola istniejącego wpisu – cicha utrata danych
-Metoda zapisz() w pamięci proceduralnej nadpisywała tylko znane pola, gubiąc nieznane. Odkryto podczas adversarialnego przeglądu kodu. Naprawiono.
 
 ### 2026-07-20 — prekalkuluj_portfel – brak zysku algorytmicznego
 Funkcja wykonuje tę samą pracę per-bar co backtest pojedynczy, tylko równolegle (1.4× przyspieszenia). Nie zmniejsza złożoności, tylko maskuje problem.

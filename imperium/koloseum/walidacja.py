@@ -372,7 +372,11 @@ def etap_pierwszy_koloseum(krzywa_equity: Sequence[float],
                 "sharpe_roczny": None, "dsr": None}
     zwroty = np.diff(krzywa) / krzywa[:-1]
     sd = zwroty.std(ddof=1)
-    skala = math.sqrt(BARY_W_ROKU.get(interwal, 365))
+    # Klucz NORMALIZOWANY (2026-07-29): '4h' spadało na fallback 365 i annualizowało
+    # Sharpe jak dla świec dziennych — 2.4× za mało. Bramka myliła się po cichu,
+    # w stronę ODRZUCANIA dobrych strategii.
+    from imperium.legiony.strategie.baza import normalizuj_interwal
+    skala = math.sqrt(BARY_W_ROKU.get(normalizuj_interwal(interwal) if interwal else "", 365))
     sharpe_roczny = float(zwroty.mean() / sd * skala) if sd > 0 else 0.0
 
     kontrole = []

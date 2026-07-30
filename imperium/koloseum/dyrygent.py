@@ -59,6 +59,16 @@ from imperium.pretorianie.filtr_asymetrii import FiltrAsymetriiRezimu
 logger = logging.getLogger("Dyrygent")
 
 
+def _kanon_interwal(s: str) -> str:
+    """Etykieta interwału w postaci kanonicznej ('4h'/'H4' → '4H'), pusta dla braku.
+
+    Import leniwy — Dyrygent (koloseum) nie ma potrzeby wiązać się z legionami na
+    poziomie modułu. JEDNO ŹRÓDŁO PRAWDY: `strategie.baza.normalizuj_interwal`.
+    """
+    from imperium.legiony.strategie.baza import normalizuj_interwal
+    return normalizuj_interwal(s) if s else ""
+
+
 @dataclass
 class DecyzjaCyklu:
     """Wynik jednego cyklu decyzyjnego — przejrzysty ślad (Prawo I: jawność)."""
@@ -280,6 +290,25 @@ class Dyrygent:
             dyrygent._senat = KonsulSenatu()
         return dyrygent
 
+    def _prog_interwalu(self, interwal: str) -> float:
+        """Próg pewności dla interwału (FAZA B, W-286) — dopasowanie po kluczu
+        KANONICZNYM, więc {'4H': 0.65} działa też na barach oznaczonych '4h'.
+        Brak wpisu → próg globalny (stare zachowanie).
+
+        Czytamy ŻYWY słownik przy każdym wywołaniu, bez kopii budowanej w `__init__`
+        (recenzja 2026-07-29): `min_pewnosc_interwalu` jest polem publicznym, więc
+        kopia rozjechałaby się po pierwszej zmianie progu w locie — a cichy rozjazd
+        konfiguracji to dokładnie ta wada, którą ta zmiana usuwa gdzie indziej.
+        Słownik ma jednostki wpisów, więc pętla per bar jest tańsza niż ryzyko.
+        """
+        if not self.min_pewnosc_interwalu:
+            return self.min_pewnosc
+        cel = _kanon_interwal(interwal)
+        for klucz, prog in self.min_pewnosc_interwalu.items():
+            if _kanon_interwal(klucz) == cel:
+                return prog
+        return self.min_pewnosc
+
     # ── Jeden cykl decyzyjny ─────────────────────────────────────────────────
     def cykl(self, symbol: str, bary: List[Dict[str, Any]],
              rezim: str = "NORMAL", timestamp: Optional[int] = None) -> DecyzjaCyklu:
@@ -328,7 +357,10 @@ class Dyrygent:
         # Wyznacza: tryb, prog_pewnosci, lewar_factor, lewar_cap, rynek, czy_grac
         # dla pary (reżim × styl interwałowy).
         tryb_aktywny = self.tryb
-        prog_aktywny = self.min_pewnosc_interwalu.get(interwal, self.min_pewnosc)
+        # Obie strony NORMALIZOWANE (2026-07-29): próg per interwał podaje wołający,
+        # więc {'4H': 0.65} nie mogło trafić na barze z etykietą '4h' — próg cicho
+        # wracał do domyślnego i nikt nie widział, że konfiguracja nie działa.
+        prog_aktywny = self._prog_interwalu(interwal)
         lewar_factor = 1.0
         decyzja_nam = None
         if self.namiestnik is not None:
@@ -917,8 +949,11 @@ class Dyrygent:
         kompletne = sum(1 for v in wskazniki.values() if v is not None) / max(len(wskazniki), 1)
         _vpin_raw = wskazniki.get("VPIN_50")
         vpin_val = float(_vpin_raw) if _vpin_raw is not None else 0.5
-        interwal_min = {"1m": 1, "5m": 5, "15m": 15, "30m": 30,
-                        "1H": 60, "4H": 240, "1D": 1440}.get(interwal, 60)
+        # Klucze KANONICZNE + normalizacja wejścia (2026-07-29): słownik mieszał
+        # konwencje ('15m' obok '4H'), więc etykieta '4h' spadała na fallback 60 min
+        # i Hermes oceniał wiek danych 4× za surowo, nie mówiąc o tym ani słowa.
+        interwal_min = {"M1": 1, "M5": 5, "M15": 15, "M30": 30,
+                        "1H": 60, "4H": 240, "1D": 1440}.get(_kanon_interwal(interwal), 60)
         ocena_hermes = Hermes().ocen(DaneHermes(
             kompletnosc_danych=round(kompletne, 3),
             interwal_minut=interwal_min,

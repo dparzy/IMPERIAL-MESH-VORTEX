@@ -327,6 +327,21 @@ def test_etap1_za_malo_tradow():
     assert not w["ok"] and "za mało trade" in w["powod"]
 
 
+def test_etap1_annualizacja_niewrazliwa_na_zapis_interwalu():
+    """GRANICA (regresja 2026-07-29): '4h' musi annualizować jak '4H'. Wcześniej mała
+    litera spadała na fallback 365 (świece dzienne) i zaniżała Sharpe ~2.4×, więc
+    bramka myliła się po cichu w stronę ODRZUCANIA dobrych strategii."""
+    krzywa = _krzywa_dobra()
+    wzorzec = etap_pierwszy_koloseum(krzywa, _Stat(), interwal="4H")["sharpe_roczny"]
+    for zapis in ("4h", "H4"):
+        w = etap_pierwszy_koloseum(krzywa, _Stat(), interwal=zapis)
+        assert abs(w["sharpe_roczny"] - wzorzec) < 1e-9, f"'{zapis}' ≠ '4H'"
+    # kontrola: nieznany interwał NADAL spada na skalę dzienną (stare zachowanie)
+    nieznany = etap_pierwszy_koloseum(krzywa, _Stat(), interwal="TICK")["sharpe_roczny"]
+    dzienny = etap_pierwszy_koloseum(krzywa, _Stat(), interwal="1D")["sharpe_roczny"]
+    assert abs(nieznany - dzienny) < 1e-9
+
+
 def test_etap1_drawdown_za_duzy():
     w = etap_pierwszy_koloseum(_krzywa_dobra(), _Stat(dd=0.20))
     assert not w["ok"] and "MaxDD" in w["powod"]

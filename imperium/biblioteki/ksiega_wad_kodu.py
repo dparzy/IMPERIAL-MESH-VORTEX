@@ -25,6 +25,18 @@ DOMYSLNA = ROOT / "bibliotheca_ulpia" / "dane" / "ksiega_wad_kodu.jsonl"
 
 # Wzorce startowe — destylat realnych uwag cubic (2026-07). Wysokosygnałowe, niskofałszywe.
 WZORCE_STARTOWE = [
+    {"kat": "kontrakt", "regex": r'\.get\(\s*interwal\s*[,)]',
+     "opis": "Słownik keyed interwałem czytany SUROWĄ etykietą (bez normalizacji)",
+     "lekcja": "Etykieta interwału krąży w dwóch konwencjach ('4h' z czytnika CSV, '4H' w "
+               "słownikach Imperium, 'H4' w strategiach). `.get(interwal, domyslne)` po surowym "
+               "kluczu nie chybia GŁOŚNO — spada na fallback, więc cała warstwa wyłącza się w "
+               "ciszy. Zmierzone 2026-07-29: '4h' wyłączało formację legionów Legatusa (SCALP "
+               "głosował na 4H), dawało Hermesowi 60 min zamiast 240 i annualizowało Sharpe "
+               "jak świece dzienne. Normalizuj OBIE strony przez "
+               "`strategie.baza.normalizuj_interwal`; 'nieznany interwał' ma znaczyć naprawdę "
+               "nieznany, nie 'inaczej zapisany'. Szum zmierzony: 2 trafienia / 255 plików, "
+               "obydwa prawdziwe (dublowane klucze '4h'+'4H' to ta sama klasa — plaster, nie lek).",
+     "zrodlo": "DISCIPULUS / A/B ucz_mwu (2026-07-29)"},
     {"kat": "odpornosc", "regex": r'req\s*\[\s*[\'"]params[\'"]\s*\]\s*\[',
      "opis": "Dostęp do pól requestu POZA try",
      "lekcja": "Parsuj pola żądania WEWNĄTRZ try — malformed request → JSON-RPC error, nie crash procesu.",

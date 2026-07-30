@@ -608,8 +608,15 @@ class Legatus:
         Filtruje sygnały po LEGIONIE zgodnie z interwałem (Faza A, W-286).
         Nieznany/pusty interwał → bez filtra (pełny rój — stare zachowanie,
         Prawo XV: nie wycinamy głosów, gdy nie wiemy, na jakim terenie gramy).
+
+        Klucz NORMALIZOWANY (2026-07-29): etykieta '4h' z czytnika CSV nie trafiała
+        w klucz '4H' i cicho wyłączała całą formację — pełny rój (z legionem SCALP)
+        głosował na 4H. Zmierzone na BTC 600 barów: 9 trade'ów zamiast 10 i inny wynik.
+        „Nieznany interwał" ma znaczyć NAPRAWDĘ nieznany, nie „inaczej zapisany".
         """
-        dozwolone = self._FORMACJE_INTERWALU.get(interwal)
+        from imperium.legiony.strategie.baza import normalizuj_interwal
+        dozwolone = self._FORMACJE_INTERWALU.get(
+            normalizuj_interwal(interwal) if interwal else "")
         if not dozwolone:
             return sygnaly
         pelne = dozwolone | self._LEGIONY_UNIWERSALNE

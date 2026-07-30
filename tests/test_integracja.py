@@ -519,6 +519,24 @@ def test_formacja_nieznany_interwal_bez_filtra():
     assert len(leg._formacja_interwalu(syg, "8H")) == 1
 
 
+def test_formacja_nie_zalezy_od_zapisu_interwalu():
+    """GRANICA (regresja 2026-07-29): '4h' z czytnika CSV musi filtrować tak samo
+    jak '4H'. Wcześniej mała litera nie trafiała w klucz i CICHO wyłączała całą
+    formację — SCALP głosował na 4H, a wynik backtestu różnił się bez ostrzeżenia."""
+    leg = zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False)
+    from imperium.legiony.mikro_neuron import SygnalNeuronu
+    syg = [SygnalNeuronu(neuron_id=f"N{i}", legion=lg, wskaznik="X", wartosc=1,
+                         kierunek="LONG", pewnosc=0.8, waga=5, kategoria="M")
+           for i, lg in enumerate(["SCALP", "SWING", "WSPOLNY"])]
+    for zapis in ("4h", "4H", "H4"):
+        legiony = {s.legion for s in leg._formacja_interwalu(syg, zapis)}
+        assert "SCALP" not in legiony, f"'{zapis}' musi wyciąć SCALP tak jak '4H'"
+        assert {"SWING", "WSPOLNY"} <= legiony
+    for zapis in ("15m", "M15"):
+        legiony = {s.legion for s in leg._formacja_interwalu(syg, zapis)}
+        assert "SWING" not in legiony and "SCALP" in legiony
+
+
 # ── W-343: Integracja Senatu + per-regime Igrzysk ─────────────────────────
 
 def test_dyrygent_senat_nie_blokuje_zwyklego():

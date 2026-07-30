@@ -84,9 +84,16 @@ def _fts_bezpieczne(q: str) -> str:
     Bez tego myślniki/słowa-klucze FTS wywalają MATCH (realny bug: temat
     'momentum trend-following breakout entry rules' → OperationalError
     'no such column: following' → temat cicho ginął). OR poszerza recall
-    (trafienie na dowolny termin), a BM25 i tak rankuje najlepsze na górę."""
-    slowa = _RE_SLOWO.findall(q or "")
-    return " OR ".join(slowa) if slowa else q
+    (trafienie na dowolny termin), a BM25 i tak rankuje najlepsze na górę.
+
+    DELEGUJE do `szukaj.sanityzuj_fts` (naprawa u źródła 2026-07-30). Ta funkcja
+    była JEDNĄ Z TRZECH kopii tej samej logiki, a czwarty wołający — `mcp_server`,
+    czyli ścieżka, którą Architekt czyta bibliotekę — nie miał jej wcale i płacił
+    za to recallem 16,7% zamiast 66,7% (QUAESITOR, 30 pytań). Zostaje jako nazwa
+    dla istniejących wywołań, ale implementacja jest już tylko w jednym miejscu.
+    """
+    from szukaj import sanityzuj_fts  # type: ignore[import]
+    return sanityzuj_fts(q, "or")
 
 
 # ── DISPENSATOR (Szafarz) — ile myślenia KUPUJEMY do której fazy zwiadu ─────────────
@@ -252,7 +259,9 @@ def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
     składni FTS5 (_fts_bezpieczne) — inaczej myślniki/słowa-klucze wywalają MATCH."""
     from szukaj import szukaj  # type: ignore[import]
     zapytanie = rozwin_zapytanie(glos, temat) if (rozwin and glos is not None) else temat
-    wyniki = szukaj(_fts_bezpieczne(zapytanie), topk=topk, tryb=tryb, cichy=True, korpus=korpus)
+    # Sanityzacja jest JUŻ w `szukaj` (jedno źródło prawdy, 2026-07-30) — podwójne
+    # złożenie dałoby „a OR OR OR b", czyli błąd składni FTS. Przekazujemy surowe.
+    wyniki = szukaj(zapytanie, topk=topk, tryb=tryb, cichy=True, korpus=korpus)
     zrodla = sorted({w.zrodlo for w in wyniki})
     baza = {"temat": temat, "zapytanie": zapytanie, "ts": time.time()}
     if not wyniki:                          # indeks jest (bramka w raport), więc to REALNY brak trafień
@@ -278,7 +287,7 @@ def scout_temat(glos, temat: str, topk: int = 6, tryb: str = "hybrid",
         from imperium.pretorianie.nomenclator import sprawdz as _nom_sprawdz
         rec["nomenclator"] = _nom_slownik(_nom_sprawdz(rec["kandydaci"]))
     if krytyka:  # U3: drugie przejście — dowody PRZECIW (osobne retrieval na kontrargumenty)
-        kontra = szukaj(_fts_bezpieczne(f"{zapytanie} {_KONTRA_SUFIKS}"),
+        kontra = szukaj(f"{zapytanie} {_KONTRA_SUFIKS}",
                         topk=topk, tryb=tryb, cichy=True, korpus=korpus)
         # Profil KRYTYKI zapisany wprost (2026-07-27). Cząstka niosła tylko `profil` generacji,
         # więc z samego ledgera NIE DAŁO SIĘ udowodnić, że krytyka poszła na droższy `osad`

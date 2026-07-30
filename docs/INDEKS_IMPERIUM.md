@@ -52,7 +52,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 
 <!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->
 
-> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-30 (75 pozycji).
+> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-30 (76 pozycji).
 
 ### LEX — prawo i rozkazy stałe — obowiązuje, nie opisuje
 
@@ -133,6 +133,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | `docs/WIZJA_LEGIONY_CIENI.md` | Kontrfaktyczne Kolosseum — równolegle do realnej decyzji Imperium maszerują 'Legiony Cieni' (widmowe warianty konfiguracji: bez weta, próg łagodny, próg surowy), mierzące ile koszt | `imperium/koloseum/legiony_cieni.py`, `narzedzia/raport_zalu.py` | 2026-07-06 |
 | `docs/WIZJA_TRYBY_I_ROZWOJ.md` | Wizja Cezara na 3 tryby operacyjne systemu (NAJLEPSZY/BILANS/OBRONA) plus katalog darmowych API do 'prześwietlania' nowych walut przed wejściem — z weryfikacją, co z wizji już stoi w kodzie | `imperium/koloseum/skaner_okazji.py`, `imperium/legiony/rejestr.py` | 2026-07-17 |
 | `docs/WIZJONER.md` | Zbiór wizji i kierunków rozwoju — zamiary na przyszłość, świadomie niezrealizowane | — | 2026-06-26 |
+| `docs/ZWIAD_ZAPYTANIA.md` | Gotowe frazy wyszukiwania dla Cezara — zwiad po literaturze celowany w ZMIERZONE luki Imperium, z kryterium oceny trafienia i listą tego, czego NIE szukać. | — | 2026-07-30 |
 
 ### MENSURA — pomiar / analiza z danych — wynik, nie opinia
 

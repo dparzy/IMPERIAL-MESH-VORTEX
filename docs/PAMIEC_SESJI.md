@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-27
+## Ostatnia aktualizacja: 2026-07-28
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -112,6 +112,24 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 ---
 
 ## 📚 LEKCJE Z SESJI
+
+### 2026-07-28 — MEXC ✗ – brak realnych orderów i pętla P&L niezamknięta
+System nie ma połączenia z MEXC, więc roj jest tylko backtestowany. Największa luka Imperium – pętla P&L→wagi nie działa.
+
+### 2026-07-28 — MEXC ✗ – pętla P&L→wagi wciąż nie zamknięta w żywym rynku
+Rój jest backtestowany, 87 neuronów, 22 warstwy audytu, ale brak realnych orderów przez MEXC. To największa luka Imperium: mierzymy tanie, bo drogie jest trudne. Efekt latarni działa.
+
+### 2026-07-28 — BIB-011 w języku chińskim – niewyszukiwalna w RAG przez brak segmentacji CJK
+Plugin BIB-011 (algorytmiczny trading) jest chińskim tłumaczeniem. 78.3% znaków to CJK. FTS5 tokenizer 'unicode61' nie segmentuje chińskiego – cały ciąg CJK to jeden token. Dodatkowo chunker tnie po whitespace, co nie działa dla tekstu bez spacji. Książka jest martwa w RAG, niewyszukiwalna.
+
+### 2026-07-28 — Fałszywy alarm INDEX FALSORUM – strażnik nie rozpoznawał rzeczownika 'obalenie'
+KOREKTA_JAWNA znała imiesłów 'obalon', ale nie rzeczownik 'obalen' → strażnik zgłaszał własną dokumentację jako kłamstwo. Lekcja: fałszywe zatrzymanie uczy obchodzić strażnika, nie jest bezpieczną stroną błędu. Naprawiono testem granicy przez mutację.
+
+### 2026-07-27 — Rozwój LLM to skoki po pomiarze, nie nauka w locie
+Model ma zamrożone wagi po treningu. Rozwój osiąga się przez RAG (natychmiastowa pamięć) i cykliczne dotrenowanie LoRA po egzaminie na arenie. Awans tylko po zielonym pomiarze.
+
+### 2026-07-27 — RTX 4050 laptop ma 6 GB VRAM – ograniczenia lokalnego treningu
+Acer Nitro z RTX 4050 pozwoli trenować LoRA na modelu 7-8B lokalnie i uruchamiać inferencję, ale nie trenować dużych modeli od zera. Ciężki trening zostaje na Colabie. CENSOR wykryje CUDA i podniesie alarm.
 
 ### 2026-07-27 — Zastosowane zasady projektowe: SYMBIOZA, Prawo XVI, Test-Granic
 Wdrożenie respektowało ZASADĘ SYMBIOZY (zmiana nie izolowana), Prawo XVI (jedno źródło prawdy dla wag IC), Regułę Test-Granic (testowanie co może pójść źle).

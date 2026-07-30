@@ -14,6 +14,53 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-31 | 🔍 | DISCRIMINATOR — F0: skupiska redundancji PIERWSZY RAZ pod pomiarem
+
+Pozycja F0 brzmiała „wypuścić 17 skupisk na wierzch". **Rozpoznanie pokazało, że to nie
+była prawdziwa luka.** Własny docstring `raport_mechanizmow` mówi wprost: skupisko to
+*kandydat do pomiaru korelacji (Prawo XVI)*. Przyrząd istniał (`korelacja_pearson`),
+ścieżka bary→Brama→`interpretuj` też — a kandydaci **nigdy nie trafiali pod przyrząd**.
+Jedyny taki pomiar w historii (`narzedzia/dekorelacja_w322.py`) był skryptem jednorazowym
+na 5 zahardkodowanych neuronów. Lista bez werdyktu i przyrząd bez wejścia to ta sama
+utrata potencjału widziana z dwóch stron.
+
+### Wynik — także tam, gdzie zaprzeczył tezie
+
+| | BTCUSDT 4h |
+|---|---|
+| skupisk / par | 17 / **125** |
+| kandydatów do scalenia | **1** — `X-05 ↔ XII-02`, r=0,82 |
+| filary w `T/trend` (8 neuronów) | **17 par** poniżej progu 0,20 |
+| milczących neuronów | 27 z 66 |
+
+**Teza o masowej redundancji NIEPOTWIERDZONA.** Największe skupisko okazało się zdrowe.
+Wynik jest stabilny na próbce: powtórka na **2640 krokach zamiast 440** (6× więcej danych)
+dała ten sam jedyny kandydat, r=0,81.
+
+### Gdzie o mało nie powstał fałszywy alarm
+
+Pierwszy bieg zgłosił `K-03`/`K-04` jako **martwy głos** (Prawo XV). Sprawdzenie przed
+zameldowaniem: to neurony alt-danych, a pomiar karmi rój wyłącznie świecami OHLCV — neuron
+bez swojego źródła **musi** milczeć. Alarm pochodziłby z ograniczenia PRZYRZĄDU, nie ze
+stanu Imperium. Werdykt nazywa się `CISZA_W_POMIARZE` i mówi wprost, czego nie rozstrzyga.
+
+Przyczyna ciszy ustalona **z kodu, nie z domysłu**: `RADAR-01` czyta klucz `BTC_TREND`,
+którego Brama nie zna przy jednej parze (neuron sam mówi *„Brak kontekstu BTC"*). Milczą
+dwie legalne rodziny: alt-dane (`K-*`, `NEWS-*`, `AUG-01`, `PSY-05`) i kontekst
+międzyrynkowy (`RADAR-*`).
+
+### 🚨 Luka odsłonięta przy okazji — zapisana, nie zamieciona
+
+**Neurony nie deklarują w kodzie, jakich danych wymagają** (brak pola `WYMAGA`/`ZRODLO` —
+sprawdzone na K-03, K-04, X-05), więc nie da się programowo odróżnić „milczy z braku
+wejścia" od „milczy, bo zepsuty". Dla `SMC-*`, `OC-*`, `PSY-01..04`, `Z-05/Z-06` przyczyna
+**niezmierzona** — rozstrzygnie bieg karmiony adapterami i wieloma parami.
+
+**Pliki:** `imperium/legiony/discriminator.py` (nowy), `tests/test_discriminator.py`
+(nowy, 17 testów), ledger `rejestr_testow.jsonl`, `docs/ARCHITEKTURA_IMPERIUM.md`.
+
+---
+
 ## 2026-07-31 | 🔒 | Hook `Stop` — EXACTOR sprawdza meldunek BEZ UDZIAŁU MOJEJ PAMIĘCI
 
 Decyzja Cezara: *„hook stop jeżeli rekomendujesz"*. Zarekomendowałem — z zastrzeżeniem zakresu.

@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-27
+## Ostatnia aktualizacja: 2026-07-30
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,20 +113,14 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-30 — Kod QUAESITORA przetrwał reinstalację, ale bez testów i poza gitem
+330 linii, CLI działa, ale brak testów i nieśledzony. Formalnie organ nie istnieje (Prawo XIX). Wymaga domknięcia testami i commitem.
+
+### 2026-07-26 — Czyszczenie historii
+Sesja została wyczyszczona przed analizą, brak danych do ekstrakcji.
+
 ### 2026-07-27 — 14,9 mln barów 1m nieużytych od 2022
 Czytnik odbiera 14,9 mln świec 1-minutowych, ale dane kończą się 2022-07-27 – backtest działa, live nie używa tych danych.
-
-### 2026-07-27 — War_lancer/sala_wojenna/valhalla w archiwum
-Trzy porty (war_lancer, sala_wojenna, valhalla) znajdują się w archiwum/kingdom_pixel_p1/, a nie w imperium/ – klasyczne widmo wynikające z fałszywego przypisania lokalizacji.
-
-### 2026-07-27 — Zidentyfikowano 3 prawdziwe widma w INDEKS-ie
-W dokumencie SZYBKA DIAGNOSTYKA wykryto 3 martwe komendy: mexc_feed.py (powinno mexc_futures.py), calculator_gate.py (powinno brama_kalkulatora.py), veto_check.py (brak w pretorianinie).
-
-### 2026-07-27 — Potrzeba suprsji kontekstowej w bramkach
-Mechaniczne 'czy plik istnieje' nie odróżnia twierdzenia od zamiaru – konieczne suprsje dla przykładów, wizji, planów, negacji i snapshotów, aby uniknąć fałszywych alarmów.
-
-### 2026-07-27 — Spłata długu gnicia nie łapie widm API
-Spłata długu gnicia per-dokument (W13–W15) szuka gnicia w istniejących plikach, nie weryfikuje istnienia API opisanego w dokumentach – dlatego 3 widma przetrwały audyt dokumentacyjny.
 
 ### 2026-07-27 — Większość odwołań do dokumentów to kronika sesji (historia)
 1003 z 1301 odwołań do docs/*.md to historia, której nie wolno przepisywać (Prawo I). Przenoszenie żywych dokumentów tworzy martwe linki; przenoszenie migawek jest tanie.
@@ -163,9 +157,6 @@ dodaj_checklist() zwraca True i inkrementuje licznik w pamięci, ale nie wywołu
 
 ### 2026-07-27 — Błąd w ocenie czasu gnicia – 9 dni zamiast pół roku
 W LOG_ZMIAN i pamięci napisano 'pół roku', a faktyczny czas od utworzenia runbooka wynosił 9 dni. Błąd wykryty przy liczeniu dla podglądu Kapitolu – poprawiono we wszystkich miejscach.
-
-### 2026-07-27 — Bieg testów #1 nieważny – równoległość z mutacjami
-Testy startowały przed zmianą W22 i biegły w tle podczas sed-owania mutacji. Wynik '55 z 73' i exit 0 od tail, nie od testów. Ważny tylko bieg #2 wystartowany po wszystkich zapisach.
 
 ### 2026-07-27 — Mutacja przeżyła przez luźny próg asercji
 Test zasięgu miał asercję 'zbadane >= 8+40', co przepuściło zawężenie z 73 do 65 dokumentów. Wymieniono na równość z liczbą policzoną ze źródła. Obie klasy do Księgi Wad. Nota nie wystawiona (błąd nie dostarczony).
@@ -205,9 +196,6 @@ konwerter.py:70 – cache djvu zbudowany poprzednio nie jest używany przy indek
 
 ### 2026-07-20 — 22 neurony czekają na adaptery/dane (Prawo XV)
 Rodziny NEWS-*, PSY-*, RADAR-*, OC-06/07/08, C-01, V-03, Z-06/Z-07 nie mają jeszcze feedów i abstynują świadomie zgodnie z Prawem XV. To znany, udokumentowany stan, a nie regresja.
-
-### 2026-07-21 — Archium lekcji ma inny nagłówek – szukaj() nie widzi schłodzonych
-Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł szukaj() używa własnego parsera, który go nie rozpoznaje. Luka w wyszukiwalności pamięci – wymaga ujednolicenia parsera lub wzbogacenia searcha.
 
 ### 2026-07-21 — Podkreślnik jako znak słowny w regexie BIB
 Użycie \b w regexie dla identyfikatorów BIB nie zamyka się na podkreślniku (jest znakiem słownym). Testy złapały błąd - naprawiono wzorzec.

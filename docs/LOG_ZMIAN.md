@@ -14,6 +14,56 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-30 | 🪙 | EXACTOR RENUNTIATIONIS — spłata TALARA `N-b74ce133` (CORONA)
+
+**Powód:** krok 8 CLAUSURY nakazuje podać PEŁNY blok PowerShell (`cd` + `git push origin
+<gałąź>`). Dałem sam `git push`, Cezar musiał pytać DWA RAZY. Rozkaz stał w CLAUDE.md,
+w pamięci prywatnej, a pieczęć CLAUSURA **wydrukowała mi go kilka minut wcześniej**.
+Wiedza była — brakowało MECHANIZMU porównującego meldunek z checklistą.
+
+**Organ:** `imperium/pretorianie/exactor.py` (26 testów) — bierze tekst meldunku i sprawdza
+go wobec ŻYWEJ checklisty czytanej z KONSTYTUCJI przez SIGILLARIUM. Jedyny organ Imperium
+czytający to, co MÓWIĘ Cezarowi (`grep` po `imperium/` i `narzedzia/`: zero innych trafień).
+
+### Kalibracja na PRAWDZIE PODSTAWOWEJ — 190 meldunków z kroniki 144 sesji
+
+| poziom | meldunków | alarmów | uwagi |
+|---|---|---|---|
+| `brak` (wzmianka w prozie) | 34 | 0 | zakaz pushu, `deny` w uprawnieniach, błąd 403 |
+| `push` (przekazanie komendy) | 126 | 3 | krok 8 |
+| `domkniecie` | 30 | — | kroki 5 i 4b |
+
+**Krok 8: recall 4/4 wobec ręcznie osądzonej prawdy (w tym oba bloki z samej noty),
+0 fałszywych alarmów na 156 przekazaniach.**
+
+### Trzy rzeczy rozstrzygnięte POMIAREM, nie projektem
+
+1. **Reguła fence'owa przegrała z regułą linii polecenia.** `git push` w bloku ``` dawał
+   2 fałszywki (JSON uprawnień, prompt subagenta) i **gubił poprawny meldunek**, bo
+   parowanie ``` przesuwa się po nieparzystym fence.
+2. **Przekazanie pushu ≠ koniec wachty.** Pierwsza wersja krzyczała o Prawo XV na 66%
+   meldunków — rozstrzygnęła arytmetyka: 39 sesji, a „domknięć" wyszło 109. Stąd DWA
+   POZIOMY, a domknięcie jest **deklarowane przez wołającego**, nie zgadywane.
+3. **Powinnością meldunku jest tylko krok, którego brzmienie każe COŚ DAĆ Cezarowi.**
+   Bez tego kryterium organ dawał **80% alarmów** na domknięciach, karząc w 45% za
+   nieprzepisanie bilansu długu, którego krok 5b wcale nie każe przepisywać. Strażnik
+   krzyczący na 4 meldunki z 5 uczy ignorowania siebie.
+
+**Uodpornienie (nie tylko wykrywanie):** `--blok-push` **generuje** blok kroku 8 z żywego
+repozytorium — skoro pamięć zawiodła przy przepisywaniu dwóch linii, nie ma powodu ich
+przepisywać. Test niezmiennika pilnuje, że to, co organ podaje, przechodzi to, czego wymaga.
+
+**Czego NIE WIEMY:** liczby dla kroków 5 i 4b (25% i 12,5% pominięć) są wskazaniem, nie
+werdyktem — brak ręcznej etykiety „tu naprawdę należało to napisać". Rozstrzygnie użycie
+na żywo. Hook `Stop` (sprawdzenie bez udziału mojej pamięci) **zaproponowany, nie wdrożony** —
+to zmiana konfiguracji stałej, więc decyzja Cezara.
+
+**Pliki:** `imperium/pretorianie/exactor.py` (nowy), `tests/test_exactor.py` (nowy, 26 testów),
+`.claude/skills/clausura/SKILL.md` (kroki 4–5 wywołania organu), `docs/ARCHITEKTURA_IMPERIUM.md`,
+`docs/CENSUS_ORGANORUM.md` (256 modułów), `README.md` (pretorianie 14→15).
+
+---
+
 ## 2026-07-30 | 🔎 | PIERWSZY POMIAR TRAFNOŚCI RAG — moja ścieżka była 4× gorsza od Hyginusowej
 
 **QUAESITOR uruchomiony PIERWSZY RAZ w historii Imperium** (organ leżał gotowy od sesji

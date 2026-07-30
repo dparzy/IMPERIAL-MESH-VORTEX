@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 255** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 256** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -243,6 +243,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 |-------|--------------------------|
 | `aegis_tarcza.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
 | `custos_liminis.py` | 🚧 CUSTOS LIMINIS — Strażnik Progu: bariera PRZED zadziałaniem narzędzia (PreToolUse) |
+| `exactor.py` | 🪙 EXACTOR RENUNTIATIONIS — egzekwuje, czy MELDUNEK KOŃCOWY spłaca checklistę |
 | `filtr_asymetrii.py` | Filtr Asymetrii Reżimu (W-314) — brama wejścia oparta na trendzie i jego sile |
 | `filtr_ekonomiczny.py` | Filtr Ekonomiczny (ECON — market price of risk) — brama „zbyt dobre, by było prawdziwe" |
 | `kalkulator_lewara.py` | Kalkulator Lewara — matematyka przeżycia |

@@ -14,6 +14,151 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-07-31 | 🔍 | DISCRIMINATOR — F0: skupiska redundancji PIERWSZY RAZ pod pomiarem
+
+Pozycja F0 brzmiała „wypuścić 17 skupisk na wierzch". **Rozpoznanie pokazało, że to nie
+była prawdziwa luka.** Własny docstring `raport_mechanizmow` mówi wprost: skupisko to
+*kandydat do pomiaru korelacji (Prawo XVI)*. Przyrząd istniał (`korelacja_pearson`),
+ścieżka bary→Brama→`interpretuj` też — a kandydaci **nigdy nie trafiali pod przyrząd**.
+Jedyny taki pomiar w historii (`narzedzia/dekorelacja_w322.py`) był skryptem jednorazowym
+na 5 zahardkodowanych neuronów. Lista bez werdyktu i przyrząd bez wejścia to ta sama
+utrata potencjału widziana z dwóch stron.
+
+### Wynik — także tam, gdzie zaprzeczył tezie
+
+| | BTCUSDT 4h |
+|---|---|
+| skupisk / par | 17 / **125** |
+| kandydatów do scalenia | **1** — `X-05 ↔ XII-02`, r=0,82 |
+| filary w `T/trend` (8 neuronów) | **17 par** poniżej progu 0,20 |
+| milczących neuronów | 27 z 66 |
+
+**Teza o masowej redundancji NIEPOTWIERDZONA.** Największe skupisko okazało się zdrowe.
+Wynik jest stabilny na próbce: powtórka na **2640 krokach zamiast 440** (6× więcej danych)
+dała ten sam jedyny kandydat, r=0,81.
+
+### Gdzie o mało nie powstał fałszywy alarm
+
+Pierwszy bieg zgłosił `K-03`/`K-04` jako **martwy głos** (Prawo XV). Sprawdzenie przed
+zameldowaniem: to neurony alt-danych, a pomiar karmi rój wyłącznie świecami OHLCV — neuron
+bez swojego źródła **musi** milczeć. Alarm pochodziłby z ograniczenia PRZYRZĄDU, nie ze
+stanu Imperium. Werdykt nazywa się `CISZA_W_POMIARZE` i mówi wprost, czego nie rozstrzyga.
+
+Przyczyna ciszy ustalona **z kodu, nie z domysłu**: `RADAR-01` czyta klucz `BTC_TREND`,
+którego Brama nie zna przy jednej parze (neuron sam mówi *„Brak kontekstu BTC"*). Milczą
+dwie legalne rodziny: alt-dane (`K-*`, `NEWS-*`, `AUG-01`, `PSY-05`) i kontekst
+międzyrynkowy (`RADAR-*`).
+
+### 🚨 Luka odsłonięta przy okazji — zapisana, nie zamieciona
+
+**Neurony nie deklarują w kodzie, jakich danych wymagają** (brak pola `WYMAGA`/`ZRODLO` —
+sprawdzone na K-03, K-04, X-05), więc nie da się programowo odróżnić „milczy z braku
+wejścia" od „milczy, bo zepsuty". Dla `SMC-*`, `OC-*`, `PSY-01..04`, `Z-05/Z-06` przyczyna
+**niezmierzona** — rozstrzygnie bieg karmiony adapterami i wieloma parami.
+
+**Pliki:** `imperium/legiony/discriminator.py` (nowy), `tests/test_discriminator.py`
+(nowy, 17 testów), ledger `rejestr_testow.jsonl`, `docs/ARCHITEKTURA_IMPERIUM.md`.
+
+---
+
+## 2026-07-31 | 🔒 | Hook `Stop` — EXACTOR sprawdza meldunek BEZ UDZIAŁU MOJEJ PAMIĘCI
+
+Decyzja Cezara: *„hook stop jeżeli rekomendujesz"*. Zarekomendowałem — z zastrzeżeniem zakresu.
+
+**Dlaczego hook, skoro organ był już wpięty w skill CLAUSURA:** skill działa, gdy pamiętam
+go wywołać. Nota `N-b74ce133` powstała dlatego, że pamięć zawiodła **mimo** wydrukowanego
+rozkazu. Wpięcie opierające się na tym samym zawodnym ogniwie nie domyka klasy wady.
+
+### Sonda PRZED logiką — kolejność, nie ozdobnik
+
+Żaden z 4 hooków Imperium nie czytał transkryptu, więc to, czy zdarzenie `Stop` w ogóle
+niesie tekst meldunku, było **niezmierzone**. Krok 1 to była sonda zapisująca surowe
+zdarzenie (poza repo, żeby nie brudzić drzewa w trakcie bramki). Pomiar:
+
+| pole | zawartość |
+|---|---|
+| `last_assistant_message` | **pełny tekst meldunku** — parsowanie transkryptu zbędne |
+| `stop_hook_active` | bezpiecznik przeciw pętli |
+| `transcript_path`, `session_id`, `cwd` | dostępne, niepotrzebne |
+
+Budowa strażnika przed tym pomiarem byłaby dokładnie tym, za co powstał TALAR.
+
+### Zasięg świadomie wąski
+
+Hook bada **wyłącznie krok 8** (`tryb="tylko_push"`) — jedyną powinność ze zmierzonym
+**zerem fałszywych alarmów** na 156 przekazaniach. Poziom „domkniecie" nie jest
+skalibrowany, a automat odpalany po KAŻDEJ turze zamieniłby go w tapetę. Nowy tryb odcina
+poziom domknięcia nawet wtedy, gdy meldunek sam je deklaruje (test granicy pilnuje).
+
+**Bezpieczniki:** `stop_hook_active` → cisza (bez pętli) · brak pola meldunku → cisza (nie
+zgadujemy z transkryptu) · awaria → kod 0 i krzyk na stderr, praca Imperium nietknięta ·
+blokada wyrażona protokołem (`decision: block`), nie kodem wyjścia.
+
+**Dowód na ŻYWYM zdarzeniu** (nie na atrapie): prawdziwe zdarzenie z sondy z podmienionym
+meldunkiem na dosłowny grzech z noty → hook blokuje i podaje gotowy blok wygenerowany
+z żywego repo.
+
+**Pliki:** `imperium/pretorianie/exactor.py` (+`ocen_zdarzenie_hooka`, `hook_stop`, tryb
+`tylko_push`, CLI `--hook`), `.claude/hooks/stop.sh` (nowy, wrapper cienki jak CUSTOS
+LIMINIS), `.claude/settings.json` (rejestracja), `tests/test_exactor.py` (26→36 testów),
+`docs/ARCHITEKTURA_IMPERIUM.md`.
+
+**Osobno — PR #137:** plik z wrzutni to *Summary by cubic*, czyli opis MOICH zmian, nie
+recenzja: zero uwag, w dodatku napisany dla commita `ffb796d`, gdy HEAD stoi na `ea9fe90`.
+Potwierdza werdykt RECOGNITORA („brak recenzji"): **podsumowanie nie jest spojrzeniem**.
+
+---
+
+## 2026-07-30 | 🪙 | EXACTOR RENUNTIATIONIS — spłata TALARA `N-b74ce133` (CORONA)
+
+**Powód:** krok 8 CLAUSURY nakazuje podać PEŁNY blok PowerShell (`cd` + `git push origin
+<gałąź>`). Dałem sam `git push`, Cezar musiał pytać DWA RAZY. Rozkaz stał w CLAUDE.md,
+w pamięci prywatnej, a pieczęć CLAUSURA **wydrukowała mi go kilka minut wcześniej**.
+Wiedza była — brakowało MECHANIZMU porównującego meldunek z checklistą.
+
+**Organ:** `imperium/pretorianie/exactor.py` (26 testów) — bierze tekst meldunku i sprawdza
+go wobec ŻYWEJ checklisty czytanej z KONSTYTUCJI przez SIGILLARIUM. Jedyny organ Imperium
+czytający to, co MÓWIĘ Cezarowi (`grep` po `imperium/` i `narzedzia/`: zero innych trafień).
+
+### Kalibracja na PRAWDZIE PODSTAWOWEJ — 190 meldunków z kroniki 144 sesji
+
+| poziom | meldunków | alarmów | uwagi |
+|---|---|---|---|
+| `brak` (wzmianka w prozie) | 34 | 0 | zakaz pushu, `deny` w uprawnieniach, błąd 403 |
+| `push` (przekazanie komendy) | 126 | 3 | krok 8 |
+| `domkniecie` | 30 | — | kroki 5 i 4b |
+
+**Krok 8: recall 4/4 wobec ręcznie osądzonej prawdy (w tym oba bloki z samej noty),
+0 fałszywych alarmów na 156 przekazaniach.**
+
+### Trzy rzeczy rozstrzygnięte POMIAREM, nie projektem
+
+1. **Reguła fence'owa przegrała z regułą linii polecenia.** `git push` w bloku ``` dawał
+   2 fałszywki (JSON uprawnień, prompt subagenta) i **gubił poprawny meldunek**, bo
+   parowanie ``` przesuwa się po nieparzystym fence.
+2. **Przekazanie pushu ≠ koniec wachty.** Pierwsza wersja krzyczała o Prawo XV na 66%
+   meldunków — rozstrzygnęła arytmetyka: 39 sesji, a „domknięć" wyszło 109. Stąd DWA
+   POZIOMY, a domknięcie jest **deklarowane przez wołającego**, nie zgadywane.
+3. **Powinnością meldunku jest tylko krok, którego brzmienie każe COŚ DAĆ Cezarowi.**
+   Bez tego kryterium organ dawał **80% alarmów** na domknięciach, karząc w 45% za
+   nieprzepisanie bilansu długu, którego krok 5b wcale nie każe przepisywać. Strażnik
+   krzyczący na 4 meldunki z 5 uczy ignorowania siebie.
+
+**Uodpornienie (nie tylko wykrywanie):** `--blok-push` **generuje** blok kroku 8 z żywego
+repozytorium — skoro pamięć zawiodła przy przepisywaniu dwóch linii, nie ma powodu ich
+przepisywać. Test niezmiennika pilnuje, że to, co organ podaje, przechodzi to, czego wymaga.
+
+**Czego NIE WIEMY:** liczby dla kroków 5 i 4b (25% i 12,5% pominięć) są wskazaniem, nie
+werdyktem — brak ręcznej etykiety „tu naprawdę należało to napisać". Rozstrzygnie użycie
+na żywo. Hook `Stop` (sprawdzenie bez udziału mojej pamięci) **zaproponowany, nie wdrożony** —
+to zmiana konfiguracji stałej, więc decyzja Cezara.
+
+**Pliki:** `imperium/pretorianie/exactor.py` (nowy), `tests/test_exactor.py` (nowy, 26 testów),
+`.claude/skills/clausura/SKILL.md` (kroki 4–5 wywołania organu), `docs/ARCHITEKTURA_IMPERIUM.md`,
+`docs/CENSUS_ORGANORUM.md` (256 modułów), `README.md` (pretorianie 14→15).
+
+---
+
 ## 2026-07-30 | 🔎 | PIERWSZY POMIAR TRAFNOŚCI RAG — moja ścieżka była 4× gorsza od Hyginusowej
 
 **QUAESITOR uruchomiony PIERWSZY RAZ w historii Imperium** (organ leżał gotowy od sesji

@@ -1,6 +1,6 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-27
+## Ostatnia aktualizacja: 2026-07-28
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
@@ -113,20 +113,44 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-28 — MEXC ✗ – brak realnych orderów i pętla P&L niezamknięta
+System nie ma połączenia z MEXC, więc roj jest tylko backtestowany. Największa luka Imperium – pętla P&L→wagi nie działa.
+
+### 2026-07-28 — MEXC ✗ – pętla P&L→wagi wciąż nie zamknięta w żywym rynku
+Rój jest backtestowany, 87 neuronów, 22 warstwy audytu, ale brak realnych orderów przez MEXC. To największa luka Imperium: mierzymy tanie, bo drogie jest trudne. Efekt latarni działa.
+
+### 2026-07-28 — BIB-011 w języku chińskim – niewyszukiwalna w RAG przez brak segmentacji CJK
+Plugin BIB-011 (algorytmiczny trading) jest chińskim tłumaczeniem. 78.3% znaków to CJK. FTS5 tokenizer 'unicode61' nie segmentuje chińskiego – cały ciąg CJK to jeden token. Dodatkowo chunker tnie po whitespace, co nie działa dla tekstu bez spacji. Książka jest martwa w RAG, niewyszukiwalna.
+
+### 2026-07-28 — Fałszywy alarm INDEX FALSORUM – strażnik nie rozpoznawał rzeczownika 'obalenie'
+KOREKTA_JAWNA znała imiesłów 'obalon', ale nie rzeczownik 'obalen' → strażnik zgłaszał własną dokumentację jako kłamstwo. Lekcja: fałszywe zatrzymanie uczy obchodzić strażnika, nie jest bezpieczną stroną błędu. Naprawiono testem granicy przez mutację.
+
+### 2026-07-27 — Rozwój LLM to skoki po pomiarze, nie nauka w locie
+Model ma zamrożone wagi po treningu. Rozwój osiąga się przez RAG (natychmiastowa pamięć) i cykliczne dotrenowanie LoRA po egzaminie na arenie. Awans tylko po zielonym pomiarze.
+
+### 2026-07-27 — RTX 4050 laptop ma 6 GB VRAM – ograniczenia lokalnego treningu
+Acer Nitro z RTX 4050 pozwoli trenować LoRA na modelu 7-8B lokalnie i uruchamiać inferencję, ale nie trenować dużych modeli od zera. Ciężki trening zostaje na Colabie. CENSOR wykryje CUDA i podniesie alarm.
+
+### 2026-07-27 — Zastosowane zasady projektowe: SYMBIOZA, Prawo XVI, Test-Granic
+Wdrożenie respektowało ZASADĘ SYMBIOZY (zmiana nie izolowana), Prawo XVI (jedno źródło prawdy dla wag IC), Regułę Test-Granic (testowanie co może pójść źle).
+
+### 2026-07-27 — Bug: tryb sign-only daje pełną wagę niezmierzonym neuronom mimo IC=0
+W legatus.py:515 w trybie sign-only neurony z domyślnym IC=0 nie są wyciszane – otrzymują pełną wagę bazową, co wypacza decyzję.
+
+### 2026-07-27 — 43 cząstki Hyginusa bez sędziego
+Największa czynna utrata potencjału – zapłacony zwiad leży odłogiem. Priorytet P0 na następne wachty.
+
+### 2026-07-27 — Kolizja plików scratcha przy równoległej konwersji
+Cubic PR#119 P1: ekstraktor.py nadpisuje plik .calibre-tmp.txt z fixu edc657f – kasowanie istniejącego pliku biblioteki przy równoległej konwersji.
+
+### 2026-07-27 — Cache djvu niepodpięty do RAG
+Cubic PR#119 P1: cache djvu zbudowany wcześniej nie jest używany przez indeksowanie RAG – chmura dalej woła djvutxt/calibre i gubi djvu. Prawo XV – utrata potencjału.
+
+### 2026-07-30 — Kod QUAESITORA przetrwał reinstalację, ale bez testów i poza gitem
+330 linii, CLI działa, ale brak testów i nieśledzony. Formalnie organ nie istnieje (Prawo XIX). Wymaga domknięcia testami i commitem.
+
 ### 2026-07-27 — 14,9 mln barów 1m nieużytych od 2022
 Czytnik odbiera 14,9 mln świec 1-minutowych, ale dane kończą się 2022-07-27 – backtest działa, live nie używa tych danych.
-
-### 2026-07-27 — War_lancer/sala_wojenna/valhalla w archiwum
-Trzy porty (war_lancer, sala_wojenna, valhalla) znajdują się w archiwum/kingdom_pixel_p1/, a nie w imperium/ – klasyczne widmo wynikające z fałszywego przypisania lokalizacji.
-
-### 2026-07-27 — Zidentyfikowano 3 prawdziwe widma w INDEKS-ie
-W dokumencie SZYBKA DIAGNOSTYKA wykryto 3 martwe komendy: mexc_feed.py (powinno mexc_futures.py), calculator_gate.py (powinno brama_kalkulatora.py), veto_check.py (brak w pretorianinie).
-
-### 2026-07-27 — Potrzeba suprsji kontekstowej w bramkach
-Mechaniczne 'czy plik istnieje' nie odróżnia twierdzenia od zamiaru – konieczne suprsje dla przykładów, wizji, planów, negacji i snapshotów, aby uniknąć fałszywych alarmów.
-
-### 2026-07-27 — Spłata długu gnicia nie łapie widm API
-Spłata długu gnicia per-dokument (W13–W15) szuka gnicia w istniejących plikach, nie weryfikuje istnienia API opisanego w dokumentach – dlatego 3 widma przetrwały audyt dokumentacyjny.
 
 ### 2026-07-27 — Większość odwołań do dokumentów to kronika sesji (historia)
 1003 z 1301 odwołań do docs/*.md to historia, której nie wolno przepisywać (Prawo I). Przenoszenie żywych dokumentów tworzy martwe linki; przenoszenie migawek jest tanie.
@@ -158,14 +182,8 @@ Pomiar cProfile wykazał stały ~66 ms/tick dla okna 251 barów. Skalowanie lini
 ### 2026-07-27 — Prawdziwy sprawca kwadratu: _py_hma (pętla w pętli wma)
 Wewnętrzna pętla w _py_hma wywołuje wma wielokrotnie (4,5 mln wywołań na 2700 ticków), dając O(period²) dla tego jednego wskaźnika. Reszta backtestu jest liniowa.
 
-### 2026-07-27 — dodaj_checklist nie zapisuje na dysk
-dodaj_checklist() zwraca True i inkrementuje licznik w pamięci, ale nie wywołuje zapisz() – wpis nie trafia na dysk. Naprawiono przez dodanie zapisu.
-
 ### 2026-07-27 — Błąd w ocenie czasu gnicia – 9 dni zamiast pół roku
 W LOG_ZMIAN i pamięci napisano 'pół roku', a faktyczny czas od utworzenia runbooka wynosił 9 dni. Błąd wykryty przy liczeniu dla podglądu Kapitolu – poprawiono we wszystkich miejscach.
-
-### 2026-07-27 — Bieg testów #1 nieważny – równoległość z mutacjami
-Testy startowały przed zmianą W22 i biegły w tle podczas sed-owania mutacji. Wynik '55 z 73' i exit 0 od tail, nie od testów. Ważny tylko bieg #2 wystartowany po wszystkich zapisach.
 
 ### 2026-07-27 — Mutacja przeżyła przez luźny próg asercji
 Test zasięgu miał asercję 'zbadane >= 8+40', co przepuściło zawężenie z 73 do 65 dokumentów. Wymieniono na równość z liczbą policzoną ze źródła. Obie klasy do Księgi Wad. Nota nie wystawiona (błąd nie dostarczony).
@@ -178,9 +196,6 @@ Linie z absolutnymi ścieżkami desktopu (~\Desktop\) ujawniają PII i struktur�
 
 ### 2026-07-26 — Regime-stale bug: pamięć branżowa ślepa na reżim rynku
 Wszystkie istniejące systemy pamięci (Mem0/Zep/Letta/A-Mem) są domenowo-ślepe – wydobywają lekcje z bull marketu podczas bessy. Nasza poprawka: × regime_match w scoringu.
-
-### 2026-07-26 — Rozjazd repo z chmurą przez hooki po obu stronach
-Od wspólnego punktu e2cb846 chmura dorobiła 2 commity (sync+migawka), lokalnie 2 (auto: sync pamięci). Hooki commitują same po obu stronach – dwa ciągi wyrosły z tego samego pnia.
 
 ### 2026-07-20 — Błąd replikacji wiedzy – Claude sam nie stosuje własnych procedur
 W poprzednich sesjach wielokrotnie brakowało aktualizacji dokumentów i ledgera, mimo że Claude tworzył procedury (np. ALMA, OBSERWATORY). To klasyczny błąd replikacji wiedzy – Claude tworzy narzędzia, ale sam ich nie używa.
@@ -205,9 +220,6 @@ konwerter.py:70 – cache djvu zbudowany poprzednio nie jest używany przy indek
 
 ### 2026-07-20 — 22 neurony czekają na adaptery/dane (Prawo XV)
 Rodziny NEWS-*, PSY-*, RADAR-*, OC-06/07/08, C-01, V-03, Z-06/Z-07 nie mają jeszcze feedów i abstynują świadomie zgodnie z Prawem XV. To znany, udokumentowany stan, a nie regresja.
-
-### 2026-07-21 — Archium lekcji ma inny nagłówek – szukaj() nie widzi schłodzonych
-Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł szukaj() używa własnego parsera, który go nie rozpoznaje. Luka w wyszukiwalności pamięci – wymaga ujednolicenia parsera lub wzbogacenia searcha.
 
 ### 2026-07-21 — Podkreślnik jako znak słowny w regexie BIB
 Użycie \b w regexie dla identyfikatorów BIB nie zamyka się na podkreślniku (jest znakiem słownym). Testy złapały błąd - naprawiono wzorzec.
@@ -253,9 +265,6 @@ W sesji 56ea4ea2 zakończono implementację U1 (korpus biblioteki anty-echo), U2
 
 ### 2026-07-20 — Bug w audycie przeoczony przez martwy wzorzec
 Linia 259 audytu zawierała jedyny subprocess.run bez encoding – trzy pozostałe naprawiono w 2026-07-17, ale tę przeoczono, bo wzorzec 'kodowanie' leżał martwy w checkliście.
-
-### 2026-07-21 — Niespójność licznika memory a rzeczywista liczba wpisów na dysku
-Metoda dodaj_checklist() zwiększała licznik w pamięci (52), ale wpis nie zapisywał się do pliku (zostało 51). Zapisz() jest osobną metodą, co powoduje cichą utratę danych. Naprawiono przez jawne wywołanie zapisz() po dodaniu.
 
 ### 2026-07-21 — Błędny wpis o czasie gnicia runbooka – 9 dni zamiast 'pół roku'
 W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokładnie: 9 dni. Sprostowano u źródła (ledgery, pamięć).
@@ -355,9 +364,6 @@ Przetestowano 3 scenariusze rynkowe — system wymaga automatycznego klasyfikato
 
 ### 2026-06-30 — Audyt W6: brak Stan na = błąd, markdown tolerowany
 Dodano else dla braku 'Stan na:'. Regex toleruje **Stan na:** data.
-
-### 2026-06-30 — Dynamiczna dźwignia od pewności i reżimu
-pewnosc <0.55→0x, <0.65→2x, <0.75→5x, <0.85→10x, <0.92→15x, >=0.92→20x. Mnożniki reżimu: VOLATILE×0.5, PANIC×0.1, RANGING×0.7, TREND_STRONG×1.2.
 
 ### 2026-06-30 — Klucznik ignorowany przez Dyrygenta (Prawo XV)
 Dyrygent nie używał wyników Klucznika (strategii) — kierunek i pewność pochodziły wyłącznie z neuronów. Naprawiono: dodano logikę trybów (agregat/filtr/strategia) uwzględniającą DopasowanieStrategii.

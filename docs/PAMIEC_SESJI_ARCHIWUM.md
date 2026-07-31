@@ -12,6 +12,90 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-27 — Dzielnik gubi formaty '###'
+Dzielnik cząstek w narzędziu A/B nie radzi sobie z formatem '### 1. **Nazwa**' – scala wiele cząstek w jeden blok (21/33). Nasyca metrykę do 95%.
+
+### 2026-07-27 — Leksykon potwierdzał sam siebie
+Leksykon LIBRA MESSIS zawierał wpisy pochodzące z własnego pliku deklaracji, a nie z żywego kodu. Np. 'order_flow' istniało tylko jako token w pliku leksykonu. Weryfikacja opierała się na samopotwierdzeniu.
+
+### 2026-07-27 — Backticki w bashu podmieniają tekst
+Przekazywanie prozy z backtickami przez `python -c` w bashu powoduje podmianę fragmentów tekstu przez powłokę. Wniosek: dyscyplina - nie używać backticków w prozie przekazywanej do shella.
+
+### 2026-07-27 — Leksykon może potwierdzać samego siebie
+Leksykon zbudowany z nazw plików zawierał fałszywe wpisy (np. 'order_flow'), które istniały tylko w pliku leksykonu, a nie w kodzie. Weryfikacja czytała plik, który sama deklarowała – tworząc cykl autopotwierdzenia. Naprawiono przez weryfikację `grep -r` w żywym kodzie.
+
+### 2026-07-27 — Pipe tail maskuje exit code testów
+Użycie `| tail` w potoku testów sprawia, że exit code pochodzi od `tail` (zawsze 0), a nie od testów. Wykryto 1 oblany test mimo raportu „exit 0”. Nie używać taila z testami – zamiast tego odczytywać pełne wyjście.
+
+### 2026-07-27 — Audyt spójności i skan wad czyste po implementacji
+Po wdrożeniu ważenia IC uruchomiono audyt (ruff W13+W14) i heurystyczny skan wad – oba exit 0, pełna harmonia.
+
+### 2026-07-27 — Runner testów wolny (~2100 testów, uruchomiony w tle)
+Pełny runner testów jest wolny (~5 min). Aby nie blokować pracy, testy uruchamiano w tle, a równolegle wykonywano inne zadania (audyt, skan).
+
+### 2026-07-27 — Pełne testy, audyt spójności i skan wad przeszły czysto
+Po wdrożeniu: pełny runner exit 0, audyt spójności (ruff W13+W14) exit 0, heurystyczny skan wad czysto. Potwierdzono harmonię systemu.
+
+### 2026-07-26 — Czyszczenie historii
+Sesja została wyczyszczona przed analizą, brak danych do ekstrakcji.
+
+### 2026-06-30 — Dynamiczna dźwignia od pewności i reżimu
+pewnosc <0.55→0x, <0.65→2x, <0.75→5x, <0.85→10x, <0.92→15x, >=0.92→20x. Mnożniki reżimu: VOLATILE×0.5, PANIC×0.1, RANGING×0.7, TREND_STRONG×1.2.
+
+### 2026-07-27 — Uruchomienie bibliotekarza z tematami zwiększa cząstki Hyginusa
+Narzędzie bibliotekarz.py z flagą --pelny --topk 8 i listą tematów (portfolio construction, execution algorithms, volatility forecasting, cross-sectional factor momentum crypto, orderbook microstructure queue position i inne) dodaje nowe cząstki do kolejki Hyginusa – wzrost z 33 do 43 cząstek czekających na sędziego.
+
+### 2026-07-27 — Filtr ekonomiczny bez walidacji NaN/inf
+lambda_max w filtr_ekonomicznym.py:72 nie sprawdza NaN/inf – brama-weto wyłącza się milcząco. Należy dodać __post_init__.
+
+### 2026-07-27 — Test realne_dane_1h czerwony na świeżym klonie
+Audyt K1: test realne_dane_1h assertuje 5 csv-1h, ale CSV są gitignorowane od 2026-07-04. Sprzeczność decyzja↔test.
+
+### 2026-07-27 — Regresja danych w katalogu ksiąg
+Cubic PR#119 P1: 10 wpisów w katalogu_ksiag.json straciło autora/tytuł (Kissell→Nieznany, garble LŁpez, Lef?vre) – enrichment nadpisał dobre wartości placeholderami calibre.
+
+### 2026-07-27 — _skroc pada na non-string
+Funkcja _skroc w dzienniku_niesmiertelnym (Cubic PR#118 P2) nie obsługuje argumentów niebędących stringami. Brak str(co0).
+
+### 2026-07-27 — Filtr ekonomiczny ignoruje NaN/inf
+lambda_max w filtrze ekonomicznym (Cubic PR#118 P1) nie waliduje NaN/inf – brama-weto wyłącza się milcząco. Wymaga __post_init__.
+
+### 2026-07-27 — dodaj_checklist nie zapisuje na dysk
+dodaj_checklist() zwraca True i inkrementuje licznik w pamięci, ale nie wywołuje zapisz() – wpis nie trafia na dysk. Naprawiono przez dodanie zapisu.
+
+### 2026-07-26 — Rozjazd repo z chmurą przez hooki po obu stronach
+Od wspólnego punktu e2cb846 chmura dorobiła 2 commity (sync+migawka), lokalnie 2 (auto: sync pamięci). Hooki commitują same po obu stronach – dwa ciągi wyrosły z tego samego pnia.
+
+### 2026-07-21 — Niespójność licznika memory a rzeczywista liczba wpisów na dysku
+Metoda dodaj_checklist() zwiększała licznik w pamięci (52), ale wpis nie zapisywał się do pliku (zostało 51). Zapisz() jest osobną metodą, co powoduje cichą utratę danych. Naprawiono przez jawne wywołanie zapisz() po dodaniu.
+
+### 2026-07-30 — Tiro: 417 par/229 użytecznych – 23% progu 1000
+Z 417 par tylko 229 uznane za użyteczne. Stan bazy par handlowych.
+
+### 2026-07-30 — Hyginus: 35 z 44 cząstek czeka na sędziego od 07-26
+Kolejka 44, 35 w stanie 'do sędziego'. Ostatni zwiad 07-26. Stan backlogu sądowego – jeden z priorytetów.
+
+### 2026-07-30 — Transkrypt zabitej sesji (637 KB) odczytany – praca ocalała
+Po reinstalacji utracono okno czatu, ale plik jsonl z 184 wpisami przetrwał na dysku. Rozumowanie i decyzje odzyskane.
+
+### 2026-07-27 — War_lancer/sala_wojenna/valhalla w archiwum
+Trzy porty (war_lancer, sala_wojenna, valhalla) znajdują się w archiwum/kingdom_pixel_p1/, a nie w imperium/ – klasyczne widmo wynikające z fałszywego przypisania lokalizacji.
+
+### 2026-07-27 — Zidentyfikowano 3 prawdziwe widma w INDEKS-ie
+W dokumencie SZYBKA DIAGNOSTYKA wykryto 3 martwe komendy: mexc_feed.py (powinno mexc_futures.py), calculator_gate.py (powinno brama_kalkulatora.py), veto_check.py (brak w pretorianinie).
+
+### 2026-07-27 — Potrzeba suprsji kontekstowej w bramkach
+Mechaniczne 'czy plik istnieje' nie odróżnia twierdzenia od zamiaru – konieczne suprsje dla przykładów, wizji, planów, negacji i snapshotów, aby uniknąć fałszywych alarmów.
+
+### 2026-07-27 — Spłata długu gnicia nie łapie widm API
+Spłata długu gnicia per-dokument (W13–W15) szuka gnicia w istniejących plikach, nie weryfikuje istnienia API opisanego w dokumentach – dlatego 3 widma przetrwały audyt dokumentacyjny.
+
+### 2026-07-27 — Bieg testów #1 nieważny – równoległość z mutacjami
+Testy startowały przed zmianą W22 i biegły w tle podczas sed-owania mutacji. Wynik '55 z 73' i exit 0 od tail, nie od testów. Ważny tylko bieg #2 wystartowany po wszystkich zapisach.
+
+### 2026-07-21 — Archium lekcji ma inny nagłówek – szukaj() nie widzi schłodzonych
+Po schłodzeniu lekcje trafiają do archiwum z innym nagłówkiem, ale moduł szukaj() używa własnego parsera, który go nie rozpoznaje. Luka w wyszukiwalności pamięci – wymaga ujednolicenia parsera lub wzbogacenia searcha.
+
 ### 2026-07-27 — Jednolita miara dla alarmu i chłodzenia lekcji
 Alarm przekroczenia limitu znaków lekcji i konsolidacja liczyły dwie różne rzeczy; połączono w jedną miarę, aby obniżenie progu nie psuło chłodzenia.
 

@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: narzedzia/census_organorum.py
-stan_na: 2026-07-30
+stan_na: 2026-07-31
 powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem"
 ---
 # 🏛️ CENSUS ORGANORUM — spis organów i narzędzi Imperium
@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 255** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 257** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -154,6 +154,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `budowniczy_wskaznikow.py` | 🔧 Budowniczy Wskaźników — spina Bramę v2 z serią barów w komplet dict dla neuronów |
 | `denoising_macierzy.py` | 🧬 IMV-LDP / Denoising + Clustering macierzy korelacji (López de Prado, MLAM 2020) |
 | `diagnostyka_korelacji.py` | 📊 IMV-DIAG / Diagnostyka Dekorelacji — macierz korelacji sygnałów modułów |
+| `discriminator.py` | 🔍 DISCRIMINATOR — orzeka, czy SKUPISKO neuronów to naprawdę redundancja |
 | `feature_importance.py` | W-355 / Feature Importance: MDA + SFI (López de Prado, AFML Ch. 8) |
 | `frac_diff.py` | W-339 / Fractional Differentiation — stacjonaryzacja z zachowaną pamięcią długiego zasięgu |
 | `jump_model.py` | 🗿 STATISTICAL JUMP MODEL — detektor reżimu z karą za skok (W-281) |
@@ -243,6 +244,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 |-------|--------------------------|
 | `aegis_tarcza.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
 | `custos_liminis.py` | 🚧 CUSTOS LIMINIS — Strażnik Progu: bariera PRZED zadziałaniem narzędzia (PreToolUse) |
+| `exactor.py` | 🪙 EXACTOR RENUNTIATIONIS — egzekwuje, czy MELDUNEK KOŃCOWY spłaca checklistę |
 | `filtr_asymetrii.py` | Filtr Asymetrii Reżimu (W-314) — brama wejścia oparta na trendzie i jego sile |
 | `filtr_ekonomiczny.py` | Filtr Ekonomiczny (ECON — market price of risk) — brama „zbyt dobre, by było prawdziwe" |
 | `kalkulator_lewara.py` | Kalkulator Lewara — matematyka przeżycia |

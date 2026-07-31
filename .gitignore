@@ -66,3 +66,6 @@ dane/_kopie/
 
 # Checkpointy pobierania (narzedzia/pobierz_binance.py) - surowe strony API, odtwarzalne.
 dane/_checkpoint/
+
+# BREVIARIUM: migawka otwarcia jest ZUZYWANA przez delta() (unlink) — plik przejsciowy, nie stan
+bibliotheca_ulpia/dane/breviarium_migawka.json

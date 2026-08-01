@@ -2,7 +2,7 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
-stan_na: 2026-07-30
+stan_na: 2026-08-02
 powod_istnienia: "Gotowe frazy wyszukiwania dla Cezara — zwiad po literaturze celowany w ZMIERZONE luki Imperium, z kryterium oceny trafienia i listą tego, czego NIE szukać."
 ---
 # 🔭 ZWIAD — ZAPYTANIA CELOWANE W NASZE LUKI
@@ -46,6 +46,39 @@ Poślizg i prowizja są **ZAŁOŻONE, nie zmierzone**. Złe założenie odwraca 
 | 1.5 | `"fill probability" limit order execution model crypto futures` | prawdopodobieństwo wypełnienia zlecenia limit — decyduje maker vs taker |
 | 1.6 | `"transaction cost" "perpetual futures" funding maker taker net return` | pełny rachunek na perpetualach (prowizja + funding + poślizg) |
 | 1.7 ❌ | `"slippage" "calibration" backtest crypto fills` | dała SaR 2603.09164 — **zły poddział**: ryzyko giełdy, nie kalibracja biorącego |
+
+### 📏 POMIAR 2026-08-02 — testowano RDZENIE, nie frazy (i to jest cała lekcja)
+
+Cezar szukał **gołymi terminami**: `implementation shortfall` oraz `slippage` — **bez
+kwalifikatorów**, które w tym dokumencie stoją obok nich (`retail`, `cryptocurrency`,
+`"bar data" OHLCV`, `without order book`). Dlatego **frazy 1.1, 1.2 i 1.4 pozostają
+NIEZMIERZONE** — nie wolno postawić przy nich ani ✅, ani ❌. Zmierzyliśmy co innego
+i coś ważniejszego: **jak zachowuje się sam rdzeń**.
+
+| plon | rdzeń | co przyszło | perspektywa |
+|---|---|---|---|
+| `1205.3482v6` Labadie–Lehalle | *implementation shortfall* | Target Close i IS w ramach Almgren-Chriss | **duże zlecenie instytucjonalne** (35× „market impact", 0× crypto/retail/OHLCV) |
+| `2003.04425v1` Çetin–Waelbroeck | *implementation shortfall* | IS przy informed trading | **wymaga księgi L2** (68× „order book") |
+| `2603.07752v1` Barzykin (HSBC) | *slippage* | sterowanie poślizgiem i odrzuceniami | **dealer / market maker** |
+
+**Trzy zapytania, trzy prace ze strony DOSTAWCY płynności — a licząc SaR z 1.7: cztery.**
+To nie pech, to własność korpusu: literatura o koszcie egzekucji jest pisana **przez
+instytucje i dla instytucji**; „retail crypto taker" nie jest w niej przedmiotem badań.
+
+> **Wniosek odwrotny do intuicyjnego — kwalifikatory w tym dokumencie NIE są ozdobą.**
+> Pomiar pokazał dokładnie to, przed czym miały bronić dopiski `without order book`
+> i `retail`. Gołe terminy sprowadzają zwiad na stronę podażową. Frazy zostają
+> **niezmierzone, ale uwiarygodnione** — trzeba je wkleić w CAŁOŚCI, z cudzysłowami.
+
+**Co te prace dały mimo złego poddziału — przez zaprzeczenie:** skoro koszt u Almgren-Chriss
+rośnie z **impaktem własnego zlecenia**, a nasze zlecenia rynkiem nie ruszają, to nasz koszt
+egzekucji **nie jest problemem optymalizacyjnym** — jest arytmetyką *spread + prowizja +
+funding*. Szukaliśmy modelu tam, gdzie wystarczy rachunek; a tego rachunku i tak nie zamkniemy
+z literatury, tylko **pomiarem na MEXC** (wraca największa luka: zero realnych zleceń).
+
+**Kandydaci na przeformułowanie P1** (jeszcze nieużyte): `effective spread estimation from
+trade data` · `cost of crossing the spread small orders` · `taker fee funding net cost
+perpetual retail`.
 
 ## 🥇 P2 — WIELKOŚĆ POZYCJI *(podnosi wynik BEZ poprawy trafności)*
 
@@ -198,6 +231,14 @@ bota tradingowego" · `hudson-and-thames/mlfinlab` (**atrapa — ciała metod to
 
 **Odrzuć od razu, jeśli:** zero tabel · same zrzuty ekranu · „survey" w tytule · brak sekcji
 ograniczeń · wynik podany bez baseline'u · liczby bez podanego `n`.
+
+> ⚠️ **POPRAWKA KRYTERIUM (2026-08-02) — najpierw rozpoznaj TYP pracy.** Reguła „zero tabel
+> = odrzuć" jest skalibrowana na prace **empiryczne (ML/dane)**. Labadie–Lehalle `1205.3482`
+> ma **0 tabel i 0 sekcji Limitations** — bo to **matematyka stosowana**, gdzie dowód
+> i jawne założenia zastępują tabelę. Zastosowana mechanicznie, reguła odrzuciłaby pracę,
+> która dała najważniejszy wniosek tego zwiadu. Dla prac teoretycznych pytaj o **założenia
+> modelu i ich osiągalność u nas** (czy potrzebuje L2? czy zakłada impakt własnego zlecenia?),
+> nie o liczbę tabel.
 
 **Bierz, jeśli:** jest **tabela ablacji** (kilka wariantów obok siebie) · jest **Limitations /
 Threats to validity** · autor pisze **„simulated"** albo **„we defer to follow-up work"** (to

@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-29
+stan_na: 2026-08-02
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,58 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-08-02 | ⚖️ | SĄD NAD RECENZJĄ cubic PR #138 — P0 (pięć wad P1) naprawione
+
+**Pierwsza recenzja zewnętrzna, która naprawdę objęła wachtę.** RECOGNITOR potwierdził
+pokrycie: recenzja z 31.07 03:31 stoi na `4cb694b`, a cały kod merytoryczny (`ea9fe90`
+EXACTOR, `f71fdf0` hook Stop, `5be5440` DISCRIMINATOR) powstał wcześniej tej nocy.
+Niezrecenzowane zostały wyłącznie dwa commity `auto: sync pamięci` — zero linii `.py`.
+Dla kontrastu PR #137 był samym „Summary by cubic", czyli opisem moich zmian bez uwag.
+
+### Werdykt sądu: 18 słusznych / 1 odrzucona / 1 odłożona do pomiaru
+
+| naprawione w P0 | co było |
+|---|---|
+| **E1** `exactor.py` | wzorzec ścieżki wymagał litery dysku → na Linuksie organ **odrzucał blok, który sam wygenerował** |
+| **E6** `exactor.py` | przy detached HEAD `blok_push()` dawał `git push origin ` — komendę niewykonalną, podaną jako gotowa do wklejenia. Teraz `BrakGalezi` |
+| **E7** `exactor.py` | `kotwica_osierocona` wpadała do gałęzi „różny od niespełnionego" → hook **milczał dokładnie wtedy, gdy jego kontrakt z konstytucją przestawał obowiązywać** |
+| **D3** `discriminator.py` | wyjątek z `interpretuj` zapisywany jako `0.0`, nieodróżnialny od uczciwego NEUTRAL → awaria trwała udawała „cichy neuron". Teraz `None` + usuwanie parami + licznik awarii |
+| **S1** hooki | `stop.sh` bez bitu `+x` |
+
+**Odrzucona: E2** (regex nieświadomy cudzysłowów) — teoretycznie prawdziwa, ale mam pomiar
+**0 fałszywek na 190 meldunkach**; parsowanie quotingu powłoki to złożoność bez zmierzonej
+korzyści (Prawo XVI). **Odłożona: E4** (krok 4b przechodzi przy jednej nazwie sługi) —
+zarzut trafny, ale ta powinność **nie jest skalibrowana**; zaostrzenie progu bez prawdy
+podstawowej byłoby dokładnie tym, za co powstał talar N-b74ce133. Idzie do Backlogu CODEX.
+
+### Czego recenzent NIE dopowiedział (rozszerzenia z własnego pomiaru)
+
+- **S1 to nie jeden plik, tylko trzy:** `stop.sh`, `pre-tool-use.sh`, `post-tool-use.sh`
+  miały `100644`, a `session-start/end.sh` `100755`. Na Unixie **3 z 5 hooków nie odpalały
+  się wcale** — w tym CUSTOS LIMINIS i VIGIL. Recenzent widzi wyłącznie diff.
+- **D1 wpadło razem z D3** (ta sama funkcja, ten sam warunek): próg `MIN_PROBEK`, bo przy
+  0–1 obserwacji „stały głos" jest artefaktem długości serii, nie własnością neuronu.
+- **`zip(strict=True)`** w `ocen_pare` — rozjazd długości serii przestał być cicho ucinany.
+
+### Dowód, nie deklaracja (LEX TALARUS)
+
+- testy: **64/64** w obu modułach (53 przed wachtą + 11 nowych granic)
+- **mutacja 6/6** — każdą naprawę cofnięto i sprawdzono, czy test czerwienieje. Pierwszy
+  przebieg dał **5/6**: `test_awaria_nie_udaje_glosu_neutral` był ŚLEPY, bo dobrałem dane,
+  na których `None→0.0` nie zmienia werdyktu. Dane poprawione, mutacja złapana.
+- **żywe dane** (BTCUSDT 4h, 800 barów, 440 kroków): wynik **odtworzony** — 17 skupisk,
+  125 par, jeden kandydat `X-05 ↔ XII-02` **r=0,8217**, 27 milczących, **0 awaryjnych**.
+  Czyli D3 była wadą **latentną**: mogła skazić przyszły pomiar, nie skaziła tego.
+  Pierwszy bieg z 31.07 pozostaje ważny.
+- ruff czysto, skan wad czysto, 6 nowych klas semantycznych w Księdze Wad (bez regexu —
+  szum niezmierzony), POMIAR dopisany do `rejestr_testow.jsonl`.
+
+**Pliki:** `imperium/pretorianie/exactor.py`, `imperium/legiony/discriminator.py`,
+`tests/test_exactor.py`, `tests/test_discriminator.py`, `.claude/hooks/*.sh` (tryb),
+`bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`, `bibliotheca_ulpia/dane/rejestr_testow.jsonl`.
 
 ---
 

@@ -98,14 +98,33 @@ def _wariancja_zerowa(seria: List[float]) -> bool:
     return len(set(seria)) <= 1
 
 
-def ocen_pare(klucz_a: str, klucz_b: str, seria_a: List[float],
-              seria_b: List[float]) -> Dict[str, Any]:
+MIN_PROBEK = 2   # jedna obserwacja nie ustala ani wariancji, ani jej braku
+
+
+def ocen_pare(klucz_a: str, klucz_b: str, seria_a: List[Optional[float]],
+              seria_b: List[Optional[float]]) -> Dict[str, Any]:
     """Werdykt dla JEDNEJ pary — czysty, bez wejścia/wyjścia.
 
     Kolejność sprawdzeń jest istotna: martwy głos rozstrzygamy PRZED korelacją, bo
     Pearson na stałej serii jest niezdefiniowany, a `None` czytane jako „brak korelacji"
     wyglądałoby jak dywersyfikacja. Rzecz niezmierzona nie jest zielona (Prawo I).
+
+    `None` w serii to BRAK POMIARU (awaria neuronu), nie głos — pary z brakiem są
+    usuwane parami (pairwise deletion), bo korelacja wymaga obserwacji w tym samym barze.
+    Poniżej `MIN_PROBEK` wspólnych obserwacji werdyktem jest NIEROZSTRZYGNIETE, nigdy
+    CISZA: przy zerze albo jednej próbce „stały głos" jest artefaktem długości serii,
+    a nie własnością neuronu (recenzja cubic PR #138, D1 — potwierdzona).
     """
+    wspolne = [(a, b) for a, b in zip(seria_a, seria_b, strict=True)
+               if a is not None and b is not None]
+    if len(wspolne) < MIN_PROBEK:
+        return {"para": (klucz_a, klucz_b), "korelacja": None, "werdykt": "NIEROZSTRZYGNIETE",
+                "martwe": [],
+                "opis": f"za mało wspólnych obserwacji ({len(wspolne)} < {MIN_PROBEK}) — "
+                        "to długość pomiaru, nie własność neuronów"}
+    seria_a = [a for a, _ in wspolne]
+    seria_b = [b for _, b in wspolne]
+
     martwe = [k for k, s in ((klucz_a, seria_a), (klucz_b, seria_b)) if _wariancja_zerowa(s)]
     if martwe:
         return {"para": (klucz_a, klucz_b), "korelacja": None, "werdykt": "CISZA_W_POMIARZE",
@@ -128,8 +147,13 @@ def ocen_pare(klucz_a: str, klucz_b: str, seria_a: List[float],
             "werdykt": werdykt, "martwe": [], "opis": opis}
 
 
-def ocen_skupisko(nazwa: str, serie: Dict[str, List[float]]) -> Dict[str, Any]:
-    """Werdykt dla całego skupiska: wszystkie pary + podsumowanie."""
+def ocen_skupisko(nazwa: str, serie: Dict[str, List[Optional[float]]],
+                  awarie: Optional[Dict[str, int]] = None) -> Dict[str, Any]:
+    """Werdykt dla całego skupiska: wszystkie pary + podsumowanie.
+
+    `awarie` (ile razy `interpretuj` rzucił wyjątkiem) idzie do wyniku ODDZIELNIE od
+    ciszy — bo to rozłączne stany: cisza jest zachowaniem neuronu, awaria jest jego wadą.
+    """
     klucze = sorted(serie)
     pary = [ocen_pare(klucze[i], klucze[j], serie[klucze[i]], serie[klucze[j]])
             for i in range(len(klucze)) for j in range(i + 1, len(klucze))]
@@ -140,21 +164,31 @@ def ocen_skupisko(nazwa: str, serie: Dict[str, List[float]]) -> Dict[str, Any]:
     return {
         "skupisko": nazwa, "neurony": klucze, "par": len(pary),
         "pary": pary, "licznik": licznik, "martwe_glosy": martwe,
+        "awaryjne": {k: c for k, c in sorted((awarie or {}).items()) if k in serie and c},
         "kandydatow_do_scalenia": licznik.get("KANDYDAT_DO_SCALENIA", 0),
         "filarow": licznik.get("FILAR_DYWERSYFIKACJI", 0),
     }
 
 
 def zbierz_serie(bary: List[Dict[str, Any]], klucze: List[str], budowniczy,
-                 *, od: int = 360, postep=None) -> Dict[str, List[float]]:
-    """Głosy wskazanych neuronów na kolejnych barach: {KLUCZ: [wartości]}.
+                 *, od: int = 360, postep=None
+                 ) -> tuple[Dict[str, List[Optional[float]]], Dict[str, int]]:
+    """Głosy wskazanych neuronów na kolejnych barach: ({KLUCZ: [wartości]}, {KLUCZ: awarii}).
 
     `od` to minimalna historia, jakiej potrzebuje najbardziej łakomy wskaźnik (Pi Cycle
     wymaga ≥360 barów) — liczenie od zera dawałoby głosy z niepełnych okien, czyli pomiar
     czegoś innego niż produkcja.
+
+    AWARIA NIE JEST GŁOSEM (recenzja cubic PR #138, D3 — uznana za słuszną). Wcześniej
+    wyjątek z `interpretuj` lądował w serii jako `0.0`, czyli DOKŁADNIE tak samo jak
+    uczciwy NEUTRAL. Skutki były dwa i oba fałszowały pomiar: awaria sporadyczna
+    przesuwała korelację, a awaria trwała dawała stałą serię, którą organ ogłaszał
+    „ciszą" — czyli zepsuty neuron wyglądał jak neuron bez wejścia. To ta sama klasa,
+    którą ten organ powstał rozróżniać: brak pomiaru ≠ zmierzone zero.
     """
     wybrane = [n for n in wszystkie_neurony() if n.KLUCZ in set(klucze)]
-    serie: Dict[str, List[float]] = {n.KLUCZ: [] for n in wybrane}
+    serie: Dict[str, List[Optional[float]]] = {n.KLUCZ: [] for n in wybrane}
+    awarie: Dict[str, int] = {n.KLUCZ: 0 for n in wybrane}
     krokow = max(0, len(bary) - od)
     for i, koniec in enumerate(range(od, len(bary)), 1):
         wskazniki = budowniczy.zbuduj(bary[:koniec])
@@ -162,12 +196,13 @@ def zbierz_serie(bary: List[Dict[str, Any]], klucze: List[str], budowniczy,
             try:
                 serie[n.KLUCZ].append(sygnal_na_liczbe(n.interpretuj(wskazniki)))
             except Exception:
-                # Awaria jednego neuronu nie może przerwać pomiaru całego skupiska,
-                # ale NEUTRAL jest tu uczciwy: brak głosu to brak głosu, nie sygnał.
-                serie[n.KLUCZ].append(0.0)
+                # Awaria jednego neuronu nie może przerwać pomiaru całego skupiska —
+                # ale zapisujemy BRAK (None) i liczymy go osobno, nigdy jako 0.0.
+                serie[n.KLUCZ].append(None)
+                awarie[n.KLUCZ] += 1
         if postep and (i % 25 == 0 or i == krokow):
             postep(i, krokow)
-    return serie
+    return serie, awarie
 
 
 def raport(wyniki: List[Dict[str, Any]]) -> str:
@@ -182,6 +217,17 @@ def raport(wyniki: List[Dict[str, Any]]) -> str:
         linie.append("      To NIE jest jeszcze zarzut: pomiar karmi rój wyłącznie świecami "
                      "OHLCV, więc neurony alt-danych (stablecoin, DXY, funding, news) muszą "
                      "milczeć. Rozstrzyga dopiero bieg z adapterami.")
+    # AWARIA to stan ROZŁĄCZNY z ciszą i jedyny w tym raporcie, który jest OSKARŻENIEM:
+    # neuron nie zamilkł, tylko rzucił wyjątkiem. Milczenie o tym byłoby ciszą udającą wynik.
+    awaryjne: Dict[str, int] = {}
+    for w in wyniki:
+        for k, c in w.get("awaryjne", {}).items():
+            awaryjne[k] = max(awaryjne.get(k, 0), c)
+    if awaryjne:
+        linie.append(f"   🚨 NEURONY AWARYJNE (Prawo XV — wyjątek w `interpretuj`, "
+                     f"NIE cisza): {', '.join(f'{k}×{c}' for k, c in sorted(awaryjne.items()))}")
+        linie.append("      Te bary NIE weszły do korelacji (usunięte parami). Awaria jest "
+                     "wadą do naprawy, nie zachowaniem do interpretacji.")
     for w in sorted(wyniki, key=lambda x: -x["kandydatow_do_scalenia"]):
         ikona = "🚨" if w["kandydatow_do_scalenia"] else "✅"
         linie.append(f"   {ikona} {w['skupisko']:<16} neuronów {len(w['neurony']):2d} "
@@ -216,14 +262,14 @@ def zbadaj(sciezka_csv: str, interwal: str = "4h", *, limit: Optional[int] = Non
     if postep:
         postep(f"liczę głosy {len(potrzebne)} neuronów z {len(nazwy)} skupisk "
                f"na {max(0, len(bary) - od)} barach", None)
-    serie = zbierz_serie(bary, potrzebne, budowniczy, od=od,
-                         postep=(lambda i, ile: postep(f"[{i}/{ile}] barów", None))
-                         if postep else None)
+    serie, awarie = zbierz_serie(bary, potrzebne, budowniczy, od=od,
+                                 postep=(lambda i, ile: postep(f"[{i}/{ile}] barów", None))
+                                 if postep else None)
 
     wyniki = []
     for nazwa in nazwy:
         podzbior = {k: serie[k] for k in wszystkie[nazwa] if k in serie}
-        wyniki.append(ocen_skupisko(nazwa, podzbior))
+        wyniki.append(ocen_skupisko(nazwa, podzbior, awarie))
     return wyniki
 
 

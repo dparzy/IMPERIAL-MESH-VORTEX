@@ -93,6 +93,69 @@ def test_obaj_milczacy_sa_wymienieni():
     assert sorted(w["martwe"]) == ["A", "B"]
 
 
+def test_jedna_probka_nie_dowodzi_stalego_glosu():
+    """D1 (cubic PR #138): przy 0 lub 1 obserwacji „stały głos" jest artefaktem DŁUGOŚCI
+    serii, nie własnością neuronu — a organ dopisywał go do martwych głosów.
+
+    Skutek był realny: przy `limit <= od` (za mało barów po rozgrzewce) KAŻDA para
+    wracała jako CISZA_W_POMIARZE i cały rój wyglądał na niemy.
+    """
+    for seria in ([], [0.5]):
+        w = d.ocen_pare("A", "B", list(seria), list(seria))
+        assert w["werdykt"] == "NIEROZSTRZYGNIETE", w
+        assert w["martwe"] == [], w
+
+
+def test_awaria_nie_udaje_glosu_neutral():
+    """D3 (cubic PR #138): wyjątek z `interpretuj` lądował w serii jako 0.0 — identycznie
+    jak uczciwy NEUTRAL. Tu bary z awarią są usuwane PARAMI i nie ruszają korelacji."""
+    # Dane dobrane tak, by MUTACJA BYŁA WIDOCZNA: na wspólnych czterech barach neurony są
+    # identyczne (r=1,0 → KANDYDAT), ale gdyby awarie policzyć jako 0.0, dwa mocne głosy
+    # partnera rozcieńczyłyby korelację do ~0,27, czyli do strefy pośredniej. Bez tego
+    # doboru test przechodzi także dla WADLIWEJ wersji — sprawdzone mutacją.
+    a = [None, None, 1.0, -1.0, 1.0, -1.0]
+    b = [5.0, -5.0, 1.0, -1.0, 1.0, -1.0]
+    w = d.ocen_pare("ZEPSUTY", "B", a, b)
+    assert w["werdykt"] == "KANDYDAT_DO_SCALENIA", w
+    assert w["korelacja"] == 1.0, w
+    assert w["martwe"] == []
+
+
+def test_neuron_stale_awaryjny_nie_jest_nazwany_cichym():
+    """Granica rozłączności: awaria trwała dawała stałą serię zer, więc organ ogłaszał
+    CISZĘ — czyli neuron ZEPSUTY wyglądał dokładnie jak neuron bez wejścia. To ta sama
+    para pojęć, dla której rozróżnienia ten organ powstał."""
+    w = d.ocen_pare("ZEPSUTY", "B", [None, None, None, None], [1.0, -1.0, 1.0, -1.0])
+    assert w["werdykt"] == "NIEROZSTRZYGNIETE", w
+    assert w["martwe"] == [], w
+
+
+def test_awarie_ida_do_wyniku_osobno_od_ciszy():
+    w = d.ocen_skupisko("T/trend",
+                        {"X-01": [1.0, -1.0, 1.0], "X-02": [0.0, 0.0, 0.0]},
+                        {"X-01": 5, "X-02": 0})
+    assert w["awaryjne"] == {"X-01": 5}
+    assert w["martwe_glosy"] == ["X-02"]
+
+
+def test_raport_oskarza_awarie_choc_nie_oskarza_ciszy():
+    """Jedyne OSKARŻENIE w tym raporcie: awaria. Cisza pozostaje stanem faktycznym."""
+    tekst = d.raport([d.ocen_skupisko(
+        "T/trend", {"X-01": [1.0, -1.0, 1.0], "X-02": [0.0, 0.0, 0.0]}, {"X-01": 5})])
+    assert "AWARYJNE" in tekst
+    assert "X-01×5" in tekst
+
+
+def test_serie_roznej_dlugosci_sa_bledem_a_nie_cichym_ucieciem():
+    """`zip` bez `strict` cicho ucinał dłuższą serię — rozjazd długości to wada danych,
+    nie rzecz do przemilczenia (ta sama zasada, co zip(strict) w Bramie)."""
+    try:
+        d.ocen_pare("A", "B", [1.0, -1.0, 1.0], [1.0, -1.0])
+        raise AssertionError("rozjazd długości serii przeszedł bez słowa")
+    except ValueError:
+        pass
+
+
 def test_cisza_nie_jest_liczona_jako_filar():
     """Granica z PIERWSZEGO biegu: 27 z 66 neuronów milczało (brak alt-danych w CSV).
     Gdyby cisza wpadała do filarów, skupisko K/macro raportowałoby dywersyfikację

@@ -93,7 +93,12 @@ KORZEN = Path(__file__).resolve().parent.parent.parent
 # Uwaga: `cd` i ścieżka Windows wymagają odwrotnego ukośnika — trzymamy go w stałej,
 # bo w powłokach pośredniczących literał bywa zjadany (zmierzone 2026-07-30).
 _UK = chr(92)
-_SCIEZKA = r"[A-Za-z]:[" + _UK + _UK + r"/]"
+# Ścieżka absolutna w OBU światach: `C:\...`/`C:/...` (Windows) oraz `/...` (POSIX).
+# Powód (recenzja cubic PR #138, E1 — potwierdzona pomiarem): wariant wyłącznie windowsowy
+# sprawiał, że na Linuksie organ ODRZUCAŁ BLOK, KTÓRY SAM WYGENEROWAŁ przez `blok_push()` —
+# a Imperium pracuje i na lokalu (Windows), i w chmurze (Linux). Strażnik niespójny ze sobą
+# jest gorszy niż jego brak: uczy, że jego werdykt można zignorować.
+_SCIEZKA = r"(?:[A-Za-z]:[" + _UK + _UK + r"/]|/)"
 
 # PRZEKAZANIE = `git push` na POZYCJI POLECENIA: początek linii albo po separatorze
 # powłoki (`;`, `&&`, `|`). Sam separator jest konieczny — bez niego wracają fałszywki
@@ -305,14 +310,31 @@ def zbadaj_meldunek(tekst: str, *, kroki: List[str], galaz: str = "",
 
 # ── UODPORNIENIE — organ SAM podaje blok, którego wymaga ─────────────────────────
 
+class BrakGalezi(RuntimeError):
+    """Repozytorium nie umie podać gałęzi (detached HEAD, brak gita, awaria wywołania).
+
+    Osobny wyjątek, a nie pusty łańcuch, bo pusty łańcuch dawał `git push origin `
+    — komendę NIEWYKONALNĄ, podaną Cezarowi jako „gotowa do wklejenia" (recenzja cubic
+    PR #138, E6). Organ, którego CAŁYM powodem istnienia jest niekompletny blok push,
+    nie ma prawa sam takiego wyprodukować.
+    """
+
+
 def blok_push(galaz: str = "", korzen: Path = None) -> str:
     """Gotowy blok PowerShell kroku 8 — policzony z ŻYWEGO repozytorium.
 
     Sedno uodpornienia: skoro pamięć zawiodła przy przepisywaniu dwóch linii, nie ma
     powodu, żeby te dwie linie w ogóle przepisywać z pamięci.
+
+    Podnosi `BrakGalezi`, gdy gałęzi nie da się ustalić — milczące „origin " byłoby
+    dokładnie tą klasą wady, przeciw której ten organ powstał.
     """
     korzen = korzen or KORZEN
     galaz = galaz or galaz_biezaca()
+    if not galaz:
+        raise BrakGalezi(
+            "nie umiem ustalić bieżącej gałęzi (detached HEAD albo git nie odpowiada) — "
+            "podaj ją jawnie: blok_push(galaz='<nazwa>')")
     return f"cd {korzen}; git push origin {galaz}"
 
 
@@ -368,17 +390,43 @@ def ocen_zdarzenie_hooka(zdarzenie: dict, *, kroki: List[str], galaz: str = "") 
         return {"blokuj": False, "powod": "", "status": "brak_meldunku"}
 
     w = zbadaj_meldunek(tekst, kroki=kroki, galaz=galaz, tryb="tylko_push")
+
+    # KOTWICA OSIEROCONA ≠ ZGODA (recenzja cubic PR #138, E7 — uznana za najcięższą).
+    # Wcześniej ten status wpadał do wspólnego „różny od niespełnionego" i hook milczał,
+    # czyli automat wyłączał się DOKŁADNIE wtedy, gdy jego kontrakt z konstytucją przestawał
+    # obowiązywać. To ta sama klasa co „bramka o wąskim zasięgu daje fałszywy spokój":
+    # brak wiedzy prezentowany jako brak zastrzeżeń. Zasięg jest wąski z rozmysłu, ale ma
+    # być JAWNY — więc tu blokujemy i mówimy wprost, że zepsuło się ŹRÓDŁO, nie meldunek.
+    # Pętli nie będzie: powtórne wejście niesie `stop_hook_active` i wraca wyżej.
+    if w["status"] == "kotwica_osierocona":
+        return {
+            "blokuj": True, "status": w["status"], "werdykt": w,
+            "powod": (
+                "EXACTOR: " + w["opis"] + " Dopóki kotwica nie wróci do CLAUDE.md § KONIEC "
+                "SESJI (albo powinność nie zostanie świadomie wycofana z rejestru organu), "
+                "werdykt tego strażnika NIC nie znaczy — nie opieraj na nim domknięcia."
+            ),
+        }
+
     if w["status"] != "niespelniony":
         return {"blokuj": False, "powod": "", "status": w["status"], "werdykt": w}
 
     braki = "; ".join(b["powod"] for b in w["braki"])
+    try:
+        naprawa = ("Popraw meldunek, wklejając dokładnie to:\n\n"
+                   f"    {blok_push(galaz=galaz)}\n\n"
+                   "Nie przepisuj go z pamięci — to ona zawiodła przy nocie N-b74ce133.")
+    except BrakGalezi as e:
+        # Blok generowany z repozytorium jest UODPORNIENIEM, nie warunkiem alarmu: brak
+        # gałęzi nie może uciszyć zarzutu, ale też nie wolno podać niewykonalnej komendy.
+        naprawa = (f"Gotowego bloku NIE PODAJĘ, bo {e}. Uzupełnij gałąź ręcznie — "
+                   "i sprawdź, czy repozytorium nie stoi w detached HEAD.")
     return {
         "blokuj": True, "status": "niespelniony", "werdykt": w,
         "powod": (
             "EXACTOR (krok 8 CLAUSURY): przekazujesz Cezarowi komendę push, ale blok nie jest "
             f"gotowy do wklejenia — {braki}. Rozkaz stały każe podać PEŁNY blok PowerShell. "
-            f"Popraw meldunek, wklejając dokładnie to:\n\n    {blok_push(galaz=galaz)}\n\n"
-            "Nie przepisuj go z pamięci — to ona zawiodła przy nocie N-b74ce133."
+            + naprawa
         ),
     }
 
@@ -399,7 +447,10 @@ def raport(w: dict) -> str:
         linie.append(f"   ❌ krok {b['krok']} — {b['opis']}")
         linie.append(f"      powód: {b['powod']}")
     if w.get("braki") and any(b["id"] == "push_pelny_blok" for b in w["braki"]):
-        linie.append(f"      gotowy blok: {blok_push()}")
+        try:
+            linie.append(f"      gotowy blok: {blok_push()}")
+        except BrakGalezi as e:
+            linie.append(f"      ⚠️ bloku nie podaję: {e}")
     if w.get("niepokryte"):
         linie.append(f"   ℹ️ zasięg: {len(w['niepokryte'])} krok(ów) z powinnością wobec "
                      "Cezara NIE jest sprawdzanych deterministycznie:")
@@ -430,7 +481,12 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     if args.blok_push:
-        print(blok_push())
+        try:
+            print(blok_push())
+        except BrakGalezi as e:
+            # Kod ≠ 0, żeby wołający skrypt nie wkleił pustki myśląc, że dostał komendę.
+            print(f"[exactor] {e}", file=sys.stderr)
+            sys.exit(3)
         sys.exit(0)
 
     if args.hook:

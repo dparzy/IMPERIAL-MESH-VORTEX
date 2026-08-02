@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-08-02
+stan_na: 2026-08-03
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,83 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-08-03 | 🚀 | HYGINUS na V4-Flash-0731 — profil `osad` zejście z v4-pro (rozkaz Cezara)
+
+**Rozkaz Cezara:** „teraz używany tylko deepseek v4 flash". Podstawa: DeepSeek wydał
+**V4-Flash-0731** dnia 31.07.2026 i **tańszy model bije droższy na wszystkich pięciu
+opublikowanych benchmarkach agentowych** — Terminal Bench 2.1 82,7 vs 72,1 · NL2Repo
+54,2 vs 38,5 · Cybergym 76,7 vs 52,7 · **DeepSWE 54,4 vs 12,8 (4,3×)** · Toolathlon
+70,3 vs 55,9 · Intelligence Index 50 vs 44. Cena wyjścia **$0,28 vs $0,87 = 3,1× taniej**.
+Zweryfikowane w DWÓCH niezależnych źródłach (MarkTechPost 07-31, Artificial Analysis) —
+nie z pamięci modelu, bo wydanie jest po jego cutoffie.
+
+**Mechanizm (nie magia):** architektura identyczna z kwietniowym preview (284B/13B),
+zmieniono **wyłącznie post-training**, nastawiając go na pracę wieloetapową; V4-Pro tego
+treningu nie dostał. Największy skok tam, gdzie zadanie ma najwięcej kroków, bo **w pętli
+błędy się mnożą, nie dodają**.
+
+**⚠️ Granica dowodu (Prawo I):** benchmarki są AGENTOWE, a profil `osad` wykonuje osąd
+dziedzinowy — przewaga na cudzym zadaniu to POSZLAKA. Rozstrzygnie A/B `flash/high vs
+pro/high` (`narzedzia/ab_plon_hyginusa.py`), dotąd nieuruchomiony. Dlatego `v4-pro`
+**zostaje w CENNIKU** jako ramię porównawcze — test tego pilnuje.
+
+**Pierwszy bieg na 0731 (2 tematy, ten sam dzień):** 7 kandydatów z sekcją „Pomiar",
+ale NOMENCLATOR wskazał **3/7 noszących imię czegoś, co już mamy** (Kelly, PBO, DSR,
+walk-forward), a PROBATOR złapał **1 halucynację cytatu** (BIB-047 spoza promptu).
+Wniosek: nowy model **nie zmniejszył redundancji** (historycznie 39,3%, teraz 43%).
+
+**Przy okazji naprawione dwa testy kodujące fałszywe założenia:**
+`test_profil_osadu_bierze_model_premium` zakładał, że **cena jest miarą jakości**;
+`test_notarius_dostaje_model_FAKTYCZNIE_uzyty` opierał moc rozróżniającą na tym, że
+`osad` ≠ model domyślny — po zrównaniu obu na `flash` **świeciłby zielono, nie badając
+niczego**. Różnica wstrzykiwana teraz jawnie.
+
+**Pliki:** `imperium/cesarz/dispensator.py`, `tests/test_dispensator.py`
+
+---
+
+## 2026-08-03 | 🐎 | VIATOR — posłaniec dróg: wsadowy sąd nad linkami (zadanie H0, krok 1)
+
+Organ `narzedzia/viator.py` (55+ testów): z materiału zewnętrznego wyciąga KAŻDY adres
+i orzeka, czy droga jest przejezdna — wznawialnie (cache JSONL append-only), z paskiem
+postępu na **stderr** (lekcja G1: pasek na stdout czyni `--json` niesparsowalnym).
+Klasyfikacja świadomie oddziela `MARTWY` (404/410) od `ZABLOKOWANY` (403/429) i `BLAD`
+— te drugie to stan NASZEGO przyrządu, nie wyrok o cudzej treści.
+
+**CZTERY KLASY FAŁSZYWEK ZŁAPANE REALNYM UŻYCIEM, ŻADNEJ NIE ZŁAPAŁ TEST:**
+(a) `)**` markdown bold — pierwsza partia próbna zgłosiła **19/20 adresów jako MARTWE**,
+repozytoria żyły; (b) `)[reference:8` znaczniki cytowań DeepSeeka; (c) backtick z kodu
+inline; (d) **`ssl.get_default_verify_paths().cafile` = None na tym Windowsie** — 86
+adresów szło jako BŁĄD z jednym powodem, w tym **83 arxiv.org**, czyli cały naukowy
+fundament materiału. Naprawa przez `certifi`, **bez wyłączania weryfikacji**.
+Każda klasa ma test regresyjny.
+
+**Wynik ważny (po naprawach), `Imperium-Botów-Tradingowych 2.md`:** 287 adresów ·
+**246 ŻYWYCH (85,7%)** · 15 przekierowań · 12 zablokowanych · **7 MARTWYCH** · 4 błędy.
+Martwa siódemka to w większości **placeholdery, nie linki, które umarły**:
+`abc123.ngrok.io`, `US20230000000A1`, `4aBcDeFg-Vortex-Nexus-Alpha`. Autor materiału
+potrafi wymyślić adres — przy sądzie nad treścią nic nie wolno przyjąć na słowo.
+
+**Pliki:** `narzedzia/viator.py`, `tests/test_viator.py`
+
+---
+
+## 2026-08-03 | 📚 | BIBLIOTEKA +40 ksiąg — dowód konieczności watchdoga (rozkaz Cezara)
+
+Cezar dograł **40 ksiąg 2026-08-01** (`BIB-206..245`). Pomiar: **248 plików na dysku
+(1852 MB) · 115 w RAG · 133 POZA RAG = 53,6%**. Dokument mówił „209 / 92" i
+**przedawnił się w 4 dni**, a audyt 24 warstw drukował „pełna harmonia", bo **żadna
+warstwa nie pilnuje KSIĄG** (W11 pilnuje modułów kodu). Ta sama klasa co kontrakt
+append-only złapany przez VINDEXA: deklarowane w dokumencie, egzekwowane przez zero.
+
+ROADMAP: **A7** poprawione (91→133, partiami), **A15 CUSTOS BIBLIOTHECAE** (watchdog —
+PRZED nadrabianiem, bo inaczej po każdej dostawie liczymy ręcznie), **A16** analiza
+BIB-206..245 + edycja dokumentacji.
+
+**Pliki:** `docs/ROADMAP_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md` (260 organów, +VIATOR)
 
 ---
 

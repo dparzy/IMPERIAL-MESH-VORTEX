@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 259** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 260** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -350,6 +350,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `sym_1h.py` | Runner symulacji TRYB NAJLEPSZY (pełny stack W-317..W-321) na danych 1h |
 | `sym_porownanie_tf.py` | Porównanie TF na TYM SAMYM oknie czasowym (izolacja: interwał vs okno) |
 | `tabularium.py` | 🏛️ TABULARIUM — archiwum państwowe Imperium: rejestr wszystkich żywych dokumentów |
+| `viator.py` | 🐎 VIATOR — posłaniec dróg: wsadowy sąd nad linkami w materiale zewnętrznym |
 | `walidacja_kalibrator.py` | 🔬 WALIDACJA KALIBRATORA — A/B progu pewności: baza vs bramka konformalna (ML-36) |
 | `waliduj_zmysly.py` | 👁️ WALIDACJA ZMYSŁÓW — czy adaptery faktycznie BUDZĄ neurony na ŻYWYCH danych (Prawo XV) |
 | `walk_forward_ic.py` | 🔬 WALK-FORWARD IC — czy skill neuronu jest STABILNY w czasie (Prawo XVI, OOS) |

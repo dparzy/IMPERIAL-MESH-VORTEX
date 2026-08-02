@@ -33,11 +33,22 @@ def test_profil_klasyfikacji_wylacza_rozumowanie():
     assert "reasoning_effort" not in p, "wyłączone myślenie nie potrzebuje poziomu głębokości"
 
 
-def test_profil_osadu_bierze_model_premium():
-    """Osąd o konsekwencjach (co wchodzi do roju) — tu stać nas na droższy model."""
+def test_profil_osadu_bierze_model_najlepszy_nie_najdrozszy():
+    """Osąd o konsekwencjach (co wchodzi do roju) — bierzemy NAJLEPSZY model, nie najdroższy.
+
+    ZMIANA ZAŁOŻENIA 2026-08-03 (rozkaz Cezara, pomiar zewnętrzny ×2 źródła): stara nazwa
+    tego testu brzmiała `..._bierze_model_premium`, a docstring mówił „stać nas na droższy" —
+    czyli test kodował ZAŁOŻENIE, że cena jest miarą jakości. Wydanie `V4-Flash-0731`
+    (31.07.2026) je obaliło: tańszy model bije droższego na wszystkich pięciu opublikowanych
+    benchmarkach agentowych, przy 3,1× niższej cenie wyjścia.
+
+    Test pilnuje teraz DWÓCH rzeczy, które pozostają prawdą niezależnie od cennika:
+    profil osądu myśli GŁĘBOKO i nie schodzi na model wyłączonego rozumowania.
+    """
     p = dobierz("osad")
-    assert p["model"] == "deepseek-v4-pro"
-    assert p["reasoning_effort"] == "high"
+    assert p["model"] == "deepseek-v4-flash"
+    assert p["reasoning_effort"] == "high", "osąd bez głębokiego rozumowania to nie osąd"
+    assert "thinking" not in p, "profil osądu nie może mieć wyłączonego myślenia"
 
 
 def test_nieznany_profil_nie_wywraca_wywolania():
@@ -183,13 +194,28 @@ def test_profil_zwiad_kupuje_tanio(monkeypatch):
     assert z["extra_body"]["reasoning_effort"] == "low"
 
 
-def test_profil_osad_kupuje_premium(monkeypatch):
-    """Osąd o konsekwencjach → v4-pro + głębokie rozumowanie."""
+def test_profil_osad_idzie_na_flash_z_glebokim_rozumowaniem(monkeypatch):
+    """Osąd o konsekwencjach → v4-flash + głębokie rozumowanie (rozkaz Cezara 2026-08-03)."""
     g = _glos_z_atrapa(monkeypatch)
     g.zapytaj("s", "t", profil="osad")
     z = g.client.zadania[0]
-    assert z["model"] == "deepseek-v4-pro"
+    assert z["model"] == "deepseek-v4-flash"
     assert z["extra_body"]["reasoning_effort"] == "high"
+
+
+def test_v4_pro_zostaje_w_cenniku_jako_ramie_porownawcze():
+    """`v4-pro` NIE znika z cennika, choć żaden profil go już nie kupuje.
+
+    Powód: A/B `flash/high vs pro/high` (ab_plon_hyginusa) jest zaplanowany i dotąd
+    nieuruchomiony. Usunięcie ceny drugiego ramienia uniemożliwiłoby ZMIERZENIE decyzji,
+    którą właśnie podjęliśmy na cudzym pomiarze — a nasz pomiar jest wyrokiem, cudzy
+    tylko poszlaką. Cena, której nie ma, to eksperyment, którego nie da się rozliczyć.
+    """
+    from imperium.cesarz.dispensator import CENNIK, PROFILE
+
+    assert "deepseek-v4-pro" in CENNIK
+    assert all(p["model"] != "deepseek-v4-pro" for p in PROFILE.values()), \
+        "żaden profil nie powinien już domyślnie kupować v4-pro"
 
 
 def test_profil_klasyfikacja_wylacza_rozumowanie(monkeypatch):
@@ -226,7 +252,16 @@ def test_notarius_dostaje_model_FAKTYCZNIE_uzyty(monkeypatch):
     zapisane = {}
     monkeypatch.setattr(g, "_protokoluj",
                         lambda *a, **k: zapisane.update({"model": a[4] if len(a) > 4 else None}))
-    g.zapytaj("s", "t", profil="osad")
+    # MOC ROZRÓŻNIAJĄCA ODZYSKANA 2026-08-03. Test opierał się na tym, że profil `osad`
+    # kupował `v4-pro`, czyli COŚ INNEGO niż domyślny `flash` z `__init__` — i tylko dzięki
+    # tej różnicy wykrywał podmianę etykiety. Gdy Cezar przestawił `osad` na `flash`,
+    # obie wartości zrównały się i test świeciłby na zielono, NIE BADAJĄC JUŻ NICZEGO
+    # (zdałby nawet wtedy, gdyby `_protokoluj` dostawał model z `__init__`). Dlatego
+    # różnicę wstrzykujemy tu jawnie, zamiast polegać na tym, że akurat wynika z cennika.
+    from imperium.cesarz import dispensator as _disp
+    monkeypatch.setitem(_disp.PROFILE, "_test_inny_model",
+                        {"model": "deepseek-v4-pro", "reasoning_effort": "high", "po_co": "test"})
+    g.zapytaj("s", "t", profil="_test_inny_model")
     assert zapisane["model"] == "deepseek-v4-pro"       # NIE flash z __init__
 
 

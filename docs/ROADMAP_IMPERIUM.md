@@ -77,6 +77,31 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 ### WACHTA A — domknięcie biblioteki *(zaczęta 2026-07-29)*
 
+> **📚 PRZYROST KSIĘGOZBIORU ZMIERZONY 2026-08-02 (rozkaz Cezara) — i DOWÓD na potrzebę watchdoga.**
+> Cezar dograł **40 nowych ksiąg 2026-08-01** (`BIB-206..245`, ciągły blok, wszystkie zgodne
+> ze schematem nazw i z naszą listą: DeFi 206–211 · prognozowanie/osąd 212–221 ·
+> ekonofizyka i złożoność 222–231 · inżynieria systemów 232–245).
+>
+> | Warstwa | Stan 2026-07-28 (dokument) | **Stan ZMIERZONY 2026-08-02** | Δ |
+> |---|---|---|---|
+> | Pliki BIB na dysku | 209 | **248** (1 852 MB) | **+39** |
+> | W katalogu metadanych | 115 | **115** | 0 |
+> | W cache tekstu | 117 | **118** | +1 |
+> | Wyszukiwalne w RAG | 115 | **115** (37 331 fragm.) | **0** |
+> | **POZA RAG** | 92 | **133 (53,6% zbioru)** | **+41** |
+>
+> **NIKT tego nie zauważył przez dobę** — audyt drukował „pełna harmonia", bo **żadna z 24 warstw
+> nie pilnuje księgozbioru** (W11 dotyczy `imperium/biblioteki/`, czyli modułów kodu, nie ksiąg).
+> To ta sama klasa co kontrakt append-only: **rzecz deklarowana w dokumencie, egzekwowana przez
+> zero mechanizmów**. Dokument sam się przedawnił w 4 dni. Stąd A15 (watchdog) przed A7 (nadrobienie):
+> **najpierw mechanizm, potem nadrabianie** — inaczej za tydzień znów będziemy liczyć ręcznie.
+>
+> **Wpływ na doktrynę LOOP/GRAPH:** 133 księgi poza RAG to **otwarta pętla o największej masie**
+> w Imperium (53,6% zapłaconego zasobu bezużyteczne dla Hyginusa i QUAESITORA). Zarazem indeksy
+> tych 133 ksiąg **karmią A10** (zbiór ewaluacyjny), a A10 odblokowuje **całe piętro GRAPH** (G4,
+> A14, K10). Domykanie tej pętli jest jednocześnie otwieraniem drogi na graf — dokładnie kryterium
+> z rozkazu 2026-08-02.
+
 | # | Zadanie | Stan | Dlaczego teraz |
 |---|---|---|---|
 | A1 | **AESTIMATOR** — pomiar wierności korpusu + kalibracja | ✅ 14 testów | dał liczby, na których stoi cała reszta wachty |
@@ -85,7 +110,9 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 | A4 | **QUAESITOR — pierwszy bieg, domknięcie K10** | 🟡 **uruchomiony 2026-07-30, 19 testów** — K10 nadal NIEZNANE | pierwszy bieg dał naprawę u źródła (sanityzacja FTS w `szukaj.sanityzuj_fts`, ścieżka MCP recall@5 **16,7% → 80,0%**), ale K10 wymaga zbioru z A10 — 30 pytań to 0,22% zawołań |
 | A5 | **OCR na BIB-007 (AFML)** — 93 listingi kodu jako obrazy | ⏸️ WARUNKOWE (po A11) | najbardziej wykonalna treść w najważniejszej książce ilościowej; ~30–40 min przy 5,2 s/stronę |
 | A6 | **Przepięcie indeksu na REDDITORA** + reindeksacja | 🔴 | **dopiero po zielonym K10** (ZASADA WPIĘCIA: opt-in, po dowodzie) |
-| A7 | **91 książek poza indeksem** → ekstrakcja → cache → indeks | 🔴 | rozkaz Cezara, pozycja 2 w jego kolejności |
+| A7 | **133 książki poza indeksem** → ekstrakcja → cache → indeks → **fragmentacja** | 🔴 **liczba PRZEMIERZONA 2026-08-02: było 91/92, jest 133** | rozkaz Cezara. Zakres urósł o **41 pozycji w 4 dni** (40 dogranych 08-01 + BIB-136/155 z OCR). Wykonanie **partiami z paskiem postępu** (Prawo XXIV) — 133 pozycje × ekstrakcja to nie jeden bieg. Po ekstrakcji **REDDITOR** (A2) daje fragmenty z dowodem SHA-256, więc podział na fragmenty jest już ROZWIĄZANY, nie do wymyślania |
+| A15 | **CUSTOS BIBLIOTHECAE — watchdog księgozbioru** (warstwa audytu W25) | 🔴 **ROZKAZ CEZARA 2026-08-02, PRZED A7** | **Dowód konieczności zmierzony:** 40 ksiąg przybyło 08-01, dokument mówił „209 plików / 92 poza RAG", prawda to „248 / 133" — a audyt 24 warstw drukował **pełna harmonia**. Żadna warstwa nie pyta o KSIĘGI (W11 pilnuje modułów kodu). Kontrakt: dysk ↔ `katalog_ksiag.json` ↔ `tekst_cache/` ↔ `baza_wiedzy.db` **muszą się zgadzać**, rozjazd = alarm z listą ID. Ta sama klasa co VINDEX: rzecz deklarowana w dokumencie, egzekwowana przez zero. **Uodpornia przeciw KLASIE** (zasada CENSORA), zamiast nadrabiać ręcznie po każdej dostawie Cezara |
+| A16 | **Analiza 40 nowych pozycji BIB-206..245** — sąd nad treścią + edycja dokumentacji | 🔴 **po A15/A7** | wg wzorca z BIBLIO28: AESTIMATOR mierzy wierność (w tym **A13 — kryterium języka**, bo BIB-011 przeszedł jako „OKROJONA" przy 100% straty użyteczności), potem wpis do `PLAN_ROZBUDOWY_BIBLIOTEKI.md` + `katalog_ksiag.json`. **Nie „wygląda dobrze" — POMIAR** (`unikalne słowa`, nie długość: lekcja z 07-28). Blok 232–245 (inżynieria: Kleppmann, Fowler, Nygard, SRE) jest osobno cenny — to korpus dla **naszych własnych** decyzji architektonicznych, nie dla tradingu |
 | A8 | **R2 — fuzja RRF** zamiast sortowania po mieszanych skalach | 🔴 | mina latentna w Księdze Wad; wybuchnie w dniu włączenia wektorów. **Potwierdzone niezależnie z zewnątrz** (sąd 07-30, poz. F2) — RRF+cross-encoder jest standardem produkcyjnym, nie naszym wynalazkiem |
 | A9 | **R3 — 3 gotowe książki + korpus `docs` (305 plików)** | 🔴 | dwa polecenia, zero ryzyka. Kandydat bez dowodu (MARK 2506.23026, praca **bez własnych pomiarów**): korekty wchodzą do korpusu retrievalu i **przebijają źródło** — u nas INDEX FALSORUM i lekcje miałyby wygrywać z książką, gdy się z nią kłócą |
 | A10 | **Zbiór ewaluacyjny z INDEKSÓW książek** — 13 729 haseł wyliczonych przez samych autorów | 🔴 | zmierzone: zbiór QUAESITORA to 30 pytań = **0,22%** zawołań zadeklarowanych w indeksach (42/118 książek ma użyteczny indeks, ~326 haseł na książkę). K10 na takiej próbce jest liczbą bez mocy. Prawda podstawowa **napisana przez autora**: zero tokenów, zero halucynacji.<br>🔧 **PROJEKT SKORYGOWANY 07-30 (VeNRA §5, decyzja Cezara):** podział **po RODZINACH, nie losowy**. Rodzina = hasło + wszystkie pytania z niego pochodne + warianty z tej samej książki. Losowy podział 80/10/10 na zbiorze z rekordami pochodnymi **gwarantuje wyciek** (rodzic w treningu, dziecko w teście → metryka zawyżona, **niewykrywalnie**). Dodatkowo: zachować **pary kontrastowe** w zbiorze testowym, by liczyć **Flip Rate** (czy przyrząd ODWRACA werdykt pod minimalną perturbacją) — sama trafność tego nie pokaże |

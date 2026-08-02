@@ -52,7 +52,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 
 <!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->
 
-> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-08-02 (76 pozycji).
+> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-08-03 (76 pozycji).
 
 ### LEX — prawo i rozkazy stałe — obowiązuje, nie opisuje
 
@@ -151,7 +151,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | Dokument | Po co istnieje | Właściciel (kod) | Stan na |
 |---|---|---|---|
 | `docs/AUDYT_SYSTEMU.md` | Pierwszy głęboki audyt stanu faktycznego systemu — co działa, co blokowane przez TA-Lib, co jest szkieletem, co brakuje całkowicie. | `imperium/cesarz/deepseek_glos.py`, `imperium/legiony/mikro_neuron.py`, `imperium/senat/meta_kora.py` | 2026-06-12 |
-| `docs/LOG_ZMIAN.md` | Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz | — | 2026-08-02 |
+| `docs/LOG_ZMIAN.md` | Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz | — | 2026-08-03 |
 | `docs/MAPA_IMPERIUM_FLOW.md` ⛔ zastąpiony przez `docs/ARCHITEKTURA_IMPERIUM.md` | Wersja narracyjna/dydaktyczna architektury — dla nowicjusza (Cezara): tłumaczy PO CO każdy organ istnieje, z przykładowym dialogiem (Zwiadowca 1 mówi 'DŁUGO...', Frakcja Byków vs N | `imperium/akwedukty/kwatermistrz_danych.py`, `imperium/biblioteki/kronikarz.py`, `imperium/biblioteki/mnemosyne.py`, `imperium/cesarz/titan_mind.py`, `imperium/drogi/nexus_hub.py`, `imperium/fundament/brama_kalkulatora.py`, `imperium/fundament/kuznia_narzedzi.py`, `imperium/koloseum/backtest.py`, `imperium/koloseum/monte_carlo.py`, `imperium/legiony/pierwszy_zwiadowca.py`, `imperium/legiony/roj_sygnalow.py`, `imperium/pretorianie/aegis_tarcza.py`, `imperium/pretorianie/lustro_prawdy.py`, `imperium/senat/meta_kora.py`, `imperium/swiatynie/kartograf.py`, `imperium/swiatynie/web_dashboard.py` | 2026-05-31 |
 | `docs/PAMIEC_SESJI_ARCHIWUM.md` | Magazyn starszych/mniej połączonych lekcji — pamięć aktywna ostra, nic nie tracimy (Prawo I). Przeszukiwalne (grep/RAG), poza wstrzykiwanym kontekstem startowym. | — | 2026-07-19 |
 | `docs/migawki/ANALIZA_AUTODOBOR_STRATEGII_2026-07-13.md` | Zwiad wiedzy (Bibliotheca Ulpia RAG 27641 fragmentów + internet) w celu ulepszenia auto-doboru strategii — zdiagnozowana luka: dobór strategii ignoruje zrealizowany P&L (czysto str | `imperium/legiony/strategie/baza.py` | 2026-07-13 |

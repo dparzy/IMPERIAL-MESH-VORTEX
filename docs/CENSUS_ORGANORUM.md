@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 258** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 259** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -236,6 +236,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 |-------|--------------------------|
 | `breviarium.py` | 📋 BREVIARIUM — Zwięzły Spis Sług Imperium (meldunek na otwarcie wachty) |
 | `censor_sprzetu.py` | 🏛️ CENSOR SPRZĘTU — organ „oczu" mierzący majątek maszyny (Prawo XV) |
+| `maturitas.py` | 📐 MATURITAS — na którym PIĘTRZE inżynierii stoi Imperium i czy pętle się domykają |
 | `wszechoko.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
 
 ### `imperium/pretorianie/` — PRAETORIANI — bezpieczniki, weto ryzyka, straż u wrót

@@ -14,6 +14,47 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-02 | 📐 | MATURITAS — doktryna loop/graph dostała MIERNIK (rozkaz Cezara)
+
+Rozkaz: „dopiszcie do apertio i clausura, żebyśmy pilnowali i weryfikowali stany
+prompt/loop/graph, poziom rozwinięcia i domknięcia". **Sam krok w checkliście byłby
+zasadą bez mechanizmu** — czyli tą klasą, którą tego samego dnia złapaliśmy przy
+kontrakcie append-only. Krok ma WOŁAĆ POMIAR, nie prosić o refleksję.
+
+**Nie nowy byt (Prawo XVI):** `docs/INGENIUM_IQ_IMPERII.md` projektuje CENZORA ROZUMU od
+2026-07-29 i **nie miał ani linii kodu**. MATURITAS jest jego **pierwszą ŻYWĄ kategorią**
+(ósmą: PIĘTRO INŻYNIERII), zbudowaną wg zasad nienaruszalnych z §3 tamtego dokumentu.
+
+| Piętro | Co pyta | Pierwszy pomiar |
+|---|---|---|
+| **PROMPT** | czy specyfikacja jest zdrowa i nie puchnie | **3/4** — CLAUDE.md 259 linii > 200 |
+| **LOOP** | czy pętle się **domykają** | **3/4** — ROADMAP domknięty w **16,2%** (11/68), 34 sugestie i 367 wizji bez werdyktu |
+| **GRAPH** | czy graf istnieje / działa / **DECYDUJE** | **3/4** — 234 węzły, 1680 krawędzi, 5 czytelników, **0 przy decyzji** |
+
+**Rozstrzygnięcie progów:** poziom nie przeskakuje niespełnionego progu. **GRAPH 4/4
+znaczy JEDNO — graf czytany PRZY DECYZJI**; niższe progi mierzą rozmiar, nie pożytek.
+
+**Zasady, które czynią z tego miernik, a nie laurkę:** `NIEZNANE` jest wynikiem (brak
+odczytu grafu ≠ graf pusty); **antywskaźnik obowiązkowy** przy każdym piętrze (jak je
+oszukać); migawki dają **DELTĘ**, bo stan bez historii nie mówi, czy idziemy w górę;
+**lustro, nie kierownica** — `test_organ_nie_jest_wpiety_w_sciezke_decyzyjna` pilnuje
+MECHANIZMEM, że żaden moduł ścieżki decyzyjnej go nie importuje (Goodhart).
+
+**Dwie liczby złapane w trakcie budowy — kłamał mój przyrząd:** graf pokazywał `NIEZNANE`
+(zły odczyt API), a warstwy audytu **15 zamiast 24**, bo `def _warstwa_\d+` nie widzi
+warstw żyjących w helperach. Miara liczy teraz **znaczniki `[W..]`**, czyli to, co audyt
+naprawdę egzekwuje. Oba przypadki mają test regresyjny.
+
+**Konstytucja:** nowy krok **5b w OTWARCIU** i **5c w KOŃCU SESJI**. Pieczęcie
+podchwyciły je natychmiast (apertio 7→8 kroków, clausura 11→12) **bez zmiany kodu sigli** —
+żelazna zasada „pieczęć czyta kroki z CLAUDE.md, nie przechowuje ich" zadziałała.
+
+**Pliki:** `imperium/oczy/maturitas.py` (nowy), `tests/test_maturitas.py` (12 testów),
+`CLAUDE.md` (kroki 5b/5c), `docs/INGENIUM_IQ_IMPERII.md`, `docs/ARCHITEKTURA_IMPERIUM.md`,
+`docs/CENSUS_ORGANORUM.md`, `bibliotheca_ulpia/dane/maturitas_migawki.jsonl` (nowy ledger).
+
+---
+
 ## 2026-08-02 | ⚖️ | VINDEX — obrońca zapisu (rozkaz Cezara, zakres B)
 
 Pytanie Cezara o watchdog odsłoniło lukę większą niż samo pytanie: **kontrakt

@@ -8,6 +8,21 @@ powod_istnienia: "Projekt organu INGENIUM — mierzalny wskaźnik rozwoju Imperi
 
 # 🧠 INGENIUM — CENZOR ROZUMU IMPERIUM (projekt organu)
 
+> ### ⚡ AKTUALIZACJA 2026-08-02 — PIERWSZA KATEGORIA OŻYŁA
+>
+> Rozkaz Cezara („pilnujmy i weryfikujmy stany prompt/loop/graph, poziom rozwinięcia,
+> pomiar działania i domknięcia") dał tej wizji pierwszy **żywy kod**: organ **MATURITAS**
+> (`imperium/oczy/maturitas.py`, 12 testów) mierzy **ósmą kategorię — PIĘTRO INŻYNIERII**
+> (PROMPT / LOOP / GRAPH), po 0–4 na każde piętro, wyłącznie z kodu i ledgerów.
+> Zbudowany wg **zasad nienaruszalnych z §3 tego dokumentu**: `NIEZNANE` jest wynikiem,
+> antywskaźnik obowiązkowy przy każdym piętrze, migawki dają DELTĘ (§3.3), a wynik jest
+> **lustrem, nie kierownicą** — test `test_organ_nie_jest_wpiety_w_sciezke_decyzyjna`
+> pilnuje §3.4 mechanizmem, nie obietnicą. Wpięty w **`/apertio` krok 5b** i **`/clausura`
+> krok 5c**. Pierwszy pomiar: PROMPT 3/4 · LOOP 3/4 · GRAPH 3/4, trzy wąskie gardła.
+>
+> **Pozostałe 7 kategorii (DISCIPLINA…AEMULATIO) nadal są ZAMIAREM** — poniższy status
+> dotyczy ich, nie MATURITAS.
+>
 > **Status: ZAMIAR, nie kod.** Ten dokument jest planem (kategoria CONSILIUM). Dopóki nie
 > powstanie 🔴 `imperium/oczy/ingenium.py` (plan) z testami, **Imperium nie ma miernika IQ**
 > — i żadna liczba stąd nie ma prawa pojawić się w raportach jako fakt (Prawo XIX).

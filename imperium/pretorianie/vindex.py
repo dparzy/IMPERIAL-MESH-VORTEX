@@ -83,6 +83,11 @@ KONTRAKTY: Dict[str, str] = {
     "bibliotheca_ulpia/dane/ab_plon_hyginusa.jsonl": KORYGOWALNY,
     "bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl": MUTOWALNY,
     "bibliotheca_ulpia/dane/procedury.jsonl": MUTOWALNY,
+    # Ledger migawek MATURITASA (2026-08-02) — jedyny wpis, którego podstawą NIE jest
+    # historia, bo jej jeszcze nie ma. Podstawą jest KOD (Prawo XIX): `zapisz_migawke`
+    # otwiera plik wyłącznie w trybie "a", a migawka ma sens tylko jako ciąg w czasie —
+    # nadpisanie starej odbiera organowi zdolność mierzenia DELTY, czyli jego rację bytu.
+    "bibliotheca_ulpia/dane/maturitas_migawki.jsonl": SCISLY,
 }
 
 # Miejsca, gdzie NOWY plik jest normalną pracą, a nie zjawiskiem do wyjaśnienia.

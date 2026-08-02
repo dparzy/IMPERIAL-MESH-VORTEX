@@ -12,6 +12,54 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-08-01 — Checklista: robić ≠ meldować
+Przebudowa rejestru CORONY: tylko kroki z jawnym obowiązkiem meldunku wymagają raportu; alarmy_jako_zadania usunięto (warunkowe), meldunek_slug sprawdzano datami; wzorzec czasownika rozszerzono o 'rozstrzygnij'/'nigdy milczeniem'. Poziom 'domkniecie' alarmował 83% — po przebudowie zgodność z konstytucją.
+
+### 2026-08-01 — Push handover ≠ session close
+Pomiar wykazał 105 push handoverów vs 4 zamknięcia sesji; początkowy detektor dawał 109 'closing' na 39 sesji (3x za szeroki). CORONA rozdzielona na dwa poziomy, by obowiązki odpalały się tylko tam, gdzie faktycznie obowiązują.
+
+### 2026-07-27 — PR dla gałęzi może już istnieć
+Przed tworzeniem PR trzeba sprawdzić istniejące (także zmergowane). Wszystkie PR-y tej gałęzi były zmergowane, a lokalny origin/main nieaktualny — realna różnica to 2 commity, 4 pliki, +101/−2; reszta weszła przez PR #117 (07-07).
+
+### 2026-07-27 — Bramka testów musi przejść PO rebase
+Rebase wciągnął 30 cudzych commitów i 9 nowych testów (2076→2087). Zielona bramka na starym stanie nie dowodzi zdrowia finalnego drzewa — po każdym rebase trzeba przepuścić testy i audyt od nowa.
+
+### 2026-07-27 — Auto-pull pomijany przy brudnym drzewie
+Hook startowy nie robi auto-pull, gdy drzewo ma niezacommitowane zmiany — przez to lokalna gałąź może być daleko za remote. Przed pushem należy świadomie sprawdzić stan zdalnej gałęzi i zrobić rebase.
+
+### 2026-08-01 — Push handover ≠ zamknięcie sesji — dwa poziomy obowiązków
+Pomiary: 105 przekazań z pushem wobec 4 zamknięć sesji; stary detektor był ~3x za szeroki. CORONA rozdzielona na dwa poziomy, by obowiązki odpalały się tylko tam, gdzie faktycznie dotyczą.
+
+### 2026-07-29 — Skill /run dostarcza wzorce uruchamiania aplikacji
+Szablon /run wstrzyknięty do kontekstu opisuje 6 wzorców uruchamiania (CLI, serwer, TUI, Electron, przeglądarka, biblioteka) oraz regułę: najpierw sprawdź skill projektu; jeśli fallback wymaga ręcznej konfiguracji, zaproponuj /run-skill-generator.
+
+### 2026-07-26 — Brakujące reżimy w systemie narracyjnym
+Zidentyfikowano, że reżim SPOT_CASH i FUTURES nie są zdefiniowane w systemie narracyjnym (missing regime definitions). Występują tylko w sygnaturze systemu.
+
+### 2026-07-29 — Brak logowania blokuje wszystkie komendy
+W sesji wszystkie komendy (jestes, run, /run) zwróciły 'Not logged in · Please run /login'. Żadna operacja nie została wykonana — autoryzacja jest twardym warunkiem wstępnym dla jakiegokolwiek działania w systemie.
+
+### 2026-07-29 — Brak loginu blokuje komendę /run
+Wszystkie próby uruchomienia /run w tej sesji, w tym z pełną treścią skilla, kończyły się wyłącznie komunikatem 'Not logged in · Please run /login'. Bez autoryzacji żadna akcja nie jest wykonywana.
+
+### 2026-07-28 — BIB-011 w języku chińskim – niewyszukiwalna w RAG przez brak segmentacji CJK
+Plugin BIB-011 (algorytmiczny trading) jest chińskim tłumaczeniem. 78.3% znaków to CJK. FTS5 tokenizer 'unicode61' nie segmentuje chińskiego – cały ciąg CJK to jeden token. Dodatkowo chunker tnie po whitespace, co nie działa dla tekstu bez spacji. Książka jest martwa w RAG, niewyszukiwalna.
+
+### 2026-07-28 — Fałszywy alarm INDEX FALSORUM – strażnik nie rozpoznawał rzeczownika 'obalenie'
+KOREKTA_JAWNA znała imiesłów 'obalon', ale nie rzeczownik 'obalen' → strażnik zgłaszał własną dokumentację jako kłamstwo. Lekcja: fałszywe zatrzymanie uczy obchodzić strażnika, nie jest bezpieczną stroną błędu. Naprawiono testem granicy przez mutację.
+
+### 2026-07-27 — RTX 4050 laptop ma 6 GB VRAM – ograniczenia lokalnego treningu
+Acer Nitro z RTX 4050 pozwoli trenować LoRA na modelu 7-8B lokalnie i uruchamiać inferencję, ale nie trenować dużych modeli od zera. Ciężki trening zostaje na Colabie. CENSOR wykryje CUDA i podniesie alarm.
+
+### 2026-07-27 — PAMIEC_ABSOLUTNA.md kłamie o API
+Dokument deklaruje nieistniejące metody kronikarz.zapytaj, porownaj_okresy, replay_sesji — kod ma tylko zapisz(RunReport). Lekcja: każda deklaracja API w dokumencie musi być zweryfikowana z kodem.
+
+### 2026-06-30 — Brak pola kategoria na SygnalNeuronu uniemożliwiał agregację wag reżimu
+Pole 'kategoria' nie istniało w SygnalNeuronu, przez co WAGI_REZIMU były martwym kodem. Dodano pole i przekazywanie z KATEGORII neuronu – teraz wagi reżimu działają poprawnie.
+
+### 2026-06-30 — Słabość ręcznego parametru reżimu
+Przetestowano 3 scenariusze rynkowe — system wymaga automatycznego klasyfikatora reżimu, bo ręczne ustawianie jest zawodne i nie skalowalne.
+
 ### 2026-07-27 — Dzielnik gubi formaty '###'
 Dzielnik cząstek w narzędziu A/B nie radzi sobie z formatem '### 1. **Nazwa**' – scala wiele cząstek w jeden blok (21/33). Nasyca metrykę do 95%.
 

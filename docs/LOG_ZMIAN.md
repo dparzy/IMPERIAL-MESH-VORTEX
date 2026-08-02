@@ -14,6 +14,57 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-02 | ⚖️ | VINDEX — obrońca zapisu (rozkaz Cezara, zakres B)
+
+Pytanie Cezara o watchdog odsłoniło lukę większą niż samo pytanie: **kontrakt
+„append-only" jest deklarowany w docstringach co najmniej sześciu organów
+(`codex_notarum`, `index_falsorum`, `dziennik_niesmiertelny`, Scriba Codex…) oraz
+w nagłówku tego pliku — i egzekwowany przez ZERO mechanizmów.** Zasada zapisana,
+mechanizmu brak: ta sama klasa co runbook W11.
+
+Stawka nie jest formalna. `rejestr_testow.jsonl` to źródło prawdy **pomiarów**, na
+których stoją decyzje o składzie roju. Dowód, że rzecz nie jest teoretyczna: `bc4913c`
+usunął z `index_falsorum` wpis mający już wypełnione pole `wycofane` — nagrobek, który
+miał „zostać na zawsze". Wpis wrócił później dopisany na nowo, więc szkoda się nie
+utrwaliła, ale **przez sześć dni nikt tego nie zauważył, bo nic nie patrzyło**.
+
+### Kontrakty z POMIARU, nie z nazw plików
+
+Kalibracja na `git log --numstat`: **883 commity, 254 dotykające ledgerów.**
+
+| Klasa | Zmierzone zachowanie | Werdykt |
+|---|---|---|
+| **ŚCISŁY** | zero usunięć w całej historii (`dziennik` 140 commitów, `codex_notarum` 29, `tiro_pary` 28) | 🚨 alarm |
+| **KORYGOWALNY** | usunięcia rzadkie i uzasadnione (`rejestr_testow` 1/48 — migracja Scriby; `ksiega_wad` 2/57 — naprawa martwych wzorców) | ⚠️ pytanie o powód |
+| **MUTOWALNY** | zmiana wpisu jest SENSEM ledgera (`wizje_i_decyzje` — status POMYSŁ→WDROŻONA; `procedury` — runbooki W11) | · cisza |
+
+**Odzywalność: 2,0%** (5 z 254 commitów). EXACTOR v1 dla porównania krzyczał na 80%
+i dlatego był tapetą — strażnik czytany to strażnik, który milczy, gdy nie ma sprawy.
+
+### Druga luka, załatana przy okazji
+
+Matcher VIGILA to `Write|Edit|NotebookEdit` — **plik tworzony lub zmieniany komendą
+powłoki był niewidzialny** (`python skrypt.py > plik`, `cp`, rozpakowanie archiwum).
+Stąd nowy hook `PostToolUse: Bash|PowerShell` → `.claude/hooks/post-bash.sh` (~0,36 s).
+W automacie zasięg wąski: obce pliki bada bramka, bo plik roboczy jest nieśledzony aż
+do `git add` — inaczej strażnik krzyczałby na każdy plik, który sam właśnie tworzę
+(złapane na sobie: `vindex.py` był pierwszym obcym plikiem, jaki ten organ zgłosił).
+
+**Granica ZMIERZONA i jawna:** dokumenty ACTA `.md` **nie** są sądzone miarą liniową —
+zmiana `stan_na:` we frontmatterze to też „usunięta linia", a `LOG_ZMIAN` ma ich 330 na
+379 commitów. Objęcie ACTA tą miarą zbudowałoby generator fałszywek, więc stoją w polu
+`niepokryte`, jak krok 9 u EXACTORA.
+
+**Droga na graf** (doktryna Cezara z tego dnia): `krawedzie()` wydaje werdykty jako
+relacje `(plik) —[naruszenie|korekta]→ (commit)` z klasą i powodem — materiał na węzły
+grafu W8, a nie płaski wpis do jednorazowego przeczytania.
+
+**Pliki:** `imperium/pretorianie/vindex.py` (nowy), `tests/test_vindex.py` (18 testów),
+`.claude/hooks/post-bash.sh` (nowy, `100755`), `.claude/settings.json`,
+`docs/ARCHITEKTURA_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md` (257→258).
+
+---
+
 ## 2026-08-02 | 🔧 | G1 — DŁUG P1 RECENZJI cubic PR #138 (E3/E5/D2/D4) + wada złapana na żywo
 
 Cztery wady dostarczone trzy dni wcześniej, plus piąta znaleziona dopiero **realnym

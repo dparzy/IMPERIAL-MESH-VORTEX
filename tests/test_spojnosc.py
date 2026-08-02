@@ -656,3 +656,104 @@ def test_w23_pomija_dokumenty_acta(monkeypatch):
                         else prawdziwy_open(p, *a_, **kw))
     bledy, _ = a._warstwa_23_liczby_w_prozie()
     assert bledy == []
+
+
+# ── WARSTWA 24: hooki wykonywalne (recenzja cubic PR #138, S1) ──────────────────
+
+def _settings(tmp_path, komenda):
+    import json
+    p = tmp_path / "settings.json"
+    p.write_text(json.dumps({"hooks": {"Stop": [{"hooks": [
+        {"type": "command", "command": komenda}]}]}}), encoding="utf-8")
+    return str(p)
+
+
+def test_audyt_w24_zielony_na_realnych_hookach():
+    """Stan faktyczny repozytorium — wszystkie hooki z settings.json mają 100755."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, info = a._warstwa_24_hooki_wykonywalne()
+    assert bledy == [], bledy
+    assert info and "W24" in info[0]
+
+
+def test_audyt_w24_lapie_hook_bez_bitu(tmp_path):
+    """Sedno: hook bez +x konczy sie na Unixie 'Permission denied' PRZED wejsciem do
+    organu, wiec milczy nieodroznialnie od hooka, ktory przepuscil."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, _ = a._warstwa_24_hooki_wykonywalne(
+        sciezka_settings=_settings(tmp_path, "$CLAUDE_PROJECT_DIR/.claude/hooks/stop.sh"),
+        tryby_gita={".claude/hooks/stop.sh": "100644"})
+    assert len(bledy) == 1 and "bitu wykonywalnosci" in bledy[0].replace("ś", "s")
+
+
+def test_audyt_w24_bit_obecny_to_cisza(tmp_path):
+    import narzedzia.audyt_spojnosci as a
+    bledy, info = a._warstwa_24_hooki_wykonywalne(
+        sciezka_settings=_settings(tmp_path, "$CLAUDE_PROJECT_DIR/.claude/hooks/stop.sh"),
+        tryby_gita={".claude/hooks/stop.sh": "100755"})
+    assert bledy == [] and info
+
+
+def test_audyt_w24_hook_niesledzony_przez_git_to_blad(tmp_path):
+    """Plik spoza gita nie pojawi sie na innej maszynie — cisza byłaby fałszywym spokojem."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, _ = a._warstwa_24_hooki_wykonywalne(
+        sciezka_settings=_settings(tmp_path, "$CLAUDE_PROJECT_DIR/.claude/hooks/duch.sh"),
+        tryby_gita={".claude/hooks/stop.sh": "100755"})
+    assert len(bledy) == 1 and "NIESLEDZONE" in bledy[0].replace("Ś", "S")
+
+
+def test_audyt_w24_hook_wolany_przez_bash_nie_wymaga_bitu(tmp_path):
+    """`bash skrypt.sh` uruchamia interpreter — bit skryptu nie ma tam znaczenia.
+    Alarm bylby falszywy, a falszywy alarm uczy ignorowania straznika."""
+    import narzedzia.audyt_spojnosci as a
+    bledy, _ = a._warstwa_24_hooki_wykonywalne(
+        sciezka_settings=_settings(tmp_path, "bash .claude/hooks/stop.sh"),
+        tryby_gita={".claude/hooks/stop.sh": "100644"})
+    assert bledy == [], bledy
+
+
+# ── WARSTWA 19: alias „Ostatnia aktualizacja" (recenzja cubic PR #138, M1) ──────
+
+def _dokument_z_data(monkeypatch, tmp_path, tresc, stan_na):
+    """Podstawia JEDEN dokument o zadanej treści pod parser Tabularium."""
+    import narzedzia.audyt_spojnosci as a  # noqa: F401
+    import narzedzia.tabularium as t
+    plik = tmp_path / "probny.md"
+    plik.write_text(tresc, encoding="utf-8")
+    monkeypatch.setattr(t, "zbierz_dokumenty", lambda: [("probny.md", {"stan_na": stan_na})])
+    monkeypatch.setattr(t, "ROOT", str(tmp_path))
+    return plik
+
+
+def test_audyt_w19_alias_lapie_naglowek_ostatnia_aktualizacja(monkeypatch, tmp_path):
+    """PAMIEC_SESJI glosila '## Ostatnia aktualizacja: 2026-07-27' przy stan_na 2026-07-18
+    i lekcjach do 2026-08-01 — trzy daty, zadnej nie pilnowala zadna warstwa."""
+    import narzedzia.audyt_spojnosci as a
+    _dokument_z_data(monkeypatch, tmp_path,
+                     "---\nkategoria: TABULA\n---\n## Ostatnia aktualizacja: 2026-07-27\n",
+                     "2026-07-18")
+    bledy, _ = a._warstwa_19_parytet_dat()
+    assert len(bledy) == 1 and "Ostatnia aktualizacja" in bledy[0]
+
+
+def test_audyt_w19_alias_zgodny_to_cisza(monkeypatch, tmp_path):
+    import narzedzia.audyt_spojnosci as a
+    _dokument_z_data(monkeypatch, tmp_path,
+                     "---\nkategoria: TABULA\n---\n## Ostatnia aktualizacja: 2026-07-13\n",
+                     "2026-07-13")
+    bledy, _ = a._warstwa_19_parytet_dat()
+    assert bledy == [], bledy
+
+
+def test_audyt_w19_data_zdarzenia_w_prozie_nie_jest_deklaracja_swiezosci(monkeypatch, tmp_path):
+    """KATALOG_NEURONOW ma '> Ostatnia aktualizacja: 2026-06-01 (CALA baza przeskanowana)' —
+    to data ZDARZENIA w cytacie, nie deklaracja swiezosci pliku. Dopasowanie frazy gdziekolwiek
+    dawaloby tam falszywy alarm, a warstwa pilnujaca prawdy nie moze produkowac nieprawdy."""
+    import narzedzia.audyt_spojnosci as a
+    _dokument_z_data(monkeypatch, tmp_path,
+                     "---\nkategoria: TABULA\n---\n"
+                     "> Ostatnia aktualizacja: 2026-06-01 (CALA baza przeskanowana)\n",
+                     "2026-07-17")
+    bledy, _ = a._warstwa_19_parytet_dat()
+    assert bledy == [], bledy

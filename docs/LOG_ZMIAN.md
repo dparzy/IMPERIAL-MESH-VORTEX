@@ -14,6 +14,83 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-02 | 🛡️ | P2 — UODPORNIENIA PRZECIW KLASOM (a nie łatanie objawów)
+
+P0 naprawiło pięć wad. P2 pyta o coś innego: **dlaczego mogły powstać** i co sprawi, że
+ta klasa nie wróci. Trzy mechanizmy + jedna granica świadomie zostawiona.
+
+### W24 — hook bez bitu wykonywalności (nowa warstwa audytu)
+
+Cubic wskazał `stop.sh`. Pomiar całego katalogu: **3 z 5** hooków miało `100644`, w tym
+`pre-tool-use.sh` (CUSTOS LIMINIS) i `post-tool-use.sh` (VIGIL) — dwaj strażnicy wdrożeni
+tydzień wcześniej byli na Unixie martwi. Warstwa czyta deklaracje z `settings.json`
+i sprawdza tryb **w indeksie gita, nie w systemie plików**: na Windowsie `os.access(X_OK)`
+zwraca prawdę zawsze, więc warstwa oparta o FS byłaby ślepa dokładnie na naszej maszynie.
+Pomija komendy typu `bash skrypt.sh` (interpreter nie potrzebuje bitu) — fałszywy alarm
+uczy ignorowania strażnika.
+
+### W19 — alias „Ostatnia aktualizacja:" (rozszerzenie parytetu dat)
+
+`PAMIEC_SESJI.md` miał **trzy różne daty naraz**: `stan_na: 2026-07-18`, nagłówek
+`2026-07-27` i lekcje sięgające `2026-08-01`. Nie pilnowała ich żadna warstwa: W6b pomija
+pliki z `stan_na` (przekazuje je Tabularium), a W19 znała wyłącznie frazę „Stan na:".
+Dokument przez pięć dni mówił Cezarowi nieprawdę o własnej świeżości.
+
+Alias wiąże się ze **strukturą**, nie z tekstem — łapie wyłącznie nagłówek `## …`.
+Powód zmierzony na trzech dokumentach: `KATALOG_NEURONOW.md` ma tę samą frazę w cytacie
+jako datę **zdarzenia** („CAŁA baza przeskanowana"), więc szeroki wzorzec dałby tam
+fałszywy alarm. W19 objęła 18 → **20** dokumentów.
+
+### Przyczyna, nie objaw: `pamiec_sesji` aktualizuje teraz OBIE daty
+
+Rozjazd był **gwarantowany**, bo zapis ruszał tylko nagłówek, a `stan_na` zostawiał.
+Automat pisze po każdej sesji, człowiek nie — ręczne przestawienie daty było odroczeniem,
+nie naprawą.
+
+### Rejestr wizji — status wywodzony z typu
+
+Cubic wskazał JEDEN wpis „ZMIANA ze statusem POMYSŁ". Policzenie ledgera: **56 z 1013**
+(44 × ZMIANA+POMYSŁ, 12 × DECYZJA+POMYSŁ). Źródła były dwa i oba były wartościami
+domyślnymi: `dodaj(status="POMYSŁ")` jako stała dla wszystkich typów oraz fallback
+w `auto_lekcja` po `ValueError`, wpisujący twarde „POMYSŁ" niezależnie od typu.
+
+Status domyślny jest teraz **wywodzony z typu** i odtwarza kanon zmierzony w tych samych
+danych (ZMIANA→WDROŻONA 444, DECYZJA→ZAMKNIĘTA 201, POMYSŁ→POMYSŁ 200, WIZJA→PLANOWANE
+111 — **94,5% rejestru**), więc reguła opisuje to, co rejestr i tak robi, a nie gust
+autora. Do tego wąska bramka: `ZMIANA`/`DECYZJA` + `POMYSŁ` → `ValueError`. Historia
+pozostaje nietknięta (Prawo I — nie falsyfikujemy przeszłości).
+
+### CUSTOS LIMINIS — granica ZNANA i świadomie NIENAPRAWIONA
+
+Strażnik zablokował mi zapis pliku, w którego treści stało `; git push origin`. Formalnie
+**miał rację**: cała zawartość heredoca jest częścią komendy Bash, więc token po
+separatorze wygląda jak polecenie. Moja pierwsza diagnoza („reaguje na wzmiankę, nie na
+polecenie") była **błędna** — CUSTOS ma regułę pozycji polecenia od 2026-07-28.
+
+Nie naprawiam, bo wyłączenie heredoca z analizy otwiera realny wektor obejścia: `bash
+<<EOF` zawartość **wykonuje**. Koszt fałszywki: jedna tura, obejście istnieje (Write),
+a twardą barierą jest `permissions.deny`. Zapisane jako granica + reguła operacyjna:
+**pliki o treści shell-podobnej pisz narzędziem Write, nigdy heredocem.**
+
+### Dowód (LEX TALARUS)
+
+Bramka **3282 → 3296** (zmierzone: deklarowanych 3296 = zdanych 3296, czerwonych 0),
+audyt exit 0 na 24 warstwach. Pierwszy bieg był **czerwony na jednym teście** —
+`test_rejestr_wizji_dodaj_i_czytaj` bronił starego kontraktu (`WIZJA` bez statusu →
+`POMYSŁ`). Test zaktualizowany **z uzasadnieniem pomiarowym**, bo kontrakt zmieniono
+świadomie; kanon dla WIZJI to `PLANOWANE` (111 ze 111 wystąpień). **Mutacja 5/5**: każdy mechanizm
+cofnięto i sprawdzono, że test czerwienieje — w tym mutacja aliasu na „frazę gdziekolwiek"
+(test fałszywego alarmu zadziałał) oraz cofnięcie domyślnych statusów, które **wywróciło
+bramkę sprzeczności**, czyli oba mechanizmy trzymają się nawzajem. 5 nowych klas
+semantycznych w Księdze Wad.
+
+**Pliki:** `narzedzia/audyt_spojnosci.py`, `imperium/biblioteki/rejestr_wizji.py`,
+`imperium/biblioteki/pamiec_sesji.py`, `narzedzia/auto_lekcja.py`,
+`tests/test_spojnosc.py`, `tests/test_rejestr_wizji_status.py`,
+`tests/test_pamiec_sesji.py`, `docs/PAMIEC_SESJI.md`, `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`.
+
+---
+
 ## 2026-08-02 | ⚖️ | SĄD NAD RECENZJĄ cubic PR #138 — P0 (pięć wad P1) naprawione
 
 **Pierwsza recenzja zewnętrzna, która naprawdę objęła wachtę.** RECOGNITOR potwierdził

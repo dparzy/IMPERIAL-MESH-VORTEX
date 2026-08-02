@@ -330,6 +330,16 @@ def dopisz_lekcje(tytul: str, tresc: str, data: Optional[str] = None,
         reszta_pliku = linie[1] if len(linie) > 1 else ""
         nowy = f"{naglowek_pliku}\n\n## Ostatnia aktualizacja: {data}\n{reszta_pliku}"
 
+    # DRUGA DATA W TYM SAMYM RUCHU (2026-08-02) — inaczej rozjazd jest GWARANTOWANY.
+    # Zmierzone: ten zapis od zawsze aktualizował „## Ostatnia aktualizacja", a `stan_na`
+    # we frontmatterze zostawiał nietknięte. Efekt: dokument miał TRZY różne daty naraz
+    # (`stan_na: 2026-07-18`, nagłówek 2026-07-27, lekcje do 2026-08-01) i przez pięć dni
+    # mówił Cezarowi nieprawdę o własnej świeżości. Ręczne przestawienie daty nie jest
+    # naprawą, tylko odroczeniem: automat pisze po każdej sesji, człowiek nie.
+    # Zasięg WĄSKI: podmieniamy wyłącznie istniejące pole w bloku frontmatteru, nigdy go
+    # nie tworzymy — dokument bez frontmatteru ma go dostać od Tabularium, nie stąd.
+    nowy = re.sub(r"(?m)^(stan_na:).*", rf"\1 {data}", nowy, count=1)
+
     plik.write_text(nowy, encoding="utf-8")
     if chlodz:
         egzekwuj_limit_sekcji(plik)

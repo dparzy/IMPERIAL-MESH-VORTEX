@@ -1,10 +1,10 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-27
+## Ostatnia aktualizacja: 2026-08-02
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
-stan_na: 2026-07-18
+stan_na: 2026-08-02
 powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360)"
 ---
 # PAMIĘĆ SESJI — W-360
@@ -113,23 +113,17 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-27 — PR dla gałęzi może już istnieć
-Przed tworzeniem PR trzeba sprawdzić istniejące (także zmergowane). Wszystkie PR-y tej gałęzi były zmergowane, a lokalny origin/main nieaktualny — realna różnica to 2 commity, 4 pliki, +101/−2; reszta weszła przez PR #117 (07-07).
+### 2026-07-27 — Brak gh i tokenów uniemożliwia PR przez API
+GitHub CLI nie jest zainstalowany, a w środowisku brak GH_TOKEN/GITHUB_TOKEN — utworzenie PR przez API jest niemożliwe. Dodatkowo 'gh auth login' jest interaktywny (przeglądarka + kod) i nie może być uruchomiony z harnessa Claude. Auth musi wykonać Cezar w terminalu.
 
-### 2026-07-27 — Bramka testów musi przejść PO rebase
-Rebase wciągnął 30 cudzych commitów i 9 nowych testów (2076→2087). Zielona bramka na starym stanie nie dowodzi zdrowia finalnego drzewa — po każdym rebase trzeba przepuścić testy i audyt od nowa.
+### 2026-07-27 — Testy Warstwy 6 padają przy nieaktualnej dacie 'Stan na:'
+Audyt spójności (Warstwa 6) zgłasza błąd, gdy README.md lub docs/MANIFEST_KODU.md deklarują 'Stan na:' starszą niż data ostatniego commitu. Zgodnie z Regułą 9 Prawa XXI to błahostka — naprawiana samodzielnie, bez eskalacji do Cezara.
 
-### 2026-07-27 — Auto-pull pomijany przy brudnym drzewie
-Hook startowy nie robi auto-pull, gdy drzewo ma niezacommitowane zmiany — przez to lokalna gałąź może być daleko za remote. Przed pushem należy świadomie sprawdzić stan zdalnej gałęzi i zrobić rebase.
+### 2026-08-01 — Heredoc gubi backslash — instrument kłamie
+Regex przekazany przez heredoc tracił backslash, co fałszowało wyniki; przejście na skrypty plikowe. Testy złapały 2 bugi: inline 'cd …; git push' i noun-first closure. Dodano testy graniczne dla fałszywych pozytywów z cytowania w prozie.
 
 ### 2026-08-01 — Regex w heredoc gubi backslash — instrument kłamie, nie dane
 Przy budowie CORONY regex przez heredoc stracił backslash; przejście na skrypty plikowe ujawniło dwa realne bugi (inline 'cd …; git push', fraza rzeczownikowa) i dwa fałszywe alarmy na cytatach w prozie. Dodano testy graniczne.
-
-### 2026-08-01 — Push handover ≠ zamknięcie sesji — dwa poziomy obowiązków
-Pomiary: 105 przekazań z pushem wobec 4 zamknięć sesji; stary detektor był ~3x za szeroki. CORONA rozdzielona na dwa poziomy, by obowiązki odpalały się tylko tam, gdzie faktycznie dotyczą.
-
-### 2026-07-29 — Skill /run dostarcza wzorce uruchamiania aplikacji
-Szablon /run wstrzyknięty do kontekstu opisuje 6 wzorców uruchamiania (CLI, serwer, TUI, Electron, przeglądarka, biblioteka) oraz regułę: najpierw sprawdź skill projektu; jeśli fallback wymaga ręcznej konfiguracji, zaproponuj /run-skill-generator.
 
 ### 2026-07-28 — MEXC ✗ – brak realnych orderów i pętla P&L niezamknięta
 System nie ma połączenia z MEXC, więc roj jest tylko backtestowany. Największa luka Imperium – pętla P&L→wagi nie działa.
@@ -175,9 +169,6 @@ W FTS bibliotekarza bug crash na myślnikach powodował ciche giniecie tematów 
 
 ### 2026-07-27 — 43 cząstki Hyginusa bez sędziego (zapłacony zwiad niewykorzystany)
 Kolejka Hyginusa zawiera 43 cząstki czekające na sąd (poprzednio 33). To zapłacony, ale niewykorzystany zwiad, co narusza Prawo XV. Priorytet najniższy (ostatnie w kolejce).
-
-### 2026-07-26 — Brakujące reżimy w systemie narracyjnym
-Zidentyfikowano, że reżim SPOT_CASH i FUTURES nie są zdefiniowane w systemie narracyjnym (missing regime definitions). Występują tylko w sygnaturze systemu.
 
 ### 2026-07-29 — Wrażliwość interwału na wielkość liter zmienia decyzje
 Etykieta interwału (np. '4h' vs '4H') jest case-sensitive w Legatus._formacja_interwalu - cicho zmienia wyniki backtestu. Przyczyna: słownik mapujący interwały. Naprawiono przez dodanie aliasów i normalizację.

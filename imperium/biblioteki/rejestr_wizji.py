@@ -43,6 +43,30 @@ PLIK_DOMYSLNY = ROOT / "bibliotheca_ulpia" / "dane" / "wizje_i_decyzje.jsonl"
 TYPY_DOZWOLONE = {"WIZJA", "DECYZJA", "POMYSŁ", "ZMIANA"}
 STATUSY_DOZWOLONE = {"POMYSŁ", "PLANOWANE", "WDROŻONA", "ODRZUCONA", "ZAWIESZONA", "ZAMKNIĘTA"}
 
+# STATUS DOMYŚLNY WYWODZONY Z TYPU (2026-08-02) — nie jedna stała dla wszystkich.
+# POWÓD ZMIERZONY na 1013 wpisach ledgera: domyślną wartością było twarde „POMYSŁ",
+# więc każdy zapis bez jawnego statusu dostawał etykietę ZAMIARU, także wtedy, gdy
+# opisywał rzecz DOKONANĄ. Efekt: 44 wpisy `ZMIANA + POMYSŁ` i 12 `DECYZJA + POMYSŁ`
+# (5,5% rejestru) — treść mówi „dodano, testy zielone", a status mówi „propozycja".
+# Kanon widać w tych samych danych: ZMIANA→WDROŻONA 444, DECYZJA→ZAMKNIĘTA 201,
+# POMYSŁ→POMYSŁ 200, WIZJA→PLANOWANE 111. Domyślne wartości ODTWARZAJĄ ten kanon,
+# więc reguła nie jest gustem — jest opisem tego, co rejestr i tak robi w 94,5%.
+STATUS_DOMYSLNY: Dict[str, str] = {
+    "WIZJA":   "PLANOWANE",
+    "DECYZJA": "ZAMKNIĘTA",
+    "ZMIANA":  "WDROŻONA",
+    "POMYSŁ":  "POMYSŁ",
+}
+
+# Kombinacje wewnętrznie sprzeczne — wpis o rzeczy DOKONANEJ nie może nosić etykiety
+# zamiaru. Bramka jest WĄSKA z rozmysłu: blokujemy wyłącznie parę, którą pomiar wskazał
+# jako realnie występującą i jednoznacznie błędną. Szersza reguła („DECYZJA tylko
+# ZAMKNIĘTA") wywróciłaby legalne przypadki jak POMYSŁ+ZAWIESZONA, których jest 1.
+STATUSY_SPRZECZNE: Dict[str, tuple] = {
+    "ZMIANA":  ("POMYSŁ",),
+    "DECYZJA": ("POMYSŁ",),
+}
+
 # Wagi ważności per typ — wpływają na scoring GA (recency decay i importance)
 _WAGA_TYPU: Dict[str, float] = {
     "WIZJA":    0.9,   # strategicznie ważna — powoli opada
@@ -103,7 +127,7 @@ def _nadpisz(wszystkie_wpisy: List[Dict[str, Any]], plik: Optional[Path] = None)
 # ─── CRUD ──────────────────────────────────────────────────────────────────────
 
 def dodaj(typ: str, tytul: str, tresc: str,
-          status: str = "POMYSŁ", rezim: str = "",
+          status: str = "", rezim: str = "",
           data: Optional[str] = None,
           plik: Optional[Path] = None,
           dedup: bool = True) -> bool:
@@ -126,11 +150,17 @@ def dodaj(typ: str, tytul: str, tresc: str,
     if plik is None:
         plik = PLIK_DOMYSLNY
     typ = typ.upper()
-    status = status.upper()
+    status = (status or STATUS_DOMYSLNY.get(typ, "POMYSŁ")).upper()
     if typ not in TYPY_DOZWOLONE:
         raise ValueError(f"Typ musi być jednym z: {TYPY_DOZWOLONE}")
     if status not in STATUSY_DOZWOLONE:
         raise ValueError(f"Status musi być jednym z: {STATUSY_DOZWOLONE}")
+    if status in STATUSY_SPRZECZNE.get(typ, ()):
+        raise ValueError(
+            f"Typ {typ} nie może mieć statusu {status}: wpis opisujący rzecz DOKONANĄ "
+            f"z etykietą zamiaru jest wewnętrznie sprzeczny — czytelnik nie wie, czy to "
+            f"propozycja, czy fakt. Użyj jednego z: "
+            f"{sorted(STATUSY_DOZWOLONE - set(STATUSY_SPRZECZNE[typ]))}")
 
     tytul = tytul.strip()
     if dedup:

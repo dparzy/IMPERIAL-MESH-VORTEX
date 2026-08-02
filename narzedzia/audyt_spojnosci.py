@@ -31,6 +31,7 @@ Warstwy 17 i 18 dopisano do kodu, ale nie do tego spisu. Dokładnie klasa wady W
   Warstwa 19 — parytet dat:     frontmatter `stan_na` = nagłówek "Stan na:" w tym samym pliku
   Warstwa 20 — katalog INDEKS:  sekcja generowana = to, co wypluwa Tabularium (zero ręcznych edycji)
   Warstwa 21 — wyzwalacze:      każdy `/skill` cytowany w konstytucji istnieje na dysku
+  Warstwa 24 — hooki:           hook z settings.json ma bit +x w indeksie gita (nie milczy jak zielony)
 
 Exit code:
   0 = pełna spójność (Imperium gotowe)
@@ -578,7 +579,117 @@ def audyt() -> tuple:
     bledy += w23_bledy
     info += w23_info
 
+    # ── WARSTWA 24: HOOKI WYKONYWALNE — strażnik bez +x milczy jak zielony ────
+    w24_bledy, w24_info = _warstwa_24_hooki_wykonywalne()
+    bledy += w24_bledy
+    info += w24_info
+
     return bledy, info
+
+
+def _warstwa_24_hooki_wykonywalne(sciezka_settings=None, tryby_gita=None):
+    """W24 — każdy hook zadeklarowany w `.claude/settings.json` ma bit wykonywalności.
+
+    Parametry istnieją WYŁĄCZNIE dla testów granic (ten sam wzorzec, co `_warstwa_22`):
+    pozwalają podać własny plik ustawień i własną mapę trybów, żeby sprawdzić alarm bez
+    psucia prawdziwego repozytorium. Produkcja woła bez argumentów.
+
+    POWÓD ZMIERZONY (recenzja cubic PR #138, uwaga S1 — i jej ZASIĘG był większy niż
+    uwaga): `stop.sh` wszedł do repo z trybem `100644`. Na Unixie `settings.json` woła
+    ścieżkę wprost, więc powłoka kończy na „Permission denied" ZANIM dojdzie do organu —
+    a hook, który nie wystartował, wygląda dokładnie tak samo jak hook, który przepuścił.
+    Cisza strażnika jest nieodróżnialna od jego zgody: ta sama klasa, co `kotwica_osierocona`
+    traktowana jak sukces i co „bramka o wąskim zasięgu daje fałszywy spokój".
+
+    Recenzent wskazał JEDEN plik, bo tylko on był w diffie. Pomiar całego katalogu pokazał
+    **3 z 5**: `pre-tool-use.sh` (CUSTOS LIMINIS) i `post-tool-use.sh` (VIGIL) też miały
+    `100644` — czyli dwaj strażnicy wdrożeni tydzień wcześniej byli na Unixie martwi.
+
+    ŹRÓDŁEM PRAWDY JEST INDEKS GITA, NIE SYSTEM PLIKÓW. Na Windowsie `os.access(X_OK)`
+    zwraca True dla każdego istniejącego pliku, więc warstwa oparta o system plików byłaby
+    ślepa DOKŁADNIE na maszynie, na której pracujemy — zielona bramka nic by nie znaczyła.
+    Git przechowuje tryb (`100755` / `100644`) niezależnie od platformy i to on jedzie
+    do chmury, gdzie hooki naprawdę się uruchamiają.
+    """
+    import json as _json
+    import subprocess as _sub
+
+    sciezka = sciezka_settings or os.path.join(ROOT, ".claude", "settings.json")
+    try:
+        with open(sciezka, encoding="utf-8") as f:
+            ustawienia = _json.load(f)
+    except FileNotFoundError:
+        return [], ["Hooki (W24): brak .claude/settings.json — nie ma czego pilnować"]
+    except (OSError, ValueError) as e:
+        return [f"[W24] Nie mogę odczytać .claude/settings.json: {e}"], []
+
+    # Zbieramy KAŻDE `command` z dowolnego zdarzenia — nazwy zdarzeń zmieniają się między
+    # wersjami harnessa (zmierzone: jest ich 31, nie ~9), więc nie wypisujemy ich z palca.
+    polecenia: list = []
+
+    def _zbierz(wezel):
+        if isinstance(wezel, dict):
+            cmd = wezel.get("command")
+            if isinstance(cmd, str):
+                polecenia.append(cmd)
+            for v in wezel.values():
+                _zbierz(v)
+        elif isinstance(wezel, list):
+            for v in wezel:
+                _zbierz(v)
+
+    _zbierz(ustawienia.get("hooks", {}))
+
+    # Interesują nas WYŁĄCZNIE polecenia wołające plik z repozytorium wprost. `python -m …`
+    # uruchamia interpreter, więc bit wykonywalności skryptu nie ma tam znaczenia.
+    pliki = set()
+    for cmd in polecenia:
+        m = re.search(r"\.claude/hooks/([A-Za-z0-9_.-]+\.sh)", cmd.replace("\\", "/"))
+        if m and not re.match(r"^\s*(?:ba)?sh\s", cmd):
+            pliki.add(f".claude/hooks/{m.group(1)}")
+    if not pliki:
+        return [], ["Hooki (W24): żaden hook nie woła skryptu z repo wprost"]
+
+    if tryby_gita is not None:
+        tryby = dict(tryby_gita)
+    else:
+        try:
+            p = _sub.run(["git", "ls-files", "-s", ".claude/hooks/"], cwd=ROOT,
+                         capture_output=True, text=True, encoding="utf-8",
+                         errors="replace", timeout=30)
+        except (OSError, _sub.SubprocessError) as e:
+            return [f"[W24] Nie mogę odczytać trybów z gita: {e}"], []
+        if p.returncode != 0:
+            return [f"[W24] `git ls-files` zwrócił {p.returncode}: "
+                    f"{p.stderr.strip()[:120]}"], []
+        tryby = {}
+        for linia in p.stdout.splitlines():
+            czesci = linia.split("\t", 1)
+            if len(czesci) == 2:
+                tryby[czesci[1].strip().replace("\\", "/")] = czesci[0].split()[0]
+
+    winni, nieznane = [], []
+    for plik in sorted(pliki):
+        tryb = tryby.get(plik)
+        if tryb is None:
+            nieznane.append(plik)
+        elif tryb != "100755":
+            winni.append(f"{plik} ({tryb})")
+    bledy = []
+    if winni:
+        bledy.append(
+            f"[W24] Hooki zadeklarowane w settings.json BEZ bitu wykonywalności: "
+            f"{', '.join(winni)}. Na Unixie kończą się 'Permission denied' przed wejściem "
+            f"do organu — strażnik milczy nieodróżnialnie od strażnika zielonego. "
+            f"Napraw: git update-index --chmod=+x <plik>")
+    if nieznane:
+        bledy.append(
+            f"[W24] Hooki wołane przez settings.json, a NIEŚLEDZONE przez git: "
+            f"{', '.join(nieznane)}. Na innej maszynie ich po prostu nie będzie")
+    if bledy:
+        return bledy, []
+    return [], [f"Hooki wykonywalne (W24): {len(pliki)} hooków z settings.json, "
+                f"wszystkie 100755 w indeksie gita ✅"]
 
 
 def _warstwa_21_wyzwalacze_rozkazow():
@@ -811,12 +922,31 @@ def _warstwa_19_parytet_dat():
         naglowek = "\n".join(tresc.splitlines()[:LINIE_NAGLOWKA])
         m = re.search(r"Stan na:\s*\**\s*(\d{4}-\d{2}-\d{2})", naglowek)
         if not m:
+            # ALIAS „Ostatnia aktualizacja:" — TYLKO JAKO NAGŁÓWEK (2026-08-02).
+            # Powód zmierzony: `PAMIEC_SESJI.md` głosił „## Ostatnia aktualizacja: 2026-07-27"
+            # przy `stan_na: 2026-07-18` i lekcjach sięgających 2026-08-01 — trzy różne daty
+            # w jednym dokumencie, żadnej nie pilnowała ani W6b (pomija pliki z `stan_na`,
+            # przekazując je Tabularium), ani W19 (znała wyłącznie frazę „Stan na:").
+            # Dokument sam mówił Cezarowi nieprawdę o swojej świeżości przez pięć dni.
+            #
+            # WĄSKO, BO SZEROKO BYŁOBY KŁAMSTWEM: `KATALOG_NEURONOW.md` ma
+            # „> Ostatnia aktualizacja: 2026-06-01 (CAŁA baza wskaźników przeskanowana)" —
+            # to data ZDARZENIA opisanego w cytacie, nie deklaracja świeżości pliku, i jego
+            # `stan_na` jest poprawne. Dopasowanie frazy w dowolnym miejscu wyprodukowałoby
+            # tam fałszywy alarm, a warstwa pilnująca prawdy nie ma prawa produkować
+            # nieprawdy o cudzych dokumentach (ta sama lekcja, co przy pierwszej wersji W19).
+            m = re.search(r"^#{1,3}\s*(Ostatnia aktualizacja):\s*\**\s*(\d{4}-\d{2}-\d{2})",
+                          naglowek, re.M)
+            etykieta, data_naglowka = (m.group(1), m.group(2)) if m else ("", "")
+        else:
+            etykieta, data_naglowka = "Stan na", m.group(1)
+        if not m:
             continue
         sprawdzone += 1
-        if str(fm).strip() != m.group(1):
+        if str(fm).strip() != data_naglowka:
             bledy.append(
                 f"[W19] {wzgledna}: frontmatter `stan_na: {fm}` ≠ nagłówek "
-                f"'Stan na: {m.group(1)}' — jedna data, dwa miejsca, jedna prawda")
+                f"'{etykieta}: {data_naglowka}' — jedna data, dwa miejsca, jedna prawda")
     info = ([f"Parytet dat (W19): {sprawdzone} dokumentów z obiema datami — zgodne ✅"]
             if not bledy else [])
     return bledy, info

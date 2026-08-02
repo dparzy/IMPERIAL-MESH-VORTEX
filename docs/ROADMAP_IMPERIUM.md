@@ -2,7 +2,7 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
-stan_na: 2026-07-30
+stan_na: 2026-08-02
 powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii."
 ---
 # 🏛️ ROADMAP IMPERIUM — MAPA DRÓG SYSTEMU
@@ -14,7 +14,7 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 ---
 
-## 🗓️ PLAN WACHT — operacyjna kolejka zadań (stan 2026-07-30)
+## 🗓️ PLAN WACHT — operacyjna kolejka zadań (stan 2026-08-02)
 
 > **Czym to jest, a czym nie:** FAZY 0–4 niżej to mapa STRATEGICZNA (dokąd zmierzamy).
 > Ta sekcja to kolejka OPERACYJNA — co robimy w najbliższych wachtach, w kolejności.
@@ -23,6 +23,27 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 > zwiad → pomiary → symbioza). Pozycja bez kalibracji przyrządu **nie jest skończona**.
 
 **Legenda stanu:** ✅ zrobione · 🟡 kod jest, brak dowodu · 🔴 nie istnieje · ⏸️ świadomie odłożone
+
+### WACHTA G — dług recenzji i piętro pętli *(zaczęta 2026-08-02, kolejność = rekomendacja)*
+
+> Powstała z sądu nad recenzją cubic PR #138 (20 uwag: 18 słusznych, 1 odrzucona, 1 odłożona)
+> oraz z pytania Cezara o **etap inżynierii**. Zmierzony stan: jesteśmy głęboko w **LOOP
+> ENGINEERING** (5 hooków, bramka 24 warstw, SIGILLARIUM, EXACTOR czytający własny meldunek,
+> Księga Wad), a **GRAPH ENGINEERING mamy w zalążku** — graf W8 (234 węzły, 1680 połączeń)
+> karmi raport startowy i `zapominanie.py`, ale **nie wnioskowanie**; RAG jest leksykalny (FTS).
+> Zastrzeżenie: nasza ścieżka decyzyjna handlowa **nie zawiera LLM-a**, więc graf poprawia
+> pamięć Imperium i pracę Architekta — **nie wynik tradingowy**. Mylenie tych dwóch rzeczy
+> byłoby tym samym rozkalibrowaniem, które złapaliśmy przy frazach P1 zwiadu.
+
+| # | Zadanie | Stan | Dlaczego w tej kolejności |
+|---|---|---|---|
+| G1 | **P1 recenzji** — E3 (`\S+` łyka separator w nazwie gałęzi), E5 (spacje w ścieżce łamią `cd`), D2 (pomiar gubi ostatni zamknięty bar), D4 (ujemne `od` przyjmowane) | 🔴 | najtańsze i domyka dług jakości na organach dostarczonych 3 dni temu. **D2 zmieni wynik pomiaru o jeden bar** → wymaga powtórki biegu i porównania z `r=0,8217` |
+| G2 | **F17 — pole `WYMAGA`/`ZRODLO` w neuronach** | 🔴 | **decyzja Cezara z 2026-07-31**, wyprzedzona przez recenzję. Usuwa CAŁĄ KLASĘ niewiedzy zamiast 27 pojedynczych przypadków: dziś żaden organ nie odróżni „milczy z braku wejścia" od „milczy, bo zepsuty". Nazwa musi być rozłączna z istniejącym `WYMAGA_BAROW` u zwiadowców.<br>➕ **ROZSZERZENIE zmierzone 2026-08-02:** `MECHANIZMY_ZWIADOWCY` (12 wpisów) ma **ZERO czytelników** w całym repo, `_wstrzyknij_mechanizm` obsługuje wyłącznie neurony, a EXP-13/14/15 nie mają wpisu wcale — więc **DISCRIMINATOR i dekorelacja mechanizmowa nie obejmują ani jednego z 15 zwiadowców** (alarm Prawa XV) |
+| G3 | **Reguła behawioralna z recenzji — automat** (praca `2607.13091`, Microsoft, wrzutnia 01.08) | 🔴 | domyka pętlę, którą dziś zamykam RĘCZNIE: zaakceptowana uwaga → trwała reguła. Mamy Księgę Wad, ale wpis robi Architekt. To jest właściwy następny krok **loop engineeringu**, nie graf |
+| G4 | **Graf pamięci czytany PRZY DECYZJI, nie tylko drukowany** | 🔴 | pierwszy realny krok w **graph engineering**: pytanie → sąsiedztwo w W8 → dopiero potem FTS. Wpięcie **opt-in OFF**, walidacja **A/B na zbiorze A10** (RAG sam vs RAG + sąsiedztwo). Bez A10 nie ma czym mierzyć → G4 **czeka na A10** |
+| G5 | **Sąd nad grupą B — 10 prac o grafach wiedzy** (wrzutnia 01.08: Disco-RAG, KAG, ROGRAG, GroundedKG-RAG, agentic KG-RAG/MIT, LLMs+Graphs, Context Graphs, ARIA, swj3854, HuixiangDou) | 🔴 | **kandydaci, nie plan** (zmierzone: 39,3% kandydatów Hyginusa twierdziło „nie dubluje" o rzeczy stojącej w kodzie). Pytanie brzmi „co dokłada się do W8, które STOI", nie „czy grafy są dobre" |
+| G6 | **E4 — kalibracja kroku 4b EXACTORA** (meldunek sług przechodzi przy JEDNEJ nazwie) | ⏸️ | zarzut recenzji **trafny**, ale powinność jest NIESKALIBROWANA. Zaostrzenie progu bez prawdy podstawowej to dokładnie to, za co powstał talar N-b74ce133. Wymaga pomiaru na korpusie 190 meldunków, nie zgadywania |
+| G7 | **CUSTOS LIMINIS — treść heredoca czytana jak polecenie** | ⏸️ ŚWIADOMIE ODŁOŻONE | strażnik **miał rację**: zawartość heredoca JEST częścią komendy Bash. Wyłączenie jej otwiera realny wektor obejścia (`bash <<EOF` zawartość wykonuje). Koszt fałszywki zmierzony: 1 tura; obejście istnieje. **Reguła operacyjna zamiast kodu:** pliki o treści shell-podobnej pisz narzędziem `Write`, nigdy heredocem |
 
 ### WACHTA A — domknięcie biblioteki *(zaczęta 2026-07-29)*
 

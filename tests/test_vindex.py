@@ -148,14 +148,56 @@ def test_binaria_nie_udaja_zmiany_linii():
     assert v._numstat("5\t0\tplik.jsonl\n") == [("plik.jsonl", 5, 0)]
 
 
-def test_awaria_gita_nie_jest_naruszeniem():
-    """Prawo I: brak narzędzia to brak wiedzy, nie zarzut. Strażnik, który przy awarii
-    krzyczy „naruszenie", uczy przechodzenia nad sobą do porządku dziennego."""
+def test_awaria_gita_to_NIEZNANE_a_nie_naruszenie_ani_czysto():
+    """Prawo I: brak narzędzia to brak WIEDZY — ani zarzut, ani rozgrzeszenie.
+
+    KONTRAKT ZAOSTRZONY 2026-08-03 (P1, cubic PR #139). Poprzednia wersja zwracała przy
+    awarii pustą listę zmian, co `podsumuj` zamieniało w status `czysto` i kod wyjścia 0 —
+    hook **zatwierdzał repozytorium, którego nie obejrzał**. Strażnik krzyczący „naruszenie"
+    przy awarii uczy ignorowania siebie, ale strażnik meldujący „czysto" jest GORSZY:
+    kłamie w stronę spokoju. Trzeci stan (`nieznane`) jest jedynym uczciwym.
+    """
     oryginal = v._git
     v._git = lambda *a: None
     try:
-        assert v.zmiany_robocze() == []
+        for wolanie in (v.zmiany_robocze, lambda: v.zmiany_commitu("HEAD")):
+            try:
+                wolanie()
+            except v.GitNieodpowiada:
+                pass
+            else:
+                raise AssertionError("awaria gita musi być JAWNA, nie pusta lista zmian")
+        w = v.zbadaj()                       # pełny werdykt NIE MOŻE wybuchnąć…
+        assert w["status"] == "nieznane"     # …ale musi powiedzieć, że nic nie wie
+        assert w["status"] != "czysto", "awaria gita nie może udawać czystego repo"
+        assert w["naruszenia"] == [], "brak wiedzy to nie zarzut"
+        assert w["niepokryte"], "milczenie o niezbadanym zakresie jest zakazane"
         assert v.obce_pliki() == []
+    finally:
+        v._git = oryginal
+
+
+def test_rename_ledgera_nie_omija_kontroli():
+    """`git mv` na ledgerze ŚCISŁYM musi być widziany jako usunięcie starej ścieżki.
+
+    P1 z recenzji cubic PR #139: przy wykrywaniu zmian nazw git pisze
+    `0\\t0\\tdocs/{stary => nowy}` — zero usunięć pod ścieżką, która nie pasuje do
+    żadnego chronionego wzorca. Bez `--no-renames` dało się usunąć ledger o kontrakcie
+    ŚCISŁYM zwykłym `git mv`, a strażnik meldował czysto.
+    """
+    uzyte: dict = {}
+    oryginal = v._git
+
+    def _szpieg(*a):
+        uzyte["args"] = a
+        return ""
+
+    v._git = _szpieg
+    try:
+        v.zmiany_robocze()
+        assert "--no-renames" in uzyte["args"], "diff bez --no-renames przepuszcza rename"
+        v.zmiany_commitu("HEAD")
+        assert "--no-renames" in uzyte["args"], "show bez --no-renames przepuszcza rename"
     finally:
         v._git = oryginal
 

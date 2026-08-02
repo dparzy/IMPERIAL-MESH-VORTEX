@@ -14,6 +14,40 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-03 | 🛡️ | SZEŚĆ P1 z recenzji cubic PR #139 — wspólny mianownik: cisza udająca spokój
+
+Wszystkie sześć zweryfikowane wobec żywego kodu przed naprawą (recenzent też halucynuje —
+przy PR #133 jedyne P1 cytowało nieistniejące reguły). **Dwa udowodnione uruchomieniem.**
+
+1. **`vindex._git()` → awaria raportowana jako `czysto`.** `None` zamieniało się w pustą
+   listę zmian, więc padnięty git dawał werdykt czysty z kodem 0 — **hook zatwierdzał
+   repozytorium, którego nie obejrzał**. Wprowadzony wyjątek `GitNieodpowiada` i trzeci
+   status `nieznane`: brak wiedzy nie jest ani zarzutem, ani rozgrzeszeniem.
+2. **Rename omijał kontrolę ledgerów.** Git pisze `0\t0\tdocs/{stary => nowy}` — zero
+   usunięć pod ścieżką niepasującą do wzorca, więc ledger ŚCISŁY dało się usunąć zwykłym
+   `git mv`. Dodane `--no-renames`; test sprawdza obecność flagi w obu wywołaniach.
+3. **Commit w tej samej komendzie był niewidzialny.** Hook porównywał drzewo z HEAD, więc
+   `git commit -am` zmieniający ledger znikał: zmiana już w HEAD, drzewo czyste. Dokładamy
+   zawartość HEAD, gdy powstał w oknie 120 s — okno, nie „zawsze", bo alarm powtarzany
+   bez końca uczy ignorowania alarmów (W9, 07-20).
+4. **`rejestr_wizji` CLI nie przyjmował ZMIANA/DECYZJA** — UDOWODNIONE: `dodaj ZMIANA x y`
+   padało z ValueError. Argparse podstawiał niepusty `POMYSŁ`, więc `status or
+   STATUS_DOMYSLNY` nigdy nie sięgało po kanon. **Bramka broniąca spójności rejestru
+   blokowała poprawne użycie rejestru.** `default=""`. Przy okazji P2: `zmien_status()`
+   dostał tę samą bramkę — niezmiennik pilnowany na jednej z dwóch dróg zapisu nie jest
+   niezmiennikiem (dało się obejść w dwóch ruchach).
+5. **EXACTOR nie cytował nazwy gałęzi** — UDOWODNIONE: `git check-ref-format --branch
+   'test;whoami'` przechodzi. Organ mający wydać komendę BEZPIECZNĄ DO WKLEJENIA mógł
+   wydać komendę robiącą co innego. Cytowanie warunkowe: groźna gałąź → `'test;whoami'`,
+   normalna → **bez zmian**, więc kalibracja na 190 meldunkach nietknięta.
+6. **Audyt W24: brak `settings.json` = zielono.** „Nie ma czego pilnować" znaczyło
+   naprawdę „wszystkie hooki wyłączone" (CUSTOS LIMINIS, VIGIL, EXACTOR, sync). Teraz błąd.
+
+**Pliki:** `imperium/pretorianie/vindex.py`, `imperium/pretorianie/exactor.py`,
+`imperium/biblioteki/rejestr_wizji.py`, `narzedzia/audyt_spojnosci.py`, +3 pliki testów
+
+---
+
 ## 2026-08-03 | 🚀 | HYGINUS na V4-Flash-0731 — profil `osad` zejście z v4-pro (rozkaz Cezara)
 
 **Rozkaz Cezara:** „teraz używany tylko deepseek v4 flash". Podstawa: DeepSeek wydał

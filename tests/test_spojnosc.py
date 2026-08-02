@@ -668,6 +668,24 @@ def _settings(tmp_path, komenda):
     return str(p)
 
 
+def test_audyt_w24_brak_settings_to_BLAD_nie_zielone(tmp_path):
+    """Brak `.claude/settings.json` to WYŁĄCZONA OBRONA, nie „nie ma czego pilnować".
+
+    Naprawa P1 z recenzji cubic PR #139. Poprzednia wersja zwracała na tej ścieżce
+    `([], [info])`, czyli **zero błędów** — audyt świecił zielono dla repozytorium,
+    w którym skasowano plik rejestrujący CUSTOS LIMINIS, VIGIL, EXACTOR i sync pamięci.
+    Bramka zatwierdzałaby wtedy stan bez żadnego strażnika. To ta sama klasa, którą
+    W24 miała ścigać: hooki martwe, a nikt nie krzyczy. Cisza o braku obrony JEST alarmem.
+    """
+    import narzedzia.audyt_spojnosci as a
+
+    bledy, info = a._warstwa_24_hooki_wykonywalne(
+        sciezka_settings=str(tmp_path / "nie-ma-takiego-pliku.json"))
+    assert bledy, "brak settings.json MUSI być błędem audytu"
+    assert "W24" in bledy[0]
+    assert not info, "to nie jest informacja, to jest zarzut"
+
+
 def test_audyt_w24_zielony_na_realnych_hookach():
     """Stan faktyczny repozytorium — wszystkie hooki z settings.json mają 100755."""
     import narzedzia.audyt_spojnosci as a

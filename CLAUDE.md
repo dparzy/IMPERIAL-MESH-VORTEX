@@ -133,7 +133,7 @@ Checklist Prawa XX (sprawdzaj po każdej sesji z nowymi modułami):
 
 - **🛠️ MELIORATIO** — gdy w trakcie pracy zobaczysz lukę, lepszą praktykę albo okazję: **zapamiętaj i zaproponuj**, nie przemilczaj (kandydat ≠ prawda). Drobne rozstrzygasz sam, kierunkowe proponujesz Cezarowi. Szczegóły: **`/praca`**.
 
-- **📜 LEX TALIONIS** — każdy ZATWIERDZONY błąd rodzi obowiązek ZATWIERDZONEGO unikatu (CORONA spłaca NOTĘ). Sesja nie domyka się z długiem honorowym > 0. Organ i procedura: **`/ledgery`**.
+- **📜 LEX TALIONIS** — każdy ZATWIERDZONY błąd rodzi obowiązek ZATWIERDZONEGO unikatu (CORONA spłaca NOTĘ). Sesja nie domyka się z długiem honorowym > 0. **WYBÓR SPŁATY NALEŻY DO CEZARA (ROZKAZ STAŁY 2026-08-03):** przed spłatą notu przedstawiasz **TRZY opcje CORONY** — każda z uzasadnieniem, opisem, WPŁYWEM i tym, co wnosi do Imperium; Cezar wybiera. Samodzielny wybór unikatu = złamanie. Organ i procedura: **`/ledgery`**.
 
 - **🔄 CURSUS PLENUS — PEŁNY CYKL ZADANIA (ROZKAZ STAŁY — Cezar 2026-07-29)** — żadne zadanie nie jest skończone po samym kodzie. Pełny obieg, **dobierany do KATEGORII zadania** (Prawo XVIII — myślisz, nie odklepujesz): **zadanie → testy → checklista (bramka kryteriów) → sprawdzenie, że DZIAŁA na żywych danych → pełna KALIBRACJA przyrządu na prawdzie podstawowej → ocena → zwiad za lepszym rozwiązaniem (nasze ma być lepsze od cudzego, nie równe) → testy → pomiary → SYMBIOZA (dokumenty, MANIFEST, INDEKS, pamięć w tym samym ruchu) → testy.** Wolno powiedzieć „jest OK" **tylko z dopiskiem, czego jeszcze nie wiemy** i kiedy poszukamy lepszego. Powód: 47 organów orzekających, 11 bez kalibracji — w tym **8 narzędzi A/B, których werdykty zadecydowały o składzie roju**. Bądź KREATYWNY w doborze kroków, nigdy w pomijaniu ich.
 

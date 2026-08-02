@@ -24,6 +24,31 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 **Legenda stanu:** ✅ zrobione · 🟡 kod jest, brak dowodu · 🔴 nie istnieje · ⏸️ świadomie odłożone
 
+### 👑 CZTERY KORONY — kolejność ZATWIERDZONA PRZEZ CEZARA 2026-08-03
+
+> Powstały jako opcje spłaty NOTY (LEX TALIONIS) za zwiad puszczony równolegle z bramką.
+> **Nowy ROZKAZ STAŁY z tej samej wachty:** przed spłatą noty Architekt podaje **TRZY
+> opcje CORONY** (uzasadnienie · opis · wpływ · co wnosi), a **wybiera Cezar** — dotąd
+> 54 korony powstały bez tej bramki, czyli wybierał ten, kto zawinił. Cezar wybrał
+> **wszystkie cztery** i dodał czwartą własnym pytaniem o organ ewolucji.
+
+| # | CORONA | Co wnosi | Piętro | Koszt |
+|---|---|---|---|---|
+| **A** ⭐ | **SILENTIUM** — bramka zakłada blokadę, hook PreToolUse **odmawia zapisu do repo** w trakcie biegu | VINDEX *wykrywa* zabrudzenie po fakcie; **nic nie ZAPOBIEGA**. Zmierzone: 4 unieważnione biegi w 4 dni, **dwa z nich w jednej wachcie 08-03 przez tego samego, kto zasadę zapisał** — dowód, że sama wiedza nie wystarcza | HARNESS | ~1 wachta |
+| **C** | **CUSTOS BIBLIOTHECAE** (= A15) — warstwa W25: dysk ↔ katalog ↔ cache ↔ RAG | Żadna z 24 warstw nie pyta o KSIĘGI. Dowód: 40 ksiąg przybyło 01.08, **nikt nie zauważył przez dobę**, audyt drukował „pełna harmonia" | LOOP | ~1 wachta |
+| **B** | **VINDEX → GRAF W8** (= H6) — krawędzie `(plik) —[naruszenie]→ (commit)` | Jedyny producent krawędzi z **realnych zdarzeń**, nie z tekstu. Jedyna droga na GRAPH **nieblokowana przez A10** — ale nie daje czytelnika przy decyzji, więc GRAPH zostanie 3/4 | GRAPH | ~½ wachty |
+| **D** | **CURSUS ARTIS** — organ mierzący **WSZYSTKIE piętra**, z **rejestrem układów** (wzorce połączeń, status `ZATWIERDZONY/KANDYDAT/OBALONY`) | MATURITAS mierzy **3 z 9**. Dwa spoza trójki **JUŻ STOJĄ i nie są liczone**: HARNESS (6 hooków, 24 warstwy, SIGILLARIUM) i NEURO-SYMBOLIC (Prawo XXI, INDEX FALSORUM, VINDEX = weryfikacja w architekturze, nie audyt post-hoc). **Prawdopodobnie ZANIŻAMY własny stan.** INGENIUM = zero plików (grep) | wszystkie | ~2 wachty |
+
+> **ROZSTRZYGNIĘCIE CEZARA o układach (D):** wzorce wchodzą do rejestru **wyłącznie po
+> zatwierdzeniu nowej wizji albo po zmierzonym odkryciu** — nigdy z lektury materiału.
+> Domyka to pętlę *odkrycie → zatwierdzenie → wzorzec → egzekwowanie* i usuwa zarzut,
+> że budowalibyśmy miernik na cudzej, nieosądzonej taksonomii.
+>
+> **Warunek uczciwości dla D:** osiem z dziewięciu pięter znamy z materiału, którego
+> jeszcze nie osądziliśmy — tego samego, który wyprodukował `US20230000000A1`
+> i `abc123.ngrok.io`. Pierwsza wersja rejestru zawiera **tylko to, co potwierdzone
+> w NASZYM kodzie**; reszta czeka na QUAESTIO.
+
 ### WACHTA H — DOMYKANIE PĘTLI *(kolejność = rekomendacja po skanie Imperium 2026-08-02)*
 
 > **Diagnoza ze skanu całego Imperium (rozkaz Cezara 2026-08-02, liczby z żywych źródeł):**

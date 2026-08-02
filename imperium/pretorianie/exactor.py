@@ -367,7 +367,13 @@ def blok_push(galaz: str = "", korzen: Path = None) -> str:
         raise BrakGalezi(
             "nie umiem ustalić bieżącej gałęzi (detached HEAD albo git nie odpowiada) — "
             "podaj ją jawnie: blok_push(galaz='<nazwa>')")
-    return f"cd {cytuj_sciezke(str(korzen))}; git push origin {galaz}"
+    # GAŁĄŹ CYTOWANA TAK SAMO JAK ŚCIEŻKA — naprawa P1 z recenzji cubic PR #139.
+    # Ścieżkę cytowaliśmy od PR #138 (E5), gałąź szła gołym `f`-stringiem, a git
+    # PRZYJMUJE nazwy z metaznakami powłoki (sprawdzone: `git check-ref-format --branch
+    # 'test;whoami'` → OK). Organ, którego jedynym zadaniem jest wydać komendę BEZPIECZNĄ
+    # DO WKLEJENIA, mógł więc wydać komendę robiącą coś innego niż push. Siostra E5/E6:
+    # ta sama wada załatana z jednej strony i zostawiona z drugiej.
+    return f"cd {cytuj_sciezke(str(korzen))}; git push origin {cytuj_sciezke(galaz)}"
 
 
 # ── ADAPTERY ─────────────────────────────────────────────────────────────────────

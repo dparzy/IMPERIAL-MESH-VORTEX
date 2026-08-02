@@ -234,6 +234,19 @@ def zmien_status(tytul: str, nowy_status: str,
     zmieniono = False
     for w in wpisy:
         if w.get("tytul", "").lower() == tytul.lower():
+            # TA SAMA BRAMKA CO PRZY DODAWANIU — naprawa P2 z recenzji cubic PR #139.
+            # Reguła sprzeczności typ↔status była egzekwowana WYŁĄCZNIE w `dodaj()`,
+            # więc dało się ją obejść w dwóch ruchach: dodaj legalnie, potem zmień status
+            # na zakazany. Niezmiennik pilnowany na jednej z dwóch dróg zapisu nie jest
+            # niezmiennikiem — to ta sama klasa co kontrakt append-only deklarowany
+            # w sześciu organach i egzekwowany przez zero (VINDEX, 2026-08-02).
+            typ_wpisu = str(w.get("typ", "")).upper()
+            if nowy_status in STATUSY_SPRZECZNE.get(typ_wpisu, ()):
+                raise ValueError(
+                    f"Typ {typ_wpisu} nie może mieć statusu {nowy_status}: wpis opisujący "
+                    f"rzecz DOKONANĄ z etykietą zamiaru jest wewnętrznie sprzeczny. "
+                    f"Użyj jednego z: "
+                    f"{sorted(STATUSY_DOZWOLONE - set(STATUSY_SPRZECZNE[typ_wpisu]))}")
             w["status"] = nowy_status
             # KIEDY zapadła decyzja — bez tego Refleksja (W9) liczyła wiek wpisu
             # ZAWIESZONEGO od jego UTWORZENIA, więc świeżo podjęta decyzja „odłóż"
@@ -330,7 +343,13 @@ if __name__ == "__main__":
     p_dodaj.add_argument("typ", choices=["WIZJA", "DECYZJA", "POMYSL", "ZMIANA"])
     p_dodaj.add_argument("tytul")
     p_dodaj.add_argument("tresc")
-    p_dodaj.add_argument("--status", default="POMYSŁ")
+    # PUSTY DOMYŚLNY, NIE „POMYSŁ" — naprawa P1 z recenzji cubic PR #139, potwierdzona
+    # uruchomieniem: `dodaj ZMIANA "x" "y"` padało z ValueError, bo argparse zawsze
+    # podstawiał niepusty „POMYSŁ", więc wyrażenie `status or STATUS_DOMYSLNY.get(typ)`
+    # NIGDY nie sięgało po kanon (ZMIANA→WDROŻONA, DECYZJA→ZAMKNIĘTA) i leciało wprost
+    # na bramkę sprzeczności. Efekt: bramka broniąca spójności rejestru BLOKOWAŁA
+    # poprawne użycie rejestru, a `STATUS_DOMYSLNY` był martwy na całej ścieżce CLI.
+    p_dodaj.add_argument("--status", default="")
     p_dodaj.add_argument("--rezim", default="")
 
     p_lista = sub.add_parser("lista", help="Pokaż wszystkie wpisy")

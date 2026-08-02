@@ -619,7 +619,15 @@ def _warstwa_24_hooki_wykonywalne(sciezka_settings=None, tryby_gita=None):
         with open(sciezka, encoding="utf-8") as f:
             ustawienia = _json.load(f)
     except FileNotFoundError:
-        return [], ["Hooki (W24): brak .claude/settings.json — nie ma czego pilnować"]
+        # BŁĄD, NIE INFORMACJA — naprawa P1 z recenzji cubic PR #139. Brak tego pliku nie
+        # znaczy „nie ma czego pilnować", tylko „WSZYSTKIE hooki projektu są wyłączone":
+        # CUSTOS LIMINIS, VIGIL, EXACTOR, sync pamięci. Poprzednia wersja przepuszczała
+        # taki stan jako zielony audyt, czyli bramka zatwierdzała repozytorium z martwą
+        # obroną — dokładnie ta klasa, którą sama W24 miała łapać (hooki bez bitu +x były
+        # martwe na Unixie i też nikt nie krzyczał). Cisza o braku obrony JEST alarmem.
+        return ([f"[W24] BRAK {os.path.relpath(sciezka, ROOT)} — wszystkie hooki projektu "
+                 f"są nieaktywne (CUSTOS LIMINIS, VIGIL, EXACTOR, sync pamięci). "
+                 f"To nie jest 'nie ma czego pilnować', to jest 'obrona wyłączona'."], [])
     except (OSError, ValueError) as e:
         return [f"[W24] Nie mogę odczytać .claude/settings.json: {e}"], []
 

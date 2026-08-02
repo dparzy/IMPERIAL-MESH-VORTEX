@@ -3,7 +3,7 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-07-29
+stan_na: 2026-08-02
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +11,267 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-08-02 | 📐 | MATURITAS — doktryna loop/graph dostała MIERNIK (rozkaz Cezara)
+
+Rozkaz: „dopiszcie do apertio i clausura, żebyśmy pilnowali i weryfikowali stany
+prompt/loop/graph, poziom rozwinięcia i domknięcia". **Sam krok w checkliście byłby
+zasadą bez mechanizmu** — czyli tą klasą, którą tego samego dnia złapaliśmy przy
+kontrakcie append-only. Krok ma WOŁAĆ POMIAR, nie prosić o refleksję.
+
+**Nie nowy byt (Prawo XVI):** `docs/INGENIUM_IQ_IMPERII.md` projektuje CENZORA ROZUMU od
+2026-07-29 i **nie miał ani linii kodu**. MATURITAS jest jego **pierwszą ŻYWĄ kategorią**
+(ósmą: PIĘTRO INŻYNIERII), zbudowaną wg zasad nienaruszalnych z §3 tamtego dokumentu.
+
+| Piętro | Co pyta | Pierwszy pomiar |
+|---|---|---|
+| **PROMPT** | czy specyfikacja jest zdrowa i nie puchnie | **3/4** — CLAUDE.md 259 linii > 200 |
+| **LOOP** | czy pętle się **domykają** | **3/4** — ROADMAP domknięty w **16,2%** (11/68), 34 sugestie i 367 wizji bez werdyktu |
+| **GRAPH** | czy graf istnieje / działa / **DECYDUJE** | **3/4** — 234 węzły, 1680 krawędzi, 5 czytelników, **0 przy decyzji** |
+
+**Rozstrzygnięcie progów:** poziom nie przeskakuje niespełnionego progu. **GRAPH 4/4
+znaczy JEDNO — graf czytany PRZY DECYZJI**; niższe progi mierzą rozmiar, nie pożytek.
+
+**Zasady, które czynią z tego miernik, a nie laurkę:** `NIEZNANE` jest wynikiem (brak
+odczytu grafu ≠ graf pusty); **antywskaźnik obowiązkowy** przy każdym piętrze (jak je
+oszukać); migawki dają **DELTĘ**, bo stan bez historii nie mówi, czy idziemy w górę;
+**lustro, nie kierownica** — `test_organ_nie_jest_wpiety_w_sciezke_decyzyjna` pilnuje
+MECHANIZMEM, że żaden moduł ścieżki decyzyjnej go nie importuje (Goodhart).
+
+**Dwie liczby złapane w trakcie budowy — kłamał mój przyrząd:** graf pokazywał `NIEZNANE`
+(zły odczyt API), a warstwy audytu **15 zamiast 24**, bo `def _warstwa_\d+` nie widzi
+warstw żyjących w helperach. Miara liczy teraz **znaczniki `[W..]`**, czyli to, co audyt
+naprawdę egzekwuje. Oba przypadki mają test regresyjny.
+
+**Konstytucja:** nowy krok **5b w OTWARCIU** i **5c w KOŃCU SESJI**. Pieczęcie
+podchwyciły je natychmiast (apertio 7→8 kroków, clausura 11→12) **bez zmiany kodu sigli** —
+żelazna zasada „pieczęć czyta kroki z CLAUDE.md, nie przechowuje ich" zadziałała.
+
+**Pliki:** `imperium/oczy/maturitas.py` (nowy), `tests/test_maturitas.py` (12 testów),
+`CLAUDE.md` (kroki 5b/5c), `docs/INGENIUM_IQ_IMPERII.md`, `docs/ARCHITEKTURA_IMPERIUM.md`,
+`docs/CENSUS_ORGANORUM.md`, `bibliotheca_ulpia/dane/maturitas_migawki.jsonl` (nowy ledger).
+
+---
+
+## 2026-08-02 | ⚖️ | VINDEX — obrońca zapisu (rozkaz Cezara, zakres B)
+
+Pytanie Cezara o watchdog odsłoniło lukę większą niż samo pytanie: **kontrakt
+„append-only" jest deklarowany w docstringach co najmniej sześciu organów
+(`codex_notarum`, `index_falsorum`, `dziennik_niesmiertelny`, Scriba Codex…) oraz
+w nagłówku tego pliku — i egzekwowany przez ZERO mechanizmów.** Zasada zapisana,
+mechanizmu brak: ta sama klasa co runbook W11.
+
+Stawka nie jest formalna. `rejestr_testow.jsonl` to źródło prawdy **pomiarów**, na
+których stoją decyzje o składzie roju. Dowód, że rzecz nie jest teoretyczna: `bc4913c`
+usunął z `index_falsorum` wpis mający już wypełnione pole `wycofane` — nagrobek, który
+miał „zostać na zawsze". Wpis wrócił później dopisany na nowo, więc szkoda się nie
+utrwaliła, ale **przez sześć dni nikt tego nie zauważył, bo nic nie patrzyło**.
+
+### Kontrakty z POMIARU, nie z nazw plików
+
+Kalibracja na `git log --numstat`: **883 commity, 254 dotykające ledgerów.**
+
+| Klasa | Zmierzone zachowanie | Werdykt |
+|---|---|---|
+| **ŚCISŁY** | zero usunięć w całej historii (`dziennik` 140 commitów, `codex_notarum` 29, `tiro_pary` 28) | 🚨 alarm |
+| **KORYGOWALNY** | usunięcia rzadkie i uzasadnione (`rejestr_testow` 1/48 — migracja Scriby; `ksiega_wad` 2/57 — naprawa martwych wzorców) | ⚠️ pytanie o powód |
+| **MUTOWALNY** | zmiana wpisu jest SENSEM ledgera (`wizje_i_decyzje` — status POMYSŁ→WDROŻONA; `procedury` — runbooki W11) | · cisza |
+
+**Odzywalność: 2,0%** (5 z 254 commitów). EXACTOR v1 dla porównania krzyczał na 80%
+i dlatego był tapetą — strażnik czytany to strażnik, który milczy, gdy nie ma sprawy.
+
+### Druga luka, załatana przy okazji
+
+Matcher VIGILA to `Write|Edit|NotebookEdit` — **plik tworzony lub zmieniany komendą
+powłoki był niewidzialny** (`python skrypt.py > plik`, `cp`, rozpakowanie archiwum).
+Stąd nowy hook `PostToolUse: Bash|PowerShell` → `.claude/hooks/post-bash.sh` (~0,36 s).
+W automacie zasięg wąski: obce pliki bada bramka, bo plik roboczy jest nieśledzony aż
+do `git add` — inaczej strażnik krzyczałby na każdy plik, który sam właśnie tworzę
+(złapane na sobie: `vindex.py` był pierwszym obcym plikiem, jaki ten organ zgłosił).
+
+**Granica ZMIERZONA i jawna:** dokumenty ACTA `.md` **nie** są sądzone miarą liniową —
+zmiana `stan_na:` we frontmatterze to też „usunięta linia", a `LOG_ZMIAN` ma ich 330 na
+379 commitów. Objęcie ACTA tą miarą zbudowałoby generator fałszywek, więc stoją w polu
+`niepokryte`, jak krok 9 u EXACTORA.
+
+**Droga na graf** (doktryna Cezara z tego dnia): `krawedzie()` wydaje werdykty jako
+relacje `(plik) —[naruszenie|korekta]→ (commit)` z klasą i powodem — materiał na węzły
+grafu W8, a nie płaski wpis do jednorazowego przeczytania.
+
+**Pliki:** `imperium/pretorianie/vindex.py` (nowy), `tests/test_vindex.py` (18 testów),
+`.claude/hooks/post-bash.sh` (nowy, `100755`), `.claude/settings.json`,
+`docs/ARCHITEKTURA_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md` (257→258).
+
+---
+
+## 2026-08-02 | 🔧 | G1 — DŁUG P1 RECENZJI cubic PR #138 (E3/E5/D2/D4) + wada złapana na żywo
+
+Cztery wady dostarczone trzy dni wcześniej, plus piąta znaleziona dopiero **realnym
+użyciem**. Każda naprawa ma test granicy, a każdy test sprawdzony **mutacją** (5/5
+złapanych) — zielony test na naprawionym kodzie sam z siebie niczego nie dowodzi.
+
+| Wada | Co było | Dlaczego to ważyło |
+|---|---|---|
+| **E3** `exactor.py` | `(\S+)` pochłaniało domykający separator, więc gałąź z bloku brzmiała `<gałąź>;` | werdykt „cudza gałąź" dla komendy **bezbłędnej** — a hook `Stop` na tym **blokuje**. Strażnik karałby za blok gotowy do wklejenia |
+| **E5** `exactor.py` | `cd {korzen}` bez cytowania — ścieżka ze spacją rozbijała komendę | siostra E6: organ, którego powodem istnienia jest niekompletny blok push, **sam** produkował niewykonalny |
+| **D2** `discriminator.py` | `range(od, len(bary))` nigdy nie wołało `zbuduj` z pełnym wycinkiem | **najświeższy bar — ten, na którym rój głosuje w produkcji — nie był badany ani razu**; licznik zapowiadał tyle kroków, ile faktycznie wykonano, więc wada była niewidoczna |
+| **D4** `discriminator.py` | ujemne `od` przyjmowane | `bary[:-5]` i `bary[:0]` — wynik **wygląda** jak pomiar, a mierzy co innego, niż deklaruje |
+| **+1 znaleziona na żywo** | pasek postępu na `stdout` razem z wynikiem | `--json` był **niesparsowalny** — organ psuł własny wydruk. Nie złapał tego żaden test, bo testy czytały funkcje, nie CLI |
+
+### Pomiar, nie deklaracja (LEX TALARUS)
+
+**EXACTOR — kalibracja nienaruszona.** A/B starych i nowych wzorców na tym samym
+korpusie kroniki (149 sesji, **76** meldunków zawierających `git push`): **zero**
+zmienionych werdyktów, zero różnic nawet w samej liście gałęzi. Uczciwe dopowiedzenie:
+wada E3 **nie miała historycznej ofiary** — 5 wystąpień `git push origin <gałąź>;`
+siedzi wewnątrz pętli retry, po `{`, czyli poza pozycją polecenia, gdzie **żaden**
+z wzorców (stary ani nowy) ich nie widzi. Naprawa jest **prewencyjna i potwierdzona
+mutacją**, nie retrospektywna. ⚠️ Liczba 76 nie jest tym samym podziałem co „190
+meldunków / 156 przekazań" z kalibracji 2026-07-30 — tamten korpus dzielono inaczej
+i **nie odtworzyłem go**; porównanie A/B jest wewnętrznie spójne (ten sam tekst po obu
+stronach), ale nie jest powtórzeniem tamtego pomiaru.
+
+**DISCRIMINATOR — werdykt bez zmian.** Powtórka biegu (BTCUSDT 4h, 800 barów, 360
+rozgrzewki): **441** kroków zamiast 440, `X-05 ↔ XII-02` **r = 0,8218** wobec bazy
+**0,8217**. Identyczne 17 skupisk / 125 par / 1 kandydat / 27 milczących / 0 awaryjnych.
+D2 usuwa **klasę** wady, nie zmienia wniosku o składzie roju.
+
+**Pliki:** `imperium/pretorianie/exactor.py`, `imperium/legiony/discriminator.py`,
+`tests/test_exactor.py`, `tests/test_discriminator.py` (`zbierz_serie` nie miała dotąd
+**ani jednego** testu — obie wady siedziały właśnie w jedynej funkcji dotykającej barów,
+co samo w sobie jest lekcją o zasięgu bramki), `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`
+(+5), `bibliotheca_ulpia/dane/rejestr_testow.jsonl` (+1 POMIAR).
+
+---
+
+## 2026-08-02 | 🛡️ | P2 — UODPORNIENIA PRZECIW KLASOM (a nie łatanie objawów)
+
+P0 naprawiło pięć wad. P2 pyta o coś innego: **dlaczego mogły powstać** i co sprawi, że
+ta klasa nie wróci. Trzy mechanizmy + jedna granica świadomie zostawiona.
+
+### W24 — hook bez bitu wykonywalności (nowa warstwa audytu)
+
+Cubic wskazał `stop.sh`. Pomiar całego katalogu: **3 z 5** hooków miało `100644`, w tym
+`pre-tool-use.sh` (CUSTOS LIMINIS) i `post-tool-use.sh` (VIGIL) — dwaj strażnicy wdrożeni
+tydzień wcześniej byli na Unixie martwi. Warstwa czyta deklaracje z `settings.json`
+i sprawdza tryb **w indeksie gita, nie w systemie plików**: na Windowsie `os.access(X_OK)`
+zwraca prawdę zawsze, więc warstwa oparta o FS byłaby ślepa dokładnie na naszej maszynie.
+Pomija komendy typu `bash skrypt.sh` (interpreter nie potrzebuje bitu) — fałszywy alarm
+uczy ignorowania strażnika.
+
+### W19 — alias „Ostatnia aktualizacja:" (rozszerzenie parytetu dat)
+
+`PAMIEC_SESJI.md` miał **trzy różne daty naraz**: `stan_na: 2026-07-18`, nagłówek
+`2026-07-27` i lekcje sięgające `2026-08-01`. Nie pilnowała ich żadna warstwa: W6b pomija
+pliki z `stan_na` (przekazuje je Tabularium), a W19 znała wyłącznie frazę „Stan na:".
+Dokument przez pięć dni mówił Cezarowi nieprawdę o własnej świeżości.
+
+Alias wiąże się ze **strukturą**, nie z tekstem — łapie wyłącznie nagłówek `## …`.
+Powód zmierzony na trzech dokumentach: `KATALOG_NEURONOW.md` ma tę samą frazę w cytacie
+jako datę **zdarzenia** („CAŁA baza przeskanowana"), więc szeroki wzorzec dałby tam
+fałszywy alarm. W19 objęła 18 → **20** dokumentów.
+
+### Przyczyna, nie objaw: `pamiec_sesji` aktualizuje teraz OBIE daty
+
+Rozjazd był **gwarantowany**, bo zapis ruszał tylko nagłówek, a `stan_na` zostawiał.
+Automat pisze po każdej sesji, człowiek nie — ręczne przestawienie daty było odroczeniem,
+nie naprawą.
+
+### Rejestr wizji — status wywodzony z typu
+
+Cubic wskazał JEDEN wpis „ZMIANA ze statusem POMYSŁ". Policzenie ledgera: **56 z 1013**
+(44 × ZMIANA+POMYSŁ, 12 × DECYZJA+POMYSŁ). Źródła były dwa i oba były wartościami
+domyślnymi: `dodaj(status="POMYSŁ")` jako stała dla wszystkich typów oraz fallback
+w `auto_lekcja` po `ValueError`, wpisujący twarde „POMYSŁ" niezależnie od typu.
+
+Status domyślny jest teraz **wywodzony z typu** i odtwarza kanon zmierzony w tych samych
+danych (ZMIANA→WDROŻONA 444, DECYZJA→ZAMKNIĘTA 201, POMYSŁ→POMYSŁ 200, WIZJA→PLANOWANE
+111 — **94,5% rejestru**), więc reguła opisuje to, co rejestr i tak robi, a nie gust
+autora. Do tego wąska bramka: `ZMIANA`/`DECYZJA` + `POMYSŁ` → `ValueError`. Historia
+pozostaje nietknięta (Prawo I — nie falsyfikujemy przeszłości).
+
+### CUSTOS LIMINIS — granica ZNANA i świadomie NIENAPRAWIONA
+
+Strażnik zablokował mi zapis pliku, w którego treści stało `; git push origin`. Formalnie
+**miał rację**: cała zawartość heredoca jest częścią komendy Bash, więc token po
+separatorze wygląda jak polecenie. Moja pierwsza diagnoza („reaguje na wzmiankę, nie na
+polecenie") była **błędna** — CUSTOS ma regułę pozycji polecenia od 2026-07-28.
+
+Nie naprawiam, bo wyłączenie heredoca z analizy otwiera realny wektor obejścia: `bash
+<<EOF` zawartość **wykonuje**. Koszt fałszywki: jedna tura, obejście istnieje (Write),
+a twardą barierą jest `permissions.deny`. Zapisane jako granica + reguła operacyjna:
+**pliki o treści shell-podobnej pisz narzędziem Write, nigdy heredocem.**
+
+### Dowód (LEX TALARUS)
+
+Bramka **3282 → 3296** (zmierzone: deklarowanych 3296 = zdanych 3296, czerwonych 0),
+audyt exit 0 na 24 warstwach. Pierwszy bieg był **czerwony na jednym teście** —
+`test_rejestr_wizji_dodaj_i_czytaj` bronił starego kontraktu (`WIZJA` bez statusu →
+`POMYSŁ`). Test zaktualizowany **z uzasadnieniem pomiarowym**, bo kontrakt zmieniono
+świadomie; kanon dla WIZJI to `PLANOWANE` (111 ze 111 wystąpień). **Mutacja 5/5**: każdy mechanizm
+cofnięto i sprawdzono, że test czerwienieje — w tym mutacja aliasu na „frazę gdziekolwiek"
+(test fałszywego alarmu zadziałał) oraz cofnięcie domyślnych statusów, które **wywróciło
+bramkę sprzeczności**, czyli oba mechanizmy trzymają się nawzajem. 5 nowych klas
+semantycznych w Księdze Wad.
+
+**Pliki:** `narzedzia/audyt_spojnosci.py`, `imperium/biblioteki/rejestr_wizji.py`,
+`imperium/biblioteki/pamiec_sesji.py`, `narzedzia/auto_lekcja.py`,
+`tests/test_spojnosc.py`, `tests/test_rejestr_wizji_status.py`,
+`tests/test_pamiec_sesji.py`, `docs/PAMIEC_SESJI.md`, `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`.
+
+---
+
+## 2026-08-02 | ⚖️ | SĄD NAD RECENZJĄ cubic PR #138 — P0 (pięć wad P1) naprawione
+
+**Pierwsza recenzja zewnętrzna, która naprawdę objęła wachtę.** RECOGNITOR potwierdził
+pokrycie: recenzja z 31.07 03:31 stoi na `4cb694b`, a cały kod merytoryczny (`ea9fe90`
+EXACTOR, `f71fdf0` hook Stop, `5be5440` DISCRIMINATOR) powstał wcześniej tej nocy.
+Niezrecenzowane zostały wyłącznie dwa commity `auto: sync pamięci` — zero linii `.py`.
+Dla kontrastu PR #137 był samym „Summary by cubic", czyli opisem moich zmian bez uwag.
+
+### Werdykt sądu: 18 słusznych / 1 odrzucona / 1 odłożona do pomiaru
+
+| naprawione w P0 | co było |
+|---|---|
+| **E1** `exactor.py` | wzorzec ścieżki wymagał litery dysku → na Linuksie organ **odrzucał blok, który sam wygenerował** |
+| **E6** `exactor.py` | przy detached HEAD `blok_push()` dawał `git push origin ` — komendę niewykonalną, podaną jako gotowa do wklejenia. Teraz `BrakGalezi` |
+| **E7** `exactor.py` | `kotwica_osierocona` wpadała do gałęzi „różny od niespełnionego" → hook **milczał dokładnie wtedy, gdy jego kontrakt z konstytucją przestawał obowiązywać** |
+| **D3** `discriminator.py` | wyjątek z `interpretuj` zapisywany jako `0.0`, nieodróżnialny od uczciwego NEUTRAL → awaria trwała udawała „cichy neuron". Teraz `None` + usuwanie parami + licznik awarii |
+| **S1** hooki | `stop.sh` bez bitu `+x` |
+
+**Odrzucona: E2** (regex nieświadomy cudzysłowów) — teoretycznie prawdziwa, ale mam pomiar
+**0 fałszywek na 190 meldunkach**; parsowanie quotingu powłoki to złożoność bez zmierzonej
+korzyści (Prawo XVI). **Odłożona: E4** (krok 4b przechodzi przy jednej nazwie sługi) —
+zarzut trafny, ale ta powinność **nie jest skalibrowana**; zaostrzenie progu bez prawdy
+podstawowej byłoby dokładnie tym, za co powstał talar N-b74ce133. Idzie do Backlogu CODEX.
+
+### Czego recenzent NIE dopowiedział (rozszerzenia z własnego pomiaru)
+
+- **S1 to nie jeden plik, tylko trzy:** `stop.sh`, `pre-tool-use.sh`, `post-tool-use.sh`
+  miały `100644`, a `session-start/end.sh` `100755`. Na Unixie **3 z 5 hooków nie odpalały
+  się wcale** — w tym CUSTOS LIMINIS i VIGIL. Recenzent widzi wyłącznie diff.
+- **D1 wpadło razem z D3** (ta sama funkcja, ten sam warunek): próg `MIN_PROBEK`, bo przy
+  0–1 obserwacji „stały głos" jest artefaktem długości serii, nie własnością neuronu.
+- **`zip(strict=True)`** w `ocen_pare` — rozjazd długości serii przestał być cicho ucinany.
+
+### Dowód, nie deklaracja (LEX TALARUS)
+
+- testy: **64/64** w obu modułach (53 przed wachtą + 11 nowych granic)
+- **mutacja 6/6** — każdą naprawę cofnięto i sprawdzono, czy test czerwienieje. Pierwszy
+  przebieg dał **5/6**: `test_awaria_nie_udaje_glosu_neutral` był ŚLEPY, bo dobrałem dane,
+  na których `None→0.0` nie zmienia werdyktu. Dane poprawione, mutacja złapana.
+- **żywe dane** (BTCUSDT 4h, 800 barów, 440 kroków): wynik **odtworzony** — 17 skupisk,
+  125 par, jeden kandydat `X-05 ↔ XII-02` **r=0,8217**, 27 milczących, **0 awaryjnych**.
+  Czyli D3 była wadą **latentną**: mogła skazić przyszły pomiar, nie skaziła tego.
+  Pierwszy bieg z 31.07 pozostaje ważny.
+- ruff czysto, skan wad czysto, 6 nowych klas semantycznych w Księdze Wad (bez regexu —
+  szum niezmierzony), POMIAR dopisany do `rejestr_testow.jsonl`.
+
+**Pliki:** `imperium/pretorianie/exactor.py`, `imperium/legiony/discriminator.py`,
+`tests/test_exactor.py`, `tests/test_discriminator.py`, `.claude/hooks/*.sh` (tryb),
+`bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`, `bibliotheca_ulpia/dane/rejestr_testow.jsonl`.
 
 ---
 

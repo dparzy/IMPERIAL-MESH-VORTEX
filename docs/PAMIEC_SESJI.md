@@ -1,10 +1,10 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-28
+## Ostatnia aktualizacja: 2026-08-02
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
-stan_na: 2026-07-18
+stan_na: 2026-08-02
 powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360)"
 ---
 # PAMIĘĆ SESJI — W-360
@@ -113,23 +113,26 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Brak gh i tokenów uniemożliwia PR przez API
+GitHub CLI nie jest zainstalowany, a w środowisku brak GH_TOKEN/GITHUB_TOKEN — utworzenie PR przez API jest niemożliwe. Dodatkowo 'gh auth login' jest interaktywny (przeglądarka + kod) i nie może być uruchomiony z harnessa Claude. Auth musi wykonać Cezar w terminalu.
+
+### 2026-07-27 — Testy Warstwy 6 padają przy nieaktualnej dacie 'Stan na:'
+Audyt spójności (Warstwa 6) zgłasza błąd, gdy README.md lub docs/MANIFEST_KODU.md deklarują 'Stan na:' starszą niż data ostatniego commitu. Zgodnie z Regułą 9 Prawa XXI to błahostka — naprawiana samodzielnie, bez eskalacji do Cezara.
+
+### 2026-08-01 — Heredoc gubi backslash — instrument kłamie
+Regex przekazany przez heredoc tracił backslash, co fałszowało wyniki; przejście na skrypty plikowe. Testy złapały 2 bugi: inline 'cd …; git push' i noun-first closure. Dodano testy graniczne dla fałszywych pozytywów z cytowania w prozie.
+
+### 2026-08-01 — Regex w heredoc gubi backslash — instrument kłamie, nie dane
+Przy budowie CORONY regex przez heredoc stracił backslash; przejście na skrypty plikowe ujawniło dwa realne bugi (inline 'cd …; git push', fraza rzeczownikowa) i dwa fałszywe alarmy na cytatach w prozie. Dodano testy graniczne.
+
 ### 2026-07-28 — MEXC ✗ – brak realnych orderów i pętla P&L niezamknięta
 System nie ma połączenia z MEXC, więc roj jest tylko backtestowany. Największa luka Imperium – pętla P&L→wagi nie działa.
 
 ### 2026-07-28 — MEXC ✗ – pętla P&L→wagi wciąż nie zamknięta w żywym rynku
 Rój jest backtestowany, 87 neuronów, 22 warstwy audytu, ale brak realnych orderów przez MEXC. To największa luka Imperium: mierzymy tanie, bo drogie jest trudne. Efekt latarni działa.
 
-### 2026-07-28 — BIB-011 w języku chińskim – niewyszukiwalna w RAG przez brak segmentacji CJK
-Plugin BIB-011 (algorytmiczny trading) jest chińskim tłumaczeniem. 78.3% znaków to CJK. FTS5 tokenizer 'unicode61' nie segmentuje chińskiego – cały ciąg CJK to jeden token. Dodatkowo chunker tnie po whitespace, co nie działa dla tekstu bez spacji. Książka jest martwa w RAG, niewyszukiwalna.
-
-### 2026-07-28 — Fałszywy alarm INDEX FALSORUM – strażnik nie rozpoznawał rzeczownika 'obalenie'
-KOREKTA_JAWNA znała imiesłów 'obalon', ale nie rzeczownik 'obalen' → strażnik zgłaszał własną dokumentację jako kłamstwo. Lekcja: fałszywe zatrzymanie uczy obchodzić strażnika, nie jest bezpieczną stroną błędu. Naprawiono testem granicy przez mutację.
-
 ### 2026-07-27 — Rozwój LLM to skoki po pomiarze, nie nauka w locie
 Model ma zamrożone wagi po treningu. Rozwój osiąga się przez RAG (natychmiastowa pamięć) i cykliczne dotrenowanie LoRA po egzaminie na arenie. Awans tylko po zielonym pomiarze.
-
-### 2026-07-27 — RTX 4050 laptop ma 6 GB VRAM – ograniczenia lokalnego treningu
-Acer Nitro z RTX 4050 pozwoli trenować LoRA na modelu 7-8B lokalnie i uruchamiać inferencję, ale nie trenować dużych modeli od zera. Ciężki trening zostaje na Colabie. CENSOR wykryje CUDA i podniesie alarm.
 
 ### 2026-07-27 — Zastosowane zasady projektowe: SYMBIOZA, Prawo XVI, Test-Granic
 Wdrożenie respektowało ZASADĘ SYMBIOZY (zmiana nie izolowana), Prawo XVI (jedno źródło prawdy dla wag IC), Regułę Test-Granic (testowanie co może pójść źle).
@@ -164,14 +167,8 @@ W petla_live.py brakowało bloku __main__, co blokowało pętlę live przy rutyn
 ### 2026-07-27 — Bug FTS na myślnikach – ciche ginięcie tematów
 W FTS bibliotekarza bug crash na myślnikach powodował ciche giniecie tematów (np. 'momentum trend-following'). Naprawiony przez _fts_bezpieczne.
 
-### 2026-07-27 — PAMIEC_ABSOLUTNA.md kłamie o API
-Dokument deklaruje nieistniejące metody kronikarz.zapytaj, porownaj_okresy, replay_sesji — kod ma tylko zapisz(RunReport). Lekcja: każda deklaracja API w dokumencie musi być zweryfikowana z kodem.
-
 ### 2026-07-27 — 43 cząstki Hyginusa bez sędziego (zapłacony zwiad niewykorzystany)
 Kolejka Hyginusa zawiera 43 cząstki czekające na sąd (poprzednio 33). To zapłacony, ale niewykorzystany zwiad, co narusza Prawo XV. Priorytet najniższy (ostatnie w kolejce).
-
-### 2026-07-26 — Brakujące reżimy w systemie narracyjnym
-Zidentyfikowano, że reżim SPOT_CASH i FUTURES nie są zdefiniowane w systemie narracyjnym (missing regime definitions). Występują tylko w sygnaturze systemu.
 
 ### 2026-07-29 — Wrażliwość interwału na wielkość liter zmienia decyzje
 Etykieta interwału (np. '4h' vs '4H') jest case-sensitive w Legatus._formacja_interwalu - cicho zmienia wyniki backtestu. Przyczyna: słownik mapujący interwały. Naprawiono przez dodanie aliasów i normalizację.
@@ -329,9 +326,6 @@ W7 audyt markerował zewnętrzne URL zawierające '.md' w domenie (np. www.mdpi.
 ### 2026-06-30 — Dekorelacja V-13 i V-14 potwierdza dywersyfikację
 Korelacja między NeuronChoppiness (V-14) a poprzednim wskaźnikiem zmienności |r|=0.05–0.27, co spełnia Prawo XVI (unikamy redundancji).
 
-### 2026-06-30 — Brak pola kategoria na SygnalNeuronu uniemożliwiał agregację wag reżimu
-Pole 'kategoria' nie istniało w SygnalNeuronu, przez co WAGI_REZIMU były martwym kodem. Dodano pole i przekazywanie z KATEGORII neuronu – teraz wagi reżimu działają poprawnie.
-
 ### 2026-06-30 — Brak Stan na: w W6 to błąd, nie pominięcie
 Audyt spojności W6 milcząco pomijał bloki bez 'Stan na:'. Dodano jawne else zgłaszające błąd. RegExp rozszerzony o markdown `**Stan na:**`.
 
@@ -358,9 +352,6 @@ Strategie używają formatu 'M5', a interwał z backtestu po .upper() daje '5M'.
 
 ### 2026-06-30 — Brama Kalkulatora wymaga TA-Lib do startu
 CalculatorGateway celowo odmawia startu bez TA-Lib (Prawo I - Zero halucynacji). Każde obliczenie logowane z SHA-256 audit stamp (Prawo XIII).
-
-### 2026-06-30 — Słabość ręcznego parametru reżimu
-Przetestowano 3 scenariusze rynkowe — system wymaga automatycznego klasyfikatora reżimu, bo ręczne ustawianie jest zawodne i nie skalowalne.
 
 ### 2026-06-30 — Audyt W6: brak Stan na = błąd, markdown tolerowany
 Dodano else dla braku 'Stan na:'. Regex toleruje **Stan na:** data.

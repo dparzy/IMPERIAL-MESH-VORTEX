@@ -196,7 +196,12 @@ def _zapisz_wyniki(wyniki: List[Dict[str, Any]], data_sesji: str) -> int:
             try:
                 dopisano = _rw.dodaj(typ, tytul, tresc, status=status, rezim=rezim, data=data_sesji)
             except ValueError:
-                dopisano = _rw.dodaj(typ, tytul, tresc, status="POMYSŁ", data=data_sesji)
+                # FALLBACK BEZ STATUSU (2026-08-02), nie na twarde „POMYSŁ". Tu powstawało
+                # 56 z 1013 wpisów sprzecznych ze sobą: gdy model podał status spoza słownika
+                # (albo sprzeczny z typem), ratunek nadawał etykietę ZAMIARU nawet wpisowi
+                # typu ZMIANA opisującemu rzecz zrobioną. Rejestr sam zna właściwą wartość
+                # domyślną dla typu — niech ją poda, zamiast zgadywać tutaj.
+                dopisano = _rw.dodaj(typ, tytul, tresc, data=data_sesji)
             if not dopisano:
                 # POMINIĘCIE MUSI BYĆ WIDOCZNE (Prawo XV), tak samo jak dla lekcji wyżej.
                 # Od 2026-07-26 rejestr wizji dedupuje SEMANTYCZNIE, nie po napisie —

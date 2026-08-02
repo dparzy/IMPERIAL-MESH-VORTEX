@@ -322,7 +322,11 @@ def test_rejestr_wizji_dodaj_i_czytaj(tmp_path):
     assert len(wpisy) == 1
     assert wpisy[0]["typ"] == "WIZJA"
     assert wpisy[0]["tytul"] == "Portfel 20 par"
-    assert wpisy[0]["status"] == "POMYSŁ"
+    # ZMIANA KONTRAKTU 2026-08-02 (świadoma, nie naginanie testu do kodu): status domyślny
+    # jest WYWODZONY Z TYPU, bo jedna stała „POMYSŁ" dla wszystkich typów rodziła wpisy
+    # sprzeczne ze sobą — 56 z 1013 w ledgerze (ZMIANA/DECYZJA z etykietą zamiaru).
+    # Dla WIZJI kanon zmierzony w tych samych danych to PLANOWANE (111 z 111 wystąpień).
+    assert wpisy[0]["status"] == "PLANOWANE"
 
 
 def test_rejestr_wizji_zmien_status(tmp_path):

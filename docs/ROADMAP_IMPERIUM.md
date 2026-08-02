@@ -2,7 +2,7 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
-stan_na: 2026-07-30
+stan_na: 2026-08-02
 powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii."
 ---
 # 🏛️ ROADMAP IMPERIUM — MAPA DRÓG SYSTEMU
@@ -14,7 +14,7 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 ---
 
-## 🗓️ PLAN WACHT — operacyjna kolejka zadań (stan 2026-07-30)
+## 🗓️ PLAN WACHT — operacyjna kolejka zadań (stan 2026-08-02)
 
 > **Czym to jest, a czym nie:** FAZY 0–4 niżej to mapa STRATEGICZNA (dokąd zmierzamy).
 > Ta sekcja to kolejka OPERACYJNA — co robimy w najbliższych wachtach, w kolejności.
@@ -23,6 +23,57 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 > zwiad → pomiary → symbioza). Pozycja bez kalibracji przyrządu **nie jest skończona**.
 
 **Legenda stanu:** ✅ zrobione · 🟡 kod jest, brak dowodu · 🔴 nie istnieje · ⏸️ świadomie odłożone
+
+### WACHTA H — DOMYKANIE PĘTLI *(kolejność = rekomendacja po skanie Imperium 2026-08-02)*
+
+> **Diagnoza ze skanu całego Imperium (rozkaz Cezara 2026-08-02, liczby z żywych źródeł):**
+> Imperium ma **znakomite wykrywanie i budowanie, a słabe ZAMYKANIE**. ROADMAP: 51 z 61
+> pozycji otwartych (84%). Rejestr wizji: **367 bez rozstrzygnięcia** (256 POMYSŁ + 111
+> PLANOWANE), najstarsze z **30.06** — 34 dni. Wrzutnia: 82 pliki. Hyginus: 35 cząstek
+> bez sędziego. Jedyna kategoria BEZ długu: TODO/FIXME w kodzie ≈ **0** (13 trafień to
+> `HACK` jako typ zdarzenia rynkowego).
+>
+> **⚠️ SPROSTOWANIE W TRAKCIE SKANU (Prawo I — kłamał mój przyrząd, nie system):** pierwszy
+> przebieg zgłosił „55 sugestii, ZERO zamkniętych, `zamknij_sugestia()` nigdy nie wołana".
+> **Było to FAŁSZYWE** — skaner filtrował status `ZAMKNIETA` (końcówka żeńska), a ledger
+> zapisuje `ZAMKNIETE`. Prawda z ledgera: 55 rekordów = **45 unikalnych sugestii**, statusy
+> `ZAMKNIETE` 8 · `ZREALIZOWANE` 2 · `ZABLOKOWANE` 1 · `CZESCIOWO` 1 · `STALE` 1 ·
+> `OCZEKUJE decyzji Cezara` 2 · `KANDYDAT` 40; dziesięć elementów ma po dwa rekordy, czyli
+> **mechanizm zamykania działa i był używany**. Otwartych realnie **35**. Wniosek o słabym
+> zamykaniu zostaje w mocy (35 otwartych, najstarsze z 18.07), ale jego uzasadnienie jest
+> słabsze, niż brzmiał pierwszy alarm — i tak ma być zapisane.
+
+| # | Zadanie | Stan | Dlaczego w tej kolejności |
+|---|---|---|---|
+| H0 | **VERITAS — sąd nad `Imperium-Botów-Tradingowych 1.md`** (wrzutnia): ocena wszystkich wersji, **sprawdzenie KAŻDEGO linku, repo i propozycji** | 🔴 **ROZKAZ CEZARA — pierwsze zadanie następnej wachty** | Skala ZMIERZONA przed przyjęciem: wersja rozszerzona ma **13 820 linii / 842 KB / 230 unikalnych linków** (poprzednia: 7 267 linii / 452 KB / 141). Nie mieści się w jednej turze → **partiami, z paskiem postępu i wznawialnie** (Prawo XXIV: nigdy jeden wielki blokujący bieg). Kolejność: (1) narzędzie sprawdzające linki wsadowo (HTTP), bo 230 ręcznie to szaleństwo i błąd metody; (2) klasyfikacja propozycji na „mamy / nie mamy / obalone"; (3) sąd VERITAS wg zasady **kandydat ≠ prawda** (zmierzone: 39,3% kandydatów Hyginusa twierdziło „nie dubluje" o rzeczy stojącej w kodzie) |
+| H1 | **35 otwartych sugestii CODEX — przejść i zamknąć** istniejącą `zamknij_sugestia()` | 🔴 **REKOMENDACJA #1 po H0** | domyka pętlę **bez pisania ani linijki nowego kodu**. Domykanie jest dziś naszą słabą stroną (ROADMAP domknięty w **16,2%** — pomiar MATURITASA), a A10 to duże zadanie, które lepiej zaczynać z czystą kolejką |
+| H2 | **Warstwa audytu: „sugestia bez werdyktu starsza niż N dni"** | 🔴 | uodpornienie przeciw KLASIE, nie łatanie objawu — inaczej kolejka odrośnie (zasada CENSORA) |
+| H3 | **A10 — zbiór ewaluacyjny z 13 729 haseł** | 🔴 **klucz do całego piętra grafowego** | odblokowuje G4 (graf przy decyzji), A14 (wektory) i domyka K10 w NORMIE. **Bez niego nie ma czym zmierzyć, czy graf pomaga** |
+| H4 | **367 wizji — sąd nad kolejką** (256 POMYSŁ + 111 PLANOWANE) | 🔴 | największy zbiornik niedomkniętych pętli. Uwaga metodyczna: to NIE 367 zadań — rejestr miesza pomysły surowe z planami, więc pierwszym krokiem jest rozdzielenie, nie ocenianie |
+| H5 | **35 cząstek Hyginusa bez sędziego** | 🔴 | zapłacony zwiad bez werdyktu (Prawo XV) |
+| H6 | **VINDEX → graf W8** — krawędzie `(plik) —[naruszenie]→ (commit)` zbierane do grafu | 🔴 | organ od 02.08 **produkuje** krawędzie, których nikt nie zbiera. Tania droga na graf, niezależna od A10 |
+
+### WACHTA G — dług recenzji i piętro pętli *(zaczęta 2026-08-02, kolejność = rekomendacja)*
+
+> Powstała z sądu nad recenzją cubic PR #138 (20 uwag: 18 słusznych, 1 odrzucona, 1 odłożona)
+> oraz z pytania Cezara o **etap inżynierii**. Zmierzony stan: jesteśmy głęboko w **LOOP
+> ENGINEERING** (5 hooków, bramka 24 warstw, SIGILLARIUM, EXACTOR czytający własny meldunek,
+> Księga Wad), a **GRAPH ENGINEERING mamy w zalążku** — graf W8 (234 węzły, 1680 połączeń)
+> karmi raport startowy i `zapominanie.py`, ale **nie wnioskowanie**; RAG jest leksykalny (FTS).
+> Zastrzeżenie: nasza ścieżka decyzyjna handlowa **nie zawiera LLM-a**, więc graf poprawia
+> pamięć Imperium i pracę Architekta — **nie wynik tradingowy**. Mylenie tych dwóch rzeczy
+> byłoby tym samym rozkalibrowaniem, które złapaliśmy przy frazach P1 zwiadu.
+
+| # | Zadanie | Stan | Dlaczego w tej kolejności |
+|---|---|---|---|
+| G1 | **P1 recenzji** — E3 (`\S+` łyka separator w nazwie gałęzi), E5 (spacje w ścieżce łamią `cd`), D2 (pomiar gubi ostatni zamknięty bar), D4 (ujemne `od` przyjmowane) | ✅ **2026-08-02**, +9 testów granic, mutacja **5/5** złapanych | Domknięte wraz z **piątą wadą znalezioną dopiero realnym użyciem**: pasek postępu szedł na `stdout`, więc `--json` był niesparsowalny — organ psuł własny wydruk, a testy tego nie widziały, bo czytały funkcje, nie CLI.<br>**POWTÓRKA WYKONANA:** 441 kroków zamiast 440, `X-05 ↔ XII-02` **r = 0,8218** vs baza **0,8217** — werdykt NIEZMIENIONY (17 skupisk / 125 par / 1 kandydat / 27 milczących / 0 awaryjnych). D2 usuwa KLASĘ, nie zmienia wniosku o składzie roju.<br>**Kalibracja EXACTORA nienaruszona:** A/B starych i nowych wzorców na 76 meldunkach kroniki z `git push` — **zero** zmienionych werdyktów. ⚠️ E3 **nie miał historycznej ofiary** (5 wystąpień `<gałąź>;` siedzi po `{` w pętli retry, poza pozycją polecenia — niewidoczne dla OBU wzorców), więc naprawa jest prewencyjna, potwierdzona mutacją, nie retrospektywna |
+| G1b | **VINDEX — obrońca zapisu** (poza pierwotną kolejką: rozkaz Cezara „watchdog", zakres B) | ✅ **2026-08-02**, 18 testów, commit `b0b986c` | Powstał z pytania Cezara o watchdog, które odsłoniło lukę większą niż samo pytanie: **kontrakt append-only deklarowany w 6+ organach, egzekwowany przez ZERO mechanizmów**. Kontrakty ustalone KALIBRACJĄ na 883 commitach (ŚCISŁY / KORYGOWALNY / MUTOWALNY), odzywalność **2,0%**, recall 3/3 na znanych korektach. Załatana druga luka: matcher VIGILA nie obejmował powłoki, więc plik tworzony komendą był niewidzialny → hook `PostToolUse: Bash\|PowerShell`. Granica JAWNA: ACTA `.md` poza miarą liniową (dałaby 330 fałszywek na 379 commitach `LOG_ZMIAN`) |
+| G2 | **F17 — pole `WYMAGA`/`ZRODLO` w neuronach** | 🔴 | **decyzja Cezara z 2026-07-31**, wyprzedzona przez recenzję. Usuwa CAŁĄ KLASĘ niewiedzy zamiast 27 pojedynczych przypadków: dziś żaden organ nie odróżni „milczy z braku wejścia" od „milczy, bo zepsuty". Nazwa musi być rozłączna z istniejącym `WYMAGA_BAROW` u zwiadowców.<br>➕ **ROZSZERZENIE zmierzone 2026-08-02:** `MECHANIZMY_ZWIADOWCY` (12 wpisów) ma **ZERO czytelników** w całym repo, `_wstrzyknij_mechanizm` obsługuje wyłącznie neurony, a EXP-13/14/15 nie mają wpisu wcale — więc **DISCRIMINATOR i dekorelacja mechanizmowa nie obejmują ani jednego z 15 zwiadowców** (alarm Prawa XV) |
+| G3 | **Reguła behawioralna z recenzji — automat** (praca `2607.13091`, Microsoft, wrzutnia 01.08) | 🔴 | domyka pętlę, którą dziś zamykam RĘCZNIE: zaakceptowana uwaga → trwała reguła. Mamy Księgę Wad, ale wpis robi Architekt. To jest właściwy następny krok **loop engineeringu**, nie graf |
+| G4 | **Graf pamięci czytany PRZY DECYZJI, nie tylko drukowany** | 🔴 | pierwszy realny krok w **graph engineering**: pytanie → sąsiedztwo w W8 → dopiero potem FTS. Wpięcie **opt-in OFF**, walidacja **A/B na zbiorze A10** (RAG sam vs RAG + sąsiedztwo). Bez A10 nie ma czym mierzyć → G4 **czeka na A10** |
+| G5 | **Sąd nad grupą B — 10 prac o grafach wiedzy** (wrzutnia 01.08: Disco-RAG, KAG, ROGRAG, GroundedKG-RAG, agentic KG-RAG/MIT, LLMs+Graphs, Context Graphs, ARIA, swj3854, HuixiangDou) | 🔴 | **kandydaci, nie plan** (zmierzone: 39,3% kandydatów Hyginusa twierdziło „nie dubluje" o rzeczy stojącej w kodzie). Pytanie brzmi „co dokłada się do W8, które STOI", nie „czy grafy są dobre" |
+| G6 | **E4 — kalibracja kroku 4b EXACTORA** (meldunek sług przechodzi przy JEDNEJ nazwie) | ⏸️ | zarzut recenzji **trafny**, ale powinność jest NIESKALIBROWANA. Zaostrzenie progu bez prawdy podstawowej to dokładnie to, za co powstał talar N-b74ce133. Wymaga pomiaru na korpusie 190 meldunków, nie zgadywania |
+| G7 | **CUSTOS LIMINIS — treść heredoca czytana jak polecenie** | ⏸️ ŚWIADOMIE ODŁOŻONE | strażnik **miał rację**: zawartość heredoca JEST częścią komendy Bash. Wyłączenie jej otwiera realny wektor obejścia (`bash <<EOF` zawartość wykonuje). Koszt fałszywki zmierzony: 1 tura; obejście istnieje. **Reguła operacyjna zamiast kodu:** pliki o treści shell-podobnej pisz narzędziem `Write`, nigdy heredocem |
 
 ### WACHTA A — domknięcie biblioteki *(zaczęta 2026-07-29)*
 

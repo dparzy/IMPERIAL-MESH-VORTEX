@@ -226,6 +226,98 @@ def test_wlasny_blok_przechodzi_wlasne_sprawdzenie():
     assert w["status"] == "spelniony", w
 
 
+def test_wlasny_blok_posix_tez_przechodzi_wlasne_sprawdzenie():
+    """E1 (cubic PR #138): ten sam niezmiennik w chmurze, gdzie korzeń jest POSIX-owy.
+
+    Przed naprawą wzorzec ścieżki wymagał litery dysku, więc `cd /home/...` nie był
+    w ogóle widziany jako `cd` — organ stawiał zarzut „brak cd" BLOKOWI, KTÓRY SAM
+    WYGENEROWAŁ. Strażnik niespójny ze sobą uczy, że jego werdykt można zignorować.
+    """
+    # PurePosixPath, nie Path: `Path("/home/x")` NA WINDOWSIE daje `\home\x`, więc test
+    # pisany „po prostu Pathem" sprawdzałby Windows, udając, że sprawdza chmurę.
+    from pathlib import PurePosixPath
+    blok = exactor.blok_push(galaz=GALAZ,
+                             korzen=PurePosixPath("/home/runner/imperial-mesh-vortex"))
+    assert blok.startswith("cd /home/"), blok
+    w = _zbadaj(f"```bash\n{blok}\n```")
+    assert w["status"] == "spelniony", w
+
+
+def test_dopuszczenie_posix_nie_zgubilo_swiata_windows():
+    """Granica w drugą stronę — rozszerzenie wzorca nie może uciszyć oryginalnej reguły."""
+    w = _zbadaj("```powershell\ncd C:\\Projekty\\imperial-mesh-vortex; "
+                f"git push origin {GALAZ}\n```")
+    assert w["status"] == "spelniony", w
+
+
+def test_blok_push_bez_galezi_odmawia_zamiast_podac_pustke():
+    """E6: `git push origin ` to komenda NIEWYKONALNA podana jako gotowa do wklejenia.
+
+    Organ, którego CAŁYM powodem istnienia jest niekompletny blok push (nota
+    N-b74ce133), nie ma prawa sam takiego wyprodukować przy detached HEAD.
+    """
+    oryginal = exactor.galaz_biezaca
+    exactor.galaz_biezaca = lambda: ""
+    try:
+        exactor.blok_push(korzen=Path("/tmp/repo"))
+        raise AssertionError("blok_push podał komendę mimo braku gałęzi")
+    except exactor.BrakGalezi:
+        pass
+    finally:
+        exactor.galaz_biezaca = oryginal
+
+
+def test_separator_po_komendzie_nie_robi_z_galezi_cudzej():
+    """E3 (cubic PR #138): `\\S+` pochłaniało domykający separator, więc `<gałąź>;`
+    ≠ `<gałąź>` i organ zgłaszał CUDZĄ GAŁĄŹ dla komendy w pełni poprawnej.
+
+    Waga wady jest większa, niż wygląda: hook `Stop` na tym werdykcie BLOKUJE, czyli
+    strażnik karałby za blok gotowy do wklejenia — dokładnie odwrotnie do swojego celu.
+    """
+    for separator in (";", " &&", " |", "&"):
+        tekst = ("```powershell\ncd C:\\Projekty\\imperial-mesh-vortex; "
+                 f"git push origin {GALAZ}{separator}\n```")
+        w = _zbadaj(tekst)
+        assert w["status"] == "spelniony", (separator, w)
+
+
+def test_capture_galezi_nadal_lapie_cudza_galaz():
+    """Granica W DRUGĄ STRONĘ: zwężenie wzorca nie może uciszyć oryginalnej reguły —
+    inaczej naprawa fałszywki kupiłaby ślepotę na wadę, której organ pilnuje."""
+    w = _zbadaj("```powershell\ncd C:\\Projekty\\imperial-mesh-vortex; "
+                "git push origin main;\n```")
+    assert w["status"] == "niespelniony", w
+    powod = next(b["powod"] for b in w["braki"] if b["id"] == "push_pelny_blok")
+    assert "'main'" in powod, powod
+
+
+def test_sciezka_ze_spacja_jest_cytowana_i_przechodzi_wlasne_sprawdzenie():
+    """E5 (cubic PR #138): `cd C:\\Program Files\\x` to komenda NIEWYKONALNA podana jako
+    „gotowa do wklejenia" — siostra wady E6 (`git push origin ` przy detached HEAD).
+
+    Sprawdzamy OBIE strony niezmiennika: że blok jest cytowany i że przechodzi to,
+    czego organ sam wymaga (bo cudzysłów zmienia dopasowanie wzorca `cd`).
+    """
+    blok = exactor.blok_push(galaz=GALAZ, korzen=Path("C:/Program Files/imperial mesh"))
+    assert "'" in blok, blok
+    w = _zbadaj(f"```powershell\n{blok}\n```")
+    assert w["status"] == "spelniony", (blok, w)
+
+
+def test_sciezka_zwykla_zostaje_bez_cudzyslowow():
+    """Postać BEZ cudzysłowów to ta, która przeszła kalibrację na 190 meldunkach.
+    Cytowanie „na wszelki wypadek" zmieniałoby rzecz ZMIERZONĄ bez nowego pomiaru."""
+    blok = exactor.blok_push(galaz=GALAZ, korzen=Path("C:/Projekty/imperial-mesh-vortex"))
+    assert "'" not in blok, blok
+
+
+def test_cytowanie_nie_rozwija_zmiennych_powloki():
+    """Pojedynczy cudzysłów, nie podwójny: w `"$HOME/x"` PowerShell i bash rozwinęłyby
+    `$HOME`, więc „gotowy do wklejenia" blok wskazywałby CUDZY katalog."""
+    assert exactor.cytuj_sciezke("/home/$USER/repo x").startswith("'")
+    assert '"' not in exactor.cytuj_sciezke("/home/$USER/repo x")
+
+
 # ── GRANICA 6: CLI ──────────────────────────────────────────────────────────────
 
 def test_cli_bramka_zwraca_kod_wyjscia(tmp_path):
@@ -276,6 +368,38 @@ def test_hook_nie_robi_petli_przy_powtornym_wejsciu():
                          last_assistant_message="```powershell\ngit push\n```"))
     assert w["blokuj"] is False
     assert w["status"] == "powtorne_wejscie"
+
+
+def test_hook_blokuje_gdy_kotwica_osierocona():
+    """E7 (cubic PR #138, najcięższa): brak WIEDZY nie może wyglądać jak brak ZASTRZEŻEŃ.
+
+    Wcześniej `kotwica_osierocona` wpadała do wspólnego „różny od niespełnionego" i hook
+    milczał — czyli jedyny automat wyłączał się DOKŁADNIE wtedy, gdy jego kontrakt
+    z konstytucją przestawał obowiązywać. To ta sama klasa co „bramka o wąskim zasięgu
+    daje fałszywy spokój". Pętli nie robi: powtórne wejście niesie `stop_hook_active`.
+    """
+    kroki_bez_kroku8 = [k for k in KROKI if "pełny blok PowerShell" not in k]
+    w = exactor.ocen_zdarzenie_hooka(
+        _zdarzenie(last_assistant_message="```powershell\ngit push\n```"),
+        kroki=kroki_bez_kroku8, galaz=GALAZ)
+    assert w["blokuj"] is True, w
+    assert w["status"] == "kotwica_osierocona"
+    assert "KOTWICA OSIEROCONA" in w["powod"]
+
+
+def test_hook_alarmuje_nawet_gdy_nie_umie_podac_bloku():
+    """E6 w hooku: brak gałęzi nie UCISZA zarzutu, ale też nie rodzi pustej komendy."""
+    oryginal = exactor.galaz_biezaca
+    exactor.galaz_biezaca = lambda: ""
+    try:
+        w = exactor.ocen_zdarzenie_hooka(
+            _zdarzenie(last_assistant_message="```powershell\ngit push\n```"),
+            kroki=KROKI, galaz="")
+    finally:
+        exactor.galaz_biezaca = oryginal
+    assert w["blokuj"] is True, w
+    assert "git push origin \n" not in w["powod"]
+    assert "NIE PODAJĘ" in w["powod"]
 
 
 def test_hook_milczy_gdy_brak_pola_meldunku():

@@ -202,6 +202,16 @@ Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
    żywy kod + kronika + Dziennik (kandydat≠prawda, POMIAR nie pamięć). Nie budujemy tego, co już mamy.
 5. **PRAWO XVII — rozpoznanie terenu:** liczby (neurony/zwiadowcy/testy) POLICZONE z kodu, nie z pamięci;
    kod+testy > ZASADY > liczby z plików > pamięć.
+5b. **MATURITAS — PIĘTRO INŻYNIERII ZMIERZONE, NIE OSZACOWANE** (ROZKAZ STAŁY, Cezar 2026-08-02):
+   `python -m imperium.oczy.maturitas` — poziom **0–4 na KAŻDYM z trzech pięter** (PROMPT /
+   LOOP / GRAPH) wraz z wąskimi gardłami. Doktryna „domykaj loop, otwieraj drogę na graph"
+   jest KRYTERIUM oceny każdego zadania, więc **musi mieć MIERNIK** — sama w checkliście
+   byłaby zasadą bez mechanizmu, czyli tą klasą, którą złapaliśmy przy kontrakcie
+   append-only (deklarowany w 6 organach, egzekwowany przez zero). Czytasz i **REAGUJESZ**:
+   wąskie gardło to ZADANIE (napraw sam / Backlog CODEX / spytaj Cezara), nigdy tapeta.
+   Zapamiętaj rozstrzygnięcie progów: **GRAPH 4/4 znaczy JEDNO — graf czytany PRZY DECYZJI,
+   nie drukowany**; niższe progi mierzą rozmiar, nie pożytek. Poziom porównujesz z ostatnią
+   migawką (`--delta`), bo stan bez historii nie mówi, czy idziemy w górę, czy w dół.
 6. **Przedstaw się rzymsko** (Vitruviusz — Architekt) — ZASADA NOMENKLATURY — **i ZADEKLARUJ SWÓJ
    MODEL + effort**. Powód (zmierzone 2026-07-21): środowisko hooka NIE niesie identyfikatora modelu
    (jest `CLAUDE_EFFORT`, `CLAUDE_AGENT_SDK_VERSION`, nie ma żadnego `*_MODEL`), więc BREVIARIUM nie
@@ -242,6 +252,19 @@ nowe zadanie bez weryfikacji „czy już istnieje"; liczby z pamięci zamiast z 
 5. **Prawo XV:** odpowiedz Cezarowi na pytanie o utratę potencjału — JAWNIE, nie milczeniem.
 5b. **LEX TALIONIS — dług honorowy:** `python -m imperium.biblioteki.codex_notarum bilans` — jeśli
    dług honorowy > 0 (błąd bez kompensującego unikatu), NIE domykaj sesji: dostarcz zatwierdzoną CORONĘ (oko za oko).
+5c. **MATURITAS — czy ta wachta PODNIOSŁA piętro** (ROZKAZ STAŁY, Cezar 2026-08-02):
+   `python -m imperium.oczy.maturitas --delta`, a po rozstrzygnięciu `--zapisz` (migawka
+   append-only, pilnowana przez VINDEXA). Odpowiadasz Cezarowi **JAWNIE** na trzy pytania:
+   **(1)** czy któreś z pięter PROMPT/LOOP/GRAPH zmieniło poziom i **dlaczego**;
+   **(2)** czy wskaźnik domknięcia ROADMAP wzrósł czy spadł — **spadek po dopisaniu
+   uczciwie nazwanego zadania jest ZDROWY**, nie jest porażką; **(3)** co ta wachta
+   **otworzyła na GRAPH** (nowy producent krawędzi? czytelnik przy decyzji? zbiór do A/B?).
+   **PRZED pochwaleniem się przeczytaj `--antywskazniki`** — każde piętro da się oszukać
+   (PROMPT rośnie od przenoszenia treści, której nikt nie woła; LOOP od kasowania pozycji
+   zamiast ich robienia; GRAPH od dopisywania węzłów, które przybywają same). Miernik,
+   który nigdy nie spada, **chwali zamiast mierzyć**. MATURITAS jest **LUSTREM, NIE
+   KIEROWNICĄ**: nie wolno go wpiąć w ścieżkę decyzyjną ani w dobór wag (Goodhart), a wynik
+   podnosi się WYŁĄCZNIE naprawą tego, co mierzy.
 6. **Dziennik Nieśmiertelny:** `python -m imperium.biblioteki.dziennik_niesmiertelny wpis ...` — PRZED ostatnim commitem.
 7. **Commit lokalny** z opisowym komunikatem (Claude NIGDY nie pushuje).
 8. **Push dla Cezara:** podaj pełny blok PowerShell (`cd` + `git push origin <branch>`); po JEGO pushu

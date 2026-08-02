@@ -98,14 +98,33 @@ def _wariancja_zerowa(seria: List[float]) -> bool:
     return len(set(seria)) <= 1
 
 
-def ocen_pare(klucz_a: str, klucz_b: str, seria_a: List[float],
-              seria_b: List[float]) -> Dict[str, Any]:
+MIN_PROBEK = 2   # jedna obserwacja nie ustala ani wariancji, ani jej braku
+
+
+def ocen_pare(klucz_a: str, klucz_b: str, seria_a: List[Optional[float]],
+              seria_b: List[Optional[float]]) -> Dict[str, Any]:
     """Werdykt dla JEDNEJ pary — czysty, bez wejścia/wyjścia.
 
     Kolejność sprawdzeń jest istotna: martwy głos rozstrzygamy PRZED korelacją, bo
     Pearson na stałej serii jest niezdefiniowany, a `None` czytane jako „brak korelacji"
     wyglądałoby jak dywersyfikacja. Rzecz niezmierzona nie jest zielona (Prawo I).
+
+    `None` w serii to BRAK POMIARU (awaria neuronu), nie głos — pary z brakiem są
+    usuwane parami (pairwise deletion), bo korelacja wymaga obserwacji w tym samym barze.
+    Poniżej `MIN_PROBEK` wspólnych obserwacji werdyktem jest NIEROZSTRZYGNIETE, nigdy
+    CISZA: przy zerze albo jednej próbce „stały głos" jest artefaktem długości serii,
+    a nie własnością neuronu (recenzja cubic PR #138, D1 — potwierdzona).
     """
+    wspolne = [(a, b) for a, b in zip(seria_a, seria_b, strict=True)
+               if a is not None and b is not None]
+    if len(wspolne) < MIN_PROBEK:
+        return {"para": (klucz_a, klucz_b), "korelacja": None, "werdykt": "NIEROZSTRZYGNIETE",
+                "martwe": [],
+                "opis": f"za mało wspólnych obserwacji ({len(wspolne)} < {MIN_PROBEK}) — "
+                        "to długość pomiaru, nie własność neuronów"}
+    seria_a = [a for a, _ in wspolne]
+    seria_b = [b for _, b in wspolne]
+
     martwe = [k for k, s in ((klucz_a, seria_a), (klucz_b, seria_b)) if _wariancja_zerowa(s)]
     if martwe:
         return {"para": (klucz_a, klucz_b), "korelacja": None, "werdykt": "CISZA_W_POMIARZE",
@@ -128,8 +147,13 @@ def ocen_pare(klucz_a: str, klucz_b: str, seria_a: List[float],
             "werdykt": werdykt, "martwe": [], "opis": opis}
 
 
-def ocen_skupisko(nazwa: str, serie: Dict[str, List[float]]) -> Dict[str, Any]:
-    """Werdykt dla całego skupiska: wszystkie pary + podsumowanie."""
+def ocen_skupisko(nazwa: str, serie: Dict[str, List[Optional[float]]],
+                  awarie: Optional[Dict[str, int]] = None) -> Dict[str, Any]:
+    """Werdykt dla całego skupiska: wszystkie pary + podsumowanie.
+
+    `awarie` (ile razy `interpretuj` rzucił wyjątkiem) idzie do wyniku ODDZIELNIE od
+    ciszy — bo to rozłączne stany: cisza jest zachowaniem neuronu, awaria jest jego wadą.
+    """
     klucze = sorted(serie)
     pary = [ocen_pare(klucze[i], klucze[j], serie[klucze[i]], serie[klucze[j]])
             for i in range(len(klucze)) for j in range(i + 1, len(klucze))]
@@ -140,34 +164,62 @@ def ocen_skupisko(nazwa: str, serie: Dict[str, List[float]]) -> Dict[str, Any]:
     return {
         "skupisko": nazwa, "neurony": klucze, "par": len(pary),
         "pary": pary, "licznik": licznik, "martwe_glosy": martwe,
+        "awaryjne": {k: c for k, c in sorted((awarie or {}).items()) if k in serie and c},
         "kandydatow_do_scalenia": licznik.get("KANDYDAT_DO_SCALENIA", 0),
         "filarow": licznik.get("FILAR_DYWERSYFIKACJI", 0),
     }
 
 
 def zbierz_serie(bary: List[Dict[str, Any]], klucze: List[str], budowniczy,
-                 *, od: int = 360, postep=None) -> Dict[str, List[float]]:
-    """Głosy wskazanych neuronów na kolejnych barach: {KLUCZ: [wartości]}.
+                 *, od: int = 360, postep=None
+                 ) -> tuple[Dict[str, List[Optional[float]]], Dict[str, int]]:
+    """Głosy wskazanych neuronów na kolejnych barach: ({KLUCZ: [wartości]}, {KLUCZ: awarii}).
 
     `od` to minimalna historia, jakiej potrzebuje najbardziej łakomy wskaźnik (Pi Cycle
     wymaga ≥360 barów) — liczenie od zera dawałoby głosy z niepełnych okien, czyli pomiar
     czegoś innego niż produkcja.
+
+    AWARIA NIE JEST GŁOSEM (recenzja cubic PR #138, D3 — uznana za słuszną). Wcześniej
+    wyjątek z `interpretuj` lądował w serii jako `0.0`, czyli DOKŁADNIE tak samo jak
+    uczciwy NEUTRAL. Skutki były dwa i oba fałszowały pomiar: awaria sporadyczna
+    przesuwała korelację, a awaria trwała dawała stałą serię, którą organ ogłaszał
+    „ciszą" — czyli zepsuty neuron wyglądał jak neuron bez wejścia. To ta sama klasa,
+    którą ten organ powstał rozróżniać: brak pomiaru ≠ zmierzone zero.
+
+    OSTATNI ZAMKNIĘTY BAR WCHODZI DO POMIARU (recenzja cubic PR #138, D2 — potwierdzona
+    odczytem kodu). `range(od, len(bary))` nigdy nie wołało `zbuduj` z PEŁNYM wycinkiem,
+    więc najświeższy bar — ten, na którym rój głosowałby w produkcji — nie był badany
+    ani razu. Zakres i licznik postępu liczymy teraz z JEDNEJ wielkości (`krokow`), bo
+    rozjazd między „ile kroków zapowiadam" a „ile wykonuję" był tu źródłem wady.
+
+    UJEMNA ROZGRZEWKA JEST BŁĘDEM, NIE POMIAREM (D4). `od < 0` dawało wycinki `bary[:-n]`
+    (prawie cała seria) i `bary[:0]` (pustka) — czyli wynik, który wygląda jak pomiar,
+    a mierzy co innego, niż deklaruje. Cicha akceptacja takiej wartości to ta sama klasa
+    co „awaria zapisana jako 0.0": wejście bez sensu udające obserwację.
     """
+    if od < 0:
+        raise ValueError(f"`od` to DŁUGOŚĆ HISTORII przed pierwszym głosem — nie może być "
+                         f"ujemne (dostałem {od})")
     wybrane = [n for n in wszystkie_neurony() if n.KLUCZ in set(klucze)]
-    serie: Dict[str, List[float]] = {n.KLUCZ: [] for n in wybrane}
-    krokow = max(0, len(bary) - od)
-    for i, koniec in enumerate(range(od, len(bary)), 1):
+    serie: Dict[str, List[Optional[float]]] = {n.KLUCZ: [] for n in wybrane}
+    awarie: Dict[str, int] = {n.KLUCZ: 0 for n in wybrane}
+    # `+ 1`, bo `koniec` jest GÓRNĄ GRANICĄ wycinka: żeby ostatni bar wszedł, wycinek musi
+    # sięgnąć `len(bary)`. Warunek `if bary` chroni przed pustym wejściem, które przy `od=0`
+    # dałoby jeden krok z pustym wycinkiem — czyli pomiar bez ani jednego bara.
+    krokow = max(0, len(bary) - od + 1) if bary else 0
+    for i, koniec in enumerate(range(od, od + krokow), 1):
         wskazniki = budowniczy.zbuduj(bary[:koniec])
         for n in wybrane:
             try:
                 serie[n.KLUCZ].append(sygnal_na_liczbe(n.interpretuj(wskazniki)))
             except Exception:
-                # Awaria jednego neuronu nie może przerwać pomiaru całego skupiska,
-                # ale NEUTRAL jest tu uczciwy: brak głosu to brak głosu, nie sygnał.
-                serie[n.KLUCZ].append(0.0)
+                # Awaria jednego neuronu nie może przerwać pomiaru całego skupiska —
+                # ale zapisujemy BRAK (None) i liczymy go osobno, nigdy jako 0.0.
+                serie[n.KLUCZ].append(None)
+                awarie[n.KLUCZ] += 1
         if postep and (i % 25 == 0 or i == krokow):
             postep(i, krokow)
-    return serie
+    return serie, awarie
 
 
 def raport(wyniki: List[Dict[str, Any]]) -> str:
@@ -182,6 +234,17 @@ def raport(wyniki: List[Dict[str, Any]]) -> str:
         linie.append("      To NIE jest jeszcze zarzut: pomiar karmi rój wyłącznie świecami "
                      "OHLCV, więc neurony alt-danych (stablecoin, DXY, funding, news) muszą "
                      "milczeć. Rozstrzyga dopiero bieg z adapterami.")
+    # AWARIA to stan ROZŁĄCZNY z ciszą i jedyny w tym raporcie, który jest OSKARŻENIEM:
+    # neuron nie zamilkł, tylko rzucił wyjątkiem. Milczenie o tym byłoby ciszą udającą wynik.
+    awaryjne: Dict[str, int] = {}
+    for w in wyniki:
+        for k, c in w.get("awaryjne", {}).items():
+            awaryjne[k] = max(awaryjne.get(k, 0), c)
+    if awaryjne:
+        linie.append(f"   🚨 NEURONY AWARYJNE (Prawo XV — wyjątek w `interpretuj`, "
+                     f"NIE cisza): {', '.join(f'{k}×{c}' for k, c in sorted(awaryjne.items()))}")
+        linie.append("      Te bary NIE weszły do korelacji (usunięte parami). Awaria jest "
+                     "wadą do naprawy, nie zachowaniem do interpretacji.")
     for w in sorted(wyniki, key=lambda x: -x["kandydatow_do_scalenia"]):
         ikona = "🚨" if w["kandydatow_do_scalenia"] else "✅"
         linie.append(f"   {ikona} {w['skupisko']:<16} neuronów {len(w['neurony']):2d} "
@@ -198,10 +261,23 @@ def raport(wyniki: List[Dict[str, Any]]) -> str:
 
 def zbadaj(sciezka_csv: str, interwal: str = "4h", *, limit: Optional[int] = None,
            od: int = 360, tylko: Optional[List[str]] = None, postep=None) -> List[Dict[str, Any]]:
-    """Pomiar na żywych danych: wczytaj bary → policz głosy → oceń każde skupisko."""
+    """Pomiar na żywych danych: wczytaj bary → policz głosy → oceń każde skupisko.
+
+    Wejście sprawdzamy PRZED wczytaniem CSV (D4): odrzucenie dopiero w `zbierz_serie`
+    kazałoby czekać na wczytanie i przeliczenie danych, żeby dowiedzieć się, że pytanie
+    było bez sensu od początku.
+    """
     from imperium.akwedukty.czytnik_csv import wczytaj_csv
     from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
 
+    if od < 0:
+        raise ValueError(f"`od` to DŁUGOŚĆ HISTORII przed pierwszym głosem — nie może być "
+                         f"ujemne (dostałem {od})")
+    if limit is not None and limit < 0:
+        # Ta sama KLASA co `od` (Prawo XV: łatamy klasę, nie objaw): liczba opisująca
+        # ROZMIAR okna nie ma ujemnej wartości, a `bary[-(-5):]` cicho wybrałoby co innego.
+        raise ValueError(f"`limit` to LICZBA BARÓW do wczytania — nie może być ujemna "
+                         f"(dostałem {limit})")
     bary = wczytaj_csv(sciezka_csv, interwal=interwal, limit=limit)
     budowniczy = BudowniczyWskaznikow()
     wszystkie = skupiska()
@@ -216,14 +292,14 @@ def zbadaj(sciezka_csv: str, interwal: str = "4h", *, limit: Optional[int] = Non
     if postep:
         postep(f"liczę głosy {len(potrzebne)} neuronów z {len(nazwy)} skupisk "
                f"na {max(0, len(bary) - od)} barach", None)
-    serie = zbierz_serie(bary, potrzebne, budowniczy, od=od,
-                         postep=(lambda i, ile: postep(f"[{i}/{ile}] barów", None))
-                         if postep else None)
+    serie, awarie = zbierz_serie(bary, potrzebne, budowniczy, od=od,
+                                 postep=(lambda i, ile: postep(f"[{i}/{ile}] barów", None))
+                                 if postep else None)
 
     wyniki = []
     for nazwa in nazwy:
         podzbior = {k: serie[k] for k in wszystkie[nazwa] if k in serie}
-        wyniki.append(ocen_skupisko(nazwa, podzbior))
+        wyniki.append(ocen_skupisko(nazwa, podzbior, awarie))
     return wyniki
 
 
@@ -234,13 +310,22 @@ if __name__ == "__main__":
     import sys
 
     logging.disable(logging.CRITICAL)
+
+    def _nieujemny(tekst: str) -> int:
+        """Argparse odrzuca ujemne rozmiary SAM (D4) — z komunikatem, nie tracebackiem."""
+        wartosc = int(tekst)
+        if wartosc < 0:
+            raise argparse.ArgumentTypeError(
+                f"to liczba barów (rozmiar okna) — nie może być ujemna, dostałem {wartosc}")
+        return wartosc
+
     ap = argparse.ArgumentParser(
         description="DISCRIMINATOR — czy skupiska redundancji to naprawdę redundancja")
     ap.add_argument("--dane", default="dane/4h/Binance_BTCUSDT_4h.csv")
     ap.add_argument("--interwal", default="4h")
-    ap.add_argument("--limit", type=int, default=800,
+    ap.add_argument("--limit", type=_nieujemny, default=800,
                     help="ile ostatnich barów wczytać (0 = wszystkie)")
-    ap.add_argument("--od", type=int, default=360,
+    ap.add_argument("--od", type=_nieujemny, default=360,
                     help="minimalna historia przed pierwszym głosem (Pi Cycle wymaga 360)")
     ap.add_argument("--tylko", nargs="*", default=None, help="tylko wskazane skupiska")
     ap.add_argument("--lista", action="store_true", help="wypisz skupiska i zakończ")
@@ -255,7 +340,11 @@ if __name__ == "__main__":
         sys.exit(0)
 
     def _postep(co, _ile):
-        print(f"   {co}", flush=True)
+        # Pasek idzie na STDERR, bo stdout niesie WYNIK. Złapane przy powtórce pomiaru
+        # D2 (2026-08-02): `--json` mieszał postęp z danymi, więc `json.load` padał na
+        # własnym wydruku organu. Strumień diagnostyczny nie ma prawa psuć strumienia
+        # wyniku — a `flush` zostaje, żeby pasek nie zniknął w buforze (Prawo XXIV).
+        print(f"   {co}", flush=True, file=sys.stderr)
 
     wyniki = zbadaj(args.dane, args.interwal,
                     limit=args.limit or None, od=args.od,

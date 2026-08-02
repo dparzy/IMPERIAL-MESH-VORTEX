@@ -52,7 +52,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 
 <!-- TABULARIUM:start — sekcja generowana, NIE edytuj ręcznie -->
 
-> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-07-31 (76 pozycji).
+> 🏛️ Sekcja generowana przez `python narzedzia/tabularium.py katalog --zapisz` z nagłówków dokumentów. Ostatni spis: 2026-08-02 (76 pozycji).
 
 ### LEX — prawo i rozkazy stałe — obowiązuje, nie opisuje
 
@@ -69,15 +69,15 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 
 | Dokument | Po co istnieje | Właściciel (kod) | Stan na |
 |---|---|---|---|
-| `README.md` | Wizytówka Imperium — podaje liczby wprost z kodu (neurony/testy/prawa), więc musi nadążać za rejestrem | `imperium/legiony/rejestr.py` | 2026-07-30 |
+| `README.md` | Wizytówka Imperium — podaje liczby wprost z kodu (neurony/testy/prawa), więc musi nadążać za rejestrem | `imperium/legiony/rejestr.py` | 2026-08-02 |
 | `docs/ARSENAL_IMPERIUM.md` | Zweryfikować (Prawo I: zero halucynacji) setki linków narzędzi z pliku źródłowego IMV, oddzielić realne od fabrykowanych/niepewnych, i zaproponować 'najmocniejszy zweryfikowany rdz | — | 2026-06-02 |
-| `docs/CENSUS_ORGANORUM.md` | Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem | `narzedzia/census_organorum.py` | 2026-07-31 |
+| `docs/CENSUS_ORGANORUM.md` | Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem | `narzedzia/census_organorum.py` | 2026-08-02 |
 | `docs/INDEKS_IMPERIUM.md` | Master Index — punkt wejścia i mapa wszystkich dokumentów; sekcja katalogu generowana przez Tabularium | `imperium/legiony/rejestr.py` | 2026-07-18 |
-| `docs/MANIFEST_KODU.md` | JEDYNE oficjalne źródło prawdy o kodzie (Prawo XIX) — tabela kluczy ze statusem, nic nie istnieje bez wpisu tutaj | `imperium/legiony/rejestr.py` | 2026-07-29 |
+| `docs/MANIFEST_KODU.md` | JEDYNE oficjalne źródło prawdy o kodzie (Prawo XIX) — tabela kluczy ze statusem, nic nie istnieje bez wpisu tutaj | `imperium/legiony/rejestr.py` | 2026-08-02 |
 | `docs/MAPA_KLUCZY.md` | JEDYNY dokument, który jawnie i systematycznie rozwiązuje rozbieżności między katalogiem (planem nazw/ID) a żywym kodem — dla każdego klucza podaje: nazwę klasy w kodzie, co robi,  | `imperium/legiony/rejestr.py` | 2026-07-16 |
 | `docs/MAPA_PAMIECI.md` | Jedyne miejsce konsolidujące 13(+1 nadrzędny=W7) warstw pamięci Claude/Imperium w jedną taksonomię, z mapowaniem na model CoALA (arXiv:2309.02427) i na 'domknięte problemy granicy 2026 | `imperium/biblioteki/centrum_pamieci.py`, `imperium/biblioteki/dziennik_niesmiertelny.py`, `imperium/biblioteki/graf_pamieci.py`, `imperium/biblioteki/kronika_czatu.py`, `imperium/biblioteki/kustosz_pamieci.py`, `imperium/biblioteki/pamiec_absolutna.py`, `imperium/biblioteki/pamiec_proceduralna.py`, `imperium/biblioteki/pamiec_proweniencji.py`, `imperium/biblioteki/pamiec_robocza.py`, `imperium/biblioteki/pamiec_sesji.py`, `imperium/biblioteki/refleksja_pamieci.py`, `imperium/biblioteki/rejestr_wizji.py`, `imperium/biblioteki/srodowisko_pamieci.py`, `imperium/biblioteki/zapominanie.py` | 2026-07-17 |
 | `docs/OBSERWATORZY.md` | Jedyny dokument mapujący WSZYSTKIE zewnętrzne źródła danych (44 źródła w 4 warstwach: OCZY/USZY/WIESZCZOWIE/SZPIEDZY) do konkretnych neuronów i modułów — z priorytetami kluczy API  | `imperium/akwedukty/bary_zdarzeniowe.py`, `imperium/akwedukty/czytnik_csv.py`, `imperium/akwedukty/klasyfikator_zdarzen.py`, `imperium/akwedukty/kwatermistrz_danych.py`, `imperium/akwedukty/news_fetcher.py`, `imperium/akwedukty/sentyment_historyczny.py`, `imperium/drogi/nexus_hub.py` | 2026-07-17 |
-| `docs/PAMIEC_SESJI.md` | Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360) | `imperium/biblioteki/pamiec_sesji.py` | 2026-07-18 |
+| `docs/PAMIEC_SESJI.md` | Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360) | `imperium/biblioteki/pamiec_sesji.py` | 2026-08-02 |
 | `docs/PROFIL_CEZARA.md` | Trwały model Cezara (preferencje, decyzje stałe) + źródło prawdy Imion Imperium — wstrzykiwany na starcie | — | 2026-07-13 |
 | `docs/README.md` | Wskaźnik na katalog dokumentów — sam spisu NIE trzyma; kieruje do generowanego katalogu w INDEKS_IMPERIUM (jedno źródło prawdy, Prawo XVI). | — | 2026-07-27 |
 | `docs/REJESTR_INSPIRACJI.md` | Jedno źródło prawdy o zewnętrznych inspiracjach AI/ML (ZPO: pełna nazwa + link + status weryfikacji) | — | 2026-07-16 |
@@ -127,13 +127,13 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | `docs/PLAN_DEEPSEEK.md` | Plan podłączenia DeepSeek API jako 'głosu' Imperium (adapter GlosImperium) + weryfikacja, GDZIE DeepSeek naprawdę trafił — realizacja poszła inną drogą niż plan (nie Senat, lecz Oczy/newsy + zwiad wiedzy + NOTARIUS). | `imperium/cesarz/deepseek_glos.py`, `imperium/akwedukty/adaptery/news_llm.py`, `imperium/biblioteki/notarius.py` | 2026-07-18 |
 | `docs/PLAN_ROZBUDOWY_BIBLIOTEKI.md` | PEŁNY spis biblioteki Imperium: 307 pozycji (BIB-001..307) — 69 posiadanych fundamentów, 234 pozycje rozbudowy, każda ze statusem posiadania i obecności w RAG. | `narzedzia/bibliotekarz.py`, `narzedzia/przygotuj_biblioteke.py` | 2026-07-28 |
 | `docs/PLAN_TIRO_LOKALNY_LLM.md` | Zbudować lokalny hybrydowy LLM 'TIRO' (uczeń), trenowany metodą destylacji od nauczyciela DeepSeek (Hyginus), z docelowym celem przejęcia ról LLM w Imperium bez kosztów API. | `imperium/biblioteki/notarius.py`, `imperium/oczy/censor_sprzetu.py`, `imperium/swiatynie/web_dashboard.py` | 2026-07-18 |
-| `docs/ROADMAP_IMPERIUM.md` | Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii. | — | 2026-07-30 |
+| `docs/ROADMAP_IMPERIUM.md` | Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii. | — | 2026-08-02 |
 | `docs/TRYBY_IMPERIUM.md` | Jedyne miejsce z **twardym, zmierzonym werdyktem o interwale 1H** — że rój nie ma na nim dodatniego edge'u i że zaostrzanie progów asymptotuje przy ~−2.5%, nigdy nie przekraczając zera | `imperium/koloseum/namiestnik.py`, `narzedzia/kalibracja_1h.py`, `narzedzia/kalibracja_1h_v2.py`, `narzedzia/sym_porownanie_tf.py` | 2026-07-21 |
 | `docs/WIZJA_KSIEGI_SYBILLINSKIE.md` | Zbudować rejestr falsyfikowalnych proroctw Imperium o samym sobie (np. 'P=0.70: neuron X osiągnie IC≥0.02'), rozliczanych automatycznie z bazy areny — mierzy nie PnL, ale samowiedz | `imperium/biblioteki/ksiegi_sybillinskie.py` | 2026-07-06 |
 | `docs/WIZJA_LEGIONY_CIENI.md` | Kontrfaktyczne Kolosseum — równolegle do realnej decyzji Imperium maszerują 'Legiony Cieni' (widmowe warianty konfiguracji: bez weta, próg łagodny, próg surowy), mierzące ile koszt | `imperium/koloseum/legiony_cieni.py`, `narzedzia/raport_zalu.py` | 2026-07-06 |
 | `docs/WIZJA_TRYBY_I_ROZWOJ.md` | Wizja Cezara na 3 tryby operacyjne systemu (NAJLEPSZY/BILANS/OBRONA) plus katalog darmowych API do 'prześwietlania' nowych walut przed wejściem — z weryfikacją, co z wizji już stoi w kodzie | `imperium/koloseum/skaner_okazji.py`, `imperium/legiony/rejestr.py` | 2026-07-17 |
 | `docs/WIZJONER.md` | Zbiór wizji i kierunków rozwoju — zamiary na przyszłość, świadomie niezrealizowane | — | 2026-06-26 |
-| `docs/ZWIAD_ZAPYTANIA.md` | Gotowe frazy wyszukiwania dla Cezara — zwiad po literaturze celowany w ZMIERZONE luki Imperium, z kryterium oceny trafienia i listą tego, czego NIE szukać. | — | 2026-07-30 |
+| `docs/ZWIAD_ZAPYTANIA.md` | Gotowe frazy wyszukiwania dla Cezara — zwiad po literaturze celowany w ZMIERZONE luki Imperium, z kryterium oceny trafienia i listą tego, czego NIE szukać. | — | 2026-08-02 |
 
 ### MENSURA — pomiar / analiza z danych — wynik, nie opinia
 
@@ -151,7 +151,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 | Dokument | Po co istnieje | Właściciel (kod) | Stan na |
 |---|---|---|---|
 | `docs/AUDYT_SYSTEMU.md` | Pierwszy głęboki audyt stanu faktycznego systemu — co działa, co blokowane przez TA-Lib, co jest szkieletem, co brakuje całkowicie. | `imperium/cesarz/deepseek_glos.py`, `imperium/legiony/mikro_neuron.py`, `imperium/senat/meta_kora.py` | 2026-06-12 |
-| `docs/LOG_ZMIAN.md` | Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz | — | 2026-07-29 |
+| `docs/LOG_ZMIAN.md` | Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz | — | 2026-08-02 |
 | `docs/MAPA_IMPERIUM_FLOW.md` ⛔ zastąpiony przez `docs/ARCHITEKTURA_IMPERIUM.md` | Wersja narracyjna/dydaktyczna architektury — dla nowicjusza (Cezara): tłumaczy PO CO każdy organ istnieje, z przykładowym dialogiem (Zwiadowca 1 mówi 'DŁUGO...', Frakcja Byków vs N | `imperium/akwedukty/kwatermistrz_danych.py`, `imperium/biblioteki/kronikarz.py`, `imperium/biblioteki/mnemosyne.py`, `imperium/cesarz/titan_mind.py`, `imperium/drogi/nexus_hub.py`, `imperium/fundament/brama_kalkulatora.py`, `imperium/fundament/kuznia_narzedzi.py`, `imperium/koloseum/backtest.py`, `imperium/koloseum/monte_carlo.py`, `imperium/legiony/pierwszy_zwiadowca.py`, `imperium/legiony/roj_sygnalow.py`, `imperium/pretorianie/aegis_tarcza.py`, `imperium/pretorianie/lustro_prawdy.py`, `imperium/senat/meta_kora.py`, `imperium/swiatynie/kartograf.py`, `imperium/swiatynie/web_dashboard.py` | 2026-05-31 |
 | `docs/PAMIEC_SESJI_ARCHIWUM.md` | Magazyn starszych/mniej połączonych lekcji — pamięć aktywna ostra, nic nie tracimy (Prawo I). Przeszukiwalne (grep/RAG), poza wstrzykiwanym kontekstem startowym. | — | 2026-07-19 |
 | `docs/migawki/ANALIZA_AUTODOBOR_STRATEGII_2026-07-13.md` | Zwiad wiedzy (Bibliotheca Ulpia RAG 27641 fragmentów + internet) w celu ulepszenia auto-doboru strategii — zdiagnozowana luka: dobór strategii ignoruje zrealizowany P&L (czysto str | `imperium/legiony/strategie/baza.py` | 2026-07-13 |

@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: narzedzia/census_organorum.py
-stan_na: 2026-07-31
+stan_na: 2026-08-02
 powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem"
 ---
 # 🏛️ CENSUS ORGANORUM — spis organów i narzędzi Imperium
@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 257** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 259** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -236,6 +236,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 |-------|--------------------------|
 | `breviarium.py` | 📋 BREVIARIUM — Zwięzły Spis Sług Imperium (meldunek na otwarcie wachty) |
 | `censor_sprzetu.py` | 🏛️ CENSOR SPRZĘTU — organ „oczu" mierzący majątek maszyny (Prawo XV) |
+| `maturitas.py` | 📐 MATURITAS — na którym PIĘTRZE inżynierii stoi Imperium i czy pętle się domykają |
 | `wszechoko.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
 
 ### `imperium/pretorianie/` — PRAETORIANI — bezpieczniki, weto ryzyka, straż u wrót
@@ -257,6 +258,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `sizing_przekonania.py` | Sizing Przekonania (W-318) — większa stawka na mocniejszej okazji |
 | `straznik_przewagi.py` | 🛡️💎 STRAŻNIK PRZEWAGI — unikat Imperium (W-287, Faza C) |
 | `vigil.py` | 🔦 VIGIL — Straż Nocna: skan KAŻDEGO zapisanego pliku .py natychmiast (PostToolUse) |
+| `vindex.py` | ⚖️ VINDEX — obrońca zapisu: czy ktoś zmienił to, co miało zostać niezmienne |
 
 ### `imperium/senat/` — SENATUS — meta-decyzje, debata
 

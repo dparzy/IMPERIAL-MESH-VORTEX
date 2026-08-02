@@ -143,6 +143,32 @@ def test_dopisz_aktualizuje_date():
     assert "## Ostatnia aktualizacja: 2026-12-31" in ps.wczytaj(p)
 
 
+def test_dopisz_aktualizuje_OBIE_daty_w_tym_samym_ruchu():
+    """Nagłówek i frontmatter to JEDNA prawda w dwóch miejscach (recenzja cubic PR #138).
+
+    Zmierzone przed naprawą: ten zapis ruszał wyłącznie „## Ostatnia aktualizacja", więc
+    `stan_na` zostawał w tyle po KAŻDEJ sesji. Dokument miał trzy różne daty naraz
+    (stan_na 2026-07-18, nagłówek 2026-07-27, lekcje do 2026-08-01) i przez pięć dni mówił
+    Cezarowi nieprawdę o własnej świeżości. Ręczne przestawienie daty nie było naprawą —
+    automat pisze po każdej sesji, człowiek nie.
+    """
+    p = _plik()
+    p.write_text("---\nkategoria: TABULA\nstan_na: 2026-01-01\n---\n"
+                 + p.read_text(encoding="utf-8"), encoding="utf-8")
+    ps.dopisz_lekcje("X", "Y", data="2026-12-31", plik=p)
+    tresc = ps.wczytaj(p)
+    assert "## Ostatnia aktualizacja: 2026-12-31" in tresc
+    assert "stan_na: 2026-12-31" in tresc, "frontmatter został w tyle za nagłówkiem"
+
+
+def test_dopisz_nie_tworzy_frontmatteru_gdy_go_nie_bylo():
+    """Zasięg wąski: uzupełniamy istniejące pole, nigdy nie dorabiamy bloku — od tego
+    jest Tabularium, a dwa organy piszące ten sam nagłówek rozjechałyby się (Prawo XVI)."""
+    p = _plik()
+    ps.dopisz_lekcje("X", "Y", data="2026-12-31", plik=p)
+    assert "stan_na:" not in ps.wczytaj(p)
+
+
 def test_dopisz_roundtrip():
     """dopisz → odczyt zwraca dokładnie tę treść."""
     p = _plik()

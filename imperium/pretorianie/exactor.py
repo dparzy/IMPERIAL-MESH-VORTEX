@@ -105,9 +105,17 @@ _SCIEZKA = r"(?:[A-Za-z]:[" + _UK + _UK + r"/]|/)"
 # z prozy („…commit z opisem, git push.") i z konfiguracji (`["Bash(git push:*)"]`).
 _POZYCJA_POLECENIA = r"(?:^|[;&|]\s*)\s*(?:PS[^>\n]*>\s*)?"
 WZ_LINIA_PUSH = re.compile(_POZYCJA_POLECENIA + r"git\s+push\b", re.M)
-WZ_PUSH_ORIGIN = re.compile(_POZYCJA_POLECENIA + r"git\s+push\s+origin\s+(\S+)", re.M)
+# Nazwa gałęzi kończy się na SEPARATORZE POWŁOKI, nie na dowolnym niebiałym znaku.
+# Powód (recenzja cubic PR #138, E3 — potwierdzona odczytem kodu): `\S+` pochłaniało
+# domykające `;`, więc poprawny, gotowy do wklejenia blok `git push origin <gałąź>;`
+# dawał porównanie `'<gałąź>;' ≠ '<gałąź>'` i organ zgłaszał CUDZĄ GAŁĄŹ. W hooku `Stop`
+# nie kończyło się to ostrzeżeniem, tylko BLOKADĄ — strażnik karał za komendę poprawną.
+# To ta sama klasa co E1: organ niespójny z tym, czego sam wymaga.
+WZ_PUSH_ORIGIN = re.compile(_POZYCJA_POLECENIA + r"git\s+push\s+origin\s+([^\s;&|]+)", re.M)
 WZ_CD = re.compile(r"^\s*cd\s+[\"']?(" + _SCIEZKA + r"[^\"';&|\n]*)", re.M)
-WZ_CD_INLINE = re.compile(r"cd\s+[\"']?" + _SCIEZKA + r"[^\"';&|\n]*[;&]+\s*git\s+push")
+# `[\"']?` PRZED separatorem — bo ścieżka ze spacją jest cytowana (E5) i bez tego
+# domykający cudzysłów łamał dopasowanie w szyku jednoliniowym.
+WZ_CD_INLINE = re.compile(r"cd\s+[\"']?" + _SCIEZKA + r"[^\"';&|\n]*[\"']?[;&]+\s*git\s+push")
 
 # Jawna DEKLARACJA domknięcia — w obu szykach, bo po polsku pada i „domykam wachtę",
 # i „Wachta domknięta". Nigdy nie jest to JEDYNY sygnał domknięcia (patrz `tryb`).
@@ -320,6 +328,28 @@ class BrakGalezi(RuntimeError):
     """
 
 
+# Ścieżka, którą powłoka przeczyta jako JEDEN argument bez cytowania. Lista DOZWOLONYCH,
+# nie zakazanych: nowy znak specjalny w czyjejś ścieżce ma domyślnie trafić pod cudzysłów,
+# a nie cicho przejść (ta sama logika, co „rzecz niezmierzona nie jest zielona").
+WZ_SCIEZKA_BEZPIECZNA = re.compile(r"^[A-Za-z0-9_./\\:+~-]+$")
+
+
+def cytuj_sciezke(sciezka: str) -> str:
+    """Ścieżka gotowa do wklejenia — cytowana WTEDY, GDY powłoka by ją rozbiła.
+
+    Cytujemy pojedynczym cudzysłowem, bo tylko on jest literalny w OBU powłokach,
+    w których ten blok bywa wklejany (PowerShell na lokalu, bash w chmurze) — podwójny
+    rozwinąłby `$` w ścieżce. Apostrof w samej ścieżce podwajamy po PowerShellowemu;
+    krok 8 mówi wprost „blok PowerShell", więc to jest właściwy dialekt.
+
+    Cytowanie jest WARUNKOWE z rozmysłu: postać bez cudzysłowów to dokładnie ta, która
+    przeszła kalibrację na 190 meldunkach (0 fałszywych na 156 przekazaniach). Zmiana
+    wyglądu bloku w najczęstszym przypadku byłaby ruszaniem rzeczy ZMIERZONEJ bez nowego
+    pomiaru — a to jest klasa talara `N-b74ce133`.
+    """
+    return sciezka if WZ_SCIEZKA_BEZPIECZNA.match(sciezka) else "'" + sciezka.replace("'", "''") + "'"
+
+
 def blok_push(galaz: str = "", korzen: Path = None) -> str:
     """Gotowy blok PowerShell kroku 8 — policzony z ŻYWEGO repozytorium.
 
@@ -327,7 +357,9 @@ def blok_push(galaz: str = "", korzen: Path = None) -> str:
     powodu, żeby te dwie linie w ogóle przepisywać z pamięci.
 
     Podnosi `BrakGalezi`, gdy gałęzi nie da się ustalić — milczące „origin " byłoby
-    dokładnie tą klasą wady, przeciw której ten organ powstał.
+    dokładnie tą klasą wady, przeciw której ten organ powstał. Ścieżka ze spacją jest
+    cytowana z tego samego powodu (recenzja cubic PR #138, E5): `cd C:\\Program Files\\x`
+    to komenda NIEWYKONALNA podana jako „gotowa do wklejenia" — siostra wady E6.
     """
     korzen = korzen or KORZEN
     galaz = galaz or galaz_biezaca()
@@ -335,7 +367,7 @@ def blok_push(galaz: str = "", korzen: Path = None) -> str:
         raise BrakGalezi(
             "nie umiem ustalić bieżącej gałęzi (detached HEAD albo git nie odpowiada) — "
             "podaj ją jawnie: blok_push(galaz='<nazwa>')")
-    return f"cd {korzen}; git push origin {galaz}"
+    return f"cd {cytuj_sciezke(str(korzen))}; git push origin {galaz}"
 
 
 # ── ADAPTERY ─────────────────────────────────────────────────────────────────────

@@ -4,12 +4,16 @@ Rdzeń jest czysty (serie to DANE, nie źródła), więc każdy werdykt da się 
 świec, bez Bramy i bez dysku. Granice utrwalone tu pochodzą z PIERWSZEGO biegu na żywych
 danych (BTCUSDT 4h, 2026-07-31), nie z wyobraźni.
 """
+import json
+import subprocess
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from imperium.legiony import discriminator as d  # noqa: E402
+
+KORZEN = Path(__file__).resolve().parent.parent
 
 
 class _Sygnal:
@@ -187,6 +191,135 @@ def test_skupiska_pochodza_z_zywego_rejestru():
     s = d.skupiska()
     assert isinstance(s, dict) and s, "rejestr nie zwrócił żadnego skupiska"
     assert all(len(v) >= 2 for v in s.values()), "skupisko z <2 neuronami nie ma sensu"
+
+
+# ── Zbieranie serii: okno pomiaru i rozgrzewka ──────────────────────────────────
+#
+# `zbierz_serie` nie miała dotąd ANI JEDNEGO testu — cały organ był sprawdzany od strony
+# czystego rdzenia (`ocen_pare`/`ocen_skupisko`), a wady D2 i D4 siedziały właśnie w tej
+# jedynej funkcji, która dotyka barów. To sama w sobie lekcja o zasięgu bramki.
+
+class _NeuronAtrapa:
+    """Neuron, którego głos MÓWI, ile barów zobaczył — dzięki temu okno pomiaru jest
+    widoczne w samej serii, a nie tylko w liczniku postępu."""
+
+    def __init__(self, klucz="X-01"):
+        self.KLUCZ = klucz
+
+    def interpretuj(self, wskazniki):
+        return _Sygnal("LONG", wskazniki["ile_barow"])
+
+
+class _BudowniczyAtrapa:
+    def zbuduj(self, bary):
+        return {"ile_barow": len(bary)}
+
+
+def _zbierz(bary, od, klucz="X-01", postep=None):
+    """Uruchamia `zbierz_serie` na atrapach — bez świec, bez dysku, bez Bramy."""
+    oryginal = d.wszystkie_neurony
+    d.wszystkie_neurony = lambda: [_NeuronAtrapa(klucz)]
+    try:
+        return d.zbierz_serie(bary, [klucz], _BudowniczyAtrapa(), od=od, postep=postep)
+    finally:
+        d.wszystkie_neurony = oryginal
+
+
+def test_ostatni_zamkniety_bar_wchodzi_do_pomiaru():
+    """D2 (cubic PR #138): `range(od, len(bary))` nigdy nie wołało `zbuduj` z PEŁNYM
+    wycinkiem, więc najświeższy bar — ten, na którym rój głosowałby w produkcji —
+    nie był badany ani razu.
+
+    Test jest tak dobrany, by MUTACJA BYŁA WIDOCZNA: głos niesie długość wycinka, więc
+    brak ostatniego bara widać wprost w ostatniej wartości serii, a nie tylko w liczbie
+    obserwacji (którą łatwo przeoczyć).
+    """
+    serie, _ = _zbierz(list(range(10)), od=8)
+    assert serie["X-01"] == [8.0, 9.0, 10.0], serie
+    assert max(serie["X-01"]) == 10, "ostatni bar nie wszedł do pomiaru"
+
+
+def test_rozgrzewka_rowna_dlugosci_danych_daje_jeden_glos():
+    """Granica dolna: przy `len(bary) == od` jest dokładnie jedno pełne okno."""
+    serie, _ = _zbierz(list(range(5)), od=5)
+    assert serie["X-01"] == [5.0], serie
+
+
+def test_za_krotkie_dane_nie_daja_glosu_ani_wyjatku():
+    """Rozgrzewka dłuższa niż dane to brak pomiaru — nie błąd i nie zmyślony głos."""
+    serie, awarie = _zbierz(list(range(3)), od=10)
+    assert serie["X-01"] == [], serie
+    assert awarie["X-01"] == 0
+
+
+def test_puste_dane_nie_daja_glosu_z_pustego_okna():
+    """Granica, którą `+1` mogłoby otworzyć: przy `od=0` i braku barów naiwny zakres
+    dałby JEDEN krok z pustym wycinkiem, czyli głos policzony z niczego."""
+    serie, _ = _zbierz([], od=0)
+    assert serie["X-01"] == [], serie
+
+
+def test_licznik_postepu_zapowiada_tyle_krokow_ile_wykonano():
+    """Rozjazd „ile kroków zapowiadam" vs „ile wykonuję" BYŁ tu źródłem wady D2 —
+    dlatego zakres i licznik liczą się teraz z jednej wielkości."""
+    widziane = []
+    serie, _ = _zbierz(list(range(30)), od=4, postep=lambda i, ile: widziane.append((i, ile)))
+    assert widziane, "pasek postępu nie odezwał się ani razu"
+    ostatni_krok, zapowiedziane = widziane[-1]
+    assert ostatni_krok == zapowiedziane == len(serie["X-01"]), widziane
+
+
+def test_ujemna_rozgrzewka_jest_bledem_a_nie_pomiarem():
+    """D4 (cubic PR #138): `od=-5` dawało wycinki `bary[:-5]` i `bary[:0]` — wynik, który
+    wygląda jak pomiar, a mierzy co innego, niż deklaruje."""
+    try:
+        _zbierz(list(range(10)), od=-1)
+        raise AssertionError("ujemna rozgrzewka przeszła bez słowa")
+    except ValueError:
+        pass
+
+
+def test_ujemne_wejscie_odrzucane_PRZED_wczytaniem_danych():
+    """Recenzja żąda odrzucenia „before entering zbierz_serie" — więc dowodem jest to,
+    że przy ŚCIEŻCE NIEISTNIEJĄCEJ dostajemy zarzut o `od`, a nie błąd czytania pliku.
+    Gdyby walidacja siedziała tylko w środku, najpierw poleciałby dysk."""
+    for kwargs in ({"od": -1}, {"od": 360, "limit": -5}):
+        try:
+            d.zbadaj("nie/ma/takiego/pliku.csv", "4h", **kwargs)
+            raise AssertionError(f"ujemne wejście przeszło bez słowa: {kwargs}")
+        except ValueError as e:
+            assert "ujemn" in str(e).lower(), (kwargs, e)
+
+
+def test_json_z_cli_da_sie_wczytac():
+    """Złapane przy powtórce pomiaru D2 (2026-08-02): pasek postępu szedł na STDOUT
+    razem z wynikiem, więc `--json` zwracał strumień, którego `json.load` nie wczyta —
+    organ psuł własny wydruk. Strumień diagnostyczny nie ma prawa mieszać się z danymi.
+
+    Okno jest minimalne z rozmysłu: sprawdzamy KONTRAKT WYDRUKU, nie wartości korelacji.
+    """
+    dane = KORZEN / "dane" / "4h" / "Binance_BTCUSDT_4h.csv"
+    if not dane.exists():
+        return  # dane historyczne bywają poza repo — brak pliku to nie wada organu
+    p = subprocess.run([sys.executable, "-m", "imperium.legiony.discriminator",
+                        "--dane", str(dane), "--limit", "363", "--od", "360", "--json"],
+                       cwd=KORZEN, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", timeout=600)
+    assert p.returncode == 0, p.stderr[-2000:]
+    wynik = json.loads(p.stdout)          # sedno testu: MUSI się wczytać
+    assert isinstance(wynik, list) and wynik, p.stdout[:500]
+    assert "barów" in p.stderr, "pasek postępu zniknął zamiast przenieść się na stderr"
+
+
+def test_cli_odrzuca_ujemne_okno():
+    """D4 od strony CLI: komunikat argparse, nie traceback (recenzja żąda obu ścieżek)."""
+    p = subprocess.run([sys.executable, "-m", "imperium.legiony.discriminator",
+                        "--od", "-1", "--lista"],
+                       cwd=KORZEN, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", timeout=120)
+    assert p.returncode != 0
+    assert "ujemna" in p.stderr.lower(), p.stderr[-500:]
+    assert "Traceback" not in p.stderr, p.stderr[-500:]
 
 
 # ── Raport ──────────────────────────────────────────────────────────────────────

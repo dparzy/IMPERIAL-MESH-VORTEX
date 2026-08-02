@@ -185,12 +185,29 @@ def zbierz_serie(bary: List[Dict[str, Any]], klucze: List[str], budowniczy,
     przesuwała korelację, a awaria trwała dawała stałą serię, którą organ ogłaszał
     „ciszą" — czyli zepsuty neuron wyglądał jak neuron bez wejścia. To ta sama klasa,
     którą ten organ powstał rozróżniać: brak pomiaru ≠ zmierzone zero.
+
+    OSTATNI ZAMKNIĘTY BAR WCHODZI DO POMIARU (recenzja cubic PR #138, D2 — potwierdzona
+    odczytem kodu). `range(od, len(bary))` nigdy nie wołało `zbuduj` z PEŁNYM wycinkiem,
+    więc najświeższy bar — ten, na którym rój głosowałby w produkcji — nie był badany
+    ani razu. Zakres i licznik postępu liczymy teraz z JEDNEJ wielkości (`krokow`), bo
+    rozjazd między „ile kroków zapowiadam" a „ile wykonuję" był tu źródłem wady.
+
+    UJEMNA ROZGRZEWKA JEST BŁĘDEM, NIE POMIAREM (D4). `od < 0` dawało wycinki `bary[:-n]`
+    (prawie cała seria) i `bary[:0]` (pustka) — czyli wynik, który wygląda jak pomiar,
+    a mierzy co innego, niż deklaruje. Cicha akceptacja takiej wartości to ta sama klasa
+    co „awaria zapisana jako 0.0": wejście bez sensu udające obserwację.
     """
+    if od < 0:
+        raise ValueError(f"`od` to DŁUGOŚĆ HISTORII przed pierwszym głosem — nie może być "
+                         f"ujemne (dostałem {od})")
     wybrane = [n for n in wszystkie_neurony() if n.KLUCZ in set(klucze)]
     serie: Dict[str, List[Optional[float]]] = {n.KLUCZ: [] for n in wybrane}
     awarie: Dict[str, int] = {n.KLUCZ: 0 for n in wybrane}
-    krokow = max(0, len(bary) - od)
-    for i, koniec in enumerate(range(od, len(bary)), 1):
+    # `+ 1`, bo `koniec` jest GÓRNĄ GRANICĄ wycinka: żeby ostatni bar wszedł, wycinek musi
+    # sięgnąć `len(bary)`. Warunek `if bary` chroni przed pustym wejściem, które przy `od=0`
+    # dałoby jeden krok z pustym wycinkiem — czyli pomiar bez ani jednego bara.
+    krokow = max(0, len(bary) - od + 1) if bary else 0
+    for i, koniec in enumerate(range(od, od + krokow), 1):
         wskazniki = budowniczy.zbuduj(bary[:koniec])
         for n in wybrane:
             try:
@@ -244,10 +261,23 @@ def raport(wyniki: List[Dict[str, Any]]) -> str:
 
 def zbadaj(sciezka_csv: str, interwal: str = "4h", *, limit: Optional[int] = None,
            od: int = 360, tylko: Optional[List[str]] = None, postep=None) -> List[Dict[str, Any]]:
-    """Pomiar na żywych danych: wczytaj bary → policz głosy → oceń każde skupisko."""
+    """Pomiar na żywych danych: wczytaj bary → policz głosy → oceń każde skupisko.
+
+    Wejście sprawdzamy PRZED wczytaniem CSV (D4): odrzucenie dopiero w `zbierz_serie`
+    kazałoby czekać na wczytanie i przeliczenie danych, żeby dowiedzieć się, że pytanie
+    było bez sensu od początku.
+    """
     from imperium.akwedukty.czytnik_csv import wczytaj_csv
     from imperium.legiony.budowniczy_wskaznikow import BudowniczyWskaznikow
 
+    if od < 0:
+        raise ValueError(f"`od` to DŁUGOŚĆ HISTORII przed pierwszym głosem — nie może być "
+                         f"ujemne (dostałem {od})")
+    if limit is not None and limit < 0:
+        # Ta sama KLASA co `od` (Prawo XV: łatamy klasę, nie objaw): liczba opisująca
+        # ROZMIAR okna nie ma ujemnej wartości, a `bary[-(-5):]` cicho wybrałoby co innego.
+        raise ValueError(f"`limit` to LICZBA BARÓW do wczytania — nie może być ujemna "
+                         f"(dostałem {limit})")
     bary = wczytaj_csv(sciezka_csv, interwal=interwal, limit=limit)
     budowniczy = BudowniczyWskaznikow()
     wszystkie = skupiska()
@@ -280,13 +310,22 @@ if __name__ == "__main__":
     import sys
 
     logging.disable(logging.CRITICAL)
+
+    def _nieujemny(tekst: str) -> int:
+        """Argparse odrzuca ujemne rozmiary SAM (D4) — z komunikatem, nie tracebackiem."""
+        wartosc = int(tekst)
+        if wartosc < 0:
+            raise argparse.ArgumentTypeError(
+                f"to liczba barów (rozmiar okna) — nie może być ujemna, dostałem {wartosc}")
+        return wartosc
+
     ap = argparse.ArgumentParser(
         description="DISCRIMINATOR — czy skupiska redundancji to naprawdę redundancja")
     ap.add_argument("--dane", default="dane/4h/Binance_BTCUSDT_4h.csv")
     ap.add_argument("--interwal", default="4h")
-    ap.add_argument("--limit", type=int, default=800,
+    ap.add_argument("--limit", type=_nieujemny, default=800,
                     help="ile ostatnich barów wczytać (0 = wszystkie)")
-    ap.add_argument("--od", type=int, default=360,
+    ap.add_argument("--od", type=_nieujemny, default=360,
                     help="minimalna historia przed pierwszym głosem (Pi Cycle wymaga 360)")
     ap.add_argument("--tylko", nargs="*", default=None, help="tylko wskazane skupiska")
     ap.add_argument("--lista", action="store_true", help="wypisz skupiska i zakończ")
@@ -301,7 +340,11 @@ if __name__ == "__main__":
         sys.exit(0)
 
     def _postep(co, _ile):
-        print(f"   {co}", flush=True)
+        # Pasek idzie na STDERR, bo stdout niesie WYNIK. Złapane przy powtórce pomiaru
+        # D2 (2026-08-02): `--json` mieszał postęp z danymi, więc `json.load` padał na
+        # własnym wydruku organu. Strumień diagnostyczny nie ma prawa psuć strumienia
+        # wyniku — a `flush` zostaje, żeby pasek nie zniknął w buforze (Prawo XXIV).
+        print(f"   {co}", flush=True, file=sys.stderr)
 
     wyniki = zbadaj(args.dane, args.interwal,
                     limit=args.limit or None, od=args.od,

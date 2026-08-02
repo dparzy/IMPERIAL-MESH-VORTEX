@@ -267,6 +267,57 @@ def test_blok_push_bez_galezi_odmawia_zamiast_podac_pustke():
         exactor.galaz_biezaca = oryginal
 
 
+def test_separator_po_komendzie_nie_robi_z_galezi_cudzej():
+    """E3 (cubic PR #138): `\\S+` pochłaniało domykający separator, więc `<gałąź>;`
+    ≠ `<gałąź>` i organ zgłaszał CUDZĄ GAŁĄŹ dla komendy w pełni poprawnej.
+
+    Waga wady jest większa, niż wygląda: hook `Stop` na tym werdykcie BLOKUJE, czyli
+    strażnik karałby za blok gotowy do wklejenia — dokładnie odwrotnie do swojego celu.
+    """
+    for separator in (";", " &&", " |", "&"):
+        tekst = ("```powershell\ncd C:\\Projekty\\imperial-mesh-vortex; "
+                 f"git push origin {GALAZ}{separator}\n```")
+        w = _zbadaj(tekst)
+        assert w["status"] == "spelniony", (separator, w)
+
+
+def test_capture_galezi_nadal_lapie_cudza_galaz():
+    """Granica W DRUGĄ STRONĘ: zwężenie wzorca nie może uciszyć oryginalnej reguły —
+    inaczej naprawa fałszywki kupiłaby ślepotę na wadę, której organ pilnuje."""
+    w = _zbadaj("```powershell\ncd C:\\Projekty\\imperial-mesh-vortex; "
+                "git push origin main;\n```")
+    assert w["status"] == "niespelniony", w
+    powod = next(b["powod"] for b in w["braki"] if b["id"] == "push_pelny_blok")
+    assert "'main'" in powod, powod
+
+
+def test_sciezka_ze_spacja_jest_cytowana_i_przechodzi_wlasne_sprawdzenie():
+    """E5 (cubic PR #138): `cd C:\\Program Files\\x` to komenda NIEWYKONALNA podana jako
+    „gotowa do wklejenia" — siostra wady E6 (`git push origin ` przy detached HEAD).
+
+    Sprawdzamy OBIE strony niezmiennika: że blok jest cytowany i że przechodzi to,
+    czego organ sam wymaga (bo cudzysłów zmienia dopasowanie wzorca `cd`).
+    """
+    blok = exactor.blok_push(galaz=GALAZ, korzen=Path("C:/Program Files/imperial mesh"))
+    assert "'" in blok, blok
+    w = _zbadaj(f"```powershell\n{blok}\n```")
+    assert w["status"] == "spelniony", (blok, w)
+
+
+def test_sciezka_zwykla_zostaje_bez_cudzyslowow():
+    """Postać BEZ cudzysłowów to ta, która przeszła kalibrację na 190 meldunkach.
+    Cytowanie „na wszelki wypadek" zmieniałoby rzecz ZMIERZONĄ bez nowego pomiaru."""
+    blok = exactor.blok_push(galaz=GALAZ, korzen=Path("C:/Projekty/imperial-mesh-vortex"))
+    assert "'" not in blok, blok
+
+
+def test_cytowanie_nie_rozwija_zmiennych_powloki():
+    """Pojedynczy cudzysłów, nie podwójny: w `"$HOME/x"` PowerShell i bash rozwinęłyby
+    `$HOME`, więc „gotowy do wklejenia" blok wskazywałby CUDZY katalog."""
+    assert exactor.cytuj_sciezke("/home/$USER/repo x").startswith("'")
+    assert '"' not in exactor.cytuj_sciezke("/home/$USER/repo x")
+
+
 # ── GRANICA 6: CLI ──────────────────────────────────────────────────────────────
 
 def test_cli_bramka_zwraca_kod_wyjscia(tmp_path):

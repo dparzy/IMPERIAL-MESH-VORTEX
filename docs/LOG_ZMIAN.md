@@ -14,6 +14,46 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-02 | 🔧 | G1 — DŁUG P1 RECENZJI cubic PR #138 (E3/E5/D2/D4) + wada złapana na żywo
+
+Cztery wady dostarczone trzy dni wcześniej, plus piąta znaleziona dopiero **realnym
+użyciem**. Każda naprawa ma test granicy, a każdy test sprawdzony **mutacją** (5/5
+złapanych) — zielony test na naprawionym kodzie sam z siebie niczego nie dowodzi.
+
+| Wada | Co było | Dlaczego to ważyło |
+|---|---|---|
+| **E3** `exactor.py` | `(\S+)` pochłaniało domykający separator, więc gałąź z bloku brzmiała `<gałąź>;` | werdykt „cudza gałąź" dla komendy **bezbłędnej** — a hook `Stop` na tym **blokuje**. Strażnik karałby za blok gotowy do wklejenia |
+| **E5** `exactor.py` | `cd {korzen}` bez cytowania — ścieżka ze spacją rozbijała komendę | siostra E6: organ, którego powodem istnienia jest niekompletny blok push, **sam** produkował niewykonalny |
+| **D2** `discriminator.py` | `range(od, len(bary))` nigdy nie wołało `zbuduj` z pełnym wycinkiem | **najświeższy bar — ten, na którym rój głosuje w produkcji — nie był badany ani razu**; licznik zapowiadał tyle kroków, ile faktycznie wykonano, więc wada była niewidoczna |
+| **D4** `discriminator.py` | ujemne `od` przyjmowane | `bary[:-5]` i `bary[:0]` — wynik **wygląda** jak pomiar, a mierzy co innego, niż deklaruje |
+| **+1 znaleziona na żywo** | pasek postępu na `stdout` razem z wynikiem | `--json` był **niesparsowalny** — organ psuł własny wydruk. Nie złapał tego żaden test, bo testy czytały funkcje, nie CLI |
+
+### Pomiar, nie deklaracja (LEX TALARUS)
+
+**EXACTOR — kalibracja nienaruszona.** A/B starych i nowych wzorców na tym samym
+korpusie kroniki (149 sesji, **76** meldunków zawierających `git push`): **zero**
+zmienionych werdyktów, zero różnic nawet w samej liście gałęzi. Uczciwe dopowiedzenie:
+wada E3 **nie miała historycznej ofiary** — 5 wystąpień `git push origin <gałąź>;`
+siedzi wewnątrz pętli retry, po `{`, czyli poza pozycją polecenia, gdzie **żaden**
+z wzorców (stary ani nowy) ich nie widzi. Naprawa jest **prewencyjna i potwierdzona
+mutacją**, nie retrospektywna. ⚠️ Liczba 76 nie jest tym samym podziałem co „190
+meldunków / 156 przekazań" z kalibracji 2026-07-30 — tamten korpus dzielono inaczej
+i **nie odtworzyłem go**; porównanie A/B jest wewnętrznie spójne (ten sam tekst po obu
+stronach), ale nie jest powtórzeniem tamtego pomiaru.
+
+**DISCRIMINATOR — werdykt bez zmian.** Powtórka biegu (BTCUSDT 4h, 800 barów, 360
+rozgrzewki): **441** kroków zamiast 440, `X-05 ↔ XII-02` **r = 0,8218** wobec bazy
+**0,8217**. Identyczne 17 skupisk / 125 par / 1 kandydat / 27 milczących / 0 awaryjnych.
+D2 usuwa **klasę** wady, nie zmienia wniosku o składzie roju.
+
+**Pliki:** `imperium/pretorianie/exactor.py`, `imperium/legiony/discriminator.py`,
+`tests/test_exactor.py`, `tests/test_discriminator.py` (`zbierz_serie` nie miała dotąd
+**ani jednego** testu — obie wady siedziały właśnie w jedynej funkcji dotykającej barów,
+co samo w sobie jest lekcją o zasięgu bramki), `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`
+(+5), `bibliotheca_ulpia/dane/rejestr_testow.jsonl` (+1 POMIAR).
+
+---
+
 ## 2026-08-02 | 🛡️ | P2 — UODPORNIENIA PRZECIW KLASOM (a nie łatanie objawów)
 
 P0 naprawiło pięć wad. P2 pyta o coś innego: **dlaczego mogły powstać** i co sprawi, że

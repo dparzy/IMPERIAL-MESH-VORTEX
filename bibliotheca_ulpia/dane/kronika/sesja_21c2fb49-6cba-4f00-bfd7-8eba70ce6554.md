@@ -161,3 +161,149 @@ Limit 5-godzinny na 100% — domykam najkrótszą legalną drogą: wszystkie zap
 
 ## 🏛️ Claude
 You've hit your session limit · resets 4:50am (Europe/Warsaw)
+
+## 🧑 Cezar
+Continue from where you left off.
+
+## 🏛️ Claude
+No response requested.
+
+## 🧑 Cezar
+limit 5 godzin
+
+## 🏛️ Claude
+Wachta wznowiona. Stan: SILENTIUM zbudowany i udokumentowany, **brakuje tylko bramki i commitu**. Odpalam bramkę — to najkrótsza legalna droga do zachowania pracy.
+
+## 🏛️ Claude
+Przed bramką domykam dwa zapisy do ledgerów (potem cisza je zablokuje): CORONA i Dziennik.
+
+## 🏛️ Claude
+Limit odnowiony — wracam do pełnej, właściwej procedury zamknięcia bez skrótów. Odpalam pełną bramkę w tle (testy → audyt sekwencyjnie, żeby ciszę zakładał jeden bieg naraz):
+
+## 🏛️ Claude
+Bramka biegnie. Sprawdzam, czy **sama bramka założyła ciszę automatycznie** — to dowód, że wpięcie działa bez mojej dyscypliny:
+
+## 🏛️ Claude
+**Mechanizm domknięty i zmierzony na żywo, bez udziału mojej dyscypliny:**
+
+- bramka `tests/run_tests.py` (pid 16120) **sama założyła ciszę** przy starcie — nie musiałem o niej pamiętać;
+- hook w trakcie biegu **odmawia** `git add` z komunikatem podającym, co trwa, ile jeszcze i jak awaryjnie zdjąć.
+
+To dokładnie ta luka, która kosztowała 4 unieważnione biegi w 4 dni — w tym dwa moje w jednej wachcie, mimo że sam zapisałem tę zasadę 31.07.
+
+Czekam na wynik pełnej bramki (testy → audyt → skan wad). Do jej końca sam też nie mogę pisać do repo — i tak ma być.
+
+## 🧑 Cezar
+<task-notification>
+<task-id>b7unml4ug</task-id>
+<tool-use-id>toolu_016Zo91KnhnL1RybfzQM6z45</tool-use-id>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\21c2fb49-6cba-4f00-bfd7-8eba70ce6554\tasks\b7unml4ug.output</output-file>
+<status>completed</status>
+<summary>Background command "Pełna bramka Prawa XXI w tle" completed (exit code 0)</summary>
+</task-notification>
+
+## 🏛️ Claude
+Bramka **czerwona: 3 oblane testy**. Sprawdzam, co konkretnie:
+
+## 🏛️ Claude
+Wszystkie trzy mają **jedną przyczynę**: katalog INDEKS nie nadąża za CENSUS po dopisaniu dwóch nowych modułów (260 → 262). Naprawiam u źródła generatorem:
+
+## 🏛️ Claude
+Audyt exit 0, W24 widzi już 7 hooków. Powtarzam pełne testy (w tle) i robię skan wad — narzędzie bierze jeden plik naraz:
+
+## 🏛️ Claude
+Skan wad czysty na wszystkich czterech nowych plikach. MATURITAS bez zmian (3/3/3) — i to jest **uczciwa** odpowiedź: SILENTIUM stoi na piętrze HARNESS, którego MATURITAS nie mierzy (mierzy 3 z 9). Czekam na powtórkę testów.
+
+## 🧑 Cezar
+<task-notification>
+<task-id>bcxjngy03</task-id>
+<tool-use-id>toolu_019Mg49xsrPmeZAPa2yVaSgj</tool-use-id>
+<output-file>~\AppData\Local\Temp\claude\C--Projekty-imperial-mesh-vortex\21c2fb49-6cba-4f00-bfd7-8eba70ce6554\tasks\bcxjngy03.output</output-file>
+<status>completed</status>
+<summary>Background command "Powtórka pełnych testów w tle" completed (exit code 0)</summary>
+</task-notification>
+
+## 🏛️ Claude
+Bramka **zielona: 3402/3402**, audyt exit 0, skan wad czysty. Domykam wachtę wg checklisty CLAUSURY.
+
+## 🏛️ Claude
+Commit `fff7b71` zapisany. Utrwalam dwie rzeczy w pamięci — stan koron i lekcję o przyrządzie:
+
+## 🏛️ Claude
+mark_chapter Wachta domknięta
+
+**CORONA A: SILENTIUM — wdrożona, skalibrowana, zacommitowana (`fff7b71`).**
+
+## Co powstało
+
+Pierwszy organ Imperium, który **zapobiega** zamiast wykrywać. Mieliśmy dwa organy patrzące wstecz — strażnik czystości w `run_tests.py` i VINDEX — i zero broniących z przodu. Strażnik czystości sam przyznaje w swoim komunikacie, że nie odróżni winy testu od równoległej edycji. Koszt luki: 4 unieważnione biegi w 4 dni, **dwa moje w jednej wachcie**, mimo że zasadę zapisałem 31.07.
+
+Blokadę zakłada **proces bramki**, nie hook rozpoznający komendę — bieg w tle wraca z narzędzia natychmiast, więc hook zdjąłby ciszę w pierwszej sekundzie 20-minutowego biegu. Trzy bezpieczniki przed zamurowaniem repo: żywotność PID, TTL 45 min, furtka `--sila`. `os.kill(pid,0)` jest zakazany — na Windowsie to `TerminateProcess`, czyli badanie „czy żyjesz" zabiłoby bramkę.
+
+## Kalibracja — i dlaczego nie ogłosiłem sukcesu od razu
+
+| wersja klasyfikatora | precyzja | czułość (ważona populacją) | przecieki |
+|---|---|---|---|
+| pierwsza, „na wyczucie" | 63,3% | ~46% | 11 / 60 |
+| po naprawie **każdej zmierzonej** pomyłki | **93,5%** | **98,3%** | 1 / 60 |
+
+Prawda podstawowa: 120 zaetykietowanych **realnych** komend z transkryptów (korpus 5571), etykiety wersjonowane, test regresji w pakiecie. Pierwsza wersja była gorsza od braku strażnika — dawałaby fałszywy spokój.
+
+**Dwie rzeczy obaliły mnie w trakcie, nie po fakcie:**
+1. Dwie z moich etykiet były **błędne** — wykrył je klasyfikator, nie ja. Sądziłem podgląd 230 znaków; pełna treść przyznała mu rację.
+2. Korpus transkryptów rośnie w trakcie sesji, więc `random.sample` na tym samym ziarnie dał po 20 minutach inny zestaw — etykiety nadane po numerach rozjechały się z komendami. Zdążyłem zameldować metrykę liczoną na przesuniętych etykietach. Próbka jest teraz zamrożona w pliku.
+
+**Weryfikacja na żywej ścieżce, nie tylko w testach:** bramka sama założyła ciszę (pid 16120), a harness **odmówił mojej realnej edycji** [ROADMAP_IMPERIUM.md](docs/ROADMAP_IMPERIUM.md).
+
+## Bramka
+3402/3402 zielone · audyt exit 0 (24 warstwy, W24 widzi 7 hooków) · ruff czysto · skan wad czysty · dług honorowy 0 (53 noty / **55** koron).
+
+Trzy oblane testy w pierwszym biegu miały jedną przyczynę (katalog INDEKS nie nadążał za CENSUS po dopisaniu 2 modułów) — naprawione generatorem, nie ręcznie. Przy okazji VIGIL wskazał wcześniejszą wadę: `_stan_repo()` dekodował `git status` kodowaniem konsoli, więc polska nazwa pliku wywaliłaby strażnika czystości dokładnie na brudnym drzewie.
+
+## 🚨 Prawo XV — utrata potencjału
+
+- **Kolejka Hyginusa rosła, nie malała:** 44 → 46 cząstek, **37 czeka na sędziego**. To zapłacony zwiad bez werdyktu.
+- **MATURITAS bez zmian 3/3/3** — i to jest uczciwe, nie porażka: SILENTIUM stoi na piętrze **HARNESS**, którego MATURITAS nie mierzy (3 piętra z 9). To argument **za** koroną D, nie przeciw.
+- **Wizje bez werdyktu: 372 → 375.** Otwieramy szybciej, niż zamykamy — bez zmian od 02.08.
+- **CLAUDE.md 282 > 200 linii** — dług kontekstu płacony w każdej sesji, wciąż nietknięty.
+
+## Push (Twój, wygenerowany komendą)
+
+```bash
+cd C:\Projekty\imperial-mesh-vortex; git push origin claude/sleepy-fermi-dsdE4
+```
+
+Następna w kolejce wg Twojej zatwierdzonej kolejności: **CORONA C — CUSTOS BIBLIOTHECAE** (warstwa W25, 133 księgi poza RAG).
+
+## 🧑 Cezar
+push zrbiony
+
+## 🏛️ Claude
+**Push potwierdzony pomiarem, nie deklaracją:**
+
+- LOKAL = ZDALNY: `[ZREDAGOWANO]`
+- ahead/behind: **0 / 0**
+- drzewo robocze: czyste
+
+CORONA A jest na `origin/claude/sleepy-fermi-dsdE4`. Wachta domknięta w komplecie — bramka zielona, dokumenty i pamięć zsynchronizowane z kodem, Dziennik zapisany, dług honorowy 0 (53 noty / 55 koron).
+
+Gdy wrócimy: **CORONA C — CUSTOS BIBLIOTHECAE** (warstwa W25: dysk ↔ katalog ↔ cache ↔ RAG). Powód stoi zmierzony: 40 ksiąg przybyło 01.08 i nikt nie zauważył przez dobę, bo żadna z 24 warstw audytu nie pyta o księgi — a 133 z 248 wciąż są poza RAG.
+
+## 🧑 Cezar
+moge clear
+
+## 🏛️ Claude
+Tak — możesz czyścić. Sprawdzone, nie zakładane:
+
+| Co | Stan |
+|---|---|
+| Kod + testy | zacommitowane, `fff7b71` |
+| Push | lokalny = zdalny, ahead/behind 0/0 |
+| Drzewo robocze | czyste (0 plików) |
+| Dziennik Nieśmiertelny | wpis zapisany — następna sesja zobaczy cały łuk |
+| Pamięć trwała | 2 pliki zapisane (stan koron + lekcja o przyrządzie), indeks MEMORY.md zaktualizowany |
+| Dług honorowy | 0 (53 noty / 55 koron) |
+
+Nic nie ginie: pamięć i Dziennik żyją poza kontekstem, a kronika sesji zapisuje się hookiem końca.
+
+Po `clear` otwórz `/apertio` — banner „NASTĘPNY KROK" powie **CORONA C: CUSTOS BIBLIOTHECAE**.

@@ -1,10 +1,10 @@
 ---
 
-## Ostatnia aktualizacja: 2026-08-02
+## Ostatnia aktualizacja: 2026-07-30
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
-stan_na: 2026-08-02
+stan_na: 2026-07-30
 powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360)"
 ---
 # PAMIĘĆ SESJI — W-360
@@ -113,23 +113,14 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-08-02 — Zielony test bez mutacji nie dowodzi złapania wady
-Cztery nowe testy graniczne zweryfikowano mutacją — 4/4 mutantów złapane. Bramka jakości wymaga sprawdzenia testu mutacją, inaczej test może być ślepy.
+### 2026-07-30 — Alarmy procesowe to zadania: 35 cząstek Hyginusa, 20 pomysłów W9, LEKCJA 3
+35 cząstek Hyginusa czeka na sędziego (trzeci raz w Top-3 lekcji), 20 pomysłów z refleksji W9 wisi >21 dni, a LEKCJA 3 o zgodności skal wymaga sprawdzenia. To zaległości, nie tapeta.
 
-### 2026-08-02 — PR 138 — realna recenzja ujawnia 5 błędów P1
-exactor odrzuca własny blok przy ścieżce POSIX; git push z pustą gałęzią przy detached HEAD; osierocona kotwica traktowana jak sukces; awaria neuronu zapisana jako 0.0 wchodzi do korelacji; stop.sh bez bitu +x na Unixie. Wzorzec: przyrząd, który kłamie o sobie.
+### 2026-07-30 — CLAUDE.md przekracza limit 200 linii i rośnie ~1 linia/dzień
+Konstytucja ma 259 linii (>200) i rośnie liniowo — pełzająca regresja. Część treści trzeba przenieść do skilli na żądanie; potrzebna decyzja kierunkowa Cezara.
 
 ### 2026-08-02 — Martwy słownik MECHANIZMY_ZWIADOWCY w rejestrze
 Słownik 12 wpisów (rejestr.py:208) nie jest czytany przez żaden kod; mechanizm MECHANIZM trafia tylko do neuronów. Skutek: DISCRIMINATOR i dekorelacja (Prawo XVI) nie obejmują 15 zwiadowców; EXP-13/14 aktywne bez wpisu.
-
-### 2026-08-02 — 5 uwag P1 trafia w organy ogłoszone jako gotowe
-Exactor, discriminator i hook stop — przyrządy ogłoszone gotowe 07-31 mają P1. Wspólna klasa z talarem N-b74ce133: przyrząd, który kłamie o sobie. Strażnik meldunku przepuszcza wszystko, gdy jego kotwica w CLAUDE.md przestanie pasować.
-
-### 2026-08-02 — Bliźniacze lekcje i duplikaty decyzji w pamięci
-PAMIEC_SESJI_ARCHIWUM.md zawiera dwie pary bliźniaczych lekcji, wizje_i_decyzje.jsonl ma duplikaty decyzji z 07-27 oraz wpis POMYSŁ z treścią mówiącą 'wdrożono'. PAMIEC_SESJI.md ma lekcję z 07-30 przy nagłówku 07-28.
-
-### 2026-08-02 — PR #138 to prawdziwa recenzja — 20 uwag, 5×P1
-W odróżnieniu od PR #137, raport cubic-dev-ai pokrywa cały kod wachty 07-31 (3 commity). Najcięższe: P1 w exactor (walidator odrzuca własny POSIX, git push z pustą gałęzią, osierocona kotwica = hook milczy), discriminator zapisuje awarię jako 0.0, stop.sh bez bitu +x.
 
 ### 2026-07-27 — Testy Warstwy 6 padają przy nieaktualnej dacie 'Stan na:'
 Audyt spójności (Warstwa 6) zgłasza błąd, gdy README.md lub docs/MANIFEST_KODU.md deklarują 'Stan na:' starszą niż data ostatniego commitu. Zgodnie z Regułą 9 Prawa XXI to błahostka — naprawiana samodzielnie, bez eskalacji do Cezara.
@@ -281,9 +272,6 @@ W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokł
 ### 2026-07-20 — prekalkuluj_portfel – brak zysku algorytmicznego
 Funkcja wykonuje tę samą pracę per-bar co backtest pojedynczy, tylko równolegle (1.4× przyspieszenia). Nie zmniejsza złożoności, tylko maskuje problem.
 
-### 2026-07-20 — Redundancja w wma (_py_hma) – 930 wywołań/tick
-Wewnętrzna pętla _py_hma wywołuje wma wielokrotnie (4.5M wywołań, 65.5s cumtime), co jest głównym źródłem stałej liniowej. Optymalizacja: prekalkulacja lub użycie numpy.
-
 ### 2026-07-20 — Backtest liniowy, nie O(n²)
 Pomiary profili dla 500-1600 barów wykazały stały ms/tick (~66ms), co oznacza skalowanie O(n·okno), nie kwadratowe. Premisa planu naprawy była błędna.
 
@@ -316,9 +304,6 @@ Błąd 403 przy push do GitHub oznacza, że sesja Claude nie ma uprawnień zapis
 
 ### 2026-06-30 — Normalizacja interwałów w strategiach
 Błąd: 5m.upper() -> '5M' zamiast 'M5'. Dodano funkcję _normalizuj_interwal w baza.py mapującą formaty (5m->M5, 1h->H1 itd.) aby backtesty filtr/strategia działały poprawnie.
-
-### 2026-06-30 — Backtest Arena: conservative SL gdy obie bariery w jednym barze
-Jeśli w jednej świecy osiągnięto zarówno TP jak i SL, wynikiem jest SL (konserwatywnie).
 
 ### 2026-06-30 — Błąd loadera po reorganizacji na strukturę rzymską
 Po przeniesieniu modułów do folderów rzymskich (fundament, legiony itp.), loader w pierwy_zwiadowca.py szukał plików po starych nazwach we własnym folderze. Naprawiono przez zmianę na ścieżki względne z importlib.util.spec_from_file_location.

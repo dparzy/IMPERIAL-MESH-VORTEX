@@ -24,7 +24,80 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 **Legenda stanu:** ✅ zrobione · 🟡 kod jest, brak dowodu · 🔴 nie istnieje · ⏸️ świadomie odłożone
 
+---
+
+## 🧹 LUSTRATIO IMPERII — WIELKI PRZEGLĄD (ROZKAZ STAŁY — Cezar 2026-08-04)
+
+> ### ⛔ ZAMROŻENIE ROZWOJU
+> **Dopóki Imperium nie będzie W PEŁNI SKALIBROWANE i w pełni zgodne z zasadami
+> i prawem Imperium — NIE RUSZAMY DALEJ.** Żadnych nowych zdolności, żadnych nowych
+> kierunków. Wolno budować **wyłącznie to, co zamyka wykrytą lukę** albo to, co jest
+> potrzebne, by lukę ZMIERZYĆ.
+
+**Słowa Cezara (2026-08-04):** *„jabłko psuje się od środka, a ryba od głowy — dlatego
+nie możemy pozwolić, aby nasze Imperium było robaczywe i zepsute w żadnej z warstw."*
+
+**Powód zmierzony tego samego dnia — trzy dziury w trzech różnych organach:**
+- LUSTRUM: **27 z 260 modułów** bez żadnego wołacza; naiwny sygnał dałby **100% fałszywek**
+  (25/25 sierot to przyrządy ręczne z CLI), a pod nimi **3 realne moduły otestowane
+  i nigdzie niewpięte** — majątek leżący odłogiem.
+- TABULARIUM: **23 błędy + 33 ostrzeżenia** leżące w trybie miękkim; **23 dokumenty bez
+  pola `wlasciciel` są NIEWIDZIALNE dla bramki GNICIA** (pętla po właścicielach nie
+  wykonuje się ani razu) — nie „przechodzą kontrolę", tylko nie są kontrolowane.
+- MATURITAS: **52 wiersze ROADMAP** wypadają z pomiaru bez śladu, bo mają w kolumnie 3
+  opis zamiast statusu; dług honorowy liczony osobną arytmetyką, nieświadomą ODROCZENIA.
+
+Wspólna KLASA wszystkich trzech: **organ, który nie umie powiedzieć „nie wiem", milczy —
+a milczenie czytamy jako zieleń.** To jest robactwo, o którym mówi rozkaz.
+
+### Kolejność przeglądu (ZATWIERDZONA)
+
+| # | Etap | Stan |
+|---|---|---|
+| L0 | **LUSTRUM** — dokończyć: testy + kalibracja progu na prawdzie podstawowej | 🟡 kod stoi, brak testów i kalibracji |
+| L1 | **TABULARIUM** — spłacić 23 błędy + 33 ostrzeżenia; zamknąć dziurę „brak właściciela = brak kontroli" | 🔴 |
+| L2 | **Przegląd WSZYSTKICH organów** wg kategorii, wykonalności, zadań, piętra ewolucji i **wzajemnej współpracy** — checklisty kontrolne per kategoria | 🔴 |
+| L3 | **Uzupełnienie wykrytych braków i luk** — dopiero po komplecie pomiarów | 🔴 |
+| L4 | **Bramka wyjścia** — zdjęcie zamrożenia | 🔴 |
+
+### Co sprawdzamy przy KAŻDYM organie (checklista bazowa)
+
+1. **Zgodność z prawem** — które z 25 Praw go dotyczą i czy je spełnia
+2. **Wykonalność** — czy w ogóle da się go uruchomić (droga wejścia: import, CLI, hook)
+3. **Kalibracja** — czy przyrząd orzekający był mierzony na PRAWDZIE PODSTAWOWEJ (LEX TALARUS)
+4. **Testy** — czy istnieją i czy mają **test granicy** dla każdego progu
+5. **Piętro ewolucji** — PROMPT / LOOP / GRAPH / HARNESS / NEURO-SYMBOLIC …
+6. **Współpraca** — kto go woła, kogo on woła, czy zgadza się ze schematem swojego etapu
+7. **Luka** — czego mu brakuje, żeby był zgodny ze wzorcem
+
+### 🆕 CO ARCHITEKT PROPONUJE DOŁOŻYĆ DO POSTANOWIENIA (do decyzji Cezara)
+
+Rozkaz kazał sprawdzić, czym go uzupełnić. Siedem pozycji, każda z powodem:
+
+- **U1 — MIERZALNY WARUNEK WYJŚCIA.** „W pełni skalibrowane" bez liczby jest stanem
+  niefalsyfikowalnym: zamrożenie albo nigdy się nie skończy, albo skończy się arbitralnie.
+  Potrzebna JEDNA bramka zwracająca exit 0 dopiero przy komplecie kryteriów.
+- **U2 — KOLEJNOŚĆ WG RYZYKA, NIE ALFABETU.** „Ryba psuje się od głowy" — głową jest to,
+  co decyduje o kapitale. Najpierw ścieżka decyzyjna (wejście/wyjście z pozycji), potem
+  przyrządy orzekające, na końcu dokumentacja.
+- **U3 — CHECKLISTA PER KATEGORIA, nie jedna dla wszystkich.** Neuron sprawdza się inaczej
+  niż strażnik: neuron musi mieć pole WYMAGA i nie zwracać wiecznie NEUTRAL, strażnik musi
+  być przetestowany na OBU drogach wejścia (zmierzona klasa: 3 wady w jednej wachcie 08-03).
+- **U4 — REJESTR POSTĘPU PRZEGLĄDU (append-only).** 262 organy nie zmieszczą się w jednej
+  wachcie. Bez ledgera przegląd zgubi się między sesjami albo zrobimy go dwa razy.
+- **U5 — ZAKAZ POWIĘKSZANIA MIANOWNIKA.** W czasie przeglądu nie powstają nowe organy poza
+  tymi, które zamykają wykrytą lukę — inaczej liczba do sprawdzenia rośnie szybciej,
+  niż ją zbijamy.
+- **U6 — ANTYWSKAŹNIKI.** Przegląd musi być NIEOSZUKIWALNY: pozycji nie zamyka się przez
+  skasowanie jej ani przez zmianę nazwy. Wzorzec gotowy — `maturitas --antywskazniki`.
+- **U7 — SPRZĄTANIE PO SOBIE JEST CZĘŚCIĄ PRZEGLĄDU.** Każda znaleziona luka od razu dostaje
+  albo naprawę, albo wpis w rejestrze z terminem. Znalezisko bez adresu to kolejna sugestia
+  w stosie 34 nierozstrzygniętych.
+
 ### 👑 CZTERY KORONY — kolejność ZATWIERDZONA PRZEZ CEZARA 2026-08-03
+
+> ⚠️ **ODŁOŻONE na czas LUSTRATIO** (rozkaz 2026-08-04): korony C, B i D to ROZWÓJ, a rozwój
+> jest zamrożony do zdjęcia bramki. Korona **A jest już wdrożona**, więc nic nie blokuje.
 
 > Powstały jako opcje spłaty NOTY (LEX TALIONIS) za zwiad puszczony równolegle z bramką.
 > **Nowy ROZKAZ STAŁY z tej samej wachty:** przed spłatą noty Architekt podaje **TRZY

@@ -40,6 +40,25 @@ decyzje kierunkowe/nieodwracalne (kasowanie, kapitał, zmiana strategii, koszt).
 
 - **🗺️ PRAWO XVII — ROZPOZNANIE TERENU** — na starcie i przed nowym zadaniem czytasz stan Imperium z KODU, nigdy z pamięci (KROK 0 wykonuje hook startowy). Rozbieżność = STOP i naprawa przed zadaniem. Komendy weryfikacyjne: **`/spojnosc`**.
 
+## ⛔ LUSTRATIO IMPERII — ZAMROŻENIE ROZWOJU (ROZKAZ STAŁY — Cezar 2026-08-04)
+
+**Dopóki Imperium nie jest W PEŁNI SKALIBROWANE i zgodne z prawem — NIE RUSZAMY DALEJ.**
+Wolno budować wyłącznie to, co **zamyka wykrytą lukę** albo pozwala ją **zmierzyć**.
+Żadnych nowych zdolności ani kierunków, także tych już zatwierdzonych (korony B/C/D czekają).
+
+Słowa Cezara: *„jabłko psuje się od środka, a ryba od głowy — nie możemy pozwolić, aby
+Imperium było robaczywe w żadnej z warstw."* Powód zmierzony 2026-08-04: trzy organy,
+trzy dziury tej samej KLASY — **organ, który nie umie powiedzieć „nie wiem", milczy,
+a milczenie czytamy jako zieleń** (LUSTRUM 100% fałszywek na jednym sygnale; 23 dokumenty
+niewidzialne dla bramki GNICIA; 52 wiersze ROADMAP poza pomiarem MATURITASA).
+
+Kolejność: **L0 LUSTRUM → L1 TABULARIUM → L2 przegląd wszystkich organów wg kategorii
+→ L3 uzupełnienie luk → L4 bramka wyjścia.** Pełny plan, checklista bazowa, checklisty
+per kategoria i siedem uzupełnień (U1–U7): **`docs/ROADMAP_IMPERIUM.md` § LUSTRATIO IMPERII**.
+
+**Złamanie:** rozpoczęcie zadania rozwojowego przed zdjęciem zamrożenia; zamknięcie pozycji
+przeglądu bez pomiaru; znalezisko bez naprawy albo bez wpisu z terminem.
+
 ## 🚨 PRAWO XV — CZERWONY ALARM UTRATY POTENCJAŁU (ROZKAZ STAŁY)
 
 **Na końcu każdej sesji, każdego audytu i każdego większego zadania** — OBOWIĄZKOWO

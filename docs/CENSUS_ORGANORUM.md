@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: narzedzia/census_organorum.py
-stan_na: 2026-08-03
+stan_na: 2026-08-04
 powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem"
 ---
 # 🏛️ CENSUS ORGANORUM — spis organów i narzędzi Imperium
@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 262** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 263** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -250,6 +250,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `filtr_ekonomiczny.py` | Filtr Ekonomiczny (ECON — market price of risk) — brama „zbyt dobre, by było prawdziwe" |
 | `kalkulator_lewara.py` | Kalkulator Lewara — matematyka przeżycia |
 | `lustro_prawdy.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
+| `lustrum.py` | 🧹 LUSTRUM — obrzęd oczyszczenia KOŃCZĄCY cenzus (CORONA A, spłata noty N-fa723062) |
 | `nomenclator.py` | 🏷️ NOMENCLATOR — Strażnik Imion Imperium (warstwa 2 anty-redundancyjna Hyginusa) |
 | `portitor.py` | 🏛️ PORTITOR — celnik u wrót: pre-flight gotowości środowiska na starcie sesji (Prawo XV/XVII) |
 | `praeda.py` | 🗡️💎 PRAEDA (Łupieżca) — TRYB ŁOWCY: kontrolowana, AUTO-skalowana chciwość (W-291) |

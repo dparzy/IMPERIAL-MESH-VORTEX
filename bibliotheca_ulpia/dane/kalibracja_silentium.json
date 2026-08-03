@@ -1,0 +1,736 @@
+{
+ "opis": "Prawda podstawowa dla klasyfikatora komend SILENTIUM. Etykiety nadal Architekt (Vitruviusz) 2026-08-03, czytajac KAZDA komende i odpowiadajac na jedno pytanie: czy jej wykonanie w czystym drzewie moze zmienic `git status`. Zapis do katalogow ignorowanych (dane/*.csv, raporty/, logs/) jest wiec CZYTA - nie uniewaznia biegu bramki.",
+ "zrodlo": "transkrypty sesji tego repo (~/.claude/projects/<repo>/*.jsonl)",
+ "korpus_unikalnych": 5572,
+ "ziarno": 20260803,
+ "na_warstwe": 60,
+ "probki": [
+  {
+   "nr": 1,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "git fetch origin claude/sleepy-fermi-dsdE4 2>&1 | tail -1; echo \"=== ahead/behind ===\"; git rev-list --left-right --count origin/claude/sleepy-fermi-dsdE4...HEAD; echo \"=== SHA lokalny / zdalny ===\"; git rev-parse HEAD; git rev-parse origin/claude/sleepy-fermi-dsdE4; echo \"=== drzewo ===\"; git status --short | head -3"
+  },
+  {
+   "nr": 2,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && echo \"=== ruff na pliku ===\"; python -m ruff check narzedzia/bibliotekarz.py 2>&1 | tail -5; echo \"=== pełne testy w tle ===\"; python tests/run_tests.py > \"$TEMP/hyg_u2_tests.txt\" 2>&1 &\necho \"start full tests (bg pid $!)\"; echo \"=== audyt ===\"; python narzedzia/audyt_spojnosci.py 2>&1 | tail -3; echo \"AUDIT_EXIT=${PIPESTATUS[0]}\""
+  },
+  {
+   "nr": 3,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python - <<'PY'\nimport re\np = \"tests/test_scriba_codex.py\"\ns = open(p, encoding=\"utf-8\").read()\ns = s.replace(\n    \"from narzedzia.scriba_codex import (zapisz_ab, zapisz_ic, zapisz_sugestia,\\n                                    POLA_AB, POLA_IC, POLA_SUGESTIA)\",\n    \"from narzedzia.scriba_codex import (zapisz_ab, zapisz_ic, zapisz_sugestia,\\n                                    zamknij_sugestia,\\n                                    POLA_AB, POLA_IC, POLA_SUGESTIA)\")\ns += '''\n\ndef test_zamknij_sugestia_dopisuje_rekord_zamkniecia():\n    \"\"\"Zamknięcie to NOWA linia z tym samym elementem (Prawo I: historii nie kasujemy).\"\"\"\n    p = _tmp()\n    zapisz_sugestia(element=\"E1\", dzial=\"Wydajnosc\", uzasadnienie=\"u\",\n                    zgodnosc_imperium=\"tak\", zrodlo=\"t\", data=\"2026-07-19\", sciezka=p)\n    assert zamknij_sugestia(element=\"E1\", powod=\"teza obalona pomiarem\",\n                            zrodlo=\"t\", data=\"2026-07-19\", sciezka=p) is True\n    linie = _linie(p)\n    assert len(linie) == 2                      # oryginał ZOSTAJE\n    assert linie[0][\"status\"] == \"KANDYDAT\"\n    assert linie[1][\"status\"] == \"ZAMKNIETE\"\n    assert linie[1][\"element\"] == \"E1\"\n    assert linie[1][\"dzial\"] == \"Wydajnosc\"     # kontekst przepisany z oryginału\n\n\ndef test_zamknij_sugestia_nieistniejaca_rzuca():\n    p = _tmp()\n    try:\n        zamknij_sugestia(element=\"NIE MA\", powod=\"x\", zrodlo=\"t\", sciezka=p)\n        assert False, \"powinien rzucić ValueError dla nieistniejącej sugestii\"\n    except ValueError:\n        pass\n\n\ndef test_zamknij_sugestia_idempotentne():\n    p = _tmp()\n    zapisz_sugestia(element=\"E2\", dzial=\"D\", uzasadnienie=\"u\",\n                    zgodnosc_imperium=\"tak\", zrodlo=\"t\", data=\"2026-07-19\", sciezka=p)\n    kw = dict(element=\"E2\", powod=\"powod\", zrodlo=\"t\", data=\"2026-07-19\", sciezka=p)\n    assert zamknij_sugestia(**kw) is True\n    assert zamknij_sugestia(**kw) is False      # identyczny rekord nie dubluje\n    assert len(_linie(p)) == 2\n'''\nopen(p, \"w\", encoding=\"utf-8\").write(s)\nprint(\"dopisane\")\nPY\npython -c \"\nimport importlib, inspect\nm=importlib.import_module('tests.test_scriba_codex')\nfns=[f for f in dir(m) if f.startswith('test_')]\nok=0\nfor n in fns:\n    getattr(m,n)(); ok+=1\nprint('scriba testy:', ok, '/', len(fns), 'OK')\n\""
+  },
+  {
+   "nr": 4,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "echo \"=== pamiec_absolutna.py: pola dataclass ===\" && python -c \"\nimport inspect\nfrom imperium.biblioteki import pamiec_absolutna as pa\nprint('MODUŁ:', pa.__file__)\nprint()\nimport dataclasses\nfor name, obj in inspect.getmembers(pa, inspect.isclass):\n    if dataclasses.is_dataclass(obj) and obj.__module__ == pa.__name__:\n        fl = [f.name for f in dataclasses.fields(obj)]\n        print(f'DATACLASS {name}: {len(fl)} pól')\n        print('  ', fl)\n        print()\nprint('FUNKCJE/KLASY publiczne:')\nfor name, obj in inspect.getmembers(pa):\n    if name.startswith('_'): continue\n    if inspect.isfunction(obj) and obj.__module__==pa.__name__: print('  fn ', name+str(inspect.signature(obj)))\n    elif inspect.isclass(obj) and obj.__module__==pa.__name__ and not dataclasses.is_dataclass(obj): print('  cls', name)\n\""
+  },
+  {
+   "nr": 5,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -c \"\nimport narzedzia.codex_probationum as c\nprint([n for n in dir(c) if 'podsum' in n or 'ledger' in n])\n\""
+  },
+  {
+   "nr": 6,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd \"C:\\Projekty\\imperial-mesh-vortex\"\npython - <<'PYEOF'\nfrom pathlib import Path\np = Path(\"docs/LOG_ZMIAN.md\")\nt = p.read_text(encoding=\"utf-8\")\nwpis = '''## 2026-07-17 | 🖥️ | Dług gnicia: START_LOKAL + SCIAGA_LOKAL — spłata przez SPRAWDZENIE\n\n**Oba dokumenty broniły się w CAŁOŚCI — treść nie wymagała ani jednej zmiany.**\n\n| Dokument | Co zmierzono | Werdykt |\n|---|---|---|\n| `START_LOKAL` (21 zmian, 14× `audyt_spojnosci.py`) | 6 komend · „13 warstw pamięci\" · luka „W1 ma 0 logów\" | wszystkie ✅ — **13 warstw potwierdzone** (W1–W13 + W3b w `kustosz_pamieci.py`), **luka W1 NADAL AKTUALNA** (brak plików logów) → zostaje jako żywe zadanie |\n| `SCIAGA_LOKAL` (5 zmian) | **24 komendy** | **24/24 istnieją** (moduły importowalne, skrypty na dysku) |\n\n**🔑 LEKCJA O NATURZE BRAMKI T2 (ważna na przyszłość):** T2 mówi **„kod się ruszył\"**, a NIE\n**„dokument kłamie\"**. `audyt_spojnosci.py` zmienił się 14×, ale START_LOKAL twierdzi o nim\ntylko „uruchom, ma być exit 0\" — twierdzenie odporne na te zmiany. **Spłatą długu jest\nWERYFIKACJA, a poprawną odpowiedzią bywa „nadal prawda\".** Bumpnięcie `stan_na` bez sprawdzenia\nbyłoby kłamstwem (Prawo I); bumpnięcie PO sprawdzeniu jest dokładnie tym, co `stan_na` znaczy:\n**data, w której twierdzenia zostały ostatnio zweryfikowane.**\n\n**Dług gnicia: 17 → 15.** W tej wachcie spłacone: GENERAL_LEGATUS, LEGIONY_ARCHITEKTURA,\nKATALOG_NEURONOW, MATRYCA_KORELACJI, START_LOKAL, SCIAGA_LOKAL (**6 dokumentów**).\n\n**Pliki:** docs/START_LOKAL.md, docs/SCIAGA_LOKAL.md, docs/INDEKS_IMPERIUM.md.\n\n'''\nkotwica = \"## 2026-07-17 | 🧭 | Dług gnicia: KATALOG_NEURONOW\"\nt = t.replace(kotwica, wpis + kotwica, 1)\np.write_text(t, encoding=\"utf-8\")\nprint(\"LOG_ZMIAN: wpis dodany\")\nPYEOF\npython narzedzia/audyt_spojnosci.py >/dev/null 2>&1; echo \"AUDYT EXIT: $?\"\ngit add -A -- docs/\ngit commit -q -F - <<'EOF'\n🖥️ Dług gnicia: START_LOKAL + SCIAGA_LOKAL — spłata przez SPRAWDZENIE\n\nOBA DOKUMENTY BRONIŁY SIĘ W CAŁOŚCI — treść nie wymagała ani jednej zmiany.\n\nSTART_LOKAL (21 zmian, 14× audyt_spojnosci.py):\n  ✅ wszystkie 6 komend istnieje\n  ✅ „13 warstw pamięci\" — PRAWDA (W1–W13 + W3b w kustosz_pamieci.py)\n  ✅ luka „W1 ma 0 logów\" — NADAL AKTUALNA (brak plików logów pamiec_absolutna)\n     → zostaje jako żywe zadanie, nie usuwam\n\nSCIAGA_LOKAL (5 zmian):\n  ✅ 24/24 komendy istnieją (moduły importowalne, skrypty na dysku)\n\n🔑 LEKCJA O NATURZE T2: bramka mówi „KOD SIĘ RUSZYŁ\", a NIE „dokument kłamie\".\naudyt_spojnosci.py zmienił się 14×, ale START_LOKAL twierdzi o nim tylko „uruchom,\nma być exit 0\" — twierdzenie odporne na te zmiany. SPŁATĄ DŁUGU JEST WERYFIKACJA,\na poprawną odpowiedzią bywa „nadal prawda\".\n\nBumpnięcie stan_na BEZ sprawdzenia byłoby kłamstwem (Prawo I). Bumpnięcie PO\nsprawdzeniu jest dokładnie tym, co stan_na znaczy: data ostatniej WERYFIKACJI twierdzeń.\n\nDług gnicia: 17 → 15. W tej wachcie spłacone 6 dokumentów: GENERAL_LEGATUS,\nLEGIONY_ARCHITEKTURA, KATALOG_NEURONOW, MATRYCA_KORELACJI, START_LOKAL, SCIAGA_LOKAL.\n\nBramka: 2494/2494 testów · audyt exit 0.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\nEOF\ngit log --oneline -1 && git status --short && echo \"(czyste)\""
+  },
+  {
+   "nr": 7,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python narzedzia/tabularium.py katalog 2>&1 | head -5; echo \"...\";  python narzedzia/tabularium.py katalog 2>&1 | grep -c '^|'"
+  },
+  {
+   "nr": 8,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd C:\\Projekty\\imperial-mesh-vortex; python -m imperium.biblioteki.codex_notarum corona --help 2>&1 | Select-Object -First 15"
+  },
+  {
+   "nr": 9,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd /c/Projekty/imperial-mesh-vortex\npython - <<'PY'\nimport re, pathlib, subprocess\n\nroot = pathlib.Path(\".\")\n# realne pliki\nreal = set()\nfor p in root.rglob(\"*.py\"):\n    if \".git\" in p.parts or \"archiwum\" in p.parts:\n        continue\n    real.add(p.as_posix())\n\n# skan żywych docs (docs/*.md, bez migawek/archiwum)\ndocs = [p for p in root.glob(\"docs/*.md\")]\npat = re.compile(r\"(imperium|narzedzia)/[a-zA-Z0-9_/]+\\.py\")\n\nwidma = {}  # sciezka -> lista (plik, linia_nr, kontekst)\nfor d in docs:\n    for i, line in enumerate(d.read_text(encoding=\"utf-8\", errors=\"replace\").splitlines(), 1):\n        for m in pat.finditer(line):\n            path = m.group(0)\n            if path not in real:\n                widma.setdefault(path, []).append((d.name, i, line.strip()[:110]))\n\nprint(f\"Realnych plików .py (bez .git/archiwum): {len(real)}\")\nprint(f\"Odwołań-ścieżek NIEISTNIEJĄCYCH w kodzie: {len(widma)}\\n\")\nfor path, occ in sorted(widma.items()):\n    print(f\"🔴 {path}  ({len(occ)}×)\")\n    for fn, ln, ctx in occ[:3]:\n        print(f\"     {fn}:{ln}  | {ctx}\")\nPY"
+  },
+  {
+   "nr": 10,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "git add -A && git commit -q -m \"$(cat <<'EOF'\n♾️ Dziennik Nieśmiertelny — domknięcie sesji (rozbudowa biblioteki)\n\nRozkaz stały: oś czasu sesji. Zapisane: lista BIB-070..274, Priorytet 0 (9 darmowych\npozycji = źródła naszych Z-01/DSR/Brier/LoRA), uczciwa legenda pewności zamiast udawanej\nweryfikacji (limit ubił zwiadowców web), następny krok.\n\nBramka: testy zielone ✅ | audyt exit 0 ✅\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\nEOF\n)\" && echo \"=== STATUS ===\" && git status --short && echo \"(pusto = czysto)\" && echo \"=== COMMITY DO WYPCHNIĘCIA ===\" && git log --oneline origin/claude/sleepy-fermi-dsdE4..HEAD"
+  },
+  {
+   "nr": 11,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python narzedzia/codex_probationum.py 2>&1 | Select-Object -Last 3; python narzedzia/audyt_spojnosci.py 2>&1 | Select-String \"harmonia|ROZBIEŻ\"; \"AUDYT=$LASTEXITCODE\"; python narzedzia/skan_wad_kodu.py 2>&1 | Select-Object -Last 2"
+  },
+  {
+   "nr": 12,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -c \"\nimport io,sys\nsys.stdout.reconfigure(encoding='utf-8')\nfrom imperium.biblioteki.index_falsorum import KOREKTA_JAWNA, _okno_prostuje\np='imperium/biblioteki/dziennik_niesmiertelny.py'\nlinie=open(p,encoding='utf-8').read().splitlines()\nfor i in range(164,171):\n    print(i+1, repr(linie[i])[:110])\nprint('okno_prostuje(166idx)=', _okno_prostuje(linie,166))\n\""
+  },
+  {
+   "nr": 13,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "git fetch origin claude/sleepy-fermi-dsdE4 -q 2>&1 | tail -2; git rev-list --left-right --count origin/claude/sleepy-fermi-dsdE4...HEAD 2>&1"
+  },
+  {
+   "nr": 14,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "git fetch origin claude/sleepy-fermi-dsdE4 2>&1 | tail -2; echo \"=== status ===\"; git status -sb | head -1; echo \"=== lokalny vs zdalny ===\"; echo \"LOKAL:  $(git rev-parse --short HEAD)\"; echo \"ZDALNY: $(git rev-parse --short origin/claude/sleepy-fermi-dsdE4)\"; echo \"=== ahead/behind ===\"; git rev-list --left-right --count origin/claude/sleepy-fermi-dsdE4...HEAD"
+  },
+  {
+   "nr": 15,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && python -m ruff check narzedzia/pomiar_dvol_ic.py tests/test_pomiar_dvol_ic.py && echo \"RUFF OK\" && { python tests/run_tests.py 2>&1 | grep -E \"WYNIK\"; python narzedzia/audyt_spojnosci.py 2>&1 | head -1; echo \"AUDIT_EXIT=$?\"; } > \"$TEMP/gate_dvol.txt\" 2>&1; echo \"GATE_DONE\"; cat \"$TEMP/gate_dvol.txt\""
+  },
+  {
+   "nr": 16,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cat >> tests/test_pamiec_sesji.py <<'PYEOF'\n\n\n# ── Regresja: recenzja cubic na PR #118 (drugi przebieg) ─────────────────────\n\ndef test_daty_nie_wchodza_do_sygnatury():\n    \"\"\"Data mówi KIEDY, nie O CZYM. Dwie różne lekcje z tego samego dnia miały\n    wspólne tokeny {2026, 06, 30} → Jaccard 0.60 → fałszywe scalenie.\"\"\"\n    s = ps.sygnatura_lekcji(\"X-01\", \"sesja 2026-06-30, 30.06.2026, rok 2026\")\n    assert s == frozenset({\"X-01\"})\n    assert not ps.czy_duplikaty(\n        \"Neuron X-01 zwraca NEUTRAL\", \"Wykryto 2026-06-30, naprawiono.\",\n        \"Zwiadowca EXP-13 milczy\", \"Wykryto 2026-06-30, inna sprawa.\")\n\n\ndef test_proza_nie_nadpisuje_rozlacznych_sygnatur():\n    \"\"\"Sito 3 (worek rdzeni tytułu) nie może scalać lekcji o RÓŻNYCH modułach,\n    nawet gdy tytuły mają identyczny worek rdzeni.\"\"\"\n    assert not ps.czy_duplikaty(\"Bug w EXP-07\", \"ATR_MULT zly\",\n                                \"Bug w EXP-13\", \"GARCH zly\")\n\n\ndef test_proza_nadal_dziala_gdy_sygnatury_slabe():\n    \"\"\"Kontrola: ograniczenie sita 3 nie może zabić jego pierwotnego celu.\"\"\"\n    assert ps.czy_duplikaty(\"True Range - poprawna definicja\", \"max(H-L).\",\n                            \"Poprawiona definicja True Range\", \"max(H-L).\")\nPYEOF\n\ncat > \"C:/Users/Ian/AppData/Local/Temp/claude/C--Projekty-imperial-mesh-vortex/1a437476-07d6-4944-ae67-f5b0b4c1c1e2/scratchpad/test_marker.py\" <<'PYEOF'\nimport sys, tempfile\nfrom pathlib import Path\nsys.path.insert(0, r\"C:\\Projekty\\imperial-mesh-vortex\")\nimport narzedzia.auto_lekcja as al\n\nd = Path(tempfile.mkdtemp())\nal.PRZETWORZONE_PLIK = d / \"nowy.txt\"\nal.STARY_MARKER = d / \"stary.txt\"\n\nkron = d / \"sesja_abc.md\"\nkron.write_text(\"treść pierwotna\", encoding=\"utf-8\")\nh1 = al._klucz_kroniki(kron)\n\nal.PRZETWORZONE_PLIK.write_text(f\"# nagl\\n{h1}  abc\\n\", encoding=\"utf-8\")\nal.STARY_MARKER.write_text(\"abc\\ninna_sesja\\n\", encoding=\"utf-8\")\n\nhasze, stare = al._wczytaj_przetworzone()\nassert h1 in hasze, \"hasz musi rozstrzygać\"\nassert \"abc\" not in stare, \"zmigrowane ID nie może blokować (bug cubic #1)\"\nassert \"inna_sesja\" in stare, \"niezmigrowane ID nadal rozstrzyga (zgodność wstecz)\"\nprint(\"  OK  kronika NIEZMIENIONA -> pomijana (hasz w zbiorze):\", h1 in hasze)\n\nkron.write_text(\"treść pierwotna + DOPISEK z nowej sesji\", encoding=\"utf-8\")\nh2 = al._klucz_kroniki(kron)\nassert h2 != h1\nhasze, stare = al._wczytaj_przetworzone()\nprzetworzy = not (h2 in hasze or \"abc\" in stare)\nprint(\"  OK  kronika ZMIENIONA -> zostanie przetworzona ponownie:\", przetworzy)\nassert przetworzy, \"BUG: zmieniona kronika nadal pomijana\"\nprint(\"\\nTest markera: ZALICZONY\")\nPYEOF\npython \"C:/Users/Ian/AppData/Local/Temp/claude/C--Projekty-imperial-mesh-vortex/1a437476-07d6-4944-ae67-f5b0b4c1c1e2/scratchpad/test_marker.py\""
+  },
+  {
+   "nr": 17,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "git add CLAUDE.md docs/ARCHITEKTURA_IMPERIUM.md docs/LOG_ZMIAN.md && git commit -q -F - <<'EOF'\n📜 Konsolidacja zasad zamknięcia sesji (+CODEX) + skodyfikowanie standing-orderów\n\nPowód (zmierzone): kroki zamknięcia były ROZPROSZONE po CLAUDE.md → omal nie pominięto\nskan_wad_kodu; CODEX był tylko „przed zadaniem\", NIE w zamknięciu (dryf łapany przypadkiem);\nstanding-order raportowania żył tylko w pamięci prywatnej (0 w repo).\n\nDODANE (rozkaz Cezara):\n- CLAUDE.md: 🏁 KONIEC SESJI — CHECKLISTA STAŁA (9 kroków): bramka Prawo XXI → CODEX\n  regen+weryfikacja+ledger → adversarial pre-push (/code-review + skan_wad_kodu) →\n  komplet docs+pamięć → Prawo XV → Dziennik → commit → blok push → alarmy hooka.\n- CLAUDE.md: 🏛️ ZASADA RAPORTOWANIA I PODGLĄDU KAPITOLU (pełna spec + zero-tokenowy\n  podgląd Kapitolu z linkiem + re-pytania po zadaniu).\n- ARCHITEKTURA: 🧰 Narzędzia z nazwą rzymską (Speculum Probationis/Cursus Fenestrarum/\n  Scriba Codex) — domknięcie ZASADY NOMENKLATURY; bump stan_na 2026-07-19.\n\nOtwarte (do decyzji Cezara): automatyczny backstop (warstwa audytu/hook pre-close\negzekwująca kroki) — osobne zadanie (nowa warstwa = kod z testami, nic nie psujemy).\n\nAudyt exit 0 (W6b/W14/W16 zielone).\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\nEOF\necho \"EXIT: $?\"; git rev-list --left-right --count origin/claude/sleepy-fermi-dsdE4...HEAD; git log --oneline -6"
+  },
+  {
+   "nr": 18,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd /c/Projekty/imperial-mesh-vortex\nPYTHONPATH=. python - <<'PY'\nfrom imperium.biblioteki.ksiega_wad_kodu import KsiegaWadKodu\nk = KsiegaWadKodu(); przed = len(k.wpisy)\nfor kat, opis, lekcja in [\n (\"detektor/FP-FN\",\n  \"Heurystyka 'okna prostujacego' zawodzi w tekscie o linii=akapicie\",\n  \"Regula 'jesli w +-kilku liniach stoi jawna korekta, to nie alarm' dziala w prozie, gdzie \"\n  \"linia niesie jedno zdanie. We wpisie Dziennika jedna linia to caly akapit o WIELU tematach: \"\n  \"slowo OBALON dotyczace U4 uciszalo falszywa liczbe zdarzen hooka stojaca linie wyzej. \"\n  \"Zasieg heurystyki musi odpowiadac ZIARNISTOSCI tekstu, nie byc staly.\"),\n (\"test\",\n  \"Test negacji, w ktorym fraza NIE PASUJE do zdania z negacja, jest atrapa\",\n  \"Test mial dowodzic, ze '_negacja_przy' ucisza alarm. Fraza doslowna 'ziemia jest plaska' \"\n  \"do zdania 'ziemia NIE jest plaska' po prostu nie pasuje — test przechodzil, bo regex nie \"\n  \"trafial, a nie dlatego, ze negacja dzialala. Druga proba z \\\\W{0,12} byla atrapa z tego \"\n  \"samego powodu (\\\\W nie obejmuje liter, 'NIE' rozrywalo wzorzec). Fraza musi PRZEKRACZAC \"\n  \"negacje. Obie atrapy wykryla dopiero MUTACJA, nie przeglad.\"),\n]:\n    print((\"  OK   \" if k.dodaj_checklist(kat, opis, lekcja, \"wachta 2026-07-27, sprzezenie Dziennik<->INDEX FALSORUM\") else \"  ZNANE\") + \" | \" + opis[:66])\nk.zapisz(); print(f\"KSIEGA WAD: {przed} -> {len(k.wpisy)}\")\nPY\npython tests/run_tests.py 2>&1 | tail -5"
+  },
+  {
+   "nr": 19,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python tests/run_tests.py > \"$TEMP/imv_testy4.out\" 2>&1; echo \"EXIT=$?\"; grep -E \"WYNIK|Wszystkie\" \"$TEMP/imv_testy4.out\" | tail -2"
+  },
+  {
+   "nr": 20,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "git add imperium/koloseum/petla_live.py tests/test_petla_live.py docs/LOG_ZMIAN.md docs/MANUAL_UZYTKOWNIKA.md && git commit -m \"$(cat <<'EOF'\n🔧 Domknięcie CLI pętli live — behawioralne opt-iny (Prawo XV, przegląd kompletności)\n\nPrzegląd 35 pól KonfigPetliLive vs CLI: kilka realnych toggli behawioralnych żyło\ntylko w config-obiekcie. Domknięto istotne dla biegu obserwacyjnego P0:\n- --cienie (kontrfaktyczny pomiar Legionów Cieni → arena CIEN_PNL, bez zmiany decyzji)\n- --funding-mexc (TIER A funding+ELR), --mwu/--igrzyska (uczenie, opt-in)\n- --filtr-asymetrii (W-314), --ksiega-wad (W-309), --min-pewnosc (walidacja ∈(0,1))\n\nŚwiadomie tylko-config: ścieżki, strojenie (limit_barow/radar/decay), auto_discover*.\nPrawo XV: każda flaga faktycznie konsumowana w pętli — zero flag-atrap.\n+3 testy granic. Testy 2317/2317 · audyt exit 0 · ruff czysty.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\nEOF\n)\""
+  },
+  {
+   "nr": 21,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python - <<'PY'\nfrom pathlib import Path\np = Path(r\"C:\\Users\\Ian\\.claude\\projects\\C--Projekty-imperial-mesh-vortex\\memory\\ingenium-iq-imperii.md\")\nt = p.read_text(encoding=\"utf-8\")\ndop = \"\"\"\n## Charakter organu — SĘDZIA, nie chwalca (rozkaz Cezara 2026-07-29, §7 dokumentu)\n\nCezar: *„ma nie pluć, tylko realnie oceniać… jak sędzia, obserwator zewnętrzny, audytor,\ndoradca bezstronny i bezgranicznie czysty, szanujący się uznaniem, nigdy nie kłamie:\nrośniemy / spadamy / IQ podskoczyło / coś jest nie tak / czas na odpoczynek i regenerację.\"*\n\nWynikające wymagania (w dokumencie jako kontrakt, nie ozdobnik):\n- **4 werdykty:** ROŚNIEMY / STOIMY / SPADAMY / ALARM — zawsze ze wskazaniem KTÓREJ kategorii\n  i O ILE. Werdykt bez składowej = opinia, nie pomiar → zakazany.\n- **Sędzia nie może być stroną:** dodanie INGENIUM nie podnosi IQ; składowe wyłącznie\n  z ledgerów ZEWNĘTRZNYCH wobec niego; zmiana progu jawna w historii migawek.\n- **Nigdy nie kłamie:** każda składowa z proweniencją (skąd + kiedy), brak danych = NIEZNANE,\n  a błędną własną ocenę organ SAM obala do INDEX FALSORUM.\n- **QUIES — sygnał regeneracji (nowość Cezara):** obowiązek powiedzenia „czas na odpoczynek\"\n  przy mierzalnych objawach przemęczenia: rosnący dług honorowy, seria czerwonych bramek,\n  **naprawa rodząca wadę** (zmierzone w tej wachcie!), SALUS rośnie a COMMUNIO stoi,\n  tempo wad > tempo domykania.\n- **Prawo XV jako pozycja liczona:** moduły gotowe a niepodpięte odejmują punkty do czasu\n  wpięcia (dowody: tesseract, log_sygnal, W1, 35 cząstek Hyginusa).\n- **Wiarygodność mierzona spadkami:** publikujemy „trafne ostrzeżenia / wszystkie ostrzeżenia\"\n  — miernik, który tylko rośnie, jest reklamą.\n\"\"\"\nif \"SĘDZIA, nie chwalca\" not in t:\n    p.write_text(t.rstrip(\"\\n\") + \"\\n\" + dop, encoding=\"utf-8\")\n    print(\"pamiec: dopisano kontrakt sedziego\")\nPY\ngit add -A && git commit -q --amend --no-edit && git log --oneline -1 && git status --porcelain | head -2; git rev-list --left-right --count origin/claude/sleepy-fermi-dsdE4...HEAD"
+  },
+  {
+   "nr": 22,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd /c/Projekty/imperial-mesh-vortex\nSCRATCH=\"C:/Users/Ian/AppData/Local/Temp/claude/C--Projekty-imperial-mesh-vortex/1a437476-07d6-4944-ae67-f5b0b4c1c1e2/scratchpad\"\npython - <<PYEOF 2>&1 | tail -5\nimport sys, re\nsys.path.insert(0,'narzedzia/rag')\nfrom ekstraktor import ekstrahuj\nfrom pathlib import Path\nzad = {\n 'BIB-069_Voshmgir_Token-Economy-3rd-ed.epub':\n   ['stable token','automated market maker','flash loan','impossible trinity','staking','over-collateral','perpetual'],\n 'BIB-054_Antonopoulos-Wood_Mastering-Ethereum.epub':\n   ['proof of stake','smart contract','decentralized finance','gas','oracle','composability'],\n}\nout=Path(r\"$SCRATCH/def_grunt.txt\"); f=out.open('w',encoding='utf-8')\nBIB=Path('bibliotheca_ulpia')\nfor i,(plik,terminy) in enumerate(zad.items(),1):\n    print(f'[{i}/{len(zad)}] {plik[:44]}', file=sys.stderr, flush=True)\n    t=re.sub(r'\\s+',' ',ekstrahuj(BIB/plik)); low=t.lower()\n    f.write(f'\\n\\n===== {plik} =====\\n')\n    for term in terminy:\n        idx=low.find(term.lower())\n        if idx>=0: f.write(f'\\n[{term}] ...{t[max(0,idx-120):idx+380]}...\\n')\nf.close(); print(f'{out.stat().st_size} B', file=sys.stderr)\nPYEOF\necho ok"
+  },
+  {
+   "nr": 23,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python tests/run_tests.py > \"$env:TEMP\\testy_zamkniecie.txt\" 2>&1"
+  },
+  {
+   "nr": 24,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python - <<'PY'\nfrom pathlib import Path\nfrom datetime import datetime, timezone\nimport csv\np = Path(\"dane/godzinowe/Binance_BTCUSDT_1h.csv\")\nus_rows, ms_ts = [], set()\nwith p.open(encoding=\"utf-8\", errors=\"replace\") as f:\n    f.readline(); f.readline()\n    for w in csv.reader(f):\n        if not w: continue\n        try: t = int(w[0])\n        except ValueError: continue\n        if len(str(abs(t))) == 16: us_rows.append((t, w[1]))\n        else: ms_ts.add(t)\nus_rows.sort()\nprint(\"µs wierszy:\", len(us_rows))\nfor t, d in us_rows[:3] + us_rows[-3:]:\n    print(f\"   ts={t} kolumna_Date='{d}' -> jako µs: {datetime.fromtimestamp(t/1e6, tz=timezone.utc)}\")\n# czy te bary DUBLUJA istniejace ms?\ndubel = sum(1 for t,_ in us_rows if int(t/1000) in ms_ts)\nprint(f\"\\nczy µs-bary maja odpowiednik w ms: {dubel}/{len(us_rows)}\")\nzakres_ms = (min(ms_ts), max(ms_ts))\nprint(\"zakres ms:\", datetime.fromtimestamp(zakres_ms[0]/1000, tz=timezone.utc), \"->\", datetime.fromtimestamp(zakres_ms[1]/1000, tz=timezone.utc))\nPY"
+  },
+  {
+   "nr": 25,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd /c/Projekty/imperial-mesh-vortex; git pull --rebase origin claude/sleepy-fermi-dsdE4 2>&1 | tail -12; echo \"=== rebase EXIT: $? ===\""
+  },
+  {
+   "nr": 26,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python - <<'PY'\nimport pathlib,re,unicodedata,difflib\np=pathlib.Path(r\"C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\d0a9bdbb-5b88-48ec-9ed7-9f67b3f2d1ee\\scratchpad\\arch_head.md\")\nt=p.read_text(encoding='utf-8')\nbloki=re.findall(r'^### (.+?)\\n(.*?)(?=\\n### |\\Z)',t,re.M|re.S)\ndef norm(s):\n    s=unicodedata.normalize('NFKD',s).encode('ascii','ignore').decode().lower()\n    return re.sub(r'[^a-z0-9]+',' ',s).strip()\npelne=[norm(h+\" \"+b) for h,b in bloki]\nprint(\"lekcji w archiwum (HEAD):\",len(bloki))\nwidziane=set(); pary=[]\nfor i in range(len(pelne)):\n    for j in range(i+1,len(pelne)):\n        r=difflib.SequenceMatcher(None,pelne[i],pelne[j]).ratio()\n        if r>0.62: pary.append((round(r,2),i,j))\nprint(\"par blizniaczych (>0.62 na naglowek+tresc):\",len(pary))\nzaangazowane={i for _,i,j in pary}|{j for _,i,j in pary}\nprint(\"lekcji uwiklanych w duplikaty:\",len(zaangazowane),f\"= {100*len(zaangazowane)/len(bloki):.0f}% archiwum\")\nfor r,i,j in sorted(pary,reverse=True)[:8]:\n    print(f\"  {r}  {bloki[i][0][:52]}  ||  {bloki[j][0][:52]}\")\nPY"
+  },
+  {
+   "nr": 27,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python tests/run_tests.py > \"$TEMP/imv_p2.out\" 2>&1; echo \"EXIT=$?\"; grep -E \"WYNIK|Wszystkie\" \"$TEMP/imv_p2.out\" | tail -2"
+  },
+  {
+   "nr": 28,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "export PYTHONIOENCODING=utf-8 && python - <<'PY'\nimport json, pathlib\nLED = pathlib.Path(\"bibliotheca_ulpia/dane/rejestr_testow.jsonl\")\nnowe = [\n    {\"typ\":\"SUGESTIA\",\n     \"element\":\"Adaptive Effort (model sam skaluje wysilek per-turn)\",\n     \"dzial\":\"dobor modelu (os zuzycia)\",\n     \"uzasadnienie\":\"druga os obok task-type: model ocenia trudnosc promptu i skaluje budzet rozumowania w locie; dla nas realne glownie przy delegacji przez Agent SDK\",\n     \"zgodnosc_imperium\":\"TAK jako opt-in (ZASADA WPIECIA — dotyka kosztu); w sesji glownej brak kontroli poza /model\",\n     \"status\":\"KANDYDAT\",\n     \"data\":\"2026-07-19\",\n     \"zrodlo\":\"zwiad Sonnet + sedzia Vitruviusz (2026-07-19)\"},\n    {\"typ\":\"SUGESTIA\",\n     \"element\":\"Straznik budzetu sesji (CLAUDE_CODE_SUBAGENT_MODEL + OTEL) -> JAWNY alarm + propozycja /model\",\n     \"dzial\":\"dobor modelu (os zuzycia)\",\n     \"uzasadnienie\":\"przekroczony prog zuzycia sesji -> jawny alarm i propozycja tanszego modelu; oparty na realnych hakach Claude Code; hook nie dostaje zuzycia na zywo (OTEL do kolektora) — realnosc do zweryfikowania\",\n     \"zgodnosc_imperium\":\"TAK jako opt-in JAWNY (nasza transparentnosc: NIGDY cicha degradacja); mechanizm dotyka kosztu -> walidacja przed wpieciem\",\n     \"status\":\"KANDYDAT\",\n     \"data\":\"2026-07-19\",\n     \"zrodlo\":\"zwiad Sonnet + sedzia Vitruviusz (2026-07-19)\"},\n]\nwith LED.open(\"a\", encoding=\"utf-8\") as f:\n    for r in nowe:\n        f.write(json.dumps(r, ensure_ascii=False) + \"\\n\")\nprint(\"Dopisano\", len(nowe), \"SUGESTIA. Lacznie SUGESTIA teraz:\",\n      sum(1 for l in LED.read_text(encoding='utf-8').splitlines() if '\"SUGESTIA\"' in l))\nPY"
+  },
+  {
+   "nr": 29,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && export PATH=\"/c/Program Files/Tesseract-OCR:$PATH\" && python - <<'EOF' 2>/dev/null\nimport sys, time, subprocess, tempfile, re\nfrom pathlib import Path\nfrom collections import Counter\nsys.stdout.reconfigure(encoding='utf-8')\nimport fitz\nSC = Path(r'C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\25f9422a-b7c7-43ec-aae4-c2fa858935b8\\scratchpad')\nsrc = Path('bibliotheca_ulpia/BIB-136_Diebold-Mariano_Comparing-Predictive-Accuracy.pdf')\nd = fitz.open(str(src))\nprint(f\"=== POMIAR OCR na BIB-136 ({len(d)} stron) — klasa PEDES, 4 watki ===\")\nt0 = time.time(); czesci = []\nfor i in range(len(d)):\n    png = SC / f\"_ocr_{i}.png\"\n    d[i].get_pixmap(dpi=300).save(str(png))\n    r = subprocess.run(['tesseract', str(png), 'stdout', '-l', 'eng'],\n                       capture_output=True, text=True, encoding='utf-8', errors='replace')\n    czesci.append(r.stdout)\n    png.unlink(missing_ok=True)\n    print(f\"\\r  [{i+1}/{len(d)}] {time.time()-t0:5.1f}s\", end=\"\", file=sys.stderr, flush=True)\nd.close()\ndt = time.time() - t0\nt = \"\\n\".join(czesci)\nsl = Counter(w for w in t.split() if len(w) > 1)\nprint(f\"\\n\\n  CZAS: {dt:.1f}s = {dt/11:.1f}s na strone\")\nprint(f\"  WYNIK: {len(t.strip())} znakow | {len(sl)} unikalnych slow (bylo 1298 zn. / 32 unik.)\")\nprint(f\"\\n  PROBKA:\\n  {re.sub(chr(10),' ', t[:520])}\")\n(SC/'BIB-136_ocr.txt').write_text(t, encoding='utf-8')\nEOF"
+  },
+  {
+   "nr": 30,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "git add README.md narzedzia/tabularium.py && git commit -q -m \"$(cat <<'EOF'\n📜 README — naprawa schematu Imperium + liczby organów wstrzykiwane (koniec rozjazdu)\n\n- Mapa organów: kod-blok → tabela z liczbami plików .py WSTRZYKIWANYMI z żywego\n  kodu (tabularium.wartosci_z_kodu → klucze organ_*). Rozjazd naprawiony pomiarem:\n  legiony 40→67, biblioteki 8→25, akwedukty 8→17, koloseum 11→16, pretorianie 5→9,\n  swiatynie 2→6, cesarz 9→11. Warstwa 15 pilnuje — nigdy więcej nie skłamie.\n- Linia \"Faza\": koniec rosnącej listy W-XXX (urywała się na W-343) → wskaźnik do\n  MANIFEST_KODU + LOG_ZMIAN (żywe źródło).\n- Role → nomenklatura rzymska + TWÓRCY: CEZAR PIXEL, VITRUVIUSZ, HYGINUS, TIRO\n  (lokalny LLM) jako twórcy na końcu dokumentu. Doktryna wojenna (wojna=giełda,\n  MEXC, order z zyskiem, łup→lepszy budulec) w wizytówce.\n- stan_na 2026-07-19. Audyt exit 0, ruff czysto, testy 2584/2584.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\nEOF\n)\" && echo \"=== OK ===\" && git log -1 --oneline"
+  },
+  {
+   "nr": 31,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python -c \"\nfrom imperium.biblioteki.codex_notarum import dodaj_nota\nn1=dodaj_nota(opis='Nowe organy i narzedzia niezameldowane w dokumentach (DISPENSATOR 0/4 dokumentow; Conflator/Nuntius/VERITAS/PORTITOR tylko w ARCHITEKTURA). Audyt dal exit 0, bo Warstwa 11 pilnuje meldunku WYLACZNIE dla imperium/biblioteki/ - reszta organow i cale narzedzia/ poza zasiegiem. Zmierzony dlug: 19 modulow imperium/ + 31 narzedzi = 50 poza INDEKS+ARCH+MANIFEST.', kategoria='symbioza/dokumentacja', zatwierdzenie='Zarzut Cezara 2026-07-20 + pomiar wlasny (skan korpusu docs vs os.walk imperium+narzedzia; audyt_spojnosci.py:840 zakres W11)', sesja='doks20', waga=2, zrodlo='narzedzia/audyt_spojnosci.py:839-853')\nn2=dodaj_nota(opis='CODEX PROBATIONUM gubi wyniki spoza schematu AB/IC: pomiar interwalow (4h +3.26 / 1d -3.03 / 1h -3.37 / 15m -5.71) - glowny werdykt wachty 07-20 - NIE trafil do rejestr_testow.jsonl. Luka zgloszona przeze mnie jako SUGESTIA-KANDYDAT trzy razy (07-19 ab_wXXX, 07-20 NIEZMIENNIK, 07-20 ponownie) i ani razu nie zamknieta - sugestia w ledgerze to odlozenie z alibi, nie naprawa.', kategoria='rejestr/kompletnosc', zatwierdzenie='Zarzut Cezara 2026-07-20 + pomiar: 07-20 w ledgerze 1 rekord AB (DVOL) + 5 SUGESTII, zero rekordu interwalow; POLA AB nie mapuja porownania interwalow', sesja='doks20', waga=2, zrodlo='bibliotheca_ulpia/dane/rejestr_testow.jsonl')\nprint(n1); print(n2)\n\""
+  },
+  {
+   "nr": 32,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python \"C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\2d00b102-79a8-412e-a2b5-0db8a00c8e74\\scratchpad\\ledger_u4_final.py\" && python narzedzia/kapitol_podglad.py plon_hyginusa 2>&1 | tail -2 && python narzedzia/codex_probationum.py 2>&1 | tail -1"
+  },
+  {
+   "nr": 33,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python -m imperium.biblioteki.codex_notarum nota \\\n  --opis \"Cicha wada etykiety interwalu: .get(interwal) po surowym kluczu spadal na fallback bez alarmu. Skutki zmierzone: Legatus wylaczal CALA formacje legionow (SCALP glosowal na 4H), Hermes dostawal 60 min zamiast 240, prog per interwal nie obowiazywal, Sharpe annualizowany ~2.4x za nisko. Wada DOSTARCZONA - przezyla bramke.\" \\\n  --kategoria \"cicha-wada-etykiety\" \\\n  --zatwierdzenie \"Cezar 2026-07-29 (sesja apert29)\" \\\n  --sesja \"apert29\" \\\n  --zrodlo \"narzedzia/ab_ucz_mwu.py, imperium/legiony/legatus.py\" 2>&1 | tail -8"
+  },
+  {
+   "nr": 34,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "git add -A; git commit -q -m \"♾️ Dziennik — domkniecie wachty doks20 (pelny krok 9 + odzysk kroniki) + SIGLA IMPERII do CODEX\n\nWpis Dziennika Niesmiertelnego zamykajacy wachte. Sugestia SIGLA IMPERII (skroty\nuzytkowe — rozkaz Cezara na nastepna sesje) dopisana do rejestru testow.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\"; git log --oneline -4; \"ahead: \" + (git rev-list --count origin/claude/sleepy-fermi-dsdE4..HEAD)"
+  },
+  {
+   "nr": 35,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -m imperium.legiony.discriminator --dane dane/4h/Binance_BTCUSDT_4h.csv --interwal 4h --limit 3000 > \"$TEMP/exactor/discr_duzy.txt\" 2>&1; echo \"EXIT=$?\" >> \"$TEMP/exactor/discr_duzy.txt\""
+  },
+  {
+   "nr": 36,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "export PYTHONIOENCODING=utf-8 && python narzedzia/skan_wad_kodu.py imperium/pretorianie/portitor.py 2>&1 | tail -2 && python narzedzia/skan_wad_kodu.py imperium/biblioteki/dziennik_niesmiertelny.py 2>&1 | tail -2 && python narzedzia/skan_wad_kodu.py narzedzia/skan_wad_kodu.py 2>&1 | tail -2 && python narzedzia/skan_wad_kodu.py narzedzia/codex_probationum.py 2>&1 | tail -2"
+  },
+  {
+   "nr": 37,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python -m imperium.biblioteki.codex_notarum nota --opis \"BREVIARIUM: abstynencja srodowiskowa dzialala TYLKO w jedna strone — _sciezka_z_innego_systemu czytal str(Path) zamiast as_posix(), wiec Path('/home/tiro') na Windows normalizowal sie do '\\home\\tiro' i kierunek 'POSIX na Windows' nie trafial nigdy. Blad DOSTARCZONY: przeszedl zielona bramke w chmurze (Linux testowal wylacznie kierunek przeciwny), oblal sie dopiero na laptopie Cezara. Powtorka klasy z 07-21: ochrona zastosowana wybiorczo jest ochrona pozorna.\" --kategoria \"abstynencja-pomiaru\" --zatwierdzenie \"pomiar 2026-07-26 na laptopie: test_dysk_tiro_z_innego_systemu_abstynuje OBLANY (2882/2885); runtime: str(Path('/home/tiro'))=='\\\\\\\\home\\\\\\\\tiro'\" --sesja \"env26\" --waga 2 --zrodlo \"imperium/oczy/breviarium.py:159\""
+  },
+  {
+   "nr": 38,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cat >> tests/test_spojnosc.py <<'PY'\n\n\n# ── WARSTWA 19: PARYTET DAT (frontmatter vs nagłówek) ────────────────────────\n\ndef test_audyt_w19_zielony_na_realnym_korpusie():\n    \"\"\"W19 na żywym repo: żaden dokument nie deklaruje dwóch różnych dat 'stan na'.\"\"\"\n    import narzedzia.audyt_spojnosci as a\n    bledy, info = a._warstwa_19_parytet_dat()\n    assert not bledy, f\"W19 wykrył rozjazd dat: {bledy}\"\n    assert any(\"W19\" in i for i in info)\n\n\ndef test_audyt_w19_lapie_rozjazd_dwoch_dat(monkeypatch, tmp_path):\n    \"\"\"GRANICA: frontmatter mówi jedno, nagłówek drugie → alarm.\n\n    Dokładnie przypadek z recenzji 2026-07-26: README miał `stan_na: 2026-07-19`\n    i „Stan na: 2026-07-26\". Warstwa 6 czytała tylko nagłówek, Tabularium tylko\n    frontmatter, więc audyt meldował harmonię przy jawnej sprzeczności.\n    \"\"\"\n    import narzedzia.audyt_spojnosci as a\n    from narzedzia import tabularium as tab\n    plik = tmp_path / \"DOK.md\"\n    plik.write_text(\"---\\nstan_na: 2026-07-19\\n---\\n> **Stan na:** 2026-07-26\\ntreść\\n\",\n                    encoding=\"utf-8\")\n    monkeypatch.setattr(tab, \"ROOT\", str(tmp_path))\n    monkeypatch.setattr(tab, \"zbierz_dokumenty\", lambda: [(\"DOK.md\", {\"stan_na\": \"2026-07-19\"})])\n    bledy, _ = a._warstwa_19_parytet_dat()\n    assert len(bledy) == 1 and \"DOK.md\" in bledy[0]\n\n\ndef test_audyt_w19_data_w_prozie_nie_jest_deklaracja(monkeypatch, tmp_path):\n    \"\"\"GRANICA (fałszywy alarm złapany w samo-recenzji przed commitem): fraza „Stan na:\"\n    zacytowana GŁĘBOKO w treści to nie deklaracja dokumentu.\n\n    Pierwsza wersja W19 skanowała cały plik i oskarżyła LOG_ZMIAN o rozjazd, bo w jednym\n    wpisie changelogu cytowano cudzą datę. Warstwa pilnująca prawdy nie ma prawa\n    produkować nieprawdy — zasięg to nagłówek dokumentu.\n    \"\"\"\n    import narzedzia.audyt_spojnosci as a\n    from narzedzia import tabularium as tab\n    plik = tmp_path / \"LOG.md\"\n    plik.write_text(\"---\\nstan_na: 2026-07-26\\n---\\n\"\n                    + \"wypełniacz\\n\" * 40\n                    + \"Naprawiono: README ze „Stan na: 2026-07-15\\\" było nieaktualne.\\n\",\n                    encoding=\"utf-8\")\n    monkeypatch.setattr(tab, \"ROOT\", str(tmp_path))\n    monkeypatch.setattr(tab, \"zbierz_dokumenty\", lambda: [(\"LOG.md\", {\"stan_na\": \"2026-07-26\"})])\n    bledy, _ = a._warstwa_19_parytet_dat()\n    assert bledy == [], f\"cytat w prozie nie może być alarmem: {bledy}\"\n\n\n# ── WARSTWA 20: KATALOG INDEKS NIETKNIĘTY RĘKĄ ───────────────────────────────\n\ndef test_audyt_w20_zielony_na_realnym_indeksie():\n    \"\"\"W20 na żywym repo: katalog w INDEKS = to, co wypluwa Tabularium.\"\"\"\n    import narzedzia.audyt_spojnosci as a\n    bledy, info = a._warstwa_20_katalog_nietkniety()\n    assert not bledy, f\"W20 wykrył ręczną edycję katalogu: {bledy}\"\n    assert any(\"W20\" in i for i in info)\n\n\ndef test_audyt_w20_lapie_wiersz_dopisany_recznie(monkeypatch):\n    \"\"\"GRANICA: jeden wiersz dopisany ręcznie do sekcji generowanej → alarm.\n\n    Przypadek z recenzji 2026-07-26: wpis o kategorii DISCIPLINA wstawiono do sekcji\n    CONSILIUM. Warstwa 7 pilnowała samej OBECNOŚCI dokumentu w INDEKS, nigdy MIEJSCA,\n    więc ręczna edycja żyła aż do pierwszej regeneracji.\n    \"\"\"\n    import narzedzia.audyt_spojnosci as a\n    from narzedzia import tabularium as tab\n    prawdziwy = tab.katalog_md()\n    monkeypatch.setattr(tab, \"katalog_md\",\n                        lambda: prawdziwy.replace(\"### DISCIPLINA\",\n                                                  \"| `docs/PODRZUCONY.md` | widmo | — | 2026-01-01 |\\n### DISCIPLINA\",\n                                                  1))\n    bledy, _ = a._warstwa_20_katalog_nietkniety()\n    assert len(bledy) == 1 and \"rozjechał się z generatorem\" in bledy[0]\n\n\ndef test_audyt_w20_data_spisu_nie_wywoluje_alarmu(monkeypatch):\n    \"\"\"GRANICA: linia „Ostatni spis: <data>\" zmienia się CODZIENNIE i musi być pomijana.\n\n    Bez tego wyłączenia audyt żądałby przepisania katalogu każdego dnia — dokładnie\n    ten fałszywy alarm naprawiliśmy już raz w Warstwie 6 (porównanie z `date.today()`).\n    \"\"\"\n    import narzedzia.audyt_spojnosci as a\n    from narzedzia import tabularium as tab\n    prawdziwy = tab.katalog_md()\n    monkeypatch.setattr(tab, \"katalog_md\",\n                        lambda: prawdziwy.replace(\"Ostatni spis: \", \"Ostatni spis: 1999-01-01 zamiast \"))\n    bledy, _ = a._warstwa_20_katalog_nietkniety()\n    assert bledy == [], \"zmiana samej daty spisu nie jest rozjazdem katalogu\"\nPY\npython -m pytest tests/test_spojnosc.py -q 2>&1 | tail -6"
+  },
+  {
+   "nr": 39,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python - <<'PYEOF'\nimport pathlib, shutil, subprocess, sys\nP=pathlib.Path(\"imperium/biblioteki/index_falsorum.py\"); O=P.read_text(encoding=\"utf-8\")\nMUT=[(\"powrot do dedupu po calym ledgerze\",\n      'if any(r.get(\"fraza\") == fraza for r in aktywne(sciezka)):',\n      'if any(r.get(\"fraza\") == fraza for r in wczytaj(sciezka)):'),\n     (\"dedup wylaczony calkiem\",\n      'if any(r.get(\"fraza\") == fraza for r in aktywne(sciezka)):', 'if False:')]\nfor nazwa,s,n in MUT:\n    assert s in O, nazwa\n    P.write_text(O.replace(s,n,1),encoding=\"utf-8\")\n    assert P.read_text(encoding=\"utf-8\")!=O\n    w=subprocess.run([sys.executable,\"-m\",\"pytest\",\"tests/test_index_falsorum.py\",\"-q\"],\n                     capture_output=True,text=True,encoding=\"utf-8\",errors=\"replace\")\n    ost=[x for x in w.stdout.strip().splitlines() if x.strip()][-1]\n    print(f\"  {'ZABITA' if 'failed' in ost else 'PRZEZYLA'} — {nazwa}: {ost.strip()}\")\n    P.write_text(O,encoding=\"utf-8\")\nassert P.read_text(encoding=\"utf-8\")==O; print(\"plik przywrocony OK\")\nPYEOF"
+  },
+  {
+   "nr": 40,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "git add CLAUDE.md && git commit -q -F - <<'EOF'\n🛠️ ZASADA MELIORATIO — odkryłeś→zapamiętaj→zaproponuj (rozkaz stały, proaktywne ulepszanie)\n\nRozkaz Cezara 2026-07-19: podczas KAŻDEGO zadania, gdy zobaczysz/odkryjesz lepszą\npraktykę, lukę, nieoptymalność albo okazję do modernizacji/rozbudowy — ZAPAMIĘTAJ\n(pamięć/Backlog CODEX/Dziennik) + ZAPROPONUJ ulepszenie wg zasad (KANDYDAT≠PRAWDA,\nZASADA WERYFIKACJI, opt-in, nazwa rzymska, web zweryfikowany datą).\n\nDopełnia REAKTYWNE Prawo XV (koniec sesji) i CENSORA (reakcja na alarm) o element\nPROAKTYWNY — aktywne szukanie ulepszeń w trakcie pracy. Audyt exit 0.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\nEOF\necho \"EXIT: $?\"; git rev-list --left-right --count origin/claude/sleepy-fermi-dsdE4...HEAD; git log --oneline -1"
+  },
+  {
+   "nr": 41,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && git add imperium/pretorianie/kalkulator_lewara.py imperium/pretorianie/aegis_tarcza.py tests/test_kalkulator.py tests/test_aegis_tarcza.py && git commit -q -m \"$(cat <<'EOF'\n🛡️ P5 fali 1: guard ZeroDiv w pretorianach (kalkulator_lewara + aegis)\n\nZwiad zreprodukował 3× ZeroDivisionError na wejściach granicznych ZANIM\nzadziałało weto/checklist: kalkulator_lewara przy dzwignia=200\n(1/200==OPŁATA → likwidacja==cena) i cena_wejscia=0; aegis_tarcza przy\ninitial_capital=0. Produkcja chroniona (dyrygent capuje ≤20), ale funkcje\nsame się nie broniły.\n\nNaprawa (monotoniczna ostrożność, produkcja bez zmian): walidacja\ncena_wejscia>0 i initial_capital>0 u wrót (ValueError, fail-loud) + guard\nmianownika |cena−likwidacja|. aegis dostał pierwsze 4 testy w historii,\nkalkulator +3 granice. Dzwignia=5 dalej checklist_ok=True (brak regresji).\n\nLEX TALIONIS: N-9a33798d ↔ C-5ca9dbad. Księga Wad #55.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\nEOF\n)\" && echo \"=== commit A (P5) ===\"; git log --oneline -1"
+  },
+  {
+   "nr": 42,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && echo \"=== test uodpornienia: czy tabularium widzi README biblioteki ===\"; python narzedzia/tabularium.py liczby 2>&1 | grep -i \"bibliotheca\\|README\\|ksiazki\" | head; echo \"=== zapisz (przepisze blok jeśli trzeba) ===\"; python narzedzia/tabularium.py liczby --zapisz 2>&1 | grep -i \"bibliotheca\\|ksiazki\\|✏️\\|✅\" | head; echo \"=== weryfikacja: liczba w README ===\"; grep -o \"LICZBA:ksiazki -->[0-9]*\" bibliotheca_ulpia/README.md"
+  },
+  {
+   "nr": 43,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "New-Item -ItemType Directory -Force wrzutnia/consilium | Out-Null; Move-Item imperium/consilium/* wrzutnia/consilium/ -Force; Remove-Item imperium/consilium -Recurse -Force; \"--- git status ---\"; git status --short; \"--- co w wrzutni/consilium ---\"; (Get-ChildItem -Recurse -File wrzutnia/consilium).Count"
+  },
+  {
+   "nr": 44,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python -m imperium.biblioteki.dziennik_niesmiertelny wpis \\\n --co \"ADVERSARIALNY ZWIAD SIGILLARIUM (rozkaz Cezara 'wyslij podobne dla 3 pieczeci, cel poprawa i latanie'). Wyslano 6 subagentow Sonnet w osobnych kontekstach: 2 na organ SIGILLARIUM (parser+ergonomia), 4 na cale Imperium (martwy potencjal, ryzyko kodu, bramki, dokumenty). KAZDE znalezisko zweryfikowane OSOBISCIE (kandydat!=prawda). NAPRAWIONO 4 wady MOJEGO swiezego organu (commit e399abf), zlapane przez zwiad a NIE przez moje testy: (1) parser kroki_z_konstytucji cicho gubil niewcieta zawinieta kontynuacje kroku (numeracja ciagla, tresc ucieta — dokladnie klasa przed ktora organ mial chronic); reprodukcja: probka -> 3 kroki z ucieta trescia. Naprawa: parser dokleja KAZDA niepusta linie w srodku kroku, stop = **Zlamanie:**/naglowek. (2) limes/SKILL.md KOPIOWAL 5 komend bramki zamiast wolac pieczec (istniejace naruszenie zasady organu). Naprawa: skill wola pieczec, komendy jedynym zrodlem w SIGLA; test pilnuje NIEOBECNOSCI. (3) brakujace_komendy slepe na 'python -m pakiet' (regex \\\\S+\\\\.py) — martwa komenda LEX TALIONIS przeszlaby cicho; reprodukcja: brakujace_komendy(-m widmo)==[]. Naprawa: _cel_komendy_istnieje mapuje a.b.c->a/b/c.py + test negatywny. (4) zapisz() nieatomowy (write_text w miejscu) — crash moglby obcac WSZYSTKIE runbooki. Naprawa: _zapisz_atomowo .tmp+os.replace. +8 testow (25->33). Aliasy: otwieramy/zamykamy/zrob bramke/przed pushem. Bramki: 2713->2719 testow, audyt exit 0, ruff/skan/FALSORUM czysto.\" \\\n --decyzje \"6 raportow zwiadu, kazdy rozdzielil POTWIERDZONE-POMIAREM od PODEJRZEN. KLUCZOWE OBALENIA (kandydat!=prawda dziala): (a) '38 neuronow milczy' z mojego dziennika OBALONE -> realnie ~17 (6 wyciszonych DOSTEPNY=False + 2 zwiadowcow + 11 ukrytych bo sentyment_per=None/news_per brak); z tego 6 PSY/K-03/K-04 maja GOTOWY kod wstrzykiwania, brak tylko wywolania = najwiekszy zysk/najmniejsze ryzyko. (b) '10 gnijacych dokumentow' -> 10/11 to FALSZYWE ALARMY (data ruszona, tresc nie — Prawo I dziala), JEDYNY realny dlug: TRYBY_IMPERIUM.md wiersz SKALP 'brak danych <1h' falsz po dogranu 1m. Ryzyko kodu: feature_importance.py:240 cicha obcinka serii (blizniak legatus.py juz latany za to samo!), kalkulator_lewara/aegis ZeroDiv ale produkcja CHRONIONA capem 20. Bramki: 7/17 warstw audytu bez testu regresyjnego (negatywnego), census W17 pomija tests/+skrypty/. WSZYSTKIE 6 znalezisk fali 1 zapisane jako Sugestie-KANDYDACI w Backlogu CODEX (rejestr_testow) — NIE latane w tym commicie bo kierunkowe (kod z testami, decyzja Cezara). LEX TALIONIS: NOTA N-d925f3dd (4 wady swiezego organu) splacona CORONA C-a9ab5637 (4 naprawy+testy), dlug 0. Ksiega Wad 52->53: 'slepa plama detektora na wariant skladni' (detektor chroniacy musi pokryc WSZYSTKIE formy zapisu celu + test NEGATYWNY, nie tylko pozytywny). LEKCJA META: moje wlasne testy autora byly slabsze niz recenzja — adversarialny zwiad zlapal 4 wady w kodzie ktory sam napisalem godzine wczesniej; to potwierdza wartosc 'dwoch modeli/dwoch spojrzen'.\" \\\n --nastepny \"ALARM Prawa XV z hooka do rozstrzygniecia: LEKCJE 25497>24000 zn (konsolidacja). POTEM decyzja Cezara wg Backlogu CODEX (6 kandydatow, rekomendacja wg ryzyka): P1 feature_importance strażnik (realny bug, blizniak juz latany, jednoznaczne+test granic), P2 TRYBY_IMPERIUM.md wiersz SKALP (jednoznaczna naprawa dokumentu), P3 backfill sentyment_per (obudzenie 6 neuronow, A/B — najwiekszy zysk ale dotyka pipeline), P4 testy regresyjne 7 warstw audytu (antykruchosc), P5 kalkulator_lewara guard, P6 census zasieg tests/+skrypty/.\" \\\n --sesja \"sigla20b\" 2>&1 | tail -2"
+  },
+  {
+   "nr": 45,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd \"C:\\Projekty\\imperial-mesh-vortex\" && python narzedzia/tabularium.py liczby 2>&1 | tail -8"
+  },
+  {
+   "nr": 46,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python - <<'PY'\nimport sys; sys.path.insert(0,\".\")\nfrom imperium.biblioteki.kronika_czatu import _redaguj\nfrom pathlib import Path\ndom = str(Path.home())\nPROBY = [\n  f\"{dom}\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\x.txt\",\n  f\"{dom}\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\",\n  dom.replace(\"\\\\\",\"/\") + \"/AppData/Local/Temp\",\n  \"C:\\\\Projekty\\\\imperial-mesh-vortex\\\\narzedzia\\\\x.py\",   # repo — MA zostac\n]\nfor p in PROBY:\n    w = _redaguj(p)\n    print(f\"  {'✅ zredagowane' if dom.lower() not in w.lower() else '🚨 WYCIEK    '} | {p[:56]:58} -> {w[:52]}\")\nprint(\"\\nklucz API nadal redagowany:\", _redaguj(\"api_key=sk-abcdefghijklmnopqrstuvwx\"))\nPY"
+  },
+  {
+   "nr": 47,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd \"C:/Projekty/imperial-mesh-vortex\"; git commit -m \"$(cat <<'EOF'\nDane: cache tekstu 5 djvu + katalog metadanych — trwałe odblokowanie djvu w chmurze\n\nPrekonwertowany na laptopie (calibre) tekst 5 djvu, których chmura nie umie odczytać\nbez calibre: Kissell (BIB-022), Aronson (BIB-048), Shreve I/II (BIB-065/066),\nSutton-Barto (BIB-067). Cache trafiony działa BEZ narzędzia (ekstrahuj_z_cache),\nwięc po tym commicie chmura czyta te djvu przez RAG. Katalog metadanych (69 wpisów,\ntytuły azw3 wzbogacone przez ebook-meta) zregenerowany.\n\nOsobny commit danych (nie merytoryczny) — zgodnie z zasadą czystych commitów kodu.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\nEOF\n)\" 2>&1 | tail -5"
+  },
+  {
+   "nr": 48,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && python tests/run_tests.py > \"$TEMP/cenzus_testy.txt\" 2>&1; echo \"EXIT=$?\"; tail -18 \"$TEMP/cenzus_testy.txt\""
+  },
+  {
+   "nr": 49,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd /c/Projekty/imperial-mesh-vortex\ngit add imperium/pretorianie/filtr_ekonomiczny.py tests/test_filtr_ekonomiczny.py \\\n        tests/test_czytnik_csv.py CLAUDE.md ZASADY_FUNDAMENTALNE.md \\\n        narzedzia/audyt_spojnosci.py skrypty/start_tv.py skrypty/start_uczenie.py\necho \"=== Staged (kontrola — bez plików pamięci) ===\"\ngit diff --cached --name-only\ngit commit --quiet -F - <<'EOF'\nTriaga bugów (cubic PR#118 + audyt 2026-07-11): bramka ECON, test 1h, spójność audytu\n\nfiltr_ekonomiczny (cubic PR#118 P1): __post_init__ odrzuca lambda_max NaN/inf/≤0.\nNaN cicho wyłączał weto (`sharpe > NaN == False`), +inf zdejmował pułap — bramka\nbezpieczeństwa ma paść GŁOŚNO przy konstrukcji, nie milcząco przepuszczać zakłady.\n+2 testy granic (Prawo XXI TEST-GRANIC).\n\nK1 (audyt): test_realne_dane_1h pomija się bez lokalnych CSV (dane poza repo od\n2026-07-04) zamiast czerwienić świeży klon — usunięto hard-assert kompletności,\ndocstring sprostowany.\n\nK3 (audyt): 3 nieaktualne listy kategorii → A/C/D/F/H/K/L/M/N/O/R/S/T/V/Z (CLAUDE.md\nKROK 0 whitelist + Reguła 2, ZASADY_FUNDAMENTALNE Reguła 2). Kod ma 15 kategorii;\nstare listy dawały fałszywy 'Bad KAT' i widma E/G/m.\n\nK6 (audyt): audyt_spojnosci ruff skanuje teraz też skrypty/ (było ślepe pole);\nnaprawiono 2×F541 (skrypty/start_tv.py, start_uczenie.py).\n\n_skroc (cubic PR#118 P2): sprawdzone — JUŻ naprawione (str() w ciele), bez zmian.\n\nTesty: +2 → 2176/2176 zielone. Audyt exit 0, ruff czysto.\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\nEOF\ngit log --oneline -1"
+  },
+  {
+   "nr": 50,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python - <<'PY'\nimport hashlib, subprocess\nfrom pathlib import Path\nCEL = Path(\"imperium/biblioteki/kronika_czatu.py\")\noryg = CEL.read_text(encoding=\"utf-8\"); h0 = hashlib.sha256(oryg.encode()).hexdigest()\nT = \"tests/test_kronika_czatu.py\"\n\nr0 = subprocess.run([\"python\",\"-m\",\"pytest\",T,\"-q\"], capture_output=True, text=True, errors=\"replace\")\nprint(f\"kontrola negatywna: rc={r0.returncode} -> {'OK' if r0.returncode==0 else 'PRZYRZAD KLAMIE'}\\n\")\n\nMUT = [\n (\"redakcja sciezek wylaczona (zostaje tylko klucze)\",\n  \"    return _WZORZEC_DOMU.sub(\\\"~\\\", tekst)\", \"    return tekst\"),\n (\"wzorzec lapie tylko JEDEN separator (gubi forme JSON)\",\n  'r\"[\\\\\\\\/]{1,2}\".join', 'r\"[\\\\\\\\/]\".join'),\n (\"separatory nieelastyczne — tylko backslash\",\n  'r\"[\\\\\\\\/]{1,2}\".join', 'r\"\\\\\\\\\\\\\\\\\".join'),\n]\nfor opis, stare, nowe in MUT:\n    if stare not in oryg:\n        print(f\"POMINIETA (wzorzec nieznaleziony) | {opis}\"); continue\n    zmut = oryg.replace(stare, nowe, 1)\n    assert hashlib.sha256(zmut.encode()).hexdigest() != h0, f\"MUTACJA SIE NIE WGRALA: {opis}\"\n    CEL.write_text(zmut, encoding=\"utf-8\")\n    skl = subprocess.run([\"python\",\"-c\",f\"import ast;ast.parse(open(r'{CEL}',encoding='utf-8').read())\"],\n                         capture_output=True).returncode == 0\n    r = subprocess.run([\"python\",\"-m\",\"pytest\",T,\"-q\"], capture_output=True, text=True, errors=\"replace\")\n    CEL.write_text(oryg, encoding=\"utf-8\")\n    w = \"ZABITA ✅\" if r.returncode==1 else (\"PRZEZYLA 🚨\" if r.returncode==0 else f\"NIEWAZNA rc={r.returncode}\")\n    print(f\"{w:14} | skladnia_ok={skl} | {opis}\")\nprint(\"\\nprzywrocony bit-w-bit:\", hashlib.sha256(CEL.read_text(encoding='utf-8').encode()).hexdigest()==h0)\nPY"
+  },
+  {
+   "nr": 51,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd \"C:\\Projekty\\imperial-mesh-vortex\" && git add README.md && git commit -q -m @'\nREADME: dodaj wiersz Strategie (20 SZKIC) + ważenie IC do Legatusa\n\nRozjazd dok↔kod (Prawo XVII/XXI): tabela statusu README nie wymieniała\n20 strategii z rejestr_strategii.py, mimo że są zmapowane na żywe klucze\nneuronów, wpięte w Legatus._dobierz_strategie i śledzone przez audyt\n(Strategie: 20, klucze: 34, Klucznik spójny). Dodano wiersz z liczbą,\nstatusem SZKIC (przepisy, nie zwalidowane) i wskaźnikiem do KATALOG_STRATEGII.\nWiersz Legatusa uzupełniony o ważenie IC opt-in (W-361, domyślnie OFF).\n\nAudyt exit 0 (pełna harmonia, W14 skan wszystkich docs).\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\n'@ && git log --oneline -2"
+  },
+  {
+   "nr": 52,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python -m imperium.biblioteki.dziennik_niesmiertelny wpis \\\n  --co \"SPLATA TALARA N-b74ce133 -> CORONA C-034d631a (zatwierdzona przez Cezara). (1) ORGAN EXACTOR RENUNTIATIONIS (imperium/pretorianie/exactor.py, 26 testow) - pierwszy organ Imperium czytajacy TEKST meldunku iddacego do Cezara i sprawdzajacy go wobec ZYWEJ checklisty CLAUSURY przez SIGILLARIUM; grep potwierdzil unikat (zaden inny organ nie bada tego, co mowie Cezarowi). (2) KALIBRACJA NA PRAWDZIE PODSTAWOWEJ: 190 historycznych meldunkow z kroniki 144 sesji - krok 8 recall 4/4 wobec recznie osadzonej prawdy (lapie oba bloki z samej noty), ZERO falszywych na 156 przekazaniach. (3) TRZY ZALOZENIA PROJEKTU OBALONE POMIAREM: regula fence gorsza od reguly LINII POLECENIA (2 falszywki + gubila poprawny meldunek 6b1d4683#49 przez parowanie ``` po nieparzystym fence); przekazanie pushu != koniec wachty (39 sesji, a domkniec wyszlo 109 - Cezar pushuje kilka razy w wachcie) -> DWA POZIOMY, domkniecie DEKLAROWANE nie zgadywane; powinnoscia meldunku jest TYLKO krok, ktorego brzmienie kaze cos DAC Cezarowi - bez tego kryterium organ dawal 80% alarmow na 20 domknieciach, karzac w 45% za nieprzepisanie bilansu dlugu, ktorego krok 5b wcale nie kaze przepisywac. (4) UODPORNIENIE: --blok-push GENERUJE blok kroku 8 z zywego repo (test niezmiennika: co organ podaje, przechodzi to, czego organ wymaga). (5) POWINNOSC WARUNKOWA kroku 9 swiadomie POZA rejestrem i JAWNA w polu niepokryte. (6) SYMBIOZA: CENSUS 256, README pretorianie 14->15, ARCHITEKTURA, LOG_ZMIAN, skill CLAUSURA woła organ (nie kopiuje krokow), ledger Pomiary 46->47. (7) Bramka 3244/3244, audyt exit 0 (23 warstwy). (8) ROZKAZ CEZARA: odpowiadac po POLSKU takze w narracji miedzy narzedziami - zapisane w pamieci prywatnej.\" \\\n  --decyzje \"CORONA zatwierdzona ustnie przez Cezara ('tak zatwierdzam') - bez zatwierdzenia codex_notarum nie wpuszcza i tak ma zostac. HOOK STOP: Cezar zgodzil sie warunkowo ('jezeli rekomendujesz') - REKOMENDUJE WASKO: tylko poziom push (krok 8), bo TYLKO on ma zmierzone 0 falszywych; poziom domkniecie NIE jest skalibrowany i w automacie bylby tapeta. Warunek wstepny: SONDA sprawdzajaca, czy zdarzenie Stop w ogole niesie tekst meldunku - zaden z 4 naszych hookow nie czyta transkryptu, wiec to NIEZMIERZONE. Budowa logiki przed ta sonda byla by dokladnie tym, za co dostalem talara. NIE robic hooka i commitu CORONY w jednym ruchu (osobna bramka). LEKCJA POWTORZONA TRZY RAZY W JEDNEJ WACHCIE: klamie PRZYRZAD, nie system - (a) heredoc zjadl backslash w regexie, (b) grep wzial wiersz raportu 'SL (Brama II): 0' za czerwony test, (c) sleep puszczany w tle wracal natychmiast, wiec trzy razy zameldowalem 'bieg stoi na 1951', gdy stal moj pomiar czasu. Lek na (c): petla until w tle, nie sleep. Trzy biegi bramki uniewaznione przeze mnie: dwa przez brudzenie repo W TRAKCIE biegu (edycje dokumentow, zapis sigillum_probationis przez codex_probationum), jeden przez zly pomiar czasu - WSZYSTKIE zapisy do repo maja isc PRZED startem bramki.\" \\\n  --nastepny \"Hook Stop w dwoch krokach: najpierw SONDA (czy zdarzenie niesie transkrypt), potem - jesli tak - wpiecie WYLACZNIE poziomu push z wlasna bramka; jesli nie, zostajemy przy skillu CLAUSURA i meldujemy to jawnie. Potem powrot do planu: F0 (17 skupisk redundancji na wierzch) albo A10.\" \\\n  --sesja \"214cc8b4\" 2>&1 | tail -5"
+  },
+  {
+   "nr": 53,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python narzedzia/tabularium.py katalog --zapisz 2>&1 | tail -2; python narzedzia/audyt_spojnosci.py > \"$TEMP/a8.out\" 2>&1; echo \"AUDYT_EXIT=$?\"; grep -E \"harmonia|❌\" \"$TEMP/a8.out\" | head -4"
+  },
+  {
+   "nr": 54,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "cat > /tmp/msg_zamk.txt <<'EOF'\nDomkniecie wachty obieg29: Dziennik Niesmiertelny + rekomendacja kroku 3\n\nWachta zamknieta. Bramka: 3078/3078 zielone, audyt exit 0 (23 warstwy), ruff czysto,\nskan wad czysto, dlug honorowy 0 (48 not / 49 koron).\n\nREKOMENDACJA zapisana w Dzienniku i w pamieci: krok 3 = pelne A/B ucz_mwu.\nMechanizm JUZ istnieje i jest wpiety (backtest(..., ucz_mwu=True)), koszt ~25 s/bieg,\na sonda 600 barow dala +114.52 USDT ON vs OFF. Jedyna z trzech opcji, ktora odpowiada\nna pytanie \"czy roj sie UCZY\", nie \"czy jest porzadek\".\n\nODLOZONE Z POMIAREM (nie z ostroznosci): bezpiecznik Hermesa hash_ok=True na sztywno.\nPomiar pokazal, ze to NIE jest poprawka jednolinijkowa — tylko 1 miejsce podaje niepuste\nhash_danych, Brama liczy sha256 ale nie dowozi go do sygnalu, a hash_ok=False dokladalby\nBLOKADE, wiec naiwne odblokowanie zawetowaloby kazde wejscie. Robic PRZED pierwszym\nrealnym orderem.\n\nALARM RECOGNITORA (krok 3 domkniecia): PR #135 nie ma ANI JEDNEJ recenzji zewnetrznej.\nCisza recenzenta != zgoda. Wewnetrzna recenzja wykonana (skan_wad_kodu na wszystkich\nzmienionych plikach — czysto), zewnetrzna do nadrobienia.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nEOF\ngit add -A && git commit -q -F /tmp/msg_zamk.txt && git log --oneline -3"
+  },
+  {
+   "nr": 55,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "git commit -q -m \"$(cat <<'EOF'\nOdzysk po reinstalacji + mina latentna w fuzji hybrydowej RAG (Ksiega Wad)\n\nReinstalacja aplikacji zabila sesje w trakcie pracy. Odzysk zmierzony:\nkod quaesitor.py (330 linii) przetrwal na dysku jako plik niesledzony,\na caly transkrypt zabitej sesji (637 KB) dal sie odczytac - odzyskane\nzostalo takze rozumowanie, nie tylko pliki.\n\nQUAESITOR (R1) wchodzi BEZ BRAMKI i z nazwanym dlugiem: zero testow,\nnigdy nie uruchomiony, zero pomiaru. Wg Prawa XIX ten organ NIE ISTNIEJE\ni nie wolno sie na niego powolywac. Cel commitu: nie stracic go przy\nkolejnej reinstalacji. Domkniecie odlozone decyzja Cezara.\n\nWada #2 audytu RAG -> Ksiega Wad, a POMIAR OBALIL MOJ WLASNY OPIS wady:\ntwierdzilem, ze wyniki wektorowe laduja na KONCU listy; symulacja pokazala\nodwrotnie - laduja na POCZATKU i wypychaja BM25, a w obrebie samego BM25\nkolejnosc jest ODWROCONA (najlepsze trafienie ostatnie). Mina latentna:\ndzis hybrid cicho degraduje do fts, wiec linia sie nie wykonuje; wybuchlaby\nprzy wlaczeniu wektorow i wygladalaby na wine embeddingow. Lek = RRF (R2).\n\nForma wpisu z pomiaru szumu: regex dawal 50% falszywek (szukaj.py:118\nsortuje czysty cosinus i jest POPRAWNY), wiec wada weszla jako pozycja\nchecklisty, nie auto-skan - klasa jest semantyczna, nie skladniowa.\n\nLEX TALIONIS: Cezar zatwierdzil NOTE N-09bca019 i splacajaca ja CORONE\nC-03dbbd37. Bilans 49/50, dlug honorowy 0.\n\nFalszywy alarm straznika czystosci rozstrzygniety: pierwszy bieg 3113/3114\nz oskarzeniem o zabrudzone repo to wariant (b) - bieg szedl rownolegle\nz moimi zapisami do ledgera i census. Czysta powtorka: 3114/3114 exit 0.\n\nBramka: testy 3114/3114, audyt exit 0 (23 warstwy), census 250->251,\nskan wad quaesitor.py czysty.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\nEOF\n)\" && git log --oneline -1"
+  },
+  {
+   "nr": 56,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "New-Item -ItemType Directory -Force imperium/consilium/kun_agents | Out-Null; Move-Item .agents/* imperium/consilium/kun_agents/ -Force; Remove-Item .agents -Recurse -Force; Move-Item docs/NOWE_KSIAZKI_BIB302-400.md imperium/consilium/ -Force; \"--- po przenosinach ---\"; git status --short"
+  },
+  {
+   "nr": 57,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "git add bibliotheca_ulpia/dane/auto_lekcja_przetworzone.txt bibliotheca_ulpia/dane/wizje_i_decyzje.jsonl docs/PAMIEC_SESJI.md\ngit commit -m \"$(cat <<'EOF'\nauto: sync pamięci sesji (resume)\n\nCo-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>\nEOF\n)\" 2>&1 | tail -3\necho \"--- stan końcowy ---\"\ngit status -sb | head -2"
+  },
+  {
+   "nr": 58,
+   "warstwa": "OSKARZONA",
+   "etykieta": "PISZE",
+   "komenda": "python - <<'PY'\n# P2 cubica: duplikat wycofania w INDEX FALSORUM — usuwam JEDEN, zachowujac kolejnosc.\nfrom pathlib import Path\np = Path(\"bibliotheca_ulpia/dane/index_falsorum.jsonl\")\nL = [l for l in p.read_text(encoding=\"utf-8\").splitlines() if l.strip()]\nwidziane, wynik, usuniete = set(), [], 0\nfor l in L:\n    if l in widziane:\n        usuniete += 1\n        continue\n    widziane.add(l); wynik.append(l)\np.write_text(\"\\n\".join(wynik) + \"\\n\", encoding=\"utf-8\")\nprint(f\"usunieto {usuniete} duplikat(ow) | linii: {len(L)} -> {len(wynik)}\")\nPY\npython -c \"\nfrom imperium.biblioteki.index_falsorum import aktywne\nprint('aktywnych twierdzen pod straza:', len(aktywne()))\n\""
+  },
+  {
+   "nr": 59,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd \"C:\\Projekty\\imperial-mesh-vortex\" && python - <<'PYEOF'\nimport subprocess\nfrom pathlib import Path\nK = Path(r\"C:\\Projekty\\imperial-mesh-vortex\")\ndef git(*a):\n    return subprocess.run([\"git\",*a],cwd=K,capture_output=True,text=True,encoding=\"utf-8\",errors=\"replace\").stdout\nfor f in [\"bibliotheca_ulpia/dane/rejestr_testow.jsonl\",\"bibliotheca_ulpia/dane/index_falsorum.jsonl\",\n          \"bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl\",\"bibliotheca_ulpia/dane/procedury.jsonl\"]:\n    print(f\"\\n=== {f} ===\")\n    out = git(\"log\",\"--numstat\",\"--format=@@%h|%ad|%s\",\"--date=short\",\"--\",f)\n    commit=None\n    for l in out.splitlines():\n        if l.startswith(\"@@\"): commit=l[2:]\n        elif \"\\t\" in l:\n            d,u,_=l.split(\"\\t\",2)\n            if u.isdigit() and int(u)>0:\n                print(f\"   +{d} -{u}  {commit[:100]}\")\nPYEOF"
+  },
+  {
+   "nr": 60,
+   "warstwa": "OSKARZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && python - <<'PYEOF'\nimport json, sys\nfrom pathlib import Path\nsys.stdout.reconfigure(encoding='utf-8')\nSC = Path(r'C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\25f9422a-b7c7-43ec-aae4-c2fa858935b8\\scratchpad')\nks = {o['nr']: o for o in json.load(open(SC/'bib069.json', encoding='utf-8'))}\n\nGRUPY = [\n (\"📈 Analiza techniczna, price action, klasyka tradingu\",\n  [2,13,14,15,21,47,49,6,1],\n  \"wskaźniki, EMA/HMA, profil rynku, formacje\"),\n (\"🧠 Psychologia i dyscyplina tradera\",\n  [4,16,17,50,51,52,38,39],\n  \"PSY-01..05, Senat, Reguła 6%\"),\n (\"🔬 Quant, ML i badania ilościowe\",\n  [7,10,11,23,26,28,31,45,46,48,68,67],\n  \"rdzeń metodologii: DSR/PBO/purged-CV, meta-labeling, IC\"),\n (\"🏛️ Mikrostruktura, HFT i egzekucja\",\n  [20,22,27,32,43,44],\n  \"Z-01 VPIN, V-03 CVD, EXP-12/14/15, OMS\"),\n (\"⚠️ Ryzyko, zmienność, grube ogony\",\n  [8,9,18,37,41,42,65,66],\n  \"Z-01..07, HALT, ECON/Feynman-Kac\"),\n (\"🌍 Makro, cykle długu, bańki i behawioryzm\",\n  [25,40,56,57,58,59,60,61,62,63,64],\n  \"RADAR-01..05, Gubernator, Z-03/04/07\"),\n (\"₿ Krypto, blockchain i tokenomika\",\n  [3,5,19,24,29,30,53,54,55,69],\n  \"OC-01..08, RADAR-02/03, Straż A-*\"),\n (\"🤖 AI, LLM i agenci\",\n  [33,34,35,36,12],\n  \"TIRO, RAG, warstwy pamięci W1..W22\"),\n]\nuzyte = {n for _, l, _ in GRUPY for n in l}\nbrak = sorted(set(ks) - uzyte)\nif brak:\n    GRUPY.append((\"🗂️ Pozostałe\", brak, \"kontekst ogólny\"))\n\nlinie = []\nfor tytul, nry, karmi in GRUPY:\n    linie.append(f\"\\n### {tytul}\\n\")\n    linie.append(f\"> Karmi: {karmi}\\n\")\n    linie.append(\"| BIB | Autor | Tytuł | Format | Fragm. w RAG |\")\n    linie.append(\"|---|---|---|---|---|\")\n    for n in nry:\n        k = ks[n]\n        rok = f\" ({k['rok']})\" if k['rok'] else \"\"\n        linie.append(f\"| {n:03d} | {k['autor']} | *{k['tytul']}*{rok} | {k['ext']} | {k['frag']} |\")\nsuma = sum(k['frag'] for k in ks.values())\nprint(f\"wierszy: {sum(1 for l in linie if l.startswith('| 0'))} | fragmentów razem: {suma}\")\n(SC/'sekcja069.md').write_text(\"\\n\".join(linie), encoding='utf-8')\nprint(\"→ zapisane\")\nPYEOF"
+  },
+  {
+   "nr": 61,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -c \"\nimport json, os, pathlib, sys, collections\nsys.path.insert(0, os.getcwd())\nfrom imperium.pretorianie import exactor\nS = pathlib.Path(os.environ['TEMP'])/'claude'/'C--Projekty-imperial-mesh-vortex'/'214cc8b4-f340-4a6e-a677-9b4d46df8ab5'/'scratchpad'\nrek = json.loads((S/'korpus.json').read_text(encoding='utf-8'))\nK, G = exactor.kroki_clausury(), exactor.galaz_biezaca()\npierwsze = {}\nfor r in rek:\n    w = exactor.zbadaj_meldunek(r['tresc'], kroki=K, galaz=G)\n    if w['poziom'] == 'domkniecie' and r['sesja'] not in pierwsze:\n        pierwsze[r['sesja']] = (r, w)\nlam = collections.Counter()\nalarm = 0\nfor r, w in pierwsze.values():\n    if w['status'] == 'niespelniony': alarm += 1\n    for b in w['braki']: lam[b['id']] += 1\nn = len(pierwsze)\nprint(f'PIERWSZA deklaracja domkniecia w sesji (proxy prawdziwego meldunku): n={n}, alarmow={alarm} ({100*alarm/n:.0f}%)')\nfor p in exactor.REJESTR:\n    if lam[p.id]: print(f'  {p.id:<20} {lam[p.id]:2d}/{n} = {100*lam[p.id]/n:5.1f}%')\n\""
+  },
+  {
+   "nr": 62,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "Select-String -Path imperium/biblioteki/codex_notarum.py -Pattern '^def ' | ForEach-Object { $_.Line.Trim() }"
+  },
+  {
+   "nr": 63,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd wrzutnia; f=\"Mapa-kluczy calosc plus.md\"\necho \"=== PIERWSZE 40 LINII ===\"; head -40 \"$f\"\necho \"\"; echo \"=== NAGŁÓWKI (# ##) — pierwsze 60 ===\"; grep -n \"^#\\{1,3\\} \" \"$f\" | head -60"
+  },
+  {
+   "nr": 64,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "grep -nE \"test_codex|discover|glob|import|TEST_MODU|dodaj|append|listdir|walk|__all__|MODUL\" tests/run_tests.py | head -30"
+  },
+  {
+   "nr": 65,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd /c/Projekty/imperial-mesh-vortex\necho \"=== ściąga / dokument o oszczędzaniu tokenów ===\"\nls docs/ | grep -iE \"sciaga|scia|token|lokal\" \ngrep -rln \"świeży start\\|swiezy start\\|clear\\|compact\\|kompakcj\\|oszczęd\" docs/*.md 2>/dev/null | head\necho\necho \"=== komendy pamięci (z CLAUDE.md / kod) ===\"\npython -m imperium.biblioteki.dziennik_niesmiertelny --help 2>&1 | head -8 || echo \"---\"\necho \"=== centrum_pamieci komendy ===\"\npython -m imperium.biblioteki.centrum_pamieci 2>&1 | head -6"
+  },
+  {
+   "nr": 66,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "timeout 120 python -m imperium.koloseum.petla_live --symbole BTCUSDT --interwal 1H --dashboard --dashboard-port 8901 --arena-log --max-barow 1 --pauza 2 2>&1 | tail -30"
+  },
+  {
+   "nr": 67,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -c \"\nfrom narzedzia import ab_plon_hyginusa as lm\nrek=[r for r in lm.wczytaj() if r.get('bieg')=='u4_rdzen']\nfor ramie in ('off','on'):\n    d=[r for r in rek if r['ramie']==ramie]\n    nd=sum(r['kandydatow']-r['duplikaty'] for r in d)\n    print(f'{ramie}: kandydatów {sum(r[\\\"kandydatow\\\"] for r in d)} | dublujących {sum(r[\\\"duplikaty\\\"] for r in d)} | NOWYCH {nd}')\n\""
+  },
+  {
+   "nr": 68,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd \"C:\\Projekty\\imperial-mesh-vortex\" && grep -n \"ANALIZA\\|WRZUTNIA\\|AUDYT_IMPERIUM\" docs/INDEKS_IMPERIUM.md | head -8"
+  },
+  {
+   "nr": 69,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -c \"\nimport sys; sys.path.insert(0,'.')\nimport tests.test_strategie as a\nn=0\nfor k,v in sorted(vars(a).items()):\n    if k.startswith('test_') and callable(v):\n        try: v(); n+=1\n        except Exception as e: print('FAIL', k, type(e).__name__, e)\nprint('przeszlo', n)\n\" 2>&1 | Select-Object -Last 3"
+  },
+  {
+   "nr": 70,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "head -30 narzedzia/kapitol_podglad.py | grep -n \"sys.path\\|import\" "
+  },
+  {
+   "nr": 71,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "git diff --stat && echo \"=== .mcp.json ===\" && cat .mcp.json 2>/dev/null"
+  },
+  {
+   "nr": 72,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "git log -1 --format='%H %ad %s' --date=short && git status --short | head -20 && echo \"--- MANIFEST Stan na ---\" && grep -n \"Stan na\" docs/MANIFEST_KODU.md | head -5"
+  },
+  {
+   "nr": 73,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "Get-Content \"C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\8c227070-c9de-42e4-93f1-a64bd4e68672\\tasks\\b0iv9uy2x.output\" -Tail 16"
+  },
+  {
+   "nr": 74,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "PISZE",
+   "komenda": "export PYTHONIOENCODING=utf-8; python tests/run_tests.py 2>&1 | tail -3; echo \"---AUDYT---\"; python narzedzia/audyt_spojnosci.py 2>&1 | tail -8; echo \"EXIT=$?\""
+  },
+  {
+   "nr": 75,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -c \"\nimport sys; sys.path.insert(0,'narzedzia/rag'); sys.path.insert(0,'.')\nfrom szukaj import szukaj\nfrom imperium.pretorianie.probator import podane_zrodla, aliasy_zrodel, sprawdz, wyodrebnij_cytaty\nw = szukaj('momentum', topk=3, tryb='fts', cichy=True, korpus='biblioteka')\nprint('1. podane_zrodla na ZYWYM RAG:', podane_zrodla(w))\nprint('2. aliasy:', aliasy_zrodel(w))\nprint('3. halucynacja BIB-999 ->', sprawdz('Teza wg BIB-999.', w).status)\nprint('4. chunk sasiada:', wyodrebnij_cytaty('Teza wg BIB-006 oraz BIB-047 chunk 8.'))\nclass W: zrodlo='BIB-006_Carson.epub'; nr_chunk=8\nprint('5. dry-run w tresci ->', sprawdz('Kandydat: filtr X. Testowac w trybie dry-run.', [W()]).status)\n\""
+  },
+  {
+   "nr": 76,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "PISZE",
+   "komenda": "python -m imperium.biblioteki.rejestr_wizji dodaj ZMIANA \"P1 test naprawy CLI\" \"sprawdzam czy ZMIANA przechodzi po naprawie default\" 2>&1 | tail -2"
+  },
+  {
+   "nr": 77,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "sleep 1; cat \"C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\570abb02-ee7f-4474-8316-6972a1d21143\\tasks\\be62flss4.output\" 2>/dev/null | tail -15"
+  },
+  {
+   "nr": 78,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd C:\\Projekty\\imperial-mesh-vortex; \"=== czy porownanie interwalow uzywa profilu stylu? ===\"; Select-String -Path narzedzia/sym_porownanie_tf.py -Pattern \"BAZA =|styl|namiestnik|profil\" | ForEach-Object { \"L$($_.LineNumber): $($_.Line.Trim())\" }; \"\"; \"=== jak dziala Namiestnik (W-323) — mapowanie interwal->styl ===\"; Select-String -Path imperium/**/namiestnik.py -Pattern \"SCALP|M1|M5|M15|def .*styl|MAPA\" -ErrorAction SilentlyContinue | Select-Object -First 10 | ForEach-Object { \"L$($_.LineNumber): $($_.Line.Trim().Substring(0,[Math]::Min(100,$_.Line.Trim().Length)))\" }"
+  },
+  {
+   "nr": 79,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "grep -rn \"rejestr_wizji.dodaj\\|wizji import dodaj\\|\\.dodaj(\" --include=*.py imperium/ narzedzia/ | grep -v pycache | grep -iv \"ksiega\\|codex\" | head -12"
+  },
+  {
+   "nr": 80,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "ls narzedzia/ | grep -i \"biblio\\|przygotuj\"; echo \"=== przygotuj_biblioteke — co robi ===\"; grep -n '\"\"\"' -A 12 narzedzia/przygotuj_biblioteke.py 2>/dev/null | head -18"
+  },
+  {
+   "nr": 81,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cat \"C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\31bae61f-8be6-4603-9493-da79bd7900fe\\tasks\\bw5sy73ix.output\" 2>/dev/null | tail -40"
+  },
+  {
+   "nr": 82,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "PISZE",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && python tests/run_tests.py 2>&1 | tail -4"
+  },
+  {
+   "nr": 83,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "grep -n \"W24\\|hooki_wykonywalne\\|settings\" tests/test_spojnosc.py | head -6"
+  },
+  {
+   "nr": 84,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && grep -rn \"ucz_mwu_strategii\" --include=*.py imperium/ | head -15"
+  },
+  {
+   "nr": 85,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "Get-Content \"C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\8c227070-c9de-42e4-93f1-a64bd4e68672\\tasks\\b5doxwtuk.output\" -Tail 6"
+  },
+  {
+   "nr": 86,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "export PYTHONIOENCODING=utf-8 && grep '\"typ\": \"SUGESTIA\"\\|\"typ\":\"SUGESTIA\"' bibliotheca_ulpia/dane/rejestr_testow.jsonl | head -2; echo \"---liczba SUGESTIA---\"; grep -c \"SUGESTIA\" bibliotheca_ulpia/dane/rejestr_testow.jsonl"
+  },
+  {
+   "nr": 87,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd \"C:\\Projekty\\imperial-mesh-vortex\" && python -m imperium.legiony.discriminator --dane dane/4h/Binance_BTCUSDT_4h.csv --interwal 4h --limit 800 --od 360 --json > \"C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\e6cc8ae6-db20-4067-9e91-4b9a3132cdeb\\scratchpad\\powtorka_d2.json\" 2> \"C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\e6cc8ae6-db20-4067-9e91-4b9a3132cdeb\\scratchpad\\powtorka_d2.err\"; echo \"exit=$?\""
+  },
+  {
+   "nr": 88,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "ls tests/ | grep -i reflek; echo \"---\"; grep -rln \"refleksja\\|wykryj_sprzecznosci\" tests/ 2>/dev/null"
+  },
+  {
+   "nr": 89,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -m pytest tests/test_przygotuj_biblioteke.py tests/test_faber.py tests/test_konwerter.py tests/test_rag.py -q 2>&1 | tail -6"
+  },
+  {
+   "nr": 90,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd /c/Projekty/imperial-mesh-vortex; grep -n \"^def \\|^KOLEJKA\" narzedzia/bibliotekarz.py | sed -n '1,40p'"
+  },
+  {
+   "nr": 91,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && python -m pytest tests/test_bibliotekarz.py -q 2>&1 | tail -8 && echo \"=== ruff ===\" && python -m ruff check narzedzia/bibliotekarz.py 2>&1 | tail -3"
+  },
+  {
+   "nr": 92,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -c \"\nimport io,sys\nfor p in ['imperium/pretorianie/vindex.py','tests/run_tests.py','narzedzia/audyt_spojnosci.py']:\n    t=open(p,encoding='utf-8').read()\n    print('='*20,p,'linii',len(t.splitlines()))\n\""
+  },
+  {
+   "nr": 93,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "tail -8 \"C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\0df8e56f-c7ce-4d01-8b75-87245d58c8c4\\tasks\\b6u84l0sr.output\"; echo \"=== PORTITOR ===\"; python -m imperium.pretorianie.portitor banner 2>&1 | head -2"
+  },
+  {
+   "nr": 94,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python narzedzia/audyt_spojnosci.py >/dev/null 2>&1; echo \"AUDYT_EXIT=$?\""
+  },
+  {
+   "nr": 95,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "ls tests/ | head -5; echo \"=== wzorzec ===\"; head -25 tests/test_prova_ignis.py 2>/dev/null || head -25 $(ls tests/test_*.py | head -1)"
+  },
+  {
+   "nr": 96,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -m pytest tests/test_kapitol_podglad.py -q 2>&1 | tail -8"
+  },
+  {
+   "nr": 97,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "PISZE",
+   "komenda": "python - <<'PY'\nimport sys; sys.path.insert(0,\".\")\nfrom pathlib import Path\nfrom imperium.biblioteki.kronika_czatu import _redaguj, _WZORZEC_DOMU\n\nzmienione = wystapienia = 0\nfor p in Path(\".\").rglob(\"*.md\"):\n    if \".git\" in p.parts or \"archiwum\" in p.parts:\n        continue\n    try: t = p.read_text(encoding=\"utf-8\")\n    except Exception: continue\n    n = len(_WZORZEC_DOMU.findall(t))\n    if not n: continue\n    p.write_text(_redaguj(t), encoding=\"utf-8\")\n    zmienione += 1; wystapienia += n\nprint(f\"oczyszczono {zmienione} plikow, {wystapienia} wystapien\")\nPY\necho \"=== KONTROLA PO ===\""
+  },
+  {
+   "nr": 98,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && python - <<'EOF'\nimport sqlite3, sys\nsys.stdout.reconfigure(encoding='utf-8')\ncur = sqlite3.connect('narzedzia/rag/baza_wiedzy.db').cursor()\nprint(\"=== KONTROLA: czy 'Baum-Welch' to naprawde zero, czy artefakt tokenizacji? ===\")\nfor q in ['Baum', '\"Baum Welch\"', 'Welch', '\"expectation maximization\"', 'Rabiner', '\"transition probabilities\"']:\n    try:\n        n = cur.execute(\"SELECT COUNT(*) FROM fts WHERE fts MATCH ?\", (q,)).fetchone()[0]\n        top = cur.execute(\"SELECT g.zrodlo FROM fts f JOIN fragmenty g ON f.rowid=g.id WHERE f.fts MATCH ? LIMIT 2\", (q,)).fetchall()\n        print(f\"  {q:28s} {n:4d}   {[t[0][:45] for t in top]}\")\n    except Exception as e:\n        print(f\"  {q:28s} BLAD {e}\")\nEOF"
+  },
+  {
+   "nr": 99,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd \"C:/Users/Ian/.claude/projects/C--Projekty-imperial-mesh-vortex/ea3446fd-e893-441a-8180-337ef0842297/tool-results\"\ngrep -n -i \"compound\\|&&\\|prefix\\|subshell\\|semicolon\\|pipe\" toolu_01MhrmCDCPke2AdL1iUMRF7y.txt | head -25"
+  },
+  {
+   "nr": 100,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "echo \"HEAD:   $(git rev-parse HEAD)\"; echo \"origin: $(git rev-parse origin/claude/sleepy-fermi-dsdE4)\"; echo; python -m imperium.oczy.breviarium --delta 2>&1 | tail -8"
+  },
+  {
+   "nr": 101,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd \"C:\\Projekty\\imperial-mesh-vortex\" && python \"C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\e6cc8ae6-db20-4067-9e91-4b9a3132cdeb\\scratchpad\\skan_petli.py\" 2>&1 | head -75"
+  },
+  {
+   "nr": 102,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "head -25 docs/MATRYCA_KORELACJI.md; echo \"...\"; grep -c \"\" docs/MATRYCA_KORELACJI.md"
+  },
+  {
+   "nr": 103,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && echo \"=== klucz ===\"; python -c \"import os; k=os.getenv('DEEPSEEK_API_KEY'); print('DEEPSEEK_API_KEY:', 'JEST ('+str(len(k))+' zn.)' if k else 'BRAK')\"\necho \"=== łączność do api.deepseek.com (timeout 8s) ===\"; python -c \"\nimport socket\ntry:\n    s=socket.create_connection(('api.deepseek.com',443),timeout=8); s.close(); print('SIEĆ: OK — mogę odpalić Hyginusa na żywo')\nexcept Exception as e: print(f'SIEĆ: BRAK ({type(e).__name__}: {e}) — API niedostępne z tego środowiska')\n\""
+  },
+  {
+   "nr": 104,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "ls .claude/hooks/; echo \"=== czy ktorys hook czyta transcript_path ===\"; grep -rln \"transcript_path\\|transcript\" .claude/hooks/ 2>/dev/null"
+  },
+  {
+   "nr": 105,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd /c/Projekty/imperial-mesh-vortex; git status --short | head -5; echo \"(pusto = drzewo czyste)\""
+  },
+  {
+   "nr": 106,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "PISZE",
+   "komenda": "python tests/run_tests.py 2>&1 | tail -3\npython narzedzia/audyt_spojnosci.py >/dev/null 2>&1; echo \"AUDYT_EXIT=$?\"\npython narzedzia/skan_wad_kodu.py 2>&1 | tail -1\necho \"=== podgląd nowego narzędzia na PRAWDZIWYM repo ===\"\nbash narzedzia/synchronizuj.sh 2>&1 | head -5"
+  },
+  {
+   "nr": 107,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -c \"\nfrom imperium.legiony.rejestr import wszystkie_neurony, wszyscy_zwiadowcy, raport_elity\nn=wszystkie_neurony(); z=wszyscy_zwiadowcy()\nprint('neurony:',len(n),'| zwiadowcy:',len(z))\ne=raport_elity(); print('elita lacznie:',e.get('lacznie_elite'))\n\" 2>&1 | tail -4"
+  },
+  {
+   "nr": 108,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd /c/Projekty/imperial-mesh-vortex\npython -m py_compile narzedzia/ab_dvol.py narzedzia/ab_stablecoin.py narzedzia/ab_usd.py && echo \"compile OK\"\nruff check narzedzia/ab_dvol.py narzedzia/ab_stablecoin.py narzedzia/ab_usd.py narzedzia/scriba_codex.py 2>&1 | tail -2"
+  },
+  {
+   "nr": 109,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -m ruff check narzedzia/waliduj_zmysly.py tests/test_waliduj_zmysly.py 2>&1 | tail -15; echo \"=== SKAN WAD ===\"; python narzedzia/skan_wad_kodu.py 2>&1 | tail -15"
+  },
+  {
+   "nr": 110,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -m pytest tests/test_wazenie_ic.py tests/test_hipoteza_b.py tests/test_ab_tryb_strategii.py tests/test_ab_strategy_mwu.py tests/test_ab_wazenie_ic.py tests/test_ab_pnl_wazenie_ic.py -q 2>&1 | tail -15"
+  },
+  {
+   "nr": 111,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "find imperium -iname \"*rejestr*wizj*\" -o -iname \"*wizje*\" 2>/dev/null | grep -v pycache; echo \"---\"; grep -rln \"wizje_i_decyzje.jsonl\\|def dodaj\\|JSONL\" imperium/biblioteki/*.py 2>/dev/null | head; echo \"=== sample rejestr ===\"; ls imperium/biblioteki/*.py | grep -iE \"rejestr|wizj|decyzj|pomysl\""
+  },
+  {
+   "nr": 112,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -c \"\nimport sys; sys.stdout.reconfigure(encoding='utf-8')\nfrom imperium.biblioteki.refleksja_pamieci import raport\nprint(raport()[:2500])\n\" 2>&1 | head -50"
+  },
+  {
+   "nr": 113,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd C:/Projekty/imperial-mesh-vortex && grep -iE \"zaliczone|Imperium gotowe|passed|failed|[0-9]+ pass\" \"C:/Users/Ian/AppData/Local/Temp/claude/C--Projekty-imperial-mesh-vortex/56ea4ea2-49c6-4804-8ebf-0032fbf37cff/tasks/bil8ke27m.output\" 2>/dev/null | tail -2"
+  },
+  {
+   "nr": 114,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "sed -n '40,55p' narzedzia/rag/mcp_server.py"
+  },
+  {
+   "nr": 115,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd C:\\Projekty\\imperial-mesh-vortex; python narzedzia/audyt_danych.py --interwal 1h --pary \"LTCUSDT\" --napraw 2>&1 | Select-Object -First 15"
+  },
+  {
+   "nr": 116,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "grep \"^EXIT=\" \"$TEMP/exactor/testy2.txt\" 2>/dev/null && echo \"stary bieg skonczony\" || echo \"stary NADAL biegnie (zignoruje jego wynik - repo zmienilo sie w trakcie)\""
+  },
+  {
+   "nr": 117,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -m pytest tests/test_sigillarium.py tests/test_pamiec_proceduralna.py -q 2>&1 | tail -25"
+  },
+  {
+   "nr": 118,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "sed -n '490,530p' tests/test_kalkulator.py; echo \"=== dyrygent sl_atr ===\"; grep -n \"sl_atr_mult\" tests/test_dyrygent.py"
+  },
+  {
+   "nr": 119,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "cd \"C:\\Users\\Ian\\AppData\\Local\\Temp\\claude\\C--Projekty-imperial-mesh-vortex\\70a5e854-c52f-4d20-a053-400383a13e43\\scratchpad\\tabularium\" 2>/dev/null\necho \"=== WERDYKTY ZWIADU (3 grupy gotowe) ===\"\ngrep -h \"^## \\|werdykt:\" *.md 2>/dev/null | paste - - 2>/dev/null | sed 's/\\*\\*werdykt:\\*\\*//' | head -45\necho \"\"\necho \"=== ILE SKATALOGOWANYCH ===\"\ngrep -hc \"^## \" *.md 2>/dev/null | paste -sd+ | bc"
+  },
+  {
+   "nr": 120,
+   "warstwa": "PRZEPUSZCZONA",
+   "etykieta": "CZYTA",
+   "komenda": "python -m pytest tests/test_wazenie_ic.py tests/test_legatus.py -q 2>&1 | tail -20"
+  }
+ ],
+ "uwaga_metodyczna": "PROBKA JEST ZAMROZONA W TYM PLIKU, nie odtwarzana z ziarna. Powod ZMIERZONY podczas budowy: korpus transkryptow ROSNIE w trakcie sesji, wiec `random.sample` na tym samym ziarnie zwrocil inny zestaw po 20 minutach i etykiety nadane po numerach rozjechaly sie z komendami. Losowanie odtwarzalne z ziarna JEST odtwarzalne tylko przy niezmiennym zbiorze - to ta sama klasa co 'klamie przyrzad, nie system'.",
+ "korekty_etykiet": "Dwie etykiety POPRAWIONE po tym, jak klasyfikator je zakwestionowal, a pelny odczyt komendy przyznal mu racje - nr 54 (dlugi heredoc konczy sie `git add -A && git commit -F /tmp/msg`) i nr 97 (`p.write_text` w petli po `Path('.').rglob('*.md')`, czyli przepisanie plikow repo). Obie ucialem wczesniej na podgladzie 230 znakow. LEKCJA: sedzia czytajacy PROBKE komendy sadzi probke, nie komende.",
+ "rozmiary_warstw": {
+  "OSKARZONA": 1109,
+  "PRZEPUSZCZONA": 4462
+ },
+ "uwaga_warstwy": "Rozmiary warstw zmierzone na korpusie 5571 unikalnych komend WERSJA PIERWSZA klasyfikatora (ta, ktora budowala probke). Sluza wylacznie do wazenia czulosci populacyjnej - probka 50/50 jest wzbogacona."
+}

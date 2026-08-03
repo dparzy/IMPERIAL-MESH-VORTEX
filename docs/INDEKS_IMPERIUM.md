@@ -71,7 +71,7 @@ Wszystkie dokumenty Imperium — **katalog GENEROWANY z nagłówków** dokument�
 |---|---|---|---|
 | `README.md` | Wizytówka Imperium — podaje liczby wprost z kodu (neurony/testy/prawa), więc musi nadążać za rejestrem | `imperium/legiony/rejestr.py` | 2026-08-02 |
 | `docs/ARSENAL_IMPERIUM.md` | Zweryfikować (Prawo I: zero halucynacji) setki linków narzędzi z pliku źródłowego IMV, oddzielić realne od fabrykowanych/niepewnych, i zaproponować 'najmocniejszy zweryfikowany rdz | — | 2026-06-02 |
-| `docs/CENSUS_ORGANORUM.md` | Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem | `narzedzia/census_organorum.py` | 2026-08-02 |
+| `docs/CENSUS_ORGANORUM.md` | Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem | `narzedzia/census_organorum.py` | 2026-08-03 |
 | `docs/INDEKS_IMPERIUM.md` | Master Index — punkt wejścia i mapa wszystkich dokumentów; sekcja katalogu generowana przez Tabularium | `imperium/legiony/rejestr.py` | 2026-07-18 |
 | `docs/MANIFEST_KODU.md` | JEDYNE oficjalne źródło prawdy o kodzie (Prawo XIX) — tabela kluczy ze statusem, nic nie istnieje bez wpisu tutaj | `imperium/legiony/rejestr.py` | 2026-08-02 |
 | `docs/MAPA_KLUCZY.md` | JEDYNY dokument, który jawnie i systematycznie rozwiązuje rozbieżności między katalogiem (planem nazw/ID) a żywym kodem — dla każdego klucza podaje: nazwę klasy w kodzie, co robi,  | `imperium/legiony/rejestr.py` | 2026-07-16 |

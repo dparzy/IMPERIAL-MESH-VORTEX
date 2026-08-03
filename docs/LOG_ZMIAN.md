@@ -14,6 +14,77 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-03 | 🤫 | CORONA A: SILENTIUM — pierwszy organ, który ZAPOBIEGA zamiast wykrywać
+
+**Spłata NOTY Architekta** (dwa złamania zasady „nie edytuj w trakcie biegu bramki"
+w jednej wachcie 08-03, przez tego, kto zasadę zapisał 31.07). Cezar wybrał CORONĘ A
+z trzech przedstawionych opcji (ROZKAZ STAŁY 08-03: wybór spłaty należy do Cezara).
+
+**Luka zmierzona:** Imperium miało DWA organy patrzące wstecz — strażnik czystości
+w `run_tests.py` (07-26) i VINDEX (08-02) — i **zero** zapobiegających. Strażnik
+czystości sam przyznaje w swoim komunikacie, że nie odróżni winy testu od równoległej
+edycji: „to fałszywe oskarżenie, powtórz bieg sam". Koszt: **4 unieważnione biegi
+w 4 dni**.
+
+**Organ SILENTIUM** (`imperium/pretorianie/silentium.py`, 19 testów):
+- blokadę zakłada **proces bramki** (`cisza()` w `run_tests.py` i `audyt_spojnosci.py`),
+  NIE hook rozpoznający komendę — bieg w tle wraca z narzędzia natychmiast, więc hook
+  zdjąłby ciszę w pierwszej sekundzie 20-minutowego biegu (klasa E7);
+- **trzy bezpieczniki** przed zamurowaniem repo: żywotność PID-u, TTL 45 min, furtka
+  `zdejmij --sila` / `SILENTIUM_OFF=1`;
+- żywotność badana `OpenProcess`, **nigdy** `os.kill(pid, 0)` — na Windowsie to
+  `TerminateProcess`, czyli badanie „czy żyjesz" ZABIŁOBY proces bramki;
+- odczyt zawsze wolny (strażnik blokujący patrzenie uczy się go obchodzić);
+- hook `PreToolUse` OSOBNY od CUSTOS LIMINIS: tamten broni rozkazów STAŁYCH, ten stanu
+  CHWILOWEGO, a jedna awaria nie ma uciszać obu barier naraz.
+
+**KALIBRACJA (LEX TALARUS — przyrząd bez pomiaru samego siebie nie istnieje).**
+Prawda podstawowa: 120 zaetykietowanych REALNYCH komend z transkryptów (korpus 5571
+unikalnych), etykiety wersjonowane w `bibliotheca_ulpia/dane/kalibracja_silentium.json`,
+narzędzie `narzedzia/kalibracja_silentium.py`, test regresji w pakiecie.
+
+| wersja | precyzja | czułość (ważona populacją) | przecieki w próbie |
+|---|---|---|---|
+| pierwsza, „na wyczucie" | 63,3% | ~46% | 11 / 60 |
+| po naprawie każdej zmierzonej pomyłki | **93,5%** | **98,3%** | 1 / 60 |
+
+Naprawione klasy, każda wskazana przez etykietę, nie przez intuicję: ciało heredoca
+czytane jak składnia powłoki (8 fałszywek), `
+` zjadany przez `shlex` przez co
+`cd`+`git add` zlewało się w jedno polecenie, proza wpisu Dziennika wyłączająca detekcję
+słowem „stan", `git fetch` liczony jako zapis, `$TEMP`/`/tmp` doklejane do korzenia repo,
+`run_tests.py` nierozpoznany mimo że odciska pieczęć w repo, zapis heredoca **poza** repo
+karany jak zapis do repo.
+
+**DWIE MOJE ETYKIETY BYŁY BŁĘDNE i klasyfikator je wykrył** (nr 54 — długi heredoc kończy
+się `git add -A && git commit`; nr 97 — `p.write_text` w pętli po `rglob("*.md")`). Obie
+oceniłem na podglądzie 230 znaków. Lekcja: **sędzia czytający PRÓBKĘ sądzi próbkę,
+nie komendę.**
+
+**Druga wada przyrządu, złapana w trakcie:** korpus transkryptów ROŚNIE w trakcie sesji,
+więc `random.sample` na tym samym ziarnie zwrócił po 20 minutach inny zestaw i etykiety
+nadane po numerach rozjechały się z komendami. Losowanie odtwarzalne z ziarna jest
+odtwarzalne **tylko przy niezmiennym zbiorze** — próbka jest teraz ZAMROŻONA w pliku.
+To ta sama klasa co „kłamie przyrząd, nie system".
+
+**Weryfikacja na ŻYWEJ ścieżce, nie tylko w testach:** przy założonej ciszy harness
+odmówił realnej edycji `docs/ROADMAP_IMPERIUM.md` komunikatem organu, a audyt spójności
+odpalony po wpięciu wypisał założenie i zdjęcie ciszy wokół własnego biegu.
+
+**Przy okazji (VIGIL, ta sama klasa z Księgi Wad):** `_stan_repo()` w `run_tests.py`
+dekodował `git status` kodowaniem KONSOLI — polska nazwa pliku wywaliłaby strażnika
+czystości dokładnie na brudnym drzewie, o którym ma ostrzegać. Dodane
+`encoding='utf-8', errors='replace'`.
+
+**Pliki:** `imperium/pretorianie/silentium.py` (nowy), `tests/test_silentium.py` (nowy,
+19 testów), `narzedzia/kalibracja_silentium.py` (nowy),
+`bibliotheca_ulpia/dane/kalibracja_silentium.json` (nowy, prawda podstawowa),
+`.claude/hooks/pre-tool-use-silentium.sh` (nowy, 100755), `.claude/settings.json`,
+`tests/run_tests.py`, `narzedzia/audyt_spojnosci.py`, `docs/ARCHITEKTURA_IMPERIUM.md`,
+`docs/CENSUS_ORGANORUM.md`, `README.md`, `.gitignore`.
+
+---
+
 ## 2026-08-03 | 🛡️ | SZEŚĆ P1 z recenzji cubic PR #139 — wspólny mianownik: cisza udająca spokój
 
 Wszystkie sześć zweryfikowane wobec żywego kodu przed naprawą (recenzent też halucynuje —

@@ -12,6 +12,33 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-08-02 — Martwy słownik MECHANIZMY_ZWIADOWCY — zwiadowcy poza dyskryminatorem
+Słownik 12 wpisów czytany przez zero miejsc w kodzie. _wstrzyknij_mechanizm nadaje MECHANIZM tylko neuronom. EXP-13 i EXP-14 aktywne bez wpisu. DISCRIMINATOR i dekorelacja nie obejmują żadnego zwiadowcy.
+
+### 2026-08-03 — Pomiar BIB: kolumna hash zamiast zrodlo
+Przyrząd pomiarowy zwrócił błędne dane, bo zapytanie wzięło kolumnę hash zamiast zrodlo — wykryto i poprawiono. Zasada: weryfikuj poprawność pomiaru, nie ufaj ślepo narzędziu.
+
+### 2026-08-03 — Regex VIATORA ucinał linki z nawiasami
+Test graniczny złapał wadę: wzorzec nie wpuszczał ')', więc linki Wikipedia/arXiv byłyby ucięte i uznane za martwe. Naprawiono u źródła; reguła: testy graniczne dla każdego progu.
+
+### 2026-08-03 — Status z echo kłamie — czytaj treść raportu
+Kod wyjścia i echo nie są wiarygodnym źródłem stanu; przy audytach i narzędziach trzeba czytać treść raportu, nie tylko status. Lekcja z poprzedniej wachty zastosowana w tej sesji.
+
+### 2026-08-03 — Przyrząd pomiarowy potrafi zwrócić złą kolumnę
+Pomiar BIB początkowo wziął kolumnę 'hash' zamiast 'zrodlo', przez co liczby były fałszywe. Weryfikuj metadane wyniku, nie ufaj etykiecie przyrządu.
+
+### 2026-07-27 — Brak gh i tokenów uniemożliwia PR przez API
+GitHub CLI nie jest zainstalowany, a w środowisku brak GH_TOKEN/GITHUB_TOKEN — utworzenie PR przez API jest niemożliwe. Dodatkowo 'gh auth login' jest interaktywny (przeglądarka + kod) i nie może być uruchomiony z harnessa Claude. Auth musi wykonać Cezar w terminalu.
+
+### 2026-07-20 — Wniosek per-reżim: BEAR=tarcza, reszta szkodzi
+W reżimie BEAR stosowanie tarczy (zabezpieczenia) jest korzystne; w pozostałych reżimach tarcza przynosi straty.
+
+### 2026-07-20 — Output hooka startowego ucięty przez harness
+Output hooka startowego (25,5 KB) został ucięty, powodując utratę kluczowej informacji (Dziennik następny krok) z pierwszego okna. Konieczna optymalizacja objętości.
+
+### 2026-06-30 — klasyfikuj_rezim() zwraca tylko 4 stany, brak TREND_WEAK/PANIC/ON-CHAIN_BULLISH/SMC_ACTIVE
+Funkcja klasyfikacji reżimu ograniczona do TREND_STRONG, RANGING, VOLATILE, NORMAL. Brakuje stanów przewidzianych w dokumentacji.
+
 ### 2026-08-01 — Checklista: robić ≠ meldować
 Przebudowa rejestru CORONY: tylko kroki z jawnym obowiązkiem meldunku wymagają raportu; alarmy_jako_zadania usunięto (warunkowe), meldunek_slug sprawdzano datami; wzorzec czasownika rozszerzono o 'rozstrzygnij'/'nigdy milczeniem'. Poziom 'domkniecie' alarmował 83% — po przebudowie zgodność z konstytucją.
 

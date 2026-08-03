@@ -69,3 +69,9 @@ dane/_checkpoint/
 
 # BREVIARIUM: migawka otwarcia jest ZUZYWANA przez delta() (unlink) — plik przejsciowy, nie stan
 bibliotheca_ulpia/dane/breviarium_migawka.json
+
+# SILENTIUM: blokada zapisu na czas biegu bramki. Stan CHWILOWY jednego procesu na jednej
+# maszynie (PID + TTL) — w repo byłby nie tylko bezużyteczny, ale wprost szkodliwy: cudzy,
+# martwy PID przyjechałby pullem jako „trwa bieg". Kalibracja klasyfikatora (obok) JEST
+# wersjonowana, bo to prawda podstawowa, nie stan.
+bibliotheca_ulpia/dane/silentium.lock

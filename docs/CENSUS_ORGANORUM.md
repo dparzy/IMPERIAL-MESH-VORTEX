@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: narzedzia/census_organorum.py
-stan_na: 2026-08-02
+stan_na: 2026-08-03
 powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem"
 ---
 # 🏛️ CENSUS ORGANORUM — spis organów i narzędzi Imperium
@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 260** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 262** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -255,6 +255,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `praeda.py` | 🗡️💎 PRAEDA (Łupieżca) — TRYB ŁOWCY: kontrolowana, AUTO-skalowana chciwość (W-291) |
 | `probator.py` | 🛡️ PROBATOR — Strażnik Cytatów Imperium (warstwa 1 anty-halucynacyjna Hyginusa) |
 | `recognitor.py` | 🔎 RECOGNITOR — poświadcza, czy RECENZJA POKRYWA DZISIEJSZY STAN kodu |
+| `silentium.py` | 🤫 SILENTIUM — cisza nad repozytorium na czas biegu bramki |
 | `sizing_przekonania.py` | Sizing Przekonania (W-318) — większa stawka na mocniejszej okazji |
 | `straznik_przewagi.py` | 🛡️💎 STRAŻNIK PRZEWAGI — unikat Imperium (W-287, Faza C) |
 | `vigil.py` | 🔦 VIGIL — Straż Nocna: skan KAŻDEGO zapisanego pliku .py natychmiast (PostToolUse) |
@@ -321,6 +322,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `install_hooks.py` | Instalator git hooków Imperium |
 | `kalibracja_1h.py` | Kalibracja progów wejścia pod 1h (W-321c). Cel: znaleźć konfigurację, która |
 | `kalibracja_1h_v2.py` | Kalibracja progów wejścia pod 1h (W-321c). Cel: znaleźć konfigurację, która |
+| `kalibracja_silentium.py` | 📏 KALIBRACJA SILENTIUM — pomiar klasyfikatora komend na PRAWDZIE PODSTAWOWEJ |
 | `kapitol_podglad.py` | 🏛️ KAPITOL PODGLĄD (Speculum Probationis) — zero-tokenowy podgląd testu w przeglądarce |
 | `najlepszy_tryb.py` | 🏆 NAJLEPSZY TRYB IMPERIUM — Skaner Okazji + Gubernator + Regime-Aware + Compounding |
 | `pobierz_4h_binance.py` | Pobiera dane 4h bezpośrednio z publicznego API Binance (bez klucza) |

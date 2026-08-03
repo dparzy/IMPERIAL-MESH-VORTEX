@@ -147,8 +147,13 @@ def _stan_repo():
     """Zbiór zmienionych plików śledzonych przez git ({} gdy git niedostępny)."""
     import subprocess
     try:
+        # encoding+errors JAWNIE (klasa z Księgi Wad, ta sama co w pieczęci niżej): samo
+        # `text=True` dekoduje kodowaniem KONSOLI (cp1250), a polska nazwa pliku w wyjściu
+        # `git status` wywaliłaby wtedy UnicodeDecodeError — czyli strażnik czystości padłby
+        # akurat na brudnym drzewie, o którym ma ostrzegać.
         wynik = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"],
-                               cwd=KORZEN, capture_output=True, text=True, timeout=30)
+                               cwd=KORZEN, capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", timeout=30)
     except (OSError, subprocess.SubprocessError):
         return None                      # brak gita = brak pomiaru; NIE udajemy czystości
     if wynik.returncode != 0:
@@ -318,5 +323,25 @@ def _odcisnij_pieczec(zaliczone: int, oblane: int) -> None:
         print(f"  (pieczęć testów niezapisana: {e})")
 
 
+def _uruchom_w_ciszy():
+    """Bieg bramki pod ochroną SILENTIUM (2026-08-03, CORONA A).
+
+    Strażnik czystości niżej wykrywa zabrudzenie PO fakcie i sam przyznaje, że nie umie
+    odróżnić winy testu od równoległej edycji. SILENTIUM zamyka tę lukę od drugiej strony:
+    na czas biegu odmawia Architektowi zapisu do repo, więc drugi z dwóch wymienionych
+    scenariuszy przestaje być możliwy — a wtedy alarm strażnika znaczy JEDNO.
+
+    Import jest lokalny i miękki: bramka nie może zależeć od własnej ochrony (bieg bez
+    SILENTIUM jest gorszy, ale bieg, którego nie da się uruchomić, jest bezużyteczny).
+    """
+    try:
+        from imperium.pretorianie.silentium import cisza
+    except Exception as e:  # noqa: BLE001
+        print(f"⚠️ SILENTIUM niedostępne ({type(e).__name__}) — bieg BEZ ochrony przed edycją.")
+        return uruchom()
+    with cisza("bramka: tests/run_tests.py"):
+        return uruchom()
+
+
 if __name__ == "__main__":
-    sys.exit(uruchom())
+    sys.exit(_uruchom_w_ciszy())

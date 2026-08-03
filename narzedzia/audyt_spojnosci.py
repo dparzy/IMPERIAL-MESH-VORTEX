@@ -1680,4 +1680,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # 🤫 SILENTIUM (CORONA A, 2026-08-03): audyt jest DRUGĄ połową bramki Prawa XXI, więc
+    # edycja repo w jego trakcie unieważnia go tak samo jak bieg testów. Ochrona miękka —
+    # brak organu nie może uniemożliwić audytu (import lokalny, wyjątek przepuszczony).
+    try:
+        from imperium.pretorianie.silentium import cisza
+        with cisza("bramka: audyt spójności (Prawo XXI)"):
+            main()
+    except ImportError:
+        main()

@@ -14,6 +14,36 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-04 | 🩹 | Świeżość dokumentu idzie tylko W PRZÓD — koniec cofania dat przez hook
+
+**Powód zmierzony (audyt W20 na czerwono na otwarciu wachty):** katalog Tabularium
+rozjechał się z `INDEKS_IMPERIUM.md` na pozycji `docs/PAMIEC_SESJI.md` — indeks mówił
+`2026-08-02`, generator liczył `2026-07-27`. Źródłem nie był indeks, tylko sam dokument:
+`narzedzia/auto_lekcja.py` woła `dopisz_lekcje(data=data_sesji)` z datą **analizowanej
+sesji**, a `dopisz_lekcje` nadpisywało nią BEZWARUNKOWO `## Ostatnia aktualizacja`
+i `stan_na`. Hook przemielił zaległe transkrypty z 27 lipca i **cofnął** świeżość
+dokumentu — ten ogłosił się starszym, niż był. Rozjazd zdarzył się co najmniej
+DWUKROTNIE (`2026-08-02` → `2026-07-30` → `2026-07-27`), więc ręczne przestawienie
+daty byłoby odroczeniem, nie naprawą: automat pisze po każdej sesji, człowiek nie.
+
+**Klasa wady:** to ta sama rodzina co naprawa z 2026-08-02 (dokument kłamiący o własnej
+świeżości). Tamta łatka pilnowała, by obie daty szły **razem** — ta pilnuje, by szły
+**w przód**. Mylone było pole: „kiedy to się wydarzyło" (prawda o sesji) i „stan na"
+(prawda o dokumencie) to dwie różne rzeczy.
+
+**Naprawa** (`imperium/biblioteki/pamiec_sesji.py`): strażnik monotoniczności `_nowsza()`
+na OBU polach nagłówka; data samej lekcji zostaje nietknięta i prawdziwa. Wartość
+nieparsowalna nie zamraża dokumentu (nowa wygrywa). Stan `PAMIEC_SESJI.md` przywrócony
+do `2026-08-02` — zmierzone z treści, bo najnowsza lekcja w pliku ma tę datę.
+
+**Testy:** +4 granice (cofnięcie, data równa, wartość nieparsowalna, `None`) —
+`tests/test_pamiec_sesji.py`, 147/147 zielone w module.
+
+**Pliki:** `imperium/biblioteki/pamiec_sesji.py`, `tests/test_pamiec_sesji.py`,
+`docs/PAMIEC_SESJI.md`, `docs/LOG_ZMIAN.md`.
+
+---
+
 ## 2026-08-03 | ⏳ | LEX TALIONIS: ODROCZENIE — mechanizm, który umie przyjąć decyzję Cezara
 
 **Powód zmierzony:** Cezar zatwierdził notę `N-fa723062` (wada współbieżności

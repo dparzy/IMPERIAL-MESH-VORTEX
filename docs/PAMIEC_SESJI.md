@@ -1,10 +1,10 @@
 ---
 
-## Ostatnia aktualizacja: 2026-07-30
+## Ostatnia aktualizacja: 2026-08-02
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
-stan_na: 2026-07-30
+stan_na: 2026-08-02
 powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360)"
 ---
 # PAMIĘĆ SESJI — W-360
@@ -112,6 +112,15 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 ---
 
 ## 📚 LEKCJE Z SESJI
+
+### 2026-07-27 — BREVIARIUM 2882/2882 dotyczy innego kodu — mierzyć, nie ufać pamięci
+Wynik testów z poprzedniej sesji nie przenosi się na dzisiejszy kod. Pełny bieg w tle dał 2882/2885 — 3 porażki. Stan testów jest NIEZNANY dopóki nie zmierzony na bieżącym drzewie.
+
+### 2026-07-27 — Rozjazd repo 2⇄2 produkują hooki commitujące po obu stronach
+Od wspólnego e2cb846 chmura i laptop dorobiły po 2 commity 'auto: sync pamięci' — wyłącznie przez hooki końca/startu sesji, nie pracę merytoryczną. Git nie wie, który ciąg jest właściwy; rozwiązanie: git stash → pull --rebase → stash pop. Drzewo ma 5 zmodyfikowanych plików.
+
+### 2026-07-27 — Path('/home/tiro') na Windows nie łapie startswith('/') — abstynencja jednostronna
+Path('/home/tiro') na Windows normalizuje się do \home\tiro, więc startswith('/') nigdy nie trafia. Abstynencja testów działała tylko dla Windows-ścieżki na Linuksie, nie dla POSIX-ścieżki na Windows. Naprawione mechanizmem (normalizacja ścieżek), nie łatką. Testy: 2882/2885 — 3 porażki, ta była jedyną naszą.
 
 ### 2026-07-30 — Alarmy procesowe to zadania: 35 cząstek Hyginusa, 20 pomysłów W9, LEKCJA 3
 35 cząstek Hyginusa czeka na sędziego (trzeci raz w Top-3 lekcji), 20 pomysłów z refleksji W9 wisi >21 dni, a LEKCJA 3 o zgodności skal wymaga sprawdzenia. To zaległości, nie tapeta.

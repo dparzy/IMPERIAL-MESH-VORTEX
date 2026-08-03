@@ -12,6 +12,81 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-07-30 — Plik wrzutni to rozmowa z DeepSeekiem, nie Hyginusem — 5 bloków
+Plik 7267 linii/452 KB zawiera: zwiad RAG/finanse+architektury, naszą kronikę, audyty z propozycją PRAWA XXVI, analizę sprzętu (16 GB vs Acer Nitro 5, modele lokalne) oraz MEMOR-AGENT 1.0→ULTIMA.
+
+### 2026-07-30 — Audyt DeepSeeka o repozytorium oparty na README, nie na kodzie
+Liczby w ocenie zewnętrznej (np. organ_biblioteki=28) pochodziły z naszego README, a nie z pomiaru kodu — aktualnie jest 29. Wnioski z audytów zewnętrznych trzeba weryfikować własnym pomiarem.
+
+### 2026-07-30 — Pierwsza sprzeczność w pliku Imperium-Botów-Tradingowych
+Liczniki w 'audycie repozytorium' DeepSeeka pochodzą z naszego README, nie z kodu (organ_biblioteki było 28, dziś 29). Audyt zewnętrzny należy weryfikować pomiarem, nie słowem — wykryto przy cząstkowej analizie 452 KB / 7 267 linii.
+
+### 2026-07-30 — CLAUDE.md przyrasta ~1 linia/dzień — pełzająca regresja
+Konstytucja ma 259 linii > limit 200. Po odchudzaniu 07-27 było 253 — przyrost ~1 linia/dzień. Klasa problemu: powolna pełzająca regresja procesowa. Wymaga decyzji kierunkowej Cezara, które rozkazy idą do skilla na żądanie.
+
+### 2026-08-03 — VIGIL dekodował git status kodowaniem konsoli — naprawione
+VIGIL wskazał realną, wcześniejszą wadę w tym samym pliku: strażnik czystości dekodował git status kodowaniem konsoli. Naprawiono przy okazji (ta sama klasa, Księga Wad).
+
+### 2026-08-03 — Klasyfikator potrafi wykryć błędy w ludzkich etykietach
+Dwie etykiety prawdy podstawowej były błędne (#54 kończyło się git add -A && git commit, #97 przepisywało pliki .md w repo) — klasyfikator je wykrył, nie autor. Sprawdzanie spornych przypadków w całości zamiast bronienia własnej etykiety.
+
+### 2026-08-03 — Rosnący korpus unieważnia pomiar — próbka musi być zamrożona
+Korpus transkryptów rósł w trakcie sesji, przez co probka() przy zapisie etykiet zwróciła inny zestaw niż czytany wydruk. Etykiety były przesunięte. Zamrożono próbkę w pliku.
+
+### 2026-08-03 — Klasyfikator potrafi mieć rację przeciw etykiecie
+Dwie etykiety były błędne (#54 kończy się `git add -A && git commit`, #97 robi `p.write_text` po `rglob("*.md")`). Prawdę podstawową trzeba weryfikować całym kodem, nie bronić własnej etykiety.
+
+### 2026-08-03 — Cięcie po wierszach psuje klasyfikację wielolinijkowych komend
+W SILENTIUM trzy przecieki miały jedną przyczynę: rozbiór po liniach niszczył wielolinijkowe `python -c "…"`. Rozwiązaniem jest automat świadomy cudzysłowów, nie proste cięcie.
+
+### 2026-08-03 — Klasyfikator potrafi mieć rację, etykieta ludzka być błędna
+Dwie etykiety (#54, #97) były błędne — kod faktycznie robił git add -A && git commit / pisał .md w repo. Zasada: sporne przypadki weryfikować w całości, zamiast bronić własnej etykiety.
+
+### 2026-08-03 — Kalibracja klasyfikatora SILENTIUM: 63,3% → 93,5%
+Pomiar na 5568 realnych komend obalił pierwszą wersję: precyzja 63,3%, czułość ~46%, przecieki 11. Przyczyny: cięcie po wierszach psuje wielolinijkowe python -c, a próbka zmieniała się bo korpus rośnie w trakcie sesji. Naprawa: automat świadomy cudzysłowów + zamrożona próbka. Wynik: precyzja 93,5%, przeciek 1.
+
+### 2026-08-03 — PORTITOR: dane świec nieaktualne — przed pomiarami odświeżać
+Zmierzono: 1H 5,4 d, 4H 5,5 d, 1D 46,3 d. Dopóki nie robimy A/B, nie blokuje, ale każdy pomiar na świecach wymaga najpierw odświeżenia danych.
+
+### 2026-08-03 — MATURITAS mierzy 3 piętra z 9; PR #139 zarzuca liczenie wierszy legionów jako ROADMAP
+PROMPT/LOOP/GRAPH są 3/4, ale brak pomiaru 6 pozostałych pięter prawdopodobnie zaniża stan Imperium. Zarzut z recenzji dotyczy wiarygodności miernika, którym się chwalimy — do rozstrzygnięcia (P4).
+
+### 2026-08-03 — Dokumenty przed gniciem bronią TABULARIUM i audyty W6b/W19-W23, ale nie przed zbędnością
+TABULARIUM (3 bramki: deklaracja, gnicie, dublet) działa w trybie miękkim; W7 sieroty i INDEX FALSORUM pilnują spisów i obalonych twierdzeń. Aktualność jest chroniona, potrzebność — nie. To uzasadnia LUSTRUM.
+
+### 2026-08-03 — Imperium słabo ZAMYKA pętle
+ROADMAP domknięty 15,5%, 375 wizji bez werdyktu, 34 sugestie otwarte, 37 cząstek Hyginusa bez sędziego, 20 pomysłów W9 wisi >21 dni. Diagnoza: świetnie buduje i wykrywa, słabo zamyka.
+
+### 2026-08-03 — Luka: brak organu oceny potrzeby narzędzi
+CENSUS ORGANORUM sprawdza tylko zameldowanie, nie pożytek. Brak analizy wołających, wieku ostatniego pożytku, ścieżki wycofania (podejrzany→karencja→archiwum) i strażnika obcych plików (82 pliki we wrzutni).
+
+### 2026-08-03 — SILENTIUM nie zakłada blokady — kolizja przy starcie
+RuntimeError 'SILENTIUM już trwa (pid 17632, 0s)' przy pierwszym starcie; plik blokady nie istnieje, hook wołał audyt raz, ochrona jest miękka. Wada wieku jednego dnia w CORONIE A.
+
+### 2026-08-03 — CLAUDE.md 282 linie > 200 — wąskie gardło PROMPT
+Konstytucja płaci ~12,7k tokenów w każdej sesji; kandydat do korony D/porządku, przeniesienie rozkazów stałych w skille wymaga decyzji Cezara.
+
+### 2026-08-02 — Zielony test bez mutacji nie dowodzi złapania wady
+Cztery nowe testy graniczne zweryfikowano mutacją — 4/4 mutantów złapane. Bramka jakości wymaga sprawdzenia testu mutacją, inaczej test może być ślepy.
+
+### 2026-08-02 — PR 138 — realna recenzja ujawnia 5 błędów P1
+exactor odrzuca własny blok przy ścieżce POSIX; git push z pustą gałęzią przy detached HEAD; osierocona kotwica traktowana jak sukces; awaria neuronu zapisana jako 0.0 wchodzi do korelacji; stop.sh bez bitu +x na Unixie. Wzorzec: przyrząd, który kłamie o sobie.
+
+### 2026-08-02 — 5 uwag P1 trafia w organy ogłoszone jako gotowe
+Exactor, discriminator i hook stop — przyrządy ogłoszone gotowe 07-31 mają P1. Wspólna klasa z talarem N-b74ce133: przyrząd, który kłamie o sobie. Strażnik meldunku przepuszcza wszystko, gdy jego kotwica w CLAUDE.md przestanie pasować.
+
+### 2026-08-02 — Bliźniacze lekcje i duplikaty decyzji w pamięci
+PAMIEC_SESJI_ARCHIWUM.md zawiera dwie pary bliźniaczych lekcji, wizje_i_decyzje.jsonl ma duplikaty decyzji z 07-27 oraz wpis POMYSŁ z treścią mówiącą 'wdrożono'. PAMIEC_SESJI.md ma lekcję z 07-30 przy nagłówku 07-28.
+
+### 2026-08-02 — PR #138 to prawdziwa recenzja — 20 uwag, 5×P1
+W odróżnieniu od PR #137, raport cubic-dev-ai pokrywa cały kod wachty 07-31 (3 commity). Najcięższe: P1 w exactor (walidator odrzuca własny POSIX, git push z pustą gałęzią, osierocona kotwica = hook milczy), discriminator zapisuje awarię jako 0.0, stop.sh bez bitu +x.
+
+### 2026-07-20 — Redundancja w wma (_py_hma) – 930 wywołań/tick
+Wewnętrzna pętla _py_hma wywołuje wma wielokrotnie (4.5M wywołań, 65.5s cumtime), co jest głównym źródłem stałej liniowej. Optymalizacja: prekalkulacja lub użycie numpy.
+
+### 2026-06-30 — Backtest Arena: conservative SL gdy obie bariery w jednym barze
+Jeśli w jednej świecy osiągnięto zarówno TP jak i SL, wynikiem jest SL (konserwatywnie).
+
 ### 2026-08-02 — Martwy słownik MECHANIZMY_ZWIADOWCY — zwiadowcy poza dyskryminatorem
 Słownik 12 wpisów czytany przez zero miejsc w kodzie. _wstrzyknij_mechanizm nadaje MECHANIZM tylko neuronom. EXP-13 i EXP-14 aktywne bez wpisu. DISCRIMINATOR i dekorelacja nie obejmują żadnego zwiadowcy.
 

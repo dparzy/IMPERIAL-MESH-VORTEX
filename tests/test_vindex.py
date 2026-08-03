@@ -221,3 +221,28 @@ def test_klasa_scisla_nadal_ma_zero_usuniec_w_historii():
                  if len(c) == 3 and c[1].isdigit() and int(c[1]) > 0]
     # Utworzenie pliku ma 0 usunięć, więc każde usunięcie tutaj jest realną zmianą.
     assert not usuniecia, f"ledger klasy ŚCISŁEJ został zmieniony: {usuniecia} (z {utworzenia})"
+
+
+def test_swiezy_commit_nie_dubluje_pliku_z_drzewa():
+    """Plik zmieniony ORAZ w drzewie, ORAZ w świeżym commicie liczy się RAZ.
+
+    Wada znaleziona recenzją tej wachty: konkatenacja bez deduplikacji dawała
+    `zbadane: 2` dla jednego pliku i drukowała to samo naruszenie dwoma wierszami —
+    Cezar widziałby dwa alarmy i musiał zgadywać, czy to dwa wykroczenia.
+    """
+    # WSZYSTKIE podmienione nazwy przywracamy — test, który zostawia po sobie atrapę
+    # w module produkcyjnym, psuje testy uruchomione PO nim i robi to niewidzialnie
+    # (lekcja „test mutujący produkcję", utajona do wykrycia przez kolejność biegu).
+    oryginaly = {n: getattr(v, n) for n in
+                 ("zmiany_robocze", "zmiany_commitu", "_commit_swiezy", "obce_pliki")}
+    plik = "bibliotheca_ulpia/dane/dziennik_niesmiertelny.jsonl"
+    v.zmiany_robocze = lambda: [v.ocen_zmiane(plik, 1, 0)]
+    v.zmiany_commitu = lambda ref="HEAD": [v.ocen_zmiane(plik, 2, 0)]
+    v._commit_swiezy = lambda *a, **k: True
+    v.obce_pliki = lambda: []
+    try:
+        w = v.zbadaj()
+        assert w["zbadane"] == 1, f"plik policzony {w['zbadane']}× zamiast raz"
+    finally:
+        for nazwa, funkcja in oryginaly.items():
+            setattr(v, nazwa, funkcja)

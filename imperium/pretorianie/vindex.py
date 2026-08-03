@@ -333,14 +333,30 @@ def zbadaj(ref: Optional[str] = None, *, tylko_kontrakty: bool = False) -> Dict[
     # zmiana była już w HEAD, a drzewo czyste. Naruszenie popełnione i zatwierdzone
     # w jednym ruchu było NIEWIDZIALNE. Dokładamy zawartość ostatniego commitu, jeśli
     # powstał w ciągu okna komendy — koszt jeden `git show`, zysk domknięcie luki.
+    etykieta = ref or "ROBOCZE"
     if ref is None:
         try:
             if _commit_swiezy():
-                werdykty = werdykty + zmiany_commitu("HEAD")
+                # DEDUPLIKACJA PO ŚCIEŻCE (własna recenzja tej wachty): plik zmieniony
+                # ORAZ w drzewie, ORAZ w świeżym commicie trafiał na listę dwa razy —
+                # `zbadane` rosło dwukrotnie, a to samo naruszenie było drukowane dwoma
+                # wierszami. Dwa alarmy o jednym pliku każą Cezarowi zgadywać, czy to
+                # dwa wykroczenia. Pierwszeństwo ma werdykt z drzewa roboczego: opisuje
+                # stan AKTUALNY, commit opisuje stan sprzed ostatniej edycji.
+                znane = {w["plik"] for w in werdykty}
+                z_commitu = [w for w in zmiany_commitu("HEAD") if w["plik"] not in znane]
+                if z_commitu:
+                    werdykty = werdykty + z_commitu
+                    # ETYKIETA KRAWĘDZI = HASH, NIE „ROBOCZE" (recenzja, znalezisko 3):
+                    # krawędź `(plik) —[naruszenie]→ ROBOCZE` gubi jedyną informację,
+                    # która czyni ją użyteczną — commit, w którym naruszenie ZATWIERDZONO.
+                    # CORONA B ma te krawędzie zbierać do grafu W8.
+                    etykieta = _git("rev-parse", "--short", "HEAD") or "HEAD"
+                    etykieta = etykieta.strip() or "HEAD"
         except GitNieodpowiada:
             pass  # brak wiedzy o commicie nie może skasować wiedzy o drzewie roboczym
     wynik = podsumuj(werdykty, [] if tylko_kontrakty else obce_pliki())
-    wynik["krawedzie"] = krawedzie(werdykty, ref or "ROBOCZE")
+    wynik["krawedzie"] = krawedzie(werdykty, etykieta)
     wynik["zasieg"] = "kontrakty" if tylko_kontrakty else "pelny"
     if tylko_kontrakty:
         wynik["niepokryte"] = ["obce pliki — badane przez bramkę, nie przez hook "

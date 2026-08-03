@@ -250,8 +250,22 @@ def sprawdz_link(url: str, timeout: float = TIMEOUT_S, otwieracz=None) -> Droga:
     return Droga(url, BLAD, komunikat="HEAD i GET nie dały rozstrzygnięcia")
 
 
-def wczytaj_cache(sciezka: str) -> dict[str, Droga]:
-    """Cache JSONL append-only. Późniejszy wpis o tym samym URL wygrywa (ostatnie słowo)."""
+def wczytaj_cache(sciezka: str, tylko_rozstrzygniete: bool = True) -> dict[str, Droga]:
+    """Cache JSONL append-only. Późniejszy wpis o tym samym URL wygrywa (ostatnie słowo).
+
+    NIEROZSTRZYGNIĘTE NIE WRACAJĄ Z CACHE (`tylko_rozstrzygniete=True`, domyślnie).
+    Naprawa własnej wady złapanej recenzją tej wachty: `BLAD` (timeout, DNS) i
+    `ZABLOKOWANY` (403/429) to stany NASZEGO przyrządu, nie wyroki o drodze — ten organ
+    mówi to wprost w docstringu modułu, a mimo to zapisywał je do cache jak wyroki.
+    Skutek: jeden chwilowy timeout na 20 adresach utrwalał się NA ZAWSZE, bo kolejny
+    bieg czytał go z pliku i nie pukał ponownie. Jedynym lekarstwem był `--odswiez`,
+    który kasuje też setki poprawnych wyników — czyli kara za awarię sieci spadała na
+    cały bieg. To ta sama klasa, na którą `ab_plon_hyginusa` ma osobny test
+    (`test_blad_sieci_nie_utrwala_sie_jako_wynik`); VIATOR jej nie miał.
+
+    Wpisy ZOSTAJĄ w pliku (kontrakt append-only pilnowany przez VINDEXA jest nienaruszony)
+    — po prostu nie są uznawane za wiedzę przy wznowieniu. Ślad pomiaru: tak, wyrok: nie.
+    """
     znane: dict[str, Droga] = {}
     if not os.path.exists(sciezka):
         return znane
@@ -262,9 +276,15 @@ def wczytaj_cache(sciezka: str) -> dict[str, Droga]:
                 continue
             try:
                 d = json.loads(linia)
-                znane[d["url"]] = Droga(**d)
+                droga = Droga(**d)
             except (json.JSONDecodeError, KeyError, TypeError):
                 continue  # uszkodzona linia nie może zabić wznowienia
+            if tylko_rozstrzygniete and not droga.rozstrzygniety:
+                # świadomie USUWAMY wcześniejszy wyrok, jeśli późniejszy wpis jest
+                # nierozstrzygnięty — inaczej „ostatnie słowo" przestałoby obowiązywać
+                znane.pop(droga.url, None)
+                continue
+            znane[droga.url] = droga
     return znane
 
 

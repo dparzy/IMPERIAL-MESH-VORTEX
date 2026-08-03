@@ -391,3 +391,52 @@ def test_kontekst_ssl_ma_zaufane_certyfikaty():
 
 def test_domena_z_adresu():
     assert domena("https://GitHub.com/a/b") == "github.com"
+
+
+def test_blad_sieci_nie_utrwala_sie_jako_wynik(tmp_path):
+    """Chwilowy timeout NIE MOŻE stać się trwałym werdyktem o adresie.
+
+    Wada znaleziona recenzją tej wachty: `BLAD` i `ZABLOKOWANY` lądowały w cache tak
+    samo jak wyroki, więc jeden zły moment sieci zamrażał adres na zawsze — a jedynym
+    lekarstwem był `--odswiez`, kasujący też setki poprawnych wyników.
+    """
+    cache = str(tmp_path / "c.jsonl")
+    url = ["https://a.org/1"]
+
+    def _timeout(zadanie, timeout=None):
+        raise TimeoutError("chwilowa awaria")
+
+    w1 = sprawdz_wsadowo(url, cache_sciezka=cache, postep=False, otwieracz=_timeout)
+    assert w1[0].status == BLAD
+
+    # drugi bieg BEZ --odswiez: musi puknąć ponownie, bo poprzedni wynik nie był wyrokiem
+    wywolania: list = []
+    w2 = sprawdz_wsadowo(url, cache_sciezka=cache, postep=False,
+                         otwieracz=otwieracz_staly(200, wywolania=wywolania))
+    assert wywolania, "nierozstrzygnięty wynik z cache zablokował ponowną próbę"
+    assert w2[0].status == ZYWY
+
+
+def test_rozstrzygniety_wynik_nadal_wraca_z_cache(tmp_path):
+    """Granica z drugiej strony: 404 to WYROK i ma oszczędzić nam pukania."""
+    cache = str(tmp_path / "c.jsonl")
+    url = ["https://a.org/1"]
+    sprawdz_wsadowo(url, cache_sciezka=cache, postep=False, otwieracz=otwieracz_staly(404))
+    wywolania: list = []
+    w = sprawdz_wsadowo(url, cache_sciezka=cache, postep=False,
+                        otwieracz=otwieracz_staly(200, wywolania=wywolania))
+    assert wywolania == [], "rozstrzygnięty wyrok powinien wrócić z cache"
+    assert w[0].status == MARTWY
+
+
+def test_pozniejszy_blad_uniewaznia_wczesniejszy_wyrok(tmp_path):
+    """Append-only: jeśli OSTATNIM słowem o adresie jest BLAD, wcześniejszy wyrok nie
+    może cicho obowiązywać — adres wraca do sprawdzenia."""
+    cache = tmp_path / "c.jsonl"
+    cache.write_text(
+        '{"url": "https://a.org/1", "status": "ZYWY", "kod": 200}\n'
+        '{"url": "https://a.org/1", "status": "BLAD"}\n',
+        encoding="utf-8",
+    )
+    assert wczytaj_cache(str(cache)) == {}
+    assert len(wczytaj_cache(str(cache), tylko_rozstrzygniete=False)) == 1

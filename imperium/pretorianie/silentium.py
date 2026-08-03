@@ -70,6 +70,23 @@ CO BLOKUJEMY, A CO ŚWIADOMIE PRZEPUSZCZAMY
 
 Sam proces bramki NIE jest przez to ograniczony: hook widzi wyłącznie wywołania narzędzi
 Architekta. Testy i audyt piszą swoje artefakty (pieczęć, raporty) normalnie.
+
+════════════════════════════════════════════════════════════════════════════════
+CISZA WSPÓŁDZIELONA (naprawa 2026-08-03, nazajutrz po wdrożeniu)
+════════════════════════════════════════════════════════════════════════════════
+Pierwsza wersja robiła ciszę WYŁĄCZNĄ i pękła w pierwszym dniu życia, na własnym
+starcie: o 10:03 ruszyły dwie sesje naraz, audyt jednej założył ciszę, audyt drugiej
+dostał odmowę i wypisał „bieg idzie BEZ ochrony" — **nieprawdę**, bo repo było wtedy
+chronione cudzą ciszą. Zaraz potem pierwsza sesja skończyła i **zdjęła ciszę spod
+wciąż trwającego biegu drugiej**. Wyłączność chroniła więc PLIK BLOKADY zamiast
+REPOZYTORIUM, a przy tym kłamała o stanie ochrony — czyli organ był tą samą klasą
+„przyrząd kłamie", którą miał zamykać.
+
+Teraz plik trzyma **listę uczestników**: każdy bieg dopisuje siebie (`dolacz`), cisza
+trwa aż wyjdzie OSTATNI, a komunikat rozróżnia trzy stany — ogłaszam ciszę / dołączam
+do trwającej / naprawdę idę bez ochrony. Wyłączność została wyłącznie w `zaloz()`,
+czyli na drodze człowieka (CLI): ogłaszając ciszę ręcznie chcę wiedzieć, że nikt
+inny jej właśnie nie trzyma.
 """
 from __future__ import annotations
 
@@ -223,28 +240,101 @@ def proces_zyje(pid: int) -> bool:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  Stan blokady
+#  Stan blokady — CISZA WSPÓŁDZIELONA (lista uczestników)
 # ══════════════════════════════════════════════════════════════════════════════
-def _wczytaj() -> Optional[Blokada]:
+# DLACZEGO WSPÓŁDZIELONA, A NIE WYŁĄCZNA — zmierzone nazajutrz po wdrożeniu (2026-08-03):
+# o 10:03 wystartowały DWIE sesje naraz (`8e2da290` i `2214d0cc`, dowód w plikach hooka).
+# Audyt pierwszej założył ciszę (pid 17632), audyt drugiej dostał odmowę i wypisał
+# „bieg idzie BEZ ochrony" — NIEPRAWDĘ, bo repo było wtedy chronione cudzą ciszą. Gorzej:
+# pierwsza sesja skończyła audyt wcześniej i ZDJĘŁA ciszę spod drugiego, wciąż trwającego
+# biegu. Wyłączność chroniła więc PLIK BLOKADY, a nie REPOZYTORIUM, i do tego kłamała
+# o stanie ochrony — czyli sama była tą klasą „przyrząd kłamie", którą organ miał zamykać.
+# Teraz plik trzyma LISTĘ uczestników: każdy bieg dopisuje siebie, cisza trwa aż wyjdzie
+# OSTATNI, a komunikat mówi prawdę. Wyłączność zostaje wyłącznie w `zaloz()` — ciszy
+# RĘCZNEJ, którą ogłasza człowiek.
+_MUTEKS_PORZUCONY_S = 10.0        # zamek starszy niż to = właściciel zginął przed zwolnieniem
+_MUTEKS_CZEKANIE_S = 5.0          # potem działamy bez zamka: bramka ma ruszyć, nie zawisnąć
+
+
+def _sciezka_pomocnicza(rozszerzenie: str) -> Path:
+    """Sąsiad pliku blokady. Liczona ZA KAŻDYM RAZEM, nie na poziomie modułu —
+    testy podmieniają `PLIK_BLOKADY` na `tmp_path`, a stała zamrożona przy imporcie
+    kazałaby im pisać do produkcyjnego katalogu (klasa „test mutujący produkcję")."""
+    return Path(str(PLIK_BLOKADY) + rozszerzenie)
+
+
+@contextmanager
+def _muteks(limit_s: float = _MUTEKS_CZEKANIE_S) -> Iterator[bool]:
+    """Krótki zamek na czas read-modify-write listy uczestników.
+
+    Sam plik blokady nie może już powstawać przez `O_CREAT|O_EXCL`, bo dopisanie
+    uczestnika to modyfikacja, nie utworzenie. Zamek jest osobnym plikiem i ma własny
+    bezpiecznik: porzucony (po `_MUTEKS_PORZUCONY_S`) usuwamy, a gdy nie doczekamy w
+    `limit_s` — idziemy dalej BEZ niego. Zawieszona bramka byłaby gorsza od wyścigu.
+    """
+    sciezka = _sciezka_pomocnicza(".mx")
+    koniec = time.time() + limit_s
+    uchwyt: Optional[int] = None
+    while True:
+        try:
+            sciezka.parent.mkdir(parents=True, exist_ok=True)
+            uchwyt = os.open(str(sciezka), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            break
+        except FileExistsError:
+            try:
+                porzucony = (time.time() - sciezka.stat().st_mtime) > _MUTEKS_PORZUCONY_S
+            except OSError:
+                porzucony = False
+            if porzucony:
+                try:
+                    sciezka.unlink()
+                except OSError:
+                    pass
+                continue
+            if time.time() >= koniec:
+                break
+            time.sleep(0.02)
+        except OSError:
+            break
+    try:
+        yield uchwyt is not None
+    finally:
+        if uchwyt is not None:
+            os.close(uchwyt)
+            try:
+                sciezka.unlink()
+            except OSError:
+                pass
+
+
+def _wczytaj_wpisy() -> List[Blokada]:
+    """Wszyscy uczestnicy zapisani w pliku — bez oceny, czy żyją."""
     try:
         surowe = json.loads(PLIK_BLOKADY.read_text(encoding="utf-8"))
     except FileNotFoundError:
-        return None
+        return []
     except (OSError, ValueError):
         # Plik uszkodzony (przerwany zapis). Uszkodzona blokada NIE blokuje — inaczej
         # jeden pół-zapisany bajt zamurowałby repo aż do ręcznej interwencji.
-        return None
-    try:
-        return Blokada(
-            zeton=str(surowe["zeton"]),
-            pid=int(surowe["pid"]),
-            powod=str(surowe.get("powod", "?")),
-            zalozona=str(surowe.get("zalozona", "?")),
-            zalozona_ts=float(surowe.get("zalozona_ts", 0.0)),
-            ttl_s=int(surowe.get("ttl_s", TTL_DOMYSLNY_S)),
-        )
-    except (KeyError, TypeError, ValueError):
-        return None
+        return []
+    if isinstance(surowe, dict) and "uczestnicy" in surowe:
+        lista = surowe.get("uczestnicy") or []
+    else:
+        lista = [surowe]            # format sprzed ciszy współdzielonej — jeden uczestnik
+    wpisy: List[Blokada] = []
+    for s in lista:
+        try:
+            wpisy.append(Blokada(
+                zeton=str(s["zeton"]),
+                pid=int(s["pid"]),
+                powod=str(s.get("powod", "?")),
+                zalozona=str(s.get("zalozona", "?")),
+                zalozona_ts=float(s.get("zalozona_ts", 0.0)),
+                ttl_s=int(s.get("ttl_s", TTL_DOMYSLNY_S)),
+            ))
+        except (KeyError, TypeError, ValueError, AttributeError):
+            continue                # wpis bez kształtu pomijamy; reszta listy zostaje ważna
+    return wpisy
 
 
 def _usun_plik() -> None:
@@ -254,44 +344,66 @@ def _usun_plik() -> None:
         pass
 
 
-def stan() -> Optional[Blokada]:
-    """Żywa blokada albo None. Martwą (zgasły PID / po TTL) sprząta przy okazji.
+def _zapisz_wpisy(wpisy: List[Blokada]) -> None:
+    """Podmiana listy uczestników. Atomowa (`os.replace`) — czytelnik nigdy nie
+    zobaczy połowy pliku, więc równoległy `stan()` nie orzeknie ciszy z niczego."""
+    if not wpisy:
+        _usun_plik()
+        return
+    tresc = json.dumps({"uczestnicy": [asdict(b) for b in wpisy]}, ensure_ascii=False, indent=2)
+    PLIK_BLOKADY.parent.mkdir(parents=True, exist_ok=True)
+    tmp = _sciezka_pomocnicza(f".{os.getpid()}.tmp")
+    tmp.write_text(tresc, encoding="utf-8")
+    os.replace(str(tmp), str(PLIK_BLOKADY))
+
+
+def _zywi(wpisy: List[Blokada]) -> List[Blokada]:
+    """Uczestnicy, którzy nadal obowiązują.
+
+    pid == 0 → CISZA RĘCZNA, bez procesu-właściciela (CLI `zaloz`). Bez tej gałęzi
+    ręczna blokada byłaby martwa w chwili narodzin: proces CLI kończy się natychmiast
+    po zapisie pliku, więc badanie żywotności PID-u zawsze orzekłoby śmierć. Wtedy
+    jedynym bezpiecznikiem jest TTL — i to wystarcza, bo ciszę ręczną zakłada człowiek.
+    """
+    return [b for b in wpisy
+            if not b.przeterminowana and (b.pid == 0 or proces_zyje(b.pid))]
+
+
+def uczestnicy() -> List[Blokada]:
+    """Żywi uczestnicy ciszy. Martwych (zgasły PID / po TTL) sprząta przy okazji.
 
     Sprzątanie w odczycie jest celowe: gdyby czekało na osobne wywołanie, po każdym
     crashu bramki repo zostawałoby zamurowane do chwili, gdy ktoś sobie przypomni.
     """
     if os.environ.get("SILENTIUM_OFF") == "1":
+        return []
+    wpisy = _wczytaj_wpisy()
+    zywi = _zywi(wpisy)
+    if len(zywi) != len(wpisy):
+        with _muteks():
+            zywi = _zywi(_wczytaj_wpisy())   # pod zamkiem czytamy raz jeszcze: w międzyczasie
+            _zapisz_wpisy(zywi)              # ktoś mógł dołączyć i nie wolno go zgubić
+    return zywi
+
+
+def stan() -> Optional[Blokada]:
+    """Blokada reprezentująca ciszę (najstarszy żywy uczestnik) albo None.
+
+    Najstarszy, a nie ostatni: to ON zaczął ciszę, więc jego powód i wiek opisują
+    stan repozytorium uczciwie — dopisany po nim bieg nie „odmładza" trwającej bramki.
+    """
+    zywi = uczestnicy()
+    if not zywi:
         return None
-    b = _wczytaj()
-    if b is None:
-        return None
-    # pid == 0 → CISZA RĘCZNA, bez procesu-właściciela (CLI `zaloz`). Bez tej gałęzi
-    # ręczna blokada byłaby martwa w chwili narodzin: proces CLI kończy się natychmiast
-    # po zapisie pliku, więc badanie żywotności PID-u zawsze orzekłoby śmierć. Wtedy
-    # jedynym bezpiecznikiem jest TTL — i to wystarcza, bo ciszę ręczną zakłada człowiek.
-    if b.przeterminowana or (b.pid > 0 and not proces_zyje(b.pid)):
-        _usun_plik()
-        return None
-    return b
+    return min(zywi, key=lambda b: b.zalozona_ts)
 
 
 def aktywna() -> bool:
     return stan() is not None
 
 
-def zaloz(powod: str, ttl_s: int = TTL_DOMYSLNY_S, pid: Optional[int] = None) -> Blokada:
-    """Zakłada ciszę. Rzuca `RuntimeError`, gdy inna ŻYWA cisza już trwa.
-
-    Tworzenie jest atomowe (`O_CREAT|O_EXCL`), więc dwa równoległe biegi bramki nie
-    nadpiszą sobie żetonu — drugi dostanie wyjątek zamiast po cichu przejąć cudzą ciszę
-    i zdjąć ją, kończąc się pierwszy.
-    """
-    biezaca = stan()
-    if biezaca is not None:
-        raise RuntimeError(
-            f"SILENTIUM już trwa: {biezaca.powod} (pid {biezaca.pid}, "
-            f"{biezaca.wiek_s:.0f}s). Poczekaj albo `zdejmij --sila`.")
-    b = Blokada(
+def _nowa(powod: str, ttl_s: int, pid: Optional[int]) -> Blokada:
+    return Blokada(
         zeton=uuid.uuid4().hex[:12],
         pid=int(pid if pid is not None else os.getpid()),
         powod=powod,
@@ -299,31 +411,60 @@ def zaloz(powod: str, ttl_s: int = TTL_DOMYSLNY_S, pid: Optional[int] = None) ->
         zalozona_ts=time.time(),
         ttl_s=int(ttl_s),
     )
-    PLIK_BLOKADY.parent.mkdir(parents=True, exist_ok=True)
-    tresc = json.dumps(asdict(b), ensure_ascii=False, indent=2)
-    try:
-        uchwyt = os.open(str(PLIK_BLOKADY), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-    except FileExistsError as e:
-        # Ktoś zdążył między `stan()` a `os.open`. Jeśli tamta jest martwa — sprzątamy
-        # i próbujemy raz jeszcze; jeśli żywa, przegrywamy wyścig świadomie.
-        if stan() is not None:
-            raise RuntimeError("SILENTIUM: wyścig o blokadę — inny bieg był szybszy.") from e
-        _usun_plik()
-        uchwyt = os.open(str(PLIK_BLOKADY), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-    with os.fdopen(uchwyt, "w", encoding="utf-8") as f:
-        f.write(tresc)
+
+
+def dolacz(powod: str, ttl_s: int = TTL_DOMYSLNY_S,
+           pid: Optional[int] = None) -> Tuple[Blokada, int]:
+    """Dopisuje uczestnika do ciszy (zakładając ją, gdy nikogo nie ma).
+
+    Zwraca własną blokadę i liczbę uczestników PO dołączeniu — komunikat ma powiedzieć
+    prawdę: czy ten bieg ciszę ogłasza, czy dołącza do już trwającej.
+    """
+    b = _nowa(powod, ttl_s, pid)
+    with _muteks():
+        wpisy = _zywi(_wczytaj_wpisy())
+        wpisy.append(b)
+        _zapisz_wpisy(wpisy)
+    return b, len(wpisy)
+
+
+def zaloz(powod: str, ttl_s: int = TTL_DOMYSLNY_S, pid: Optional[int] = None) -> Blokada:
+    """Zakłada ciszę WYŁĄCZNĄ. Rzuca `RuntimeError`, gdy jakakolwiek cisza już trwa.
+
+    Wyłączność jest tu na miejscu, bo to droga człowieka (CLI `zaloz`): ogłaszając ciszę
+    ręcznie chcę wiedzieć, że nikt inny jej właśnie nie trzyma. Biegi bramki idą przez
+    `cisza()`/`dolacz()` i współdzielą ją bez wypychania się nawzajem.
+    """
+    with _muteks():
+        wpisy = [] if os.environ.get("SILENTIUM_OFF") == "1" else _zywi(_wczytaj_wpisy())
+        if wpisy:
+            biezaca = min(wpisy, key=lambda x: x.zalozona_ts)
+            raise RuntimeError(
+                f"SILENTIUM już trwa: {biezaca.powod} (pid {biezaca.pid}, "
+                f"{biezaca.wiek_s:.0f}s). Poczekaj albo `zdejmij --sila`.")
+        b = _nowa(powod, ttl_s, pid)
+        _zapisz_wpisy([b])
     return b
 
 
 def zdejmij(zeton: Optional[str] = None, sila: bool = False) -> bool:
-    """Zdejmuje ciszę. Bez `sila` wymaga zgodnego żetonu — cudzej ciszy się nie zdejmuje."""
-    b = _wczytaj()
-    if b is None:
-        return False
-    if not sila and zeton is not None and b.zeton != zeton:
-        return False
-    _usun_plik()
-    return True
+    """Wypisuje uczestnika z ciszy; gdy był ostatni — cisza znika.
+
+    Bez żetonu (droga człowieka z CLI) i z `--sila` zdejmujemy ciszę w CAŁOŚCI: furtka
+    awaryjna ma otwierać repo od razu, a nie po jednym uczestniku.
+    """
+    with _muteks():
+        wpisy = _wczytaj_wpisy()
+        if not wpisy:
+            return False
+        if sila or zeton is None:
+            _usun_plik()
+            return True
+        pozostali = [b for b in wpisy if b.zeton != zeton]
+        if len(pozostali) == len(wpisy):
+            return False                 # cudzy albo nieznany żeton — cudzej ciszy się nie rusza
+        _zapisz_wpisy(pozostali)
+        return True
 
 
 @contextmanager
@@ -336,16 +477,25 @@ def cisza(powod: str, ttl_s: int = TTL_DOMYSLNY_S) -> Iterator[Optional[Blokada]
     """
     b: Optional[Blokada] = None
     try:
-        b = zaloz(powod, ttl_s=ttl_s)
-        print(f"🤫 SILENTIUM: cisza nad repo na czas biegu ({powod}, pid {b.pid}) — "
-              f"zapisy Architekta odmawiane do końca.")
+        b, ilu = dolacz(powod, ttl_s=ttl_s)
+        if ilu > 1:
+            print(f"🤫 SILENTIUM: cisza już trwa — DOŁĄCZAM jako {ilu}. uczestnik "
+                  f"({powod}, pid {b.pid}); repo pozostaje chronione do końca MOJEGO biegu.")
+        else:
+            print(f"🤫 SILENTIUM: cisza nad repo na czas biegu ({powod}, pid {b.pid}) — "
+                  f"zapisy Architekta odmawiane do końca.")
     except Exception as e:  # noqa: BLE001
         print(f"⚠️ SILENTIUM nie założone ({type(e).__name__}: {e}) — bieg idzie BEZ ochrony.")
     try:
         yield b
     finally:
         if b is not None and zdejmij(b.zeton):
-            print("🤫 SILENTIUM: cisza zdjęta — repo znów otwarte na zapis.")
+            pozostalo = len(uczestnicy())
+            if pozostalo:
+                print(f"🤫 SILENTIUM: wychodzę z ciszy — trwa nadal ({pozostalo} "
+                      f"uczestnik{'ów' if pozostalo != 1 else ''} w biegu).")
+            else:
+                print("🤫 SILENTIUM: cisza zdjęta — repo znów otwarte na zapis.")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -376,7 +526,9 @@ def _w_repo(sciezka: str) -> bool:
         wzgledna = p.relative_to(KORZEN)
     except (ValueError, OSError):
         return False               # poza repo (scratchpad, %TEMP%) — wolne
-    if p == PLIK_BLOKADY:
+    # Plik ciszy i jego pliki pomocnicze (zamek `.mx`, `.<pid>.tmp`) — strażnik nie może
+    # blokować własnego zapisu, bo dopisanie uczestnika jest właśnie zapisem.
+    if p.parent == PLIK_BLOKADY.parent and p.name.startswith(PLIK_BLOKADY.name):
         return False
     czesci = [c.lower() for c in wzgledna.parts]
     for wolny in _WOLNE_KATALOGI:
@@ -669,7 +821,9 @@ def ocen(tool_name: str, tool_input: Dict[str, Any]) -> Optional[Dict[str, str]]
     if b is None:
         return None
     ogon = max(0, b.ttl_s - int(b.wiek_s))
-    stopka = (f"Bramka trwa: {b.powod} (pid {b.pid}, {b.wiek_s:.0f}s, TTL za {ogon}s). "
+    ilu = len(uczestnicy())
+    razem = f", uczestników {ilu}" if ilu > 1 else ""
+    stopka = (f"Bramka trwa: {b.powod} (pid {b.pid}, {b.wiek_s:.0f}s, TTL za {ogon}s{razem}). "
               f"Zapis TERAZ unieważnia bieg — poczekaj na wynik. Awaryjnie: "
               f"`python -m imperium.pretorianie.silentium zdejmij --sila`.")
 
@@ -712,12 +866,17 @@ def _hook() -> int:
 
 
 def _opis_stanu() -> Tuple[str, int]:
-    b = stan()
-    if b is None:
+    zywi = uczestnicy()
+    if not zywi:
         return "🤫 SILENTIUM: brak ciszy — repo otwarte na zapis.", 0
-    return (f"🤫 SILENTIUM AKTYWNE: {b.powod}\n"
-            f"   pid {b.pid} | żeton {b.zeton} | założona {b.zalozona} "
-            f"| wiek {b.wiek_s:.0f}s | TTL {b.ttl_s}s", 1)
+    b = min(zywi, key=lambda x: x.zalozona_ts)
+    linie = [f"🤫 SILENTIUM AKTYWNE: {b.powod}",
+             f"   pid {b.pid} | żeton {b.zeton} | założona {b.zalozona} "
+             f"| wiek {b.wiek_s:.0f}s | TTL {b.ttl_s}s"]
+    for inny in sorted(zywi, key=lambda x: x.zalozona_ts)[1:]:
+        linie.append(f"   + współuczestnik: {inny.powod} (pid {inny.pid}, "
+                     f"żeton {inny.zeton}, wiek {inny.wiek_s:.0f}s)")
+    return "\n".join(linie), 1
 
 
 def main(argv: Optional[List[str]] = None) -> int:

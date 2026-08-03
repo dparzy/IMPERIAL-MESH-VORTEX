@@ -7,9 +7,11 @@ Trzy warstwy, bo organ ma trzy zupełnie różne rodzaje ryzyka:
   3. **Kalibracja** — regresja wobec WERSJONOWANEJ prawdy podstawowej; bez tego
      przyrząd mógłby się pogorszyć po cichu przy dowolnej późniejszej zmianie.
 """
+import io
 import json
 import os
 import sys
+from contextlib import redirect_stdout
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -32,18 +34,109 @@ def test_zaloz_i_zdejmij(monkeypatch, tmp_path):
     assert not S.aktywna()
 
 
-def test_druga_cisza_nie_przejmuje_pierwszej(monkeypatch, tmp_path):
-    """Dwa równoległe biegi: drugi dostaje wyjątek, NIE cudzy żeton.
+def test_druga_cisza_reczna_nie_przejmuje_pierwszej(monkeypatch, tmp_path):
+    """Cisza RĘCZNA (CLI `zaloz`) jest wyłączna: druga dostaje wyjątek, NIE cudzy żeton.
 
-    Gdyby przejmował, skończyłby się pierwszy i zdjął ciszę spod biegu, który wciąż trwa.
+    Wyłączność została tylko na drodze człowieka. Biegi bramki idą przez `cisza()` i
+    współdzielą blokadę — patrz test niżej, zbudowany na zmierzonej wadzie z 2026-08-03.
     """
     _przekieruj(monkeypatch, tmp_path)
     S.zaloz("pierwszy")
     try:
         S.zaloz("drugi")
-        assert False, "druga cisza powinna była odmówić"
+        assert False, "druga cisza ręczna powinna była odmówić"
     except RuntimeError as e:
         assert "już trwa" in str(e)
+
+
+def test_drugi_bieg_dolacza_zamiast_zostac_bez_ochrony(monkeypatch, tmp_path):
+    """REGRESJA na wadę ZMIERZONĄ 2026-08-03 (dwie sesje o 10:03, dowód w plikach hooka).
+
+    Pierwsza wersja organu odmawiała drugiemu biegowi i pisała „bieg idzie BEZ ochrony" —
+    NIEPRAWDĘ, bo repo było chronione cudzą ciszą. Komunikat kłamiący o stanie ochrony
+    uczy ignorować alarm, czyli zabija strażnika skuteczniej niż brak strażnika.
+    """
+    _przekieruj(monkeypatch, tmp_path)
+    # Przechwytywanie stdout RĘCZNIE, nie fixture `capsys`: bramką Imperium jest własny
+    # `tests/run_tests.py` (stdlib, bez pytest), który fixtur nie wstrzykuje. Test pisany
+    # pod samo pytest przechodził u mnie i padał na bramce — zmierzone w tej wachcie.
+    bufor = io.StringIO()
+    with redirect_stdout(bufor):
+        with S.cisza("bramka: testy"):
+            with S.cisza("bramka: audyt"):
+                assert len(S.uczestnicy()) == 2, "oba biegi mają być zapisane jako uczestnicy"
+    wydruk = bufor.getvalue()
+    assert "BEZ ochrony" not in wydruk, "trwająca cisza to ochrona, nie jej brak"
+    assert "DOŁĄCZAM" in wydruk
+
+
+def test_wyjscie_pierwszego_nie_zdejmuje_ciszy_drugiemu(monkeypatch, tmp_path):
+    """DRUGA połowa tej samej wady: pierwszy bieg kończył się i otwierał repo w środku
+    cudzej, wciąż trwającej bramki. Cisza ma trwać, dopóki nie wyjdzie OSTATNI."""
+    _przekieruj(monkeypatch, tmp_path)
+    pierwszy, ilu = S.dolacz("bramka: testy")
+    assert ilu == 1
+    drugi, ilu = S.dolacz("bramka: audyt")
+    assert ilu == 2
+
+    assert S.zdejmij(pierwszy.zeton)
+    assert S.aktywna(), "drugi bieg wciąż trwa — repo musi zostać zamknięte"
+    assert S.stan().powod == "bramka: audyt"
+
+    assert S.zdejmij(drugi.zeton)
+    assert not S.aktywna(), "po wyjściu ostatniego cisza znika"
+    assert not S.PLIK_BLOKADY.exists()
+
+
+def test_martwy_uczestnik_nie_zdejmuje_ciszy_zywemu(monkeypatch, tmp_path):
+    """GRANICA sprzątania: zgasły PID znika z listy, ale cisza żywego biegu zostaje.
+
+    Bez tego bezpiecznik „martwy PID zwalnia repo" stałby się dziurą: jeden padnięty
+    bieg otwierałby repo w środku drugiego, który ma się dobrze.
+    """
+    _przekieruj(monkeypatch, tmp_path)
+    # Podmiana PRZED dołączeniem, nie po: `dolacz` sam odsiewa martwych, więc przy
+    # prawdziwym `proces_zyje` sztuczny pid=1 wypadłby już w chwili dopisywania trupa
+    # i test badałby pustą listę zamiast granicy, o którą pyta.
+    monkeypatch.setattr(S, "proces_zyje", lambda pid: pid == 1)
+    zywy, _ = S.dolacz("bramka żywa", pid=1)
+    trup, _ = S.dolacz("bramka, która padła", pid=999_999_999)
+
+    zywi = S.uczestnicy()
+    assert [b.zeton for b in zywi] == [zywy.zeton], "martwy wypada, żywy zostaje"
+    assert S.aktywna()
+    assert trup.zeton not in S.PLIK_BLOKADY.read_text(encoding="utf-8")
+
+
+def test_stary_format_pliku_wciaz_czytany(monkeypatch, tmp_path):
+    """Plik zapisany przed ciszą współdzieloną (pojedynczy obiekt) nadal obowiązuje.
+
+    Blokada bywa na dysku w chwili wgrania nowej wersji — gdyby nowy kod jej nie rozumiał,
+    trwająca bramka zostałaby bezgłośnie odsłonięta.
+    """
+    _przekieruj(monkeypatch, tmp_path)
+    S.PLIK_BLOKADY.write_text(json.dumps({
+        "zeton": "stary123", "pid": 0, "powod": "bieg sprzed zmiany",
+        "zalozona": "2026-08-03T10:03:00", "zalozona_ts": S.time.time(), "ttl_s": 600,
+    }), encoding="utf-8")
+    b = S.stan()
+    assert b is not None and b.powod == "bieg sprzed zmiany"
+
+
+def test_pliki_pomocnicze_ciszy_nie_sa_zapisem_do_repo(monkeypatch, tmp_path):
+    """Strażnik nie może blokować własnego zamka — dopisanie uczestnika JEST zapisem.
+
+    Gdyby `.mx` liczyło się jako zapis do repo, hook zablokowałby operację, przez którą
+    sam działa: organ udusiłby się własną regułą.
+
+    ŚWIADOMIE bez `_przekieruj`: pytanie brzmi „czy ta ścieżka leży w repo", więc badana
+    ścieżka musi być PRODUKCYJNA. Na `tmp_path` test przeszedłby zawsze — z powodu
+    położenia poza drzewem, nie z powodu reguły, której pilnuje.
+    """
+    for rozszerzenie in ("", ".mx", ".12345.tmp"):
+        assert not S._w_repo(str(S.PLIK_BLOKADY) + rozszerzenie)
+    assert S._w_repo(str(S.PLIK_BLOKADY.parent / "inny_plik.json")), \
+        "sąsiad w tym samym katalogu MA być chroniony — zwolnienie dotyczy plików ciszy"
 
 
 def test_cudzego_zetonu_nie_zdejmiesz(monkeypatch, tmp_path):
@@ -78,11 +171,11 @@ def test_bezpiecznik_2_ttl_granica(monkeypatch, tmp_path):
     dane = json.loads(S.PLIK_BLOKADY.read_text(encoding="utf-8"))
     monkeypatch.setattr(S.time, "time", lambda: 1000.0)
 
-    dane["zalozona_ts"] = 900.0                  # wiek == TTL → jeszcze w środku
+    dane["uczestnicy"][0]["zalozona_ts"] = 900.0     # wiek == TTL → jeszcze w środku
     S.PLIK_BLOKADY.write_text(json.dumps(dane), encoding="utf-8")
     assert S.stan() is not None, "na samym progu TTL cisza jeszcze obowiązuje"
 
-    dane["zalozona_ts"] = 899.0                  # wiek > TTL → wygasła
+    dane["uczestnicy"][0]["zalozona_ts"] = 899.0     # wiek > TTL → wygasła
     S.PLIK_BLOKADY.write_text(json.dumps(dane), encoding="utf-8")
     assert S.stan() is None, "sekundę po TTL cisza musi wygasnąć sama"
 

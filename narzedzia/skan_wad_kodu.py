@@ -25,13 +25,33 @@ if str(ROOT) not in sys.path:
 from imperium.biblioteki.ksiega_wad_kodu import KsiegaWadKodu, zasiej_startowe  # noqa: E402
 
 
+# Moduł wzorców trzyma regexy JAKO DANE, więc trafia sam w siebie — musi być pominięty.
+_MODUL_WZORCOW = "imperium/biblioteki/ksiega_wad_kodu.py"
+
+
+def _pomijany(p: Path) -> bool:
+    """Czy ten plik jest wyłączony ze skanu — pytane W JEDNYM miejscu, przy skanowaniu.
+
+    Zmierzone 2026-08-03: wyłączenie stało wyłącznie w `_filtruj_py`, czyli na drodze
+    „pliki z gita". Plik podany JAWNIE (tak woła VIGIL w hooku PostToolUse) omijał je
+    bokiem i dawał 5 fałszywych trafień — z własnych opisów wzorców. To ta sama klasa,
+    co kontrakt append-only deklarowany w sześciu organach i egzekwowany przez zero:
+    reguła zapisana przy jednym wejściu nie obowiązuje przy drugim. Fałszywki
+    w narzędziu bramkowym są droższe niż jego brak, bo uczą przewijać jego wydruk.
+    """
+    try:
+        wzgledna = p.resolve().relative_to(ROOT).as_posix()
+    except (ValueError, OSError):
+        return False
+    return wzgledna == _MODUL_WZORCOW
+
+
 def _filtruj_py(linie) -> set[str]:
-    """Filtr wspólny: z listy nazw plików zostaw .py w imperium/ i narzedzia/, bez samego
-    modułu wzorców (trzyma regexy jako dane — trafiałby w siebie)."""
-    pliki = {l for l in linie
-             if l.endswith(".py") and l.startswith(("imperium/", "narzedzia/"))}
-    pliki.discard("imperium/biblioteki/ksiega_wad_kodu.py")
-    return pliki
+    """Filtr wspólny: z listy nazw plików zostaw .py w imperium/ i narzedzia/.
+    Za wyłączenia odpowiada `_pomijany` przy samym skanie — tu ich świadomie NIE ma,
+    żeby nie istniały dwa miejsca decydujące o tym samym."""
+    return {l for l in linie
+            if l.endswith(".py") and l.startswith(("imperium/", "narzedzia/"))}
 
 
 def _zmienione_py() -> list[Path]:
@@ -71,6 +91,8 @@ def _py_ostatni_commit() -> list[Path]:
 def skanuj_pliki(pliki: list[Path], ksiega: KsiegaWadKodu) -> list[tuple[Path, dict]]:
     trafienia = []
     for p in pliki:
+        if _pomijany(p):
+            continue
         try:
             tekst = p.read_text(encoding="utf-8")
         except Exception:

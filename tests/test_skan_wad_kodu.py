@@ -8,6 +8,7 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from imperium.biblioteki.ksiega_wad_kodu import KsiegaWadKodu  # noqa: E402
 from narzedzia import skan_wad_kodu as skan  # noqa: E402
 
 
@@ -24,10 +25,29 @@ def test_filtruj_py_odrzuca_nie_py_i_obce_katalogi():
     assert skan._filtruj_py(linie) == {"imperium/a.py"}
 
 
-def test_filtruj_py_wyklucza_sam_modul_wzorcow():
-    """Księga wzorców trzyma regexy jako dane → trafiałaby w siebie; musi być wykluczona."""
+def test_modul_wzorcow_pominiety_takze_gdy_podany_jawnie(tmp_path):
+    """REGRESJA na wadę ZMIERZONĄ 2026-08-03: wykluczenie modułu wzorców stało wyłącznie
+    w `_filtruj_py`, czyli na drodze „pliki z gita". Plik podany JAWNIE — tak woła VIGIL
+    w hooku PostToolUse — omijał je bokiem i dawał 5 fałszywych trafień z własnych opisów
+    wzorców. Reguła obowiązująca przy jednym wejściu, a nieegzekwowana przy drugim, to ta
+    sama klasa co kontrakt append-only deklarowany w sześciu organach i pilnowany przez zero.
+    """
+    ksiega = KsiegaWadKodu(tmp_path / "ksiega.json")
+    ksiega.dodaj("test", r"^import ", "wzorzec trafiający w każdy moduł", "lekcja", "test")
+    modul_wzorcow = skan.ROOT / "imperium" / "biblioteki" / "ksiega_wad_kodu.py"
+    inny_modul = skan.ROOT / "narzedzia" / "skan_wad_kodu.py"
+
+    assert skan.skanuj_pliki([modul_wzorcow], ksiega) == [], \
+        "moduł wzorców pomijamy niezależnie od tego, jak trafił do skanu"
+    assert skan.skanuj_pliki([inny_modul], ksiega), \
+        "KONTROLA: ten sam wzorzec MUSI trafiać w zwykły moduł — inaczej test niczego nie dowodzi"
+
+
+def test_filtruj_py_nie_decyduje_juz_o_wykluczeniach():
+    """Filtr przepuszcza moduł wzorców ŚWIADOMIE: o pominięciu decyduje jedno miejsce
+    (`_pomijany` przy skanie). Dwa miejsca rozjechałyby się przy pierwszej zmianie."""
     linie = ["imperium/biblioteki/ksiega_wad_kodu.py", "narzedzia/x.py"]
-    assert skan._filtruj_py(linie) == {"narzedzia/x.py"}
+    assert skan._filtruj_py(linie) == set(linie)
 
 
 def test_filtruj_py_pusta_lista():

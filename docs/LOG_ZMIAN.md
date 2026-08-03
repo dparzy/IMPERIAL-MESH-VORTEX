@@ -14,6 +14,37 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-03 | 🔧 | SILENTIUM: cisza WSPÓŁDZIELONA — organ pękł na własnym starcie, dzień po wdrożeniu
+
+**Wada znaleziona REALNYM UŻYCIEM, nie testem** — przez alarm w wydruku hooka otwarcia:
+`⚠️ SILENTIUM nie założone (RuntimeError: SILENTIUM już trwa … pid 17632, 0s)`.
+
+**Dowód (nie domysł):** o 10:03 wystartowały DWIE sesje naraz — pliki hooka
+`2214d0cc…` i `8e2da290…` mają ten sam znacznik czasu. Audyt drugiej sesji założył
+ciszę (pid 17632), audyt pierwszej dostał odmowę i wypisał **„bieg idzie BEZ ochrony"
+— nieprawdę**, bo repo było wtedy chronione cudzą ciszą. Gorzej: sesja, która
+skończyła audyt pierwsza, **zdjęła ciszę spod wciąż trwającego biegu drugiej**.
+
+**Diagnoza:** wyłączna blokada chroniła PLIK BLOKADY, a nie REPOZYTORIUM. Do tego
+komunikat kłamał o stanie ochrony — czyli organ zapobiegawczy sam był klasą
+„przyrząd kłamie, nie system", którą miał domykać. Komunikat fałszywie alarmujący
+uczy ignorować alarmy, więc szkodzi bardziej niż jego brak.
+
+**Naprawa:** plik ciszy trzyma **listę uczestników** (`dolacz`), cisza trwa aż wyjdzie
+OSTATNI, komunikat rozróżnia trzy stany (ogłaszam / dołączam / naprawdę bez ochrony).
+Zapis listy pod krótkim zamkiem `.mx` z własnym bezpiecznikiem (porzucony po 10 s,
+czekanie do 5 s, potem bieg bez zamka — zawieszona bramka byłaby gorsza od wyścigu)
+i atomową podmianą `os.replace`. Wyłączność została w `zaloz()` — na drodze człowieka.
+
+**Testy:** 19 → **24** (pięć nowych, wszystkie na granicach tej wady): drugi bieg
+dołącza zamiast zostać bez ochrony · wyjście pierwszego nie zdejmuje ciszy drugiemu ·
+martwy uczestnik nie zdejmuje ciszy żywemu · stary format pliku wciąż czytany ·
+pliki pomocnicze ciszy nie są zapisem do repo (strażnik nie może dusić się własną regułą).
+
+**Pliki:** `imperium/pretorianie/silentium.py`, `tests/test_silentium.py`, `.gitignore`
+
+---
+
 ## 2026-08-03 | 🤫 | CORONA A: SILENTIUM — pierwszy organ, który ZAPOBIEGA zamiast wykrywać
 
 **Spłata NOTY Architekta** (dwa złamania zasady „nie edytuj w trakcie biegu bramki"

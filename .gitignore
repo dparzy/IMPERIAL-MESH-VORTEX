@@ -75,3 +75,5 @@ bibliotheca_ulpia/dane/breviarium_migawka.json
 # martwy PID przyjechałby pullem jako „trwa bieg". Kalibracja klasyfikatora (obok) JEST
 # wersjonowana, bo to prawda podstawowa, nie stan.
 bibliotheca_ulpia/dane/silentium.lock
+# Zamek `.mx` i pliki tymczasowe podmiany listy uczestników (cisza współdzielona, 08-03).
+bibliotheca_ulpia/dane/silentium.lock.*

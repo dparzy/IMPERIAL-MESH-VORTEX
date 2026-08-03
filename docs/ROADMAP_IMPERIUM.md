@@ -2,7 +2,7 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
-stan_na: 2026-08-02
+stan_na: 2026-08-03
 powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii."
 ---
 # 🏛️ ROADMAP IMPERIUM — MAPA DRÓG SYSTEMU
@@ -48,6 +48,43 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 > jeszcze nie osądziliśmy — tego samego, który wyprodukował `US20230000000A1`
 > i `abc123.ngrok.io`. Pierwsza wersja rejestru zawiera **tylko to, co potwierdzone
 > w NASZYM kodzie**; reszta czeka na QUAESTIO.
+
+### 👑 DRUGA TRÓJKA KORON — spłata NOTY `N-fa723062` (wybór Cezara 2026-08-03)
+
+> **Nota:** SILENTIUM przeszedł bramkę z wadą cyklu życia blokady — cisza WYŁĄCZNA
+> chroniła *plik blokady* zamiast *repozytorium*, drugi bieg dostawał komunikat
+> „bieg idzie BEZ ochrony" (nieprawdę), a pierwszy wychodzący zdejmował ciszę spod
+> trwającego biegu. **19 testów tego nie złapało, bo cały pakiet testuje JEDNOWĄTKOWO.**
+> Zgodnie z ROZKAZEM STAŁYM Architekt podał trzy opcje; **Cezar wybrał A i rozkazał
+> zacząć od niej w nowej sesji, resztę wg rekomendacji.**
+
+| # | CORONA | Unikat — czego dziś NIE MA | Wpływ | Stan |
+|---|---|---|---|---|
+| **A** 🎯 | **LUSTRUM** — organ mierzący **POŻYTEK** narzędzia (kto woła, wiek ostatniego użycia, testy, ślad w ledgerze) i wycofujący etapami `PODEJRZANY → KARENCJA → HONESTA MISSIO` | CENSUS ORGANORUM (W17) pyta wyłącznie „czy **zameldowany**", **nigdy „czy jeszcze potrzebny"**. Prawo XV robiliśmy RĘCZNIE 05.07 (12 niepodpiętych) — audyt na rozkaz, nie organ w pętli | pierwszy organ, który **ZAMYKA, a nie otwiera**: ROADMAP 15,5%, 375 wizji i 34 sugestie bez werdyktu | 🔴 **START NOWEJ SESJI** (rozkaz Cezara 08-03) |
+| **B** | **PROBATIO ITINERUM** — warstwa sprawdzająca, że narzędzie bramkowe daje **ten sam werdykt każdą drogą wejścia** (jawny plik / git / hook / `pytest` vs `run_tests.py`) | nikt nie testuje **równoważności dróg wejścia**. Zmierzone 08-03: **trzy wady tej klasy w jednej wachcie** (skaner wad — 5 fałszywek przy wywołaniu z hooka; test przechodzący pod pytest i padający pod bramką; wcześniej append-only w 6 organach / 0 egzekucji) | broni wiarygodności **wszystkich** bramek naraz — bez tego „czysto" znaczy tylko „czysto tą drogą" | 🔴 wg rekomendacji |
+| **C** | **SPECULATOR CONCURRENS** — kalibrowany próbnik współbieżności: N równoległych biegów i pomiar, czy niezmienniki (cisza, append-only, sigillum) trzymają | **całe Imperium testuje jednowątkowo** — to ślepa plama pakietu, nie luka jednego organu | jedyny sposób, by wada tej klasy została złapana **testem, a nie sesją Cezara** | 🔴 wg rekomendacji |
+
+> **🚨 DWA ROZJAZDY MATURITASA zmierzone przy domykaniu 2026-08-03** (dopisane, nie
+> przemilczane — miernik chwalący zamiast mierzyć jest gorszy od braku miernika):
+> **(1)** dopisanie do ROADMAP **7 realnych pozycji** (3 korony + 4 pytania) nie ruszyło
+> licznika — dalej `11/71`, więc te tabele są dla niego niewidzialne; to druga strona
+> zarzutu z recenzji PR #139, że liczy wiersze legionów jako pozycje.
+> **(2)** migawka zapisała `dlug_honorowy: 0` w chwili, gdy `codex_notarum bilans`
+> pokazuje **1** (nota `N-fa723062`). Miernik długu, który nie widzi długu, to dokładnie
+> klasa „przyrząd kłamie, nie system". **Zadanie na wachtę CORONY A** — LUSTRUM i tak
+> będzie czytał te same źródła.
+
+### ❓ PYTANIA OTWARTE — czekają na rozstrzygnięcie Cezara (zapisane 2026-08-03 na rozkaz)
+
+> Powód zapisu: pytanie zadane w rozmowie i nieutrwalone **ginie** — to ta sama klasa,
+> co 375 wizji bez werdyktu. Każde ma mieć albo odpowiedź, albo widoczny status.
+
+| # | Pytanie | Kontekst zmierzony | Stan |
+|---|---|---|---|
+| **P-01** | **Stos dashboardu PRAETORIUM: Dart/Flutter/Wasm czy to, co już mamy (HTML+JS)?** | materiał `wrzutnia/Dart-WebAssembly-components.md` (3495 linii, 168 KB, 83 adresy) opisuje budowę dashboardu w Dart/Wasm — to **nowy język i cały nowy stos** w Imperium Pythonowym. Rekomendacja Architekta: HTML+JS, zero nowych zależności | ⏳ **OTWARTE** |
+| **P-02** | **Repozytorium publiczne czy prywatne?** | DeepSeek **czytał nasz kod z GitHuba i cytuje go** znacznikami `[reference:N]`; zweryfikowane pomiarem: 4 z 5 liczb plików w organach dokładne, piąta nieaktualna o jeden dzień. Wcześniejszy zamiar Cezara („push po repo → private") nigdy nie został wykonany | ⏳ **OTWARTE** |
+| **P-03** | **Sąd VERITAS nad materiałem Dart/Wasm** — kiedy i w jakim zakresie | VIATOR gotowy (55 testów) na 83 adresy; destylat techniczny osobno. Materiał zawiera też **mockup dashboardu w stylu rzymskim** — wprost dotyka zamówienia Cezara z 02.08 (żywy schemat Imperium) | ⏳ **OTWARTE** |
+| **P-04** | **Czy LUSTRUM wchłania „strażnika obcych plików"** (pomysł Cezara 28.07) | 82 pliki we wrzutni; strażnik miał **kierować do kwarantanny, nie kasować** — to ta sama doktryna „nigdy nie kasuj sam", więc kandydat na jeden organ zamiast dwóch (Prawo XVI) | ⏳ **OTWARTE** |
 
 ### WACHTA H — DOMYKANIE PĘTLI *(kolejność = rekomendacja po skanie Imperium 2026-08-02)*
 

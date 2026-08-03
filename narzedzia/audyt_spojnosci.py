@@ -1058,12 +1058,19 @@ def _warstwa_18_dlug_honorowy(sciezka=None):
         from imperium.biblioteki.codex_notarum import bilans
         b = bilans(sciezka) if sciezka is not None else bilans()
         dlug = b.get("dlug_honorowy") or []
+        # Noty ODROCZONE decyzją Cezara nie blokują commita, ale MUSZĄ być widoczne
+        # w każdym raporcie — inaczej odroczenie po cichu zamieniłoby się w umorzenie
+        # (2026-08-03: Cezar przesunął spłatę CORONY A na następną wachtę).
+        odr = b.get("odroczone") or []
+        nota_odr = ([f"⏳ LEX TALIONIS (W18): {len(odr)} nota/y ODROCZONA decyzją Cezara — "
+                     f"dług TRWA, spłata w kolejnej wachcie: "
+                     + "; ".join(str(n.get("opis", "?"))[:70] for n in odr[:3])] if odr else [])
         if not dlug:
             return [], [f"LEX TALIONIS (W18): dług honorowy 0 — {b['noty']} not, "
-                        f"{b['korony']} koron ✅"]
+                        f"{b['korony']} koron ✅", *nota_odr]
         opisy = "; ".join(str(n.get("opis", "?"))[:80] for n in dlug[:3])
         return [f"[W18] DŁUG HONOROWY: {len(dlug)} zatwierdzonych błędów bez kompensującego "
-                f"unikatu (LEX TALIONIS). Dostarcz CORONĘ zanim commitujesz: {opisy}"], []
+                f"unikatu (LEX TALIONIS). Dostarcz CORONĘ zanim commitujesz: {opisy}"], nota_odr
     except Exception as e:  # noqa: BLE001 — awaria ledgera nie może wywrócić audytu
         return [f"[W18] Błąd odczytu CODEX NOTARUM: {e}"], []
 

@@ -252,6 +252,12 @@ nowe zadanie bez weryfikacji „czy już istnieje"; liczby z pamięci zamiast z 
 5. **Prawo XV:** odpowiedz Cezarowi na pytanie o utratę potencjału — JAWNIE, nie milczeniem.
 5b. **LEX TALIONIS — dług honorowy:** `python -m imperium.biblioteki.codex_notarum bilans` — jeśli
    dług honorowy > 0 (błąd bez kompensującego unikatu), NIE domykaj sesji: dostarcz zatwierdzoną CORONĘ (oko za oko).
+   **JEDYNY wyjątek — ODROCZENIE (Cezar 2026-08-03):** gdy Cezar sam przesuwa spłatę na następną wachtę,
+   zapisujesz to jawnie (`codex_notarum odroczenie --nota <id> --zatwierdzenie "<słowa Cezara>" --plan "<czym i kiedy>"`).
+   Odroczenie zdejmuje BLOKADĘ commita, ale **nie kasuje długu**: nota zostaje w ledgerze i jest drukowana
+   przy każdym bilansie oraz w audycie (W18), dopóki korona nie przyjdzie. Odroczenie bez `--plan` jest
+   odrzucane — to byłoby umorzenie pod inną nazwą. Powód: mechanizm, który nie umie przyjąć decyzji
+   Imperatora, zmusza do obchodzenia siebie, a obchodzenie bramki znika bez śladu.
 5c. **MATURITAS — czy ta wachta PODNIOSŁA piętro** (ROZKAZ STAŁY, Cezar 2026-08-02):
    `python -m imperium.oczy.maturitas --delta`, a po rozstrzygnięciu `--zapisz` (migawka
    append-only, pilnowana przez VINDEXA). Odpowiadasz Cezarowi **JAWNIE** na trzy pytania:

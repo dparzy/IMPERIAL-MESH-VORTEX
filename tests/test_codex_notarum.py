@@ -106,3 +106,56 @@ def test_raport_z_dlugiem(tmp_path):
     cn.dodaj_nota(opis="e2", kategoria="x", zatwierdzenie="Cezar",
                   sesja="s1", sciezka=led)
     assert "DŁUG HONOROWY" in cn.raport(led)
+
+
+# ── ODROCZENIE (2026-08-03): decyzja Cezara o przesunięciu spłaty ────────────────
+
+def test_odroczenie_zdejmuje_blokade_ale_nie_dlug(tmp_path):
+    """GRANICA: odroczona nota wychodzi z `dlug_honorowy` (nie blokuje commita),
+    ale NADAL jest długiem — widocznym w `odroczone` i w raporcie.
+
+    Powód istnienia mechanizmu: LEX TALIONIS wymaga spłaty w tej samej sesji, a Cezar
+    rozkazał zamknąć wachtę i zbudować CORONĘ w następnej. Bez tego rekordu jego rozkaz
+    byłby niewykonalny bez obchodzenia bramki — a obchodzenie znika bez śladu.
+    """
+    led = tmp_path / "codex_notarum.jsonl"
+    nid = cn.dodaj_nota(opis="wada X", kategoria="x", zatwierdzenie="Cezar",
+                        sesja="s1", sciezka=led)
+    assert len(cn.dlug_honorowy(led)) == 1
+
+    cn.dodaj_odroczenie(nota=nid, zatwierdzenie="Cezar 2026-08-03",
+                        sesja="s1", plan="CORONA A: LUSTRUM w następnej wachcie", sciezka=led)
+
+    assert cn.dlug_honorowy(led) == [], "odroczona nota nie blokuje commita"
+    assert [r["id"] for r in cn.odroczone(led)] == [nid], "…ale dług NIE znika"
+    assert "ODROCZONE" in cn.raport(led), "raport musi krzyczeć, inaczej to ciche umorzenie"
+
+
+def test_odroczenie_bez_planu_odrzucone(tmp_path):
+    """Odroczenie bez planu spłaty jest umorzeniem pod inną nazwą — odmawiamy."""
+    led = tmp_path / "codex_notarum.jsonl"
+    nid = cn.dodaj_nota(opis="wada Y", kategoria="x", zatwierdzenie="Cezar",
+                        sesja="s1", sciezka=led)
+    with pytest.raises(ValueError):
+        cn.dodaj_odroczenie(nota=nid, zatwierdzenie="Cezar", sesja="s1", plan="  ",
+                            sciezka=led)
+
+
+def test_odroczenie_nieistniejacej_noty_odrzucone(tmp_path):
+    led = tmp_path / "codex_notarum.jsonl"
+    with pytest.raises(ValueError):
+        cn.dodaj_odroczenie(nota="N-nieistnieje", zatwierdzenie="Cezar", sesja="s1",
+                            plan="cokolwiek", sciezka=led)
+
+
+def test_corona_splaca_takze_note_odroczona(tmp_path):
+    """Odroczenie to PRZESUNIĘCIE, nie zwolnienie: korona nadal ją spłaca i dopiero
+    wtedy nota znika z obu list."""
+    led = tmp_path / "codex_notarum.jsonl"
+    nid = cn.dodaj_nota(opis="wada Z", kategoria="x", zatwierdzenie="Cezar",
+                        sesja="s1", sciezka=led)
+    cn.dodaj_odroczenie(nota=nid, zatwierdzenie="Cezar", sesja="s1",
+                        plan="LUSTRUM", sciezka=led)
+    cn.dodaj_corona(opis="LUSTRUM", kategoria="x", zatwierdzenie="Cezar",
+                    sesja="s2", splaca=nid, sciezka=led)
+    assert cn.dlug_honorowy(led) == [] and cn.odroczone(led) == []

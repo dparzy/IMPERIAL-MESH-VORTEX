@@ -14,6 +14,31 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-03 | ⏳ | LEX TALIONIS: ODROCZENIE — mechanizm, który umie przyjąć decyzję Cezara
+
+**Powód zmierzony:** Cezar zatwierdził notę `N-fa723062` (wada współbieżności
+w SILENTIUM), wybrał **CORONĘ A = LUSTRUM** i rozkazał zbudować ją **w następnej
+wachcie**, a tę zamknąć. Bramka W18 blokowała commit, bo LEX TALIONIS zakłada spłatę
+w TEJ SAMEJ sesji. Rozkaz Imperatora był więc niewykonalny bez obchodzenia własnej
+bramki — a mechanizm, którego nie da się posłuchać, uczy się obchodzić.
+
+**Rozwiązanie — nowy typ rekordu `ODROCZENIE`** (`imperium/biblioteki/codex_notarum.py`):
+- `odroczenie --nota <id> --zatwierdzenie "<słowa Cezara>" --plan "<czym i kiedy>"`,
+- zdejmuje **blokadę commita**, nie kasuje **długu**: nota wychodzi z `dlug_honorowy()`
+  do `odroczone()` i jest drukowana przy KAŻDYM bilansie oraz w audycie (W18),
+- **odroczenie bez `--plan` jest odrzucane** — to byłoby umorzenie pod inną nazwą,
+- korona nadal ją spłaca; dopiero wtedy nota znika z obu list.
+
+**Testy:** +4 (odroczenie zdejmuje blokadę, ale nie dług · bez planu odrzucone ·
+nieistniejąca nota odrzucona · korona spłaca także notę odroczoną).
+**Skodyfikowane w CLAUDE.md** § KONIEC SESJI krok 5b — dokument nie może kłamać
+o tym, kiedy wolno domknąć sesję.
+
+**Pliki:** `imperium/biblioteki/codex_notarum.py`, `narzedzia/audyt_spojnosci.py` (W18),
+`tests/test_codex_notarum.py`, `CLAUDE.md`
+
+---
+
 ## 2026-08-03 | 🔧 | SILENTIUM: cisza WSPÓŁDZIELONA — organ pękł na własnym starcie, dzień po wdrożeniu
 
 **Wada znaleziona REALNYM UŻYCIEM, nie testem** — przez alarm w wydruku hooka otwarcia:

@@ -450,6 +450,39 @@ def test_liczby_lapie_rozjazd_i_naprawia():
         os.unlink(sciezka)
 
 
+def test_liczby_sesje_kroniki_sledza_kronike():
+    """Kronika rośnie SAMA — od pracy, nie od commitu — więc T2 nigdy jej nie złapie.
+
+    Zmierzone 2026-08-04 przy kalibracji bramki gnicia: PLAN_TIRO twierdził w DWÓCH
+    miejscach „kronika 102 sesji" przy 154 realnych, a T2 wskazywała jako winowajcę
+    `notarius.py` — plik bez żadnego związku z tą liczbą. Klasa wady: dokument cytuje
+    wielkość, która przyrasta bez śladu w kodzie, więc żadna bramka oparta na commitach
+    nie ma jej jak zobaczyć. Lekarstwem nie jest ostrzejsza bramka, tylko odebranie
+    dokumentowi prawa do wpisywania tej liczby ręcznie (ta sama kuracja co „42 książki").
+    """
+    from imperium.biblioteki.srodowisko_pamieci import sesje_w_kronice
+    from narzedzia.tabularium import wartosci_z_kodu, wstrzyknij_liczby
+    prawda = sesje_w_kronice()
+    assert prawda > 0, "kronika jest wersjonowana w gicie — zero znaczy, że liczenie padło"
+    assert wartosci_z_kodu()["sesje_kroniki"] == prawda
+
+    # GRANICA: sam fakt, że klucz jest znany, NIE dowodzi, że naprawia (LEX TALARUS —
+    # mierzymy przyrząd, nie deklarację). Podstawiamy jawnie fałszywą liczbę.
+    sciezka = _tymczasowy_dokument(
+        "---\nkategoria: TABULA\ntyp: zywy\nwlasciciel: —\nstan_na: 2026-08-04\n"
+        "powod_istnienia: test\n---\n\nkronika <!-- LICZBA:sesje_kroniki -->102<!-- /LICZBA --> sesji\n")
+    try:
+        zmiany, bledy = wstrzyknij_liczby(sucho=True)
+        assert not bledy, bledy
+        assert any("102" in z and str(prawda) in z for z in zmiany), zmiany
+        wstrzyknij_liczby(sucho=False)
+        with open(sciezka, encoding="utf-8") as f:
+            tresc = f.read()
+        assert f"<!-- LICZBA:sesje_kroniki -->{prawda}<!-- /LICZBA -->" in tresc, tresc
+    finally:
+        os.unlink(sciezka)
+
+
 def test_liczby_nieznany_klucz_to_blad():
     """GRANICA: literówka w kluczu (`neuronyy`) musi krzyczeć, a nie cicho nic nie robić.
 
@@ -774,3 +807,103 @@ def test_spis_brak_gita_nie_wywraca_spisu():
         assert tb.zbierz_dokumenty(), "brak gita nie może wyzerować spisu"
     finally:
         tb._sledzone_przez_git = stare
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DRUGIE ŚWIADECTWO T2 — waga alarmu gnicia (kalibracja 2026-08-04)
+# ─────────────────────────────────────────────────────────────────────────────
+
+_META_TEST = {"kategoria": "TABULA", "typ": "zywy", "stan_na": "2026-07-17",
+              "wlasciciel": "narzedzia/tabularium.py"}
+
+
+def _swiadectwo_na_atrapach(monkeypatch, tresc, zmienione, pospolitosc):
+    """Świadectwo liczone bez dotykania gita — testy nie mogą zależeć od historii repo."""
+    from narzedzia import tabularium as tb
+    monkeypatch.setattr(tb, "_symbole_zmienione", lambda _w, _d: set(zmienione))
+    monkeypatch.setattr(tb, "_pospolitosc_symboli", lambda: pospolitosc)
+    sciezka = _tymczasowy_dokument(
+        "---\nkategoria: TABULA\ntyp: zywy\nwlasciciel: narzedzia/tabularium.py\n"
+        f"stan_na: 2026-07-17\npowod_istnienia: test\n---\n\n{tresc}\n")
+    try:
+        return tb.swiadectwo_gnicia(os.path.relpath(sciezka, ROOT).replace("\\", "/"),
+                                    _META_TEST)
+    finally:
+        os.unlink(sciezka)
+
+
+def test_swiadectwo_mocne_gdy_dokument_opisuje_ruszony_symbol(monkeypatch):
+    """SEDNO: alarm jest mocny tylko wtedy, gdy ruszyło się to, co dokument OPISUJE.
+
+    Zmierzone 2026-08-04 na 6 losowanych dokumentach z zamrożoną prawdą podstawową:
+    sam sygnał „commit dotknął właściciela" miał 33% precyzji (2/6), a sprawcę wskazał
+    0/6 razy. Waga mocna trafiła 2/2 prawdziwych i 0/4 fałszywek.
+    """
+    waga, symbole = _swiadectwo_na_atrapach(
+        monkeypatch, "Organ woła `eksportuj_sft` przy żniwie.",
+        zmienione={"eksportuj_sft"}, pospolitosc={"eksportuj_sft": 1})
+    assert waga == "MOCNE"
+    assert symbole == ["eksportuj_sft"]
+
+
+def test_swiadectwo_slabe_gdy_zmiana_poza_cytowanymi(monkeypatch):
+    """NEGATYWNY: kod się ruszył, ale nie w miejscu, o którym dokument mówi.
+
+    Tak wyglądały 4 z 6 fałszywek — m.in. GUBERNATOR, gdzie commit usunął MARTWĄ
+    gałąź bit-identycznie, więc żadne zdanie dokumentu nie mogło przez to skłamać.
+    """
+    waga, symbole = _swiadectwo_na_atrapach(
+        monkeypatch, "Dokument mówi o `zupelnie_czym_innym`.",
+        zmienione={"jakas_funkcja"}, pospolitosc={"jakas_funkcja": 1})
+    assert waga == "SŁABE"
+    assert symbole == []
+
+
+def test_swiadectwo_homonim_nie_jest_dowodem(monkeypatch):
+    """GRANICA PROGU: `main` żyje w 84 plikach — jego zmiana nie dowodzi niczego.
+
+    Bez progu pospolitości SCIAGA_LOKAL dostawała wagę mocną wyłącznie dlatego, że
+    i ona, i zmieniony plik są Pythonem. W16 z tego właśnie powodu świadomie nie łapie
+    nazw funkcji; próg przywraca je bezpiecznie, bo odsiewa homonimy POMIAREM.
+    """
+    from narzedzia.tabularium import PROG_POSPOLITOSCI
+    waga, symbole = _swiadectwo_na_atrapach(
+        monkeypatch, "Uruchom `main` z konsoli.",
+        zmienione={"main"}, pospolitosc={"main": PROG_POSPOLITOSCI + 79})
+    assert waga == "SŁABE", "pospolita nazwa nie może awansować alarmu"
+    assert symbole == []
+
+
+def test_swiadectwo_pusty_pomiar_to_nie_zielen(monkeypatch):
+    """GRANICA: gdy pomiar pospolitości padnie, świadectwa NIE MA — i to musi być widać.
+
+    Realna wada złapana przy pierwszym biegu organu (2026-08-04): mapa pospolitości
+    powstawała z listy `*.md` przefiltrowanej po `.py`, czyli była PUSTA, a warunek
+    `get(s, 0) < PRÓG` przepuszczał wtedy każdy homonim jako świadectwo. Filtr nie
+    krzyknął — cicho przestał filtrować. Milczenie nie może uchodzić ani za zieleń,
+    ani za słaby alarm (klasa K2 z LUSTRATIO).
+    """
+    waga, symbole = _swiadectwo_na_atrapach(
+        monkeypatch, "Cytat `cokolwiek`.", zmienione={"cokolwiek"}, pospolitosc=None)
+    assert waga == "NIEROZSTRZYGNIĘTE"
+    assert symbole == []
+
+
+def test_swiadectwo_pospolitosc_liczy_pliki_py_nie_md():
+    """Mapa pospolitości MUSI powstawać z plików .py — źródło wady z 2026-08-04."""
+    from narzedzia import tabularium as tb
+    pliki = tb._pliki_py_repo()
+    assert pliki, "brak plików .py — zapytanie git padło?"
+    assert all(p.endswith(".py") for p in pliki)
+    mapa = tb._pospolitosc_symboli()
+    assert mapa, "pusta mapa = pomiar padł (musi być None-owana, nie 'same rzadkie')"
+    assert mapa.get("main", 0) >= tb.PROG_POSPOLITOSCI, \
+        "`main` żyje w dziesiątkach modułów CLI — próg musi go widzieć jako homonim"
+
+
+def test_swiadectwo_bez_daty_nie_wybucha(monkeypatch):
+    """GRANICA: dokument bez `stan_na` nie może wywrócić przeglądu."""
+    from narzedzia import tabularium as tb
+    monkeypatch.setattr(tb, "_pospolitosc_symboli", lambda: {"x": 1})
+    waga, symbole = tb.swiadectwo_gnicia("docs/README.md", {"wlasciciel": "x.py"})
+    assert waga == "SŁABE" and symbole == []

@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/centrum_pamieci.py, imperium/biblioteki/dziennik_niesmiertelny.py, imperium/biblioteki/graf_pamieci.py, imperium/biblioteki/kronika_czatu.py, imperium/biblioteki/kustosz_pamieci.py, imperium/biblioteki/pamiec_absolutna.py, imperium/biblioteki/pamiec_proceduralna.py, imperium/biblioteki/pamiec_proweniencji.py, imperium/biblioteki/pamiec_robocza.py, imperium/biblioteki/pamiec_sesji.py, imperium/biblioteki/refleksja_pamieci.py, imperium/biblioteki/rejestr_wizji.py, imperium/biblioteki/srodowisko_pamieci.py, imperium/biblioteki/zapominanie.py
-stan_na: 2026-07-17
+stan_na: 2026-08-04
 powod_istnienia: "Jedyne miejsce konsolidujące 13(+1 nadrzędny=W7) warstw pamięci Claude/Imperium w jedną taksonomię, z mapowaniem na model CoALA (arXiv:2309.02427) i na 'domknięte problemy granicy 2026'"
 ---
 # 🗺️ MAPA PAMIĘCI IMPERIUM — Centrum Pamięci W-360 v5
@@ -16,6 +16,15 @@ powod_istnienia: "Jedyne miejsce konsolidujące 13(+1 nadrzędny=W7) warstw pami
 > Chmura↔Lokal). Sprostowano też „42 książek" → realnie <!-- LICZBA:ksiazki -->115<!-- /LICZBA -->
 > (liczba była ZASZYTA w czterech miejscach kodu i tu; teraz liczy ją
 > `srodowisko_pamieci.ksiazki_w_bazie()` i wstrzykuje W15).
+
+> ✅ **Weryfikacja wobec kodu 2026-08-04** (kalibracja bramki T2 — spłata przez SPRAWDZENIE,
+> nie przepisanie): 13 warstw W1–W13 + W3b nadal w `kustosz_pamieci.py` · `rag_wektory = 0`
+> wciąż prawdą (`raport_dostepnosci()` → tryb `FTS`) · **naprawione dwa zaszyte kłamstwa:**
+> „29 699 fragmentów" (realnie <!-- LICZBA:fragmenty -->37331<!-- /LICZBA -->) i „104 źródła"
+> — ta druga była wewnętrznie sprzeczna, bo obok stała wstrzykiwana liczba książek, a
+> <!-- LICZBA:ksiazki -->115<!-- /LICZBA --> + encyklopedia nie daje 104. Obie liczby rosną
+> SAME, więc żaden commit nie mógł ich zestarzeć w sposób widoczny dla bramki gnicia —
+> dlatego wchodzą teraz przez znaczniki W15 zamiast przez czyjąś rękę.
 
 ## 📜 Czym jest Centrum Pamięci
 
@@ -89,8 +98,8 @@ Poprzednia wersja sugerowała, że tryb FTS to ograniczenie *chmury* („lokalni
 
 | Miara (zmierzone) | Wartość |
 |---|---|
-| Fragmenty w RAG | 29 699 |
-| Źródła łącznie | 104 (<!-- LICZBA:ksiazki -->115<!-- /LICZBA --> książek BIB-* + 25 plików encyklopedii) |
+| Fragmenty w RAG | <!-- LICZBA:fragmenty -->37331<!-- /LICZBA --> |
+| Źródła książkowe | <!-- LICZBA:ksiazki -->115<!-- /LICZBA --> książek BIB-* (+ pliki encyklopedii) |
 | **Wektory** | **0** ← semantyka nieaktywna |
 | `model_embeddings` (sentence-transformers) | **False** ← brak pakietu |
 

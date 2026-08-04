@@ -27,6 +27,71 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 ---
 
+## 📕 REJESTR DŁUGÓW — czego NIE USTALONO i NIE NAPRAWIONO (rozkaz Cezara 2026-08-04)
+
+> **Po co ta sekcja:** długi Imperium leżały rozsypane po ROADMAP, Księdze Wad, CODEX
+> i Dzienniku — widoczne pojedynczo, niewidoczne razem. Cezar zażądał **jednej listy
+> uporządkowanej wg ważności**. Kolejność jest REKOMENDACJĄ Architekta, nie alfabetem.
+> Każda pozycja ma **datę powstania długu** — bo dług, który nie starzeje się na widoku,
+> nie jest długiem, tylko notatką.
+>
+> **Rozróżnienie, które trzyma tę listę w ryzach:** *nie ustalono* = brak POMIARU (nie
+> wiemy, jak jest); *nie naprawiono* = wiemy dokładnie, co jest złe, i kod stoi nietknięty.
+> Mieszanie tych dwóch rzeczy jest tym, co pozwalało im obu wisieć.
+
+### 🔴 D1 — kod łamie spisane prawo (NAJWYŻSZY priorytet)
+
+| poz. | dług | zmierzone | od |
+|---|---|---|---|
+| **D1.1** | **Bramka integralności, która zawsze przepuszcza.** `dyrygent.py:961` podaje Hermesowi `hash_ok=True` **na sztywno**, a pole `hash_sha256` ma **ZERO przypisań** w całej bazie kodu. Prawo IX wymienia je jako OBOWIĄZKOWE → **kod łamie własne prawo**. Naprawa zmienia ścieżkę decyzyjną (Hermes zacznie oznaczać dane jako BRUDNE), więc wchodzi **opt-in OFF** — i wymaga **decyzji Cezara** | potwierdzone grepem 2026-08-04 | **2026-07-17** (18 dni) |
+
+### 🔴 D2 — mechanizm zadeklarowany, implementacja zerowa
+
+| poz. | dług | zmierzone | od |
+|---|---|---|---|
+| **D2.1** | **Strażnik pracy bez śladu** (= L3c). CLAUDE.md deklaruje „brak wpisu z dziś = czerwony alarm", grep po hookach/audycie/Dzienniku daje **ZERO** implementacji. Złapane na żywym przypadku: wachta wykonała pełną pracę, wpis nie powstał wcale, **żaden organ nie zauważył** | 2026-08-04 | 2026-06-28 (deklaracja) |
+| **D2.2** | **Klasa „cytat dosłowny KODU"** (= L3d). Dokument bywa wierny nie nazwie, lecz kodowi — żadne świadectwo oparte na symbolach tego nie widzi | 2026-08-04 | 2026-08-04 |
+
+### 🟡 D3 — niewiadome blokujące inne prace
+
+| poz. | niewiadoma | co blokuje | od |
+|---|---|---|---|
+| **D3.1** | **K10 — trafność RAG NIEZNANA.** QUAESITOR pobiegł raz, dał naprawę u źródła (recall@5 16,7 % → 80,0 % na ścieżce MCP), ale zbiór 30 pytań to **0,22 %** zawołań z indeksów | A6 (przepięcie na REDDITORA), prawo do słowa „najlepsza" w NORMIE, A14 (wektory) | 2026-07-30 |
+| **D3.2** | **Czy graf W8 pomaga przy DECYZJI.** `czytelnicy_przy_decyzji: 0`, `kto_przy_decyzji: NIKT` — 234 węzły i 1680 krawędzi karmią pamięć, nie wybór | całe piętro GRAPH stoi na 3/4; bez zbioru A10 nie ma na czym zrobić A/B | 2026-08-02 |
+| **D3.3** | **Precyzja bramki T3 DUBLET** (= L3e). T3 grupuje po `(kategoria, wlasciciel)` — pyta „czy dwa dokumenty wskazują ten sam plik", nie o podobieństwo treści | 10 werdyktów `dublet_rozstrzygniety`, świadomie niewpisanych (klasa K3) | 2026-08-04 |
+| **D3.4** | **LUSTRUM: 24 pozycje klasy ZBADAĆ** nigdy nie zweryfikowane pojedynczo; prawdę podstawową klasy WPIĄĆ ustalił **sam autor klasyfikatora** | wiarygodność wycofywania narzędzi | 2026-08-04 |
+| **D3.5** | **Narzut MCP niezmierzony** (MCP odroczone) | decyzja o soczewkach | 2026-07-15 |
+
+### 🔴 D4 — zapłacone i niewykorzystane (Prawo XV)
+
+| poz. | dług | liczba | od |
+|---|---|---|---|
+| **D4.1** | **Zwiad bez sędziego:** cząstki Hyginusa czekające na werdykt · wizje bez rozstrzygnięcia · sugestie otwarte w CODEX | 37 · 398 · 34 | narasta od 2026-07-21 |
+| **D4.2** | **Księgi poza RAG** (248 na dysku, 115 zaindeksowanych). Przyrost 40 pozycji z 01.08 przeszedł niezauważony — **żadna z 24 warstw audytu nie pilnuje ksiąg** | 133 | 2026-08-02 |
+| **D4.3** | **Otwieramy szybciej, niż zamykamy** — wąskie gardło piętra LOOP. Wskaźnika **nie wpisujemy tu ręcznie**: liczy go `python -m imperium.oczy.maturitas` (ta pozycja rozjechała się z prawdą w ciągu jednej wachty, zanim ktokolwiek zdążył ją przeczytać — dokładnie klasa „liczba rosnąca sama") | czytaj z MATURITASA | trwałe |
+| **D4.4** | **CLAUDE.md 308 linii** przy limicie doktrynalnym 200 — dług kontekstu płacony w KAŻDEJ sesji | +108 | trwałe |
+
+### 🔴 D5 — największa luka strategiczna
+
+| poz. | dług | zmierzone | od |
+|---|---|---|---|
+| **D5.1** | **Zero realnych orderów na MEXC.** PORTITOR melduje `MEXC✗`. Rój jest backtestowany, **nie wdrożony**; pętla P&L → wagi pozostaje NIEZAMKNIĘTA. Efekt latarni: mierzymy to, co tanie, bo drogie jest trudne | 2026-08-04 (hook) | od zawsze |
+| **D5.2** | **Dane rynkowe stare:** 1H sprzed 6,4 dnia, 4H sprzed 6,5 dnia. Nie blokuje pracy nad kodem i dokumentami — **blokuje każdy pomiar na żywych danych** | 2026-08-04 (PORTITOR) | bieżące |
+
+### ⏸️ D6 — odłożone ŚWIADOMIE, z powodem (nie milczeniem)
+
+| poz. | pozycja | powód odłożenia |
+|---|---|---|
+| **D6.1** | CUSTOS LIMINIS — treść heredoca czytana jak polecenie (= G7) | strażnik **ma rację**: zawartość heredoca JEST częścią komendy; naprawa wymagałaby osłabienia strażnika |
+| **D6.2** | Korony B / C / D | ZAMROŻENIE LUSTRATIO — to rozwój, a rozwój czeka na bramkę wyjścia L4 |
+
+> **Uczciwa uwaga o wadze tej listy:** pozycje **D1 i D3.1–D3.2** psują WNIOSKI — na ich
+> podstawie moglibyśmy orzec coś nieprawdziwego. Reszta to niedomknięte pętle: kolejka
+> rośnie, bo mierzymy więcej, niż zamykamy, i to jest stan **zdrowszy** niż cisza, choć
+> wygląda gorzej w tabeli. Jedyna pozycja czekająca **wyłącznie na słowo Cezara** to D1.1.
+
+---
+
 ## 🧹 LUSTRATIO IMPERII — WIELKI PRZEGLĄD (ROZKAZ STAŁY — Cezar 2026-08-04)
 
 > ### ⛔ ZAMROŻENIE ROZWOJU

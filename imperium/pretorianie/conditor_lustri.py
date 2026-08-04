@@ -1,4 +1,13 @@
-"""🏁 CONDITOR LUSTRI — JEDYNA bramka zdejmująca ZAMROŻENIE LUSTRATIO (U1).
+"""🏁 CONDITOR LUSTRI — miernik gotowości Imperium (U1; do 2026-08-05 bramka zamrożenia).
+
+⚠️ **STAN OD 2026-08-05:** Cezar zdjął ZAMROŻENIE LUSTRATIO **decyzją, nie spełnieniem
+kryteriów** — ten organ świecił wtedy 2 spełnione / 2 niespełnione / 3 NIE WIEM. Od tej
+chwili **mierzy, ale nie blokuje**: `--bramka` nadal zwraca kod wyjścia, żeby dało się go
+użyć w skrypcie, lecz nic w Imperium nie jest od niego zależne. Kryteria bez producenta
+(KLASY, KALIBRACJA) **pozostają długiem** i mają być widoczne dopóki go nie spłacimy.
+Organ NIE ZOSTAJE przerobiony na „zielony", bo zamrożenie zniknęło — miernik, który po
+zmianie decyzji politycznej zaczyna raportować sukces, przestaje być miernikiem.
+
 
 Rzymscy cenzorzy kończyli lustrację obrzędem *condere lustrum* — „zamknąć lustrum".
 Dopóki go nie odprawiono, cenzus trwał. Ten organ jest tym obrzędem: odpowiada

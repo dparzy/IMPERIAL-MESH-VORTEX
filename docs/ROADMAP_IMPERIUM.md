@@ -33,6 +33,7 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 | # | zadanie | stan | dlaczego TERAZ |
 |---|---|---|---|
+| **0** | **DOMKNĄĆ BRAMKĘ DO 7/7** — `conditor_lustri` ma świecić zielono **spełnieniem kryteriów**, nie decyzją. Brakuje: TABULARIUM (33 alarmy T2/T3), ETAPY (7 otwartych L0–L3x), **KLASY** (rejestr leków na K1–K4 — nie istnieje), **KALIBRACJA** (rejestr kalibracji organów orzekających — nie istnieje) | 🔴 | **ROZKAZ CEZARA 2026-08-05: „naprawimy to na nowej sesji, aby wszystkie były spełnione".** Zamrożenie zdjęto DECYZJĄ przy czerwonej bramce — dług nie zniknął razem z zakazem |
 | **1** | **BIBLIOTHECA ULPIA — domknięcie biblioteki** (a) 133 księgi poza RAG → zaindeksować, (b) **świeży bieg `aestimator.py`** — ile realnie ginie z tabel, wzorów i wykresów i w których pozycjach, (c) watchdog przyrostu ksiąg (dziś **żadna z 24 warstw audytu nie pilnuje ksiąg**) | 🔴 | **ROZKAZ CEZARA 2026-08-05: „najpierw musimy mieć najlepszą Bibliotekę Ulpia — nazwa zobowiązuje".** *Bibliotheca Ulpia* Trajana była największą biblioteką cesarstwa. Dopóki 133 z 248 ksiąg jest niewidzialnych, każdy zwiad czerpie z połowy zasobu |
 | **1b** | **Organy mają czytać LINKI, WYKRESY, TABELE i ZŁOŻONE WZORY** — dziś każda ścieżka ekstrakcji (`_pdf` PyMuPDF, OCR, epub/mobi/djvu/calibre) daje **płaski tekst**; struktura tabel, wzory i wykresy **nie są odzyskiwane przez ŻADNĄ z nich** | 🔴 | Rozkaz Cezara 08-05: *„aby nic nie ginęło, aby cała wiedza była w 100% zbadana, oceniona, porównana i wybrana"*. **Kolejność: najpierw pomiar AESTIMATOREM, potem wybór technologii** — struktura tabel ≠ wzory ≠ wykresy to trzy różne problemy o trzech różnych kosztach |
 | **2** | **LUDUS MAGNUS P1 — IC dla WSZYSTKICH 87 neuronów** (15 par 4h, walk-forward OOS, PBO/DSR od pierwszego biegu, wynik do CODEX) | 🔴 narzędzia istnieją | **Rozkaz Cezara 2026-08-05.** Ledger ma **4 wyniki IC na 87 neuronów** — skill ~95% roju nigdy nie zmierzony. Bez tego P2–P5 nie mają czego ważyć, a MEXC byłby hazardem |
@@ -217,11 +218,18 @@ będzie produkował rankingi, których nikt nie skonsumuje — czyli powtórzy s
 
 ## 🧹 LUSTRATIO IMPERII — WIELKI PRZEGLĄD (ROZKAZ STAŁY — Cezar 2026-08-04)
 
-> ### ⛔ ZAMROŻENIE ROZWOJU
-> **Dopóki Imperium nie będzie W PEŁNI SKALIBROWANE i w pełni zgodne z zasadami
-> i prawem Imperium — NIE RUSZAMY DALEJ.** Żadnych nowych zdolności, żadnych nowych
-> kierunków. Wolno budować **wyłącznie to, co zamyka wykrytą lukę** albo to, co jest
-> potrzebne, by lukę ZMIERZYĆ.
+> ### ✅ ZAMROŻENIE ZDJĘTE 2026-08-05 — zastąpione rozkazem DELIBERATIO
+> **Cezar:** *„odmrażam oficjalnie, to nic nie daje — tylko teraz, zanim coś zrobimy,
+> musimy dokładnie to przeanalizować: każde zadanie wolniej, ale dokładniej."*
+> **Zdjęte DECYZJĄ, nie spełnieniem kryteriów** — `conditor_lustri` świecił wtedy
+> 2 spełnione / 2 niespełnione / 3 NIE WIEM. Organ zostaje **miernikiem zdrowia**,
+> przestaje być blokadą; kryteria bez producenta **nadal są długiem**.
+> Ograniczeniem nie jest już TEMAT zadania, lecz **głębokość jego analizy** (`CLAUDE.md § DELIBERATIO`).
+> Powód: zamrożenie nie zapobiegło ANI JEDNEJ z wad złapanych 2026-08-05 — wszystkie
+> wzięły się z pośpiechu WEWNĄTRZ dozwolonego zadania, nie z niedozwolonego tematu.
+>
+> *Poniższa treść zostaje jako zapis powodu i przebiegu przeglądu — LUSTRATIO trwa jako
+> program porządkowy, przestaje być zakazem.*
 
 **Słowa Cezara (2026-08-04):** *„jabłko psuje się od środka, a ryba od głowy — dlatego
 nie możemy pozwolić, aby nasze Imperium było robaczywe i zepsute w żadnej z warstw."*
@@ -253,7 +261,7 @@ a milczenie czytamy jako zieleń.** To jest robactwo, o którym mówi rozkaz.
 | L3d | **Klasa nieobjęta ŻADNYM świadectwem: CYTAT DOSŁOWNY KODU** (wykryta pomiarem 2026-08-04). Dokument bywa wierny nie NAZWIE, lecz kodowi — `PAMIEC_ABSOLUTNA.md` podawała `f"{data}_{symbol}_{typ.lower()}.jsonl"`, gdy kod od 2026-07-29 sanityzuje symbol, a rozjazd siedzi w prywatnej `_sciezka`, której dokument nie wymienia z nazwy. **Żaden wariant oparty na symbolach tego nie złapie**; wariant sprzed kalibracji II „trafiał" ten przypadek wyłącznie przez nazwę klasy, czyli z tautologii — utrata tego trafienia jest uczciwsza niż fałszywa zasługa. **Do zbudowania:** świadectwo pytające, czy fragment kodu cytowany w backticku/bloku nadal występuje dosłownie w pliku-właścicielu | 🔴 |
 | **L3c** | 🚨 **STRAŻNIK PRACY BEZ ŚLADU — dziura międzyorganowa** (rozkaz Cezara 2026-08-04: *„musimy mieć zabezpieczenie i weryfikowanie takiej sytuacji, któryś organ musi to wykrywać"*). **Zmierzone tego samego dnia na żywym przypadku:** wachta wykonała pełną pracę w kodzie, a wpis do Dziennika **nie powstał wcale** (komenda padła przed zapisem) — i **żaden organ tego nie zauważył**. CLAUDE.md **deklaruje** „Brak wpisu z dziś = czerwony alarm w podsumowaniu startowym", ale grep po hookach, audycie i Dzienniku daje **ZERO** implementacji: hook startowy woła tylko `dziennik_niesmiertelny nastepny` (drukuje następny krok, nie sprawdza czy poprzedni wpis istnieje). EXACTOR świadomie tego nie bada, bo jego komentarz mówi, że „bramkę, Dziennik i commit sprawdza bramka i audyt" — a **audyt tego nie sprawdza**. Klasyczne K2 (milczenie czytane jako zieleń) + przekazanie odpowiedzialności organowi, który jej nie przyjął. **Do zbudowania:** warstwa audytu / krok hooka porównujący commity wachty z ostatnim wpisem Dziennika — commit merytoryczny bez wpisu = alarm | 🔴 **P0 następnej wachty** |
 | L3b | **Uzupełnienie pozostałych wykrytych braków i luk** — dopiero po komplecie pomiarów | 🔴 |
-| L4 | **Bramka wyjścia** — zdjęcie zamrożenia. **U1 WYKONANE 2026-08-05**: organ `CONDITOR LUSTRI` (`python -m imperium.pretorianie.conditor_lustri --bramka`, 7 kryteriów, +18 testów) zamienia „w pełni skalibrowane" w exit code. Pierwszy pomiar: **1 spełnione / 3 niespełnione / 3 NIE WIEM**. Sam etap L4 domknie się dopiero przy exit 0 — i **zdejmuje zamrożenie CEZAR, nie organ** | 🔴 bramka istnieje, świeci czerwono |
+| L4 | **Bramka wyjścia** ✅ *(zamrożenie zdjęte decyzją Cezara 2026-08-05, przy CZERWONEJ bramce — patrz ramka wyżej)*. **U1 WYKONANE 2026-08-05**: organ `CONDITOR LUSTRI` (`python -m imperium.pretorianie.conditor_lustri --bramka`, 7 kryteriów, +18 testów) zamienia „w pełni skalibrowane" w exit code. Pierwszy pomiar: **1 spełnione / 3 niespełnione / 3 NIE WIEM**. Sam etap L4 domknie się dopiero przy exit 0 — i **zdejmuje zamrożenie CEZAR, nie organ** | 🔴 bramka istnieje, świeci czerwono |
 
 ### Co sprawdzamy przy KAŻDYM organie (checklista bazowa)
 

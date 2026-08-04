@@ -41,24 +41,30 @@ decyzje kierunkowe/nieodwracalne (kasowanie, kapitał, zmiana strategii, koszt).
 
 - **🗺️ PRAWO XVII — ROZPOZNANIE TERENU** — na starcie i przed nowym zadaniem czytasz stan Imperium z KODU, nigdy z pamięci (KROK 0 wykonuje hook startowy). Rozbieżność = STOP i naprawa przed zadaniem. Komendy weryfikacyjne: **`/spojnosc`**.
 
-## ⛔ LUSTRATIO IMPERII — ZAMROŻENIE ROZWOJU (ROZKAZ STAŁY — Cezar 2026-08-04)
+## 🐢 DELIBERATIO — WOLNIEJ, ALE DOKŁADNIE (ROZKAZ STAŁY — Cezar 2026-08-05)
 
-**Dopóki Imperium nie jest W PEŁNI SKALIBROWANE i zgodne z prawem — NIE RUSZAMY DALEJ.**
-Wolno budować wyłącznie to, co **zamyka wykrytą lukę** albo pozwala ją **zmierzyć**.
-Żadnych nowych zdolności ani kierunków, także tych już zatwierdzonych (korony B/C/D czekają).
+**ZAMROŻENIE LUSTRATIO ZDJĘTE oficjalnie 2026-08-05** słowami Cezara: *„odmrażam
+oficjalnie, to nic nie daje — tylko teraz, zanim coś zrobimy, musimy dokładnie to
+przeanalizować: każde zadanie wolniej, ale dokładniej."*
 
-Słowa Cezara: *„jabłko psuje się od środka, a ryba od głowy — nie możemy pozwolić, aby
-Imperium było robaczywe w żadnej z warstw."* Powód zmierzony 2026-08-04: trzy organy,
-trzy dziury tej samej KLASY — **organ, który nie umie powiedzieć „nie wiem", milczy,
-a milczenie czytamy jako zieleń** (LUSTRUM 100% fałszywek na jednym sygnale; 23 dokumenty
-niewidzialne dla bramki GNICIA; 52 wiersze ROADMAP poza pomiarem MATURITASA).
+> ⚠️ **ZDJĘTE DECYZJĄ, NIE SPEŁNIENIEM KRYTERIÓW.** `python -m imperium.pretorianie.conditor_lustri`
+> świecił w chwili zdjęcia **2 spełnione / 2 niespełnione / 3 NIE WIEM**. Organ **zostaje jako
+> MIERNIK ZDROWIA**, przestaje być blokadą — i nie wolno mu przemilczeć, że warunki nie zostały
+> spełnione. Kryteria bez producenta (rejestr klas K1–K4, rejestr kalibracji) **nadal są długiem**.
 
-Kolejność: **L0 LUSTRUM → L1 TABULARIUM → L2 przegląd wszystkich organów wg kategorii
-→ L3 uzupełnienie luk → L4 bramka wyjścia.** Pełny plan, checklista bazowa, checklisty
-per kategoria i siedem uzupełnień (U1–U7): **`docs/ROADMAP_IMPERIUM.md` § LUSTRATIO IMPERII**.
+**Nowy rozkaz zastępuje zamrożenie:** tempo nie jest już ograniczone TEMATEM zadania, lecz
+**głębokością jego analizy**. Przed KAŻDYM zadaniem — także drobnym — powstaje jawna
+**DELIBERATIO**: (1) co dokładnie robimy i czego to dotyka, (2) **czego NIE WIEMY** przed
+startem, (3) czym to **zmierzymy** i co uznamy za sukces, (4) co może pójść źle i jak to
+wykryjemy, (5) czy to **już istnieje** (CODEX + kod + kronika + Dziennik).
 
-**Złamanie:** rozpoczęcie zadania rozwojowego przed zdjęciem zamrożenia; zamknięcie pozycji
-przeglądu bez pomiaru; znalezisko bez naprawy albo bez wpisu z terminem.
+**Powód, dla którego to zastępuje zamrożenie, a nie tylko je znosi:** zamrożenie ograniczało
+*co* wolno robić i nie zapobiegło ANI JEDNEJ z wad złapanych 2026-08-05 (kolumna stanu poza
+pomiarem MATURITASA, cztery liczby-widma, kolizja prefiksu `D`, niepełna poprawka daty).
+Wszystkie wzięły się z **pośpiechu wewnątrz dozwolonego zadania**, nie z niedozwolonego tematu.
+
+**Złamanie:** rozpoczęcie zadania bez DELIBERATIO; „zmierzę to później"; ogłoszenie działania
+przed pomiarem (LEX TALARUS); zamknięcie pozycji bez dowodu.
 
 ## 🚨 PRAWO XV — CZERWONY ALARM UTRATY POTENCJAŁU (ROZKAZ STAŁY)
 

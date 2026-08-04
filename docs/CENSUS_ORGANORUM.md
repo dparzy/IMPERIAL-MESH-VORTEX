@@ -244,7 +244,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | Moduł | Rola (docstring modułu) |
 |-------|--------------------------|
 | `aegis_tarcza.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
-| `conditor_lustri.py` | 🏁 CONDITOR LUSTRI — JEDYNA bramka zdejmująca ZAMROŻENIE LUSTRATIO (U1) |
+| `conditor_lustri.py` | 🏁 CONDITOR LUSTRI — miernik gotowości Imperium (U1; do 2026-08-05 bramka zamrożenia) |
 | `custos_liminis.py` | 🚧 CUSTOS LIMINIS — Strażnik Progu: bariera PRZED zadziałaniem narzędzia (PreToolUse) |
 | `exactor.py` | 🪙 EXACTOR RENUNTIATIONIS — egzekwuje, czy MELDUNEK KOŃCOWY spłaca checklistę |
 | `filtr_asymetrii.py` | Filtr Asymetrii Reżimu (W-314) — brama wejścia oparta na trendzie i jego sile |

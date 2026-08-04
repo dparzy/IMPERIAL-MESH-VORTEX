@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: narzedzia/census_organorum.py
-stan_na: 2026-08-04
+stan_na: 2026-08-05
 powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem"
 ---
 # 🏛️ CENSUS ORGANORUM — spis organów i narzędzi Imperium
@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 263** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 264** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -244,6 +244,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | Moduł | Rola (docstring modułu) |
 |-------|--------------------------|
 | `aegis_tarcza.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
+| `conditor_lustri.py` | 🏁 CONDITOR LUSTRI — JEDYNA bramka zdejmująca ZAMROŻENIE LUSTRATIO (U1) |
 | `custos_liminis.py` | 🚧 CUSTOS LIMINIS — Strażnik Progu: bariera PRZED zadziałaniem narzędzia (PreToolUse) |
 | `exactor.py` | 🪙 EXACTOR RENUNTIATIONIS — egzekwuje, czy MELDUNEK KOŃCOWY spłaca checklistę |
 | `filtr_asymetrii.py` | Filtr Asymetrii Reżimu (W-314) — brama wejścia oparta na trendzie i jego sile |

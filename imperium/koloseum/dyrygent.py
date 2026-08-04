@@ -106,7 +106,18 @@ class Dyrygent:
         drift_adapter: Optional[Any] = None,
         rada_doradcow: Optional[Any] = None,
         filtr_asymetrii: bool = False,
+        weryfikuj_integralnosc: bool = False,
     ) -> None:
+        # D1.1 (2026-08-05) — OPT-IN, DOMYŚLNIE OFF (ZASADA WPIĘCIA W ŚCIEŻKĘ DECYZYJNĄ).
+        # Do dziś Hermes dostawał `hash_ok` jako STAŁĄ prawdziwą: bramka integralności, która
+        # nie mogła zapalić się NIGDY — martwy głos udający bezpiecznik (Prawo XV), przy
+        # polu `hash_sha256` z zerem przypisań. Włączenie ZMIENIA ścieżkę decyzyjną (Hermes
+        # zacznie orzekać NIEKOMPLETNE przy naruszonym odcisku), więc wchodzi wyłączone
+        # i czeka na zielone A/B — tak samo jak każda inna zmiana dotykająca wejścia w pozycję.
+        self.weryfikuj_integralnosc = weryfikuj_integralnosc
+        # Odcisk wskaźników z chwili ICH POLICZENIA. `None` = jeszcze nie liczono w tej
+        # świecy; wtedy weryfikacja nie ma czego porównać i mówi to wprost (patrz niżej).
+        self._odcisk_wskaznikow: Optional[str] = None
         self.legatus = legatus
         self.kalkulator = kalkulator
         self.engine = engine
@@ -886,7 +897,46 @@ class Dyrygent:
                 adapter.wzbogac(wskazniki, symbol)
             except Exception as e:
                 logger.warning(f"[Dyrygent] adapter {getattr(adapter, 'NAZWA', '?')} pominięty: {e}")
+
+        # D1.1: odcisk bierzemy PO adapterach, bo to ten komplet idzie do neuronów i do Rady.
+        # Liczony ZAWSZE, także przy fladze OFF — inaczej włączenie weryfikacji w locie
+        # zastałoby `None` i pierwsza świeca po włączeniu orzekłaby BRUDNE bez powodu.
+        # Koszt to jeden sha256 na świecę; cena za to, żeby flaga nie miała skutku ubocznego.
+        self._odcisk_wskaznikow = self.odcisk_wskaznikow(wskazniki)
         return wskazniki
+
+    @staticmethod
+    def odcisk_wskaznikow(wskazniki: Dict[str, Any]) -> str:
+        """Odcisk SHA-256 kompletu wskaźników — to, na czym Imperium podejmuje decyzję.
+
+        `sort_keys=True` obowiązkowe: słownik wskaźników bywa budowany w różnej kolejności
+        (Budowniczy, potem adaptery), a odcisk ma świadczyć o TREŚCI, nie o kolejności
+        wstawiania — inaczej weryfikacja krzyczałaby przy każdej świecy.
+        """
+        import hashlib
+        import json
+
+        payload = json.dumps(wskazniki, sort_keys=True, ensure_ascii=False, default=str)
+        return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+    def _integralnosc_wskaznikow(self, wskazniki: Dict[str, Any]) -> bool:
+        """Czy komplet wskaźników jest tym samym, co po policzeniu (D1.1, Prawo IX).
+
+        **Przy fladze OFF zwraca `True` — dokładnie dzisiejsze zachowanie**, żeby wpięcie
+        nie zmieniło ani jednej decyzji, dopóki A/B tego nie potwierdzi. Różnica wobec stanu
+        sprzed naprawy jest taka, że zgoda przestała być literałem: jest gałęzią, która
+        NAZYWA swoje założenie i którą da się włączyć jednym argumentem.
+
+        Przy fladze ON brak odcisku odniesienia daje **`False`, nie `True`** — nie mając
+        czego porównać, nie wolno orzec „czyste" (brak dowodu ≠ dowód niewinności).
+        """
+        if not self.weryfikuj_integralnosc:
+            return True
+        if self._odcisk_wskaznikow is None:
+            logger.warning("[Dyrygent] weryfikacja integralności bez odcisku odniesienia "
+                           "— orzekam BRUDNE (brak dowodu nie jest dowodem)")
+            return False
+        return self.odcisk_wskaznikow(wskazniki) == self._odcisk_wskaznikow
 
     def _opinia_rady(self, wskazniki: Dict[str, Any], raport, plan,
                      kierunek: str, interwal: str, rezim: str):
@@ -958,7 +1008,7 @@ class Dyrygent:
             kompletnosc_danych=round(kompletne, 3),
             interwal_minut=interwal_min,
             wiek_danych_minut=1,   # bieżący bar = tylko co obliczony
-            hash_ok=True,
+            hash_ok=self._integralnosc_wskaznikow(wskazniki),
             vpin=vpin_val,
         ))
 

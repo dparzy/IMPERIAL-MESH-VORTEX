@@ -43,7 +43,7 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 | poz. | dług | zmierzone | od |
 |---|---|---|---|
-| **D1.1** | **Bramka integralności, która zawsze przepuszcza.** `dyrygent.py:961` podaje Hermesowi `hash_ok=True` **na sztywno**, a pole `hash_sha256` ma **ZERO przypisań** w całej bazie kodu. Prawo IX wymienia je jako OBOWIĄZKOWE → **kod łamie własne prawo**. Naprawa zmienia ścieżkę decyzyjną (Hermes zacznie oznaczać dane jako BRUDNE), więc wchodzi **opt-in OFF** — i wymaga **decyzji Cezara** | potwierdzone grepem 2026-08-04 | **2026-07-17** (18 dni) |
+| **D1.1** ✅ | **SPŁACONE 2026-08-05** (19 dni długu). `policz_hash`/`zweryfikuj` + wypełnianie pola w `zapisz()`; w Dyrygencie literał zastąpiony `_integralnosc_wskaznikow()` — **opt-in OFF**, więc przy wyłączonej fladze ani jedna decyzja się nie zmienia. Dwie granice „braku dowodu" pilnowane testami: rekord bez hasza → `False`, weryfikacja bez odcisku → BRUDNE. **Czeka na A/B przed włączeniem.** Opis wady poniżej zostaje jako historia: ~~**Bramka integralności, która zawsze przepuszcza.** `dyrygent.py:961` podaje Hermesowi `hash_ok=True` **na sztywno**, a pole `hash_sha256` ma **ZERO przypisań** w całej bazie kodu. Prawo IX wymienia je jako OBOWIĄZKOWE → **kod łamie własne prawo**. Naprawa zmienia ścieżkę decyzyjną (Hermes zacznie oznaczać dane jako BRUDNE), więc wchodzi **opt-in OFF** — i wymaga **decyzji Cezara** ~~ | naprawione i otestowane 2026-08-05 | **2026-07-17** → spłacone po 19 dniach |
 
 ### 🔴 D2 — mechanizm zadeklarowany, implementacja zerowa
 
@@ -88,7 +88,84 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 > **Uczciwa uwaga o wadze tej listy:** pozycje **D1 i D3.1–D3.2** psują WNIOSKI — na ich
 > podstawie moglibyśmy orzec coś nieprawdziwego. Reszta to niedomknięte pętle: kolejka
 > rośnie, bo mierzymy więcej, niż zamykamy, i to jest stan **zdrowszy** niż cisza, choć
-> wygląda gorzej w tabeli. Jedyna pozycja czekająca **wyłącznie na słowo Cezara** to D1.1.
+> wygląda gorzej w tabeli. D1.1 było jedyną pozycją czekającą wyłącznie na słowo Cezara —
+> **słowo padło 2026-08-05 i dług został spłacony**; teraz czeka już tylko na A/B przed
+> włączeniem flagi, bo dotyka ścieżki decyzyjnej.
+
+---
+
+## 🏟️ LUDUS MAGNUS — SZKOŁA GLADIATORÓW (ROZKAZ CEZARA 2026-08-05)
+
+> **Rzymski *Ludus Magnus* stał tuż przy Koloseum: gladiator nie wchodził na arenę,
+> dopóki nie przeszedł szkoły.** Cezar odrzucił podpięcie MEXC pytaniem, na które nie
+> mieliśmy odpowiedzi: *„skąd wiemy, czy neurony są dobrze zbudowane i czy głosują dobrze?
+> Kto im dał wzorce? Skąd wiemy, że legiony są zdrowe i że ostateczna decyzja jest właściwa,
+> skoro strategie mamy tylko w szkicach?"* — **mamy 15 par z kilku lat i 63 pliki CSV**
+> (4h · 15m · 5m · godzinowe · dzienne · minutowe), więc rój szkolimy i mierzymy na historii.
+
+**Zmierzone 2026-08-05, gdy padły te pytania:**
+
+| pytanie Cezara | co odpowiada KOD |
+|---|---|
+| „czy głosują dobrze" | ledger ma **4 wyniki IC na 87 neuronów** — skill ~95% roju nigdy nie zmierzony |
+| „kto nimi steruje" | wagi reżimowe **wpisane ręcznie**; jedyny mechanizm uczenia (`ucz_mwu`) zmierzony jako **SZKODLIWY** i wyłączony |
+| „czy strategia właściwa" | MANIFEST sam mówi: 20 strategii, **„status SZKIC — przepisy, nie zwalidowane"** |
+| „czy skalibrowane" | kryterium KALIBRACJA w CONDITOR LUSTRI świeci **NIE WIEM** — rejestr nie istnieje |
+| „ocena źródeł news" | `WIARYGODNOSC_ZRODEL` to **6 liczb wpisanych ręcznie** — zgadywanie udające wiarygodność |
+
+### Kolejność ZATWIERDZONA PRZEZ CEZARA: **P1 → P5 → P3**
+
+> ⚠️ **LISTA OTWARTA (Cezar 2026-08-05: „ludus magnus później będziemy rozbudowywać jeszcze").**
+> Poniższa tabela to **szkielet startowy, nie komplet** — kolejne etapy DOPISUJEMY, nie
+> zastępujemy istniejących. Kolejność P1→P5→P3 obowiązuje, dopóki Cezar jej nie zmieni.
+
+| # | etap | odpowiada na pytanie | narzędzie |
+|---|---|---|---|
+| **P1** | **IC dla WSZYSTKICH 87 neuronów** — 15 par 4h, walk-forward OOS, wynik do CODEX | „czy głosują dobrze" | `narzedzia/raport_ic.py`, `narzedzia/walk_forward_ic.py` — **istnieją, użyte 4×** | 
+| **P5** | **Wiarygodność źródeł MIERZONA** — 6 ręcznych liczb → skuteczność na historii (czy ostrzegało i z jakim wyprzedzeniem) | lista zaufanych źródeł | NEWS-05 + archiwum kanałów |
+| **P3** | **Walidacja 20 strategii** — SZKIC → zmierzone | „czy strategia właściwa" | backtest + DSR + PBO |
+| P2 | Dekorelacja całego roju (martwe głosy, dublety) | „czy legiony zdrowe" | `diagnostyka_korelacji` (Prawo XVI) |
+| P4 | Rejestr kalibracji (organ bez wpisu = nieskalibrowany) | domyka bramkę wyjścia | — |
+| P6 | **MEXC dopiero na końcu**: paper → grosze → skala | | |
+
+### 🎪 EDITOR MUNERIS — organ układający PROGRAM igrzysk (wizja Cezara 2026-08-05)
+
+**Słowa Cezara:** *„musimy mieć organ, który będzie nam wymyślał najlepsze testy, wymyślne
+igrzyska — będzie poddawał próbom wszystkie bary, różne interwały na różnych parach, wszystkie
+możliwe neurony w różnych ustawieniach: pojedynczo, w parach, i również strategie; wymyślał
+najlepsze miksy. I za każdym razem system, dzięki najlepszym systemom anty-przeuczenia, będzie
+się sam uczył. A gdy zbudujemy największą bibliotekę wiedzy — będzie z niej czerpał do nauki."*
+
+**Nazwa (ZASADA NOMENKLATURY):** rzymski *editor muneris* układał PROGRAM igrzysk i decydował
+o parach gladiatorów — nie walczył i nie sędziował. Trening i rankingi mamy w `igrzyska.py`
+(LANISTA), sędziowanie w `walidacja.py`; brakuje **tego, kto decyduje, kto z kim staje**.
+
+> 🔒 **ZASADA NIENARUSZALNA — LICZBA PRÓB JEST SKŁADNIKIEM WERDYKTU, NIE JEGO TŁEM.**
+> „Wszystkie możliwe ustawienia" jest niewykonalne kombinatorycznie (same pary z 87 neuronów
+> to **3 741 kombinacji × ~90 zbiorów** par/interwałów ≈ **337 tys. biegów**), ale groźniejsze
+> jest co innego: **im więcej prób, tym pewniejsze, że najlepszy wynik jest dziełem przypadku.**
+> Deflated Sharpe Ratio istnieje dokładnie po to — deflacja NALEŻY do liczby prób. Organ
+> przeszukujący bez budżetu i bez zapisu liczby prób **unieważnia własne wyniki**.
+
+**Konstrukcja wynikająca z tej zasady:** sekwencyjny **plan doświadczeń z budżetem prób**
+zamiast przeszukiwania wyczerpującego · każda próba w ledgerze append-only · licznik prób
+**zasila DSR/PBO** · purged-CV od pierwszego biegu · wiedza z biblioteki wchodzi jako
+**priorytet kolejnych prób** (co sprawdzić najpierw), nigdy jako uzasadnienie wyniku.
+
+**Warunek wstępny, nie skutek:** pętla areny jest dziś ROZWARTA (`ucz_mwu = False`, bo
+zmierzono, że SZKODZI: −0,6/−0,5 pp, PBO ~0,6). EDITOR MUNERIS bez domkniętej pętli do wag
+będzie produkował rankingi, których nikt nie skonsumuje — czyli powtórzy stan obecny, tylko drożej.
+
+> ⚠️ **ZASTRZEŻENIE OBOWIĄZUJĄCE OD PIERWSZEGO BIEGU P1:** arena strojona wielokrotnie na
+> tych samych 15 parach zaczyna mierzyć **własne dopasowanie, nie rynek**. PBO, DSR
+> i purged-CV chodzą **od początku**, nie na końcu — inaczej zbudujemy arenę, która
+> wygrywa wyłącznie z przeszłością.
+
+> 📕 **KLASA WADY ZNALEZIONA PRZY OKAZJI:** **U2** niżej nakazuje „kolejność wg RYZYKA, nie
+> alfabetu — najpierw ścieżka decyzyjna, potem przyrządy orzekające, **na końcu dokumentacja**".
+> Trzy wachty z rzędu robiły dokumenty i bramki, czyli **ostatnią pozycję tej listy**. Rozkaz
+> Cezara nie zmienia kursu — **przywraca kolejność, którą sami zapisaliśmy i której nie
+> wykonywaliśmy**.
 
 ---
 
@@ -120,7 +197,7 @@ a milczenie czytamy jako zieleń.** To jest robactwo, o którym mówi rozkaz.
 
 | # | Etap | Stan |
 |---|---|---|
-| L0 | **LUSTRUM** — dokończyć: testy + kalibracja progu na prawdzie podstawowej | 🟡 kod stoi, brak testów i kalibracji |
+| L0 | **LUSTRUM** — testy ✅ (24 w `tests/test_lustrum.py`) i kalibracja ✅ (pięć świadectw zamiast jednego sygnału). **Zostaje granica kalibracji (= D3.4):** prawdę podstawową klasy WPIĄĆ ustalił sam autor klasyfikatora (klasa K3), a 24 pozycje klasy ZBADAĆ nie były weryfikowane pojedynczo. ⚠️ Ten wiersz mówił „brak testów i kalibracji" jeszcze 2026-08-05, gdy jedno i drugie istniało od doby — **dokument o przeglądzie gnicia sam zgnił**, złapane przez CONDITOR LUSTRI | 🟡 granica kalibracji |
 | L1 | **TABULARIUM — MECHANIZM** ✅ (2026-08-04): błędy **23 → 0**. Naprawiona sprzeczność „`—` znaczy brak, a bramka żąda wartości"; nowe bramki **T1b** (właściciel albo jawny `bez_wlasciciela`, z zakazem wyciszania dla TABULA/FORMA/MENSURA), **T2b** (zegar 90 dni dla dokumentów bez właściciela — brak kodu ≠ brak kontroli) i **filtr gita** (plik spoza kontroli wersji nie jest dokumentem Imperium, Prawo XIX). 22 dokumenty uporządkowane, właściciel-widmo `schola` naprawiony, +10 testów | ✅ |
 | L2 | **Przegląd WSZYSTKICH organów** wg kategorii, wykonalności, zadań, piętra ewolucji i **wzajemnej współpracy** — checklisty kontrolne per kategoria. Wchodzi tu **L2a** (mapa współpracy) i **L2b** (taksonomia pięter — WYKONANE) | 🟡 w toku |
 | **L3** | **PRZEGLĄDY TREŚCI — ZACZĘTE OD KALIBRACJI PRZYRZĄDU** (2026-08-04, decyzja Cezara „wg rekomendacji"). Zamiast odhaczać 26 pozycji po kolei, **zmierzono najpierw sam sygnał** na zamrożonej próbce 6 (ziarno 20260804, etykiety z pełnej treści + diffów): **precyzja werdyktu 33%** (2/6), **precyzja przyczyny 0/6**. Oba prawdziwe gnicia brały się z **liczb rosnących SAME** (fragmenty RAG, sesje kroniki) — niewidzialnych dla bramki opartej na commitach. **Zrobione:** naprawa u źródła (klucz `sesje_kroniki` + `sesje_w_kronice()`, zaszyte liczby → znaczniki W15) w MAPA_PAMIECI i PLAN_TIRO; **drugie świadectwo** `python narzedzia/tabularium.py swiadectwa` dzieli 26 alarmów na **9 MOCNYCH / 17 SŁABYCH** (zgodność z próbką 6/6, próg pospolitości <5 plików). **Kalibracja II (L3a, ten sam dzień)** przeetykietowała wszystkie MOCNE prawdą podstawową i wymieniła mechanizm — dziś **4 MOCNE / 20 SŁABYCH** z 24. **Zostaje:** 4 przeglądy MOCNYCH + 11× T3 DUBLET + 20 SŁABYCH okazjonalnie | 🟡 **przyrząd skalibrowany dwukrotnie, kolejka posortowana** |
@@ -130,7 +207,7 @@ a milczenie czytamy jako zieleń.** To jest robactwo, o którym mówi rozkaz.
 | L3d | **Klasa nieobjęta ŻADNYM świadectwem: CYTAT DOSŁOWNY KODU** (wykryta pomiarem 2026-08-04). Dokument bywa wierny nie NAZWIE, lecz kodowi — `PAMIEC_ABSOLUTNA.md` podawała `f"{data}_{symbol}_{typ.lower()}.jsonl"`, gdy kod od 2026-07-29 sanityzuje symbol, a rozjazd siedzi w prywatnej `_sciezka`, której dokument nie wymienia z nazwy. **Żaden wariant oparty na symbolach tego nie złapie**; wariant sprzed kalibracji II „trafiał" ten przypadek wyłącznie przez nazwę klasy, czyli z tautologii — utrata tego trafienia jest uczciwsza niż fałszywa zasługa. **Do zbudowania:** świadectwo pytające, czy fragment kodu cytowany w backticku/bloku nadal występuje dosłownie w pliku-właścicielu | 🔴 |
 | **L3c** | 🚨 **STRAŻNIK PRACY BEZ ŚLADU — dziura międzyorganowa** (rozkaz Cezara 2026-08-04: *„musimy mieć zabezpieczenie i weryfikowanie takiej sytuacji, któryś organ musi to wykrywać"*). **Zmierzone tego samego dnia na żywym przypadku:** wachta wykonała pełną pracę w kodzie, a wpis do Dziennika **nie powstał wcale** (komenda padła przed zapisem) — i **żaden organ tego nie zauważył**. CLAUDE.md **deklaruje** „Brak wpisu z dziś = czerwony alarm w podsumowaniu startowym", ale grep po hookach, audycie i Dzienniku daje **ZERO** implementacji: hook startowy woła tylko `dziennik_niesmiertelny nastepny` (drukuje następny krok, nie sprawdza czy poprzedni wpis istnieje). EXACTOR świadomie tego nie bada, bo jego komentarz mówi, że „bramkę, Dziennik i commit sprawdza bramka i audyt" — a **audyt tego nie sprawdza**. Klasyczne K2 (milczenie czytane jako zieleń) + przekazanie odpowiedzialności organowi, który jej nie przyjął. **Do zbudowania:** warstwa audytu / krok hooka porównujący commity wachty z ostatnim wpisem Dziennika — commit merytoryczny bez wpisu = alarm | 🔴 **P0 następnej wachty** |
 | L3b | **Uzupełnienie pozostałych wykrytych braków i luk** — dopiero po komplecie pomiarów | 🔴 |
-| L4 | **Bramka wyjścia** — zdjęcie zamrożenia (wymaga U1: mierzalnego warunku) | 🔴 |
+| L4 | **Bramka wyjścia** — zdjęcie zamrożenia. **U1 WYKONANE 2026-08-05**: organ `CONDITOR LUSTRI` (`python -m imperium.pretorianie.conditor_lustri --bramka`, 7 kryteriów, +18 testów) zamienia „w pełni skalibrowane" w exit code. Pierwszy pomiar: **1 spełnione / 3 niespełnione / 3 NIE WIEM**. Sam etap L4 domknie się dopiero przy exit 0 — i **zdejmuje zamrożenie CEZAR, nie organ** | 🔴 bramka istnieje, świeci czerwono |
 
 ### Co sprawdzamy przy KAŻDYM organie (checklista bazowa)
 
@@ -227,9 +304,14 @@ Zmierzone 2026-08-04 (import z drzewa składniowego, nie regex): **261 organów,
 
 Rozkaz kazał sprawdzić, czym go uzupełnić. Siedem pozycji, każda z powodem:
 
-- **U1 — MIERZALNY WARUNEK WYJŚCIA.** „W pełni skalibrowane" bez liczby jest stanem
-  niefalsyfikowalnym: zamrożenie albo nigdy się nie skończy, albo skończy się arbitralnie.
-  Potrzebna JEDNA bramka zwracająca exit 0 dopiero przy komplecie kryteriów.
+- ✅ **U1 — MIERZALNY WARUNEK WYJŚCIA (WYKONANE 2026-08-05).** „W pełni skalibrowane" bez
+  liczby jest stanem niefalsyfikowalnym: zamrożenie albo nigdy się nie skończy, albo skończy
+  się arbitralnie. Zbudowany organ **CONDITOR LUSTRI** — jedna bramka, exit 0 dopiero przy
+  komplecie siedmiu kryteriów, `NIE WIEM` blokuje tak samo jak `NIE`.
+  **Dwa kryteria nie mają jeszcze producenta i to one są realnym warunkiem odmrożenia:**
+  rejestr klas K1–K4 (czy lek WDROŻONY, nie tylko nazwany) i rejestr kalibracji organów
+  orzekających. Ocena ryzyka przekazana Cezarowi: groźniejsze od przedwczesnego odmrożenia
+  jest zamrożenie bez licznika — po jego drugiej stronie leży D5.1 (zero realnych orderów).
 - **U2 — KOLEJNOŚĆ WG RYZYKA, NIE ALFABETU.** „Ryba psuje się od głowy" — głową jest to,
   co decyduje o kapitale. Najpierw ścieżka decyzyjna (wejście/wyjście z pozycji), potem
   przyrządy orzekające, na końcu dokumentacja.

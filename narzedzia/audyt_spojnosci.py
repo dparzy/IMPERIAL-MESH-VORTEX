@@ -74,6 +74,34 @@ def _istnieje(sciezka: str) -> bool:
     return os.path.exists(os.path.join(ROOT, sciezka))
 
 
+def _data_commitu_pliku(sciezka_rel: str):
+    """Data ostatniego commitu DOTYCZĄCEGO TEGO pliku (`date`) albo `None`.
+
+    Celowo pyta o pojedynczy plik, a nie o repo: „ostatni commit repozytorium" przesuwa się
+    od cudzej pracy (u nas: auto-commitów pamięci z hooka), więc dokument dostawałby alarm
+    za zmianę, której nie było. W6b robi to hurtem dla `docs/`; tu potrzebne są dwa pliki,
+    w tym `README.md` z korzenia, którego tamten skan nie obejmuje — źródłem prawdy w obu
+    miejscach jest ten sam git, nie druga arytmetyka.
+
+    `encoding="utf-8"` obowiązkowe — bez niego wyjście gita dekoduje się kodowaniem konsoli
+    Windows i pierwszy plik z polską literą w nazwie cicho wywraca odczyt (klasa z 2026-07-17).
+    """
+    import subprocess
+    try:
+        out = subprocess.run(["git", "log", "-1", "--format=%cd", "--date=short",
+                              "--", sciezka_rel],
+                             capture_output=True, text=True, timeout=10,
+                             cwd=ROOT, encoding="utf-8", errors="replace")
+    except Exception:      # noqa: BLE001 — brak gita nie może wywalić audytu
+        return None
+    if out.returncode != 0 or not out.stdout.strip():
+        return None
+    try:
+        return date.fromisoformat(out.stdout.strip())
+    except ValueError:
+        return None
+
+
 def audyt() -> tuple:
     """Zwraca (bledy: list, info: list)."""
     bledy = []
@@ -265,20 +293,20 @@ def audyt() -> tuple:
         # bez commitu (data dokumentu = data ostatniej zmiany = poprawna, ale „starsza niż
         # dziś"). Teraz: doc-date musi nadążać za ostatnią ZMIANĄ (commitem), nie za zegarem.
         # To wciąż łapie prawdziwą niespójność: kod zmieniony (nowy commit) + stara data → alarm.
-        import subprocess
-        ref = date.today()
-        try:
-            _out = subprocess.run(["git", "log", "-1", "--format=%cd", "--date=short"],
-                                  capture_output=True, text=True, timeout=5,
-                                  encoding="utf-8", errors="replace")
-            if _out.returncode == 0 and _out.stdout.strip():
-                ref = date.fromisoformat(_out.stdout.strip())
-        except Exception:  # noqa: BLE001 — brak gita → fallback na dziś
-            pass
+        # NAPRAWA II (2026-08-05): odniesieniem jest ostatni commit TEGO DOKUMENTU,
+        # nie całego repo. Powód zmierzony: hook końca sesji robi commity `auto: sync
+        # pamięci sesji` dotykające WYŁĄCZNIE kroniki i wizji — a one przesuwały `ref`
+        # dla MANIFEST i README, które nikt nie ruszał. Bramka czerwieniła się od pracy
+        # własnego hooka, czyli uczyła Architekta lekceważyć czerwień (odwrotność klasy K2).
+        # Ta sama zasada, którą W6b niżej ma opisaną w komentarzu od 2026-07-16 — MANIFEST
+        # i README były jedynymi dwoma dokumentami wciąż sądzonymi per-repo.
+        # Pytanie „czy dokument nadąża za KODEM" nie ginie: zadaje je bramka T2 Tabularium,
+        # ostrzej (po commitach WŁAŚCICIELA), i oba dokumenty jej podlegają.
         TOLERANCJA_DNI = 2
 
         for doc_path, label in [("docs/MANIFEST_KODU.md", "MANIFEST"), ("README.md", "README")]:
             doc = _czytaj(doc_path)
+            ref = _data_commitu_pliku(doc_path) or date.today()
             # Tolerancja markdown: '**Stan na:** 2026-06-03' (gwiazdki/spacje przed datą)
             m = re.search(r"Stan na:\s*\**\s*(\d{4}-\d{2}-\d{2})", doc)
             if m:
@@ -286,8 +314,8 @@ def audyt() -> tuple:
                 delta = (ref - doc_date).days
                 if delta > TOLERANCJA_DNI:
                     bledy.append(
-                        f"[W6] {label} 'Stan na:' = {m.group(1)} — "
-                        f"starsze o {delta} dni niż ostatni commit ({ref}). Zaktualizuj po zmianie."
+                        f"[W6] {label} 'Stan na:' = {m.group(1)} — starsze o {delta} dni niż "
+                        f"ostatnia zmiana TEGO dokumentu ({ref}). Zaktualizuj po zmianie."
                     )
             else:
                 bledy.append(
@@ -960,6 +988,42 @@ def _warstwa_19_parytet_dat():
     return bledy, info
 
 
+def _para_najblizsza(nadmiar, brak):
+    """Para (wiersz_z_pliku, wiersz_z_generatora) o NAJDŁUŻSZYM wspólnym początku.
+
+    Po co: gdy katalog rozjeżdża się w jednej kolumnie, ten sam wiersz trafia do obu list.
+    Bez sparowania komunikat pokazuje dwa razy to samo i ukrywa różnicę. Wspólny prefiks
+    jest tu wystarczającą miarą podobieństwa, bo wiersze katalogu zaczynają się od ścieżki
+    dokumentu — a to ona identyfikuje wiersz.
+    """
+    if not nadmiar or not brak:
+        return None
+    najlepsza, najdluzszy = None, -1
+    for a in nadmiar:
+        for b in brak:
+            wspolny = 0
+            for za, zb in zip(a, b):
+                if za != zb:
+                    break
+                wspolny += 1
+            if wspolny > najdluzszy:
+                najlepsza, najdluzszy = (a, b), wspolny
+    # Zero wspólnych znaków = to nie jest ten sam wiersz w dwóch wersjach, tylko dwie
+    # różne pozycje. Wtedy parowanie wprowadzałoby w błąd i wracamy do listy „dopisane/brakujące".
+    return najlepsza if najdluzszy > 0 else None
+
+
+def _fragmenty_roznicy(a, b, kontekst=20, okno=70):
+    """Oba wiersze przycięte tak, żeby PIERWSZA RÓŻNICA była widoczna."""
+    i = 0
+    for za, zb in zip(a, b):
+        if za != zb:
+            break
+        i += 1
+    start = max(0, i - kontekst)
+    return a[start:start + okno], b[start:start + okno]
+
+
 def _warstwa_20_katalog_nietkniety():
     """W20 — sekcja katalogu w INDEKS musi być tym, co generuje Tabularium.
 
@@ -1008,6 +1072,7 @@ def _warstwa_20_katalog_nietkniety():
 
     def istotne(tekst):
         """Wiersze niosące treść katalogu: nagłówki sekcji i wiersze tabeli."""
+        # (helpery różnicy niżej — patrz _para_najblizsza / _fragmenty_roznicy)
         return [w.strip() for w in tekst.splitlines()
                 if w.startswith("### ") or (w.startswith("|") and "Ostatni spis" not in w)]
 
@@ -1019,10 +1084,25 @@ def _warstwa_20_katalog_nietkniety():
     nadmiar = [w for w in w_pliku if w not in z_kodu]
     brak = [w for w in z_kodu if w not in w_pliku]
     szczegol = []
-    if nadmiar:
-        szczegol.append(f"dopisane ręcznie ({len(nadmiar)}): {nadmiar[0][:90]}")
-    if brak:
-        szczegol.append(f"brakujące ({len(brak)}): {brak[0][:90]}")
+
+    # POKAZUJEMY MIEJSCE RÓŻNICY, NIE POCZĄTEK WIERSZA (naprawa 2026-08-05).
+    # Wada zmierzona na żywym przypadku: wiersze katalogu różniły się OSTATNIĄ kolumną
+    # („Stan na"), a komunikat ucinał je po 90 znakach — więc ta sama linia stała
+    # jednocześnie jako „dopisana ręcznie" i „brakująca", a różnica była niewidoczna.
+    # Przyrząd raportujący realny rozjazd w sposób, który go ukrywa, uczy operatora
+    # ignorować siebie (klasa „przyrząd kłamie”) i kosztował grep przy każdym alarmie.
+    para = _para_najblizsza(nadmiar, brak)
+    if para:
+        w_pliku_frag, z_kodu_frag = _fragmenty_roznicy(*para)
+        szczegol.append(f"wiersz różni się w pliku: „…{w_pliku_frag}” "
+                        f"vs generator: „…{z_kodu_frag}”")
+        if len(nadmiar) > 1 or len(brak) > 1:
+            szczegol.append(f"razem {len(nadmiar)} dopisanych ręcznie / {len(brak)} brakujących")
+    else:
+        if nadmiar:
+            szczegol.append(f"dopisane ręcznie ({len(nadmiar)}): {nadmiar[0][:90]}")
+        if brak:
+            szczegol.append(f"brakujące ({len(brak)}): {brak[0][:90]}")
     if not szczegol:          # te same wiersze, inna KOLEJNOŚĆ (zła sekcja / złe sortowanie)
         szczegol.append("te same wiersze w innej kolejności lub sekcji")
     return [("[W20] Katalog w INDEKS_IMPERIUM.md rozjechał się z generatorem — "

@@ -775,3 +775,57 @@ def test_audyt_w19_data_zdarzenia_w_prozie_nie_jest_deklaracja_swiezosci(monkeyp
                      "2026-07-17")
     bledy, _ = a._warstwa_19_parytet_dat()
     assert bledy == [], bledy
+
+
+# ── W20: komunikat MUSI pokazywać miejsce różnicy, nie wspólny początek ──────────
+# Wada zmierzona 2026-08-05: wiersze katalogu różniły się OSTATNIĄ kolumną („Stan na"),
+# a komunikat ucinał je po 90 znakach — ta sama linia stała jednocześnie jako „dopisana
+# ręcznie" i „brakująca". Alarm był prawdziwy, lecz nieczytelny: przyrząd raportujący
+# realny rozjazd w sposób, który go ukrywa, uczy operatora ignorować siebie.
+
+_WIERSZ_A = ("| `docs/X.md` | bardzo dlugi opis ktory jest identyczny po obu stronach "
+             "i zjada caly limit znakow | `imperium/legiony/rejestr.py` | 2026-08-02 |")
+_WIERSZ_B = _WIERSZ_A.replace("2026-08-02", "2026-08-04")
+
+
+def test_audyt_w20_para_najblizsza_laczy_ten_sam_wiersz():
+    import narzedzia.audyt_spojnosci as a
+    assert a._para_najblizsza([_WIERSZ_A], [_WIERSZ_B]) == (_WIERSZ_A, _WIERSZ_B)
+
+
+def test_audyt_w20_para_bez_wspolnego_poczatku_to_nie_para():
+    """GRANICA: zero wspólnych znaków = dwie różne pozycje, nie jeden wiersz w dwóch wersjach."""
+    import narzedzia.audyt_spojnosci as a
+    assert a._para_najblizsza(["### Sekcja"], ["| `docs/Y.md` |"]) is None
+
+
+def test_audyt_w20_fragment_pokazuje_roznice_a_nie_poczatek():
+    import narzedzia.audyt_spojnosci as a
+    frag_a, frag_b = a._fragmenty_roznicy(_WIERSZ_A, _WIERSZ_B)
+    assert "2026-08-02" in frag_a and "2026-08-04" in frag_b
+    assert frag_a != frag_b, "dwa identyczne fragmenty to dokładnie ta wada, którą naprawiamy"
+
+
+def test_audyt_w20_fragment_gdy_roznica_na_poczatku():
+    """Druga strona granicy: różnica w pierwszym znaku nie może wyjść poza zakres."""
+    import narzedzia.audyt_spojnosci as a
+    frag_a, frag_b = a._fragmenty_roznicy("Aaa", "Baa")
+    assert frag_a == "Aaa" and frag_b == "Baa"
+
+
+# ── W6: odniesieniem jest commit TEGO pliku, nie ostatni commit repozytorium ─────
+# Powód zmierzony 2026-08-05: hook końca sesji commituje `auto: sync pamięci sesji`
+# (kronika, wizje). To przesuwało odniesienie dla MANIFEST i README, których nikt nie
+# ruszał — bramka czerwieniła się od pracy własnego hooka i uczyła lekceważyć czerwień.
+
+def test_audyt_w6_data_commitu_pliku_dziala_na_zywym_repo():
+    import narzedzia.audyt_spojnosci as a
+    from datetime import date
+    d = a._data_commitu_pliku("README.md")
+    assert d is None or isinstance(d, date)
+
+
+def test_audyt_w6_nieistniejacy_plik_nie_wywraca_audytu():
+    """Brak historii → None → warstwa spada na `date.today()`, a nie na wyjątek."""
+    import narzedzia.audyt_spojnosci as a
+    assert a._data_commitu_pliku("nie_ma_takiego_pliku_w_repo.md") is None

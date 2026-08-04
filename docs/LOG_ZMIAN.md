@@ -15,6 +15,85 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-05 | 🔐 | D1.1 SPŁACONE — bezpiecznik integralności przestał być literałem (19 dni długu)
+
+**Stan sprzed naprawy:** `ImperiumLog.hash_sha256` miał **ZERO przypisań w całej bazie kodu**,
+a `dyrygent.py` podawał doradcy Hermesowi `hash_ok` jako **stałą prawdziwą**. Hermes ma gałąź
+`if not hash_ok → NIEKOMPLETNE`, więc łańcuch WYGLĄDAŁ na zamknięty, nie mając czego
+porównywać — martwy głos udający bezpiecznik (Prawo XV). Prawo IX wymienia to pole jako
+OBOWIĄZKOWE, więc **kod łamał własne prawo od 2026-07-17**.
+
+**Dwie połówki naprawy:**
+- `pamiec_absolutna.policz_hash()` / `zweryfikuj()`, a `zapisz()` wypełnia pole przy każdym
+  zapisie — **po nadaniu sekwencji**, żeby odcisk dotyczył rekordu, który naprawdę ląduje na
+  dysku. Rekord z już ustawionym haszem **nie jest nadpisywany**: inaczej podmiana treści
+  „uwierzytelniałaby się sama", czyli wracałaby naprawiana klasa.
+- `Dyrygent.odcisk_wskaznikow()` + `_integralnosc_wskaznikow()` — literał zastąpiony
+  policzonym warunkiem. **Opt-in, domyślnie OFF** (ZASADA WPIĘCIA): przy OFF zachowanie jest
+  co do decyzji **identyczne** jak dotąd, ale zgoda przestała być literałem — jest gałęzią,
+  która NAZYWA swoje założenie. Odcisk liczony ZAWSZE (także przy OFF), żeby włączenie flagi
+  w locie nie zastało `None` i nie orzekło BRUDNE bez powodu.
+
+**Dwie granice „braku dowodu", każda z testem** — bez nich wada wróciłaby pod nową nazwą:
+rekord **bez hasza** weryfikuje się jako `False` (dotyczy wszystkich rekordów sprzed naprawy),
+a weryfikacja **bez odcisku odniesienia** orzeka BRUDNE. Brak dowodu nie jest dowodem niewinności.
+
+**Zmierzone:** `skan_wad_kodu.py` na `dyrygent.py` — **czysto**, pierwszy raz od 2026-07-17
+(klasa `bezpiecznik` znikła). +15 testów (`tests/test_integralnosc_d11.py`).
+
+**Wada przyrządu złapana przy okazji:** skaner Księgi Wad **nie pomija komentarzy** — zgłosił
+mój własny komentarz opisujący naprawianą wadę, bo cytował ją dosłownie. Alarm na własnej
+dokumentacji uczy lekceważyć skaner; komentarz przeformułowany, obserwacja zapisana.
+
+**Czego NIE wiemy (LEX TALARUS):** nie zmierzyliśmy jeszcze, jak często odcisk realnie się
+rozjeżdża na żywym biegu — flaga **czeka na zielone A/B** i nie ogłaszam jej działającą.
+
+**Pliki:** `imperium/biblioteki/pamiec_absolutna.py`, `imperium/koloseum/dyrygent.py`,
+`tests/test_integralnosc_d11.py`, `docs/PAMIEC_ABSOLUTNA.md`, `docs/ROADMAP_IMPERIUM.md`
+
+---
+
+## 2026-08-05 | 🏁 | CONDITOR LUSTRI — zamrożenie LUSTRATIO dostało MIERZALNY warunek wyjścia (U1)
+
+**Powód zmierzony:** ZAMROŻENIE z 2026-08-04 zabraniało rozwoju, dopóki Imperium nie
+będzie „w pełni skalibrowane" — **bez liczby**. Nasz własny ROADMAP nazwał to wprost:
+*„W pełni skalibrowane bez liczby jest stanem niefalsyfikowalnym: zamrożenie albo nigdy
+się nie skończy, albo skończy się arbitralnie."* To ta sama klasa wady, która zamrożenie
+wywołała — organ bez miary, którego milczenie czyta się dowolnie. Zamrożenie leczące
+bramki bez miary samo nie miało miary.
+
+**Organ** `imperium/pretorianie/conditor_lustri.py` (+18 testów). Rzym. *condere lustrum*
+— obrzęd, którym cenzorzy zamykali lustrację; bez niego cenzus trwał. Siedem kryteriów,
+każde z JEDNYM producentem (K1 — nic nie liczy sam): AUDYT · TESTY · TABULARIUM · DŁUG ·
+ETAPY · KLASY · KALIBRACJA.
+
+**Trzy decyzje konstrukcyjne, każda z osobnym testem granicy:**
+- **`NIE WIEM` blokuje tak samo jak `NIE`** (K2). Bez tego najtańszą drogą do zielonej
+  bramki byłoby dopisanie kryterium bez miernika — miernik zamieniłby się w pochlebcę.
+- **L4 świadomie POZA oceną.** L4 („bramka wyjścia") domknie właśnie ten organ; w
+  kryteriach żądałby własnego domknięcia, żeby się domknąć.
+- **Pusta lista kryteriów = czerwień.** `all([])` daje `True`, więc bez jawnego warunku
+  bramka bez kryteriów przepuszczałaby wszystko.
+
+**Pierwszy pomiar (2026-08-05): 1 spełnione / 3 niespełnione / 3 NIE WIEM** — zamrożenie
+trwa. Dwa kryteria nie mają jeszcze producenta i to one są realnym warunkiem odmrożenia:
+**rejestr klas K1–K4** (czy lek WDROŻONY, nie tylko nazwany) i **rejestr kalibracji**
+organów orzekających (dziś kalibracja żyje w prozie Dziennika, więc nie da się zapytać,
+ile organów orzekających jest nieskalibrowanych — a to był powód zamrożenia).
+
+**Przy okazji naprawiona klasa K1 w MATURITASIE:** dług honorowy liczył się tam własną
+arytmetyką `NOTA − CORONA`, obok CODEX NOTARUM. Dwa błędy naraz: odejmowanie LICZNIKÓW
+nie wie, która korona spłaca którą notę (5 koron i 3 niespłacone noty dają fałszywe zero),
+i nie wie o ODROCZENIU z 2026-08-03. **Dziś obie drogi dawały 0, więc rozjazd był
+niewidoczny** — i dokładnie tak wygląda K1, zanim zacznie kłamać. Wydzielony też jeden
+parser wierszy ROADMAP (`maturitas.wiersze_stanu`) na dwa pytania zamiast dwóch parserów
+tego samego pliku; wynik po refaktorze bit-identyczny (14/68/17,1%).
+
+**Pliki:** `imperium/pretorianie/conditor_lustri.py`, `imperium/oczy/maturitas.py`,
+`tests/test_conditor_lustri.py`, `docs/ROADMAP_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`
+
+---
+
 ## 2026-08-04 | 🔬 | Świadectwo gnicia przestało powtarzać tezę bramki (kalibracja II)
 
 **Powód zmierzony:** drugie świadectwo T2 opierało 4 z 7 mocnych alarmów na nazwie

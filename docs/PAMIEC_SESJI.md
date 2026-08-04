@@ -113,6 +113,12 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-08-04 — MATURITAS: dług honorowy bez świadomości ODROCZENIA
+maturitas.py:161 liczy NOTA−CORONA i obcina do zera. Realnie 54−55 = −1 → 0, a odroczona nota (N-fa723062) niewidoczna; lustro melduje czystą kartę przy żywym długu.
+
+### 2026-08-04 — MATURITAS: niezrozumiany wiersz cicho ignorowany
+Miernik traktuje każdą tabelę 4-kolumnową jako status w kolumnie 3. W ROADMAP 52 wiersze mają tam opis, nie status — wypadają z pomiaru bez śladu. Wada klasy: miernik nie umie powiedzieć 'nie wiem'.
+
 ### 2026-08-04 — Dwie prawdy w jednym polu daty
 Mylono „kiedy to się wydarzyło” (o sesji) z „stan na” (o dokumencie). Poprzednia łatka pilnowała, by daty szły razem; ta pilnuje, by szły w przód. Wiersz niezrozumiały musi być zgłaszany, nie ignorowany.
 

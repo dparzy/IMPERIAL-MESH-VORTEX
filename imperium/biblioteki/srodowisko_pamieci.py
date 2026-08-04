@@ -110,6 +110,23 @@ def fragmenty_w_bazie() -> int:
     return _fragmenty_w_bazie()
 
 
+def sesje_w_kronice() -> int:
+    """Ile sesji leży w kronice (W3b) — liczone, nigdy zaszyte.
+
+    Rośnie SAMA, z każdą przeprowadzoną wachtą — dokładnie jak `fragmenty_w_bazie()`.
+    Zmierzone 2026-08-04 przy kalibracji bramki T2: dwa żywe dokumenty (PLAN_TIRO
+    w dwóch miejscach) twierdziły „kronika 102 sesji" przy 154 realnych. Żaden commit
+    ich nie dotknął — zestarzały się od SAMEGO UPŁYWU pracy, bo liczba była wpisana
+    ręcznie. To ta sama klasa co zaszyte „42 książki" i „27 959 fragmentów”.
+
+    Bez abstynencji (inaczej niż korpus książek): kronika JEST wersjonowana w gicie,
+    więc chmura i lokal liczą ten sam zbiór plików — pomiar jest wszędzie możliwy.
+    """
+    if not KRONIKA_DIR.is_dir():
+        return 0
+    return len(list(KRONIKA_DIR.glob("sesja_*.md")))
+
+
 def ksiazki_w_bazie() -> int:
     """Ile KSIĄŻEK (BIB-*) jest zaindeksowanych w RAG — liczone, nigdy zaszyte.
 

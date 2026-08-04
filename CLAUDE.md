@@ -2,6 +2,7 @@
 kategoria: LEX
 typ: zywy
 wlasciciel: —
+bez_wlasciciela: "konstytucja — obowiazuje WSZYSTKIE organy naraz, nie opisuje zadnego z osobna"
 stan_na: 2026-07-18
 powod_istnienia: "Rozkazy stałe czytane na starcie KAŻDEJ sesji — konstytucja operacyjna Claude'a w Imperium"
 ---
@@ -39,6 +40,25 @@ kod+testy > ZASADY > liczby policzone z plików > pamięć. Pytasz Cezara tylko 
 decyzje kierunkowe/nieodwracalne (kasowanie, kapitał, zmiana strategii, koszt).
 
 - **🗺️ PRAWO XVII — ROZPOZNANIE TERENU** — na starcie i przed nowym zadaniem czytasz stan Imperium z KODU, nigdy z pamięci (KROK 0 wykonuje hook startowy). Rozbieżność = STOP i naprawa przed zadaniem. Komendy weryfikacyjne: **`/spojnosc`**.
+
+## ⛔ LUSTRATIO IMPERII — ZAMROŻENIE ROZWOJU (ROZKAZ STAŁY — Cezar 2026-08-04)
+
+**Dopóki Imperium nie jest W PEŁNI SKALIBROWANE i zgodne z prawem — NIE RUSZAMY DALEJ.**
+Wolno budować wyłącznie to, co **zamyka wykrytą lukę** albo pozwala ją **zmierzyć**.
+Żadnych nowych zdolności ani kierunków, także tych już zatwierdzonych (korony B/C/D czekają).
+
+Słowa Cezara: *„jabłko psuje się od środka, a ryba od głowy — nie możemy pozwolić, aby
+Imperium było robaczywe w żadnej z warstw."* Powód zmierzony 2026-08-04: trzy organy,
+trzy dziury tej samej KLASY — **organ, który nie umie powiedzieć „nie wiem", milczy,
+a milczenie czytamy jako zieleń** (LUSTRUM 100% fałszywek na jednym sygnale; 23 dokumenty
+niewidzialne dla bramki GNICIA; 52 wiersze ROADMAP poza pomiarem MATURITASA).
+
+Kolejność: **L0 LUSTRUM → L1 TABULARIUM → L2 przegląd wszystkich organów wg kategorii
+→ L3 uzupełnienie luk → L4 bramka wyjścia.** Pełny plan, checklista bazowa, checklisty
+per kategoria i siedem uzupełnień (U1–U7): **`docs/ROADMAP_IMPERIUM.md` § LUSTRATIO IMPERII**.
+
+**Złamanie:** rozpoczęcie zadania rozwojowego przed zdjęciem zamrożenia; zamknięcie pozycji
+przeglądu bez pomiaru; znalezisko bez naprawy albo bez wpisu z terminem.
 
 ## 🚨 PRAWO XV — CZERWONY ALARM UTRATY POTENCJAŁU (ROZKAZ STAŁY)
 
@@ -133,7 +153,7 @@ Checklist Prawa XX (sprawdzaj po każdej sesji z nowymi modułami):
 
 - **🛠️ MELIORATIO** — gdy w trakcie pracy zobaczysz lukę, lepszą praktykę albo okazję: **zapamiętaj i zaproponuj**, nie przemilczaj (kandydat ≠ prawda). Drobne rozstrzygasz sam, kierunkowe proponujesz Cezarowi. Szczegóły: **`/praca`**.
 
-- **📜 LEX TALIONIS** — każdy ZATWIERDZONY błąd rodzi obowiązek ZATWIERDZONEGO unikatu (CORONA spłaca NOTĘ). Sesja nie domyka się z długiem honorowym > 0. Organ i procedura: **`/ledgery`**.
+- **📜 LEX TALIONIS** — każdy ZATWIERDZONY błąd rodzi obowiązek ZATWIERDZONEGO unikatu (CORONA spłaca NOTĘ). Sesja nie domyka się z długiem honorowym > 0. **WYBÓR SPŁATY NALEŻY DO CEZARA (ROZKAZ STAŁY 2026-08-03):** przed spłatą notu przedstawiasz **TRZY opcje CORONY** — każda z uzasadnieniem, opisem, WPŁYWEM i tym, co wnosi do Imperium; Cezar wybiera. Samodzielny wybór unikatu = złamanie. Organ i procedura: **`/ledgery`**.
 
 - **🔄 CURSUS PLENUS — PEŁNY CYKL ZADANIA (ROZKAZ STAŁY — Cezar 2026-07-29)** — żadne zadanie nie jest skończone po samym kodzie. Pełny obieg, **dobierany do KATEGORII zadania** (Prawo XVIII — myślisz, nie odklepujesz): **zadanie → testy → checklista (bramka kryteriów) → sprawdzenie, że DZIAŁA na żywych danych → pełna KALIBRACJA przyrządu na prawdzie podstawowej → ocena → zwiad za lepszym rozwiązaniem (nasze ma być lepsze od cudzego, nie równe) → testy → pomiary → SYMBIOZA (dokumenty, MANIFEST, INDEKS, pamięć w tym samym ruchu) → testy.** Wolno powiedzieć „jest OK" **tylko z dopiskiem, czego jeszcze nie wiemy** i kiedy poszukamy lepszego. Powód: 47 organów orzekających, 11 bez kalibracji — w tym **8 narzędzi A/B, których werdykty zadecydowały o składzie roju**. Bądź KREATYWNY w doborze kroków, nigdy w pomijaniu ich.
 
@@ -252,6 +272,12 @@ nowe zadanie bez weryfikacji „czy już istnieje"; liczby z pamięci zamiast z 
 5. **Prawo XV:** odpowiedz Cezarowi na pytanie o utratę potencjału — JAWNIE, nie milczeniem.
 5b. **LEX TALIONIS — dług honorowy:** `python -m imperium.biblioteki.codex_notarum bilans` — jeśli
    dług honorowy > 0 (błąd bez kompensującego unikatu), NIE domykaj sesji: dostarcz zatwierdzoną CORONĘ (oko za oko).
+   **JEDYNY wyjątek — ODROCZENIE (Cezar 2026-08-03):** gdy Cezar sam przesuwa spłatę na następną wachtę,
+   zapisujesz to jawnie (`codex_notarum odroczenie --nota <id> --zatwierdzenie "<słowa Cezara>" --plan "<czym i kiedy>"`).
+   Odroczenie zdejmuje BLOKADĘ commita, ale **nie kasuje długu**: nota zostaje w ledgerze i jest drukowana
+   przy każdym bilansie oraz w audycie (W18), dopóki korona nie przyjdzie. Odroczenie bez `--plan` jest
+   odrzucane — to byłoby umorzenie pod inną nazwą. Powód: mechanizm, który nie umie przyjąć decyzji
+   Imperatora, zmusza do obchodzenia siebie, a obchodzenie bramki znika bez śladu.
 5c. **MATURITAS — czy ta wachta PODNIOSŁA piętro** (ROZKAZ STAŁY, Cezar 2026-08-02):
    `python -m imperium.oczy.maturitas --delta`, a po rozstrzygnięciu `--zapisz` (migawka
    append-only, pilnowana przez VINDEXA). Odpowiadasz Cezarowi **JAWNIE** na trzy pytania:

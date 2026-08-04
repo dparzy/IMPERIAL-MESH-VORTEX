@@ -619,7 +619,15 @@ def _warstwa_24_hooki_wykonywalne(sciezka_settings=None, tryby_gita=None):
         with open(sciezka, encoding="utf-8") as f:
             ustawienia = _json.load(f)
     except FileNotFoundError:
-        return [], ["Hooki (W24): brak .claude/settings.json — nie ma czego pilnować"]
+        # BŁĄD, NIE INFORMACJA — naprawa P1 z recenzji cubic PR #139. Brak tego pliku nie
+        # znaczy „nie ma czego pilnować", tylko „WSZYSTKIE hooki projektu są wyłączone":
+        # CUSTOS LIMINIS, VIGIL, EXACTOR, sync pamięci. Poprzednia wersja przepuszczała
+        # taki stan jako zielony audyt, czyli bramka zatwierdzała repozytorium z martwą
+        # obroną — dokładnie ta klasa, którą sama W24 miała łapać (hooki bez bitu +x były
+        # martwe na Unixie i też nikt nie krzyczał). Cisza o braku obrony JEST alarmem.
+        return ([f"[W24] BRAK {os.path.relpath(sciezka, ROOT)} — wszystkie hooki projektu "
+                 f"są nieaktywne (CUSTOS LIMINIS, VIGIL, EXACTOR, sync pamięci). "
+                 f"To nie jest 'nie ma czego pilnować', to jest 'obrona wyłączona'."], [])
     except (OSError, ValueError) as e:
         return [f"[W24] Nie mogę odczytać .claude/settings.json: {e}"], []
 
@@ -1050,12 +1058,19 @@ def _warstwa_18_dlug_honorowy(sciezka=None):
         from imperium.biblioteki.codex_notarum import bilans
         b = bilans(sciezka) if sciezka is not None else bilans()
         dlug = b.get("dlug_honorowy") or []
+        # Noty ODROCZONE decyzją Cezara nie blokują commita, ale MUSZĄ być widoczne
+        # w każdym raporcie — inaczej odroczenie po cichu zamieniłoby się w umorzenie
+        # (2026-08-03: Cezar przesunął spłatę CORONY A na następną wachtę).
+        odr = b.get("odroczone") or []
+        nota_odr = ([f"⏳ LEX TALIONIS (W18): {len(odr)} nota/y ODROCZONA decyzją Cezara — "
+                     f"dług TRWA, spłata w kolejnej wachcie: "
+                     + "; ".join(str(n.get("opis", "?"))[:70] for n in odr[:3])] if odr else [])
         if not dlug:
             return [], [f"LEX TALIONIS (W18): dług honorowy 0 — {b['noty']} not, "
-                        f"{b['korony']} koron ✅"]
+                        f"{b['korony']} koron ✅", *nota_odr]
         opisy = "; ".join(str(n.get("opis", "?"))[:80] for n in dlug[:3])
         return [f"[W18] DŁUG HONOROWY: {len(dlug)} zatwierdzonych błędów bez kompensującego "
-                f"unikatu (LEX TALIONIS). Dostarcz CORONĘ zanim commitujesz: {opisy}"], []
+                f"unikatu (LEX TALIONIS). Dostarcz CORONĘ zanim commitujesz: {opisy}"], nota_odr
     except Exception as e:  # noqa: BLE001 — awaria ledgera nie może wywrócić audytu
         return [f"[W18] Błąd odczytu CODEX NOTARUM: {e}"], []
 
@@ -1672,4 +1687,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # 🤫 SILENTIUM (CORONA A, 2026-08-03): audyt jest DRUGĄ połową bramki Prawa XXI, więc
+    # edycja repo w jego trakcie unieważnia go tak samo jak bieg testów. Ochrona miękka —
+    # brak organu nie może uniemożliwić audytu (import lokalny, wyjątek przepuszczony).
+    try:
+        from imperium.pretorianie.silentium import cisza
+        with cisza("bramka: audyt spójności (Prawo XXI)"):
+            main()
+    except ImportError:
+        main()

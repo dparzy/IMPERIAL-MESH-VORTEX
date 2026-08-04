@@ -2,7 +2,7 @@
 kategoria: TABULA
 typ: zywy
 wlasciciel: narzedzia/census_organorum.py
-stan_na: 2026-08-02
+stan_na: 2026-08-04
 powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zywego kodu — zadny organ nie moze istniec bez meldunku; bramka Warstwy 17 audytu porownuje ten plik z kodem"
 ---
 # 🏛️ CENSUS ORGANORUM — spis organów i narzędzi Imperium
@@ -23,7 +23,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 
 <!-- CENSUS:start — sekcja generowana, NIE edytuj ręcznie -->
 
-**Modułów w cenzusie: 259** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
+**Modułów w cenzusie: 263** w 18 katalogach (generowane z żywego kodu — `python narzedzia/census_organorum.py --zapisz`).
 
 ### `imperium/akwedukty/` — AQUAEDUCTUS — przepływ danych (świece, adaptery zewnętrzne)
 
@@ -250,11 +250,13 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `filtr_ekonomiczny.py` | Filtr Ekonomiczny (ECON — market price of risk) — brama „zbyt dobre, by było prawdziwe" |
 | `kalkulator_lewara.py` | Kalkulator Lewara — matematyka przeżycia |
 | `lustro_prawdy.py` | ╔══════════════════════════════════════════════════════════════════════════════╗ |
+| `lustrum.py` | 🧹 LUSTRUM — obrzęd oczyszczenia KOŃCZĄCY cenzus (CORONA A, spłata noty N-fa723062) |
 | `nomenclator.py` | 🏷️ NOMENCLATOR — Strażnik Imion Imperium (warstwa 2 anty-redundancyjna Hyginusa) |
 | `portitor.py` | 🏛️ PORTITOR — celnik u wrót: pre-flight gotowości środowiska na starcie sesji (Prawo XV/XVII) |
 | `praeda.py` | 🗡️💎 PRAEDA (Łupieżca) — TRYB ŁOWCY: kontrolowana, AUTO-skalowana chciwość (W-291) |
 | `probator.py` | 🛡️ PROBATOR — Strażnik Cytatów Imperium (warstwa 1 anty-halucynacyjna Hyginusa) |
 | `recognitor.py` | 🔎 RECOGNITOR — poświadcza, czy RECENZJA POKRYWA DZISIEJSZY STAN kodu |
+| `silentium.py` | 🤫 SILENTIUM — cisza nad repozytorium na czas biegu bramki |
 | `sizing_przekonania.py` | Sizing Przekonania (W-318) — większa stawka na mocniejszej okazji |
 | `straznik_przewagi.py` | 🛡️💎 STRAŻNIK PRZEWAGI — unikat Imperium (W-287, Faza C) |
 | `vigil.py` | 🔦 VIGIL — Straż Nocna: skan KAŻDEGO zapisanego pliku .py natychmiast (PostToolUse) |
@@ -321,6 +323,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `install_hooks.py` | Instalator git hooków Imperium |
 | `kalibracja_1h.py` | Kalibracja progów wejścia pod 1h (W-321c). Cel: znaleźć konfigurację, która |
 | `kalibracja_1h_v2.py` | Kalibracja progów wejścia pod 1h (W-321c). Cel: znaleźć konfigurację, która |
+| `kalibracja_silentium.py` | 📏 KALIBRACJA SILENTIUM — pomiar klasyfikatora komend na PRAWDZIE PODSTAWOWEJ |
 | `kapitol_podglad.py` | 🏛️ KAPITOL PODGLĄD (Speculum Probationis) — zero-tokenowy podgląd testu w przeglądarce |
 | `najlepszy_tryb.py` | 🏆 NAJLEPSZY TRYB IMPERIUM — Skaner Okazji + Gubernator + Regime-Aware + Compounding |
 | `pobierz_4h_binance.py` | Pobiera dane 4h bezpośrednio z publicznego API Binance (bez klucza) |
@@ -350,6 +353,7 @@ powod_istnienia: "Spis WSZYSTKICH modulow imperium/ i narzedzia/ generowany z zy
 | `sym_1h.py` | Runner symulacji TRYB NAJLEPSZY (pełny stack W-317..W-321) na danych 1h |
 | `sym_porownanie_tf.py` | Porównanie TF na TYM SAMYM oknie czasowym (izolacja: interwał vs okno) |
 | `tabularium.py` | 🏛️ TABULARIUM — archiwum państwowe Imperium: rejestr wszystkich żywych dokumentów |
+| `viator.py` | 🐎 VIATOR — posłaniec dróg: wsadowy sąd nad linkami w materiale zewnętrznym |
 | `walidacja_kalibrator.py` | 🔬 WALIDACJA KALIBRATORA — A/B progu pewności: baza vs bramka konformalna (ML-36) |
 | `waliduj_zmysly.py` | 👁️ WALIDACJA ZMYSŁÓW — czy adaptery faktycznie BUDZĄ neurony na ŻYWYCH danych (Prawo XV) |
 | `walk_forward_ic.py` | 🔬 WALK-FORWARD IC — czy skill neuronu jest STABILNY w czasie (Prawo XVI, OOS) |

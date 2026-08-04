@@ -1,7 +1,8 @@
 ---
-kategoria: MENSURA
+kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
+bez_wlasciciela: "analiza CUDZEGO roju (DNSS) jako poprzeczka — u nas nie ma odpowiednika w kodzie"
 stan_na: 2026-06-02
 powod_istnienia: "Punkt odniesienia: analiza zewnętrznego roju 79 agentów (DNSS) — dowód, że wizja jest osiągalna, i poprzeczka do przebicia"
 ---

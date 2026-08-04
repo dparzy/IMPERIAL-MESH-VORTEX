@@ -113,8 +113,23 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-27 — Brak gh i tokenów uniemożliwia PR przez API
-GitHub CLI nie jest zainstalowany, a w środowisku brak GH_TOKEN/GITHUB_TOKEN — utworzenie PR przez API jest niemożliwe. Dodatkowo 'gh auth login' jest interaktywny (przeglądarka + kod) i nie może być uruchomiony z harnessa Claude. Auth musi wykonać Cezar w terminalu.
+### 2026-07-27 — BREVIARIUM 2882/2882 dotyczy innego kodu — mierzyć, nie ufać pamięci
+Wynik testów z poprzedniej sesji nie przenosi się na dzisiejszy kod. Pełny bieg w tle dał 2882/2885 — 3 porażki. Stan testów jest NIEZNANY dopóki nie zmierzony na bieżącym drzewie.
+
+### 2026-07-27 — Rozjazd repo 2⇄2 produkują hooki commitujące po obu stronach
+Od wspólnego e2cb846 chmura i laptop dorobiły po 2 commity 'auto: sync pamięci' — wyłącznie przez hooki końca/startu sesji, nie pracę merytoryczną. Git nie wie, który ciąg jest właściwy; rozwiązanie: git stash → pull --rebase → stash pop. Drzewo ma 5 zmodyfikowanych plików.
+
+### 2026-07-27 — Path('/home/tiro') na Windows nie łapie startswith('/') — abstynencja jednostronna
+Path('/home/tiro') na Windows normalizuje się do \home\tiro, więc startswith('/') nigdy nie trafia. Abstynencja testów działała tylko dla Windows-ścieżki na Linuksie, nie dla POSIX-ścieżki na Windows. Naprawione mechanizmem (normalizacja ścieżek), nie łatką. Testy: 2882/2885 — 3 porażki, ta była jedyną naszą.
+
+### 2026-07-30 — Alarmy procesowe to zadania: 35 cząstek Hyginusa, 20 pomysłów W9, LEKCJA 3
+35 cząstek Hyginusa czeka na sędziego (trzeci raz w Top-3 lekcji), 20 pomysłów z refleksji W9 wisi >21 dni, a LEKCJA 3 o zgodności skal wymaga sprawdzenia. To zaległości, nie tapeta.
+
+### 2026-07-30 — CLAUDE.md przekracza limit 200 linii i rośnie ~1 linia/dzień
+Konstytucja ma 259 linii (>200) i rośnie liniowo — pełzająca regresja. Część treści trzeba przenieść do skilli na żądanie; potrzebna decyzja kierunkowa Cezara.
+
+### 2026-08-02 — Martwy słownik MECHANIZMY_ZWIADOWCY w rejestrze
+Słownik 12 wpisów (rejestr.py:208) nie jest czytany przez żaden kod; mechanizm MECHANIZM trafia tylko do neuronów. Skutek: DISCRIMINATOR i dekorelacja (Prawo XVI) nie obejmują 15 zwiadowców; EXP-13/14 aktywne bez wpisu.
 
 ### 2026-07-27 — Testy Warstwy 6 padają przy nieaktualnej dacie 'Stan na:'
 Audyt spójności (Warstwa 6) zgłasza błąd, gdy README.md lub docs/MANIFEST_KODU.md deklarują 'Stan na:' starszą niż data ostatniego commitu. Zgodnie z Regułą 9 Prawa XXI to błahostka — naprawiana samodzielnie, bez eskalacji do Cezara.
@@ -206,9 +221,6 @@ Harnessy A/B (ab_tryb_strategii, ab_strategy_mwu, ab_wazenie_ic, ab_pnl_wazenie_
 ### 2026-07-20 — Brak flagi --dashboard w CLI – utrata potencjału
 Konfig pętli live posiada pola dashboard, ale CLI __main__ nie eksponowało odpowiedniej flagi. Cel P0 (obserwacja live) nie był osiągalny przez CLI. Naprawiono przez refaktoryzację i dodanie flagi.
 
-### 2026-07-20 — Wniosek per-reżim: BEAR=tarcza, reszta szkodzi
-W reżimie BEAR stosowanie tarczy (zabezpieczenia) jest korzystne; w pozostałych reżimach tarcza przynosi straty.
-
 ### 2026-07-20 — Ekstraktor – kolizja plików scratcha przy równoległej konwersji
 ekstraktor.py:149 – kasowanie istniejącego pliku biblioteki przez równoczesne zapisy .calibre-tmp.txt. Fix edc657f nie domknięty.
 
@@ -269,14 +281,8 @@ W LOG_ZMIAN i pamięci napisano, że runbook gnił 'pół roku'. Zmierzono dokł
 ### 2026-07-20 — prekalkuluj_portfel – brak zysku algorytmicznego
 Funkcja wykonuje tę samą pracę per-bar co backtest pojedynczy, tylko równolegle (1.4× przyspieszenia). Nie zmniejsza złożoności, tylko maskuje problem.
 
-### 2026-07-20 — Redundancja w wma (_py_hma) – 930 wywołań/tick
-Wewnętrzna pętla _py_hma wywołuje wma wielokrotnie (4.5M wywołań, 65.5s cumtime), co jest głównym źródłem stałej liniowej. Optymalizacja: prekalkulacja lub użycie numpy.
-
 ### 2026-07-20 — Backtest liniowy, nie O(n²)
 Pomiary profili dla 500-1600 barów wykazały stały ms/tick (~66ms), co oznacza skalowanie O(n·okno), nie kwadratowe. Premisa planu naprawy była błędna.
-
-### 2026-07-20 — Output hooka startowego ucięty przez harness
-Output hooka startowego (25,5 KB) został ucięty, powodując utratę kluczowej informacji (Dziennik następny krok) z pierwszego okna. Konieczna optymalizacja objętości.
 
 ### 2026-06-30 — KROK 0 ujawnił błąd w liczeniu neuronów w MANIFEST
 MANIFEST pokazywał 45 aktywnych, podczas gdy grep wykazał ~16. Przyczyna: zwiadowcy i infrastruktura liczone jako neurony. Nauczka: ujednolicić sposób liczenia.
@@ -308,17 +314,11 @@ Błąd 403 przy push do GitHub oznacza, że sesja Claude nie ma uprawnień zapis
 ### 2026-06-30 — Normalizacja interwałów w strategiach
 Błąd: 5m.upper() -> '5M' zamiast 'M5'. Dodano funkcję _normalizuj_interwal w baza.py mapującą formaty (5m->M5, 1h->H1 itd.) aby backtesty filtr/strategia działały poprawnie.
 
-### 2026-06-30 — Backtest Arena: conservative SL gdy obie bariery w jednym barze
-Jeśli w jednej świecy osiągnięto zarówno TP jak i SL, wynikiem jest SL (konserwatywnie).
-
 ### 2026-06-30 — Błąd loadera po reorganizacji na strukturę rzymską
 Po przeniesieniu modułów do folderów rzymskich (fundament, legiony itp.), loader w pierwy_zwiadowca.py szukał plików po starych nazwach we własnym folderze. Naprawiono przez zmianę na ścieżki względne z importlib.util.spec_from_file_location.
 
 ### 2026-06-30 — Błąd cross-module loader po reorganizacji folderów
 Po przeniesieniu modułów do struktury rzymskiej, loader szukał plików po starych nazwach. Naprawiono przez aktualizację ścieżek względnych w pierwszym_zwiadowca.py.
-
-### 2026-06-30 — klasyfikuj_rezim() zwraca tylko 4 stany, brak TREND_WEAK/PANIC/ON-CHAIN_BULLISH/SMC_ACTIVE
-Funkcja klasyfikacji reżimu ograniczona do TREND_STRONG, RANGING, VOLATILE, NORMAL. Brakuje stanów przewidzianych w dokumentacji.
 
 ### 2026-06-30 — Bug W7 audytu fałszywie flaguje URL z .md w domenie
 W7 audyt markerował zewnętrzne URL zawierające '.md' w domenie (np. www.mdpi.com) jako martwe linki, blokując commit. Naprawiono przez dodanie warunku pomijającego zewnętrzne protokoły (http/https/mailto/ftp) na początku href.

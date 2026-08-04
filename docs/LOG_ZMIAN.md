@@ -3,7 +3,8 @@ kategoria: ACTA
 typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
-stan_na: 2026-08-02
+bez_wlasciciela: "dziennik CALEGO Imperium — historia nie nalezy do zadnego organu"
+stan_na: 2026-08-03
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -11,6 +12,274 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-08-04 | 🩹 | Świeżość dokumentu idzie tylko W PRZÓD — koniec cofania dat przez hook
+
+**Powód zmierzony (audyt W20 na czerwono na otwarciu wachty):** katalog Tabularium
+rozjechał się z `INDEKS_IMPERIUM.md` na pozycji `docs/PAMIEC_SESJI.md` — indeks mówił
+`2026-08-02`, generator liczył `2026-07-27`. Źródłem nie był indeks, tylko sam dokument:
+`narzedzia/auto_lekcja.py` woła `dopisz_lekcje(data=data_sesji)` z datą **analizowanej
+sesji**, a `dopisz_lekcje` nadpisywało nią BEZWARUNKOWO `## Ostatnia aktualizacja`
+i `stan_na`. Hook przemielił zaległe transkrypty z 27 lipca i **cofnął** świeżość
+dokumentu — ten ogłosił się starszym, niż był. Rozjazd zdarzył się co najmniej
+DWUKROTNIE (`2026-08-02` → `2026-07-30` → `2026-07-27`), więc ręczne przestawienie
+daty byłoby odroczeniem, nie naprawą: automat pisze po każdej sesji, człowiek nie.
+
+**Klasa wady:** to ta sama rodzina co naprawa z 2026-08-02 (dokument kłamiący o własnej
+świeżości). Tamta łatka pilnowała, by obie daty szły **razem** — ta pilnuje, by szły
+**w przód**. Mylone było pole: „kiedy to się wydarzyło" (prawda o sesji) i „stan na"
+(prawda o dokumencie) to dwie różne rzeczy.
+
+**Naprawa** (`imperium/biblioteki/pamiec_sesji.py`): strażnik monotoniczności `_nowsza()`
+na OBU polach nagłówka; data samej lekcji zostaje nietknięta i prawdziwa. Wartość
+nieparsowalna nie zamraża dokumentu (nowa wygrywa). Stan `PAMIEC_SESJI.md` przywrócony
+do `2026-08-02` — zmierzone z treści, bo najnowsza lekcja w pliku ma tę datę.
+
+**Testy:** +4 granice (cofnięcie, data równa, wartość nieparsowalna, `None`) —
+`tests/test_pamiec_sesji.py`, 147/147 zielone w module.
+
+**Pliki:** `imperium/biblioteki/pamiec_sesji.py`, `tests/test_pamiec_sesji.py`,
+`docs/PAMIEC_SESJI.md`, `docs/LOG_ZMIAN.md`.
+
+---
+
+## 2026-08-03 | ⏳ | LEX TALIONIS: ODROCZENIE — mechanizm, który umie przyjąć decyzję Cezara
+
+**Powód zmierzony:** Cezar zatwierdził notę `N-fa723062` (wada współbieżności
+w SILENTIUM), wybrał **CORONĘ A = LUSTRUM** i rozkazał zbudować ją **w następnej
+wachcie**, a tę zamknąć. Bramka W18 blokowała commit, bo LEX TALIONIS zakłada spłatę
+w TEJ SAMEJ sesji. Rozkaz Imperatora był więc niewykonalny bez obchodzenia własnej
+bramki — a mechanizm, którego nie da się posłuchać, uczy się obchodzić.
+
+**Rozwiązanie — nowy typ rekordu `ODROCZENIE`** (`imperium/biblioteki/codex_notarum.py`):
+- `odroczenie --nota <id> --zatwierdzenie "<słowa Cezara>" --plan "<czym i kiedy>"`,
+- zdejmuje **blokadę commita**, nie kasuje **długu**: nota wychodzi z `dlug_honorowy()`
+  do `odroczone()` i jest drukowana przy KAŻDYM bilansie oraz w audycie (W18),
+- **odroczenie bez `--plan` jest odrzucane** — to byłoby umorzenie pod inną nazwą,
+- korona nadal ją spłaca; dopiero wtedy nota znika z obu list.
+
+**Testy:** +4 (odroczenie zdejmuje blokadę, ale nie dług · bez planu odrzucone ·
+nieistniejąca nota odrzucona · korona spłaca także notę odroczoną).
+**Skodyfikowane w CLAUDE.md** § KONIEC SESJI krok 5b — dokument nie może kłamać
+o tym, kiedy wolno domknąć sesję.
+
+**Pliki:** `imperium/biblioteki/codex_notarum.py`, `narzedzia/audyt_spojnosci.py` (W18),
+`tests/test_codex_notarum.py`, `CLAUDE.md`
+
+---
+
+## 2026-08-03 | 🔧 | SILENTIUM: cisza WSPÓŁDZIELONA — organ pękł na własnym starcie, dzień po wdrożeniu
+
+**Wada znaleziona REALNYM UŻYCIEM, nie testem** — przez alarm w wydruku hooka otwarcia:
+`⚠️ SILENTIUM nie założone (RuntimeError: SILENTIUM już trwa … pid 17632, 0s)`.
+
+**Dowód (nie domysł):** o 10:03 wystartowały DWIE sesje naraz — pliki hooka
+`2214d0cc…` i `8e2da290…` mają ten sam znacznik czasu. Audyt drugiej sesji założył
+ciszę (pid 17632), audyt pierwszej dostał odmowę i wypisał **„bieg idzie BEZ ochrony"
+— nieprawdę**, bo repo było wtedy chronione cudzą ciszą. Gorzej: sesja, która
+skończyła audyt pierwsza, **zdjęła ciszę spod wciąż trwającego biegu drugiej**.
+
+**Diagnoza:** wyłączna blokada chroniła PLIK BLOKADY, a nie REPOZYTORIUM. Do tego
+komunikat kłamał o stanie ochrony — czyli organ zapobiegawczy sam był klasą
+„przyrząd kłamie, nie system", którą miał domykać. Komunikat fałszywie alarmujący
+uczy ignorować alarmy, więc szkodzi bardziej niż jego brak.
+
+**Naprawa:** plik ciszy trzyma **listę uczestników** (`dolacz`), cisza trwa aż wyjdzie
+OSTATNI, komunikat rozróżnia trzy stany (ogłaszam / dołączam / naprawdę bez ochrony).
+Zapis listy pod krótkim zamkiem `.mx` z własnym bezpiecznikiem (porzucony po 10 s,
+czekanie do 5 s, potem bieg bez zamka — zawieszona bramka byłaby gorsza od wyścigu)
+i atomową podmianą `os.replace`. Wyłączność została w `zaloz()` — na drodze człowieka.
+
+**Testy:** 19 → **24** (pięć nowych, wszystkie na granicach tej wady): drugi bieg
+dołącza zamiast zostać bez ochrony · wyjście pierwszego nie zdejmuje ciszy drugiemu ·
+martwy uczestnik nie zdejmuje ciszy żywemu · stary format pliku wciąż czytany ·
+pliki pomocnicze ciszy nie są zapisem do repo (strażnik nie może dusić się własną regułą).
+
+**Pliki:** `imperium/pretorianie/silentium.py`, `tests/test_silentium.py`, `.gitignore`
+
+---
+
+## 2026-08-03 | 🤫 | CORONA A: SILENTIUM — pierwszy organ, który ZAPOBIEGA zamiast wykrywać
+
+**Spłata NOTY Architekta** (dwa złamania zasady „nie edytuj w trakcie biegu bramki"
+w jednej wachcie 08-03, przez tego, kto zasadę zapisał 31.07). Cezar wybrał CORONĘ A
+z trzech przedstawionych opcji (ROZKAZ STAŁY 08-03: wybór spłaty należy do Cezara).
+
+**Luka zmierzona:** Imperium miało DWA organy patrzące wstecz — strażnik czystości
+w `run_tests.py` (07-26) i VINDEX (08-02) — i **zero** zapobiegających. Strażnik
+czystości sam przyznaje w swoim komunikacie, że nie odróżni winy testu od równoległej
+edycji: „to fałszywe oskarżenie, powtórz bieg sam". Koszt: **4 unieważnione biegi
+w 4 dni**.
+
+**Organ SILENTIUM** (`imperium/pretorianie/silentium.py`, 19 testów):
+- blokadę zakłada **proces bramki** (`cisza()` w `run_tests.py` i `audyt_spojnosci.py`),
+  NIE hook rozpoznający komendę — bieg w tle wraca z narzędzia natychmiast, więc hook
+  zdjąłby ciszę w pierwszej sekundzie 20-minutowego biegu (klasa E7);
+- **trzy bezpieczniki** przed zamurowaniem repo: żywotność PID-u, TTL 45 min, furtka
+  `zdejmij --sila` / `SILENTIUM_OFF=1`;
+- żywotność badana `OpenProcess`, **nigdy** `os.kill(pid, 0)` — na Windowsie to
+  `TerminateProcess`, czyli badanie „czy żyjesz" ZABIŁOBY proces bramki;
+- odczyt zawsze wolny (strażnik blokujący patrzenie uczy się go obchodzić);
+- hook `PreToolUse` OSOBNY od CUSTOS LIMINIS: tamten broni rozkazów STAŁYCH, ten stanu
+  CHWILOWEGO, a jedna awaria nie ma uciszać obu barier naraz.
+
+**KALIBRACJA (LEX TALARUS — przyrząd bez pomiaru samego siebie nie istnieje).**
+Prawda podstawowa: 120 zaetykietowanych REALNYCH komend z transkryptów (korpus 5571
+unikalnych), etykiety wersjonowane w `bibliotheca_ulpia/dane/kalibracja_silentium.json`,
+narzędzie `narzedzia/kalibracja_silentium.py`, test regresji w pakiecie.
+
+| wersja | precyzja | czułość (ważona populacją) | przecieki w próbie |
+|---|---|---|---|
+| pierwsza, „na wyczucie" | 63,3% | ~46% | 11 / 60 |
+| po naprawie każdej zmierzonej pomyłki | **93,5%** | **98,3%** | 1 / 60 |
+
+Naprawione klasy, każda wskazana przez etykietę, nie przez intuicję: ciało heredoca
+czytane jak składnia powłoki (8 fałszywek), `
+` zjadany przez `shlex` przez co
+`cd`+`git add` zlewało się w jedno polecenie, proza wpisu Dziennika wyłączająca detekcję
+słowem „stan", `git fetch` liczony jako zapis, `$TEMP`/`/tmp` doklejane do korzenia repo,
+`run_tests.py` nierozpoznany mimo że odciska pieczęć w repo, zapis heredoca **poza** repo
+karany jak zapis do repo.
+
+**DWIE MOJE ETYKIETY BYŁY BŁĘDNE i klasyfikator je wykrył** (nr 54 — długi heredoc kończy
+się `git add -A && git commit`; nr 97 — `p.write_text` w pętli po `rglob("*.md")`). Obie
+oceniłem na podglądzie 230 znaków. Lekcja: **sędzia czytający PRÓBKĘ sądzi próbkę,
+nie komendę.**
+
+**Druga wada przyrządu, złapana w trakcie:** korpus transkryptów ROŚNIE w trakcie sesji,
+więc `random.sample` na tym samym ziarnie zwrócił po 20 minutach inny zestaw i etykiety
+nadane po numerach rozjechały się z komendami. Losowanie odtwarzalne z ziarna jest
+odtwarzalne **tylko przy niezmiennym zbiorze** — próbka jest teraz ZAMROŻONA w pliku.
+To ta sama klasa co „kłamie przyrząd, nie system".
+
+**Weryfikacja na ŻYWEJ ścieżce, nie tylko w testach:** przy założonej ciszy harness
+odmówił realnej edycji `docs/ROADMAP_IMPERIUM.md` komunikatem organu, a audyt spójności
+odpalony po wpięciu wypisał założenie i zdjęcie ciszy wokół własnego biegu.
+
+**Przy okazji (VIGIL, ta sama klasa z Księgi Wad):** `_stan_repo()` w `run_tests.py`
+dekodował `git status` kodowaniem KONSOLI — polska nazwa pliku wywaliłaby strażnika
+czystości dokładnie na brudnym drzewie, o którym ma ostrzegać. Dodane
+`encoding='utf-8', errors='replace'`.
+
+**Pliki:** `imperium/pretorianie/silentium.py` (nowy), `tests/test_silentium.py` (nowy,
+19 testów), `narzedzia/kalibracja_silentium.py` (nowy),
+`bibliotheca_ulpia/dane/kalibracja_silentium.json` (nowy, prawda podstawowa),
+`.claude/hooks/pre-tool-use-silentium.sh` (nowy, 100755), `.claude/settings.json`,
+`tests/run_tests.py`, `narzedzia/audyt_spojnosci.py`, `docs/ARCHITEKTURA_IMPERIUM.md`,
+`docs/CENSUS_ORGANORUM.md`, `README.md`, `.gitignore`.
+
+---
+
+## 2026-08-03 | 🛡️ | SZEŚĆ P1 z recenzji cubic PR #139 — wspólny mianownik: cisza udająca spokój
+
+Wszystkie sześć zweryfikowane wobec żywego kodu przed naprawą (recenzent też halucynuje —
+przy PR #133 jedyne P1 cytowało nieistniejące reguły). **Dwa udowodnione uruchomieniem.**
+
+1. **`vindex._git()` → awaria raportowana jako `czysto`.** `None` zamieniało się w pustą
+   listę zmian, więc padnięty git dawał werdykt czysty z kodem 0 — **hook zatwierdzał
+   repozytorium, którego nie obejrzał**. Wprowadzony wyjątek `GitNieodpowiada` i trzeci
+   status `nieznane`: brak wiedzy nie jest ani zarzutem, ani rozgrzeszeniem.
+2. **Rename omijał kontrolę ledgerów.** Git pisze `0\t0\tdocs/{stary => nowy}` — zero
+   usunięć pod ścieżką niepasującą do wzorca, więc ledger ŚCISŁY dało się usunąć zwykłym
+   `git mv`. Dodane `--no-renames`; test sprawdza obecność flagi w obu wywołaniach.
+3. **Commit w tej samej komendzie był niewidzialny.** Hook porównywał drzewo z HEAD, więc
+   `git commit -am` zmieniający ledger znikał: zmiana już w HEAD, drzewo czyste. Dokładamy
+   zawartość HEAD, gdy powstał w oknie 120 s — okno, nie „zawsze", bo alarm powtarzany
+   bez końca uczy ignorowania alarmów (W9, 07-20).
+4. **`rejestr_wizji` CLI nie przyjmował ZMIANA/DECYZJA** — UDOWODNIONE: `dodaj ZMIANA x y`
+   padało z ValueError. Argparse podstawiał niepusty `POMYSŁ`, więc `status or
+   STATUS_DOMYSLNY` nigdy nie sięgało po kanon. **Bramka broniąca spójności rejestru
+   blokowała poprawne użycie rejestru.** `default=""`. Przy okazji P2: `zmien_status()`
+   dostał tę samą bramkę — niezmiennik pilnowany na jednej z dwóch dróg zapisu nie jest
+   niezmiennikiem (dało się obejść w dwóch ruchach).
+5. **EXACTOR nie cytował nazwy gałęzi** — UDOWODNIONE: `git check-ref-format --branch
+   'test;whoami'` przechodzi. Organ mający wydać komendę BEZPIECZNĄ DO WKLEJENIA mógł
+   wydać komendę robiącą co innego. Cytowanie warunkowe: groźna gałąź → `'test;whoami'`,
+   normalna → **bez zmian**, więc kalibracja na 190 meldunkach nietknięta.
+6. **Audyt W24: brak `settings.json` = zielono.** „Nie ma czego pilnować" znaczyło
+   naprawdę „wszystkie hooki wyłączone" (CUSTOS LIMINIS, VIGIL, EXACTOR, sync). Teraz błąd.
+
+**Pliki:** `imperium/pretorianie/vindex.py`, `imperium/pretorianie/exactor.py`,
+`imperium/biblioteki/rejestr_wizji.py`, `narzedzia/audyt_spojnosci.py`, +3 pliki testów
+
+---
+
+## 2026-08-03 | 🚀 | HYGINUS na V4-Flash-0731 — profil `osad` zejście z v4-pro (rozkaz Cezara)
+
+**Rozkaz Cezara:** „teraz używany tylko deepseek v4 flash". Podstawa: DeepSeek wydał
+**V4-Flash-0731** dnia 31.07.2026 i **tańszy model bije droższy na wszystkich pięciu
+opublikowanych benchmarkach agentowych** — Terminal Bench 2.1 82,7 vs 72,1 · NL2Repo
+54,2 vs 38,5 · Cybergym 76,7 vs 52,7 · **DeepSWE 54,4 vs 12,8 (4,3×)** · Toolathlon
+70,3 vs 55,9 · Intelligence Index 50 vs 44. Cena wyjścia **$0,28 vs $0,87 = 3,1× taniej**.
+Zweryfikowane w DWÓCH niezależnych źródłach (MarkTechPost 07-31, Artificial Analysis) —
+nie z pamięci modelu, bo wydanie jest po jego cutoffie.
+
+**Mechanizm (nie magia):** architektura identyczna z kwietniowym preview (284B/13B),
+zmieniono **wyłącznie post-training**, nastawiając go na pracę wieloetapową; V4-Pro tego
+treningu nie dostał. Największy skok tam, gdzie zadanie ma najwięcej kroków, bo **w pętli
+błędy się mnożą, nie dodają**.
+
+**⚠️ Granica dowodu (Prawo I):** benchmarki są AGENTOWE, a profil `osad` wykonuje osąd
+dziedzinowy — przewaga na cudzym zadaniu to POSZLAKA. Rozstrzygnie A/B `flash/high vs
+pro/high` (`narzedzia/ab_plon_hyginusa.py`), dotąd nieuruchomiony. Dlatego `v4-pro`
+**zostaje w CENNIKU** jako ramię porównawcze — test tego pilnuje.
+
+**Pierwszy bieg na 0731 (2 tematy, ten sam dzień):** 7 kandydatów z sekcją „Pomiar",
+ale NOMENCLATOR wskazał **3/7 noszących imię czegoś, co już mamy** (Kelly, PBO, DSR,
+walk-forward), a PROBATOR złapał **1 halucynację cytatu** (BIB-047 spoza promptu).
+Wniosek: nowy model **nie zmniejszył redundancji** (historycznie 39,3%, teraz 43%).
+
+**Przy okazji naprawione dwa testy kodujące fałszywe założenia:**
+`test_profil_osadu_bierze_model_premium` zakładał, że **cena jest miarą jakości**;
+`test_notarius_dostaje_model_FAKTYCZNIE_uzyty` opierał moc rozróżniającą na tym, że
+`osad` ≠ model domyślny — po zrównaniu obu na `flash` **świeciłby zielono, nie badając
+niczego**. Różnica wstrzykiwana teraz jawnie.
+
+**Pliki:** `imperium/cesarz/dispensator.py`, `tests/test_dispensator.py`
+
+---
+
+## 2026-08-03 | 🐎 | VIATOR — posłaniec dróg: wsadowy sąd nad linkami (zadanie H0, krok 1)
+
+Organ `narzedzia/viator.py` (55+ testów): z materiału zewnętrznego wyciąga KAŻDY adres
+i orzeka, czy droga jest przejezdna — wznawialnie (cache JSONL append-only), z paskiem
+postępu na **stderr** (lekcja G1: pasek na stdout czyni `--json` niesparsowalnym).
+Klasyfikacja świadomie oddziela `MARTWY` (404/410) od `ZABLOKOWANY` (403/429) i `BLAD`
+— te drugie to stan NASZEGO przyrządu, nie wyrok o cudzej treści.
+
+**CZTERY KLASY FAŁSZYWEK ZŁAPANE REALNYM UŻYCIEM, ŻADNEJ NIE ZŁAPAŁ TEST:**
+(a) `)**` markdown bold — pierwsza partia próbna zgłosiła **19/20 adresów jako MARTWE**,
+repozytoria żyły; (b) `)[reference:8` znaczniki cytowań DeepSeeka; (c) backtick z kodu
+inline; (d) **`ssl.get_default_verify_paths().cafile` = None na tym Windowsie** — 86
+adresów szło jako BŁĄD z jednym powodem, w tym **83 arxiv.org**, czyli cały naukowy
+fundament materiału. Naprawa przez `certifi`, **bez wyłączania weryfikacji**.
+Każda klasa ma test regresyjny.
+
+**Wynik ważny (po naprawach), `Imperium-Botów-Tradingowych 2.md`:** 287 adresów ·
+**246 ŻYWYCH (85,7%)** · 15 przekierowań · 12 zablokowanych · **7 MARTWYCH** · 4 błędy.
+Martwa siódemka to w większości **placeholdery, nie linki, które umarły**:
+`abc123.ngrok.io`, `US20230000000A1`, `4aBcDeFg-Vortex-Nexus-Alpha`. Autor materiału
+potrafi wymyślić adres — przy sądzie nad treścią nic nie wolno przyjąć na słowo.
+
+**Pliki:** `narzedzia/viator.py`, `tests/test_viator.py`
+
+---
+
+## 2026-08-03 | 📚 | BIBLIOTEKA +40 ksiąg — dowód konieczności watchdoga (rozkaz Cezara)
+
+Cezar dograł **40 ksiąg 2026-08-01** (`BIB-206..245`). Pomiar: **248 plików na dysku
+(1852 MB) · 115 w RAG · 133 POZA RAG = 53,6%**. Dokument mówił „209 / 92" i
+**przedawnił się w 4 dni**, a audyt 24 warstw drukował „pełna harmonia", bo **żadna
+warstwa nie pilnuje KSIĄG** (W11 pilnuje modułów kodu). Ta sama klasa co kontrakt
+append-only złapany przez VINDEXA: deklarowane w dokumencie, egzekwowane przez zero.
+
+ROADMAP: **A7** poprawione (91→133, partiami), **A15 CUSTOS BIBLIOTHECAE** (watchdog —
+PRZED nadrabianiem, bo inaczej po każdej dostawie liczymy ręcznie), **A16** analiza
+BIB-206..245 + edycja dokumentacji.
+
+**Pliki:** `docs/ROADMAP_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md` (260 organów, +VIATOR)
 
 ---
 

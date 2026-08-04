@@ -2,7 +2,8 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
-stan_na: 2026-08-02
+bez_wlasciciela: "plan calego Imperium — zamiar, nie opis istniejacego organu"
+stan_na: 2026-08-03
 powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii."
 ---
 # 🏛️ ROADMAP IMPERIUM — MAPA DRÓG SYSTEMU
@@ -23,6 +24,235 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 > zwiad → pomiary → symbioza). Pozycja bez kalibracji przyrządu **nie jest skończona**.
 
 **Legenda stanu:** ✅ zrobione · 🟡 kod jest, brak dowodu · 🔴 nie istnieje · ⏸️ świadomie odłożone
+
+---
+
+## 🧹 LUSTRATIO IMPERII — WIELKI PRZEGLĄD (ROZKAZ STAŁY — Cezar 2026-08-04)
+
+> ### ⛔ ZAMROŻENIE ROZWOJU
+> **Dopóki Imperium nie będzie W PEŁNI SKALIBROWANE i w pełni zgodne z zasadami
+> i prawem Imperium — NIE RUSZAMY DALEJ.** Żadnych nowych zdolności, żadnych nowych
+> kierunków. Wolno budować **wyłącznie to, co zamyka wykrytą lukę** albo to, co jest
+> potrzebne, by lukę ZMIERZYĆ.
+
+**Słowa Cezara (2026-08-04):** *„jabłko psuje się od środka, a ryba od głowy — dlatego
+nie możemy pozwolić, aby nasze Imperium było robaczywe i zepsute w żadnej z warstw."*
+
+**Powód zmierzony tego samego dnia — trzy dziury w trzech różnych organach:**
+- LUSTRUM: **27 z 260 modułów** bez żadnego wołacza; naiwny sygnał dałby **100% fałszywek**
+  (25/25 sierot to przyrządy ręczne z CLI), a pod nimi **3 realne moduły otestowane
+  i nigdzie niewpięte** — majątek leżący odłogiem.
+- TABULARIUM: **23 błędy + 33 ostrzeżenia** leżące w trybie miękkim; **23 dokumenty bez
+  pola `wlasciciel` są NIEWIDZIALNE dla bramki GNICIA** (pętla po właścicielach nie
+  wykonuje się ani razu) — nie „przechodzą kontrolę", tylko nie są kontrolowane.
+- MATURITAS: **52 wiersze ROADMAP** wypadają z pomiaru bez śladu, bo mają w kolumnie 3
+  opis zamiast statusu; dług honorowy liczony osobną arytmetyką, nieświadomą ODROCZENIA.
+
+Wspólna KLASA wszystkich trzech: **organ, który nie umie powiedzieć „nie wiem", milczy —
+a milczenie czytamy jako zieleń.** To jest robactwo, o którym mówi rozkaz.
+
+### Kolejność przeglądu (ZATWIERDZONA)
+
+| # | Etap | Stan |
+|---|---|---|
+| L0 | **LUSTRUM** — dokończyć: testy + kalibracja progu na prawdzie podstawowej | 🟡 kod stoi, brak testów i kalibracji |
+| L1 | **TABULARIUM — MECHANIZM** ✅ (2026-08-04): błędy **23 → 0**. Naprawiona sprzeczność „`—` znaczy brak, a bramka żąda wartości"; nowe bramki **T1b** (właściciel albo jawny `bez_wlasciciela`, z zakazem wyciszania dla TABULA/FORMA/MENSURA), **T2b** (zegar 90 dni dla dokumentów bez właściciela — brak kodu ≠ brak kontroli) i **filtr gita** (plik spoza kontroli wersji nie jest dokumentem Imperium, Prawo XIX). 22 dokumenty uporządkowane, właściciel-widmo `schola` naprawiony, +10 testów | ✅ |
+| L2 | **Przegląd WSZYSTKICH organów** wg kategorii, wykonalności, zadań, piętra ewolucji i **wzajemnej współpracy** — checklisty kontrolne per kategoria. Wchodzi tu **L2a** (mapa współpracy) i **L2b** (taksonomia pięter — WYKONANE) | 🟡 w toku |
+| **L3** | **PRZEGLĄDY TREŚCI — ZACZĘTE OD KALIBRACJI PRZYRZĄDU** (2026-08-04, decyzja Cezara „wg rekomendacji"). Zamiast odhaczać 26 pozycji po kolei, **zmierzono najpierw sam sygnał** na zamrożonej próbce 6 (ziarno 20260804, etykiety z pełnej treści + diffów): **precyzja werdyktu 33%** (2/6), **precyzja przyczyny 0/6**. Oba prawdziwe gnicia brały się z **liczb rosnących SAME** (fragmenty RAG, sesje kroniki) — niewidzialnych dla bramki opartej na commitach. **Zrobione:** naprawa u źródła (klucz `sesje_kroniki` + `sesje_w_kronice()`, zaszyte liczby → znaczniki W15) w MAPA_PAMIECI i PLAN_TIRO; **drugie świadectwo** `python narzedzia/tabularium.py swiadectwa` dzieli 26 alarmów na **9 MOCNYCH / 17 SŁABYCH** (zgodność z próbką 6/6, próg pospolitości <5 plików). **Zostaje:** 7 przeglądów MOCNYCH + 11× T3 DUBLET + 17 SŁABYCH okazjonalnie | 🟡 **przyrząd skalibrowany, kolejka posortowana** |
+| L3a | **Limit drugiego świadectwa — nagłówek hunka podaje KLASĘ** (zmierzone 2026-08-04): `git show` opisuje hunk najbliższym nagłówkiem na lewym marginesie, więc zmiana METODY raportuje się jako `class Legatus`. Nazwa klasy jest cytowana w każdym dokumencie o module → fałszywe MOCNE. Dotknięte ~4 z 9 (GENERAL_LEGATUS — nie ma ani jednego zdania o tym, co się zmieniło; IGRZYSKA, KALKULATOR_LEWARA, PAMIEC_ABSOLUTNA). Wariant „bez klas z hunka" przygotowany, **NIEZMIERZONY** — nie ogłaszać działającym (LEX TALARUS) | 🔴 **następne zadanie** |
+| **L3c** | 🚨 **STRAŻNIK PRACY BEZ ŚLADU — dziura międzyorganowa** (rozkaz Cezara 2026-08-04: *„musimy mieć zabezpieczenie i weryfikowanie takiej sytuacji, któryś organ musi to wykrywać"*). **Zmierzone tego samego dnia na żywym przypadku:** wachta wykonała pełną pracę w kodzie, a wpis do Dziennika **nie powstał wcale** (komenda padła przed zapisem) — i **żaden organ tego nie zauważył**. CLAUDE.md **deklaruje** „Brak wpisu z dziś = czerwony alarm w podsumowaniu startowym", ale grep po hookach, audycie i Dzienniku daje **ZERO** implementacji: hook startowy woła tylko `dziennik_niesmiertelny nastepny` (drukuje następny krok, nie sprawdza czy poprzedni wpis istnieje). EXACTOR świadomie tego nie bada, bo jego komentarz mówi, że „bramkę, Dziennik i commit sprawdza bramka i audyt" — a **audyt tego nie sprawdza**. Klasyczne K2 (milczenie czytane jako zieleń) + przekazanie odpowiedzialności organowi, który jej nie przyjął. **Do zbudowania:** warstwa audytu / krok hooka porównujący commity wachty z ostatnim wpisem Dziennika — commit merytoryczny bez wpisu = alarm | 🔴 **P0 następnej wachty** |
+| L3b | **Uzupełnienie pozostałych wykrytych braków i luk** — dopiero po komplecie pomiarów | 🔴 |
+| L4 | **Bramka wyjścia** — zdjęcie zamrożenia (wymaga U1: mierzalnego warunku) | 🔴 |
+
+### Co sprawdzamy przy KAŻDYM organie (checklista bazowa)
+
+1. **Zgodność z prawem** — które z 25 Praw go dotyczą i czy je spełnia
+2. **Wykonalność** — czy w ogóle da się go uruchomić (droga wejścia: import, CLI, hook)
+3. **Kalibracja** — czy przyrząd orzekający był mierzony na PRAWDZIE PODSTAWOWEJ (LEX TALARUS)
+4. **Testy** — czy istnieją i czy mają **test granicy** dla każdego progu
+5. **Piętro ewolucji** — PROMPT / LOOP / GRAPH / HARNESS / NEURO-SYMBOLIC …
+6. **Współpraca** — kto go woła, kogo on woła, czy zgadza się ze schematem swojego etapu
+7. **Luka** — czego mu brakuje, żeby był zgodny ze wzorcem
+
+### ⚖️ METODA PRZEGLĄDU: KLASA, NIE ILOŚĆ (ZATWIERDZONE — Cezar 2026-08-04)
+
+> *„nie ilość — o tym mówiłem wcześniej, ilość to niepotrzebne przeciążenie,
+> ale KLASA i JAKOŚĆ jest ważna"* — Cezar
+
+**Nie odhaczamy 262 organów po kolei.** Szukamy **WZORCA WADY** i naprawiamy go u źródła;
+jedna naprawa klasy zamyka wiele pozycji naraz. Dowód, że to działa: sześć dzisiejszych
+wad w pięciu różnych organach okazało się **czterema klasami**, nie sześcioma sprawami.
+
+Konsekwencja dla bramek: **nie dobudowujemy warstwy 25.** Audyt ma dziś 24 warstwy
+i wszystkie dzisiejsze wady przez nie przeszły — dokładanie kolejnej to leczenie objawu
+metodą, która właśnie zawiodła. Najpierw **mierzymy siłę tego, co mamy** (U8).
+
+**Cztery klasy zmierzone 2026-08-04 — to jest lista robocza L2:**
+
+| Klasa | Objaw u nas | Lek |
+|---|---|---|
+| **K1 — dwa organy liczą ten sam fakt osobno** | MATURITAS liczy dług jako `NOTA−CORONA` zamiast pytać `codex_notarum`, więc nie wie o ODROCZENIU; CENSUS i INDEKS trzymają tę samą datę dwa razy (wywaliło bramkę 08-04) | fakt ma **jednego producenta**, reszta go woła; warstwa tropiąca powtórne wyprowadzanie |
+| **K2 — milczenie czytane jako zieleń** | MATURITAS gubi 52 wiersze ROADMAP; TABULARIUM zwalnia 22 dokumenty z bramki GNICIA | każdy klasyfikator ma trzeci wynik **NIE WIEM** i musi go **LICZYĆ**; audyt czerwony przy nieznanych > 0 bez jawnej deklaracji |
+| **K3 — piszący decyduje o własnej prawdzie** | `dopisz_lekcje` brało datę od wołającego i **cofało** świeżość dokumentu | niezmiennik należy do **POLA**, nie do wołającego (monotoniczność, append-only) — egzekwowany w miejscu zapisu |
+| **K4 — wyciszenie bez powodu** | działa tam, gdzie jest (`powod_acta`, `dublet_rozstrzygniety`), nie działa nigdzie indziej | **uogólnić na wszystkie bramki**: wyciszenie zawsze wymaga powodu, który zostaje na widoku |
+
+### 🔎 L2b — QUAESTIO NAD TAKSONOMIĄ PIĘTER (WYKONANE 2026-08-04, rozkaz Cezara „tak zrób")
+
+**Po co:** Cezar rozkazał, by każdy moduł nosił oznaczenie **grupy ewolucji**. Stemplowanie
+261 organów taksonomią, której sami nie osądziliśmy, rozniosłoby jeden błąd po całym
+Imperium — naprawa byłaby 261-krotna zamiast jednokrotnej. Dlatego najpierw sąd.
+
+**Źródło:** `wrzutnia/Imperium-Botów-Tradingowych 2.md` (§5.2–5.3) — materiał zewnętrzny,
+ten sam, który wyprodukował `US20230000000A1` i `abc123.ngrok.io`. Kandydat ≠ prawda.
+
+> 🚨 **KOREKTA WŁASNEJ LICZBY:** mówiliśmy „MATURITAS mierzy **3 z 9**". Źródło wymienia
+> **OSIEM** pięter (warstwy 0–7), nie dziewięć. Liczba „9" pochodziła z pamięci, nie
+> z materiału — czyli dokładnie ten błąd, który nasze własne prawo zakazuje. Jest **3 z 8**.
+
+| # | Piętro | Co u NAS je realizuje (grep) | Werdykt | Mierzone? |
+|---|---|---|---|---|
+| 0 | PROMPT | TIRO (`notarius.py`), Hyginus (`bibliotekarz.py`), DISPENSATOR | ✅ POTWIERDZONE | ✅ — ale patrz kolizja niżej |
+| 1 | CONTEXT | 6 modułów pamięci + 11 modułów RAG | ✅ POTWIERDZONE | ❌ **niemierzone** |
+| 2 | HARNESS | 7 hooków, senat, audyt 24 warstw, SIGILLARIUM, 25 Praw | ✅ POTWIERDZONE | ❌ **niemierzone** |
+| 3 | LOOP | `hedge_mwu.py` + pętla decyzyjna | ✅ POTWIERDZONE | ✅ |
+| 4 | GRAPH | `graf_pamieci.py` — ale to graf PAMIĘCI, nie routing decyzyjny; `LangGraph` = **0 trafień** | 🟡 CZĘŚCIOWE | ✅ (3/4, „nie czytany przy decyzji") |
+| 5 | HIPERGRAF | **zero trafień w całym repo** | 🔴 BRAK | — |
+| 6 | NEURO-SYMBOLIC | INDEX FALSORUM, VINDEX, Prawo XXI | ⚠️ **SPORNE** | ❌ |
+| 7 | SAMO-EWOLUCJA | `ucz_mwu` | ⚠️ **ISTNIEJE, ale OBALONE** | ❌ |
+
+**Dwie tezy, które NIE PRZETRWAŁY pomiaru — obie były nasze własne:**
+
+1. **„HARNESS i NEURO-SYMBOLIC już stoją i nie są liczone".** HARNESS — tak, potwierdzone.
+   **NEURO-SYMBOLIC — wątpliwe.** Źródło rozumie przez to *weryfikację ŁAŃCUCHA DECYZYJNEGO*
+   (VeriCoT, SITL: czy decyzja jest logicznie spójna). Nasze INDEX FALSORUM i VINDEX weryfikują
+   **KOD i DOKUMENTY**, nie decyzje handlowe. To inna rzecz pod tą samą nazwą — a podpięcie jej
+   pod piętro 6 zawyżyłoby nasz stan. Do rozstrzygnięcia, nie do policzenia.
+2. **„Prawdopodobnie zaniżamy własny stan" — częściowo prawda, ale mniej, niż sądziliśmy.**
+   Realnie niemierzone i potwierdzone są **DWA** piętra (CONTEXT, HARNESS), nie sześć.
+
+**Trzecia rzecz do rozstrzygnięcia — KOLIZJA NAZWY na piętrze 0.** MATURITAS mierzy pod
+nazwą „PROMPT" *zdrowie specyfikacji* (czy `CLAUDE.md` nie puchnie), a źródło rozumie
+*warstwę instrukcji dla modeli* (TIRO/Hyginus). Dwie różne rzeczy w jednym słowie — jeśli
+tego nie rozdzielimy, `CURSUS ARTIS` zsumuje jabłka z gruszkami.
+
+**Wniosek operacyjny:** do stemplowania modułów wchodzą **cztery piętra potwierdzone**
+(PROMPT · CONTEXT · HARNESS · LOOP) + GRAPH jako częściowe. HIPERGRAF, NEURO-SYMBOLIC
+i SAMO-EWOLUCJA **nie stemplują niczego**, dopóki nie zostaną rozstrzygnięte.
+
+### 🕸️ L2a — MAPA WSPÓŁPRACY ORGANÓW (pytanie Cezara: „czy organy właściwie się komunikują")
+
+Zmierzone 2026-08-04 (import z drzewa składniowego, nie regex): **261 organów, 489 krawędzi**,
+164 wołających, 140 wołanych, **30 zupełnie samotnych**. Huby: `czytnik_csv` (44), `backtest` (36),
+`baza` (28), `mikro_neuron` (23). Trzy luki o różnej trudności:
+
+- **G1 — graf połączeń.** Da się zbudować dziś (liczby wyżej). ⚠️ **30 samotnych ≠ 27 sierot LUSTRUM**
+  — dwie różne miary (import AST vs wzmianka nazwy); rozjazd sam jest informacją, do zbadania.
+- **G3 — wzorzec oczekiwany.** Bez zadeklarowanego schematu graf jest obrazkiem, nie kontrolą.
+  To **rejestr układów z CORONY D** i jedyne znane domknięcie wąskiego gardła GRAPH
+  („graf nie jest czytany przy żadnej decyzji") — graf organów czytany przy przeglądzie
+  byłby PIERWSZYM czytelnikiem przy decyzji.
+- **G2 — aktywność RUNTIME.** Zero. Wszystko dziś mierzymy statycznie; organ może być
+  zaimportowany i **nigdy się nie wykonać** (np. za flagą opt-in OFF). Ostatni w kolejce —
+  wymaga instrumentacji kodu produkcyjnego, a rozwój jest zamrożony.
+
+### 🆕 CO ARCHITEKT PROPONUJE DOŁOŻYĆ DO POSTANOWIENIA (do decyzji Cezara)
+
+Rozkaz kazał sprawdzić, czym go uzupełnić. Siedem pozycji, każda z powodem:
+
+- **U1 — MIERZALNY WARUNEK WYJŚCIA.** „W pełni skalibrowane" bez liczby jest stanem
+  niefalsyfikowalnym: zamrożenie albo nigdy się nie skończy, albo skończy się arbitralnie.
+  Potrzebna JEDNA bramka zwracająca exit 0 dopiero przy komplecie kryteriów.
+- **U2 — KOLEJNOŚĆ WG RYZYKA, NIE ALFABETU.** „Ryba psuje się od głowy" — głową jest to,
+  co decyduje o kapitale. Najpierw ścieżka decyzyjna (wejście/wyjście z pozycji), potem
+  przyrządy orzekające, na końcu dokumentacja.
+- **U3 — CHECKLISTA PER KATEGORIA, nie jedna dla wszystkich.** Neuron sprawdza się inaczej
+  niż strażnik: neuron musi mieć pole WYMAGA i nie zwracać wiecznie NEUTRAL, strażnik musi
+  być przetestowany na OBU drogach wejścia (zmierzona klasa: 3 wady w jednej wachcie 08-03).
+- **U4 — REJESTR POSTĘPU PRZEGLĄDU (append-only).** 262 organy nie zmieszczą się w jednej
+  wachcie. Bez ledgera przegląd zgubi się między sesjami albo zrobimy go dwa razy.
+- **U5 — ZAKAZ POWIĘKSZANIA MIANOWNIKA.** W czasie przeglądu nie powstają nowe organy poza
+  tymi, które zamykają wykrytą lukę — inaczej liczba do sprawdzenia rośnie szybciej,
+  niż ją zbijamy.
+- **U6 — ANTYWSKAŹNIKI.** Przegląd musi być NIEOSZUKIWALNY: pozycji nie zamyka się przez
+  skasowanie jej ani przez zmianę nazwy. Wzorzec gotowy — `maturitas --antywskazniki`.
+- **U7 — SPRZĄTANIE PO SOBIE JEST CZĘŚCIĄ PRZEGLĄDU.** Każda znaleziona luka od razu dostaje
+  albo naprawę, albo wpis w rejestrze z terminem. Znalezisko bez adresu to kolejna sugestia
+  w stosie 34 nierozstrzygniętych.
+- **U8 — MUTACJA JAKO STAŁY POMIAR** ⭐ *rekomendacja nr 1 Architekta*. Okresowo wstrzykujemy
+  znane wady i mierzymy, ile bramka łapie. **Bramka o niezmierzonej sile to bramka, w którą
+  WIERZYMY.** Robiliśmy to RAZ (7/8 złapanych) i nigdy więcej. To jedyny punkt, który mówi,
+  czy pozostałe naprawy w ogóle działają — reszta to naprawy, ten jeden to sprawdzian.
+- **U9 — KALIBRACJA JAKO BRAMKA, NIE ZASADA.** LEX TALARUS wymaga kalibracji przyrządu, ale
+  **nic tego nie egzekwuje**. Organ orzekający bez wpisu kalibracyjnego w ledgerze → błąd
+  audytu. Dowód opłacalności z 08-04: naiwna miara LUSTRUM miała **7,4% precyzji**.
+- **U10 — JEDNA KOMENDA SYMBIOZY.** Wszystkie generatory przepisywane w kolejności zależności
+  jednym poleceniem. Dziś trzeba **pamiętać**, że CENSUS karmi INDEKS — i właśnie dlatego
+  bramka poszła na czerwono 08-04. Zależność trzymana w ludzkiej pamięci to awaria zaplanowana.
+
+### 👑 CZTERY KORONY — kolejność ZATWIERDZONA PRZEZ CEZARA 2026-08-03
+
+> ⚠️ **ODŁOŻONE na czas LUSTRATIO** (rozkaz 2026-08-04): korony C, B i D to ROZWÓJ, a rozwój
+> jest zamrożony do zdjęcia bramki. Korona **A jest już wdrożona**, więc nic nie blokuje.
+
+> Powstały jako opcje spłaty NOTY (LEX TALIONIS) za zwiad puszczony równolegle z bramką.
+> **Nowy ROZKAZ STAŁY z tej samej wachty:** przed spłatą noty Architekt podaje **TRZY
+> opcje CORONY** (uzasadnienie · opis · wpływ · co wnosi), a **wybiera Cezar** — dotąd
+> 54 korony powstały bez tej bramki, czyli wybierał ten, kto zawinił. Cezar wybrał
+> **wszystkie cztery** i dodał czwartą własnym pytaniem o organ ewolucji.
+
+| # | CORONA | Co wnosi | Piętro | Koszt |
+|---|---|---|---|---|
+| **A** ✅ | **SILENTIUM** (WDROŻONA 2026-08-03) — bramka zakłada blokadę, hook PreToolUse **odmawia zapisu do repo** w trakcie biegu | VINDEX *wykrywa* zabrudzenie po fakcie; **nic nie ZAPOBIEGA**. Zmierzone: 4 unieważnione biegi w 4 dni, **dwa z nich w jednej wachcie 08-03 przez tego samego, kto zasadę zapisał** — dowód, że sama wiedza nie wystarcza | HARNESS | ~1 wachta |
+| **C** | **CUSTOS BIBLIOTHECAE** (= A15) — warstwa W25: dysk ↔ katalog ↔ cache ↔ RAG | Żadna z 24 warstw nie pyta o KSIĘGI. Dowód: 40 ksiąg przybyło 01.08, **nikt nie zauważył przez dobę**, audyt drukował „pełna harmonia" | LOOP | ~1 wachta |
+| **B** | **VINDEX → GRAF W8** (= H6) — krawędzie `(plik) —[naruszenie]→ (commit)` | Jedyny producent krawędzi z **realnych zdarzeń**, nie z tekstu. Jedyna droga na GRAPH **nieblokowana przez A10** — ale nie daje czytelnika przy decyzji, więc GRAPH zostanie 3/4 | GRAPH | ~½ wachty |
+| **D** | **CURSUS ARTIS** — organ mierzący **WSZYSTKIE piętra**, z **rejestrem układów** (wzorce połączeń, status `ZATWIERDZONY/KANDYDAT/OBALONY`) | MATURITAS mierzy **3 z 9**. Dwa spoza trójki **JUŻ STOJĄ i nie są liczone**: HARNESS (6 hooków, 24 warstwy, SIGILLARIUM) i NEURO-SYMBOLIC (Prawo XXI, INDEX FALSORUM, VINDEX = weryfikacja w architekturze, nie audyt post-hoc). **Prawdopodobnie ZANIŻAMY własny stan.** INGENIUM = zero plików (grep) | wszystkie | ~2 wachty |
+
+> **ROZSTRZYGNIĘCIE CEZARA o układach (D):** wzorce wchodzą do rejestru **wyłącznie po
+> zatwierdzeniu nowej wizji albo po zmierzonym odkryciu** — nigdy z lektury materiału.
+> Domyka to pętlę *odkrycie → zatwierdzenie → wzorzec → egzekwowanie* i usuwa zarzut,
+> że budowalibyśmy miernik na cudzej, nieosądzonej taksonomii.
+>
+> **Warunek uczciwości dla D:** osiem z dziewięciu pięter znamy z materiału, którego
+> jeszcze nie osądziliśmy — tego samego, który wyprodukował `US20230000000A1`
+> i `abc123.ngrok.io`. Pierwsza wersja rejestru zawiera **tylko to, co potwierdzone
+> w NASZYM kodzie**; reszta czeka na QUAESTIO.
+
+### 👑 DRUGA TRÓJKA KORON — spłata NOTY `N-fa723062` (wybór Cezara 2026-08-03)
+
+> **Nota:** SILENTIUM przeszedł bramkę z wadą cyklu życia blokady — cisza WYŁĄCZNA
+> chroniła *plik blokady* zamiast *repozytorium*, drugi bieg dostawał komunikat
+> „bieg idzie BEZ ochrony" (nieprawdę), a pierwszy wychodzący zdejmował ciszę spod
+> trwającego biegu. **19 testów tego nie złapało, bo cały pakiet testuje JEDNOWĄTKOWO.**
+> Zgodnie z ROZKAZEM STAŁYM Architekt podał trzy opcje; **Cezar wybrał A i rozkazał
+> zacząć od niej w nowej sesji, resztę wg rekomendacji.**
+
+| # | CORONA | Unikat — czego dziś NIE MA | Wpływ | Stan |
+|---|---|---|---|---|
+| **A** 🎯 | **LUSTRUM** — organ mierzący **POŻYTEK** narzędzia (kto woła, wiek ostatniego użycia, testy, ślad w ledgerze) i wycofujący etapami `PODEJRZANY → KARENCJA → HONESTA MISSIO` | CENSUS ORGANORUM (W17) pyta wyłącznie „czy **zameldowany**", **nigdy „czy jeszcze potrzebny"**. Prawo XV robiliśmy RĘCZNIE 05.07 (12 niepodpiętych) — audyt na rozkaz, nie organ w pętli | pierwszy organ, który **ZAMYKA, a nie otwiera**: ROADMAP 15,5%, 375 wizji i 34 sugestie bez werdyktu | 🔴 **START NOWEJ SESJI** (rozkaz Cezara 08-03) |
+| **B** | **PROBATIO ITINERUM** — warstwa sprawdzająca, że narzędzie bramkowe daje **ten sam werdykt każdą drogą wejścia** (jawny plik / git / hook / `pytest` vs `run_tests.py`) | nikt nie testuje **równoważności dróg wejścia**. Zmierzone 08-03: **trzy wady tej klasy w jednej wachcie** (skaner wad — 5 fałszywek przy wywołaniu z hooka; test przechodzący pod pytest i padający pod bramką; wcześniej append-only w 6 organach / 0 egzekucji) | broni wiarygodności **wszystkich** bramek naraz — bez tego „czysto" znaczy tylko „czysto tą drogą" | 🔴 wg rekomendacji |
+| **C** | **SPECULATOR CONCURRENS** — kalibrowany próbnik współbieżności: N równoległych biegów i pomiar, czy niezmienniki (cisza, append-only, sigillum) trzymają | **całe Imperium testuje jednowątkowo** — to ślepa plama pakietu, nie luka jednego organu | jedyny sposób, by wada tej klasy została złapana **testem, a nie sesją Cezara** | 🔴 wg rekomendacji |
+
+> **🚨 DWA ROZJAZDY MATURITASA zmierzone przy domykaniu 2026-08-03** (dopisane, nie
+> przemilczane — miernik chwalący zamiast mierzyć jest gorszy od braku miernika):
+> **(1)** dopisanie do ROADMAP **7 realnych pozycji** (3 korony + 4 pytania) nie ruszyło
+> licznika — dalej `11/71`, więc te tabele są dla niego niewidzialne; to druga strona
+> zarzutu z recenzji PR #139, że liczy wiersze legionów jako pozycje.
+> **(2)** migawka zapisała `dlug_honorowy: 0` w chwili, gdy `codex_notarum bilans`
+> pokazuje **1** (nota `N-fa723062`). Miernik długu, który nie widzi długu, to dokładnie
+> klasa „przyrząd kłamie, nie system". **Zadanie na wachtę CORONY A** — LUSTRUM i tak
+> będzie czytał te same źródła.
+
+### ❓ PYTANIA OTWARTE — czekają na rozstrzygnięcie Cezara (zapisane 2026-08-03 na rozkaz)
+
+> Powód zapisu: pytanie zadane w rozmowie i nieutrwalone **ginie** — to ta sama klasa,
+> co 375 wizji bez werdyktu. Każde ma mieć albo odpowiedź, albo widoczny status.
+
+| # | Pytanie | Kontekst zmierzony | Stan |
+|---|---|---|---|
+| **P-01** | **Stos dashboardu PRAETORIUM: Dart/Flutter/Wasm czy to, co już mamy (HTML+JS)?** | materiał `wrzutnia/Dart-WebAssembly-components.md` (3495 linii, 168 KB, 83 adresy) opisuje budowę dashboardu w Dart/Wasm — to **nowy język i cały nowy stos** w Imperium Pythonowym. Rekomendacja Architekta: HTML+JS, zero nowych zależności | ⏳ **OTWARTE** |
+| **P-02** | **Repozytorium publiczne czy prywatne?** | DeepSeek **czytał nasz kod z GitHuba i cytuje go** znacznikami `[reference:N]`; zweryfikowane pomiarem: 4 z 5 liczb plików w organach dokładne, piąta nieaktualna o jeden dzień. Wcześniejszy zamiar Cezara („push po repo → private") nigdy nie został wykonany | ⏳ **OTWARTE** |
+| **P-03** | **Sąd VERITAS nad materiałem Dart/Wasm** — kiedy i w jakim zakresie | VIATOR gotowy (55 testów) na 83 adresy; destylat techniczny osobno. Materiał zawiera też **mockup dashboardu w stylu rzymskim** — wprost dotyka zamówienia Cezara z 02.08 (żywy schemat Imperium) | ⏳ **OTWARTE** |
+| **P-04** | **Czy LUSTRUM wchłania „strażnika obcych plików"** (pomysł Cezara 28.07) | 82 pliki we wrzutni; strażnik miał **kierować do kwarantanny, nie kasować** — to ta sama doktryna „nigdy nie kasuj sam", więc kandydat na jeden organ zamiast dwóch (Prawo XVI) | ⏳ **OTWARTE** |
 
 ### WACHTA H — DOMYKANIE PĘTLI *(kolejność = rekomendacja po skanie Imperium 2026-08-02)*
 
@@ -77,6 +307,31 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 ### WACHTA A — domknięcie biblioteki *(zaczęta 2026-07-29)*
 
+> **📚 PRZYROST KSIĘGOZBIORU ZMIERZONY 2026-08-02 (rozkaz Cezara) — i DOWÓD na potrzebę watchdoga.**
+> Cezar dograł **40 nowych ksiąg 2026-08-01** (`BIB-206..245`, ciągły blok, wszystkie zgodne
+> ze schematem nazw i z naszą listą: DeFi 206–211 · prognozowanie/osąd 212–221 ·
+> ekonofizyka i złożoność 222–231 · inżynieria systemów 232–245).
+>
+> | Warstwa | Stan 2026-07-28 (dokument) | **Stan ZMIERZONY 2026-08-02** | Δ |
+> |---|---|---|---|
+> | Pliki BIB na dysku | 209 | **248** (1 852 MB) | **+39** |
+> | W katalogu metadanych | 115 | **115** | 0 |
+> | W cache tekstu | 117 | **118** | +1 |
+> | Wyszukiwalne w RAG | 115 | **115** (37 331 fragm.) | **0** |
+> | **POZA RAG** | 92 | **133 (53,6% zbioru)** | **+41** |
+>
+> **NIKT tego nie zauważył przez dobę** — audyt drukował „pełna harmonia", bo **żadna z 24 warstw
+> nie pilnuje księgozbioru** (W11 dotyczy `imperium/biblioteki/`, czyli modułów kodu, nie ksiąg).
+> To ta sama klasa co kontrakt append-only: **rzecz deklarowana w dokumencie, egzekwowana przez
+> zero mechanizmów**. Dokument sam się przedawnił w 4 dni. Stąd A15 (watchdog) przed A7 (nadrobienie):
+> **najpierw mechanizm, potem nadrabianie** — inaczej za tydzień znów będziemy liczyć ręcznie.
+>
+> **Wpływ na doktrynę LOOP/GRAPH:** 133 księgi poza RAG to **otwarta pętla o największej masie**
+> w Imperium (53,6% zapłaconego zasobu bezużyteczne dla Hyginusa i QUAESITORA). Zarazem indeksy
+> tych 133 ksiąg **karmią A10** (zbiór ewaluacyjny), a A10 odblokowuje **całe piętro GRAPH** (G4,
+> A14, K10). Domykanie tej pętli jest jednocześnie otwieraniem drogi na graf — dokładnie kryterium
+> z rozkazu 2026-08-02.
+
 | # | Zadanie | Stan | Dlaczego teraz |
 |---|---|---|---|
 | A1 | **AESTIMATOR** — pomiar wierności korpusu + kalibracja | ✅ 14 testów | dał liczby, na których stoi cała reszta wachty |
@@ -85,7 +340,9 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 | A4 | **QUAESITOR — pierwszy bieg, domknięcie K10** | 🟡 **uruchomiony 2026-07-30, 19 testów** — K10 nadal NIEZNANE | pierwszy bieg dał naprawę u źródła (sanityzacja FTS w `szukaj.sanityzuj_fts`, ścieżka MCP recall@5 **16,7% → 80,0%**), ale K10 wymaga zbioru z A10 — 30 pytań to 0,22% zawołań |
 | A5 | **OCR na BIB-007 (AFML)** — 93 listingi kodu jako obrazy | ⏸️ WARUNKOWE (po A11) | najbardziej wykonalna treść w najważniejszej książce ilościowej; ~30–40 min przy 5,2 s/stronę |
 | A6 | **Przepięcie indeksu na REDDITORA** + reindeksacja | 🔴 | **dopiero po zielonym K10** (ZASADA WPIĘCIA: opt-in, po dowodzie) |
-| A7 | **91 książek poza indeksem** → ekstrakcja → cache → indeks | 🔴 | rozkaz Cezara, pozycja 2 w jego kolejności |
+| A7 | **133 książki poza indeksem** → ekstrakcja → cache → indeks → **fragmentacja** | 🔴 **liczba PRZEMIERZONA 2026-08-02: było 91/92, jest 133** | rozkaz Cezara. Zakres urósł o **41 pozycji w 4 dni** (40 dogranych 08-01 + BIB-136/155 z OCR). Wykonanie **partiami z paskiem postępu** (Prawo XXIV) — 133 pozycje × ekstrakcja to nie jeden bieg. Po ekstrakcji **REDDITOR** (A2) daje fragmenty z dowodem SHA-256, więc podział na fragmenty jest już ROZWIĄZANY, nie do wymyślania |
+| A15 | **CUSTOS BIBLIOTHECAE — watchdog księgozbioru** (warstwa audytu W25) | 🔴 **ROZKAZ CEZARA 2026-08-02, PRZED A7** | **Dowód konieczności zmierzony:** 40 ksiąg przybyło 08-01, dokument mówił „209 plików / 92 poza RAG", prawda to „248 / 133" — a audyt 24 warstw drukował **pełna harmonia**. Żadna warstwa nie pyta o KSIĘGI (W11 pilnuje modułów kodu). Kontrakt: dysk ↔ `katalog_ksiag.json` ↔ `tekst_cache/` ↔ `baza_wiedzy.db` **muszą się zgadzać**, rozjazd = alarm z listą ID. Ta sama klasa co VINDEX: rzecz deklarowana w dokumencie, egzekwowana przez zero. **Uodpornia przeciw KLASIE** (zasada CENSORA), zamiast nadrabiać ręcznie po każdej dostawie Cezara |
+| A16 | **Analiza 40 nowych pozycji BIB-206..245** — sąd nad treścią + edycja dokumentacji | 🔴 **po A15/A7** | wg wzorca z BIBLIO28: AESTIMATOR mierzy wierność (w tym **A13 — kryterium języka**, bo BIB-011 przeszedł jako „OKROJONA" przy 100% straty użyteczności), potem wpis do `PLAN_ROZBUDOWY_BIBLIOTEKI.md` + `katalog_ksiag.json`. **Nie „wygląda dobrze" — POMIAR** (`unikalne słowa`, nie długość: lekcja z 07-28). Blok 232–245 (inżynieria: Kleppmann, Fowler, Nygard, SRE) jest osobno cenny — to korpus dla **naszych własnych** decyzji architektonicznych, nie dla tradingu |
 | A8 | **R2 — fuzja RRF** zamiast sortowania po mieszanych skalach | 🔴 | mina latentna w Księdze Wad; wybuchnie w dniu włączenia wektorów. **Potwierdzone niezależnie z zewnątrz** (sąd 07-30, poz. F2) — RRF+cross-encoder jest standardem produkcyjnym, nie naszym wynalazkiem |
 | A9 | **R3 — 3 gotowe książki + korpus `docs` (305 plików)** | 🔴 | dwa polecenia, zero ryzyka. Kandydat bez dowodu (MARK 2506.23026, praca **bez własnych pomiarów**): korekty wchodzą do korpusu retrievalu i **przebijają źródło** — u nas INDEX FALSORUM i lekcje miałyby wygrywać z książką, gdy się z nią kłócą |
 | A10 | **Zbiór ewaluacyjny z INDEKSÓW książek** — 13 729 haseł wyliczonych przez samych autorów | 🔴 | zmierzone: zbiór QUAESITORA to 30 pytań = **0,22%** zawołań zadeklarowanych w indeksach (42/118 książek ma użyteczny indeks, ~326 haseł na książkę). K10 na takiej próbce jest liczbą bez mocy. Prawda podstawowa **napisana przez autora**: zero tokenów, zero halucynacji.<br>🔧 **PROJEKT SKORYGOWANY 07-30 (VeNRA §5, decyzja Cezara):** podział **po RODZINACH, nie losowy**. Rodzina = hasło + wszystkie pytania z niego pochodne + warianty z tej samej książki. Losowy podział 80/10/10 na zbiorze z rekordami pochodnymi **gwarantuje wyciek** (rodzic w treningu, dziecko w teście → metryka zawyżona, **niewykrywalnie**). Dodatkowo: zachować **pary kontrastowe** w zbiorze testowym, by liczyć **Flip Rate** (czy przyrząd ODWRACA werdykt pod minimalną perturbacją) — sama trafność tego nie pokaże |

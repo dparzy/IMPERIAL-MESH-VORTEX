@@ -1,7 +1,9 @@
 ---
-kategoria: MENSURA
-typ: zywy
+kategoria: ACTA
+powod_acta: "glęboki skan pliku zrodlowego z archiwum — datowany wynik przeszukania, nie zywy pomiar"
+typ: acta
 wlasciciel: —
+bez_wlasciciela: "przeglad pliku zrodlowego z archiwum — opisuje material, nie modul"
 stan_na: 2026-06-01
 powod_istnienia: "Głęboki skan pliku źródłowego `archiwum/Azjatycki_skan_rynku_3100_links.md` (7106 linii) przez 'cztery legiony zwiadowców', żeby wyłowić perełki (nowe neurony/strategie/architektur"
 ---

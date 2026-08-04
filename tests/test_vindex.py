@@ -148,14 +148,56 @@ def test_binaria_nie_udaja_zmiany_linii():
     assert v._numstat("5\t0\tplik.jsonl\n") == [("plik.jsonl", 5, 0)]
 
 
-def test_awaria_gita_nie_jest_naruszeniem():
-    """Prawo I: brak narzędzia to brak wiedzy, nie zarzut. Strażnik, który przy awarii
-    krzyczy „naruszenie", uczy przechodzenia nad sobą do porządku dziennego."""
+def test_awaria_gita_to_NIEZNANE_a_nie_naruszenie_ani_czysto():
+    """Prawo I: brak narzędzia to brak WIEDZY — ani zarzut, ani rozgrzeszenie.
+
+    KONTRAKT ZAOSTRZONY 2026-08-03 (P1, cubic PR #139). Poprzednia wersja zwracała przy
+    awarii pustą listę zmian, co `podsumuj` zamieniało w status `czysto` i kod wyjścia 0 —
+    hook **zatwierdzał repozytorium, którego nie obejrzał**. Strażnik krzyczący „naruszenie"
+    przy awarii uczy ignorowania siebie, ale strażnik meldujący „czysto" jest GORSZY:
+    kłamie w stronę spokoju. Trzeci stan (`nieznane`) jest jedynym uczciwym.
+    """
     oryginal = v._git
     v._git = lambda *a: None
     try:
-        assert v.zmiany_robocze() == []
+        for wolanie in (v.zmiany_robocze, lambda: v.zmiany_commitu("HEAD")):
+            try:
+                wolanie()
+            except v.GitNieodpowiada:
+                pass
+            else:
+                raise AssertionError("awaria gita musi być JAWNA, nie pusta lista zmian")
+        w = v.zbadaj()                       # pełny werdykt NIE MOŻE wybuchnąć…
+        assert w["status"] == "nieznane"     # …ale musi powiedzieć, że nic nie wie
+        assert w["status"] != "czysto", "awaria gita nie może udawać czystego repo"
+        assert w["naruszenia"] == [], "brak wiedzy to nie zarzut"
+        assert w["niepokryte"], "milczenie o niezbadanym zakresie jest zakazane"
         assert v.obce_pliki() == []
+    finally:
+        v._git = oryginal
+
+
+def test_rename_ledgera_nie_omija_kontroli():
+    """`git mv` na ledgerze ŚCISŁYM musi być widziany jako usunięcie starej ścieżki.
+
+    P1 z recenzji cubic PR #139: przy wykrywaniu zmian nazw git pisze
+    `0\\t0\\tdocs/{stary => nowy}` — zero usunięć pod ścieżką, która nie pasuje do
+    żadnego chronionego wzorca. Bez `--no-renames` dało się usunąć ledger o kontrakcie
+    ŚCISŁYM zwykłym `git mv`, a strażnik meldował czysto.
+    """
+    uzyte: dict = {}
+    oryginal = v._git
+
+    def _szpieg(*a):
+        uzyte["args"] = a
+        return ""
+
+    v._git = _szpieg
+    try:
+        v.zmiany_robocze()
+        assert "--no-renames" in uzyte["args"], "diff bez --no-renames przepuszcza rename"
+        v.zmiany_commitu("HEAD")
+        assert "--no-renames" in uzyte["args"], "show bez --no-renames przepuszcza rename"
     finally:
         v._git = oryginal
 
@@ -179,3 +221,28 @@ def test_klasa_scisla_nadal_ma_zero_usuniec_w_historii():
                  if len(c) == 3 and c[1].isdigit() and int(c[1]) > 0]
     # Utworzenie pliku ma 0 usunięć, więc każde usunięcie tutaj jest realną zmianą.
     assert not usuniecia, f"ledger klasy ŚCISŁEJ został zmieniony: {usuniecia} (z {utworzenia})"
+
+
+def test_swiezy_commit_nie_dubluje_pliku_z_drzewa():
+    """Plik zmieniony ORAZ w drzewie, ORAZ w świeżym commicie liczy się RAZ.
+
+    Wada znaleziona recenzją tej wachty: konkatenacja bez deduplikacji dawała
+    `zbadane: 2` dla jednego pliku i drukowała to samo naruszenie dwoma wierszami —
+    Cezar widziałby dwa alarmy i musiał zgadywać, czy to dwa wykroczenia.
+    """
+    # WSZYSTKIE podmienione nazwy przywracamy — test, który zostawia po sobie atrapę
+    # w module produkcyjnym, psuje testy uruchomione PO nim i robi to niewidzialnie
+    # (lekcja „test mutujący produkcję", utajona do wykrycia przez kolejność biegu).
+    oryginaly = {n: getattr(v, n) for n in
+                 ("zmiany_robocze", "zmiany_commitu", "_commit_swiezy", "obce_pliki")}
+    plik = "bibliotheca_ulpia/dane/dziennik_niesmiertelny.jsonl"
+    v.zmiany_robocze = lambda: [v.ocen_zmiane(plik, 1, 0)]
+    v.zmiany_commitu = lambda ref="HEAD": [v.ocen_zmiane(plik, 2, 0)]
+    v._commit_swiezy = lambda *a, **k: True
+    v.obce_pliki = lambda: []
+    try:
+        w = v.zbadaj()
+        assert w["zbadane"] == 1, f"plik policzony {w['zbadane']}× zamiast raz"
+    finally:
+        for nazwa, funkcja in oryginaly.items():
+            setattr(v, nazwa, funkcja)

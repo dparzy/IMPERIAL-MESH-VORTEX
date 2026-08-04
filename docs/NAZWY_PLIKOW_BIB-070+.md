@@ -1,7 +1,7 @@
 ---
-kategoria: FORMA
+kategoria: DISCIPLINA
 typ: zywy
-wlasciciel: —
+wlasciciel: narzedzia/przygotuj_biblioteke.py
 stan_na: 2026-07-28
 powod_istnienia: "Gotowa do skopiowania lista nazw plików (konwencja `BIB-XXX_Autor_Tytul.ext`) dla całej listy BIB-070..306, żeby Cezar mógł szybko nazwać pobrane pliki bez przepisywania z tabel PL"
 ---

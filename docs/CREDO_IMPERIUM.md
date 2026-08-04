@@ -2,6 +2,7 @@
 kategoria: LEX
 typ: zywy
 wlasciciel: —
+bez_wlasciciela: "doktryna zalozycielska Cezara — slowa Imperatora, nie opis modulu"
 stan_na: 2026-07-07
 powod_istnienia: "Doktryna założycielska Cezara (verbatim) — serce, z którego wyrasta 25 Praw; źródło przy milczeniu prawa"
 ---

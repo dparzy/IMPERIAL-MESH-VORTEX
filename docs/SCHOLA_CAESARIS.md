@@ -1,7 +1,7 @@
 ---
 kategoria: DISCIPLINA
 typ: zywy
-wlasciciel: schola
+wlasciciel: imperium/biblioteki/schola.py
 stan_na: 2026-07-29
 powod_istnienia: "Szkoła Cezara — lekcje wywiedzione z WŁASNYCH pomiarów Imperium, nie z podręczników. Cezar uczy się razem z Imperium, a każda lekcja rodząca twierdzenie sprawdzalne dostaje status i pomiar."
 ---

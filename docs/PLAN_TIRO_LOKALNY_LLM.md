@@ -2,7 +2,7 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: imperium/biblioteki/notarius.py, imperium/oczy/censor_sprzetu.py, imperium/swiatynie/web_dashboard.py
-stan_na: 2026-07-18
+stan_na: 2026-08-04
 powod_istnienia: "Zbudować lokalny hybrydowy LLM 'TIRO' (uczeń), trenowany metodą destylacji od nauczyciela DeepSeek (Hyginus), z docelowym celem przejęcia ról LLM w Imperium bez kosztów API."
 ---
 # 🎓 PLAN TIRO — Lokalny Hybrydowy LLM-Uczeń Imperium
@@ -11,10 +11,16 @@ powod_istnienia: "Zbudować lokalny hybrydowy LLM 'TIRO' (uczeń), trenowany met
 
 > **✅ Weryfikacja wobec kodu 2026-07-18: rdzeń stanu potwierdzony.** CENSOR (5 klas majątkowych
 > PROLETARIUS→CONSUL, CLI raport/migawka/klasa/zmiana/zatwierdz) ✅ · NOTARIUS
-> (`tiro_pary_nauczyciela.jsonl`, `LIMIT_PROBEK_NA_PYTANIE=3`, `eksportuj_sft`) ✅ · rój 87 ·
-> kronika 102 sesji. Pomiary E1 (llama-bench, tok/s) to prawda DATOWANA (2026-07-16), nietknięta.
+> (`tiro_pary_nauczyciela.jsonl`, `LIMIT_PROBEK_NA_PYTANIE=3`, `eksportuj_sft`) ✅ · rój <!-- LICZBA:neurony -->87<!-- /LICZBA --> ·
+> kronika <!-- LICZBA:sesje_kroniki -->155<!-- /LICZBA --> sesji. Pomiary E1 (llama-bench, tok/s) to prawda DATOWANA (2026-07-16), nietknięta.
 > Jedyna korekta: liczba fragmentów RAG „27 959" → dziś <!-- LICZBA:fragmenty -->37331<!-- /LICZBA -->
 > (przeniesiona na blok W15, by nie zamarzła — rośnie z biblioteką).
+> ✅ **Re-weryfikacja 2026-08-04** (kalibracja bramki T2): `LIMIT_PROBEK_NA_PYTANIE = 3` ✅ ·
+> `eksportuj_sft` ✅ · CENSOR CLI ✅ · RAM zmierzona 15.88 GB, klasa PEDES ✅ · adapter
+> `llama-server` nadal NIEZROBIONY (uczciwie odhaczony). **Naprawione:** „kronika 102 sesji"
+> w dwóch miejscach (realnie <!-- LICZBA:sesje_kroniki -->155<!-- /LICZBA -->) — liczba rosnąca
+> SAMA, niewidzialna dla bramki gnicia, więc od dziś wstrzykiwana; oraz zadanie „do naprawy:
+> `uzyj_llm=False`", które było zamknięte już 2026-07-17 i stało tu jako otwarte.
 > **Architekt:** VITRUVIUSZ (Opus) · **Zwiad:** Sonnet (web) + Hyginus (DeepSeek, plik `wrzutnia/zrodla danych i inne.md`)
 > **Rzymskie imię:** **TIRO** (łac. *tiro* — rekrut/uczeń w szkoleniu; docelowo awansuje przez stopnie)
 
@@ -138,8 +144,8 @@ techniczne** — tylko jedno jest dla nas dobre:
 ### 🎯 Werdykt Architekta: co czyni model NASZYM
 
 Scalanie wag daje to samo, co ma każdy inny na Hugging Face. **Unikalność TIRO nie weźmie się z techniki
-łączenia — weźmie się z DANYCH, KTÓRYCH NIKT INNY NIE MA:** wyniki areny, decyzje 87 neuronów, biblioteka
-RAG (<!-- LICZBA:fragmenty -->37331<!-- /LICZBA --> fragmentów), werdykty Hyginusa, kronika 102 sesji. Uczeń wytrenowany na *tym* będzie jedynym
+łączenia — weźmie się z DANYCH, KTÓRYCH NIKT INNY NIE MA:** wyniki areny, decyzje <!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów, biblioteka
+RAG (<!-- LICZBA:fragmenty -->37331<!-- /LICZBA --> fragmentów), werdykty Hyginusa, kronika <!-- LICZBA:sesje_kroniki -->155<!-- /LICZBA --> sesji. Uczeń wytrenowany na *tym* będzie jedynym
 modelem na świecie rozumiejącym Imperium. Frankenmerge z trzech modeli z HF nie da tego nigdy.
 
 **→ Hybryda = wspólny szkielet z HF (rodzina Qwen) + distylacja na danych Imperium.** Scalanie wag = opcjonalny
@@ -215,8 +221,11 @@ a `uzyj_llm` jest **domyślnie True** + `glos=None` → lazy-init z klucza → t
 z sieci i płacą za PRAWDZIWY LLM. Cała bramka ~17 wywołań na przebieg.
 **Trzy szkody:** testy nieszczelne (zależą od sieci i od tego, co akurat piszą o ETH → niedeterministyczne),
 kosztują przy każdym przebiegu, są przez to wolne.
-**Bez NOTARIUSA nikt by tego nie zauważył.** Do naprawy: wstrzykiwać atrapę fetchera/głosu w testach
-pętli (`uzyj_llm=False`), tak jak robi to już `test_sentyment_news.py`.
+**Bez NOTARIUSA nikt by tego nie zauważył.**
+✅ **NAPRAWIONE 2026-07-17** (zweryfikowane 2026-08-04): zapora nie stanęła w pojedynczym teście,
+tylko w `tests/conftest.py` — całą bramkę odcięto od płatnych wywołań naraz. Powód wyższości tego
+wariantu zapisany w samym conftest: klasa „testy palą pieniądze" była już RAZ zanotowana w Księdze
+Wad (2026-07-16) i wróciła nazajutrz, bo notatka nie jest mechanizmem.
 - [ ] **E3 — Pierwszy A/B:** surowy mały model vs DeepSeek na newsach (Brier) — baseline jakości ucznia.
 - [ ] **E4 — Szkoła:** trening LoRA w Colab na zebranym datasecie → GGUF → lokalna inferencja.
 - [ ] **E5 — Egzamin:** A/B ucznia-po-treningu vs nauczyciel; awans roli tylko po zielonym pomiarze.

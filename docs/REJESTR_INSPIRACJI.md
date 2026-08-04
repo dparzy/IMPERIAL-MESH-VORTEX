@@ -1,7 +1,7 @@
 ---
 kategoria: TABULA
 typ: zywy
-wlasciciel: —
+wlasciciel: narzedzia/audyt_spojnosci.py
 stan_na: 2026-07-16
 powod_istnienia: "Jedno źródło prawdy o zewnętrznych inspiracjach AI/ML (ZPO: pełna nazwa + link + status weryfikacji)"
 ---

@@ -90,9 +90,31 @@ PROFILE: Dict[str, Dict[str, Any]] = {
         "model": "deepseek-v4-flash", "reasoning_effort": "high",
         "po_co": "self-critique Hyginusa — druga perspektywa, dowody przeciw",
     },
-    # Osąd: konsekwencje długoterminowe (co wchodzi do roju). Tu stać nas na premium.
+    # Osąd: konsekwencje długoterminowe (co wchodzi do roju).
+    #
+    # PRZESTAWIONE Z `v4-pro` NA `v4-flash` — ROZKAZ CEZARA 2026-08-03, po pomiarze
+    # zewnętrznym zweryfikowanym w dwóch niezależnych źródłach (MarkTechPost 07-31 +
+    # Artificial Analysis). DeepSeek wydał `V4-Flash-0731` 31.07.2026 i TAŃSZY model bije
+    # droższego na WSZYSTKICH pięciu opublikowanych benchmarkach agentowych:
+    #   Terminal Bench 2.1  82,7 vs 72,1  ·  NL2Repo    54,2 vs 38,5
+    #   Cybergym            76,7 vs 52,7  ·  DeepSWE    54,4 vs 12,8  (4,3×)
+    #   Toolathlon-Verified 70,3 vs 55,9  ·  Intelligence Index 50 vs 44
+    # Cena wyjścia: $0.28 vs $0.87 — czyli 3,1× taniej ZA LEPSZY WYNIK.
+    #
+    # PRZYCZYNA (nie „nowy model", tylko inna nauka): architektura jest identyczna
+    # z kwietniowym preview (284B/13B) — zmieniono WYŁĄCZNIE post-training, nastawiając
+    # go na pracę wieloetapową. `V4-Pro` tego treningu NIE dostał („The V4-Pro API […]
+    # was not updated"). Największy skok jest tam, gdzie zadanie ma najwięcej kroków,
+    # bo w pętli błędy się MNOŻĄ, nie dodają.
+    #
+    # ⚠️ GRANICA TEGO DOWODU (Prawo I): tamte benchmarki są AGENTOWE (terminal, repo,
+    # narzędzia), a ten profil wykonuje OSĄD dziedzinowy — ocenia kandydata na neuron.
+    # Przewaga zmierzona na cudzym zadaniu jest POSZLAKĄ, nie wyrokiem o naszym.
+    # Rozstrzygnie A/B opisany w `narzedzia/ab_plon_hyginusa.py` (flash/high vs pro/high),
+    # zaplanowany i dotąd nieuruchomiony. Do czasu jego wyniku `v4-pro` zostaje w CENNIKU
+    # jako ramię porównawcze — usunięcie go zabiłoby możliwość zmierzenia tej decyzji.
     "osad": {
-        "model": "deepseek-v4-pro", "reasoning_effort": "high",
+        "model": "deepseek-v4-flash", "reasoning_effort": "high",
         "po_co": "ocena kandydatów na neurony/strategie — decyzja o konsekwencjach",
     },
 }

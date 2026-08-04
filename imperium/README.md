@@ -1,7 +1,7 @@
 ---
-kategoria: FORMA
+kategoria: DISCIPLINA
 typ: zywy
-wlasciciel: —
+wlasciciel: imperium/legiony/rejestr.py
 stan_na: 2026-05-31
 powod_istnienia: "Mapa organów rzymskich w kodzie (folder → rola → moduły) — pierwszy dokument czytany przy wejściu w imperium/"
 ---

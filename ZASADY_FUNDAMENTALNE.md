@@ -2,6 +2,7 @@
 kategoria: LEX
 typ: zywy
 wlasciciel: —
+bez_wlasciciela: "prawo Imperium — obowiazuje wszystkie organy, nie opisuje kodu"
 stan_na: 2026-07-11
 powod_istnienia: "25 Praw Imperium — pełna konstytucja, do której odwołuje się każda decyzja"
 ---

@@ -63,6 +63,32 @@ KATEGORIE = {
 TYPY = {"zywy", "acta"}
 POLA_WYMAGANE = ("kategoria", "typ", "wlasciciel", "stan_na", "powod_istnienia")
 
+# ── WŁAŚCICIEL: KIEDY WOLNO GO NIE MIEĆ (naprawa 2026-08-04) ──────────────────
+# SPRZECZNOŚĆ W SAMYM ORGANIE, zmierzona na 22 dokumentach: parser świadomie zamienia
+# `—` na pustkę („— musi znaczyć BRAK właściciela" — kontrakt utrwalony testem), a bramka
+# T1 zaraz potem żąda wartości NIEPUSTEJ. Organ wypisywał więc `—` we własnym katalogu
+# jako wartość poprawną i karał za jej wpisanie. Skutek uboczny był gorszy od samego
+# błędu: dokument bez właściciela wypadał TAKŻE z bramki GNICIA, bo pętla po właścicielach
+# nie wykonywała się ani razu. Dostawał błąd i zwolnienie z kontroli w jednym ruchu —
+# czyli klasa „milczenie czytane jako zieleń" (K2 przeglądu LUSTRATIO).
+#
+# Rozstrzygnięcie: brak właściciela jest DOZWOLONY, ale nigdy MILCZĄCY. Ten sam wzorzec
+# co `powod_acta` i `dublet_rozstrzygniety`: wyciszenie bramki zawsze wymaga powodu,
+# który zostaje na widoku (K4).
+POLE_BEZ_WLASCICIELA = "bez_wlasciciela"
+
+# Kategorie, w których brak właściciela jest SPRZECZNOŚCIĄ Z DEFINICJĄ KATEGORII,
+# więc żaden powód go nie usprawiedliwia:
+#   TABULA  — „rejestr prawdy o kodzie, musi zgadzać się 1:1" → rejestr, który nie
+#             wskazuje żadnego kodu, nie ma z czym się zgadzać,
+#   FORMA   — „opis budowy organu" → opis budowy bez organu,
+#   MENSURA — „pomiar z danych" → pomiar bez mierzonego przedmiotu.
+KATEGORIE_Z_OBOWIAZKOWYM_WLASCICIELEM = ("TABULA", "FORMA", "MENSURA")
+
+# Zastępczy zegar świeżości dla dokumentów BEZ właściciela. Bez niego brak kodu
+# oznaczałby brak jakiejkolwiek kontroli aktualności — a doktryna też się starzeje.
+DNI_BEZ_WLASCICIELA = 90
+
 # Poza rejestrem — każde z własnymi zasadami, Tabularium pilnuje ŻYWEJ dokumentacji:
 #   archiwum/          — magazyn, otwierany na rozkaz Cezara (ZASADA ARCHIWIZACJI)
 #   bibliotheca_ulpia/ — księgozbiór i kronika sesji: historia, Prawo I zabrania tykać
@@ -119,7 +145,7 @@ def wartosci_z_kodu():
 
     from imperium.biblioteki.pamiec_absolutna import ImperiumLog
     from imperium.biblioteki.srodowisko_pamieci import (
-        fragmenty_w_bazie, korpus_ksiazek_obecny, ksiazki_w_bazie,
+        fragmenty_w_bazie, korpus_ksiazek_obecny, ksiazki_w_bazie, sesje_w_kronice,
     )
     from imperium.legiony.rejestr import (
         neurony_dla_trybu, raport_elity, wszystkie_neurony, wszyscy_zwiadowcy,
@@ -144,6 +170,11 @@ def wartosci_z_kodu():
         # zestarzeje się tak samo, jak zaszyte w kodzie „42" zestarzało się przy 79.
         "ksiazki": ksiazki_w_bazie(),
         "fragmenty": fragmenty_w_bazie(),
+        # Kronika rośnie od SAMEJ PRACY, bez żadnego commitu w plikach-właścicielach —
+        # dlatego bramka gnicia (T2) nigdy jej nie złapie. Zmierzone 2026-08-04: dwa
+        # dokumenty pisały „102 sesji" przy 154 realnych. Liczba wstrzykiwana zamyka
+        # klasę u źródła: dokument NIE MA JAK skłamać o wielkości, której nie zapisuje.
+        "sesje_kroniki": sesje_w_kronice(),
     }
     # ABSTYNENCJA ZAMIAST ZERA (Prawo XV, zmierzone 2026-07-26). Książki są świadomie poza
     # gitem, więc chmura mierzy 0 książek i 551 fragmentów tam, gdzie lokal ma 115/37331.
@@ -185,7 +216,9 @@ def wstrzyknij_liczby(sucho=False, tylko=None):
     """
     wartosci = wartosci_z_kodu()
     zmiany, bledy = [], []
-    dokumenty = list(zbierz_dokumenty())
+    # USŁUGA, nie sędzia — naprawia znaczniki gdziekolwiek je zastanie (patrz docstring
+    # `zbierz_dokumenty`); filtr gita obowiązuje wyłącznie bramki orzekające.
+    dokumenty = list(zbierz_dokumenty(tylko_sledzone=False))
     # Dołącz żywe drogowskazy spoza rejestru (np. README biblioteki) — tylko warstwa liczb.
     for wzgl in DROGOWSKAZY_Z_LICZBAMI:
         if os.path.exists(os.path.join(ROOT, wzgl)):
@@ -261,9 +294,40 @@ def czytaj_naglowek(sciezka):
     return meta
 
 
-def zbierz_dokumenty():
-    """Wszystkie żywe .md Imperium → [(sciezka_wzgledna, meta)] posortowane."""
+def _sledzone_przez_git():
+    """Zbiór ścieżek wersjonowanych, albo None gdy gita nie ma (wtedy nie filtrujemy).
+
+    ZMIERZONE 2026-08-04: Tabularium żądało metadanych od `raporty/RAPORT_TOKENY_2026-07-26.md`,
+    który jest **gitignored** (`.gitignore:20`). Plik spoza kontroli wersji nie jest
+    dokumentem Imperium — nie ma go na branchu, więc wedle Prawa XIX nie istnieje.
+    Naprawa KLASOWA, nie punktowa: dopisanie `raporty` do POZA_REJESTREM uciszyłoby
+    ten jeden katalog, a każdy następny ignorowany katalog powtórzyłby alarm.
+    Brak gita nie może wywrócić spisu — wtedy zachowujemy się jak dawniej.
+    """
+    try:
+        wynik = subprocess.run(
+            ["git", "ls-files", "*.md"], capture_output=True, text=True, timeout=30,
+            cwd=ROOT, encoding="utf-8", errors="replace",
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if wynik.returncode != 0:
+        return None
+    return {l.strip() for l in wynik.stdout.splitlines() if l.strip()}
+
+
+def zbierz_dokumenty(tylko_sledzone=True):
+    """Wszystkie żywe .md Imperium → [(sciezka_wzgledna, meta)] posortowane.
+
+    `tylko_sledzone=False` wyłącza filtr gita. SĘDZIA vs USŁUGA (rozstrzygnięcie
+    2026-08-04): bramki (`sprawdz`, `katalog_md`) ORZEKAJĄ o dokumentach Imperium,
+    więc plik spoza kontroli wersji ich nie obchodzi. Wstrzykiwacz liczb niczego nie
+    osądza — naprawia znaczniki tam, gdzie je zastanie, także w dokumencie roboczym.
+    Rozdzielenie jest potrzebne, bo filtr założony bez niego wyciął testom grunt pod
+    nogami: sprawdzały wstrzykiwacz na pliku tymczasowym, czyli z definicji nieśledzonym.
+    """
     znalezione = []
+    sledzone = _sledzone_przez_git() if tylko_sledzone else None
     for katalog, podkatalogi, pliki in os.walk(ROOT):
         podkatalogi[:] = [d for d in podkatalogi if d not in POZA_REJESTREM]
         for plik in pliki:
@@ -271,6 +335,8 @@ def zbierz_dokumenty():
                 continue
             pelna = os.path.join(katalog, plik)
             wzgledna = os.path.relpath(pelna, ROOT).replace("\\", "/")
+            if sledzone is not None and wzgledna not in sledzone:
+                continue          # poza kontrolą wersji = poza Imperium (Prawo XIX)
             znalezione.append((wzgledna, czytaj_naglowek(pelna)))
     return sorted(znalezione)
 
@@ -317,6 +383,149 @@ def _commity_wlasciciela_po(sciezka_wlasciciela, stan_na):
     return [w for w in wynik.stdout.strip().splitlines() if w.strip()]
 
 
+_DEF_W_DIFFIE = re.compile(r"^[+-]\s*(?:async\s+)?(?:def|class)\s+([A-Za-z_]\w*)")
+_DEF_W_HUNKU = re.compile(r"^@@ .* @@\s*(?:async\s+)?(?:def|class)\s+([A-Za-z_]\w*)")
+_DEF_W_KODZIE = re.compile(r"^\s*(?:async\s+)?(?:def|class)\s+([A-Za-z_]\w*)", re.M)
+_CYTAT_BACKTICK = re.compile(r"`([^`\n]{1,120})`")
+_IDENTYFIKATOR = re.compile(r"[A-Za-z_]\w*")
+
+# Symbol zdefiniowany w tylu plikach (lub więcej) jest HOMONIMEM, nie świadectwem.
+# Próg zmierzony 2026-08-04 na populacji 26 gnijących dokumentów: rozkład jest
+# bimodalny (symbole unikalne żyją w 1–3 plikach, pospolite w 40–97), więc progi
+# 2, 3, 5 i 10 dają IDENTYCZNY wynik — 9 mocnych świadectw. Brak wrażliwości na
+# próg to dowód, że nie stroimy go pod oczekiwany wynik. Bez niego `main` (84 pliki)
+# „dowodził", że SCIAGA_LOKAL opisuje zmieniony kod — świadectwo mówiące tylko tyle,
+# że oba pliki są Pythonem.
+PROG_POSPOLITOSCI = 5
+_POSPOLITOSC_CACHE = None
+
+
+def _pliki_py_repo():
+    """Wersjonowane pliki .py. WŁASNE zapytanie — `_sledzone_przez_git()` listuje `*.md`.
+
+    Zmierzone 2026-08-04 przy pierwszym biegu tego organu: przefiltrowanie listy `*.md`
+    po `.endswith('.py')` dawało ZBIÓR PUSTY, więc mapa pospolitości była pusta, a
+    `licznik.get(s, 0) < PRÓG` przepuszczał KAŻDY symbol jako rzadki — `main` (84 pliki)
+    awansował na świadectwo. Filtr nie krzyknął, tylko cicho przestał filtrować: dokładnie
+    klasa „milczenie udające wynik". Stąd zapora w `_pospolitosc_symboli()`.
+    """
+    try:
+        wynik = subprocess.run(
+            ["git", "ls-files", "*.py"], capture_output=True, text=True, timeout=30,
+            cwd=ROOT, encoding="utf-8", errors="replace",
+        )
+    except (OSError, subprocess.SubprocessError):
+        return []
+    if wynik.returncode != 0:
+        return []
+    return [l.strip() for l in wynik.stdout.splitlines() if l.strip()]
+
+
+def _pospolitosc_symboli():
+    """Symbol → w ilu plikach .py repo jest DEFINIOWANY (cache na proces).
+
+    Pusta mapa NIE oznacza „same rzadkie symbole" — oznacza, że pomiar padł. Zwracamy
+    wtedy None, a wołający ma obowiązek uznać świadectwo za NIEROZSTRZYGNIĘTE, zamiast
+    hurtowo awansować homonimy (Prawo XV: brak danych to abstynencja, nie wynik).
+    """
+    global _POSPOLITOSC_CACHE
+    if _POSPOLITOSC_CACHE is not None:
+        return _POSPOLITOSC_CACHE
+    licznik = {}
+    for sciezka in _pliki_py_repo():
+        try:
+            with open(os.path.join(ROOT, sciezka), encoding="utf-8", errors="replace") as f:
+                tresc = f.read()
+        except OSError:
+            continue
+        for nazwa in set(_DEF_W_KODZIE.findall(tresc)):
+            licznik[nazwa] = licznik.get(nazwa, 0) + 1
+    _POSPOLITOSC_CACHE = licznik or None
+    return _POSPOLITOSC_CACHE
+
+
+def _symbole_zmienione(sciezka_wlasciciela, stan_na):
+    """Nazwy funkcji/klas, których diff DOTKNĄŁ po dacie `stan_na`.
+
+    Nagłówek hunka (`@@ … @@ def foo`) niesie funkcję-kontekst, więc łapiemy też
+    zmianę CIAŁA funkcji, nie tylko jej sygnatury.
+    """
+    nastepny_dzien = stan_na + timedelta(days=1)
+    try:
+        log = subprocess.run(
+            ["git", "log", f"--since={nastepny_dzien.isoformat()}", "--format=%H",
+             "--", sciezka_wlasciciela],
+            capture_output=True, text=True, timeout=20, cwd=ROOT,
+            encoding="utf-8", errors="replace",
+        )
+        if log.returncode != 0:
+            return set()
+        symbole = set()
+        for sha in log.stdout.split():
+            pokaz = subprocess.run(
+                ["git", "show", sha, "--unified=0", "--", sciezka_wlasciciela],
+                capture_output=True, text=True, timeout=20, cwd=ROOT,
+                encoding="utf-8", errors="replace",
+            )
+            for linia in pokaz.stdout.splitlines():
+                trafienie = _DEF_W_HUNKU.match(linia) or _DEF_W_DIFFIE.match(linia)
+                if trafienie:
+                    symbole.add(trafienie.group(1))
+        return symbole
+    except (OSError, subprocess.SubprocessError):
+        return set()
+
+
+def _symbole_cytowane(tresc):
+    """Identyfikatory, które dokument realnie WYMIENIA (w backtickach)."""
+    znalezione = set()
+    for cytat in _CYTAT_BACKTICK.findall(tresc):
+        znalezione.update(_IDENTYFIKATOR.findall(cytat))
+    return znalezione
+
+
+def swiadectwo_gnicia(sciezka, meta):
+    """DRUGIE ŚWIADECTWO T2: czy ruszyło się to, co dokument OPISUJE? → (waga, symbole).
+
+    DLACZEGO ISTNIEJE (zmierzone 2026-08-04, kalibracja na 6 losowanych dokumentach
+    z zamrożoną prawdą podstawową): sam sygnał „commit dotknął pliku-właściciela" ma
+    **33% precyzji** (2 z 6 dokumentów realnie kłamało), a wskazanego przez siebie
+    SPRAWCĘ trafił **0 razy na 6** — oba prawdziwe gnicia wzięły się z liczb rosnących
+    same (fragmenty RAG, sesje kroniki), nie z żadnego commitu. Bramka o takiej precyzji
+    uczy ignorować siebie: 26 pozycji, z których dwie są prawdziwe, czyta się jak tapetę.
+
+    NIE KASUJE ALARMU — nadaje mu wagę (klasa K2 z LUSTRATIO: milczenie nie może być
+    zielenią). Dokument bez mocnego świadectwa nadal jest zgłoszony, tylko niżej w
+    kolejce. Zmierzone na tej samej próbce: waga MOCNA trafia 2/2 prawdziwych i 0/4
+    fałszywek, a populacja 26 dzieli się na 9 pilnych i 17 do przeglądu okazjonalnego.
+
+    ŚWIADOMY LIMIT: zmiana zachowania wewnątrz funkcji, o której dokument mówi PROZĄ
+    (bez nazwy w backtickach), dostanie wagę słabą. Dlatego waga, nie filtr.
+    """
+    stan_na = meta.get("stan_na")
+    try:
+        stan_na = date.fromisoformat(stan_na) if isinstance(stan_na, str) else stan_na
+    except (TypeError, ValueError):
+        return "SŁABE", []
+    if not stan_na:
+        return "SŁABE", []
+    try:
+        with open(os.path.join(ROOT, sciezka), encoding="utf-8") as f:
+            cytowane = _symbole_cytowane(f.read())
+    except OSError:
+        return "SŁABE", []
+    pospolitosc = _pospolitosc_symboli()
+    if pospolitosc is None:
+        return "NIEROZSTRZYGNIĘTE", []
+    zmienione = set()
+    for wlasciciel in _wlasciciele(meta):
+        if os.path.exists(os.path.join(ROOT, wlasciciel)):
+            zmienione |= _symbole_zmienione(wlasciciel, stan_na)
+    wspolne = sorted(s for s in (zmienione & cytowane)
+                     if pospolitosc.get(s, 0) < PROG_POSPOLITOSCI)
+    return ("MOCNE" if wspolne else "SŁABE"), wspolne
+
+
 def _wlasciciele(meta):
     """Pole `wlasciciel` → lista ścieżek (dopuszczamy kilka po przecinku)."""
     surowe = meta.get("wlasciciel", "").strip()
@@ -342,9 +551,28 @@ def sprawdz(dokumenty=None):
 
         # ── BRAMKA 1: DEKLARACJA ────────────────────────────────────────────
         for pole in POLA_WYMAGANE:
+            if pole == "wlasciciel":
+                continue        # osobny tryb — patrz BRAMKA 1b
             if not meta.get(pole):
                 bledy.append(f"[T1] {sciezka}: brak pola `{pole}` w nagłówku")
         kategoria = meta.get("kategoria", "")
+
+        # ── BRAMKA 1b: WŁAŚCICIEL ALBO JAWNY POWÓD JEGO BRAKU ───────────────
+        # Brak właściciela jest dozwolony, ale nigdy milczący (patrz komentarz
+        # przy POLE_BEZ_WLASCICIELA). Kategoria orzeka, czy w ogóle wolno go nie mieć.
+        if not meta.get("wlasciciel"):
+            powod_braku = meta.get(POLE_BEZ_WLASCICIELA, "")
+            if kategoria in KATEGORIE_Z_OBOWIAZKOWYM_WLASCICIELEM:
+                bledy.append(
+                    f"[T1] {sciezka}: kategoria `{kategoria}` WYMAGA właściciela — "
+                    f"{KATEGORIE.get(kategoria, '')}. Dokument tej kategorii bez wskazanego "
+                    f"kodu nie ma z czym się zgadzać. Wskaż plik albo zmień kategorię")
+            elif not powod_braku:
+                bledy.append(
+                    f"[T1] {sciezka}: brak właściciela BEZ POWODU — dopisz "
+                    f"`{POLE_BEZ_WLASCICIELA}: \"<czemu ten dokument nie opisuje kodu>\"`. "
+                    f"Samo `—` nie wystarcza: wyciszenie bramki zawsze wymaga powodu "
+                    f"na widoku (jak `powod_acta` i `dublet_rozstrzygniety`)")
         if kategoria and kategoria not in KATEGORIE:
             bledy.append(f"[T1] {sciezka}: kategoria `{kategoria}` spoza słownika "
                          f"({'/'.join(sorted(KATEGORIE))})")
@@ -386,6 +614,19 @@ def sprawdz(dokumenty=None):
         # Raport AGREGOWANY per dokument (Prawo XXIV): jedna linia = jeden dokument.
         # Powód: rozbicie na (dokument × właściciel) dało 86 linii dla 20 dokumentów —
         # ściana tekstu, której nikt nie czyta, to bramka, której nikt nie słucha.
+        # ── BRAMKA 2b: ZEGAR ZASTĘPCZY dla dokumentów BEZ właściciela ───────
+        # Zmierzone 2026-08-04: 22 dokumenty bez właściciela były NIEWIDZIALNE dla T2,
+        # bo pętla `for wlasciciel in _wlasciciele(meta)` nie wykonywała się ani razu.
+        # Nie „przechodziły kontrolę" — nie były kontrolowane. Doktryna też się starzeje,
+        # więc dostaje własny zegar liczony od `stan_na`, nie od cudzego kodu.
+        if typ == "zywy" and stan_na and not zastapiony and not _wlasciciele(meta):
+            wiek = (date.today() - stan_na).days
+            if wiek > DNI_BEZ_WLASCICIELA:
+                ostrzezenia.append(
+                    f"[T2b] {sciezka}: dokument bez właściciela nie był weryfikowany "
+                    f"od {wiek} dni (próg {DNI_BEZ_WLASCICIELA}). Brak kodu nie może "
+                    f"oznaczać braku kontroli — przejrzyj i przestaw `stan_na`")
+
         if typ == "zywy" and stan_na and not zastapiony:
             gnijace, lacznie = [], 0
             for wlasciciel in _wlasciciele(meta):
@@ -514,7 +755,8 @@ def zapisz_katalog(sciezka_indeksu="docs/INDEKS_IMPERIUM.md"):
 
 def main():
     parser = argparse.ArgumentParser(description="Tabularium — rejestr dokumentów Imperium")
-    parser.add_argument("komenda", choices=["sprawdz", "katalog", "dublety", "liczby"])
+    parser.add_argument("komenda",
+                        choices=["sprawdz", "katalog", "dublety", "liczby", "swiadectwa"])
     parser.add_argument("--twardy", action="store_true",
                         help="exit 1 przy błędach (domyślnie miękki — ZASADA WPIĘCIA)")
     parser.add_argument("--zapisz", action="store_true",
@@ -545,7 +787,45 @@ def main():
         print(katalog_md())
         return 0
 
-    bledy, ostrzezenia, info = sprawdz()
+    dokumenty = list(zbierz_dokumenty())
+    bledy, ostrzezenia, info = sprawdz(dokumenty)
+
+    if args.komenda == "swiadectwa":
+        # ŚWIADOMIE POZA AUDYTEM: jedno `git show` na commit kosztuje ~60 ms, a populacja
+        # gnijących ma ich ponad dwieście — audyt startowy musi zostać szybki, bo chodzi
+        # w hooku KAŻDEJ sesji. To narzędzie do PRZEGLĄDU, nie do bramkowania commita.
+        gnijace = {}
+        for o in ostrzezenia:
+            trafienie = re.match(r"\[T2\] GNICIE (\S+) ", o)
+            if trafienie:
+                gnijace[trafienie.group(1)] = o
+        meta_wg = dict(dokumenty)
+        oceny = []
+        for i, sciezka in enumerate(sorted(gnijace), 1):
+            _pasek(i, len(gnijace), sciezka)
+            waga, symbole = swiadectwo_gnicia(sciezka, meta_wg.get(sciezka, {}))
+            oceny.append((waga, sciezka, symbole))
+        print("🏛️ TABULARIUM — świadectwa gnicia (waga alarmu, nie jego kasowanie)")
+        mocne = [o for o in oceny if o[0] == "MOCNE"]
+        nieznane = [o for o in oceny if o[0] == "NIEROZSTRZYGNIĘTE"]
+        print(f"   • Zgłoszonych przez T2: {len(oceny)} → 🔴 MOCNE {len(mocne)} · "
+              f"🟡 SŁABE {len(oceny) - len(mocne) - len(nieznane)} · ⚫ NIEROZSTRZYGNIĘTE "
+              f"{len(nieznane)}")
+        print(f"   • Próg pospolitości symbolu: < {PROG_POSPOLITOSCI} plików "
+              f"(homonim nie jest świadectwem)")
+        znaki = {"MOCNE": "🔴", "SŁABE": "🟡", "NIEROZSTRZYGNIĘTE": "⚫"}
+        kolejnosc = {"MOCNE": 0, "NIEROZSTRZYGNIĘTE": 1, "SŁABE": 2}
+        for waga, sciezka, symbole in sorted(oceny, key=lambda o: (kolejnosc[o[0]], o[1])):
+            if waga == "NIEROZSTRZYGNIĘTE":
+                powod = "🚨 pomiar pospolitości padł — świadectwa NIE MA (nie mylić ze słabym)"
+            elif symbole:
+                powod = f"dokument opisuje ruszone: {', '.join(symbole[:5])}"
+            else:
+                powod = "zmiany poza tym, co dokument cytuje"
+            print(f"   {znaki[waga]} [{waga}] {sciezka} — {powod}")
+        if not oceny:
+            print("   ✅ Żaden dokument nie jest zgłoszony jako gnijący")
+        return 0
 
     if args.komenda == "dublety":
         dublety = [o for o in ostrzezenia if o.startswith("[T3]")]

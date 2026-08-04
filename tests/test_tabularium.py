@@ -450,6 +450,39 @@ def test_liczby_lapie_rozjazd_i_naprawia():
         os.unlink(sciezka)
 
 
+def test_liczby_sesje_kroniki_sledza_kronike():
+    """Kronika rośnie SAMA — od pracy, nie od commitu — więc T2 nigdy jej nie złapie.
+
+    Zmierzone 2026-08-04 przy kalibracji bramki gnicia: PLAN_TIRO twierdził w DWÓCH
+    miejscach „kronika 102 sesji" przy 154 realnych, a T2 wskazywała jako winowajcę
+    `notarius.py` — plik bez żadnego związku z tą liczbą. Klasa wady: dokument cytuje
+    wielkość, która przyrasta bez śladu w kodzie, więc żadna bramka oparta na commitach
+    nie ma jej jak zobaczyć. Lekarstwem nie jest ostrzejsza bramka, tylko odebranie
+    dokumentowi prawa do wpisywania tej liczby ręcznie (ta sama kuracja co „42 książki").
+    """
+    from imperium.biblioteki.srodowisko_pamieci import sesje_w_kronice
+    from narzedzia.tabularium import wartosci_z_kodu, wstrzyknij_liczby
+    prawda = sesje_w_kronice()
+    assert prawda > 0, "kronika jest wersjonowana w gicie — zero znaczy, że liczenie padło"
+    assert wartosci_z_kodu()["sesje_kroniki"] == prawda
+
+    # GRANICA: sam fakt, że klucz jest znany, NIE dowodzi, że naprawia (LEX TALARUS —
+    # mierzymy przyrząd, nie deklarację). Podstawiamy jawnie fałszywą liczbę.
+    sciezka = _tymczasowy_dokument(
+        "---\nkategoria: TABULA\ntyp: zywy\nwlasciciel: —\nstan_na: 2026-08-04\n"
+        "powod_istnienia: test\n---\n\nkronika <!-- LICZBA:sesje_kroniki -->102<!-- /LICZBA --> sesji\n")
+    try:
+        zmiany, bledy = wstrzyknij_liczby(sucho=True)
+        assert not bledy, bledy
+        assert any("102" in z and str(prawda) in z for z in zmiany), zmiany
+        wstrzyknij_liczby(sucho=False)
+        with open(sciezka, encoding="utf-8") as f:
+            tresc = f.read()
+        assert f"<!-- LICZBA:sesje_kroniki -->{prawda}<!-- /LICZBA -->" in tresc, tresc
+    finally:
+        os.unlink(sciezka)
+
+
 def test_liczby_nieznany_klucz_to_blad():
     """GRANICA: literówka w kluczu (`neuronyy`) musi krzyczeć, a nie cicho nic nie robić.
 
@@ -590,7 +623,8 @@ def test_klucz_abstynujacy_nie_nadpisuje_dokumentu():
         # sześć produkcyjnych dokumentów (MAPA_PAMIECI, ARCHITEKTURA, README biblioteki…).
         # Dokładnie klasa złapana 07-21 („tryb testowy mutujący trwały rejestr") — test
         # pisze WYŁĄCZNIE do swojego pliku, nigdy do repozytorium.
-        tab.zbierz_dokumenty = lambda: []
+        # `**_` — sygnatura przyjęła `tylko_sledzone` (rozdział sędzia/usługa, 2026-08-04)
+        tab.zbierz_dokumenty = lambda **_: []
         tab.DROGOWSKAZY_Z_LICZBAMI = [wzgledna]
 
         # 1) ABSTYNENCJA (None) — dokument nietknięty, zero zgłoszonych zmian.
@@ -662,3 +696,214 @@ def test_korpus_obecny_znaczy_niezerowa_liczba(monkeypatch):
     assert sp.korpus_ksiazek_obecny() is False, "zero książek ≠ obecny korpus"
     monkeypatch.setattr(sp, "ksiazki_w_bazie", lambda: 1)
     assert sp.korpus_ksiazek_obecny() is True, "jedna książka wystarcza — korpus JEST"
+
+
+# ── BRAMKA 1b: WŁAŚCICIEL ALBO JAWNY POWÓD JEGO BRAKU (naprawa 2026-08-04) ──
+# Sprzeczność zmierzona na 22 dokumentach: parser świadomie zamienia `—` na pustkę
+# (kontrakt utrwalony testem wyżej), a T1 zaraz potem żądało wartości NIEPUSTEJ.
+# Organ wypisywał `—` we własnym katalogu i karał za jego wpisanie — a dokument bez
+# właściciela wypadał TAKŻE z bramki gnicia, bo pętla po właścicielach nie wykonywała
+# się ani razu. Błąd i zwolnienie z kontroli w jednym ruchu.
+
+def test_bramka1b_sam_myslnik_to_za_malo():
+    """`—` bez powodu = ciche wyciszenie bramki. Zawsze musi być powód na widoku."""
+    from narzedzia.tabularium import sprawdz
+    bledy, _, _ = sprawdz([("x.md", _meta(kategoria="LEX", wlasciciel=""))])
+    assert any("BEZ POWODU" in b for b in bledy)
+
+
+def test_bramka1b_powod_zdejmuje_zarzut():
+    """Powód podany → dokument przechodzi. To ten sam wzorzec co `powod_acta`."""
+    from narzedzia.tabularium import sprawdz
+    bledy, _, _ = sprawdz([("x.md", _meta(kategoria="LEX", wlasciciel="",
+                                          bez_wlasciciela="doktryna, nie opisuje kodu"))])
+    assert not [b for b in bledy if "wlascic" in b.lower() or "właścic" in b.lower()]
+
+
+def test_bramka1b_TABULA_nie_da_sie_wyciszyc_zadnym_powodem():
+    """GRANICA: kategoria orzeka, czy wolno NIE MIEĆ właściciela.
+
+    TABULA to „rejestr prawdy o kodzie, musi zgadzać się 1:1" — rejestr, który nie
+    wskazuje żadnego kodu, nie ma z czym się zgadzać. Żaden powód tego nie naprawia,
+    bo wadą jest sama kategoria. Inaczej `bez_wlasciciela` stałoby się uniwersalnym
+    wyłącznikiem bramki, czyli tylnymi drzwiami — tą samą klasą co ucieczka w `acta`.
+    """
+    from narzedzia.tabularium import sprawdz
+    for kategoria in ("TABULA", "FORMA", "MENSURA"):
+        bledy, _, _ = sprawdz([("x.md", _meta(kategoria=kategoria, wlasciciel="",
+                                              bez_wlasciciela="wymówka"))])
+        assert any("WYMAGA właściciela" in b for b in bledy), kategoria
+
+
+def test_bramka1b_kategoria_bez_obowiazku_przepuszcza_z_powodem():
+    """Dopełnienie granicy: LEX/ACTA/CONSILIUM wolno nie mieć kodu — z powodem."""
+    from narzedzia.tabularium import sprawdz
+    for kategoria in ("LEX", "CONSILIUM"):
+        bledy, _, _ = sprawdz([("x.md", _meta(kategoria=kategoria, wlasciciel="",
+                                              bez_wlasciciela="powód"))])
+        assert not any("WYMAGA właściciela" in b for b in bledy), kategoria
+
+
+# ── BRAMKA 2b: ZEGAR ZASTĘPCZY dla dokumentów bez właściciela ───────────────
+
+def test_bramka2b_dokument_bez_wlasciciela_dostaje_wlasny_zegar():
+    """Brak kodu NIE MOŻE oznaczać braku kontroli — 22 dokumenty były niewidzialne."""
+    from narzedzia.tabularium import sprawdz, DNI_BEZ_WLASCICIELA
+    stary = (date.today() - timedelta(days=DNI_BEZ_WLASCICIELA + 1)).isoformat()
+    _, ostrz, _ = sprawdz([("x.md", _meta(kategoria="LEX", wlasciciel="",
+                                          bez_wlasciciela="doktryna", stan_na=stary))])
+    assert any("[T2b]" in o for o in ostrz)
+
+
+def test_bramka2b_granica_progu_dokladnie():
+    """GRANICA: w dniu progu jeszcze cicho, dzień po — alarm (próg domknięty od góry)."""
+    from narzedzia.tabularium import sprawdz, DNI_BEZ_WLASCICIELA
+    na_progu = (date.today() - timedelta(days=DNI_BEZ_WLASCICIELA)).isoformat()
+    _, ostrz, _ = sprawdz([("x.md", _meta(kategoria="LEX", wlasciciel="",
+                                          bez_wlasciciela="d", stan_na=na_progu))])
+    assert not any("[T2b]" in o for o in ostrz), "próg nie może alarmować w swoim dniu"
+
+
+def test_bramka2b_nie_dotyczy_dokumentu_z_wlascicielem():
+    """Dokument z właścicielem ma zegar T2 (kod) — dwa zegary naraz byłyby szumem."""
+    from narzedzia.tabularium import sprawdz, DNI_BEZ_WLASCICIELA
+    stary = (date.today() - timedelta(days=DNI_BEZ_WLASCICIELA + 100)).isoformat()
+    _, ostrz, _ = sprawdz([("x.md", _meta(stan_na=stary))])
+    assert not any("[T2b]" in o for o in ostrz)
+
+
+def test_bramka2b_acta_nie_dostaje_zegara():
+    """ACTA to prawda swojego czasu (Prawo I) — migawka z definicji się nie starzeje."""
+    from narzedzia.tabularium import sprawdz, DNI_BEZ_WLASCICIELA
+    stary = (date.today() - timedelta(days=DNI_BEZ_WLASCICIELA + 500)).isoformat()
+    _, ostrz, _ = sprawdz([("x.md", _meta(kategoria="ACTA", typ="acta", wlasciciel="",
+                                          bez_wlasciciela="historia", stan_na=stary))])
+    assert not any("[T2b]" in o for o in ostrz)
+
+
+# ── SPIS: pliki spoza kontroli wersji nie są dokumentami Imperium ───────────
+
+def test_spis_pomija_pliki_spoza_gita():
+    """Prawo XIX: czego nie ma na branchu, tego nie ma.
+
+    Zmierzone 2026-08-04: Tabularium żądało metadanych od `raporty/RAPORT_TOKENY…md`,
+    który jest gitignored. Naprawa KLASOWA (filtr `git ls-files`), nie punktowa —
+    dopisanie jednego katalogu do POZA_REJESTREM uciszyłoby ten alarm, a każdy
+    następny ignorowany katalog powtórzyłby go od nowa.
+    """
+    from narzedzia.tabularium import zbierz_dokumenty
+    sciezki = [s for s, _ in zbierz_dokumenty()]
+    assert sciezki, "spis nie może być pusty"
+    assert not any(s.startswith("raporty/") for s in sciezki)
+
+
+def test_spis_brak_gita_nie_wywraca_spisu():
+    """GRANICA: gdy `git ls-files` zawiedzie, wracamy do zachowania sprzed filtra —
+    strażnik nie może oślepnąć na całe repo tylko dlatego, że zabrakło narzędzia."""
+    from narzedzia import tabularium as tb
+    stare = tb._sledzone_przez_git
+    try:
+        tb._sledzone_przez_git = lambda: None
+        assert tb.zbierz_dokumenty(), "brak gita nie może wyzerować spisu"
+    finally:
+        tb._sledzone_przez_git = stare
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DRUGIE ŚWIADECTWO T2 — waga alarmu gnicia (kalibracja 2026-08-04)
+# ─────────────────────────────────────────────────────────────────────────────
+
+_META_TEST = {"kategoria": "TABULA", "typ": "zywy", "stan_na": "2026-07-17",
+              "wlasciciel": "narzedzia/tabularium.py"}
+
+
+def _swiadectwo_na_atrapach(monkeypatch, tresc, zmienione, pospolitosc):
+    """Świadectwo liczone bez dotykania gita — testy nie mogą zależeć od historii repo."""
+    from narzedzia import tabularium as tb
+    monkeypatch.setattr(tb, "_symbole_zmienione", lambda _w, _d: set(zmienione))
+    monkeypatch.setattr(tb, "_pospolitosc_symboli", lambda: pospolitosc)
+    sciezka = _tymczasowy_dokument(
+        "---\nkategoria: TABULA\ntyp: zywy\nwlasciciel: narzedzia/tabularium.py\n"
+        f"stan_na: 2026-07-17\npowod_istnienia: test\n---\n\n{tresc}\n")
+    try:
+        return tb.swiadectwo_gnicia(os.path.relpath(sciezka, ROOT).replace("\\", "/"),
+                                    _META_TEST)
+    finally:
+        os.unlink(sciezka)
+
+
+def test_swiadectwo_mocne_gdy_dokument_opisuje_ruszony_symbol(monkeypatch):
+    """SEDNO: alarm jest mocny tylko wtedy, gdy ruszyło się to, co dokument OPISUJE.
+
+    Zmierzone 2026-08-04 na 6 losowanych dokumentach z zamrożoną prawdą podstawową:
+    sam sygnał „commit dotknął właściciela" miał 33% precyzji (2/6), a sprawcę wskazał
+    0/6 razy. Waga mocna trafiła 2/2 prawdziwych i 0/4 fałszywek.
+    """
+    waga, symbole = _swiadectwo_na_atrapach(
+        monkeypatch, "Organ woła `eksportuj_sft` przy żniwie.",
+        zmienione={"eksportuj_sft"}, pospolitosc={"eksportuj_sft": 1})
+    assert waga == "MOCNE"
+    assert symbole == ["eksportuj_sft"]
+
+
+def test_swiadectwo_slabe_gdy_zmiana_poza_cytowanymi(monkeypatch):
+    """NEGATYWNY: kod się ruszył, ale nie w miejscu, o którym dokument mówi.
+
+    Tak wyglądały 4 z 6 fałszywek — m.in. GUBERNATOR, gdzie commit usunął MARTWĄ
+    gałąź bit-identycznie, więc żadne zdanie dokumentu nie mogło przez to skłamać.
+    """
+    waga, symbole = _swiadectwo_na_atrapach(
+        monkeypatch, "Dokument mówi o `zupelnie_czym_innym`.",
+        zmienione={"jakas_funkcja"}, pospolitosc={"jakas_funkcja": 1})
+    assert waga == "SŁABE"
+    assert symbole == []
+
+
+def test_swiadectwo_homonim_nie_jest_dowodem(monkeypatch):
+    """GRANICA PROGU: `main` żyje w 84 plikach — jego zmiana nie dowodzi niczego.
+
+    Bez progu pospolitości SCIAGA_LOKAL dostawała wagę mocną wyłącznie dlatego, że
+    i ona, i zmieniony plik są Pythonem. W16 z tego właśnie powodu świadomie nie łapie
+    nazw funkcji; próg przywraca je bezpiecznie, bo odsiewa homonimy POMIAREM.
+    """
+    from narzedzia.tabularium import PROG_POSPOLITOSCI
+    waga, symbole = _swiadectwo_na_atrapach(
+        monkeypatch, "Uruchom `main` z konsoli.",
+        zmienione={"main"}, pospolitosc={"main": PROG_POSPOLITOSCI + 79})
+    assert waga == "SŁABE", "pospolita nazwa nie może awansować alarmu"
+    assert symbole == []
+
+
+def test_swiadectwo_pusty_pomiar_to_nie_zielen(monkeypatch):
+    """GRANICA: gdy pomiar pospolitości padnie, świadectwa NIE MA — i to musi być widać.
+
+    Realna wada złapana przy pierwszym biegu organu (2026-08-04): mapa pospolitości
+    powstawała z listy `*.md` przefiltrowanej po `.py`, czyli była PUSTA, a warunek
+    `get(s, 0) < PRÓG` przepuszczał wtedy każdy homonim jako świadectwo. Filtr nie
+    krzyknął — cicho przestał filtrować. Milczenie nie może uchodzić ani za zieleń,
+    ani za słaby alarm (klasa K2 z LUSTRATIO).
+    """
+    waga, symbole = _swiadectwo_na_atrapach(
+        monkeypatch, "Cytat `cokolwiek`.", zmienione={"cokolwiek"}, pospolitosc=None)
+    assert waga == "NIEROZSTRZYGNIĘTE"
+    assert symbole == []
+
+
+def test_swiadectwo_pospolitosc_liczy_pliki_py_nie_md():
+    """Mapa pospolitości MUSI powstawać z plików .py — źródło wady z 2026-08-04."""
+    from narzedzia import tabularium as tb
+    pliki = tb._pliki_py_repo()
+    assert pliki, "brak plików .py — zapytanie git padło?"
+    assert all(p.endswith(".py") for p in pliki)
+    mapa = tb._pospolitosc_symboli()
+    assert mapa, "pusta mapa = pomiar padł (musi być None-owana, nie 'same rzadkie')"
+    assert mapa.get("main", 0) >= tb.PROG_POSPOLITOSCI, \
+        "`main` żyje w dziesiątkach modułów CLI — próg musi go widzieć jako homonim"
+
+
+def test_swiadectwo_bez_daty_nie_wybucha(monkeypatch):
+    """GRANICA: dokument bez `stan_na` nie może wywrócić przeglądu."""
+    from narzedzia import tabularium as tb
+    monkeypatch.setattr(tb, "_pospolitosc_symboli", lambda: {"x": 1})
+    waga, symbole = tb.swiadectwo_gnicia("docs/README.md", {"wlasciciel": "x.py"})
+    assert waga == "SŁABE" and symbole == []

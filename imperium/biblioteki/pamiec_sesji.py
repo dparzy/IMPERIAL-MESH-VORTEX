@@ -290,6 +290,30 @@ def lekcje(plik: Path = DOMYSLNY_PLIK, limit: Optional[int] = None) -> List[Dict
     return wyniki
 
 
+def _nowsza(istniejaca: str, nowa: str) -> str:
+    """Data świeżości dokumentu NIGDY nie cofa się — zwraca późniejszą z dwóch.
+
+    ZMIERZONE 2026-08-03 (audyt W20 na czerwono): `auto_lekcja` woła `dopisz_lekcje`
+    z datą ANALIZOWANEJ SESJI, a nie dnia zapisu. Hook przemielił zaległe transkrypty
+    z 27 lipca i przestawił `## Ostatnia aktualizacja` oraz `stan_na` w PAMIEC_SESJI.md
+    z 2026-07-30 na 2026-07-27 — dokument sam ogłosił, że jest starszy, niż był, a
+    katalog Tabularium (liczony z `stan_na`) rozjechał się z INDEKSEM.
+    To ta sama KLASA co naprawa z 2026-08-02: dokument kłamiący o własnej świeżości.
+    Tamta łatka pilnowała, by obie daty szły RAZEM — ta pilnuje, by szły W PRZÓD.
+    Data samej lekcji zostaje nietknięta: „kiedy to się wydarzyło" to prawda o sesji,
+    „stan na" to prawda o dokumencie — dwie różne rzeczy, mylone dotąd w jednym polu.
+    Wartość nieparsowalna nie blokuje zapisu: nowa data wygrywa (lepiej mieć świeżą
+    prawdę niż zamarznąć na śmieciu), pusta/brakująca tak samo.
+    """
+    nowa = (nowa or "").strip()
+    istniejaca = (istniejaca or "").strip()
+    try:
+        return (istniejaca if _dt.date.fromisoformat(istniejaca)
+                > _dt.date.fromisoformat(nowa) else nowa)
+    except ValueError:
+        return nowa or istniejaca
+
+
 def dopisz_lekcje(tytul: str, tresc: str, data: Optional[str] = None,
                   plik: Path = DOMYSLNY_PLIK, chlodz: bool = True) -> None:
     """
@@ -322,8 +346,8 @@ def dopisz_lekcje(tytul: str, tresc: str, data: Optional[str] = None,
     # Zaktualizuj datę "Ostatnia aktualizacja: ..." (lub wstaw gdy brak — BUG 4 recenzji,
     # bez tego re.sub był cichym no-op i kontrakt „aktualizuje datę" był łamany).
     if re.search(r"## Ostatnia aktualizacja:", nowy):
-        nowy = re.sub(r"(## Ostatnia aktualizacja:).*",
-                      rf"\1 {data}", nowy, count=1)
+        nowy = re.sub(r"(## Ostatnia aktualizacja:)(.*)",
+                      lambda m: f"{m.group(1)} {_nowsza(m.group(2), data)}", nowy, count=1)
     else:
         linie = nowy.split("\n", 1)
         naglowek_pliku = linie[0]
@@ -338,7 +362,9 @@ def dopisz_lekcje(tytul: str, tresc: str, data: Optional[str] = None,
     # naprawą, tylko odroczeniem: automat pisze po każdej sesji, człowiek nie.
     # Zasięg WĄSKI: podmieniamy wyłącznie istniejące pole w bloku frontmatteru, nigdy go
     # nie tworzymy — dokument bez frontmatteru ma go dostać od Tabularium, nie stąd.
-    nowy = re.sub(r"(?m)^(stan_na:).*", rf"\1 {data}", nowy, count=1)
+    # ...i NIGDY wstecz (2026-08-03) — obie daty przez ten sam strażnik monotoniczności.
+    nowy = re.sub(r"(?m)^(stan_na:)(.*)",
+                  lambda m: f"{m.group(1)} {_nowsza(m.group(2), data)}", nowy, count=1)
 
     plik.write_text(nowy, encoding="utf-8")
     if chlodz:

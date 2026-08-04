@@ -63,6 +63,7 @@ from __future__ import annotations
 
 import fnmatch
 import subprocess
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -226,15 +227,57 @@ def _numstat(surowe: Optional[str]) -> List[Tuple[str, int, int]]:
     return wynik
 
 
+class GitNieodpowiada(RuntimeError):
+    """Git nie dał odpowiedzi — stan repozytorium jest NIEZNANY, nie czysty.
+
+    Naprawa P1 z recenzji cubic PR #139. `_git()` zwraca `None` przy awarii, a `_numstat`
+    zamieniało to na pustą listę — więc padnięty git, brak repozytorium czy timeout
+    dawały werdykt `czysto` z kodem wyjścia 0. Hook zatwierdzał wtedy repozytorium,
+    KTÓREGO NIE OBEJRZAŁ. To jest ta sama klasa, którą sam VINDEX powstał ścigać:
+    cisza raportowana jako spokój. Brak wiedzy musi mieć własną nazwę.
+    """
+
+
+# `--no-renames` JEST WARUNKIEM POPRAWNOŚCI, nie kosmetyką (P1, cubic PR #139): przy
+# wykrywaniu zmian nazw git pisze `0\t0\tdocs/{stary.md => nowy.md}`, czyli ZERO usunięć
+# pod ścieżką, która nie pasuje do żadnego chronionego ledgera. Ktoś mógłby więc usunąć
+# ledger o kontrakcie ŚCISŁYM przez zwykły `git mv`, a strażnik zameldowałby czysto.
+# Bez tej flagi stara ścieżka jest liczona jako usunięcie — i tak ma być.
+_ARG_BEZ_RENAME = "--no-renames"
+
+
+OKNO_SWIEZOSCI_S = 120
+
+
+def _commit_swiezy(okno_s: int = OKNO_SWIEZOSCI_S) -> bool:
+    """Czy HEAD powstał w ciągu ostatnich `okno_s` sekund (czyli mógł być dziełem
+    komendy, po której właśnie odpalił się hook).
+
+    Okno, nie „zawsze": doklejanie zawartości HEAD do KAŻDEGO badania drzewa roboczego
+    kazałoby strażnikowi w kółko oceniać dawno zatwierdzone commity i zamieniłoby
+    jednorazowe naruszenie w alarm powtarzany bez końca — a alarm, którego nie da się
+    wyciszyć, uczy ignorowania alarmów (lekcja z Refleksji W9, 2026-07-20).
+    """
+    surowe = _git("log", "-1", "--format=%ct")
+    if surowe is None or not surowe.strip().isdigit():
+        return False
+    return (time.time() - int(surowe.strip())) <= okno_s
+
+
 def zmiany_robocze() -> List[Dict[str, Any]]:
     """Niezacommitowane zmiany w drzewie roboczym (łącznie z poczekalnią)."""
-    return [ocen_zmiane(s, d, u) for s, d, u in _numstat(_git("diff", "--numstat", "HEAD"))]
+    surowe = _git("diff", _ARG_BEZ_RENAME, "--numstat", "HEAD")
+    if surowe is None:
+        raise GitNieodpowiada("git diff nie odpowiedział — stan drzewa roboczego NIEZNANY")
+    return [ocen_zmiane(s, d, u) for s, d, u in _numstat(surowe)]
 
 
 def zmiany_commitu(ref: str = "HEAD") -> List[Dict[str, Any]]:
     """Zmiany JEDNEGO commitu — do bramki i do wglądu wstecz."""
-    return [ocen_zmiane(s, d, u)
-            for s, d, u in _numstat(_git("show", "--numstat", "--format=", ref))]
+    surowe = _git("show", _ARG_BEZ_RENAME, "--numstat", "--format=", ref)
+    if surowe is None:
+        raise GitNieodpowiada(f"git show {ref} nie odpowiedział — zawartość commitu NIEZNANA")
+    return [ocen_zmiane(s, d, u) for s, d, u in _numstat(surowe)]
 
 
 def _ignorowane_dodatkowo() -> Tuple[str, ...]:
@@ -275,9 +318,45 @@ def zbadaj(ref: Optional[str] = None, *, tylko_kontrakty: bool = False) -> Dict[
     2,0% na 254 commitach; obce pliki nie mają takiego pomiaru i idą do bramki, która
     chodzi raz na zadanie.
     """
-    werdykty = zmiany_commitu(ref) if ref else zmiany_robocze()
+    try:
+        werdykty = zmiany_commitu(ref) if ref else zmiany_robocze()
+    except GitNieodpowiada as e:
+        # NIEZNANE ≠ CZYSTO (P1, cubic PR #139). Nie udajemy werdyktu, którego nie mamy:
+        # meldujemy wprost, że badanie się nie odbyło, i mówimy to głośno w raporcie.
+        return {"status": "nieznane", "ikona": "🚨", "zbadane": 0,
+                "naruszenia": [], "korekty": [], "obce": [], "krawedzie": [],
+                "zasieg": "ŻADEN — git nie odpowiedział",
+                "niepokryte": [f"CAŁE repozytorium: {e}"]}
+    # ŚWIEŻY COMMIT TEŻ JEST BADANY (P1, cubic PR #139). Hook po komendzie powłoki
+    # porównywał wyłącznie drzewo robocze z HEAD — więc komenda, która JEDNOCZEŚNIE
+    # zmieniała ledger i commitowała (`git commit -am`), znikała strażnikowi z oczu:
+    # zmiana była już w HEAD, a drzewo czyste. Naruszenie popełnione i zatwierdzone
+    # w jednym ruchu było NIEWIDZIALNE. Dokładamy zawartość ostatniego commitu, jeśli
+    # powstał w ciągu okna komendy — koszt jeden `git show`, zysk domknięcie luki.
+    etykieta = ref or "ROBOCZE"
+    if ref is None:
+        try:
+            if _commit_swiezy():
+                # DEDUPLIKACJA PO ŚCIEŻCE (własna recenzja tej wachty): plik zmieniony
+                # ORAZ w drzewie, ORAZ w świeżym commicie trafiał na listę dwa razy —
+                # `zbadane` rosło dwukrotnie, a to samo naruszenie było drukowane dwoma
+                # wierszami. Dwa alarmy o jednym pliku każą Cezarowi zgadywać, czy to
+                # dwa wykroczenia. Pierwszeństwo ma werdykt z drzewa roboczego: opisuje
+                # stan AKTUALNY, commit opisuje stan sprzed ostatniej edycji.
+                znane = {w["plik"] for w in werdykty}
+                z_commitu = [w for w in zmiany_commitu("HEAD") if w["plik"] not in znane]
+                if z_commitu:
+                    werdykty = werdykty + z_commitu
+                    # ETYKIETA KRAWĘDZI = HASH, NIE „ROBOCZE" (recenzja, znalezisko 3):
+                    # krawędź `(plik) —[naruszenie]→ ROBOCZE` gubi jedyną informację,
+                    # która czyni ją użyteczną — commit, w którym naruszenie ZATWIERDZONO.
+                    # CORONA B ma te krawędzie zbierać do grafu W8.
+                    etykieta = _git("rev-parse", "--short", "HEAD") or "HEAD"
+                    etykieta = etykieta.strip() or "HEAD"
+        except GitNieodpowiada:
+            pass  # brak wiedzy o commicie nie może skasować wiedzy o drzewie roboczym
     wynik = podsumuj(werdykty, [] if tylko_kontrakty else obce_pliki())
-    wynik["krawedzie"] = krawedzie(werdykty, ref or "ROBOCZE")
+    wynik["krawedzie"] = krawedzie(werdykty, etykieta)
     wynik["zasieg"] = "kontrakty" if tylko_kontrakty else "pelny"
     if tylko_kontrakty:
         wynik["niepokryte"] = ["obce pliki — badane przez bramkę, nie przez hook "

@@ -11,6 +11,7 @@ Weryfikuje:
   • roundtrip: dopisz → odczyt zwraca dokładnie tę lekcję na pozycji 0.
 """
 
+import re
 import tempfile
 from pathlib import Path
 
@@ -159,6 +160,55 @@ def test_dopisz_aktualizuje_OBIE_daty_w_tym_samym_ruchu():
     tresc = ps.wczytaj(p)
     assert "## Ostatnia aktualizacja: 2026-12-31" in tresc
     assert "stan_na: 2026-12-31" in tresc, "frontmatter został w tyle za nagłówkiem"
+
+
+def test_dopisz_NIE_COFA_dat_gdy_lekcja_jest_starsza():
+    """Świeżość dokumentu idzie tylko W PRZÓD (audyt W20 na czerwono, 2026-08-03).
+
+    Zmierzone: `auto_lekcja` woła z datą ANALIZOWANEJ SESJI, nie dnia zapisu. Hook
+    przemielił zaległe transkrypty z 27 lipca i cofnął obie daty PAMIEC_SESJI.md
+    z 2026-07-30 na 2026-07-27 — dokument ogłosił się starszym, niż był, a katalog
+    Tabularium (czytany z `stan_na`) rozjechał się z INDEKS_IMPERIUM.md.
+    Data samej lekcji zostaje prawdziwa — cofa się tylko to, czego cofać nie wolno.
+    """
+    p = _plik()
+    p.write_text("---\nkategoria: TABULA\nstan_na: 2026-07-30\n---\n"
+                 + re.sub(r"## Ostatnia aktualizacja:.*",
+                          "## Ostatnia aktualizacja: 2026-07-30",
+                          p.read_text(encoding="utf-8"), count=1),
+                 encoding="utf-8")
+    assert "## Ostatnia aktualizacja: 2026-07-30" in ps.wczytaj(p), "fixture nie ustawił nagłówka"
+    ps.dopisz_lekcje("Zaległa", "Z przemielonego transkryptu.", data="2026-07-27", plik=p)
+    tresc = ps.wczytaj(p)
+    assert "## Ostatnia aktualizacja: 2026-07-30" in tresc, "nagłówek cofnął się wstecz"
+    assert "stan_na: 2026-07-30" in tresc, "frontmatter cofnął się wstecz"
+    assert ps.lekcje(p)[0]["data"] == "2026-07-27", "data lekcji ma zostać prawdziwa"
+
+
+def test_dopisz_data_rowna_nie_psuje_pola():
+    """GRANICA: ten sam dzień to nie cofnięcie — pole zostaje poprawne, nie puste."""
+    p = _plik()
+    p.write_text("---\nstan_na: 2026-07-30\n---\n" + p.read_text(encoding="utf-8"),
+                 encoding="utf-8")
+    ps.dopisz_lekcje("Dzisiejsza", "Treść.", data="2026-07-30", plik=p)
+    assert "stan_na: 2026-07-30" in ps.wczytaj(p)
+
+
+def test_dopisz_data_niepasowalna_nie_blokuje_zapisu():
+    """GRANICA: śmieć w polu nie może zamrozić dokumentu — nowa data wygrywa."""
+    p = _plik()
+    p.write_text("---\nstan_na: wkrótce\n---\n" + p.read_text(encoding="utf-8"),
+                 encoding="utf-8")
+    ps.dopisz_lekcje("X", "Y", data="2026-07-30", plik=p)
+    assert "stan_na: 2026-07-30" in ps.wczytaj(p)
+
+
+def test_nowsza_znosi_none_i_pustke():
+    """GRANICA (Reguła Test-Granic): None w polu daje TypeError, jeśli go nie przewidzieć."""
+    assert ps._nowsza(None, "2026-07-30") == "2026-07-30"
+    assert ps._nowsza("2026-07-30", None) == "2026-07-30"
+    assert ps._nowsza("", "2026-07-30") == "2026-07-30"
+    assert ps._nowsza(None, None) == ""
 
 
 def test_dopisz_nie_tworzy_frontmatteru_gdy_go_nie_bylo():

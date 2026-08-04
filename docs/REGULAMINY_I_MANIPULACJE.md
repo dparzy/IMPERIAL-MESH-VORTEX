@@ -2,6 +2,7 @@
 kategoria: LEX
 typ: zywy
 wlasciciel: —
+bez_wlasciciela: "opisuje reguly rynku i CUDZE manipulacje, nie nasz kod"
 stan_na: 2026-06-01
 powod_istnienia: "Zgodność z regulaminami giełd + katalog 7 manipulacji rynkowych do wykrywania — tarcza prawna Imperium"
 ---

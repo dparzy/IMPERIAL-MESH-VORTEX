@@ -275,6 +275,19 @@ CHECKLIST_STARTOWA = [
                "owijaj w try/except + fallback (u nas: calibre) i traktuj PUSTY WYNIK bez wyjątku tak samo "
                "jak wyjątek — cicha pustka jest gorsza od głośnego błędu.",
      "zrodlo": "BIB-075 whitepaper Bitcoina (2026-07-16)"},
+    {"kat": "wspolbieznosc",
+     "opis": "Zasób WSPÓŁDZIELONY chroniony blokadą WYŁĄCZNĄ — drugi uczestnik zostaje bez ochrony, "
+             "a pierwszy wychodzący otwiera zasób pod trwającym biegiem",
+     "lekcja": "Realny przypadek (2026-08-03, dzień po wdrożeniu SILENTIUM): dwie sesje ruszyły o 10:03, "
+               "audyt drugiej dostał `RuntimeError: już trwa` i wypisał „bieg idzie BEZ ochrony\" — "
+               "NIEPRAWDĘ, bo repo było chronione cudzą ciszą; zaraz potem sesja kończąca pierwsza "
+               "ZDJĘŁA ciszę spod wciąż trwającego biegu drugiej. Pytaj, czego blokada naprawdę broni: "
+               "wyłączność broniła PLIKU BLOKADY, a chronić miała REPOZYTORIUM. Gdy chroniony jest STAN "
+               "WSPÓLNY (repo, katalog, urządzenie), a nie sekcja krytyczna, właściwym wzorcem jest "
+               "licznik uczestników — zasób zwalnia OSTATNI wychodzący, nie pierwszy. Osobno: komunikat "
+               "musi rozróżniać „nie ma ochrony\" od „ochronę trzyma ktoś inny\" — fałszywy alarm o braku "
+               "ochrony uczy ignorować alarmy, więc szkodzi bardziej niż jego brak.",
+     "zrodlo": "SILENTIUM — wada znaleziona realnym użyciem nazajutrz po wdrożeniu (2026-08-03)"},
 ]
 
 

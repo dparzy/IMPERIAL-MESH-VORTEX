@@ -157,11 +157,18 @@ Brama liczy pieczątkę audytu dla każdego wskaźnika (`CalcResult.sha256`,
 Zapisane w Księdze Wad Kodu jako klasa `bramka-zawsze-przepuszcza`. Naprawa = osobne zadanie
 (wpięcie hash Bramy w log + realna weryfikacja u Hermesa wg ZASADY WPIĘCIA: opt-in OFF).
 
-**LUKA 2 — 6 z 9 typów logu bez producenta:** `TEST` (miał rejestrować okna WFO —
+**LUKA 2 — 5 z 9 typów logu bez producenta:** `TEST` (miał rejestrować okna WFO —
 Walk-Forward Optimization, optymalizacja krocząca: [`walk_forward.py`](../imperium/koloseum/walk_forward.py)
-liczy własny raport i **nie zapisuje** ImperiumLog), `SENAT`, `WETO`, `IGRZYSKA`, `DORADCY`,
-`SYGNAL` poza fabryką. Deklarowany łańcuch „Senat→SENAT, Pretorianie→WETO, Igrzyska→IGRZYSKA"
-jest 🔴 planem, nie działaniem.
+liczy własny raport i **nie zapisuje** ImperiumLog), `SENAT`, `WETO`, `IGRZYSKA`, `DORADCY`.
+Deklarowany łańcuch „Senat→SENAT, Pretorianie→WETO, Igrzyska→IGRZYSKA" jest 🔴 planem,
+nie działaniem.
+
+> ✅ **`SYGNAL` wyszedł z tej listy 2026-07-29** (commit `da80b9a`): `log_sygnal` nie miała
+> wtedy **ani jednego** wywołania, więc W1 znała wynik trade'u, ale nie jego autorów —
+> atrybucja per neuron była fizycznie niemożliwa, a MWU budował 0 wag. Dziś woła ją
+> [`dyrygent.py`](../imperium/koloseum/dyrygent.py) przy każdym wejściu, pod tym samym
+> opt-inem `log_dir`. Zmierzone przy wpięciu: W1 **23 → 46** wpisów (23 SYGNAL + 23
+> TRADE_CLOSE, parowanie 1:1 po `trade_id`), MWU **0 → 37** wag.
 
 ---
 

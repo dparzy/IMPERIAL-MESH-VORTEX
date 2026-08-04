@@ -388,6 +388,7 @@ _ZAKRES_HUNKA = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 _DEF_W_KODZIE = re.compile(r"^\s*(?:async\s+)?(?:def|class)\s+([A-Za-z_]\w*)", re.M)
 _DEF_W_LINII = re.compile(r"^\s*(?:async\s+)?(?:def|class)\s+([A-Za-z_]\w*)")
 _CYTAT_BACKTICK = re.compile(r"`([^`\n]{1,120})`")
+_BLOK_KODU = re.compile(r"```[a-zA-Z]*\n(.*?)```", re.S)
 _IDENTYFIKATOR = re.compile(r"[A-Za-z_]\w*")
 
 # Symbol zdefiniowany w tylu plikach (lub więcej) jest HOMONIMEM, nie świadectwem.
@@ -525,10 +526,28 @@ def _symbole_zmienione(sciezka_wlasciciela, stan_na):
 
 
 def _symbole_cytowane(tresc):
-    """Identyfikatory, które dokument realnie WYMIENIA (w backtickach)."""
+    """Identyfikatory, które dokument realnie WYMIENIA — w backtickach ORAZ w blokach kodu.
+
+    BLOKI DOŁĄCZONE 2026-08-04 (kalibracja II, druga runda): sam backtick inline nie
+    wystarcza, bo dokumenty pokazują REALNE API właśnie w blokach ```python. Zmierzone
+    na żywym przypadku: MANUAL_UZYTKOWNIKA uczy wywołania `raport_waznosci(sygnaly, wyniki)`,
+    a kod od `8561bc6` rzuca `ValueError` przy niezgodnych długościach — nazwa stała
+    wyłącznie w bloku, więc świadectwo nie miało jej z czym zestawić i manual uczący
+    wywołania, które wybucha, przechodził jako SŁABY.
+
+    Zmierzony bilans na populacji 23 (prawda podstawowa: 7 dokumentów etykietowanych
+    ręcznie): precyzja 3/7 wobec 2/4 bez bloków — różnica w granicach szumu przy tej
+    próbie — ale recall 3/3 wobec 2/3. Dla narzędzia PRZEGLĄDU to właściwy kierunek:
+    fałszywka kosztuje minutę czytania, przeoczenie kosztuje kłamiący manual.
+
+    ŚWIADOMY LIMIT: blok bywa ilustracją wzoru albo przykładem „jak NIE robić" — wtedy
+    nazwa w nim nie jest twierdzeniem o kontrakcie. Stąd waga, nie bramka.
+    """
     znalezione = set()
     for cytat in _CYTAT_BACKTICK.findall(tresc):
         znalezione.update(_IDENTYFIKATOR.findall(cytat))
+    for blok in _BLOK_KODU.findall(tresc):
+        znalezione.update(_IDENTYFIKATOR.findall(blok))
     return znalezione
 
 

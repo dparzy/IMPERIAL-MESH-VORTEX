@@ -985,6 +985,33 @@ def test_symbole_zmienione_nie_bierze_nazwy_klasy_z_naglowka_hunka(monkeypatch):
     assert "Organ" not in symbole
 
 
+def test_cytowane_widzi_BLOK_KODU_nie_tylko_backtick():
+    """SEDNO drugiej rundy: dokumenty pokazują REALNE API w blokach ```python.
+
+    Zmierzone 2026-08-04: MANUAL_UZYTKOWNIKA uczy wywołania `raport_waznosci(...)`, które
+    od commitu 8561bc6 rzuca `ValueError` przy niezgodnych długościach serii. Nazwa stała
+    wyłącznie w bloku, więc świadectwo nie miało jej z czym zestawić — manual uczący
+    wywołania, które wybucha, przechodził jako SŁABY.
+    """
+    from narzedzia.tabularium import _symbole_cytowane
+    tresc = ("Zwykły akapit o `inline_symbol`.\n\n"
+             "```python\n"
+             "from imperium.legiony.feature_importance import raport_waznosci\n"
+             "raport = raport_waznosci(sygnaly, wyniki)\n"
+             "```\n")
+    cytowane = _symbole_cytowane(tresc)
+    assert "raport_waznosci" in cytowane, "blok kodu to też cytowanie"
+    assert "inline_symbol" in cytowane, "backtick inline nie może przestać działać"
+
+
+def test_cytowane_blok_bez_jezyka_i_pusty_nie_wywracaja():
+    """GRANICE: blok bez znacznika języka liczy się; pusty blok i brak bloków nie wybuchają."""
+    from narzedzia.tabularium import _symbole_cytowane
+    assert "goly_blok" in _symbole_cytowane("```\ngoly_blok = 1\n```\n")
+    assert _symbole_cytowane("```\n```\n") == set()
+    assert _symbole_cytowane("tekst bez niczego") == set()
+
+
 def test_symbole_zmienione_lapie_zmieniona_SYGNATURE(monkeypatch):
     """KONTROLA ODWROTNA: gdy zmienia się sama linia `def`/`class`, nazwa nadal liczy się wprost.
 

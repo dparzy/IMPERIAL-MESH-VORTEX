@@ -55,6 +55,32 @@ o własnej prawdzie).
 `docs/PAMIEC_ABSOLUTNA.md`, `docs/ROADMAP_IMPERIUM.md` (L3a ✅, L3d 🔴),
 `bibliotheca_ulpia/dane/rejestr_testow.jsonl`. Bramka: 3462/3462, ruff czysto.
 
+### Runda 2 tej samej kalibracji — bloki kodu też są cytowaniem
+
+Przegląd wyników odsłonił **drugą lukę w tym samym przyrządzie**: `_symbole_cytowane`
+czytało wyłącznie backticki inline, a dokumenty pokazują REALNE API w blokach
+```` ```python ````. Złapane na żywym przypadku: **`MANUAL_UZYTKOWNIKA` uczy wywołania
+`raport_waznosci(sygnaly, wyniki)`, które od `8561bc6` rzuca `ValueError`** przy nierównych
+seriach — nazwa stała tylko w bloku, więc manual uczący wywołania, które wybucha,
+przechodził jako SŁABY. Naprawione w obu miejscach: przyrząd czyta bloki, manual opisuje
+kontrakt.
+
+Zmierzone na populacji 23: precyzja **3/7** wobec 2/4 bez bloków — różnica w granicach
+szumu przy tej próbie i **nie** ona rozstrzygnęła — ale **recall 3/3** wobec 2/3. Dla
+narzędzia PRZEGLĄDU to właściwy kierunek: fałszywka kosztuje minutę czytania, przeoczenie
+kosztuje kłamiący manual. Koszt zerowy (regex na treści, bez wywołań gita).
+
+Przy okazji zamknięty przegląd `KALKULATOR_LEWARA` (dopisany kontrakt wejściowy: `ValueError`
+przy `cena_wejscia <= 0`, zachowanie graniczne bufora przy skrajnej dźwigni; `stan_na`
+podniesiony, bo od poprzedniej weryfikacji plik dotknął **jeden** commit) i drugie gnicie
+w `PAMIEC_ABSOLUTNA` (**LUKA 2 wymieniała `SYGNAL` jako typ bez producenta**, a `log_sygnal`
+dostała wołacza w `dyrygent.py` 2026-07-29: W1 23 → 46 wpisów, MWU 0 → 37 wag).
+
+**Pliki rundy 2:** `narzedzia/tabularium.py` (`_symbole_cytowane`, `_BLOK_KODU`),
+`tests/test_tabularium.py` (+2 granice), `docs/MANUAL_UZYTKOWNIKA.md`,
+`docs/KALKULATOR_LEWARA.md`, `docs/PAMIEC_ABSOLUTNA.md`, `docs/ROADMAP_IMPERIUM.md`
+(L3a2 ✅, L3e 🔴).
+
 ---
 
 ## 2026-08-04 | 🩹 | Świeżość dokumentu idzie tylko W PRZÓD — koniec cofania dat przez hook

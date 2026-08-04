@@ -1,7 +1,7 @@
 ---
 kategoria: TABULA
 typ: zywy
-wlasciciel: —
+wlasciciel: narzedzia/tabularium.py
 stan_na: 2026-07-27
 powod_istnienia: "Wskaźnik na katalog dokumentów — sam spisu NIE trzyma; kieruje do generowanego katalogu w INDEKS_IMPERIUM (jedno źródło prawdy, Prawo XVI)."
 ---

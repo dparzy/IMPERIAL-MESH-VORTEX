@@ -2,6 +2,7 @@
 kategoria: ACTA
 typ: acta
 wlasciciel: —
+bez_wlasciciela: "magazyn schlodzonych lekcji z wielu organow naraz"
 stan_na: 2026-07-19
 powod_acta: "Archiwum lekcji SCHŁODZONYCH z PAMIEC_SESJI.md (konsolidacja, Prawo XV). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz (Prawo I)."
 powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć aktywna ostra, nic nie tracimy (Prawo I). Przeszukiwalne (grep/RAG), poza wstrzykiwanym kontekstem startowym."

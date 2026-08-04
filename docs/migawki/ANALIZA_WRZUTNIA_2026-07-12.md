@@ -2,6 +2,7 @@
 kategoria: ACTA
 typ: acta
 wlasciciel: —
+bez_wlasciciela: "migawka analizy z dnia w nazwie — prawda swojego czasu"
 stan_na: 2026-07-15
 powod_istnienia: "Kontynuacja żniwa wrzutni (po ANALIZA_WRZUTNIA_2026-07-10) — 6 nieprzerobionych tur z 12 lipca, z web-weryfikacją KAŻDEGO cytowania (lekcja RE_AUDYT 07-13 zastosowana w praktyce: 5"
 ---

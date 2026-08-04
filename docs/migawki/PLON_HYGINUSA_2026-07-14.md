@@ -2,6 +2,7 @@
 kategoria: ACTA
 typ: acta
 wlasciciel: —
+bez_wlasciciela: "migawka plonu z dnia w nazwie — prawda swojego czasu"
 stan_na: 2026-07-14
 powod_istnienia: "Pierwszy realny bieg Hyginusa (DeepSeek) po komplecie ulepszeń U1-U4 (query-expansion + self-critique + świadomość systemu) — Vitruviusz (Opus) jako sędzia ocenia 4 tematy/kandydat"
 ---

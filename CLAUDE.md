@@ -2,6 +2,7 @@
 kategoria: LEX
 typ: zywy
 wlasciciel: —
+bez_wlasciciela: "konstytucja — obowiazuje WSZYSTKIE organy naraz, nie opisuje zadnego z osobna"
 stan_na: 2026-07-18
 powod_istnienia: "Rozkazy stałe czytane na starcie KAŻDEJ sesji — konstytucja operacyjna Claude'a w Imperium"
 ---

@@ -63,6 +63,32 @@ KATEGORIE = {
 TYPY = {"zywy", "acta"}
 POLA_WYMAGANE = ("kategoria", "typ", "wlasciciel", "stan_na", "powod_istnienia")
 
+# ── WŁAŚCICIEL: KIEDY WOLNO GO NIE MIEĆ (naprawa 2026-08-04) ──────────────────
+# SPRZECZNOŚĆ W SAMYM ORGANIE, zmierzona na 22 dokumentach: parser świadomie zamienia
+# `—` na pustkę („— musi znaczyć BRAK właściciela" — kontrakt utrwalony testem), a bramka
+# T1 zaraz potem żąda wartości NIEPUSTEJ. Organ wypisywał więc `—` we własnym katalogu
+# jako wartość poprawną i karał za jej wpisanie. Skutek uboczny był gorszy od samego
+# błędu: dokument bez właściciela wypadał TAKŻE z bramki GNICIA, bo pętla po właścicielach
+# nie wykonywała się ani razu. Dostawał błąd i zwolnienie z kontroli w jednym ruchu —
+# czyli klasa „milczenie czytane jako zieleń" (K2 przeglądu LUSTRATIO).
+#
+# Rozstrzygnięcie: brak właściciela jest DOZWOLONY, ale nigdy MILCZĄCY. Ten sam wzorzec
+# co `powod_acta` i `dublet_rozstrzygniety`: wyciszenie bramki zawsze wymaga powodu,
+# który zostaje na widoku (K4).
+POLE_BEZ_WLASCICIELA = "bez_wlasciciela"
+
+# Kategorie, w których brak właściciela jest SPRZECZNOŚCIĄ Z DEFINICJĄ KATEGORII,
+# więc żaden powód go nie usprawiedliwia:
+#   TABULA  — „rejestr prawdy o kodzie, musi zgadzać się 1:1" → rejestr, który nie
+#             wskazuje żadnego kodu, nie ma z czym się zgadzać,
+#   FORMA   — „opis budowy organu" → opis budowy bez organu,
+#   MENSURA — „pomiar z danych" → pomiar bez mierzonego przedmiotu.
+KATEGORIE_Z_OBOWIAZKOWYM_WLASCICIELEM = ("TABULA", "FORMA", "MENSURA")
+
+# Zastępczy zegar świeżości dla dokumentów BEZ właściciela. Bez niego brak kodu
+# oznaczałby brak jakiejkolwiek kontroli aktualności — a doktryna też się starzeje.
+DNI_BEZ_WLASCICIELA = 90
+
 # Poza rejestrem — każde z własnymi zasadami, Tabularium pilnuje ŻYWEJ dokumentacji:
 #   archiwum/          — magazyn, otwierany na rozkaz Cezara (ZASADA ARCHIWIZACJI)
 #   bibliotheca_ulpia/ — księgozbiór i kronika sesji: historia, Prawo I zabrania tykać
@@ -185,7 +211,9 @@ def wstrzyknij_liczby(sucho=False, tylko=None):
     """
     wartosci = wartosci_z_kodu()
     zmiany, bledy = [], []
-    dokumenty = list(zbierz_dokumenty())
+    # USŁUGA, nie sędzia — naprawia znaczniki gdziekolwiek je zastanie (patrz docstring
+    # `zbierz_dokumenty`); filtr gita obowiązuje wyłącznie bramki orzekające.
+    dokumenty = list(zbierz_dokumenty(tylko_sledzone=False))
     # Dołącz żywe drogowskazy spoza rejestru (np. README biblioteki) — tylko warstwa liczb.
     for wzgl in DROGOWSKAZY_Z_LICZBAMI:
         if os.path.exists(os.path.join(ROOT, wzgl)):
@@ -261,9 +289,40 @@ def czytaj_naglowek(sciezka):
     return meta
 
 
-def zbierz_dokumenty():
-    """Wszystkie żywe .md Imperium → [(sciezka_wzgledna, meta)] posortowane."""
+def _sledzone_przez_git():
+    """Zbiór ścieżek wersjonowanych, albo None gdy gita nie ma (wtedy nie filtrujemy).
+
+    ZMIERZONE 2026-08-04: Tabularium żądało metadanych od `raporty/RAPORT_TOKENY_2026-07-26.md`,
+    który jest **gitignored** (`.gitignore:20`). Plik spoza kontroli wersji nie jest
+    dokumentem Imperium — nie ma go na branchu, więc wedle Prawa XIX nie istnieje.
+    Naprawa KLASOWA, nie punktowa: dopisanie `raporty` do POZA_REJESTREM uciszyłoby
+    ten jeden katalog, a każdy następny ignorowany katalog powtórzyłby alarm.
+    Brak gita nie może wywrócić spisu — wtedy zachowujemy się jak dawniej.
+    """
+    try:
+        wynik = subprocess.run(
+            ["git", "ls-files", "*.md"], capture_output=True, text=True, timeout=30,
+            cwd=ROOT, encoding="utf-8", errors="replace",
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if wynik.returncode != 0:
+        return None
+    return {l.strip() for l in wynik.stdout.splitlines() if l.strip()}
+
+
+def zbierz_dokumenty(tylko_sledzone=True):
+    """Wszystkie żywe .md Imperium → [(sciezka_wzgledna, meta)] posortowane.
+
+    `tylko_sledzone=False` wyłącza filtr gita. SĘDZIA vs USŁUGA (rozstrzygnięcie
+    2026-08-04): bramki (`sprawdz`, `katalog_md`) ORZEKAJĄ o dokumentach Imperium,
+    więc plik spoza kontroli wersji ich nie obchodzi. Wstrzykiwacz liczb niczego nie
+    osądza — naprawia znaczniki tam, gdzie je zastanie, także w dokumencie roboczym.
+    Rozdzielenie jest potrzebne, bo filtr założony bez niego wyciął testom grunt pod
+    nogami: sprawdzały wstrzykiwacz na pliku tymczasowym, czyli z definicji nieśledzonym.
+    """
     znalezione = []
+    sledzone = _sledzone_przez_git() if tylko_sledzone else None
     for katalog, podkatalogi, pliki in os.walk(ROOT):
         podkatalogi[:] = [d for d in podkatalogi if d not in POZA_REJESTREM]
         for plik in pliki:
@@ -271,6 +330,8 @@ def zbierz_dokumenty():
                 continue
             pelna = os.path.join(katalog, plik)
             wzgledna = os.path.relpath(pelna, ROOT).replace("\\", "/")
+            if sledzone is not None and wzgledna not in sledzone:
+                continue          # poza kontrolą wersji = poza Imperium (Prawo XIX)
             znalezione.append((wzgledna, czytaj_naglowek(pelna)))
     return sorted(znalezione)
 
@@ -342,9 +403,28 @@ def sprawdz(dokumenty=None):
 
         # ── BRAMKA 1: DEKLARACJA ────────────────────────────────────────────
         for pole in POLA_WYMAGANE:
+            if pole == "wlasciciel":
+                continue        # osobny tryb — patrz BRAMKA 1b
             if not meta.get(pole):
                 bledy.append(f"[T1] {sciezka}: brak pola `{pole}` w nagłówku")
         kategoria = meta.get("kategoria", "")
+
+        # ── BRAMKA 1b: WŁAŚCICIEL ALBO JAWNY POWÓD JEGO BRAKU ───────────────
+        # Brak właściciela jest dozwolony, ale nigdy milczący (patrz komentarz
+        # przy POLE_BEZ_WLASCICIELA). Kategoria orzeka, czy w ogóle wolno go nie mieć.
+        if not meta.get("wlasciciel"):
+            powod_braku = meta.get(POLE_BEZ_WLASCICIELA, "")
+            if kategoria in KATEGORIE_Z_OBOWIAZKOWYM_WLASCICIELEM:
+                bledy.append(
+                    f"[T1] {sciezka}: kategoria `{kategoria}` WYMAGA właściciela — "
+                    f"{KATEGORIE.get(kategoria, '')}. Dokument tej kategorii bez wskazanego "
+                    f"kodu nie ma z czym się zgadzać. Wskaż plik albo zmień kategorię")
+            elif not powod_braku:
+                bledy.append(
+                    f"[T1] {sciezka}: brak właściciela BEZ POWODU — dopisz "
+                    f"`{POLE_BEZ_WLASCICIELA}: \"<czemu ten dokument nie opisuje kodu>\"`. "
+                    f"Samo `—` nie wystarcza: wyciszenie bramki zawsze wymaga powodu "
+                    f"na widoku (jak `powod_acta` i `dublet_rozstrzygniety`)")
         if kategoria and kategoria not in KATEGORIE:
             bledy.append(f"[T1] {sciezka}: kategoria `{kategoria}` spoza słownika "
                          f"({'/'.join(sorted(KATEGORIE))})")
@@ -386,6 +466,19 @@ def sprawdz(dokumenty=None):
         # Raport AGREGOWANY per dokument (Prawo XXIV): jedna linia = jeden dokument.
         # Powód: rozbicie na (dokument × właściciel) dało 86 linii dla 20 dokumentów —
         # ściana tekstu, której nikt nie czyta, to bramka, której nikt nie słucha.
+        # ── BRAMKA 2b: ZEGAR ZASTĘPCZY dla dokumentów BEZ właściciela ───────
+        # Zmierzone 2026-08-04: 22 dokumenty bez właściciela były NIEWIDZIALNE dla T2,
+        # bo pętla `for wlasciciel in _wlasciciele(meta)` nie wykonywała się ani razu.
+        # Nie „przechodziły kontrolę" — nie były kontrolowane. Doktryna też się starzeje,
+        # więc dostaje własny zegar liczony od `stan_na`, nie od cudzego kodu.
+        if typ == "zywy" and stan_na and not zastapiony and not _wlasciciele(meta):
+            wiek = (date.today() - stan_na).days
+            if wiek > DNI_BEZ_WLASCICIELA:
+                ostrzezenia.append(
+                    f"[T2b] {sciezka}: dokument bez właściciela nie był weryfikowany "
+                    f"od {wiek} dni (próg {DNI_BEZ_WLASCICIELA}). Brak kodu nie może "
+                    f"oznaczać braku kontroli — przejrzyj i przestaw `stan_na`")
+
         if typ == "zywy" and stan_na and not zastapiony:
             gnijace, lacznie = [], 0
             for wlasciciel in _wlasciciele(meta):

@@ -2,6 +2,7 @@
 kategoria: LEX
 typ: zywy
 wlasciciel: —
+bez_wlasciciela: "wzorzec redakcyjny dokumentow — dotyczy pisania, nie kodu"
 stan_na: 2026-06-02
 powod_istnienia: "ROZKAZ STAŁY: Zasada Pełnego Opisu (ZPO) — szablon i wymóg opisu zrozumiałego bez wiedzy eksperckiej"
 ---

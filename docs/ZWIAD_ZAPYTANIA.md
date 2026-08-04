@@ -2,6 +2,7 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
+bez_wlasciciela: "tresc zapytan zwiadu — material dla ludzi i modeli, nie opis modulu"
 stan_na: 2026-08-02
 powod_istnienia: "Gotowe frazy wyszukiwania dla Cezara — zwiad po literaturze celowany w ZMIERZONE luki Imperium, z kryterium oceny trafienia i listą tego, czego NIE szukać."
 ---

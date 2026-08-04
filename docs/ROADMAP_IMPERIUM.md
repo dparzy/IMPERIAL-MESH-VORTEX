@@ -2,6 +2,7 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
+bez_wlasciciela: "plan calego Imperium — zamiar, nie opis istniejacego organu"
 stan_na: 2026-08-03
 powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii."
 ---
@@ -55,10 +56,11 @@ a milczenie czytamy jako zieleń.** To jest robactwo, o którym mówi rozkaz.
 | # | Etap | Stan |
 |---|---|---|
 | L0 | **LUSTRUM** — dokończyć: testy + kalibracja progu na prawdzie podstawowej | 🟡 kod stoi, brak testów i kalibracji |
-| L1 | **TABULARIUM** — spłacić 23 błędy + 33 ostrzeżenia; zamknąć dziurę „brak właściciela = brak kontroli" | 🔴 |
-| L2 | **Przegląd WSZYSTKICH organów** wg kategorii, wykonalności, zadań, piętra ewolucji i **wzajemnej współpracy** — checklisty kontrolne per kategoria | 🔴 |
-| L3 | **Uzupełnienie wykrytych braków i luk** — dopiero po komplecie pomiarów | 🔴 |
-| L4 | **Bramka wyjścia** — zdjęcie zamrożenia | 🔴 |
+| L1 | **TABULARIUM — MECHANIZM** ✅ (2026-08-04): błędy **23 → 0**. Naprawiona sprzeczność „`—` znaczy brak, a bramka żąda wartości"; nowe bramki **T1b** (właściciel albo jawny `bez_wlasciciela`, z zakazem wyciszania dla TABULA/FORMA/MENSURA), **T2b** (zegar 90 dni dla dokumentów bez właściciela — brak kodu ≠ brak kontroli) i **filtr gita** (plik spoza kontroli wersji nie jest dokumentem Imperium, Prawo XIX). 22 dokumenty uporządkowane, właściciel-widmo `schola` naprawiony, +10 testów | ✅ |
+| L2 | **Przegląd WSZYSTKICH organów** wg kategorii, wykonalności, zadań, piętra ewolucji i **wzajemnej współpracy** — checklisty kontrolne per kategoria. Wchodzi tu **L2a** (mapa współpracy) i **L2b** (taksonomia pięter — WYKONANE) | 🟡 w toku |
+| **L3** | **36 POJEDYNCZYCH PRZEGLĄDÓW TREŚCI** — decyzja Cezara 2026-08-04: **odłożone, wracamy na POCZĄTKU następnej wachty**. To już nie naprawa mechanizmu (ta jest zrobiona), tylko ILOŚĆ: **25× T2 GNICIE** (kod ruszył po `stan_na` — każdy wymaga przeczytania dokumentu i porównania z kodem) + **11× T3 DUBLET** (ta sama kategoria i ten sam właściciel — scalić albo rozstrzygnąć wpisem `dublet_rozstrzygniety` z powodem). Komenda: `python narzedzia/tabularium.py sprawdz` | ⏸️ **PIERWSZE ZADANIE NASTĘPNEJ WACHTY** |
+| L3b | **Uzupełnienie pozostałych wykrytych braków i luk** — dopiero po komplecie pomiarów | 🔴 |
+| L4 | **Bramka wyjścia** — zdjęcie zamrożenia (wymaga U1: mierzalnego warunku) | 🔴 |
 
 ### Co sprawdzamy przy KAŻDYM organie (checklista bazowa)
 
@@ -69,6 +71,87 @@ a milczenie czytamy jako zieleń.** To jest robactwo, o którym mówi rozkaz.
 5. **Piętro ewolucji** — PROMPT / LOOP / GRAPH / HARNESS / NEURO-SYMBOLIC …
 6. **Współpraca** — kto go woła, kogo on woła, czy zgadza się ze schematem swojego etapu
 7. **Luka** — czego mu brakuje, żeby był zgodny ze wzorcem
+
+### ⚖️ METODA PRZEGLĄDU: KLASA, NIE ILOŚĆ (ZATWIERDZONE — Cezar 2026-08-04)
+
+> *„nie ilość — o tym mówiłem wcześniej, ilość to niepotrzebne przeciążenie,
+> ale KLASA i JAKOŚĆ jest ważna"* — Cezar
+
+**Nie odhaczamy 262 organów po kolei.** Szukamy **WZORCA WADY** i naprawiamy go u źródła;
+jedna naprawa klasy zamyka wiele pozycji naraz. Dowód, że to działa: sześć dzisiejszych
+wad w pięciu różnych organach okazało się **czterema klasami**, nie sześcioma sprawami.
+
+Konsekwencja dla bramek: **nie dobudowujemy warstwy 25.** Audyt ma dziś 24 warstwy
+i wszystkie dzisiejsze wady przez nie przeszły — dokładanie kolejnej to leczenie objawu
+metodą, która właśnie zawiodła. Najpierw **mierzymy siłę tego, co mamy** (U8).
+
+**Cztery klasy zmierzone 2026-08-04 — to jest lista robocza L2:**
+
+| Klasa | Objaw u nas | Lek |
+|---|---|---|
+| **K1 — dwa organy liczą ten sam fakt osobno** | MATURITAS liczy dług jako `NOTA−CORONA` zamiast pytać `codex_notarum`, więc nie wie o ODROCZENIU; CENSUS i INDEKS trzymają tę samą datę dwa razy (wywaliło bramkę 08-04) | fakt ma **jednego producenta**, reszta go woła; warstwa tropiąca powtórne wyprowadzanie |
+| **K2 — milczenie czytane jako zieleń** | MATURITAS gubi 52 wiersze ROADMAP; TABULARIUM zwalnia 22 dokumenty z bramki GNICIA | każdy klasyfikator ma trzeci wynik **NIE WIEM** i musi go **LICZYĆ**; audyt czerwony przy nieznanych > 0 bez jawnej deklaracji |
+| **K3 — piszący decyduje o własnej prawdzie** | `dopisz_lekcje` brało datę od wołającego i **cofało** świeżość dokumentu | niezmiennik należy do **POLA**, nie do wołającego (monotoniczność, append-only) — egzekwowany w miejscu zapisu |
+| **K4 — wyciszenie bez powodu** | działa tam, gdzie jest (`powod_acta`, `dublet_rozstrzygniety`), nie działa nigdzie indziej | **uogólnić na wszystkie bramki**: wyciszenie zawsze wymaga powodu, który zostaje na widoku |
+
+### 🔎 L2b — QUAESTIO NAD TAKSONOMIĄ PIĘTER (WYKONANE 2026-08-04, rozkaz Cezara „tak zrób")
+
+**Po co:** Cezar rozkazał, by każdy moduł nosił oznaczenie **grupy ewolucji**. Stemplowanie
+261 organów taksonomią, której sami nie osądziliśmy, rozniosłoby jeden błąd po całym
+Imperium — naprawa byłaby 261-krotna zamiast jednokrotnej. Dlatego najpierw sąd.
+
+**Źródło:** `wrzutnia/Imperium-Botów-Tradingowych 2.md` (§5.2–5.3) — materiał zewnętrzny,
+ten sam, który wyprodukował `US20230000000A1` i `abc123.ngrok.io`. Kandydat ≠ prawda.
+
+> 🚨 **KOREKTA WŁASNEJ LICZBY:** mówiliśmy „MATURITAS mierzy **3 z 9**". Źródło wymienia
+> **OSIEM** pięter (warstwy 0–7), nie dziewięć. Liczba „9" pochodziła z pamięci, nie
+> z materiału — czyli dokładnie ten błąd, który nasze własne prawo zakazuje. Jest **3 z 8**.
+
+| # | Piętro | Co u NAS je realizuje (grep) | Werdykt | Mierzone? |
+|---|---|---|---|---|
+| 0 | PROMPT | TIRO (`notarius.py`), Hyginus (`bibliotekarz.py`), DISPENSATOR | ✅ POTWIERDZONE | ✅ — ale patrz kolizja niżej |
+| 1 | CONTEXT | 6 modułów pamięci + 11 modułów RAG | ✅ POTWIERDZONE | ❌ **niemierzone** |
+| 2 | HARNESS | 7 hooków, senat, audyt 24 warstw, SIGILLARIUM, 25 Praw | ✅ POTWIERDZONE | ❌ **niemierzone** |
+| 3 | LOOP | `hedge_mwu.py` + pętla decyzyjna | ✅ POTWIERDZONE | ✅ |
+| 4 | GRAPH | `graf_pamieci.py` — ale to graf PAMIĘCI, nie routing decyzyjny; `LangGraph` = **0 trafień** | 🟡 CZĘŚCIOWE | ✅ (3/4, „nie czytany przy decyzji") |
+| 5 | HIPERGRAF | **zero trafień w całym repo** | 🔴 BRAK | — |
+| 6 | NEURO-SYMBOLIC | INDEX FALSORUM, VINDEX, Prawo XXI | ⚠️ **SPORNE** | ❌ |
+| 7 | SAMO-EWOLUCJA | `ucz_mwu` | ⚠️ **ISTNIEJE, ale OBALONE** | ❌ |
+
+**Dwie tezy, które NIE PRZETRWAŁY pomiaru — obie były nasze własne:**
+
+1. **„HARNESS i NEURO-SYMBOLIC już stoją i nie są liczone".** HARNESS — tak, potwierdzone.
+   **NEURO-SYMBOLIC — wątpliwe.** Źródło rozumie przez to *weryfikację ŁAŃCUCHA DECYZYJNEGO*
+   (VeriCoT, SITL: czy decyzja jest logicznie spójna). Nasze INDEX FALSORUM i VINDEX weryfikują
+   **KOD i DOKUMENTY**, nie decyzje handlowe. To inna rzecz pod tą samą nazwą — a podpięcie jej
+   pod piętro 6 zawyżyłoby nasz stan. Do rozstrzygnięcia, nie do policzenia.
+2. **„Prawdopodobnie zaniżamy własny stan" — częściowo prawda, ale mniej, niż sądziliśmy.**
+   Realnie niemierzone i potwierdzone są **DWA** piętra (CONTEXT, HARNESS), nie sześć.
+
+**Trzecia rzecz do rozstrzygnięcia — KOLIZJA NAZWY na piętrze 0.** MATURITAS mierzy pod
+nazwą „PROMPT" *zdrowie specyfikacji* (czy `CLAUDE.md` nie puchnie), a źródło rozumie
+*warstwę instrukcji dla modeli* (TIRO/Hyginus). Dwie różne rzeczy w jednym słowie — jeśli
+tego nie rozdzielimy, `CURSUS ARTIS` zsumuje jabłka z gruszkami.
+
+**Wniosek operacyjny:** do stemplowania modułów wchodzą **cztery piętra potwierdzone**
+(PROMPT · CONTEXT · HARNESS · LOOP) + GRAPH jako częściowe. HIPERGRAF, NEURO-SYMBOLIC
+i SAMO-EWOLUCJA **nie stemplują niczego**, dopóki nie zostaną rozstrzygnięte.
+
+### 🕸️ L2a — MAPA WSPÓŁPRACY ORGANÓW (pytanie Cezara: „czy organy właściwie się komunikują")
+
+Zmierzone 2026-08-04 (import z drzewa składniowego, nie regex): **261 organów, 489 krawędzi**,
+164 wołających, 140 wołanych, **30 zupełnie samotnych**. Huby: `czytnik_csv` (44), `backtest` (36),
+`baza` (28), `mikro_neuron` (23). Trzy luki o różnej trudności:
+
+- **G1 — graf połączeń.** Da się zbudować dziś (liczby wyżej). ⚠️ **30 samotnych ≠ 27 sierot LUSTRUM**
+  — dwie różne miary (import AST vs wzmianka nazwy); rozjazd sam jest informacją, do zbadania.
+- **G3 — wzorzec oczekiwany.** Bez zadeklarowanego schematu graf jest obrazkiem, nie kontrolą.
+  To **rejestr układów z CORONY D** i jedyne znane domknięcie wąskiego gardła GRAPH
+  („graf nie jest czytany przy żadnej decyzji") — graf organów czytany przy przeglądzie
+  byłby PIERWSZYM czytelnikiem przy decyzji.
+- **G2 — aktywność RUNTIME.** Zero. Wszystko dziś mierzymy statycznie; organ może być
+  zaimportowany i **nigdy się nie wykonać** (np. za flagą opt-in OFF). Ostatni w kolejce —
+  wymaga instrumentacji kodu produkcyjnego, a rozwój jest zamrożony.
 
 ### 🆕 CO ARCHITEKT PROPONUJE DOŁOŻYĆ DO POSTANOWIENIA (do decyzji Cezara)
 
@@ -93,6 +176,16 @@ Rozkaz kazał sprawdzić, czym go uzupełnić. Siedem pozycji, każda z powodem:
 - **U7 — SPRZĄTANIE PO SOBIE JEST CZĘŚCIĄ PRZEGLĄDU.** Każda znaleziona luka od razu dostaje
   albo naprawę, albo wpis w rejestrze z terminem. Znalezisko bez adresu to kolejna sugestia
   w stosie 34 nierozstrzygniętych.
+- **U8 — MUTACJA JAKO STAŁY POMIAR** ⭐ *rekomendacja nr 1 Architekta*. Okresowo wstrzykujemy
+  znane wady i mierzymy, ile bramka łapie. **Bramka o niezmierzonej sile to bramka, w którą
+  WIERZYMY.** Robiliśmy to RAZ (7/8 złapanych) i nigdy więcej. To jedyny punkt, który mówi,
+  czy pozostałe naprawy w ogóle działają — reszta to naprawy, ten jeden to sprawdzian.
+- **U9 — KALIBRACJA JAKO BRAMKA, NIE ZASADA.** LEX TALARUS wymaga kalibracji przyrządu, ale
+  **nic tego nie egzekwuje**. Organ orzekający bez wpisu kalibracyjnego w ledgerze → błąd
+  audytu. Dowód opłacalności z 08-04: naiwna miara LUSTRUM miała **7,4% precyzji**.
+- **U10 — JEDNA KOMENDA SYMBIOZY.** Wszystkie generatory przepisywane w kolejności zależności
+  jednym poleceniem. Dziś trzeba **pamiętać**, że CENSUS karmi INDEKS — i właśnie dlatego
+  bramka poszła na czerwono 08-04. Zależność trzymana w ludzkiej pamięci to awaria zaplanowana.
 
 ### 👑 CZTERY KORONY — kolejność ZATWIERDZONA PRZEZ CEZARA 2026-08-03
 

@@ -1,7 +1,7 @@
 ---
 kategoria: TABULA
 typ: zywy
-wlasciciel: —
+wlasciciel: imperium/biblioteki/pamiec_sesji.py
 stan_na: 2026-07-13
 powod_istnienia: "Trwały model Cezara (preferencje, decyzje stałe) + źródło prawdy Imion Imperium — wstrzykiwany na starcie"
 ---

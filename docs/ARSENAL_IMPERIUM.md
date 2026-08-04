@@ -1,7 +1,9 @@
 ---
-kategoria: TABULA
-typ: zywy
+kategoria: ACTA
+powod_acta: "weryfikacja setek linkow narzedzi wykonana w maju 2026 — prawda swojego czasu; nowe pozycje ida do REJESTR_INSPIRACJI"
+typ: acta
 wlasciciel: —
+bez_wlasciciela: "weryfikacja CUDZYCH linkow z maja 2026 — opisuje internet, nie nasz kod"
 stan_na: 2026-06-02
 powod_istnienia: "Zweryfikować (Prawo I: zero halucynacji) setki linków narzędzi z pliku źródłowego IMV, oddzielić realne od fabrykowanych/niepewnych, i zaproponować 'najmocniejszy zweryfikowany rdz"
 ---

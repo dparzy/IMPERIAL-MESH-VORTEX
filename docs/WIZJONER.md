@@ -2,6 +2,7 @@
 kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
+bez_wlasciciela: "wizja — zamiar na przyszlosc, ktoremu z definicji nie odpowiada jeszcze kod"
 stan_na: 2026-06-26
 powod_istnienia: "Zbiór wizji i kierunków rozwoju — zamiary na przyszłość, świadomie niezrealizowane"
 ---

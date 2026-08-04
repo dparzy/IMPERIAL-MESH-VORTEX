@@ -590,7 +590,8 @@ def test_klucz_abstynujacy_nie_nadpisuje_dokumentu():
         # sześć produkcyjnych dokumentów (MAPA_PAMIECI, ARCHITEKTURA, README biblioteki…).
         # Dokładnie klasa złapana 07-21 („tryb testowy mutujący trwały rejestr") — test
         # pisze WYŁĄCZNIE do swojego pliku, nigdy do repozytorium.
-        tab.zbierz_dokumenty = lambda: []
+        # `**_` — sygnatura przyjęła `tylko_sledzone` (rozdział sędzia/usługa, 2026-08-04)
+        tab.zbierz_dokumenty = lambda **_: []
         tab.DROGOWSKAZY_Z_LICZBAMI = [wzgledna]
 
         # 1) ABSTYNENCJA (None) — dokument nietknięty, zero zgłoszonych zmian.
@@ -662,3 +663,114 @@ def test_korpus_obecny_znaczy_niezerowa_liczba(monkeypatch):
     assert sp.korpus_ksiazek_obecny() is False, "zero książek ≠ obecny korpus"
     monkeypatch.setattr(sp, "ksiazki_w_bazie", lambda: 1)
     assert sp.korpus_ksiazek_obecny() is True, "jedna książka wystarcza — korpus JEST"
+
+
+# ── BRAMKA 1b: WŁAŚCICIEL ALBO JAWNY POWÓD JEGO BRAKU (naprawa 2026-08-04) ──
+# Sprzeczność zmierzona na 22 dokumentach: parser świadomie zamienia `—` na pustkę
+# (kontrakt utrwalony testem wyżej), a T1 zaraz potem żądało wartości NIEPUSTEJ.
+# Organ wypisywał `—` we własnym katalogu i karał za jego wpisanie — a dokument bez
+# właściciela wypadał TAKŻE z bramki gnicia, bo pętla po właścicielach nie wykonywała
+# się ani razu. Błąd i zwolnienie z kontroli w jednym ruchu.
+
+def test_bramka1b_sam_myslnik_to_za_malo():
+    """`—` bez powodu = ciche wyciszenie bramki. Zawsze musi być powód na widoku."""
+    from narzedzia.tabularium import sprawdz
+    bledy, _, _ = sprawdz([("x.md", _meta(kategoria="LEX", wlasciciel=""))])
+    assert any("BEZ POWODU" in b for b in bledy)
+
+
+def test_bramka1b_powod_zdejmuje_zarzut():
+    """Powód podany → dokument przechodzi. To ten sam wzorzec co `powod_acta`."""
+    from narzedzia.tabularium import sprawdz
+    bledy, _, _ = sprawdz([("x.md", _meta(kategoria="LEX", wlasciciel="",
+                                          bez_wlasciciela="doktryna, nie opisuje kodu"))])
+    assert not [b for b in bledy if "wlascic" in b.lower() or "właścic" in b.lower()]
+
+
+def test_bramka1b_TABULA_nie_da_sie_wyciszyc_zadnym_powodem():
+    """GRANICA: kategoria orzeka, czy wolno NIE MIEĆ właściciela.
+
+    TABULA to „rejestr prawdy o kodzie, musi zgadzać się 1:1" — rejestr, który nie
+    wskazuje żadnego kodu, nie ma z czym się zgadzać. Żaden powód tego nie naprawia,
+    bo wadą jest sama kategoria. Inaczej `bez_wlasciciela` stałoby się uniwersalnym
+    wyłącznikiem bramki, czyli tylnymi drzwiami — tą samą klasą co ucieczka w `acta`.
+    """
+    from narzedzia.tabularium import sprawdz
+    for kategoria in ("TABULA", "FORMA", "MENSURA"):
+        bledy, _, _ = sprawdz([("x.md", _meta(kategoria=kategoria, wlasciciel="",
+                                              bez_wlasciciela="wymówka"))])
+        assert any("WYMAGA właściciela" in b for b in bledy), kategoria
+
+
+def test_bramka1b_kategoria_bez_obowiazku_przepuszcza_z_powodem():
+    """Dopełnienie granicy: LEX/ACTA/CONSILIUM wolno nie mieć kodu — z powodem."""
+    from narzedzia.tabularium import sprawdz
+    for kategoria in ("LEX", "CONSILIUM"):
+        bledy, _, _ = sprawdz([("x.md", _meta(kategoria=kategoria, wlasciciel="",
+                                              bez_wlasciciela="powód"))])
+        assert not any("WYMAGA właściciela" in b for b in bledy), kategoria
+
+
+# ── BRAMKA 2b: ZEGAR ZASTĘPCZY dla dokumentów bez właściciela ───────────────
+
+def test_bramka2b_dokument_bez_wlasciciela_dostaje_wlasny_zegar():
+    """Brak kodu NIE MOŻE oznaczać braku kontroli — 22 dokumenty były niewidzialne."""
+    from narzedzia.tabularium import sprawdz, DNI_BEZ_WLASCICIELA
+    stary = (date.today() - timedelta(days=DNI_BEZ_WLASCICIELA + 1)).isoformat()
+    _, ostrz, _ = sprawdz([("x.md", _meta(kategoria="LEX", wlasciciel="",
+                                          bez_wlasciciela="doktryna", stan_na=stary))])
+    assert any("[T2b]" in o for o in ostrz)
+
+
+def test_bramka2b_granica_progu_dokladnie():
+    """GRANICA: w dniu progu jeszcze cicho, dzień po — alarm (próg domknięty od góry)."""
+    from narzedzia.tabularium import sprawdz, DNI_BEZ_WLASCICIELA
+    na_progu = (date.today() - timedelta(days=DNI_BEZ_WLASCICIELA)).isoformat()
+    _, ostrz, _ = sprawdz([("x.md", _meta(kategoria="LEX", wlasciciel="",
+                                          bez_wlasciciela="d", stan_na=na_progu))])
+    assert not any("[T2b]" in o for o in ostrz), "próg nie może alarmować w swoim dniu"
+
+
+def test_bramka2b_nie_dotyczy_dokumentu_z_wlascicielem():
+    """Dokument z właścicielem ma zegar T2 (kod) — dwa zegary naraz byłyby szumem."""
+    from narzedzia.tabularium import sprawdz, DNI_BEZ_WLASCICIELA
+    stary = (date.today() - timedelta(days=DNI_BEZ_WLASCICIELA + 100)).isoformat()
+    _, ostrz, _ = sprawdz([("x.md", _meta(stan_na=stary))])
+    assert not any("[T2b]" in o for o in ostrz)
+
+
+def test_bramka2b_acta_nie_dostaje_zegara():
+    """ACTA to prawda swojego czasu (Prawo I) — migawka z definicji się nie starzeje."""
+    from narzedzia.tabularium import sprawdz, DNI_BEZ_WLASCICIELA
+    stary = (date.today() - timedelta(days=DNI_BEZ_WLASCICIELA + 500)).isoformat()
+    _, ostrz, _ = sprawdz([("x.md", _meta(kategoria="ACTA", typ="acta", wlasciciel="",
+                                          bez_wlasciciela="historia", stan_na=stary))])
+    assert not any("[T2b]" in o for o in ostrz)
+
+
+# ── SPIS: pliki spoza kontroli wersji nie są dokumentami Imperium ───────────
+
+def test_spis_pomija_pliki_spoza_gita():
+    """Prawo XIX: czego nie ma na branchu, tego nie ma.
+
+    Zmierzone 2026-08-04: Tabularium żądało metadanych od `raporty/RAPORT_TOKENY…md`,
+    który jest gitignored. Naprawa KLASOWA (filtr `git ls-files`), nie punktowa —
+    dopisanie jednego katalogu do POZA_REJESTREM uciszyłoby ten alarm, a każdy
+    następny ignorowany katalog powtórzyłby go od nowa.
+    """
+    from narzedzia.tabularium import zbierz_dokumenty
+    sciezki = [s for s, _ in zbierz_dokumenty()]
+    assert sciezki, "spis nie może być pusty"
+    assert not any(s.startswith("raporty/") for s in sciezki)
+
+
+def test_spis_brak_gita_nie_wywraca_spisu():
+    """GRANICA: gdy `git ls-files` zawiedzie, wracamy do zachowania sprzed filtra —
+    strażnik nie może oślepnąć na całe repo tylko dlatego, że zabrakło narzędzia."""
+    from narzedzia import tabularium as tb
+    stare = tb._sledzone_przez_git
+    try:
+        tb._sledzone_przez_git = lambda: None
+        assert tb.zbierz_dokumenty(), "brak gita nie może wyzerować spisu"
+    finally:
+        tb._sledzone_przez_git = stare

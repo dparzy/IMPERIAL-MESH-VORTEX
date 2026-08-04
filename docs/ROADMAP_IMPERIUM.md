@@ -15,7 +15,7 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 ---
 
-## 🗓️ PLAN WACHT — operacyjna kolejka zadań (stan 2026-08-02)
+## 🗓️ PLAN WACHT — operacyjna kolejka zadań (przegląd 2026-08-05)
 
 > **Czym to jest, a czym nie:** FAZY 0–4 niżej to mapa STRATEGICZNA (dokąd zmierzamy).
 > Ta sekcja to kolejka OPERACYJNA — co robimy w najbliższych wachtach, w kolejności.
@@ -24,6 +24,52 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 > zwiad → pomiary → symbioza). Pozycja bez kalibracji przyrządu **nie jest skończona**.
 
 **Legenda stanu:** ✅ zrobione · 🟡 kod jest, brak dowodu · 🔴 nie istnieje · ⏸️ świadomie odłożone
+
+> ⚠️ **Ta sekcja przez trzy dni była NAGŁÓWKIEM BEZ KOLEJKI** — obiecywała „co robimy
+> w najbliższych wachtach", a kolejka leżała rozsypana po ośmiu sekcjach niżej (H, G, A,
+> F, B, C, Ł, E). Uporządkowane 2026-08-05 na rozkaz Cezara.
+
+### 🎯 KOLEJKA NA TERAZ (rekomendacja Architekta, kolejność = priorytet)
+
+| # | zadanie | stan | dlaczego TERAZ |
+|---|---|---|---|
+| **1** | **BIBLIOTHECA ULPIA — domknięcie biblioteki** (a) 133 księgi poza RAG → zaindeksować, (b) **świeży bieg `aestimator.py`** — ile realnie ginie z tabel, wzorów i wykresów i w których pozycjach, (c) watchdog przyrostu ksiąg (dziś **żadna z 24 warstw audytu nie pilnuje ksiąg**) | 🔴 | **ROZKAZ CEZARA 2026-08-05: „najpierw musimy mieć najlepszą Bibliotekę Ulpia — nazwa zobowiązuje".** *Bibliotheca Ulpia* Trajana była największą biblioteką cesarstwa. Dopóki 133 z 248 ksiąg jest niewidzialnych, każdy zwiad czerpie z połowy zasobu |
+| **1b** | **Organy mają czytać LINKI, WYKRESY, TABELE i ZŁOŻONE WZORY** — dziś każda ścieżka ekstrakcji (`_pdf` PyMuPDF, OCR, epub/mobi/djvu/calibre) daje **płaski tekst**; struktura tabel, wzory i wykresy **nie są odzyskiwane przez ŻADNĄ z nich** | 🔴 | Rozkaz Cezara 08-05: *„aby nic nie ginęło, aby cała wiedza była w 100% zbadana, oceniona, porównana i wybrana"*. **Kolejność: najpierw pomiar AESTIMATOREM, potem wybór technologii** — struktura tabel ≠ wzory ≠ wykresy to trzy różne problemy o trzech różnych kosztach |
+| **2** | **LUDUS MAGNUS P1 — IC dla WSZYSTKICH 87 neuronów** (15 par 4h, walk-forward OOS, PBO/DSR od pierwszego biegu, wynik do CODEX) | 🔴 narzędzia istnieją | **Rozkaz Cezara 2026-08-05.** Ledger ma **4 wyniki IC na 87 neuronów** — skill ~95% roju nigdy nie zmierzony. Bez tego P2–P5 nie mają czego ważyć, a MEXC byłby hazardem |
+| **3** | **LUDUS MAGNUS P5 — wiarygodność źródeł MIERZONA** | 🔴 | `WIARYGODNOSC_ZRODEL` to 6 liczb wpisanych ręcznie; zgadywanie udające wiarygodność. Domyka też DOKTRYNĘ WIEDZY Cezara |
+| **4** | **LUDUS MAGNUS P3 — walidacja 20 strategii** (SZKIC → zmierzone, DSR+PBO) | 🔴 | MANIFEST sam mówi „status SZKIC — nie zwalidowane"; to najbliżej ostatecznej decyzji (U2) |
+| **5** | **Domknięcie pętli areny** — `ucz_mwu` stoi na `False`, bo zmierzono, że SZKODZI (−0,6/−0,5 pp, PBO ~0,6) | 🔴 | Arena osądza walki, a **werdykty nie zmieniają wag**. Warunek WSTĘPNY dla EDITOR MUNERIS, nie jego skutek |
+| **6** | **EDITOR MUNERIS** — organ układający program igrzysk (wizja Cezara 08-05) | 🔴 | Zasada nienaruszalna: liczba prób jest składnikiem werdyktu (DSR), budżet zamiast przeszukiwania wyczerpującego |
+| **7** | **Dwa organy blokujące ODMROŻENIE**: rejestr klas K1–K4 + rejestr kalibracji organów orzekających | 🔴 | Jedyne dwa kryteria `CONDITOR LUSTRI` bez producenta — świecą NIE WIEM i **trzymają zamrożenie** |
+| **8** | **A/B dla flagi `weryfikuj_integralnosc`** (D1.1) | 🔴 | Kod stoi opt-in OFF; LEX TALARUS zabrania ogłaszać działanie przed pomiarem |
+| **9** | **LUSTRATIO L3c** — strażnik pracy bez śladu w Dzienniku | 🔴 | Deklaracja w CLAUDE.md, implementacja ZERO; złapane na żywym przypadku |
+
+### 📌 Co zostało po wachcie 2026-08-05 (stan zmierzony, nie deklarowany)
+
+**Zrobione tej wachty:** U1 `CONDITOR LUSTRI` ✅ · D1.1 `hash_ok` ✅ (opt-in OFF) · K1
+w MATURITASIE ✅ · dwie wady bramek (W6, W20) ✅ · LUDUS MAGNUS i EDITOR MUNERIS zapisane ·
+kolizja numeracji `D` → `Ł` naprawiona · cztery przeterminowane liczby w tym dokumencie
+zastąpione **wskazaniem producenta** (klasa „liczba rosnąca sama").
+
+**Otwarte pozycje wg sekcji (policzone z tabel niżej, nie z pamięci):**
+
+| sekcja | otwarte | uwaga |
+|---|---|---|
+| WACHTA F — adopcje i alarmy | **17** | największa kolejka; wymaga przesiania wg wagi |
+| WACHTA A — biblioteka | **12** | tu leży 133 księgi poza RAG (doktryna wiedzy) |
+| WACHTA H — domykanie pętli | **7** | |
+| LUSTRATIO L0–L3x | **7** | L4 zależy od kryteriów bramki wyjścia |
+| WACHTA G — dług recenzji | **6** | |
+| WACHTA C — kolejka Cezara | **5** | |
+| WACHTA Ł — łup | **5** | czeka na wynik LUDUS MAGNUS |
+| WACHTA E — dług techniczny | **4** | |
+| KORONY B/C/D | **3** | ⏸️ zamrożone do L4 |
+| WACHTA B — dług kalibracyjny | **3** | zasila kryterium KALIBRACJA bramki wyjścia |
+
+> **Uczciwa uwaga o tej liczbie (~69 otwartych):** rośnie, bo mierzymy więcej, niż zamykamy —
+> i **spadek wskaźnika domknięcia po dopisaniu uczciwie nazwanego zadania jest ZDROWY**
+> (MATURITAS, antywskaźnik piętra LOOP). Wskaźnika **nie wpisujemy tutaj ręcznie**: liczy go
+> `python -m imperium.oczy.maturitas`.
 
 ---
 
@@ -669,21 +715,27 @@ Zmierzone 2026-07-29: **47 organów orzekających, 11 bez testu kalibracyjnego.*
 
 | # | Zadanie | Stan |
 |---|---|---|
-| C1 | **Sąd nad 35 cząstkami Hyginusa** (kolejka 44, osądzonych 8) | 🟡 narzędzie jest, plon czeka |
+| C1 | **Sąd nad cząstkami Hyginusa** — stan kolejki czytaj z `python -m imperium.oczy.breviarium`; liczb NIE wpisujemy tu ręcznie, bo „kolejka 44 / osądzonych 8” rozjechało się w kilka dni (klasa „liczba rosnąca sama”) | 🟡 narzędzie jest, plon czeka |
 | C2 | **ESSENTIA** — esencja = falsyfikowalna hipoteza, nie streszczenie | 🔴 kod nie istnieje |
 | C3 | **Rejestr książka→moduł→werdykt** wg McLean-Pontiff (IC przed/po wdrożeniu) | 🔴 **brak prior artu — definiujemy sami** |
-| C4 | **TIRO E3** — 229/1000 par użytecznych (23% progu) | 🟡 w toku |
+| C4 | **TIRO E3** — postęp par użytecznych wobec progu 1000 czytaj z `python -m imperium.oczy.breviarium` (wpisane tu „229/1000” było już nieaktualne) | 🟡 w toku |
 | C5 | **INGENIUM** — IQ Imperium w 7 kategoriach | 🔴 projekt w docs, kod nie istnieje |
 
-### WACHTA D — fronty, które decydują o ŁUPIE (nie o wiedzy)
+### WACHTA Ł — fronty, które decydują o ŁUPIE (nie o wiedzy)
+
+> 🔤 **Przemianowana z „WACHTA D” 2026-08-05:** prefiks `D` znaczył w tym samym
+> dokumencie DWIE różne rzeczy — pozycje tej wachty i pozycje REJESTRU DŁUGÓW
+> (D1.1 = `hash_ok`, D1 = MEXC). Dwa znaczenia jednego klucza w jednym dokumencie
+> to ta sama klasa co dwa organy liczące ten sam fakt (K1): rozjazd jest niewidoczny,
+> dopóki ktoś nie zacytuje „D1” i nie trafi w drugie znaczenie.
 
 | # | Zadanie | Stan | Uwaga |
 |---|---|---|---|
-| D1 | **JEDEN zamknięty obieg na realnych groszach (MEXC)** | 🔴 `MEXC_API_KEY` brak | **zero prawdziwych wypełnień w historii Imperium** — poślizg i prowizja są ZAŁOŻONE, nie zmierzone. Decyzja kapitałowa = wyłącznie Cezar |
-| D2 | **Świeżość danych** — dryf 1D **41,5 dnia**, 1m 9,3 dnia | 🔴 zmierzone, niezałatane | rój głosuje na nieświeżych danych |
-| D3 | **Kalibracja kosztu egzekucji na realnych fillach** | 🔴 | zależy od D1. **Zwiad 07-30 (SaR 2603.09164, Sepper/ex-Gauntlet) NIE domyka D3** — mierzy poślizg **likwidacji po stronie giełdy** (wielkość funduszu ubezpieczeniowego, wymogi kapitałowe), a nie to, ile zje NASZE małe zlecenie; **2 z 4 jego wejść są dla nas nieosiągalne** (pełne migawki L2 ≥1/min — mamy zero; atrybucja na poziomie kont — dostępna „on fully on-chain DEXs", a MEXC jest scentralizowana). Co się przenosi: forma `S ∝ 1/L` i legitymizacja **poślizgu ZALEŻNEGO OD STANU** zamiast stałej założonej. Odłożone do dnia wpięcia L2 |
-| D4 | **Poślizg zależny od stanu zamiast stałej** — funkcja mierzalnych zmiennych (zakres, wolumen, zmienność) | 🔴 | Dziś poślizg i prowizja są **ZAŁOŻONE**, więc mogą odwracać znak wyniku strategii. Nie wymaga L2: nawet zgrubna funkcja tego, co mierzymy, jest **ściśle lepsza od stałej**. Prior art do wzięcia: warstwowe modele wypełnienia z `nautilus_trader` (poz. 5 zwiadu 07-29 — głębokość symulowana **z samego wolumenu świecy**) |
-| D5 | **DR-OPE — oszacowanie zwrotu polityki BEZ realnych zleceń** | 🔴 | Z Atkinsona: *Doubly Robust Off-Policy Evaluation*, nieobciążony estymator oczekiwanego zwrotu, wagi IPS obcinane. **Odblokowuje pomiar tam, gdzie D1 stoi na braku kluczy MEXC i decyzji kapitałowej Cezara** — polityki nie trzeba wdrożyć, żeby oszacować jej zwrot. Do tego z tego samego źródła: **Temporal Degradation** (nachylenie wierności względem czasu) — mamy Prawo XXIII o trafności per reżim, ale **nachylenia nie liczymy** |
+| Ł1 | **JEDEN zamknięty obieg na realnych groszach (MEXC)** | 🔴 `MEXC_API_KEY` brak | **zero prawdziwych wypełnień w historii Imperium** — poślizg i prowizja są ZAŁOŻONE, nie zmierzone. Decyzja kapitałowa = wyłącznie Cezar |
+| Ł2 | **Świeżość danych** — dryf per interwał melduje PORTITOR na starcie sesji; liczb nie wpisujemy ręcznie, bo wartości z 07-29 zdążyły się przeterminować | 🔴 zmierzone, niezałatane | rój głosuje na nieświeżych danych |
+| Ł3 | **Kalibracja kosztu egzekucji na realnych fillach** | 🔴 | zależy od Ł1. **Zwiad 07-30 (SaR 2603.09164, Sepper/ex-Gauntlet) NIE domyka D3** — mierzy poślizg **likwidacji po stronie giełdy** (wielkość funduszu ubezpieczeniowego, wymogi kapitałowe), a nie to, ile zje NASZE małe zlecenie; **2 z 4 jego wejść są dla nas nieosiągalne** (pełne migawki L2 ≥1/min — mamy zero; atrybucja na poziomie kont — dostępna „on fully on-chain DEXs", a MEXC jest scentralizowana). Co się przenosi: forma `S ∝ 1/L` i legitymizacja **poślizgu ZALEŻNEGO OD STANU** zamiast stałej założonej. Odłożone do dnia wpięcia L2 |
+| Ł4 | **Poślizg zależny od stanu zamiast stałej** — funkcja mierzalnych zmiennych (zakres, wolumen, zmienność) | 🔴 | Dziś poślizg i prowizja są **ZAŁOŻONE**, więc mogą odwracać znak wyniku strategii. Nie wymaga L2: nawet zgrubna funkcja tego, co mierzymy, jest **ściśle lepsza od stałej**. Prior art do wzięcia: warstwowe modele wypełnienia z `nautilus_trader` (poz. 5 zwiadu 07-29 — głębokość symulowana **z samego wolumenu świecy**) |
+| Ł5 | **DR-OPE — oszacowanie zwrotu polityki BEZ realnych zleceń** | 🔴 | Z Atkinsona: *Doubly Robust Off-Policy Evaluation*, nieobciążony estymator oczekiwanego zwrotu, wagi IPS obcinane. **Odblokowuje pomiar tam, gdzie D1 stoi na braku kluczy MEXC i decyzji kapitałowej Cezara** — polityki nie trzeba wdrożyć, żeby oszacować jej zwrot. Do tego z tego samego źródła: **Temporal Degradation** (nachylenie wierności względem czasu) — mamy Prawo XXIII o trafności per reżim, ale **nachylenia nie liczymy** |
 
 ### WACHTA E — dług techniczny z zamrożonej listy
 
@@ -692,7 +744,7 @@ Zmierzone 2026-07-29: **47 organów orzekających, 11 bez testu kalibracyjnego.*
 | E1 | `zip(strict=)` w Bramie · RUF012 · strażnik budżetu | 🔴 |
 | E2 | WFO chunkowany (backtest liniowy ~66 ms/tik — premisa „kwadratowy" była błędna) | 🟡 |
 | E3 | Strażnik obcych plików → wrzutnia/kwarantanna zamiast kasowania | 🔴 pomysł Cezara 07-28 |
-| E4 | Dług kontekstu: CLAUDE.md **259 linii > 200** | 🔴 rośnie z każdym rozkazem (253 po odchudzeniu 07-27 → 259 dziś) |
+| E4 | Dług kontekstu: CLAUDE.md ponad limit 200 linii — **liczbę podaje `python -m imperium.oczy.maturitas`** (piętro PROMPT). Wpisana tu „259” była nieaktualna o kilkadziesiąt linii: dokument opisujący dług kontekstu sam gnił | 🔴 rośnie z każdym rozkazem |
 
 ---
 

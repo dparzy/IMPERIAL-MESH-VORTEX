@@ -384,8 +384,9 @@ def _commity_wlasciciela_po(sciezka_wlasciciela, stan_na):
 
 
 _DEF_W_DIFFIE = re.compile(r"^[+-]\s*(?:async\s+)?(?:def|class)\s+([A-Za-z_]\w*)")
-_DEF_W_HUNKU = re.compile(r"^@@ .* @@\s*(?:async\s+)?(?:def|class)\s+([A-Za-z_]\w*)")
+_ZAKRES_HUNKA = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 _DEF_W_KODZIE = re.compile(r"^\s*(?:async\s+)?(?:def|class)\s+([A-Za-z_]\w*)", re.M)
+_DEF_W_LINII = re.compile(r"^\s*(?:async\s+)?(?:def|class)\s+([A-Za-z_]\w*)")
 _CYTAT_BACKTICK = re.compile(r"`([^`\n]{1,120})`")
 _IDENTYFIKATOR = re.compile(r"[A-Za-z_]\w*")
 
@@ -444,11 +445,46 @@ def _pospolitosc_symboli():
     return _POSPOLITOSC_CACHE
 
 
+def _tresc_po_commicie(sha, sciezka):
+    """Linie pliku w wersji PO commicie `sha` (pusta lista = plik wtedy nie istniał)."""
+    try:
+        r = subprocess.run(["git", "show", f"{sha}:{sciezka}"], capture_output=True,
+                           text=True, timeout=20, cwd=ROOT,
+                           encoding="utf-8", errors="replace")
+    except (OSError, subprocess.SubprocessError):
+        return []
+    return r.stdout.splitlines() if r.returncode == 0 else []
+
+
+def _definicja_obejmujaca(linie, nr):
+    """Nazwa najbliższej definicji POPRZEDZAJĄCEJ linię `nr` (1-indeks) albo None.
+
+    Skan wstecz, nie parser AST: hunk bywa w pliku, który wtedy się nie kompilował,
+    a `ast` na takim wejściu rzuca i zabiera CAŁE świadectwo. Zgrubność jest tu
+    tańsza niż kruchość — mylimy się co najwyżej o jeden poziom zagnieżdżenia.
+    """
+    for i in range(min(nr, len(linie)) - 1, -1, -1):
+        trafienie = _DEF_W_LINII.match(linie[i])
+        if trafienie:
+            return trafienie.group(1)
+    return None
+
+
 def _symbole_zmienione(sciezka_wlasciciela, stan_na):
     """Nazwy funkcji/klas, których diff DOTKNĄŁ po dacie `stan_na`.
 
-    Nagłówek hunka (`@@ … @@ def foo`) niesie funkcję-kontekst, więc łapiemy też
-    zmianę CIAŁA funkcji, nie tylko jej sygnatury.
+    NIE bierzemy nazwy z nagłówka hunka, tylko NUMER LINII — i szukamy definicji,
+    która tę linię naprawdę obejmuje. Powód zmierzony 2026-08-04 (kalibracja II,
+    populacja 24): `git show` opisuje hunk najbliższym nagłówkiem na LEWYM MARGINESIE,
+    więc dla zmiany wewnątrz metody podaje `class X`. A nazwa klasy stoi w backtickach
+    w KAŻDYM dokumencie o module — świadectwo degenerowało się wtedy do zdania „plik
+    był dotknięty", czyli powtarzało tezę bramki T2, zamiast ją ważyć. Zmierzone: 4 z 7
+    mocnych świadectw stało WYŁĄCZNIE na nazwie klasy z nagłówka hunka, a wskazana
+    przyczyna nie mówiła nic o tym, co się zmieniło (`Legatus` zamiast
+    `_formacja_interwalu`, `KalkulatorLewara` zamiast `policz`).
+
+    Sama linia `+`/`-` z definicją nadal liczy się wprost — tam zmieniła się SYGNATURA,
+    a nie tylko ciało.
     """
     nastepny_dzien = stan_na + timedelta(days=1)
     try:
@@ -468,9 +504,21 @@ def _symbole_zmienione(sciezka_wlasciciela, stan_na):
                 encoding="utf-8", errors="replace",
             )
             for linia in pokaz.stdout.splitlines():
-                trafienie = _DEF_W_HUNKU.match(linia) or _DEF_W_DIFFIE.match(linia)
+                trafienie = _DEF_W_DIFFIE.match(linia)
                 if trafienie:
                     symbole.add(trafienie.group(1))
+                    continue
+                zakres = _ZAKRES_HUNKA.match(linia)
+                if not zakres:
+                    continue
+                start = int(zakres.group(1))
+                dlugosc = int(zakres.group(2) or 1)
+                linie_po = _tresc_po_commicie(sha, sciezka_wlasciciela)
+                # pierwsza i ostatnia zmieniona linia — hunk potrafi przeciąć dwie definicje
+                for nr in {start, start + max(dlugosc - 1, 0)}:
+                    nazwa = _definicja_obejmujaca(linie_po, nr)
+                    if nazwa:
+                        symbole.add(nazwa)
         return symbole
     except (OSError, subprocess.SubprocessError):
         return set()
@@ -501,6 +549,15 @@ def swiadectwo_gnicia(sciezka, meta):
 
     ŚWIADOMY LIMIT: zmiana zachowania wewnątrz funkcji, o której dokument mówi PROZĄ
     (bez nazwy w backtickach), dostanie wagę słabą. Dlatego waga, nie filtr.
+
+    LIMIT DRUGI, ZMIERZONY I NIENAPRAWIONY (kalibracja II, 2026-08-04): dokument może
+    cytować nie NAZWĘ, lecz sam KOD — i wtedy żaden wariant oparty na symbolach go nie
+    obroni. PAMIEC_ABSOLUTNA.md cytowała `f"{data}_{symbol}_{typ.lower()}.jsonl"`, gdy
+    kod dawno wstawiał tam symbol sanityzowany; realne gnicie leżało w prywatnej
+    `_sciezka`, której dokument nie wymienia z nazwy. Wariant sprzed tej zmiany „trafiał"
+    ten przypadek WYŁĄCZNIE przez nazwę klasy — czyli z tautologii, nie z wiedzy; po
+    naprawie nazwy klasy trafienie znika i to jest uczciwszy stan niż fałszywa zasługa.
+    Klasa „cytat dosłowny kodu, którego już nie ma" czeka w ROADMAP jako osobne zadanie.
     """
     stan_na = meta.get("stan_na")
     try:

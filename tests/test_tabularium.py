@@ -907,3 +907,106 @@ def test_swiadectwo_bez_daty_nie_wybucha(monkeypatch):
     monkeypatch.setattr(tb, "_pospolitosc_symboli", lambda: {"x": 1})
     waga, symbole = tb.swiadectwo_gnicia("docs/README.md", {"wlasciciel": "x.py"})
     assert waga == "SŁABE" and symbole == []
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# KALIBRACJA II (2026-08-04) — nazwa z nagłówka hunka to KONTEKST, nie sprawca
+# ─────────────────────────────────────────────────────────────────────────────
+
+_PLIK_ATRAPA = [
+    "import os",                      # 1
+    "",                               # 2
+    "",                               # 3
+    "class Organ:",                   # 4
+    "    STALA = 1",                  # 5
+    "",                               # 6
+    "    def policz(self, x):",       # 7
+    "        y = x + 1",              # 8
+    "        return y",               # 9
+    "",                               # 10
+    "    def zapisz(self):",          # 11
+    "        return True",            # 12
+]
+
+
+def test_definicja_obejmujaca_wskazuje_METODE_nie_klase():
+    """SEDNO KALIBRACJI II: zmiana w ciele metody ma wskazywać metodę.
+
+    `git show` wpisuje w nagłówek hunka najbliższy nagłówek z LEWEGO MARGINESU, więc
+    dla zmiany w `policz` podawał `class Organ`. Nazwa klasy stoi w backtickach w każdym
+    dokumencie o module, więc świadectwo degenerowało się do „plik był dotknięty" —
+    czyli powtarzało tezę bramki T2 zamiast ją ważyć.
+    """
+    from narzedzia.tabularium import _definicja_obejmujaca
+    assert _definicja_obejmujaca(_PLIK_ATRAPA, 8) == "policz"
+    assert _definicja_obejmujaca(_PLIK_ATRAPA, 12) == "zapisz"
+
+
+def test_definicja_obejmujaca_cialo_klasy_to_wciaz_klasa():
+    """GRANICA: linia w ciele klasy POZA metodą należy do klasy — i tak ma być."""
+    from narzedzia.tabularium import _definicja_obejmujaca
+    assert _definicja_obejmujaca(_PLIK_ATRAPA, 5) == "Organ"
+
+
+def test_definicja_obejmujaca_granice_zakresu():
+    """GRANICE: linia samej definicji należy do niej; poziom modułu → None; poza plikiem → nie wybucha."""
+    from narzedzia.tabularium import _definicja_obejmujaca
+    assert _definicja_obejmujaca(_PLIK_ATRAPA, 7) == "policz", "linia `def` należy do siebie"
+    assert _definicja_obejmujaca(_PLIK_ATRAPA, 1) is None, "import to nie funkcja"
+    assert _definicja_obejmujaca(_PLIK_ATRAPA, 999) == "zapisz", "numer poza plikiem nie może wywrócić"
+    assert _definicja_obejmujaca([], 5) is None, "pusty plik → brak definicji, nie wyjątek"
+
+
+def test_symbole_zmienione_nie_bierze_nazwy_klasy_z_naglowka_hunka(monkeypatch):
+    """SEDNO na pełnej ścieżce: hunk z `class Organ:` w nagłówku, a zmiana w `policz`.
+
+    Odtworzony przypadek GENERAL_LEGATUS z 2026-08-04: jedyne trafienie pochodziło
+    z nagłówka `@@ … @@ class Legatus:`, choć zmiana dotyczyła `_formacja_interwalu`,
+    o której dokument nie mówi ani słowa. Dokument dostawał wagę MOCNĄ za nic.
+    """
+    from narzedzia import tabularium as tb
+
+    class _Wynik:
+        def __init__(self, stdout):
+            self.returncode, self.stdout = 0, stdout
+
+    diff = "@@ -8 +8 @@ class Organ:\n-        y = x + 1\n+        y = x + 2\n"
+
+    def _fake_run(cmd, **_kw):
+        if "log" in cmd:
+            return _Wynik("abc1234\n")
+        if cmd[1] == "show" and ":" in cmd[2]:      # git show sha:plik
+            return _Wynik("\n".join(_PLIK_ATRAPA))
+        return _Wynik(diff)
+
+    monkeypatch.setattr(tb.subprocess, "run", _fake_run)
+    symbole = tb._symbole_zmienione("imperium/atrapa.py", date(2026, 7, 17))
+    assert symbole == {"policz"}, f"kontekst hunka nie jest sprawcą (dostałem {symbole})"
+    assert "Organ" not in symbole
+
+
+def test_symbole_zmienione_lapie_zmieniona_SYGNATURE(monkeypatch):
+    """KONTROLA ODWROTNA: gdy zmienia się sama linia `def`/`class`, nazwa nadal liczy się wprost.
+
+    Bez tego wariant „bez nazw klas" gubiłby realne przemianowanie klasy — to była
+    zmierzona wada wariantu odrzuconego (kandydat B): kupował precyzję recallem.
+    """
+    from narzedzia import tabularium as tb
+
+    class _Wynik:
+        def __init__(self, stdout):
+            self.returncode, self.stdout = 0, stdout
+
+    diff = ("@@ -7,2 +7,2 @@ class Organ:\n"
+            "-    def policz(self, x):\n"
+            "+    def policz(self, x, y):\n")
+
+    def _fake_run(cmd, **_kw):
+        if "log" in cmd:
+            return _Wynik("abc1234\n")
+        if cmd[1] == "show" and ":" in cmd[2]:
+            return _Wynik("\n".join(_PLIK_ATRAPA))
+        return _Wynik(diff)
+
+    monkeypatch.setattr(tb.subprocess, "run", _fake_run)
+    assert "policz" in tb._symbole_zmienione("imperium/atrapa.py", date(2026, 7, 17))

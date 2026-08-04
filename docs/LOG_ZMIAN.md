@@ -15,6 +15,48 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-04 | 🔬 | Świadectwo gnicia przestało powtarzać tezę bramki (kalibracja II)
+
+**Powód zmierzony:** drugie świadectwo T2 opierało 4 z 7 mocnych alarmów na nazwie
+wziętej z **nagłówka hunka**. `git show` wpisuje tam najbliższy nagłówek z LEWEGO
+MARGINESU, więc zmiana metody raportowała się jako `class Legatus`. A nazwa klasy stoi
+w backtickach w **każdym** dokumencie o module — świadectwo degenerowało się wtedy do
+zdania „plik był dotknięty", czyli **powtarzało tezę bramki T2**, którą miało ważyć.
+Wskazana przyczyna nie mówiła nic o zmianie: `Legatus` zamiast `_formacja_interwalu`,
+`KalkulatorLewara` zamiast `policz`.
+
+**Prawda podstawowa** (wszystkie 7 MOCNYCH, dokument w całości + realny diff właściciela):
+realnie kłamiały **dwa** — `PLAN_DEEPSEEK.md` (cytat sygnatury `zapytaj` bez czterech
+parametrów DISPENSATORA z 2026-07-21) i `PAMIEC_ABSOLUTNA.md` (cytat
+`f"{data}_{symbol}_{typ.lower()}.jsonl"`, gdy kod od 2026-07-29 sanityzuje symbol).
+Oba naprawione w tej samej wachcie.
+
+**Cztery warianty na tej samej populacji 24:** A (obecny) 7 MOCNYCH, precyzja 2/7,
+recall 2/2 · B („hunk bez `class`") 3, precyzja 1/3, **recall 1/2** · C („`class`
+nigdzie") wynik identyczny z B, bo populacja nie ma ani jednego `diff-class` — dane
+**nie rozstrzygają** B vs C · D (hunk → numer linii → definicja obejmująca) 4 MOCNE.
+
+**Wybrano D, nie B.** Kandydat B kupował +5 pp precyzji za połowę recallu. D naprawia
+to, co pierwsza kalibracja wypunktowała najostrzej — **precyzję PRZYCZYNY (było 0/6)**:
+wskazuje dziś `policz` i `zapytaj`. D jest podzbiorem A, więc żaden SŁABY nie awansował.
+
+🚨 **Uczciwa strata:** D gubi `PAMIEC_ABSOLUTNA` — jedyne prawdziwe gnicie, które A
+łapało **tautologicznie** (rozjazd siedzi w prywatnej `_sciezka`, nie wymienionej
+w dokumencie z nazwy). To odsłoniło klasę, której nie widzi żaden wariant oparty na
+symbolach: **cytat dosłowny KODU**. Zapisana jako ROADMAP **L3d**, nie jako sukces.
+
+**Koszt:** bieg 40 s → 97 s (2,4×) — narzędzie świadomie stoi poza audytem chodzącym
+w hooku każdej sesji. `stan_na` obu naprawionych dokumentów **celowo nie podniesiony**:
+poprawiono konkretne zdania, nie zweryfikowano całości (klasa K3 — piszący nie decyduje
+o własnej prawdzie).
+
+**Pliki:** `narzedzia/tabularium.py` (`_symbole_zmienione`, `_definicja_obejmujaca`,
+`_tresc_po_commicie`), `tests/test_tabularium.py` (+5 granic), `docs/PLAN_DEEPSEEK.md`,
+`docs/PAMIEC_ABSOLUTNA.md`, `docs/ROADMAP_IMPERIUM.md` (L3a ✅, L3d 🔴),
+`bibliotheca_ulpia/dane/rejestr_testow.jsonl`. Bramka: 3462/3462, ruff czysto.
+
+---
+
 ## 2026-08-04 | 🩹 | Świeżość dokumentu idzie tylko W PRZÓD — koniec cofania dat przez hook
 
 **Powód zmierzony (audyt W20 na czerwono na otwarciu wachty):** katalog Tabularium

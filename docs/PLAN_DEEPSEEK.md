@@ -86,7 +86,13 @@ class GlosImperium:
                              base_url="https://api.deepseek.com/v1")
         self.model = model
 
-    def zapytaj(self, system_prompt: str, tresc: str, temperatura: float = 0.7) -> str: ...
+    # Sygnatura ROZSZERZONA 2026-07-21 (DISPENSATOR): `profil` oddaje dobór głębokości
+    # Szafarzowi, reszta pozwala nadpisać go ręcznie. Wszystkie opcjonalne — starzy
+    # wołający działają bez zmian.
+    def zapytaj(self, system_prompt: str, tresc: str, temperatura: float = 0.7,
+                profil: Optional[str] = None, model: Optional[str] = None,
+                thinking: Optional[dict] = None,
+                reasoning_effort: Optional[str] = None) -> str: ...
     def test_polaczenia(self) -> bool: ...   # „powiedz cześć" → sprawdza klucz
 ```
 

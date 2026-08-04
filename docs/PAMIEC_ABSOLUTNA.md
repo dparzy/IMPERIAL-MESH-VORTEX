@@ -95,10 +95,17 @@ z MAE/MFE) · ✅ `drogi/scheduler.py` (ANALIZA) · ✅ czyta: `biblioteki/centr
 imperium/biblioteki/pamiec/logi/<rok>/<mies>/<data>_<symbol>_<typ>.jsonl
    np. 2026/06/2026-06-01_BTCUSDT_sygnał.jsonl      ← typ = TypLogu.lower()
        2026/06/2026-06-01_BTCUSDT_trade_close.jsonl
+       2026/07/2026-07-29_BTC-USDT-USDT_trade_close.jsonl   ← symbol SANITYZOWANY
 ```
 
-Nazwa pliku powstaje z `f"{data}_{symbol}_{typ.lower()}.jsonl"` — dla `SYGNAL` daje to
+Nazwa pliku powstaje z `f"{data}_{bezpieczny}_{typ.lower()}.jsonl"` — dla `SYGNAL` daje to
 `_sygnał.jsonl` (z polskim znakiem, bo wartość enuma to `"SYGNAŁ"`).
+
+**Symbol nie trafia do nazwy surowy** (`_sciezka`, od 2026-07-29): `_ZNAKI_NIELEGALNE`
+zamienia `/ \ : * ? " < > |` na `-`, bo notacja ccxt dla kontraktów (`BTC/USDT:USDT`)
+zrobiłaby z ukośnika PODKATALOG, a dwukropek jest na Windows nielegalny w nazwie pliku.
+`wczytaj(symbol=…)` sanityzuje pytanie TAK SAMO — sanityzacja po jednej stronie byłaby
+gorsza niż jej brak, bo dane są, a nie widać ich.
 
 🔴 **NIE ISTNIEJĄ** (były opisane jako gotowe do 2026-07-17 — nieprawda): katalogi
 `igrzyska/`, `sesje/`, `analizy/walk_forward/`, plik `indeks.json`, pliki panteonu

@@ -113,26 +113,20 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-08-05 — W19 złapało niepełną poprawkę frontmatter README
-Podniesiono nagłówek README, ale zapomniano o frontmatter; bramka W19 to wykryła. Domyknięto poprawkę i wygenerowano katalog. Bramka działa zgodnie z przeznaczeniem.
+### 2026-07-29 — Test zależny od środowiska jest kruchy
+Test wymagający calibre na PATH przeszedłby na laptopie, padł w chmurze bez niego. Usunięto zależność środowiskową — testy muszą być niezależne od maszyny.
 
-### 2026-08-05 — W3 weryfikuje klucze MANIFESTU maszynowo; data Stan na może być tylko etykietą
-W3 (zielone) pilnuje kluczy MANIFESTU 1:1 z kodem i liczby neuronów; dzięki temu wiadomo, że treść jest aktualna, a przestarzała była tylko data. Datę podniesiono bez ręcznego przeglądu 258 wierszy (LEX TALARUS).
+### 2026-07-29 — Dowód przez mutację — inaczej test bywa atrapą
+Lekcja recog28 zastosowana: test bez mutacji bywa atrapą. Należy celowo psuć mechanizm i sprawdzać, czy testy czerwienieją — dopiero to dowodzi, że test realnie testuje.
 
-### 2026-08-05 — MANIFEST to rejestr neuronów i zwiadowców, nie wszystkich organów
-Zarzut braku LUSTRUM/SILENTIUM w MANIFEST był chybiony; od organów jest CENSUS (W17, 263 organy). Przed alarmem W6 należało sprawdzić strukturę pliku, a nie zakładać brak wpisów.
+### 2026-07-29 — Bug: len(doc) po doc.close() w FABER
+Własny kod FABERA wołał len(doc) po zamknięciu dokumentu — realny bug wykryty i naprawiony; dowód przez mutację potwierdził czułość testów.
+
+### 2026-08-04 — Reżim NORMAL jako stan domyślny
+Reżim NORMAL powinien być domyślnym stanem systemu — jeżeli żaden inny reżim nie pasuje do warunków rynkowych, system wchodzi w tryb NORMAL. To upraszcza logikę i eliminuje przypadki niezdefiniowanego zachowania.
 
 ### 2026-08-05 — Milczący organ bez 'nie wiem' jest czytany jako zieleń
 Wspólna klasa bugów LUSTRUM, TABULARIUM i MATURITAS: organ, który nie umie powiedzieć 'nie wiem', milczy, a milczenie czytamy jako zieleń. To jest właściwe robactwo Imperium, nie pojedyncze błędy.
-
-### 2026-08-05 — W6 mierzy wobec commitu całego repo, nie per plik
-W6 porównuje MANIFEST/README z ostatnim commitem całego repo; auto-sync pamięci dotykający kroniki i wizji daje fałszywe czerwienienie. Komentarz W6b wskazuje, że tylko pomiar per-plik jest poprawny. Czerwienienie od hooka trenuje ignorowanie alarmów (odwrócona klasa K2).
-
-### 2026-08-05 — W20 ukrywa różnicę w ostatniej kolumnie przez ucięcie wiersza
-Komunikat audytu W20 ucina wiersz ok. 60 znaków, a różnica dotyczyła ostatniej kolumny (data). Skutek: ta sama linia była raportowana jednocześnie jako dopisana ręcznie i brakująca. Dopiero grep pokazał realną różnicę.
-
-### 2026-08-04 — Legatus — fałszywe świadectwo z nagłówka hunka
-Świadectwo dla dokumentu Legatus wzięło się z nazwy klasy w nagłówku hunka gita — git podaje ją dla każdej zmiany, więc symbol wyglądał na cytowany, choć dokument nie mówi o interwałach. Homonimia klasy z nazwą dokumentu generuje fałszywe alarmy.
 
 ### 2026-08-02 — Martwy słownik MECHANIZMY_ZWIADOWCY w rejestrze
 Słownik 12 wpisów (rejestr.py:208) nie jest czytany przez żaden kod; mechanizm MECHANIZM trafia tylko do neuronów. Skutek: DISCRIMINATOR i dekorelacja (Prawo XVI) nie obejmują 15 zwiadowców; EXP-13/14 aktywne bez wpisu.
@@ -197,9 +191,6 @@ Etykieta interwału (np. '4h' vs '4H') jest case-sensitive w Legatus._formacja_i
 ### 2026-07-27 — Backtest liniowy O(n·okno), nie O(n²)
 Pomiar cProfile wykazał stały ~66 ms/tick dla okna 251 barów. Skalowanie liniowe, nie kwadratowe. Poprzednia diagnoza o O(n²) była błędna.
 
-### 2026-07-27 — Prawdziwy sprawca kwadratu: _py_hma (pętla w pętli wma)
-Wewnętrzna pętla w _py_hma wywołuje wma wielokrotnie (4,5 mln wywołań na 2700 ticków), dając O(period²) dla tego jednego wskaźnika. Reszta backtestu jest liniowa.
-
 ### 2026-07-27 — Błąd w ocenie czasu gnicia – 9 dni zamiast pół roku
 W LOG_ZMIAN i pamięci napisano 'pół roku', a faktyczny czas od utworzenia runbooka wynosił 9 dni. Błąd wykryty przy liczeniu dla podglądu Kapitolu – poprawiono we wszystkich miejscach.
 
@@ -241,9 +232,6 @@ Użycie \b w regexie dla identyfikatorów BIB nie zamyka się na podkreślniku (
 
 ### 2026-07-20 — API-widma – istnienie w docs ≠ istnienie w kodzie
 Błąd klasy API-widma: dokumentacja indeksu/manualu zawiera komendy do plików, które nie istnieją lub zmieniły nazwę. Zweryfikowano na 9 kandydatach – 3 prawdziwe widma. W16 precyzyjnie odróżnia widma od supresji (dydaktyka, wizje, negacje).
-
-### 2026-07-20 — 1003 z 1301 odwolan do dokumentow to kronika sesji
-Przenoszenie zywych dokumentow tworzy martwe linki w historii (Prawa I nie wolno poprawiac). Rozklad asymetryczny: zywe maja 1-19 odwolan, kronika 58-63. Przenoszenie jest drogie.
 
 ### 2026-07-21 — Test negatywny PROBATORA wykrył błąd graniczny z '_'
 Znak '_' jest traktowany jako słowny przez \b, co powodowało fałszywe dopasowanie przy identyfikatorze BIB-006_Carson. Poprawiono test, nie organ – zastosowano inny separator.
@@ -295,9 +283,6 @@ MANIFEST pokazywał 45 aktywnych, podczas gdy grep wykazał ~16. Przyczyna: zwia
 
 ### 2026-06-30 — DeepSeek zawyża możliwości – weryfikacja przez deep-research
 Wiele twierdzeń DeepSeek z Zbior_wskaznikow_i_strategi okazało się błędnych lub przesadzonych. Zweryfikowano zewnętrznymi źródłami – system musi opierać się na mierzonych faktach (Prawo XVI).
-
-### 2026-06-30 — Golden Cross w IMPERIUM to wariant EMA
-Strategia ZŁOTY ORZEŁ używa EMA 50/200, nie kanonicznego SMA. Zapisano w dokumentacji jako wariant EMA. Wyjaśniono brak aktywacji na DOGE (death cross w całym oknie backtestu).
 
 ### 2026-06-30 — Filtr kara w baza.py: wyciszone filtry nie karzą
 Gdy n_akt_f==0 (wszystkie neurony FILTR wyciszone), strategia otrzymywała karę 0.5. Poprawiono na 1.0 – neuron FILTR nieobecny nie powinien karać (Prawo XV).

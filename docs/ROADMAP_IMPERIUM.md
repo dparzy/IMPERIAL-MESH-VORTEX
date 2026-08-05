@@ -3,7 +3,7 @@ kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
 bez_wlasciciela: "plan calego Imperium — zamiar, nie opis istniejacego organu"
-stan_na: 2026-08-03
+stan_na: 2026-08-05
 powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii."
 ---
 # 🏛️ ROADMAP IMPERIUM — MAPA DRÓG SYSTEMU
@@ -36,6 +36,9 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 | **0** | **DOMKNĄĆ BRAMKĘ DO 7/7** — `conditor_lustri` ma świecić zielono **spełnieniem kryteriów**, nie decyzją. Brakuje: TABULARIUM (33 alarmy T2/T3), ETAPY (7 otwartych L0–L3x), **KLASY** (rejestr leków na K1–K4 — nie istnieje), **KALIBRACJA** (rejestr kalibracji organów orzekających — nie istnieje) | 🔴 | **ROZKAZ CEZARA 2026-08-05: „naprawimy to na nowej sesji, aby wszystkie były spełnione".** Zamrożenie zdjęto DECYZJĄ przy czerwonej bramce — dług nie zniknął razem z zakazem |
 | **0a** ✅ | **ZROBIONE 2026-08-05 (wachta 0a).** Pięć wad naprawionych, każda z testem granicy „celowo psuję producenta"; **dowód mutacyjny: 8/8 testów czerwienieje z ASERCJI** przy przywróconej wadzie (czerwień z importu nie liczy się jako dowód). Zmierzony skutek naprawy W4 na żywym repo: DANE woła 23→14, RÓJ wołany 93→82 — **11 krawędzi było raportowanych pod złym filarem**. Dołożony lek na KLASĘ: `tests/test_kontrakty_publiczne.py` (skan całego repo + jawna lista 13 plików długu, która ma maleć). **🚨 PRZY OKAZJI ZŁAPANE: zapis 5 klas do Księgi Wad, deklarowany w Dzienniku i w tym wierszu, NIGDY NIE NASTĄPIŁ** (0 wpisów z datą 2026-08-05; ostatni był z 08-03) — dopisane teraz, 159→164, potwierdzone odczytem z dysku. Naprawione (plik:linia sprzed naprawy): `dyrygent.py:344` odcisk przed `wskazniki.update(kontekst_dodatkowy)` · `descriptio.py:158` tautologiczna kontrola kompletności · `pamiec_absolutna.py:216` bump `sekwencja` przy stałym haszu · `descriptio.py:137` mapa `stem→filar` gubiąca kolizje · `conditor_lustri.py:173` import prywatnej `_stan_domkniety` | ✅ | Dwie pierwsze to ta sama ironia: naprawiłem bezpiecznik, który nie mógł się zapalić, i w tej samej wachcie zbudowałem **drugi taki sam** oraz jego **lustrzane odbicie** (zapala się zawsze). Klasa przeżyła naprawę, bo naprawiłem INSTANCJĘ, nie WZORZEC |
 | **0b** | **PIĘĆ BRAKUJĄCYCH FILARÓW + dwie wady mapy** — `INSTITUTIO` (uczenie), `FISCUS` (kapitał/ryzyko), `HARNESS` (7 hooków + 9 skilli), `ŚWIADECTWO` (187 plików testów), `FAMILIA` (Hyginus, TIRO). Do tego: DESCRIPTIO musi **deklarować swój zakres** i liczyć to, co poza nim; `scheduler.py` ma **0 wołaczy** | 🔴 | Znalezione w TRZECH przejściach pod różnym kątem — **każde coś dało**, więc nie mam podstaw twierdzić, że czwarte nic by nie dało. Wariant zatwierdzony przez Cezara: przypisania per-moduł + test istnienia pliku |
+| **M1** ⭐ | **25. WARSTWA AUDYTU — MARTWY KAPITAŁ** *(fitness function)*. Asercja o właściwości architektury, nie o funkcji: „moduł bez wołacza produkcyjnego I bez pomiaru, starszy niż N dni = CZERWIEŃ". Do tego `vulture` na 40 zmierzonych sierot. **Wchodzi RAZEM z antywskaźnikiem** — inaczej podniesie się dopisaniem pustego pomiaru do ledgera | 🔴 | **Najtańszy mechanizm z całego zwiadu (~3 h)**: ta sama forma co 24 istniejące warstwy, zero nowych zależności. Celuje wprost w Prawo XV: **40 organów zbudowanych, nigdy niewołanych i niezmierzonych** |
+| **M2** ⭐ | **KLASA WADY BEZ STRAŻNIKA BLOKUJE COMMIT** — każdy wpis Księgi Wad z ≥2 wystąpieniami musi mieć test odpowiadający na pytanie „czy ta klasa zostałaby DZIŚ złapana automatycznie"; brak → `/limes` blokuje, tak jak dziś blokuje dług honorowy. **To jest brakujący producent kryterium KLASY** w `conditor_lustri` | 🔴 | Celuje w **79% klas wad, które wróciły** (kontrakt 13×, testy 12×, pomiar 12×). Wzór: Google SRE error-budget policy — przekroczenie progu przez JEDNĄ klasę wymusza pozycję P0, nie jest opcją. ~4 h + ciągła dyscyplina |
+| **M3** ⭐ | **MUTATOR — organ dowodzący, że test UMIE ZAWIEŚĆ** (mutation testing próbkowany: 1 moduł na wachtę, rotacja, wynik do CODEX). **To jest brakujący producent kryterium KALIBRACJA** — kalibracja strażnika to pytanie „czy wykrywa, gdy psuję producenta" | 🔴 | **Zalążek ISTNIEJE**: dowód mutacyjny wachty 0a (8/8 wad wykrytych z asercji) — ale leży w katalogu tymczasowym, więc **jutro nie istnieje**. Celuje w to, że wady łapie recenzja (64), a nie testy (35). ~3 h + bieg w tle |
 | **1** | **BIBLIOTHECA ULPIA — domknięcie biblioteki** (a) 133 księgi poza RAG → zaindeksować, (b) **świeży bieg `aestimator.py`** — ile realnie ginie z tabel, wzorów i wykresów i w których pozycjach, (c) watchdog przyrostu ksiąg (dziś **żadna z 24 warstw audytu nie pilnuje ksiąg**) | 🔴 | **ROZKAZ CEZARA 2026-08-05: „najpierw musimy mieć najlepszą Bibliotekę Ulpia — nazwa zobowiązuje".** *Bibliotheca Ulpia* Trajana była największą biblioteką cesarstwa. Dopóki 133 z 248 ksiąg jest niewidzialnych, każdy zwiad czerpie z połowy zasobu |
 | **1b** | **Organy mają czytać LINKI, WYKRESY, TABELE i ZŁOŻONE WZORY** — dziś każda ścieżka ekstrakcji (`_pdf` PyMuPDF, OCR, epub/mobi/djvu/calibre) daje **płaski tekst**; struktura tabel, wzory i wykresy **nie są odzyskiwane przez ŻADNĄ z nich** | 🔴 | Rozkaz Cezara 08-05: *„aby nic nie ginęło, aby cała wiedza była w 100% zbadana, oceniona, porównana i wybrana"*. **Kolejność: najpierw pomiar AESTIMATOREM, potem wybór technologii** — struktura tabel ≠ wzory ≠ wykresy to trzy różne problemy o trzech różnych kosztach |
 | **2** | **LUDUS MAGNUS P1 — IC dla WSZYSTKICH 87 neuronów** (15 par 4h, walk-forward OOS, PBO/DSR od pierwszego biegu, wynik do CODEX) | 🔴 narzędzia istnieją | **Rozkaz Cezara 2026-08-05.** Ledger ma **4 wyniki IC na 87 neuronów** — skill ~95% roju nigdy nie zmierzony. Bez tego P2–P5 nie mają czego ważyć, a MEXC byłby hazardem |
@@ -43,9 +46,97 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 | **4** | **LUDUS MAGNUS P3 — walidacja 20 strategii** (SZKIC → zmierzone, DSR+PBO) | 🔴 | MANIFEST sam mówi „status SZKIC — nie zwalidowane"; to najbliżej ostatecznej decyzji (U2) |
 | **5** | **Domknięcie pętli areny** — `ucz_mwu` stoi na `False`, bo zmierzono, że SZKODZI (−0,6/−0,5 pp, PBO ~0,6) | 🔴 | Arena osądza walki, a **werdykty nie zmieniają wag**. Warunek WSTĘPNY dla EDITOR MUNERIS, nie jego skutek |
 | **6** | **EDITOR MUNERIS** — organ układający program igrzysk (wizja Cezara 08-05) | 🔴 | Zasada nienaruszalna: liczba prób jest składnikiem werdyktu (DSR), budżet zamiast przeszukiwania wyczerpującego |
-| **7** | **Dwa organy blokujące ODMROŻENIE**: rejestr klas K1–K4 + rejestr kalibracji organów orzekających | 🔴 | Jedyne dwa kryteria `CONDITOR LUSTRI` bez producenta — świecą NIE WIEM i **trzymają zamrożenie** |
+| **7** | **Dwa organy blokujące ODMROŻENIE**: rejestr klas K1–K4 + rejestr kalibracji organów orzekających. **FORMĘ DOSTAŁY 2026-08-05 — to są M2 i M3** (sekcja „ZWIAD ZEWNĘTRZNY" niżej): rejestr klas = „klasa wady z ≥2 wystąpieniami musi mieć test-strażnika", rejestr kalibracji = MUTATOR | 🔴 | Jedyne dwa kryteria `CONDITOR LUSTRI` bez producenta — świecą NIE WIEM i **blokują pozycję 0**. Do 08-05 pozycja była NAZWANA BEZ FORMY: wiedzieliśmy, czego brakuje, nie wiedzieliśmy, jak to zbudować |
 | **8** | **A/B dla flagi `weryfikuj_integralnosc`** (D1.1) | 🔴 | Kod stoi opt-in OFF; LEX TALARUS zabrania ogłaszać działanie przed pomiarem |
 | **9** | **LUSTRATIO L3c** — strażnik pracy bez śladu w Dzienniku | 🔴 | Deklaracja w CLAUDE.md, implementacja ZERO; złapane na żywym przypadku |
+| **M4** | **WYNIK DOJRZAŁOŚCI PER MODUŁ + PRÓG CZASOWY** (0–4 zamiast globalnego %) wzorem OpenSSF Scorecard — liczony z sygnałów repo, bez recenzenta. Moduł poniżej 4/4 dłużej niż N dni → alarm audytu | 🔴 | Po M1–M3, bo bez nich podnosiłby się sam. **Wymaga antywskaźnika** — to jest miernik najłatwiejszy do oszukania z całej piątki. Punkt wyjścia: 24% modułów ma 4/4 |
+| **M5** | **EVALS `pass^k` dla organów orzekających** wzorem Anthropica (5–10 przypadków z Księgi Wad jako zadania; `pass@k` = udało się raz, `pass^k` = udaje się KONSEKWENTNIE). Bez modelu-sędziego — tylko code-based, koszt tokenów zero | 🔴 | Naturalne piętro nad M3 i wejście do LUDUS MAGNUS. **Nie teraz** — 6–10 h na pierwsze 10 modułów, a przedtem trzeba mieć M1, żeby eval sam nie stał się 41. sierotą |
+
+### 🐎 ZWIAD ZEWNĘTRZNY 2026-08-05 — jak INNI domykają cykl dojrzałości (pytanie Cezara)
+
+> **Pytanie Cezara (2026-08-05):** *„zastanawiam się, skąd te wszystkie błędy i powroty do
+> organów — musimy znaleźć przyczyny. Może dlatego, że nie mamy wzorców określających
+> postępowanie i brak dopełnienia etapów ewolucji danej kategorii inżynierii AI"* —
+> o **całość Imperium**, nie o sam kod.
+
+**POMIAR PRZED ZWIADEM** (bo diagnoza z opinii nie jest diagnozą). Zmierzone na 262 modułach
+— nazwa `baza` wyłączona jako niejednoznaczna, ta sama pułapka co wada nr 4 tej wachty:
+
+| co zmierzone | wynik |
+|---|---|
+| moduły z **pełnym cyklem 4/4** (test · wpięcie · pomiar w CODEX · opis w żywym dokumencie) | **24%** |
+| 3/4 · 2/4 · ≤1/4 | 48% · 18% · 9% |
+| moduły **bez ani jednego pomiaru** w `rejestr_testow.jsonl` | **72%** ← wąskie gardło |
+| moduły bez testów · bez opisu | 17% · 3% |
+| **organy bez wołacza produkcyjnego I bez pomiaru** (martwy kapitał, Prawo XV) | **40** |
+| klasy wad należące do kategorii, która wystąpiła **>1×** | **79%** (kontrakt 13×, testy 12×, pomiar 12×) |
+| kto łapie wady: **recenzja / testy** | **64 / 35** |
+
+> ⚠️ **Te liczby NIE MAJĄ PRODUCENTA W REPO** — policzył je skrypt wachty 0a, leżący
+> w katalogu tymczasowym. Dopóki **M1** nie powstanie, są prawdą **swojego dnia**, nie
+> liczbą żywą; za tydzień nikt ich nie odtworzy. To jest ta sama klasa co „liczba rosnąca
+> sama", tylko od drugiej strony — i dlatego M1 stoi wyżej niż M4, który by je ładnie pokazał.
+
+**WERDYKT ZWIADU (FRUMENTARIUS, Sonnet, 19 wywołań narzędzi):** hipoteza Cezara broni się
+**w połowie, i ta druga połowa jest ważniejsza**. Wzorzec ISTNIEJE — CURSUS PLENUS stoi
+w konstytucji. Czego nie ma, to **miernika dopełnienia i KONSEKWENCJI ograniczonej czasowo**.
+U innych działa nie lepszy opis, tylko konsekwencja wpięta w miernik: Google SRE — przekroczenie
+budżetu błędów przez jedną klasę → *production freeze* i obowiązkowe P0; OpenSSF Scorecard —
+wynik liczony z sygnałów repo bez recenzenta; Backstage/Cortex — niski wynik rodzi
+przypomnienie **z terminem**, nie liczbę w raporcie.
+
+**SPROSTOWANIE ARCHITEKTA DO MELDUNKU ZWIADOWCY (Prawo I — kandydat ≠ prawda):** zwiadowca
+napisał, że *„świadomie odcięliśmy miernik od egzekucji"*, powołując się na regułę „MATURITAS
+jest LUSTREM, NIE KIEROWNICĄ". **Zatarł różnicę.** Zakaz brzmi: *„nie wolno go wpiąć w ścieżkę
+decyzyjną ani w dobór wag"* — a ścieżka decyzyjna jest u nas zdefiniowana jako **wejście/wyjście
+z pozycji**. Bramka commita nią NIE JEST. Wpięcie miernika dojrzałości w `/limes` nie łamie
+zakazu Goodharta; wpięcie go w wagi neuronów — łamałoby. Realne ryzyko leży gdzie indziej:
+próg blokujący commit kusi, żeby podnosić wskaźnik zamiast naprawiać to, co mierzy — dlatego
+**każdy z tych mechanizmów wchodzi razem ze swoim antywskaźnikiem**.
+
+**ODKRYCIE, KTÓRE ZMIENIA PRIORYTET:** M2 i M3 to nie jest nowa praca obok planu — to jest
+**brakujący producent pozycji 7** (rejestr klas K1–K4 + rejestr kalibracji), która blokuje
+**pozycję 0** (bramka 7/7). Pozycja 7 była dotąd NAZWANA BEZ FORMY. Dlatego M1–M3 stoją
+w kolejce zaraz po 0b, a nie na końcu.
+
+**CO ZWIAD ODRZUCIŁ (z powodem, nie z gustu):**
+
+| odrzucone | powód |
+|---|---|
+| Spotify Backstage / Soundcheck, Cortex.io | platformy webowe z backendem — idea scorecardów TAK, produkt NIE (mamy „jeden lokalny skrypt-bramka") |
+| DORA Four Keys | mierzy częstość deployów; nie mamy CI/CD ani wielu wdrożeń tygodniowo — zła SKALA, nie zła idea |
+| chaos engineering (Chaos Toolkit, AWS FIS) | mierzyłby odporność systemu, który **nie ma jeszcze ani jednego realnego ordera** — odłożyć do zamkniętego obiegu P&L |
+| recenzja przez drugiego inżyniera (rdzeń PRR) | wykluczone naszym układem: jeden nietechniczny właściciel + jeden agent. Zastępują ją M1 i M3 |
+| Jira/Scrum Definition-of-Done | otoczka nieadekwatna; samą zasadę „checklista weryfikowana automatycznie" już mamy w 24 warstwach |
+
+**CZEGO ZWIAD NIE ZNALAZŁ (uczciwie zapisane — to jest część wyniku):**
+
+- **Zero prior artu dla układu „jeden nietechniczny właściciel + jeden agent AI pisze cały kod".**
+  Każde źródło (Google SRE, Cortex, Backstage, postmortem) zakłada ZESPÓŁ z rolami. Nikt nie
+  opisuje sytuacji, w której recenzent i autor to ten sam model w innej sesji.
+- **Brak benchmarku, z którym porównać nasze 24%** — branża używa poziomów (bronze/silver/gold),
+  nie odsetka „ile modułów przeszło WSZYSTKIE etapy". Pytanie „czy 24% to źle" **zostaje bez
+  zewnętrznego punktu odniesienia**.
+- **Liczby wydajności mutation testingu odrzucone przez samego zwiadowcę** („1200 mutantów/min",
+  „benchmark PyCon 2025") — bez wiarygodnego źródła, prawdopodobny artefakt sumaryzatora.
+  **Zmierzyć samemu przy M3, nie wierzyć.**
+- Brak literatury łączącej **wiek komponentu w chwili wykrycia wady** z jakimkolwiek standardowym
+  miernikiem. Nasza obserwacja (10 z 16 policzalnych wad w organie młodszym niż doba, mediana
+  0 dni — MAŁA PRÓBA) może być miarą własną. Warta rozwinięcia przy M4.
+
+**ŹRÓDŁA:** [Google SRE — Error Budget Policy](https://sre.google/workbook/error-budget-policy/) ·
+[OpenSSF Scorecard](https://scorecard.dev/) ·
+[Thoughtworks — fitness functions](https://www.thoughtworks.com/en-us/insights/articles/fitness-function-driven-development) ·
+[Anthropic — Demystifying evals for AI agents](https://anthropic.com/engineering/demystifying-evals-for-ai-agents) ·
+[mutmut](https://github.com/boxed/mutmut) · [cosmic-ray](https://github.com/sixty-north/cosmic-ray) ·
+[vulture](https://github.com/jendrikseipp/vulture) · [Hypothesis](https://hypothesis.readthedocs.io/)
+
+> 🐢 **DELIBERATIO OBOWIĄZUJE KAŻDĄ Z TYCH POZYCJI** (rozkaz Cezara 2026-08-05: *„zawsze musimy
+> sprawdzić dokładnie, powoli wszystko przed podjęciem decyzji"*). Przed startem M1–M5 — jak
+> przed każdym innym zadaniem — powstaje jawna analiza pięciu punktów: co robimy i czego to
+> dotyka · czego NIE WIEMY · czym zmierzymy i co uznamy za sukces · co może pójść źle i jak to
+> wykryjemy · czy to już istnieje. **Zapis w ROADMAP nie jest zgodą na budowę** — jest zapisem
+> kandydata. Kolejność wyżej to REKOMENDACJA Architekta, nie decyzja.
 
 ### 📌 Co zostało po wachcie 2026-08-05 (stan zmierzony, nie deklarowany)
 
@@ -67,9 +158,10 @@ zastąpione **wskazaniem producenta** (klasa „liczba rosnąca sama").
 | WACHTA Ł — łup | **5** | czeka na wynik LUDUS MAGNUS |
 | WACHTA E — dług techniczny | **4** | |
 | KORONY B/C/D | **3** | ⏸️ zamrożone do L4 |
-| WACHTA B — dług kalibracyjny | **3** | zasila kryterium KALIBRACJA bramki wyjścia |
+| WACHTA B — dług kalibracyjny | **3** | zasila kryterium KALIBRACJA bramki wyjścia — **realizuje to M3** |
+| MECHANIZMY M1–M5 (zwiad 08-05) | **5** | dopisane 2026-08-05; M2+M3 to producent pozycji 7 |
 
-> **Uczciwa uwaga o tej liczbie (~69 otwartych):** rośnie, bo mierzymy więcej, niż zamykamy —
+> **Uczciwa uwaga o tej liczbie (rosnącej po dopisaniu M1–M5):** rośnie, bo mierzymy więcej, niż zamykamy —
 > i **spadek wskaźnika domknięcia po dopisaniu uczciwie nazwanego zadania jest ZDROWY**
 > (MATURITAS, antywskaźnik piętra LOOP). Wskaźnika **nie wpisujemy tutaj ręcznie**: liczy go
 > `python -m imperium.oczy.maturitas`.

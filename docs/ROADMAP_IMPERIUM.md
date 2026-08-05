@@ -3,7 +3,7 @@ kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
 bez_wlasciciela: "plan calego Imperium — zamiar, nie opis istniejacego organu"
-stan_na: 2026-08-05
+stan_na: 2026-08-06
 powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii."
 ---
 # 🏛️ ROADMAP IMPERIUM — MAPA DRÓG SYSTEMU
@@ -15,7 +15,7 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 ---
 
-## 🗓️ PLAN WACHT — operacyjna kolejka zadań (przegląd 2026-08-05)
+## 🗓️ PLAN WACHT — operacyjna kolejka zadań (przegląd 2026-08-06)
 
 > **Czym to jest, a czym nie:** FAZY 0–4 niżej to mapa STRATEGICZNA (dokąd zmierzamy).
 > Ta sekcja to kolejka OPERACYJNA — co robimy w najbliższych wachtach, w kolejności.
@@ -51,6 +51,14 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 | **9** | **LUSTRATIO L3c** — strażnik pracy bez śladu w Dzienniku | 🔴 | Deklaracja w CLAUDE.md, implementacja ZERO; złapane na żywym przypadku |
 | **M4** | **WYNIK DOJRZAŁOŚCI PER MODUŁ + PRÓG CZASOWY** (0–4 zamiast globalnego %) wzorem OpenSSF Scorecard — liczony z sygnałów repo, bez recenzenta. Moduł poniżej 4/4 dłużej niż N dni → alarm audytu | 🔴 | Po M1–M3, bo bez nich podnosiłby się sam. **Wymaga antywskaźnika** — to jest miernik najłatwiejszy do oszukania z całej piątki. Punkt wyjścia: 24% modułów ma 4/4 |
 | **M5** | **EVALS `pass^k` dla organów orzekających** wzorem Anthropica (5–10 przypadków z Księgi Wad jako zadania; `pass@k` = udało się raz, `pass^k` = udaje się KONSEKWENTNIE). Bez modelu-sędziego — tylko code-based, koszt tokenów zero | 🔴 | Naturalne piętro nad M3 i wejście do LUDUS MAGNUS. **Nie teraz** — 6–10 h na pierwsze 10 modułów, a przedtem trzeba mieć M1, żeby eval sam nie stał się 41. sierotą |
+| **KM1** ⭐ | **CI/CD — `.github/workflows/ci.yml`** + `pyproject.toml` (pin wersji). Bieg: `tests/run_tests.py` → `narzedzia/audyt_spojnosci.py` → ruff. **Wchodzi z antywskaźnikiem:** workflow, który nigdy nie czerwienieje, jest tapetą — pierwszy bieg musi być poprzedzony **celowym złamaniem** (mutacja w kodzie → CI czerwone → mutacja cofnięta) | 🔴 | **JEDYNE w pełni nowe znalezisko z audytu Kimi K3** (zmierzone: katalogu `.github/workflows` nie ma). Dziś regresję łapie **wyłącznie ręczne odpalenie `/limes`** — bramka Prawa XXI istnieje, ale **nie ma egzekutora**. To ta sama klasa co VINDEX: rzecz deklarowana, egzekwowana przez zero. ⚠️ Teza audytu „brak `requirements.txt`" **FAŁSZYWA** — plik istnieje; `__init__.py` **nie jest błędem** (pakiety przestrzeni nazw, `python -m` działa) |
+| **KM2** | **WARSTWA PEWNOŚCI per fragment RAG** — `pewność: float` · `status: ALIGNED/UNALIGNED/GENERAL` · `typ: tekst/tabela/wzór/wykres` · `weryfikowalność: cytat/parafraza/wniosek_autora`. Reguła: `pewność < próg` → fragment **nie wchodzi do kontekstu decyzyjnego** | 🔴 | Zmierzone: grep `pewnosc\|confidence` w `imperium/biblioteki/szukaj.py` → **zero trafień**. To jest **Prawo I w kodzie, nie w dokumencie**. ⚠️ **WARUNEK: po A10** — próg odcięcia bez zbioru ewaluacyjnego byłby liczbą wpisaną z palca (LEX TALARUS: przyrząd bez kalibracji nie istnieje). Progi VeNRY (0,55/0,30) są skalibrowane na **angielskich 10-K**, nasz korpus to polskie zapytania o książki metodyczne — **do przeliczenia, nie do skopiowania** |
+| **KM3** | **ARENA PRZED MEXC — Bitget/Bybit demo** przez CCXT `set_sandbox_mode(True)` + `productType: "SUSDT-FUTURES"`; kalibracja poślizgu, fill ratio i `PORTITOR` na realnym order booku | 🔴 | **Zweryfikowane w sieci 2026-08-06:** MEXC **ma** Demo Trading na Futures (interfejs, do 50 000 USDT), ale **API nie ma środowiska sandbox** — teza audytu „brak testnet/demo" jest **przesadzona, wniosek operacyjny słuszny**. Wzmacnia rozkaz `LUDUS MAGNUS` (arena przed MEXC) konkretem: droga do pierwszego zamkniętego obiegu **bez ryzyka kapitału**. Warunek: **po LUDUS MAGNUS P1** (bez IC roju byłby to hazard na cudzym sandboxie) |
+| **KM4** | **KANDYDACI EKSTRAKCJI STRUKTURALNEJ — wejście do pozycji 1b:** `MinerU` (MIT, tabele jako tabele, wzory jako LaTeX), `Marker`, `Docling` (IBM), `Nougat` (wzory LaTeX z PDF akademickich) | 🔴 | Zadanie **1b jest nasze**, ale **listy kandydatów nie mieliśmy** — audyt wnosi odpowiedź na pytanie *czym*. **Kolejność NIENARUSZONA: najpierw pomiar AESTIMATOREM, ile realnie ginie i w których pozycjach, potem wybór narzędzia.** Nie odwrotnie |
+| **KM5** | **POMIAR PAMIĘCI OBSERWACYJNEJ** — czy forma `[data] obserwacja` (Letta / observational memory) bije nasz esej-kronikę. Mierzymy: ile znaków oszczędza przy **zachowaniu odpowiedzi na te same pytania** (zbiór pytań z QUAESITORA) | 🔴 | Celuje w **zmierzony** dług kontekstu: AERARIUM mówi, że DZIENNIK to **76% wydruku hooka**, a `CLAUDE.md` przekracza limit doktrynalny. ⚠️ „10× taniej" to **liczba producenta, nie nasza** — kandydat ≠ prawda. **Bez pomiaru to wiara**, dlatego pozycja brzmi „pomiar", nie „wdrożenie" |
+| **KM6** | **HMO Tier-2 — pamięć sesyjna skompresowana** (mamy Tier 1 = kontekst i Tier 3 = dysk/graf; brak warstwy środkowej) | ⏸️ | Odłożone **świadomie, z powodem**: ryzyko, że budujemy organ nad czymś, co harness (`/compact`) już robi. Wraca dopiero, gdy KM5 pokaże, że forma obserwacyjna daje mierzalny zysk |
+| **KM7** | **KIMI K3 jako silnik pod Claude Code** — `ANTHROPIC_BASE_URL=https://api.moonshot.ai/anthropic`, model `kimi-k3[1m]` | ⏸️ **DECYZJA CEZARA** | **Fakty zweryfikowane w sieci 2026-08-06:** 2,8 bln parametrów (MoE, 104 mld aktywnych), **1M kontekstu**, $3/$15 za M tokenów, wagi otwarte 27.07.2026, reasoning always-on. **ZA:** 1M kontekstu = całe repo w jednej sesji, nasz dług kontekstu przestaje boleć. **PRZECIW:** wyższy wskaźnik halucynacji (**Prawo I**) · always-on reasoning = płacisz za myślenie przy `grep` (**Prawo XV**). **Rekomendacja Architekta: PO A10** — bez zbioru ewaluacyjnego A/B „K3 vs Claude" da liczbę z zastrzeżeniem większym niż sama liczba (ta sama pułapka co K10 na 30 pytaniach) |
+| **KM8** | **BIB: „Adaptive Markets" — Andrew Lo** → dopisać do `PLAN_ROZBUDOWY_BIBLIOTEKI.md` | 🔴 **dostawa Cezara** | Z ośmiu tytułów proponowanych przez audyt **siedem już mamy** (Douglas ×2, Lefevre, Lewis, Ilmanen ×2, McNeil, Narang, Chan ×8 — zmierzone `ls`). Brakuje wyłącznie Lo. `BIB-229 Miller-Page Complex-Adaptive-Systems` to **inna książka**, nie zamiennik |
 
 ### 🐎 ZWIAD ZEWNĘTRZNY 2026-08-05 — jak INNI domykają cykl dojrzałości (pytanie Cezara)
 
@@ -138,6 +146,97 @@ w kolejce zaraz po 0b, a nie na końcu.
 > wykryjemy · czy to już istnieje. **Zapis w ROADMAP nie jest zgodą na budowę** — jest zapisem
 > kandydata. Kolejność wyżej to REKOMENDACJA Architekta, nie decyzja.
 
+### 🔎 SĄD NAD AUDYTEM KIMI K3 (`wrzutnia/05.08.2026/`, osądzone 2026-08-06)
+
+> **Materiał:** 7 plików — metaprompt + 4 raporty (156 KB markdown) + 3 obrazy. Autor: „AI Auditor
+> (Kimi K3)". **Przeczytane w całości**, każda falsyfikowalna teza zderzona z ŻYWYM KODEM albo
+> z SIECIĄ. Rozkaz Cezara: *„nie odrzucamy, tylko analizujemy i dokładnie sprawdzamy"*.
+
+**⚠️ OSTRZEŻENIE METODOLOGICZNE — czytaj przed użyciem czegokolwiek stąd.**
+Raport ogólny **sam deklaruje w nagłówku**: *„Treść plików źródłowych Python (.py) niedostępna do
+bezpośredniej inspekcji (blokada GitHub raw)"* — i konsekwentnie mapuje repo jako **3 pliki `.py`**
+oraz konstytucję **10 zasad**. Metaprompt **tego samego autora, tej samej sesji** mówi o **467
+plikach**. Zmierzone: **466**. Ocena **3,75/10** została wystawiona repozytorium, które nie istnieje.
+
+| Wielkość | Audyt ogólny | Metaprompt | **Zmierzone 2026-08-06** |
+|---|---|---|---|
+| pliki `.py` | 3 | 467 | **466** |
+| prawa konstytucji | 10 | 21 | **25** |
+| commity | — | 141 | **1054** |
+
+#### ⚠️ WERDYKT „ZASADY NIE BLOKUJĄ" — PROCEDURALNIE NIEWAŻNY, NIE FAŁSZYWY
+
+Trzy dokumenty (metaprompt §2.2, STRATEGICZNY §7, KOMPLEKSOWY §12) wydają ten sam werdykt na
+podstawie tabeli **21 praw**. Mamy **25**. Zgodne treścią: **I** (zero halucynacji), **VII**
+(stopniowo), **XIX** (kod+testy), **XX** (status elitarny) — **4 z 25, trafność ~16%**.
+Rozjechane m.in.: ich **XV** „nie płacisz za organ" ≠ nasze **CZERWONY ALARM UTRATY POTENCJAŁU**;
+ich **XXI** „neuro-symboliczna weryfikacja" ≠ nasz **PROTOKÓŁ SPÓJNOŚCI**. **Nieobecne
+całkowicie: XXII, XXIII, XXIV, XXV.** Egzaminowano inną konstytucję → **werdykt nie został
+wydany**, nie „został wydany błędnie". Dług otwarty: przejść pytanie na naszych 25 prawach.
+
+#### ✅ POTWIERDZONE POMIAREM — przyjęte (→ KM1–KM8)
+
+> ⚠️ **Kolumna „skąd" celowo BEZ znaczników stanu** (`✅ 🔴 🟡 ⏸️`). Pierwsza wersja tej tabeli
+> ich użyła i **zafałszowała piętro LOOP MATURITASA o 4 pozycje otwarte i 2 domknięte** —
+> `maturitas.stan_domkniety()` liczy pozycje ROADMAP po tych emoji w KAŻDEJ tabeli, także
+> dowodowej. Złapane pomiarem w tej samej wachcie (86→98 zamiast 86→94). Klasa: **zapis
+> o pracy poruszył miernik pracy**. Producent pozycji to wyłącznie tabela KOLEJKI.
+
+| Teza audytu | Dowód | Skąd |
+|---|---|---|
+| Brak CI/CD (`.github/workflows`) | katalogu **nie ma** | **NOWE — jedyne w pełni** → KM1 |
+| Brak `pyproject.toml` | potwierdzone | NOWE → KM1 |
+| `scheduler.py` — zero wołaczy produkcyjnych | grep importów → **pusto** | nasze (0b) |
+| Graf nieczytany przy decyzji | nasz MATURITAS: `kto_przy_decyzji: NIKT` | nasze |
+| 133 księgi poza RAG · K10 nieznane | nasz pomiar | nasze (poz. 1) |
+| Brak warstwy pewności per fragment RAG | grep w `szukaj.py` → **zero** | częściowo nowe → KM2 |
+| MEXC: API bez sandboxu | sieć 2026-08-06 | zewnętrzne → KM3 |
+| Kimi K3: 2,8 bln / 1M / $3/$15 / wagi 27.07 | sieć 2026-08-06 | zewnętrzne → KM7 |
+| Kimi K3 działa w Claude Code (`ANTHROPIC_BASE_URL`) | sieć — **potwierdzone**, choć w dokumencie stoi na **pustym cytacie** (`article🛠web_search:16#9`, l. 328 STRATEGICZNEGO) | zewnętrzne → KM7 |
+
+#### ❌ OBALONE POMIAREM — do INDEX FALSORUM
+
+| Twierdzenie audytu | Stan faktyczny |
+|---|---|
+| „**SENAT** nie istnieje" | `imperium/senat/` — `debata_senatu.py`, `meta_kora.py` |
+| „**TRYBUNAŁ** (audyt) nie istnieje" | 24 warstwy audytu + 19 pretorianów |
+| „**SKARBIEC** (persystencja) nie istnieje" | `pamiec_absolutna.py`, `arena_baza.py`, ledgery JSONL, `baza_wiedzy.db` — **funkcja jest, brakuje tylko nazwy** |
+| „Brak `requirements.txt`" | **plik istnieje** |
+| „Imperium ma 21 praw" | **25** |
+| „P0: zbudować MCP Server dla Imperium (~3 h)" | **mamy DWA** — `.mcp.json`: `biblioteka` + `arena` |
+| „Brak headless / automatyzacji bez GUI" | **5 typów hooków działa**: PreToolUse, PostToolUse, SessionStart, SessionEnd, Stop |
+| Patenty `US 11,847,xxx` · `CN 115xxxxxx` · `EP 3xxx xxx` | **numery-zaślepki** — nieweryfikowalne, nie wolno cytować jako faktu |
+
+#### 🚫 ODRZUCONE — z powodem
+
+| Odrzucone | Powód |
+|---|---|
+| **Ocena 3,75/10 + plan 30 dni + plan 12 tygodni** | Wystawione repo liczącemu **3 pliki `.py`** zamiast 466. Wszystko, co z tej oceny wynika, dziedziczy wadę |
+| **VIA APPIA** (message bus) — jedyna trafiona teza o brakującym organie | Nasza architektura to **synchroniczny pipeline w jednym procesie**, nie system rozproszony. Rozwiązywałby problem, którego nie mamy |
+| **„Tolerancja immunologiczna"** (podnoś próg po serii strat) | **JUŻ MAMY:** `backtest.py:132` — *„ML-36 Bramka konformalna — podnosi próg pewności po serii strat"* |
+| **„Quorum threshold per reżim"** | **JUŻ MAMY:** `progi_adaptacyjne.py`, `progi_rsi(rezim, atr_pct)`, `prog_adx(rezim, atr_pct)`, `UstawieniaRezimu` |
+| **Reranking / RRF jako nowość** | **JUŻ W ROADMAP** jako A8, z adnotacją „potwierdzone niezależnie z zewnątrz" |
+| **A15, A10, A1b, A13, A14, F1, F2 jako rekomendacje audytu** | To **NASZE pozycje** — cytowane z naszymi datami, naszymi liczbami i naszym zdaniem *„leksyka jest sędzią, wektor wnioskodawcą"*. Ocena „5,5/10" biblioteki to ocena **naszej własnej samooceny** |
+| **„Ekologiczna redundancja"** (≥2 implementacje każdej krytycznej funkcji) | ⚠️ **KOLIDUJE z Prawem XVI**: odrzucamy za *skorelowany sygnał bez nowej informacji*, **mierzymy** — nie dublujemy na zapas |
+| **Mapowanie VSM (Stafford Beer, 5 systemów)** | Mamy **DESCRIPTIO z 11 filarami**, wpięte w apertio/clausura. Druga taksonomia bez pomiaru = Prawo XVI |
+| **7 z 8 proponowanych książek** | Zmierzone `ls`: Douglas ×2, Lefevre, Lewis, Ilmanen ×2, McNeil, Narang, Chan ×8 — **już w zbiorze**. Zostaje tylko Lo → KM8 |
+
+#### 🎭 TRZY OBRAZY — ilustracje, ZERO wartości dowodowej
+
+| Obraz | Werdykt |
+|---|---|
+| `1000101472.jpg` — dashboard „87 neuronów na XAUUSD" | Seria **syntetyczna**: 1180→2400 w 10 świecach, RSI to idealna sinusoida, symetryczne piki MACD na obu krawędziach. Instrument = **złoto**; handlujemy krypto. Nie mówi nic o naszych neuronach |
+| `1000101474.jpg` — schemat decyzyjny | Zawiera **filtr godzin 09:00–17:00 UTC** = sesja akcji; krypto handluje się **24/7**. Klasy (Momentum 15 / Trend 12 / … / ML 4) **sumują się do 87**, ale nasza taksonomia jest **literowa: 15 kategorii A–Z** — fabrykacja trafiająca w sumę |
+| `1000101475.jpg` — gap analysis | **Falsyfikowalny z naszego środowiska:** „Parallel Agents 1/10", „Multi-Agent 1/10", „CLI Scripting 1/10", „Background Run 2/10" — istnieje narzędzie `Agent` (9 typów subagentów), `run_in_background`, Bash+PowerShell, `CronCreate`, 5 typów hooków, 2 serwery MCP. Oceny „0–10" **bez rubryki**. Trafione: **CI/CD** |
+
+**Bilans:** ze 156 KB materiału **jedna pozycja w pełni nowa i wysokiej wartości** (CI/CD → KM1),
+dwie wnoszą konkret do rzeczy już zaplanowanych (KM3, KM4), jedna to zweryfikowany fakt do
+decyzji Cezara (KM7). Reszta to **nasze własne odbicie albo tezy obalone pomiarem**.
+**To jest drugi z rzędu „audyt zewnętrzny", który okazał się echem** (pierwszy: DeepSeek 07-30) —
+klasa do zapamiętania: *materiał opisujący nas naszymi liczbami nie jest niezależnym pomiarem*.
+
+---
+
 ### 📌 Co zostało po wachcie 2026-08-05 (stan zmierzony, nie deklarowany)
 
 **Zrobione tej wachty:** U1 `CONDITOR LUSTRI` ✅ · D1.1 `hash_ok` ✅ (opt-in OFF) · K1
@@ -160,6 +259,7 @@ zastąpione **wskazaniem producenta** (klasa „liczba rosnąca sama").
 | KORONY B/C/D | **3** | ⏸️ zamrożone do L4 |
 | WACHTA B — dług kalibracyjny | **3** | zasila kryterium KALIBRACJA bramki wyjścia — **realizuje to M3** |
 | MECHANIZMY M1–M5 (zwiad 08-05) | **5** | dopisane 2026-08-05; M2+M3 to producent pozycji 7 |
+| ADOPCJE KM1–KM8 (sąd nad Kimi K3) | **8** | dopisane 2026-08-06; z tego **1 w pełni nowa** (KM1 CI/CD), 2 odłożone świadomie (KM6, KM7) |
 
 > **Uczciwa uwaga o tej liczbie (rosnącej po dopisaniu M1–M5):** rośnie, bo mierzymy więcej, niż zamykamy —
 > i **spadek wskaźnika domknięcia po dopisaniu uczciwie nazwanego zadania jest ZDROWY**

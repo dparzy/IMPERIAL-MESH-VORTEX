@@ -113,23 +113,26 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-27 — Środowisko dev ma dostęp do sieci — adaptery live działają
-MEXC, Binance-fapi i Fear&Greed odpowiadają 200 OK; oba formaty symboli (BTCUSDT i BTC/USDT) działają w DataLoader.fetch. Można testować adaptery na żywych danych bezpośrednio w tym środowisku.
+### 2026-07-27 — Lokalny dysk zawiera pełne dane: kod, 69 książek i RAG cache
+Sesja na /c/Projekty/imperial-mesh-vortex (Windows, git user Pixel) ma pełny dostęp: kod imperium, bibliotheca_ulpia 69/69 (559MB, poza git) i tekst_cache 69 plików (59MB, w git). To odblokowuje ciężkie zadania wymagające książek/danych, niemożliwe na chmurze.
 
-### 2026-07-27 — NEWS-03/04 ożywają po jednym barze rozgrzewki (W-382)
-Moduły ze stanem kroczącym nie strzelają od pierwszego cyklu. Po rozgrzewce: NEWS_ATTENTION_SPIKE=0.76, NEWS_SENTYMENT_DELTA od -0.2 do +0.257 (cykl 8 LONG). Działa jak zaprojektowano.
+### 2026-08-05 — Konstytucja ma 25 praw, nie 21 — błąd audytu zewnętrznego
+Audyt Kimi 3 cytował 21 praw; żywa konstytucja (CLAUDE.md) zawiera 25. Cytaty z reguł trzeba sprawdzać grepem wobec aktualnego źródła, nie wobec pamięci ani cudzych odwołań.
 
-### 2026-07-27 — Sygnał neuronu: neuron_id, kierunek, wartosc, kategoria
-raport.sygnaly to lista SygnalNeuronu; moduł ŻYWY/zmierzony gdy wartosc is not None. Punkt zaczepienia do pomiaru aktywacji i diagnostyki modułów.
+### 2026-08-05 — scheduler.py ma zero wołaczy — martwy moduł
+Weryfikacja grepem: scheduler.py nie jest wołany z żadnego miejsca w kodzie. Martwy moduł potwierdzony — kandydat do usunięcia lub reaktywacji w ramach M1 (40 martwych organów).
 
-### 2026-07-27 — petla_live = realtime, nie replay: przetwarza tylko ostatni bar
-Pętla live pobiera to samo okno i przetwarza ostatni bar (limit=cfg.limit_barow), czekając pauzę między barami. Do pomiaru modułów potrzebny szybki bieg na żywych danych, nie czekanie na każdy bar.
+### 2026-08-05 — Pusty cytat web_search w audycie — weryfikacja niezależna
+Linia 328 audytu zawierała nierozwinięty znacznik article🛠web_search:16#9; teza 'Kimi K3 działa w Claude Code' stała na pustym cytacie. Niezależna weryfikacja w sieci potwierdziła tezę — pusty cytat to brak dowodu, nie fałsz.
 
-### 2026-07-29 — Test zależny od środowiska jest kruchy
-Test wymagający calibre na PATH przeszedłby na laptopie, padł w chmurze bez niego. Usunięto zależność środowiskową — testy muszą być niezależne od maszyny.
+### 2026-08-05 — Audyt zewnętrzny Kimi 3 nie czytał kodu — 3 pliki .py vs 467
+Metaprompt Kimi 3 mówi o 467 plikach Pythona, a sam audyt mapuje repo jako 3 pliki i deklaruje: 'Treść plików .py niedostępna'. Audyt bez dostępu do kodu nie może być podstawą zmian — weryfikuj mapowanie repo przed analizą.
 
-### 2026-07-29 — Dowód przez mutację — inaczej test bywa atrapą
-Lekcja recog28 zastosowana: test bez mutacji bywa atrapą. Należy celowo psuć mechanizm i sprawdzać, czy testy czerwienieją — dopiero to dowodzi, że test realnie testuje.
+### 2026-08-05 — Liczby w dokumentach muszą być synchronizowane z kodem (audyt W15)
+Złamanie Prawa XXI (W15): docs miały 158 sesji_kroniki, kod 159. Narzędzie tabularium.py liczby --zapisz synchronizuje dokumenty z żywym kodem. Po każdej zmianie liczebności trzeba uruchamiać audyt.
+
+### 2026-08-05 — Dashboard w audycie to synteza, nie pomiar
+Obraz pokazuje XAUUSD (my handlujemy krypto), cenę 1180→2400 w 10 świec i idealną sinusoidę RSI — nie stanowi dowodu empirycznego.
 
 ### 2026-07-29 — Bug: len(doc) po doc.close() w FABER
 Własny kod FABERA wołał len(doc) po zamknięciu dokumentu — realny bug wykryty i naprawiony; dowód przez mutację potwierdził czułość testów.

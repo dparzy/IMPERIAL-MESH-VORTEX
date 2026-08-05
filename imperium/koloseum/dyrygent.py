@@ -342,6 +342,13 @@ class Dyrygent:
         # silnika portfelowego (BTC_TREND lidera) — dolewane do wskaźników.
         if self.kontekst_dodatkowy:
             wskazniki.update(self.kontekst_dodatkowy)
+            # D1.1 — ODCISK BIERZEMY W NAJPÓŹNIEJSZYM PUNKCIE MUTACJI (wada z recenzji
+            # 2026-08-05). Odcisk z `_wskazniki()` powstawał PRZED tym dolaniem, więc przy
+            # ustawionym kontekście (RADAR: BTC_TREND/DOMINANCJA/PRZEPLYW) porównanie w Radzie
+            # nie mogło się zgodzić NIGDY: z flagą ON każda świeca orzekałaby BRUDNE i blokowała
+            # wejście. Bezpiecznik zapalający się zawsze jest tak samo martwy jak ten, który nie
+            # zapala się nigdy — obie skrajności znaczą, że nie mierzy niczego.
+            self._odcisk_wskaznikow = self.odcisk_wskaznikow(wskazniki)
 
         # 1b. Auto-klasyfikacja reżimu (Prawo XV — ożywia system reżimowy).
         # rezim="AUTO" → klasyfikator z gotowych wskaźników (nie zgadywanie, dane Bramy).

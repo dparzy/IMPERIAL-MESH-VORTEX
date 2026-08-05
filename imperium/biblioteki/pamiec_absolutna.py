@@ -212,14 +212,21 @@ class PamiecAbsolutna:
     def zapisz(self, log: ImperiumLog) -> str:
         """Zapisuje log do pliku JSONL. Zwraca log_id."""
         data = log.timestamp_utc[:10]
+        # Rekord Z ODCISKIEM jest przepisywany (migracja, import, ponowny zapis tego samego
+        # obiektu) — zachowuje CAŁĄ swoją tożsamość: i hasz, i sekwencję. Wada z recenzji
+        # 2026-08-05: sekwencja bumpowała się przy każdym zapisie, a hasz zostawał stary,
+        # więc `zweryfikuj()` orzekało „dane zmodyfikowane" o rekordzie, którego nikt nie
+        # tknął (`sekwencja` wchodzi do hasza). Odcisk musi obejmować to, co ląduje na dysku.
+        if log.hash_sha256:
+            return self._dopisz(log, data)
         log.sekwencja = self._nastepna_sekwencja(log.sesja_id)
         # Hasz liczony PO nadaniu sekwencji — inaczej odcisk dotyczyłby innego rekordu
         # niż ten, który ląduje na dysku, i weryfikacja przy odczycie zawsze by pękała.
-        # Nie nadpisujemy hasza już ustawionego: rekord przepisywany (migracja, import)
-        # ma zachować odcisk swojego źródła, bo inaczej podmiana treści „uwierzytelniałaby
-        # się sama" — a to jest dokładnie ta klasa, którą tu naprawiamy.
-        if not log.hash_sha256:
-            log.hash_sha256 = policz_hash(log)
+        log.hash_sha256 = policz_hash(log)
+        return self._dopisz(log, data)
+
+    def _dopisz(self, log: ImperiumLog, data: str) -> str:
+        """Sam zapis do JSONL — jedna ścieżka na dysk dla obu przypadków wyżej."""
         sciezka = self._sciezka(log.symbol, log.log_typ, data)
         with open(sciezka, "a", encoding="utf-8") as f:
             f.write(log.to_json() + "\n")

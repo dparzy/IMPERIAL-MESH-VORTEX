@@ -104,13 +104,24 @@ def wiersze_stanu(tekst: str) -> List[tuple]:
     return out
 
 
-def _stan_domkniety(stan: str) -> Optional[bool]:
-    """True = domknięte, False = otwarte, **None = nie wiem** (klasa K2: milczenie ≠ zieleń)."""
+def stan_domkniety(stan: str) -> Optional[bool]:
+    """True = domknięte, False = otwarte, **None = nie wiem** (klasa K2: milczenie ≠ zieleń).
+
+    PUBLICZNE tak samo jak `wiersze_stanu` i z tego samego powodu: czyta to więcej niż jeden
+    organ (MATURITAS liczy udział domkniętych, CONDITOR LUSTRI pyta o etapy LUSTRATIO).
+    Do 2026-08-05 nazywało się `_stan_domkniety` i CONDITOR importował je mimo podkreślnika —
+    zmiana nazwy w tym module zamieniłaby jego kryterium ETAPY w ciche `NIE WIEM` (bo awarię
+    producenta łapie tam `except`). Kontrakt między organami musi być nazwany kontraktem.
+    """
     if "✅" in stan:
         return True
     if any(z in stan for z in ("🔴", "🟡", "⏸️")):
         return False
     return None
+
+
+# Alias zgodności — istniejące wołania sprzed 2026-08-05. Nowy kod używa nazwy publicznej.
+_stan_domkniety = stan_domkniety
 
 
 # ── PIĘTRO 1: PROMPT — zdrowie specyfikacji ─────────────────────────────────────

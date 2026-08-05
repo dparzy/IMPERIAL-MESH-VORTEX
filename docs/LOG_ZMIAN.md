@@ -15,6 +15,55 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-05 | 🐞 | POZYCJA 0a — pięć wad z recenzji naprawionych, każda z dowodem mutacyjnym
+
+**Rozkaz Cezara:** *„tak 0a zaczynaj"* — po recenzji `/code-review` własnej wachty.
+
+**Co naprawione** (każda: naprawa + test granicy „celowo psuję producenta"):
+
+1. `imperium/koloseum/dyrygent.py:344` — odcisk wskaźników brany w `_wskazniki()`, a `cykl()`
+   linijkę dalej dolewał `kontekst_dodatkowy` (RADAR). Z flagą ON **każda świeca** orzekałaby
+   BRUDNE i blokowała wejście. Odcisk przeniesiony do **najpóźniejszego punktu mutacji**.
+2. `imperium/oczy/descriptio.py:158` — kontrola kompletności była **tautologią** (obie liczby
+   z tej samej pętli). Zastąpiona porównaniem **zbiorów nazw** wobec listy odniesienia zdjętej
+   u producenta PRZED przypisywaniem; łapie też podmianę i duplikat, czego suma nie widzi.
+3. `imperium/biblioteki/pamiec_absolutna.py:216` — `sekwencja` (pole wchodzące do hasza)
+   bumpowana przy każdym zapisie, hasz nie. Rekord z odciskiem zachowuje **całą tożsamość**.
+4. `imperium/oczy/descriptio.py:137` — mapa `stem→filar` gubiła kolizje (trzy `baza.py`
+   z dwóch filarów). **Zmierzony skutek naprawy: DANE woła 23→14, RÓJ wołany 93→82 — 11 krawędzi
+   raportowano pod złym filarem.** Nazwy niejednoznaczne są wykluczane i JAWNIE zgłaszane.
+5. `imperium/pretorianie/conditor_lustri.py:173` — import prywatnej `_stan_domkniety`;
+   `maturitas.stan_domkniety()` jest teraz **publicznym kontraktem** (alias zgodności zostaje).
+
+**Lek na KLASĘ, nie na instancję** (lekcja wachty: wzorzec przeżywa naprawę instancji):
+`tests/test_kontrakty_publiczne.py` skanuje całe `imperium/`+`narzedzia/` po importach prywatnych
+nazw. Jawna lista `ZNANY_DLUG` (13 plików) **ma maleć** — pilnują tego dwa testy z obu stron:
+nowy grzech = czerwień, spłacony dług nieusunięty z listy = też czerwień.
+
+**Dowód, że testy nie są ślepe (LEX TALARUS):** skrypt mutacyjny przywrócił każdą z pięciu wad
+i zażądał czerwieni — **8/8 testów zczerwieniało Z ASERCJI** (czerwień z `SyntaxError`/`ImportError`
+odrzucana jako niedowód; przyrząd sprawdza POWÓD czerwieni, nie sam kod wyjścia).
+
+**🚨 ZŁAPANE PRZY OKAZJI — mój błąd sprzed doby:** Dziennik i ROADMAP twierdziły „5 klas dopisanych
+do Księgi Wad Kodu". Zmierzone: **zero wpisów z datą 2026-08-05**, ostatnia klasa z 08-03.
+**Zapis nigdy nie nastąpił — ogłosiłem go bez sprawdzenia.** Dopisane teraz: 159 → 164 wpisy,
+liczba **odczytana z dysku po zapisie**, nie z pamięci procesu.
+
+**Zmiana opisu w CONDITOR LUSTRI:** raport pisał „⛔ ZAMROŻENIE TRWA", a zamrożenie zdjęto decyzją
+08-05 — miernik ogłaszający nieistniejący zakaz uczy ignorować własne komunikaty. Teraz:
+„BRAMKA CZERWONA … DŁUG NIE ZNIKNĄŁ RAZEM Z ZAKAZEM". **Kryteria i progi nietknięte.**
+
+**Bramka:** testy **3539/3539** (+22 nowe) · audyt spójności **exit 0** · `descriptio --bramka` exit 0
+· skan wad na 5 zmienionych plikach czysto.
+
+**Pliki:** `imperium/koloseum/dyrygent.py`, `imperium/oczy/descriptio.py`, `imperium/oczy/maturitas.py`,
+`imperium/biblioteki/pamiec_absolutna.py`, `imperium/pretorianie/conditor_lustri.py`,
+`tests/test_descriptio.py`, `tests/test_integralnosc_d11.py`, `tests/test_conditor_lustri.py`,
+`tests/test_kontrakty_publiczne.py` (nowy), `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`,
+`docs/ROADMAP_IMPERIUM.md`, `docs/LOG_ZMIAN.md`
+
+---
+
 ## 2026-08-05 | 🏛️ | DESCRIPTIO IMPERII — Imperium wie, z jakich FILARÓW jest zbudowane
 
 **Rozkaz Cezara:** *„musimy wiedzieć, z jakich filarów, jakich kategorii i jaki schemat ma

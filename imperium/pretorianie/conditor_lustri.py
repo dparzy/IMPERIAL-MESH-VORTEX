@@ -161,7 +161,10 @@ ETAPY_POZA_OCENA = {"L4"}
 
 def k_etapy() -> Kryterium:
     """Etapy przeglądu L0–L3x domknięte (stan czytany z ROADMAP jednym parserem)."""
-    from imperium.oczy.maturitas import wiersze_stanu, _stan_domkniety   # producent parsera
+    # Tylko PUBLICZNE API producenta — import prywatnej nazwy robił z tego kryterium
+    # zakładnika cudzego refaktoru: zmiana nazwy = ImportError = ciche NIE WIEM (wada
+    # z recenzji 2026-08-05, złapana bez ani jednego czerwonego testu).
+    from imperium.oczy.maturitas import wiersze_stanu, stan_domkniety     # producent parsera
     import re
 
     rm = KORZEN / "docs" / "ROADMAP_IMPERIUM.md"
@@ -179,7 +182,7 @@ def k_etapy() -> Kryterium:
         czysta = etykieta.replace("*", "").strip()
         if not re.fullmatch(r"L\d[a-z]?\d?", czysta) or czysta in ETAPY_POZA_OCENA:
             continue
-        czy = _stan_domkniety(stan)
+        czy = stan_domkniety(stan)
         (domkniete if czy is True else otwarte if czy is False else nieznane).append(czysta)
 
     if nieznane:
@@ -323,10 +326,16 @@ def raport_tekst(w: Optional[Werdykt] = None) -> str:
     linie.append(f"   RAZEM: {w.spelnione} spełnionych | {w.niespelnione} niespełnionych "
                  f"| {w.nieznane} NIE WIEM")
     if w.wolno_zdjac:
-        linie.append("   ✅ WOLNO ZDJĄĆ ZAMROŻENIE — decyzja należy do Cezara (organ nie zdejmuje sam).")
+        linie.append("   ✅ KRYTERIA SPEŁNIONE w komplecie — organ nie orzeka decyzji, tylko stan.")
     else:
-        linie.append(f"   ⛔ ZAMROŻENIE TRWA — do zdjęcia brakuje "
-                     f"{w.niespelnione + w.nieznane} kryteriów (powyżej, z instrukcją).")
+        # Do 2026-08-05 stało tu „⛔ ZAMROŻENIE TRWA". Cezar zdjął zamrożenie DECYZJĄ tego dnia,
+        # więc zdanie stało się nieprawdą o świecie — a miernik, który raportuje nieistniejący
+        # zakaz, uczy czytelnika ignorować własne komunikaty. Zmienia się WYŁĄCZNIE opis stanu:
+        # kryteria, progi i kod wyjścia zostają, bo zieleń „bo tak zdecydowano" byłaby końcem
+        # tego organu jako przyrządu.
+        linie.append(f"   ⛔ BRAMKA CZERWONA — {w.niespelnione + w.nieznane} kryteriów "
+                     "niespełnionych (powyżej, z instrukcją). Zamrożenie zdjęto decyzją "
+                     "2026-08-05; DŁUG NIE ZNIKNĄŁ RAZEM Z ZAKAZEM.")
         linie.append("   ℹ️ `NIE WIEM` blokuje tak samo jak `NIE` — milczenie nie jest zielenią (K2).")
     return "\n".join(linie)
 

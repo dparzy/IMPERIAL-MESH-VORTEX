@@ -149,11 +149,45 @@ def test_parser_wierszy_pomija_naglowki_i_separatory():
 
 
 def test_stan_domkniety_trzy_odpowiedzi():
-    assert M._stan_domkniety("✅ zrobione") is True
-    assert M._stan_domkniety("🔴") is False
-    assert M._stan_domkniety("🟡 w toku") is False
-    assert M._stan_domkniety("⏸️ odłożone") is False
-    assert M._stan_domkniety("opis bez statusu") is None, "brak statusu ≠ otwarte ≠ domknięte"
+    assert M.stan_domkniety("✅ zrobione") is True
+    assert M.stan_domkniety("🔴") is False
+    assert M.stan_domkniety("🟡 w toku") is False
+    assert M.stan_domkniety("⏸️ odłożone") is False
+    assert M.stan_domkniety("opis bez statusu") is None, "brak statusu ≠ otwarte ≠ domknięte"
+
+
+# ── KONTRAKT MIĘDZY ORGANAMI JEST PUBLICZNY (wada z recenzji 2026-08-05) ─────────
+# CONDITOR importował z MATURITASA prywatną `_stan_domkniety`. Zmiana nazwy w cudzym module
+# dałaby `ImportError`, ten zaś wpada w `except` w `zmierz()` i zamienia kryterium ETAPY
+# w ciche `NIE WIEM` — awaria wyglądająca jak niewiedza. Cały organ stoi na tym, że nie
+# wolno milczeć; nie może się przewracać przez podkreślnik w cudzej nazwie.
+
+def test_parser_etapow_jest_publicznym_api_maturitasa():
+    """Kontrakt nazwany kontraktem: obie funkcje muszą istnieć BEZ podkreślnika."""
+    assert callable(getattr(M, "stan_domkniety", None)), \
+        "CONDITOR czyta stan etapów tą funkcją — kontrakt musi być publiczny"
+    assert callable(getattr(M, "wiersze_stanu", None))
+
+
+def test_conditor_nie_importuje_prywatnych_nazw():
+    """GRANICA: żaden import z podkreślnikiem w tym pliku — inaczej wada wraca pod nową nazwą."""
+    import re
+    zrodlo = (C.KORZEN / "imperium" / "pretorianie" / "conditor_lustri.py").read_text(encoding="utf-8")
+    podejrzane = [w.strip() for w in zrodlo.splitlines()
+                  if re.search(r"^\s*(from|import)\s.*\bimport\b.*(^|[\s,])_[a-zA-Z]", w)]
+    assert not podejrzane, f"import prywatnej nazwy = zakładnik cudzego refaktoru: {podejrzane}"
+
+
+def test_kryterium_etapy_dziala_na_zywym_roadmapie():
+    """Dowód empiryczny, że kontrakt naprawdę działa — nie tylko że się importuje.
+
+    Gdyby import padł, `zmierz()` zamieniłby to w `NIE WIEM` z „awaria producenta"; ten test
+    żąda ODPOWIEDZI producenta (dowolnego z trzech stanów), ale nie awarii.
+    """
+    k = C.k_etapy()
+    assert k.klucz == "ETAPY"
+    assert k.wartosc != "awaria producenta"
+    assert "domkniętych" in k.wartosc or "brak ROADMAP" in k.wartosc
 
 
 def test_maturitas_dlug_z_jednego_producenta():
@@ -170,11 +204,20 @@ def test_maturitas_dlug_z_jednego_producenta():
 def test_raport_czerwony_nie_oglasza_zgody():
     w = C.Werdykt(kryteria=[_k(C.NIE_WIEM, "A")])
     t = C.raport_tekst(w)
-    assert "ZAMROŻENIE TRWA" in t and "WOLNO ZDJĄĆ" not in t
+    assert "BRAMKA CZERWONA" in t and "SPEŁNIONE w komplecie" not in t
+
+
+def test_raport_czerwony_mowi_o_dlugu_nie_o_zniesionym_zakazie():
+    """Do 2026-08-05 raport pisał „⛔ ZAMROŻENIE TRWA". Cezar zdjął zamrożenie DECYZJĄ tego
+    dnia, więc zdanie stało się nieprawdą o świecie — a miernik raportujący nieistniejący
+    zakaz uczy czytelnika ignorować własne komunikaty. Zmienił się WYŁĄCZNIE opis stanu."""
+    t = C.raport_tekst(C.Werdykt(kryteria=[_k(C.NIESPELNIONE, "A")]))
+    assert "ZAMROŻENIE TRWA" not in t, "organ nie może ogłaszać zakazu, którego już nie ma"
+    assert "DŁUG NIE ZNIKNĄŁ" in t, "…ale nie wolno mu też przemilczeć, że kryteria nie są spełnione"
 
 
 def test_raport_zielony_oddaje_decyzje_cezarowi():
     w = C.Werdykt(kryteria=[_k(C.SPELNIONE, "A")])
     t = C.raport_tekst(w)
-    assert "WOLNO ZDJĄĆ ZAMROŻENIE" in t
-    assert "Cezara" in t, "organ nie zdejmuje zamrożenia sam"
+    assert "KRYTERIA SPEŁNIONE" in t
+    assert "nie orzeka decyzji" in t, "organ mierzy stan, decyzja należy do Cezara"

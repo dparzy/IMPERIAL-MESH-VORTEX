@@ -90,6 +90,41 @@ def test_zapisz_nie_nadpisuje_cudzego_hasza(tmp_path):
     assert log.hash_sha256 == "odcisk-z-innego-systemu"
 
 
+def test_ponowny_zapis_tego_samego_rekordu_nie_falszuje_odcisku(tmp_path):
+    """GRANICA (wada z recenzji 2026-08-05): `zapisz()` bumpowało `sekwencja` przy KAŻDYM
+    wywołaniu, a hasz nadpisywało tylko gdy pusty — a `sekwencja` wchodzi do hasza. Efekt:
+    po drugim zapisie NIENARUSZONY rekord czytał się jako zmodyfikowany. Bezpiecznik zapalający
+    się zawsze jest tak samo martwy jak ten, który nie zapala się nigdy."""
+    pa = PA.PamiecAbsolutna(katalog=tmp_path)
+    log = _log()
+    pa.zapisz(log)
+    assert PA.zweryfikuj(log) is True
+    sekwencja_po_pierwszym = log.sekwencja
+
+    pa.zapisz(log)                                   # retry / przepisanie tego samego obiektu
+    assert log.sekwencja == sekwencja_po_pierwszym, "rekord z odciskiem zachowuje SWOJĄ sekwencję"
+    assert PA.zweryfikuj(log) is True, "nikt nie tknął treści — werdykt 'zmodyfikowany' to fałsz"
+
+
+def test_podmiana_tresci_miedzy_zapisami_nadal_wykryta(tmp_path):
+    """Druga strona granicy: cisza po ponownym zapisie nie może oznaczać ślepoty."""
+    pa = PA.PamiecAbsolutna(katalog=tmp_path)
+    log = _log()
+    pa.zapisz(log)
+    log.pnl_usdt = 999.0                             # celowo psuję treść po nadaniu odcisku
+    pa.zapisz(log)
+    assert PA.zweryfikuj(log) is False
+
+
+def test_nowe_rekordy_wciaz_dostaja_rosnace_sekwencje(tmp_path):
+    """Naprawa nie może zabić numeracji: RÓŻNE rekordy tej samej sesji nadal rosną."""
+    pa = PA.PamiecAbsolutna(katalog=tmp_path)
+    a, b = _log(), _log()
+    pa.zapisz(a)
+    pa.zapisz(b)
+    assert (a.sekwencja, b.sekwencja) == (1, 2)
+
+
 def test_zapisany_rekord_odczytuje_sie_jako_zweryfikowany(tmp_path):
     """Pełna pętla: zapis → odczyt z dysku → weryfikacja. Hasz liczony PO nadaniu
     sekwencji, więc odczytany rekord musi się zgadzać co do znaku."""
@@ -144,3 +179,64 @@ def test_odcisk_znosi_wartosci_niestandardowe():
     """`default=str` — pole nowego typu nie może wywrócić liczenia odcisku."""
     from datetime import datetime
     assert Dyrygent.odcisk_wskaznikow({"kiedy": datetime(2026, 8, 5)})
+
+
+# ── 5. GRANICA W PEŁNYM CYKLU: ODCISK Z NAJPÓŹNIEJSZEGO PUNKTU MUTACJI ───────────
+# Wada z recenzji 2026-08-05: odcisk powstawał w `_wskazniki()`, a `cykl()` linijkę dalej
+# robił `wskazniki.update(kontekst_dodatkowy)` (RADAR: BTC_TREND/DOMINANCJA/PRZEPLYW).
+# Z flagą ON KAŻDA świeca orzekała BRUDNE i blokowała wejście — bezpiecznik zapalający się
+# zawsze. Testy niżej idą przez PRAWDZIWY `cykl()`, bo wada mieszkała między metodami,
+# a nie w żadnej z nich osobno; test jednej metody nie mógł jej zobaczyć.
+
+def _bary_testowe(n=60, start=100.0, krok=0.5):
+    bary, cena = [], start
+    for i in range(n):
+        o, c = cena, cena + krok
+        bary.append({"open": o, "high": c + 0.2, "low": o - 0.2, "close": c,
+                     "volume": 1000.0 + i, "symbol": "BTCUSDT", "interwal": "1H"})
+        cena = c
+    return bary
+
+
+def _dyrygent_zywy(wskazniki, **kw):
+    from imperium.koloseum.paper_trading import PaperTradingEngine
+    from imperium.pretorianie.kalkulator_lewara import KalkulatorLewara
+    from imperium.legiony.rejestr import zbuduj_legatusa
+    return Dyrygent(
+        legatus=zbuduj_legatusa(min_neuronow=1, min_przewaga=0.1, aktywuj_smc=False),
+        kalkulator=KalkulatorLewara(),
+        engine=PaperTradingEngine(kapital_startowy=10_000.0, sesja_id="D11"),
+        wskazniki_provider=lambda bary: dict(wskazniki),
+        min_pewnosc=0.1, **kw,
+    )
+
+
+WSK_BAZA = {"CLOSE": 100.0, "RSI_14": 55.0}
+KONTEKST_RADARU = {"BTC_TREND": 1.0, "BTC_DOMINANCJA": 0.52, "PRZEPLYW_KAPITALU": 0.3}
+
+
+def test_kontekst_radaru_nie_orzeka_brudne():
+    """Komplet PO dolaniu kontekstu — ten, na którym głosuje rój — musi być czysty."""
+    d = _dyrygent_zywy(WSK_BAZA, weryfikuj_integralnosc=True)
+    d.kontekst_dodatkowy = dict(KONTEKST_RADARU)
+    d.cykl("BTCUSDT", _bary_testowe())
+    komplet = {**WSK_BAZA, **KONTEKST_RADARU}
+    assert d._integralnosc_wskaznikow(komplet) is True, \
+        "odcisk wzięty PRZED dolaniem kontekstu → każda świeca BRUDNA i wejście zablokowane"
+
+
+def test_bez_kontekstu_odcisk_tez_zgodny():
+    """Ścieżka bez RADARU nie może się zepsuć przy okazji naprawy tej z RADAREM."""
+    d = _dyrygent_zywy(WSK_BAZA, weryfikuj_integralnosc=True)
+    d.cykl("BTCUSDT", _bary_testowe())
+    assert d._integralnosc_wskaznikow(dict(WSK_BAZA)) is True
+
+
+def test_mutacja_po_dolaniu_kontekstu_NADAL_wykryta():
+    """Druga strona granicy — celowo psuję wskaźniki po ustaleniu odcisku: bezpiecznik,
+    który po naprawie przestałby zapalać się w ogóle, byłby tą samą wadą od drugiej strony."""
+    d = _dyrygent_zywy(WSK_BAZA, weryfikuj_integralnosc=True)
+    d.kontekst_dodatkowy = dict(KONTEKST_RADARU)
+    d.cykl("BTCUSDT", _bary_testowe())
+    brudne = {**WSK_BAZA, **KONTEKST_RADARU, "RSI_14": 99.0}
+    assert d._integralnosc_wskaznikow(brudne) is False

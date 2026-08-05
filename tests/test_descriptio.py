@@ -28,6 +28,18 @@ def test_suma_filarow_rowna_liczbie_modulow():
     assert suma == p["modulow_razem"]
 
 
+def test_lista_odniesienia_pochodzi_z_osobnego_przejscia():
+    """`moduly_zrodlowe` to lista Z PRODUCENTA, zdjęta PRZED przypisywaniem do filarów.
+
+    Bez niej kontrola kompletności porównywałaby wynik pętli z liczbą policzoną w TEJ SAMEJ
+    pętli — czyli sama ze sobą (wada z recenzji 2026-08-05: bezpiecznik, który nie mógł się
+    zapalić). Ten test pilnuje, żeby lista odniesienia nie zniknęła po cichu przy refaktorze.
+    """
+    p = D.podzial()
+    assert p["moduly_zrodlowe"], "brak listy odniesienia = nie ma czym sprawdzić kompletności"
+    assert len(p["moduly_zrodlowe"]) == p["modulow_razem"]
+
+
 def test_zywe_repo_zgodne():
     assert D.zgodny() is True, D.bledy()
 
@@ -71,6 +83,46 @@ def test_straznik_widmo_to_alarm(monkeypatch):
     assert any("NIE MA w kodzie" in b for b in D.bledy(p))
 
 
+# ── 2b. GRANICA: CELOWO PSUJĘ PODZIAŁ — KONTROLA MUSI SIĘ ZAPALIĆ ───────────────
+# Wada z recenzji 2026-08-05: poprzednia kontrola kompletności („suma ≠ razem") była
+# TAUTOLOGIĄ — obie liczby wychodziły z tej samej pętli, więc nie mogła zapalić się nigdy.
+# Poniższe cztery testy psują podział na cztery różne sposoby; każdy MUSI dać alarm.
+
+def test_zgubiony_modul_w_podziale_to_alarm():
+    """Moduł, który wypadł między producentem a filarem — sumy tego nie widziały."""
+    p = D.podzial()
+    filar = next(iter(p["filary"]))
+    p["filary"][filar]["moduly"].pop()          # celowo psuję producenta podziału
+    assert D.zgodny(p) is False
+    assert any("GUBI" in b for b in D.bledy(p)), D.bledy(p)
+
+
+def test_wymyslony_modul_w_podziale_to_alarm():
+    """Odwrotny kierunek: filar zawiera coś, czego CENSUS nie zna (literówka, duch)."""
+    p = D.podzial()
+    filar = next(iter(p["filary"]))
+    p["filary"][filar]["moduly"].append("imperium/widmo/nie_ma_mnie.py")
+    assert D.zgodny(p) is False
+    assert any("WYMYŚLA" in b for b in D.bledy(p)), D.bledy(p)
+
+
+def test_modul_w_dwoch_filarach_to_alarm():
+    """Nakładające się filary zawyżałyby każdą liczbę współpracy — sumy i tak by się zgodziły."""
+    p = D.podzial()
+    dwa = list(p["filary"])[:2]
+    p["filary"][dwa[1]]["moduly"].append(p["filary"][dwa[0]]["moduly"][0])
+    assert D.zgodny(p) is False
+    assert any("DWA RAZY" in b for b in D.bledy(p)), D.bledy(p)
+
+
+def test_brak_listy_odniesienia_to_alarm_nie_zielen():
+    """K2: bez czego porównać — mówimy „nie ma czym sprawdzić", nie „w porządku"."""
+    p = D.podzial()
+    p.pop("moduly_zrodlowe")
+    assert D.zgodny(p) is False
+    assert any("NIE MA CZYM sprawdzić" in b for b in D.bledy(p)), D.bledy(p)
+
+
 # ── 3. DOPASOWANIE PO NAJDŁUŻSZYM PREFIKSIE ─────────────────────────────────────
 
 def test_rag_idzie_do_wiedzy_a_reszta_narzedzi_do_pomiaru():
@@ -98,6 +150,60 @@ def test_wspolpraca_pomija_krawedzie_wewnatrz_filara():
 
 def test_wspolpraca_ma_krawedzie_na_zywym_repo():
     assert len(D.wspolpraca()) > 0, "zero krawędzi na żywym repo = licznik przestał liczyć"
+
+
+# ── 4b. KOLIZJA NAZW — NIE ZGADUJEMY, DO KTÓREGO FILARA NALEŻY `baza.py` ────────
+# Wada z recenzji 2026-08-05: mapa `stem → filar` była zwykłym słownikiem, więc przy trzech
+# plikach `baza.py` z DWÓCH filarów wygrywał ostatni wpis, a importy szły do przypadkowego
+# filara. Zmierzony skutek naprawy na żywym repo: DANE woła 23→14, RÓJ wołany 93→82 —
+# jedenaście krawędzi było raportowanych Cezarowi pod złym filarem.
+
+def _p_testowy(filary, zrodlowe=None):
+    zrodlowe = zrodlowe if zrodlowe is not None else [m for d in filary.values() for m in d["moduly"]]
+    return {"filary": {f: {"po_co": "", "straznik": "", "katalogi": [], **d}
+                       for f, d in filary.items()},
+            "nieprzypisane": [], "moduly_zrodlowe": zrodlowe, "modulow_razem": len(zrodlowe)}
+
+
+def test_kolizja_nazw_wykryta_na_zywym_repo():
+    """`baza.py` faktycznie żyje w dwóch filarach — jeśli ten test zgaśnie, sprawdź DLACZEGO."""
+    kol = D.kolizje_nazw()
+    assert "baza" in kol, f"spodziewana kolizja `baza` zniknęła; widziane: {list(kol)}"
+    assert len(kol["baza"]) >= 2
+
+
+def test_import_niejednoznacznej_nazwy_NIE_TRAFIA_do_zadnego_filara(tmp_path, monkeypatch):
+    """GRANICA — celowo podsuwam kolizję: ta sama nazwa w dwóch filarach + moduł, który ją
+    importuje. Przed naprawą powstawała krawędź do LOSOWEGO filara; teraz nie powstaje żadna."""
+    for k in ("a", "b", "c"):
+        (tmp_path / k).mkdir()
+    (tmp_path / "a" / "baza.py").write_text("X = 1\n", encoding="utf-8")
+    (tmp_path / "b" / "baza.py").write_text("X = 2\n", encoding="utf-8")
+    (tmp_path / "c" / "klient.py").write_text("from a.baza import X\n", encoding="utf-8")
+    monkeypatch.setattr(D, "KORZEN", tmp_path)
+
+    p = _p_testowy({"A": {"moduly": ["a/baza.py"]},
+                    "B": {"moduly": ["b/baza.py"]},
+                    "C": {"moduly": ["c/klient.py"]}})
+    assert D.kolizje_nazw(p) == {"baza": ["A", "B"]}
+    assert D.wspolpraca(p) == {}, "nazwa niejednoznaczna nie może dostać krawędzi z losowania"
+
+
+def test_nazwa_jednoznaczna_nadal_daje_krawedz(tmp_path, monkeypatch):
+    """Druga strona granicy: filtr kolizji nie może wyciszyć CAŁEGO licznika."""
+    for k in ("a", "c"):
+        (tmp_path / k).mkdir()
+    (tmp_path / "a" / "unikat.py").write_text("X = 1\n", encoding="utf-8")
+    (tmp_path / "c" / "klient.py").write_text("from a.unikat import X\n", encoding="utf-8")
+    monkeypatch.setattr(D, "KORZEN", tmp_path)
+
+    p = _p_testowy({"A": {"moduly": ["a/unikat.py"]}, "C": {"moduly": ["c/klient.py"]}})
+    assert D.wspolpraca(p) == {("C", "A"): 1}
+
+
+def test_raport_mowi_o_pominietych_nazwach():
+    """Zaniżenie miary musi być WIDOCZNE — miara milcząca o ślepej plamce kłamie."""
+    assert "POMINIĘTE" in D.raport_tekst()
 
 
 # ── 5. RAPORT I BRAMKA ──────────────────────────────────────────────────────────

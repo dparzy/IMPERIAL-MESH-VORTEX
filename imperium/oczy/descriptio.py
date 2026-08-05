@@ -101,11 +101,16 @@ def podzial() -> Dict[str, Any]:
     from narzedzia.census_organorum import spisz_moduly          # producent
 
     spis = spisz_moduly()
+    # LISTA ODNIESIENIA — z osobnego przejścia po źródle, PRZED pętlą przypisującą.
+    # Powód (wada z recenzji 2026-08-05): poprzednia kontrola kompletności liczyła
+    # `razem` W TEJ SAMEJ pętli, która przypisywała moduły do filarów, więc obie liczby
+    # zawsze były równe — bezpiecznik, który NIE MÓGŁ się zapalić. Liczba odniesienia
+    # musi pochodzić z przejścia NIEZALEŻNEGO od tego, które sprawdzamy.
+    zrodlowe: List[str] = [f"{katalog}/{n}" for katalog, wpisy in spis.items() for n, _ in wpisy]
+
     filary: Dict[str, Dict[str, Any]] = {}
     nieprzypisane: List[str] = []
-    razem = 0
     for katalog, wpisy in spis.items():
-        razem += len(wpisy)
         trafienie = _filar_dla(katalog)
         if trafienie is None:
             nieprzypisane.extend(f"{katalog}/{n}" for n, _ in wpisy)
@@ -117,7 +122,26 @@ def podzial() -> Dict[str, Any]:
         wpis["katalogi"].append(katalog)
     return {"filary": dict(sorted(filary.items())),
             "nieprzypisane": nieprzypisane,
-            "modulow_razem": razem}
+            "moduly_zrodlowe": zrodlowe,
+            "modulow_razem": len(zrodlowe)}
+
+
+def kolizje_nazw(p: Optional[Dict[str, Any]] = None) -> Dict[str, List[str]]:
+    """Nazwy plików występujące w WIĘCEJ NIŻ JEDNYM filarze — `{stem: [filary]}`.
+
+    Powód (wada z recenzji 2026-08-05): mapa `stem → filar` budowana słownikiem gubi
+    kolizje po cichu — wygrywa OSTATNI wpis, więc importy trzech różnych `baza.py`
+    (`akwedukty/adaptery` = DANE, `legiony/strategie` i `legiony/zwiadowcy` = RÓJ)
+    lądowały w jednym, przypadkowym filarze i zafałszowywały liczby współpracy.
+    Nazwa niejednoznaczna nie daje się rozstrzygnąć tą miarą, więc jej NIE ZGADUJEMY —
+    wykluczamy z liczenia i mówimy o tym wprost (miara opisowa, nie normatywna).
+    """
+    p = p or podzial()
+    gdzie: Dict[str, set] = {}
+    for filar, dane in p["filary"].items():
+        for m in dane["moduly"]:
+            gdzie.setdefault(Path(m).stem, set()).add(filar)
+    return {stem: sorted(filary) for stem, filary in sorted(gdzie.items()) if len(filary) > 1}
 
 
 def wspolpraca(p: Optional[Dict[str, Any]] = None) -> Dict[Tuple[str, str], int]:
@@ -127,9 +151,14 @@ def wspolpraca(p: Optional[Dict[str, Any]] = None) -> Dict[Tuple[str, str], int]
     leniwie wewnątrz funkcji — pełne parsowanie AST łapałoby tylko część, a różnica byłaby
     niewidoczna. To miara RUCHU, nie dokładnej liczby wywołań; do porównywania filarów między
     sobą wystarcza, do orzekania o pojedynczym module NIE — i tak jest opisana.
+
+    **Nazwy niejednoznaczne są POMIJANE, nie zgadywane** (patrz `kolizje_nazw`): lepiej
+    zaniżyć ruch i powiedzieć o tym, niż dopisać go losowemu filarowi.
     """
     p = p or podzial()
-    gdzie = {Path(m).stem: f for f, d in p["filary"].items() for m in d["moduly"]}
+    niejasne = set(kolizje_nazw(p))
+    gdzie = {Path(m).stem: f for f, d in p["filary"].items() for m in d["moduly"]
+             if Path(m).stem not in niejasne}
     kraw: Dict[Tuple[str, str], int] = {}
     for filar, dane in p["filary"].items():
         for wzgl in dane["moduly"]:
@@ -152,10 +181,28 @@ def bledy(p: Optional[Dict[str, Any]] = None) -> List[str]:
         ile = len(p["nieprzypisane"])
         out.append(f"[DESCRIPTIO] {ile} modułów POZA filarami (nowy katalog bez wpisu w FILARY): "
                    + ", ".join(p["nieprzypisane"][:5]) + (" …" if ile > 5 else ""))
-    suma = sum(len(d["moduly"]) for d in p["filary"].values()) + len(p["nieprzypisane"])
-    if suma != p["modulow_razem"]:
-        out.append(f"[DESCRIPTIO] suma filarów {suma} ≠ modułów w CENSUS {p['modulow_razem']} "
-                   "— podział gubi moduły po drodze")
+    # KONTROLA KOMPLETNOŚCI — porównanie ZBIORÓW NAZW, nie sum. Nazwy pochodzą z dwóch
+    # RÓŻNYCH przejść: `moduly_zrodlowe` z producenta (przed przypisywaniem), reszta
+    # z pętli przypisującej. Porównanie liczb było tautologią (obie z tej samej pętli);
+    # porównanie zbiorów łapie też podmianę i duplikat, czego suma nigdy nie zobaczy.
+    rozdane = [m for d in p["filary"].values() for m in d["moduly"]] + list(p["nieprzypisane"])
+    zrodlo = set(p.get("moduly_zrodlowe") or [])
+    if zrodlo:
+        zgubione = sorted(zrodlo - set(rozdane))
+        wymyslone = sorted(set(rozdane) - zrodlo)
+        if zgubione:
+            out.append(f"[DESCRIPTIO] podział GUBI {len(zgubione)} modułów obecnych w CENSUS: "
+                       + ", ".join(zgubione[:5]) + (" …" if len(zgubione) > 5 else ""))
+        if wymyslone:
+            out.append(f"[DESCRIPTIO] podział WYMYŚLA {len(wymyslone)} modułów, których CENSUS "
+                       "nie zna: " + ", ".join(wymyslone[:5]) + (" …" if len(wymyslone) > 5 else ""))
+        if len(rozdane) != len(set(rozdane)):
+            ile = len(rozdane) - len(set(rozdane))
+            out.append(f"[DESCRIPTIO] {ile} modułów przypisanych DWA RAZY — filary się nakładają")
+    else:
+        # Brak listy odniesienia = nie ma czym sprawdzić; milczenie byłoby zielenią (K2).
+        out.append("[DESCRIPTIO] brak listy odniesienia `moduly_zrodlowe` — kompletności "
+                   "podziału NIE MA CZYM sprawdzić (podział z obcego źródła?)")
     for filar, dane in p["filary"].items():
         if not (KORZEN / dane["straznik"]).exists():
             out.append(f"[DESCRIPTIO] filar {filar} wskazuje strażnika, którego NIE MA w kodzie: "
@@ -186,6 +233,15 @@ def raport_tekst(p: Optional[Dict[str, Any]] = None, zwiezle: bool = False) -> s
             linie.append(f"      · po co: {dane['po_co']}")
             linie.append(f"      · strażnik: {dane['straznik']}")
     linie.append(f"   {'RAZEM':24} {p['modulow_razem']:>4} modułów (źródło: CENSUS ORGANORUM)")
+
+    # Zaniżenie miary MUSI być widoczne — miara, która milczy o swoich ślepych plamach,
+    # kłamie dokładnie tam, gdzie jest najbardziej przekonująca.
+    kol = kolizje_nazw(p)
+    if kol:
+        przyklad = "; ".join(f"{s} → {', '.join(f)}" for s, f in list(kol.items())[:3])
+        linie.append(f"   ℹ️ {len(kol)} nazw plików żyje w >1 filarze — ich importy POMINIĘTE "
+                     f"w liczbach współpracy (nie zgadujemy): {przyklad}"
+                     + (" …" if len(kol) > 3 else ""))
 
     b = bledy(p)
     if b:

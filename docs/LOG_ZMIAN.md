@@ -15,6 +15,63 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-05 | 🏛️ | DESCRIPTIO IMPERII — Imperium wie, z jakich FILARÓW jest zbudowane
+
+**Rozkaz Cezara:** *„musimy wiedzieć, z jakich filarów, jakich kategorii i jaki schemat ma
+nasze Imperium, jakie są do nich przypisane organy i jak wzajemnie współpracują — wtedy
+będziemy po kolei naprawiać braki i luki. Nic nie wolno pomijać."*
+
+**Luka, nie duplikat (sprawdzone PRZED budową):** `CENSUS_ORGANORUM` liczy moduły,
+`MATURITAS` mierzy piętra, a mapy Imperium istniały wyłącznie jako proza pisana RĘCZNIE
+(`ARCHITEKTURA_IMPERIUM.md`) albo jako ACTA sprzed miesięcy (`MAPA_IMPERIUM_FLOW.md`, która
+sama deklaruje, że opisuje nieistniejący kod). **Nikt nie łączył tego w filary.** Tego samego
+dnia cztery ręcznie wpisane liczby w ROADMAP okazały się przeterminowane — mapa pisana ręcznie
+kłamie tym pewniej, im większe Imperium, więc jedyną uczciwą formą jest **generator**.
+
+**Organ** `imperium/oczy/descriptio.py` (+14 testów). **Nie liczy niczego sam** (K1): moduły
+z `census_organorum.spisz_moduly()`, piętra zostają przy MATURITASIE. **Moduł poza filarem to
+ALARM, nie cisza** (K2) — nowy katalog wywraca organ na czerwono, zamiast po cichu wypaść
+z obrazu, czyli odwrotnie niż MATURITAS gubiący 52 wiersze ROADMAP. **Strażnik nazwany musi
+ISTNIEĆ** (klasa API-widm). Miara „cienkości" filara jest **opisowa, nie normatywna** — próg
+bez kalibracji byłby zgadywaniem udającym pomiar (LEX TALARUS).
+
+**Pierwszy pomiar: 11 filarów, 265 modułów, ZERO sierot** (suma = CENSUS co do jednego).
+Trzy rzeczy, które od razu powiedział:
+- **filar WIEDZY woła 3, jest wołany 56** — wiedza wypływa, **nic do niej nie wraca**;
+- **RÓJ wołany 93, woła 6** i **ani razu nie sięga do WIEDZY** — neurony nie czytają biblioteki;
+- **EGZEKUCJA to 4 moduły z 265** — najcieńszy filar Imperium jest tym, który styka się z rynkiem.
+
+**Podejrzenie do osobnego pomiaru (NIE twierdzenie):** FUNDAMENT woła 0, jest wołany 3, choć
+Prawo I czyni Bramę jedynym wejściem do matematyki. Licznik zlicza po nazwach modułów i może
+zaniżać — sprawdzić, zanim ktokolwiek powie „Brama jest obchodzona".
+
+**Wpięty w `/apertio`** (hook startowy, `--zwiezle` — AERARIUM pilnuje wagi wydruku)
+**i `/clausura`** (`--bramka`: nowy organ musi należeć do filara).
+
+**PIĘĆ BRAKUJĄCYCH FILARÓW — znalezione w TRZECH przejściach, na żądanie Cezara („sprawdź
+jeszcze raz, pod innym kątem"). Każde przejście coś dało:**
+- **I — funkcja rozrzucona po cudzych filarach:** `INSTITUTIO` (uczenie: 2 filary) i `FISCUS`
+  (kapitał/ryzyko: 3 filary) — **żaden nie ma strażnika**, więc nikt nie pyta o ich zdrowie
+  jako całości. To wyjaśnia, dlaczego `ucz_mwu` jest wyłączony od 29 lipca i niczyj.
+- **II — poza granicą pomiaru:** w repo jest **467 plików `.py`**, mapa liczy **270**. Poza nią:
+  `tests/` (187 plików / 3517 testów) → filar **ŚWIADECTWO**, oraz 7 hooków + 9 skilli →
+  filar **HARNESS**. `archiwum/` wykluczone słusznie.
+- **III — co dzieje się bez Cezara:** `imperium/drogi/scheduler.py` ma **ZERO wołaczy
+  produkcyjnych** → **Imperium nie ma autonomii w czasie**. Oraz filar **FAMILIA** (Hyginus,
+  TIRO) rozrzucony po 3 filarach, z silnikiem TIRO poza repozytorium.
+
+🚨 **WADA W TYM ORGANIE Z DNIA JEGO BUDOWY (klasa K2, moja):** DESCRIPTIO drukował „zero
+pominięć", licząc wyłącznie własny zakres; `census_organorum` ma `KORZENIE = ("imperium",
+"narzedzia")` **bez słowa uzasadnienia** — granica CICHA, nie zadeklarowana. Zbudowałem organ
+przeciwko tej klasie i sam w nią wpadłem. Naprawa (następna wachta): jawna deklaracja zakresu
++ liczenie tego, co poza nim. **Nie ogłaszam mapy Imperium za kompletną** — trzy przejścia,
+trzy znaleziska, więc brak podstaw, by twierdzić, że czwarte nic by nie dało.
+
+**Pliki:** `imperium/oczy/descriptio.py`, `tests/test_descriptio.py`, `CLAUDE.md`,
+`.claude/hooks/session-start.sh`, `docs/ARCHITEKTURA_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`
+
+---
+
 ## 2026-08-05 | 🔐 | D1.1 SPŁACONE — bezpiecznik integralności przestał być literałem (19 dni długu)
 
 **Stan sprzed naprawy:** `ImperiumLog.hash_sha256` miał **ZERO przypisań w całej bazie kodu**,

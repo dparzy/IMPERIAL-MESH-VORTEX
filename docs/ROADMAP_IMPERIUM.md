@@ -34,6 +34,7 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 | # | zadanie | stan | dlaczego TERAZ |
 |---|---|---|---|
 | **0** | **DOMKNĄĆ BRAMKĘ DO 7/7** — `conditor_lustri` ma świecić zielono **spełnieniem kryteriów**, nie decyzją. Brakuje: TABULARIUM (33 alarmy T2/T3), ETAPY (7 otwartych L0–L3x), **KLASY** (rejestr leków na K1–K4 — nie istnieje), **KALIBRACJA** (rejestr kalibracji organów orzekających — nie istnieje) | 🔴 | **ROZKAZ CEZARA 2026-08-05: „naprawimy to na nowej sesji, aby wszystkie były spełnione".** Zamrożenie zdjęto DECYZJĄ przy czerwonej bramce — dług nie zniknął razem z zakazem |
+| **0b** | **PIĘĆ BRAKUJĄCYCH FILARÓW + dwie wady mapy** — `INSTITUTIO` (uczenie), `FISCUS` (kapitał/ryzyko), `HARNESS` (7 hooków + 9 skilli), `ŚWIADECTWO` (187 plików testów), `FAMILIA` (Hyginus, TIRO). Do tego: DESCRIPTIO musi **deklarować swój zakres** i liczyć to, co poza nim; `scheduler.py` ma **0 wołaczy** | 🔴 | Znalezione w TRZECH przejściach pod różnym kątem — **każde coś dało**, więc nie mam podstaw twierdzić, że czwarte nic by nie dało. Wariant zatwierdzony przez Cezara: przypisania per-moduł + test istnienia pliku |
 | **1** | **BIBLIOTHECA ULPIA — domknięcie biblioteki** (a) 133 księgi poza RAG → zaindeksować, (b) **świeży bieg `aestimator.py`** — ile realnie ginie z tabel, wzorów i wykresów i w których pozycjach, (c) watchdog przyrostu ksiąg (dziś **żadna z 24 warstw audytu nie pilnuje ksiąg**) | 🔴 | **ROZKAZ CEZARA 2026-08-05: „najpierw musimy mieć najlepszą Bibliotekę Ulpia — nazwa zobowiązuje".** *Bibliotheca Ulpia* Trajana była największą biblioteką cesarstwa. Dopóki 133 z 248 ksiąg jest niewidzialnych, każdy zwiad czerpie z połowy zasobu |
 | **1b** | **Organy mają czytać LINKI, WYKRESY, TABELE i ZŁOŻONE WZORY** — dziś każda ścieżka ekstrakcji (`_pdf` PyMuPDF, OCR, epub/mobi/djvu/calibre) daje **płaski tekst**; struktura tabel, wzory i wykresy **nie są odzyskiwane przez ŻADNĄ z nich** | 🔴 | Rozkaz Cezara 08-05: *„aby nic nie ginęło, aby cała wiedza była w 100% zbadana, oceniona, porównana i wybrana"*. **Kolejność: najpierw pomiar AESTIMATOREM, potem wybór technologii** — struktura tabel ≠ wzory ≠ wykresy to trzy różne problemy o trzech różnych kosztach |
 | **2** | **LUDUS MAGNUS P1 — IC dla WSZYSTKICH 87 neuronów** (15 par 4h, walk-forward OOS, PBO/DSR od pierwszego biegu, wynik do CODEX) | 🔴 narzędzia istnieją | **Rozkaz Cezara 2026-08-05.** Ledger ma **4 wyniki IC na 87 neuronów** — skill ~95% roju nigdy nie zmierzony. Bez tego P2–P5 nie mają czego ważyć, a MEXC byłby hazardem |
@@ -138,6 +139,65 @@ zastąpione **wskazaniem producenta** (klasa „liczba rosnąca sama").
 > wygląda gorzej w tabeli. D1.1 było jedyną pozycją czekającą wyłącznie na słowo Cezara —
 > **słowo padło 2026-08-05 i dług został spłacony**; teraz czeka już tylko na A/B przed
 > włączeniem flagi, bo dotyka ścieżki decyzyjnej.
+
+---
+
+## 🧱 PIĘĆ BRAKUJĄCYCH FILARÓW IMPERIUM (zmierzone 2026-08-05, decyzja Cezara: DODAJEMY)
+
+> **Pytanie Cezara:** *„czy mamy wszystkie filary, czy jakiegoś brakuje?"* — a po pierwszej
+> odpowiedzi: *„sprawdź jeszcze raz, pod innym kątem, może czegoś nie mamy"*. **Trzy przejścia,
+> każde pod innym kątem, każde coś znalazło.** To jest najważniejszy wniosek metodyczny tej
+> wachty: **jedno spojrzenie na mapę nie wystarcza** — a skoro trzecie wciąż produkowało
+> znaleziska, nie wolno ogłaszać mapy za kompletną.
+
+### PRZEJŚCIE I — „funkcja rozrzucona po cudzych filarach, bez strażnika"
+
+| filar | moduły | dziś leżą w | strażnik |
+|---|---|---|---|
+| **INSTITUTIO — UCZENIE** (wynik → zmiana zachowania) | `hedge_mwu`, `igrzyska`, `notarius`, `schola`, `drift_adapter`, `optymalizator` | **2 filary** (WIEDZA + PRÓBA) | **żaden** |
+| **FISCUS — KAPITAŁ I RYZYKO** (ile stawiamy) | `kalkulator_lewara`, `praeda`, `sizing_przekonania`, `straznik_przewagi`, `aegis_tarcza`, `gubernator`, `aerarium` | **3 filary** (OBRONA + PRÓBA + DECYZJA) | **żaden** |
+
+**Dlaczego to nie kosmetyka:** filar bez granicy nie ma strażnika, więc nikt nie pyta o jego
+zdrowie JAKO CAŁOŚĆ. Dowód z tej samej wachty: filar WIEDZY **woła 3 / jest wołany 56**, a RÓJ
+**ani razu** nie sięga do WIEDZY — droga powrotna nie istnieje, **bo uczenie jest niczyje**.
+`ucz_mwu` stoi wyłączony od 2026-07-29 (zmierzono, że szkodzi) i od tamtej pory nienaprawiony.
+
+### PRZEJŚCIE II — „co leży POZA granicą pomiaru"
+
+W repo jest **467 plików `.py`**, a DESCRIPTIO liczy **270**. Poza mapą stoją: `tests/`
+(**187 plików / 3517 testów**), 7 hooków, 9 skilli, `skrypty/`, `wrzutnia/`.
+`archiwum/` (4) jest wykluczone **słusznie** — otwierane wyłącznie na rozkaz Cezara.
+
+| filar | co obejmuje | dlaczego jest filarem |
+|---|---|---|
+| **HARNESS — RYTM I ROZKAZY** | 7 hooków, 9 skilli, `settings.json`, SIGILLARIUM | **uruchamia CAŁE Imperium** — każda sesja zaczyna się od hooka. L2b orzekło o nim „✅ POTWIERDZONE, ❌ niemierzone"; teraz wiadomo DLACZEGO: leży poza granicą wszystkich liczników |
+| **ŚWIADECTWO — TESTY** | 187 plików, 3517 testów | Prawo XIX mówi, że nic nie istnieje bez kodu **i testów** — nośnik najważniejszego prawa był niewidoczny w mapie Imperium |
+
+> 🚨 **WADA W ORGANIE Z DNIA JEGO BUDOWY (klasa K2, moja własna):** DESCRIPTIO drukował
+> „✅ zero pominięć", licząc wyłącznie własny zakres. `census_organorum` ma
+> `KORZENIE = ("imperium", "narzedzia")` **bez jednego słowa uzasadnienia** — granica jest
+> CICHA, nie zadeklarowana. Zbudowałem organ przeciw tej klasie i sam w nią wpadłem.
+> **Naprawa:** organ ma jawnie deklarować zakres i **liczyć to, co poza nim**.
+
+### PRZEJŚCIE III — „co dzieje się bez Cezara" i „czyje ręce pracują"
+
+| znalezisko | pomiar | znaczenie |
+|---|---|---|
+| 🚨 **`imperium/drogi/scheduler.py` — ZERO wołaczy produkcyjnych** | 1 plik testów, zero użycia w kodzie | **Imperium nie ma autonomii w czasie** — nic nie dzieje się, dopóki Cezar nie otworzy sesji. Prawo XV: organ zapłacony i niewpięty. Pętle ciągłe UMIEMY (`live_monitor`, `webhook_tradingview` są wpięte w `petla_live`) — brakuje **wyzwalacza**, nie pętli |
+| **FAMILIA — SŁUDZY** | `bibliotekarz.py` (XI), `deepseek_glos.py` (V), `notarius.py` (I), silnik TIRO w `C:\TIRO` **poza repo** | siła robocza Imperium rozrzucona po **3 filarach**, a jej silnik leży poza repozytorium. BREVIARIUM ich raportuje, ale **raport to nie opieka**. Nazwa z *familia Caesaris* — personel administracyjny, który realnie prowadził rzymskie Imperium |
+
+### Nazwy i sposób wdrożenia
+
+*institutio* = kształcenie (Kwintylian, *Institutio Oratoria*) · *fiscus* = prywatny skarbiec
+cesarza (odróżniany od państwowego *aerarium*) · *familia Caesaris* = personel cesarski.
+Sprawdzone: żadna nie koliduje z organem ani kategorią dokumentu (`DISCIPLINA` odpadła — jest
+już kategorią w TABULARIUM).
+
+**Wariant WYBRANY PRZEZ CEZARA:** przypisania **per-moduł** w `DESCRIPTIO` jako jawne wyjątki od
+reguły katalogowej, **z testem pilnującym, że każdy wymieniony plik istnieje** (ten sam mechanizm,
+którym organ broni się przed strażnikami-widmami). Tanie i odwracalne, nie dotyka ani jednego
+importu. **Odrzucone świadomie:** przenoszenie plików do nowych katalogów — taksonomicznie
+czystsze, ale dotyka importów przy 265 modułach i 3517 testach.
 
 ---
 

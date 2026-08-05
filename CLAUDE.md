@@ -214,7 +214,8 @@ Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
 1. **Przeczytaj wydruk hooka w całości** (kolejność drukowania): 🎯 **NASTĘPNY KROK** (banner na górze,
    A2 — zawsze widoczny mimo ~25 KB) → **PORTITOR** (pre-flight środowiska: deps/klucze API/dryf, B1)
    → **CENSOR SPRZĘTU** (żelazo zmierzone) → **AERARIUM** (waga kontekstu startowego, stopnie GRADUS,
-   nadzór nad kosztem samego wydruku hooka) → **INDEX FALSORUM** → **BREVIARIUM** (słudzy: Hyginus/TIRO/
+   nadzór nad kosztem samego wydruku hooka) → **INDEX FALSORUM** → **DESCRIPTIO IMPERII** (filary Imperium: ile organów, kto kogo woła, czy któryś
+   moduł wypadł poza filar) → **BREVIARIUM** (słudzy: Hyginus/TIRO/
    modele) → **LEX TALIONIS** (dług honorowy) → **audyt Prawo XXI** (pełny) → **CODEX**
    (podsumowanie ledgera, C1) → **Centrum Pamięci** (profil, Top-3 lekcji, aktywny cel W12, Refleksja W9)
    → **Dziennik Nieśmiertelny** (pełna oś) → **skan wad ostatniego commitu**. Wydruk >25 KB bywa ucięty
@@ -267,7 +268,9 @@ nowe zadanie bez weryfikacji „czy już istnieje"; liczby z pamięci zamiast z 
    bez spojrzenia, bo nic nie pytało, czy recenzent nadążył). Nowe wady → Księga Wad (`ksiega_wad_kodu`).
 4. **Komplet dokumentów + pamięć zsynchronizowane z kodem** (ZASADA PEŁNEJ SYMBIOZY): LOG_ZMIAN, MANIFEST,
    INDEKS, MAPA_KLUCZY, liczby, ARCHITEKTURA (nowy organ/narzędzie z nazwą rzymską — ZASADA NOMENKLATURY),
-   pamięć. Nowa ZASADA w pamięci → skodyfikuj też w CLAUDE.md/ZASADY (nie zostawiaj tylko w pamięci prywatnej).
+   pamięć. **`python -m imperium.oczy.descriptio --bramka`** — nowy organ MUSI należeć do filara;
+   moduł poza filarem albo strażnik-widmo to alarm, nie cisza (rozkaz Cezara 2026-08-05).
+    Nowa ZASADA w pamięci → skodyfikuj też w CLAUDE.md/ZASADY (nie zostawiaj tylko w pamięci prywatnej).
 4b. **BREVIARIUM — meldunek SŁUG na domknięcie** (ROZKAZ STAŁY, Cezar 2026-07-21):
    `python -m imperium.oczy.breviarium --delta` — stan HYGINUSA i TIRO **oraz RÓŻNICA wobec
    otwarcia** (co ta wachta zmieniła: kolejka, plon czekający na sędziego, podejrzane cząstki,

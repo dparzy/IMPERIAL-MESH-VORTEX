@@ -101,6 +101,16 @@ if [ -f imperium/oczy/breviarium.py ]; then
   python -m imperium.oczy.breviarium --migawka || true
 fi
 
+# 0.9a2) DESCRIPTIO IMPERII — z jakich FILARÓW zbudowane jest Imperium (rozkaz Cezara
+#        2026-08-05: „musimy wiedzieć, z jakich filarów i jaki schemat ma nasze Imperium,
+#        jakie organy są do nich przypisane i jak współpracują"). `--zwiezle` bo AERARIUM
+#        pilnuje wagi wydruku: jedna linia na filar, bez opisów i strażników (pełny obraz:
+#        `python -m imperium.oczy.descriptio`). Alarm o module POZA filarami drukuje się
+#        zawsze — nowy katalog ma wywrócić obraz na czerwono, a nie z niego zniknąć.
+if [ -f imperium/oczy/descriptio.py ]; then
+  python -m imperium.oczy.descriptio --zwiezle || true
+fi
+
 # 0.9b) SCHOLA CAESARIS — jedna linia nauki (rozkaz Cezara 2026-07-29: „dokument żywy
 #       stale podlegający rozwojowi i pamiętany co sesja"). JEDNA linia, nie raport —
 #       AERARIUM pilnuje wagi wydruku, a szkoła ma przypominać o sobie, nie zajmować

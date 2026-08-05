@@ -1,10 +1,10 @@
 ---
 
-## Ostatnia aktualizacja: 2026-08-04
+## Ostatnia aktualizacja: 2026-08-05
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
-stan_na: 2026-08-04
+stan_na: 2026-08-05
 powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360)"
 ---
 # PAMIĘĆ SESJI — W-360
@@ -113,23 +113,26 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-08-04 — MATURITAS: dług honorowy bez świadomości ODROCZENIA
-maturitas.py:161 liczy NOTA−CORONA i obcina do zera. Realnie 54−55 = −1 → 0, a odroczona nota (N-fa723062) niewidoczna; lustro melduje czystą kartę przy żywym długu.
+### 2026-08-05 — W19 złapało niepełną poprawkę frontmatter README
+Podniesiono nagłówek README, ale zapomniano o frontmatter; bramka W19 to wykryła. Domyknięto poprawkę i wygenerowano katalog. Bramka działa zgodnie z przeznaczeniem.
 
-### 2026-08-04 — MATURITAS: niezrozumiany wiersz cicho ignorowany
-Miernik traktuje każdą tabelę 4-kolumnową jako status w kolumnie 3. W ROADMAP 52 wiersze mają tam opis, nie status — wypadają z pomiaru bez śladu. Wada klasy: miernik nie umie powiedzieć 'nie wiem'.
+### 2026-08-05 — W3 weryfikuje klucze MANIFESTU maszynowo; data Stan na może być tylko etykietą
+W3 (zielone) pilnuje kluczy MANIFESTU 1:1 z kodem i liczby neuronów; dzięki temu wiadomo, że treść jest aktualna, a przestarzała była tylko data. Datę podniesiono bez ręcznego przeglądu 258 wierszy (LEX TALARUS).
 
-### 2026-08-04 — Dwie prawdy w jednym polu daty
-Mylono „kiedy to się wydarzyło” (o sesji) z „stan na” (o dokumencie). Poprzednia łatka pilnowała, by daty szły razem; ta pilnuje, by szły w przód. Wiersz niezrozumiały musi być zgłaszany, nie ignorowany.
+### 2026-08-05 — MANIFEST to rejestr neuronów i zwiadowców, nie wszystkich organów
+Zarzut braku LUSTRUM/SILENTIUM w MANIFEST był chybiony; od organów jest CENSUS (W17, 263 organy). Przed alarmem W6 należało sprawdzić strukturę pliku, a nie zakładać brak wpisów.
 
-### 2026-08-04 — MOCNE świadectwa potrafią łapać gnicie przypadkiem
-PAMIEC_ABSOLUTNA została wykryta tylko dzięki nazwie klasy; realny rozjazd siedzi w prywatnej `_sciezka`, której dokument nie wymienia. Warianty oparte na symbolach nie widzą cytatów dosłownych kodu — stąd L3d.
+### 2026-08-05 — Milczący organ bez 'nie wiem' jest czytany jako zieleń
+Wspólna klasa bugów LUSTRUM, TABULARIUM i MATURITAS: organ, który nie umie powiedzieć 'nie wiem', milczy, a milczenie czytamy jako zieleń. To jest właściwe robactwo Imperium, nie pojedyncze błędy.
 
-### 2026-08-04 — Dwa realne gnicia dokumentacji: PLAN_DEEPSEEK i PAMIEC_ABSOLUTNA
-PLAN_DEEPSEEK.md cytował sygnaturę bez 4 parametrów (DISPENSATOR); PAMIEC_ABSOLUTNA.md nie uwzględniał sanityzacji symbolu od 2026-07-29 (BTC/USDT:USDT tworzy podkatalog i dwukropek). Obie treści poprawiono.
+### 2026-08-05 — W6 mierzy wobec commitu całego repo, nie per plik
+W6 porównuje MANIFEST/README z ostatnim commitem całego repo; auto-sync pamięci dotykający kroniki i wizji daje fałszywe czerwienienie. Komentarz W6b wskazuje, że tylko pomiar per-plik jest poprawny. Czerwienienie od hooka trenuje ignorowanie alarmów (odwrócona klasa K2).
 
-### 2026-08-04 — Wariant B odrzucony pomiarem: +5 pp precyzji za połowę recallu
-Dla 24 dokumentów A dawał 2/7 precyzji i recall 2/2; B (hunk bez `class`) 1/3 i recall 1/2; C identyczny z B. Pomiar obalił hipotezę Claude'a, więc wybrano D mimo niższej precyzji.
+### 2026-08-05 — W20 ukrywa różnicę w ostatniej kolumnie przez ucięcie wiersza
+Komunikat audytu W20 ucina wiersz ok. 60 znaków, a różnica dotyczyła ostatniej kolumny (data). Skutek: ta sama linia była raportowana jednocześnie jako dopisana ręcznie i brakująca. Dopiero grep pokazał realną różnicę.
+
+### 2026-08-04 — Legatus — fałszywe świadectwo z nagłówka hunka
+Świadectwo dla dokumentu Legatus wzięło się z nazwy klasy w nagłówku hunka gita — git podaje ją dla każdej zmiany, więc symbol wyglądał na cytowany, choć dokument nie mówi o interwałach. Homonimia klasy z nazwą dokumentu generuje fałszywe alarmy.
 
 ### 2026-08-02 — Martwy słownik MECHANIZMY_ZWIADOWCY w rejestrze
 Słownik 12 wpisów (rejestr.py:208) nie jest czytany przez żaden kod; mechanizm MECHANIZM trafia tylko do neuronów. Skutek: DISCRIMINATOR i dekorelacja (Prawo XVI) nie obejmują 15 zwiadowców; EXP-13/14 aktywne bez wpisu.

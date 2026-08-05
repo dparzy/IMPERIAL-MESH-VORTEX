@@ -84,6 +84,46 @@ def _poziom(warunki: List[bool]) -> int:
     return poziom
 
 
+def wiersze_stanu(tekst: str) -> List[tuple]:
+    """Wiersze tabel ROADMAP jako `[(etykieta, stan)]` — JEDEN parser na całe Imperium.
+
+    Publiczne, bo pyta o to więcej niż jeden organ: MATURITAS liczy, JAKA CZĘŚĆ pozycji jest
+    domknięta, a CONDITOR LUSTRI pyta o KONKRETNE wiersze etapów LUSTRATIO. To jedno źródło
+    i dwa pytania — nie dwa parsery. Powód zapisany w Księdze Wad (2026-07-17): „jeden format
+    = jeden parser; dwa parsery rozjadą się co do znaku", a rozjazd byłby tu niewidoczny,
+    bo obie strony dawałyby liczbę wyglądającą sensownie.
+    """
+    out: List[tuple] = []
+    for w in tekst.splitlines():
+        if not w.startswith("|") or w.count("|") < 4:
+            continue
+        kol = [c.strip() for c in w.split("|")]
+        if len(kol) < 4 or not kol[1] or kol[1].startswith("-") or kol[1] == "#":
+            continue
+        out.append((kol[1], kol[3]))
+    return out
+
+
+def stan_domkniety(stan: str) -> Optional[bool]:
+    """True = domknięte, False = otwarte, **None = nie wiem** (klasa K2: milczenie ≠ zieleń).
+
+    PUBLICZNE tak samo jak `wiersze_stanu` i z tego samego powodu: czyta to więcej niż jeden
+    organ (MATURITAS liczy udział domkniętych, CONDITOR LUSTRI pyta o etapy LUSTRATIO).
+    Do 2026-08-05 nazywało się `_stan_domkniety` i CONDITOR importował je mimo podkreślnika —
+    zmiana nazwy w tym module zamieniłaby jego kryterium ETAPY w ciche `NIE WIEM` (bo awarię
+    producenta łapie tam `except`). Kontrakt między organami musi być nazwany kontraktem.
+    """
+    if "✅" in stan:
+        return True
+    if any(z in stan for z in ("🔴", "🟡", "⏸️")):
+        return False
+    return None
+
+
+# Alias zgodności — istniejące wołania sprzed 2026-08-05. Nowy kod używa nazwy publicznej.
+_stan_domkniety = stan_domkniety
+
+
 # ── PIĘTRO 1: PROMPT — zdrowie specyfikacji ─────────────────────────────────────
 
 def zmierz_prompt() -> Dict[str, Any]:
@@ -131,16 +171,12 @@ def zmierz_loop() -> Dict[str, Any]:
     # ROADMAP: pozycje otwarte vs domknięte (stan czytany z tabel, nie z pamięci)
     rm = (KORZEN / "docs" / "ROADMAP_IMPERIUM.md")
     tekst = rm.read_text(encoding="utf-8", errors="replace") if rm.exists() else ""
-    wiersze = [l for l in tekst.splitlines() if l.startswith("|") and l.count("|") >= 4]
     otw = dom = 0
-    for w in wiersze:
-        kol = [c.strip() for c in w.split("|")]
-        if len(kol) < 4 or not kol[1] or kol[1].startswith("-") or kol[1] == "#":
-            continue
-        stan = kol[3]
-        if "✅" in stan:
+    for _etykieta, stan in wiersze_stanu(tekst):
+        czy = _stan_domkniety(stan)
+        if czy is True:
             dom += 1
-        elif any(z in stan for z in ("🔴", "🟡", "⏸️")):
+        elif czy is False:
             otw += 1
 
     # SUGESTIE: rekord zamknięcia jest OSOBNYM wpisem (ledger append-only), więc liczymy
@@ -157,9 +193,15 @@ def zmierz_loop() -> Dict[str, Any]:
     wizje = _jsonl("wizje_i_decyzje.jsonl")
     bez_werdyktu = sum(1 for w in wizje if w.get("status") in ("POMYSŁ", "PLANOWANE"))
 
-    noty = _jsonl("codex_notarum.jsonl")
-    dlug_honorowy = max(0, sum(1 for n in noty if n.get("typ") == "NOTA")
-                        - sum(1 for n in noty if n.get("typ") == "CORONA"))
+    # KLASA K1 (naprawiona 2026-08-05): dług liczyliśmy TUTAJ jako `NOTA − CORONA`, czyli
+    # drugą arytmetyką obok CODEX NOTARUM. Dwa błędy naraz: (1) odejmowanie LICZNIKÓW nie wie,
+    # KTÓRA korona spłaca KTÓRĄ notę (5 koron i 3 niespłacone noty dają fałszywe zero),
+    # (2) nie wie o ODROCZENIU wprowadzonym 2026-08-03. Dziś obie drogi dają 0, więc rozjazd
+    # był NIEWIDOCZNY — i dokładnie tak wygląda K1, zanim zacznie kłamać. Fakt ma jednego
+    # producenta; my go WOŁAMY.
+    from imperium.biblioteki import codex_notarum
+    dlug_honorowy = len(codex_notarum.dlug_honorowy())
+    odroczonych = len(codex_notarum.odroczone())
 
     hooki = sorted((KORZEN / ".claude" / "hooks").glob("*.sh")) \
         if (KORZEN / ".claude" / "hooks").exists() else []
@@ -180,6 +222,9 @@ def zmierz_loop() -> Dict[str, Any]:
         "wizje_bez_werdyktu": bez_werdyktu,
         "hooki": len(hooki), "warstwy_audytu": warstwy,
         "dlug_honorowy": dlug_honorowy,
+        # Odroczenie zdejmuje BLOKADĘ, nie dług — więc musi być widoczne obok niego,
+        # inaczej stałoby się cichym umorzeniem (klasa K4: wyciszenie bez powodu na widoku).
+        "noty_odroczone": odroczonych,
     }
     poziom = _poziom([
         len(hooki) >= 1,                              # 1 — cokolwiek się samo sprawdza

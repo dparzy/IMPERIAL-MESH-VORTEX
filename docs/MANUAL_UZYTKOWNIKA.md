@@ -467,11 +467,19 @@ from imperium.legiony.feature_importance import raport_waznosci
 
 # historia_sygnalow: lista snapów [{klucz_neuronu: "LONG"/"SHORT"/"NEUTRAL"}, ...]
 # historia_wynikow:  [+1, -1, +1, ...] (+1=cena wzrosła, -1=spadła następny bar)
+# ⚠️ OBIE SERIE MUSZĄ MIEĆ RÓWNĄ DŁUGOŚĆ — inaczej ValueError (patrz niżej)
 raport = raport_waznosci(historia_sygnalow, historia_wynikow)
 print(raport)                  # tabela z rankingiem MDA + SFI
 print(raport.martwe_glosy)     # neurony do wyciszenia
 print(raport.redundantne)      # kandydaci do scalenia
 ```
+
+> ⚠️ **Nierówne serie = `ValueError`, nie cichy wynik** (zaostrzone 2026-07-21). Wcześniej
+> `min()` po cichu ucinał do krótszej serii. Jeśli przesunięcie jest w ŚRODKU historii,
+> `sygnaly[i]` i `wyniki[i]` przestają opisywać **ten sam bar** — MDA i SFI liczą się wtedy
+> na skażonych parach, a raport ogłasza „martwy głos" albo „redundantny" o neuronie, który
+> zawinił tylko tym, że etykieta się rozjechała (Prawa XVI i XX). Lepiej głośny błąd niż
+> ranking, któremu nie wolno wierzyć. Ten sam strażnik stoi w `legatus.oblicz_wagi_ic`.
 
 ### 10.2 — Bary dolarowe (lepsze niż czasowe)
 

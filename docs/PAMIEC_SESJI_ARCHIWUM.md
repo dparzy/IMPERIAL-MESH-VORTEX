@@ -13,6 +13,54 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-08-04 — Pusta mapa pospolitości = milczenie udające wynik
+Pusta mapa pospolitości przepuszczała wszystko jako 'rzadkie', bo _sledzone_przez_git() listuje wyłącznie pliki *.md. Przyrząd milcząco zawyżał moc świadectwa. Naprawiono wraz z zaporą i dodano testy graniczne.
+
+### 2026-08-04 — Bramka GNICIA mierzy zmianę pliku, nie prawdziwość dokumentu
+GNICIE wykrywa, że plik kodu się zmienił po dacie dokumentu, a nie że fakt opisany w dokumencie przestał być prawdziwy. Przykład: docs/START_LOKAL.md gnije przez 26 zmian audyt_spojnosci.py, choć instrukcja dla użytkownika nie zmieniła się ani o literę. Przy naiwnej mierze precyzja wynosiła 7,4%.
+
+### 2026-08-04 — MATURITAS: dług honorowy bez świadomości ODROCZENIA
+maturitas.py:161 liczy NOTA−CORONA i obcina do zera. Realnie 54−55 = −1 → 0, a odroczona nota (N-fa723062) niewidoczna; lustro melduje czystą kartę przy żywym długu.
+
+### 2026-08-04 — MATURITAS: niezrozumiany wiersz cicho ignorowany
+Miernik traktuje każdą tabelę 4-kolumnową jako status w kolumnie 3. W ROADMAP 52 wiersze mają tam opis, nie status — wypadają z pomiaru bez śladu. Wada klasy: miernik nie umie powiedzieć 'nie wiem'.
+
+### 2026-08-04 — Dwie prawdy w jednym polu daty
+Mylono „kiedy to się wydarzyło” (o sesji) z „stan na” (o dokumencie). Poprzednia łatka pilnowała, by daty szły razem; ta pilnuje, by szły w przód. Wiersz niezrozumiały musi być zgłaszany, nie ignorowany.
+
+### 2026-08-04 — MOCNE świadectwa potrafią łapać gnicie przypadkiem
+PAMIEC_ABSOLUTNA została wykryta tylko dzięki nazwie klasy; realny rozjazd siedzi w prywatnej `_sciezka`, której dokument nie wymienia. Warianty oparte na symbolach nie widzą cytatów dosłownych kodu — stąd L3d.
+
+### 2026-08-04 — Dwa realne gnicia dokumentacji: PLAN_DEEPSEEK i PAMIEC_ABSOLUTNA
+PLAN_DEEPSEEK.md cytował sygnaturę bez 4 parametrów (DISPENSATOR); PAMIEC_ABSOLUTNA.md nie uwzględniał sanityzacji symbolu od 2026-07-29 (BTC/USDT:USDT tworzy podkatalog i dwukropek). Obie treści poprawiono.
+
+### 2026-08-04 — Wariant B odrzucony pomiarem: +5 pp precyzji za połowę recallu
+Dla 24 dokumentów A dawał 2/7 precyzji i recall 2/2; B (hunk bez `class`) 1/3 i recall 1/2; C identyczny z B. Pomiar obalił hipotezę Claude'a, więc wybrano D mimo niższej precyzji.
+
+### 2026-08-04 — Cytat dosłowny kodu to osobna klasa gnicia
+Wariant D gubi PAMIEC_ABSOLUTNA — realny rozjazd siedzi w prywatnej _sciezka, niewidoczny dla żadnego wariantu opartego na symbolach. Zapisane jako L3d, nie jako sukces.
+
+### 2026-08-04 — Nazwa klasy w backtickach to tautologia
+Nazwa klasy stoi w każdym dokumencie o module, więc hunk-class znaczyło tylko 'plik był dotknięty' i powtarzało tezę bramki T2, którą świadectwo miało ważyć.
+
+### 2026-08-04 — Wariant B odrzucony pomiarem
+Hunk bez class dawał +5 pp precyzji za połowę recallu (1/2). Wariant C był identyczny z B, bo w całej populacji nie ma ani jednego diff-class — dane nie rozstrzygają między nimi.
+
+### 2026-07-27 — BREVIARIUM 2882/2882 dotyczy innego kodu — mierzyć, nie ufać pamięci
+Wynik testów z poprzedniej sesji nie przenosi się na dzisiejszy kod. Pełny bieg w tle dał 2882/2885 — 3 porażki. Stan testów jest NIEZNANY dopóki nie zmierzony na bieżącym drzewie.
+
+### 2026-07-27 — Rozjazd repo 2⇄2 produkują hooki commitujące po obu stronach
+Od wspólnego e2cb846 chmura i laptop dorobiły po 2 commity 'auto: sync pamięci' — wyłącznie przez hooki końca/startu sesji, nie pracę merytoryczną. Git nie wie, który ciąg jest właściwy; rozwiązanie: git stash → pull --rebase → stash pop. Drzewo ma 5 zmodyfikowanych plików.
+
+### 2026-07-27 — Path('/home/tiro') na Windows nie łapie startswith('/') — abstynencja jednostronna
+Path('/home/tiro') na Windows normalizuje się do \home\tiro, więc startswith('/') nigdy nie trafia. Abstynencja testów działała tylko dla Windows-ścieżki na Linuksie, nie dla POSIX-ścieżki na Windows. Naprawione mechanizmem (normalizacja ścieżek), nie łatką. Testy: 2882/2885 — 3 porażki, ta była jedyną naszą.
+
+### 2026-07-30 — Alarmy procesowe to zadania: 35 cząstek Hyginusa, 20 pomysłów W9, LEKCJA 3
+35 cząstek Hyginusa czeka na sędziego (trzeci raz w Top-3 lekcji), 20 pomysłów z refleksji W9 wisi >21 dni, a LEKCJA 3 o zgodności skal wymaga sprawdzenia. To zaległości, nie tapeta.
+
+### 2026-07-30 — CLAUDE.md przekracza limit 200 linii i rośnie ~1 linia/dzień
+Konstytucja ma 259 linii (>200) i rośnie liniowo — pełzająca regresja. Część treści trzeba przenieść do skilli na żądanie; potrzebna decyzja kierunkowa Cezara.
+
 ### 2026-07-30 — Plik wrzutni to rozmowa z DeepSeekiem, nie Hyginusem — 5 bloków
 Plik 7267 linii/452 KB zawiera: zwiad RAG/finanse+architektury, naszą kronikę, audyty z propozycją PRAWA XXVI, analizę sprzętu (16 GB vs Acer Nitro 5, modele lokalne) oraz MEMOR-AGENT 1.0→ULTIMA.
 

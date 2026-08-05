@@ -137,6 +137,43 @@ class ImperiumLog:
         return cls(**json.loads(s))
 
 
+# ─── Integralność zapisu (Prawo IX) ──────────────────────────────────────────
+# DŁUG D1.1 SPŁACONY 2026-08-05. Pole `hash_sha256` istniało od początku i miało
+# **ZERO PRZYPISAŃ W CAŁEJ BAZIE KODU** — a doradca Hermes ma gałąź `if not hash_ok →
+# BRUDNE`, więc łańcuch WYGLĄDAŁ na zamknięty, nie mając czego porównywać. Bezpiecznik,
+# który dostaje swój werdykt jako stałą, nie jest bezpiecznikiem (Księga Wad, kat.
+# „bezpiecznik"). Prawo IX wymienia to pole jako OBOWIĄZKOWE, więc kod łamał własne prawo.
+
+POLA_POZA_HASHEM = ("hash_sha256",)
+
+
+def policz_hash(log: "ImperiumLog") -> str:
+    """Odcisk SHA-256 rekordu — liczony ze WSZYSTKICH pól poza samym polem hasza.
+
+    `sort_keys=True` jest tu warunkiem sensu, nie kosmetyką: bez niego ten sam rekord
+    dawałby dwa różne odciski zależnie od kolejności pól, więc weryfikacja zgłaszałaby
+    fałszywe „dane zmodyfikowane". `default=str` chroni przed wywróceniem na polu, które
+    ktoś kiedyś doda jako niestandardowy typ — odcisk ma być zawsze policzalny.
+    """
+    import hashlib
+
+    dane = {k: v for k, v in asdict(log).items() if k not in POLA_POZA_HASHEM}
+    payload = json.dumps(dane, sort_keys=True, ensure_ascii=False, default=str)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def zweryfikuj(log: "ImperiumLog") -> bool:
+    """Czy rekord jest tym, co zapisano.
+
+    **Rekord BEZ hasza zwraca `False`, nie `True`** — brak dowodu to nie jest dowód
+    niewinności. Tak samo czyta się rekordy sprzed tej naprawy: nie kłamiemy, że były
+    zweryfikowane.
+    """
+    if not log.hash_sha256:
+        return False
+    return log.hash_sha256 == policz_hash(log)
+
+
 # ─── Zapisywacz ──────────────────────────────────────────────────────────────
 
 class PamiecAbsolutna:
@@ -175,7 +212,21 @@ class PamiecAbsolutna:
     def zapisz(self, log: ImperiumLog) -> str:
         """Zapisuje log do pliku JSONL. Zwraca log_id."""
         data = log.timestamp_utc[:10]
+        # Rekord Z ODCISKIEM jest przepisywany (migracja, import, ponowny zapis tego samego
+        # obiektu) — zachowuje CAŁĄ swoją tożsamość: i hasz, i sekwencję. Wada z recenzji
+        # 2026-08-05: sekwencja bumpowała się przy każdym zapisie, a hasz zostawał stary,
+        # więc `zweryfikuj()` orzekało „dane zmodyfikowane" o rekordzie, którego nikt nie
+        # tknął (`sekwencja` wchodzi do hasza). Odcisk musi obejmować to, co ląduje na dysku.
+        if log.hash_sha256:
+            return self._dopisz(log, data)
         log.sekwencja = self._nastepna_sekwencja(log.sesja_id)
+        # Hasz liczony PO nadaniu sekwencji — inaczej odcisk dotyczyłby innego rekordu
+        # niż ten, który ląduje na dysku, i weryfikacja przy odczycie zawsze by pękała.
+        log.hash_sha256 = policz_hash(log)
+        return self._dopisz(log, data)
+
+    def _dopisz(self, log: ImperiumLog, data: str) -> str:
+        """Sam zapis do JSONL — jedna ścieżka na dysk dla obu przypadków wyżej."""
         sciezka = self._sciezka(log.symbol, log.log_typ, data)
         with open(sciezka, "a", encoding="utf-8") as f:
             f.write(log.to_json() + "\n")

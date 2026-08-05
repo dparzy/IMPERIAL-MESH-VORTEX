@@ -45,7 +45,7 @@ Grupy pól — nazwy **dokładnie takie jak w kodzie** (Prawo XXI: żadnych alia
 | **Plan pozycji** | `plan_aktywny` · `kierunek_pozycji` · `cena_wejscia` · `dzwignia` · `cena_likwidacji` · `stop_loss` · `take_profit` · `rozmiar_usdt` · `ryzyko_usdt` · `rr_ratio` |
 | **Egzekucja** | `trade_id` · `trade_status` · `cena_wykonania` · `slippage_pct` · `prowizja_usdt` · `kapital_przed` · `kapital_po` · `pnl_usdt` · `pnl_pct` · `czas_trwania_min` · `powod_zamkniecia` · **`mae_pct`** · **`mfe_pct`** |
 | **Źródła (kanały)** | `kanaly_aktywne` · `on_chain_snapshot` · `sentyment_snapshot` · `macro_snapshot` (JSON-stringi) |
-| **Jakość danych** | `hash_sha256` (⚠️ patrz LUKA 1) · `bramka_wersja` · `kompletnosc_danych` |
+| **Jakość danych** | `hash_sha256` (✅ wypełniany od 2026-08-05 — D1.1) · `bramka_wersja` · `kompletnosc_danych` |
 | **Metadane** | `wersja_systemu` · `strategia_id` · `igrzyska_wagi` · `notatka` |
 
 `log_id`, `sekwencja` i `timestamp_utc` mają wartości domyślne — reszta jest opcjonalna
@@ -95,10 +95,17 @@ z MAE/MFE) · ✅ `drogi/scheduler.py` (ANALIZA) · ✅ czyta: `biblioteki/centr
 imperium/biblioteki/pamiec/logi/<rok>/<mies>/<data>_<symbol>_<typ>.jsonl
    np. 2026/06/2026-06-01_BTCUSDT_sygnał.jsonl      ← typ = TypLogu.lower()
        2026/06/2026-06-01_BTCUSDT_trade_close.jsonl
+       2026/07/2026-07-29_BTC-USDT-USDT_trade_close.jsonl   ← symbol SANITYZOWANY
 ```
 
-Nazwa pliku powstaje z `f"{data}_{symbol}_{typ.lower()}.jsonl"` — dla `SYGNAL` daje to
+Nazwa pliku powstaje z `f"{data}_{bezpieczny}_{typ.lower()}.jsonl"` — dla `SYGNAL` daje to
 `_sygnał.jsonl` (z polskim znakiem, bo wartość enuma to `"SYGNAŁ"`).
+
+**Symbol nie trafia do nazwy surowy** (`_sciezka`, od 2026-07-29): `_ZNAKI_NIELEGALNE`
+zamienia `/ \ : * ? " < > |` na `-`, bo notacja ccxt dla kontraktów (`BTC/USDT:USDT`)
+zrobiłaby z ukośnika PODKATALOG, a dwukropek jest na Windows nielegalny w nazwie pliku.
+`wczytaj(symbol=…)` sanityzuje pytanie TAK SAMO — sanityzacja po jednej stronie byłaby
+gorsza niż jej brak, bo dane są, a nie widać ich.
 
 🔴 **NIE ISTNIEJĄ** (były opisane jako gotowe do 2026-07-17 — nieprawda): katalogi
 `igrzyska/`, `sesje/`, `analizy/walk_forward/`, plik `indeks.json`, pliki panteonu
@@ -138,23 +145,43 @@ wypełnia). Efficiency ratio da się policzyć z `pnl_pct`/`mfe_pct` po fakcie �
 
 ## 🚨 LUKI ZMIERZONE 2026-07-17 (Prawo XV — utrata potencjału)
 
-**LUKA 1 — łańcuch integralności SHA-256 jest przerwany na całej długości.**
-Brama liczy pieczątkę audytu dla każdego wskaźnika (`CalcResult.sha256`,
-[`brama_kalkulatora.py`](../imperium/fundament/brama_kalkulatora.py)) ✅ — ale:
-- `ImperiumLog.hash_sha256` **nigdy nie jest wypełniany** (0 przypisań w całej bazie kodu);
-- doradca Hermes ma bramkę `hash_ok` opisaną jako „SHA-256 zgadza się z zapisem w Pamięci
-  Absolutnej", a [`dyrygent.py`](../imperium/koloseum/dyrygent.py) podaje jej **`hash_ok=True`
-  na sztywno** — bramka integralności, która zawsze przepuszcza, nie jest bramką;
-- Prawo IX (niżej) wymienia `hash_sha256` jako pole OBOWIĄZKOWE — **kod łamie własne prawo**.
+**LUKA 1 — łańcuch integralności SHA-256 był przerwany na całej długości. ✅ SPŁACONA 2026-08-05 (dług D1.1, 19 dni).**
+Stan sprzed naprawy: Brama liczyła pieczątkę audytu dla każdego wskaźnika
+(`CalcResult.sha256`, [`brama_kalkulatora.py`](../imperium/fundament/brama_kalkulatora.py)) ✅,
+ale `ImperiumLog.hash_sha256` **nie był wypełniany przez NIC** (0 przypisań w całej bazie kodu),
+a [`dyrygent.py`](../imperium/koloseum/dyrygent.py) podawał doradcy Hermesowi `hash_ok` jako
+**stałą prawdziwą** — bramka, która nie mogła zapalić się nigdy. Prawo IX wymienia
+`hash_sha256` jako pole OBOWIĄZKOWE, więc **kod łamał własne prawo**.
 
-Zapisane w Księdze Wad Kodu jako klasa `bramka-zawsze-przepuszcza`. Naprawa = osobne zadanie
-(wpięcie hash Bramy w log + realna weryfikacja u Hermesa wg ZASADY WPIĘCIA: opt-in OFF).
+**Co stoi dziś (2 połówki, obie z testami granic — `tests/test_integralnosc_d11.py`):**
+- `policz_hash(log)` / `zweryfikuj(log)` w [`pamiec_absolutna.py`](../imperium/biblioteki/pamiec_absolutna.py),
+  a `zapisz()` **wypełnia pole przy każdym zapisie** (po nadaniu sekwencji, żeby odcisk dotyczył
+  rekordu, który naprawdę ląduje na dysku). Rekord z cudzym haszem NIE jest nadpisywany —
+  inaczej podmiana treści uwierzytelniałaby się sama.
+- `Dyrygent.odcisk_wskaznikow()` + `_integralnosc_wskaznikow()` — Hermes dostaje **policzony
+  warunek zamiast literału**. Wpięcie **opt-in, domyślnie OFF** (`weryfikuj_integralnosc=False`,
+  ZASADA WPIĘCIA W ŚCIEŻKĘ DECYZYJNĄ): przy OFF zachowanie jest **co do decyzji identyczne** jak
+  dotąd, ale zgoda przestała być literałem — jest gałęzią, która NAZYWA swoje założenie.
 
-**LUKA 2 — 6 z 9 typów logu bez producenta:** `TEST` (miał rejestrować okna WFO —
+**Dwie granice „braku dowodu", pilnowane testami** (bez nich wada wróciłaby pod nową nazwą):
+rekord **bez hasza** weryfikuje się jako `False`, nie `True` (dotyczy wszystkich rekordów
+sprzed tej naprawy), a weryfikacja **bez odcisku odniesienia** orzeka BRUDNE, nie CZYSTE.
+
+**Czego jeszcze NIE wiemy (LEX TALARUS):** flaga czeka na **zielone A/B** — nie zmierzyliśmy
+jeszcze, jak często odcisk realnie się rozjeżdża na żywym biegu, więc nie ogłaszamy włączenia.
+
+**LUKA 2 — 5 z 9 typów logu bez producenta:** `TEST` (miał rejestrować okna WFO —
 Walk-Forward Optimization, optymalizacja krocząca: [`walk_forward.py`](../imperium/koloseum/walk_forward.py)
-liczy własny raport i **nie zapisuje** ImperiumLog), `SENAT`, `WETO`, `IGRZYSKA`, `DORADCY`,
-`SYGNAL` poza fabryką. Deklarowany łańcuch „Senat→SENAT, Pretorianie→WETO, Igrzyska→IGRZYSKA"
-jest 🔴 planem, nie działaniem.
+liczy własny raport i **nie zapisuje** ImperiumLog), `SENAT`, `WETO`, `IGRZYSKA`, `DORADCY`.
+Deklarowany łańcuch „Senat→SENAT, Pretorianie→WETO, Igrzyska→IGRZYSKA" jest 🔴 planem,
+nie działaniem.
+
+> ✅ **`SYGNAL` wyszedł z tej listy 2026-07-29** (commit `da80b9a`): `log_sygnal` nie miała
+> wtedy **ani jednego** wywołania, więc W1 znała wynik trade'u, ale nie jego autorów —
+> atrybucja per neuron była fizycznie niemożliwa, a MWU budował 0 wag. Dziś woła ją
+> [`dyrygent.py`](../imperium/koloseum/dyrygent.py) przy każdym wejściu, pod tym samym
+> opt-inem `log_dir`. Zmierzone przy wpięciu: W1 **23 → 46** wpisów (23 SYGNAL + 23
+> TRADE_CLOSE, parowanie 1:1 po `trade_id`), MWU **0 → 37** wag.
 
 ---
 
@@ -164,7 +191,7 @@ jest 🔴 planem, nie działaniem.
 > Moduł bez logu = moduł bez dowodu istnienia."
 
 **Minimalny zestaw wg prawa:** `log_id`, `log_typ`, `sesja_id`, `timestamp_utc`, `symbol`,
-`hash_sha256` — z czego pierwsze pięć jest realnie wypełniane ✅, a `hash_sha256` nie (LUKA 1).
+`hash_sha256` — wszystkie realnie wypełniane ✅ (`hash_sha256` od 2026-08-05, D1.1).
 Prawo pozostaje celem; ten dokument nie udaje, że jest już spełnione (Prawo I).
 
 ---

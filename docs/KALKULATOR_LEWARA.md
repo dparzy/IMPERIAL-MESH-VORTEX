@@ -2,7 +2,7 @@
 kategoria: FORMA
 typ: zywy
 wlasciciel: imperium/pretorianie/kalkulator_lewara.py
-stan_na: 2026-07-17
+stan_na: 2026-08-04
 powod_istnienia: "Jedyny dokument z pełną 'matematyką przeżycia' pozycji lewarowanej — od ceny likwidacji przez stop-loss, dynamiczną dźwignię, zarządzanie kapitałem (2%), take-profit, checklist Pretorianów"
 ---
 # ⚖️ KALKULATOR LEWARA — Matematyka Przeżycia
@@ -10,7 +10,9 @@ powod_istnienia: "Jedyny dokument z pełną 'matematyką przeżycia' pozycji lew
 > **Zasada Żelazna:** Zanim wejdziesz w pozycję lewarowaną — MUSISZ znać dokładną cenę likwidacji.
 > Jeśli system nie policzy likwidacji → pozycja NIE wchodzi. Bezwzględnie.
 
-> **⚠️ Jak czytać (weryfikacja wobec kodu 2026-07-17).** Bloki `python` poniżej są
+> **⚠️ Jak czytać (weryfikacja wobec kodu 2026-08-04; poprzednia pełna 2026-07-17).** Od tamtej
+> weryfikacji plik-właściciel dotknął **jeden** commit — `aeccdfb` (guardy graniczne), opisany
+> w „Kontrakcie wejściowym" niżej; stałe, checklist i progi sprawdzone ponownie. Bloki `python` są
 > **ilustracją wzoru, nie kopią kodu** — źródłem prawdy jest zawsze
 > [`kalkulator_lewara.py`](../imperium/pretorianie/kalkulator_lewara.py). Poprzednia wersja
 > (2026-06-04) podawała funkcję `policz_dzwignie()`, której **nie ma w kodzie**, i twierdziła,
@@ -284,6 +286,23 @@ def policz(self, symbol, kierunek, cena_wejscia, dzwignia, kapital_usdt,
            atr=None, sl_atr_mult=None,   # stop-loss oparty na ATR (§11)
            mnoznik_rozmiaru=1.0) -> PlanPozycji:
 ```
+
+**Kontrakt wejściowy — kiedy `policz()` NIE zwraca planu, tylko rzuca** (zaostrzony
+2026-07-21, Księga Wad #55; zwiad zreprodukował 3× `ZeroDivisionError` na wejściach
+granicznych, ZANIM zdążyło zadziałać weto):
+
+| warunek | reakcja | dlaczego u wrót, nie w środku |
+|---|---|---|
+| `kierunek` spoza `LONG`/`SHORT` | `AssertionError` | — |
+| `cena_wejscia <= 0` | **`ValueError`** | cztery kroki niżej `stop_pct = \|cena−stop\|/cena` dzieliłoby przez zero — jawny błąd u wrót bije kryptyczny wyjątek z głębi (fail-loud) |
+
+**Zachowanie graniczne bufora:** przy skrajnej dźwigni mianownik `|cena − likwidacja|`
+zbiega do zera (dla 200× zachodzi `1/dźwignia == OPLATA_UTRZYMANIA`, czyli likwidacja
+**równa się** cenie wejścia). Wtedy `bufor_pct = 0.0` — pozycja natychmiast likwidowalna —
+a **nie** `ZeroDivisionError`. Checklist i tak odrzuci taki plan, bo `MAX_DZWIGNIA = 20`.
+
+> Produkcja nigdy nie trafia w te warunki: Dyrygent capuje dźwignię ≤ 20 i podaje realną
+> cenę > 0. Guardy bronią wywołań **z pominięciem Dyrygenta** — bezpośrednich i przyszłych.
 
 ---
 

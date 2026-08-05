@@ -3,7 +3,7 @@ kategoria: CONSILIUM
 typ: zywy
 wlasciciel: —
 bez_wlasciciela: "plan calego Imperium — zamiar, nie opis istniejacego organu"
-stan_na: 2026-08-03
+stan_na: 2026-08-05
 powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyklu paper trading do pełnej autonomii."
 ---
 # 🏛️ ROADMAP IMPERIUM — MAPA DRÓG SYSTEMU
@@ -15,7 +15,7 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 ---
 
-## 🗓️ PLAN WACHT — operacyjna kolejka zadań (stan 2026-08-02)
+## 🗓️ PLAN WACHT — operacyjna kolejka zadań (przegląd 2026-08-05)
 
 > **Czym to jest, a czym nie:** FAZY 0–4 niżej to mapa STRATEGICZNA (dokąd zmierzamy).
 > Ta sekcja to kolejka OPERACYJNA — co robimy w najbliższych wachtach, w kolejności.
@@ -25,15 +25,364 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 
 **Legenda stanu:** ✅ zrobione · 🟡 kod jest, brak dowodu · 🔴 nie istnieje · ⏸️ świadomie odłożone
 
+> ⚠️ **Ta sekcja przez trzy dni była NAGŁÓWKIEM BEZ KOLEJKI** — obiecywała „co robimy
+> w najbliższych wachtach", a kolejka leżała rozsypana po ośmiu sekcjach niżej (H, G, A,
+> F, B, C, Ł, E). Uporządkowane 2026-08-05 na rozkaz Cezara.
+
+### 🎯 KOLEJKA NA TERAZ (rekomendacja Architekta, kolejność = priorytet)
+
+| # | zadanie | stan | dlaczego TERAZ |
+|---|---|---|---|
+| **0** | **DOMKNĄĆ BRAMKĘ DO 7/7** — `conditor_lustri` ma świecić zielono **spełnieniem kryteriów**, nie decyzją. Brakuje: TABULARIUM (33 alarmy T2/T3), ETAPY (7 otwartych L0–L3x), **KLASY** (rejestr leków na K1–K4 — nie istnieje), **KALIBRACJA** (rejestr kalibracji organów orzekających — nie istnieje) | 🔴 | **ROZKAZ CEZARA 2026-08-05: „naprawimy to na nowej sesji, aby wszystkie były spełnione".** Zamrożenie zdjęto DECYZJĄ przy czerwonej bramce — dług nie zniknął razem z zakazem |
+| **0a** ✅ | **ZROBIONE 2026-08-05 (wachta 0a).** Pięć wad naprawionych, każda z testem granicy „celowo psuję producenta"; **dowód mutacyjny: 8/8 testów czerwienieje z ASERCJI** przy przywróconej wadzie (czerwień z importu nie liczy się jako dowód). Zmierzony skutek naprawy W4 na żywym repo: DANE woła 23→14, RÓJ wołany 93→82 — **11 krawędzi było raportowanych pod złym filarem**. Dołożony lek na KLASĘ: `tests/test_kontrakty_publiczne.py` (skan całego repo + jawna lista 13 plików długu, która ma maleć). **🚨 PRZY OKAZJI ZŁAPANE: zapis 5 klas do Księgi Wad, deklarowany w Dzienniku i w tym wierszu, NIGDY NIE NASTĄPIŁ** (0 wpisów z datą 2026-08-05; ostatni był z 08-03) — dopisane teraz, 159→164, potwierdzone odczytem z dysku. Naprawione (plik:linia sprzed naprawy): `dyrygent.py:344` odcisk przed `wskazniki.update(kontekst_dodatkowy)` · `descriptio.py:158` tautologiczna kontrola kompletności · `pamiec_absolutna.py:216` bump `sekwencja` przy stałym haszu · `descriptio.py:137` mapa `stem→filar` gubiąca kolizje · `conditor_lustri.py:173` import prywatnej `_stan_domkniety` | ✅ | Dwie pierwsze to ta sama ironia: naprawiłem bezpiecznik, który nie mógł się zapalić, i w tej samej wachcie zbudowałem **drugi taki sam** oraz jego **lustrzane odbicie** (zapala się zawsze). Klasa przeżyła naprawę, bo naprawiłem INSTANCJĘ, nie WZORZEC |
+| **0b** | **PIĘĆ BRAKUJĄCYCH FILARÓW + dwie wady mapy** — `INSTITUTIO` (uczenie), `FISCUS` (kapitał/ryzyko), `HARNESS` (7 hooków + 9 skilli), `ŚWIADECTWO` (187 plików testów), `FAMILIA` (Hyginus, TIRO). Do tego: DESCRIPTIO musi **deklarować swój zakres** i liczyć to, co poza nim; `scheduler.py` ma **0 wołaczy** | 🔴 | Znalezione w TRZECH przejściach pod różnym kątem — **każde coś dało**, więc nie mam podstaw twierdzić, że czwarte nic by nie dało. Wariant zatwierdzony przez Cezara: przypisania per-moduł + test istnienia pliku |
+| **M1** ⭐ | **25. WARSTWA AUDYTU — MARTWY KAPITAŁ** *(fitness function)*. Asercja o właściwości architektury, nie o funkcji: „moduł bez wołacza produkcyjnego I bez pomiaru, starszy niż N dni = CZERWIEŃ". Do tego `vulture` na 40 zmierzonych sierot. **Wchodzi RAZEM z antywskaźnikiem** — inaczej podniesie się dopisaniem pustego pomiaru do ledgera | 🔴 | **Najtańszy mechanizm z całego zwiadu (~3 h)**: ta sama forma co 24 istniejące warstwy, zero nowych zależności. Celuje wprost w Prawo XV: **40 organów zbudowanych, nigdy niewołanych i niezmierzonych** |
+| **M2** ⭐ | **KLASA WADY BEZ STRAŻNIKA BLOKUJE COMMIT** — każdy wpis Księgi Wad z ≥2 wystąpieniami musi mieć test odpowiadający na pytanie „czy ta klasa zostałaby DZIŚ złapana automatycznie"; brak → `/limes` blokuje, tak jak dziś blokuje dług honorowy. **To jest brakujący producent kryterium KLASY** w `conditor_lustri` | 🔴 | Celuje w **79% klas wad, które wróciły** (kontrakt 13×, testy 12×, pomiar 12×). Wzór: Google SRE error-budget policy — przekroczenie progu przez JEDNĄ klasę wymusza pozycję P0, nie jest opcją. ~4 h + ciągła dyscyplina |
+| **M3** ⭐ | **MUTATOR — organ dowodzący, że test UMIE ZAWIEŚĆ** (mutation testing próbkowany: 1 moduł na wachtę, rotacja, wynik do CODEX). **To jest brakujący producent kryterium KALIBRACJA** — kalibracja strażnika to pytanie „czy wykrywa, gdy psuję producenta" | 🔴 | **Zalążek ISTNIEJE**: dowód mutacyjny wachty 0a (8/8 wad wykrytych z asercji) — ale leży w katalogu tymczasowym, więc **jutro nie istnieje**. Celuje w to, że wady łapie recenzja (64), a nie testy (35). ~3 h + bieg w tle |
+| **1** | **BIBLIOTHECA ULPIA — domknięcie biblioteki** (a) 133 księgi poza RAG → zaindeksować, (b) **świeży bieg `aestimator.py`** — ile realnie ginie z tabel, wzorów i wykresów i w których pozycjach, (c) watchdog przyrostu ksiąg (dziś **żadna z 24 warstw audytu nie pilnuje ksiąg**) | 🔴 | **ROZKAZ CEZARA 2026-08-05: „najpierw musimy mieć najlepszą Bibliotekę Ulpia — nazwa zobowiązuje".** *Bibliotheca Ulpia* Trajana była największą biblioteką cesarstwa. Dopóki 133 z 248 ksiąg jest niewidzialnych, każdy zwiad czerpie z połowy zasobu |
+| **1b** | **Organy mają czytać LINKI, WYKRESY, TABELE i ZŁOŻONE WZORY** — dziś każda ścieżka ekstrakcji (`_pdf` PyMuPDF, OCR, epub/mobi/djvu/calibre) daje **płaski tekst**; struktura tabel, wzory i wykresy **nie są odzyskiwane przez ŻADNĄ z nich** | 🔴 | Rozkaz Cezara 08-05: *„aby nic nie ginęło, aby cała wiedza była w 100% zbadana, oceniona, porównana i wybrana"*. **Kolejność: najpierw pomiar AESTIMATOREM, potem wybór technologii** — struktura tabel ≠ wzory ≠ wykresy to trzy różne problemy o trzech różnych kosztach |
+| **2** | **LUDUS MAGNUS P1 — IC dla WSZYSTKICH 87 neuronów** (15 par 4h, walk-forward OOS, PBO/DSR od pierwszego biegu, wynik do CODEX) | 🔴 narzędzia istnieją | **Rozkaz Cezara 2026-08-05.** Ledger ma **4 wyniki IC na 87 neuronów** — skill ~95% roju nigdy nie zmierzony. Bez tego P2–P5 nie mają czego ważyć, a MEXC byłby hazardem |
+| **3** | **LUDUS MAGNUS P5 — wiarygodność źródeł MIERZONA** | 🔴 | `WIARYGODNOSC_ZRODEL` to 6 liczb wpisanych ręcznie; zgadywanie udające wiarygodność. Domyka też DOKTRYNĘ WIEDZY Cezara |
+| **4** | **LUDUS MAGNUS P3 — walidacja 20 strategii** (SZKIC → zmierzone, DSR+PBO) | 🔴 | MANIFEST sam mówi „status SZKIC — nie zwalidowane"; to najbliżej ostatecznej decyzji (U2) |
+| **5** | **Domknięcie pętli areny** — `ucz_mwu` stoi na `False`, bo zmierzono, że SZKODZI (−0,6/−0,5 pp, PBO ~0,6) | 🔴 | Arena osądza walki, a **werdykty nie zmieniają wag**. Warunek WSTĘPNY dla EDITOR MUNERIS, nie jego skutek |
+| **6** | **EDITOR MUNERIS** — organ układający program igrzysk (wizja Cezara 08-05) | 🔴 | Zasada nienaruszalna: liczba prób jest składnikiem werdyktu (DSR), budżet zamiast przeszukiwania wyczerpującego |
+| **7** | **Dwa organy blokujące ODMROŻENIE**: rejestr klas K1–K4 + rejestr kalibracji organów orzekających. **FORMĘ DOSTAŁY 2026-08-05 — to są M2 i M3** (sekcja „ZWIAD ZEWNĘTRZNY" niżej): rejestr klas = „klasa wady z ≥2 wystąpieniami musi mieć test-strażnika", rejestr kalibracji = MUTATOR | 🔴 | Jedyne dwa kryteria `CONDITOR LUSTRI` bez producenta — świecą NIE WIEM i **blokują pozycję 0**. Do 08-05 pozycja była NAZWANA BEZ FORMY: wiedzieliśmy, czego brakuje, nie wiedzieliśmy, jak to zbudować |
+| **8** | **A/B dla flagi `weryfikuj_integralnosc`** (D1.1) | 🔴 | Kod stoi opt-in OFF; LEX TALARUS zabrania ogłaszać działanie przed pomiarem |
+| **9** | **LUSTRATIO L3c** — strażnik pracy bez śladu w Dzienniku | 🔴 | Deklaracja w CLAUDE.md, implementacja ZERO; złapane na żywym przypadku |
+| **M4** | **WYNIK DOJRZAŁOŚCI PER MODUŁ + PRÓG CZASOWY** (0–4 zamiast globalnego %) wzorem OpenSSF Scorecard — liczony z sygnałów repo, bez recenzenta. Moduł poniżej 4/4 dłużej niż N dni → alarm audytu | 🔴 | Po M1–M3, bo bez nich podnosiłby się sam. **Wymaga antywskaźnika** — to jest miernik najłatwiejszy do oszukania z całej piątki. Punkt wyjścia: 24% modułów ma 4/4 |
+| **M5** | **EVALS `pass^k` dla organów orzekających** wzorem Anthropica (5–10 przypadków z Księgi Wad jako zadania; `pass@k` = udało się raz, `pass^k` = udaje się KONSEKWENTNIE). Bez modelu-sędziego — tylko code-based, koszt tokenów zero | 🔴 | Naturalne piętro nad M3 i wejście do LUDUS MAGNUS. **Nie teraz** — 6–10 h na pierwsze 10 modułów, a przedtem trzeba mieć M1, żeby eval sam nie stał się 41. sierotą |
+
+### 🐎 ZWIAD ZEWNĘTRZNY 2026-08-05 — jak INNI domykają cykl dojrzałości (pytanie Cezara)
+
+> **Pytanie Cezara (2026-08-05):** *„zastanawiam się, skąd te wszystkie błędy i powroty do
+> organów — musimy znaleźć przyczyny. Może dlatego, że nie mamy wzorców określających
+> postępowanie i brak dopełnienia etapów ewolucji danej kategorii inżynierii AI"* —
+> o **całość Imperium**, nie o sam kod.
+
+**POMIAR PRZED ZWIADEM** (bo diagnoza z opinii nie jest diagnozą). Zmierzone na 262 modułach
+— nazwa `baza` wyłączona jako niejednoznaczna, ta sama pułapka co wada nr 4 tej wachty:
+
+| co zmierzone | wynik |
+|---|---|
+| moduły z **pełnym cyklem 4/4** (test · wpięcie · pomiar w CODEX · opis w żywym dokumencie) | **24%** |
+| 3/4 · 2/4 · ≤1/4 | 48% · 18% · 9% |
+| moduły **bez ani jednego pomiaru** w `rejestr_testow.jsonl` | **72%** ← wąskie gardło |
+| moduły bez testów · bez opisu | 17% · 3% |
+| **organy bez wołacza produkcyjnego I bez pomiaru** (martwy kapitał, Prawo XV) | **40** |
+| klasy wad należące do kategorii, która wystąpiła **>1×** | **79%** (kontrakt 13×, testy 12×, pomiar 12×) |
+| kto łapie wady: **recenzja / testy** | **64 / 35** |
+
+> ⚠️ **Te liczby NIE MAJĄ PRODUCENTA W REPO** — policzył je skrypt wachty 0a, leżący
+> w katalogu tymczasowym. Dopóki **M1** nie powstanie, są prawdą **swojego dnia**, nie
+> liczbą żywą; za tydzień nikt ich nie odtworzy. To jest ta sama klasa co „liczba rosnąca
+> sama", tylko od drugiej strony — i dlatego M1 stoi wyżej niż M4, który by je ładnie pokazał.
+
+**WERDYKT ZWIADU (FRUMENTARIUS, Sonnet, 19 wywołań narzędzi):** hipoteza Cezara broni się
+**w połowie, i ta druga połowa jest ważniejsza**. Wzorzec ISTNIEJE — CURSUS PLENUS stoi
+w konstytucji. Czego nie ma, to **miernika dopełnienia i KONSEKWENCJI ograniczonej czasowo**.
+U innych działa nie lepszy opis, tylko konsekwencja wpięta w miernik: Google SRE — przekroczenie
+budżetu błędów przez jedną klasę → *production freeze* i obowiązkowe P0; OpenSSF Scorecard —
+wynik liczony z sygnałów repo bez recenzenta; Backstage/Cortex — niski wynik rodzi
+przypomnienie **z terminem**, nie liczbę w raporcie.
+
+**SPROSTOWANIE ARCHITEKTA DO MELDUNKU ZWIADOWCY (Prawo I — kandydat ≠ prawda):** zwiadowca
+napisał, że *„świadomie odcięliśmy miernik od egzekucji"*, powołując się na regułę „MATURITAS
+jest LUSTREM, NIE KIEROWNICĄ". **Zatarł różnicę.** Zakaz brzmi: *„nie wolno go wpiąć w ścieżkę
+decyzyjną ani w dobór wag"* — a ścieżka decyzyjna jest u nas zdefiniowana jako **wejście/wyjście
+z pozycji**. Bramka commita nią NIE JEST. Wpięcie miernika dojrzałości w `/limes` nie łamie
+zakazu Goodharta; wpięcie go w wagi neuronów — łamałoby. Realne ryzyko leży gdzie indziej:
+próg blokujący commit kusi, żeby podnosić wskaźnik zamiast naprawiać to, co mierzy — dlatego
+**każdy z tych mechanizmów wchodzi razem ze swoim antywskaźnikiem**.
+
+**ODKRYCIE, KTÓRE ZMIENIA PRIORYTET:** M2 i M3 to nie jest nowa praca obok planu — to jest
+**brakujący producent pozycji 7** (rejestr klas K1–K4 + rejestr kalibracji), która blokuje
+**pozycję 0** (bramka 7/7). Pozycja 7 była dotąd NAZWANA BEZ FORMY. Dlatego M1–M3 stoją
+w kolejce zaraz po 0b, a nie na końcu.
+
+**CO ZWIAD ODRZUCIŁ (z powodem, nie z gustu):**
+
+| odrzucone | powód |
+|---|---|
+| Spotify Backstage / Soundcheck, Cortex.io | platformy webowe z backendem — idea scorecardów TAK, produkt NIE (mamy „jeden lokalny skrypt-bramka") |
+| DORA Four Keys | mierzy częstość deployów; nie mamy CI/CD ani wielu wdrożeń tygodniowo — zła SKALA, nie zła idea |
+| chaos engineering (Chaos Toolkit, AWS FIS) | mierzyłby odporność systemu, który **nie ma jeszcze ani jednego realnego ordera** — odłożyć do zamkniętego obiegu P&L |
+| recenzja przez drugiego inżyniera (rdzeń PRR) | wykluczone naszym układem: jeden nietechniczny właściciel + jeden agent. Zastępują ją M1 i M3 |
+| Jira/Scrum Definition-of-Done | otoczka nieadekwatna; samą zasadę „checklista weryfikowana automatycznie" już mamy w 24 warstwach |
+
+**CZEGO ZWIAD NIE ZNALAZŁ (uczciwie zapisane — to jest część wyniku):**
+
+- **Zero prior artu dla układu „jeden nietechniczny właściciel + jeden agent AI pisze cały kod".**
+  Każde źródło (Google SRE, Cortex, Backstage, postmortem) zakłada ZESPÓŁ z rolami. Nikt nie
+  opisuje sytuacji, w której recenzent i autor to ten sam model w innej sesji.
+- **Brak benchmarku, z którym porównać nasze 24%** — branża używa poziomów (bronze/silver/gold),
+  nie odsetka „ile modułów przeszło WSZYSTKIE etapy". Pytanie „czy 24% to źle" **zostaje bez
+  zewnętrznego punktu odniesienia**.
+- **Liczby wydajności mutation testingu odrzucone przez samego zwiadowcę** („1200 mutantów/min",
+  „benchmark PyCon 2025") — bez wiarygodnego źródła, prawdopodobny artefakt sumaryzatora.
+  **Zmierzyć samemu przy M3, nie wierzyć.**
+- Brak literatury łączącej **wiek komponentu w chwili wykrycia wady** z jakimkolwiek standardowym
+  miernikiem. Nasza obserwacja (10 z 16 policzalnych wad w organie młodszym niż doba, mediana
+  0 dni — MAŁA PRÓBA) może być miarą własną. Warta rozwinięcia przy M4.
+
+**ŹRÓDŁA:** [Google SRE — Error Budget Policy](https://sre.google/workbook/error-budget-policy/) ·
+[OpenSSF Scorecard](https://scorecard.dev/) ·
+[Thoughtworks — fitness functions](https://www.thoughtworks.com/en-us/insights/articles/fitness-function-driven-development) ·
+[Anthropic — Demystifying evals for AI agents](https://anthropic.com/engineering/demystifying-evals-for-ai-agents) ·
+[mutmut](https://github.com/boxed/mutmut) · [cosmic-ray](https://github.com/sixty-north/cosmic-ray) ·
+[vulture](https://github.com/jendrikseipp/vulture) · [Hypothesis](https://hypothesis.readthedocs.io/)
+
+> 🐢 **DELIBERATIO OBOWIĄZUJE KAŻDĄ Z TYCH POZYCJI** (rozkaz Cezara 2026-08-05: *„zawsze musimy
+> sprawdzić dokładnie, powoli wszystko przed podjęciem decyzji"*). Przed startem M1–M5 — jak
+> przed każdym innym zadaniem — powstaje jawna analiza pięciu punktów: co robimy i czego to
+> dotyka · czego NIE WIEMY · czym zmierzymy i co uznamy za sukces · co może pójść źle i jak to
+> wykryjemy · czy to już istnieje. **Zapis w ROADMAP nie jest zgodą na budowę** — jest zapisem
+> kandydata. Kolejność wyżej to REKOMENDACJA Architekta, nie decyzja.
+
+### 📌 Co zostało po wachcie 2026-08-05 (stan zmierzony, nie deklarowany)
+
+**Zrobione tej wachty:** U1 `CONDITOR LUSTRI` ✅ · D1.1 `hash_ok` ✅ (opt-in OFF) · K1
+w MATURITASIE ✅ · dwie wady bramek (W6, W20) ✅ · LUDUS MAGNUS i EDITOR MUNERIS zapisane ·
+kolizja numeracji `D` → `Ł` naprawiona · cztery przeterminowane liczby w tym dokumencie
+zastąpione **wskazaniem producenta** (klasa „liczba rosnąca sama").
+
+**Otwarte pozycje wg sekcji (policzone z tabel niżej, nie z pamięci):**
+
+| sekcja | otwarte | uwaga |
+|---|---|---|
+| WACHTA F — adopcje i alarmy | **17** | największa kolejka; wymaga przesiania wg wagi |
+| WACHTA A — biblioteka | **12** | tu leży 133 księgi poza RAG (doktryna wiedzy) |
+| WACHTA H — domykanie pętli | **7** | |
+| LUSTRATIO L0–L3x | **7** | L4 zależy od kryteriów bramki wyjścia |
+| WACHTA G — dług recenzji | **6** | |
+| WACHTA C — kolejka Cezara | **5** | |
+| WACHTA Ł — łup | **5** | czeka na wynik LUDUS MAGNUS |
+| WACHTA E — dług techniczny | **4** | |
+| KORONY B/C/D | **3** | ⏸️ zamrożone do L4 |
+| WACHTA B — dług kalibracyjny | **3** | zasila kryterium KALIBRACJA bramki wyjścia — **realizuje to M3** |
+| MECHANIZMY M1–M5 (zwiad 08-05) | **5** | dopisane 2026-08-05; M2+M3 to producent pozycji 7 |
+
+> **Uczciwa uwaga o tej liczbie (rosnącej po dopisaniu M1–M5):** rośnie, bo mierzymy więcej, niż zamykamy —
+> i **spadek wskaźnika domknięcia po dopisaniu uczciwie nazwanego zadania jest ZDROWY**
+> (MATURITAS, antywskaźnik piętra LOOP). Wskaźnika **nie wpisujemy tutaj ręcznie**: liczy go
+> `python -m imperium.oczy.maturitas`.
+
+---
+
+## 📕 REJESTR DŁUGÓW — czego NIE USTALONO i NIE NAPRAWIONO (rozkaz Cezara 2026-08-04)
+
+> **Po co ta sekcja:** długi Imperium leżały rozsypane po ROADMAP, Księdze Wad, CODEX
+> i Dzienniku — widoczne pojedynczo, niewidoczne razem. Cezar zażądał **jednej listy
+> uporządkowanej wg ważności**. Kolejność jest REKOMENDACJĄ Architekta, nie alfabetem.
+> Każda pozycja ma **datę powstania długu** — bo dług, który nie starzeje się na widoku,
+> nie jest długiem, tylko notatką.
+>
+> **Rozróżnienie, które trzyma tę listę w ryzach:** *nie ustalono* = brak POMIARU (nie
+> wiemy, jak jest); *nie naprawiono* = wiemy dokładnie, co jest złe, i kod stoi nietknięty.
+> Mieszanie tych dwóch rzeczy jest tym, co pozwalało im obu wisieć.
+
+### 🔴 D1 — kod łamie spisane prawo (NAJWYŻSZY priorytet)
+
+| poz. | dług | zmierzone | od |
+|---|---|---|---|
+| **D1.1** ✅ | **SPŁACONE 2026-08-05** (19 dni długu). `policz_hash`/`zweryfikuj` + wypełnianie pola w `zapisz()`; w Dyrygencie literał zastąpiony `_integralnosc_wskaznikow()` — **opt-in OFF**, więc przy wyłączonej fladze ani jedna decyzja się nie zmienia. Dwie granice „braku dowodu" pilnowane testami: rekord bez hasza → `False`, weryfikacja bez odcisku → BRUDNE. **Czeka na A/B przed włączeniem.** Opis wady poniżej zostaje jako historia: ~~**Bramka integralności, która zawsze przepuszcza.** `dyrygent.py:961` podaje Hermesowi `hash_ok=True` **na sztywno**, a pole `hash_sha256` ma **ZERO przypisań** w całej bazie kodu. Prawo IX wymienia je jako OBOWIĄZKOWE → **kod łamie własne prawo**. Naprawa zmienia ścieżkę decyzyjną (Hermes zacznie oznaczać dane jako BRUDNE), więc wchodzi **opt-in OFF** — i wymaga **decyzji Cezara** ~~ | naprawione i otestowane 2026-08-05 | **2026-07-17** → spłacone po 19 dniach |
+
+### 🔴 D2 — mechanizm zadeklarowany, implementacja zerowa
+
+| poz. | dług | zmierzone | od |
+|---|---|---|---|
+| **D2.1** | **Strażnik pracy bez śladu** (= L3c). CLAUDE.md deklaruje „brak wpisu z dziś = czerwony alarm", grep po hookach/audycie/Dzienniku daje **ZERO** implementacji. Złapane na żywym przypadku: wachta wykonała pełną pracę, wpis nie powstał wcale, **żaden organ nie zauważył** | 2026-08-04 | 2026-06-28 (deklaracja) |
+| **D2.2** | **Klasa „cytat dosłowny KODU"** (= L3d). Dokument bywa wierny nie nazwie, lecz kodowi — żadne świadectwo oparte na symbolach tego nie widzi | 2026-08-04 | 2026-08-04 |
+
+### 🟡 D3 — niewiadome blokujące inne prace
+
+| poz. | niewiadoma | co blokuje | od |
+|---|---|---|---|
+| **D3.1** | **K10 — trafność RAG NIEZNANA.** QUAESITOR pobiegł raz, dał naprawę u źródła (recall@5 16,7 % → 80,0 % na ścieżce MCP), ale zbiór 30 pytań to **0,22 %** zawołań z indeksów | A6 (przepięcie na REDDITORA), prawo do słowa „najlepsza" w NORMIE, A14 (wektory) | 2026-07-30 |
+| **D3.2** | **Czy graf W8 pomaga przy DECYZJI.** `czytelnicy_przy_decyzji: 0`, `kto_przy_decyzji: NIKT` — 234 węzły i 1680 krawędzi karmią pamięć, nie wybór | całe piętro GRAPH stoi na 3/4; bez zbioru A10 nie ma na czym zrobić A/B | 2026-08-02 |
+| **D3.3** | **Precyzja bramki T3 DUBLET** (= L3e). T3 grupuje po `(kategoria, wlasciciel)` — pyta „czy dwa dokumenty wskazują ten sam plik", nie o podobieństwo treści | 10 werdyktów `dublet_rozstrzygniety`, świadomie niewpisanych (klasa K3) | 2026-08-04 |
+| **D3.4** | **LUSTRUM: 24 pozycje klasy ZBADAĆ** nigdy nie zweryfikowane pojedynczo; prawdę podstawową klasy WPIĄĆ ustalił **sam autor klasyfikatora** | wiarygodność wycofywania narzędzi | 2026-08-04 |
+| **D3.5** | **Narzut MCP niezmierzony** (MCP odroczone) | decyzja o soczewkach | 2026-07-15 |
+
+### 🔴 D4 — zapłacone i niewykorzystane (Prawo XV)
+
+| poz. | dług | liczba | od |
+|---|---|---|---|
+| **D4.1** | **Zwiad bez sędziego:** cząstki Hyginusa czekające na werdykt · wizje bez rozstrzygnięcia · sugestie otwarte w CODEX | 37 · 398 · 34 | narasta od 2026-07-21 |
+| **D4.2** | **Księgi poza RAG** (248 na dysku, 115 zaindeksowanych). Przyrost 40 pozycji z 01.08 przeszedł niezauważony — **żadna z 24 warstw audytu nie pilnuje ksiąg** | 133 | 2026-08-02 |
+| **D4.3** | **Otwieramy szybciej, niż zamykamy** — wąskie gardło piętra LOOP. Wskaźnika **nie wpisujemy tu ręcznie**: liczy go `python -m imperium.oczy.maturitas` (ta pozycja rozjechała się z prawdą w ciągu jednej wachty, zanim ktokolwiek zdążył ją przeczytać — dokładnie klasa „liczba rosnąca sama") | czytaj z MATURITASA | trwałe |
+| **D4.4** | **CLAUDE.md 308 linii** przy limicie doktrynalnym 200 — dług kontekstu płacony w KAŻDEJ sesji | +108 | trwałe |
+
+### 🔴 D5 — największa luka strategiczna
+
+| poz. | dług | zmierzone | od |
+|---|---|---|---|
+| **D5.1** | **Zero realnych orderów na MEXC.** PORTITOR melduje `MEXC✗`. Rój jest backtestowany, **nie wdrożony**; pętla P&L → wagi pozostaje NIEZAMKNIĘTA. Efekt latarni: mierzymy to, co tanie, bo drogie jest trudne | 2026-08-04 (hook) | od zawsze |
+| **D5.2** | **Dane rynkowe stare:** 1H sprzed 6,4 dnia, 4H sprzed 6,5 dnia. Nie blokuje pracy nad kodem i dokumentami — **blokuje każdy pomiar na żywych danych** | 2026-08-04 (PORTITOR) | bieżące |
+
+### ⏸️ D6 — odłożone ŚWIADOMIE, z powodem (nie milczeniem)
+
+| poz. | pozycja | powód odłożenia |
+|---|---|---|
+| **D6.1** | CUSTOS LIMINIS — treść heredoca czytana jak polecenie (= G7) | strażnik **ma rację**: zawartość heredoca JEST częścią komendy; naprawa wymagałaby osłabienia strażnika |
+| **D6.2** | Korony B / C / D | ZAMROŻENIE LUSTRATIO — to rozwój, a rozwój czeka na bramkę wyjścia L4 |
+
+> **Uczciwa uwaga o wadze tej listy:** pozycje **D1 i D3.1–D3.2** psują WNIOSKI — na ich
+> podstawie moglibyśmy orzec coś nieprawdziwego. Reszta to niedomknięte pętle: kolejka
+> rośnie, bo mierzymy więcej, niż zamykamy, i to jest stan **zdrowszy** niż cisza, choć
+> wygląda gorzej w tabeli. D1.1 było jedyną pozycją czekającą wyłącznie na słowo Cezara —
+> **słowo padło 2026-08-05 i dług został spłacony**; teraz czeka już tylko na A/B przed
+> włączeniem flagi, bo dotyka ścieżki decyzyjnej.
+
+---
+
+## 🧱 PIĘĆ BRAKUJĄCYCH FILARÓW IMPERIUM (zmierzone 2026-08-05, decyzja Cezara: DODAJEMY)
+
+> **Pytanie Cezara:** *„czy mamy wszystkie filary, czy jakiegoś brakuje?"* — a po pierwszej
+> odpowiedzi: *„sprawdź jeszcze raz, pod innym kątem, może czegoś nie mamy"*. **Trzy przejścia,
+> każde pod innym kątem, każde coś znalazło.** To jest najważniejszy wniosek metodyczny tej
+> wachty: **jedno spojrzenie na mapę nie wystarcza** — a skoro trzecie wciąż produkowało
+> znaleziska, nie wolno ogłaszać mapy za kompletną.
+
+### PRZEJŚCIE I — „funkcja rozrzucona po cudzych filarach, bez strażnika"
+
+| filar | moduły | dziś leżą w | strażnik |
+|---|---|---|---|
+| **INSTITUTIO — UCZENIE** (wynik → zmiana zachowania) | `hedge_mwu`, `igrzyska`, `notarius`, `schola`, `drift_adapter`, `optymalizator` | **2 filary** (WIEDZA + PRÓBA) | **żaden** |
+| **FISCUS — KAPITAŁ I RYZYKO** (ile stawiamy) | `kalkulator_lewara`, `praeda`, `sizing_przekonania`, `straznik_przewagi`, `aegis_tarcza`, `gubernator`, `aerarium` | **3 filary** (OBRONA + PRÓBA + DECYZJA) | **żaden** |
+
+**Dlaczego to nie kosmetyka:** filar bez granicy nie ma strażnika, więc nikt nie pyta o jego
+zdrowie JAKO CAŁOŚĆ. Dowód z tej samej wachty: filar WIEDZY **woła 3 / jest wołany 56**, a RÓJ
+**ani razu** nie sięga do WIEDZY — droga powrotna nie istnieje, **bo uczenie jest niczyje**.
+`ucz_mwu` stoi wyłączony od 2026-07-29 (zmierzono, że szkodzi) i od tamtej pory nienaprawiony.
+
+### PRZEJŚCIE II — „co leży POZA granicą pomiaru"
+
+W repo jest **467 plików `.py`**, a DESCRIPTIO liczy **270**. Poza mapą stoją: `tests/`
+(**187 plików / 3517 testów**), 7 hooków, 9 skilli, `skrypty/`, `wrzutnia/`.
+`archiwum/` (4) jest wykluczone **słusznie** — otwierane wyłącznie na rozkaz Cezara.
+
+| filar | co obejmuje | dlaczego jest filarem |
+|---|---|---|
+| **HARNESS — RYTM I ROZKAZY** | 7 hooków, 9 skilli, `settings.json`, SIGILLARIUM | **uruchamia CAŁE Imperium** — każda sesja zaczyna się od hooka. L2b orzekło o nim „✅ POTWIERDZONE, ❌ niemierzone"; teraz wiadomo DLACZEGO: leży poza granicą wszystkich liczników |
+| **ŚWIADECTWO — TESTY** | 187 plików, 3517 testów | Prawo XIX mówi, że nic nie istnieje bez kodu **i testów** — nośnik najważniejszego prawa był niewidoczny w mapie Imperium |
+
+> 🚨 **WADA W ORGANIE Z DNIA JEGO BUDOWY (klasa K2, moja własna):** DESCRIPTIO drukował
+> „✅ zero pominięć", licząc wyłącznie własny zakres. `census_organorum` ma
+> `KORZENIE = ("imperium", "narzedzia")` **bez jednego słowa uzasadnienia** — granica jest
+> CICHA, nie zadeklarowana. Zbudowałem organ przeciw tej klasie i sam w nią wpadłem.
+> **Naprawa:** organ ma jawnie deklarować zakres i **liczyć to, co poza nim**.
+
+### PRZEJŚCIE III — „co dzieje się bez Cezara" i „czyje ręce pracują"
+
+| znalezisko | pomiar | znaczenie |
+|---|---|---|
+| 🚨 **`imperium/drogi/scheduler.py` — ZERO wołaczy produkcyjnych** | 1 plik testów, zero użycia w kodzie | **Imperium nie ma autonomii w czasie** — nic nie dzieje się, dopóki Cezar nie otworzy sesji. Prawo XV: organ zapłacony i niewpięty. Pętle ciągłe UMIEMY (`live_monitor`, `webhook_tradingview` są wpięte w `petla_live`) — brakuje **wyzwalacza**, nie pętli |
+| **FAMILIA — SŁUDZY** | `bibliotekarz.py` (XI), `deepseek_glos.py` (V), `notarius.py` (I), silnik TIRO w `C:\TIRO` **poza repo** | siła robocza Imperium rozrzucona po **3 filarach**, a jej silnik leży poza repozytorium. BREVIARIUM ich raportuje, ale **raport to nie opieka**. Nazwa z *familia Caesaris* — personel administracyjny, który realnie prowadził rzymskie Imperium |
+
+### Nazwy i sposób wdrożenia
+
+*institutio* = kształcenie (Kwintylian, *Institutio Oratoria*) · *fiscus* = prywatny skarbiec
+cesarza (odróżniany od państwowego *aerarium*) · *familia Caesaris* = personel cesarski.
+Sprawdzone: żadna nie koliduje z organem ani kategorią dokumentu (`DISCIPLINA` odpadła — jest
+już kategorią w TABULARIUM).
+
+**Wariant WYBRANY PRZEZ CEZARA:** przypisania **per-moduł** w `DESCRIPTIO` jako jawne wyjątki od
+reguły katalogowej, **z testem pilnującym, że każdy wymieniony plik istnieje** (ten sam mechanizm,
+którym organ broni się przed strażnikami-widmami). Tanie i odwracalne, nie dotyka ani jednego
+importu. **Odrzucone świadomie:** przenoszenie plików do nowych katalogów — taksonomicznie
+czystsze, ale dotyka importów przy 265 modułach i 3517 testach.
+
+---
+
+## 🏟️ LUDUS MAGNUS — SZKOŁA GLADIATORÓW (ROZKAZ CEZARA 2026-08-05)
+
+> **Rzymski *Ludus Magnus* stał tuż przy Koloseum: gladiator nie wchodził na arenę,
+> dopóki nie przeszedł szkoły.** Cezar odrzucił podpięcie MEXC pytaniem, na które nie
+> mieliśmy odpowiedzi: *„skąd wiemy, czy neurony są dobrze zbudowane i czy głosują dobrze?
+> Kto im dał wzorce? Skąd wiemy, że legiony są zdrowe i że ostateczna decyzja jest właściwa,
+> skoro strategie mamy tylko w szkicach?"* — **mamy 15 par z kilku lat i 63 pliki CSV**
+> (4h · 15m · 5m · godzinowe · dzienne · minutowe), więc rój szkolimy i mierzymy na historii.
+
+**Zmierzone 2026-08-05, gdy padły te pytania:**
+
+| pytanie Cezara | co odpowiada KOD |
+|---|---|
+| „czy głosują dobrze" | ledger ma **4 wyniki IC na 87 neuronów** — skill ~95% roju nigdy nie zmierzony |
+| „kto nimi steruje" | wagi reżimowe **wpisane ręcznie**; jedyny mechanizm uczenia (`ucz_mwu`) zmierzony jako **SZKODLIWY** i wyłączony |
+| „czy strategia właściwa" | MANIFEST sam mówi: 20 strategii, **„status SZKIC — przepisy, nie zwalidowane"** |
+| „czy skalibrowane" | kryterium KALIBRACJA w CONDITOR LUSTRI świeci **NIE WIEM** — rejestr nie istnieje |
+| „ocena źródeł news" | `WIARYGODNOSC_ZRODEL` to **6 liczb wpisanych ręcznie** — zgadywanie udające wiarygodność |
+
+### Kolejność ZATWIERDZONA PRZEZ CEZARA: **P1 → P5 → P3**
+
+> ⚠️ **LISTA OTWARTA (Cezar 2026-08-05: „ludus magnus później będziemy rozbudowywać jeszcze").**
+> Poniższa tabela to **szkielet startowy, nie komplet** — kolejne etapy DOPISUJEMY, nie
+> zastępujemy istniejących. Kolejność P1→P5→P3 obowiązuje, dopóki Cezar jej nie zmieni.
+
+| # | etap | odpowiada na pytanie | narzędzie |
+|---|---|---|---|
+| **P1** | **IC dla WSZYSTKICH 87 neuronów** — 15 par 4h, walk-forward OOS, wynik do CODEX | „czy głosują dobrze" | `narzedzia/raport_ic.py`, `narzedzia/walk_forward_ic.py` — **istnieją, użyte 4×** | 
+| **P5** | **Wiarygodność źródeł MIERZONA** — 6 ręcznych liczb → skuteczność na historii (czy ostrzegało i z jakim wyprzedzeniem) | lista zaufanych źródeł | NEWS-05 + archiwum kanałów |
+| **P3** | **Walidacja 20 strategii** — SZKIC → zmierzone | „czy strategia właściwa" | backtest + DSR + PBO |
+| P2 | Dekorelacja całego roju (martwe głosy, dublety) | „czy legiony zdrowe" | `diagnostyka_korelacji` (Prawo XVI) |
+| P4 | Rejestr kalibracji (organ bez wpisu = nieskalibrowany) | domyka bramkę wyjścia | — |
+| P6 | **MEXC dopiero na końcu**: paper → grosze → skala | | |
+
+### 🎪 EDITOR MUNERIS — organ układający PROGRAM igrzysk (wizja Cezara 2026-08-05)
+
+**Słowa Cezara:** *„musimy mieć organ, który będzie nam wymyślał najlepsze testy, wymyślne
+igrzyska — będzie poddawał próbom wszystkie bary, różne interwały na różnych parach, wszystkie
+możliwe neurony w różnych ustawieniach: pojedynczo, w parach, i również strategie; wymyślał
+najlepsze miksy. I za każdym razem system, dzięki najlepszym systemom anty-przeuczenia, będzie
+się sam uczył. A gdy zbudujemy największą bibliotekę wiedzy — będzie z niej czerpał do nauki."*
+
+**Nazwa (ZASADA NOMENKLATURY):** rzymski *editor muneris* układał PROGRAM igrzysk i decydował
+o parach gladiatorów — nie walczył i nie sędziował. Trening i rankingi mamy w `igrzyska.py`
+(LANISTA), sędziowanie w `walidacja.py`; brakuje **tego, kto decyduje, kto z kim staje**.
+
+> 🔒 **ZASADA NIENARUSZALNA — LICZBA PRÓB JEST SKŁADNIKIEM WERDYKTU, NIE JEGO TŁEM.**
+> „Wszystkie możliwe ustawienia" jest niewykonalne kombinatorycznie (same pary z 87 neuronów
+> to **3 741 kombinacji × ~90 zbiorów** par/interwałów ≈ **337 tys. biegów**), ale groźniejsze
+> jest co innego: **im więcej prób, tym pewniejsze, że najlepszy wynik jest dziełem przypadku.**
+> Deflated Sharpe Ratio istnieje dokładnie po to — deflacja NALEŻY do liczby prób. Organ
+> przeszukujący bez budżetu i bez zapisu liczby prób **unieważnia własne wyniki**.
+
+**Konstrukcja wynikająca z tej zasady:** sekwencyjny **plan doświadczeń z budżetem prób**
+zamiast przeszukiwania wyczerpującego · każda próba w ledgerze append-only · licznik prób
+**zasila DSR/PBO** · purged-CV od pierwszego biegu · wiedza z biblioteki wchodzi jako
+**priorytet kolejnych prób** (co sprawdzić najpierw), nigdy jako uzasadnienie wyniku.
+
+**Warunek wstępny, nie skutek:** pętla areny jest dziś ROZWARTA (`ucz_mwu = False`, bo
+zmierzono, że SZKODZI: −0,6/−0,5 pp, PBO ~0,6). EDITOR MUNERIS bez domkniętej pętli do wag
+będzie produkował rankingi, których nikt nie skonsumuje — czyli powtórzy stan obecny, tylko drożej.
+
+> ⚠️ **ZASTRZEŻENIE OBOWIĄZUJĄCE OD PIERWSZEGO BIEGU P1:** arena strojona wielokrotnie na
+> tych samych 15 parach zaczyna mierzyć **własne dopasowanie, nie rynek**. PBO, DSR
+> i purged-CV chodzą **od początku**, nie na końcu — inaczej zbudujemy arenę, która
+> wygrywa wyłącznie z przeszłością.
+
+> 📕 **KLASA WADY ZNALEZIONA PRZY OKAZJI:** **U2** niżej nakazuje „kolejność wg RYZYKA, nie
+> alfabetu — najpierw ścieżka decyzyjna, potem przyrządy orzekające, **na końcu dokumentacja**".
+> Trzy wachty z rzędu robiły dokumenty i bramki, czyli **ostatnią pozycję tej listy**. Rozkaz
+> Cezara nie zmienia kursu — **przywraca kolejność, którą sami zapisaliśmy i której nie
+> wykonywaliśmy**.
+
 ---
 
 ## 🧹 LUSTRATIO IMPERII — WIELKI PRZEGLĄD (ROZKAZ STAŁY — Cezar 2026-08-04)
 
-> ### ⛔ ZAMROŻENIE ROZWOJU
-> **Dopóki Imperium nie będzie W PEŁNI SKALIBROWANE i w pełni zgodne z zasadami
-> i prawem Imperium — NIE RUSZAMY DALEJ.** Żadnych nowych zdolności, żadnych nowych
-> kierunków. Wolno budować **wyłącznie to, co zamyka wykrytą lukę** albo to, co jest
-> potrzebne, by lukę ZMIERZYĆ.
+> ### ✅ ZAMROŻENIE ZDJĘTE 2026-08-05 — zastąpione rozkazem DELIBERATIO
+> **Cezar:** *„odmrażam oficjalnie, to nic nie daje — tylko teraz, zanim coś zrobimy,
+> musimy dokładnie to przeanalizować: każde zadanie wolniej, ale dokładniej."*
+> **Zdjęte DECYZJĄ, nie spełnieniem kryteriów** — `conditor_lustri` świecił wtedy
+> 2 spełnione / 2 niespełnione / 3 NIE WIEM. Organ zostaje **miernikiem zdrowia**,
+> przestaje być blokadą; kryteria bez producenta **nadal są długiem**.
+> Ograniczeniem nie jest już TEMAT zadania, lecz **głębokość jego analizy** (`CLAUDE.md § DELIBERATIO`).
+> Powód: zamrożenie nie zapobiegło ANI JEDNEJ z wad złapanych 2026-08-05 — wszystkie
+> wzięły się z pośpiechu WEWNĄTRZ dozwolonego zadania, nie z niedozwolonego tematu.
+>
+> *Poniższa treść zostaje jako zapis powodu i przebiegu przeglądu — LUSTRATIO trwa jako
+> program porządkowy, przestaje być zakazem.*
 
 **Słowa Cezara (2026-08-04):** *„jabłko psuje się od środka, a ryba od głowy — dlatego
 nie możemy pozwolić, aby nasze Imperium było robaczywe i zepsute w żadnej z warstw."*
@@ -55,14 +404,17 @@ a milczenie czytamy jako zieleń.** To jest robactwo, o którym mówi rozkaz.
 
 | # | Etap | Stan |
 |---|---|---|
-| L0 | **LUSTRUM** — dokończyć: testy + kalibracja progu na prawdzie podstawowej | 🟡 kod stoi, brak testów i kalibracji |
+| L0 | **LUSTRUM** — testy ✅ (24 w `tests/test_lustrum.py`) i kalibracja ✅ (pięć świadectw zamiast jednego sygnału). **Zostaje granica kalibracji (= D3.4):** prawdę podstawową klasy WPIĄĆ ustalił sam autor klasyfikatora (klasa K3), a 24 pozycje klasy ZBADAĆ nie były weryfikowane pojedynczo. ⚠️ Ten wiersz mówił „brak testów i kalibracji" jeszcze 2026-08-05, gdy jedno i drugie istniało od doby — **dokument o przeglądzie gnicia sam zgnił**, złapane przez CONDITOR LUSTRI | 🟡 granica kalibracji |
 | L1 | **TABULARIUM — MECHANIZM** ✅ (2026-08-04): błędy **23 → 0**. Naprawiona sprzeczność „`—` znaczy brak, a bramka żąda wartości"; nowe bramki **T1b** (właściciel albo jawny `bez_wlasciciela`, z zakazem wyciszania dla TABULA/FORMA/MENSURA), **T2b** (zegar 90 dni dla dokumentów bez właściciela — brak kodu ≠ brak kontroli) i **filtr gita** (plik spoza kontroli wersji nie jest dokumentem Imperium, Prawo XIX). 22 dokumenty uporządkowane, właściciel-widmo `schola` naprawiony, +10 testów | ✅ |
 | L2 | **Przegląd WSZYSTKICH organów** wg kategorii, wykonalności, zadań, piętra ewolucji i **wzajemnej współpracy** — checklisty kontrolne per kategoria. Wchodzi tu **L2a** (mapa współpracy) i **L2b** (taksonomia pięter — WYKONANE) | 🟡 w toku |
-| **L3** | **PRZEGLĄDY TREŚCI — ZACZĘTE OD KALIBRACJI PRZYRZĄDU** (2026-08-04, decyzja Cezara „wg rekomendacji"). Zamiast odhaczać 26 pozycji po kolei, **zmierzono najpierw sam sygnał** na zamrożonej próbce 6 (ziarno 20260804, etykiety z pełnej treści + diffów): **precyzja werdyktu 33%** (2/6), **precyzja przyczyny 0/6**. Oba prawdziwe gnicia brały się z **liczb rosnących SAME** (fragmenty RAG, sesje kroniki) — niewidzialnych dla bramki opartej na commitach. **Zrobione:** naprawa u źródła (klucz `sesje_kroniki` + `sesje_w_kronice()`, zaszyte liczby → znaczniki W15) w MAPA_PAMIECI i PLAN_TIRO; **drugie świadectwo** `python narzedzia/tabularium.py swiadectwa` dzieli 26 alarmów na **9 MOCNYCH / 17 SŁABYCH** (zgodność z próbką 6/6, próg pospolitości <5 plików). **Zostaje:** 7 przeglądów MOCNYCH + 11× T3 DUBLET + 17 SŁABYCH okazjonalnie | 🟡 **przyrząd skalibrowany, kolejka posortowana** |
-| L3a | **Limit drugiego świadectwa — nagłówek hunka podaje KLASĘ** (zmierzone 2026-08-04): `git show` opisuje hunk najbliższym nagłówkiem na lewym marginesie, więc zmiana METODY raportuje się jako `class Legatus`. Nazwa klasy jest cytowana w każdym dokumencie o module → fałszywe MOCNE. Dotknięte ~4 z 9 (GENERAL_LEGATUS — nie ma ani jednego zdania o tym, co się zmieniło; IGRZYSKA, KALKULATOR_LEWARA, PAMIEC_ABSOLUTNA). Wariant „bez klas z hunka" przygotowany, **NIEZMIERZONY** — nie ogłaszać działającym (LEX TALARUS) | 🔴 **następne zadanie** |
+| **L3** | **PRZEGLĄDY TREŚCI — ZACZĘTE OD KALIBRACJI PRZYRZĄDU** (2026-08-04, decyzja Cezara „wg rekomendacji"). Zamiast odhaczać 26 pozycji po kolei, **zmierzono najpierw sam sygnał** na zamrożonej próbce 6 (ziarno 20260804, etykiety z pełnej treści + diffów): **precyzja werdyktu 33%** (2/6), **precyzja przyczyny 0/6**. Oba prawdziwe gnicia brały się z **liczb rosnących SAME** (fragmenty RAG, sesje kroniki) — niewidzialnych dla bramki opartej na commitach. **Zrobione:** naprawa u źródła (klucz `sesje_kroniki` + `sesje_w_kronice()`, zaszyte liczby → znaczniki W15) w MAPA_PAMIECI i PLAN_TIRO; **drugie świadectwo** `python narzedzia/tabularium.py swiadectwa` dzieli 26 alarmów na **9 MOCNYCH / 17 SŁABYCH** (zgodność z próbką 6/6, próg pospolitości <5 plików). **Kalibracja II (L3a, ten sam dzień)** przeetykietowała wszystkie MOCNE prawdą podstawową i wymieniła mechanizm — dziś **4 MOCNE / 20 SŁABYCH** z 24. **Zostaje:** 4 przeglądy MOCNYCH + 11× T3 DUBLET + 20 SŁABYCH okazjonalnie | 🟡 **przyrząd skalibrowany dwukrotnie, kolejka posortowana** |
+| L3a | **Limit drugiego świadectwa — nagłówek hunka podawał KLASĘ** ✅ (zmierzone i domknięte 2026-08-04, kalibracja II). Prawda podstawowa dla **wszystkich 7 MOCNYCH** (dokument w całości + realny diff): realnie kłamały **2** — PLAN_DEEPSEEK (sygnatura `zapytaj` bez 4 parametrów DISPENSATORA) i PAMIEC_ABSOLUTNA (cytat `f"{data}_{symbol}_…"` przy sanityzowanym symbolu); oba naprawione. **Kandydat B („hunk bez `class`") ODRZUCONY POMIAREM** — kupował +5 pp precyzji za **połowę recallu**; wariant C dał wynik identyczny z B, bo w populacji nie ma ani jednego `diff-class`, więc dane tego wyboru **nie rozstrzygają**. Wdrożony **wariant D**: z hunka bierzemy NUMER LINII i szukamy definicji, która ją obejmuje. Efekt: 7 → **4 MOCNE**, przyczyna wreszcie wskazuje sprawcę (`policz` zamiast `KalkulatorLewara`, `zapytaj` zamiast `GlosImperium`), **żaden SŁABY nie awansował** (D ⊂ A, zero nowego szumu). Koszt biegu 40 s → **97 s** (świadomie poza audytem). +5 testów granic | ✅ |
+| L3a2 | **Druga runda tej samej kalibracji: BLOKI KODU też są cytowaniem** ✅ (2026-08-04). `_symbole_cytowane` czytało wyłącznie backticki inline, a dokumenty pokazują REALNE API w blokach ```` ```python ````. Złapane na żywym przypadku: `MANUAL_UZYTKOWNIKA` uczy wywołania `raport_waznosci(sygnaly, wyniki)`, które od `8561bc6` **rzuca `ValueError`** przy nierównych seriach — nazwa stała tylko w bloku, więc manual uczący wywołania, które wybucha, przechodził jako SŁABY. Zmierzone na populacji 23: precyzja **3/7** wobec 2/4 bez bloków (różnica w granicach szumu przy tej próbie), ale **recall 3/3** wobec 2/3 — dla narzędzia PRZEGLĄDU właściwy kierunek, bo fałszywka kosztuje minutę czytania, a przeoczenie kosztuje kłamiący manual. +2 testy granic | ✅ |
+| L3e | **T3 DUBLET — bramka BEZ prawdy podstawowej** (obserwacja zmierzona 2026-08-04, do rozstrzygnięcia). T3 grupuje po `(kategoria, wlasciciel)`, czyli pyta „czy dwa dokumenty wskazują ten sam plik" — **nie o podobieństwo treści**. Na 10 zgłoszeniach: `rejestr.py` łączy README (1 wzmianka), INDEKS (10), MANIFEST (2), MAPA_KLUCZY (2) — cztery różne przekroje; **9 z 12 dokumentów w zgłoszonych grupach otwiera `powod_istnienia` słowem „Jedyny/Jedyne"**. Precyzja T3 jest **NIEZNANA** — nie odhaczamy 10 werdyktów `dublet_rozstrzygniety`, bo to wyciszenie pisane przez autora dokumentu (klasa K3: piszący decyduje o własnej prawdzie), i po nim alarm znika na zawsze. **Do zrobienia najpierw:** kalibracja jak przy T2 — prawda podstawowa z porównania TREŚCI o wspólnym pliku | 🔴 |
+| L3d | **Klasa nieobjęta ŻADNYM świadectwem: CYTAT DOSŁOWNY KODU** (wykryta pomiarem 2026-08-04). Dokument bywa wierny nie NAZWIE, lecz kodowi — `PAMIEC_ABSOLUTNA.md` podawała `f"{data}_{symbol}_{typ.lower()}.jsonl"`, gdy kod od 2026-07-29 sanityzuje symbol, a rozjazd siedzi w prywatnej `_sciezka`, której dokument nie wymienia z nazwy. **Żaden wariant oparty na symbolach tego nie złapie**; wariant sprzed kalibracji II „trafiał" ten przypadek wyłącznie przez nazwę klasy, czyli z tautologii — utrata tego trafienia jest uczciwsza niż fałszywa zasługa. **Do zbudowania:** świadectwo pytające, czy fragment kodu cytowany w backticku/bloku nadal występuje dosłownie w pliku-właścicielu | 🔴 |
 | **L3c** | 🚨 **STRAŻNIK PRACY BEZ ŚLADU — dziura międzyorganowa** (rozkaz Cezara 2026-08-04: *„musimy mieć zabezpieczenie i weryfikowanie takiej sytuacji, któryś organ musi to wykrywać"*). **Zmierzone tego samego dnia na żywym przypadku:** wachta wykonała pełną pracę w kodzie, a wpis do Dziennika **nie powstał wcale** (komenda padła przed zapisem) — i **żaden organ tego nie zauważył**. CLAUDE.md **deklaruje** „Brak wpisu z dziś = czerwony alarm w podsumowaniu startowym", ale grep po hookach, audycie i Dzienniku daje **ZERO** implementacji: hook startowy woła tylko `dziennik_niesmiertelny nastepny` (drukuje następny krok, nie sprawdza czy poprzedni wpis istnieje). EXACTOR świadomie tego nie bada, bo jego komentarz mówi, że „bramkę, Dziennik i commit sprawdza bramka i audyt" — a **audyt tego nie sprawdza**. Klasyczne K2 (milczenie czytane jako zieleń) + przekazanie odpowiedzialności organowi, który jej nie przyjął. **Do zbudowania:** warstwa audytu / krok hooka porównujący commity wachty z ostatnim wpisem Dziennika — commit merytoryczny bez wpisu = alarm | 🔴 **P0 następnej wachty** |
 | L3b | **Uzupełnienie pozostałych wykrytych braków i luk** — dopiero po komplecie pomiarów | 🔴 |
-| L4 | **Bramka wyjścia** — zdjęcie zamrożenia (wymaga U1: mierzalnego warunku) | 🔴 |
+| L4 | **Bramka wyjścia** ✅ *(zamrożenie zdjęte decyzją Cezara 2026-08-05, przy CZERWONEJ bramce — patrz ramka wyżej)*. **U1 WYKONANE 2026-08-05**: organ `CONDITOR LUSTRI` (`python -m imperium.pretorianie.conditor_lustri --bramka`, 7 kryteriów, +18 testów) zamienia „w pełni skalibrowane" w exit code. Pierwszy pomiar: **1 spełnione / 3 niespełnione / 3 NIE WIEM**. Sam etap L4 domknie się dopiero przy exit 0 — i **zdejmuje zamrożenie CEZAR, nie organ** | 🔴 bramka istnieje, świeci czerwono |
 
 ### Co sprawdzamy przy KAŻDYM organie (checklista bazowa)
 
@@ -159,9 +511,14 @@ Zmierzone 2026-08-04 (import z drzewa składniowego, nie regex): **261 organów,
 
 Rozkaz kazał sprawdzić, czym go uzupełnić. Siedem pozycji, każda z powodem:
 
-- **U1 — MIERZALNY WARUNEK WYJŚCIA.** „W pełni skalibrowane" bez liczby jest stanem
-  niefalsyfikowalnym: zamrożenie albo nigdy się nie skończy, albo skończy się arbitralnie.
-  Potrzebna JEDNA bramka zwracająca exit 0 dopiero przy komplecie kryteriów.
+- ✅ **U1 — MIERZALNY WARUNEK WYJŚCIA (WYKONANE 2026-08-05).** „W pełni skalibrowane" bez
+  liczby jest stanem niefalsyfikowalnym: zamrożenie albo nigdy się nie skończy, albo skończy
+  się arbitralnie. Zbudowany organ **CONDITOR LUSTRI** — jedna bramka, exit 0 dopiero przy
+  komplecie siedmiu kryteriów, `NIE WIEM` blokuje tak samo jak `NIE`.
+  **Dwa kryteria nie mają jeszcze producenta i to one są realnym warunkiem odmrożenia:**
+  rejestr klas K1–K4 (czy lek WDROŻONY, nie tylko nazwany) i rejestr kalibracji organów
+  orzekających. Ocena ryzyka przekazana Cezarowi: groźniejsze od przedwczesnego odmrożenia
+  jest zamrożenie bez licznika — po jego drugiej stronie leży D5.1 (zero realnych orderów).
 - **U2 — KOLEJNOŚĆ WG RYZYKA, NIE ALFABETU.** „Ryba psuje się od głowy" — głową jest to,
   co decyduje o kapitale. Najpierw ścieżka decyzyjna (wejście/wyjście z pozycji), potem
   przyrządy orzekające, na końcu dokumentacja.
@@ -519,21 +876,27 @@ Zmierzone 2026-07-29: **47 organów orzekających, 11 bez testu kalibracyjnego.*
 
 | # | Zadanie | Stan |
 |---|---|---|
-| C1 | **Sąd nad 35 cząstkami Hyginusa** (kolejka 44, osądzonych 8) | 🟡 narzędzie jest, plon czeka |
+| C1 | **Sąd nad cząstkami Hyginusa** — stan kolejki czytaj z `python -m imperium.oczy.breviarium`; liczb NIE wpisujemy tu ręcznie, bo „kolejka 44 / osądzonych 8” rozjechało się w kilka dni (klasa „liczba rosnąca sama”) | 🟡 narzędzie jest, plon czeka |
 | C2 | **ESSENTIA** — esencja = falsyfikowalna hipoteza, nie streszczenie | 🔴 kod nie istnieje |
 | C3 | **Rejestr książka→moduł→werdykt** wg McLean-Pontiff (IC przed/po wdrożeniu) | 🔴 **brak prior artu — definiujemy sami** |
-| C4 | **TIRO E3** — 229/1000 par użytecznych (23% progu) | 🟡 w toku |
+| C4 | **TIRO E3** — postęp par użytecznych wobec progu 1000 czytaj z `python -m imperium.oczy.breviarium` (wpisane tu „229/1000” było już nieaktualne) | 🟡 w toku |
 | C5 | **INGENIUM** — IQ Imperium w 7 kategoriach | 🔴 projekt w docs, kod nie istnieje |
 
-### WACHTA D — fronty, które decydują o ŁUPIE (nie o wiedzy)
+### WACHTA Ł — fronty, które decydują o ŁUPIE (nie o wiedzy)
+
+> 🔤 **Przemianowana z „WACHTA D” 2026-08-05:** prefiks `D` znaczył w tym samym
+> dokumencie DWIE różne rzeczy — pozycje tej wachty i pozycje REJESTRU DŁUGÓW
+> (D1.1 = `hash_ok`, D1 = MEXC). Dwa znaczenia jednego klucza w jednym dokumencie
+> to ta sama klasa co dwa organy liczące ten sam fakt (K1): rozjazd jest niewidoczny,
+> dopóki ktoś nie zacytuje „D1” i nie trafi w drugie znaczenie.
 
 | # | Zadanie | Stan | Uwaga |
 |---|---|---|---|
-| D1 | **JEDEN zamknięty obieg na realnych groszach (MEXC)** | 🔴 `MEXC_API_KEY` brak | **zero prawdziwych wypełnień w historii Imperium** — poślizg i prowizja są ZAŁOŻONE, nie zmierzone. Decyzja kapitałowa = wyłącznie Cezar |
-| D2 | **Świeżość danych** — dryf 1D **41,5 dnia**, 1m 9,3 dnia | 🔴 zmierzone, niezałatane | rój głosuje na nieświeżych danych |
-| D3 | **Kalibracja kosztu egzekucji na realnych fillach** | 🔴 | zależy od D1. **Zwiad 07-30 (SaR 2603.09164, Sepper/ex-Gauntlet) NIE domyka D3** — mierzy poślizg **likwidacji po stronie giełdy** (wielkość funduszu ubezpieczeniowego, wymogi kapitałowe), a nie to, ile zje NASZE małe zlecenie; **2 z 4 jego wejść są dla nas nieosiągalne** (pełne migawki L2 ≥1/min — mamy zero; atrybucja na poziomie kont — dostępna „on fully on-chain DEXs", a MEXC jest scentralizowana). Co się przenosi: forma `S ∝ 1/L` i legitymizacja **poślizgu ZALEŻNEGO OD STANU** zamiast stałej założonej. Odłożone do dnia wpięcia L2 |
-| D4 | **Poślizg zależny od stanu zamiast stałej** — funkcja mierzalnych zmiennych (zakres, wolumen, zmienność) | 🔴 | Dziś poślizg i prowizja są **ZAŁOŻONE**, więc mogą odwracać znak wyniku strategii. Nie wymaga L2: nawet zgrubna funkcja tego, co mierzymy, jest **ściśle lepsza od stałej**. Prior art do wzięcia: warstwowe modele wypełnienia z `nautilus_trader` (poz. 5 zwiadu 07-29 — głębokość symulowana **z samego wolumenu świecy**) |
-| D5 | **DR-OPE — oszacowanie zwrotu polityki BEZ realnych zleceń** | 🔴 | Z Atkinsona: *Doubly Robust Off-Policy Evaluation*, nieobciążony estymator oczekiwanego zwrotu, wagi IPS obcinane. **Odblokowuje pomiar tam, gdzie D1 stoi na braku kluczy MEXC i decyzji kapitałowej Cezara** — polityki nie trzeba wdrożyć, żeby oszacować jej zwrot. Do tego z tego samego źródła: **Temporal Degradation** (nachylenie wierności względem czasu) — mamy Prawo XXIII o trafności per reżim, ale **nachylenia nie liczymy** |
+| Ł1 | **JEDEN zamknięty obieg na realnych groszach (MEXC)** | 🔴 `MEXC_API_KEY` brak | **zero prawdziwych wypełnień w historii Imperium** — poślizg i prowizja są ZAŁOŻONE, nie zmierzone. Decyzja kapitałowa = wyłącznie Cezar |
+| Ł2 | **Świeżość danych** — dryf per interwał melduje PORTITOR na starcie sesji; liczb nie wpisujemy ręcznie, bo wartości z 07-29 zdążyły się przeterminować | 🔴 zmierzone, niezałatane | rój głosuje na nieświeżych danych |
+| Ł3 | **Kalibracja kosztu egzekucji na realnych fillach** | 🔴 | zależy od Ł1. **Zwiad 07-30 (SaR 2603.09164, Sepper/ex-Gauntlet) NIE domyka D3** — mierzy poślizg **likwidacji po stronie giełdy** (wielkość funduszu ubezpieczeniowego, wymogi kapitałowe), a nie to, ile zje NASZE małe zlecenie; **2 z 4 jego wejść są dla nas nieosiągalne** (pełne migawki L2 ≥1/min — mamy zero; atrybucja na poziomie kont — dostępna „on fully on-chain DEXs", a MEXC jest scentralizowana). Co się przenosi: forma `S ∝ 1/L` i legitymizacja **poślizgu ZALEŻNEGO OD STANU** zamiast stałej założonej. Odłożone do dnia wpięcia L2 |
+| Ł4 | **Poślizg zależny od stanu zamiast stałej** — funkcja mierzalnych zmiennych (zakres, wolumen, zmienność) | 🔴 | Dziś poślizg i prowizja są **ZAŁOŻONE**, więc mogą odwracać znak wyniku strategii. Nie wymaga L2: nawet zgrubna funkcja tego, co mierzymy, jest **ściśle lepsza od stałej**. Prior art do wzięcia: warstwowe modele wypełnienia z `nautilus_trader` (poz. 5 zwiadu 07-29 — głębokość symulowana **z samego wolumenu świecy**) |
+| Ł5 | **DR-OPE — oszacowanie zwrotu polityki BEZ realnych zleceń** | 🔴 | Z Atkinsona: *Doubly Robust Off-Policy Evaluation*, nieobciążony estymator oczekiwanego zwrotu, wagi IPS obcinane. **Odblokowuje pomiar tam, gdzie D1 stoi na braku kluczy MEXC i decyzji kapitałowej Cezara** — polityki nie trzeba wdrożyć, żeby oszacować jej zwrot. Do tego z tego samego źródła: **Temporal Degradation** (nachylenie wierności względem czasu) — mamy Prawo XXIII o trafności per reżim, ale **nachylenia nie liczymy** |
 
 ### WACHTA E — dług techniczny z zamrożonej listy
 
@@ -542,7 +905,7 @@ Zmierzone 2026-07-29: **47 organów orzekających, 11 bez testu kalibracyjnego.*
 | E1 | `zip(strict=)` w Bramie · RUF012 · strażnik budżetu | 🔴 |
 | E2 | WFO chunkowany (backtest liniowy ~66 ms/tik — premisa „kwadratowy" była błędna) | 🟡 |
 | E3 | Strażnik obcych plików → wrzutnia/kwarantanna zamiast kasowania | 🔴 pomysł Cezara 07-28 |
-| E4 | Dług kontekstu: CLAUDE.md **259 linii > 200** | 🔴 rośnie z każdym rozkazem (253 po odchudzeniu 07-27 → 259 dziś) |
+| E4 | Dług kontekstu: CLAUDE.md ponad limit 200 linii — **liczbę podaje `python -m imperium.oczy.maturitas`** (piętro PROMPT). Wpisana tu „259” była nieaktualna o kilkadziesiąt linii: dokument opisujący dług kontekstu sam gnił | 🔴 rośnie z każdym rozkazem |
 
 ---
 

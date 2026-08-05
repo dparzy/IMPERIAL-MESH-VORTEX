@@ -41,24 +41,30 @@ decyzje kierunkowe/nieodwracalne (kasowanie, kapitał, zmiana strategii, koszt).
 
 - **🗺️ PRAWO XVII — ROZPOZNANIE TERENU** — na starcie i przed nowym zadaniem czytasz stan Imperium z KODU, nigdy z pamięci (KROK 0 wykonuje hook startowy). Rozbieżność = STOP i naprawa przed zadaniem. Komendy weryfikacyjne: **`/spojnosc`**.
 
-## ⛔ LUSTRATIO IMPERII — ZAMROŻENIE ROZWOJU (ROZKAZ STAŁY — Cezar 2026-08-04)
+## 🐢 DELIBERATIO — WOLNIEJ, ALE DOKŁADNIE (ROZKAZ STAŁY — Cezar 2026-08-05)
 
-**Dopóki Imperium nie jest W PEŁNI SKALIBROWANE i zgodne z prawem — NIE RUSZAMY DALEJ.**
-Wolno budować wyłącznie to, co **zamyka wykrytą lukę** albo pozwala ją **zmierzyć**.
-Żadnych nowych zdolności ani kierunków, także tych już zatwierdzonych (korony B/C/D czekają).
+**ZAMROŻENIE LUSTRATIO ZDJĘTE oficjalnie 2026-08-05** słowami Cezara: *„odmrażam
+oficjalnie, to nic nie daje — tylko teraz, zanim coś zrobimy, musimy dokładnie to
+przeanalizować: każde zadanie wolniej, ale dokładniej."*
 
-Słowa Cezara: *„jabłko psuje się od środka, a ryba od głowy — nie możemy pozwolić, aby
-Imperium było robaczywe w żadnej z warstw."* Powód zmierzony 2026-08-04: trzy organy,
-trzy dziury tej samej KLASY — **organ, który nie umie powiedzieć „nie wiem", milczy,
-a milczenie czytamy jako zieleń** (LUSTRUM 100% fałszywek na jednym sygnale; 23 dokumenty
-niewidzialne dla bramki GNICIA; 52 wiersze ROADMAP poza pomiarem MATURITASA).
+> ⚠️ **ZDJĘTE DECYZJĄ, NIE SPEŁNIENIEM KRYTERIÓW.** `python -m imperium.pretorianie.conditor_lustri`
+> świecił w chwili zdjęcia **2 spełnione / 2 niespełnione / 3 NIE WIEM**. Organ **zostaje jako
+> MIERNIK ZDROWIA**, przestaje być blokadą — i nie wolno mu przemilczeć, że warunki nie zostały
+> spełnione. Kryteria bez producenta (rejestr klas K1–K4, rejestr kalibracji) **nadal są długiem**.
 
-Kolejność: **L0 LUSTRUM → L1 TABULARIUM → L2 przegląd wszystkich organów wg kategorii
-→ L3 uzupełnienie luk → L4 bramka wyjścia.** Pełny plan, checklista bazowa, checklisty
-per kategoria i siedem uzupełnień (U1–U7): **`docs/ROADMAP_IMPERIUM.md` § LUSTRATIO IMPERII**.
+**Nowy rozkaz zastępuje zamrożenie:** tempo nie jest już ograniczone TEMATEM zadania, lecz
+**głębokością jego analizy**. Przed KAŻDYM zadaniem — także drobnym — powstaje jawna
+**DELIBERATIO**: (1) co dokładnie robimy i czego to dotyka, (2) **czego NIE WIEMY** przed
+startem, (3) czym to **zmierzymy** i co uznamy za sukces, (4) co może pójść źle i jak to
+wykryjemy, (5) czy to **już istnieje** (CODEX + kod + kronika + Dziennik).
 
-**Złamanie:** rozpoczęcie zadania rozwojowego przed zdjęciem zamrożenia; zamknięcie pozycji
-przeglądu bez pomiaru; znalezisko bez naprawy albo bez wpisu z terminem.
+**Powód, dla którego to zastępuje zamrożenie, a nie tylko je znosi:** zamrożenie ograniczało
+*co* wolno robić i nie zapobiegło ANI JEDNEJ z wad złapanych 2026-08-05 (kolumna stanu poza
+pomiarem MATURITASA, cztery liczby-widma, kolizja prefiksu `D`, niepełna poprawka daty).
+Wszystkie wzięły się z **pośpiechu wewnątrz dozwolonego zadania**, nie z niedozwolonego tematu.
+
+**Złamanie:** rozpoczęcie zadania bez DELIBERATIO; „zmierzę to później"; ogłoszenie działania
+przed pomiarem (LEX TALARUS); zamknięcie pozycji bez dowodu.
 
 ## 🚨 PRAWO XV — CZERWONY ALARM UTRATY POTENCJAŁU (ROZKAZ STAŁY)
 
@@ -208,7 +214,8 @@ Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
 1. **Przeczytaj wydruk hooka w całości** (kolejność drukowania): 🎯 **NASTĘPNY KROK** (banner na górze,
    A2 — zawsze widoczny mimo ~25 KB) → **PORTITOR** (pre-flight środowiska: deps/klucze API/dryf, B1)
    → **CENSOR SPRZĘTU** (żelazo zmierzone) → **AERARIUM** (waga kontekstu startowego, stopnie GRADUS,
-   nadzór nad kosztem samego wydruku hooka) → **INDEX FALSORUM** → **BREVIARIUM** (słudzy: Hyginus/TIRO/
+   nadzór nad kosztem samego wydruku hooka) → **INDEX FALSORUM** → **DESCRIPTIO IMPERII** (filary Imperium: ile organów, kto kogo woła, czy któryś
+   moduł wypadł poza filar) → **BREVIARIUM** (słudzy: Hyginus/TIRO/
    modele) → **LEX TALIONIS** (dług honorowy) → **audyt Prawo XXI** (pełny) → **CODEX**
    (podsumowanie ledgera, C1) → **Centrum Pamięci** (profil, Top-3 lekcji, aktywny cel W12, Refleksja W9)
    → **Dziennik Nieśmiertelny** (pełna oś) → **skan wad ostatniego commitu**. Wydruk >25 KB bywa ucięty
@@ -261,7 +268,9 @@ nowe zadanie bez weryfikacji „czy już istnieje"; liczby z pamięci zamiast z 
    bez spojrzenia, bo nic nie pytało, czy recenzent nadążył). Nowe wady → Księga Wad (`ksiega_wad_kodu`).
 4. **Komplet dokumentów + pamięć zsynchronizowane z kodem** (ZASADA PEŁNEJ SYMBIOZY): LOG_ZMIAN, MANIFEST,
    INDEKS, MAPA_KLUCZY, liczby, ARCHITEKTURA (nowy organ/narzędzie z nazwą rzymską — ZASADA NOMENKLATURY),
-   pamięć. Nowa ZASADA w pamięci → skodyfikuj też w CLAUDE.md/ZASADY (nie zostawiaj tylko w pamięci prywatnej).
+   pamięć. **`python -m imperium.oczy.descriptio --bramka`** — nowy organ MUSI należeć do filara;
+   moduł poza filarem albo strażnik-widmo to alarm, nie cisza (rozkaz Cezara 2026-08-05).
+    Nowa ZASADA w pamięci → skodyfikuj też w CLAUDE.md/ZASADY (nie zostawiaj tylko w pamięci prywatnej).
 4b. **BREVIARIUM — meldunek SŁUG na domknięcie** (ROZKAZ STAŁY, Cezar 2026-07-21):
    `python -m imperium.oczy.breviarium --delta` — stan HYGINUSA i TIRO **oraz RÓŻNICA wobec
    otwarcia** (co ta wachta zmieniła: kolejka, plon czekający na sędziego, podejrzane cząstki,

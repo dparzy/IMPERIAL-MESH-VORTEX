@@ -15,6 +15,259 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-05 | 🐞 | POZYCJA 0a — pięć wad z recenzji naprawionych, każda z dowodem mutacyjnym
+
+**Rozkaz Cezara:** *„tak 0a zaczynaj"* — po recenzji `/code-review` własnej wachty.
+
+**Co naprawione** (każda: naprawa + test granicy „celowo psuję producenta"):
+
+1. `imperium/koloseum/dyrygent.py:344` — odcisk wskaźników brany w `_wskazniki()`, a `cykl()`
+   linijkę dalej dolewał `kontekst_dodatkowy` (RADAR). Z flagą ON **każda świeca** orzekałaby
+   BRUDNE i blokowała wejście. Odcisk przeniesiony do **najpóźniejszego punktu mutacji**.
+2. `imperium/oczy/descriptio.py:158` — kontrola kompletności była **tautologią** (obie liczby
+   z tej samej pętli). Zastąpiona porównaniem **zbiorów nazw** wobec listy odniesienia zdjętej
+   u producenta PRZED przypisywaniem; łapie też podmianę i duplikat, czego suma nie widzi.
+3. `imperium/biblioteki/pamiec_absolutna.py:216` — `sekwencja` (pole wchodzące do hasza)
+   bumpowana przy każdym zapisie, hasz nie. Rekord z odciskiem zachowuje **całą tożsamość**.
+4. `imperium/oczy/descriptio.py:137` — mapa `stem→filar` gubiła kolizje (trzy `baza.py`
+   z dwóch filarów). **Zmierzony skutek naprawy: DANE woła 23→14, RÓJ wołany 93→82 — 11 krawędzi
+   raportowano pod złym filarem.** Nazwy niejednoznaczne są wykluczane i JAWNIE zgłaszane.
+5. `imperium/pretorianie/conditor_lustri.py:173` — import prywatnej `_stan_domkniety`;
+   `maturitas.stan_domkniety()` jest teraz **publicznym kontraktem** (alias zgodności zostaje).
+
+**Lek na KLASĘ, nie na instancję** (lekcja wachty: wzorzec przeżywa naprawę instancji):
+`tests/test_kontrakty_publiczne.py` skanuje całe `imperium/`+`narzedzia/` po importach prywatnych
+nazw. Jawna lista `ZNANY_DLUG` (13 plików) **ma maleć** — pilnują tego dwa testy z obu stron:
+nowy grzech = czerwień, spłacony dług nieusunięty z listy = też czerwień.
+
+**Dowód, że testy nie są ślepe (LEX TALARUS):** skrypt mutacyjny przywrócił każdą z pięciu wad
+i zażądał czerwieni — **8/8 testów zczerwieniało Z ASERCJI** (czerwień z `SyntaxError`/`ImportError`
+odrzucana jako niedowód; przyrząd sprawdza POWÓD czerwieni, nie sam kod wyjścia).
+
+**🚨 ZŁAPANE PRZY OKAZJI — mój błąd sprzed doby:** Dziennik i ROADMAP twierdziły „5 klas dopisanych
+do Księgi Wad Kodu". Zmierzone: **zero wpisów z datą 2026-08-05**, ostatnia klasa z 08-03.
+**Zapis nigdy nie nastąpił — ogłosiłem go bez sprawdzenia.** Dopisane teraz: 159 → 164 wpisy,
+liczba **odczytana z dysku po zapisie**, nie z pamięci procesu.
+
+**Zmiana opisu w CONDITOR LUSTRI:** raport pisał „⛔ ZAMROŻENIE TRWA", a zamrożenie zdjęto decyzją
+08-05 — miernik ogłaszający nieistniejący zakaz uczy ignorować własne komunikaty. Teraz:
+„BRAMKA CZERWONA … DŁUG NIE ZNIKNĄŁ RAZEM Z ZAKAZEM". **Kryteria i progi nietknięte.**
+
+**Bramka:** testy **3539/3539** (+22 nowe) · audyt spójności **exit 0** · `descriptio --bramka` exit 0
+· skan wad na 5 zmienionych plikach czysto.
+
+**Pliki:** `imperium/koloseum/dyrygent.py`, `imperium/oczy/descriptio.py`, `imperium/oczy/maturitas.py`,
+`imperium/biblioteki/pamiec_absolutna.py`, `imperium/pretorianie/conditor_lustri.py`,
+`tests/test_descriptio.py`, `tests/test_integralnosc_d11.py`, `tests/test_conditor_lustri.py`,
+`tests/test_kontrakty_publiczne.py` (nowy), `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`,
+`docs/ROADMAP_IMPERIUM.md`, `docs/LOG_ZMIAN.md`
+
+---
+
+## 2026-08-05 | 🏛️ | DESCRIPTIO IMPERII — Imperium wie, z jakich FILARÓW jest zbudowane
+
+**Rozkaz Cezara:** *„musimy wiedzieć, z jakich filarów, jakich kategorii i jaki schemat ma
+nasze Imperium, jakie są do nich przypisane organy i jak wzajemnie współpracują — wtedy
+będziemy po kolei naprawiać braki i luki. Nic nie wolno pomijać."*
+
+**Luka, nie duplikat (sprawdzone PRZED budową):** `CENSUS_ORGANORUM` liczy moduły,
+`MATURITAS` mierzy piętra, a mapy Imperium istniały wyłącznie jako proza pisana RĘCZNIE
+(`ARCHITEKTURA_IMPERIUM.md`) albo jako ACTA sprzed miesięcy (`MAPA_IMPERIUM_FLOW.md`, która
+sama deklaruje, że opisuje nieistniejący kod). **Nikt nie łączył tego w filary.** Tego samego
+dnia cztery ręcznie wpisane liczby w ROADMAP okazały się przeterminowane — mapa pisana ręcznie
+kłamie tym pewniej, im większe Imperium, więc jedyną uczciwą formą jest **generator**.
+
+**Organ** `imperium/oczy/descriptio.py` (+14 testów). **Nie liczy niczego sam** (K1): moduły
+z `census_organorum.spisz_moduly()`, piętra zostają przy MATURITASIE. **Moduł poza filarem to
+ALARM, nie cisza** (K2) — nowy katalog wywraca organ na czerwono, zamiast po cichu wypaść
+z obrazu, czyli odwrotnie niż MATURITAS gubiący 52 wiersze ROADMAP. **Strażnik nazwany musi
+ISTNIEĆ** (klasa API-widm). Miara „cienkości" filara jest **opisowa, nie normatywna** — próg
+bez kalibracji byłby zgadywaniem udającym pomiar (LEX TALARUS).
+
+**Pierwszy pomiar: 11 filarów, 265 modułów, ZERO sierot** (suma = CENSUS co do jednego).
+Trzy rzeczy, które od razu powiedział:
+- **filar WIEDZY woła 3, jest wołany 56** — wiedza wypływa, **nic do niej nie wraca**;
+- **RÓJ wołany 93, woła 6** i **ani razu nie sięga do WIEDZY** — neurony nie czytają biblioteki;
+- **EGZEKUCJA to 4 moduły z 265** — najcieńszy filar Imperium jest tym, który styka się z rynkiem.
+
+**Podejrzenie do osobnego pomiaru (NIE twierdzenie):** FUNDAMENT woła 0, jest wołany 3, choć
+Prawo I czyni Bramę jedynym wejściem do matematyki. Licznik zlicza po nazwach modułów i może
+zaniżać — sprawdzić, zanim ktokolwiek powie „Brama jest obchodzona".
+
+**Wpięty w `/apertio`** (hook startowy, `--zwiezle` — AERARIUM pilnuje wagi wydruku)
+**i `/clausura`** (`--bramka`: nowy organ musi należeć do filara).
+
+**PIĘĆ BRAKUJĄCYCH FILARÓW — znalezione w TRZECH przejściach, na żądanie Cezara („sprawdź
+jeszcze raz, pod innym kątem"). Każde przejście coś dało:**
+- **I — funkcja rozrzucona po cudzych filarach:** `INSTITUTIO` (uczenie: 2 filary) i `FISCUS`
+  (kapitał/ryzyko: 3 filary) — **żaden nie ma strażnika**, więc nikt nie pyta o ich zdrowie
+  jako całości. To wyjaśnia, dlaczego `ucz_mwu` jest wyłączony od 29 lipca i niczyj.
+- **II — poza granicą pomiaru:** w repo jest **467 plików `.py`**, mapa liczy **270**. Poza nią:
+  `tests/` (187 plików / 3517 testów) → filar **ŚWIADECTWO**, oraz 7 hooków + 9 skilli →
+  filar **HARNESS**. `archiwum/` wykluczone słusznie.
+- **III — co dzieje się bez Cezara:** `imperium/drogi/scheduler.py` ma **ZERO wołaczy
+  produkcyjnych** → **Imperium nie ma autonomii w czasie**. Oraz filar **FAMILIA** (Hyginus,
+  TIRO) rozrzucony po 3 filarach, z silnikiem TIRO poza repozytorium.
+
+🚨 **WADA W TYM ORGANIE Z DNIA JEGO BUDOWY (klasa K2, moja):** DESCRIPTIO drukował „zero
+pominięć", licząc wyłącznie własny zakres; `census_organorum` ma `KORZENIE = ("imperium",
+"narzedzia")` **bez słowa uzasadnienia** — granica CICHA, nie zadeklarowana. Zbudowałem organ
+przeciwko tej klasie i sam w nią wpadłem. Naprawa (następna wachta): jawna deklaracja zakresu
++ liczenie tego, co poza nim. **Nie ogłaszam mapy Imperium za kompletną** — trzy przejścia,
+trzy znaleziska, więc brak podstaw, by twierdzić, że czwarte nic by nie dało.
+
+**Pliki:** `imperium/oczy/descriptio.py`, `tests/test_descriptio.py`, `CLAUDE.md`,
+`.claude/hooks/session-start.sh`, `docs/ARCHITEKTURA_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`
+
+---
+
+## 2026-08-05 | 🔐 | D1.1 SPŁACONE — bezpiecznik integralności przestał być literałem (19 dni długu)
+
+**Stan sprzed naprawy:** `ImperiumLog.hash_sha256` miał **ZERO przypisań w całej bazie kodu**,
+a `dyrygent.py` podawał doradcy Hermesowi `hash_ok` jako **stałą prawdziwą**. Hermes ma gałąź
+`if not hash_ok → NIEKOMPLETNE`, więc łańcuch WYGLĄDAŁ na zamknięty, nie mając czego
+porównywać — martwy głos udający bezpiecznik (Prawo XV). Prawo IX wymienia to pole jako
+OBOWIĄZKOWE, więc **kod łamał własne prawo od 2026-07-17**.
+
+**Dwie połówki naprawy:**
+- `pamiec_absolutna.policz_hash()` / `zweryfikuj()`, a `zapisz()` wypełnia pole przy każdym
+  zapisie — **po nadaniu sekwencji**, żeby odcisk dotyczył rekordu, który naprawdę ląduje na
+  dysku. Rekord z już ustawionym haszem **nie jest nadpisywany**: inaczej podmiana treści
+  „uwierzytelniałaby się sama", czyli wracałaby naprawiana klasa.
+- `Dyrygent.odcisk_wskaznikow()` + `_integralnosc_wskaznikow()` — literał zastąpiony
+  policzonym warunkiem. **Opt-in, domyślnie OFF** (ZASADA WPIĘCIA): przy OFF zachowanie jest
+  co do decyzji **identyczne** jak dotąd, ale zgoda przestała być literałem — jest gałęzią,
+  która NAZYWA swoje założenie. Odcisk liczony ZAWSZE (także przy OFF), żeby włączenie flagi
+  w locie nie zastało `None` i nie orzekło BRUDNE bez powodu.
+
+**Dwie granice „braku dowodu", każda z testem** — bez nich wada wróciłaby pod nową nazwą:
+rekord **bez hasza** weryfikuje się jako `False` (dotyczy wszystkich rekordów sprzed naprawy),
+a weryfikacja **bez odcisku odniesienia** orzeka BRUDNE. Brak dowodu nie jest dowodem niewinności.
+
+**Zmierzone:** `skan_wad_kodu.py` na `dyrygent.py` — **czysto**, pierwszy raz od 2026-07-17
+(klasa `bezpiecznik` znikła). +15 testów (`tests/test_integralnosc_d11.py`).
+
+**Wada przyrządu złapana przy okazji:** skaner Księgi Wad **nie pomija komentarzy** — zgłosił
+mój własny komentarz opisujący naprawianą wadę, bo cytował ją dosłownie. Alarm na własnej
+dokumentacji uczy lekceważyć skaner; komentarz przeformułowany, obserwacja zapisana.
+
+**Czego NIE wiemy (LEX TALARUS):** nie zmierzyliśmy jeszcze, jak często odcisk realnie się
+rozjeżdża na żywym biegu — flaga **czeka na zielone A/B** i nie ogłaszam jej działającą.
+
+**Pliki:** `imperium/biblioteki/pamiec_absolutna.py`, `imperium/koloseum/dyrygent.py`,
+`tests/test_integralnosc_d11.py`, `docs/PAMIEC_ABSOLUTNA.md`, `docs/ROADMAP_IMPERIUM.md`
+
+---
+
+## 2026-08-05 | 🏁 | CONDITOR LUSTRI — zamrożenie LUSTRATIO dostało MIERZALNY warunek wyjścia (U1)
+
+**Powód zmierzony:** ZAMROŻENIE z 2026-08-04 zabraniało rozwoju, dopóki Imperium nie
+będzie „w pełni skalibrowane" — **bez liczby**. Nasz własny ROADMAP nazwał to wprost:
+*„W pełni skalibrowane bez liczby jest stanem niefalsyfikowalnym: zamrożenie albo nigdy
+się nie skończy, albo skończy się arbitralnie."* To ta sama klasa wady, która zamrożenie
+wywołała — organ bez miary, którego milczenie czyta się dowolnie. Zamrożenie leczące
+bramki bez miary samo nie miało miary.
+
+**Organ** `imperium/pretorianie/conditor_lustri.py` (+18 testów). Rzym. *condere lustrum*
+— obrzęd, którym cenzorzy zamykali lustrację; bez niego cenzus trwał. Siedem kryteriów,
+każde z JEDNYM producentem (K1 — nic nie liczy sam): AUDYT · TESTY · TABULARIUM · DŁUG ·
+ETAPY · KLASY · KALIBRACJA.
+
+**Trzy decyzje konstrukcyjne, każda z osobnym testem granicy:**
+- **`NIE WIEM` blokuje tak samo jak `NIE`** (K2). Bez tego najtańszą drogą do zielonej
+  bramki byłoby dopisanie kryterium bez miernika — miernik zamieniłby się w pochlebcę.
+- **L4 świadomie POZA oceną.** L4 („bramka wyjścia") domknie właśnie ten organ; w
+  kryteriach żądałby własnego domknięcia, żeby się domknąć.
+- **Pusta lista kryteriów = czerwień.** `all([])` daje `True`, więc bez jawnego warunku
+  bramka bez kryteriów przepuszczałaby wszystko.
+
+**Pierwszy pomiar (2026-08-05): 1 spełnione / 3 niespełnione / 3 NIE WIEM** — zamrożenie
+trwa. Dwa kryteria nie mają jeszcze producenta i to one są realnym warunkiem odmrożenia:
+**rejestr klas K1–K4** (czy lek WDROŻONY, nie tylko nazwany) i **rejestr kalibracji**
+organów orzekających (dziś kalibracja żyje w prozie Dziennika, więc nie da się zapytać,
+ile organów orzekających jest nieskalibrowanych — a to był powód zamrożenia).
+
+**Przy okazji naprawiona klasa K1 w MATURITASIE:** dług honorowy liczył się tam własną
+arytmetyką `NOTA − CORONA`, obok CODEX NOTARUM. Dwa błędy naraz: odejmowanie LICZNIKÓW
+nie wie, która korona spłaca którą notę (5 koron i 3 niespłacone noty dają fałszywe zero),
+i nie wie o ODROCZENIU z 2026-08-03. **Dziś obie drogi dawały 0, więc rozjazd był
+niewidoczny** — i dokładnie tak wygląda K1, zanim zacznie kłamać. Wydzielony też jeden
+parser wierszy ROADMAP (`maturitas.wiersze_stanu`) na dwa pytania zamiast dwóch parserów
+tego samego pliku; wynik po refaktorze bit-identyczny (14/68/17,1%).
+
+**Pliki:** `imperium/pretorianie/conditor_lustri.py`, `imperium/oczy/maturitas.py`,
+`tests/test_conditor_lustri.py`, `docs/ROADMAP_IMPERIUM.md`, `docs/CENSUS_ORGANORUM.md`
+
+---
+
+## 2026-08-04 | 🔬 | Świadectwo gnicia przestało powtarzać tezę bramki (kalibracja II)
+
+**Powód zmierzony:** drugie świadectwo T2 opierało 4 z 7 mocnych alarmów na nazwie
+wziętej z **nagłówka hunka**. `git show` wpisuje tam najbliższy nagłówek z LEWEGO
+MARGINESU, więc zmiana metody raportowała się jako `class Legatus`. A nazwa klasy stoi
+w backtickach w **każdym** dokumencie o module — świadectwo degenerowało się wtedy do
+zdania „plik był dotknięty", czyli **powtarzało tezę bramki T2**, którą miało ważyć.
+Wskazana przyczyna nie mówiła nic o zmianie: `Legatus` zamiast `_formacja_interwalu`,
+`KalkulatorLewara` zamiast `policz`.
+
+**Prawda podstawowa** (wszystkie 7 MOCNYCH, dokument w całości + realny diff właściciela):
+realnie kłamiały **dwa** — `PLAN_DEEPSEEK.md` (cytat sygnatury `zapytaj` bez czterech
+parametrów DISPENSATORA z 2026-07-21) i `PAMIEC_ABSOLUTNA.md` (cytat
+`f"{data}_{symbol}_{typ.lower()}.jsonl"`, gdy kod od 2026-07-29 sanityzuje symbol).
+Oba naprawione w tej samej wachcie.
+
+**Cztery warianty na tej samej populacji 24:** A (obecny) 7 MOCNYCH, precyzja 2/7,
+recall 2/2 · B („hunk bez `class`") 3, precyzja 1/3, **recall 1/2** · C („`class`
+nigdzie") wynik identyczny z B, bo populacja nie ma ani jednego `diff-class` — dane
+**nie rozstrzygają** B vs C · D (hunk → numer linii → definicja obejmująca) 4 MOCNE.
+
+**Wybrano D, nie B.** Kandydat B kupował +5 pp precyzji za połowę recallu. D naprawia
+to, co pierwsza kalibracja wypunktowała najostrzej — **precyzję PRZYCZYNY (było 0/6)**:
+wskazuje dziś `policz` i `zapytaj`. D jest podzbiorem A, więc żaden SŁABY nie awansował.
+
+🚨 **Uczciwa strata:** D gubi `PAMIEC_ABSOLUTNA` — jedyne prawdziwe gnicie, które A
+łapało **tautologicznie** (rozjazd siedzi w prywatnej `_sciezka`, nie wymienionej
+w dokumencie z nazwy). To odsłoniło klasę, której nie widzi żaden wariant oparty na
+symbolach: **cytat dosłowny KODU**. Zapisana jako ROADMAP **L3d**, nie jako sukces.
+
+**Koszt:** bieg 40 s → 97 s (2,4×) — narzędzie świadomie stoi poza audytem chodzącym
+w hooku każdej sesji. `stan_na` obu naprawionych dokumentów **celowo nie podniesiony**:
+poprawiono konkretne zdania, nie zweryfikowano całości (klasa K3 — piszący nie decyduje
+o własnej prawdzie).
+
+**Pliki:** `narzedzia/tabularium.py` (`_symbole_zmienione`, `_definicja_obejmujaca`,
+`_tresc_po_commicie`), `tests/test_tabularium.py` (+5 granic), `docs/PLAN_DEEPSEEK.md`,
+`docs/PAMIEC_ABSOLUTNA.md`, `docs/ROADMAP_IMPERIUM.md` (L3a ✅, L3d 🔴),
+`bibliotheca_ulpia/dane/rejestr_testow.jsonl`. Bramka: 3462/3462, ruff czysto.
+
+### Runda 2 tej samej kalibracji — bloki kodu też są cytowaniem
+
+Przegląd wyników odsłonił **drugą lukę w tym samym przyrządzie**: `_symbole_cytowane`
+czytało wyłącznie backticki inline, a dokumenty pokazują REALNE API w blokach
+```` ```python ````. Złapane na żywym przypadku: **`MANUAL_UZYTKOWNIKA` uczy wywołania
+`raport_waznosci(sygnaly, wyniki)`, które od `8561bc6` rzuca `ValueError`** przy nierównych
+seriach — nazwa stała tylko w bloku, więc manual uczący wywołania, które wybucha,
+przechodził jako SŁABY. Naprawione w obu miejscach: przyrząd czyta bloki, manual opisuje
+kontrakt.
+
+Zmierzone na populacji 23: precyzja **3/7** wobec 2/4 bez bloków — różnica w granicach
+szumu przy tej próbie i **nie** ona rozstrzygnęła — ale **recall 3/3** wobec 2/3. Dla
+narzędzia PRZEGLĄDU to właściwy kierunek: fałszywka kosztuje minutę czytania, przeoczenie
+kosztuje kłamiący manual. Koszt zerowy (regex na treści, bez wywołań gita).
+
+Przy okazji zamknięty przegląd `KALKULATOR_LEWARA` (dopisany kontrakt wejściowy: `ValueError`
+przy `cena_wejscia <= 0`, zachowanie graniczne bufora przy skrajnej dźwigni; `stan_na`
+podniesiony, bo od poprzedniej weryfikacji plik dotknął **jeden** commit) i drugie gnicie
+w `PAMIEC_ABSOLUTNA` (**LUKA 2 wymieniała `SYGNAL` jako typ bez producenta**, a `log_sygnal`
+dostała wołacza w `dyrygent.py` 2026-07-29: W1 23 → 46 wpisów, MWU 0 → 37 wag).
+
+**Pliki rundy 2:** `narzedzia/tabularium.py` (`_symbole_cytowane`, `_BLOK_KODU`),
+`tests/test_tabularium.py` (+2 granice), `docs/MANUAL_UZYTKOWNIKA.md`,
+`docs/KALKULATOR_LEWARA.md`, `docs/PAMIEC_ABSOLUTNA.md`, `docs/ROADMAP_IMPERIUM.md`
+(L3a2 ✅, L3e 🔴).
+
+---
+
 ## 2026-08-04 | 🩹 | Świeżość dokumentu idzie tylko W PRZÓD — koniec cofania dat przez hook
 
 **Powód zmierzony (audyt W20 na czerwono na otwarciu wachty):** katalog Tabularium

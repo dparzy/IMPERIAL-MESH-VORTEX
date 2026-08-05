@@ -15,6 +15,51 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-06 | ⚖️ | SĄD nad audytem Kimi K3 — 8 adopcji KM1–KM8, reszta obalona pomiarem
+
+**Rozkaz Cezara:** *„zanim coś zmienimy przeczytaj dokładnie i przeanalizuj metaprompt innego
+audytora kimi 3 (…) nie odrzucamy tylko analizujemy i dokładnie sprawdzamy"*, potem
+*„wszystkie tier dopisz do roadmap plan i zaktualizuj"*.
+
+**Materiał:** `wrzutnia/05.08.2026/` — 7 plików (156 KB markdown + 3 obrazy). Przeczytany
+w CAŁOŚCI, każda falsyfikowalna teza zderzona z żywym kodem albo z siecią.
+
+**Co rozstrzygnęło — PROWENIENCJA.** Raport ogólny sam deklaruje w nagłówku *„treść plików
+`.py` niedostępna (blokada GitHub raw)"* i mapuje repo jako **3 pliki `.py` / 10 zasad**.
+Metaprompt tego samego autora, tej samej sesji, mówi **467 plików / 21 praw**. Zmierzone:
+**466 plików, 25 praw, 1054 commity**. Ocena **3,75/10** dotyczy repozytorium, które nie istnieje.
+
+**Werdykt „Zasady nie blokują" (powtórzony w 3 dokumentach) — PROCEDURALNIE NIEWAŻNY:**
+analizuje 21 praw, mamy 25; zgodne treścią 4 (I, VII, XIX, XX) = trafność ~16%; XXII–XXV
+nieobecne. Egzaminowano inną konstytucję → werdykt **nie został wydany**, nie „wydany błędnie".
+
+**Przyjęte (KM1–KM8):** KM1 CI/CD + `pyproject.toml` (**jedyne w pełni nowe** — katalogu
+`.github/workflows` nie ma, więc regresję łapie dziś wyłącznie ręczne `/limes`) · KM2 warstwa
+pewności RAG po A10 · KM3 arena Bitget przed MEXC · KM4 kandydaci ekstrakcji do 1b ·
+KM5 pomiar pamięci obserwacyjnej · KM6 HMO Tier-2 (odłożone) · KM7 Kimi K3 (decyzja Cezara) ·
+KM8 „Adaptive Markets" Lo.
+
+**Obalone pomiarem:** SENAT istnieje · TRYBUNAŁ = 24 warstwy + 19 pretorianów · SKARBIEC =
+`pamiec_absolutna`/`arena_baza`/ledgery · `requirements.txt` istnieje · „zbuduj MCP Server" —
+mamy DWA · „brak headless" — 5 typów hooków · patenty `US 11,847,xxx` = numery-zaślepki.
+
+**Odrzucone bo JUŻ MAMY:** tolerancja immunologiczna (`backtest.py:132`, ML-36 podnosi próg
+po serii strat) · quorum per reżim (`progi_adaptacyjne.py`) · RRF (nasze A8) ·
+A15/A10/A1b/A13/A14/F1/F2 (nasze pozycje) · 7 z 8 książek.
+
+**🚨 Złapane własnym pomiarem w tej samej wachcie:** pierwsza wersja tabeli dowodowej użyła
+emoji stanu (`✅🔴🟡⏸️`) i **zafałszowała piętro LOOP o 4 pozycje otwarte i 2 domknięte** —
+`maturitas.stan_domkniety()` liczy je w KAŻDEJ tabeli pliku, nie tylko w kolejce. Naprawione
+u źródła; po naprawie otwarte 86→94 = **dokładnie 8 pozycji KM**, domknięte 16 bez zmian.
+Klasa otwarta: **wzorzec przeżył naprawę instancji** — dowolna przyszła tabela z tymi emoji
+powtórzy błąd. Kandydat na strażnika zapisany, nie zbudowany (wymaga DELIBERATIO).
+
+**Pliki:** `docs/ROADMAP_IMPERIUM.md` (8 pozycji + sekcja sądu), `docs/INDEKS_IMPERIUM.md`
+(katalog regenerowany po zmianie `stan_na` — złapane przez W20), `docs/PLAN_TIRO_LOKALNY_LLM.md`
+(W15 z otwarcia), `docs/LOG_ZMIAN.md`. **Zero zmian w `.py`.** Testy 3539/3539, audyt exit 0.
+
+---
+
 ## 2026-08-05 | 🐞 | POZYCJA 0a — pięć wad z recenzji naprawionych, każda z dowodem mutacyjnym
 
 **Rozkaz Cezara:** *„tak 0a zaczynaj"* — po recenzji `/code-review` własnej wachty.

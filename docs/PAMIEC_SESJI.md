@@ -113,6 +113,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
+### 2026-07-27 — Środowisko dev ma dostęp do sieci — adaptery live działają
+MEXC, Binance-fapi i Fear&Greed odpowiadają 200 OK; oba formaty symboli (BTCUSDT i BTC/USDT) działają w DataLoader.fetch. Można testować adaptery na żywych danych bezpośrednio w tym środowisku.
+
+### 2026-07-27 — NEWS-03/04 ożywają po jednym barze rozgrzewki (W-382)
+Moduły ze stanem kroczącym nie strzelają od pierwszego cyklu. Po rozgrzewce: NEWS_ATTENTION_SPIKE=0.76, NEWS_SENTYMENT_DELTA od -0.2 do +0.257 (cykl 8 LONG). Działa jak zaprojektowano.
+
+### 2026-07-27 — Sygnał neuronu: neuron_id, kierunek, wartosc, kategoria
+raport.sygnaly to lista SygnalNeuronu; moduł ŻYWY/zmierzony gdy wartosc is not None. Punkt zaczepienia do pomiaru aktywacji i diagnostyki modułów.
+
+### 2026-07-27 — petla_live = realtime, nie replay: przetwarza tylko ostatni bar
+Pętla live pobiera to samo okno i przetwarza ostatni bar (limit=cfg.limit_barow), czekając pauzę między barami. Do pomiaru modułów potrzebny szybki bieg na żywych danych, nie czekanie na każdy bar.
+
 ### 2026-07-29 — Test zależny od środowiska jest kruchy
 Test wymagający calibre na PATH przeszedłby na laptopie, padł w chmurze bez niego. Usunięto zależność środowiskową — testy muszą być niezależne od maszyny.
 

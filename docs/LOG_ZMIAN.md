@@ -4,7 +4,7 @@ typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
 bez_wlasciciela: "dziennik CALEGO Imperium — historia nie nalezy do zadnego organu"
-stan_na: 2026-08-03
+stan_na: 2026-08-06
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -12,6 +12,86 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-08-06 | 🧱 | KM1 — VALLUM: bramka Prawa XXI dostała egzekutora poza maszyną Architekta
+
+**Rozkaz Cezara:** *„zaczniemy od km1 wg rekomendacji"*, a w ROADMAP warunek nienaruszalny:
+workflow wchodzi **z antywskaźnikiem** — CI, które nigdy nie czerwienieje, jest tapetą.
+
+**Co powstało:** `.github/workflows/ci.yml` (**VALLUM** — wał) + `pyproject.toml`.
+Imię odrębne od `LIMES` świadomie: LIMES to bramka lokalna, zależna od dyscypliny Architekta;
+VALLUM stoi **poza jego maszyną** i nie zależy od niczyjej. Do dziś Prawo XXI miało 24 warstwy
+i **zero egzekutorów** poza terminalem — ta sama klasa co kontrakt append-only (deklarowany
+w 6 organach, egzekwowany przez zero).
+
+### Metoda: zanim powstał workflow, powstał POMIAR
+Zamiast pisać YAML „jak się zwykle pisze", sklonowałem repo do katalogu roboczego i uruchomiłem
+w nim pełną bramkę — bo dokładnie to robi runner CI: bierze **wyłącznie pliki z gita**.
+Klon odtworzony 1:1 (0 rozbieżności). Ten jeden ruch zwrócił KM1 z nawiązką **przed** pierwszym
+biegiem CI.
+
+### 🔴 ZNALEZISKO P0 — bramka testów działała TYLKO na maszynie Cezara
+`tests/run_tests.py` łapał `unittest.SkipTest`, `AssertionError` i `Exception`. Ale
+`pytest.skip()` rzuca `_pytest.outcomes.Skipped`, który dziedziczy po **BaseException** —
+przeleciał przez każdy `except` i **urwał cały bieg tracebackiem po 2345 liniach**; wszystkie
+pliki testowe po winowajcy nie uruchomiły się w ogóle. Lokalnie niewidoczne, bo u Cezara baza
+RAG istnieje i skip nie zachodzi. Deklaracja *„3539/3539 zielone"* była prawdziwa na jednej
+maszynie i nieprawdziwa na każdej innej.
+
+**Naprawa KLASY, nie instancji** (lekcja z 2026-08-05: wzorzec przeżył naprawę przypadku):
+runner dostał krotkę `_POMINIECIA` obejmującą oba dialekty pominięcia, z leniwym importem —
+pytest pozostaje opcjonalny (Prawo I). **Test granicy** (`tests/test_runner_shim.py`) udowodniony
+mutacyjnie: na stanie sprzed naprawy **czerwienieje**, po naprawie zielony. Dowód po naprawie
+w biegu: bieg doszedł do końca (3539 zebranych, 1 pominięty) zamiast umrzeć w 2/3 drogi.
+
+### 🔴 ZNALEZISKO — `requirements.txt` mówił o środowisku nieprawdę
+Plik twierdzi, że *„testy działają BEZ tych zależności (graceful fallback)"*. **Zmierzone**
+biegiem z zablokowanym TA-Lib: **138 z 3539 testów PADA**, a audyt czerwienieje na W12.
+Brama Kalkulatora świadomie rzuca `RuntimeError` zamiast liczyć po swojemu (*„brak fallbacku
+do ręcznej matematyki"*, Prawo I) — czyli osłona `try/except` istnieje, ale **nie jest
+fallbackiem**. Mój pierwszy wniosek („23 z 24 importów w try → graceful") był **błędny i został
+obalony pomiarem w tej samej wachcie**. Skutek dla wału: TA-Lib jest **obowiązkowy**, a jego
+brak pada w JEDNYM czytelnym kroku, nie na 138 sposobów naraz.
+
+Sprawdzone w sieci (PyPI, 2026-08-06): TA-Lib 0.6.6 publikuje wheels `manylinux_2_28` dla
+**cp310 i cp311** — dokładnie naszej macierzy. Kompilacja C niepotrzebna, więc wał instaluje
+**pełny `requirements.txt`, bez wyjątków** i mierzy to samo, co lokal.
+
+### Decyzje projektowe — każda z powodu, nie z nawyku
+| Decyzja | Powód ZMIERZONY |
+|---|---|
+| Ruff jako **osobny twardy krok** | `audyt_spojnosci.py:1422-1427`: gdy ruffa brak, W13 wypisuje notę i **przepuszcza audyt zielono**. W CI to cisza udająca spokój |
+| Kolejność ruff → audyt → testy | ruff <1 s, audyt 13 s, testy 560 s — rozjazd dokumentów wychodzi po kilkunastu sekundach, nie po dziesięciu minutach |
+| Macierz 3.10 + 3.11 | `requires-python=">=3.10"` przestaje być deklaracją na wiarę; repo jest **PUBLIC**, więc Actions nie kosztuje minut |
+| `run_tests.py`, nie pytest | bramką Imperium jest runner; gdyby CI wołało pytest, „zielone CI" nie znaczyłoby „zielona bramka" |
+| Brak `[tool.ruff]` w pyproject | ruff czyta `ruff.toml` z pierwszeństwem — duplikat byłby **konfiguracją-widmem** (Prawo XVI) |
+| `timeout-minutes: 30` | ~3× zmierzonego czasu (560 s), nie zgadywanka |
+
+### Antywskaźnik — trzy osobne mutacje, po jednej na nogę
+Jedna mutacja wywalająca wszystko dowodzi tylko, że *coś* czerwienieje. Każda noga musi
+umieć zaczerwienić się **sama**. Wykonane w klonie, żywe repo nietknięte:
+
+| Noga | Mutacja | Wynik |
+|---|---|---|
+| RUFF | `F821` — użycie niezdefiniowanej nazwy | zielony → **rc=1** → zielony po cofnięciu |
+| AUDYT | rozjazd wstrzykniętej liczby kod↔dokument | zielony → **rc=1 na W15** → zielony po cofnięciu |
+| TESTY | `MAX_DRAWDOWN_STOP` 0.30 → 0.99 (bezpiecznik AOA wyłączony) | **rc=1**, 7 oblanych (3532/3539), 576 s → cofnięte |
+
+Noga TESTÓW złapała mutację **tam, gdzie powinna**: cztery testy bezpiecznika nazwały problem
+wprost (*„30% obsunięcia MUSI przepalić bezpiecznik"*, *„Przepalony bezpiecznik musi blokować
+wejście"*), a trzy dalsze pokazały skutki uboczne. To jest różnica między „testy padły"
+a „testy wiedzą, co się zepsuło".
+
+⚠️ **CZEGO JESZCZE NIE WIEMY (LEX TALARUS — nie ogłaszam działania przed pomiarem):**
+udowodnione jest, że **komendy** wału czerwienieją. Że czerwienieje **sam workflow na GitHubie**,
+zweryfikuje dopiero pierwszy realny bieg po pushu Cezara — Architekt nie pushuje. Do tego czasu
+VALLUM jest **zmierzony lokalnie, niezweryfikowany zdalnie**, i tak jest opisany w ROADMAP.
+
+**Przy okazji naprawione:** rozjazd W15 (`sesje_kroniki` 159→160). **Księga Wad Kodu +2 klasy**
+(164→166, zapis potwierdzony odczytem z dysku): *pętla łapiąca tylko `Exception` wobec sygnału
+z `BaseException`* oraz *deklaracja o środowisku nigdy nie zmierzona w tym środowisku*.
 
 ---
 

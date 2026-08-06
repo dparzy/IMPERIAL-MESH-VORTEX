@@ -10,6 +10,7 @@ Testy biegną pod OBOMA silnikami (pytest i runner) i muszą przechodzić w obu.
 """
 import os
 import sys
+import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -95,3 +96,39 @@ def test_setenv_delenv_cofaja_srodowisko():
     assert os.environ[klucz] == "wartosc"
     mp.undo()
     assert klucz not in os.environ
+
+
+def test_runner_honoruje_pominiecie_w_dialekcie_pytesta():
+    """Runner musi traktować `pytest.skip()` jak pominięcie — NIE jak śmierć całego biegu.
+
+    ZMIERZONA WADA (2026-08-06, symulacja CI na czystym klonie bez bazy RAG):
+    `_pytest.outcomes.Skipped` dziedziczy po BaseException, nie po Exception, więc
+    przelatywał przez wszystkie `except` pętli runnera i przerywał bieg tracebackiem —
+    wszystkie pliki testowe PO winowajcy nie uruchamiały się w ogóle. Lokalnie niewidoczne
+    (u Cezara baza RAG istnieje, więc skip nie zachodził): strażnik działający na jednej
+    maszynie. To jest TEST GRANICY: celowo rzucam to, co producent wcześniej zabijało.
+    """
+    from tests.run_tests import _POMINIECIA
+
+    assert unittest.SkipTest in _POMINIECIA, "stdlibowy SkipTest wypadł z obsługi pominięć"
+
+    try:
+        from _pytest.outcomes import Skipped
+    except Exception:  # noqa: BLE001 — bez pytesta nie ma czego sprawdzać
+        raise unittest.SkipTest(
+            "pytest niezainstalowany — dialekt pytesta nie dotyczy tej maszyny") from None
+
+    # Sedno wady: gdyby Skipped był zwykłym Exception, obsługa nie byłaby potrzebna.
+    # Gdy pytest kiedyś zmieni hierarchię, ten assert zgaśnie i powie DLACZEGO.
+    assert not issubclass(Skipped, Exception), \
+        "Skipped stał się zwykłym Exception — obsługa specjalna może być zbędna, sprawdź runner"
+    assert Skipped in _POMINIECIA, \
+        "pytest.skip() ubije cały bieg runnera — Skipped musi być w _POMINIECIA"
+
+    # Dowód wykonawczy, nie tylko strukturalny: krotka MUSI faktycznie łapać.
+    zlapane = False
+    try:
+        raise Skipped("celowe pominięcie w dialekcie pytesta")
+    except _POMINIECIA:
+        zlapane = True
+    assert zlapane, "krotka _POMINIECIA nie łapie Skipped — bieg nadal umiera na pytest.skip()"

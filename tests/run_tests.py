@@ -16,6 +16,23 @@ import sys, os, importlib, traceback, inspect, tempfile
 import unittest   # SkipTest — jedyne pojęcie abstynencji w stdlib (honoruje je też pytest)
 from pathlib import Path
 
+# 🛡️ POMINIĘCIA — dwa dialekty, jedna obsługa (zmierzone 2026-08-06 na czystym klonie).
+# `pytest.skip()` NIE rzuca zwykłego wyjątku: `_pytest.outcomes.Skipped` dziedziczy po
+# BaseException, więc przelatuje przez KAŻDY `except Exception` runnera i zabija cały bieg
+# — nie tylko ten jeden test. DOWÓD (symulacja CI, klon bez bazy RAG): test_sanityzacja_fts
+# urwał bieg tracebackiem po 2345 liniach, a wszystkie pliki testowe PO nim nie uruchomiły
+# się w ogóle. Lokalnie tego nie widać, bo u Cezara baza RAG istnieje i skip nie zachodzi —
+# klasyczny strażnik działający wyłącznie na jednej maszynie.
+# Naprawiamy KLASĘ, nie instancję: dowolny przyszły test napisany w dialekcie pytesta
+# (najnaturalniejszym pod pytest) powtórzyłby tę wadę.
+_POMINIECIA = [unittest.SkipTest]
+try:  # pytest jest OPCJONALNY — runner ma działać bez zależności (Prawo I)
+    from _pytest.outcomes import Skipped as _PytestSkipped
+    _POMINIECIA.append(_PytestSkipped)
+except Exception:  # noqa: BLE001 — brak pytesta → zostaje sam SkipTest
+    pass
+_POMINIECIA = tuple(_POMINIECIA)
+
 # Windows: konsola cp1250 (polski Windows) wywala się na emoji w wynikach testów.
 # Wymuszamy UTF-8 na stdout/stderr — koniec ręcznego PYTHONIOENCODING=utf-8 przy każdym
 # uruchomieniu (lekcja lokala 2026-07-05). No-op na Linux/macOS (już UTF-8).
@@ -210,7 +227,7 @@ def uruchom():
                 funkcja(**kwargs)
                 print(f"  ✅ {nazwa_f}")
                 zaliczone += 1
-            except unittest.SkipTest as e:
+            except _POMINIECIA as e:
                 print(f"  ⏭️ {nazwa_f}: POMINIĘTY — {e}")
                 pominiete += 1
                 powody_pominiec.append((nazwa_modulu, nazwa_f, str(e)))

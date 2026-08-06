@@ -13,6 +13,36 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-08-05 — Dane PORTITOR stare (1H 8.0d, 4H 8.1d) blokują A/B
+Nieaktualne dane handlowe blokują przyszłe testy A/B, ale nie blokują sądu nad recenzją; do odświeżenia przed kolejnymi eksperymentami.
+
+### 2026-08-05 — Konstytucja ma 25 praw, nie 21
+Żywe repo ma 25 praw; audyt operuje liczbą 21. Wszystkie falsyfikowalne tezy audytu mierzono wobec kodu i reguł.
+
+### 2026-08-05 — Audyt Kimi niekompletny: 3 pliki .py vs 467
+Metaprompt Kimi mówi o 467 plikach Pythona, ale sam audyt deklaruje 'Treść plików .py niedostępna' i mapuje repo jako 3 pliki — wyniki wymagają weryfikacji wobec żywego kodu.
+
+### 2026-08-05 — scheduler.py ma zero wołaczy w kodzie
+Niezależna weryfikacja potwierdziła tezę audytu: scheduler.py nie jest wywoływany nigdzie w żywym kodzie.
+
+### 2026-07-27 — Środowisko dev ma dostęp do sieci — adaptery live działają
+MEXC, Binance-fapi i Fear&Greed odpowiadają 200 OK; oba formaty symboli (BTCUSDT i BTC/USDT) działają w DataLoader.fetch. Można testować adaptery na żywych danych bezpośrednio w tym środowisku.
+
+### 2026-07-27 — NEWS-03/04 ożywają po jednym barze rozgrzewki (W-382)
+Moduły ze stanem kroczącym nie strzelają od pierwszego cyklu. Po rozgrzewce: NEWS_ATTENTION_SPIKE=0.76, NEWS_SENTYMENT_DELTA od -0.2 do +0.257 (cykl 8 LONG). Działa jak zaprojektowano.
+
+### 2026-07-27 — Sygnał neuronu: neuron_id, kierunek, wartosc, kategoria
+raport.sygnaly to lista SygnalNeuronu; moduł ŻYWY/zmierzony gdy wartosc is not None. Punkt zaczepienia do pomiaru aktywacji i diagnostyki modułów.
+
+### 2026-07-27 — petla_live = realtime, nie replay: przetwarza tylko ostatni bar
+Pętla live pobiera to samo okno i przetwarza ostatni bar (limit=cfg.limit_barow), czekając pauzę między barami. Do pomiaru modułów potrzebny szybki bieg na żywych danych, nie czekanie na każdy bar.
+
+### 2026-07-29 — Test zależny od środowiska jest kruchy
+Test wymagający calibre na PATH przeszedłby na laptopie, padł w chmurze bez niego. Usunięto zależność środowiskową — testy muszą być niezależne od maszyny.
+
+### 2026-07-29 — Dowód przez mutację — inaczej test bywa atrapą
+Lekcja recog28 zastosowana: test bez mutacji bywa atrapą. Należy celowo psuć mechanizm i sprawdzać, czy testy czerwienieją — dopiero to dowodzi, że test realnie testuje.
+
 ### 2026-07-29 — Heurystyka 'podejrzany PDF = skan' obalona pomiarem
 BIB-138 ma warstwę tekstową na str. 261 (1957 znaków), brak tylko na stronach tytułowych; BIB-170 ma tekst na str. 91, skan to tylko przód. Nie oceniać książki po pierwszych stronach.
 

@@ -316,3 +316,37 @@ def test_kalibracja_na_realnych_komendach():
     assert w["n"] >= 100, "prawda podstawowa musi zostać w repo (co najmniej 100 etykiet)"
     assert w["precyzja"] >= 0.90, f"precyzja spadła do {w['precyzja']:.1%} (kalibracja: 93.5%)"
     assert w["czulosc"] >= 0.90, f"czułość spadła do {w['czulosc']:.1%} (kalibracja: 97.7%)"
+
+
+def test_sciezka_windows_pod_posixem_nie_jest_nasza(monkeypatch):
+    """LUSTRO reguły POSIX-owej: ścieżka z literą dysku oglądana spod Linuksa NIE jest repo.
+
+    ZMIERZONA WADA (2026-08-06, PIERWSZY bieg VALLUM na ubuntu-latest): organ obsługiwał
+    tylko JEDEN kierunek przenośności. Pod POSIX-em ścieżka windowsowa nie jest absolutna,
+    więc `Path` doklejał ją do korzenia repozytorium i strażnik pilnował windowsowego
+    katalogu tymczasowego jak własnego drzewa — cztery testy ciszy padły, a kalibracja
+    spadła z 93,5% na 89,6% precyzji. Asymetria widoczna WYŁĄCZNIE poza maszyną autora.
+
+    Test udaje `os.name`, więc bada OBA systemy niezależnie od tego, gdzie biegnie —
+    inaczej sam byłby strażnikiem działającym na jednej maszynie, czyli powielałby
+    dokładnie tę wadę, którą ma łapać.
+    """
+    B = chr(92)   # backslash budowany jawnie — literał w cudzysłowie zbyt łatwo zgubić
+    windowsowa = "C:" + B + "Users" + B + "Ian" + B + "AppData" + B + "Local" + B + "Temp" + B + "x.md"
+    unc = B + B + "serwer" + B + "udzial" + B + "plik.md"
+
+    monkeypatch.setattr(S.os, "name", "posix")
+    assert S._obca_sciezka_windows(windowsowa) is True, "windowsowy temp pod POSIX-em to NIE nasze repo"
+    assert S._obca_sciezka_windows("c:/users/ian/temp/x.md") is True, "mała litera i ukośniki też"
+    assert S._obca_sciezka_windows(unc) is True, "UNC (dwa backslashe) również nie jest nasz"
+    assert S._obca_sciezka_windows("docs/LOG_ZMIAN.md") is False, "nasz plik względny zostaje nasz"
+    assert S._obca_sciezka_windows("/tmp/x.md") is False, "ścieżkę POSIX-ową obsługuje osobna reguła"
+    assert S._w_repo(windowsowa) is False, "strażnik nie może pilnować cudzego katalogu tymczasowego"
+
+    # GRANICA W DRUGĄ STRONĘ — tu leży realne ryzyko tej naprawy: gdyby reguła odezwała
+    # się pod Windowsem, uznałaby WŁASNE repo Cezara (C:\...) za obce i rozbroiła
+    # strażnika na jedynej maszynie, na której on naprawdę pracuje.
+    monkeypatch.setattr(S.os, "name", "nt")
+    assert S._obca_sciezka_windows(windowsowa) is False, "pod Windowsem reguła MUSI milczeć"
+    assert S._obca_sciezka_windows(unc) is False, "pod Windowsem UNC też nie jest obcy z tego powodu"
+

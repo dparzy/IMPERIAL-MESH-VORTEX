@@ -93,6 +93,53 @@ VALLUM jest **zmierzony lokalnie, niezweryfikowany zdalnie**, i tak jest opisany
 (164→166, zapis potwierdzony odczytem z dysku): *pętla łapiąca tylko `Exception` wobec sygnału
 z `BaseException`* oraz *deklaracja o środowisku nigdy nie zmierzona w tym środowisku*.
 
+### 🔴 PIERWSZY REALNY BIEG WAŁU — CZERWONY (bieg `31060020148`)
+Cezar wypchnął commit; VALLUM ruszył sam. **Przeszły: zależności, TA-Lib z wheeli, RUFF
+i cały AUDYT (24 warstwy) — na 3.10 ORAZ 3.11.** Padła noga TESTÓW: **8 z 3540**,
+**identycznie na obu wersjach** — a ta identyczność jest sama w sobie diagnozą: przyczyną
+nie jest wersja Pythona, tylko środowisko.
+
+Nie muszę już pisać „nie wiem, czy workflow umie zaczerwienieć". **Umie** — pokazał to
+na własnym pierwszym biegu, bez mutacji, na prawdziwym kodzie.
+
+### Żniwo: 8 testów, które żyły wyłącznie na maszynie Cezara
+**(A) WADA ORGANU, nie testów — 4× SILENTIUM + kalibracja.** `_w_repo()` miał regułę dla
+ścieżek POSIX-owych pod Windowsem, ale **brakowało jej lustra**: ścieżka `C:\…` widziana
+spod Linuksa nie jest absolutna, więc `Path` doklejał ją do korzenia repozytorium i strażnik
+**pilnował windowsowego katalogu tymczasowego jak własnego drzewa**. Dodana
+`_obca_sciezka_windows()` + test granicy badający OBA systemy przez udawanie `os.name`.
+Twarda asercja w drugą stronę: **pod Windowsem reguła MUSI milczeć**, bo tam `C:\Projekty\…`
+to naprawdę nasze repo i odezwanie się rozbroiłoby strażnika na jedynej maszynie, gdzie pracuje.
+
+**(B) 2× `test_calibre_*`.** Padały na `faber.wymagaj("ebook-convert")`, choć oba udają
+`subprocess.run` i prawdziwy calibre nie jest im do niczego potrzebny. Podmieniony FABER
+**zamiast pominięcia** — pominięcie oddawałoby pokrycie na każdej maszynie bez calibre,
+a `_calibre` ma własną gałąź „FABERA brak" i to jej używamy.
+
+**(C) `test_raport_alarmuje_o_skazonej_krytyce` — moja pierwsza diagnoza była BŁĘDNA.**
+Obstawiałem różnicę systemu; rozstrzygnęło dopiero sprawdzenie, czy test padał również
+w klonie **na Windowsie**. Padał. `raport()` ma na wejściu bramkę *„brak indeksu RAG =
+AWARIA INFRY"* i wraca komunikatem, zanim dojdzie do badanej sekcji — a `baza_wiedzy.db`
+stoi w `.gitignore`, więc **istnieje wyłącznie na maszynie, która ją zaindeksowała**.
+Bramka w kodzie jest SŁUSZNA i zostaje; to test nie deklarował swojej zależności.
+
+### ⚠️ MOC DOWODU JEST RÓŻNA — nie zrównuję jej (LEX TALARUS)
+| Naprawa | Czym dowiedziona | Siła |
+|---|---|---|
+| (C) skażona krytyka | odtworzona realna porażka w klonie → zgasła | **pełna** |
+| (B) calibre ×2 | bieg przy udawanym braku narzędzia | mocna |
+| (A) SILENTIUM ×4 + kalibracja | diagnoza + test granicy pod udawanym `os.name` | **niepełna** — czy kalibracja wróci z 89,6% na 93,5% pod PRAWDZIWYM Linuksem, pokaże dopiero następny bieg wału |
+
+**Klasa nadrzędna — trzecia w jednej wachcie:** *rzecz uznana za sprawdzoną, bo sprawdzano
+ją w jedynym miejscu, gdzie ją kiedykolwiek uruchomiono.* Najpierw runner testów, potem
+`requirements.txt`, teraz 8 testów. Wał nie stworzył tych wad — **odsłonił je w pierwszej
+godzinie istnienia**.
+
+**Złapane na sobie:** heredoc powłoki zjadł mi backslashe dwukrotnie (raz w kodzie testu,
+raz w docstringu), przez co przez chwilę raportowałem „ZLE" dla przypadku UNC, choć wada
+była w moim **rusztowaniu pomiarowym**, nie w kodzie. Literały ze znakami ucieczki buduję
+odtąd jawnie (`chr(92)`), a treść z ukośnikami piszę narzędziem plikowym, nie powłoką.
+
 ---
 
 ## 2026-08-06 | ⚖️ | SĄD nad audytem Kimi K3 — 8 adopcji KM1–KM8, reszta obalona pomiarem

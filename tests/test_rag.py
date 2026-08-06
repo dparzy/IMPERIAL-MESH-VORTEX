@@ -311,12 +311,21 @@ def test_calibre_output_rozszerzenie_txt_nie_tmp():
             out.write_text("TRESC Z CALIBRE " * 20, encoding="utf-8")
             return None                              # check=True nie rzuca — sukces
 
+        # FABER wyciszony razem z subprocess (zmierzone 2026-08-06, pierwszy bieg VALLUM):
+        # `_calibre` pyta FABERA o binarkę ZANIM cokolwiek uruchomi, więc na maszynie bez
+        # calibre test padał na `BrakNarzedzia` — mimo że sprawdza kontrakt rozszerzenia,
+        # do którego prawdziwy calibre nie jest potrzebny. Podmiana (zamiast pominięcia)
+        # jest tu LEPSZA: pominięcie oddawałoby pokrycie na każdej maszynie bez calibre,
+        # a `_calibre` ma własną gałąź „FABERA brak" i to jej właśnie używamy.
         orig = ekstraktor.subprocess.run
+        orig_faber = ekstraktor._faber
         ekstraktor.subprocess.run = _fake_run
+        ekstraktor._faber = lambda: None
         try:
             tekst = ekstraktor._calibre(src)
         finally:
             ekstraktor.subprocess.run = orig
+            ekstraktor._faber = orig_faber
 
         out = zapis["out"]
         assert out.suffix == ".txt"                  # granica: format wyjścia = txt
@@ -338,11 +347,14 @@ def test_calibre_porazka_zwraca_pusto_i_sprzata():
             raise RuntimeError("ebook-convert failed")               # ...ale konwersja padła
 
         orig = ekstraktor.subprocess.run
-        ekstraktor.subprocess.run = _fake_run
+        orig_faber = ekstraktor._faber          # patrz komentarz w teście obok — brak calibre
+        ekstraktor.subprocess.run = _fake_run   # nie może przesądzać o tym teście
+        ekstraktor._faber = lambda: None
         try:
             assert ekstraktor._calibre(src) == ""
         finally:
             ekstraktor.subprocess.run = orig
+            ekstraktor._faber = orig_faber
         # brak śmieci .calibre-tmp.txt w katalogu źródła (sprzątanie w finally)
         assert list(Path(tmp).glob("*.calibre-tmp.txt")) == []
 

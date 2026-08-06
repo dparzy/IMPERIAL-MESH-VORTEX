@@ -501,15 +501,45 @@ def cisza(powod: str, ttl_s: int = TTL_DOMYSLNY_S) -> Iterator[Optional[Blokada]
 # ══════════════════════════════════════════════════════════════════════════════
 #  Klasyfikacja: czy TO wywołanie pisze do repozytorium
 # ══════════════════════════════════════════════════════════════════════════════
+_DYSK_WINDOWS = re.compile(r"^[A-Za-z]:[\\/]")
+
+
+def _obca_sciezka_windows(sciezka: str) -> bool:
+    """Czy to ścieżka windowsowa oglądana spod POSIX-a (a więc NIE nasze drzewo).
+
+    LUSTRO reguły `/tmp` z `_w_repo`: tam ścieżka POSIX-owa pod Windowsem nie jest
+    absolutna, tu ścieżka windowsowa pod POSIX-em nie jest absolutna. W obu razach
+    `Path` dokleiłby ją do korzenia repozytorium i strażnik pilnowałby cudzego katalogu
+    jak własnego.
+
+    POD WINDOWSEM MUSI ZWRACAĆ FALSE — i to nie jest ostrożność, tylko warunek
+    poprawności: tam `C:\\Projekty\\imperial-mesh-vortex\\docs\\x.md` JEST naszym repo,
+    więc uznanie litery dysku za obcość rozbroiłoby strażnika na maszynie Cezara.
+    """
+    if os.name == "nt":
+        return False
+    if sciezka.startswith("\\\\"):        # UNC: \\serwer\udzial — również nie nasze
+        return True
+    return bool(_DYSK_WINDOWS.match(sciezka))
+
+
 def _w_repo(sciezka: str) -> bool:
     """Czy ścieżka celuje w wersjonowaną część repozytorium.
 
-    DWA PRZYPADKI ZMIERZONE JAKO FAŁSZYWE ALARMY (2 z 22 w pierwszej wersji):
+    TRZY PRZYPADKI ZMIERZONE JAKO FAŁSZYWE ALARMY (2 z 22 w pierwszej wersji + 1 z CI):
       • `$TEMP/x.txt`, `$env:TEMP\\x.txt`, `%TEMP%\\x` — powłoka rozwinie je POZA repo,
         ale `Path` widzi napis względny i doklejał go do korzenia repozytorium;
       • `/tmp/x` — na Windowsie `Path("/tmp/x").is_absolute()` jest FAŁSZEM (brak litery
-        dysku), więc ścieżka rdzennie POSIX-owa również lądowała „w repo".
-    W obu razach strażnik blokowałby zapis do katalogu tymczasowego, czyli karałby
+        dysku), więc ścieżka rdzennie POSIX-owa również lądowała „w repo";
+      • `C:\\Users\\…\\Temp\\x` NA LINUKSIE — dokładne LUSTRO poprzedniego przypadku,
+        którego brakowało. `Path("C:\\Users\\x").is_absolute()` pod POSIX-em jest FAŁSZEM
+        (to dla niego jeden dziwny człon nazwy), więc ścieżka rdzennie windowsowa była
+        doklejana do korzenia repo i strażnik uznawał katalog tymczasowy Windowsa za
+        SWOJE drzewo. Złapane 2026-08-06 przez VALLUM w PIERWSZYM biegu na `ubuntu-latest`:
+        cztery testy ciszy padły, a kalibracja spadła z 93,5% na 89,6% precyzji.
+        Organ obsługiwał jeden kierunek przenośności i milczał o drugim — asymetria
+        widoczna WYŁĄCZNIE poza maszyną autora.
+    We wszystkich razach strażnik blokowałby zapis do katalogu tymczasowego, czyli karałby
     zachowanie, którego sam wymaga (pisz do scratchpada, nie do repo).
     """
     if not sciezka:
@@ -518,6 +548,8 @@ def _w_repo(sciezka: str) -> bool:
         return False                   # nierozwinięta zmienna — celu nie znamy, nie zgadujemy
     if sciezka.startswith("/") and not sciezka.startswith("//"):
         return False                   # ścieżka POSIX-owa (/tmp, /c/…) — nie nasze drzewo
+    if _obca_sciezka_windows(sciezka):
+        return False                   # `C:\…` albo `\\serwer\udział` widziane spod POSIX-a
     try:
         p = Path(sciezka)
         if not p.is_absolute():

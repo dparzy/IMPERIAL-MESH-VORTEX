@@ -203,6 +203,15 @@ def test_raport_alarmuje_o_skazonej_krytyce(tmp_path, monkeypatch):
     zmierzone 07-26 — kandydaci 0/10 skażonych, krytyka 2/10).
     """
     import szukaj as szukaj_mod
+    # BAZA RAG UDAWANA (zmierzone 2026-08-06): `raport()` ma na wejściu bramkę „brak indeksu
+    # RAG = AWARIA INFRY" i wraca komunikatem, ZANIM dojdzie do sekcji PROBATORA. Baza
+    # `narzedzia/rag/baza_wiedzy.db` stoi w .gitignore, więc istnieje WYŁĄCZNIE na maszynie,
+    # która ją zaindeksowała — test przechodził u Cezara i padał na każdym czystym klonie
+    # (potwierdzone dwukrotnie na Windowsie, zanim VALLUM pokazał to samo na Linuksie).
+    # Bramka w kodzie jest SŁUSZNA i zostaje; to test nie deklarował swojej zależności.
+    baza_atrapa = tmp_path / "baza_wiedzy.db"
+    baza_atrapa.write_bytes(b"")          # samo istnienie wystarczy — szukaj i tak podmieniony
+    monkeypatch.setattr(szukaj_mod, "DEFAULT_BAZA", baza_atrapa)
     monkeypatch.setattr(bib, "KOLEJKA", tmp_path / "kolejka.jsonl")
     monkeypatch.setattr(szukaj_mod, "szukaj",
                         lambda q, **kw: [_FakeWynik("BIB-001", "Chan", 1, "tekst", -1.0, "biblioteka")])

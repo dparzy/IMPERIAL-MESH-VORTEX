@@ -155,6 +155,16 @@ więc `/tmp/x` nadal wypada z drzewa, a `/home/runner/…/docs/x.md` zostaje roz
 **Ta sama reguła przenośności była zepsuta w OBIE strony — każda połowa widoczna wyłącznie
 z drugiego systemu.**
 
+### 🟢 TRZECI BIEG (`31083330629`) — ZIELONY na 3.10 I 3.11. VALLUM DZIAŁA.
+Wszystkie 8 napraw potwierdzone pod prawdziwym Linuksem. **Dopiero teraz KM1 dostaje ✅** —
+przez trzy biegi stało 🟡, bo dowód był niepełny, a nie dlatego, że praca była niegotowa.
+
+**Droga wału w jeden dzień:** nie istnieje → zbudowany → **czerwony (8 wad)** → czerwony (2 wady)
+→ **zielony**. Ani jednej z tych wad wał nie stworzył; wszystkie leżały w repo i były niewidoczne,
+bo jedyną maszyną, na której cokolwiek uruchamiano, był komputer Cezara.
+
+**Od tego commitu Imperium przestało polegać na tym, że Architekt pamięta o bramce.**
+
 **Złapane na sobie:** heredoc powłoki zjadł mi backslashe dwukrotnie (raz w kodzie testu,
 raz w docstringu), przez co przez chwilę raportowałem „ZLE" dla przypadku UNC, choć wada
 była w moim **rusztowaniu pomiarowym**, nie w kodzie. Literały ze znakami ucieczki buduję

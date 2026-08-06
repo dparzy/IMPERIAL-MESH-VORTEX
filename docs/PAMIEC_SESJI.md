@@ -113,17 +113,8 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-08-06 — PR bez recenzji to stan normalny, nie incydent
-92 z 141 PR (65,2%) nie miało żadnej recenzji. W próbce 12 ostatnich PR każdy scalony w 11–35 s nie ma recenzji, a każdy żyjący minuty/godziny ma. Main bez branch protection, merguje dparzy — recenzja fizycznie nie zdąży wystartować.
-
-### 2026-08-06 — RECOGNITOR istnieje, ale jest wołaczem-widmem
-Recognitor (251 linii, własne testy) nie jest wywoływany w /limes ani w kodzie — grep pokazuje tylko CLAUDE.md i test własny. Docstring deklaruje krok 3 clausury i /limes, a żaden go nie używa. Ta sama klasa luki co 'API-widmo' z Warstwy 16.
-
-### 2026-08-06 — Limit ścieżki Windows w scratchpadzie — core.longpaths
-Głęboki katalog scratchpada powodował przekroczenie limitu ścieżki Windows (nie wada repo; na ubuntu-latest limit 4096). Obejście przez core.longpaths. Klon czysty — 0 rozbieżności.
-
-### 2026-08-06 — Repo PUBLIC — GitHub Actions bez limitu minut
-Repozytorium imperial-mesh-vortex jest publiczne, więc standardowe runnery GitHub Actions nie mają limitu minut. Obawa o koszt biegów CI została zniesiona.
+### 2026-08-06 — GRAPH: kto_przy_decyzji=NIKT — graf pamięta, nie wybiera
+Graf poprawia pamięć, nie wybór. Znane wąskie gardło nierozstrzygnięte.
 
 ### 2026-08-05 — Konstytucja ma 25 praw, nie 21 — błąd audytu zewnętrznego
 Audyt Kimi 3 cytował 21 praw; żywa konstytucja (CLAUDE.md) zawiera 25. Cytaty z reguł trzeba sprawdzać grepem wobec aktualnego źródła, nie wobec pamięci ani cudzych odwołań.

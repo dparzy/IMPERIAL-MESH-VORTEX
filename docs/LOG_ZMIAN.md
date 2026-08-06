@@ -135,6 +135,26 @@ ją w jedynym miejscu, gdzie ją kiedykolwiek uruchomiono.* Najpierw runner test
 `requirements.txt`, teraz 8 testów. Wał nie stworzył tych wad — **odsłonił je w pierwszej
 godzinie istnienia**.
 
+### 🔁 DRUGI BIEG (`31062067510`) — 8 → 2, i druga połowa tej samej wady
+Sześć napraw zadziałało. **Kalibracja SILENTIUM zniknęła z listy porażek** — czyli wróciła
+ponad próg, co potwierdziło hipotezę (A), której nie dało się dowieść lokalnie.
+
+Zostały 2 testy ciszy — i wskazały **lustrzane odbicie tej samej wady przenośności**.
+Reguła *„ścieżka zaczynająca się od `/` to nie nasze drzewo"* jest poprawna **wyłącznie pod
+Windowsem** (tam repo ma literę dysku). Pod Linuksem korzeń repozytorium to `/home/runner/…`,
+więc reguła **uznawała WŁASNE REPOZYTORIUM ZA OBCE**: strażnik nie chronił ŻADNEGO pliku
+wskazanego ścieżką absolutną — milcząc, czyli wyglądając na spokój.
+
+Oba testy trafiły w to, bo **świadomie używają ścieżek produkcyjnych** (`test_pliki_pomocnicze_ciszy`
+ma to wprost w docstringu: *na `tmp_path` test przeszedłby zawsze — z powodu położenia, nie
+z powodu reguły, której pilnuje*). Ta decyzja sprzed miesięcy jest powodem, dla którego wada
+w ogóle wyszła na jaw.
+
+Naprawa: warunek obwarowany `os.name == "nt"`; pod POSIX-em rozstrzyga `relative_to(KORZEN)`,
+więc `/tmp/x` nadal wypada z drzewa, a `/home/runner/…/docs/x.md` zostaje rozpoznane jako nasze.
+**Ta sama reguła przenośności była zepsuta w OBIE strony — każda połowa widoczna wyłącznie
+z drugiego systemu.**
+
 **Złapane na sobie:** heredoc powłoki zjadł mi backslashe dwukrotnie (raz w kodzie testu,
 raz w docstringu), przez co przez chwilę raportowałem „ZLE" dla przypadku UNC, choć wada
 była w moim **rusztowaniu pomiarowym**, nie w kodzie. Literały ze znakami ucieczki buduję

@@ -350,3 +350,29 @@ def test_sciezka_windows_pod_posixem_nie_jest_nasza(monkeypatch):
     assert S._obca_sciezka_windows(windowsowa) is False, "pod Windowsem reguła MUSI milczeć"
     assert S._obca_sciezka_windows(unc) is False, "pod Windowsem UNC też nie jest obcy z tego powodu"
 
+
+def test_regula_posixowa_nie_wywlaszcza_repo_na_linuksie(monkeypatch):
+    """Reguła „ścieżka od / to nie nasze" NIE MOŻE działać pod POSIX-em — tam repo też ma /.
+
+    ZMIERZONA WADA (2026-08-06, DRUGI bieg VALLUM): warunek odrzucał ryczałtem każdą ścieżkę
+    zaczynającą się od „/". Pod Windowsem to poprawne (repo ma literę dysku), ale pod
+    Linuksem korzeń repozytorium to `/home/runner/…`, więc strażnik uznawał WŁASNE REPO
+    ZA OBCE i nie chronił ŻADNEGO pliku wskazanego ścieżką absolutną — milcząc, czyli
+    wyglądając na spokój. Lustrzane odbicie wady ze ścieżkami windowsowymi pod POSIX-em:
+    ta sama reguła przenośności zepsuta w obie strony, każda widoczna tylko na drugim systemie.
+    """
+    wewnatrz = str(S.KORZEN / "docs" / "LOG_ZMIAN.md")
+
+    # Pod BIEŻĄCYM systemem (jakikolwiek jest) własne repo musi być rozpoznane jako nasze —
+    # to jest asercja, która pada na Linuksie przed naprawą, a przechodzi po niej.
+    assert S._w_repo(wewnatrz) is True, "plik WEWNĄTRZ repo musi być chroniony niezależnie od systemu"
+    assert S._w_repo("imperium/legiony/rejestr.py") is True, "ścieżka względna też celuje w repo"
+
+    # Granica: katalog tymczasowy spoza drzewa zostaje wolny — i to NIE dzięki regule
+    # od „/", tylko dzięki `relative_to(KORZEN)`, które wypycha go z drzewa.
+    assert S._w_repo("/tmp/msg.txt") is False, "cudzy katalog POSIX-owy nie może być chroniony"
+
+    # Pod udawanym Windowsem reguła skrótowa wraca do gry i nadal odrzuca „/…".
+    monkeypatch.setattr(S.os, "name", "nt")
+    assert S._w_repo("/tmp/msg.txt") is False, "pod Windowsem ścieżka od / nigdy nie jest nasza"
+

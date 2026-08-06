@@ -546,8 +546,16 @@ def _w_repo(sciezka: str) -> bool:
         return False
     if "$" in sciezka or "%" in sciezka or sciezka.startswith("~"):
         return False                   # nierozwinięta zmienna — celu nie znamy, nie zgadujemy
-    if sciezka.startswith("/") and not sciezka.startswith("//"):
-        return False                   # ścieżka POSIX-owa (/tmp, /c/…) — nie nasze drzewo
+    if os.name == "nt" and sciezka.startswith("/") and not sciezka.startswith("//"):
+        # ścieżka POSIX-owa (/tmp, /c/…) POD WINDOWSEM — tam repo ma literę dysku, więc
+        # nic zaczynającego się od „/" nie może być nasze.
+        # WARUNEK `os.name == "nt"` DOPISANY 2026-08-06 po DRUGIM biegu VALLUM: bez niego
+        # reguła pod Linuksem uznawała ZA OBCE WŁASNE REPOZYTORIUM (korzeń to tam
+        # `/home/runner/…`, więc też zaczyna się od „/"). Strażnik nie chronił wtedy ŻADNEGO
+        # pliku wskazanego ścieżką absolutną — milcząc, czyli wyglądając na spokój.
+        # Pod POSIX-em rozstrzyga niżej `relative_to(KORZEN)`: `/tmp/x` wypada z drzewa
+        # i wraca False tą samą drogą, a `/home/runner/…/docs/x.md` zostaje rozpoznane jako nasze.
+        return False
     if _obca_sciezka_windows(sciezka):
         return False                   # `C:\…` albo `\\serwer\udział` widziane spod POSIX-a
     try:

@@ -13,6 +13,30 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-08-06 — Repo bez CI/CD — potwierdzone pomiarem, nie pamięcią
+Brak katalogu .github oraz pyproject/setup zmierzony bezpośrednio. Znalezisko Kimi K3 o braku CI/CD było prawdziwe. To dowód, że weryfikacja musi być mierzona, a nie zapamiętywana.
+
+### 2026-07-27 — Lokalny dysk zawiera pełne dane: kod, 69 książek i RAG cache
+Sesja na /c/Projekty/imperial-mesh-vortex (Windows, git user Pixel) ma pełny dostęp: kod imperium, bibliotheca_ulpia 69/69 (559MB, poza git) i tekst_cache 69 plików (59MB, w git). To odblokowuje ciężkie zadania wymagające książek/danych, niemożliwe na chmurze.
+
+### 2026-08-05 — scheduler.py ma zero wołaczy — martwy moduł
+Weryfikacja grepem: scheduler.py nie jest wołany z żadnego miejsca w kodzie. Martwy moduł potwierdzony — kandydat do usunięcia lub reaktywacji w ramach M1 (40 martwych organów).
+
+### 2026-08-05 — Pusty cytat web_search w audycie — weryfikacja niezależna
+Linia 328 audytu zawierała nierozwinięty znacznik article🛠web_search:16#9; teza 'Kimi K3 działa w Claude Code' stała na pustym cytacie. Niezależna weryfikacja w sieci potwierdziła tezę — pusty cytat to brak dowodu, nie fałsz.
+
+### 2026-08-05 — Audyt zewnętrzny Kimi 3 nie czytał kodu — 3 pliki .py vs 467
+Metaprompt Kimi 3 mówi o 467 plikach Pythona, a sam audyt mapuje repo jako 3 pliki i deklaruje: 'Treść plików .py niedostępna'. Audyt bez dostępu do kodu nie może być podstawą zmian — weryfikuj mapowanie repo przed analizą.
+
+### 2026-08-05 — Liczby w dokumentach muszą być synchronizowane z kodem (audyt W15)
+Złamanie Prawa XXI (W15): docs miały 158 sesji_kroniki, kod 159. Narzędzie tabularium.py liczby --zapisz synchronizuje dokumenty z żywym kodem. Po każdej zmianie liczebności trzeba uruchamiać audyt.
+
+### 2026-08-05 — Dashboard w audycie to synteza, nie pomiar
+Obraz pokazuje XAUUSD (my handlujemy krypto), cenę 1180→2400 w 10 świec i idealną sinusoidę RSI — nie stanowi dowodu empirycznego.
+
+### 2026-07-29 — Wrażliwość interwału na wielkość liter zmienia decyzje
+Etykieta interwału (np. '4h' vs '4H') jest case-sensitive w Legatus._formacja_interwalu - cicho zmienia wyniki backtestu. Przyczyna: słownik mapujący interwały. Naprawiono przez dodanie aliasów i normalizację.
+
 ### 2026-08-05 — Dane PORTITOR stare (1H 8.0d, 4H 8.1d) blokują A/B
 Nieaktualne dane handlowe blokują przyszłe testy A/B, ale nie blokują sądu nad recenzją; do odświeżenia przed kolejnymi eksperymentami.
 

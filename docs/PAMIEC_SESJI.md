@@ -1,10 +1,10 @@
 ---
 
-## Ostatnia aktualizacja: 2026-08-05
+## Ostatnia aktualizacja: 2026-08-06
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
-stan_na: 2026-08-05
+stan_na: 2026-08-06
 powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360)"
 ---
 # PAMIĘĆ SESJI — W-360
@@ -113,26 +113,20 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-27 — Lokalny dysk zawiera pełne dane: kod, 69 książek i RAG cache
-Sesja na /c/Projekty/imperial-mesh-vortex (Windows, git user Pixel) ma pełny dostęp: kod imperium, bibliotheca_ulpia 69/69 (559MB, poza git) i tekst_cache 69 plików (59MB, w git). To odblokowuje ciężkie zadania wymagające książek/danych, niemożliwe na chmurze.
+### 2026-08-06 — PR bez recenzji to stan normalny, nie incydent
+92 z 141 PR (65,2%) nie miało żadnej recenzji. W próbce 12 ostatnich PR każdy scalony w 11–35 s nie ma recenzji, a każdy żyjący minuty/godziny ma. Main bez branch protection, merguje dparzy — recenzja fizycznie nie zdąży wystartować.
+
+### 2026-08-06 — RECOGNITOR istnieje, ale jest wołaczem-widmem
+Recognitor (251 linii, własne testy) nie jest wywoływany w /limes ani w kodzie — grep pokazuje tylko CLAUDE.md i test własny. Docstring deklaruje krok 3 clausury i /limes, a żaden go nie używa. Ta sama klasa luki co 'API-widmo' z Warstwy 16.
+
+### 2026-08-06 — Limit ścieżki Windows w scratchpadzie — core.longpaths
+Głęboki katalog scratchpada powodował przekroczenie limitu ścieżki Windows (nie wada repo; na ubuntu-latest limit 4096). Obejście przez core.longpaths. Klon czysty — 0 rozbieżności.
+
+### 2026-08-06 — Repo PUBLIC — GitHub Actions bez limitu minut
+Repozytorium imperial-mesh-vortex jest publiczne, więc standardowe runnery GitHub Actions nie mają limitu minut. Obawa o koszt biegów CI została zniesiona.
 
 ### 2026-08-05 — Konstytucja ma 25 praw, nie 21 — błąd audytu zewnętrznego
 Audyt Kimi 3 cytował 21 praw; żywa konstytucja (CLAUDE.md) zawiera 25. Cytaty z reguł trzeba sprawdzać grepem wobec aktualnego źródła, nie wobec pamięci ani cudzych odwołań.
-
-### 2026-08-05 — scheduler.py ma zero wołaczy — martwy moduł
-Weryfikacja grepem: scheduler.py nie jest wołany z żadnego miejsca w kodzie. Martwy moduł potwierdzony — kandydat do usunięcia lub reaktywacji w ramach M1 (40 martwych organów).
-
-### 2026-08-05 — Pusty cytat web_search w audycie — weryfikacja niezależna
-Linia 328 audytu zawierała nierozwinięty znacznik article🛠web_search:16#9; teza 'Kimi K3 działa w Claude Code' stała na pustym cytacie. Niezależna weryfikacja w sieci potwierdziła tezę — pusty cytat to brak dowodu, nie fałsz.
-
-### 2026-08-05 — Audyt zewnętrzny Kimi 3 nie czytał kodu — 3 pliki .py vs 467
-Metaprompt Kimi 3 mówi o 467 plikach Pythona, a sam audyt mapuje repo jako 3 pliki i deklaruje: 'Treść plików .py niedostępna'. Audyt bez dostępu do kodu nie może być podstawą zmian — weryfikuj mapowanie repo przed analizą.
-
-### 2026-08-05 — Liczby w dokumentach muszą być synchronizowane z kodem (audyt W15)
-Złamanie Prawa XXI (W15): docs miały 158 sesji_kroniki, kod 159. Narzędzie tabularium.py liczby --zapisz synchronizuje dokumenty z żywym kodem. Po każdej zmianie liczebności trzeba uruchamiać audyt.
-
-### 2026-08-05 — Dashboard w audycie to synteza, nie pomiar
-Obraz pokazuje XAUUSD (my handlujemy krypto), cenę 1180→2400 w 10 świec i idealną sinusoidę RSI — nie stanowi dowodu empirycznego.
 
 ### 2026-07-29 — Bug: len(doc) po doc.close() w FABER
 Własny kod FABERA wołał len(doc) po zamknięciu dokumentu — realny bug wykryty i naprawiony; dowód przez mutację potwierdził czułość testów.
@@ -199,9 +193,6 @@ W FTS bibliotekarza bug crash na myślnikach powodował ciche giniecie tematów 
 
 ### 2026-07-27 — 43 cząstki Hyginusa bez sędziego (zapłacony zwiad niewykorzystany)
 Kolejka Hyginusa zawiera 43 cząstki czekające na sąd (poprzednio 33). To zapłacony, ale niewykorzystany zwiad, co narusza Prawo XV. Priorytet najniższy (ostatnie w kolejce).
-
-### 2026-07-29 — Wrażliwość interwału na wielkość liter zmienia decyzje
-Etykieta interwału (np. '4h' vs '4H') jest case-sensitive w Legatus._formacja_interwalu - cicho zmienia wyniki backtestu. Przyczyna: słownik mapujący interwały. Naprawiono przez dodanie aliasów i normalizację.
 
 ### 2026-07-27 — Backtest liniowy O(n·okno), nie O(n²)
 Pomiar cProfile wykazał stały ~66 ms/tick dla okna 251 barów. Skalowanie liniowe, nie kwadratowe. Poprzednia diagnoza o O(n²) była błędna.

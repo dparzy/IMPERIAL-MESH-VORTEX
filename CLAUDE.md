@@ -304,6 +304,19 @@ nowe zadanie bez weryfikacji „czy już istnieje"; liczby z pamięci zamiast z 
 7. **Commit lokalny** z opisowym komunikatem (Claude NIGDY nie pushuje).
 8. **Push dla Cezara:** podaj pełny blok PowerShell (`cd` + `git push origin <branch>`); po JEGO pushu
    zweryfikuj `ahead 0, behind 0` przed clear.
+8b. **WAŁ I BRAMA — `gh run list --workflow=ci.yml --limit 2` PO PUSHU** (ROZKAZ STAŁY, Cezar
+   2026-08-06). **VALLUM nie miał ANI JEDNEGO wołacza** — zbudowany 08-06, egzekwował, a żaden
+   hook ani krok nie pytał o jego werdykt; o anulowanym biegu dowiedziałem się tylko dlatego,
+   że sprawdziłem ręcznie. To ta sama klasa co RECOGNITOR stojący w konstytucji poza bramką.
+   Czytasz **zdarzenie i wynik**: `cancelled` ≠ `failure` (bieg `pull_request` bywa anulowany,
+   gdy PR zmergowano wcześniej), a werdyktem dla commita jest bieg `push`.
+   **MERGE DO `main` DOPIERO PO POTWIERDZENIU ARCHITEKTA** — Cezar 2026-08-06: *„zrobiłem
+   odruchowo pull merge do main, już tego więcej nie zrobię bez twojego potwierdzenia"*.
+   Architekt potwierdza, gdy **VALLUM zielony** ORAZ **recenzent dostał swoje okno**
+   (`python -m imperium.pretorianie.recognitor --bramka`). Zmierzone 2026-08-06 na 141 PR:
+   **92 (65,2%) bez ani jednej recenzji, 36 z 49 recenzji PO MERGU, przejrzane na czas 10
+   (7,1%)**, mediana okna do mergu **10 s** — krócej, niż recenzent zdąży ruszyć.
+   Rozkład na całej historii: `python -m imperium.pretorianie.recognitor historia`.
 9. **Alarmy hooka = ZADANIA** (ZASADA CENSORA): jawnie rozstrzygnij / zaplanuj w Backlogu CODEX / zapytaj Cezara — nigdy milczeniem.
 
 - **🔍 SPÓJNOŚĆ PRZY PR** — przy tworzeniu PR: bramka kodu + porównanie gałąź↔main + raport w opisie; czerwona bramka = nie tworzysz PR. Procedura: **`/spojnosc`**.

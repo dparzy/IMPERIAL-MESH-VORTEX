@@ -29,14 +29,107 @@ powod_istnienia: "Mapa dróg rozwoju systemu w 5 fazach (0-4), od pierwszego cyk
 > w najbliższych wachtach", a kolejka leżała rozsypana po ośmiu sekcjach niżej (H, G, A,
 > F, B, C, Ł, E). Uporządkowane 2026-08-05 na rozkaz Cezara.
 
+### 👑 SUCCESSIO — DOKTRYNA NADRZĘDNA (ROZKAZ KIERUNKOWY Cezara 2026-08-07)
+
+> *„działaj tak, aby przygotowywać się na powolne stopniowe przekazywanie pałeczki lokalnemu
+> LLM, dbając o dobrą kondycję i działający kod i cały system (…) dawaj z siebie wszystko
+> i ostrożnie buduj nasze imperium"*
+
+**To nie jest odległa wizja, tylko KRYTERIUM OCENY KAŻDEJ POZYCJI NIŻEJ.** Cel: orkiestrator
+oparty na TIRO. Zmierzone ograniczenia, w których musi się zmieścić: sprzęt PEDES unosi
+1–3 mld parametrów szybko (Q4) albo 7–8 mld wsadowo; TIRO ma **254 użyteczne pary z progu
+1000**. Model tej klasy **nie zastąpi rozumowania** — więc jedyna droga to **zmniejszać liczbę
+rzeczy wymagających sądu**, nie czekać na większy model.
+
+| # | Reguła | Konsekwencja inżynierska |
+|---|---|---|
+| 1 | **Determinizm bije sąd** | reguła z kodem wyjścia = jedna rzecz mniej dla orkiestratora (dowód: HARNESS 4/4, NEURO-SYM 4/4) |
+| 2 | **Każdy organ ma WOŁACZA i kontrakt** | mały model nie odgadnie, kiedy coś wywołać; wołacz-widmo = przyszła ślepa plama |
+| 3 | **Liczby zamiast intuicji** | każdy próg z kalibracją i testem granicy (LEX TALARUS) |
+| 4 | **Zapisuj DLACZEGO, nie tylko CO** | docstringi z dowodem to materiał, z którego TIRO uczy się domeny |
+| 5 | **Kondycja przed rozbudową** | zielona bramka i zero długu mają pierwszeństwo przed nowym organem |
+
+**GRANICA PRAWNA, NIENARUSZALNA:** TIRO uczy się od **Hyginusa (DeepSeek) i z danych Imperium**,
+NIGDY z wyjść Architekta — destylacja modelu Anthropic jest zabroniona przez ToS, niezależnie
+od tego, kto uruchamia trening. **Zweryfikowane pomiarem 2026-08-07:** 482 pary nauczyciela
+pochodzą w 100 % z DeepSeeka (v4-flash 464, v4-pro 18), **zero z Architekta** — droga jest
+czysta i ma taka zostać.
+
+**PYTANIE OTWARTE, do zaplanowania RAZEM z orkiestratorem, nie po nim:** dziś umiemy zmierzyć
+„czy organ ma wołacza". Przy orkiestratorze pytanie zabrzmi „czy zawołał we **właściwym
+momencie**" — a to wymaga prawdy podstawowej, której nie mamy. Bez tego powtórzymy klasę
+„organ orzekający bez kalibracji" (47 organów, 11 bez kalibracji).
+
+---
+
+### 🔄 RAMA POJĘCIOWA — CZTERY PYTANIA O ORGAN I SZEŚĆ PĘTLI
+
+**Powstała 2026-08-07, bo Cezar powiedział wprost: *„już się zagubiłem"*.** To nie ma być
+w niczyjej głowie — ma być w kodzie i w tym dokumencie.
+
+**O KAŻDYM organie zadajemy CZTERY pytania, nie jedno:**
+
+| # | Pytanie | Nazwa | Kto dziś na nie odpowiada |
+|---|---|---|---|
+| 1 | Kto go **uruchamia**? | **wołacz** | od 2026-08-06: `komendy_konstytucji_poza_pieczecia` — ale **tylko dla LIMES** |
+| 2 | Co robi i **co zwraca**? | **kontrakt** | nikt systematycznie |
+| 3 | Kto sprawdza, że **działa**? | **weryfikator** | testy + LUSTRUM — **ale LUSTRUM liczy regexem, więc myli się** |
+| 4 | Gdzie idzie jego **werdykt**? | **odbiorca** | nikt systematycznie |
+
+**TRZY POZIOMY ODPOWIEDZIALNOŚCI:** wykonawcy (265 organów — robią jedno dobrze, nie decydują
+kiedy) · strażnicy (audyt, SILENTIUM, VALLUM, VINDEX — **mają prawo zatrzymać**) · **kora
+decyzyjna (dziś: wyłącznie Architekt)**. Nikt nie weryfikuje samych strażników — dlatego
+LUSTRUM przez miesiąc dawał martwemu organowi ocenę 1.00.
+
+**SZEŚĆ PĘTLI (zmierzone 2026-08-07) — kryterium: czy wyjście wraca na wejście:**
+
+| # | pętla | co wraca | stan |
+|---|---|---|---|
+| 1 | **sesji** | Dziennik z `/clausura` wstrzykiwany na starcie następnej | ✅ |
+| 2 | **bramki** | VALLUM czerwieni → naprawa → push → nowy bieg | ✅ |
+| 3 | **długu honorowego** | błąd → nota → korona → bilans blokuje commit | ✅ |
+| 4 | **handlowa** (`petla_live`) | pozycja → wynik → stan → następna decyzja | ✅ |
+| 5 | **uczenia** (`ucz_mwu`) | werdykt areny → **wagi neuronów** | 🔴 **zbudowana, WYŁĄCZONA — zmierzone, że SZKODZI** (−0,6 pp, PBO ~0,6) |
+| 6 | **CENSORA** | wada → łatka → **uodpornienie** → Księga Wad | 🟡 **PRZECIEKA: 79 % klas wad WRACA** |
+
+**Dwie chore pętle to te najważniejsze:** (5) rój **nie uczy się z własnych wyników** — arena
+osądza, werdykty nie zmieniają wag; (6) lekcja **nie staje się mechanizmem** — dowód z jednej
+doby 2026-08-06/07: **cztery trafienia w tę samą klasę**, mimo że była zapisana jako lekcja.
+Pozycja **M2** niżej domyka pętlę 6. Pozycja **5** domyka pętlę 5.
+
+**BRAKUJE SIÓDMEJ — OBIEGU WIEDZY.** Zmierzone 2026-08-07 na ścieżce
+`petla_live → dyrygent → rejestr`: `diagnostyka_korelacji` **jest** wołana (2 trafienia), ale
+`bibliotekarz`, `quaesitor`, `graf_pamieci`, `schola` mają **ZERO**. Biblioteka rośnie, RAG
+indeksuje, Hyginus zbiera — i **nic z tego nie wraca do decyzji**. Zgodne z pomiarem DESCRIPTIO
+z 08-05: filar RÓJ nie sięga do filara WIEDZA ani razu.
+**Wzorzec, który to zamyka, nazywa się ARCHITEKTURA TABLICOWA (blackboard, HEARSAY-II)** —
+specjaliści obserwują wspólny stan i **odzywają się sami**, gdy rozpoznają swoją dziedzinę.
+Pokrewne, rozróżnione świadomie: *event-driven* (mamy — w hookach, czyli w procesie, nie
+w decyzji), *stigmergia* (ledgery są śladami, ale nikt ich nie czyta przy decyzji),
+*ensemble/voting* (**to mamy** — 87 neuronów, MWU, konfluencja).
+⚠️ **Warunek wstępny:** kryterium „istotności" nie może powstać z tych samych danych, na
+których testujemy — inaczej blackboard staje się maszyną do look-ahead i przeuczenia.
+
+**⚠️ NAZWA MYLĄCA — do rozstrzygnięcia:** nasze piętro **LOOP** w MATURITAS mierzy *domykanie
+zobowiązań* (ROADMAP 14,3 %, sugestie, wizje bez werdyktu), a branżowe *loop engineering*
+znaczy *pętlę wykonawczą agenta* (obserwuj → działaj → sprawdź → popraw). Dwie różne rzeczy
+pod jedną nazwą. Przy budowie orkiestratora to może kosztować — TIRO odczyta nazwę
+po branżowemu. Albo doprecyzować nazwę, albo zapisać różnicę w organie.
+
+---
+
 ### 🎯 KOLEJKA NA TERAZ (rekomendacja Architekta, kolejność = priorytet)
 
 | # | zadanie | stan | dlaczego TERAZ |
 |---|---|---|---|
+| **W1** ⭐ | **PIĘĆ WAD Z `/code-review` WŁASNEJ WACHTY** (2026-08-06, wszystkie moje). **P1:** `recognitor.py:298` — `_sekundy(...) or 0` zamienia BRAK daty złożenia recenzji w 0 s, więc recenzja PENDING przy PR zmergowanym w 10 s liczy się jako **złożona NA CZAS** (zmierzone wywołaniem: `odsetek_na_czas = 100%` dla PR, którego nikt nie przejrzał). **P2:** `recognitor.py:279` docstring podaje 13/141 (9,2 %), kod zwraca 10/141 (7,1 %) · `sigillarium.py:78` `sekcja_komend` bez `kroki_komend` = **cichy nadzór**. **P3:** `historia --bramka` kończy exit 0 przed obsługą flagi · dwie miary procentowe obok siebie, łagodniejsza brzmi jak główna | 🔴 | **ROZKAZ CEZARA 2026-08-06: „zapamiętaj te błędy po code review, będziemy od nich zaczynać nową sesję".** P1 to **dokładnie ta klasa, którą organ ma zwalczać** — brak danych udający sukces — popełniona w organie od jej wykrywania. Przy P2 rozważyć **rozszerzenie Warstwy 23 na docstringi `.py`**, inaczej naprawimy instancję, nie klasę |
+| **W2** ⭐ | **ZDJĄĆ BIAŁĄ LISTĘ Z NADZORU KOMEND** — `sigillarium.komendy_konstytucji_poza_pieczecia()` działa **tylko dla LIMES**; APERTIO i CLAUSURA mają puste `sekcja_komend`, więc funkcja zwraca `[]` natychmiast. Zmierzone: **8 z 13 komend konstytucji nie ma egzekutora** — w tym `maturitas` (krok 5b otwarcia, ROZKAZ STAŁY), `descriptio --bramka`, `breviarium --delta`, `dziennik_niesmiertelny wpis` | 🔴 | **To naprawa MOJEJ WŁASNEJ wachty z 08-06, która powtórzyła klasę zapisaną w pamięci jako lekcja:** *„bramka o wąskim zasięgu = fałszywy spokój"* (W11 pilnowała 1 katalogu z 11). **Potwierdzone pomiarem: `maturitas` występuje 0 razy w hooku startowym**, a descriptio/breviarium/codex mają tam 7 trafień — uruchomiłem go ręcznie i gdybym zapomniał, nikt by nie zauważył. **Koszt: godziny** — to zdjęcie białej listy z działającej funkcji, nie nowy organ |
+| **W3** | **DESCRIPTIO — przestać gubić moduł w sumie filara.** `sieroty_filara()` (moduły filara z zerem wołaczy) + twardy warunek w `bledy()`: **strażnik filara musi mieć WOŁACZA**, nie tylko istnieć (dziś `.exists()`) + przepiąć `wspolpraca()` z regexu na **AST** (dziś liczy też `import json`) | 🔴 | Zmierzone zwiadem AST 2026-08-07: **3 z 13 strażników filarów ma ZERO wołaczy** — `quaesitor` (WIEDZA), `meta_kora` (DECYZJA), `nexus_hub` (EGZEKUCJA, filar „zero realnych orderów"). Filar RÓJ pokazuje „wołany 82" i wygląda zdrowo, mając w środku 5 organów z zerem: **dane są zbierane per moduł i tracone przy sumowaniu**. Bramkowo tylko dla filarów `imperium/` — `narzedzia/` to warsztat CLI, gdzie brak wołacza jest normą (51 przypadków) |
+| **W4** | **NAPRAWIĆ `lustrum.sygnaly()` — liczy wołaczy REGEXEM, nie AST-em** (`re.compile(rf"\b{nazwa}\b")`), więc proza w cudzym docstringu liczy się jako wywołanie produkcyjne warte 0.40 | 🔴 | **RECOGNITOR — kanoniczny wołacz-widmo — dostał od LUSTRUM pożytek 1.00 i werdykt ZOSTAW.** Do tego sam próg (CLI 0.20 + docs 0.15 + ledger 0.15 = 0.45 > 0.40) sprawia, że organ opisany i otestowany **nigdy nie zejdzie poniżej progu**, choćby nikt go nie wołał. Póki tak jest, **każdy raport pożytku jest zawyżony** (zmierzone: 2, 3, 1, 2 fałszywych wołaczy na czterech organach). To nie nowy organ — jedna funkcja |
 | **0** | **DOMKNĄĆ BRAMKĘ DO 7/7** — `conditor_lustri` ma świecić zielono **spełnieniem kryteriów**, nie decyzją. Brakuje: TABULARIUM (33 alarmy T2/T3), ETAPY (7 otwartych L0–L3x), **KLASY** (rejestr leków na K1–K4 — nie istnieje), **KALIBRACJA** (rejestr kalibracji organów orzekających — nie istnieje) | 🔴 | **ROZKAZ CEZARA 2026-08-05: „naprawimy to na nowej sesji, aby wszystkie były spełnione".** Zamrożenie zdjęto DECYZJĄ przy czerwonej bramce — dług nie zniknął razem z zakazem |
 | **0a** ✅ | **ZROBIONE 2026-08-05 (wachta 0a).** Pięć wad naprawionych, każda z testem granicy „celowo psuję producenta"; **dowód mutacyjny: 8/8 testów czerwienieje z ASERCJI** przy przywróconej wadzie (czerwień z importu nie liczy się jako dowód). Zmierzony skutek naprawy W4 na żywym repo: DANE woła 23→14, RÓJ wołany 93→82 — **11 krawędzi było raportowanych pod złym filarem**. Dołożony lek na KLASĘ: `tests/test_kontrakty_publiczne.py` (skan całego repo + jawna lista 13 plików długu, która ma maleć). **🚨 PRZY OKAZJI ZŁAPANE: zapis 5 klas do Księgi Wad, deklarowany w Dzienniku i w tym wierszu, NIGDY NIE NASTĄPIŁ** (0 wpisów z datą 2026-08-05; ostatni był z 08-03) — dopisane teraz, 159→164, potwierdzone odczytem z dysku. Naprawione (plik:linia sprzed naprawy): `dyrygent.py:344` odcisk przed `wskazniki.update(kontekst_dodatkowy)` · `descriptio.py:158` tautologiczna kontrola kompletności · `pamiec_absolutna.py:216` bump `sekwencja` przy stałym haszu · `descriptio.py:137` mapa `stem→filar` gubiąca kolizje · `conditor_lustri.py:173` import prywatnej `_stan_domkniety` | ✅ | Dwie pierwsze to ta sama ironia: naprawiłem bezpiecznik, który nie mógł się zapalić, i w tej samej wachcie zbudowałem **drugi taki sam** oraz jego **lustrzane odbicie** (zapala się zawsze). Klasa przeżyła naprawę, bo naprawiłem INSTANCJĘ, nie WZORZEC |
 | **0b** | **PIĘĆ BRAKUJĄCYCH FILARÓW + dwie wady mapy** — `INSTITUTIO` (uczenie), `FISCUS` (kapitał/ryzyko), `HARNESS` (7 hooków + 9 skilli), `ŚWIADECTWO` (187 plików testów), `FAMILIA` (Hyginus, TIRO). Do tego: DESCRIPTIO musi **deklarować swój zakres** i liczyć to, co poza nim; `scheduler.py` ma **0 wołaczy** | 🔴 | Znalezione w TRZECH przejściach pod różnym kątem — **każde coś dało**, więc nie mam podstaw twierdzić, że czwarte nic by nie dało. Wariant zatwierdzony przez Cezara: przypisania per-moduł + test istnienia pliku |
-| **M1** ⭐ | **25. WARSTWA AUDYTU — MARTWY KAPITAŁ** *(fitness function)*. Asercja o właściwości architektury, nie o funkcji: „moduł bez wołacza produkcyjnego I bez pomiaru, starszy niż N dni = CZERWIEŃ". Do tego `vulture` na 40 zmierzonych sierot. **Wchodzi RAZEM z antywskaźnikiem** — inaczej podniesie się dopisaniem pustego pomiaru do ledgera | 🔴 | **Najtańszy mechanizm z całego zwiadu (~3 h)**: ta sama forma co 24 istniejące warstwy, zero nowych zależności. Celuje wprost w Prawo XV: **40 organów zbudowanych, nigdy niewołanych i niezmierzonych** |
+| **M1** ⭐ | **25. WARSTWA AUDYTU — MARTWY KAPITAŁ** *(fitness function)*. Asercja o właściwości architektury, nie o funkcji: „moduł bez wołacza produkcyjnego I bez pomiaru, starszy niż N dni = CZERWIEŃ". Do tego `vulture` na zmierzone sieroty. **Wchodzi RAZEM z antywskaźnikiem** — inaczej podniesie się dopisaniem pustego pomiaru do ledgera. **🆕 DOSTAŁ SWÓJ POMIAR 2026-08-07** (zwiad AST na rozkaz Cezara — grep dawał fałszywe „ma wołacza" na prozie w docstringach, np. `self.discriminator_weights`, łacina „condere lustrum"; odsiane też dokumenty GENEROWANE, bo wymieniają każdy moduł automatycznie): **82 z 265 (31 %) bez wołacza wykonawczego**, z czego **51 to przyrządy CLI wołane ręcznie = NIE WADA** (odsiew świadomy — LUSTRUM zmierzył 08-04, że jednosygnałowe „brak wołacza" dałoby 100 % fałszywek). **Realnie do oceny: 31**, w tym **5 NIEOSIĄGALNYCH** (bez `__main__` i bez wołacza = 1231 linii: `bary_zdarzeniowe`, `meta_labeling`, `kronikarz_zdarzen`, `neutralizacja`, `filtr_ekonomiczny`) i **3 strażników filarów**. **ŁAŃCUCH WIDMA:** `maturitas` ma jednego wołacza w kodzie — `conditor_lustri`, **który sam jest widmem** | 🔴 | **Najtańszy mechanizm z całego zwiadu (~3 h)**: ta sama forma co 24 istniejące warstwy, zero nowych zależności. Celuje wprost w Prawo XV. **Do rozstrzygnięcia PRZEZ CEZARA, nie przez pomiar:** 7 modułów z **2026-05-31** (dzień pierwszy repo, ozdobne ramki „NexGenHub", „MetaCortex", „OmniSight", „AegisShield") — świadoma decyzja czy zapomniany kod? **68 dni bez wołacza.** Druga warstwa dat to 4 organy z 07-29…08-05, czyli **wzorzec powtarza się co kilka dni, nie jest reliktem** |
 | **M2** ⭐ | **KLASA WADY BEZ STRAŻNIKA BLOKUJE COMMIT** — każdy wpis Księgi Wad z ≥2 wystąpieniami musi mieć test odpowiadający na pytanie „czy ta klasa zostałaby DZIŚ złapana automatycznie"; brak → `/limes` blokuje, tak jak dziś blokuje dług honorowy. **To jest brakujący producent kryterium KLASY** w `conditor_lustri` | 🔴 | Celuje w **79% klas wad, które wróciły** (kontrakt 13×, testy 12×, pomiar 12×). Wzór: Google SRE error-budget policy — przekroczenie progu przez JEDNĄ klasę wymusza pozycję P0, nie jest opcją. ~4 h + ciągła dyscyplina |
 | **M3** ⭐ | **MUTATOR — organ dowodzący, że test UMIE ZAWIEŚĆ** (mutation testing próbkowany: 1 moduł na wachtę, rotacja, wynik do CODEX). **To jest brakujący producent kryterium KALIBRACJA** — kalibracja strażnika to pytanie „czy wykrywa, gdy psuję producenta" | 🔴 | **Zalążek ISTNIEJE**: dowód mutacyjny wachty 0a (8/8 wad wykrytych z asercji) — ale leży w katalogu tymczasowym, więc **jutro nie istnieje**. Celuje w to, że wady łapie recenzja (64), a nie testy (35). ~3 h + bieg w tle |
 | **1** | **BIBLIOTHECA ULPIA — domknięcie biblioteki** (a) 133 księgi poza RAG → zaindeksować, (b) **świeży bieg `aestimator.py`** — ile realnie ginie z tabel, wzorów i wykresów i w których pozycjach, (c) watchdog przyrostu ksiąg (dziś **żadna z 24 warstw audytu nie pilnuje ksiąg**) | 🔴 | **ROZKAZ CEZARA 2026-08-05: „najpierw musimy mieć najlepszą Bibliotekę Ulpia — nazwa zobowiązuje".** *Bibliotheca Ulpia* Trajana była największą biblioteką cesarstwa. Dopóki 133 z 248 ksiąg jest niewidzialnych, każdy zwiad czerpie z połowy zasobu |
@@ -664,15 +757,33 @@ Rozkaz kazał sprawdzić, czym go uzupełnić. Siedem pozycji, każda z powodem:
 | **A** ✅ | **SILENTIUM** (WDROŻONA 2026-08-03) — bramka zakłada blokadę, hook PreToolUse **odmawia zapisu do repo** w trakcie biegu | VINDEX *wykrywa* zabrudzenie po fakcie; **nic nie ZAPOBIEGA**. Zmierzone: 4 unieważnione biegi w 4 dni, **dwa z nich w jednej wachcie 08-03 przez tego samego, kto zasadę zapisał** — dowód, że sama wiedza nie wystarcza | HARNESS | ~1 wachta |
 | **C** | **CUSTOS BIBLIOTHECAE** (= A15) — warstwa W25: dysk ↔ katalog ↔ cache ↔ RAG | Żadna z 24 warstw nie pyta o KSIĘGI. Dowód: 40 ksiąg przybyło 01.08, **nikt nie zauważył przez dobę**, audyt drukował „pełna harmonia" | LOOP | ~1 wachta |
 | **B** | **VINDEX → GRAF W8** (= H6) — krawędzie `(plik) —[naruszenie]→ (commit)` | Jedyny producent krawędzi z **realnych zdarzeń**, nie z tekstu. Jedyna droga na GRAPH **nieblokowana przez A10** — ale nie daje czytelnika przy decyzji, więc GRAPH zostanie 3/4 | GRAPH | ~½ wachty |
-| **D** | **CURSUS ARTIS** — organ mierzący **WSZYSTKIE piętra**, z **rejestrem układów** (wzorce połączeń, status `ZATWIERDZONY/KANDYDAT/OBALONY`) | MATURITAS mierzy **3 z 9**. Dwa spoza trójki **JUŻ STOJĄ i nie są liczone**: HARNESS (6 hooków, 24 warstwy, SIGILLARIUM) i NEURO-SYMBOLIC (Prawo XXI, INDEX FALSORUM, VINDEX = weryfikacja w architekturze, nie audyt post-hoc). **Prawdopodobnie ZANIŻAMY własny stan.** INGENIUM = zero plików (grep) | wszystkie | ~2 wachty |
+| **D** 🟡 | **CURSUS ARTIS** — organ mierzący **WSZYSTKIE piętra**, z **rejestrem układów** (wzorce połączeń, status `ZATWIERDZONY/KANDYDAT/OBALONY`) | **CZĘŚCIOWO WYKONANE 2026-08-06** (rozkaz Cezara „zróbmy teraz, żeby przy następnej sesji już działało"): MATURITAS mierzy **5 pięter, nie 3** — dopisane HARNESS (4/4) i NEURO-SYM (4/4), które **stały zbudowane i nieliczone**, więc zaniżanie POTWIERDZONE i usunięte. Wydruk pokazuje organy per piętro, luki i wskazówkę o pozycji w planie. **Rejestr układów NADAL nierobiony.** | wszystkie | ~1 wachta (reszta) |
 
 > **ROZSTRZYGNIĘCIE CEZARA o układach (D):** wzorce wchodzą do rejestru **wyłącznie po
 > zatwierdzeniu nowej wizji albo po zmierzonym odkryciu** — nigdy z lektury materiału.
 > Domyka to pętlę *odkrycie → zatwierdzenie → wzorzec → egzekwowanie* i usuwa zarzut,
 > że budowalibyśmy miernik na cudzej, nieosądzonej taksonomii.
 >
-> **Warunek uczciwości dla D:** osiem z dziewięciu pięter znamy z materiału, którego
-> jeszcze nie osądziliśmy — tego samego, który wyprodukował `US20230000000A1`
+> **⚠️ WARUNEK UCZCIWOŚCI DLA D — SPRAWDZONY I ROZSTRZYGNIĘTY 2026-08-06.** Brzmiał: osiem
+> z dziewięciu pięter znamy z materiału, którego jeszcze nie osądziliśmy — tego samego, który
+> wyprodukował `US20230000000A1`. **Cezar kazał to zweryfikować zwiadem; FRUMENTARIUS obalił
+> OBIE rzeczy:**
+> - **patent `US20230000000A1` NIE ISTNIEJE** — Google Patents 404, a numeracja publikacji USA
+>   startuje od `0000001`, więc numer z samych zer jest strukturalnie niemożliwy. Kontrola
+>   pozytywna na sąsiednim `US20230010000A1` zwróciła pełny rekord, więc 404 jest realny.
+> - **liczba „9 pięter" NIE MA POKRYCIA W ŹRÓDŁACH.** Realne taksonomie mają 5
+>   (Prompt/Context/Harness/Loop/Graph — Rastogi, arXiv 2606.28270), 6 (autonomia L0–L5),
+>   7 (Arsanjani) albo 8 (Eledath). Jedyna znaleziona „dziewiątka" to oś FILOZOFICZNA
+>   Twemlowa (ANI→AGI→ASI→„AI as God") — inna oś niż warstwy inżynierii. Nasza dziewiątka
+>   była prawdopodobnie **sklejką dwóch taksonomii**.
+>
+> Oba twierdzenia trafiły do **INDEX FALSORUM** (18→20), więc nie wrócą jako fakt. Zasięg
+> miernika liczy się odtąd od taksonomii POTWIERDZONEJ: **5 z 6** (5 warstw + NEURO-SYM),
+> nie 3 z 9. Jedyne piętro brakujące z potwierdzonej piątki to **CONTEXT** (arXiv 2507.13334) —
+> dziś mierzone częściowo wewnątrz PROMPT przez AERARIUM, bez własnego poziomu.
+> Sześciu kandydatów spoza tej osi (OBSERVABILITY, GUARDRAILS, INTENT, MEMORY, COORDINATION,
+> AUTONOMIA L0–L5) czeka w kodzie jako `KANDYDACI_NA_PIETRA` — **nie awansują sami**,
+> wchodzą wyłącznie po zatwierdzeniu przez Cezara (rozstrzygnięcie o układach, wyżej).
 > i `abc123.ngrok.io`. Pierwsza wersja rejestru zawiera **tylko to, co potwierdzone
 > w NASZYM kodzie**; reszta czeka na QUAESTIO.
 

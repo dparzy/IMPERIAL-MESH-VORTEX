@@ -4,7 +4,7 @@ typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
 bez_wlasciciela: "dziennik CALEGO Imperium — historia nie nalezy do zadnego organu"
-stan_na: 2026-08-06
+stan_na: 2026-08-07
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -12,6 +12,65 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-08-07 | 📐 | MATURITAS mierzy 5 pięter, nie 3 — a liczba „9" okazała się halucynacją
+
+**Rozkaz Cezara:** *„chciałbym, żeby pokazywał wszystkie etapy ewolucji, o których mówiliśmy,
+nie tylko trzy — i bardziej szczegółowo: jakie organy są wiązane w danym etapie, gdzie jest
+brakująca opcja dopełnienia i czy mamy już opcję jej dopełnienia w ROADMAP"*. Zaraz potem sam
+zauważył: *„już chyba ten pomysł był"* — **i miał rację**: to CORONA D (CURSUS ARTIS), stojąca
+w ROADMAP od 2026-08-03.
+
+### Zaniżanie POTWIERDZONE i usunięte
+ROADMAP notował, że MATURITAS mierzy **3 z 9**, a HARNESS i NEURO-SYMBOLIC „już stoją i nie są
+liczone". Zmierzone po dopisaniu: **HARNESS 4/4** (6 wpisów hooków na 5 zdarzeniach, PreToolUse
+zapobiega, VALLUM egzekwuje poza maszyną) i **NEURO-SYM 4/4** (24 warstwy, 20 obalonych
+twierdzeń pod strażą, bramka z kodem wyjścia, weryfikacja przed zapisem). Zaniżaliśmy o dwa
+piętra, oba na maksimum.
+
+### 🪞 Zwiad obalił fundament liczby — na rozkaz Cezara
+Cezar kazał sprawdzić subagentem patent i taksonomię. **FRUMENTARIUS obalił oba twierdzenia:**
+- **`US20230000000A1` NIE ISTNIEJE** — Google Patents 404; numeracja publikacji USA startuje
+  od `0000001`, więc numer z samych zer jest **strukturalnie niemożliwy**. Kontrola pozytywna
+  na sąsiednim `US20230010000A1` zwróciła pełny rekord — 404 jest realny, nie awarią narzędzia.
+- **„9 pięter inżynierii AI" nie ma pokrycia w źródłach.** Realne taksonomie liczą 5
+  (Prompt/Context/Harness/Loop/Graph — Rastogi, arXiv 2606.28270), 6, 7 albo 8 pozycji. Jedyna
+  znaleziona „dziewiątka" to oś **filozoficzna** Twemlowa (ANI→AGI→ASI→„AI as God") — inna oś
+  niż warstwy inżynierii. Nasza dziewiątka była **sklejką dwóch taksonomii**.
+
+Oba trafiły do **INDEX FALSORUM (18→20)**, frazą kodującą twierdzenie, nie token. Zasięg
+miernika liczy się odtąd od taksonomii **potwierdzonej**: `5 z 6`, nie `3 z 9`. Brakuje nam
+jednego piętra z potwierdzonej piątki — **CONTEXT** (arXiv 2507.13334). Sześciu kandydatów
+spoza tej osi czeka w `KANDYDACI_NA_PIETRA` i **nie awansuje sam**.
+
+### Trzy pytania Cezara dostały odpowiedź w wydruku
+`organy_pietra()` pokazuje organy wiązane z każdym piętrem — **weryfikując ścieżki na dysku**,
+bo lista wpisana ręcznie i niesprawdzana byłaby API-widmem (Warstwa 16) w organie mierzącym
+dojrzałość. `luka_w_planie()` mówi, czy wąskie gardło ma pozycję w ROADMAP.
+
+### 🚨 Ta sama klasa złapana TRZECI raz jednego dnia
+Pierwsza wersja `luka_w_planie` liczyła każde słowo dłuższe niż 5 znaków — więc „decyzji",
+„roadmap" i „kontekstu" dawały trafienie ZAWSZE (ROADMAP jest o decyzjach). Wszystkie trzy
+wąskie gardła dostały ✅ „mamy to w planie", choć funkcja nie sprawdziła niczego. Naprawa:
+próg rzadkości (`PROG_RZADKOSCI = 5`) dobrany **pomiarem** — „decyzji" 20×, „roadmap" 13×,
+„kontekstu" 10×, „czytany" 7×. Werdykt nazwany **WSKAZÓWKĄ, nie dowodem**.
+Do progu wpisałem najpierw liczby **z głowy** (27×/58×/12×) i pomiar obalił je w tej samej
+minucie — trzecie wystąpienie klasy „liczba w prozie, której nikt nie policzył" (docstring
+RECOGNITORA, errata w Dzienniku, ten komentarz). **Warstwa 23 łapie to w `.md`, ale NIE
+w komentarzach `.py`** — luka odnotowana, niezałatana.
+
+### VALLUM dostał wołacza (pytanie Cezara: „czy jest wpięty, żeby o nim nie zapomnieć")
+Zmierzone: **zero wołaczy** — żaden hook ani krok nie pytał o werdykt wału; o anulowanym biegu
+dowiedziałem się tylko dlatego, że sprawdziłem ręcznie. Ta sama klasa co RECOGNITOR.
+Nowy **krok 8b clausury**: `gh run list --workflow=ci.yml` po pushu, z rozróżnieniem
+`cancelled` ≠ `failure`, oraz **rozkaz Cezara: merge do `main` dopiero po potwierdzeniu
+Architekta** — a Architekt potwierdza, gdy VALLUM zielony i recenzent dostał swoje okno.
+
+**Testy:** +11 (mutacja organu-widma, granica progu rzadkości, zapobieganie vs raportowanie,
+workflow niewołający bramki). **Pliki:** `imperium/oczy/maturitas.py`, `tests/test_maturitas.py`,
+`CLAUDE.md`, `docs/ROADMAP_IMPERIUM.md`, `bibliotheca_ulpia/dane/index_falsorum.jsonl`
 
 ---
 

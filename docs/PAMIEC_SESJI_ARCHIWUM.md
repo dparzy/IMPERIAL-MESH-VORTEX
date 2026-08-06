@@ -13,6 +13,108 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-08-05 — Dane PORTITOR stare (1H 8.0d, 4H 8.1d) blokują A/B
+Nieaktualne dane handlowe blokują przyszłe testy A/B, ale nie blokują sądu nad recenzją; do odświeżenia przed kolejnymi eksperymentami.
+
+### 2026-08-05 — Konstytucja ma 25 praw, nie 21
+Żywe repo ma 25 praw; audyt operuje liczbą 21. Wszystkie falsyfikowalne tezy audytu mierzono wobec kodu i reguł.
+
+### 2026-08-05 — Audyt Kimi niekompletny: 3 pliki .py vs 467
+Metaprompt Kimi mówi o 467 plikach Pythona, ale sam audyt deklaruje 'Treść plików .py niedostępna' i mapuje repo jako 3 pliki — wyniki wymagają weryfikacji wobec żywego kodu.
+
+### 2026-08-05 — scheduler.py ma zero wołaczy w kodzie
+Niezależna weryfikacja potwierdziła tezę audytu: scheduler.py nie jest wywoływany nigdzie w żywym kodzie.
+
+### 2026-07-27 — Środowisko dev ma dostęp do sieci — adaptery live działają
+MEXC, Binance-fapi i Fear&Greed odpowiadają 200 OK; oba formaty symboli (BTCUSDT i BTC/USDT) działają w DataLoader.fetch. Można testować adaptery na żywych danych bezpośrednio w tym środowisku.
+
+### 2026-07-27 — NEWS-03/04 ożywają po jednym barze rozgrzewki (W-382)
+Moduły ze stanem kroczącym nie strzelają od pierwszego cyklu. Po rozgrzewce: NEWS_ATTENTION_SPIKE=0.76, NEWS_SENTYMENT_DELTA od -0.2 do +0.257 (cykl 8 LONG). Działa jak zaprojektowano.
+
+### 2026-07-27 — Sygnał neuronu: neuron_id, kierunek, wartosc, kategoria
+raport.sygnaly to lista SygnalNeuronu; moduł ŻYWY/zmierzony gdy wartosc is not None. Punkt zaczepienia do pomiaru aktywacji i diagnostyki modułów.
+
+### 2026-07-27 — petla_live = realtime, nie replay: przetwarza tylko ostatni bar
+Pętla live pobiera to samo okno i przetwarza ostatni bar (limit=cfg.limit_barow), czekając pauzę między barami. Do pomiaru modułów potrzebny szybki bieg na żywych danych, nie czekanie na każdy bar.
+
+### 2026-07-29 — Test zależny od środowiska jest kruchy
+Test wymagający calibre na PATH przeszedłby na laptopie, padł w chmurze bez niego. Usunięto zależność środowiskową — testy muszą być niezależne od maszyny.
+
+### 2026-07-29 — Dowód przez mutację — inaczej test bywa atrapą
+Lekcja recog28 zastosowana: test bez mutacji bywa atrapą. Należy celowo psuć mechanizm i sprawdzać, czy testy czerwienieją — dopiero to dowodzi, że test realnie testuje.
+
+### 2026-07-29 — Heurystyka 'podejrzany PDF = skan' obalona pomiarem
+BIB-138 ma warstwę tekstową na str. 261 (1957 znaków), brak tylko na stronach tytułowych; BIB-170 ma tekst na str. 91, skan to tylko przód. Nie oceniać książki po pierwszych stronach.
+
+### 2026-07-29 — Narzędzia poza PATH istnieją na dysku — shutil.which ich nie widzi
+Calibre Portable i Tesseract-OCR są zainstalowane, ale nie w PATH; potok oparty na shutil.which pomijał je po cichu, gubiąc 11 pozycji djvu (w tym BIB-128/159/189). Trzeba rozwiązywać ścieżki jawnie.
+
+### 2026-07-27 — Ledger AB/IC gubił wyniki spoza schematu — luka zgłoszona 3×
+CODEX_PROBATIONUM znał tylko typy AB i IC, więc porównania interwałów nie miały gdzie trafić. Luka nazwana trzy razy jako sugestia, ale nigdy nie zamknięta; sugestia w ledgerze to nie naprawa.
+
+### 2026-07-27 — Audyt sprawdzał tylko imperium/biblioteki/ — reszta organów poza kontrolą
+Warstwa 11 egzekwowała meldunek wyłącznie dla imperium/biblioteki/. Organy w imperium/cesarz/ (np. Dispensator) i narzedzia/ były niewidoczne; audyt exit 0 nie oznaczał pełnej harmonii.
+
+### 2026-07-27 — LEX TALIONIS: nota musi urodzić mechanizm, nie łatę
+Ręczne poprawienie 50 wpisów zgnije za tydzień. Każda NOTA zobowiązuje do CORONY — mechanizmu, który łapie klasę błędu automatycznie. Wzorzec sprawdzony: Tabularium/liczby wstrzykiwane, bramka gryzie (exit 1).
+
+### 2026-07-27 — Tabularium: 10 dokumentów gniło — stan_na starszy niż kod
+MAPA_PAMIECI, MANUAL_UZYTKOWNIKA, MANUAL_CLAUDE_CODE, START_LOKAL, SCIAGA_LOKAL, GUBERNATOR, OBSERWATORZY, TRYBY_IMPERIUM, PLAN_TIR i in. Audyt ich nie łapał, bo Tabularium biegnie w trybie miękkim.
+
+### 2026-07-27 — W backteście głosuje 43 z 81 neuronów — 38 milczy
+W tym wszystkie trzy sygnały Tier-1 zwalidowane pomiarem IC. Imperium buduje doskonale i nie podłącza — priorytet: podłączyć to, co już mamy (A/B podzbiór vs pełny rój).
+
+### 2026-07-20 — 1003 z 1301 odwolan do dokumentow to kronika sesji
+Przenoszenie zywych dokumentow tworzy martwe linki w historii (Prawa I nie wolno poprawiac). Rozklad asymetryczny: zywe maja 1-19 odwolan, kronika 58-63. Przenoszenie jest drogie.
+
+### 2026-07-27 — Limit Binance: OI i Long/Short tylko ~30 dni, funding pełny
+Backfill_sentyment ma pełną historię funding, ale OI i Long/Short ograniczone do ~30 dni. A/B na pełnej erze obudzi realnie tylko neurony fundingowe; PSY-02/PSY-04 dostaną forward-fill z pustki. Werdykt wymaga rangi LIMEN FENESTRAE.
+
+### 2026-07-27 — Audyt W11 był ślepy poza imperium/biblioteki/ — exit 0 mógł kłamać
+Warstwa 11 egzekwowała meldunek w INDEKS tylko dla imperium/biblioteki/; organy w imperium/cesarz/ (DISPENSATOR) i narzedzia/ były niewidzialne. 'Pełna harmonia' była prawdą o 1/11 organów i ciszą o reszcie. Naprawione warstwą W17.
+
+### 2026-08-05 — D1.1: hash_sha256 to martwe pole
+Potwierdzone grepem: hash_sha256 istnieje jako pole z zerem przypisań, a Księga Wad ma już wpis o tej klasie. To podstawa rozpoznania przed realizacją drogi D1.1.
+
+### 2026-08-05 — Wspólna klasa robactwa: milczenie zamiast 'nie wiem'
+LUSTRUM dał 100% fałszywek (25/25 'sierot' to zdrowe CLI), TABULARIUM czynił 23 dokumenty niewidzialnymi dla pętli właścicieli, MATURITAS gubił 52 wiersze ROADMAP bez śladu. Organ, który nie umie powiedzieć 'nie wiem', milczy, a milczenie czytamy jako zieleń.
+
+### 2026-08-05 — W20 ukrywa różnicę w raporcie
+Komunikat audytu ucina wiersz na ~60 znakach, a różnica była w ostatniej kolumnie (data) — ta sama linia raportowana jako 'dopisana ręcznie' i 'brakująca'. Aby zobaczyć realną różnicę, trzeba grepować.
+
+### 2026-08-05 — SILENTIUM blokuje odczyt przez organ zapisujący podczas biegu testów
+Gdy organ zapisujący trzymał Księgę Wad (bieg testów), SILENTIUM zablokował odczyt przez Dziennik. Obejściem był bezpośredni odczyt pliku z pominięciem organu.
+
+### 2026-08-05 — Dziennik i ROADMAP potrafią twierdzić nieprawdę — weryfikuj w pliku
+Dziennik i ROADMAP twierdziły, że 2026-08-05 dopisano 5 klas do Księgi Wad; w Księdze było zero wpisów z tej daty. Ogłoszony zapis nie istniał — twarde fakty trzeba czytać w źródle, nie w deklaracjach organów.
+
+### 2026-07-27 — Prawdziwy sprawca kwadratu: _py_hma (pętla w pętli wma)
+Wewnętrzna pętla w _py_hma wywołuje wma wielokrotnie (4,5 mln wywołań na 2700 ticków), dając O(period²) dla tego jednego wskaźnika. Reszta backtestu jest liniowa.
+
+### 2026-08-05 — Wzorzec przeżywa naprawę instancji — szukaj klas, nie linijek
+Przy naprawie wad trzeba przeszukać kod pod kątem klas, nie tylko instancji; naprawienie jednego wystąpienia nie leczy wzorca. Stąd testy celowo psują producenta na poziomie klasy.
+
+### 2026-08-05 — W19 złapało niepełną poprawkę frontmatter README
+Podniesiono nagłówek README, ale zapomniano o frontmatter; bramka W19 to wykryła. Domyknięto poprawkę i wygenerowano katalog. Bramka działa zgodnie z przeznaczeniem.
+
+### 2026-08-05 — W3 weryfikuje klucze MANIFESTU maszynowo; data Stan na może być tylko etykietą
+W3 (zielone) pilnuje kluczy MANIFESTU 1:1 z kodem i liczby neuronów; dzięki temu wiadomo, że treść jest aktualna, a przestarzała była tylko data. Datę podniesiono bez ręcznego przeglądu 258 wierszy (LEX TALARUS).
+
+### 2026-08-05 — MANIFEST to rejestr neuronów i zwiadowców, nie wszystkich organów
+Zarzut braku LUSTRUM/SILENTIUM w MANIFEST był chybiony; od organów jest CENSUS (W17, 263 organy). Przed alarmem W6 należało sprawdzić strukturę pliku, a nie zakładać brak wpisów.
+
+### 2026-08-05 — W6 mierzy wobec commitu całego repo, nie per plik
+W6 porównuje MANIFEST/README z ostatnim commitem całego repo; auto-sync pamięci dotykający kroniki i wizji daje fałszywe czerwienienie. Komentarz W6b wskazuje, że tylko pomiar per-plik jest poprawny. Czerwienienie od hooka trenuje ignorowanie alarmów (odwrócona klasa K2).
+
+### 2026-08-05 — W20 ukrywa różnicę w ostatniej kolumnie przez ucięcie wiersza
+Komunikat audytu W20 ucina wiersz ok. 60 znaków, a różnica dotyczyła ostatniej kolumny (data). Skutek: ta sama linia była raportowana jednocześnie jako dopisana ręcznie i brakująca. Dopiero grep pokazał realną różnicę.
+
+### 2026-08-04 — Legatus — fałszywe świadectwo z nagłówka hunka
+Świadectwo dla dokumentu Legatus wzięło się z nazwy klasy w nagłówku hunka gita — git podaje ją dla każdej zmiany, więc symbol wyglądał na cytowany, choć dokument nie mówi o interwałach. Homonimia klasy z nazwą dokumentu generuje fałszywe alarmy.
+
+### 2026-06-30 — Golden Cross w IMPERIUM to wariant EMA
+Strategia ZŁOTY ORZEŁ używa EMA 50/200, nie kanonicznego SMA. Zapisano w dokumentacji jako wariant EMA. Wyjaśniono brak aktywacji na DOGE (death cross w całym oknie backtestu).
+
 ### 2026-08-04 — Pusta mapa pospolitości = milczenie udające wynik
 Pusta mapa pospolitości przepuszczała wszystko jako 'rzadkie', bo _sledzone_przez_git() listuje wyłącznie pliki *.md. Przyrząd milcząco zawyżał moc świadectwa. Naprawiono wraz z zaporą i dodano testy graniczne.
 

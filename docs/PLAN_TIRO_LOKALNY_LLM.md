@@ -12,13 +12,13 @@ powod_istnienia: "Zbudować lokalny hybrydowy LLM 'TIRO' (uczeń), trenowany met
 > **✅ Weryfikacja wobec kodu 2026-07-18: rdzeń stanu potwierdzony.** CENSOR (5 klas majątkowych
 > PROLETARIUS→CONSUL, CLI raport/migawka/klasa/zmiana/zatwierdz) ✅ · NOTARIUS
 > (`tiro_pary_nauczyciela.jsonl`, `LIMIT_PROBEK_NA_PYTANIE=3`, `eksportuj_sft`) ✅ · rój <!-- LICZBA:neurony -->87<!-- /LICZBA --> ·
-> kronika <!-- LICZBA:sesje_kroniki -->158<!-- /LICZBA --> sesji. Pomiary E1 (llama-bench, tok/s) to prawda DATOWANA (2026-07-16), nietknięta.
+> kronika <!-- LICZBA:sesje_kroniki -->161<!-- /LICZBA --> sesji. Pomiary E1 (llama-bench, tok/s) to prawda DATOWANA (2026-07-16), nietknięta.
 > Jedyna korekta: liczba fragmentów RAG „27 959" → dziś <!-- LICZBA:fragmenty -->37331<!-- /LICZBA -->
 > (przeniesiona na blok W15, by nie zamarzła — rośnie z biblioteką).
 > ✅ **Re-weryfikacja 2026-08-04** (kalibracja bramki T2): `LIMIT_PROBEK_NA_PYTANIE = 3` ✅ ·
 > `eksportuj_sft` ✅ · CENSOR CLI ✅ · RAM zmierzona 15.88 GB, klasa PEDES ✅ · adapter
 > `llama-server` nadal NIEZROBIONY (uczciwie odhaczony). **Naprawione:** „kronika 102 sesji"
-> w dwóch miejscach (realnie <!-- LICZBA:sesje_kroniki -->158<!-- /LICZBA -->) — liczba rosnąca
+> w dwóch miejscach (realnie <!-- LICZBA:sesje_kroniki -->161<!-- /LICZBA -->) — liczba rosnąca
 > SAMA, niewidzialna dla bramki gnicia, więc od dziś wstrzykiwana; oraz zadanie „do naprawy:
 > `uzyj_llm=False`", które było zamknięte już 2026-07-17 i stało tu jako otwarte.
 > **Architekt:** VITRUVIUSZ (Opus) · **Zwiad:** Sonnet (web) + Hyginus (DeepSeek, plik `wrzutnia/zrodla danych i inne.md`)
@@ -145,7 +145,7 @@ techniczne** — tylko jedno jest dla nas dobre:
 
 Scalanie wag daje to samo, co ma każdy inny na Hugging Face. **Unikalność TIRO nie weźmie się z techniki
 łączenia — weźmie się z DANYCH, KTÓRYCH NIKT INNY NIE MA:** wyniki areny, decyzje <!-- LICZBA:neurony -->87<!-- /LICZBA --> neuronów, biblioteka
-RAG (<!-- LICZBA:fragmenty -->37331<!-- /LICZBA --> fragmentów), werdykty Hyginusa, kronika <!-- LICZBA:sesje_kroniki -->158<!-- /LICZBA --> sesji. Uczeń wytrenowany na *tym* będzie jedynym
+RAG (<!-- LICZBA:fragmenty -->37331<!-- /LICZBA --> fragmentów), werdykty Hyginusa, kronika <!-- LICZBA:sesje_kroniki -->161<!-- /LICZBA --> sesji. Uczeń wytrenowany na *tym* będzie jedynym
 modelem na świecie rozumiejącym Imperium. Frankenmerge z trzech modeli z HF nie da tego nigdy.
 
 **→ Hybryda = wspólny szkielet z HF (rodzina Qwen) + distylacja na danych Imperium.** Scalanie wag = opcjonalny

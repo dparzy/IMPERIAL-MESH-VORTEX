@@ -185,7 +185,7 @@ znak uruchamiający pełną checklistę. Organ: **SIGILLARIUM** (`imperium/bibli
 |---|---|---|
 | `/apertio` | pełną checklistę **OTWARCIA SESJI** (sekcja niżej) | otwarcie, start sesji, zaczynamy, nowa sesja |
 | `/clausura` | pełną checklistę **KOŃCA SESJI** (sekcja niżej) | zamknięcie, koniec sesji, domykamy, kończymy |
-| `/limes` | **bramkę Prawa XXI**: testy → audyt (pełny — m.in. ruff W13, census W17, dług honorowy W18, parytet dat W19, katalog W20) → skan wad → INDEX FALSORUM | bramka, przed commitem, sprawdź wszystko |
+| `/limes` | **bramkę Prawa XXI**: testy → audyt (pełny — m.in. ruff W13, census W17, dług honorowy W18, parytet dat W19, katalog W20) → skan wad → INDEX FALSORUM → RECOGNITOR (pokrycie recenzji) | bramka, przed commitem, sprawdź wszystko |
 
 **ŻELAZNA ZASADA: pieczęć NIE przechowuje kroków — czyta je z TEGO pliku w chwili wywołania.**
 Powód zmierzony (2026-07-20): runbook W11 kazał Claude `git push` przez 9 dni po zakazie (rozkaz

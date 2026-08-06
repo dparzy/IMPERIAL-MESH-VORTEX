@@ -1,0 +1,35 @@
+# 🏛️ IMPERIAL MESH VORTEX — metadane projektu i konfiguracja narzędzi.
+#
+# ⚠️ CZEGO TU NIE MA I DLACZEGO (Prawo XVI — nie dublujemy, mierzymy):
+#   [tool.ruff] NIE STOI TUTAJ. Ruff czyta `ruff.toml` Z PIERWSZEŃSTWEM nad sekcją
+#   `[tool.ruff]` w pyproject.toml. Gdyby istniały obie, ta tutaj byłaby
+#   KONFIGURACJĄ-WIDMEM: napisaną, czytaną przez człowieka, ignorowaną przez
+#   narzędzie — czyli dokładnie tą klasą wady, którą Imperium tropi (deklaracja
+#   bez egzekucji). Jedyne źródło prawdy dla lintera: `ruff.toml` w korzeniu.
+
+[project]
+name = "imperial-mesh-vortex"
+version = "1.0.0"
+description = "Imperium Cezara Pixel — rój neuronów decyzyjnych, organy nadzoru i bramka spójności (Prawo XXI)"
+readme = "README.md"
+license = { file = "LICENSE" }
+
+# ZMIERZONE, NIE ZGADNIĘTE (2026-08-06):
+#   • PORTITOR mierzy na lokalu Cezara: Python 3.11.9,
+#   • `ruff.toml` deklaruje target-version = "py310",
+#   • skan kodu: ZERO użyć składni wyłącznie 3.11+ (brak `match`, `Self`,
+#     `ExceptionGroup`, `tomllib` w imperium/ i narzedzia/).
+# Dlatego dolna granica to 3.10 — i NIE jest to deklaracja na wiarę: workflow CI
+# uruchamia pełną bramkę na 3.10 ORAZ 3.11 (macierz), więc każde złamanie tej
+# granicy zaczerwieni CI. Deklaracja i jej egzekutor wchodzą w tym samym ruchu.
+requires-python = ">=3.10"
+
+[project.urls]
+Repository = "https://github.com/dparzy/IMPERIAL-MESH-VORTEX"
+
+# ── pytest (opcjonalny; bramką Imperium jest tests/run_tests.py) ──
+# Bez `testpaths` pytest przeczesuje CAŁY korzeń — w tym `archiwum/`,
+# `bibliotheca_ulpia/` i `wrzutnia/` (repo waży ~723 MB). Zmierzone: wszystkie 185
+# plików `test_*.py` leżą w `tests/`, ZERO poza nim — więc zawężenie niczego nie gubi.
+[tool.pytest.ini_options]
+testpaths = ["tests"]

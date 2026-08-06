@@ -4,7 +4,7 @@ typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
 bez_wlasciciela: "dziennik CALEGO Imperium — historia nie nalezy do zadnego organu"
-stan_na: 2026-08-03
+stan_na: 2026-08-06
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -12,6 +12,267 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-08-06 | 🔎 | Wołacz-widmo: RECOGNITOR stał w konstytucji, a bramka go nie wołała
+
+**Rozkaz Cezara:** pozycja **A** — „mechanizm na PR bez recenzji" (czwarte wystąpienie klasy
+po #134, #140, #141). Zadanie zaczęło się od DELIBERATIO, punkt 5: *czy to już istnieje*.
+
+### Pomiar obalił nazwę pozycji, zanim powstała pierwsza linia kodu
+**Mechanizm ISTNIAŁ.** `imperium/pretorianie/recognitor.py` (od 2026-07-28) mierzy dokładnie tę
+klasę. Ale `grep` po całym repo pokazał **zero wołaczy**: jedynymi trafieniami były proza
+w `CLAUDE.md` i jego własny plik testów. Docstring organu twierdził wprost, że „chodzi
+w `/limes`" — a `SIGLA["LIMES"]` trzymało **twardą listę komend**, do której nigdy go nie
+dopisano. **Zdanie było fałszem przez dziewięć dni.**
+
+Dlaczego nikt tego nie złapał: strażnik pieczęci (`brakujace_komendy`) pytał wyłącznie „czy
+komenda LIMES wskazuje na żywy moduł" — nigdy „czy nakazana komenda w ogóle do LIMES trafiła".
+**Ta sama asymetria co w LUSTRUM** (W17 pytał „czy zameldowany", nigdy „czy potrzebny"):
+strażnik badający wyłącznie zbiór, który już zna, nie potrafi wykryć BRAKU.
+
+### Skala zmierzona na wszystkich 141 PR — nie „czwarte wystąpienie", tylko stan normalny
+| miara | wynik |
+|---|---|
+| PR bez ANI JEDNEJ recenzji | **92 / 141 (65,2 %)** |
+| recenzja przyszła **PO MERGU** | **36 z 49 recenzowanych (73 %)** |
+| **przejrzane NA CZAS** (recenzja na commicie gałęzi przed mergem) | **10 / 141 (7,1 %)** |
+| mediana okna utworzenie→merge (bez recenzji) | **10 s** |
+
+**Przyczyna nie jest milczeniem recenzenta ani zapominalstwem Architekta:** PR bywał mergowany
+w 9–35 sekund po utworzeniu — krócej, niż recenzent potrzebuje na start. Rozdział w próbce
+12 ostatnich PR był doskonały, bez wyjątku: każdy PR żyjący sekundy nie miał recenzji, każdy
+żyjący minuty/godziny miał. `main` nie miał branch protection (`Branch not protected`).
+
+### 🪞 Miernik obalił SAM SIEBIE godzinę po napisaniu (LEX TALARUS)
+Pierwsza wersja `ocen_historie` liczyła „pokryte: 46 (32,6 %)" — wliczając 36 recenzji złożonych
+**po mergu**, czyli do kodu, który już był w `main`. Ostrzegałem w jej własnym docstringu, że
+zatarcie różnicy zamieni miernik w pochlebcę — i zatarłem **inną** różnicę: czasową. Dodany
+wymiar `pokryte_przed_mergem` zbił chwaloną liczbę z **32,6 % na 7,1 %**. Ta sama klasa złapana
+dwa razy w jednej godzinie: raz na cudzym wymiarze (commit), raz na własnym (czas).
+
+**Co powstało:**
+- `sigillarium`: pola `sekcja_komend` + `kroki_komend` (deklaracja nadzoru zamiast prozy
+  w `zrodlo`), funkcje `komendy_konstytucji_poza_pieczecia()` i `kroki_nadzoru_osierocone()`.
+  Kierunek odwrotny do istniejącego strażnika — pilnuje, czy komenda z konstytucji **trafiła**
+  do pieczęci. Reguła świadomie **jednokierunkowa**: bramce wolno być ostrzejszą od checklisty
+  (`--falsa`), nie wolno łagodniejszą.
+- `recognitor`: **FENESTRA RECOGNITIONIS** — rozkład pokrycia po całej historii PR
+  (`recognitor historia`). Świadomie **miernik, nie bramka**: kończy zerem, bo commit nie
+  naprawi PR-a sprzed miesiąca, a bramka karząca za przeszłość uczy obchodzenia bramki.
+- RECOGNITOR dopisany do komend `/limes` + zaktualizowane opisy (CLAUDE.md, SKILL.md).
+
+**Testy:** +7 (sigillarium, w tym dwie mutacje: wycięty recognitor i osierocona kotwica)
+oraz +9 (FENESTRA, w tym test granicy sekundy wokół mergu i PR otwartego). Bramka: 3549/3549.
+
+**Czego to NIE robi (uczciwie):** nie wymusza, żeby recenzja przyszła. Czyni brak GŁOŚNYM.
+Fizyczne okno dla recenzenta daje dopiero branch protection na `main` — krok w rękach Cezara.
+
+**Pliki:** `imperium/biblioteki/sigillarium.py`, `imperium/pretorianie/recognitor.py`,
+`tests/test_sigillarium.py`, `tests/test_recognitor.py`, `CLAUDE.md`, `.claude/skills/limes/SKILL.md`
+
+---
+
+## 2026-08-06 | 🧱 | KM1 — VALLUM: bramka Prawa XXI dostała egzekutora poza maszyną Architekta
+
+**Rozkaz Cezara:** *„zaczniemy od km1 wg rekomendacji"*, a w ROADMAP warunek nienaruszalny:
+workflow wchodzi **z antywskaźnikiem** — CI, które nigdy nie czerwienieje, jest tapetą.
+
+**Co powstało:** `.github/workflows/ci.yml` (**VALLUM** — wał) + `pyproject.toml`.
+Imię odrębne od `LIMES` świadomie: LIMES to bramka lokalna, zależna od dyscypliny Architekta;
+VALLUM stoi **poza jego maszyną** i nie zależy od niczyjej. Do dziś Prawo XXI miało 24 warstwy
+i **zero egzekutorów** poza terminalem — ta sama klasa co kontrakt append-only (deklarowany
+w 6 organach, egzekwowany przez zero).
+
+### Metoda: zanim powstał workflow, powstał POMIAR
+Zamiast pisać YAML „jak się zwykle pisze", sklonowałem repo do katalogu roboczego i uruchomiłem
+w nim pełną bramkę — bo dokładnie to robi runner CI: bierze **wyłącznie pliki z gita**.
+Klon odtworzony 1:1 (0 rozbieżności). Ten jeden ruch zwrócił KM1 z nawiązką **przed** pierwszym
+biegiem CI.
+
+### 🔴 ZNALEZISKO P0 — bramka testów działała TYLKO na maszynie Cezara
+`tests/run_tests.py` łapał `unittest.SkipTest`, `AssertionError` i `Exception`. Ale
+`pytest.skip()` rzuca `_pytest.outcomes.Skipped`, który dziedziczy po **BaseException** —
+przeleciał przez każdy `except` i **urwał cały bieg tracebackiem po 2345 liniach**; wszystkie
+pliki testowe po winowajcy nie uruchomiły się w ogóle. Lokalnie niewidoczne, bo u Cezara baza
+RAG istnieje i skip nie zachodzi. Deklaracja *„3539/3539 zielone"* była prawdziwa na jednej
+maszynie i nieprawdziwa na każdej innej.
+
+**Naprawa KLASY, nie instancji** (lekcja z 2026-08-05: wzorzec przeżył naprawę przypadku):
+runner dostał krotkę `_POMINIECIA` obejmującą oba dialekty pominięcia, z leniwym importem —
+pytest pozostaje opcjonalny (Prawo I). **Test granicy** (`tests/test_runner_shim.py`) udowodniony
+mutacyjnie: na stanie sprzed naprawy **czerwienieje**, po naprawie zielony. Dowód po naprawie
+w biegu: bieg doszedł do końca (3539 zebranych, 1 pominięty) zamiast umrzeć w 2/3 drogi.
+
+### 🔴 ZNALEZISKO — `requirements.txt` mówił o środowisku nieprawdę
+Plik twierdzi, że *„testy działają BEZ tych zależności (graceful fallback)"*. **Zmierzone**
+biegiem z zablokowanym TA-Lib: **138 z 3539 testów PADA**, a audyt czerwienieje na W12.
+Brama Kalkulatora świadomie rzuca `RuntimeError` zamiast liczyć po swojemu (*„brak fallbacku
+do ręcznej matematyki"*, Prawo I) — czyli osłona `try/except` istnieje, ale **nie jest
+fallbackiem**. Mój pierwszy wniosek („23 z 24 importów w try → graceful") był **błędny i został
+obalony pomiarem w tej samej wachcie**. Skutek dla wału: TA-Lib jest **obowiązkowy**, a jego
+brak pada w JEDNYM czytelnym kroku, nie na 138 sposobów naraz.
+
+Sprawdzone w sieci (PyPI, 2026-08-06): TA-Lib 0.6.6 publikuje wheels `manylinux_2_28` dla
+**cp310 i cp311** — dokładnie naszej macierzy. Kompilacja C niepotrzebna, więc wał instaluje
+**pełny `requirements.txt`, bez wyjątków** i mierzy to samo, co lokal.
+
+### Decyzje projektowe — każda z powodu, nie z nawyku
+| Decyzja | Powód ZMIERZONY |
+|---|---|
+| Ruff jako **osobny twardy krok** | `audyt_spojnosci.py:1422-1427`: gdy ruffa brak, W13 wypisuje notę i **przepuszcza audyt zielono**. W CI to cisza udająca spokój |
+| Kolejność ruff → audyt → testy | ruff <1 s, audyt 13 s, testy 560 s — rozjazd dokumentów wychodzi po kilkunastu sekundach, nie po dziesięciu minutach |
+| Macierz 3.10 + 3.11 | `requires-python=">=3.10"` przestaje być deklaracją na wiarę; repo jest **PUBLIC**, więc Actions nie kosztuje minut |
+| `run_tests.py`, nie pytest | bramką Imperium jest runner; gdyby CI wołało pytest, „zielone CI" nie znaczyłoby „zielona bramka" |
+| Brak `[tool.ruff]` w pyproject | ruff czyta `ruff.toml` z pierwszeństwem — duplikat byłby **konfiguracją-widmem** (Prawo XVI) |
+| `timeout-minutes: 30` | ~3× zmierzonego czasu (560 s), nie zgadywanka |
+
+### Antywskaźnik — trzy osobne mutacje, po jednej na nogę
+Jedna mutacja wywalająca wszystko dowodzi tylko, że *coś* czerwienieje. Każda noga musi
+umieć zaczerwienić się **sama**. Wykonane w klonie, żywe repo nietknięte:
+
+| Noga | Mutacja | Wynik |
+|---|---|---|
+| RUFF | `F821` — użycie niezdefiniowanej nazwy | zielony → **rc=1** → zielony po cofnięciu |
+| AUDYT | rozjazd wstrzykniętej liczby kod↔dokument | zielony → **rc=1 na W15** → zielony po cofnięciu |
+| TESTY | `MAX_DRAWDOWN_STOP` 0.30 → 0.99 (bezpiecznik AOA wyłączony) | **rc=1**, 7 oblanych (3532/3539), 576 s → cofnięte |
+
+Noga TESTÓW złapała mutację **tam, gdzie powinna**: cztery testy bezpiecznika nazwały problem
+wprost (*„30% obsunięcia MUSI przepalić bezpiecznik"*, *„Przepalony bezpiecznik musi blokować
+wejście"*), a trzy dalsze pokazały skutki uboczne. To jest różnica między „testy padły"
+a „testy wiedzą, co się zepsuło".
+
+⚠️ **CZEGO JESZCZE NIE WIEMY (LEX TALARUS — nie ogłaszam działania przed pomiarem):**
+udowodnione jest, że **komendy** wału czerwienieją. Że czerwienieje **sam workflow na GitHubie**,
+zweryfikuje dopiero pierwszy realny bieg po pushu Cezara — Architekt nie pushuje. Do tego czasu
+VALLUM jest **zmierzony lokalnie, niezweryfikowany zdalnie**, i tak jest opisany w ROADMAP.
+
+**Przy okazji naprawione:** rozjazd W15 (`sesje_kroniki` 159→160). **Księga Wad Kodu +2 klasy**
+(164→166, zapis potwierdzony odczytem z dysku): *pętla łapiąca tylko `Exception` wobec sygnału
+z `BaseException`* oraz *deklaracja o środowisku nigdy nie zmierzona w tym środowisku*.
+
+### 🔴 PIERWSZY REALNY BIEG WAŁU — CZERWONY (bieg `31060020148`)
+Cezar wypchnął commit; VALLUM ruszył sam. **Przeszły: zależności, TA-Lib z wheeli, RUFF
+i cały AUDYT (24 warstwy) — na 3.10 ORAZ 3.11.** Padła noga TESTÓW: **8 z 3540**,
+**identycznie na obu wersjach** — a ta identyczność jest sama w sobie diagnozą: przyczyną
+nie jest wersja Pythona, tylko środowisko.
+
+Nie muszę już pisać „nie wiem, czy workflow umie zaczerwienieć". **Umie** — pokazał to
+na własnym pierwszym biegu, bez mutacji, na prawdziwym kodzie.
+
+### Żniwo: 8 testów, które żyły wyłącznie na maszynie Cezara
+**(A) WADA ORGANU, nie testów — 4× SILENTIUM + kalibracja.** `_w_repo()` miał regułę dla
+ścieżek POSIX-owych pod Windowsem, ale **brakowało jej lustra**: ścieżka `C:\…` widziana
+spod Linuksa nie jest absolutna, więc `Path` doklejał ją do korzenia repozytorium i strażnik
+**pilnował windowsowego katalogu tymczasowego jak własnego drzewa**. Dodana
+`_obca_sciezka_windows()` + test granicy badający OBA systemy przez udawanie `os.name`.
+Twarda asercja w drugą stronę: **pod Windowsem reguła MUSI milczeć**, bo tam `C:\Projekty\…`
+to naprawdę nasze repo i odezwanie się rozbroiłoby strażnika na jedynej maszynie, gdzie pracuje.
+
+**(B) 2× `test_calibre_*`.** Padały na `faber.wymagaj("ebook-convert")`, choć oba udają
+`subprocess.run` i prawdziwy calibre nie jest im do niczego potrzebny. Podmieniony FABER
+**zamiast pominięcia** — pominięcie oddawałoby pokrycie na każdej maszynie bez calibre,
+a `_calibre` ma własną gałąź „FABERA brak" i to jej używamy.
+
+**(C) `test_raport_alarmuje_o_skazonej_krytyce` — moja pierwsza diagnoza była BŁĘDNA.**
+Obstawiałem różnicę systemu; rozstrzygnęło dopiero sprawdzenie, czy test padał również
+w klonie **na Windowsie**. Padał. `raport()` ma na wejściu bramkę *„brak indeksu RAG =
+AWARIA INFRY"* i wraca komunikatem, zanim dojdzie do badanej sekcji — a `baza_wiedzy.db`
+stoi w `.gitignore`, więc **istnieje wyłącznie na maszynie, która ją zaindeksowała**.
+Bramka w kodzie jest SŁUSZNA i zostaje; to test nie deklarował swojej zależności.
+
+### ⚠️ MOC DOWODU JEST RÓŻNA — nie zrównuję jej (LEX TALARUS)
+| Naprawa | Czym dowiedziona | Siła |
+|---|---|---|
+| (C) skażona krytyka | odtworzona realna porażka w klonie → zgasła | **pełna** |
+| (B) calibre ×2 | bieg przy udawanym braku narzędzia | mocna |
+| (A) SILENTIUM ×4 + kalibracja | diagnoza + test granicy pod udawanym `os.name` | **niepełna** — czy kalibracja wróci z 89,6% na 93,5% pod PRAWDZIWYM Linuksem, pokaże dopiero następny bieg wału |
+
+**Klasa nadrzędna — trzecia w jednej wachcie:** *rzecz uznana za sprawdzoną, bo sprawdzano
+ją w jedynym miejscu, gdzie ją kiedykolwiek uruchomiono.* Najpierw runner testów, potem
+`requirements.txt`, teraz 8 testów. Wał nie stworzył tych wad — **odsłonił je w pierwszej
+godzinie istnienia**.
+
+### 🔁 DRUGI BIEG (`31062067510`) — 8 → 2, i druga połowa tej samej wady
+Sześć napraw zadziałało. **Kalibracja SILENTIUM zniknęła z listy porażek** — czyli wróciła
+ponad próg, co potwierdziło hipotezę (A), której nie dało się dowieść lokalnie.
+
+Zostały 2 testy ciszy — i wskazały **lustrzane odbicie tej samej wady przenośności**.
+Reguła *„ścieżka zaczynająca się od `/` to nie nasze drzewo"* jest poprawna **wyłącznie pod
+Windowsem** (tam repo ma literę dysku). Pod Linuksem korzeń repozytorium to `/home/runner/…`,
+więc reguła **uznawała WŁASNE REPOZYTORIUM ZA OBCE**: strażnik nie chronił ŻADNEGO pliku
+wskazanego ścieżką absolutną — milcząc, czyli wyglądając na spokój.
+
+Oba testy trafiły w to, bo **świadomie używają ścieżek produkcyjnych** (`test_pliki_pomocnicze_ciszy`
+ma to wprost w docstringu: *na `tmp_path` test przeszedłby zawsze — z powodu położenia, nie
+z powodu reguły, której pilnuje*). Ta decyzja sprzed miesięcy jest powodem, dla którego wada
+w ogóle wyszła na jaw.
+
+Naprawa: warunek obwarowany `os.name == "nt"`; pod POSIX-em rozstrzyga `relative_to(KORZEN)`,
+więc `/tmp/x` nadal wypada z drzewa, a `/home/runner/…/docs/x.md` zostaje rozpoznane jako nasze.
+**Ta sama reguła przenośności była zepsuta w OBIE strony — każda połowa widoczna wyłącznie
+z drugiego systemu.**
+
+### 🟢 TRZECI BIEG (`31083330629`) — ZIELONY na 3.10 I 3.11. VALLUM DZIAŁA.
+Wszystkie 8 napraw potwierdzone pod prawdziwym Linuksem. **Dopiero teraz KM1 dostaje ✅** —
+przez trzy biegi stało 🟡, bo dowód był niepełny, a nie dlatego, że praca była niegotowa.
+
+**Droga wału w jeden dzień:** nie istnieje → zbudowany → **czerwony (8 wad)** → czerwony (2 wady)
+→ **zielony**. Ani jednej z tych wad wał nie stworzył; wszystkie leżały w repo i były niewidoczne,
+bo jedyną maszyną, na której cokolwiek uruchamiano, był komputer Cezara.
+
+**Od tego commitu Imperium przestało polegać na tym, że Architekt pamięta o bramce.**
+
+**Złapane na sobie:** heredoc powłoki zjadł mi backslashe dwukrotnie (raz w kodzie testu,
+raz w docstringu), przez co przez chwilę raportowałem „ZLE" dla przypadku UNC, choć wada
+była w moim **rusztowaniu pomiarowym**, nie w kodzie. Literały ze znakami ucieczki buduję
+odtąd jawnie (`chr(92)`), a treść z ukośnikami piszę narzędziem plikowym, nie powłoką.
+
+---
+
+## 2026-08-06 | ⚖️ | SĄD nad audytem Kimi K3 — 8 adopcji KM1–KM8, reszta obalona pomiarem
+
+**Rozkaz Cezara:** *„zanim coś zmienimy przeczytaj dokładnie i przeanalizuj metaprompt innego
+audytora kimi 3 (…) nie odrzucamy tylko analizujemy i dokładnie sprawdzamy"*, potem
+*„wszystkie tier dopisz do roadmap plan i zaktualizuj"*.
+
+**Materiał:** `wrzutnia/05.08.2026/` — 7 plików (156 KB markdown + 3 obrazy). Przeczytany
+w CAŁOŚCI, każda falsyfikowalna teza zderzona z żywym kodem albo z siecią.
+
+**Co rozstrzygnęło — PROWENIENCJA.** Raport ogólny sam deklaruje w nagłówku *„treść plików
+`.py` niedostępna (blokada GitHub raw)"* i mapuje repo jako **3 pliki `.py` / 10 zasad**.
+Metaprompt tego samego autora, tej samej sesji, mówi **467 plików / 21 praw**. Zmierzone:
+**466 plików, 25 praw, 1054 commity**. Ocena **3,75/10** dotyczy repozytorium, które nie istnieje.
+
+**Werdykt „Zasady nie blokują" (powtórzony w 3 dokumentach) — PROCEDURALNIE NIEWAŻNY:**
+analizuje 21 praw, mamy 25; zgodne treścią 4 (I, VII, XIX, XX) = trafność ~16%; XXII–XXV
+nieobecne. Egzaminowano inną konstytucję → werdykt **nie został wydany**, nie „wydany błędnie".
+
+**Przyjęte (KM1–KM8):** KM1 CI/CD + `pyproject.toml` (**jedyne w pełni nowe** — katalogu
+`.github/workflows` nie ma, więc regresję łapie dziś wyłącznie ręczne `/limes`) · KM2 warstwa
+pewności RAG po A10 · KM3 arena Bitget przed MEXC · KM4 kandydaci ekstrakcji do 1b ·
+KM5 pomiar pamięci obserwacyjnej · KM6 HMO Tier-2 (odłożone) · KM7 Kimi K3 (decyzja Cezara) ·
+KM8 „Adaptive Markets" Lo.
+
+**Obalone pomiarem:** SENAT istnieje · TRYBUNAŁ = 24 warstwy + 19 pretorianów · SKARBIEC =
+`pamiec_absolutna`/`arena_baza`/ledgery · `requirements.txt` istnieje · „zbuduj MCP Server" —
+mamy DWA · „brak headless" — 5 typów hooków · patenty `US 11,847,xxx` = numery-zaślepki.
+
+**Odrzucone bo JUŻ MAMY:** tolerancja immunologiczna (`backtest.py:132`, ML-36 podnosi próg
+po serii strat) · quorum per reżim (`progi_adaptacyjne.py`) · RRF (nasze A8) ·
+A15/A10/A1b/A13/A14/F1/F2 (nasze pozycje) · 7 z 8 książek.
+
+**🚨 Złapane własnym pomiarem w tej samej wachcie:** pierwsza wersja tabeli dowodowej użyła
+emoji stanu (`✅🔴🟡⏸️`) i **zafałszowała piętro LOOP o 4 pozycje otwarte i 2 domknięte** —
+`maturitas.stan_domkniety()` liczy je w KAŻDEJ tabeli pliku, nie tylko w kolejce. Naprawione
+u źródła; po naprawie otwarte 86→94 = **dokładnie 8 pozycji KM**, domknięte 16 bez zmian.
+Klasa otwarta: **wzorzec przeżył naprawę instancji** — dowolna przyszła tabela z tymi emoji
+powtórzy błąd. Kandydat na strażnika zapisany, nie zbudowany (wymaga DELIBERATIO).
+
+**Pliki:** `docs/ROADMAP_IMPERIUM.md` (8 pozycji + sekcja sądu), `docs/INDEKS_IMPERIUM.md`
+(katalog regenerowany po zmianie `stan_na` — złapane przez W20), `docs/PLAN_TIRO_LOKALNY_LLM.md`
+(W15 z otwarcia), `docs/LOG_ZMIAN.md`. **Zero zmian w `.py`.** Testy 3539/3539, audyt exit 0.
 
 ---
 

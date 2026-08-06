@@ -1,6 +1,6 @@
 ---
 name: limes
-description: SIGILLUM LIMES — wał graniczny, twarda bramka Prawa XXI przed każdym commitem. Użyj przed commitem oraz gdy Cezar pisze „bramka", „sprawdź wszystko", „limes". Uruchamia testy, pełny audyt spójności (z ruff W13), łowcę powtórek z Księgi Wad, spis obalonych twierdzeń (INDEX FALSORUM) i bilans długu honorowego.
+description: SIGILLUM LIMES — wał graniczny, twarda bramka Prawa XXI przed każdym commitem. Użyj przed commitem oraz gdy Cezar pisze „bramka", „sprawdź wszystko", „limes". Uruchamia testy, pełny audyt spójności (z ruff W13), łowcę powtórek z Księgi Wad, spis obalonych twierdzeń (INDEX FALSORUM), pokrycie recenzji (RECOGNITOR) i bilans długu honorowego.
 ---
 
 # 🔏 SIGILLUM LIMES — bramka Prawa XXI
@@ -30,3 +30,8 @@ bramki (to samo gnicie, które SIGILLARIUM ma eliminować). Pieczęć podaje akt
 - Czerwona bramka → **NIE commitujesz**: naprawiasz u źródła, potem powtarzasz LIMES.
 - Jeśli pieczęć zgłosi `🚨 MARTWE KOMENDY`, któryś skrypt/moduł bramki zniknął lub zmienił
   nazwę — bramka udawałaby sprawną. Napraw natychmiast.
+- `🚨 KONSTYTUCJA NAKAZUJE, PIECZĘĆ NIE WOŁA` = bramka jest ŁAGODNIEJSZA od checklisty
+  końca sesji: komenda stoi w CLAUDE.md, ale wypadła z rejestru `SIGLA`. Dopisz ją.
+  `🚨 KOTWICA OSIEROCONA` = przenumerowano checklistę i nadzór wskazuje w próżnię.
+- **RECOGNITOR bez sieci albo bez `gh` zwraca `NIEZMIERZONE` (exit 2) — to NIE jest
+  zielone światło.** Rzecz niezmierzona nie jest zielona, jest niezmierzona (Prawo I).

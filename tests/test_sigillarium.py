@@ -6,6 +6,7 @@ bramki wskaże nieistniejący plik. Cicha pusta procedura to dokładnie klasa
 „mechanizm, który przy awarii wygląda na sprawny".
 """
 from pathlib import Path
+from unittest import mock
 
 from imperium.biblioteki import pamiec_proceduralna as pp
 from imperium.biblioteki import sigillarium as sg
@@ -342,3 +343,74 @@ def test_synchronizacja_w11_przepisuje_zywe_kroki(tmp_path):
     zapisane = {w["nazwa"]: w for w in pp.wszystkie(plik)}
     for s in sg.wszystkie():
         assert zapisane[s.tytul]["kroki"] == sg.kroki(s.nazwa)
+
+
+# ── NADZÓR NAD TWARDĄ LISTĄ KOMEND (2026-08-06) ──────────────────────────────
+# Powód: RECOGNITOR stał w kroku 3 domknięcia od 2026-07-28 i przez dziewięć dni
+# nie był częścią LIMES. Bramka wyglądała na kompletną, bo istniejące testy pytały
+# WYŁĄCZNIE, czy komendy pieczęci wskazują na żywe moduły — nigdy, czy nakazana
+# komenda w ogóle do pieczęci trafiła. Testy niżej pilnują DRUGIEGO kierunku.
+
+def test_limes_wola_recognitora():
+    """Regresja instancji: bramka bez RECOGNITORA nie pyta, czy recenzent widział kod.
+
+    Zmierzone 2026-08-06: 92 ze 141 PR repozytorium (65,2%) nie miało ANI JEDNEJ
+    recenzji, a `/limes` — jedyna bramka wołana przed commitem — nie zawierała
+    jedynego organu, który to mierzy.
+    """
+    komendy = sg.SIGLA["LIMES"].komendy
+    assert any("recognitor" in k for k in komendy), \
+        f"LIMES nie woła RECOGNITORA — bramka nie pyta o pokrycie recenzji: {komendy}"
+
+
+def test_zadna_nakazana_komenda_nie_wypadla_z_pieczeci():
+    """Regresja KLASY na ŻYWEJ konstytucji: każda komenda z nadzorowanych kroków
+    CLAUDE.md musi być w `komendy` pieczęci. To ten test zaświeciłby na czerwono
+    2026-07-28, gdyby istniał."""
+    for s in sg.wszystkie():
+        assert sg.komendy_konstytucji_poza_pieczecia(s.nazwa) == [], (
+            f"{s.nazwa}: konstytucja nakazuje komendy, których pieczęć nie woła — "
+            f"{sg.komendy_konstytucji_poza_pieczecia(s.nazwa)}")
+
+
+def test_zadna_kotwica_nadzoru_nie_jest_osierocona():
+    """Nadzór po NUMERACH kroków gnije przy przenumerowaniu checklisty — a gnije
+    CICHO, wyglądając na spełniony. Ten test pilnuje samego przyrządu."""
+    for s in sg.wszystkie():
+        assert sg.kroki_nadzoru_osierocone(s.nazwa) == [], (
+            f"{s.nazwa}: nadzoruje kroki nieistniejące w konstytucji — "
+            f"{sg.kroki_nadzoru_osierocone(s.nazwa)}")
+
+
+def test_wykrywa_komende_wypadla_z_pieczeci():
+    """Mutacja: strażnik, którego nie widziano na CZERWONO, nie jest zmierzony."""
+    from dataclasses import replace
+    okrojony = replace(sg.SIGLA["LIMES"],
+                       komendy=[k for k in sg.SIGLA["LIMES"].komendy if "recognitor" not in k])
+    with mock.patch.dict(sg.SIGLA, {"LIMES": okrojony}):
+        assert sg.komendy_konstytucji_poza_pieczecia("LIMES") == [
+            "python -m imperium.pretorianie.recognitor --bramka"]
+
+
+def test_wykrywa_kotwice_wskazujaca_w_prozne():
+    """Mutacja: krok, którego w konstytucji nie ma, musi KRZYCZEĆ, nie milczeć."""
+    from dataclasses import replace
+    zgnily = replace(sg.SIGLA["LIMES"], kroki_komend=("1", "3", "5b", "9z"))
+    with mock.patch.dict(sg.SIGLA, {"LIMES": zgnily}):
+        assert sg.kroki_nadzoru_osierocone("LIMES") == ["9z"]
+
+
+def test_nadmiar_komend_w_pieczeci_jest_dozwolony():
+    """GRANICA reguły: jednokierunkowa. Bramce WOLNO być ostrzejszą od checklisty
+    (LIMES woła `--falsa`, którego krok 3 nie wymienia), nie wolno łagodniejszą.
+    Bez tego testu ktoś „naprawiłby" regułę w obie strony i wyciął INDEX FALSORUM."""
+    assert any("--falsa" in k for k in sg.SIGLA["LIMES"].komendy)
+    assert sg.komendy_konstytucji_poza_pieczecia("LIMES") == []
+
+
+def test_komendy_w_tekscie_pomija_to_co_nie_jest_poleceniem():
+    """Krok 3 cytuje w grzbietach także `/code-review` (skill harnessa) i
+    `ksiega_wad_kodu` (nazwa ledgera) — żadne z nich nie jest komendą powłoki."""
+    krok = ("3. `/code-review` na diffie + `python narzedzia/skan_wad_kodu.py` na "
+            "zmienionych plikach. Nowe wady → Księga Wad (`ksiega_wad_kodu`).")
+    assert sg._komendy_w_tekscie(krok) == ["python narzedzia/skan_wad_kodu.py"]

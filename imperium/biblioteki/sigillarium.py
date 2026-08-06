@@ -56,6 +56,15 @@ class Sigillum:
     `sekcja`   — nagłówek w CLAUDE.md, z którego czytamy kroki (źródło prawdy).
     `komendy`  — alternatywa dla sekcji: twarda lista komend (gdy procedura JEST
                  sekwencją poleceń, a nie prozą — np. bramka LIMES).
+
+    `sekcja_komend` + `kroki_komend` — NADZÓR NAD TWARDĄ LISTĄ (dodane 2026-08-06).
+    Pieczęć z `komendy` łamie żelazną zasadę tego organu („pieczęć NIE przechowuje
+    kroków") świadomie, bo bramka JEST sekwencją poleceń. Ale świadome złamanie
+    zasady nadal gnije: RECOGNITOR wszedł do kroku 3 domknięcia 2026-07-28 i przez
+    dziewięć dni NIE BYŁ CZĘŚCIĄ LIMES — bo listę trzeba było dopisać ręcznie w dwóch
+    miejscach, a dopisano w jednym. Te dwa pola mówią, KTÓRE kroki konstytucji ta lista
+    ma pokrywać, żeby `komendy_konstytucji_poza_pieczecia()` mogło to sprawdzić
+    maszynowo zamiast liczyć na pamięć Architekta.
     """
 
     nazwa: str
@@ -65,6 +74,8 @@ class Sigillum:
     sekcja: str = ""
     komendy: List[str] = field(default_factory=list)
     zrodlo: str = ""
+    sekcja_komend: str = ""
+    kroki_komend: tuple = ()
 
 
 # ── REJESTR SIGLI (rdzeń zatwierdzony przez Cezara 2026-07-20) ────────────────
@@ -93,7 +104,8 @@ SIGLA: Dict[str, Sigillum] = {
         nazwa="LIMES",
         tytul="LIMES — bramka Prawa XXI (wał graniczny)",
         opis="Twarda bramka przed każdym commitem: testy, pełny audyt (z ruff W13), "
-             "łowca powtórek Księgi Wad, spis obalonych twierdzeń, dług honorowy.",
+             "łowca powtórek Księgi Wad, spis obalonych twierdzeń, pokrycie recenzji "
+             "(RECOGNITOR), dług honorowy.",
         wyzwalacze=["limes", "bramka", "zrób bramkę", "zrob bramke", "przed commitem",
                     "przed pushem", "sprawdź wszystko", "sprawdz wszystko"],
         komendy=[
@@ -101,9 +113,15 @@ SIGLA: Dict[str, Sigillum] = {
             "python narzedzia/audyt_spojnosci.py",
             "python narzedzia/skan_wad_kodu.py",
             "python narzedzia/skan_wad_kodu.py --falsa",
+            "python -m imperium.pretorianie.recognitor --bramka",
             "python -m imperium.biblioteki.codex_notarum bilans",
         ],
         zrodlo="CLAUDE.md § TRYB AUTONOMICZNY + § KONIEC SESJI kroki 1/3/5b",
+        # Deklaracja nadzoru, nie ozdoba: te kroki konstytucji MUSZĄ być pokryte przez
+        # `komendy` powyżej. Dzięki temu „kroki 1/3/5b" w `zrodlo` przestaje być prozą,
+        # której nikt nie sprawdza, a staje się kontraktem z egzekutorem (test granicy).
+        sekcja_komend="## 🏁 KONIEC SESJI",
+        kroki_komend=("1", "3", "5b"),
     ),
 }
 
@@ -236,6 +254,75 @@ def brakujace_komendy(nazwa: str) -> List[str]:
     return [kom for kom in s.komendy if _cel_komendy_istnieje(kom) is False]
 
 
+# Komenda cytowana w prozie konstytucji: `python ...` w grzbiecie (backtickach).
+# Tylko `python`, bo pieczęć wykonuje polecenia powłoki — `/code-review` (skill harnessa)
+# ani `ksiega_wad_kodu` (nazwa ledgera) nie są komendami do uruchomienia.
+_RE_KOMENDA_W_GRZBIECIE = re.compile(r"`([^`]+)`")
+
+
+def _komendy_w_tekscie(tekst: str) -> List[str]:
+    """Komendy `python ...` zacytowane w treści kroku konstytucji."""
+    znalezione = []
+    for kandydat in _RE_KOMENDA_W_GRZBIECIE.findall(tekst):
+        kom = _splasz(kandydat)
+        if kom.startswith("python ") and kom not in znalezione:
+            znalezione.append(kom)
+    return znalezione
+
+
+def kroki_nadzoru_osierocone(nazwa: str, tekst: Optional[str] = None) -> List[str]:
+    """Numery kroków, które pieczęć deklaruje nadzorować, a których NIE MA w konstytucji.
+
+    Strażnik oparty na NUMERACH kroków ma wbudowaną kruchość: gdy Cezar przenumeruje
+    checklistę, `kroki_komend=("1","3","5b")` zacznie wskazywać w próżnię i nadzór
+    ucichnie — wyglądając na spełniony. To dokładnie klasa „mechanizm, który przy awarii
+    wygląda na sprawny", więc osierocona kotwica musi KRZYCZEĆ, a nie milczeć (ta sama
+    lekcja co `kotwica_osierocona` w EXACTORZE, zgłoszona przez recenzenta w PR #138).
+    """
+    s = sigillum(nazwa)
+    if s is None or not s.sekcja_komend:
+        return []
+    obecne = set()
+    for krok in kroki_z_konstytucji(s.sekcja_komend, tekst):
+        m = re.match(r"^(\d+[a-z]?)\.", krok)
+        if m:
+            obecne.add(m.group(1))
+    return [nr for nr in s.kroki_komend if nr not in obecne]
+
+
+def komendy_konstytucji_poza_pieczecia(nazwa: str, tekst: Optional[str] = None) -> List[str]:
+    """Komendy stojące w KONSTYTUCJI, których pieczęć NIE uruchamia (kierunek odwrotny).
+
+    `brakujace_komendy()` pyta „czy komenda pieczęci wskazuje na żywy moduł" — czyli
+    pilnuje, by pieczęć nie wołała widma. Ta funkcja pyta o DRUGĄ STRONĘ: czy żywa komenda,
+    którą konstytucja nakazuje w krokach objętych nadzorem, w ogóle trafiła do pieczęci.
+
+    POWÓD ISTNIENIA (zmierzone 2026-08-06): `python -m imperium.pretorianie.recognitor
+    --bramka` stał w kroku 3 domknięcia od 2026-07-28 i NIE BYŁ w komendach LIMES.
+    Bramka wyglądała na kompletną, bo każda komenda, którą miała, była żywa — nikt nie
+    pytał o tę, której nie miała. To ta sama asymetria co w LUSTRUM (W17 pytał „czy
+    zameldowany", nigdy „czy potrzebny") i w CENSUS: strażnik badający wyłącznie zbiór,
+    który już zna, nie potrafi wykryć BRAKU.
+
+    Nadmiar jest DOZWOLONY świadomie — reguła jest jednokierunkowa. LIMES woła
+    `skan_wad_kodu.py --falsa` (INDEX FALSORUM), którego krok 3 nie wymienia wprost:
+    bramka może być ostrzejsza od checklisty, nie wolno jej być łagodniejszej.
+    """
+    s = sigillum(nazwa)
+    if s is None or not s.sekcja_komend:
+        return []
+    mam = {_splasz(k) for k in s.komendy}
+    braki: List[str] = []
+    for krok in kroki_z_konstytucji(s.sekcja_komend, tekst):
+        m = re.match(r"^(\d+[a-z]?)\.", krok)
+        if not m or m.group(1) not in s.kroki_komend:
+            continue
+        for kom in _komendy_w_tekscie(krok):
+            if kom not in mam and kom not in braki:
+                braki.append(kom)
+    return braki
+
+
 def raport(nazwa: str) -> str:
     """Wydruk pieczęci gotowy do wykonania (to widzi Architekt po `/apertio`)."""
     s = sigillum(nazwa)
@@ -252,6 +339,17 @@ def raport(nazwa: str) -> str:
     braki = brakujace_komendy(nazwa)
     if braki:
         stopka = "\n\n🚨 MARTWE KOMENDY (plik nie istnieje):\n" + "\n".join(f"   • {b}" for b in braki)
+    # Dwa alarmy nadzoru — obie strony rozjazdu pieczęć↔konstytucja są głośne.
+    sieroty = kroki_nadzoru_osierocone(nazwa)
+    if sieroty:
+        stopka += ("\n\n🚨 KOTWICA OSIEROCONA — pieczęć nadzoruje kroki, których NIE MA "
+                   f"w „{s.sekcja_komend}”: {', '.join(sieroty)}. Numeracja checklisty się "
+                   "zmieniła, więc nadzór wskazuje w próżnię — popraw `kroki_komend`.")
+    pominiete = komendy_konstytucji_poza_pieczecia(nazwa)
+    if pominiete:
+        stopka += ("\n\n🚨 KONSTYTUCJA NAKAZUJE, PIECZĘĆ NIE WOŁA:\n"
+                   + "\n".join(f"   • {b}" for b in pominiete)
+                   + "\n   Bramka jest ŁAGODNIEJSZA od checklisty — dopisz do `komendy`.")
     return f"{naglowek}\n\n{ciało}{stopka}"
 
 

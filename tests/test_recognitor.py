@@ -144,3 +144,100 @@ def test_banner_jest_jednolinijkowy():
     """ZASADA WYDRUKU: organ w bramce drukuje JEDNĄ linię (koszt kontekstu jest mierzony)."""
     w = rec.ocen_pokrycie(head=BFB, recenzje=CUBIC, commity_po=[], stan_pr="OPEN", pr_numer=134)
     assert "\n" not in rec.banner(w)
+
+
+# ── FENESTRA RECOGNITIONIS — rozkład po całej historii (2026-08-06) ──────────
+# Pojedynczy PR bez recenzji wygląda na potknięcie; dopiero rozkład pokazuje regułę.
+# Zmierzone na 141 PR: 92 bez recenzji, 36 z recenzją PO MERGU, 10 na czas (7,1%).
+# Testy pilnują GRANICY MIĘDZY „pokryte" A „pokryte NA CZAS" — bo pierwsza wersja
+# miernika ich nie rozróżniała i chwaliła proces za recenzje kodu, który już wszedł.
+
+def _pr(nr, *, utworzony="2026-08-01T10:00:00Z", zmergowany="2026-08-01T11:00:00Z",
+        head="aaa", recenzje=()):
+    return {"numer": nr, "utworzony": utworzony, "zmergowany": zmergowany,
+            "head": head, "recenzje": list(recenzje)}
+
+
+def _rec(commit="aaa", kiedy="2026-08-01T10:30:00Z", kto="cubic-dev-ai[bot]"):
+    return {"commit": commit, "kiedy": kiedy, "recenzent": kto}
+
+
+def test_historia_liczy_recenzje_na_czas():
+    """Recenzja na commicie gałęzi ZŁOŻONA PRZED mergem — jedyny przypadek pełnego sukcesu."""
+    w = rec.ocen_historie([_pr(1, recenzje=[_rec()])])
+    assert w["pokryte"] == 1 and w["pokryte_przed_mergem"] == 1
+    assert w["recenzja_po_mergu"] == 0
+    assert w["odsetek_na_czas"] == 100.0
+    assert w["niepokryte_numery"] == []
+
+
+def test_recenzja_po_mergu_nie_jest_sukcesem():
+    """SEDNO poprawki: recenzja pokrywająca commit, ale złożona PO mergu, opisuje kod,
+    który już wszedł do `main`. Liczy się jako `pokryte`, ale NIGDY jako `na czas`."""
+    w = rec.ocen_historie([_pr(1, zmergowany="2026-08-01T10:00:00Z",
+                               recenzje=[_rec(kiedy="2026-08-01T12:00:00Z")])])
+    assert w["pokryte"] == 1           # commit się zgadza…
+    assert w["pokryte_przed_mergem"] == 0   # …ale nikogo nie ochroniła
+    assert w["recenzja_po_mergu"] == 1
+    assert w["niepokryte_numery"] == [1]
+
+
+def test_granica_sekundy_wokol_mergu():
+    """TEST GRANICY (Prawo XXI): sekunda przed mergem to sukces, sekunda po — spóźnienie.
+    Bez tego progu 'na czas' byłoby uznaniowe."""
+    tuz_przed = rec.ocen_historie([_pr(1, zmergowany="2026-08-01T11:00:00Z",
+                                       recenzje=[_rec(kiedy="2026-08-01T10:59:59Z")])])
+    tuz_po = rec.ocen_historie([_pr(1, zmergowany="2026-08-01T11:00:00Z",
+                                    recenzje=[_rec(kiedy="2026-08-01T11:00:01Z")])])
+    rowno = rec.ocen_historie([_pr(1, zmergowany="2026-08-01T11:00:00Z",
+                                   recenzje=[_rec(kiedy="2026-08-01T11:00:00Z")])])
+    assert tuz_przed["pokryte_przed_mergem"] == 1
+    assert tuz_po["pokryte_przed_mergem"] == 0 and tuz_po["recenzja_po_mergu"] == 1
+    # Równo w chwili mergu liczymy jako NA CZAS — spóźnienie musi być ściśle dodatnie,
+    # inaczej zaokrąglenie znacznika GitHuba do sekundy karałoby recenzenta za remis.
+    assert rowno["pokryte_przed_mergem"] == 1 and rowno["recenzja_po_mergu"] == 0
+
+
+def test_pr_otwarty_nie_jest_spozniony():
+    """GRANICA: PR bez daty mergu nic jeszcze nie wpuścił do `main`, więc recenzja
+    nie może być 'po mergu'. Inaczej każdy otwarty PR fałszywie psułby statystykę."""
+    w = rec.ocen_historie([_pr(1, zmergowany="", recenzje=[_rec()])])
+    assert w["recenzja_po_mergu"] == 0
+    assert w["pokryte_przed_mergem"] == 1
+
+
+def test_recenzja_na_starszym_commicie_nie_pokrywa():
+    """Klasa PR #134: recenzja BYŁA, tylko trzy commity wcześniej."""
+    w = rec.ocen_historie([_pr(1, head=OB8, recenzje=[_rec(commit=BFB)])])
+    assert w["z_recenzja"] == 1
+    assert w["pokryte"] == 0 and w["pokryte_przed_mergem"] == 0
+    assert w["niepokryte_numery"] == [1]
+
+
+def test_pr_bez_recenzji_wpada_do_niepokrytych():
+    w = rec.ocen_historie([_pr(1), _pr(2, recenzje=[_rec()])])
+    assert w["bez_recenzji"] == 1 and w["z_recenzja"] == 1
+    assert w["niepokryte_numery"] == [1]
+    assert w["odsetek_na_czas"] == 50.0
+
+
+def test_recenzent_spoza_listy_sie_nie_liczy():
+    """Milczenie PILNOWANEGO recenzenta to luka — komentarz kogoś innego jej nie zamyka."""
+    w = rec.ocen_historie([_pr(1, recenzje=[_rec(kto="ktos-inny")])])
+    assert w["z_recenzja"] == 0 and w["bez_recenzji"] == 1
+
+
+def test_mediana_i_pusta_historia():
+    assert rec.mediana([]) is None
+    assert rec.mediana([5]) == 5
+    assert rec.mediana([1, 3]) == 2          # parzysta — średnia środkowych
+    assert rec.mediana([9, 1, 5]) == 5       # sortuje sama
+    assert rec.mediana([None, 4, None]) == 4  # braki pomijane, nie zerowane
+    pusta = rec.ocen_historie([])
+    assert pusta["ogolem"] == 0 and pusta["odsetek_na_czas"] is None
+
+
+def test_okno_liczone_w_sekundach():
+    assert rec._sekundy("2026-08-01T10:00:00Z", "2026-08-01T10:00:35Z") == 35
+    assert rec._sekundy("", "2026-08-01T10:00:00Z") is None   # brak daty ≠ zero
+    assert rec._sekundy("2026-08-01T10:00:00Z", "zepsuta") is None

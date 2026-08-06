@@ -15,6 +15,65 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-06 | 🔎 | Wołacz-widmo: RECOGNITOR stał w konstytucji, a bramka go nie wołała
+
+**Rozkaz Cezara:** pozycja **A** — „mechanizm na PR bez recenzji" (czwarte wystąpienie klasy
+po #134, #140, #141). Zadanie zaczęło się od DELIBERATIO, punkt 5: *czy to już istnieje*.
+
+### Pomiar obalił nazwę pozycji, zanim powstała pierwsza linia kodu
+**Mechanizm ISTNIAŁ.** `imperium/pretorianie/recognitor.py` (od 2026-07-28) mierzy dokładnie tę
+klasę. Ale `grep` po całym repo pokazał **zero wołaczy**: jedynymi trafieniami były proza
+w `CLAUDE.md` i jego własny plik testów. Docstring organu twierdził wprost, że „chodzi
+w `/limes`" — a `SIGLA["LIMES"]` trzymało **twardą listę komend**, do której nigdy go nie
+dopisano. **Zdanie było fałszem przez dziewięć dni.**
+
+Dlaczego nikt tego nie złapał: strażnik pieczęci (`brakujace_komendy`) pytał wyłącznie „czy
+komenda LIMES wskazuje na żywy moduł" — nigdy „czy nakazana komenda w ogóle do LIMES trafiła".
+**Ta sama asymetria co w LUSTRUM** (W17 pytał „czy zameldowany", nigdy „czy potrzebny"):
+strażnik badający wyłącznie zbiór, który już zna, nie potrafi wykryć BRAKU.
+
+### Skala zmierzona na wszystkich 141 PR — nie „czwarte wystąpienie", tylko stan normalny
+| miara | wynik |
+|---|---|
+| PR bez ANI JEDNEJ recenzji | **92 / 141 (65,2 %)** |
+| recenzja przyszła **PO MERGU** | **36 z 49 recenzowanych (73 %)** |
+| **przejrzane NA CZAS** (recenzja na commicie gałęzi przed mergem) | **10 / 141 (7,1 %)** |
+| mediana okna utworzenie→merge (bez recenzji) | **10 s** |
+
+**Przyczyna nie jest milczeniem recenzenta ani zapominalstwem Architekta:** PR bywał mergowany
+w 9–35 sekund po utworzeniu — krócej, niż recenzent potrzebuje na start. Rozdział w próbce
+12 ostatnich PR był doskonały, bez wyjątku: każdy PR żyjący sekundy nie miał recenzji, każdy
+żyjący minuty/godziny miał. `main` nie miał branch protection (`Branch not protected`).
+
+### 🪞 Miernik obalił SAM SIEBIE godzinę po napisaniu (LEX TALARUS)
+Pierwsza wersja `ocen_historie` liczyła „pokryte: 46 (32,6 %)" — wliczając 36 recenzji złożonych
+**po mergu**, czyli do kodu, który już był w `main`. Ostrzegałem w jej własnym docstringu, że
+zatarcie różnicy zamieni miernik w pochlebcę — i zatarłem **inną** różnicę: czasową. Dodany
+wymiar `pokryte_przed_mergem` zbił chwaloną liczbę z **32,6 % na 7,1 %**. Ta sama klasa złapana
+dwa razy w jednej godzinie: raz na cudzym wymiarze (commit), raz na własnym (czas).
+
+**Co powstało:**
+- `sigillarium`: pola `sekcja_komend` + `kroki_komend` (deklaracja nadzoru zamiast prozy
+  w `zrodlo`), funkcje `komendy_konstytucji_poza_pieczecia()` i `kroki_nadzoru_osierocone()`.
+  Kierunek odwrotny do istniejącego strażnika — pilnuje, czy komenda z konstytucji **trafiła**
+  do pieczęci. Reguła świadomie **jednokierunkowa**: bramce wolno być ostrzejszą od checklisty
+  (`--falsa`), nie wolno łagodniejszą.
+- `recognitor`: **FENESTRA RECOGNITIONIS** — rozkład pokrycia po całej historii PR
+  (`recognitor historia`). Świadomie **miernik, nie bramka**: kończy zerem, bo commit nie
+  naprawi PR-a sprzed miesiąca, a bramka karząca za przeszłość uczy obchodzenia bramki.
+- RECOGNITOR dopisany do komend `/limes` + zaktualizowane opisy (CLAUDE.md, SKILL.md).
+
+**Testy:** +7 (sigillarium, w tym dwie mutacje: wycięty recognitor i osierocona kotwica)
+oraz +9 (FENESTRA, w tym test granicy sekundy wokół mergu i PR otwartego). Bramka: 3549/3549.
+
+**Czego to NIE robi (uczciwie):** nie wymusza, żeby recenzja przyszła. Czyni brak GŁOŚNYM.
+Fizyczne okno dla recenzenta daje dopiero branch protection na `main` — krok w rękach Cezara.
+
+**Pliki:** `imperium/biblioteki/sigillarium.py`, `imperium/pretorianie/recognitor.py`,
+`tests/test_sigillarium.py`, `tests/test_recognitor.py`, `CLAUDE.md`, `.claude/skills/limes/SKILL.md`
+
+---
+
 ## 2026-08-06 | 🧱 | KM1 — VALLUM: bramka Prawa XXI dostała egzekutora poza maszyną Architekta
 
 **Rozkaz Cezara:** *„zaczniemy od km1 wg rekomendacji"*, a w ROADMAP warunek nienaruszalny:

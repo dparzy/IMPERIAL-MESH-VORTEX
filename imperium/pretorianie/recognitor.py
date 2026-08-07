@@ -151,7 +151,22 @@ def ocen_pokrycie(*, head: str, recenzje: list, commity_po, stan_pr: str,
                 "opis": f"PR #{pr_numer} NIE MA ANI JEDNEJ recenzji od {' / '.join(RECENZENCI) or 'kogokolwiek'}. "
                         "Brak uwag = brak spojrzenia, nie brak wad."}
 
-    ostatnia = max(istotne, key=lambda r: r.get("kiedy", ""))
+    # ⚠️ SZKIC NIE JEST RECENZJĄ (naprawa 2026-08-07, wada nr 1 własnej recenzji adversarialnej —
+    # ZMIERZONA SZERZEJ, NIŻ JĄ ZGŁOSZONO). Recenzja zgłosiła ten ślepy punkt w `ocen_historie`
+    # (miernik). Pomiar przed naprawą pokazał, że siedzi ON TAKŻE TUTAJ, czyli w ŚCIEŻCE BRAMKOWEJ:
+    # `ocen_pokrycie(head='abc', recenzje=[{'commit':'abc','kiedy':''}])` zwracało `pokryte, exit 0`.
+    # GitHub oddaje w `reviews` również szkice — mają `commit_id`, ale `submitted_at = null` (stan
+    # PENDING). Bez tego filtra ROZPOCZĘCIE pisania recenzji zielenił bramkę mocniej niż jej
+    # ZŁOŻENIE. Data złożenia jest tu jedynym DOWODEM, że ktokolwiek nacisnął „submit"; jej brak
+    # to niewiedza, a niewiedza nigdy nie jest zielona (Prawo I).
+    zlozone = [r for r in istotne if r.get("kiedy")]
+    if not zlozone:
+        return {**baza, "status": "recenzja_niezlozona", "ikona": "🚨", "exit": 1,
+                "opis": f"PR #{pr_numer}: recenzja ISTNIEJE, ale NIE ZOSTAŁA ZŁOŻONA "
+                        "(brak `submitted_at` — stan PENDING). Szkic recenzenta nie jest "
+                        "spojrzeniem: tych uwag nie zobaczył jeszcze nikt."}
+
+    ostatnia = max(zlozone, key=lambda r: r.get("kiedy", ""))
     recenzowany = ostatnia.get("commit", "")
     baza["recenzowany"] = recenzowany
     baza["kiedy"] = ostatnia.get("kiedy", "")
@@ -219,8 +234,9 @@ def zbadaj(galaz: str = "") -> dict:
                  "kiedy": r.get("submitted_at") or "",
                  "recenzent": (r.get("user") or {}).get("login", "")}
                 for r in surowe]
-    istotne = [r for r in recenzje if _interesujacy(r["recenzent"])]
-    po = _commity_po(max(istotne, key=lambda r: r["kiedy"])["commit"]) if istotne else []
+    # Ten sam filtr co w rdzeniu: punktem odniesienia jest recenzja ZŁOŻONA, nie szkic.
+    zlozone = [r for r in recenzje if _interesujacy(r["recenzent"]) and r["kiedy"]]
+    po = _commity_po(max(zlozone, key=lambda r: r["kiedy"])["commit"]) if zlozone else []
     return ocen_pokrycie(head=head, recenzje=recenzje, commity_po=po, stan_pr=stan,
                          pr_numer=numer, head_pr=pr[0].get("headRefOid") or "")
 
@@ -276,7 +292,14 @@ def ocen_historie(pry: list) -> dict:
     cubica **36 (73%) dostało ją PO MERGU** — kod był już w `main`, więc recenzja nie
     pełniła funkcji bramy, tylko sekcji zwłok. Miernik liczący je jako sukces chwaliłby
     proces za coś, co nikogo nie chroniło. Prawdziwa liczba to `pokryte_przed_mergem`:
-    13 ze 141 PR (9,2%).
+    **10 ze 141 PR (7,1%)** — pomiar z 2026-08-06 komendą `recognitor historia`.
+
+    ⚠️ TA LICZBA BYŁA W TYM DOCSTRINGU FAŁSZYWA (wada nr 2 własnej recenzji, naprawiona
+    2026-08-07). Stało tu „13 ze 141 (9,2%)", a ten sam kod na tym samym repo zwracał 10
+    (7,1%): dziewiątka pochodziła z mojego RĘCZNEGO rachunku 49−36, zrobionego ZANIM
+    dołożyłem warunek `kryje_commit`. Klasa: Warstwa 23 (liczby w prozie niezgodne z kodem)
+    — tyle że w docstringu `.py`, którego W23 nie skanuje. Dlatego liczba nosi teraz DATĘ
+    i KOMENDĘ: twierdzenie o przeszłym pomiarze nie gnije, twierdzenie o „stanie" gnije zawsze.
 
     Ta poprawka jest tą samą klasą, przed którą ostrzega akapit wyżej — miara zbyt
     łagodna wobec własnego procesu. Raz złapana na cudzym wymiarze (commit), raz na
@@ -284,23 +307,36 @@ def ocen_historie(pry: list) -> dict:
     """
     ogolem = len(pry)
     pokryte, pokryte_przed, z_recenzja, po_mergu = 0, 0, 0, 0
+    niezlozone, czas_nieznany = 0, 0
     okna_z, okna_bez = [], []
     niepokryte = []
     for pr in pry:
         istotne = [r for r in pr.get("recenzje", []) if _interesujacy(r.get("recenzent", ""))]
+        # Szkic recenzenta (PENDING, `submitted_at = null`) NIE liczy się jako recenzja —
+        # uzasadnienie i pomiar przy tym samym filtrze w `ocen_pokrycie`.
+        zlozone = [r for r in istotne if r.get("kiedy")]
         okno = _sekundy(pr.get("utworzony", ""), pr.get("zmergowany", ""))
-        if istotne:
+        if istotne and not zlozone:
+            niezlozone += 1
+        if zlozone:
             z_recenzja += 1
             okna_z.append(okno)
-            ostatnia = max(istotne, key=lambda r: r.get("kiedy", ""))
+            ostatnia = max(zlozone, key=lambda r: r.get("kiedy", ""))
             kryje_commit = bool(ostatnia.get("commit")) and ostatnia["commit"] == pr.get("head")
             # Brak daty mergu (PR otwarty) NIE jest spóźnieniem — nic jeszcze nie weszło.
-            spozniona = bool(pr.get("zmergowany")) and (
-                _sekundy(pr.get("zmergowany", ""), ostatnia.get("kiedy", "")) or 0) > 0
+            data_mergu = pr.get("zmergowany", "")
+            opoznienie = _sekundy(data_mergu, ostatnia["kiedy"]) if data_mergu else None
+            spozniona = opoznienie is not None and opoznienie > 0
+            # „NA CZAS" WYMAGA DOWODU, nie braku dowodu przeciwnego (ta sama klasa co wada nr 1):
+            # albo PR nie jest jeszcze zmergowany, albo różnicę dat DAŁO SIĘ policzyć. Znacznik
+            # nieparsowalny to niewiedza — dawne `(_sekundy(...) or 0) > 0` zamieniało ją w sukces.
+            czas_zmierzony = (not data_mergu) or opoznienie is not None
+            czas_nieznany += 0 if czas_zmierzony else 1
+            na_czas = kryje_commit and czas_zmierzony and not spozniona
             po_mergu += 1 if spozniona else 0
             pokryte += 1 if kryje_commit else 0
-            pokryte_przed += 1 if (kryje_commit and not spozniona) else 0
-            if not kryje_commit or spozniona:
+            pokryte_przed += 1 if na_czas else 0
+            if not na_czas:
                 niepokryte.append(pr.get("numer"))
         else:
             okna_bez.append(okno)
@@ -312,8 +348,18 @@ def ocen_historie(pry: list) -> dict:
         "recenzja_po_mergu": po_mergu,
         "z_recenzja": z_recenzja,
         "bez_recenzji": ogolem - z_recenzja,
+        "recenzje_niezlozone": niezlozone,
+        "czas_nieporownywalny": czas_nieznany,
         "odsetek_pokrycia": round(100.0 * pokryte / ogolem, 1) if ogolem else None,
         "odsetek_na_czas": round(100.0 * pokryte_przed / ogolem, 1) if ogolem else None,
+        # MIARA GŁÓWNA ZADEKLAROWANA MASZYNOWO (wada nr 5 własnej recenzji, 2026-08-07).
+        # Obok siebie stoją dwie liczby: `odsetek_pokrycia` (32,6% — wlicza recenzje PO
+        # mergu) i `odsetek_na_czas` (7,1% — tylko te, które mogły cokolwiek zatrzymać).
+        # Pochlebna jest pierwsza. Dopóki zwycięzca istniał wyłącznie w mojej głowie i w
+        # kolejności linii raportu, wystarczyłaby jedna wygodna edycja nagłówka, żeby
+        # miernik zaczął chwalić — bez żadnego czerwonego testu. Teraz wybór jest DANĄ,
+        # której pilnuje test granicy (`test_miara_glowna_jest_ta_surowsza`).
+        "miara_glowna": "odsetek_na_czas",
         "mediana_okna_z_recenzja_s": mediana(okna_z),
         "mediana_okna_bez_recenzji_s": mediana(okna_bez),
         "niepokryte_numery": niepokryte,
@@ -351,15 +397,27 @@ def raport_historii(w=None, limit: int = 200) -> str:
     w = zbadaj_historie(limit) if w is None else w
     if w.get("blad"):
         return f"❔ FENESTRA RECOGNITIONIS: {w['blad']}"
+    # Nagłówek CZYTA zadeklarowaną miarę główną zamiast powtarzać jej nazwę — dzięki temu
+    # `miara_glowna` nie jest ozdobnym kluczem, tylko nośnikiem: podmiana deklaracji na
+    # łagodniejszą liczbę natychmiast zapala test granicy, a nie tylko zmienia wydruk.
+    glowna = w.get("miara_glowna", "odsetek_na_czas")
     linie = [
         f"🔎 FENESTRA RECOGNITIONIS — okno recenzji na {w['ogolem']} PR:",
         f"   ⭐ PRZEJRZANE NA CZAS (recenzja na commicie gałęzi PRZED mergem): "
-        f"{w['pokryte_przed_mergem']} ({w['odsetek_na_czas']}%)",
+        f"{w['pokryte_przed_mergem']} ({w[glowna]}%)",
         f"   pokryte commitowo, ale PO MERGU (sekcja zwłok): {w['recenzja_po_mergu']}",
         f"   z jakąkolwiek recenzją: {w['z_recenzja']} | BEZ ANI JEDNEJ: {w['bez_recenzji']}",
         f"   mediana okna utworzenie→merge: z recenzją {_okno_czytelnie(w['mediana_okna_z_recenzja_s'])}"
         f" | bez recenzji {_okno_czytelnie(w['mediana_okna_bez_recenzji_s'])}",
     ]
+    # Odrzucone dane MUSZĄ być widoczne. Cichy filtr jest tą samą klasą co cicha zeroizacja,
+    # którą właśnie naprawiamy — tyle że o jedno piętro wyżej (Prawo I).
+    if w.get("recenzje_niezlozone"):
+        linie.append(f"   ✍️ PR ze SZKICEM recenzji (PENDING, nigdy nie złożona): "
+                     f"{w['recenzje_niezlozone']} — liczone jako BEZ recenzji, bo nikt ich nie widział")
+    if w.get("czas_nieporownywalny"):
+        linie.append(f"   ❔ PR z nieporównywalnymi znacznikami czasu: {w['czas_nieporownywalny']} "
+                     "— NIE zaliczone jako „na czas\", bo tego nie zmierzyliśmy")
     if w["recenzja_po_mergu"] > w["pokryte_przed_mergem"]:
         linie.append("   🚨 Recenzji PO mergu jest WIĘCEJ niż na czas — recenzent opisuje kod, "
                      "który już wszedł do `main`. To nie brama, to protokół powypadkowy.")
@@ -404,7 +462,17 @@ if __name__ == "__main__":
     # FENESTRA jest MIERNIKIEM, nie bramką: świadomie zawsze kończy zerem. Rozkład po całej
     # historii opisuje przeszłość, której commit „naprawić" nie może — blokowanie nim commita
     # karałoby Architekta za PR-y sprzed miesiąca i nauczyłoby obchodzenia bramki.
+    #
+    # ⚠️ ODMOWA JEST GŁOŚNA (wada nr 4 własnej recenzji, naprawiona 2026-08-07). Wcześniej
+    # `historia --bramka` kończyło się `sys.exit(0)` PRZED spojrzeniem na flagę: CLI przyjmowało
+    # ją bez słowa i nie robiło nic. Ktokolwiek wpiąłby tę komendę w bramkę, dostałby wieczną
+    # zieleń i wierzył, że coś pilnuje. Świadoma decyzja projektowa musi ODMAWIAĆ, nie MILCZEĆ —
+    # ta sama różnica, którą cały ten organ wytyka recenzentowi (cisza ≠ zgoda).
     if args.tryb == "historia":
+        if args.bramka:
+            p.error("tryb `historia` NIE JEST bramką i świadomie nią nie będzie: opisuje rozkład "
+                    "po całej historii PR, więc kod wyjścia karałby dzisiejszy commit za PR-y "
+                    "sprzed miesiąca. Bramką jest `recognitor --bramka` (tryb domyślny).")
         print(raport_historii(limit=args.limit))
         sys.exit(0)
 

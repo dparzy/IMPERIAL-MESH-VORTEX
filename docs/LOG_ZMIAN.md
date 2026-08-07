@@ -15,6 +15,58 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 
 ---
 
+## 2026-08-07 | 🔧 | Pięć wad z recenzji adversarialnej — jedna okazała się szersza, jedna wróciła po raz trzeci
+
+**Rozkaz Cezara (2026-08-06):** *„zapamiętaj te błędy po code review, będziemy od nich zaczynać
+nową sesję"*. Pozycja W1 kolejki. Wszystkie pięć wad było MOICH i wszystkie mieszczą się w jednej
+klasie: **brak danych udający sukces** — popełnionej w organie zbudowanym do jej tępienia.
+
+### Dowód, że żadna z naszych trzech bramek nie mogła ich złapać
+Rano, z całą piątką w kodzie: `ruff` czysto, audyt spójności **exit 0 („pełna harmonia")**, testy
+**3570/3570**. VALLUM też nie pomógł — ma **dokładnie te same trzy nogi** (ruff → audyt → testy),
+więc jego wartością jest czyste środowisko na dwóch wersjach Pythona, nie druga para oczu.
+Te wady to **kod, który istnieje i nic nie robi**; nasze strażniki pytają o OBECNOŚĆ, nie o SKUTEK.
+
+### P1 — pomiar przed naprawą pokazał, że wada jest SZERSZA niż zgłoszenie
+Recenzja wskazała `ocen_historie` (miernik). Pomiar znalazł ten sam ślepy punkt w `ocen_pokrycie`,
+czyli **w ścieżce bramkowej `/limes`**: szkic recenzji (`submitted_at = null`, stan PENDING) stojący
+na HEADzie zwracał `status=pokryte, exit 0`. **Rozpoczęcie pisania recenzji zwalniało bramkę
+mocniej niż jej złożenie.** Naprawione w obu miejscach; przy okazji domknięty sąsiedni wariant —
+nieparsowalny znacznik czasu też dawał `None`, które `or 0` zamieniało w „zdążył".
+
+### Pozostałe cztery
+- **P2** `recognitor.py` — docstring głosił „13 ze 141 (9,2%)", kod zwracał 10 (7,1%). Liczba nosi
+  teraz DATĘ i KOMENDĘ: twierdzenie o przeszłym pomiarze nie gnije, twierdzenie o stanie gnije zawsze.
+  Obalonej liczby **nie skasowano** — stoi jako zapis błędu, a test pilnuje, że leży PO zdaniu,
+  które ją unieważnia (kontekst, nie token — ta sama różnica, na której potyka się dziś INDEX FALSORUM).
+- **P2** `sigillarium.py` — `sekcja_komend` bez `kroki_komend` dawało **cichy nadzór**: obie funkcje
+  strażnika zwracały pustą listę, zero alarmów, zielone testy. `__post_init__` rzuca teraz wyjątkiem:
+  stan półskonfigurowany **przestał być możliwy**, zamiast być wykrywanym po fakcie.
+- **P3** `historia --bramka` kończyło `sys.exit(0)` przed odczytem flagi — przyjmowana i ignorowana.
+  Teraz **odmawia głośno** (`parser.error`, exit 2 — zmierzone). Świadoma decyzja musi odmawiać, nie milczeć.
+- **P3** dwie miary obok siebie (32,6% vs 7,1%) bez zadeklarowanego zwycięzcy. `miara_glowna` jest
+  teraz DANĄ, nagłówek raportu ją CZYTA, a test pilnuje relacji łagodna ≥ surowa.
+
+### 🚨 Przy okazji: klasa, która ugryzła TRZECI raz — zamknięta mechanizmem
+`KsiegaWadKodu.dodaj_checklist()` mutowała wyłącznie pamięć i zwracała `True`. Mój zapis 5 klas
+**nie trafił na dysk** — wykryty tylko dlatego, że policzyłem rekordy Z DYSKU zamiast uwierzyć
+własnemu wydrukowi. Ta pułapka jest opisana od **2026-07-20** („mój własny wpis przepadł"),
+powtórzona **2026-08-05** (zapis deklarowany w Dzienniku nigdy nie nastąpił) i dziś po raz trzeci.
+Trzy zapisane lekcje o tej samej pułapce znaczą, że **lekcja nie jest lekarstwem** — więc `dodaj()`
+i `dodaj_checklist()` mają teraz `utrwal=True` domyślnie (`utrwal=False` zostaje na batch i testy).
+Księga: **170 → 175** wpisów, 5 nowych klas semantycznych (`niewiedza`, `cichy_nadzor`,
+`cicha_flaga`, `miara_glowna`, `liczba_w_docstringu`).
+
+**Testy:** 3570 → **3580** (+10: 8 regresji wad + 2 na autozapis Księgi), 0 oblanych. Każdy
+odtwarza stan SPRZED naprawy. Liczba policzona z biegu, nie z pamięci — pierwsza wersja tego
+zdania mówiła „+11" i była o jeden zawyżona, czyli dokładnie klasą `liczba_w_docstringu`
+skatalogowaną w tym samym commicie.
+**Pliki:** `imperium/pretorianie/recognitor.py`, `imperium/biblioteki/sigillarium.py`,
+`imperium/biblioteki/ksiega_wad_kodu.py`, `tests/test_recognitor.py`, `tests/test_sigillarium.py`,
+`tests/test_ksiega_wad_kodu.py`, `docs/ROADMAP_IMPERIUM.md`, `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`
+
+---
+
 ## 2026-08-07 | 📐 | MATURITAS mierzy 5 pięter, nie 3 — a liczba „9" okazała się halucynacją
 
 **Rozkaz Cezara:** *„chciałbym, żeby pokazywał wszystkie etapy ewolucji, o których mówiliśmy,

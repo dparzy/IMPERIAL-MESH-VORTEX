@@ -237,6 +237,111 @@ def test_mediana_i_pusta_historia():
     assert pusta["ogolem"] == 0 and pusta["odsetek_na_czas"] is None
 
 
+# ── PIĘĆ WAD Z WŁASNEJ RECENZJI ADVERSARIALNEJ (2026-08-06 → naprawa 2026-08-07) ──
+# Wszystkie były MOJE i wszystkie mieszczą się w jednej klasie: BRAK DANYCH UDAJĄCY SUKCES —
+# czyli dokładnie tym, czego ten organ ma pilnować u innych. Testy poniżej odtwarzają stan
+# SPRZED naprawy, żeby powrót wady był czerwony, a nie cichy.
+
+def test_szkic_recenzji_nie_zielenil_BRAMKI():
+    """WADA 1, ŚCIEŻKA BRAMKOWA — groźniejsza niż zgłoszona i znaleziona dopiero pomiarem.
+
+    Recenzja zgłosiła ślepy punkt w `ocen_historie` (miernik). Pomiar przed naprawą pokazał
+    go TAKŻE w `ocen_pokrycie`, czyli tam, gdzie kod wyjścia zieleni `/limes`: szkic recenzji
+    (`submitted_at = null`, stan PENDING) stojący na HEADzie dawał `pokryte, exit 0`.
+    ROZPOCZĘCIE pisania recenzji zwalniało bramkę mocniej niż jej ZŁOŻENIE."""
+    szkic = [{"commit": OB8, "kiedy": "", "recenzent": "cubic-dev-ai[bot]"}]
+    w = rec.ocen_pokrycie(head=OB8, recenzje=szkic, commity_po=[], stan_pr="OPEN", pr_numer=142)
+    assert w["status"] == "recenzja_niezlozona"
+    assert w["exit"] == 1, "szkic recenzji NIE MA PRAWA zwolnić bramki"
+    assert "PENDING" in w["opis"]
+
+
+def test_zlozona_recenzja_bije_szkic_przy_wyborze_najnowszej():
+    """GRANICA DRUGIEJ STRONY: filtr szkiców nie może wyciąć PRAWDZIWEJ recenzji.
+    PR ze szkicem OBOK złożonej recenzji jest nadal pokryty — inaczej naprawa
+    zamieniłaby fałszywą zieleń na fałszywą czerwień."""
+    mieszane = [{"commit": OB8, "kiedy": "", "recenzent": "cubic-dev-ai[bot]"},
+                {"commit": OB8, "kiedy": "2026-07-27T10:34:58Z", "recenzent": "cubic-dev-ai[bot]"}]
+    w = rec.ocen_pokrycie(head=OB8, recenzje=mieszane, commity_po=[], stan_pr="OPEN", pr_numer=142)
+    assert w["status"] == "pokryte" and w["exit"] == 0
+
+
+def test_szkic_recenzji_nie_liczy_sie_jako_na_czas():
+    """WADA 1, ŚCIEŻKA MIERNIKA — odtworzony PR #142: utworzony 18:11:03, zmergowany
+    18:11:20 (SIEDEMNAŚCIE SEKUND), zero złożonych recenzji. Przed naprawą
+    `_sekundy(...) or 0` zamieniało BRAK daty w zero sekund, więc `0 > 0` było fałszem,
+    PR nie był „spóźniony" i wychodziło `odsetek_na_czas = 100%` dla kodu, którego NIKT
+    nie przejrzał. Miernik chwalił proces właśnie tam, gdzie ten zawiódł najmocniej."""
+    w = rec.ocen_historie([_pr(142, utworzony="2026-08-06T18:11:03Z",
+                               zmergowany="2026-08-06T18:11:20Z",
+                               recenzje=[_rec(kiedy="")])])
+    assert w["pokryte_przed_mergem"] == 0
+    assert w["odsetek_na_czas"] == 0.0
+    assert w["recenzje_niezlozone"] == 1, "odrzucony szkic musi być WIDOCZNY, nie wycięty w ciszy"
+    assert w["bez_recenzji"] == 1 and w["z_recenzja"] == 0
+    assert w["niepokryte_numery"] == [142]
+    assert "SZKICEM" in rec.raport_historii(w)
+
+
+def test_nieporownywalny_znacznik_czasu_nie_jest_sukcesem():
+    """TA SAMA KLASA NA SĄSIEDNIM WEJŚCIU: zepsuty znacznik mergu też dawał `None`, które
+    `or 0` zamieniało w „zdążył". Nieporównywalna data to NIEWIEDZA — nie wolno jej
+    zaliczyć na czas i nie wolno jej przemilczeć."""
+    w = rec.ocen_historie([_pr(1, zmergowany="ZEPSUTA-DATA", recenzje=[_rec()])])
+    assert w["pokryte"] == 1                  # commit się zgadza…
+    assert w["pokryte_przed_mergem"] == 0     # …ale czasu NIE ZMIERZYLIŚMY
+    assert w["czas_nieporownywalny"] == 1
+    assert "nieporównywalnymi" in rec.raport_historii(w)
+
+
+def test_liczba_z_docstringu_zgadza_sie_z_kodem():
+    """WADA 2: docstring `ocen_historie` głosił „13 ze 141 (9,2%)", a ten sam kod na tym
+    samym repo zwracał 10 (7,1%) — liczba pochodziła z ręcznego rachunku sprzed dodania
+    warunku `kryje_commit`. Klasa Warstwy 23 (liczby w prozie ≠ kod) w docstringu `.py`,
+    którego W23 NIE SKANUJE. Test odtwarza deklarowany pomiar z kodu zamiast ufać prozie."""
+    pry = ([_pr(i, recenzje=[_rec()]) for i in range(10)]          # 10 na czas
+           + [_pr(100 + i, zmergowany="2026-08-01T10:00:00Z",
+                  recenzje=[_rec(kiedy="2026-08-01T12:00:00Z")]) for i in range(36)]  # po mergu
+           + [_pr(200 + i) for i in range(95)])                    # bez recenzji
+    w = rec.ocen_historie(pry)
+    assert w["ogolem"] == 141 and w["pokryte_przed_mergem"] == 10
+    assert w["odsetek_na_czas"] == 7.1, "liczba w docstringu musi być TĄ, którą zwraca kod"
+    tekst = rec.ocen_historie.__doc__
+    assert "10 ze 141 PR (7,1%)" in tekst
+    # Obalonej liczby NIE kasujemy — zapis własnego błędu jest wart więcej niż czysta karta.
+    # Warunek pilnuje więc KONTEKSTU, nie tokenu: „9,2%" wolno stać wyłącznie PO zdaniu,
+    # które ją unieważnia. (Ta sama różnica, na której INDEX FALSORUM potyka się dziś,
+    # zgłaszając jako fałsz trzy miejsca, które fałsz OBALAJĄ.)
+    unieważnienie = tekst.find("BYŁA W TYM DOCSTRINGU FAŁSZYWA")
+    assert unieważnienie > 0, "obalona liczba musi być JAWNIE oznaczona jako obalona"
+    assert tekst.find("9,2%") > unieważnienie, "obalona liczba nie może stać jako aktualna"
+
+
+def test_miara_glowna_jest_ta_surowsza():
+    """WADA 5: obok siebie stały `odsetek_pokrycia` (32,6%, wlicza recenzje PO mergu)
+    i `odsetek_na_czas` (7,1%). Nic nie mówiło, która jest miarą sukcesu — wystarczyłaby
+    jedna wygodna edycja nagłówka, żeby miernik zaczął chwalić, i żaden test by nie zapłonął.
+    Teraz zwycięzca jest DANĄ, nagłówek go CZYTA, a łagodniejsza liczba nigdy nie jest niższa."""
+    w = rec.ocen_historie([_pr(1, zmergowany="2026-08-01T10:00:00Z",
+                               recenzje=[_rec(kiedy="2026-08-01T12:00:00Z")]),
+                           _pr(2, recenzje=[_rec()])])
+    assert w["miara_glowna"] == "odsetek_na_czas"
+    assert w["odsetek_pokrycia"] >= w["odsetek_na_czas"], "pochlebna miara nie może być surowsza"
+    assert f"({w['odsetek_na_czas']}%)" in rec.raport_historii(w), "nagłówek czyta miarę główną"
+
+
+def test_historia_z_bramka_ODMAWIA_zamiast_milczec():
+    """WADA 4: `historia --bramka` kończyło `sys.exit(0)` PRZED spojrzeniem na flagę —
+    CLI przyjmowało ją i nie robiło NIC. Wpięta w bramkę dawałaby wieczną zieleń.
+    Świadoma decyzja („to miernik, nie bramka") musi ODMAWIAĆ głośno, nie milczeć."""
+    import subprocess
+    p = subprocess.run([sys.executable, "-m", "imperium.pretorianie.recognitor",
+                        "historia", "--bramka"], cwd=ROOT, capture_output=True,
+                       text=True, encoding="utf-8", errors="replace", timeout=60)
+    assert p.returncode == 2, "cicha akceptacja ignorowanej flagi to fałszywy spokój"
+    assert "NIE JEST bramką" in (p.stderr or "")
+
+
 def test_okno_liczone_w_sekundach():
     assert rec._sekundy("2026-08-01T10:00:00Z", "2026-08-01T10:00:35Z") == 35
     assert rec._sekundy("", "2026-08-01T10:00:00Z") is None   # brak daty ≠ zero

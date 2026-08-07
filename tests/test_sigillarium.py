@@ -408,6 +408,32 @@ def test_nadmiar_komend_w_pieczeci_jest_dozwolony():
     assert sg.komendy_konstytucji_poza_pieczecia("LIMES") == []
 
 
+def test_nadzor_pol_skonfigurowany_NIE_MA_PRAWA_POWSTAC():
+    """WADA 3 z własnej recenzji adversarialnej (2026-08-06 → naprawa 2026-08-07).
+
+    `sekcja_komend` bez `kroki_komend` (i odwrotnie) dawało CICHY NADZÓR: obie funkcje
+    strażnika zwracały pustą listę, raport nie drukował ani jednego alarmu, oba testy
+    świeciły zielono. Czyli strażnik zbudowany PRZECIWKO cichemu przeoczeniu dawał się
+    skonfigurować tak, by cicho przeoczyć — wada wracała pod przykrywką lekarstwa.
+
+    Naprawa jest KLASOWA, nie punktowa: stan półskonfigurowany nie jest wykrywany po
+    fakcie, tylko przestaje być możliwy do utworzenia."""
+    from dataclasses import replace
+
+    for pole, wartosc in (("kroki_komend", ()), ("sekcja_komend", "")):
+        try:
+            replace(sg.SIGLA["LIMES"], **{pole: wartosc})
+        except ValueError as e:
+            assert "PÓŁ-SKONFIGUROWANY" in str(e)
+        else:
+            raise AssertionError(f"pieczęć bez `{pole}` powstała po cichu — nadzór jest martwy")
+
+    # GRANICA: komplet i całkowity brak nadzoru są nadal legalne (większość sigli go nie ma).
+    assert replace(sg.SIGLA["LIMES"], sekcja_komend="", kroki_komend=()).kroki_komend == ()
+    for s in sg.wszystkie():
+        assert bool(s.sekcja_komend) == bool(s.kroki_komend), f"{s.nazwa}: nadzór półskonfigurowany"
+
+
 def test_komendy_w_tekscie_pomija_to_co_nie_jest_poleceniem():
     """Krok 3 cytuje w grzbietach także `/code-review` (skill harnessa) i
     `ksiega_wad_kodu` (nazwa ledgera) — żadne z nich nie jest komendą powłoki."""

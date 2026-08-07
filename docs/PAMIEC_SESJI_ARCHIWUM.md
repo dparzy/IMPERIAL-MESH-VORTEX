@@ -13,6 +13,30 @@ powod_istnienia: "Magazyn starszych/mniej połączonych lekcji — pamięć akty
 
 ## 📦 LEKCJE ARCHIWALNE (schłodzone wg wartości retencji)
 
+### 2026-08-06 — Czas życia PR determinuje obecność recenzji
+Próbka 12 ostatnich PR: wszystkie żyjące 11–35 s mają 0 recenzji, wszystkie żyjące 37 min–4h55m mają 1 recenzję. Podział doskonały, bez wyjątku — recenzja fizycznie nie zdąży wystartować.
+
+### 2026-08-06 — 65,2% PR-ów w historii repo nie miało żadnej recenzji
+Spośród 141 PR tylko 49 (34,8%) ma recenzję cubica, 92 (65,2%) nie ma ani jednej. To stan normalny, nie czwarte wystąpienie klasy.
+
+### 2026-08-06 — RECOGNITOR to wołacz-widmo — zero wołaczy w kodzie
+RECOGNITOR istnieje (251 linii, testy), ale grep pokazuje tylko CLAUDE.md i testy; /limes uruchamia 5 komend bez RECOGNITORA, mimo że docstring deklaruje go w clausura i /limes. Reguła deklarowana, egzekwowana przez nikogo.
+
+### 2026-08-06 — RECOGNITOR istnieje, ale nie ma wołaczy w kodzie
+grep pokazuje tylko CLAUDE.md:266 (proza dla człowieka) i test_recognitor.py; /limes odpala 5 komend bez RECOGNITORA. Docstring deklaruje egzekutora w clausurze i /limes, który nie istnieje — wołacz-widmo, lustrzane odbicie API-widma z Warstwy 16.
+
+### 2026-08-06 — PR bez recenzji to stan normalny, nie incydent
+92 z 141 PR (65,2%) nie miało żadnej recenzji. W próbce 12 ostatnich PR każdy scalony w 11–35 s nie ma recenzji, a każdy żyjący minuty/godziny ma. Main bez branch protection, merguje dparzy — recenzja fizycznie nie zdąży wystartować.
+
+### 2026-08-06 — RECOGNITOR istnieje, ale jest wołaczem-widmem
+Recognitor (251 linii, własne testy) nie jest wywoływany w /limes ani w kodzie — grep pokazuje tylko CLAUDE.md i test własny. Docstring deklaruje krok 3 clausury i /limes, a żaden go nie używa. Ta sama klasa luki co 'API-widmo' z Warstwy 16.
+
+### 2026-08-06 — Limit ścieżki Windows w scratchpadzie — core.longpaths
+Głęboki katalog scratchpada powodował przekroczenie limitu ścieżki Windows (nie wada repo; na ubuntu-latest limit 4096). Obejście przez core.longpaths. Klon czysty — 0 rozbieżności.
+
+### 2026-08-06 — Repo PUBLIC — GitHub Actions bez limitu minut
+Repozytorium imperial-mesh-vortex jest publiczne, więc standardowe runnery GitHub Actions nie mają limitu minut. Obawa o koszt biegów CI została zniesiona.
+
 ### 2026-08-06 — Repo bez CI/CD — potwierdzone pomiarem, nie pamięcią
 Brak katalogu .github oraz pyproject/setup zmierzony bezpośrednio. Znalezisko Kimi K3 o braku CI/CD było prawdziwe. To dowód, że weryfikacja musi być mierzona, a nie zapamiętywana.
 

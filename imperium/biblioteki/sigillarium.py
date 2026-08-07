@@ -77,6 +77,32 @@ class Sigillum:
     sekcja_komend: str = ""
     kroki_komend: tuple = ()
 
+    def __post_init__(self) -> None:
+        """NADZÓR PÓŁ-SKONFIGUROWANY NIE MA PRAWA POWSTAĆ (naprawa 2026-08-07, wada nr 3
+        własnej recenzji adversarialnej).
+
+        Oba pola działają wyłącznie w parze — i to milcząco. Ustawione `sekcja_komend`
+        bez `kroki_komend` przepuszczało pętlę po WSZYSTKICH krokach bez ani jednego
+        dopasowania; ustawione `kroki_komend` bez `sekcja_komend` wychodziło wcześniej
+        po `if not s.sekcja_komend`. W obu przypadkach `kroki_nadzoru_osierocone()` i
+        `komendy_konstytucji_poza_pieczecia()` zwracały PUSTĄ LISTĘ, raport nie drukował
+        żadnego alarmu, a oba testy świeciły na zielono. Czyli: strażnik zbudowany
+        2026-08-06 PRZECIWKO cichemu przeoczeniu dawał się skonfigurować tak, by cicho
+        przeoczyć — ta sama wada wracała pod przykrywką własnego lekarstwa.
+
+        Dlatego to nie jest ostrzeżenie ani wpis do raportu, tylko WYJĄTEK przy tworzeniu
+        pieczęci: stan półskonfigurowany przestaje istnieć jako możliwy, zamiast być
+        wykrywany po fakcie (naprawa KLASY, nie instancji).
+        """
+        if bool(self.sekcja_komend) != bool(self.kroki_komend):
+            brakuje = "kroki_komend" if self.sekcja_komend else "sekcja_komend"
+            mam = "sekcja_komend" if self.sekcja_komend else "kroki_komend"
+            raise ValueError(
+                f"Sigillum {self.nazwa!r}: NADZÓR PÓŁ-SKONFIGUROWANY — ustawione {mam}, "
+                f"brakuje {brakuje}. Oba pola działają tylko w parze; samo {mam} daje "
+                "nadzór, który zawsze zwraca pustą listę i wygląda na spełniony. "
+                f"Uzupełnij {brakuje} albo wyczyść {mam}.")
+
 
 # ── REJESTR SIGLI (rdzeń zatwierdzony przez Cezara 2026-07-20) ────────────────
 SIGLA: Dict[str, Sigillum] = {

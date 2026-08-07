@@ -220,6 +220,16 @@ Na starcie KAŻDEJ sesji wykonaj w kolejności (pominięcie kroku = złamanie):
    (podsumowanie ledgera, C1) → **Centrum Pamięci** (profil, Top-3 lekcji, aktywny cel W12, Refleksja W9)
    → **Dziennik Nieśmiertelny** (pełna oś) → **skan wad ostatniego commitu**. Wydruk >25 KB bywa ucięty
    w podglądzie — pełna treść jest w pliku `tool-results/hook-*.txt` (czytaj go, jeśli banner/plan zniknął).
+1b. **WAŁ Z POPRZEDNIEJ WACHTY — przeczytaj werdykt VALLUM i ZAREAGUJ** (ROZKAZ STAŁY, Cezar
+   2026-08-07). Hook drukuje `🧱 VALLUM (ostatni bieg push)` jedną linią. Powód zmierzony tego
+   samego dnia: wał wyzwala **wyłącznie zdarzenie GitHuba** (`push`/`pull_request`/
+   `workflow_dispatch`), a pushuje Cezar RĘCZNIE — więc bieg startuje **PO** domknięciu wachty,
+   a krok 8b clausury odczyta go tylko wtedy, gdy sesja jeszcze żyje. **Push po `/clear` znaczył
+   werdykt, którego nie przeczytał nikt.** Fraza `gh run list` stała wtedy w całym Imperium
+   DOKŁADNIE RAZ — w prozie tego pliku, bez ani jednego wołacza. Czytasz: `ZIELONY` = wał
+   potwierdził commit poza Twoją maszyną; `ANULOWANY` ≠ porażka ANI zgoda (bieg przerwany
+   nowszym pushem albo mergem — **zmierz ponownie**); `❔ NIEZMIERZONE` nie jest zielone.
+   Czerwień to **pierwsze zadanie wachty**, przed planem.
 2. **Audyt ≠ „pełna harmonia" → rozstrzygnij JAWNIE PRZED pierwszym zadaniem** (A3). Czerwony alarm audytu,
    Prawo XV, Refleksja W9 czy limity pamięci to ZADANIA: napraw sam (błahostka, Prawo XVIII), zaplanuj
    w Backlogu CODEX (średnie) albo spytaj Cezara (kierunkowe) — nigdy milczeniem.

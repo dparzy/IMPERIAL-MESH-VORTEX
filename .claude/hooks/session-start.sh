@@ -61,6 +61,35 @@ if [ -f imperium/biblioteki/dziennik_niesmiertelny.py ]; then
   python -m imperium.biblioteki.dziennik_niesmiertelny nastepny || true
 fi
 
+# 0.55) WAŁ Z POPRZEDNIEJ WACHTY — werdykt VALLUM (rozkaz Cezara 2026-08-07: „dawaj, zgadzam się").
+#       POWÓD ZMIERZONY: VALLUM wyzwala WYŁĄCZNIE zdarzenie GitHuba (`push`/`pull_request`/
+#       `workflow_dispatch`), a pushuje Cezar RĘCZNIE — więc bieg wału startuje PO domknięciu
+#       wachty. Krok 8b clausury każe odczytać werdykt, ale czytelnikiem jestem ja: gdy Cezar
+#       pushnie po `/clear`, wyniku NIE ODCZYTA NIKT. Zmierzone tego samego dnia: fraza
+#       `gh run list` występowała w całym Imperium DOKŁADNIE RAZ — w prozie CLAUDE.md, bez
+#       ani jednego wołacza (ta sama klasa co RECOGNITOR stojący w konstytucji poza bramką).
+#       Lekarstwem jest PRZESUNIĘCIE ODCZYTU na otwarcie NASTĘPNEJ wachty: następna sesja
+#       zawsze istnieje, a bieg jest wtedy już rozstrzygnięty. Jedna linia (ZASADA WYDRUKU).
+#       Brak `gh`/sieci = ❔ NIEZMIERZONE, nigdy cisza udająca zieleń (Prawo I).
+if command -v gh >/dev/null 2>&1 && [ -f .github/workflows/ci.yml ]; then
+  GALAZ_WAL="$(git symbolic-ref --short HEAD 2>/dev/null || echo '')"
+  WERDYKT_WAL="$(gh run list --workflow=ci.yml --branch "$GALAZ_WAL" --event push --limit 1 \
+    --json conclusion,status,headSha,displayTitle --jq '
+      if length == 0 then "brak biegu push dla tej galezi — wal jeszcze nie widzial tego kodu"
+      else (.[0] |
+        (if .status != "completed" then "W TOKU"
+         elif .conclusion == "success" then "ZIELONY"
+         elif .conclusion == "cancelled" then "ANULOWANY (to NIE jest porazka ANI zgoda)"
+         else (.conclusion | ascii_upcase) end)
+        + " · " + (.headSha[0:7]) + " · " + (.displayTitle[0:60])) end' 2>/dev/null)" \
+    || WERDYKT_WAL=""
+  if [ -n "$WERDYKT_WAL" ]; then
+    echo "🧱 VALLUM (ostatni bieg push): $WERDYKT_WAL"
+  else
+    echo "🧱 VALLUM: ❔ NIEZMIERZONE — gh/sieć nie odpowiedziały. To NIE jest zielone światło."
+  fi
+fi
+
 # 0.6) PORTITOR — celnik u wrót: pre-flight środowiska (B1 — uszczelnienie OTWARCIA 2026-07-19).
 #      Lekki, BEZ SIECI, stdlib-only: Python + krytyczne deps (numpy/TA-Lib) + OBECNOŚĆ kluczy
 #      API (nigdy wartość) + świeżość danych + dryf vs baseline. Uzupełnia CENSOR SPRZĘTU

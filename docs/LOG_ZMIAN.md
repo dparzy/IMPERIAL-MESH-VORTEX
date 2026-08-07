@@ -57,7 +57,25 @@ i `dodaj_checklist()` mają teraz `utrwal=True` domyślnie (`utrwal=False` zosta
 Księga: **170 → 175** wpisów, 5 nowych klas semantycznych (`niewiedza`, `cichy_nadzor`,
 `cicha_flaga`, `miara_glowna`, `liczba_w_docstringu`).
 
-**Testy:** 3570 → **3580** (+10: 8 regresji wad + 2 na autozapis Księgi), 0 oblanych. Każdy
+### 🧱 Werdykt wału przeniesiony na OTWARCIE — bo na domknięciu nie miał czytelnika
+Pytanie Cezara: *„czy VALLUM zawsze jest odpalany po komendzie zamykania sesji"*. **Odpowiedź
+zmierzona z `ci.yml`: NIE i nie może być.** Wał wyzwalają wyłącznie zdarzenia GitHuba
+(`push` / `pull_request` / `workflow_dispatch`), a pushuje Cezar RĘCZNIE — więc bieg startuje
+**PO** domknięciu wachty. Krok 8b clausury każe odczytać werdykt, ale czytelnikiem jest
+Architekt: **push po `/clear` dawał wynik, którego nie czytał nikt.** Do tego fraza `gh run list`
+występowała w całym Imperium **dokładnie raz** — w prozie CLAUDE.md, bez ani jednego wołacza
+(ta sama klasa co RECOGNITOR stojący w konstytucji poza bramką).
+
+**Naprawa (zgoda Cezara 2026-08-07):** odczyt przeniesiony na **otwarcie następnej wachty** —
+następna sesja zawsze istnieje, a bieg jest wtedy rozstrzygnięty. Blok 0.55 w
+`session-start.sh` drukuje jedną linię, odróżnia `cancelled` od `failure`, a brak `gh`/sieci
+melduje jako ❔ NIEZMIERZONE, nigdy ciszą. Krok **1b** w checkliście OTWARCIA czyni z tego
+rozkaz, nie ozdobę wydruku; test `test_werdykt_walu_ma_wolacza_I_rozkaz` pilnuje **obu stron**,
+bo każda z osobna już raz zawiodła. Zweryfikowane na żywo: `ZIELONY · 47bfef2`.
+**Koszt przyznany wprost:** CLAUDE.md 330 → 340 linii, czyli dług kontekstu (limit 200) urósł.
+Świadoma wymiana: rozkaz bez egzekutora kosztuje więcej niż dziesięć linii.
+
+**Testy:** 3570 → **3581** (+11: 8 regresji wad + 2 na autozapis Księgi + 1 kotwica wału), 0 oblanych. Każdy
 odtwarza stan SPRZED naprawy. Liczba policzona z biegu, nie z pamięci — pierwsza wersja tego
 zdania mówiła „+11" i była o jeden zawyżona, czyli dokładnie klasą `liczba_w_docstringu`
 skatalogowaną w tym samym commicie.

@@ -440,3 +440,31 @@ def test_komendy_w_tekscie_pomija_to_co_nie_jest_poleceniem():
     krok = ("3. `/code-review` na diffie + `python narzedzia/skan_wad_kodu.py` na "
             "zmienionych plikach. Nowe wady → Księga Wad (`ksiega_wad_kodu`).")
     assert sg._komendy_w_tekscie(krok) == ["python narzedzia/skan_wad_kodu.py"]
+
+
+def test_werdykt_walu_ma_wolacza_I_rozkaz(tmp_path):
+    """KOTWICA DWUSTRONNA: odczyt VALLUM musi stać JEDNOCZEŚNIE w hooku i w konstytucji.
+
+    Rozkaz Cezara 2026-08-07. Powód zmierzony tego samego dnia: VALLUM wyzwala WYŁĄCZNIE
+    zdarzenie GitHuba, a pushuje Cezar ręcznie — więc bieg startuje PO domknięciu wachty,
+    a krok 8b clausury odczyta go tylko wtedy, gdy sesja jeszcze żyje. Push po `/clear`
+    dawał werdykt, którego nie czytał NIKT. Fraza `gh run list` stała wtedy w całym Imperium
+    DOKŁADNIE RAZ — w prozie CLAUDE.md, bez ani jednego wołacza.
+
+    Test pilnuje OBU stron, bo każda z osobna już raz zawiodła:
+      • sam rozkaz w konstytucji = ósmy rozkaz bez egzekutora (klasa `komendy_konstytucji_poza_pieczecia`);
+      • sam wydruk w hooku = liczba na ekranie, której nikt nie ma obowiązku przeczytać.
+    """
+    hook = KORZEN / ".claude/hooks/session-start.sh"
+    assert hook.exists(), "hook startowy zniknął — wołacz werdyktu wału przepadł razem z nim"
+    tresc_hooka = hook.read_text(encoding="utf-8", errors="ignore")
+    assert "gh run list" in tresc_hooka, "hook nie woła wału — werdykt nie ma czytelnika"
+    assert "VALLUM" in tresc_hooka
+
+    kroki_otwarcia = sg.kroki_z_konstytucji("## 🌅 OTWARCIE SESJI")
+    assert kroki_otwarcia, "sekcja OTWARCIE zniknęła albo zmieniła format"
+    wal = [k for k in kroki_otwarcia if "VALLUM" in k]
+    assert wal, "konstytucja nie nakazuje czytać werdyktu wału — wydruk bez obowiązku"
+    # `cancelled` ≠ `failure` musi stać W ROZKAZIE, nie tylko w mojej pamięci: to ta
+    # rozróżnialność uratowała nas 2026-08-06, gdy anulowany bieg wyglądał jak porażka.
+    assert any("ANULOWANY" in k for k in wal), "rozkaz musi odróżniać anulowany od czerwonego"

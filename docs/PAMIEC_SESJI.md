@@ -1,10 +1,10 @@
 ---
 
-## Ostatnia aktualizacja: 2026-08-06
+## Ostatnia aktualizacja: 2026-08-07
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
-stan_na: 2026-08-06
+stan_na: 2026-08-07
 powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360)"
 ---
 # PAMIĘĆ SESJI — W-360
@@ -112,6 +112,15 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 ---
 
 ## 📚 LEKCJE Z SESJI
+
+### 2026-08-07 — Wołaczem 6 skilli-rozkazów jest wyłącznie Claude z pamięci
+Skille-rozkazy egzekwowane są wyłącznie uwagą Claude'a, gdy linia-wyzwalacz w CLAUDE.md przypomni. Nikt nie sprawdza, czy krok "wczytaj skill" został wykonany. Egzekwowanie takie samo jak przed przeniesieniem.
+
+### 2026-08-07 — W21 i test skilli pytają o obecność, nie o skutek
+W21 audytu sprawdza .exists() katalogu skill; test_skill_bez_pieczeci wymaga tylko dwóch fraz ("przeniesione z CLAUDE.md" i "ROZKAZ STAŁY"). Skill może być pusty poza tymi napisami i przejdzie.
+
+### 2026-08-07 — MATURITAS PROMPT 3 liczy katalogi, nie egzekwowanie
+Kryterium poziomu 3 to len(skille)>=5, czyli zliczanie katalogów. Dziewięć wydmuszek dałoby ten sam poziom. Kryterium raz spełnione nigdy nie spada — antywskaźnik konstytucji sam to opisuje.
 
 ### 2026-08-06 — GRAPH: kto_przy_decyzji=NIKT — graf pamięta, nie wybiera
 Graf poprawia pamięć, nie wybór. Znane wąskie gardło nierozstrzygnięte.

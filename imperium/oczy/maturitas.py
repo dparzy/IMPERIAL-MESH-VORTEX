@@ -124,6 +124,134 @@ def stan_domkniety(stan: str) -> Optional[bool]:
 _stan_domkniety = stan_domkniety
 
 
+# ── MAPA ORGANÓW I PIĘTER (rozkaz Cezara 2026-08-06) ────────────────────────────
+# „chciałbym, żeby pokazywał (…) bardziej szczegółowo, jakie organy są wiązane w danym
+# rodzaju etapu, gdzie jest brakująca opcja dopełnienia i czy mamy już opcję jej
+# dopełnienia w ROADMAP" — trzy pytania, na które sam poziom 0–4 nie odpowiada.
+#
+# ŚCIEŻKI SĄ WERYFIKOWANE, NIE DEKLAROWANE: `organy_pietra()` odsiewa te, których nie ma
+# na dysku, i zwraca je osobno jako WIDMA. Lista organów wpisana ręcznie i nigdy
+# niesprawdzana byłaby tą samą klasą co API-widma z Warstwy 16 — a w organie, który ma
+# mierzyć dojrzałość, brzmiałoby to szczególnie fałszywie.
+
+ORGANY_PIETRA: Dict[str, List[str]] = {
+    "PROMPT": ["CLAUDE.md", "imperium/biblioteki/sigillarium.py",
+               "imperium/cesarz/aerarium.py", ".claude/skills"],
+    "LOOP": ["docs/ROADMAP_IMPERIUM.md", "narzedzia/codex_probationum.py",
+             "imperium/biblioteki/codex_notarum.py", "imperium/biblioteki/rejestr_wizji.py"],
+    "GRAPH": ["imperium/biblioteki/graf_pamieci.py", "imperium/biblioteki/kustosz_pamieci.py",
+              "imperium/biblioteki/pamiec_proweniencji.py"],
+    "HARNESS": [".claude/settings.json", ".claude/hooks", ".github/workflows/ci.yml",
+                "imperium/pretorianie/silentium.py", "imperium/pretorianie/custos_liminis.py",
+                "imperium/pretorianie/vigil.py", "imperium/pretorianie/exactor.py"],
+    "NEURO-SYM": ["narzedzia/audyt_spojnosci.py", "narzedzia/skan_wad_kodu.py",
+                  "imperium/pretorianie/vindex.py", "imperium/pretorianie/recognitor.py",
+                  "bibliotheca_ulpia/dane/index_falsorum.jsonl"],
+}
+
+# ── ZASIĘG MIERNIKA — SKORYGOWANY ZWIADEM 2026-08-06 ────────────────────────────
+# ⚠️ LICZBA „9 PIĘTER" NIE MA POKRYCIA W ŹRÓDŁACH. Do 2026-08-06 ROADMAP notował przy
+# CORONIE D, że MATURITAS mierzy „3 z 9" — dziewiątka pochodziła z materiału zewnętrznego
+# wygenerowanego przez model językowy. FRUMENTARIUS (zwiad na rozkaz Cezara) ustalił:
+#
+#  1. Patent `US20230000000A1`, cytowany w TYM SAMYM materiale, **NIE ISTNIEJE** — Google
+#     Patents zwraca 404, a numeracja publikacji USA startuje od `0000001`, więc numer
+#     z samych zer jest strukturalnie niemożliwy. Klasyczny placeholder halucynacji.
+#  2. **Żadne znalezione źródło nie podaje DZIEWIĘCIU etapów inżynierii agentowej.** Jedyna
+#     znaleziona „dziewiątka" to filozoficzna oś Twemlowa (ANI→AGI→ASI→…) — INNA OŚ niż
+#     warstwy inżynierii. Nasza dziewiątka to prawdopodobnie sklejka dwóch taksonomii,
+#     czyli dokładnie ta klasa błędu, którą ten organ ma wykrywać.
+#
+# CO ISTNIEJE NAPRAWDĘ (najbliższe nam, potwierdzone): pięciowarstwowy model
+# **Prompt → Context → Harness → Loop → Graph** (Rastogi; pokrewnie arXiv 2606.28270).
+# `context engineering` (arXiv 2507.13334) i `harness engineering` (arXiv 2604.25850) to
+# terminy ustalone lub ustalające się; `loop`/`graph engineering` dopiero się rodzą.
+# Mierzymy CZTERY z tych pięciu (brak CONTEXT) plus NEURO-SYM, które jest nasze własne —
+# termin naukowy starszy niż era LLM, w tamtej rodzinie nieobecny.
+TAKSONOMIA_ZRODLO = ("Prompt/Context/Harness/Loop/Graph (Rastogi; arXiv 2606.28270) — "
+                     "zweryfikowane zwiadem 2026-08-06; liczba 9 OBALONA")
+PIETER_ZNANYCH = 6          # 5 warstw potwierdzonej taksonomii + NEURO-SYM (nasze własne)
+
+# Próg rzadkości słowa w ROADMAP: powyżej niego słowo jest TŁEM dokumentu, nie nazwą rzeczy.
+# Wartość 5 dobrana POMIAREM na żywym ROADMAP (2026-08-06): „decyzji" 20×, „roadmap" 13×,
+# „kontekstu" 10×, „czytany" 7× — wszystkie odpadają jako tło; nazwy pozycji i organów
+# występują 1–4 razy i przechodzą. Każdy próg ma mieć test granicy (Prawo XXI).
+#
+# ⚠️ TE LICZBY BYŁY NAJPIERW WPISANE Z GŁOWY (27×/58×/12×) i pomiar je obalił w tej samej
+# minucie. Zapisuję to tutaj, bo to TRZECIE wystąpienie tej klasy jednego dnia (docstring
+# RECOGNITORA, errata w Dzienniku, ten komentarz): liczba w prozie obok kodu, której nikt
+# nie policzył. Warstwa 23 audytu łapie to w dokumentach .md, ale NIE w komentarzach .py.
+PROG_RZADKOSCI = 5
+PIETRA_NIEMIERZONE = [
+    "CONTEXT — inżynieria kontekstu jako OSOBNE piętro (arXiv 2507.13334). Dziś mierzona "
+    "częściowo wewnątrz PROMPT przez AERARIUM, ale bez własnego poziomu 0–4",
+]
+
+# Kandydaci SPOZA potwierdzonej taksonomii, wskazani przez zwiad jako osobne dojrzałe
+# dziedziny. NIE są piętrami, dopóki Cezar nie osądzi, czy należą do TEJ osi —
+# rozstrzygnięcie z CORONY D: wzorzec wchodzi do rejestru po ZATWIERDZENIU, nigdy
+# z lektury materiału. Trzymamy ich tutaj jawnie, żeby nie zginęli i nie awansowali sami.
+KANDYDACI_NA_PIETRA = [
+    "OBSERVABILITY — obserwowalność agentów (osobna dziedzina narzędziowa 2026)",
+    "GUARDRAILS — bramki bezpieczeństwa, sandboxing, policy checks",
+    "INTENT — inżynieria intencji (piąta warstwa w arXiv 2606.28270)",
+    "MEMORY — pamięć długoterminowa jako osobny nurt (arXiv 2512.13564)",
+    "COORDINATION — orkiestracja wieloagentowa, odrębna od GRAPH (arXiv 2605.10052)",
+    "AUTONOMIA L0–L5 — INNA OŚ (wzorzec SAE J3016), nie warstwa inżynierii (arXiv 2506.12469)",
+]
+
+
+def _warstwy_audytu() -> int:
+    """Ile warstw audyt REALNIE egzekwuje — po znacznikach `[W..]`, nie po nazwach funkcji.
+
+    Jedno źródło prawdy dla LOOP, HARNESS i NEURO-SYM: trzy piętra pytają o tę samą
+    liczbę, a trzy własne parsery rozjechałyby się przy pierwszej zmianie formatu.
+    """
+    audyt = KORZEN / "narzedzia" / "audyt_spojnosci.py"
+    if not audyt.exists():
+        return 0
+    return len(set(re.findall(r"\[W\d+[a-z]?\]",
+                              audyt.read_text(encoding="utf-8", errors="replace"))))
+
+
+def organy_pietra(pietro: str) -> Dict[str, List[str]]:
+    """Organy wiązane z piętrem, rozdzielone na ŻYWE i WIDMA (ścieżka nie istnieje)."""
+    zywe, widma = [], []
+    for sciezka in ORGANY_PIETRA.get(pietro, []):
+        (zywe if (KORZEN / sciezka).exists() else widma).append(sciezka)
+    return {"zywe": zywe, "widma": widma}
+
+
+def luka_w_planie(wask: str) -> str:
+    """Czy wąskie gardło ma już POZYCJĘ W PLANIE — odpowiedź na trzecie pytanie Cezara.
+
+    Szuka w ROADMAP wyłącznie słów RZADKICH — i to jest istota tej funkcji, nie detal.
+
+    ⚠️ PIERWSZA WERSJA BYŁA MIARĄ ZBYT ŁAGODNĄ (naprawione tego samego dnia, 2026-08-06).
+    Liczyła każde słowo dłuższe niż 5 znaków, więc „decyzji", „roadmap" i „domknięty"
+    dawały trafienie ZAWSZE — ROADMAP jest o decyzjach i domykaniu. Wszystkie trzy wąskie
+    gardła dostały ✅ „mamy to w planie", choć funkcja nie sprawdziła NICZEGO. To ta sama
+    klasa, którą tego dnia złapaliśmy dwa razy w RECOGNITORZE: miara łagodna wobec własnego
+    procesu, chwaląca zamiast mierzyć.
+
+    Naprawa: słowo liczy się tylko wtedy, gdy w ROADMAP występuje RZADKO (< `PROG_RZADKOSCI`
+    razy) — czyli jest nazwą rzeczy, nie tłem dokumentu. Werdykt świadomie nazwany
+    WSKAZÓWKĄ, nie dowodem: dopasowanie po słowach nie umie odróżnić pozycji planu od
+    zdania w prozie, a miernik ma mówić, ile wie, nie więcej.
+    """
+    plan = KORZEN / "docs" / "ROADMAP_IMPERIUM.md"
+    if not wask or not plan.exists():
+        return ""
+    tresc = plan.read_text(encoding="utf-8", errors="replace").lower()
+    slowa = {s.strip(".,:;()„”\"'—") for s in wask.lower().split() if len(s) > 5}
+    rzadkie = {s: tresc.count(s) for s in slowa if 0 < tresc.count(s) < PROG_RZADKOSCI}
+    if len(rzadkie) >= 2:
+        naj = sorted(rzadkie, key=rzadkie.get)[:3]
+        return ("🔎 WSKAZÓWKA: możliwa pozycja w ROADMAP (rzadkie słowa: "
+                + ", ".join(f"{s}×{rzadkie[s]}" for s in naj) + ") — zweryfikuj ręcznie")
+    return "🔴 BRAK POZYCJI W ROADMAP — luka bez planu dopełnienia"
+
+
 # ── PIĘTRO 1: PROMPT — zdrowie specyfikacji ─────────────────────────────────────
 
 def zmierz_prompt() -> Dict[str, Any]:
@@ -205,13 +333,10 @@ def zmierz_loop() -> Dict[str, Any]:
 
     hooki = sorted((KORZEN / ".claude" / "hooks").glob("*.sh")) \
         if (KORZEN / ".claude" / "hooks").exists() else []
-    # Warstwy liczymy po ZNACZNIKACH `[W..]`, którymi audyt oznacza swoje zarzuty — nie po
-    # nazwach funkcji. Zmierzone: `def _warstwa_\d+` daje 15 przy realnych 24, bo część
-    # warstw żyje w helperach i pod innymi nazwami. Miara ma liczyć to, co audyt EGZEKWUJE.
-    audyt = KORZEN / "narzedzia" / "audyt_spojnosci.py"
-    warstwy = len(set(re.findall(r"\[W\d+[a-z]?\]",
-                                 audyt.read_text(encoding="utf-8", errors="replace")))) \
-        if audyt.exists() else 0
+    # Warstwy liczy `_warstwy_audytu()` — po ZNACZNIKACH `[W..]`, nie po nazwach funkcji
+    # (zmierzone: `def _warstwa_\d+` daje 15 przy realnych 24, bo część warstw żyje
+    # w helperach). Wspólna funkcja, bo o tę samą liczbę pytają też HARNESS i NEURO-SYM.
+    warstwy = _warstwy_audytu()
 
     razem = otw + dom
     domkniecie = round(100 * dom / razem, 1) if razem else None
@@ -295,11 +420,150 @@ def zmierz_graph() -> Dict[str, Any]:
     }
 
 
+# ── PIĘTRO 4: HARNESS — czy reguła ma EGZEKUTORA, nie tylko zapis ───────────────
+# DLACZEGO DOPISANE 2026-08-06 (rozkaz Cezara: „chciałbym, żeby pokazywał wszystkie etapy,
+# nie tylko trzy"): ROADMAP przy CORONIE D notował od 2026-08-03, że MATURITAS mierzy
+# **3 z 9** pięter, a DWA spoza trójki **JUŻ STOJĄ i nie są liczone** — HARNESS i
+# NEURO-SYMBOLIC — więc „prawdopodobnie ZANIŻAMY własny stan". Miernik, który pomija
+# zbudowane piętra, myli się w drugą stronę niż laurka, ale myli się tak samo.
+#
+# CZEMU AKURAT TE DWA, A NIE POZOSTAŁE CZTERY: te dwa mierzą rzeczy NASZE i policzalne
+# z kodu (hooki, workflow, warstwy audytu). Pozostałe znamy z materiału zewnętrznego,
+# którego NIE OSĄDZILIŚMY — a miernik zbudowany na cudzej, nieosądzonej taksonomii byłby
+# dokładnie tą wadą, którą ma wykrywać (warunek uczciwości zapisany przy CORONIE D).
+
+def zmierz_harness() -> Dict[str, Any]:
+    """Czy reguły Imperium mają EGZEKUTORA — i czy ten egzekutor żyje poza maszyną Architekta.
+
+    Rozróżnia cztery rzeczy, które łatwo pomylić: reguła ZAPISANA / obserwowana /
+    ZAPOBIEGAJĄCA / egzekwowana POZA maszyną autora. Dowód, że to rozróżnienie jest realne:
+    kontrakt append-only był deklarowany w sześciu organach i egzekwowany przez ZERO,
+    a Prawo XXI miało 24 warstwy i zero egzekutorów poza terminalem Architekta aż do VALLUM.
+    """
+    zdarzenia: Dict[str, int] = {}
+    ustawienia = KORZEN / ".claude" / "settings.json"
+    try:
+        dane = json.loads(ustawienia.read_text(encoding="utf-8", errors="replace"))
+        for zdarzenie, wpisy in (dane.get("hooks") or {}).items():
+            zdarzenia[zdarzenie] = len(wpisy) if isinstance(wpisy, list) else 1
+    except Exception:  # noqa: BLE001
+        pass                       # brak/zepsuty plik = pusto, nie zgadujemy (Prawo I)
+
+    # Egzekutor POZA maszyną: workflow, który realnie woła bramkę Imperium. Sama obecność
+    # pliku .yml nie wystarcza — CI drukujące „hello" byłoby tapetą (warunek Cezara).
+    workflows = sorted((KORZEN / ".github" / "workflows").glob("*.yml")) \
+        if (KORZEN / ".github" / "workflows").exists() else []
+    wolajace_bramke = [w.name for w in workflows
+                       if "run_tests.py" in w.read_text(encoding="utf-8", errors="replace")]
+
+    warstwy = _warstwy_audytu()
+    zapobiegawcze = zdarzenia.get("PreToolUse", 0)
+
+    wskazniki = {
+        "hooki_zdarzenia": zdarzenia or NIEZNANE,
+        "hooki_razem": sum(zdarzenia.values()) if zdarzenia else 0,
+        "zapobiegawcze_PreToolUse": zapobiegawcze,
+        "warstwy_audytu": warstwy,
+        "workflow_poza_maszyna": [w.name for w in workflows] or "BRAK",
+        "workflow_wolajace_bramke": wolajace_bramke or "BRAK",
+    }
+    poziom = _poziom([
+        bool(zdarzenia),                 # 1 — jakikolwiek automat w ogóle istnieje
+        len(zdarzenia) >= 3,             # 2 — obejmuje wiele zdarzeń, nie tylko start sesji
+        zapobiegawcze > 0,               # 3 — ODMAWIA przed szkodą, nie raportuje po niej
+        bool(wolajace_bramke),           # 4 — egzekutor poza maszyną Architekta (VALLUM)
+    ])
+    wask = ""
+    if not zdarzenia:
+        wask = "ZERO hooków — każda reguła zależy od pamięci Architekta"
+    elif not zapobiegawcze:
+        wask = ("hooki tylko RAPORTUJĄ — nic nie odmawia przed szkodą "
+                "(VINDEX wykrywa po fakcie, SILENTIUM zapobiega)")
+    elif not wolajace_bramke:
+        wask = ("bramka działa wyłącznie na maszynie Architekta — brak egzekutora w CI, "
+                "więc commit z innego urządzenia albo przerwana sesja omija Prawo XXI")
+    return {
+        "pietro": "HARNESS", "poziom": poziom, "nazwa": POZIOMY[poziom],
+        "wskazniki": wskazniki, "wask": wask,
+        "organy": organy_pietra("HARNESS"),
+        "antywskaznik": "poziom rośnie od DODAWANIA hooków, a hook, który nigdy nie odmówił, "
+                        "jest nieodróżnialny od braku hooka. Rozstrzyga próg 3 (zapobiega) "
+                        "i 4 (poza maszyną) — liczba hooków mierzy nakład, nie ochronę",
+    }
+
+
+# ── PIĘTRO 5: NEURO-SYMBOLIC — twarda reguła nad miękkim wyjściem ───────────────
+
+def zmierz_neuro_symbolic() -> Dict[str, Any]:
+    """Czy wyjście LLM-a (moje) jest sprawdzane REGUŁĄ DETERMINISTYCZNĄ, a nie drugim LLM-em.
+
+    To jest piętro, na którym Imperium stoi wysoko od dawna, nigdy tego nie licząc:
+    audyt spójności, INDEX FALSORUM i VINDEX to weryfikacja symboliczna wbudowana
+    w architekturę, nie recenzja post-hoc. Zmierzony powód, dla którego to piętro ma
+    znaczenie: DeepSeek halucynował w 94–96 % odpowiedzi z pamięci, a recenzent zewnętrzny
+    cytował NIEISTNIEJĄCE reguły — obu złapały reguły twarde, nie drugi model.
+    """
+    warstwy = _warstwy_audytu()
+    falsa = DANE / "index_falsorum.jsonl"
+    ile_falsa = len(_jsonl("index_falsorum.jsonl")) if falsa.exists() else 0
+    ksiega = len(_jsonl("ksiega_wad_kodu.jsonl"))
+
+    # Czy weryfikacja UMIE ZATRZYMAĆ, czy tylko opisuje: bramka musi mieć kod wyjścia.
+    audyt = KORZEN / "narzedzia" / "audyt_spojnosci.py"
+    ma_exit = "sys.exit" in audyt.read_text(encoding="utf-8", errors="replace") \
+        if audyt.exists() else False
+    # Czy stoi PRZED zapisem (PreToolUse), czy dopiero po nim.
+    przed_zapisem = []
+    ustawienia = KORZEN / ".claude" / "settings.json"
+    try:
+        dane = json.loads(ustawienia.read_text(encoding="utf-8", errors="replace"))
+        przed_zapisem = [h for h in (dane.get("hooks") or {}).get("PreToolUse", [])]
+    except Exception:  # noqa: BLE001
+        pass
+
+    wskazniki = {
+        "warstwy_regul": warstwy,
+        "obalone_twierdzenia_pod_straza": ile_falsa,
+        "klasy_wad_w_ksiedze": ksiega,
+        "bramka_ma_kod_wyjscia": ma_exit,
+        "weryfikacja_przed_zapisem": len(przed_zapisem),
+    }
+    poziom = _poziom([
+        warstwy > 0,                     # 1 — istnieje jakakolwiek reguła twarda
+        warstwy >= 10,                   # 2 — reguły pokrywają wiele wymiarów
+        bool(ma_exit),                   # 3 — reguła UMIE ZATRZYMAĆ, nie tylko opisać
+        bool(przed_zapisem),             # 4 — sprawdza PRZED zapisem, nie po szkodzie
+    ])
+    wask = ""
+    if not warstwy:
+        wask = "brak reguł deterministycznych — wyjście modelu nikt nie sprawdza twardo"
+    elif not ma_exit:
+        wask = "weryfikacja RAPORTUJE, ale nie zatrzymuje — cisza udająca zgodę"
+    elif not przed_zapisem:
+        wask = "weryfikacja działa PO fakcie — szkoda powstaje, zanim reguła się odezwie"
+    return {
+        "pietro": "NEURO-SYM", "poziom": poziom, "nazwa": POZIOMY[poziom],
+        "wskazniki": wskazniki, "wask": wask,
+        "organy": organy_pietra("NEURO-SYM"),
+        "antywskaznik": "poziom rośnie od DOPISYWANIA warstw audytu, a warstwa o wąskim "
+                        "zasięgu daje fałszywy spokój (zmierzone: W11 pilnowała 1 katalogu "
+                        "z 11). Liczba warstw mierzy nakład, nie pokrycie",
+    }
+
+
 def zmierz() -> Dict[str, Any]:
-    pietra = [zmierz_prompt(), zmierz_loop(), zmierz_graph()]
+    pietra = [zmierz_prompt(), zmierz_loop(), zmierz_graph(),
+              zmierz_harness(), zmierz_neuro_symbolic()]
+    for p in pietra:
+        p.setdefault("organy", organy_pietra(p["pietro"]))
+        p["luka_w_planie"] = luka_w_planie(p["wask"]) if p["wask"] else ""
     return {"pietra": pietra,
             "wask_gardla": [p["wask"] for p in pietra if p["wask"]],
-            "poziomy": {p["pietro"]: p["poziom"] for p in pietra}}
+            "poziomy": {p["pietro"]: p["poziom"] for p in pietra},
+            "mierzone_pieter": len(pietra), "znane_pieter": PIETER_ZNANYCH,
+            "niemierzone": list(PIETRA_NIEMIERZONE),
+            "kandydaci": list(KANDYDACI_NA_PIETRA),
+            "taksonomia": TAKSONOMIA_ZRODLO}
 
 
 # ── MIGAWKI — bo „IQ 137" bez historii jest fikcją (zasada 3 projektu INGENIUM) ──
@@ -347,16 +611,29 @@ def delta(w: Optional[Dict[str, Any]] = None, sciezka: Path = MIGAWKI) -> Dict[s
 
 def raport(w: Optional[Dict[str, Any]] = None) -> str:
     w = w or zmierz()
-    linie = ["📐 MATURITAS — piętro inżynierii Imperium (lustro, nie kierownica):"]
+    linie = [f"📐 MATURITAS — piętra inżynierii Imperium (lustro, nie kierownica) — "
+             f"mierzone {w['mierzone_pieter']} z {w['znane_pieter']} znanych:"]
     for p in w["pietra"]:
         pasek = "█" * p["poziom"] + "·" * (4 - p["poziom"])
-        linie.append(f"   {p['pietro']:<6} [{pasek}] {p['poziom']}/4 {p['nazwa']}")
+        linie.append(f"   {p['pietro']:<9} [{pasek}] {p['poziom']}/4 {p['nazwa']}")
         for k, v in p["wskazniki"].items():
             linie.append(f"      · {k}: {v}")
+        org = p.get("organy") or {}
+        if org.get("zywe"):
+            linie.append(f"      🏛️ organy ({len(org['zywe'])}): {', '.join(org['zywe'])}")
+        if org.get("widma"):
+            linie.append(f"      🚨 ORGANY-WIDMA (w mapie, brak na dysku): "
+                         f"{', '.join(org['widma'])}")
         if p["wask"]:
             linie.append(f"      ⚠️ WĄSKIE GARDŁO: {p['wask']}")
+            if p.get("luka_w_planie"):
+                linie.append(f"      📋 dopełnienie: {p['luka_w_planie']}")
     if not w["wask_gardla"]:
         linie.append("   ✅ żadne piętro nie zgłasza wąskiego gardła")
+    if w.get("niemierzone"):
+        linie.append(f"   ❔ NIEMIERZONE ({len(w['niemierzone'])} z {w['znane_pieter']}) — "
+                     "taksonomia z materiału, którego NIE OSĄDZILIŚMY (warunek CORONY D):")
+        linie += [f"      · {n}" for n in w["niemierzone"]]
     linie.append("   ℹ️ Goodhart: ten wynik NIE steruje decyzją handlową ani wagami. "
                  "Podnosi się go wyłącznie naprawą tego, co mierzy (`--antywskazniki`).")
     return "\n".join(linie)
@@ -383,7 +660,14 @@ if __name__ == "__main__":
         if d.get("powod"):
             print(f"   ℹ️ {d['powod']}")
         for p, z in (d.get("zmiany_poziomow") or {}).items():
-            print(f"   {'📈' if z > 0 else '📉'} {p}: {d['poprzednie'][p]} → {d['obecne'][p]}")
+            # `.get` z NIEZNANE, bo piętro DOPISANE po ostatniej migawce nie ma historii —
+            # i to nie jest awaria, tylko normalny stan po rozszerzeniu miernika. Pierwsza
+            # wersja czytała `d['poprzednie'][p]` wprost i wywaliła się `KeyError: 'HARNESS'`
+            # w tej samej minucie, w której dopisałem HARNESS i NEURO-SYM (2026-08-07).
+            # Klasa: miernik, który rozszerzenie własnego zasięgu traktuje jak błąd danych.
+            skad = d["poprzednie"].get(p, NIEZNANE)
+            strzalka = "🆕" if skad == NIEZNANE else ("📈" if z > 0 else "📉")
+            print(f"   {strzalka} {p}: {skad} → {d['obecne'][p]}")
         if d["stan"] == "bez zmian":
             print(f"   poziomy: {d['obecne']}")
         sys.exit(0)

@@ -1,10 +1,10 @@
 ---
 
-## Ostatnia aktualizacja: 2026-08-05
+## Ostatnia aktualizacja: 2026-08-09
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
-stan_na: 2026-08-05
+stan_na: 2026-08-09
 powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360)"
 ---
 # PAMIĘĆ SESJI — W-360
@@ -113,26 +113,32 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 
 ## 📚 LEKCJE Z SESJI
 
-### 2026-07-27 — Lokalny dysk zawiera pełne dane: kod, 69 książek i RAG cache
-Sesja na /c/Projekty/imperial-mesh-vortex (Windows, git user Pixel) ma pełny dostęp: kod imperium, bibliotheca_ulpia 69/69 (559MB, poza git) i tekst_cache 69 plików (59MB, w git). To odblokowuje ciężkie zadania wymagające książek/danych, niemożliwe na chmurze.
+### 2026-08-09 — Testy PROBATORA są w pytest, nie unittest
+Sonda unittest znalazła 0 testów, bo organ używa funkcji modułowych + parametrize. Po odpaleniu pytest: 14/14 zielonych. Wada sondy, nie kodu; runner Imperium zbiera te pliki auto-discovery.
+
+### 2026-08-09 — Wachta może zostać ucięta przed commitem
+Limit uciął poprzednią wachtę: hook końca sesji zdążył, Architekt nie; 3 ostatnie commity to tylko auto:sync, cała merytoryka (PROBATOR + 18 plików) wisiała niezacommitowana. Automatyczny sync nie zastępuje domknięcia.
+
+### 2026-08-09 — Fałszywy wpis LOOP 3→2 w LOG_ZMIAN
+Wpis chwalący PROBATORA głosił spadek LOOP 3→2, a LOOP nigdy nie był 2 (migawki 08-06/08-07/08-08: zawsze 3). Faktycznie spadł wskaźnik domknięcia 14.5→14.2. Wada klasy, którą PROBATOR ma łapać — wykryta przed commitem, wymaga erraty.
+
+### 2026-08-09 — PROBATOR MENSURAE — organ kontroli dowodów działa
+Nowy organ (probator_mensurae.py + test_probator_mensurae.py) sprawdza, czy liczba podana jako dowód umie zareagować na to, czemu ją przypisano; wołacz w maturitas.delta; 14/14 testów zielonych, kalibracja 2/2, DESCRIPTIO --bramka exit 0. CORONA za N-782f3360, dług honorowy BRAK.
+
+### 2026-08-08 — SILENTIUM blokuje zapis podczas biegu testów
+Strażnik ciszy zablokował zapis w trakcie testów — to zamierzone działanie. Nie należy omijać blokady; poczekać na wynik testów.
+
+### 2026-08-08 — Skaner wad ma 17 wzorców na 158 klas i myli się
+Zmierzone: skaner wad pokrywa 17 wzorców / 158 klas; 141 klas pilnuje wyłącznie pamięć. Własny skaner skłamał 5 razy na 5 — kalibracja obowiązkowa przed zaufaniem wynikom.
+
+### 2026-08-08 — Audyt W15 samonapędza się przez pliki kroniki
+Każda sesja tworzy nowy plik kroniki, więc liczba sesje_kroniki rośnie sama (165→166→168 w jednym otwarciu). Bez odświeżania audyt będzie czerwony na każdym otwarciu i uczy ignorować W15 — ta sama klasa co M5.
+
+### 2026-08-06 — GRAPH: kto_przy_decyzji=NIKT — graf pamięta, nie wybiera
+Graf poprawia pamięć, nie wybór. Znane wąskie gardło nierozstrzygnięte.
 
 ### 2026-08-05 — Konstytucja ma 25 praw, nie 21 — błąd audytu zewnętrznego
 Audyt Kimi 3 cytował 21 praw; żywa konstytucja (CLAUDE.md) zawiera 25. Cytaty z reguł trzeba sprawdzać grepem wobec aktualnego źródła, nie wobec pamięci ani cudzych odwołań.
-
-### 2026-08-05 — scheduler.py ma zero wołaczy — martwy moduł
-Weryfikacja grepem: scheduler.py nie jest wołany z żadnego miejsca w kodzie. Martwy moduł potwierdzony — kandydat do usunięcia lub reaktywacji w ramach M1 (40 martwych organów).
-
-### 2026-08-05 — Pusty cytat web_search w audycie — weryfikacja niezależna
-Linia 328 audytu zawierała nierozwinięty znacznik article🛠web_search:16#9; teza 'Kimi K3 działa w Claude Code' stała na pustym cytacie. Niezależna weryfikacja w sieci potwierdziła tezę — pusty cytat to brak dowodu, nie fałsz.
-
-### 2026-08-05 — Audyt zewnętrzny Kimi 3 nie czytał kodu — 3 pliki .py vs 467
-Metaprompt Kimi 3 mówi o 467 plikach Pythona, a sam audyt mapuje repo jako 3 pliki i deklaruje: 'Treść plików .py niedostępna'. Audyt bez dostępu do kodu nie może być podstawą zmian — weryfikuj mapowanie repo przed analizą.
-
-### 2026-08-05 — Liczby w dokumentach muszą być synchronizowane z kodem (audyt W15)
-Złamanie Prawa XXI (W15): docs miały 158 sesji_kroniki, kod 159. Narzędzie tabularium.py liczby --zapisz synchronizuje dokumenty z żywym kodem. Po każdej zmianie liczebności trzeba uruchamiać audyt.
-
-### 2026-08-05 — Dashboard w audycie to synteza, nie pomiar
-Obraz pokazuje XAUUSD (my handlujemy krypto), cenę 1180→2400 w 10 świec i idealną sinusoidę RSI — nie stanowi dowodu empirycznego.
 
 ### 2026-07-29 — Bug: len(doc) po doc.close() w FABER
 Własny kod FABERA wołał len(doc) po zamknięciu dokumentu — realny bug wykryty i naprawiony; dowód przez mutację potwierdził czułość testów.
@@ -199,9 +205,6 @@ W FTS bibliotekarza bug crash na myślnikach powodował ciche giniecie tematów 
 
 ### 2026-07-27 — 43 cząstki Hyginusa bez sędziego (zapłacony zwiad niewykorzystany)
 Kolejka Hyginusa zawiera 43 cząstki czekające na sąd (poprzednio 33). To zapłacony, ale niewykorzystany zwiad, co narusza Prawo XV. Priorytet najniższy (ostatnie w kolejce).
-
-### 2026-07-29 — Wrażliwość interwału na wielkość liter zmienia decyzje
-Etykieta interwału (np. '4h' vs '4H') jest case-sensitive w Legatus._formacja_interwalu - cicho zmienia wyniki backtestu. Przyczyna: słownik mapujący interwały. Naprawiono przez dodanie aliasów i normalizację.
 
 ### 2026-07-27 — Backtest liniowy O(n·okno), nie O(n²)
 Pomiar cProfile wykazał stały ~66 ms/tick dla okna 251 barów. Skalowanie liniowe, nie kwadratowe. Poprzednia diagnoza o O(n²) była błędna.

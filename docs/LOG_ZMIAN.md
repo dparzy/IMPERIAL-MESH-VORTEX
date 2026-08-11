@@ -4,7 +4,7 @@ typ: acta
 powod_acta: "Dziennik akumulujący — każdy wpis jest datowaną prawdą swojego czasu. Wpisów NIE aktualizujemy wstecz (ROZKAZ STAŁY, Prawo I: nie falsyfikujemy historii). Dokument jest żywy jako CAŁOŚĆ, ale jego treść to wyłącznie historia."
 wlasciciel: —
 bez_wlasciciela: "dziennik CALEGO Imperium — historia nie nalezy do zadnego organu"
-stan_na: 2026-08-06
+stan_na: 2026-08-07
 powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ STAŁY). Wpisy datowane = prawda swojego czasu, nie aktualizujemy wstecz"
 ---
 # 📜 LOG ZMIAN IMPERIUM — Żywa Pamięć Projektu
@@ -12,6 +12,135 @@ powod_istnienia: "Żywa pamięć projektu: chronologia KAŻDEJ zmiany (ROZKAZ ST
 > **Zasada (ROZKAZ STAŁY):** Po KAŻDEJ zmianie systemu, kodu, dokumentacji — wpis do tego logu.
 > Format: Data | Typ | Opis | Powód | Pliki. Najnowsze wpisy na górze.
 > Ten plik jest źródłem prawdy historii Imperium. Bez niego decyzje giną.
+
+---
+
+## 2026-08-07 | 🔧 | Pięć wad z recenzji adversarialnej — jedna okazała się szersza, jedna wróciła po raz trzeci
+
+**Rozkaz Cezara (2026-08-06):** *„zapamiętaj te błędy po code review, będziemy od nich zaczynać
+nową sesję"*. Pozycja W1 kolejki. Wszystkie pięć wad było MOICH i wszystkie mieszczą się w jednej
+klasie: **brak danych udający sukces** — popełnionej w organie zbudowanym do jej tępienia.
+
+### Dowód, że żadna z naszych trzech bramek nie mogła ich złapać
+Rano, z całą piątką w kodzie: `ruff` czysto, audyt spójności **exit 0 („pełna harmonia")**, testy
+**3570/3570**. VALLUM też nie pomógł — ma **dokładnie te same trzy nogi** (ruff → audyt → testy),
+więc jego wartością jest czyste środowisko na dwóch wersjach Pythona, nie druga para oczu.
+Te wady to **kod, który istnieje i nic nie robi**; nasze strażniki pytają o OBECNOŚĆ, nie o SKUTEK.
+
+### P1 — pomiar przed naprawą pokazał, że wada jest SZERSZA niż zgłoszenie
+Recenzja wskazała `ocen_historie` (miernik). Pomiar znalazł ten sam ślepy punkt w `ocen_pokrycie`,
+czyli **w ścieżce bramkowej `/limes`**: szkic recenzji (`submitted_at = null`, stan PENDING) stojący
+na HEADzie zwracał `status=pokryte, exit 0`. **Rozpoczęcie pisania recenzji zwalniało bramkę
+mocniej niż jej złożenie.** Naprawione w obu miejscach; przy okazji domknięty sąsiedni wariant —
+nieparsowalny znacznik czasu też dawał `None`, które `or 0` zamieniało w „zdążył".
+
+### Pozostałe cztery
+- **P2** `recognitor.py` — docstring głosił „13 ze 141 (9,2%)", kod zwracał 10 (7,1%). Liczba nosi
+  teraz DATĘ i KOMENDĘ: twierdzenie o przeszłym pomiarze nie gnije, twierdzenie o stanie gnije zawsze.
+  Obalonej liczby **nie skasowano** — stoi jako zapis błędu, a test pilnuje, że leży PO zdaniu,
+  które ją unieważnia (kontekst, nie token — ta sama różnica, na której potyka się dziś INDEX FALSORUM).
+- **P2** `sigillarium.py` — `sekcja_komend` bez `kroki_komend` dawało **cichy nadzór**: obie funkcje
+  strażnika zwracały pustą listę, zero alarmów, zielone testy. `__post_init__` rzuca teraz wyjątkiem:
+  stan półskonfigurowany **przestał być możliwy**, zamiast być wykrywanym po fakcie.
+- **P3** `historia --bramka` kończyło `sys.exit(0)` przed odczytem flagi — przyjmowana i ignorowana.
+  Teraz **odmawia głośno** (`parser.error`, exit 2 — zmierzone). Świadoma decyzja musi odmawiać, nie milczeć.
+- **P3** dwie miary obok siebie (32,6% vs 7,1%) bez zadeklarowanego zwycięzcy. `miara_glowna` jest
+  teraz DANĄ, nagłówek raportu ją CZYTA, a test pilnuje relacji łagodna ≥ surowa.
+
+### 🚨 Przy okazji: klasa, która ugryzła TRZECI raz — zamknięta mechanizmem
+`KsiegaWadKodu.dodaj_checklist()` mutowała wyłącznie pamięć i zwracała `True`. Mój zapis 5 klas
+**nie trafił na dysk** — wykryty tylko dlatego, że policzyłem rekordy Z DYSKU zamiast uwierzyć
+własnemu wydrukowi. Ta pułapka jest opisana od **2026-07-20** („mój własny wpis przepadł"),
+powtórzona **2026-08-05** (zapis deklarowany w Dzienniku nigdy nie nastąpił) i dziś po raz trzeci.
+Trzy zapisane lekcje o tej samej pułapce znaczą, że **lekcja nie jest lekarstwem** — więc `dodaj()`
+i `dodaj_checklist()` mają teraz `utrwal=True` domyślnie (`utrwal=False` zostaje na batch i testy).
+Księga: **170 → 175** wpisów, 5 nowych klas semantycznych (`niewiedza`, `cichy_nadzor`,
+`cicha_flaga`, `miara_glowna`, `liczba_w_docstringu`).
+
+### 🧱 Werdykt wału przeniesiony na OTWARCIE — bo na domknięciu nie miał czytelnika
+Pytanie Cezara: *„czy VALLUM zawsze jest odpalany po komendzie zamykania sesji"*. **Odpowiedź
+zmierzona z `ci.yml`: NIE i nie może być.** Wał wyzwalają wyłącznie zdarzenia GitHuba
+(`push` / `pull_request` / `workflow_dispatch`), a pushuje Cezar RĘCZNIE — więc bieg startuje
+**PO** domknięciu wachty. Krok 8b clausury każe odczytać werdykt, ale czytelnikiem jest
+Architekt: **push po `/clear` dawał wynik, którego nie czytał nikt.** Do tego fraza `gh run list`
+występowała w całym Imperium **dokładnie raz** — w prozie CLAUDE.md, bez ani jednego wołacza
+(ta sama klasa co RECOGNITOR stojący w konstytucji poza bramką).
+
+**Naprawa (zgoda Cezara 2026-08-07):** odczyt przeniesiony na **otwarcie następnej wachty** —
+następna sesja zawsze istnieje, a bieg jest wtedy rozstrzygnięty. Blok 0.55 w
+`session-start.sh` drukuje jedną linię, odróżnia `cancelled` od `failure`, a brak `gh`/sieci
+melduje jako ❔ NIEZMIERZONE, nigdy ciszą. Krok **1b** w checkliście OTWARCIA czyni z tego
+rozkaz, nie ozdobę wydruku; test `test_werdykt_walu_ma_wolacza_I_rozkaz` pilnuje **obu stron**,
+bo każda z osobna już raz zawiodła. Zweryfikowane na żywo: `ZIELONY · 47bfef2`.
+**Koszt przyznany wprost:** CLAUDE.md 330 → 340 linii, czyli dług kontekstu (limit 200) urósł.
+Świadoma wymiana: rozkaz bez egzekutora kosztuje więcej niż dziesięć linii.
+
+**Testy:** 3570 → **3581** (+11: 8 regresji wad + 2 na autozapis Księgi + 1 kotwica wału), 0 oblanych. Każdy
+odtwarza stan SPRZED naprawy. Liczba policzona z biegu, nie z pamięci — pierwsza wersja tego
+zdania mówiła „+11" i była o jeden zawyżona, czyli dokładnie klasą `liczba_w_docstringu`
+skatalogowaną w tym samym commicie.
+**Pliki:** `imperium/pretorianie/recognitor.py`, `imperium/biblioteki/sigillarium.py`,
+`imperium/biblioteki/ksiega_wad_kodu.py`, `tests/test_recognitor.py`, `tests/test_sigillarium.py`,
+`tests/test_ksiega_wad_kodu.py`, `docs/ROADMAP_IMPERIUM.md`, `bibliotheca_ulpia/dane/ksiega_wad_kodu.jsonl`
+
+---
+
+## 2026-08-07 | 📐 | MATURITAS mierzy 5 pięter, nie 3 — a liczba „9" okazała się halucynacją
+
+**Rozkaz Cezara:** *„chciałbym, żeby pokazywał wszystkie etapy ewolucji, o których mówiliśmy,
+nie tylko trzy — i bardziej szczegółowo: jakie organy są wiązane w danym etapie, gdzie jest
+brakująca opcja dopełnienia i czy mamy już opcję jej dopełnienia w ROADMAP"*. Zaraz potem sam
+zauważył: *„już chyba ten pomysł był"* — **i miał rację**: to CORONA D (CURSUS ARTIS), stojąca
+w ROADMAP od 2026-08-03.
+
+### Zaniżanie POTWIERDZONE i usunięte
+ROADMAP notował, że MATURITAS mierzy **3 z 9**, a HARNESS i NEURO-SYMBOLIC „już stoją i nie są
+liczone". Zmierzone po dopisaniu: **HARNESS 4/4** (6 wpisów hooków na 5 zdarzeniach, PreToolUse
+zapobiega, VALLUM egzekwuje poza maszyną) i **NEURO-SYM 4/4** (24 warstwy, 20 obalonych
+twierdzeń pod strażą, bramka z kodem wyjścia, weryfikacja przed zapisem). Zaniżaliśmy o dwa
+piętra, oba na maksimum.
+
+### 🪞 Zwiad obalił fundament liczby — na rozkaz Cezara
+Cezar kazał sprawdzić subagentem patent i taksonomię. **FRUMENTARIUS obalił oba twierdzenia:**
+- **`US20230000000A1` NIE ISTNIEJE** — Google Patents 404; numeracja publikacji USA startuje
+  od `0000001`, więc numer z samych zer jest **strukturalnie niemożliwy**. Kontrola pozytywna
+  na sąsiednim `US20230010000A1` zwróciła pełny rekord — 404 jest realny, nie awarią narzędzia.
+- **„9 pięter inżynierii AI" nie ma pokrycia w źródłach.** Realne taksonomie liczą 5
+  (Prompt/Context/Harness/Loop/Graph — Rastogi, arXiv 2606.28270), 6, 7 albo 8 pozycji. Jedyna
+  znaleziona „dziewiątka" to oś **filozoficzna** Twemlowa (ANI→AGI→ASI→„AI as God") — inna oś
+  niż warstwy inżynierii. Nasza dziewiątka była **sklejką dwóch taksonomii**.
+
+Oba trafiły do **INDEX FALSORUM (18→20)**, frazą kodującą twierdzenie, nie token. Zasięg
+miernika liczy się odtąd od taksonomii **potwierdzonej**: `5 z 6`, nie `3 z 9`. Brakuje nam
+jednego piętra z potwierdzonej piątki — **CONTEXT** (arXiv 2507.13334). Sześciu kandydatów
+spoza tej osi czeka w `KANDYDACI_NA_PIETRA` i **nie awansuje sam**.
+
+### Trzy pytania Cezara dostały odpowiedź w wydruku
+`organy_pietra()` pokazuje organy wiązane z każdym piętrem — **weryfikując ścieżki na dysku**,
+bo lista wpisana ręcznie i niesprawdzana byłaby API-widmem (Warstwa 16) w organie mierzącym
+dojrzałość. `luka_w_planie()` mówi, czy wąskie gardło ma pozycję w ROADMAP.
+
+### 🚨 Ta sama klasa złapana TRZECI raz jednego dnia
+Pierwsza wersja `luka_w_planie` liczyła każde słowo dłuższe niż 5 znaków — więc „decyzji",
+„roadmap" i „kontekstu" dawały trafienie ZAWSZE (ROADMAP jest o decyzjach). Wszystkie trzy
+wąskie gardła dostały ✅ „mamy to w planie", choć funkcja nie sprawdziła niczego. Naprawa:
+próg rzadkości (`PROG_RZADKOSCI = 5`) dobrany **pomiarem** — „decyzji" 20×, „roadmap" 13×,
+„kontekstu" 10×, „czytany" 7×. Werdykt nazwany **WSKAZÓWKĄ, nie dowodem**.
+Do progu wpisałem najpierw liczby **z głowy** (27×/58×/12×) i pomiar obalił je w tej samej
+minucie — trzecie wystąpienie klasy „liczba w prozie, której nikt nie policzył" (docstring
+RECOGNITORA, errata w Dzienniku, ten komentarz). **Warstwa 23 łapie to w `.md`, ale NIE
+w komentarzach `.py`** — luka odnotowana, niezałatana.
+
+### VALLUM dostał wołacza (pytanie Cezara: „czy jest wpięty, żeby o nim nie zapomnieć")
+Zmierzone: **zero wołaczy** — żaden hook ani krok nie pytał o werdykt wału; o anulowanym biegu
+dowiedziałem się tylko dlatego, że sprawdziłem ręcznie. Ta sama klasa co RECOGNITOR.
+Nowy **krok 8b clausury**: `gh run list --workflow=ci.yml` po pushu, z rozróżnieniem
+`cancelled` ≠ `failure`, oraz **rozkaz Cezara: merge do `main` dopiero po potwierdzeniu
+Architekta** — a Architekt potwierdza, gdy VALLUM zielony i recenzent dostał swoje okno.
+
+**Testy:** +11 (mutacja organu-widma, granica progu rzadkości, zapobieganie vs raportowanie,
+workflow niewołający bramki). **Pliki:** `imperium/oczy/maturitas.py`, `tests/test_maturitas.py`,
+`CLAUDE.md`, `docs/ROADMAP_IMPERIUM.md`, `bibliotheca_ulpia/dane/index_falsorum.jsonl`
 
 ---
 

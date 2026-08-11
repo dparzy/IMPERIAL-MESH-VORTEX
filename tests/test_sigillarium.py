@@ -408,9 +408,63 @@ def test_nadmiar_komend_w_pieczeci_jest_dozwolony():
     assert sg.komendy_konstytucji_poza_pieczecia("LIMES") == []
 
 
+def test_nadzor_pol_skonfigurowany_NIE_MA_PRAWA_POWSTAC():
+    """WADA 3 z własnej recenzji adversarialnej (2026-08-06 → naprawa 2026-08-07).
+
+    `sekcja_komend` bez `kroki_komend` (i odwrotnie) dawało CICHY NADZÓR: obie funkcje
+    strażnika zwracały pustą listę, raport nie drukował ani jednego alarmu, oba testy
+    świeciły zielono. Czyli strażnik zbudowany PRZECIWKO cichemu przeoczeniu dawał się
+    skonfigurować tak, by cicho przeoczyć — wada wracała pod przykrywką lekarstwa.
+
+    Naprawa jest KLASOWA, nie punktowa: stan półskonfigurowany nie jest wykrywany po
+    fakcie, tylko przestaje być możliwy do utworzenia."""
+    from dataclasses import replace
+
+    for pole, wartosc in (("kroki_komend", ()), ("sekcja_komend", "")):
+        try:
+            replace(sg.SIGLA["LIMES"], **{pole: wartosc})
+        except ValueError as e:
+            assert "PÓŁ-SKONFIGUROWANY" in str(e)
+        else:
+            raise AssertionError(f"pieczęć bez `{pole}` powstała po cichu — nadzór jest martwy")
+
+    # GRANICA: komplet i całkowity brak nadzoru są nadal legalne (większość sigli go nie ma).
+    assert replace(sg.SIGLA["LIMES"], sekcja_komend="", kroki_komend=()).kroki_komend == ()
+    for s in sg.wszystkie():
+        assert bool(s.sekcja_komend) == bool(s.kroki_komend), f"{s.nazwa}: nadzór półskonfigurowany"
+
+
 def test_komendy_w_tekscie_pomija_to_co_nie_jest_poleceniem():
     """Krok 3 cytuje w grzbietach także `/code-review` (skill harnessa) i
     `ksiega_wad_kodu` (nazwa ledgera) — żadne z nich nie jest komendą powłoki."""
     krok = ("3. `/code-review` na diffie + `python narzedzia/skan_wad_kodu.py` na "
             "zmienionych plikach. Nowe wady → Księga Wad (`ksiega_wad_kodu`).")
     assert sg._komendy_w_tekscie(krok) == ["python narzedzia/skan_wad_kodu.py"]
+
+
+def test_werdykt_walu_ma_wolacza_I_rozkaz(tmp_path):
+    """KOTWICA DWUSTRONNA: odczyt VALLUM musi stać JEDNOCZEŚNIE w hooku i w konstytucji.
+
+    Rozkaz Cezara 2026-08-07. Powód zmierzony tego samego dnia: VALLUM wyzwala WYŁĄCZNIE
+    zdarzenie GitHuba, a pushuje Cezar ręcznie — więc bieg startuje PO domknięciu wachty,
+    a krok 8b clausury odczyta go tylko wtedy, gdy sesja jeszcze żyje. Push po `/clear`
+    dawał werdykt, którego nie czytał NIKT. Fraza `gh run list` stała wtedy w całym Imperium
+    DOKŁADNIE RAZ — w prozie CLAUDE.md, bez ani jednego wołacza.
+
+    Test pilnuje OBU stron, bo każda z osobna już raz zawiodła:
+      • sam rozkaz w konstytucji = ósmy rozkaz bez egzekutora (klasa `komendy_konstytucji_poza_pieczecia`);
+      • sam wydruk w hooku = liczba na ekranie, której nikt nie ma obowiązku przeczytać.
+    """
+    hook = KORZEN / ".claude/hooks/session-start.sh"
+    assert hook.exists(), "hook startowy zniknął — wołacz werdyktu wału przepadł razem z nim"
+    tresc_hooka = hook.read_text(encoding="utf-8", errors="ignore")
+    assert "gh run list" in tresc_hooka, "hook nie woła wału — werdykt nie ma czytelnika"
+    assert "VALLUM" in tresc_hooka
+
+    kroki_otwarcia = sg.kroki_z_konstytucji("## 🌅 OTWARCIE SESJI")
+    assert kroki_otwarcia, "sekcja OTWARCIE zniknęła albo zmieniła format"
+    wal = [k for k in kroki_otwarcia if "VALLUM" in k]
+    assert wal, "konstytucja nie nakazuje czytać werdyktu wału — wydruk bez obowiązku"
+    # `cancelled` ≠ `failure` musi stać W ROZKAZIE, nie tylko w mojej pamięci: to ta
+    # rozróżnialność uratowała nas 2026-08-06, gdy anulowany bieg wyglądał jak porażka.
+    assert any("ANULOWANY" in k for k in wal), "rozkaz musi odróżniać anulowany od czerwonego"

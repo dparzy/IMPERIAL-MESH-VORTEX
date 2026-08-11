@@ -77,3 +77,16 @@ bibliotheca_ulpia/dane/breviarium_migawka.json
 bibliotheca_ulpia/dane/silentium.lock
 # Zamek `.mx` i pliki tymczasowe podmiany listy uczestników (cisza współdzielona, 08-03).
 bibliotheca_ulpia/dane/silentium.lock.*
+
+# Sekrety - NIGDY do repozytorium
+.env
+.env.*
+!.env.example
+
+# Ksiazki - tylko lokalnie, NIE do publicznego repo
+bibliotheca_ulpia/**/*.pdf
+bibliotheca_ulpia/**/*.epub
+bibliotheca_ulpia/**/*.djvu
+bibliotheca_ulpia/**/*.mobi
+bibliotheca_ulpia/**/*.azw3
+bibliotheca_ulpia/dane/tekst_cache/

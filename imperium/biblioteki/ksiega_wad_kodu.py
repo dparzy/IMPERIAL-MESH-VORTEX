@@ -316,12 +316,15 @@ class KsiegaWadKodu:
             for w in self.wpisy:
                 f.write(json.dumps(w, ensure_ascii=False) + "\n")
 
-    def dodaj(self, kat: str, regex: str, opis: str, lekcja: str, zrodlo: str = "") -> bool:
+    def dodaj(self, kat: str, regex: str, opis: str, lekcja: str, zrodlo: str = "",
+              *, utrwal: bool = True) -> bool:
         """Dodaje wzorzec. Odrzuca duplikat regex i błędny regex. Zwraca czy dodano.
 
         Gdy ten sam OPIS istnieje już jako pozycja checklisty (bez regexu) — AWANSUJE ją
         do wzorca zamiast dublować: klasa semantyczna zyskuje auto-skan w dniu, w którym
         zmierzymy jej szum. Bez tego księga trzymałaby dwa wpisy o tej samej wadzie.
+
+        `utrwal=True` (domyślnie) zapisuje NATYCHMIAST — uzasadnienie w `_utrwal`.
         """
         if not regex or not opis:
             raise ValueError("regex i opis są wymagane")
@@ -335,20 +338,51 @@ class KsiegaWadKodu:
         for i, w in enumerate(self.wpisy):
             if not w.get("regex") and w["opis"] == opis:
                 self.wpisy[i] = nowy      # awans checklisty → wzorzec
-                return True
+                return self._utrwal(utrwal)
         self.wpisy.append(nowy)
+        return self._utrwal(utrwal)
+
+    def _utrwal(self, utrwal: bool) -> bool:
+        """Zapisuje na dysk zaraz po dodaniu wpisu. Zwraca True (wpis dodany).
+
+        POWÓD — KLASA, KTÓRA UGRYZŁA TRZY RAZY (mechanizm z 2026-08-07):
+        `dodaj()` i `dodaj_checklist()` mutowały wyłącznie `self.wpisy` i zwracały True.
+        Wołający dostawał potwierdzenie „dodano", licznik w pamięci rósł, proces kończył
+        się — i wpis przepadał, bo nikt nie zawołał `zapisz()`. Metoda o nazwie „dodaj",
+        która niczego nie dodaje na trwałe, jest tą samą klasą, którą ta księga kataloguje:
+        czynność WYGLĄDAJĄCA na wykonaną.
+
+        Historia (dlatego mechanizm, a nie czwarta lekcja):
+          • 2026-07-20 — „mój własny wpis o wadzie przepadł i musiałem go zapisać drugi raz"
+            (zanotowane w `narzedzia/kapitol_podglad.py`);
+          • 2026-08-05 — zapis 5 klas deklarowany w Dzienniku NIGDY NIE NASTĄPIŁ (0 wpisów
+            z tą datą), wykryty dopiero przy okazji;
+          • 2026-08-07 — to samo przy zapisie klas z recenzji adversarialnej, złapane tylko
+            dlatego, że policzyłem rekordy Z DYSKU zamiast uwierzyć własnemu wydrukowi.
+        Trzy zapisane lekcje o tej samej pułapce znaczą, że lekcja nie jest lekarstwem.
+
+        `utrwal=False` zostaje świadomie — do batcha (`zapisz()` raz na końcu) i do testów
+        operujących na kopii w pamięci. Domyślna jest jednak droga BEZPIECZNA, bo to
+        pominięcie było kosztem cichym: nic nie krzyczało, licznik się zgadzał.
+        """
+        if utrwal:
+            self.zapisz()
         return True
 
-    def dodaj_checklist(self, kat: str, opis: str, lekcja: str, zrodlo: str = "") -> bool:
+    def dodaj_checklist(self, kat: str, opis: str, lekcja: str, zrodlo: str = "",
+                        *, utrwal: bool = True) -> bool:
         """Dodaje pozycję CHECKLISTY review (bez regexu — klasa semantyczna, nie auto-skan).
-        Dedup po opisie (brak regexu jako klucza). Zwraca czy dodano."""
+
+        Dedup po opisie (brak regexu jako klucza). Zwraca czy dodano.
+        `utrwal=True` (domyślnie) zapisuje NATYCHMIAST — uzasadnienie w `_utrwal`.
+        """
         if not opis or not lekcja:
             raise ValueError("opis i lekcja są wymagane")
         if any(not w.get("regex") and w["opis"] == opis for w in self.wpisy):
             return False
         self.wpisy.append({"kat": kat, "regex": "", "opis": opis,
                            "lekcja": lekcja, "zrodlo": zrodlo})
-        return True
+        return self._utrwal(utrwal)
 
     def skanuj(self, tekst: str) -> list[dict]:
         """Zwraca trafienia: {wpis, linia} — które znane wzorce REGEX pasują do kodu (nudge).

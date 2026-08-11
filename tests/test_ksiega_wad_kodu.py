@@ -253,3 +253,45 @@ def test_wzorzec_bezpiecznik_zyje_i_milczy(tmp_path):
     assert any(t["kat"] == "bezpiecznik" for t in k.skanuj(zly))
     assert not any(t["kat"] == "bezpiecznik" for t in k.skanuj(dobry))
     assert not any(t["kat"] == "bezpiecznik" for t in k.skanuj(mkdir)), "idiom mkdir to nie bramka"
+
+
+def test_dodaj_UTRWALA_od_razu_bez_osobnego_zapisz(tmp_path):
+    """KLASA, KTÓRA UGRYZŁA TRZY RAZY — mechanizm z 2026-08-07 zamiast czwartej lekcji.
+
+    `dodaj()` / `dodaj_checklist()` mutowały tylko `self.wpisy` i zwracały True. Wołający
+    dostawał „dodano", licznik w pamięci rósł, proces się kończył — i wpis przepadał.
+    Metoda o nazwie „dodaj", która nie dodaje na trwałe, to ta sama klasa, którą ta księga
+    kataloguje: czynność WYGLĄDAJĄCA na wykonaną.
+
+    Historia: 2026-07-20 (wpis przepadł, zapisany drugi raz) → 2026-08-05 (zapis 5 klas
+    deklarowany w Dzienniku nigdy nie nastąpił) → 2026-08-07 (to samo, złapane wyłącznie
+    przez policzenie rekordów Z DYSKU zamiast zaufania własnemu wydrukowi).
+
+    Test czyta z DYSKU przez NOWĄ instancję — sprawdzanie `k.wpisy` powtórzyłoby dokładnie
+    ten błąd, który tu naprawiamy (wiara w licznik w pamięci)."""
+    plik = tmp_path / "k.jsonl"
+    zasiej_startowe(plik)
+    k = KsiegaWadKodu(plik)
+    ile_przed = len(KsiegaWadKodu(plik).wszystkie())
+
+    assert k.dodaj_checklist("test", "Klasa semantyczna X", "Lekcja X", "test 2026-08-07")
+    assert k.dodaj("test", r"nigdy_taki_regex_xyz", "Wzorzec Y", "Lekcja Y", "test 2026-08-07")
+
+    z_dysku = KsiegaWadKodu(plik).wszystkie()
+    assert len(z_dysku) == ile_przed + 2, "wpis bez osobnego `zapisz()` MUSI być już na dysku"
+    assert any(w["opis"] == "Klasa semantyczna X" for w in z_dysku)
+    assert any(w["opis"] == "Wzorzec Y" for w in z_dysku)
+
+
+def test_utrwal_false_zostaje_swiadomym_wyjatkiem(tmp_path):
+    """GRANICA DRUGIEJ STRONY: batch (`zapisz()` raz na końcu) i testy w pamięci nadal
+    działają. Bez tego testu ktoś „naprawiłby" mechanizm, wymuszając zapis przy każdym
+    wpisie także tam, gdzie dodaje się ich setki — i zamienił jedną wadę na wolniejszą."""
+    plik = tmp_path / "k.jsonl"
+    zasiej_startowe(plik)
+    k = KsiegaWadKodu(plik)
+    ile_przed = len(KsiegaWadKodu(plik).wszystkie())
+    assert k.dodaj_checklist("test", "Tylko w pamięci", "Lekcja", utrwal=False)
+    assert len(KsiegaWadKodu(plik).wszystkie()) == ile_przed, "utrwal=False nie ma pisać"
+    k.zapisz()
+    assert len(KsiegaWadKodu(plik).wszystkie()) == ile_przed + 1, "jawny zapisz() ma domknąć batch"

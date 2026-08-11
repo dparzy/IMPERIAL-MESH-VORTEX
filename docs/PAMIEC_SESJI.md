@@ -1,10 +1,10 @@
 ---
 
-## Ostatnia aktualizacja: 2026-08-08
+## Ostatnia aktualizacja: 2026-08-09
 kategoria: TABULA
 typ: zywy
 wlasciciel: imperium/biblioteki/pamiec_sesji.py
-stan_na: 2026-08-08
+stan_na: 2026-08-09
 powod_istnienia: "Mapa podpięć 13 warstw pamięci + lekcje — ciągłość między sesjami (W-360)"
 ---
 # PAMIĘĆ SESJI — W-360
@@ -112,6 +112,18 @@ lub snapshotu sygnałów — nie zrównoleglenia pętli portfela.
 ---
 
 ## 📚 LEKCJE Z SESJI
+
+### 2026-08-09 — Testy PROBATORA są w pytest, nie unittest
+Sonda unittest znalazła 0 testów, bo organ używa funkcji modułowych + parametrize. Po odpaleniu pytest: 14/14 zielonych. Wada sondy, nie kodu; runner Imperium zbiera te pliki auto-discovery.
+
+### 2026-08-09 — Wachta może zostać ucięta przed commitem
+Limit uciął poprzednią wachtę: hook końca sesji zdążył, Architekt nie; 3 ostatnie commity to tylko auto:sync, cała merytoryka (PROBATOR + 18 plików) wisiała niezacommitowana. Automatyczny sync nie zastępuje domknięcia.
+
+### 2026-08-09 — Fałszywy wpis LOOP 3→2 w LOG_ZMIAN
+Wpis chwalący PROBATORA głosił spadek LOOP 3→2, a LOOP nigdy nie był 2 (migawki 08-06/08-07/08-08: zawsze 3). Faktycznie spadł wskaźnik domknięcia 14.5→14.2. Wada klasy, którą PROBATOR ma łapać — wykryta przed commitem, wymaga erraty.
+
+### 2026-08-09 — PROBATOR MENSURAE — organ kontroli dowodów działa
+Nowy organ (probator_mensurae.py + test_probator_mensurae.py) sprawdza, czy liczba podana jako dowód umie zareagować na to, czemu ją przypisano; wołacz w maturitas.delta; 14/14 testów zielonych, kalibracja 2/2, DESCRIPTIO --bramka exit 0. CORONA za N-782f3360, dług honorowy BRAK.
 
 ### 2026-08-08 — SILENTIUM blokuje zapis podczas biegu testów
 Strażnik ciszy zablokował zapis w trakcie testów — to zamierzone działanie. Nie należy omijać blokady; poczekać na wynik testów.
